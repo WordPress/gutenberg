@@ -24,12 +24,12 @@ const ModalExample = ( props ) => {
 
 	return (
 		<>
-			<Button isSecondary onClick={ openModal }>
+			<Button variant="secondary" onClick={ openModal }>
 				Open Modal
 			</Button>
 			{ isOpen && (
 				<Modal { ...props } onRequestClose={ closeModal }>
-					<Button isSecondary onClick={ closeModal }>
+					<Button variant="secondary" onClick={ closeModal }>
 						Close Modal
 					</Button>
 				</Modal>

@@ -150,7 +150,7 @@ class WP_REST_Widgets_Controller extends WP_REST_Controller {
 	 */
 	public function get_item( $request ) {
 		$widget_id  = $request['id'];
-		$sidebar_id = gutenberg_find_widgets_sidebar( $widget_id );
+		$sidebar_id = wp_find_widgets_sidebar( $widget_id );
 
 		if ( is_null( $sidebar_id ) ) {
 			return new WP_Error(
@@ -192,7 +192,7 @@ class WP_REST_Widgets_Controller extends WP_REST_Controller {
 			return $widget_id;
 		}
 
-		gutenberg_assign_widget_to_sidebar( $widget_id, $sidebar_id );
+		wp_assign_widget_to_sidebar( $widget_id, $sidebar_id );
 
 		$request['context'] = 'edit';
 
@@ -229,10 +229,10 @@ class WP_REST_Widgets_Controller extends WP_REST_Controller {
 	 */
 	public function update_item( $request ) {
 		$widget_id  = $request['id'];
-		$sidebar_id = gutenberg_find_widgets_sidebar( $widget_id );
+		$sidebar_id = wp_find_widgets_sidebar( $widget_id );
 
 		// Allow sidebar to be unset or missing when widget is not a WP_Widget.
-		$parsed_id     = gutenberg_parse_widget_id( $widget_id );
+		$parsed_id     = wp_parse_widget_id( $widget_id );
 		$widget_object = gutenberg_get_widget_object( $parsed_id['id_base'] );
 		if ( is_null( $sidebar_id ) && $widget_object ) {
 			return new WP_Error(
@@ -243,7 +243,6 @@ class WP_REST_Widgets_Controller extends WP_REST_Controller {
 		}
 
 		if (
-			$request->has_param( 'settings' ) || // Backwards compatibility. TODO: Remove.
 			$request->has_param( 'instance' ) ||
 			$request->has_param( 'form_data' )
 		) {
@@ -256,7 +255,7 @@ class WP_REST_Widgets_Controller extends WP_REST_Controller {
 		if ( $request->has_param( 'sidebar' ) ) {
 			if ( $sidebar_id !== $request['sidebar'] ) {
 				$sidebar_id = $request['sidebar'];
-				gutenberg_assign_widget_to_sidebar( $widget_id, $sidebar_id );
+				wp_assign_widget_to_sidebar( $widget_id, $sidebar_id );
 			}
 		}
 
@@ -282,12 +281,16 @@ class WP_REST_Widgets_Controller extends WP_REST_Controller {
 	 *
 	 * @since 5.6.0
 	 *
+	 * @global array $wp_registered_widget_updates The registered widget update functions.
+	 *
 	 * @param WP_REST_Request $request Full details about the request.
 	 * @return WP_REST_Response|WP_Error Response object on success, or WP_Error object on failure.
 	 */
 	public function delete_item( $request ) {
+		global $wp_registered_widget_updates;
+
 		$widget_id  = $request['id'];
-		$sidebar_id = gutenberg_find_widgets_sidebar( $widget_id );
+		$sidebar_id = wp_find_widgets_sidebar( $widget_id );
 
 		if ( is_null( $sidebar_id ) ) {
 			return new WP_Error(
@@ -300,17 +303,46 @@ class WP_REST_Widgets_Controller extends WP_REST_Controller {
 		$request['context'] = 'edit';
 
 		if ( $request['force'] ) {
-			$prepared = $this->prepare_item_for_response( compact( 'widget_id', 'sidebar_id' ), $request );
-			gutenberg_assign_widget_to_sidebar( $widget_id, '' );
-			$prepared->set_data(
+			$response = $this->prepare_item_for_response( compact( 'widget_id', 'sidebar_id' ), $request );
+
+			$parsed_id = wp_parse_widget_id( $widget_id );
+			$id_base   = $parsed_id['id_base'];
+
+			$original_post    = $_POST;
+			$original_request = $_REQUEST;
+
+			$_POST    = array(
+				'sidebar'         => $sidebar_id,
+				"widget-$id_base" => array(),
+				'the-widget-id'   => $widget_id,
+				'delete_widget'   => '1',
+			);
+			$_REQUEST = $_POST;
+
+			$callback = $wp_registered_widget_updates[ $id_base ]['callback'];
+			$params   = $wp_registered_widget_updates[ $id_base ]['params'];
+
+			if ( is_callable( $callback ) ) {
+				ob_start();
+				call_user_func_array( $callback, $params );
+				ob_end_clean();
+			}
+
+			$_POST    = $original_post;
+			$_REQUEST = $original_request;
+
+			wp_assign_widget_to_sidebar( $widget_id, '' );
+
+			$response->set_data(
 				array(
 					'deleted'  => true,
-					'previous' => $prepared->get_data(),
+					'previous' => $response->get_data(),
 				)
 			);
 		} else {
-			gutenberg_assign_widget_to_sidebar( $widget_id, 'wp_inactive_widgets' );
-			$prepared = $this->prepare_item_for_response(
+			wp_assign_widget_to_sidebar( $widget_id, 'wp_inactive_widgets' );
+
+			$response = $this->prepare_item_for_response(
 				array(
 					'sidebar_id' => 'wp_inactive_widgets',
 					'widget_id'  => $widget_id,
@@ -319,7 +351,7 @@ class WP_REST_Widgets_Controller extends WP_REST_Controller {
 			);
 		}
 
-		return $prepared;
+		return $response;
 	}
 
 	/**
@@ -360,7 +392,7 @@ class WP_REST_Widgets_Controller extends WP_REST_Controller {
 		if ( isset( $request['id'] ) ) {
 			// Saving an existing widget.
 			$id            = $request['id'];
-			$parsed_id     = gutenberg_parse_widget_id( $id );
+			$parsed_id     = wp_parse_widget_id( $id );
 			$id_base       = $parsed_id['id_base'];
 			$number        = isset( $parsed_id['number'] ) ? $parsed_id['number'] : null;
 			$widget_object = gutenberg_get_widget_object( $id_base );
@@ -386,18 +418,7 @@ class WP_REST_Widgets_Controller extends WP_REST_Controller {
 			);
 		}
 
-		if ( ! empty( $request['settings'] ) ) { // Backwards compatibility. TODO: Remove.
-			_deprecated_argument( 'settings', '10.2.0' );
-			if ( $widget_object ) {
-				$form_data = array(
-					"widget-$id_base" => array(
-						$number => $request['settings'],
-					),
-				);
-			} else {
-				$form_data = $request['settings'];
-			}
-		} elseif ( isset( $request['instance'] ) ) {
+		if ( isset( $request['instance'] ) ) {
 			if ( ! $widget_object ) {
 				return new WP_Error(
 					'rest_invalid_widget',
@@ -507,7 +528,7 @@ class WP_REST_Widgets_Controller extends WP_REST_Controller {
 		}
 
 		$widget    = $wp_registered_widgets[ $widget_id ];
-		$parsed_id = gutenberg_parse_widget_id( $widget_id );
+		$parsed_id = wp_parse_widget_id( $widget_id );
 		$fields    = $this->get_fields_for_response( $request );
 
 		$prepared = array(
@@ -523,11 +544,11 @@ class WP_REST_Widgets_Controller extends WP_REST_Controller {
 			rest_is_field_included( 'rendered', $fields ) &&
 			'wp_inactive_widgets' !== $sidebar_id
 		) {
-			$prepared['rendered'] = trim( gutenberg_render_widget( $widget_id, $sidebar_id ) );
+			$prepared['rendered'] = trim( wp_render_widget( $widget_id, $sidebar_id ) );
 		}
 
 		if ( rest_is_field_included( 'rendered_form', $fields ) ) {
-			$rendered_form = gutenberg_render_widget_control( $widget_id );
+			$rendered_form = wp_render_widget_control( $widget_id );
 			if ( ! is_null( $rendered_form ) ) {
 				$prepared['rendered_form'] = trim( $rendered_form );
 			}
@@ -537,26 +558,16 @@ class WP_REST_Widgets_Controller extends WP_REST_Controller {
 			$widget_object = gutenberg_get_widget_object( $parsed_id['id_base'] );
 			$instance      = gutenberg_get_widget_instance( $widget_id );
 
-			if ( $instance ) {
+			if ( ! is_null( $instance ) ) {
 				$serialized_instance             = serialize( $instance );
 				$prepared['instance']['encoded'] = base64_encode( $serialized_instance );
 				$prepared['instance']['hash']    = wp_hash( $serialized_instance );
 
 				if ( ! empty( $widget_object->show_instance_in_rest ) ) {
-					$prepared['instance']['raw'] = $instance;
+					// Use new stdClass so that JSON result is {} and not [].
+					$prepared['instance']['raw'] = empty( $instance ) ? new stdClass : $instance;
 				}
 			}
-		}
-
-		// Backwards compatibility. TODO: Remove.
-		$widget_object            = gutenberg_get_widget_object( $parsed_id['id_base'] );
-		$prepared['widget_class'] = $widget_object ? get_class( $widget_object ) : '';
-		$prepared['name']         = $widget['name'];
-		$prepared['description']  = ! empty( $widget['description'] ) ? $widget['description'] : '';
-		$prepared['number']       = $widget_object ? (int) $parsed_id['number'] : 0;
-		if ( rest_is_field_included( 'settings', $fields ) ) {
-			$instance             = gutenberg_get_widget_instance( $widget_id );
-			$prepared['settings'] = $instance ? $instance : array();
 		}
 
 		$context  = ! empty( $request['context'] ) ? $request['context'] : 'view';
@@ -675,6 +686,23 @@ class WP_REST_Widgets_Controller extends WP_REST_Controller {
 					'type'        => 'object',
 					'context'     => array( 'view', 'edit', 'embed' ),
 					'default'     => null,
+					'properties'  => array(
+						'encoded' => array(
+							'description' => __( 'Base64 encoded representation of the instance settings.', 'gutenberg' ),
+							'type'        => 'string',
+							'context'     => array( 'view', 'edit', 'embed' ),
+						),
+						'hash'    => array(
+							'description' => __( 'Cryptographic hash of the instance settings.', 'gutenberg' ),
+							'type'        => 'string',
+							'context'     => array( 'view', 'edit', 'embed' ),
+						),
+						'raw'     => array(
+							'description' => __( 'Unencoded instance settings, if supported.', 'gutenberg' ),
+							'type'        => 'object',
+							'context'     => array( 'view', 'edit', 'embed' ),
+						),
+					),
 				),
 				'form_data'     => array(
 					'description' => __( 'URL-encoded form data from the widget admin form. Used to update a widget that does not support instance. Write only.', 'gutenberg' ),
@@ -688,34 +716,6 @@ class WP_REST_Widgets_Controller extends WP_REST_Controller {
 						},
 					),
 				),
-				// BEGIN backwards compatibility. TODO: Remove.
-				'widget_class'  => array(
-					'description' => __( 'DEPRECATED. Class name of the widget implementation.', 'gutenberg' ),
-					'type'        => 'string',
-					'context'     => array( 'view', 'edit', 'embed' ),
-				),
-				'name'          => array(
-					'description' => __( 'DEPRECATED. Name of the widget.', 'gutenberg' ),
-					'type'        => 'string',
-					'context'     => array( 'view', 'edit', 'embed' ),
-				),
-				'description'   => array(
-					'description' => __( 'DEPRECATED. Description of the widget.', 'gutenberg' ),
-					'type'        => 'string',
-					'context'     => array( 'view', 'edit', 'embed' ),
-				),
-				'number'        => array(
-					'description' => __( 'DEPRECATED. Number of the widget.', 'gutenberg' ),
-					'type'        => 'integer',
-					'context'     => array( 'view', 'edit', 'embed' ),
-				),
-				'settings'      => array(
-					'description' => __( 'DEPRECATED. Settings of the widget.', 'gutenberg' ),
-					'type'        => 'object',
-					'context'     => array( 'view', 'edit', 'embed' ),
-					'default'     => array(),
-				),
-				// END backwards compatibility.
 			),
 		);
 

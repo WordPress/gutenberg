@@ -1,6 +1,33 @@
+.customize-widgets-header {
+	@include break-medium() {
+		// Make space for the floating toolbar.
+		margin-bottom: $grid-unit-60 + $default-block-margin;
+	}
+
+	&.is-fixed-toolbar-active {
+		// Top toolbar mode toolbar should be right under the header.
+		margin-bottom: 0;
+	}
+
+	display: flex;
+	justify-content: flex-end;
+
+	// Offset the customizer's sidebar padding.
+	// Zero bottom margin so that the fixed toolbar is right under the header.
+	margin: -15px ( -$grid-unit-15 ) ( 0 ) ( -$grid-unit-15 );
+
+	// Match the customizer grey background.
+	background: #f0f0f1;
+	border-bottom: 1px solid $gray-200;
+
+	z-index: z-index(".customize-widgets__topbar");
+}
+
 .customize-widgets-header-toolbar {
 	display: flex;
 	border: none;
+	width: 100%;
+	align-items: center;
 
 	.customize-widgets-header-toolbar__inserter-toggle.components-button.has-icon {
 		border-radius: 2px;
@@ -8,7 +35,7 @@
 		padding: 0;
 		min-width: $grid-unit-30;
 		height: $grid-unit-30;
-		margin-left: auto;
+		margin: $grid-unit-15 0 $grid-unit-15 auto;
 
 		&::before {
 			content: none;
@@ -17,5 +44,10 @@
 		&.is-pressed {
 			background: $gray-900;
 		}
+	}
+
+	// Move it more closely to he left visually.
+	.components-button.has-icon.customize-widgets-editor-history-button.redo-button {
+		margin-left: -12px;
 	}
 }

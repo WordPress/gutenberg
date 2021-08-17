@@ -28,6 +28,7 @@ const developmentFiles = [
 	'**/benchmark/**/*.js',
 	'**/@(__mocks__|__tests__|test)/**/*.js',
 	'**/@(storybook|stories)/**/*.js',
+	'packages/babel-preset-default/bin/**/*.js',
 ];
 
 // All files from packages that have types provided with TypeScript.
@@ -48,6 +49,7 @@ module.exports = {
 		jsdoc: {
 			mode: 'typescript',
 		},
+		'import/resolver': require.resolve( './tools/eslint/import-resolver' ),
 	},
 	rules: {
 		'jest/expect-expect': 'off',
@@ -61,13 +63,18 @@ module.exports = {
 			},
 		],
 		'@wordpress/no-unsafe-wp-apis': 'off',
-		'@wordpress/data-no-store-string-literals': 'warn',
+		'@wordpress/data-no-store-string-literals': 'error',
 		'import/default': 'error',
 		'import/named': 'error',
 		'no-restricted-imports': [
 			'error',
 			{
 				paths: [
+					{
+						name: 'framer-motion',
+						message:
+							'Please use the Framer Motion API through `@wordpress/components` instead.',
+					},
 					{
 						name: 'lodash',
 						importNames: [ 'memoize' ],
@@ -88,6 +95,16 @@ module.exports = {
 						importNames: [ 'combineReducers' ],
 						message:
 							'Please use `combineReducers` from `@wordpress/data` instead.',
+					},
+					{
+						name: 'puppeteer-testing-library',
+						message:
+							'`puppeteer-testing-library` is still experimental.',
+					},
+					{
+						name: '@emotion/css',
+						message:
+							'Please use `@emotion/react` and `@emotion/styled` in order to maintain iframe support',
 					},
 				],
 			},
@@ -158,11 +175,22 @@ module.exports = {
 	},
 	overrides: [
 		{
-			files: [ '**/*.@(android|ios|native).js', ...developmentFiles ],
+			files: [
+				'**/*.@(android|ios|native).js',
+				'packages/react-native-*/**/*.js',
+				...developmentFiles,
+			],
 			rules: {
 				'import/no-extraneous-dependencies': 'off',
 				'import/no-unresolved': 'off',
 				'import/named': 'off',
+				'@wordpress/data-no-store-string-literals': 'off',
+			},
+		},
+		{
+			files: [ 'packages/react-native-*/**/*.js' ],
+			settings: {
+				'import/ignore': [ 'react-native' ], // Workaround for https://github.com/facebook/react-native/issues/28549
 			},
 		},
 		{
@@ -204,7 +232,7 @@ module.exports = {
 			},
 		},
 		{
-			files: [ 'bin/**/*.js' ],
+			files: [ 'bin/**/*.js', 'packages/env/**' ],
 			rules: {
 				'no-console': 'off',
 			},

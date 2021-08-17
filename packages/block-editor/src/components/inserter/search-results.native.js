@@ -1,115 +1,53 @@
 /**
- * External dependencies
- */
-import {
-	FlatList,
-	View,
-	TouchableHighlight,
-	TouchableWithoutFeedback,
-	Dimensions,
-} from 'react-native';
-
-/**
  * WordPress dependencies
  */
-import { useState, useEffect } from '@wordpress/element';
-import { BottomSheet, InserterButton } from '@wordpress/components';
+import { useSelect } from '@wordpress/data';
 
 /**
  * Internal dependencies
  */
-import styles from './style.scss';
-
-const MIN_COL_NUM = 3;
+import { searchItems } from './search-items';
+import BlockTypesList from '../block-types-list';
+import InserterNoResults from './no-results';
+import { store as blockEditorStore } from '../../store';
+import useBlockTypeImpressions from './hooks/use-block-type-impressions';
 
 function InserterSearchResults( {
-	items,
+	filterValue,
 	onSelect,
 	listProps,
-	safeAreaBottomInset,
-	searchFormHeight = 0,
+	rootClientId,
 } ) {
-	const [ numberOfColumns, setNumberOfColumns ] = useState( MIN_COL_NUM );
-	const [ itemWidth, setItemWidth ] = useState();
-	const [ maxWidth, setMaxWidth ] = useState();
+	const { blockTypes } = useSelect(
+		( select ) => {
+			const allItems = select( blockEditorStore ).getInserterItems(
+				rootClientId
+			);
+			const filteredItems = searchItems( allItems, filterValue );
 
-	useEffect( () => {
-		Dimensions.addEventListener( 'change', onLayout );
-		return () => {
-			Dimensions.removeEventListener( 'change', onLayout );
-		};
-	}, [] );
+			return { blockTypes: filteredItems };
+		},
+		[ rootClientId, filterValue ]
+	);
 
-	function calculateItemWidth() {
-		const {
-			paddingLeft: itemPaddingLeft,
-			paddingRight: itemPaddingRight,
-		} = InserterButton.Styles.modalItem;
-		const { width } = InserterButton.Styles.modalIconWrapper;
-		return width + itemPaddingLeft + itemPaddingRight;
+	const { items, trackBlockTypeSelected } = useBlockTypeImpressions(
+		blockTypes
+	);
+
+	if ( ! items || items?.length === 0 ) {
+		return <InserterNoResults />;
 	}
 
-	function onLayout() {
-		const sumLeftRightPadding =
-			styles.columnPadding.paddingLeft +
-			styles.columnPadding.paddingRight;
-
-		const bottomSheetWidth = BottomSheet.getWidth();
-		const containerTotalWidth = bottomSheetWidth - sumLeftRightPadding;
-		const itemTotalWidth = calculateItemWidth();
-
-		const columnsFitToWidth = Math.floor(
-			containerTotalWidth / itemTotalWidth
-		);
-
-		const numColumns = Math.max( MIN_COL_NUM, columnsFitToWidth );
-
-		setNumberOfColumns( numColumns );
-		setMaxWidth( containerTotalWidth / numColumns );
-
-		if ( columnsFitToWidth < MIN_COL_NUM ) {
-			const updatedItemWidth =
-				( bottomSheetWidth - 2 * sumLeftRightPadding ) / MIN_COL_NUM;
-			setItemWidth( updatedItemWidth );
-		}
-	}
+	const handleSelect = ( ...args ) => {
+		trackBlockTypeSelected( ...args );
+		onSelect( ...args );
+	};
 
 	return (
-		<TouchableHighlight accessible={ false }>
-			<FlatList
-				onLayout={ onLayout }
-				key={ `InserterUI-${ numberOfColumns }` } //re-render when numberOfColumns changes
-				keyboardShouldPersistTaps="always"
-				numColumns={ numberOfColumns }
-				data={ items }
-				initialNumToRender={ 3 }
-				ItemSeparatorComponent={ () => (
-					<TouchableWithoutFeedback accessible={ false }>
-						<View style={ styles.rowSeparator } />
-					</TouchableWithoutFeedback>
-				) }
-				keyExtractor={ ( item ) => item.name }
-				renderItem={ ( { item } ) => (
-					<InserterButton
-						{ ...{
-							item,
-							itemWidth,
-							maxWidth,
-							onSelect,
-						} }
-					/>
-				) }
-				{ ...listProps }
-				contentContainerStyle={ [
-					...listProps.contentContainerStyle,
-					{
-						paddingBottom:
-							( safeAreaBottomInset ||
-								styles.list.paddingBottom ) + searchFormHeight,
-					},
-				] }
-			/>
-		</TouchableHighlight>
+		<BlockTypesList
+			name="Blocks"
+			{ ...{ items, onSelect: handleSelect, listProps } }
+		/>
 	);
 }
 

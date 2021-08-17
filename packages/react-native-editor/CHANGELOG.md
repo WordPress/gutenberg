@@ -9,8 +9,88 @@ For each user feature we should also add a importance categorization label  to i
 [*] → Minor enhancements and fixes that address annoyances — things our users can miss.
 -->
 
-## Unreleased
-* [*] Image block: Improve text entry for long alt text. [#29670]
+## 1.59.0
+-   [*] [Android] Fix UBE's inaccessible "more" toolbar item. [#33740]
+-   [*] Image block: Add a "featured" banner and ability to set or remove an image as featured. (iOS only) [#31345]
+
+## 1.58.2
+-   [*] Fix issue with text input in alt text settings [#33845]
+
+## 1.58.1
+-   [*] Global styles: Check for undefined values and merge user colors [#33707]
+-   [*] [Embed block] Disable paragraph transform [#33745]
+
+## 1.58.0
+-   [***] New Block: Embed block. [#33452]
+
+## 1.57.0
+-   [*] Update loading and failed screens for web version of the editor [#32395]
+-   [*] Handle floating keyboard case - Fix issue with the block selector on iPad. [#33089]
+-   [**] Added color/background customization for text blocks. [#33250]
+
+## 1.56.0
+-   [*] Tweaks to the badge component's styling, including change of background color and reduced padding. [#32865]
+
+## 1.55.2
+-   [**] Fix incorrect block insertion point after blurring the post title field. [#32831]
+
+## 1.55.1
+-   [*] Fix: RNMobile borderRadius value setting [#32717]
+-   [*] Improve unsupported block message for reusable block [#32618]
+
+## 1.55.0
+-   [*] Gallery block - Fix gallery images caption text formatting [#32351]
+-   [*] Image block: "Set as featured" button within image block settings. (Android only) [#31705]
+-   [***] Audio block now available on WP.com sites on the free plan. [#31966]
+
+## 1.54.0
+-   [***] Slash inserter [#29772]
+-   [*] Audio block: Add Insert from URL functionality. [#27817]
+-   [*] The BottomSheet Cell component now supports the help prop so that a hint can be supplied to all Cell based components. [#30885]
+-   [***] Enable reusable block only in WP.com sites [#31744]
+
+## 1.53.1
+
+-   [*] Fix missing title for some unsupported blocks [#31743]
+
+## 1.53.0
+
+-   [*] Bottom-sheet: Add custom header [#30291]
+-   [*] Fixes color picker rendering bug when scrolling [#30994]
+-   [*] Add enableCaching param to fetch request on Android [#31186]
+-   [***] Add reusable blocks to the inserter menu. [#28495]
+
+## 1.52.2
+
+-   [*] Disabled featured image banner on iOS. [#31681]
+
+## 1.52.1
+
+-   [*] Fixes for the generated localized strings files.
+
+## 1.52.0
+
+-   [***] Search block now available on mobile! [https://github.com/WordPress/gutenberg/pull/30783]
+-   [*] Image block: Add a "featured" banner. (Android only) [#30806]
+-   [**] The media upload options of the Image, Video and Gallery block automatically opens when the respective block is inserted. [#29546]
+-   [**] The media upload options of the File and Audio block automatically opens when the respective block is inserted. [#31025]
+-   [*] Fixed a bug where the Search block was stealing focus from the Image block upon updating image asset [#31393]
+
+## 1.51.1
+
+-   [*] Updates relative block-support asset path [#31184]
+
+## 1.51.0
+
+-   [*] Image block: Improve text entry for long alt text. [#29670]
+-   [*] a11y: Bug fix: Allow stepper cell to be selected by screenreader [#30694]
+
+## 1.50.1
+
+-   [*] Truncate rangecell screenreader decimals] [#30678]
+-   [*] Fix Quote block citation [#30548]
+-   [**] Fix crash from non-adjustable unit RangeCell a11y activation [#30636]
+-   [**] Fix Unsupported Block Editor on Android [#30650]
 
 ## 1.50.0
 
@@ -18,7 +98,7 @@ For each user feature we should also add a importance categorization label  to i
 
 ## 1.49.0
 
-* [*] Remove the cancel button from settings options (Android only) [https://github.com/WordPress/gutenberg/pull/29599]
+-   [*] Remove the cancel button from settings options (Android only) [https://github.com/WordPress/gutenberg/pull/29599]
 
 ## 1.48.0
 

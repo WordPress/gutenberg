@@ -8,6 +8,7 @@ Here is the basic InnerBlocks usage.
 
 {% codetabs %}
 {% ESNext %}
+
 ```js
 import { registerBlockType } from '@wordpress/blocks';
 import { InnerBlocks, useBlockProps } from '@wordpress/block-editor';
@@ -36,9 +37,11 @@ registerBlockType( 'gutenberg-examples/example-06', {
 	},
 } );
 ```
+
 {% ES5 %}
+
 ```js
-( function( blocks, element, blockEditor ) {
+( function ( blocks, element, blockEditor ) {
 	var el = element.createElement;
 	var InnerBlocks = blockEditor.InnerBlocks;
 	var useBlockProps = blockEditor.useBlockProps;
@@ -47,32 +50,21 @@ registerBlockType( 'gutenberg-examples/example-06', {
 		title: 'Example: Inner Blocks',
 		category: 'design',
 
-		edit: function() {
+		edit: function () {
 			var blockProps = useBlockProps();
 
-			return el(
-				'div',
-				blockProps,
-				el( InnerBlocks )
-			);
+			return el( 'div', blockProps, el( InnerBlocks ) );
 		},
 
-		save: function() {
+		save: function () {
 			var blockProps = useBlockProps.save();
 
-			return el(
-				'div',
-				blockProps,
-				el( InnerBlocks.Content )
-			);
+			return el( 'div', blockProps, el( InnerBlocks.Content ) );
 		},
 	} );
-} (
-	window.wp.blocks,
-	window.wp.element,
-	window.wp.blockEditor,
-) );
+} )( window.wp.blocks, window.wp.element, window.wp.blockEditor );
 ```
+
 {% end %}
 
 ## Allowed Blocks
@@ -82,18 +74,15 @@ Using the `ALLOWED_BLOCKS` property, you can define the set of blocks allowed in
 ```js
 const ALLOWED_BLOCKS = [ 'core/image', 'core/paragraph' ];
 //...
-<InnerBlocks
-	allowedBlocks={ ALLOWED_BLOCKS }
-/>
+<InnerBlocks allowedBlocks={ ALLOWED_BLOCKS } />;
 ```
 
 ## Orientation
 
 By default, `InnerBlocks` expects its blocks to be shown in a vertical list. A valid use-case is to style InnerBlocks to appear horizontally. When blocks are styled in such a way, the `orientation` prop can be used to indicate a horizontal layout:
+
 ```js
-<InnerBlocks
-	orientation="horizontal"
-/>
+<InnerBlocks orientation="horizontal" />
 ```
 
 Specifying this prop will result in the block movers being shown horizontally, and also ensure drag and drop works correctly.
@@ -104,6 +93,7 @@ Use the template property to define a set of blocks that prefill the InnerBlocks
 
 {% codetabs %}
 {% ESNext %}
+
 ```js
 const MY_TEMPLATE = [
 	[ 'core/image', {} ],
@@ -122,7 +112,9 @@ const MY_TEMPLATE = [
 		);
 	},
 ```
+
 {% ES5 %}
+
 ```js
 const MY_TEMPLATE = [
 	[ 'core/image', {} ],
@@ -142,6 +134,7 @@ const MY_TEMPLATE = [
 		);
 	},
 ```
+
 {% end %}
 
 Use the `templateLock` property to lock down the template. Using `all` locks the template complete, no changes can be made. Using `insert` prevents additional blocks to be inserted, but existing blocks can be reordered. See [templateLock documentation](https://github.com/WordPress/gutenberg/tree/HEAD/packages/block-editor/src/components/inner-blocks/README.md#templatelock) for additional information.
@@ -151,7 +144,6 @@ Use the `templateLock` property to lock down the template. Using `all` locks the
 Unrelated to `InnerBlocks` but worth mentioning here, you can create a [post template](https://developer.wordpress.org/block-editor/developers/block-api/block-templates/) by post type, that preloads the block editor with a set of blocks.
 
 The `InnerBlocks` template is for the component in the single block that you created, the rest of the post can include any blocks the user likes. Using a post template, can lock the entire post to just the template you define.
-
 
 ```php
 add_action( 'init', function() {
@@ -176,5 +168,5 @@ export const settings = {
 	icon,
 	description: __( 'A single column within a columns block.' ),
 	//...
-}
+};
 ```

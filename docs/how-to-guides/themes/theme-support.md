@@ -4,12 +4,12 @@ The new Blocks include baseline support in all themes, enhancements to opt-in to
 
 There are a few new concepts to consider when building themes:
 
-- **Editor Color Palette** - A default set of colors is provided, but themes can register their own and optionally lock users into picking from the defined palette.
-- **Editor Text Size Palette** - A default set of sizes is provided, but themes can register their own and optionally lock users into picking from preselected sizes.
-- **Responsive Embeds** - Themes must opt-in to responsive embeds.
-- **Frontend & Editor Styles** - To get the most out of blocks, theme authors will want to make sure Core styles look good and opt-in, or write their own styles to best fit their theme.
-- **Block Tools** - Themes can opt-in to several block tools like line height, custom units.
-- **Core Block Patterns** - Themes can opt-out of the default block patterns.
+-   **Editor Color Palette** - A default set of colors is provided, but themes can register their own and optionally lock users into picking from the defined palette.
+-   **Editor Text Size Palette** - A default set of sizes is provided, but themes can register their own and optionally lock users into picking from preselected sizes.
+-   **Responsive Embeds** - Themes must opt-in to responsive embeds.
+-   **Frontend & Editor Styles** - To get the most out of blocks, theme authors will want to make sure Core styles look good and opt-in, or write their own styles to best fit their theme.
+-   **Block Tools** - Themes can opt-in to several block tools like line height, custom units.
+-   **Core Block Patterns** - Themes can opt-out of the default block patterns.
 
 By default, blocks provide their styles to enable basic support for blocks in themes without any change. They also [provide opt-in opinionated styles](#default-block-styles). Themes can add/override these styles, or they can provide no styles at all, and rely fully on what the blocks provide.
 
@@ -21,23 +21,23 @@ To opt-in for one of these features, call `add_theme_support` in the `functions.
 function mytheme_setup_theme_supported_features() {
 	add_theme_support( 'editor-color-palette', array(
 		array(
-			'name' => esc_attr__( 'strong magenta', 'themeLangDomain' ),
-			'slug' => 'strong-magenta',
+			'name'  => esc_attr__( 'strong magenta', 'themeLangDomain' ),
+			'slug'  => 'strong-magenta',
 			'color' => '#a156b4',
 		),
 		array(
-			'name' => esc_attr__( 'light grayish magenta', 'themeLangDomain' ),
-			'slug' => 'light-grayish-magenta',
+			'name'  => esc_attr__( 'light grayish magenta', 'themeLangDomain' ),
+			'slug'  => 'light-grayish-magenta',
 			'color' => '#d0a5db',
 		),
 		array(
-			'name' => esc_attr__( 'very light gray', 'themeLangDomain' ),
-			'slug' => 'very-light-gray',
+			'name'  => esc_attr__( 'very light gray', 'themeLangDomain' ),
+			'slug'  => 'very-light-gray',
 			'color' => '#eee',
 		),
 		array(
-			'name' => esc_attr__( 'very dark gray', 'themeLangDomain' ),
-			'slug' => 'very-dark-gray',
+			'name'  => esc_attr__( 'very dark gray', 'themeLangDomain' ),
+			'slug'  => 'very-dark-gray',
 			'color' => '#444',
 		),
 	) );
@@ -57,6 +57,8 @@ The block editor allows themes to opt-in to slightly more opinionated styles for
 ```php
 add_theme_support( 'wp-block-styles' );
 ```
+
+You can see the CSS that will be included in the [block library theme file](https://github.com/WordPress/gutenberg/blob/trunk/packages/block-library/src/theme.scss).
 
 ### Wide Alignment:
 
@@ -103,23 +105,23 @@ Different blocks have the possibility of customizing colors. The block editor pr
 ```php
 add_theme_support( 'editor-color-palette', array(
 	array(
-		'name' => esc_attr__( 'strong magenta', 'themeLangDomain' ),
-		'slug' => 'strong-magenta',
+		'name'  => esc_attr__( 'strong magenta', 'themeLangDomain' ),
+		'slug'  => 'strong-magenta',
 		'color' => '#a156b4',
 	),
 	array(
-		'name' => esc_attr__( 'light grayish magenta', 'themeLangDomain' ),
-		'slug' => 'light-grayish-magenta',
+		'name'  => esc_attr__( 'light grayish magenta', 'themeLangDomain' ),
+		'slug'  => 'light-grayish-magenta',
 		'color' => '#d0a5db',
 	),
 	array(
-		'name' => esc_attr__( 'very light gray', 'themeLangDomain' ),
-		'slug' => 'very-light-gray',
+		'name'  => esc_attr__( 'very light gray', 'themeLangDomain' ),
+		'slug'  => 'very-light-gray',
 		'color' => '#eee',
 	),
 	array(
-		'name' => esc_attr__( 'very dark gray', 'themeLangDomain' ),
-		'slug' => 'very-dark-gray',
+		'name'  => esc_attr__( 'very dark gray', 'themeLangDomain' ),
+		'slug'  => 'very-dark-gray',
 		'color' => '#444',
 	),
 ) );
@@ -188,10 +190,13 @@ Themes are responsible for creating the classes that apply the gradients. So to 
 
 ```css
 .has-vivid-cyan-blue-to-vivid-purple-gradient-background {
-	background: linear-gradient(135deg,rgba(6,147,227,1) 0%,rgb(155,81,224) 100%);
+	background: linear-gradient(
+		135deg,
+		rgba( 6, 147, 227, 1 ) 0%,
+		rgb( 155, 81, 224 ) 100%
+	);
 }
 ```
-
 
 ### Block Font Sizes:
 
@@ -235,7 +240,9 @@ As an example for the regular font size, a theme may provide the following class
 }
 ```
 
-**Note:** The slugs `default` and `custom` are reserved and cannot be used by themes.
+<div class="callout callout-info">
+<strong>Note:</strong> The slugs `default` and `custom` are reserved and cannot be used by themes.
+</div>
 
 ### Disabling custom font sizes
 
@@ -305,7 +312,7 @@ The block editor supports the theme's [editor styles](https://codex.wordpress.or
 
 In the classic editor, the editor stylesheet is loaded directly into the iframe of the WYSIWYG editor, with no changes. The block editor, however, doesn't use iframes. To make sure your styles are applied only to the content of the editor, we automatically transform your editor styles by selectively rewriting or adjusting certain CSS selectors. This also allows the block editor to leverage your editor style in block variation previews.
 
-For example, if you write `body { ... }` in your editor style, this is rewritten to `.editor-styles-wrapper { ... }`.  This also means that you should _not_ target any of the editor class names directly.
+For example, if you write `body { ... }` in your editor style, this is rewritten to `.editor-styles-wrapper { ... }`. This also means that you should _not_ target any of the editor class names directly.
 
 Because it works a little differently, you need to opt-in to this by adding an extra snippet to your theme, in addition to the add_editor_style function:
 
@@ -348,12 +355,12 @@ To change the main column width of the editor, add the following CSS to `style-e
 }
 
 /* Width of "wide" blocks */
-.wp-block[data-align="wide"] {
+.wp-block[data-align='wide'] {
 	max-width: 1080px;
 }
 
 /* Width of "full-wide" blocks */
-.wp-block[data-align="full"] {
+.wp-block[data-align='full'] {
 	max-width: none;
 }
 ```
@@ -381,35 +388,37 @@ add_theme_support( 'responsive-embeds' );
 Some blocks can have padding controls. This is off by default, and requires the theme to opt in by declaring support:
 
 ```php
-add_theme_support('custom-spacing');
+add_theme_support( 'custom-spacing' );
 ```
 
-## Experimental — Link color control
+## Link color control
 
-Using the Gutenberg plugin (version 8.3 or later), link color control is available to the Paragraph, Heading, Group, Columns, and Media & Text blocks. This is off by default, and  requires the theme to opt in by declaring support:
+Link support has been made stable as part of WordPress 5.8. It's `false` by default and themes can enable it via the [theme.json file](./theme-json.md):
 
-```php
-add_theme_support('experimental-link-color');
-```
-
-If a theme opts in, it should [define default link colors](https://developer.wordpress.org/block-editor/developers/themes/theme-json/#color-properties) in `experimental-theme.json` (or in its theme styles if no `experimental-theme.json` is present). For example:
-
-```css
+```json
 {
-    "global": {
-        "styles": {
-            "color": {
-                "link": "hotpink"
-            }
-        }
-    }
+	"version": 1,
+	"settings": {
+		"color": {
+			"link": true
+		}
+	}
 }
 ```
 
-If the theme styles the link color in its stylesheets (editor and front-end), it should ensure it maps to the `--wp--style--color--link` CSS variable:
+> Alternatively, with the Gutenberg plugin active, the old legacy support `add_theme_support( 'experimental-link-color' )` would also work. This fallback would be removed when the Gutenberg plugin requires WordPress 5.8 as the minimum version.
+
+When the user sets the link color of a block, a new style will be added in the form of:
 
 ```css
-a {
-    color: var(--wp--style--color--link);
+.wp-elements-<uuid> a {
+	color: <link-color> !important;
 }
 ```
+
+where
+
+- `<uuid>` is a random number
+- `<link-color>` is either `var(--wp--preset--color--slug)` (if the user selected a preset value) or a raw color value (if the user selected a custom value)
+
+The block will get attached the class `.wp-elements-<uuid>`.

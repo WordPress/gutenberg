@@ -11,6 +11,7 @@ import { useDispatch, useSelect } from '@wordpress/data';
 import {
 	store as coreStore,
 	__experimentalFetchLinkSuggestions as fetchLinkSuggestions,
+	__experimentalFetchUrlData as fetchUrlData,
 } from '@wordpress/core-data';
 
 /**
@@ -32,30 +33,34 @@ function useBlockEditorSettings( settings, hasTemplate ) {
 		reusableBlocks,
 		hasUploadPermissions,
 		canUseUnfilteredHTML,
-		isTitleSelected,
 	} = useSelect( ( select ) => {
-		const { canUserUseUnfilteredHTML, isPostTitleSelected } = select(
-			editorStore
+		const { canUserUseUnfilteredHTML } = select( editorStore );
+		const isWeb = Platform.OS === 'web';
+		const { canUser, getUnstableBase, hasFinishedResolution } = select(
+			coreStore
 		);
-		const { canUser } = select( coreStore );
+
+		const siteData = getUnstableBase();
+
+		const hasFinishedResolvingSiteData = hasFinishedResolution(
+			'getUnstableBase'
+		);
 
 		return {
 			canUseUnfilteredHTML: canUserUseUnfilteredHTML(),
-			reusableBlocks: select( coreStore ).getEntityRecords(
-				'postType',
-				'wp_block',
-				/**
-				 * Unbounded queries are not supported on native so as a workaround, we set per_page with the maximum value that native version can handle.
-				 * Related issue: https://github.com/wordpress-mobile/gutenberg-mobile/issues/2661
-				 */
-				{ per_page: Platform.select( { web: -1, native: 10 } ) }
-			),
+			reusableBlocks: isWeb
+				? select( coreStore ).getEntityRecords(
+						'postType',
+						'wp_block',
+						{ per_page: -1 }
+				  )
+				: [], // Reusable blocks are fetched in the native version of this hook.
 			hasUploadPermissions: defaultTo(
 				canUser( 'create', 'media' ),
 				true
 			),
-			// This selector is only defined on mobile.
-			isTitleSelected: isPostTitleSelected && isPostTitleSelected(),
+			hasResolvedLocalSiteData: hasFinishedResolvingSiteData,
+			baseUrl: siteData?.url || '',
 		};
 	}, [] );
 
@@ -107,9 +112,9 @@ function useBlockEditorSettings( settings, hasTemplate ) {
 			__experimentalReusableBlocks: reusableBlocks,
 			__experimentalFetchLinkSuggestions: ( search, searchOptions ) =>
 				fetchLinkSuggestions( search, searchOptions, settings ),
+			__experimentalFetchRichUrlData: fetchUrlData,
 			__experimentalCanUserUseUnfilteredHTML: canUseUnfilteredHTML,
 			__experimentalUndo: undo,
-			__experimentalShouldInsertAtTheTop: isTitleSelected,
 			outlineMode: hasTemplate,
 		} ),
 		[
@@ -118,7 +123,6 @@ function useBlockEditorSettings( settings, hasTemplate ) {
 			reusableBlocks,
 			canUseUnfilteredHTML,
 			undo,
-			isTitleSelected,
 			hasTemplate,
 		]
 	);

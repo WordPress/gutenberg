@@ -266,7 +266,7 @@ export function MediaPlaceholder( {
 				<Button
 					className="block-editor-media-placeholder__cancel-button"
 					title={ __( 'Cancel' ) }
-					isLink
+					variant="link"
 					onClick={ onCancel }
 				>
 					{ __( 'Cancel' ) }
@@ -283,7 +283,7 @@ export function MediaPlaceholder( {
 						className="block-editor-media-placeholder__button"
 						onClick={ openURLInput }
 						isPressed={ isURLInputVisible }
-						isTertiary
+						variant="tertiary"
 					>
 						{ __( 'Insert from URL' ) }
 					</Button>
@@ -316,9 +316,8 @@ export function MediaPlaceholder( {
 				render={ ( { open } ) => {
 					return (
 						<Button
-							isTertiary
-							onClick={ ( event ) => {
-								event.stopPropagation();
+							variant="tertiary"
+							onClick={ () => {
 								open();
 							} }
 						>
@@ -341,7 +340,7 @@ export function MediaPlaceholder( {
 							const content = (
 								<>
 									<Button
-										isPrimary
+										variant="primary"
 										className={ classnames(
 											'block-editor-media-placeholder__button',
 											'block-editor-media-placeholder__upload-button'
@@ -366,7 +365,7 @@ export function MediaPlaceholder( {
 				<>
 					{ renderDropZone() }
 					<FormFileUpload
-						isPrimary
+						variant="primary"
 						className={ classnames(
 							'block-editor-media-placeholder__button',
 							'block-editor-media-placeholder__upload-button'

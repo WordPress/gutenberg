@@ -1,24 +1,25 @@
 /**
  * External dependencies
  */
+import memize from 'memize';
+
 /**
  * WordPress dependencies
  */
 import RNReactNativeGutenbergBridge, {
+	requestBlockTypeImpressions,
+	setBlockTypeImpressions,
 	subscribeParentGetHtml,
 	subscribeParentToggleHTMLMode,
 	subscribeUpdateHtml,
 	subscribeSetTitle,
 	subscribeMediaAppend,
 	subscribeReplaceBlock,
-	subscribeUpdateTheme,
+	subscribeUpdateEditorSettings,
 	subscribeUpdateCapabilities,
 	subscribeShowNotice,
+	subscribeShowEditorHelp,
 } from '@wordpress/react-native-bridge';
-
-/**
- * WordPress dependencies
- */
 import { Component } from '@wordpress/element';
 import { count as wordCount } from '@wordpress/wordcount';
 import {
@@ -33,7 +34,10 @@ import { applyFilters } from '@wordpress/hooks';
 import {
 	validateThemeColors,
 	validateThemeGradients,
+	store as blockEditorStore,
 } from '@wordpress/block-editor';
+import { getGlobalStyles } from '@wordpress/components';
+import { NEW_BLOCK_TYPES } from '@wordpress/block-library';
 
 const postTypeEntities = [
 	{ name: 'post', baseURL: '/wp/v2/posts' },
@@ -51,6 +55,7 @@ const postTypeEntities = [
 		meta: true,
 	},
 } ) );
+import { EditorHelpTopics } from '@wordpress/editor';
 
 /**
  * Internal dependencies
@@ -69,16 +74,26 @@ class NativeEditorProvider extends Component {
 			this.post.type,
 			this.post
 		);
+		this.getEditorSettings = memize(
+			( settings, capabilities ) => ( {
+				...settings,
+				capabilities,
+			} ),
+			{
+				maxSize: 1,
+			}
+		);
+		this.state = {
+			isHelpVisible: false,
+		};
 	}
 
 	componentDidMount() {
-		const { capabilities, colors, gradients } = this.props;
+		const { capabilities, updateSettings } = this.props;
 
-		this.props.updateSettings( {
+		updateSettings( {
 			...capabilities,
-			// Set theme colors for the editor
-			...( colors ? { colors } : {} ),
-			...( gradients ? { gradients } : {} ),
+			...this.getThemeColors( this.props ),
 		} );
 
 		this.subscriptionParentGetHtml = subscribeParentGetHtml( () => {
@@ -125,15 +140,10 @@ class NativeEditorProvider extends Component {
 			}
 		);
 
-		this.subscriptionParentUpdateTheme = subscribeUpdateTheme(
-			( theme ) => {
-				// Reset the colors and gradients in case one theme was set with custom items and then updated to a theme without custom elements.
-
-				theme.colors = validateThemeColors( theme.colors );
-
-				theme.gradients = validateThemeGradients( theme.gradients );
-
-				this.props.updateSettings( theme );
+		this.subscriptionParentUpdateEditorSettings = subscribeUpdateEditorSettings(
+			( editorSettings ) => {
+				const themeColors = this.getThemeColors( editorSettings );
+				updateSettings( themeColors );
 			}
 		);
 
@@ -148,6 +158,30 @@ class NativeEditorProvider extends Component {
 				this.props.createSuccessNotice( payload.message );
 			}
 		);
+
+		this.subscriptionParentShowEditorHelp = subscribeShowEditorHelp( () => {
+			// Temporary: feature hidden from production. This is just here for testing
+			// purposes and will be replaced with actual logic in a later PR.
+			this.setState( { isHelpVisible: true } );
+		} );
+
+		// Request current block impressions from native app
+		requestBlockTypeImpressions( ( storedImpressions ) => {
+			const impressions = { ...NEW_BLOCK_TYPES, ...storedImpressions };
+
+			// Persist impressions to JavaScript store
+			updateSettings( { impressions } );
+
+			// Persist impressions to native store if they do not include latest
+			// `NEW_BLOCK_TYPES` configuration
+			const storedImpressionKeys = Object.keys( storedImpressions );
+			const storedImpressionsCurrent = Object.keys(
+				NEW_BLOCK_TYPES
+			).every( ( newKey ) => storedImpressionKeys.includes( newKey ) );
+			if ( ! storedImpressionsCurrent ) {
+				setBlockTypeImpressions( impressions );
+			}
+		} );
 	}
 
 	componentWillUnmount() {
@@ -175,8 +209,8 @@ class NativeEditorProvider extends Component {
 			this.subscriptionParentMediaAppend.remove();
 		}
 
-		if ( this.subscriptionParentUpdateTheme ) {
-			this.subscriptionParentUpdateTheme.remove();
+		if ( this.subscriptionParentUpdateEditorSettings ) {
+			this.subscriptionParentUpdateEditorSettings.remove();
 		}
 
 		if ( this.subscriptionParentUpdateCapabilities ) {
@@ -186,6 +220,21 @@ class NativeEditorProvider extends Component {
 		if ( this.subscriptionParentShowNotice ) {
 			this.subscriptionParentShowNotice.remove();
 		}
+
+		if ( this.subscriptionParentShowEditorHelp ) {
+			this.subscriptionParentShowEditorHelp.remove();
+		}
+	}
+
+	getThemeColors( { colors, gradients, rawStyles, rawFeatures } ) {
+		return {
+			...( rawStyles && rawFeatures
+				? getGlobalStyles( rawStyles, rawFeatures )
+				: {
+						colors: validateThemeColors( colors ),
+						gradients: validateThemeGradients( gradients ),
+				  } ),
+		};
 	}
 
 	componentDidUpdate( prevProps ) {
@@ -266,13 +315,26 @@ class NativeEditorProvider extends Component {
 		const {
 			children,
 			post, // eslint-disable-line no-unused-vars
+			capabilities,
+			settings,
 			...props
 		} = this.props;
+		const editorSettings = this.getEditorSettings( settings, capabilities );
 
 		return (
-			<EditorProvider post={ this.post } { ...props }>
-				{ children }
-			</EditorProvider>
+			<>
+				<EditorProvider
+					post={ this.post }
+					settings={ editorSettings }
+					{ ...props }
+				>
+					{ children }
+				</EditorProvider>
+				<EditorHelpTopics
+					isVisible={ this.state.isHelpVisible }
+					onClose={ () => this.setState( { isHelpVisible: false } ) }
+				/>
+			</>
 		);
 	}
 }
@@ -291,7 +353,8 @@ export default compose( [
 			getBlockIndex,
 			getSelectedBlockClientId,
 			getGlobalBlockCount,
-		} = select( 'core/block-editor' );
+			getSettings: getBlockEditorSettings,
+		} = select( blockEditorStore );
 
 		const selectedBlockClientId = getSelectedBlockClientId();
 		return {
@@ -300,6 +363,7 @@ export default compose( [
 			blocks: getEditorBlocks(),
 			title: getEditedPostAttribute( 'title' ),
 			getEditedPostContent,
+			getBlockEditorSettings,
 			selectedBlockIndex: getBlockIndex( selectedBlockClientId ),
 			blockCount: getGlobalBlockCount(),
 			paragraphCount: getGlobalBlockCount( 'core/paragraph' ),
@@ -312,7 +376,7 @@ export default compose( [
 			clearSelectedBlock,
 			insertBlock,
 			replaceBlock,
-		} = dispatch( 'core/block-editor' );
+		} = dispatch( blockEditorStore );
 		const { switchEditorMode } = dispatch( 'core/edit-post' );
 		const { addEntities, receiveEntityRecords } = dispatch( 'core' );
 		const { createSuccessNotice } = dispatch( 'core/notices' );

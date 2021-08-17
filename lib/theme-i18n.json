@@ -1,0 +1,106 @@
+{
+	"settings": {
+		"typography": {
+				"fontSizes": [
+					{
+						"name": "Font size name"
+					}
+				],
+				"fontStyles": [
+					{
+						"name": "Font style name"
+					}
+				],
+				"fontWeights": [
+					{
+						"name": "Font weight name"
+					}
+				],
+				"fontFamilies": [
+					{
+						"name": "Font family name"
+					}
+				],
+				"textTransforms": [
+					{
+						"name": "Text transform name"
+					}
+				],
+				"textDecorations": [
+					{
+						"name": "Text decoration name"
+					}
+				]
+		},
+		"color": {
+				"palette": [
+					{
+						"name": "Color name"
+					}
+				],
+				"gradients": [
+					{
+						"name": "Gradient name"
+					}
+				],
+				"duotone": [
+					{
+						"name": "Duotone name"
+					}
+				]
+		},
+		"blocks": {
+			"*": {
+				"typography": {
+					"fontSizes": [
+						{
+							"name": "Font size name"
+						}
+					],
+					"fontStyles": [
+						{
+							"name": "Font style name"
+						}
+					],
+					"fontWeights": [
+						{
+							"name": "Font weight name"
+						}
+					],
+					"fontFamilies": [
+						{
+							"name": "Font family name"
+						}
+					],
+					"textTransforms": [
+						{
+							"name": "Text transform name"
+						}
+					],
+					"textDecorations": [
+						{
+							"name": "Text decoration name"
+						}
+					]
+				},
+				"color": {
+					"palette": [
+						{
+							"name": "Color name"
+						}
+					],
+					"gradients": [
+						{
+							"name": "Gradient name"
+						}
+					]
+				}
+			}
+		}
+	},
+	"customTemplates": [
+		{
+			"title": "Custom template name"
+		}
+	]
+}

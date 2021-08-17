@@ -21,7 +21,7 @@ const isEverySelectedBlockAllowed = ( selected, allowed ) =>
  * is of one allowed type (not necessarily the same).
  *
  * @param {string[]} selectedBlocks Array containing the names of the blocks selected
- * @param {string[]} allowedBlocks Array containing the names of the blocks allowed
+ * @param {string[]} allowedBlocks  Array containing the names of the blocks allowed
  * @return {boolean} Whether the item will be rendered or not.
  */
 const shouldRenderItem = ( selectedBlocks, allowedBlocks ) =>

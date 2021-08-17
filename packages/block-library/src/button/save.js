@@ -6,18 +6,20 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { RichText, useBlockProps } from '@wordpress/block-editor';
-
-/**
- * Internal dependencies
- */
-import getColorAndStyleProps from './color-props';
+import {
+	RichText,
+	useBlockProps,
+	__experimentalGetBorderClassesAndStyles as getBorderClassesAndStyles,
+	__experimentalGetColorClassesAndStyles as getColorClassesAndStyles,
+	__experimentalGetSpacingClassesAndStyles as getSpacingClassesAndStyles,
+} from '@wordpress/block-editor';
 
 export default function save( { attributes, className } ) {
 	const {
-		borderRadius,
+		fontSize,
 		linkTarget,
 		rel,
+		style,
 		text,
 		title,
 		url,
@@ -28,17 +30,23 @@ export default function save( { attributes, className } ) {
 		return null;
 	}
 
-	const colorProps = getColorAndStyleProps( attributes );
+	const borderProps = getBorderClassesAndStyles( attributes );
+	const colorProps = getColorClassesAndStyles( attributes );
+	const spacingProps = getSpacingClassesAndStyles( attributes );
 	const buttonClasses = classnames(
 		'wp-block-button__link',
 		colorProps.className,
+		borderProps.className,
 		{
-			'no-border-radius': borderRadius === 0,
+			// For backwards compatibility add style that isn't provided via
+			// block support.
+			'no-border-radius': style?.border?.radius === 0,
 		}
 	);
 	const buttonStyle = {
-		borderRadius: borderRadius ? borderRadius + 'px' : undefined,
+		...borderProps.style,
 		...colorProps.style,
+		...spacingProps.style,
 	};
 
 	// The use of a `title` attribute here is soft-deprecated, but still applied
@@ -47,6 +55,7 @@ export default function save( { attributes, className } ) {
 
 	const wrapperClasses = classnames( className, {
 		[ `has-custom-width wp-block-button__width-${ width }` ]: width,
+		[ `has-custom-font-size` ]: fontSize || style?.typography?.fontSize,
 	} );
 
 	return (

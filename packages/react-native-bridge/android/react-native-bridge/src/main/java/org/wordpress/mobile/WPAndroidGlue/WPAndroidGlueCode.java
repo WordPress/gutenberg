@@ -25,9 +25,12 @@ import com.facebook.react.ReactInstanceManager;
 import com.facebook.react.ReactInstanceManagerBuilder;
 import com.facebook.react.ReactPackage;
 import com.facebook.react.ReactRootView;
+import com.facebook.react.bridge.Arguments;
 import com.facebook.react.bridge.ReactContext;
 import com.facebook.react.bridge.ReadableArray;
 import com.facebook.react.bridge.ReadableMap;
+import com.facebook.react.bridge.ReadableMapKeySetIterator;
+import com.facebook.react.bridge.WritableMap;
 import com.facebook.react.common.LifecycleState;
 import com.facebook.react.modules.core.DefaultHardwareBackBtnHandler;
 import com.facebook.react.shell.MainPackageConfig;
@@ -37,6 +40,7 @@ import com.horcrux.svg.SvgPackage;
 import com.BV.LinearGradient.LinearGradientPackage;
 import com.reactnativecommunity.slider.ReactSliderPackage;
 import org.linusu.RNGetRandomValuesPackage;
+import com.reactnativecommunity.webview.RNCWebViewPackage;
 import com.swmansion.gesturehandler.react.RNGestureHandlerEnabledRootView;
 import com.swmansion.gesturehandler.react.RNGestureHandlerPackage;
 import com.swmansion.reanimated.ReanimatedPackage;
@@ -64,6 +68,7 @@ import java.util.Map.Entry;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
+import im.shimo.react.prompt.RNPromptPackage;
 import okhttp3.OkHttpClient;
 
 
@@ -84,6 +89,7 @@ public class WPAndroidGlueCode {
     private OnMediaLibraryButtonListener mOnMediaLibraryButtonListener;
     private OnReattachMediaUploadQueryListener mOnReattachMediaUploadQueryListener;
     private OnReattachMediaSavingQueryListener mOnReattachMediaSavingQueryListener;
+    private OnSetFeaturedImageListener mOnSetFeaturedImageListener;
     private OnEditorMountListener mOnEditorMountListener;
     private OnEditorAutosaveListener mOnEditorAutosaveListener;
     private OnImageFullscreenPreviewListener mOnImageFullscreenPreviewListener;
@@ -93,6 +99,8 @@ public class WPAndroidGlueCode {
     private ReplaceUnsupportedBlockCallback mReplaceUnsupportedBlockCallback;
     private OnMediaFilesCollectionBasedBlockEditorListener mOnMediaFilesCollectionBasedBlockEditorListener;
     private OnFocalPointPickerTooltipShownEventListener mOnFocalPointPickerTooltipShownListener;
+    private OnGutenbergDidRequestPreviewListener mOnGutenbergDidRequestPreviewListener;
+    private OnBlockTypeImpressionsEventListener mOnBlockTypeImpressionsEventListener;
     private boolean mIsEditorMounted;
 
     private String mContentHtml = "";
@@ -171,6 +179,10 @@ public class WPAndroidGlueCode {
         void onQueryCurrentProgressForSavingMedia();
     }
 
+    public interface OnSetFeaturedImageListener {
+        void onSetFeaturedImageButtonClicked(int mediaId);
+    }
+
     public interface OnEditorMountListener {
         void onEditorDidMount(ArrayList<Object> unsupportedBlockNames);
     }
@@ -204,6 +216,15 @@ public class WPAndroidGlueCode {
         void onContentInfoFailed();
         void onEditorNotReady();
         void onContentInfoReceived(HashMap<String, Object> contentInfo);
+    }
+
+    public interface OnGutenbergDidRequestPreviewListener {
+        void gutenbergDidRequestPreview();
+    }
+
+    public interface OnBlockTypeImpressionsEventListener {
+        void onSetBlockTypeImpressions(Map<String, Double> impressions);
+        Map<String, Double> onRequestBlockTypeImpressions();
     }
 
     public void mediaSelectionCancelled() {
@@ -317,6 +338,11 @@ public class WPAndroidGlueCode {
             }
 
             @Override
+            public void setFeaturedImage(int mediaId) {
+                mOnSetFeaturedImageListener.onSetFeaturedImageButtonClicked(mediaId);
+            }
+
+            @Override
             public void editorDidMount(ReadableArray unsupportedBlockNames) {
                 mOnEditorMountListener.onEditorDidMount(unsupportedBlockNames.toArrayList());
                 mDeferredEventEmitter.setEmitter(mRnReactNativeGutenbergBridgePackage
@@ -388,8 +414,8 @@ public class WPAndroidGlueCode {
             }
 
             @Override
-            public void performRequest(String pathFromJS, Consumer<String> onSuccess, Consumer<Bundle> onError) {
-                mRequestExecutor.performRequest(pathFromJS, onSuccess, onError);
+            public void performRequest(String pathFromJS, boolean enableCaching, Consumer<String> onSuccess, Consumer<Bundle> onError) {
+                mRequestExecutor.performRequest(pathFromJS, enableCaching, onSuccess, onError);
             }
 
             @Override
@@ -473,6 +499,34 @@ public class WPAndroidGlueCode {
                 boolean tooltipShown = mOnFocalPointPickerTooltipShownListener.onRequestFocalPointPickerTooltipShown();
                 focalPointPickerTooltipShownCallback.onRequestFocalPointPickerTooltipShown(tooltipShown);
             }
+
+            @Override
+            public void requestPreview() {
+                mOnGutenbergDidRequestPreviewListener.gutenbergDidRequestPreview();
+            }
+
+            @Override
+            public void requestBlockTypeImpressions(BlockTypeImpressionsCallback blockTypeImpressionsCallback) {
+                // Double utilized to satisfy both React Native's expectations (https://bit.ly/3f3tsT4)
+                // and Gson's deserialization which uses Double for all numbers (https://bit.ly/2VfpvUv)
+                Map<String, Double> storedImpressions = mOnBlockTypeImpressionsEventListener.onRequestBlockTypeImpressions();
+                WritableMap impressions = Arguments.createMap();
+                for (Map.Entry<String, Double> entry: storedImpressions.entrySet()) {
+                    impressions.putDouble(entry.getKey(), entry.getValue());
+                }
+                blockTypeImpressionsCallback.onRequestBlockTypeImpressions(impressions);
+            }
+
+            @Override
+            public void setBlockTypeImpressions(ReadableMap newImpressions) {
+                Map<String, Double> impressions = new HashMap<>();
+                ReadableMapKeySetIterator iterator = newImpressions.keySetIterator();
+                while (iterator.hasNextKey()) {
+                    String key = iterator.nextKey();
+                    impressions.put(key, newImpressions.getDouble(key));
+                }
+                mOnBlockTypeImpressionsEventListener.onSetBlockTypeImpressions(impressions);
+            }
         }, mIsDarkMode);
 
         return Arrays.asList(
@@ -488,6 +542,8 @@ public class WPAndroidGlueCode {
                 new SafeAreaContextPackage(),
                 new RNCMaskedViewPackage(),
                 new ReanimatedPackage(),
+                new RNPromptPackage(),
+                new RNCWebViewPackage(),
                 mRnReactNativeGutenbergBridgePackage);
     }
 
@@ -537,6 +593,7 @@ public class WPAndroidGlueCode {
                                   OnMediaLibraryButtonListener onMediaLibraryButtonListener,
                                   OnReattachMediaUploadQueryListener onReattachMediaUploadQueryListener,
                                   OnReattachMediaSavingQueryListener onReattachMediaSavingQueryListener,
+                                  OnSetFeaturedImageListener onSetFeaturedImageListener,
                                   OnEditorMountListener onEditorMountListener,
                                   OnEditorAutosaveListener onEditorAutosaveListener,
                                   OnAuthHeaderRequestedListener onAuthHeaderRequestedListener,
@@ -548,6 +605,8 @@ public class WPAndroidGlueCode {
                                   ShowSuggestionsUtil showSuggestionsUtil,
                                   OnMediaFilesCollectionBasedBlockEditorListener onMediaFilesCollectionBasedBlockEditorListener,
                                   OnFocalPointPickerTooltipShownEventListener onFocalPointPickerTooltipListener,
+                                  OnGutenbergDidRequestPreviewListener onGutenbergDidRequestPreviewListener,
+                                  OnBlockTypeImpressionsEventListener onBlockTypeImpressionsEventListener,
                                   boolean isDarkMode) {
         MutableContextWrapper contextWrapper = (MutableContextWrapper) mReactRootView.getContext();
         contextWrapper.setBaseContext(viewGroup.getContext());
@@ -555,6 +614,7 @@ public class WPAndroidGlueCode {
         mOnMediaLibraryButtonListener = onMediaLibraryButtonListener;
         mOnReattachMediaUploadQueryListener = onReattachMediaUploadQueryListener;
         mOnReattachMediaSavingQueryListener = onReattachMediaSavingQueryListener;
+        mOnSetFeaturedImageListener = onSetFeaturedImageListener;
         mOnEditorMountListener = onEditorMountListener;
         mOnEditorAutosaveListener = onEditorAutosaveListener;
         mRequestExecutor = fetchExecutor;
@@ -565,6 +625,8 @@ public class WPAndroidGlueCode {
         mShowSuggestionsUtil = showSuggestionsUtil;
         mOnMediaFilesCollectionBasedBlockEditorListener = onMediaFilesCollectionBasedBlockEditorListener;
         mOnFocalPointPickerTooltipShownListener = onFocalPointPickerTooltipListener;
+        mOnGutenbergDidRequestPreviewListener = onGutenbergDidRequestPreviewListener;
+        mOnBlockTypeImpressionsEventListener = onBlockTypeImpressionsEventListener;
 
         sAddCookiesInterceptor.setOnAuthHeaderRequestedListener(onAuthHeaderRequestedListener);
 
@@ -689,6 +751,10 @@ public class WPAndroidGlueCode {
         } else {
             AppLog.d(AppLog.T.EDITOR, "Notice not shown because message is null");
         }
+    }
+
+    public void showEditorHelp() {
+        mRnReactNativeGutenbergBridgePackage.getRNReactNativeGutenbergBridgeModule().showEditorHelp();
     }
 
     public void setTitle(String title) {
@@ -954,6 +1020,10 @@ public class WPAndroidGlueCode {
 
     public void mediaIdChanged(final String oldId, final String newId, final String oldUrl) {
         mDeferredEventEmitter.onMediaIdChanged(oldId, newId, oldUrl);
+    }
+
+    public void sendToJSFeaturedImageId(int mediaId) {
+        mDeferredEventEmitter.sendToJSFeaturedImageId(mediaId);
     }
 
     public void replaceUnsupportedBlock(String content, String blockId) {

@@ -1,7 +1,6 @@
 /**
  * WordPress dependencies
  */
-import { __, _x } from '@wordpress/i18n';
 import { postCommentsForm as icon } from '@wordpress/icons';
 
 /**
@@ -14,8 +13,6 @@ const { name } = metadata;
 export { metadata, name };
 
 export const settings = {
-	title: _x( 'Post Comments Form', 'block title' ),
-	description: __( "Display a post's comments form." ),
 	icon,
 	edit,
 };

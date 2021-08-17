@@ -7,6 +7,7 @@ import { withSelect } from '@wordpress/data';
  * Internal dependencies
  */
 import PostTypeSupportCheck from '../post-type-support-check';
+import { store as editorStore } from '../../store';
 
 function PostFormatCheck( { disablePostFormats, ...props } ) {
 	return (
@@ -17,7 +18,7 @@ function PostFormatCheck( { disablePostFormats, ...props } ) {
 }
 
 export default withSelect( ( select ) => {
-	const editorSettings = select( 'core/editor' ).getEditorSettings();
+	const editorSettings = select( editorStore ).getEditorSettings();
 	return {
 		disablePostFormats: editorSettings.disablePostFormats,
 	};

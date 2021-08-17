@@ -2,7 +2,7 @@
  * External dependencies
  */
 import { Platform, findNodeHandle } from 'react-native';
-import { partial, first, castArray, last, compact } from 'lodash';
+import { partial, first, castArray, last, compact, every } from 'lodash';
 /**
  * WordPress dependencies
  */
@@ -15,10 +15,12 @@ import {
 import {
 	getBlockType,
 	getDefaultBlockName,
+	hasBlockSupport,
 	serialize,
 	rawHandler,
 	createBlock,
 	isUnmodifiedDefaultBlock,
+	isReusableBlock,
 } from '@wordpress/blocks';
 import { __, sprintf } from '@wordpress/i18n';
 import { withDispatch, withSelect } from '@wordpress/data';
@@ -26,6 +28,9 @@ import { withInstanceId, compose } from '@wordpress/compose';
 import { moreHorizontalMobile } from '@wordpress/icons';
 import { useRef, useState } from '@wordpress/element';
 import { store as noticesStore } from '@wordpress/notices';
+import { store as reusableBlocksStore } from '@wordpress/reusable-blocks';
+import { store as coreStore } from '@wordpress/core-data';
+
 /**
  * Internal dependencies
  */
@@ -39,13 +44,18 @@ const BlockActionsMenu = ( {
 	canInsertBlockType,
 	getBlocksByClientId,
 	isEmptyDefaultBlock,
+	isLocked,
+	canDuplicate,
 	isFirst,
 	isLast,
+	isReusableBlockType,
+	reusableBlock,
 	rootClientId,
 	selectedBlockClientId,
 	selectedBlockPossibleTransformations,
 	// Dispatch
 	createSuccessNotice,
+	convertToRegularBlocks,
 	duplicateBlock,
 	onMoveDown,
 	onMoveUp,
@@ -175,20 +185,48 @@ const BlockActionsMenu = ( {
 				);
 			},
 		},
+		convertToRegularBlocks: {
+			id: 'convertToRegularBlocksOption',
+			label: __( 'Convert to regular blocks' ),
+			value: 'convertToRegularBlocksOption',
+			onSelect: () => {
+				createSuccessNotice(
+					sprintf(
+						/* translators: %s: name of the reusable block */
+						__( '%s converted to regular blocks' ),
+						reusableBlock?.title?.raw || blockTitle
+					)
+				);
+				convertToRegularBlocks();
+			},
+		},
 	};
 
 	const options = compact( [
 		wrapBlockMover && allOptions.backwardButton,
 		wrapBlockMover && allOptions.forwardButton,
 		wrapBlockSettings && allOptions.settings,
-		selectedBlockPossibleTransformations.length &&
+		! isLocked &&
+			selectedBlockPossibleTransformations.length &&
 			allOptions.transformButton,
-		allOptions.copyButton,
-		allOptions.cutButton,
-		isPasteEnabled && allOptions.pasteButton,
-		allOptions.duplicateButton,
-		allOptions.delete,
+		canDuplicate && allOptions.copyButton,
+		canDuplicate && allOptions.cutButton,
+		canDuplicate && isPasteEnabled && allOptions.pasteButton,
+		canDuplicate && allOptions.duplicateButton,
+		isReusableBlockType && allOptions.convertToRegularBlocks,
+		! isLocked && allOptions.delete,
 	] );
+
+	// End early if there are no options to show.
+	if ( ! options.length ) {
+		return (
+			<ToolbarButton
+				title={ __( 'Open Block Actions Menu' ) }
+				icon={ moreHorizontalMobile }
+				disabled={ true }
+			/>
+		);
+	}
 
 	function onPasteBlock() {
 		if ( ! clipboard ) {
@@ -267,12 +305,13 @@ export default compose(
 			getBlocksByClientId,
 			getSelectedBlockClientIds,
 			canInsertBlockType,
+			getTemplateLock,
 		} = select( blockEditorStore );
 		const normalizedClientIds = castArray( clientIds );
 		const block = getBlock( normalizedClientIds );
 		const blockName = getBlockName( normalizedClientIds );
 		const blockType = getBlockType( blockName );
-		const blockTitle = blockType.title;
+		const blockTitle = blockType?.title;
 		const firstClientId = first( normalizedClientIds );
 		const rootClientId = getBlockRootClientId( firstClientId );
 		const blockOrder = getBlockOrder( rootClientId );
@@ -283,18 +322,39 @@ export default compose(
 			rootClientId
 		);
 
+		const innerBlocks = getBlocksByClientId( clientIds );
+
+		const canDuplicate = every( innerBlocks, ( innerBlock ) => {
+			return (
+				!! innerBlock &&
+				hasBlockSupport( innerBlock.name, 'multiple', true ) &&
+				canInsertBlockType( innerBlock.name, rootClientId )
+			);
+		} );
+
 		const isDefaultBlock = blockName === getDefaultBlockName();
-		const isEmptyContent = block.attributes.content === '';
+		const isEmptyContent = block?.attributes.content === '';
 		const isExactlyOneBlock = blockOrder.length === 1;
 		const isEmptyDefaultBlock =
 			isExactlyOneBlock && isDefaultBlock && isEmptyContent;
+		const isLocked = !! getTemplateLock( rootClientId );
 
-		const selectedBlockClientId = getSelectedBlockClientIds();
-		const selectedBlock = getBlocksByClientId( selectedBlockClientId );
-		const selectedBlockPossibleTransformations = getBlockTransformItems(
-			selectedBlock,
-			rootClientId
-		);
+		const selectedBlockClientId = first( getSelectedBlockClientIds() );
+		const selectedBlock = selectedBlockClientId
+			? first( getBlocksByClientId( selectedBlockClientId ) )
+			: undefined;
+		const selectedBlockPossibleTransformations = selectedBlock
+			? getBlockTransformItems( [ selectedBlock ], rootClientId )
+			: [];
+
+		const isReusableBlockType = block ? isReusableBlock( block ) : false;
+		const reusableBlock = isReusableBlockType
+			? select( coreStore ).getEntityRecord(
+					'postType',
+					'wp_block',
+					block?.attributes.ref
+			  )
+			: undefined;
 
 		return {
 			blockTitle,
@@ -302,15 +362,23 @@ export default compose(
 			currentIndex: firstIndex,
 			getBlocksByClientId,
 			isEmptyDefaultBlock,
+			isLocked,
+			canDuplicate,
 			isFirst: firstIndex === 0,
 			isLast: lastIndex === blockOrder.length - 1,
+			isReusableBlockType,
+			reusableBlock,
 			rootClientId,
 			selectedBlockClientId,
 			selectedBlockPossibleTransformations,
 		};
 	} ),
 	withDispatch(
-		( dispatch, { clientIds, rootClientId, currentIndex }, { select } ) => {
+		(
+			dispatch,
+			{ clientIds, rootClientId, currentIndex, selectedBlockClientId },
+			{ select }
+		) => {
 			const {
 				moveBlocksDown,
 				moveBlocksUp,
@@ -318,6 +386,7 @@ export default compose(
 				removeBlocks,
 				insertBlock,
 				replaceBlocks,
+				clearSelectedBlock,
 			} = dispatch( blockEditorStore );
 			const { openGeneralSidebar } = dispatch( 'core/edit-post' );
 			const { getBlockSelectionEnd, getBlock } = select(
@@ -325,8 +394,20 @@ export default compose(
 			);
 			const { createSuccessNotice } = dispatch( noticesStore );
 
+			const {
+				__experimentalConvertBlockToStatic: convertBlockToStatic,
+			} = dispatch( reusableBlocksStore );
+
 			return {
 				createSuccessNotice,
+				convertToRegularBlocks() {
+					clearSelectedBlock();
+					// Convert action is executed at the end of the current JavaScript execution block
+					// to prevent issues related to undo/redo actions.
+					setImmediate( () =>
+						convertBlockToStatic( selectedBlockClientId )
+					);
+				},
 				duplicateBlock() {
 					return duplicateBlocks( clientIds );
 				},

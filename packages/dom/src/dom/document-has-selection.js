@@ -15,8 +15,9 @@ import documentHasTextSelection from './document-has-text-selection';
  */
 export default function documentHasSelection( doc ) {
 	return (
-		isTextField( doc.activeElement ) ||
-		isNumberInput( doc.activeElement ) ||
-		documentHasTextSelection( doc )
+		!! doc.activeElement &&
+		( isTextField( doc.activeElement ) ||
+			isNumberInput( doc.activeElement ) ||
+			documentHasTextSelection( doc ) )
 	);
 }

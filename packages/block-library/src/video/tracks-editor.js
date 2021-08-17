@@ -73,7 +73,7 @@ function TrackList( { tracks, onEditPress } ) {
 				>
 					<span>{ track.label } </span>
 					<Button
-						isTertiary
+						variant="tertiary"
 						onClick={ () => onEditPress( index ) }
 						aria-label={ sprintf(
 							/* translators: %s: Label of the video text track e.g: "French subtitles" */
@@ -152,7 +152,7 @@ function SingleTrackEditor( { track, onChange, onClose, onRemove } ) {
 				/>
 				<div className="block-library-video-tracks-editor__single-track-editor-buttons-container">
 					<Button
-						isSecondary
+						variant="secondary"
 						onClick={ () => {
 							const changes = {};
 							let hasChanges = false;
@@ -179,7 +179,7 @@ function SingleTrackEditor( { track, onChange, onClose, onRemove } ) {
 					>
 						{ __( 'Close' ) }
 					</Button>
-					<Button isDestructive isLink onClick={ onRemove }>
+					<Button isDestructive variant="link" onClick={ onRemove }>
 						{ __( 'Remove track' ) }
 					</Button>
 				</div>

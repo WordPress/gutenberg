@@ -20,6 +20,11 @@ import {
 import { __, sprintf } from '@wordpress/i18n';
 import { postFeaturedImage } from '@wordpress/icons';
 
+/**
+ * Internal dependencies
+ */
+import DimensionControls from './dimension-controls';
+
 const ALLOWED_MEDIA_TYPES = [ 'image' ];
 const placeholderChip = (
 	<div className="post-featured-image_placeholder">
@@ -29,12 +34,14 @@ const placeholderChip = (
 );
 
 function PostFeaturedImageDisplay( {
-	attributes: { isLink },
+	attributes,
 	setAttributes,
-	context: { postId, postType },
+	context: { postId, postType, queryId },
 	noticeUI,
 	noticeOperations,
 } ) {
+	const isDescendentOfQueryLoop = !! queryId;
+	const { isLink, height, width, scale } = attributes;
 	const [ featuredImage, setFeaturedImage ] = useEntityProp(
 		'postType',
 		postType,
@@ -43,9 +50,13 @@ function PostFeaturedImageDisplay( {
 	);
 	const media = useSelect(
 		( select ) =>
-			featuredImage && select( coreStore ).getMedia( featuredImage ),
+			featuredImage &&
+			select( coreStore ).getMedia( featuredImage, { context: 'view' } ),
 		[ featuredImage ]
 	);
+	const blockProps = useBlockProps( {
+		style: { width },
+	} );
 	const onSelectImage = ( value ) => {
 		if ( value?.id ) {
 			setFeaturedImage( value.id );
@@ -56,6 +67,9 @@ function PostFeaturedImageDisplay( {
 		noticeOperations.createErrorNotice( message );
 	}
 	let image;
+	if ( ! featuredImage && isDescendentOfQueryLoop ) {
+		return <div { ...blockProps }>{ placeholderChip }</div>;
+	}
 	if ( ! featuredImage ) {
 		image = (
 			<MediaPlaceholder
@@ -81,6 +95,7 @@ function PostFeaturedImageDisplay( {
 			<img
 				src={ media.source_url }
 				alt={ media.alt_text || __( 'Featured image' ) }
+				style={ { height, objectFit: height && scale } }
 			/>
 		);
 	}
@@ -88,6 +103,10 @@ function PostFeaturedImageDisplay( {
 	return (
 		<>
 			<InspectorControls>
+				<DimensionControls
+					attributes={ attributes }
+					setAttributes={ setAttributes }
+				/>
 				<PanelBody title={ __( 'Link settings' ) }>
 					<ToggleControl
 						label={ sprintf(
@@ -100,8 +119,8 @@ function PostFeaturedImageDisplay( {
 					/>
 				</PanelBody>
 			</InspectorControls>
-			<BlockControls group="other">
-				{ !! media && (
+			{ !! media && ! isDescendentOfQueryLoop && (
+				<BlockControls group="other">
 					<MediaReplaceFlow
 						mediaId={ featuredImage }
 						mediaURL={ media.source_url }
@@ -110,9 +129,9 @@ function PostFeaturedImageDisplay( {
 						onSelect={ onSelectImage }
 						onError={ onUploadError }
 					/>
-				) }
-			</BlockControls>
-			<div { ...useBlockProps() }>{ image }</div>
+				</BlockControls>
+			) }
+			<figure { ...blockProps }>{ image }</figure>
 		</>
 	);
 }
@@ -120,8 +139,9 @@ function PostFeaturedImageDisplay( {
 const PostFeaturedImageWithNotices = withNotices( PostFeaturedImageDisplay );
 
 export default function PostFeaturedImageEdit( props ) {
+	const blockProps = useBlockProps();
 	if ( ! props.context?.postId ) {
-		return placeholderChip;
+		return <div { ...blockProps }>{ placeholderChip }</div>;
 	}
 	return <PostFeaturedImageWithNotices { ...props } />;
 }

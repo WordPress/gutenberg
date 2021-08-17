@@ -1,49 +1,65 @@
 /**
  * WordPress dependencies
  */
-import { render, unmountComponentAtNode } from '@wordpress/element';
+import { dispatch } from '@wordpress/data';
 
 /**
  * Internal dependencies
  */
-import SidebarBlockEditor from '../components/sidebar-block-editor';
 import SidebarAdapter from '../components/sidebar-block-editor/sidebar-adapter';
-import InserterOuterSection from './inserter-outer-section';
+import getInserterOuterSection from './inserter-outer-section';
+import { store as customizeWidgetsStore } from '../store';
 
-const {
-	wp: { customize },
-} = window;
+const getInserterId = ( controlId ) => `widgets-inserter-${ controlId }`;
 
-const inserterId = 'widgets-inserter';
+export default function getSidebarControl() {
+	const {
+		wp: { customize },
+	} = window;
 
-class SidebarControl extends customize.Control {
-	ready() {
-		this.inserter = new InserterOuterSection( inserterId, {} );
-		customize.section.add( this.inserter );
-		this.render();
-	}
-	onChangeExpanded() {
-		this.render();
-	}
-	expanded() {
-		return customize.section( this.section() ).expanded();
-	}
-	render() {
-		if ( this.expanded() ) {
-			render(
-				<SidebarBlockEditor
-					sidebar={ new SidebarAdapter( this.setting, customize ) }
-					inserter={ this.inserter }
-				/>,
-				this.container[ 0 ]
-			);
-		} else {
-			unmountComponentAtNode( this.container[ 0 ] );
+	return class SidebarControl extends customize.Control {
+		constructor( ...args ) {
+			super( ...args );
 
-			// Close the inserter when the section collapses.
-			this.inserter.close();
+			this.subscribers = new Set();
 		}
-	}
-}
 
-export default SidebarControl;
+		ready() {
+			const InserterOuterSection = getInserterOuterSection();
+			this.inserter = new InserterOuterSection(
+				getInserterId( this.id ),
+				{}
+			);
+			customize.section.add( this.inserter );
+
+			this.sectionInstance = customize.section( this.section() );
+
+			this.inspector = this.sectionInstance.inspector;
+
+			this.sidebarAdapter = new SidebarAdapter( this.setting, customize );
+		}
+
+		subscribe( callback ) {
+			this.subscribers.add( callback );
+
+			return () => {
+				this.subscribers.delete( callback );
+			};
+		}
+
+		onChangeSectionExpanded( expanded, args ) {
+			if ( ! args.unchanged ) {
+				// Close the inserter when the section collapses.
+				if ( ! expanded ) {
+					dispatch( customizeWidgetsStore ).setIsInserterOpened(
+						false
+					);
+				}
+
+				this.subscribers.forEach( ( subscriber ) =>
+					subscriber( expanded, args )
+				);
+			}
+		}
+	};
+}

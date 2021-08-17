@@ -33,11 +33,11 @@ export {
 // block. For composition, it also means inner blocks can effectively be child
 // components whose mechanisms can be shielded from the `edit` implementation
 // and just passed along.
+export { default as parse } from './parser';
 export {
-	default as parse,
 	getBlockAttributes,
 	parseWithAttributeSchema,
-} from './parser';
+} from './parser/get-block-attributes';
 
 // While block transformations account for a specific surface of the API, there
 // are also raw transformations which handle arbitrary sources not made out of
@@ -141,6 +141,7 @@ export {
 	getBlockLabel as __experimentalGetBlockLabel,
 	getAccessibleBlockLabel as __experimentalGetAccessibleBlockLabel,
 	__experimentalSanitizeBlockAttributes,
+	__experimentalGetBlockAttributesNamesByRole,
 } from './utils';
 
 // Templates are, in a general sense, a basic collection of block nodes with any
@@ -155,4 +156,7 @@ export {
 } from './templates';
 export { default as children } from './children';
 export { default as node } from './node';
-export { __EXPERIMENTAL_STYLE_PROPERTY } from './constants';
+export {
+	__EXPERIMENTAL_STYLE_PROPERTY,
+	__EXPERIMENTAL_ELEMENTS,
+} from './constants';

@@ -87,7 +87,7 @@ describe( 'Taxonomies', () => {
 
 		// Type the category name in the field.
 		await page.type(
-			'.editor-post-taxonomies__hierarchical-terms-input[type=text]',
+			'.editor-post-taxonomies__hierarchical-terms-input input[type=text]',
 			'z rand category 1'
 		);
 

@@ -5,7 +5,9 @@
  * of the editor by themes.
  */
 
-.editor-styles-wrapper {
+// We use :where to keep specificity minimal.
+// https://css-tricks.com/almanac/selectors/w/where/
+html :where(.editor-styles-wrapper) {
 	padding: 8px;
 
 	/**
@@ -16,6 +18,11 @@
 	font-size: initial;
 	line-height: initial;
 	color: initial;
+
+	// Many themes with white backgrounds load editor styles but fail to also provide
+	// an explicit white background color, assuming a white editing canvas.
+	// So to match browser defaults, we provide a white default here as well.
+	background: #fff;
 
 	// For full-wide blocks, we compensate for the base padding.
 	// These margins should match the padding value above.

@@ -51,8 +51,8 @@ https://www.youtube.com/watch?v=lXMskKTw3Bc
 </div></figure>
 <!-- /wp:embed -->
 
-<!-- wp:embed {\\"url\\":\\"https://cloudup.com/cQFlxqtY4ob\\"} -->
-<figure class=\\"wp-block-embed\\"><div class=\\"wp-block-embed__wrapper\\">
+<!-- wp:embed {\\"url\\":\\"https://cloudup.com/cQFlxqtY4ob\\",\\"type\\":\\"photo\\",\\"providerNameSlug\\":\\"cloudup\\",\\"responsive\\":true} -->
+<figure class=\\"wp-block-embed is-type-photo is-provider-cloudup wp-block-embed-cloudup\\"><div class=\\"wp-block-embed__wrapper\\">
 https://cloudup.com/cQFlxqtY4ob
 </div></figure>
 <!-- /wp:embed -->"

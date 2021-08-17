@@ -14,7 +14,7 @@ import { getPhrasingContentSchema, removeInvalidHTML } from '@wordpress/dom';
 import { htmlToBlocks } from './html-to-blocks';
 import { hasBlockSupport } from '../registration';
 import { getBlockInnerHTML } from '../serializer';
-import { parseWithGrammar } from '../parser';
+import parse from '../parser';
 import normaliseBlocks from './normalise-blocks';
 import specialCommentConverter from './special-comment-converter';
 import commentRemover from './comment-remover';
@@ -43,7 +43,7 @@ const { console } = window;
 /**
  * Filters HTML to only contain phrasing content.
  *
- * @param {string}  HTML The HTML to filter.
+ * @param {string}  HTML               The HTML to filter.
  * @param {boolean} preserveWhiteSpace Whether or not to preserve consequent white space.
  *
  * @return {string} HTML only containing phrasing content.
@@ -72,13 +72,13 @@ function filterInlineHTML( HTML, preserveWhiteSpace ) {
  * Converts an HTML string to known blocks. Strips everything else.
  *
  * @param {Object}  options
- * @param {string}  [options.HTML]      The HTML to convert.
- * @param {string}  [options.plainText] Plain text version.
- * @param {string}  [options.mode]      Handle content as blocks or inline content.
- *                                      * 'AUTO': Decide based on the content passed.
- *                                      * 'INLINE': Always handle as inline content, and return string.
- *                                      * 'BLOCKS': Always handle as blocks, and return array of blocks.
- * @param {Array}   [options.tagName]   The tag into which content will be inserted.
+ * @param {string}  [options.HTML]               The HTML to convert.
+ * @param {string}  [options.plainText]          Plain text version.
+ * @param {string}  [options.mode]               Handle content as blocks or inline content.
+ *                                               * 'AUTO': Decide based on the content passed.
+ *                                               * 'INLINE': Always handle as inline content, and return string.
+ *                                               * 'BLOCKS': Always handle as blocks, and return array of blocks.
+ * @param {Array}   [options.tagName]            The tag into which content will be inserted.
  * @param {boolean} [options.preserveWhiteSpace] Whether or not to preserve consequent white space.
  *
  * @return {Array|string} A list of blocks or a string, depending on `handlerMode`.
@@ -108,7 +108,7 @@ export function pasteHandler( {
 		const content = HTML ? HTML : plainText;
 
 		if ( content.indexOf( '<!-- wp:' ) !== -1 ) {
-			return parseWithGrammar( content );
+			return parse( content );
 		}
 	}
 

@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { ToolbarGroup } from '@wordpress/components';
+import { ToolbarDropdownMenu } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
 
 /**
@@ -9,30 +9,25 @@ import { __, sprintf } from '@wordpress/i18n';
  */
 import LevelIcon from './level-icon';
 
-export default function LevelToolbar( { level, onChange } ) {
+export default function LevelControl( { level, onChange } ) {
+	const allControls = [ 1, 2, 3, 4, 5, 6, 0 ].map( ( currentLevel ) => {
+		const isActive = currentLevel === level;
+		return {
+			icon: <LevelIcon level={ currentLevel } isPressed={ isActive } />,
+			title:
+				currentLevel === 0
+					? __( 'Paragraph' )
+					: // translators: %s: heading level e.g: "1", "2", "3"
+					  sprintf( __( 'Heading %d' ), currentLevel ),
+			isActive,
+			onClick: () => onChange( currentLevel ),
+		};
+	} );
 	return (
-		<ToolbarGroup
-			isCollapsed
-			icon={ <LevelIcon level={ level } /> }
-			controls={ [ 1, 2, 3, 4, 5, 6, 0 ].map( ( currentLevel ) => {
-				const isActive = currentLevel === level;
-				return {
-					icon: (
-						<LevelIcon
-							level={ currentLevel }
-							isPressed={ isActive }
-						/>
-					),
-					title:
-						currentLevel === 0
-							? __( 'Paragraph' )
-							: // translators: %s: heading level e.g: "1", "2", "3"
-							  sprintf( __( 'Heading %d' ), currentLevel ),
-					isActive,
-					onClick: () => onChange( currentLevel ),
-				};
-			} ) }
+		<ToolbarDropdownMenu
 			label={ __( 'Change heading level' ) }
+			icon={ <LevelIcon level={ level } /> }
+			controls={ allControls }
 		/>
 	);
 }

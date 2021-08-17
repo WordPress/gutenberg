@@ -1,7 +1,7 @@
 buildscript {
     ext {
-        gradlePluginVersion = '4.0.1'
-        kotlinVersion = '1.3.61'
+        gradlePluginVersion = '4.0.2'
+        kotlinVersion = '1.5.20'
         supportLibVersion = '29.0.2'
         tagSoupVersion = '1.2.1'
         glideVersion = '3.7.0'
@@ -12,10 +12,16 @@ buildscript {
         wordpressUtilsVersion = '1.22'
         espressoVersion = '3.0.1'
         aztecVersion = 'v1.3.45'
-        willPublishReactNativeAztecBinary = properties["publishReactNativeAztecVersion"]?.trim() as boolean
+        willPublishReactNativeAztecBinary = properties["willPublishReactNativeAztecBinary"]?.toBoolean() ?: false
     }
 
     repositories {
+        maven {
+            url 'https://a8c-libs.s3.amazonaws.com/android'
+            content {
+                includeGroup 'com.automattic.android'
+            }
+        }
         jcenter()
         google()
     }
@@ -24,22 +30,19 @@ buildscript {
         classpath "com.android.tools.build:gradle:$gradlePluginVersion"
         classpath 'com.github.dcendents:android-maven-gradle-plugin:2.1'
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlinVersion"
+        classpath 'com.automattic.android:publish-to-s3:0.6.1'
     }
-}
-
-plugins {
-    id "com.jfrog.bintray"
 }
 
 apply plugin: 'com.android.library'
 apply plugin: 'kotlin-android'
 apply plugin: 'com.github.dcendents.android-maven'
-apply plugin: 'maven-publish' // this enables publishing via Bintray
+apply plugin: 'com.automattic.android.publish-to-s3'
 
 // import the `readReactNativeVersion()` function
 apply from: 'https://gist.githubusercontent.com/hypest/742448b9588b3a0aa580a5e80ae95bdf/raw/8eb62d40ee7a5104d2fcaeff21ce6f29bd93b054/readReactNativeVersion.gradle'
 
-group = 'com.github.wordpress-mobile.gutenberg-mobile'
+group = 'org.wordpress-mobile.gutenberg-mobile'
 
 // The sample build uses multiple directories to
 // keep boilerplate and common code separate from
@@ -86,9 +89,10 @@ repositories {
     google()
 
     maven { url "https://jitpack.io" }
+    maven { url "https://a8c-libs.s3.amazonaws.com/android/hermes-mirror" }
 
     if (willPublishReactNativeAztecBinary) {
-        maven { url "https://dl.bintray.com/wordpress-mobile/react-native-mirror/" }
+        maven { url "https://a8c-libs.s3.amazonaws.com/android/react-native-mirror" }
     } else {
         maven { url("$rootDir/../../../node_modules/react-native/android") }
     }
@@ -119,43 +123,27 @@ dependencies {
     }
 }
 
-if (willPublishReactNativeAztecBinary) {
-    bintray {
-        user = project.hasProperty('bintrayUser') ? project.property('bintrayUser') : System.getenv('BINTRAY_USER')
-        key = project.hasProperty('bintrayKey') ? project.property('bintrayKey') : System.getenv('BINTRAY_KEY')
-        publications = ['ReactNativeAztecPublication']
-        publish = true
-        pkg {
-            repo = 'maven'
-            name = 'react-native-aztec'
-            licenses = ['GPL-2.0']
-            userOrg = 'wordpress-mobile'
-            vcsUrl = 'https://github.com/wordpress-mobile/gutenberg-mobile.git'
-            version {
-                name = publishReactNativeAztecVersion
-                released  = new Date()
+project.afterEvaluate {
+    publishing {
+        publications {
+            ReactNativeAztecPublication(MavenPublication) {
+                artifact bundleReleaseAar
+
+                groupId 'org.wordpress-mobile.gutenberg-mobile'
+                artifactId 'react-native-aztec'
+                // version is set by 'publish-to-s3' plugin
+
+                addDependenciesToPom(pom)
             }
         }
-    }
-
-    project.afterEvaluate {
-        publishing {
-            publications {
-                ReactNativeAztecPublication(MavenPublication) {
-                    artifact bundleReleaseAar
-
-                    groupId 'com.github.wordpress-mobile.gutenberg-mobile'
-                    artifactId 'react-native-aztec'
-                    version publishReactNativeAztecVersion
-
-                    addDependenciesToPom(pom)
-                }
-            }
-        }
-    }
+   }
 }
 
-// Publication doesn't know about dependencies, so we need to manually add them
+publishToS3Plugin {
+    mavenPublishGroupId 'org.wordpress-mobile.gutenberg-mobile'
+    mavenPublishArtifactId 'react-native-aztec'
+}
+
 def addDependenciesToPom(pom) {
     pom.withXml {
         def dependenciesNode = asNode().getAt('dependencies')[0] ?: asNode().appendNode('dependencies')
@@ -171,4 +159,3 @@ def addDependenciesToPom(pom) {
                 }
     }
 }
-

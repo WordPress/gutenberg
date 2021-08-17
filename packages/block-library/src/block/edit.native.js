@@ -12,19 +12,30 @@ import {
 /**
  * WordPress dependencies
  */
-import { useState } from '@wordpress/element';
-import { useEntityBlockEditor, store as coreStore } from '@wordpress/core-data';
-import { BottomSheet, Icon, Disabled } from '@wordpress/components';
-import { useSelect } from '@wordpress/data';
-import { __ } from '@wordpress/i18n';
+import { useState, useCallback } from '@wordpress/element';
 import {
-	BlockEditorProvider,
-	BlockList,
+	useEntityBlockEditor,
+	useEntityProp,
+	store as coreStore,
+} from '@wordpress/core-data';
+import {
+	BottomSheet,
+	Icon,
+	Disabled,
+	TextControl,
+} from '@wordpress/components';
+import { useSelect, useDispatch } from '@wordpress/data';
+import { __, sprintf } from '@wordpress/i18n';
+import {
+	__experimentalUseNoRecursiveRenders as useNoRecursiveRenders,
+	InnerBlocks,
+	Warning,
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import { usePreferredColorSchemeStyle } from '@wordpress/compose';
 import { help } from '@wordpress/icons';
 import { store as reusableBlocksStore } from '@wordpress/reusable-blocks';
+import { store as noticesStore } from '@wordpress/notices';
 
 /**
  * Internal dependencies
@@ -37,7 +48,9 @@ export default function ReusableBlockEdit( {
 	clientId,
 	isSelected,
 } ) {
-	const recordArgs = [ 'postType', 'wp_block', ref ];
+	const [ hasAlreadyRendered, RecursionProvider ] = useNoRecursiveRenders(
+		ref
+	);
 
 	const [ showHelp, setShowHelp ] = useState( false );
 	const infoTextStyle = usePreferredColorSchemeStyle(
@@ -52,45 +65,57 @@ export default function ReusableBlockEdit( {
 		styles.infoSheetIcon,
 		styles.infoSheetIconDark
 	);
+	const infoDescriptionStyle = usePreferredColorSchemeStyle(
+		styles.infoDescription,
+		styles.infoDescriptionDark
+	);
+	const actionButtonStyle = usePreferredColorSchemeStyle(
+		styles.actionButton,
+		styles.actionButtonDark
+	);
 	const spinnerStyle = usePreferredColorSchemeStyle(
 		styles.spinner,
 		styles.spinnerDark
 	);
 
-	const { reusableBlock, hasResolved, isEditing, settings } = useSelect(
+	const { hasResolved, isEditing, isMissing } = useSelect(
 		( select ) => {
-			const { getSettings } = select( blockEditorStore );
-
+			const persistedBlock = select( coreStore ).getEntityRecord(
+				'postType',
+				'wp_block',
+				ref
+			);
+			const hasResolvedBlock = select(
+				coreStore
+			).hasFinishedResolution( 'getEntityRecord', [
+				'postType',
+				'wp_block',
+				ref,
+			] );
 			return {
-				reusableBlock: select( coreStore ).getEditedEntityRecord(
-					...recordArgs
-				),
-				hasResolved: select( coreStore ).hasFinishedResolution(
-					'getEditedEntityRecord',
-					recordArgs
-				),
-				isSaving: select( coreStore ).isSavingEntityRecord(
-					...recordArgs
-				),
-				canUserUpdate: select( coreStore ).canUser(
-					'update',
-					'blocks',
-					ref
-				),
+				hasResolved: hasResolvedBlock,
 				isEditing: select(
 					reusableBlocksStore
 				).__experimentalIsEditingReusableBlock( clientId ),
-				settings: getSettings(),
+				isMissing: hasResolvedBlock && ! persistedBlock,
 			};
 		},
 		[ ref, clientId ]
 	);
+
+	const { createSuccessNotice } = useDispatch( noticesStore );
+	const {
+		__experimentalConvertBlockToStatic: convertBlockToStatic,
+	} = useDispatch( reusableBlocksStore );
+	const { clearSelectedBlock } = useDispatch( blockEditorStore );
 
 	const [ blocks, onInput, onChange ] = useEntityBlockEditor(
 		'postType',
 		'wp_block',
 		{ id: ref }
 	);
+
+	const [ title ] = useEntityProp( 'postType', 'wp_block', 'title', ref );
 
 	function openSheet() {
 		setShowHelp( true );
@@ -100,13 +125,30 @@ export default function ReusableBlockEdit( {
 		setShowHelp( false );
 	}
 
+	const onConvertToRegularBlocks = useCallback( () => {
+		createSuccessNotice(
+			sprintf(
+				/* translators: %s: name of the reusable block */
+				__( '%s converted to regular blocks' ),
+				title
+			)
+		);
+
+		clearSelectedBlock();
+		// Convert action is executed at the end of the current JavaScript execution block
+		// to prevent issues related to undo/redo actions.
+		setImmediate( () => convertBlockToStatic( clientId ) );
+	}, [ title, clientId ] );
+
 	function renderSheet() {
 		const infoTitle =
 			Platform.OS === 'android'
 				? __(
-						"Reusable blocks aren't editable on WordPress for Android"
+						'Editing reusable blocks is not yet supported on WordPress for Android'
 				  )
-				: __( "Reusable blocks aren't editable on WordPress for iOS" );
+				: __(
+						'Editing reusable blocks is not yet supported on WordPress for iOS'
+				  );
 
 		return (
 			<BottomSheet
@@ -123,8 +165,35 @@ export default function ReusableBlockEdit( {
 					<Text style={ [ infoTextStyle, infoTitleStyle ] }>
 						{ infoTitle }
 					</Text>
+					<Text style={ [ infoTextStyle, infoDescriptionStyle ] }>
+						{ __(
+							'Alternatively, you can detach and edit these blocks separately by tapping "Convert to regular blocks".'
+						) }
+					</Text>
+					<TextControl
+						label={ __( 'Convert to regular blocks' ) }
+						separatorType="topFullWidth"
+						onPress={ onConvertToRegularBlocks }
+						labelStyle={ actionButtonStyle }
+					/>
 				</View>
 			</BottomSheet>
+		);
+	}
+
+	if ( hasAlreadyRendered ) {
+		return (
+			<Warning
+				message={ __( 'Block cannot be rendered inside itself.' ) }
+			/>
+		);
+	}
+
+	if ( isMissing ) {
+		return (
+			<Warning
+				message={ __( 'Block has been deleted or is unavailable.' ) }
+			/>
 		);
 	}
 
@@ -136,22 +205,12 @@ export default function ReusableBlockEdit( {
 		);
 	}
 
-	if ( ! reusableBlock ) {
-		return (
-			<Text>{ __( 'Block has been deleted or is unavailable.' ) }</Text>
-		);
-	}
-
-	const { title } = reusableBlock;
 	let element = (
-		<BlockEditorProvider
-			settings={ settings }
+		<InnerBlocks
 			value={ blocks }
 			onChange={ onChange }
 			onInput={ onInput }
-		>
-			<BlockList withFooter={ false } marginHorizontal={ 0 } />
-		</BlockEditorProvider>
+		/>
 	);
 
 	if ( ! isEditing ) {
@@ -159,18 +218,20 @@ export default function ReusableBlockEdit( {
 	}
 
 	return (
-		<TouchableWithoutFeedback
-			disabled={ ! isSelected }
-			accessibilityLabel={ __( 'Help button' ) }
-			accessibilityRole={ 'button' }
-			accessibilityHint={ __( 'Tap here to show help' ) }
-			onPress={ openSheet }
-		>
-			<View>
-				{ isSelected && <EditTitle title={ title } /> }
-				{ element }
-				{ renderSheet() }
-			</View>
-		</TouchableWithoutFeedback>
+		<RecursionProvider>
+			<TouchableWithoutFeedback
+				disabled={ ! isSelected }
+				accessibilityLabel={ __( 'Help button' ) }
+				accessibilityRole={ 'button' }
+				accessibilityHint={ __( 'Tap here to show help' ) }
+				onPress={ openSheet }
+			>
+				<View>
+					{ isSelected && <EditTitle title={ title } /> }
+					{ element }
+					{ renderSheet() }
+				</View>
+			</TouchableWithoutFeedback>
+		</RecursionProvider>
 	);
 }

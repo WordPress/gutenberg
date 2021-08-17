@@ -1,7 +1,7 @@
 /**
  * Return `true` if the given path is http/https.
  *
- * @param  {string}  filePath path
+ * @param {string} filePath path
  *
  * @return {boolean} is remote path.
  */
@@ -12,7 +12,7 @@ function isRemotePath( filePath ) {
 /**
  * Return `true` if the given filePath is an absolute url.
  *
- * @param  {string}  filePath path
+ * @param {string} filePath path
  *
  * @return {boolean} is absolute path.
  */
@@ -23,7 +23,7 @@ function isAbsolutePath( filePath ) {
 /**
  * Whether or not the url should be inluded.
  *
- * @param  {Object} meta url meta info
+ * @param {Object} meta url meta info
  *
  * @return {boolean} is valid.
  */
@@ -51,10 +51,10 @@ function isValidURL( meta ) {
 /**
  * Get the absolute path of the url, relative to the basePath
  *
- * @param  {string} str          the url
- * @param  {string} baseURL      base URL
+ * @param {string} str     the url
+ * @param {string} baseURL base URL
  *
- * @return {string}              the full path to the file
+ * @return {string} the full path to the file
  */
 function getResourcePath( str, baseURL ) {
 	return new URL( str, baseURL ).toString();
@@ -63,8 +63,9 @@ function getResourcePath( str, baseURL ) {
 /**
  * Process the single `url()` pattern
  *
- * @param  {string} baseURL  the base URL for relative URLs
- * @return {Promise}         the Promise
+ * @param {string} baseURL the base URL for relative URLs.
+ *
+ * @return {Promise} the Promise.
  */
 function processURL( baseURL ) {
 	return ( meta ) => ( {
@@ -83,9 +84,9 @@ function processURL( baseURL ) {
 /**
  * Get all `url()`s, and return the meta info
  *
- * @param  {string} value decl.value
+ * @param {string} value decl.value.
  *
- * @return {Array}        the urls
+ * @return {Array} the urls.
  */
 function getURLs( value ) {
 	const reg = /url\((\s*)(['"]?)(.+?)\2(\s*)\)/g;
@@ -110,10 +111,10 @@ function getURLs( value ) {
 /**
  * Replace the raw value's `url()` segment to the new value
  *
- * @param  {string} raw  the raw value
- * @param  {Array}  URLs the URLs to replace
+ * @param {string} raw  the raw value.
+ * @param {Array}  URLs the URLs to replace.
  *
- * @return {string}     the new value
+ * @return {string} the new value.
  */
 function replaceURLs( raw, URLs ) {
 	URLs.forEach( ( item ) => {

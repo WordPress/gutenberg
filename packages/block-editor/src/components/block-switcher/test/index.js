@@ -176,7 +176,6 @@ describe( 'BlockSwitcherDropdownMenu', () => {
 			const onToggleStub = jest.fn();
 			const mockKeyDown = {
 				preventDefault: () => {},
-				stopPropagation: () => {},
 				keyCode: DOWN,
 			};
 

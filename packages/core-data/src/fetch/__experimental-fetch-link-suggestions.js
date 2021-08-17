@@ -13,13 +13,19 @@ import { __ } from '@wordpress/i18n';
  */
 
 /**
+ * A link with an id may be of kind post-type or taxonomy
+ *
+ * @typedef { 'post-type' | 'taxonomy' } WPKind
+ */
+
+/**
  * @typedef WPLinkSearchOptions
  *
- * @property {boolean}             [isInitialSuggestions] Displays initial search suggestions, when true.
- * @property {WPLinkSearchType}    [type]                 Filters by search type.
- * @property {string}              [subtype]              Slug of the post-type or taxonomy.
- * @property {number}              [page]                 Which page of results to return.
- * @property {number}              [perPage]              Search results per page.
+ * @property {boolean}          [isInitialSuggestions] Displays initial search suggestions, when true.
+ * @property {WPLinkSearchType} [type]                 Filters by search type.
+ * @property {string}           [subtype]              Slug of the post-type or taxonomy.
+ * @property {number}           [page]                 Which page of results to return.
+ * @property {number}           [perPage]              Search results per page.
  */
 
 /**
@@ -29,6 +35,7 @@ import { __ } from '@wordpress/i18n';
  * @property {string} url    Link url.
  * @property {string} title  Title of the link.
  * @property {string} type   The taxonomy or post type slug or type URL.
+ * @property {WPKind} [kind] Link kind of post-type or taxonomy
  */
 
 /**
@@ -87,7 +94,16 @@ const fetchLinkSuggestions = async (
 					type: 'post',
 					subtype,
 				} ),
-			} ).catch( () => [] ) // fail by returning no results
+			} )
+				.then( ( results ) => {
+					return results.map( ( result ) => {
+						return {
+							...result,
+							meta: { kind: 'post-type', subtype },
+						};
+					} );
+				} )
+				.catch( () => [] ) // fail by returning no results
 		);
 	}
 
@@ -101,7 +117,16 @@ const fetchLinkSuggestions = async (
 					type: 'term',
 					subtype,
 				} ),
-			} ).catch( () => [] )
+			} )
+				.then( ( results ) => {
+					return results.map( ( result ) => {
+						return {
+							...result,
+							meta: { kind: 'taxonomy', subtype },
+						};
+					} );
+				} )
+				.catch( () => [] )
 		);
 	}
 
@@ -115,7 +140,16 @@ const fetchLinkSuggestions = async (
 					type: 'post-format',
 					subtype,
 				} ),
-			} ).catch( () => [] )
+			} )
+				.then( ( results ) => {
+					return results.map( ( result ) => {
+						return {
+							...result,
+							meta: { kind: 'taxonomy', subtype },
+						};
+					} );
+				} )
+				.catch( () => [] )
 		);
 	}
 
@@ -146,6 +180,7 @@ const fetchLinkSuggestions = async (
 							decodeEntities( result.title || '' ) ||
 							__( '(no title)' ),
 						type: result.subtype || result.type,
+						kind: result?.meta?.kind,
 					};
 				}
 			);

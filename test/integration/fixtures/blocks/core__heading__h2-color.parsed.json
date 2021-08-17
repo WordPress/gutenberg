@@ -1,0 +1,13 @@
+[
+	{
+		"blockName": "core/heading",
+		"attrs": {
+			"textColor": "accent"
+		},
+		"innerBlocks": [],
+		"innerHTML": "\n<h2 class=\"has-accent-color has-text-color\">Text</h2>\n",
+		"innerContent": [
+			"\n<h2 class=\"has-accent-color has-text-color\">Text</h2>\n"
+		]
+	}
+]

@@ -231,7 +231,19 @@ export function isNavigationOpened( state ) {
  * @return {boolean} True if the inserter panel should be open; false if closed.
  */
 export function isInserterOpened( state ) {
-	return state.blockInserterPanel;
+	return !! state.blockInserterPanel;
+}
+
+/**
+ * Get the insertion point for the inserter.
+ *
+ * @param {Object} state Global application state.
+ *
+ * @return {Object} The root client ID and index to insert at.
+ */
+export function __experimentalGetInsertionPoint( state ) {
+	const { rootClientId, insertionIndex } = state.blockInserterPanel;
+	return { rootClientId, insertionIndex };
 }
 
 /**

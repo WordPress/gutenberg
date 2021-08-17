@@ -1,18 +1,14 @@
 /**
- * External dependencies
- */
-import { useContextSystem } from '@wp-g2/context';
-import { cx } from '@wp-g2/styles';
-import { getValidChildren } from '@wp-g2/utils';
-
-/**
  * Internal dependencies
  */
+import { getValidChildren } from '../utils/get-valid-children';
+import { useContextSystem } from '../context';
 import { ControlGroupContext } from './context';
 import * as styles from './styles';
+import { useCx } from '../../utils/hooks/use-cx';
 
 /**
- * @param {import('@wp-g2/create-styles').ViewOwnProps<import('./types').Props, 'div'>} props
+ * @param {import('../context').PolymorphicComponentProps<import('./types').Props, 'div'>} props
  */
 export function useControlGroup( props ) {
 	const {
@@ -26,6 +22,8 @@ export function useControlGroup( props ) {
 	const validChildren = getValidChildren( children );
 	const isVertical = direction === 'column';
 	const isGrid = !! templateColumns;
+
+	const cx = useCx();
 
 	const classes = cx(
 		styles.itemFocus,
@@ -44,7 +42,7 @@ export function useControlGroup( props ) {
 			// @ts-ignore
 			const _key = child?.key || index;
 
-			/** @type {string | undefined} */
+			/** @type {import('@emotion/react').SerializedStyles | undefined} */
 			let first;
 			if ( isFirst ) {
 				if ( isVertical ) {
@@ -54,7 +52,7 @@ export function useControlGroup( props ) {
 				}
 			}
 
-			/** @type {string | undefined} */
+			/** @type {import('@emotion/react').SerializedStyles | undefined} */
 			let last;
 			if ( isLast ) {
 				if ( isVertical ) {

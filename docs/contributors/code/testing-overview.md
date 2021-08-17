@@ -371,7 +371,7 @@ Part of the unit-tests suite is a set of Jest tests run exercise native-mobile c
 To locally run the tests in debug mode, follow these steps:
 
 0. Make sure you have ran `npm ci` to install all the packages
-1. Run `npm run test-unit:native:debug` inside the Gutenberg root folder, on the CLI. Node is now waiting for the debugger to connect.
+1. Run `npm run native test:debug` inside the Gutenberg root folder, on the CLI. Node is now waiting for the debugger to connect.
 2. Open `chrome://inspect` in Chrome
 3. Under the "Remote Target" section, look for a `../../node_modules/.bin/jest` target and click on the "inspect" link. That will open a new window with the Chrome DevTools debugger attached to the process and stopped at the beginning of the `jest.js` file. Alternatively, if the targets are not visible, click on the `Open dedicated DevTools for Node` link in the same page.
 4. You can place breakpoints or `debugger;` statements throughout the code, including the tests code, to stop and inspect
@@ -382,9 +382,15 @@ To locally run the tests in debug mode, follow these steps:
 
 Contributors to Gutenberg will note that PRs include continuous integration E2E tests running the native mobile E2E tests on Android and iOS. For troubleshooting failed tests, check our guide on [native mobile tests in continious integration](docs/contributors/native-mobile.md#native-mobile-e2e-tests-in-continuous-integration). More information on running these tests locally can be found in the [relevant directory README.md](https://github.com/WordPress/gutenberg/tree/HEAD/packages/react-native-editor/__device-tests__).
 
+### Native mobile integration tests
+
+There is an ongoing effort to add integration tests to the native mobile project using the [`react-native-testing-library`](https://testing-library.com/docs/react-native-testing-library/intro/) library. A guide to writing integration tests can be found [here](native-mobile-integration-test-guide.md).
+
 ## End-to-end Testing
 
 End-to-end tests use [Puppeteer](https://github.com/puppeteer/puppeteer) as a headless Chromium driver, and are otherwise still run by a [Jest](https://jestjs.io/) test runner.
+
+### Using wp-env
 
 If you're using the built-in [local environment](/docs/contributors/code/getting-started-with-code-contribution.md#local-environment), you can run the e2e tests locally using this command:
 
@@ -416,11 +422,21 @@ You can additionally have the devtools automatically open for interactive debugg
 npm run test-e2e:watch -- --puppeteer-devtools
 ```
 
-If you're using a different setup, you can provide the base URL, username and password like this:
+### Using alternate enviornment
+
+If you're using a different setup than wp-env, you can provide the base URL, username and password like this:
 
 ```bash
 npm run test-e2e -- --wordpress-base-url=http://localhost:8888 --wordpress-username=admin --wordpress-password=password
 ```
+
+You also need to symlink all e2e test plugins to your site plugins directory:
+
+```bash
+ln -s gutenberg/packages/e2e-tests/plugins/* .
+```
+
+### Scenario Testing
 
 If you find that end-to-end tests pass when run locally, but fail in Travis, you may be able to isolate a CPU- or netowrk-bound race condition by simulating a slow CPU or network:
 
@@ -430,7 +446,7 @@ THROTTLE_CPU=4 npm run test-e2e
 
 `THROTTLE_CPU` is a slowdown factor (in this example, a 4x slowdown multiplier)
 
-Related: https://chromedevtools.github.io/devtools-protocol/tot/Emulation#method-setCPUThrottlingRate
+See [Chrome docs: setCPUThrottlingRate](https://chromedevtools.github.io/devtools-protocol/tot/Emulation#method-setCPUThrottlingRate)
 
 ```
 SLOW_NETWORK=true npm run test-e2e
@@ -438,7 +454,7 @@ SLOW_NETWORK=true npm run test-e2e
 
 `SLOW_NETWORK` emulates a network speed equivalent to "Fast 3G" in the Chrome devtools.
 
-Related: https://chromedevtools.github.io/devtools-protocol/tot/Network#method-emulateNetworkConditions and https://github.com/ChromeDevTools/devtools-frontend/blob/80c102878fd97a7a696572054007d40560dcdd21/front_end/sdk/NetworkManager.js#L252-L274
+See [Chrome docs: emulateNetworkConditions](https://chromedevtools.github.io/devtools-protocol/tot/Network#method-emulateNetworkConditions) and [NetworkManager.js](https://github.com/ChromeDevTools/devtools-frontend/blob/80c102878fd97a7a696572054007d40560dcdd21/front_end/sdk/NetworkManager.js#L252-L274)
 
 ```
 OFFLINE=true npm run test-e2e
@@ -446,11 +462,11 @@ OFFLINE=true npm run test-e2e
 
 `OFFLINE` emulates network disconnection.
 
-Related: https://chromedevtools.github.io/devtools-protocol/tot/Network#method-emulateNetworkConditions
+See [Chrome docs: emulateNetworkConditions](https://chromedevtools.github.io/devtools-protocol/tot/Network#method-emulateNetworkConditions)
 
 ### Core Block Testing
 
-Every core block is required to have at least one set of fixture files for its main save function and one for each deprecation. These fixtures test the parsing and serialization of the block. See [the e2e tests fixtures readme](https://github.com/wordpress/gutenberg/blob/HEAD/packages/e2e-tests/fixtures/blocks/README.md) for more information and instructions.
+Every core block is required to have at least one set of fixture files for its main save function and one for each deprecation. These fixtures test the parsing and serialization of the block. See [the integration tests fixtures readme](https://github.com/wordpress/gutenberg/blob/HEAD/test/integration/fixtures/blocks/README.md) for more information and instructions.
 
 ## PHP Testing
 

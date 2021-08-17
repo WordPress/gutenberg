@@ -21,7 +21,7 @@ const DEFAULT_METHOD = 'GET';
  * API Fetch middleware which overrides the request method for HTTP v1
  * compatibility leveraging the REST API X-HTTP-Method-Override header.
  *
- * @type {import('../types').ApiFetchMiddleware}
+ * @type {import('../types').APIFetchMiddleware}
  */
 const httpV1Middleware = ( options, next ) => {
 	const { method = DEFAULT_METHOD } = options;

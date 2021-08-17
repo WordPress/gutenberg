@@ -5,12 +5,14 @@ import { Icon, search } from '@wordpress/icons';
 
 const PlaceholderPreview = () => {
 	return (
-		<div className="wp-block-navigation-placeholder__preview">
-			<span className="wp-block-navigation-link"></span>
-			<span className="wp-block-navigation-link"></span>
-			<span className="wp-block-navigation-link"></span>
-			<Icon icon={ search } />
-		</div>
+		<ul className="wp-block-navigation-placeholder__preview wp-block-navigation__container">
+			<li className="wp-block-navigation-link">&#8203;</li>
+			<li className="wp-block-navigation-link">&#8203;</li>
+			<li className="wp-block-navigation-link">&#8203;</li>
+			<li className="wp-block-navigation-placeholder__preview-search-icon">
+				<Icon icon={ search } />
+			</li>
+		</ul>
 	);
 };
 

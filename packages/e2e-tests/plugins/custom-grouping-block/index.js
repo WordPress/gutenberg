@@ -1,4 +1,4 @@
-( function() {
+( function () {
 	wp.blocks.registerBlockType( 'test/alternative-group-block', {
 		title: 'Alternative Group Block',
 		category: 'design',

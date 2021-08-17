@@ -24,9 +24,9 @@ describe( 'Cover', () => {
 		);
 
 		// Select the cover block.By default the child paragraph gets selected.
-		await page.click( 'button[aria-label="List view"]' );
+		await page.click( '.edit-post-header-toolbar__list-view-toggle' );
 		await page.click(
-			'.block-editor-block-navigation-block__contents-container button'
+			'.block-editor-list-view-block__contents-container button'
 		);
 
 		const heightInput = (

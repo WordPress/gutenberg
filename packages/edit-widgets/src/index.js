@@ -4,23 +4,54 @@
 import {
 	registerBlockType,
 	unstable__bootstrapServerSideBlockDefinitions, // eslint-disable-line camelcase
+	setFreeformContentHandlerName,
 } from '@wordpress/blocks';
-import { render } from '@wordpress/element';
+import { render, unmountComponentAtNode } from '@wordpress/element';
 import {
 	registerCoreBlocks,
 	__experimentalGetCoreBlocks,
 	__experimentalRegisterExperimentalCoreBlocks,
 } from '@wordpress/block-library';
 import { __experimentalFetchLinkSuggestions as fetchLinkSuggestions } from '@wordpress/core-data';
+import {
+	registerLegacyWidgetBlock,
+	registerLegacyWidgetVariations,
+} from '@wordpress/widgets';
 
 /**
  * Internal dependencies
  */
 import './store';
-import './hooks';
+import './filters';
 import * as widgetArea from './blocks/widget-area';
 import Layout from './components/layout';
-import registerLegacyWidgetVariations from './register-legacy-widget-variations';
+import {
+	ALLOW_REUSABLE_BLOCKS,
+	ENABLE_EXPERIMENTAL_FSE_BLOCKS,
+} from './constants';
+
+const disabledBlocks = [
+	'core/more',
+	'core/freeform',
+	...( ! ALLOW_REUSABLE_BLOCKS && [ 'core/block' ] ),
+];
+
+/**
+ * Reinitializes the editor after the user chooses to reboot the editor after
+ * an unhandled error occurs, replacing previously mounted editor element using
+ * an initial state from prior to the crash.
+ *
+ * @param {Element} target   DOM node in which editor is rendered.
+ * @param {?Object} settings Editor settings object.
+ */
+export function reinitializeEditor( target, settings ) {
+	unmountComponentAtNode( target );
+	const reboot = reinitializeEditor.bind( null, target, settings );
+	render(
+		<Layout blockEditorSettings={ settings } onError={ reboot } />,
+		target
+	);
+}
 
 /**
  * Initializes the block editor in the widgets screen.
@@ -29,22 +60,37 @@ import registerLegacyWidgetVariations from './register-legacy-widget-variations'
  * @param {Object} settings Block editor settings.
  */
 export function initialize( id, settings ) {
-	const coreBlocks = __experimentalGetCoreBlocks().filter(
-		( block ) => ! [ 'core/more' ].includes( block.name )
-	);
+	const target = document.getElementById( id );
+	const reboot = reinitializeEditor.bind( null, target, settings );
+	const coreBlocks = __experimentalGetCoreBlocks().filter( ( block ) => {
+		return ! (
+			disabledBlocks.includes( block.name ) ||
+			block.name.startsWith( 'core/post' ) ||
+			block.name.startsWith( 'core/query' ) ||
+			block.name.startsWith( 'core/site' )
+		);
+	} );
+
 	registerCoreBlocks( coreBlocks );
+	registerLegacyWidgetBlock();
 	if ( process.env.GUTENBERG_PHASE === 2 ) {
 		__experimentalRegisterExperimentalCoreBlocks( {
-			enableLegacyWidgetBlock: true,
+			enableFSEBlocks: ENABLE_EXPERIMENTAL_FSE_BLOCKS,
 		} );
 	}
 	registerLegacyWidgetVariations( settings );
 	registerBlock( widgetArea );
 	settings.__experimentalFetchLinkSuggestions = ( search, searchOptions ) =>
 		fetchLinkSuggestions( search, searchOptions, settings );
+
+	// As we are unregistering `core/freeform` to avoid the Classic block, we must
+	// replace it with something as the default freeform content handler. Failure to
+	// do this will result in errors in the default block parser.
+	// see: https://github.com/WordPress/gutenberg/issues/33097
+	setFreeformContentHandlerName( 'core/html' );
 	render(
-		<Layout blockEditorSettings={ settings } />,
-		document.getElementById( id )
+		<Layout blockEditorSettings={ settings } onError={ reboot } />,
+		target
 	);
 }
 

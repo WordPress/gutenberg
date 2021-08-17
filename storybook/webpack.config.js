@@ -12,7 +12,7 @@ module.exports = ( { config } ) => {
 	config.module.rules.push(
 		{
 			test: /\/stories\/.+\.js$/,
-			loaders: [ require.resolve( '@storybook/source-loader' ) ],
+			loader: require.resolve( '@storybook/source-loader' ),
 			enforce: 'pre',
 		},
 		{
@@ -23,8 +23,10 @@ module.exports = ( { config } ) => {
 				{
 					loader: 'postcss-loader',
 					options: {
-						ident: 'postcss',
-						plugins: postcssPlugins,
+						postcssOptions: {
+							ident: 'postcss',
+							plugins: postcssPlugins,
+						},
 					},
 				},
 				'sass-loader',
