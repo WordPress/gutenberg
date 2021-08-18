@@ -82,12 +82,13 @@ Features are boolean values used for toggling specific editor features on or off
 Set the default values for any features on editor initialization:
 
 ```js
-import { setFeatureDefaults } from '@wordpress/interface';
+import { dispatch } from '@wordpress/data';
+import { store as interfaceStore } from '@wordpress/interface';
 
 function initialize() {
 	// ...
 
-	setFeatureDefaults( 'namespace/editor-or-plugin-name', {
+	dispatch( interfaceStore ).setFeatureDefaults( 'namespace/editor-or-plugin-name', {
 		myFeatureName: true
 	} );
 

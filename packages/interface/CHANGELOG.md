@@ -4,7 +4,7 @@
 
 ### New Feature
 
--  Add support for editor 'feature' preferences. Adds an `isFeatureActive` selector, a `toggleFeature` action, a `setFeatureDefaults` API function, a `MoreMenuDropdown` component, and a `MoreMenuFeatureToggle` component. ([#33774](https://github.com/WordPress/gutenberg/pull/33774)).
+-  Add support for editor 'feature' preferences. Adds an `isFeatureActive` selector, a `toggleFeature` action, a `MoreMenuDropdown` component, and a `MoreMenuFeatureToggle` component. ([#33774](https://github.com/WordPress/gutenberg/pull/33774)).
 
 ## 4.0.0 (2021-07-29)
 
