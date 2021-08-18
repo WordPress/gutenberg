@@ -1278,6 +1278,24 @@
 		"parent": "components"
 	},
 	{
+		"title": "ToolsPanelHeader",
+		"slug": "tools-panel-header",
+		"markdown_source": "../packages/components/src/tools-panel/tools-panel-header/README.md",
+		"parent": "components"
+	},
+	{
+		"title": "ToolsPanelItem",
+		"slug": "tools-panel-item",
+		"markdown_source": "../packages/components/src/tools-panel/tools-panel-item/README.md",
+		"parent": "components"
+	},
+	{
+		"title": "ToolsPanel",
+		"slug": "tools-panel",
+		"markdown_source": "../packages/components/src/tools-panel/tools-panel/README.md",
+		"parent": "components"
+	},
+	{
 		"title": "Tooltip",
 		"slug": "tooltip",
 		"markdown_source": "../packages/components/src/tooltip/README.md",

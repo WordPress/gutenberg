@@ -2,6 +2,32 @@
 
 ## Unreleased
 
+### Breaking Changes
+
+-   Increase the minimum Node.js version to v12.13 matching requirements from bundled dependencies ([#33818](https://github.com/WordPress/gutenberg/pull/33818)).
+-   The bundled `webpack` dependency has been updated to the next major version `^5.47.1` (see [Breaking Changes](https://webpack.js.org/migrate/5/), [##33818](https://github.com/WordPress/gutenberg/pull/#33818)).
+-   The bundled `webpack-cli` dependency has been updated to the next major version `^4.7.2` ([##33818](https://github.com/WordPress/gutenberg/pull/#33818)).
+-   The bundled `css-loader` dependency has been updated from requiring `^5.1.3` to requiring `^6.2.0` ([#33818](https://github.com/WordPress/gutenberg/pull/33818)).
+-   The bundled `file-loader` dependency has been removed ([#33818](https://github.com/WordPress/gutenberg/pull/33818)).
+-   The bundled `ignore-emit-webpack-plugin` dependency has been removed ([#33818](https://github.com/WordPress/gutenberg/pull/33818)).
+-   The bundled `mini-css-extract-plugin` dependency has been updated from requiring `^1.3.9` to requiring `^2.1.0` ([#33818](https://github.com/WordPress/gutenberg/pull/33818)).
+-   The bundled `postcss-loader` dependency has been updated from requiring `^4.2.0` to requiring `^6.1.1` ([#33818](https://github.com/WordPress/gutenberg/pull/33818)).
+-   The bundled `sass-loader` dependency has been updated from requiring `^10.1.1` to requiring `^12.1.0` ([#33818](https://github.com/WordPress/gutenberg/pull/33818)).
+-   The bundled `source-map-loader` dependency has been updated from requiring `^0.2.4` to requiring `^3.0.0` ([#33818](https://github.com/WordPress/gutenberg/pull/33818)).
+-   The bundled `thread-loader` dependency has been removed ([#33818](https://github.com/WordPress/gutenberg/pull/33818)).
+-   The bundled `terser-webpack-plugin` dependency has been updated from requiring `^3.0.3` to requiring `^5.1.4` ([#33818](https://github.com/WordPress/gutenberg/pull/33818)).
+-   The bundled `webpack-live-reload-plugin` dependency has been updated from requiring `^2.3.0` to requiring `^3.0.1` ([#33818](https://github.com/WordPress/gutenberg/pull/33818)).
+-   The bundled `webpack-sources` dependency has been removed ([#33818](https://github.com/WordPress/gutenberg/pull/33818)).
+
+### Enhancements
+
+-   The bundled `@svgr/webpack` dependency has been updated from requiring `^5.2.0` to requiring `^5.5.0` ([#33818](https://github.com/WordPress/gutenberg/pull/33818)).
+-   The bundled `webpack-bundle-analyzer` dependency has been updated from requiring `^4.2.0` to requiring `^4.4.2` ([#33818](https://github.com/WordPress/gutenberg/pull/33818)).
+
+### Bug Fixes
+
+-   Add missing fallback for target in webpack 5 config ([#34112](https://github.com/WordPress/gutenberg/pull/34112)),
+
 ## 17.1.0 (2021-07-29)
 
 ### Enhancements

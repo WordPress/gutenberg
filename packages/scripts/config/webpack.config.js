@@ -6,6 +6,7 @@ const LiveReloadPlugin = require( 'webpack-livereload-plugin' );
 const MiniCSSExtractPlugin = require( 'mini-css-extract-plugin' );
 const TerserPlugin = require( 'terser-webpack-plugin' );
 const { CleanWebpackPlugin } = require( 'clean-webpack-plugin' );
+const browserslist = require( 'browserslist' );
 const path = require( 'path' );
 
 /**
@@ -18,15 +19,18 @@ const postcssPlugins = require( '@wordpress/postcss-plugins-preset' );
  * Internal dependencies
  */
 const {
-	getPackageProp,
+	fromConfigRoot,
 	hasBabelConfig,
 	hasCssnanoConfig,
 	hasPostCSSConfig,
 } = require( '../utils' );
-const FixStyleWebpackPlugin = require( './fix-style-webpack-plugin' );
 
 const isProduction = process.env.NODE_ENV === 'production';
 const mode = isProduction ? 'production' : 'development';
+let target = 'browserslist';
+if ( ! browserslist.findConfig( '.' ) ) {
+	target += ':' + fromConfigRoot( '.browserslistrc' );
+}
 
 const cssLoaders = [
 	{
@@ -75,32 +79,6 @@ const cssLoaders = [
 	},
 ];
 
-/**
- * Gets a unique identifier for the webpack build to avoid multiple webpack
- * runtimes to conflict when using globals.
- * This is polyfill and it is based on the default webpack 5 implementation.
- *
- * @see https://github.com/webpack/webpack/blob/bbb16e7af2eddba4cd77ca739904c2aa238a2b7b/lib/config/defaults.js#L374-L376
- *
- * @return {string} The generated identifier.
- */
-const getJsonpFunctionIdentifier = () => {
-	const jsonpFunction = 'webpackJsonp_';
-	const packageName = getPackageProp( 'name' );
-	if ( typeof packageName !== 'string' || ! packageName ) {
-		return jsonpFunction;
-	}
-	const IDENTIFIER_NAME_REPLACE_REGEX = /^([^a-zA-Z$_])/;
-	const IDENTIFIER_ALPHA_NUMERIC_NAME_REPLACE_REGEX = /[^a-zA-Z0-9$]+/g;
-
-	return (
-		jsonpFunction +
-		packageName
-			.replace( IDENTIFIER_NAME_REPLACE_REGEX, '_$1' )
-			.replace( IDENTIFIER_ALPHA_NUMERIC_NAME_REPLACE_REGEX, '_' )
-	);
-};
-
 const getLiveReloadPort = ( inputPort ) => {
 	const parsedPort = parseInt( inputPort, 10 );
 
@@ -109,16 +87,13 @@ const getLiveReloadPort = ( inputPort ) => {
 
 const config = {
 	mode,
+	target,
 	entry: {
 		index: path.resolve( process.cwd(), 'src', 'index.js' ),
 	},
 	output: {
 		filename: '[name].js',
 		path: path.resolve( process.cwd(), 'build' ),
-		// Prevents conflicts when multiple webpack runtimes (from different apps)
-		// are used on the same page.
-		// @see https://github.com/WordPress/gutenberg/issues/23607
-		jsonpFunction: getJsonpFunctionIdentifier(),
 	},
 	resolve: {
 		alias: {
@@ -132,19 +107,20 @@ const config = {
 		splitChunks: {
 			cacheGroups: {
 				style: {
+					type: 'css/mini-extract',
 					test: /[\\/]style(\.module)?\.(sc|sa|c)ss$/,
 					chunks: 'all',
 					enforce: true,
-					automaticNameDelimiter: '-',
+					name( module, chunks, cacheGroupKey ) {
+						return `${ cacheGroupKey }-${ chunks[ 0 ].name }`;
+					},
 				},
 				default: false,
 			},
 		},
 		minimizer: [
 			new TerserPlugin( {
-				cache: true,
 				parallel: true,
-				sourceMap: ! isProduction,
 				terserOptions: {
 					output: {
 						comments: /translators:/i,
@@ -166,7 +142,6 @@ const config = {
 				test: /\.jsx?$/,
 				exclude: /node_modules/,
 				use: [
-					require.resolve( 'thread-loader' ),
 					{
 						loader: require.resolve( 'babel-loader' ),
 						options: {
@@ -210,24 +185,21 @@ const config = {
 			{
 				test: /\.svg$/,
 				use: [ '@svgr/webpack', 'url-loader' ],
+				type: 'javascript/auto',
 			},
 			{
 				test: /\.(bmp|png|jpe?g|gif)$/i,
-				loader: require.resolve( 'file-loader' ),
-				options: {
-					name: 'images/[name].[hash:8].[ext]',
+				type: 'asset/resource',
+				generator: {
+					filename: 'images/[name].[hash:8][ext]',
 				},
 			},
 			{
-				test: /\.(woff|woff2|eot|ttf|otf)$/,
-				use: [
-					{
-						loader: 'file-loader',
-						options: {
-							name: 'fonts/[name].[hash:8].[ext]',
-						},
-					},
-				],
+				test: /\.(woff|woff2|eot|ttf|otf)$/i,
+				type: 'asset/resource',
+				generator: {
+					filename: 'fonts/[name].[hash:8][ext]',
+				},
 			},
 		],
 	},
@@ -244,10 +216,6 @@ const config = {
 		process.env.WP_BUNDLE_ANALYZER && new BundleAnalyzerPlugin(),
 		// MiniCSSExtractPlugin to extract the CSS thats gets imported into JavaScript.
 		new MiniCSSExtractPlugin( { filename: '[name].css' } ),
-		// MiniCSSExtractPlugin creates JavaScript assets for CSS that are
-		// obsolete and should be removed. Related webpack issue:
-		// https://github.com/webpack-contrib/mini-css-extract-plugin/issues/85
-		new FixStyleWebpackPlugin(),
 		// WP_LIVE_RELOAD_PORT global variable changes port on which live reload
 		// works when running watch mode.
 		! isProduction &&

@@ -711,7 +711,7 @@ _Parameters_
 
 _Returns_
 
--   `?WPBlock`: The block, if it has been successfully registered; otherwise `undefined`.
+-   `?WPBlockType`: The block, if it has been successfully registered; otherwise `undefined`.
 
 ### registerBlockVariation
 
@@ -837,7 +837,7 @@ _Parameters_
 
 _Returns_
 
--   `?WPBlock`: The previous block value, if it has been successfully unregistered; otherwise `undefined`.
+-   `?WPBlockType`: The previous block value, if it has been successfully unregistered; otherwise `undefined`.
 
 ### unregisterBlockVariation
 

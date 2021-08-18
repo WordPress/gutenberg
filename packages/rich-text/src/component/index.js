@@ -3,6 +3,7 @@
  */
 import { useRef, useLayoutEffect, useReducer } from '@wordpress/element';
 import { useMergeRefs, useRefEffect } from '@wordpress/compose';
+import { useRegistry } from '@wordpress/data';
 
 /**
  * Internal dependencies
@@ -18,6 +19,7 @@ import { useSelectObject } from './use-select-object';
 import { useIndentListItemOnSpace } from './use-indent-list-item-on-space';
 import { useInputAndSelection } from './use-input-and-selection';
 import { useDelete } from './use-delete';
+import { useSpace } from './use-space';
 
 export function useRichText( {
 	value = '',
@@ -35,6 +37,7 @@ export function useRichText( {
 	__unstableBeforeSerialize,
 	__unstableAddInvisibleFormats,
 } ) {
+	const registry = useRegistry();
 	const [ , forceRender ] = useReducer( () => ( {} ) );
 	const ref = useRef();
 
@@ -136,10 +139,13 @@ export function useRichText( {
 
 		// Selection must be updated first, so it is recorded in history when
 		// the content change happens.
-		onSelectionChange( start, end );
-		onChange( _value.current, {
-			__unstableFormats: formats,
-			__unstableText: text,
+		// We batch both calls to only attempty to rerender once.
+		registry.batch( () => {
+			onSelectionChange( start, end );
+			onChange( _value.current, {
+				__unstableFormats: formats,
+				__unstableText: text,
+			} );
 		} );
 		forceRender();
 	}
@@ -198,6 +204,7 @@ export function useRichText( {
 			isSelected,
 			onSelectionChange,
 		} ),
+		useSpace(),
 		useRefEffect( () => {
 			applyFromProps();
 			didMount.current = true;

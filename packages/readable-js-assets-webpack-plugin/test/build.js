@@ -44,7 +44,12 @@ describe( 'ReadableJsAssetsWebpackPlugin', () => {
 				assetFiles.forEach( ( assetFile ) => {
 					expect(
 						fs.readFileSync( assetFile, 'utf-8' )
-					).toMatchSnapshot( 'Asset file should match snapshot' );
+					).toMatchSnapshot(
+						`Asset file ${ path.relative(
+							outputDirectory,
+							assetFile
+						) } should match snapshot`
+					);
 				} );
 
 				resolve();

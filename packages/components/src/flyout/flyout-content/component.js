@@ -8,7 +8,7 @@ import { contextConnect, useContextSystem } from '../../ui/context';
 /**
  *
  * @param {import('../../ui/context').PolymorphicComponentProps<import('../types').ContentProps, 'div', false>} props
- * @param {import('react').Ref<any>}                                                                     forwardedRef
+ * @param {import('react').Ref<any>}                                                                            forwardedRef
  */
 function FlyoutContent( props, forwardedRef ) {
 	const {

@@ -27,7 +27,7 @@ import {
 	__experimentalUseCustomUnits as useCustomUnits,
 } from '@wordpress/components';
 import { useInstanceId } from '@wordpress/compose';
-import { search } from '@wordpress/icons';
+import { Icon, search } from '@wordpress/icons';
 import { __ } from '@wordpress/i18n';
 
 /**
@@ -211,7 +211,8 @@ export default function SearchEdit( {
 		const buttonClasses = classnames(
 			'wp-block-search__button',
 			colorProps.className,
-			isButtonPositionInside ? undefined : borderProps.className
+			isButtonPositionInside ? undefined : borderProps.className,
+			buttonUseIcon ? 'has-icon' : undefined
 		);
 		const buttonStyles = {
 			...colorProps.style,
@@ -223,11 +224,13 @@ export default function SearchEdit( {
 		return (
 			<>
 				{ buttonUseIcon && (
-					<Button
-						icon={ search }
+					<button
+						type="button"
 						className={ buttonClasses }
 						style={ buttonStyles }
-					/>
+					>
+						<Icon icon={ search } />
+					</button>
 				) }
 
 				{ ! buttonUseIcon && (

@@ -94,7 +94,13 @@ function getPresetsClasses( blockSelector, blockPresets = {} ) {
 							const classSelectorToUse = `.has-${ kebabCase(
 								slug
 							) }-${ classSuffix }`;
-							const selectorToUse = `${ blockSelector }${ classSelectorToUse }`;
+							const selectorToUse = blockSelector
+								.split( ',' ) // Selector can be "h1, h2, h3"
+								.map(
+									( selector ) =>
+										`${ selector }${ classSelectorToUse }`
+								)
+								.join( ',' );
 							const value = `var(--wp--preset--${ cssVarInfix }--${ kebabCase(
 								slug
 							) })`;
@@ -253,10 +259,11 @@ export const getNodesWithSettings = ( tree, blockSelectors ) => {
 
 	// Top-level.
 	const presets = pickPresets( tree.settings );
-	if ( ! isEmpty( presets ) ) {
+	const custom = tree.settings?.custom;
+	if ( ! isEmpty( presets ) || !! custom ) {
 		nodes.push( {
 			presets,
-			custom: tree.settings?.custom,
+			custom,
 			selector: ROOT_BLOCK_SELECTOR,
 		} );
 	}
@@ -264,10 +271,11 @@ export const getNodesWithSettings = ( tree, blockSelectors ) => {
 	// Blocks.
 	forEach( tree.settings?.blocks, ( node, blockName ) => {
 		const blockPresets = pickPresets( node );
-		if ( ! isEmpty( blockPresets ) ) {
+		const blockCustom = node.custom;
+		if ( ! isEmpty( blockPresets ) || !! blockCustom ) {
 			nodes.push( {
 				presets: blockPresets,
-				custom: node.custom,
+				custom: blockCustom,
 				selector: blockSelectors[ blockName ].selector,
 			} );
 		}

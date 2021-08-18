@@ -227,6 +227,8 @@ PODS:
     - react-native-video/Video (= 5.0.2-wp)
   - react-native-video/Video (5.0.2-wp):
     - React-Core
+  - react-native-webview (11.6.5-wp):
+    - React-Core
   - React-perflogger (0.64.0)
   - React-RCTActionSheet (0.64.0):
     - React-Core/RCTActionSheetHeaders (= 0.64.0)
@@ -334,6 +336,7 @@ DEPENDENCIES:
   - react-native-safe-area-context (from `../../../node_modules/react-native-safe-area-context`)
   - "react-native-slider (from `../../../node_modules/@react-native-community/slider`)"
   - react-native-video (from `../../../node_modules/react-native-video`)
+  - react-native-webview (from `../../../node_modules/react-native-webview`)
   - React-perflogger (from `../../../node_modules/react-native/ReactCommon/reactperflogger`)
   - React-RCTActionSheet (from `../../../node_modules/react-native/Libraries/ActionSheetIOS`)
   - React-RCTAnimation (from `../../../node_modules/react-native/Libraries/NativeAnimation`)
@@ -408,6 +411,8 @@ EXTERNAL SOURCES:
     :path: "../../../node_modules/@react-native-community/slider"
   react-native-video:
     :path: "../../../node_modules/react-native-video"
+  react-native-webview:
+    :path: "../../../node_modules/react-native-webview"
   React-perflogger:
     :path: "../../../node_modules/react-native/ReactCommon/reactperflogger"
   React-RCTActionSheet:
@@ -473,6 +478,7 @@ SPEC CHECKSUMS:
   react-native-safe-area-context: a009bc6258899017cc2614c7934aefec8c396a52
   react-native-slider: 7109c55a87870d6b55e958c3c16a5900d66b4be8
   react-native-video: a84c5b1d4f2247040b205ea110528c8fdc147bce
+  react-native-webview: a182c691cb1ed627c0d407685630a9a0407a4853
   React-perflogger: 9c547d8f06b9bf00cb447f2b75e8d7f19b7e02af
   React-RCTActionSheet: 3080b6e12e0e1a5b313c8c0050699b5c794a1b11
   React-RCTAnimation: 3f96f21a497ae7dabf4d2f150ee43f906aaf516f
