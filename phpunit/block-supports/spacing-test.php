@@ -9,8 +9,31 @@
 class WP_Block_Supports_Spacing_Test extends WP_UnitTestCase {
 	private $sample_block_content = '<div class="wp-block-test-block">Test</div>';
 
+	private $test_gap_block_value = array();
+	private $test_gap_block_args = array();
+
 	function setUp() {
 		parent::setUp();
+
+		$this->test_gap_block_value = array(
+			'blockName' => 'test/test-block',
+			'attrs'     => array(
+				'style' => array(
+					'spacing' => array(
+						'blockGap' => '3em',
+					),
+				),
+			),
+		);
+
+		$this->test_gap_block_args = array(
+			'api_version' => 2,
+			'supports'    => array(
+				'spacing' => array(
+					'blockGap' => true,
+				),
+			),
+		);
 	}
 
 	function tearDown() {
@@ -20,60 +43,36 @@ class WP_Block_Supports_Spacing_Test extends WP_UnitTestCase {
 	}
 
 	function test_spacing_gap_block_support_renders_block_inline_style() {
-		$block = array(
-			'blockName' => 'test/test-block',
-			'attrs'     => array(
-				'style' => array(
-					'spacing' => array(
-						'blockGap' => '3em',
-					),
-				),
-			),
+		register_block_type( 'test/test-block', $this->test_gap_block_args );
+		$render_output = gutenberg_render_spacing_gap_support(
+			$this->sample_block_content,
+			$this->test_gap_block_value
 		);
-
-		$test_block_args = array(
-			'api_version' => 2,
-			'supports'    => array(
-				'spacing' => array(
-					'blockGap' => true,
-				),
-			),
-		);
-
-		register_block_type( 'test/test-block', $test_block_args );
-		$render_output = gutenberg_render_spacing_support( $this->sample_block_content, $block );
 
 		$this->assertSame(
-			'<div style="--wp--style--block-gap: 3em;" class="wp-block-test-block">Test</div>',
+			'<div style="--wp--style--block-gap: 3em" class="wp-block-test-block">Test</div>',
+			$render_output
+		);
+	}
+
+	function test_spacing_gap_block_support_renders_block_inline_style_with_inner_tag() {
+		register_block_type( 'test/test-block', $this->test_gap_block_args );
+		$render_output = gutenberg_render_spacing_gap_support(
+			'<div class="wp-test-block"><p style="color: red;">Test</p></div>',
+			$this->test_gap_block_value
+		);
+
+		$this->assertSame(
+			'<div style="--wp--style--block-gap: 3em" class="wp-test-block"><p style="color: red;">Test</p></div>',
 			$render_output
 		);
 	}
 
 	function test_spacing_gap_block_support_renders_appended_block_inline_style() {
-		$block = array(
-			'blockName' => 'test/test-block',
-			'attrs'     => array(
-				'style' => array(
-					'spacing' => array(
-						'blockGap' => '3em',
-					),
-				),
-			),
-		);
-
-		$test_block_args = array(
-			'api_version' => 2,
-			'supports'    => array(
-				'spacing' => array(
-					'blockGap' => true,
-				),
-			),
-		);
-
-		register_block_type( 'test/test-block', $test_block_args );
-		$render_output = gutenberg_render_spacing_support(
+		register_block_type( 'test/test-block', $this->test_gap_block_args );
+		$render_output = gutenberg_render_spacing_gap_support(
 			'<div class="wp-test-block" style="background: green;"><p style="color: red;">Test</p></div>',
-			$block
+			$this->test_gap_block_value
 		);
 
 		$this->assertSame(
@@ -83,28 +82,13 @@ class WP_Block_Supports_Spacing_Test extends WP_UnitTestCase {
 	}
 
 	function test_spacing_gap_block_support_does_not_render_style_when_support_is_false() {
-		$block = array(
-			'blockName' => 'test/test-block',
-			'attrs'     => array(
-				'style' => array(
-					'spacing' => array(
-						'blockGap' => '3em',
-					),
-				),
-			),
-		);
+		$this->test_gap_block_args['supports']['spacing']['blockGap'] = false;
 
-		$test_block_args = array(
-			'api_version' => 2,
-			'supports'    => array(
-				'spacing' => array(
-					'blockGap' => false,
-				),
-			),
+		register_block_type( 'test/test-block', $test_gap_block_args );
+		$render_output = gutenberg_render_spacing_gap_support(
+			$this->sample_block_content,
+			$this->test_gap_block_value
 		);
-
-		register_block_type( 'test/test-block', $test_block_args );
-		$render_output = gutenberg_render_spacing_support( $this->sample_block_content, $block );
 
 		$this->assertEquals(
 			$this->sample_block_content,
@@ -113,28 +97,14 @@ class WP_Block_Supports_Spacing_Test extends WP_UnitTestCase {
 	}
 
 	function test_spacing_gap_block_support_does_not_render_style_when_gap_is_null() {
-		$block = array(
-			'blockName' => 'test/test-block',
-			'attrs'     => array(
-				'style' => array(
-					'spacing' => array(
-						'blockGap' => null,
-					),
-				),
-			),
-		);
-
-		$test_block_args = array(
-			'api_version' => 2,
-			'supports'    => array(
-				'spacing' => array(
-					'blockGap' => true,
-				),
-			),
-		);
+		$this->test_gap_block_value['attrs']['style']['spacing']['blockGap'] = null;
+		$this->test_gap_block_args['supports']['spacing']['blockGap'] = true;
 
 		register_block_type( 'test/test-block', $test_block_args );
-		$render_output = gutenberg_render_spacing_support( $this->sample_block_content, $block );
+		$render_output = gutenberg_render_spacing_gap_support(
+			$this->sample_block_content,
+			$this->test_gap_block_value
+		);
 
 		$this->assertEquals(
 			$this->sample_block_content,

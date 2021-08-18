@@ -101,30 +101,38 @@ function gutenberg_skip_spacing_serialization( $block_type ) {
 
 
 /**
- * Renders the spacing support to the block wrapper, for supports that
- * require block-level server-side rendering, for example blockGap support
- * which uses CSS variables.
+ * Renders the spacing gap support to the block wrapper, to ensure
+ * that the CSS variable is rendered in all environments.
  *
  * @param  string $block_content Rendered block content.
  * @param  array  $block         Block object.
  * @return string                Filtered block content.
  */
-function gutenberg_render_spacing_support( $block_content, $block ) {
+function gutenberg_render_spacing_gap_support( $block_content, $block ) {
 	$block_type      = WP_Block_Type_Registry::get_instance()->get_registered( $block['blockName'] );
 	$has_gap_support = gutenberg_block_has_support( $block_type, array( 'spacing', 'blockGap' ), false );
 	if ( ! $has_gap_support || ! isset( $block['attrs']['style']['spacing']['blockGap'] ) ) {
 		return $block_content;
 	}
 
+	$gap_value = $block['attrs']['style']['spacing']['blockGap'];
+
+	// Skip if gap value contains unsupported characters.
+	// Regex for CSS value borrowed from `safecss_filter_attr`, and used here
+	// because we only want to match against the value, not the CSS attribute.
+	if ( preg_match( '%[\\\(&=}]|/\*%', $gap_value ) ) {
+		return $block_content;
+	}
+
 	$style = sprintf(
-		'--wp--style--block-gap: %s;',
-		esc_attr( $block['attrs']['style']['spacing']['blockGap'] )
+		'--wp--style--block-gap: %s',
+		esc_attr( $gap_value )
 	);
 
 	// Attempt to update an existing style attribute on the wrapper element.
 	$injected_style = preg_replace(
-		'/^(.+?)(' . preg_quote( 'style="', '/' ) . ')(?=.+?>)/',
-		'$1$2' . $style . ' ',
+		'/^([^>.]+?)(' . preg_quote( 'style="', '/' ) . ')(?=.+?>)/',
+		'$1$2' . $style . '; ',
 		$block_content,
 		1
 	);
@@ -151,4 +159,4 @@ WP_Block_Supports::get_instance()->register(
 	)
 );
 
-add_filter( 'render_block', 'gutenberg_render_spacing_support', 10, 2 );
+add_filter( 'render_block', 'gutenberg_render_spacing_gap_support', 10, 2 );
