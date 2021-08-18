@@ -6,6 +6,7 @@ const LiveReloadPlugin = require( 'webpack-livereload-plugin' );
 const MiniCSSExtractPlugin = require( 'mini-css-extract-plugin' );
 const TerserPlugin = require( 'terser-webpack-plugin' );
 const { CleanWebpackPlugin } = require( 'clean-webpack-plugin' );
+const browserslist = require( 'browserslist' );
 const path = require( 'path' );
 
 /**
@@ -18,6 +19,7 @@ const postcssPlugins = require( '@wordpress/postcss-plugins-preset' );
  * Internal dependencies
  */
 const {
+	fromConfigRoot,
 	hasBabelConfig,
 	hasCssnanoConfig,
 	hasPostCSSConfig,
@@ -25,6 +27,10 @@ const {
 
 const isProduction = process.env.NODE_ENV === 'production';
 const mode = isProduction ? 'production' : 'development';
+let target = 'browserslist';
+if ( ! browserslist.findConfig( '.' ) ) {
+	target += ':' + fromConfigRoot( '.browserslistrc' );
+}
 
 const cssLoaders = [
 	{
@@ -81,7 +87,7 @@ const getLiveReloadPort = ( inputPort ) => {
 
 const config = {
 	mode,
-	target: 'browserslist',
+	target,
 	entry: {
 		index: path.resolve( process.cwd(), 'src', 'index.js' ),
 	},
