@@ -1404,3 +1404,10 @@ export function setHasControlledInnerBlocks(
 		clientId,
 	};
 }
+
+export function setIframedEditorWrapper( node ) {
+	return {
+		type: 'SET_IFRAMED_EDITOR_WRAPPER',
+		node,
+	};
+}

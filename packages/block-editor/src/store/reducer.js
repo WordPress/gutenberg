@@ -1711,6 +1711,13 @@ export function lastBlockInserted( state = {}, action ) {
 	return state;
 }
 
+export function iframedEditorWrapper( state = null, action ) {
+	if ( action.type === 'SET_IFRAMED_EDITOR_WRAPPER' ) {
+		return action.node;
+	}
+	return state;
+}
+
 export default combineReducers( {
 	blocks,
 	isTyping,
@@ -1732,4 +1739,5 @@ export default combineReducers( {
 	automaticChangeStatus,
 	highlightedBlock,
 	lastBlockInserted,
+	iframedEditorWrapper,
 } );

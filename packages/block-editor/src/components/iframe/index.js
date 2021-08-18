@@ -13,12 +13,14 @@ import {
 import { __ } from '@wordpress/i18n';
 import { useMergeRefs } from '@wordpress/compose';
 import { __experimentalStyleProvider as StyleProvider } from '@wordpress/components';
+import { dispatch } from '@wordpress/data';
 
 /**
  * Internal dependencies
  */
 import { useBlockSelectionClearer } from '../block-selection-clearer';
 import { useWritingFlow } from '../writing-flow';
+import { store as blockEditorStore } from '../../store';
 
 const BODY_CLASS_NAME = 'editor-styles-wrapper';
 const BLOCK_PREFIX = 'wp-block';
@@ -150,6 +152,8 @@ function bubbleEvents( doc ) {
 function setBodyClassName( doc ) {
 	doc.dir = document.dir;
 	doc.body.className = BODY_CLASS_NAME;
+
+	dispatch( blockEditorStore ).setIframedEditorWrapper( doc.body );
 
 	for ( const name of document.body.classList ) {
 		if ( name.startsWith( 'admin-color-' ) ) {
