@@ -248,7 +248,7 @@ describe( 'Widgets screen', () => {
 	` );
 	} );
 
-	it.skip( 'Should insert content using the inline inserter', async () => {
+	it( 'Should insert content using the inline inserter', async () => {
 		const [ firstWidgetArea ] = await findAll( {
 			role: 'document',
 			name: 'Block: Widget Area',
@@ -520,7 +520,7 @@ describe( 'Widgets screen', () => {
 		} );
 	} );
 
-	it.skip( 'Should duplicate the widgets', async () => {
+	it( 'Should duplicate the widgets', async () => {
 		let [ firstWidgetArea ] = await findAll( {
 			role: 'document',
 			name: 'Block: Widget Area',
@@ -719,7 +719,7 @@ describe( 'Widgets screen', () => {
 	` );
 	} );
 
-	it.skip( 'allows widgets to be moved between widget areas using the dropdown in the block toolbar', async () => {
+	it( 'allows widgets to be moved between widget areas using the dropdown in the block toolbar', async () => {
 		const widgetAreas = await findAll( {
 			role: 'document',
 			name: 'Block: Widget Area',
