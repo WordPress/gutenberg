@@ -53,7 +53,6 @@
 			"__experimentalDefaultControls": {
 				"color": true,
 				"radius": true,
-				"style": true,
 				"width": true
 			}
 		}
