@@ -125,14 +125,13 @@ export function useRichText( {
 		if ( disableFormats ) {
 			_value.current = newRecord.text;
 		} else {
-			if ( __unstableBeforeSerialize ) {
-				newRecord = {
-					...newRecord,
-					formats: __unstableBeforeSerialize( newRecord ),
-				};
-			}
 			_value.current = toHTMLString( {
-				value: newRecord,
+				value: __unstableBeforeSerialize
+					? {
+							...newRecord,
+							formats: __unstableBeforeSerialize( newRecord ),
+					  }
+					: newRecord,
 				multilineTag,
 				preserveWhiteSpace,
 			} );
