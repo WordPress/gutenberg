@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { useSpring } from 'react-spring/web.cjs';
+import { useSpring } from 'react-spring';
 
 /**
  * WordPress dependencies

@@ -3,7 +3,7 @@
  */
 // eslint-disable-next-line no-restricted-imports
 import { RadioGroup, useRadioState } from 'reakit';
-import useResizeAware from 'react-resize-aware';
+import useResizeAware from 'react-resize-aware/dist/index.esm';
 
 /**
  * WordPress dependencies

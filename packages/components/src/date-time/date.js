@@ -6,7 +6,7 @@ import classnames from 'classnames';
 
 // react-dates doesn't tree-shake correctly, so we import from the individual
 // component here, to avoid including too much of the library
-import DayPickerSingleDateController from 'react-dates/lib/components/DayPickerSingleDateController';
+// import DayPickerSingleDateController from 'react-dates/lib/components/DayPickerSingleDateController';
 
 /**
  * WordPress dependencies

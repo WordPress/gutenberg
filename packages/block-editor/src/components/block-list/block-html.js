@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import TextareaAutosize from 'react-autosize-textarea';
+//import TextareaAutosize from 'react-autosize-textarea/src';
 
 /**
  * WordPress dependencies
@@ -59,7 +59,7 @@ function BlockHTML( { clientId } ) {
 	}, [ block ] );
 
 	return (
-		<TextareaAutosize
+		<textarea
 			className="block-editor-block-list__block-html-textarea"
 			value={ html }
 			onBlur={ onChange }

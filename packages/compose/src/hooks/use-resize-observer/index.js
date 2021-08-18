@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import useResizeAware from 'react-resize-aware';
+import useResizeAware from 'react-resize-aware/dist/index.esm';
 
 /**
  * Hook which allows to listen the resize event of any target element when it changes sizes.

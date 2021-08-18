@@ -2,8 +2,8 @@
  * External dependencies
  */
 import momentLib from 'moment';
-import 'moment-timezone/moment-timezone';
-import 'moment-timezone/moment-timezone-utils';
+//import 'moment-timezone/moment-timezone';
+//import 'moment-timezone/moment-timezone-utils';
 
 /** @typedef {import('moment').Moment} Moment */
 /** @typedef {import('moment').LocaleSpecification} MomentLocaleSpecification */
@@ -172,7 +172,7 @@ export function setSettings( dateSettings ) {
 	} );
 	momentLib.locale( currentLocale );
 
-	setupWPTimezone();
+	// setupWPTimezone();
 }
 
 /**
@@ -508,8 +508,10 @@ export function gmdateI18n( dateFormat, dateValue = new Date() ) {
  * @return {boolean} Is in the future.
  */
 export function isInTheFuture( dateValue ) {
-	const now = momentLib.tz( WP_ZONE );
-	const momentObject = momentLib.tz( dateValue, WP_ZONE );
+	/*const now = momentLib.tz( WP_ZONE );
+	const momentObject = momentLib.tz( dateValue, WP_ZONE );*/
+	const now = momentLib();
+	const momentObject = momentLib( dateValue );
 
 	return momentObject.isAfter( now );
 }
@@ -523,10 +525,12 @@ export function isInTheFuture( dateValue ) {
  */
 export function getDate( dateString ) {
 	if ( ! dateString ) {
-		return momentLib.tz( WP_ZONE ).toDate();
+		//return momentLib.tz( WP_ZONE ).toDate();
+		return momentLib().toDate();
 	}
 
-	return momentLib.tz( dateString, WP_ZONE ).toDate();
+	//return momentLib.tz( dateString, WP_ZONE ).toDate();
+	return momentLib( dateString ).toDate();
 }
 
 /**
@@ -576,4 +580,4 @@ function isUTCOffset( offset ) {
 	return VALID_UTC_OFFSET.test( offset );
 }
 
-setupWPTimezone();
+// setupWPTimezone();

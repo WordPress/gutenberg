@@ -2,7 +2,7 @@
  * External dependencies
  */
 import { act, create } from 'react-test-renderer';
-import Textarea from 'react-autosize-textarea';
+import Textarea from 'react-autosize-textarea/src';
 
 /**
  * WordPress dependencies

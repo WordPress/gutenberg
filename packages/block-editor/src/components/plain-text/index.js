@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import TextareaAutosize from 'react-autosize-textarea';
+//import TextareaAutosize from 'react-autosize-textarea/src';
 import classnames from 'classnames';
 
 /**
@@ -25,7 +25,7 @@ const PlainText = forwardRef( ( { __experimentalVersion, ...props }, ref ) => {
 	const { className, onChange, ...remainingProps } = props;
 
 	return (
-		<TextareaAutosize
+		<textarea
 			ref={ ref }
 			className={ classnames( 'block-editor-plain-text', className ) }
 			onChange={ ( event ) => onChange( event.target.value ) }

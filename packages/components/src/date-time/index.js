@@ -3,7 +3,7 @@
  */
 // Needed to initialise the default datepicker styles.
 // See: https://github.com/airbnb/react-dates#initialize
-import 'react-dates/initialize';
+//import 'react-dates/esm/initialize';
 import { noop } from 'lodash';
 
 /**

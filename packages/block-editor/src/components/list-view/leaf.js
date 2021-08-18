@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { animated } from 'react-spring/web.cjs';
+import { animated } from 'react-spring';
 import classnames from 'classnames';
 
 /**
