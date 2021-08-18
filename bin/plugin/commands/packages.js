@@ -256,7 +256,7 @@ async function updatePackages(
 }
 
 /**
- * Push the local Git Changes and Tags to the remote repository.
+ * Push the local Git Changes the remote repository.
  *
  * @param {string} gitWorkingDirectoryPath Git working directory path.
  * @param {string} releaseBranch           Release branch name.
@@ -267,22 +267,14 @@ async function runPushGitChangesStep(
 	releaseBranch,
 	abortMessage
 ) {
-	await runStep(
-		'Pushing the release branch and the tag',
-		abortMessage,
-		async () => {
-			await askForConfirmation(
-				'The release branch and the tag are going to be pushed to the remote repository. Continue?',
-				true,
-				abortMessage
-			);
-			await git.pushBranchToOrigin(
-				gitWorkingDirectoryPath,
-				releaseBranch
-			);
-			await git.pushTagsToOrigin();
-		}
-	);
+	await runStep( 'Pushing the release branch', abortMessage, async () => {
+		await askForConfirmation(
+			'The release branch is going to be pushed to the remote repository. Continue?',
+			true,
+			abortMessage
+		);
+		await git.pushBranchToOrigin( gitWorkingDirectoryPath, releaseBranch );
+	} );
 }
 
 /**
