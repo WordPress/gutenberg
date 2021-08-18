@@ -62,13 +62,17 @@ function gutenberg_experimental_global_styles_enqueue_assets() {
 		return;
 	}
 
+	// Dequeue and deregister global styles, if needed, to enqueue with a later priority.
+	// This lets theme styles load before on the default priority, so global styles
+	// user settings take prededence over theme settings and css.
 	if ( isset( wp_styles()->registered['global-styles'] ) ) {
-		wp_styles()->registered['global-styles']->extra['after'][0] = $stylesheet;
-	} else {
-		wp_register_style( 'global-styles', false, array(), true, true );
-		wp_add_inline_style( 'global-styles', $stylesheet );
-		wp_enqueue_style( 'global-styles' );
+		wp_dequeue_style( 'global-styles' );
+		wp_deregister_style( 'global-styles' );
 	}
+
+	wp_register_style( 'global-styles', false, array(), true, true );
+	wp_add_inline_style( 'global-styles', $stylesheet );
+	wp_enqueue_style( 'global-styles' );
 }
 
 /**
@@ -334,7 +338,8 @@ if ( function_exists( 'get_block_editor_settings' ) ) {
 }
 
 add_action( 'init', 'gutenberg_experimental_global_styles_register_user_cpt' );
-add_action( 'wp_enqueue_scripts', 'gutenberg_experimental_global_styles_enqueue_assets' );
+// Enqueue on a later priority so theme styles on the default priority are enqueued first.
+add_action( 'wp_enqueue_scripts', 'gutenberg_experimental_global_styles_enqueue_assets', 50 );
 
 // kses actions&filters.
 add_action( 'init', 'gutenberg_global_styles_kses_init' );
