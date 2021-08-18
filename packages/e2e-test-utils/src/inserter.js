@@ -62,17 +62,17 @@ export async function toggleGlobalBlockInserter() {
  * Moves focus to the selected block.
  */
 async function focusSelectedBlock() {
-	// Ideally there shouuld be a UI way to do this. (Focus the selected block)
-	await page.evaluate( () => {
-		wp.data
-			.dispatch( 'core/block-editor' )
-			.selectBlock(
-				wp.data
-					.select( 'core/block-editor' )
-					.getSelectedBlockClientId(),
-				0
-			);
-	} );
+	// Do a waitForFunction and wait until block is really focused
+	const blockId = await page.evaluate( () =>
+		wp.data.select( 'core/block-editor' ).getSelectedBlockClientId()
+	);
+	const blockElement = await page.waitForSelector(
+		`[data-block="${ blockId }"]`
+	);
+	await page.evaluate( ( id ) => {
+		wp.data.dispatch( 'core/block-editor' ).selectBlock( id, 0 );
+	}, blockId );
+	await blockElement.waitForElementState( 'stable' );
 }
 
 /**
@@ -94,10 +94,8 @@ async function waitForInserterCloseAndContentFocus() {
  */
 export async function searchForBlock( searchTerm ) {
 	await openGlobalBlockInserter();
-	await page.waitForSelector( INSERTER_SEARCH_SELECTOR );
-	await page.focus( INSERTER_SEARCH_SELECTOR );
-	await pressKeyWithModifier( 'primary', 'a' );
-	await page.keyboard.type( searchTerm );
+	await page.fill( INSERTER_SEARCH_SELECTOR, '' );
+	await page.type( INSERTER_SEARCH_SELECTOR, searchTerm );
 }
 
 /**
@@ -152,13 +150,8 @@ export async function searchForReusableBlock( searchTerm ) {
  */
 export async function insertBlock( searchTerm ) {
 	await searchForBlock( searchTerm );
-	const insertButton = await page.waitForXPath(
-		`//button//span[contains(text(), '${ searchTerm }')]`
-	);
-	await insertButton.click();
+	await page.click( `button :text("${ searchTerm }")` );
 	await focusSelectedBlock();
-	// We should wait until the inserter closes and the focus moves to the content.
-	await waitForInserterCloseAndContentFocus();
 }
 
 /**
