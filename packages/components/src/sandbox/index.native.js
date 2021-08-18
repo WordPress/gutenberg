@@ -157,7 +157,6 @@ function Sandbox( {
 	url,
 } ) {
 	const ref = useRef();
-	const [ width, setWidth ] = useState( 0 );
 	const [ height, setHeight ] = useState( 0 );
 	const [ contentHtml, setContentHtml ] = useState( getHtmlDoc() );
 
@@ -247,19 +246,13 @@ function Sandbox( {
 			return;
 		}
 
-		setWidth( data.width );
 		setHeight( data.height );
 	}
 
 	function getSizeStyle() {
-		const contentWidth = Math.ceil( width );
 		const contentHeight = Math.ceil( height );
 
-		if ( contentWidth && contentHeight ) {
-			return { width: contentWidth, height: contentHeight };
-		}
-
-		return { aspectRatio: 1 };
+		return { height: contentHeight };
 	}
 
 	function onChangeDimensions( dimensions ) {
@@ -281,7 +274,6 @@ function Sandbox( {
 		// When device orientation changes we have to recalculate the size,
 		// for this purpose we reset the current size value.
 		if ( wasLandscape.current !== isLandscape ) {
-			setWidth( 0 );
 			setHeight( 0 );
 		}
 		wasLandscape.current = isLandscape;
@@ -289,17 +281,17 @@ function Sandbox( {
 
 	return (
 		<WebView
-			containerStyle={ containerStyle }
+			containerStyle={ [
+				sandboxStyles[ 'sandbox-webview__container' ],
+				containerStyle,
+			] }
 			key={ key }
 			ref={ ref }
 			source={ { baseUrl: providerUrl, html: contentHtml } }
 			// Wildcard value is required for static HTML
 			// Reference: https://github.com/react-native-webview/react-native-webview/blob/master/docs/Reference.md#source
 			originWhitelist={ [ '*' ] }
-			style={ [
-				sandboxStyles[ 'sandbox-webview__container' ],
-				getSizeStyle(),
-			] }
+			style={ getSizeStyle() }
 			onMessage={ checkMessageForResize }
 		/>
 	);
