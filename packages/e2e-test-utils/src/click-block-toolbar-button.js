@@ -21,7 +21,7 @@ export async function clickBlockToolbarButton( label, type = 'ariaLabel' ) {
 
 	if ( type === 'content' ) {
 		return await page.click(
-			`${ BLOCK_TOOLBAR_SELECTOR } button :text("${ label }")`
+			`${ BLOCK_TOOLBAR_SELECTOR } button:text("${ label }")`
 		);
 	}
 }
