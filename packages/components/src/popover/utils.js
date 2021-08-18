@@ -197,12 +197,13 @@ export function computePopoverYAxisPosition(
 				// popover from always restricting block content and interaction while selected if the
 				// block is near the top of the site editor.
 
-				// If there is no room above the block in the canvas, return the bottom position for the
-				// popover.
-				const scrollRoomAbove = editorWrapper.scrollTop;
-				const noRoomAboveInCanvas =
-					height >= scrollRoomAbove + anchorRect.top - HEIGHT_OFFSET;
-				if ( noRoomAboveInCanvas ) {
+				const isRoomAboveInCanvas =
+					height + HEIGHT_OFFSET <
+					editorWrapper.scrollTop + anchorRect.top;
+				const isRoomBelowVisually =
+					anchorRect.bottom + height + relativeOffsetTop <=
+					stickyRect.bottom;
+				if ( ! isRoomAboveInCanvas && isRoomBelowVisually ) {
 					return {
 						yAxis: 'bottom',
 						popoverTop: anchorRect.bottom,
