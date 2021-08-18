@@ -296,6 +296,10 @@ function Sandbox( {
 				getSizeStyle(),
 			] }
 			onMessage={ checkMessageForResize }
+			scrollEnabled={ false }
+			setBuiltInZoomControls={ false }
+			showsHorizontalScrollIndicator={ false }
+			showsVerticalScrollIndicator={ false }
 		/>
 	);
 }
