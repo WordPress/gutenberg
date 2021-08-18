@@ -15,7 +15,6 @@ export { default as Dashicon } from './dashicon';
 export { default as Dropdown } from './dropdown';
 export { default as DropdownMenu } from './dropdown-menu';
 export { default as FocalPointPicker } from './focal-point-picker';
-export { default as FontSizePicker } from './font-size-picker';
 export { default as Toolbar } from './toolbar';
 export { default as ToolbarButton } from './toolbar-button';
 export { default as __experimentalToolbarContext } from './toolbar-context';
@@ -31,6 +30,7 @@ export {
 	Fill,
 	Provider as SlotFillProvider,
 } from './slot-fill';
+export { default as FontSizePicker } from './font-size-picker'; // Intentionally called after slot-fill.
 export { default as __experimentalStyleProvider } from './style-provider';
 export { default as BaseControl } from './base-control';
 export { default as TextareaControl } from './textarea-control';
