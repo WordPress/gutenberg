@@ -11,21 +11,17 @@ import { showBlockToolbar } from './show-block-toolbar';
  */
 export async function clickBlockToolbarButton( label, type = 'ariaLabel' ) {
 	await showBlockToolbar();
-	const BLOCK_TOOLBAR_SELECTOR = 'block-editor-block-toolbar';
-	let button;
+	const BLOCK_TOOLBAR_SELECTOR = '.block-editor-block-toolbar';
 
 	if ( type === 'ariaLabel' ) {
-		button = await page.waitForSelector(
-			`.${ BLOCK_TOOLBAR_SELECTOR } button[aria-label="${ label }"]`
+		return await page.click(
+			`${ BLOCK_TOOLBAR_SELECTOR } button[aria-label="${ label }"]`
 		);
 	}
 
 	if ( type === 'content' ) {
-		button = await page.waitForXPath(
-			`//*[contains(concat(' ', normalize-space(@class), ' '), ' ${ BLOCK_TOOLBAR_SELECTOR } ')]//button[contains(text(), '${ label }')]`
+		return await page.click(
+			`${ BLOCK_TOOLBAR_SELECTOR } button :text("${ label }")`
 		);
 	}
-
-	await button.evaluate( ( element ) => element.scrollIntoView() );
-	await button.click();
 }
