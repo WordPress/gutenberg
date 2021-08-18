@@ -35,6 +35,7 @@ export function useBlockSelectionClearer() {
 				// inline-block element.
 				// See https://stackoverflow.com/questions/34354085/clicking-outside-a-contenteditable-div-stills-give-focus-to-it
 				event.preventDefault();
+				node.closest( '[tabindex]' ).focus();
 
 				if ( ! hasSelectedBlock() && ! hasMultiSelection() ) {
 					return;
