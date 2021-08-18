@@ -1,30 +1,21 @@
 /**
  * WordPress dependencies
  */
-import {
-	ToolbarDropdownMenu,
-	MenuGroup,
-	MenuItem,
-	VisuallyHidden,
-} from '@wordpress/components';
+import { MenuGroup, MenuItem, VisuallyHidden } from '@wordpress/components';
 import { useState } from '@wordpress/element';
 import { __, _x } from '@wordpress/i18n';
-import { external, moreVertical } from '@wordpress/icons';
+import { external } from '@wordpress/icons';
 import { displayShortcut } from '@wordpress/keycodes';
 import { useShortcut } from '@wordpress/keyboard-shortcuts';
+import { MoreMenuDropdown, MoreMenuFeatureToggle } from '@wordpress/interface';
 
 /**
  * Internal dependencies
  */
-import FeatureToggle from './feature-toggle';
 import KeyboardShortcutHelpModal from '../keyboard-shortcut-help-modal';
 
 const POPOVER_PROPS = {
 	className: 'customize-widgets-more-menu__content',
-	position: 'bottom left',
-};
-const TOGGLE_PROPS = {
-	tooltipPosition: 'bottom',
 };
 
 export default function MoreMenu() {
@@ -45,18 +36,15 @@ export default function MoreMenu() {
 
 	return (
 		<>
-			<ToolbarDropdownMenu
+			<MoreMenuDropdown
 				className="customize-widgets-more-menu"
-				icon={ moreVertical }
-				/* translators: button label text should, if possible, be under 16 characters. */
-				label={ __( 'Options' ) }
 				popoverProps={ POPOVER_PROPS }
-				toggleProps={ TOGGLE_PROPS }
 			>
 				{ () => (
 					<>
 						<MenuGroup label={ _x( 'View', 'noun' ) }>
-							<FeatureToggle
+							<MoreMenuFeatureToggle
+								scope="core/customize-widgets"
 								feature="fixedToolbar"
 								label={ __( 'Top toolbar' ) }
 								info={ __(
@@ -79,7 +67,8 @@ export default function MoreMenu() {
 							>
 								{ __( 'Keyboard shortcuts' ) }
 							</MenuItem>
-							<FeatureToggle
+							<MoreMenuFeatureToggle
+								scope="core/customize-widgets"
 								feature="welcomeGuide"
 								label={ __( 'Welcome Guide' ) }
 							/>
@@ -102,7 +91,8 @@ export default function MoreMenu() {
 							</MenuItem>
 						</MenuGroup>
 						<MenuGroup label={ __( 'Preferences' ) }>
-							<FeatureToggle
+							<MoreMenuFeatureToggle
+								scope="core/customize-widgets"
 								feature="keepCaretInsideBlock"
 								label={ __(
 									'Contain text cursor inside block'
@@ -120,7 +110,7 @@ export default function MoreMenu() {
 						</MenuGroup>
 					</>
 				) }
-			</ToolbarDropdownMenu>
+			</MoreMenuDropdown>
 			<KeyboardShortcutHelpModal
 				isModalActive={ isKeyboardShortcutsModalActive }
 				toggleModal={ toggleKeyboardShortcutsModal }
