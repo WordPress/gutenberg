@@ -1,10 +1,9 @@
 const closeSubmenus = ( element ) => {
-	if ( element.getAttribute( 'aria-expanded' ) === 'true' ) {
-		element.setAttribute( 'aria-expanded', 'false' );
-	}
-	element.querySelectorAll( '[aria-expanded="true"]' ).forEach( ( child ) => {
-		closeSubmenus( child );
-	} );
+	element
+		.querySelectorAll( '[aria-expanded="true"]' )
+		.forEach( ( toggle ) => {
+			toggle.setAttribute( 'aria-expanded', 'false' );
+		} );
 };
 
 const toggleSubmenuOnClick = ( event ) => {
@@ -12,12 +11,10 @@ const toggleSubmenuOnClick = ( event ) => {
 	const isSubmenuOpen = buttonToggle.getAttribute( 'aria-expanded' );
 
 	if ( isSubmenuOpen === 'true' ) {
-		closeSubmenus( buttonToggle );
+		closeSubmenus( buttonToggle.closest( '.wp-block-dropdown' ) );
 	} else {
 		// Close all sibling submenus.
-		const parentElement = buttonToggle.closest(
-			'.wp-block-navigation-item'
-		);
+		const parentElement = buttonToggle.closest( '.wp-block-dropdown' );
 		const parentList =
 			buttonToggle.closest( '.wp-block-dropdown__container' ) ||
 			buttonToggle.closest( '.wp-block-navigation__container' );
