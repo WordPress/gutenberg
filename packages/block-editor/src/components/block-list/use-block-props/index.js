@@ -99,7 +99,7 @@ export function useBlockProps( props = {}, { __unstableIsHtml } = {} ) {
 				index: getBlockIndex( clientId, rootClientId ),
 				mode: getBlockMode( clientId ),
 				name: blockName,
-				blockTitle: blockType.title,
+				blockTitle: blockType?.title,
 				isPartOfSelection: isSelected || isPartOfMultiSelection,
 				adjustScrolling:
 					isSelected || isFirstMultiSelectedBlock( clientId ),
@@ -107,7 +107,7 @@ export function useBlockProps( props = {}, { __unstableIsHtml } = {} ) {
 					! isTyping() &&
 					getGlobalBlockCount() <= BLOCK_ANIMATION_THRESHOLD,
 				lightBlockWrapper:
-					blockType.apiVersion > 1 ||
+					blockType?.apiVersion > 1 ||
 					hasBlockSupport( blockType, 'lightBlockWrapper', false ),
 			};
 		},
