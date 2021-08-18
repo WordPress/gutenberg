@@ -10,9 +10,10 @@ import { speak } from '@wordpress/a11y';
 /**
  * Internal dependencies
  */
-import { store as editWidgetsStore } from '../../store';
+import { store as interfaceStore } from '../../store';
 
-export default function FeatureToggle( {
+export default function MoreMenuFeatureToggle( {
+	scope,
 	label,
 	info,
 	messageActivated,
@@ -22,12 +23,10 @@ export default function FeatureToggle( {
 } ) {
 	const isActive = useSelect(
 		( select ) =>
-			select( editWidgetsStore ).__unstableIsFeatureActive( feature ),
+			select( interfaceStore ).isFeatureActive( scope, feature ),
 		[ feature ]
 	);
-	const { __unstableToggleFeature: toggleFeature } = useDispatch(
-		editWidgetsStore
-	);
+	const { toggleFeature } = useDispatch( interfaceStore );
 	const speakMessage = () => {
 		if ( isActive ) {
 			speak( messageDeactivated || __( 'Feature deactivated' ) );
@@ -41,7 +40,7 @@ export default function FeatureToggle( {
 			icon={ isActive && check }
 			isSelected={ isActive }
 			onClick={ () => {
-				toggleFeature( feature );
+				toggleFeature( scope, feature );
 				speakMessage();
 			} }
 			role="menuitemcheckbox"

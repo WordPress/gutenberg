@@ -4,7 +4,8 @@
 
 ### New Features
 
- - Added a `batch` registry method to batch dispatch calls for performance reasons.
+-   Added a `batch` registry method to batch dispatch calls for performance reasons.
+-   Add a new migration for the persistence plugin to migrate edit-widgets preferences to the interface package. As part of this change deprecated migrations for the persistence plugin have been removed ([#33774](https://github.com/WordPress/gutenberg/pull/33774)).
 
 ## 6.0.0 (2021-07-29)
 

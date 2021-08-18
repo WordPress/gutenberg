@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { merge, isPlainObject, get, has } from 'lodash';
+import { merge, isPlainObject } from 'lodash';
 
 /**
  * Internal dependencies
@@ -223,75 +223,64 @@ function persistencePlugin( registry, pluginOptions ) {
 }
 
 /**
+ * Move the 'features' object in local storage from the sourceStoreName to the
+ * interface store.
+ *
+ * @param {Object} persistence     The persistence interface.
+ * @param {string} sourceStoreName The name of the store that has persisted
+ *                                 preferences to migrate to the interface
+ *                                 package.
+ */
+export function migrateFeaturePreferencesToInterfaceStore(
+	persistence,
+	sourceStoreName
+) {
+	const interfaceStoreName = 'core/interface';
+	const state = persistence.get();
+	const sourcePreferences = state[ sourceStoreName ]?.preferences;
+	const sourceFeatures = sourcePreferences?.features;
+
+	if ( sourceFeatures ) {
+		const targetFeatures =
+			state[ interfaceStoreName ]?.preferences?.features;
+
+		// Avoid migrating features again if they've previously been migrated.
+		if ( ! targetFeatures?.[ sourceStoreName ] ) {
+			// Set the feature values in the interface store, the features
+			// object is keyed by 'scope', which matches the store name for
+			// the source.
+			persistence.set( interfaceStoreName, {
+				preferences: {
+					features: {
+						...targetFeatures,
+						[ sourceStoreName ]: sourceFeatures,
+					},
+				},
+			} );
+
+			// Remove feature preferences from the source.
+			persistence.set( sourceStoreName, {
+				preferences: {
+					...sourcePreferences,
+					features: undefined,
+				},
+			} );
+		}
+	}
+}
+
+/**
  * Deprecated: Remove this function and the code in WordPress Core that calls
- * it once WordPress 5.4 is released.
+ * it once WordPress 6.0 is released.
  */
 
 persistencePlugin.__unstableMigrate = ( pluginOptions ) => {
 	const persistence = createPersistenceInterface( pluginOptions );
 
-	const state = persistence.get();
-
-	// Migrate 'insertUsage' from 'core/editor' to 'core/block-editor'
-	const editorInsertUsage = state[ 'core/editor' ]?.preferences?.insertUsage;
-	if ( editorInsertUsage ) {
-		const blockEditorInsertUsage =
-			state[ 'core/block-editor' ]?.preferences?.insertUsage;
-		persistence.set( 'core/block-editor', {
-			preferences: {
-				insertUsage: {
-					...editorInsertUsage,
-					...blockEditorInsertUsage,
-				},
-			},
-		} );
-	}
-
-	let editPostState = state[ 'core/edit-post' ];
-
-	// Default `fullscreenMode` to `false` if any persisted state had existed
-	// and the user hadn't made an explicit choice about fullscreen mode. This
-	// is needed since `fullscreenMode` previously did not have a default value
-	// and was implicitly false by its absence. It is now `true` by default, but
-	// this change is not intended to affect upgrades from earlier versions.
-	const hadPersistedState = Object.keys( state ).length > 0;
-	const hadFullscreenModePreference = has( state, [
-		'core/edit-post',
-		'preferences',
-		'features',
-		'fullscreenMode',
-	] );
-	if ( hadPersistedState && ! hadFullscreenModePreference ) {
-		editPostState = merge( {}, editPostState, {
-			preferences: { features: { fullscreenMode: false } },
-		} );
-	}
-
-	// Migrate 'areTipsEnabled' from 'core/nux' to 'showWelcomeGuide' in 'core/edit-post'
-	const areTipsEnabled = get( state, [
-		'core/nux',
-		'preferences',
-		'areTipsEnabled',
-	] );
-	const hasWelcomeGuide = has( state, [
-		'core/edit-post',
-		'preferences',
-		'features',
-		'welcomeGuide',
-	] );
-	if ( areTipsEnabled !== undefined && ! hasWelcomeGuide ) {
-		editPostState = merge( {}, editPostState, {
-			preferences: {
-				features: {
-					welcomeGuide: areTipsEnabled,
-				},
-			},
-		} );
-	}
-
-	if ( editPostState !== state[ 'core/edit-post' ] ) {
-		persistence.set( 'core/edit-post', editPostState );
-	}
+	migrateFeaturePreferencesToInterfaceStore(
+		persistence,
+		'core/edit-widgets'
+	);
 };
 
 export default persistencePlugin;
