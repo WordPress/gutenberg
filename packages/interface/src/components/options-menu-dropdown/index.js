@@ -10,7 +10,7 @@ import { DropdownMenu } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { moreVertical } from '@wordpress/icons';
 
-export default function OptionsMenu( {
+export default function OptionsMenuDropdown( {
 	className,
 	/* translators: button label text should, if possible, be under 16 characters. */
 	label = __( 'Options' ),
@@ -20,14 +20,17 @@ export default function OptionsMenu( {
 } ) {
 	return (
 		<DropdownMenu
-			className={ classnames( 'interface-options-menu', className ) }
+			className={ classnames(
+				'interface-options-menu-dropdown',
+				className
+			) }
 			icon={ moreVertical }
 			label={ label }
 			popoverProps={ {
 				position: 'bottom left',
 				...popoverProps,
 				className: classnames(
-					'interface-options-menu__content',
+					'interface-options-menu-dropdown__content',
 					popoverProps?.className
 				),
 			} }

@@ -1,4 +1,4 @@
-.interface-options-menu {
+.interface-options-menu-dropdown {
 	margin-left: -4px;
 
 	// The padding and margin of the options menu is intentionally non-standard.
@@ -16,7 +16,7 @@
 	}
 }
 
-.interface-options-menu__content .components-popover__content {
+.interface-options-menu-dropdown__content .components-popover__content {
 	min-width: 280px;
 
 	// Let the menu scale to fit items.
@@ -30,6 +30,6 @@
 	}
 }
 
-.components-popover.interface-options-menu__content {
+.components-popover.interface-options-menu-dropdown__content {
 	z-index: z-index(".components-popover.edit-widgets-more-menu__content");
 }
