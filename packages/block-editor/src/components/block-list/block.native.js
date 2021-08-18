@@ -51,6 +51,7 @@ function BlockForType( {
 	baseGlobalStyles,
 } ) {
 	const defaultColors = useSetting( 'color.palette' ) || emptyArray;
+	const typography = useSetting( 'typography' ) || emptyArray;
 	const globalStyle = useGlobalStyles();
 	const mergedStyle = useMemo( () => {
 		return getMergedGlobalStyles(
@@ -59,7 +60,8 @@ function BlockForType( {
 			wrapperProps.style,
 			attributes,
 			defaultColors,
-			name
+			name,
+			typography
 		);
 	}, [
 		defaultColors,

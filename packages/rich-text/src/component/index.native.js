@@ -56,6 +56,8 @@ const gutenbergFormatNamesToAztec = {
 };
 
 const EMPTY_PARAGRAPH_TAGS = '<p></p>';
+const DEFAULT_FONT_SIZE = 16;
+const DEFAULT_LINE_HEIGHT = 1.5;
 
 export class RichText extends Component {
 	constructor( {
@@ -853,6 +855,39 @@ export class RichText extends Component {
 		};
 	}
 
+	getFontSize() {
+		const { baseGlobalStyles } = this.props;
+
+		if ( this.props.fontSize ) {
+			return parseFloat( this.props.fontSize );
+		}
+
+		if ( this.props.style?.fontSize ) {
+			return parseFloat( this.props.style.fontSize );
+		}
+
+		if ( baseGlobalStyles?.typography?.fontSize ) {
+			return parseFloat( baseGlobalStyles?.typography?.fontSize );
+		}
+
+		return DEFAULT_FONT_SIZE;
+	}
+
+	getLineHeight( fontSize ) {
+		const { baseGlobalStyles } = this.props;
+		let lineHeight = DEFAULT_LINE_HEIGHT;
+
+		if ( baseGlobalStyles?.typography?.lineHeight ) {
+			lineHeight = parseFloat( baseGlobalStyles?.typography?.lineHeight );
+		}
+
+		if ( this.props.style?.lineHeight ) {
+			lineHeight = parseFloat( this.props.style.lineHeight );
+		}
+
+		return parseInt( fontSize + fontSize * lineHeight, 10 );
+	}
+
 	render() {
 		const {
 			tagName,
@@ -879,6 +914,8 @@ export class RichText extends Component {
 		);
 
 		const { color: defaultPlaceholderTextColor } = placeholderStyle;
+		const fontSize = this.getFontSize();
+		const lineHeight = this.getLineHeight( fontSize );
 
 		const {
 			color: defaultColor,
@@ -974,6 +1011,7 @@ export class RichText extends Component {
 							? { width }
 							: { maxWidth } ),
 						minHeight: this.state.height,
+						lineHeight,
 					} }
 					text={ {
 						text: html,
@@ -1017,11 +1055,7 @@ export class RichText extends Component {
 					}
 					maxImagesWidth={ 200 }
 					fontFamily={ this.props.fontFamily || defaultFontFamily }
-					fontSize={
-						this.props.fontSize ||
-						( style &&
-							this.convertFontSizeFromString( style.fontSize ) )
-					}
+					fontSize={ fontSize }
 					fontWeight={ this.props.fontWeight }
 					fontStyle={ this.props.fontStyle }
 					disableEditingMenu={ disableEditingMenu }
@@ -1079,8 +1113,9 @@ export default compose( [
 			'attributes',
 			'childrenStyles',
 		] );
-		const baseGlobalStyles = getSettings()
-			?.__experimentalGlobalStylesBaseStyles;
+
+		const settings = getSettings();
+		const baseGlobalStyles = settings?.__experimentalGlobalStylesBaseStyles;
 
 		return {
 			areMentionsSupported:
