@@ -1,7 +1,12 @@
 /**
  * WordPress dependencies
  */
-import { MenuGroup, MenuItem, VisuallyHidden } from '@wordpress/components';
+import {
+	MenuGroup,
+	MenuItem,
+	ToolbarDropdownMenu,
+	VisuallyHidden,
+} from '@wordpress/components';
 import { useState } from '@wordpress/element';
 import { __, _x } from '@wordpress/i18n';
 import { external } from '@wordpress/icons';
@@ -37,6 +42,7 @@ export default function MoreMenu() {
 	return (
 		<>
 			<MoreMenuDropdown
+				as={ ToolbarDropdownMenu }
 				className="customize-widgets-more-menu"
 				popoverProps={ POPOVER_PROPS }
 			>
