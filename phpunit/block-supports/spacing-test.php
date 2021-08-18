@@ -8,9 +8,8 @@
 
 class WP_Block_Supports_Spacing_Test extends WP_UnitTestCase {
 	private $sample_block_content = '<div class="wp-block-test-block">Test</div>';
-
 	private $test_gap_block_value = array();
-	private $test_gap_block_args = array();
+	private $test_gap_block_args  = array();
 
 	function setUp() {
 		parent::setUp();
@@ -111,7 +110,7 @@ class WP_Block_Supports_Spacing_Test extends WP_UnitTestCase {
 
 	function test_spacing_gap_block_support_does_not_render_style_when_gap_is_null() {
 		$this->test_gap_block_value['attrs']['style']['spacing']['blockGap'] = null;
-		$this->test_gap_block_args['supports']['spacing']['blockGap'] = true;
+		$this->test_gap_block_args['supports']['spacing']['blockGap']        = true;
 
 		register_block_type( 'test/test-block', $test_block_args );
 		$render_output = gutenberg_render_spacing_gap_support(
@@ -127,7 +126,7 @@ class WP_Block_Supports_Spacing_Test extends WP_UnitTestCase {
 
 	function test_spacing_gap_block_support_does_not_render_style_when_gap_is_illegal_value() {
 		$this->test_gap_block_value['attrs']['style']['spacing']['blockGap'] = '" javascript="alert("hello");';
-		$this->test_gap_block_args['supports']['spacing']['blockGap'] = true;
+		$this->test_gap_block_args['supports']['spacing']['blockGap']        = true;
 
 		register_block_type( 'test/test-block', $test_block_args );
 		$render_output = gutenberg_render_spacing_gap_support(
