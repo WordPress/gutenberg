@@ -291,7 +291,10 @@ function Sandbox( {
 			// Wildcard value is required for static HTML
 			// Reference: https://github.com/react-native-webview/react-native-webview/blob/master/docs/Reference.md#source
 			originWhitelist={ [ '*' ] }
-			style={ getSizeStyle() }
+			style={ [
+				sandboxStyles[ 'sandbox-webview__content' ],
+				getSizeStyle(),
+			] }
 			onMessage={ checkMessageForResize }
 		/>
 	);
