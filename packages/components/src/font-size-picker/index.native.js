@@ -126,7 +126,7 @@ function FontSizePicker( {
 								accessibilityLabel={
 									item.size === selectedValue
 										? sprintf(
-												// translators: %s: Select control option value e.g: "Auto, 25%".
+												// translators: %s: Select font size option value e.g: "Selected: Large".
 												__( 'Selected: %s' ),
 												item.name
 										  )
