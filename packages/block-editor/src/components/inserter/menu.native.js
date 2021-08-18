@@ -202,13 +202,16 @@ function InserterMenu( {
 			}
 			hasNavigation
 			setMinHeightToMaxHeight={ showSearchForm }
-			contentStyle={ styles.list }
+			contentStyle={ styles[ 'inserter-menu__list' ] }
 			isFullScreen={ ! isIOS && showSearchForm }
 			allowDragIndicator={ true }
 		>
 			<BottomSheetConsumer>
 				{ ( { listProps } ) => (
-					<TouchableHighlight accessible={ false }>
+					<TouchableHighlight
+						accessible={ false }
+						style={ styles[ 'inserter-menu__list-wrapper' ] }
+					>
 						{ ! showTabs || filterValue ? (
 							<InserterSearchResults
 								rootClientId={ rootClientId }
