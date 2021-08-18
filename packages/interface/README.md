@@ -103,12 +103,12 @@ wp.data.dispatch( 'core/interface' ).toggleFeature( 'namespace/editor-or-plugin-
 wp.data.select( 'core/interface' ).isFeatureActive( 'namespace/editor-or-plugin-name', 'myFeatureName' ); // false
 ```
 
-The `OptionsMenuDropdown` and `MoreMenuFeatureToggle` components help to implement an editor menu for changing preferences and feature values.
+The `MoreMenuDropdown` and `MoreMenuFeatureToggle` components help to implement an editor menu for changing preferences and feature values.
 
 ```jsx
 function MyEditorMenu() {
 	return (
-		<OptionsMenuDropdown>
+		<MoreMenuDropdown>
 			{ () => (
 				<MenuGroup label={ __( 'Features' ) }>
 					<MoreMenuFeatureToggle
@@ -121,7 +121,7 @@ function MyEditorMenu() {
 					/>
 				</MenuGroup>
 			) }
-		</OptionsMenuDropdown>
+		</MoreMenuDropdown>
 	);
 }
 ```

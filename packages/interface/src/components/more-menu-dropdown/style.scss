@@ -1,7 +1,7 @@
-.interface-options-menu-dropdown {
+.interface-more-menu-dropdown {
 	margin-left: -4px;
 
-	// The padding and margin of the options menu is intentionally non-standard.
+	// the padding and margin of the more menu is intentionally non-standard
 	.components-button {
 		width: auto;
 		padding: 0 2px;
@@ -16,7 +16,7 @@
 	}
 }
 
-.interface-options-menu-dropdown__content .components-popover__content {
+.interface-more-menu-dropdown__content .components-popover__content {
 	min-width: 280px;
 
 	// Let the menu scale to fit items.
@@ -30,6 +30,6 @@
 	}
 }
 
-.components-popover.interface-options-menu-dropdown__content {
+.components-popover.interface-more-menu-dropdown__content {
 	z-index: z-index(".components-popover.edit-widgets-more-menu__content");
 }
