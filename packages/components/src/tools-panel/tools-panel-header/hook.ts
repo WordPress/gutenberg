@@ -30,11 +30,15 @@ export function useToolsPanelHeader(
 	}, [] );
 
 	const { menuItems, hasMenuItems } = useToolsPanelContext();
-
+	const menuItemsArray = Object.entries( menuItems );
+	const hasSelectedMenuItems = menuItemsArray.some(
+		( [ , isSelected ] ) => isSelected
+	);
 	return {
 		...otherProps,
 		dropdownMenuClassName,
 		hasMenuItems,
+		hasSelectedMenuItems,
 		menuItems,
 		className: classes,
 	};
