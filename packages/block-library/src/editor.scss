@@ -62,6 +62,13 @@
 	font-size: 42px;
 }
 
+// The following sets baseline border styles with zero specificity such that
+// when a user begins to alter block borders via the block support UI they
+// see immediate visual changes.
+html :where(.wp-block) {
+	border: 0 solid currentColor;
+}
+
 /**
  * Editor Normalization Styles
  *
