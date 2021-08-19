@@ -7,24 +7,25 @@ import classnames from 'classnames';
  * WordPress dependencies
  */
 import { useRefEffect } from '@wordpress/compose';
-import { addQueryArgs } from '@wordpress/url';
-import { useState, useContext } from '@wordpress/element';
+import { useState } from '@wordpress/element';
 import { Placeholder, Spinner, Disabled } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
+import apiFetch from '@wordpress/api-fetch';
 
-/**
- * Internal dependencies
- */
-import WidgetsSettings from '../../../components/widgets-settings';
+async function renderPreview( idBase, instance ) {
+	const restRoute = '/wp/v2/widget-types/' + idBase + '/render';
+	return await apiFetch( {
+		path: restRoute,
+		method: 'POST',
+		data: {
+			id_base: idBase,
+			instance,
+		},
+	} );
+}
 
 export default function Preview( { idBase, instance, isVisible } ) {
 	const [ isLoaded, setIsLoaded ] = useState( false );
-	const { adminUrl } = useContext( WidgetsSettings );
-
-	const widgetPreviewUrl = ( adminUrl ?? '' ) + 'widgets.php';
-	const widgetPreviewUrlQueryParameters = {
-		'legacy-widget-preview': { idBase, instance },
-	};
 
 	// Resize the iframe on either the load event, or when the iframe becomes visible.
 	const ref = useRefEffect(
@@ -69,6 +70,9 @@ export default function Preview( { idBase, instance, isVisible } ) {
 					iframe.removeEventListener( 'load', setHeight );
 				};
 			}
+			renderPreview( idBase, instance ).then( ( response ) => {
+				iframe.srcdoc = response.preview;
+			} );
 		},
 		[ isLoaded ]
 	);
@@ -107,10 +111,6 @@ export default function Preview( { idBase, instance, isVisible } ) {
 						// TODO: This chokes when the query param is too big.
 						// Ideally, we'd render a <ServerSideRender>. Maybe by
 						// rendering one in an iframe via a portal.
-						src={ addQueryArgs(
-							widgetPreviewUrl,
-							widgetPreviewUrlQueryParameters
-						) }
 						onLoad={ ( event ) => {
 							// To hide the scrollbars of the preview frame for some edge cases,
 							// such as negative margins in the Gallery Legacy Widget.
