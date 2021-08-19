@@ -29,6 +29,10 @@ describe( 'getPxFromCssUnit', () => {
 		expect( getPxFromCssUnit( '1pc' ) ).toBe( '16px' );
 	} );
 
+	it( 'Q return px unit', () => {
+		expect( getPxFromCssUnit( '40Q' ) ).toBe( '38px' ); // 40 Q should be 1 cm
+	} );
+
 	// Relative units
 	it( 'em return px unit', () => {
 		expect( getPxFromCssUnit( '2em', { fontSize: 10 } ) ).toBe( '20px' );
@@ -58,6 +62,10 @@ describe( 'getPxFromCssUnit', () => {
 		).toBe( '40px' );
 	} );
 
+	it( 'lh return px unit', () => {
+		expect( getPxFromCssUnit( '20lh', { lineHeight: 2 } ) ).toBe( '40px' );
+	} );
+
 	it( '% return px unit', () => {
 		expect(
 			getPxFromCssUnit( '120%', {
@@ -68,6 +76,7 @@ describe( 'getPxFromCssUnit', () => {
 			} )
 		).toBe( '12px' );
 	} );
+
 	// Function units
 	it( 'min() return px unit', () => {
 		expect( getPxFromCssUnit( 'min(20px, 25px)' ) ).toBe( '20px' );
@@ -128,5 +137,37 @@ describe( 'getPxFromCssUnit', () => {
 
 	it( 'test calc(42vw / 10px) function return px unit', () => {
 		expect( getPxFromCssUnit( 'calc(45vw / 10px)' ) ).toBe( '17px' );
+	} );
+
+	it( 'test empty string', () => {
+		expect( getPxFromCssUnit( '' ) ).toBe( null );
+	} );
+
+	it( 'test undefined string', () => {
+		expect( getPxFromCssUnit( undefined ) ).toBe( null );
+	} );
+	it( 'test integer string', () => {
+		expect( getPxFromCssUnit( 123 ) ).toBe( '123px' );
+	} );
+
+	it( 'test float string', () => {
+		expect( getPxFromCssUnit( 123.456 ) ).toBe( '123px' );
+	} );
+
+	it( 'test text string', () => {
+		expect( getPxFromCssUnit( 'abc' ) ).toBe( null );
+	} );
+
+	it( 'test not non function return null', () => {
+		expect( getPxFromCssUnit( 'abc + num' ) ).toBe( null );
+	} );
+
+	it( 'test not a fishy function return null', () => {
+		expect( getPxFromCssUnit( 'console.log("howdy"); + 10px' ) ).toBe(
+			null
+		);
+	} );
+	it( 'test not a typo function return null', () => {
+		expect( getPxFromCssUnit( 'calc(12vw * 10px' ) ).toBe( null );
 	} );
 } );

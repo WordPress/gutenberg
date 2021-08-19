@@ -6,9 +6,9 @@
  */
 function parseUnit( cssUnit ) {
 	const match = cssUnit
-		.trim()
+		?.trim()
 		.match(
-			/^(0?[-.]?\d+)(r?e[m|x]|v[h|w|min|max]+|p[x|t|c]|[c|m]m|%|in|ch)$/
+			/^(0?[-.]?\d+)(r?e[m|x]|v[h|w|min|max]+|p[x|t|c]|[c|m]m|%|in|ch|Q|lh)$/
 		);
 	return match
 		? { value: parseFloat( match[ 1 ] ) || match[ 1 ], unit: match[ 2 ] }
@@ -32,10 +32,8 @@ function calculate( expression ) {
  * @return {string} unit containing the unit in PX.
  */
 function getFunctionUnitValue( functionUnitValue, options ) {
-	if ( ! functionUnitValue ) {
-		return null;
-	}
 	const functionUnit = functionUnitValue.split( /[(),]/g ).filter( Boolean );
+
 	const units = functionUnit
 		.slice( 1 )
 		.map( ( unit ) => parseUnit( getPxFromCssUnit( unit, options ) ).value )
@@ -65,37 +63,30 @@ function getFunctionUnitValue( functionUnitValue, options ) {
 /**
  * Take a css function such as min, max, calc, clamp and returns parsedUnit
  *
+ * How this works for the nested function is that it first replaces the inner function call.
+ * Then it tackles the outer onces.
+ * So for example: min( max(25px, 35px), 40px )
+ * in the first pass we would replace max(25px, 35px) with 35px.
+ * then we would try to evaluate min( 35px, 40px )
+ * and then finally return 35px.
+ *
  * @param {string} cssUnit
  * @return {Object} parsedUnit object.
  */
 function parseUnitFunction( cssUnit ) {
-	let matchFound = false;
 	while ( true ) {
 		const currentCssUnit = cssUnit;
-
-		const regExps = [
-			/max\(([^()]*)\)/g,
-			/min\(([^()]*)\)/g,
-			/calc\(([^()]*)\)/g,
-			/clamp\(([^()]*)\)/g,
-		];
-		regExps.forEach( ( regExp ) => {
-			const matches = regExp.exec( cssUnit ) || [];
+		const regExp = /(max|min|calc|clamp)\(([^()]*)\)/g;
+		const matches = regExp.exec( cssUnit ) || [];
+		if ( matches[ 0 ] ) {
 			const functionUnitValue = getFunctionUnitValue( matches[ 0 ] );
-			if ( functionUnitValue ) {
-				matchFound = true;
-				cssUnit = cssUnit.replace( matches[ 0 ], functionUnitValue );
-			}
-		} );
+			cssUnit = cssUnit.replace( matches[ 0 ], functionUnitValue );
+		}
 
-		// if the unit hasn't been modified
+		// if the unit hasn't been modified or we have a single value break free.
 		if ( cssUnit === currentCssUnit || parseFloat( cssUnit ) ) {
 			break;
 		}
-	}
-
-	if ( ! matchFound ) {
-		return cssUnit; // just return the value. We didn't find a match.
 	}
 
 	return parseUnit( cssUnit );
@@ -121,16 +112,21 @@ function isMathExpression( cssUnit ) {
  * @return {string} return a converfted value to px.
  */
 function evalMathExpression( cssUnit ) {
+	let errorFound = false;
 	// Convert every part of the expression to px values.
-	const functionUnits = cssUnit.split( /[+-/*/]/g ).filter( Boolean );
-	functionUnits.forEach( ( unit ) => {
-		// standardize the unit to px and extract the value.
+	const cssUnitsBits = cssUnit.split( /[+-/*/]/g ).filter( Boolean );
+	for ( const unit of cssUnitsBits ) {
+		// Standardize the unit to px and extract the value.
 		const parsedUnit = parseUnit( getPxFromCssUnit( unit ) );
-
+		if ( ! parseFloat( parsedUnit.value ) ) {
+			errorFound = true;
+			// end early since we are dealing with a null value.
+			break;
+		}
 		cssUnit = cssUnit.replace( unit, parsedUnit.value );
-	} );
+	}
 
-	return calculate( cssUnit ).toFixed( 0 ) + 'px';
+	return errorFound ? null : calculate( cssUnit ).toFixed( 0 ) + 'px';
 }
 /**
  * Convert a parsedUnit object to px value.
@@ -143,21 +139,9 @@ function convertParsedUnitToPx( parsedUnit, options ) {
 	const PIXELS_PER_INCH = 96;
 	const ONE_PERCENT = 0.01;
 
-	const defaults = {
-		ch: 8,
-		ex: 7.15625,
-		em: 16,
-		rem: 16,
-		in: PIXELS_PER_INCH,
-		cm: PIXELS_PER_INCH / 2.54,
-		mm: PIXELS_PER_INCH / 25.4,
-		pt: PIXELS_PER_INCH / 72,
-		pc: PIXELS_PER_INCH / 6,
-		px: 1,
-	};
-
 	const defaultProperties = {
 		fontSize: 16,
+		lineHeight: 16,
 		width: 375,
 		height: 812,
 		type: 'font',
@@ -182,6 +166,19 @@ function convertParsedUnitToPx( parsedUnit, options ) {
 			( setOptions.type === 'font'
 				? setOptions.fontSize
 				: setOptions.width ) * ONE_PERCENT,
+		ch: 8, // The advance measure (width) of the glyph "0" of the element's font. Approximate
+		ex: 7.15625, // x-height of the element's font. Approximate
+		lh: setOptions.lineHeight,
+	};
+
+	const absoluteUnits = {
+		in: PIXELS_PER_INCH,
+		cm: PIXELS_PER_INCH / 2.54,
+		mm: PIXELS_PER_INCH / 25.4,
+		pt: PIXELS_PER_INCH / 72,
+		pc: PIXELS_PER_INCH / 6,
+		px: 1,
+		Q: PIXELS_PER_INCH / 2.54 / 40,
 	};
 
 	if ( relativeUnits[ parsedUnit.unit ] ) {
@@ -192,10 +189,11 @@ function convertParsedUnitToPx( parsedUnit, options ) {
 		);
 	}
 
-	if ( defaults[ parsedUnit.unit ] ) {
+	if ( absoluteUnits[ parsedUnit.unit ] ) {
 		return (
-			( defaults[ parsedUnit.unit ] * parsedUnit.value ).toFixed( 0 ) +
-			'px'
+			( absoluteUnits[ parsedUnit.unit ] * parsedUnit.value ).toFixed(
+				0
+			) + 'px'
 		);
 	}
 
@@ -209,6 +207,12 @@ function convertParsedUnitToPx( parsedUnit, options ) {
  * @return {string} returns the cssUnit value in a simple px format.
  */
 export function getPxFromCssUnit( cssUnit, options = {} ) {
+	if ( Number.isFinite( cssUnit ) ) {
+		return cssUnit.toFixed( 0 ) + 'px';
+	}
+	if ( cssUnit === undefined ) {
+		return null;
+	}
 	let parsedUnit = parseUnit( cssUnit );
 
 	if ( ! parsedUnit.unit ) {
