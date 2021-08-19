@@ -110,7 +110,7 @@ export default function useBlockDropZone( {
 		useCallback( ( event, currentTarget ) => {
 			const blockElements = Array.from( currentTarget.children ).filter(
 				// Ensure the element is a block. It should have the `wp-block` class.
-				( element ) => element.classList.contains( 'wp-block' )
+				( element ) => element.hasAttribute( 'data-block' )
 			);
 			const targetIndex = getNearestBlockIndex(
 				blockElements,
