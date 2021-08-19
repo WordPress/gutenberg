@@ -52,10 +52,6 @@
 	opacity: 0.05 !important;
 	border-radius: $radius-block-ui !important;
 
-	// We apply a max-height so that when dragging big selections, you don't have to drag by a tall slot.
-	max-height: 240px !important;
-	overflow: hidden !important;
-
 	// Disabling pointer events during the drag event is necessary,
 	// lest the block might affect your drag operation.
 	pointer-events: none !important;
