@@ -168,7 +168,7 @@ export default function PostTitle() {
 	// The wp-block className is important for editor styles.
 	// This same block is used in both the visual and the code editor.
 	const className = classnames(
-		'wp-block editor-post-title editor-post-title__block',
+		'wp-block editor-post-title editor-post-title__block rich-text',
 		{
 			'is-selected': isSelected,
 			'is-focus-mode': isFocusMode,
@@ -202,19 +202,17 @@ export default function PostTitle() {
 	/* eslint-disable jsx-a11y/heading-has-content, jsx-a11y/no-noninteractive-element-interactions */
 	return (
 		<PostTypeSupportCheck supportKeys="title">
-			<div className={ className }>
-				<h1
-					ref={ useMergeRefs( [ richTextRef, ref ] ) }
-					contentEditable
-					className="editor-post-title__input rich-text"
-					aria-label={ decodedPlaceholder }
-					onFocus={ onSelect }
-					onBlur={ onUnselect }
-					onKeyDown={ onKeyDown }
-					onKeyPress={ onUnselect }
-					onPaste={ onPaste }
-				/>
-			</div>
+			<h1
+				ref={ useMergeRefs( [ richTextRef, ref ] ) }
+				contentEditable
+				className={ className }
+				aria-label={ decodedPlaceholder }
+				onFocus={ onSelect }
+				onBlur={ onUnselect }
+				onKeyDown={ onKeyDown }
+				onKeyPress={ onUnselect }
+				onPaste={ onPaste }
+			/>
 		</PostTypeSupportCheck>
 	);
 	/* eslint-enable jsx-a11y/heading-has-content, jsx-a11y/no-noninteractive-element-interactions */
