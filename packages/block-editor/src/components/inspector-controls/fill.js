@@ -21,7 +21,7 @@ export default function InspectorControlsFill( {
 		return null;
 	}
 	if ( ! isDisplayed ) {
-		return false;
+		return null;
 	}
 
 	return (
