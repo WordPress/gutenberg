@@ -129,6 +129,10 @@ const BlockInspectorSingleBlock = ( {
 				</div>
 			) }
 			<InspectorControls.Slot bubblesVirtually={ bubblesVirtually } />
+			<InspectorControls.Slot
+				__experimentalGroup="dimensions"
+				bubblesVirtually={ false }
+			/>
 			<div>
 				<AdvancedControls bubblesVirtually={ bubblesVirtually } />
 			</div>

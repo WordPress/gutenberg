@@ -18,6 +18,7 @@ export function useToolsPanelItem( props ) {
 		hasValue,
 		isShownByDefault,
 		label,
+		resetAllFilter,
 		onDeselect = () => undefined,
 		onSelect = () => undefined,
 		...otherProps
@@ -32,6 +33,7 @@ export function useToolsPanelItem( props ) {
 		menuItems,
 		registerPanelItem,
 		deregisterPanelItem,
+		isResetting,
 	} = useToolsPanelContext();
 
 	// Registering the panel item allows the panel to include it in its
@@ -41,6 +43,7 @@ export function useToolsPanelItem( props ) {
 			hasValue,
 			isShownByDefault,
 			label,
+			resetAllFilter,
 		} );
 
 		return () => deregisterPanelItem( label );
@@ -56,6 +59,10 @@ export function useToolsPanelItem( props ) {
 	// Determine if the panel item's corresponding menu is being toggled and
 	// trigger appropriate callback if it is.
 	useEffect( () => {
+		if ( isResetting ) {
+			return;
+		}
+
 		if ( isMenuItemChecked && ! isValueSet && ! wasMenuItemChecked ) {
 			onSelect();
 		}

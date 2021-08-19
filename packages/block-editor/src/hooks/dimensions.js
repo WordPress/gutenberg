@@ -1,10 +1,7 @@
 /**
  * WordPress dependencies
  */
-import {
-	__experimentalToolsPanel as ToolsPanel,
-	__experimentalToolsPanelItem as ToolsPanelItem,
-} from '@wordpress/components';
+import { __experimentalToolsPanelItem as ToolsPanelItem } from '@wordpress/components';
 import { Platform } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { getBlockSupport } from '@wordpress/blocks';
@@ -34,7 +31,6 @@ import {
 	resetPadding,
 	useIsPaddingDisabled,
 } from './padding';
-import { cleanEmptyObject } from './utils';
 
 export const SPACING_SUPPORT_KEY = 'spacing';
 export const ALL_SIDES = [ 'top', 'right', 'bottom', 'left' ];
@@ -63,62 +59,69 @@ export function DimensionsPanel( props ) {
 		'__experimentalDefaultControls',
 	] );
 
-	// Callback to reset all block support attributes controlled via this panel.
-	const resetAll = () => {
-		const { style } = props.attributes;
-
-		props.setAttributes( {
-			style: cleanEmptyObject( {
-				...style,
-				spacing: {
-					...style?.spacing,
-					blockGap: undefined,
-					margin: undefined,
-					padding: undefined,
-				},
-			} ),
-		} );
-	};
-
 	return (
-		<InspectorControls key="dimensions">
-			<ToolsPanel
-				label={ __( 'Dimensions options' ) }
-				header={ __( 'Dimensions' ) }
-				resetAll={ resetAll }
-			>
-				{ ! isPaddingDisabled && (
-					<ToolsPanelItem
-						hasValue={ () => hasPaddingValue( props ) }
-						label={ __( 'Padding' ) }
-						onDeselect={ () => resetPadding( props ) }
-						isShownByDefault={ defaultSpacingControls?.padding }
-					>
-						<PaddingEdit { ...props } />
-					</ToolsPanelItem>
-				) }
-				{ ! isMarginDisabled && (
-					<ToolsPanelItem
-						hasValue={ () => hasMarginValue( props ) }
-						label={ __( 'Margin' ) }
-						onDeselect={ () => resetMargin( props ) }
-						isShownByDefault={ defaultSpacingControls?.margin }
-					>
-						<MarginEdit { ...props } />
-					</ToolsPanelItem>
-				) }
-				{ ! isGapDisabled && (
-					<ToolsPanelItem
-						className="single-column"
-						hasValue={ () => hasGapValue( props ) }
-						label={ __( 'Block gap' ) }
-						onDeselect={ () => resetGap( props ) }
-						isShownByDefault={ defaultSpacingControls?.blockGap }
-					>
-						<GapEdit { ...props } />
-					</ToolsPanelItem>
-				) }
-			</ToolsPanel>
+		<InspectorControls __experimentalGroup="dimensions">
+			{ ! isPaddingDisabled && (
+				<ToolsPanelItem
+					hasValue={ () => hasPaddingValue( props ) }
+					label={ __( 'Padding' ) }
+					onDeselect={ () => resetPadding( props ) }
+					resetAllFilter={ ( newAttributes ) => ( {
+						...newAttributes,
+						style: {
+							...newAttributes.style,
+							spacing: {
+								...newAttributes.style?.spacing,
+								padding: undefined,
+							},
+						},
+					} ) }
+					isShownByDefault={ defaultSpacingControls?.padding }
+				>
+					<PaddingEdit { ...props } />
+				</ToolsPanelItem>
+			) }
+			{ ! isMarginDisabled && (
+				<ToolsPanelItem
+					hasValue={ () => hasMarginValue( props ) }
+					label={ __( 'Margin' ) }
+					onDeselect={ () => resetMargin( props ) }
+					resetAllFilter={ ( newAttributes ) => ( {
+						...newAttributes,
+						style: {
+							...newAttributes.style,
+							spacing: {
+								...newAttributes.style?.spacing,
+								margin: undefined,
+							},
+						},
+					} ) }
+					isShownByDefault={ defaultSpacingControls?.margin }
+				>
+					<MarginEdit { ...props } />
+				</ToolsPanelItem>
+			) }
+			{ ! isGapDisabled && (
+				<ToolsPanelItem
+					className="single-column"
+					hasValue={ () => hasGapValue( props ) }
+					label={ __( 'Block gap' ) }
+					onDeselect={ () => resetGap( props ) }
+					resetAllFilter={ ( newAttributes ) => ( {
+						...newAttributes,
+						style: {
+							...newAttributes.style,
+							spacing: {
+								...newAttributes.style?.spacing,
+								blockGap: undefined,
+							},
+						},
+					} ) }
+					isShownByDefault={ defaultSpacingControls?.blockGap }
+				>
+					<GapEdit { ...props } />
+				</ToolsPanelItem>
+			) }
 		</InspectorControls>
 	);
 }

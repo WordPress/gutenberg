@@ -316,6 +316,10 @@ describe( 'ToolsPanel', () => {
 			await selectMenuItem( 'Reset all' );
 
 			expect( resetAll ).toHaveBeenCalledTimes( 1 );
+			expect( controlProps.onSelect ).not.toHaveBeenCalled();
+			expect( controlProps.onDeselect ).not.toHaveBeenCalled();
+			expect( altControlProps.onSelect ).not.toHaveBeenCalled();
+			expect( altControlProps.onDeselect ).not.toHaveBeenCalled();
 		} );
 	} );
 
