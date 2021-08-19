@@ -72,8 +72,61 @@ describe( 'getPxFromCssUnit', () => {
 	it( 'min() return px unit', () => {
 		expect( getPxFromCssUnit( 'min(20px, 25px)' ) ).toBe( '20px' );
 	} );
+	it( 'min() function with many arguments return px unit', () => {
+		expect( getPxFromCssUnit( 'min(20px, 9px, 12pt, 25px)' ) ).toBe(
+			'9px'
+		);
+	} );
 
 	it( 'max() return px unit', () => {
 		expect( getPxFromCssUnit( 'max(20px, 25px)' ) ).toBe( '25px' );
+	} );
+
+	it( 'clamp() lower return px unit', () => {
+		expect( getPxFromCssUnit( 'clamp(10px, 9px, 25px)' ) ).toBe( '10px' );
+	} );
+
+	it( 'clamp() upper return px unit', () => {
+		expect( getPxFromCssUnit( 'clamp(10px, 35px, 25px)' ) ).toBe( '25px' );
+	} );
+
+	it( 'clamp() middle return px unit', () => {
+		expect( getPxFromCssUnit( 'clamp(10px, 15px, 25px)' ) ).toBe( '15px' );
+	} );
+
+	it( 'nested max min function return px unit', () => {
+		expect( getPxFromCssUnit( 'min(max(20px,25px), 35px)' ) ).toBe(
+			'25px'
+		);
+	} );
+
+	it( 'nested min max function return px unit', () => {
+		expect( getPxFromCssUnit( 'max(min(20px,25px), 35px)' ) ).toBe(
+			'35px'
+		);
+	} );
+
+	it( 'calcualte function return px unit', () => {
+		expect( getPxFromCssUnit( '10px + 25px' ) ).toBe( '35px' );
+	} );
+
+	it( 'test calc(10px + 25px) function return px unit', () => {
+		expect( getPxFromCssUnit( 'calc(10px + 25px)' ) ).toBe( '35px' );
+	} );
+
+	it( 'test calc(25px - 10px) function return px unit', () => {
+		expect( getPxFromCssUnit( 'calc(25px - 10px)' ) ).toBe( '15px' );
+	} );
+
+	it( 'test min(10px + 25px, 55pt) function return px unit', () => {
+		expect( getPxFromCssUnit( 'min(10px + 25px, 55pt)' ) ).toBe( '35px' );
+	} );
+
+	it( 'test calc(12vw * 10px) function return px unit', () => {
+		expect( getPxFromCssUnit( 'calc(12vw * 10px)' ) ).toBe( '450px' );
+	} );
+
+	it( 'test calc(42vw / 10px) function return px unit', () => {
+		expect( getPxFromCssUnit( 'calc(45vw / 10px)' ) ).toBe( '17px' );
 	} );
 } );
