@@ -169,7 +169,17 @@ $ wp-env destroy
 $ wp-env start
 ```
 
-### 7. Debug mode and inspecting the generated dockerfile.
+### 7. Manually nuke everything
+
+If you get Docker errors with `wp-env destroy`, then some containers may be stuck in a broken state. When that happens, removing them directly through Docker may be necessary.
+
+**⚠️ WARNING: This will permanently delete any posts, pages, media, etc. in the local WordPress installation.**
+
+```sh
+$ find ~/.wp-env -maxdepth 1 -type d -exec bash -c "cd '{}' && docker-compose down" \;
+```
+
+### 8. Debug mode and inspecting the generated dockerfile.
 
 `wp-env` uses docker behind the scenes. Inspecting the generated docker-compose file can help to understand what's going on.
 
