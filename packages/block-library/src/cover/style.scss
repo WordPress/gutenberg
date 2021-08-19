@@ -11,6 +11,7 @@
 	padding: 1em;
 	// This block has customizable padding, border-box makes that more predictable.
 	box-sizing: border-box;
+	color: $white;
 
 	&.has-parallax {
 		background-attachment: fixed;
@@ -104,7 +105,6 @@
 	.wp-block-cover__inner-container {
 		width: 100%;
 		z-index: z-index(".wp-block-cover__inner-container");
-		color: $white;
 	}
 
 	p,
