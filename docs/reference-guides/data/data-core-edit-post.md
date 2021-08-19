@@ -514,15 +514,11 @@ _Returns_
 
 ### togglePinnedPluginItem
 
-Returns an action object used to toggle a plugin name flag.
+Triggers an action object used to toggle a plugin name flag.
 
 _Parameters_
 
 -   _pluginName_ `string`: Plugin name.
-
-_Returns_
-
--   `Object`: Action object.
 
 ### togglePublishSidebar
 

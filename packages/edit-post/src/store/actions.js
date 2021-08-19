@@ -185,17 +185,24 @@ export function* switchEditorMode( mode ) {
 }
 
 /**
- * Returns an action object used to toggle a plugin name flag.
+ * Triggers an action object used to toggle a plugin name flag.
  *
  * @param {string} pluginName Plugin name.
- *
- * @return {Object} Action object.
  */
-export function togglePinnedPluginItem( pluginName ) {
-	return {
-		type: 'TOGGLE_PINNED_PLUGIN_ITEM',
-		pluginName,
-	};
+export function* togglePinnedPluginItem( pluginName ) {
+	const isPinned = yield controls.select(
+		interfaceStore.name,
+		'isItemPinned',
+		'core/edit-post',
+		pluginName
+	);
+
+	yield controls.dispatch(
+		interfaceStore.name,
+		isPinned ? 'unpinItem' : 'pinItem',
+		'core/edit-post',
+		pluginName
+	);
 }
 
 /**
