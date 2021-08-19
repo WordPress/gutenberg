@@ -43,16 +43,10 @@ import { __ } from '@wordpress/i18n';
 import BlockInspectorButton from './block-inspector-button';
 import { store as editPostStore } from '../../store';
 
-function MaybeIframe( {
-	children,
-	contentRef,
-	isTemplateMode,
-	styles,
-	style,
-} ) {
+function MaybeIframe( { children, contentRef, shouldIframe, styles, style } ) {
 	const ref = useMouseMoveTypingReset();
 
-	if ( ! isTemplateMode ) {
+	if ( ! shouldIframe ) {
 		return (
 			<>
 				<EditorStyles styles={ styles } />
@@ -217,7 +211,11 @@ export default function VisualEditor( { styles } ) {
 					className={ previewMode }
 				>
 					<MaybeIframe
-						isTemplateMode={ isTemplateMode }
+						shouldIframe={
+							isTemplateMode ||
+							deviceType === 'Tablet' ||
+							deviceType === 'Mobile'
+						}
 						contentRef={ contentRef }
 						styles={ styles }
 						style={ { paddingBottom } }

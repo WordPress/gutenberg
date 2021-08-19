@@ -1,8 +1,3 @@
-// This tag marks the start of the styles that apply to editing canvas contents and need to be manipulated when we resize the editor.
-#start-resizable-editor-section {
-	display: none;
-}
-
 @import "./archives/editor.scss";
 @import "./audio/editor.scss";
 @import "./block/editor.scss";
@@ -95,8 +90,3 @@
  * These are only output in the editor, but styles here are NOT prefixed .editor-styles-wrapper.
  * This allows us to create normalization styles that are easily overridden by editor styles.
  */
-
-// This tag marks the end of the styles that apply to editing canvas contents and need to be manipulated when we resize the editor.
-#end-resizable-editor-section {
-	display: none;
-}
