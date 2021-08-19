@@ -19,12 +19,15 @@ import {
 	TextControl,
 	ToggleControl,
 } from '@wordpress/components';
+import { useMemo } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { store as coreStore } from '@wordpress/core-data';
+import { decodeEntities } from '@wordpress/html-entities';
 
 /**
  * Internal dependencies
  */
+import { buildBreadcrumb } from './utils';
 
 export default function BreadcrumbsEdit( {
 	attributes,
@@ -36,23 +39,25 @@ export default function BreadcrumbsEdit( {
 		separator,
 		showCurrentPageTitle,
 		showLeadingSeparator,
+		showSiteTitle,
+		siteTitleOverride,
 		textAlign,
 	} = attributes;
 
-	const { parents, post } = useSelect(
+	const { parents, post, siteTitle } = useSelect(
 		( select ) => {
 			const { getEntityRecord, getEditedEntityRecord } = select(
 				coreStore
 			);
 
-			const parentEntities = [];
-
+			const siteData = getEntityRecord( 'root', '__unstableBase' );
 			const currentPost = getEditedEntityRecord(
 				'postType',
 				postType,
 				postId
 			);
 
+			const parentEntities = [];
 			let currentParentId = currentPost?.parent;
 
 			while ( currentParentId ) {
@@ -73,81 +78,63 @@ export default function BreadcrumbsEdit( {
 			return {
 				post: currentPost,
 				parents: parentEntities.reverse(),
+				siteTitle: decodeEntities( siteData?.name ),
 			};
 		},
 		[ postId, postType ]
 	);
 
-	// Set breadcrumb page titles to real titles if available, and
-	// fall back to placeholder content.
-	let breadcrumbTitles = parents.length
-		? parents.map( ( parent ) => parent?.title?.rendered || ' ' )
-		: [ __( 'Root' ), __( 'Top-level page' ), __( 'Child page' ) ];
+	// Construct breadcrumbs.
+	const breadcrumbs = useMemo( () => {
+		// Set breadcrumb page titles to real titles if available, and
+		// fall back to placeholder content.
+		let breadcrumbTitles = parents.length
+			? parents.map( ( parent ) => parent?.title?.rendered || ' ' )
+			: [ __( 'Top-level page' ), __( 'Child page' ) ];
 
-	if ( nestingLevel > 0 ) {
-		breadcrumbTitles = breadcrumbTitles.slice( -nestingLevel );
-	}
-
-	const buildBreadcrumb = (
-		crumbTitle,
-		showSeparator,
-		addLeadingSeparator,
-		key
-	) => {
-		let separatorSpan;
-		let crumbAnchor;
-
-		if ( showSeparator && separator ) {
-			separatorSpan = (
-				<span className="wp-block-breadcrumbs__separator">
-					{ separator }
-				</span>
-			);
+		// Prepend the site title or site title override if specified.
+		if ( showSiteTitle && siteTitle ) {
+			if ( siteTitleOverride ) {
+				breadcrumbTitles.unshift( siteTitleOverride );
+			} else {
+				breadcrumbTitles.unshift( siteTitle );
+			}
 		}
 
-		if ( crumbTitle ) {
-			/* eslint-disable jsx-a11y/anchor-is-valid */
-			crumbAnchor = (
-				<a href="#" onClick={ ( event ) => event.preventDefault() }>
-					{ crumbTitle }
-				</a>
-			);
-			/* eslint-enable */
+		// Limit titles by nesting level.
+		if ( nestingLevel > 0 ) {
+			breadcrumbTitles = breadcrumbTitles.slice( -nestingLevel );
 		}
 
-		return (
-			<li className="wp-block-breadcrumbs__item" key={ key }>
-				{ addLeadingSeparator ? separatorSpan : null }
-				{ crumbAnchor }
-				{ separatorSpan }
-			</li>
-		);
-	};
+		// Append current page title if set.
+		if ( showCurrentPageTitle ) {
+			breadcrumbTitles.push( post?.title || __( 'Current page' ) );
+		}
 
-	const breadcrumbs = [];
-
-	// Add a useMemo on this one?
-	breadcrumbs.push(
-		...breadcrumbTitles.map( ( item, index ) =>
-			buildBreadcrumb(
-				item,
-				index < breadcrumbTitles.length - 1 || showCurrentPageTitle,
-				index === 0 && showLeadingSeparator,
-				index
-			)
-		)
-	);
-
-	if ( showCurrentPageTitle ) {
-		breadcrumbs.push(
-			buildBreadcrumb(
-				post?.title || __( 'Current page' ),
-				false,
-				false,
-				breadcrumbTitles.length
+		const crumbs = [];
+		crumbs.push(
+			...breadcrumbTitles.map( ( item, index ) =>
+				buildBreadcrumb( {
+					crumbTitle: item,
+					separator,
+					showSeparator:
+						index < breadcrumbTitles.length - 1 ||
+						showCurrentPageTitle,
+					addLeadingSeparator: index === 0 && showLeadingSeparator,
+					key: index,
+				} )
 			)
 		);
-	}
+		return crumbs;
+	}, [
+		parents,
+		showCurrentPageTitle,
+		showLeadingSeparator,
+		showSiteTitle,
+		siteTitle,
+		siteTitleOverride,
+		nestingLevel,
+	] );
 
 	const blockProps = useBlockProps( {
 		className: classnames( {
@@ -212,6 +199,32 @@ export default function BreadcrumbsEdit( {
 							} )
 						}
 					/>
+					<ToggleControl
+						label={ __( 'Show site title' ) }
+						checked={ showSiteTitle }
+						onChange={ () =>
+							setAttributes( {
+								showSiteTitle: ! showSiteTitle,
+							} )
+						}
+					/>
+					{ showSiteTitle && (
+						<TextControl
+							label={ __( 'Site title override' ) }
+							help={ __(
+								'Enter a label to override the site title'
+							) }
+							value={ siteTitleOverride || '' }
+							placeholder={ __( 'e.g. Home' ) }
+							onChange={ ( nextValue ) =>
+								setAttributes( {
+									siteTitleOverride: nextValue,
+								} )
+							}
+							autoCapitalize="none"
+							autoComplete="off"
+						/>
+					) }
 				</PanelBody>
 			</InspectorControls>
 			<nav { ...blockProps }>

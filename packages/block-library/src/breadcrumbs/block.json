@@ -25,6 +25,13 @@
 			"type": "boolean",
 			"default": false
 		},
+		"showSiteTitle": {
+			"type": "boolean",
+			"default": true
+		},
+		"siteTitleOverride": {
+			"type": "string"
+		},
 		"textAlign": {
 			"type": "string"
 		}
