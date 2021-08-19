@@ -35,9 +35,7 @@
 			"style": true,
 			"width": true
 		},
-		"__experimentalLayout": {
-			"allowSwitching": true
-		}
+		"__experimentalLayout": {}
 	},
 	"editorStyle": "wp-block-group-editor",
 	"style": "wp-block-group"
