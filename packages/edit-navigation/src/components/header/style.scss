@@ -1,11 +1,8 @@
 .edit-navigation-header {
 	display: flex;
+	justify-content: space-between;
 	align-items: center;
 	padding: $grid-unit-15 $grid-unit-30 $grid-unit-15 20px;
-}
-
-.edit-navigation-header__title-subtitle {
-	flex-grow: 1;
 }
 
 .edit-navigation-header__title {
