@@ -56,6 +56,11 @@
 	// lest the block might affect your drag operation.
 	pointer-events: none !important;
 
+	// Hide subsequent multiselected blocks, as they can become rather tall.
+	&.is-multi-selected + .is-multi-selected {
+		display: none !important;
+	}
+
 	// Hide the multi selection indicator when dragging.
 	&::selection {
 		background: transparent !important;
