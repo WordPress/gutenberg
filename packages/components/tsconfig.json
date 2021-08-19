@@ -24,6 +24,7 @@
 		"src/base-field/**/*",
 		"src/button/**/*",
 		"src/card/**/*",
+		"src/confirm/**/*",
 		"src/dashicon/**/*",
 		"src/disabled/**/*",
 		"src/divider/**/*",

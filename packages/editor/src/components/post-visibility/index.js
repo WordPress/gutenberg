@@ -3,7 +3,7 @@
  */
 import { __ } from '@wordpress/i18n';
 import { Component } from '@wordpress/element';
-import { VisuallyHidden } from '@wordpress/components';
+import { VisuallyHidden, confirm } from '@wordpress/components';
 import { withInstanceId, compose } from '@wordpress/compose';
 import { withSelect, withDispatch } from '@wordpress/data';
 
@@ -34,12 +34,14 @@ export class PostVisibility extends Component {
 		this.setState( { hasPassword: false } );
 	}
 
-	setPrivate() {
+	async setPrivate() {
 		if (
 			// eslint-disable-next-line no-alert
-			! window.confirm(
-				__( 'Would you like to privately publish this post now?' )
-			)
+			! ( await confirm( {
+				confirmation: __(
+					'Would you like to privately publish this post now?'
+				),
+			} ) )
 		) {
 			return;
 		}
