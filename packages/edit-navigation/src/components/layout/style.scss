@@ -34,14 +34,6 @@
 		// Reference element for the block popover position.
 		position: relative;
 
-		// The 10px match that of similar settings pages.
-		padding: $grid-unit-15 10px 10px 10px;
-
-		@include break-medium() {
-			// Provide space for the floating block toolbar.
-			padding-top: $navigation-editor-spacing-top;
-		}
-
 		// Ensure the entire layout is full-height, the background
 		// of the editing canvas needs to be full-height for block
 		// deselection to work.
