@@ -188,9 +188,11 @@ export function computePopoverYAxisPosition(
 
 	if ( stickyBoundaryElement ) {
 		const stickyRect = stickyBoundaryElement.getBoundingClientRect();
-		const stickyPosition = stickyRect.top + height - relativeOffsetTop;
+		const stickyPositionTop = stickyRect.top + height - relativeOffsetTop;
+		const stickyPositionBottom =
+			stickyRect.bottom - height - relativeOffsetTop;
 
-		if ( anchorRect.top <= stickyPosition ) {
+		if ( anchorRect.top <= stickyPositionTop ) {
 			if ( editorWrapper ) {
 				// If a popover cannot be positioned above the anchor, even after scrolling, we must
 				// ensure we use the bottom position instead of the popover slot.  This prevents the
@@ -200,20 +202,20 @@ export function computePopoverYAxisPosition(
 				const isRoomAboveInCanvas =
 					height + HEIGHT_OFFSET <
 					editorWrapper.scrollTop + anchorRect.top;
-				const isRoomBelowVisually =
-					anchorRect.bottom + height + relativeOffsetTop <=
-					stickyRect.bottom;
-				if ( ! isRoomAboveInCanvas && isRoomBelowVisually ) {
+				if ( ! isRoomAboveInCanvas ) {
 					return {
 						yAxis: 'bottom',
-						popoverTop: anchorRect.bottom,
+						popoverTop: Math.min(
+							anchorRect.bottom,
+							stickyPositionBottom
+						),
 					};
 				}
 			}
 			// Default sticky behavior.
 			return {
 				yAxis,
-				popoverTop: Math.min( anchorRect.bottom, stickyPosition ),
+				popoverTop: Math.min( anchorRect.bottom, stickyPositionTop ),
 			};
 		}
 	}
