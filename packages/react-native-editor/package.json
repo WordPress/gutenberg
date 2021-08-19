@@ -62,7 +62,7 @@
 		"react-native-keyboard-aware-scroll-view": "git+https://github.com/wordpress-mobile/react-native-keyboard-aware-scroll-view.git#v0.8.8-wp",
 		"react-native-linear-gradient": "git+https://github.com/wordpress-mobile/react-native-linear-gradient.git#wp-fork",
 		"react-native-modal": "^11.10.0",
-		"react-native-prompt-android": "git+https://github.com/wordpress-mobile/react-native-prompt-android.git#70146814340f81b72d3337784fac54856d0a72b5",
+		"react-native-prompt-android": "git+https://github.com/wordpress-mobile/react-native-prompt-android.git#wp-fork",
 		"react-native-reanimated": "git+https://github.com/wordpress-mobile/react-native-reanimated.git#wp-fork",
 		"react-native-safe-area": "^0.5.0",
 		"react-native-safe-area-context": "git+https://github.com/wordpress-mobile/react-native-safe-area-context.git#wp-fork",
