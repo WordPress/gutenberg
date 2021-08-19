@@ -109,6 +109,7 @@ const EMPTY_ARRAY = [];
 
 function Sandbox( {
 	html = '',
+	customJS,
 	providerUrl = '',
 	scripts = EMPTY_ARRAY,
 	styles = EMPTY_ARRAY,
@@ -165,7 +166,7 @@ function Sandbox( {
 					<script
 						type="text/javascript"
 						dangerouslySetInnerHTML={ {
-							__html: observeAndResizeJS,
+							__html: customJS || observeAndResizeJS,
 						} }
 					/>
 					{ scripts.map( ( src ) => (
