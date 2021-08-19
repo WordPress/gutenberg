@@ -33,10 +33,7 @@ const SCALE_OPTIONS = (
 		/>
 		<SegmentedControlOption
 			value="fill"
-			label={ _x(
-				'Stretch',
-				'Scale option for Image dimension control'
-			) }
+			label={ _x( 'Fill', 'Scale option for Image dimension control' ) }
 		/>
 	</>
 );
