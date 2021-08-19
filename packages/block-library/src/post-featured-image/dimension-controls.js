@@ -41,6 +41,18 @@ const SCALE_OPTIONS = (
 	</>
 );
 
+const scaleHelp = {
+	cover: __(
+		'Image is sized to maintain its aspect ratio and cropped to fill the entire space.'
+	),
+	contain: __(
+		'Image is scaled to fill the space without clipping the content.'
+	),
+	fill: __(
+		'Image will be stretched and distorted to completely fill the space.'
+	),
+};
+
 const DimensionControls = ( {
 	attributes: { width, height, scale },
 	setAttributes,
@@ -98,6 +110,7 @@ const DimensionControls = ( {
 				<SegmentedControl
 					label={ scaleLabel }
 					value={ scale }
+					help={ scaleHelp[ scale ] }
 					onChange={ ( value ) => {
 						setAttributes( {
 							scale: value,
