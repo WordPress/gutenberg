@@ -91,6 +91,22 @@
 		},
 		"__experimentalSelector": ".wp-block-button__link"
 	},
+	"blockStyles": {
+		"border": {
+			"radius": "9999px"
+		},
+		"color": {
+			"text": "#fff",
+			"background": "#32373c"
+		},
+		"typography": {
+			"fontSize": "1.125em",
+			"textDecoration": "none"
+		},
+		"spacing": {
+			"padding": "calc(0.667em + 2px) calc(1.333em + 2px)"
+		}
+	},
 	"styles": [
 		{ "name": "fill", "label": "Fill", "isDefault": true },
 		{ "name": "outline", "label": "Outline" }
