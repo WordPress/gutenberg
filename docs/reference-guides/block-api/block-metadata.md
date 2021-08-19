@@ -108,7 +108,7 @@ It returns the registered block type (`WPBlock`) on success or `undefined` on fa
 ```js
 import { registerBlockType } from '@wordpress/blocks';
 import Edit from './edit';
-import metadata from './block.json';
+import metadata from './block.json' assert { type: 'json' };;
 
 registerBlockType( metadata, {
 	edit: Edit,
@@ -548,7 +548,7 @@ In JavaScript, you can use `registerBlockType` method from `@wordpress/blocks` p
 ```js
 import { registerBlockType } from '@wordpress/blocks';
 import Edit from './edit';
-import metadata from './block.json';
+import metadata from './block.json' assert { type: 'json' };;
 
 registerBlockType( metadata, {
 	edit: Edit,

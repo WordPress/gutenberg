@@ -7,7 +7,7 @@ import { addFilter } from '@wordpress/hooks';
 /**
  * Internal dependencies
  */
-import metadata from './block.json';
+import metadata from './block.json' assert { type: 'json' };;
 import edit from './edit';
 import save from './save';
 import variations from './variations';

@@ -7,7 +7,7 @@ import { createBlock, getBlockAttributes } from '@wordpress/blocks';
  * Internal dependencies
  */
 import { getLevelFromHeadingNodeName } from './shared';
-import { name } from './block.json';
+import { name } from './block.json' assert { type: 'json' };;
 
 const transforms = {
 	from: [

@@ -7,7 +7,7 @@ import { getBlockType } from '@wordpress/blocks';
  * Internal dependencies
  */
 import edit from './edit';
-import metadata from './block.json';
+import metadata from './block.json' assert { type: 'json' };;
 import save from './save';
 
 const { name } = metadata;

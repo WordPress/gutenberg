@@ -6,7 +6,7 @@ import { createBlock } from '@wordpress/blocks';
 /**
  * Internal dependencies
  */
-import metadata from './block.json';
+import metadata from './block.json' assert { type: 'json' };;
 
 const { name: EMBED_BLOCK } = metadata;
 

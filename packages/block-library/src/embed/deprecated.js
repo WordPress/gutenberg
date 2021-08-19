@@ -6,7 +6,7 @@ import classnames from 'classnames';
 /**
  * Internal dependencies
  */
-import metadata from './block.json';
+import metadata from './block.json' assert { type: 'json' };;
 
 /**
  * WordPress dependencies

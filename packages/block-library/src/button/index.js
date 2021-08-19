@@ -9,7 +9,7 @@ import { button as icon } from '@wordpress/icons';
  */
 import deprecated from './deprecated';
 import edit from './edit';
-import metadata from './block.json';
+import metadata from './block.json' assert { type: 'json' };;
 import save from './save';
 
 const { name } = metadata;

@@ -6,7 +6,8 @@ import { archive as icon } from '@wordpress/icons';
 /**
  * Internal dependencies
  */
-import metadata from './block.json';
+// eslint-disable-next-line
+import metadata from './block.json' assert { type: 'json' };
 import edit from './edit';
 
 const { name } = metadata;

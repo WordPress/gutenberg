@@ -7,7 +7,7 @@ import { __unstableCreateElement as createElement } from '@wordpress/rich-text';
 /**
  * Internal dependencies
  */
-import { name } from './block.json';
+import { name } from './block.json' assert { type: 'json' };;
 
 const transforms = {
 	from: [
