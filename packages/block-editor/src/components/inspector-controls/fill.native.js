@@ -7,18 +7,27 @@ import { View } from 'react-native';
  * WordPress dependencies
  */
 import { Children } from '@wordpress/element';
-import { createSlotFill, BottomSheetConsumer } from '@wordpress/components';
+import { BottomSheetConsumer } from '@wordpress/components';
+import warning from '@wordpress/warning';
 
 /**
  * Internal dependencies
  */
+import groups from './groups';
 import { useBlockEditContext } from '../block-edit/context';
 import { BlockSettingsButton } from '../block-settings';
 
-const { Fill, Slot } = createSlotFill( 'InspectorControls' );
-
-const FillWithSettingsButton = ( { children, ...props } ) => {
+export default function InspectorControlsFill( {
+	children,
+	__experimentalGroup: group = 'default',
+	...props
+} ) {
 	const { isSelected } = useBlockEditContext();
+	const Fill = groups[ group ]?.Fill;
+	if ( ! Fill ) {
+		warning( `Unknown InspectorControl group "${ group }" provided.` );
+		return null;
+	}
 	if ( ! isSelected ) {
 		return null;
 	}
@@ -35,13 +44,4 @@ const FillWithSettingsButton = ( { children, ...props } ) => {
 			{ Children.count( children ) > 0 && <BlockSettingsButton /> }
 		</>
 	);
-};
-
-const InspectorControls = FillWithSettingsButton;
-
-InspectorControls.Slot = Slot;
-
-/**
- * @see https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/inspector-controls/README.md
- */
-export default InspectorControls;
+}
