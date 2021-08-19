@@ -21,6 +21,9 @@ describe( 'TypeWriter', () => {
 		// Create first block.
 		await page.keyboard.press( 'Enter' );
 
+		// Create second block.
+		await page.keyboard.press( 'Enter' );
+
 		const initialPosition = await getCaretPosition();
 
 		// The page shouldn't be scrolled when it's being filled.
