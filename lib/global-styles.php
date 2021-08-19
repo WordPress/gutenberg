@@ -91,6 +91,16 @@ function gutenberg_experimental_global_styles_settings( $settings ) {
 		$context = 'site-editor';
 	}
 
+	// Is it a block editor on site that supports block templates?
+	if (
+		is_callable( 'get_current_screen' ) &&
+		get_current_screen()->is_block_editor() &&
+		WP_Theme_JSON_Resolver_Gutenberg::theme_has_support() &&
+		gutenberg_supports_block_templates()
+	) {
+		$context = 'post-editor';
+	}
+
 	if (
 		defined( 'REST_REQUEST' ) &&
 		REST_REQUEST &&
@@ -111,7 +121,7 @@ function gutenberg_experimental_global_styles_settings( $settings ) {
 	}
 	$consolidated = WP_Theme_JSON_Resolver_Gutenberg::get_merged_data( $settings, $origin );
 
-	if ( 'mobile' === $context ) {
+	if ( 'mobile' === $context || 'post-editor' === $context ) {
 		$settings['__experimentalStyles'] = $consolidated->get_raw_data()['styles'];
 	}
 

@@ -554,6 +554,7 @@ _Properties_
 -   _\_\_experimentalBlockDirectory_ `boolean`: Whether the user has enabled the Block Directory
 -   _\_\_experimentalBlockPatterns_ `Array`: Array of objects representing the block patterns
 -   _\_\_experimentalBlockPatternCategories_ `Array`: Array of objects representing the block pattern categories
+-   _\_\_experimentalStyles_ `Array`: Array of objects consolidated styles from core, theme, and user origins.
 
 ### SkipToSelectedBlock
 
