@@ -32,7 +32,7 @@ export function useRichText( {
 	__unstableMultilineTag: multilineTag,
 	__unstableDisableFormats: disableFormats,
 	__unstableIsSelected: isSelected,
-	__unstableDependencies,
+	__unstableDependencies = [],
 	__unstableAfterParse,
 	__unstableBeforeSerialize,
 	__unstableAddInvisibleFormats,
@@ -90,7 +90,9 @@ export function useRichText( {
 			record.current.formats = Array( value.length );
 			record.current.replacements = Array( value.length );
 		}
-		record.current.formats = __unstableAfterParse( record.current );
+		if ( __unstableAfterParse ) {
+			record.current.formats = __unstableAfterParse( record.current );
+		}
 		record.current.start = selectionStart;
 		record.current.end = selectionEnd;
 	}
@@ -124,10 +126,12 @@ export function useRichText( {
 			_value.current = newRecord.text;
 		} else {
 			_value.current = toHTMLString( {
-				value: {
-					...newRecord,
-					formats: __unstableBeforeSerialize( newRecord ),
-				},
+				value: __unstableBeforeSerialize
+					? {
+							...newRecord,
+							formats: __unstableBeforeSerialize( newRecord ),
+					  }
+					: newRecord,
 				multilineTag,
 				preserveWhiteSpace,
 			} );

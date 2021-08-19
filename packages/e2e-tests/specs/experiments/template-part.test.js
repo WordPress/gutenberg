@@ -292,6 +292,9 @@ describe( 'Template Part', () => {
 			const confirmTitleButton = await page.waitForSelector(
 				confirmTitleButtonSelector
 			);
+			await page.keyboard.press( 'Tab' );
+			await page.keyboard.press( 'Tab' );
+			await page.keyboard.type( 'Create New' );
 			await confirmTitleButton.click();
 
 			const newTemplatePart = await page.waitForSelector(
@@ -314,10 +317,8 @@ describe( 'Template Part', () => {
 			);
 			await chooseExistingButton.click();
 			const preview = await page.waitForSelector(
-				'.block-editor-block-preview__content iframe'
+				'[aria-label="Create New"]'
 			);
-			expect( preview ).toBeTruthy();
-
 			await preview.click();
 			await page.waitForSelector( activatedTemplatePartSelector );
 			const templatePartContent = await page.waitForXPath(
