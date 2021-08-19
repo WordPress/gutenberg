@@ -226,4 +226,52 @@ describe( 'splitting and merging blocks', () => {
 
 		expect( await getEditedPostContent() ).toMatchSnapshot();
 	} );
+
+	describe( 'test restore selection when merge produces more than one block', () => {
+		it( 'on forward delete', async () => {
+			await insertBlock( 'Paragraph' );
+			await page.keyboard.type( 'hi' );
+			await insertBlock( 'List' );
+			await page.keyboard.type( 'item 1' );
+			await page.keyboard.press( 'Enter' );
+			await page.keyboard.type( 'item 2' );
+			await pressKeyTimes( 'ArrowUp', 2 );
+			await page.keyboard.press( 'Delete' );
+			await page.keyboard.type(
+				' caret is in first block and at the proper position. '
+			);
+			expect( await getEditedPostContent() ).toMatchInlineSnapshot( `
+			"<!-- wp:paragraph -->
+			<p>hi caret is in first block and at the proper position. item 1</p>
+			<!-- /wp:paragraph -->
+
+			<!-- wp:paragraph -->
+			<p>item 2</p>
+			<!-- /wp:paragraph -->"
+		` );
+		} );
+		it( 'on backspace', async () => {
+			await insertBlock( 'Paragraph' );
+			await page.keyboard.type( 'hi' );
+			await insertBlock( 'List' );
+			await page.keyboard.type( 'item 1' );
+			await page.keyboard.press( 'Enter' );
+			await page.keyboard.type( 'item 2' );
+			await page.keyboard.press( 'ArrowUp' );
+			await pressKeyTimes( 'ArrowLeft', 6 );
+			await page.keyboard.press( 'Backspace' );
+			await page.keyboard.type(
+				' caret is in first block and at the proper position. '
+			);
+			expect( await getEditedPostContent() ).toMatchInlineSnapshot( `
+			"<!-- wp:paragraph -->
+			<p>hi caret is in first block and at the proper position. item 1</p>
+			<!-- /wp:paragraph -->
+
+			<!-- wp:paragraph -->
+			<p>item 2</p>
+			<!-- /wp:paragraph -->"
+		` );
+		} );
+	} );
 } );
