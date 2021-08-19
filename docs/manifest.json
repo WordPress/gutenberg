@@ -2016,6 +2016,12 @@
 		"parent": "code"
 	},
 	{
+		"title": "React Native Integration Test Guide",
+		"slug": "native-mobile-integration-test-guide",
+		"markdown_source": "../docs/contributors/code/native-mobile-integration-test-guide.md",
+		"parent": "code"
+	},
+	{
 		"title": "Getting Started for the React Native based Mobile Gutenberg",
 		"slug": "getting-started-native-mobile",
 		"markdown_source": "../docs/contributors/code/getting-started-native-mobile.md",
