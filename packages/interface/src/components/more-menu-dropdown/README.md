@@ -37,6 +37,13 @@ function MyEditorMenu() {
 
 ## Props
 
+### as
+
+Provide a component that the dropdown should render as. This may be useful if you need `MoreMenuDropdown` to render a `ToolbarDropdownMenu` instead of a `DropdownMenu`. Defaults to `DropdownMenu`.
+
+-   Type: `Component`
+-   Required: No.
+
 ### className
 
 Provide an additional class name to the dropdown component.
