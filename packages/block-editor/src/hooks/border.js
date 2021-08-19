@@ -11,6 +11,7 @@ import { __ } from '@wordpress/i18n';
  */
 import InspectorControls from '../components/inspector-controls';
 import useSetting from '../components/use-setting';
+import useConsolidatedStyles from '../components/use-consolidated-styles';
 import { BorderColorEdit } from './border-color';
 import { BorderRadiusEdit } from './border-radius';
 import { BorderStyleEdit } from './border-style';
@@ -38,6 +39,29 @@ export function BorderPanel( props ) {
 		useSetting( 'border.customWidth' ) &&
 		hasBorderSupport( props.name, 'width' );
 
+	// TODO
+	// This is an example targeted at border for now while testing.
+	// We could consolidate at the highest level: packages/block-editor/src/hooks/style.js
+	const consolidatedStyles = useConsolidatedStyles(
+		props.attributes?.style,
+		'border'
+	);
+
+	// TODO abstract this to the hook?
+	// TODO We'll have to revisit defaults here.
+	// E.g., if the user removes a value from the post editor, what does that mean?
+	// Do we automatically default to the global style value, or do we interpret empty as `0` for border width for example?
+	// At which point do we reinstate the global style value?
+	const mergedProps = {
+		...props,
+		attributes: {
+			...props.attributes,
+			style: {
+				...consolidatedStyles,
+			},
+		},
+	};
+
 	if ( isDisabled || ! isSupported ) {
 		return null;
 	}
@@ -51,12 +75,16 @@ export function BorderPanel( props ) {
 			>
 				{ ( isWidthSupported || isStyleSupported ) && (
 					<div className="block-editor-hooks__border-controls-row">
-						{ isWidthSupported && <BorderWidthEdit { ...props } /> }
-						{ isStyleSupported && <BorderStyleEdit { ...props } /> }
+						{ isWidthSupported && (
+							<BorderWidthEdit { ...mergedProps } />
+						) }
+						{ isStyleSupported && (
+							<BorderStyleEdit { ...mergedProps } />
+						) }
 					</div>
 				) }
-				{ isColorSupported && <BorderColorEdit { ...props } /> }
-				{ isRadiusSupported && <BorderRadiusEdit { ...props } /> }
+				{ isColorSupported && <BorderColorEdit { ...mergedProps } /> }
+				{ isRadiusSupported && <BorderRadiusEdit { ...mergedProps } /> }
 			</PanelBody>
 		</InspectorControls>
 	);

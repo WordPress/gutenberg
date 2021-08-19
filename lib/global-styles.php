@@ -81,6 +81,19 @@ function gutenberg_experimental_global_styles_enqueue_assets() {
 function gutenberg_experimental_global_styles_settings( $settings ) {
 	// Set what is the context for this data request.
 	$context = 'all';
+
+	// Is it a block editor on site that supports block templates?
+	if (
+		is_callable( 'get_current_screen' ) &&
+		get_current_screen()->is_block_editor() &&
+		function_exists( 'gutenberg_is_edit_site_page' ) &&
+		! gutenberg_is_edit_site_page( get_current_screen()->id ) &&
+		WP_Theme_JSON_Resolver_Gutenberg::theme_has_support() &&
+		gutenberg_supports_block_templates()
+	) {
+		$context = 'post-editor';
+	}
+
 	if (
 		is_callable( 'get_current_screen' ) &&
 		function_exists( 'gutenberg_is_edit_site_page' ) &&
@@ -89,16 +102,6 @@ function gutenberg_experimental_global_styles_settings( $settings ) {
 		gutenberg_supports_block_templates()
 	) {
 		$context = 'site-editor';
-	}
-
-	// Is it a block editor on site that supports block templates?
-	if (
-		is_callable( 'get_current_screen' ) &&
-		get_current_screen()->is_block_editor() &&
-		WP_Theme_JSON_Resolver_Gutenberg::theme_has_support() &&
-		gutenberg_supports_block_templates()
-	) {
-		$context = 'post-editor';
 	}
 
 	if (
