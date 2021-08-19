@@ -78,16 +78,6 @@ export const preferences = flow( [
 
 		return state;
 	},
-	features( state, action ) {
-		if ( action.type === 'TOGGLE_FEATURE' ) {
-			return {
-				...state,
-				[ action.feature ]: ! state[ action.feature ],
-			};
-		}
-
-		return state;
-	},
 	editorMode( state, action ) {
 		if ( action.type === 'SWITCH_MODE' ) {
 			return action.mode;

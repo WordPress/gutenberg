@@ -189,9 +189,14 @@ export function isModalActive( state, modalName ) {
  *
  * @return {boolean} Is active.
  */
-export function isFeatureActive( state, feature ) {
-	return get( state.preferences.features, [ feature ], false );
-}
+export const isFeatureActive = createRegistrySelector(
+	( select ) => ( state, feature ) => {
+		return select( interfaceStore ).isFeatureActive(
+			'core/edit-post',
+			feature
+		);
+	}
+);
 
 /**
  * Returns true if the plugin item is pinned to the header.
