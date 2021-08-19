@@ -22,11 +22,13 @@ import { usePreParsePatterns } from '../../utils/pre-parse-patterns';
 import { LayoutProvider, defaultLayout } from './layout';
 import BlockToolsBackCompat from '../block-tools/back-compat';
 import { useBlockSelectionClearer } from '../block-selection-clearer';
-import { Head } from './head';
+
+const elementContext = createContext();
 
 export const IntersectionObserver = createContext();
 
 function Root( { className, children } ) {
+	const [ element, setElement ] = useState();
 	const isLargeViewport = useViewportMatch( 'medium' );
 	const { isOutlineMode, isFocusMode, isNavigationMode } = useSelect(
 		( select ) => {
@@ -43,12 +45,13 @@ function Root( { className, children } ) {
 		[]
 	);
 	return (
-		<Head>
+		<elementContext.Provider value={ element }>
 			<div
 				ref={ useMergeRefs( [
 					useBlockSelectionClearer(),
 					useBlockDropZone(),
 					useInBetweenInserter(),
+					setElement,
 				] ) }
 				className={ classnames(
 					'block-editor-block-list__layout is-root-container',
@@ -62,7 +65,7 @@ function Root( { className, children } ) {
 			>
 				{ children }
 			</div>
-		</Head>
+		</elementContext.Provider>
 	);
 }
 
@@ -76,6 +79,8 @@ export default function BlockList( { className, ...props } ) {
 		</BlockToolsBackCompat>
 	);
 }
+
+BlockList.__unstableElementContext = elementContext;
 
 function Items( {
 	placeholder,
