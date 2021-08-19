@@ -166,7 +166,7 @@ export default function BreadcrumbsEdit( {
 				/>
 			</BlockControls>
 			<InspectorControls>
-				<PanelBody title={ __( 'Breadcrumbs settings' ) }>
+				<PanelBody title={ __( 'Breadcrumbs' ) }>
 					<RangeControl
 						label={ __( 'Nesting level' ) }
 						help={ __(
@@ -185,7 +185,7 @@ export default function BreadcrumbsEdit( {
 							'Enter a character to display between items.'
 						) }
 						value={ separator || '' }
-						placeholder={ __( 'e.g. /' ) }
+						placeholder={ __( 'e.g. / - *' ) }
 						onChange={ ( nextValue ) =>
 							setAttributes( {
 								separator: nextValue,
