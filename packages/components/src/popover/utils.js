@@ -205,6 +205,12 @@ export function computePopoverYAxisPosition(
 				if ( ! isRoomAboveInCanvas ) {
 					return {
 						yAxis: 'bottom',
+						// If the bottom of the block is also below the bottom sticky position (ex -
+						// block is also taller than the editor window), return the bottom sticky
+						// position instead.  We do this instead of the top sticky position both to
+						// allow a smooth transition and more importantly to ensure every section of
+						// the block can be free from popover obscuration at some point in the
+						// scroll position.
 						popoverTop: Math.min(
 							anchorRect.bottom,
 							stickyPositionBottom

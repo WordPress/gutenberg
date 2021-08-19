@@ -440,10 +440,6 @@ _Returns_
 
 -   `number`: Number of blocks in the post, or number of blocks with name equal to blockName.
 
-### getIframedEditorWrapper
-
-Undocumented declaration.
-
 ### getInserterItems
 
 Determines the items that appear in the inserter. Includes both static
@@ -1395,10 +1391,6 @@ _Parameters_
 
 -   _clientId_ `string`: The block's clientId.
 -   _hasControlledInnerBlocks_ `boolean`: True if the block's inner blocks are controlled.
-
-### setIframedEditorWrapper
-
-Undocumented declaration.
 
 ### setNavigationMode
 

@@ -2246,6 +2246,13 @@ export function wasBlockJustInserted( state, clientId, source ) {
 	);
 }
 
-export function getIframedEditorWrapper( state ) {
-	return state.iframedEditorWrapper;
+/**
+ * Returns the current editor wrapper node for the iframed editor.
+ *
+ * @param {Object} state Global application state.
+ *
+ * @return {Object|null} The iframed editor wrapper's html node.
+ */
+export function __unstableGetIframedEditorCanvasWrapper( state ) {
+	return state.iframedEditorCanvasWrapper;
 }

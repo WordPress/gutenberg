@@ -34,7 +34,7 @@ function selector( select ) {
 		isCaretWithinFormattedText,
 		getSettings,
 		getLastMultiSelectedBlockClientId,
-		getIframedEditorWrapper,
+		__unstableGetIframedEditorCanvasWrapper,
 	} = select( blockEditorStore );
 	return {
 		isNavigationMode: isNavigationMode(),
@@ -44,7 +44,7 @@ function selector( select ) {
 		hasMultiSelection: hasMultiSelection(),
 		hasFixedToolbar: getSettings().hasFixedToolbar,
 		lastClientId: getLastMultiSelectedBlockClientId(),
-		iframedEditorWrapper: getIframedEditorWrapper(),
+		iframedEditorCanvasWrapper: __unstableGetIframedEditorCanvasWrapper(),
 	};
 }
 
@@ -65,7 +65,7 @@ function BlockPopover( {
 		hasMultiSelection,
 		hasFixedToolbar,
 		lastClientId,
-		iframedEditorWrapper,
+		iframedEditorCanvasWrapper,
 	} = useSelect( selector, [] );
 	const isInsertionPointVisible = useSelect(
 		( select ) => {
@@ -216,7 +216,9 @@ function BlockPopover( {
 			// Observe movement for block animations (especially horizontal).
 			__unstableObserveElement={ node }
 			shouldAnchorIncludePadding
-			__unstableContentWrapper={ iframedEditorWrapper }
+			// Used to safeguard sticky position behavior against cases where it would permanently
+			// obscure specific sections of a block.
+			__unstableEditorCanvasWrapper={ iframedEditorCanvasWrapper }
 		>
 			{ ( shouldShowContextualToolbar || isToolbarForced ) && (
 				<div

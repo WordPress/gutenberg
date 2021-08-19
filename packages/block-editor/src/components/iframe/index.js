@@ -153,7 +153,9 @@ function setBodyClassName( doc ) {
 	doc.dir = document.dir;
 	doc.body.className = BODY_CLASS_NAME;
 
-	dispatch( blockEditorStore ).setIframedEditorWrapper( doc.body );
+	dispatch( blockEditorStore ).__unstableSetIframedEditorCanvasWrapper(
+		doc.body
+	);
 
 	for ( const name of document.body.classList ) {
 		if ( name.startsWith( 'admin-color-' ) ) {
