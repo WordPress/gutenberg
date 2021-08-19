@@ -40,10 +40,10 @@ const SCALE_OPTIONS = (
 
 const scaleHelp = {
 	cover: __(
-		'Image is sized to maintain its aspect ratio and cropped to fill the entire space.'
+		'Image is scaled and cropped to fill the entire space without being distorted.'
 	),
 	contain: __(
-		'Image is scaled to fill the space without clipping the content.'
+		'Image is scaled to fill the space without clipping nor distorting.'
 	),
 	fill: __(
 		'Image will be stretched and distorted to completely fill the space.'
