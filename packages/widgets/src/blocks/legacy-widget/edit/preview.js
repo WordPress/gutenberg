@@ -30,52 +30,52 @@ export default function Preview( { idBase, instance, isVisible } ) {
 	// Resize the iframe on either the load event, or when the iframe becomes visible.
 	const ref = useRefEffect(
 		( iframe ) => {
-			// Only set height if the iframe is loaded,
-			// or it will grow to an unexpected large height in Safari if it's hidden initially.
-			if ( isLoaded ) {
-				// If the preview frame has another origin then this won't work.
-				// One possible solution is to add custom script to call `postMessage` in the preview frame.
-				// Or, better yet, we migrate away from iframe.
-				function setHeight() {
-					// Pick the maximum of these two values to account for margin collapsing.
-					const height = Math.max(
-						iframe.contentDocument.documentElement.offsetHeight,
-						iframe.contentDocument.body.offsetHeight
-					);
-					iframe.style.height = `${ height }px`;
-				}
-
-				const {
-					IntersectionObserver,
-				} = iframe.ownerDocument.defaultView;
-
-				// Observe for intersections that might cause a change in the height of
-				// the iframe, e.g. a Widget Area becoming expanded.
-				const intersectionObserver = new IntersectionObserver(
-					( [ entry ] ) => {
-						if ( entry.isIntersecting ) {
-							setHeight();
-						}
-					},
-					{
-						threshold: 1,
-					}
-				);
-				intersectionObserver.observe( iframe );
-
-				iframe.addEventListener( 'load', setHeight );
-
-				return () => {
-					intersectionObserver.disconnect();
-					iframe.removeEventListener( 'load', setHeight );
-				};
-			}
-
-			if ( ! iframe.srcdoc ) {
+			if ( ! iframe.previewLoaded ) {
 				renderPreview( idBase, instance ).then( ( response ) => {
 					iframe.srcdoc = response.preview;
+					iframe.previewLoaded = true;
 				} );
 			}
+
+			// Only set height if the iframe is loaded,
+			// or it will grow to an unexpected large height in Safari if it's hidden initially.
+			if ( ! isLoaded ) {
+				return;
+			}
+			// If the preview frame has another origin then this won't work.
+			// One possible solution is to add custom script to call `postMessage` in the preview frame.
+			// Or, better yet, we migrate away from iframe.
+			function setHeight() {
+				// Pick the maximum of these two values to account for margin collapsing.
+				const height = Math.max(
+					iframe.contentDocument.documentElement.offsetHeight,
+					iframe.contentDocument.body.offsetHeight
+				);
+				iframe.style.height = `${ height }px`;
+			}
+
+			const { IntersectionObserver } = iframe.ownerDocument.defaultView;
+
+			// Observe for intersections that might cause a change in the height of
+			// the iframe, e.g. a Widget Area becoming expanded.
+			const intersectionObserver = new IntersectionObserver(
+				( [ entry ] ) => {
+					if ( entry.isIntersecting ) {
+						setHeight();
+					}
+				},
+				{
+					threshold: 1,
+				}
+			);
+			intersectionObserver.observe( iframe );
+
+			iframe.addEventListener( 'load', setHeight );
+
+			return () => {
+				intersectionObserver.disconnect();
+				iframe.removeEventListener( 'load', setHeight );
+			};
 		},
 		[ isLoaded ]
 	);
