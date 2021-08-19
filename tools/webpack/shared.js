@@ -19,7 +19,7 @@ const {
 } = process.env;
 
 const baseConfig = {
-	target: 'browserslist',
+	target: 'browserslist:last 2 Chrome versions',
 	optimization: {
 		// Only concatenate modules in production, when not analyzing bundles.
 		concatenateModules:

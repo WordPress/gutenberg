@@ -92,6 +92,9 @@ class DependencyExtractionWebpackPlugin {
 			if ( scriptDependency ) {
 				return scriptDependency;
 			}
+			if ( false === scriptDependency ) {
+				return;
+			}
 		}
 
 		// Fall back to the request name
@@ -158,7 +161,9 @@ class DependencyExtractionWebpackPlugin {
 					const scriptDependency = this.mapRequestToDependency(
 						userRequest
 					);
-					entrypointExternalizedWpDeps.add( scriptDependency );
+					if ( scriptDependency ) {
+						entrypointExternalizedWpDeps.add( scriptDependency );
+					}
 				}
 			};
 

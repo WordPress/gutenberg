@@ -1,0 +1,35 @@
+{
+	"name": "@wordpress/esm-example",
+	"version": "0.1.0",
+	"description": "An example esm package. Useless, just a poc for ESM modules.",
+	"author": "The WordPress Contributors",
+	"license": "GPL-2.0-or-later",
+	"private": true,
+	"keywords": [
+		"wordpress",
+		"gutenberg",
+		"esm"
+	],
+	"homepage": "https://github.com/WordPress/gutenberg/tree/HEAD/packages/esm-example/README.md",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/WordPress/gutenberg.git",
+		"directory": "packages/esm-example"
+	},
+	"bugs": {
+		"url": "https://github.com/WordPress/gutenberg/issues"
+	},
+	"engines": {
+		"node": ">=12"
+	},
+	"module": "build-module/index.js",
+	"react-native": "src/index",
+	"types": "build-types",
+	"sideEffects": false,
+	"dependencies": {
+		"@babel/runtime": "^7.13.10"
+	},
+	"publishConfig": {
+		"access": "public"
+	}
+}

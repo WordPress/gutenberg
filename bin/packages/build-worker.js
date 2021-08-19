@@ -139,9 +139,20 @@ async function buildCSS( file ) {
 }
 
 async function buildJS( file ) {
+	const pkgName = getPackageName( file );
+	const pkgConfig = JSON.parse(
+		await readFile(
+			path.resolve( PACKAGES_DIR, pkgName, 'package.json' ),
+			'utf8'
+		)
+	);
+
 	for ( const [ environment, buildDir ] of Object.entries(
 		JS_ENVIRONMENTS
 	) ) {
+		if ( ! pkgConfig[ environment ] ) {
+			continue;
+		}
 		const destPath = getBuildPath(
 			file.replace( /\.tsx?$/, '.js' ),
 			buildDir

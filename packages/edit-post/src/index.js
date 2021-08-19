@@ -147,6 +147,9 @@ export function initializeEditor(
 	);
 }
 
+// esm-example
+import( '@wordpress/esm-example' ).then( ( mod ) => mod.run() );
+
 export { default as PluginBlockSettingsMenuItem } from './components/block-settings-menu/plugin-block-settings-menu-item';
 export { default as PluginDocumentSettingPanel } from './components/sidebar/plugin-document-setting-panel';
 export { default as PluginMoreMenuItem } from './components/header/plugin-more-menu-item';

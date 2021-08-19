@@ -1,5 +1,6 @@
 const WORDPRESS_NAMESPACE = '@wordpress/';
 const BUNDLED_PACKAGES = [ '@wordpress/icons', '@wordpress/interface' ];
+const ESM_PACKAGES = [ '@wordpress/esm-example' ];
 
 /**
  * Default request to global transformation
@@ -34,6 +35,10 @@ function defaultRequestToExternal( request ) {
 			return 'ReactDOM';
 	}
 
+	if ( ESM_PACKAGES.includes( request ) ) {
+		return 'import ' + request;
+	}
+
 	if ( BUNDLED_PACKAGES.includes( request ) ) {
 		return undefined;
 	}
@@ -64,6 +69,10 @@ function defaultRequestToHandle( request ) {
 
 		case 'lodash-es':
 			return 'lodash';
+	}
+
+	if ( ESM_PACKAGES.includes( request ) ) {
+		return false;
 	}
 
 	if ( request.startsWith( WORDPRESS_NAMESPACE ) ) {

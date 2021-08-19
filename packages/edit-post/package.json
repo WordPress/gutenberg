@@ -39,6 +39,7 @@
 		"@wordpress/data-controls": "file:../data-controls",
 		"@wordpress/editor": "file:../editor",
 		"@wordpress/element": "file:../element",
+		"@wordpress/esm-example": "file:../esm-example",
 		"@wordpress/hooks": "file:../hooks",
 		"@wordpress/i18n": "file:../i18n",
 		"@wordpress/icons": "file:../icons",
