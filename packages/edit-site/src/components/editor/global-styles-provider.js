@@ -16,10 +16,15 @@ import {
 import {
 	__EXPERIMENTAL_STYLE_PROPERTY as STYLE_PROPERTY,
 	__EXPERIMENTAL_ELEMENTS as ELEMENTS,
+	__EXPERIMENTAL_PRESET_METADATA as PRESET_METADATA,
 	store as blocksStore,
 } from '@wordpress/blocks';
 import { useEntityProp } from '@wordpress/core-data';
 import { useSelect, useDispatch } from '@wordpress/data';
+import {
+	__experimentalGetResolvedStyleVariable as getResolvedStyleVariable,
+	__experimentalGetPresetVariableRepresentingAValue as getPresetVariableRepresentingAValue,
+} from '@wordpress/block-editor';
 
 /**
  * Internal dependencies
@@ -28,9 +33,6 @@ import {
 	ROOT_BLOCK_NAME,
 	ROOT_BLOCK_SELECTOR,
 	ROOT_BLOCK_SUPPORTS,
-	getValueFromVariable,
-	getPresetVariable,
-	PRESET_METADATA,
 } from './utils';
 import { toCustomProperties, toStyles } from './global-styles-renderer';
 import { store as editSiteStore } from '../../store';
@@ -256,7 +258,11 @@ export default function GlobalStylesProvider( { children, baseStyles } ) {
 
 				if ( origin === 'theme' ) {
 					const value = get( themeStyles?.styles, path );
-					return getValueFromVariable( themeStyles, context, value );
+					return getResolvedStyleVariable(
+						themeStyles.settings,
+						context,
+						value
+					);
 				}
 
 				if ( origin === 'user' ) {
@@ -265,11 +271,19 @@ export default function GlobalStylesProvider( { children, baseStyles } ) {
 					// We still need to use merged styles here because the
 					// presets used to resolve user variable may be defined a
 					// layer down ( core, theme, or user ).
-					return getValueFromVariable( mergedStyles, context, value );
+					return getResolvedStyleVariable(
+						mergedStyles.setting,
+						context,
+						value
+					);
 				}
 
 				const value = get( mergedStyles?.styles, path );
-				return getValueFromVariable( mergedStyles, context, value );
+				return getResolvedStyleVariable(
+					mergedStyles.settings,
+					context,
+					value
+				);
 			},
 			setStyle: ( context, propertyName, newValue ) => {
 				const newContent = { ...userStyles };
@@ -288,8 +302,8 @@ export default function GlobalStylesProvider( { children, baseStyles } ) {
 				set(
 					newStyles,
 					propertyPath,
-					getPresetVariable(
-						mergedStyles,
+					getPresetVariableRepresentingAValue(
+						mergedStyles.settings,
 						context,
 						propertyName,
 						newValue

@@ -111,9 +111,7 @@ function gutenberg_experimental_global_styles_settings( $settings ) {
 	}
 	$consolidated = WP_Theme_JSON_Resolver_Gutenberg::get_merged_data( $settings, $origin );
 
-	if ( 'mobile' === $context ) {
-		$settings['__experimentalStyles'] = $consolidated->get_raw_data()['styles'];
-	}
+	$settings['__experimentalStyles'] = $consolidated->get_raw_data()['styles'];
 
 	if ( 'site-editor' === $context ) {
 		$theme       = WP_Theme_JSON_Resolver_Gutenberg::get_merged_data( $settings, 'theme' );

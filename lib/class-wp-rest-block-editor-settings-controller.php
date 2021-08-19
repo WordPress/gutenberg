@@ -149,7 +149,7 @@ class WP_REST_Block_Editor_Settings_Controller extends WP_REST_Controller {
 				'__experimentalStyles'                   => array(
 					'description' => __( 'Styles consolidated from core, theme, and user origins.', 'gutenberg' ),
 					'type'        => 'object',
-					'context'     => array( 'mobile' ),
+					'context'     => array( 'post-editor', 'site-editor', 'widgets-editor', 'mobile' ),
 				),
 
 				'alignWide'                              => array(
