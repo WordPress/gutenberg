@@ -147,3 +147,4 @@ export { default as __experimentalUseNoRecursiveRenders } from './use-no-recursi
 
 export { default as BlockEditorProvider } from './provider';
 export { default as useSetting } from './use-setting';
+export { default as __experimentalUseStyle } from './use-style';

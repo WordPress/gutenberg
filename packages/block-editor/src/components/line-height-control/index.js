@@ -15,7 +15,11 @@ import {
 	isLineHeightDefined,
 } from './utils';
 
-export default function LineHeightControl( { value: lineHeight, onChange } ) {
+export default function LineHeightControl( {
+	value: lineHeight,
+	onChange,
+	placeholder = BASE_DEFAULT_VALUE,
+} ) {
 	const isDefined = isLineHeightDefined( lineHeight );
 
 	const handleOnKeyDown = ( event ) => {
@@ -70,7 +74,7 @@ export default function LineHeightControl( { value: lineHeight, onChange } ) {
 				onKeyDown={ handleOnKeyDown }
 				onChange={ handleOnChange }
 				label={ __( 'Line height' ) }
-				placeholder={ BASE_DEFAULT_VALUE }
+				placeholder={ placeholder }
 				step={ STEP }
 				type="number"
 				value={ value }

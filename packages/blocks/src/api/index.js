@@ -159,4 +159,5 @@ export { default as node } from './node';
 export {
 	__EXPERIMENTAL_STYLE_PROPERTY,
 	__EXPERIMENTAL_ELEMENTS,
+	__EXPERIMENTAL_PRESET_METADATA,
 } from './constants';

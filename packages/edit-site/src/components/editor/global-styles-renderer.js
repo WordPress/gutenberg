@@ -20,12 +20,13 @@ import {
 import {
 	__EXPERIMENTAL_STYLE_PROPERTY as STYLE_PROPERTY,
 	__EXPERIMENTAL_ELEMENTS as ELEMENTS,
+	__EXPERIMENTAL_PRESET_METADATA as PRESET_METADATA,
 } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
  */
-import { PRESET_METADATA, ROOT_BLOCK_SELECTOR } from './utils';
+import { ROOT_BLOCK_SELECTOR } from './utils';
 
 function compileStyleValue( uncompiledValue ) {
 	const VARIABLE_REFERENCE_PREFIX = 'var:';

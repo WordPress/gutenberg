@@ -72,6 +72,7 @@ function useBlockEditorSettings( settings, hasTemplate ) {
 				'__experimentalBlockDirectory',
 				'__experimentalBlockPatternCategories',
 				'__experimentalBlockPatterns',
+				'__experimentalStyles',
 				'__experimentalFeatures',
 				'__experimentalGlobalStylesBaseStyles',
 				'__experimentalGlobalStylesUserEntityId',

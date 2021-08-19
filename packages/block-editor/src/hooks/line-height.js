@@ -9,6 +9,7 @@ import { hasBlockSupport } from '@wordpress/blocks';
 import LineHeightControl from '../components/line-height-control';
 import { cleanEmptyObject } from './utils';
 import useSetting from '../components/use-setting';
+import useStyle from '../components/use-style';
 
 export const LINE_HEIGHT_SUPPORT_KEY = 'typography.lineHeight';
 
@@ -24,6 +25,7 @@ export function LineHeightEdit( props ) {
 		attributes: { style },
 	} = props;
 	const isDisabled = useIsLineHeightDisabled( props );
+	const defaultLineHeight = useStyle( [ 'typography', 'lineHeight' ] );
 
 	if ( isDisabled ) {
 		return null;
@@ -45,6 +47,7 @@ export function LineHeightEdit( props ) {
 		<LineHeightControl
 			value={ style?.typography?.lineHeight }
 			onChange={ onChange }
+			placeholder={ defaultLineHeight }
 		/>
 	);
 }
