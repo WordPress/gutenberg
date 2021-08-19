@@ -15,7 +15,6 @@ import { createContext, useState, useMemo } from '@wordpress/element';
  */
 import BlockListBlock from './block';
 import BlockListAppender from '../block-list-appender';
-import useBlockDropZone from '../use-block-drop-zone';
 import { useInBetweenInserter } from './use-in-between-inserter';
 import { store as blockEditorStore } from '../../store';
 import { usePreParsePatterns } from '../../utils/pre-parse-patterns';
