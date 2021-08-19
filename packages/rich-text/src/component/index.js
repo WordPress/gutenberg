@@ -143,7 +143,7 @@ export function useRichText( {
 
 		// Selection must be updated first, so it is recorded in history when
 		// the content change happens.
-		// We batch both calls to only attempty to rerender once.
+		// We batch both calls to only attempt to rerender once.
 		registry.batch( () => {
 			onSelectionChange( start, end );
 			onChange( _value.current, {
