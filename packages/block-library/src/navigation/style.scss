@@ -1,8 +1,12 @@
 // Navigation block and menu item styles.
-// This also styles navigation links inside the Page List block,
 // as that block is meant to behave as menu items when leveraged.
-// The CSS lives here so that it is output even if you only use a
-// Page List block inside your navigation block.
+// These styles also affect the Page List block when used inside your navigation block.
+//
+// Classes:
+// - .wp-block-navigation__submenu-container targets submenu containers.
+// - .wp-block-navigation-item targets the menu item itself.
+// - .wp-block-navigation-item__content targets the link inside a menu item.
+// - .wp-block-navigation__submenu-icon targets the chevron icon indicating submenus.
 .wp-block-navigation {
 	position: relative;
 
@@ -27,13 +31,12 @@
 	}
 
 	// Menu item container.
-	.wp-block-pages-list__item,
-	.wp-block-navigation-link {
+	.wp-block-navigation-item {
 		display: flex;
 		align-items: center;
 		position: relative;
 
-		.wp-block-navigation-link__container:empty {
+		.wp-block-navigation__submenu-container:empty {
 			display: none;
 		}
 	}
@@ -50,9 +53,8 @@
 	// Force links to inherit text decoration applied to navigation block.
 	// The extra selector adds specificity to ensure it works when user-set.
 	&[style*="text-decoration"] {
-		.wp-block-pages-list__item,
-		.wp-block-navigation-link__container,
-		.wp-block-navigation-link {
+		.wp-block-navigation-item,
+		.wp-block-navigation__submenu-container {
 			text-decoration: inherit;
 		}
 
@@ -78,7 +80,6 @@
 	}
 
 	// Submenu indicator.
-	.wp-block-page-list__submenu-icon,
 	.wp-block-navigation-link__submenu-icon {
 		align-self: center;
 		height: inherit;
@@ -99,7 +100,7 @@
 	// We use :where to keep specificity minimal, yet still scope it to only the navigation block.
 	// That way if padding is set in theme.json, it still wins.
 	// https://css-tricks.com/almanac/selectors/w/where/
-	:where(.submenu-container, .wp-block-navigation-link__container) {
+	:where(.wp-block-navigation__submenu-container) {
 		background-color: inherit;
 		color: inherit;
 		position: absolute;
@@ -115,15 +116,13 @@
 		visibility: hidden;
 
 		// Submenu items.
-		> .wp-block-pages-list__item,
-		> .wp-block-navigation-link {
+		> .wp-block-navigation-item {
 			> a {
 				display: flex;
 				flex-grow: 1;
 
 				// Right-align the chevron in submenus.
-				.wp-block-page-list__submenu-icon,
-				.wp-block-navigation-link__submenu-icon {
+				.wp-block-navigation__submenu-icon {
 					margin-right: 0;
 					margin-left: auto;
 				}
@@ -143,8 +142,7 @@
 		// Nested submenus sit to the left on large breakpoints.
 		// On smaller breakpoints, they open vertically, accordion-style.
 		@include break-medium {
-			.submenu-container,
-			.wp-block-navigation-link__container {
+			.wp-block-navigation__submenu-container {
 				left: 100%;
 				top: -1px; // Border width.
 
@@ -161,8 +159,7 @@
 			}
 
 			// Reset the submenu indicator for horizontal flyouts.
-			.wp-block-page-list__submenu-icon svg,
-			.wp-block-navigation-link__submenu-icon svg {
+			.wp-block-navigation__submenu-icon svg {
 				transform: rotate(-90deg);
 			}
 		}
@@ -174,13 +171,13 @@
 
 	// Custom menu items.
 	// Show submenus on hover.
-	&:hover > .wp-block-navigation-link__container {
+	&:hover > .wp-block-navigation__submenu-container {
 		visibility: visible;
 		opacity: 1;
 	}
 
 	// Keep submenus open when focus is within.
-	&:focus-within > .wp-block-navigation-link__container {
+	&:focus-within > .wp-block-navigation__submenu-container {
 		visibility: visible;
 		opacity: 1;
 	}
@@ -206,15 +203,13 @@
 }
 
 // Submenu indentation when there's a background.
-.wp-block-navigation.has-background .has-child .submenu-container,
-.wp-block-navigation.has-background .has-child .wp-block-navigation-link__container {
+.wp-block-navigation.has-background .has-child .wp-block-navigation__submenu-container {
 	left: 0;
 	top: 100%;
 
 	// There's no border on submenus when there are backgrounds.
 	@include break-medium {
-		.submenu-container,
-		.wp-block-navigation-link__container {
+		.wp-block-navigation__submenu-container {
 			left: 100%;
 			top: 0;
 		}
@@ -229,8 +224,8 @@
 
 // Menu items with no background.
 .wp-block-page-list,
-.wp-block-page-list > .wp-block-pages-list__item,
-.wp-block-navigation__container > .wp-block-navigation-link {
+.wp-block-page-list > .wp-block-navigation-item,
+.wp-block-navigation__container > .wp-block-navigation-item {
 	margin: 0 2em 0 0;
 
 	// Margin of right-most margin should be zero, for right aligned or justified items.
@@ -245,8 +240,8 @@
 // https://css-tricks.com/almanac/selectors/w/where/
 .wp-block-navigation:where(.has-background) {
 	.wp-block-page-list,
-	.wp-block-page-list > .wp-block-pages-list__item,
-	.wp-block-navigation__container > .wp-block-navigation-link {
+	.wp-block-page-list > .wp-block-navigation-item,
+	.wp-block-navigation__container > .wp-block-navigation-item {
 		margin: 0 0.5em 0 0;
 
 		// Don't show right margin on the last child.
@@ -277,7 +272,7 @@
 }
 
 // Provide a default padding for submenus who should always have some, regardless of the top level menu items.
-.wp-block-navigation :where(.submenu-container, .wp-block-navigation-link__container) a {
+.wp-block-navigation :where(.wp-block-navigation__submenu-container) a {
 	padding: 0.5em 1em;
 }
 
@@ -295,14 +290,12 @@
 .wp-block-navigation.items-justified-right > .wp-block-navigation__container .has-child {
 
 	// First submenu.
-	.submenu-container,
-	.wp-block-navigation-link__container {
+	.wp-block-navigation__submenu-container {
 		left: auto;
 		right: 0;
 
 		// Nested submenus.
-		.submenu-container,
-		.wp-block-navigation-link__container {
+		.wp-block-navigation__submenu-container {
 			left: auto;
 			right: 100%;
 		}
@@ -311,8 +304,9 @@
 
 // Default background and font color.
 .wp-block-navigation:not(.has-background) {
+	// @todo: check this one separately.
 	.submenu-container, // This target items created by the Page List block.
-	.wp-block-navigation__container .wp-block-navigation-link__container {
+	.wp-block-navigation__container .wp-block-navigation__submenu-container {
 		// Set a background color for submenus so that they're not transparent.
 		// NOTE TO DEVS - if refactoring this code, please double-check that
 		// submenus have a default background color, this feature has regressed
@@ -374,8 +368,7 @@
 .is-vertical.items-justified-right > ul {
 	align-items: flex-end;
 
-	.wp-block-navigation-link,
-	.wp-block-pages-list__item {
+	.wp-block-navigation-item {
 		margin-right: 0;
 		justify-content: flex-end;
 	}
@@ -432,10 +425,8 @@
 		// Remove background colors for items inside the overlay menu.
 		// Has to be !important to override global styles.
 		// @todo: We should revisit this so that the overlay colors can be applied, instead of the background.
-		.wp-block-pages-list__item .submenu-container,
-		.wp-block-navigation-link .wp-block-navigation-link__container,
-		.wp-block-pages-list__item,
-		.wp-block-navigation-link {
+		.wp-block-navigation-item .wp-block-navigation__submenu-container,
+		.wp-block-navigation-item {
 			color: inherit !important;
 			background: transparent !important;
 		}
@@ -456,8 +447,7 @@
 
 		&.is-menu-open {
 			// Override breakpoint-inherited submenu rules.
-			.submenu-container.submenu-container.submenu-container.submenu-container,
-			.wp-block-navigation-link__container.wp-block-navigation-link__container.wp-block-navigation-link__container.wp-block-navigation-link__container {
+			.wp-block-navigation__submenu-container.wp-block-navigation__submenu-container.wp-block-navigation__submenu-container.wp-block-navigation__submenu-container {
 				left: 0;
 			}
 		}
@@ -537,13 +527,12 @@
 
 // Always show submenus fully expanded inside the modal menu.
 .wp-block-navigation .wp-block-navigation__responsive-container.is-menu-open {
-	.wp-block-page-list__submenu-icon,
-	.wp-block-navigation-link__submenu-icon {
+	.wp-block-navigation__submenu-icon {
 		display: none;
 	}
 
 	.has-child .submenu-container,
-	.has-child .wp-block-navigation-link__container {
+	.has-child .wp-block-navigation__submenu-container {
 		position: relative;
 		opacity: 1;
 		visibility: visible;
@@ -552,8 +541,7 @@
 		border: none;
 	}
 
-	.wp-block-navigation-link,
-	.wp-block-pages-list__item {
+	.wp-block-navigation-item {
 		flex-direction: column;
 		align-items: flex-start;
 	}
