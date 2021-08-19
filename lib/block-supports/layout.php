@@ -58,18 +58,21 @@ function gutenberg_get_layout_style( $selector, $layout ) {
 			$style .= '}';
 
 			$style .= "$selector > .alignwide { max-width: " . esc_html( $wide_max_width_value ) . ';}';
-
 			$style .= "$selector .alignfull { max-width: none; }";
 		}
 
 		$style .= "$selector .alignleft { float: left; margin-right: 2em; }";
 		$style .= "$selector .alignright { float: right; margin-left: 2em; }";
+		$style .= "$selector > * + * { margin-top: var( --wp--style--block-gap ); margin-bottom: 0; }";
 	} elseif ( 'flex' === $layout_type ) {
 		$style  = "$selector {";
 		$style .= 'display: flex;';
-		$style .= 'column-gap: 0.5em;';
+		$style .= 'gap: var( --wp--style--block-gap, 0.5em );';
+		$style .= 'flex-wrap: wrap;';
 		$style .= 'align-items: center;';
 		$style .= '}';
+
+		$style .= "$selector > * { margin: 0; }";
 	}
 
 	return $style;
@@ -83,13 +86,14 @@ function gutenberg_get_layout_style( $selector, $layout ) {
  * @return string                Filtered block content.
  */
 function gutenberg_render_layout_support_flag( $block_content, $block ) {
-	$block_type     = WP_Block_Type_Registry::get_instance()->get_registered( $block['blockName'] );
-	$support_layout = gutenberg_block_has_support( $block_type, array( '__experimentalLayout' ), false );
-	if ( ! $support_layout || ! isset( $block['attrs']['layout'] ) ) {
+	$block_type        = WP_Block_Type_Registry::get_instance()->get_registered( $block['blockName'] );
+	$support_layout    = gutenberg_block_has_support( $block_type, array( '__experimentalLayout' ), false );
+	$has_innner_blocks = count( $block['innerBlocks'] ) > 0;
+	if ( ! $support_layout && ! $has_innner_blocks ) {
 		return $block_content;
 	}
 
-	$used_layout = $block['attrs']['layout'];
+	$used_layout = isset( $block['attrs']['layout'] ) ? $block['attrs']['layout'] : array();
 	if ( isset( $used_layout['inherit'] ) && $used_layout['inherit'] ) {
 		$tree           = WP_Theme_JSON_Resolver_Gutenberg::get_merged_data( array(), 'theme' );
 		$default_layout = _wp_array_get( $tree->get_settings(), array( 'layout' ) );

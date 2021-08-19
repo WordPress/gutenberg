@@ -307,7 +307,8 @@ export const toStyles = ( tree, blockSelectors ) => {
 	const nodesWithStyles = getNodesWithStyles( tree, blockSelectors );
 	const nodesWithSettings = getNodesWithSettings( tree, blockSelectors );
 
-	let ruleset = '';
+	let ruleset =
+		'.wp-site-blocks > * + * { margin-top: var( --wp--style--block-gap ); margin-bottom: 0; }';
 	nodesWithStyles.forEach( ( { selector, styles } ) => {
 		const declarations = getStylesDeclarations( styles );
 

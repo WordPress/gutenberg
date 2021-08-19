@@ -61,8 +61,9 @@ class WP_Theme_JSON_Gutenberg {
 			'text'       => null,
 		),
 		'spacing'    => array(
-			'margin'  => null,
-			'padding' => null,
+			'margin'   => null,
+			'padding'  => null,
+			'blockGap' => null,
 		),
 		'typography' => array(
 			'fontFamily'     => null,
@@ -233,6 +234,7 @@ class WP_Theme_JSON_Gutenberg {
 		'padding-right'              => array( 'spacing', 'padding', 'right' ),
 		'padding-bottom'             => array( 'spacing', 'padding', 'bottom' ),
 		'padding-left'               => array( 'spacing', 'padding', 'left' ),
+		'--wp--style--block-gap'     => array( 'spacing', 'blockGap' ),
 		'text-decoration'            => array( 'typography', 'textDecoration' ),
 		'text-transform'             => array( 'typography', 'textTransform' ),
 	);
@@ -835,6 +837,10 @@ class WP_Theme_JSON_Gutenberg {
 			$selector     = $metadata['selector'];
 			$declarations = self::compute_style_properties( $node );
 			$block_rules .= self::to_ruleset( $selector, $declarations );
+
+			if ( self::ROOT_BLOCK_SELECTOR === $selector ) {
+				$block_rules .= '.wp-site-blocks > * + * { margin-top: var( --wp--style--block-gap ); margin-bottom: 0; }';
+			}
 		}
 
 		$preset_rules = '';
