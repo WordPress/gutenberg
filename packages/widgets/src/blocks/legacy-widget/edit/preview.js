@@ -7,10 +7,22 @@ import classnames from 'classnames';
  * WordPress dependencies
  */
 import { useRefEffect } from '@wordpress/compose';
-import { addQueryArgs } from '@wordpress/url';
 import { useState } from '@wordpress/element';
 import { Placeholder, Spinner, Disabled } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
+import apiFetch from '@wordpress/api-fetch';
+
+async function renderPreview( idBase, instance ) {
+	const restRoute = `/wp/v2/widget-types/${ idBase }/render`;
+	return await apiFetch( {
+		path: restRoute,
+		method: 'POST',
+		data: {
+			id_base: idBase,
+			instance,
+		},
+	} );
+}
 
 export default function Preview( { idBase, instance, isVisible } ) {
 	const [ isLoaded, setIsLoaded ] = useState( false );
@@ -58,6 +70,12 @@ export default function Preview( { idBase, instance, isVisible } ) {
 					iframe.removeEventListener( 'load', setHeight );
 				};
 			}
+
+			if ( ! iframe.srcdoc ) {
+				renderPreview( idBase, instance ).then( ( response ) => {
+					iframe.srcdoc = response.preview;
+				} );
+			}
 		},
 		[ isLoaded ]
 	);
@@ -96,12 +114,6 @@ export default function Preview( { idBase, instance, isVisible } ) {
 						// TODO: This chokes when the query param is too big.
 						// Ideally, we'd render a <ServerSideRender>. Maybe by
 						// rendering one in an iframe via a portal.
-						src={ addQueryArgs( 'widgets.php', {
-							'legacy-widget-preview': {
-								idBase,
-								instance,
-							},
-						} ) }
 						onLoad={ ( event ) => {
 							// To hide the scrollbars of the preview frame for some edge cases,
 							// such as negative margins in the Gallery Legacy Widget.
