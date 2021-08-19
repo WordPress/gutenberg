@@ -39,7 +39,7 @@ function public_queryable_true_public_false_cpt() {
 			'show_in_rest'       => true,
 			'public'             => false,
 			'publicly_queryable' => true,
-			'supports'           => array( 'title', 'editor', 'revisions' ),
+			'supports'           => array( 'excerpt', 'title', 'editor', 'revisions' ),
 			'show_ui'            => true,
 			'show_in_menu'       => true,
 		)
@@ -59,7 +59,7 @@ function public_queryable_false_public_true_cpt() {
 			'show_in_rest'       => true,
 			'public'             => true,
 			'publicly_queryable' => false,
-			'supports'           => array( 'title', 'editor', 'revisions' ),
+			'supports'           => array( 'excerpt', 'title', 'editor', 'revisions' ),
 			'show_ui'            => true,
 			'show_in_menu'       => true,
 		)
@@ -79,7 +79,7 @@ function public_queryable_true_public_true_cpt() {
 			'show_in_rest'       => true,
 			'public'             => true,
 			'publicly_queryable' => true,
-			'supports'           => array( 'title', 'editor', 'revisions' ),
+			'supports'           => array( 'excerpt', 'title', 'editor', 'revisions' ),
 			'show_ui'            => true,
 			'show_in_menu'       => true,
 		)

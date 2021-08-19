@@ -32,12 +32,13 @@ function Example() {
 
 Label for the form element.
 
-### `baseId`
+### `hideLabelFromVision`
 
--   Type: `string`
+-   Type: `boolean`
 -   Required: No
+-   Default: `false`
 
-ID that will serve as a base for all the items IDs.
+If true, the label will only be visible to screen readers.
 
 ### `isAdaptiveWidth`
 
@@ -68,3 +69,10 @@ Callback when a segment is selected.
 -   Type: `string | number`
 
 The value of the `SegmentedControl`.
+
+### `help`
+
+-   Type: `ReactNode`
+-   Required: No
+
+If this property is added, a help text will be generated using help property as the content.

@@ -4,22 +4,18 @@ Attributes are the way a block stores data, they define how a block is parsed to
 
 For this block tutorial, we want to allow the user to type in a message that we will display stylized in the published post. So, we need to add a **message** attribute that will hold the user message. The following code defines a **message** attribute; the attribute type is a string; the source is the text from the selector which is a `div` tag.
 
-```js
-registerBlockType( 'create-block/gutenpride', {
-	apiVersion: 2,
-	attributes: {
-		message: {
-			type: 'string',
-			source: 'text',
-			selector: 'div',
-			default: '', // empty default
-		},
+```json
+"attributes": {
+	"message": {
+		"type": "string",
+		"source": "text",
+		"selector": "div",
+		"default": "",
 	},
-	// other settings, like the save and edit functions.
-} );
+},
 ```
 
-Add this to the `index.js` file within the `registerBlockType` function. The `attributes` are at the same level as the _edit_ and _save_ fields.
+Add this to the `block.json` file. The `attributes` are at the same level as the _name_ and _title_ fields.
 
 When the block loads it will look at the saved content for the block, look for the div tag, take the text portion, and store the content in an `attributes.message` variable.
 

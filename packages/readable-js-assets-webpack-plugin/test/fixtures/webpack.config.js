@@ -17,9 +17,7 @@ module.exports = {
 		concatenateModules: true,
 		minimizer: [
 			new TerserPlugin( {
-				cache: true,
 				parallel: true,
-				sourceMap: true,
 				terserOptions: {
 					output: {
 						comments: /translators:/i,

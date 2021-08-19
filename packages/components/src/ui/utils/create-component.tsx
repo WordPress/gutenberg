@@ -9,7 +9,6 @@ import type { As } from 'reakit-utils/types';
  * Internal dependencies
  */
 import { contextConnect } from '../context';
-// eslint-disable-next-line no-duplicate-imports
 import type {
 	PolymorphicComponentProps,
 	PolymorphicComponentFromProps,

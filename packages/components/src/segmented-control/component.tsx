@@ -10,7 +10,7 @@ import useResizeAware from 'react-resize-aware';
  */
 import { __ } from '@wordpress/i18n';
 import { useRef, useMemo } from '@wordpress/element';
-import { useMergeRefs } from '@wordpress/compose';
+import { useMergeRefs, useInstanceId } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -21,6 +21,7 @@ import {
 	PolymorphicComponentProps,
 } from '../ui/context';
 import { View } from '../view';
+import BaseControl from '../base-control';
 import * as styles from './styles';
 import { useUpdateEffect, useCx } from '../utils/hooks';
 import Backdrop from './segmented-control-backdrop';
@@ -35,11 +36,11 @@ function SegmentedControl(
 ) {
 	const {
 		className,
-		baseId,
 		isAdaptiveWidth = false,
 		isBlock = false,
-		id,
 		label,
+		hideLabelFromVision = false,
+		help,
 		onChange = noop,
 		value,
 		children,
@@ -48,9 +49,12 @@ function SegmentedControl(
 	const cx = useCx();
 	const containerRef = useRef();
 	const [ resizeListener, sizes ] = useResizeAware();
-
+	const baseId = useInstanceId(
+		SegmentedControl,
+		'segmented-control'
+	).toString();
 	const radio = useRadioState( {
-		baseId: baseId || id,
+		baseId,
 		state: value,
 	} );
 
@@ -74,29 +78,38 @@ function SegmentedControl(
 				'medium',
 				className
 			),
-		[ className ]
+		[ className, isBlock ]
 	);
 	return (
-		<SegmentedControlContext.Provider
-			value={ { ...radio, isBlock: ! isAdaptiveWidth } }
-		>
-			<RadioGroup
-				{ ...radio }
-				aria-label={ label }
-				as={ View }
-				className={ classes }
-				{ ...otherProps }
-				ref={ useMergeRefs( [ containerRef, forwardedRef ] ) }
+		<BaseControl help={ help }>
+			<SegmentedControlContext.Provider
+				value={ { ...radio, isBlock: ! isAdaptiveWidth } }
 			>
-				{ resizeListener }
-				<Backdrop
+				{ ! hideLabelFromVision && (
+					<div>
+						<BaseControl.VisualLabel>
+							{ label }
+						</BaseControl.VisualLabel>
+					</div>
+				) }
+				<RadioGroup
 					{ ...radio }
-					containerRef={ containerRef }
-					containerWidth={ sizes.width }
-				/>
-				{ children }
-			</RadioGroup>
-		</SegmentedControlContext.Provider>
+					aria-label={ label }
+					as={ View }
+					className={ classes }
+					{ ...otherProps }
+					ref={ useMergeRefs( [ containerRef, forwardedRef ] ) }
+				>
+					{ resizeListener }
+					<Backdrop
+						{ ...radio }
+						containerRef={ containerRef }
+						containerWidth={ sizes.width }
+					/>
+					{ children }
+				</RadioGroup>
+			</SegmentedControlContext.Provider>
+		</BaseControl>
 	);
 }
 

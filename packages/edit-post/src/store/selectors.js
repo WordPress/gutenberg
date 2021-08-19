@@ -203,7 +203,7 @@ export function isFeatureActive( state, feature ) {
  * @return {boolean} Whether the plugin item is pinned.
  */
 export const isPluginItemPinned = createRegistrySelector(
-	( select ) => ( pluginName ) => {
+	( select ) => ( state, pluginName ) => {
 		return select( interfaceStore ).isItemPinned(
 			'core/edit-post',
 			pluginName

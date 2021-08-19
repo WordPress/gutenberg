@@ -186,7 +186,7 @@ async function loadScript( doc, { id, src } ) {
 	} );
 }
 
-function Iframe( { contentRef, children, head, ...props }, ref ) {
+function Iframe( { contentRef, children, head, tabIndex = 0, ...props }, ref ) {
 	const [ , forceRender ] = useReducer( () => ( {} ) );
 	const [ iframeDocument, setIframeDocument ] = useState();
 	const styles = useParsedAssets( window.__editorAssets.styles );
@@ -279,13 +279,12 @@ function Iframe( { contentRef, children, head, ...props }, ref ) {
 
 	return (
 		<>
-			{ before }
+			{ tabIndex >= 0 && before }
 			<iframe
 				{ ...props }
 				ref={ useMergeRefs( [ ref, setRef ] ) }
-				tabIndex="0"
+				tabIndex={ tabIndex }
 				title={ __( 'Editor canvas' ) }
-				name="editor-canvas"
 			>
 				{ iframeDocument &&
 					createPortal(
@@ -296,7 +295,7 @@ function Iframe( { contentRef, children, head, ...props }, ref ) {
 					) }
 				{ iframeDocument && createPortal( head, iframeDocument.head ) }
 			</iframe>
-			{ after }
+			{ tabIndex >= 0 && after }
 		</>
 	);
 }

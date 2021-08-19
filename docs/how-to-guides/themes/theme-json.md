@@ -523,9 +523,11 @@ Note that the name of the variable is created by adding `--` in between each nes
 {
 	"version": 1,
 	"settings": {
-		"core/button": {
-			"border": {
-				"customRadius": false
+		"blocks": {
+			"core/button": {
+				"border": {
+					"customRadius": false
+				}
 			}
 		}
 	}
@@ -567,20 +569,22 @@ Note that the name of the variable is created by adding `--` in between each nes
 				}
 			]
 		},
-		"core/group": {
-			"color": {
-				"palette": [
-					{
-						"slug": "black",
-						"color": "#000000",
-						"name": "Black"
-					},
-					{
-						"slug": "white",
-						"color": "#FFF",
-						"name": "White"
-					}
-				]
+		"blocks": {
+			"core/group": {
+				"color": {
+					"palette": [
+						{
+							"slug": "black",
+							"color": "#000000",
+							"name": "Black"
+						},
+						{
+							"slug": "white",
+							"color": "#FFF",
+							"name": "White"
+						}
+					]
+				}
 			}
 		}
 	}
@@ -595,7 +599,7 @@ The Gutenberg plugin extends the styles available from WordPress 5.8, so they ca
 The tabs below show WordPress 5.8 supported styles and the ones supported by the Gutenberg plugin.
 </div>
 
-Each block declares which style properties it exposes via the [block supports mechanism](../block-api/block-supports.md). The support declarations are used to automatically generate the UI controls for the block in the editor. Themes can use any style property via the `theme.json` for any block ― it's the theme's responsibility to verify that it works properly according to the block markup, etc.
+Each block declares which style properties it exposes via the [block supports mechanism](/docs/reference-guides/block-api/block-supports.md). The support declarations are used to automatically generate the UI controls for the block in the editor. Themes can use any style property via the `theme.json` for any block ― it's the theme's responsibility to verify that it works properly according to the block markup, etc.
 
 {% codetabs %}
 

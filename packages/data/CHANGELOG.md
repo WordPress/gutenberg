@@ -2,6 +2,18 @@
 
 ## Unreleased
 
+### New Features
+
+-   Added a `batch` registry method to batch dispatch calls for performance reasons.
+-   Add a new migration for the persistence plugin to migrate edit-widgets preferences to the interface package. As part of this change deprecated migrations for the persistence plugin have been removed ([#33774](https://github.com/WordPress/gutenberg/pull/33774)).
+-   Update data controls to accept a data store definition as their first param in addition to a string-based store name value ([#34170](https://github.com/WordPress/gutenberg/pull/34170)).
+
+## 6.0.0 (2021-07-29)
+
+### Breaking Change
+
+-   Upgraded React components to work with v17.0 ([#29118](https://github.com/WordPress/gutenberg/pull/29118)). There are no new features in React v17.0 as explained in the [blog post](https://reactjs.org/blog/2020/10/20/react-v17.html).
+
 ## 5.2.0 (2021-07-21)
 
 ## 5.1.0 (2021-05-20)

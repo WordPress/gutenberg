@@ -29,10 +29,10 @@
 	}
 
 	.block-editor-link-control {
-		width: 200px; // hardcoded width avoids resizing of control when switching between preview/edit
+		width: 220px; // Hardcoded width avoids resizing of control when switching between preview/edit.
 
 		.block-editor-url-input {
-			padding: 0; // cancel unnecessary default 1px padding in this case
+			padding: 0; // Cancel unnecessary default 1px padding in this case.
 		}
 
 		.components-base-control .components-base-control__field {
@@ -41,6 +41,11 @@
 
 		.block-editor-link-control__search-item-title {
 			max-width: 180px;
+			white-space: nowrap;
+		}
+
+		.block-editor-link-control__search-item-info {
+			white-space: nowrap;
 		}
 
 		.block-editor-link-control__search-item.is-current {

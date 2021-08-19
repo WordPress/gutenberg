@@ -40,15 +40,6 @@ import BlockDraggable from '../block-draggable';
 import useBlockDisplayInformation from '../use-block-display-information';
 
 /**
- * Returns true if the user is using windows.
- *
- * @return {boolean} Whether the user is using Windows.
- */
-function isWindows() {
-	return window.navigator.platform.indexOf( 'Win' ) > -1;
-}
-
-/**
  * Block selection button component, displaying the label of the block. If the block
  * descends from a root block, a button is displayed enabling the user to select
  * the root block.
@@ -87,17 +78,20 @@ function BlockSelectionButton( { clientId, rootClientId, blockElement } ) {
 	const { setNavigationMode, removeBlock } = useDispatch( blockEditorStore );
 	const ref = useRef();
 
+	const blockType = getBlockType( name );
+	const label = getAccessibleBlockLabel(
+		blockType,
+		attributes,
+		index + 1,
+		orientation
+	);
+
 	// Focus the breadcrumb in navigation mode.
 	useEffect( () => {
 		ref.current.focus();
 
-		// NVDA on windows suffers from a bug where focus changes are not announced properly
-		// See WordPress/gutenberg#24121 and nvaccess/nvda#5825 for more details
-		// To solve it we announce the focus change manually.
-		if ( isWindows() ) {
-			speak( label );
-		}
-	}, [] );
+		speak( label );
+	}, [ label ] );
 
 	const {
 		hasBlockMovingClientId,
@@ -223,14 +217,6 @@ function BlockSelectionButton( { clientId, rootClientId, blockElement } ) {
 			}
 		}
 	}
-
-	const blockType = getBlockType( name );
-	const label = getAccessibleBlockLabel(
-		blockType,
-		attributes,
-		index + 1,
-		orientation
-	);
 
 	const classNames = classnames(
 		'block-editor-block-list__block-selection-button',
