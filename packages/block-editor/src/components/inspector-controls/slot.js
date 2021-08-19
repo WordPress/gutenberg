@@ -10,7 +10,7 @@ import warning from '@wordpress/warning';
 import groups from './groups';
 
 export default function InspectorControlsSlot( {
-	group = 'default',
+	__experimentalGroup: group = 'default',
 	bubblesVirtually = true,
 	...props
 } ) {

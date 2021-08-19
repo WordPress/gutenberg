@@ -151,7 +151,8 @@ const AdvancedControls = ( { bubblesVirtually } ) => {
 			title={ __( 'Advanced' ) }
 			initialOpen={ false }
 		>
-			<InspectorAdvancedControls.Slot
+			<InspectorControls.Slot
+				__experimentalGroup="advanced"
 				bubblesVirtually={ bubblesVirtually }
 			/>
 		</PanelBody>
