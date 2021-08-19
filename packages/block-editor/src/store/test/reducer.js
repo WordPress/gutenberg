@@ -33,6 +33,7 @@ import {
 	blockListSettings,
 	lastBlockAttributesChange,
 	lastBlockInserted,
+	iframedEditorCanvasWrapper,
 } from '../reducer';
 
 describe( 'state', () => {
@@ -2967,6 +2968,33 @@ describe( 'state', () => {
 			const state = lastBlockInserted( expectedState, action );
 
 			expect( state ).toEqual( expectedState );
+		} );
+	} );
+
+	describe( 'iframedEditorCanvasWrapper()', () => {
+		it( 'should return null if nothing has been set', () => {
+			const initialState = iframedEditorCanvasWrapper( undefined, {} );
+			expect( initialState ).toBe( null );
+		} );
+
+		it( 'should set action.node when type "SET_IFRAMED_EDITOR_CANVAS_WRAPPER"', () => {
+			const node = {};
+			const action = {
+				type: 'SET_IFRAMED_EDITOR_CANVAS_WRAPPER',
+				node,
+			};
+			const state = iframedEditorCanvasWrapper( undefined, action );
+			expect( state ).toBe( node );
+		} );
+
+		it( 'should not change state with other action types', () => {
+			const initialState = {};
+			const action = {
+				type: 'FOOBAR',
+				node: {},
+			};
+			const state = iframedEditorCanvasWrapper( initialState, action );
+			expect( state ).toBe( initialState );
 		} );
 	} );
 } );
