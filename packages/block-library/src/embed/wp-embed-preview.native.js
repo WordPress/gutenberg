@@ -1,24 +1,8 @@
 /**
- * External dependencies
- */
-import { Dimensions, Platform } from 'react-native';
-import { WebView } from 'react-native-webview';
-
-/**
  * WordPress dependencies
  */
-import {
-	renderToString,
-	memo,
-	useRef,
-	useState,
-	useEffect,
-} from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
-import styles from './styles.scss';
+import { memo, useMemo } from '@wordpress/element';
+import { SandBox } from '@wordpress/components';
 
 /**
  * Checks for WordPress embed events signaling the height change when iframe
@@ -66,39 +50,8 @@ const observeAndResizeJS = `
          window.addEventListener( 'message', sendResize );
  } )();`;
 
-const style = `
-     body {
-         margin: 0;
-     }
-     html,
-     body,
-     body > div,
-     body > div iframe {
-         width: 100%;
-     }
-     body > div > * {
-         margin-top: 0 !important; /* Has to have !important to override inline styles. */
-         margin-bottom: 0 !important;
-     }
- `;
-
-function WpEmbedPreview( { html, providerUrl = '', title = '', url } ) {
-	const ref = useRef();
-	const [ height, setHeight ] = useState( 0 );
-	const [ contentHtml, setContentHtml ] = useState( getHtmlDoc() );
-
-	const windowSize = Dimensions.get( 'window' );
-	const [ isLandscape, setIsLandscape ] = useState(
-		windowSize.width >= windowSize.height
-	);
-	// On Android, we need to recreate the WebView when the device rotates, otherwise it disappears.
-	// For this purpose, the key value used in the WebView will change when the device orientation gets updated.
-	const key = Platform.select( {
-		android: `${ url }-${ isLandscape ? 'landscape' : 'portrait' }`,
-		ios: url,
-	} );
-
-	function getWPEmbedHtml() {
+function WpEmbedPreview( { html, ...rest } ) {
+	const wpEmbedHtml = useMemo( () => {
 		const doc = new window.DOMParser().parseFromString( html, 'text/html' );
 		const iframe = doc.querySelector( 'iframe' );
 
@@ -113,119 +66,13 @@ function WpEmbedPreview( { html, providerUrl = '', title = '', url } ) {
 		}
 
 		return doc.body.innerHTML;
-	}
-
-	function getHtmlDoc() {
-		// TODO: Use the device's locale
-		const lang = 'en';
-
-		// Put the html snippet into a html document, and update the state to refresh the WebView,
-		// we can use this in the future to inject custom styles or scripts.
-		// Scripts go into the body rather than the head, to support embedded content such as Instagram
-		// that expect the scripts to be part of the body.
-		const htmlDoc = (
-			<html lang={ lang }>
-				<head>
-					<title>{ title }</title>
-					<meta
-						name="viewport"
-						content="width=device-width, initial-scale=1"
-					></meta>
-					<style
-						dangerouslySetInnerHTML={ {
-							__html: style,
-						} }
-					/>
-				</head>
-				<body>
-					<div
-						dangerouslySetInnerHTML={ {
-							__html: getWPEmbedHtml(),
-						} }
-					/>
-					<script
-						type="text/javascript"
-						dangerouslySetInnerHTML={ {
-							__html: observeAndResizeJS,
-						} }
-					/>
-				</body>
-			</html>
-		);
-		return '<!DOCTYPE html>' + renderToString( htmlDoc );
-	}
-
-	function updateContentHtml( forceRerender = false ) {
-		const newContentHtml = getHtmlDoc();
-
-		if ( forceRerender && contentHtml === newContentHtml ) {
-			// The re-render is forced by updating the state with empty HTML,
-			// waiting for the JS code to be executed with "setImmediate" and then
-			// setting the content HTML again.
-			setContentHtml( '' );
-			setImmediate( () => setContentHtml( newContentHtml ) );
-		} else {
-			setContentHtml( newContentHtml );
-		}
-	}
-
-	function checkMessageForResize( event ) {
-		// Attempt to parse the message data as JSON if passed as string
-		let data = event.nativeEvent.data || {};
-
-		if ( 'string' === typeof data ) {
-			try {
-				data = JSON.parse( data );
-			} catch ( e ) {}
-		}
-
-		// Update the state only if the message is formatted as we expect,
-		// i.e. as an object with a 'resize' action.
-		if ( 'resize' !== data.action ) {
-			return;
-		}
-
-		setHeight( data.height );
-	}
-
-	function getSizeStyle() {
-		const contentHeight = Math.ceil( height );
-
-		if ( contentHeight ) {
-			return { height: contentHeight };
-		}
-
-		return { aspectRatio: 1 };
-	}
-
-	function onChangeDimensions( dimensions ) {
-		setIsLandscape( dimensions.window.width >= dimensions.window.height );
-	}
-
-	useEffect( () => {
-		Dimensions.addEventListener( 'change', onChangeDimensions );
-		return () => {
-			Dimensions.removeEventListener( 'change', onChangeDimensions );
-		};
-	}, [] );
-
-	useEffect( () => {
-		updateContentHtml();
-	}, [ html, title ] );
+	}, [ html ] );
 
 	return (
-		<WebView
-			key={ key }
-			ref={ ref }
-			source={ {
-				baseUrl: providerUrl,
-				html: contentHtml,
-			} }
-			// Wildcard value is required for static HTML
-			// Reference: https://github.com/react-native-webview/react-native-webview/blob/master/docs/Reference.md#source
-			originWhitelist={ [ '*' ] }
-			style={ [ styles[ 'wp-embed__wrapper' ], getSizeStyle() ] }
-			onMessage={ checkMessageForResize }
+		<SandBox
+			customJS={ observeAndResizeJS }
+			html={ wpEmbedHtml }
+			{ ...rest }
 		/>
 	);
 }

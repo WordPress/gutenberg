@@ -78,6 +78,7 @@ const EmbedPreview = ( {
 		'wp-block-embed__wrapper'
 	);
 
+	const PreviewContent = 'wp-embed' === type ? WpEmbedPreview : SandBox;
 	const embedWrapper = (
 		<>
 			<TouchableWithoutFeedback
@@ -91,22 +92,13 @@ const EmbedPreview = ( {
 				} }
 			>
 				<View pointerEvents="box-only">
-					{ 'wp-embed' === type ? (
-						<WpEmbedPreview
-							html={ html }
-							title={ iframeTitle }
-							providerUrl={ providerUrl }
-							url={ url }
-						/>
-					) : (
-						<SandBox
-							html={ html }
-							title={ iframeTitle }
-							type={ sandboxClassnames }
-							providerUrl={ providerUrl }
-							url={ url }
-						/>
-					) }
+					<PreviewContent
+						html={ html }
+						title={ iframeTitle }
+						type={ sandboxClassnames }
+						providerUrl={ providerUrl }
+						url={ url }
+					/>
 				</View>
 			</TouchableWithoutFeedback>
 		</>
