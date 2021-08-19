@@ -12,9 +12,15 @@
 }
 
 .edit-navigation-header__subtitle {
+	display: none;
 	margin: 0;
 	font-size: 15px;
 	font-weight: normal;
+
+	// Only display on larger screens.
+	@include break-small() {
+		display: block;
+	}
 }
 
 .edit-navigation-header__actions {
