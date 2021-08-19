@@ -74,6 +74,7 @@ function MaybeIframe( {
 			ref={ ref }
 			contentRef={ contentRef }
 			style={ { width: '100%', height: '100%', display: 'block' } }
+			name="editor-canvas"
 		>
 			{ children }
 		</Iframe>

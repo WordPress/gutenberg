@@ -95,6 +95,7 @@ export default function BlockEditor( { setIsInserterOpen } ) {
 					head={ <EditorStyles styles={ settings.styles } /> }
 					ref={ ref }
 					contentRef={ mergedRefs }
+					name="editor-canvas"
 				>
 					<BlockList
 						className="edit-site-block-editor__block-list"
