@@ -27,7 +27,7 @@ import { store as blockEditorStore } from '../store';
 import { InspectorControls } from '../components';
 import useSetting from '../components/use-setting';
 import { LayoutStyle } from '../components/block-list/layout';
-import { Head } from '../components/block-list/head';
+import BlockList from '../components/block-list';
 import { getLayoutType, getLayoutTypes } from '../layouts';
 
 const layoutBlockSupportKey = '__experimentalLayout';
@@ -177,7 +177,7 @@ export const withLayoutStyles = createHigherOrderComponent(
 			},
 			[ clientId ]
 		);
-		const element = useContext( Head.context );
+		const element = useContext( BlockList.__unstableElementContext );
 		const shouldRenderLayoutStyles = supportLayout || hasInnerBlocks;
 		const { layout = {} } = attributes;
 		const usedLayout = !! layout && layout.inherit ? defaultLayout : layout;
