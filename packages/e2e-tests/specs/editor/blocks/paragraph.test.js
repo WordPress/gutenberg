@@ -14,7 +14,7 @@ describe( 'Paragraph', () => {
 
 		const firstBlockTagName = await page.evaluate( () => {
 			return document.querySelector(
-				'.block-editor-block-list__layout .wp-block'
+				'.block-editor-block-list__layout [data-block]'
 			).tagName;
 		} );
 

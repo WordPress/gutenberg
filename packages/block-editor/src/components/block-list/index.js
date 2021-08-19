@@ -66,11 +66,16 @@ function Root( { className, children } ) {
 	);
 }
 
-export default function BlockList( { className, ...props } ) {
+export default function BlockList( {
+	className,
+	__unstablePrepend,
+	...props
+} ) {
 	usePreParsePatterns();
 	return (
 		<BlockToolsBackCompat>
 			<Root className={ className }>
+				{ __unstablePrepend }
 				<BlockListItems { ...props } />
 			</Root>
 		</BlockToolsBackCompat>

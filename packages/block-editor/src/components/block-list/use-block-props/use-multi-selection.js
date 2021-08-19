@@ -64,7 +64,7 @@ export function useMultiSelection( clientId ) {
 				const endClientId = getBlockClientId( selection.focusNode );
 				const isSingularSelection = clientId === endClientId;
 
-				if ( isSingularSelection ) {
+				if ( ! endClientId || isSingularSelection ) {
 					selectBlock( clientId );
 
 					// If the selection is complete (on mouse up), and no

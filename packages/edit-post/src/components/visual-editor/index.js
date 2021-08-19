@@ -226,11 +226,6 @@ export default function VisualEditor( { styles } ) {
 								layout={ defaultLayout }
 							/>
 						) }
-						{ ! isTemplateMode && (
-							<div className="edit-post-visual-editor__post-title-wrapper">
-								<PostTitle />
-							</div>
-						) }
 						<RecursionProvider>
 							<BlockList
 								className={
@@ -239,6 +234,9 @@ export default function VisualEditor( { styles } ) {
 										: undefined
 								}
 								__experimentalLayout={ layout }
+								__unstablePrepend={
+									! isTemplateMode && <PostTitle />
+								}
 							/>
 						</RecursionProvider>
 					</MaybeIframe>
