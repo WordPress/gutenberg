@@ -74,9 +74,6 @@
 			"__experimentalDuotone": "> .wp-block-cover__image-background, > .wp-block-cover__video-background",
 			"text": false,
 			"background": false
-		},
-		"__experimentalLayout": {
-			"allowEditing": false
 		}
 	},
 	"editorStyle": "wp-block-cover-editor",
