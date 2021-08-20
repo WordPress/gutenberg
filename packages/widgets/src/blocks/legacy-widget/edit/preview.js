@@ -59,7 +59,7 @@ export default function Preview( { idBase, instance, isVisible } ) {
 				abortController.abort();
 			}
 		};
-	} );
+	}, [] );
 
 	// Resize the iframe on either the load event, or when the iframe becomes visible.
 	const ref = useRefEffect(
