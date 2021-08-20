@@ -37,7 +37,7 @@ function render_block_core_breadcrumbs( $attributes, $content, $block ) {
 
 		$breadcrumbs[] = array(
 			'url'   => get_bloginfo( 'url' ),
-			'title' => $site_title
+			'title' => $site_title,
 		);
 	}
 
@@ -45,7 +45,7 @@ function render_block_core_breadcrumbs( $attributes, $content, $block ) {
 	foreach ( array_reverse( $ancestor_ids ) as $ancestor_id ) {
 		$breadcrumbs[] = array(
 			'url'   => get_the_permalink( $ancestor_id ),
-			'title' => get_the_title( $ancestor_id )
+			'title' => get_the_title( $ancestor_id ),
 		);
 	}
 
@@ -61,7 +61,7 @@ function render_block_core_breadcrumbs( $attributes, $content, $block ) {
 	if ( ! empty( $attributes['showCurrentPageTitle'] ) ) {
 		$breadcrumbs[] = array(
 			'url'   => get_the_permalink( $post_id ),
-			'title' => get_the_title( $post_id )
+			'title' => get_the_title( $post_id ),
 		);
 	}
 
@@ -69,7 +69,7 @@ function render_block_core_breadcrumbs( $attributes, $content, $block ) {
 
 	foreach ( $breadcrumbs as $index => $breadcrumb ) {
 		$show_separator = $index < count( $breadcrumbs ) - 1;
-		$inner_markup .= build_block_core_breadcrumbs_inner_markup_item(
+		$inner_markup  .= build_block_core_breadcrumbs_inner_markup_item(
 			$breadcrumb['url'],
 			$breadcrumb['title'],
 			$attributes,
