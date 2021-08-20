@@ -166,19 +166,12 @@ export const withInspectorControls = createHigherOrderComponent(
  */
 export const withLayoutStyles = createHigherOrderComponent(
 	( BlockListBlock ) => ( props ) => {
-		const { name, attributes, clientId } = props;
+		const { name, attributes } = props;
 		const supportLayout = hasBlockSupport( name, layoutBlockSupportKey );
 		const id = useInstanceId( BlockListBlock );
 		const defaultLayout = useSetting( 'layout' ) || {};
-		const hasInnerBlocks = useSelect(
-			( select ) => {
-				const { getBlockCount } = select( blockEditorStore );
-				return getBlockCount( clientId ) > 0;
-			},
-			[ clientId ]
-		);
 		const element = useContext( BlockList.__unstableElementContext );
-		const shouldRenderLayoutStyles = supportLayout || hasInnerBlocks;
+		const shouldRenderLayoutStyles = supportLayout;
 		const { layout = {} } = attributes;
 		const usedLayout = !! layout && layout.inherit ? defaultLayout : layout;
 		const className = classnames( props?.className, {
