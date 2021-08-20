@@ -21,8 +21,6 @@ export function useConfirm(
 	const wrapperClassName = cx( styles.wrapper );
 	const overlayClassName = cx( styles.overlay );
 
-	console.log( otherProps );
-
 	return {
 		className: classes,
 		wrapperClassName,
