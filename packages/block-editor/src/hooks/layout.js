@@ -162,21 +162,20 @@ export const withInspectorControls = createHigherOrderComponent(
  */
 export const withLayoutStyles = createHigherOrderComponent(
 	( BlockListBlock ) => ( props ) => {
-		const { name, attributes, clientId } = props;
-		const supportLayout = hasBlockSupport( name, layoutBlockSupportKey );
-		const id = useInstanceId( BlockListBlock );
-		const defaultLayout = useSetting( 'layout' ) || {};
-		const hasInnerBlocks = useSelect(
-			( select ) => {
-				const { getBlockCount } = select( blockEditorStore );
-				return getBlockCount( clientId ) > 0;
-			},
-			[ clientId ]
+		const { name, attributes } = props;
+		const shouldRenderLayoutStyles = hasBlockSupport(
+			name,
+			layoutBlockSupportKey
 		);
+		const id = useInstanceId( BlockListBlock );
+		const defaultThemeLayout = useSetting( 'layout' ) || {};
 		const element = useContext( BlockList.__unstableElementContext );
-		const shouldRenderLayoutStyles = supportLayout || hasInnerBlocks;
 		const { layout = {} } = attributes;
-		const usedLayout = !! layout && layout.inherit ? defaultLayout : layout;
+		const { default: defaultBlockLayout } =
+			getBlockSupport( name, layoutBlockSupportKey ) || {};
+		const usedLayout = layout?.inherit
+			? defaultThemeLayout
+			: defaultBlockLayout || {};
 		const className = classnames( props?.className, {
 			[ `wp-container-${ id }` ]: shouldRenderLayoutStyles,
 		} );
