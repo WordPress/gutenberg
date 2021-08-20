@@ -34,7 +34,7 @@ function Confirm(
 	} = useConfirm( props );
 
 	function handleEscapePress( event: KeyboardEvent< HTMLDivElement > ) {
-		// `keyCode` is depreacted, so let's use `key`
+		// `keyCode` is deprecated, so let's use `key`
 		if ( event.key === 'Escape' ) {
 			proceed( false );
 		}
