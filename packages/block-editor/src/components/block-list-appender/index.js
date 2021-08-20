@@ -31,7 +31,7 @@ function BlockListAppender( {
 } ) {
 	if ( CustomAppender !== undefined ) {
 		deprecated( 'renderAppender prop', {
-			since: '11.0',
+			since: '11.3',
 			alternative: 'appender prop',
 		} );
 	}
