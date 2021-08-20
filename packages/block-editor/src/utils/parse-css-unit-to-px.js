@@ -10,6 +10,9 @@ function parseUnit( cssUnit ) {
 		.match(
 			/^(0?[-.]?\d+)(r?e[m|x]|v[h|w|min|max]+|p[x|t|c]|[c|m]m|%|in|ch|Q|lh)$/
 		);
+	if ( ! isNaN( cssUnit ) && ! isNaN( parseFloat( cssUnit ) ) ) {
+		return { value: parseFloat( cssUnit ), unit: 'px' };
+	}
 	return match
 		? { value: parseFloat( match[ 1 ] ) || match[ 1 ], unit: match[ 2 ] }
 		: { value: cssUnit, unit: undefined };
@@ -221,11 +224,6 @@ export function getPxFromCssUnit( cssUnit, options = {} ) {
 
 	if ( isMathExpression( cssUnit ) && ! parsedUnit.unit ) {
 		return evalMathExpression( cssUnit );
-	}
-
-	// shortcut
-	if ( parsedUnit.unit === 'px' ) {
-		return parsedUnit.value + parsedUnit.unit;
 	}
 
 	return convertParsedUnitToPx( parsedUnit, options );
