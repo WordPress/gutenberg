@@ -7,7 +7,6 @@ import deepFreeze from 'deep-freeze';
  * Internal dependencies
  */
 import {
-	preferences,
 	settings,
 	homeTemplateId,
 	editedPost,
@@ -15,7 +14,6 @@ import {
 	blockInserterPanel,
 	listViewPanel,
 } from '../reducer';
-import { PREFERENCES_DEFAULTS } from '../defaults';
 
 import {
 	setNavigationPanelActiveMenu,
@@ -26,26 +24,6 @@ import {
 } from '../actions';
 
 describe( 'state', () => {
-	describe( 'preferences()', () => {
-		it( 'should apply all defaults', () => {
-			const state = preferences( undefined, {} );
-
-			expect( state ).toEqual( PREFERENCES_DEFAULTS );
-		} );
-
-		it( 'should toggle a feature flag', () => {
-			const state = preferences(
-				deepFreeze( { features: { chicken: true } } ),
-				{
-					type: 'TOGGLE_FEATURE',
-					feature: 'chicken',
-				}
-			);
-
-			expect( state.features ).toEqual( { chicken: false } );
-		} );
-	} );
-
 	describe( 'settings()', () => {
 		it( 'should apply default state', () => {
 			expect( settings( undefined, {} ) ).toEqual( {} );
