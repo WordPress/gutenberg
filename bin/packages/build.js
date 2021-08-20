@@ -156,8 +156,7 @@ if ( files.length ) {
 	} );
 
 	stream.push( null );
-	stream = stream.pipe( createStyleEntryTransform() )
-
+	stream = stream.pipe( createStyleEntryTransform() );
 } else {
 	const bar = new ProgressBar( 'Build Progress: [:bar] :percent', {
 		width: 30,

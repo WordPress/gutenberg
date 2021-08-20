@@ -1,5 +1,8 @@
 module.exports = {
-	parser: 'babel-eslint',
+	parser: '@babel/eslint-parser',
+	parserOptions: {
+		importAssertions: true,
+	},
 	extends: [
 		require.resolve( './jsx-a11y.js' ),
 		require.resolve( './custom.js' ),

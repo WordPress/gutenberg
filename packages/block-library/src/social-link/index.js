@@ -7,7 +7,7 @@ import { share as icon } from '@wordpress/icons';
  * Internal dependencies
  */
 import edit from './edit';
-import metadata from './block.json' assert { type: 'json' };;
+import metadata from './block.json' assert { type: 'json' };
 import variations from './variations';
 
 const { name } = metadata;

@@ -6,7 +6,7 @@ import { createBlock, getBlockAttributes } from '@wordpress/blocks';
 /**
  * Internal dependencies
  */
-import { name } from './block.json' assert { type: 'json' };;
+import { name } from './block.json' assert { type: 'json' };
 
 const transforms = {
 	from: [

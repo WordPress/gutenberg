@@ -31,10 +31,10 @@
 	],
 	"main": "index.js",
 	"dependencies": {
+		"@babel/eslint-parser": "^7.15.0",
 		"@typescript-eslint/eslint-plugin": "^4.15.0",
 		"@typescript-eslint/parser": "^4.15.0",
 		"@wordpress/prettier-config": "file:../prettier-config",
-		"babel-eslint": "^10.1.0",
 		"cosmiconfig": "^7.0.0",
 		"eslint-config-prettier": "^7.1.0",
 		"eslint-plugin-import": "^2.23.4",

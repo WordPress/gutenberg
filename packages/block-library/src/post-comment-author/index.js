@@ -1,7 +1,7 @@
 /**
  * Internal dependencies
  */
-import metadata from './block.json' assert { type: 'json' };;
+import metadata from './block.json' assert { type: 'json' };
 import edit from './edit';
 
 /**
