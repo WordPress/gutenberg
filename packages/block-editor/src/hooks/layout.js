@@ -170,12 +170,12 @@ export const withLayoutStyles = createHigherOrderComponent(
 		const id = useInstanceId( BlockListBlock );
 		const defaultThemeLayout = useSetting( 'layout' ) || {};
 		const element = useContext( BlockList.__unstableElementContext );
-		const { layout = {} } = attributes;
+		const { layout } = attributes;
 		const { default: defaultBlockLayout } =
 			getBlockSupport( name, layoutBlockSupportKey ) || {};
 		const usedLayout = layout?.inherit
 			? defaultThemeLayout
-			: defaultBlockLayout || {};
+			: layout || defaultBlockLayout || {};
 		const className = classnames( props?.className, {
 			[ `wp-container-${ id }` ]: shouldRenderLayoutStyles,
 		} );
