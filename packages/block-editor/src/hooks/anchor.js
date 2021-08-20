@@ -128,7 +128,6 @@ export const withInspectorControl = createHigherOrderComponent(
 									{ textControl }
 									<HelpText
 										url="https://wordpress.org/support/article/page-jumps/"
-										r
 										moreLinkText={ __(
 											'Learn more about anchors'
 										) }
