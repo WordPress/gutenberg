@@ -572,9 +572,15 @@ function CoverEdit( {
 					hasValue={ () => !! minHeight }
 					label={ __( 'Minimum height' ) }
 					onDeselect={ () =>
-						setAttributes( { minHeight: undefined } )
+						setAttributes( {
+							minHeight: undefined,
+							minHeightUnit: undefined,
+						} )
 					}
-					resetAllFilter={ () => ( { minHeight: undefined } ) }
+					resetAllFilter={ () => ( {
+						minHeight: undefined,
+						minHeightUnit: undefined,
+					} ) }
 					isShownByDefault={ true }
 				>
 					<CoverHeightInput
