@@ -68,7 +68,7 @@ export const Gallery = ( props ) => {
 			contentResizeMode: 'stretch',
 			allowedBlocks: [ 'core/image' ],
 			orientation: 'horizontal',
-			renderAppender: false,
+			appender: null,
 			numColumns: displayedColumns,
 			marginHorizontal: TILE_SPACING,
 			marginVertical: TILE_SPACING,
