@@ -5,6 +5,7 @@
  * @package gutenberg
  */
 
+// phpcs:ignore VariableAnalysis.CodeAnalysis.VariableAnalysis.UnusedVariable
 $import_map_entries = array();
 
 /**
