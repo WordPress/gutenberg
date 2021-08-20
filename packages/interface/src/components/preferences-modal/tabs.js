@@ -26,11 +26,18 @@ export default function PreferencesModalTabs( { tabs } ) {
 
 	// On big screens, do a tabbed layout.
 	if ( isTabbedLayout ) {
+		// If the 'top level menu' is selected in the navigation layout, treat
+		// it as an unselected tab.
+		const hasUnselectedTab =
+			! activeTabName || activeTabName === TOP_LEVEL_MENU_NAME;
+
 		return (
 			<TabPanel
 				className="interface-preferences-modal__tab-panel"
 				tabs={ tabs }
-				initialTabName={ tabs[ 0 ].name }
+				initialTabName={
+					hasUnselectedTab ? tabs[ 0 ].name : activeTabName
+				}
 				onSelect={ setActiveTabName }
 				orientation="vertical"
 			>
