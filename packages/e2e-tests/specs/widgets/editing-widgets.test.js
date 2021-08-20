@@ -56,23 +56,10 @@ describe( 'Widgets screen', () => {
 	beforeAll( async () => {
 		// TODO: Ideally we can bundle our test theme directly in the repo.
 		await activateTheme( 'twentytwenty' );
-		// Reduced motion is needed to immediately show and dismiss the snackbars.
-		await page.emulateMediaFeatures( [
-			{
-				name: 'prefers-reduced-motion',
-				value: 'reduce',
-			},
-		] );
 		await deleteAllWidgets();
 	} );
 
 	afterAll( async () => {
-		await page.emulateMediaFeatures( [
-			{
-				name: 'prefers-reduced-motion',
-				value: 'no-preference',
-			},
-		] );
 		await activateTheme( 'twentytwentyone' );
 	} );
 
