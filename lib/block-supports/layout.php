@@ -69,6 +69,7 @@ function gutenberg_get_layout_style( $selector, $layout ) {
 		$style .= 'display: flex;';
 		$style .= 'gap: var( --wp--style--block-gap, 0.5em );';
 		$style .= 'flex-wrap: wrap;';
+		$style .= 'align-items: center;';
 		$style .= '}';
 
 		$style .= "$selector > * { margin: 0; }";

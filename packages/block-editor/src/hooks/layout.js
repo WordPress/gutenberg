@@ -46,8 +46,14 @@ function LayoutPanel( { setAttributes, attributes, name: blockName } ) {
 
 	const {
 		allowSwitching: canBlockSwitchLayout,
+		allowEditing = true,
+		allowInheriting,
 		default: defaultBlockLayout,
 	} = getBlockSupport( blockName, layoutBlockSupportKey ) || {};
+
+	if ( ! allowEditing ) {
+		return null;
+	}
 
 	const usedLayout = layout ? layout : defaultBlockLayout || {};
 	const { inherit = false, type = 'default' } = usedLayout;
@@ -61,7 +67,7 @@ function LayoutPanel( { setAttributes, attributes, name: blockName } ) {
 	return (
 		<InspectorControls>
 			<PanelBody title={ __( 'Layout' ) }>
-				{ inherit && !! defaultThemeLayout && (
+				{ allowInheriting && !! defaultThemeLayout && (
 					<ToggleControl
 						label={ __( 'Inherit default layout' ) }
 						checked={ !! inherit }
