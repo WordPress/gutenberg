@@ -47,8 +47,8 @@ export default function BlockSupportToolsPanel( { group, children } ) {
 
 	return (
 		<ToolsPanel
-			label={ BLOCK_SUPPORT_GROUPS[ group ].label }
-			header={ BLOCK_SUPPORT_GROUPS[ group ].header }
+			label={ BLOCK_SUPPORT_GROUPS[ group ]?.label }
+			header={ BLOCK_SUPPORT_GROUPS[ group ]?.header }
 			resetAll={ resetAll }
 		>
 			{ children }
