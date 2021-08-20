@@ -2,33 +2,14 @@
  * WordPress dependencies
  */
 import { __experimentalToolsPanel as ToolsPanel } from '@wordpress/components';
-import { __ } from '@wordpress/i18n';
 import { useDispatch, useSelect } from '@wordpress/data';
 
 /**
  * Internal dependencies
  */
+import { BLOCK_SUPPORT_GROUPS } from './constants';
 import { store as blockEditorStore } from '../../store';
 import { cleanEmptyObject } from '../../hooks/utils';
-
-const labels = {
-	border: {
-		label: __( 'Border options' ),
-		header: __( 'Border' ),
-	},
-	color: {
-		label: __( 'Color options' ),
-		header: __( 'Color' ),
-	},
-	dimensions: {
-		label: __( 'Dimensions options' ),
-		header: __( 'Dimensions' ),
-	},
-	typography: {
-		label: __( 'Typography options' ),
-		header: __( 'Typography' ),
-	},
-};
 
 export default function BlockSupportToolsPanel( { group, children } ) {
 	const { clientId, attributes } = useSelect( ( select ) => {
@@ -66,8 +47,8 @@ export default function BlockSupportToolsPanel( { group, children } ) {
 
 	return (
 		<ToolsPanel
-			label={ labels[ group ].label }
-			header={ labels[ group ].header }
+			label={ BLOCK_SUPPORT_GROUPS[ group ].label }
+			header={ BLOCK_SUPPORT_GROUPS[ group ].header }
 			resetAll={ resetAll }
 		>
 			{ children }
