@@ -39,7 +39,7 @@ import {
 	createInterpolateElement,
 } from '@wordpress/element';
 import { placeCaretAtHorizontalEdge } from '@wordpress/dom';
-import { link as linkIcon } from '@wordpress/icons';
+import { link as linkIcon, addSubmenu } from '@wordpress/icons';
 import { store as coreStore } from '@wordpress/core-data';
 
 /**
@@ -49,6 +49,8 @@ import { ItemSubmenuIcon } from './icons';
 import { name } from './block.json';
 
 const ALLOWED_BLOCKS = [ 'core/navigation-link' ];
+
+const MAX_NESTING = 5;
 
 /**
  * A React hook to determine if it's dragging within the target element.
@@ -289,9 +291,10 @@ export default function NavigationLinkEdit( {
 	};
 	const { showSubmenuIcon } = context;
 	const { saveEntityRecord } = useDispatch( coreStore );
-	const { __unstableMarkNextChangeAsNotPersistent } = useDispatch(
-		blockEditorStore
-	);
+	const {
+		replaceBlock,
+		__unstableMarkNextChangeAsNotPersistent,
+	} = useDispatch( blockEditorStore );
 	const [ isLinkOpen, setIsLinkOpen ] = useState( false );
 	const listItemRef = useRef( null );
 	const isDraggingWithin = useIsDraggingWithin( listItemRef );
@@ -299,6 +302,7 @@ export default function NavigationLinkEdit( {
 	const ref = useRef();
 
 	const {
+		isAtMaxNesting,
 		isTopLevelLink,
 		isParentOfSelectedBlock,
 		isImmediateParentOfSelectedBlock,
@@ -321,6 +325,9 @@ export default function NavigationLinkEdit( {
 				.length;
 
 			return {
+				isAtMaxNesting:
+					getBlockParentsByBlockName( clientId, name ).length >=
+					MAX_NESTING,
 				isTopLevelLink:
 					getBlockParentsByBlockName( clientId, name ).length === 0,
 				isParentOfSelectedBlock: hasSelectedInnerBlock(
@@ -356,6 +363,14 @@ export default function NavigationLinkEdit( {
 		__unstableMarkNextChangeAsNotPersistent();
 		setAttributes( { isTopLevelLink } );
 	}, [ isTopLevelLink ] );
+
+	/**
+	 * Transform to submenu block.
+	 */
+	function transformToSubmenu() {
+		const newSubmenu = createBlock( 'core/dropdown', attributes );
+		replaceBlock( clientId, newSubmenu );
+	}
 
 	// Show the LinkControl on mount if the URL is empty
 	// ( When adding a new menu item)
@@ -573,6 +588,14 @@ export default function NavigationLinkEdit( {
 						shortcut={ displayShortcut.primary( 'k' ) }
 						onClick={ () => setIsLinkOpen( true ) }
 					/>
+					{ ! isAtMaxNesting && (
+						<ToolbarButton
+							name="submenu"
+							icon={ addSubmenu }
+							title={ __( 'Add submenu' ) }
+							onClick={ transformToSubmenu }
+						/>
+					) }
 				</ToolbarGroup>
 			</BlockControls>
 			<InspectorControls>
