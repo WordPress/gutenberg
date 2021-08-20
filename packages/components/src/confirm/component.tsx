@@ -4,7 +4,7 @@
  * External dependencies
  */
 // eslint-disable-next-line no-restricted-imports
-import type { Ref } from 'react';
+import { Ref, useEffect } from 'react';
 import { confirmable } from 'react-confirm';
 
 /**
@@ -16,6 +16,8 @@ import { Card, CardHeader, CardFooter } from '../card';
 import { Heading } from '../heading';
 import { contextConnect, PolymorphicComponentProps } from '../ui/context';
 import { useConfirm } from './hook';
+import type { KeyboardEvent } from 'react';
+import { ESCAPE } from '@wordpress/keycodes';
 
 // @todo deal with overlay click event, close dialog
 // @todo add type declarations for the react-confirm functions
@@ -26,21 +28,35 @@ function Confirm(
 	const {
 		role,
 		wrapperClassName,
+		overlayClassName,
 		show,
 		proceed,
 		confirmation,
 		...otherProps
 	} = useConfirm( props );
 
+	function handleEscapePress( event: KeyboardEvent< HTMLDivElement > ) {
+		// `keyCode` is depreacted, so let's use `key`
+		if ( event.key === 'Escape' ) {
+			proceed( false );
+		}
+	}
+
+	useEffect( () => {
+		document.addEventListener( 'keydown', handleEscapePress );
+		return () =>
+			document.removeEventListener( 'keydown', handleEscapePress );
+	} );
+
 	return (
 		<div
 			{ ...otherProps }
 			role={ role }
-			className={ wrapperClassName }
 			ref={ forwardedRef }
+			className={ wrapperClassName }
 			style={ { visibility: show ? 'visible' : 'hidden' } }
 		>
-			<Card>
+			<Card onMouseDown={ ( event ) => event.preventDefault() }>
 				<CardHeader>
 					<Heading level="4">{ confirmation }</Heading>
 				</CardHeader>
@@ -56,6 +72,10 @@ function Confirm(
 					</Button>
 				</CardFooter>
 			</Card>
+			<div
+				className={ overlayClassName }
+				onClick={ () => proceed( false ) }
+			></div>
 		</div>
 	);
 }

@@ -18,15 +18,15 @@ export function useConfirm(
 	const cx = useCx();
 
 	const classes = cx( className );
-	const wrapperClassName = cx( styles.overlayWrapper );
-	const dialogWrapperClassName = cx( styles.dialogWrapper );
+	const wrapperClassName = cx( styles.wrapper );
+	const overlayClassName = cx( styles.overlay );
 
 	console.log( otherProps );
 
 	return {
 		className: classes,
 		wrapperClassName,
-		dialogWrapperClassName,
+		overlayClassName,
 		...otherProps,
 	};
 }
