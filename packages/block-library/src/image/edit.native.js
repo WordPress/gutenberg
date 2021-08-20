@@ -26,9 +26,6 @@ import {
 	BottomSheet,
 	BottomSheetTextControl,
 	BottomSheetSelectControl,
-	FooterMessageControl,
-	FooterMessageLink,
-	ExternalLink,
 	HelpText,
 	Badge,
 } from '@wordpress/components';
@@ -590,14 +587,9 @@ export class ImageEdit extends Component {
 				>
 					{ canImageBeFeatured &&
 						this.getFeaturedButtonPanel( isFeaturedImage ) }
-					<FooterMessageControl
-						label={ __(
-							'Changes to featured image will not be affected by the undo/redo buttons.'
-						) }
-						cellContainerStyle={
-							styles.setFeaturedButtonCellContainer
-						}
-					/>
+					<HelpText>{ __(
+						'Changes to featured image will not be affected by the undo/redo buttons.'
+					) }</HelpText>
 				</PanelBody>
 			</InspectorControls>
 		);
