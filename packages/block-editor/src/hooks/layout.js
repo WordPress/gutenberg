@@ -32,18 +32,9 @@ import { getLayoutType, getLayoutTypes } from '../layouts';
 
 const layoutBlockSupportKey = '__experimentalLayout';
 
-const canBlockSwitchLayout = ( blockTypeOrName ) => {
-	const layoutBlockSupportConfig = getBlockSupport(
-		blockTypeOrName,
-		layoutBlockSupportKey
-	);
-
-	return layoutBlockSupportConfig?.allowSwitching;
-};
-
 function LayoutPanel( { setAttributes, attributes, name: blockName } ) {
-	const { layout = {} } = attributes;
-	const defaultLayout = useSetting( 'layout' );
+	const { layout } = attributes;
+	const defaultThemeLayout = useSetting( 'layout' );
 	const themeSupportsLayout = useSelect( ( select ) => {
 		const { getSettings } = select( blockEditorStore );
 		return getSettings().supportsLayout;
@@ -53,8 +44,13 @@ function LayoutPanel( { setAttributes, attributes, name: blockName } ) {
 		return null;
 	}
 
-	const allowLayoutSwitching = canBlockSwitchLayout( blockName );
-	const { inherit = false, type = 'default' } = layout;
+	const {
+		allowSwitching: canBlockSwitchLayout,
+		default: defaultBlockLayout,
+	} = getBlockSupport( blockName, layoutBlockSupportKey ) || {};
+
+	const usedLayout = layout ? layout : defaultBlockLayout || {};
+	const { inherit = false, type = 'default' } = usedLayout;
 	const layoutType = getLayoutType( type );
 
 	const onChangeType = ( newType ) =>
@@ -65,7 +61,7 @@ function LayoutPanel( { setAttributes, attributes, name: blockName } ) {
 	return (
 		<InspectorControls>
 			<PanelBody title={ __( 'Layout' ) }>
-				{ !! defaultLayout && (
+				{ inherit && !! defaultThemeLayout && (
 					<ToggleControl
 						label={ __( 'Inherit default layout' ) }
 						checked={ !! inherit }
@@ -75,7 +71,7 @@ function LayoutPanel( { setAttributes, attributes, name: blockName } ) {
 					/>
 				) }
 
-				{ ! inherit && allowLayoutSwitching && (
+				{ ! inherit && canBlockSwitchLayout && (
 					<LayoutTypeSwitcher
 						type={ type }
 						onChange={ onChangeType }

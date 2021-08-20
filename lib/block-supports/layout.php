@@ -69,7 +69,6 @@ function gutenberg_get_layout_style( $selector, $layout ) {
 		$style .= 'display: flex;';
 		$style .= 'gap: var( --wp--style--block-gap, 0.5em );';
 		$style .= 'flex-wrap: wrap;';
-		$style .= 'align-items: center;';
 		$style .= '}';
 
 		$style .= "$selector > * { margin: 0; }";
@@ -93,7 +92,8 @@ function gutenberg_render_layout_support_flag( $block_content, $block ) {
 		return $block_content;
 	}
 
-	$used_layout = isset( $block['attrs']['layout'] ) ? $block['attrs']['layout'] : array();
+	$default_block_layout = _wp_array_get( $block_type->supports, array( '__experimentalLayout', 'default' ), array() );
+	$used_layout          = isset( $block['attrs']['layout'] ) ? $block['attrs']['layout'] : $default_block_layout;
 	if ( isset( $used_layout['inherit'] ) && $used_layout['inherit'] ) {
 		$tree           = WP_Theme_JSON_Resolver_Gutenberg::get_merged_data( array(), 'theme' );
 		$default_layout = _wp_array_get( $tree->get_settings(), array( 'layout' ) );
