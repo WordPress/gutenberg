@@ -10,7 +10,6 @@ import {
 	__experimentalNavigation as Navigation,
 	__experimentalNavigationMenu as NavigationMenu,
 	__experimentalNavigationItem as NavigationItem,
-	Modal,
 	TabPanel,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
@@ -26,12 +25,15 @@ import {
 	store as editorStore,
 } from '@wordpress/editor';
 import { store as coreStore } from '@wordpress/core-data';
-import { PreferencesModalFeatureToggle } from '@wordpress/interface';
+import {
+	PreferencesModal,
+	PreferencesModalSection,
+	PreferencesModalFeatureToggle,
+} from '@wordpress/interface';
 
 /**
  * Internal dependencies
  */
-import Section from './section';
 import {
 	EnablePluginDocumentSettingPanelOption,
 	EnablePublishSidebarOption,
@@ -44,7 +46,7 @@ import BlockManager from '../block-manager';
 const MODAL_NAME = 'edit-post/preferences';
 const PREFERENCES_MENU = 'preferences-menu';
 
-export default function PreferencesModal() {
+export default function PostEditorPreferencesModal() {
 	const isLargeViewport = useViewportMatch( 'medium' );
 	const { closeModal } = useDispatch( editPostStore );
 	const { isModalActive, isViewable } = useSelect( ( select ) => {
@@ -80,7 +82,7 @@ export default function PreferencesModal() {
 				content: (
 					<>
 						{ isLargeViewport && (
-							<Section
+							<PreferencesModalSection
 								title={ __( 'Publishing' ) }
 								description={ __(
 									'Change options related to publishing.'
@@ -94,10 +96,10 @@ export default function PreferencesModal() {
 										'Include pre-publish checklist'
 									) }
 								/>
-							</Section>
+							</PreferencesModalSection>
 						) }
 
-						<Section
+						<PreferencesModalSection
 							title={ __( 'Appearance' ) }
 							description={ __(
 								'Customize options related to the block editor interface and editing flow.'
@@ -143,7 +145,7 @@ export default function PreferencesModal() {
 									label={ __( 'Display block breadcrumbs' ) }
 								/>
 							) }
-						</Section>
+						</PreferencesModalSection>
 					</>
 				),
 			},
@@ -152,7 +154,7 @@ export default function PreferencesModal() {
 				label: __( 'Blocks' ),
 				content: (
 					<>
-						<Section
+						<PreferencesModalSection
 							title={ __( 'Block interactions' ) }
 							description={ __(
 								'Customize how you interact with blocks in the block library and editing canvas.'
@@ -176,15 +178,15 @@ export default function PreferencesModal() {
 									'Contain text cursor inside block'
 								) }
 							/>
-						</Section>
-						<Section
+						</PreferencesModalSection>
+						<PreferencesModalSection
 							title={ __( 'Visible blocks' ) }
 							description={ __(
 								"Disable blocks that you don't want to appear in the inserter. They can always be toggled back on later."
 							) }
 						>
 							<BlockManager />
-						</Section>
+						</PreferencesModalSection>
 					</>
 				),
 			},
@@ -193,7 +195,7 @@ export default function PreferencesModal() {
 				label: __( 'Panels' ),
 				content: (
 					<>
-						<Section
+						<PreferencesModalSection
 							title={ __( 'Document settings' ) }
 							description={ __(
 								'Choose what displays in the panel.'
@@ -249,15 +251,15 @@ export default function PreferencesModal() {
 									panelName="page-attributes"
 								/>
 							</PageAttributesCheck>
-						</Section>
-						<Section
+						</PreferencesModalSection>
+						<PreferencesModalSection
 							title={ __( 'Additional' ) }
 							description={ __(
 								'Add extra areas to the editor.'
 							) }
 						>
 							<MetaBoxesSection />
-						</Section>
+						</PreferencesModalSection>
 					</>
 				),
 			},
@@ -342,13 +344,8 @@ export default function PreferencesModal() {
 	}
 
 	return (
-		<Modal
-			className="edit-post-preferences-modal"
-			title={ __( 'Preferences' ) }
-			closeLabel={ __( 'Close' ) }
-			onRequestClose={ closeModal }
-		>
+		<PreferencesModal onRequestClose={ closeModal }>
 			{ modalContent }
-		</Modal>
+		</PreferencesModal>
 	);
 }
