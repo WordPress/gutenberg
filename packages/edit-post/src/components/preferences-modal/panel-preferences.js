@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { get } from 'lodash';
+import { get, filter, map } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -23,10 +23,52 @@ import { PreferencesModalSection } from '@wordpress/interface';
  * Internal dependencies
  */
 import {
+	EnableCustomFieldsOption,
 	EnablePluginDocumentSettingPanelOption,
 	EnablePanelOption,
 } from './options';
-import MetaBoxesSection from './meta-boxes-section';
+import { store as editPostStore } from '../../store';
+
+function MetaBoxesSection() {
+	const { areCustomFieldsRegistered, metaBoxes } = useSelect( ( select ) => {
+		const { getEditorSettings } = select( editorStore );
+		const { getAllMetaBoxes } = select( editPostStore );
+
+		return {
+			// This setting should not live in the block editor's store.
+			areCustomFieldsRegistered:
+				getEditorSettings().enableCustomFields !== undefined,
+			metaBoxes: getAllMetaBoxes(),
+		};
+	} );
+	// The 'Custom Fields' meta box is a special case that we handle separately.
+	const thirdPartyMetaBoxes = filter(
+		metaBoxes,
+		( { id } ) => id !== 'postcustom'
+	);
+
+	if ( ! areCustomFieldsRegistered && thirdPartyMetaBoxes.length === 0 ) {
+		return null;
+	}
+
+	return (
+		<PreferencesModalSection
+			title={ __( 'Additional' ) }
+			description={ __( 'Add extra areas to the editor.' ) }
+		>
+			{ areCustomFieldsRegistered && (
+				<EnableCustomFieldsOption label={ __( 'Custom fields' ) } />
+			) }
+			{ map( thirdPartyMetaBoxes, ( { id, title } ) => (
+				<EnablePanelOption
+					key={ id }
+					label={ title }
+					panelName={ `meta-box-${ id }` }
+				/>
+			) ) }
+		</PreferencesModalSection>
+	);
+}
 
 export default function PanelPreferences() {
 	const isViewable = useSelect( ( select ) => {
@@ -90,12 +132,7 @@ export default function PanelPreferences() {
 					/>
 				</PageAttributesCheck>
 			</PreferencesModalSection>
-			<PreferencesModalSection
-				title={ __( 'Additional' ) }
-				description={ __( 'Add extra areas to the editor.' ) }
-			>
-				<MetaBoxesSection />
-			</PreferencesModalSection>
+			<MetaBoxesSection />
 		</>
 	);
 }
