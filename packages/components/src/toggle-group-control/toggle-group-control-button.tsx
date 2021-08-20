@@ -13,7 +13,7 @@ import { memo } from '@wordpress/element';
  * Internal dependencies
  */
 import * as styles from './styles';
-import type { SegmentedControlButtonProps } from './types';
+import type { ToggleGroupControlButtonProps } from './types';
 import { useCx } from '../utils/hooks';
 
 const {
@@ -23,7 +23,7 @@ const {
 	SeparatorView,
 } = styles;
 
-function SegmentedControlButton( {
+function ToggleGroupControlButton( {
 	className,
 	forwardedRef,
 	isBlock = false,
@@ -31,7 +31,7 @@ function SegmentedControlButton( {
 	showSeparator,
 	value,
 	...props
-}: SegmentedControlButtonProps ) {
+}: ToggleGroupControlButtonProps ) {
 	const isActive = props.state === value;
 	const cx = useCx();
 	const labelViewClasses = cx( isBlock && styles.labelBlock );
@@ -56,12 +56,12 @@ function SegmentedControlButton( {
 					{ label }
 				</LabelPlaceholderView>
 			</Radio>
-			<SegmentedControlSeparator isActive={ ! showSeparator } />
+			<ToggleGroupControlSeparator isActive={ ! showSeparator } />
 		</LabelView>
 	);
 }
 
-const SegmentedControlSeparator = memo(
+const ToggleGroupControlSeparator = memo(
 	( { isActive }: { isActive: boolean } ) => {
 		const cx = useCx();
 		const classes = cx( isActive && styles.separatorActive );
@@ -69,4 +69,4 @@ const SegmentedControlSeparator = memo(
 	}
 );
 
-export default memo( SegmentedControlButton );
+export default memo( ToggleGroupControlButton );

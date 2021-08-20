@@ -6,33 +6,33 @@ import { render, fireEvent } from '@testing-library/react';
 /**
  * Internal dependencies
  */
-import { SegmentedControl, SegmentedControlOption } from '../index';
+import { ToggleGroupControl, ToggleGroupControlOption } from '../index';
 
-describe( 'SegmentedControl', () => {
+describe( 'ToggleGroupControl', () => {
 	const options = (
 		<>
-			<SegmentedControlOption value="rigas" label="R" />
-			<SegmentedControlOption value="jack" label="J" />
+			<ToggleGroupControlOption value="rigas" label="R" />
+			<ToggleGroupControlOption value="jack" label="J" />
 		</>
 	);
 	it( 'should render correctly', () => {
 		const { container } = render(
-			<SegmentedControl label="Test Segmented Control">
+			<ToggleGroupControl label="Test Toggle Group Control">
 				{ options }
-			</SegmentedControl>
+			</ToggleGroupControl>
 		);
 		expect( container.firstChild ).toMatchSnapshot();
 	} );
 	it( 'should call onChange with proper value', () => {
 		const mockOnChange = jest.fn();
 		const { getByLabelText } = render(
-			<SegmentedControl
+			<ToggleGroupControl
 				value="jack"
 				onChange={ mockOnChange }
-				label="Test Segmented Control"
+				label="Test Toggle Group Control"
 			>
 				{ options }
-			</SegmentedControl>
+			</ToggleGroupControl>
 		);
 		const firstButton = getByLabelText( 'R' );
 		fireEvent.click( firstButton );

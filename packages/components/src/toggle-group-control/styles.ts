@@ -9,7 +9,7 @@ import styled from '@emotion/styled';
  */
 import { CONFIG, COLORS, reduceMotion } from '../utils';
 
-export const SegmentedControl = css`
+export const ToggleGroupControl = css`
 	background: ${ COLORS.ui.background };
 	border: 1px solid;
 	border-color: ${ COLORS.ui.border };
@@ -41,7 +41,7 @@ export const block = css`
 export const BackdropView = styled.div`
 	background: ${ COLORS.gray[ 900 ] };
 	border-radius: ${ CONFIG.controlBorderRadius };
-	box-shadow: ${ CONFIG.segmentedControlBackdropBoxShadow };
+	box-shadow: ${ CONFIG.toggleGroupControlBackdropBoxShadow };
 	left: 0;
 	position: absolute;
 	top: 2px;
@@ -90,7 +90,7 @@ export const buttonView = css`
 	}
 
 	&:active {
-		background: ${ CONFIG.segmentedControlBackgroundColor };
+		background: ${ CONFIG.toggleGroupControlBackgroundColor };
 	}
 `;
 
