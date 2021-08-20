@@ -117,9 +117,7 @@ export default function BreadcrumbsEdit( {
 				buildBreadcrumb( {
 					crumbTitle: item,
 					separator,
-					showSeparator:
-						index < breadcrumbTitles.length - 1 ||
-						showCurrentPageTitle,
+					showSeparator: index < breadcrumbTitles.length - 1,
 					addLeadingSeparator: index === 0 && showLeadingSeparator,
 					key: index,
 				} )

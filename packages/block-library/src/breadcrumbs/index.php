@@ -68,9 +68,7 @@ function render_block_core_breadcrumbs( $attributes, $content, $block ) {
 	$inner_markup = '';
 
 	foreach ( $breadcrumbs as $index => $breadcrumb ) {
-		$show_separator =
-			! empty( $attributes['showCurrentPageTitle'] ) ||
-			$index < count( $breadcrumbs ) - 1;
+		$show_separator = $index < count( $breadcrumbs ) - 1;
 		$inner_markup .= build_block_core_breadcrumbs_inner_markup_item(
 			$breadcrumb['url'],
 			$breadcrumb['title'],
