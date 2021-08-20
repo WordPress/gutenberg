@@ -59,6 +59,17 @@ export function DimensionsPanel( props ) {
 		'__experimentalDefaultControls',
 	] );
 
+	const createResetAllFilter = ( attribute ) => ( newAttributes ) => ( {
+		...newAttributes,
+		style: {
+			...newAttributes.style,
+			spacing: {
+				...newAttributes.style?.spacing,
+				[ attribute ]: undefined,
+			},
+		},
+	} );
+
 	return (
 		<InspectorControls __experimentalGroup="dimensions">
 			{ ! isPaddingDisabled && (
@@ -66,16 +77,7 @@ export function DimensionsPanel( props ) {
 					hasValue={ () => hasPaddingValue( props ) }
 					label={ __( 'Padding' ) }
 					onDeselect={ () => resetPadding( props ) }
-					resetAllFilter={ ( newAttributes ) => ( {
-						...newAttributes,
-						style: {
-							...newAttributes.style,
-							spacing: {
-								...newAttributes.style?.spacing,
-								padding: undefined,
-							},
-						},
-					} ) }
+					resetAllFilter={ createResetAllFilter( 'padding' ) }
 					isShownByDefault={ defaultSpacingControls?.padding }
 				>
 					<PaddingEdit { ...props } />
@@ -86,16 +88,7 @@ export function DimensionsPanel( props ) {
 					hasValue={ () => hasMarginValue( props ) }
 					label={ __( 'Margin' ) }
 					onDeselect={ () => resetMargin( props ) }
-					resetAllFilter={ ( newAttributes ) => ( {
-						...newAttributes,
-						style: {
-							...newAttributes.style,
-							spacing: {
-								...newAttributes.style?.spacing,
-								margin: undefined,
-							},
-						},
-					} ) }
+					resetAllFilter={ createResetAllFilter( 'margin' ) }
 					isShownByDefault={ defaultSpacingControls?.margin }
 				>
 					<MarginEdit { ...props } />
