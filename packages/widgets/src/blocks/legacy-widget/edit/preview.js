@@ -40,7 +40,7 @@ export default function Preview( { idBase, instance, isVisible } ) {
 			return;
 		}
 
-		fetchPreviewHTML( idBase, instance, abortController )
+		fetchPreviewHTML()
 			.then( ( response ) => {
 				setIsPreviewFetched( true );
 				setSrcDoc( response.preview );
