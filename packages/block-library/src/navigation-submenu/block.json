@@ -1,12 +1,12 @@
 {
 	"apiVersion": 2,
-	"name": "core/dropdown",
-	"title": "Dropdown",
+	"name": "core/navigation-submenu",
+	"title": "Submenu",
 	"category": "design",
 	"parent": [
 		"core/navigation"
 	],
-	"description": "Add a submenu dropdown to your navigation.",
+	"description": "Add a submenu to your navigation.",
 	"textdomain": "default",
 	"attributes": {
 		"label": {
@@ -60,6 +60,6 @@
 		"html": false
 	},
 	"viewScript": "file:./view.min.js",
-	"editorStyle": "wp-block-dropdown-editor",
-	"style": "wp-block-dropdown"
+	"editorStyle": "wp-block-navigation-submenu-editor",
+	"style": "wp-block-navigation-submenu"
 }

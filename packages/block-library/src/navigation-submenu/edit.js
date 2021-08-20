@@ -50,7 +50,7 @@ import { speak } from '@wordpress/a11y';
 import { ItemSubmenuIcon } from './icons';
 import { name } from './block.json';
 
-const ALLOWED_BLOCKS = [ 'core/navigation-link', 'core/dropdown' ];
+const ALLOWED_BLOCKS = [ 'core/navigation-link', 'core/navigation-submenu' ];
 
 const MAX_NESTING = 5;
 
@@ -267,7 +267,7 @@ export const updateNavigationLinkBlockAttributes = (
 	} );
 };
 
-export default function DropdownEdit( {
+export default function NavigationSubmenuEdit( {
 	attributes,
 	isSelected,
 	setAttributes,
@@ -454,12 +454,12 @@ export default function DropdownEdit( {
 	const innerBlocksColors = getColors( context, true );
 
 	if ( isAtMaxNesting ) {
-		pull( ALLOWED_BLOCKS, 'core/dropdown' );
+		pull( ALLOWED_BLOCKS, 'core/navigation-submenu' );
 	}
 
 	const innerBlocksProps = useInnerBlocksProps(
 		{
-			className: classnames( 'wp-block-dropdown__container', {
+			className: classnames( 'wp-block-navigation__submenu-container', {
 				'is-parent-of-selected-block': isParentOfSelectedBlock,
 				'has-text-color': !! (
 					innerBlocksColors.textColor ||
@@ -546,7 +546,7 @@ export default function DropdownEdit( {
 			</InspectorControls>
 			<div { ...blockProps }>
 				{ /* eslint-disable jsx-a11y/anchor-is-valid */ }
-				<ParentElement className="wp-block-dropdown__parent">
+				<ParentElement className="wp-block-navigation-item__content">
 					{ /* eslint-enable */ }
 					{
 						<RichText

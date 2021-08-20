@@ -1,6 +1,6 @@
 <?php
 /**
- * Server-side rendering of the `core/dropdown` block.
+ * Server-side rendering of the `core/navigation-submenu` block.
  *
  * @package gutenberg
  */
@@ -13,7 +13,7 @@
  * @param  array $attributes Block attributes.
  * @return array Colors CSS classes and inline styles.
  */
-function block_core_dropdown_build_css_colors( $context, $attributes ) {
+function block_core_navigation_submenu_build_css_colors( $context, $attributes ) {
 	$colors = array(
 		'css_classes'   => array(),
 		'inline_styles' => '',
@@ -83,7 +83,7 @@ function block_core_dropdown_build_css_colors( $context, $attributes ) {
  * @param  array $context Navigation block context.
  * @return array Font size CSS classes and inline styles.
  */
-function block_core_dropdown_build_css_font_sizes( $context ) {
+function block_core_navigation_submenu_build_css_font_sizes( $context ) {
 	// CSS classes.
 	$font_sizes = array(
 		'css_classes'   => array(),
@@ -109,12 +109,12 @@ function block_core_dropdown_build_css_font_sizes( $context ) {
  *
  * @return string
  */
-function block_core_dropdown_render_submenu_icon() {
+function block_core_navigation_submenu_render_submenu_icon() {
 	return '<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 12 12" fill="none" role="img" aria-hidden="true" focusable="false"><path d="M1.50002 4L6.00002 8L10.5 4" stroke-width="1.5"></path></svg>';
 }
 
 /**
- * Renders the `core/dropdown` block.
+ * Renders the `core/navigation-submenu` block.
  *
  * @param array $attributes The block attributes.
  * @param array $content The saved content.
@@ -122,9 +122,9 @@ function block_core_dropdown_render_submenu_icon() {
  *
  * @return string Returns the post content with the legacy widget added.
  */
-function render_block_core_dropdown( $attributes, $content, $block ) {
-	if ( ! wp_script_is( 'wp-block-dropdown-view' ) ) {
-		wp_enqueue_script( 'wp-block-dropdown-view' );
+function render_block_core_navigation_submenu( $attributes, $content, $block ) {
+	if ( ! wp_script_is( 'wp-block-navigation-submenu-view' ) ) {
+		wp_enqueue_script( 'wp-block-navigation-submenu-view' );
 	}
 
 	$navigation_link_has_id = isset( $attributes['id'] ) && is_numeric( $attributes['id'] );
@@ -144,8 +144,8 @@ function render_block_core_dropdown( $attributes, $content, $block ) {
 		return '';
 	}
 
-	$colors          = block_core_dropdown_build_css_colors( $block->context, $attributes );
-	$font_sizes      = block_core_dropdown_build_css_font_sizes( $block->context );
+	$colors          = block_core_navigation_submenu_build_css_colors( $block->context, $attributes );
+	$font_sizes      = block_core_navigation_submenu_build_css_font_sizes( $block->context );
 	$classes         = array_merge(
 		$colors['css_classes'],
 		$font_sizes['css_classes']
@@ -175,7 +175,7 @@ function render_block_core_dropdown( $attributes, $content, $block ) {
 	// We also render a submenu button, so the submenu can be opened on click.
 	if ( isset( $attributes['url'] ) && '' !== $attributes['url'] ) {
 		// Start appending HTML attributes to anchor tag.
-		$html .= '<a class="wp-block-dropdown__parent" href="' . esc_url( $attributes['url'] ) . '"';
+		$html .= '<a class="wp-block-navigation-item__content" href="' . esc_url( $attributes['url'] ) . '"';
 
 		if ( isset( $attributes['opensInNewTab'] ) && true === $attributes['opensInNewTab'] ) {
 			$html .= ' target="_blank"  ';
@@ -221,11 +221,11 @@ function render_block_core_dropdown( $attributes, $content, $block ) {
 
 		// The submenu icon has to be rendered in a button here
 		// so that there's a clickable elment to open the submenu.
-		$html .= '<button class="wp-block-dropdown__submenu-icon wp-block-dropdown__toggle" aria-expanded="false">' . block_core_dropdown_render_submenu_icon() . '</button>';
+		$html .= '<button class="wp-block-navigation__submenu-icon wp-block-navigation-submenu__toggle" aria-expanded="false">' . block_core_navigation_submenu_render_submenu_icon() . '</button>';
 
 	} else {
 		// If the Parent element is not a link, we render the whole thing as a button.
-		$html .= '<button class="wp-block-dropdown__parent wp-block-dropdown__toggle" aria-expanded="false">';
+		$html .= '<button class="wp-block-navigation-item__content wp-block-navigation-submenu__toggle" aria-expanded="false">';
 
 		// Wrap title with span to isolate it from submenu icon.
 		$html .= '<span class="wp-block-navigation-link__label">';
@@ -256,7 +256,7 @@ function render_block_core_dropdown( $attributes, $content, $block ) {
 
 		if ( isset( $block->context['showSubmenuIcon'] ) && $block->context['showSubmenuIcon'] ) {
 			// The submenu icon can be hidden by a CSS rule on the Navigation Block.
-			$html .= '<span class="wp-block-navigation-link__submenu-icon">' . block_core_dropdown_render_submenu_icon() . '</span>';
+			$html .= '<span class="wp-block-navigation-link__submenu-icon">' . block_core_navigation_submenu_render_submenu_icon() . '</span>';
 		}
 
 		$html .= '</button>';
@@ -270,7 +270,7 @@ function render_block_core_dropdown( $attributes, $content, $block ) {
 		}
 
 		$html .= sprintf(
-			'<ul class="wp-block-dropdown__container">%s</ul>',
+			'<ul class="wp-block-navigation__submenu-container">%s</ul>',
 			$inner_blocks_html
 		);
 	}
@@ -281,17 +281,17 @@ function render_block_core_dropdown( $attributes, $content, $block ) {
 }
 
 /**
- * Register the dropdown block.
+ * Register the navigation submenu block.
  *
- * @uses render_block_core_navigation()
+ * @uses render_block_core_navigation_submenu()
  * @throws WP_Error An WP_Error exception parsing the block definition.
  */
-function register_block_core_dropdown() {
+function register_block_core_navigation_submenu() {
 	register_block_type_from_metadata(
-		__DIR__ . '/dropdown',
+		__DIR__ . '/navigation-submenu',
 		array(
-			'render_callback' => 'render_block_core_dropdown',
+			'render_callback' => 'render_block_core_navigation_submenu',
 		)
 	);
 }
-add_action( 'init', 'register_block_core_dropdown' );
+add_action( 'init', 'register_block_core_navigation_submenu' );

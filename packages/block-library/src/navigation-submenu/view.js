@@ -11,12 +11,14 @@ const toggleSubmenuOnClick = ( event ) => {
 	const isSubmenuOpen = buttonToggle.getAttribute( 'aria-expanded' );
 
 	if ( isSubmenuOpen === 'true' ) {
-		closeSubmenus( buttonToggle.closest( '.wp-block-dropdown' ) );
+		closeSubmenus( buttonToggle.closest( '.wp-block-navigation-submenu' ) );
 	} else {
 		// Close all sibling submenus.
-		const parentElement = buttonToggle.closest( '.wp-block-dropdown' );
+		const parentElement = buttonToggle.closest(
+			'.wp-block-navigation-submenu'
+		);
 		const parentList =
-			buttonToggle.closest( '.wp-block-dropdown__container' ) ||
+			buttonToggle.closest( '.wp-block-navigation__submenu-container' ) ||
 			buttonToggle.closest( '.wp-block-navigation__container' );
 		Array.from( parentList.children ).forEach( ( child ) => {
 			if ( child !== parentElement ) {
@@ -28,11 +30,11 @@ const toggleSubmenuOnClick = ( event ) => {
 	}
 };
 
-const dropdownButtons = document.querySelectorAll(
-	'.wp-block-dropdown__toggle'
+const submenuButtons = document.querySelectorAll(
+	'.wp-block-navigation-submenu__toggle'
 );
 
-dropdownButtons.forEach( ( button ) => {
+submenuButtons.forEach( ( button ) => {
 	button.addEventListener( 'click', toggleSubmenuOnClick );
 } );
 

@@ -1,10 +1,10 @@
-.wp-block-dropdown {
+.wp-block-navigation-submenu {
 	display: block;
 
 	// Show on editor selected, even if on frontend it only stays open on focus-within.
 	&.is-selected,
 	&.has-child-selected {
-		> .wp-block-dropdown__container {
+		> .wp-block-navigation__submenu-container {
 			// We use important here because if the parent block is selected and submenus are present, they should always be visible.
 			visibility: visible !important;
 			opacity: 1 !important;

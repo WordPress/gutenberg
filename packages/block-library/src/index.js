@@ -27,13 +27,13 @@ import * as code from './code';
 import * as columns from './columns';
 import * as column from './column';
 import * as cover from './cover';
-import * as dropdown from './dropdown';
 import * as embed from './embed';
 import * as file from './file';
 import * as html from './html';
 import * as mediaText from './media-text';
 import * as navigation from './navigation';
 import * as navigationLink from './navigation-link';
+import * as navigationSubmenu from './navigation-submenu';
 import * as homeLink from './home-link';
 import * as latestComments from './latest-comments';
 import * as latestPosts from './latest-posts';
@@ -232,7 +232,7 @@ export const __experimentalRegisterExperimentalCoreBlocks =
 					navigation,
 					navigationLink,
 					homeLink,
-					dropdown,
+					navigationSubmenu,
 
 					// Register Full Site Editing Blocks.
 					...( enableFSEBlocks

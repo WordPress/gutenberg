@@ -368,7 +368,7 @@ export default function NavigationLinkEdit( {
 	 * Transform to submenu block.
 	 */
 	function transformToSubmenu() {
-		const newSubmenu = createBlock( 'core/dropdown', attributes );
+		const newSubmenu = createBlock( 'core/navigation-submenu', attributes );
 		replaceBlock( clientId, newSubmenu );
 	}
 
