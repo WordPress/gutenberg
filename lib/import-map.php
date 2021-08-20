@@ -34,7 +34,8 @@ function gutenberg_inject_import_map() {
 	}
 
 	echo '
-<script type="importmap">
+<script defer src="https://unpkg.com/es-module-shims@0.12.5/dist/es-module-shims.js"></script>
+<script type="importmap-shim">
 {
 	"imports": ' . json_encode( $import_map_entries ) . '
 }
