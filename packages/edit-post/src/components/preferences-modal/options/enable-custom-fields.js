@@ -6,11 +6,7 @@ import { __ } from '@wordpress/i18n';
 import { Button } from '@wordpress/components';
 import { withSelect } from '@wordpress/data';
 import { store as editorStore } from '@wordpress/editor';
-
-/**
- * Internal dependencies
- */
-import BaseOption from './base';
+import { PreferencesMenuToggle } from '@wordpress/interface';
 
 export function CustomFieldsConfirmation( { willEnable } ) {
 	const [ isReloading, setIsReloading ] = useState( false );
@@ -46,7 +42,7 @@ export function EnableCustomFieldsOption( { label, areCustomFieldsEnabled } ) {
 	const [ isChecked, setIsChecked ] = useState( areCustomFieldsEnabled );
 
 	return (
-		<BaseOption
+		<PreferencesMenuToggle
 			label={ label }
 			isChecked={ isChecked }
 			onChange={ setIsChecked }
@@ -54,7 +50,7 @@ export function EnableCustomFieldsOption( { label, areCustomFieldsEnabled } ) {
 			{ isChecked !== areCustomFieldsEnabled && (
 				<CustomFieldsConfirmation willEnable={ isChecked } />
 			) }
-		</BaseOption>
+		</PreferencesMenuToggle>
 	);
 }
 

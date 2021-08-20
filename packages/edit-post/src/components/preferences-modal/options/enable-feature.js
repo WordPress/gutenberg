@@ -3,11 +3,11 @@
  */
 import { compose } from '@wordpress/compose';
 import { withSelect, withDispatch } from '@wordpress/data';
+import { PreferencesMenuToggle } from '@wordpress/interface';
 
 /**
  * Internal dependencies
  */
-import BaseOption from './base';
 import { store as editPostStore } from '../../../store';
 
 export default compose(
@@ -20,4 +20,4 @@ export default compose(
 	withDispatch( ( dispatch, { featureName } ) => ( {
 		onChange: () => dispatch( editPostStore ).toggleFeature( featureName ),
 	} ) )
-)( BaseOption );
+)( PreferencesMenuToggle );
