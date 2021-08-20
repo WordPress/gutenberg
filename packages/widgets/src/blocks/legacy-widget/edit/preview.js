@@ -15,7 +15,7 @@ import apiFetch from '@wordpress/api-fetch';
 export default function Preview( { idBase, instance, isVisible } ) {
 	const [ isLoaded, setIsLoaded ] = useState( false );
 	const [ srcDoc, setSrcDoc ] = useState( '' );
-	const [ isPreviewFetched, setIsPreviewFetched ] = useState( true );
+	const [ isPreviewFetched, setIsPreviewFetched ] = useState( false );
 
 	const abortController =
 		typeof window.AbortController === 'undefined'
@@ -36,13 +36,13 @@ export default function Preview( { idBase, instance, isVisible } ) {
 	}
 
 	useEffect( () => {
-		if ( ! isPreviewFetched ) {
+		if ( isPreviewFetched ) {
 			return;
 		}
 
 		fetchPreviewHTML( idBase, instance, abortController )
 			.then( ( response ) => {
-				setIsPreviewFetched( false );
+				setIsPreviewFetched( true );
 				setSrcDoc( response.preview );
 			} )
 			.catch( ( error ) => {
