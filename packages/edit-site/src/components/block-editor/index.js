@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { useSelect, useDispatch } from '@wordpress/data';
-import { useCallback, useRef } from '@wordpress/element';
+import { useCallback, useMemo, useRef } from '@wordpress/element';
 import { useEntityBlockEditor } from '@wordpress/core-data';
 import {
 	BlockEditorProvider,
@@ -18,6 +18,7 @@ import {
 	__unstableIframe as Iframe,
 } from '@wordpress/block-editor';
 import { useMergeRefs } from '@wordpress/compose';
+import { store as interfaceStore } from '@wordpress/interface';
 
 /**
  * Internal dependencies
@@ -35,7 +36,14 @@ const LAYOUT = {
 };
 
 export default function BlockEditor( { setIsInserterOpen } ) {
-	const { settings, templateType, page, deviceType } = useSelect(
+	const {
+		settings,
+		templateType,
+		page,
+		deviceType,
+		isFixedToolbarActive,
+		isFocusModeActive,
+	} = useSelect(
 		( select ) => {
 			const {
 				getSettings,
@@ -44,6 +52,14 @@ export default function BlockEditor( { setIsInserterOpen } ) {
 				__experimentalGetPreviewDeviceType,
 			} = select( editSiteStore );
 			return {
+				isFixedToolbarActive: select( interfaceStore ).isFeatureActive(
+					'core/edit-site',
+					'fixedToolbar'
+				),
+				isFocusModeActive: select( interfaceStore ).isFeatureActive(
+					'core/edit-site',
+					'focusMode'
+				),
 				settings: getSettings( setIsInserterOpen ),
 				templateType: getEditedPostType(),
 				page: getPage(),
@@ -62,9 +78,18 @@ export default function BlockEditor( { setIsInserterOpen } ) {
 	const contentRef = useRef();
 	const mergedRefs = useMergeRefs( [ contentRef, useTypingObserver() ] );
 
+	const editorSettings = useMemo(
+		() => ( {
+			...settings,
+			hasFixedToolbar: isFixedToolbarActive,
+			focusMode: isFocusModeActive,
+		} ),
+		[ settings, isFixedToolbarActive, isFocusModeActive ]
+	);
+
 	return (
 		<BlockEditorProvider
-			settings={ settings }
+			settings={ editorSettings }
 			value={ blocks }
 			onInput={ onInput }
 			onChange={ onChange }

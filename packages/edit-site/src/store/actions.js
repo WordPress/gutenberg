@@ -3,11 +3,13 @@
  */
 import { parse, __unstableSerializeAndClean } from '@wordpress/blocks';
 import { controls, dispatch } from '@wordpress/data';
+import deprecated from '@wordpress/deprecated';
 import { apiFetch } from '@wordpress/data-controls';
 import { addQueryArgs, getPathAndQueryString } from '@wordpress/url';
 import { __ } from '@wordpress/i18n';
 import { store as noticesStore } from '@wordpress/notices';
 import { store as coreStore } from '@wordpress/core-data';
+import { store as interfaceStore } from '@wordpress/interface';
 
 /**
  * Internal dependencies
@@ -19,14 +21,23 @@ import isTemplateRevertable from '../utils/is-template-revertable';
  * Returns an action object used to toggle a feature flag.
  *
  * @param {string} feature Feature name.
- *
- * @return {Object} Action object.
  */
-export function toggleFeature( feature ) {
-	return {
-		type: 'TOGGLE_FEATURE',
-		feature,
-	};
+export function* toggleFeature( feature ) {
+	deprecated(
+		'`dispatch( editSiteStore ).toggleFeature( myFeature )` action',
+		{
+			since: '11.3',
+			alternative:
+				"`dispatch( interfaceStore ).toggleFeature( 'core/edit-site', myFeature )` action",
+		}
+	);
+
+	yield controls.dispatch(
+		interfaceStore.name,
+		'toggleFeature',
+		'core/edit-site',
+		feature
+	);
 }
 
 /**

@@ -2,7 +2,6 @@
  * Internal dependencies
  */
 import {
-	toggleFeature,
 	setTemplate,
 	addTemplate,
 	removeTemplate,
@@ -14,16 +13,6 @@ import {
 } from '../actions';
 
 describe( 'actions', () => {
-	describe( 'toggleFeature', () => {
-		it( 'should return TOGGLE_FEATURE action', () => {
-			const feature = 'name';
-			expect( toggleFeature( feature ) ).toEqual( {
-				type: 'TOGGLE_FEATURE',
-				feature,
-			} );
-		} );
-	} );
-
 	describe( 'setTemplate', () => {
 		it( 'should return the SET_TEMPLATE action when slug is provided', () => {
 			const templateId = 1;

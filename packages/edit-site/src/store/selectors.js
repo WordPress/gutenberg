@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { get, map } from 'lodash';
+import { map } from 'lodash';
 import createSelector from 'rememo';
 
 /**
@@ -9,7 +9,9 @@ import createSelector from 'rememo';
  */
 import { store as coreDataStore } from '@wordpress/core-data';
 import { createRegistrySelector } from '@wordpress/data';
+import deprecated from '@wordpress/deprecated';
 import { uploadMedia } from '@wordpress/media-utils';
+import { store as interfaceStore } from '@wordpress/interface';
 
 /**
  * Internal dependencies
@@ -33,9 +35,23 @@ import {
  *
  * @return {boolean} Is active.
  */
-export function isFeatureActive( state, feature ) {
-	return get( state.preferences.features, [ feature ], false );
-}
+export const isFeatureActive = createRegistrySelector(
+	( select ) => ( state, feature ) => {
+		deprecated(
+			'`select( editSiteStore ).isFeatureActive( myFeature )` action',
+			{
+				since: '11.3',
+				alternative:
+					"`select( interfaceStore ).isFeatureActive( 'core/edit-site', myFeature )` action",
+			}
+		);
+
+		return select( interfaceStore ).isFeatureActive(
+			'core/edit-site',
+			feature
+		);
+	}
+);
 
 /**
  * Returns the current editing canvas device type.
@@ -72,8 +88,6 @@ export const getSettings = createSelector(
 		const settings = {
 			...state.settings,
 			outlineMode: true,
-			focusMode: isFeatureActive( state, 'focusMode' ),
-			hasFixedToolbar: isFeatureActive( state, 'fixedToolbar' ),
 			__experimentalSetIsInserterOpened: setIsInserterOpen,
 		};
 
@@ -91,12 +105,7 @@ export const getSettings = createSelector(
 		};
 		return settings;
 	},
-	( state ) => [
-		getCanUserCreateMedia( state ),
-		state.settings,
-		isFeatureActive( state, 'focusMode' ),
-		isFeatureActive( state, 'fixedToolbar' ),
-	]
+	( state ) => [ getCanUserCreateMedia( state ), state.settings ]
 );
 
 /**

@@ -7,7 +7,6 @@ import { store as coreDataStore } from '@wordpress/core-data';
  * Internal dependencies
  */
 import {
-	isFeatureActive,
 	getCanUserCreateMedia,
 	getSettings,
 	getHomeTemplateId,
@@ -25,51 +24,6 @@ describe( 'selectors', () => {
 	getCanUserCreateMedia.registry = {
 		select: jest.fn( () => ( { canUser } ) ),
 	};
-
-	describe( 'isFeatureActive', () => {
-		it( 'is tolerant to an undefined features preference', () => {
-			// See: https://github.com/WordPress/gutenberg/issues/14580
-			const state = {
-				preferences: {},
-			};
-
-			expect( isFeatureActive( state, 'chicken' ) ).toBe( false );
-		} );
-
-		it( 'should return true if feature is active', () => {
-			const state = {
-				preferences: {
-					features: {
-						chicken: true,
-					},
-				},
-			};
-
-			expect( isFeatureActive( state, 'chicken' ) ).toBe( true );
-		} );
-
-		it( 'should return false if feature is not active', () => {
-			const state = {
-				preferences: {
-					features: {
-						chicken: false,
-					},
-				},
-			};
-
-			expect( isFeatureActive( state, 'chicken' ) ).toBe( false );
-		} );
-
-		it( 'should return false if feature is not referred', () => {
-			const state = {
-				preferences: {
-					features: {},
-				},
-			};
-
-			expect( isFeatureActive( state, 'chicken' ) ).toBe( false );
-		} );
-	} );
 
 	describe( 'getCanUserCreateMedia', () => {
 		it( "selects `canUser( 'create', 'media' )` from the core store", () => {
@@ -89,8 +43,6 @@ describe( 'selectors', () => {
 			const setInserterOpened = () => {};
 			expect( getSettings( state, setInserterOpened ) ).toEqual( {
 				outlineMode: true,
-				focusMode: false,
-				hasFixedToolbar: false,
 				__experimentalSetIsInserterOpened: setInserterOpened,
 			} );
 		} );
@@ -109,8 +61,6 @@ describe( 'selectors', () => {
 			expect( getSettings( state, setInserterOpened ) ).toEqual( {
 				outlineMode: true,
 				key: 'value',
-				focusMode: true,
-				hasFixedToolbar: true,
 				__experimentalSetIsInserterOpened: setInserterOpened,
 				mediaUpload: expect.any( Function ),
 			} );

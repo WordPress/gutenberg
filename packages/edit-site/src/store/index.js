@@ -17,7 +17,6 @@ export const storeConfig = {
 	actions,
 	selectors,
 	controls,
-	persist: [ 'preferences' ],
 };
 
 export const store = createReduxStore( STORE_NAME, storeConfig );

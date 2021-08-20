@@ -7,6 +7,8 @@ import {
 } from '@wordpress/block-library';
 import { render, unmountComponentAtNode } from '@wordpress/element';
 import { __experimentalFetchLinkSuggestions as fetchLinkSuggestions } from '@wordpress/core-data';
+import { dispatch } from '@wordpress/data';
+import { store as interfaceStore } from '@wordpress/interface';
 
 /**
  * Internal dependencies
@@ -43,6 +45,13 @@ export function initialize( id, settings ) {
 	settings.__experimentalFetchLinkSuggestions = ( search, searchOptions ) =>
 		fetchLinkSuggestions( search, searchOptions, settings );
 	settings.__experimentalSpotlightEntityBlocks = [ 'core/template-part' ];
+
+	dispatch( interfaceStore ).setFeatureDefaults( 'core/edit-site', {
+		fixedToolbar: false,
+		welcomeGuide: true,
+		showBlockBreadcrumbs: true,
+		themeStyles: true,
+	} );
 
 	const target = document.getElementById( id );
 	const reboot = reinitializeEditor.bind( null, target, settings );

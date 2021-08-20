@@ -2,36 +2,32 @@
  * WordPress dependencies
  */
 import { __, _x } from '@wordpress/i18n';
-import { moreVertical } from '@wordpress/icons';
-import { DropdownMenu, MenuGroup } from '@wordpress/components';
-import { ActionItem } from '@wordpress/interface';
+import { MenuGroup } from '@wordpress/components';
+import {
+	ActionItem,
+	MoreMenuDropdown,
+	MoreMenuFeatureToggle,
+} from '@wordpress/interface';
 
 /**
  * Internal dependencies
  */
-import FeatureToggle from '../feature-toggle';
 import ToolsMoreMenuGroup from '../tools-more-menu-group';
 
 const POPOVER_PROPS = {
 	className: 'edit-site-more-menu__content',
-	position: 'bottom left',
-};
-const TOGGLE_PROPS = {
-	tooltipPosition: 'bottom',
 };
 
 const MoreMenu = () => (
-	<DropdownMenu
+	<MoreMenuDropdown
 		className="edit-site-more-menu"
-		icon={ moreVertical }
-		label={ __( 'More tools & options' ) }
 		popoverProps={ POPOVER_PROPS }
-		toggleProps={ TOGGLE_PROPS }
 	>
 		{ ( { onClose } ) => (
 			<>
 				<MenuGroup label={ _x( 'View', 'noun' ) }>
-					<FeatureToggle
+					<MoreMenuFeatureToggle
+						scope="core/edit-site"
 						feature="fixedToolbar"
 						label={ __( 'Top toolbar' ) }
 						info={ __(
@@ -40,7 +36,8 @@ const MoreMenu = () => (
 						messageActivated={ __( 'Top toolbar activated' ) }
 						messageDeactivated={ __( 'Top toolbar deactivated' ) }
 					/>
-					<FeatureToggle
+					<MoreMenuFeatureToggle
+						scope="core/edit-site"
 						feature="focusMode"
 						label={ __( 'Spotlight mode' ) }
 						info={ __( 'Focus on one block at a time' ) }
@@ -59,7 +56,7 @@ const MoreMenu = () => (
 				<ToolsMoreMenuGroup.Slot fillProps={ { onClose } } />
 			</>
 		) }
-	</DropdownMenu>
+	</MoreMenuDropdown>
 );
 
 export default MoreMenu;
