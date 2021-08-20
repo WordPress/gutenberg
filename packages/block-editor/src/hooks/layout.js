@@ -47,7 +47,7 @@ function LayoutPanel( { setAttributes, attributes, name: blockName } ) {
 	const {
 		allowSwitching: canBlockSwitchLayout,
 		allowEditing = true,
-		allowInheriting,
+		allowInheriting = true,
 		default: defaultBlockLayout,
 	} = getBlockSupport( blockName, layoutBlockSupportKey ) || {};
 
