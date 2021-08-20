@@ -116,20 +116,22 @@ function UnitControl( {
 	};
 
 	const renderUnitPicker = useCallback( () => {
-		if ( hasUnits( units ) ) {
+		if ( units === false ) {
 			return null;
 		}
 		return (
 			<View style={ styles.unitMenu } ref={ anchorNodeRef }>
 				{ renderUnitButton }
-				<Picker
-					ref={ pickerRef }
-					options={ units }
-					onChange={ onUnitChange }
-					hideCancelButton
-					leftAlign
-					getAnchor={ getAnchor }
-				/>
+				{ hasUnits( units ) && units?.length > 1 ? (
+					<Picker
+						ref={ pickerRef }
+						options={ units }
+						onChange={ onUnitChange }
+						hideCancelButton
+						leftAlign
+						getAnchor={ getAnchor }
+					/>
+				) : null }
 			</View>
 		);
 	}, [ pickerRef, units, onUnitChange, getAnchor, renderUnitButton ] );
