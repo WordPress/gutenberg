@@ -17,9 +17,7 @@ import { Heading } from '../heading';
 import { contextConnect, PolymorphicComponentProps } from '../ui/context';
 import { useConfirm } from './hook';
 import type { KeyboardEvent } from 'react';
-import { ESCAPE } from '@wordpress/keycodes';
 
-// @todo deal with overlay click event, close dialog
 // @todo add type declarations for the react-confirm functions
 function Confirm(
 	props: PolymorphicComponentProps< OwnProps, 'div', false >,
