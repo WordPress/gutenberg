@@ -14,6 +14,7 @@ import { BlockCaption } from '@wordpress/block-editor';
 import { __, sprintf } from '@wordpress/i18n';
 import { memo, useState } from '@wordpress/element';
 import { SandBox } from '@wordpress/components';
+import { withPreferredColorScheme } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -30,6 +31,7 @@ const EmbedPreview = ( {
 	label,
 	onFocus,
 	preview,
+	preferredColorScheme,
 	previewable,
 	type,
 	url,
@@ -96,6 +98,7 @@ const EmbedPreview = ( {
 							html={ html }
 							title={ iframeTitle }
 							type={ sandboxClassnames }
+							preferredColorScheme={ preferredColorScheme }
 							providerUrl={ providerUrl }
 							url={ url }
 						/>
@@ -137,4 +140,4 @@ const EmbedPreview = ( {
 	);
 };
 
-export default memo( EmbedPreview );
+export default memo( withPreferredColorScheme( EmbedPreview ) );
