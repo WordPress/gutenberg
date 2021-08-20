@@ -1,8 +1,13 @@
+export { default as ActionItem } from './action-item';
 export { default as ComplementaryArea } from './complementary-area';
 export { default as ComplementaryAreaMoreMenuItem } from './complementary-area-more-menu-item';
 export { default as FullscreenMode } from './fullscreen-mode';
 export { default as InterfaceSkeleton } from './interface-skeleton';
-export { default as PinnedItems } from './pinned-items';
 export { default as MoreMenuDropdown } from './more-menu-dropdown';
 export { default as MoreMenuFeatureToggle } from './more-menu-feature-toggle';
-export { default as ActionItem } from './action-item';
+export { default as PinnedItems } from './pinned-items';
+export { default as PreferencesModal } from './preferences-modal';
+export { default as PreferencesModalTabs } from './preferences-modal/tabs';
+export { default as PreferencesModalSection } from './preferences-modal/section';
+export { default as PreferencesModalToggle } from './preferences-modal-toggle';
+export { default as PreferencesModalFeatureToggle } from './preferences-modal-toggle/feature-toggle';

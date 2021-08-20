@@ -26,6 +26,7 @@ import {
 	store as editorStore,
 } from '@wordpress/editor';
 import { store as coreStore } from '@wordpress/core-data';
+import { PreferencesModalFeatureToggle } from '@wordpress/interface';
 
 /**
  * Internal dependencies
@@ -35,7 +36,6 @@ import {
 	EnablePluginDocumentSettingPanelOption,
 	EnablePublishSidebarOption,
 	EnablePanelOption,
-	EnableFeature,
 } from './options';
 import MetaBoxesSection from './meta-boxes-section';
 import { store as editPostStore } from '../../store';
@@ -76,7 +76,7 @@ export default function PreferencesModal() {
 		() => [
 			{
 				name: 'general',
-				tabLabel: __( 'General' ),
+				label: __( 'General' ),
 				content: (
 					<>
 						{ isLargeViewport && (
@@ -103,35 +103,40 @@ export default function PreferencesModal() {
 								'Customize options related to the block editor interface and editing flow.'
 							) }
 						>
-							<EnableFeature
-								featureName="reducedUI"
+							<PreferencesModalFeatureToggle
+								scope="core/edit-post"
+								feature="reducedUI"
 								help={ __(
 									'Compacts options and outlines in the toolbar.'
 								) }
 								label={ __( 'Reduce the interface' ) }
 							/>
-							<EnableFeature
-								featureName="focusMode"
+							<PreferencesModalFeatureToggle
+								scope="core/edit-post"
+								feature="focusMode"
 								help={ __(
 									'Highlights the current block and fades other content.'
 								) }
 								label={ __( 'Spotlight mode' ) }
 							/>
-							<EnableFeature
-								featureName="showIconLabels"
+							<PreferencesModalFeatureToggle
+								scope="core/edit-post"
+								feature="showIconLabels"
 								help={ __( 'Shows text instead of icons.' ) }
 								label={ __( 'Display button labels' ) }
 							/>
-							<EnableFeature
-								featureName="themeStyles"
+							<PreferencesModalFeatureToggle
+								scope="core/edit-post"
+								feature="themeStyles"
 								help={ __(
 									'Make the editor look like your theme.'
 								) }
 								label={ __( 'Use theme styles' ) }
 							/>
 							{ showBlockBreadcrumbsOption && (
-								<EnableFeature
-									featureName="showBlockBreadcrumbs"
+								<PreferencesModalFeatureToggle
+									scope="core/edit-post"
+									feature="showBlockBreadcrumbs"
 									help={ __(
 										'Shows block breadcrumbs at the bottom of the editor.'
 									) }
@@ -144,7 +149,7 @@ export default function PreferencesModal() {
 			},
 			{
 				name: 'blocks',
-				tabLabel: __( 'Blocks' ),
+				label: __( 'Blocks' ),
 				content: (
 					<>
 						<Section
@@ -153,15 +158,17 @@ export default function PreferencesModal() {
 								'Customize how you interact with blocks in the block library and editing canvas.'
 							) }
 						>
-							<EnableFeature
-								featureName="mostUsedBlocks"
+							<PreferencesModalFeatureToggle
+								scope="core/edit-post"
+								feature="mostUsedBlocks"
 								help={ __(
 									'Places the most frequent blocks in the block library.'
 								) }
 								label={ __( 'Show most used blocks' ) }
 							/>
-							<EnableFeature
-								featureName="keepCaretInsideBlock"
+							<PreferencesModalFeatureToggle
+								scope="core/edit-post"
+								feature="keepCaretInsideBlock"
 								help={ __(
 									'Aids screen readers by stopping text caret from leaving blocks.'
 								) }
@@ -183,7 +190,7 @@ export default function PreferencesModal() {
 			},
 			{
 				name: 'panels',
-				tabLabel: __( 'Panels' ),
+				label: __( 'Panels' ),
 				content: (
 					<>
 						<Section
@@ -333,6 +340,7 @@ export default function PreferencesModal() {
 			</Navigation>
 		);
 	}
+
 	return (
 		<Modal
 			className="edit-post-preferences-modal"

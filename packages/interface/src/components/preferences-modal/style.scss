@@ -1,0 +1,147 @@
+$vertical-tabs-width: 160px;
+
+// Modal styles.
+.interface-preferences-modal {
+	// To keep modal dimensions consistent as subsections are navigated, width
+	// and height are used instead of max-(width/height).
+	@include break-small() {
+		width: calc(100% - #{ $grid-unit-20 * 2 });
+		height: calc(100% - #{ $header-height * 2 });
+	}
+	@include break-medium() {
+		width: $break-medium - $grid-unit-20 * 2;
+	}
+	@include break-large() {
+		height: 70%;
+	}
+
+	// Clears spacing to flush fit the navigation component to the modal edges.
+	@media (max-width: #{ ($break-medium - 1) }) {
+		.components-modal__content {
+			padding: 0;
+
+			&::before {
+				content: none;
+			}
+		}
+	}
+
+	// TODO - find out why this is needed.
+	.components-base-control__help {
+		margin: -$grid-unit-10 0 $grid-unit-10 58px;
+		font-size: $helptext-font-size;
+		font-style: normal;
+		color: $gray-700;
+	}
+}
+
+// Tab styles.
+.interface-preferences-modal__tab-panel {
+	.components-tab-panel__tabs {
+		position: absolute;
+		top: $header-height + $grid-unit-30;
+
+		// Aligns button text instead of button box.
+		left: $grid-unit-20;
+		width: $vertical-tabs-width;
+
+		.components-tab-panel__tabs-item {
+			border-radius: $radius-block-ui;
+			font-weight: 400;
+			&.is-active {
+				background: $gray-100;
+				box-shadow: none;
+				font-weight: 500;
+			}
+			&:focus:not(:disabled) {
+				box-shadow: inset 0 0 0 var(--wp-admin-border-width-focus) var(--wp-admin-theme-color);
+			}
+		}
+	}
+
+	.components-tab-panel__tab-content {
+		padding-left: $grid-unit-30;
+		margin-left: $vertical-tabs-width;
+	}
+}
+
+.interface-preferences-modal__navigation {
+	background-color: $white;
+	padding: 0;
+	max-height: 100%;
+	overflow-y: auto;
+
+	> * {
+		// Matches spacing cleared from the modal content element.
+		padding: $grid-unit-30 $grid-unit-40;
+	}
+}
+
+.interface-preferences-modal__navigation-menu {
+	margin: 0;
+	color: $gray-900;
+
+	.components-navigation__menu-title-heading {
+		color: inherit;
+		border-bottom: 1px solid $gray-300;
+		padding-left: 0;
+		padding-right: 0;
+	}
+
+	.components-navigation__back-button {
+		color: inherit;
+		padding-left: 0;
+		&:hover {
+			color: var(--wp-admin-theme-color);
+		}
+	}
+}
+
+.interface-preferences-modal__navigation-item {
+	// The inheritance of some items is quite strong, so we have to duplicate this one.
+	color: $gray-900;
+
+	& > button {
+		color: inherit;
+		padding: 3px $grid-unit-20;
+		height: $grid-unit-60;
+
+		// Aligns button text instead of button box.
+		margin: 0 #{-$grid-unit-20};
+		width: calc(#{$grid-unit-40} + 100%);
+
+		&:focus {
+			background: $gray-100;
+			font-weight: 500;
+		}
+
+		&:hover {
+			color: var(--wp-admin-theme-color);
+		}
+	}
+
+	.components-toggle-control__label {
+		color: inherit;
+	}
+}
+
+// Section styles.
+.interface-preferences-modal__section {
+	margin: 0 0 2.5rem 0;
+
+	&:last-child {
+		margin: 0;
+	}
+}
+
+.interface-preferences-modal__section-title {
+	font-size: 0.9rem;
+	font-weight: 600;
+}
+
+.interface-preferences-modal__section-description {
+	margin: -$grid-unit-10 0 $grid-unit-10 0;
+	font-size: $helptext-font-size;
+	font-style: normal;
+	color: $gray-700;
+}
