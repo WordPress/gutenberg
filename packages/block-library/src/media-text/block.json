@@ -92,6 +92,9 @@
 		"color": {
 			"gradients": true,
 			"link": true
+		},
+		"__experimentalLayout": {
+			"allowEditing": false
 		}
 	},
 	"editorStyle": "wp-block-media-text-editor",

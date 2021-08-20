@@ -86,7 +86,7 @@ function LayoutPanel( { setAttributes, attributes, name: blockName } ) {
 
 				{ ! inherit && layoutType && (
 					<layoutType.edit
-						layout={ layout }
+						layout={ usedLayout }
 						onChange={ onChangeLayout }
 					/>
 				) }
