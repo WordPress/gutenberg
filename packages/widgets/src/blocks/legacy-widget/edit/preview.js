@@ -7,36 +7,65 @@ import classnames from 'classnames';
  * WordPress dependencies
  */
 import { useRefEffect } from '@wordpress/compose';
-import { useState } from '@wordpress/element';
+import { useState, useEffect } from '@wordpress/element';
 import { Placeholder, Spinner, Disabled } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import apiFetch from '@wordpress/api-fetch';
 
-async function renderPreview( idBase, instance ) {
-	const restRoute = `/wp/v2/widget-types/${ idBase }/render`;
-	return await apiFetch( {
-		path: restRoute,
-		method: 'POST',
-		data: {
-			id_base: idBase,
-			instance,
-		},
-	} );
-}
-
 export default function Preview( { idBase, instance, isVisible } ) {
 	const [ isLoaded, setIsLoaded ] = useState( false );
+	const [ srcDoc, setSrcDoc ] = useState( '' );
+	const [ isPreviewFetched, setIsPreviewFetched ] = useState( true );
+
+	const abortController =
+		typeof window.AbortController === 'undefined'
+			? undefined
+			: new window.AbortController();
+
+	async function fetchPreviewHTML() {
+		const restRoute = `/wp/v2/widget-types/${ idBase }/render`;
+		return await apiFetch( {
+			path: restRoute,
+			method: 'POST',
+			signal: abortController?.signal,
+			data: {
+				id_base: idBase,
+				instance,
+			},
+		} );
+	}
+
+	useEffect( () => {
+		if ( ! isPreviewFetched ) {
+			return;
+		}
+
+		fetchPreviewHTML( idBase, instance, abortController )
+			.then( ( response ) => {
+				setIsPreviewFetched( false );
+				setSrcDoc( response.preview );
+			} )
+			.catch( ( error ) => {
+				if ( error.name === 'AbortError' ) {
+					// We don't want to log abort errors.
+					return;
+				}
+				window.console.error(
+					`An error occurred while trying to fetch preview: ${ error.message }`,
+					error
+				);
+			} );
+
+		return () => {
+			if ( typeof abortController !== 'undefined' ) {
+				abortController.abort();
+			}
+		};
+	} );
 
 	// Resize the iframe on either the load event, or when the iframe becomes visible.
 	const ref = useRefEffect(
 		( iframe ) => {
-			if ( ! iframe.previewLoaded ) {
-				renderPreview( idBase, instance ).then( ( response ) => {
-					iframe.srcdoc = response.preview;
-					iframe.previewLoaded = true;
-				} );
-			}
-
 			// Only set height if the iframe is loaded,
 			// or it will grow to an unexpected large height in Safari if it's hidden initially.
 			if ( ! isLoaded ) {
@@ -114,6 +143,7 @@ export default function Preview( { idBase, instance, isVisible } ) {
 						// TODO: This chokes when the query param is too big.
 						// Ideally, we'd render a <ServerSideRender>. Maybe by
 						// rendering one in an iframe via a portal.
+						srcDoc={ srcDoc }
 						onLoad={ ( event ) => {
 							// To hide the scrollbars of the preview frame for some edge cases,
 							// such as negative margins in the Gallery Legacy Widget.
