@@ -26,34 +26,56 @@ function render_block_core_breadcrumbs( $attributes, $content, $block ) {
 		return '';
 	}
 
-	if ( ! empty( $attributes['nestingLevel'] ) ) {
-		$ancestor_ids = array_slice(
-			$ancestor_ids,
-			0,
-			intval( $attributes['nestingLevel'] )
+	$breadcrumbs = array();
+
+	// Prepend site title breadcrumb if available and set to show.
+	$site_title = get_bloginfo( 'name' );
+	if ( $site_title && ! empty( $attributes['showSiteTitle'] ) ) {
+		$site_title = ! empty( $attributes['siteTitleOverride'] ) ?
+			$attributes['siteTitleOverride'] :
+			$site_title;
+
+		$breadcrumbs[] = array(
+			'url'   => get_bloginfo( 'url' ),
+			'title' => $site_title
+		);
+	}
+
+	// Construct remaining breadcrumbs from ancestor ids.
+	foreach ( array_reverse( $ancestor_ids ) as $ancestor_id ) {
+		$breadcrumbs[] = array(
+			'url'   => get_the_permalink( $ancestor_id ),
+			'title' => get_the_title( $ancestor_id )
+		);
+	}
+
+	// Trim the list of breadcrumbs based on nesting level if available.
+	if ( ! empty( $attributes['nestingLevel'] ) && is_numeric( $attributes['nestingLevel'] ) ) {
+		$breadcrumbs = array_slice(
+			$breadcrumbs,
+			0 - intval( $attributes['nestingLevel'] )
+		);
+	}
+
+	// Append current page title if set to show.
+	if ( ! empty( $attributes['showCurrentPageTitle'] ) ) {
+		$breadcrumbs[] = array(
+			'url'   => get_the_permalink( $post_id ),
+			'title' => get_the_title( $post_id )
 		);
 	}
 
 	$inner_markup = '';
 
-	foreach ( array_reverse( $ancestor_ids ) as $index => $ancestor_id ) {
+	foreach ( $breadcrumbs as $index => $breadcrumb ) {
 		$show_separator =
 			! empty( $attributes['showCurrentPageTitle'] ) ||
-			$index < count( $ancestor_ids ) - 1;
-		$inner_markup  .= build_block_core_breadcrumbs_inner_markup_item(
-			$ancestor_id,
+			$index < count( $breadcrumbs ) - 1;
+		$inner_markup .= build_block_core_breadcrumbs_inner_markup_item(
+			$breadcrumb['url'],
+			$breadcrumb['title'],
 			$attributes,
 			$index,
-			$show_separator
-		);
-	}
-
-	if ( ! empty( $attributes['showCurrentPageTitle'] ) ) {
-		$show_separator = false;
-		$inner_markup  .= build_block_core_breadcrumbs_inner_markup_item(
-			$post_id,
-			$attributes,
-			count( $ancestor_ids ),
 			$show_separator
 		);
 	}
@@ -71,16 +93,17 @@ function render_block_core_breadcrumbs( $attributes, $content, $block ) {
 /**
  * Builds the markup for a single Breadcrumb item.
  *
- * Used when iterating over a list of ancestor post ids.
+ * Used when iterating over a list of breadcrumb urls and titles.
  *
- * @param int   $post_id        The post id for this item.
- * @param array $attributes     Block attributes.
- * @param int   $index          The position in a list of ids.
- * @param bool  $show_separator Whether to show the separator character where available.
+ * @param string $url            The url for the link in the breadcrumb.
+ * @param string $title          The label/title for the breadcrumb item.
+ * @param array  $attributes     Block attributes.
+ * @param int    $index          The position in a list of ids.
+ * @param bool   $show_separator Whether to show the separator character where available.
  *
  * @return string The markup for a single breadcrumb item wrapped in an `li` element.
  */
-function build_block_core_breadcrumbs_inner_markup_item( $post_id, $attributes, $index, $show_separator = true ) {
+function build_block_core_breadcrumbs_inner_markup_item( $url, $title, $attributes, $index, $show_separator = true ) {
 	$li_class        = 'wp-block-breadcrumbs__item';
 	$separator_class = 'wp-block-breadcrumbs__separator';
 
@@ -99,14 +122,12 @@ function build_block_core_breadcrumbs_inner_markup_item( $post_id, $attributes, 
 		);
 	}
 
-	if ( ! empty( $post_id ) ) {
-		$markup .= sprintf(
-			'<a itemprop="item" href="%s">%s%s</a>',
-			get_the_permalink( $post_id ),
-			sprintf( '<span itemprop="name">%s</span>', get_the_title( $post_id ) ),
-			sprintf( '<meta itemprop="position" content="%s" />', $index + 1 )
-		);
-	}
+	$markup .= sprintf(
+		'<a itemprop="item" href="%s">%s%s</a>',
+		esc_url( $url ),
+		sprintf( '<span itemprop="name">%s</span>', esc_html( $title ) ),
+		sprintf( '<meta itemprop="position" content="%s" />', $index + 1 )
+	);
 
 	if (
 		$show_separator &&
