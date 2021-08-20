@@ -15,40 +15,40 @@ import { SandBox } from '@wordpress/components';
  * WordPress core embed-template on resize: https://github.com/WordPress/WordPress/blob/HEAD/wp-includes/js/wp-embed-template.js#L187
  */
 const observeAndResizeJS = `
-     ( function() {
-         if ( ! document.body || ! window.parent ) {
-             return;
-         }
- 
-         function sendResize( { data: { secret, message, value } = {} } ) {
-             if (
-                 [ secret, message, value ].some(
-                     ( attribute ) => ! attribute
-                 ) ||
-                 message !== 'height'
-             ) {
-                 return;
-             }
- 
-             document
-                 .querySelectorAll( \`iframe[data-secret="\${ secret }"\` )
-                 .forEach( ( iframe ) => {
-                     if ( +iframe.height !== value ) {
-                         iframe.height = value;
-                     }
-                 } );
- 
-             // The function postMessage is exposed by the react-native-webview library 
-             // to communicate between React Native and the WebView, in this case, 
-             // we use it for notifying resize changes.
-             window.ReactNativeWebView.postMessage(JSON.stringify( {
-                 action: 'resize',
-                 height: value,
-             }));
-         }
- 
-         window.addEventListener( 'message', sendResize );
- } )();`;
+    ( function() {
+        if ( ! document.body || ! window.parent ) {
+            return;
+        }
+
+        function sendResize( { data: { secret, message, value } = {} } ) {
+            if (
+                [ secret, message, value ].some(
+                    ( attribute ) => ! attribute
+                ) ||
+                message !== 'height'
+            ) {
+                return;
+            }
+
+            document
+                .querySelectorAll( 'iframe[data-secret="' + secret + '"' )
+                .forEach( ( iframe ) => {  
+                    if ( +iframe.height !== value ) {
+                        iframe.height = value;
+                    }
+                } );
+
+            // The function postMessage is exposed by the react-native-webview library 
+            // to communicate between React Native and the WebView, in this case, 
+            // we use it for notifying resize changes.
+            window.ReactNativeWebView.postMessage(JSON.stringify( {
+                action: 'resize',
+                height: value,
+            }));
+        }
+
+        window.addEventListener( 'message', sendResize );
+} )();`;
 
 function WpEmbedPreview( { html, ...rest } ) {
 	const wpEmbedHtml = useMemo( () => {
