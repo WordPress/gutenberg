@@ -48,9 +48,7 @@ export function initialize( id, settings ) {
 
 	dispatch( interfaceStore ).setFeatureDefaults( 'core/edit-site', {
 		fixedToolbar: false,
-		welcomeGuide: true,
-		showBlockBreadcrumbs: true,
-		themeStyles: true,
+		focusMode: false,
 	} );
 
 	const target = document.getElementById( id );
