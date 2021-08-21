@@ -48,7 +48,6 @@ function Confirm(
 
 	return (
 		<div
-			{ ...otherProps }
 			role={ role }
 			ref={ forwardedRef }
 			className={ wrapperClassName }
