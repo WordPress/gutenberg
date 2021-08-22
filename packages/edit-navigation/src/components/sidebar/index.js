@@ -83,7 +83,7 @@ export default function Sidebar( {
 			isActiveByDefault={ isLargeViewport }
 			header={ <SidebarHeader sidebarName={ sidebarName } /> }
 			headerClassName="edit-navigation-sidebar__panel-tabs"
-			isPinnable={ true }
+			isPinnable
 		>
 			{ sidebarName === SIDEBAR_MENU && (
 				<>
