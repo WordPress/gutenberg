@@ -232,6 +232,10 @@ addFilter(
  * ```
  */
 export const registerCoreBlocks = () => {
+	// IMPORTANT: The order blocks appear here determines the order they are displayed in the native mobile block inserter.
+	// Exceptions include inner blocks (button, column, etc) and blocks which don't appear in the block inserter (e.g. missing) – the position
+	// of these blocks is irrelevant in the context of the block inserter.
+	//
 	// When adding new blocks to this list please also consider updating /src/block-support/supported-blocks.json in the Gutenberg-Mobile repo
 	[
 		paragraph,
