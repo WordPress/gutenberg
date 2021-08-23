@@ -1,48 +1,51 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`MetaBoxesSection renders a Custom Fields option 1`] = `
-<Section
-  title="Advanced panels"
+<PreferencesModalSection
+  description="Add extra areas to the editor."
+  title="Additional"
 >
   <WithSelect(EnableCustomFieldsOption)
     label="Custom fields"
   />
-</Section>
+</PreferencesModalSection>
 `;
 
 exports[`MetaBoxesSection renders a Custom Fields option and meta box options 1`] = `
-<Section
-  title="Advanced panels"
+<PreferencesModalSection
+  description="Add extra areas to the editor."
+  title="Additional"
 >
   <WithSelect(EnableCustomFieldsOption)
     label="Custom fields"
   />
-  <WithSelect(IfCondition(WithDispatch(BaseOption)))
+  <WithSelect(IfCondition(WithDispatch(PreferencesModalToggle)))
     key="test1"
     label="Meta Box 1"
     panelName="meta-box-test1"
   />
-  <WithSelect(IfCondition(WithDispatch(BaseOption)))
+  <WithSelect(IfCondition(WithDispatch(PreferencesModalToggle)))
     key="test2"
     label="Meta Box 2"
     panelName="meta-box-test2"
   />
-</Section>
+</PreferencesModalSection>
 `;
 
 exports[`MetaBoxesSection renders meta box options 1`] = `
-<Section
-  title="Advanced panels"
+<PreferencesModalSection
+  description="Add extra areas to the editor."
+  title="Additional"
 >
-  <WithSelect(IfCondition(WithDispatch(BaseOption)))
+  <WithSelect(IfCondition(WithDispatch(PreferencesModalToggle)))
     key="test1"
     label="Meta Box 1"
     panelName="meta-box-test1"
   />
-  <WithSelect(IfCondition(WithDispatch(BaseOption)))
+  <WithSelect(IfCondition(WithDispatch(PreferencesModalToggle)))
     key="test2"
     label="Meta Box 2"
     panelName="meta-box-test2"
   />
-</Section>
+</PreferencesModalSection>
 `;

@@ -29,7 +29,7 @@ import {
 } from './options';
 import { store as editPostStore } from '../../store';
 
-function MetaBoxesSection() {
+export function MetaBoxesSection() {
 	const { areCustomFieldsRegistered, metaBoxes } = useSelect( ( select ) => {
 		const { getEditorSettings } = select( editorStore );
 		const { getAllMetaBoxes } = select( editPostStore );
