@@ -1,4 +1,9 @@
 <?php
+/**
+ * REST API: WP_REST_Widget_Render_Endpoint_Polyfill class
+ *
+ * @package gutenberg
+ */
 
 /**
  * Polyfill API class to render widgets via the REST API.
@@ -11,8 +16,8 @@ class WP_REST_Widget_Render_Endpoint_Polyfill extends \WP_REST_Controller {
 	 * Constructor.
 	 */
 	public function __construct() {
-		$this->namespace = 'wp/v2';
-		$this->rest_base = 'widget-types';
+		$this->namespace              = 'wp/v2';
+		$this->rest_base              = 'widget-types';
 		$this->full_endpoint_instance = new WP_REST_Widget_Types_Controller();
 	}
 
@@ -24,7 +29,7 @@ class WP_REST_Widget_Render_Endpoint_Polyfill extends \WP_REST_Controller {
 	public function register_routes() {
 		$route = '/' . $this->rest_base . '/(?P<id>[a-zA-Z0-9_-]+)/render';
 
-		// Don't override if already registered
+		// Don't override if already registered.
 		if ( rest_get_server()->get_route_options( $route ) ) {
 			return;
 		}
@@ -38,12 +43,12 @@ class WP_REST_Widget_Render_Endpoint_Polyfill extends \WP_REST_Controller {
 					'callback'            => array( $this, 'render' ),
 					'args'                => array(
 						'id_base'  => array(
-							'description' => __( 'The widget type id.' ),
+							'description' => __( 'The widget type id.', 'default' ),
 							'type'        => 'string',
 							'required'    => true,
 						),
 						'instance' => array(
-							'description' => __( 'Current instance settings of the widget.' ),
+							'description' => __( 'Current instance settings of the widget.', 'default' ),
 							'type'        => 'object',
 						),
 					),
@@ -72,7 +77,7 @@ class WP_REST_Widget_Render_Endpoint_Polyfill extends \WP_REST_Controller {
 	 * Renders a page containing a preview of the requested Legacy Widget block.
 	 *
 	 * @param string $id_base The id base of the requested widget.
-	 * @param array $instance The widget instance attributes.
+	 * @param array  $instance The widget instance attributes.
 	 *
 	 * @return string Rendered Legacy Widget block preview.
 	 */
@@ -121,14 +126,3 @@ class WP_REST_Widget_Render_Endpoint_Polyfill extends \WP_REST_Controller {
 	}
 
 }
-
-/**
- * Registers routes from the WP_REST_Widget_Render_Endpoint_Polyfill class.
- */
-function setup_widget_render_api_endpoint_polyfill() {
-	$polyfill = new WP_REST_Widget_Render_Endpoint_Polyfill();
-	$polyfill->register_routes();
-}
-
-// Priority should be larger than 99 which is the one used for registering the core routes.
-add_action( 'rest_api_init', 'setup_widget_render_api_endpoint_polyfill', 100 );
