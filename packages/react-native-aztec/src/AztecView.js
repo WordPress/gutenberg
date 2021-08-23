@@ -215,16 +215,16 @@ class AztecView extends Component {
 		// https://github.com/WordPress/gutenberg/issues/23611
 		const { style } = this.props;
 
-		if ( style.hasOwnProperty( 'lineHeight' ) ) {
-			delete style.lineHeight;
-			window.console.warn(
-				"Removing lineHeight style as it's not supported by native AztecView"
-			);
-			// IMPORTANT: Current Gutenberg implementation is supporting line-height without unit e.g. 'line-height':1.5
-			// and library which we are using to convert css to react-native requires unit to be included with dimension
-			// https://github.com/kristerkari/css-to-react-native-transform/blob/945866e84a505fdfb1a43b03ebe4bd32784a7f22/src/index.spec.js#L1234
-			// which means that we would need to patch the library if we want to support line-height from native AztecView in the future.
-		}
+		// if ( style.hasOwnProperty( 'lineHeight' ) ) {
+		// 	delete style.lineHeight;
+		// 	window.console.warn(
+		// 		"Removing lineHeight style as it's not supported by native AztecView"
+		// 	);
+		// 	// IMPORTANT: Current Gutenberg implementation is supporting line-height without unit e.g. 'line-height':1.5
+		// 	// and library which we are using to convert css to react-native requires unit to be included with dimension
+		// 	// https://github.com/kristerkari/css-to-react-native-transform/blob/945866e84a505fdfb1a43b03ebe4bd32784a7f22/src/index.spec.js#L1234
+		// 	// which means that we would need to patch the library if we want to support line-height from native AztecView in the future.
+		// }
 
 		return (
 			<TouchableWithoutFeedback onPress={ this._onPress }>
