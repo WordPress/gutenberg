@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 18.0.0 (2021-08-23)
+
 ### Breaking Changes
 
 -   Increase the minimum Node.js version to v12.13 matching requirements from bundled dependencies ([#33818](https://github.com/WordPress/gutenberg/pull/33818)).
@@ -23,6 +25,10 @@
 
 -   The bundled `@svgr/webpack` dependency has been updated from requiring `^5.2.0` to requiring `^5.5.0` ([#33818](https://github.com/WordPress/gutenberg/pull/33818)).
 -   The bundled `webpack-bundle-analyzer` dependency has been updated from requiring `^4.2.0` to requiring `^4.4.2` ([#33818](https://github.com/WordPress/gutenberg/pull/33818)).
+
+### Bug Fixes
+
+-   Add missing fallback for target in webpack 5 config ([#34112](https://github.com/WordPress/gutenberg/pull/34112)),
 
 ## 17.1.0 (2021-07-29)
 

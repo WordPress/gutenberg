@@ -10,7 +10,13 @@ For each user feature we should also add a importance categorization label  to i
 -->
 
 ## Unreleased
+
+## 1.60.0
 -   [**] Embed block: Add "Resize for smaller devices" setting. [#33654]
+
+## 1.59.2
+-   [*] Inserter: Prevent non-deterministic order of inserter items [#34078]
+-   [*] Fix missing block title of core/latest-posts block [#34116]
 
 ## 1.59.1
 -   [*] Global styles - Add color to the block styles filter list [#34000]
