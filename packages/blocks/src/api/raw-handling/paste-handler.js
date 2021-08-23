@@ -14,7 +14,7 @@ import { getPhrasingContentSchema, removeInvalidHTML } from '@wordpress/dom';
 import { htmlToBlocks } from './html-to-blocks';
 import { hasBlockSupport } from '../registration';
 import { getBlockInnerHTML } from '../serializer';
-import { parseWithGrammar } from '../parser';
+import parse from '../parser';
 import normaliseBlocks from './normalise-blocks';
 import specialCommentConverter from './special-comment-converter';
 import commentRemover from './comment-remover';
@@ -108,7 +108,7 @@ export function pasteHandler( {
 		const content = HTML ? HTML : plainText;
 
 		if ( content.indexOf( '<!-- wp:' ) !== -1 ) {
-			return parseWithGrammar( content );
+			return parse( content );
 		}
 	}
 

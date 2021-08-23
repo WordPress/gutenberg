@@ -4,7 +4,8 @@
 		"name": "core/post-featured-image",
 		"isValid": true,
 		"attributes": {
-			"isLink": false
+			"isLink": false,
+			"scale": "cover"
 		},
 		"innerBlocks": [],
 		"originalContent": ""

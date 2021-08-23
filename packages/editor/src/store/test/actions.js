@@ -400,32 +400,17 @@ describe( 'Post generator actions', () => {
 
 describe( 'Editor actions', () => {
 	describe( 'setupEditor()', () => {
-		const post = { content: { raw: '' }, status: 'publish' };
-
-		let fulfillment;
-		const reset = ( edits, template ) =>
-			( fulfillment = actions.setupEditor( post, edits, template ) );
-		beforeAll( () => {
-			reset();
-		} );
-
-		it( 'should yield action object for resetPost', () => {
-			const { value } = fulfillment.next();
+		it( 'should yield the setup editor actions but not reset blocks when the template is empty', () => {
+			const post = { content: { raw: '' }, status: 'publish' };
+			const fulfillment = actions.setupEditor( post );
+			let { value } = fulfillment.next();
 			expect( value ).toEqual( actions.resetPost( post ) );
-		} );
-		it( 'should yield the SETUP_EDITOR action', () => {
-			const { value } = fulfillment.next();
+			value = fulfillment.next().value;
 			expect( value ).toEqual( {
 				type: 'SETUP_EDITOR',
 				post: { content: { raw: '' }, status: 'publish' },
 			} );
-		} );
-		it( 'should yield action object for resetEditorBlocks', () => {
-			const { value } = fulfillment.next();
-			expect( Object.keys( value ) ).toEqual( [] );
-		} );
-		it( 'should yield action object for setupEditorState', () => {
-			const { value } = fulfillment.next();
+			value = fulfillment.next().value;
 			expect( value ).toEqual(
 				actions.setupEditorState( {
 					content: { raw: '' },

@@ -19,9 +19,17 @@ _This package assumes that your code will run in an **ES2015+** environment. If 
 Below is an example of a component which simply renders a list of authors:
 
 ```jsx
-const { withSelect } = wp.data;
+const { useSelect } = wp.data;
 
-function MyAuthorsListBase( { authors } ) {
+function MyAuthorsListBase() {
+	const authors = useSelect( ( select ) => {
+		return select( 'core' ).getUsers( { who: 'authors' } );
+	}, [] );
+
+	if ( ! authors ) {
+		return null;
+	}
+
 	return (
 		<ul>
 			{ authors.map( ( author ) => (
@@ -30,10 +38,6 @@ function MyAuthorsListBase( { authors } ) {
 		</ul>
 	);
 }
-
-const MyAuthorsList = withSelect( ( select ) => ( {
-	authors: select( 'core' ).getAuthors(),
-} ) )( MyAuthorsListBase );
 ```
 
 ## Actions
@@ -289,6 +293,8 @@ _Returns_
 -   `boolean|undefined`: Whether or not the user can edit, or `undefined` if the OPTIONS request is still being made.
 
 ### getAuthors
+
+> **Deprecated** since 11.3. Callers should use `select( 'core' ).getUsers({ who: 'authors' })` instead.
 
 Returns all available authors.
 

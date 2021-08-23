@@ -6,7 +6,7 @@
 const fs = require( 'fs' );
 const path = require( 'path' );
 const https = require( 'https' );
-const [ branch, hash, baseHash, timestamp ] = process.argv.slice( 2 );
+const [ token, branch, hash, baseHash, timestamp ] = process.argv.slice( 2 );
 
 const performanceResults = JSON.parse(
 	fs.readFileSync(
@@ -27,9 +27,9 @@ const data = new TextEncoder().encode(
 );
 
 const options = {
-	hostname: 'codehealth-riad.vercel.app',
+	hostname: 'codehealth.vercel.app',
 	port: 443,
-	path: '/api/log',
+	path: '/api/log?token=' + token,
 	method: 'POST',
 	headers: {
 		'Content-Type': 'application/json',

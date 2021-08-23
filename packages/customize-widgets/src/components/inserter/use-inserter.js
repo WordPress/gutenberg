@@ -1,16 +1,27 @@
 /**
  * WordPress dependencies
  */
-import { useState, useEffect, useCallback } from '@wordpress/element';
+import { useEffect, useCallback } from '@wordpress/element';
+import { useSelect, useDispatch, select as selectStore } from '@wordpress/data';
+
+/**
+ * Internal dependencies
+ */
+import { store as customizeWidgetsStore } from '../../store';
 
 export default function useInserter( inserter ) {
-	const [ isInserterOpened, setIsInserterOpened ] = useState(
-		() => inserter.isOpen
+	const isInserterOpened = useSelect( ( select ) =>
+		select( customizeWidgetsStore ).isInserterOpened()
 	);
+	const { setIsInserterOpened } = useDispatch( customizeWidgetsStore );
 
 	useEffect( () => {
-		return inserter.subscribe( setIsInserterOpened );
-	}, [ inserter ] );
+		if ( isInserterOpened ) {
+			inserter.open();
+		} else {
+			inserter.close();
+		}
+	}, [ inserter, isInserterOpened ] );
 
 	return [
 		isInserterOpened,
@@ -18,16 +29,14 @@ export default function useInserter( inserter ) {
 			( updater ) => {
 				let isOpen = updater;
 				if ( typeof updater === 'function' ) {
-					isOpen = updater( inserter.isOpen );
+					isOpen = updater(
+						selectStore( customizeWidgetsStore ).isInserterOpened()
+					);
 				}
 
-				if ( isOpen ) {
-					inserter.open();
-				} else {
-					inserter.close();
-				}
+				setIsInserterOpened( isOpen );
 			},
-			[ inserter ]
+			[ setIsInserterOpened ]
 		),
 	];
 }

@@ -301,7 +301,7 @@ function gutenberg_get_block_templates( $query = array(), $template_type = 'wp_t
 	/**
 	 * Filters the block templates array before the query takes place.
 	 *
-	 * Return a non-null value to bypass the WordPress quries.
+	 * Return a non-null value to bypass the WordPress queries.
 	 *
 	 * @since 10.8
 	 *
@@ -412,7 +412,7 @@ function gutenberg_get_block_template( $id, $template_type = 'wp_template' ) {
 	/**
 	 * Filters the block templates array before the query takes place.
 	 *
-	 * Return a non-null value to bypass the WordPress quries.
+	 * Return a non-null value to bypass the WordPress queries.
 	 *
 	 * @since 10.8
 	 *
@@ -483,7 +483,7 @@ function gutenberg_get_block_file_template( $id, $template_type = 'wp_template' 
 	/**
 	 * Filters the block templates array before the query takes place.
 	 *
-	 * Return a non-null value to bypass the WordPress quries.
+	 * Return a non-null value to bypass the WordPress queries.
 	 *
 	 * @since 10.8
 	 *

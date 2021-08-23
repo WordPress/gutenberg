@@ -71,6 +71,11 @@ module.exports = {
 			{
 				paths: [
 					{
+						name: 'framer-motion',
+						message:
+							'Please use the Framer Motion API through `@wordpress/components` instead.',
+					},
+					{
 						name: 'lodash',
 						importNames: [ 'memoize' ],
 						message: 'Please use `memize` instead.',

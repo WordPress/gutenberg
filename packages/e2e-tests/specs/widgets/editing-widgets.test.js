@@ -39,7 +39,7 @@ describe( 'Widgets screen', () => {
 
 		// Wait for the widget areas to load.
 		await findAll( {
-			role: 'group',
+			role: 'document',
 			name: 'Block: Widget Area',
 		} );
 	} );
@@ -148,7 +148,7 @@ describe( 'Widgets screen', () => {
 		).toBe( true );
 
 		const widgetAreas = await findAll( {
-			role: 'group',
+			role: 'document',
 			name: 'Block: Widget Area',
 		} );
 		const [ firstWidgetArea, secondWidgetArea ] = widgetAreas;
@@ -249,7 +249,7 @@ describe( 'Widgets screen', () => {
 
 	it.skip( 'Should insert content using the inline inserter', async () => {
 		const [ firstWidgetArea ] = await findAll( {
-			role: 'group',
+			role: 'document',
 			name: 'Block: Widget Area',
 		} );
 
@@ -521,7 +521,7 @@ describe( 'Widgets screen', () => {
 
 	it.skip( 'Should duplicate the widgets', async () => {
 		let [ firstWidgetArea ] = await findAll( {
-			role: 'group',
+			role: 'document',
 			name: 'Block: Widget Area',
 		} );
 
@@ -530,7 +530,7 @@ describe( 'Widgets screen', () => {
 
 		let firstParagraphBlock = await find(
 			{
-				role: 'group',
+				role: 'document',
 				name: /^Empty block/,
 			},
 			{ root: firstWidgetArea }
@@ -542,7 +542,7 @@ describe( 'Widgets screen', () => {
 		await page.reload();
 		// Wait for the widget areas to load.
 		[ firstWidgetArea ] = await findAll( {
-			role: 'group',
+			role: 'document',
 			name: 'Block: Widget Area',
 		} );
 
@@ -686,7 +686,7 @@ describe( 'Widgets screen', () => {
 
 		// Focus the Legacy Widget block.
 		const legacyWidget = await find( {
-			role: 'group',
+			role: 'document',
 			name: 'Block: Legacy Widget',
 		} );
 		await legacyWidget.focus();
@@ -745,7 +745,7 @@ describe( 'Widgets screen', () => {
 
 	it.skip( 'allows widgets to be moved between widget areas using the dropdown in the block toolbar', async () => {
 		const widgetAreas = await findAll( {
-			role: 'group',
+			role: 'document',
 			name: 'Block: Widget Area',
 		} );
 		const [ firstWidgetArea, secondWidgetArea ] = widgetAreas;
@@ -758,7 +758,7 @@ describe( 'Widgets screen', () => {
 		await inserterParagraphBlock.click();
 		const addedParagraphBlockInFirstWidgetArea = await find(
 			{
-				role: 'group',
+				role: 'document',
 				name: /^Empty block/,
 			},
 			{ root: firstWidgetArea }
@@ -769,7 +769,7 @@ describe( 'Widgets screen', () => {
 		// Check that the block exists in the first widget area.
 		await find(
 			{
-				role: 'group',
+				role: 'document',
 				name: 'Paragraph block',
 				value: 'First Paragraph',
 			},
@@ -790,7 +790,7 @@ describe( 'Widgets screen', () => {
 		// Check that the block exists in the second widget area.
 		await find(
 			{
-				role: 'group',
+				role: 'document',
 				name: 'Paragraph block',
 				value: 'First Paragraph',
 			},
@@ -813,7 +813,7 @@ describe( 'Widgets screen', () => {
 
 	it( 'Allows widget deletion to be undone', async () => {
 		const [ firstWidgetArea ] = await findAll( {
-			role: 'group',
+			role: 'document',
 			name: 'Block: Widget Area',
 		} );
 

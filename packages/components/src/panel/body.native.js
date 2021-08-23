@@ -9,11 +9,13 @@ import { Text, View } from 'react-native';
 import styles from './body.scss';
 import BottomSeparatorCover from './bottom-separator-cover';
 
-export function PanelBody( { children, title, style = {} } ) {
+export function PanelBody( { children, title, style, titleStyle = {} } ) {
 	return (
 		<View style={ [ styles.panelContainer, style ] }>
 			{ title && (
-				<Text style={ styles.sectionHeaderText }>{ title }</Text>
+				<Text style={ [ styles.sectionHeaderText, titleStyle ] }>
+					{ title }
+				</Text>
 			) }
 			{ children }
 			<BottomSeparatorCover />
