@@ -766,6 +766,11 @@ export class RichText extends Component {
 				this.needsSelectionUpdate = true;
 				this.manipulateEventCounterToForceNativeToRefresh(); // force a refresh on the native side
 			}
+
+			if ( nextProps?.style?.fontSize !== this.props?.style?.fontSize ) {
+				this.needsSelectionUpdate = true;
+				this.manipulateEventCounterToForceNativeToRefresh(); // force a refresh on the native side
+			}
 		}
 
 		return true;
