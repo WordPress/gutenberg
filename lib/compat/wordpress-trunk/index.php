@@ -5,4 +5,4 @@
  * @package gutenberg
  */
 
-require_once __DIR__ . '/widget-render-api-endpoint.php';
+require_once __DIR__ . '/widget-render-api-endpoint/index.php';
