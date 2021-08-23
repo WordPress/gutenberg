@@ -7,6 +7,7 @@ import { default as TestRenderer, act } from 'react-test-renderer';
  * WordPress dependencies
  */
 import { Button } from '@wordpress/components';
+import { PreferencesModalToggle } from '@wordpress/interface';
 
 /**
  * Internal dependencies
@@ -15,7 +16,6 @@ import {
 	EnableCustomFieldsOption,
 	CustomFieldsConfirmation,
 } from '../enable-custom-fields';
-import BaseOption from '../base';
 
 describe( 'EnableCustomFieldsOption', () => {
 	it( 'renders a checked checkbox when custom fields are enabled', () => {
@@ -37,7 +37,9 @@ describe( 'EnableCustomFieldsOption', () => {
 			<EnableCustomFieldsOption areCustomFieldsEnabled />
 		);
 		act( () => {
-			renderer.root.findByType( BaseOption ).props.onChange( false );
+			renderer.root
+				.findByType( PreferencesModalToggle )
+				.props.onChange( false );
 		} );
 		expect( renderer ).toMatchSnapshot();
 	} );
@@ -47,7 +49,9 @@ describe( 'EnableCustomFieldsOption', () => {
 			<EnableCustomFieldsOption areCustomFieldsEnabled={ false } />
 		);
 		act( () => {
-			renderer.root.findByType( BaseOption ).props.onChange( true );
+			renderer.root
+				.findByType( PreferencesModalToggle )
+				.props.onChange( true );
 		} );
 		expect( renderer ).toMatchSnapshot();
 	} );
