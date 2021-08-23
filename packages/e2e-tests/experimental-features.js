@@ -111,13 +111,6 @@ export const siteEditor = {
 		await page.waitForSelector( '.edit-site-visual-editor iframe' );
 	},
 
-	async toggleMoreMenu() {
-		// eslint-disable-next-line jest/no-standalone-expect
-		await expect( page ).toClick(
-			'.edit-site-more-menu [aria-label="More tools & options"]'
-		);
-	},
-
 	async getEditedPostContent() {
 		return page.evaluate( async () => {
 			const postId = window.wp.data
