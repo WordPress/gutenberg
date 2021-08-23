@@ -3,7 +3,7 @@
  */
 import { compose, ifCondition } from '@wordpress/compose';
 import { withSelect, withDispatch } from '@wordpress/data';
-import { PreferencesMenuToggle } from '@wordpress/interface';
+import { PreferencesModalToggle } from '@wordpress/interface';
 
 /**
  * Internal dependencies
@@ -25,4 +25,4 @@ export default compose(
 		onChange: () =>
 			dispatch( editPostStore ).toggleEditorPanelEnabled( panelName ),
 	} ) )
-)( PreferencesMenuToggle );
+)( PreferencesModalToggle );

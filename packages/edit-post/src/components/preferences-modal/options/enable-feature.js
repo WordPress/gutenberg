@@ -3,7 +3,7 @@
  */
 import { compose } from '@wordpress/compose';
 import { withSelect, withDispatch } from '@wordpress/data';
-import { PreferencesMenuToggle } from '@wordpress/interface';
+import { PreferencesModalToggle } from '@wordpress/interface';
 
 /**
  * Internal dependencies
@@ -20,4 +20,4 @@ export default compose(
 	withDispatch( ( dispatch, { featureName } ) => ( {
 		onChange: () => dispatch( editPostStore ).toggleFeature( featureName ),
 	} ) )
-)( PreferencesMenuToggle );
+)( PreferencesModalToggle );

@@ -46,7 +46,7 @@ export default function PreferencesModalTabs( { tabs } ) {
 		);
 	}
 
-	// One little screens, do a navigation layout.
+	// On little screens, do a navigation layout.
 	return (
 		<Navigation
 			className="interface-preferences-modal__navigation"
