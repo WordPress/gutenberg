@@ -129,7 +129,3 @@ function setup_widget_render_api_endpoint() {
 
 // Priority should be larger than 99 which is the one used for registering the core routes.
 add_action( 'rest_api_init', 'setup_widget_render_api_endpoint', 100 );
-
-
-
-
