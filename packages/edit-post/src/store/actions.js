@@ -153,17 +153,17 @@ export function removeEditorPanel( panelName ) {
 }
 
 /**
- * Returns an action object used to toggle a feature flag.
+ * Triggers an action used to toggle a feature flag.
  *
  * @param {string} feature Feature name.
- *
- * @return {Object} Action object.
  */
-export function toggleFeature( feature ) {
-	return {
-		type: 'TOGGLE_FEATURE',
-		feature,
-	};
+export function* toggleFeature( feature ) {
+	yield controls.dispatch(
+		interfaceStore.name,
+		'toggleFeature',
+		'core/edit-post',
+		feature
+	);
 }
 
 export function* switchEditorMode( mode ) {
