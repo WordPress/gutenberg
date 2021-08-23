@@ -51,13 +51,12 @@
 
 .inserter-tabs__wrapper {
 	overflow: hidden;
+	flex: 1;
 }
 
 .inserter-tabs__container {
 	height: 100%;
 	width: 100%;
-}
-
-.inserter-tabs__item {
-	position: absolute;
+	flex: 1;
+	flex-direction: row;
 }
