@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Breaking Change
+
+-   The `toggleFeature` action and the `isFeatureActive` selector are now deprecated and will be removed in a future release. Implementers should migrate to the `toggleFeature` action and `isFeatureActive` selector in the `@wordpress/interface` package.
+
 ## 3.0.0 (2021-07-29)
 
 ### Breaking Change
