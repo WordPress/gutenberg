@@ -15,51 +15,43 @@ import apiFetch from '@wordpress/api-fetch';
 export default function Preview( { idBase, instance, isVisible } ) {
 	const [ isLoaded, setIsLoaded ] = useState( false );
 	const [ srcDoc, setSrcDoc ] = useState( '' );
-	const [ isPreviewFetched, setIsPreviewFetched ] = useState( false );
-
-	const abortController =
-		typeof window.AbortController === 'undefined'
-			? undefined
-			: new window.AbortController();
-
-	async function fetchPreviewHTML() {
-		const restRoute = `/wp/v2/widget-types/${ idBase }/render`;
-		return await apiFetch( {
-			path: restRoute,
-			method: 'POST',
-			signal: abortController?.signal,
-			data: {
-				id_base: idBase,
-				instance,
-			},
-		} );
-	}
 
 	useEffect( () => {
-		if ( ! isPreviewFetched ) {
-			setIsPreviewFetched( true );
-			fetchPreviewHTML()
-				.then( ( response ) => {
-					setSrcDoc( response.preview );
-				} )
-				.catch( ( error ) => {
-					if ( error.name === 'AbortError' ) {
-						// We don't want to log abort errors.
-						return;
-					}
-					window.console.error(
-						`An error occurred while trying to fetch preview: ${ error.message }`,
-						error
-					);
-				} );
+		const abortController =
+			typeof window.AbortController === 'undefined'
+				? undefined
+				: new window.AbortController();
+
+		async function fetchPreviewHTML() {
+			const restRoute = `/wp/v2/widget-types/${ idBase }/render`;
+			return await apiFetch( {
+				path: restRoute,
+				method: 'POST',
+				signal: abortController?.signal,
+				data: {
+					id_base: idBase,
+					instance,
+				},
+			} );
 		}
 
-		return () => {
-			if ( typeof abortController !== 'undefined' ) {
-				abortController.abort();
-			}
-		};
-	}, [] );
+		fetchPreviewHTML()
+			.then( ( response ) => {
+				setSrcDoc( response.preview );
+			} )
+			.catch( ( error ) => {
+				if ( error.name === 'AbortError' ) {
+					// We don't want to log abort errors.
+					return;
+				}
+				window.console.error(
+					`An error occurred while trying to fetch preview: ${ error.message }`,
+					error
+				);
+			} );
+
+		return () => abortController?.abort();
+	}, [ idBase, instance ] );
 
 	// Resize the iframe on either the load event, or when the iframe becomes visible.
 	const ref = useRefEffect(
