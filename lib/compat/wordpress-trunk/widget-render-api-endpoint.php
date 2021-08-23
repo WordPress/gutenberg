@@ -17,7 +17,7 @@ class WP_REST_Widget_Render_Endpoint_Polyfill extends \WP_REST_Controller {
 	}
 
 	/**
-	 * Registers the widget type routes.
+	 * Registers the widget render route if one is missing.
 	 *
 	 * @see register_rest_route()
 	 */
@@ -122,7 +122,10 @@ class WP_REST_Widget_Render_Endpoint_Polyfill extends \WP_REST_Controller {
 
 }
 
-function setup_widget_render_api_endpoint() {
+/**
+ * Registers routes from the WP_REST_Widget_Render_Endpoint_Polyfill class.
+ */
+function setup_widget_render_api_endpoint_polyfill() {
 	$polyfill = new WP_REST_Widget_Render_Endpoint_Polyfill();
 	$polyfill->register_routes();
 }
