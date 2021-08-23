@@ -5,7 +5,7 @@ import { useSelect } from '@wordpress/data';
 import {
 	InnerBlocks,
 	useBlockProps,
-	InspectorAdvancedControls,
+	InspectorControls,
 	__experimentalUseInnerBlocksProps as useInnerBlocksProps,
 	useSetting,
 	store as blockEditorStore,
@@ -45,7 +45,7 @@ function GroupEdit( { attributes, setAttributes, clientId } ) {
 
 	return (
 		<>
-			<InspectorAdvancedControls>
+			<InspectorControls __experimentalGroup="advanced">
 				<SelectControl
 					label={ __( 'HTML element' ) }
 					options={ [
@@ -62,7 +62,7 @@ function GroupEdit( { attributes, setAttributes, clientId } ) {
 						setAttributes( { tagName: value } )
 					}
 				/>
-			</InspectorAdvancedControls>
+			</InspectorControls>
 			{ themeSupportsLayout && <TagName { ...innerBlocksProps } /> }
 			{ /* Ideally this is not needed but it's there for backward compatibility reason
 				to keep this div for themes that might rely on its presence */ }
