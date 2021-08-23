@@ -8,7 +8,11 @@ import os from 'os';
 /**
  * WordPress dependencies
  */
-import { trashAllPosts, activateTheme } from '@wordpress/e2e-test-utils';
+import {
+	clickOnMoreMenuItem,
+	trashAllPosts,
+	activateTheme,
+} from '@wordpress/e2e-test-utils';
 
 /**
  * Internal dependencies
@@ -52,7 +56,7 @@ describe( 'Site Editor Templates Export', () => {
 			downloadPath: directory,
 		} );
 
-		await siteEditor.clickOnMoreMenuItem( 'Export' );
+		await clickOnMoreMenuItem( 'Export' );
 		const filePath = path.join( directory, 'edit-site-export.zip' );
 		await waitForFileExists( filePath );
 		expect( fs.existsSync( filePath ) ).toBe( true );

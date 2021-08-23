@@ -118,19 +118,6 @@ export const siteEditor = {
 		);
 	},
 
-	async clickOnMoreMenuItem( buttonLabel ) {
-		await this.toggleMoreMenu();
-		const moreMenuContainerSelector =
-			'//*[contains(concat(" ", @class, " "), " edit-site-more-menu__content ")]';
-		const elementToClick = (
-			await page.$x(
-				`${ moreMenuContainerSelector }//span[contains(concat(" ", @class, " "), " components-menu-item__item ")][contains(text(), "${ buttonLabel }")]`
-			)
-		 )[ 0 ];
-
-		await elementToClick.click();
-	},
-
 	async getEditedPostContent() {
 		return page.evaluate( async () => {
 			const postId = window.wp.data
