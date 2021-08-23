@@ -151,6 +151,8 @@ export function resetSelection(
  * Unlike resetBlocks, these should be appended to the existing known set, not
  * replacing.
  *
+ * Todo: This should be deprecated
+ *
  * @param {Object[]} blocks Array of block objects.
  *
  * @return {Object} Action object.

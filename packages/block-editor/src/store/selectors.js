@@ -132,77 +132,28 @@ export function getBlockAttributes( state, clientId ) {
  *
  * @return {Object} Parsed block object.
  */
-export const getBlock = createSelector(
-	( state, clientId ) => {
-		const block = state.blocks.byClientId[ clientId ];
-		if ( ! block ) {
-			return null;
-		}
+export function getBlock( state, clientId ) {
+	const block = state.blocks.byClientId[ clientId ];
+	if ( ! block ) {
+		return null;
+	}
 
-		return {
-			...block,
-			attributes: getBlockAttributes( state, clientId ),
-			innerBlocks: areInnerBlocksControlled( state, clientId )
-				? EMPTY_ARRAY
-				: getBlocks( state, clientId ),
-		};
-	},
-	( state, clientId ) => [
-		// Normally, we'd have both `getBlockAttributes` dependencies and
-		// `getBlocks` (children) dependencies here but for performance reasons
-		// we use a denormalized cache key computed in the reducer that takes both
-		// the attributes and inner blocks into account. The value of the cache key
-		// is being changed whenever one of these dependencies is out of date.
-		state.blocks.cache[ clientId ],
-	]
-);
-
-export const __unstableGetBlockWithoutInnerBlocks = createSelector(
-	( state, clientId ) => {
-		const block = state.blocks.byClientId[ clientId ];
-		if ( ! block ) {
-			return null;
-		}
-
-		return {
-			...block,
-			attributes: getBlockAttributes( state, clientId ),
-		};
-	},
-	( state, clientId ) => [
-		state.blocks.byClientId[ clientId ],
-		state.blocks.attributes[ clientId ],
-	]
-);
+	return state.blocks.tree[ clientId ];
+}
 
 /**
  * Returns all block objects for the current post being edited as an array in
  * the order they appear in the post. Note that this will exclude child blocks
  * of nested inner block controllers.
  *
- * Note: It's important to memoize this selector to avoid return a new instance
- * on each call. We use the block cache state for each top-level block of the
- * given clientID. This way, the selector only refreshes on changes to blocks
- * associated with the given entity, and does not refresh when changes are made
- * to blocks which are part of different inner block controllers.
- *
  * @param {Object}  state        Editor state.
  * @param {?string} rootClientId Optional root client ID of block list.
  *
  * @return {Object[]} Post blocks.
  */
-export const getBlocks = createSelector(
-	( state, rootClientId ) => {
-		return map( getBlockOrder( state, rootClientId ), ( clientId ) =>
-			getBlock( state, clientId )
-		);
-	},
-	( state, rootClientId ) =>
-		map(
-			state.blocks.order[ rootClientId || '' ],
-			( id ) => state.blocks.cache[ id ]
-		)
-);
+export function getBlocks( state, rootClientId ) {
+	return state.blocks.tree[ rootClientId || '' ]?.innerBlocks || EMPTY_ARRAY;
+}
 
 /**
  * Similar to getBlock, except it will include the entire nested block tree as

@@ -281,7 +281,7 @@ function wrapperSelector( select ) {
 		getSelectedBlockClientId,
 		getFirstMultiSelectedBlockClientId,
 		getBlockRootClientId,
-		__unstableGetBlockWithoutInnerBlocks,
+		getBlock,
 		getBlockParents,
 		__experimentalGetBlockListSettingsForBlocks,
 	} = select( blockEditorStore );
@@ -293,8 +293,7 @@ function wrapperSelector( select ) {
 		return;
 	}
 
-	const { name, attributes = {}, isValid } =
-		__unstableGetBlockWithoutInnerBlocks( clientId ) || {};
+	const { name, attributes = {}, isValid } = getBlock( clientId ) || {};
 	const blockParentsClientIds = getBlockParents( clientId );
 
 	// Get Block List Settings for all ancestors of the current Block clientId

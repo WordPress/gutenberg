@@ -194,9 +194,11 @@ const applyWithSelect = withSelect( ( select, { clientId, rootClientId } ) => {
 		getBlockMode,
 		isSelectionEnabled,
 		getTemplateLock,
-		__unstableGetBlockWithoutInnerBlocks,
+		getBlock,
 	} = select( blockEditorStore );
-	const block = __unstableGetBlockWithoutInnerBlocks( clientId );
+	// This change is going to leak innerBlocks,
+	// so maybe keep the selector but change how it's computed.
+	const block = getBlock( clientId );
 	const isSelected = isBlockSelected( clientId );
 	const templateLock = getTemplateLock( rootClientId );
 	// The fallback to `{}` is a temporary fix.
