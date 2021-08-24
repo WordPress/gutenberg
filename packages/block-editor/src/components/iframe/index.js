@@ -23,8 +23,6 @@ import { useWritingFlow } from '../writing-flow';
 const BODY_CLASS_NAME = 'editor-styles-wrapper';
 const BLOCK_PREFIX = 'wp-block';
 
-export const wrapperState = { wrapperNode: null };
-
 /**
  * Clones stylesheets targetting the editor canvas to the given document. A
  * stylesheet is considered targetting the editor a canvas if it contains the
@@ -218,7 +216,6 @@ function Iframe( { contentRef, children, head, ...props }, ref ) {
 			bubbleEvents( contentDocument );
 			setBodyClassName( contentDocument );
 			setIframeDocument( contentDocument );
-			wrapperState.wrapperNode = contentDocument?.body;
 			clearerRef( documentElement );
 			clearerRef( body );
 			writingFlowRef( body );

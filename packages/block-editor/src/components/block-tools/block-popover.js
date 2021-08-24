@@ -24,7 +24,6 @@ import Inserter from '../inserter';
 import { store as blockEditorStore } from '../../store';
 import { __unstableUseBlockElement as useBlockElement } from '../block-list/use-block-props/use-block-refs';
 import { usePopoverScroll } from './use-popover-scroll';
-import { wrapperState } from '../iframe';
 
 function selector( select ) {
 	const {
@@ -216,7 +215,7 @@ function BlockPopover( {
 			shouldAnchorIncludePadding
 			// Used to safeguard sticky position behavior against cases where it would permanently
 			// obscure specific sections of a block.
-			__unstableEditorCanvasWrapper={ wrapperState.wrapperNode }
+			__unstableEditorCanvasWrapper={ __unstableContentRef.current }
 		>
 			{ ( shouldShowContextualToolbar || isToolbarForced ) && (
 				<div
