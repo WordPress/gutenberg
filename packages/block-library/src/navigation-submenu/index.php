@@ -170,7 +170,7 @@ function render_block_core_navigation_submenu( $attributes, $content, $block ) {
 		)
 	);
 	$html               = '<li ' . $wrapper_attributes . '>';
-		
+
 	// If the Parent element is a link, we render an anchor tag with attributes.
 	// We also render a submenu button, so the submenu can be opened on click.
 	if ( isset( $attributes['url'] ) && '' !== $attributes['url'] ) {
@@ -180,13 +180,13 @@ function render_block_core_navigation_submenu( $attributes, $content, $block ) {
 		if ( isset( $attributes['opensInNewTab'] ) && true === $attributes['opensInNewTab'] ) {
 			$html .= ' target="_blank"  ';
 		}
-	
+
 		if ( isset( $attributes['rel'] ) ) {
 			$html .= ' rel="' . esc_attr( $attributes['rel'] ) . '"';
 		} elseif ( isset( $attributes['nofollow'] ) && $attributes['nofollow'] ) {
 			$html .= ' rel="nofollow"';
 		}
-	
+
 		if ( isset( $attributes['title'] ) ) {
 			$html .= ' title="' . esc_attr( $attributes['title'] ) . '"';
 		}
