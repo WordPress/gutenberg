@@ -241,7 +241,7 @@ function buildBlockTree( state, blocks ) {
 }
 
 function updateParentInnerBlocksInTree( state, tree, updatedClientIds ) {
-	const clientIds = new Set( updatedClientIds.length ? [] : [ '' ] );
+	const clientIds = new Set( [] );
 	const controlledParents = new Set();
 	for ( const clientId of updatedClientIds ) {
 		let current = clientId;
@@ -310,7 +310,7 @@ const withBlockTree = ( reducer ) => ( state = {}, action ) => {
 					...newState.tree,
 					...subTree,
 				},
-				action.rootClientId ? [ action.rootClientId ] : []
+				action.rootClientId ? [ action.rootClientId ] : [ '' ]
 			);
 			break;
 		}
@@ -353,7 +353,14 @@ const withBlockTree = ( reducer ) => ( state = {}, action ) => {
 			newState.tree = updateParentInnerBlocksInTree(
 				newState,
 				{
-					...omit( newState.tree, action.replacedClientIds ),
+					...omit(
+						newState.tree,
+						action.replacedClientIds.concat(
+							action.replacedClientIds.map(
+								( clientId ) => 'controlled||' + clientId
+							)
+						)
+					),
 					...subTree,
 				},
 				action.blocks.map( ( b ) => b.clientId )
@@ -364,15 +371,23 @@ const withBlockTree = ( reducer ) => ( state = {}, action ) => {
 			const parentsOfRemovedBlocks = [];
 			for ( const clientId of action.clientIds ) {
 				if (
-					state.parents[ clientId ] &&
-					newState.byClientId[ state.parents[ clientId ] ]
+					state.parents[ clientId ] !== undefined &&
+					( state.parents[ clientId ] === '' ||
+						newState.byClientId[ state.parents[ clientId ] ] )
 				) {
 					parentsOfRemovedBlocks.push( state.parents[ clientId ] );
 				}
 			}
 			newState.tree = updateParentInnerBlocksInTree(
 				newState,
-				omit( newState.tree, action.removedClientIds ),
+				omit(
+					newState.tree,
+					action.removedClientIds.concat(
+						action.removedClientIds.map(
+							( clientId ) => 'controlled||' + clientId
+						)
+					)
+				),
 				parentsOfRemovedBlocks
 			);
 			break;
