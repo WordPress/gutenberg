@@ -12,7 +12,7 @@ This set of guidelines should apply especially to newly introduced components. I
 
 ### Compatibility
 
-The `@wordpress/components` package includes several components which are relied upon by many developers across different projects. It is, therefore, very important to avoid introducing breaking changes as much as possible.
+The `@wordpress/components` package includes components that are relied upon by many developers across different projects. It is, therefore, very important to avoid introducing breaking changes.
 
 In these situations, an alternative approach is to "soft-deprecate" the given legacy API. This is achieved by removing traces of the API from the docs, while the code keeps supporing it in the background (with or without a warning)
 
