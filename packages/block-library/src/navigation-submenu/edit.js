@@ -7,7 +7,6 @@ import { escape, pull } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { createBlock } from '@wordpress/blocks';
 import { useSelect, useDispatch } from '@wordpress/data';
 import {
 	KeyboardShortcuts,
@@ -271,7 +270,6 @@ export default function NavigationSubmenuEdit( {
 	attributes,
 	isSelected,
 	setAttributes,
-	insertBlocksAfter,
 	mergeBlocks,
 	onReplace,
 	context,
@@ -559,11 +557,6 @@ export default function NavigationSubmenuEdit( {
 							}
 							onMerge={ mergeBlocks }
 							onReplace={ onReplace }
-							__unstableOnSplitAtEnd={ () =>
-								insertBlocksAfter(
-									createBlock( 'core/navigation-link' )
-								)
-							}
 							aria-label={ __( 'Navigation link text' ) }
 							placeholder={ itemLabelPlaceholder }
 							withoutInteractiveFormatting
