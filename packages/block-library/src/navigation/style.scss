@@ -80,10 +80,13 @@
 	// Submenu indicator.
 	.wp-block-page-list__submenu-icon,
 	.wp-block-navigation-link__submenu-icon {
+		align-self: center;
 		height: inherit;
+		line-height: 0;
 		margin-left: 6px;
 
 		svg {
+			display: inline-block;
 			stroke: currentColor;
 		}
 	}
@@ -338,6 +341,7 @@
 	// Horizontal layout
 	display: flex;
 	flex-wrap: wrap;
+	flex: 1;
 }
 
 // Vertical layout

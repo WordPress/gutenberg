@@ -262,8 +262,6 @@ export class BlockList extends Component {
 						{ flex: isRootList ? 1 : 0 },
 						! isRootList && styles.overflowVisible,
 					] }
-					horizontal={ horizontal }
-					numColumns={ 1 }
 					extraData={ this.getExtraData() }
 					scrollEnabled={ isRootList }
 					contentContainerStyle={ [
