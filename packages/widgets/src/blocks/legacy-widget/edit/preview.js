@@ -41,7 +41,7 @@ export default function Preview( { idBase, instance, isVisible } ) {
 			} )
 			.catch( ( error ) => {
 				if ( 'AbortError' === error.name ) {
-					// We don't want to log abort "errors".
+					// We don't want to log aborted requests.
 					return;
 				}
 				throw error;
