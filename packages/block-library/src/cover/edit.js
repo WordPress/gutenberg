@@ -629,7 +629,7 @@ function CoverEdit( {
 		dimRatioToClass( dimRatio ),
 		{
 			'is-dark-theme': isDark,
-			'has-background-dim': dimRatio !== 0,
+			'has-background-dim': url && dimRatio !== 0,
 			'is-transient': isUploadingMedia,
 			'has-parallax': hasParallax,
 			'is-repeated': isRepeated,

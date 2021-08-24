@@ -76,7 +76,7 @@ export default function save( { attributes } ) {
 		dimRatioToClass( dimRatio ),
 		overlayColorClass,
 		{
-			'has-background-dim': dimRatio !== 0,
+			'has-background-dim': url && dimRatio !== 0,
 			'has-parallax': hasParallax,
 			'is-repeated': isRepeated,
 			'has-background-gradient': gradient || customGradient,
