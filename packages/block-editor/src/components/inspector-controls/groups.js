@@ -6,7 +6,7 @@ import { createSlotFill } from '@wordpress/components';
 const InspectorControlsDefault = createSlotFill( 'InspectorControls' );
 const InspectorControlsAdvanced = createSlotFill( 'InspectorAdvancedControls' );
 const InspectorControlsDimensions = createSlotFill(
-	'InspectorDimensionsControls'
+	'InspectorControlsDimensions'
 );
 
 const groups = {
