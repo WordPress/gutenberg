@@ -631,19 +631,10 @@ describe( 'Widgets screen', () => {
 
 		await page.reload();
 
-		// Wait for the Legacy Widget block's preview iframe to load.
-		const frame = await new Promise( ( resolve ) => {
-			const checkFrame = async ( candidateFrame ) => {
-				const title = await candidateFrame.title();
-				if ( 'Legacy Widget Preview' === title ) {
-					page.off( 'frameattached', checkFrame );
-					page.off( 'framenavigated', checkFrame );
-					resolve( candidateFrame );
-				}
-			};
-			page.on( 'frameattached', checkFrame );
-			page.on( 'framenavigated', checkFrame );
-		} );
+		const frameElement = await page.$(
+			'iframe.wp-block-legacy-widget__edit-preview-iframe'
+		);
+		const frame = frameElement.contentFrame();
 
 		// Expect to have search input.
 		await find(
