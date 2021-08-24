@@ -17,7 +17,8 @@
 	},
 	"supports": {
 		"anchor": true,
-		"align": [ "wide", "full" ]
+		"align": [ "wide", "full" ],
+		"__experimentalExposeControlsToChildren": true
 	},
 	"editorStyle": "wp-block-buttons-editor",
 	"style": "wp-block-buttons"

@@ -40,7 +40,8 @@
 	},
 	"supports": {
 		"align": [ "left", "center", "right" ],
-		"anchor": true
+		"anchor": true,
+		"__experimentalExposeControlsToChildren": true
 	},
 	"styles": [
 		{ "name": "default", "label": "Default", "isDefault": true },
