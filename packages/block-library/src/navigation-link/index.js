@@ -5,6 +5,7 @@ import { _x } from '@wordpress/i18n';
 import { customLink as linkIcon } from '@wordpress/icons';
 import { InnerBlocks } from '@wordpress/block-editor';
 import { addFilter } from '@wordpress/hooks';
+import { createBlock } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
@@ -84,6 +85,16 @@ export const settings = {
 			},
 		},
 	],
+	transforms: {
+		to: [
+			{
+				type: 'block',
+				blocks: [ 'core/navigation-submenu' ],
+				transform: ( attributes ) =>
+					createBlock( 'core/navigation-submenu', attributes ),
+			},
+		],
+	},
 };
 
 // importing this file includes side effects. This is whitelisted in block-library/package.json under sideEffects
