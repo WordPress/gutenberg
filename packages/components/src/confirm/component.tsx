@@ -44,7 +44,7 @@ function Confirm(
 		document.addEventListener( 'keydown', handleEscapePress );
 		return () =>
 			document.removeEventListener( 'keydown', handleEscapePress );
-	} );
+	}, [] );
 
 	return (
 		<div
