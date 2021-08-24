@@ -246,10 +246,16 @@ function updateParentInnerBlocksInTree( state, tree, updatedClientIds ) {
 		do {
 			// Should stop on controlled blocks.
 			current = state.parents[ current ];
-			if ( current !== undefined ) {
+			if (
+				current !== undefined &&
+				! state.controlledInnerBlocks[ current ]
+			) {
 				clientIds.push( current );
 			}
-		} while ( current !== undefined );
+		} while (
+			current !== undefined &&
+			! state.controlledInnerBlocks[ current ]
+		);
 	}
 
 	// To make sure the order of assignments doesn't matter,
