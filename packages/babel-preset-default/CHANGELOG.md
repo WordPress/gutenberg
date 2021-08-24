@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Breaking Changes
+
+-   Use `@babel/preset-react` with `@wordpress/element`'s automatic runtime to transform JSX ([#34221](https://github.com/WordPress/gutenberg/pull/34221)).
+
 ## 6.2.0 (2021-05-31)
 
 ### New Feature

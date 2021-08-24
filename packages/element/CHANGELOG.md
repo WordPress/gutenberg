@@ -4,7 +4,7 @@
 
 ### New Features
 
--   Added `jsx-runtime` and `jsx-dev-runtime` modules to support the new automatic JSX transform. ([#34221](https://github.com/WordPress/gutenberg/pull/34221))
+-   Added `jsx-runtime` and `jsx-dev-runtime` modules to support the new automatic JSX transform ([#34221](https://github.com/WordPress/gutenberg/pull/34221)).
 
 ## 4.0.0 (2021-07-29)
 

@@ -68,18 +68,18 @@ module.exports = ( api ) => {
 	return {
 		presets: [
 			getPresetEnv(),
-			require.resolve( '@babel/preset-typescript' ),
-		],
-		plugins: [
-			require.resolve( '@wordpress/warning/babel-plugin' ),
 			[
-				require.resolve( '@babel/plugin-transform-react-jsx' ),
+				require.resolve( '@babel/preset-react' ),
 				{
 					runtime: 'automatic',
 					importSource: '@wordpress/element',
 					development: isDevEnv,
 				},
 			],
+			require.resolve( '@babel/preset-typescript' ),
+		],
+		plugins: [
+			require.resolve( '@wordpress/warning/babel-plugin' ),
 			maybeGetPluginTransformRuntime(),
 		].filter( Boolean ),
 	};
