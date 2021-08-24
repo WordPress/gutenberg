@@ -152,7 +152,11 @@ export function getBlock( state, clientId ) {
  * @return {Object[]} Post blocks.
  */
 export function getBlocks( state, rootClientId ) {
-	return state.blocks.tree[ rootClientId || '' ]?.innerBlocks || EMPTY_ARRAY;
+	const treeKey =
+		! rootClientId || ! areInnerBlocksControlled( state, rootClientId )
+			? rootClientId || ''
+			: 'controlled||' + rootClientId;
+	return state.blocks.tree[ treeKey ]?.innerBlocks || EMPTY_ARRAY;
 }
 
 /**

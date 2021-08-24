@@ -223,39 +223,39 @@ function buildBlockTree( state, blocks ) {
 		stack.push( ...block.innerBlocks );
 		flattenedBlocks.push( ...block.innerBlocks );
 	}
-
+	// Create objects before mutating them, that way it's always defined.
 	for ( const block of flattenedBlocks ) {
-		result[ block.clientId ] = {
+		result[ block.clientId ] = {};
+	}
+	for ( const block of flattenedBlocks ) {
+		result[ block.clientId ] = Object.assign( result[ block.clientId ], {
 			...state.byClientId[ block.clientId ],
 			attributes: state.attributes[ block.clientId ],
 			innerBlocks: block.innerBlocks.map(
 				( subBlock ) => result[ subBlock.clientId ]
 			),
-		};
+		} );
 	}
 
 	return result;
 }
 
 function updateParentInnerBlocksInTree( state, tree, updatedClientIds ) {
-	const clientIds = updatedClientIds.length
-		? [ ...updatedClientIds ]
-		: [ '' ];
+	const clientIds = new Set( updatedClientIds.length ? [] : [ '' ] );
+	const controlledParents = new Set();
 	for ( const clientId of updatedClientIds ) {
 		let current = clientId;
 		do {
+			if ( state.controlledInnerBlocks[ current ] ) {
+				controlledParents.add( current );
+				// If we reach a controlled parent, break out of the loop.
+				break;
+			} else {
+				clientIds.add( current );
+			}
 			// Should stop on controlled blocks.
 			current = state.parents[ current ];
-			if (
-				current !== undefined &&
-				! state.controlledInnerBlocks[ current ]
-			) {
-				clientIds.push( current );
-			}
-		} while (
-			current !== undefined &&
-			! state.controlledInnerBlocks[ current ]
-		);
+		} while ( current !== undefined );
 	}
 
 	// To make sure the order of assignments doesn't matter,
@@ -265,11 +265,19 @@ function updateParentInnerBlocksInTree( state, tree, updatedClientIds ) {
 			...tree[ clientId ],
 		};
 	}
-	//	console.log( clientIds, state.order );
 	for ( const clientId of clientIds ) {
 		tree[ clientId ].innerBlocks = ( state.order[ clientId ] || [] ).map(
 			( subClientId ) => tree[ subClientId ]
 		);
+	}
+	// Controlled parent blocks, need a dedicated key for their inner blocks
+	// to be used when doing getBlocks( controlledBlockClientId ).
+	for ( const clientId of controlledParents ) {
+		tree[ 'controlled||' + clientId ] = {
+			innerBlocks: ( state.order[ clientId ] || [] ).map(
+				( subClientId ) => tree[ subClientId ]
+			),
+		};
 	}
 
 	return tree;
