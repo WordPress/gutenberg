@@ -550,7 +550,7 @@ class WP_Theme_JSON_Gutenberg {
 
 			// Skip if empty and not "0" or value represents array of longhand values.
 			$has_missing_value = empty( $value ) && ! is_numeric( $value );
-			if ( $missing_value || is_array( $value ) ) {
+			if ( $has_missing_value || is_array( $value ) ) {
 				continue;
 			}
 
