@@ -265,7 +265,7 @@ function render_block_core_navigation( $attributes, $content, $block ) {
 			$inner_blocks_html .= '</ul>';
 		}
 		if ( 'core/site-title' === $inner_block->name || 'core/site-logo' === $inner_block->name ) {
-			$inner_blocks_html .= '<li>' . $inner_block->render() . '</li>';
+			$inner_blocks_html .= '<li class="wp-block-navigation-item">' . $inner_block->render() . '</li>';
 		} else {
 			$inner_blocks_html .= $inner_block->render();
 		}
