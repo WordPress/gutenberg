@@ -8,27 +8,24 @@ import { View } from 'react-native';
  */
 import { Children } from '@wordpress/element';
 import { BottomSheetConsumer } from '@wordpress/components';
-import warning from '@wordpress/warning';
 
 /**
  * Internal dependencies
  */
-import groups from './groups';
-import { useBlockEditContext } from '../block-edit/context';
 import { BlockSettingsButton } from '../block-settings';
+import useInspectorControlsFill from './hook';
 
 export default function InspectorControlsFill( {
-	children,
 	__experimentalGroup: group = 'default',
+	__experimentalExposeToChildren = false,
+	children,
 	...props
 } ) {
-	const { isSelected } = useBlockEditContext();
-	const Fill = groups[ group ]?.Fill;
+	const Fill = useInspectorControlsFill(
+		group,
+		__experimentalExposeToChildren
+	);
 	if ( ! Fill ) {
-		warning( `Unknown InspectorControl group "${ group }" provided.` );
-		return null;
-	}
-	if ( ! isSelected ) {
 		return null;
 	}
 

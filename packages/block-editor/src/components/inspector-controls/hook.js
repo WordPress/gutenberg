@@ -13,7 +13,7 @@ import { store as blockEditorStore } from '../../store';
 import { useBlockEditContext } from '../block-edit/context';
 import useDisplayBlockControls from '../use-display-block-controls';
 
-export default function useBlockControlsFill( group, exposeToChildren ) {
+export default function useInspectorControlsFill( group, exposeToChildren ) {
 	const isDisplayed = useDisplayBlockControls();
 	const { clientId } = useBlockEditContext();
 	const isParentDisplayed = useSelect(
@@ -36,7 +36,7 @@ export default function useBlockControlsFill( group, exposeToChildren ) {
 	);
 
 	if ( ! groups[ group ] ) {
-		warning( `Unknown BlockControls group "${ group }" provided.` );
+		warning( `Unknown InspectorControls group "${ group }" provided.` );
 		return null;
 	}
 	if ( isDisplayed ) {

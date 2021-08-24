@@ -2,25 +2,22 @@
  * WordPress dependencies
  */
 import { __experimentalStyleProvider as StyleProvider } from '@wordpress/components';
-import warning from '@wordpress/warning';
 
 /**
  * Internal dependencies
  */
-import useDisplayBlockControls from '../use-display-block-controls';
-import groups from './groups';
+import useInspectorControlsFill from './hook';
 
 export default function InspectorControlsFill( {
 	__experimentalGroup: group = 'default',
+	__experimentalExposeToChildren = false,
 	children,
 } ) {
-	const isDisplayed = useDisplayBlockControls();
-	const Fill = groups[ group ]?.Fill;
+	const Fill = useInspectorControlsFill(
+		group,
+		__experimentalExposeToChildren
+	);
 	if ( ! Fill ) {
-		warning( `Unknown InspectorControl group "${ group }" provided.` );
-		return null;
-	}
-	if ( ! isDisplayed ) {
 		return null;
 	}
 

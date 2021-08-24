@@ -166,7 +166,7 @@ export function SocialLinksEdit( props ) {
 					) }
 				</ToolbarDropdownMenu>
 			</BlockControls>
-			<InspectorControls>
+			<InspectorControls __experimentalExposeToChildren>
 				<PanelBody title={ __( 'Link settings' ) }>
 					<ToggleControl
 						label={ __( 'Open links in new tab' ) }

@@ -128,6 +128,10 @@ const BlockInspectorSingleBlock = ( {
 					</PanelBody>
 				</div>
 			) }
+			<InspectorControls.Slot
+				__experimentalGroup="parent"
+				bubblesVirtually={ bubblesVirtually }
+			/>
 			<InspectorControls.Slot bubblesVirtually={ bubblesVirtually } />
 			<div>
 				<AdvancedControls bubblesVirtually={ bubblesVirtually } />
