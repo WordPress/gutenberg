@@ -548,8 +548,9 @@ class WP_Theme_JSON_Gutenberg {
 		foreach ( self::PROPERTIES_METADATA as $css_property => $value_path ) {
 			$value = self::get_property_value( $styles, $value_path );
 
-			// Skip if empty or value represents array of longhand values.
-			if ( empty( $value ) || is_array( $value ) ) {
+			// Skip if empty and not "0" or value represents array of longhand values.
+			$missing_value = empty( $value ) && ! is_numeric( $value );
+			if ( $missing_value || is_array( $value ) ) {
 				continue;
 			}
 
