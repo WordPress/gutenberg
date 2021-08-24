@@ -204,10 +204,7 @@ function InserterMenu( {
 		>
 			<BottomSheetConsumer>
 				{ ( { listProps } ) => (
-					<TouchableHighlight
-						accessible={ false }
-						style={ { flex: 1 } }
-					>
+					<TouchableHighlight accessible={ false }>
 						{ ! showTabs || filterValue ? (
 							<InserterSearchResults
 								rootClientId={ rootClientId }
