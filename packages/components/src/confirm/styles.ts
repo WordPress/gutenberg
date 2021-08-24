@@ -25,5 +25,3 @@ export const overlay = css`
 	z-index: -1;
 	background: rgba( 0, 0, 0, 0.5 );
 `;
-
-export const dialogWrapper = css``;
