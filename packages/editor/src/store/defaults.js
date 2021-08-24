@@ -18,7 +18,8 @@ export const PREFERENCES_DEFAULTS = {
  *                                     true  = the user has opted to show the Custom Fields panel at the bottom of the editor.
  *                                     false = the user has opted to hide the Custom Fields panel at the bottom of the editor.
  *                                     undefined = the current environment does not support Custom Fields,
- *                                                 and the user doesn't see the option toggle.
+ *                                                 so the option toggle in Preferences -> Panels to
+ *                                                 enable the Custom Fields panel is not displayed.
  *  autosaveInterval   number        Autosave Interval
  *  availableTemplates array?        The available post templates
  *  disablePostFormats boolean       Whether or not the post formats are disabled
