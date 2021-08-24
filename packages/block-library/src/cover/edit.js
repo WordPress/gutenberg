@@ -639,6 +639,7 @@ function CoverEdit( {
 			'has-custom-content-position': ! isContentPositionCenter(
 				contentPosition
 			),
+			'is-default-background-color': ! overlayColor.class,
 		},
 		getPositionClassName( contentPosition )
 	);
