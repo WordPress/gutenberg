@@ -57,7 +57,6 @@ const {
 	updateSettings,
 	selectionChange,
 	validateBlocksToTemplate,
-	__unstableSetIframedEditorCanvasWrapper,
 } = actions;
 
 describe( 'actions', () => {
@@ -1530,17 +1529,6 @@ describe( 'actions', () => {
 			);
 
 			expect( result ).toEqual( false );
-		} );
-	} );
-
-	describe( '__unstableSetIframedEditorCanvasWrapper', () => {
-		it( 'should return the SET_IFRAMED_EDITOR_CANVAS_WRAPPER action (string) and input node (object)', () => {
-			const node = {};
-			const result = __unstableSetIframedEditorCanvasWrapper( node );
-			expect( result ).toEqual( {
-				type: 'SET_IFRAMED_EDITOR_CANVAS_WRAPPER',
-				node,
-			} );
 		} );
 	} );
 } );

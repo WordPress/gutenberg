@@ -1711,21 +1711,6 @@ export function lastBlockInserted( state = {}, action ) {
 	return state;
 }
 
-/**
- * Reducer returning the html node of the iframed editor's wrapper.
- *
- * @param {Object|null} state  Current state.
- * @param {Object}      action Dispatched action.
- *
- * @return {Object|null} Updated state.
- */
-export function iframedEditorCanvasWrapper( state = null, action ) {
-	if ( action.type === 'SET_IFRAMED_EDITOR_CANVAS_WRAPPER' ) {
-		return action.node;
-	}
-	return state;
-}
-
 export default combineReducers( {
 	blocks,
 	isTyping,
@@ -1747,5 +1732,4 @@ export default combineReducers( {
 	automaticChangeStatus,
 	highlightedBlock,
 	lastBlockInserted,
-	iframedEditorCanvasWrapper,
 } );

@@ -1404,15 +1404,3 @@ export function setHasControlledInnerBlocks(
 		clientId,
 	};
 }
-
-/**
- * Returns an action object that sets the node for the editor styles wrapper inside an iframed editor.
- *
- * @param {Object|null} node The iframed editor wrapper's html node.
- */
-export function __unstableSetIframedEditorCanvasWrapper( node ) {
-	return {
-		type: 'SET_IFRAMED_EDITOR_CANVAS_WRAPPER',
-		node,
-	};
-}

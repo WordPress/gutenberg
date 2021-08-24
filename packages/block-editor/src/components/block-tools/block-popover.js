@@ -24,6 +24,7 @@ import Inserter from '../inserter';
 import { store as blockEditorStore } from '../../store';
 import { __unstableUseBlockElement as useBlockElement } from '../block-list/use-block-props/use-block-refs';
 import { usePopoverScroll } from './use-popover-scroll';
+import { wrapperState } from '../iframe';
 
 function selector( select ) {
 	const {
@@ -34,7 +35,6 @@ function selector( select ) {
 		isCaretWithinFormattedText,
 		getSettings,
 		getLastMultiSelectedBlockClientId,
-		__unstableGetIframedEditorCanvasWrapper,
 	} = select( blockEditorStore );
 	return {
 		isNavigationMode: isNavigationMode(),
@@ -44,7 +44,6 @@ function selector( select ) {
 		hasMultiSelection: hasMultiSelection(),
 		hasFixedToolbar: getSettings().hasFixedToolbar,
 		lastClientId: getLastMultiSelectedBlockClientId(),
-		iframedEditorCanvasWrapper: __unstableGetIframedEditorCanvasWrapper(),
 	};
 }
 
@@ -65,7 +64,6 @@ function BlockPopover( {
 		hasMultiSelection,
 		hasFixedToolbar,
 		lastClientId,
-		iframedEditorCanvasWrapper,
 	} = useSelect( selector, [] );
 	const isInsertionPointVisible = useSelect(
 		( select ) => {
@@ -218,7 +216,7 @@ function BlockPopover( {
 			shouldAnchorIncludePadding
 			// Used to safeguard sticky position behavior against cases where it would permanently
 			// obscure specific sections of a block.
-			__unstableEditorCanvasWrapper={ iframedEditorCanvasWrapper }
+			__unstableEditorCanvasWrapper={ wrapperState.wrapperNode }
 		>
 			{ ( shouldShowContextualToolbar || isToolbarForced ) && (
 				<div

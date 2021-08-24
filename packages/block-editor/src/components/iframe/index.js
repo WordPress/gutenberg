@@ -13,17 +13,17 @@ import {
 import { __ } from '@wordpress/i18n';
 import { useMergeRefs } from '@wordpress/compose';
 import { __experimentalStyleProvider as StyleProvider } from '@wordpress/components';
-import { dispatch } from '@wordpress/data';
 
 /**
  * Internal dependencies
  */
 import { useBlockSelectionClearer } from '../block-selection-clearer';
 import { useWritingFlow } from '../writing-flow';
-import { store as blockEditorStore } from '../../store';
 
 const BODY_CLASS_NAME = 'editor-styles-wrapper';
 const BLOCK_PREFIX = 'wp-block';
+
+export const wrapperState = { wrapperNode: null };
 
 /**
  * Clones stylesheets targetting the editor canvas to the given document. A
@@ -153,10 +153,6 @@ function setBodyClassName( doc ) {
 	doc.dir = document.dir;
 	doc.body.className = BODY_CLASS_NAME;
 
-	dispatch( blockEditorStore ).__unstableSetIframedEditorCanvasWrapper(
-		doc.body
-	);
-
 	for ( const name of document.body.classList ) {
 		if ( name.startsWith( 'admin-color-' ) ) {
 			doc.body.classList.add( name );
@@ -222,6 +218,7 @@ function Iframe( { contentRef, children, head, ...props }, ref ) {
 			bubbleEvents( contentDocument );
 			setBodyClassName( contentDocument );
 			setIframeDocument( contentDocument );
+			wrapperState.wrapperNode = contentDocument?.body;
 			clearerRef( documentElement );
 			clearerRef( body );
 			writingFlowRef( body );

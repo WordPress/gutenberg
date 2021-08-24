@@ -77,7 +77,6 @@ const {
 	__unstableGetClientIdsTree,
 	__experimentalGetPatternTransformItems,
 	wasBlockJustInserted,
-	__unstableGetIframedEditorCanvasWrapper,
 } = selectors;
 
 describe( 'selectors', () => {
@@ -3841,15 +3840,5 @@ describe( '__unstableGetClientIdsTree', () => {
 				],
 			},
 		] );
-	} );
-} );
-
-describe( '__unstableGetIframedEditorCanvasWrapper', () => {
-	it( 'should return the iframedEditorCanvasWrapper state', () => {
-		const state = {
-			iframedEditorCanvasWrapper: {},
-		};
-		const result = __unstableGetIframedEditorCanvasWrapper( state );
-		expect( result ).toBe( state.iframedEditorCanvasWrapper );
 	} );
 } );
