@@ -634,8 +634,8 @@ describe( 'Widgets screen', () => {
 		// Wait for the Legacy Widget block's preview iframe to load.
 		const frame = await new Promise( ( resolve ) => {
 			const checkFrame = async ( candidateFrame ) => {
-				const url = await candidateFrame.url();
-				if ( url.includes( 'legacy-widget-preview' ) ) {
+				const title = await candidateFrame.title();
+				if ( 'Legacy Widget Preview' === title ) {
 					page.off( 'frameattached', checkFrame );
 					page.off( 'framenavigated', checkFrame );
 					resolve( candidateFrame );
