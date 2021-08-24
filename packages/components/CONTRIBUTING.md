@@ -64,7 +64,7 @@ For an example of a component that follows these requirements, take a look at [`
 
 #### TypeScript
 
-All new components should be written in TypeScript and should be typed using the `PolymorphicComponent` type (more details about polymorphism can be found above in the "Components composition" section).
+We strongly encourage using TypeScript for all new components. Components should be typed using the `WordPressComponent` type (more details about polymorphism can be found above in the "Components composition" section).
 
 #### Emotion
 
