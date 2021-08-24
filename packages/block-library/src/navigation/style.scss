@@ -1,5 +1,4 @@
 // Navigation block and menu item styles.
-// as that block is meant to behave as menu items when leveraged.
 // These styles also affect the Page List block when used inside your navigation block.
 //
 // Classes:
@@ -80,7 +79,7 @@
 	}
 
 	// Submenu indicator.
-	.wp-block-navigation-link__submenu-icon {
+	.wp-block-navigation__submenu-icon {
 		align-self: center;
 		height: inherit;
 		line-height: 0;
@@ -180,25 +179,6 @@
 	&:focus-within > .wp-block-navigation__submenu-container {
 		visibility: visible;
 		opacity: 1;
-	}
-
-	// Page list menu items.
-	&:hover {
-		cursor: pointer;
-
-		> .submenu-container {
-			visibility: visible;
-			opacity: 1;
-		}
-	}
-
-	&:focus-within {
-		cursor: pointer;
-
-		> .submenu-container {
-			visibility: visible;
-			opacity: 1;
-		}
 	}
 }
 
@@ -304,9 +284,7 @@
 
 // Default background and font color.
 .wp-block-navigation:not(.has-background) {
-	// @todo: check this one separately.
-	.submenu-container, // This target items created by the Page List block.
-	.wp-block-navigation__container .wp-block-navigation__submenu-container {
+	.wp-block-navigation__submenu-container {
 		// Set a background color for submenus so that they're not transparent.
 		// NOTE TO DEVS - if refactoring this code, please double-check that
 		// submenus have a default background color, this feature has regressed
