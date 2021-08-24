@@ -40,14 +40,11 @@ export default function Preview( { idBase, instance, isVisible } ) {
 				setSrcDoc( response.preview );
 			} )
 			.catch( ( error ) => {
-				if ( error.name === 'AbortError' ) {
-					// We don't want to log abort errors.
+				if ( 'AbortError' === error.name ) {
+					// We don't want to log abort "errors".
 					return;
 				}
-				window.console.error(
-					`An error occurred while trying to fetch preview: ${ error.message }`,
-					error
-				);
+				throw error;
 			} );
 
 		return () => abortController?.abort();
