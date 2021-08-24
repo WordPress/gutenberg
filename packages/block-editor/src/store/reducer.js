@@ -301,19 +301,6 @@ const withBlockTree = ( reducer ) => ( state = {}, action ) => {
 
 	newState.tree = state.tree ? state.tree : {};
 	switch ( action.type ) {
-		case 'RESET_BLOCKS': {
-			const subTree = buildBlockTree( newState, action.blocks );
-			newState.tree = {
-				...subTree,
-				// Root
-				'': {
-					innerBlocks: action.blocks.map(
-						( subBlock ) => subTree[ subBlock.clientId ]
-					),
-				},
-			};
-			break;
-		}
 		case 'RECEIVE_BLOCKS':
 		case 'INSERT_BLOCKS': {
 			const subTree = buildBlockTree( newState, action.blocks );
@@ -598,21 +585,21 @@ const withInnerBlocksRemoveCascade = ( reducer ) => ( state, action ) => {
  * @return {Function} Enhanced reducer function.
  */
 const withBlockReset = ( reducer ) => ( state, action ) => {
-	if ( state && action.type === 'RESET_BLOCKS' ) {
+	if ( action.type === 'RESET_BLOCKS' ) {
 		/**
 		 * A list of client IDs associated with the top level entity (like a
 		 * post or template). It excludes the client IDs of blocks associated
 		 * with other entities, like inner block controllers or reusable blocks.
 		 */
 		const visibleClientIds = getNestedBlockClientIds(
-			state.order,
+			state?.order ?? {},
 			'',
-			state.controlledInnerBlocks
+			state?.controlledInnerBlocks ?? {}
 		);
 
 		// pickBy returns only the truthy values from controlledInnerBlocks
 		const controlledInnerBlocks = Object.keys(
-			pickBy( state.controlledInnerBlocks )
+			pickBy( state?.controlledInnerBlocks ?? {} )
 		);
 
 		/**
@@ -639,30 +626,30 @@ const withBlockReset = ( reducer ) => ( state, action ) => {
 		const newState = {
 			...state,
 			byClientId: {
-				...omit( state.byClientId, visibleClientIds ),
+				...omit( state?.byClientId, visibleClientIds ),
 				...getFlattenedBlocksWithoutAttributes( action.blocks ),
 			},
 			attributes: {
-				...omit( state.attributes, visibleClientIds ),
+				...omit( state?.attributes, visibleClientIds ),
 				...getFlattenedBlockAttributes( action.blocks ),
 			},
 			order: {
-				...omit( state.order, visibleClientIds ),
+				...omit( state?.order, visibleClientIds ),
 				...omit(
 					mapBlockOrder( action.blocks ),
 					controlledInnerBlocks
 				),
 			},
 			parents: {
-				...omit( state.parents, visibleClientIds ),
+				...omit( state?.parents, visibleClientIds ),
 				...mapBlockParents( action.blocks ),
 			},
+			controlledInnerBlocks: state?.controlledInnerBlocks || {},
 		};
 
-		// This seem to be duplicated in withBlockTree,
-		// but both are needed according to unit tests
 		const subTree = buildBlockTree( newState, action.blocks );
 		newState.tree = {
+			...omit( state?.tree, visibleClientIds ),
 			...subTree,
 			// Root
 			'': {
@@ -811,9 +798,6 @@ export const blocks = flow(
 )( {
 	byClientId( state = {}, action ) {
 		switch ( action.type ) {
-			case 'RESET_BLOCKS':
-				return getFlattenedBlocksWithoutAttributes( action.blocks );
-
 			case 'RECEIVE_BLOCKS':
 			case 'INSERT_BLOCKS':
 				return {
@@ -860,9 +844,6 @@ export const blocks = flow(
 
 	attributes( state = {}, action ) {
 		switch ( action.type ) {
-			case 'RESET_BLOCKS':
-				return getFlattenedBlockAttributes( action.blocks );
-
 			case 'RECEIVE_BLOCKS':
 			case 'INSERT_BLOCKS':
 				return {
@@ -948,9 +929,6 @@ export const blocks = flow(
 
 	order( state = {}, action ) {
 		switch ( action.type ) {
-			case 'RESET_BLOCKS':
-				return mapBlockOrder( action.blocks );
-
 			case 'RECEIVE_BLOCKS': {
 				const blockOrder = mapBlockOrder( action.blocks );
 				return {
@@ -1126,9 +1104,6 @@ export const blocks = flow(
 	// an optimization for the selectors which derive the ancestry of a block.
 	parents( state = {}, action ) {
 		switch ( action.type ) {
-			case 'RESET_BLOCKS':
-				return mapBlockParents( action.blocks );
-
 			case 'RECEIVE_BLOCKS':
 				return {
 					...state,
