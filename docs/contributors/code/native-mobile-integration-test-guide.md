@@ -198,7 +198,7 @@ Additionally when rendering the entire editor, we can also verify if the HTML ou
 
 ```
 expect( getEditorHtml() ).toBe(
-'<!-- wp:spacer {"height":50} -->\n<div style="height:50px" aria-hidden="true" class="wp-block-spacer"></div>\n<!-- /wp:spacer -->'
+	'<!-- wp:spacer {"height":50} -->\n<div style="height:50px" aria-hidden="true" class="wp-block-spacer"></div>\n<!-- /wp:spacer -->'
 );
 ```
 
@@ -223,7 +223,7 @@ A common way to query a block is by its accessibility label, here is an example:
 
 ```
 const spacerBlock = await waitFor( () =>
-getByA11yLabel( /Spacer Block\. Row 1/ )
+	getByA11yLabel( /Spacer Block\. Row 1/ )
 );
 ```
 
@@ -270,8 +270,8 @@ When using the scoped component approach, we need first to render the `SlotFillP
 
 ```
 <SlotFillProvider>
-<BlockEdit isSelected name={ name } clientId={ 0 } { ...props } />
-<BottomSheetSettings isVisible />
+	<BlockEdit isSelected name={ name } clientId={ 0 } { ...props } />
+	<BottomSheetSettings isVisible />
 </SlotFillProvider>
 ```
 
@@ -338,7 +338,7 @@ fireEvent.press( buttonInnerBlock );
 
 If you have trouble locating an element’s identifier, you may wish to use Xcode’s Accessibility Inspector. Most identifiers are cross-platform, so even though the tests are run on Android by default, the Accessibility Inspector can be used to find the right identifier.
 
-<img src="../../assets/xcode-accessibility-inspector-screenshot.png" alt="Screenshot of the Xcode Accessibility Inspector app. The screenshot shows how to choose the correct target in the device dropdown, enable target mode, and locate accessibility labels after tapping on screen elements"/>
+<img src="https://raw.githubusercontent.com/WordPress/gutenberg/trunk/docs/assets/xcode-accessibility-inspector-screenshot.png" alt="Screenshot of the Xcode Accessibility Inspector app. The screenshot shows how to choose the correct target in the device dropdown, enable target mode, and locate accessibility labels after tapping on screen elements"/>
 
 ## Common pitfalls and caveats
 
