@@ -70,10 +70,12 @@ const BottomSheetSelectControl = ( {
 			showSheet={ showSubSheet }
 		>
 			<>
-				<BottomSheet.NavigationHeader
-					screen={ label }
-					leftButtonOnPress={ goBack }
-				/>
+				<BottomSheet.Header>
+					<BottomSheet.Header.BackButton onPress={ goBack } />
+					<BottomSheet.Header.Title>
+						{ label }
+					</BottomSheet.Header.Title>
+				</BottomSheet.Header>
 				<View style={ styles.selectControl }>
 					{ items.map( ( item, index ) => (
 						<BottomSheet.Cell

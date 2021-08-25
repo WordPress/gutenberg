@@ -49,10 +49,10 @@ const ExampleControl = () => {
 			showSheet={ showSubSheet }
 		>
 			<>
-				<BottomSheet.NavigationHeader
-					screen={ 'Howdy' }
-					leftButtonOnPress={ goBack }
-				/>
+				<BottomSheet.Header>
+					<BottomSheet.Header.BackButton onPress={ goBack } />
+					<BottomSheet.Header.Title>{ 'Howdy' }</BottomSheet.Header.Title>
+				</BottomSheet.Header>
 				<View paddingHorizontal={ 16 }>
 					<Text>{ 'World' }</Text>
 				</View>

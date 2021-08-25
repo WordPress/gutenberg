@@ -61,6 +61,11 @@ function EditorHelpTopics( { close, isVisible, onClose } ) {
 		postType: select( editorStore ).getEditedPostAttribute( 'type' ),
 	} ) );
 
+	const title =
+		postType === 'page'
+			? __( 'How to edit your page' )
+			: __( 'How to edit your post' );
+
 	return (
 		<BottomSheet
 			isVisible={ isVisible }
@@ -76,16 +81,12 @@ function EditorHelpTopics( { close, isVisible, onClose } ) {
 					name="help-topics"
 				>
 					<View style={ styles.container }>
-						<BottomSheet.NavigationHeader
-							isFullscreen
-							leftButtonOnPress={ close }
-							leftButtonText={ __( 'Close' ) }
-							screen={
-								postType === 'page'
-									? __( 'How to edit your page' )
-									: __( 'How to edit your post' )
-							}
-						/>
+						<BottomSheet.Header>
+							<BottomSheet.Header.CloseButton onPress={ close } />
+							<BottomSheet.Header.Title>
+								{ title }
+							</BottomSheet.Header.Title>
+						</BottomSheet.Header>
 						<BottomSheetConsumer>
 							{ ( { listProps } ) => {
 								const contentContainerStyle = StyleSheet.flatten(

@@ -70,10 +70,12 @@ const BottomSheetTextControl = ( {
 			showSheet={ showSubSheet }
 		>
 			<>
-				<BottomSheet.NavigationHeader
-					screen={ label }
-					leftButtonOnPress={ goBack }
-				/>
+				<BottomSheet.Header>
+					<BottomSheet.Header.BackButton onPress={ goBack } />
+					<BottomSheet.Header.Title>
+						{ label }
+					</BottomSheet.Header.Title>
+				</BottomSheet.Header>
 				<PanelBody style={ horizontalBorderStyle }>
 					<TextInput
 						label={ label }

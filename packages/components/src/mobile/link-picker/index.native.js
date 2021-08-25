@@ -18,7 +18,7 @@ import { usePreferredColorSchemeStyle } from '@wordpress/compose';
  * Internal dependencies
  */
 import LinkPickerResults from './link-picker-results';
-import NavigationHeader from '../bottom-sheet/navigation-header';
+import Header from '../bottom-sheet/header';
 import styles from './styles.scss';
 
 // this creates a search suggestion for adding a url directly
@@ -81,12 +81,11 @@ export const LinkPicker = ( {
 
 	return (
 		<SafeAreaView style={ styles.safeArea }>
-			<NavigationHeader
-				screen={ __( 'Link to' ) }
-				leftButtonOnPress={ cancel }
-				applyButtonOnPress={ onSubmit }
-				isFullscreen
-			/>
+			<Header>
+				<Header.CancelButton onPress={ cancel } />
+				<Header.Title>{ __( 'Link to' ) }</Header.Title>
+				<Header.ApplyButton onPress={ onSubmit } />
+			</Header>
 			<View style={ styles.contentContainer }>
 				<BottomSheet.Cell
 					icon={ link }
