@@ -30,8 +30,10 @@
 		font-family: $default-font;
 
 		// Increase specificity.
-		.wp-block-navigation-item {
+		.wp-block-navigation-item,
+		.wp-block-navigation-submenu {
 			display: block;
+			margin: $grid-unit-05 0 $grid-unit-05 0;
 
 			// Show submenus on click.
 			> .wp-block-navigation__submenu-container {
@@ -55,7 +57,8 @@
 
 			// Menu items.
 			// This needs high specificity to override inherited values.
-			&.wp-block-navigation-item.wp-block-navigation-item {
+			&.wp-block-navigation-item.wp-block-navigation-item,
+			&.wp-block-navigation-submenu .wp-block-navigation-submenu {
 				margin-right: 0;
 			}
 
@@ -103,27 +106,27 @@
 		// Submenu icon indicator.
 		.wp-block-navigation__submenu-icon {
 			position: absolute;
-			top: 6px;
+			top: 15px;
 			left: 0;
-			padding: 6px;
+			padding: 0px;
 			pointer-events: none;
 
 			svg {
 				// Point rightwards.
 				transform: rotate(-90deg);
-
 				transition: transform 0.2s ease;
 				@include reduce-motion("transition");
 			}
 		}
 
 		// Point downwards when open.
-		.is-selected.has-child > .wp-block-navigation__submenu-icon svg,
-		.has-child-selected.has-child > .wp-block-navigation__submenu-icon svg {
+		.is-selected.has-child .wp-block-navigation-item__content .wp-block-navigation__submenu-icon svg,
+		.has-child-selected.has-child .wp-block-navigation-item__content .wp-block-navigation__submenu-icon svg {
 			transform: rotate(0deg);
 		}
 
 		// Override inherited values to optimize menu items for the screen context.
+		.wp-block-navigation-submenu.has-child,
 		.wp-block-navigation-item.has-child {
 			cursor: default;
 			border-radius: $radius-block-ui;
@@ -137,7 +140,8 @@
 
 		// When editing a link with children, highlight the parent
 		// and adjust the spacing and submenu icon.
-		.wp-block-navigation-item.has-child.is-editing {
+		.wp-block-navigation-item.has-child.is-editing,
+		.wp-block-navigation-submenu.has-child.is-editing {
 			> .wp-block-navigation__container,
 			> .wp-block-navigation__submenu-container {
 				opacity: 1;
@@ -158,9 +162,13 @@
 			}
 		}
 
-		// Add buttons
+		// Appender styles
+		.block-list-appender {
+			margin: 0;
+		}
+
 		.block-editor-button-block-appender.block-list-appender__toggle {
-			margin: 0 0 0 $grid-unit-20;
+			margin: $grid-unit-05 0 $grid-unit-05 $grid-unit-30;
 			padding: 0;
 		}
 	}
