@@ -256,13 +256,24 @@ export function registerBlockType( blockNameOrMetadata, settings ) {
 		return;
 	}
 
+	if ( ! /^[a-z][a-z0-9-]*\/[a-z][a-z0-9-]*$/.test( name ) ) {
+		console.error(
+			'Block names must contain a namespace prefix, include only lowercase alphanumeric characters or dashes, and start with a letter. Example: my-plugin/my-custom-block'
+		);
+		return;
+	}
+	if ( select( blocksStore ).getBlockType( name ) ) {
+		console.error( 'Block "' + name + '" is already registered.' );
+		return;
+	}
+
 	if ( isObject( blockNameOrMetadata ) ) {
 		unstable__bootstrapServerSideBlockDefinitions( {
 			[ name ]: getBlockSettingsFromMetadata( blockNameOrMetadata ),
 		} );
 	}
 
-	settings = {
+	const blockType = {
 		name,
 		icon: BLOCK_ICON_DEFAULT,
 		keywords: [],
@@ -276,19 +287,11 @@ export function registerBlockType( blockNameOrMetadata, settings ) {
 		...settings,
 	};
 
-	if ( ! /^[a-z][a-z0-9-]*\/[a-z][a-z0-9-]*$/.test( name ) ) {
-		console.error(
-			'Block names must contain a namespace prefix, include only lowercase alphanumeric characters or dashes, and start with a letter. Example: my-plugin/my-custom-block'
-		);
-		return;
-	}
-	if ( select( blocksStore ).getBlockType( name ) ) {
-		console.error( 'Block "' + name + '" is already registered.' );
-		return;
-	}
-
-	const preFilterSettings = { ...settings };
-	settings = applyFilters( 'blocks.registerBlockType', settings, name );
+	settings = applyFilters(
+		'blocks.registerBlockType',
+		{ ...blockType },
+		name
+	);
 
 	if ( settings.deprecated ) {
 		settings.deprecated = settings.deprecated.map( ( deprecation ) =>
@@ -302,7 +305,7 @@ export function registerBlockType( blockNameOrMetadata, settings ) {
 					{
 						// Omit deprecation keys here so that deprecations
 						// can opt out of specific keys like "supports".
-						...omit( preFilterSettings, DEPRECATED_ENTRY_KEYS ),
+						...omit( blockType, DEPRECATED_ENTRY_KEYS ),
 						...deprecation,
 					},
 					name
@@ -367,7 +370,7 @@ export function registerBlockType( blockNameOrMetadata, settings ) {
 
 	dispatch( blocksStore ).addBlockTypes( settings );
 
-	return settings;
+	return select( blocksStore ).getBlockType( name );
 }
 
 /**
