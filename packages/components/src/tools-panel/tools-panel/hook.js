@@ -39,9 +39,15 @@ export function useToolsPanel( props ) {
 	// Panels need to deregister on unmount to avoid orphans in menu state.
 	// This is an issue when panel items are being injected via SlotFills.
 	const deregisterPanelItem = ( label ) => {
-		setPanelItems( ( items ) =>
-			items.filter( ( item ) => item.label !== label )
-		);
+		// When switching selections between components injecting matching
+		// controls, e.g. both panels have a "padding" control, the
+		// deregistration of the first panel doesn't occur until after the
+		// registration of the next.
+		const index = panelItems.findIndex( ( item ) => item.label === label );
+
+		if ( index !== -1 ) {
+			setPanelItems( ( items ) => items.splice( index, 1 ) );
+		}
 	};
 
 	// Manage and share display state of menu items representing child controls.
