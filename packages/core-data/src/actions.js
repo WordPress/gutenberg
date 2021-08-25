@@ -647,15 +647,13 @@ export function* __experimentalBatch( requests ) {
  * @param {Object} recordId ID of the record.
  * @param {Object} options  Saving options.
  */
-export const saveEditedEntityRecord = ( kind, name, recordId, options ) =>
- async ( { select, dispatch } ) => {
-	if (
-		! ( select.hasEditsForEntityRecord(
-			kind,
-			name,
-			recordId
-		) )
-	) {
+export const saveEditedEntityRecord = (
+	kind,
+	name,
+	recordId,
+	options
+) => async ( { select, dispatch } ) => {
+	if ( ! select.hasEditsForEntityRecord( kind, name, recordId ) ) {
 		return;
 	}
 	const edits = select.getEntityRecordNonTransientEdits(
@@ -665,7 +663,7 @@ export const saveEditedEntityRecord = ( kind, name, recordId, options ) =>
 	);
 	const record = { id: recordId, ...edits };
 	return await dispatch( saveEntityRecord( kind, name, record, options ) );
-}
+};
 
 /**
  * Action triggered to save only specified properties for the entity.
@@ -683,13 +681,7 @@ export const __experimentalSaveSpecifiedEntityEdits = (
 	itemsToSave,
 	options
 ) => async ( { select, dispatch } ) => {
-	if (
-		! ( select.hasEditsForEntityRecord(
-			kind,
-			name,
-			recordId
-		) )
-	) {
+	if ( ! select.hasEditsForEntityRecord( kind, name, recordId ) ) {
 		return;
 	}
 	const edits = select.getEntityRecordNonTransientEdits(
@@ -703,8 +695,10 @@ export const __experimentalSaveSpecifiedEntityEdits = (
 			editsToSave[ edit ] = edits[ edit ];
 		}
 	}
-	return await dispatch( saveEntityRecord( kind, name, editsToSave, options ) );
-}
+	return await dispatch(
+		saveEntityRecord( kind, name, editsToSave, options )
+	);
+};
 
 /**
  * Returns an action object used in signalling that Upload permissions have been received.
