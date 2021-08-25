@@ -17,9 +17,9 @@ module.exports = {
 	testEnvironmentOptions: {
 		'jest-playwright': {
 			launchOptions: {
-				// devtools: true,
-				// headless: false, // use PWDEBUG=1 for headfull run with debugger window
-				// slowMo: 100,
+				devtools: process.env.PLAYWRIGHT_DEVTOOLS === 'true',
+				headless: process.env.PLAYWRIGHT_HEADLESS !== 'false',
+				slowMo: parseInt( process.env.PLAYWRIGHT_SLOWMO, 10 ) || 0,
 				args: [ '--enable-blink-features=ComputedAccessibilityInfo' ],
 			},
 		},
