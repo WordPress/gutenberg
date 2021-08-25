@@ -10,10 +10,7 @@ import { MenuItem } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 
 export default function ConvertToRegularBlocks( { clientId } ) {
-	const innerBlocks = useSelect(
-		( select ) => select( blockEditorStore ).getBlocks( clientId ),
-		[ clientId ]
-	);
+	const { getBlocks } = useSelect( blockEditorStore );
 	const { replaceBlocks } = useDispatch( blockEditorStore );
 
 	return (
@@ -21,7 +18,7 @@ export default function ConvertToRegularBlocks( { clientId } ) {
 			{ ( { onClose } ) => (
 				<MenuItem
 					onClick={ () => {
-						replaceBlocks( clientId, innerBlocks );
+						replaceBlocks( clientId, getBlocks( clientId ) );
 						onClose();
 					} }
 				>

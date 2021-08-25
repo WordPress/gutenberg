@@ -290,11 +290,11 @@ export const getBlocksByClientId = createSelector(
 		map( castArray( clientIds ), ( clientId ) =>
 			getBlock( state, clientId )
 		),
-	( state ) => [
-		state.blocks.byClientId,
-		state.blocks.order,
-		state.blocks.attributes,
-	]
+	( state, clientIds ) =>
+		map(
+			castArray( clientIds ),
+			( clientId ) => state.blocks.tree[ clientId ]
+		)
 );
 
 /**
