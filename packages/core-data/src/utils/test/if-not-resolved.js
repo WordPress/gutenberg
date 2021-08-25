@@ -27,48 +27,30 @@ describe( 'ifNotResolved', () => {
 		expect( resolver ).toBeInstanceOf( Function );
 	} );
 
-	it( 'triggers original resolver if not already resolved', () => {
-		controls.select.mockImplementation( ( _storeKey, selectorName ) => ( {
-			_nextValue:
-				selectorName === 'hasStartedResolution' ? false : undefined,
-		} ) );
+	it( 'triggers original resolver if not already resolved', async () => {
+		const select = { hasStartedResolution: () => false };
+		const dispatch = () => {};
 
 		const originalResolver = jest
 			.fn()
-			.mockImplementation( function* () {} );
+			.mockImplementation( async function () {} );
 
 		const resolver = ifNotResolved( originalResolver, 'originalResolver' );
-
-		const runResolver = resolver();
-
-		let next, nextValue;
-		do {
-			next = runResolver.next( nextValue );
-			nextValue = next.value?._nextValue;
-		} while ( ! next.done );
+		await resolver()( { select, dispatch } );
 
 		expect( originalResolver ).toHaveBeenCalledTimes( 1 );
 	} );
 
-	it( 'does not trigger original resolver if already resolved', () => {
-		controls.select.mockImplementation( ( _storeKey, selectorName ) => ( {
-			_nextValue:
-				selectorName === 'hasStartedResolution' ? true : undefined,
-		} ) );
+	it( 'does not trigger original resolver if already resolved', async () => {
+		const select = { hasStartedResolution: () => true };
+		const dispatch = () => {};
 
 		const originalResolver = jest
 			.fn()
-			.mockImplementation( function* () {} );
+			.mockImplementation( async function () {} );
 
 		const resolver = ifNotResolved( originalResolver, 'originalResolver' );
-
-		const runResolver = resolver();
-
-		let next, nextValue;
-		do {
-			next = runResolver.next( nextValue );
-			nextValue = next.value?._nextValue;
-		} while ( ! next.done );
+		await resolver()( { select, dispatch } );
 
 		expect( originalResolver ).toHaveBeenCalledTimes( 0 );
 	} );
