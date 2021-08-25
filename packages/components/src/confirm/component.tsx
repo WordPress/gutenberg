@@ -1,78 +1,58 @@
-// @ts-nocheck (for now)
+//@ts-nocheck (while we're using react-confirm)
 
 /**
  * External dependencies
  */
 // eslint-disable-next-line no-restricted-imports
-import { Ref, useEffect } from 'react';
 import { confirmable } from 'react-confirm';
+import { __ } from '@wordpress/i18n';
+import { useMemo } from 'react';
 
 /**
  * Internal dependencies
  */
+import * as styles from './styles';
 import Button from '../button';
+import Modal from '../modal';
 import type { OwnProps } from './types';
-import { Card, CardHeader, CardFooter } from '../card';
-import { Heading } from '../heading';
-import { contextConnect, PolymorphicComponentProps } from '../ui/context';
+import {
+	useContextSystem,
+	contextConnect,
+	PolymorphicComponentProps,
+} from '../ui/context';
 import { useConfirm } from './hook';
-import type { KeyboardEvent } from 'react';
+import { useCx } from '../utils/hooks/use-cx';
 
 // @todo add type declarations for the react-confirm functions
 function Confirm(
 	props: PolymorphicComponentProps< OwnProps, 'div', false >,
 	forwardedRef: Ref< any >
 ) {
-	const {
-		role,
-		wrapperClassName,
-		overlayClassName,
-		show,
-		proceed,
-		confirmation,
-		...otherProps
-	} = useConfirm( props );
+	const { show, proceed, role, ...otherProps } = useContextSystem(
+		props,
+		'Confirm'
+	);
+	const cx = useCx();
 
-	function handleEscapePress( event: KeyboardEvent< HTMLDivElement > ) {
-		// `keyCode` is deprecated, so let's use `key`
-		if ( event.key === 'Escape' ) {
-			proceed( false );
-		}
-	}
+	const invisibleClassName = cx( ! show && styles.wrapperHidden );
 
-	useEffect( () => {
-		document.addEventListener( 'keydown', handleEscapePress );
-		return () =>
-			document.removeEventListener( 'keydown', handleEscapePress );
-	}, [] );
+	console.log( show );
+	console.log( isVisible );
 
 	return (
 		<div
 			role={ role }
 			ref={ forwardedRef }
-			className={ wrapperClassName }
-			style={ { visibility: show ? 'visible' : 'hidden' } }
+			className={ invisibleClassName }
 		>
-			<Card onMouseDown={ ( event ) => event.preventDefault() }>
-				<CardHeader>
-					<Heading level="4">{ confirmation }</Heading>
-				</CardHeader>
-				<CardFooter justify="center">
-					<Button
-						variant="secondary"
-						onClick={ () => proceed( false ) }
-					>
-						Cancel
-					</Button>
-					<Button variant="primary" onClick={ () => proceed( true ) }>
-						OK
-					</Button>
-				</CardFooter>
-			</Card>
-			<div
-				className={ overlayClassName }
-				onClick={ () => proceed( false ) }
-			></div>
+			<Modal { ...otherProps } ref={ forwardedRef }>
+				<Button variant="secondary" onClick={ () => proceed( false ) }>
+					{ __( 'Cancel' ) }
+				</Button>
+				<Button variant="primary" onClick={ () => proceed( true ) }>
+					{ __( 'OK' ) }
+				</Button>
+			</Modal>
 		</div>
 	);
 }
