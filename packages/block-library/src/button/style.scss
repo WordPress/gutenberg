@@ -14,7 +14,7 @@ $blocks-block__margin: 0.5em;
 	padding: calc(0.667em + 2px) calc(1.333em + 2px); // The extra 2px are added to size solids the same as the outline versions.
 	text-align: center;
 	text-decoration: none;
-	overflow-wrap: break-word;
+	word-break: break-word; // overflow-wrap doesn't work well if a link is wrapped in the div, so use word-break here.
 	box-sizing: border-box;
 
 	&:hover,
