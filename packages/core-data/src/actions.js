@@ -643,7 +643,16 @@ export function* __experimentalBatch( requests ) {
 			);
 		},
 	};
-	const resultPromises = requests.map( ( request ) => request( api ) );
+	const resultPromises = [];
+	const awaitNextFrame = () => __unstableAwaitPromise( new Promise( window.requestAnimationFrame ) );
+	for ( const request of requests ) {
+		resultPromises.push( request( api ) );
+
+		// Each request( api ) is pretty fast, but when there's a lot of them it may block the browser for a few
+		// seconds. Let's split this long, blocking task into bite-sized pieces scheduled separately to give the
+		// browser a space for processing other tasks.
+		yield awaitNextFrame();
+	}
 	const [ , ...results ] = yield __unstableAwaitPromise(
 		Promise.all( [ batch.run(), ...resultPromises ] )
 	);
