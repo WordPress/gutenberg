@@ -11,6 +11,9 @@ For each user feature we should also add a importance categorization label  to i
 
 ## Unreleased
 
+## 1.60.1
+-   [*] RNmobile: Fix the cancel button on Block Variation Picker / Columns Block. [#34249]
+
 ## 1.60.0
 -   [**] Embed block: Add "Resize for smaller devices" setting. [#33654]
 
