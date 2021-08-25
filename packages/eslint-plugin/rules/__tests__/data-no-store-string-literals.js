@@ -26,6 +26,7 @@ const valid = [
 	// Direct function calls
 	`import { useDispatch } from '@wordpress/data'; import { store as coreStore } from '@wordpress/core-data'; useDispatch( store );`,
 	`import { dispatch } from '@wordpress/data'; import { store as coreStore } from '@wordpress/core-data'; dispatch( store );`,
+	`import { useSelect } from '@wordpress/data'; import { store as coreStore } from '@wordpress/core-data'; useSelect( store );`,
 	`import { select } from '@wordpress/data'; import { store as coreStore } from '@wordpress/core-data'; select( store );`,
 	`import { resolveSelect } from '@wordpress/data'; import { store as coreStore } from '@wordpress/core-data'; resolveSelect( store );`,
 	`import { resolveSelect as resolveSelectAlias } from '@wordpress/data'; import { store as coreStore } from '@wordpress/core-data'; resolveSelectAlias( store );`,
@@ -63,6 +64,7 @@ const invalid = [
 	// Direct function calls
 	`import { useDispatch } from '@wordpress/data'; useDispatch( 'core' );`,
 	`import { dispatch } from '@wordpress/data'; dispatch( 'core' );`,
+	`import { useSelect } from '@wordpress/data'; useSelect( 'core' );`,
 	`import { select } from '@wordpress/data'; select( 'core' );`,
 	`import { resolveSelect } from '@wordpress/data'; resolveSelect( 'core' );`,
 	`import { resolveSelect as resolveSelectAlias } from '@wordpress/data'; resolveSelectAlias( 'core' );`,
