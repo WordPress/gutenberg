@@ -647,11 +647,10 @@ export function* __experimentalBatch( requests ) {
  * @param {Object} recordId ID of the record.
  * @param {Object} options  Saving options.
  */
-export function* saveEditedEntityRecord( kind, name, recordId, options ) {
+export const saveEditedEntityRecord = ( kind, name, recordId, options ) =>
+ async ( { select, dispatch } ) => {
 	if (
-		! ( yield controls.select(
-			STORE_NAME,
-			'hasEditsForEntityRecord',
+		! ( select.hasEditsForEntityRecord(
 			kind,
 			name,
 			recordId
@@ -659,15 +658,13 @@ export function* saveEditedEntityRecord( kind, name, recordId, options ) {
 	) {
 		return;
 	}
-	const edits = yield controls.select(
-		STORE_NAME,
-		'getEntityRecordNonTransientEdits',
+	const edits = select.getEntityRecordNonTransientEdits(
 		kind,
 		name,
 		recordId
 	);
 	const record = { id: recordId, ...edits };
-	return yield* saveEntityRecord( kind, name, record, options );
+	return await dispatch( saveEntityRecord( kind, name, record, options ) );
 }
 
 /**
@@ -679,17 +676,15 @@ export function* saveEditedEntityRecord( kind, name, recordId, options ) {
  * @param {Array}  itemsToSave List of entity properties to save.
  * @param {Object} options     Saving options.
  */
-export function* __experimentalSaveSpecifiedEntityEdits(
+export const __experimentalSaveSpecifiedEntityEdits = (
 	kind,
 	name,
 	recordId,
 	itemsToSave,
 	options
-) {
+) => async ( { select, dispatch } ) => {
 	if (
-		! ( yield controls.select(
-			STORE_NAME,
-			'hasEditsForEntityRecord',
+		! ( select.hasEditsForEntityRecord(
 			kind,
 			name,
 			recordId
@@ -697,9 +692,7 @@ export function* __experimentalSaveSpecifiedEntityEdits(
 	) {
 		return;
 	}
-	const edits = yield controls.select(
-		STORE_NAME,
-		'getEntityRecordNonTransientEdits',
+	const edits = select.getEntityRecordNonTransientEdits(
 		kind,
 		name,
 		recordId
@@ -710,7 +703,7 @@ export function* __experimentalSaveSpecifiedEntityEdits(
 			editsToSave[ edit ] = edits[ edit ];
 		}
 	}
-	return yield* saveEntityRecord( kind, name, editsToSave, options );
+	return await dispatch( saveEntityRecord( kind, name, editsToSave, options ) );
 }
 
 /**
