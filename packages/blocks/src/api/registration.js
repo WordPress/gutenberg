@@ -603,7 +603,7 @@ export function hasBlockSupport( nameOrType, feature, defaultSupports ) {
  * @return {boolean} Whether the given block is a reusable block.
  */
 export function isReusableBlock( blockOrType ) {
-	return blockOrType.name === 'core/block';
+	return blockOrType?.name === 'core/block';
 }
 
 /**

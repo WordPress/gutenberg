@@ -435,7 +435,7 @@ class BottomSheet extends Component {
 
 		let listStyle = {};
 		if ( isFullScreen ) {
-			listStyle = { flexGrow: 1 };
+			listStyle = { flexGrow: 1, flexShrink: 1 };
 		} else if ( isMaxHeightSet ) {
 			listStyle = { maxHeight };
 
@@ -532,7 +532,10 @@ class BottomSheet extends Component {
 					} }
 					keyboardVerticalOffset={ -safeAreaBottomInset }
 				>
-					<View onLayout={ this.onHeaderLayout }>
+					<View
+						style={ styles.header }
+						onLayout={ this.onHeaderLayout }
+					>
 						{ ! ( Platform.OS === 'android' && isFullScreen ) && (
 							<View style={ styles.dragIndicator } />
 						) }

@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/react-native-editor",
-	"version": "1.59.0",
+	"version": "1.60.0",
 	"description": "Mobile WordPress gutenberg editor.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -70,7 +70,8 @@
 		"react-native-screens": "git+https://github.com/wordpress-mobile/react-native-screens.git#2.9.0-wp",
 		"react-native-svg": "git+https://github.com/wordpress-mobile/react-native-svg.git#v9.13.7-wp",
 		"react-native-url-polyfill": "^1.1.2",
-		"react-native-video": "git+https://github.com/wordpress-mobile/react-native-video.git#5.0.2-wp"
+		"react-native-video": "git+https://github.com/wordpress-mobile/react-native-video.git#5.0.2-wp",
+		"react-native-webview": "git+https://github.com/wordpress-mobile/react-native-webview.git#v11.6.5-wp"
 	},
 	"publishConfig": {
 		"access": "public"

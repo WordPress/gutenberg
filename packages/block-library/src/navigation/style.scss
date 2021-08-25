@@ -80,10 +80,13 @@
 	// Submenu indicator.
 	.wp-block-page-list__submenu-icon,
 	.wp-block-navigation-link__submenu-icon {
+		align-self: center;
 		height: inherit;
+		line-height: 0;
 		margin-left: 6px;
 
 		svg {
+			display: inline-block;
 			stroke: currentColor;
 		}
 	}
@@ -338,13 +341,15 @@
 	// Horizontal layout
 	display: flex;
 	flex-wrap: wrap;
+	flex: 1;
+}
 
-	// Vertical layout
-	.is-vertical & {
-		display: block;
-		flex-direction: column;
-		align-items: flex-start;
-	}
+// Vertical layout
+.is-vertical .wp-block-page-list, // Page list.
+.is-vertical .wp-block-navigation__container {
+	display: block;
+	flex-direction: column;
+	align-items: flex-start;
 }
 
 // Justification.
@@ -441,6 +446,7 @@
 			display: flex;
 			flex-direction: row;
 			position: relative;
+			z-index: 2;
 			background-color: inherit;
 
 			.wp-block-navigation__responsive-container-close {

@@ -179,12 +179,10 @@ exports[`PreferencesModal should match snapshot when the modal is active small v
             />
           </PageAttributesCheck>
         </Section>
-        <Section
+        <WithSelect(MetaBoxesSection)
           description="Add extra areas to the editor."
           title="Additional"
-        >
-          <WithSelect(MetaBoxesSection) />
-        </Section>
+        />
       </NavigationItem>
     </NavigationMenu>
   </Navigation>

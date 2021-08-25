@@ -165,7 +165,13 @@ export function useMultiSelection( clientId ) {
 
 				if ( event.shiftKey ) {
 					const blockSelectionStart = getBlockSelectionStart();
-					if ( blockSelectionStart !== clientId ) {
+					// Handle the case where we select a single block by
+					// holding the `shiftKey` and don't mark this action
+					// as multiselection.
+					if (
+						blockSelectionStart &&
+						blockSelectionStart !== clientId
+					) {
 						toggleRichText( node, false );
 						multiSelect( blockSelectionStart, clientId );
 						event.preventDefault();

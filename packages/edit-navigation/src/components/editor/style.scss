@@ -3,7 +3,12 @@
 	border: $border-width solid $gray-900;
 	border-radius: $radius-block-ui;
 	max-width: $navigation-editor-width;
-	margin: auto;
+	margin: $grid-unit-40 auto 0 auto;
+
+	@include break-medium() {
+		// Provide space for the floating block toolbar.
+		margin-top: $grid-unit-50 * 2;
+	}
 
 	.editor-styles-wrapper {
 		padding: 0;

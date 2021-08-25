@@ -123,7 +123,7 @@ const LABEL_FEATURE_MAPPING = {
 	'[Package] Icons': 'Icons',
 	'[Package] Block Editor': 'Block Editor',
 	'[Package] Block library': 'Block Library',
-	'[Package] Editor': 'Editor',
+	'[Package] Editor': 'Post Editor',
 	'[Package] Edit Widgets': 'Widgets Editor',
 	'[Package] Widgets Customizer': 'Widgets Editor',
 	'[Package] Components': 'Components',
@@ -282,6 +282,12 @@ function getIssueType( issue ) {
 		...getTypesByLabels( labels ),
 		...getTypesByTitle( issue.title ),
 	];
+
+	// Force all tasks identified as Documentation tasks
+	// to appear under the main "Documentation" section.
+	if ( candidates.includes( 'Documentation' ) ) {
+		return 'Documentation';
+	}
 
 	return candidates.length ? candidates.sort( sortType )[ 0 ] : 'Various';
 }
@@ -533,6 +539,27 @@ function getEntry( issue ) {
 }
 
 /**
+ * Returns a formatted changelog entry for a given issue object and matching feature name, or undefined
+ * if entry should be omitted.
+ *
+ * @param {IssuesListForRepoResponseItem} issue       Issue object.
+ * @param {string}                        featureName Feature name.
+ *
+ * @return {string=} Formatted changelog entry, or undefined to omit.
+ */
+function getFeatureEntry( issue, featureName ) {
+	return getEntry( issue )
+		?.replace(
+			new RegExp( `\\[${ featureName.toLowerCase() } \- `, 'i' ),
+			'['
+		)
+		.replace(
+			new RegExp( `(?<=^- )${ featureName.toLowerCase() }: `, 'i' ),
+			''
+		);
+}
+
+/**
  * Returns the latest release for a given series
  *
  * @param {GitHub} octokit Initialized Octokit REST client.
@@ -636,6 +663,17 @@ async function getChangelog( settings ) {
 		}
 	}
 
+	return formatChangelog( pullRequests );
+}
+
+/**
+ * Formats the changelog string for a given list of pull requests.
+ *
+ * @param {IssuesListForRepoResponseItem[]} pullRequests List of pull requests.
+ *
+ * @return {string} The formatted changelog string.
+ */
+function formatChangelog( pullRequests ) {
 	let changelog = '';
 
 	const groupedPullRequests = groupBy( pullRequests, getIssueType );
@@ -665,8 +703,9 @@ async function getChangelog( settings ) {
 			const featureGroupPRs = featureGroups[ featureName ];
 
 			const featureGroupEntries = featureGroupPRs
-				.map( getEntry )
-				.filter( Boolean );
+				.map( ( issue ) => getFeatureEntry( issue, featureName ) )
+				.filter( Boolean )
+				.sort();
 
 			// Don't create feature sections when there are no PRs.
 			if ( ! featureGroupEntries.length ) {
@@ -675,18 +714,18 @@ async function getChangelog( settings ) {
 
 			// Avoids double nesting such as "Documentation" feature under
 			// the "Documentation" section.
-			if ( group !== featureName ) {
+			if (
+				group !== featureName &&
+				featureName !== UNKNOWN_FEATURE_FALLBACK_NAME
+			) {
 				// Start new <ul> for the Feature group.
-				changelog += '- ' + featureName + '\n';
+				changelog += '#### ' + featureName + '\n';
 			}
 
 			// Add a <li> for each PR in the Feature.
 			featureGroupEntries.forEach( ( entry ) => {
-				// Strip feature name from entry if present.
-				entry = entry && entry.replace( `[${ featureName } - `, '[' );
-
 				// Add a new bullet point to the list.
-				changelog += `  ${ entry }\n`;
+				changelog += `${ entry }\n`;
 			} );
 
 			// Close the <ul> for the Feature group.
@@ -709,11 +748,11 @@ async function getChangelog( settings ) {
 function sortFeatureGroups( featureGroups ) {
 	return Object.keys( featureGroups ).sort(
 		( featureAName, featureBName ) => {
-			// Sort "Unknown" to always be at the end
+			// Sort "uncategorized" items to *always* be at the top of the section
 			if ( featureAName === UNKNOWN_FEATURE_FALLBACK_NAME ) {
-				return 1;
-			} else if ( featureBName === UNKNOWN_FEATURE_FALLBACK_NAME ) {
 				return -1;
+			} else if ( featureBName === UNKNOWN_FEATURE_FALLBACK_NAME ) {
+				return 1;
 			}
 
 			// Sort by greatest number of PRs in the group first.
@@ -787,4 +826,5 @@ async function getReleaseChangelog( options ) {
 	sortGroup,
 	getTypesByLabels,
 	getTypesByTitle,
+	formatChangelog,
 };

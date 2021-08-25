@@ -53,7 +53,10 @@ const baseConfig = {
 		] ),
 	},
 	watchOptions: {
-		ignored: [ '**/node_modules', '**/packages/*/src' ],
+		ignored: [
+			'**/node_modules',
+			'**/packages/*/src/**/*.{js,ts,tsx,scss}',
+		],
 		aggregateTimeout: 500,
 	},
 	devtool,
@@ -67,9 +70,6 @@ const plugins = [
 		// Inject the `GUTENBERG_PHASE` global, used for feature flagging.
 		'process.env.GUTENBERG_PHASE': JSON.stringify(
 			parseInt( process.env.npm_package_config_GUTENBERG_PHASE, 10 ) || 1
-		),
-		'process.env.FORCE_REDUCED_MOTION': JSON.stringify(
-			process.env.FORCE_REDUCED_MOTION
 		),
 	} ),
 	new DependencyExtractionWebpackPlugin( { injectPolyfill: true } ),

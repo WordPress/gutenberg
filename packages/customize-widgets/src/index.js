@@ -12,6 +12,8 @@ import {
 	registerLegacyWidgetVariations,
 } from '@wordpress/widgets';
 import { setFreeformContentHandlerName } from '@wordpress/blocks';
+import { dispatch } from '@wordpress/data';
+import { store as interfaceStore } from '@wordpress/interface';
 
 /**
  * Internal dependencies
@@ -33,6 +35,11 @@ const ENABLE_EXPERIMENTAL_FSE_BLOCKS = false;
  * @param {Object} blockEditorSettings Block editor settings.
  */
 export function initialize( editorName, blockEditorSettings ) {
+	dispatch( interfaceStore ).setFeatureDefaults( 'core/customize-widgets', {
+		fixedToolbar: false,
+		welcomeGuide: true,
+	} );
+
 	const coreBlocks = __experimentalGetCoreBlocks().filter( ( block ) => {
 		return ! (
 			DISABLED_BLOCKS.includes( block.name ) ||
