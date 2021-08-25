@@ -6,10 +6,10 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import {useRefEffect} from '@wordpress/compose';
-import {useEffect, useState} from '@wordpress/element';
-import {Disabled, Placeholder, Spinner} from '@wordpress/components';
-import {__} from '@wordpress/i18n';
+import { useRefEffect } from '@wordpress/compose';
+import { useEffect, useState } from '@wordpress/element';
+import { Disabled, Placeholder, Spinner } from '@wordpress/components';
+import { __ } from '@wordpress/i18n';
 import apiFetch from '@wordpress/api-fetch';
 
 export default function Preview( { idBase, instance, isVisible } ) {
