@@ -82,7 +82,7 @@ require_once __DIR__ . '/widgets-page.php';
 
 require __DIR__ . '/compat.php';
 require __DIR__ . '/compat/wordpress-5.8/index.php';
-require __DIR__ . '/compat/wordpress-trunk/index.php';
+require __DIR__ . '/compat/wordpress-5.9/index.php';
 require __DIR__ . '/utils.php';
 require __DIR__ . '/editor-settings.php';
 

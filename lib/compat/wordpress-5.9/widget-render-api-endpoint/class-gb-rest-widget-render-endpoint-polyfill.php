@@ -1,6 +1,6 @@
 <?php
 /**
- * REST API: WP_REST_Widget_Render_Endpoint_Polyfill class
+ * REST API: GB_REST_Widget_Render_Endpoint_Polyfill class
  *
  * @package gutenberg
  */
@@ -10,7 +10,7 @@
  *
  * @see \WP_REST_Controller
  */
-class WP_REST_Widget_Render_Endpoint_Polyfill extends \WP_REST_Widget_Types_Controller {
+class GB_REST_Widget_Render_Endpoint_Polyfill extends \WP_REST_Widget_Types_Controller {
 
 	/**
 	 * Registers the widget render route if one is missing.
