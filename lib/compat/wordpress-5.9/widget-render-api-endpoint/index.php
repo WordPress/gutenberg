@@ -6,13 +6,13 @@
  */
 
 // Load the polyfill class.
-require_once __DIR__ . '/class-wp-rest-widget-render-endpoint-polyfill.php';
+require_once __DIR__ . '/class-gb-rest-widget-render-endpoint-polyfill.php';
 
 /**
- * Registers routes from the WP_REST_Widget_Render_Endpoint_Polyfill class.
+ * Registers routes from the GB_REST_Widget_Render_Endpoint_Polyfill class.
  */
 function setup_widget_render_api_endpoint_polyfill() {
-	$polyfill = new WP_REST_Widget_Render_Endpoint_Polyfill();
+	$polyfill = new GB_REST_Widget_Render_Endpoint_Polyfill();
 	$polyfill->register_routes();
 }
 
