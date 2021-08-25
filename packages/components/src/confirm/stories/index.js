@@ -19,10 +19,10 @@ export const _default = () => {
 	const [ confirmVal, setConfirmVal ] = useState();
 
 	async function triggerConfirm() {
-		if ( await confirm( { confirmation: 'Are you sure?' } ) ) {
-			setConfirmVal( 'You are sure!' );
+		if ( await confirm( { message: 'Are you sure?' } ) ) {
+			setConfirmVal( "Let's do it!" );
 		} else {
-			setConfirmVal( 'Ok, take more time to decide!' );
+			setConfirmVal( 'Ok, take your time!' );
 		}
 	}
 
