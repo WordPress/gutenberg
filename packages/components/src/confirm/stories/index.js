@@ -1,6 +1,7 @@
 /**
  * External dependencies
  */
+// eslint-disable-next-line no-restricted-imports
 import React, { useState } from 'react';
 
 /**
@@ -19,7 +20,7 @@ export const _default = () => {
 	const [ confirmVal, setConfirmVal ] = useState();
 
 	async function triggerConfirm() {
-		if ( await confirm( { message: 'Are you sure?' } ) ) {
+		if ( await confirm( 'Are you sure?' ) ) {
 			setConfirmVal( "Let's do it!" );
 		} else {
 			setConfirmVal( 'Ok, take your time!' );

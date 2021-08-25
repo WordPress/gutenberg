@@ -1,10 +1,10 @@
-//@ts-nocheck (while we're using react-confirm)
-
 /**
  * External dependencies
  */
 // eslint-disable-next-line no-restricted-imports
-import { confirmable } from 'react-confirm';
+import { useState } from 'react';
+// eslint-disable-next-line no-restricted-imports
+import type { Ref, MouseEvent } from 'react';
 /**
  * WordPress dependencies
  */
@@ -29,32 +29,41 @@ function Confirm(
 	forwardedRef: Ref< any >
 ) {
 	const {
-		show: isOpen = true,
-		proceed,
-		role,
 		message,
+		onConfirm,
+		onCancel,
+		role,
 		...otherProps
 	} = useContextSystem( props, 'Confirm' );
+
+	const [ isOpen, setIsOpen ] = useState( true );
+
+	const closeAndHandle = (
+		callback: ( event: MouseEvent< HTMLButtonElement > ) => void
+	) => ( event: MouseEvent< HTMLButtonElement > ) => {
+		setIsOpen( false );
+		callback( event );
+	};
 
 	return (
 		<>
 			{ isOpen && (
 				<Modal
 					title={ message }
-					onRequestClose={ () => proceed( false ) }
+					onRequestClose={ closeAndHandle( onCancel ) }
 					{ ...otherProps }
 					ref={ forwardedRef }
 				>
 					<Flex justify="flex-end">
 						<Button
 							variant="secondary"
-							onClick={ () => proceed( false ) }
+							onClick={ closeAndHandle( onCancel ) }
 						>
 							{ __( 'Cancel' ) }
 						</Button>
 						<Button
 							variant="primary"
-							onClick={ () => proceed( true ) }
+							onClick={ closeAndHandle( onConfirm ) }
 						>
 							{ __( 'OK' ) }
 						</Button>
@@ -65,4 +74,4 @@ function Confirm(
 	);
 }
 
-export default confirmable( contextConnect( Confirm, 'Confirm' ) );
+export default contextConnect( Confirm, 'Confirm' );
