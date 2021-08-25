@@ -256,7 +256,7 @@ function render_block_core_navigation_submenu( $attributes, $content, $block ) {
 
 		if ( isset( $block->context['showSubmenuIcon'] ) && $block->context['showSubmenuIcon'] ) {
 			// The submenu icon can be hidden by a CSS rule on the Navigation Block.
-			$html .= '<span class="wp-block-navigation-link__submenu-icon">' . block_core_navigation_submenu_render_submenu_icon() . '</span>';
+			$html .= '<span class="wp-block-navigation__submenu-icon">' . block_core_navigation_submenu_render_submenu_icon() . '</span>';
 		}
 
 		$html .= '</button>';
