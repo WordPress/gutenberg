@@ -656,6 +656,9 @@ export function* __experimentalBatch( requests ) {
 		// Each request( api ) is pretty fast, but when there's a lot of them it may block the browser for a few
 		// seconds. Let's split this long, blocking task into bite-sized pieces scheduled separately to give the
 		// browser a space for processing other tasks.
+		//
+		// Ideally this will be just a temporary fix and the blocking would not be an issue in the first place.
+		// Replacing redux-rungen usage with async thunks may help with that, see https://github.com/WordPress/gutenberg/pull/27276
 		yield awaitNextFrame();
 	}
 	const [ , ...results ] = yield __unstableAwaitPromise(
