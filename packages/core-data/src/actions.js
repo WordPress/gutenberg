@@ -645,7 +645,7 @@ export function* __experimentalBatch( requests ) {
 	};
 	const resultPromises = [];
 	const awaitNextFrame = () =>
-		__unstableAwaitPromise( new Promise( window.requestAnimationFrame ) );
+		__unstableAwaitPromise( new Promise( resolve => window.requestAnimationFrame( () => resolve() ) ) );
 	for ( const request of requests ) {
 		resultPromises.push( request( api ) );
 
