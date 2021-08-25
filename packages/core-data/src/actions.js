@@ -403,7 +403,7 @@ export const saveEntityRecord = (
 			}
 		}
 
-		dispatch( {
+		await dispatch( {
 			type: 'SAVE_ENTITY_RECORD_START',
 			kind,
 			name,
@@ -417,8 +417,6 @@ export const saveEntityRecord = (
 				recordId ? '/' + recordId : ''
 			}`;
 			const persistedRecord = select.getRawEntityRecord(
-				STORE_NAME,
-				'getRawEntityRecord',
 				kind,
 				name,
 				recordId
@@ -432,8 +430,6 @@ export const saveEntityRecord = (
 				const currentUser = select.getCurrentUser();
 				const currentUserId = currentUser ? currentUser.id : undefined;
 				const autosavePost = select.getAutosave(
-					STORE_NAME,
-					'getAutosave',
 					persistedRecord.type,
 					persistedRecord.id,
 					currentUserId
