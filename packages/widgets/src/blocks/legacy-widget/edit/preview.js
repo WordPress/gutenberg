@@ -127,9 +127,6 @@ export default function Preview( { idBase, instance, isVisible } ) {
 						ref={ ref }
 						className="wp-block-legacy-widget__edit-preview-iframe"
 						title={ __( 'Legacy Widget Preview' ) }
-						// TODO: This chokes when the query param is too big.
-						// Ideally, we'd render a <ServerSideRender>. Maybe by
-						// rendering one in an iframe via a portal.
 						srcDoc={ srcDoc }
 						onLoad={ ( event ) => {
 							// To hide the scrollbars of the preview frame for some edge cases,
