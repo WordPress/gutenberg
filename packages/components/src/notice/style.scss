@@ -76,6 +76,7 @@
 	// The notice should never be wider than the viewport, or the close button might be hidden. Especially relevant at high zoom levels. Related to https://core.trac.wordpress.org/ticket/47603#ticket.
 	max-width: 100vw;
 	box-sizing: border-box;
+	z-index: z-index(".components-notice-list");
 
 	.components-notice__content {
 		margin-top: $grid-unit-15;

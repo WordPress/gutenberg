@@ -1,12 +1,22 @@
-// Dismissible & non-dismissible notices.
-.components-editor-notices__dismissible,
+// Dismissible notices.
+.components-editor-notices__dismissible {
+	position: sticky;
+	top: 0;
+	right: 0;
+	color: $gray-900;
+}
+
+// Non-dismissible notices.
 .components-editor-notices__pinned {
 	position: relative;
 	left: 0;
 	top: 0;
 	right: 0;
 	color: $gray-900;
+}
 
+.components-editor-notices__dismissible,
+.components-editor-notices__pinned {
 	.components-notice {
 		box-sizing: border-box;
 		margin: 0;
