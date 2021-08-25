@@ -11,7 +11,7 @@ import { useContextSystem } from '../../ui/context';
 import { useCx } from '../../utils/hooks/use-cx';
 
 export function useToolsPanel( props ) {
-	const { className, resetAll, ...otherProps } = useContextSystem(
+	const { className, resetAll, panelId, ...otherProps } = useContextSystem(
 		props,
 		'ToolsPanel'
 	);
@@ -103,6 +103,7 @@ export function useToolsPanel( props ) {
 	};
 
 	const panelContext = {
+		panelId,
 		menuItems,
 		registerPanelItem,
 		deregisterPanelItem,

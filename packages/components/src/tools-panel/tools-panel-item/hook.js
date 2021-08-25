@@ -18,6 +18,7 @@ export function useToolsPanelItem( props ) {
 		hasValue,
 		isShownByDefault,
 		label,
+		panelId,
 		resetAllFilter,
 		onDeselect = () => undefined,
 		onSelect = () => undefined,
@@ -30,6 +31,7 @@ export function useToolsPanelItem( props ) {
 	} );
 
 	const {
+		panelId: currentPanelId,
 		menuItems,
 		registerPanelItem,
 		deregisterPanelItem,
@@ -39,12 +41,15 @@ export function useToolsPanelItem( props ) {
 	// Registering the panel item allows the panel to include it in its
 	// automatically generated menu and determine its initial checked status.
 	useEffect( () => {
-		registerPanelItem( {
-			hasValue,
-			isShownByDefault,
-			label,
-			resetAllFilter,
-		} );
+		if ( currentPanelId === panelId ) {
+			registerPanelItem( {
+				hasValue,
+				isShownByDefault,
+				label,
+				resetAllFilter,
+				panelId,
+			} );
+		}
 
 		return () => deregisterPanelItem( label );
 	}, [] );

@@ -79,6 +79,7 @@ export function DimensionsPanel( props ) {
 					onDeselect={ () => resetPadding( props ) }
 					resetAllFilter={ createResetAllFilter( 'padding' ) }
 					isShownByDefault={ defaultSpacingControls?.padding }
+					panelId={ props.clientId }
 				>
 					<PaddingEdit { ...props } />
 				</ToolsPanelItem>
@@ -90,6 +91,7 @@ export function DimensionsPanel( props ) {
 					onDeselect={ () => resetMargin( props ) }
 					resetAllFilter={ createResetAllFilter( 'margin' ) }
 					isShownByDefault={ defaultSpacingControls?.margin }
+					panelId={ props.clientId }
 				>
 					<MarginEdit { ...props } />
 				</ToolsPanelItem>

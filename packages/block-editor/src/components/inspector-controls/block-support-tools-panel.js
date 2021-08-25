@@ -50,6 +50,8 @@ export default function BlockSupportToolsPanel( { group, children } ) {
 			label={ BLOCK_SUPPORT_GROUPS[ group ]?.label }
 			header={ BLOCK_SUPPORT_GROUPS[ group ]?.header }
 			resetAll={ resetAll }
+			key={ clientId }
+			panelId={ clientId }
 		>
 			{ children }
 		</ToolsPanel>
