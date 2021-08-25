@@ -53,6 +53,39 @@ function mapBlockOrder( blocks, rootClientId = '' ) {
 }
 
 /**
+ * Given an array of blocks, returns an object where each key is a block clientId
+ * and the value is the index of the block inside its own parent.
+ *
+ * @param {Array} blocks Blocks to map.
+ *
+ * @return {Object} Block index map object.
+ */
+function mapBlockIndexes( blocks = [] ) {
+	const result = {};
+	blocks.forEach( ( block, index ) => {
+		result[ block.clientId ] = index;
+		Object.assign( result, mapBlockIndexes( block.innerBlocks ) );
+	} );
+
+	return result;
+}
+
+/**
+ * Given a blocks order array, return indexes per clientId.
+ *
+ * @param {Array} blocksOrder Blocks order array.
+ *
+ * @return {Object} Block index map object.
+ */
+function mapBlockIndexesFromOrder( blocksOrder ) {
+	const result = {};
+	for ( const [ clientId, index ] of Object.entries( blocksOrder ) ) {
+		result[ clientId ] = index;
+	}
+	return result;
+}
+
+/**
  * Given an array of blocks, returns an object where each key contains
  * the clientId of the block and the value is the parent of the block.
  *
@@ -453,6 +486,97 @@ const withBlockTree = ( reducer ) => ( state = {}, action ) => {
 };
 
 /**
+ * Higher-order reducer intended to compute full block objects key for each block in the post.
+ * This is a denormalization to optimize the performance of the getBlock selectors and avoid
+ * recomputing the block objects and avoid heavy memoization.
+ *
+ * @param {Function} reducer Original reducer function.
+ *
+ * @return {Function} Enhanced reducer function.
+ */
+const withBlockIndex = ( reducer ) => ( state = {}, action ) => {
+	const newState = reducer( state, action );
+
+	if ( newState === state ) {
+		return state;
+	}
+
+	newState.index = newState.index ? newState.index : {};
+
+	switch ( action.type ) {
+		case 'RECEIVE_BLOCKS': {
+			const blockIndex = mapBlockIndexes( action.blocks );
+			const currentLength = ( newState?.order?.[ '' ] || [] ).length;
+			return {
+				...newState,
+				...mapValues( blockIndex, ( i ) => i + currentLength ),
+			};
+		}
+		case 'INSERT_BLOCKS': {
+			const { rootClientId = '' } = action;
+			const blockIndex = mapBlockIndexesFromOrder(
+				newState.order[ rootClientId ]
+			);
+			newState.index = {
+				...newState.index,
+				...blockIndex,
+			};
+			break;
+		}
+
+		case 'MOVE_BLOCKS_TO_POSITION': {
+			const { fromRootClientId = '', toRootClientId = '' } = action;
+			const fromBlockIndex = mapBlockIndexesFromOrder(
+				newState.order[ fromRootClientId ]
+			);
+			const toBlockIndex =
+				fromRootClientId !== toRootClientId
+					? mapBlockIndexesFromOrder(
+							newState.order[ toRootClientId ]
+					  )
+					: {};
+
+			newState.index = {
+				...newState.index,
+				...fromBlockIndex,
+				...toBlockIndex,
+			};
+			break;
+		}
+
+		case 'MOVE_BLOCKS_UP':
+		case 'MOVE_BLOCKS_DOWN': {
+			const { rootClientId = '' } = action;
+			const blockIndex = mapBlockIndexesFromOrder(
+				newState.order[ rootClientId ]
+			);
+
+			newState.index = {
+				...newState.index,
+				...blockIndex,
+			};
+			break;
+		}
+
+		case 'REMOVE_BLOCKS_AUGMENTED_WITH_CHILDREN':
+		case 'REPLACE_BLOCKS_AUGMENTED_WITH_CHILDREN': {
+			if ( ! action.blocks ) {
+				return newState;
+			}
+
+			const result = {};
+			for ( const subOrder of Object.values( newState.order ) ) {
+				Object.assign( result, mapBlockIndexes( subOrder ) );
+			}
+			newState.index = result;
+			break;
+		}
+	}
+
+	return newState;
+};
+
+/**
  * Higher-order reducer intended to augment the blocks reducer, assigning an
  * `isPersistentChange` property value corresponding to whether a change in
  * state can be considered as persistent. All changes are considered persistent
@@ -655,6 +779,10 @@ const withBlockReset = ( reducer ) => ( state, action ) => {
 					controlledInnerBlocks
 				),
 			},
+			index: {
+				...omit( state?.index, visibleClientIds ),
+				...mapBlockIndexes( action.blocks ),
+			},
 			parents: {
 				...omit( state?.parents, visibleClientIds ),
 				...mapBlockParents( action.blocks ),
@@ -803,8 +931,9 @@ const withSaveReusableBlock = ( reducer ) => ( state, action ) => {
  */
 export const blocks = flow(
 	combineReducers,
-	withSaveReusableBlock, // needs to be before withBlockCache
+	withSaveReusableBlock,
 	withBlockTree, // needs to be before withInnerBlocksRemoveCascade
+	withBlockIndex,
 	withInnerBlocksRemoveCascade,
 	withReplaceInnerBlocks, // needs to be after withInnerBlocksRemoveCascade
 	withBlockReset,

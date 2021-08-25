@@ -357,10 +357,7 @@ export default compose( [
 		const destinationRootClientId = isAnyBlockSelected
 			? getBlockRootClientId( end )
 			: rootClientId;
-		const selectedBlockIndex = getBlockIndex(
-			end,
-			destinationRootClientId
-		);
+		const selectedBlockIndex = getBlockIndex( end );
 		const endOfRootIndex = getBlockOrder( rootClientId ).length;
 		const isSelectedUnmodifiedDefaultBlock = isAnyBlockSelected
 			? isUnmodifiedDefaultBlock( getBlock( end ) )
@@ -378,7 +375,7 @@ export default compose( [
 
 			// If the clientId is defined, we insert at the position of the block.
 			if ( clientId ) {
-				return getBlockIndex( clientId, rootClientId );
+				return getBlockIndex( clientId );
 			}
 
 			// If there is a selected block,

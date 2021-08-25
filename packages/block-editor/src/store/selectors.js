@@ -885,14 +885,13 @@ export function getBlockOrder( state, rootClientId ) {
  * Returns the index at which the block corresponding to the specified client
  * ID occurs within the block order, or `-1` if the block does not exist.
  *
- * @param {Object}  state        Editor state.
- * @param {string}  clientId     Block client ID.
- * @param {?string} rootClientId Optional root client ID of block list.
+ * @param {Object} state    Editor state.
+ * @param {string} clientId Block client ID.
  *
  * @return {number} Index at which block exists in order.
  */
-export function getBlockIndex( state, clientId, rootClientId ) {
-	return getBlockOrder( state, rootClientId ).indexOf( clientId );
+export function getBlockIndex( state, clientId ) {
+	return state.blocks.index[ clientId ] || -1;
 }
 
 /**
@@ -1112,7 +1111,7 @@ export function getBlockInsertionPoint( state ) {
 
 	if ( clientId ) {
 		rootClientId = getBlockRootClientId( state, clientId ) || undefined;
-		index = getBlockIndex( state, selectionEnd.clientId, rootClientId ) + 1;
+		index = getBlockIndex( state, selectionEnd.clientId ) + 1;
 	} else {
 		index = getBlockOrder( state ).length;
 	}

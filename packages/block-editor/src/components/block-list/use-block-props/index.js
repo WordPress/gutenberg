@@ -76,7 +76,6 @@ export function useBlockProps( props = {}, { __unstableIsHtml } = {} ) {
 	} = useSelect(
 		( select ) => {
 			const {
-				getBlockRootClientId,
 				getBlockIndex,
 				getBlockMode,
 				getBlockName,
@@ -92,11 +91,10 @@ export function useBlockProps( props = {}, { __unstableIsHtml } = {} ) {
 				isBlockMultiSelected( clientId ) ||
 				isAncestorMultiSelected( clientId );
 			const blockName = getBlockName( clientId );
-			const rootClientId = getBlockRootClientId( clientId );
 			const blockType = getBlockType( blockName );
 
 			return {
-				index: getBlockIndex( clientId, rootClientId ),
+				index: getBlockIndex( clientId ),
 				mode: getBlockMode( clientId ),
 				name: blockName,
 				blockTitle: blockType?.title,
