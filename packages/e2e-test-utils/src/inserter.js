@@ -62,13 +62,13 @@ export async function toggleGlobalBlockInserter() {
  * Moves focus to the selected block.
  */
 async function focusSelectedBlock() {
-	// Do a waitForFunction and wait until block is really focused
 	const blockId = await page.evaluate( () =>
 		wp.data.select( 'core/block-editor' ).getSelectedBlockClientId()
 	);
 	const blockElement = await page.waitForSelector(
 		`[data-block="${ blockId }"]`
 	);
+	// Ideally there should be a UI way to do this. (Focus the selected block)
 	await page.evaluate( ( id ) => {
 		wp.data.dispatch( 'core/block-editor' ).selectBlock( id, 0 );
 	}, blockId );
