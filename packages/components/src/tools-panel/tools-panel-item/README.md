@@ -18,6 +18,13 @@ for how to use `ToolsPanelItem`.
 
 ## Props
 
+### `hasValue`: `function`
+
+This is called when building the `ToolsPanel` menu to determine the item's
+initial checked state.
+
+-   Required: Yes
+
 ### `isShownByDefault`: `boolean`
 
 This prop identifies the current item as being displayed by default. This means
@@ -37,3 +44,33 @@ determine if the panel item should be displayed.
 A panel item's `label` should be unique among all items within a single panel.
 
 -   Required: Yes
+
+### `onDeselect`: `function`
+
+Called when this item is deselected in the `ToolsPanel` menu. This is normally
+used to reset the panel item control's value.
+
+-   Required: No
+
+### `onSelect`: `function`
+
+A callback to take action when this item is selected in the `ToolsPanel` menu.
+
+-   Required: No
+
+### `panelId`: `string`
+
+This prop can be set to a ID representing a unique `ToolsPanel`. Before
+attempting to register with a panel, each item will ensure that it belongs to
+the current panel. This avoids issues when sharing SlotFills to inject items
+into a panel.
+
+-   Required: No
+
+### `resetAllFilter`: `function`
+
+A `ToolsPanel` will collect each item's `resetAllFilter` and pass an array of
+these function through to the panel's `resetAll` callback. They can then be
+iterated over to perform additional tasks for items injected via SlotFills.
+
+-   Required: No

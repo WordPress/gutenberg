@@ -71,21 +71,29 @@ export function DimensionPanel( props ) {
 
 ## Props
 
+### `header`: `string`
+
+Text to be displayed within the panel's header.
+
+- Required: Yes
+
 ### `label`: `string`
 
 The label for the panel's dropdown menu.
 
 - Required: Yes
 
+### `panelId`: `function`
+
+The `panelId` is passed through the `ToolsPanelContext` to panel items. This is
+be used to ensure items injected via SlotFills are only registered for their
+intended panels.
+
+- Required: No
+
 ### `resetAll`: `function`
 
 A function to call when the `Reset all` menu option is selected. This is passed
 through to the panel's header component.
-
-- Required: Yes
-
-### `header`: `string`
-
-Text to be displayed within the panel's header.
 
 - Required: Yes
