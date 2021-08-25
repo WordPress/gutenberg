@@ -12,8 +12,10 @@ import {
 } from '@wordpress/e2e-test-utils';
 import { addQueryArgs } from '@wordpress/url';
 
+// The Jest timeout is increased because these tests are a bit slow
+jest.setTimeout( 100000 );
+
 async function setupBrowser() {
-	//await clearLocalStorage();
 	await setBrowserViewport( 'large' );
 }
 
