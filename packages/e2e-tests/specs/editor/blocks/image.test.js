@@ -41,8 +41,7 @@ async function upload( inputSelector ) {
 
 async function waitForImage( filename ) {
 	const imageElement = await page.waitForSelector(
-		`.wp-block-image img[src$="${ filename }.png"]`,
-		{ state: 'visible' }
+		`.wp-block-image img[src$="${ filename }.png"]`
 	);
 
 	return imageElement;
