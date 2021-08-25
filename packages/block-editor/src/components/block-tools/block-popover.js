@@ -215,7 +215,7 @@ function BlockPopover( {
 			shouldAnchorIncludePadding
 			// Used to safeguard sticky position behavior against cases where it would permanently
 			// obscure specific sections of a block.
-			__unstableEditorCanvasWrapper={ __unstableContentRef.current }
+			__unstableEditorCanvasWrapper={ __unstableContentRef?.current }
 		>
 			{ ( shouldShowContextualToolbar || isToolbarForced ) && (
 				<div
