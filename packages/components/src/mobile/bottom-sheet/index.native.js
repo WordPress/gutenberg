@@ -43,6 +43,7 @@ import NavigationContainer from './bottom-sheet-navigation/navigation-container'
 import KeyboardAvoidingView from './keyboard-avoiding-view';
 import BottomSheetSubSheet from './sub-sheet';
 import NavigationHeader from './navigation-header';
+import Header from './header';
 import { BottomSheetProvider } from './bottom-sheet-context';
 
 const DEFAULT_LAYOUT_ANIMATION = LayoutAnimation.Presets.easeInEaseOut;
@@ -600,6 +601,7 @@ ThemedBottomSheet.Button = Button;
 ThemedBottomSheet.Cell = Cell;
 ThemedBottomSheet.SubSheet = BottomSheetSubSheet;
 ThemedBottomSheet.NavigationHeader = NavigationHeader;
+ThemedBottomSheet.Header = Header;
 ThemedBottomSheet.CyclePickerCell = CyclePickerCell;
 ThemedBottomSheet.PickerCell = PickerCell;
 ThemedBottomSheet.SwitchCell = SwitchCell;
