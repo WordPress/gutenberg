@@ -582,6 +582,7 @@ function CoverEdit( {
 						minHeightUnit: undefined,
 					} ) }
 					isShownByDefault={ true }
+					panelId={ clientId }
 				>
 					<CoverHeightInput
 						value={ temporaryMinHeight || minHeight }
