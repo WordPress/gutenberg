@@ -341,7 +341,7 @@ describe( '__experimentalBatch', () => {
 		};
 		const dispatch = () => actions;
 		// Run generator up to the last `yield awaitNextFrame( )`.
-		generator.next( dispatch )
+		generator.next( dispatch );
 		generator.next();
 		generator.next();
 		const { value: awaitPromiseControl } = generator.next();
