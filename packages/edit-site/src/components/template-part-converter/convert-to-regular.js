@@ -10,11 +10,8 @@ import { MenuItem } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 
 export default function ConvertToRegularBlocks( { clientId } ) {
-	const { innerBlocks } = useSelect(
-		( select ) =>
-			select( blockEditorStore ).__unstableGetBlockWithBlockTree(
-				clientId
-			),
+	const innerBlocks = useSelect(
+		( select ) => select( blockEditorStore ).getBlocks( clientId ),
 		[ clientId ]
 	);
 	const { replaceBlocks } = useDispatch( blockEditorStore );

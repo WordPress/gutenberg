@@ -141,6 +141,24 @@ export function getBlock( state, clientId ) {
 	return state.blocks.tree[ clientId ];
 }
 
+export const __unstableGetBlockWithoutInnerBlocks = createSelector(
+	( state, clientId ) => {
+		const block = state.blocks.byClientId[ clientId ];
+		if ( ! block ) {
+			return null;
+		}
+
+		return {
+			...block,
+			attributes: getBlockAttributes( state, clientId ),
+		};
+	},
+	( state, clientId ) => [
+		state.blocks.byClientId[ clientId ],
+		state.blocks.attributes[ clientId ],
+	]
+);
+
 /**
  * Returns all block objects for the current post being edited as an array in
  * the order they appear in the post. Note that this will exclude child blocks
@@ -158,58 +176,6 @@ export function getBlocks( state, rootClientId ) {
 			: 'controlled||' + rootClientId;
 	return state.blocks.tree[ treeKey ]?.innerBlocks || EMPTY_ARRAY;
 }
-
-/**
- * Similar to getBlock, except it will include the entire nested block tree as
- * inner blocks. The normal getBlock selector will exclude sections of the block
- * tree which belong to different entities.
- *
- * @param {Object} state    Editor state.
- * @param {string} clientId Client ID of the block to get.
- *
- * @return {Object} The block with all
- */
-export const __unstableGetBlockWithBlockTree = createSelector(
-	( state, clientId ) => {
-		const block = state.blocks.byClientId[ clientId ];
-		if ( ! block ) {
-			return null;
-		}
-
-		return {
-			...block,
-			attributes: getBlockAttributes( state, clientId ),
-			innerBlocks: __unstableGetBlockTree( state, clientId ),
-		};
-	},
-	( state ) => [
-		state.blocks.byClientId,
-		state.blocks.order,
-		state.blocks.attributes,
-	]
-);
-
-/**
- * Similar to getBlocks, except this selector returns the entire block tree
- * represented in the block-editor store from the given root regardless of any
- * inner block controllers.
- *
- * @param {Object}  state        Editor state.
- * @param {?string} rootClientId Optional root client ID of block list.
- *
- * @return {Object[]} Post blocks.
- */
-export const __unstableGetBlockTree = createSelector(
-	( state, rootClientId = '' ) =>
-		map( getBlockOrder( state, rootClientId ), ( clientId ) =>
-			__unstableGetBlockWithBlockTree( state, clientId )
-		),
-	( state ) => [
-		state.blocks.byClientId,
-		state.blocks.order,
-		state.blocks.attributes,
-	]
-);
 
 /**
  * Returns a stripped down block object containing only its client ID,
