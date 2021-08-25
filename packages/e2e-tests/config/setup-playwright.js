@@ -152,7 +152,6 @@ export async function trashExistingPosts( postType = 'post' ) {
 	}
 
 	// Select all posts.
-	await page.waitForSelector( '[id^=cb-select-all-]' );
 	await page.click( '[id^=cb-select-all-]' );
 	// Select the "bulk actions" > "trash" option.
 	await page.select( '#bulk-action-selector-top', 'trash' );
