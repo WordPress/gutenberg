@@ -10,7 +10,7 @@
  * the corresponding stylesheet.
  *
  * @param WP_Theme_JSON_Gutenberg $tree Input tree.
- * @param string                  $type Type of stylesheet we want accepts 'all', 'block_styles', and 'css_variables'.
+ * @param string                  $type Type of stylesheet we want accepts 'all', 'block_styles', 'css_variables', and 'presets'.
  *
  * @return string Stylesheet.
  */
@@ -51,7 +51,11 @@ function gutenberg_experimental_global_styles_enqueue_assets() {
 	$settings = gutenberg_get_default_block_editor_settings();
 	$all      = WP_Theme_JSON_Resolver_Gutenberg::get_merged_data( $settings );
 
-	$stylesheet = gutenberg_experimental_global_styles_get_stylesheet( $all );
+	$type = 'all';
+	if ( ! WP_Theme_JSON_Resolver_Gutenberg::theme_has_support() ) {
+		$type = 'presets';
+	}
+	$stylesheet = gutenberg_experimental_global_styles_get_stylesheet( $all, $type );
 	if ( empty( $stylesheet ) ) {
 		return;
 	}
