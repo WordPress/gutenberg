@@ -19,11 +19,18 @@ export default {
 
 	save: function FlexLayoutStyle( { selector } ) {
 		return (
-			<style>{ `${ appendSelectors( selector ) } {
-            display: flex;
-            column-gap: 0.5em;
-            align-items: center;
-        }` }</style>
+			<style>{ `
+				${ appendSelectors( selector ) } {
+					display: flex;
+					gap: var( --wp--style--block-gap, 0.5em );
+					flex-wrap: wrap;
+					align-items: center;
+				}
+
+				${ appendSelectors( selector, '> *' ) } {
+					margin: 0;
+				}
+			` }</style>
 		);
 	},
 

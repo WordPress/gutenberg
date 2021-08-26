@@ -21,7 +21,6 @@ import { useSelect, useDispatch } from '@wordpress/data';
 import {
 	BlockControls,
 	InspectorControls,
-	InspectorAdvancedControls,
 	RichText,
 	__experimentalImageSizeControl as ImageSizeControl,
 	__experimentalImageURLInputUI as ImageURLInputUI,
@@ -83,10 +82,14 @@ export default function Image( {
 	onSelectURL,
 	onUploadError,
 	containerRef,
+	context,
 	clientId,
 } ) {
 	const captionRef = useRef();
 	const prevUrl = usePrevious( url );
+	const { allowResize = true } = context;
+	const { getBlock } = useSelect( blockEditorStore );
+
 	const { image, multiImageSelection } = useSelect(
 		( select ) => {
 			const { getMedia } = select( coreStore );
@@ -108,7 +111,6 @@ export default function Image( {
 	);
 	const {
 		canInsertCover,
-		getBlock,
 		imageEditing,
 		imageSizes,
 		maxWidth,
@@ -116,18 +118,12 @@ export default function Image( {
 	} = useSelect(
 		( select ) => {
 			const {
-				getBlock: _getBlock,
 				getBlockRootClientId,
-				getBlockTransformItems,
 				getSettings,
+				canInsertBlockType,
 			} = select( blockEditorStore );
 
-			const block = _getBlock( clientId );
 			const rootClientId = getBlockRootClientId( clientId );
-			const transformations = getBlockTransformItems(
-				[ block ],
-				rootClientId
-			);
 			const settings = pick( getSettings(), [
 				'imageEditing',
 				'imageSizes',
@@ -137,12 +133,10 @@ export default function Image( {
 
 			return {
 				...settings,
-				getBlock: _getBlock,
-				canInsertCover:
-					transformations?.length &&
-					!! transformations.find(
-						( { name } ) => name === 'core/cover'
-					),
+				canInsertCover: canInsertBlockType(
+					'core/cover',
+					rootClientId
+				),
 			};
 		},
 		[ clientId ]
@@ -157,7 +151,7 @@ export default function Image( {
 	const [ isEditingImage, setIsEditingImage ] = useState( false );
 	const [ externalBlob, setExternalBlob ] = useState();
 	const clientWidth = useClientWidth( containerRef, [ align ] );
-	const isResizable = ! isWideAligned && isLargeViewport;
+	const isResizable = allowResize && ! ( isWideAligned && isLargeViewport );
 	const imageSizeOptions = map(
 		filter( imageSizes, ( { slug } ) =>
 			get( image, [ 'media_details', 'sizes', slug, 'source_url' ] )
@@ -376,7 +370,7 @@ export default function Image( {
 					/>
 				</PanelBody>
 			</InspectorControls>
-			<InspectorAdvancedControls>
+			<InspectorControls __experimentalGroup="advanced">
 				<TextControl
 					label={ __( 'Title attribute' ) }
 					value={ title || '' }
@@ -394,7 +388,7 @@ export default function Image( {
 						</>
 					}
 				/>
-			</InspectorAdvancedControls>
+			</InspectorControls>
 		</>
 	);
 

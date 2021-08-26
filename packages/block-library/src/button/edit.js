@@ -20,7 +20,6 @@ import {
 import {
 	BlockControls,
 	InspectorControls,
-	InspectorAdvancedControls,
 	RichText,
 	useBlockProps,
 	__experimentalUseBorderProps as useBorderProps,
@@ -260,13 +259,13 @@ function ButtonEdit( props ) {
 					setAttributes={ setAttributes }
 				/>
 			</InspectorControls>
-			<InspectorAdvancedControls>
+			<InspectorControls __experimentalGroup="advanced">
 				<TextControl
 					label={ __( 'Link rel' ) }
 					value={ rel || '' }
 					onChange={ onSetLinkRel }
 				/>
-			</InspectorAdvancedControls>
+			</InspectorControls>
 		</>
 	);
 }

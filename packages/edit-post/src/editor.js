@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { size, map, without, omit } from 'lodash';
+import { size, map, without } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -114,7 +114,7 @@ function Editor( {
 
 	const editorSettings = useMemo( () => {
 		const result = {
-			...omit( settings, [ 'styles' ] ),
+			...settings,
 			__experimentalPreferredStyleVariations: {
 				value: preferredStyleVariations,
 				onChange: updatePreferredStyleVariations,

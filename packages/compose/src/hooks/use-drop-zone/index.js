@@ -73,17 +73,23 @@ export default function useDropZone( {
 			/**
 			 * Checks if an element is in the drop zone.
 			 *
-			 * @param {HTMLElement|null} elementToCheck
+			 * @param {EventTarget|null} targetToCheck
 			 *
 			 * @return {boolean} True if in drop zone, false if not.
 			 */
-			function isElementInZone( elementToCheck ) {
+			function isElementInZone( targetToCheck ) {
+				const { defaultView } = ownerDocument;
 				if (
-					! elementToCheck ||
-					! element.contains( elementToCheck )
+					! targetToCheck ||
+					! defaultView ||
+					! ( targetToCheck instanceof defaultView.HTMLElement ) ||
+					! element.contains( targetToCheck )
 				) {
 					return false;
 				}
+
+				/** @type {HTMLElement|null} */
+				let elementToCheck = targetToCheck;
 
 				do {
 					if ( elementToCheck.dataset.isDropZone ) {
@@ -155,11 +161,7 @@ export default function useDropZone( {
 				// leaving the drop zone, which means the `relatedTarget`
 				// (element that has been entered) should be outside the drop
 				// zone.
-				if (
-					isElementInZone(
-						/** @type {HTMLElement|null} */ ( event.relatedTarget )
-					)
-				) {
+				if ( isElementInZone( event.relatedTarget ) ) {
 					return;
 				}
 

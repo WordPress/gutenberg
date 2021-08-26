@@ -119,7 +119,7 @@ export function* resetAutosave( newAutosave ) {
 
 	const postId = yield controls.select( STORE_NAME, 'getCurrentPostId' );
 	yield controls.dispatch(
-		coreStore.name,
+		coreStore,
 		'receiveAutosaves',
 		postId,
 		newAutosave
@@ -200,7 +200,7 @@ export function setupEditorState( post ) {
 export function* editPost( edits, options ) {
 	const { id, type } = yield controls.select( STORE_NAME, 'getCurrentPost' );
 	yield controls.dispatch(
-		coreStore.name,
+		coreStore,
 		'editEntityRecord',
 		'postType',
 		type,
@@ -236,7 +236,7 @@ export function* savePost( options = {} ) {
 	edits = {
 		id: previousRecord.id,
 		...( yield controls.select(
-			coreStore.name,
+			coreStore,
 			'getEntityRecordNonTransientEdits',
 			'postType',
 			previousRecord.type,
@@ -245,7 +245,7 @@ export function* savePost( options = {} ) {
 		...edits,
 	};
 	yield controls.dispatch(
-		coreStore.name,
+		coreStore,
 		'saveEntityRecord',
 		'postType',
 		previousRecord.type,
@@ -255,7 +255,7 @@ export function* savePost( options = {} ) {
 	yield __experimentalRequestPostUpdateFinish( options );
 
 	const error = yield controls.select(
-		coreStore.name,
+		coreStore,
 		'getLastEntitySaveError',
 		'postType',
 		previousRecord.type,
@@ -283,7 +283,7 @@ export function* savePost( options = {} ) {
 			previousPost: previousRecord,
 			post: updatedRecord,
 			postType: yield controls.resolveSelect(
-				coreStore.name,
+				coreStore,
 				'getPostType',
 				updatedRecord.type
 			),
@@ -300,7 +300,7 @@ export function* savePost( options = {} ) {
 		// considered for change detection.
 		if ( ! options.isAutosave ) {
 			yield controls.dispatch(
-				blockEditorStore.name,
+				blockEditorStore,
 				'__unstableMarkLastChangeAsPersistent'
 			);
 		}
@@ -317,7 +317,7 @@ export function* refreshPost() {
 		'getCurrentPostType'
 	);
 	const postType = yield controls.resolveSelect(
-		coreStore.name,
+		coreStore,
 		'getPostType',
 		postTypeSlug
 	);
@@ -340,7 +340,7 @@ export function* trashPost() {
 		'getCurrentPostType'
 	);
 	const postType = yield controls.resolveSelect(
-		coreStore.name,
+		coreStore,
 		'getPostType',
 		postTypeSlug
 	);
@@ -419,7 +419,7 @@ export function* autosave( { local = false, ...options } = {} ) {
  * @yield {Object} Action object.
  */
 export function* redo() {
-	yield controls.dispatch( coreStore.name, 'redo' );
+	yield controls.dispatch( coreStore, 'redo' );
 }
 
 /**
@@ -428,7 +428,7 @@ export function* redo() {
  * @yield {Object} Action object.
  */
 export function* undo() {
-	yield controls.dispatch( coreStore.name, 'undo' );
+	yield controls.dispatch( coreStore, 'undo' );
 }
 
 /**
@@ -608,7 +608,7 @@ export function* resetEditorBlocks( blocks, options = {} ) {
 		);
 		const noChange =
 			( yield controls.select(
-				coreStore.name,
+				coreStore,
 				'getEditedEntityRecord',
 				'postType',
 				type,
@@ -616,7 +616,7 @@ export function* resetEditorBlocks( blocks, options = {} ) {
 			) ).blocks === edits.blocks;
 		if ( noChange ) {
 			return yield controls.dispatch(
-				coreStore.name,
+				coreStore,
 				'__unstableCreateUndoLevel',
 				'postType',
 				type,
@@ -658,7 +658,7 @@ const getBlockEditorAction = ( name ) =>
 			alternative:
 				"`wp.data.dispatch( 'core/block-editor' )." + name + '`',
 		} );
-		yield controls.dispatch( blockEditorStore.name, name, ...args );
+		yield controls.dispatch( blockEditorStore, name, ...args );
 	};
 
 /**

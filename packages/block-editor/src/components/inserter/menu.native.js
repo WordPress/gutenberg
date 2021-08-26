@@ -38,8 +38,10 @@ function InserterMenu( {
 	const [ filterValue, setFilterValue ] = useState( '' );
 	const [ showTabs, setShowTabs ] = useState( true );
 	// eslint-disable-next-line no-undef
-	const [ showSearchForm, setShowSearchForm ] = useState( __DEV__ );
+	const [ showSearchForm, setShowSearchForm ] = useState( true );
 	const [ tabIndex, setTabIndex ] = useState( 0 );
+
+	const isIOS = Platform.OS === 'ios';
 
 	const {
 		showInsertionPoint,
@@ -200,17 +202,23 @@ function InserterMenu( {
 			}
 			hasNavigation
 			setMinHeightToMaxHeight={ showSearchForm }
-			contentStyle={ styles.list }
+			contentStyle={ styles[ 'inserter-menu__list' ] }
+			isFullScreen={ ! isIOS && showSearchForm }
+			allowDragIndicator={ true }
 		>
 			<BottomSheetConsumer>
 				{ ( { listProps } ) => (
-					<TouchableHighlight accessible={ false }>
+					<TouchableHighlight
+						accessible={ false }
+						style={ styles[ 'inserter-menu__list-wrapper' ] }
+					>
 						{ ! showTabs || filterValue ? (
 							<InserterSearchResults
 								rootClientId={ rootClientId }
 								filterValue={ filterValue }
 								onSelect={ onSelectItem }
 								listProps={ listProps }
+								isFullScreen={ ! isIOS && showSearchForm }
 							/>
 						) : (
 							<InserterTabs

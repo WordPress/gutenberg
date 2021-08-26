@@ -8,6 +8,7 @@ import {
 	TouchableOpacity,
 	Platform,
 	useColorScheme,
+	Keyboard,
 } from 'react-native';
 
 /**
@@ -116,12 +117,18 @@ function SearchControl( {
 		setCurrentStyles( futureStyles );
 	}, [ isActive, isDark ] );
 
-	useEffect(
-		() => () => {
+	useEffect( () => {
+		const keyboardHideSubscription = Keyboard.addListener(
+			'keyboardDidHide',
+			() => {
+				onCancel();
+			}
+		);
+		return () => {
 			clearTimeout( onCancelTimer.current );
-		},
-		[]
-	);
+			keyboardHideSubscription.remove();
+		};
+	}, [] );
 
 	const {
 		'search-control__container': containerStyle,

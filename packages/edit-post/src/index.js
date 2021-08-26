@@ -6,6 +6,8 @@ import {
 	__experimentalRegisterExperimentalCoreBlocks,
 } from '@wordpress/block-library';
 import { render, unmountComponentAtNode } from '@wordpress/element';
+import { dispatch } from '@wordpress/data';
+import { store as interfaceStore } from '@wordpress/interface';
 
 /**
  * Internal dependencies
@@ -88,6 +90,17 @@ export function initializeEditor(
 		settings,
 		initialEdits
 	);
+
+	dispatch( interfaceStore ).setFeatureDefaults( 'core/edit-post', {
+		fixedToolbar: false,
+		welcomeGuide: true,
+		fullscreenMode: true,
+		showIconLabels: false,
+		themeStyles: true,
+		showBlockBreadcrumbs: true,
+		welcomeGuideTemplate: true,
+	} );
+
 	registerCoreBlocks();
 	if ( process.env.GUTENBERG_PHASE === 2 ) {
 		__experimentalRegisterExperimentalCoreBlocks( {

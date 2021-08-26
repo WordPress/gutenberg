@@ -3,6 +3,7 @@
  */
 import { useRef, useLayoutEffect, useReducer } from '@wordpress/element';
 import { useMergeRefs, useRefEffect } from '@wordpress/compose';
+import { useRegistry } from '@wordpress/data';
 
 /**
  * Internal dependencies
@@ -18,6 +19,7 @@ import { useSelectObject } from './use-select-object';
 import { useIndentListItemOnSpace } from './use-indent-list-item-on-space';
 import { useInputAndSelection } from './use-input-and-selection';
 import { useDelete } from './use-delete';
+import { useSpace } from './use-space';
 
 export function useRichText( {
 	value = '',
@@ -30,11 +32,12 @@ export function useRichText( {
 	__unstableMultilineTag: multilineTag,
 	__unstableDisableFormats: disableFormats,
 	__unstableIsSelected: isSelected,
-	__unstableDependencies,
+	__unstableDependencies = [],
 	__unstableAfterParse,
 	__unstableBeforeSerialize,
 	__unstableAddInvisibleFormats,
 } ) {
+	const registry = useRegistry();
 	const [ , forceRender ] = useReducer( () => ( {} ) );
 	const ref = useRef();
 
@@ -87,7 +90,9 @@ export function useRichText( {
 			record.current.formats = Array( value.length );
 			record.current.replacements = Array( value.length );
 		}
-		record.current.formats = __unstableAfterParse( record.current );
+		if ( __unstableAfterParse ) {
+			record.current.formats = __unstableAfterParse( record.current );
+		}
 		record.current.start = selectionStart;
 		record.current.end = selectionEnd;
 	}
@@ -121,10 +126,12 @@ export function useRichText( {
 			_value.current = newRecord.text;
 		} else {
 			_value.current = toHTMLString( {
-				value: {
-					...newRecord,
-					formats: __unstableBeforeSerialize( newRecord ),
-				},
+				value: __unstableBeforeSerialize
+					? {
+							...newRecord,
+							formats: __unstableBeforeSerialize( newRecord ),
+					  }
+					: newRecord,
 				multilineTag,
 				preserveWhiteSpace,
 			} );
@@ -136,10 +143,13 @@ export function useRichText( {
 
 		// Selection must be updated first, so it is recorded in history when
 		// the content change happens.
-		onSelectionChange( start, end );
-		onChange( _value.current, {
-			__unstableFormats: formats,
-			__unstableText: text,
+		// We batch both calls to only attempt to rerender once.
+		registry.batch( () => {
+			onSelectionChange( start, end );
+			onChange( _value.current, {
+				__unstableFormats: formats,
+				__unstableText: text,
+			} );
 		} );
 		forceRender();
 	}
@@ -198,6 +208,7 @@ export function useRichText( {
 			isSelected,
 			onSelectionChange,
 		} ),
+		useSpace(),
 		useRefEffect( () => {
 			applyFromProps();
 			didMount.current = true;
