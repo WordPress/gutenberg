@@ -20,7 +20,6 @@ export default function BlockNavigationList( {
 	return (
 		<ListView
 			blocks={ blocks }
-			showAppender
 			showBlockMovers
 			showNestedBlocks
 			__experimentalFeatures={ __experimentalFeatures }
