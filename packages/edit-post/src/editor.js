@@ -33,7 +33,6 @@ function Editor( {
 	settings,
 	initialEdits,
 	onError,
-	markEditorReady,
 	...props
 } ) {
 	const {
@@ -49,7 +48,6 @@ function Editor( {
 		keepCaretInsideBlock,
 		isTemplateMode,
 		template,
-		isEditorReady,
 	} = useSelect( ( select ) => {
 		const {
 			isFeatureActive,
@@ -61,9 +59,7 @@ function Editor( {
 		const { getEntityRecord, getPostType, getEntityRecords } = select(
 			coreStore
 		);
-		const { getEditorSettings, __unstableIsEditorReady } = select(
-			editorStore
-		);
+		const { getEditorSettings } = select( editorStore );
 		const { getBlockTypes } = select( blocksStore );
 		const isTemplate = [ 'wp_template', 'wp_template_part' ].includes(
 			postType
@@ -104,7 +100,6 @@ function Editor( {
 					? getEditedPostTemplate()
 					: null,
 			post: postObject,
-			isEditorReady: __unstableIsEditorReady(),
 		};
 	} );
 
@@ -166,14 +161,6 @@ function Editor( {
 
 	if ( ! post ) {
 		return null;
-	}
-
-	/**
-	 * Some features like back compat metaboxes rely on editor notifying that
-	 * it's ready by calling markEditorReady.
-	 */
-	if ( markEditorReady && isEditorReady ) {
-		markEditorReady();
 	}
 
 	return (

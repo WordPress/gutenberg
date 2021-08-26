@@ -62,9 +62,6 @@ export function reinitializeEditor(
 /**
  * Initializes and returns an instance of Editor.
  *
- * The return value of this function is not necessary if we change where we
- * call initializeEditor(). This is due to metaBox timing.
- *
  * @param {string}  id           Unique identifier for editor instance.
  * @param {string}  postType     Post type of the post to edit.
  * @param {Object}  postId       ID of the post to edit.
@@ -72,7 +69,6 @@ export function reinitializeEditor(
  * @param {Object}  initialEdits Programmatic edits to apply initially, to be
  *                               considered as non-user-initiated (bypass for
  *                               unsaved changes prompt).
- * @return {Promise} Promise that resolves when editor is initialized.
  */
 export function initializeEditor(
 	id,
@@ -148,19 +144,16 @@ export function initializeEditor(
 		} );
 	}
 
-	return new Promise( ( resolve ) => {
-		render(
-			<Editor
-				settings={ settings }
-				onError={ reboot }
-				postId={ postId }
-				postType={ postType }
-				initialEdits={ initialEdits }
-				markEditorReady={ resolve }
-			/>,
-			target
-		);
-	} );
+	render(
+		<Editor
+			settings={ settings }
+			onError={ reboot }
+			postId={ postId }
+			postType={ postType }
+			initialEdits={ initialEdits }
+		/>,
+		target
+	);
 }
 
 export { default as PluginBlockSettingsMenuItem } from './components/block-settings-menu/plugin-block-settings-menu-item';
