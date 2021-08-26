@@ -10,6 +10,7 @@ For each user feature we should also add a importance categorization label  to i
 -->
 
 ## Unreleased
+-   [*] Column block: Fix Android close button alignment. [#34332]
 
 ## 1.60.1
 -   [*] RNmobile: Fix the cancel button on Block Variation Picker / Columns Block. [#34249]
