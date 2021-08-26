@@ -107,21 +107,29 @@ module.exports = async function initConfig( {
  * @return {string} The dockerfile contents.
  */
 function dockerFileContents( image, config ) {
-	let shouldInstallXdebug = true;
-	// By default, an undefined phpVersion uses the version on the docker image,
-	// which is supported by Xdebug 3.
-	if ( config.env.development.phpVersion ) {
-		const versionTokens = config.env.development.phpVersion.split( '.' );
-		const majorVersion = parseInt( versionTokens[ 0 ] );
-		const minorVersion = parseInt( versionTokens[ 1 ] );
-		if ( isNaN( majorVersion ) || isNaN( minorVersion ) ) {
-			throw new Error( 'Something went wrong parsing the php version.' );
-		}
+	// Don't install XDebug unless it is explicitly required
+	let shouldInstallXdebug = false;
+	
+	if (config.xdebug !== 'off') {
+		// By default, an undefined phpVersion uses the version on the docker image,
+		// which is supported by Xdebug 3.
+		if ( config.env.development.phpVersion ) {
+			const versionTokens = config.env.development.phpVersion.split( '.' );
+			const majorVersion = parseInt( versionTokens[ 0 ] );
+			const minorVersion = parseInt( versionTokens[ 1 ] );
+			
+			if ( isNaN( majorVersion ) || isNaN( minorVersion ) ) {
+				throw new Error( 'Something went wrong parsing the php version.' );
+			}
 
-		// Disable Xdebug for PHP < 7.2. Xdebug 3 supports 7.2 and higher.
-		if ( majorVersion < 7 || ( majorVersion === 7 && minorVersion < 2 ) ) {
-			shouldInstallXdebug = false;
+			// Disable Xdebug for PHP < 7.2. Xdebug 3 supports 7.2 and higher.
+			if ( majorVersion > 7 && minorVersion >= 2 ) {
+				shouldInstallXdebug = true;
+			} else {
+				throw new Error( 'Cannot use XDebug 3 on PHP < 7.2.' );
+			}
 		}
+		
 	}
 
 	return `FROM ${ image }
