@@ -23,7 +23,7 @@ export default function Preview( { idBase, instance, isVisible } ) {
 				: new window.AbortController();
 
 		async function fetchPreviewHTML() {
-			const restRoute = `/wp/v2/widget-types/${ idBase }/encode`;
+			const restRoute = `/wp/v2/widget-types/${ idBase }/render`;
 			return await apiFetch( {
 				path: restRoute,
 				method: 'POST',
