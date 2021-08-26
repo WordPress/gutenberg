@@ -110,7 +110,7 @@ function dockerFileContents( image, config ) {
 	// Don't install XDebug unless it is explicitly required
 	let shouldInstallXdebug = false;
 	
-	if (config.xdebug !== 'off') {
+	if ( config.xdebug !== 'off' ) {
 		if ( config.env.development.phpVersion ) {
 			const versionTokens = config.env.development.phpVersion.split( '.' );
 			const majorVersion = parseInt( versionTokens[ 0 ] );
