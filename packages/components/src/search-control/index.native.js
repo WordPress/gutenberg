@@ -121,7 +121,9 @@ function SearchControl( {
 		const keyboardHideSubscription = Keyboard.addListener(
 			'keyboardDidHide',
 			() => {
-				onCancel();
+				if ( ! isIOS ) {
+					onCancel();
+				}
 			}
 		);
 		return () => {
