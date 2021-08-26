@@ -105,6 +105,9 @@ module.exports = {
 		'jsdoc/require-param-description': 'off',
 		'jsdoc/require-returns': 'off',
 		'jsdoc/require-yields': 'off',
+		'jsdoc/tag-lines': 'off',
+		'jsdoc/no-multi-asterisks': 'off',
+		'jsdoc/valid-types': 'off',
 		'jsdoc/check-access': 'error',
 		'jsdoc/check-alignment': 'error',
 		'jsdoc/check-line-alignment': [
@@ -133,6 +136,5 @@ module.exports = {
 		'jsdoc/require-returns-check': 'error',
 		'jsdoc/require-returns-description': 'error',
 		'jsdoc/require-returns-type': 'error',
-		'jsdoc/valid-types': 'error',
 	},
 };
