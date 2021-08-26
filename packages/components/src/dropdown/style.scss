@@ -2,6 +2,12 @@
 	display: inline-block;
 }
 
-.components-dropdown__content .components-popover__content > div {
-	padding: $grid-unit-15;
+.components-dropdown__content {
+	.components-popover__content > div {
+		padding: $grid-unit-15;
+	}
+
+	[role="menuitem"] {
+		white-space: nowrap;
+	}
 }

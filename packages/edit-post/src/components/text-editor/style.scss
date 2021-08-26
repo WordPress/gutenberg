@@ -9,32 +9,22 @@
 		max-width: none;
 		line-height: $default-line-height;
 
-		// This needs specificity to change the title block appearance on the code editor.
-		.editor-post-title__input.editor-post-title__input.editor-post-title__input {
-			font-family: $editor-html-font;
-			font-size: 2.5em;
-			font-weight: normal;
-		}
+		font-family: $editor-html-font;
+		font-size: 2.5em;
+		font-weight: normal;
 
-		// Always show outlines in code editor
-		.editor-post-title__input {
-			border: $border-width solid $gray-600;
-			margin-bottom: -$border-width;
+		border: $border-width solid $gray-600;
 
-			// Same padding as body.
-			padding: $grid-unit-20;
-			@include break-small() {
-				padding: $grid-unit-30;
-			}
-
-			&:focus {
-				border-color: var(--wp-admin-theme-color);
-				box-shadow: 0 0 0 var(--wp-admin-border-width-focus) var(--wp-admin-theme-color);
-			}
-		}
+		// Same padding as body.
+		padding: $grid-unit-20;
 
 		@include break-small() {
-			padding: 0;
+			padding: $grid-unit-30;
+		}
+
+		&:focus {
+			border-color: var(--wp-admin-theme-color);
+			box-shadow: 0 0 0 var(--wp-admin-border-width-focus) var(--wp-admin-theme-color);
 		}
 	}
 }

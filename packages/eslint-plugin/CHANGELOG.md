@@ -4,8 +4,13 @@
 
 ### Bug Fix
 
--   Include `.jsx` extension when linting import statements in case TypeScript not present ([#33746](https://github.com/WordPress/gutenberg/pull/33746)).
 -   The recommended configuration will now respect `type` imports in TypeScript files ([#34055](https://github.com/WordPress/gutenberg/pull/34055)).
+
+## 9.1.1 (2021-08-23)
+
+### Bug Fix
+
+-   Include `.jsx` extension when linting import statements in case TypeScript not present ([#33746](https://github.com/WordPress/gutenberg/pull/33746)).
 
 ## 9.1.0 (2021-07-21)
 

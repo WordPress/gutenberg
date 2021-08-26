@@ -77,6 +77,7 @@ function useBlockEditorSettings( settings, hasTemplate ) {
 				'__experimentalGlobalStylesUserEntityId',
 				'__experimentalPreferredStyleVariations',
 				'__experimentalSetIsInserterOpened',
+				'__unstableGalleryWithImageBlocks',
 				'alignWide',
 				'allowedBlockTypes',
 				'bodyPlaceholder',

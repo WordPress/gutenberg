@@ -228,19 +228,19 @@ describe( 'selectors', () => {
 					parents: {
 						123: '',
 					},
-					cache: {
-						123: {},
+					tree: {
+						123: {
+							clientId: 123,
+							name: 'core/paragraph',
+							attributes: {},
+							innerBlocks: [],
+						},
 					},
 					controlledInnerBlocks: {},
 				},
 			};
 
-			expect( getBlock( state, 123 ) ).toEqual( {
-				clientId: 123,
-				name: 'core/paragraph',
-				attributes: {},
-				innerBlocks: [],
-			} );
+			expect( getBlock( state, 123 ) ).toBe( state.blocks.tree[ 123 ] );
 		} );
 
 		it( 'should return null if the block is not present in state', () => {
@@ -250,55 +250,19 @@ describe( 'selectors', () => {
 					attributes: {},
 					order: {},
 					parents: {},
-					cache: {},
+					tree: {
+						123: {
+							clientId: 123,
+							name: 'core/paragraph',
+							attributes: {},
+							innerBlocks: [],
+						},
+					},
 					controlledInnerBlocks: {},
 				},
 			};
 
 			expect( getBlock( state, 123 ) ).toBe( null );
-		} );
-
-		it( 'should include inner blocks', () => {
-			const state = {
-				blocks: {
-					byClientId: {
-						123: { clientId: 123, name: 'core/paragraph' },
-						456: { clientId: 456, name: 'core/paragraph' },
-					},
-					attributes: {
-						123: {},
-						456: {},
-					},
-					order: {
-						'': [ 123 ],
-						123: [ 456 ],
-						456: [],
-					},
-					parents: {
-						123: '',
-						456: 123,
-					},
-					cache: {
-						123: {},
-						456: {},
-					},
-					controlledInnerBlocks: {},
-				},
-			};
-
-			expect( getBlock( state, 123 ) ).toEqual( {
-				clientId: 123,
-				name: 'core/paragraph',
-				attributes: {},
-				innerBlocks: [
-					{
-						clientId: 456,
-						name: 'core/paragraph',
-						attributes: {},
-						innerBlocks: [],
-					},
-				],
-			} );
 		} );
 	} );
 
@@ -321,7 +285,23 @@ describe( 'selectors', () => {
 						123: '',
 						23: '',
 					},
-					cache: {
+					tree: {
+						'': {
+							innerBlocks: [
+								{
+									clientId: 123,
+									name: 'core/paragraph',
+									attributes: {},
+									innerBlocks: [],
+								},
+								{
+									clientId: 23,
+									name: 'core/heading',
+									attributes: {},
+									innerBlocks: [],
+								},
+							],
+						},
 						123: {},
 						23: {},
 					},
@@ -329,92 +309,9 @@ describe( 'selectors', () => {
 				},
 			};
 
-			expect( getBlocks( state ) ).toEqual( [
-				{
-					clientId: 123,
-					name: 'core/paragraph',
-					attributes: {},
-					innerBlocks: [],
-				},
-				{
-					clientId: 23,
-					name: 'core/heading',
-					attributes: {},
-					innerBlocks: [],
-				},
-			] );
-		} );
-		it( 'only returns a new value if the cache key of a direct child changes', () => {
-			const cacheRef = {};
-			const state = {
-				blocks: {
-					byClientId: {
-						23: { clientId: 23, name: 'core/heading' },
-					},
-					attributes: {
-						23: {},
-					},
-					order: {
-						'': [ 23 ],
-					},
-					parents: {
-						23: '',
-					},
-					cache: {
-						23: cacheRef,
-					},
-					controlledInnerBlocks: {},
-				},
-			};
-			const oldBlocks = getBlocks( state );
-
-			const newStateSameCache = {
-				blocks: {
-					byClientId: {
-						23: { clientId: 23, name: 'core/heading' },
-					},
-					attributes: {
-						23: {},
-					},
-					order: {
-						'': [ 23 ],
-					},
-					parents: {
-						23: '',
-					},
-					cache: {
-						23: cacheRef,
-					},
-					controlledInnerBlocks: {},
-				},
-			};
-			// Makes sure blocks are referentially equal if the cache key stays the same.
-			const newBlocks = getBlocks( newStateSameCache );
-			expect( oldBlocks ).toBe( newBlocks );
-
-			const newStateNewCache = {
-				blocks: {
-					byClientId: {
-						23: { clientId: 23, name: 'core/heading' },
-					},
-					attributes: {
-						23: {},
-					},
-					order: {
-						'': [ 23 ],
-					},
-					parents: {
-						23: '',
-					},
-					cache: {
-						23: {},
-					},
-					controlledInnerBlocks: {},
-				},
-			};
-			// Blocks are referentially different if the cache key changes.
-			const newBlocksNewCache = getBlocks( newStateNewCache );
-			expect( oldBlocks ).not.toBe( newBlocksNewCache );
+			expect( getBlocks( state ) ).toBe(
+				state.blocks.tree[ '' ].innerBlocks
+			);
 		} );
 	} );
 
@@ -963,6 +860,14 @@ describe( 'selectors', () => {
 						23: '',
 						123: '',
 					},
+					tree: {
+						23: {
+							clientId: 23,
+							name: 'core/heading',
+							attributes: {},
+							innerBlocks: [],
+						},
+					},
 				},
 				selection: {
 					selectionStart: {},
@@ -992,6 +897,14 @@ describe( 'selectors', () => {
 					parents: {
 						123: '',
 						23: '',
+					},
+					tree: {
+						23: {
+							clientId: 23,
+							name: 'core/heading',
+							attributes: {},
+							innerBlocks: [],
+						},
 					},
 				},
 				selection: {
@@ -1023,8 +936,13 @@ describe( 'selectors', () => {
 						123: '',
 						23: '',
 					},
-					cache: {
-						23: {},
+					tree: {
+						23: {
+							clientId: 23,
+							name: 'core/heading',
+							attributes: {},
+							innerBlocks: [],
+						},
 					},
 					controlledInnerBlocks: {},
 				},
@@ -1034,12 +952,9 @@ describe( 'selectors', () => {
 				},
 			};
 
-			expect( getSelectedBlock( state ) ).toEqual( {
-				clientId: 23,
-				name: 'core/heading',
-				attributes: {},
-				innerBlocks: [],
-			} );
+			expect( getSelectedBlock( state ) ).toEqual(
+				getBlock( state, 23 )
+			);
 		} );
 	} );
 
@@ -2560,7 +2475,11 @@ describe( 'selectors', () => {
 					attributes: {},
 					order: {},
 					parents: {},
-					cache: {},
+					tree: {
+						'': {
+							innerBlocks: [],
+						},
+					},
 				},
 				settings: {
 					__experimentalReusableBlocks: [
@@ -2636,9 +2555,19 @@ describe( 'selectors', () => {
 						block3: '',
 						block4: '',
 					},
-					cache: {
-						block3: {},
-						block4: {},
+					tree: {
+						block3: {
+							clientId: 'block3',
+							name: 'core/test-block-a',
+							attributes: {},
+							innerBlocks: [],
+						},
+						block4: {
+							clientId: 'block4',
+							name: 'core/test-block-a',
+							attributes: {},
+							innerBlocks: [],
+						},
 					},
 					controlledInnerBlocks: {},
 				},
@@ -2726,8 +2655,13 @@ describe( 'selectors', () => {
 					order: {
 						'': [ 'block1' ],
 					},
-					cache: {
-						block1: {},
+					tree: {
+						block1: {
+							clientId: 'block1',
+							name: 'core/test-block-b',
+							attributes: {},
+							innerBlocks: [],
+						},
 					},
 					controlledInnerBlocks: {},
 				},
@@ -2929,8 +2863,13 @@ describe( 'selectors', () => {
 					order: {
 						'': [ 'block1' ],
 					},
-					cache: {
-						block1: {},
+					tree: {
+						block1: {
+							clientId: 'block1',
+							name: 'core/with-tranforms-c',
+							attributes: {},
+							innerBlocks: [],
+						},
 					},
 					controlledInnerBlocks: {},
 				},

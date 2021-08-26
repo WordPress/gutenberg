@@ -20,6 +20,10 @@ import {
 import { find, findAll } from 'puppeteer-testing-library';
 import { groupBy, mapValues } from 'lodash';
 
+const twentyTwentyError = `Stylesheet twentytwenty-block-editor-styles-css was not properly added.
+For blocks, use the block API's style (https://developer.wordpress.org/block-editor/reference-guides/block-api/block-metadata/#style) or editorStyle (https://developer.wordpress.org/block-editor/reference-guides/block-api/block-metadata/#editor-style).
+For themes, use add_editor_style (https://developer.wordpress.org/block-editor/how-to-guides/themes/theme-support/#editor-styles).`;
+
 describe( 'Widgets screen', () => {
 	beforeEach( async () => {
 		await visitWidgetsScreen();
@@ -52,23 +56,10 @@ describe( 'Widgets screen', () => {
 	beforeAll( async () => {
 		// TODO: Ideally we can bundle our test theme directly in the repo.
 		await activateTheme( 'twentytwenty' );
-		// Reduced motion is needed to immediately show and dismiss the snackbars.
-		await page.emulateMediaFeatures( [
-			{
-				name: 'prefers-reduced-motion',
-				value: 'reduce',
-			},
-		] );
 		await deleteAllWidgets();
 	} );
 
 	afterAll( async () => {
-		await page.emulateMediaFeatures( [
-			{
-				name: 'prefers-reduced-motion',
-				value: 'no-preference',
-			},
-		] );
 		await activateTheme( 'twentytwentyone' );
 	} );
 
@@ -246,6 +237,8 @@ describe( 'Widgets screen', () => {
 		</div></div>",
 		}
 	` );
+
+		expect( console ).toHaveErrored( twentyTwentyError );
 	} );
 
 	it.skip( 'Should insert content using the inline inserter', async () => {
@@ -613,6 +606,8 @@ describe( 'Widgets screen', () => {
 				initialSerializedWidgetAreas[ 'sidebar-1' ],
 			].join( '\n' )
 		);
+
+		expect( console ).toHaveErrored( twentyTwentyError );
 	} );
 
 	it( 'Should display legacy widgets', async () => {
@@ -785,6 +780,8 @@ describe( 'Widgets screen', () => {
 		</div></div>",
 		}
 	` );
+
+		expect( console ).toHaveErrored( twentyTwentyError );
 	} );
 
 	it( 'Allows widget deletion to be undone', async () => {
@@ -842,6 +839,8 @@ describe( 'Widgets screen', () => {
 		</div></div>",
 		}
 	` );
+
+		expect( console ).toHaveErrored( twentyTwentyError );
 	} );
 } );
 

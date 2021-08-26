@@ -305,7 +305,7 @@ export default compose( [
 			getBlockIndex,
 			getSettings,
 			isBlockSelected,
-			__unstableGetBlockWithoutInnerBlocks,
+			getBlock,
 			getSelectedBlockClientId,
 			getLowestCommonAncestorWithSelectedBlock,
 			getBlockParents,
@@ -315,7 +315,7 @@ export default compose( [
 		const order = getBlockIndex( clientId, rootClientId );
 		const isSelected = isBlockSelected( clientId );
 		const isInnerBlockSelected = hasSelectedInnerBlock( clientId );
-		const block = __unstableGetBlockWithoutInnerBlocks( clientId );
+		const block = getBlock( clientId );
 		const { name, attributes, isValid } = block || {};
 
 		const blockType = getBlockType( name || 'core/missing' );

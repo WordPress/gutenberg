@@ -1,129 +1,197 @@
-.wp-block-gallery,
-.blocks-gallery-grid {
+// Import styles for rendering the static content of deprecated gallery versions.
+@import "./deprecated.scss";
+
+// Styles for current version of gallery block.
+.wp-block-gallery.blocks-gallery-grid.has-nested-images {
 	display: flex;
 	flex-wrap: wrap;
-	list-style-type: none;
-	padding: 0;
-	// Some themes give all <ul> default margin instead of padding.
-	margin: 0;
-
-	.blocks-gallery-image,
-	.blocks-gallery-item {
+	// Need bogus :not(#individual-image) to override long :not()
+	// specificity chain on default image block on front end.
+	figure.wp-block-image:not(#individual-image) {
 		// Add space between thumbnails, and unset right most thumbnails later.
-		margin: 0 1em 1em 0;
-		display: flex;
-		flex-grow: 1;
-		flex-direction: column;
-		justify-content: center;
-		position: relative;
-		align-self: flex-start;
+		margin: 0 var(--gallery-block--gutter-size, #{$grid-unit-20}) var(--gallery-block--gutter-size, #{$grid-unit-20}) 0;
 
-		// On mobile and responsive viewports, we allow only 1 or 2 columns at the most.
-		width: calc(50% - 1em);
+		&:last-of-type:not(#individual-image) {
+			margin-right: 0;
+		}
+
+		width: calc(50% - (var(--gallery-block--gutter-size, #{$grid-unit-20}) / 2));
 
 		&:nth-of-type(even) {
 			margin-right: 0;
 		}
+	}
 
-		figure {
+	figure.wp-block-image {
+		display: flex;
+		flex-grow: 1;
+		justify-content: center;
+		position: relative;
+		margin-top: auto;
+		margin-bottom: auto;
+		// IE11 doesn't like the "flex-direction: column;" here.
+		@supports ( position: sticky ) {
+			flex-direction: column;
+		}
+
+		> div,
+		> a {
 			margin: 0;
-			height: 100%;
 
-			// IE doesn't support flex so omit that.
-			@supports (position: sticky) {
-				display: flex;
-				align-items: flex-end;
-				justify-content: flex-start;
+			// Avoid applying flex styles to IE11.
+			@supports ( position: sticky ) {
+				flex-direction: column;
+				flex-grow: 1;
 			}
 		}
 
 		img {
 			display: block;
-			max-width: 100%;
 			height: auto;
-
-			// IE doesn't handle cropping, so we need an explicit width here.
+			max-width: 100%;
 			width: 100%;
 
+			// IE doesn't handle cropping, so we need an explicit width here.
 			// IE11 doesn't read rules inside this query. They are applied only to modern browsers.
-			@supports (position: sticky) {
+			@supports ( position: sticky ) {
 				width: auto;
 			}
 		}
 
 		figcaption {
-			position: absolute;
+			background: linear-gradient(0deg, rgba($color: $black, $alpha: 0.7) 0, rgba($color: $black, $alpha: 0.3) 70%, transparent);
 			bottom: 0;
-			width: 100%;
+			color: $white;
+			font-size: $default-font-size;
+			left: 0;
+			margin-bottom: 0;
 			max-height: 100%;
 			overflow: auto;
-			padding: 3em 0.77em 0.7em;
-			color: $white;
+			padding: 40px 10px 9px;
+			position: absolute;
 			text-align: center;
-			font-size: 0.8em;
-			background: linear-gradient(0deg, rgba($color: $black, $alpha: 0.7) 0, rgba($color: $black, $alpha: 0.3) 70%, transparent);
-			box-sizing: border-box;
-			margin: 0;
+			width: 100%;
 
 			img {
 				display: inline;
+			}
+		}
+
+		&.is-style-rounded {
+			> div,
+			> a {
+				// Not supported in IE11.
+				@supports ( position: sticky ) {
+					flex: 1 1 auto;
+				}
+			}
+			figcaption {
+				background: none;
+				// Not supported in IE11.
+				@supports ( position: sticky ) {
+					flex: initial;
+					background: none;
+					color: inherit;
+					margin: 0;
+					padding: 10px 10px 9px;
+					position: relative;
+				}
 			}
 		}
 	}
 
 	figcaption {
 		flex-grow: 1;
+		flex-basis: 100%;
+		text-align: center;
 	}
 
-	// Cropped
-	&.is-cropped .blocks-gallery-image,
-	&.is-cropped .blocks-gallery-item {
+	// Non cropped images.
+	&:not(.is-cropped) {
+
+		figure.wp-block-image:not(#individual-image) {
+			margin-top: 0;
+			margin-bottom: auto;
+			img {
+				margin-bottom: var(--gallery-block--gutter-size, #{$grid-unit-20});
+			}
+
+			figcaption {
+				bottom: var(--gallery-block--gutter-size, #{$grid-unit-20});
+			}
+		}
+	}
+
+	// Cropped Images.
+	&.is-cropped figure.wp-block-image:not(#individual-image) {
 		align-self: inherit;
+		> div:not(.components-drop-zone),
+		> a {
+			display: block; // Thanks to IE11 not supporting object-fit fall back to display: block.
+
+			// Without IE11 object-fit support "display: flex;" here causes distortion of aspect ratio.
+			@supports ( position: sticky ) {
+				display: flex;
+			}
+		}
 
 		a,
 		img {
-			// IE11 doesn't support object-fit, so just make sure images aren't skewed.
-			// The following rules are for all browsers.
 			width: 100%;
 
 			// IE11 doesn't read rules inside this query. They are applied only to modern browsers.
-			@supports (position: sticky) {
+			@supports ( position: sticky ) {
+				flex: 1 0 0%;
 				height: 100%;
-				flex: 1;
 				object-fit: cover;
 			}
 		}
 	}
 
-	&.columns-1 .blocks-gallery-image,
-	&.columns-1 .blocks-gallery-item {
-		width: 100%;
+	&.columns-1 figure.wp-block-image:not(#individual-image) {
 		margin-right: 0;
+		width: 100%;
 	}
 
 	// Beyond mobile viewports, we allow up to 8 columns.
 	@include break-small {
 		@for $i from 3 through 8 {
-			&.columns-#{ $i } .blocks-gallery-image,
-			&.columns-#{ $i } .blocks-gallery-item {
-				width: calc(#{ math.div(100%, $i) } - #{ math.div(1em * ( $i - 1 ), $i) });
-				margin-right: 1em;
+			&.columns-#{ $i } figure.wp-block-image:not(#individual-image) {
+				margin-right: var(--gallery-block--gutter-size, #{$grid-unit-20});
+				width: calc(#{math.div(100%, $i)} - (var(--gallery-block--gutter-size, #{$grid-unit-20}) * #{math.div($i - 1, $i)}));
+
+			}
+
+			// Prevent collapsing margin while sibling is being dragged.
+			&.columns-#{$i} figure.wp-block-image:not(#individual-image).is-dragging ~ figure.wp-block-image:not(#individual-image) {
+				margin-right: var(--gallery-block--gutter-size, #{$grid-unit-20});
 			}
 		}
-
 		// Unset the right margin on every rightmost gallery item to ensure center balance.
 		@for $column-count from 1 through 8 {
-			&.columns-#{ $column-count } .blocks-gallery-image:nth-of-type(#{ $column-count }n),
-			&.columns-#{ $column-count } .blocks-gallery-item:nth-of-type(#{ $column-count }n) {
+			&.columns-#{$column-count} figure.wp-block-image:not(#individual-image):nth-of-type(#{ $column-count }n) {
 				margin-right: 0;
 			}
 		}
-	}
-
-	// Last item always needs margins reset.
-	.blocks-gallery-image:last-child,
-	.blocks-gallery-item:last-child {
-		margin-right: 0;
+		// If number of columns not explicitly set default to 3 columns if 3 or more images.
+		&.columns-default {
+			figure.wp-block-image:not(#individual-image) {
+				margin-right: var(--gallery-block--gutter-size, #{$grid-unit-20});
+				width: calc(33.33% - (var(--gallery-block--gutter-size, 16px) * #{math.div(2, 3)}));
+			}
+			figure.wp-block-image:not(#individual-image):nth-of-type(3n+3) {
+				margin-right: 0;
+			}
+			// If only 2 child images use 2 columns.
+			figure.wp-block-image:not(#individual-image):first-child:nth-last-child(2),
+			figure.wp-block-image:not(#individual-image):first-child:nth-last-child(2) ~ figure.wp-block-image:not(#individual-image) {
+				width: calc(50% - (var(--gallery-block--gutter-size, 16px) * 0.5));
+			}
+			// For a single image set to 100%.
+			figure.wp-block-image:not(#individual-image):first-child:nth-last-child(1) {
+				width: 100%;
+			}
+		}
 	}
 
 	// Apply max-width to floated items that have no intrinsic width.
@@ -135,8 +203,6 @@
 
 	// If the gallery is centered, center the content inside as well.
 	&.aligncenter {
-		.blocks-gallery-item figure {
-			justify-content: center;
-		}
+		justify-content: center;
 	}
 }

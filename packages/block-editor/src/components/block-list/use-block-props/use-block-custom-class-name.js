@@ -25,9 +25,9 @@ export function useBlockCustomClassName( clientId ) {
 			const { getBlockName, getBlockAttributes } = select(
 				blockEditorStore
 			);
-			const { className } = getBlockAttributes( clientId );
+			const attributes = getBlockAttributes( clientId );
 
-			if ( ! className ) {
+			if ( ! attributes?.className ) {
 				return;
 			}
 
@@ -40,7 +40,7 @@ export function useBlockCustomClassName( clientId ) {
 				return;
 			}
 
-			return className;
+			return attributes.className;
 		},
 		[ clientId ]
 	);

@@ -1,5 +1,5 @@
 // Normalize Link and edit containers, to look mostly the same.
-.wp-block-navigation-link__container {
+.wp-block-navigation__submenu-container {
 	border-radius: 0;
 
 	// Make it the same height as the appender to prevent a jump.
@@ -15,22 +15,20 @@
 .wp-block-navigation .has-child {
 	cursor: pointer;
 
-	.submenu-container,
-	.wp-block-navigation-link__container {
-		z-index: z-index(".has-child .wp-block-navigation-link__container");
+	.wp-block-navigation__submenu-container {
+		z-index: z-index(".has-child .wp-block-navigation__submenu-container");
 	}
 
 	&:hover {
-		.submenu-container,
-		.wp-block-navigation-link__container {
-			z-index: z-index(".has-child:hover .wp-block-navigation-link__container");
+		.wp-block-navigation__submenu-container {
+			z-index: z-index(".has-child:hover .wp-block-navigation__submenu-container");
 		}
 	}
 
 	// Show on editor selected, even if on frontend it only stays open on focus-within.
 	&.is-selected,
 	&.has-child-selected {
-		> .wp-block-navigation-link__container {
+		> .wp-block-navigation__submenu-container {
 			// We use important here because if the parent block is selected and submenus are present, they should always be visible.
 			visibility: visible !important;
 			opacity: 1 !important;
@@ -44,11 +42,11 @@
  */
 
 .wp-block-navigation-link {
-	.wp-block-navigation-link__container {
+	.wp-block-navigation__submenu-container {
 		display: block;
 	}
 
-	.wp-block-navigation-link__content {
+	.wp-block-navigation-item__content {
 		cursor: text;
 	}
 
@@ -96,7 +94,7 @@
 	}
 
 	// This needs extra specificity.
-	&.wp-block-navigation-link__content {
+	&.wp-block-navigation-item__content {
 		cursor: pointer;
 	}
 }

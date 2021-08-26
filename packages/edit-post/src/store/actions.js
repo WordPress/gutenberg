@@ -30,7 +30,7 @@ import { store as editPostStore } from '.';
  */
 export function* openGeneralSidebar( name ) {
 	yield controls.dispatch(
-		interfaceStore.name,
+		interfaceStore,
 		'enableComplementaryArea',
 		editPostStore.name,
 		name
@@ -44,7 +44,7 @@ export function* openGeneralSidebar( name ) {
  */
 export function* closeGeneralSidebar() {
 	yield controls.dispatch(
-		interfaceStore.name,
+		interfaceStore,
 		'disableComplementaryArea',
 		editPostStore.name
 	);
@@ -153,17 +153,17 @@ export function removeEditorPanel( panelName ) {
 }
 
 /**
- * Returns an action object used to toggle a feature flag.
+ * Triggers an action used to toggle a feature flag.
  *
  * @param {string} feature Feature name.
- *
- * @return {Object} Action object.
  */
-export function toggleFeature( feature ) {
-	return {
-		type: 'TOGGLE_FEATURE',
-		feature,
-	};
+export function* toggleFeature( feature ) {
+	yield controls.dispatch(
+		interfaceStore.name,
+		'toggleFeature',
+		'core/edit-post',
+		feature
+	);
 }
 
 export function* switchEditorMode( mode ) {
@@ -174,7 +174,7 @@ export function* switchEditorMode( mode ) {
 
 	// Unselect blocks when we switch to the code editor.
 	if ( mode !== 'visual' ) {
-		yield controls.dispatch( blockEditorStore.name, 'clearSelectedBlock' );
+		yield controls.dispatch( blockEditorStore, 'clearSelectedBlock' );
 	}
 
 	const message =
@@ -185,17 +185,24 @@ export function* switchEditorMode( mode ) {
 }
 
 /**
- * Returns an action object used to toggle a plugin name flag.
+ * Triggers an action object used to toggle a plugin name flag.
  *
  * @param {string} pluginName Plugin name.
- *
- * @return {Object} Action object.
  */
-export function togglePinnedPluginItem( pluginName ) {
-	return {
-		type: 'TOGGLE_PINNED_PLUGIN_ITEM',
-		pluginName,
-	};
+export function* togglePinnedPluginItem( pluginName ) {
+	const isPinned = yield controls.select(
+		interfaceStore,
+		'isItemPinned',
+		'core/edit-post',
+		pluginName
+	);
+
+	yield controls.dispatch(
+		interfaceStore,
+		isPinned ? 'unpinItem' : 'pinItem',
+		'core/edit-post',
+		pluginName
+	);
 }
 
 /**
@@ -274,20 +281,14 @@ export function* setAvailableMetaBoxesPerLocation( metaBoxesPerLocation ) {
 		metaBoxesPerLocation,
 	};
 
-	const postType = yield controls.select(
-		editorStore.name,
-		'getCurrentPostType'
-	);
+	const postType = yield controls.select( editorStore, 'getCurrentPostType' );
 	if ( window.postboxes.page !== postType ) {
 		window.postboxes.add_postbox_toggles( postType );
 	}
 
-	let wasSavingPost = yield controls.select(
-		editorStore.name,
-		'isSavingPost'
-	);
+	let wasSavingPost = yield controls.select( editorStore, 'isSavingPost' );
 	let wasAutosavingPost = yield controls.select(
-		editorStore.name,
+		editorStore,
 		'isAutosavingPost'
 	);
 
@@ -296,7 +297,7 @@ export function* setAvailableMetaBoxesPerLocation( metaBoxesPerLocation ) {
 	//
 	// See: https://github.com/WordPress/WordPress/blob/5.1.1/wp-admin/includes/post.php#L2307-L2309
 	const hasActiveMetaBoxes = yield controls.select(
-		editPostStore.name,
+		editPostStore,
 		'hasMetaBoxes'
 	);
 
@@ -307,8 +308,8 @@ export function* setAvailableMetaBoxesPerLocation( metaBoxesPerLocation ) {
 
 	// Save metaboxes when performing a full save on the post.
 	saveMetaboxUnsubscribe = subscribe( () => {
-		const isSavingPost = select( editorStore.name ).isSavingPost();
-		const isAutosavingPost = select( editorStore.name ).isAutosavingPost();
+		const isSavingPost = select( editorStore ).isSavingPost();
+		const isAutosavingPost = select( editorStore ).isAutosavingPost();
 
 		// Save metaboxes on save completion, except for autosaves that are not a post preview.
 		const shouldTriggerMetaboxesSave =
@@ -322,7 +323,7 @@ export function* setAvailableMetaBoxesPerLocation( metaBoxesPerLocation ) {
 		wasAutosavingPost = isAutosavingPost;
 
 		if ( shouldTriggerMetaboxesSave ) {
-			dispatch( editPostStore.name ).requestMetaBoxUpdates();
+			dispatch( editPostStore ).requestMetaBoxUpdates();
 		}
 	} );
 }
@@ -344,7 +345,7 @@ export function* requestMetaBoxUpdates() {
 
 	// Additional data needed for backward compatibility.
 	// If we do not provide this data, the post will be overridden with the default values.
-	const post = yield controls.select( editorStore.name, 'getCurrentPost' );
+	const post = yield controls.select( editorStore, 'getCurrentPost' );
 	const additionalData = [
 		post.comment_status ? [ 'comment_status', post.comment_status ] : false,
 		post.ping_status ? [ 'ping_status', post.ping_status ] : false,
@@ -357,7 +358,7 @@ export function* requestMetaBoxUpdates() {
 		document.querySelector( '.metabox-base-form' )
 	);
 	const activeMetaBoxLocations = yield controls.select(
-		editPostStore.name,
+		editPostStore,
 		'getActiveMetaBoxLocations'
 	);
 	const formDataToMerge = [
@@ -391,9 +392,9 @@ export function* requestMetaBoxUpdates() {
 			body: formData,
 			parse: false,
 		} );
-		yield controls.dispatch( editPostStore.name, 'metaBoxUpdatesSuccess' );
+		yield controls.dispatch( editPostStore, 'metaBoxUpdatesSuccess' );
 	} catch {
-		yield controls.dispatch( editPostStore.name, 'metaBoxUpdatesFailure' );
+		yield controls.dispatch( editPostStore, 'metaBoxUpdatesFailure' );
 	}
 }
 
@@ -487,7 +488,7 @@ export function* __unstableSwitchToTemplateMode( newTemplate = false ) {
 	yield setIsEditingTemplate( true );
 
 	const isWelcomeGuideActive = yield controls.select(
-		editPostStore.name,
+		editPostStore,
 		'isFeatureActive',
 		'welcomeGuideTemplate'
 	);
@@ -517,7 +518,7 @@ export function* __unstableCreateTemplate( template ) {
 		'wp_template',
 		template
 	);
-	const post = yield controls.select( editorStore.name, 'getCurrentPost' );
+	const post = yield controls.select( editorStore, 'getCurrentPost' );
 
 	yield controls.dispatch(
 		coreStore,

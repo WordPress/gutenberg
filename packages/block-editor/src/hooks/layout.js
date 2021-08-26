@@ -27,23 +27,14 @@ import { store as blockEditorStore } from '../store';
 import { InspectorControls } from '../components';
 import useSetting from '../components/use-setting';
 import { LayoutStyle } from '../components/block-list/layout';
-import { Head } from '../components/block-list/head';
+import BlockList from '../components/block-list';
 import { getLayoutType, getLayoutTypes } from '../layouts';
 
 const layoutBlockSupportKey = '__experimentalLayout';
 
-const canBlockSwitchLayout = ( blockTypeOrName ) => {
-	const layoutBlockSupportConfig = getBlockSupport(
-		blockTypeOrName,
-		layoutBlockSupportKey
-	);
-
-	return layoutBlockSupportConfig?.allowSwitching;
-};
-
 function LayoutPanel( { setAttributes, attributes, name: blockName } ) {
-	const { layout = {} } = attributes;
-	const defaultLayout = useSetting( 'layout' );
+	const { layout } = attributes;
+	const defaultThemeLayout = useSetting( 'layout' );
 	const themeSupportsLayout = useSelect( ( select ) => {
 		const { getSettings } = select( blockEditorStore );
 		return getSettings().supportsLayout;
@@ -53,8 +44,19 @@ function LayoutPanel( { setAttributes, attributes, name: blockName } ) {
 		return null;
 	}
 
-	const allowLayoutSwitching = canBlockSwitchLayout( blockName );
-	const { inherit = false, type = 'default' } = layout;
+	const {
+		allowSwitching: canBlockSwitchLayout,
+		allowEditing = true,
+		allowInheriting = true,
+		default: defaultBlockLayout,
+	} = getBlockSupport( blockName, layoutBlockSupportKey ) || {};
+
+	if ( ! allowEditing ) {
+		return null;
+	}
+
+	const usedLayout = layout ? layout : defaultBlockLayout || {};
+	const { inherit = false, type = 'default' } = usedLayout;
 	const layoutType = getLayoutType( type );
 
 	const onChangeType = ( newType ) =>
@@ -65,7 +67,7 @@ function LayoutPanel( { setAttributes, attributes, name: blockName } ) {
 	return (
 		<InspectorControls>
 			<PanelBody title={ __( 'Layout' ) }>
-				{ !! defaultLayout && (
+				{ allowInheriting && !! defaultThemeLayout && (
 					<ToggleControl
 						label={ __( 'Inherit default layout' ) }
 						checked={ !! inherit }
@@ -75,7 +77,7 @@ function LayoutPanel( { setAttributes, attributes, name: blockName } ) {
 					/>
 				) }
 
-				{ ! inherit && allowLayoutSwitching && (
+				{ ! inherit && canBlockSwitchLayout && (
 					<LayoutTypeSwitcher
 						type={ type }
 						onChange={ onChangeType }
@@ -84,7 +86,7 @@ function LayoutPanel( { setAttributes, attributes, name: blockName } ) {
 
 				{ ! inherit && layoutType && (
 					<layoutType.edit
-						layout={ layout }
+						layout={ usedLayout }
 						onChange={ onChangeLayout }
 					/>
 				) }
@@ -167,24 +169,27 @@ export const withInspectorControls = createHigherOrderComponent(
 export const withLayoutStyles = createHigherOrderComponent(
 	( BlockListBlock ) => ( props ) => {
 		const { name, attributes } = props;
-		const supportLayout = hasBlockSupport( name, layoutBlockSupportKey );
-		const id = useInstanceId( BlockListBlock );
-		const defaultLayout = useSetting( 'layout' ) || {};
-		if ( ! supportLayout ) {
-			return <BlockListBlock { ...props } />;
-		}
-		const { layout = {} } = attributes;
-		const usedLayout = !! layout && layout.inherit ? defaultLayout : layout;
-		const className = classnames(
-			props?.className,
-			`wp-container-${ id }`
+		const shouldRenderLayoutStyles = hasBlockSupport(
+			name,
+			layoutBlockSupportKey
 		);
-
-		const element = useContext( Head.context );
+		const id = useInstanceId( BlockListBlock );
+		const defaultThemeLayout = useSetting( 'layout' ) || {};
+		const element = useContext( BlockList.__unstableElementContext );
+		const { layout } = attributes;
+		const { default: defaultBlockLayout } =
+			getBlockSupport( name, layoutBlockSupportKey ) || {};
+		const usedLayout = layout?.inherit
+			? defaultThemeLayout
+			: layout || defaultBlockLayout || {};
+		const className = classnames( props?.className, {
+			[ `wp-container-${ id }` ]: shouldRenderLayoutStyles,
+		} );
 
 		return (
 			<>
-				{ element &&
+				{ shouldRenderLayoutStyles &&
+					element &&
 					createPortal(
 						<LayoutStyle
 							selector={ `.wp-container-${ id }` }

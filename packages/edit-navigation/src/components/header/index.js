@@ -38,14 +38,12 @@ export default function Header( {
 
 	return (
 		<div className="edit-navigation-header">
-			<div className="edit-navigation-header__title-subtitle">
-				<h1 className="edit-navigation-header__title">
-					{ __( 'Navigation' ) }
-				</h1>
-				<h2 className="edit-navigation-header__subtitle">
-					{ isMenuSelected && actionHeaderText }
-				</h2>
-			</div>
+			<h1 className="edit-navigation-header__title">
+				{ __( 'Navigation' ) }
+			</h1>
+			<h2 className="edit-navigation-header__subtitle">
+				{ isMenuSelected && actionHeaderText }
+			</h2>
 			{ isMenuSelected && (
 				<div className="edit-navigation-header__actions">
 					<DropdownMenu
