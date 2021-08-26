@@ -73,20 +73,14 @@ function URLPicker( {
 	opensInNewTab,
 	onToggleOpenInNewTab,
 	anchorRef,
+	richTextRef,
 } ) {
-	const [ isLinkControlVisible, setIsLinkControlVisible ] = useState( false );
 	const [ isEditingURL, setIsEditingURL ] = useState( false );
 	const isURLSet = !! url;
 
-	const startEditingURL = ( event ) => {
+	const startEditing = ( event ) => {
 		event.preventDefault();
 		setIsEditingURL( true );
-		setIsLinkControlVisible( true );
-	};
-
-	const stopEditingURL = () => {
-		setIsEditingURL( false );
-		setIsLinkControlVisible( false );
 	};
 
 	const unlink = () => {
@@ -95,29 +89,23 @@ function URLPicker( {
 			linkTarget: undefined,
 			rel: undefined,
 		} );
-		stopEditingURL();
+		setIsEditingURL( false );
 	};
 
 	useEffect( () => {
-		// When a button block with a set URL becomes selected, show the
-		// link control without commencing editing. Focus should remain in
-		// the button's RichText.
-		if ( isURLSet && isSelected ) {
-			setIsLinkControlVisible( true );
-		}
-
-		// Whenever the block is deselected, stop any editing of the link
-		// that might be in progress.
 		if ( ! isSelected ) {
-			stopEditingURL();
+			setIsEditingURL( false );
 		}
-	}, [ isSelected, isURLSet ] );
+	}, [ isSelected ] );
 
-	const linkControl = ( isLinkControlVisible || isEditingURL ) && isSelected && (
+	const isLinkControlVisible = isSelected && ( isEditingURL || isURLSet );
+
+	const linkControl = isLinkControlVisible && (
 		<Popover
 			position="bottom center"
 			onClose={ () => {
 				setIsEditingURL( false );
+				richTextRef.current?.focus();
 			} }
 			anchorRef={ anchorRef?.current }
 			focusOnMount={ isEditingURL ? 'firstElement' : false }
@@ -135,7 +123,10 @@ function URLPicker( {
 						onToggleOpenInNewTab( newOpensInNewTab );
 					}
 				} }
-				onRemove={ unlink }
+				onRemove={ () => {
+					unlink();
+					richTextRef.current?.focus();
+				} }
 				forceIsEditingLink={ isEditingURL }
 			/>
 		</Popover>
@@ -150,7 +141,7 @@ function URLPicker( {
 						icon={ link }
 						title={ __( 'Link' ) }
 						shortcut={ displayShortcut.primary( 'k' ) }
-						onClick={ startEditingURL }
+						onClick={ startEditing }
 					/>
 				) }
 				{ isURLSet && (
@@ -168,7 +159,7 @@ function URLPicker( {
 				<KeyboardShortcuts
 					bindGlobal
 					shortcuts={ {
-						[ rawShortcut.primary( 'k' ) ]: startEditingURL,
+						[ rawShortcut.primary( 'k' ) ]: startEditing,
 						[ rawShortcut.primaryShift( 'k' ) ]: unlink,
 					} }
 				/>
@@ -231,6 +222,7 @@ function ButtonEdit( props ) {
 	const colorProps = useColorProps( attributes );
 	const spacingProps = useSpacingProps( attributes );
 	const ref = useRef();
+	const richTextRef = useRef();
 	const blockProps = useBlockProps( { ref } );
 
 	return (
@@ -243,6 +235,7 @@ function ButtonEdit( props ) {
 				} ) }
 			>
 				<RichText
+					ref={ richTextRef }
 					aria-label={ __( 'Button text' ) }
 					placeholder={ placeholder || __( 'Add text…' ) }
 					value={ text }
@@ -282,6 +275,7 @@ function ButtonEdit( props ) {
 				opensInNewTab={ linkTarget === '_blank' }
 				onToggleOpenInNewTab={ onToggleOpenInNewTab }
 				anchorRef={ ref }
+				richTextRef={ richTextRef }
 			/>
 			<InspectorControls>
 				<WidthPanel
