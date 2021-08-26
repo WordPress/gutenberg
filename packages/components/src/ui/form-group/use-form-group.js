@@ -11,7 +11,7 @@ import * as styles from './form-group-styles';
 import { useCx } from '../../utils/hooks/use-cx';
 
 /**
- * @param {import('../context').PolymorphicComponentProps<import('./types').FormGroupProps, 'div'>} props
+ * @param {import('../context').WordPressComponentProps<import('./types').FormGroupProps, 'div'>} props
  */
 export function useFormGroup( props ) {
 	const {

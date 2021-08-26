@@ -8,7 +8,7 @@ import type { Ref } from 'react';
  * Internal dependencies
  */
 import { useContextSystem, contextConnect } from '../context';
-import type { PolymorphicComponentProps } from '../context';
+import type { WordPressComponentProps } from '../context';
 import { View } from '../../view';
 
 export interface ShortcutDescription {
@@ -22,7 +22,7 @@ export interface Props {
 }
 
 function Shortcut(
-	props: PolymorphicComponentProps< Props, 'span' >,
+	props: WordPressComponentProps< Props, 'span' >,
 	forwardedRef: Ref< any >
 ): JSX.Element | null {
 	const {
