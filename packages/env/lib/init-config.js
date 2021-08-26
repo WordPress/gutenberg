@@ -109,21 +109,21 @@ module.exports = async function initConfig( {
 function dockerFileContents( image, config ) {
 	// Don't install XDebug unless it is explicitly required
 	let shouldInstallXdebug = false;
-	
+
 	if ( config.xdebug !== 'off' ) {
 		if ( config.env.development.phpVersion ) {
 			const versionTokens = config.env.development.phpVersion.split( '.' );
 			const majorVersion = parseInt( versionTokens[ 0 ] );
 			const minorVersion = parseInt( versionTokens[ 1 ] );
-			
+
 			if ( isNaN( majorVersion ) || isNaN( minorVersion ) ) {
 				throw new Error( 'Something went wrong parsing the php version.' );
 			}
-			
+
 			// Xdebug 3 supports 7.2 and higher.
 			// Enable Xdebug for PHP >= 7.2.
 			const usingCompatiblePhpVersion = majorVersion > 7 && minorVersion >= 2;
-			
+
 			if ( usingCompatiblePhpVersion ) {
 				shouldInstallXdebug = true;
 			} else {
@@ -134,7 +134,7 @@ function dockerFileContents( image, config ) {
 			// which is supported by Xdebug 3.
 			shouldInstallXdebug = true;
 		}
-		
+
 	}
 
 	return `FROM ${ image }
