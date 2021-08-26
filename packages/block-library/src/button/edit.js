@@ -160,7 +160,10 @@ function URLPicker( {
 					bindGlobal
 					shortcuts={ {
 						[ rawShortcut.primary( 'k' ) ]: startEditing,
-						[ rawShortcut.primaryShift( 'k' ) ]: unlink,
+						[ rawShortcut.primaryShift( 'k' ) ]: () => {
+							unlink();
+							richTextRef.current?.focus();
+						},
 					} }
 				/>
 			) }
