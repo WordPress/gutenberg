@@ -1215,11 +1215,11 @@ _Parameters_
 
 ### receiveBlocks
 
+> **Deprecated**
+
 Returns an action object used in signalling that blocks have been received.
 Unlike resetBlocks, these should be appended to the existing known set, not
 replacing.
-
-Todo: This should be deprecated
 
 _Parameters_
 

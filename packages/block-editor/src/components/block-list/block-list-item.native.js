@@ -225,7 +225,7 @@ export default compose( [
 
 			const isReadOnly = getSettings().readOnly;
 
-			const { attributes, name } = getBlock( clientId );
+			const { attributes, name } = getBlock( clientId ) || {};
 			const { align } = attributes || {};
 			const parents = getBlockParents( clientId, true );
 			const hasParents = !! parents.length;
