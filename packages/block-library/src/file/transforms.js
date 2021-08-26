@@ -73,7 +73,8 @@ const transforms = {
 			transform: ( attributes ) => {
 				return createBlock( 'core/file', {
 					href: attributes.url,
-					fileName: attributes.caption || getFilename( attributes.url ),
+					fileName:
+						attributes.caption || getFilename( attributes.url ),
 					textLinkHref: attributes.url,
 					id: attributes.id,
 					anchor: attributes.anchor,
