@@ -1,91 +1,67 @@
-# Header
+# BottomSheet Header
 
-Header components is meant to be used to compose the header inside the BottomSheet.
+BottomSheet Header components provide styled elements for composing header UI within a `BottomSheet`.
 
-### Usage
-See 
+## Usage
+
 ```jsx
-/**
- * External dependencies
- */
-import { View, Text } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
-
-/**
- * WordPress dependencies
- */
 import { BottomSheet } from '@wordpress/components';
 
-const ExampleControl = () => {
-
-    const goBack = () => {};
-    const applySettings = () => {};
-
-	return (
-		<BottomSheet.SubSheet>
-			<>
-				<BottomSheet.Header>
-					<BottomSheet.Header.BackButton onPress={ goBack } />
-					<BottomSheet.Header.Title>{ 'Howdy' }</BottomSheet.Header.Title>
-                    <BottomSheet.Header.ApplyButton onPress={ applySetting } />
-				</BottomSheet.Header>
-				<View paddingHorizontal={ 16 }>
-					<Text>{ 'World' }</Text>
-				</View>
-			</>
-		</BottomSheet.SubSheet>
-	);
-};
-
-export default ExampleControl;
+export default = () => (
+	<BottomSheet>
+		<BottomSheet.Header>
+			<BottomSheet.Header.BackButton onPress={ () => {} } />
+			<BottomSheet.Header.Title>A Sheet Title</BottomSheet.Header.Title>
+			<BottomSheet.Header.ApplyButton onPress={ () => {} } />
+		</BottomSheet.Header>
+	</BottomSheet>
+);
 ```
+
+## BottomSheet.Header
+
+Provides structural styles for left-center-right layout for header UI.
+
+## BottomSheet.Header.Title
+
+Displays a styled title for a bottom sheet.
+
+## BottomSheet.Header.ApplyButton
+
+Displays a styled button to apply settings of bottom sheet controls.
 
 ### Props
-Header component doesn't have any props. 
 
-### Other Components
-Other components that Header component makes available. 
+#### onPress
 
-#### ApplyButton 
-```
-<Header.ApplyButton onPress={ goBack } />
-```
+Callback invoked once the button is pressed.
 
-The apply button is used to apply settings of the bottom sheet control.
+## BottomSheet.Header.BackButton
 
-##### onPress 
-use to pass a call back once the ApplyButton is clicked. 
+Displays a styled button to navigate backwards from a bottom sheet.
 
-#### BackButton 
-```
-<Header.BackButton onPress={ goBack } />
-```
+### Props
 
-The back button is used to send the user back to the previous sheet. 
+#### onPress
 
-##### onPress 
-use to pass a call back once the BackButton is clicked. 
+Callback invoked once the button is pressed.
 
-#### CancelButton 
-```
-<Header.CancelButton onPress={ goBack } />
-```
+## BottomSheet.Header.CancelButton
 
-The cancel button is used to send the user back to the previous sheet. Closes the sheet. Use this if you are using a full screen bottom sheet. 
+Displays a styled button to dismiss a full screen bottom sheet.
 
-##### onPress 
-use to pass a call back once the CancelButton is clicked. 
+### Props
 
-#### CloseButton 
-```
-<Header.CloseButton onPress={ goBack } />
-```
+#### onPress
 
-The close button is used to closes the bottom sheet. Use this if you are using a full screen bottom sheet. 
+Callback invoked once the button is pressed.
 
-#### Title 
-```
-<Header.Title>{ 'Howdy' }</Header.Title>
-```
+## BottomSheet.Header.CloseButton
 
-The title is used to display the title of the bottom sheet control.
+Displays a styled button to dismiss a full screen bottom sheet.
+
+### Props
+
+#### onPress
+
+Callback invoked once the button is pressed.
