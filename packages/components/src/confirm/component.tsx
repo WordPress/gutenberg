@@ -32,7 +32,6 @@ function Confirm(
 		message,
 		onConfirm,
 		onCancel,
-		role,
 		...otherProps
 	} = useContextSystem( props, 'Confirm' );
 
