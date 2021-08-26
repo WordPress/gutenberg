@@ -12,9 +12,10 @@ import {
 	removeBlockVariations,
 } from '../actions';
 import {
-	blockVariations,
-	blockStyles,
+	unprocessedBlockTypes,
 	blockTypes,
+	blockStyles,
+	blockVariations,
 	categories,
 	defaultBlockName,
 	freeformFallbackBlockName,
@@ -22,6 +23,44 @@ import {
 	groupingBlockName,
 	DEFAULT_CATEGORIES,
 } from '../reducer';
+
+describe( 'unprocessedBlockTypes', () => {
+	it( 'should return an empty object as default state', () => {
+		expect( unprocessedBlockTypes( undefined, {} ) ).toEqual( {} );
+	} );
+
+	it( 'should add a new block type', () => {
+		const original = deepFreeze( {
+			'core/paragraph': { name: 'core/paragraph' },
+		} );
+
+		const state = unprocessedBlockTypes( original, {
+			type: 'ADD_UNPROCESSED_BLOCK_TYPE',
+			blockType: { name: 'core/code' },
+		} );
+
+		expect( state ).toEqual( {
+			'core/paragraph': { name: 'core/paragraph' },
+			'core/code': { name: 'core/code' },
+		} );
+	} );
+
+	it( 'should remove unprocessed block types', () => {
+		const original = deepFreeze( {
+			'core/paragraph': { name: 'core/paragraph' },
+			'core/code': { name: 'core/code' },
+		} );
+
+		const state = blockTypes( original, {
+			type: 'REMOVE_BLOCK_TYPES',
+			names: [ 'core/code' ],
+		} );
+
+		expect( state ).toEqual( {
+			'core/paragraph': { name: 'core/paragraph' },
+		} );
+	} );
+} );
 
 describe( 'blockTypes', () => {
 	it( 'should return an empty object as default state', () => {

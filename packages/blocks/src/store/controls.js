@@ -12,6 +12,7 @@ import { applyFilters } from '@wordpress/hooks';
 /**
  * Internal dependencies
  */
+import { STORE_NAME } from './constants';
 import { isValidIcon, normalizeIconObject } from '../api/utils';
 import { DEPRECATED_ENTRY_KEYS } from '../api/constants';
 
@@ -81,7 +82,7 @@ function processBlockType( blockType, select ) {
 
 	if (
 		'category' in settings &&
-		! some( select( 'core/blocks' ).getCategories(), {
+		! some( select( STORE_NAME ).getCategories(), {
 			slug: settings.category,
 		} )
 	) {
@@ -117,14 +118,31 @@ function processBlockType( blockType, select ) {
 }
 
 const controls = {
-	ADD_PROCESSED_BLOCK_TYPE: createRegistryControl(
+	APPLY_BLOCK_TYPE_FILTERS: createRegistryControl(
 		( { dispatch, select } ) => ( { blockType } ) => {
-			const settings = processBlockType( blockType, select );
-			if ( ! settings ) {
+			const processedBlockType = processBlockType( blockType, select );
+			if ( ! processedBlockType ) {
 				return;
 			}
 
-			dispatch( 'core/blocks' ).addBlockTypes( settings );
+			dispatch( STORE_NAME ).addBlockTypes( processedBlockType );
+		}
+	),
+	REAPPLY_BLOCK_TYPE_FILTERS: createRegistryControl(
+		( { dispatch, select } ) => () => {
+			const unprocessedBlockTypes = select(
+				STORE_NAME
+			).__experimentalGetUnprocessedBlockTypes();
+
+			const processedBlockTypes = unprocessedBlockTypes
+				.map( ( blockType ) => processBlockType( blockType, select ) )
+				.filter( Boolean );
+
+			if ( ! processedBlockTypes.length ) {
+				return;
+			}
+
+			dispatch( STORE_NAME ).addBlockTypes( processedBlockTypes );
 		}
 	),
 };

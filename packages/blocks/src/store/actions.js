@@ -21,8 +21,18 @@ export function addBlockTypes( blockTypes ) {
 
 export function* __experimentalAddBlockType( blockType ) {
 	yield {
-		type: 'ADD_PROCESSED_BLOCK_TYPE',
+		type: 'ADD_UNPROCESSED_BLOCK_TYPE',
 		blockType,
+	};
+	yield {
+		type: 'APPLY_BLOCK_TYPE_FILTERS',
+		blockType,
+	};
+}
+
+export function* __experimentalReapplyBlockTypeFilters() {
+	yield {
+		type: 'REAPPLY_BLOCK_TYPE_FILTERS',
 	};
 }
 

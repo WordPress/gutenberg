@@ -42,7 +42,29 @@ export const DEFAULT_CATEGORIES = [
 ];
 
 /**
- * Reducer managing the block types
+ * Reducer managing the unprocessed block types registered by block authors.
+ *
+ * @param {Object} state  Current state.
+ * @param {Object} action Dispatched action.
+ *
+ * @return {Object} Updated state.
+ */
+export function unprocessedBlockTypes( state = {}, action ) {
+	switch ( action.type ) {
+		case 'ADD_UNPROCESSED_BLOCK_TYPE':
+			return {
+				...state,
+				[ action.blockType.name ]: action.blockType,
+			};
+		case 'REMOVE_BLOCK_TYPES':
+			return omit( state, action.names );
+	}
+
+	return state;
+}
+
+/**
+ * Reducer managing the processed block types with all filters applied.
  *
  * @param {Object} state  Current state.
  * @param {Object} action Dispatched action.
@@ -256,6 +278,7 @@ export function collections( state = {}, action ) {
 }
 
 export default combineReducers( {
+	unprocessedBlockTypes,
 	blockTypes,
 	blockStyles,
 	blockVariations,
