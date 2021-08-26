@@ -111,8 +111,6 @@ function dockerFileContents( image, config ) {
 	let shouldInstallXdebug = false;
 	
 	if (config.xdebug !== 'off') {
-		// By default, an undefined phpVersion uses the version on the docker image,
-		// which is supported by Xdebug 3.
 		if ( config.env.development.phpVersion ) {
 			const versionTokens = config.env.development.phpVersion.split( '.' );
 			const majorVersion = parseInt( versionTokens[ 0 ] );
@@ -128,6 +126,10 @@ function dockerFileContents( image, config ) {
 			} else {
 				throw new Error( 'Cannot use XDebug 3 on PHP < 7.2.' );
 			}
+		} else {
+			// By default, an undefined phpVersion uses the version on the docker image,
+			// which is supported by Xdebug 3.
+			shouldInstallXdebug = true;
 		}
 		
 	}
