@@ -119,9 +119,12 @@ function dockerFileContents( image, config ) {
 			if ( isNaN( majorVersion ) || isNaN( minorVersion ) ) {
 				throw new Error( 'Something went wrong parsing the php version.' );
 			}
-
-			// Disable Xdebug for PHP < 7.2. Xdebug 3 supports 7.2 and higher.
-			if ( majorVersion > 7 && minorVersion >= 2 ) {
+			
+			// Xdebug 3 supports 7.2 and higher.
+			// Enable Xdebug for PHP >= 7.2.
+			const usingCompatiblePhpVersion = majorVersion > 7 && minorVersion >= 2;
+			
+			if usingCompatiblePhpVersion {
 				shouldInstallXdebug = true;
 			} else {
 				throw new Error( 'Cannot use XDebug 3 on PHP < 7.2.' );
