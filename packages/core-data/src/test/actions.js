@@ -2,13 +2,16 @@
  * WordPress dependencies
  */
 import { controls } from '@wordpress/data';
+import apiFetch from '@wordpress/api-fetch';
+
+jest.mock( '@wordpress/api-fetch' );
 
 /**
  * Internal dependencies
  */
 import {
 	editEntityRecord,
-	// saveEntityRecord,
+	saveEntityRecord,
 	deleteEntityRecord,
 	// receiveEntityRecords,
 	receiveUserPermission,
@@ -105,150 +108,236 @@ describe( 'deleteEntityRecord', () => {
 	} );
 } );
 
-// describe( 'saveEntityRecord', () => {
-// 	it( 'triggers a POST request for a new record', async () => {
-// 		const post = { title: 'new post' };
-// 		const entities = [
-// 			{ name: 'post', kind: 'postType', baseURL: '/wp/v2/posts' },
-// 		];
-// 		const fulfillment = saveEntityRecord( 'postType', 'post', post );
-// 		// Trigger generator
-// 		fulfillment.next();
-//
-// 		// Provide entities and acquire lock
-// 		expect( fulfillment.next( entities ).value.type ).toBe(
-// 			'MOCKED_ACQUIRE_LOCK'
-// 		);
-//
-// 		// Trigger apiFetch
-// 		expect( fulfillment.next().value.type ).toEqual(
-// 			'SAVE_ENTITY_RECORD_START'
-// 		);
-//
-// 		expect( fulfillment.next().value.type ).toBe( '@@data/SELECT' );
-// 		const { value: apiFetchAction } = fulfillment.next( {} );
-// 		expect( apiFetchAction.request ).toEqual( {
-// 			path: '/wp/v2/posts',
-// 			method: 'POST',
-// 			data: post,
-// 		} );
-// 		// Provide response and trigger action
-// 		const updatedRecord = { ...post, id: 10 };
-// 		const { value: received } = fulfillment.next( updatedRecord );
-// 		expect( received ).toEqual(
-// 			receiveEntityRecords(
-// 				'postType',
-// 				'post',
-// 				updatedRecord,
-// 				undefined,
-// 				true,
-// 				{ title: 'new post' }
-// 			)
-// 		);
-// 		expect( fulfillment.next().value.type ).toBe(
-// 			'SAVE_ENTITY_RECORD_FINISH'
-// 		);
-// 		// Release lock
-// 		expect( fulfillment.next().value.type ).toEqual(
-// 			'MOCKED_RELEASE_LOCK'
-// 		);
-//
-// 		expect( fulfillment.next().value ).toBe( updatedRecord );
-// 	} );
-//
-// 	it( 'triggers a PUT request for an existing record', async () => {
-// 		const post = { id: 10, title: 'new post' };
-// 		const entities = [
-// 			{ name: 'post', kind: 'postType', baseURL: '/wp/v2/posts' },
-// 		];
-// 		const fulfillment = saveEntityRecord( 'postType', 'post', post );
-// 		// Trigger generator
-// 		fulfillment.next();
-//
-// 		// Provide entities and acquire lock
-// 		expect( fulfillment.next( entities ).value.type ).toBe(
-// 			'MOCKED_ACQUIRE_LOCK'
-// 		);
-//
-// 		// Trigger apiFetch
-// 		expect( fulfillment.next().value.type ).toEqual(
-// 			'SAVE_ENTITY_RECORD_START'
-// 		);
-// 		expect( fulfillment.next().value.type ).toBe( '@@data/SELECT' );
-// 		const { value: apiFetchAction } = fulfillment.next( {} );
-// 		expect( apiFetchAction.request ).toEqual( {
-// 			path: '/wp/v2/posts/10',
-// 			method: 'PUT',
-// 			data: post,
-// 		} );
-// 		// Provide response and trigger action
-// 		const { value: received } = fulfillment.next( post );
-// 		expect( received ).toEqual(
-// 			receiveEntityRecords( 'postType', 'post', post, undefined, true, {
-// 				title: 'new post',
-// 				id: 10,
-// 			} )
-// 		);
-// 		expect( fulfillment.next().value.type ).toBe(
-// 			'SAVE_ENTITY_RECORD_FINISH'
-// 		);
-// 		// Release lock
-// 		expect( fulfillment.next().value.type ).toEqual(
-// 			'MOCKED_RELEASE_LOCK'
-// 		);
-// 	} );
-//
-// 	it( 'triggers a PUT request for an existing record with a custom key', async () => {
-// 		const postType = { slug: 'page', title: 'Pages' };
-// 		const entities = [
-// 			{
-// 				name: 'postType',
-// 				kind: 'root',
-// 				baseURL: '/wp/v2/types',
-// 				key: 'slug',
-// 			},
-// 		];
-// 		const fulfillment = saveEntityRecord( 'root', 'postType', postType );
-// 		// Trigger generator
-// 		fulfillment.next();
-//
-// 		// Provide entities and acquire lock
-// 		expect( fulfillment.next( entities ).value.type ).toBe(
-// 			'MOCKED_ACQUIRE_LOCK'
-// 		);
-//
-// 		// Trigger apiFetch
-// 		expect( fulfillment.next().value.type ).toEqual(
-// 			'SAVE_ENTITY_RECORD_START'
-// 		);
-// 		expect( fulfillment.next().value.type ).toBe( '@@data/SELECT' );
-// 		const { value: apiFetchAction } = fulfillment.next( {} );
-// 		expect( apiFetchAction.request ).toEqual( {
-// 			path: '/wp/v2/types/page',
-// 			method: 'PUT',
-// 			data: postType,
-// 		} );
-// 		// Provide response and trigger action
-// 		const { value: received } = fulfillment.next( postType );
-// 		expect( received ).toEqual(
-// 			receiveEntityRecords(
-// 				'root',
-// 				'postType',
-// 				postType,
-// 				undefined,
-// 				true,
-// 				{ slug: 'page', title: 'Pages' }
-// 			)
-// 		);
-// 		expect( fulfillment.next().value.type ).toBe(
-// 			'SAVE_ENTITY_RECORD_FINISH'
-// 		);
-// 		// Release lock
-// 		expect( fulfillment.next().value.type ).toEqual(
-// 			'MOCKED_RELEASE_LOCK'
-// 		);
-// 	} );
-// } );
+describe( 'saveEntityRecord', () => {
+	beforeEach( async () => {
+		apiFetch.mockReset();
+		jest.useFakeTimers();
+	} );
+
+	it( 'triggers a POST request for a new record', async () => {
+		const post = { title: 'new post' };
+		const entities = [
+			{ name: 'post', kind: 'postType', baseURL: '/wp/v2/posts' },
+		];
+		const select = {
+			getRawEntityRecord: () => post,
+		};
+
+		const dispatch = Object.assign( jest.fn(), {
+			receiveEntityRecords: jest.fn(),
+		} );
+		// Provide entities
+		dispatch.mockReturnValueOnce( entities );
+
+		// Provide response
+		const updatedRecord = { ...post, id: 10 };
+		apiFetch.mockImplementation( () => {
+			return updatedRecord;
+		} );
+
+		const result = await saveEntityRecord(
+			'postType',
+			'post',
+			post
+		)( { select, dispatch } );
+
+		expect( apiFetch ).toHaveBeenCalledTimes( 1 );
+		expect( apiFetch ).toHaveBeenCalledWith( {
+			path: '/wp/v2/posts',
+			method: 'POST',
+			data: post,
+		} );
+
+		expect( dispatch ).toHaveBeenCalledTimes( 5 );
+		expect( dispatch ).toHaveBeenCalledWith( {
+			type: 'SAVE_ENTITY_RECORD_START',
+			kind: 'postType',
+			name: 'post',
+			recordId: undefined,
+			isAutosave: false,
+		} );
+		expect( dispatch ).toHaveBeenCalledWith( [
+			{
+				type: 'MOCKED_ACQUIRE_LOCK',
+			},
+		] );
+		expect( dispatch ).toHaveBeenCalledWith( {
+			type: 'SAVE_ENTITY_RECORD_FINISH',
+			kind: 'postType',
+			name: 'post',
+			recordId: undefined,
+			error: undefined,
+			isAutosave: false,
+		} );
+		expect( dispatch ).toHaveBeenCalledWith( [
+			{
+				type: 'MOCKED_RELEASE_LOCK',
+			},
+		] );
+
+		expect( dispatch.receiveEntityRecords ).toHaveBeenCalledTimes( 1 );
+		expect( dispatch.receiveEntityRecords ).toHaveBeenCalledWith(
+			'postType',
+			'post',
+			updatedRecord,
+			undefined,
+			true,
+			post
+		);
+
+		expect( result ).toBe( updatedRecord );
+	} );
+
+	it( 'triggers a PUT request for an existing record', async () => {
+		const post = { id: 10, title: 'new post' };
+		const entities = [
+			{ name: 'post', kind: 'postType', baseURL: '/wp/v2/posts' },
+		];
+		const select = {
+			getRawEntityRecord: () => post,
+		};
+
+		const dispatch = Object.assign( jest.fn(), {
+			receiveEntityRecords: jest.fn(),
+		} );
+		// Provide entities
+		dispatch.mockReturnValueOnce( entities );
+
+		// Provide response
+		const updatedRecord = { ...post, id: 10 };
+		apiFetch.mockImplementation( () => {
+			return updatedRecord;
+		} );
+
+		const result = await saveEntityRecord(
+			'postType',
+			'post',
+			post
+		)( { select, dispatch } );
+
+		expect( apiFetch ).toHaveBeenCalledTimes( 1 );
+		expect( apiFetch ).toHaveBeenCalledWith( {
+			path: '/wp/v2/posts/10',
+			method: 'PUT',
+			data: post,
+		} );
+
+		expect( dispatch ).toHaveBeenCalledTimes( 5 );
+		expect( dispatch ).toHaveBeenCalledWith( {
+			type: 'SAVE_ENTITY_RECORD_START',
+			kind: 'postType',
+			name: 'post',
+			recordId: 10,
+			isAutosave: false,
+		} );
+		expect( dispatch ).toHaveBeenCalledWith( [
+			{
+				type: 'MOCKED_ACQUIRE_LOCK',
+			},
+		] );
+		expect( dispatch ).toHaveBeenCalledWith( {
+			type: 'SAVE_ENTITY_RECORD_FINISH',
+			kind: 'postType',
+			name: 'post',
+			recordId: 10,
+			error: undefined,
+			isAutosave: false,
+		} );
+		expect( dispatch ).toHaveBeenCalledWith( [
+			{
+				type: 'MOCKED_RELEASE_LOCK',
+			},
+		] );
+
+		expect( dispatch.receiveEntityRecords ).toHaveBeenCalledTimes( 1 );
+		expect( dispatch.receiveEntityRecords ).toHaveBeenCalledWith(
+			'postType',
+			'post',
+			updatedRecord,
+			undefined,
+			true,
+			post
+		);
+
+		expect( result ).toBe( updatedRecord );
+	} );
+
+	it( 'triggers a PUT request for an existing record with a custom key', async () => {
+		const postType = { slug: 'page', title: 'Pages' };
+		const entities = [
+			{
+				name: 'postType',
+				kind: 'root',
+				baseURL: '/wp/v2/types',
+				key: 'slug',
+			},
+		];
+		const select = {
+			getRawEntityRecord: () => ( {} ),
+		};
+
+		const dispatch = Object.assign( jest.fn(), {
+			receiveEntityRecords: jest.fn(),
+		} );
+		// Provide entities
+		dispatch.mockReturnValueOnce( entities );
+
+		// Provide response
+		apiFetch.mockImplementation( () => postType );
+
+		const result = await saveEntityRecord(
+			'root',
+			'postType',
+			postType
+		)( { select, dispatch } );
+
+		expect( apiFetch ).toHaveBeenCalledTimes( 1 );
+		expect( apiFetch ).toHaveBeenCalledWith( {
+			path: '/wp/v2/types/page',
+			method: 'PUT',
+			data: postType,
+		} );
+
+		expect( dispatch ).toHaveBeenCalledTimes( 5 );
+		expect( dispatch ).toHaveBeenCalledWith( {
+			type: 'SAVE_ENTITY_RECORD_START',
+			kind: 'root',
+			name: 'postType',
+			recordId: 'page',
+			isAutosave: false,
+		} );
+		expect( dispatch ).toHaveBeenCalledWith( [
+			{
+				type: 'MOCKED_ACQUIRE_LOCK',
+			},
+		] );
+		expect( dispatch ).toHaveBeenCalledWith( {
+			type: 'SAVE_ENTITY_RECORD_FINISH',
+			kind: 'root',
+			name: 'postType',
+			recordId: 'page',
+			error: undefined,
+			isAutosave: false,
+		} );
+		expect( dispatch ).toHaveBeenCalledWith( [
+			{
+				type: 'MOCKED_RELEASE_LOCK',
+			},
+		] );
+
+		expect( dispatch.receiveEntityRecords ).toHaveBeenCalledTimes( 1 );
+		expect( dispatch.receiveEntityRecords ).toHaveBeenCalledWith(
+			'root',
+			'postType',
+			postType,
+			undefined,
+			true,
+			{ slug: 'page', title: 'Pages' }
+		);
+
+		expect( result ).toBe( postType );
+	} );
+} );
 
 describe( 'receiveUserPermission', () => {
 	it( 'builds an action object', () => {
