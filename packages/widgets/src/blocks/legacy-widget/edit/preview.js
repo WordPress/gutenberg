@@ -29,7 +29,7 @@ export default function Preview( { idBase, instance, isVisible } ) {
 				method: 'POST',
 				signal: abortController?.signal,
 				data: {
-					id: idBase,
+					id_base: idBase,
 					instance,
 				},
 			} );
