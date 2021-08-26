@@ -29,6 +29,7 @@ export default function useText( props ) {
 	const {
 		adjustLineHeightForInnerControls,
 		align,
+		as = 'span',
 		children,
 		className,
 		color,
@@ -151,6 +152,7 @@ export default function useText( props ) {
 
 	const finalComponentProps = {
 		...otherProps,
+		as,
 		className: classes,
 		children,
 		ellipsizeMode: ellipsizeMode || finalEllipsizeMode,
