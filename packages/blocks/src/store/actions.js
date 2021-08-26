@@ -19,6 +19,13 @@ export function addBlockTypes( blockTypes ) {
 	};
 }
 
+export function* __experimentalAddBlockType( blockType ) {
+	yield {
+		type: 'ADD_PROCESSED_BLOCK_TYPE',
+		blockType,
+	};
+}
+
 /**
  * Returns an action object used to remove a registered block type.
  *
