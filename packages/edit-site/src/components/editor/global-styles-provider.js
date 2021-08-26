@@ -72,21 +72,6 @@ export const useGlobalStylesReset = () => {
 	];
 };
 
-const shouldExtractKey = ( name, supports ) => {
-	// Opting out means that, for certain support keys, blocks have to explicitly
-	// set the support value false. If the key is unset, we still extract it.
-	const blockHasNotOptedOut =
-		STYLE_PROPERTY[ name ].requiresOptOut &&
-		has( supports, STYLE_PROPERTY[ name ].support[ 0 ] ) &&
-		get( supports, STYLE_PROPERTY[ name ].support ) !== false;
-
-	const blockHasAllowedSupportKey =
-		! STYLE_PROPERTY[ name ].requiresOptOut &&
-		get( supports, STYLE_PROPERTY[ name ].support, false );
-
-	return blockHasAllowedSupportKey || blockHasNotOptedOut;
-};
-
 const extractSupportKeys = ( supports ) => {
 	const supportKeys = [];
 	Object.keys( STYLE_PROPERTY ).forEach( ( name ) => {
@@ -94,8 +79,20 @@ const extractSupportKeys = ( supports ) => {
 			return;
 		}
 
-		if ( shouldExtractKey( name, supports ) ) {
-			supportKeys.push( name );
+		// Opting out means that, for certain support keys like background color,
+		// blocks have to explicitly set the support value false. If the key is
+		// unset, we still enable it.
+		if ( STYLE_PROPERTY[ name ].requiresOptOut ) {
+			if (
+				has( supports, STYLE_PROPERTY[ name ].support[ 0 ] ) &&
+				get( supports, STYLE_PROPERTY[ name ].support ) !== false
+			) {
+				return supportKeys.push( name );
+			}
+		}
+
+		if ( get( supports, STYLE_PROPERTY[ name ].support, false ) ) {
+			return supportKeys.push( name );
 		}
 	} );
 	return supportKeys;
