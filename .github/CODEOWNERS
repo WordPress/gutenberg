@@ -127,6 +127,7 @@
 /lib/theme.json                                 @timothybjabocs @spacedmonkey @nosolosw
 /lib/class-wp-theme-json-gutenberg.php          @timothybjabocs @spacedmonkey @nosolosw
 /lib/class-wp-theme-json-resolver-gutenberg.php @timothybjabocs @spacedmonkey @nosolosw
+/lib/full-site-editing                          @janw-me
 /phpunit/class-wp-theme-json-test.php           @nosolosw
 
 # Web App
