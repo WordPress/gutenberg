@@ -124,7 +124,7 @@ function dockerFileContents( image, config ) {
 			// Enable Xdebug for PHP >= 7.2.
 			const usingCompatiblePhpVersion = majorVersion > 7 && minorVersion >= 2;
 			
-			if usingCompatiblePhpVersion {
+			if ( usingCompatiblePhpVersion ) {
 				shouldInstallXdebug = true;
 			} else {
 				throw new Error( 'Cannot use XDebug 3 on PHP < 7.2.' );
