@@ -1,0 +1,273 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`ToggleGroupControl should render correctly 1`] = `
+.emotion-0 {
+  font-family: -apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Oxygen-Sans,Ubuntu,Cantarell,'Helvetica Neue',sans-serif;
+  font-size: 13px;
+}
+
+.emotion-2 {
+  margin-bottom: calc(4px * 2);
+}
+
+.components-panel__row .emotion-2 {
+  margin-bottom: inherit;
+}
+
+.emotion-4 {
+  background: #fff;
+  border: 1px solid;
+  border-color: #757575;
+  border-radius: 2px;
+  display: -webkit-inline-box;
+  display: -webkit-inline-flex;
+  display: -ms-inline-flexbox;
+  display: inline-flex;
+  min-height: 36px;
+  min-width: 0;
+  padding: 2px;
+  position: relative;
+  -webkit-transition: -webkit-transform 100ms linear;
+  transition: transform 100ms linear;
+}
+
+@media ( prefers-reduced-motion: reduce ) {
+  .emotion-4 {
+    transition-duration: 0ms;
+  }
+}
+
+.emotion-4:hover {
+  border-color: #757575;
+}
+
+.emotion-4:focus-within {
+  border-color: var( --wp-admin-theme-color-darker-10, #007cba);
+  box-shadow: 0 0 0 0.5px var( --wp-admin-theme-color, #00669b);
+  outline: none;
+  z-index: 1;
+}
+
+.emotion-6 {
+  background: #1e1e1e;
+  border-radius: 2px;
+  box-shadow: transparent;
+  left: 0;
+  position: absolute;
+  top: 2px;
+  bottom: 2px;
+  -webkit-transition: -webkit-transform 160ms ease;
+  transition: transform 160ms ease;
+  z-index: 1;
+}
+
+@media ( prefers-reduced-motion: reduce ) {
+  .emotion-6 {
+    transition-duration: 0ms;
+  }
+}
+
+.emotion-8 {
+  display: -webkit-inline-box;
+  display: -webkit-inline-flex;
+  display: -ms-inline-flexbox;
+  display: inline-flex;
+  max-width: 100%;
+  min-width: 0;
+  position: relative;
+  -webkit-flex: 1;
+  -ms-flex: 1;
+  flex: 1;
+}
+
+.emotion-10 {
+  -webkit-align-items: center;
+  -webkit-box-align: center;
+  -ms-flex-align: center;
+  align-items: center;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  -ms-appearance: none;
+  appearance: none;
+  background: transparent;
+  border: none;
+  border-radius: 2px;
+  color: #757575;
+  cursor: pointer;
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+  height: 100%;
+  -webkit-box-pack: center;
+  -ms-flex-pack: center;
+  -webkit-justify-content: center;
+  justify-content: center;
+  line-height: 100%;
+  outline: none;
+  padding: 0 12px;
+  position: relative;
+  text-align: center;
+  -webkit-transition: background 160ms linear,color 160ms linear,font-weight 60ms linear;
+  transition: background 160ms linear,color 160ms linear,font-weight 60ms linear;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  width: 100%;
+  z-index: 2;
+}
+
+@media ( prefers-reduced-motion: reduce ) {
+  .emotion-10 {
+    transition-duration: 0ms;
+  }
+}
+
+.emotion-10::-moz-focus-inner {
+  border: 0;
+}
+
+.emotion-10:active {
+  background: #fff;
+}
+
+.emotion-11 {
+  font-size: 13px;
+  line-height: 1;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  -webkit-transform: translate( -50%, -50% );
+  -moz-transform: translate( -50%, -50% );
+  -ms-transform: translate( -50%, -50% );
+  transform: translate( -50%, -50% );
+}
+
+.emotion-13 {
+  font-size: 13px;
+  font-weight: bold;
+  height: 0;
+  overflow: hidden;
+  visibility: hidden;
+}
+
+.emotion-15 {
+  background: rgba(0, 0, 0, 0.1);
+  height: calc( 100% - 4px - 4px );
+  position: absolute;
+  right: 0;
+  top: 4px;
+  -webkit-transition: background 200ms linear;
+  transition: background 200ms linear;
+  width: 1px;
+  background: transparent;
+}
+
+@media ( prefers-reduced-motion: reduce ) {
+  .emotion-15 {
+    transition-duration: 0ms;
+  }
+}
+
+<div
+  class="components-base-control emotion-0 emotion-1"
+>
+  <div
+    class="components-base-control__field emotion-2 emotion-3"
+  >
+    <div>
+      <span
+        class="components-base-control__label"
+      >
+        Test Toggle Group Control
+      </span>
+    </div>
+    <div
+      aria-label="Test Toggle Group Control"
+      class="medium components-toggle-group-control emotion-4 emotion-5"
+      data-wp-c16t="true"
+      data-wp-component="ToggleGroupControl"
+      id="toggle-group-control-0"
+      role="radiogroup"
+    >
+      <iframe
+        aria-hidden="true"
+        frameborder="0"
+        src="about:blank"
+        style="display: block; opacity: 0; position: absolute; top: 0px; left: 0px; height: 100%; width: 100%; overflow: hidden; pointer-events: none; z-index: -1;"
+        tabindex="-1"
+      />
+      <div
+        class="emotion-6 emotion-7"
+        role="presentation"
+        style="transform: translateX(0px); transition: none; width: 0px;"
+      />
+      <div
+        class="emotion-8 emotion-9"
+        data-active="false"
+      >
+        <button
+          aria-checked="false"
+          aria-label="R"
+          class="emotion-10 components-toggle-group-control-option"
+          data-value="rigas"
+          data-wp-c16t="true"
+          data-wp-component="ToggleGroupControlOption"
+          id="toggle-group-control-0-0"
+          role="radio"
+          tabindex="0"
+        >
+          <div
+            class="emotion-11 emotion-12"
+          >
+            R
+          </div>
+          <div
+            aria-hidden="true"
+            class="emotion-13 emotion-14"
+          >
+            R
+          </div>
+        </button>
+        <div
+          aria-hidden="true"
+          class="emotion-15 emotion-16"
+        />
+      </div>
+      <div
+        class="emotion-8 emotion-9"
+        data-active="false"
+      >
+        <button
+          aria-checked="false"
+          aria-label="J"
+          class="emotion-10 components-toggle-group-control-option"
+          data-value="jack"
+          data-wp-c16t="true"
+          data-wp-component="ToggleGroupControlOption"
+          id="toggle-group-control-0-1"
+          role="radio"
+          tabindex="-1"
+        >
+          <div
+            class="emotion-11 emotion-12"
+          >
+            J
+          </div>
+          <div
+            aria-hidden="true"
+            class="emotion-13 emotion-14"
+          >
+            J
+          </div>
+        </button>
+        <div
+          aria-hidden="true"
+          class="emotion-15 emotion-16"
+        />
+      </div>
+    </div>
+  </div>
+</div>
+`;

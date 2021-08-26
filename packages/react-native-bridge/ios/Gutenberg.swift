@@ -64,6 +64,8 @@ public class Gutenberg: NSObject {
             initialProps["initialTitle"] = initialTitle
         }
 
+        initialProps["featuredImageId"] = dataSource.gutenbergFeaturedImageId()
+
         initialProps["postType"] = dataSource.gutenbergPostType()
 
         if let locale = dataSource.gutenbergLocale() {
@@ -113,6 +115,10 @@ public class Gutenberg: NSObject {
 
     public func updateHtml(_ html: String) {
         sendEvent(.updateHtml, body: ["html": html])
+    }
+
+    public func featuredImageIdNativeUpdated(mediaId: Int32) {
+        sendEvent(.featuredImageIdNativeUpdated, body: ["featuredImageId": mediaId])
     }
 
     public func replace(block: Block) {

@@ -78,9 +78,13 @@ function collectAllNodesFromDirectFunctionCalls( context, node ) {
 	const specifiers = node.specifiers.filter(
 		( specifier ) =>
 			specifier.imported &&
-			[ 'useDispatch', 'dispatch', 'select', 'resolveSelect' ].includes(
-				specifier.imported.name
-			)
+			[
+				'useDispatch',
+				'dispatch',
+				'useSelect',
+				'select',
+				'resolveSelect',
+			].includes( specifier.imported.name )
 	);
 	const references = getReferences( context, specifiers );
 	const possibleCallExpressionNodes = references

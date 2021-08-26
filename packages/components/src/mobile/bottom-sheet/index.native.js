@@ -435,7 +435,7 @@ class BottomSheet extends Component {
 
 		let listStyle = {};
 		if ( isFullScreen ) {
-			listStyle = { flexGrow: 1 };
+			listStyle = { flexGrow: 1, flexShrink: 1 };
 		} else if ( isMaxHeightSet ) {
 			listStyle = { maxHeight };
 
@@ -485,6 +485,16 @@ class BottomSheet extends Component {
 			</>
 		);
 
+		const showDragIndicator = () => {
+			// if iOS or not fullscreen show the drag indicator
+			if ( Platform.OS === 'ios' || ! this.state.isFullScreen ) {
+				return true;
+			}
+
+			// Otherwise check the allowDragIndicator
+			return this.props.allowDragIndicator;
+		};
+
 		return (
 			<Modal
 				isVisible={ isVisible }
@@ -532,8 +542,11 @@ class BottomSheet extends Component {
 					} }
 					keyboardVerticalOffset={ -safeAreaBottomInset }
 				>
-					<View onLayout={ this.onHeaderLayout }>
-						{ ! ( Platform.OS === 'android' && isFullScreen ) && (
+					<View
+						style={ styles.header }
+						onLayout={ this.onHeaderLayout }
+					>
+						{ showDragIndicator() && (
 							<View style={ styles.dragIndicator } />
 						) }
 						{ ! hideHeader && getHeader() }

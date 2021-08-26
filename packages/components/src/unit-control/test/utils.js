@@ -1,7 +1,11 @@
 /**
  * Internal dependencies
  */
-import { filterUnitsWithSettings, useCustomUnits } from '../utils';
+import {
+	filterUnitsWithSettings,
+	useCustomUnits,
+	getValidParsedUnit,
+} from '../utils';
 
 describe( 'UnitControl utils', () => {
 	describe( 'useCustomUnits', () => {
@@ -58,6 +62,57 @@ describe( 'UnitControl utils', () => {
 			expect(
 				filterUnitsWithSettings( preferredUnits, availableUnits )
 			).toEqual( [] );
+		} );
+	} );
+
+	describe( 'getValidParsedUnit', () => {
+		it( 'should parse valid number and unit', () => {
+			const nextValue = '42px';
+
+			expect( getValidParsedUnit( nextValue ) ).toEqual( [ 42, 'px' ] );
+		} );
+
+		it( 'should return next value only where no known unit parsed', () => {
+			const nextValue = '365zz';
+
+			expect( getValidParsedUnit( nextValue ) ).toEqual( [
+				365,
+				undefined,
+			] );
+		} );
+
+		it( 'should return fallback value', () => {
+			const nextValue = 'thirteen';
+			const preferredUnits = [ { value: 'em' } ];
+			const fallbackValue = 13;
+
+			expect(
+				getValidParsedUnit( nextValue, preferredUnits, fallbackValue )
+			).toEqual( [ 13, 'em' ] );
+		} );
+
+		it( 'should return fallback unit', () => {
+			const nextValue = '911';
+			const fallbackUnit = '%';
+
+			expect(
+				getValidParsedUnit(
+					nextValue,
+					undefined,
+					undefined,
+					fallbackUnit
+				)
+			).toEqual( [ 911, '%' ] );
+		} );
+
+		it( 'should return first unit in preferred units collection as second fallback unit', () => {
+			const nextValue = 101;
+			const preferredUnits = [ { value: 'px' } ];
+
+			expect( getValidParsedUnit( nextValue, preferredUnits ) ).toEqual( [
+				101,
+				'px',
+			] );
 		} );
 	} );
 } );

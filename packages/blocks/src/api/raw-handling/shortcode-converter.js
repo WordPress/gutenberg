@@ -13,7 +13,8 @@ import { regexp, next } from '@wordpress/shortcode';
  */
 import { createBlock, getBlockTransforms, findTransform } from '../factory';
 import { getBlockType } from '../registration';
-import { getBlockAttributes } from '../parser';
+import { getBlockAttributes } from '../parser/get-block-attributes';
+import { applyBuiltInValidationFixes } from '../parser/apply-built-in-validation-fixes';
 
 function segmentHTMLToShortcodeBlock(
 	HTML,
@@ -91,17 +92,22 @@ function segmentHTMLToShortcodeBlock(
 			( schema ) => schema.shortcode( match.shortcode.attrs, match )
 		);
 
-		const block = createBlock(
+		const transformationBlockType = {
+			...getBlockType( transformation.blockName ),
+			attributes: transformation.attributes,
+		};
+
+		let block = createBlock(
 			transformation.blockName,
 			getBlockAttributes(
-				{
-					...getBlockType( transformation.blockName ),
-					attributes: transformation.attributes,
-				},
+				transformationBlockType,
 				match.shortcode.content,
 				attributes
 			)
 		);
+		block.originalContent = match.shortcode.content;
+		// Applying the built-in fixes can enhance the attributes with missing content like "className".
+		block = applyBuiltInValidationFixes( block, transformationBlockType );
 
 		return [
 			...segmentHTMLToShortcodeBlock( beforeHTML ),

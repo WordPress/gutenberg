@@ -26,6 +26,15 @@ import useBlockTypesState from './hooks/use-block-types-state';
 import { searchBlockItems, searchItems } from './search-items';
 import InserterListbox from '../inserter-listbox';
 
+const INITIAL_INSERTER_RESULTS = 9;
+/**
+ * Shared reference to an empty array for cases where it is important to avoid
+ * returning a new array reference on every invocation and rerendering the component.
+ *
+ * @type {Array}
+ */
+const EMPTY_ARRAY = [];
+
 function InserterSearchResults( {
 	filterValue,
 	onSelect,
@@ -101,7 +110,14 @@ function InserterSearchResults( {
 		debouncedSpeak( resultsFoundMessage );
 	}, [ filterValue, debouncedSpeak ] );
 
-	const currentShownPatterns = useAsyncList( filteredBlockPatterns );
+	const currentShownBlockTypes = useAsyncList( filteredBlockTypes, {
+		step: INITIAL_INSERTER_RESULTS,
+	} );
+	const currentShownPatterns = useAsyncList(
+		currentShownBlockTypes.length === filteredBlockTypes.length
+			? filteredBlockPatterns
+			: EMPTY_ARRAY
+	);
 
 	const hasItems =
 		! isEmpty( filteredBlockTypes ) || ! isEmpty( filteredBlockPatterns );
@@ -117,7 +133,7 @@ function InserterSearchResults( {
 					}
 				>
 					<BlockTypesList
-						items={ filteredBlockTypes }
+						items={ currentShownBlockTypes }
 						onSelect={ onSelectBlockType }
 						onHover={ onHover }
 						label={ __( 'Blocks' ) }

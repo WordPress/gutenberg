@@ -8,6 +8,7 @@ export {
 	getColorClassesAndStyles as __experimentalGetColorClassesAndStyles,
 	useColorProps as __experimentalUseColorProps,
 	useCustomSides as __experimentalUseCustomSides,
+	getSpacingClassesAndStyles as __experimentalGetSpacingClassesAndStyles,
 } from './hooks';
 export * from './components';
 export * from './utils';

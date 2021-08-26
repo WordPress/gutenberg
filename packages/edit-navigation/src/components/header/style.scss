@@ -1,25 +1,26 @@
 .edit-navigation-header {
 	display: flex;
+	justify-content: space-between;
 	align-items: center;
 	padding: $grid-unit-15 $grid-unit-30 $grid-unit-15 20px;
 }
 
-.edit-navigation-header__title-subtitle {
-	flex-grow: 1;
-}
-
 .edit-navigation-header__title {
-	font-size: 23px;
-	font-weight: 400;
-	margin: 0;
-	padding: 7px 0 4px 0;
-	line-height: 1.3;
+	font-size: 20px;
+	padding: 0;
+	margin: 0 20px 0 0;
 }
 
 .edit-navigation-header__subtitle {
+	display: none;
 	margin: 0;
 	font-size: 15px;
 	font-weight: normal;
+
+	// Only display on larger screens.
+	@include break-small() {
+		display: block;
+	}
 }
 
 .edit-navigation-header__actions {

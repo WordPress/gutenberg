@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { View, TouchableWithoutFeedback, Platform } from 'react-native';
+import { View, TouchableWithoutFeedback } from 'react-native';
 
 /**
  * WordPress dependencies
@@ -26,6 +26,7 @@ import {
 	BottomSheet,
 	BottomSheetTextControl,
 	BottomSheetSelectControl,
+	FooterMessageControl,
 	FooterMessageLink,
 	Badge,
 } from '@wordpress/components';
@@ -63,6 +64,8 @@ import { getUpdatedLinkTargetSettings } from './utils';
 
 import {
 	LINK_DESTINATION_CUSTOM,
+	LINK_DESTINATION_ATTACHMENT,
+	LINK_DESTINATION_MEDIA,
 	MEDIA_ID_NO_FEATURED_IMAGE_SET,
 } from './constants';
 
@@ -171,12 +174,12 @@ export class ImageEdit extends Component {
 	}
 
 	componentDidUpdate( previousProps ) {
-		if ( ! previousProps.image && this.props.image ) {
-			const { image, attributes } = this.props;
+		const { image, attributes, setAttributes } = this.props;
+		if ( ! previousProps.image && image ) {
 			const url =
 				getUrlForSlug( image, attributes?.sizeSlug ) ||
 				image.source_url;
-			this.props.setAttributes( { url } );
+			setAttributes( { url } );
 		}
 	}
 
@@ -292,14 +295,13 @@ export class ImageEdit extends Component {
 	}
 
 	onSetSizeSlug( sizeSlug ) {
-		const { image } = this.props;
+		const { image, setAttributes } = this.props;
 
 		const url = getUrlForSlug( image, sizeSlug );
 		if ( ! url ) {
 			return null;
 		}
-
-		this.props.setAttributes( {
+		setAttributes( {
 			url,
 			width: undefined,
 			height: undefined,
@@ -308,11 +310,8 @@ export class ImageEdit extends Component {
 	}
 
 	onSelectMediaUploadOption( media ) {
-		const {
-			attributes: { id, url },
-			imageDefaultSize,
-		} = this.props;
-
+		const { imageDefaultSize } = this.props;
+		const { id, url, destination } = this.props.attributes;
 		const mediaAttributes = {
 			id: media.id,
 			url: media.url,
@@ -331,6 +330,17 @@ export class ImageEdit extends Component {
 			// Keep the same url when selecting the same file, so "Image Size" option is not changed.
 			additionalAttributes = { url };
 		}
+
+		let href;
+		switch ( destination ) {
+			case LINK_DESTINATION_MEDIA:
+				href = media.url;
+				break;
+			case LINK_DESTINATION_ATTACHMENT:
+				href = media.link;
+				break;
+		}
+		mediaAttributes.href = href;
 
 		this.props.setAttributes( {
 			...mediaAttributes,
@@ -372,9 +382,17 @@ export class ImageEdit extends Component {
 
 	setMappedAttributes( { url: href, ...restAttributes } ) {
 		const { setAttributes } = this.props;
+
 		return href === undefined
-			? setAttributes( restAttributes )
-			: setAttributes( { ...restAttributes, href } );
+			? setAttributes( {
+					...restAttributes,
+					linkDestination: LINK_DESTINATION_CUSTOM,
+			  } )
+			: setAttributes( {
+					...restAttributes,
+					href,
+					linkDestination: LINK_DESTINATION_CUSTOM,
+			  } );
 	}
 
 	getLinkSettings() {
@@ -382,7 +400,6 @@ export class ImageEdit extends Component {
 		const {
 			attributes: { href: url, ...unMappedAttributes },
 		} = this.props;
-
 		const mappedAttributes = { ...unMappedAttributes, url };
 
 		return (
@@ -445,7 +462,7 @@ export class ImageEdit extends Component {
 		closeSettingsBottomSheet();
 	}
 
-	getSetFeaturedButton( isFeaturedImage ) {
+	getFeaturedButtonPanel( isFeaturedImage ) {
 		const { attributes, getStylesFromColorScheme } = this.props;
 
 		const setFeaturedButtonStyle = getStylesFromColorScheme(
@@ -460,6 +477,8 @@ export class ImageEdit extends Component {
 					setFeaturedButtonStyle,
 					styles.removeFeaturedButton,
 				] }
+				cellContainerStyle={ styles.setFeaturedButtonCellContainer }
+				separatorType={ 'none' }
 				onPress={ () =>
 					this.onSetFeatured( MEDIA_ID_NO_FEATURED_IMAGE_SET )
 				}
@@ -470,17 +489,13 @@ export class ImageEdit extends Component {
 			<BottomSheet.Cell
 				label={ __( 'Set as Featured Image ' ) }
 				labelStyle={ setFeaturedButtonStyle }
+				cellContainerStyle={ styles.setFeaturedButtonCellContainer }
+				separatorType={ 'none' }
 				onPress={ () => this.onSetFeatured( attributes.id ) }
 			/>
 		);
 
-		return (
-			<PanelBody>
-				{ isFeaturedImage
-					? removeFeaturedButton()
-					: setFeaturedButton() }
-			</PanelBody>
-		);
+		return isFeaturedImage ? removeFeaturedButton() : setFeaturedButton();
 	}
 
 	render() {
@@ -491,6 +506,7 @@ export class ImageEdit extends Component {
 			image,
 			clientId,
 			imageDefaultSize,
+			context: { imageCrop = false } = {},
 			featuredImageId,
 			wasBlockJustInserted,
 		} = this.props;
@@ -518,14 +534,14 @@ export class ImageEdit extends Component {
 		}
 
 		// By default, it's only possible to set images that have been uploaded to a site's library as featured.
-		// Images that haven't been uploaded to a site's library have an id of 'undefined', which the 'canImageBeFeatured' check filters out.
-		const canImageBeFeatured = typeof attributes.id !== 'undefined';
+		// The 'canImageBeFeatured' check filters out images that haven't been uploaded based on the following:
+		// - Images that are embedded in a post but are uploaded elsewhere have an id of 'undefined'.
+		// - Image that are uploading or have failed to upload are given a temporary negative ID.
+		const canImageBeFeatured =
+			typeof attributes.id !== 'undefined' && attributes.id > 0;
 
 		const isFeaturedImage =
 			canImageBeFeatured && featuredImageId === attributes.id;
-
-		// eslint-disable-next-line no-unused-vars
-		const androidOnly = Platform.OS === 'android';
 
 		const getToolbarEditButton = ( open ) => (
 			<BlockControls>
@@ -564,9 +580,21 @@ export class ImageEdit extends Component {
 				<PanelBody title={ __( 'Link Settings' ) }>
 					{ this.getLinkSettings( true ) }
 				</PanelBody>
-				{ androidOnly &&
-					canImageBeFeatured &&
-					this.getSetFeaturedButton( isFeaturedImage ) }
+				<PanelBody
+					title={ __( 'Featured Image' ) }
+					titleStyle={ styles.featuredImagePanelTitle }
+				>
+					{ canImageBeFeatured &&
+						this.getFeaturedButtonPanel( isFeaturedImage ) }
+					<FooterMessageControl
+						label={ __(
+							'Changes to featured image will not be affected by the undo/redo buttons.'
+						) }
+						cellContainerStyle={
+							styles.setFeaturedButtonCellContainer
+						}
+					/>
+				</PanelBody>
 			</InspectorControls>
 		);
 
@@ -592,6 +620,11 @@ export class ImageEdit extends Component {
 			right: 'flex-end',
 			full: 'center',
 			wide: 'center',
+		};
+
+		const additionalImageProps = {
+			height: '100%',
+			resizeMode: imageCrop ? 'cover' : 'contain',
 		};
 
 		const getImageComponent = ( openMediaOptions, getMediaOptions ) => (
@@ -626,25 +659,33 @@ export class ImageEdit extends Component {
 								retryMessage,
 							} ) => {
 								return (
-									<Image
-										align={ align && alignToFlex[ align ] }
-										alt={ alt }
-										isSelected={
-											isSelected && ! isCaptionSelected
-										}
-										isUploadFailed={ isUploadFailed }
-										isUploadInProgress={
-											isUploadInProgress
-										}
-										onSelectMediaUploadOption={
-											this.onSelectMediaUploadOption
-										}
-										openMediaOptions={ openMediaOptions }
-										retryMessage={ retryMessage }
-										url={ url }
-										shapeStyle={ styles[ className ] }
-										width={ this.getWidth() }
-									/>
+									<View style={ styles.isGallery }>
+										<Image
+											align={
+												align && alignToFlex[ align ]
+											}
+											alt={ alt }
+											isSelected={
+												isSelected &&
+												! isCaptionSelected
+											}
+											isUploadFailed={ isUploadFailed }
+											isUploadInProgress={
+												isUploadInProgress
+											}
+											onSelectMediaUploadOption={
+												this.onSelectMediaUploadOption
+											}
+											openMediaOptions={
+												openMediaOptions
+											}
+											retryMessage={ retryMessage }
+											url={ url }
+											shapeStyle={ styles[ className ] }
+											width={ this.getWidth() }
+											{ ...additionalImageProps }
+										/>
+									</View>
 								);
 							} }
 						/>

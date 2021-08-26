@@ -20,11 +20,11 @@ import {
 import {
 	BlockControls,
 	InspectorControls,
-	InspectorAdvancedControls,
 	RichText,
 	useBlockProps,
 	__experimentalUseBorderProps as useBorderProps,
 	__experimentalUseColorProps as useColorProps,
+	__experimentalGetSpacingClassesAndStyles as useSpacingProps,
 	__experimentalLinkControl as LinkControl,
 } from '@wordpress/block-editor';
 import { rawShortcut, displayShortcut } from '@wordpress/keycodes';
@@ -199,6 +199,7 @@ function ButtonEdit( props ) {
 
 	const borderProps = useBorderProps( attributes );
 	const colorProps = useColorProps( attributes );
+	const spacingProps = useSpacingProps( attributes );
 	const ref = useRef();
 	const blockProps = useBlockProps( { ref } );
 
@@ -231,6 +232,7 @@ function ButtonEdit( props ) {
 					style={ {
 						...borderProps.style,
 						...colorProps.style,
+						...spacingProps.style,
 					} }
 					onSplit={ ( value ) =>
 						createBlock( 'core/button', {
@@ -257,13 +259,13 @@ function ButtonEdit( props ) {
 					setAttributes={ setAttributes }
 				/>
 			</InspectorControls>
-			<InspectorAdvancedControls>
+			<InspectorControls __experimentalGroup="advanced">
 				<TextControl
 					label={ __( 'Link rel' ) }
 					value={ rel || '' }
 					onChange={ onSetLinkRel }
 				/>
-			</InspectorAdvancedControls>
+			</InspectorControls>
 		</>
 	);
 }

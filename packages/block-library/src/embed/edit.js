@@ -29,16 +29,6 @@ import { useBlockProps } from '@wordpress/block-editor';
 import { store as coreStore } from '@wordpress/core-data';
 import { View } from '@wordpress/primitives';
 
-function getResponsiveHelp( checked ) {
-	return checked
-		? __(
-				'This embed will preserve its aspect ratio when the browser is resized.'
-		  )
-		: __(
-				'This embed may not preserve its aspect ratio when the browser is resized.'
-		  );
-}
-
 const EmbedEdit = ( props ) => {
 	const {
 		attributes: {
@@ -242,7 +232,6 @@ const EmbedEdit = ( props ) => {
 				themeSupportsResponsive={ themeSupportsResponsive }
 				blockSupportsResponsive={ responsive }
 				allowResponsive={ allowResponsive }
-				getResponsiveHelp={ getResponsiveHelp }
 				toggleResponsive={ toggleResponsive }
 				switchBackToURLInput={ () => setIsEditingURL( true ) }
 			/>

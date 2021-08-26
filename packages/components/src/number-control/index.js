@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * External dependencies
  */
@@ -13,10 +14,8 @@ import { isRTL } from '@wordpress/i18n';
  * Internal dependencies
  */
 import { Input } from './styles/number-control-styles';
-import {
-	inputControlActionTypes,
-	composeStateReducers,
-} from '../input-control/state';
+import * as inputControlActionTypes from '../input-control/reducer/actions';
+import { composeStateReducers } from '../input-control/reducer/reducer';
 import { add, subtract, roundClamp } from '../utils/math';
 import { useJumpStep } from '../utils/hooks';
 import { isValueEmpty } from '../utils/values';

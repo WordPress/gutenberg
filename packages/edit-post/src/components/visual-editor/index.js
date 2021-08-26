@@ -2,7 +2,6 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import { motion } from 'framer-motion';
 
 /**
  * WordPress dependencies
@@ -32,7 +31,7 @@ import {
 	__experimentalUseNoRecursiveRenders as useNoRecursiveRenders,
 } from '@wordpress/block-editor';
 import { useRef, useMemo } from '@wordpress/element';
-import { Button } from '@wordpress/components';
+import { Button, __unstableMotion as motion } from '@wordpress/components';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { useMergeRefs } from '@wordpress/compose';
 import { arrowLeft } from '@wordpress/icons';
@@ -44,16 +43,10 @@ import { __ } from '@wordpress/i18n';
 import BlockInspectorButton from './block-inspector-button';
 import { store as editPostStore } from '../../store';
 
-function MaybeIframe( {
-	children,
-	contentRef,
-	isTemplateMode,
-	styles,
-	style,
-} ) {
+function MaybeIframe( { children, contentRef, shouldIframe, styles, style } ) {
 	const ref = useMouseMoveTypingReset();
 
-	if ( ! isTemplateMode ) {
+	if ( ! shouldIframe ) {
 		return (
 			<>
 				<EditorStyles styles={ styles } />
@@ -75,6 +68,7 @@ function MaybeIframe( {
 			ref={ ref }
 			contentRef={ contentRef }
 			style={ { width: '100%', height: '100%', display: 'block' } }
+			name="editor-canvas"
 		>
 			{ children }
 		</Iframe>
@@ -120,7 +114,8 @@ export default function VisualEditor( { styles } ) {
 	const { clearSelectedBlock } = useDispatch( blockEditorStore );
 	const { setIsEditingTemplate } = useDispatch( editPostStore );
 	const desktopCanvasStyles = {
-		height: '100%',
+		// We intentionally omit a 100% height here. The container is a flex item, so the 100% height is granted by default.
+		// If a percentage height is present, older browsers such as Safari 13 apply that, but do so incorrectly as the inheritance is buggy.
 		width: '100%',
 		margin: 0,
 		display: 'flex',
@@ -181,7 +176,7 @@ export default function VisualEditor( { styles } ) {
 		}
 
 		return undefined;
-	}, [ isTemplateMode, themeSupportsLayout ] );
+	}, [ isTemplateMode, themeSupportsLayout, defaultLayout ] );
 
 	return (
 		<BlockTools
@@ -216,7 +211,11 @@ export default function VisualEditor( { styles } ) {
 					className={ previewMode }
 				>
 					<MaybeIframe
-						isTemplateMode={ isTemplateMode }
+						shouldIframe={
+							isTemplateMode ||
+							deviceType === 'Tablet' ||
+							deviceType === 'Mobile'
+						}
 						contentRef={ contentRef }
 						styles={ styles }
 						style={ { paddingBottom } }
@@ -233,7 +232,14 @@ export default function VisualEditor( { styles } ) {
 							</div>
 						) }
 						<RecursionProvider>
-							<BlockList __experimentalLayout={ layout } />
+							<BlockList
+								className={
+									isTemplateMode
+										? 'wp-site-blocks'
+										: undefined
+								}
+								__experimentalLayout={ layout }
+							/>
 						</RecursionProvider>
 					</MaybeIframe>
 				</motion.div>
