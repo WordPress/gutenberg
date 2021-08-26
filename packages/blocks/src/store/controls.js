@@ -134,9 +134,18 @@ const controls = {
 				STORE_NAME
 			).__experimentalGetUnprocessedBlockTypes();
 
-			const processedBlockTypes = unprocessedBlockTypes
-				.map( ( blockType ) => processBlockType( blockType, select ) )
-				.filter( Boolean );
+			const processedBlockTypes = Object.keys(
+				unprocessedBlockTypes
+			).reduce( ( accumulator, blockName ) => {
+				const result = processBlockType(
+					unprocessedBlockTypes[ blockName ],
+					select
+				);
+				if ( result ) {
+					accumulator.push( result );
+				}
+				return accumulator;
+			}, [] );
 
 			if ( ! processedBlockTypes.length ) {
 				return;

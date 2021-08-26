@@ -1,13 +1,14 @@
 /**
  * WordPress dependencies
  */
-import { store as blocksStore } from '@wordpress/blocks';
+import { store as blocksStore, registerBlockType } from '@wordpress/blocks';
 import {
 	registerCoreBlocks,
 	__experimentalRegisterExperimentalCoreBlocks,
 } from '@wordpress/block-library';
 import { render, unmountComponentAtNode } from '@wordpress/element';
 import { dispatch } from '@wordpress/data';
+import { addFilter } from '@wordpress/hooks';
 import { store as interfaceStore } from '@wordpress/interface';
 
 /**
@@ -97,6 +98,36 @@ export function initializeEditor(
 		showBlockBreadcrumbs: true,
 		welcomeGuideTemplate: true,
 	} );
+
+	// Temporary test block.
+	registerBlockType( 'wp-js-plugin-starter/hello-world', {
+		title: 'Hello World',
+		description: 'Hello World block',
+		icon: 'admin-site',
+		category: 'widgets',
+		edit() {
+			return 'Hello Editor';
+		},
+		save() {
+			return 'Hello Frontend';
+		},
+	} );
+
+	// Temporary test filter registered after the test block.
+	addFilter(
+		'blocks.registerBlockType',
+		'wp-js-plugin-starter/hello-world/filter-name',
+		( blockType, name ) => {
+			if ( name === 'wp-js-plugin-starter/hello-world' ) {
+				return {
+					...blockType,
+					category: 'common',
+				};
+			}
+
+			return blockType;
+		}
+	);
 
 	dispatch( blocksStore ).__experimentalReapplyBlockTypeFilters();
 
