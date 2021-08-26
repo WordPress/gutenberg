@@ -99,35 +99,37 @@ export function initializeEditor(
 		welcomeGuideTemplate: true,
 	} );
 
-	// Temporary test block.
-	registerBlockType( 'wp-js-plugin-starter/hello-world', {
-		title: 'Hello World',
-		description: 'Hello World block',
-		icon: 'admin-site',
-		category: 'widgets',
-		edit() {
-			return 'Hello Editor';
-		},
-		save() {
-			return 'Hello Frontend';
-		},
-	} );
+	for ( let i = 1; i <= 100; i++ ) {
+		// Temporary test block.
+		registerBlockType( `wp-js-plugin-starter/hello-world-${ i }`, {
+			title: `Hello World ${ i }`,
+			description: `Hello World block ${ i }`,
+			icon: 'admin-site',
+			category: 'widgets',
+			edit() {
+				return `Hello Editor ${ i }`;
+			},
+			save() {
+				return `Hello Frontend ${ i }`;
+			},
+		} );
 
-	// Temporary test filter registered after the test block.
-	addFilter(
-		'blocks.registerBlockType',
-		'wp-js-plugin-starter/hello-world/filter-name',
-		( blockType, name ) => {
-			if ( name === 'wp-js-plugin-starter/hello-world' ) {
-				return {
-					...blockType,
-					category: 'common',
-				};
+		// Temporary test filter registered after the test block.
+		addFilter(
+			'blocks.registerBlockType',
+			`wp-js-plugin-starter/hello-world/filter-name-${ i }`,
+			( blockType, name ) => {
+				if ( name.startsWith( 'wp-js-plugin-starter/hello-world' ) ) {
+					return {
+						...blockType,
+						category: 'common',
+					};
+				}
+
+				return blockType;
 			}
-
-			return blockType;
-		}
-	);
+		);
+	}
 
 	dispatch( blocksStore ).__experimentalReapplyBlockTypeFilters();
 
