@@ -7,7 +7,7 @@ import classnames from 'classnames';
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { useCallback, useState, useRef } from '@wordpress/element';
+import { useCallback, useEffect, useState, useRef } from '@wordpress/element';
 import {
 	Button,
 	ButtonGroup,
@@ -74,26 +74,53 @@ function URLPicker( {
 	onToggleOpenInNewTab,
 	anchorRef,
 } ) {
-	const [ isURLPickerOpen, setIsURLPickerOpen ] = useState( false );
-	const urlIsSet = !! url;
-	const urlIsSetandSelected = urlIsSet && isSelected;
-	const openLinkControl = () => {
-		setIsURLPickerOpen( true );
-		return false; // prevents default behaviour for event
+	const [ isLinkControlVisible, setIsLinkControlVisible ] = useState( false );
+	const [ isEditingURL, setIsEditingURL ] = useState( false );
+	const isURLSet = !! url;
+
+	const startEditingURL = ( event ) => {
+		event.preventDefault();
+		setIsEditingURL( true );
+		setIsLinkControlVisible( true );
 	};
-	const unlinkButton = () => {
+
+	const stopEditingURL = () => {
+		setIsEditingURL( false );
+		setIsLinkControlVisible( false );
+	};
+
+	const unlink = () => {
 		setAttributes( {
 			url: undefined,
 			linkTarget: undefined,
 			rel: undefined,
 		} );
-		setIsURLPickerOpen( false );
+		stopEditingURL();
 	};
-	const linkControl = ( isURLPickerOpen || urlIsSetandSelected ) && (
+
+	useEffect( () => {
+		// When a button block with a set URL becomes selected, show the
+		// link control without commencing editing. Focus should remain in
+		// the button's RichText.
+		if ( isURLSet && isSelected ) {
+			setIsLinkControlVisible( true );
+		}
+
+		// Whenever the block is deselected, stop any editing of the link
+		// that might be in progress.
+		if ( ! isSelected ) {
+			stopEditingURL();
+		}
+	}, [ isSelected, isURLSet ] );
+
+	const linkControl = ( isLinkControlVisible || isEditingURL ) && isSelected && (
 		<Popover
 			position="bottom center"
-			onClose={ () => setIsURLPickerOpen( false ) }
+			onClose={ () => {
+				setIsEditingURL( false );
+			} }
 			anchorRef={ anchorRef?.current }
+			focusOnMount={ isEditingURL ? 'firstElement' : false }
 		>
 			<LinkControl
 				className="wp-block-navigation-link__inline-link-input"
@@ -108,28 +135,31 @@ function URLPicker( {
 						onToggleOpenInNewTab( newOpensInNewTab );
 					}
 				} }
+				onRemove={ unlink }
+				forceIsEditingLink={ isEditingURL }
 			/>
 		</Popover>
 	);
+
 	return (
 		<>
 			<BlockControls group="block">
-				{ ! urlIsSet && (
+				{ ! isURLSet && (
 					<ToolbarButton
 						name="link"
 						icon={ link }
 						title={ __( 'Link' ) }
 						shortcut={ displayShortcut.primary( 'k' ) }
-						onClick={ openLinkControl }
+						onClick={ startEditingURL }
 					/>
 				) }
-				{ urlIsSetandSelected && (
+				{ isURLSet && (
 					<ToolbarButton
 						name="link"
 						icon={ linkOff }
 						title={ __( 'Unlink' ) }
 						shortcut={ displayShortcut.primaryShift( 'k' ) }
-						onClick={ unlinkButton }
+						onClick={ unlink }
 						isActive={ true }
 					/>
 				) }
@@ -138,8 +168,8 @@ function URLPicker( {
 				<KeyboardShortcuts
 					bindGlobal
 					shortcuts={ {
-						[ rawShortcut.primary( 'k' ) ]: openLinkControl,
-						[ rawShortcut.primaryShift( 'k' ) ]: unlinkButton,
+						[ rawShortcut.primary( 'k' ) ]: startEditingURL,
+						[ rawShortcut.primaryShift( 'k' ) ]: unlink,
 					} }
 				/>
 			) }
