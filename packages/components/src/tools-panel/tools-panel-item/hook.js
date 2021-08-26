@@ -28,7 +28,11 @@ export function useToolsPanelItem( props ) {
 		return cx( styles.ToolsPanelItem, className );
 	} );
 
-	const { menuItems, registerPanelItem } = useToolsPanelContext();
+	const {
+		menuItems,
+		registerPanelItem,
+		deregisterPanelItem,
+	} = useToolsPanelContext();
 
 	// Registering the panel item allows the panel to include it in its
 	// automatically generated menu and determine its initial checked status.
@@ -38,6 +42,8 @@ export function useToolsPanelItem( props ) {
 			isShownByDefault,
 			label,
 		} );
+
+		return () => deregisterPanelItem( label );
 	}, [] );
 
 	const isValueSet = hasValue();

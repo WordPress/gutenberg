@@ -23,7 +23,7 @@ function filter_metadata_registration( $metadata ) {
 	$metadata['apiVersion'] = 1;
 	return $metadata;
 };
-add_filter( 'block_type_metadata', 'filter_metadata_registration', 10, 2 );
+add_filter( 'block_type_metadata', 'filter_metadata_registration' );
 
 register_block_type( __DIR__ );
 ```

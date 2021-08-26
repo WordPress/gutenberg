@@ -28,6 +28,7 @@ export const PREFERENCES_DEFAULTS = {
  * @property {boolean}       __experimentalBlockDirectory           Whether the user has enabled the Block Directory
  * @property {Array}         __experimentalBlockPatterns            Array of objects representing the block patterns
  * @property {Array}         __experimentalBlockPatternCategories   Array of objects representing the block pattern categories
+ * @property {boolean}       __unstableGalleryWithImageBlocks       Whether the user has enabled the refactored gallery block which uses InnerBlocks
  */
 export const SETTINGS_DEFAULTS = {
 	alignWide: false,
@@ -155,6 +156,7 @@ export const SETTINGS_DEFAULTS = {
 	__experimentalBlockPatterns: [],
 	__experimentalBlockPatternCategories: [],
 	__experimentalSpotlightEntityBlocks: [],
+	__unstableGalleryWithImageBlocks: false,
 
 	// gradients setting is not used anymore now defaults are passed from theme.json on the server and core has its own defaults.
 	// The setting is only kept for backward compatibility purposes.

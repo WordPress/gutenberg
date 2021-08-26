@@ -331,7 +331,8 @@ describe( 'Change detection', () => {
 		// Verify that the title is empty.
 		const title = await page.$eval(
 			'.editor-post-title__input',
-			( element ) => element.innerHTML
+			// Trim padding non-breaking space
+			( element ) => element.textContent.trim()
 		);
 		expect( title ).toBe( '' );
 

@@ -26,7 +26,8 @@
 		},
 		"typography": {
 			"lineHeight": true,
-			"fontSize": true
+			"fontSize": true,
+			"__experimentalFontWeight": true
 		}
 	},
 	"style": "wp-block-post-terms"

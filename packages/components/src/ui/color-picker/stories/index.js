@@ -57,3 +57,23 @@ const Example = () => {
 export const _default = () => {
 	return <Example />;
 };
+
+const LegacyExample = () => {
+	const [ legacyColor, setLegacyColor ] = useState( '#fff' );
+	const legacyProps = {
+		color: legacyColor,
+		onChangeComplete: setLegacyColor,
+		disableAlpha: boolean( 'disableAlpha', true ),
+	};
+
+	return (
+		<Flex align="flex-start" justify="flex-start">
+			<ColorPicker { ...legacyProps } />
+			<pre style={ { width: '20em' } }>
+				{ JSON.stringify( legacyColor, undefined, 4 ) }
+			</pre>
+		</Flex>
+	);
+};
+
+export const legacy = () => <LegacyExample />;

@@ -292,6 +292,9 @@ describe( 'Template Part', () => {
 			const confirmTitleButton = await page.waitForSelector(
 				confirmTitleButtonSelector
 			);
+			await page.keyboard.press( 'Tab' );
+			await page.keyboard.press( 'Tab' );
+			await page.keyboard.type( 'Create New' );
 			await confirmTitleButton.click();
 
 			const newTemplatePart = await page.waitForSelector(
@@ -313,9 +316,9 @@ describe( 'Template Part', () => {
 				chooseExistingButtonSelector
 			);
 			await chooseExistingButton.click();
-			const preview = await page.waitForXPath( testContentSelector );
-			expect( preview ).toBeTruthy();
-
+			const preview = await page.waitForSelector(
+				'[aria-label="Create New"]'
+			);
 			await preview.click();
 			await page.waitForSelector( activatedTemplatePartSelector );
 			const templatePartContent = await page.waitForXPath(

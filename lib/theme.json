@@ -236,5 +236,8 @@
 				}
 			}
 		}
+	},
+	"styles": {
+		"spacing": { "blockGap": "24px" }
 	}
 }

@@ -37,7 +37,7 @@
 
 // Only show the flyout on hover if the parent menu item is selected.
 .wp-block-navigation:not(.is-selected):not(.has-child-selected) .has-child:hover {
-	> .wp-block-navigation-link__container {
+	> .wp-block-navigation__submenu-container {
 		opacity: 0;
 		visibility: hidden;
 	}
@@ -47,7 +47,7 @@
 .has-child {
 	&.is-selected,
 	&.has-child-selected {
-		> .wp-block-navigation-link__container {
+		> .wp-block-navigation__submenu-container {
 			display: flex;
 			opacity: 1;
 			visibility: visible;
@@ -58,7 +58,7 @@
 // Show a submenu when generally dragging (is-dragging-components-draggable) if that
 // submenu has children (has-child) and is being dragged within (is-dragging-within).
 .is-dragging-components-draggable .has-child.is-dragging-within {
-	> .wp-block-navigation-link__container {
+	> .wp-block-navigation__submenu-container {
 		opacity: 1;
 		visibility: visible;
 	}

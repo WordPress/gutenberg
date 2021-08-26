@@ -8,7 +8,7 @@ import classnames from 'classnames';
  */
 import {
 	AlignmentToolbar,
-	InspectorAdvancedControls,
+	InspectorControls,
 	BlockControls,
 	Warning,
 	useBlockProps,
@@ -79,7 +79,7 @@ export default function PostTermsEdit( {
 					} }
 				/>
 			</BlockControls>
-			<InspectorAdvancedControls>
+			<InspectorControls __experimentalGroup="advanced">
 				<TextControl
 					autoComplete="off"
 					label={ __( 'Separator' ) }
@@ -89,7 +89,7 @@ export default function PostTermsEdit( {
 					} }
 					help={ __( 'Enter character(s) used to separate terms.' ) }
 				/>
-			</InspectorAdvancedControls>
+			</InspectorControls>
 			<div { ...blockProps }>
 				{ isLoading && <Spinner /> }
 				{ ! isLoading &&
