@@ -18,6 +18,15 @@ import { create } from './create';
  */
 export function mergePair( a, b ) {
 	a.formats = a.formats.concat( b.formats );
+	for ( const [ format, selection ] of b._formats ) {
+		const existingSelection = a._formats.get( format );
+		a._formats.set( format, [
+			existingSelection
+				? existingSelection[ 0 ]
+				: selection[ 0 ] + a.text.length,
+			selection[ 1 ] + a.text.length,
+		] );
+	}
 	a.replacements = a.replacements.concat( b.replacements );
 	a.text += b.text;
 

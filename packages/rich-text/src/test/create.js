@@ -89,6 +89,7 @@ describe( 'create', () => {
 
 		expect( value ).toEqual( {
 			formats: [ [ em ], [ em ], [ em, strong ], [ em, strong ] ],
+			_formats: new Map().set( em, [ 0, 4 ] ).set( strong, [ 2, 4 ] ),
 			replacements: [ , , , , ],
 			text: 'test',
 		} );

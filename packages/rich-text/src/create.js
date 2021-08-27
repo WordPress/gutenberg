@@ -38,7 +38,9 @@ import {
 
 function createEmptyValue() {
 	return {
+		// Change with getter and setter.
 		formats: [],
+		_formats: new Map(),
 		replacements: [],
 		text: '',
 	};
@@ -169,6 +171,7 @@ export function create( {
 	if ( typeof text === 'string' && text.length > 0 ) {
 		return {
 			formats: Array( text.length ),
+			_formats: new Map(),
 			replacements: Array( text.length ),
 			text,
 		};
@@ -185,12 +188,13 @@ export function create( {
 	}
 
 	if ( ! multilineTag ) {
-		return createFromElement( {
+		const v = createFromElement( {
 			element,
 			range,
 			isEditableTree,
 			preserveWhiteSpace,
 		} );
+		return v;
 	}
 
 	return createFromMultilineElement( {
@@ -399,6 +403,7 @@ function createFromElement( {
 		if ( type === 'script' ) {
 			const value = {
 				formats: [ , ],
+				_formats: new Map(),
 				replacements: [
 					{
 						type,
@@ -469,11 +474,20 @@ function createFromElement( {
 			if ( format.attributes ) {
 				mergePair( accumulator, {
 					formats: [ , ],
+					_formats: new Map(),
 					replacements: [ format ],
 					text: OBJECT_REPLACEMENT_CHARACTER,
 				} );
 			}
 		} else {
+			const existingSelection = accumulator._formats.get( format );
+			accumulator._formats.set( format, [
+				existingSelection
+					? existingSelection[ 0 ]
+					: accumulator.text.length,
+				accumulator.text.length + value.text.length,
+			] );
+
 			// Indices should share a reference to the same formats array.
 			// Only create a new reference if `formats` changes.
 			function mergeFormats( formats ) {
@@ -563,6 +577,7 @@ function createFromMultilineElement( {
 		if ( index !== 0 || currentWrapperTags.length > 0 ) {
 			mergePair( accumulator, {
 				formats: [ , ],
+				_formats: new Map(),
 				replacements:
 					currentWrapperTags.length > 0
 						? [ currentWrapperTags ]

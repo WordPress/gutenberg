@@ -106,214 +106,58 @@ function fromFormat( {
 	};
 }
 
-/**
- * Checks if both arrays of formats up until a certain index are equal.
- *
- * @param {Array}  a     Array of formats to compare.
- * @param {Array}  b     Array of formats to compare.
- * @param {number} index Index to check until.
- */
-function isEqualUntil( a, b, index ) {
-	do {
-		if ( a[ index ] !== b[ index ] ) {
-			return false;
-		}
-	} while ( index-- );
-
-	return true;
-}
-
 export function toTree( {
 	value,
 	multilineTag,
 	preserveWhiteSpace,
 	createEmpty,
 	append,
-	getLastChild,
 	getParent,
-	isText,
-	getText,
-	remove,
-	appendText,
+	createNewLine,
 	onStartIndex,
 	onEndIndex,
 	isEditableTree,
 	placeholder,
 } ) {
-	const { formats, replacements, text, start, end } = value;
-	const formatsLength = formats.length + 1;
-	const tree = createEmpty();
-	const multilineFormat = { type: multilineTag };
+	const { replacements, text, start, end, _formats } = value;
 	const activeFormats = getActiveFormats( value );
 	const deepestActiveFormat = activeFormats[ activeFormats.length - 1 ];
 
-	let lastSeparatorFormats;
-	let lastCharacterFormats;
-	let lastCharacter;
+	const _tree = createEmpty();
+	let _index = 0;
+	let _pointer = _tree;
+	const _maxLength = [];
+	let lastMultilineFormats;
 
-	// If we're building a multiline tree, start off with a multiline element.
-	if ( multilineTag ) {
-		append( append( tree, { type: multilineTag } ), '' );
-		lastCharacterFormats = lastSeparatorFormats = [ multilineFormat ];
-	} else {
-		append( tree, '' );
-	}
+	if ( multilineTag ) _pointer = append( _tree, { type: multilineTag } );
 
-	for ( let i = 0; i < formatsLength; i++ ) {
-		const character = text.charAt( i );
-		const shouldInsertPadding =
-			isEditableTree &&
-			// Pad the line if the line is empty.
-			( ! lastCharacter ||
-				lastCharacter === LINE_SEPARATOR ||
-				// Pad the line if the previous character is a line break, otherwise
-				// the line break won't be visible.
-				lastCharacter === '\n' );
-
-		let characterFormats = formats[ i ];
-
-		// Set multiline tags in queue for building the tree.
-		if ( multilineTag ) {
-			if ( character === LINE_SEPARATOR ) {
-				characterFormats = lastSeparatorFormats = (
-					replacements[ i ] || []
-				).reduce(
-					( accumulator, format ) => {
-						accumulator.push( format, multilineFormat );
-						return accumulator;
-					},
-					[ multilineFormat ]
-				);
+	function _appendSplitText( _text, _start, _end ) {
+		if ( _text === OBJECT_REPLACEMENT_CHARACTER ) {
+			if (
+				! isEditableTree &&
+				replacements[ _start ]?.type === 'script'
+			) {
+				// pointer = append(
+				// 	getParent( pointer ),
+				// 	fromFormat( {
+				// 		type: 'script',
+				// 		isEditableTree,
+				// 	} )
+				// );
+				// append( pointer, {
+				// 	html: decodeURIComponent(
+				// 		replacements[ i ].attributes[ 'data-rich-text-script' ]
+				// 	),
+				// } );
 			} else {
-				characterFormats = [
-					...lastSeparatorFormats,
-					...( characterFormats || [] ),
-				];
-			}
-		}
-
-		let pointer = getLastChild( tree );
-
-		if ( shouldInsertPadding && character === LINE_SEPARATOR ) {
-			let node = pointer;
-
-			while ( ! isText( node ) ) {
-				node = getLastChild( node );
-			}
-
-			append( getParent( node ), ZWNBSP );
-		}
-
-		// Set selection for the start of line.
-		if ( lastCharacter === LINE_SEPARATOR ) {
-			let node = pointer;
-
-			while ( ! isText( node ) ) {
-				node = getLastChild( node );
-			}
-
-			if ( onStartIndex && start === i ) {
-				onStartIndex( tree, node );
-			}
-
-			if ( onEndIndex && end === i ) {
-				onEndIndex( tree, node );
-			}
-		}
-
-		if ( characterFormats ) {
-			characterFormats.forEach( ( format, formatIndex ) => {
-				if (
-					pointer &&
-					lastCharacterFormats &&
-					// Reuse the last element if all formats remain the same.
-					isEqualUntil(
-						characterFormats,
-						lastCharacterFormats,
-						formatIndex
-					) &&
-					// Do not reuse the last element if the character is a
-					// line separator.
-					( character !== LINE_SEPARATOR ||
-						characterFormats.length - 1 !== formatIndex )
-				) {
-					pointer = getLastChild( pointer );
-					return;
-				}
-
-				const { type, attributes, unregisteredAttributes } = format;
-
-				const boundaryClass =
-					isEditableTree &&
-					character !== LINE_SEPARATOR &&
-					format === deepestActiveFormat;
-
-				const parent = getParent( pointer );
-				const newNode = append(
-					parent,
-					fromFormat( {
-						type,
-						attributes,
-						unregisteredAttributes,
-						boundaryClass,
-						isEditableTree,
-					} )
-				);
-
-				if ( isText( pointer ) && getText( pointer ).length === 0 ) {
-					remove( pointer );
-				}
-
-				pointer = append( newNode, '' );
-			} );
-		}
-
-		// No need for further processing if the character is a line separator.
-		if ( character === LINE_SEPARATOR ) {
-			lastCharacterFormats = characterFormats;
-			lastCharacter = character;
-			continue;
-		}
-
-		// If there is selection at 0, handle it before characters are inserted.
-		if ( i === 0 ) {
-			if ( onStartIndex && start === 0 ) {
-				onStartIndex( tree, pointer );
-			}
-
-			if ( onEndIndex && end === 0 ) {
-				onEndIndex( tree, pointer );
-			}
-		}
-
-		if ( character === OBJECT_REPLACEMENT_CHARACTER ) {
-			if ( ! isEditableTree && replacements[ i ]?.type === 'script' ) {
-				pointer = append(
-					getParent( pointer ),
-					fromFormat( {
-						type: 'script',
-						isEditableTree,
-					} )
-				);
-				append( pointer, {
-					html: decodeURIComponent(
-						replacements[ i ].attributes[ 'data-rich-text-script' ]
-					),
+				_text = fromFormat( {
+					...replacements[ _start ],
+					object: true,
+					isEditableTree,
 				} );
-			} else {
-				pointer = append(
-					getParent( pointer ),
-					fromFormat( {
-						...replacements[ i ],
-						object: true,
-						isEditableTree,
-					} )
-				);
 			}
-			// Ensure pointer is text node.
-			pointer = append( getParent( pointer ), '' );
-		} else if ( ! preserveWhiteSpace && character === '\n' ) {
-			pointer = append( getParent( pointer ), {
+		} else if ( _text === '\n' && ! preserveWhiteSpace ) {
+			_text = {
 				type: 'br',
 				attributes: isEditableTree
 					? {
@@ -321,45 +165,173 @@ export function toTree( {
 					  }
 					: undefined,
 				object: true,
-			} );
-			// Ensure pointer is text node.
-			pointer = append( getParent( pointer ), '' );
-		} else if ( ! isText( pointer ) ) {
-			pointer = append( getParent( pointer ), character );
-		} else {
-			appendText( pointer, character );
+			};
+		} else if ( _text === LINE_SEPARATOR ) {
+			if ( isEditableTree ) {
+				const padding = append( _pointer, ZWNBSP );
+
+				if ( start === _start ) {
+					onStartIndex( _tree, padding, [ 0 ] );
+				}
+
+				if ( end === _start ) {
+					onEndIndex( _tree, padding, [ 0 ] );
+				}
+			}
+
+			let diff =
+				( replacements[ _start ] || [] ).length -
+				( lastMultilineFormats || [] ).length;
+
+			if ( diff === 0 ) {
+				_pointer = createNewLine( _pointer, multilineTag );
+			} else if ( diff > 0 ) {
+				_pointer = append(
+					_pointer,
+					replacements[ _start ][ replacements[ _start ].length - 1 ]
+				);
+				_pointer = append( _pointer, { type: multilineTag } );
+			} else if ( diff < 0 ) {
+				// Point to the list container.
+				_pointer = getParent( _pointer );
+
+				while ( diff++ ) {
+					// Point to the list item.
+					_pointer = getParent( _pointer );
+					// Point to the list container.
+					_pointer = getParent( _pointer );
+				}
+
+				_pointer = append( _pointer, { type: multilineTag } );
+			}
+
+			lastMultilineFormats = replacements[ _start ];
+			return;
 		}
 
-		if ( onStartIndex && start === i + 1 ) {
-			onStartIndex( tree, pointer );
+		const node = append( _pointer, _text );
+
+		if ( isEditableTree ) {
+			if ( onStartIndex && start >= _start && start <= _end ) {
+				onStartIndex(
+					_tree,
+					node,
+					typeof _text === 'string' ? [ start - _start ] : []
+				);
+			}
+
+			if ( onEndIndex && end >= _start && end <= _end ) {
+				onEndIndex(
+					_tree,
+					node,
+					typeof _text === 'string' ? [ end - _start ] : []
+				);
+			}
+		}
+	}
+
+	function _appendText( _start, _end ) {
+		const _text = text.slice( _start, _end );
+
+		if ( ! _text ) {
+			return;
 		}
 
-		if ( onEndIndex && end === i + 1 ) {
-			onEndIndex( tree, pointer );
-		}
+		let remainingText = '';
+		let i;
 
-		if ( shouldInsertPadding && i === text.length ) {
-			append( getParent( pointer ), ZWNBSP );
-
-			if ( placeholder && text.length === 0 ) {
-				append( getParent( pointer ), {
-					type: 'span',
-					attributes: {
-						'data-rich-text-placeholder': placeholder,
-						// Necessary to prevent the placeholder from catching
-						// selection. The placeholder is also not editable after
-						// all.
-						contenteditable: 'false',
-						style:
-							'pointer-events:none;user-select:none;-webkit-user-select:none;-moz-user-select:none;-ms-user-select:none;',
-					},
-				} );
+		for ( i = 0; i < _text.length; i++ ) {
+			const letter = _text[ i ];
+			if (
+				letter === '\n' ||
+				letter === OBJECT_REPLACEMENT_CHARACTER ||
+				letter === LINE_SEPARATOR
+			) {
+				if ( remainingText ) {
+					_appendSplitText(
+						remainingText,
+						_start + i - remainingText.length,
+						_start + i
+					);
+				}
+				_appendSplitText( letter, _start + i, _start + i + 1 );
+				remainingText = '';
+			} else {
+				remainingText += letter;
 			}
 		}
 
-		lastCharacterFormats = characterFormats;
-		lastCharacter = character;
+		if ( remainingText ) {
+			_appendSplitText(
+				remainingText,
+				_start + i - remainingText.length,
+				_start + i
+			);
+		}
 	}
 
-	return tree;
+	function _fillText( untilIndex ) {
+		let _maxLengths = _maxLength.length;
+
+		while ( _maxLengths-- ) {
+			if ( untilIndex >= _maxLength[ _maxLengths ] ) {
+				const index = _maxLength.pop();
+				_appendText( _index, index );
+				_pointer = getParent( _pointer );
+				_index = index;
+			} else {
+				break;
+			}
+		}
+
+		_appendText( _index, untilIndex );
+	}
+
+	for ( const [ format, [ _start, _end ] ] of _formats.entries() ) {
+		_fillText( _start );
+
+		const boundaryClass = isEditableTree && format === deepestActiveFormat;
+
+		_pointer = append(
+			_pointer,
+			fromFormat( { ...format, boundaryClass, isEditableTree } )
+		);
+		_index = _start;
+		_maxLength.push( _end );
+	}
+
+	_fillText( text.length );
+
+	if ( ! isEditableTree ) {
+		return _tree;
+	}
+
+	const padding = append( _pointer, ZWNBSP );
+
+	if ( text.length === 0 || !! multilineTag ) {
+		if ( start === text.length ) {
+			onStartIndex( _tree, padding, [ 0 ] );
+		}
+
+		if ( end === text.length ) {
+			onEndIndex( _tree, padding, [ 0 ] );
+		}
+	}
+
+	if ( placeholder && text.length === 0 ) {
+		append( getParent( padding ), {
+			type: 'span',
+			attributes: {
+				'data-rich-text-placeholder': placeholder,
+				// Necessary to prevent the placeholder from catching
+				// selection. The placeholder is also not editable after
+				// all.
+				contenteditable: 'false',
+				style:
+					'pointer-events:none;user-select:none;-webkit-user-select:none;-moz-user-select:none;-ms-user-select:none;',
+			},
+		} );
+	}
+
+	return _tree;
 }
