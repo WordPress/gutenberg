@@ -12,6 +12,7 @@ import { useCx } from '../../utils/hooks/use-cx';
  */
 export function useControlLabel( props ) {
 	const {
+		as = 'label',
 		htmlFor: htmlForProp,
 		isBlock = false,
 		size = 'medium',
@@ -37,6 +38,7 @@ export function useControlLabel( props ) {
 
 	return {
 		...textProps,
+		as,
 		className: classes,
 		htmlFor,
 	};
