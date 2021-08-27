@@ -63,7 +63,7 @@ class Test_Widget extends WP_Widget {
 	 * @return array Settings to save or bool false to cancel saving.
 	 * @since 4.8.1
 	 */
-	// @codingStandardsIgnoreStart
+	// @codingStandardsIgnoreStart – to prevent phpcs from complaining about unused function argument.
 	public function update( $new_instance, $old_instance ) {
 	// @codingStandardsIgnoreEnd
 		$instance          = array();
