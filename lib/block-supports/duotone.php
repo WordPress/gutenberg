@@ -207,7 +207,6 @@ function gutenberg_tinycolor_string_to_rgb( $color_str ) {
 				'h' => $match[1],
 				's' => $match[2],
 				'l' => $match[3],
-				'a' => $match[4],
 			)
 		);
 
@@ -240,7 +239,6 @@ function gutenberg_tinycolor_string_to_rgb( $color_str ) {
 				'r' => base_convert( $match[1], 16, 10 ),
 				'g' => base_convert( $match[2], 16, 10 ),
 				'b' => base_convert( $match[3], 16, 10 ),
-				'a' => 1,
 			)
 		);
 
