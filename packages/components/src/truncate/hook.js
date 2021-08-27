@@ -21,6 +21,7 @@ import { useCx } from '../utils/hooks/use-cx';
  */
 export default function useTruncate( props ) {
 	const {
+		as = 'span',
 		className,
 		children,
 		ellipsis = TRUNCATE_ELLIPSIS,
@@ -61,5 +62,10 @@ export default function useTruncate( props ) {
 		);
 	}, [ className, numberOfLines, shouldTruncate ] );
 
-	return { ...otherProps, className: classes, children: truncatedContent };
+	return {
+		...otherProps,
+		as,
+		className: classes,
+		children: truncatedContent,
+	};
 }
