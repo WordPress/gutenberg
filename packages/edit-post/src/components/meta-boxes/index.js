@@ -6,7 +6,7 @@ import { map } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { useSelect, select, subscribe, dispatch } from '@wordpress/data';
+import { useSelect, subscribe, dispatch } from '@wordpress/data';
 import { store as editorStore } from '@wordpress/editor';
 import { useEffect, useState } from '@wordpress/element';
 
@@ -19,14 +19,14 @@ import { store as editPostStore } from '../../store';
 
 export default function MetaBoxes( { location } ) {
 	const { isReady, metaBoxes, isVisible, postType } = useSelect(
-		( _select ) => {
-			const { __unstableIsEditorReady, getCurrentPostType } = _select(
+		( select ) => {
+			const { __unstableIsEditorReady, getCurrentPostType } = select(
 				editorStore
 			);
 			const {
 				isMetaBoxLocationVisible,
 				getMetaBoxesPerLocation,
-			} = _select( editPostStore );
+			} = select( editPostStore );
 			return {
 				isReady: __unstableIsEditorReady(),
 				metaBoxes: getMetaBoxesPerLocation( location ),
@@ -35,6 +35,8 @@ export default function MetaBoxes( { location } ) {
 			};
 		}
 	);
+	const { isSavingPost, isAutosavingPost } = useSelect( editorStore );
+	const { hasMetaBoxes } = useSelect( editPostStore );
 	const [ initialized, setInitialized ] = useState( false );
 
 	// When editor is ready, initialize postboxes (wp core script) and metabox
@@ -47,17 +49,11 @@ export default function MetaBoxes( { location } ) {
 				window.postboxes.add_postbox_toggles( postType );
 			}
 
-			let wasSavingPost = select( editorStore ).isSavingPost();
-			let wasAutosavingPost = select( editorStore ).isAutosavingPost();
-			const hasActiveMetaBoxes = select( editPostStore ).hasMetaBoxes();
+			let wasSavingPost = isSavingPost();
+			let wasAutosavingPost = isAutosavingPost();
 
 			// Save metaboxes when performing a full save on the post.
 			subscribe( () => {
-				const isSavingPost = select( editorStore ).isSavingPost();
-				const isAutosavingPost = select(
-					editorStore
-				).isAutosavingPost();
-
 				// Save metaboxes on save completion, except for autosaves that are not a post preview.
 				//
 				// Meta boxes are initialized once at page load. It is not necessary to
@@ -65,14 +61,14 @@ export default function MetaBoxes( { location } ) {
 				//
 				// See: https://github.com/WordPress/WordPress/blob/5.1.1/wp-admin/includes/post.php#L2307-L2309
 				const shouldTriggerMetaboxesSave =
-					hasActiveMetaBoxes &&
+					hasMetaBoxes() &&
 					wasSavingPost &&
-					! isSavingPost &&
+					! isSavingPost() &&
 					! wasAutosavingPost;
 
 				// Save current state for next inspection.
-				wasSavingPost = isSavingPost;
-				wasAutosavingPost = isAutosavingPost;
+				wasSavingPost = isSavingPost();
+				wasAutosavingPost = isAutosavingPost();
 
 				if ( shouldTriggerMetaboxesSave ) {
 					dispatch( editPostStore ).requestMetaBoxUpdates();
