@@ -22,3 +22,4 @@ export { safeDecodeURI } from './safe-decode-uri';
 export { safeDecodeURIComponent } from './safe-decode-uri-component';
 export { filterURLForDisplay } from './filter-url-for-display';
 export { cleanForSlug } from './clean-for-slug';
+export { getFilename } from './get-filename';
