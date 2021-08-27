@@ -25,14 +25,13 @@ import {
 import { applyFilters } from '@wordpress/hooks';
 import { select, dispatch } from '@wordpress/data';
 import { _x } from '@wordpress/i18n';
-import { blockDefault } from '@wordpress/icons';
 
 /**
  * Internal dependencies
  */
 import i18nBlockSchema from './i18n-block.json';
 import { isValidIcon, normalizeIconObject } from './utils';
-import { DEPRECATED_ENTRY_KEYS } from './constants';
+import { BLOCK_ICON_DEFAULT, DEPRECATED_ENTRY_KEYS } from './constants';
 import { store as blocksStore } from '../store';
 
 /**
@@ -265,7 +264,7 @@ export function registerBlockType( blockNameOrMetadata, settings ) {
 
 	settings = {
 		name,
-		icon: blockDefault,
+		icon: BLOCK_ICON_DEFAULT,
 		keywords: [],
 		attributes: {},
 		providesContext: {},
