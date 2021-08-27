@@ -1,14 +1,13 @@
 /**
  * WordPress dependencies
  */
-import { registerBlockType } from '@wordpress/blocks';
+import { store as blocksStore } from '@wordpress/blocks';
 import {
 	registerCoreBlocks,
 	__experimentalRegisterExperimentalCoreBlocks,
 } from '@wordpress/block-library';
 import { render, unmountComponentAtNode } from '@wordpress/element';
 import { dispatch } from '@wordpress/data';
-import { addFilter } from '@wordpress/hooks';
 import { store as interfaceStore } from '@wordpress/interface';
 
 /**
@@ -99,39 +98,7 @@ export function initializeEditor(
 		welcomeGuideTemplate: true,
 	} );
 
-	for ( let i = 1; i <= 100; i++ ) {
-		// Temporary test block.
-		registerBlockType( `wp-js-plugin-starter/hello-world-${ i }`, {
-			title: `Hello World ${ i }`,
-			description: `Hello World block ${ i }`,
-			icon: 'admin-site',
-			category: 'widgets',
-			edit() {
-				return `Hello Editor ${ i }`;
-			},
-			save() {
-				return `Hello Frontend ${ i }`;
-			},
-		} );
-
-		// Temporary test filter registered after the test block.
-		addFilter(
-			'blocks.registerBlockType',
-			`wp-js-plugin-starter/hello-world/filter-name-${ i }`,
-			( blockType, name ) => {
-				if ( name.startsWith( 'wp-js-plugin-starter/hello-world' ) ) {
-					return {
-						...blockType,
-						category: 'common',
-					};
-				}
-
-				return blockType;
-			}
-		);
-	}
-
-	// dispatch( blocksStore ).__experimentalReapplyBlockTypeFilters();
+	dispatch( blocksStore ).__experimentalReapplyBlockTypeFilters();
 	registerCoreBlocks();
 	if ( process.env.GUTENBERG_PHASE === 2 ) {
 		__experimentalRegisterExperimentalCoreBlocks( {
