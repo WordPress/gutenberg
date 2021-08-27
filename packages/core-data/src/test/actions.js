@@ -13,7 +13,6 @@ import {
 	editEntityRecord,
 	saveEntityRecord,
 	deleteEntityRecord,
-	// receiveEntityRecords,
 	receiveUserPermission,
 	receiveAutosaves,
 	receiveCurrentUser,
