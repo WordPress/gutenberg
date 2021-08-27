@@ -64,6 +64,7 @@ export function MediaPlaceholder( {
 	accept,
 	addToGallery,
 	multiple = false,
+	handleUpload = true,
 	dropZoneUIOnly,
 	disableDropZone,
 	disableMediaButtons,
@@ -118,6 +119,9 @@ export function MediaPlaceholder( {
 	};
 
 	const onFilesUpload = ( files ) => {
+		if ( ! handleUpload ) {
+			return onSelect( files );
+		}
 		onFilesPreUpload( files );
 		let setMedia;
 		if ( multiple ) {

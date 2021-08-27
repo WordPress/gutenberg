@@ -628,7 +628,7 @@ To add custom font sizes, create a new section called `typography` under `settin
 `fontSizes` is the equivalent of `add_theme_support( 'editor-font-sizes' )`.
 
 ```json
-"typograhy": {
+"typography": {
 	"fontSizes": [
 	]
 }
@@ -641,7 +641,7 @@ The keys used by `fontSizes` are:
 - `name` The visible name in the editor.
 
 ```json
-"typograhy": {
+"typography": {
 	"fontSizes": [
 		{
 			"slug": "normal",

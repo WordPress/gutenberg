@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { values, noop } from 'lodash';
+import { values, noop, omit } from 'lodash';
 import deepFreeze from 'deep-freeze';
 
 /**
@@ -236,7 +236,8 @@ describe( 'state', () => {
 						chicken: '',
 						'chicken-child': 'chicken',
 					},
-					cache: {
+					tree: {
+						'': {},
 						chicken: {},
 						'chicken-child': {},
 					},
@@ -258,7 +259,7 @@ describe( 'state', () => {
 
 				const state = blocks( existingState, action );
 
-				expect( state ).toEqual( {
+				expect( omit( state, [ 'tree' ] ) ).toEqual( {
 					isPersistentChange: true,
 					isIgnoredChange: false,
 					byClientId: {
@@ -289,14 +290,10 @@ describe( 'state', () => {
 						[ newChildBlockId ]: 'chicken',
 						chicken: '',
 					},
-					cache: {
-						chicken: {},
-						[ newChildBlockId ]: {},
-					},
 					controlledInnerBlocks: {},
 				} );
-				expect( state.cache.chicken ).not.toBe(
-					existingState.cache.chicken
+				expect( state.tree.chicken ).not.toBe(
+					existingState.tree.chicken
 				);
 			} );
 
@@ -319,7 +316,10 @@ describe( 'state', () => {
 					parents: {
 						chicken: '',
 					},
-					cache: {
+					tree: {
+						'': {
+							innerBlocks: [],
+						},
 						chicken: {},
 					},
 					controlledInnerBlocks: {},
@@ -340,7 +340,7 @@ describe( 'state', () => {
 
 				const state = blocks( existingState, action );
 
-				expect( state ).toEqual( {
+				expect( omit( state, [ 'tree' ] ) ).toEqual( {
 					isPersistentChange: true,
 					isIgnoredChange: false,
 					byClientId: {
@@ -371,15 +371,27 @@ describe( 'state', () => {
 						[ newChildBlockId ]: 'chicken',
 						chicken: '',
 					},
-					cache: {
-						chicken: {},
-						[ newChildBlockId ]: {},
-					},
 					controlledInnerBlocks: {},
 				} );
-				expect( state.cache.chicken ).not.toBe(
-					existingState.cache.chicken
+				expect( state.tree.chicken ).not.toBe(
+					existingState.tree.chicken
 				);
+				expect( state.tree[ '' ].innerBlocks[ 0 ] ).toBe(
+					state.tree.chicken
+				);
+				expect( state.tree.chicken.innerBlocks[ 0 ] ).toBe(
+					state.tree[ newChildBlockId ]
+				);
+				expect( state.tree[ newChildBlockId ] ).toEqual( {
+					clientId: newChildBlockId,
+					innerBlocks: [],
+					isValid: true,
+					name: 'core/test-child-block',
+					attributes: {
+						attr: false,
+						attr2: 'perfect',
+					},
+				} );
 			} );
 
 			it( 'can replace multiple child blocks', () => {
@@ -421,11 +433,7 @@ describe( 'state', () => {
 						'chicken-child': 'chicken',
 						'chicken-child-2': 'chicken',
 					},
-					cache: {
-						chicken: {},
-						'chicken-child': {},
-						'chicken-child-2': {},
-					},
+					tree: {},
 					controlledInnerBlocks: {},
 				} );
 
@@ -455,7 +463,7 @@ describe( 'state', () => {
 
 				const state = blocks( existingState, action );
 
-				expect( state ).toEqual( {
+				expect( omit( state, [ 'tree' ] ) ).toEqual( {
 					isPersistentChange: true,
 					isIgnoredChange: false,
 					byClientId: {
@@ -511,13 +519,30 @@ describe( 'state', () => {
 						[ newChildBlockId2 ]: 'chicken',
 						[ newChildBlockId3 ]: 'chicken',
 					},
-					cache: {
-						chicken: {},
-						[ newChildBlockId1 ]: {},
-						[ newChildBlockId2 ]: {},
-						[ newChildBlockId3 ]: {},
-					},
 					controlledInnerBlocks: {},
+				} );
+
+				expect( state.tree[ '' ].innerBlocks[ 0 ] ).toBe(
+					state.tree.chicken
+				);
+				expect( state.tree.chicken.innerBlocks[ 0 ] ).toBe(
+					state.tree[ newChildBlockId1 ]
+				);
+				expect( state.tree.chicken.innerBlocks[ 1 ] ).toBe(
+					state.tree[ newChildBlockId2 ]
+				);
+				expect( state.tree.chicken.innerBlocks[ 2 ] ).toBe(
+					state.tree[ newChildBlockId3 ]
+				);
+				expect( state.tree[ newChildBlockId1 ] ).toEqual( {
+					innerBlocks: [],
+					clientId: newChildBlockId1,
+					name: 'core/test-child-block',
+					isValid: true,
+					attributes: {
+						attr: false,
+						attr2: 'perfect',
+					},
 				} );
 			} );
 
@@ -556,10 +581,8 @@ describe( 'state', () => {
 						'chicken-child': 'chicken',
 						'chicken-grand-child': 'chicken-child',
 					},
-					cache: {
+					tree: {
 						chicken: {},
-						'chicken-child': {},
-						'chicken-grand-child': {},
 					},
 					controlledInnerBlocks: {},
 				} );
@@ -576,7 +599,7 @@ describe( 'state', () => {
 
 				const state = blocks( existingState, action );
 
-				expect( state ).toEqual( {
+				expect( omit( state, [ 'tree' ] ) ).toEqual( {
 					isPersistentChange: true,
 					isIgnoredChange: false,
 					byClientId: {
@@ -604,16 +627,12 @@ describe( 'state', () => {
 						chicken: '',
 						[ newChildBlockId ]: 'chicken',
 					},
-					cache: {
-						chicken: {},
-						[ newChildBlockId ]: {},
-					},
 					controlledInnerBlocks: {},
 				} );
 
-				// the cache key of the parent should be updated
-				expect( existingState.cache.chicken ).not.toBe(
-					state.cache.chicken
+				// the block object of the parent should be updated
+				expect( state.tree.chicken ).not.toBe(
+					existingState.tree.chicken
 				);
 			} );
 		} );
@@ -628,7 +647,7 @@ describe( 'state', () => {
 				parents: {},
 				isPersistentChange: true,
 				isIgnoredChange: false,
-				cache: {},
+				tree: {},
 				controlledInnerBlocks: {},
 			} );
 		} );
@@ -648,9 +667,13 @@ describe( 'state', () => {
 					'': [ 'bananas' ],
 					bananas: [],
 				} );
-				expect( state.cache ).toEqual( {
-					bananas: {},
+				expect( state.tree.bananas ).toEqual( {
+					clientId: 'bananas',
+					innerBlocks: [],
 				} );
+				expect( state.tree[ '' ].innerBlocks[ 0 ] ).toBe(
+					state.tree.bananas
+				);
 			} );
 		} );
 
@@ -673,10 +696,6 @@ describe( 'state', () => {
 				'': [ 'bananas' ],
 				apples: [],
 				bananas: [ 'apples' ],
-			} );
-			expect( state.cache ).toEqual( {
-				bananas: {},
-				apples: {},
 			} );
 		} );
 
@@ -710,12 +729,17 @@ describe( 'state', () => {
 				chicken: [],
 				ribs: [],
 			} );
-			expect( state.cache ).toEqual( {
-				chicken: {},
-				ribs: {},
+
+			expect( state.tree[ '' ].innerBlocks[ 0 ] ).toBe(
+				state.tree.chicken
+			);
+			expect( state.tree[ '' ].innerBlocks[ 1 ] ).toBe( state.tree.ribs );
+			expect( state.tree.chicken ).toEqual( {
+				clientId: 'chicken',
+				name: 'core/test-block',
+				attributes: {},
+				innerBlocks: [],
 			} );
-			// The cache key is the same because the block has not been modified.
-			expect( original.cache.chicken ).toBe( state.cache.chicken );
 		} );
 
 		it( 'should replace the block', () => {
@@ -754,10 +778,16 @@ describe( 'state', () => {
 			expect( state.parents ).toEqual( {
 				wings: '',
 			} );
-			expect( state.cache ).toEqual( {
-				wings: {},
+			expect( state.tree[ '' ].innerBlocks[ 0 ] ).toBe(
+				state.tree.wings
+			);
+			expect( state.tree.wings ).toEqual( {
+				clientId: 'wings',
+				name: 'core/freeform',
+				innerBlocks: [],
 			} );
 		} );
+
 		it( 'should replace the block and remove references to its inner blocks', () => {
 			const original = blocks( undefined, {
 				type: 'RESET_BLOCKS',
@@ -797,8 +827,13 @@ describe( 'state', () => {
 			expect( state.parents ).toEqual( {
 				wings: '',
 			} );
-			expect( state.cache ).toEqual( {
-				wings: {},
+			expect( state.tree[ '' ].innerBlocks[ 0 ] ).toBe(
+				state.tree.wings
+			);
+			expect( state.tree.wings ).toEqual( {
+				clientId: 'wings',
+				name: 'core/freeform',
+				innerBlocks: [],
 			} );
 		} );
 
@@ -813,21 +848,11 @@ describe( 'state', () => {
 				blocks: [ wrapperBlock ],
 			} );
 
-			const originalWrapperBlockCacheKey =
-				original.cache[ wrapperBlock.clientId ];
-
 			const state = blocks( original, {
 				type: 'REPLACE_BLOCKS',
 				clientIds: [ nestedBlock.clientId ],
 				blocks: [ replacementBlock ],
 			} );
-
-			const newWrapperBlockCacheKey =
-				state.cache[ wrapperBlock.clientId ];
-
-			expect( newWrapperBlockCacheKey ).not.toBe(
-				originalWrapperBlockCacheKey
-			);
 
 			expect( state.order ).toEqual( {
 				'': [ wrapperBlock.clientId ],
@@ -840,9 +865,15 @@ describe( 'state', () => {
 				[ replacementBlock.clientId ]: wrapperBlock.clientId,
 			} );
 
-			expect( state.cache ).toEqual( {
-				[ wrapperBlock.clientId ]: {},
-				[ replacementBlock.clientId ]: {},
+			expect( state.tree[ wrapperBlock.clientId ].innerBlocks[ 0 ] ).toBe(
+				state.tree[ replacementBlock.clientId ]
+			);
+			expect( state.tree[ replacementBlock.clientId ] ).toEqual( {
+				clientId: replacementBlock.clientId,
+				name: 'core/test-block',
+				innerBlocks: [],
+				attributes: {},
+				isValid: true,
 			} );
 		} );
 
@@ -884,11 +915,8 @@ describe( 'state', () => {
 				'': [ 'chicken' ],
 				chicken: [],
 			} );
-			expect( replacedState.cache ).toEqual( {
-				chicken: {},
-			} );
-			expect( originalState.cache.chicken ).not.toBe(
-				replacedState.cache.chicken
+			expect( originalState.tree.chicken ).not.toBe(
+				replacedState.tree.chicken
 			);
 
 			const nestedBlock = {
@@ -963,11 +991,18 @@ describe( 'state', () => {
 			expect( state.attributes.chicken ).toEqual( {
 				content: 'ribs',
 			} );
-
-			expect( state.cache ).toEqual( {
-				chicken: {},
+			expect( state.tree[ '' ].innerBlocks[ 0 ] ).toBe(
+				state.tree.chicken
+			);
+			expect( state.tree.chicken ).toEqual( {
+				clientId: 'chicken',
+				name: 'core/test-block',
+				innerBlocks: [],
+				attributes: {
+					content: 'ribs',
+				},
+				isValid: true,
 			} );
-			expect( state.cache.chicken ).not.toBe( original.cache.chicken );
 		} );
 
 		it( 'should update the reusable block reference if the temporary id is swapped', () => {
@@ -1001,10 +1036,19 @@ describe( 'state', () => {
 			expect( state.attributes.chicken ).toEqual( {
 				ref: 3,
 			} );
-			expect( state.cache ).toEqual( {
-				chicken: {},
+
+			expect( state.tree[ '' ].innerBlocks[ 0 ] ).toBe(
+				state.tree.chicken
+			);
+			expect( state.tree.chicken ).toEqual( {
+				clientId: 'chicken',
+				name: 'core/block',
+				isValid: false,
+				innerBlocks: [],
+				attributes: {
+					ref: 3,
+				},
 			} );
-			expect( state.cache.chicken ).not.toBe( original.cache.chicken );
 		} );
 
 		it( 'should move the block up', () => {
@@ -1031,8 +1075,11 @@ describe( 'state', () => {
 			} );
 
 			expect( state.order[ '' ] ).toEqual( [ 'ribs', 'chicken' ] );
-			expect( state.cache.ribs ).toBe( original.cache.ribs );
-			expect( state.cache.chicken ).toBe( original.cache.chicken );
+			expect( state.tree[ '' ].innerBlocks[ 0 ] ).toBe( state.tree.ribs );
+			expect( state.tree[ '' ].innerBlocks[ 1 ] ).toBe(
+				state.tree.chicken
+			);
+			expect( state.tree.chicken ).toBe( original.tree.chicken );
 		} );
 
 		it( 'should move the nested block up', () => {
@@ -1061,14 +1108,15 @@ describe( 'state', () => {
 				[ movedBlock.clientId ]: [],
 				[ siblingBlock.clientId ]: [],
 			} );
-			expect( state.cache[ wrapperBlock.clientId ] ).not.toBe(
-				original.cache[ wrapperBlock.clientId ]
+
+			expect( state.tree[ wrapperBlock.clientId ].innerBlocks[ 0 ] ).toBe(
+				state.tree[ movedBlock.clientId ]
 			);
-			expect( state.cache[ movedBlock.clientId ] ).toBe(
-				original.cache[ movedBlock.clientId ]
+			expect( state.tree[ wrapperBlock.clientId ].innerBlocks[ 1 ] ).toBe(
+				state.tree[ siblingBlock.clientId ]
 			);
-			expect( state.cache[ siblingBlock.clientId ] ).toBe(
-				original.cache[ siblingBlock.clientId ]
+			expect( state.tree[ movedBlock.clientId ] ).toBe(
+				original.tree[ movedBlock.clientId ]
 			);
 		} );
 
@@ -1351,9 +1399,7 @@ describe( 'state', () => {
 			expect( state.attributes ).toEqual( {
 				ribs: {},
 			} );
-			expect( state.cache ).toEqual( {
-				ribs: {},
-			} );
+			expect( state.tree[ '' ].innerBlocks ).toHaveLength( 1 );
 		} );
 
 		it( 'should remove multiple blocks', () => {

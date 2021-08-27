@@ -1,35 +1,61 @@
 /**
  * External dependencies
  */
-import { View } from 'react-native';
+import {
+	ScrollView,
+	StyleSheet,
+	TouchableWithoutFeedback,
+	View,
+} from 'react-native';
+import { useNavigation } from '@react-navigation/native';
 
 /**
  * WordPress dependencies
  */
-import { BottomSheet } from '@wordpress/components';
-import { useNavigation } from '@react-navigation/native';
-import { __ } from '@wordpress/i18n';
+import { BottomSheet, BottomSheetContext } from '@wordpress/components';
+import { useContext } from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
 import styles from './style.scss';
 
-const HelpDetailNavigationScreen = ( { name, content } ) => {
+const HelpDetailNavigationScreen = ( { content, label } ) => {
 	const navigation = useNavigation();
 
-	const goBack = () => {
-		navigation.goBack();
-	};
+	const { listProps } = useContext( BottomSheetContext );
+	const contentContainerStyle = StyleSheet.flatten(
+		listProps.contentContainerStyle
+	);
 
 	return (
-		<BottomSheet.NavigationScreen name={ __( 'What is a block?' ) }>
-			<BottomSheet.NavigationHeader
-				screen={ name }
-				leftButtonOnPress={ goBack }
-			/>
-			<View style={ styles.separator } />
-			{ content }
+		<BottomSheet.NavigationScreen isScrollable fullScreen>
+			<View style={ styles.container }>
+				<BottomSheet.NavigationHeader
+					screen={ label }
+					leftButtonOnPress={ navigation.goBack }
+				/>
+				<ScrollView
+					{ ...listProps }
+					contentContainerStyle={ {
+						...contentContainerStyle,
+						paddingBottom: Math.max(
+							listProps.safeAreaBottomInset,
+							contentContainerStyle.paddingBottom
+						),
+						/**
+						 * Remove margin set via `hideHeader`. Combining a header
+						 * and navigation in this bottom sheet is at odds with the
+						 * current `BottomSheet` implementation.
+						 */
+						marginTop: 0,
+					} }
+				>
+					<TouchableWithoutFeedback accessible={ false }>
+						<View>{ content }</View>
+					</TouchableWithoutFeedback>
+				</ScrollView>
+			</View>
 		</BottomSheet.NavigationScreen>
 	);
 };

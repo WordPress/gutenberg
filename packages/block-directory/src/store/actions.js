@@ -87,7 +87,7 @@ export function* installBlockType( block ) {
 
 		yield loadAssets( assets );
 		const registeredBlocks = yield controls.select(
-			blocksStore.name,
+			blocksStore,
 			'getBlockTypes'
 		);
 		if ( ! registeredBlocks.some( ( i ) => i.name === block.name ) ) {

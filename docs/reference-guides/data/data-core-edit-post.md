@@ -502,27 +502,19 @@ _Returns_
 
 ### toggleFeature
 
-Returns an action object used to toggle a feature flag.
+Triggers an action used to toggle a feature flag.
 
 _Parameters_
 
 -   _feature_ `string`: Feature name.
 
-_Returns_
-
--   `Object`: Action object.
-
 ### togglePinnedPluginItem
 
-Returns an action object used to toggle a plugin name flag.
+Triggers an action object used to toggle a plugin name flag.
 
 _Parameters_
 
 -   _pluginName_ `string`: Plugin name.
-
-_Returns_
-
--   `Object`: Action object.
 
 ### togglePublishSidebar
 

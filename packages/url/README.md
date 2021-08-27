@@ -132,6 +132,25 @@ _Returns_
 
 -   `string|void`: The authority part of the URL.
 
+### getFilename
+
+Returns the filename part of the URL.
+
+_Usage_
+
+```js
+const filename1 = getFilename( 'http://localhost:8080/this/is/a/test.jpg' ); // 'test.jpg'
+const filename2 = getFilename( '/this/is/a/test.png' ); // 'test.png'
+```
+
+_Parameters_
+
+-   _url_ `string`: The full URL.
+
+_Returns_
+
+-   `string|void`: The filename part of the URL.
+
 ### getFragment
 
 Returns the fragment part of the URL.

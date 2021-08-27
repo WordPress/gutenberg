@@ -163,12 +163,38 @@ export default function FontAppearanceControl( props ) {
 		return __( 'Appearance' );
 	};
 
+	// Adjusts screen reader description based on styles or weights.
+	const getDescribedBy = () => {
+		if ( ! hasFontStyles ) {
+			return sprintf(
+				// translators: %s: Currently selected font weight.
+				__( 'Currently selected font weight: %s' ),
+				currentSelection.name
+			);
+		}
+
+		if ( ! hasFontWeights ) {
+			return sprintf(
+				// translators: %s: Currently selected font style.
+				__( 'Currently selected font style: %s' ),
+				currentSelection.name
+			);
+		}
+
+		return sprintf(
+			// translators: %s: Currently selected font appearance.
+			__( 'Currently selected font appearance: %s' ),
+			currentSelection.name
+		);
+	};
+
 	return (
 		<fieldset className="components-font-appearance-control">
 			{ hasStylesOrWeights && (
 				<CustomSelectControl
 					className="components-font-appearance-control__select"
 					label={ getLabel() }
+					describedBy={ getDescribedBy() }
 					options={ selectOptions }
 					value={ currentSelection }
 					onChange={ ( { selectedItem } ) =>

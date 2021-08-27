@@ -93,7 +93,7 @@ describe( 'actions', () => {
 			expect( generator.next( [ block ] ).value ).toMatchObject( {
 				type: '@@data/DISPATCH',
 				actionName: 'createInfoNotice',
-				storeKey: noticesStore,
+				storeKey: noticesStore.name,
 			} );
 
 			expect( generator.next().value ).toEqual( {
@@ -161,7 +161,7 @@ describe( 'actions', () => {
 			expect( generator.next( [ inactiveBlock ] ).value ).toMatchObject( {
 				type: '@@data/DISPATCH',
 				actionName: 'createInfoNotice',
-				storeKey: noticesStore,
+				storeKey: noticesStore.name,
 			} );
 
 			expect( generator.next().value ).toEqual( {
@@ -211,7 +211,7 @@ describe( 'actions', () => {
 			expect( generator.next().value ).toMatchObject( {
 				type: '@@data/DISPATCH',
 				actionName: 'createErrorNotice',
-				storeKey: noticesStore,
+				storeKey: noticesStore.name,
 			} );
 
 			expect( generator.next().value ).toEqual( {
@@ -300,7 +300,7 @@ describe( 'actions', () => {
 			expect( generator.throw( apiError ).value ).toMatchObject( {
 				type: '@@data/DISPATCH',
 				actionName: 'createErrorNotice',
-				storeKey: noticesStore,
+				storeKey: noticesStore.name,
 			} );
 
 			expect( generator.next() ).toEqual( {

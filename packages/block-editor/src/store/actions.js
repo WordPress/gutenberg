@@ -151,11 +151,18 @@ export function resetSelection(
  * Unlike resetBlocks, these should be appended to the existing known set, not
  * replacing.
  *
+ * @deprecated
+ *
  * @param {Object[]} blocks Array of block objects.
  *
  * @return {Object} Action object.
  */
 export function receiveBlocks( blocks ) {
+	deprecated( 'wp.data.dispatch( "core/block-editor" ).receiveBlocks', {
+		since: '5.9',
+		alternative: 'resetBlocks or insertBlocks',
+	} );
+
 	return {
 		type: 'RECEIVE_BLOCKS',
 		blocks,
