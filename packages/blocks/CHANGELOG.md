@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Backward Compatibility
+
+-   Register a block even when an invalid value provided for the icon setting ([#34350](https://github.com/WordPress/gutenberg/pull/34350)).
+
 ## 11.0.0 (2021-07-29)
 
 ### Breaking Change
