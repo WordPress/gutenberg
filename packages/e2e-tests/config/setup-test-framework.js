@@ -240,9 +240,10 @@ beforeAll( async () => {
 	await trashAllPosts( 'wp_block' );
 	await setupBrowser();
 	await activatePlugin( 'gutenberg-test-plugin-disables-the-css-animations' );
-	await page.emulateMediaFeatures( [
-		{ name: 'prefers-reduced-motion', value: 'reduce' },
-	] );
+	// Doesn't play well with https://core.trac.wordpress.org/changeset/51677.
+	// await page.emulateMediaFeatures( [
+	// 	{ name: 'prefers-reduced-motion', value: 'reduce' },
+	// ] );
 } );
 
 afterEach( async () => {
