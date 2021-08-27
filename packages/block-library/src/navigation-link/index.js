@@ -90,8 +90,12 @@ export const settings = {
 			{
 				type: 'block',
 				blocks: [ 'core/navigation-submenu' ],
-				transform: ( attributes ) =>
-					createBlock( 'core/navigation-submenu', attributes ),
+				transform: ( attributes, innerBlocks ) =>
+					createBlock(
+						'core/navigation-submenu',
+						attributes,
+						innerBlocks
+					),
 			},
 		],
 	},
