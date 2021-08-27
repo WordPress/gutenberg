@@ -11,6 +11,11 @@
 		margin-left: 0;
 		padding-left: 0;
 	}
+
+	// Top, left and right margins are inherited by classic.scss.
+	.block-list-appender {
+		margin: 0;
+	}
 }
 
 // This element is inline on the frontend but needs to be editable, therefore inline-block, in the editor.
