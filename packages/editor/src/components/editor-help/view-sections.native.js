@@ -37,10 +37,21 @@ export const HelpDetailSectionHeadingText = ( { text } ) => {
 	);
 };
 
-export const HelpDetailImage = ( props ) => {
+export const HelpDetailImage = ( {
+	accessible,
+	accessibilityLabel,
+	source,
+} ) => {
 	const imageStyle = usePreferredColorSchemeStyle(
 		styles.helpDetailImage,
 		styles.helpDetailImageDark
 	);
-	return <Image style={ imageStyle } { ...props } />;
+	return (
+		<Image
+			accessible={ accessible }
+			accessibilityLabel={ accessibilityLabel }
+			source={ source }
+			style={ imageStyle }
+		/>
+	);
 };
