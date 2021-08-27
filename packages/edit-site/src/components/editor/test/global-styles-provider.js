@@ -58,10 +58,6 @@ describe( 'global styles provider', () => {
 		dispatch( 'core/edit-site' ).updateSettings( settings );
 	} );
 
-	// afterEach( () => {
-	// 	dispatch( 'core/blocks' ).removeBlockTypes( 'core/cover' );
-	// } );
-
 	describe( 'when a block enables color support', () => {
 		it( 'automatically enables text color and background color supports', () => {
 			act( () => {
