@@ -379,6 +379,7 @@ function gutenberg_render_duotone_support( $block_content, $block ) {
 					<feFuncB type="table" tableValues="<?php echo esc_attr( implode( ' ', $duotone_values['b'] ) ); ?>" />
 					<feFuncA type="table" tableValues="<?php echo esc_attr( implode( ' ', $duotone_values['a'] ) ); ?>" />
 				</feComponentTransfer>
+				<feComposite in2="SourceGraphic" operator="in" />
 			</filter>
 		</defs>
 	</svg>

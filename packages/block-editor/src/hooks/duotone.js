@@ -123,6 +123,7 @@ ${ selector } {
 								tableValues={ values.a.join( ' ' ) }
 							/>
 						</feComponentTransfer>
+						<feComposite in2="SourceGraphic" operator="in" />
 					</filter>
 				</defs>
 			</SVG>
