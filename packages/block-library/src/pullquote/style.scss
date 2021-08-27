@@ -2,6 +2,7 @@
 	margin: 0 0 1em 0;
 	padding: 3em 0;
 	text-align: center; // Default text-alignment where the `textAlign` attribute value isn't specified.
+	overflow-wrap: break-word; // Break long strings of text without spaces so they don't overflow the block.
 
 	p,
 	blockquote,
