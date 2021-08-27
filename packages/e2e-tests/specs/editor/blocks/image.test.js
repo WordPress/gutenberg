@@ -97,6 +97,8 @@ describe( 'Image', () => {
 
 		expect( await getEditedPostContent() ).toMatch( regex2 );
 
+		// Focus back to the img element for the right context
+		await page.click( '[aria-label="Block: Image"] img' );
 		await clickButton( 'Replace' );
 		const filename2 = await upload(
 			'.block-editor-media-replace-flow__options input[type="file"]'
@@ -120,9 +122,13 @@ describe( 'Image', () => {
 		await waitForImage( fileName );
 		await page.keyboard.type( '1' );
 		await page.keyboard.press( 'Enter' );
-		// Make sure the <p> is created between keypresses
-		await page.waitForSelector( 'p[aria-label*="Empty block"]' );
+		// Make sure the <p> is created between keypresses...
+		const paragraph = await page.waitForSelector(
+			'p[aria-label*="Empty block"]'
+		);
 		await page.keyboard.press( 'Backspace' );
+		// ...and make sure it's removed.
+		await paragraph.waitForElementState( 'hidden' );
 		await page.keyboard.type( '2' );
 
 		expect(
@@ -334,6 +340,8 @@ describe( 'Image', () => {
 		// Check if dimensions are changed.
 		expect( await getEditedPostContent() ).toMatch( regexBefore );
 
+		// Focus back to the img element for the right context
+		await page.click( '[aria-label="Block: Image"] img' );
 		// Replace uploaded image with an URL.
 		await clickButton( 'Replace' );
 		await clickButton( 'Edit' );
