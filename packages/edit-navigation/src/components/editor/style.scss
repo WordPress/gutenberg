@@ -33,7 +33,7 @@
 		.wp-block-navigation-item,
 		.wp-block-navigation-submenu {
 			display: block;
-			margin: $grid-unit-05 0 $grid-unit-05 0;
+			margin: $grid-unit-10 0;
 
 			// Show submenus on click.
 			> .wp-block-navigation__submenu-container {
@@ -133,7 +133,6 @@
 		}
 
 		// Override for deeply nested submenus.
-		.has-child .wp-block-navigation__container .wp-block-navigation__container,
 		.has-child .wp-block-navigation__container .wp-block-navigation__submenu-container {
 			left: auto;
 		}
@@ -141,7 +140,6 @@
 		// When editing a submenu with children, highlight the parent
 		// and adjust the spacing and submenu icon.
 		.wp-block-navigation-submenu.is-editing {
-			> .wp-block-navigation__container,
 			> .wp-block-navigation__submenu-container {
 				opacity: 1;
 				visibility: visible;
@@ -163,11 +161,16 @@
 
 		// Appender styles
 		.block-list-appender {
-			margin: 0;
+			// Make appender rows the same height as items and center the button vertically.
+			display: flex;
+			flex-direction: column;
+			justify-content: center;
+			height: $grid-unit-50;
+			margin: $grid-unit-10 0;
 		}
 
 		.block-editor-button-block-appender.block-list-appender__toggle {
-			margin: $grid-unit-05 0 $grid-unit-05 $grid-unit-30;
+			margin: 0 0 0 $grid-unit-30;
 			padding: 0;
 		}
 	}
