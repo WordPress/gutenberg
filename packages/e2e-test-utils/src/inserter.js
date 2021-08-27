@@ -151,6 +151,7 @@ export async function searchForReusableBlock( searchTerm ) {
 export async function insertBlock( searchTerm ) {
 	await searchForBlock( searchTerm );
 	await page.click( `button :text("${ searchTerm }")` );
+	await toggleGlobalBlockInserter();
 	await focusSelectedBlock();
 }
 
