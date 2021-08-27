@@ -197,7 +197,10 @@ function AudioEdit( {
 							checked={ loop }
 						/>
 						<SelectControl
-							label={ _x( 'Preload', 'noun; Audio block parameter' ) }
+							label={ _x(
+								'Preload',
+								'noun; Audio block parameter'
+							) }
 							value={ preload || '' }
 							// `undefined` is required for the preload attribute to be unset.
 							onChange={ ( value ) =>
@@ -209,7 +212,10 @@ function AudioEdit( {
 								{ value: '', label: __( 'Browser default' ) },
 								{ value: 'auto', label: __( 'Auto' ) },
 								{ value: 'metadata', label: __( 'Metadata' ) },
-								{ value: 'none', label: _x( 'None', '"Preload" value' ) },
+								{
+									value: 'none',
+									label: _x( 'None', '"Preload" value' ),
+								},
 							] }
 							hideCancelButton={ true }
 						/>

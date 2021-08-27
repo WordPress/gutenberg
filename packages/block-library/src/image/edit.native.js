@@ -121,7 +121,10 @@ export class ImageEdit extends Component {
 			},
 			linkRel: {
 				label: __( 'Link Rel' ),
-				placeholder: _x( 'None', 'Link rel attribute value placeholder' ),
+				placeholder: _x(
+					'None',
+					'Link rel attribute value placeholder'
+				),
 			},
 		};
 	}

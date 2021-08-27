@@ -169,7 +169,10 @@ function AudioEdit( {
 							{ value: '', label: __( 'Browser default' ) },
 							{ value: 'auto', label: __( 'Auto' ) },
 							{ value: 'metadata', label: __( 'Metadata' ) },
-							{ value: 'none', label: _x( 'None', '"Preload" value' ) },
+							{
+								value: 'none',
+								label: _x( 'None', '"Preload" value' ),
+							},
 						] }
 					/>
 				</PanelBody>
