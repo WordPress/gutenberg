@@ -359,13 +359,13 @@ export function __unstableCreateUndoLevel() {
  * @param {Function} [options.__unstableFetch]  Internal use only. Function to
  *                                              call instead of `apiFetch()`.
  *                                              Must return a control
- *                                              descriptor.
+ *                                              descriptor or a promise.
  */
 export const saveEntityRecord = (
 	kind,
 	name,
 	record,
-	{ isAutosave = false, __unstableFetch = null } = {}
+	{ isAutosave = false, __unstableFetch = triggerFetch } = {}
 ) => async ( { select, dispatch } ) => {
 	const entities = await dispatch( getKindEntities( kind ) );
 	const entity = find( entities, { kind, name } );
@@ -461,11 +461,8 @@ export const saveEntityRecord = (
 					method: 'POST',
 					data,
 				};
-				if ( __unstableFetch ) {
-					updatedRecord = await __unstableFetch( options );
-				} else {
-					updatedRecord = await triggerFetch( options );
-				}
+				updatedRecord = await __unstableFetch( options );
+
 				// An autosave may be processed by the server as a regular save
 				// when its update is requested by the author and the post had
 				// draft or auto-draft status.
