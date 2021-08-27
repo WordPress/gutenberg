@@ -40,8 +40,6 @@ export default function MetaBoxes( { location } ) {
 	// When editor is ready, initialize postboxes (wp core script) and metabox
 	// saving.
 	useEffect( () => {
-		let saveMetaboxUnsubscribe;
-
 		if ( postType !== undefined && isReady && ! initialized ) {
 			setInitialized( true );
 
@@ -54,7 +52,7 @@ export default function MetaBoxes( { location } ) {
 			const hasActiveMetaBoxes = select( editPostStore ).hasMetaBoxes();
 
 			// Save metaboxes when performing a full save on the post.
-			saveMetaboxUnsubscribe = subscribe( () => {
+			subscribe( () => {
 				const isSavingPost = select( editorStore ).isSavingPost();
 				const isAutosavingPost = select(
 					editorStore
@@ -81,8 +79,6 @@ export default function MetaBoxes( { location } ) {
 				}
 			} );
 		}
-
-		return () => saveMetaboxUnsubscribe && saveMetaboxUnsubscribe();
 	}, [ isReady, postType, initialized ] );
 
 	if ( ! isReady ) {
