@@ -138,10 +138,9 @@
 			left: auto;
 		}
 
-		// When editing a link with children, highlight the parent
+		// When editing a submenu with children, highlight the parent
 		// and adjust the spacing and submenu icon.
-		.wp-block-navigation-item.has-child.is-editing,
-		.wp-block-navigation-submenu.has-child.is-editing {
+		.wp-block-navigation-submenu.is-editing {
 			> .wp-block-navigation__container,
 			> .wp-block-navigation__submenu-container {
 				opacity: 1;
