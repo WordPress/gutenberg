@@ -164,7 +164,9 @@ function gutenberg_tinycolor_string_to_rgb( $color_str ) {
 				'b' => $match[3],
 			)
 		);
+
 		$rgb['a'] = 1;
+
 		return $rgb;
 	}
 
@@ -177,7 +179,9 @@ function gutenberg_tinycolor_string_to_rgb( $color_str ) {
 				'b' => $match[3],
 			)
 		);
+
 		$rgb['a'] = gutenberg_tinycolor_bound_alpha( $match[4] );
+
 		return $rgb;
 	}
 
@@ -190,7 +194,9 @@ function gutenberg_tinycolor_string_to_rgb( $color_str ) {
 				'l' => $match[3],
 			)
 		);
+
 		$rgb['a'] = 1;
+
 		return $rgb;
 	}
 
@@ -204,7 +210,9 @@ function gutenberg_tinycolor_string_to_rgb( $color_str ) {
 				'a' => $match[4],
 			)
 		);
+
 		$rgb['a'] = gutenberg_tinycolor_bound_alpha( $match[4] );
+
 		return $rgb;
 	}
 
@@ -217,9 +225,11 @@ function gutenberg_tinycolor_string_to_rgb( $color_str ) {
 				'b' => base_convert( $match[3], 16, 10 ),
 			)
 		);
+
 		$rgb['a'] = gutenberg_tinycolor_bound_alpha(
 			base_convert( $match[4], 16, 10 ) / 255
 		);
+
 		return $rgb;
 	}
 
@@ -233,7 +243,9 @@ function gutenberg_tinycolor_string_to_rgb( $color_str ) {
 				'a' => 1,
 			)
 		);
+
 		$rgb['a'] = 1;
+
 		return $rgb;
 	}
 
@@ -246,9 +258,11 @@ function gutenberg_tinycolor_string_to_rgb( $color_str ) {
 				'b' => base_convert( $match[3] . $match[3], 16, 10 ),
 			)
 		);
+
 		$rgb['a'] = gutenberg_tinycolor_bound_alpha(
 			base_convert( $match[4] . $match[4], 16, 10 ) / 255
 		);
+
 		return $rgb;
 	}
 
@@ -261,7 +275,9 @@ function gutenberg_tinycolor_string_to_rgb( $color_str ) {
 				'b' => base_convert( $match[3] . $match[3], 16, 10 ),
 			)
 		);
+
 		$rgb['a'] = 1;
+
 		return $rgb;
 	}
 }
