@@ -493,16 +493,8 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 	 * @return string The whole file path or empty if the file doesn't exist.
 	 */
 	private static function get_file_path_from_theme( $file_name ) {
-		// This used to be a locate_template call.
-		// However, that method proved problematic
-		// due to its use of constants (STYLESHEETPATH)
-		// that threw errors in some scenarios.
-		//
-		// When the theme.json merge algorithm properly supports
-		// child themes, this should also fallback
-		// to the template path, as locate_template did.
 		$located   = '';
-		$candidate = get_stylesheet_directory() . '/' . $file_name;
+		$candidate = get_theme_file_path( $file_name );
 		if ( is_readable( $candidate ) ) {
 			$located = $candidate;
 		}
