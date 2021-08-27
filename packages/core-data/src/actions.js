@@ -358,8 +358,7 @@ export function __unstableCreateUndoLevel() {
  * @param {boolean}  [options.isAutosave=false] Whether this is an autosave.
  * @param {Function} [options.__unstableFetch]  Internal use only. Function to
  *                                              call instead of `apiFetch()`.
- *                                              Must return a control
- *                                              descriptor or a promise.
+ *                                              Must return a promise.
  */
 export const saveEntityRecord = (
 	kind,
