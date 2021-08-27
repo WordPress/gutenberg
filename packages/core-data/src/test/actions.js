@@ -19,19 +19,6 @@ import {
 	__experimentalBatch,
 } from '../actions';
 
-jest.mock( '../locks/actions', () => ( {
-	__unstableAcquireStoreLock: jest.fn( () => [
-		{
-			type: 'MOCKED_ACQUIRE_LOCK',
-		},
-	] ),
-	__unstableReleaseStoreLock: jest.fn( () => [
-		{
-			type: 'MOCKED_RELEASE_LOCK',
-		},
-	] ),
-} ) );
-
 jest.mock( '../batch', () => {
 	const { createBatch } = jest.requireActual( '../batch' );
 	return {
@@ -74,7 +61,7 @@ describe( 'deleteEntityRecord', () => {
 
 		// Acquire lock
 		expect( fulfillment.next( entities ).value.type ).toBe(
-			'MOCKED_ACQUIRE_LOCK'
+			'@@data/DISPATCH'
 		);
 
 		// Start
@@ -96,9 +83,7 @@ describe( 'deleteEntityRecord', () => {
 		);
 
 		// Release lock
-		expect( fulfillment.next().value.type ).toEqual(
-			'MOCKED_RELEASE_LOCK'
-		);
+		expect( fulfillment.next().value.type ).toEqual( '@@data/DISPATCH' );
 
 		expect( fulfillment.next() ).toMatchObject( {
 			done: true,
