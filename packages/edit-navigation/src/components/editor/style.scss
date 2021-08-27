@@ -108,7 +108,7 @@
 			position: absolute;
 			top: 15px;
 			left: 0;
-			padding: 0px;
+			padding: 0;
 			pointer-events: none;
 
 			svg {
@@ -120,8 +120,8 @@
 		}
 
 		// Point downwards when open.
-		.is-selected.has-child .wp-block-navigation-item__content .wp-block-navigation__submenu-icon svg,
-		.has-child-selected.has-child .wp-block-navigation-item__content .wp-block-navigation__submenu-icon svg {
+		.wp-block-navigation-submenu.is-selected > .wp-block-navigation-item__content > .wp-block-navigation__submenu-icon svg,
+		.wp-block-navigation-submenu.has-child-selected > .wp-block-navigation-item__content > .wp-block-navigation__submenu-icon svg {
 			transform: rotate(0deg);
 		}
 
