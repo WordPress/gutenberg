@@ -131,8 +131,8 @@ function gutenberg_render_spacing_gap_support( $block_content, $block ) {
 	// If there is no existing style attribute, add one to the wrapper element.
 	if ( $injected_style === $block_content ) {
 		$injected_style = preg_replace(
-			'/<([a-zA-Z]+)/',
-			'<$1 style="' . $style . '"',
+			'/<([a-zA-Z0-9]+)([ >])/',
+			'<$1 style="' . $style . '"$2',
 			$block_content,
 			1
 		);
