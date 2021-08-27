@@ -30,7 +30,7 @@
 		font-family: $default-font;
 
 		// Increase specificity.
-		.wp-block-navigation-link {
+		.wp-block-navigation-item {
 			display: block;
 
 			// Show submenus on click.
@@ -55,7 +55,7 @@
 
 			// Menu items.
 			// This needs high specificity to override inherited values.
-			&.wp-block-navigation-link.wp-block-navigation-link {
+			&.wp-block-navigation-item.wp-block-navigation-item {
 				margin-right: 0;
 			}
 
@@ -124,7 +124,7 @@
 		}
 
 		// Override inherited values to optimize menu items for the screen context.
-		.wp-block-navigation-link.has-child {
+		.wp-block-navigation-item.has-child {
 			cursor: default;
 			border-radius: $radius-block-ui;
 		}
@@ -137,7 +137,7 @@
 
 		// When editing a link with children, highlight the parent
 		// and adjust the spacing and submenu icon.
-		.wp-block-navigation-link.has-child.is-editing {
+		.wp-block-navigation-item.has-child.is-editing {
 			> .wp-block-navigation__container,
 			> .wp-block-navigation__submenu-container {
 				opacity: 1;

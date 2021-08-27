@@ -29,6 +29,7 @@ import {
 	filterURLForDisplay,
 	cleanForSlug,
 	getQueryArgs,
+	getFilename,
 } from '../';
 import wptData from './fixtures/wpt-data';
 
@@ -240,6 +241,7 @@ describe( 'isValidPath', () => {
 		expect( isValidPath( 'relative/path' ) ).toBe( true );
 		expect( isValidPath( 'slightly/longer/path/' ) ).toBe( true );
 		expect( isValidPath( 'path/with/percent%20encoding' ) ).toBe( true );
+		expect( isValidPath( '/' ) ).toBe( true );
 	} );
 
 	it( 'returns false if the path is invalid', () => {
@@ -249,6 +251,42 @@ describe( 'isValidPath', () => {
 		expect( isValidPath( 'path/with/number/symbol#' ) ).toBe( false );
 		expect( isValidPath( 'path/with/question/mark?' ) ).toBe( false );
 		expect( isValidPath( ' path/with/padding ' ) ).toBe( false );
+	} );
+} );
+
+describe( 'getFilename', () => {
+	it( 'returns the filename part of the URL', () => {
+		expect( getFilename( 'https://wordpress.org/image.jpg' ) ).toBe(
+			'image.jpg'
+		);
+		expect(
+			getFilename( 'https://wordpress.org/image.jpg?query=test' )
+		).toBe( 'image.jpg' );
+		expect( getFilename( 'https://wordpress.org/image.jpg#anchor' ) ).toBe(
+			'image.jpg'
+		);
+		expect(
+			getFilename( 'http://localhost:8080/a/path/to/an/image.jpg' )
+		).toBe( 'image.jpg' );
+		expect( getFilename( '/path/to/an/image.jpg' ) ).toBe( 'image.jpg' );
+		expect( getFilename( 'path/to/an/image.jpg' ) ).toBe( 'image.jpg' );
+		expect( getFilename( '/image.jpg' ) ).toBe( 'image.jpg' );
+		expect( getFilename( 'image.jpg' ) ).toBe( 'image.jpg' );
+	} );
+
+	it( 'returns undefined when the provided value does not contain a filename', () => {
+		expect( getFilename( 'http://localhost:8080/' ) ).toBe( undefined );
+		expect( getFilename( 'http://localhost:8080/a/path/' ) ).toBe(
+			undefined
+		);
+		expect( getFilename( 'http://localhost:8080/?query=test' ) ).toBe(
+			undefined
+		);
+		expect( getFilename( 'http://localhost:8080/#anchor' ) ).toBe(
+			undefined
+		);
+		expect( getFilename( 'a/path/' ) ).toBe( undefined );
+		expect( getFilename( '/' ) ).toBe( undefined );
 	} );
 } );
 

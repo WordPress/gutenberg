@@ -76,11 +76,6 @@ describe( '__unstableProcessPendingLockRequests', () => {
 	it( 'Grants a lock request that may be granted', async () => {
 		const fulfillment = __unstableProcessPendingLockRequests();
 
-		// Start
-		expect( fulfillment.next().value.type ).toBe(
-			'PROCESS_PENDING_LOCK_REQUESTS'
-		);
-
 		// Get pending lock requests
 		expect( fulfillment.next().value.type ).toBe( '@@data/SELECT' );
 
@@ -117,11 +112,6 @@ describe( '__unstableProcessPendingLockRequests', () => {
 	it( 'Does not grants a lock request that may not be granted', async () => {
 		const fulfillment = __unstableProcessPendingLockRequests();
 
-		// Start
-		expect( fulfillment.next().value.type ).toBe(
-			'PROCESS_PENDING_LOCK_REQUESTS'
-		);
-
 		// Get pending lock requests
 		expect( fulfillment.next().value.type ).toBe( '@@data/SELECT' );
 
@@ -139,11 +129,6 @@ describe( '__unstableProcessPendingLockRequests', () => {
 
 	it( 'Handles multiple lock requests', async () => {
 		const fulfillment = __unstableProcessPendingLockRequests();
-
-		// Start
-		expect( fulfillment.next().value.type ).toBe(
-			'PROCESS_PENDING_LOCK_REQUESTS'
-		);
 
 		// Get pending lock requests
 		expect( fulfillment.next().value.type ).toBe( '@@data/SELECT' );
@@ -201,10 +186,6 @@ describe( '__unstableAcquireStoreLock', () => {
 		// Start
 		expect( fulfillment.next().value.type ).toBe( 'ENQUEUE_LOCK_REQUEST' );
 
-		// Get pending lock requests
-		expect( fulfillment.next().value.type ).toBe(
-			'PROCESS_PENDING_LOCK_REQUESTS'
-		);
 		expect( fulfillment.next().value.type ).toBe( '@@data/SELECT' );
 
 		// Check if lock may be granted
@@ -243,10 +224,6 @@ describe( '__unstableAcquireStoreLock', () => {
 		// Start
 		expect( fulfillment.next().value.type ).toBe( 'ENQUEUE_LOCK_REQUEST' );
 
-		// Get pending lock requests
-		expect( fulfillment.next().value.type ).toBe(
-			'PROCESS_PENDING_LOCK_REQUESTS'
-		);
 		expect( fulfillment.next().value.type ).toBe( '@@data/SELECT' );
 
 		// Check if lock may be granted
@@ -286,10 +263,6 @@ describe( '__unstableReleaseStoreLock', () => {
 			lock,
 		} );
 
-		// Attempt to grant any pending lock requests, find none, return
-		expect( fulfillment.next().value.type ).toBe(
-			'PROCESS_PENDING_LOCK_REQUESTS'
-		);
 		expect( fulfillment.next().value.type ).toBe( '@@data/SELECT' );
 
 		// Short-circuit with no results and return
