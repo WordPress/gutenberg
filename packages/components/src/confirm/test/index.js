@@ -3,7 +3,7 @@
 /**
  * External dependencies
  */
-import { render, fireEvent } from '@testing-library/react';
+import { render, fireEvent, waitForElementToBeRemoved } from '@testing-library/react';
 
 /**
  * Internal dependencies
@@ -63,13 +63,18 @@ describe( 'Confirm', () => {
 				<Confirm onConfirm={ noop } onCancel={ noop } />
 			);
 
-			const overlay = wrapper.baseElement.querySelector(
-				'.components-modal__screen-overlay'
-			);
+			const frame = wrapper.baseElement.querySelector( '.components-modal__frame.components-confirm' );
+			/**
+			 * The overlay click is handled by detecting an onBlur from the modal frame.
+			 * See the `handeFocusOutside` function in the `ModalFrame` component
+			 * and the `withFocusOutside` HOC for moret details.
+			 */
 
-			fireEvent.click( overlay );
+			fireEvent.blur(frame);
 
-			expect( overlay ).toMatchSnapshot();
+			await waitForElementToBeRemoved(frame);
+
+			expect( wrapper ).toMatchSnapshot();
 		} );
 
 		it.skip( 'should call the confirm callback upon confirming', () => {} );
