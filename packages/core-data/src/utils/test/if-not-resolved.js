@@ -54,4 +54,23 @@ describe( 'ifNotResolved', () => {
 
 		expect( originalResolver ).toHaveBeenCalledTimes( 0 );
 	} );
+
+	it( 'returns a promise when the resolver was not already resolved', async () => {
+		const select = { hasStartedResolution: () => false };
+		let thunkRetval;
+		const dispatch = jest.fn( ( thunk ) => {
+			thunkRetval = thunk();
+			return thunkRetval;
+		} );
+
+		const originalResolver = jest.fn( () => () =>
+			Promise.resolve( 'success!' )
+		);
+
+		const resolver = ifNotResolved( originalResolver, 'originalResolver' );
+		const result = resolver()( { select, dispatch } );
+
+		await expect( result ).resolves.toBe( undefined );
+		await expect( thunkRetval ).resolves.toBe( 'success!' );
+	} );
 } );

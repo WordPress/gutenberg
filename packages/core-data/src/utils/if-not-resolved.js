@@ -10,12 +10,12 @@
  *
  * @return {Function} Enhanced resolver.
  */
-const ifNotResolved = ( resolver, selectorName ) => ( ...args ) => ( {
+const ifNotResolved = ( resolver, selectorName ) => ( ...args ) => async ( {
 	select,
 	dispatch,
 } ) => {
 	if ( ! select.hasStartedResolution( selectorName, args ) ) {
-		dispatch( resolver( ...args ) );
+		await dispatch( resolver( ...args ) );
 	}
 };
 
