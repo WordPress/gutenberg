@@ -59,22 +59,27 @@ describe( 'global styles provider', () => {
 	} );
 
 	describe( 'when a block enables color support', () => {
-		it( 'automatically enables text color and background color supports', () => {
-			act( () => {
-				dispatch( 'core/blocks' ).addBlockTypes(
-					generateCoverBlockType( { link: true } )
-				);
-			} );
+		describe( 'and disables background color support', () => {
+			it( 'still enables text color support', () => {
+				act( () => {
+					dispatch( 'core/blocks' ).addBlockTypes(
+						generateCoverBlockType( {
+							link: true,
+							background: false,
+						} )
+					);
+				} );
 
-			const wrapper = generateWrapper();
-			const actual = wrapper
-				.findWhere( ( ele ) => Boolean( ele.prop( 'supports' ) ) )
-				.prop( 'supports' );
-			expect( actual ).toContain( 'backgroundColor' );
-			expect( actual ).toContain( 'color' );
+				const wrapper = generateWrapper();
+				const actual = wrapper
+					.findWhere( ( ele ) => Boolean( ele.prop( 'supports' ) ) )
+					.prop( 'supports' );
+				expect( actual ).not.toContain( 'backgroundColor' );
+				expect( actual ).toContain( 'color' );
 
-			act( () => {
-				dispatch( 'core/blocks' ).removeBlockTypes( 'core/cover' );
+				act( () => {
+					dispatch( 'core/blocks' ).removeBlockTypes( 'core/cover' );
+				} );
 			} );
 		} );
 
@@ -103,7 +108,7 @@ describe( 'global styles provider', () => {
 		} );
 
 		describe( 'and text color and background color supports are omitted', () => {
-			it( 'still enables text color and background color supports', () => {
+			it( 'still enables both text color and background color supports', () => {
 				act( () => {
 					dispatch( 'core/blocks' ).addBlockTypes(
 						generateCoverBlockType( { link: true } )
