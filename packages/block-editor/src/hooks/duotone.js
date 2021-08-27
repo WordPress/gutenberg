@@ -93,6 +93,8 @@ ${ selector } {
 				<defs>
 					<filter id={ id }>
 						<feColorMatrix
+							// Use sRGB instead of linearRGB to be consistent with how CSS gradients work.
+							colorInterpolationFilters="sRGB"
 							type="matrix"
 							// Use perceptual brightness to convert to grayscale.
 							values="

@@ -381,6 +381,7 @@ function gutenberg_render_duotone_support( $block_content, $block ) {
 		<defs>
 			<filter id="<?php echo esc_attr( $duotone_id ); ?>">
 				<feColorMatrix
+					color-interpolation-filters="sRGB"
 					type="matrix"
 					values="
 						.299 .587 .114 0 0
