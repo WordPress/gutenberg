@@ -38,9 +38,6 @@ export function* __unstableReleaseStoreLock( lock ) {
 }
 
 export function* __unstableProcessPendingLockRequests() {
-	yield {
-		type: 'PROCESS_PENDING_LOCK_REQUESTS',
-	};
 	const lockRequests = yield controls.select(
 		STORE_NAME,
 		'__unstableGetPendingLockRequests'
