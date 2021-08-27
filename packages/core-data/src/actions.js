@@ -662,7 +662,7 @@ export const saveEditedEntityRecord = (
 		recordId
 	);
 	const record = { id: recordId, ...edits };
-	return await dispatch( saveEntityRecord( kind, name, record, options ) );
+	return await dispatch.saveEntityRecord( kind, name, record, options );
 };
 
 /**
