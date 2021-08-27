@@ -35,7 +35,7 @@ class GB_REST_Widget_Render_Endpoint_Polyfill extends \WP_REST_Widget_Types_Cont
 					'permission_callback' => array( $this, 'get_item_permissions_check' ),
 					'callback'            => array( $this, 'render' ),
 					'args'                => array(
-						'id_base'  => array(
+						'id'  => array(
 							'description' => __( 'The widget type id.', 'default' ),
 							'type'        => 'string',
 							'required'    => true,
@@ -60,7 +60,7 @@ class GB_REST_Widget_Render_Endpoint_Polyfill extends \WP_REST_Widget_Types_Cont
 	public function render( $request ) {
 		return array(
 			'preview' => $this->render_legacy_widget_preview_iframe(
-				$request['id_base'],
+				$request['id'],
 				isset( $request['instance'] ) ? $request['instance'] : null
 			),
 		);
