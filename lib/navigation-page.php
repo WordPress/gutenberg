@@ -33,9 +33,9 @@ function gutenberg_navigation_init( $hook ) {
 	}
 
 	$preload_paths = array(
-			'/__experimental/menu-locations',
-			array( '/wp/v2/pages', 'OPTIONS' ),
-			array( '/wp/v2/posts', 'OPTIONS' ),
+		'/__experimental/menu-locations',
+		array( '/wp/v2/pages', 'OPTIONS' ),
+		array( '/wp/v2/posts', 'OPTIONS' ),
 	);
 
 	$settings = array_merge(
