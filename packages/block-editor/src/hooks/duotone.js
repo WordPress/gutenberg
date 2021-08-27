@@ -93,7 +93,7 @@ ${ selector } {
 				<defs>
 					<filter id={ id }>
 						<feColorMatrix
-							// Use sRGB instead of linearRGB to be consistent with how CSS gradients work.
+							// Use sRGB instead of linearRGB so transparency looks correct.
 							colorInterpolationFilters="sRGB"
 							type="matrix"
 							// Use perceptual brightness to convert to grayscale.
@@ -125,7 +125,11 @@ ${ selector } {
 								tableValues={ values.a.join( ' ' ) }
 							/>
 						</feComponentTransfer>
-						<feComposite in2="SourceGraphic" operator="in" />
+						<feComposite
+							// Re-mask the image with the original transparency since the feColorMatrix above loses that information.
+							in2="SourceGraphic"
+							operator="in"
+						/>
 					</filter>
 				</defs>
 			</SVG>
