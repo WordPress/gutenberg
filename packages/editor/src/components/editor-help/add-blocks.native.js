@@ -7,6 +7,7 @@ import { View } from 'react-native';
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
+import { usePreferredColorScheme } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -15,9 +16,16 @@ import styles from './style.scss';
 import { HelpDetailBodyText, HelpDetailImage } from './view-sections';
 
 const AddBlocks = () => {
+	const darkModeEnabled = usePreferredColorScheme() === 'dark';
 	return (
 		<>
-			<HelpDetailImage source={ require( './images/add-blocks.png' ) } />
+			<HelpDetailImage
+				source={
+					darkModeEnabled
+						? require( './images/add-dark.png' )
+						: require( './images/add-light.png' )
+				}
+			/>
 			<View style={ styles.helpDetailContainer }>
 				<HelpDetailBodyText
 					text={ __(

@@ -7,7 +7,10 @@ import { View, Text } from 'react-native';
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { usePreferredColorSchemeStyle } from '@wordpress/compose';
+import {
+	usePreferredColorSchemeStyle,
+	usePreferredColorScheme,
+} from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -24,10 +27,11 @@ const IntroToBlocks = () => {
 		styles.helpDetailTitle,
 		styles.helpDetailTitleDark
 	);
+	const darkModeEnabled = usePreferredColorScheme() === 'dark';
 	return (
 		<>
 			<HelpDetailImage
-				source={ require( './images/intro-blocks-1.png' ) }
+				source={ require( './images/block-layout-collage.png' ) }
 			/>
 			<View style={ styles.helpDetailContainer }>
 				<Text
@@ -55,7 +59,11 @@ const IntroToBlocks = () => {
 					accessibilityLabel={ __(
 						'Text formatting controls are located within the toolbar positioned above the keyboard while editing a text block'
 					) }
-					source={ require( './images/intro-blocks-2.png' ) }
+					source={
+						darkModeEnabled
+							? require( './images/rich-text-dark.png' )
+							: require( './images/rich-text-light.png' )
+					}
 				/>
 				<HelpDetailSectionHeadingText text={ __( 'Embed media' ) } />
 				<HelpDetailBodyText
@@ -64,7 +72,11 @@ const IntroToBlocks = () => {
 					) }
 				/>
 				<HelpDetailImage
-					source={ require( './images/intro-blocks-3.png' ) }
+					source={
+						darkModeEnabled
+							? require( './images/embed-media-dark.png' )
+							: require( './images/embed-media-light.png' )
+					}
 				/>
 				<HelpDetailSectionHeadingText text={ __( 'Build layouts' ) } />
 				<HelpDetailBodyText
@@ -73,7 +85,11 @@ const IntroToBlocks = () => {
 					) }
 				/>
 				<HelpDetailImage
-					source={ require( './images/intro-blocks-4.png' ) }
+					source={
+						darkModeEnabled
+							? require( './images/build-layouts-dark.png' )
+							: require( './images/build-layouts-light.png' )
+					}
 				/>
 				<HelpDetailBodyText
 					text={ __(
