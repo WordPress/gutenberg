@@ -694,13 +694,14 @@ describe( 'Widgets Customizer', () => {
 		// Expect pressing the Escape key to enter navigation mode,
 		// but not close the editor.
 		await page.keyboard.press( 'Escape' );
+
+		expect( console ).toHaveErrored( twentyTwentyError );
+
 		await expect( {
 			text: /^You are currently in navigation mode\./,
 			selector: '*[aria-live="polite"][aria-relevant="additions text"]',
 		} ).toBeFound();
 		await expect( paragraphBlock ).toBeVisible();
-
-		expect( console ).toHaveErrored( twentyTwentyError );
 	} );
 
 	it( 'should move (inner) blocks to another sidebar', async () => {
