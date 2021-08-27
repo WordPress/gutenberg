@@ -16,7 +16,11 @@
 		"align": [ "wide", "full" ],
 		"typography": {
 			"fontSize": true,
-			"lineHeight": true
+			"lineHeight": true,
+			"__experimentalDefaultControls": {
+				"fontSize": true,
+				"lineHeight": true
+			}
 		},
 		"color": {
 			"gradients": true,

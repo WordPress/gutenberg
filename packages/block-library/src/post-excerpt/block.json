@@ -30,7 +30,11 @@
 		},
 		"typography": {
 			"fontSize": true,
-			"lineHeight": true
+			"lineHeight": true,
+			"__experimentalDefaultControls": {
+				"fontSize": true,
+				"lineHeight": true
+			}
 		}
 	},
 	"editorStyle": "wp-block-post-excerpt-editor",

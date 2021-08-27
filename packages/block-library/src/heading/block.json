@@ -38,7 +38,11 @@
 		"typography": {
 			"fontSize": true,
 			"lineHeight": true,
-			"__experimentalFontWeight": true
+			"__experimentalFontWeight": true,
+			"__experimentalDefaultControls": {
+				"fontSize": true,
+				"lineHeight": true
+			}
 		},
 		"__experimentalSelector": "h1,h2,h3,h4,h5,h6",
 		"__unstablePasteTextInline": true,

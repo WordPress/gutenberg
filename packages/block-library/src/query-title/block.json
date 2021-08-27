@@ -29,7 +29,11 @@
 		"typography": {
 			"fontSize": true,
 			"lineHeight": true,
-			"__experimentalFontFamily": true
+			"__experimentalFontFamily": true,
+			"__experimentalDefaultControls": {
+				"fontSize": true,
+				"lineHeight": true
+			}
 		}
 	},
 	"editorStyle": "wp-block-query-title-editor"

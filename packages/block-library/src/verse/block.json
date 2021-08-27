@@ -27,7 +27,10 @@
 		},
 		"typography": {
 			"fontSize": true,
-			"__experimentalFontFamily": true
+			"__experimentalFontFamily": true,
+			"__experimentalDefaultControls": {
+				"fontSize": true
+			}
 		},
 		"spacing": {
 			"padding": true

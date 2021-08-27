@@ -21,7 +21,10 @@
 			"gradients": true
 		},
 		"typography": {
-			"fontSize": true
+			"fontSize": true,
+			"__experimentalDefaultControls": {
+				"fontSize": true
+			}
 		}
 	},
 	"style": "wp-block-preformatted"
