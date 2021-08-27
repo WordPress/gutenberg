@@ -366,12 +366,12 @@ function gutenberg_render_duotone_support( $block_content, $block ) {
 			<filter id="<?php echo esc_attr( $duotone_id ); ?>">
 				<feColorMatrix
 					type="matrix"
-					<?php // phpcs:disable Generic.WhiteSpace.DisallowSpaceIndent ?>
-					values=".299 .587 .114 0 0
-							.299 .587 .114 0 0
-							.299 .587 .114 0 0
-							.299 .587 .114 0 0"
-					<?php // phpcs:enable Generic.WhiteSpace.DisallowSpaceIndent ?>
+					values="
+						.299 .587 .114 0 0
+						.299 .587 .114 0 0
+						.299 .587 .114 0 0
+						.299 .587 .114 0 0
+					"
 				/>
 				<feComponentTransfer color-interpolation-filters="sRGB" >
 					<feFuncR type="table" tableValues="<?php echo esc_attr( implode( ' ', $duotone_values['r'] ) ); ?>" />

@@ -95,11 +95,12 @@ ${ selector } {
 						<feColorMatrix
 							type="matrix"
 							// Use perceptual brightness to convert to grayscale.
-							// prettier-ignore
-							values=".299 .587 .114 0 0
-							        .299 .587 .114 0 0
-							        .299 .587 .114 0 0
-							        .299 .587 .114 0 0"
+							values="
+								.299 .587 .114 0 0
+								.299 .587 .114 0 0
+								.299 .587 .114 0 0
+								.299 .587 .114 0 0
+							"
 						/>
 						<feComponentTransfer
 							// Use sRGB instead of linearRGB to be consistent with how CSS gradients work.
