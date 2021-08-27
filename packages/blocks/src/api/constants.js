@@ -72,10 +72,6 @@ export const __EXPERIMENTAL_STYLE_PROPERTY = {
 		value: [ 'typography', 'fontWeight' ],
 		support: [ 'typography', '__experimentalFontWeight' ],
 	},
-	'--wp--style--block-gap': {
-		value: [ 'spacing', 'blockGap' ],
-		support: [ 'spacing', 'blockGap' ],
-	},
 	lineHeight: {
 		value: [ 'typography', 'lineHeight' ],
 		support: [ 'typography', 'lineHeight' ],
@@ -114,6 +110,7 @@ export const __EXPERIMENTAL_STYLE_PROPERTY = {
 	},
 	'--wp--style--block-gap': {
 		value: [ 'spacing', 'blockGap' ],
+		support: [ 'spacing', 'blockGap' ],
 	},
 };
 
