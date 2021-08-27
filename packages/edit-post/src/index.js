@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { store as blocksStore, registerBlockType } from '@wordpress/blocks';
+import { registerBlockType } from '@wordpress/blocks';
 import {
 	registerCoreBlocks,
 	__experimentalRegisterExperimentalCoreBlocks,
@@ -131,8 +131,7 @@ export function initializeEditor(
 		);
 	}
 
-	dispatch( blocksStore ).__experimentalReapplyBlockTypeFilters();
-
+	// dispatch( blocksStore ).__experimentalReapplyBlockTypeFilters();
 	registerCoreBlocks();
 	if ( process.env.GUTENBERG_PHASE === 2 ) {
 		__experimentalRegisterExperimentalCoreBlocks( {
