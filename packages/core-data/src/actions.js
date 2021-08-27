@@ -535,11 +535,7 @@ export const saveEntityRecord = (
 					method: recordId ? 'PUT' : 'POST',
 					data: edits,
 				};
-				if ( __unstableFetch ) {
-					updatedRecord = await __unstableFetch( options );
-				} else {
-					updatedRecord = await triggerFetch( options );
-				}
+				updatedRecord = await __unstableFetch( options );
 				await dispatch.receiveEntityRecords(
 					kind,
 					name,
