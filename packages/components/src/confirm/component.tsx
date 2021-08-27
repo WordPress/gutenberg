@@ -28,12 +28,10 @@ function Confirm(
 	props: PolymorphicComponentProps< OwnProps, 'div', false >,
 	forwardedRef: Ref< any >
 ) {
-	const {
-		message,
-		onConfirm,
-		onCancel,
-		...otherProps
-	} = useContextSystem( props, 'Confirm' );
+	const { message, onConfirm, onCancel, ...otherProps } = useContextSystem(
+		props,
+		'Confirm'
+	);
 
 	const [ isOpen, setIsOpen ] = useState( true );
 
