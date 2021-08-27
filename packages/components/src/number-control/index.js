@@ -17,7 +17,6 @@ import { Input } from './styles/number-control-styles';
 import * as inputControlActionTypes from '../input-control/reducer/actions';
 import { composeStateReducers } from '../input-control/reducer/reducer';
 import { add, subtract, roundClamp } from '../utils/math';
-import { useJumpStep } from '../utils/hooks';
 import { isValueEmpty } from '../utils/values';
 
 export function NumberControl(
@@ -40,13 +39,14 @@ export function NumberControl(
 	},
 	ref
 ) {
-	const baseValue = roundClamp( 0, min, max, step );
-
-	const jumpStep = useJumpStep( {
-		step,
-		shiftStep,
-		isShiftStepEnabled,
-	} );
+	const baseStep = step === 'any' ? 1 : parseFloat( step );
+	const baseValue = roundClamp( 0, min, max, baseStep );
+	const constrainValue = ( value ) => {
+		// When step is "any" clamp the value, otherwise round and clamp it
+		return step === 'any'
+			? Math.min( max, Math.max( min, value ) )
+			: roundClamp( value, min, max, baseStep );
+	};
 
 	const autoComplete = typeProp === 'number' ? 'off' : null;
 	const classes = classNames( 'components-number-control', className );
@@ -75,8 +75,8 @@ export function NumberControl(
 			const enableShift = event.shiftKey && isShiftStepEnabled;
 
 			const incrementalValue = enableShift
-				? parseFloat( shiftStep ) * parseFloat( step )
-				: parseFloat( step );
+				? parseFloat( shiftStep ) * baseStep
+				: baseStep;
 			let nextValue = isValueEmpty( currentValue )
 				? baseValue
 				: currentValue;
@@ -105,8 +105,8 @@ export function NumberControl(
 			const { delta, shiftKey } = payload;
 			const [ x, y ] = delta;
 			const modifier = shiftKey
-				? parseFloat( shiftStep ) * parseFloat( step )
-				: parseFloat( step );
+				? parseFloat( shiftStep ) * baseStep
+				: baseStep;
 
 			let directionModifier;
 			let directionBaseValue;
@@ -159,7 +159,7 @@ export function NumberControl(
 
 			state.value = applyEmptyValue
 				? currentValue
-				: roundClamp( currentValue, min, max, step );
+				: constrainValue( currentValue );
 		}
 
 		return state;
@@ -179,7 +179,7 @@ export function NumberControl(
 			min={ min }
 			ref={ ref }
 			required={ required }
-			step={ jumpStep }
+			step={ step }
 			type={ typeProp }
 			value={ valueProp }
 			__unstableStateReducer={ composeStateReducers(
