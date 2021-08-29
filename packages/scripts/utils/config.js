@@ -131,13 +131,14 @@ const getWebpackArgs = () => {
 		// The following handles the support for multiple entry points in webpack, e.g.:
 		// `wp-scripts build one.js custom=./two.js` -> `webpack one=./one.js custom=./two.js`
 		webpackArgs = webpackArgs.reduce( ( args, cliArg ) => {
-			if (
-				getFileArgsFromCLI().includes( cliArg ) &&
-				! cliArg.includes( '=' )
-			) {
-				args.push( ...pathToEntry( cliArg ) );
-			} else {
+			if ( ! getFileArgsFromCLI().includes( cliArg ) ) {
 				args.push( cliArg );
+				return args;
+			}
+			if ( cliArg.includes( '=' ) ) {
+				args.push( '--env', 'entries.' + cliArg );
+			} else {
+				args.push( ...pathToEntry( cliArg ) );
 			}
 			return args;
 		}, [] );
