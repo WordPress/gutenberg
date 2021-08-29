@@ -486,6 +486,9 @@ export function* __unstableCreateTemplate( template ) {
 
 let metaBoxesInitialized = false;
 
+/**
+ * Initializes WordPress `postboxes` script and the logic for saving meta boxes.
+ */
 export function* initializeMetaBoxes() {
 	const isEditorReady = yield controls.select(
 		editorStore,

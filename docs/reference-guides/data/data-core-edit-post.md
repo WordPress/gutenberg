@@ -365,7 +365,7 @@ _Returns_
 
 ### initializeMetaBoxes
 
-Undocumented declaration.
+Initializes WordPress `postboxes` script and the logic for saving meta boxes.
 
 ### metaBoxUpdatesFailure
 
