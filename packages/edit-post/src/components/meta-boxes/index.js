@@ -46,10 +46,10 @@ export default function MetaBoxes( { location } ) {
 	// saving. This initializes all meta box locations, not just this specific
 	// one.
 	useEffect( () => {
-		if ( isEditorReady ) {
+		if ( isEditorReady && ! metaBoxesInitialized ) {
 			registry.dispatch( editPostStore ).initializeMetaBoxes();
 		}
-	}, [ isEditorReady ] );
+	}, [ isEditorReady, metaBoxesInitialized ] );
 
 	if ( ! metaBoxesInitialized ) {
 		return null;
