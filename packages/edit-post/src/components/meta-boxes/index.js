@@ -8,7 +8,7 @@ import { map } from 'lodash';
  */
 import { useSelect, subscribe, dispatch } from '@wordpress/data';
 import { store as editorStore } from '@wordpress/editor';
-import { useEffect, useState } from '@wordpress/element';
+import { useEffect, useRef } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -18,7 +18,7 @@ import MetaBoxVisibility from './meta-box-visibility';
 import { store as editPostStore } from '../../store';
 
 export default function MetaBoxes( { location } ) {
-	const { isReady, metaBoxes, isVisible, postType } = useSelect(
+	const { isEditorReady, metaBoxes, isVisible, postType } = useSelect(
 		( select ) => {
 			const { __unstableIsEditorReady, getCurrentPostType } = select(
 				editorStore
@@ -28,7 +28,7 @@ export default function MetaBoxes( { location } ) {
 				getMetaBoxesPerLocation,
 			} = select( editPostStore );
 			return {
-				isReady: __unstableIsEditorReady(),
+				isEditorReady: __unstableIsEditorReady(),
 				metaBoxes: getMetaBoxesPerLocation( location ),
 				isVisible: isMetaBoxLocationVisible( location ),
 				postType: getCurrentPostType(),
@@ -37,13 +37,17 @@ export default function MetaBoxes( { location } ) {
 	);
 	const { isSavingPost, isAutosavingPost } = useSelect( editorStore );
 	const { hasMetaBoxes } = useSelect( editPostStore );
-	const [ initialized, setInitialized ] = useState( false );
+	const initialized = useRef( false );
 
 	// When editor is ready, initialize postboxes (wp core script) and metabox
 	// saving.
 	useEffect( () => {
-		if ( postType !== undefined && isReady && ! initialized ) {
-			setInitialized( true );
+		if (
+			postType !== undefined &&
+			isEditorReady &&
+			! initialized.current
+		) {
+			initialized.current = true;
 
 			if ( window.postboxes.page !== postType ) {
 				window.postboxes.add_postbox_toggles( postType );
@@ -75,9 +79,9 @@ export default function MetaBoxes( { location } ) {
 				}
 			} );
 		}
-	}, [ isReady, postType, initialized ] );
+	}, [ isEditorReady, postType ] );
 
-	if ( ! isReady ) {
+	if ( ! isEditorReady ) {
 		return null;
 	}
 
