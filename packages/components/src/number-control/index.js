@@ -41,11 +41,11 @@ export function NumberControl(
 ) {
 	const baseStep = step === 'any' ? 1 : parseFloat( step );
 	const baseValue = roundClamp( 0, min, max, baseStep );
-	const constrainValue = ( value ) => {
+	const constrainValue = ( value, stepOverride ) => {
 		// When step is "any" clamp the value, otherwise round and clamp it
 		return step === 'any'
 			? Math.min( max, Math.max( min, value ) )
-			: roundClamp( value, min, max, baseStep );
+			: roundClamp( value, min, max, stepOverride ?? baseStep );
 	};
 
 	const autoComplete = typeProp === 'number' ? 'off' : null;
@@ -93,58 +93,54 @@ export function NumberControl(
 				nextValue = subtract( nextValue, incrementalValue );
 			}
 
-			nextValue = roundClamp( nextValue, min, max, incrementalValue );
-
-			state.value = nextValue;
+			state.value = constrainValue(
+				nextValue,
+				enableShift ? incrementalValue : null
+			);
 		}
 
 		/**
 		 * Handles drag to update events
 		 */
 		if ( type === inputControlActionTypes.DRAG && isDragEnabled ) {
-			const { delta, shiftKey } = payload;
-			const [ x, y ] = delta;
-			const modifier = shiftKey
+			const [ x, y ] = payload.delta;
+			const modifier = payload.shiftKey
 				? parseFloat( shiftStep ) * baseStep
 				: baseStep;
 
 			let directionModifier;
-			let directionBaseValue;
+			let delta;
 
 			switch ( dragDirection ) {
 				case 'n':
-					directionBaseValue = y;
+					delta = y;
 					directionModifier = -1;
 					break;
 
 				case 'e':
-					directionBaseValue = x;
+					delta = x;
 					directionModifier = isRTL() ? -1 : 1;
 					break;
 
 				case 's':
-					directionBaseValue = y;
+					delta = y;
 					directionModifier = 1;
 					break;
 
 				case 'w':
-					directionBaseValue = x;
+					delta = x;
 					directionModifier = isRTL() ? 1 : -1;
 					break;
 			}
 
-			const distance = directionBaseValue * modifier * directionModifier;
-			let nextValue;
+			if ( delta !== 0 ) {
+				delta = Math.ceil( Math.abs( delta ) ) * Math.sign( delta );
+				const distance = delta * modifier * directionModifier;
 
-			if ( distance !== 0 ) {
-				nextValue = roundClamp(
+				state.value = constrainValue(
 					add( currentValue, distance ),
-					min,
-					max,
-					modifier
+					payload.shiftKey ? modifier : null
 				);
-
-				state.value = nextValue;
 			}
 		}
 
