@@ -34,7 +34,8 @@ export default function MetaBoxes( { location } ) {
 				isVisible: isMetaBoxLocationVisible( location ),
 				postType: getCurrentPostType(),
 			};
-		}
+		},
+		[ location ]
 	);
 	const { isSavingPost, isAutosavingPost } = useSelect( editorStore );
 	const { hasMetaBoxes } = useSelect( editPostStore );
