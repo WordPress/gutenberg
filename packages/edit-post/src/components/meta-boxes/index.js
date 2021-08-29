@@ -6,7 +6,7 @@ import { map } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { useSelect, subscribe, dispatch } from '@wordpress/data';
+import { useSelect, useRegistry } from '@wordpress/data';
 import { store as editorStore } from '@wordpress/editor';
 import { useEffect, useRef } from '@wordpress/element';
 
@@ -18,6 +18,7 @@ import MetaBoxVisibility from './meta-box-visibility';
 import { store as editPostStore } from '../../store';
 
 export default function MetaBoxes( { location } ) {
+	const registry = useRegistry();
 	const { isEditorReady, metaBoxes, isVisible, postType } = useSelect(
 		( select ) => {
 			const { __unstableIsEditorReady, getCurrentPostType } = select(
@@ -57,7 +58,7 @@ export default function MetaBoxes( { location } ) {
 			let wasAutosavingPost = isAutosavingPost();
 
 			// Save metaboxes when performing a full save on the post.
-			subscribe( () => {
+			registry.subscribe( () => {
 				// Save metaboxes on save completion, except for autosaves that are not a post preview.
 				//
 				// Meta boxes are initialized once at page load. It is not necessary to
@@ -75,7 +76,7 @@ export default function MetaBoxes( { location } ) {
 				wasAutosavingPost = isAutosavingPost();
 
 				if ( shouldTriggerMetaboxesSave ) {
-					dispatch( editPostStore ).requestMetaBoxUpdates();
+					registry.dispatch( editPostStore ).requestMetaBoxUpdates();
 				}
 			} );
 		}
