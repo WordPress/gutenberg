@@ -8,6 +8,7 @@ import { map } from 'lodash';
  */
 import { useSelect, useRegistry } from '@wordpress/data';
 import { useEffect } from '@wordpress/element';
+import { store as editorStore } from '@wordpress/editor';
 
 /**
  * Internal dependencies
@@ -18,8 +19,14 @@ import { store as editPostStore } from '../../store';
 
 export default function MetaBoxes( { location } ) {
 	const registry = useRegistry();
-	const { metaBoxes, isVisible, metaBoxesInitialized } = useSelect(
+	const {
+		metaBoxes,
+		isVisible,
+		metaBoxesInitialized,
+		isEditorReady,
+	} = useSelect(
 		( select ) => {
+			const { __unstableIsEditorReady } = select( editorStore );
 			const {
 				isMetaBoxLocationVisible,
 				getMetaBoxesPerLocation,
@@ -29,6 +36,7 @@ export default function MetaBoxes( { location } ) {
 				metaBoxes: getMetaBoxesPerLocation( location ),
 				isVisible: isMetaBoxLocationVisible( location ),
 				metaBoxesInitialized: _metaBoxesInitialized(),
+				isEditorReady: __unstableIsEditorReady(),
 			};
 		},
 		[ location ]
@@ -38,10 +46,10 @@ export default function MetaBoxes( { location } ) {
 	// saving. This initializes all meta box locations, not just this specific
 	// one.
 	useEffect( () => {
-		if ( ! metaBoxesInitialized ) {
+		if ( isEditorReady ) {
 			registry.dispatch( editPostStore ).initializeMetaBoxes();
 		}
-	}, [ metaBoxesInitialized ] );
+	}, [ isEditorReady ] );
 
 	if ( ! metaBoxesInitialized ) {
 		return null;
