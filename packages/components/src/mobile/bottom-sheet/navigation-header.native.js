@@ -17,6 +17,7 @@ import styles from './styles.scss';
 import chevronBack from './chevron-back';
 
 function BottomSheetNavigationHeader( {
+	leftButtonText,
 	leftButtonOnPress,
 	screen,
 	applyButtonOnPress,
@@ -57,7 +58,13 @@ function BottomSheetNavigationHeader( {
 					style={ chevronLeftStyle }
 				/>
 			);
-			backText = isFullscreen ? __( 'Cancel' ) : __( 'Back' );
+			if ( leftButtonText ) {
+				backText = leftButtonText;
+			} else if ( isFullscreen ) {
+				backText = __( 'Cancel' );
+			} else {
+				backText = __( 'Back' );
+			}
 		} else {
 			backIcon = (
 				<Icon
@@ -77,7 +84,7 @@ function BottomSheetNavigationHeader( {
 					'Navigates to the previous content sheet'
 				) }
 			>
-				<View style={ styles.bottomSheetBackButton }>
+				<View style={ styles.bottomSheetActionButton }>
 					<>
 						{ backIcon }
 						{ backText && (
@@ -96,40 +103,43 @@ function BottomSheetNavigationHeader( {
 
 	return (
 		<View style={ styles.bottomSheetHeader }>
-			{ renderBackButton() }
+			<View style={ styles.bottomSheetHeaderLeft }>
+				{ renderBackButton() }
+			</View>
 			<Text
+				accessibilityRole="header"
 				style={ bottomSheetHeaderTitleStyle }
 				maxFontSizeMultiplier={ 3 }
 			>
 				{ screen }
 			</Text>
-			{ !! applyButtonOnPress ? (
-				<TouchableWithoutFeedback
-					onPress={ applyButtonOnPress }
-					accessibilityRole={ 'button' }
-					accessibilityLabel={ __( 'Apply' ) }
-					accessibilityHint={ __( 'Applies the setting' ) }
-				>
-					<View style={ styles.bottomSheetApplyButton }>
-						{ isIOS ? (
-							<Text
-								style={ bottomSheetButtonTextStyle }
-								maxFontSizeMultiplier={ 2 }
-							>
-								{ __( 'Apply' ) }
-							</Text>
-						) : (
-							<Icon
-								icon={ check }
-								size={ 24 }
-								style={ applyButtonStyle }
-							/>
-						) }
-					</View>
-				</TouchableWithoutFeedback>
-			) : (
-				<View style={ styles.bottomSheetRightSpace } />
-			) }
+			<View style={ styles.bottomSheetHeaderRight }>
+				{ !! applyButtonOnPress && (
+					<TouchableWithoutFeedback
+						onPress={ applyButtonOnPress }
+						accessibilityRole={ 'button' }
+						accessibilityLabel={ __( 'Apply' ) }
+						accessibilityHint={ __( 'Applies the setting' ) }
+					>
+						<View style={ styles.bottomSheetActionButton }>
+							{ isIOS ? (
+								<Text
+									style={ bottomSheetButtonTextStyle }
+									maxFontSizeMultiplier={ 2 }
+								>
+									{ __( 'Apply' ) }
+								</Text>
+							) : (
+								<Icon
+									icon={ check }
+									size={ 24 }
+									style={ applyButtonStyle }
+								/>
+							) }
+						</View>
+					</TouchableWithoutFeedback>
+				) }
+			</View>
 		</View>
 	);
 }

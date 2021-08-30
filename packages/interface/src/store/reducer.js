@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { get } from 'lodash';
+import { flow, get } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -78,6 +78,59 @@ export function multipleEnableItems(
 	};
 }
 
+/**
+ * Reducer returning the defaults for user preferences.
+ *
+ * This is kept intentionally separate from the preferences
+ * themselves so that defaults are not persisted.
+ *
+ * @param {Object} state  Current state.
+ * @param {Object} action Dispatched action.
+ *
+ * @return {Object} Updated state.
+ */
+export const preferenceDefaults = flow( [ combineReducers ] )( {
+	features( state = {}, action ) {
+		if ( action.type === 'SET_FEATURE_DEFAULTS' ) {
+			const { scope, defaults } = action;
+			return {
+				...state,
+				[ scope ]: {
+					...state[ scope ],
+					...defaults,
+				},
+			};
+		}
+
+		return state;
+	},
+} );
+
+/**
+ * Reducer returning the user preferences.
+ *
+ * @param {Object} state  Current state.
+ * @param {Object} action Dispatched action.
+ *
+ * @return {Object} Updated state.
+ */
+export const preferences = flow( [ combineReducers ] )( {
+	features( state = {}, action ) {
+		if ( action.type === 'SET_FEATURE_VALUE' ) {
+			const { scope, featureName, value } = action;
+			return {
+				...state,
+				[ scope ]: {
+					...state[ scope ],
+					[ featureName ]: value,
+				},
+			};
+		}
+
+		return state;
+	},
+} );
+
 const enableItems = combineReducers( {
 	singleEnableItems,
 	multipleEnableItems,
@@ -85,4 +138,6 @@ const enableItems = combineReducers( {
 
 export default combineReducers( {
 	enableItems,
+	preferenceDefaults,
+	preferences,
 } );

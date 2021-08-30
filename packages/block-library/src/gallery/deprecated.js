@@ -10,9 +10,17 @@ import { map, some } from 'lodash';
 import { RichText } from '@wordpress/block-editor';
 
 /**
- * Internal dependencies
+ * Original function to determine default number of columns from a block's
+ * attributes.
+ *
+ * Used in deprecations: v1-6, for versions of the gallery block that didn't use inner blocks.
+ *
+ * @param {Object} attributes Block attributes.
+ * @return {number}           Default number of columns for the gallery.
  */
-import { defaultColumnsNumber } from './shared';
+export function defaultColumnsNumberV1( attributes ) {
+	return Math.min( 3, attributes.images.length );
+}
 
 const deprecated = [
 	{
@@ -114,7 +122,7 @@ const deprecated = [
 		save( { attributes } ) {
 			const {
 				images,
-				columns = defaultColumnsNumber( attributes ),
+				columns = defaultColumnsNumberV1( attributes ),
 				imageCrop,
 				caption,
 				linkTo,
@@ -270,7 +278,7 @@ const deprecated = [
 		save( { attributes } ) {
 			const {
 				images,
-				columns = defaultColumnsNumber( attributes ),
+				columns = defaultColumnsNumberV1( attributes ),
 				imageCrop,
 				caption,
 				linkTo,
@@ -409,7 +417,7 @@ const deprecated = [
 		save( { attributes } ) {
 			const {
 				images,
-				columns = defaultColumnsNumber( attributes ),
+				columns = defaultColumnsNumberV1( attributes ),
 				imageCrop,
 				linkTo,
 			} = attributes;
@@ -549,7 +557,7 @@ const deprecated = [
 		save( { attributes } ) {
 			const {
 				images,
-				columns = defaultColumnsNumber( attributes ),
+				columns = defaultColumnsNumberV1( attributes ),
 				imageCrop,
 				linkTo,
 			} = attributes;
@@ -655,7 +663,7 @@ const deprecated = [
 		save( { attributes } ) {
 			const {
 				images,
-				columns = defaultColumnsNumber( attributes ),
+				columns = defaultColumnsNumberV1( attributes ),
 				align,
 				imageCrop,
 				linkTo,

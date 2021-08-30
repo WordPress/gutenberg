@@ -152,18 +152,6 @@ describe( 'state', () => {
 			expect( state.editorMode ).toBe( 'text' );
 		} );
 
-		it( 'should toggle a feature flag', () => {
-			const state = preferences(
-				deepFreeze( { features: { chicken: true } } ),
-				{
-					type: 'TOGGLE_FEATURE',
-					feature: 'chicken',
-				}
-			);
-
-			expect( state.features ).toEqual( { chicken: false } );
-		} );
-
 		describe( 'hiddenBlockTypes', () => {
 			it( 'concatenates unique names on disable', () => {
 				const original = deepFreeze( {

@@ -99,7 +99,7 @@ function block_core_home_link_build_li_wrapper_attributes( $context ) {
 		$font_sizes['css_classes']
 	);
 	$style_attribute = ( $colors['inline_styles'] . $font_sizes['inline_styles'] );
-	$css_classes     = trim( implode( ' ', $classes ) );
+	$css_classes     = trim( implode( ' ', $classes ) ) . ' wp-block-navigation-item';
 
 	$wrapper_attributes = get_block_wrapper_attributes(
 		array(
@@ -127,7 +127,7 @@ function render_block_core_home_link( $attributes, $content, $block ) {
 
 	$wrapper_attributes = block_core_home_link_build_li_wrapper_attributes( $block->context );
 
-	$html = '<li ' . $wrapper_attributes . '><a class="wp-block-home-link__content"';
+	$html = '<li ' . $wrapper_attributes . '><a class="wp-block-home-link__content wp-block-navigation-item__content"';
 
 	// Start appending HTML attributes to anchor tag.
 	$html .= ' href="' . esc_url( home_url() ) . '"';

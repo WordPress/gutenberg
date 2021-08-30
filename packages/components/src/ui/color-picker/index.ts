@@ -1,1 +1,1 @@
-export { default as ColorPicker } from './component';
+export { LegacyAdapter as ColorPicker } from './legacy-adapter';

@@ -2,7 +2,6 @@
  * Internal dependencies
  */
 import { useContextSystem } from '../ui/context';
-// eslint-disable-next-line no-duplicate-imports
 import type { PolymorphicComponentProps } from '../ui/context';
 import type { Props as TextProps } from '../text/types';
 import { useText } from '../text';

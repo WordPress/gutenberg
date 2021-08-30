@@ -17,6 +17,8 @@ import {
 	registerLegacyWidgetBlock,
 	registerLegacyWidgetVariations,
 } from '@wordpress/widgets';
+import { dispatch } from '@wordpress/data';
+import { store as interfaceStore } from '@wordpress/interface';
 
 /**
  * Internal dependencies
@@ -69,6 +71,13 @@ export function initialize( id, settings ) {
 			block.name.startsWith( 'core/query' ) ||
 			block.name.startsWith( 'core/site' )
 		);
+	} );
+
+	dispatch( interfaceStore ).setFeatureDefaults( 'core/edit-widgets', {
+		fixedToolbar: false,
+		welcomeGuide: true,
+		showBlockBreadcrumbs: true,
+		themeStyles: true,
 	} );
 
 	registerCoreBlocks( coreBlocks );
