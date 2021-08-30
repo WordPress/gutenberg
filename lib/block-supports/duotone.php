@@ -257,12 +257,13 @@ function gutenberg_register_duotone_support( $block_type ) {
  * @param string $duotone_id The ID of the SVG filter.
  * @return string The markup for the <style> tag.
  */
-function gutenberg_get_dutone_style( $selectors_group, $duotone_id ) {
+function gutenberg_get_duotone_style( $selectors_group, $duotone_id ) {
 	ob_start();
+
 	?>
 	<style>
 		<?php echo $selectors_group; ?> {
-			filter: url( <?php echo esc_url( '#' . $duotone_id ); ?> );
+			filter: url( <?php echo esc_url( '#' . $duotone_id ); ?> ) !important; <?php // We need !important to overide rules that come from theme.json. ?>
 		}
 	</style>
 	<?php
@@ -346,7 +347,7 @@ function get_duotone_color_values( $duotone_colors ) {
 function gutenberg_output_duotone_markup( $duotone_markup ) {
 	add_action(
 		// Ideally we should use wp_head, but SVG defs can't be put in there.
-		'wp_footer',
+		is_admin() ? 'in_admin_footer' : 'wp_footer',
 		function () use ( $duotone_markup ) {
 			echo $duotone_markup;
 		}
@@ -390,12 +391,14 @@ function gutenberg_render_duotone_support( $block_content, $block ) {
 		},
 		$selectors
 	);
-	$selectors_group  = implode( ', ', $selectors_scoped );
+	$selectors_group = implode( ', ', $selectors_scoped );
 
-	$duotone_markup = gutenberg_get_dutone_style( $selectors_group, $duotone_id );
+	$duotone_markup = gutenberg_get_duotone_style( $selectors_group, $duotone_id );
 	$duotone_markup .= gutenberg_get_dutone_svg_filters( $duotone_id, $duotone_values );
 
-	gutenberg_output_duotone_markup( $duotone_markup );
+	if ( ! is_admin() ) {
+		gutenberg_output_duotone_markup( $duotone_markup );
+	}
 
 	// Like the layout hook, this assumes the hook only applies to blocks with a single wrapper.
 	$content = preg_replace(
@@ -420,7 +423,20 @@ WP_Block_Supports::get_instance()->register(
 remove_filter( 'render_block', 'wp_render_duotone_support', 10, 2 );
 add_filter( 'render_block', 'gutenberg_render_duotone_support', 10, 2 );
 
-function gutenberg_render_duotone_filters_from_theme_json( $theme_json) {
+/**
+ * Renders a the SVG and CSS to make duotone filters work.
+ */
+function gutenberg_render_duotone_filters_from_theme_json() {
+	if (
+		! get_theme_support( 'experimental-link-color' ) && // link color support needs the presets CSS variables regardless of the presence of theme.json file.
+		! WP_Theme_JSON_Resolver_Gutenberg::theme_has_support() ) {
+		return;
+	}
+
+
+	$settings = gutenberg_get_default_block_editor_settings();
+	$theme_json = WP_Theme_JSON_Resolver_Gutenberg::get_merged_data( $settings );
+
 	$theme_json_settings = $theme_json->get_settings();
 	if( ! empty( $theme_json_settings['color'] ) && ! empty( $theme_json_settings['color']['duotone'] ) &&  ! empty( $theme_json_settings['color']['duotone']['theme'] ) ) {
 		foreach( $theme_json_settings['color']['duotone']['theme'] as $duotone_setting ) {
@@ -431,4 +447,5 @@ function gutenberg_render_duotone_filters_from_theme_json( $theme_json) {
 		}
 	}
 }
-add_action( 'gutenberg_experimental_global_styles', 'gutenberg_render_duotone_filters_from_theme_json' );
+
+add_action( 'enqueue_block_assets', 'gutenberg_render_duotone_filters_from_theme_json' );

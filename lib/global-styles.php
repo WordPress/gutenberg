@@ -61,8 +61,6 @@ function gutenberg_experimental_global_styles_enqueue_assets() {
 		return;
 	}
 
-	do_action( 'gutenberg_experimental_global_styles', $all );
-
 	if ( isset( wp_styles()->registered['global-styles'] ) ) {
 		wp_styles()->registered['global-styles']->extra['after'][0] = $stylesheet;
 	} else {
