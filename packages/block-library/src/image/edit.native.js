@@ -42,7 +42,7 @@ import {
 	BlockStyles,
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
-import { __, sprintf } from '@wordpress/i18n';
+import { __, _x, sprintf } from '@wordpress/i18n';
 import { getProtocol, hasQueryArg } from '@wordpress/url';
 import { doAction, hasAction } from '@wordpress/hooks';
 import { compose, withPreferredColorScheme } from '@wordpress/compose';
@@ -121,7 +121,10 @@ export class ImageEdit extends Component {
 			},
 			linkRel: {
 				label: __( 'Link Rel' ),
-				placeholder: __( 'None' ),
+				placeholder: _x(
+					'None',
+					'Link rel attribute value placeholder'
+				),
 			},
 		};
 	}

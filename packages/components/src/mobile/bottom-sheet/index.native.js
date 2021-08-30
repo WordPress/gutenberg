@@ -485,6 +485,16 @@ class BottomSheet extends Component {
 			</>
 		);
 
+		const showDragIndicator = () => {
+			// if iOS or not fullscreen show the drag indicator
+			if ( Platform.OS === 'ios' || ! this.state.isFullScreen ) {
+				return true;
+			}
+
+			// Otherwise check the allowDragIndicator
+			return this.props.allowDragIndicator;
+		};
+
 		return (
 			<Modal
 				isVisible={ isVisible }
@@ -536,7 +546,7 @@ class BottomSheet extends Component {
 						style={ styles.header }
 						onLayout={ this.onHeaderLayout }
 					>
-						{ ! ( Platform.OS === 'android' && isFullScreen ) && (
+						{ showDragIndicator() && (
 							<View style={ styles.dragIndicator } />
 						) }
 						{ ! hideHeader && getHeader() }

@@ -2,7 +2,6 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import { isEmpty } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -70,11 +69,6 @@ export default function PageListEdit( {
 		context.customOverlayBackgroundColor,
 	] );
 
-	useEffect( () => {
-		const isNavigationChild = isEmpty( context ) ? false : true;
-		setAttributes( { isNavigationChild } );
-	}, [] );
-
 	const { textColor, backgroundColor, showSubmenuIcon, style } =
 		context || {};
 
@@ -106,6 +100,10 @@ export default function PageListEdit( {
 	);
 
 	useEffect( () => {
+		setAttributes( { isNavigationChild: isParentNavigation } );
+	}, [] );
+
+	useEffect( () => {
 		if ( isParentNavigation ) {
 			apiFetch( {
 				path: addQueryArgs( '/wp/v2/pages', {
@@ -127,6 +125,12 @@ export default function PageListEdit( {
 	const openModal = () => setOpen( true );
 	const closeModal = () => setOpen( false );
 
+	// Update parent status before component first renders.
+	const attributesWithParentStatus = {
+		...attributes,
+		isNavigationChild: isParentNavigation,
+	};
+
 	return (
 		<>
 			{ allowConvertToLinks && (
@@ -145,7 +149,7 @@ export default function PageListEdit( {
 			<div { ...blockProps }>
 				<ServerSideRender
 					block="core/page-list"
-					attributes={ attributes }
+					attributes={ attributesWithParentStatus }
 				/>
 			</div>
 		</>

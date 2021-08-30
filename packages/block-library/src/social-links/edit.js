@@ -111,7 +111,7 @@ export function SocialLinksEdit( props ) {
 
 	return (
 		<Fragment>
-			<BlockControls group="block">
+			<BlockControls group="block" __experimentalExposeToChildren>
 				<JustifyContentControl
 					allowedControls={ [
 						'left',

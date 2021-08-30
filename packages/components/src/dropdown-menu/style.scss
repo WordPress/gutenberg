@@ -44,6 +44,11 @@
 			width: $button-size-small;
 			height: $button-size-small;
 		}
+
+		// If menu items are icon-only, make them stretch only to the icon size.
+		&.is-icon-only {
+			width: auto;
+		}
 	}
 
 	.components-menu-item__button,

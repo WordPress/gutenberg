@@ -31,13 +31,13 @@
 
 // Low specificity default to ensure background color applies to submenus.
 .wp-block-navigation__container,
-.wp-block-navigation-link {
+.wp-block-navigation-item {
 	background-color: inherit;
 }
 
 // Only show the flyout on hover if the parent menu item is selected.
 .wp-block-navigation:not(.is-selected):not(.has-child-selected) .has-child:hover {
-	> .wp-block-navigation-link__container {
+	> .wp-block-navigation__submenu-container {
 		opacity: 0;
 		visibility: hidden;
 	}
@@ -47,7 +47,7 @@
 .has-child {
 	&.is-selected,
 	&.has-child-selected {
-		> .wp-block-navigation-link__container {
+		> .wp-block-navigation__submenu-container {
 			display: flex;
 			opacity: 1;
 			visibility: visible;
@@ -58,7 +58,7 @@
 // Show a submenu when generally dragging (is-dragging-components-draggable) if that
 // submenu has children (has-child) and is being dragged within (is-dragging-within).
 .is-dragging-components-draggable .has-child.is-dragging-within {
-	> .wp-block-navigation-link__container {
+	> .wp-block-navigation__submenu-container {
 		opacity: 1;
 		visibility: visible;
 	}
@@ -215,7 +215,7 @@ $color-control-label-height: 20px;
 
 	// Style skeleton elements to mostly match the metrics of actual menu items.
 	// Needs specificity.
-	.wp-block-navigation-link.wp-block-navigation-link {
+	.wp-block-navigation-item.wp-block-navigation-item {
 		position: relative;
 		min-width: 72px;
 
@@ -237,7 +237,7 @@ $color-control-label-height: 20px;
 	}
 
 
-	.wp-block-navigation-link.wp-block-navigation-link,
+	.wp-block-navigation-item.wp-block-navigation-item,
 	.wp-block-navigation-placeholder__preview-search-icon {
 		opacity: 0.3;
 	}
@@ -250,6 +250,7 @@ $color-control-label-height: 20px;
 		width: 0;
 		overflow: hidden;
 		flex-wrap: nowrap;
+		flex: 0;
 	}
 
 	// Hide entirely when vertical.
