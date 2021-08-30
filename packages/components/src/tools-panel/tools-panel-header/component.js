@@ -2,6 +2,7 @@
  * WordPress dependencies
  */
 import { check, moreVertical } from '@wordpress/icons';
+import { SVG } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 
 /**
@@ -12,6 +13,10 @@ import MenuGroup from '../../menu-group';
 import MenuItem from '../../menu-item';
 import { useToolsPanelHeader } from './hook';
 import { contextConnect } from '../../ui/context';
+
+const emptyIcon = (
+	<SVG xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"></SVG>
+);
 
 const ToolsPanelHeader = ( props, forwardedRef ) => {
 	const {
@@ -41,7 +46,11 @@ const ToolsPanelHeader = ( props, forwardedRef ) => {
 										return (
 											<MenuItem
 												key={ label }
-												icon={ isSelected && check }
+												icon={
+													isSelected
+														? check
+														: emptyIcon
+												}
 												isSelected={ isSelected }
 												onClick={ () => {
 													toggleItem( label );
