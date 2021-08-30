@@ -66,7 +66,7 @@ export function resetHeight( { attributes = {}, setAttributes } ) {
  * @return {boolean} Whether height control is disabled.
  */
 export function useIsHeightDisabled( { name: blockName } = {} ) {
-	const isDisabled = ! useSetting( 'dimensions.customHeight' );
+	const isDisabled = ! useSetting( 'dimensions.height' );
 	return ! hasHeightSupport( blockName ) || isDisabled;
 }
 

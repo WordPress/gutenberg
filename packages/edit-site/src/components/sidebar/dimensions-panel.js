@@ -27,7 +27,7 @@ export function useHasDimensionsPanel( context ) {
 }
 
 function useHasHeight( { name, supports } ) {
-	const settings = useSetting( 'dimensions.customHeight', name );
+	const settings = useSetting( 'dimensions.height', name );
 
 	return settings && supports.includes( 'height' );
 }

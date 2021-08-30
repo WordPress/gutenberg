@@ -98,7 +98,7 @@ class WP_Theme_JSON_Gutenberg {
 		),
 		'custom'     => null,
 		'dimensions' => array(
-			'customHeight' => null,
+			'height' => null,
 		),
 		'layout'     => array(
 			'contentSize' => null,
