@@ -374,7 +374,7 @@ export function isEditingTemplate( state ) {
  *
  * @return {boolean} Whether meta boxes are initialized.
  */
-export function metaBoxesInitialized( state ) {
+export function areMetaBoxesInitialized( state ) {
 	return state.metaBoxes.initialized;
 }
 

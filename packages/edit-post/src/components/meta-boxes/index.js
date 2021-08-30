@@ -22,7 +22,7 @@ export default function MetaBoxes( { location } ) {
 	const {
 		metaBoxes,
 		isVisible,
-		metaBoxesInitialized,
+		areMetaBoxesInitialized,
 		isEditorReady,
 	} = useSelect(
 		( select ) => {
@@ -30,12 +30,12 @@ export default function MetaBoxes( { location } ) {
 			const {
 				isMetaBoxLocationVisible,
 				getMetaBoxesPerLocation,
-				metaBoxesInitialized: _metaBoxesInitialized,
+				areMetaBoxesInitialized: _areMetaBoxesInitialized,
 			} = select( editPostStore );
 			return {
 				metaBoxes: getMetaBoxesPerLocation( location ),
 				isVisible: isMetaBoxLocationVisible( location ),
-				metaBoxesInitialized: _metaBoxesInitialized(),
+				areMetaBoxesInitialized: _areMetaBoxesInitialized(),
 				isEditorReady: __unstableIsEditorReady(),
 			};
 		},
@@ -46,12 +46,12 @@ export default function MetaBoxes( { location } ) {
 	// saving. This initializes all meta box locations, not just this specific
 	// one.
 	useEffect( () => {
-		if ( isEditorReady && ! metaBoxesInitialized ) {
+		if ( isEditorReady && ! areMetaBoxesInitialized ) {
 			registry.dispatch( editPostStore ).initializeMetaBoxes();
 		}
-	}, [ isEditorReady, metaBoxesInitialized ] );
+	}, [ isEditorReady, areMetaBoxesInitialized ] );
 
-	if ( ! metaBoxesInitialized ) {
+	if ( ! areMetaBoxesInitialized ) {
 		return null;
 	}
 
