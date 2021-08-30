@@ -99,7 +99,7 @@ class WP_Theme_JSON_Gutenberg {
 			'wideSize'    => null,
 		),
 		'spacing'    => array(
-			'customBlockGap' => null,
+			'blockGap' => null,
 			'customMargin'   => null,
 			'customPadding'  => null,
 			'units'          => null,

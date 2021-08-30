@@ -39,7 +39,7 @@ function useHasMargin( { name, supports } ) {
 }
 
 function useHasGap( { name, supports } ) {
-	const settings = useSetting( 'spacing.customBlockGap', name );
+	const settings = useSetting( 'spacing.blockGap', name );
 
 	return settings && supports.includes( '--wp--style--block-gap' );
 }

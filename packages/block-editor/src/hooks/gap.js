@@ -66,7 +66,7 @@ export function resetGap( { attributes = {}, setAttributes } ) {
  * @return {boolean}     Whether the gap setting is disabled.
  */
 export function useIsGapDisabled( { name: blockName } = {} ) {
-	const isDisabled = ! useSetting( 'spacing.customBlockGap' );
+	const isDisabled = ! useSetting( 'spacing.blockGap' );
 	return ! hasGapSupport( blockName ) || isDisabled;
 }
 
