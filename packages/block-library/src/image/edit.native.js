@@ -26,6 +26,7 @@ import {
 	BottomSheet,
 	BottomSheetTextControl,
 	BottomSheetSelectControl,
+	FooterMessageControl,
 	FooterMessageLink,
 	Badge,
 } from '@wordpress/components';
@@ -41,7 +42,7 @@ import {
 	BlockStyles,
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
-import { __, sprintf } from '@wordpress/i18n';
+import { __, _x, sprintf } from '@wordpress/i18n';
 import { getProtocol, hasQueryArg } from '@wordpress/url';
 import { doAction, hasAction } from '@wordpress/hooks';
 import { compose, withPreferredColorScheme } from '@wordpress/compose';
@@ -120,7 +121,10 @@ export class ImageEdit extends Component {
 			},
 			linkRel: {
 				label: __( 'Link Rel' ),
-				placeholder: __( 'None' ),
+				placeholder: _x(
+					'None',
+					'Link rel attribute value placeholder'
+				),
 			},
 		};
 	}
@@ -476,6 +480,8 @@ export class ImageEdit extends Component {
 					setFeaturedButtonStyle,
 					styles.removeFeaturedButton,
 				] }
+				cellContainerStyle={ styles.setFeaturedButtonCellContainer }
+				separatorType={ 'none' }
 				onPress={ () =>
 					this.onSetFeatured( MEDIA_ID_NO_FEATURED_IMAGE_SET )
 				}
@@ -486,17 +492,13 @@ export class ImageEdit extends Component {
 			<BottomSheet.Cell
 				label={ __( 'Set as Featured Image ' ) }
 				labelStyle={ setFeaturedButtonStyle }
+				cellContainerStyle={ styles.setFeaturedButtonCellContainer }
+				separatorType={ 'none' }
 				onPress={ () => this.onSetFeatured( attributes.id ) }
 			/>
 		);
 
-		return (
-			<PanelBody>
-				{ isFeaturedImage
-					? removeFeaturedButton()
-					: setFeaturedButton() }
-			</PanelBody>
-		);
+		return isFeaturedImage ? removeFeaturedButton() : setFeaturedButton();
 	}
 
 	render() {
@@ -581,8 +583,21 @@ export class ImageEdit extends Component {
 				<PanelBody title={ __( 'Link Settings' ) }>
 					{ this.getLinkSettings( true ) }
 				</PanelBody>
-				{ canImageBeFeatured &&
-					this.getFeaturedButtonPanel( isFeaturedImage ) }
+				<PanelBody
+					title={ __( 'Featured Image' ) }
+					titleStyle={ styles.featuredImagePanelTitle }
+				>
+					{ canImageBeFeatured &&
+						this.getFeaturedButtonPanel( isFeaturedImage ) }
+					<FooterMessageControl
+						label={ __(
+							'Changes to featured image will not be affected by the undo/redo buttons.'
+						) }
+						cellContainerStyle={
+							styles.setFeaturedButtonCellContainer
+						}
+					/>
+				</PanelBody>
 			</InspectorControls>
 		);
 

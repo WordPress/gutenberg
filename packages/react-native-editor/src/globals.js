@@ -59,7 +59,7 @@ if ( ! global.window.matchMedia ) {
 	} );
 }
 
-global.window.navigator.userAgent = [];
+global.window.navigator.userAgent = global.window.navigator.userAgent ?? '';
 
 // Leverages existing console polyfill from react-native
 global.nativeLoggingHook = nativeLoggingHook;

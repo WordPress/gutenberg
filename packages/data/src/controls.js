@@ -1,7 +1,14 @@
 /**
+ * External dependencies
+ */
+import { isObject } from 'lodash';
+
+/**
  * Internal dependencies
  */
 import { createRegistryControl } from './factory';
+
+/** @typedef {import('./types').WPDataStore} WPDataStore */
 
 const SELECT = '@@data/SELECT';
 const RESOLVE_SELECT = '@@data/RESOLVE_SELECT';
@@ -13,9 +20,9 @@ const DISPATCH = '@@data/DISPATCH';
  * Note: This control synchronously returns the current selector value, triggering the
  * resolution, but not waiting for it.
  *
- * @param {string} storeKey     The key for the store the selector belongs to.
- * @param {string} selectorName The name of the selector.
- * @param {Array}  args         Arguments for the selector.
+ * @param {string|WPDataStore} storeNameOrDefinition Unique namespace identifier for the store
+ * @param {string}             selectorName          The name of the selector.
+ * @param {Array}              args                  Arguments for the selector.
  *
  * @example
  * ```js
@@ -30,8 +37,15 @@ const DISPATCH = '@@data/DISPATCH';
  *
  * @return {Object} The control descriptor.
  */
-function select( storeKey, selectorName, ...args ) {
-	return { type: SELECT, storeKey, selectorName, args };
+function select( storeNameOrDefinition, selectorName, ...args ) {
+	return {
+		type: SELECT,
+		storeKey: isObject( storeNameOrDefinition )
+			? storeNameOrDefinition.name
+			: storeNameOrDefinition,
+		selectorName,
+		args,
+	};
 }
 
 /**
@@ -41,9 +55,9 @@ function select( storeKey, selectorName, ...args ) {
  * selectors that may have a resolver. In such case, it will return a `Promise` that resolves
  * after the selector finishes resolving, with the final result value.
  *
- * @param {string} storeKey     The key for the store the selector belongs to
- * @param {string} selectorName The name of the selector
- * @param {Array}  args         Arguments for the selector.
+ * @param {string|WPDataStore} storeNameOrDefinition Unique namespace identifier for the store
+ * @param {string}             selectorName          The name of the selector
+ * @param {Array}              args                  Arguments for the selector.
  *
  * @example
  * ```js
@@ -58,16 +72,23 @@ function select( storeKey, selectorName, ...args ) {
  *
  * @return {Object} The control descriptor.
  */
-function resolveSelect( storeKey, selectorName, ...args ) {
-	return { type: RESOLVE_SELECT, storeKey, selectorName, args };
+function resolveSelect( storeNameOrDefinition, selectorName, ...args ) {
+	return {
+		type: RESOLVE_SELECT,
+		storeKey: isObject( storeNameOrDefinition )
+			? storeNameOrDefinition.name
+			: storeNameOrDefinition,
+		selectorName,
+		args,
+	};
 }
 
 /**
  * Dispatches a control action for triggering a registry dispatch.
  *
- * @param {string} storeKey   The key for the store the action belongs to
- * @param {string} actionName The name of the action to dispatch
- * @param {Array}  args       Arguments for the dispatch action.
+ * @param {string|WPDataStore} storeNameOrDefinition Unique namespace identifier for the store
+ * @param {string}             actionName            The name of the action to dispatch
+ * @param {Array}              args                  Arguments for the dispatch action.
  *
  * @example
  * ```js
@@ -82,8 +103,15 @@ function resolveSelect( storeKey, selectorName, ...args ) {
  *
  * @return {Object}  The control descriptor.
  */
-function dispatch( storeKey, actionName, ...args ) {
-	return { type: DISPATCH, storeKey, actionName, args };
+function dispatch( storeNameOrDefinition, actionName, ...args ) {
+	return {
+		type: DISPATCH,
+		storeKey: isObject( storeNameOrDefinition )
+			? storeNameOrDefinition.name
+			: storeNameOrDefinition,
+		actionName,
+		args,
+	};
 }
 
 export const controls = { select, resolveSelect, dispatch };

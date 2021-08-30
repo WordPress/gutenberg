@@ -14,7 +14,6 @@ import { isValidElement } from '@wordpress/element';
  */
 import { getValidChildren } from '../ui/utils/get-valid-children';
 import { contextConnect, useContextSystem } from '../ui/context';
-// eslint-disable-next-line no-duplicate-imports
 import type { PolymorphicComponentProps } from '../ui/context';
 import { ZStackView, ZStackChildView } from './styles';
 

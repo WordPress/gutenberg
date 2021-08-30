@@ -60,7 +60,7 @@ function UnitControl( props ) {
 	return (
 		<BaseUnitControl
 			className="focal-point-picker__controls-position-unit-control"
-			labelPosition="side"
+			labelPosition="top"
 			max={ TEXTCONTROL_MAX }
 			min={ TEXTCONTROL_MIN }
 			unit="%"

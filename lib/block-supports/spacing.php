@@ -2,6 +2,10 @@
 /**
  * Spacing block support flag.
  *
+ * For backwards compatibility with core, this remains separate to the
+ * dimensions.php block support despite both belonging under a single panel in
+ * the editor.
+ *
  * @package gutenberg
  */
 

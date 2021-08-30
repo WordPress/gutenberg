@@ -144,7 +144,7 @@ function getSuggestionsQuery( type, kind ) {
  * 4: Theme colors
  * 5: Global styles
  *
- * @param {Object} context
+ * @param {Object}  context
  * @param {boolean} isSubMenu
  */
 function getColors( context, isSubMenu ) {
@@ -419,6 +419,23 @@ export default function NavigationLinkEdit( {
 		selection.addRange( range );
 	}
 
+	/**
+	 * Removes the current link if set.
+	 */
+	function removeLink() {
+		// Reset all attributes that comprise the link.
+		setAttributes( {
+			url: '',
+			label: '',
+			id: '',
+			kind: '',
+			type: '',
+		} );
+
+		// Close the link editing UI.
+		setIsLinkOpen( false );
+	}
+
 	let userCanCreate = false;
 	if ( ! type || type === 'page' ) {
 		userCanCreate = userCanCreatePages;
@@ -452,7 +469,7 @@ export default function NavigationLinkEdit( {
 
 	const blockProps = useBlockProps( {
 		ref: listItemRef,
-		className: classnames( {
+		className: classnames( 'wp-block-navigation-item', {
 			'is-editing': isSelected || isParentOfSelectedBlock,
 			'is-dragging-within': isDraggingWithin,
 			'has-link': !! url,
@@ -479,19 +496,23 @@ export default function NavigationLinkEdit( {
 	const innerBlocksColors = getColors( context, true );
 	const innerBlocksProps = useInnerBlocksProps(
 		{
-			className: classnames( 'wp-block-navigation-link__container', {
-				'is-parent-of-selected-block': isParentOfSelectedBlock,
-				'has-text-color': !! (
-					innerBlocksColors.textColor ||
-					innerBlocksColors.customTextColor
-				),
-				[ `has-${ innerBlocksColors.textColor }-color` ]: !! innerBlocksColors.textColor,
-				'has-background': !! (
-					innerBlocksColors.backgroundColor ||
-					innerBlocksColors.customBackgroundColor
-				),
-				[ `has-${ innerBlocksColors.backgroundColor }-background-color` ]: !! innerBlocksColors.backgroundColor,
-			} ),
+			className: classnames(
+				'wp-block-navigation-link__container',
+				'wp-block-navigation__submenu-container',
+				{
+					'is-parent-of-selected-block': isParentOfSelectedBlock,
+					'has-text-color': !! (
+						innerBlocksColors.textColor ||
+						innerBlocksColors.customTextColor
+					),
+					[ `has-${ innerBlocksColors.textColor }-color` ]: !! innerBlocksColors.textColor,
+					'has-background': !! (
+						innerBlocksColors.backgroundColor ||
+						innerBlocksColors.customBackgroundColor
+					),
+					[ `has-${ innerBlocksColors.backgroundColor }-background-color` ]: !! innerBlocksColors.backgroundColor,
+				}
+			),
 			style: {
 				color: innerBlocksColors.customTextColor,
 				backgroundColor: innerBlocksColors.customBackgroundColor,
@@ -510,9 +531,13 @@ export default function NavigationLinkEdit( {
 		}
 	);
 
-	const classes = classnames( 'wp-block-navigation-link__content', {
-		'wp-block-navigation-link__placeholder': ! url,
-	} );
+	const classes = classnames(
+		'wp-block-navigation-link__content',
+		'wp-block-navigation-item__content',
+		{
+			'wp-block-navigation-link__placeholder': ! url,
+		}
+	);
 
 	let missingText = '';
 	switch ( type ) {
@@ -690,11 +715,12 @@ export default function NavigationLinkEdit( {
 										attributes
 									)
 								}
+								onRemove={ removeLink }
 							/>
 						</Popover>
 					) }
 					{ hasDescendants && showSubmenuIcon && (
-						<span className="wp-block-navigation-link__submenu-icon">
+						<span className="wp-block-navigation-link__submenu-icon wp-block-navigation__submenu-icon">
 							<ItemSubmenuIcon />
 						</span>
 					) }

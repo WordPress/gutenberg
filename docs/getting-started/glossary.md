@@ -28,9 +28,6 @@
 <dt>Block Template Parts</dt>
 <dd>Building on Block Templates, these parts help set structure for reusable items like a Footer or Header that one typically sees in a WordPress site. They are primarily site structure and are never to be mixed with the post content editor. With Full Site Editing and block based themes, users can create their own arbitrary Template Parts, save those in the database for their site, and re-use them throughout their site. Template parts are equivalent – in blocks – of theme template parts. They are generally defined by a theme first, carry some semantic meaning (could be swapped between themes such as a header), and can only be inserted in the site editor context (within “templates”). </dd>
 
-<dt>Patterns</dt>
-<dd>Patterns are predefined layouts of blocks that can be inserted as starter content that are meant to be changed by the user every time. Once inserted, they exist as a local save and are not global.</dd>
-
 <dt>Block type</dt>
 <dd>In contrast with the blocks composing a particular post, a block type describes the blueprint by which any block of that type should behave. So while there may be many images within a post, each behaves consistent with a unified image block type definition.</dd>
 
@@ -49,23 +46,26 @@
 <dt>Navigation Block</dt>
 <dd>A block that allows you to edit a site's navigation menu, both in terms of structure and design.</a></dd>
 
+<dt>Patterns</dt>
+<dd>Patterns are predefined layouts of blocks that can be inserted as starter content that are meant to be changed by the user every time. Once inserted, they exist as a local save and are not global.</dd>
+
 <dt>Post settings</dt>
 <dd>A sidebar region containing metadata fields for the post, including scheduling, visibility, terms, and featured image.</dd>
 
 <dt>Query Block</dt>
 <dd>A block that replicates the classic WP_Query and allows for further customization with additional functionality.</dd>
 
-<dt>RichText</dt>
-<dd>A common component enabling rich content editing including bold, italics, hyperlinks, etc.</dd>
-
 <dt>Reusable block</dt>
 <dd>A block that is saved and then can be shared as a reusable, repeatable piece of content.</dd>
 
-<dt id="settings-sidebar">Settings Sidebar</dt>
-<dd>The panel on the right that contains the document and block settings. The sidebar is toggled using the Settings gear icon. Block settings are shown when a block is selected, otherwise document settings are shown.</dd>
+<dt>RichText</dt>
+<dd>A common component enabling rich content editing including bold, italics, hyperlinks, etc.</dd>
 
 <dt>Serialization</dt>
 <dd>The process of converting a block's attributes object into HTML markup, which occurs each time a block is edited.</dd>
+
+<dt id="settings-sidebar">Settings Sidebar</dt>
+<dd>The panel on the right that contains the document and block settings. The sidebar is toggled using the Settings gear icon. Block settings are shown when a block is selected, otherwise document settings are shown.</dd>
 
 <dt>Site Editor</dt>
 <dd>The cohesive experience that allows you to directly edit and navigate between various templates, template parts, styling options, and more. </dd>

@@ -95,7 +95,8 @@
 		}
 	},
 	"providesContext": {
-		"allowResize": "allowResize"
+		"allowResize": "allowResize",
+		"imageCrop": "imageCrop"
 	},
 	"supports": {
 		"anchor": true,
