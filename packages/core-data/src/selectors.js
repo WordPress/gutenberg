@@ -122,6 +122,21 @@ export function getEntity( state, kind, name ) {
 }
 
 /**
+ * Checks whether the attribute is a "raw" attribute or not.
+ *
+ * @param {Object} state     Data state.
+ * @param {string} kind      Entity kind.
+ * @param {string} name      Entity name.
+ * @param {string} attribute Attribute name.
+ *
+ * @return {boolean} Is the attribute raw
+ */
+export function isRawAttribute( state, kind, name, attribute ) {
+	const entity = getEntity( state, kind, name );
+	return ( entity.rawAttributes || [] ).includes( attribute );
+}
+
+/**
  * Returns the Entity's record object by key. Returns `null` if the value is not
  * yet received, undefined if the value entity is known to not exist, or the
  * entity object if it exists and is received.
@@ -202,15 +217,10 @@ export function __experimentalGetEntityRecordNoResolver(
 export const getRawEntityRecord = createSelector(
 	( state, kind, name, key ) => {
 		const record = getEntityRecord( state, kind, name, key );
-		const entity = getEntity( state, kind, name );
 		return (
 			record &&
 			Object.keys( record ).reduce( ( accumulator, _key ) => {
-				const isRawAttribute = ( entity.rawAttributes || [] ).includes(
-					_key
-				);
-
-				if ( isRawAttribute ) {
+				if ( isRawAttribute( state, kind, name, _key ) ) {
 					// Because edits are the "raw" attribute values,
 					// we return those from record selectors to make rendering,
 					// comparisons, and joins with edits easier.

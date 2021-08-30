@@ -23,6 +23,7 @@ import {
 	getAutosaves,
 	getCurrentUser,
 	getReferenceByDistinctEdits,
+	isRawAttribute,
 } from '../selectors';
 
 // getEntityRecord and __experimentalGetEntityRecordNoResolver selectors share the same tests
@@ -202,6 +203,40 @@ describe( 'hasEntityRecords', () => {
 		} );
 
 		expect( hasEntityRecords( state, 'root', 'postType' ) ).toBe( true );
+	} );
+} );
+
+describe( 'isRawAttribute', () => {
+	it( 'should correctly assess that the attribute is not raw', () => {
+		const state = deepFreeze( {
+			entities: {
+				config: [
+					{
+						kind: 'someKind',
+						name: 'someName',
+					},
+				],
+			},
+		} );
+		expect( isRawAttribute( state, 'someKind', 'someName', 'title' ) ).toBe(
+			false
+		);
+	} );
+	it( 'should correctly assess that the attribute is raw', () => {
+		const state = deepFreeze( {
+			entities: {
+				config: [
+					{
+						kind: 'someKind',
+						name: 'someName',
+						rawAttributes: [ 'title' ],
+					},
+				],
+			},
+		} );
+		expect( isRawAttribute( state, 'someKind', 'someName', 'title' ) ).toBe(
+			true
+		);
 	} );
 } );
 
