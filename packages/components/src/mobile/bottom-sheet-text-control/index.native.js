@@ -7,7 +7,7 @@ import { useNavigation } from '@react-navigation/native';
 /**
  * WordPress dependencies
  */
-import { useState, useEffect } from '@wordpress/element';
+import { useState } from '@wordpress/element';
 import { Icon, chevronRight } from '@wordpress/icons';
 import { usePreferredColorSchemeStyle } from '@wordpress/compose';
 import {
@@ -42,12 +42,6 @@ const BottomSheetTextControl = ( {
 		setShowSubSheet( true );
 	};
 
-	const [ value, onChangeText ] = useState( initialValue );
-
-	useEffect( () => {
-		onChange( value );
-	}, [ value ] );
-
 	const horizontalBorderStyle = usePreferredColorSchemeStyle(
 		styles.horizontalBorder,
 		styles.horizontalBorderDark
@@ -81,8 +75,8 @@ const BottomSheetTextControl = ( {
 				<PanelBody style={ horizontalBorderStyle }>
 					<TextInput
 						label={ label }
-						onChangeText={ ( text ) => onChangeText( text ) }
-						defaultValue={ value }
+						onChangeText={ ( text ) => onChange( text ) }
+						defaultValue={ initialValue }
 						multiline={ true }
 						placeholder={ placeholder }
 						placeholderTextColor={ '#87a6bc' }
