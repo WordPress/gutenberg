@@ -28,9 +28,7 @@ export default function Preview( { idBase, instance, isVisible } ) {
 				path: restRoute,
 				method: 'POST',
 				signal: abortController?.signal,
-				data: {
-					instance,
-				},
+				data: instance ? { instance } : {},
 			} );
 		}
 
