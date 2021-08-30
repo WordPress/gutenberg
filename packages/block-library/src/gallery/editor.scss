@@ -16,7 +16,7 @@ figure.wp-block-gallery {
 		flex: 0 0 100%;
 	}
 
-	.components-form-file-upload {
+	> .components-form-file-upload {
 		flex-basis: 100%;
 	}
 	// @todo: this deserves a refactor, by being moved to the toolbar.
