@@ -12,6 +12,7 @@ const SETTINGS_DEFAULTS = {
 	// eslint-disable-next-line no-undef
 	__unstableGalleryWithImageBlocks: __DEV__,
 	alignWide: true,
+	supportsLayout: false,
 };
 
 export { PREFERENCES_DEFAULTS, SETTINGS_DEFAULTS };

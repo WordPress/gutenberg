@@ -42,8 +42,8 @@ Snapshot Diff:
 @@ -1,8 +1,8 @@
   <div>
     <div
--     class="components-flex components-card__footer components-card-footer css-t1j3xg-View-Flex-sx-Base-sx-Items-ItemsRow-Footer-borderRadius-borderColor-medium em57xhy0"
-+     class="components-flex components-card__footer components-card-footer css-101hjjr-View-Flex-sx-Base-sx-Items-ItemsRow-Footer-borderRadius-borderColor-medium-shady em57xhy0"
+-     class="components-flex components-card__footer components-card-footer css-otmewz-View-Flex-sx-Base-sx-Items-ItemsRow-Footer-borderRadius-borderColor-medium em57xhy0"
++     class="components-flex components-card__footer components-card-footer css-f5ly6j-View-Flex-sx-Base-sx-Items-ItemsRow-Footer-borderRadius-borderColor-medium-shady em57xhy0"
       data-wp-c16t="true"
       data-wp-component="CardFooter"
     >
@@ -59,8 +59,8 @@ Snapshot Diff:
 @@ -1,8 +1,8 @@
   <div>
     <div
--     class="components-flex components-card__footer components-card-footer css-t1j3xg-View-Flex-sx-Base-sx-Items-ItemsRow-Footer-borderRadius-borderColor-medium em57xhy0"
-+     class="components-flex components-card__footer components-card-footer css-1q5iaph-View-Flex-sx-Base-sx-Items-ItemsRow-Footer-borderRadius-borderColor-medium em57xhy0"
+-     class="components-flex components-card__footer components-card-footer css-otmewz-View-Flex-sx-Base-sx-Items-ItemsRow-Footer-borderRadius-borderColor-medium em57xhy0"
++     class="components-flex components-card__footer components-card-footer css-sonr8h-View-Flex-sx-Base-sx-Items-ItemsRow-Footer-borderRadius-borderColor-medium em57xhy0"
       data-wp-c16t="true"
       data-wp-component="CardFooter"
     >
@@ -76,8 +76,8 @@ Snapshot Diff:
 @@ -1,8 +1,8 @@
   <div>
     <div
--     class="components-flex components-card__header components-card-header css-knnhft-View-Flex-sx-Base-sx-Items-ItemsRow-Header-borderRadius-borderColor-medium em57xhy0"
-+     class="components-flex components-card__header components-card-header css-1nuvmhw-View-Flex-sx-Base-sx-Items-ItemsRow-Header-borderRadius-borderColor-medium-shady em57xhy0"
+-     class="components-flex components-card__header components-card-header css-cw4qrt-View-Flex-sx-Base-sx-Items-ItemsRow-Header-borderRadius-borderColor-medium em57xhy0"
++     class="components-flex components-card__header components-card-header css-d00z5k-View-Flex-sx-Base-sx-Items-ItemsRow-Header-borderRadius-borderColor-medium-shady em57xhy0"
       data-wp-c16t="true"
       data-wp-component="CardHeader"
     >
@@ -96,8 +96,8 @@ Snapshot Diff:
       class="css-mgwsf4-View-Content em57xhy0"
     >
       <div
--       class="components-flex components-card__header components-card-header css-knnhft-View-Flex-sx-Base-sx-Items-ItemsRow-Header-borderRadius-borderColor-medium em57xhy0"
-+       class="components-flex components-card__header components-card-header css-9zq5kx-View-Flex-sx-Base-sx-Items-ItemsRow-Header-borderRadius-borderColor-large em57xhy0"
+-       class="components-flex components-card__header components-card-header css-cw4qrt-View-Flex-sx-Base-sx-Items-ItemsRow-Header-borderRadius-borderColor-medium em57xhy0"
++       class="components-flex components-card__header components-card-header css-1dtpden-View-Flex-sx-Base-sx-Items-ItemsRow-Header-borderRadius-borderColor-large em57xhy0"
         data-wp-c16t="true"
         data-wp-component="CardHeader"
       >
@@ -124,8 +124,8 @@ Snapshot Diff:
         class="css-mgwsf4-View-Content em57xhy0"
       >
         <div
--         class="components-flex components-card__header components-card-header css-lwijn2-View-Flex-sx-Base-sx-Items-ItemsRow-Header-borderRadius-borderColor-large-borderless em57xhy0"
-+         class="components-flex components-card__header components-card-header css-lnnbkk-View-Flex-sx-Base-sx-Items-ItemsRow-Header-borderRadius-borderColor-small em57xhy0"
+-         class="components-flex components-card__header components-card-header css-t8b09c-View-Flex-sx-Base-sx-Items-ItemsRow-Header-borderRadius-borderColor-large-borderless em57xhy0"
++         class="components-flex components-card__header components-card-header css-1e0mt81-View-Flex-sx-Base-sx-Items-ItemsRow-Header-borderRadius-borderColor-small em57xhy0"
           data-wp-c16t="true"
           data-wp-component="CardHeader"
         >
@@ -140,8 +140,8 @@ Snapshot Diff:
           Body
         </div>
         <div
--         class="components-flex components-card__footer components-card-footer css-1ptqzjj-View-Flex-sx-Base-sx-Items-ItemsRow-Footer-borderRadius-borderColor-large-borderless em57xhy0"
-+         class="components-flex components-card__footer components-card-footer css-1bztdp0-View-Flex-sx-Base-sx-Items-ItemsRow-Footer-borderRadius-borderColor-xSmall em57xhy0"
+-         class="components-flex components-card__footer components-card-footer css-c7cteg-View-Flex-sx-Base-sx-Items-ItemsRow-Footer-borderRadius-borderColor-large-borderless em57xhy0"
++         class="components-flex components-card__footer components-card-footer css-1mzdgj0-View-Flex-sx-Base-sx-Items-ItemsRow-Footer-borderRadius-borderColor-xSmall em57xhy0"
           data-wp-c16t="true"
           data-wp-component="CardFooter"
         >
@@ -166,8 +166,8 @@ Snapshot Diff:
         class="css-mgwsf4-View-Content em57xhy0"
       >
         <div
--         class="components-flex components-card__header components-card-header css-lwijn2-View-Flex-sx-Base-sx-Items-ItemsRow-Header-borderRadius-borderColor-large-borderless em57xhy0"
-+         class="components-flex components-card__header components-card-header css-lnnbkk-View-Flex-sx-Base-sx-Items-ItemsRow-Header-borderRadius-borderColor-small em57xhy0"
+-         class="components-flex components-card__header components-card-header css-t8b09c-View-Flex-sx-Base-sx-Items-ItemsRow-Header-borderRadius-borderColor-large-borderless em57xhy0"
++         class="components-flex components-card__header components-card-header css-1e0mt81-View-Flex-sx-Base-sx-Items-ItemsRow-Header-borderRadius-borderColor-small em57xhy0"
           data-wp-c16t="true"
           data-wp-component="CardHeader"
         >
@@ -182,8 +182,8 @@ Snapshot Diff:
           Body
         </div>
         <div
--         class="components-flex components-card__footer components-card-footer css-1ptqzjj-View-Flex-sx-Base-sx-Items-ItemsRow-Footer-borderRadius-borderColor-large-borderless em57xhy0"
-+         class="components-flex components-card__footer components-card-footer css-sifz68-View-Flex-sx-Base-sx-Items-ItemsRow-Footer-borderRadius-borderColor-small em57xhy0"
+-         class="components-flex components-card__footer components-card-footer css-c7cteg-View-Flex-sx-Base-sx-Items-ItemsRow-Footer-borderRadius-borderColor-large-borderless em57xhy0"
++         class="components-flex components-card__footer components-card-footer css-1trggei-View-Flex-sx-Base-sx-Items-ItemsRow-Footer-borderRadius-borderColor-small em57xhy0"
           data-wp-c16t="true"
           data-wp-component="CardFooter"
         >
@@ -229,7 +229,7 @@ Object {
   padding: calc(4px * 4) calc(4px * 6);
 }
 
-.emotion-4>*+*:not(marquee) {
+.emotion-4>*+*:not( marquee ) {
   margin-left: calc(4px * 2);
 }
 
@@ -325,7 +325,7 @@ Object {
   padding: calc(4px * 4) calc(4px * 6);
 }
 
-.emotion-16>*+*:not(marquee) {
+.emotion-16>*+*:not( marquee ) {
   margin-left: calc(4px * 2);
 }
 
@@ -485,7 +485,7 @@ Object {
   padding: calc(4px * 4) calc(4px * 6);
 }
 
-.emotion-4>*+*:not(marquee) {
+.emotion-4>*+*:not( marquee ) {
   margin-left: calc(4px * 2);
 }
 
@@ -581,7 +581,7 @@ Object {
   padding: calc(4px * 4) calc(4px * 6);
 }
 
-.emotion-16>*+*:not(marquee) {
+.emotion-16>*+*:not( marquee ) {
   margin-left: calc(4px * 2);
 }
 

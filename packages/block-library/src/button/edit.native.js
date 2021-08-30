@@ -6,7 +6,7 @@ import { View, AccessibilityInfo, Platform, Text } from 'react-native';
  * WordPress dependencies
  */
 import { withInstanceId, compose } from '@wordpress/compose';
-import { __ } from '@wordpress/i18n';
+import { __, _x } from '@wordpress/i18n';
 import {
 	RichText,
 	InspectorControls,
@@ -136,7 +136,10 @@ class ButtonEdit extends Component {
 			},
 			linkRel: {
 				label: __( 'Link Rel' ),
-				placeholder: __( 'None' ),
+				placeholder: _x(
+					'None',
+					'Link rel attribute value placeholder'
+				),
 			},
 		};
 

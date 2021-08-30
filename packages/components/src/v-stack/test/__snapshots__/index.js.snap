@@ -19,7 +19,7 @@ exports[`props should render alignment 1`] = `
   justify-content: center;
 }
 
-.emotion-0>*+*:not(marquee) {
+.emotion-0>*+*:not( marquee ) {
   margin-top: calc(4px * 2);
 }
 
@@ -59,7 +59,7 @@ exports[`props should render correctly 1`] = `
   justify-content: space-between;
 }
 
-.emotion-0>*+*:not(marquee) {
+.emotion-0>*+*:not( marquee ) {
   margin-top: calc(4px * 2);
 }
 
@@ -99,7 +99,7 @@ exports[`props should render spacing 1`] = `
   justify-content: space-between;
 }
 
-.emotion-0>*+*:not(marquee) {
+.emotion-0>*+*:not( marquee ) {
   margin-top: calc(4px * 5);
 }
 

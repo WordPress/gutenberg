@@ -56,6 +56,10 @@ const PaletteScreen = () => {
 		styles.clearButton,
 		styles.clearButtonDark
 	);
+	const selectedColorTextStyle = usePreferredColorSchemeStyle(
+		styles.colorText,
+		styles.colorTextDark
+	);
 
 	const isSolidSegment = currentSegment === segments[ 0 ];
 	const isCustomGadientShown = ! isSolidSegment && isGradientColor;
@@ -136,12 +140,22 @@ const PaletteScreen = () => {
 						/>
 					) }
 				</View>
-				<Text
-					style={ styles.selectColorText }
-					maxFontSizeMultiplier={ 2 }
-				>
-					{ __( 'Select a color' ) }
-				</Text>
+				{ currentValue ? (
+					<Text
+						style={ selectedColorTextStyle }
+						maxFontSizeMultiplier={ 2 }
+						selectable
+					>
+						{ currentValue.toUpperCase() }
+					</Text>
+				) : (
+					<Text
+						style={ styles.selectColorText }
+						maxFontSizeMultiplier={ 2 }
+					>
+						{ __( 'Select a color above' ) }
+					</Text>
+				) }
 				<View style={ styles.flex }>
 					{ currentValue && getClearButton() }
 				</View>

@@ -257,10 +257,10 @@ export function filterUnitsWithSettings( settings = [], units = [] ) {
  * TODO: ideally this hook shouldn't be needed
  * https://github.com/WordPress/gutenberg/pull/31822#discussion_r633280823
  *
- * @param {Object} args                                  An object containing units, settingPath & defaultUnits.
- * @param {Array<Object>|undefined} args.units           Collection of available units.
- * @param {Array<string>|undefined} args.availableUnits  The setting path. Defaults to 'spacing.units'.
- * @param {Object|undefined}        args.defaultValues   Collection of default values for defined units. Example: { px: '350', em: '15' }.
+ * @param {Object}                  args                An object containing units, settingPath & defaultUnits.
+ * @param {Array<Object>|undefined} args.units          Collection of available units.
+ * @param {Array<string>|undefined} args.availableUnits The setting path. Defaults to 'spacing.units'.
+ * @param {Object|undefined}        args.defaultValues  Collection of default values for defined units. Example: { px: '350', em: '15' }.
  *
  * @return {Array|boolean} Filtered units based on settings.
  */

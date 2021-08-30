@@ -62,7 +62,7 @@ function isSourceFile( filename ) {
 	const relativePath = path.relative( process.cwd(), filename );
 
 	return (
-		/\/src\/.+\.(js|json|scss)$/.test( relativePath ) &&
+		/\/src\/.+\.(js|json|scss|ts|tsx)$/.test( relativePath ) &&
 		! [
 			/\/(benchmark|__mocks__|__tests__|test|storybook|stories)\/.+/,
 			/.\.(spec|test)\.js$/,

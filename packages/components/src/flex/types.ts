@@ -43,7 +43,6 @@ export type FlexProps = {
 	gap?: SpaceInput;
 	/**
 	 * Horizontally aligns content if the `direction` is `row`, or vertically aligns content if the `direction` is `column`.
-	 * In the example below, `flex-start` will align the children content to the left.
 	 *
 	 * @default 'space-between'
 	 */

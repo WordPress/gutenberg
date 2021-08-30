@@ -170,8 +170,6 @@ class NativeEditorProvider extends Component {
 		);
 
 		this.subscriptionParentShowEditorHelp = subscribeShowEditorHelp( () => {
-			// Temporary: feature hidden from production. This is just here for testing
-			// purposes and will be replaced with actual logic in a later PR.
 			this.setState( { isHelpVisible: true } );
 		} );
 
@@ -343,6 +341,7 @@ class NativeEditorProvider extends Component {
 				<EditorHelpTopics
 					isVisible={ this.state.isHelpVisible }
 					onClose={ () => this.setState( { isHelpVisible: false } ) }
+					close={ () => this.setState( { isHelpVisible: false } ) }
 				/>
 			</>
 		);

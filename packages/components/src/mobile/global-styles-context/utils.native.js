@@ -7,6 +7,7 @@ export const BLOCK_STYLE_ATTRIBUTES = [
 	'textColor',
 	'backgroundColor',
 	'style',
+	'color',
 ];
 
 // Mapping style properties name to native
@@ -205,9 +206,7 @@ export function getGlobalStyles( rawStyles, rawFeatures ) {
 			},
 			typography: {
 				fontSizes: features?.typography?.fontSizes,
-				custom: {
-					'line-height': features?.custom?.[ 'line-height' ],
-				},
+				customLineHeight: features?.custom?.[ 'line-height' ],
 			},
 		},
 		__experimentalGlobalStylesBaseStyles: globalStyles,

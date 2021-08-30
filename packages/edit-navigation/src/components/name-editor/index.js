@@ -4,6 +4,7 @@
 import { __ } from '@wordpress/i18n';
 import { TextControl } from '@wordpress/components';
 import { useEffect, useRef, useContext } from '@wordpress/element';
+import { decodeEntities } from '@wordpress/html-entities';
 
 /**
  * Internal dependencies
@@ -36,7 +37,7 @@ export function NameEditor() {
 			label={ __( 'Name' ) }
 			onBlur={ () => setIsMenuNameEditFocused( false ) }
 			className="edit-navigation-name-editor__text-control"
-			value={ name || '' }
+			value={ decodeEntities( name || '' ) }
 			onChange={ setName }
 		/>
 	);

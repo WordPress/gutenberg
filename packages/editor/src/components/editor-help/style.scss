@@ -1,66 +1,58 @@
+.container {
+	height: 100%;
+}
+
 .contentContainer {
 	padding: 0;
 }
 
-.sectionContainer {
+.helpDetailContainer {
 	padding: 0 16px;
 }
 
-.separator {
-	background-color: $light-gray-400;
-	height: 1px;
-	width: 100%;
-}
-
-.separatorDark {
-	background-color: $gray-70;
-}
-
-.bottomSheetHeader {
-	flex-direction: row;
-	align-items: center;
-	padding-right: $grid-unit-20;
-	padding-left: $grid-unit-20;
-	min-height: 44px;
-}
-
-.bottomSheetHeaderTitle {
-	color: $light-primary;
-	text-align: center;
-	font-weight: 600;
-	font-size: 16px;
-	flex: 2;
-}
-
-.bottomSheetHeaderTitleDark {
-	color: $dark-primary;
-}
-
-.helpDetailContainer {
-	width: 100%;
-	padding: 0;
-	height: 100%;
-}
-
 .helpDetailImage {
+	background-color: $gray-light;
+	margin-bottom: 16px;
 	width: 100%;
+}
+
+.helpDetailImageDark {
+	background-color: $gray-dark;
+}
+
+.helpDetailTitle,
+.helpDetailSectionHeading,
+.helpDetailBody {
 	margin-bottom: 16px;
 }
 
 .helpDetailTitle {
-	font-weight: 700;
+	color: $light-primary;
+	font-weight: 600;
 	font-size: 28px;
-	padding: 16px;
+}
+
+.helpDetailTitleDark {
+	color: $dark-primary;
 }
 
 .helpDetailSectionHeading {
+	color: $light-primary;
 	font-weight: 600;
 	font-size: 16px;
-	padding: 0 16px 16px 16px;
+	margin-top: 24px;
+}
+
+.helpDetailSectionHeadingDark {
+	color: $dark-secondary;
 }
 
 .helpDetailBody {
-	width: 100%;
-	padding: 0 16px 16px 16px;
+	color: $light-secondary;
 	font-size: 16px;
+	line-height: 24px;
+}
+
+.helpDetailBodyDark {
+	color: $dark-secondary;
 }

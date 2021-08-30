@@ -53,7 +53,14 @@ figure.wp-block-gallery {
 		}
 	}
 
-
+	// Shown while image is being uploaded
+	.components-spinner {
+		position: absolute;
+		top: 50%;
+		left: 50%;
+		margin-top: -9px;
+		margin-left: -9px;
+	}
 }
 
 
