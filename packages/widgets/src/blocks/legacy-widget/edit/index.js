@@ -12,8 +12,9 @@ import {
 	InspectorControls,
 	BlockIcon,
 	store as blockEditorStore,
+	Placeholder,
 } from '@wordpress/block-editor';
-import { Spinner, Placeholder } from '@wordpress/components';
+import { Spinner } from '@wordpress/components';
 import { brush as brushIcon } from '@wordpress/icons';
 import { __ } from '@wordpress/i18n';
 import { useState, useCallback } from '@wordpress/element';

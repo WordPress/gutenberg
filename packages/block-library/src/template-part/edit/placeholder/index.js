@@ -9,9 +9,10 @@ import { find } from 'lodash';
 import { __, sprintf } from '@wordpress/i18n';
 import { useCallback, useState } from '@wordpress/element';
 import { useDispatch, useSelect } from '@wordpress/data';
-import { Placeholder, Dropdown, Button, Spinner } from '@wordpress/components';
+import { Dropdown, Button, Spinner } from '@wordpress/components';
 import { serialize } from '@wordpress/blocks';
 import { store as coreStore } from '@wordpress/core-data';
+import { Placeholder } from '@wordpress/block-editor';
 
 /**
  * Internal dependencies

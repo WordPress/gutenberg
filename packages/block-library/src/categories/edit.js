@@ -8,14 +8,17 @@ import { times, unescape } from 'lodash';
  */
 import {
 	PanelBody,
-	Placeholder,
 	Spinner,
 	ToggleControl,
 	VisuallyHidden,
 } from '@wordpress/components';
 import { useInstanceId } from '@wordpress/compose';
 import { useSelect } from '@wordpress/data';
-import { InspectorControls, useBlockProps } from '@wordpress/block-editor';
+import {
+	InspectorControls,
+	useBlockProps,
+	Placeholder,
+} from '@wordpress/block-editor';
 import { __ } from '@wordpress/i18n';
 import { pin } from '@wordpress/icons';
 import { store as coreStore } from '@wordpress/core-data';

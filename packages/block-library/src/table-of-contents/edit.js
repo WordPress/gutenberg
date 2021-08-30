@@ -12,11 +12,11 @@ import {
 	InspectorControls,
 	store as blockEditorStore,
 	useBlockProps,
+	Placeholder,
 } from '@wordpress/block-editor';
 import { createBlock, store as blocksStore } from '@wordpress/blocks';
 import {
 	PanelBody,
-	Placeholder,
 	ToggleControl,
 	ToolbarButton,
 	ToolbarGroup,

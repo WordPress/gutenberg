@@ -8,7 +8,6 @@ import {
 	store as coreStore,
 } from '@wordpress/core-data';
 import {
-	Placeholder,
 	Spinner,
 	ToolbarGroup,
 	ToolbarButton,
@@ -25,6 +24,7 @@ import {
 	InspectorControls,
 	useBlockProps,
 	Warning,
+	Placeholder,
 } from '@wordpress/block-editor';
 import { store as reusableBlocksStore } from '@wordpress/reusable-blocks';
 import { ungroup } from '@wordpress/icons';

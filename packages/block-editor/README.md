@@ -514,6 +514,19 @@ _Related_
 
 Undocumented declaration.
 
+### Placeholder
+
+Placeholder for use in blocks. Creates an admin styling context and a tabbing
+context in the block editor's writing flow.
+
+_Parameters_
+
+-   _props_ `Object`:
+
+_Returns_
+
+-   `WPComponent`: The component
+
 ### PlainText
 
 _Related_

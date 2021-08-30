@@ -8,10 +8,10 @@ import memoize from 'memize';
  * WordPress dependencies
  */
 import { calendar as icon } from '@wordpress/icons';
-import { Disabled, Placeholder, Spinner } from '@wordpress/components';
+import { Disabled, Spinner } from '@wordpress/components';
 import { useSelect } from '@wordpress/data';
 import ServerSideRender from '@wordpress/server-side-render';
-import { useBlockProps } from '@wordpress/block-editor';
+import { useBlockProps, Placeholder } from '@wordpress/block-editor';
 import { store as coreStore } from '@wordpress/core-data';
 import { __ } from '@wordpress/i18n';
 

@@ -12,16 +12,6 @@ import { useRef } from '@wordpress/element';
  */
 import { store as blockEditorStore } from '../../store';
 
-function isFormElement( element ) {
-	const { tagName } = element;
-	return (
-		tagName === 'INPUT' ||
-		tagName === 'BUTTON' ||
-		tagName === 'SELECT' ||
-		tagName === 'TEXTAREA'
-	);
-}
-
 export default function useTabNav() {
 	const container = useRef();
 	const focusCaptureBeforeRef = useRef();
@@ -104,8 +94,11 @@ export default function useTabNav() {
 				return;
 			}
 
+			if ( event.target.getAttribute( 'aria-pressed' ) === 'true' ) {
+				return;
+			}
+
 			const isShift = event.shiftKey;
-			const direction = isShift ? 'findPrevious' : 'findNext';
 
 			if ( ! hasMultiSelection() && ! getSelectedBlockClientId() ) {
 				// Preserve the behaviour of entering navigation mode when
@@ -115,18 +108,6 @@ export default function useTabNav() {
 				// focus land on the writing flow container and pressing Tab
 				// will no longer send focus through the focus capture element.
 				if ( event.target === node ) setNavigationMode( true );
-				return;
-			}
-
-			// Allow tabbing between form elements rendered in a block,
-			// such as inside a placeholder. Form elements are generally
-			// meant to be UI rather than part of the content. Ideally
-			// these are not rendered in the content and perhaps in the
-			// future they can be rendered in an iframe or shadow DOM.
-			if (
-				isFormElement( event.target ) &&
-				isFormElement( focus.tabbable[ direction ]( event.target ) )
-			) {
 				return;
 			}
 
