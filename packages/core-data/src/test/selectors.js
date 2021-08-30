@@ -252,14 +252,14 @@ describe( 'getRawEntityRecord', () => {
 			},
 		} );
 	} );
-	it( 'should flatten the structure of `raw` field for entities configured with rawBlockMarkupFields', () => {
+	it( 'should flatten the structure of `raw` field for entities configured with rawAttributes', () => {
 		const state = deepFreeze( {
 			entities: {
 				config: [
 					{
 						kind: 'someKind',
 						name: 'someName',
-						rawBlockMarkupFields: [ 'title' ],
+						rawAttributes: [ 'title' ],
 					},
 				],
 				data: { ...data },

@@ -41,7 +41,7 @@ export const defaultEntities = [
 		key: 'slug',
 		baseURL: '/wp/v2/types',
 		baseURLParams: { context: 'edit' },
-		rawBlockMarkupFields: [ 'title', 'content' ],
+		rawAttributes: [ 'title', 'content' ],
 	},
 	{
 		name: 'media',
@@ -185,7 +185,7 @@ function* loadPostTypeEntities() {
 				selection: true,
 			},
 			mergedEdits: { meta: true },
-			rawBlockMarkupFields: [ 'title', 'excerpt', 'content' ],
+			rawAttributes: [ 'title', 'excerpt', 'content' ],
 			getTitle: ( record ) =>
 				record?.title?.rendered ||
 				record?.title ||

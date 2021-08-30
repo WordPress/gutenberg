@@ -206,11 +206,11 @@ export const getRawEntityRecord = createSelector(
 		return (
 			record &&
 			Object.keys( record ).reduce( ( accumulator, _key ) => {
-				const isRawBlockMarkupField = (
-					entity.rawBlockMarkupFields || []
-				).includes( _key );
+				const isRawAttribute = ( entity.rawAttributes || [] ).includes(
+					_key
+				);
 
-				if ( isRawBlockMarkupField ) {
+				if ( isRawAttribute ) {
 					// Because edits are the "raw" attribute values,
 					// we return those from record selectors to make rendering,
 					// comparisons, and joins with edits easier.
