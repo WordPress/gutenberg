@@ -193,18 +193,19 @@ export default function ReusableBlockEdit( { attributes: { ref }, clientId } ) {
 							showTooltip
 						/>
 					</ToolbarGroup>
-					<ToolbarGroup>
-						<ToolbarButton
-							isPrimary
-							className="block-library-block__reusable-block-save-button"
-							onClick={ saveEditedRecords }
-							label={ __( 'Save reusable block' ) }
-							showTooltip
-							isDisabled={ ! hasEdits }
-						>
-							{ __( 'Save' ) }
-						</ToolbarButton>
-					</ToolbarGroup>
+					{ hasEdits && (
+						<ToolbarGroup>
+							<ToolbarButton
+								isPrimary
+								className="block-library-block__reusable-block-save-button"
+								onClick={ saveEditedRecords }
+								label={ __( 'Save reusable block' ) }
+								showTooltip
+							>
+								{ __( 'Save' ) }
+							</ToolbarButton>
+						</ToolbarGroup>
+					) }
 				</BlockControls>
 				<InspectorControls>
 					<PanelBody>

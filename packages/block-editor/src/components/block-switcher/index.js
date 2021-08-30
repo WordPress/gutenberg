@@ -148,9 +148,7 @@ export const BlockSwitcherDropdownMenu = ( { clientIds, blocks } ) => {
 						} }
 						icon={
 							<>
-								{ isReusable && (
-									<Slot name="block-unsaved-changes-indicator" />
-								) }
+								<Slot name="block-unsaved-changes-indicator" />
 								<BlockIcon
 									icon={ icon }
 									className="block-editor-block-switcher__toggle"

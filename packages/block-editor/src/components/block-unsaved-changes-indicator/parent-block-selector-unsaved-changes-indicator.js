@@ -19,12 +19,8 @@ function UnsavedChangesIndicator() {
 
 		return () => {
 			// remove classes from the parent selector and contextual toolbar when component unmounts
-			document
-				.querySelector( '.block-editor-block-parent-selector' )
-				.classList.remove( 'parent-block-has-changes' );
-			document
-				.querySelector( '.block-editor-block-contextual-toolbar' )
-				.classList.remove( 'parent-block-has-changes' );
+			parentSelectorBtn.classList.remove( 'parent-block-has-changes' );
+			contextualToolBar.classList.remove( 'parent-block-has-changes' );
 		};
 	}, [] );
 
