@@ -368,6 +368,17 @@ export function isEditingTemplate( state ) {
 }
 
 /**
+ * Returns true if meta boxes are initialized.
+ *
+ * @param {Object} state Global application state.
+ *
+ * @return {boolean} Whether meta boxes are initialized.
+ */
+export function areMetaBoxesInitialized( state ) {
+	return state.metaBoxes.initialized;
+}
+
+/**
  * Retrieves the template of the currently edited post.
  *
  * @return {Object?} Post Template.

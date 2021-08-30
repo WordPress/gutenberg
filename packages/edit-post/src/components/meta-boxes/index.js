@@ -6,7 +6,9 @@ import { map } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { withSelect } from '@wordpress/data';
+import { useSelect, useRegistry } from '@wordpress/data';
+import { useEffect } from '@wordpress/element';
+import { store as editorStore } from '@wordpress/editor';
 
 /**
  * Internal dependencies
@@ -15,7 +17,44 @@ import MetaBoxesArea from './meta-boxes-area';
 import MetaBoxVisibility from './meta-box-visibility';
 import { store as editPostStore } from '../../store';
 
-function MetaBoxes( { location, isVisible, metaBoxes } ) {
+export default function MetaBoxes( { location } ) {
+	const registry = useRegistry();
+	const {
+		metaBoxes,
+		isVisible,
+		areMetaBoxesInitialized,
+		isEditorReady,
+	} = useSelect(
+		( select ) => {
+			const { __unstableIsEditorReady } = select( editorStore );
+			const {
+				isMetaBoxLocationVisible,
+				getMetaBoxesPerLocation,
+				areMetaBoxesInitialized: _areMetaBoxesInitialized,
+			} = select( editPostStore );
+			return {
+				metaBoxes: getMetaBoxesPerLocation( location ),
+				isVisible: isMetaBoxLocationVisible( location ),
+				areMetaBoxesInitialized: _areMetaBoxesInitialized(),
+				isEditorReady: __unstableIsEditorReady(),
+			};
+		},
+		[ location ]
+	);
+
+	// When editor is ready, initialize postboxes (wp core script) and metabox
+	// saving. This initializes all meta box locations, not just this specific
+	// one.
+	useEffect( () => {
+		if ( isEditorReady && ! areMetaBoxesInitialized ) {
+			registry.dispatch( editPostStore ).initializeMetaBoxes();
+		}
+	}, [ isEditorReady, areMetaBoxesInitialized ] );
+
+	if ( ! areMetaBoxesInitialized ) {
+		return null;
+	}
+
 	return (
 		<>
 			{ map( metaBoxes, ( { id } ) => (
@@ -25,14 +64,3 @@ function MetaBoxes( { location, isVisible, metaBoxes } ) {
 		</>
 	);
 }
-
-export default withSelect( ( select, { location } ) => {
-	const { isMetaBoxLocationVisible, getMetaBoxesPerLocation } = select(
-		editPostStore
-	);
-
-	return {
-		metaBoxes: getMetaBoxesPerLocation( location ),
-		isVisible: isMetaBoxLocationVisible( location ),
-	};
-} )( MetaBoxes );

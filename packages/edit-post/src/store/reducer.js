@@ -281,9 +281,26 @@ function isEditingTemplate( state = false, action ) {
 	return state;
 }
 
+/**
+ * Reducer tracking whether meta boxes are initialized.
+ *
+ * @param {boolean} state
+ * @param {Object}  action
+ *
+ * @return {boolean} Updated state.
+ */
+function metaBoxesInitialized( state = false, action ) {
+	switch ( action.type ) {
+		case 'META_BOXES_INITIALIZED':
+			return true;
+	}
+	return state;
+}
+
 const metaBoxes = combineReducers( {
 	isSaving: isSavingMetaBoxes,
 	locations: metaBoxLocations,
+	initialized: metaBoxesInitialized,
 } );
 
 export default combineReducers( {
