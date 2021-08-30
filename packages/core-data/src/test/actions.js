@@ -109,6 +109,8 @@ describe( 'saveEntityRecord', () => {
 
 		const dispatch = Object.assign( jest.fn(), {
 			receiveEntityRecords: jest.fn(),
+			__unstableAcquireStoreLock: jest.fn(),
+			__unstableReleaseStoreLock: jest.fn(),
 		} );
 		// Provide entities
 		dispatch.mockReturnValueOnce( entities );
@@ -132,7 +134,7 @@ describe( 'saveEntityRecord', () => {
 			data: post,
 		} );
 
-		expect( dispatch ).toHaveBeenCalledTimes( 5 );
+		expect( dispatch ).toHaveBeenCalledTimes( 3 );
 		expect( dispatch ).toHaveBeenCalledWith( {
 			type: 'SAVE_ENTITY_RECORD_START',
 			kind: 'postType',
@@ -140,11 +142,9 @@ describe( 'saveEntityRecord', () => {
 			recordId: undefined,
 			isAutosave: false,
 		} );
-		expect( dispatch ).toHaveBeenCalledWith( [
-			{
-				type: 'MOCKED_ACQUIRE_LOCK',
-			},
-		] );
+		expect( dispatch.__unstableAcquireStoreLock ).toHaveBeenCalledTimes(
+			1
+		);
 		expect( dispatch ).toHaveBeenCalledWith( {
 			type: 'SAVE_ENTITY_RECORD_FINISH',
 			kind: 'postType',
@@ -153,11 +153,9 @@ describe( 'saveEntityRecord', () => {
 			error: undefined,
 			isAutosave: false,
 		} );
-		expect( dispatch ).toHaveBeenCalledWith( [
-			{
-				type: 'MOCKED_RELEASE_LOCK',
-			},
-		] );
+		expect( dispatch.__unstableReleaseStoreLock ).toHaveBeenCalledTimes(
+			1
+		);
 
 		expect( dispatch.receiveEntityRecords ).toHaveBeenCalledTimes( 1 );
 		expect( dispatch.receiveEntityRecords ).toHaveBeenCalledWith(
@@ -183,6 +181,8 @@ describe( 'saveEntityRecord', () => {
 
 		const dispatch = Object.assign( jest.fn(), {
 			receiveEntityRecords: jest.fn(),
+			__unstableAcquireStoreLock: jest.fn(),
+			__unstableReleaseStoreLock: jest.fn(),
 		} );
 		// Provide entities
 		dispatch.mockReturnValueOnce( entities );
@@ -206,7 +206,7 @@ describe( 'saveEntityRecord', () => {
 			data: post,
 		} );
 
-		expect( dispatch ).toHaveBeenCalledTimes( 5 );
+		expect( dispatch ).toHaveBeenCalledTimes( 3 );
 		expect( dispatch ).toHaveBeenCalledWith( {
 			type: 'SAVE_ENTITY_RECORD_START',
 			kind: 'postType',
@@ -214,11 +214,9 @@ describe( 'saveEntityRecord', () => {
 			recordId: 10,
 			isAutosave: false,
 		} );
-		expect( dispatch ).toHaveBeenCalledWith( [
-			{
-				type: 'MOCKED_ACQUIRE_LOCK',
-			},
-		] );
+		expect( dispatch.__unstableAcquireStoreLock ).toHaveBeenCalledTimes(
+			1
+		);
 		expect( dispatch ).toHaveBeenCalledWith( {
 			type: 'SAVE_ENTITY_RECORD_FINISH',
 			kind: 'postType',
@@ -227,11 +225,9 @@ describe( 'saveEntityRecord', () => {
 			error: undefined,
 			isAutosave: false,
 		} );
-		expect( dispatch ).toHaveBeenCalledWith( [
-			{
-				type: 'MOCKED_RELEASE_LOCK',
-			},
-		] );
+		expect( dispatch.__unstableReleaseStoreLock ).toHaveBeenCalledTimes(
+			1
+		);
 
 		expect( dispatch.receiveEntityRecords ).toHaveBeenCalledTimes( 1 );
 		expect( dispatch.receiveEntityRecords ).toHaveBeenCalledWith(
@@ -262,6 +258,8 @@ describe( 'saveEntityRecord', () => {
 
 		const dispatch = Object.assign( jest.fn(), {
 			receiveEntityRecords: jest.fn(),
+			__unstableAcquireStoreLock: jest.fn(),
+			__unstableReleaseStoreLock: jest.fn(),
 		} );
 		// Provide entities
 		dispatch.mockReturnValueOnce( entities );
@@ -282,7 +280,7 @@ describe( 'saveEntityRecord', () => {
 			data: postType,
 		} );
 
-		expect( dispatch ).toHaveBeenCalledTimes( 5 );
+		expect( dispatch ).toHaveBeenCalledTimes( 3 );
 		expect( dispatch ).toHaveBeenCalledWith( {
 			type: 'SAVE_ENTITY_RECORD_START',
 			kind: 'root',
@@ -290,11 +288,9 @@ describe( 'saveEntityRecord', () => {
 			recordId: 'page',
 			isAutosave: false,
 		} );
-		expect( dispatch ).toHaveBeenCalledWith( [
-			{
-				type: 'MOCKED_ACQUIRE_LOCK',
-			},
-		] );
+		expect( dispatch.__unstableAcquireStoreLock ).toHaveBeenCalledTimes(
+			1
+		);
 		expect( dispatch ).toHaveBeenCalledWith( {
 			type: 'SAVE_ENTITY_RECORD_FINISH',
 			kind: 'root',
@@ -303,11 +299,9 @@ describe( 'saveEntityRecord', () => {
 			error: undefined,
 			isAutosave: false,
 		} );
-		expect( dispatch ).toHaveBeenCalledWith( [
-			{
-				type: 'MOCKED_RELEASE_LOCK',
-			},
-		] );
+		expect( dispatch.__unstableReleaseStoreLock ).toHaveBeenCalledTimes(
+			1
+		);
 
 		expect( dispatch.receiveEntityRecords ).toHaveBeenCalledTimes( 1 );
 		expect( dispatch.receiveEntityRecords ).toHaveBeenCalledWith(
