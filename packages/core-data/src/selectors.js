@@ -202,17 +202,25 @@ export function __experimentalGetEntityRecordNoResolver(
 export const getRawEntityRecord = createSelector(
 	( state, kind, name, key ) => {
 		const record = getEntityRecord( state, kind, name, key );
+		const entity = getEntity( state, kind, name );
 		return (
 			record &&
 			Object.keys( record ).reduce( ( accumulator, _key ) => {
-				// Because edits are the "raw" attribute values,
-				// we return those from record selectors to make rendering,
-				// comparisons, and joins with edits easier.
-				accumulator[ _key ] = get(
-					record[ _key ],
-					'raw',
-					record[ _key ]
-				);
+				const isRawBlockMarkupField = (
+					entity.rawBlockMarkupFields || []
+				).includes( _key );
+				if ( isRawBlockMarkupField ) {
+					// Because edits are the "raw" attribute values,
+					// we return those from record selectors to make rendering,
+					// comparisons, and joins with edits easier.
+					accumulator[ _key ] = get(
+						record[ _key ],
+						'raw',
+						record[ _key ]
+					);
+				} else {
+					accumulator[ _key ] = record[ _key ];
+				}
 				return accumulator;
 			}, {} )
 		);
