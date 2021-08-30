@@ -42,6 +42,7 @@ import { placeCaretAtHorizontalEdge } from '@wordpress/dom';
 import { link as linkIcon } from '@wordpress/icons';
 import { store as coreStore } from '@wordpress/core-data';
 import { speak } from '@wordpress/a11y';
+import { createBlock } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
@@ -291,6 +292,7 @@ export default function NavigationSubmenuEdit( {
 	};
 	const { showSubmenuIcon } = context;
 	const { saveEntityRecord } = useDispatch( coreStore );
+	const { insertBlock } = useDispatch( blockEditorStore );
 	const [ isLinkOpen, setIsLinkOpen ] = useState( false );
 	const listItemRef = useRef( null );
 	const isDraggingWithin = useIsDraggingWithin( listItemRef );
@@ -303,6 +305,7 @@ export default function NavigationSubmenuEdit( {
 		isParentOfSelectedBlock,
 		isImmediateParentOfSelectedBlock,
 		hasDescendants,
+		numberOfDescendants,
 		selectedBlockHasDescendants,
 		userCanCreatePages,
 		userCanCreatePosts,
@@ -335,6 +338,7 @@ export default function NavigationSubmenuEdit( {
 					false
 				),
 				hasDescendants: !! descendants,
+				numberOfDescendants: descendants,
 				selectedBlockHasDescendants: !! getClientIdsOfDescendants( [
 					selectedBlockId,
 				] )?.length,
@@ -429,7 +433,7 @@ export default function NavigationSubmenuEdit( {
 
 	const blockProps = useBlockProps( {
 		ref: listItemRef,
-		className: classnames( {
+		className: classnames( 'wp-block-navigation-item', {
 			'is-editing': isSelected || isParentOfSelectedBlock,
 			'is-dragging-within': isDraggingWithin,
 			'has-link': !! url,
@@ -454,6 +458,17 @@ export default function NavigationSubmenuEdit( {
 	if ( isAtMaxNesting ) {
 		pull( ALLOWED_BLOCKS, 'core/navigation-submenu' );
 	}
+
+	// Add a link when creating a new Submenu.
+	useEffect( () => {
+		if ( ! hasDescendants ) {
+			insertBlock(
+				createBlock( 'core/navigation-link' ),
+				numberOfDescendants,
+				clientId
+			);
+		}
+	}, [] );
 
 	const innerBlocksProps = useInnerBlocksProps(
 		{
