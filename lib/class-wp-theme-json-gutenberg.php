@@ -186,7 +186,7 @@ class WP_Theme_JSON_Gutenberg {
 			'path'          => array( 'color', 'duotone' ),
 			'value_key'     => 'slug',
 			'css_var_infix' => 'duotone',
-			'value_wrapper' => 'url(#wp-duotone-filter-$s)',
+			'value_format' => 'url(#wp-duotone-filter-%s)',
 			'classes'       => array(
 				array(
 					'class_suffix'  => 'duotone',
@@ -687,8 +687,10 @@ class WP_Theme_JSON_Gutenberg {
 			$preset_per_origin = _wp_array_get( $settings, $preset['path'], array() );
 			$preset_by_slug    = self::get_merged_preset_by_slug( $preset_per_origin, $preset['value_key'] );
 			foreach ( $preset_by_slug as $slug => $value ) {
-				if ( ! empty( $preset['value_wrapper'] ) ) {
-					$value = str_replace( '$s', $value, $preset['value_wrapper'] );
+				if ( ! empty( $preset['value_format'] ) ) {
+					$value = vsprintf(
+						$preset['value_format'], is_array( $value ) ? $value : array( $value )
+					);
 				}
 				$declarations[] = array(
 					'name'  => '--wp--preset--' . $preset['css_var_infix'] . '--' . gutenberg_experimental_to_kebab_case( $slug ),
