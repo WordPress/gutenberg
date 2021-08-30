@@ -4,6 +4,7 @@
 import { DropdownMenu } from '@wordpress/components';
 import { PinnedItems } from '@wordpress/interface';
 import { __, sprintf } from '@wordpress/i18n';
+import { decodeEntities } from '@wordpress/html-entities';
 
 /**
  * Internal dependencies
@@ -42,7 +43,7 @@ export default function Header( {
 				{ __( 'Navigation' ) }
 			</h1>
 			<h2 className="edit-navigation-header__subtitle">
-				{ isMenuSelected && actionHeaderText }
+				{ isMenuSelected && decodeEntities( actionHeaderText ) }
 			</h2>
 			{ isMenuSelected && (
 				<div className="edit-navigation-header__actions">

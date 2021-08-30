@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { check, moreHorizontal } from '@wordpress/icons';
+import { check, moreVertical } from '@wordpress/icons';
 import { __ } from '@wordpress/i18n';
 
 /**
@@ -32,7 +32,7 @@ const ToolsPanelHeader = ( props, forwardedRef ) => {
 		<h2 { ...headerProps } ref={ forwardedRef }>
 			{ header }
 			{ hasMenuItems && (
-				<DropdownMenu icon={ moreHorizontal } label={ menuLabel }>
+				<DropdownMenu icon={ moreVertical } label={ menuLabel }>
 					{ ( { onClose } ) => (
 						<>
 							<MenuGroup label={ __( 'Display options' ) }>

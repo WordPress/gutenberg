@@ -30,6 +30,7 @@ export default function useBlockNavigator( clientId, __experimentalFeatures ) {
 			onRequestClose={ () => {
 				setIsNavigationListOpen( false );
 			} }
+			shouldCloseOnClickOutside={ false }
 		>
 			<BlockNavigationList
 				clientId={ clientId }
