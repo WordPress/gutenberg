@@ -209,6 +209,7 @@ export const getRawEntityRecord = createSelector(
 				const isRawBlockMarkupField = (
 					entity.rawBlockMarkupFields || []
 				).includes( _key );
+
 				if ( isRawBlockMarkupField ) {
 					// Because edits are the "raw" attribute values,
 					// we return those from record selectors to make rendering,
