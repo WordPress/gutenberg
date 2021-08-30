@@ -528,3 +528,13 @@
 html.has-modal-open {
 	overflow: hidden;
 }
+
+
+/**
+ * Child blocks.
+ */
+
+// Text decoration is inherited all the way down. Floating the item unsets it.
+.wp-block-navigation[style*="text-decoration"] .wp-block-search {
+	float: left;
+}
