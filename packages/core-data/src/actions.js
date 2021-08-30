@@ -7,7 +7,6 @@ import { v4 as uuid } from 'uuid';
 /**
  * WordPress dependencies
  */
-import { controls } from '@wordpress/data';
 import { apiFetch, __unstableAwaitPromise } from '@wordpress/data-controls';
 import triggerFetch from '@wordpress/api-fetch';
 import { addQueryArgs } from '@wordpress/url';
@@ -250,28 +249,22 @@ export function* deleteEntityRecord(
  *
  * @return {Object} Action object.
  */
-export function* editEntityRecord( kind, name, recordId, edits, options = {} ) {
-	const entity = yield controls.select( STORE_NAME, 'getEntity', kind, name );
+export const editEntityRecord = (
+	kind,
+	name,
+	recordId,
+	edits,
+	options = {}
+) => async ( { select, dispatch } ) => {
+	const entity = select.getEntity( kind, name );
 	if ( ! entity ) {
 		throw new Error(
 			`The entity being edited (${ kind }, ${ name }) does not have a loaded config.`
 		);
 	}
 	const { transientEdits = {}, mergedEdits = {} } = entity;
-	const record = yield controls.select(
-		STORE_NAME,
-		'getRawEntityRecord',
-		kind,
-		name,
-		recordId
-	);
-	const editedRecord = yield controls.select(
-		STORE_NAME,
-		'getEditedEntityRecord',
-		kind,
-		name,
-		recordId
-	);
+	const record = select.getRawEntityRecord( kind, name, recordId );
+	const editedRecord = select.getEditedEntityRecord( kind, name, recordId );
 
 	const edit = {
 		kind,
@@ -290,7 +283,7 @@ export function* editEntityRecord( kind, name, recordId, edits, options = {} ) {
 		}, {} ),
 		transientEdits,
 	};
-	return {
+	return await dispatch( {
 		type: 'EDIT_ENTITY_RECORD',
 		...edit,
 		meta: {
@@ -303,44 +296,40 @@ export function* editEntityRecord( kind, name, recordId, edits, options = {} ) {
 				}, {} ),
 			},
 		},
-	};
-}
+	} );
+};
 
 /**
  * Action triggered to undo the last edit to
  * an entity record, if any.
  */
-export function* undo() {
-	const undoEdit = yield controls.select( STORE_NAME, 'getUndoEdit' );
+export const undo = () => ( { select, dispatch } ) => {
+	const undoEdit = select.getUndoEdit();
 	if ( ! undoEdit ) {
 		return;
 	}
-	yield {
+	return dispatch( {
 		type: 'EDIT_ENTITY_RECORD',
 		...undoEdit,
-		meta: {
-			isUndo: true,
-		},
-	};
-}
+		meta: { isUndo: true },
+	} );
+};
 
 /**
  * Action triggered to redo the last undoed
  * edit to an entity record, if any.
  */
-export function* redo() {
-	const redoEdit = yield controls.select( STORE_NAME, 'getRedoEdit' );
+export const redo = () => ( { select, dispatch } ) => {
+	const redoEdit = select.getRedoEdit();
 	if ( ! redoEdit ) {
 		return;
 	}
-	yield {
+	return dispatch( {
 		type: 'EDIT_ENTITY_RECORD',
 		...redoEdit,
-		meta: {
-			isRedo: true,
-		},
-	};
-}
+		meta: { isRedo: true },
+	} );
+};
 
 /**
  * Forces the creation of a new undo level.
