@@ -897,6 +897,7 @@ export class RichText extends Component {
 			lineHeight = parseFloat( this.props.style.lineHeight );
 		}
 
+		// TO-DO to be updated for both iOS and Android
 		return parseInt( fontSize + fontSize * lineHeight, 10 );
 	}
 

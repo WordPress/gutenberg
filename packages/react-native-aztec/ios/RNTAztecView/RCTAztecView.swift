@@ -109,6 +109,10 @@ class RCTAztecView: Aztec.TextView {
     /// Font weight for all contents.  Once this is set, it will always override the font weight for all of its
     /// contents, regardless of what HTML is provided to Aztec.
     private var fontWeight: String? = nil
+    
+    /// Line height for all contents.  Once this is set, it will always override the font size for all of its
+    /// contents, regardless of what HTML is provided to Aztec.
+    private var lineHeight: CGFloat? = nil
 
     // MARK: - Formats
 
@@ -597,6 +601,15 @@ class RCTAztecView: Aztec.TextView {
         fontWeight = weight
         refreshFont()
     }
+    
+    @objc func setLineHeight(_ newLineHeight: CGFloat) {
+        print(newLineHeight)
+        guard lineHeight != newLineHeight else {
+            return
+        }
+        lineHeight = newLineHeight
+        refreshLineHeight()
+    }
 
     // MARK: - Font Refreshing
 
@@ -652,6 +665,19 @@ class RCTAztecView: Aztec.TextView {
     private func refreshTypingAttributesAndPlaceholderFont() {
         let currentFont = font(from: typingAttributes)        
         placeholderLabel.font = currentFont
+    }
+    
+    /// This method refreshes the line height.
+    private func refreshLineHeight() {
+        if ((lineHeight) != nil) {
+            defaultParagraphStyle.regularLineSpacing = lineHeight!
+            
+            let attributeString = NSMutableAttributedString(string: self.text)
+            let style = NSMutableParagraphStyle()
+
+            style.lineSpacing = lineHeight!
+            textStorage.addAttribute(NSAttributedString.Key.paragraphStyle, value: style, range: NSMakeRange(0, textStorage.length))
+        }
     }
 
     // MARK: - Formatting interface
