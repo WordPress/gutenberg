@@ -44,8 +44,9 @@ const useKeyboardVisibility = () => {
 	const previousKeyboardVisible = usePrevious( keyboardVisible );
 
 	useEffect( () => {
+		let isCurrent = true;
 		const showListener = Keyboard.addListener( 'keyboardDidShow', () => {
-			if ( previousKeyboardVisible !== true ) {
+			if ( isCurrent && previousKeyboardVisible !== true ) {
 				setKeyboardVisible( true );
 			}
 		} );
@@ -54,11 +55,12 @@ const useKeyboardVisibility = () => {
 			ios: 'keyboardWillHide',
 		} );
 		const hideListener = Keyboard.addListener( keyboardHideEvent, () => {
-			if ( previousKeyboardVisible !== false ) {
+			if ( isCurrent && previousKeyboardVisible !== false ) {
 				setKeyboardVisible( false );
 			}
 		} );
 		return () => {
+			isCurrent = false;
 			showListener.remove();
 			hideListener.remove();
 		};
@@ -273,6 +275,7 @@ const TooltipSlot = ( { children, ...rest } ) => {
 				}
 				pointerEvents="box-none"
 				style={ StyleSheet.absoluteFill }
+				testID="tooltip-overlay"
 			>
 				{ children }
 				<Slot { ...rest } />

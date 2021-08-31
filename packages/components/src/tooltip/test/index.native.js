@@ -1,6 +1,7 @@
 /**
  * External dependencies
  */
+import { act } from 'react-test-renderer';
 import { fireEvent, render, waitFor } from 'test/helpers';
 import { Keyboard, Text } from 'react-native';
 
@@ -69,6 +70,42 @@ it( 'dismisses when the screen is tapped', async () => {
 	expect( message ).toBeTruthy();
 
 	fireEvent( screen.getByTestId( 'tooltip-overlay' ), 'touchStart' );
+
+	expect( screen.queryByText( 'A helpful message' ) ).toBeNull();
+} );
+
+it( 'dismisses when the keyboard closes', async () => {
+	const screen = render(
+		<TooltipSlot>
+			<Tooltip visible={ true } text="A helpful message">
+				<Text>I need help</Text>
+			</Tooltip>
+		</TooltipSlot>
+	);
+
+	// Show keyboard
+	act( () => {
+		keyboardHandlers.forEach( ( [ event, handler ] ) => {
+			if ( event === 'keyboardDidShow' ) {
+				handler();
+			}
+		} );
+	} );
+
+	const message = await waitFor( () =>
+		screen.getByText( 'A helpful message' )
+	);
+
+	expect( message ).toBeTruthy();
+
+	// Hide keyboard
+	act( () => {
+		keyboardHandlers.forEach( ( [ event, handler ] ) => {
+			if ( event === 'keyboardDidHide' ) {
+				handler();
+			}
+		} );
+	} );
 
 	expect( screen.queryByText( 'A helpful message' ) ).toBeNull();
 } );
