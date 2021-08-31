@@ -1,8 +1,7 @@
 /**
  * Internal dependencies
  */
-import { useContextSystem } from '../ui/context';
-import type { WordPressComponentProps } from '../ui/context';
+import { useContextSystem, WordPressComponentProps } from '../ui/context';
 import type { Props as TextProps } from '../text/types';
 import { useText } from '../text';
 import { getHeadingFontSize } from '../ui/utils/font-size';

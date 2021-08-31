@@ -7,8 +7,11 @@ import type { Ref } from 'react';
 /**
  * Internal dependencies
  */
-import { useContextSystem, contextConnect } from '../context';
-import type { WordPressComponentProps } from '../context';
+import {
+	useContextSystem,
+	contextConnect,
+	WordPressComponentProps,
+} from '../context';
 import { View } from '../../view';
 
 export interface ShortcutDescription {
