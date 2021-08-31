@@ -2,6 +2,6 @@ export { default as transformStyles } from './transform-styles';
 export * from './theme';
 export * from './block-variation-transforms';
 export {
-	getResolvedStyleVariable as __experimentalGetResolvedStyleVariable,
-	getPresetVariableRepresentingAValue as __experimentalGetPresetVariableRepresentingAValue,
+	getValueFromVariable as __experimentalGetValueFromVariable,
+	getPresetVariableFromValue as __experimentalGetPresetVariableFromValue,
 } from './style-variable-resolution';
