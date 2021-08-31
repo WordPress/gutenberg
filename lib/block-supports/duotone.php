@@ -278,7 +278,7 @@ function gutenberg_get_duotone_style( $selectors_group, $duotone_id ) {
  * @param array $duotone_values
  * @return string The markup for the <svg> tag.
  */
-function gutenberg_get_dutone_svg_filters( $duotone_id, $duotone_values ) {
+function gutenberg_get_duotone_svg_filters( $duotone_id, $duotone_values ) {
 	ob_start();
 	?>
 
