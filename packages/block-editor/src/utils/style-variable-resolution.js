@@ -16,14 +16,14 @@ const STYLE_PROPERTIES_TO_CSS_VAR_INFIX = {
 
 function findInPresetsBy(
 	features,
-	context,
+	blockName,
 	presetPath,
 	presetProperty,
 	presetValueValue
 ) {
 	// Block presets take priority above root level presets.
 	const orderedPresetsByOrigin = [
-		get( features, [ 'blocks', context, ...presetPath ] ),
+		get( features, [ 'blocks', blockName, ...presetPath ] ),
 		get( features, presetPath ),
 	];
 	for ( const presetByOrigin of orderedPresetsByOrigin ) {
@@ -45,7 +45,7 @@ function findInPresetsBy(
 						// if there is a highest priority preset with the same slug but different value the preset we found was overwritten and should be ignored.
 						const highestPresetObjectWithSameSlug = findInPresetsBy(
 							features,
-							context,
+							blockName,
 							presetPath,
 							'slug',
 							presetObject.slug
@@ -87,7 +87,7 @@ function getValueFromPresetVariable(
 	if ( presetObject ) {
 		const { valueKey } = metadata;
 		const result = presetObject[ valueKey ];
-		return getResolvedStyleVariable( features, blockName, result );
+		return getValueFromVariable( features, blockName, result );
 	}
 
 	return variable;
@@ -101,29 +101,27 @@ function getValueFromCustomVariable( features, blockName, variable, path ) {
 		return variable;
 	}
 	// A variable may reference another variable so we need recursion until we find the value.
-	return getResolvedStyleVariable( features, blockName, result );
+	return getValueFromVariable( features, blockName, result );
 }
 
-export function getResolvedStyleVariable( features, context, variable ) {
+export function getValueFromVariable( features, blockName, variable ) {
 	if ( ! variable || ! isString( variable ) ) {
 		return variable;
 	}
-	const INTERNAL_REFERENCE_PREFIX = 'var:';
-	const CSS_REFERENCE_PREFIX = 'var(--wp--';
-	const CSS_REFERENCE_SUFFIX = ')';
+	const USER_VALUE_PREFIX = 'var:';
+	const THEME_VALUE_PREFIX = 'var(--wp--';
+	const THEME_VALUE_SUFFIX = ')';
 
 	let parsedVar;
 
-	if ( variable.startsWith( INTERNAL_REFERENCE_PREFIX ) ) {
-		parsedVar = variable
-			.slice( INTERNAL_REFERENCE_PREFIX.length )
-			.split( '|' );
+	if ( variable.startsWith( USER_VALUE_PREFIX ) ) {
+		parsedVar = variable.slice( USER_VALUE_PREFIX.length ).split( '|' );
 	} else if (
-		variable.startsWith( CSS_REFERENCE_PREFIX ) &&
-		variable.endsWith( CSS_REFERENCE_SUFFIX )
+		variable.startsWith( THEME_VALUE_PREFIX ) &&
+		variable.endsWith( THEME_VALUE_SUFFIX )
 	) {
 		parsedVar = variable
-			.slice( CSS_REFERENCE_PREFIX.length, -CSS_REFERENCE_SUFFIX.length )
+			.slice( THEME_VALUE_PREFIX.length, -THEME_VALUE_SUFFIX.length )
 			.split( '--' );
 	} else {
 		// We don't know how to parse the value: either is raw of uses complex CSS such as `calc(1px * var(--wp--variable) )`
@@ -132,48 +130,58 @@ export function getResolvedStyleVariable( features, context, variable ) {
 
 	const [ type, ...path ] = parsedVar;
 	if ( type === 'preset' ) {
-		return getValueFromPresetVariable( features, context, variable, path );
+		return getValueFromPresetVariable(
+			features,
+			blockName,
+			variable,
+			path
+		);
 	}
 	if ( type === 'custom' ) {
-		return getValueFromCustomVariable( features, context, variable, path );
+		return getValueFromCustomVariable(
+			features,
+			blockName,
+			variable,
+			path
+		);
 	}
 	return variable;
 }
 
-export function getPresetVariableRepresentingAValue(
+export function getPresetVariableFromValue(
 	features,
-	context,
-	propertyName,
-	value
+	blockName,
+	presetPropertyName,
+	presetPropertyValue
 ) {
-	if ( ! value ) {
-		return value;
+	if ( ! presetPropertyValue ) {
+		return presetPropertyValue;
 	}
 
 	const cssVarInfix =
-		STYLE_PROPERTIES_TO_CSS_VAR_INFIX[ propertyName ] ||
-		kebabCase( propertyName );
+		STYLE_PROPERTIES_TO_CSS_VAR_INFIX[ presetPropertyName ] ||
+		kebabCase( presetPropertyName );
 
 	const metadata = find( PRESET_METADATA, [ 'cssVarInfix', cssVarInfix ] );
 	if ( ! metadata ) {
 		// The property doesn't have preset data
 		// so the value should be returned as it is.
-		return value;
+		return presetPropertyValue;
 	}
 	const { valueKey, path } = metadata;
 
 	const presetObject = findInPresetsBy(
 		features,
-		context,
+		blockName,
 		path,
 		valueKey,
-		value
+		presetPropertyValue
 	);
 
 	if ( ! presetObject ) {
 		// Value wasn't found in the presets,
 		// so it must be a custom value.
-		return value;
+		return presetPropertyValue;
 	}
 
 	return `var:preset|${ cssVarInfix }|${ presetObject.slug }`;

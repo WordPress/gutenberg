@@ -7,13 +7,14 @@ import { get } from 'lodash';
  * WordPress dependencies
  */
 import { useSelect } from '@wordpress/data';
+import { useMemo } from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
 import { useBlockEditContext } from '../block-edit';
 import { store as blockEditorStore } from '../../store';
-import { getResolvedStyleVariable } from '../../utils/style-variable-resolution';
+import { getValueFromVariable } from '../../utils/style-variable-resolution';
 
 /**
  * Hook that retrieves the global styles of a block.
@@ -31,22 +32,20 @@ import { getResolvedStyleVariable } from '../../utils/style-variable-resolution'
 export default function useStyle( path ) {
 	const { name: blockName } = useBlockEditContext();
 
-	const setting = useSelect(
-		( select ) => {
-			const settings = select( blockEditorStore ).getSettings();
-			const settingsForBlock = get( settings, [
-				'__experimentalStyles',
-				'blocks',
-				blockName,
-			] );
-			return getResolvedStyleVariable(
-				settings.__experimentalFeatures,
-				blockName,
-				get( settingsForBlock, path )
-			);
-		},
-		[ blockName, path ]
-	);
-
-	return setting;
+	const settings = useSelect( ( select ) => {
+		return select( blockEditorStore ).getSettings();
+	}, [] );
+	const settingsForBlock = get( settings, [
+		'__experimentalStyles',
+		'blocks',
+		blockName,
+	] );
+	const value = get( settingsForBlock, path );
+	return useMemo( () => {
+		return getValueFromVariable(
+			settings.__experimentalFeatures,
+			blockName,
+			value
+		);
+	}, [ settings.__experimentalFeatures, blockName, value ] );
 }

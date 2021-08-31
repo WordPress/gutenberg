@@ -22,8 +22,8 @@ import {
 import { useEntityProp } from '@wordpress/core-data';
 import { useSelect, useDispatch } from '@wordpress/data';
 import {
-	__experimentalGetResolvedStyleVariable as getResolvedStyleVariable,
-	__experimentalGetPresetVariableRepresentingAValue as getPresetVariableRepresentingAValue,
+	__experimentalGetValueFromVariable as getValueFromVariable,
+	__experimentalGetPresetVariableFromValue as getPresetVariableFromValue,
 } from '@wordpress/block-editor';
 
 /**
@@ -258,7 +258,7 @@ export default function GlobalStylesProvider( { children, baseStyles } ) {
 
 				if ( origin === 'theme' ) {
 					const value = get( themeStyles?.styles, path );
-					return getResolvedStyleVariable(
+					return getValueFromVariable(
 						themeStyles.settings,
 						context,
 						value
@@ -271,7 +271,7 @@ export default function GlobalStylesProvider( { children, baseStyles } ) {
 					// We still need to use merged styles here because the
 					// presets used to resolve user variable may be defined a
 					// layer down ( core, theme, or user ).
-					return getResolvedStyleVariable(
+					return getValueFromVariable(
 						mergedStyles.settings,
 						context,
 						value
@@ -279,7 +279,7 @@ export default function GlobalStylesProvider( { children, baseStyles } ) {
 				}
 
 				const value = get( mergedStyles?.styles, path );
-				return getResolvedStyleVariable(
+				return getValueFromVariable(
 					mergedStyles.settings,
 					context,
 					value
@@ -302,7 +302,7 @@ export default function GlobalStylesProvider( { children, baseStyles } ) {
 				set(
 					newStyles,
 					propertyPath,
-					getPresetVariableRepresentingAValue(
+					getPresetVariableFromValue(
 						mergedStyles.settings,
 						context,
 						propertyName,
@@ -337,6 +337,7 @@ export default function GlobalStylesProvider( { children, baseStyles } ) {
 				},
 			],
 			__experimentalFeatures: mergedStyles.settings,
+			__experimentalStyles: mergedStyles.styles,
 		} );
 	}, [ blocks, mergedStyles ] );
 
