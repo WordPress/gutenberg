@@ -47,7 +47,10 @@
 		height: 30px;
 		margin-top: 0;
 		margin-bottom: 0;
-		z-index: 1;
+	}
+
+	.components-button:focus {
+		z-index: z-index(".components-button {:focus or .is-primary}");
 	}
 }
 
