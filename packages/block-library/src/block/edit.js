@@ -21,11 +21,14 @@ import {
 	__experimentalUseInnerBlocksProps as useInnerBlocksProps,
 	__experimentalUseNoRecursiveRenders as useNoRecursiveRenders,
 	__experimentalBlockContentOverlay as BlockContentOverlay,
+	__experimentalParentBlockSelectorUnsavedChangesIndicator as ParentBlockSelectorUnsavedChangesIndicator,
+	__experimentalSelectedBlockUnsavedChangesIndicator as SelectedBlockUnsavedChangesIndicator,
 	InnerBlocks,
 	BlockControls,
 	InspectorControls,
 	useBlockProps,
 	Warning,
+	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import { store as reusableBlocksStore } from '@wordpress/reusable-blocks';
 import { ungroup } from '@wordpress/icons';
@@ -67,6 +70,23 @@ export default function ReusableBlockEdit( { attributes: { ref }, clientId } ) {
 		},
 		[ ref, clientId ]
 	);
+
+	const { isChildSelected, isSelected } = useSelect( ( select ) => {
+		const { getBlockParents, getSelectedBlockClientId } = select(
+			blockEditorStore
+		);
+		const selectedBlockClientId = getSelectedBlockClientId();
+		const _isSelected = selectedBlockClientId === clientId;
+
+		const parents = getBlockParents( selectedBlockClientId );
+		const firstParentClientId = parents[ parents.length - 1 ];
+		const _isChildSelected = firstParentClientId === clientId;
+
+		return {
+			isChildSelected: _isChildSelected,
+			isSelected: _isSelected,
+		};
+	}, [] );
 
 	const {
 		__experimentalConvertBlockToStatic: convertBlockToStatic,
@@ -156,6 +176,14 @@ export default function ReusableBlockEdit( { attributes: { ref }, clientId } ) {
 	return (
 		<RecursionProvider>
 			<div { ...blockProps }>
+				{ isSelected && hasEdits && (
+					<SelectedBlockUnsavedChangesIndicator />
+				) }
+
+				{ isChildSelected && hasEdits && (
+					<ParentBlockSelectorUnsavedChangesIndicator />
+				) }
+
 				<BlockControls>
 					<ToolbarGroup>
 						<ToolbarButton
@@ -165,18 +193,19 @@ export default function ReusableBlockEdit( { attributes: { ref }, clientId } ) {
 							showTooltip
 						/>
 					</ToolbarGroup>
-					<ToolbarGroup>
-						<ToolbarButton
-							isPrimary
-							className="block-library-block__reusable-block-save-button"
-							onClick={ saveEditedRecords }
-							label={ __( 'Save reusable block' ) }
-							showTooltip
-							isDisabled={ ! hasEdits }
-						>
-							{ __( 'Save' ) }
-						</ToolbarButton>
-					</ToolbarGroup>
+					{ hasEdits && (
+						<ToolbarGroup>
+							<ToolbarButton
+								isPrimary
+								className="block-library-block__reusable-block-save-button"
+								onClick={ saveEditedRecords }
+								label={ __( 'Save reusable block' ) }
+								showTooltip
+							>
+								{ __( 'Save' ) }
+							</ToolbarButton>
+						</ToolbarGroup>
+					) }
 				</BlockControls>
 				<InspectorControls>
 					<PanelBody>

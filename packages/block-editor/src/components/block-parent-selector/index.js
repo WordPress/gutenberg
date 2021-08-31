@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { getBlockType, store as blocksStore } from '@wordpress/blocks';
-import { ToolbarButton } from '@wordpress/components';
+import { ToolbarButton, Slot } from '@wordpress/components';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { __, sprintf } from '@wordpress/i18n';
 import { useRef } from '@wordpress/element';
@@ -78,6 +78,7 @@ export default function BlockParentSelector() {
 			ref={ nodeRef }
 			{ ...showMoversGestures }
 		>
+			<Slot name="parent-block-selector-unsaved-changes-indicator" />
 			<ToolbarButton
 				className="block-editor-block-parent-selector__button"
 				onClick={ () => selectBlock( firstParentClientId ) }
