@@ -2,64 +2,67 @@
  * WordPress dependencies
  */
 import {
-	__experimentalUseInnerBlocksProps as useInnerBlocksProps,
 	useBlockProps,
-	RichText,
+	BlockIcon,
+	ButtonBlockAppender,
+	InnerBlocks,
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
+import { Placeholder, TextControl } from '@wordpress/components';
+import { group as groupIcon } from '@wordpress/icons';
 import { __ } from '@wordpress/i18n';
-import { createBlock } from '@wordpress/blocks';
-import { useDispatch, useSelect } from '@wordpress/data';
+import { useSelect } from '@wordpress/data';
 
-export default function Edit( {
-	attributes,
-	setAttributes,
-	clientId,
-	onReplace,
-	mergeBlocks,
-} ) {
+export default function Edit( props ) {
+	const { clientId, isSelected } = props;
 	const { getBlock } = useSelect( blockEditorStore );
-	const { replaceInnerBlocks } = useDispatch( blockEditorStore );
-
 	const { innerBlocks } = getBlock( clientId );
 
-	const innerBlocksProps = useInnerBlocksProps( {
-		className: 'wp-widget-group-blocks',
-	} );
-
-	const blockProps = useBlockProps();
-
-	/**
-	 * Split RichText on ENTER by manually creating a new paragraph block
-	 * within the innerBlocks of the **existing** Widget Group block.
-	 * If we don't do this then RichText will be split into heading + para
-	 * thereby entirely removint the Widget Group block altogether.
-	 */
-	function allowSingleLineOnly() {
-		replaceInnerBlocks(
-			clientId,
-			[ createBlock( 'core/paragraph', {} ), ...innerBlocks ],
-			true
-		);
+	if ( innerBlocks.length === 0 ) {
+		return <SetUp { ...props } />;
+	} else if ( isSelected ) {
+		return <EditTitle { ...props } />;
 	}
+	return <Preview { ...props } />;
+}
 
+function SetUp( { attributes, setAttributes, clientId } ) {
 	return (
-		<div { ...blockProps }>
-			<RichText
-				identifier="content"
-				className="widget-title"
-				tagName="h2"
-				aria-label={ __( 'Widget title' ) }
-				placeholder={ __( 'Add title' ) }
+		<div { ...useBlockProps() }>
+			<Placeholder
+				icon={ <BlockIcon icon={ groupIcon } /> }
+				label={ __( 'Widget Group' ) }
+			>
+				<TextControl
+					label={ __( 'Title' ) }
+					value={ attributes.title }
+					onChange={ ( title ) => setAttributes( { title } ) }
+				/>
+				<ButtonBlockAppender rootClientId={ clientId } />
+			</Placeholder>
+			<InnerBlocks renderAppender={ false } />
+		</div>
+	);
+}
+
+function EditTitle( { attributes, setAttributes } ) {
+	return (
+		<div { ...useBlockProps() }>
+			<h3>{ __( 'Widget Group' ) }</h3>
+			<TextControl
+				label={ __( 'Title' ) }
 				value={ attributes.title }
-				onChange={ ( value ) => setAttributes( { title: value } ) }
-				onReplace={ onReplace }
-				onMerge={ mergeBlocks }
-				onSplit={ allowSingleLineOnly }
-				onRemove={ () => onReplace( [] ) }
-				{ ...blockProps }
+				onChange={ ( title ) => setAttributes( { title } ) }
 			/>
-			<div { ...innerBlocksProps } />
+		</div>
+	);
+}
+
+function Preview( { attributes } ) {
+	return (
+		<div { ...useBlockProps() }>
+			<h2>{ attributes.title }</h2>
+			<InnerBlocks />
 		</div>
 	);
 }
