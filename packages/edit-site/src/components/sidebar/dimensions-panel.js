@@ -34,7 +34,7 @@ function useHasHeight( { name, supports } ) {
 }
 
 function useHasMinHeight( { name, supports } ) {
-	const settings = useSetting( 'dimensions.customMinHeight', name );
+	const settings = useSetting( 'dimensions.minHeight', name );
 
 	return settings && supports.includes( 'minHeight' );
 }

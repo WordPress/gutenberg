@@ -67,7 +67,7 @@ export function resetMinHeight( { attributes = {}, setAttributes } ) {
  * @return {boolean} Whether min-height control is disabled.
  */
 export function useIsMinHeightDisabled( { name: blockName } = {} ) {
-	const isDisabled = ! useSetting( 'dimensions.customMinHeight' );
+	const isDisabled = ! useSetting( 'dimensions.minHeight' );
 	return ! hasMinHeightSupport( blockName ) || isDisabled;
 }
 
