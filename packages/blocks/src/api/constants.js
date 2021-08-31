@@ -124,3 +124,11 @@ export const __EXPERIMENTAL_ELEMENTS = {
 	h5: 'h5',
 	h6: 'h6',
 };
+
+export const PATHS_WITH_MERGE = {
+	'color.duotone': true,
+	'color.gradients': true,
+	'color.palette': true,
+	'typography.fontFamilies': true,
+	'typography.fontSizes': true,
+};

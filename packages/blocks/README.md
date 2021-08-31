@@ -665,6 +665,10 @@ _Returns_
 
 -   `Array|string`: A list of blocks or a string, depending on `handlerMode`.
 
+### PATHS_WITH_MERGE
+
+Undocumented declaration.
+
 ### rawHandler
 
 Converts an HTML string to known blocks.
