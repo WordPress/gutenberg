@@ -14,7 +14,6 @@ export default function InspectorControlsSlot( {
 	__experimentalGroup: group = 'default',
 	bubblesVirtually = true,
 	label,
-	header,
 	...props
 } ) {
 	const Slot = groups[ group ]?.Slot;
@@ -29,13 +28,9 @@ export default function InspectorControlsSlot( {
 		return null;
 	}
 
-	if ( header ) {
+	if ( label ) {
 		return (
-			<BlockSupportToolsPanel
-				group={ group }
-				header={ header }
-				label={ label }
-			>
+			<BlockSupportToolsPanel group={ group } label={ label }>
 				<Slot { ...props } bubblesVirtually={ bubblesVirtually } />
 			</BlockSupportToolsPanel>
 		);

@@ -50,11 +50,7 @@ export function DimensionPanel( props ) {
 	};
 
 	return (
-		<ToolsPanel
-			header={ __( 'Dimensions' ) }
-			label={ __( 'Dimensions options' ) }
-			resetAll={ resetAll }
-		>
+		<ToolsPanel label={ __( 'Dimensions' ) } resetAll={ resetAll }>
 			{ ! isPaddingDisabled && (
 				<ToolsPanelItem
 					hasValue={ () => hasPaddingValue( props ) }
@@ -71,15 +67,10 @@ export function DimensionPanel( props ) {
 
 ## Props
 
-### `header`: `string`
-
-Text to be displayed within the panel's header.
-
-- Required: Yes
-
 ### `label`: `string`
 
-The label for the panel's dropdown menu.
+Text to be displayed within the panel's header and as the aria label for the
+panel's dropdown menu.
 
 - Required: Yes
 

@@ -10,7 +10,6 @@ import { contextConnect } from '../../ui/context';
 const ToolsPanel = ( props, forwardedRef ) => {
 	const {
 		children,
-		header,
 		label,
 		panelContext,
 		resetAllItems,
@@ -22,8 +21,7 @@ const ToolsPanel = ( props, forwardedRef ) => {
 		<View { ...toolsPanelProps } ref={ forwardedRef }>
 			<ToolsPanelContext.Provider value={ panelContext }>
 				<ToolsPanelHeader
-					header={ header }
-					menuLabel={ label }
+					label={ label }
 					resetAll={ resetAllItems }
 					toggleItem={ toggleItem }
 				/>

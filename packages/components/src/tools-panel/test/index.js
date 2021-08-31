@@ -12,8 +12,7 @@ const resetAll = jest.fn();
 
 // Default props for the tools panel.
 const defaultProps = {
-	header: 'Panel header',
-	label: 'Display options',
+	label: 'Panel header',
 	resetAll,
 };
 
@@ -231,9 +230,9 @@ describe( 'ToolsPanel', () => {
 			expect( menuItems[ 1 ] ).toHaveAttribute( 'aria-checked', 'false' );
 		} );
 
-		it( 'should render panel header', () => {
+		it( 'should render panel label as header text', () => {
 			renderPanel();
-			const header = screen.getByText( defaultProps.header );
+			const header = screen.getByText( defaultProps.label );
 
 			expect( header ).toBeInTheDocument();
 		} );

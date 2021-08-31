@@ -132,8 +132,7 @@ const BlockInspectorSingleBlock = ( {
 			<InspectorControls.Slot
 				__experimentalGroup="dimensions"
 				bubblesVirtually={ false }
-				header={ __( 'Dimensions' ) }
-				label={ __( 'Dimensions options' ) }
+				label={ __( 'Dimensions' ) }
 			/>
 			<div>
 				<AdvancedControls bubblesVirtually={ bubblesVirtually } />

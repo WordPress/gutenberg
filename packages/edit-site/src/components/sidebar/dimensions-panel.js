@@ -140,11 +140,7 @@ export default function DimensionsPanel( { context, getStyle, setStyle } ) {
 	};
 
 	return (
-		<ToolsPanel
-			label={ __( 'Dimensions options' ) }
-			header={ __( 'Dimensions' ) }
-			resetAll={ resetAll }
-		>
+		<ToolsPanel label={ __( 'Dimensions' ) } resetAll={ resetAll }>
 			{ showPaddingControl && (
 				<ToolsPanelItem
 					hasValue={ hasPaddingValue }
