@@ -24,16 +24,16 @@ export default function Edit( {
 	const { innerBlocks } = getBlock( clientId );
 
 	const innerBlocksProps = useInnerBlocksProps( {
-		className: 'wp-widget-box__inner-blocks',
+		className: 'wp-widget-group-blocks',
 	} );
 
 	const blockProps = useBlockProps();
 
 	/**
 	 * Split RichText on ENTER by manually creating a new paragraph block
-	 * within the innerBlocks of the **existing** Widget Box block.
+	 * within the innerBlocks of the **existing** Widget Group block.
 	 * If we don't do this then RichText will be split into heading + para
-	 * thereby entirely removint the Widget Box block altogether.
+	 * thereby entirely removint the Widget Group block altogether.
 	 */
 	function allowSingleLineOnly() {
 		replaceInnerBlocks(

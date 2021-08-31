@@ -1,6 +1,6 @@
 {
 	"apiVersion": 2,
-	"name": "core/widget-box",
+	"name": "core/widget-group",
 	"category": "widgets",
 	"attributes": {
 		"title": {
@@ -13,6 +13,6 @@
 		"customClassName": true,
 		"reusable": false
 	},
-	"editorStyle": "wp-block-widget-box-editor",
-	"style": "wp-block-widget-box"
+	"editorStyle": "wp-block-widget-group-editor",
+	"style": "wp-block-widget-group"
 }

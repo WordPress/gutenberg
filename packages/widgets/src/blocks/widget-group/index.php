@@ -1,12 +1,12 @@
 <?php
 /**
- * Server-side rendering of the `core/widget-box` block.
+ * Server-side rendering of the `core/widget-group` block.
  *
  * @package WordPress
  */
 
 
-function render_block_core_widget_box( $attributes, $content, $block ) {
+function render_block_core_widget_group( $attributes, $content, $block ) {
 	global $wp_registered_sidebars, $_sidebar_being_rendered;
 
 	if ( isset( $wp_registered_sidebars[ $_sidebar_being_rendered ] ) ) {
@@ -23,7 +23,7 @@ function render_block_core_widget_box( $attributes, $content, $block ) {
 		$html .= $before_title . $attributes['title'] . $after_title;
 	}
 
-	$html .= '<div class="wp-widget-box__inner-blocks">';
+	$html .= '<div class="wp-widget-group__inner-blocks">';
 	foreach ( $block->inner_blocks as $inner_block ) {
 		$html .= $inner_block->render();
 	}
@@ -33,18 +33,18 @@ function render_block_core_widget_box( $attributes, $content, $block ) {
 }
 
 /**
- * Registers the 'core/widget-box' block.
+ * Registers the 'core/widget-group' block.
  */
-function register_block_core_widget_box() {
+function register_block_core_widget_group() {
 	register_block_type_from_metadata(
-		__DIR__ . '/widget-box',
+		__DIR__ . '/widget-group',
 		array(
-			'render_callback' => 'render_block_core_widget_box',
+			'render_callback' => 'render_block_core_widget_group',
 		)
 	);
 }
 
-add_action( 'init', 'register_block_core_widget_box' );
+add_action( 'init', 'register_block_core_widget_group' );
 
 function note_sidebar_being_rendered( $index ) {
 	global $_sidebar_being_rendered;

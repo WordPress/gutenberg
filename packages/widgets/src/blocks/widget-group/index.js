@@ -29,16 +29,16 @@ export const settings = {
 				isMultiBlock: true,
 				blocks: [ '*' ],
 				__experimentalConvert( blocks ) {
-					// Avoid transforming existing `widget-box` blocks.
-					const blocksContainWidgetBox = !! blocks.filter(
-						( block ) => block.name === 'core/widget-box'
+					// Avoid transforming existing `widget-group` blocks.
+					const blocksContainWidgetGroup = !! blocks.filter(
+						( block ) => block.name === 'core/widget-group'
 					)?.length;
 
-					if ( blocksContainWidgetBox ) {
+					if ( blocksContainWidgetGroup ) {
 						return;
 					}
 
-					// Put the selected blocks inside the new Widget Box's innerBlocks.
+					// Put the selected blocks inside the new Widget Group's innerBlocks.
 					let innerBlocks = [
 						...blocks.map( ( block ) => {
 							return createBlock(
@@ -57,13 +57,13 @@ export const settings = {
 							: null;
 
 					// Remove the first heading block as we're copying
-					// it's content into the Widget Box's title attribute.
+					// it's content into the Widget Group's title attribute.
 					innerBlocks = innerBlocks.filter(
 						( block ) => block !== firstHeadingBlock
 					);
 
 					return createBlock(
-						'core/widget-box',
+						'core/widget-group',
 						{
 							...( firstHeadingBlock && {
 								title: firstHeadingBlock.attributes.content,
