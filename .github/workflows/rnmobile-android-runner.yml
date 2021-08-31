@@ -31,7 +31,10 @@ jobs:
                   node-version: ${{ matrix.node }}
                   cache: npm
 
-            - run: npm ci
+
+            # temporarily disabling for PR CI
+            # - run: npm ci
+            - run: npm install
 
             - name: Restore Gradle cache
               uses: actions/cache@c64c572235d810460d0d6876e9c705ad5002b353 # v2.1.6

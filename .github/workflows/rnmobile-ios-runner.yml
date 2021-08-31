@@ -31,7 +31,9 @@ jobs:
                   node-version: ${{ matrix.node }}
                   cache: npm
 
-            - run: npm ci
+            # temporarily disabling for PR CI
+            # - run: npm ci
+            - run: npm install
 
             - name: Prepare build cache key
               run: find package-lock.json packages/react-native-editor/ios packages/react-native-aztec/ios packages/react-native-bridge/ios -type f -print0 | sort -z | xargs -0 shasum | tee ios-checksums.txt
