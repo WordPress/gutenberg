@@ -35,15 +35,25 @@ export default function ColorPanel( {
 		name
 	);
 	const isLinkEnabled = useSetting( 'color.link', name );
+	const isTextEnabled = useSetting( 'color.text', name );
+	const isBackgroundEnabled = useSetting( 'color.background', name );
 
 	const hasLinkColor =
 		supports.includes( 'linkColor' ) &&
 		isLinkEnabled &&
 		( solids.length > 0 || areCustomSolidsEnabled );
+	const hasTextColor =
+		supports.includes( 'color' ) &&
+		isTextEnabled &&
+		( solids.length > 0 || areCustomSolidsEnabled );
+	const hasBackgroundColor =
+		supports.includes( 'backgroundColor' ) &&
+		isBackgroundEnabled &&
+		( solids.length > 0 || areCustomSolidsEnabled );
 
 	const settings = [];
 
-	if ( supports.includes( 'color' ) ) {
+	if ( hasTextColor ) {
 		const color = getStyle( name, 'color' );
 		const userColor = getStyle( name, 'color', 'user' );
 		settings.push( {
@@ -55,7 +65,7 @@ export default function ColorPanel( {
 	}
 
 	let backgroundSettings = {};
-	if ( supports.includes( 'backgroundColor' ) ) {
+	if ( hasBackgroundColor ) {
 		const backgroundColor = getStyle( name, 'backgroundColor' );
 		const userBackgroundColor = getStyle( name, 'backgroundColor', 'user' );
 		backgroundSettings = {
