@@ -50,12 +50,9 @@ jobs:
                   node-version: ${{ matrix.node }}
                   cache: npm
 
-            - name: Temporarily force new npm cache
-              run: |
-                  npm install
-
             - uses: preactjs/compressed-size-action@df6e03e187079aef959a2878311639c77b95ee2e # v2.2.0
               with:
                   repo-token: '${{ secrets.GITHUB_TOKEN }}'
                   pattern: '{build/**/*.min.js,build/**/*.css}'
+                  build-script: 'i'
                   clean-script: 'distclean'
