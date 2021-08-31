@@ -57,7 +57,7 @@ const gutenbergFormatNamesToAztec = {
 
 const EMPTY_PARAGRAPH_TAGS = '<p></p>';
 const DEFAULT_FONT_SIZE = 16;
-const DEFAULT_LINE_HEIGHT = 1.5;
+const DEFAULT_LINE_HEIGHT = 1.6;
 
 export class RichText extends Component {
 	constructor( {
@@ -771,6 +771,13 @@ export class RichText extends Component {
 				this.needsSelectionUpdate = true;
 				this.manipulateEventCounterToForceNativeToRefresh(); // force a refresh on the native side
 			}
+
+			if (
+				nextProps?.style?.lineHeight !== this.props?.style?.lineHeight
+			) {
+				this.needsSelectionUpdate = true;
+				this.manipulateEventCounterToForceNativeToRefresh(); // force a refresh on the native side
+			}
 		}
 
 		return true;
@@ -1016,7 +1023,6 @@ export class RichText extends Component {
 							? { width }
 							: { maxWidth } ),
 						minHeight: this.state.height,
-						lineHeight,
 					} }
 					text={ {
 						text: html,
@@ -1061,6 +1067,7 @@ export class RichText extends Component {
 					maxImagesWidth={ 200 }
 					fontFamily={ this.props.fontFamily || defaultFontFamily }
 					fontSize={ fontSize }
+					lineHeight={ lineHeight }
 					fontWeight={ this.props.fontWeight }
 					fontStyle={ this.props.fontStyle }
 					disableEditingMenu={ disableEditingMenu }
