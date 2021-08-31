@@ -2,6 +2,13 @@
 .components-menu-item__button.components-button {
 	width: 100%;
 
+	&[role="menuitemradio"],
+	&[role="menuitemcheckbox"] {
+		.components-menu-item__item:only-child {
+			padding-right: $grid-unit-60;
+		}
+	}
+
 	.components-menu-items__item-icon {
 		margin-right: -2px; // This optically balances the icon.
 		margin-left: $grid-unit-30;
