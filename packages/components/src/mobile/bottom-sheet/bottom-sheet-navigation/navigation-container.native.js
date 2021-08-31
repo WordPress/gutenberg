@@ -94,9 +94,7 @@ function BottomSheetNavigationContainer( { children, animate, main, theme } ) {
 			}
 
 			if ( height > 1 ) {
-				if ( currentHeight === 1 ) {
-					setCurrentHeight( height );
-				} else if ( animate ) {
+				if ( animate ) {
 					performLayoutAnimation( ANIMATION_DURATION );
 					setCurrentHeight( height );
 				} else {

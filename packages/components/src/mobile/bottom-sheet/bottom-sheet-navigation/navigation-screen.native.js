@@ -27,6 +27,7 @@ const BottomSheetNavigationScreen = ( {
 	fullScreen,
 	isScrollable,
 	isNested,
+	name,
 } ) => {
 	const navigation = useNavigation();
 	const heightRef = useRef( { maxHeight: 0 } );
@@ -79,11 +80,19 @@ const BottomSheetNavigationScreen = ( {
 	};
 	return useMemo( () => {
 		return isScrollable || isNested ? (
-			<View onLayout={ onLayout }>{ children }</View>
+			<View
+				onLayout={ onLayout }
+				testID={ `navigation-screen-${ name }` }
+			>
+				{ children }
+			</View>
 		) : (
 			<ScrollView { ...listProps }>
 				<TouchableHighlight accessible={ false }>
-					<View onLayout={ onLayout }>
+					<View
+						onLayout={ onLayout }
+						testID={ `navigation-screen-${ name }` }
+					>
 						{ children }
 						{ ! isNested && (
 							<View
