@@ -345,6 +345,18 @@ test( 'should contain mars if planets is true', () => {
 } );
 ```
 
+Another good technique is to use the `toMatchDiffSnapshot` function (provided by the [`snapshot-diff` package](https://github.com/jest-community/snapshot-diff)), which allows to snapshot only the difference between two different states of the DOM. This approach is useful to test the effects of a prop change on the resulting DOM while generating a much smaller snapshot, live in this example:
+
+```js
+test( 'should render a darker background when isShady is true', () => {
+	const { container } = render( <CardBody>Body</CardBody> );
+	const { container: containerShady } = render(
+		<CardBody isShady>Body</CardBody>
+	);
+	expect( container ).toMatchDiffSnapshot( containerShady );
+} );
+```
+
 #### Troubleshooting
 
 Sometimes we need to mock refs for some stories which use them. Check the following documents to learn more:
