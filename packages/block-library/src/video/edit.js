@@ -99,7 +99,11 @@ function VideoEdit( {
 		}
 		// sets the block's attribute and updates the edit component from the
 		// selected media
-		setAttributes( { src: media.url, id: media.id } );
+		setAttributes( {
+			src: media.url,
+			id: media.id,
+			poster: media?.image?.src,
+		} );
 	}
 
 	function onSelectURL( newSrc ) {
