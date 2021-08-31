@@ -29,7 +29,7 @@ export const getMergedGlobalStyles = (
 	blockAttributes,
 	defaultColors,
 	blockName,
-	typography
+	fontSizes
 ) => {
 	const baseGlobalColors = {
 		baseColors: baseGlobalStyles || {},
@@ -64,7 +64,7 @@ export const getMergedGlobalStyles = (
 	);
 	const blockTypography = getBlockTypography(
 		blockStyleAttributes,
-		typography,
+		fontSizes,
 		blockName,
 		baseGlobalStyles
 	);

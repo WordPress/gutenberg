@@ -51,7 +51,7 @@ function BlockForType( {
 	baseGlobalStyles,
 } ) {
 	const defaultColors = useSetting( 'color.palette' ) || emptyArray;
-	const typography = useSetting( 'typography' ) || emptyArray;
+	const fontSizes = useSetting( 'typography.fontSizes' ) || emptyArray;
 	const globalStyle = useGlobalStyles();
 	const mergedStyle = useMemo( () => {
 		return getMergedGlobalStyles(
@@ -61,7 +61,7 @@ function BlockForType( {
 			attributes,
 			defaultColors,
 			name,
-			typography
+			fontSizes
 		);
 	}, [
 		defaultColors,

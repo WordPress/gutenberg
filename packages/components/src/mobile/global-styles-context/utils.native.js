@@ -124,17 +124,13 @@ export function getBlockColors(
 
 export function getBlockTypography(
 	blockStyleAttributes,
-	typography,
+	fontSizes,
 	blockName,
 	baseGlobalStyles
 ) {
 	const typographyStyles = {};
 	const customBlockStyles = blockStyleAttributes?.style?.typography || {};
 	const blockGlobalStyles = baseGlobalStyles?.blocks?.[ blockName ];
-	const fontSizes = {
-		...typography?.fontSizes?.theme,
-		...typography?.fontSizes?.user,
-	};
 
 	// Global styles
 	if ( blockGlobalStyles?.typography ) {
