@@ -85,6 +85,7 @@ class WP_Theme_JSON_Gutenberg {
 			'customWidth'  => null,
 		),
 		'color'      => array(
+			'background'     => null,
 			'custom'         => null,
 			'customDuotone'  => null,
 			'customGradient' => null,
@@ -92,6 +93,7 @@ class WP_Theme_JSON_Gutenberg {
 			'gradients'      => null,
 			'link'           => null,
 			'palette'        => null,
+			'text'           => null,
 		),
 		'custom'     => null,
 		'layout'     => array(
