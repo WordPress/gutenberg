@@ -1,13 +1,32 @@
 .edit-post-layout__metaboxes {
 	flex-shrink: 0;
-}
-.edit-post-layout__metaboxes:not(:empty) {
-	border-top: $border-width solid $gray-300;
-	padding: 10px 0 10px;
-	clear: both;
 
-	.edit-post-meta-boxes-area {
-		margin: auto 20px;
+	position: absolute;
+	left: 0;
+	right: 0;
+	bottom: 0;
+	top: 0;
+	z-index: 40;
+
+	.components-button.edit-post-sidebar__panel-tab {
+		background-color: #fff;
+	}
+
+	transform: translateY(calc(100% - 48px));
+
+	&:focus-within {
+		transform: translateY(0);
+	}
+
+	.edit-post-layout__metaboxes-container {
+		border-top: 1px solid #ddd;
+		position: absolute;
+		left: 0;
+		right: 0;
+		bottom: 0;
+		top: 48px;
+		overflow: auto;
+		background: #fff;
 	}
 }
 

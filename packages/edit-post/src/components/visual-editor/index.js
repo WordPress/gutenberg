@@ -53,7 +53,12 @@ function MaybeIframe( { children, contentRef, shouldIframe, styles, style } ) {
 				<WritingFlow
 					ref={ contentRef }
 					className="editor-styles-wrapper"
-					style={ { flex: '1', ...style } }
+					style={ {
+						flex: '1',
+						height: '100%',
+						overflow: 'auto',
+						...style,
+					} }
 					tabIndex={ -1 }
 				>
 					{ children }
