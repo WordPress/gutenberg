@@ -263,7 +263,7 @@ function gutenberg_get_duotone_style( $selectors_group, $duotone_id ) {
 	?>
 	<style>
 		<?php echo $selectors_group; ?> {
-			filter: url( <?php echo esc_url( '#' . $duotone_id ); ?> ) !important; <?php // We need !important to overide rules that come from theme.json. ?>
+			filter: url( <?php echo esc_url( '#' . $duotone_id ); ?> );
 		}
 	</style>
 	<?php
@@ -442,7 +442,7 @@ function gutenberg_render_duotone_filters_from_theme_json() {
 		foreach( $theme_json_settings['color']['duotone']['theme'] as $duotone_setting ) {
 			$duotone_values = get_duotone_color_values( $duotone_setting['colors'] );
 			$duotone_id = 'wp-duotone-filter-' . $duotone_setting['slug'];
-			$duotone_markup = gutenberg_get_dutone_svg_filters( $duotone_id, $duotone_values );
+			$duotone_markup = gutenberg_get_duotone_svg_filters( $duotone_id, $duotone_values );
 			gutenberg_output_duotone_markup( $duotone_markup );
 		}
 	}
