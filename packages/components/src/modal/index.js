@@ -36,8 +36,8 @@ export default function Modal( {
 	focusOnMount = true,
 	shouldCloseOnEsc = true,
 	shouldCloseOnClickOutside = true,
-	isDismissable = true, // Deprecated
-	isDismissible = isDismissable,
+	isDismissable, // Deprecated
+	isDismissible = isDismissable || true,
 	/* accessibility */
 	aria = {
 		labelledby: null,
