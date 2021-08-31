@@ -186,7 +186,7 @@ export const deleteEntityRecord = (
 	);
 
 	try {
-		await dispatch( {
+		dispatch( {
 			type: 'DELETE_ENTITY_RECORD_START',
 			kind,
 			name,
@@ -210,7 +210,7 @@ export const deleteEntityRecord = (
 			error = _error;
 		}
 
-		await dispatch( {
+		dispatch( {
 			type: 'DELETE_ENTITY_RECORD_FINISH',
 			kind,
 			name,
