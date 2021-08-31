@@ -272,7 +272,7 @@ export default function GlobalStylesProvider( { children, baseStyles } ) {
 					// presets used to resolve user variable may be defined a
 					// layer down ( core, theme, or user ).
 					return getResolvedStyleVariable(
-						mergedStyles.setting,
+						mergedStyles.settings,
 						context,
 						value
 					);
