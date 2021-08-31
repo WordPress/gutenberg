@@ -1,25 +1,43 @@
 /**
+ * External dependencies
+ */
+import classnames from 'classnames';
+
+/**
  * WordPress dependencies
  */
 import { createPortal, useEffect, useRef } from '@wordpress/element';
-import { useInstanceId } from '@wordpress/compose';
+import {
+	useInstanceId,
+	useFocusReturn,
+	useFocusOnMount,
+	__experimentalUseFocusOutside as useFocusOutside,
+	useConstrainedTabbing,
+	useMergeRefs,
+} from '@wordpress/compose';
 import deprecated from '@wordpress/deprecated';
+import { ESCAPE } from '@wordpress/keycodes';
+import { __ } from '@wordpress/i18n';
+import { closeSmall } from '@wordpress/icons';
 
 /**
  * Internal dependencies
  */
-import ModalFrame from './frame';
-import ModalHeader from './header';
 import * as ariaHelper from './aria-helper';
+import Button from '../button';
 
 // Used to count the number of open modals.
 let openModalCount = 0;
 
 export default function Modal( {
 	bodyOpenClassName = 'modal-open',
+	role = 'dialog',
 	title = null,
-	isDismissible = true,
-	isDismissable, // Deprecated
+	focusOnMount = true,
+	shouldCloseOnEsc = true,
+	shouldCloseOnClickOutside = true,
+	isDismissable = true, // Deprecated
+	isDismissible = isDismissable,
 	/* accessibility */
 	aria = {
 		labelledby: null,
@@ -29,10 +47,20 @@ export default function Modal( {
 	icon,
 	closeButtonLabel,
 	children,
-	...otherProps
+	style,
+	overlayClassName,
+	className,
+	contentLabel,
 } ) {
-	const instanceId = useInstanceId( Modal );
 	const ref = useRef();
+	const instanceId = useInstanceId( Modal );
+	const headingId = title
+		? `components-modal-header-${ instanceId }`
+		: aria.labelledby;
+	const focusOnMountRef = useFocusOnMount( focusOnMount );
+	const constrainedTabbingRef = useConstrainedTabbing();
+	const focusReturnRef = useFocusReturn();
+	const focusOutsideProps = useFocusOutside( onRequestClose );
 
 	useEffect( () => {
 		openModalCount++;
@@ -52,40 +80,85 @@ export default function Modal( {
 		};
 	}, [] );
 
-	const headingId = title
-		? `components-modal-header-${ instanceId }`
-		: aria.labelledby;
-
 	if ( isDismissable ) {
 		deprecated( 'isDismissable prop of the Modal component', {
 			since: '5.4',
 			alternative: 'isDismissible prop (renamed) of the Modal component',
 		} );
 	}
-	// Disable reason: this stops mouse events from triggering tooltips and
-	// other elements underneath the modal overlay.
+
+	function handleEscapeKeyDown( event ) {
+		if (
+			shouldCloseOnEsc &&
+			event.keyCode === ESCAPE &&
+			! event.defaultPrevented
+		) {
+			event.preventDefault();
+			if ( onRequestClose ) {
+				onRequestClose( event );
+			}
+		}
+	}
+
 	return createPortal(
-		<ModalFrame
+		// eslint-disable-next-line jsx-a11y/no-static-element-interactions
+		<div
 			ref={ ref }
-			onRequestClose={ onRequestClose }
-			aria={ {
-				labelledby: headingId,
-				describedby: aria.describedby,
-			} }
-			{ ...otherProps }
+			className={ classnames(
+				'components-modal__screen-overlay',
+				overlayClassName
+			) }
+			onKeyDown={ handleEscapeKeyDown }
 		>
-			<div className={ 'components-modal__content' } role="document">
-				<ModalHeader
-					closeLabel={ closeButtonLabel }
-					headingId={ title && headingId }
-					icon={ icon }
-					isDismissible={ isDismissible || isDismissable }
-					onClose={ onRequestClose }
-					title={ title }
-				/>
-				{ children }
+			<div
+				className={ classnames( 'components-modal__frame', className ) }
+				style={ style }
+				ref={ useMergeRefs( [
+					constrainedTabbingRef,
+					focusReturnRef,
+					focusOnMountRef,
+				] ) }
+				role={ role }
+				aria-label={ contentLabel }
+				aria-labelledby={ contentLabel ? null : headingId }
+				aria-describedby={ aria.describedby }
+				tabIndex="-1"
+				{ ...( shouldCloseOnClickOutside ? focusOutsideProps : {} ) }
+			>
+				<div className={ 'components-modal__content' } role="document">
+					<div className="components-modal__header">
+						<div className="components-modal__header-heading-container">
+							{ icon && (
+								<span
+									className="components-modal__icon-container"
+									aria-hidden
+								>
+									{ icon }
+								</span>
+							) }
+							{ title && (
+								<h1
+									id={ headingId }
+									className="components-modal__header-heading"
+								>
+									{ title }
+								</h1>
+							) }
+						</div>
+						{ isDismissible && (
+							<Button
+								onClick={ onRequestClose }
+								icon={ closeSmall }
+								label={
+									closeButtonLabel || __( 'Close dialog' )
+								}
+							/>
+						) }
+					</div>
+					{ children }
+				</div>
 			</div>
-		</ModalFrame>,
+		</div>,
 		document.body
 	);
 }
