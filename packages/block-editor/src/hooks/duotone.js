@@ -68,7 +68,7 @@ export function getValuesFromColors( colors = [] ) {
 function DuotoneFilter( { selector, id, values } ) {
 	const stylesheet = `
 ${ selector } {
-	filter: url( #${ id } ) !important; // We need !important to overide rules that come from theme.json.
+	filter: url( #${ id } ) !important; /* We need !important to overide rules that come from theme.json.*/
 }
 `;
 
