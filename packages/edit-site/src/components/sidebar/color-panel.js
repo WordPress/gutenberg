@@ -27,10 +27,13 @@ export default function ColorPanel( {
 	getSetting,
 	setSetting,
 } ) {
-	const colors = useSetting( 'color.palette', name );
-	const disableCustomColors = ! useSetting( 'color.custom', name );
+	const solids = useSetting( 'color.palette', name );
 	const gradients = useSetting( 'color.gradients', name );
-	const disableCustomGradients = ! useSetting( 'color.customGradient', name );
+	const areCustomSolidsEnabled = useSetting( 'color.custom', name );
+	const areCustomGradientsEnabled = useSetting(
+		'color.customGradient',
+		name
+	);
 
 	const settings = [];
 
@@ -99,10 +102,10 @@ export default function ColorPanel( {
 		<PanelColorGradientSettings
 			title={ __( 'Color' ) }
 			settings={ settings }
-			colors={ colors }
+			colors={ solids }
 			gradients={ gradients }
-			disableCustomColors={ disableCustomColors }
-			disableCustomGradients={ disableCustomGradients }
+			disableCustomColors={ ! areCustomSolidsEnabled }
+			disableCustomGradients={ ! areCustomGradientsEnabled }
 		>
 			<ColorPalettePanel
 				key={ 'color-palette-panel-' + name }
