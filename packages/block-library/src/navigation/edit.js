@@ -258,6 +258,17 @@ function Navigation( {
 							label={ __( 'Show submenu indicator icons' ) }
 						/>
 						<ToggleControl
+							checked={ attributes.openSubmenusOnClick }
+							onChange={ ( value ) => {
+								setAttributes( {
+									openSubmenusOnClick: value,
+								} );
+							} }
+							label={ __(
+								'Open submenus on click instead of hover'
+							) }
+						/>
+						<ToggleControl
 							checked={ attributes.isResponsive }
 							onChange={ ( value ) => {
 								setAttributes( {

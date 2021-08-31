@@ -13,11 +13,13 @@
 		stroke: currentColor;
 	}
 
-	// Show submenus on hover and on click.
-	&:hover > .wp-block-navigation__submenu-container,
+	// Show submenus on click.
 	.wp-block-navigation-submenu__toggle[aria-expanded="true"] + .wp-block-navigation__submenu-container {
 		visibility: visible;
 		opacity: 1;
+		width: auto;
+		height: auto;
+		min-width: 200px;
 	}
 }
 
@@ -25,4 +27,5 @@ button.wp-block-navigation-item__content {
 	background-color: transparent;
 	border: none;
 	color: currentColor;
+	font-size: inherit;
 }

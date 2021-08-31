@@ -170,8 +170,8 @@
 	// We will need to replace focus-within with a JS solution for IE keyboard support.
 
 	// Custom menu items.
-	// Show submenus on hover.
-	&:hover > .wp-block-navigation__submenu-container {
+	// Show submenus on hover unless they open on click.
+	&:where(:not(.open-on-click)):hover > .wp-block-navigation__submenu-container {
 		visibility: visible;
 		opacity: 1;
 		width: auto;
@@ -180,7 +180,7 @@
 	}
 
 	// Keep submenus open when focus is within.
-	&:focus-within > .wp-block-navigation__submenu-container {
+	&:where(:not(.open-on-click):not(.open-on-hover-click)):focus-within > .wp-block-navigation__submenu-container {
 		visibility: visible;
 		opacity: 1;
 		width: auto;

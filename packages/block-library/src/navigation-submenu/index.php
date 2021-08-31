@@ -162,20 +162,26 @@ function render_block_core_navigation_submenu( $attributes, $content, $block ) {
 		$css_classes .= ' ' . $class_name;
 	}
 
+	$open_on_click = isset( $block->context['openSubmenusOnClick'] ) && $block->context['openSubmenusOnClick'];
+	$open_on_hover_and_click = isset( $block->context['openSubmenusOnClick'] ) && ! $block->context['openSubmenusOnClick'] &&
+		isset( $block->context['showSubmenuIcon'] ) && $block->context['showSubmenuIcon'];
+
 	$wrapper_attributes = get_block_wrapper_attributes(
 		array(
 			'class' => $css_classes . ' wp-block-navigation-item' . ( $has_submenu ? ' has-child' : '' ) .
-				( $is_active ? ' current-menu-item' : '' ),
+			( $open_on_click ? ' open-on-click' : '') . ( $open_on_hover_and_click ? ' open-on-hover-click' : '') . 
+			( $is_active ? ' current-menu-item' : '' ),
 			'style' => $style_attribute,
 		)
 	);
 	$html               = '<li ' . $wrapper_attributes . '>';
 
-	// If the Parent element is a link, we render an anchor tag with attributes.
-	// We also render a submenu button, so the submenu can be opened on click.
-	if ( isset( $attributes['url'] ) && '' !== $attributes['url'] ) {
+	// If Submenus open on hover, we render an anchor tag with attributes.
+	// If submenu icons are set to show, we also render a submenu button, so the submenu can be opened on click.
+	if ( !$open_on_click ) {
+		$item_url = isset($attributes['url']) ? esc_url( $attributes['url'] ) : '';
 		// Start appending HTML attributes to anchor tag.
-		$html .= '<a class="wp-block-navigation-item__content" href="' . esc_url( $attributes['url'] ) . '"';
+		$html .= '<a class="wp-block-navigation-item__content" href="' . $item_url . '"';
 
 		if ( isset( $attributes['opensInNewTab'] ) && true === $attributes['opensInNewTab'] ) {
 			$html .= ' target="_blank"  ';
@@ -219,12 +225,13 @@ function render_block_core_navigation_submenu( $attributes, $content, $block ) {
 		$html .= '</a>';
 		// End anchor tag content.
 
-		// The submenu icon has to be rendered in a button here
-		// so that there's a clickable elment to open the submenu.
-		$html .= '<button class="wp-block-navigation__submenu-icon wp-block-navigation-submenu__toggle" aria-expanded="false">' . block_core_navigation_submenu_render_submenu_icon() . '</button>';
-
+		if ( isset( $block->context['showSubmenuIcon'] ) && $block->context['showSubmenuIcon'] ) {
+			// The submenu icon is rendered in a button here
+			// so that there's a clickable elment to open the submenu.
+			$html .= '<button class="wp-block-navigation__submenu-icon wp-block-navigation-submenu__toggle" aria-expanded="false">' . block_core_navigation_submenu_render_submenu_icon() . '</button>';
+		}
 	} else {
-		// If the Parent element is not a link, we render the whole thing as a button.
+		// If menus open on click, we render the parent as a button.
 		$html .= '<button class="wp-block-navigation-item__content wp-block-navigation-submenu__toggle" aria-expanded="false">';
 
 		// Wrap title with span to isolate it from submenu icon.
@@ -255,7 +262,6 @@ function render_block_core_navigation_submenu( $attributes, $content, $block ) {
 		$html .= '</span>';
 
 		if ( isset( $block->context['showSubmenuIcon'] ) && $block->context['showSubmenuIcon'] ) {
-			// The submenu icon can be hidden by a CSS rule on the Navigation Block.
 			$html .= '<span class="wp-block-navigation__submenu-icon">' . block_core_navigation_submenu_render_submenu_icon() . '</span>';
 		}
 

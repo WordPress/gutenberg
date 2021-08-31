@@ -38,13 +38,24 @@ submenuButtons.forEach( ( button ) => {
 	button.addEventListener( 'click', toggleSubmenuOnClick );
 } );
 
-// Close on click outside.
 /* eslint-disable @wordpress/no-global-event-listener */
+// Close on click outside.
 document.addEventListener( 'click', function ( event ) {
 	const navigationBlocks = document.querySelectorAll(
 		'.wp-block-navigation'
 	);
 	navigationBlocks.forEach( ( block ) => {
+		if ( ! block.contains( event.target ) ) {
+			closeSubmenus( block );
+		}
+	} );
+} );
+// Close on focus outside.
+document.addEventListener( 'keyup', function ( event ) {
+	const submenuBlocks = document.querySelectorAll(
+		'.wp-block-navigation-submenu'
+	);
+	submenuBlocks.forEach( ( block ) => {
 		if ( ! block.contains( event.target ) ) {
 			closeSubmenus( block );
 		}

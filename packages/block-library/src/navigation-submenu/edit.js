@@ -290,7 +290,7 @@ export default function NavigationSubmenuEdit( {
 		url,
 		opensInNewTab,
 	};
-	const { showSubmenuIcon } = context;
+	const { showSubmenuIcon, openSubmenusOnClick } = context;
 	const { saveEntityRecord } = useDispatch( coreStore );
 	const { insertBlock } = useDispatch( blockEditorStore );
 	const [ isLinkOpen, setIsLinkOpen ] = useState( false );
@@ -503,7 +503,7 @@ export default function NavigationSubmenuEdit( {
 		}
 	);
 
-	const ParentElement = url ? 'a' : 'button';
+	const ParentElement = openSubmenusOnClick ? 'button' : 'a';
 
 	return (
 		<Fragment>
@@ -516,13 +516,15 @@ export default function NavigationSubmenuEdit( {
 								setIsLinkOpen( true ),
 						} }
 					/>
-					<ToolbarButton
-						name="link"
-						icon={ linkIcon }
-						title={ __( 'Link' ) }
-						shortcut={ displayShortcut.primary( 'k' ) }
-						onClick={ () => setIsLinkOpen( true ) }
-					/>
+					{ ! openSubmenusOnClick && (
+						<ToolbarButton
+							name="link"
+							icon={ linkIcon }
+							title={ __( 'Link' ) }
+							shortcut={ displayShortcut.primary( 'k' ) }
+							onClick={ () => setIsLinkOpen( true ) }
+						/>
+					) }
 				</ToolbarGroup>
 			</BlockControls>
 			<InspectorControls>
@@ -583,7 +585,7 @@ export default function NavigationSubmenuEdit( {
 							] }
 						/>
 					}
-					{ isLinkOpen && (
+					{ ! openSubmenusOnClick && isLinkOpen && (
 						<Popover
 							position="bottom center"
 							onClose={ () => setIsLinkOpen( false ) }

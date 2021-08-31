@@ -53,6 +53,7 @@
 		"fontSize",
 		"customFontSize",
 		"showSubmenuIcon",
+		"openSubmenusOnClick",
 		"style"
 	],
 	"supports": {
