@@ -302,13 +302,15 @@ export const editEntityRecord = (
 /**
  * Action triggered to undo the last edit to
  * an entity record, if any.
+ *
+ * @return {undefined}
  */
 export const undo = () => ( { select, dispatch } ) => {
 	const undoEdit = select.getUndoEdit();
 	if ( ! undoEdit ) {
 		return;
 	}
-	return dispatch( {
+	dispatch( {
 		type: 'EDIT_ENTITY_RECORD',
 		...undoEdit,
 		meta: { isUndo: true },
@@ -318,13 +320,15 @@ export const undo = () => ( { select, dispatch } ) => {
 /**
  * Action triggered to redo the last undoed
  * edit to an entity record, if any.
+ *
+ * @return {undefined}
  */
 export const redo = () => ( { select, dispatch } ) => {
 	const redoEdit = select.getRedoEdit();
 	if ( ! redoEdit ) {
 		return;
 	}
-	return dispatch( {
+	dispatch( {
 		type: 'EDIT_ENTITY_RECORD',
 		...redoEdit,
 		meta: { isRedo: true },
