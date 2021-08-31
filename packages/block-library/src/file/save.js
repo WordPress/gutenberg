@@ -13,6 +13,8 @@ export default function save( { attributes } ) {
 		textLinkTarget,
 		showDownloadButton,
 		downloadButtonText,
+		displayPreview,
+		previewHeight,
 	} = attributes;
 
 	const pdfEmbedLabel = RichText.isEmpty( fileName )

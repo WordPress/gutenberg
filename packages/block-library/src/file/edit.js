@@ -65,9 +65,6 @@ function FileEdit( {
 	setAttributes,
 	noticeUI,
 	noticeOperations,
-	setAttributes,
-	noticeUI,
-	noticeOperations,
 	clientId,
 } ) {
 	const {
