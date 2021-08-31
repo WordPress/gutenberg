@@ -126,7 +126,7 @@ export function getResolvedStyleVariable( features, context, variable ) {
 			.slice( CSS_REFERENCE_PREFIX.length, -CSS_REFERENCE_SUFFIX.length )
 			.split( '--' );
 	} else {
-		// Value is raw.
+		// We don't know how to parse the value: either is raw of uses complex CSS such as `calc(1px * var(--wp--variable) )`
 		return variable;
 	}
 
