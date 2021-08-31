@@ -34,6 +34,12 @@ export default function ColorPanel( {
 		'color.customGradient',
 		name
 	);
+	const isLinkEnabled = useSetting( 'color.link', name );
+
+	const hasLinkColor =
+		supports.includes( 'linkColor' ) &&
+		isLinkEnabled &&
+		( solids.length > 0 || areCustomSolidsEnabled );
 
 	const settings = [];
 
@@ -88,7 +94,7 @@ export default function ColorPanel( {
 		} );
 	}
 
-	if ( supports.includes( 'linkColor' ) ) {
+	if ( hasLinkColor ) {
 		const color = getStyle( name, 'linkColor' );
 		const userColor = getStyle( name, 'linkColor', 'user' );
 		settings.push( {
