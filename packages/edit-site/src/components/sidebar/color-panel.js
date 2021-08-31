@@ -50,6 +50,9 @@ export default function ColorPanel( {
 		supports.includes( 'backgroundColor' ) &&
 		isBackgroundEnabled &&
 		( solids.length > 0 || areCustomSolidsEnabled );
+	const hasGradientColor =
+		supports.includes( 'background' ) &&
+		( gradients.length > 0 || areCustomGradientsEnabled );
 
 	const settings = [];
 
@@ -80,7 +83,7 @@ export default function ColorPanel( {
 	}
 
 	let gradientSettings = {};
-	if ( supports.includes( 'background' ) ) {
+	if ( hasGradientColor ) {
 		const gradient = getStyle( name, 'background' );
 		const userGradient = getStyle( name, 'background', 'user' );
 		gradientSettings = {
@@ -93,10 +96,7 @@ export default function ColorPanel( {
 		}
 	}
 
-	if (
-		supports.includes( 'background' ) ||
-		supports.includes( 'backgroundColor' )
-	) {
+	if ( hasBackgroundColor || hasGradientColor ) {
 		settings.push( {
 			...backgroundSettings,
 			...gradientSettings,
@@ -114,6 +114,7 @@ export default function ColorPanel( {
 			clearable: color === userColor,
 		} );
 	}
+
 	return (
 		<PanelColorGradientSettings
 			title={ __( 'Color' ) }
