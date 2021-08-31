@@ -54,5 +54,5 @@ jobs:
               with:
                   repo-token: '${{ secrets.GITHUB_TOKEN }}'
                   pattern: '{build/**/*.min.js,build/**/*.css}'
-                  build-script: 'i'
+                  build-script: 'temp-run-npm-install'
                   clean-script: 'distclean'
