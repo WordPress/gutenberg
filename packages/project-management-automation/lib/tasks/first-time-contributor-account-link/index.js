@@ -86,7 +86,7 @@ async function firstTimeContributorAccountLink( payload, octokit ) {
 	try {
 		hasProfile = await hasWordPressProfile( author );
 	} catch ( error ) {
-		if ( error instanceof Error ) {
+		if ( error instanceof Object ) {
 			debug(
 				`first-time-contributor-account-link: Error retrieving from profile API:\n\n${ error.toString() }`
 			);
