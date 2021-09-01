@@ -79,8 +79,7 @@ Each component that is exported from the `@wordpress/components` package should 
 As a result of the above guidelines, all new components (execpt for shared utilities) should generally follow this folder structure:
 
 ```
-component-parent-folder/
-├── sub-component-folder/
+component-name/
 ├── component.tsx
 ├── context.ts
 ├── hook.ts
@@ -93,15 +92,15 @@ component-parent-folder/
 In case of a family of components (e.g. `Card` and `CardBody`, `CardFooter`, `CardHeader` ...), each component's implementation should live in a separate subfolder:
 
 ```
-component-parent-folder/
-├── sub-component-folder/
+component-family-name/
+├── sub-component-name/
 │   ├── index.ts
 │   ├── component.tsx
 │   ├── hook.ts
 │   ├── README.md
 │   ├── styles.ts
 │   └── types.ts
-├── sub-component-folder/
+├── sub-component-name/
 │   ├── index.ts
 │   ├── component.tsx
 │   ├── hook.ts
