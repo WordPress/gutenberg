@@ -50,7 +50,11 @@ export function BorderColorEdit( props ) {
 	const disableCustomColors = ! useSetting( 'color.custom' );
 	const disableCustomGradients = ! useSetting( 'color.customGradient' );
 	const [ colorValue, setColorValue ] = useState(
-		borderColor || style?.border?.color
+		getColorObjectByAttributeValues(
+			colors,
+			borderColor,
+			style?.border?.color
+		)?.color
 	);
 
 	const onChangeColor = ( value ) => {
