@@ -41,11 +41,10 @@ data class GutenbergProps @JvmOverloads constructor(
                     ?.let { putSerializable(PROP_STYLES, it) }
             theme.getSerializable(PROP_FEATURES)
                     ?.let { putSerializable(PROP_FEATURES, it) }
-            putSerializable(PROP_IS_FSE_THEME, theme.getBoolean(PROP_IS_FSE_THEME))
-            putSerializable(
-                    PROP_GALLERY_WITH_IMAGE_BLOCKS,
-                    theme.getBoolean(PROP_GALLERY_WITH_IMAGE_BLOCKS)
-            )
+            theme.getSerializable(PROP_IS_FSE_THEME)
+                    ?.let { putSerializable(PROP_IS_FSE_THEME, it) }
+            theme.getSerializable(PROP_GALLERY_WITH_IMAGE_BLOCKS)
+                    ?.let { putSerializable(PROP_GALLERY_WITH_IMAGE_BLOCKS, it) }
         }
     }
 
