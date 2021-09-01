@@ -290,8 +290,6 @@ describe( 'SolarSystem', () => {
 		expect( container.firstChild ).toMatchSnapshot();
 		expect( getByText( /mars/i ) ).toBeInTheDocument();
 	} );
-
-
 } );
 ```
 
