@@ -12,6 +12,8 @@ import {
 	BlockControls,
 	RichText,
 	useBlockProps,
+	getColorObjectByAttributeValues,
+	__experimentalGetColorClassesAndStyles as getColorClassesAndStyles,
 } from '@wordpress/block-editor';
 import { createBlock } from '@wordpress/blocks';
 
@@ -21,22 +23,60 @@ import { createBlock } from '@wordpress/blocks';
 import { Figure } from './figure';
 import { BlockQuote } from './blockquote';
 
+const getBackgroundColor = ( { attributes, colors, style } ) => {
+	const { backgroundColor } = attributes;
+
+	const colorProps = getColorClassesAndStyles( attributes );
+	const colorObject = getColorObjectByAttributeValues(
+		colors,
+		backgroundColor
+	);
+
+	return (
+		colorObject?.color ||
+		colorProps.style?.backgroundColor ||
+		colorProps.style?.background ||
+		style?.backgroundColor
+	);
+};
+
+const getTextColor = ( { attributes, colors, style } ) => {
+	const colorProps = getColorClassesAndStyles( attributes );
+	const colorObject = getColorObjectByAttributeValues(
+		colors,
+		attributes.textColor
+	);
+
+	return colorObject?.color || colorProps.style?.color || style?.color;
+};
+const getBorderColor = ( props ) => {
+	const { wrapperProps, attributes } = props;
+	const { className } = attributes;
+
+	// Checking for the is-style-solid-color we can better approximate the pull quote style
+	const defaultColor =
+		className.search( 'is-style-solid-color' ) !== -1
+			? getBackgroundColor( props )
+			: getTextColor( props );
+
+	return wrapperProps?.style?.borderColor || defaultColor;
+};
 /**
  * Internal dependencies
  */
 
-function PullQuoteEdit( {
-	attributes,
-	setAttributes,
-	isSelected,
-	insertBlocksAfter,
-} ) {
+function PullQuoteEdit( props ) {
+	const { attributes, setAttributes, isSelected, insertBlocksAfter } = props;
 	const { textAlign, citation, value } = attributes;
+
 	const blockProps = useBlockProps( {
 		className: classnames( {
 			[ `has-text-align-${ textAlign }` ]: textAlign,
 		} ),
+		backgroundColor: getBackgroundColor( props ),
+		borderColor: getBorderColor( props ),
 	} );
+
 	const shouldShowCitation = ! RichText.isEmpty( citation ) || isSelected;
 
 	return (
@@ -50,7 +90,7 @@ function PullQuoteEdit( {
 				/>
 			</BlockControls>
 			<Figure { ...blockProps }>
-				<BlockQuote>
+				<BlockQuote textColor={ getTextColor( props ) }>
 					<RichText
 						identifier="value"
 						multiline
