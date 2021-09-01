@@ -1,7 +1,6 @@
 /**
  * WordPress dependencies
  */
-import { controls } from '@wordpress/data';
 import apiFetch from '@wordpress/api-fetch';
 
 jest.mock( '@wordpress/api-fetch' );
@@ -29,20 +28,19 @@ jest.mock( '../batch', () => {
 } );
 
 describe( 'editEntityRecord', () => {
-	it( 'throws when the edited entity does not have a loaded config.', () => {
+	it( 'throws when the edited entity does not have a loaded config.', async () => {
 		const entity = { kind: 'someKind', name: 'someName', id: 'someId' };
+		const select = {
+			getEntity: jest.fn(),
+		};
 		const fulfillment = editEntityRecord(
 			entity.kind,
 			entity.name,
 			entity.id,
 			{}
-		);
-		expect( fulfillment.next().value ).toEqual(
-			controls.select( 'core', 'getEntity', entity.kind, entity.name )
-		);
-
-		// Don't pass back an entity config.
-		expect( fulfillment.next.bind( fulfillment ) ).toThrow(
+		)( { select } );
+		expect( select.getEntity ).toHaveBeenCalledTimes( 1 );
+		await expect( fulfillment ).rejects.toThrow(
 			`The entity being edited (${ entity.kind }, ${ entity.name }) does not have a loaded config.`
 		);
 	} );
