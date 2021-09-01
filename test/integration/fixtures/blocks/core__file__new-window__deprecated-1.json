@@ -1,0 +1,18 @@
+[
+	{
+		"clientId": "_clientId_0",
+		"name": "core/file",
+		"isValid": true,
+		"attributes": {
+			"href": "http://localhost:8888/wp-content/uploads/2018/05/keycodes.js",
+			"fileName": "6546",
+			"textLinkHref": "http://localhost:8888/wp-content/uploads/2018/05/keycodes.js",
+			"textLinkTarget": "_blank",
+			"showDownloadButton": true,
+			"downloadButtonText": "Download",
+			"previewHeight": 600
+		},
+		"innerBlocks": [],
+		"originalContent": "<div class=\"wp-block-file\"><a href=\"http://localhost:8888/wp-content/uploads/2018/05/keycodes.js\" target=\"_blank\"\n\t\trel=\"noreferrer noopener\">6546</a><a href=\"http://localhost:8888/wp-content/uploads/2018/05/keycodes.js\"\n\t\tclass=\"wp-block-file__button\" download>Download</a></div>"
+	}
+]

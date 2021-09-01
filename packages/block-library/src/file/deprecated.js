@@ -1,7 +1,8 @@
 /**
  * WordPress dependencies
  */
-import { RichText } from '@wordpress/block-editor';
+import { RichText, useBlockProps } from '@wordpress/block-editor';
+import { __, sprintf } from '@wordpress/i18n';
 
 // Version of the file block without PR#28062 accessibility fix.
 const deprecated = [
@@ -39,8 +40,16 @@ const deprecated = [
 				source: 'html',
 				selector: 'a[download]',
 			},
+			displayPreview: {
+				type: 'boolean',
+			},
+			previewHeight: {
+				type: 'number',
+				default: 600,
+			},
 		},
 		supports: {
+			anchor: true,
 			align: true,
 		},
 		save( { attributes } ) {
@@ -51,11 +60,35 @@ const deprecated = [
 				textLinkTarget,
 				showDownloadButton,
 				downloadButtonText,
+				displayPreview,
+				previewHeight,
 			} = attributes;
+
+			const pdfEmbedLabel = RichText.isEmpty( fileName )
+				? __( 'PDF embed' )
+				: sprintf(
+						/* translators: %s: filename. */
+						__( 'Embed of %s.' ),
+						fileName
+				  );
 
 			return (
 				href && (
-					<div>
+					<div { ...useBlockProps.save() }>
+						{ displayPreview && (
+							<>
+								<object
+									className="wp-block-file__embed"
+									data={ href }
+									type="application/pdf"
+									style={ {
+										width: '100%',
+										height: `${ previewHeight }px`,
+									} }
+									aria-label={ pdfEmbedLabel }
+								/>
+							</>
+						) }
 						{ ! RichText.isEmpty( fileName ) && (
 							<a
 								href={ textLinkHref }
@@ -63,7 +96,7 @@ const deprecated = [
 								rel={
 									textLinkTarget
 										? 'noreferrer noopener'
-										: false
+										: undefined
 								}
 							>
 								<RichText.Content value={ fileName } />
