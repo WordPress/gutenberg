@@ -76,7 +76,7 @@ Each component that is exported from the `@wordpress/components` package should 
 
 #### Folder structure
 
-Following all previous guidelines, all new components should follow this folder structure:
+As a result of the above guidelines, all new components (execpt for shared utilities) should generally follow this folder structure:
 
 ```
 component-parent-folder/
@@ -90,7 +90,7 @@ component-parent-folder/
 └── types.ts
 ```
 
-In case of a family of components (e.g. `Card` and `CardBody`, `CardFooter`, `CardHeader` ...), each component's implementation should be added in a separate subfolder:
+In case of a family of components (e.g. `Card` and `CardBody`, `CardFooter`, `CardHeader` ...), each component's implementation should live in a separate subfolder:
 
 ```
 component-parent-folder/
