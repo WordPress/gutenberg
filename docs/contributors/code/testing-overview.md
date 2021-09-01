@@ -274,7 +274,7 @@ You should never create or modify a snapshot directly, they are generated and up
 Snapshot are mostly targeted at component testing. They make us conscious of changes to a component's structure which makes them _ideal_ for refactoring. If a snapshot is kept up to date over the course of a series of commits, the snapshot diffs record the evolution of a component's structure. Pretty cool 😎
 
 ```js
-import { render } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
 import SolarSystem from 'solar-system';
 
 describe( 'SolarSystem', () => {
@@ -285,10 +285,10 @@ describe( 'SolarSystem', () => {
 	} );
 
 	test( 'should contain mars if planets is true', () => {
-		const { container, getByText } = render( <SolarSystem planets /> );
+		const { container } = render( <SolarSystem planets /> );
 
 		expect( container.firstChild ).toMatchSnapshot();
-		expect( getByText( /mars/i ) ).toBeInTheDocument();
+		expect( screen.getByText( /mars/i ) ).toBeInTheDocument();
 	} );
 } );
 ```
@@ -333,13 +333,13 @@ Snapshots themselves don't express anything about what we expect. Snapshots are 
 
 ```js
 test( 'should contain mars if planets is true', () => {
-	const { container, getByText } = render( <SolarSystem planets /> );
+	const { container } = render( <SolarSystem planets /> );
 
 	// Snapshot will catch unintended changes
 	expect( container.firstChild ).toMatchSnapshot();
 
 	// This is what we actually expect to find in our test
-	expect( getByText( /mars/i ) ).toBeInTheDocument();
+	expect( screen.getByText( /mars/i ) ).toBeInTheDocument();
 } );
 ```
 
