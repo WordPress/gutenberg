@@ -213,7 +213,7 @@ export function useInputControlStateReducer(
 	 * Actions for the reducer
 	 */
 	const change = createChangeEvent( actions.CHANGE );
-	const invalidate = ( error: Error, event: SyntheticEvent ) =>
+	const invalidate = ( error: unknown, event: SyntheticEvent ) =>
 		dispatch( { type: actions.INVALIDATE, payload: { error, event } } );
 	const reset = createChangeEvent( actions.RESET );
 	const commit = createChangeEvent( actions.COMMIT );

@@ -21,7 +21,7 @@ When writing tests consider the following:
 
 Tests for JavaScript use [Jest](https://jestjs.io/) as the test runner and its API for [globals](https://jestjs.io/docs/en/api.html) (`describe`, `test`, `beforeEach` and so on) [assertions](https://jestjs.io/docs/en/expect.html), [mocks](https://jestjs.io/docs/en/mock-functions.html), [spies](https://jestjs.io/docs/en/jest-object.html#jestspyonobject-methodname) and [mock functions](https://jestjs.io/docs/en/mock-function-api.html). If needed, you can also use [React Testing Library](https://testing-library.com/docs/react-testing-library/intro) for React component testing.
 
-It should be noted that in the past, React components were unit tested with [Enzyme](https://github.com/airbnb/enzyme). However, for new tests, it is preferred to use React Testing Library (RTL) and over time old tests should be refactored to use RTL too (typically when working on code that touches an old test).
+_It should be noted that in the past, React components were unit tested with [Enzyme](https://github.com/airbnb/enzyme). However, React Testing Library (RTL) should be used for new tests instead, and over time old tests should be refactored to use RTL too (typically when working on code that touches an old test)._
 
 Assuming you've followed the [instructions](/docs/contributors/code/getting-started-with-code-contribution.md) to install Node and project dependencies, tests can be run from the command-line with NPM:
 
@@ -273,23 +273,22 @@ You should never create or modify a snapshot directly, they are generated and up
 
 Snapshot are mostly targeted at component testing. They make us conscious of changes to a component's structure which makes them _ideal_ for refactoring. If a snapshot is kept up to date over the course of a series of commits, the snapshot diffs record the evolution of a component's structure. Pretty cool 😎
 
-```js
-import { shallow } from 'enzyme';
+```jsx
+import { render, screen } from '@testing-library/react';
 import SolarSystem from 'solar-system';
-import { Mars } from 'planets';
 
 describe( 'SolarSystem', () => {
 	test( 'should render', () => {
-		const wrapper = shallow( <SolarSystem /> );
+		const { container } = render( <SolarSystem /> );
 
-		expect( wrapper ).toMatchSnapshot();
+		expect( container.firstChild ).toMatchSnapshot();
 	} );
 
 	test( 'should contain mars if planets is true', () => {
-		const wrapper = shallow( <SolarSystem planets /> );
+		const { container } = render( <SolarSystem planets /> );
 
-		expect( wrapper ).toMatchSnapshot();
-		expect( wrapper.find( Mars ) ).toHaveLength( 1 );
+		expect( container.firstChild ).toMatchSnapshot();
+		expect( screen.getByText( /mars/i ) ).toBeInTheDocument();
 	} );
 } );
 ```
@@ -332,23 +331,41 @@ If you're starting a refactor, snapshots are quite nice, you can add them as the
 
 Snapshots themselves don't express anything about what we expect. Snapshots are best used in conjunction with other tests that describe our expectations, like in the example above:
 
-```js
+```jsx
 test( 'should contain mars if planets is true', () => {
-	const wrapper = shallow( <SolarSystem planets /> );
+	const { container } = render( <SolarSystem planets /> );
 
 	// Snapshot will catch unintended changes
-	expect( wrapper ).toMatchSnapshot();
+	expect( container.firstChild ).toMatchSnapshot();
 
 	// This is what we actually expect to find in our test
-	expect( wrapper.find( Mars ) ).toHaveLength( 1 );
+	expect( screen.getByText( /mars/i ) ).toBeInTheDocument();
 } );
 ```
 
-[`shallow`](http://airbnb.io/enzyme/docs/api/shallow.html) rendering is your friend:
+Another good technique is to use the `toMatchDiffSnapshot` function (provided by the [`snapshot-diff` package](https://github.com/jest-community/snapshot-diff)), which allows to snapshot only the difference between two different states of the DOM. This approach is useful to test the effects of a prop change on the resulting DOM while generating a much smaller snapshot, like in this example:
 
-> Shallow rendering is useful to constrain yourself to testing a component as a unit, and to ensure that your tests aren't indirectly asserting on behavior of child components.
+```jsx
+test( 'should render a darker background when isShady is true', () => {
+	const { container } = render( <CardBody>Body</CardBody> );
+	const { container: containerShady } = render(
+		<CardBody isShady>Body</CardBody>
+	);
+	expect( container ).toMatchDiffSnapshot( containerShady );
+} );
+```
 
-It's tempting to snapshot deep renders, but that makes for huge snapshots. Additionally, deep renders no longer test a single component, but an entire tree. With `shallow`, we snapshot just the components that are directly rendered by the component we want to test.
+Similarly, the `toMatchStyleDiffSnapshot` function allows to snapshot only the difference between the _styles_ associated to two different states of a component, like in this example:
+
+```jsx
+test( 'should render margin', () => {
+	const { container: spacer } = render( <Spacer /> );
+	const { container: spacerWithMargin } = render( <Spacer margin={ 5 } /> );
+	expect( spacerWithMargin.firstChild ).toMatchStyleDiffSnapshot(
+		spacer.firstChild
+	);
+} );
+```
 
 #### Troubleshooting
 

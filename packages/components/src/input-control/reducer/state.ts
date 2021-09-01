@@ -11,7 +11,7 @@ import type { InputAction } from './actions';
 
 export interface InputState {
 	_event: Event | {};
-	error: Error | null;
+	error: unknown;
 	initialValue?: string;
 	isDirty: boolean;
 	isDragEnabled: boolean;

@@ -17,10 +17,6 @@ import { addQueryArgs } from '@wordpress/url';
  */
 import { receiveItems, removeItems, receiveQueriedItems } from './queried-data';
 import { getKindEntities, DEFAULT_ENTITY_KEY } from './entities';
-import {
-	__unstableAcquireStoreLock,
-	__unstableReleaseStoreLock,
-} from './locks';
 import { createBatch } from './batch';
 import { getDispatch } from './controls';
 import { STORE_NAME } from './name';
@@ -183,11 +179,14 @@ export function* deleteEntityRecord(
 		return;
 	}
 
-	const lock = yield* __unstableAcquireStoreLock(
+	const lock = yield controls.dispatch(
+		STORE_NAME,
+		'__unstableAcquireStoreLock',
 		STORE_NAME,
 		[ 'entities', 'data', kind, name, recordId ],
 		{ exclusive: true }
 	);
+
 	try {
 		yield {
 			type: 'DELETE_ENTITY_RECORD_START',
@@ -230,7 +229,11 @@ export function* deleteEntityRecord(
 
 		return deletedRecord;
 	} finally {
-		yield* __unstableReleaseStoreLock( lock );
+		yield controls.dispatch(
+			STORE_NAME,
+			'__unstableReleaseStoreLock',
+			lock
+		);
 	}
 }
 
@@ -374,13 +377,12 @@ export const saveEntityRecord = (
 	const entityIdKey = entity.key || DEFAULT_ENTITY_KEY;
 	const recordId = record[ entityIdKey ];
 
-	const lock = await dispatch(
-		__unstableAcquireStoreLock(
-			STORE_NAME,
-			[ 'entities', 'data', kind, name, recordId || uuid() ],
-			{ exclusive: true }
-		)
+	const lock = await dispatch.__unstableAcquireStoreLock(
+		STORE_NAME,
+		[ 'entities', 'data', kind, name, recordId || uuid() ],
+		{ exclusive: true }
 	);
+
 	try {
 		// Evaluate optimized edits.
 		// (Function edits that should be evaluated on save to avoid expensive computations on every edit.)
@@ -558,7 +560,7 @@ export const saveEntityRecord = (
 
 		return updatedRecord;
 	} finally {
-		await dispatch( __unstableReleaseStoreLock( lock ) );
+		await dispatch.__unstableReleaseStoreLock( lock );
 	}
 };
 
