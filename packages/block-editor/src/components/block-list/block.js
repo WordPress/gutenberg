@@ -111,11 +111,11 @@ function BlockListBlock( {
 
 	const blockType = getBlockType( name );
 	const lightBlockWrapper =
-		blockType.apiVersion > 1 ||
+		blockType?.apiVersion > 1 ||
 		hasBlockSupport( blockType, 'lightBlockWrapper', false );
 
 	// Determine whether the block has props to apply to the wrapper.
-	if ( blockType.getEditWrapperProps ) {
+	if ( blockType?.getEditWrapperProps ) {
 		wrapperProps = mergeWrapperProps(
 			wrapperProps,
 			blockType.getEditWrapperProps( attributes )
