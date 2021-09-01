@@ -2,7 +2,7 @@
  * External dependencies
  */
 import { act } from 'react-test-renderer';
-import { fireEvent, render, waitFor } from 'test/helpers';
+import { fireEvent, render } from 'test/helpers';
 import { Keyboard, Text } from 'react-native';
 
 /**
@@ -38,7 +38,7 @@ afterAll( () => {
 	keyboardAddListenerSpy.mockRestore();
 } );
 
-it( 'displays the message', async () => {
+it( 'displays the message', () => {
 	const screen = render(
 		<TooltipSlot>
 			<Tooltip visible={ true } text="A helpful message">
@@ -47,14 +47,10 @@ it( 'displays the message', async () => {
 		</TooltipSlot>
 	);
 
-	const message = await waitFor( () =>
-		screen.getByText( 'A helpful message' )
-	);
-
-	expect( message ).toBeTruthy();
+	expect( screen.getByText( 'A helpful message' ) ).toBeTruthy();
 } );
 
-it( 'dismisses when the screen is tapped', async () => {
+it( 'dismisses when the screen is tapped', () => {
 	const screen = render(
 		<TooltipSlot>
 			<Tooltip visible={ true } text="A helpful message">
@@ -63,18 +59,14 @@ it( 'dismisses when the screen is tapped', async () => {
 		</TooltipSlot>
 	);
 
-	const message = await waitFor( () =>
-		screen.getByText( 'A helpful message' )
-	);
-
-	expect( message ).toBeTruthy();
+	expect( screen.getByText( 'A helpful message' ) ).toBeTruthy();
 
 	fireEvent( screen.getByTestId( 'tooltip-overlay' ), 'touchStart' );
 
 	expect( screen.queryByText( 'A helpful message' ) ).toBeNull();
 } );
 
-it( 'dismisses when the keyboard closes', async () => {
+it( 'dismisses when the keyboard closes', () => {
 	const screen = render(
 		<TooltipSlot>
 			<Tooltip visible={ true } text="A helpful message">
@@ -92,11 +84,7 @@ it( 'dismisses when the keyboard closes', async () => {
 		} );
 	} );
 
-	const message = await waitFor( () =>
-		screen.getByText( 'A helpful message' )
-	);
-
-	expect( message ).toBeTruthy();
+	expect( screen.getByText( 'A helpful message' ) ).toBeTruthy();
 
 	// Hide keyboard
 	act( () => {
