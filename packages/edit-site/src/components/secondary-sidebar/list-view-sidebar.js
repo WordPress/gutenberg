@@ -13,6 +13,7 @@ import {
 	useMergeRefs,
 } from '@wordpress/compose';
 import { useDispatch } from '@wordpress/data';
+import { memo } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { closeSmall } from '@wordpress/icons';
 import { ESCAPE } from '@wordpress/keycodes';
@@ -22,7 +23,7 @@ import { ESCAPE } from '@wordpress/keycodes';
  */
 import { store as editSiteStore } from '../../store';
 
-export default function ListViewSidebar() {
+function ListViewSidebar( blocksChangedUUID ) {
 	const { setIsListViewOpened } = useDispatch( editSiteStore );
 
 	const { clearSelectedBlock, selectBlock } = useDispatch( blockEditorStore );
@@ -64,9 +65,12 @@ export default function ListViewSidebar() {
 				<ListView
 					onSelect={ selectEditorBlock }
 					showNestedBlocks
+					blocksChangedUUID={ blocksChangedUUID }
 					__experimentalPersistentListViewFeatures
 				/>
 			</div>
 		</div>
 	);
 }
+
+export default memo( ListViewSidebar );

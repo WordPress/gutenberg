@@ -2163,3 +2163,14 @@ export function wasBlockJustInserted( state, clientId, source ) {
 		lastBlockInserted.source === source
 	);
 }
+
+/**
+ * Returns a uuid which changes every time a block is added, removed or inserted
+ *
+ * @param {Object} state Block editor state.
+ *
+ * @return {string} uuid string
+ */
+export function __unstableGetBlocksChangedUUID( state ) {
+	return state.__unstableBlocksChangedUUID;
+}

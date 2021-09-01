@@ -47,6 +47,7 @@ const expanded = ( state, action ) => {
  * @param {Function} props.onSelect                                 Block selection callback.
  * @param {boolean}  props.showNestedBlocks                         Flag to enable displaying nested blocks.
  * @param {boolean}  props.showOnlyCurrentHierarchy                 Flag to limit the list to the current hierarchy of blocks.
+ * @param {string}   props.blocksChangedUUID                        if blocks is not specified, used to help cache break clientIdsTree
  * @param {boolean}  props.__experimentalFeatures                   Flag to enable experimental features.
  * @param {boolean}  props.__experimentalPersistentListViewFeatures Flag to enable features for the Persistent List View experiment.
  * @param {Object}   ref                                            Forwarded ref
@@ -58,6 +59,7 @@ function ListView(
 		onSelect = noop,
 		__experimentalFeatures,
 		__experimentalPersistentListViewFeatures,
+		blocksChangedUUID = '',
 		...props
 	},
 	ref
@@ -65,7 +67,8 @@ function ListView(
 	const { clientIdsTree, selectedClientIds } = useListViewClientIds(
 		blocks,
 		showOnlyCurrentHierarchy,
-		__experimentalPersistentListViewFeatures
+		__experimentalPersistentListViewFeatures,
+		blocksChangedUUID
 	);
 	const { selectBlock } = useDispatch( blockEditorStore );
 	const selectEditorBlock = useCallback(

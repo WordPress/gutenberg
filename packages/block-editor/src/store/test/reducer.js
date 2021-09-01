@@ -33,7 +33,24 @@ import {
 	blockListSettings,
 	lastBlockAttributesChange,
 	lastBlockInserted,
+	__unstableBlocksChangedUUID,
 } from '../reducer';
+
+jest.mock( 'uuid', () => {
+	const v4 = jest.requireActual( 'uuid' ).v4;
+	let lastCall = null;
+	return {
+		v4: jest.fn( () => {
+			lastCall = v4();
+			return lastCall;
+		} ),
+		getLastCall: () => {
+			return lastCall;
+		},
+	};
+} );
+
+const uuid = require( 'uuid' );
 
 describe( 'state', () => {
 	describe( 'hasSameKeys()', () => {
@@ -3037,6 +3054,53 @@ describe( 'state', () => {
 			const state = lastBlockInserted( expectedState, action );
 
 			expect( state ).toEqual( expectedState );
+		} );
+	} );
+	describe( '__unstableBlocksChangedUUID', () => {
+		it( 'should return a new uuid when blocks are reset', () => {
+			const initialState = 'initial-state-uuid';
+			const action = {
+				type: 'RESET_BLOCKS',
+			};
+			const state = __unstableBlocksChangedUUID( initialState, action );
+			expect( state ).toEqual( uuid.getLastCall() );
+			expect( state ).not.toEqual( initialState );
+		} );
+		it( 'should return a new uuid when inner blocks are replaced', () => {
+			const initialState = 'initial-state-uuid';
+			const action = {
+				type: 'REPLACE_INNER_BLOCKS',
+			};
+			const state = __unstableBlocksChangedUUID( initialState, action );
+			expect( state ).toEqual( uuid.getLastCall() );
+			expect( state ).not.toEqual( initialState );
+		} );
+		it( 'should return a new uuid when blocks are removed', () => {
+			const initialState = 'initial-state-uuid';
+			const action = {
+				type: 'REMOVE_BLOCKS',
+			};
+			const state = __unstableBlocksChangedUUID( initialState, action );
+			expect( state ).toEqual( uuid.getLastCall() );
+			expect( state ).not.toEqual( initialState );
+		} );
+		it( 'should return a new uuid when blocks are replaced', () => {
+			const initialState = 'initial-state-uuid';
+			const action = {
+				type: 'REPLACE_BLOCKS',
+			};
+			const state = __unstableBlocksChangedUUID( initialState, action );
+			expect( state ).toEqual( uuid.getLastCall() );
+			expect( state ).not.toEqual( initialState );
+		} );
+		it( 'should return a new uuid when blocks are inserted', () => {
+			const initialState = 'initial-state-uuid';
+			const action = {
+				type: 'INSERT_BLOCKS',
+			};
+			const state = __unstableBlocksChangedUUID( initialState, action );
+			expect( state ).toEqual( uuid.getLastCall() );
+			expect( state ).not.toEqual( initialState );
 		} );
 	} );
 } );

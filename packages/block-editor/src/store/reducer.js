@@ -16,6 +16,7 @@ import {
 	omitBy,
 	pickBy,
 } from 'lodash';
+import { v4 as uuid } from 'uuid';
 
 /**
  * WordPress dependencies
@@ -1195,6 +1196,26 @@ export function isTyping( state = false, action ) {
 }
 
 /**
+ * Reducer that returns a new uuid every time a block is added, removed or inserted.
+ *
+ * @param {string} state  uuid string
+ * @param {Object} action Dispated action
+ *
+ * @return {string} Updated state
+ */
+export function __unstableBlocksChangedUUID( state = uuid(), action ) {
+	switch ( action.type ) {
+		case 'REPLACE_INNER_BLOCKS':
+		case 'INSERT_BLOCKS':
+		case 'REMOVE_BLOCKS':
+		case 'REPLACE_BLOCKS':
+		case 'RESET_BLOCKS':
+			return uuid();
+	}
+	return state;
+}
+
+/**
  * Reducer returning dragged block client id.
  *
  * @param {string[]} state  Current state.
@@ -1799,4 +1820,5 @@ export default combineReducers( {
 	automaticChangeStatus,
 	highlightedBlock,
 	lastBlockInserted,
+	__unstableBlocksChangedUUID,
 } );

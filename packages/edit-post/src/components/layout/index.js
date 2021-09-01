@@ -16,7 +16,10 @@ import {
 	store as editorStore,
 } from '@wordpress/editor';
 import { AsyncModeProvider, useSelect, useDispatch } from '@wordpress/data';
-import { BlockBreadcrumb } from '@wordpress/block-editor';
+import {
+	BlockBreadcrumb,
+	store as blockEditorStore,
+} from '@wordpress/block-editor';
 import { Button, ScrollLock, Popover } from '@wordpress/components';
 import { useViewportMatch } from '@wordpress/compose';
 import { PluginArea } from '@wordpress/plugins';
@@ -70,6 +73,13 @@ function Layout( { styles } ) {
 		closeGeneralSidebar,
 		setIsInserterOpened,
 	} = useDispatch( editPostStore );
+	// Used to help determine if ListViewSidebar should update
+	const { blocksChangedUUID } = useSelect( ( select ) => {
+		const { __unstableGetBlocksChangedUUID } = select( blockEditorStore );
+		return {
+			blocksChangedUUID: __unstableGetBlocksChangedUUID(),
+		};
+	} );
 	const {
 		mode,
 		isFullscreenActive,
@@ -177,7 +187,7 @@ function Layout( { styles } ) {
 		if ( mode === 'visual' && isListViewOpened ) {
 			return (
 				<AsyncModeProvider value="true">
-					<ListViewSidebar />
+					<ListViewSidebar blocksChangedUUID={ blocksChangedUUID } />
 				</AsyncModeProvider>
 			);
 		}
