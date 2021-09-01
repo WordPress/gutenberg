@@ -86,9 +86,11 @@ async function firstTimeContributorAccountLink( payload, octokit ) {
 	try {
 		hasProfile = await hasWordPressProfile( author );
 	} catch ( error ) {
-		debug(
-			`first-time-contributor-account-link: Error retrieving from profile API:\n\n${ error.toString() }`
-		);
+		if ( error instanceof Object ) {
+			debug(
+				`first-time-contributor-account-link: Error retrieving from profile API:\n\n${ error.toString() }`
+			);
+		}
 		return;
 	}
 
