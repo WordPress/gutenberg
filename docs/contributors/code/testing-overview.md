@@ -355,6 +355,18 @@ test( 'should render a darker background when isShady is true', () => {
 } );
 ```
 
+Similarly, the `toMatchStyleDiffSnapshot` function allows to snapshot only the difference between the _styles_ associated to two different states of a component, like in this example:
+
+```js
+test( 'should render margin', () => {
+	const { container: base } = render( <Spacer /> );
+	const { container: withMargin } = render( <Spacer margin={ 5 } /> );
+	expect( withMargin.firstChild ).toMatchStyleDiffSnapshot(
+		base.firstChild
+	);
+} );
+```
+
 #### Troubleshooting
 
 Sometimes we need to mock refs for some stories which use them. Check the following documents to learn more:
