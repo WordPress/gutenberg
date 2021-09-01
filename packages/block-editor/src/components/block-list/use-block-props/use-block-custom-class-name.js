@@ -33,7 +33,7 @@ export function useBlockCustomClassName( clientId ) {
 
 			const blockType = getBlockType( getBlockName( clientId ) );
 			const hasLightBlockWrapper =
-				blockType.apiVersion > 1 ||
+				blockType?.apiVersion > 1 ||
 				hasBlockSupport( blockType, 'lightBlockWrapper', false );
 
 			if ( ! hasLightBlockWrapper ) {

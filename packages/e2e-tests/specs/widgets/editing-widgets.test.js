@@ -633,12 +633,14 @@ describe( 'Widgets screen', () => {
 
 		// Wait for the Legacy Widget block's preview iframe to load.
 		const frame = await new Promise( ( resolve ) => {
-			const checkFrame = async ( candidateFrame ) => {
-				const url = await candidateFrame.url();
-				if ( url.includes( 'legacy-widget-preview' ) ) {
+			const checkFrame = async () => {
+				const frameElement = await page.$(
+					'iframe.wp-block-legacy-widget__edit-preview-iframe'
+				);
+				if ( frameElement ) {
 					page.off( 'frameattached', checkFrame );
 					page.off( 'framenavigated', checkFrame );
-					resolve( candidateFrame );
+					resolve( frameElement.contentFrame() );
 				}
 			};
 			page.on( 'frameattached', checkFrame );

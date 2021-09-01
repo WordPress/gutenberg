@@ -17,7 +17,10 @@ import { HelpDetailBodyText, HelpDetailImage } from './view-sections';
 const AddBlocks = () => {
 	return (
 		<>
-			<HelpDetailImage source={ require( './images/add-blocks.png' ) } />
+			<HelpDetailImage
+				source={ require( './images/add-light.png' ) }
+				sourceDarkMode={ require( './images/add-dark.png' ) }
+			/>
 			<View style={ styles.helpDetailContainer }>
 				<HelpDetailBodyText
 					text={ __(
