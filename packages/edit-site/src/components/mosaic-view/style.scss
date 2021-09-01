@@ -4,7 +4,8 @@
 	grid-template-columns: repeat(auto-fit, 400px);
 	grid-template-rows: repeat(auto-fit, 400px);
 	grid-gap: $grid-unit-40;
-	background-color: $white;
+	background-color: $gray-800;
+	color: $gray-200;
 	padding: $grid-unit-40;
 	justify-content: center;
 	min-height: 100%;
@@ -19,6 +20,7 @@
 	grid-gap: $grid-unit-20;
 	.components-base-control__help {
 		margin-left: $grid-unit-40;
+		color: $gray-600;
 	}
 	&:focus {
 		box-shadow: 0 0 0 var(--wp-admin-border-width-focus) var(--wp-admin-theme-color);
@@ -28,16 +30,17 @@
 
 	&:hover {
 		border: $border-width solid var(--wp-admin-theme-color);
-		cursor: pointer;
 	}
 }
 
 .edit-site-mosaic-view__template-preview {
-	border: $border-width solid $gray-400;
 	border-radius: $radius-block-ui;
 	color: $gray-900;
 	grid-column: span 2;
 	overflow: hidden;
+	&:hover {
+		cursor: pointer;
+	}
 	.components-spinner {
 		position: relative;
 		top: calc(50% - #{ math.div($spinner-size, 2) });
@@ -62,4 +65,8 @@
 	.components-base-control__help {
 		margin-left: $grid-unit-10;
 	}
+}
+
+.edit-site-mosaic-view__template-actions .components-button {
+	color: $gray-200;
 }

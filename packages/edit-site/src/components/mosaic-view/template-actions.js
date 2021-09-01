@@ -40,7 +40,11 @@ export default function TemplateActions( {
 	);
 	const { deleteEntityRecord } = useDispatch( coreStore );
 	return (
-		<DropdownMenu icon={ moreVertical } label={ __( 'Template actions' ) }>
+		<DropdownMenu
+			className="edit-site-mosaic-view__template-actions"
+			icon={ moreVertical }
+			label={ __( 'Template actions' ) }
+		>
 			{ ( { onClose } ) => (
 				<>
 					{ addedBy && (
