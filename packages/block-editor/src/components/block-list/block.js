@@ -103,7 +103,7 @@ function BlockListBlock( {
 			insertBlocksAfter={ isLocked ? undefined : onInsertBlocksAfter }
 			onReplace={ canRemove ? onReplace : undefined }
 			onRemove={ canRemove ? onRemove : undefined }
-			mergeBlocks={ isLocked ? undefined : onMerge }
+			mergeBlocks={ canRemove ? onMerge : undefined }
 			clientId={ clientId }
 			isSelectionEnabled={ isSelectionEnabled }
 			toggleSelection={ toggleSelection }
