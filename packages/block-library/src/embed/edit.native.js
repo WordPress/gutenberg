@@ -38,7 +38,7 @@ const PREVIEWABLE_PROVIDERS = [ 'youtube', 'twitter' ];
 
 const EmbedEdit = ( props ) => {
 	const {
-		attributes: { providerNameSlug, previewable, responsive, url },
+		attributes: { align, providerNameSlug, previewable, responsive, url },
 		attributes,
 		isSelected,
 		onReplace,
@@ -238,6 +238,7 @@ const EmbedEdit = ( props ) => {
 					/>
 					<View { ...blockProps }>
 						<EmbedPreview
+							align={ align }
 							className={ className }
 							clientId={ clientId }
 							icon={ icon }
