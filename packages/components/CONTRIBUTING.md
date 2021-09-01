@@ -98,7 +98,7 @@ Each component that is exported from the `@wordpress/components` package should 
 
 #### Folder structure
 
-As a result of the above guidelines, all new components (execpt for shared utilities) should generally follow this folder structure:
+As a result of the above guidelines, all new components (except for shared utilities) should _generally_ follow this folder structure:
 
 ```
 component-name/
