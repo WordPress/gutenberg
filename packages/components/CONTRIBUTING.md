@@ -28,7 +28,6 @@ In these situations, one possible approach is to "soft-deprecate" a given legacy
 - Using `children` vs custom render props vs arbitrary "data" props
 - Controlled and semi-controlled components
 - Composition patterns
-- Sub-components naming conventions
 - Components' layout responsibilities and boundaries (i.e., a component should only affect the layout of its children, not its own)
 - ...
 
@@ -82,6 +81,7 @@ A couple of good examples of how hooks are used for composition are:
 
 - Boolean component props should be prefixed with `is*` (e.g. `isChecked`), `has*` (e.g. `hasValue`) or `enable*` (e.g. `enableScroll`)
 - Event callback props should be prefixed with `on*` (e.g. `onChanged`)
+- Sub-components naming conventions (e.g `CardBody` instead of `Card.Body`)
 - ...
 
 ### Technical requirements for new components
