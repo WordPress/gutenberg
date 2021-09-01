@@ -462,7 +462,7 @@ let metaBoxesInitialized = false;
  */
 export function* initializeMetaBoxes() {
 	const isEditorReady = yield controls.select(
-		editorStore,
+		'core/editor',
 		'__unstableIsEditorReady'
 	);
 
@@ -470,7 +470,10 @@ export function* initializeMetaBoxes() {
 		return;
 	}
 
-	const postType = yield controls.select( editorStore, 'getCurrentPostType' );
+	const postType = yield controls.select(
+		'core/editor',
+		'getCurrentPostType'
+	);
 
 	// Only initialize once.
 	if ( metaBoxesInitialized ) {
@@ -483,17 +486,17 @@ export function* initializeMetaBoxes() {
 
 	metaBoxesInitialized = true;
 
-	let wasSavingPost = yield controls.select( editorStore, 'isSavingPost' );
+	let wasSavingPost = yield controls.select( 'core/editor', 'isSavingPost' );
 	let wasAutosavingPost = yield controls.select(
-		editorStore,
+		'core/editor',
 		'isAutosavingPost'
 	);
 	const hasMetaBoxes = yield controls.select( editPostStore, 'hasMetaBoxes' );
 
 	// Save metaboxes when performing a full save on the post.
 	subscribe( () => {
-		const isSavingPost = select( editorStore ).isSavingPost();
-		const isAutosavingPost = select( editorStore ).isAutosavingPost();
+		const isSavingPost = select( 'core/editor' ).isSavingPost();
+		const isAutosavingPost = select( 'core/editor' ).isAutosavingPost();
 
 		// Save metaboxes on save completion, except for autosaves that are not a post preview.
 		//
