@@ -8,7 +8,7 @@ import { v4 as uuid } from 'uuid';
  * WordPress dependencies
  */
 import { controls } from '@wordpress/data';
-import { apiFetch, __unstableAwaitPromise } from '@wordpress/data-controls';
+import { __unstableAwaitPromise } from '@wordpress/data-controls';
 import triggerFetch from '@wordpress/api-fetch';
 import { addQueryArgs } from '@wordpress/url';
 
@@ -17,10 +17,6 @@ import { addQueryArgs } from '@wordpress/url';
  */
 import { receiveItems, removeItems, receiveQueriedItems } from './queried-data';
 import { getKindEntities, DEFAULT_ENTITY_KEY } from './entities';
-import {
-	__unstableAcquireStoreLock,
-	__unstableReleaseStoreLock,
-} from './locks';
 import { createBatch } from './batch';
 import { getDispatch } from './controls';
 import { STORE_NAME } from './name';
@@ -166,16 +162,16 @@ export function receiveEmbedPreview( url, preview ) {
  * @param {Object}   [options]                 Delete options.
  * @param {Function} [options.__unstableFetch] Internal use only. Function to
  *                                             call instead of `apiFetch()`.
- *                                             Must return a control descriptor.
+ *                                             Must return a promise.
  */
-export function* deleteEntityRecord(
+export const deleteEntityRecord = (
 	kind,
 	name,
 	recordId,
 	query,
-	{ __unstableFetch = null } = {}
-) {
-	const entities = yield getKindEntities( kind );
+	{ __unstableFetch = triggerFetch } = {}
+) => async ( { dispatch } ) => {
+	const entities = await dispatch( getKindEntities( kind ) );
 	const entity = find( entities, { kind, name } );
 	let error;
 	let deletedRecord = false;
@@ -183,18 +179,19 @@ export function* deleteEntityRecord(
 		return;
 	}
 
-	const lock = yield* __unstableAcquireStoreLock(
+	const lock = await dispatch.__unstableAcquireStoreLock(
 		STORE_NAME,
 		[ 'entities', 'data', kind, name, recordId ],
 		{ exclusive: true }
 	);
+
 	try {
-		yield {
+		dispatch( {
 			type: 'DELETE_ENTITY_RECORD_START',
 			kind,
 			name,
 			recordId,
-		};
+		} );
 
 		try {
 			let path = `${ entity.baseURL }/${ recordId }`;
@@ -203,36 +200,29 @@ export function* deleteEntityRecord(
 				path = addQueryArgs( path, query );
 			}
 
-			const options = {
+			deletedRecord = await __unstableFetch( {
 				path,
 				method: 'DELETE',
-			};
-			if ( __unstableFetch ) {
-				deletedRecord = yield __unstableAwaitPromise(
-					__unstableFetch( options )
-				);
-			} else {
-				deletedRecord = yield apiFetch( options );
-			}
+			} );
 
-			yield removeItems( kind, name, recordId, true );
+			await dispatch( removeItems( kind, name, recordId, true ) );
 		} catch ( _error ) {
 			error = _error;
 		}
 
-		yield {
+		dispatch( {
 			type: 'DELETE_ENTITY_RECORD_FINISH',
 			kind,
 			name,
 			recordId,
 			error,
-		};
+		} );
 
 		return deletedRecord;
 	} finally {
-		yield* __unstableReleaseStoreLock( lock );
+		dispatch.__unstableReleaseStoreLock( lock );
 	}
-}
+};
 
 /**
  * Returns an action object that triggers an
@@ -247,28 +237,22 @@ export function* deleteEntityRecord(
  *
  * @return {Object} Action object.
  */
-export function* editEntityRecord( kind, name, recordId, edits, options = {} ) {
-	const entity = yield controls.select( STORE_NAME, 'getEntity', kind, name );
+export const editEntityRecord = (
+	kind,
+	name,
+	recordId,
+	edits,
+	options = {}
+) => async ( { select, dispatch } ) => {
+	const entity = select.getEntity( kind, name );
 	if ( ! entity ) {
 		throw new Error(
 			`The entity being edited (${ kind }, ${ name }) does not have a loaded config.`
 		);
 	}
 	const { transientEdits = {}, mergedEdits = {} } = entity;
-	const record = yield controls.select(
-		STORE_NAME,
-		'getRawEntityRecord',
-		kind,
-		name,
-		recordId
-	);
-	const editedRecord = yield controls.select(
-		STORE_NAME,
-		'getEditedEntityRecord',
-		kind,
-		name,
-		recordId
-	);
+	const record = select.getRawEntityRecord( kind, name, recordId );
+	const editedRecord = select.getEditedEntityRecord( kind, name, recordId );
 
 	const edit = {
 		kind,
@@ -287,7 +271,7 @@ export function* editEntityRecord( kind, name, recordId, edits, options = {} ) {
 		}, {} ),
 		transientEdits,
 	};
-	return {
+	return await dispatch( {
 		type: 'EDIT_ENTITY_RECORD',
 		...edit,
 		meta: {
@@ -300,44 +284,44 @@ export function* editEntityRecord( kind, name, recordId, edits, options = {} ) {
 				}, {} ),
 			},
 		},
-	};
-}
+	} );
+};
 
 /**
  * Action triggered to undo the last edit to
  * an entity record, if any.
+ *
+ * @return {undefined}
  */
-export function* undo() {
-	const undoEdit = yield controls.select( STORE_NAME, 'getUndoEdit' );
+export const undo = () => ( { select, dispatch } ) => {
+	const undoEdit = select.getUndoEdit();
 	if ( ! undoEdit ) {
 		return;
 	}
-	yield {
+	dispatch( {
 		type: 'EDIT_ENTITY_RECORD',
 		...undoEdit,
-		meta: {
-			isUndo: true,
-		},
-	};
-}
+		meta: { isUndo: true },
+	} );
+};
 
 /**
  * Action triggered to redo the last undoed
  * edit to an entity record, if any.
+ *
+ * @return {undefined}
  */
-export function* redo() {
-	const redoEdit = yield controls.select( STORE_NAME, 'getRedoEdit' );
+export const redo = () => ( { select, dispatch } ) => {
+	const redoEdit = select.getRedoEdit();
 	if ( ! redoEdit ) {
 		return;
 	}
-	yield {
+	dispatch( {
 		type: 'EDIT_ENTITY_RECORD',
 		...redoEdit,
-		meta: {
-			isRedo: true,
-		},
-	};
-}
+		meta: { isRedo: true },
+	} );
+};
 
 /**
  * Forces the creation of a new undo level.
@@ -374,13 +358,12 @@ export const saveEntityRecord = (
 	const entityIdKey = entity.key || DEFAULT_ENTITY_KEY;
 	const recordId = record[ entityIdKey ];
 
-	const lock = await dispatch(
-		__unstableAcquireStoreLock(
-			STORE_NAME,
-			[ 'entities', 'data', kind, name, recordId || uuid() ],
-			{ exclusive: true }
-		)
+	const lock = await dispatch.__unstableAcquireStoreLock(
+		STORE_NAME,
+		[ 'entities', 'data', kind, name, recordId || uuid() ],
+		{ exclusive: true }
 	);
+
 	try {
 		// Evaluate optimized edits.
 		// (Function edits that should be evaluated on save to avoid expensive computations on every edit.)
@@ -558,7 +541,7 @@ export const saveEntityRecord = (
 
 		return updatedRecord;
 	} finally {
-		await dispatch( __unstableReleaseStoreLock( lock ) );
+		await dispatch.__unstableReleaseStoreLock( lock );
 	}
 };
 

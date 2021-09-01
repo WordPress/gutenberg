@@ -27,8 +27,10 @@ const isDuplicateValidationError = ( requestError ) => {
 	// The included version of RequestError provides no way to access the
 	// full 'errors' array that the github REST API returns. Hopefully they
 	// resolve this soon!
-	const errorMessage = /** @type {undefined | null | {message?: string}} */ ( requestError )
-		?.message;
+	const errorMessage =
+		requestError &&
+		typeof requestError === 'object' &&
+		/** @type {{message?: string}} */ ( requestError ).message;
 	return (
 		typeof errorMessage === 'string' &&
 		errorMessage.includes( 'already_exists' )
