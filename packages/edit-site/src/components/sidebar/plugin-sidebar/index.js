@@ -2,16 +2,6 @@
  * WordPress dependencies
  */
 import { ComplementaryArea } from '@wordpress/interface';
-import { useSelect } from '@wordpress/data';
-import { store as keyboardShortcutsStore } from '@wordpress/keyboard-shortcuts';
-
-/**
- * Internal dependencies
- */
-/**
- * Internal dependencies
- */
-import { store as editSiteStore } from '../../../store';
 
 /**
  * Renders a sidebar when activated. The contents within the `PluginSidebar` will appear as content within the sidebar.
@@ -79,25 +69,11 @@ import { store as editSiteStore } from '../../../store';
  * ```
  */
 export default function PluginSidebarEditSite( { className, ...props } ) {
-	const { shortcut, showIconLabels } = useSelect( ( select ) => {
-		return {
-			shortcut: select(
-				keyboardShortcutsStore
-			).getShortcutRepresentation(
-				'core/edit-site/toggle-block-settings-sidebar'
-			),
-			showIconLabels: select( editSiteStore ).isFeatureActive(
-				'showIconLabels'
-			),
-		};
-	} );
 	return (
 		<ComplementaryArea
 			panelClassName={ className }
 			className="edit-site-sidebar"
 			scope="core/edit-site"
-			toggleShortcut={ shortcut }
-			showIconLabels={ showIconLabels }
 			{ ...props }
 		/>
 	);
