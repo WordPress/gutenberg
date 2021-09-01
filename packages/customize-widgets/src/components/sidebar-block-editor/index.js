@@ -88,6 +88,7 @@ export default function SidebarBlockEditor( {
 		blockEditorSettings,
 		isFixedToolbarActive,
 		keepCaretInsideBlock,
+		setIsInserterOpened,
 	] );
 
 	if ( isWelcomeGuideActive ) {

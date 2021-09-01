@@ -126,10 +126,14 @@ function FontSizePicker(
 							if ( 0 === parseFloat( nextSize ) || ! nextSize ) {
 								onChange( undefined );
 							} else {
-								onChange( nextSize );
+								onChange(
+									hasUnits
+										? nextSize
+										: parseInt( nextSize, 10 )
+								);
 							}
 						} }
-						units={ units }
+						units={ hasUnits ? units : false }
 					/>
 				) }
 				<Button

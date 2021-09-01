@@ -9,7 +9,7 @@ import { castArray, reduce } from 'lodash';
 import { __ } from '@wordpress/i18n';
 import { apiFetch } from '@wordpress/data-controls';
 import { store as interfaceStore } from '@wordpress/interface';
-import { controls, dispatch, select, subscribe } from '@wordpress/data';
+import { controls, select, subscribe, dispatch } from '@wordpress/data';
 import { speak } from '@wordpress/a11y';
 import { store as noticesStore } from '@wordpress/notices';
 import { store as coreStore } from '@wordpress/core-data';
@@ -256,8 +256,6 @@ export function showBlockTypes( blockNames ) {
 	};
 }
 
-let saveMetaboxUnsubscribe;
-
 /**
  * Returns an action object used in signaling
  * what Meta boxes are available in which location.
@@ -271,55 +269,6 @@ export function* setAvailableMetaBoxesPerLocation( metaBoxesPerLocation ) {
 		type: 'SET_META_BOXES_PER_LOCATIONS',
 		metaBoxesPerLocation,
 	};
-
-	const postType = yield controls.select(
-		'core/editor',
-		'getCurrentPostType'
-	);
-	if ( window.postboxes.page !== postType ) {
-		window.postboxes.add_postbox_toggles( postType );
-	}
-
-	let wasSavingPost = yield controls.select( 'core/editor', 'isSavingPost' );
-	let wasAutosavingPost = yield controls.select(
-		'core/editor',
-		'isAutosavingPost'
-	);
-
-	// Meta boxes are initialized once at page load. It is not necessary to
-	// account for updates on each state change.
-	//
-	// See: https://github.com/WordPress/WordPress/blob/5.1.1/wp-admin/includes/post.php#L2307-L2309
-	const hasActiveMetaBoxes = yield controls.select(
-		editPostStore.name,
-		'hasMetaBoxes'
-	);
-
-	// First remove any existing subscription in order to prevent multiple saves
-	if ( !! saveMetaboxUnsubscribe ) {
-		saveMetaboxUnsubscribe();
-	}
-
-	// Save metaboxes when performing a full save on the post.
-	saveMetaboxUnsubscribe = subscribe( () => {
-		const isSavingPost = select( 'core/editor' ).isSavingPost();
-		const isAutosavingPost = select( 'core/editor' ).isAutosavingPost();
-
-		// Save metaboxes on save completion, except for autosaves that are not a post preview.
-		const shouldTriggerMetaboxesSave =
-			hasActiveMetaBoxes &&
-			wasSavingPost &&
-			! isSavingPost &&
-			! wasAutosavingPost;
-
-		// Save current state for next inspection.
-		wasSavingPost = isSavingPost;
-		wasAutosavingPost = isAutosavingPost;
-
-		if ( shouldTriggerMetaboxesSave ) {
-			dispatch( editPostStore.name ).requestMetaBoxUpdates();
-		}
-	} );
 }
 
 /**
@@ -504,4 +453,73 @@ export function* __unstableSwitchToTemplateMode( template ) {
 			type: 'snackbar',
 		} );
 	}
+}
+
+let metaBoxesInitialized = false;
+
+/**
+ * Initializes WordPress `postboxes` script and the logic for saving meta boxes.
+ */
+export function* initializeMetaBoxes() {
+	const isEditorReady = yield controls.select(
+		'core/editor',
+		'__unstableIsEditorReady'
+	);
+
+	if ( ! isEditorReady ) {
+		return;
+	}
+
+	const postType = yield controls.select(
+		'core/editor',
+		'getCurrentPostType'
+	);
+
+	// Only initialize once.
+	if ( metaBoxesInitialized ) {
+		return;
+	}
+
+	if ( window.postboxes.page !== postType ) {
+		window.postboxes.add_postbox_toggles( postType );
+	}
+
+	metaBoxesInitialized = true;
+
+	let wasSavingPost = yield controls.select( 'core/editor', 'isSavingPost' );
+	let wasAutosavingPost = yield controls.select(
+		'core/editor',
+		'isAutosavingPost'
+	);
+	const hasMetaBoxes = yield controls.select( editPostStore, 'hasMetaBoxes' );
+
+	// Save metaboxes when performing a full save on the post.
+	subscribe( () => {
+		const isSavingPost = select( 'core/editor' ).isSavingPost();
+		const isAutosavingPost = select( 'core/editor' ).isAutosavingPost();
+
+		// Save metaboxes on save completion, except for autosaves that are not a post preview.
+		//
+		// Meta boxes are initialized once at page load. It is not necessary to
+		// account for updates on each state change.
+		//
+		// See: https://github.com/WordPress/WordPress/blob/5.1.1/wp-admin/includes/post.php#L2307-L2309
+		const shouldTriggerMetaboxesSave =
+			hasMetaBoxes &&
+			wasSavingPost &&
+			! isSavingPost &&
+			! wasAutosavingPost;
+
+		// Save current state for next inspection.
+		wasSavingPost = isSavingPost;
+		wasAutosavingPost = isAutosavingPost;
+
+		if ( shouldTriggerMetaboxesSave ) {
+			dispatch( editPostStore ).requestMetaBoxUpdates();
+		}
+	} );
+
+	return {
+		type: 'META_BOXES_INITIALIZED',
+	};
 }

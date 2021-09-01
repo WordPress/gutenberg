@@ -7,7 +7,7 @@ import classnames from 'classnames';
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { useCallback, useState, useRef } from '@wordpress/element';
+import { useCallback, useEffect, useState, useRef } from '@wordpress/element';
 import {
 	Button,
 	ButtonGroup,
@@ -68,27 +68,42 @@ function URLPicker( {
 	opensInNewTab,
 	onToggleOpenInNewTab,
 	anchorRef,
+	richTextRef,
 } ) {
-	const [ isURLPickerOpen, setIsURLPickerOpen ] = useState( false );
-	const urlIsSet = !! url;
-	const urlIsSetandSelected = urlIsSet && isSelected;
-	const openLinkControl = () => {
-		setIsURLPickerOpen( true );
-		return false; // prevents default behaviour for event
+	const [ isEditingURL, setIsEditingURL ] = useState( false );
+	const isURLSet = !! url;
+
+	const startEditing = ( event ) => {
+		event.preventDefault();
+		setIsEditingURL( true );
 	};
-	const unlinkButton = () => {
+
+	const unlink = () => {
 		setAttributes( {
 			url: undefined,
 			linkTarget: undefined,
 			rel: undefined,
 		} );
-		setIsURLPickerOpen( false );
+		setIsEditingURL( false );
 	};
-	const linkControl = ( isURLPickerOpen || urlIsSetandSelected ) && (
+
+	useEffect( () => {
+		if ( ! isSelected ) {
+			setIsEditingURL( false );
+		}
+	}, [ isSelected ] );
+
+	const isLinkControlVisible = isSelected && ( isEditingURL || isURLSet );
+
+	const linkControl = isLinkControlVisible && (
 		<Popover
 			position="bottom center"
-			onClose={ () => setIsURLPickerOpen( false ) }
+			onClose={ () => {
+				setIsEditingURL( false );
+				richTextRef.current?.focus();
+			} }
 			anchorRef={ anchorRef?.current }
+			focusOnMount={ isEditingURL ? 'firstElement' : false }
 		>
 			<LinkControl
 				className="wp-block-navigation-link__inline-link-input"
@@ -103,28 +118,34 @@ function URLPicker( {
 						onToggleOpenInNewTab( newOpensInNewTab );
 					}
 				} }
+				onRemove={ () => {
+					unlink();
+					richTextRef.current?.focus();
+				} }
+				forceIsEditingLink={ isEditingURL }
 			/>
 		</Popover>
 	);
+
 	return (
 		<>
 			<BlockControls group="block">
-				{ ! urlIsSet && (
+				{ ! isURLSet && (
 					<ToolbarButton
 						name="link"
 						icon={ link }
 						title={ __( 'Link' ) }
 						shortcut={ displayShortcut.primary( 'k' ) }
-						onClick={ openLinkControl }
+						onClick={ startEditing }
 					/>
 				) }
-				{ urlIsSetandSelected && (
+				{ isURLSet && (
 					<ToolbarButton
 						name="link"
 						icon={ linkOff }
 						title={ __( 'Unlink' ) }
 						shortcut={ displayShortcut.primaryShift( 'k' ) }
-						onClick={ unlinkButton }
+						onClick={ unlink }
 						isActive={ true }
 					/>
 				) }
@@ -133,8 +154,11 @@ function URLPicker( {
 				<KeyboardShortcuts
 					bindGlobal
 					shortcuts={ {
-						[ rawShortcut.primary( 'k' ) ]: openLinkControl,
-						[ rawShortcut.primaryShift( 'k' ) ]: unlinkButton,
+						[ rawShortcut.primary( 'k' ) ]: startEditing,
+						[ rawShortcut.primaryShift( 'k' ) ]: () => {
+							unlink();
+							richTextRef.current?.focus();
+						},
 					} }
 				/>
 			) }
@@ -195,6 +219,7 @@ function ButtonEdit( props ) {
 	const borderRadius = style?.border?.radius;
 	const colorProps = useColorProps( attributes );
 	const ref = useRef();
+	const richTextRef = useRef();
 	const blockProps = useBlockProps( { ref } );
 
 	return (
@@ -207,6 +232,7 @@ function ButtonEdit( props ) {
 				} ) }
 			>
 				<RichText
+					ref={ richTextRef }
 					aria-label={ __( 'Button text' ) }
 					placeholder={ placeholder || __( 'Add text…' ) }
 					value={ text }
@@ -244,6 +270,7 @@ function ButtonEdit( props ) {
 				opensInNewTab={ linkTarget === '_blank' }
 				onToggleOpenInNewTab={ onToggleOpenInNewTab }
 				anchorRef={ ref }
+				richTextRef={ richTextRef }
 			/>
 			<InspectorControls>
 				<WidthPanel
