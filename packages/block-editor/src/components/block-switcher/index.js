@@ -36,6 +36,22 @@ import PatternTransformationsMenu from './pattern-transformations-menu';
 export const BlockSwitcherDropdownMenu = ( { clientIds, blocks } ) => {
 	const { replaceBlocks } = useDispatch( blockEditorStore );
 	const blockInformation = useBlockDisplayInformation( blocks[ 0 ].clientId );
+
+	// The following method is needed to allow a manual transform from the old to new
+	// gallery block formats. It can be removed once old galleries are automatically
+	// migrated on edit.
+	const transformNewGalleryTitle = ( transform ) => {
+		{
+			if (
+				blockInformation.name === 'core/gallery' &&
+				transform.id === 'core/gallery'
+			) {
+				transform.title = __( 'New Gallery Format' );
+			}
+			return transform;
+		}
+	};
+
 	const {
 		possibleBlockTransformations,
 		hasBlockStyles,
@@ -73,7 +89,7 @@ export const BlockSwitcherDropdownMenu = ( { clientIds, blocks } ) => {
 				possibleBlockTransformations: getBlockTransformItems(
 					blocks,
 					rootClientId
-				),
+				).map( transformNewGalleryTitle ),
 				hasBlockStyles: !! styles?.length,
 				icon: _icon,
 				blockTitle: getBlockType( firstBlockName ).title,

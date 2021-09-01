@@ -129,6 +129,49 @@ addFilter(
 const transforms = {
 	from: [
 		{
+			// Allow transform to new gallery format if experimental flag enabled.
+			// can be removed once automatic migration of old galleries on edit is added.
+			type: 'block',
+			isMultiBlock: false,
+			blocks: [ 'core/gallery' ],
+			priority: 1,
+			isMatch( { ids } ) {
+				const settings = select( blockEditorStore ).getSettings();
+				return (
+					settings.__unstableGalleryWithImageBlocks && ids.length > 0
+				);
+			},
+			transform( { images, linkTo, sizeSlug } ) {
+				let link;
+				switch ( linkTo ) {
+					case 'post':
+						link = LINK_DESTINATION_ATTACHMENT;
+						break;
+					case 'file':
+						link = LINK_DESTINATION_MEDIA;
+						break;
+					default:
+						link = LINK_DESTINATION_NONE;
+						break;
+				}
+				const innerBlocks = images.map( ( image ) =>
+					createBlock( 'core/image', {
+						id: parseInt( image.id, 10 ),
+						url: image.url,
+						alt: image.alt,
+						caption: image.caption,
+						linkDestination: link,
+					} )
+				);
+
+				return createBlock(
+					'core/gallery',
+					{ sizeSlug, linkTo: link },
+					innerBlocks
+				);
+			},
+		},
+		{
 			type: 'block',
 			isMultiBlock: true,
 			blocks: [ 'core/image' ],
