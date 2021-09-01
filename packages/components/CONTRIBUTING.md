@@ -16,26 +16,6 @@ The `@wordpress/components` package includes components that are relied upon by 
 
 In these situations, an alternative approach is to "soft-deprecate" the given legacy API. This is achieved by removing traces of the API from the docs, while the code keeps supporing it in the background (with or without a warning)
 
-### Components structure
-
-The contents of the `@wordpress/components` package can be divided into three groups: UI Primitives, UI Blocks, and Utilities.
-
-#### UI Primitives
-
-Lower-level components, which are usually composed together to build the second type of components: UI Blocks. UI Primitives usually don't contain translated text and aim at being highly configurable (at the expense of exposing more props and therefore more complexity).
-
-UI Primitives can be useful when in need of building an app with all new UI that looks and feels like WordPress but isn't powered by other WordPress technologies (like `@wordpress/i18n`).
-
-_[Note: we need to discuss how to properly classify/label these components. Should we introduce `primitives`, `blocks` and `utils` folders in the `src` folder? Should we include a standard way in each component's README to show which category it belongs to?]_
-
-#### UI Blocks
-
-Higher-level components, which usually offer fewer props compared to UI Primitives and contain translated text. These components use other WordPress technologies and are ready to be used in Gutenberg's UI.
-
-#### Utilities
-
-Components and other utilities function that don't necessarily render a piece of UI to screen, but are instead useful when implementing a given piece of functionality.
-
 ### Components composition
 
 [To be expanded] E.g.:
