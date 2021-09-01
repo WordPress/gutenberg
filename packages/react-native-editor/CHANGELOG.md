@@ -10,7 +10,7 @@ For each user feature we should also add a importance categorization label  to i
 -->
 
 ## Unreleased
-
+-   [**] Enable embed inline previews (for now only YouTube and Twitter will be available) [#34447]
 ## 1.60.1
 -   [*] RNmobile: Fix the cancel button on Block Variation Picker / Columns Block. [#34249]
 -   [*] Column block: Fix Android close button alignment. [#34332]
