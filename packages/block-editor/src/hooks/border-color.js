@@ -54,8 +54,9 @@ export function BorderColorEdit( props ) {
 	const { style: borderStyle } = style?.border || {};
 	const defaultBorderStyle = useStyle( [ 'border', 'style' ] );
 	const defaultBorderColor = useStyle( [ 'border', 'color' ] );
+
 	const [ colorValue, setColorValue ] = useState(
-		borderColor || style?.border?.color || defaultBorderColor
+		borderColor || style?.border?.color
 	);
 
 	const onChangeColor = ( value ) => {
@@ -91,7 +92,7 @@ export function BorderColorEdit( props ) {
 	return (
 		<ColorGradientControl
 			label={ __( 'Color' ) }
-			colorValue={ colorValue }
+			colorValue={ colorValue || defaultBorderColor }
 			colors={ colors }
 			gradients={ undefined }
 			disableCustomColors={ disableCustomColors }
