@@ -40,7 +40,7 @@ export default function useStyle( path ) {
 		'blocks',
 		blockName,
 	] );
-	const value = get( settingsForBlock, path );
+	const value = get( stylesForBlock, path );
 	return useMemo( () => {
 		return getValueFromVariable(
 			settings.__experimentalFeatures,
