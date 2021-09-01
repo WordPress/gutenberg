@@ -179,11 +179,11 @@
 			"dropCap": true,
 			"customFontSize": true,
 			"customLineHeight": false,
-			"customFontStyle": true,
-			"customFontWeight": true,
-			"customTextTransforms": true,
-			"customTextDecorations": true,
-			"customLetterSpacing": true,
+			"fontStyle": true,
+			"fontWeight": true,
+			"textTransform": true,
+			"textDecoration": true,
+			"letterSpacing": true,
 			"fontSizes": [
 				{
 					"name": "Small",

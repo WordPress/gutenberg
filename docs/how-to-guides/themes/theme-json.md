@@ -244,12 +244,12 @@ The settings section has the following structure:
 		},
 		"typography": {
 			"customFontSize": true,
-			"customFontStyle": true,
-			"customFontWeight": true,
 			"customLineHeight": false,
-			"customTextDecorations": true,
-			"customTextTransforms": true,
 			"dropCap": true,
+			"fontStyle": true,
+			"fontWeight": true,
+			"textDecoration": true,
+			"textTransform": true,
 			"fontFamilies": [],
 			"fontSizes": []
 		},

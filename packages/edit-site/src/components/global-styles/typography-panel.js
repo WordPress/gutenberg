@@ -38,10 +38,10 @@ function useHasLineHeightControl( name ) {
 function useHasAppearanceControl( name ) {
 	const supports = getSupportedGlobalStylesPanels( name );
 	const hasFontStyles =
-		useSetting( 'typography.customFontStyle', name )[ 0 ] &&
+		useSetting( 'typography.fontStyle', name )[ 0 ] &&
 		supports.includes( 'fontStyle' );
 	const hasFontWeights =
-		useSetting( 'typography.customFontWeight', name )[ 0 ] &&
+		useSetting( 'typography.fontWeight', name )[ 0 ] &&
 		supports.includes( 'fontWeight' );
 	return hasFontStyles || hasFontWeights;
 }
@@ -49,7 +49,7 @@ function useHasAppearanceControl( name ) {
 function useHasLetterSpacingControl( name ) {
 	const supports = getSupportedGlobalStylesPanels( name );
 	return (
-		useSetting( 'typography.customLetterSpacing', name )[ 0 ] &&
+		useSetting( 'typography.letterSpacing', name )[ 0 ] &&
 		supports.includes( 'letterSpacing' )
 	);
 }
@@ -63,10 +63,10 @@ export default function TypographyPanel( { name } ) {
 	)[ 0 ];
 	const [ fontFamilies ] = useSetting( 'typography.fontFamilies', name );
 	const hasFontStyles =
-		useSetting( 'typography.customFontStyle', name )[ 0 ] &&
+		useSetting( 'typography.fontStyle', name )[ 0 ] &&
 		supports.includes( 'fontStyle' );
 	const hasFontWeights =
-		useSetting( 'typography.customFontWeight', name )[ 0 ] &&
+		useSetting( 'typography.fontWeight', name )[ 0 ] &&
 		supports.includes( 'fontWeight' );
 	const hasLineHeightEnabled = useHasLineHeightControl( name );
 	const hasAppearanceControl = useHasAppearanceControl( name );
