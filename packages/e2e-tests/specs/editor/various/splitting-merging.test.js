@@ -237,12 +237,11 @@ describe( 'splitting and merging blocks', () => {
 			await page.keyboard.type( 'item 2' );
 			await pressKeyTimes( 'ArrowUp', 2 );
 			await page.keyboard.press( 'Delete' );
-			await page.keyboard.type(
-				' caret is in first block and at the proper position. '
-			);
+			// Carret should be in the first block and at the proper position.
+			await page.keyboard.type( '-' );
 			expect( await getEditedPostContent() ).toMatchInlineSnapshot( `
 			"<!-- wp:paragraph -->
-			<p>hi caret is in first block and at the proper position. item 1</p>
+			<p>hi-item 1</p>
 			<!-- /wp:paragraph -->
 
 			<!-- wp:paragraph -->
@@ -260,12 +259,11 @@ describe( 'splitting and merging blocks', () => {
 			await page.keyboard.press( 'ArrowUp' );
 			await pressKeyTimes( 'ArrowLeft', 6 );
 			await page.keyboard.press( 'Backspace' );
-			await page.keyboard.type(
-				' caret is in first block and at the proper position. '
-			);
+			// Carret should be in the first block and at the proper position.
+			await page.keyboard.type( '-' );
 			expect( await getEditedPostContent() ).toMatchInlineSnapshot( `
 			"<!-- wp:paragraph -->
-			<p>hi caret is in first block and at the proper position. item 1</p>
+			<p>hi-item 1</p>
 			<!-- /wp:paragraph -->
 
 			<!-- wp:paragraph -->
