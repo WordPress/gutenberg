@@ -9,6 +9,7 @@ import classnames from 'classnames';
 import { addFilter } from '@wordpress/hooks';
 import { __ } from '@wordpress/i18n';
 import { createHigherOrderComponent } from '@wordpress/compose';
+import { useState } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -22,6 +23,7 @@ import {
 import useSetting from '../components/use-setting';
 import { hasBorderSupport, shouldSkipSerialization } from './border';
 import { cleanEmptyObject } from './utils';
+import useStyle from '../components/use-style';
 
 // Defining empty array here instead of inline avoids unnecessary re-renders of
 // color control.
@@ -49,7 +51,16 @@ export function BorderColorEdit( props ) {
 	const disableCustomColors = ! useSetting( 'color.custom' );
 	const disableCustomGradients = ! useSetting( 'color.customGradient' );
 
+	const { style: borderStyle } = style?.border || {};
+	const defaultBorderStyle = useStyle( [ 'border', 'style' ] );
+	const defaultBorderColor = useStyle( [ 'border', 'color' ] );
+	const [ colorValue, setColorValue ] = useState(
+		borderColor || style?.border?.color || defaultBorderColor
+	);
+
 	const onChangeColor = ( value ) => {
+		setColorValue( value );
+
 		const colorObject = getColorObjectByColorValue( colors, value );
 		const newStyle = {
 			...style,
@@ -62,6 +73,15 @@ export function BorderColorEdit( props ) {
 		// If empty slug, ensure undefined to remove attribute.
 		const newNamedColor = colorObject?.slug ? colorObject.slug : undefined;
 
+		if ( value && borderStyle === undefined ) {
+			// If a border color is selected, make sure the style property is selected
+			// so that the user can get immediate visual feedback. Set style to the default
+			// style if it exists, or set it to solid.
+			newStyle.border.style = defaultBorderStyle
+				? defaultBorderStyle
+				: 'solid';
+		}
+
 		setAttributes( {
 			style: cleanEmptyObject( newStyle ),
 			borderColor: newNamedColor,
@@ -71,7 +91,7 @@ export function BorderColorEdit( props ) {
 	return (
 		<ColorGradientControl
 			label={ __( 'Color' ) }
-			value={ borderColor || style?.border?.color }
+			colorValue={ colorValue }
 			colors={ colors }
 			gradients={ undefined }
 			disableCustomColors={ disableCustomColors }

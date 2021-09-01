@@ -13,6 +13,7 @@ import { __ } from '@wordpress/i18n';
  */
 import { cleanEmptyObject } from './utils';
 import useSetting from '../components/use-setting';
+import useStyle from '../components/use-style';
 
 const MIN_BORDER_WIDTH = 0;
 
@@ -33,6 +34,9 @@ export const BorderWidthEdit = ( props ) => {
 		style?.border || {};
 	const [ styleSelection, setStyleSelection ] = useState();
 	const [ colorSelection, setColorSelection ] = useState();
+
+	const defaultBorderStyle = useStyle( [ 'border', 'style' ] );
+	const defaultBorderWidth = useStyle( [ 'border', 'width' ] );
 
 	// Temporarily track previous border color & style selections to be able to
 	// restore them when border width changes from zero value.
@@ -81,6 +85,12 @@ export const BorderWidthEdit = ( props ) => {
 			newStyle.border.style = styleSelection;
 		}
 
+		if ( ! hasZeroWidth && borderStyle === undefined ) {
+			newStyle.border.style = defaultBorderStyle
+				? defaultBorderStyle
+				: 'solid';
+		}
+
 		// Restore previous border color selection if width is no longer zero
 		// and current border color is undefined.
 		if ( ! hasZeroWidth && borderColor === undefined ) {
@@ -106,6 +116,7 @@ export const BorderWidthEdit = ( props ) => {
 	return (
 		<UnitControl
 			value={ width }
+			placeholder={ defaultBorderWidth }
 			label={ __( 'Width' ) }
 			min={ MIN_BORDER_WIDTH }
 			onChange={ onChange }

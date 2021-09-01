@@ -123,7 +123,7 @@ export default function BorderPanel( {
 			{ hasBorderColor && (
 				<ColorGradientControl
 					label={ __( 'Color' ) }
-					value={ borderColor }
+					colorValue={ borderColor }
 					colors={ colors }
 					gradients={ undefined }
 					disableCustomColors={ disableCustomColors }

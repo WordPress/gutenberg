@@ -3,6 +3,7 @@
  */
 import BorderStyleControl from '../components/border-style-control';
 import { cleanEmptyObject } from './utils';
+import useStyle from '../components/use-style';
 
 /**
  * Inspector control for configuring border style property.
@@ -16,6 +17,8 @@ export const BorderStyleEdit = ( props ) => {
 		attributes: { style },
 		setAttributes,
 	} = props;
+
+	const defaultBorderStyle = useStyle( [ 'border', 'style' ] );
 
 	const onChange = ( newBorderStyle ) => {
 		const newStyleAttributes = {
@@ -31,7 +34,7 @@ export const BorderStyleEdit = ( props ) => {
 
 	return (
 		<BorderStyleControl
-			value={ style?.border?.style }
+			value={ style?.border?.style || defaultBorderStyle }
 			onChange={ onChange }
 		/>
 	);
