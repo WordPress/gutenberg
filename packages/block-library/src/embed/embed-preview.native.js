@@ -111,19 +111,16 @@ const EmbedPreview = ( {
 			disabled={ ! isSelected }
 		>
 			<View>
-				{
-					// eslint-disable-next-line no-undef
-					__DEV__ && previewable ? (
-						embedWrapper
-					) : (
-						<EmbedNoPreview
-							label={ label }
-							icon={ icon }
-							isSelected={ isSelected }
-							onPress={ () => setIsCaptionSelected( false ) }
-						/>
-					)
-				}
+				{ previewable ? (
+					embedWrapper
+				) : (
+					<EmbedNoPreview
+						label={ label }
+						icon={ icon }
+						isSelected={ isSelected }
+						onPress={ () => setIsCaptionSelected( false ) }
+					/>
+				) }
 				<BlockCaption
 					accessibilityLabelCreator={ accessibilityLabelCreator }
 					accessible
