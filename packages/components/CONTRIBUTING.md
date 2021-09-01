@@ -32,6 +32,50 @@ In these situations, one possible approach is to "soft-deprecate" a given legacy
 - Components' layout responsibilities and boundaries (i.e., a component should only affect the layout of its children, not its own)
 - ...
 
+#### Components & Hooks
+
+One way to enable reusability and composition is to extract a component's underlying logic into a hook (living in a separate `hook.ts` file). The actual component (usually defined in a `component.tsx` file) can then invoke the hook and use its output to render the required DOM elements. For example:
+
+```tsx
+// in `hook.ts`
+function useExampleComponent( props: PolymorphicComponentProps< ExampleProps, 'div' > ) {
+	// Merge received props with the context system.
+	const { isVisible, className, ...otherProps	} = useContextSystem( props, 'Example' );
+
+	// Any other reusable rendering logic (e.g. computing className, state, event listeners...)
+	const cx = useCx();
+	const classes = useMemo(
+		() =>
+			cx(
+				styles.example,
+				isVisible && styles.visible,
+				className
+			),
+		[ className, isVisible ]
+	);
+
+	return {
+		...otherProps,
+		className: classes
+	};
+}
+
+// in `component.tsx`
+function Example(
+	props: PolymorphicComponentProps< ExampleProps, 'div' >,
+	forwardedRef: Ref< any >
+) {
+	const exampleProps = useExampleComponent( props );
+
+	return <View { ...spacerProps } ref={ forwardedRef } />;
+}
+```
+
+A couple of good examples of how hooks are used for composition are:
+
+- the `Card` component, which builds on top of the `Surface` component by [calling the `useSurface` hook inside its own hook](/packages/components/src/card/card/hook.js);
+- the `HStack` component, which builds on top of the `Flex` component and [calls the `useFlex` hook inside its own hook](/packages/components/src/h-stack/hook.js).
+
 ### APIs Consinstency
 
 [To be expanded] E.g.:
@@ -57,10 +101,6 @@ All new component should be styled using [Emotion](https://emotion.sh/docs/intro
 Note: Instead of using Emotion's standard `cx` function, the custom [`useCx` hook](/packages/components/src/utils/hooks/use-cx.ts) should be used instead.
 
 #### Context system
-
-[To be expanded]
-
-#### Hooks vs Components
 
 [To be expanded]
 
