@@ -63,7 +63,7 @@ body:
       id: plugins
       attributes:
           label: Please confirm that you have tested with all plugins deactivated except Gutenberg.
-      multiple: true
+          multiple: true
           options:
              - Yes
              - No
