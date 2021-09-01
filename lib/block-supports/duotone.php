@@ -247,6 +247,12 @@ function gutenberg_register_duotone_support( $block_type ) {
 				'type' => 'object',
 			);
 		}
+
+		if ( ! array_key_exists( 'duotone', $block_type->attributes ) ) {
+			$block_type->attributes['duotone'] = array(
+				'type' => 'string',
+			);
+		}
 	}
 }
 
@@ -346,8 +352,8 @@ function get_duotone_color_values( $duotone_colors ) {
  */
 function gutenberg_output_duotone_markup( $duotone_markup ) {
 	add_action(
-		// Ideally we should use wp_head, but SVG defs can't be put in there.
-		is_admin() ? 'in_admin_footer' : 'wp_footer',
+		// SVG defs need to be within a container that is displayed (not inside a display: none or in the header).
+		is_admin() ? 'admin_footer' : 'wp_footer',
 		function () use ( $duotone_markup ) {
 			echo $duotone_markup;
 		}
@@ -368,18 +374,18 @@ function gutenberg_render_duotone_support( $block_content, $block ) {
 	if ( $block_type && property_exists( $block_type, 'supports' ) ) {
 		$duotone_support = _wp_array_get( $block_type->supports, array( 'color', '__experimentalDuotone' ), false );
 	}
-
-	$has_duotone_attribute = isset( $block['attrs']['style']['color']['duotone'] );
+	$has_named_duotone  = isset( $block['attrs']['duotone'] );
+	$has_custom_duotone = isset( $block['attrs']['style']['color']['duotone'] );
 
 	if (
 		! $duotone_support ||
-		! $has_duotone_attribute
+		$has_named_duotone ||
+		! $has_custom_duotone
 	) {
 		return $block_content;
 	}
 
 	$duotone_colors = $block['attrs']['style']['color']['duotone'];
-
 	$duotone_values = get_duotone_color_values( $duotone_colors );
 
 	$duotone_id = gutenberg_get_duotone_filter_id( uniqid() );
@@ -411,11 +417,40 @@ function gutenberg_render_duotone_support( $block_content, $block ) {
 	return $content;
 }
 
+/**
+ * Add CSS classes and inline styles for duotone to the incoming attributes.
+ * This will be applied to the block markup in the front-end.
+ *
+ * @param  WP_Block_Type $block_type       Block type.
+ * @param  array         $block_attributes Block attributes.
+ *
+ * @return array Duotone CSS classes and inline styles.
+ */
+function gutenberg_apply_duotone_support( $block_type, $block_attributes ) {
+	$has_duotone_support = _wp_array_get( $block_type->supports, array( 'color', '__experimentalDuotone' ), false );
+	$has_custom_duotone  = isset( $block_attributes['style']['color']['duotone'] );
+	$has_named_duotone   = isset( $block_attributes['duotone'] );
+
+	if (
+		! $has_duotone_support ||
+		! $has_named_duotone ||
+		$has_custom_duotone
+	) {
+		return array();
+	}
+
+	return array(
+		'class' => sprintf( 'has-%s-duotone', $block_attributes['duotone'] ),
+	);
+}
+
+
 // Register the block support.
 WP_Block_Supports::get_instance()->register(
 	'duotone',
 	array(
 		'register_attribute' => 'gutenberg_register_duotone_support',
+		'apply'              => 'gutenberg_apply_duotone_support',
 	)
 );
 

@@ -183,6 +183,18 @@ class WP_Theme_JSON_Gutenberg {
 			),
 		),
 		array(
+			'path'          => array( 'color', 'duotone' ),
+			'value_key'     => 'slug',
+			'css_var_infix' => 'duotone',
+			'value_format'  => 'url(#wp-duotone-%s)',
+			'classes'       => array(
+				array(
+					'class_suffix'  => 'duotone',
+					'property_name' => 'filter',
+				),
+			),
+		),
+		array(
 			'path'          => array( 'typography', 'fontSizes' ),
 			'value_key'     => 'size',
 			'css_var_infix' => 'font-size',
@@ -608,7 +620,14 @@ class WP_Theme_JSON_Gutenberg {
 				// see https://github.com/WordPress/gutenberg/issues/32347
 				// However, we need to make sure the generated class or css variable
 				// doesn't contain spaces.
-				$result[ preg_replace( '/\s+/', '-', $preset['slug'] ) ] = $preset[ $value_key ];
+				$result[ preg_replace( '/\s+/', '-', $preset['slug'] ) ] = is_array( $value_key )
+					? array_map(
+						function ( $key ) use ( $preset ) {
+							return $preset[ $key ];
+						},
+						$value_key
+					)
+					: $preset[ $value_key ];
 			}
 		}
 		return $result;
@@ -674,6 +693,12 @@ class WP_Theme_JSON_Gutenberg {
 			$preset_per_origin = _wp_array_get( $settings, $preset['path'], array() );
 			$preset_by_slug    = self::get_merged_preset_by_slug( $preset_per_origin, $preset['value_key'] );
 			foreach ( $preset_by_slug as $slug => $value ) {
+				if ( ! empty( $preset['value_format'] ) ) {
+					$value = vsprintf(
+						$preset['value_format'],
+						is_array( $value ) ? $value : array( $value )
+					);
+				}
 				$declarations[] = array(
 					'name'  => '--wp--preset--' . $preset['css_var_infix'] . '--' . gutenberg_experimental_to_kebab_case( $slug ),
 					'value' => $value,
@@ -858,8 +883,8 @@ class WP_Theme_JSON_Gutenberg {
 		}
 
 		$theme_json_settings = $this->get_settings();
-		if ( ! empty( $theme_json_settings['color'] ) && ! empty( $theme_json_settings['color']['duotone'] ) && ! empty( $theme_json_settings['color']['duotone'] ) ) {
-			foreach ( $theme_json_settings['color']['duotone'] as $duotone_setting ) {
+		if ( isset( $theme_json_settings['color']['duotone']['theme'] ) ) {
+			foreach ( $theme_json_settings['color']['duotone']['theme'] as $duotone_setting ) {
 				gutenberg_generate_duotone_filters_settings( $duotone_setting );
 			}
 		}

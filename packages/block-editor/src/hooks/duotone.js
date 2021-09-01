@@ -125,9 +125,6 @@ ${ selector } {
 }
 
 function DuotonePanel( { attributes, setAttributes } ) {
-	const style = attributes?.style;
-	const duotone = style?.color?.duotone;
-
 	const duotonePalette = useSetting( 'color.duotone' ) || EMPTY_ARRAY;
 	const colorPalette = useSetting( 'color.palette' ) || EMPTY_ARRAY;
 	const disableCustomColors = ! useSetting( 'color.custom' );
@@ -139,6 +136,13 @@ function DuotonePanel( { attributes, setAttributes } ) {
 		return null;
 	}
 
+	const style = attributes?.style;
+	// TODO: There might be too much conversion going on between slug and colors now. Maybe worth checking if it can be simplified at all.
+	const duotone =
+		style?.color?.duotone ||
+		duotonePalette.find( ( { slug } ) => slug === attributes?.duotone )
+			?.colors;
+
 	return (
 		<BlockControls group="block" __experimentalExposeToChildren>
 			<DuotoneControl
@@ -148,14 +152,26 @@ function DuotonePanel( { attributes, setAttributes } ) {
 				disableCustomColors={ disableCustomColors }
 				value={ duotone }
 				onChange={ ( newDuotone ) => {
+					const slug = duotonePalette.find( ( { colors } ) =>
+						colors.every(
+							( color, index ) => newDuotone[ index ] === color
+						)
+					)?.slug;
 					const newStyle = {
 						...style,
 						color: {
 							...style?.color,
-							duotone: newDuotone,
 						},
 					};
-					setAttributes( { style: newStyle } );
+					if ( slug ) {
+						delete newStyle.color.duotone;
+					} else {
+						newStyle.color.duotone = newDuotone;
+					}
+					setAttributes( {
+						duotone: slug,
+						style: newStyle,
+					} );
 				} }
 			/>
 		</BlockControls>
@@ -185,7 +201,46 @@ function addDuotoneAttributes( settings ) {
 		} );
 	}
 
+	if ( ! settings.attributes.duotone ) {
+		Object.assign( settings.attributes, {
+			duotone: {
+				type: 'string',
+			},
+		} );
+	}
+
 	return settings;
+}
+
+function getDuotoneClassName( slug ) {
+	return `has-${ slug }-duotone`;
+}
+
+/**
+ * Override props assigned to save component to inject duotone classnames.
+ *
+ * @param {Object} props      Additional props applied to save element.
+ * @param {Object} blockType  Block type.
+ * @param {Object} attributes Block attributes.
+ *
+ * @return {Object} Filtered props applied to save element.
+ */
+function addDuotoneClasses( props, blockType, attributes ) {
+	const { duotone, style } = attributes;
+	if (
+		! hasBlockSupport( blockType, 'color.__experimentalDuotone' ) ||
+		! duotone ||
+		style?.color?.duotone
+	) {
+		return props;
+	}
+
+	props.className = classnames(
+		props.className,
+		getDuotoneClassName( duotone )
+	);
+
+	return props;
 }
 
 /**
@@ -226,10 +281,20 @@ const withDuotoneStyles = createHigherOrderComponent(
 			props.name,
 			'color.__experimentalDuotone'
 		);
-		const values = props?.attributes?.style?.color?.duotone;
 
-		if ( ! duotoneSupport || ! values ) {
+		if ( ! duotoneSupport ) {
 			return <BlockListBlock { ...props } />;
+		}
+
+		const customDuotone = props?.attributes?.style?.color?.duotone;
+		const namedDuotone = props?.attributes?.duotone;
+
+		if ( namedDuotone && ! customDuotone ) {
+			const className = classnames(
+				props?.className,
+				getDuotoneClassName( namedDuotone )
+			);
+			return <BlockListBlock { ...props } className={ className } />;
 		}
 
 		const id = `wp-duotone-filter-${ useInstanceId( BlockListBlock ) }`;
@@ -251,7 +316,7 @@ const withDuotoneStyles = createHigherOrderComponent(
 						<DuotoneFilter
 							selector={ selectorsGroup }
 							id={ id }
-							values={ getValuesFromColors( values ) }
+							values={ getValuesFromColors( customDuotone ) }
 						/>,
 						element
 					) }
@@ -266,6 +331,11 @@ addFilter(
 	'blocks.registerBlockType',
 	'core/editor/duotone/add-attributes',
 	addDuotoneAttributes
+);
+addFilter(
+	'blocks.getSaveContent.extraProps',
+	'core/color/addSaveProps',
+	addDuotoneClasses
 );
 addFilter(
 	'editor.BlockEdit',
