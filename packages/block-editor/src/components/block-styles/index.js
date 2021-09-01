@@ -7,7 +7,7 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { useMemo } from '@wordpress/element';
+import {useCallback, useMemo, useState} from '@wordpress/element';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { ENTER, SPACE } from '@wordpress/keycodes';
 import { _x } from '@wordpress/i18n';
@@ -17,12 +17,13 @@ import {
 	getBlockFromExample,
 	store as blocksStore,
 } from '@wordpress/blocks';
-
+import { Button, Popover} from '@wordpress/components';
 /**
  * Internal dependencies
  */
 import { getActiveStyle, replaceActiveStyle } from './utils';
 import BlockPreview from '../block-preview';
+import BlockStylesPreviewPanel from './block-styles-preview-panel';
 import { store as blockEditorStore } from '../../store';
 
 const EMPTY_OBJECT = {};
@@ -75,6 +76,13 @@ function BlockStyles( {
 
 	const { updateBlockAttributes } = useDispatch( blockEditorStore );
 	const genericPreviewBlock = useGenericPreviewBlock( block, type );
+	const [ hoveredStyle, setHoveredStyle ] = useState( null );
+	const onStyleHover = useCallback(
+		( item ) => {
+			setHoveredStyle( item );
+		},
+		[ setHoveredStyle ]
+	);
 
 	if ( ! styles || styles.length === 0 ) {
 		return null;
@@ -91,37 +99,82 @@ function BlockStyles( {
 				...styles,
 		  ];
 
+	/* TODO
+		- get top offset of styles panel
+		- create a portal into the Editor content container `interface-interface-skeleton__content` or the block-editor__container
+		- inject the preview and assign right:0
+
+	 */
 	const activeStyle = getActiveStyle( renderedStyles, className );
 	return (
 		<div className="block-editor-block-styles">
-			{ renderedStyles.map( ( style ) => {
-				const styleClassName = replaceActiveStyle(
-					className,
-					activeStyle,
-					style
-				);
-				return (
-					<BlockStyleItem
-						genericPreviewBlock={ genericPreviewBlock }
-						viewportWidth={ type.example?.viewportWidth ?? 500 }
+			<div className="block-editor-block-styles__variants">
+				{ renderedStyles.map( ( style ) => {
+					const styleClassName = replaceActiveStyle(
+						className,
+						activeStyle,
+						style
+					);
+					const buttonText = style.label || style.name;
+
+					return (
+						<Button
+							className={ classnames( 'block-editor-block-styles__button', {
+								'is-active': activeStyle === style,
+							} ) }
+							key={ style.name }
+							variant="secondary"
+							label={ buttonText }
+							onMouseEnter={ () => onStyleHover( style ) }
+							onMouseLeave={ () => setHoveredStyle( null ) }
+							onClick={ () => {
+								updateBlockAttributes( clientId, {
+									className: styleClassName,
+								} );
+								onHoverClassName( null );
+								setHoveredStyle( null );
+								onSwitch();
+							} }
+						> { buttonText } </Button>
+						// <BlockStyleItem
+						// 	genericPreviewBlock={ genericPreviewBlock }
+						// 	viewportWidth={ type.example?.viewportWidth ?? 500 }
+						// 	className={ className }
+						// 	isActive={ activeStyle === style }
+						// 	key={ style.name }
+						// 	onSelect={ () => {
+						// 		updateBlockAttributes( clientId, {
+						// 			className: styleClassName,
+						// 		} );
+						// 		onHoverClassName( null );
+						// 		onSwitch();
+						// 	} }
+						// 	onBlur={ () => onHoverClassName( null ) }
+						// 	onHover={ () => {
+						// 		onHoverClassName( styleClassName );
+						// 	} }
+						// 	style={ style }
+						// 	styleClassName={ styleClassName }
+						// 	itemRole={ itemRole }
+						// />
+					);
+				} ) }
+			</div>
+			{ hoveredStyle && (
+				<Popover
+					className="block-editor-block-styles__popover"
+					position="middle left"
+					focusOnMount={ false }
+				>
+					<BlockStylesPreviewPanel
+						activeStyle={ activeStyle }
 						className={ className }
-						isActive={ activeStyle === style }
-						key={ style.name }
-						onSelect={ () => {
-							updateBlockAttributes( clientId, {
-								className: styleClassName,
-							} );
-							onHoverClassName( null );
-							onSwitch();
-						} }
-						onBlur={ () => onHoverClassName( null ) }
-						onHover={ () => onHoverClassName( styleClassName ) }
-						style={ style }
-						styleClassName={ styleClassName }
-						itemRole={ itemRole }
+						genericPreviewBlock={ genericPreviewBlock }
+						style={ hoveredStyle }
+						viewportWidth={ type.example?.viewportWidth ?? 500 }
 					/>
-				);
-			} ) }
+				</Popover>
+			) }
 		</div>
 	);
 }
