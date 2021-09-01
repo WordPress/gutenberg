@@ -106,7 +106,12 @@ const style = `
 		overflow: hidden; /* If it has an aspect ratio, it shouldn't scroll. */
 	}
 
-	/* Add responsiveness to embeds with aspect ratios. */
+	/**
+	 * Add responsiveness to embeds with aspect ratios.
+	 * 
+	 * These styles have been copied from the web version (https://git.io/JEFcX) and
+	 * adapted for the native version.
+	 */
 	.wp-has-aspect-ratio.wp-block-embed__wrapper::before {
 		content: "";
 		display: block;
