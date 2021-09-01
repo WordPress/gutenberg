@@ -18,6 +18,7 @@ import { SandBox } from '@wordpress/components';
 /**
  * Internal dependencies
  */
+import { getPhotoHtml } from './util';
 import EmbedNoPreview from './embed-no-preview';
 import styles from './styles.scss';
 
@@ -68,7 +69,7 @@ const EmbedPreview = ( {
 	}
 
 	const { provider_url: providerUrl } = preview;
-	const html = preview.html;
+	const html = 'photo' === type ? getPhotoHtml( preview ) : preview.html;
 	const parsedHost = new URL( url ).host.split( '.' );
 	const parsedHostBaseUrl = parsedHost
 		.splice( parsedHost.length - 2, parsedHost.length - 1 )
