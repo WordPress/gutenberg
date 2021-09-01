@@ -1,8 +1,12 @@
 # Block Variation Picker
 
-The `BlockVariationPicker` component allows to display for certain types of blocks their different variations, and to choose one of them.
+<div class="callout callout-alert">
+This feature is still experimental. “Experimental” means this is an early implementation subject to drastic and breaking changes.
+</div>
 
-This component is currently used by the "Columns" block to display and choose the number and structure of columns. It is also used by the "Post Hierarchical Terms Block" block.
+The `BlockVariationPicker` component allows certain types of blocks to display their different variations, and to choose one of them. Variations provided are usually filtered by their inclusion of the `block` value in their `scope` attribute.
+
+This component is currently used by "Columns" and "Query Loop" blocks.
 
 ![Columns block variations](https://make.wordpress.org/core/files/2020/09/colums-block-variations.png)
 
@@ -18,32 +22,61 @@ This component is currently used by the "Columns" block to display and choose th
 Renders the variations of a block.
 
 ```jsx
-import { BlockVariationPicker } from '@wordpress/block-editor';
+import { useSelect } from '@wordpress/data';
+import {
+	__experimentalBlockVariationPicker as BlockVariationPicker,
+	store as blockEditorStore,
+} from '@wordpress/block-editor';
 
-const MyBlockVariationPicker = () => (
-	<BlockVariationPicker variations={ variations } />
-);
+const MyBlockVariationPicker = ( { blockName } ) => {
+	const variations = useSelect(
+		( select ) => {
+			const { getBlockVariations } = select( blocksStore );
+			return getBlockVariations( blockName, 'block' );
+		},
+		[ blockName ]
+	);
+	return <BlockVariationPicker variations={ variations } />;
+};
 ```
 
 ### Props
 
-#### label
+#### `label`
+
+-   Type: `String`
+-   Required: No
+-   Default: `Choose variation`
 
 The label of each variation of the block.
 
--   Type: `String`
+#### `instructions`
 
-#### instructions
+-   Type: `String`
+-   Required: No
+-   Default: `Select a variation to start with.`
 
 The instructions to choose a block variation.
 
--   Type: `String`
+#### `variations`
 
-#### variations
-
--   Type: `Array`
+-   Type: `Array<WPBlockVariation>`
 
 The different variations of the block.
+
+#### `onSelect`
+
+-   Type: `Function`
+
+Callback called when a block variation is selected. It recieves the selected variation as a parameter.
+
+#### `icon`
+
+-   Type: `Icon component`
+-   Required: No
+-   Default: `layout`
+
+Icon to be displayed at the top of the component before the `label`.
 
 ## Related components
 
