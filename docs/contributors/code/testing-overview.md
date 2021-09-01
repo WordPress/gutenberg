@@ -359,10 +359,10 @@ Similarly, the `toMatchStyleDiffSnapshot` function allows to snapshot only the d
 
 ```jsx
 test( 'should render margin', () => {
-	const { container: base } = render( <Spacer /> );
-	const { container: withMargin } = render( <Spacer margin={ 5 } /> );
-	expect( withMargin.firstChild ).toMatchStyleDiffSnapshot(
-		base.firstChild
+	const { container: spacer } = render( <Spacer /> );
+	const { container: spacerWithMargin } = render( <Spacer margin={ 5 } /> );
+	expect( spacerWithMargin.firstChild ).toMatchStyleDiffSnapshot(
+		spacer.firstChild
 	);
 } );
 ```
