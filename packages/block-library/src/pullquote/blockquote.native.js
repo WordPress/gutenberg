@@ -16,19 +16,19 @@ export const BlockQuote = ( props ) => {
 	const quoteStyle = { ...styles.quote };
 
 	if ( props.textColor ) {
-		citationStyle.color = props.textColor;
 		quoteStyle.color = props.textColor;
+		citationStyle.color = props.textColor;
 	}
 
 	const newChildren = Children.map( props.children, ( child ) => {
 		if ( child && child.props.identifier === 'value' ) {
 			return cloneElement( child, {
-				style: citationStyle,
+				style: quoteStyle,
 			} );
 		}
 		if ( child && child.props.identifier === 'citation' ) {
 			return cloneElement( child, {
-				style: quoteStyle,
+				style: citationStyle,
 			} );
 		}
 		return child;
