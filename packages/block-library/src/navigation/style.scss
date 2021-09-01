@@ -211,7 +211,7 @@
  */
 
 // Menu items with no background.
-.wp-block-navigation__container .wp-block-page-list,
+.wp-block-navigation .wp-block-page-list,
 .wp-block-navigation__container {
 	gap: 0.5em 2em;
 }
@@ -221,7 +221,7 @@
 // That way if padding is set in theme.json, it still wins.
 // https://css-tricks.com/almanac/selectors/w/where/
 .wp-block-navigation:where(.has-background) {
-	.wp-block-navigation__container .wp-block-page-list,
+	.wp-block-navigation .wp-block-page-list,
 	.wp-block-navigation__container {
 		gap: 0 0.5em;
 	}
