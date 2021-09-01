@@ -38,7 +38,7 @@ export function useHasBorderPanel( name ) {
 function useHasBorderColorControl( name ) {
 	const supports = getSupportedGlobalStylesPanels( name );
 	return (
-		useSetting( 'border.customColor', name )[ 0 ] &&
+		useSetting( 'border.color', name )[ 0 ] &&
 		supports.includes( 'borderColor' )
 	);
 }
@@ -46,7 +46,7 @@ function useHasBorderColorControl( name ) {
 function useHasBorderRadiusControl( name ) {
 	const supports = getSupportedGlobalStylesPanels( name );
 	return (
-		useSetting( 'border.customRadius', name )[ 0 ] &&
+		useSetting( 'border.radius', name )[ 0 ] &&
 		supports.includes( 'borderRadius' )
 	);
 }
@@ -54,7 +54,7 @@ function useHasBorderRadiusControl( name ) {
 function useHasBorderStyleControl( name ) {
 	const supports = getSupportedGlobalStylesPanels( name );
 	return (
-		useSetting( 'border.customStyle', name )[ 0 ] &&
+		useSetting( 'border.style', name )[ 0 ] &&
 		supports.includes( 'borderStyle' )
 	);
 }
@@ -62,7 +62,7 @@ function useHasBorderStyleControl( name ) {
 function useHasBorderWidthControl( name ) {
 	const supports = getSupportedGlobalStylesPanels( name );
 	return (
-		useSetting( 'border.customWidth', name )[ 0 ] &&
+		useSetting( 'border.width', name )[ 0 ] &&
 		supports.includes( 'borderWidth' )
 	);
 }

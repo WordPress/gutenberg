@@ -56,7 +56,10 @@ class WP_Theme_JSON_Schema_V0_Test extends WP_UnitTestCase {
 						'link'    => true,
 					),
 					'border' => array(
+						'customColor'  => false,
 						'customRadius' => false,
+						'customStyle'  => false,
+						'customWidth'  => false,
 					),
 				),
 				'core/paragraph' => array(
@@ -108,7 +111,10 @@ class WP_Theme_JSON_Schema_V0_Test extends WP_UnitTestCase {
 					'link'    => true,
 				),
 				'border' => array(
-					'customRadius' => false,
+					'color'  => false,
+					'radius' => false,
+					'style'  => false,
+					'width'  => false,
 				),
 				'blocks' => array(
 					'core/paragraph' => array(

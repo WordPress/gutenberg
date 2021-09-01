@@ -82,10 +82,10 @@ class WP_Theme_JSON_Gutenberg {
 
 	const VALID_SETTINGS = array(
 		'border'     => array(
-			'customColor'  => null,
-			'customRadius' => null,
-			'customStyle'  => null,
-			'customWidth'  => null,
+			'color'  => null,
+			'radius' => null,
+			'style'  => null,
+			'width'  => null,
 		),
 		'color'      => array(
 			'background'     => null,
