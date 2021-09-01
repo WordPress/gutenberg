@@ -709,7 +709,7 @@ _Parameters_
 
 _Returns_
 
--   `?Array`: Block Template.
+-   `?Array`: Block Template
 
 ### getTemplateLock
 

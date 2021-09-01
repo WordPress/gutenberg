@@ -51,7 +51,7 @@ _Parameters_
 
 -   _state_ `Object`: Data state.
 -   _nameOrType_ `(string|Object)`: Block name or type object
--   _feature_ `Array|string`: Feature to retrieve
+-   _feature_ `string`: Feature to retrieve
 -   _defaultSupports_ `*`: Default value to return if not explicitly defined
 
 _Returns_

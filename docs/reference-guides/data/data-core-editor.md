@@ -529,18 +529,6 @@ _Returns_
 
 -   `Object`: A user object.
 
-### getPostTypeLabel
-
-Returns a post type label depending on the current post.
-
-_Parameters_
-
--   _state_ `Object`: Global application state.
-
-_Returns_
-
--   `string|undefined`: The post type label if available, otherwise undefined.
-
 ### getPreviousBlockClientId
 
 _Related_
@@ -1043,18 +1031,6 @@ _Parameters_
 _Returns_
 
 -   `boolean`: Whether the pre-publish panel should be shown or not.
-
-### isSavingNonPostEntityChanges
-
-Returns true if non-post entities are currently being saved, or false otherwise.
-
-_Parameters_
-
--   _state_ `Object`: Global application state.
-
-_Returns_
-
--   `boolean`: Whether non-post entities are being saved.
 
 ### isSavingPost
 

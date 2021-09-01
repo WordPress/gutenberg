@@ -293,7 +293,7 @@ Returns true if the plugin sidebar is opened.
 
 _Parameters_
 
--   _state_ `Object`: Global application state.
+-   _state_ `Object`: Global application state
 
 _Returns_
 
@@ -367,17 +367,9 @@ _Returns_
 
 Initializes WordPress `postboxes` script and the logic for saving meta boxes.
 
-### metaBoxUpdatesFailure
-
-Returns an action object used to signal a failed meta box update.
-
-_Returns_
-
--   `Object`: Action object.
-
 ### metaBoxUpdatesSuccess
 
-Returns an action object used to signal a successful meta box update.
+Returns an action object used signal a successful meta box update.
 
 _Returns_
 
