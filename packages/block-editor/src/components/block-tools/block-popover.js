@@ -213,6 +213,9 @@ function BlockPopover( {
 			// Observe movement for block animations (especially horizontal).
 			__unstableObserveElement={ node }
 			shouldAnchorIncludePadding
+			// Used to safeguard sticky position behavior against cases where it would permanently
+			// obscure specific sections of a block.
+			__unstableEditorCanvasWrapper={ __unstableContentRef?.current }
 		>
 			{ ( shouldShowContextualToolbar || isToolbarForced ) && (
 				<div
@@ -281,7 +284,7 @@ function wrapperSelector( select ) {
 		getSelectedBlockClientId,
 		getFirstMultiSelectedBlockClientId,
 		getBlockRootClientId,
-		__unstableGetBlockWithoutInnerBlocks,
+		getBlock,
 		getBlockParents,
 		__experimentalGetBlockListSettingsForBlocks,
 	} = select( blockEditorStore );
@@ -293,8 +296,7 @@ function wrapperSelector( select ) {
 		return;
 	}
 
-	const { name, attributes = {}, isValid } =
-		__unstableGetBlockWithoutInnerBlocks( clientId ) || {};
+	const { name, attributes = {}, isValid } = getBlock( clientId ) || {};
 	const blockParentsClientIds = getBlockParents( clientId );
 
 	// Get Block List Settings for all ancestors of the current Block clientId

@@ -9,6 +9,7 @@ import { v4 as uuid } from 'uuid';
  */
 import { controls } from '@wordpress/data';
 import { apiFetch, __unstableAwaitPromise } from '@wordpress/data-controls';
+import triggerFetch from '@wordpress/api-fetch';
 import { addQueryArgs } from '@wordpress/url';
 
 /**
@@ -16,10 +17,6 @@ import { addQueryArgs } from '@wordpress/url';
  */
 import { receiveItems, removeItems, receiveQueriedItems } from './queried-data';
 import { getKindEntities, DEFAULT_ENTITY_KEY } from './entities';
-import {
-	__unstableAcquireStoreLock,
-	__unstableReleaseStoreLock,
-} from './locks';
 import { createBatch } from './batch';
 import { getDispatch } from './controls';
 import { STORE_NAME } from './name';
@@ -182,11 +179,14 @@ export function* deleteEntityRecord(
 		return;
 	}
 
-	const lock = yield* __unstableAcquireStoreLock(
+	const lock = yield controls.dispatch(
+		STORE_NAME,
+		'__unstableAcquireStoreLock',
 		STORE_NAME,
 		[ 'entities', 'data', kind, name, recordId ],
 		{ exclusive: true }
 	);
+
 	try {
 		yield {
 			type: 'DELETE_ENTITY_RECORD_START',
@@ -229,7 +229,11 @@ export function* deleteEntityRecord(
 
 		return deletedRecord;
 	} finally {
-		yield* __unstableReleaseStoreLock( lock );
+		yield controls.dispatch(
+			STORE_NAME,
+			'__unstableReleaseStoreLock',
+			lock
+		);
 	}
 }
 
@@ -357,16 +361,15 @@ export function __unstableCreateUndoLevel() {
  * @param {boolean}  [options.isAutosave=false] Whether this is an autosave.
  * @param {Function} [options.__unstableFetch]  Internal use only. Function to
  *                                              call instead of `apiFetch()`.
- *                                              Must return a control
- *                                              descriptor.
+ *                                              Must return a promise.
  */
-export function* saveEntityRecord(
+export const saveEntityRecord = (
 	kind,
 	name,
 	record,
-	{ isAutosave = false, __unstableFetch = null } = {}
-) {
-	const entities = yield getKindEntities( kind );
+	{ isAutosave = false, __unstableFetch = triggerFetch } = {}
+) => async ( { select, dispatch } ) => {
+	const entities = await dispatch( getKindEntities( kind ) );
 	const entity = find( entities, { kind, name } );
 	if ( ! entity ) {
 		return;
@@ -374,26 +377,21 @@ export function* saveEntityRecord(
 	const entityIdKey = entity.key || DEFAULT_ENTITY_KEY;
 	const recordId = record[ entityIdKey ];
 
-	const lock = yield* __unstableAcquireStoreLock(
+	const lock = await dispatch.__unstableAcquireStoreLock(
 		STORE_NAME,
 		[ 'entities', 'data', kind, name, recordId || uuid() ],
 		{ exclusive: true }
 	);
+
 	try {
 		// Evaluate optimized edits.
 		// (Function edits that should be evaluated on save to avoid expensive computations on every edit.)
 		for ( const [ key, value ] of Object.entries( record ) ) {
 			if ( typeof value === 'function' ) {
 				const evaluatedValue = value(
-					yield controls.select(
-						STORE_NAME,
-						'getEditedEntityRecord',
-						kind,
-						name,
-						recordId
-					)
+					select.getEditedEntityRecord( kind, name, recordId )
 				);
-				yield editEntityRecord(
+				await dispatch.editEntityRecord(
 					kind,
 					name,
 					recordId,
@@ -406,22 +404,20 @@ export function* saveEntityRecord(
 			}
 		}
 
-		yield {
+		await dispatch( {
 			type: 'SAVE_ENTITY_RECORD_START',
 			kind,
 			name,
 			recordId,
 			isAutosave,
-		};
+		} );
 		let updatedRecord;
 		let error;
 		try {
 			const path = `${ entity.baseURL }${
 				recordId ? '/' + recordId : ''
 			}`;
-			const persistedRecord = yield controls.select(
-				STORE_NAME,
-				'getRawEntityRecord',
+			const persistedRecord = select.getRawEntityRecord(
 				kind,
 				name,
 				recordId
@@ -432,14 +428,9 @@ export function* saveEntityRecord(
 				// This is fine for now as it is the only supported autosave,
 				// but ideally this should all be handled in the back end,
 				// so the client just sends and receives objects.
-				const currentUser = yield controls.select(
-					STORE_NAME,
-					'getCurrentUser'
-				);
+				const currentUser = select.getCurrentUser();
 				const currentUserId = currentUser ? currentUser.id : undefined;
-				const autosavePost = yield controls.select(
-					STORE_NAME,
-					'getAutosave',
+				const autosavePost = select.getAutosave(
 					persistedRecord.type,
 					persistedRecord.id,
 					currentUserId
@@ -471,13 +462,8 @@ export function* saveEntityRecord(
 					method: 'POST',
 					data,
 				};
-				if ( __unstableFetch ) {
-					updatedRecord = yield __unstableAwaitPromise(
-						__unstableFetch( options )
-					);
-				} else {
-					updatedRecord = yield apiFetch( options );
-				}
+				updatedRecord = await __unstableFetch( options );
+
 				// An autosave may be processed by the server as a regular save
 				// when its update is requested by the author and the post had
 				// draft or auto-draft status.
@@ -521,7 +507,7 @@ export function* saveEntityRecord(
 						},
 						{}
 					);
-					yield receiveEntityRecords(
+					await dispatch.receiveEntityRecords(
 						kind,
 						name,
 						newRecord,
@@ -529,7 +515,10 @@ export function* saveEntityRecord(
 						true
 					);
 				} else {
-					yield receiveAutosaves( persistedRecord.id, updatedRecord );
+					await dispatch.receiveAutosaves(
+						persistedRecord.id,
+						updatedRecord
+					);
 				}
 			} else {
 				let edits = record;
@@ -547,14 +536,8 @@ export function* saveEntityRecord(
 					method: recordId ? 'PUT' : 'POST',
 					data: edits,
 				};
-				if ( __unstableFetch ) {
-					updatedRecord = yield __unstableAwaitPromise(
-						__unstableFetch( options )
-					);
-				} else {
-					updatedRecord = yield apiFetch( options );
-				}
-				yield receiveEntityRecords(
+				updatedRecord = await __unstableFetch( options );
+				await dispatch.receiveEntityRecords(
 					kind,
 					name,
 					updatedRecord,
@@ -566,20 +549,20 @@ export function* saveEntityRecord(
 		} catch ( _error ) {
 			error = _error;
 		}
-		yield {
+		dispatch( {
 			type: 'SAVE_ENTITY_RECORD_FINISH',
 			kind,
 			name,
 			recordId,
 			error,
 			isAutosave,
-		};
+		} );
 
 		return updatedRecord;
 	} finally {
-		yield* __unstableReleaseStoreLock( lock );
+		await dispatch.__unstableReleaseStoreLock( lock );
 	}
-}
+};
 
 /**
  * Runs multiple core-data actions at the same time using one API request.
@@ -658,28 +641,23 @@ export function* __experimentalBatch( requests ) {
  * @param {Object} recordId ID of the record.
  * @param {Object} options  Saving options.
  */
-export function* saveEditedEntityRecord( kind, name, recordId, options ) {
-	if (
-		! ( yield controls.select(
-			STORE_NAME,
-			'hasEditsForEntityRecord',
-			kind,
-			name,
-			recordId
-		) )
-	) {
+export const saveEditedEntityRecord = (
+	kind,
+	name,
+	recordId,
+	options
+) => async ( { select, dispatch } ) => {
+	if ( ! select.hasEditsForEntityRecord( kind, name, recordId ) ) {
 		return;
 	}
-	const edits = yield controls.select(
-		STORE_NAME,
-		'getEntityRecordNonTransientEdits',
+	const edits = select.getEntityRecordNonTransientEdits(
 		kind,
 		name,
 		recordId
 	);
 	const record = { id: recordId, ...edits };
-	return yield* saveEntityRecord( kind, name, record, options );
-}
+	return await dispatch.saveEntityRecord( kind, name, record, options );
+};
 
 /**
  * Action triggered to save only specified properties for the entity.
@@ -690,27 +668,17 @@ export function* saveEditedEntityRecord( kind, name, recordId, options ) {
  * @param {Array}  itemsToSave List of entity properties to save.
  * @param {Object} options     Saving options.
  */
-export function* __experimentalSaveSpecifiedEntityEdits(
+export const __experimentalSaveSpecifiedEntityEdits = (
 	kind,
 	name,
 	recordId,
 	itemsToSave,
 	options
-) {
-	if (
-		! ( yield controls.select(
-			STORE_NAME,
-			'hasEditsForEntityRecord',
-			kind,
-			name,
-			recordId
-		) )
-	) {
+) => async ( { select, dispatch } ) => {
+	if ( ! select.hasEditsForEntityRecord( kind, name, recordId ) ) {
 		return;
 	}
-	const edits = yield controls.select(
-		STORE_NAME,
-		'getEntityRecordNonTransientEdits',
+	const edits = select.getEntityRecordNonTransientEdits(
 		kind,
 		name,
 		recordId
@@ -721,8 +689,8 @@ export function* __experimentalSaveSpecifiedEntityEdits(
 			editsToSave[ edit ] = edits[ edit ];
 		}
 	}
-	return yield* saveEntityRecord( kind, name, editsToSave, options );
-}
+	return await dispatch.saveEntityRecord( kind, name, editsToSave, options );
+};
 
 /**
  * Returns an action object used in signalling that Upload permissions have been received.

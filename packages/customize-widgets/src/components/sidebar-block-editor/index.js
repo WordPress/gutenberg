@@ -21,6 +21,7 @@ import {
 	__unstableBlockSettingsMenuFirstItem,
 } from '@wordpress/block-editor';
 import { uploadMedia } from '@wordpress/media-utils';
+import { store as interfaceStore } from '@wordpress/interface';
 
 /**
  * Internal dependencies
@@ -29,7 +30,6 @@ import BlockInspectorButton from '../block-inspector-button';
 import Header from '../header';
 import useInserter from '../inserter/use-inserter';
 import SidebarEditorProvider from './sidebar-editor-provider';
-import { store as customizeWidgetsStore } from '../../store';
 import WelcomeGuide from '../welcome-guide';
 import KeyboardShortcuts from '../keyboard-shortcuts';
 import BlockAppender from '../block-appender';
@@ -47,20 +47,24 @@ export default function SidebarBlockEditor( {
 		keepCaretInsideBlock,
 		isWelcomeGuideActive,
 	} = useSelect( ( select ) => {
+		const { isFeatureActive } = select( interfaceStore );
 		return {
 			hasUploadPermissions: defaultTo(
 				select( coreStore ).canUser( 'create', 'media' ),
 				true
 			),
-			isFixedToolbarActive: select(
-				customizeWidgetsStore
-			).__unstableIsFeatureActive( 'fixedToolbar' ),
-			keepCaretInsideBlock: select(
-				customizeWidgetsStore
-			).__unstableIsFeatureActive( 'keepCaretInsideBlock' ),
-			isWelcomeGuideActive: select(
-				customizeWidgetsStore
-			).__unstableIsFeatureActive( 'welcomeGuide' ),
+			isFixedToolbarActive: isFeatureActive(
+				'core/customize-widgets',
+				'fixedToolbar'
+			),
+			keepCaretInsideBlock: isFeatureActive(
+				'core/customize-widgets',
+				'keepCaretInsideBlock'
+			),
+			isWelcomeGuideActive: isFeatureActive(
+				'core/customize-widgets',
+				'welcomeGuide'
+			),
 		};
 	}, [] );
 	const settings = useMemo( () => {

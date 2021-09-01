@@ -684,6 +684,7 @@ Each block declares which style properties it exposes via the [block supports me
 			"text": "value"
 		},
 		"spacing": {
+			"blockGap": "value",
 			"margin": {
 				"top": "value",
 				"right": "value",

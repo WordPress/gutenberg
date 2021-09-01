@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { get, filter, map, last, pick, includes } from 'lodash';
+import { get, filter, map, pick, includes } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -21,7 +21,6 @@ import { useSelect, useDispatch } from '@wordpress/data';
 import {
 	BlockControls,
 	InspectorControls,
-	InspectorAdvancedControls,
 	RichText,
 	__experimentalImageSizeControl as ImageSizeControl,
 	__experimentalImageURLInputUI as ImageURLInputUI,
@@ -31,7 +30,7 @@ import {
 } from '@wordpress/block-editor';
 import { useEffect, useState, useRef } from '@wordpress/element';
 import { __, sprintf, isRTL } from '@wordpress/i18n';
-import { getPath } from '@wordpress/url';
+import { getFilename } from '@wordpress/url';
 import { createBlock, switchToBlockType } from '@wordpress/blocks';
 import { crop, overlayText, upload } from '@wordpress/icons';
 import { store as noticesStore } from '@wordpress/notices';
@@ -49,13 +48,6 @@ import { isExternalImage } from './edit';
  * Module constants
  */
 import { MIN_SIZE, ALLOWED_MEDIA_TYPES } from './constants';
-
-function getFilename( url ) {
-	const path = getPath( url );
-	if ( path ) {
-		return last( path.split( '/' ) );
-	}
-}
 
 export default function Image( {
 	temporaryURL,
@@ -83,11 +75,14 @@ export default function Image( {
 	onSelectURL,
 	onUploadError,
 	containerRef,
+	context,
 	clientId,
 } ) {
 	const captionRef = useRef();
 	const prevUrl = usePrevious( url );
+	const { allowResize = true } = context;
 	const { getBlock } = useSelect( blockEditorStore );
+
 	const { image, multiImageSelection } = useSelect(
 		( select ) => {
 			const { getMedia } = select( coreStore );
@@ -149,7 +144,7 @@ export default function Image( {
 	const [ isEditingImage, setIsEditingImage ] = useState( false );
 	const [ externalBlob, setExternalBlob ] = useState();
 	const clientWidth = useClientWidth( containerRef, [ align ] );
-	const isResizable = ! isWideAligned && isLargeViewport;
+	const isResizable = allowResize && ! ( isWideAligned && isLargeViewport );
 	const imageSizeOptions = map(
 		filter( imageSizes, ( { slug } ) =>
 			get( image, [ 'media_details', 'sizes', slug, 'source_url' ] )
@@ -368,7 +363,7 @@ export default function Image( {
 					/>
 				</PanelBody>
 			</InspectorControls>
-			<InspectorAdvancedControls>
+			<InspectorControls __experimentalGroup="advanced">
 				<TextControl
 					label={ __( 'Title attribute' ) }
 					value={ title || '' }
@@ -386,7 +381,7 @@ export default function Image( {
 						</>
 					}
 				/>
-			</InspectorAdvancedControls>
+			</InspectorControls>
 		</>
 	);
 

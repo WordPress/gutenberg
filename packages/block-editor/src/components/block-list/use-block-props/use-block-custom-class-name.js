@@ -25,22 +25,22 @@ export function useBlockCustomClassName( clientId ) {
 			const { getBlockName, getBlockAttributes } = select(
 				blockEditorStore
 			);
-			const { className } = getBlockAttributes( clientId );
+			const attributes = getBlockAttributes( clientId );
 
-			if ( ! className ) {
+			if ( ! attributes?.className ) {
 				return;
 			}
 
 			const blockType = getBlockType( getBlockName( clientId ) );
 			const hasLightBlockWrapper =
-				blockType.apiVersion > 1 ||
+				blockType?.apiVersion > 1 ||
 				hasBlockSupport( blockType, 'lightBlockWrapper', false );
 
 			if ( ! hasLightBlockWrapper ) {
 				return;
 			}
 
-			return className;
+			return attributes.className;
 		},
 		[ clientId ]
 	);

@@ -96,6 +96,7 @@ export function ImageEdit( {
 	insertBlocksAfter,
 	noticeOperations,
 	onReplace,
+	context,
 	clientId,
 } ) {
 	const {
@@ -140,6 +141,7 @@ export function ImageEdit( {
 				title: undefined,
 				caption: undefined,
 			} );
+
 			return;
 		}
 
@@ -276,14 +278,12 @@ export function ImageEdit( {
 	// If an image is temporary, revoke the Blob url when it is uploaded (and is
 	// no longer temporary).
 	useEffect( () => {
-		if ( ! temporaryURL ) {
+		if ( isTemp ) {
+			setTemporaryURL( url );
 			return;
 		}
-
-		return () => {
-			revokeBlobURL( temporaryURL );
-		};
-	}, [ temporaryURL ] );
+		revokeBlobURL( temporaryURL );
+	}, [ isTemp, url ] );
 
 	const isExternal = isExternalImage( id, url );
 	const src = isExternal ? url : undefined;
@@ -321,6 +321,7 @@ export function ImageEdit( {
 					onSelectURL={ onSelectURL }
 					onUploadError={ onUploadError }
 					containerRef={ ref }
+					context={ context }
 					clientId={ clientId }
 				/>
 			) }
