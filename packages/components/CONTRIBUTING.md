@@ -82,7 +82,7 @@ Note: Instead of using Emotion's standard `cx` function, the custom [`useCx` hoo
 
 #### Unit tests
 
-All new components should include unit tests using [testing library](https://testing-library.com/). Ideally, the component's main piece of functionality would be tested explicitely (rather than using snapshots).
+Please refer to the [JavaScript Testing Overview docs](/docs/contributors/code/testing-overview.md)
 
 #### Storybook
 
