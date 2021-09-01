@@ -44,9 +44,8 @@ const useKeyboardVisibility = () => {
 	const previousKeyboardVisible = usePrevious( keyboardVisible );
 
 	useEffect( () => {
-		let isCurrent = true;
 		const showListener = Keyboard.addListener( 'keyboardDidShow', () => {
-			if ( isCurrent && previousKeyboardVisible !== true ) {
+			if ( previousKeyboardVisible !== true ) {
 				setKeyboardVisible( true );
 			}
 		} );
@@ -55,12 +54,11 @@ const useKeyboardVisibility = () => {
 			ios: 'keyboardWillHide',
 		} );
 		const hideListener = Keyboard.addListener( keyboardHideEvent, () => {
-			if ( isCurrent && previousKeyboardVisible !== false ) {
+			if ( previousKeyboardVisible !== false ) {
 				setKeyboardVisible( false );
 			}
 		} );
 		return () => {
-			isCurrent = false;
 			showListener.remove();
 			hideListener.remove();
 		};

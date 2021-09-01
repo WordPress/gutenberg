@@ -29,8 +29,12 @@ beforeAll( () => {
 	keyboardAddListenerSpy = jest
 		.spyOn( Keyboard, 'addListener' )
 		.mockImplementation( ( event, handler ) => {
-			keyboardHandlers.push( [ event, handler ] );
-			return { remove: () => {} };
+			const length = keyboardHandlers.push( [ event, handler ] );
+			return {
+				remove: () => {
+					keyboardHandlers.splice( length - 1 );
+				},
+			};
 		} );
 } );
 
