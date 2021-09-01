@@ -22,14 +22,28 @@ In these situations, one possible approach is to "soft-deprecate" a given legacy
 
 ### Components composition
 
-[To be expanded] E.g.:
 
-- Polymorphic Components
-- Using `children` vs custom render props vs arbitrary "data" props
-- Controlled and semi-controlled components
-- Composition patterns
-- Components' layout responsibilities and boundaries (i.e., a component should only affect the layout of its children, not its own)
-- ...
+### Polymorphic Components (i.e. the `as` prop)
+
+The primary way to compose components is through the `as` prop. This prop can be used to change the underlying element used to render a component, e.g.:
+
+```tsx
+function LinkButton( { href, children } ) {
+	return <Button variant="primary" as="a" href={href}>{ children }</Button>;
+}
+```
+
+### Composition patterns
+
+TBD — E.g. Using `children` vs custom render props vs arbitrary "data" props
+
+### (Semi-)Controlled components
+
+TBD
+
+### Layout "responsibilities"
+
+TBD — Components' layout responsibilities and boundaries (i.e., a component should only affect the layout of its children, not its own)
 
 #### Components & Hooks
 
