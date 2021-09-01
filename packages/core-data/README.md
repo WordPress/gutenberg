@@ -730,21 +730,6 @@ _Returns_
 
 -   `boolean`: Is the preview for the URL an oEmbed link fallback.
 
-### isRawAttribute
-
-Checks whether the attribute is a "raw" attribute or not.
-
-_Parameters_
-
--   _state_ `Object`: Data state.
--   _kind_ `string`: Entity kind.
--   _name_ `string`: Entity name.
--   _attribute_ `string`: Attribute name.
-
-_Returns_
-
--   `boolean`: Is the attribute raw
-
 ### isRequestingEmbedPreview
 
 Returns true if a request is in progress for embed preview data, or false

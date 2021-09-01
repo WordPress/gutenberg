@@ -17,7 +17,7 @@ import deprecated from '@wordpress/deprecated';
 import { STORE_NAME } from './name';
 import { getQueriedItems } from './queried-data';
 import { DEFAULT_ENTITY_KEY } from './entities';
-import { getNormalizedCommaSeparable } from './utils';
+import { getNormalizedCommaSeparable, isRawAttribute } from './utils';
 
 /**
  * Shared reference to an empty array for cases where it is important to avoid
@@ -122,21 +122,6 @@ export function getEntity( state, kind, name ) {
 }
 
 /**
- * Checks whether the attribute is a "raw" attribute or not.
- *
- * @param {Object} state     Data state.
- * @param {string} kind      Entity kind.
- * @param {string} name      Entity name.
- * @param {string} attribute Attribute name.
- *
- * @return {boolean} Is the attribute raw
- */
-export function isRawAttribute( state, kind, name, attribute ) {
-	const entity = getEntity( state, kind, name );
-	return ( entity.rawAttributes || [] ).includes( attribute );
-}
-
-/**
  * Returns the Entity's record object by key. Returns `null` if the value is not
  * yet received, undefined if the value entity is known to not exist, or the
  * entity object if it exists and is received.
@@ -220,7 +205,7 @@ export const getRawEntityRecord = createSelector(
 		return (
 			record &&
 			Object.keys( record ).reduce( ( accumulator, _key ) => {
-				if ( isRawAttribute( state, kind, name, _key ) ) {
+				if ( isRawAttribute( getEntity( state, kind, name ), _key ) ) {
 					// Because edits are the "raw" attribute values,
 					// we return those from record selectors to make rendering,
 					// comparisons, and joins with edits easier.
