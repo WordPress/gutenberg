@@ -12,6 +12,7 @@
 
 	.components-datetime__calendar-help {
 		padding: $grid-unit-20;
+		min-width: 260px;
 
 		h4 {
 			margin: 0;
@@ -46,6 +47,10 @@
 		height: 30px;
 		margin-top: 0;
 		margin-bottom: 0;
+	}
+
+	.components-button:focus {
+		z-index: z-index(".components-button {:focus or .is-primary}");
 	}
 }
 
