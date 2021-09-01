@@ -1,6 +1,6 @@
 name: Bug report
 description: Report a bug with the WordPress block editor or Gutenberg plugin
-title: '<title>'
+title: ''
 body:
     - type: markdown
       attributes:
@@ -56,8 +56,8 @@ body:
           description: You can do this by searching https://github.com/WordPress/gutenberg/issues and making sure the bug is not related to another plugin.
           multiple: true
           options:
-             - Yes
-             - No
+             - 'Yes'
+             - 'No'
    
     - type: dropdown
       id: plugins
@@ -65,6 +65,6 @@ body:
           label: Please confirm that you have tested with all plugins deactivated except Gutenberg.
           multiple: true
           options:
-             - Yes
-             - No
+             - 'Yes'
+             - 'No'
         
