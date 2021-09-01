@@ -49,46 +49,62 @@ describe( 'editEntityRecord', () => {
 } );
 
 describe( 'deleteEntityRecord', () => {
+	beforeEach( async () => {
+		apiFetch.mockReset();
+		jest.useFakeTimers();
+	} );
+
 	it( 'triggers a DELETE request for an existing record', async () => {
-		const post = 10;
+		const deletedRecord = { title: 'new post', id: 10 };
 		const entities = [
 			{ name: 'post', kind: 'postType', baseURL: '/wp/v2/posts' },
 		];
-		const fulfillment = deleteEntityRecord( 'postType', 'post', post );
 
-		// Trigger generator
-		fulfillment.next();
+		const dispatch = Object.assign( jest.fn(), {
+			receiveEntityRecords: jest.fn(),
+			__unstableAcquireStoreLock: jest.fn(),
+			__unstableReleaseStoreLock: jest.fn(),
+		} );
+		// Provide entities
+		dispatch.mockReturnValueOnce( entities );
 
-		// Acquire lock
-		expect( fulfillment.next( entities ).value.type ).toBe(
-			'@@data/DISPATCH'
-		);
+		// Provide response
+		apiFetch.mockImplementation( () => deletedRecord );
 
-		// Start
-		expect( fulfillment.next().value.type ).toEqual(
-			'DELETE_ENTITY_RECORD_START'
-		);
+		const result = await deleteEntityRecord(
+			'postType',
+			'post',
+			deletedRecord.id
+		)( { dispatch } );
 
-		// delete api call
-		const { value: apiFetchAction } = fulfillment.next();
-		expect( apiFetchAction.request ).toEqual( {
+		expect( apiFetch ).toHaveBeenCalledTimes( 1 );
+		expect( apiFetch ).toHaveBeenCalledWith( {
 			path: '/wp/v2/posts/10',
 			method: 'DELETE',
 		} );
 
-		expect( fulfillment.next().value.type ).toBe( 'REMOVE_ITEMS' );
-
-		expect( fulfillment.next().value.type ).toBe(
-			'DELETE_ENTITY_RECORD_FINISH'
+		expect( dispatch ).toHaveBeenCalledTimes( 4 );
+		expect( dispatch ).toHaveBeenCalledWith( {
+			type: 'DELETE_ENTITY_RECORD_START',
+			kind: 'postType',
+			name: 'post',
+			recordId: 10,
+		} );
+		expect( dispatch ).toHaveBeenCalledWith( {
+			type: 'DELETE_ENTITY_RECORD_FINISH',
+			kind: 'postType',
+			name: 'post',
+			recordId: 10,
+			error: undefined,
+		} );
+		expect( dispatch.__unstableAcquireStoreLock ).toHaveBeenCalledTimes(
+			1
+		);
+		expect( dispatch.__unstableReleaseStoreLock ).toHaveBeenCalledTimes(
+			1
 		);
 
-		// Release lock
-		expect( fulfillment.next().value.type ).toEqual( '@@data/DISPATCH' );
-
-		expect( fulfillment.next() ).toMatchObject( {
-			done: true,
-			value: undefined,
-		} );
+		expect( result ).toBe( deletedRecord );
 	} );
 } );
 

@@ -8,7 +8,7 @@ import { v4 as uuid } from 'uuid';
  * WordPress dependencies
  */
 import { controls } from '@wordpress/data';
-import { apiFetch, __unstableAwaitPromise } from '@wordpress/data-controls';
+import { __unstableAwaitPromise } from '@wordpress/data-controls';
 import triggerFetch from '@wordpress/api-fetch';
 import { addQueryArgs } from '@wordpress/url';
 
@@ -162,16 +162,16 @@ export function receiveEmbedPreview( url, preview ) {
  * @param {Object}   [options]                 Delete options.
  * @param {Function} [options.__unstableFetch] Internal use only. Function to
  *                                             call instead of `apiFetch()`.
- *                                             Must return a control descriptor.
+ *                                             Must return a promise.
  */
-export function* deleteEntityRecord(
+export const deleteEntityRecord = (
 	kind,
 	name,
 	recordId,
 	query,
-	{ __unstableFetch = null } = {}
-) {
-	const entities = yield getKindEntities( kind );
+	{ __unstableFetch = triggerFetch } = {}
+) => async ( { dispatch } ) => {
+	const entities = await dispatch( getKindEntities( kind ) );
 	const entity = find( entities, { kind, name } );
 	let error;
 	let deletedRecord = false;
@@ -179,21 +179,19 @@ export function* deleteEntityRecord(
 		return;
 	}
 
-	const lock = yield controls.dispatch(
-		STORE_NAME,
-		'__unstableAcquireStoreLock',
+	const lock = await dispatch.__unstableAcquireStoreLock(
 		STORE_NAME,
 		[ 'entities', 'data', kind, name, recordId ],
 		{ exclusive: true }
 	);
 
 	try {
-		yield {
+		dispatch( {
 			type: 'DELETE_ENTITY_RECORD_START',
 			kind,
 			name,
 			recordId,
-		};
+		} );
 
 		try {
 			let path = `${ entity.baseURL }/${ recordId }`;
@@ -202,40 +200,29 @@ export function* deleteEntityRecord(
 				path = addQueryArgs( path, query );
 			}
 
-			const options = {
+			deletedRecord = await __unstableFetch( {
 				path,
 				method: 'DELETE',
-			};
-			if ( __unstableFetch ) {
-				deletedRecord = yield __unstableAwaitPromise(
-					__unstableFetch( options )
-				);
-			} else {
-				deletedRecord = yield apiFetch( options );
-			}
+			} );
 
-			yield removeItems( kind, name, recordId, true );
+			await dispatch( removeItems( kind, name, recordId, true ) );
 		} catch ( _error ) {
 			error = _error;
 		}
 
-		yield {
+		dispatch( {
 			type: 'DELETE_ENTITY_RECORD_FINISH',
 			kind,
 			name,
 			recordId,
 			error,
-		};
+		} );
 
 		return deletedRecord;
 	} finally {
-		yield controls.dispatch(
-			STORE_NAME,
-			'__unstableReleaseStoreLock',
-			lock
-		);
+		dispatch.__unstableReleaseStoreLock( lock );
 	}
-}
+};
 
 /**
  * Returns an action object that triggers an
