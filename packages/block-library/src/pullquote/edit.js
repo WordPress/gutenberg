@@ -55,7 +55,7 @@ const getBorderColor = ( props ) => {
 
 	// Checking for the is-style-solid-color we can better approximate the pull quote style
 	const defaultColor =
-		className.search( 'is-style-solid-color' ) !== -1
+		className?.search( 'is-style-solid-color' ) !== -1
 			? getBackgroundColor( props )
 			: getTextColor( props );
 
