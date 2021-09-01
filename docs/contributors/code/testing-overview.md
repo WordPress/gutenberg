@@ -273,7 +273,7 @@ You should never create or modify a snapshot directly, they are generated and up
 
 Snapshot are mostly targeted at component testing. They make us conscious of changes to a component's structure which makes them _ideal_ for refactoring. If a snapshot is kept up to date over the course of a series of commits, the snapshot diffs record the evolution of a component's structure. Pretty cool 😎
 
-```js
+```jsx
 import { render, screen } from '@testing-library/react';
 import SolarSystem from 'solar-system';
 
@@ -331,7 +331,7 @@ If you're starting a refactor, snapshots are quite nice, you can add them as the
 
 Snapshots themselves don't express anything about what we expect. Snapshots are best used in conjunction with other tests that describe our expectations, like in the example above:
 
-```js
+```jsx
 test( 'should contain mars if planets is true', () => {
 	const { container } = render( <SolarSystem planets /> );
 
@@ -345,7 +345,7 @@ test( 'should contain mars if planets is true', () => {
 
 Another good technique is to use the `toMatchDiffSnapshot` function (provided by the [`snapshot-diff` package](https://github.com/jest-community/snapshot-diff)), which allows to snapshot only the difference between two different states of the DOM. This approach is useful to test the effects of a prop change on the resulting DOM while generating a much smaller snapshot, like in this example:
 
-```js
+```jsx
 test( 'should render a darker background when isShady is true', () => {
 	const { container } = render( <CardBody>Body</CardBody> );
 	const { container: containerShady } = render(
@@ -357,7 +357,7 @@ test( 'should render a darker background when isShady is true', () => {
 
 Similarly, the `toMatchStyleDiffSnapshot` function allows to snapshot only the difference between the _styles_ associated to two different states of a component, like in this example:
 
-```js
+```jsx
 test( 'should render margin', () => {
 	const { container: base } = render( <Spacer /> );
 	const { container: withMargin } = render( <Spacer margin={ 5 } /> );
