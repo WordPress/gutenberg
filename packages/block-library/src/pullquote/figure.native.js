@@ -11,9 +11,7 @@ import { usePreferredColorSchemeStyle } from '@wordpress/compose';
  */
 import styles from './figure.scss';
 
-export const Figure = ( props ) => {
-	const { children, backgroundColor, borderColor } = props;
-
+export const Figure = ( { children, backgroundColor, borderColor } ) => {
 	const wpPullquoteFigure = usePreferredColorSchemeStyle(
 		styles.light,
 		styles.dark
