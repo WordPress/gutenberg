@@ -60,7 +60,11 @@ describe( 'deleteEntityRecord', () => {
 			{ name: 'post', kind: 'postType', baseURL: '/wp/v2/posts' },
 		];
 
-		const dispatch = jest.fn();
+		const dispatch = Object.assign( jest.fn(), {
+			receiveEntityRecords: jest.fn(),
+			__unstableAcquireStoreLock: jest.fn(),
+			__unstableReleaseStoreLock: jest.fn(),
+		} );
 		// Provide entities
 		dispatch.mockReturnValueOnce( entities );
 
@@ -79,19 +83,13 @@ describe( 'deleteEntityRecord', () => {
 			method: 'DELETE',
 		} );
 
-
-		expect( dispatch ).toHaveBeenCalledTimes( 6 );
+		expect( dispatch ).toHaveBeenCalledTimes( 4 );
 		expect( dispatch ).toHaveBeenCalledWith( {
 			type: 'DELETE_ENTITY_RECORD_START',
 			kind: 'postType',
 			name: 'post',
 			recordId: 10,
 		} );
-		expect( dispatch ).toHaveBeenCalledWith( [
-			{
-				type: 'MOCKED_ACQUIRE_LOCK',
-			},
-		] );
 		expect( dispatch ).toHaveBeenCalledWith( {
 			type: 'DELETE_ENTITY_RECORD_FINISH',
 			kind: 'postType',
@@ -99,11 +97,12 @@ describe( 'deleteEntityRecord', () => {
 			recordId: 10,
 			error: undefined,
 		} );
-		expect( dispatch ).toHaveBeenCalledWith( [
-			{
-				type: 'MOCKED_RELEASE_LOCK',
-			},
-		] );
+		expect( dispatch.__unstableAcquireStoreLock ).toHaveBeenCalledTimes(
+			1
+		);
+		expect( dispatch.__unstableReleaseStoreLock ).toHaveBeenCalledTimes(
+			1
+		);
 
 		expect( result ).toBe( deletedRecord );
 	} );
