@@ -44,7 +44,7 @@ In these situations, one possible approach is to "soft-deprecate" a given legacy
 
 The following are a set of technical requirements for all newly introduced components. These requirements are also retroactively being applied to existing components.
 
-For an example of a component that follows these requirements, take a look at [`ItemGroup`](/packages/components/src/item-group);
+For an example of a component that follows these requirements, take a look at [`ItemGroup`](/packages/components/src/item-group) as an example.
 
 #### TypeScript
 
@@ -66,7 +66,7 @@ Note: Instead of using Emotion's standard `cx` function, the custom [`useCx` hoo
 
 #### Unit tests
 
-Please refer to the [JavaScript Testing Overview docs](/docs/contributors/code/testing-overview.md)
+Please refer to the [JavaScript Testing Overview docs](/docs/contributors/code/testing-overview.md).
 
 #### Storybook
 
