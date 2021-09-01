@@ -141,15 +141,17 @@ function gutenberg_experimental_global_styles_settings( $settings ) {
 		}
 
 		// Reset existing global styles.
+		$styles_without_existing_global_styles = array();
 		foreach ( $settings['styles'] as $key => $style ) {
-			if ( isset( $style['__unstableType'] ) && 'globalStyles' === $style['__unstableType'] ) {
-				unset( $settings['styles'][ $key ] );
+			if ( ! isset( $style['__unstableType'] ) || 'globalStyles' !== $style['__unstableType'] ) {
+				$styles_without_existing_global_styles[] = $style;
 			}
 		}
 
 		// Add the new ones.
-		$settings['styles'][] = $css_variables;
-		$settings['styles'][] = $block_styles;
+		$styles_without_existing_global_styles[] = $css_variables;
+		$styles_without_existing_global_styles[] = $block_styles;
+		$settings['styles']                      = $styles_without_existing_global_styles;
 	}
 
 	// Copied from get_block_editor_settings() at wordpress-develop/block-editor.php.
