@@ -39,11 +39,9 @@ const EmbedPreview = ( {
 
 	const wrapperStyle = styles[ 'embed-preview__wrapper' ];
 	const wrapperAlignStyle =
-		styles[ `embed-preview__wrapper--align-${ align }` ] ||
-		styles[ 'embed-preview__wrapper--align' ];
+		styles[ `embed-preview__wrapper--align-${ align }` ];
 	const sandboxAlignStyle =
-		styles[ `embed-preview__sandbox--align-${ align }` ] ||
-		styles[ 'embed-preview__sandbox--align' ];
+		styles[ `embed-preview__sandbox--align-${ align }` ];
 
 	function accessibilityLabelCreator( caption ) {
 		return isEmpty( caption )
