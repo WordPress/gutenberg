@@ -274,8 +274,8 @@ function gutenberg_get_duotone_style( $selectors_group, $duotone_id ) {
 /**
  * Returns the markup for duotone filters.
  *
- * @param string $duotone_id
- * @param array $duotone_values
+ * @param string $duotone_id     UUID for the duotone filter.
+ * @param array  $duotone_values Duotone color values.
  * @return string The markup for the <svg> tag.
  */
 function gutenberg_get_duotone_svg_filters( $duotone_id, $duotone_values ) {
@@ -342,7 +342,7 @@ function get_duotone_color_values( $duotone_colors ) {
 /**
  * Output Duotone markup in the footer.
  *
- * @param $duotone_markup The markup for the SVG filer, and if necessary the style tag.
+ * @param string $duotone_markup The markup for the SVG filer, and if necessary the style tag.
  */
 function gutenberg_output_duotone_markup( $duotone_markup ) {
 	add_action(
@@ -391,9 +391,9 @@ function gutenberg_render_duotone_support( $block_content, $block ) {
 		},
 		$selectors
 	);
-	$selectors_group = implode( ', ', $selectors_scoped );
+	$selectors_group  = implode( ', ', $selectors_scoped );
 
-	$duotone_markup = gutenberg_get_duotone_style( $selectors_group, $duotone_id );
+	$duotone_markup  = gutenberg_get_duotone_style( $selectors_group, $duotone_id );
 	$duotone_markup .= gutenberg_get_duotone_svg_filters( $duotone_id, $duotone_values );
 
 	if ( ! is_admin() ) {
@@ -435,11 +435,11 @@ function gutenberg_get_duotone_filter_id( $id ) {
 /**
  * Generates duotone markup from a settings array
  *
- * @param  array  $duotone_setting Block object.
+ * @param array $duotone_setting Block object.
  */
-function gutenberg_generate_duotone_filters_settings( $duotone_setting) {
+function gutenberg_generate_duotone_filters_settings( $duotone_setting ) {
 	$duotone_values = get_duotone_color_values( $duotone_setting['colors'] );
-	$duotone_id = gutenberg_get_duotone_filter_id( $duotone_setting['slug'] );
+	$duotone_id     = gutenberg_get_duotone_filter_id( $duotone_setting['slug'] );
 	$duotone_markup = gutenberg_get_duotone_svg_filters( $duotone_id, $duotone_values );
 	gutenberg_output_duotone_markup( $duotone_markup );
 }
