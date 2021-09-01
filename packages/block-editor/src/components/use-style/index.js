@@ -35,7 +35,7 @@ export default function useStyle( path ) {
 	const settings = useSelect( ( select ) => {
 		return select( blockEditorStore ).getSettings();
 	}, [] );
-	const settingsForBlock = get( settings, [
+	const stylesForBlock = get( settings, [
 		'__experimentalStyles',
 		'blocks',
 		blockName,
