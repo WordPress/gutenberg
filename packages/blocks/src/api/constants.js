@@ -1,3 +1,5 @@
+export const BLOCK_ICON_DEFAULT = 'block-default';
+
 /**
  * Array of valid keys in a block type settings deprecation object.
  *
