@@ -7,7 +7,6 @@ import { v4 as uuid } from 'uuid';
 /**
  * WordPress dependencies
  */
-import { controls } from '@wordpress/data';
 import { __unstableAwaitPromise } from '@wordpress/data-controls';
 import triggerFetch from '@wordpress/api-fetch';
 import { addQueryArgs } from '@wordpress/url';
