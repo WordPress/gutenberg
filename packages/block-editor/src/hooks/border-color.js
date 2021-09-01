@@ -56,7 +56,11 @@ export function BorderColorEdit( props ) {
 	const defaultBorderColor = useStyle( [ 'border', 'color' ] );
 
 	const [ colorValue, setColorValue ] = useState(
-		borderColor || style?.border?.color
+		getColorObjectByAttributeValues(
+			colors,
+			borderColor,
+			style?.border?.color
+		)?.color
 	);
 
 	const onChangeColor = ( value ) => {
