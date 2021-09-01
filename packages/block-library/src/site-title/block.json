@@ -3,7 +3,7 @@
 	"name": "core/site-title",
 	"title": "Site Title",
 	"category": "design",
-	"description": "Displays and allows editing the name of the site. The site title usually appears in the browser title bar, in search results, and more. Also available in Settings > General.",
+	"description": "Displays the name of this site. Update the block, and the changes apply everywhere it’s used. This will also appear in the browser title bar and in search results.",
 	"textdomain": "default",
 	"attributes": {
 		"level": {
