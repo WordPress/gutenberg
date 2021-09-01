@@ -124,7 +124,7 @@ Lock settings can be inherited by InnerBlocks. If `templateLock` is not set in a
 
 Alongside template level locking, you can lock individual blocks; you can do this using a `lock` attribute on the attributes level. Block-level lock takes priority over the `templateLock` feature. Currently, you can lock moving and removing blocks.
 
-**Block level locking is an exprimental feature.**
+**Block-level locking is an experimental feature that may be removed or change anytime.**
 ```js
 attributes: {
   // Prevent a block from being moved or removed.
