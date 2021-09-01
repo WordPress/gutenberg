@@ -66,7 +66,25 @@ Please refer to the [JavaScript Testing Overview docs](/docs/contributors/code/t
 
 #### Storybook
 
-All new components should include Storybook examples.
+All new components should include [Storybook](https://storybook.js.org/) stories, in order to make it easier to work on and review each component in isolation.
+
+A component's stories should be showcasing its different states — for example, a `Button`'s different variants:
+
+```jsx
+import Button from '../';
+
+export default { title: 'Components/Button', component: Button };
+
+export const _default = () => <Button>Default Button</Button>;
+
+export const primary = () => <Button variant="primary">Primary Button</Button>;
+
+export const secondary = () => <Button variant="secondary">Secondary Button</Button>;
+```
+
+For even more flexibility while writing stories, the [`@storybook/addons-controls`](https://storybook.js.org/addons/@storybook/addon-controls) addon is a great way to interact with a component's arguments dynamically and in real time.
+
+Storybook can be started on a local maching by running `npm run storybook:dev`. Alternatively, the components' catalogue (up to date with the latest code on `trunk`) can be found at [wordpress.github.io/gutenberg/](https://wordpress.github.io/gutenberg/).
 
 #### Documentation
 
