@@ -3,7 +3,7 @@
 	"name": "core/site-logo",
 	"title": "Site Logo",
 	"category": "layout",
-	"description": "Useful for displaying a symbol to represent the site. Once a site logo is set, it can be reused in different places. This is not the same as a site icon, which is the small image used in the dashboard, browser tabs, etc, to help identify a site.",
+	"description": "Display a graphic to represent this site. Update the block, and the changes apply everywhere it’s used.",
 	"textdomain": "default",
 	"attributes": {
 		"align": {
