@@ -58,6 +58,8 @@ body:
           options:
              - 'Yes'
              - 'No'
+      validations:
+          required: true
    
     - type: dropdown
       id: plugins
@@ -67,4 +69,5 @@ body:
           options:
              - 'Yes'
              - 'No'
-        
+      validations:
+          required: true
