@@ -14,7 +14,11 @@ This set of guidelines should apply especially to newly introduced components. I
 
 The `@wordpress/components` package includes components that are relied upon by many developers across different projects. It is, therefore, very important to avoid introducing breaking changes.
 
-In these situations, an alternative approach is to "soft-deprecate" the given legacy API. This is achieved by removing traces of the API from the docs, while the code keeps supporing it in the background (with or without a warning)
+In these situations, one possible approach is to "soft-deprecate" a given legacy API. This is achieved by:
+
+1. Removing traces of the API from the docs, while still supporing it in code;
+2. Updating all places in Gutenberg that use that API;
+3. Adding deprecation warnings (only after the previous point is completed, otherwide the Browser Console will be polluted by all those warnings and some e2e tests may fail).
 
 ### Components composition
 
