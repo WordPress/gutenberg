@@ -31,6 +31,7 @@ function InserterTabs( {
 	rootClientId,
 	showReusableBlocks,
 	tabIndex,
+	isFullScreen,
 } ) {
 	const tabAnimation = useRef( new Animated.Value( 0 ) ).current;
 	const lastScrollEvents = useRef( [] ).current;
@@ -91,16 +92,28 @@ function InserterTabs( {
 			width: wrapperWidth * tabKeys.length,
 			transform: [ { translateX } ],
 		},
+		isFullScreen && { flex: 1, flexDirection: 'row' },
 	];
 
 	return (
 		<View
-			style={ styles[ 'inserter-tabs__wrapper' ] }
+			style={ [
+				styles[ 'inserter-tabs__wrapper' ],
+				isFullScreen && { flex: 1 },
+			] }
 			onLayout={ onWrapperLayout }
 		>
 			<Animated.View style={ containerStyle }>
 				{ tabs.map( ( { component: TabComponent }, index ) => (
-					<View key={ `tab-${ index }` }>
+					<View
+						key={ `tab-${ index }` }
+						style={
+							! isFullScreen && {
+								position: 'absolute',
+								left: index * wrapperWidth,
+							}
+						}
+					>
 						<TabComponent
 							rootClientId={ rootClientId }
 							onSelect={ onSelect }

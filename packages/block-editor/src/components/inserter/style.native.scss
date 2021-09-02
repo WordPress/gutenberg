@@ -8,10 +8,6 @@
 	color: $blue-30;
 }
 
-.inserter-menu__list-wrapper {
-	flex: 1;
-}
-
 .inserter-menu__list {
 	padding-bottom: 20;
 	padding-top: 8;
@@ -55,12 +51,9 @@
 
 .inserter-tabs__wrapper {
 	overflow: hidden;
-	flex: 1;
 }
 
 .inserter-tabs__container {
 	height: 100%;
 	width: 100%;
-	flex: 1;
-	flex-direction: row;
 }

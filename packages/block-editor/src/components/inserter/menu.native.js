@@ -210,7 +210,7 @@ function InserterMenu( {
 				{ ( { listProps } ) => (
 					<TouchableHighlight
 						accessible={ false }
-						style={ styles[ 'inserter-menu__list-wrapper' ] }
+						style={ ! isIOS && { flex: 1 } }
 					>
 						{ ! showTabs || filterValue ? (
 							<InserterSearchResults
@@ -227,6 +227,7 @@ function InserterMenu( {
 								tabIndex={ tabIndex }
 								onSelect={ onSelectItem }
 								showReusableBlocks={ showReusableBlocks }
+								isFullScreen={ ! isIOS }
 							/>
 						) }
 					</TouchableHighlight>
