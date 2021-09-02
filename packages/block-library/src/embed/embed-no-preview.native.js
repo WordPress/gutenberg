@@ -74,12 +74,14 @@ const EmbedNoPreview = ( { label, icon, isSelected, onPress } ) => {
 	const comingSoonDescription =
 		postType === 'page'
 			? sprintf(
+					// translators: %s: embed block variant's label e.g: "Twitter".
 					__(
 						'We’re working hard on adding support for %s previews. In the meantime, you can preview the embedded content on the page.'
 					),
 					label
 			  )
 			: sprintf(
+					// translators: %s: embed block variant's label e.g: "Twitter".
 					__(
 						'We’re working hard on adding support for %s previews. In the meantime, you can preview the embedded content on the post.'
 					),
@@ -125,6 +127,7 @@ const EmbedNoPreview = ( { label, icon, isSelected, onPress } ) => {
 					<Text style={ labelStyle }>{ label }</Text>
 					<Text style={ descriptionStyle }>
 						{ sprintf(
+							// translators: %s: embed block variant's label e.g: "Twitter".
 							__( '%s previews not yet available' ),
 							label
 						) }
@@ -164,6 +167,7 @@ const EmbedNoPreview = ( { label, icon, isSelected, onPress } ) => {
 					</View>
 					<Text style={ sheetTitleStyle }>
 						{ sprintf(
+							// translators: %s: embed block variant's label e.g: "Twitter".
 							__( '%s block previews are coming soon' ),
 							label
 						) }
