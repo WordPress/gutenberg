@@ -885,7 +885,8 @@ export function* mergeBlocks( firstBlockClientId, secondBlockClientId ) {
 				},
 			},
 			...blocksWithTheSameType.slice( 1 ),
-		]
+		],
+		0 // If we don't pass the `indexToSelect` it will default to the last block.
 	);
 }
 

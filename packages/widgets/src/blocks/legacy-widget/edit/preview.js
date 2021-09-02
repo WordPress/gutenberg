@@ -7,57 +7,88 @@ import classnames from 'classnames';
  * WordPress dependencies
  */
 import { useRefEffect } from '@wordpress/compose';
-import { addQueryArgs } from '@wordpress/url';
-import { useState } from '@wordpress/element';
-import { Placeholder, Spinner, Disabled } from '@wordpress/components';
+import { useEffect, useState } from '@wordpress/element';
+import { Disabled, Placeholder, Spinner } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
+import apiFetch from '@wordpress/api-fetch';
 
 export default function Preview( { idBase, instance, isVisible } ) {
 	const [ isLoaded, setIsLoaded ] = useState( false );
+	const [ srcDoc, setSrcDoc ] = useState( '' );
+
+	useEffect( () => {
+		const abortController =
+			typeof window.AbortController === 'undefined'
+				? undefined
+				: new window.AbortController();
+
+		async function fetchPreviewHTML() {
+			const restRoute = `/wp/v2/widget-types/${ idBase }/render`;
+			return await apiFetch( {
+				path: restRoute,
+				method: 'POST',
+				signal: abortController?.signal,
+				data: instance ? { instance } : {},
+			} );
+		}
+
+		fetchPreviewHTML()
+			.then( ( response ) => {
+				setSrcDoc( response.preview );
+			} )
+			.catch( ( error ) => {
+				if ( 'AbortError' === error.name ) {
+					// We don't want to log aborted requests.
+					return;
+				}
+				throw error;
+			} );
+
+		return () => abortController?.abort();
+	}, [ idBase, instance ] );
 
 	// Resize the iframe on either the load event, or when the iframe becomes visible.
 	const ref = useRefEffect(
 		( iframe ) => {
 			// Only set height if the iframe is loaded,
 			// or it will grow to an unexpected large height in Safari if it's hidden initially.
-			if ( isLoaded ) {
-				// If the preview frame has another origin then this won't work.
-				// One possible solution is to add custom script to call `postMessage` in the preview frame.
-				// Or, better yet, we migrate away from iframe.
-				function setHeight() {
-					// Pick the maximum of these two values to account for margin collapsing.
-					const height = Math.max(
-						iframe.contentDocument.documentElement.offsetHeight,
-						iframe.contentDocument.body.offsetHeight
-					);
-					iframe.style.height = `${ height }px`;
-				}
-
-				const {
-					IntersectionObserver,
-				} = iframe.ownerDocument.defaultView;
-
-				// Observe for intersections that might cause a change in the height of
-				// the iframe, e.g. a Widget Area becoming expanded.
-				const intersectionObserver = new IntersectionObserver(
-					( [ entry ] ) => {
-						if ( entry.isIntersecting ) {
-							setHeight();
-						}
-					},
-					{
-						threshold: 1,
-					}
-				);
-				intersectionObserver.observe( iframe );
-
-				iframe.addEventListener( 'load', setHeight );
-
-				return () => {
-					intersectionObserver.disconnect();
-					iframe.removeEventListener( 'load', setHeight );
-				};
+			if ( ! isLoaded ) {
+				return;
 			}
+			// If the preview frame has another origin then this won't work.
+			// One possible solution is to add custom script to call `postMessage` in the preview frame.
+			// Or, better yet, we migrate away from iframe.
+			function setHeight() {
+				// Pick the maximum of these two values to account for margin collapsing.
+				const height = Math.max(
+					iframe.contentDocument.documentElement.offsetHeight,
+					iframe.contentDocument.body.offsetHeight
+				);
+				iframe.style.height = `${ height }px`;
+			}
+
+			const { IntersectionObserver } = iframe.ownerDocument.defaultView;
+
+			// Observe for intersections that might cause a change in the height of
+			// the iframe, e.g. a Widget Area becoming expanded.
+			const intersectionObserver = new IntersectionObserver(
+				( [ entry ] ) => {
+					if ( entry.isIntersecting ) {
+						setHeight();
+					}
+				},
+				{
+					threshold: 1,
+				}
+			);
+			intersectionObserver.observe( iframe );
+
+			iframe.addEventListener( 'load', setHeight );
+
+			return () => {
+				intersectionObserver.disconnect();
+				iframe.removeEventListener( 'load', setHeight );
+			};
 		},
 		[ isLoaded ]
 	);
@@ -93,15 +124,7 @@ export default function Preview( { idBase, instance, isVisible } ) {
 						ref={ ref }
 						className="wp-block-legacy-widget__edit-preview-iframe"
 						title={ __( 'Legacy Widget Preview' ) }
-						// TODO: This chokes when the query param is too big.
-						// Ideally, we'd render a <ServerSideRender>. Maybe by
-						// rendering one in an iframe via a portal.
-						src={ addQueryArgs( 'widgets.php', {
-							'legacy-widget-preview': {
-								idBase,
-								instance,
-							},
-						} ) }
+						srcDoc={ srcDoc }
 						onLoad={ ( event ) => {
 							// To hide the scrollbars of the preview frame for some edge cases,
 							// such as negative margins in the Gallery Legacy Widget.

@@ -6,6 +6,7 @@ import { get, find, forEach, camelCase, isString } from 'lodash';
  * WordPress dependencies
  */
 import { useSelect } from '@wordpress/data';
+import { __EXPERIMENTAL_PATHS_WITH_MERGE as PATHS_WITH_MERGE } from '@wordpress/blocks';
 /**
  * Internal dependencies
  */
@@ -90,13 +91,6 @@ function getPresetMetadataFromStyleProperty( styleProperty ) {
 	}
 	return getPresetMetadataFromStyleProperty.MAP[ styleProperty ];
 }
-
-const PATHS_WITH_MERGE = {
-	'color.gradients': true,
-	'color.palette': true,
-	'typography.fontFamilies': true,
-	'typography.fontSizes': true,
-};
 
 export function useSetting( path, blockName = '' ) {
 	const settings = useSelect( ( select ) => {

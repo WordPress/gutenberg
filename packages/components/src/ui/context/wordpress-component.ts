@@ -11,7 +11,7 @@ import type * as React from 'react';
  * by `ComponentPropsWithRef`. The context is that components should require the `children`
  * prop explicitely when needed (see https://github.com/WordPress/gutenberg/pull/31817).
  */
-export type PolymorphicComponentProps<
+export type WordPressComponentProps<
 	P,
 	T extends React.ElementType,
 	IsPolymorphic extends boolean = true
@@ -23,17 +23,17 @@ export type PolymorphicComponentProps<
 		  }
 		: { as?: never } );
 
-export type PolymorphicComponent<
+export type WordPressComponent<
 	T extends React.ElementType,
 	O,
 	IsPolymorphic extends boolean
 > = {
 	< TT extends React.ElementType >(
-		props: PolymorphicComponentProps< O, TT, IsPolymorphic > &
+		props: WordPressComponentProps< O, TT, IsPolymorphic > &
 			( IsPolymorphic extends true ? { as: TT } : { as: never } )
 	): JSX.Element | null;
 	(
-		props: PolymorphicComponentProps< O, T, IsPolymorphic >
+		props: WordPressComponentProps< O, T, IsPolymorphic >
 	): JSX.Element | null;
 	displayName?: string;
 	/**
@@ -47,8 +47,8 @@ export type PolymorphicComponent<
 	selector: `.${ string }`;
 };
 
-export type PolymorphicComponentFromProps<
+export type WordPressComponentFromProps<
 	Props
-> = Props extends PolymorphicComponentProps< infer P, infer T, infer I >
-	? PolymorphicComponent< T, P, I >
+> = Props extends WordPressComponentProps< infer P, infer T, infer I >
+	? WordPressComponent< T, P, I >
 	: never;

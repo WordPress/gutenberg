@@ -10,6 +10,7 @@ For each user feature we should also add a importance categorization label  to i
 -->
 
 ## Unreleased
+-   [**] Enable embed preview for a list of providers (for now only YouTube and Twitter) [#34446]
 -   [*] Fix animation stutter when closing full-screen bottom sheets. [#34425]
 
 ## 1.60.1
