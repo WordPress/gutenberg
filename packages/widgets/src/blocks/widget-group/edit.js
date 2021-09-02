@@ -19,33 +19,42 @@ export default function Edit( props ) {
 	const { getBlock } = useSelect( blockEditorStore );
 	const { innerBlocks } = getBlock( clientId );
 
+	let content;
 	if ( innerBlocks.length === 0 ) {
-		return <SetUp { ...props } />;
+		content = <PlaceholderContent { ...props } />;
 	} else if ( isSelected ) {
-		return <EditTitle { ...props } innerBlocks={ innerBlocks } />;
+		content = <EditFormContent { ...props } innerBlocks={ innerBlocks } />;
+	} else {
+		content = <PreviewContent { ...props } innerBlocks={ innerBlocks } />;
 	}
-	return <Preview { ...props } innerBlocks={ innerBlocks } />;
+
+	return (
+		<div { ...useBlockProps( { className: 'widget' } ) }>{ content }</div>
+	);
 }
 
-function SetUp( { clientId } ) {
+function PlaceholderContent( { clientId } ) {
 	return (
-		<div { ...useBlockProps() }>
+		<>
 			<Placeholder
+				className="wp-block-widget-group__placeholder"
 				icon={ <BlockIcon icon={ groupIcon } /> }
 				label={ __( 'Widget Group' ) }
 			>
 				<ButtonBlockAppender rootClientId={ clientId } />
 			</Placeholder>
 			<InnerBlocks renderAppender={ false } />
-		</div>
+		</>
 	);
 }
 
-function EditTitle( { attributes, setAttributes, innerBlocks } ) {
+function EditFormContent( { attributes, setAttributes, innerBlocks } ) {
 	const defaultTitle = getDefaultTitle( innerBlocks );
 	return (
-		<div { ...useBlockProps() }>
-			<h3>{ attributes.title || defaultTitle }</h3>
+		<div className="wp-block-widget-group__edit-form">
+			<h2 className="wp-block-widget-group__edit-form-title">
+				{ attributes.title || defaultTitle }
+			</h2>
 			<TextControl
 				label={ __( 'Title' ) }
 				placeholder={ defaultTitle }
@@ -56,12 +65,14 @@ function EditTitle( { attributes, setAttributes, innerBlocks } ) {
 	);
 }
 
-function Preview( { attributes, innerBlocks } ) {
+function PreviewContent( { attributes, innerBlocks } ) {
 	return (
-		<div { ...useBlockProps() }>
-			<h3>{ attributes.title || getDefaultTitle( innerBlocks ) }</h3>
+		<>
+			<h2 className="widget-title">
+				{ attributes.title || getDefaultTitle( innerBlocks ) }
+			</h2>
 			<InnerBlocks />
-		</div>
+		</>
 	);
 }
 
