@@ -10,7 +10,6 @@ import { escape } from 'lodash';
 import { createBlock } from '@wordpress/blocks';
 import { useSelect, useDispatch } from '@wordpress/data';
 import {
-	KeyboardShortcuts,
 	PanelBody,
 	Popover,
 	TextControl,
@@ -18,7 +17,7 @@ import {
 	ToolbarButton,
 	ToolbarGroup,
 } from '@wordpress/components';
-import { rawShortcut, displayShortcut } from '@wordpress/keycodes';
+import { displayShortcut, isKeyboardEvent, ENTER } from '@wordpress/keycodes';
 import { __, sprintf } from '@wordpress/i18n';
 import {
 	BlockControls,
@@ -467,6 +466,15 @@ export default function NavigationLinkEdit( {
 		customBackgroundColor,
 	} = getColors( context, ! isTopLevelLink );
 
+	function onKeyDown( event ) {
+		if (
+			isKeyboardEvent.primary( event, 'k' ) ||
+			( ! url && event.keyCode === ENTER )
+		) {
+			setIsLinkOpen( true );
+		}
+	}
+
 	const blockProps = useBlockProps( {
 		ref: listItemRef,
 		className: classnames( 'wp-block-navigation-item', {
@@ -486,6 +494,7 @@ export default function NavigationLinkEdit( {
 			color: ! textColor && customTextColor,
 			backgroundColor: ! backgroundColor && customBackgroundColor,
 		},
+		onKeyDown,
 	} );
 
 	if ( ! url ) {
@@ -566,13 +575,6 @@ export default function NavigationLinkEdit( {
 		<Fragment>
 			<BlockControls>
 				<ToolbarGroup>
-					<KeyboardShortcuts
-						bindGlobal
-						shortcuts={ {
-							[ rawShortcut.primary( 'k' ) ]: () =>
-								setIsLinkOpen( true ),
-						} }
-					/>
 					<ToolbarButton
 						name="link"
 						icon={ linkIcon }
@@ -626,12 +628,6 @@ export default function NavigationLinkEdit( {
 					{ /* eslint-enable */ }
 					{ ! url ? (
 						<div className="wp-block-navigation-link__placeholder-text">
-							<KeyboardShortcuts
-								shortcuts={ {
-									enter: () =>
-										isSelected && setIsLinkOpen( true ),
-								} }
-							/>
 							{ missingText }
 						</div>
 					) : (
@@ -672,12 +668,6 @@ export default function NavigationLinkEdit( {
 							onClose={ () => setIsLinkOpen( false ) }
 							anchorRef={ listItemRef.current }
 						>
-							<KeyboardShortcuts
-								bindGlobal
-								shortcuts={ {
-									escape: () => setIsLinkOpen( false ),
-								} }
-							/>
 							<LinkControl
 								className="wp-block-navigation-link__inline-link-input"
 								value={ link }
