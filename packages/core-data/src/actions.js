@@ -499,24 +499,17 @@ export function prepareAutosaveRequest(
 	// So we fallback to the previous autosave and then
 	// to the actual persisted entity if the edits don't
 	// have a value.
-	let data = {
+	const { title, excerpt, content, status } = {
 		...persistedRecord,
 		...autosavePost,
 		...record,
 	};
-	data = Object.keys( data ).reduce(
-		( acc, key ) => {
-			if ( [ 'title', 'excerpt', 'content' ].includes( key ) ) {
-				// Edits should be the "raw" attribute values.
-				acc[ key ] = get( data[ key ], 'raw', data[ key ] );
-			}
-			return acc;
-		},
-		{
-			status: data.status === 'auto-draft' ? 'draft' : data.status,
-		}
-	);
-	return data;
+	return {
+		title,
+		excerpt,
+		content,
+		status: status === 'auto-draft' ? 'draft' : status,
+	};
 }
 
 export function reconcileAutosave(
