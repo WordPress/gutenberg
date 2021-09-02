@@ -6,18 +6,18 @@ import classNames from 'classnames';
 /**
  * WordPress dependencies
  */
-
+import { getBlockSupport } from '@wordpress/blocks';
+import { useSelect } from '@wordpress/data';
 import { Fragment, useEffect } from '@wordpress/element';
-
 import {
 	BlockControls,
 	__experimentalUseInnerBlocksProps as useInnerBlocksProps,
 	useBlockProps,
 	InspectorControls,
-	JustifyContentControl,
 	ContrastChecker,
 	PanelColorSettings,
 	withColors,
+	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import {
 	MenuGroup,
@@ -38,8 +38,18 @@ const sizeOptions = [
 	{ name: __( 'Huge' ), value: 'has-huge-icon-size' },
 ];
 
+const getDefaultBlockLayout = ( blockTypeOrName ) => {
+	const layoutBlockSupportConfig = getBlockSupport(
+		blockTypeOrName,
+		'__experimentalLayout'
+	);
+	return layoutBlockSupportConfig?.default;
+};
+
 export function SocialLinksEdit( props ) {
 	const {
+		name,
+		clientId,
 		attributes,
 		iconBackgroundColor,
 		iconColor,
@@ -52,10 +62,23 @@ export function SocialLinksEdit( props ) {
 	const {
 		iconBackgroundColorValue,
 		iconColorValue,
-		itemsJustification,
 		openInNewTab,
 		size,
+		layout,
 	} = attributes;
+	// This probably should not be used/checked here. We need to make all `social-links`
+	// blocks to use `flex` layout.
+	const { themeSupportsLayout } = useSelect(
+		( select ) => {
+			const { getSettings } = select( blockEditorStore );
+			return {
+				themeSupportsLayout: getSettings()?.supportsLayout,
+			};
+		},
+		[ clientId ]
+	);
+
+	const usedLayout = !! layout || getDefaultBlockLayout( name );
 
 	// Remove icon background color if logos only style selected.
 	const logosOnly =
@@ -93,16 +116,16 @@ export function SocialLinksEdit( props ) {
 		'has-icon-color': iconColor.color || iconColorValue,
 		'has-icon-background-color':
 			iconBackgroundColor.color || iconBackgroundColorValue,
-		[ `items-justified-${ itemsJustification }` ]: itemsJustification,
 	} );
 
 	const blockProps = useBlockProps( { className } );
 	const innerBlocksProps = useInnerBlocksProps( blockProps, {
 		allowedBlocks: ALLOWED_BLOCKS,
-		orientation: 'horizontal',
 		placeholder: isSelected ? SelectedSocialPlaceholder : SocialPlaceholder,
 		templateLock: false,
 		__experimentalAppenderTagName: 'li',
+		__experimentalLayout:
+			themeSupportsLayout && usedLayout ? usedLayout : undefined,
 	} );
 
 	const POPOVER_PROPS = {
@@ -111,24 +134,6 @@ export function SocialLinksEdit( props ) {
 
 	return (
 		<Fragment>
-			<BlockControls group="block" __experimentalExposeToChildren>
-				<JustifyContentControl
-					allowedControls={ [
-						'left',
-						'center',
-						'right',
-						'space-between',
-					] }
-					value={ itemsJustification }
-					onChange={ ( value ) =>
-						setAttributes( { itemsJustification: value } )
-					}
-					popoverProps={ {
-						position: 'bottom right',
-						isAlternate: true,
-					} }
-				/>
-			</BlockControls>
 			<BlockControls group="other">
 				<ToolbarDropdownMenu
 					label={ __( 'Size' ) }

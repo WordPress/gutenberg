@@ -29,7 +29,7 @@ function gutenberg_register_layout_support( $block_type ) {
  * Generates the CSS corresponding to the provided layout.
  *
  * @param string  $selector CSS selector.
- * @param array   $layout   Layout object.
+ * @param array   $layout   Layout object. The one that is passed has already checked the existance of default block layout.
  * @param boolean $has_block_gap_support Whether the theme has support for the block gap.
  *
  * @return string CSS style.
@@ -77,6 +77,14 @@ function gutenberg_get_layout_style( $selector, $layout, $has_block_gap_support 
 		}
 		$style .= 'flex-wrap: wrap;';
 		$style .= 'align-items: center;';
+		/**
+		 * Add this style only if is not empty for backwards compatibility,
+		 * since we intend to convert blocks that had flex layout implemented
+		 * by custom css.
+		 */
+		if ( ! empty( $layout['justifyContent'] ) ) {
+			$style .= "justify-content: {$layout['justifyContent']};";
+		}
 		$style .= '}';
 
 		$style .= "$selector > * { margin: 0; }";

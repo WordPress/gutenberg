@@ -41,7 +41,14 @@
 	"supports": {
 		"align": [ "left", "center", "right" ],
 		"anchor": true,
-		"__experimentalExposeControlsToChildren": true
+		"__experimentalExposeControlsToChildren": true,
+		"__experimentalLayout": {
+			"allowSwitching": false,
+			"allowInheriting": false,
+			"default": {
+				"type": "flex"
+			}
+		}
 	},
 	"styles": [
 		{ "name": "default", "label": "Default", "isDefault": true },
