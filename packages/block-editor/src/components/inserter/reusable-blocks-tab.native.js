@@ -1,6 +1,7 @@
 /**
  * WordPress dependencies
  */
+import { useCallback } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
 
 /**
@@ -9,16 +10,21 @@ import { useSelect } from '@wordpress/data';
 import BlockTypesList from '../block-types-list';
 import { store as blockEditorStore } from '../../store';
 
-const REUSABLE_BLOCKS_CATEGORY = 'reusable';
+function ReusableBlocksTab( {
+	onSelect,
+	rootClientId,
+	listProps,
+	allowedBlockFilter = () => true,
+} ) {
+	const blockFilter = useCallback( ( block ) =>
+		allowedBlockFilter( block, { onlyReusable: true } )
+	);
 
-function ReusableBlocksTab( { onSelect, rootClientId, listProps } ) {
 	const { items } = useSelect(
 		( select ) => {
 			const { getInserterItems } = select( blockEditorStore );
 			const allItems = getInserterItems( rootClientId );
-			const reusableBlockItems = allItems.filter(
-				( { category } ) => category === REUSABLE_BLOCKS_CATEGORY
-			);
+			const reusableBlockItems = allItems.filter( blockFilter );
 
 			return { items: reusableBlockItems };
 		},

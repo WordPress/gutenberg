@@ -31,6 +31,7 @@ function InserterTabs( {
 	rootClientId,
 	showReusableBlocks,
 	tabIndex,
+	allowedBlockFilter,
 } ) {
 	const tabAnimation = useRef( new Animated.Value( 0 ) ).current;
 	const lastScrollEvents = useRef( [] ).current;
@@ -105,6 +106,7 @@ function InserterTabs( {
 							rootClientId={ rootClientId }
 							onSelect={ onSelect }
 							listProps={ { ...listProps, onScroll } }
+							allowedBlockFilter={ allowedBlockFilter }
 						/>
 					</View>
 				) ) }

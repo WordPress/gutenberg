@@ -12,15 +12,13 @@ import InserterNoResults from './no-results';
 import { store as blockEditorStore } from '../../store';
 import useBlockTypeImpressions from './hooks/use-block-type-impressions';
 
-const NON_BLOCK_CATEGORIES = [ 'reusable' ];
-const ALLOWED_EMBED_VARIATIONS = [ 'core/embed' ];
-
 function InserterSearchResults( {
 	filterValue,
 	onSelect,
 	listProps,
 	rootClientId,
 	isFullScreen,
+	allowedBlockFilter = () => true,
 } ) {
 	const { blockTypes } = useSelect(
 		( select ) => {
@@ -28,15 +26,8 @@ function InserterSearchResults( {
 				rootClientId
 			);
 
-			const blockItems = allItems.filter(
-				( { id, category } ) =>
-					! NON_BLOCK_CATEGORIES.includes( category ) &&
-					// We don't want to show all possible embed variations
-					// as different blocks in the inserter. We'll only show a
-					// few popular ones.
-					( category !== 'embed' ||
-						( category === 'embed' &&
-							ALLOWED_EMBED_VARIATIONS.includes( id ) ) )
+			const blockItems = allItems.filter( ( block ) =>
+				allowedBlockFilter( block, { allowReusable: true } )
 			);
 
 			const filteredItems = searchItems( blockItems, filterValue );
