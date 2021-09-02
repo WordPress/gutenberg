@@ -16,9 +16,24 @@ figure.wp-block-gallery {
 		flex: 0 0 100%;
 	}
 
-	.components-form-file-upload {
+	> .components-form-file-upload {
 		flex-basis: 100%;
 	}
+
+	.wp-block-image {
+		.components-notice.is-error {
+			display: block;
+		}
+		.components-notice__content {
+			margin: 4px 0;
+		}
+		.components-notice__dismiss {
+			position: absolute;
+			top: 0;
+			right: 5px;
+		}
+	}
+
 	// @todo: this deserves a refactor, by being moved to the toolbar.
 	.block-editor-media-placeholder.is-appender {
 		.components-placeholder__label {
