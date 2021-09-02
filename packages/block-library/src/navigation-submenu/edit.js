@@ -441,6 +441,7 @@ export default function NavigationSubmenuEdit( {
 				'background-color',
 				backgroundColor
 			) ]: !! backgroundColor,
+			'open-on-click': openSubmenusOnClick,
 		} ),
 		style: {
 			color: ! textColor && customTextColor,
