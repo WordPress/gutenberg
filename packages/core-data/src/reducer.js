@@ -281,7 +281,6 @@ function entity( entityConfig ) {
 								pending:
 									action.type === 'SAVE_ENTITY_RECORD_START',
 								error: action.error,
-								isAutosave: action.isAutosave,
 							},
 						};
 				}
