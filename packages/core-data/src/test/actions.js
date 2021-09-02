@@ -185,6 +185,7 @@ describe( 'reconcileAutosaveResults', () => {
 		status: 'updatedRecord status',
 		excerpt: 'updatedRecord excerpt',
 		sticky: 'updatedRecord sticky',
+		content: 'updatedRecord content',
 	};
 	it( 'has all the same keys as the merged data', () => {
 		const reconciled = reconcileAutosave(
@@ -209,7 +210,7 @@ describe( 'reconcileAutosaveResults', () => {
 			expect.objectContaining( {
 				title: 'updatedRecord title',
 				excerpt: 'updatedRecord excerpt',
-				content: 'persisted content',
+				content: 'updatedRecord content',
 			} )
 		);
 	} );
@@ -228,11 +229,11 @@ describe( 'reconcileAutosaveResults', () => {
 				...persistedRecord,
 				status: 'auto-draft',
 			},
-			requestData,
 			{
-				...updatedRecord,
+				...requestData,
 				status: 'draft',
-			}
+			},
+			updatedRecord
 		);
 		expect( reconciled.status ).toEqual( 'draft' );
 	} );
@@ -249,11 +250,11 @@ describe( 'reconcileAutosaveResults', () => {
 					...persistedRecord,
 					status: _from,
 				},
-				requestData,
 				{
-					...updatedRecord,
-					status: _to,
-				}
+					...requestData,
+					stat1us: _to,
+				},
+				updatedRecord
 			);
 			expect( reconciled.status ).toEqual( _from );
 		} )

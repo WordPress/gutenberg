@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { get, castArray, isEqual, find } from 'lodash';
+import { castArray, isEqual, find } from 'lodash';
 import { v4 as uuid } from 'uuid';
 
 /**
@@ -517,34 +517,23 @@ export function reconcileAutosave(
 	requestData,
 	updatedRecord
 ) {
-	const newRecord = {
+	const { title, excerpt, content } = updatedRecord;
+
+	// Status is only persisted in autosaves when going from
+	// "auto-draft" to "draft".
+	const newStatus =
+		persistedRecord.status === 'auto-draft' &&
+		requestData.status === 'draft'
+			? requestData.status
+			: persistedRecord.status;
+
+	return {
 		...persistedRecord,
-		...requestData,
-		...updatedRecord,
+		title,
+		excerpt,
+		content,
+		status: newStatus,
 	};
-	return Object.keys( newRecord ).reduce( ( acc, key ) => {
-		// These properties are persisted in autosaves.
-		if ( [ 'title', 'excerpt', 'content' ].includes( key ) ) {
-			// Edits should be the "raw" attribute values.
-			acc[ key ] = get( newRecord[ key ], 'raw', newRecord[ key ] );
-		} else if ( key === 'status' ) {
-			// Status is only persisted in autosaves when going from
-			// "auto-draft" to "draft".
-			acc[ key ] =
-				persistedRecord.status === 'auto-draft' &&
-				newRecord.status === 'draft'
-					? newRecord.status
-					: persistedRecord.status;
-		} else {
-			// These properties are not persisted in autosaves.
-			acc[ key ] = get(
-				persistedRecord[ key ],
-				'raw',
-				persistedRecord[ key ]
-			);
-		}
-		return acc;
-	}, {} );
 }
 
 /**
