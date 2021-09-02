@@ -75,7 +75,7 @@ export default function CustomSelectControl( {
 		items,
 		itemToString,
 		onSelectedItemChange,
-		selectedItem: _selectedItem,
+		...( _selectedItem ? { selectedItem: _selectedItem } : undefined ),
 		stateReducer,
 	} );
 
