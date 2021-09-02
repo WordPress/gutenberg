@@ -28,9 +28,15 @@ export const _default = () => {
 	const [ alignState, setAlignState ] = useState( aligns[ 0 ] );
 	const label = text( 'Label', 'Toggle Group Control' );
 	const hideLabelFromVision = boolean( 'Hide label from vision', false );
-	const help = text( 'Help Text', 'This is the help text' );
-	const isBlock = boolean( 'Render as a (CSS) block element', true );
-
+	const isBlock = boolean(
+		'Render `ToggleGroupControl` as a (CSS) block element',
+		false
+	);
+	const help = text( 'Help Text' );
+	const isAdaptiveWidth = boolean(
+		'Render segments with equal widths',
+		false
+	);
 	return (
 		<View>
 			<ToggleGroupControl
@@ -40,6 +46,7 @@ export const _default = () => {
 				hideLabelFromVision={ hideLabelFromVision }
 				help={ help }
 				isBlock={ isBlock }
+				isAdaptiveWidth={ isAdaptiveWidth }
 			>
 				{ alignOptions }
 			</ToggleGroupControl>
