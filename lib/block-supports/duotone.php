@@ -382,7 +382,7 @@ function gutenberg_render_duotone_support( $block_content, $block ) {
 
 	$duotone_values = get_duotone_color_values( $duotone_colors );
 
-	$duotone_id = 'wp-duotone-' . uniqid();
+	$duotone_id = gutenberg_get_duotone_filter_id( uniqid() );
 
 	$selectors        = explode( ',', $duotone_support );
 	$selectors_scoped = array_map(
@@ -424,28 +424,22 @@ remove_filter( 'render_block', 'wp_render_duotone_support', 10, 2 );
 add_filter( 'render_block', 'gutenberg_render_duotone_support', 10, 2 );
 
 /**
- * Renders a the SVG and CSS to make duotone filters work.
+ * Returns the ID for the duotone filter
+ *
+ * @param string $id The ID of the filter.
  */
-function gutenberg_render_duotone_filters_from_theme_json() {
-	if (
-		! get_theme_support( 'experimental-link-color' ) && // link color support needs the presets CSS variables regardless of the presence of theme.json file.
-		! WP_Theme_JSON_Resolver_Gutenberg::theme_has_support() ) {
-		return;
-	}
-
-
-	$settings = gutenberg_get_default_block_editor_settings();
-	$theme_json = WP_Theme_JSON_Resolver_Gutenberg::get_merged_data( $settings );
-
-	$theme_json_settings = $theme_json->get_settings();
-	if( ! empty( $theme_json_settings['color'] ) && ! empty( $theme_json_settings['color']['duotone'] ) &&  ! empty( $theme_json_settings['color']['duotone'] ) ) {
-		foreach( $theme_json_settings['color']['duotone'] as $duotone_setting ) {
-			$duotone_values = get_duotone_color_values( $duotone_setting['colors'] );
-			$duotone_id = 'wp-duotone-' . $duotone_setting['slug'];
-			$duotone_markup = gutenberg_get_duotone_svg_filters( $duotone_id, $duotone_values );
-			gutenberg_output_duotone_markup( $duotone_markup );
-		}
-	}
+function gutenberg_get_duotone_filter_id( $id ) {
+	return 'wp-duotone-' . $id;
 }
 
-add_action( 'enqueue_block_assets', 'gutenberg_render_duotone_filters_from_theme_json' );
+/**
+ * Generates duotone markup from a settings array
+ *
+ * @param  array  $duotone_setting Block object.
+ */
+function gutenberg_generate_duotone_filters_settings( $duotone_setting) {
+	$duotone_values = get_duotone_color_values( $duotone_setting['colors'] );
+	$duotone_id = gutenberg_get_duotone_filter_id( $duotone_setting['slug'] );
+	$duotone_markup = gutenberg_get_duotone_svg_filters( $duotone_id, $duotone_values );
+	gutenberg_output_duotone_markup( $duotone_markup );
+}

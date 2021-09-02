@@ -858,6 +858,13 @@ class WP_Theme_JSON_Gutenberg {
 			$preset_rules .= self::compute_preset_classes( $node, $selector );
 		}
 
+		$theme_json_settings = $this->get_settings();
+		if( ! empty( $theme_json_settings['color'] ) && ! empty( $theme_json_settings['color']['duotone'] ) &&  ! empty( $theme_json_settings['color']['duotone'] ) ) {
+			foreach( $theme_json_settings['color']['duotone'] as $duotone_setting ) {
+				gutenberg_generate_duotone_filters_settings( $duotone_setting );
+			}
+		}
+
 		return $block_rules . $preset_rules;
 	}
 
