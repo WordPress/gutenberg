@@ -7,7 +7,13 @@ import { omit } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { RawHTML, useRef, useCallback, forwardRef } from '@wordpress/element';
+import {
+	RawHTML,
+	useRef,
+	useCallback,
+	forwardRef,
+	createContext,
+} from '@wordpress/element';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { children as childrenSource } from '@wordpress/blocks';
 import { useInstanceId, useMergeRefs } from '@wordpress/compose';
@@ -38,6 +44,8 @@ import { useFormatTypes } from './use-format-types';
 import { useRemoveBrowserShortcuts } from './use-remove-browser-shortcuts';
 import FormatEdit from './format-edit';
 import { getMultilineTag, getAllowedFormats } from './utils';
+
+export const keyboardShortcutContext = createContext( new Set() );
 
 /**
  * Removes props used for the native version of RichText so that they are not
@@ -244,8 +252,14 @@ function RichTextWrapper(
 	useCaretInFormat( { value } );
 	useMarkPersistent( { html: adjustedValue, value } );
 
+	const keyboardShortcuts = useRef( new Set() );
+
 	function onKeyDown( event ) {
 		const { keyCode } = event;
+
+		for ( const keyboardShortcut of keyboardShortcuts.current ) {
+			keyboardShortcut( event );
+		}
 
 		if ( event.defaultPrevented ) {
 			return;
@@ -290,13 +304,17 @@ function RichTextWrapper(
 				children &&
 				children( { value, onChange, onFocus } ) }
 			{ isSelected && (
-				<FormatEdit
-					value={ value }
-					onChange={ onChange }
-					onFocus={ onFocus }
-					formatTypes={ formatTypes }
-					forwardedRef={ anchorRef }
-				/>
+				<keyboardShortcutContext.Provider
+					value={ keyboardShortcuts.current }
+				>
+					<FormatEdit
+						value={ value }
+						onChange={ onChange }
+						onFocus={ onFocus }
+						formatTypes={ formatTypes }
+						forwardedRef={ anchorRef }
+					/>
+				</keyboardShortcutContext.Provider>
 			) }
 			{ isSelected && hasFormats && (
 				<FormatToolbarContainer
