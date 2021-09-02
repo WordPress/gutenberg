@@ -24,9 +24,11 @@ function gutenberg_extend_block_editor_settings_with_default_editor_styles( $set
 
 	// Remove the default font addition from Core Code.
 	$styles_without_core_styles = array();
-	foreach ( $settings['styles'] as $style ) {
-		if ( 'core' !== $style['__unstableType'] ) {
-			$styles_without_core_styles[] = $style;
+	if ( isset( $settings['styles'] ) ) {
+		foreach ( $settings['styles'] as $style ) {
+			if ( 'core' !== $style['__unstableType'] ) {
+				$styles_without_core_styles[] = $style;
+			}
 		}
 	}
 	$settings['styles'] = $styles_without_core_styles;
