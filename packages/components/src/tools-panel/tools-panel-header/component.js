@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { check, moreVertical } from '@wordpress/icons';
+import { check, minus, moreVertical } from '@wordpress/icons';
 import { __ } from '@wordpress/i18n';
 
 /**
@@ -27,6 +27,9 @@ const ToolsPanelHeader = ( props, forwardedRef ) => {
 		return null;
 	}
 
+	const defaultItems = Object.entries( menuItems?.default || {} );
+	const optionalItems = Object.entries( menuItems?.optional || {} );
+
 	return (
 		<h2 { ...headerProps } ref={ forwardedRef }>
 			{ labelText }
@@ -34,26 +37,54 @@ const ToolsPanelHeader = ( props, forwardedRef ) => {
 				<DropdownMenu icon={ moreVertical } label={ labelText }>
 					{ ( { onClose } ) => (
 						<>
-							<MenuGroup label={ __( 'Display options' ) }>
-								{ Object.entries( menuItems ).map(
-									( [ label, isSelected ] ) => {
-										return (
-											<MenuItem
-												key={ label }
-												icon={ isSelected && check }
-												isSelected={ isSelected }
-												onClick={ () => {
-													toggleItem( label );
-													onClose();
-												} }
-												role="menuitemcheckbox"
-											>
-												{ label }
-											</MenuItem>
-										);
-									}
-								) }
-							</MenuGroup>
+							{ !! defaultItems?.length && (
+								<MenuGroup>
+									{ defaultItems.map(
+										( [ label, hasValue ] ) => {
+											const icon = hasValue
+												? minus
+												: check;
+											return (
+												<MenuItem
+													key={ label }
+													icon={ icon }
+													isSelected={ true }
+													disabled={ ! hasValue }
+													onClick={ () => {
+														toggleItem( label );
+														onClose();
+													} }
+													role="menuitemcheckbox"
+												>
+													{ label }
+												</MenuItem>
+											);
+										}
+									) }
+								</MenuGroup>
+							) }
+							{ !! optionalItems?.length && (
+								<MenuGroup>
+									{ optionalItems.map(
+										( [ label, isSelected ] ) => {
+											return (
+												<MenuItem
+													key={ label }
+													icon={ isSelected && check }
+													isSelected={ isSelected }
+													onClick={ () => {
+														toggleItem( label );
+														onClose();
+													} }
+													role="menuitemcheckbox"
+												>
+													{ label }
+												</MenuItem>
+											);
+										}
+									) }
+								</MenuGroup>
+							) }
 							<MenuGroup>
 								<MenuItem
 									onClick={ () => {
