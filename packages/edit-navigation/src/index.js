@@ -36,7 +36,7 @@ const registerBlock = ( block ) => {
 };
 
 export function initialize( id, settings ) {
-	addFilters( ! settings.blockNavMenus );
+	addFilters();
 
 	registerBlock( menuBlock );
 	registerBlock( menuItemBlock );
