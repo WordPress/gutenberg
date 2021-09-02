@@ -382,7 +382,7 @@ function gutenberg_render_duotone_support( $block_content, $block ) {
 
 	$duotone_values = get_duotone_color_values( $duotone_colors );
 
-	$duotone_id = 'wp-duotone-filter-' . uniqid();
+	$duotone_id = 'wp-duotone-' . uniqid();
 
 	$selectors        = explode( ',', $duotone_support );
 	$selectors_scoped = array_map(
@@ -438,10 +438,10 @@ function gutenberg_render_duotone_filters_from_theme_json() {
 	$theme_json = WP_Theme_JSON_Resolver_Gutenberg::get_merged_data( $settings );
 
 	$theme_json_settings = $theme_json->get_settings();
-	if( ! empty( $theme_json_settings['color'] ) && ! empty( $theme_json_settings['color']['duotone'] ) &&  ! empty( $theme_json_settings['color']['duotone']['theme'] ) ) {
-		foreach( $theme_json_settings['color']['duotone']['theme'] as $duotone_setting ) {
+	if( ! empty( $theme_json_settings['color'] ) && ! empty( $theme_json_settings['color']['duotone'] ) &&  ! empty( $theme_json_settings['color']['duotone'] ) ) {
+		foreach( $theme_json_settings['color']['duotone'] as $duotone_setting ) {
 			$duotone_values = get_duotone_color_values( $duotone_setting['colors'] );
-			$duotone_id = 'wp-duotone-filter-' . $duotone_setting['slug'];
+			$duotone_id = 'wp-duotone-' . $duotone_setting['slug'];
 			$duotone_markup = gutenberg_get_duotone_svg_filters( $duotone_id, $duotone_values );
 			gutenberg_output_duotone_markup( $duotone_markup );
 		}
