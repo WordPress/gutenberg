@@ -48,14 +48,8 @@
 @import "./term-description/editor.scss";
 
 :root .editor-styles-wrapper {
-	// Background colors.
-	@include background-colors();
-
-	// Foreground colors.
-	@include foreground-colors();
-
-	// Gradients
-	@include gradient-colors();
+	@include background-colors-deprecated();
+	@include foreground-colors-deprecated();
 }
 
 // Font sizes.
