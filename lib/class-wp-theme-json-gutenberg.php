@@ -103,6 +103,7 @@ class WP_Theme_JSON_Gutenberg {
 			'customMargin'  => null,
 			'customPadding' => null,
 			'units'         => null,
+			'blockGap'      => null,
 		),
 		'typography' => array(
 			'customFontSize'        => null,

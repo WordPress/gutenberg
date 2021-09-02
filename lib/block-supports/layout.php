@@ -28,12 +28,13 @@ function gutenberg_register_layout_support( $block_type ) {
 /**
  * Generates the CSS corresponding to the provided layout.
  *
- * @param string $selector CSS selector.
- * @param array  $layout   Layout object.
+ * @param string  $selector CSS selector.
+ * @param array   $layout   Layout object.
+ * @param boolean $has_block_gap_support Whether the theme has support for the block gap.
  *
  * @return string CSS style.
  */
-function gutenberg_get_layout_style( $selector, $layout ) {
+function gutenberg_get_layout_style( $selector, $layout, $has_block_gap_support = false ) {
 	$layout_type = isset( $layout['type'] ) ? $layout['type'] : 'default';
 
 	$style = '';
@@ -63,11 +64,17 @@ function gutenberg_get_layout_style( $selector, $layout ) {
 
 		$style .= "$selector .alignleft { float: left; margin-right: 2em; }";
 		$style .= "$selector .alignright { float: right; margin-left: 2em; }";
-		$style .= "$selector > * + * { margin-top: var( --wp--style--block-gap ); margin-bottom: 0; }";
+		if ( $has_block_gap_support ) {
+			$style .= "$selector > * + * { margin-top: var( --wp--style--block-gap ); margin-bottom: 0; }";
+		}
 	} elseif ( 'flex' === $layout_type ) {
 		$style  = "$selector {";
 		$style .= 'display: flex;';
-		$style .= 'gap: var( --wp--style--block-gap, 0.5em );';
+		if ( $has_block_gap_support ) {
+			$style .= 'gap: var( --wp--style--block-gap, 0.5em );';
+		} else {
+			$style .= 'gap: 0.5em;';
+		}
 		$style .= 'flex-wrap: wrap;';
 		$style .= 'align-items: center;';
 		$style .= '}';
@@ -93,11 +100,13 @@ function gutenberg_render_layout_support_flag( $block_content, $block ) {
 		return $block_content;
 	}
 
-	$default_block_layout = _wp_array_get( $block_type->supports, array( '__experimentalLayout', 'default' ), array() );
-	$used_layout          = isset( $block['attrs']['layout'] ) ? $block['attrs']['layout'] : $default_block_layout;
+	$tree                  = WP_Theme_JSON_Resolver_Gutenberg::get_merged_data( array(), 'theme' );
+	$theme_settings        = $tree->get_settings();
+	$default_layout        = _wp_array_get( $tree->get_settings(), array( 'layout' ) );
+	$has_block_gap_support = isset( $theme_settings['spacing']['blockGap'] ) ? null !== $theme_settings['spacing']['blockGap'] : false;
+	$default_block_layout  = _wp_array_get( $block_type->supports, array( '__experimentalLayout', 'default' ), array() );
+	$used_layout           = isset( $block['attrs']['layout'] ) ? $block['attrs']['layout'] : $default_block_layout;
 	if ( isset( $used_layout['inherit'] ) && $used_layout['inherit'] ) {
-		$tree           = WP_Theme_JSON_Resolver_Gutenberg::get_merged_data( array(), 'theme' );
-		$default_layout = _wp_array_get( $tree->get_settings(), array( 'layout' ) );
 		if ( ! $default_layout ) {
 			return $block_content;
 		}
@@ -105,7 +114,7 @@ function gutenberg_render_layout_support_flag( $block_content, $block ) {
 	}
 
 	$id    = uniqid();
-	$style = gutenberg_get_layout_style( ".wp-container-$id", $used_layout );
+	$style = gutenberg_get_layout_style( ".wp-container-$id", $used_layout, $has_block_gap_support );
 	// This assumes the hook only applies to blocks with a single wrapper.
 	// I think this is a reasonable limitation for that particular hook.
 	$content = preg_replace(
