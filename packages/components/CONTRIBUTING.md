@@ -116,7 +116,15 @@ Note: Instead of using Emotion's standard `cx` function, the custom [`useCx` hoo
 
 #### Context system
 
-[To be expanded]
+The `@wordpress/components` context system is based on [React's `Context` API](https://reactjs.org/docs/context.html), and is a way for components to adapt to the "context" they're being rendered in.
+
+Components can use this system via a couple of functions:
+
+- they can provide values using a shared `ContextSystemProvider` component
+- they can connect to the Context via `contextConnect`
+- they can read the "computed" values from the context via `useContextSystem`
+
+An example of how this is used is the [`Card` component](https://github.com/WordPress/gutenberg/blob/trunk/packages/components/src/card/card/component.js#L44-L54) — all of its subcomponents (e.g. `CardBody`, `CardHeader`...) will [use, by default, the same value for the `size` as the parent `Card` component](https://github.com/WordPress/gutenberg/blob/trunk/packages/components/src/card/card-body/hook.js#L23) — which results in all the components having all the correct spacing "auto-magically".
 
 #### Unit tests
 
