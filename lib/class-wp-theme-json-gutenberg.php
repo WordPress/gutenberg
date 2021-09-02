@@ -611,7 +611,6 @@ class WP_Theme_JSON_Gutenberg {
 				$result[ preg_replace( '/\s+/', '-', $preset['slug'] ) ] = $preset[ $value_key ];
 			}
 		}
-
 		return $result;
 	}
 
