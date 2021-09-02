@@ -12,6 +12,7 @@ import { Placeholder, TextControl } from '@wordpress/components';
 import { group as groupIcon } from '@wordpress/icons';
 import { __ } from '@wordpress/i18n';
 import { useSelect } from '@wordpress/data';
+import { getBlockType } from '@wordpress/blocks';
 
 export default function Edit( props ) {
 	const { clientId, isSelected } = props;
@@ -21,23 +22,18 @@ export default function Edit( props ) {
 	if ( innerBlocks.length === 0 ) {
 		return <SetUp { ...props } />;
 	} else if ( isSelected ) {
-		return <EditTitle { ...props } />;
+		return <EditTitle { ...props } innerBlocks={ innerBlocks } />;
 	}
-	return <Preview { ...props } />;
+	return <Preview { ...props } innerBlocks={ innerBlocks } />;
 }
 
-function SetUp( { attributes, setAttributes, clientId } ) {
+function SetUp( { clientId } ) {
 	return (
 		<div { ...useBlockProps() }>
 			<Placeholder
 				icon={ <BlockIcon icon={ groupIcon } /> }
 				label={ __( 'Widget Group' ) }
 			>
-				<TextControl
-					label={ __( 'Title' ) }
-					value={ attributes.title }
-					onChange={ ( title ) => setAttributes( { title } ) }
-				/>
 				<ButtonBlockAppender rootClientId={ clientId } />
 			</Placeholder>
 			<InnerBlocks renderAppender={ false } />
@@ -45,12 +41,14 @@ function SetUp( { attributes, setAttributes, clientId } ) {
 	);
 }
 
-function EditTitle( { attributes, setAttributes } ) {
+function EditTitle( { attributes, setAttributes, innerBlocks } ) {
+	const defaultTitle = getDefaultTitle( innerBlocks );
 	return (
 		<div { ...useBlockProps() }>
-			<h3>{ __( 'Widget Group' ) }</h3>
+			<h3>{ attributes.title || defaultTitle }</h3>
 			<TextControl
 				label={ __( 'Title' ) }
+				placeholder={ defaultTitle }
 				value={ attributes.title }
 				onChange={ ( title ) => setAttributes( { title } ) }
 			/>
@@ -58,11 +56,18 @@ function EditTitle( { attributes, setAttributes } ) {
 	);
 }
 
-function Preview( { attributes } ) {
+function Preview( { attributes, innerBlocks } ) {
 	return (
 		<div { ...useBlockProps() }>
-			<h2>{ attributes.title }</h2>
+			<h3>{ attributes.title || getDefaultTitle( innerBlocks ) }</h3>
 			<InnerBlocks />
 		</div>
 	);
+}
+
+function getDefaultTitle( innerBlocks ) {
+	if ( innerBlocks.length === 0 ) {
+		return null;
+	}
+	return getBlockType( innerBlocks[ 0 ].name ).title;
 }
