@@ -1,0 +1,17 @@
+{
+	"apiVersion": 2,
+	"name": "edit-navigation/menu",
+	"title": "Menu",
+	"category": "theme",
+	"description": "A collection of blocks that allow visitors to get around your site.",
+	"keywords": [ "menu", "navigation", "links" ],
+	"textdomain": "default",
+	"attributes": {},
+	"supports": {
+		"customClassName": false,
+		"html": false,
+		"inserter": true
+	},
+	"editorStyle": "wp-block-menu-editor",
+	"style": "wp-block-menu"
+}
