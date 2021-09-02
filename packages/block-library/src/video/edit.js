@@ -102,7 +102,7 @@ function VideoEdit( {
 		setAttributes( {
 			src: media.url,
 			id: media.id,
-			poster: media?.image?.src,
+			poster: media.image?.src,
 		} );
 	}
 
