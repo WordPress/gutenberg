@@ -19,9 +19,19 @@
 		padding: 0;
 	}
 
-	// Add buttons
+	// Appender styles
+	.block-list-appender {
+		// Make appender rows the same height as items and center the button vertically.
+		display: flex;
+		flex-direction: column;
+		justify-content: center;
+		height: $grid-unit-50;
+		margin: $grid-unit-10 0;
+	}
+
 	.block-editor-button-block-appender.block-list-appender__toggle {
-		margin: 0 0 0 $grid-unit-20;
+		margin: 0 0 0 $grid-unit-30;
 		padding: 0;
 	}
 }
+

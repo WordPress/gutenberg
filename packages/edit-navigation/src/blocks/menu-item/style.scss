@@ -1,6 +1,7 @@
 // Menu item container.
 .wp-block-menu-item {
 	display: block;
+	margin: $grid-unit-10 0;
 
 	// Hide submenus by default.
 	.wp-block-menu-item__submenu-container {
@@ -10,7 +11,7 @@
 	// Show submenus on click.
 	&.has-child.is-editing > .wp-block-menu-item__submenu-container {
 		display: block;
-		padding-left: $grid-unit-15;
+		padding-left: $grid-unit-20 + $grid-unit-05;
 		border: none;
 
 		&::before {
@@ -28,7 +29,6 @@
 		display: block;
 		color: inherit;
 		padding: 0.5em 1em;
-		margin-bottom: 6px;
 		border-radius: $radius-block-ui;
 
 		&:hover {
@@ -63,10 +63,10 @@
 			@include reduce-motion("transition");
 		}
 	}
-}
 
-// Rotate icon downwards when a submenu is open.
-.is-selected.has-child > .wp-block-menu-item__submenu-icon svg,
-.has-child-selected.has-child > .wp-block-menu-item__submenu-icon svg {
-	transform: rotate(0deg);
+	// Rotate icon downwards when a submenu is open.
+	&.is-selected.has-child > .wp-block-menu-item__submenu-icon svg,
+	&.has-child-selected.has-child > .wp-block-menu-item__submenu-icon svg {
+		transform: rotate(0deg);
+	}
 }
