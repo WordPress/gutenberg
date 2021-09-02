@@ -42,10 +42,13 @@ import { useInputRules } from './use-input-rules';
 import { useEnter } from './use-enter';
 import { useFormatTypes } from './use-format-types';
 import { useRemoveBrowserShortcuts } from './use-remove-browser-shortcuts';
+import { useShortcuts } from './use-shortcuts';
+import { useInputEvents } from './use-input-events';
 import FormatEdit from './format-edit';
 import { getMultilineTag, getAllowedFormats } from './utils';
 
-export const keyboardShortcutContext = createContext( new Set() );
+export const keyboardShortcutContext = createContext();
+export const inputEventContext = createContext();
 
 /**
  * Removes props used for the native version of RichText so that they are not
@@ -253,13 +256,10 @@ function RichTextWrapper(
 	useMarkPersistent( { html: adjustedValue, value } );
 
 	const keyboardShortcuts = useRef( new Set() );
+	const inputEvents = useRef( new Set() );
 
 	function onKeyDown( event ) {
 		const { keyCode } = event;
-
-		for ( const keyboardShortcut of keyboardShortcuts.current ) {
-			keyboardShortcut( event );
-		}
 
 		if ( event.defaultPrevented ) {
 			return;
@@ -307,13 +307,15 @@ function RichTextWrapper(
 				<keyboardShortcutContext.Provider
 					value={ keyboardShortcuts.current }
 				>
-					<FormatEdit
-						value={ value }
-						onChange={ onChange }
-						onFocus={ onFocus }
-						formatTypes={ formatTypes }
-						forwardedRef={ anchorRef }
-					/>
+					<inputEventContext.Provider value={ inputEvents.current }>
+						<FormatEdit
+							value={ value }
+							onChange={ onChange }
+							onFocus={ onFocus }
+							formatTypes={ formatTypes }
+							forwardedRef={ anchorRef }
+						/>
+					</inputEventContext.Provider>
 				</keyboardShortcutContext.Provider>
 			) }
 			{ isSelected && hasFormats && (
@@ -341,6 +343,8 @@ function RichTextWrapper(
 						onReplace,
 					} ),
 					useRemoveBrowserShortcuts(),
+					useShortcuts( keyboardShortcuts ),
+					useInputEvents( inputEvents ),
 					useUndoAutomaticChange(),
 					usePasteHandler( {
 						isSelected,
