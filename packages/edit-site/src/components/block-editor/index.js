@@ -3,9 +3,7 @@
  */
 import { useSelect, useDispatch } from '@wordpress/data';
 import { useCallback, useRef } from '@wordpress/element';
-import { useEntityBlockEditor } from '@wordpress/core-data';
 import {
-	BlockEditorProvider,
 	__experimentalLinkControl,
 	BlockInspector,
 	BlockList,
@@ -35,26 +33,20 @@ const LAYOUT = {
 };
 
 export default function BlockEditor( { setIsInserterOpen } ) {
-	const { settings, templateType, page, deviceType } = useSelect(
+	const { styles, page, deviceType } = useSelect(
 		( select ) => {
 			const {
 				getSettings,
-				getEditedPostType,
 				getPage,
 				__experimentalGetPreviewDeviceType,
 			} = select( editSiteStore );
 			return {
-				settings: getSettings( setIsInserterOpen ),
-				templateType: getEditedPostType(),
+				styles: getSettings().styles,
 				page: getPage(),
 				deviceType: __experimentalGetPreviewDeviceType(),
 			};
 		},
 		[ setIsInserterOpen ]
-	);
-	const [ blocks, onInput, onChange ] = useEntityBlockEditor(
-		'postType',
-		templateType
 	);
 	const { setPage } = useDispatch( editSiteStore );
 	const resizedCanvasStyles = useResizeCanvas( deviceType, true );
@@ -63,13 +55,7 @@ export default function BlockEditor( { setIsInserterOpen } ) {
 	const mergedRefs = useMergeRefs( [ contentRef, useTypingObserver() ] );
 
 	return (
-		<BlockEditorProvider
-			settings={ settings }
-			value={ blocks }
-			onInput={ onInput }
-			onChange={ onChange }
-			useSubRegistry={ false }
-		>
+		<>
 			<TemplatePartConverter />
 			<__experimentalLinkControl.ViewerFill>
 				{ useCallback(
@@ -92,7 +78,7 @@ export default function BlockEditor( { setIsInserterOpen } ) {
 			>
 				<Iframe
 					style={ resizedCanvasStyles }
-					head={ <EditorStyles styles={ settings.styles } /> }
+					head={ <EditorStyles styles={ styles } /> }
 					ref={ ref }
 					contentRef={ mergedRefs }
 					name="editor-canvas"
@@ -108,6 +94,6 @@ export default function BlockEditor( { setIsInserterOpen } ) {
 					) }
 				</__unstableBlockSettingsMenuFirstItem>
 			</BlockTools>
-		</BlockEditorProvider>
+		</>
 	);
 }
