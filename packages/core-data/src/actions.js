@@ -413,11 +413,16 @@ export const saveEntityRecord = (
 					persistedRecord.id,
 					select.getCurrentUser()?.id
 				);
-				const requestData = prepareAutosaveRequest(
-					persistedRecord,
-					autosavePost,
-					record
-				);
+
+				// Autosaves need all expected fields to be present.
+				// So we fallback to the previous autosave and then
+				// to the actual persisted entity if the edits don't
+				// have a value.
+				const requestData = prepareAutosaveRequest({
+					...persistedRecord,
+					...autosavePost,
+					...record
+				});
 
 				updatedRecord = await __unstableFetch( {
 					path: `${ path }/autosaves`,
@@ -490,51 +495,34 @@ export const saveEntityRecord = (
 	}
 };
 
-export function prepareAutosaveRequest(
-	persistedRecord,
-	autosavePost,
-	record
-) {
-	// Autosaves need all expected fields to be present.
-	// So we fallback to the previous autosave and then
-	// to the actual persisted entity if the edits don't
-	// have a value.
-	const { title, excerpt, content, status } = {
-		...persistedRecord,
-		...autosavePost,
-		...record,
-	};
-	return {
-		title,
-		excerpt,
-		content,
-		status: status === 'auto-draft' ? 'draft' : status,
-	};
-}
+export const prepareAutosaveRequest = (
+	{ title, excerpt, content, status }
+) => ({
+	title,
+	excerpt,
+	content,
+	status: status === 'auto-draft' ? 'draft' : status,
+})
 
-export function reconcileAutosave(
+export const reconcileAutosave = (
 	persistedRecord,
 	requestData,
 	updatedRecord
-) {
-	const { title, excerpt, content } = updatedRecord;
+) => ({
+	...persistedRecord,
+
+	title: updatedRecord.title,
+	excerpt: updatedRecord.excerpt,
+	content: updatedRecord.content,
 
 	// Status is only persisted in autosaves when going from
 	// "auto-draft" to "draft".
-	const newStatus =
+	status:
 		persistedRecord.status === 'auto-draft' &&
 		requestData.status === 'draft'
 			? requestData.status
-			: persistedRecord.status;
-
-	return {
-		...persistedRecord,
-		title,
-		excerpt,
-		content,
-		status: newStatus,
-	};
-}
+			: persistedRecord.status,
+})
 
 /**
  * Runs multiple core-data actions at the same time using one API request.
