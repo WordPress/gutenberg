@@ -7,12 +7,12 @@ import type { Ref } from 'react';
 /**
  * Internal dependencies
  */
-import { contextConnect, PolymorphicComponentProps } from '../ui/context';
+import { contextConnect, WordPressComponentProps } from '../ui/context';
 import { View } from '../view';
 import { useHeading, HeadingProps } from './hook';
 
 function Heading(
-	props: PolymorphicComponentProps< HeadingProps, 'h1' >,
+	props: WordPressComponentProps< HeadingProps, 'h1' >,
 	forwardedRef: Ref< any >
 ) {
 	const headerProps = useHeading( props );

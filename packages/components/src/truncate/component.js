@@ -6,8 +6,8 @@ import { View } from '../view';
 import useTruncate from './hook';
 
 /**
- * @param {import('../ui/context').PolymorphicComponentProps<import('./types').Props, 'span'>} props
- * @param {import('react').Ref<any>}                                                           forwardedRef
+ * @param {import('../ui/context').WordPressComponentProps<import('./types').Props, 'span'>} props
+ * @param {import('react').Ref<any>}                                                         forwardedRef
  */
 function Truncate( props, forwardedRef ) {
 	const truncateProps = useTruncate( props );

@@ -7,13 +7,13 @@ import type { Ref } from 'react';
 /**
  * Internal dependencies
  */
-import { contextConnect, PolymorphicComponentProps } from '../ui/context';
+import { contextConnect, WordPressComponentProps } from '../ui/context';
 import { View } from '../view';
 import { useSpacer } from './hook';
 import type { Props } from './types';
 
 function Spacer(
-	props: PolymorphicComponentProps< Props, 'div' >,
+	props: WordPressComponentProps< Props, 'div' >,
 	forwardedRef: Ref< any >
 ) {
 	const spacerProps = useSpacer( props );

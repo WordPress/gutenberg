@@ -6,8 +6,8 @@ import { View } from '../../view';
 import { useCardMedia } from './hook';
 
 /**
- * @param {import('../../ui/context').PolymorphicComponentProps<{ children: import('react').ReactNode }, 'div'>} props
- * @param {import('react').Ref<any>}                                                                             forwardedRef
+ * @param {import('../../ui/context').WordPressComponentProps<{ children: import('react').ReactNode }, 'div'>} props
+ * @param {import('react').Ref<any>}                                                                           forwardedRef
  */
 function CardMedia( props, forwardedRef ) {
 	const cardMediaProps = useCardMedia( props );

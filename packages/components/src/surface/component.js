@@ -6,8 +6,8 @@ import { View } from '../view';
 import { useSurface } from './hook';
 
 /**
- * @param {import('../ui/context').PolymorphicComponentProps<import('./types').Props, 'div'>} props
- * @param {import('react').Ref<any>}                                                          forwardedRef
+ * @param {import('../ui/context').WordPressComponentProps<import('./types').Props, 'div'>} props
+ * @param {import('react').Ref<any>}                                                        forwardedRef
  */
 function Surface( props, forwardedRef ) {
 	const surfaceProps = useSurface( props );

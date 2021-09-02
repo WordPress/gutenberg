@@ -6,8 +6,8 @@ import { View } from '../view';
 import { useScrollable } from './hook';
 
 /**
- * @param {import('../ui/context').PolymorphicComponentProps<import('./types').Props, 'div'>} props
- * @param {import('react').Ref<any>}                                                          forwardedRef
+ * @param {import('../ui/context').WordPressComponentProps<import('./types').Props, 'div'>} props
+ * @param {import('react').Ref<any>}                                                        forwardedRef
  */
 function Scrollable( props, forwardedRef ) {
 	const scrollableProps = useScrollable( props );

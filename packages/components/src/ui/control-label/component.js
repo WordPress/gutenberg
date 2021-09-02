@@ -6,8 +6,8 @@ import { View } from '../../view';
 import { useControlLabel } from './hook';
 
 /**
- * @param {import('../context').PolymorphicComponentProps<import('./types').Props, 'label'>} props
- * @param {import('react').Ref<any>}                                                         forwardedRef
+ * @param {import('../context').WordPressComponentProps<import('./types').Props, 'label'>} props
+ * @param {import('react').Ref<any>}                                                       forwardedRef
  */
 function ControlLabel( props, forwardedRef ) {
 	const controlLabelProps = useControlLabel( props );
