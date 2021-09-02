@@ -88,9 +88,21 @@ export function roundClamp(
 ) {
 	const baseValue = getNumber( value );
 	const stepValue = getNumber( step );
-	const precision = getPrecision( step );
-	const rounded = Math.round( baseValue / stepValue ) * stepValue;
-	const clampedValue = clamp( rounded, min, max );
+	const precision = Math.max( getPrecision( step ), getPrecision( min ) );
+	const realMin = min === Infinity ? 0 : min;
+
+	let tare = 0;
+	if ( realMin % stepValue ) {
+		tare = realMin;
+	}
+
+	let maxOnStep = max;
+	if ( max % stepValue || Math.abs( tare ) ) {
+		maxOnStep = Math.floor( ( max - tare ) / stepValue ) * stepValue + tare;
+	}
+
+	const rounded = Math.round( ( baseValue - tare ) / stepValue ) * stepValue;
+	const clampedValue = clamp( rounded + tare, min, maxOnStep );
 
 	return precision
 		? getNumber( clampedValue.toFixed( precision ) )
