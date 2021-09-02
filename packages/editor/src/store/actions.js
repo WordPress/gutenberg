@@ -233,6 +233,9 @@ export function* savePost( options = {} ) {
 		STORE_NAME,
 		'getCurrentPost'
 	);
+	if ( options.isAutosave ) {
+	}
+
 	edits = {
 		id: previousRecord.id,
 		...( yield controls.select(

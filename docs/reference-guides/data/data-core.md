@@ -555,6 +555,10 @@ _Returns_
 
 -   `Object`: Action object.
 
+### prepareAutosaveRequest
+
+Undocumented declaration.
+
 ### receiveAutosaves
 
 Returns an action object used in signalling that the autosaves for a
@@ -674,6 +678,10 @@ _Parameters_
 _Returns_
 
 -   `Object`: Action object.
+
+### reconcileAutosave
+
+Undocumented declaration.
 
 ### redo
 
