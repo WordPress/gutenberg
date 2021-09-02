@@ -142,7 +142,7 @@ function gutenberg_experimental_global_styles_settings( $settings ) {
 
 		// Reset existing global styles.
 		$styles_without_existing_global_styles = array();
-		foreach ( $settings['styles'] as $key => $style ) {
+		foreach ( $settings['styles'] as $style ) {
 			if ( ! isset( $style['__unstableType'] ) || 'globalStyles' !== $style['__unstableType'] ) {
 				$styles_without_existing_global_styles[] = $style;
 			}
