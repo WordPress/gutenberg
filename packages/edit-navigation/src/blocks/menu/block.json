@@ -1,6 +1,6 @@
 {
 	"apiVersion": 2,
-	"name": "edit-navigation/menu",
+	"name": "core/menu",
 	"title": "Menu",
 	"category": "theme",
 	"description": "A collection of blocks that allow visitors to get around your site.",

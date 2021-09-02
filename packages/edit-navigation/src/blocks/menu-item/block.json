@@ -1,10 +1,10 @@
 {
 	"apiVersion": 2,
-	"name": "edit-navigation/menu-item",
+	"name": "core/menu-item",
 	"title": "Menu Item",
 	"category": "design",
 	"parent": [
-		"edit-navigation/menu"
+		"core/menu"
 	],
 	"description": "Add a page, link, or another item to your navigation.",
 	"textdomain": "default",

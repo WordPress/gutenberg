@@ -6,7 +6,7 @@ import { createHigherOrderComponent } from '@wordpress/compose';
 
 const removeNavigationBlockEditUnsupportedFeatures = createHigherOrderComponent(
 	( BlockEdit ) => ( props ) => {
-		if ( props.name !== 'edit-navigation/menu' ) {
+		if ( props.name !== 'core/menu' ) {
 			return <BlockEdit { ...props } />;
 		}
 

@@ -6,7 +6,10 @@ import { sortBy } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { createBlock, parse } from '@wordpress/blocks';
+/**
+ * WordPress dependencies
+ */
+import { createBlock } from '@wordpress/blocks';
 
 /**
  * Convert a flat menu item structure to a nested blocks structure.
@@ -37,18 +40,6 @@ function mapMenuItemsToBlocks( menuItems ) {
 	const sortedItems = sortBy( menuItems, 'menu_order' );
 
 	const innerBlocks = sortedItems.map( ( menuItem ) => {
-		if ( menuItem.type === 'block' ) {
-			const [ block ] = parse( menuItem.content.raw );
-
-			if ( ! block ) {
-				return createBlock( 'core/freeform', {
-					content: menuItem.content,
-				} );
-			}
-
-			return block;
-		}
-
 		const attributes = menuItemToBlockAttributes( menuItem );
 
 		// If there are children recurse to build those nested blocks.
@@ -121,7 +112,7 @@ function menuItemToBlockAttributes( {
 	type: menuItemTypeField,
 	target,
 } ) {
-	// For historical reasons, the `core/menu-item` variation type is `tag`
+	// For historical reasons, the `core/navigation-link` variation type is `tag`
 	// whereas WP Core expects `post_tag` as the `object` type.
 	// To avoid writing a block migration we perform a conversion here.
 	// See also inverse equivalent in `blockAttributesToMenuItem`.

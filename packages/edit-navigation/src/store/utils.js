@@ -156,7 +156,7 @@ export function computeCustomizedAttribute(
 
 		let attributes;
 
-		if ( block.name === 'edit-navigation/menu-item' ) {
+		if ( block.name === 'core/menu-item' ) {
 			attributes = blockAttributesToMenuItem( block.attributes );
 		} else {
 			attributes = {
@@ -214,7 +214,7 @@ export const blockAttributesToMenuItem = ( {
 	kind,
 	opensInNewTab,
 } ) => {
-	// For historical reasons, the `edit-navigation/menu-item` variation type is `tag`
+	// For historical reasons, the `core/menu-item` variation type is `tag`
 	// whereas WP Core expects `post_tag` as the `object` type.
 	// To avoid writing a block migration we perform a conversion here.
 	// See also inverse equivalent in `menuItemToBlockAttributes`.
@@ -272,7 +272,7 @@ export const menuItemToBlockAttributes = ( {
 	type: menuItemTypeField,
 	target,
 } ) => {
-	// For historical reasons, the `edit-navigation/menu-item` variation type is `tag`
+	// For historical reasons, the `core/menu-item` variation type is `tag`
 	// whereas WP Core expects `post_tag` as the `object` type.
 	// To avoid writing a block migration we perform a conversion here.
 	// See also inverse equivalent in `blockAttributesToMenuItem`.

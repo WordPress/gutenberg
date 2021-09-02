@@ -31,6 +31,6 @@ export const settings = {
 // importing this file includes side effects. This is whitelisted in block-library/package.json under sideEffects
 addFilter(
 	'blocks.registerBlockType',
-	'edit-navigation/menu-item',
+	'core/menu-item',
 	enhanceNavigationLinkVariations
 );

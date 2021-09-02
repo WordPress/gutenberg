@@ -62,11 +62,11 @@ describe( 'converting menu items to blocks', () => {
 
 		expect( actual ).toEqual( [
 			expect.objectContaining( {
-				name: 'edit-navigation/menu-item',
+				name: 'core/menu-item',
 				innerBlocks: [],
 			} ),
 			expect.objectContaining( {
-				name: 'edit-navigation/menu-item',
+				name: 'core/menu-item',
 				innerBlocks: [],
 			} ),
 		] );
@@ -186,32 +186,32 @@ describe( 'converting menu items to blocks', () => {
 
 		expect( actual ).toEqual( [
 			expect.objectContaining( {
-				name: 'edit-navigation/menu-item',
+				name: 'core/menu-item',
 				attributes: expect.objectContaining( {
 					label: 'Top Level',
 				} ),
 				innerBlocks: [
 					expect.objectContaining( {
-						name: 'edit-navigation/menu-item',
+						name: 'core/menu-item',
 						attributes: expect.objectContaining( {
 							label: 'Child 1',
 						} ),
 						innerBlocks: [],
 					} ),
 					expect.objectContaining( {
-						name: 'edit-navigation/menu-item',
+						name: 'core/menu-item',
 						attributes: expect.objectContaining( {
 							label: 'Child 2',
 						} ),
 						innerBlocks: [
 							expect.objectContaining( {
-								name: 'edit-navigation/menu-item',
+								name: 'core/menu-item',
 								attributes: expect.objectContaining( {
 									label: 'Sub Child',
 								} ),
 								innerBlocks: [
 									expect.objectContaining( {
-										name: 'edit-navigation/menu-item',
+										name: 'core/menu-item',
 										attributes: expect.objectContaining( {
 											label: 'Sub Sub Child',
 										} ),
@@ -224,7 +224,7 @@ describe( 'converting menu items to blocks', () => {
 				],
 			} ),
 			expect.objectContaining( {
-				name: 'edit-navigation/menu-item',
+				name: 'core/menu-item',
 				attributes: expect.objectContaining( {
 					label: 'Top Level 2',
 				} ),
@@ -329,31 +329,31 @@ describe( 'converting menu items to blocks', () => {
 
 		expect( actual ).toEqual( [
 			expect.objectContaining( {
-				name: 'edit-navigation/menu-item',
+				name: 'core/menu-item',
 				attributes: expect.objectContaining( {
 					label: 'Ordered 1st',
 				} ),
 			} ),
 			expect.objectContaining( {
-				name: 'edit-navigation/menu-item',
+				name: 'core/menu-item',
 				attributes: expect.objectContaining( {
 					label: 'Ordered 2nd',
 				} ),
 			} ),
 			expect.objectContaining( {
-				name: 'edit-navigation/menu-item',
+				name: 'core/menu-item',
 				attributes: expect.objectContaining( {
 					label: 'Ordered 3rd',
 				} ),
 			} ),
 			expect.objectContaining( {
-				name: 'edit-navigation/menu-item',
+				name: 'core/menu-item',
 				attributes: expect.objectContaining( {
 					label: 'Ordered 4th',
 				} ),
 			} ),
 			expect.objectContaining( {
-				name: 'edit-navigation/menu-item',
+				name: 'core/menu-item',
 				attributes: expect.objectContaining( {
 					label: 'Ordered 5th',
 				} ),

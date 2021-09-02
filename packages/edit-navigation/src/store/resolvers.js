@@ -92,10 +92,6 @@ function createNavigationBlock( menuItems ) {
 		menuItems
 	);
 
-	const navigationBlock = createBlock(
-		'edit-navigation/menu',
-		{},
-		innerBlocks
-	);
+	const navigationBlock = createBlock( 'core/menu', {}, innerBlocks );
 	return [ navigationBlock, menuItemIdToClientId ];
 }

@@ -226,7 +226,7 @@ describe( 'computeCustomizedAttribute', () => {
 				clientId: 'navigation-link-block-client-id-1',
 				innerBlocks: [],
 				isValid: true,
-				name: 'edit-navigation/menu-item',
+				name: 'core/menu-item',
 			},
 			{
 				attributes: {
@@ -241,7 +241,7 @@ describe( 'computeCustomizedAttribute', () => {
 				clientId: 'navigation-link-block-client-id-2',
 				innerBlocks: [],
 				isValid: true,
-				name: 'edit-navigation/menu-item',
+				name: 'core/menu-item',
 			},
 			{
 				attributes: {
@@ -257,7 +257,7 @@ describe( 'computeCustomizedAttribute', () => {
 				clientId: 'navigation-link-block-client-id-3',
 				innerBlocks: [],
 				isValid: true,
-				name: 'edit-navigation/menu-item',
+				name: 'core/menu-item',
 			},
 		];
 
@@ -375,7 +375,7 @@ describe( 'Mapping block attributes and menu item fields', () => {
 				clientId: 'navigation-link-block-client-id-1',
 				innerBlocks: [],
 				isValid: true,
-				name: 'edit-navigation/menu-item',
+				name: 'core/menu-item',
 			},
 			menuItem: {
 				title: 'Example Page',
@@ -407,7 +407,7 @@ describe( 'Mapping block attributes and menu item fields', () => {
 				clientId: 'navigation-link-block-client-id-2',
 				innerBlocks: [],
 				isValid: true,
-				name: 'edit-navigation/menu-item',
+				name: 'core/menu-item',
 			},
 			menuItem: {
 				title: 'Example Post',
@@ -440,7 +440,7 @@ describe( 'Mapping block attributes and menu item fields', () => {
 				clientId: 'navigation-link-block-client-id-3',
 				innerBlocks: [],
 				isValid: true,
-				name: 'edit-navigation/menu-item',
+				name: 'core/menu-item',
 			},
 			menuItem: {
 				title: 'Example Category',
@@ -470,7 +470,7 @@ describe( 'Mapping block attributes and menu item fields', () => {
 				clientId: 'navigation-link-block-client-id-4',
 				innerBlocks: [],
 				isValid: true,
-				name: 'edit-navigation/menu-item',
+				name: 'core/menu-item',
 			},
 			menuItem: {
 				title: 'Example Tag',
@@ -497,7 +497,7 @@ describe( 'Mapping block attributes and menu item fields', () => {
 				clientId: 'navigation-link-block-client-id-5',
 				innerBlocks: [],
 				isValid: true,
-				name: 'edit-navigation/menu-item',
+				name: 'core/menu-item',
 			},
 			menuItem: {
 				title: 'Example Custom Link',

@@ -1,0 +1,27 @@
+.wp-block-menu {
+	// Horizontal layout
+	display: flex;
+	flex-direction: column;
+	align-items: flex-start;
+	margin: 0;
+	font-size: 15px;
+	padding: $grid-unit-15;
+
+	// This is the default font that is going to be used in the content of the areas (blocks).
+	font-family: $default-font;
+
+	// Normalize list styles.
+	ul,
+	ul li {
+		list-style: none;
+
+		// Overrides generic ".entry-content li" styles on the front end.
+		padding: 0;
+	}
+
+	// Add buttons
+	.block-editor-button-block-appender.block-list-appender__toggle {
+		margin: 0 0 0 $grid-unit-20;
+		padding: 0;
+	}
+}

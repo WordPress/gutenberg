@@ -16,7 +16,7 @@ import { compose } from '@wordpress/compose';
  */
 import Placeholder from './placeholder';
 
-const ALLOWED_BLOCKS = [ 'edit-navigation/menu-item' ];
+const ALLOWED_BLOCKS = [ 'core/menu-item' ];
 
 function MenuEdit( {
 	selectedBlockHasDescendants,

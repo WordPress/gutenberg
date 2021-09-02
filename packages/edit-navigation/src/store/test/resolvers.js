@@ -163,7 +163,7 @@ describe( 'getNavigationPostForMenu', () => {
 							},
 							clientId: 'client-id-0',
 							innerBlocks: [],
-							name: 'edit-navigation/menu-item',
+							name: 'core/menu-item',
 						},
 						{
 							attributes: {
@@ -174,7 +174,7 @@ describe( 'getNavigationPostForMenu', () => {
 							},
 							clientId: 'client-id-1',
 							innerBlocks: [],
-							name: 'edit-navigation/menu-item',
+							name: 'core/menu-item',
 						},
 						{
 							attributes: {
@@ -187,10 +187,10 @@ describe( 'getNavigationPostForMenu', () => {
 							},
 							clientId: 'client-id-2',
 							innerBlocks: [],
-							name: 'edit-navigation/menu-item',
+							name: 'core/menu-item',
 						},
 					],
-					name: 'edit-navigation/menu',
+					name: 'core/menu',
 				},
 			],
 			meta: {
@@ -221,7 +221,7 @@ describe( 'getNavigationPostForMenu', () => {
 		expect( generator.next().done ).toBe( true );
 	} );
 
-	it( 'creates correct edit-navigation/menu-item block variations from menu objects', () => {
+	it( 'creates correct core/menu-item block variations from menu objects', () => {
 		const menuId = 123;
 
 		const generator = getNavigationPostForMenu( menuId );
@@ -292,7 +292,7 @@ describe( 'getNavigationPostForMenu', () => {
 		// Gen step: yield persistPost
 		const persistPostAction = generator.next().value;
 
-		// Get the edit-navigation/menu-item blocks from the generated edit-navigation/menu block innerBlocks.
+		// Get the core/menu-item blocks from the generated core/menu block innerBlocks.
 		const blockAttrs = persistPostAction.args[ 2 ].blocks[ 0 ].innerBlocks.map(
 			( block ) => block.attributes
 		);

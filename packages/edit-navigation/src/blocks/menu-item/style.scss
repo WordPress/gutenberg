@@ -1,0 +1,72 @@
+// Menu item container.
+.wp-block-menu-item {
+	display: block;
+
+	// Hide submenus by default.
+	.wp-block-menu-item__submenu-container {
+		display: none;
+	}
+
+	// Show submenus on click.
+	&.has-child.is-editing > .wp-block-menu-item__submenu-container {
+		display: block;
+		padding-left: $grid-unit-15;
+		border: none;
+
+		&::before {
+			display: none;
+		}
+	}
+
+	// Apply focus outlines.
+	&.is-selected > .wp-block-menu-item__content,
+	&.is-selected:hover > .wp-block-menu-item__content {
+		box-shadow: 0 0 0 var(--wp-admin-border-width-focus) var(--wp-admin-theme-color);
+	}
+
+	.wp-block-menu-item__content {
+		display: block;
+		color: inherit;
+		padding: 0.5em 1em;
+		margin-bottom: 6px;
+		border-radius: $radius-block-ui;
+
+		&:hover {
+			box-shadow: 0 0 0 $border-width $gray-300;
+		}
+	}
+
+	.wp-block-menu-item__label {
+		cursor: text;
+	}
+
+	.wp-block-menu-item__label,
+	.wp-block-menu-item__placeholder-text {
+		padding: $grid-unit-05;
+		padding-left: $grid-unit-10;
+	}
+
+	// Submenu icon indicator.
+	.wp-block-menu-item__submenu-icon {
+		position: absolute;
+		top: 6px;
+		padding: 6px;
+		pointer-events: none;
+
+		svg {
+			display: inline-block;
+			stroke: currentColor;
+
+			// Point rightwards.
+			transform: rotate(-90deg);
+			transition: transform 0.2s ease;
+			@include reduce-motion("transition");
+		}
+	}
+}
+
+// Rotate icon downwards when a submenu is open.
+.is-selected.has-child > .wp-block-menu-item__submenu-icon svg,
+.has-child-selected.has-child > .wp-block-menu-item__submenu-icon svg {
+	transform: rotate(0deg);
+}

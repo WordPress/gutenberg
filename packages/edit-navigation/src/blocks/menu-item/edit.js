@@ -54,7 +54,7 @@ import { store as coreStore } from '@wordpress/core-data';
 import { ItemSubmenuIcon } from './icons';
 import { name } from './block.json';
 
-const ALLOWED_BLOCKS = [ 'edit-navigation/menu-item' ];
+const ALLOWED_BLOCKS = [ 'core/menu-item' ];
 
 /**
  * A React hook to determine if it's dragging within the target element.
@@ -305,7 +305,7 @@ export default function MenuItemEdit( {
 	 */
 	function insertLinkBlock() {
 		const insertionPoint = numberOfDescendants;
-		const blockToInsert = createBlock( 'edit-navigation/menu-item' );
+		const blockToInsert = createBlock( 'core/menu-item' );
 		insertBlock( blockToInsert, insertionPoint, clientId );
 	}
 
@@ -550,7 +550,7 @@ export default function MenuItemEdit( {
 							onReplace={ onReplace }
 							__unstableOnSplitAtEnd={ () =>
 								insertBlocksAfter(
-									createBlock( 'edit-navigation/menu-item' )
+									createBlock( 'core/menu-item' )
 								)
 							}
 							aria-label={ __( 'Menu item link text' ) }
