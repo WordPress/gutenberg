@@ -490,63 +490,14 @@
 	}
 }
 
-@mixin foreground-colors() {
-	.has-pale-pink-color {
-		color: #f78da7;
-	}
-
-	.has-vivid-red-color {
-		color: #cf2e2e;
-	}
-
-	.has-luminous-vivid-orange-color {
-		color: #ff6900;
-	}
-
-	.has-luminous-vivid-amber-color {
-		color: #fcb900;
-	}
-
-	.has-light-green-cyan-color {
-		color: #7bdcb5;
-	}
-
-	.has-vivid-green-cyan-color {
-		color: #00d084;
-	}
-
-	.has-pale-cyan-blue-color {
-		color: #8ed1fc;
-	}
-
-	.has-vivid-cyan-blue-color {
-		color: #0693e3;
-	}
-
-	.has-vivid-purple-color {
-		color: #9b51e0;
-	}
-
-	.has-white-color {
-		color: #fff;
-	}
-
-	// Deprecated from UI, kept for back-compat.
+// Deprecated from UI, kept for back-compat.
+@mixin foreground-colors-deprecated() {
 	.has-very-light-gray-color {
 		color: #eee;
 	}
 
-	.has-cyan-bluish-gray-color {
-		color: #abb8c3;
-	}
-
-	// Deprecated from UI, kept for back-compat.
 	.has-very-dark-gray-color {
 		color: #313131;
-	}
-
-	.has-black-color {
-		color: #000;
 	}
 }
 
