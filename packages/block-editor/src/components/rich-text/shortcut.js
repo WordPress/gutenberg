@@ -22,9 +22,9 @@ export function RichTextShortcut( { character, type, onUse } ) {
 			}
 		}
 
-		keyboardShortcuts.add( callback );
+		keyboardShortcuts.current.add( callback );
 		return () => {
-			keyboardShortcuts.delete( callback );
+			keyboardShortcuts.current.delete( callback );
 		};
 	}, [ character, type ] );
 

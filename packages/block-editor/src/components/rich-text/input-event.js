@@ -21,9 +21,9 @@ export function __unstableRichTextInputEvent( { inputType, onInput } ) {
 			}
 		}
 
-		callbacks.add( callback );
+		callbacks.current.add( callback );
 		return () => {
-			callbacks.delete( callback );
+			callbacks.current.delete( callback );
 		};
 	}, [ inputType ] );
 

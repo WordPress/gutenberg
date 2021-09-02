@@ -300,14 +300,10 @@ function RichTextWrapper(
 	const TagName = tagName;
 	const content = (
 		<>
-			{ isSelected &&
-				children &&
-				children( { value, onChange, onFocus } ) }
 			{ isSelected && (
-				<keyboardShortcutContext.Provider
-					value={ keyboardShortcuts.current }
-				>
-					<inputEventContext.Provider value={ inputEvents.current }>
+				<keyboardShortcutContext.Provider value={ keyboardShortcuts }>
+					<inputEventContext.Provider value={ inputEvents }>
+						{ children && children( { value, onChange, onFocus } ) }
 						<FormatEdit
 							value={ value }
 							onChange={ onChange }
