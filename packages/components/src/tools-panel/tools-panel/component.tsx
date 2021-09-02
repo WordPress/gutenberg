@@ -11,11 +11,11 @@ import ToolsPanelHeader from '../tools-panel-header';
 import { ToolsPanelContext } from '../context';
 import { useToolsPanel } from './hook';
 import { View } from '../../view';
-import { contextConnect, PolymorphicComponentProps } from '../../ui/context';
+import { contextConnect, WordPressComponentProps } from '../../ui/context';
 import type { ToolsPanelProps } from '../types';
 
 const ToolsPanel = (
-	props: PolymorphicComponentProps< ToolsPanelProps, 'div' >,
+	props: WordPressComponentProps< ToolsPanelProps, 'div' >,
 	forwardedRef: Ref< any >
 ) => {
 	const {

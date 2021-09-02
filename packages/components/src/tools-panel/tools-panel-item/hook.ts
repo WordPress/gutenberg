@@ -9,12 +9,12 @@ import { useEffect, useMemo } from '@wordpress/element';
  */
 import * as styles from '../styles';
 import { useToolsPanelContext } from '../context';
-import { useContextSystem, PolymorphicComponentProps } from '../../ui/context';
+import { useContextSystem, WordPressComponentProps } from '../../ui/context';
 import { useCx } from '../../utils/hooks/use-cx';
 import type { ToolsPanelItemProps } from '../types';
 
 export function useToolsPanelItem(
-	props: PolymorphicComponentProps< ToolsPanelItemProps, 'div' >
+	props: WordPressComponentProps< ToolsPanelItemProps, 'div' >
 ) {
 	const {
 		className,
