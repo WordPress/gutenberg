@@ -6,6 +6,10 @@
 
 -   Fixed RTL styles in `Flex` component ([#33729](https://github.com/WordPress/gutenberg/pull/33729)).
 
+### Internal
+
+-   Renamed `PolymorphicComponent*` types to `WordPressComponent*` ([#34330](https://github.com/WordPress/gutenberg/pull/34330))
+
 ## 16.0.0 (2021-08-23)
 
 ### Breaking Change

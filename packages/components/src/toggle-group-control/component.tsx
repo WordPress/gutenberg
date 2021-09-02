@@ -18,7 +18,7 @@ import { useMergeRefs, useInstanceId } from '@wordpress/compose';
 import {
 	contextConnect,
 	useContextSystem,
-	PolymorphicComponentProps,
+	WordPressComponentProps,
 } from '../ui/context';
 import { View } from '../view';
 import BaseControl from '../base-control';
@@ -31,7 +31,7 @@ import ToggleGroupControlContext from './toggle-group-control-context';
 const noop = () => {};
 
 function ToggleGroupControl(
-	props: PolymorphicComponentProps< ToggleGroupControlProps, 'input' >,
+	props: WordPressComponentProps< ToggleGroupControlProps, 'input' >,
 	forwardedRef: import('react').Ref< any >
 ) {
 	const {

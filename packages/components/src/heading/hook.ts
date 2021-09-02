@@ -1,8 +1,7 @@
 /**
  * Internal dependencies
  */
-import { useContextSystem } from '../ui/context';
-import type { PolymorphicComponentProps } from '../ui/context';
+import { useContextSystem, WordPressComponentProps } from '../ui/context';
 import type { Props as TextProps } from '../text/types';
 import { useText } from '../text';
 import { getHeadingFontSize } from '../ui/utils/font-size';
@@ -50,7 +49,7 @@ export interface HeadingProps extends Omit< TextProps, 'size' > {
 }
 
 export function useHeading(
-	props: PolymorphicComponentProps< HeadingProps, 'h1' >
+	props: WordPressComponentProps< HeadingProps, 'h1' >
 ) {
 	const { as: asProp, level = 2, ...otherProps } = useContextSystem(
 		props,
