@@ -1,65 +1,87 @@
 /**
  * External dependencies
  */
-import renderer from 'react-test-renderer';
+import { act, fireEvent, initializeEditor, getEditorHtml } from 'test/helpers';
+import { Image } from 'react-native';
+
+/**
+ * WordPress dependencies
+ */
+import { getBlockTypes, unregisterBlockType } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
  */
-import { ImageEdit } from '../edit';
-import { NEW_TAB_REL } from '../constants';
+import { registerCoreBlocks } from '../..';
 
-const getStylesFromColorScheme = () => {
-	return { color: 'white' };
-};
+beforeAll( () => {
+	registerCoreBlocks();
 
-const setAttributes = jest.fn();
+	// Mock Image.getSize to avoid failed attempt to size non-existant image
+	const getSizeSpy = jest.spyOn( Image, 'getSize' );
+	getSizeSpy.mockImplementation( ( _url, callback ) => callback( 300, 200 ) );
+} );
 
-const getImageComponent = ( attributes = {} ) => (
-	<ImageEdit
-		setAttributes={ setAttributes }
-		attributes={ attributes }
-		getStylesFromColorScheme={ getStylesFromColorScheme }
-	/>
-);
+afterAll( () => {
+	getBlockTypes().forEach( ( { name } ) => {
+		unregisterBlockType( name );
+	} );
+
+	// Restore mocks
+	Image.getSize.mockRestore();
+} );
 
 describe( 'Image Block', () => {
-	beforeEach( () => {
-		setAttributes.mockReset();
+	it( 'sets link target', async () => {
+		const initialHtml = `
+		<!-- wp:image {"id":1,"sizeSlug":"large","linkDestination":"custom","className":"is-style-default"} -->
+		<figure class="wp-block-image size-large is-style-default">
+			<a href="https://wordpress.org">
+				<img src="https://cldup.com/cXyG__fTLN.jpg" alt="" class="wp-image-1"/>
+			</a>
+		<figcaption>Mountain</figcaption></figure>
+		<!-- /wp:image -->`;
+		const screen = await initializeEditor( { initialHtml } );
+
+		const imageBlock = screen.getByA11yLabel( /Image Block/ );
+		fireEvent.press( imageBlock );
+
+		const settingsButton = screen.getByA11yLabel( 'Open Settings' );
+		await act( () => fireEvent.press( settingsButton ) );
+
+		const linkTargetButton = screen.getByText( 'Open in new tab' );
+		fireEvent.press( linkTargetButton );
+
+		const expectedHtml = `<!-- wp:image {"id":1,"sizeSlug":"large","linkDestination":"custom","className":"is-style-default"} -->
+<figure class="wp-block-image size-large is-style-default"><a href="https://wordpress.org" target="_blank" rel="noreferrer noopener"><img src="https://cldup.com/cXyG__fTLN.jpg" alt="" class="wp-image-1"/></a><figcaption>Mountain</figcaption></figure>
+<!-- /wp:image -->`;
+		expect( getEditorHtml() ).toBe( expectedHtml );
 	} );
 
-	it( 'renders without crashing', () => {
-		const component = renderer.create( getImageComponent() );
-		const rendered = component.toJSON();
-		expect( rendered ).toBeTruthy();
-	} );
+	it( 'unset link target', async () => {
+		const initialHtml = `
+		<!-- wp:image {"id":1,"sizeSlug":"large","linkDestination":"custom","className":"is-style-default"} -->
+		<figure class="wp-block-image size-large is-style-default">
+			<a href="https://wordpress.org" target="_blank" rel="noreferrer noopener">
+				<img src="https://cldup.com/cXyG__fTLN.jpg" alt="" class="wp-image-1"/>
+			</a>
+			<figcaption>Mountain</figcaption>
+		</figure>
+		<!-- /wp:image -->`;
+		const screen = await initializeEditor( { initialHtml } );
 
-	it( 'sets link target', () => {
-		const component = renderer.create( getImageComponent() );
-		const instance = component.getInstance();
+		const imageBlock = screen.getByA11yLabel( /Image Block/ );
+		fireEvent.press( imageBlock );
 
-		instance.onSetNewTab( true );
+		const settingsButton = screen.getByA11yLabel( 'Open Settings' );
+		await act( () => fireEvent.press( settingsButton ) );
 
-		expect( setAttributes ).toHaveBeenCalledWith( {
-			linkTarget: '_blank',
-			rel: undefined,
-		} );
-	} );
+		const linkTargetButton = screen.getByText( 'Open in new tab' );
+		fireEvent.press( linkTargetButton );
 
-	it( 'unset link target', () => {
-		const component = renderer.create(
-			getImageComponent( {
-				linkTarget: '_blank',
-				rel: NEW_TAB_REL.join( ' ' ),
-			} )
-		);
-		const instance = component.getInstance();
-
-		instance.onSetNewTab( false );
-
-		expect( setAttributes ).toHaveBeenCalledWith( {
-			linkTarget: undefined,
-			rel: undefined,
-		} );
+		const expectedHtml = `<!-- wp:image {"id":1,"sizeSlug":"large","linkDestination":"custom","className":"is-style-default"} -->
+<figure class="wp-block-image size-large is-style-default"><a href="https://wordpress.org"><img src="https://cldup.com/cXyG__fTLN.jpg" alt="" class="wp-image-1"/></a><figcaption>Mountain</figcaption></figure>
+<!-- /wp:image -->`;
+		expect( getEditorHtml() ).toBe( expectedHtml );
 	} );
 } );
