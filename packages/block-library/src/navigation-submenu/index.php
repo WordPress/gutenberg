@@ -162,9 +162,10 @@ function render_block_core_navigation_submenu( $attributes, $content, $block ) {
 		$css_classes .= ' ' . $class_name;
 	}
 
+	$show_submenu_indicators = isset( $block->context['showSubmenuIcon'] ) && $block->context['showSubmenuIcon'];
 	$open_on_click = isset( $block->context['openSubmenusOnClick'] ) && $block->context['openSubmenusOnClick'];
 	$open_on_hover_and_click = isset( $block->context['openSubmenusOnClick'] ) && ! $block->context['openSubmenusOnClick'] &&
-		isset( $block->context['showSubmenuIcon'] ) && $block->context['showSubmenuIcon'];
+		$show_submenu_indicators;
 
 	$wrapper_attributes = get_block_wrapper_attributes(
 		array(
@@ -225,7 +226,7 @@ function render_block_core_navigation_submenu( $attributes, $content, $block ) {
 		$html .= '</a>';
 		// End anchor tag content.
 
-		if ( isset( $block->context['showSubmenuIcon'] ) && $block->context['showSubmenuIcon'] ) {
+		if ( $show_submenu_indicators ) {
 			// The submenu icon is rendered in a button here
 			// so that there's a clickable elment to open the submenu.
 			$html .= '<button class="wp-block-navigation__submenu-icon wp-block-navigation-submenu__toggle" aria-expanded="false">' . block_core_navigation_submenu_render_submenu_icon() . '</button>';
@@ -261,9 +262,7 @@ function render_block_core_navigation_submenu( $attributes, $content, $block ) {
 
 		$html .= '</span>';
 
-		if ( isset( $block->context['showSubmenuIcon'] ) && $block->context['showSubmenuIcon'] ) {
-			$html .= '<span class="wp-block-navigation__submenu-icon">' . block_core_navigation_submenu_render_submenu_icon() . '</span>';
-		}
+		$html .= '<span class="wp-block-navigation__submenu-icon">' . block_core_navigation_submenu_render_submenu_icon() . '</span>';
 
 		$html .= '</button>';
 

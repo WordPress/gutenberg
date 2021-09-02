@@ -248,15 +248,17 @@ function Navigation( {
 			<InspectorControls>
 				{ hasSubmenuIndicatorSetting && (
 					<PanelBody title={ __( 'Display settings' ) }>
-						<ToggleControl
-							checked={ attributes.showSubmenuIcon }
-							onChange={ ( value ) => {
-								setAttributes( {
-									showSubmenuIcon: value,
-								} );
-							} }
-							label={ __( 'Show submenu indicator icons' ) }
-						/>
+						{ ! attributes.openSubmenusOnClick && (
+							<ToggleControl
+								checked={ attributes.showSubmenuIcon }
+								onChange={ ( value ) => {
+									setAttributes( {
+										showSubmenuIcon: value,
+									} );
+								} }
+								label={ __( 'Show submenu indicator icons' ) }
+							/>
+						) }
 						<ToggleControl
 							checked={ attributes.openSubmenusOnClick }
 							onChange={ ( value ) => {

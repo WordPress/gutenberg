@@ -631,7 +631,7 @@ export default function NavigationSubmenuEdit( {
 							/>
 						</Popover>
 					) }
-					{ showSubmenuIcon && (
+					{ ( showSubmenuIcon || openSubmenusOnClick ) && (
 						<span className="wp-block-navigation__submenu-icon">
 							<ItemSubmenuIcon />
 						</span>
