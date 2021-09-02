@@ -27,7 +27,7 @@ function render_block_core_widget_group( $attributes, $content, $block ) {
 
 	$html = '';
 
-	if ( ! empty( $atttributes['title'] ) ) {
+	if ( ! empty( $attributes['title'] ) ) {
 		$title = $attributes['title'];
 	} elseif ( ! empty( $block->inner_blocks ) ) {
 		$title = $block->inner_blocks[0]->block_type->title;
