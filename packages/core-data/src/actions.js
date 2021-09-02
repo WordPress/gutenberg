@@ -19,7 +19,6 @@ import { getKindEntities, DEFAULT_ENTITY_KEY } from './entities';
 import { createBatch } from './batch';
 import { getDispatch } from './controls';
 import { STORE_NAME } from './name';
-import { isRawAttribute } from './utils';
 
 /**
  * Returns an action object used in signalling that authors have been received.
@@ -423,7 +422,9 @@ export const saveEntityRecord = (
 				let data = { ...persistedRecord, ...autosavePost, ...record };
 				data = Object.keys( data ).reduce(
 					( acc, key ) => {
-						if ( isRawAttribute( entity, key ) ) {
+						if (
+							[ 'title', 'excerpt', 'content' ].includes( key )
+						) {
 							// Edits should be the "raw" attribute values.
 							acc[ key ] = get( data[ key ], 'raw', data[ key ] );
 						}
@@ -455,7 +456,11 @@ export const saveEntityRecord = (
 					newRecord = Object.keys( newRecord ).reduce(
 						( acc, key ) => {
 							// These properties are persisted in autosaves.
-							if ( isRawAttribute( entity, key ) ) {
+							if (
+								[ 'title', 'excerpt', 'content' ].includes(
+									key
+								)
+							) {
 								// Edits should be the "raw" attribute values.
 								acc[ key ] = get(
 									newRecord[ key ],
