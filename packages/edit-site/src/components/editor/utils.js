@@ -6,7 +6,7 @@ import { get, find, forEach, camelCase, isString } from 'lodash';
  * WordPress dependencies
  */
 import { useSelect } from '@wordpress/data';
-import { PATHS_WITH_MERGE } from '@wordpress/blocks';
+import { __EXPERIMENTAL_PATHS_WITH_MERGE as PATHS_WITH_MERGE } from '@wordpress/blocks';
 /**
  * Internal dependencies
  */

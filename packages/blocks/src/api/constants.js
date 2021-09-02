@@ -125,7 +125,7 @@ export const __EXPERIMENTAL_ELEMENTS = {
 	h6: 'h6',
 };
 
-export const PATHS_WITH_MERGE = {
+export const __EXPERIMENTAL_PATHS_WITH_MERGE = {
 	'color.duotone': true,
 	'color.gradients': true,
 	'color.palette': true,
