@@ -10,14 +10,14 @@ import type { As } from 'reakit-utils/types';
  */
 import { contextConnect } from '../context';
 import type {
-	PolymorphicComponentProps,
-	PolymorphicComponentFromProps,
+	WordPressComponentProps,
+	WordPressComponentFromProps,
 } from '../context';
 import { View } from '../../view';
 
 interface Options<
 	A extends As,
-	P extends PolymorphicComponentProps< {}, A, any >
+	P extends WordPressComponentProps< {}, A, any >
 > {
 	as: A;
 	name: string;
@@ -37,13 +37,13 @@ interface Options<
  */
 export const createComponent = <
 	A extends As,
-	P extends PolymorphicComponentProps< {}, A, any >
+	P extends WordPressComponentProps< {}, A, any >
 >( {
 	as,
 	name,
 	useHook,
 	memo = false,
-}: Options< A, P > ): PolymorphicComponentFromProps< P > => {
+}: Options< A, P > ): WordPressComponentFromProps< P > => {
 	function Component( props: P, forwardedRef: Ref< any > ) {
 		const otherProps = useHook( props );
 

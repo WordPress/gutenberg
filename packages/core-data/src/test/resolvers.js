@@ -22,19 +22,6 @@ import {
 	receiveCurrentUser,
 } from '../actions';
 
-jest.mock( '../locks/actions', () => ( {
-	__unstableAcquireStoreLock: jest.fn( () => [
-		{
-			type: 'MOCKED_ACQUIRE_LOCK',
-		},
-	] ),
-	__unstableReleaseStoreLock: jest.fn( () => [
-		{
-			type: 'MOCKED_RELEASE_LOCK',
-		},
-	] ),
-} ) );
-
 describe( 'getEntityRecord', () => {
 	const POST_TYPE = { slug: 'post' };
 	const ENTITIES = [
@@ -52,7 +39,7 @@ describe( 'getEntityRecord', () => {
 		fulfillment.next();
 		// Provide entities and acquire lock
 		expect( fulfillment.next( ENTITIES ).value.type ).toEqual(
-			'MOCKED_ACQUIRE_LOCK'
+			'@@data/DISPATCH'
 		);
 		// trigger apiFetch
 		const { value: apiFetchAction } = fulfillment.next();
@@ -65,9 +52,7 @@ describe( 'getEntityRecord', () => {
 			receiveEntityRecords( 'root', 'postType', POST_TYPE )
 		);
 		// Release lock
-		expect( fulfillment.next().value.type ).toEqual(
-			'MOCKED_RELEASE_LOCK'
-		);
+		expect( fulfillment.next().value.type ).toEqual( '@@data/DISPATCH' );
 	} );
 
 	it( 'accepts a query that overrides default api path', async () => {
@@ -86,7 +71,7 @@ describe( 'getEntityRecord', () => {
 
 		// Provide entities and acquire lock
 		expect( fulfillment.next( ENTITIES ).value.type ).toEqual(
-			'MOCKED_ACQUIRE_LOCK'
+			'@@data/DISPATCH'
 		);
 
 		// Check resolution cache for an existing entity that fulfills the request with query
@@ -108,9 +93,7 @@ describe( 'getEntityRecord', () => {
 		);
 
 		// Release lock
-		expect( fulfillment.next().value.type ).toEqual(
-			'MOCKED_RELEASE_LOCK'
-		);
+		expect( fulfillment.next().value.type ).toEqual( '@@data/DISPATCH' );
 	} );
 } );
 
@@ -168,7 +151,7 @@ describe( 'getEntityRecords', () => {
 		fulfillment.next();
 		// Provide entities and acquire lock
 		expect( fulfillment.next( ENTITIES ).value.type ).toEqual(
-			'MOCKED_ACQUIRE_LOCK'
+			'@@data/DISPATCH'
 		);
 		fulfillment.next();
 		fulfillment.next( POST_TYPES );
@@ -178,9 +161,7 @@ describe( 'getEntityRecords', () => {
 		fulfillment.next();
 
 		// Release lock
-		expect( fulfillment.next().value.type ).toEqual(
-			'MOCKED_RELEASE_LOCK'
-		);
+		expect( fulfillment.next().value.type ).toEqual( '@@data/DISPATCH' );
 	} );
 
 	it( 'marks specific entity records as resolved', async () => {

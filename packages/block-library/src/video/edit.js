@@ -154,7 +154,7 @@ function VideoEdit( {
 		setAttributes( { poster: '' } );
 
 		// Move focus back to the Media Upload button.
-		this.posterImageButton.current.focus();
+		posterImageButton.current.focus();
 	}
 
 	const videoPosterDescription = `video-block__poster-image-description-${ instanceId }`;

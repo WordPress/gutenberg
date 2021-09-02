@@ -208,19 +208,12 @@
 
 /**
  * Margins
- * @todo: refactor this to use gap.
  */
 
 // Menu items with no background.
-.wp-block-page-list,
-.wp-block-page-list > .wp-block-navigation-item,
-.wp-block-navigation__container > .wp-block-navigation-item {
-	margin: 0 2em 0 0;
-
-	// Margin of right-most margin should be zero, for right aligned or justified items.
-	&:last-child {
-		margin-right: 0;
-	}
+.wp-block-navigation .wp-block-page-list,
+.wp-block-navigation__container {
+	gap: 0.5em 2em;
 }
 
 // Menu items with background.
@@ -228,15 +221,9 @@
 // That way if padding is set in theme.json, it still wins.
 // https://css-tricks.com/almanac/selectors/w/where/
 .wp-block-navigation:where(.has-background) {
-	.wp-block-page-list,
-	.wp-block-page-list > .wp-block-navigation-item,
-	.wp-block-navigation__container > .wp-block-navigation-item {
-		margin: 0 0.5em 0 0;
-
-		// Don't show right margin on the last child.
-		&:last-child {
-			margin: 0;
-		}
+	.wp-block-navigation .wp-block-page-list,
+	.wp-block-navigation__container {
+		gap: 0 0.5em;
 	}
 }
 
@@ -345,6 +332,7 @@
 
 .items-justified-space-between .wp-block-navigation__container {
 	justify-content: space-between;
+	flex: 1;
 }
 
 // Vertical justification.
@@ -356,7 +344,6 @@
 	align-items: flex-end;
 
 	.wp-block-navigation-item {
-		margin-right: 0;
 		justify-content: flex-end;
 	}
 }
@@ -523,6 +510,8 @@
 		position: relative;
 		opacity: 1;
 		visibility: visible;
+		height: auto;
+		width: auto;
 
 		padding: 0 0 0 32px;
 		border: none;

@@ -8,7 +8,7 @@ import * as styles from './styles';
 import { useCx } from '../../utils/hooks/use-cx';
 
 /**
- * @param {import('../context').PolymorphicComponentProps<import('./types').Props, 'div'>} props
+ * @param {import('../context').WordPressComponentProps<import('./types').Props, 'div'>} props
  */
 export function useControlGroup( props ) {
 	const {

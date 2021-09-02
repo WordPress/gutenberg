@@ -20,8 +20,8 @@ import { useCx, rtl } from '../../utils';
 
 /**
  *
- * @param {import('../../ui/context').PolymorphicComponentProps<import('../types').FlexProps, 'div'>} props
- * @return {import('../../ui/context').PolymorphicComponentProps<import('../types').FlexProps, 'div'>} Props with the deprecated props removed.
+ * @param {import('../../ui/context').WordPressComponentProps<import('../types').FlexProps, 'div'>} props
+ * @return {import('../../ui/context').WordPressComponentProps<import('../types').FlexProps, 'div'>} Props with the deprecated props removed.
  */
 function useDeprecatedProps( { isReversed, ...otherProps } ) {
 	if ( typeof isReversed !== 'undefined' ) {
@@ -39,7 +39,7 @@ function useDeprecatedProps( { isReversed, ...otherProps } ) {
 }
 
 /**
- * @param {import('../../ui/context').PolymorphicComponentProps<import('../types').FlexProps, 'div'>} props
+ * @param {import('../../ui/context').WordPressComponentProps<import('../types').FlexProps, 'div'>} props
  */
 export function useFlex( props ) {
 	const {

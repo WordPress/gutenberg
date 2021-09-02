@@ -104,7 +104,7 @@ module.exports = {
 					{
 						name: '@emotion/css',
 						message:
-							'Please use `@emotion/react` and `@emotion/styled` in order to maintain iframe support',
+							'Please use `@emotion/react` and `@emotion/styled` in order to maintain iframe support. As a replacement for the `cx` function, please use the `useCx` hook defined in `@wordpress/components` instead.',
 					},
 				],
 			},
