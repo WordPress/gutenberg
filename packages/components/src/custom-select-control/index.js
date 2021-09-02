@@ -75,7 +75,9 @@ export default function CustomSelectControl( {
 		items,
 		itemToString,
 		onSelectedItemChange,
-		selectedItem: _selectedItem,
+		...( typeof _selectedItem !== 'undefined' && _selectedItem !== null
+			? { selectedItem: _selectedItem }
+			: undefined ),
 		stateReducer,
 	} );
 
