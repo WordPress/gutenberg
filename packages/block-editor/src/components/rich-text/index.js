@@ -7,7 +7,13 @@ import { omit } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { RawHTML, useRef, useCallback, forwardRef } from '@wordpress/element';
+import {
+	RawHTML,
+	useRef,
+	useCallback,
+	forwardRef,
+	createContext,
+} from '@wordpress/element';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { children as childrenSource } from '@wordpress/blocks';
 import { useInstanceId, useMergeRefs } from '@wordpress/compose';
@@ -36,8 +42,13 @@ import { useInputRules } from './use-input-rules';
 import { useEnter } from './use-enter';
 import { useFormatTypes } from './use-format-types';
 import { useRemoveBrowserShortcuts } from './use-remove-browser-shortcuts';
+import { useShortcuts } from './use-shortcuts';
+import { useInputEvents } from './use-input-events';
 import FormatEdit from './format-edit';
 import { getMultilineTag, getAllowedFormats } from './utils';
+
+export const keyboardShortcutContext = createContext();
+export const inputEventContext = createContext();
 
 /**
  * Removes props used for the native version of RichText so that they are not
@@ -244,6 +255,9 @@ function RichTextWrapper(
 	useCaretInFormat( { value } );
 	useMarkPersistent( { html: adjustedValue, value } );
 
+	const keyboardShortcuts = useRef( new Set() );
+	const inputEvents = useRef( new Set() );
+
 	function onKeyDown( event ) {
 		const { keyCode } = event;
 
@@ -286,17 +300,19 @@ function RichTextWrapper(
 	const TagName = tagName;
 	const content = (
 		<>
-			{ isSelected &&
-				children &&
-				children( { value, onChange, onFocus } ) }
 			{ isSelected && (
-				<FormatEdit
-					value={ value }
-					onChange={ onChange }
-					onFocus={ onFocus }
-					formatTypes={ formatTypes }
-					forwardedRef={ anchorRef }
-				/>
+				<keyboardShortcutContext.Provider value={ keyboardShortcuts }>
+					<inputEventContext.Provider value={ inputEvents }>
+						{ children && children( { value, onChange, onFocus } ) }
+						<FormatEdit
+							value={ value }
+							onChange={ onChange }
+							onFocus={ onFocus }
+							formatTypes={ formatTypes }
+							forwardedRef={ anchorRef }
+						/>
+					</inputEventContext.Provider>
+				</keyboardShortcutContext.Provider>
 			) }
 			{ isSelected && hasFormats && (
 				<FormatToolbarContainer
@@ -323,6 +339,8 @@ function RichTextWrapper(
 						onReplace,
 					} ),
 					useRemoveBrowserShortcuts(),
+					useShortcuts( keyboardShortcuts ),
+					useInputEvents( inputEvents ),
 					useUndoAutomaticChange(),
 					usePasteHandler( {
 						isSelected,
