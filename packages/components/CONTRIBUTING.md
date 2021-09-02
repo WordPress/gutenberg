@@ -95,7 +95,7 @@ A couple of good examples of how hooks are used for composition are:
 
 - Boolean component props should be prefixed with `is*` (e.g. `isChecked`), `has*` (e.g. `hasValue`) or `enable*` (e.g. `enableScroll`)
 - Event callback props should be prefixed with `on*` (e.g. `onChanged`)
-- Sub-components naming conventions (e.g `CardBody` instead of `Card.Body`)
+- Subcomponents naming conventions (e.g `CardBody` instead of `Card.Body`)
 - ...
 
 ### Technical requirements for new components
