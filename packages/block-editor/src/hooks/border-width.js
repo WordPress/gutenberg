@@ -2,6 +2,7 @@
  * WordPress dependencies
  */
 import {
+	__experimentalParseUnit as parseUnit,
 	__experimentalUnitControl as UnitControl,
 	__experimentalUseCustomUnits as useCustomUnits,
 } from '@wordpress/components';
@@ -36,7 +37,9 @@ export const BorderWidthEdit = ( props ) => {
 	const [ colorSelection, setColorSelection ] = useState();
 
 	const defaultBorderStyle = useStyle( [ 'border', 'style' ] );
-	const defaultBorderWidth = useStyle( [ 'border', 'width' ] );
+	const [ defaultBorderWidth ] = parseUnit(
+		useStyle( [ 'border', 'width' ] )
+	);
 
 	// Temporarily track previous border color & style selections to be able to
 	// restore them when border width changes from zero value.
