@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import { boolean, text } from '@storybook/addon-knobs';
+
+/**
  * WordPress dependencies
  */
 import { useState } from '@wordpress/element';
@@ -6,7 +11,6 @@ import { useState } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import { __experimentalSpacer as Spacer } from '../../';
 import { ToggleGroupControl, ToggleGroupControlOption } from '../index';
 import { View } from '../../view';
 
@@ -22,46 +26,23 @@ const alignOptions = aligns.map( ( key ) => (
 
 export const _default = () => {
 	const [ alignState, setAlignState ] = useState( aligns[ 0 ] );
-	const label = 'Toggle Group Control';
+	const label = text( 'Label', 'Toggle Group Control' );
+	const hideLabelFromVision = boolean( 'Hide label from vision', false );
+	const help = text( 'Help Text', 'This is the help text' );
+	const isBlock = boolean( 'Render as a (CSS) block element', true );
 
 	return (
 		<View>
-			<Spacer>
-				<ToggleGroupControl
-					isBlock
-					onChange={ setAlignState }
-					value={ alignState }
-					label={ label }
-				>
-					{ alignOptions }
-				</ToggleGroupControl>
-			</Spacer>
-			<Spacer>
-				<ToggleGroupControl label={ label } value="horizontal">
-					<ToggleGroupControlOption
-						value="horizontal"
-						label="Horizontal"
-					/>
-					<ToggleGroupControlOption
-						value="vertical"
-						label="Vertical"
-					/>
-				</ToggleGroupControl>
-			</Spacer>
-			<Spacer>
-				<ToggleGroupControl
-					isAdaptiveWidth
-					label={ label }
-					value="long"
-					hideLabelFromVision={ true }
-				>
-					<ToggleGroupControlOption value="short" label="Short" />
-					<ToggleGroupControlOption
-						value="long"
-						label="Looooooooooooong"
-					/>
-				</ToggleGroupControl>
-			</Spacer>
+			<ToggleGroupControl
+				onChange={ setAlignState }
+				value={ alignState }
+				label={ label }
+				hideLabelFromVision={ hideLabelFromVision }
+				help={ help }
+				isBlock={ isBlock }
+			>
+				{ alignOptions }
+			</ToggleGroupControl>
 		</View>
 	);
 };
