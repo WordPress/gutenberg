@@ -568,6 +568,11 @@ export default function NavigationSubmenuEdit( {
 								'core/image',
 								'core/strikethrough',
 							] }
+							onClick={ () => {
+								if ( ! openSubmenusOnClick && ! url ) {
+									setIsLinkOpen( true );
+								}
+							} }
 						/>
 					}
 					{ ! openSubmenusOnClick && isLinkOpen && (
