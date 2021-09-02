@@ -1,27 +1,9 @@
-buildscript {
-    ext.kotlinVersion = '1.5.20'
-
-    repositories {
-        maven {
-            url 'https://a8c-libs.s3.amazonaws.com/android'
-            content {
-                includeGroup "com.automattic.android"
-            }
-        }
-        jcenter()
-        google()
-    }
-
-    dependencies {
-        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlinVersion"
-        classpath 'com.android.tools.build:gradle:4.0.2'
-        classpath 'com.automattic.android:publish-to-s3:0.6.1'
-    }
+plugins {
+    id "com.android.library"
+    id "org.jetbrains.kotlin.android"
+    id "maven-publish"
+    id "com.automattic.android.publish-to-s3"
 }
-
-apply plugin: 'com.android.library'
-apply plugin: 'kotlin-android'
-apply plugin: 'com.automattic.android.publish-to-s3'
 
 // import the `readReactNativeVersion()` function
 apply from: 'https://gist.githubusercontent.com/hypest/742448b9588b3a0aa580a5e80ae95bdf/raw/8eb62d40ee7a5104d2fcaeff21ce6f29bd93b054/readReactNativeVersion.gradle'
@@ -39,8 +21,6 @@ android {
     defaultConfig {
         minSdkVersion 21
         targetSdkVersion 29
-        versionCode 1
-        versionName "1.0"
         buildConfigField "boolean", "SHOULD_ATTACH_JS_BUNDLE", willPublishReactNativeBridgeBinary.toString()
     }
 
@@ -66,15 +46,14 @@ android {
 }
 
 repositories {
-    google()
-    jcenter()
-    maven { url "https://jitpack.io" }
     maven { url "https://a8c-libs.s3.amazonaws.com/android" }
     maven { url "https://a8c-libs.s3.amazonaws.com/android/hermes-mirror" }
+    maven { url "https://jitpack.io" }
+    google()
+    jcenter()
 }
 
 dependencies {
-    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlinVersion"
     // For animated GIF support
     implementation 'com.facebook.fresco:animated-gif:2.0.0'
     implementation 'com.google.android.material:material:1.2.1'
@@ -98,7 +77,6 @@ dependencies {
         implementation "com.github.wordpress-mobile:react-native-prompt-android:${readHashedVersion('../../../react-native-editor/package.json', 'react-native-prompt-android', 'dependencies')}"
         implementation "com.github.wordpress-mobile:react-native-webview:${readHashedVersion('../../../react-native-editor/package.json', 'react-native-webview', 'dependencies')}"
         runtimeOnly "org.wordpress-mobile:hermes-release-mirror:0.64.0"
-
    } else {
         api 'com.facebook.react:react-native:+'
         api project(':@wordpress_react-native-aztec')

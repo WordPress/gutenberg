@@ -11,6 +11,13 @@
 		margin-left: 0;
 		padding-left: 0;
 	}
+
+	// Revert any left/right margins.
+	// This also makes it work with classic theme auto margins.
+	.wp-block-navigation-item.wp-block {
+		margin-left: revert;
+		margin-right: revert;
+	}
 }
 
 // This element is inline on the frontend but needs to be editable, therefore inline-block, in the editor.
