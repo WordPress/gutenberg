@@ -73,11 +73,17 @@ const EmbedNoPreview = ( { label, icon, isSelected, onPress } ) => {
 		postType === 'page' ? __( 'Preview page' ) : __( 'Preview post' );
 	const comingSoonDescription =
 		postType === 'page'
-			? __(
-					'We’re working hard on adding support for embed previews. In the meantime, you can preview the embedded content on the page.'
+			? sprintf(
+					__(
+						'We’re working hard on adding support for %s previews. In the meantime, you can preview the embedded content on the page.'
+					),
+					label
 			  )
-			: __(
-					'We’re working hard on adding support for embed previews. In the meantime, you can preview the embedded content on the post.'
+			: sprintf(
+					__(
+						'We’re working hard on adding support for %s previews. In the meantime, you can preview the embedded content on the post.'
+					),
+					label
 			  );
 
 	function onOpenSheet() {
@@ -118,7 +124,10 @@ const EmbedNoPreview = ( { label, icon, isSelected, onPress } ) => {
 					<BlockIcon icon={ icon } />
 					<Text style={ labelStyle }>{ label }</Text>
 					<Text style={ descriptionStyle }>
-						{ __( 'Embed previews not yet available' ) }
+						{ sprintf(
+							__( '%s previews not yet available' ),
+							label
+						) }
 					</Text>
 					<Text style={ styles.embed__action }>
 						{ previewButtonText.toUpperCase() }
@@ -154,7 +163,10 @@ const EmbedNoPreview = ( { label, icon, isSelected, onPress } ) => {
 						/>
 					</View>
 					<Text style={ sheetTitleStyle }>
-						{ __( 'Embed block previews are coming soon' ) }
+						{ sprintf(
+							__( '%s block previews are coming soon' ),
+							label
+						) }
 					</Text>
 					<Text style={ sheetDescriptionStyle }>
 						{ comingSoonDescription }
