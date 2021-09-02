@@ -107,12 +107,6 @@ export function editedPost( state = {}, action ) {
 				type: 'wp_template_part',
 				id: action.templatePartId,
 			};
-		case 'SWITCH_MODE': {
-			if ( action.mode !== 'mosaic' ) {
-				return state;
-			}
-			return {};
-		}
 	}
 
 	return state;

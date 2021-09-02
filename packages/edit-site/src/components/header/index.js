@@ -16,7 +16,7 @@ import {
 import { useSelect, useDispatch } from '@wordpress/data';
 import { PinnedItems } from '@wordpress/interface';
 import { _x, __, _n, sprintf } from '@wordpress/i18n';
-import { listView, plus } from '@wordpress/icons';
+import { listView, plus, closeSmall } from '@wordpress/icons';
 import { Button, Slot } from '@wordpress/components';
 import { store as keyboardShortcutsStore } from '@wordpress/keyboard-shortcuts';
 import { store as editorStore } from '@wordpress/editor';
@@ -99,6 +99,7 @@ export default function Header( {
 		__experimentalSetPreviewDeviceType: setPreviewDeviceType,
 		setIsInserterOpened,
 		setIsListViewOpened,
+		switchEditorMode,
 	} = useDispatch( editSiteStore );
 
 	const isLargeViewport = useViewportMatch( 'medium' );
@@ -224,33 +225,41 @@ export default function Header( {
 					) }
 					{ editorMode === 'mosaic' &&
 						selectedTemplates.length === 0 && (
-							<Slot name="PinnedItems/core/edit-site">
-								{ ( fills ) => {
-									const globalStylesFill =
-										fills &&
-										fills.find &&
-										fills.find( ( element ) => {
-											if ( ! element ) {
-												return false;
-											}
-											const firstElement = first(
-												element
-											);
-											if ( ! firstElement ) {
-												return false;
-											}
-											return (
-												firstElement.props &&
-												firstElement.props
-													.identifier ===
-													'edit-site/global-styles'
-											);
-										} );
-									return globalStylesFill
-										? globalStylesFill
-										: null;
-								} }
-							</Slot>
+							<>
+								<Slot name="PinnedItems/core/edit-site">
+									{ ( fills ) => {
+										const globalStylesFill =
+											fills &&
+											fills.find &&
+											fills.find( ( element ) => {
+												if ( ! element ) {
+													return false;
+												}
+												const firstElement = first(
+													element
+												);
+												if ( ! firstElement ) {
+													return false;
+												}
+												return (
+													firstElement.props &&
+													firstElement.props
+														.identifier ===
+														'edit-site/global-styles'
+												);
+											} );
+										return globalStylesFill
+											? globalStylesFill
+											: null;
+									} }
+								</Slot>
+								<Button
+									icon={ closeSmall }
+									onClick={ () => {
+										switchEditorMode( 'visual' );
+									} }
+								/>
+							</>
 						) }
 					{ editorMode === 'mosaic' &&
 						selectedTemplates.length > 0 && (
