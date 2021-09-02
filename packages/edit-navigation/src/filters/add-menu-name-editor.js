@@ -10,7 +10,7 @@ import NameDisplay from '../components/name-display';
 
 const addMenuNameEditor = createHigherOrderComponent(
 	( BlockEdit ) => ( props ) => {
-		if ( props.name !== 'core/navigation' ) {
+		if ( props.name !== 'edit-navigation/menu' ) {
 			return <BlockEdit { ...props } />;
 		}
 		return (

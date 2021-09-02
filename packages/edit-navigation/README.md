@@ -51,15 +51,15 @@ Themes can opt into this behaviour by declaring:
 add_theme_support( 'block-nav-menus' );
 ```
 
-This unlocks significant additional capabilities in the Navigation Editor. For example, by default, [the Navigation Editor screen only allows _link_ (`core/navigation-link`) blocks to be inserted into a navigation](https://github.com/WordPress/gutenberg/blob/7fcd57c9a62c232899e287f6d96416477d810d5e/packages/edit-navigation/src/filters/disable-inserting-non-navigation-blocks.js). When a theme opts into `block-nav-menus` however, users are able to add non-link blocks to a navigation using the Navigation Editor screen, including:
+This unlocks significant additional capabilities in the Navigation Editor. For example, by default, [the Navigation Editor screen only allows _link_ (`edit-navigation/menu-item`) blocks to be inserted into a navigation](https://github.com/WordPress/gutenberg/blob/7fcd57c9a62c232899e287f6d96416477d810d5e/packages/edit-navigation/src/filters/disable-inserting-non-navigation-blocks.js). When a theme opts into `block-nav-menus` however, users are able to add non-link blocks to a navigation using the Navigation Editor screen, including:
 
--   `core/navigation-link`.
+-   `edit-navigation/menu-item`.
 -   `core/social`.
 -   `core/search`.
 
 #### Technical Implementation details
 
-By default, `core/navigation-link` items are serialized and persisted as `nav_menu_item` posts. No serialized block HTML is stored for these standard link blocks.
+By default, `edit-navigation/menu-item` items are serialized and persisted as `nav_menu_item` posts. No serialized block HTML is stored for these standard link blocks.
 
 _Non_-link navigation items however, are [persisted as `nav_menu_items` with a special `type` of `block`](https://github.com/WordPress/gutenberg/blob/7fcd57c9a62c232899e287f6d96416477d810d5e/packages/edit-navigation/src/store/utils.js#L159-L166). These items have an [_additional_ `content` field which is used to store the serialized block markup](https://github.com/WordPress/gutenberg/blob/7fcd57c9a62c232899e287f6d96416477d810d5e/lib/navigation.php#L71-L101).
 
@@ -160,8 +160,8 @@ return (
 
 ## Glossary
 
--   **Link block** - the basic `core/navigation-link` block which is the standard block used to add links within navigations.
--   **Navigation block** - the root `core/navigation` block which can be used both with the Navigation Editor and outside (eg: Post / Site Editor).
+-   **Link block** - the basic `edit-navigation/menu-item` block which is the standard block used to add links within navigations.
+-   **Navigation block** - the root `edit-navigation/menu` block which can be used both with the Navigation Editor and outside (eg: Post / Site Editor).
 -   **Navigation editor / screen** - the new screen provided by Gutenberg to allow the user to edit navigations using a block-based UI.
 -   **Menus screen** - the current/existing [interface/screen for managing Menus](https://codex.wordpress.org/WordPress_Menu_User_Guide) in WordPress WPAdmin.
 

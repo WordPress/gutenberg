@@ -47,7 +47,7 @@ describe( 'createMissingMenuItems', () => {
 					clientId: 'navigation-block-client-id',
 					innerBlocks: [],
 					isValid: true,
-					name: 'core/navigation',
+					name: 'edit-navigation/menu',
 				},
 			],
 		};
@@ -131,7 +131,7 @@ describe( 'createMissingMenuItems', () => {
 							clientId: 'navigation-link-block-client-id-1',
 							innerBlocks: [],
 							isValid: true,
-							name: 'core/navigation-link',
+							name: 'edit-navigation/menu',
 						},
 						{
 							attributes: {
@@ -142,11 +142,11 @@ describe( 'createMissingMenuItems', () => {
 							clientId: 'navigation-link-block-client-id-2',
 							innerBlocks: [],
 							isValid: true,
-							name: 'core/navigation-link',
+							name: 'edit-navigation/menu',
 						},
 					],
 					isValid: true,
-					name: 'core/navigation',
+					name: 'edit-navigation/menu',
 				},
 			],
 		};
@@ -262,7 +262,7 @@ describe( 'saveNavigationPost', () => {
 							clientId: 'navigation-link-block-client-id-1',
 							innerBlocks: [],
 							isValid: true,
-							name: 'core/navigation-link',
+							name: 'edit-navigation/menu-item',
 						},
 						{
 							attributes: {
@@ -277,11 +277,11 @@ describe( 'saveNavigationPost', () => {
 							clientId: 'navigation-link-block-client-id-2',
 							innerBlocks: [],
 							isValid: true,
-							name: 'core/navigation-link',
+							name: 'edit-navigation/menu-item',
 						},
 					],
 					isValid: true,
-					name: 'core/navigation',
+					name: 'edit-navigation/menu',
 				},
 			],
 		};
@@ -410,7 +410,7 @@ describe( 'saveNavigationPost', () => {
 							clientId: 'navigation-link-block-client-id-1',
 							innerBlocks: [],
 							isValid: true,
-							name: 'core/navigation-link',
+							name: 'edit-navigation/menu-item',
 						},
 						{
 							attributes: {
@@ -425,11 +425,11 @@ describe( 'saveNavigationPost', () => {
 							clientId: 'navigation-link-block-client-id-2',
 							innerBlocks: [],
 							isValid: true,
-							name: 'core/navigation-link',
+							name: 'edit-navigation/menu-item',
 						},
 					],
 					isValid: true,
-					name: 'core/navigation',
+					name: 'edit-navigation/menu',
 				},
 			],
 		};
@@ -551,7 +551,7 @@ describe( 'saveNavigationPost', () => {
 							clientId: 'navigation-link-block-client-id-1',
 							innerBlocks: [],
 							isValid: true,
-							name: 'core/navigation-link',
+							name: 'edit-navigation/menu-item',
 						},
 						{
 							attributes: {
@@ -566,11 +566,11 @@ describe( 'saveNavigationPost', () => {
 							clientId: 'navigation-link-block-client-id-2',
 							innerBlocks: [],
 							isValid: true,
-							name: 'core/navigation-link',
+							name: 'edit-navigation/menu-item',
 						},
 					],
 					isValid: true,
-					name: 'core/navigation',
+					name: 'edit-navigation/menu',
 				},
 			],
 		};

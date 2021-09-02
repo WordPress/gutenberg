@@ -67,7 +67,7 @@ function mapMenuItemsToBlocks( menuItems ) {
 
 		// Create block with nested "innerBlocks".
 		const block = createBlock(
-			'core/navigation-link',
+			'edit-navigation/menu-item',
 			attributes,
 			nestedBlocks
 		);
@@ -125,7 +125,7 @@ function menuItemToBlockAttributes( {
 	type: menuItemTypeField,
 	target,
 } ) {
-	// For historical reasons, the `core/navigation-link` variation type is `tag`
+	// For historical reasons, the `edit-navigation/menu-item` variation type is `tag`
 	// whereas WP Core expects `post_tag` as the `object` type.
 	// To avoid writing a block migration we perform a conversion here.
 	// See also inverse equivalent in `blockAttributesToMenuItem`.

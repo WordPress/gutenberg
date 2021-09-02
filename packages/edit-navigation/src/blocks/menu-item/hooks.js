@@ -30,7 +30,7 @@ function getIcon( variationName ) {
 }
 
 export function enhanceNavigationLinkVariations( settings, name ) {
-	if ( name !== 'core/navigation-link' ) {
+	if ( name !== 'edit-navigation/menu-item' ) {
 		return settings;
 	}
 

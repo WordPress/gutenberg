@@ -1,6 +1,6 @@
 <?php
 /**
- * Server-side rendering of the `core/navigation-link` block.
+ * Server-side rendering of the `edit-navigation/menu-item` block.
  *
  * @package gutenberg
  */

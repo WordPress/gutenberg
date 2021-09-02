@@ -4,7 +4,7 @@
 import { addFilter } from '@wordpress/hooks';
 
 function removeNavigationBlockSettingsUnsupportedFeatures( settings, name ) {
-	if ( name !== 'core/navigation' ) {
+	if ( name !== 'edit-navigation/menu' ) {
 		return settings;
 	}
 

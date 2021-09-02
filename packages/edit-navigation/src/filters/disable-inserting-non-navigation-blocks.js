@@ -8,7 +8,11 @@ import { addFilter } from '@wordpress/hooks';
 import { set } from 'lodash';
 
 function disableInsertingNonNavigationBlocks( settings, name ) {
-	if ( ! [ 'core/navigation', 'core/navigation-link' ].includes( name ) ) {
+	if (
+		! [ 'edit-navigation/menu', 'edit-navigation/menu-item' ].includes(
+			name
+		)
+	) {
 		set( settings, [ 'supports', 'inserter' ], false );
 	}
 	return settings;

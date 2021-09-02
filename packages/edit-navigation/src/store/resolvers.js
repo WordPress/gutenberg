@@ -93,10 +93,8 @@ function createNavigationBlock( menuItems ) {
 	);
 
 	const navigationBlock = createBlock(
-		'core/navigation',
-		{
-			orientation: 'vertical',
-		},
+		'edit-navigation/menu',
+		{},
 		innerBlocks
 	);
 	return [ navigationBlock, menuItemIdToClientId ];
