@@ -74,6 +74,24 @@ export function getAllValue( values = {} ) {
 }
 
 /**
+ * For shorthand style & backwards compatibility, takes the radius values
+ * and handles flat string value.
+ *
+ * @param {string} values Radius values.
+ * @return {Object}       Radius values in longhand object form.
+ */
+export function getValuesObject( values = {} ) {
+	return typeof values !== 'string'
+		? values
+		: {
+				topLeft: values,
+				topRight: values,
+				bottomLeft: values,
+				bottomRight: values,
+		  };
+}
+
+/**
  * Checks to determine if values are mixed.
  *
  * @param {Object} values Radius values.

@@ -1,8 +1,16 @@
 /**
  * WordPress dependencies
  */
-import { __experimentalUnitControl as UnitControl } from '@wordpress/components';
+import {
+	__experimentalParseUnit as parseUnit,
+	__experimentalUnitControl as UnitControl,
+} from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
+
+/**
+ * Internal dependencies
+ */
+import { getValuesObject } from './utils';
 
 const CORNERS = {
 	topLeft: __( 'Top left' ),
@@ -14,6 +22,7 @@ const CORNERS = {
 export default function BoxInputControls( {
 	onChange,
 	values: valuesProp,
+	defaults: defaultsProp,
 	...props
 } ) {
 	const createHandleOnChange = ( corner ) => ( next ) => {
@@ -27,16 +36,9 @@ export default function BoxInputControls( {
 		} );
 	};
 
-	// For shorthand style & backwards compatibility, handle flat string value.
-	const values =
-		typeof valuesProp !== 'string'
-			? valuesProp
-			: {
-					topLeft: valuesProp,
-					topRight: valuesProp,
-					bottomLeft: valuesProp,
-					bottomRight: valuesProp,
-			  };
+	// For shorthand style & backwards compatibility, handle flat string values.
+	const values = getValuesObject( valuesProp );
+	const defaults = getValuesObject( defaultsProp );
 
 	// Controls are wrapped in tooltips as visible labels aren't desired here.
 	return (
@@ -47,6 +49,7 @@ export default function BoxInputControls( {
 					key={ key }
 					aria-label={ label }
 					value={ values[ key ] }
+					placeholder={ parseUnit( defaults[ key ] )[ 0 ] }
 					onChange={ createHandleOnChange( key ) }
 				/>
 			) ) }

@@ -3,6 +3,7 @@
  */
 import BorderRadiusControl from '../components/border-radius-control';
 import { cleanEmptyObject } from './utils';
+import useStyle from '../components/use-style';
 
 /**
  * Inspector control panel containing the border radius related configuration.
@@ -16,6 +17,8 @@ export function BorderRadiusEdit( props ) {
 		attributes: { style },
 		setAttributes,
 	} = props;
+
+	const defaultBorderRadius = useStyle( [ 'border', 'radius' ] );
 
 	const onChange = ( newRadius ) => {
 		let newStyle = {
@@ -36,6 +39,7 @@ export function BorderRadiusEdit( props ) {
 	return (
 		<BorderRadiusControl
 			values={ style?.border?.radius }
+			defaults={ defaultBorderRadius }
 			onChange={ onChange }
 		/>
 	);

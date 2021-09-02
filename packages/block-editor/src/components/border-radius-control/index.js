@@ -42,12 +42,20 @@ const MAX_BORDER_RADIUS_VALUES = {
  * @param {Object}   props          Component props.
  * @param {Function} props.onChange Callback to handle onChange.
  * @param {Object}   props.values   Border radius values.
+ * @param {Object}   props.defaults Border radius default values.
  *
  * @return {WPElement}              Custom border radius control.
  */
-export default function BorderRadiusControl( { onChange, values } ) {
+export default function BorderRadiusControl( { onChange, values, defaults } ) {
+	const isMixedValues =
+		hasDefinedValues( values ) && hasMixedValues( values );
+	const isMixedDefaults =
+		hasDefinedValues( defaults ) && hasMixedValues( defaults );
 	const [ isLinked, setIsLinked ] = useState(
-		! hasDefinedValues( values ) || ! hasMixedValues( values )
+		! (
+			isMixedValues ||
+			( ! hasDefinedValues( values ) && isMixedDefaults )
+		)
 	);
 
 	const units = useCustomUnits( {
@@ -58,6 +66,7 @@ export default function BorderRadiusControl( { onChange, values } ) {
 	const step = unitConfig?.step || 1;
 
 	const [ allValue ] = parseUnit( getAllValue( values ) );
+	const [ allDefault ] = parseUnit( getAllValue( defaults ) );
 
 	const toggleLinked = () => setIsLinked( ! isLinked );
 
@@ -74,6 +83,7 @@ export default function BorderRadiusControl( { onChange, values } ) {
 						<AllInputControl
 							className="components-border-radius-control__unit-control"
 							values={ values }
+							defaults={ defaults }
 							min={ MIN_BORDER_RADIUS_VALUE }
 							onChange={ onChange }
 							unit={ unit }
@@ -81,7 +91,7 @@ export default function BorderRadiusControl( { onChange, values } ) {
 						/>
 						<RangeControl
 							className="components-border-radius-control__range-control"
-							value={ allValue }
+							value={ allValue || allDefault }
 							min={ MIN_BORDER_RADIUS_VALUE }
 							max={ MAX_BORDER_RADIUS_VALUES[ unit ] }
 							initialPosition={ 0 }
@@ -95,6 +105,7 @@ export default function BorderRadiusControl( { onChange, values } ) {
 						min={ MIN_BORDER_RADIUS_VALUE }
 						onChange={ onChange }
 						values={ values || DEFAULT_VALUES }
+						defaults={ defaults }
 						units={ units }
 					/>
 				) }
