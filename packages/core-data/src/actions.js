@@ -418,11 +418,11 @@ export const saveEntityRecord = (
 				// So we fallback to the previous autosave and then
 				// to the actual persisted entity if the edits don't
 				// have a value.
-				const requestData = prepareAutosaveRequest({
+				const requestData = prepareAutosaveRequest( {
 					...persistedRecord,
 					...autosavePost,
-					...record
-				});
+					...record,
+				} );
 
 				updatedRecord = await __unstableFetch( {
 					path: `${ path }/autosaves`,
@@ -495,20 +495,23 @@ export const saveEntityRecord = (
 	}
 };
 
-export const prepareAutosaveRequest = (
-	{ title, excerpt, content, status }
-) => ({
+export const prepareAutosaveRequest = ( {
+	title,
+	excerpt,
+	content,
+	status,
+} ) => ( {
 	title,
 	excerpt,
 	content,
 	status: status === 'auto-draft' ? 'draft' : status,
-})
+} );
 
 export const reconcileAutosave = (
 	persistedRecord,
 	requestData,
 	updatedRecord
-) => ({
+) => ( {
 	...persistedRecord,
 
 	title: updatedRecord.title,
@@ -522,7 +525,7 @@ export const reconcileAutosave = (
 		requestData.status === 'draft'
 			? requestData.status
 			: persistedRecord.status,
-})
+} );
 
 /**
  * Runs multiple core-data actions at the same time using one API request.

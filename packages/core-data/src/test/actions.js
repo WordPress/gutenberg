@@ -127,25 +127,33 @@ describe( 'prepareAutosaveRequest', () => {
 		status: 'record status',
 		unrelatedField: 'unrelated',
 	};
-	it('picks a specific subset of data', async () => {
+	it( 'picks a specific subset of data', async () => {
 		expect(
-			prepareAutosaveRequest({ ...persistedRecord, ...autosavePost, ...record })
-		).toEqual({
+			prepareAutosaveRequest( {
+				...persistedRecord,
+				...autosavePost,
+				...record,
+			} )
+		).toEqual( {
 			title: 'autosave title',
 			excerpt: 'record excerpt',
 			content: 'record content',
 			status: 'record status',
-		});
+		} );
 		expect(
-			prepareAutosaveRequest({ ...autosavePost, ...persistedRecord, ...record })
-		).toEqual({
+			prepareAutosaveRequest( {
+				...autosavePost,
+				...persistedRecord,
+				...record,
+			} )
+		).toEqual( {
 			title: 'persisted title',
 			excerpt: 'record excerpt',
 			content: 'record content',
 			status: 'record status',
-		});
+		} );
 		expect(
-			prepareAutosaveRequest({ ...autosavePost, ...persistedRecord } )
+			prepareAutosaveRequest( { ...autosavePost, ...persistedRecord } )
 		).toEqual( {
 			title: 'persisted title',
 			excerpt: 'autosave excerpt',
@@ -155,7 +163,7 @@ describe( 'prepareAutosaveRequest', () => {
 	} );
 	it( 'corrects the auto-draft status to draft', async () => {
 		expect(
-			prepareAutosaveRequest({
+			prepareAutosaveRequest( {
 				...persistedRecord,
 				...autosavePost,
 				status: 'auto-draft',
