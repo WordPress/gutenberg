@@ -40,8 +40,8 @@ it( 'animates from full-screen to non-full-screen', async () => {
 			nativeEvent: {
 				layout: {
 					/**
-					 * onLayout would never provide a string height, but this si the most
-					 * straightforward approach to recreating the desired testing contex.
+					 * onLayout would never provide a string height, but this is the most
+					 * straightforward approach to recreating the desired testing context.
 					 * The alternative would be `navigation.navigate` from a full-screen
 					 * screen to a non-full-screen screen.
 					 */
