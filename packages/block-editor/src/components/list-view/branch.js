@@ -6,6 +6,8 @@ import { map, compact } from 'lodash';
 /**
  * WordPress dependencies
  */
+
+import { AsyncModeProvider } from '@wordpress/data';
 import { Fragment } from '@wordpress/element';
 
 /**
@@ -94,7 +96,8 @@ export default function ListViewBranch( props ) {
 				};
 
 				return (
-					<Fragment key={ clientId }>
+					// Make updates to the selected block synchronous.
+					<AsyncModeProvider key={ clientId } value={ ! isSelected }>
 						<ListViewBlock
 							block={ block }
 							onClick={ selectBlockWithClientId }
@@ -129,7 +132,7 @@ export default function ListViewBranch( props ) {
 								path={ updatedPath }
 							/>
 						) }
-					</Fragment>
+					</AsyncModeProvider>
 				);
 			} ) }
 			{ hasAppender && (
