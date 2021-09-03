@@ -144,12 +144,11 @@ export default function FontAppearanceControl( props ) {
 	}, [ props.options ] );
 
 	// Find current selection by comparing font style & weight against options.
-	const currentSelection =
-		selectOptions.find(
-			( option ) =>
-				option.style.fontStyle === fontStyle &&
-				option.style.fontWeight === fontWeight
-		) || selectOptions[ 0 ];
+	const currentSelection = selectOptions.find(
+		( option ) =>
+			option.style.fontStyle === fontStyle &&
+			option.style.fontWeight === fontWeight
+	);
 
 	// Adjusts field label in case either styles or weights are disabled.
 	const getLabel = () => {
