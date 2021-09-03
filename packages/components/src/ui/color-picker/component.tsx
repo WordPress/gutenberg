@@ -9,7 +9,7 @@ import type { ColorFormats } from 'tinycolor2';
  * WordPress dependencies
  */
 import { useState } from '@wordpress/element';
-import { moreVertical } from '@wordpress/icons';
+import { settings } from '@wordpress/icons';
 import { useDebounce } from '@wordpress/compose';
 import { __ } from '@wordpress/i18n';
 
@@ -24,7 +24,7 @@ import {
 import { HStack } from '../../h-stack';
 import Button from '../../button';
 import { Spacer } from '../../spacer';
-import { ColorfulWrapper, SelectControl } from './styles';
+import { ColorfulWrapper, SelectControl, AuxiliaryColorArtefactWrapper } from './styles';
 import { ColorDisplay } from './color-display';
 import { ColorInput } from './color-input';
 import { Picker } from './picker';
@@ -95,7 +95,8 @@ const ColorPicker = (
 				color={ safeColor }
 				enableAlpha={ enableAlpha }
 			/>
-			<HStack justify="space-between">
+			<AuxiliaryColorArtefactWrapper>
+				<HStack justify="space-between">
 				{ showInputs ? (
 					<SelectControl
 						options={ options }
@@ -115,7 +116,7 @@ const ColorPicker = (
 				) }
 				<Button
 					onClick={ () => setShowInputs( ! showInputs ) }
-					icon={ moreVertical }
+					icon={ settings }
 					isPressed={ showInputs }
 					label={
 						showInputs
@@ -124,15 +125,16 @@ const ColorPicker = (
 					}
 				/>
 			</HStack>
-			<Spacer />
-			{ showInputs && (
-				<ColorInput
-					colorType={ colorType }
-					color={ safeColor }
-					onChange={ handleChange }
-					enableAlpha={ enableAlpha }
-				/>
-			) }
+				<Spacer margin={ 4 } />
+				{ showInputs && (
+					<ColorInput
+						colorType={ colorType }
+						color={ safeColor }
+						onChange={ handleChange }
+						enableAlpha={ enableAlpha }
+					/>
+				) }
+			</AuxiliaryColorArtefactWrapper>
 		</ColorfulWrapper>
 	);
 };

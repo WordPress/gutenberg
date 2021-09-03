@@ -38,7 +38,12 @@ export const HexInput = ( { color, onChange, enableAlpha }: HexInputProps ) => {
 		<InputControl
 			__unstableInputWidth="8em"
 			prefix={
-				<Spacer as={ Text } marginLeft={ space( 2 ) } color="blue">
+				<Spacer
+					as={ Text }
+					marginLeft={ space( 3.5 ) }
+					color="blue"
+					lineHeight={ 1 }
+				>
 					#
 				</Spacer>
 			}

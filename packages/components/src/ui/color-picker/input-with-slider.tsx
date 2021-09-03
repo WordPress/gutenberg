@@ -1,12 +1,11 @@
 /**
  * Internal dependencies
  */
-import NumberControl from '../../number-control';
 import { HStack } from '../../h-stack';
 import { Text } from '../../text';
 import { Spacer } from '../../spacer';
 import { space } from '../utils/space';
-import { RangeControl } from './styles';
+import { RangeControl, NumberControlWrapper } from './styles';
 
 interface InputWithSliderProps {
 	min: number;
@@ -27,8 +26,7 @@ export const InputWithSlider = ( {
 }: InputWithSliderProps ) => {
 	return (
 		<Spacer as={ HStack }>
-			<NumberControl
-				__unstableInputWidth="5em"
+			<NumberControlWrapper
 				min={ min }
 				max={ max }
 				label={ label }
@@ -36,7 +34,12 @@ export const InputWithSlider = ( {
 				value={ value }
 				onChange={ onChange }
 				prefix={
-					<Spacer as={ Text } paddingLeft={ space( 1 ) } color="blue">
+					<Spacer
+						as={ Text }
+						paddingLeft={ space( 3.5 ) }
+						color="blue"
+						lineHeight={ 1 }
+					>
 						{ abbreviation }
 					</Spacer>
 				}

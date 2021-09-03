@@ -12,8 +12,10 @@ import NumberControl from '../../number-control';
 import { COLORS, reduceMotion, rtl } from '../../utils';
 import { space } from '../../ui/utils/space';
 
-const rangeHeight = () => css( { height: 30, minHeight: 30 } );
-const thumbSize = 12;
+const rangeHeightValue = 30;
+const rangeHeight = () =>
+	css( { height: rangeHeightValue, minHeight: rangeHeightValue } );
+const thumbSize = 9;
 
 export const Root = styled.div`
 	-webkit-tap-highlight-color: transparent;
@@ -179,7 +181,7 @@ export const ThumbWrapper = styled.span`
 	display: flex;
 	height: ${ thumbSize }px;
 	justify-content: center;
-	margin-top: 9px;
+	margin-top: ${ ( rangeHeightValue - thumbSize ) / 2 }px;
 	outline: 0;
 	pointer-events: none;
 	position: absolute;
