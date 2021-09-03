@@ -266,9 +266,7 @@ function Navigation( {
 									openSubmenusOnClick: value,
 								} );
 							} }
-							label={ __(
-								'Open submenus on click instead of hover'
-							) }
+							label={ __( 'Open submenus on click' ) }
 						/>
 						<ToggleControl
 							checked={ attributes.isResponsive }
