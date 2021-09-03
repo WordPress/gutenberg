@@ -40,10 +40,6 @@ function LayoutPanel( { setAttributes, attributes, name: blockName } ) {
 		return getSettings().supportsLayout;
 	}, [] );
 
-	if ( ! themeSupportsLayout ) {
-		return null;
-	}
-
 	const {
 		allowSwitching: canBlockSwitchLayout,
 		allowEditing = true,
@@ -55,8 +51,16 @@ function LayoutPanel( { setAttributes, attributes, name: blockName } ) {
 		return null;
 	}
 
-	const usedLayout = layout ? layout : defaultBlockLayout || {};
+	const usedLayout = layout || defaultBlockLayout || {};
 	const { inherit = false, type = 'default' } = usedLayout;
+	/**
+	 * `themeSupportsLayout` is only relevant to the `default/flow`
+	 * layout and it should not be taken into account when other
+	 * `layout` types are used.
+	 */
+	if ( type === 'default' && ! themeSupportsLayout ) {
+		return null;
+	}
 	const layoutType = getLayoutType( type );
 
 	const onChangeType = ( newType ) =>
