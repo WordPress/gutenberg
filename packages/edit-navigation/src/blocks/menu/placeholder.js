@@ -28,6 +28,29 @@ import { useMenuEntityProp } from '../../hooks';
 import useNavigationEntities from './use-navigation-entities';
 import menuItemsToBlocks from './menu-items-to-blocks';
 
+/**
+ * Convert pages to blocks.
+ *
+ * @param {Object[]} pages An array of pages.
+ *
+ * @return {WPBlock[]} An array of blocks.
+ */
+function convertPagesToBlocks( pages ) {
+	if ( ! pages ) {
+		return null;
+	}
+
+	return pages.map( ( { title, type, link: url, id } ) =>
+		createBlock( 'core/menu-item', {
+			type,
+			id,
+			url,
+			label: ! title.rendered ? __( '(no title)' ) : title.rendered,
+			opensInNewTab: false,
+		} )
+	);
+}
+
 function NavigationPlaceholder( { onCreate }, ref ) {
 	const [ selectedMenu, setSelectedMenu ] = useState();
 	const [ isCreatingFromMenu, setIsCreatingFromMenu ] = useState( false );
@@ -43,6 +66,7 @@ function NavigationPlaceholder( { onCreate }, ref ) {
 		isResolvingMenus,
 		menuItems,
 		hasResolvedMenuItems,
+		pages,
 		hasPages,
 		hasMenus,
 	} = useNavigationEntities( selectedMenu );
@@ -71,10 +95,9 @@ function NavigationPlaceholder( { onCreate }, ref ) {
 	};
 
 	const onCreateAllPages = () => {
-		// TODO - don't create a page list.
-		const block = [ createBlock( 'core/page-list' ) ];
+		const blocks = convertPagesToBlocks( pages );
 		const selectNavigationBlock = true;
-		onCreate( block, selectNavigationBlock );
+		onCreate( blocks, selectNavigationBlock );
 	};
 
 	useEffect( () => {
