@@ -53,8 +53,8 @@ export function persistAutosaveToAPI( {
 	entity,
 	persistedRecord,
 	record,
-	prepareAutosaveRequest = identity,
-	reconcileAutosaveResponse = identity,
+	preprocessRequestData = identity,
+	preprocessResponseData = identity,
 	__unstableFetch = triggerFetch,
 } ) {
 	return async ( { select, dispatch } ) => {
@@ -68,7 +68,7 @@ export function persistAutosaveToAPI( {
 		// So we fallback to the previous autosave and then
 		// to the actual persisted entity if the edits don't
 		// have a value.
-		const requestData = prepareAutosaveRequest( {
+		const requestData = preprocessRequestData( {
 			...persistedRecord,
 			...autosavePost,
 			...record,
@@ -84,7 +84,7 @@ export function persistAutosaveToAPI( {
 
 		// An autosave may be processed by the server as a regular save.
 		const processedAsRegularSave = persistedRecord.id === updatedRecord.id;
-		const reconciledRecord = reconcileAutosaveResponse(
+		const reconciledRecord = preprocessResponseData(
 			updatedRecord,
 			requestData,
 			persistedRecord,

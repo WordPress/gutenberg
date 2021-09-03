@@ -1276,19 +1276,11 @@ _Related_
 
 -   multiSelect in core/block-editor store.
 
-### prepareAutosaveRequest
-
-Undocumented declaration.
-
 ### receiveBlocks
 
 _Related_
 
 -   receiveBlocks in core/block-editor store.
-
-### reconcileAutosaveResponse
-
-Undocumented declaration.
 
 ### redo
 

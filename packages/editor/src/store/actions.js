@@ -418,11 +418,11 @@ export function* autosave( { local = false, ...options } = {} ) {
 const autosavePostToAPI = ( options ) =>
 	persistAutosaveToAPI( {
 		...options,
-		prepareAutosaveRequest,
-		reconcileAutosaveResponse,
+		preprocessRequestData,
+		preprocessResponseData,
 	} );
 
-export function prepareAutosaveRequest( { title, excerpt, content, status } ) {
+function preprocessRequestData( { title, excerpt, content, status } ) {
 	return {
 		title,
 		excerpt,
@@ -431,7 +431,7 @@ export function prepareAutosaveRequest( { title, excerpt, content, status } ) {
 	};
 }
 
-export function reconcileAutosaveResponse(
+function preprocessResponseData(
 	updatedRecord,
 	requestData,
 	persistedRecord,
