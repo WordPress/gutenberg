@@ -86,18 +86,24 @@ function ListView(
 		isMounted.current = true;
 	}, [] );
 
-	const expand = ( clientId ) => {
-		if ( ! clientId ) {
-			return;
-		}
-		setExpandedState( { type: 'expand', clientId } );
-	};
-	const collapse = ( clientId ) => {
-		if ( ! clientId ) {
-			return;
-		}
-		setExpandedState( { type: 'collapse', clientId } );
-	};
+	const expand = useCallback(
+		( clientId ) => {
+			if ( ! clientId ) {
+				return;
+			}
+			setExpandedState( { type: 'expand', clientId } );
+		},
+		[ setExpandedState ]
+	);
+	const collapse = useCallback(
+		( clientId ) => {
+			if ( ! clientId ) {
+				return;
+			}
+			setExpandedState( { type: 'collapse', clientId } );
+		},
+		[ setExpandedState ]
+	);
 	const expandRow = ( row ) => {
 		expand( row?.dataset?.block );
 	};
