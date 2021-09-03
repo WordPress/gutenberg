@@ -49,15 +49,14 @@ function PlaceholderContent( { clientId } ) {
 }
 
 function EditFormContent( { attributes, setAttributes, innerBlocks } ) {
-	const defaultTitle = getDefaultTitle( innerBlocks );
 	return (
 		<div className="wp-block-widget-group__edit-form">
 			<h2 className="wp-block-widget-group__edit-form-title">
-				{ attributes.title || defaultTitle }
+				{ __( 'Widget Group' ) }
 			</h2>
 			<TextControl
 				label={ __( 'Title' ) }
-				placeholder={ defaultTitle }
+				placeholder={ getDefaultTitle( innerBlocks ) }
 				value={ attributes.title }
 				onChange={ ( title ) => setAttributes( { title } ) }
 			/>
