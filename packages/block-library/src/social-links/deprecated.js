@@ -8,12 +8,6 @@ import classNames from 'classnames';
  */
 import { InnerBlocks, useBlockProps } from '@wordpress/block-editor';
 
-const justifyContentMap = {
-	left: 'flex-start',
-	right: 'flex-end',
-	center: 'center',
-	'space-between': 'space-between',
-};
 /**
  * The specific handling by `className` below is needed because `itemsJustification`
  * was introduced in https://github.com/WordPress/gutenberg/pull/28980/files and wasn't
@@ -46,8 +40,7 @@ const migrateWithLayout = ( attributes ) => {
 		Object.assign( newAttributes, {
 			layout: {
 				type: 'flex',
-				justifyContent:
-					justifyContentMap[ justifyContent.slice( prefix.length ) ],
+				justifyContent: justifyContent.slice( prefix.length ),
 			},
 		} );
 	}
