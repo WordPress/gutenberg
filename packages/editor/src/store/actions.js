@@ -409,10 +409,51 @@ export function* autosave( { local = false, ...options } = {} ) {
 		};
 	} else {
 		yield controls.dispatch( STORE_NAME, 'savePost', {
-			persist: persistAutosaveToAPI,
+			persist: autosavePostToAPI,
 			...options,
 		} );
 	}
+}
+
+const autosavePostToAPI = ( options ) =>
+	persistAutosaveToAPI( {
+		...options,
+		prepareAutosaveRequest,
+		reconcileAutosaveResponse,
+	} );
+
+export function prepareAutosaveRequest( { title, excerpt, content, status } ) {
+	return {
+		title,
+		excerpt,
+		content,
+		status: status === 'auto-draft' ? 'draft' : status,
+	};
+}
+
+export function reconcileAutosaveResponse(
+	updatedRecord,
+	requestData,
+	persistedRecord,
+	{ processedAsRegularSave }
+) {
+	return processedAsRegularSave
+		? {
+				...persistedRecord,
+
+				title: updatedRecord.title,
+				excerpt: updatedRecord.excerpt,
+				content: updatedRecord.content,
+
+				// Status is only persisted in autosaves when going from
+				// "auto-draft" to "draft".
+				status:
+					persistedRecord.status === 'auto-draft' &&
+					requestData.status === 'draft'
+						? requestData.status
+						: persistedRecord.status,
+		  }
+		: updatedRecord;
 }
 
 /**
