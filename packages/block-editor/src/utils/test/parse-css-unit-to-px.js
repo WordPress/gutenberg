@@ -120,7 +120,7 @@ describe( 'getPxFromCssUnit', () => {
 		);
 	} );
 
-	it( 'test calcualte function return px unit', () => {
+	it( 'test calculate function return px unit', () => {
 		expect( getPxFromCssUnit( '10px + 25px' ) ).toBe( '35px' );
 	} );
 
