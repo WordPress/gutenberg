@@ -22,8 +22,7 @@ In these situations, one possible approach is to "soft-deprecate" a given legacy
 
 ### Components composition
 
-
-### Polymorphic Components (i.e. the `as` prop)
+<!-- ### Polymorphic Components (i.e. the `as` prop)
 
 The primary way to compose components is through the `as` prop. This prop can be used to change the underlying element used to render a component, e.g.:
 
@@ -43,7 +42,7 @@ TBD
 
 ### Layout "responsibilities"
 
-TBD — Components' layout responsibilities and boundaries (i.e., a component should only affect the layout of its children, not its own)
+TBD — Components' layout responsibilities and boundaries (i.e., a component should only affect the layout of its children, not its own) -->
 
 #### Components & Hooks
 
@@ -89,7 +88,7 @@ A couple of good examples of how hooks are used for composition are:
 - the `Card` component, which builds on top of the `Surface` component by [calling the `useSurface` hook inside its own hook](/packages/components/src/card/card/hook.js);
 - the `HStack` component, which builds on top of the `Flex` component and [calls the `useFlex` hook inside its own hook](/packages/components/src/h-stack/hook.js).
 
-### APIs Consinstency
+<!-- ### APIs Consinstency
 
 [To be expanded] E.g.:
 
@@ -97,6 +96,10 @@ A couple of good examples of how hooks are used for composition are:
 - Event callback props should be prefixed with `on*` (e.g. `onChanged`)
 - Subcomponents naming conventions (e.g `CardBody` instead of `Card.Body`)
 - ...
+
+### Performance
+
+TDB -->
 
 ### Technical requirements for new components
 
