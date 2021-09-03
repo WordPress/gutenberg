@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Breaking Change
+
+-   Removed a min-width from the `DropdownMenu` component, allowing the menu to accommodate thin contents like vertical tools menus ([#33995](https://github.com/WordPress/gutenberg/pull/33995)).
+
 ### Bug Fix
 
 -   Fixed RTL styles in `Flex` component ([#33729](https://github.com/WordPress/gutenberg/pull/33729)).
