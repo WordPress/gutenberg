@@ -18,7 +18,7 @@ import { hasBlockSupport, store as blocksStore } from '@wordpress/blocks';
 import { createHigherOrderComponent } from '@wordpress/compose';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { check, moreVertical } from '@wordpress/icons';
-import { store as blockEditorStore } from '@wordpress/block-editor';
+import { store as blockEditorStore } from '../store';
 
 /**
  * Internal dependencies
@@ -65,37 +65,53 @@ export const withInspectorControl = createHigherOrderComponent(
 				true
 			);
 
-			//const { updateBlockAttributes } = useDispatch( blockEditorStore );
+			const { updateBlockAttributes } = useDispatch( blockEditorStore );
 
 			const blockStyles = useSelect(
 				( select ) => {
 					const { getBlockStyles } = select( blocksStore );
 					return getBlockStyles( props.name );
 				},
-				[ props.name ]
+				[ props.name, props.attributes.className ]
 			);
 
 			const hasBlockStyles = blockStyles && blockStyles.length;
 
-			const activeStyleName = hasBlockStyles
+			const activeStyle = hasBlockStyles
 				? getActiveStyle(
 						blockStyles,
 						props.attributes.className || ''
-				  )?.name
+				  )
 				: null;
 
-			const onSelectStyleClassName = ( styleClassName ) => {
-				// updateBlockAttributes( props.clientId, {
-				// 	className: styleClassName,
-				// } );
+			const onSelectStyleClassName = ( style ) => {
+				const styleClassName = replaceActiveStyle(
+					props.attributes.className,
+					activeStyle,
+					style
+				);
+				updateBlockAttributes( props.clientId, {
+					className: styleClassName,
+				} );
 			};
+
+			const additionalClassNameContainerClasses = classnames(
+				'additional-class-name-control__container',
+				{
+					'has-block-styles': hasBlockStyles,
+				}
+			);
 
 			if ( hasCustomClassName && props.isSelected ) {
 				return (
 					<>
 						<BlockEdit { ...props } />
 						<InspectorControls __experimentalGroup="advanced">
-							<div className="custom-class-name-control">
+							<div
+								className={
+									additionalClassNameContainerClasses
+								}
+							>
 								<TextControl
 									autoComplete="off"
 									label={ __( 'Additional CSS class(es)' ) }
@@ -112,21 +128,25 @@ export const withInspectorControl = createHigherOrderComponent(
 										'Separate multiple classes with spaces.'
 									) }
 								/>
-								{ hasBlockStyles > 0 && (
+								{ hasBlockStyles && (
 									<DropdownMenu
 										icon={ moreVertical }
-										label={ __( 'Style CSS class(es)' ) }
+										label={ __( 'Block style classes' ) }
 									>
 										{ ( { onClose } ) => (
-											<MenuGroup>
+											<MenuGroup
+												label={ __(
+													'Block style classes'
+												) }
+											>
 												{ blockStyles.map(
-													( { name, label } ) => {
+													( style ) => {
 														const isSelected =
-															activeStyleName ===
-															name;
+															activeStyle?.name ===
+															style.name;
 														return (
 															<MenuItem
-																key={ label }
+																key={ style.label }
 																icon={
 																	isSelected &&
 																	check
@@ -136,17 +156,16 @@ export const withInspectorControl = createHigherOrderComponent(
 																}
 																onClick={ () => {
 																	onSelectStyleClassName(
-																		name
+																		style
 																	);
 																	onClose();
 																} }
 																role="menuitemcheckbox"
 															>
-																{ label }
+																{ style.label }
 															</MenuItem>
 														);
-													}
-												) }
+												} ) }
 											</MenuGroup>
 										) }
 									</DropdownMenu>
