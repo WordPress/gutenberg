@@ -32,7 +32,7 @@ export function useHasBorderPanel( { supports, name } ) {
 		useHasBorderWidthControl( { supports, name } ),
 	];
 
-	return controls.every( Boolean );
+	return controls.some( Boolean );
 }
 
 function useHasBorderColorControl( { supports, name } ) {
