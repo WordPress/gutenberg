@@ -7,7 +7,6 @@ import classNames from 'classnames';
  * WordPress dependencies
  */
 import { getBlockSupport } from '@wordpress/blocks';
-import { useSelect } from '@wordpress/data';
 import { Fragment, useEffect } from '@wordpress/element';
 import {
 	BlockControls,
@@ -17,7 +16,6 @@ import {
 	ContrastChecker,
 	PanelColorSettings,
 	withColors,
-	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import {
 	MenuGroup,
@@ -49,7 +47,6 @@ const getDefaultBlockLayout = ( blockTypeOrName ) => {
 export function SocialLinksEdit( props ) {
 	const {
 		name,
-		clientId,
 		attributes,
 		iconBackgroundColor,
 		iconColor,
@@ -66,19 +63,7 @@ export function SocialLinksEdit( props ) {
 		size,
 		layout,
 	} = attributes;
-	// This probably should not be used/checked here. We need to make all `social-links`
-	// blocks to use `flex` layout.
-	const { themeSupportsLayout } = useSelect(
-		( select ) => {
-			const { getSettings } = select( blockEditorStore );
-			return {
-				themeSupportsLayout: getSettings()?.supportsLayout,
-			};
-		},
-		[ clientId ]
-	);
-
-	const usedLayout = !! layout || getDefaultBlockLayout( name );
+	const usedLayout = layout || getDefaultBlockLayout( name );
 
 	// Remove icon background color if logos only style selected.
 	const logosOnly =
@@ -124,8 +109,7 @@ export function SocialLinksEdit( props ) {
 		placeholder: isSelected ? SelectedSocialPlaceholder : SocialPlaceholder,
 		templateLock: false,
 		__experimentalAppenderTagName: 'li',
-		__experimentalLayout:
-			themeSupportsLayout && usedLayout ? usedLayout : undefined,
+		__experimentalLayout: usedLayout,
 	} );
 
 	const POPOVER_PROPS = {
