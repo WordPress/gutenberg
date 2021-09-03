@@ -33,10 +33,7 @@ export default function MoreMenu() {
 
 	useShortcut(
 		'core/customize-widgets/keyboard-shortcuts',
-		toggleKeyboardShortcutsModal,
-		{
-			bindGlobal: true,
-		}
+		toggleKeyboardShortcutsModal
 	);
 
 	return (

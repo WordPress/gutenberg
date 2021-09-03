@@ -112,8 +112,6 @@ function BlockPopover( {
 			stopTyping( true );
 		}, [] ),
 		{
-			bindGlobal: true,
-			eventName: 'keydown',
 			isDisabled: ! canFocusHiddenToolbar,
 		}
 	);

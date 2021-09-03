@@ -1,13 +1,19 @@
 /**
  * WordPress dependencies
  */
-import { useSelect } from '@wordpress/data';
-import { useKeyboardShortcut } from '@wordpress/compose';
+import {
+	createContext,
+	useContext,
+	useEffect,
+	useRef,
+} from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
-import { store as keyboardShortcutsStore } from '../store';
+import useShortcutEventMatch from './use-shortcut-event-match';
+
+export const context = createContext();
 
 /**
  * Attach a keyboard shortcut handler.
@@ -17,16 +23,27 @@ import { store as keyboardShortcutsStore } from '../store';
  * @param {Object}   options  Shortcut options.
  */
 function useShortcut( name, callback, options ) {
-	const shortcuts = useSelect(
-		( select ) => {
-			return select(
-				keyboardShortcutsStore
-			).getAllShortcutRawKeyCombinations( name );
-		},
-		[ name ]
-	);
+	const shortcuts = useContext( context );
+	const isMatch = useShortcutEventMatch();
+	const callbackRef = useRef();
+	callbackRef.current = callback;
 
-	useKeyboardShortcut( shortcuts, callback, options );
+	useEffect( () => {
+		if ( options?.isDisabled ) {
+			return;
+		}
+
+		function _callback( event ) {
+			if ( isMatch( name, event ) ) {
+				callbackRef.current( event );
+			}
+		}
+
+		shortcuts.current.add( _callback );
+		return () => {
+			shortcuts.current.delete( _callback );
+		};
+	}, [ name ] );
 }
 
 export default useShortcut;

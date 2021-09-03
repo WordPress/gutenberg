@@ -6,9 +6,6 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-/**
- * WordPress dependencies
- */
 import { forwardRef, useEffect } from '@wordpress/element';
 import { __unstableUseNavigateRegions as useNavigateRegions } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
@@ -40,6 +37,7 @@ function InterfaceSkeleton(
 		actions,
 		labels,
 		className,
+		onKeyDown,
 		shortcuts,
 	},
 	ref
@@ -68,6 +66,7 @@ function InterfaceSkeleton(
 	const mergedLabels = { ...defaultLabels, ...labels };
 
 	return (
+		// eslint-disable-next-line jsx-a11y/no-static-element-interactions
 		<div
 			{ ...navigateRegionsProps }
 			ref={ useMergeRefs( [ ref, navigateRegionsProps.ref ] ) }
@@ -77,6 +76,13 @@ function InterfaceSkeleton(
 				navigateRegionsProps.className,
 				!! footer && 'has-footer'
 			) }
+			onKeyDown={ ( event ) => {
+				if ( onKeyDown ) {
+					onKeyDown( event );
+				}
+
+				navigateRegionsProps.onKeyDown( event );
+			} }
 		>
 			{ !! drawer && (
 				<div

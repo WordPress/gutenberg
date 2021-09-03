@@ -25,10 +25,7 @@ export default function MoreMenu() {
 
 	useShortcut(
 		'core/edit-widgets/keyboard-shortcuts',
-		toggleKeyboardShortcutsModal,
-		{
-			bindGlobal: true,
-		}
+		toggleKeyboardShortcutsModal
 	);
 
 	const isLargeViewport = useViewportMatch( 'medium' );

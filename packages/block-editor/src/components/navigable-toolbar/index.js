@@ -100,10 +100,7 @@ function useToolbarFocus(
 	}, [] );
 
 	// Focus on toolbar when pressing alt+F10 when the toolbar is visible
-	useShortcut( 'core/block-editor/focus-toolbar', focusToolbar, {
-		bindGlobal: true,
-		eventName: 'keydown',
-	} );
+	useShortcut( 'core/block-editor/focus-toolbar', focusToolbar );
 
 	useEffect( () => {
 		if ( initialFocusOnMount ) {

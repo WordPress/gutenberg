@@ -16,30 +16,19 @@ function NavigationEditorShortcuts( { saveBlocks } ) {
 		useCallback( ( event ) => {
 			event.preventDefault();
 			saveBlocks();
-		} ),
-		{
-			bindGlobal: true,
-		}
+		} )
 	);
 
 	const { redo, undo } = useDispatch( coreStore );
-	useShortcut(
-		'core/edit-navigation/undo',
-		( event ) => {
-			undo();
-			event.preventDefault();
-		},
-		{ bindGlobal: true }
-	);
+	useShortcut( 'core/edit-navigation/undo', ( event ) => {
+		undo();
+		event.preventDefault();
+	} );
 
-	useShortcut(
-		'core/edit-navigation/redo',
-		( event ) => {
-			redo();
-			event.preventDefault();
-		},
-		{ bindGlobal: true }
-	);
+	useShortcut( 'core/edit-navigation/redo', ( event ) => {
+		redo();
+		event.preventDefault();
+	} );
 
 	return null;
 }
