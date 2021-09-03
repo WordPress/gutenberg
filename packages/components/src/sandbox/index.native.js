@@ -154,6 +154,7 @@ const EMPTY_ARRAY = [];
 function Sandbox( {
 	containerStyle,
 	html = '',
+	customJS,
 	providerUrl = '',
 	scripts = EMPTY_ARRAY,
 	styles = EMPTY_ARRAY,
@@ -209,7 +210,7 @@ function Sandbox( {
 					<script
 						type="text/javascript"
 						dangerouslySetInnerHTML={ {
-							__html: observeAndResizeJS,
+							__html: customJS || observeAndResizeJS,
 						} }
 					/>
 					{ scripts.map( ( src ) => (
@@ -257,7 +258,7 @@ function Sandbox( {
 	function getSizeStyle() {
 		const contentHeight = Math.ceil( height );
 
-		return { height: contentHeight };
+		return contentHeight ? { height: contentHeight } : { aspectRatio: 1 };
 	}
 
 	function onChangeDimensions( dimensions ) {
