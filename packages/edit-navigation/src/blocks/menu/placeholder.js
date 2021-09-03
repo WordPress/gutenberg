@@ -36,7 +36,7 @@ import menuItemsToBlocks from './menu-items-to-blocks';
  * @return {WPBlock[]} An array of blocks.
  */
 function convertPagesToBlocks( pages ) {
-	if ( ! pages ) {
+	if ( ! pages?.length ) {
 		return null;
 	}
 

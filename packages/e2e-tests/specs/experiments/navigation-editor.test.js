@@ -193,7 +193,18 @@ describe( 'Navigation editor', () => {
 				POST: menuPostResponse,
 			} ),
 			...getMenuItemMocks( { GET: [] } ),
-			...getPagesMocks( { GET: [ {} ] } ), // mock a single page
+			...getPagesMocks( {
+				GET: [
+					{
+						type: 'page',
+						id: 1,
+						link: 'https://example.com/1',
+						title: {
+							rendered: 'My page',
+						},
+					},
+				],
+			} ),
 		] );
 
 		await page.keyboard.type( 'Main Menu' );
@@ -207,7 +218,7 @@ describe( 'Navigation editor', () => {
 
 		// Select the navigation block and create a block from existing pages.
 		const navigationBlock = await page.waitForSelector(
-			'div[aria-label="Block: Navigation"]'
+			'div[aria-label="Block: Menu"]'
 		);
 		await navigationBlock.click();
 
@@ -218,12 +229,12 @@ describe( 'Navigation editor', () => {
 
 		// When the block is created the root element changes from a div (for the placeholder)
 		// to a nav (for the navigation itself). Wait for this to happen.
-		await page.waitForSelector( 'nav[aria-label="Block: Navigation"]' );
+		await page.waitForSelector( 'nav[aria-label="Block: Menu"]' );
 
 		expect( await getSerializedBlocks() ).toMatchSnapshot();
 	} );
 
-	it( 'allows creation of a menu when there are existing menu items', async () => {
+	it( 'allows creation of a menu when there are existing menus', async () => {
 		const menuPostResponse = {
 			id: 4,
 			description: '',
@@ -281,7 +292,7 @@ describe( 'Navigation editor', () => {
 		await page.waitForXPath( '//div[contains(., "Menu created")]' );
 
 		// An empty navigation block will appear.
-		await page.waitForSelector( 'div[aria-label="Block: Navigation"]' );
+		await page.waitForSelector( 'div[aria-label="Block: Menu"]' );
 
 		expect( await getSerializedBlocks() ).toMatchSnapshot();
 	} );
@@ -299,7 +310,7 @@ describe( 'Navigation editor', () => {
 		} );
 
 		// Wait for the block to be present.
-		await page.waitForSelector( 'nav[aria-label="Block: Navigation"]' );
+		await page.waitForSelector( 'nav[aria-label="Block: Menu"]' );
 
 		expect( await getSerializedBlocks() ).toMatchSnapshot();
 	} );
@@ -313,7 +324,7 @@ describe( 'Navigation editor', () => {
 
 		// Select a link block with nested links in a submenu.
 		const parentLinkXPath =
-			'//div[@aria-label="Block: Custom Link" and contains(.,"WordPress.org")]';
+			'//div[@aria-label="Block: Menu Item" and contains(.,"WordPress.org")]';
 		const linkBlock = await page.waitForXPath( parentLinkXPath );
 		await linkBlock.click();
 
@@ -322,7 +333,7 @@ describe( 'Navigation editor', () => {
 		// Submenus are hidden using `visibility: hidden` and shown using
 		// `visibility: visible` so the visible/hidden options must be used
 		// when selecting the elements.
-		const submenuLinkXPath = `${ parentLinkXPath }//div[@aria-label="Block: Custom Link"]`;
+		const submenuLinkXPath = `${ parentLinkXPath }//div[@aria-label="Block: Menu Item"]`;
 		const submenuLinkVisible = await page.waitForXPath( submenuLinkXPath, {
 			visible: true,
 		} );
@@ -350,11 +361,11 @@ describe( 'Navigation editor', () => {
 
 		// Wait for the block to be present and start an empty block.
 		const navBlock = await page.waitForSelector(
-			'div[aria-label="Block: Navigation"]'
+			'div[aria-label="Block: Menu"]'
 		);
 		await navBlock.click();
 		const startEmptyButton = await page.waitForXPath(
-			'//button[.="Start empty"]'
+			'//button[.="Start blank"]'
 		);
 		await startEmptyButton.click();
 

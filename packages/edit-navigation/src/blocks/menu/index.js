@@ -1,6 +1,7 @@
 /**
  * WordPress dependencies
  */
+import { InnerBlocks } from '@wordpress/block-editor';
 import { navigation as icon } from '@wordpress/icons';
 
 /**
@@ -16,5 +17,7 @@ export { metadata, name };
 export const settings = {
 	icon,
 	edit,
-	save() {},
+	save() {
+		return <InnerBlocks.Content />;
+	},
 };
