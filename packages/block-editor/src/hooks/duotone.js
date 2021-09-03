@@ -33,6 +33,10 @@ const EMPTY_ARRAY = [];
  * @return {Object} R, G, and B values.
  */
 export function getValuesFromColors( colors = [] ) {
+	if ( typeof colors === 'string' ) {
+		return colors;
+	}
+
 	const values = { r: [], g: [], b: [] };
 
 	colors.forEach( ( color ) => {
@@ -66,11 +70,19 @@ export function getValuesFromColors( colors = [] ) {
  * @return {WPElement} Duotone element.
  */
 function DuotoneFilter( { selector, id, values } ) {
+	if ( values === 'unset' ) {
+		const unsetStylesheet = `
+			${ selector } {
+				filter: unset !important; /* We need !important to overide rules that come from theme.json.*/
+			}
+		`;
+		return ( <style dangerouslySetInnerHTML={ { __html: unsetStylesheet } } /> );
+	}
+
 	const stylesheet = `
-${ selector } {
-	filter: url( #${ id } ) !important; /* We need !important to overide rules that come from theme.json.*/
-}
-`;
+		${ selector } {
+			filter: url( #${ id } ) !important; /* We need !important to overide rules that come from theme.json.*/
+	}`;
 
 	return (
 		<>

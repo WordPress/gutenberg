@@ -49,6 +49,10 @@ export function getDefaultColors( palette ) {
  * @return {string} CSS gradient string for the duotone swatch.
  */
 export function getGradientFromCSSColors( colors = [], angle = '90deg' ) {
+	if ( typeof colors === 'string' ) {
+		return null;
+	}
+
 	const l = 100 / colors.length;
 
 	const stops = colors
@@ -66,6 +70,10 @@ export function getGradientFromCSSColors( colors = [], angle = '90deg' ) {
  * @return {Object[]} Color stop information.
  */
 export function getColorStopsFromColors( colors ) {
+	if ( typeof colors === 'string' ) {
+		return null;
+	}
+
 	return colors.map( ( color, i ) => ( {
 		position: ( i * 100 ) / ( colors.length - 1 ),
 		color,

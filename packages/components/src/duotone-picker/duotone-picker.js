@@ -69,11 +69,19 @@ function DuotonePicker( {
 				);
 			} ) }
 			actions={
-				<CircularOptionPicker.ButtonAction
-					onClick={ () => onChange( undefined ) }
-				>
-					{ __( 'Clear' ) }
-				</CircularOptionPicker.ButtonAction>
+				<div>
+					<CircularOptionPicker.ButtonAction
+						onClick={ () => onChange( 'unset' ) }
+					>
+						{ __( 'Disable' ) }
+					</CircularOptionPicker.ButtonAction>
+
+					<CircularOptionPicker.ButtonAction
+						onClick={ () => onChange( undefined ) }
+					>
+						{ __( 'Clear' ) }
+					</CircularOptionPicker.ButtonAction>
+				</div>
 			}
 		>
 			{ ! disableCustomColors && ! disableCustomDuotone && (

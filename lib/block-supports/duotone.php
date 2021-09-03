@@ -381,7 +381,6 @@ function gutenberg_render_duotone_support( $block_content, $block ) {
 	$duotone_colors = $block['attrs']['style']['color']['duotone'];
 
 	$duotone_values = get_duotone_color_values( $duotone_colors );
-
 	$duotone_id = gutenberg_get_duotone_filter_id( uniqid() );
 
 	$selectors        = explode( ',', $duotone_support );
@@ -393,8 +392,12 @@ function gutenberg_render_duotone_support( $block_content, $block ) {
 	);
 	$selectors_group = implode( ', ', $selectors_scoped );
 
-	$duotone_markup = gutenberg_get_duotone_style( $selectors_group, $duotone_id );
-	$duotone_markup .= gutenberg_get_duotone_svg_filters( $duotone_id, $duotone_values );
+	if ( 'unset' === $duotone_colors ) {
+		$duotone_markup = '<style>' . $selectors_group . '{ filter: unset; }</style>';
+	} else {
+		$duotone_markup = gutenberg_get_duotone_style( $selectors_group, $duotone_id );
+		$duotone_markup .= gutenberg_get_duotone_svg_filters( $duotone_id, $duotone_values );
+	}
 
 	if ( ! is_admin() ) {
 		gutenberg_output_duotone_markup( $duotone_markup );

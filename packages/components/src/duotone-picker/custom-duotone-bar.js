@@ -12,10 +12,15 @@ import {
 const PLACEHOLDER_VALUES = [ '#333', '#CCC' ];
 
 export default function CustomDuotoneBar( { value, onChange } ) {
+	if ( typeof value === 'string' ) {
+		return null;
+	}
+
 	const hasGradient = !! value;
 	const values = hasGradient ? value : PLACEHOLDER_VALUES;
 	const background = getGradientFromCSSColors( values );
 	const controlPoints = getColorStopsFromColors( values );
+
 	return (
 		<CustomGradientBar
 			disableInserter
