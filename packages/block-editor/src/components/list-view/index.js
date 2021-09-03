@@ -4,7 +4,7 @@
 
 import { useMergeRefs } from '@wordpress/compose';
 import { __experimentalTreeGrid as TreeGrid } from '@wordpress/components';
-import { useDispatch } from '@wordpress/data';
+import { AsyncModeProvider, useDispatch } from '@wordpress/data';
 import {
 	useCallback,
 	useEffect,
@@ -131,7 +131,7 @@ function ListView(
 	);
 
 	return (
-		<>
+		<AsyncModeProvider value={ true }>
 			<ListViewDropIndicator
 				listViewRef={ elementRef }
 				blockDropTarget={ blockDropTarget }
@@ -152,7 +152,7 @@ function ListView(
 					/>
 				</ListViewContext.Provider>
 			</TreeGrid>
-		</>
+		</AsyncModeProvider>
 	);
 }
 export default forwardRef( ListView );

@@ -8,7 +8,6 @@ import { map, compact } from 'lodash';
  */
 
 import { AsyncModeProvider } from '@wordpress/data';
-import { Fragment } from '@wordpress/element';
 
 /**
  * Internal dependencies
