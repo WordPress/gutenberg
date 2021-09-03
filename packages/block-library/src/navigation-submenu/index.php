@@ -170,7 +170,7 @@ function render_block_core_navigation_submenu( $attributes, $content, $block ) {
 	$wrapper_attributes = get_block_wrapper_attributes(
 		array(
 			'class' => $css_classes . ' wp-block-navigation-item' . ( $has_submenu ? ' has-child' : '' ) .
-			( $open_on_click ? ' open-on-click' : '') . ( $open_on_hover_and_click ? ' open-on-hover-click' : '') . 
+			( $open_on_click ? ' open-on-click' : '' ) . ( $open_on_hover_and_click ? ' open-on-hover-click' : '' ) .
 			( $is_active ? ' current-menu-item' : '' ),
 			'style' => $style_attribute,
 		)
@@ -179,8 +179,8 @@ function render_block_core_navigation_submenu( $attributes, $content, $block ) {
 
 	// If Submenus open on hover, we render an anchor tag with attributes.
 	// If submenu icons are set to show, we also render a submenu button, so the submenu can be opened on click.
-	if ( !$open_on_click ) {
-		$item_url = isset($attributes['url']) ? esc_url( $attributes['url'] ) : '';
+	if ( ! $open_on_click ) {
+		$item_url = isset( $attributes['url'] ) ? esc_url( $attributes['url'] ) : '';
 		// Start appending HTML attributes to anchor tag.
 		$html .= '<a class="wp-block-navigation-item__content" href="' . $item_url . '"';
 

@@ -5,6 +5,7 @@
 		"isValid": true,
 		"attributes": {
 			"showSubmenuIcon": true,
+			"openSubmenusOnClick": false,
 			"isResponsive": false
 		},
 		"innerBlocks": [],
