@@ -110,7 +110,6 @@ module.exports = {
 			'error',
 			{ preventAtMiddleLines: false },
 		],
-		'jsdoc/valid-types': 'off',
 		'jsdoc/check-access': 'error',
 		'jsdoc/check-alignment': 'error',
 		'jsdoc/check-line-alignment': [
@@ -139,5 +138,6 @@ module.exports = {
 		'jsdoc/require-returns-check': 'error',
 		'jsdoc/require-returns-description': 'error',
 		'jsdoc/require-returns-type': 'error',
+		'jsdoc/valid-types': 'error',
 	},
 };
