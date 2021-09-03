@@ -224,7 +224,7 @@ function RichTextWrapper(
 		);
 	}
 
-	const { value, onChange, onFocus, ref: richTextRef } = useRichText( {
+	const { value, onChange, ref: richTextRef } = useRichText( {
 		value: adjustedValue,
 		onChange( html, { __unstableFormats, __unstableText } ) {
 			adjustedOnChange( html );
@@ -295,6 +295,10 @@ function RichTextWrapper(
 
 			event.preventDefault();
 		}
+	}
+
+	function onFocus() {
+		anchorRef.current.focus();
 	}
 
 	const TagName = tagName;
