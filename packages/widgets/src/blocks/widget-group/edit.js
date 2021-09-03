@@ -16,8 +16,9 @@ import { getBlockType } from '@wordpress/blocks';
 
 export default function Edit( props ) {
 	const { clientId, isSelected } = props;
-	const { getBlock } = useSelect( blockEditorStore );
-	const { innerBlocks } = getBlock( clientId );
+	const { innerBlocks } = useSelect( ( select ) =>
+		select( blockEditorStore ).getBlock( clientId )
+	);
 
 	let content;
 	if ( innerBlocks.length === 0 ) {
