@@ -7,7 +7,7 @@ You will learn about the required files, how to combine templates and template p
 
 Full site editing is an experimental feature, and the workflow in this tutorial is likely to change.
 
-This tutorial is up to date with Gutenberg version 10.6.
+This tutorial is up to date with Gutenberg version 11.0.0.
 
 ## Table of Contents
 
@@ -139,7 +139,6 @@ theme
 ```
 
 ## Creating the templates and template parts
-
 Before continuing, install and activate your theme.
 
 There are several ways to create templates and template parts:
@@ -226,7 +225,7 @@ Confirm that the checkboxes are correct and save all three.
 ### Template editing mode
 
 The template editing mode is a way to edit the website without the complexity of the site editor interface.
-It is more limited than the site editor because you can not create, select or navigate between templates in this view.
+It is more limited than the site editor because you can not select or navigate between templates in this view.
 
 You access the template editing mode via the block editor.
 Create a new post or page. Next, open the document settings sidebar and locate the **Template** panel below **Status & visibility**.
@@ -254,7 +253,7 @@ Saved templates have precedence over theme files. To use the updated theme files
 #### Blog
 
 Now the theme has a basic site header and footer, but it does not display any content.
-To create a list of posts, you will use the query and query loop blocks.
+To create a list of posts, you will use the query loop and post template blocks.
 
 Whether you are using the site editor or editing theme files directly, open the index template.
 
@@ -281,30 +280,30 @@ Change the `<div>` in the group block to a `<main>` element using the `tagName` 
 
 If you are using one of the editors, change the element from `<div>` to `<main>` under **Advanced** in the block setting sidebar.
 
-Add a query block inside the group.
-When you place a query block in the editor, the query loop is used as an inner block and you have the option to start with an empty loop or include selected post blocks like a post title and featured image.
+Add a query loop block inside the group.
+When you place a query loop block in the editor, the post template is used as an inner block and you have the option to start with an empty loop or include selected post blocks like a post title and featured image.
 
 Example markup:
 
 ```html
 <!-- wp:query -->
-<div class="wp-block-query"><!-- wp:query-loop -->
+<div class="wp-block-query"><!-- wp:post-template -->
 <!-- wp:post-title /-->
 <!-- wp:post-date /-->
 <!-- wp:post-excerpt /-->
-<!-- /wp:query-loop --></div>
+<!-- /wp:post-template --></div>
 <!-- /wp:query -->
 ```
 
-The query pagination block can only be used inside the query. Place it inside the query, but outside the loop:
+The query pagination block can only be used inside the query loop. Place it inside the query, but outside the post template:
 
 ```html
 <!-- wp:query -->
-<div class="wp-block-query"><!-- wp:query-loop -->
+<div class="wp-block-query"><!-- wp:post-template -->
 <!-- wp:post-title /-->
 <!-- wp:post-date /-->
 <!-- wp:post-excerpt /-->
-<!-- /wp:query-loop -->
+<!-- /wp:post-template -->
 
 <!-- wp:query-pagination -->
 <div class="wp-block-query-pagination">
@@ -468,7 +467,7 @@ To enable link colors, add a `color` setting and set `link` to true:
 }
 ```
 
-To enable padding and custom spacing units, include a setting for spacing:
+To enable padding, margin and custom spacing units, include a setting for spacing:
 
 ```json
 {
@@ -485,6 +484,7 @@ To enable padding and custom spacing units, include a setting for spacing:
 		},
 		"spacing": {
 			"customPadding": true,
+			"customMargin": true,
 			"units": [ "px", "em", "rem", "vh", "vw" ]
 		}
 	}
@@ -628,7 +628,7 @@ To add custom font sizes, create a new section called `typography` under `settin
 `fontSizes` is the equivalent of `add_theme_support( 'editor-font-sizes' )`.
 
 ```json
-"typograhy": {
+"typography": {
 	"fontSizes": [
 	]
 }
@@ -641,7 +641,7 @@ The keys used by `fontSizes` are:
 - `name` The visible name in the editor.
 
 ```json
-"typograhy": {
+"typography": {
 	"fontSizes": [
 		{
 			"slug": "normal",

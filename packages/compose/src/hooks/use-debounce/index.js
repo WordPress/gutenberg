@@ -23,7 +23,7 @@ import { useEffect } from '@wordpress/element';
  * @param {TFunc}                             fn        The function to debounce.
  * @param {number}                            [wait]    The number of milliseconds to delay.
  * @param {import('lodash').DebounceSettings} [options] The options object.
- * @return {TFunc & import('lodash').Cancelable} Debounced function.
+ * @return {import('lodash').DebouncedFunc<TFunc>} Debounced function.
  */
 export default function useDebounce( fn, wait, options ) {
 	/* eslint-enable jsdoc/valid-types */

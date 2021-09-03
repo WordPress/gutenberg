@@ -570,6 +570,12 @@
 		"parent": "filters"
 	},
 	{
+		"title": "i18n Filters",
+		"slug": "i18n-filters",
+		"markdown_source": "../docs/reference-guides/filters/i18n-filters.md",
+		"parent": "filters"
+	},
+	{
 		"title": "Parser Filters",
 		"slug": "parser-filters",
 		"markdown_source": "../docs/reference-guides/filters/parser-filters.md",
@@ -1014,6 +1020,18 @@
 		"parent": "components"
 	},
 	{
+		"title": "ItemGroup",
+		"slug": "item-group",
+		"markdown_source": "../packages/components/src/item-group/item-group/README.md",
+		"parent": "components"
+	},
+	{
+		"title": "Item",
+		"slug": "item",
+		"markdown_source": "../packages/components/src/item-group/item/README.md",
+		"parent": "components"
+	},
+	{
 		"title": "KeyboardShortcuts",
 		"slug": "keyboard-shortcuts",
 		"markdown_source": "../packages/components/src/keyboard-shortcuts/README.md",
@@ -1152,12 +1170,6 @@
 		"parent": "components"
 	},
 	{
-		"title": "SegmentedControl",
-		"slug": "segmented-control",
-		"markdown_source": "../packages/components/src/segmented-control/README.md",
-		"parent": "components"
-	},
-	{
 		"title": "SelectControl",
 		"slug": "select-control",
 		"markdown_source": "../packages/components/src/select-control/README.md",
@@ -1230,6 +1242,12 @@
 		"parent": "components"
 	},
 	{
+		"title": "ToggleGroupControl",
+		"slug": "toggle-group-control",
+		"markdown_source": "../packages/components/src/toggle-group-control/README.md",
+		"parent": "components"
+	},
+	{
 		"title": "ToolbarButton",
 		"slug": "toolbar-button",
 		"markdown_source": "../packages/components/src/toolbar-button/README.md",
@@ -1257,6 +1275,24 @@
 		"title": "Toolbar",
 		"slug": "toolbar",
 		"markdown_source": "../packages/components/src/toolbar/README.md",
+		"parent": "components"
+	},
+	{
+		"title": "ToolsPanelHeader",
+		"slug": "tools-panel-header",
+		"markdown_source": "../packages/components/src/tools-panel/tools-panel-header/README.md",
+		"parent": "components"
+	},
+	{
+		"title": "ToolsPanelItem",
+		"slug": "tools-panel-item",
+		"markdown_source": "../packages/components/src/tools-panel/tools-panel-item/README.md",
+		"parent": "components"
+	},
+	{
+		"title": "ToolsPanel",
+		"slug": "tools-panel",
+		"markdown_source": "../packages/components/src/tools-panel/tools-panel/README.md",
 		"parent": "components"
 	},
 	{
@@ -1977,6 +2013,12 @@
 		"title": "React Native based mobile Gutenberg",
 		"slug": "native-mobile",
 		"markdown_source": "../docs/contributors/code/native-mobile.md",
+		"parent": "code"
+	},
+	{
+		"title": "React Native Integration Test Guide",
+		"slug": "native-mobile-integration-test-guide",
+		"markdown_source": "../docs/contributors/code/native-mobile-integration-test-guide.md",
 		"parent": "code"
 	},
 	{

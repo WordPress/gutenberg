@@ -29,7 +29,7 @@ function getBlockDisplayText( block ) {
 }
 
 function useSecondaryText() {
-	const { getBlock } = useSelect( 'core/block-editor' );
+	const { getBlock } = useSelect( blockEditorStore );
 	const activeEntityBlockId = useSelect(
 		( select ) =>
 			select(

@@ -46,6 +46,8 @@ const ALLOWED_BLOCKS = [
 	'core/page-list',
 	'core/spacer',
 	'core/home-link',
+	'core/site-title',
+	'core/site-logo',
 ];
 
 const LAYOUT = {
@@ -155,7 +157,6 @@ function Navigation( {
 				isSelected
 					? InnerBlocks.DefaultAppender
 					: false,
-			__experimentalAppenderTagName: 'li',
 			__experimentalCaptureToolbars: true,
 			// Template lock set to false here so that the Nav
 			// Block on the experimental menus screen does not

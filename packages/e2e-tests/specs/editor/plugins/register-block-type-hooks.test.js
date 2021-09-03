@@ -21,7 +21,7 @@ describe( 'Register block type hooks', () => {
 	it( 'has a custom category for Paragraph block', async () => {
 		await openGlobalBlockInserter();
 
-		const widgetsCategory = await page.$(
+		const widgetsCategory = await page.waitForSelector(
 			'.block-editor-block-types-list[aria-label="Widgets"]'
 		);
 

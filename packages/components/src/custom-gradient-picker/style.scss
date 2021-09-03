@@ -10,7 +10,9 @@ $components-custom-gradient-picker__padding: 6px; // 36px container, 24px handle
 	height: $button-size;
 	border-radius: $button-size;
 	margin-bottom: $grid-unit-15;
+	/*rtl:ignore*/
 	padding-left: $components-custom-gradient-picker__padding;
+	/*rtl:ignore*/
 	padding-right: $button-size - $components-custom-gradient-picker__padding;
 
 	.components-custom-gradient-picker__markers-container {
@@ -61,6 +63,8 @@ $components-custom-gradient-picker__padding: 6px; // 36px container, 24px handle
 }
 
 .components-custom-gradient-picker__inserter {
+	/*rtl:ignore*/
+	direction: ltr;
 	width: 100%;
 }
 

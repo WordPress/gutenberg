@@ -10,6 +10,7 @@ import {
 	clickBlockToolbarButton,
 	clickButton,
 	clickMenuItem,
+	saveDraft,
 } from '@wordpress/e2e-test-utils';
 
 async function getSelectedFlatIndices() {
@@ -286,6 +287,28 @@ describe( 'Multi-block selection', () => {
 		await page.keyboard.up( 'Shift' );
 		await testNativeSelection();
 		expect( await getSelectedFlatIndices() ).toEqual( [ 2, 3 ] );
+	} );
+
+	// @see https://github.com/WordPress/gutenberg/issues/34118
+	it( 'should properly select a single block even if `shift` was held for the selection', async () => {
+		await clickBlockAppender();
+		await page.keyboard.type( 'test' );
+
+		await saveDraft();
+		await page.reload();
+		await page.waitForSelector( '.edit-post-layout' );
+
+		await page.keyboard.down( 'Shift' );
+		await page.click( '[data-type="core/paragraph"]', { visible: true } );
+		await page.keyboard.up( 'Shift' );
+
+		await pressKeyWithModifier( 'primary', 'a' );
+		await page.keyboard.type( 'new content' );
+		expect( await getEditedPostContent() ).toMatchInlineSnapshot( `
+		"<!-- wp:paragraph -->
+		<p>new content</p>
+		<!-- /wp:paragraph -->"
+	` );
 	} );
 
 	it( 'should select by dragging', async () => {
@@ -654,5 +677,21 @@ describe( 'Multi-block selection', () => {
 
 		// Expect both paragraphs to be deleted.
 		expect( await getEditedPostContent() ).toMatchSnapshot();
+	} );
+
+	it( 'should select title if the cursor is on title', async () => {
+		await clickBlockAppender();
+
+		await page.keyboard.type( '1' );
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.type( '2' );
+
+		await page.type( '.editor-post-title__input', 'Post title' );
+
+		await pressKeyWithModifier( 'primary', 'a' );
+		const selectedText = await page.evaluate( () => {
+			return window.getSelection().toString();
+		} );
+		expect( selectedText ).toEqual( 'Post title' );
 	} );
 } );

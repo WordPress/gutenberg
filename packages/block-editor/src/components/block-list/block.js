@@ -17,7 +17,6 @@ import {
 	getBlockType,
 	getSaveContent,
 	isUnmodifiedDefaultBlock,
-	hasBlockSupport,
 } from '@wordpress/blocks';
 import { withFilters } from '@wordpress/components';
 import { withDispatch, withSelect, useDispatch } from '@wordpress/data';
@@ -110,12 +109,9 @@ function BlockListBlock( {
 	);
 
 	const blockType = getBlockType( name );
-	const lightBlockWrapper =
-		blockType.apiVersion > 1 ||
-		hasBlockSupport( blockType, 'lightBlockWrapper', false );
 
 	// Determine whether the block has props to apply to the wrapper.
-	if ( blockType.getEditWrapperProps ) {
+	if ( blockType?.getEditWrapperProps ) {
 		wrapperProps = mergeWrapperProps(
 			wrapperProps,
 			blockType.getEditWrapperProps( attributes )
@@ -159,7 +155,7 @@ function BlockListBlock( {
 				</Block>
 			</>
 		);
-	} else if ( lightBlockWrapper ) {
+	} else if ( blockType?.apiVersion > 1 ) {
 		block = blockEdit;
 	} else {
 		block = <Block { ...wrapperProps }>{ blockEdit }</Block>;

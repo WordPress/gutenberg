@@ -14,7 +14,7 @@ import { useMemo } from '@wordpress/element';
  */
 import { useContextSystem } from '../ui/context';
 import * as styles from './styles';
-import CONFIG from '../utils/config-values';
+import { CONFIG, reduceMotion } from '../utils';
 import { useCx } from '../utils/hooks/use-cx';
 
 /**
@@ -30,7 +30,7 @@ export function getBoxShadow( value ) {
 }
 
 /**
- * @param {import('../ui/context').PolymorphicComponentProps<import('./types').Props, 'div'>} props
+ * @param {import('../ui/context').WordPressComponentProps<import('./types').Props, 'div'>} props
  */
 export function useElevation( props ) {
 	const {
@@ -62,16 +62,19 @@ export function useElevation( props ) {
 
 		const sx = {};
 
-		sx.Base = css( {
-			borderRadius,
-			bottom: offset,
-			boxShadow: getBoxShadow( value ),
-			opacity: CONFIG.elevationIntensity,
-			left: offset,
-			right: offset,
-			top: offset,
-			transition,
-		} );
+		sx.Base = css(
+			{
+				borderRadius,
+				bottom: offset,
+				boxShadow: getBoxShadow( value ),
+				opacity: CONFIG.elevationIntensity,
+				left: offset,
+				right: offset,
+				top: offset,
+				transition,
+			},
+			reduceMotion( 'transition' )
+		);
 
 		if ( ! isNil( hoverValue ) ) {
 			sx.hover = css`

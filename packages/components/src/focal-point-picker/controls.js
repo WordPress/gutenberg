@@ -30,11 +30,12 @@ export default function FocalPointPickerControls( {
 	const valueX = fractionToPercentage( percentages.x );
 	const valueY = fractionToPercentage( percentages.y );
 
-	const handleOnXChange = ( next ) => {
-		onChange( { ...percentages, x: parseInt( next ) / 100 } );
-	};
-	const handleOnYChange = ( next ) => {
-		onChange( { ...percentages, y: parseInt( next ) / 100 } );
+	const handleChange = ( value, axis ) => {
+		const num = parseInt( value, 10 );
+
+		if ( ! isNaN( num ) ) {
+			onChange( { ...percentages, [ axis ]: num / 100 } );
+		}
 	};
 
 	return (
@@ -42,13 +43,13 @@ export default function FocalPointPickerControls( {
 			<UnitControl
 				label={ __( 'Left' ) }
 				value={ valueX }
-				onChange={ handleOnXChange }
+				onChange={ ( next ) => handleChange( next, 'x' ) }
 				dragDirection="e"
 			/>
 			<UnitControl
 				label={ __( 'Top' ) }
 				value={ valueY }
-				onChange={ handleOnYChange }
+				onChange={ ( next ) => handleChange( next, 'y' ) }
 				dragDirection="s"
 			/>
 		</ControlWrapper>
@@ -59,7 +60,7 @@ function UnitControl( props ) {
 	return (
 		<BaseUnitControl
 			className="focal-point-picker__controls-position-unit-control"
-			labelPosition="side"
+			labelPosition="top"
 			max={ TEXTCONTROL_MAX }
 			min={ TEXTCONTROL_MIN }
 			unit="%"

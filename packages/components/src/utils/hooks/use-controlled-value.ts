@@ -27,8 +27,18 @@ export function useControlledValue< T >( {
 	const initialValue = hasValue ? valueProp : defaultValue;
 	const [ state, setState ] = useState( initialValue );
 	const value = hasValue ? valueProp : state;
-	const setValue =
-		hasValue && typeof onChange === 'function' ? onChange : setState;
+
+	let setValue: ( nextValue: T ) => void;
+	if ( hasValue && typeof onChange === 'function' ) {
+		setValue = onChange;
+	} else if ( ! hasValue && typeof onChange === 'function' ) {
+		setValue = ( nextValue ) => {
+			onChange( nextValue );
+			setState( nextValue );
+		};
+	} else {
+		setValue = setState;
+	}
 
 	return [ value, setValue ];
 }

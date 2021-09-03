@@ -21,9 +21,12 @@ export function usePopoverScroll( scrollableRef ) {
 				const { deltaX, deltaY } = event;
 				scrollableRef.current.scrollBy( deltaX, deltaY );
 			}
-			node.addEventListener( 'wheel', onWheel );
+			// Tell the browser that we do not call event.preventDefault
+			// See https://developer.mozilla.org/en-US/docs/Web/API/EventTarget/addEventListener#improving_scrolling_performance_with_passive_listeners
+			const options = { passive: true };
+			node.addEventListener( 'wheel', onWheel, options );
 			return () => {
-				node.removeEventListener( 'wheel', onWheel );
+				node.removeEventListener( 'wheel', onWheel, options );
 			};
 		},
 		[ scrollableRef ]

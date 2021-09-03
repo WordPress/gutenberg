@@ -24,6 +24,7 @@ const selectMock = {
 	canInsertBlockType: jest.fn(),
 	getBlockType: jest.fn(),
 	getClipboard: jest.fn(),
+	getSettings: jest.fn( () => ( {} ) ),
 };
 
 describe( 'BlockTypesTab component', () => {
@@ -48,7 +49,8 @@ describe( 'BlockTypesTab component', () => {
 		selectMock.getInserterItems.mockReturnValue( items );
 
 		const blockItems = items.filter(
-			( { category } ) => category !== 'reusable'
+			( { id, category } ) =>
+				category !== 'reusable' && id !== 'core-embed/a-paragraph-embed'
 		);
 		const component = shallow(
 			<BlockTypesTab

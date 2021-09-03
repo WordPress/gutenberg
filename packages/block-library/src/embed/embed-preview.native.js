@@ -1,8 +1,9 @@
 /**
  * External dependencies
  */
-import { TouchableWithoutFeedback, Image } from 'react-native';
+import { TouchableWithoutFeedback } from 'react-native';
 import { isEmpty } from 'lodash';
+import classnames from 'classnames/dedupe';
 
 /**
  * WordPress dependencies
@@ -11,26 +12,37 @@ import { View } from '@wordpress/primitives';
 
 import { BlockCaption } from '@wordpress/block-editor';
 import { __, sprintf } from '@wordpress/i18n';
-import { useState } from '@wordpress/element';
+import { memo, useState } from '@wordpress/element';
+import { SandBox } from '@wordpress/components';
 
 /**
  * Internal dependencies
  */
+import { getPhotoHtml } from './util';
 import EmbedNoPreview from './embed-no-preview';
 import styles from './styles.scss';
 
 const EmbedPreview = ( {
+	align,
+	className,
 	clientId,
 	icon,
 	insertBlocksAfter,
 	isSelected,
 	label,
-	onBlur,
 	onFocus,
 	preview,
 	previewable,
+	type,
+	url,
 } ) => {
 	const [ isCaptionSelected, setIsCaptionSelected ] = useState( false );
+
+	const wrapperStyle = styles[ 'embed-preview__wrapper' ];
+	const wrapperAlignStyle =
+		styles[ `embed-preview__wrapper--align-${ align }` ];
+	const sandboxAlignStyle =
+		styles[ `embed-preview__sandbox--align-${ align }` ];
 
 	function accessibilityLabelCreator( caption ) {
 		return isEmpty( caption )
@@ -56,12 +68,53 @@ const EmbedPreview = ( {
 		}
 	}
 
-	const cannotShowThumbnail =
-		! previewable ||
-		! preview ||
-		! preview.thumbnail_url?.length ||
-		! preview.height ||
-		! preview.width;
+	const { provider_url: providerUrl } = preview;
+	const html = 'photo' === type ? getPhotoHtml( preview ) : preview.html;
+	const parsedHost = new URL( url ).host.split( '.' );
+	const parsedHostBaseUrl = parsedHost
+		.splice( parsedHost.length - 2, parsedHost.length - 1 )
+		.join( '.' );
+	const iframeTitle = sprintf(
+		// translators: %s: host providing embed content e.g: www.youtube.com
+		__( 'Embedded content from %s' ),
+		parsedHostBaseUrl
+	);
+	const sandboxClassnames = classnames(
+		type,
+		className,
+		'wp-block-embed__wrapper'
+	);
+
+	const embedWrapper =
+		/* We should render here: <WpEmbedPreview html={ html } /> */
+		'wp-embed' === type ? null : (
+			<>
+				<TouchableWithoutFeedback
+					onPress={ () => {
+						if ( onFocus ) {
+							onFocus();
+						}
+						if ( isCaptionSelected ) {
+							setIsCaptionSelected( false );
+						}
+					} }
+				>
+					<View
+						pointerEvents="box-only"
+						style={ [ wrapperStyle, wrapperAlignStyle ] }
+					>
+						<SandBox
+							html={ html }
+							title={ iframeTitle }
+							type={ sandboxClassnames }
+							providerUrl={ providerUrl }
+							url={ url }
+							containerStyle={ sandboxAlignStyle }
+						/>
+					</View>
+				</TouchableWithoutFeedback>
+			</>
+		);
 
 	return (
 		<TouchableWithoutFeedback
@@ -70,23 +123,14 @@ const EmbedPreview = ( {
 			disabled={ ! isSelected }
 		>
 			<View>
-				{ cannotShowThumbnail ? (
+				{ previewable ? (
+					embedWrapper
+				) : (
 					<EmbedNoPreview
 						label={ label }
 						icon={ icon }
 						isSelected={ isSelected }
 						onPress={ () => setIsCaptionSelected( false ) }
-					/>
-				) : (
-					<Image
-						style={ [
-							styles[ 'embed-preview__image' ],
-							{ aspectRatio: preview.width / preview.height },
-						] }
-						source={ {
-							uri: preview.thumbnail_url,
-						} }
-						resizeMode="cover"
 					/>
 				) }
 				<BlockCaption
@@ -95,7 +139,6 @@ const EmbedPreview = ( {
 					clientId={ clientId }
 					insertBlocksAfter={ insertBlocksAfter }
 					isSelected={ isCaptionSelected }
-					onBlur={ onBlur }
 					onFocus={ onFocusCaption }
 				/>
 			</View>
@@ -103,4 +146,4 @@ const EmbedPreview = ( {
 	);
 };
 
-export default EmbedPreview;
+export default memo( EmbedPreview );

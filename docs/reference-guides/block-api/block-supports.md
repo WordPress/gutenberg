@@ -226,7 +226,7 @@ This property adds UI controls which allow the user to apply a gradient backgrou
 ```js
 supports: {
     color: {
-        gradient: true,
+        gradients: true,
 
         // Default values must be disabled if you don't want to use them with gradient.
         background: false,
@@ -585,4 +585,4 @@ supports: {
 }
 ```
 
-A spacing property may define an array of allowable sides that can be configured. When arbitrary sides are defined only UI controls for those sides are displayed.
+A spacing property may define an array of allowable sides that can be configured. When arbitrary sides are defined only UI controls for those sides are displayed. Axial sides are defined with the `vertical` and `horizontal` terms, and display a single UI control for each axial pair (for example, `vertical` controls both the top and bottom sides). A spacing property may support arbitrary individual sides **or** axial sides, but not a mix of both.

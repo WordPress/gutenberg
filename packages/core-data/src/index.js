@@ -11,8 +11,7 @@ import reducer from './reducer';
 import * as selectors from './selectors';
 import * as actions from './actions';
 import * as resolvers from './resolvers';
-import * as locksSelectors from './locks/selectors';
-import * as locksActions from './locks/actions';
+import createLocksActions from './locks/actions';
 import customControls from './controls';
 import { defaultEntities, getMethodName } from './entities';
 import { STORE_NAME } from './name';
@@ -24,8 +23,8 @@ import { STORE_NAME } from './name';
 
 const entitySelectors = defaultEntities.reduce( ( result, entity ) => {
 	const { kind, name } = entity;
-	result[ getMethodName( kind, name ) ] = ( state, key ) =>
-		selectors.getEntityRecord( state, kind, name, key );
+	result[ getMethodName( kind, name ) ] = ( state, key, query ) =>
+		selectors.getEntityRecord( state, kind, name, key, query );
 	result[ getMethodName( kind, name, 'get', true ) ] = ( state, ...args ) =>
 		selectors.getEntityRecords( state, kind, name, ...args );
 	return result;
@@ -33,8 +32,8 @@ const entitySelectors = defaultEntities.reduce( ( result, entity ) => {
 
 const entityResolvers = defaultEntities.reduce( ( result, entity ) => {
 	const { kind, name } = entity;
-	result[ getMethodName( kind, name ) ] = ( key ) =>
-		resolvers.getEntityRecord( kind, name, key );
+	result[ getMethodName( kind, name ) ] = ( key, query ) =>
+		resolvers.getEntityRecord( kind, name, key, query );
 	const pluralMethodName = getMethodName( kind, name, 'get', true );
 	result[ pluralMethodName ] = ( ...args ) =>
 		resolvers.getEntityRecords( kind, name, ...args );
@@ -57,13 +56,14 @@ const entityActions = defaultEntities.reduce( ( result, entity ) => {
 	return result;
 }, {} );
 
-const storeConfig = {
+const storeConfig = () => ( {
 	reducer,
 	controls: { ...customControls, ...controls },
-	actions: { ...actions, ...entityActions, ...locksActions },
-	selectors: { ...selectors, ...entitySelectors, ...locksSelectors },
+	actions: { ...actions, ...entityActions, ...createLocksActions() },
+	selectors: { ...selectors, ...entitySelectors },
 	resolvers: { ...resolvers, ...entityResolvers },
-};
+	__experimentalUseThunks: true,
+} );
 
 /**
  * Store definition for the code data namespace.
@@ -72,7 +72,7 @@ const storeConfig = {
  *
  * @type {Object}
  */
-export const store = createReduxStore( STORE_NAME, storeConfig );
+export const store = createReduxStore( STORE_NAME, storeConfig() );
 
 register( store );
 

@@ -7,6 +7,8 @@ import memize from 'memize';
  * WordPress dependencies
  */
 import RNReactNativeGutenbergBridge, {
+	requestBlockTypeImpressions,
+	setBlockTypeImpressions,
 	subscribeParentGetHtml,
 	subscribeParentToggleHTMLMode,
 	subscribeUpdateHtml,
@@ -35,6 +37,7 @@ import {
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import { getGlobalStyles } from '@wordpress/components';
+import { NEW_BLOCK_TYPES } from '@wordpress/block-library';
 
 const postTypeEntities = [
 	{ name: 'post', baseURL: '/wp/v2/posts' },
@@ -51,6 +54,7 @@ const postTypeEntities = [
 	mergedEdits: {
 		meta: true,
 	},
+	rawAttributes: [ 'title', 'excerpt', 'content' ],
 } ) );
 import { EditorHelpTopics } from '@wordpress/editor';
 
@@ -86,10 +90,15 @@ class NativeEditorProvider extends Component {
 	}
 
 	componentDidMount() {
-		const { capabilities, updateSettings } = this.props;
+		const {
+			capabilities,
+			updateSettings,
+			galleryWithImageBlocks,
+		} = this.props;
 
 		updateSettings( {
 			...capabilities,
+			...{ __unstableGalleryWithImageBlocks: galleryWithImageBlocks },
 			...this.getThemeColors( this.props ),
 		} );
 
@@ -139,8 +148,13 @@ class NativeEditorProvider extends Component {
 
 		this.subscriptionParentUpdateEditorSettings = subscribeUpdateEditorSettings(
 			( editorSettings ) => {
-				const themeColors = this.getThemeColors( editorSettings );
-				updateSettings( themeColors );
+				updateSettings( {
+					...{
+						__unstableGalleryWithImageBlocks:
+							editorSettings.galleryWithImageBlocks,
+					},
+					...this.getThemeColors( editorSettings ),
+				} );
 			}
 		);
 
@@ -157,9 +171,25 @@ class NativeEditorProvider extends Component {
 		);
 
 		this.subscriptionParentShowEditorHelp = subscribeShowEditorHelp( () => {
-			// Temporary: feature hidden from production. This is just here for testing
-			// purposes and will be replaced with actual logic in a later PR.
 			this.setState( { isHelpVisible: true } );
+		} );
+
+		// Request current block impressions from native app
+		requestBlockTypeImpressions( ( storedImpressions ) => {
+			const impressions = { ...NEW_BLOCK_TYPES, ...storedImpressions };
+
+			// Persist impressions to JavaScript store
+			updateSettings( { impressions } );
+
+			// Persist impressions to native store if they do not include latest
+			// `NEW_BLOCK_TYPES` configuration
+			const storedImpressionKeys = Object.keys( storedImpressions );
+			const storedImpressionsCurrent = Object.keys(
+				NEW_BLOCK_TYPES
+			).every( ( newKey ) => storedImpressionKeys.includes( newKey ) );
+			if ( ! storedImpressionsCurrent ) {
+				setBlockTypeImpressions( impressions );
+			}
 		} );
 	}
 
@@ -207,8 +237,8 @@ class NativeEditorProvider extends Component {
 
 	getThemeColors( { colors, gradients, rawStyles, rawFeatures } ) {
 		return {
-			...( rawStyles
-				? getGlobalStyles( rawStyles, rawFeatures, colors, gradients )
+			...( rawStyles && rawFeatures
+				? getGlobalStyles( rawStyles, rawFeatures )
 				: {
 						colors: validateThemeColors( colors ),
 						gradients: validateThemeGradients( gradients ),
@@ -312,6 +342,7 @@ class NativeEditorProvider extends Component {
 				<EditorHelpTopics
 					isVisible={ this.state.isHelpVisible }
 					onClose={ () => this.setState( { isHelpVisible: false } ) }
+					close={ () => this.setState( { isHelpVisible: false } ) }
 				/>
 			</>
 		);
@@ -332,6 +363,7 @@ export default compose( [
 			getBlockIndex,
 			getSelectedBlockClientId,
 			getGlobalBlockCount,
+			getSettings: getBlockEditorSettings,
 		} = select( blockEditorStore );
 
 		const selectedBlockClientId = getSelectedBlockClientId();
@@ -341,6 +373,7 @@ export default compose( [
 			blocks: getEditorBlocks(),
 			title: getEditedPostAttribute( 'title' ),
 			getEditedPostContent,
+			getBlockEditorSettings,
 			selectedBlockIndex: getBlockIndex( selectedBlockClientId ),
 			blockCount: getGlobalBlockCount(),
 			paragraphCount: getGlobalBlockCount( 'core/paragraph' ),

@@ -9,23 +9,33 @@ import { useSelect } from '@wordpress/data';
 import BlockTypesList from '../block-types-list';
 import useClipboardBlock from './hooks/use-clipboard-block';
 import { store as blockEditorStore } from '../../store';
+import useBlockTypeImpressions from './hooks/use-block-type-impressions';
 
 const NON_BLOCK_CATEGORIES = [ 'reusable' ];
+
+const ALLOWED_EMBED_VARIATIONS = [ 'core/embed' ];
 
 function BlockTypesTab( { onSelect, rootClientId, listProps } ) {
 	const clipboardBlock = useClipboardBlock( rootClientId );
 
-	const { items } = useSelect(
+	const { blockTypes } = useSelect(
 		( select ) => {
 			const { getInserterItems } = select( blockEditorStore );
 
 			const allItems = getInserterItems( rootClientId );
 			const blockItems = allItems.filter(
-				( { category } ) => ! NON_BLOCK_CATEGORIES.includes( category )
+				( { id, category } ) =>
+					! NON_BLOCK_CATEGORIES.includes( category ) &&
+					// We don't want to show all possible embed variations
+					// as different blocks in the inserter. We'll only show a
+					// few popular ones.
+					( category !== 'embed' ||
+						( category === 'embed' &&
+							ALLOWED_EMBED_VARIATIONS.includes( id ) ) )
 			);
 
 			return {
-				items: clipboardBlock
+				blockTypes: clipboardBlock
 					? [ clipboardBlock, ...blockItems ]
 					: blockItems,
 			};
@@ -33,11 +43,20 @@ function BlockTypesTab( { onSelect, rootClientId, listProps } ) {
 		[ rootClientId ]
 	);
 
+	const { items, trackBlockTypeSelected } = useBlockTypeImpressions(
+		blockTypes
+	);
+
+	const handleSelect = ( ...args ) => {
+		trackBlockTypeSelected( ...args );
+		onSelect( ...args );
+	};
+
 	return (
 		<BlockTypesList
 			name="Blocks"
 			items={ items }
-			onSelect={ onSelect }
+			onSelect={ handleSelect }
 			listProps={ listProps }
 		/>
 	);

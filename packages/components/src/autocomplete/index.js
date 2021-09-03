@@ -226,6 +226,9 @@ function useAutocomplete( {
 		if ( filteredOptions.length === 0 ) {
 			return;
 		}
+		if ( event.defaultPrevented ) {
+			return;
+		}
 		switch ( event.keyCode ) {
 			case UP:
 				setSelectedIndex(
@@ -244,6 +247,7 @@ function useAutocomplete( {
 			case ESCAPE:
 				setAutocompleter( null );
 				setAutocompleterUI( null );
+				event.preventDefault();
 				break;
 
 			case ENTER:
@@ -262,7 +266,6 @@ function useAutocomplete( {
 		// Any handled keycode should prevent original behavior. This relies on
 		// the early return in the default case.
 		event.preventDefault();
-		event.stopPropagation();
 	}
 
 	let textContent;

@@ -66,6 +66,13 @@
 			"__experimentalFontFamily": true
 		},
 		"reusable": false,
+		"spacing": {
+			"__experimentalSkipSerialization": true,
+			"padding": [ "horizontal", "vertical" ],
+			"__experimentalDefaultControls": {
+				"padding": true
+			}
+		},
 		"__experimentalBorder": {
 			"radius": true,
 			"__experimentalSkipSerialization": true

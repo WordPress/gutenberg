@@ -86,6 +86,7 @@ export default function PostExcerptEditor( {
 			onChange={ ( newMoreText ) =>
 				setAttributes( { moreText: newMoreText } )
 			}
+			withoutInteractiveFormatting={ true }
 		/>
 	);
 	const excerptContent = isEditable ? (

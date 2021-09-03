@@ -55,13 +55,15 @@ function ComboboxControl( {
 		selected: __( 'Item selected.' ),
 	},
 } ) {
+	const currentOption = options.find( ( option ) => option.value === value );
+	const currentLabel = currentOption?.label ?? '';
 	const instanceId = useInstanceId( ComboboxControl );
-	const [ selectedSuggestion, setSelectedSuggestion ] = useState( null );
+	const [ selectedSuggestion, setSelectedSuggestion ] = useState(
+		currentOption || null
+	);
 	const [ isExpanded, setIsExpanded ] = useState( false );
 	const [ inputValue, setInputValue ] = useState( '' );
 	const inputContainer = useRef();
-	const currentOption = options.find( ( option ) => option.value === value );
-	const currentLabel = currentOption?.label ?? '';
 
 	const matchingSuggestions = useMemo( () => {
 		const startsWithMatch = [];
@@ -104,6 +106,10 @@ function ComboboxControl( {
 	const onKeyDown = ( event ) => {
 		let preventDefault = false;
 
+		if ( event.defaultPrevented ) {
+			return;
+		}
+
 		switch ( event.keyCode ) {
 			case ENTER:
 				if ( selectedSuggestion ) {
@@ -123,7 +129,6 @@ function ComboboxControl( {
 				setIsExpanded( false );
 				setSelectedSuggestion( null );
 				preventDefault = true;
-				event.stopPropagation();
 				break;
 			default:
 				break;
@@ -155,6 +160,18 @@ function ComboboxControl( {
 		onChange( null );
 		inputContainer.current.input.focus();
 	};
+
+	// Update current selections when the filter input changes.
+	useEffect( () => {
+		const hasMatchingSuggestions = matchingSuggestions.length > 0;
+		const hasSelectedMatchingSuggestions =
+			matchingSuggestions.indexOf( selectedSuggestion ) > 0;
+
+		if ( hasMatchingSuggestions && ! hasSelectedMatchingSuggestions ) {
+			// If the current selection isn't present in the list of suggestions, then automatically select the first item from the list of suggestions.
+			setSelectedSuggestion( matchingSuggestions[ 0 ] );
+		}
+	}, [ matchingSuggestions, selectedSuggestion ] );
 
 	// Announcements
 	useEffect( () => {

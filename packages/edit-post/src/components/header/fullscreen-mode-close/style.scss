@@ -11,7 +11,7 @@
 		align-items: center;
 		align-self: stretch;
 		border: none;
-		background: #23282e; // WP-admin gray.
+		background: $gray-900;
 		color: $white;
 		border-radius: 0;
 		height: $header-height + $border-width;
@@ -38,7 +38,7 @@
 			bottom: 9px;
 			left: 9px;
 			border-radius: $radius-block-ui + $border-width + $border-width;
-			box-shadow: inset 0 0 0 var(--wp-admin-border-width-focus) #23282e;
+			box-shadow: inset 0 0 0 var(--wp-admin-border-width-focus) $gray-900;
 		}
 
 		// Hover color.

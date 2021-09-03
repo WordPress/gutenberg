@@ -5,14 +5,13 @@ import { useSelect } from '@wordpress/data';
 import {
 	InnerBlocks,
 	useBlockProps,
-	InspectorAdvancedControls,
+	InspectorControls,
 	__experimentalUseInnerBlocksProps as useInnerBlocksProps,
 	useSetting,
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import { SelectControl } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-import { useMemo } from '@wordpress/element';
 
 function GroupEdit( { attributes, setAttributes, clientId } ) {
 	const { hasInnerBlocks, themeSupportsLayout } = useSelect(
@@ -29,21 +28,6 @@ function GroupEdit( { attributes, setAttributes, clientId } ) {
 	const defaultLayout = useSetting( 'layout' ) || {};
 	const { tagName: TagName = 'div', templateLock, layout = {} } = attributes;
 	const usedLayout = !! layout && layout.inherit ? defaultLayout : layout;
-	const { contentSize, wideSize } = usedLayout;
-	const _layout = useMemo( () => {
-		if ( themeSupportsLayout ) {
-			const alignments =
-				contentSize || wideSize
-					? [ 'wide', 'full', 'left', 'center', 'right' ]
-					: [ 'left', 'center', 'right' ];
-			return {
-				type: 'default',
-				// Find a way to inject this in the support flag code (hooks).
-				alignments,
-			};
-		}
-		return undefined;
-	}, [ themeSupportsLayout, contentSize, wideSize ] );
 
 	const blockProps = useBlockProps();
 	const innerBlocksProps = useInnerBlocksProps(
@@ -55,13 +39,13 @@ function GroupEdit( { attributes, setAttributes, clientId } ) {
 			renderAppender: hasInnerBlocks
 				? undefined
 				: InnerBlocks.ButtonBlockAppender,
-			__experimentalLayout: _layout,
+			__experimentalLayout: themeSupportsLayout ? usedLayout : undefined,
 		}
 	);
 
 	return (
 		<>
-			<InspectorAdvancedControls>
+			<InspectorControls __experimentalGroup="advanced">
 				<SelectControl
 					label={ __( 'HTML element' ) }
 					options={ [
@@ -78,7 +62,7 @@ function GroupEdit( { attributes, setAttributes, clientId } ) {
 						setAttributes( { tagName: value } )
 					}
 				/>
-			</InspectorAdvancedControls>
+			</InspectorControls>
 			{ themeSupportsLayout && <TagName { ...innerBlocksProps } /> }
 			{ /* Ideally this is not needed but it's there for backward compatibility reason
 				to keep this div for themes that might rely on its presence */ }

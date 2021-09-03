@@ -2,14 +2,15 @@
  * WordPress dependencies
  */
 import {
-	activatePlugin,
+	__experimentalActivatePlugin as activatePlugin,
 	activateTheme,
 	clickBlockToolbarButton,
-	deactivatePlugin,
+	__experimentalDeactivatePlugin as deactivatePlugin,
 	showBlockToolbar,
 	visitAdminPage,
 	deleteAllWidgets,
 	pressKeyWithModifier,
+	__experimentalRest as rest,
 } from '@wordpress/e2e-test-utils';
 
 /**
@@ -19,6 +20,10 @@ import {
 import { find, findAll } from 'puppeteer-testing-library';
 import { groupBy, mapValues } from 'lodash';
 
+const twentyTwentyError = `Stylesheet twentytwenty-block-editor-styles-css was not properly added.
+For blocks, use the block API's style (https://developer.wordpress.org/block-editor/reference-guides/block-api/block-metadata/#style) or editorStyle (https://developer.wordpress.org/block-editor/reference-guides/block-api/block-metadata/#editor-style).
+For themes, use add_editor_style (https://developer.wordpress.org/block-editor/how-to-guides/themes/theme-support/#editor-styles).`;
+
 describe( 'Widgets screen', () => {
 	beforeEach( async () => {
 		await visitWidgetsScreen();
@@ -26,20 +31,20 @@ describe( 'Widgets screen', () => {
 		// Disable welcome guide if it is enabled.
 		const isWelcomeGuideActive = await page.evaluate( () =>
 			wp.data
-				.select( 'core/edit-widgets' )
-				.__unstableIsFeatureActive( 'welcomeGuide' )
+				.select( 'core/interface' )
+				.isFeatureActive( 'core/edit-widgets', 'welcomeGuide' )
 		);
 		if ( isWelcomeGuideActive ) {
 			await page.evaluate( () =>
 				wp.data
-					.dispatch( 'core/edit-widgets' )
-					.__unstableToggleFeature( 'welcomeGuide' )
+					.dispatch( 'core/interface' )
+					.toggleFeature( 'core/edit-widgets', 'welcomeGuide' )
 			);
 		}
 
 		// Wait for the widget areas to load.
 		await findAll( {
-			role: 'group',
+			role: 'document',
 			name: 'Block: Widget Area',
 		} );
 	} );
@@ -51,30 +56,17 @@ describe( 'Widgets screen', () => {
 	beforeAll( async () => {
 		// TODO: Ideally we can bundle our test theme directly in the repo.
 		await activateTheme( 'twentytwenty' );
-		// Reduced motion is needed to immediately show and dismiss the snackbars.
-		await page.emulateMediaFeatures( [
-			{
-				name: 'prefers-reduced-motion',
-				value: 'reduce',
-			},
-		] );
 		await deleteAllWidgets();
 	} );
 
 	afterAll( async () => {
-		await page.emulateMediaFeatures( [
-			{
-				name: 'prefers-reduced-motion',
-				value: 'no-preference',
-			},
-		] );
 		await activateTheme( 'twentytwentyone' );
 	} );
 
 	async function getBlockInGlobalInserter( blockName ) {
 		const addBlockButton = await find( {
 			role: 'button',
-			name: 'Add block',
+			name: 'Toggle block inserter',
 			pressed: false,
 		} );
 		await addBlockButton.click();
@@ -148,7 +140,7 @@ describe( 'Widgets screen', () => {
 		).toBe( true );
 
 		const widgetAreas = await findAll( {
-			role: 'group',
+			role: 'document',
 			name: 'Block: Widget Area',
 		} );
 		const [ firstWidgetArea, secondWidgetArea ] = widgetAreas;
@@ -245,11 +237,13 @@ describe( 'Widgets screen', () => {
 		</div></div>",
 		}
 	` );
+
+		expect( console ).toHaveErrored( twentyTwentyError );
 	} );
 
 	it.skip( 'Should insert content using the inline inserter', async () => {
 		const [ firstWidgetArea ] = await findAll( {
-			role: 'group',
+			role: 'document',
 			name: 'Block: Widget Area',
 		} );
 
@@ -521,7 +515,7 @@ describe( 'Widgets screen', () => {
 
 	it.skip( 'Should duplicate the widgets', async () => {
 		let [ firstWidgetArea ] = await findAll( {
-			role: 'group',
+			role: 'document',
 			name: 'Block: Widget Area',
 		} );
 
@@ -530,7 +524,7 @@ describe( 'Widgets screen', () => {
 
 		let firstParagraphBlock = await find(
 			{
-				role: 'group',
+				role: 'document',
 				name: /^Empty block/,
 			},
 			{ root: firstWidgetArea }
@@ -542,7 +536,7 @@ describe( 'Widgets screen', () => {
 		await page.reload();
 		// Wait for the widget areas to load.
 		[ firstWidgetArea ] = await findAll( {
-			role: 'group',
+			role: 'document',
 			name: 'Block: Widget Area',
 		} );
 
@@ -554,8 +548,6 @@ describe( 'Widgets screen', () => {
 		</div></div>",
 		}
 	` );
-		const initialWidgets = await getWidgetAreaWidgets();
-		expect( initialWidgets[ 'sidebar-1' ].length ).toBe( 1 );
 
 		firstParagraphBlock = await firstWidgetArea.$(
 			'[data-block][data-type="core/paragraph"]'
@@ -608,66 +600,47 @@ describe( 'Widgets screen', () => {
 		</div></div>",
 		}
 	` );
-		const editedWidgets = await getWidgetAreaWidgets();
-		expect( editedWidgets[ 'sidebar-1' ].length ).toBe( 2 );
-		expect( editedWidgets[ 'sidebar-1' ][ 0 ] ).toBe(
-			initialWidgets[ 'sidebar-1' ][ 0 ]
+		expect( editedSerializedWidgetAreas[ 'sidebar-1' ] ).toBe(
+			[
+				initialSerializedWidgetAreas[ 'sidebar-1' ],
+				initialSerializedWidgetAreas[ 'sidebar-1' ],
+			].join( '\n' )
 		);
+
+		expect( console ).toHaveErrored( twentyTwentyError );
 	} );
 
 	it( 'Should display legacy widgets', async () => {
-		/**
-		 * Using the classic widgets screen to simulate creating legacy widgets.
-		 */
-		await activatePlugin( 'gutenberg-test-classic-widgets' );
-		await visitAdminPage( 'widgets.php' );
+		// Get the default empty instance of a legacy search widget.
+		const { instance: defaultSearchInstance } = await rest( {
+			method: 'POST',
+			path: '/wp/v2/widget-types/search/encode',
+			data: { instance: {} },
+		} );
 
-		const searchWidget = await find(
-			{
-				role: 'heading',
-				name: 'Search',
-				level: 3,
+		// Create a search widget in the first sidebar using the default instance.
+		await rest( {
+			method: 'POST',
+			path: '/wp/v2/widgets',
+			data: {
+				id_base: 'search',
+				sidebar: 'sidebar-1',
+				instance: defaultSearchInstance,
 			},
-			{
-				root: await page.$( '#widget-list' ),
-			}
-		);
-		await searchWidget.click();
-
-		const addWidgetButton = await find( {
-			role: 'button',
-			name: 'Add Widget',
 		} );
-		await addWidgetButton.click();
 
-		// Wait for the changes to be saved.
-		// TODO: Might have better ways to do this.
-		await page.waitForFunction( () => {
-			const addedSearchWidget = document.querySelector(
-				'#widgets-right .widget'
-			);
-			const spinner = addedSearchWidget.querySelector( '.spinner' );
-
-			return (
-				addedSearchWidget.classList.contains( 'open' ) &&
-				! spinner.classList.contains( 'is-active' )
-			);
-		} );
-		// FIXME: For some reasons, waiting for the spinner to disappear is not enough.
-		// eslint-disable-next-line no-restricted-syntax
-		await page.waitForTimeout( 500 );
-
-		await deactivatePlugin( 'gutenberg-test-classic-widgets' );
-		await visitWidgetsScreen();
+		await page.reload();
 
 		// Wait for the Legacy Widget block's preview iframe to load.
 		const frame = await new Promise( ( resolve ) => {
-			const checkFrame = async ( candidateFrame ) => {
-				const url = await candidateFrame.url();
-				if ( url.includes( 'legacy-widget-preview' ) ) {
+			const checkFrame = async () => {
+				const frameElement = await page.$(
+					'iframe.wp-block-legacy-widget__edit-preview-iframe'
+				);
+				if ( frameElement ) {
 					page.off( 'frameattached', checkFrame );
 					page.off( 'framenavigated', checkFrame );
-					resolve( candidateFrame );
+					resolve( frameElement.contentFrame() );
 				}
 			};
 			page.on( 'frameattached', checkFrame );
@@ -686,7 +659,7 @@ describe( 'Widgets screen', () => {
 
 		// Focus the Legacy Widget block.
 		const legacyWidget = await find( {
-			role: 'group',
+			role: 'document',
 			name: 'Block: Legacy Widget',
 		} );
 		await legacyWidget.focus();
@@ -745,7 +718,7 @@ describe( 'Widgets screen', () => {
 
 	it.skip( 'allows widgets to be moved between widget areas using the dropdown in the block toolbar', async () => {
 		const widgetAreas = await findAll( {
-			role: 'group',
+			role: 'document',
 			name: 'Block: Widget Area',
 		} );
 		const [ firstWidgetArea, secondWidgetArea ] = widgetAreas;
@@ -758,7 +731,7 @@ describe( 'Widgets screen', () => {
 		await inserterParagraphBlock.click();
 		const addedParagraphBlockInFirstWidgetArea = await find(
 			{
-				role: 'group',
+				role: 'document',
 				name: /^Empty block/,
 			},
 			{ root: firstWidgetArea }
@@ -769,7 +742,7 @@ describe( 'Widgets screen', () => {
 		// Check that the block exists in the first widget area.
 		await find(
 			{
-				role: 'group',
+				role: 'document',
 				name: 'Paragraph block',
 				value: 'First Paragraph',
 			},
@@ -790,7 +763,7 @@ describe( 'Widgets screen', () => {
 		// Check that the block exists in the second widget area.
 		await find(
 			{
-				role: 'group',
+				role: 'document',
 				name: 'Paragraph block',
 				value: 'First Paragraph',
 			},
@@ -809,11 +782,13 @@ describe( 'Widgets screen', () => {
 		</div></div>",
 		}
 	` );
+
+		expect( console ).toHaveErrored( twentyTwentyError );
 	} );
 
 	it( 'Allows widget deletion to be undone', async () => {
 		const [ firstWidgetArea ] = await findAll( {
-			role: 'group',
+			role: 'document',
 			name: 'Block: Widget Area',
 		} );
 
@@ -842,6 +817,7 @@ describe( 'Widgets screen', () => {
 		await page.keyboard.type( 'Second Paragraph' );
 
 		await saveWidgets();
+		await page.focus( '.block-editor-writing-flow' );
 
 		// Delete the last block and save again.
 		await pressKeyWithModifier( 'access', 'z' );
@@ -865,6 +841,8 @@ describe( 'Widgets screen', () => {
 		</div></div>",
 		}
 	` );
+
+		expect( console ).toHaveErrored( twentyTwentyError );
 	} );
 } );
 
@@ -915,9 +893,7 @@ async function saveWidgets() {
 }
 
 async function getSerializedWidgetAreas() {
-	const widgets = await page.evaluate( () =>
-		wp.data.select( 'core' ).getWidgets( { _embed: 'about' } )
-	);
+	const widgets = await rest( { path: '/wp/v2/widgets' } );
 
 	const serializedWidgetAreas = mapValues(
 		groupBy( widgets, 'sidebar' ),
@@ -929,21 +905,4 @@ async function getSerializedWidgetAreas() {
 	);
 
 	return serializedWidgetAreas;
-}
-
-async function getWidgetAreaWidgets() {
-	const widgets = await page.evaluate( () => {
-		const widgetAreas = wp.data
-			.select( 'core/edit-widgets' )
-			.getWidgetAreas();
-		const sidebars = {};
-
-		for ( const widgetArea of widgetAreas ) {
-			sidebars[ widgetArea.id ] = widgetArea.widgets;
-		}
-
-		return sidebars;
-	} );
-
-	return widgets;
 }

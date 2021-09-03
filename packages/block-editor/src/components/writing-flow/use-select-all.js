@@ -31,15 +31,11 @@ export default function useSelectAll() {
 				return;
 			}
 
-			const selectedClientIds = getSelectedBlockClientIds();
-
-			if (
-				selectedClientIds.length === 1 &&
-				! isEntirelySelected( event.target )
-			) {
+			if ( ! isEntirelySelected( event.target ) ) {
 				return;
 			}
 
+			const selectedClientIds = getSelectedBlockClientIds();
 			const [ firstSelectedClientId ] = selectedClientIds;
 			const rootClientId = getBlockRootClientId( firstSelectedClientId );
 			let blockClientIds = getBlockOrder( rootClientId );
