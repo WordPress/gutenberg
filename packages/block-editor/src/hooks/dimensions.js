@@ -113,6 +113,7 @@ export function DimensionsPanel( props ) {
 						},
 					} ) }
 					isShownByDefault={ defaultSpacingControls?.blockGap }
+					panelId={ props.clientId }
 				>
 					<GapEdit { ...props } />
 				</ToolsPanelItem>
