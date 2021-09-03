@@ -102,16 +102,7 @@ export function DimensionsPanel( props ) {
 					hasValue={ () => hasGapValue( props ) }
 					label={ __( 'Block gap' ) }
 					onDeselect={ () => resetGap( props ) }
-					resetAllFilter={ ( newAttributes ) => ( {
-						...newAttributes,
-						style: {
-							...newAttributes.style,
-							spacing: {
-								...newAttributes.style?.spacing,
-								blockGap: undefined,
-							},
-						},
-					} ) }
+					resetAllFilter={ createResetAllFilter( 'blockGap' ) }
 					isShownByDefault={ defaultSpacingControls?.blockGap }
 					panelId={ props.clientId }
 				>
