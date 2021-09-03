@@ -1,7 +1,5 @@
 buildscript {
     ext {
-        gradlePluginVersion = '4.0.2'
-        kotlinVersion = '1.5.20'
         supportLibVersion = '29.0.2'
         tagSoupVersion = '1.2.1'
         glideVersion = '3.7.0'
@@ -14,30 +12,14 @@ buildscript {
         aztecVersion = 'v1.3.45'
         willPublishReactNativeAztecBinary = properties["willPublishReactNativeAztecBinary"]?.toBoolean() ?: false
     }
-
-    repositories {
-        maven {
-            url 'https://a8c-libs.s3.amazonaws.com/android'
-            content {
-                includeGroup 'com.automattic.android'
-            }
-        }
-        jcenter()
-        google()
-    }
-
-    dependencies {
-        classpath "com.android.tools.build:gradle:$gradlePluginVersion"
-        classpath 'com.github.dcendents:android-maven-gradle-plugin:2.1'
-        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlinVersion"
-        classpath 'com.automattic.android:publish-to-s3:0.6.1'
-    }
 }
 
-apply plugin: 'com.android.library'
-apply plugin: 'kotlin-android'
-apply plugin: 'com.github.dcendents.android-maven'
-apply plugin: 'com.automattic.android.publish-to-s3'
+plugins {
+    id "com.android.library"
+    id "org.jetbrains.kotlin.android"
+    id "maven-publish"
+    id "com.automattic.android.publish-to-s3"
+}
 
 // import the `readReactNativeVersion()` function
 apply from: 'https://gist.githubusercontent.com/hypest/742448b9588b3a0aa580a5e80ae95bdf/raw/8eb62d40ee7a5104d2fcaeff21ce6f29bd93b054/readReactNativeVersion.gradle'
@@ -104,8 +86,6 @@ dependencies {
     api "com.github.wordpress-mobile.WordPress-Aztec-Android:wordpress-comments:$aztecVersion"
     api "com.github.wordpress-mobile.WordPress-Aztec-Android:glide-loader:$aztecVersion"
     implementation "org.wordpress:utils:$wordpressUtilsVersion"
-
-    implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlinVersion"
 
     implementation 'androidx.legacy:legacy-support-v4:1.0.0'
     implementation 'androidx.gridlayout:gridlayout:1.0.0'

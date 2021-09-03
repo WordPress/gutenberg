@@ -152,7 +152,10 @@ add_filter( 'walker_nav_menu_start_el', 'gutenberg_output_block_nav_menu_item', 
  * @return array Updated menu items, sorted by each menu item's menu order.
  */
 function gutenberg_remove_block_nav_menu_items( $menu_items ) {
-	if ( current_theme_supports( 'block-nav-menus' ) ) {
+	// We should uncomment the line below when the block-nav-menus feature becomes stable.
+	// @see https://github.com/WordPress/gutenberg/issues/34265.
+	/*if ( current_theme_supports( 'block-nav-menus' ) ) {*/
+	if ( false ) {
 		return $menu_items;
 	}
 
@@ -246,7 +249,10 @@ function gutenberg_convert_menu_items_to_blocks(
  * @return string|null Nav menu output to short-circuit with.
  */
 function gutenberg_output_block_nav_menu( $output, $args ) {
-	if ( ! current_theme_supports( 'block-nav-menus' ) ) {
+	// We should uncomment the line below when the block-nav-menus feature becomes stable.
+	// @see https://github.com/WordPress/gutenberg/issues/34265.
+	/*if ( ! current_theme_supports( 'block-nav-menus' ) ) {*/
+	if ( true ) {
 		return null;
 	}
 

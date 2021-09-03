@@ -8,7 +8,7 @@ import { TouchableOpacity, TouchableWithoutFeedback, Text } from 'react-native';
  */
 import { View } from '@wordpress/primitives';
 
-import { __ } from '@wordpress/i18n';
+import { __, sprintf } from '@wordpress/i18n';
 import { useRef, useState } from '@wordpress/element';
 import { usePreferredColorSchemeStyle } from '@wordpress/compose';
 import { requestPreview } from '@wordpress/react-native-bridge';
@@ -73,11 +73,19 @@ const EmbedNoPreview = ( { label, icon, isSelected, onPress } ) => {
 		postType === 'page' ? __( 'Preview page' ) : __( 'Preview post' );
 	const comingSoonDescription =
 		postType === 'page'
-			? __(
-					'We’re working hard on adding support for embed previews. In the meantime, you can preview the embedded content on the page.'
+			? sprintf(
+					// translators: %s: embed block variant's label e.g: "Twitter".
+					__(
+						'We’re working hard on adding support for %s previews. In the meantime, you can preview the embedded content on the page.'
+					),
+					label
 			  )
-			: __(
-					'We’re working hard on adding support for embed previews. In the meantime, you can preview the embedded content on the post.'
+			: sprintf(
+					// translators: %s: embed block variant's label e.g: "Twitter".
+					__(
+						'We’re working hard on adding support for %s previews. In the meantime, you can preview the embedded content on the post.'
+					),
+					label
 			  );
 
 	function onOpenSheet() {
@@ -118,7 +126,11 @@ const EmbedNoPreview = ( { label, icon, isSelected, onPress } ) => {
 					<BlockIcon icon={ icon } />
 					<Text style={ labelStyle }>{ label }</Text>
 					<Text style={ descriptionStyle }>
-						{ __( 'Embed previews not yet available' ) }
+						{ sprintf(
+							// translators: %s: embed block variant's label e.g: "Twitter".
+							__( '%s previews not yet available' ),
+							label
+						) }
 					</Text>
 					<Text style={ styles.embed__action }>
 						{ previewButtonText.toUpperCase() }
@@ -154,7 +166,11 @@ const EmbedNoPreview = ( { label, icon, isSelected, onPress } ) => {
 						/>
 					</View>
 					<Text style={ sheetTitleStyle }>
-						{ __( 'Embed block previews are coming soon' ) }
+						{ sprintf(
+							// translators: %s: embed block variant's label e.g: "Twitter".
+							__( '%s block previews are coming soon' ),
+							label
+						) }
 					</Text>
 					<Text style={ sheetDescriptionStyle }>
 						{ comingSoonDescription }

@@ -144,7 +144,14 @@ function addAttribute( settings ) {
 	return settings;
 }
 
-const skipSerializationPaths = {
+/**
+ * A dictionary of paths to flag skipping block support serialization as the key,
+ * with values providing the style paths to be omitted from serialization.
+ *
+ * @constant
+ * @type {Record<string, string[]>}
+ */
+const skipSerializationPathsEdit = {
 	[ `${ BORDER_SUPPORT_KEY }.__experimentalSkipSerialization` ]: [ 'border' ],
 	[ `${ COLOR_SUPPORT_KEY }.__experimentalSkipSerialization` ]: [
 		COLOR_SUPPORT_KEY,
@@ -158,22 +165,45 @@ const skipSerializationPaths = {
 };
 
 /**
+ * A dictionary of paths to flag skipping block support serialization as the key,
+ * with values providing the style paths to be omitted from serialization.
+ *
+ * Extends the Edit skip paths to enable skipping additional paths in just
+ * the Save component. This allows a block support to be serialized within the
+ * editor, while using an alternate approach, such as server-side rendering, when
+ * the support is saved.
+ *
+ * @constant
+ * @type {Record<string, string[]>}
+ */
+const skipSerializationPathsSave = {
+	...skipSerializationPathsEdit,
+	[ `${ SPACING_SUPPORT_KEY }` ]: [ 'spacing.blockGap' ],
+};
+
+/**
  * Override props assigned to save component to inject the CSS variables definition.
  *
- * @param {Object} props      Additional props applied to save element.
- * @param {Object} blockType  Block type.
- * @param {Object} attributes Block attributes.
+ * @param {Object}                    props      Additional props applied to save element.
+ * @param {Object}                    blockType  Block type.
+ * @param {Object}                    attributes Block attributes.
+ * @param {?Record<string, string[]>} skipPaths  An object of keys and paths to skip serialization.
  *
  * @return {Object} Filtered props applied to save element.
  */
-export function addSaveProps( props, blockType, attributes ) {
+export function addSaveProps(
+	props,
+	blockType,
+	attributes,
+	skipPaths = skipSerializationPathsSave
+) {
 	if ( ! hasStyleSupport( blockType ) ) {
 		return props;
 	}
 
 	let { style } = attributes;
 
-	forEach( skipSerializationPaths, ( path, indicator ) => {
+	forEach( skipPaths, ( path, indicator ) => {
 		if ( getBlockSupport( blockType, indicator ) ) {
 			style = omit( style, path );
 		}
@@ -207,7 +237,12 @@ export function addEditProps( settings ) {
 			props = existingGetEditWrapperProps( attributes );
 		}
 
-		return addSaveProps( props, settings, attributes );
+		return addSaveProps(
+			props,
+			settings,
+			attributes,
+			skipSerializationPathsEdit
+		);
 	};
 
 	return settings;

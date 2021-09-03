@@ -41,6 +41,8 @@ Moreover, when the navigation is rendered on the front of the site the system co
 
 ### Block-based Mode
 
+**Important**: block-based mode has been temporarily ***disabled*** until it becomes stable. So, if a theme declares support for the `block-nav-menus` feature it will not affect the frontend.
+
 If desired, themes are able to opt into _rendering_ complete block-based menus using the Navigation Editor. This allows for arbitrarily complex navigation block structures to be used in an existing theme whilst still ensuring the navigation data is still _saved_ to the existing (post type powered) Menus system.
 
 Themes can opt into this behaviour by declaring:

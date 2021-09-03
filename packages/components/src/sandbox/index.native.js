@@ -92,22 +92,67 @@ const style = `
 	body > div iframe {
 		width: 100%;
 	}
-	html.wp-has-aspect-ratio,
-	body.wp-has-aspect-ratio,
-	body.wp-has-aspect-ratio > div,
-	body.wp-has-aspect-ratio > div iframe {
-		height: auto;
-		overflow: hidden; /* If it has an aspect ratio, it shouldn't scroll. */
-	}
 	body > div > * {
 		margin-top: 0 !important; /* Has to have !important to override inline styles. */
 		margin-bottom: 0 !important;
+	}
+
+	.wp-block-embed__wrapper {
+		position: relative;
+	}
+
+	body.wp-has-aspect-ratio > div iframe {
+		height: 100%;
+		overflow: hidden; /* If it has an aspect ratio, it shouldn't scroll. */
+	}
+
+	/**
+	 * Add responsiveness to embeds with aspect ratios.
+	 * 
+	 * These styles have been copied from the web version (https://git.io/JEFcX) and
+	 * adapted for the native version.
+	 */
+	.wp-has-aspect-ratio.wp-block-embed__wrapper::before {
+		content: "";
+		display: block;
+		padding-top: 50%; // Default to 2:1 aspect ratio.
+	}
+	.wp-has-aspect-ratio iframe {
+		position: absolute;
+		top: 0;
+		right: 0;
+		bottom: 0;
+		left: 0;
+		height: 100%;
+		width: 100%;
+	}
+	.wp-embed-aspect-21-9.wp-block-embed__wrapper::before {
+		padding-top: 42.85%; // 9 / 21 * 100
+	}
+	.wp-embed-aspect-18-9.wp-block-embed__wrapper::before {
+		padding-top: 50%; // 9 / 18 * 100
+	}
+	.wp-embed-aspect-16-9.wp-block-embed__wrapper::before {
+		padding-top: 56.25%; // 9 / 16 * 100
+	}
+	.wp-embed-aspect-4-3.wp-block-embed__wrapper::before {
+		padding-top: 75%; // 3 / 4 * 100
+	}
+	.wp-embed-aspect-1-1.wp-block-embed__wrapper::before {
+		padding-top: 100%; // 1 / 1 * 100
+	}
+	.wp-embed-aspect-9-16.wp-block-embed__wrapper::before {
+		padding-top: 177.77%; // 16 / 9 * 100
+	}
+	.wp-embed-aspect-1-2.wp-block-embed__wrapper::before {
+		padding-top: 200%; // 2 / 1 * 100
 	}
 `;
 
 const EMPTY_ARRAY = [];
 
 function Sandbox( {
+	containerStyle,
 	html = '',
 	providerUrl = '',
 	scripts = EMPTY_ARRAY,
@@ -117,7 +162,6 @@ function Sandbox( {
 	url,
 } ) {
 	const ref = useRef();
-	const [ width, setWidth ] = useState( 0 );
 	const [ height, setHeight ] = useState( 0 );
 	const [ contentHtml, setContentHtml ] = useState( getHtmlDoc() );
 
@@ -142,7 +186,7 @@ function Sandbox( {
 		// Scripts go into the body rather than the head, to support embedded content such as Instagram
 		// that expect the scripts to be part of the body.
 		const htmlDoc = (
-			<html lang={ lang } className={ type }>
+			<html lang={ lang }>
 				<head>
 					<title>{ title }</title>
 					<meta
@@ -207,19 +251,13 @@ function Sandbox( {
 			return;
 		}
 
-		setWidth( data.width );
 		setHeight( data.height );
 	}
 
 	function getSizeStyle() {
-		const contentWidth = Math.ceil( width );
 		const contentHeight = Math.ceil( height );
 
-		if ( contentWidth && contentHeight ) {
-			return { width: contentWidth, height: contentHeight };
-		}
-
-		return { aspectRatio: 1 };
+		return { height: contentHeight };
 	}
 
 	function onChangeDimensions( dimensions ) {
@@ -241,7 +279,6 @@ function Sandbox( {
 		// When device orientation changes we have to recalculate the size,
 		// for this purpose we reset the current size value.
 		if ( wasLandscape.current !== isLandscape ) {
-			setWidth( 0 );
 			setHeight( 0 );
 		}
 		wasLandscape.current = isLandscape;
@@ -249,6 +286,10 @@ function Sandbox( {
 
 	return (
 		<WebView
+			containerStyle={ [
+				sandboxStyles[ 'sandbox-webview__container' ],
+				containerStyle,
+			] }
 			key={ key }
 			ref={ ref }
 			source={ { baseUrl: providerUrl, html: contentHtml } }
@@ -256,10 +297,14 @@ function Sandbox( {
 			// Reference: https://github.com/react-native-webview/react-native-webview/blob/master/docs/Reference.md#source
 			originWhitelist={ [ '*' ] }
 			style={ [
-				sandboxStyles[ 'sandbox-webview__container' ],
+				sandboxStyles[ 'sandbox-webview__content' ],
 				getSizeStyle(),
 			] }
 			onMessage={ checkMessageForResize }
+			scrollEnabled={ false }
+			setBuiltInZoomControls={ false }
+			showsHorizontalScrollIndicator={ false }
+			showsVerticalScrollIndicator={ false }
 		/>
 	);
 }
