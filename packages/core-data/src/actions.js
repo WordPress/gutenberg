@@ -354,8 +354,7 @@ export const saveEntityRecord = (
 	if ( ! entity ) {
 		return;
 	}
-	const entityIdKey = entity.key || DEFAULT_ENTITY_KEY;
-	const recordId = record[ entityIdKey ];
+	const recordId = getRecordId( entity, record );
 
 	const lock = await dispatch.__unstableAcquireStoreLock(
 		STORE_NAME,
@@ -364,7 +363,9 @@ export const saveEntityRecord = (
 	);
 
 	try {
-		record = await dispatch( evaluateOptimizedEdits( record ) );
+		record = await dispatch(
+			evaluateOptimizedEdits( kind, name, recordId, record )
+		);
 
 		await dispatch( {
 			type: 'SAVE_ENTITY_RECORD_START',
@@ -380,11 +381,18 @@ export const saveEntityRecord = (
 				entity.name,
 				recordId
 			);
-			const path = `${ entity.baseURL }${
-				recordId ? '/' + recordId : ''
-			}`;
-			const commit = isAutosave ? performAutosave : performSave;
-			updatedRecord = await dispatch( commit( { entity, persistedRecord, record, recordId, path, __unstableFetch } ) );
+			const persist = isAutosave
+				? persistAutosaveToAPI
+				: persistRecordToAPI;
+			updatedRecord = await dispatch(
+				persist( {
+					entity,
+					persistedRecord,
+					record,
+					recordId,
+					__unstableFetch,
+				} )
+			);
 		} catch ( _error ) {
 			error = _error;
 		}
@@ -402,14 +410,19 @@ export const saveEntityRecord = (
 	}
 };
 
-function evaluateOptimizedEdits(record) {
-	return async ({ select, dispatch }) => {
+const getRecordId = ( entity, record ) => {
+	const entityIdKey = entity.key || DEFAULT_ENTITY_KEY;
+	return record[ entityIdKey ];
+};
+
+function evaluateOptimizedEdits( kind, name, recordId, record ) {
+	return async ( { select, dispatch } ) => {
 		// Evaluate optimized edits.
 		// (Function edits that should be evaluated on save to avoid expensive computations on every edit.)
-		for (const [key, value] of Object.entries(record)) {
-			if (typeof value === 'function') {
+		for ( const [ key, value ] of Object.entries( record ) ) {
+			if ( typeof value === 'function' ) {
 				const evaluatedValue = value(
-					select.getEditedEntityRecord(kind, name, recordId)
+					select.getEditedEntityRecord( kind, name, recordId )
 				);
 
 				await dispatch.editEntityRecord(
@@ -417,31 +430,34 @@ function evaluateOptimizedEdits(record) {
 					name,
 					recordId,
 					{
-						[key]: evaluatedValue,
+						[ key ]: evaluatedValue,
 					},
 					{ undoIgnore: true }
 				);
-				record[key] = evaluatedValue;
+				record[ key ] = evaluatedValue;
 			}
 		}
 		return record;
-	}
+	};
 }
 
-function performSave({ entity, persistedRecord, record, recordId, path, __unstableFetch }) {
-	return async ({ select, dispatch }) => {
+function persistRecordToAPI( {
+	entity,
+	persistedRecord,
+	record,
+	__unstableFetch,
+} ) {
+	return async ( { dispatch } ) => {
+		const recordId = getRecordId( entity, record );
 		let edits = record;
 		if ( entity.__unstablePrePersist ) {
 			edits = {
 				...edits,
-				...entity.__unstablePrePersist(
-					persistedRecord,
-					edits
-				),
+				...entity.__unstablePrePersist( persistedRecord, edits ),
 			};
 		}
 		const options = {
-			path,
+			path: entityEndpointPath( entity, recordId ),
 			method: recordId ? 'PUT' : 'POST',
 			data: edits,
 		};
@@ -455,61 +471,7 @@ function performSave({ entity, persistedRecord, record, recordId, path, __unstab
 			edits
 		);
 		return updatedRecord;
-	}
-}
-
-function performAutosave({ entity, persistedRecord, record, recordId, path, __unstableFetch }) {
-	return async ({ select, dispatch }) => {
-		// Most of this autosave logic is very specific to posts.
-		// This is fine for now as it is the only supported autosave,
-		// but ideally this should all be handled in the back end,
-		// so the client just sends and receives objects.
-		const autosavePost = select.getAutosave(
-			persistedRecord.type,
-			persistedRecord.id,
-			select.getCurrentUser()?.id
-		);
-
-		// Autosaves need all expected fields to be present.
-		// So we fallback to the previous autosave and then
-		// to the actual persisted entity if the edits don't
-		// have a value.
-		const requestData = prepareAutosaveRequest( {
-			...persistedRecord,
-			...autosavePost,
-			...record,
-		} );
-
-		const updatedRecord = await __unstableFetch( {
-			path: `${ path }/autosaves`,
-			method: 'POST',
-			data: requestData,
-		} );
-
-		// An autosave may be processed by the server as a regular save
-		// when its update is requested by the author and the post had
-		// draft or auto-draft status.
-		if ( persistedRecord.id === updatedRecord.id ) {
-			await dispatch.receiveEntityRecords(
-				entity.kind,
-				entity.name,
-				reconcileAutosave(
-					persistedRecord,
-					requestData,
-					updatedRecord
-				),
-				undefined,
-				true
-			);
-		} else {
-			await dispatch.receiveAutosaves(
-				persistedRecord.id,
-				updatedRecord
-			);
-		}
-
-		return updatedRecord;
-	}
+	};
 }
 
 export const prepareAutosaveRequest = ( {
@@ -527,22 +489,96 @@ export const prepareAutosaveRequest = ( {
 export const reconcileAutosave = (
 	persistedRecord,
 	requestData,
-	updatedRecord
-) => ( {
-	...persistedRecord,
+	updatedRecord,
+	{ processedAsRegularSave }
+) =>
+	processedAsRegularSave
+		? {
+				...persistedRecord,
 
-	title: updatedRecord.title,
-	excerpt: updatedRecord.excerpt,
-	content: updatedRecord.content,
+				title: updatedRecord.title,
+				excerpt: updatedRecord.excerpt,
+				content: updatedRecord.content,
 
-	// Status is only persisted in autosaves when going from
-	// "auto-draft" to "draft".
-	status:
-		persistedRecord.status === 'auto-draft' &&
-		requestData.status === 'draft'
-			? requestData.status
-			: persistedRecord.status,
-} );
+				// Status is only persisted in autosaves when going from
+				// "auto-draft" to "draft".
+				status:
+					persistedRecord.status === 'auto-draft' &&
+					requestData.status === 'draft'
+						? requestData.status
+						: persistedRecord.status,
+		  }
+		: updatedRecord;
+
+function persistAutosaveToAPI( {
+	entity,
+	persistedRecord,
+	record,
+	__unstableFetch,
+	__prepareAutosaveRequest = prepareAutosaveRequest,
+	__reconcileAutosave = reconcileAutosave,
+} ) {
+	return async ( { select, dispatch } ) => {
+		const recordId = getRecordId( entity, record );
+		// Most of this autosave logic is very specific to posts.
+		// This is fine for now as it is the only supported autosave,
+		// but ideally this should all be handled in the back end,
+		// so the client just sends and receives objects.
+		const autosavePost = select.getAutosave(
+			persistedRecord.type,
+			persistedRecord.id,
+			select.getCurrentUser()?.id
+		);
+
+		// Autosaves need all expected fields to be present.
+		// So we fallback to the previous autosave and then
+		// to the actual persisted entity if the edits don't
+		// have a value.
+		const requestData = __prepareAutosaveRequest( {
+			...persistedRecord,
+			...autosavePost,
+			...record,
+		} );
+
+		const path = entityEndpointPath( entity, recordId );
+		const updatedRecord = await __unstableFetch( {
+			path: `${ path }/autosaves`,
+			method: 'POST',
+			data: requestData,
+		} );
+
+		// An autosave may be processed by the server as a regular save
+		// when its update is requested by the author and the post had
+		// draft or auto-draft status.
+		const processedAsRegularSave = persistedRecord.id === updatedRecord.id;
+		const reconciledRecord = __reconcileAutosave(
+			persistedRecord,
+			requestData,
+			updatedRecord,
+			{ processedAsRegularSave }
+		);
+
+		if ( processedAsRegularSave ) {
+			await dispatch.receiveEntityRecords(
+				entity.kind,
+				entity.name,
+				reconciledRecord,
+				undefined,
+				true
+			);
+		} else {
+			await dispatch.receiveAutosaves(
+				persistedRecord.id,
+				reconciledRecord
+			);
+		}
+
+		return updatedRecord;
+	};
+}
+
+const entityEndpointPath = ( entity, recordId ) =>
+	`${ entity.baseURL }${ recordId ? '/' + recordId : '' }`;
 
 /**
  * Runs multiple core-data actions at the same time using one API request.
