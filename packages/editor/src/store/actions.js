@@ -15,7 +15,7 @@ import {
 	__unstableSerializeAndClean,
 } from '@wordpress/blocks';
 import { store as noticesStore } from '@wordpress/notices';
-import { store as coreStore } from '@wordpress/core-data';
+import { persistAutosaveToAPI, store as coreStore } from '@wordpress/core-data';
 import { store as blockEditorStore } from '@wordpress/block-editor';
 
 /**
@@ -409,7 +409,7 @@ export function* autosave( { local = false, ...options } = {} ) {
 		};
 	} else {
 		yield controls.dispatch( STORE_NAME, 'savePost', {
-			isAutosave: true,
+			persist: persistAutosaveToAPI,
 			...options,
 		} );
 	}

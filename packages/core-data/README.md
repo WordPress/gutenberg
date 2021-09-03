@@ -89,18 +89,6 @@ _Returns_
 
 -   `Object`: Action object.
 
-### persistAutosaveToAPI
-
-Undocumented declaration.
-
-### persistRecordToAPI
-
-Undocumented declaration.
-
-### prepareAutosaveRequest
-
-Undocumented declaration.
-
 ### receiveAutosaves
 
 Returns an action object used in signalling that the autosaves for a
@@ -221,10 +209,6 @@ _Returns_
 
 -   `Object`: Action object.
 
-### reconcileAutosave
-
-Undocumented declaration.
-
 ### redo
 
 Action triggered to redo the last undoed
@@ -255,7 +239,6 @@ _Parameters_
 -   _name_ `string`: Name of the received entity.
 -   _record_ `Object`: Record to be saved.
 -   _options_ `Object`: Saving options.
--   _options.isAutosave_ `[boolean]`: Whether this is an autosave.
 -   _options.persist_ `[Function]`: Function used to persist the record
 
 ### undo

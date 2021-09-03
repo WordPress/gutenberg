@@ -79,3 +79,4 @@ register( store );
 export { default as EntityProvider } from './entity-provider';
 export * from './entity-provider';
 export * from './fetch';
+export * from './persist';
