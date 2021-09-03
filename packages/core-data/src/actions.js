@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { castArray, get, isEqual, find } from 'lodash';
+import { castArray, isEqual, find } from 'lodash';
 import { v4 as uuid } from 'uuid';
 
 /**
@@ -425,8 +425,7 @@ export const saveEntityRecord = (
 						if (
 							[ 'title', 'excerpt', 'content' ].includes( key )
 						) {
-							// Edits should be the "raw" attribute values.
-							acc[ key ] = get( data[ key ], 'raw', data[ key ] );
+							acc[ key ] = data[ key ];
 						}
 						return acc;
 					},
@@ -461,12 +460,7 @@ export const saveEntityRecord = (
 									key
 								)
 							) {
-								// Edits should be the "raw" attribute values.
-								acc[ key ] = get(
-									newRecord[ key ],
-									'raw',
-									newRecord[ key ]
-								);
+								acc[ key ] = newRecord[ key ];
 							} else if ( key === 'status' ) {
 								// Status is only persisted in autosaves when going from
 								// "auto-draft" to "draft".
@@ -477,11 +471,7 @@ export const saveEntityRecord = (
 										: persistedRecord.status;
 							} else {
 								// These properties are not persisted in autosaves.
-								acc[ key ] = get(
-									persistedRecord[ key ],
-									'raw',
-									persistedRecord[ key ]
-								);
+								acc[ key ] = persistedRecord[ key ];
 							}
 							return acc;
 						},
