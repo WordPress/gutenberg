@@ -34,7 +34,11 @@ const ToolsPanelHeader = ( props, forwardedRef ) => {
 		<h2 { ...headerProps } ref={ forwardedRef }>
 			{ labelText }
 			{ hasMenuItems && (
-				<DropdownMenu icon={ moreVertical } label={ labelText }>
+				<DropdownMenu
+					icon={ moreVertical }
+					label={ labelText }
+					menuProps={ { style: { minWidth: '200px' } } }
+				>
 					{ ( { onClose } ) => (
 						<>
 							{ !! defaultItems?.length && (
