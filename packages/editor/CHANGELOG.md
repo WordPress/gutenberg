@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Breaking changes
+
+- Removed the deprecated resetAutosave action.
+- Removed the deprecated getAutosave, hasAutosave and getBlockForSerialization selectors.
 ## 11.0.0 (2021-07-29)
 
 ### Breaking Change

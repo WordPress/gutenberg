@@ -2,6 +2,11 @@
 
 ## Unreleased
 
+### Breaking changes
+
+- Removed the deprecated position and menuLable from the DropdownMenu component.
+- Removed the deprecated onClickOutside prop from the Popover component.
+
 ## 17.0.0 (2021-09-09)
 
 ### Breaking Change
