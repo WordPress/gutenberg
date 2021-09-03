@@ -7,15 +7,24 @@ import classnames from 'classnames';
  * WordPress dependencies
  */
 import { addFilter } from '@wordpress/hooks';
-import { TextControl } from '@wordpress/components';
+import {
+	DropdownMenu,
+	MenuGroup,
+	MenuItem,
+	TextControl,
+} from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-import { hasBlockSupport } from '@wordpress/blocks';
+import { hasBlockSupport, store as blocksStore } from '@wordpress/blocks';
 import { createHigherOrderComponent } from '@wordpress/compose';
+import { useDispatch, useSelect } from '@wordpress/data';
+import { check, moreVertical } from '@wordpress/icons';
+import { store as blockEditorStore } from '@wordpress/block-editor';
 
 /**
  * Internal dependencies
  */
 import { InspectorControls } from '../components';
+import { getActiveStyle, replaceActiveStyle } from '../components/block-styles/utils';
 
 /**
  * Filters registered block settings, extending attributes with anchor using ID
@@ -55,27 +64,94 @@ export const withInspectorControl = createHigherOrderComponent(
 				'customClassName',
 				true
 			);
+
+			//const { updateBlockAttributes } = useDispatch( blockEditorStore );
+
+			const blockStyles = useSelect(
+				( select ) => {
+					const { getBlockStyles } = select( blocksStore );
+					return getBlockStyles( props.name );
+				},
+				[ props.name ]
+			);
+
+			const hasBlockStyles = blockStyles && blockStyles.length;
+
+			const activeStyleName = hasBlockStyles
+				? getActiveStyle(
+						blockStyles,
+						props.attributes.className || ''
+				  )?.name
+				: null;
+
+			const onSelectStyleClassName = ( styleClassName ) => {
+				// updateBlockAttributes( props.clientId, {
+				// 	className: styleClassName,
+				// } );
+			};
+
 			if ( hasCustomClassName && props.isSelected ) {
 				return (
 					<>
 						<BlockEdit { ...props } />
 						<InspectorControls __experimentalGroup="advanced">
-							<TextControl
-								autoComplete="off"
-								label={ __( 'Additional CSS class(es)' ) }
-								value={ props.attributes.className || '' }
-								onChange={ ( nextValue ) => {
-									props.setAttributes( {
-										className:
-											nextValue !== ''
-												? nextValue
-												: undefined,
-									} );
-								} }
-								help={ __(
-									'Separate multiple classes with spaces.'
+							<div className="custom-class-name-control">
+								<TextControl
+									autoComplete="off"
+									label={ __( 'Additional CSS class(es)' ) }
+									value={ props.attributes.className || '' }
+									onChange={ ( nextValue ) => {
+										props.setAttributes( {
+											className:
+												nextValue !== ''
+													? nextValue
+													: undefined,
+										} );
+									} }
+									help={ __(
+										'Separate multiple classes with spaces.'
+									) }
+								/>
+								{ hasBlockStyles > 0 && (
+									<DropdownMenu
+										icon={ moreVertical }
+										label={ __( 'Style CSS class(es)' ) }
+									>
+										{ ( { onClose } ) => (
+											<MenuGroup>
+												{ blockStyles.map(
+													( { name, label } ) => {
+														const isSelected =
+															activeStyleName ===
+															name;
+														return (
+															<MenuItem
+																key={ label }
+																icon={
+																	isSelected &&
+																	check
+																}
+																isSelected={
+																	isSelected
+																}
+																onClick={ () => {
+																	onSelectStyleClassName(
+																		name
+																	);
+																	onClose();
+																} }
+																role="menuitemcheckbox"
+															>
+																{ label }
+															</MenuItem>
+														);
+													}
+												) }
+											</MenuGroup>
+										) }
+									</DropdownMenu>
 								) }
-							/>
+							</div>
 						</InspectorControls>
 					</>
 				);
