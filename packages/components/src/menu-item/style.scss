@@ -52,7 +52,10 @@
 }
 
 .components-menu-item__item {
+	// Provide a minimum width for text items in menus.
 	white-space: nowrap;
+	min-width: 160px;
+
 	margin-right: auto;
 	display: inline-flex;
 	align-items: center;
