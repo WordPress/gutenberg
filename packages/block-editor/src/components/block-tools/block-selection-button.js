@@ -54,15 +54,13 @@ function BlockSelectionButton( { clientId, rootClientId, blockElement } ) {
 	const selected = useSelect(
 		( select ) => {
 			const {
-				__unstableGetBlockWithoutInnerBlocks,
+				getBlock,
 				getBlockIndex,
 				hasBlockMovingClientId,
 				getBlockListSettings,
 			} = select( blockEditorStore );
 			const index = getBlockIndex( clientId, rootClientId );
-			const { name, attributes } = __unstableGetBlockWithoutInnerBlocks(
-				clientId
-			);
+			const { name, attributes } = getBlock( clientId );
 			const blockMovingMode = hasBlockMovingClientId();
 			return {
 				index,

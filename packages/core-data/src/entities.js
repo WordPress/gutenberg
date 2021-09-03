@@ -18,6 +18,8 @@ import { STORE_NAME } from './name';
 
 export const DEFAULT_ENTITY_KEY = 'id';
 
+const POST_RAW_ATTRIBUTES = [ 'title', 'excerpt', 'content' ];
+
 export const defaultEntities = [
 	{
 		label: __( 'Base' ),
@@ -41,6 +43,7 @@ export const defaultEntities = [
 		key: 'slug',
 		baseURL: '/wp/v2/types',
 		baseURLParams: { context: 'edit' },
+		rawAttributes: POST_RAW_ATTRIBUTES,
 	},
 	{
 		name: 'media',
@@ -184,6 +187,7 @@ function* loadPostTypeEntities() {
 				selection: true,
 			},
 			mergedEdits: { meta: true },
+			rawAttributes: POST_RAW_ATTRIBUTES,
 			getTitle: ( record ) =>
 				record?.title?.rendered ||
 				record?.title ||

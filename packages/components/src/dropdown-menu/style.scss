@@ -44,6 +44,11 @@
 			width: $button-size-small;
 			height: $button-size-small;
 		}
+
+		// If menu items are icon-only, make them stretch only to the icon size.
+		&.is-icon-only {
+			width: auto;
+		}
 	}
 
 	.components-menu-item__button,
@@ -56,25 +61,25 @@
 	}
 
 	.components-menu-group {
-		padding: $grid-unit-15;
+		padding: $grid-unit-10;
 		margin-top: 0;
 		margin-bottom: 0;
-		margin-left: -$grid-unit-15;
-		margin-right: -$grid-unit-15;
+		margin-left: -$grid-unit-10;
+		margin-right: -$grid-unit-10;
 
 		&:first-child {
-			margin-top: -$grid-unit-15;
+			margin-top: -$grid-unit-10;
 		}
 
 		&:last-child {
-			margin-bottom: -$grid-unit-15;
+			margin-bottom: -$grid-unit-10;
 		}
 	}
 
 	.components-menu-group + .components-menu-group {
 		margin-top: 0;
 		border-top: $border-width solid $gray-400;
-		padding: $grid-unit-15;
+		padding: $grid-unit-10;
 
 		.is-alternate & {
 			border-color: $gray-900;

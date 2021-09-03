@@ -7,15 +7,13 @@ import type { ElementType } from 'react';
 /**
  * Internal dependencies
  */
-import { useContextSystem, PolymorphicComponentProps } from '../../ui/context';
+import { useContextSystem, WordPressComponentProps } from '../../ui/context';
 import * as styles from '../styles';
 import { useItemGroupContext } from '../context';
 import { useCx } from '../../utils/hooks/use-cx';
 import type { ItemProps } from '../types';
 
-export function useItem(
-	props: PolymorphicComponentProps< ItemProps, 'div' >
-) {
+export function useItem( props: WordPressComponentProps< ItemProps, 'div' > ) {
 	const {
 		isAction = false,
 		as: asProp,

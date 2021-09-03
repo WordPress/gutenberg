@@ -11,6 +11,8 @@
 	// Selector requires a lot of specificity to override base styles.
 	input[type="url"].block-editor-media-placeholder__url-input-field {
 		width: 100%;
+		min-width: 200px;
+
 		@include break-small() {
 			width: 300px;
 		}

@@ -10,7 +10,7 @@ import { usePopoverState } from 'reakit';
 import { useContextSystem } from '../../ui/context';
 
 /**
- * @param {import('../../ui/context').PolymorphicComponentProps<import('../types').Props, 'div', false>} props
+ * @param {import('../../ui/context').WordPressComponentProps<import('../types').Props, 'div', false>} props
  */
 export function useFlyout( props ) {
 	const {

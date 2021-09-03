@@ -56,7 +56,7 @@ function useAutosaveNotice() {
 		} ),
 		[]
 	);
-	const { getEditedPostAttribute } = useSelect( 'core/editor' );
+	const { getEditedPostAttribute } = useSelect( editorStore );
 
 	const { createWarningNotice, removeNotice } = useDispatch( noticesStore );
 	const { editPost, resetEditorBlocks } = useDispatch( editorStore );

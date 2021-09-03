@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { Disabled } from '@wordpress/components';
-import { useResizeObserver, pure } from '@wordpress/compose';
+import { useResizeObserver, pure, useRefEffect } from '@wordpress/compose';
 import { useSelect } from '@wordpress/data';
 
 /**
@@ -46,7 +46,7 @@ function AutoBlockPreview( { viewportWidth, __experimentalPadding } ) {
 			>
 				<Iframe
 					head={ <EditorStyles styles={ styles } /> }
-					contentRef={ ( bodyElement ) => {
+					contentRef={ useRefEffect( ( bodyElement ) => {
 						const {
 							ownerDocument: { documentElement },
 						} = bodyElement;
@@ -54,7 +54,7 @@ function AutoBlockPreview( { viewportWidth, __experimentalPadding } ) {
 						documentElement.style.width = '100%';
 						bodyElement.style.padding =
 							__experimentalPadding + 'px';
-					} }
+					}, [] ) }
 					aria-hidden
 					tabIndex={ -1 }
 					style={ {

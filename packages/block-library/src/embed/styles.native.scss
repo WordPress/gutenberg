@@ -72,6 +72,24 @@
 	align-items: center;
 }
 
+.embed-preview__wrapper {
+	flex: 1;
+}
+
+.embed-preview__wrapper--align-left {
+	align-items: flex-start;
+}
+.embed-preview__wrapper--align-right {
+	align-items: flex-end;
+}
+
+.embed-preview__sandbox--align-left {
+	max-width: 360px;
+}
+.embed-preview__sandbox--align-right {
+	max-width: 360px;
+}
+
 .embed-preview__loading--dark {
 	background-color: $background-dark-secondary;
 }

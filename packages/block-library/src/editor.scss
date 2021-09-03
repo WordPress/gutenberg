@@ -11,7 +11,6 @@
 @import "./freeform/editor.scss";
 @import "./gallery/editor.scss";
 @import "./group/editor.scss";
-@import "./heading/editor.scss";
 @import "./html/editor.scss";
 @import "./image/editor.scss";
 @import "./latest-posts/editor.scss";
@@ -49,14 +48,9 @@
 @import "./term-description/editor.scss";
 
 :root .editor-styles-wrapper {
-	// Background colors.
-	@include background-colors();
-
-	// Foreground colors.
-	@include foreground-colors();
-
-	// Gradients
-	@include gradient-colors();
+	@include background-colors-deprecated();
+	@include foreground-colors-deprecated();
+	@include gradient-colors-deprecated();
 }
 
 // Font sizes.

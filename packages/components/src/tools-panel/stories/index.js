@@ -22,6 +22,7 @@ export default {
 
 export const _default = () => {
 	const [ height, setHeight ] = useState();
+	const [ minHeight, setMinHeight ] = useState();
 	const [ width, setWidth ] = useState();
 
 	const resetAll = () => {
@@ -39,6 +40,18 @@ export const _default = () => {
 				>
 					<ToolsPanelItem
 						className="single-column"
+						hasValue={ () => !! width }
+						label="Width"
+						onDeselect={ () => setWidth( undefined ) }
+					>
+						<UnitControl
+							label="Width"
+							value={ width }
+							onChange={ ( next ) => setWidth( next ) }
+						/>
+					</ToolsPanelItem>
+					<ToolsPanelItem
+						className="single-column"
 						hasValue={ () => !! height }
 						label="Height"
 						onDeselect={ () => setHeight( undefined ) }
@@ -50,15 +63,14 @@ export const _default = () => {
 						/>
 					</ToolsPanelItem>
 					<ToolsPanelItem
-						className="single-column"
-						hasValue={ () => !! width }
-						label="Width"
-						onDeselect={ () => setWidth( undefined ) }
+						hasValue={ () => !! minHeight }
+						label="Minimum height"
+						onDeselect={ () => setMinHeight( undefined ) }
 					>
 						<UnitControl
-							label="Width"
-							value={ width }
-							onChange={ ( next ) => setWidth( next ) }
+							label="Minimum height"
+							value={ minHeight }
+							onChange={ ( next ) => setMinHeight( next ) }
 						/>
 					</ToolsPanelItem>
 				</ToolsPanel>

@@ -120,6 +120,7 @@ export function useRichText( {
 	 * @param {Object} newRecord The record to sync and apply.
 	 */
 	function handleChange( newRecord ) {
+		record.current = newRecord;
 		applyRecord( newRecord );
 
 		if ( disableFormats ) {
@@ -136,8 +137,6 @@ export function useRichText( {
 				preserveWhiteSpace,
 			} );
 		}
-
-		record.current = newRecord;
 
 		const { start, end, formats, text } = newRecord;
 
@@ -178,11 +177,6 @@ export function useRichText( {
 		hadSelectionUpdate.current = false;
 	}, [ hadSelectionUpdate.current ] );
 
-	function focus() {
-		ref.current.focus();
-		applyRecord( record.current );
-	}
-
 	const mergedRefs = useMergeRefs( [
 		ref,
 		useDefaultStyle(),
@@ -218,7 +212,6 @@ export function useRichText( {
 	return {
 		value: record.current,
 		onChange: handleChange,
-		onFocus: focus,
 		ref: mergedRefs,
 	};
 }

@@ -29,33 +29,20 @@
 		position: relative;
 		margin-top: auto;
 		margin-bottom: auto;
-		// IE11 doesn't like the "flex-direction: column;" here.
-		@supports ( position: sticky ) {
-			flex-direction: column;
-		}
+		flex-direction: column;
 
 		> div,
 		> a {
 			margin: 0;
-
-			// Avoid applying flex styles to IE11.
-			@supports ( position: sticky ) {
-				flex-direction: column;
-				flex-grow: 1;
-			}
+			flex-direction: column;
+			flex-grow: 1;
 		}
 
 		img {
 			display: block;
 			height: auto;
 			max-width: 100%;
-			width: 100%;
-
-			// IE doesn't handle cropping, so we need an explicit width here.
-			// IE11 doesn't read rules inside this query. They are applied only to modern browsers.
-			@supports ( position: sticky ) {
-				width: auto;
-			}
+			width: auto;
 		}
 
 		figcaption {
@@ -65,12 +52,13 @@
 			font-size: $default-font-size;
 			left: 0;
 			margin-bottom: 0;
-			max-height: 100%;
+			max-height: 60%;
 			overflow: auto;
-			padding: 40px 10px 9px;
+			padding: 0 8px 8px;
 			position: absolute;
 			text-align: center;
 			width: 100%;
+			box-sizing: border-box;
 
 			img {
 				display: inline;
@@ -80,22 +68,15 @@
 		&.is-style-rounded {
 			> div,
 			> a {
-				// Not supported in IE11.
-				@supports ( position: sticky ) {
-					flex: 1 1 auto;
-				}
+				flex: 1 1 auto;
 			}
 			figcaption {
+				flex: initial;
 				background: none;
-				// Not supported in IE11.
-				@supports ( position: sticky ) {
-					flex: initial;
-					background: none;
-					color: inherit;
-					margin: 0;
-					padding: 10px 10px 9px;
-					position: relative;
-				}
+				color: inherit;
+				margin: 0;
+				padding: 10px 10px 9px;
+				position: relative;
 			}
 		}
 	}
@@ -127,24 +108,15 @@
 		align-self: inherit;
 		> div:not(.components-drop-zone),
 		> a {
-			display: block; // Thanks to IE11 not supporting object-fit fall back to display: block.
-
-			// Without IE11 object-fit support "display: flex;" here causes distortion of aspect ratio.
-			@supports ( position: sticky ) {
-				display: flex;
-			}
+			display: flex;
 		}
 
 		a,
 		img {
 			width: 100%;
-
-			// IE11 doesn't read rules inside this query. They are applied only to modern browsers.
-			@supports ( position: sticky ) {
-				flex: 1 0 0%;
-				height: 100%;
-				object-fit: cover;
-			}
+			flex: 1 0 0%;
+			height: 100%;
+			object-fit: cover;
 		}
 	}
 
