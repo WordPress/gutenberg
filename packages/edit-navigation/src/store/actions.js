@@ -1,14 +1,14 @@
 /**
  * External dependencies
  */
-import { invert } from 'lodash';
-import { v4 as uuid } from 'uuid';
+import { invert, omit } from 'lodash';
 
 /**
  * WordPress dependencies
  */
 import { __, sprintf } from '@wordpress/i18n';
 import { store as noticesStore } from '@wordpress/notices';
+import { serialize } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
@@ -16,18 +16,16 @@ import { store as noticesStore } from '@wordpress/notices';
 import {
 	getMenuItemToClientIdMapping,
 	resolveMenuItems,
-	dispatch,
-	select,
-	apiFetch,
+	dispatch as registryDispatch,
+	select as registrySelect,
+	apiFetch as apiFetchControl,
 } from './controls';
 import { NAVIGATION_POST_KIND, NAVIGATION_POST_POST_TYPE } from '../constants';
 import {
 	menuItemsQuery,
 	serializeProcessing,
-	computeCustomizedAttribute,
+	blockAttributesToMenuItem,
 } from './utils';
-
-const { ajaxurl } = window;
 
 /**
  * Returns an action object used to select menu.
@@ -59,7 +57,7 @@ export const createMissingMenuItems = serializeProcessing( function* ( post ) {
 	while ( stack.length ) {
 		const block = stack.pop();
 		if ( ! ( block.clientId in clientIdToMenuId ) ) {
-			const menuItem = yield apiFetch( {
+			const menuItem = yield apiFetchControl( {
 				path: `/__experimental/menu-items`,
 				method: 'POST',
 				data: {
@@ -71,7 +69,7 @@ export const createMissingMenuItems = serializeProcessing( function* ( post ) {
 
 			mapping[ menuItem.id ] = block.clientId;
 			const menuItems = yield resolveMenuItems( menuId );
-			yield dispatch(
+			yield registryDispatch(
 				'core',
 				'receiveEntityRecords',
 				'root',
@@ -106,7 +104,7 @@ export const saveNavigationPost = serializeProcessing( function* ( post ) {
 
 	try {
 		// Save edits to the menu, like the menu name.
-		yield dispatch(
+		yield registryDispatch(
 			'core',
 			'saveEditedEntityRecord',
 			'root',
@@ -114,7 +112,7 @@ export const saveNavigationPost = serializeProcessing( function* ( post ) {
 			menuId
 		);
 
-		const error = yield select(
+		const error = yield registrySelect(
 			'core',
 			'getLastEntitySaveError',
 			'root',
@@ -126,6 +124,8 @@ export const saveNavigationPost = serializeProcessing( function* ( post ) {
 			throw new Error( error.message );
 		}
 
+		// saveEntityRecord for each menu item with block-based data
+		// saveEntityRecord for each deleted menu item
 		// Save blocks as menu items.
 		const batchSaveResponse = yield* batchSave(
 			menuId,
@@ -138,7 +138,7 @@ export const saveNavigationPost = serializeProcessing( function* ( post ) {
 		}
 
 		// Clear "stub" navigation post edits to avoid a false "dirty" state.
-		yield dispatch(
+		yield registryDispatch(
 			'core',
 			'receiveEntityRecords',
 			NAVIGATION_POST_KIND,
@@ -147,7 +147,7 @@ export const saveNavigationPost = serializeProcessing( function* ( post ) {
 			undefined
 		);
 
-		yield dispatch(
+		yield registryDispatch(
 			noticesStore,
 			'createSuccessNotice',
 			__( 'Navigation saved.' ),
@@ -163,9 +163,14 @@ export const saveNavigationPost = serializeProcessing( function* ( post ) {
 					saveError.message
 			  )
 			: __( 'Unable to save: An error ocurred.' );
-		yield dispatch( noticesStore, 'createErrorNotice', errorMessage, {
-			type: 'snackbar',
-		} );
+		yield registryDispatch(
+			noticesStore,
+			'createErrorNotice',
+			errorMessage,
+			{
+				type: 'snackbar',
+			}
+		);
 	}
 } );
 
@@ -184,36 +189,96 @@ function mapMenuItemsByClientId( menuItems, clientIdsByMenuId ) {
 }
 
 function* batchSave( menuId, menuItemsByClientId, navigationBlock ) {
-	const { nonce, stylesheet } = yield apiFetch( {
-		path: '/__experimental/customizer-nonces/get-save-nonce',
-	} );
-	if ( ! nonce ) {
-		throw new Error();
+	const blocksList = blocksTreeToFlatList( navigationBlock.innerBlocks );
+
+	const batchTasks = [];
+	// Enqueue updates
+	for ( const { block, parentId, position } of blocksList ) {
+		const menuItem = getMenuItemForBlock( block );
+
+		// Update an existing navigation item.
+		yield registryDispatch(
+			'core',
+			'editEntityRecord',
+			'root',
+			'menuItem',
+			menuItem.id,
+			blockToEntityRecord( block, parentId, position ),
+			{ undoIgnore: true }
+		);
+
+		const hasEdits = yield registrySelect(
+			'core',
+			'hasEditsForEntityRecord',
+			'root',
+			'menuItem',
+			menuItem.id
+		);
+
+		if ( ! hasEdits ) {
+			continue;
+		}
+
+		batchTasks.push( ( { saveEditedEntityRecord } ) =>
+			saveEditedEntityRecord( 'root', 'menuItem', menuItem.id )
+		);
+	}
+	return yield registryDispatch( 'core', '__experimentalBatch', batchTasks );
+
+	// Enqueue deletes
+	// @TODO
+
+	// Create an object like { "nav_menu_item[12]": {...}} }
+	// const computeKey = ( item ) => `nav_menu_item[${ item.id }]`;
+	// const dataObject = keyBy( dataList, computeKey );
+	//
+	// // Deleted menu items should be sent as false, e.g. { "nav_menu_item[13]": false }
+	// for ( const clientId in menuItemsByClientId ) {
+	// 	const key = computeKey( menuItemsByClientId[ clientId ] );
+	// 	if ( ! ( key in dataObject ) ) {
+	// 		dataObject[ key ] = false;
+	// 	}
+	// }
+
+	function blockToEntityRecord( block, parentId, position ) {
+		const menuItem = omit( getMenuItemForBlock( block ), 'menus', 'meta' );
+
+		let attributes;
+
+		if ( block.name === 'core/navigation-link' ) {
+			attributes = blockAttributesToMenuItem( block.attributes );
+		} else {
+			attributes = {
+				type: 'block',
+				content: serialize( block ),
+			};
+		}
+
+		return {
+			...menuItem,
+			...attributes,
+			position,
+			nav_menu_term_id: menuId,
+			menu_item_parent: parentId,
+			status: 'publish',
+			_invalid: false,
+		};
 	}
 
-	// eslint-disable-next-line no-undef
-	const body = new FormData();
-	body.append( 'wp_customize', 'on' );
-	body.append( 'customize_theme', stylesheet );
-	body.append( 'nonce', nonce );
-	body.append( 'customize_changeset_uuid', uuid() );
-	body.append( 'customize_autosaved', 'on' );
-	body.append( 'customize_changeset_status', 'publish' );
-	body.append( 'action', 'customize_save' );
-	body.append(
-		'customized',
-		computeCustomizedAttribute(
-			navigationBlock.innerBlocks,
-			menuId,
-			menuItemsByClientId
-		)
-	);
+	function blocksTreeToFlatList( innerBlocks, parentId = 0 ) {
+		return innerBlocks.flatMap( ( block, index ) =>
+			[ { block, parentId, position: index + 1 } ].concat(
+				blocksTreeToFlatList(
+					block.innerBlocks,
+					getMenuItemForBlock( block )?.id
+				)
+			)
+		);
+	}
 
-	return yield apiFetch( {
-		url: ajaxurl || '/wp-admin/admin-ajax.php',
-		method: 'POST',
-		body,
-	} );
+	function getMenuItemForBlock( block ) {
+		return omit( menuItemsByClientId[ block.clientId ] || {}, '_links' );
+	}
 }
 
 /**

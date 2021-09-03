@@ -1,7 +1,8 @@
 export default function createThunkMiddleware( args ) {
 	return () => ( next ) => ( action ) => {
 		if ( typeof action === 'function' ) {
-			return action( args );
+			const retval = action( args );
+			return retval;
 		}
 
 		return next( action );
