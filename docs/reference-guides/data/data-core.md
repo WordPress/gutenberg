@@ -555,6 +555,14 @@ _Returns_
 
 -   `Object`: Action object.
 
+### persistAutosaveToAPI
+
+Undocumented declaration.
+
+### persistRecordToAPI
+
+Undocumented declaration.
+
 ### prepareAutosaveRequest
 
 Undocumented declaration.
@@ -714,7 +722,7 @@ _Parameters_
 -   _record_ `Object`: Record to be saved.
 -   _options_ `Object`: Saving options.
 -   _options.isAutosave_ `[boolean]`: Whether this is an autosave.
--   _options.\_\_unstableFetch_ `[Function]`: Internal use only. Function to call instead of `apiFetch()`. Must return a promise.
+-   _options.persist_ `[Function]`: Function used to persist the record
 
 ### undo
 

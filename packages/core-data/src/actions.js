@@ -334,21 +334,22 @@ export function __unstableCreateUndoLevel() {
 /**
  * Action triggered to save an entity record.
  *
- * @param {string}   kind                       Kind of the received entity.
- * @param {string}   name                       Name of the received entity.
- * @param {Object}   record                     Record to be saved.
- * @param {Object}   options                    Saving options.
- * @param {boolean}  [options.isAutosave=false] Whether this is an autosave.
- * @param {Function} [options.__unstableFetch]  Internal use only. Function to
- *                                              call instead of `apiFetch()`.
- *                                              Must return a promise.
+ * @param {string}   kind                                 Kind of the received entity.
+ * @param {string}   name                                 Name of the received entity.
+ * @param {Object}   record                               Record to be saved.
+ * @param {Object}   options                              Saving options.
+ * @param {boolean}  [options.isAutosave=false]           Whether this is an autosave.
+ * @param {Function} [options.persist=persistRecordToAPI] Function used to persist the record
  */
 export const saveEntityRecord = (
 	kind,
 	name,
 	record,
-	{ isAutosave = false, __unstableFetch = triggerFetch } = {}
+	{ persist = persistRecordToAPI, isAutosave = false } = {}
 ) => async ( { select, dispatch } ) => {
+	// For BC:
+	if ( isAutosave ) persist = persistAutosaveToAPI;
+
 	const entities = await dispatch( getKindEntities( kind ) );
 	const entity = find( entities, { kind, name } );
 	if ( ! entity ) {
@@ -381,16 +382,11 @@ export const saveEntityRecord = (
 				entity.name,
 				recordId
 			);
-			const persist = isAutosave
-				? persistAutosaveToAPI
-				: persistRecordToAPI;
 			updatedRecord = await dispatch(
 				persist( {
 					entity,
 					persistedRecord,
 					record,
-					recordId,
-					__unstableFetch,
 				} )
 			);
 		} catch ( _error ) {
@@ -441,11 +437,11 @@ function evaluateOptimizedEdits( kind, name, recordId, record ) {
 	};
 }
 
-function persistRecordToAPI( {
+export function persistRecordToAPI( {
 	entity,
 	persistedRecord,
 	record,
-	__unstableFetch,
+	__unstableFetch = triggerFetch,
 } ) {
 	return async ( { dispatch } ) => {
 		const recordId = getRecordId( entity, record );
@@ -474,47 +470,14 @@ function persistRecordToAPI( {
 	};
 }
 
-export const prepareAutosaveRequest = ( {
-	title,
-	excerpt,
-	content,
-	status,
-} ) => ( {
-	title,
-	excerpt,
-	content,
-	status: status === 'auto-draft' ? 'draft' : status,
-} );
+const entityEndpointPath = ( entity, recordId ) =>
+	`${ entity.baseURL }${ recordId ? '/' + recordId : '' }`;
 
-export const reconcileAutosave = (
-	persistedRecord,
-	requestData,
-	updatedRecord,
-	{ processedAsRegularSave }
-) =>
-	processedAsRegularSave
-		? {
-				...persistedRecord,
-
-				title: updatedRecord.title,
-				excerpt: updatedRecord.excerpt,
-				content: updatedRecord.content,
-
-				// Status is only persisted in autosaves when going from
-				// "auto-draft" to "draft".
-				status:
-					persistedRecord.status === 'auto-draft' &&
-					requestData.status === 'draft'
-						? requestData.status
-						: persistedRecord.status,
-		  }
-		: updatedRecord;
-
-function persistAutosaveToAPI( {
+export function persistAutosaveToAPI( {
 	entity,
 	persistedRecord,
 	record,
-	__unstableFetch,
+	__unstableFetch = triggerFetch,
 	__prepareAutosaveRequest = prepareAutosaveRequest,
 	__reconcileAutosave = reconcileAutosave,
 } ) {
@@ -551,12 +514,14 @@ function persistAutosaveToAPI( {
 		// when its update is requested by the author and the post had
 		// draft or auto-draft status.
 		const processedAsRegularSave = persistedRecord.id === updatedRecord.id;
-		const reconciledRecord = __reconcileAutosave(
-			persistedRecord,
-			requestData,
-			updatedRecord,
-			{ processedAsRegularSave }
-		);
+		const reconciledRecord = __reconcileAutosave
+			? __reconcileAutosave(
+					persistedRecord,
+					requestData,
+					updatedRecord,
+					{ processedAsRegularSave }
+			  )
+			: updatedRecord;
 
 		if ( processedAsRegularSave ) {
 			await dispatch.receiveEntityRecords(
@@ -577,8 +542,39 @@ function persistAutosaveToAPI( {
 	};
 }
 
-const entityEndpointPath = ( entity, recordId ) =>
-	`${ entity.baseURL }${ recordId ? '/' + recordId : '' }`;
+export function prepareAutosaveRequest( { title, excerpt, content, status } ) {
+	return {
+		title,
+		excerpt,
+		content,
+		status: status === 'auto-draft' ? 'draft' : status,
+	};
+}
+
+export function reconcileAutosave(
+	persistedRecord,
+	requestData,
+	updatedRecord,
+	{ processedAsRegularSave }
+) {
+	return processedAsRegularSave
+		? {
+				...persistedRecord,
+
+				title: updatedRecord.title,
+				excerpt: updatedRecord.excerpt,
+				content: updatedRecord.content,
+
+				// Status is only persisted in autosaves when going from
+				// "auto-draft" to "draft".
+				status:
+					persistedRecord.status === 'auto-draft' &&
+					requestData.status === 'draft'
+						? requestData.status
+						: persistedRecord.status,
+		  }
+		: updatedRecord;
+}
 
 /**
  * Runs multiple core-data actions at the same time using one API request.
@@ -605,13 +601,26 @@ const entityEndpointPath = ( entity, recordId ) =>
 export function* __experimentalBatch( requests ) {
 	const batch = createBatch();
 	const dispatch = yield getDispatch();
+	const replaceFetch = ( options = {}, __unstableFetch ) => {
+		const persist = options.persist || persistRecordToAPI;
+		return {
+			...options,
+			persist: ( persistOptions ) =>
+				persist( {
+					...persistOptions,
+					__unstableFetch,
+				} ),
+		};
+	};
 	const api = {
 		saveEntityRecord( kind, name, record, options ) {
 			return batch.add( ( add ) =>
-				dispatch( STORE_NAME ).saveEntityRecord( kind, name, record, {
-					...options,
-					__unstableFetch: add,
-				} )
+				dispatch( STORE_NAME ).saveEntityRecord(
+					kind,
+					name,
+					record,
+					replaceFetch( options, add )
+				)
 			);
 		},
 		saveEditedEntityRecord( kind, name, recordId, options ) {
@@ -620,10 +629,7 @@ export function* __experimentalBatch( requests ) {
 					kind,
 					name,
 					recordId,
-					{
-						...options,
-						__unstableFetch: add,
-					}
+					replaceFetch( options, add )
 				)
 			);
 		},
@@ -634,10 +640,7 @@ export function* __experimentalBatch( requests ) {
 					name,
 					recordId,
 					query,
-					{
-						...options,
-						__unstableFetch: add,
-					}
+					replaceFetch( options, add )
 				)
 			);
 		},
