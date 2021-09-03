@@ -28,16 +28,13 @@ export const settings = {
 				type: 'block',
 				isMultiBlock: true,
 				blocks: [ '*' ],
-				__experimentalConvert( blocks ) {
+				isMatch( attributes, blocks ) {
 					// Avoid transforming existing `widget-group` blocks.
-					const blocksContainWidgetGroup = !! blocks.filter(
+					return ! blocks.some(
 						( block ) => block.name === 'core/widget-group'
-					)?.length;
-
-					if ( blocksContainWidgetGroup ) {
-						return;
-					}
-
+					);
+				},
+				__experimentalConvert( blocks ) {
 					// Put the selected blocks inside the new Widget Group's innerBlocks.
 					let innerBlocks = [
 						...blocks.map( ( block ) => {

@@ -6,6 +6,10 @@
 
 -   Register a block even when an invalid value provided for the icon setting ([#34350](https://github.com/WordPress/gutenberg/pull/34350)).
 
+### New API
+
+-   The `isMatch` callback on block transforms now receives the block object (or block objects if `isMulti` is `true`) as its second argument.
+
 ## 11.0.0 (2021-07-29)
 
 ### Breaking Change
