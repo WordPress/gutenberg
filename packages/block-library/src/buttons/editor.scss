@@ -10,7 +10,6 @@ $blocks-block__margin: 0.5em;
 	> .wp-block {
 		// Override editor auto block margins.
 		margin-left: 0;
-		margin-top: $blocks-block__margin;
 		margin-right: $blocks-block__margin;
 	}
 	> .block-list-appender {
