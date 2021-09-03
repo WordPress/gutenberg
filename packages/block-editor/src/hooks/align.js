@@ -140,18 +140,20 @@ export const withToolbarControls = createHigherOrderComponent(
 			props.setAttributes( { align: nextAlign } );
 		};
 
-		return [
-			validAlignments.length > 0 && props.isSelected && (
-				<BlockControls key="align-controls" group="block">
-					<BlockAlignmentControl
-						value={ props.attributes.align }
-						onChange={ updateAlignment }
-						controls={ validAlignments }
-					/>
-				</BlockControls>
-			),
-			<BlockEdit key="edit" { ...props } />,
-		];
+		return (
+			<>
+				{ validAlignments.length > 0 && (
+					<BlockControls group="block" __experimentalExposeToChildren>
+						<BlockAlignmentControl
+							value={ props.attributes.align }
+							onChange={ updateAlignment }
+							controls={ validAlignments }
+						/>
+					</BlockControls>
+				) }
+				<BlockEdit { ...props } />
+			</>
+		);
 	},
 	'withToolbarControls'
 );

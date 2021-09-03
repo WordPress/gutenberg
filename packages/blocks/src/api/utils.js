@@ -14,6 +14,7 @@ import { __unstableStripHTML as stripHTML } from '@wordpress/dom';
 /**
  * Internal dependencies
  */
+import { BLOCK_ICON_DEFAULT } from './constants';
 import { getBlockType, getDefaultBlockName } from './registration';
 import { createBlock } from './factory';
 
@@ -89,6 +90,7 @@ export function isValidIcon( icon ) {
  * @return {WPBlockTypeIconDescriptor} Object describing the icon.
  */
 export function normalizeIconObject( icon ) {
+	icon = icon || BLOCK_ICON_DEFAULT;
 	if ( isValidIcon( icon ) ) {
 		return { src: icon };
 	}

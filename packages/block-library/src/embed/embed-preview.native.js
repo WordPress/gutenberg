@@ -21,8 +21,10 @@ import { SandBox } from '@wordpress/components';
 import { getPhotoHtml } from './util';
 import EmbedNoPreview from './embed-no-preview';
 import WpEmbedPreview from './wp-embed-preview';
+import styles from './styles.scss';
 
 const EmbedPreview = ( {
+	align,
 	className,
 	clientId,
 	icon,
@@ -36,6 +38,12 @@ const EmbedPreview = ( {
 	url,
 } ) => {
 	const [ isCaptionSelected, setIsCaptionSelected ] = useState( false );
+
+	const wrapperStyle = styles[ 'embed-preview__wrapper' ];
+	const wrapperAlignStyle =
+		styles[ `embed-preview__wrapper--align-${ align }` ];
+	const sandboxAlignStyle =
+		styles[ `embed-preview__sandbox--align-${ align }` ];
 
 	function accessibilityLabelCreator( caption ) {
 		return isEmpty( caption )
@@ -91,13 +99,17 @@ const EmbedPreview = ( {
 					}
 				} }
 			>
-				<View pointerEvents="box-only">
+				<View
+					pointerEvents="box-only"
+					style={ [ wrapperStyle, wrapperAlignStyle ] }
+				>
 					<PreviewContent
 						html={ html }
 						title={ iframeTitle }
 						type={ sandboxClassnames }
 						providerUrl={ providerUrl }
 						url={ url }
+						containerStyle={ sandboxAlignStyle }
 					/>
 				</View>
 			</TouchableWithoutFeedback>
@@ -110,19 +122,16 @@ const EmbedPreview = ( {
 			disabled={ ! isSelected }
 		>
 			<View>
-				{
-					// eslint-disable-next-line no-undef
-					__DEV__ && previewable ? (
-						embedWrapper
-					) : (
-						<EmbedNoPreview
-							label={ label }
-							icon={ icon }
-							isSelected={ isSelected }
-							onPress={ () => setIsCaptionSelected( false ) }
-						/>
-					)
-				}
+				{ previewable ? (
+					embedWrapper
+				) : (
+					<EmbedNoPreview
+						label={ label }
+						icon={ icon }
+						isSelected={ isSelected }
+						onPress={ () => setIsCaptionSelected( false ) }
+					/>
+				) }
 				<BlockCaption
 					accessibilityLabelCreator={ accessibilityLabelCreator }
 					accessible

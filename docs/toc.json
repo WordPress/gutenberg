@@ -178,11 +178,13 @@
 			},
 			{ "docs/how-to-guides/accessibility.md": [] },
 			{ "docs/how-to-guides/internationalization.md": [] },
-			{ "docs/how-to-guides/widgets/README.md": [
-				{ "docs/how-to-guides/widgets/overview.md": [] },
-				{ "docs/how-to-guides/widgets/opting-out.md": [] },
-				{ "docs/how-to-guides/widgets/legacy-widget-block.md": [] }
-			] }
+			{
+				"docs/how-to-guides/widgets/README.md": [
+					{ "docs/how-to-guides/widgets/overview.md": [] },
+					{ "docs/how-to-guides/widgets/opting-out.md": [] },
+					{ "docs/how-to-guides/widgets/legacy-widget-block.md": [] }
+				]
+			}
 		]
 	},
 	{
@@ -318,6 +320,9 @@
 					{ "docs/contributors/code/managing-packages.md": [] },
 					{ "docs/contributors/code/release.md": [] },
 					{ "docs/contributors/code/native-mobile.md": [] },
+					{
+						"docs/contributors/code/native-mobile-integration-test-guide.md": []
+					},
 					{
 						"docs/contributors/code/getting-started-native-mobile.md": []
 					}

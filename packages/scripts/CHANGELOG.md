@@ -2,6 +2,12 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   Bring back support for SVG files in CSS ([#34394](https://github.com/WordPress/gutenberg/pull/34394)). It wasn't correctly migrated when integrating webpack v5.
+
+## 18.0.0 (2021-08-23)
+
 ### Breaking Changes
 
 -   Increase the minimum Node.js version to v12.13 matching requirements from bundled dependencies ([#33818](https://github.com/WordPress/gutenberg/pull/33818)).

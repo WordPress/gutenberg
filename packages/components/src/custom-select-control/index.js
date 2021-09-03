@@ -75,14 +75,16 @@ export default function CustomSelectControl( {
 		items,
 		itemToString,
 		onSelectedItemChange,
-		selectedItem: _selectedItem,
+		...( typeof _selectedItem !== 'undefined' && _selectedItem !== null
+			? { selectedItem: _selectedItem }
+			: undefined ),
 		stateReducer,
 	} );
 
 	const controlDescribedBy = describedBy
 		? describedBy
 		: // translators: %s: The selected option.
-		  sprintf( __( 'Currently selected: %s' ), selectedItem.name );
+		  sprintf( __( 'Currently selected: %s' ), selectedItem?.name );
 
 	const menuProps = getMenuProps( {
 		className: 'components-custom-select-control__menu',

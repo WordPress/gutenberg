@@ -6,8 +6,8 @@ import { Flex } from '../../flex';
 import { useCardHeader } from './hook';
 
 /**
- * @param {import('../../ui/context').PolymorphicComponentProps<import('../types').HeaderProps, 'div'>} props
- * @param {import('react').Ref<any>}                                                                    forwardedRef
+ * @param {import('../../ui/context').WordPressComponentProps<import('../types').HeaderProps, 'div'>} props
+ * @param {import('react').Ref<any>}                                                                  forwardedRef
  */
 function CardHeader( props, forwardedRef ) {
 	const headerProps = useCardHeader( props );

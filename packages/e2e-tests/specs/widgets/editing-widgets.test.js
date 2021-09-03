@@ -56,23 +56,10 @@ describe( 'Widgets screen', () => {
 	beforeAll( async () => {
 		// TODO: Ideally we can bundle our test theme directly in the repo.
 		await activateTheme( 'twentytwenty' );
-		// Reduced motion is needed to immediately show and dismiss the snackbars.
-		await page.emulateMediaFeatures( [
-			{
-				name: 'prefers-reduced-motion',
-				value: 'reduce',
-			},
-		] );
 		await deleteAllWidgets();
 	} );
 
 	afterAll( async () => {
-		await page.emulateMediaFeatures( [
-			{
-				name: 'prefers-reduced-motion',
-				value: 'no-preference',
-			},
-		] );
 		await activateTheme( 'twentytwentyone' );
 	} );
 
@@ -646,12 +633,14 @@ describe( 'Widgets screen', () => {
 
 		// Wait for the Legacy Widget block's preview iframe to load.
 		const frame = await new Promise( ( resolve ) => {
-			const checkFrame = async ( candidateFrame ) => {
-				const url = await candidateFrame.url();
-				if ( url.includes( 'legacy-widget-preview' ) ) {
+			const checkFrame = async () => {
+				const frameElement = await page.$(
+					'iframe.wp-block-legacy-widget__edit-preview-iframe'
+				);
+				if ( frameElement ) {
 					page.off( 'frameattached', checkFrame );
 					page.off( 'framenavigated', checkFrame );
-					resolve( candidateFrame );
+					resolve( frameElement.contentFrame() );
 				}
 			};
 			page.on( 'frameattached', checkFrame );

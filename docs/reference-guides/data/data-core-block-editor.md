@@ -281,12 +281,6 @@ Returns all block objects for the current post being edited as an array in
 the order they appear in the post. Note that this will exclude child blocks
 of nested inner block controllers.
 
-Note: It's important to memoize this selector to avoid return a new instance
-on each call. We use the block cache state for each top-level block of the
-given clientID. This way, the selector only refreshes on changes to blocks
-associated with the given entity, and does not refresh when changes are made
-to blocks which are part of different inner block controllers.
-
 _Parameters_
 
 -   _state_ `Object`: Editor state.
@@ -1220,6 +1214,8 @@ _Parameters_
 -   _end_ `string`: Last block of the multiselection.
 
 ### receiveBlocks
+
+> **Deprecated**
 
 Returns an action object used in signalling that blocks have been received.
 Unlike resetBlocks, these should be appended to the existing known set, not

@@ -12,26 +12,26 @@ import {
 	__experimentalUnitControl as UnitControl,
 	Flex,
 	FlexItem,
-	__experimentalSegmentedControl as SegmentedControl,
-	__experimentalSegmentedControlOption as SegmentedControlOption,
+	__experimentalToggleGroupControl as ToggleGroupControl,
+	__experimentalToggleGroupControlOption as ToggleGroupControlOption,
 	__experimentalUseCustomUnits as useCustomUnits,
 } from '@wordpress/components';
 import { useSetting } from '@wordpress/block-editor';
 
 const SCALE_OPTIONS = (
 	<>
-		<SegmentedControlOption
+		<ToggleGroupControlOption
 			value="cover"
 			label={ _x( 'Cover', 'Scale option for Image dimension control' ) }
 		/>
-		<SegmentedControlOption
+		<ToggleGroupControlOption
 			value="contain"
 			label={ _x(
 				'Contain',
 				'Scale option for Image dimension control'
 			) }
 		/>
-		<SegmentedControlOption
+		<ToggleGroupControlOption
 			value="fill"
 			label={ _x( 'Fill', 'Scale option for Image dimension control' ) }
 		/>
@@ -104,7 +104,7 @@ const DimensionControls = ( {
 				</FlexItem>
 			</Flex>
 			{ !! height && (
-				<SegmentedControl
+				<ToggleGroupControl
 					label={ scaleLabel }
 					value={ scale }
 					help={ scaleHelp[ scale ] }
@@ -116,7 +116,7 @@ const DimensionControls = ( {
 					isBlock
 				>
 					{ SCALE_OPTIONS }
-				</SegmentedControl>
+				</ToggleGroupControl>
 			) }
 		</PanelBody>
 	);

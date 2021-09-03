@@ -373,7 +373,7 @@ export function setIsInserterOpened( value ) {
  */
 export function* closeGeneralSidebar() {
 	yield dispatch(
-		interfaceStore.name,
+		interfaceStore,
 		'disableComplementaryArea',
 		editWidgetsStoreName
 	);

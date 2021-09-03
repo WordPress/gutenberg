@@ -32,9 +32,13 @@ import {
 import { store as coreStore } from '@wordpress/core-data';
 import { View } from '@wordpress/primitives';
 
+// The inline preview feature will be released progressible, for this reason
+// the embed will only be considered previewable for the following providers list.
+const PREVIEWABLE_PROVIDERS = [ 'youtube', 'twitter' ];
+
 const EmbedEdit = ( props ) => {
 	const {
-		attributes: { providerNameSlug, previewable, responsive, url },
+		attributes: { align, providerNameSlug, previewable, responsive, url },
 		attributes,
 		isSelected,
 		onReplace,
@@ -234,6 +238,7 @@ const EmbedEdit = ( props ) => {
 					/>
 					<View { ...blockProps }>
 						<EmbedPreview
+							align={ align }
 							className={ className }
 							clientId={ clientId }
 							icon={ icon }
@@ -242,7 +247,12 @@ const EmbedEdit = ( props ) => {
 							label={ title }
 							onFocus={ onFocus }
 							preview={ preview }
-							previewable={ previewable }
+							previewable={
+								previewable &&
+								PREVIEWABLE_PROVIDERS.includes(
+									providerNameSlug
+								)
+							}
 							type={ type }
 							url={ url }
 						/>

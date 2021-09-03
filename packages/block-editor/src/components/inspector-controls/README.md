@@ -6,201 +6,6 @@ Inspector Controls appear in the post settings sidebar when a block is being edi
 
 ## Usage
 
-{% codetabs %}
-{% ES5 %}
-
-```js
-var el = wp.element.createElement,
-	Fragment = wp.element.Fragment,
-	registerBlockType = wp.blocks.registerBlockType,
-	RichText = wp.editor.RichText,
-	InspectorControls = wp.blockEditor.InspectorControls,
-	useBlockProps = wp.blockEditor.useBlockProps,
-	CheckboxControl = wp.components.CheckboxControl,
-	RadioControl = wp.components.RadioControl,
-	TextControl = wp.components.TextControl,
-	ToggleControl = wp.components.ToggleControl,
-	SelectControl = wp.components.SelectControl,
-	PanelBody = wp.components.PanelBody;
-
-registerBlockType( 'my-plugin/inspector-controls-example', {
-	apiVersion: 2,
-
-	title: 'Inspector controls example',
-
-	icon: 'universal-access-alt',
-
-	category: 'design',
-
-	attributes: {
-		content: {
-			type: 'string',
-			source: 'html',
-			selector: 'p',
-		},
-		checkboxField: {
-			type: 'boolean',
-			default: true,
-		},
-		radioField: {
-			type: 'string',
-			default: 'yes',
-		},
-		textField: {
-			type: 'string',
-		},
-		toggleField: {
-			type: 'boolean',
-		},
-		selectField: {
-			type: 'string',
-		},
-	},
-
-	edit: function ( props ) {
-		var blockProps = useBlockProps();
-
-		var content = props.attributes.content,
-			checkboxField = props.attributes.checkboxField,
-			radioField = props.attributes.radioField,
-			textField = props.attributes.textField,
-			toggleField = props.attributes.toggleField,
-			selectField = props.attributes.selectField;
-
-		function onChangeContent( newContent ) {
-			props.setAttributes( { content: newContent } );
-		}
-
-		function onChangeCheckboxField( newValue ) {
-			props.setAttributes( { checkboxField: newValue } );
-		}
-
-		function onChangeRadioField( newValue ) {
-			props.setAttributes( { radioField: newValue } );
-		}
-
-		function onChangeTextField( newValue ) {
-			props.setAttributes( { textField: newValue } );
-		}
-
-		function onChangeToggleField( newValue ) {
-			props.setAttributes( { toggleField: newValue } );
-		}
-
-		function onChangeSelectField( newValue ) {
-			props.setAttributes( { selectField: newValue } );
-		}
-
-		return el(
-			Fragment,
-			null,
-			el(
-				InspectorControls,
-				null,
-				el(
-					PanelBody, 
-					{
-						title: 'Settings',
-					},
-					el( CheckboxControl, {
-						heading: 'Checkbox Field',
-						label: 'Tick Me',
-						help: 'Additional help text',
-						checked: checkboxField,
-						onChange: onChangeCheckboxField,
-					} ),
-					el( RadioControl, {
-						label: 'Radio Field',
-						selected: radioField,
-						options: [
-							{
-								label: 'Yes',
-								value: 'yes',
-							},
-							{
-								label: 'No',
-								value: 'no',
-							},
-						],
-						onChange: onChangeRadioField,
-					} ),
-					el( TextControl, {
-						label: 'Text Field',
-						help: 'Additional help text',
-						value: textField,
-						onChange: onChangeTextField,
-					} ),
-					el( ToggleControl, {
-						label: 'Toggle Field',
-						checked: toggleField,
-						onChange: onChangeToggleField,
-					} ),
-					el( SelectControl, {
-						label: 'Select Field',
-						value: selectField,
-						options: [
-							{
-								value: 'a',
-								label: 'Option A',
-							},
-							{
-								value: 'b',
-								label: 'Option B',
-							},
-							{
-								value: 'c',
-								label: 'Option C',
-							},
-						],
-						onChange: onChangeSelectField,
-					} )
-				)
-			),
-			el(
-				RichText,
-				Object.assing( blockProps, {
-					key: 'editable',
-					tagName: 'p',
-					onChange: onChangeContent,
-					value: content,
-				} )
-			)
-		);
-	},
-
-	save: function ( props ) {
-		var blockProps = useBlockProps.save();
-		var content = props.attributes.content,
-			checkboxField = props.attributes.checkboxField,
-			radioField = props.attributes.radioField,
-			textField = props.attributes.textField,
-			toggleField = props.attributes.toggleField,
-			selectField = props.attributes.selectField;
-
-		return el(
-			'div',
-			blockProps,
-			el( RichText.Content, {
-				value: content,
-				tagName: 'p',
-			} ),
-			el( 'h2', null, 'Inspector Control Fields' ),
-			el(
-				'ul',
-				null,
-				el( 'li', null, 'Checkbox Field: ', checkboxField ),
-				el( 'li', null, 'Radio Field: ', radioField ),
-				el( 'li', null, 'Text Field: ', textField ),
-				el( 'li', null, 'Toggle Field: ', toggleField ),
-				el( 'li', null, 'Select Field: ', selectField )
-			)
-		);
-	},
-} );
-```
-
-{% ESNext %}
-
 ```js
 import { registerBlockType } from '@wordpress/blocks';
 import {
@@ -209,7 +14,7 @@ import {
 	TextControl,
 	ToggleControl,
 	SelectControl,
-	PanelBody
+	PanelBody,
 } from '@wordpress/components';
 import {
 	RichText,
@@ -289,7 +94,7 @@ registerBlockType( 'my-plugin/inspector-controls-example', {
 		return (
 			<>
 				<InspectorControls>
-					<PanelBody title={__('Settings')}>
+					<PanelBody title={ __( 'Settings' ) }>
 						<CheckboxControl
 							heading="Checkbox Field"
 							label="Tick Me"
@@ -374,4 +179,44 @@ registerBlockType( 'my-plugin/inspector-controls-example', {
 } );
 ```
 
-{% end %}
+## InspectorAdvancedControls
+
+<img src="https://user-images.githubusercontent.com/150562/94028603-df90bf00-fdb3-11ea-9e6f-eb15c5631d85.png" width="280" alt="inspector-advanced-controls">
+
+Inspector Advanced Controls appear under the _Advanced_ panel of a block's [InspectorControls](https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/inspector-controls/README.md) -- that is, they appear as a specific set of controls within a block's settings panels. As the name suggests, `InspectorAdvancedControls` is meant for controls that most users aren't meant to interact with most of the time, such as adding an HTML anchor or custom CSS classes to a block.
+
+### Usage
+
+```js
+import {
+	TextControl,
+} from '@wordpress/components';
+import {
+	InspectorControls,
+	InspectorAdvancedControls,
+} from '@wordpress/block-editor';
+
+function MyBlockEdit( { attributes, setAttributes } ) {
+	return (
+		<>
+			<div>
+				{ /* Block markup goes here */ }
+			</div
+			<InspectorControls>
+				{ /* Regular control goes here */
+			</InspectorControls>
+			<InspectorAdvancedControls>
+				<TextControl
+					label="HTML anchor"
+					value={ attributes.anchor }
+					onChange={ ( nextValue ) => {
+						setAttributes( {
+							anchor: nextValue,
+						} );
+					} }
+				/>
+			</InspectorAdvancedControls>
+		</>
+	);
+}
+```

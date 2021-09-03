@@ -21,7 +21,7 @@ import InputBase from '../input-control/input-base';
 import type { InputBaseProps, LabelPosition } from '../input-control/types';
 import { Select, DownArrowWrapper } from './styles/select-control-styles';
 import type { Size } from './types';
-import type { PolymorphicComponentProps } from '../ui/context';
+import type { WordPressComponentProps } from '../ui/context';
 
 function useUniqueId( idProp?: string ) {
 	const instanceId = useInstanceId( SelectControl );
@@ -71,7 +71,7 @@ function SelectControl(
 		prefix,
 		suffix,
 		...props
-	}: PolymorphicComponentProps< SelectControlProps, 'select', false >,
+	}: WordPressComponentProps< SelectControlProps, 'select', false >,
 	ref: Ref< HTMLSelectElement >
 ) {
 	const [ isFocused, setIsFocused ] = useState( false );

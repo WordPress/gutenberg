@@ -30,10 +30,6 @@ import {
 } from './actions';
 import { getKindEntities, DEFAULT_ENTITY_KEY } from './entities';
 import { ifNotResolved, getNormalizedCommaSeparable } from './utils';
-import {
-	__unstableAcquireStoreLock,
-	__unstableReleaseStoreLock,
-} from './locks';
 
 /**
  * Requests authors from the REST API.
@@ -74,11 +70,14 @@ export function* getEntityRecord( kind, name, key = '', query ) {
 		return;
 	}
 
-	const lock = yield* __unstableAcquireStoreLock(
+	const lock = yield controls.dispatch(
+		STORE_NAME,
+		'__unstableAcquireStoreLock',
 		STORE_NAME,
 		[ 'entities', 'data', kind, name, key ],
 		{ exclusive: false }
 	);
+
 	try {
 		if ( query !== undefined && query._fields ) {
 			// If requesting specific fields, items and query association to said
@@ -129,7 +128,11 @@ export function* getEntityRecord( kind, name, key = '', query ) {
 		// We need a way to handle and access REST API errors in state
 		// Until then, catching the error ensures the resolver is marked as resolved.
 	} finally {
-		yield* __unstableReleaseStoreLock( lock );
+		yield controls.dispatch(
+			STORE_NAME,
+			'__unstableReleaseStoreLock',
+			lock
+		);
 	}
 }
 
@@ -163,11 +166,14 @@ export function* getEntityRecords( kind, name, query = {} ) {
 		return;
 	}
 
-	const lock = yield* __unstableAcquireStoreLock(
+	const lock = yield controls.dispatch(
+		STORE_NAME,
+		'__unstableAcquireStoreLock',
 		STORE_NAME,
 		[ 'entities', 'data', kind, name ],
 		{ exclusive: false }
 	);
+
 	try {
 		if ( query._fields ) {
 			// If requesting specific fields, items and query association to said
@@ -225,7 +231,11 @@ export function* getEntityRecords( kind, name, query = {} ) {
 			};
 		}
 	} finally {
-		yield* __unstableReleaseStoreLock( lock );
+		yield controls.dispatch(
+			STORE_NAME,
+			'__unstableReleaseStoreLock',
+			lock
+		);
 	}
 }
 
