@@ -14,37 +14,40 @@ const justifyContentMap = {
 	center: 'center',
 	'space-between': 'space-between',
 };
-
-// TODO: this is temp implementation to test quickly.
-// This will need to be applied to the others migrations.
-// The problem exists because `itemsJustification` was introduced in https://github.com/WordPress/gutenberg/pull/28980/files
-// and wasn't declared in block.json (https://github.com/WordPress/gutenberg/issues/34003).
+/**
+ * The specific handling by `className` below is needed because `itemsJustification`
+ * was introduced in https://github.com/WordPress/gutenberg/pull/28980/files and wasn't
+ * declared in block.json.
+ *
+ * @param {Object} attributes Block's attributes.
+ */
 const migrateWithLayout = ( attributes ) => {
 	if ( !! attributes.layout ) {
 		return attributes;
 	}
-
-	let justifyContent = 'flex-start';
-	let className = attributes.className;
-	const cssClasses = className?.split( ' ' );
-	if ( cssClasses ) {
-		const prefix = 'item-justified-';
-		className = cssClasses.reduce( ( accumulator, cssClass ) => {
-			if ( ! cssClass.startsWith( prefix ) ) {
-				justifyContent =
-					justifyContentMap[ cssClass.slice( prefix.length + 1 ) ];
-				return accumulator;
-			}
-			return `${ accumulator } ${ cssClass }`;
-		}, '' );
+	const { className } = attributes;
+	// Matches classes with `items-justified-` prefix.
+	const prefix = `items-justified-`;
+	const justifiedItemsRegex = new RegExp( `\\b${ prefix }[^ ]*[ ]?\\b`, 'g' );
+	const layout = { type: 'flex' };
+	/**
+	 * Add justifyContent style only if needed for backwards compatibility.
+	 * Also due to the missing attribute, it's possible for a block to have
+	 * more than one of `justified` classes.
+	 */
+	const justifyContent = className
+		?.match( justifiedItemsRegex )?.[ 0 ]
+		?.trim();
+	if ( justifyContent ) {
+		Object.assign( layout, {
+			justifyContent:
+				justifyContentMap[ justifyContent.slice( prefix.length ) ],
+		} );
 	}
 	return {
 		...attributes,
-		className,
-		layout: {
-			type: 'flex',
-			justifyContent,
-		},
+		className: className?.replace( justifiedItemsRegex, '' ).trim(),
+		layout,
 	};
 };
 
@@ -140,6 +143,7 @@ const deprecated = [
 			align: [ 'left', 'center', 'right' ],
 			anchor: true,
 		},
+		migrate: migrateWithLayout,
 		save: ( props ) => {
 			const {
 				attributes: {
