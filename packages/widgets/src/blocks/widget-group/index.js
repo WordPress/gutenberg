@@ -10,7 +10,6 @@ import { group as icon } from '@wordpress/icons';
  */
 import metadata from './block.json';
 import edit from './edit';
-// eslint-disable-next-line no-unused-vars
 import save from './save';
 const { name } = metadata;
 export { metadata, name };
