@@ -38,7 +38,7 @@ export const SIDEBAR_SCOPE = 'core/edit-navigation';
  *
  * @type {string}
  */
-export const SIDEBAR_MENU = 'core/menu';
+export const SIDEBAR_MENU = 'edit-navigation/menu';
 
 /**
  * The identifier of the editor's block complementary area.
