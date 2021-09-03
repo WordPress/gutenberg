@@ -201,7 +201,7 @@ export function __experimentalGetEntityRecordNoResolver(
  */
 export const getRawEntityRecord = createSelector(
 	( state, kind, name, key ) => {
-		const record = getEntityRecord(state, kind, name, key);
+		const record = getEntityRecord( state, kind, name, key );
 		return (
 			record &&
 			Object.keys( record ).reduce( ( accumulator, _key ) => {
