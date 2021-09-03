@@ -35,3 +35,45 @@
 	}
 }
 
+.wp-block-menu-placeholder {
+	// The navigation editor already has a border around content.
+	// Hide the placeholder's border. Requires extra specificity.
+	&.wp-block-menu-placeholder {
+		box-shadow: none;
+	}
+
+	// Show placeholder instructions when it's a medium size.
+	&.is-medium .components-placeholder__instructions {
+		display: block;
+	}
+
+	// Display buttons in a column when placeholder is small.
+	.wp-block-menu-placeholder__actions {
+		display: flex;
+		flex-direction: column;
+
+		.components-button {
+			margin-bottom: $grid-unit-15;
+			margin-right: 0;
+
+			// Avoid bottom margin on the dropdown since it makes the
+			// menu anchor itself too far away from the button.
+			&.components-dropdown-menu__toggle {
+				margin-bottom: 0;
+			}
+		}
+	}
+
+	@include break-medium() {
+		.wp-block-menu-placeholder__actions {
+			flex-direction: row;
+		}
+
+		// Change the default button margin. Again use extra specificity.
+		&.wp-block-menu-placeholder.is-medium .components-button {
+			margin-bottom: 0;
+			margin-right: $grid-unit-15;
+		}
+	}
+
+}

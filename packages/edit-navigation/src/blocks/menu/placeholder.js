@@ -10,7 +10,7 @@ import {
 	MenuItem,
 	Spinner,
 } from '@wordpress/components';
-
+import { useSelect } from '@wordpress/data';
 import {
 	forwardRef,
 	useCallback,
@@ -18,18 +18,24 @@ import {
 	useEffect,
 } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
-import { navigation, chevronDown, Icon } from '@wordpress/icons';
+import { chevronDown } from '@wordpress/icons';
 
 /**
  * Internal dependencies
  */
+import { store as navigationStore } from '../../store';
+import { useMenuEntityProp } from '../../hooks';
 import useNavigationEntities from './use-navigation-entities';
 import menuItemsToBlocks from './menu-items-to-blocks';
 
 function NavigationPlaceholder( { onCreate }, ref ) {
 	const [ selectedMenu, setSelectedMenu ] = useState();
-
 	const [ isCreatingFromMenu, setIsCreatingFromMenu ] = useState( false );
+
+	const selectedMenuId = useSelect( ( select ) =>
+		select( navigationStore ).getSelectedMenuId()
+	);
+	const [ menuName ] = useMenuEntityProp( 'name', selectedMenuId );
 
 	const {
 		isResolvingPages,
@@ -81,12 +87,18 @@ function NavigationPlaceholder( { onCreate }, ref ) {
 	}, [ isCreatingFromMenu, hasResolvedMenuItems ] );
 
 	const toggleProps = {
-		variant: 'primary',
-		className: 'wp-block-menu-placeholder__actions__dropdown',
+		variant: 'tertiary',
 	};
 
 	return (
-		<Placeholder className="wp-block-menu-placeholder">
+		<Placeholder
+			className="wp-block-menu-placeholder"
+			label={ menuName }
+			instructions={ __(
+				'This menu is empty. You can start blank and choose what to add,' +
+					' add your existing pages, or add the content of another menu.'
+			) }
+		>
 			<div className="wp-block-menu-placeholder__controls">
 				{ isLoading && (
 					<div ref={ ref }>
@@ -98,12 +110,23 @@ function NavigationPlaceholder( { onCreate }, ref ) {
 						ref={ ref }
 						className="wp-block-menu-placeholder__actions"
 					>
-						<div className="wp-block-menu-placeholder__actions__indicator">
-							<Icon icon={ navigation } /> { __( 'Navigation' ) }
-						</div>
+						<Button
+							variant="tertiary"
+							onClick={ onCreateEmptyMenu }
+						>
+							{ __( 'Start blank' ) }
+						</Button>
+						{ hasPages ? (
+							<Button
+								variant={ hasMenus ? 'tertiary' : 'primary' }
+								onClick={ onCreateAllPages }
+							>
+								{ __( 'Add all pages' ) }
+							</Button>
+						) : undefined }
 						{ hasMenus ? (
 							<DropdownMenu
-								text={ __( 'Add existing menu' ) }
+								text={ __( 'Copy existing menu' ) }
 								icon={ chevronDown }
 								toggleProps={ toggleProps }
 							>
@@ -129,20 +152,6 @@ function NavigationPlaceholder( { onCreate }, ref ) {
 								) }
 							</DropdownMenu>
 						) : undefined }
-						{ hasPages ? (
-							<Button
-								variant={ hasMenus ? 'tertiary' : 'primary' }
-								onClick={ onCreateAllPages }
-							>
-								{ __( 'Add all pages' ) }
-							</Button>
-						) : undefined }
-						<Button
-							variant="tertiary"
-							onClick={ onCreateEmptyMenu }
-						>
-							{ __( 'Start empty' ) }
-						</Button>
 					</div>
 				) }
 			</div>
