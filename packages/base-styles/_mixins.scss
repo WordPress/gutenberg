@@ -500,3 +500,41 @@
 		color: #313131;
 	}
 }
+
+// Deprecated from UI, kept for back-compat.
+@mixin gradient-colors-deprecated() {
+	/*
+	 * Our classes uses the same values we set for gradient value attributes,
+	 * and we can not use spacing because of WP multi site kses rule.
+	 */
+
+	/* stylelint-disable function-comma-space-after */
+	.has-vivid-green-cyan-to-vivid-cyan-blue-gradient-background {
+		background: linear-gradient(135deg,rgba(0,208,132,1) 0%,rgba(6,147,227,1) 100%);
+	}
+
+	.has-purple-crush-gradient-background {
+		background: linear-gradient(135deg,rgb(52,226,228) 0%,rgb(71,33,251) 50%,rgb(171,29,254) 100%);
+	}
+
+	.has-hazy-dawn-gradient-background {
+		background: linear-gradient(135deg,rgb(250,172,168) 0%,rgb(218,208,236) 100%);
+	}
+
+	.has-subdued-olive-gradient-background {
+		background: linear-gradient(135deg,rgb(250,250,225) 0%,rgb(103,166,113) 100%);
+	}
+
+	.has-atomic-cream-gradient-background {
+		background: linear-gradient(135deg,rgb(253,215,154) 0%,rgb(0,74,89) 100%);
+	}
+
+	.has-nightshade-gradient-background {
+		background: linear-gradient(135deg,rgb(51,9,104) 0%,rgb(49,205,207) 100%);
+	}
+
+	.has-midnight-gradient-background {
+		background: linear-gradient(135deg,rgb(2,3,129) 0%,rgb(40,116,252) 100%);
+	}
+	/* stylelint-enable function-comma-space-after */
+}

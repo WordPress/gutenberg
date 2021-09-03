@@ -50,6 +50,7 @@
 :root .editor-styles-wrapper {
 	@include background-colors-deprecated();
 	@include foreground-colors-deprecated();
+	@include gradient-colors-deprecated();
 }
 
 // Font sizes.
