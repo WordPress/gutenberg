@@ -22,7 +22,6 @@ export default {
 			<ToggleGroupControl
 				label={ __( 'Justify content' ) }
 				value={ justifyContent }
-				help={ __( 'Add some help here??' ) }
 				onChange={ ( value ) => {
 					onChange( {
 						...layout,
