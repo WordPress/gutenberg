@@ -29,26 +29,29 @@ const migrateWithLayout = ( attributes ) => {
 	// Matches classes with `items-justified-` prefix.
 	const prefix = `items-justified-`;
 	const justifiedItemsRegex = new RegExp( `\\b${ prefix }[^ ]*[ ]?\\b`, 'g' );
-	const layout = { type: 'flex' };
+	const newAttributes = {
+		...attributes,
+		className: className?.replace( justifiedItemsRegex, '' ).trim(),
+	};
 	/**
-	 * Add justifyContent style only if needed for backwards compatibility.
-	 * Also due to the missing attribute, it's possible for a block to have
-	 * more than one of `justified` classes.
+	 * Add `layout` prop only if `justifyContent` is defined, for backwards
+	 * compatibility. In other cases the block's default layout will be used.
+	 * Also noting that due to the missing attribute, it's possible for a block
+	 * to have more than one of `justified` classes.
 	 */
 	const justifyContent = className
 		?.match( justifiedItemsRegex )?.[ 0 ]
 		?.trim();
 	if ( justifyContent ) {
-		Object.assign( layout, {
-			justifyContent:
-				justifyContentMap[ justifyContent.slice( prefix.length ) ],
+		Object.assign( newAttributes, {
+			layout: {
+				type: 'flex',
+				justifyContent:
+					justifyContentMap[ justifyContent.slice( prefix.length ) ],
+			},
 		} );
 	}
-	return {
-		...attributes,
-		className: className?.replace( justifiedItemsRegex, '' ).trim(),
-		layout,
-	};
+	return newAttributes;
 };
 
 // Social Links block deprecations.

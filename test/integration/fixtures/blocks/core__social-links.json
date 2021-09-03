@@ -4,10 +4,7 @@
 		"name": "core/social-links",
 		"isValid": true,
 		"attributes": {
-			"openInNewTab": false,
-			"layout": {
-				"type": "flex"
-			}
+			"openInNewTab": false
 		},
 		"innerBlocks": [
 			{
