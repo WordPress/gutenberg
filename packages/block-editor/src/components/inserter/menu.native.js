@@ -25,6 +25,7 @@ import styles from './style.scss';
 
 const MIN_ITEMS_FOR_SEARCH = 2;
 const REUSABLE_BLOCKS_CATEGORY = 'reusable';
+const ALLOWED_EMBED_VARIATIONS = [ 'core/embed' ];
 
 function allowedBlockFilter(
 	block,
@@ -41,9 +42,9 @@ function allowedBlockFilter(
 		return allowReusable;
 	}
 	// We don't want to show all possible embed variations
-	// as different blocks in the inserter. Instead just show
-	// the core embed block.
-	return category !== 'embed' || id === 'core/embed';
+	// as different blocks in the inserter. We'll only show a
+	// few popular ones
+	return category !== 'embed' || ALLOWED_EMBED_VARIATIONS.includes( id );
 }
 
 function InserterMenu( {
@@ -57,7 +58,6 @@ function InserterMenu( {
 } ) {
 	const [ filterValue, setFilterValue ] = useState( '' );
 	const [ showTabs, setShowTabs ] = useState( true );
-	// eslint-disable-next-line no-undef
 	const [ showSearchForm, setShowSearchForm ] = useState( true );
 	const [ tabIndex, setTabIndex ] = useState( 0 );
 
