@@ -14,6 +14,7 @@ import {
 	useState,
 	useEffect,
 } from '@wordpress/element';
+import { usePreferredColorScheme } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -154,7 +155,6 @@ const EMPTY_ARRAY = [];
 function Sandbox( {
 	containerStyle,
 	html = '',
-	colorScheme,
 	customJS,
 	providerUrl = '',
 	scripts = EMPTY_ARRAY,
@@ -163,6 +163,7 @@ function Sandbox( {
 	type,
 	url,
 } ) {
+	const colorScheme = usePreferredColorScheme();
 	const ref = useRef();
 	const [ height, setHeight ] = useState( 0 );
 	const [ contentHtml, setContentHtml ] = useState( getHtmlDoc() );

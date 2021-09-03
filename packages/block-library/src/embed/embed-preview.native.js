@@ -14,7 +14,6 @@ import { BlockCaption } from '@wordpress/block-editor';
 import { __, sprintf } from '@wordpress/i18n';
 import { memo, useState } from '@wordpress/element';
 import { SandBox } from '@wordpress/components';
-import { usePreferredColorScheme } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -38,7 +37,6 @@ const EmbedPreview = ( {
 	type,
 	url,
 } ) => {
-	const colorScheme = usePreferredColorScheme();
 	const [ isCaptionSelected, setIsCaptionSelected ] = useState( false );
 
 	const wrapperStyle = styles[ 'embed-preview__wrapper' ];
@@ -106,7 +104,6 @@ const EmbedPreview = ( {
 					style={ [ wrapperStyle, wrapperAlignStyle ] }
 				>
 					<PreviewContent
-						colorScheme={ colorScheme }
 						html={ html }
 						title={ iframeTitle }
 						type={ sandboxClassnames }
