@@ -163,7 +163,7 @@ function render_block_core_navigation_submenu( $attributes, $content, $block ) {
 	}
 
 	$show_submenu_indicators = isset( $block->context['showSubmenuIcon'] ) && $block->context['showSubmenuIcon'];
-	$open_on_click = isset( $block->context['openSubmenusOnClick'] ) && $block->context['openSubmenusOnClick'];
+	$open_on_click           = isset( $block->context['openSubmenusOnClick'] ) && $block->context['openSubmenusOnClick'];
 	$open_on_hover_and_click = isset( $block->context['openSubmenusOnClick'] ) && ! $block->context['openSubmenusOnClick'] &&
 		$show_submenu_indicators;
 
