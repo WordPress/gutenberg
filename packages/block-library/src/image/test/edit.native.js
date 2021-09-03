@@ -8,11 +8,23 @@ import { Image } from 'react-native';
  * WordPress dependencies
  */
 import { getBlockTypes, unregisterBlockType } from '@wordpress/blocks';
+import { apiFetch } from '@wordpress/data-controls';
 
 /**
  * Internal dependencies
  */
 import { registerCoreBlocks } from '../..';
+
+jest.mock( '@wordpress/data-controls', () => {
+	const dataControls = jest.requireActual( '@wordpress/data-controls' );
+	return {
+		...dataControls,
+		apiFetch: jest.fn(),
+	};
+} );
+
+const apiFetchPromise = Promise.resolve( {} );
+apiFetch.mockImplementation( () => apiFetchPromise );
 
 beforeAll( () => {
 	registerCoreBlocks();
@@ -42,6 +54,8 @@ describe( 'Image Block', () => {
 		<figcaption>Mountain</figcaption></figure>
 		<!-- /wp:image -->`;
 		const screen = await initializeEditor( { initialHtml } );
+		// We must await the image fetch via `getMedia`
+		await act( () => apiFetchPromise );
 
 		const imageBlock = screen.getByA11yLabel( /Image Block/ );
 		fireEvent.press( imageBlock );
@@ -69,6 +83,8 @@ describe( 'Image Block', () => {
 		</figure>
 		<!-- /wp:image -->`;
 		const screen = await initializeEditor( { initialHtml } );
+		// We must await the image fetch via `getMedia`
+		await act( () => apiFetchPromise );
 
 		const imageBlock = screen.getByA11yLabel( /Image Block/ );
 		fireEvent.press( imageBlock );
