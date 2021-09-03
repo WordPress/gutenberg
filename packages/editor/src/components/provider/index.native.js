@@ -54,6 +54,7 @@ const postTypeEntities = [
 	mergedEdits: {
 		meta: true,
 	},
+	rawAttributes: [ 'title', 'excerpt', 'content' ],
 } ) );
 import { EditorHelpTopics } from '@wordpress/editor';
 

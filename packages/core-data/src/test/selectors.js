@@ -11,6 +11,7 @@ import {
 	__experimentalGetEntityRecordNoResolver,
 	hasEntityRecords,
 	getEntityRecords,
+	getRawEntityRecord,
 	__experimentalGetDirtyEntityRecords,
 	__experimentalGetEntitiesBeingSaved,
 	getEntityRecordNonTransientEdits,
@@ -201,6 +202,76 @@ describe( 'hasEntityRecords', () => {
 		} );
 
 		expect( hasEntityRecords( state, 'root', 'postType' ) ).toBe( true );
+	} );
+} );
+
+describe( 'getRawEntityRecord', () => {
+	const data = {
+		someKind: {
+			someName: {
+				queriedData: {
+					items: {
+						default: {
+							post: {
+								title: {
+									raw: { html: '<h1>post</h1>' },
+									rendered:
+										'<div id="post"><h1>rendered post</h1></div>',
+								},
+							},
+						},
+					},
+					itemIsComplete: {
+						default: {
+							post: true,
+						},
+					},
+					queries: {},
+				},
+			},
+		},
+	};
+	it( 'should preserve the structure of `raw` field by default', () => {
+		const state = deepFreeze( {
+			entities: {
+				config: [
+					{
+						kind: 'someKind',
+						name: 'someName',
+					},
+				],
+				data: { ...data },
+			},
+		} );
+		expect(
+			getRawEntityRecord( state, 'someKind', 'someName', 'post' )
+		).toEqual( {
+			title: {
+				raw: { html: '<h1>post</h1>' },
+				rendered: '<div id="post"><h1>rendered post</h1></div>',
+			},
+		} );
+	} );
+	it( 'should flatten the structure of `raw` field for entities configured with rawAttributes', () => {
+		const state = deepFreeze( {
+			entities: {
+				config: [
+					{
+						kind: 'someKind',
+						name: 'someName',
+						rawAttributes: [ 'title' ],
+					},
+				],
+				data: { ...data },
+			},
+		} );
+		expect(
+			getRawEntityRecord( state, 'someKind', 'someName', 'post' )
+		).toEqual( {
+			title: {
+				html: '<h1>post</h1>',
+			},
+		} );
 	} );
 } );
 
