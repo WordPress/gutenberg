@@ -109,7 +109,7 @@ const EMPTY_ARRAY = [];
 
 function Sandbox( {
 	html = '',
-	preferredColorScheme,
+	colorScheme,
 	providerUrl = '',
 	scripts = EMPTY_ARRAY,
 	styles = EMPTY_ARRAY,
@@ -134,7 +134,7 @@ function Sandbox( {
 	const key = Platform.select( {
 		android: `${ url }-${
 			isLandscape ? 'landscape' : 'portrait'
-		}-${ preferredColorScheme }`,
+		}-${ colorScheme }`,
 		ios: url,
 	} );
 
