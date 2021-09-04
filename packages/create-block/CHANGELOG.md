@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+-   Code Quality: explictly specify `save: save` for consistency [#33613](https://github.com/WordPress/gutenberg/issues/33613)
+
 ## 2.5.0 (2021-07-21)
 
 ### Enhancements
