@@ -1,12 +1,11 @@
-
-.header {
+.nav-bar {
 	align-items: center;
 	flex-direction: row;
 	height: 44px;
 	justify-content: center;
 }
 
-.title {
+.heading {
 	color: $light-primary;
 	text-align: center;
 	font-weight: 600;
@@ -15,7 +14,7 @@
 	width: 100%;
 }
 
-.title-dark {
+.heading-dark {
 	color: $dark-primary;
 }
 
@@ -42,7 +41,6 @@
 	justify-content: center;
 	z-index: 2;
 }
-
 
 .button-text {
 	color: $blue-50;

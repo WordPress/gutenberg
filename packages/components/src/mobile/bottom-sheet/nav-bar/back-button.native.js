@@ -70,7 +70,7 @@ function BackButton( { onPress } ) {
 	return <Button onPress={ onPress } icon={ backIcon } text={ backText } />;
 }
 
-function CancelButton( { onPress, text } ) {
+function DismissButton( { onPress, iosText } ) {
 	const arrowLeftStyle = usePreferredColorSchemeStyle(
 		styles[ 'arrow-left-icon' ],
 		styles[ 'arrow-right-icon-dark' ]
@@ -80,7 +80,7 @@ function CancelButton( { onPress, text } ) {
 	let backText;
 
 	if ( Platform.OS === 'ios' ) {
-		backText = text ? text : __( 'Cancel' );
+		backText = iosText ? iosText : __( 'Cancel' );
 	} else {
 		backIcon = <Icon icon={ close } size={ 24 } style={ arrowLeftStyle } />;
 	}
@@ -88,12 +88,7 @@ function CancelButton( { onPress, text } ) {
 	return <Button onPress={ onPress } icon={ backIcon } text={ backText } />;
 }
 
-function CloseButton( { onPress } ) {
-	return <CancelButton onPress={ onPress } text={ __( 'Close' ) } />;
-}
-
 Button.Back = BackButton;
-Button.Cancel = CancelButton;
-Button.Close = CloseButton;
+Button.Dismiss = DismissButton; // Cancel or Close Button
 
 export default Button;

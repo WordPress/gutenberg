@@ -9,24 +9,24 @@ import { BottomSheet } from '@wordpress/components';
 
 export default = () => (
 	<BottomSheet>
-		<BottomSheet.Header>
-			<BottomSheet.Header.BackButton onPress={ () => {} } />
-			<BottomSheet.Header.Title>A Sheet Title</BottomSheet.Header.Title>
-			<BottomSheet.Header.ApplyButton onPress={ () => {} } />
-		</BottomSheet.Header>
+		<BottomSheet.NavBar>
+			<BottomSheet.NavBar.BackButton onPress={ () => {} } />
+			<BottomSheet.NavBar.Title>A Sheet Title</BottomSheet.NavBar.Title>
+			<BottomSheet.NavBar.ApplyButton onPress={ () => {} } />
+		</BottomSheet.NavBar>
 	</BottomSheet>
 );
 ```
 
-## BottomSheet.Header
+## BottomSheet.NavBar
 
 Provides structural styles for left-center-right layout for header UI.
 
-## BottomSheet.Header.Title
+## BottomSheet.NavBar.Title
 
 Displays a styled title for a bottom sheet.
 
-## BottomSheet.Header.ApplyButton
+## BottomSheet.NavBar.ApplyButton
 
 Displays a styled button to apply settings of bottom sheet controls.
 
@@ -36,7 +36,7 @@ Displays a styled button to apply settings of bottom sheet controls.
 
 Callback invoked once the button is pressed.
 
-## BottomSheet.Header.BackButton
+## BottomSheet.NavBar.BackButton
 
 Displays a styled button to navigate backwards from a bottom sheet.
 
@@ -46,7 +46,7 @@ Displays a styled button to navigate backwards from a bottom sheet.
 
 Callback invoked once the button is pressed.
 
-## BottomSheet.Header.CancelButton
+## BottomSheet.NavBar.DismissButton
 
 Displays a styled button to dismiss a full screen bottom sheet.
 
@@ -56,12 +56,6 @@ Displays a styled button to dismiss a full screen bottom sheet.
 
 Callback invoked once the button is pressed.
 
-## BottomSheet.Header.CloseButton
+#### iosText 
 
-Displays a styled button to dismiss a full screen bottom sheet.
-
-### Props
-
-#### onPress
-
-Callback invoked once the button is pressed.
+Used to display iOS text if different from "Cancel". 

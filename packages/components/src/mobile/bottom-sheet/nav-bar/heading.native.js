@@ -13,16 +13,16 @@ import { usePreferredColorSchemeStyle } from '@wordpress/compose';
  */
 import styles from './styles.scss';
 
-function Title( { children } ) {
-	const titleStyle = usePreferredColorSchemeStyle(
-		styles.title,
-		styles[ 'title-dark' ]
+function Heading( { children } ) {
+	const headingStyle = usePreferredColorSchemeStyle(
+		styles.heading,
+		styles[ 'heading-dark' ]
 	);
 
 	return (
 		<Text
 			accessibilityRole="header"
-			style={ titleStyle }
+			style={ headingStyle }
 			maxFontSizeMultiplier={ 3 }
 		>
 			{ children }
@@ -30,4 +30,4 @@ function Title( { children } ) {
 	);
 }
 
-export default Title;
+export default Heading;
