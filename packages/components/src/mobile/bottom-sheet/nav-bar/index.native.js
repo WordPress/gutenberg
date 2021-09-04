@@ -6,13 +6,12 @@ import { View } from 'react-native';
 /**
  * Internal dependencies
  */
-import styles from './styles.scss';
-import Button from './back-button';
 import ApplyButton from './apply-button';
+import Button from './back-button';
 import Heading from './heading';
-
+import styles from './styles.scss';
 function NavBar( { children } ) {
-	return <View style={ styles['nav-bar'] }>{ children }</View>;
+	return <View style={ styles[ 'nav-bar' ] }>{ children }</View>;
 }
 
 NavBar.ApplyButton = ApplyButton;
