@@ -84,12 +84,12 @@ function FontSizePicker( {
 			showSheet={ showSubSheet }
 		>
 			<>
-				<BottomSheet.Header>
-					<BottomSheet.Header.BackButton onPress={ goBack } />
-					<BottomSheet.Header.Title>
+				<BottomSheet.NavBar>
+					<BottomSheet.NavBar.BackButton onPress={ goBack } />
+					<BottomSheet.NavBar.Heading>
 						{ label }
-					</BottomSheet.Header.Title>
-				</BottomSheet.Header>
+					</BottomSheet.NavBar.Heading>
+				</BottomSheet.NavBar>
 				<View style={ styles[ 'components-font-size-picker' ] }>
 					<BottomSheet.Cell
 						customActionButton

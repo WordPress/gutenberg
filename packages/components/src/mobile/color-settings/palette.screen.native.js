@@ -20,7 +20,7 @@ import { useRoute, useNavigation } from '@react-navigation/native';
  */
 import ColorPalette from '../../color-palette';
 import ColorIndicator from '../../color-indicator';
-import Header from '../bottom-sheet/header';
+import NavBar from '../bottom-sheet/nav-bar';
 import SegmentedControls from '../segmented-control';
 import { colorsUtils } from './utils';
 
@@ -164,10 +164,10 @@ const PaletteScreen = () => {
 	}
 	return (
 		<View>
-			<Header>
-				<Header.BackButton onPress={ navigation.goBack } />
-				<Header.Title>{ label } </Header.Title>
-			</Header>
+			<NavBar>
+				<NavBar.BackButton onPress={ navigation.goBack } />
+				<NavBar.Heading>{ label } </NavBar.Heading>
+			</NavBar>
 			<ColorPalette
 				setColor={ setColor }
 				activeColor={ currentValue }

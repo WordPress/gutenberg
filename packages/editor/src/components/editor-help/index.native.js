@@ -81,12 +81,15 @@ function EditorHelpTopics( { close, isVisible, onClose } ) {
 					name="help-topics"
 				>
 					<View style={ styles.container }>
-						<BottomSheet.Header>
-							<BottomSheet.Header.CloseButton onPress={ close } />
-							<BottomSheet.Header.Title>
+						<BottomSheet.NavBar>
+							<BottomSheet.NavBar.DismissButton
+								onPress={ close }
+								iosText={ __( 'Close' ) }
+							/>
+							<BottomSheet.NavBar.Heading>
 								{ title }
-							</BottomSheet.Header.Title>
-						</BottomSheet.Header>
+							</BottomSheet.NavBar.Heading>
+						</BottomSheet.NavBar>
 						<BottomSheetConsumer>
 							{ ( { listProps } ) => {
 								const contentContainerStyle = StyleSheet.flatten(

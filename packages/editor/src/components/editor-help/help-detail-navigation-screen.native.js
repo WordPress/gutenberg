@@ -31,14 +31,14 @@ const HelpDetailNavigationScreen = ( { content, label } ) => {
 	return (
 		<BottomSheet.NavigationScreen isScrollable fullScreen>
 			<View style={ styles.container }>
-				<BottomSheet.Header>
-					<BottomSheet.Header.BackButton
+				<BottomSheet.NavBar>
+					<BottomSheet.NavBar.BackButton
 						onPress={ navigation.goBack }
 					/>
-					<BottomSheet.Header.Title>
+					<BottomSheet.NavBar.Heading>
 						{ label }
-					</BottomSheet.Header.Title>
-				</BottomSheet.Header>
+					</BottomSheet.NavBar.Heading>
+				</BottomSheet.NavBar>
 				<ScrollView
 					{ ...listProps }
 					contentContainerStyle={ {

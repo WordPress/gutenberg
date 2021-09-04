@@ -14,7 +14,7 @@ import { BottomSheetContext, FocalPointPicker } from '@wordpress/components';
 /**
  * Internal dependencies
  */
-import Header from '../bottom-sheet/header';
+import NavBar from '../bottom-sheet/nav-bar';
 import styles from './styles.scss';
 
 const FocalPointSettingsPanelMemo = memo(
@@ -43,15 +43,17 @@ const FocalPointSettingsPanelMemo = memo(
 
 		return (
 			<SafeAreaView style={ styles.safearea }>
-				<Header>
-					<Header.CancelButton
+				<NavBar>
+					<NavBar.DismissButton
 						onPress={ () => onButtonPress( 'cancel' ) }
 					/>
-					<Header.Title>{ __( 'Edit focal point' ) }</Header.Title>
-					<Header.ApplyButton
+					<NavBar.Heading>
+						{ __( 'Edit focal point' ) }
+					</NavBar.Heading>
+					<NavBar.ApplyButton
 						onPress={ () => onButtonPress( 'apply' ) }
 					/>
-				</Header>
+				</NavBar>
 				<FocalPointPicker
 					focalPoint={ draftFocalPoint }
 					onChange={ setPosition }
