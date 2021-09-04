@@ -42,7 +42,6 @@ import NavigationScreen from './bottom-sheet-navigation/navigation-screen';
 import NavigationContainer from './bottom-sheet-navigation/navigation-container';
 import KeyboardAvoidingView from './keyboard-avoiding-view';
 import BottomSheetSubSheet from './sub-sheet';
-import NavigationHeader from './navigation-header';
 import NavBar from './nav-bar';
 import { BottomSheetProvider } from './bottom-sheet-context';
 
@@ -600,7 +599,6 @@ ThemedBottomSheet.getWidth = getWidth;
 ThemedBottomSheet.Button = Button;
 ThemedBottomSheet.Cell = Cell;
 ThemedBottomSheet.SubSheet = BottomSheetSubSheet;
-ThemedBottomSheet.NavigationHeader = NavigationHeader;
 ThemedBottomSheet.NavBar = NavBar;
 ThemedBottomSheet.CyclePickerCell = CyclePickerCell;
 ThemedBottomSheet.PickerCell = PickerCell;
