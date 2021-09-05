@@ -12,7 +12,7 @@ import {
  */
 import { appendSelectors } from './utils';
 import useSetting from '../components/use-setting';
-import { BlockControls, JustifyContentControl } from '../index';
+import { BlockControls, JustifyContentControl } from '../components';
 
 const justifyContentMap = {
 	left: 'flex-start',
