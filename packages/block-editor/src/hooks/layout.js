@@ -69,33 +69,43 @@ function LayoutPanel( { setAttributes, attributes, name: blockName } ) {
 		setAttributes( { layout: newLayout } );
 
 	return (
-		<InspectorControls>
-			<PanelBody title={ __( 'Layout' ) }>
-				{ allowInheriting && !! defaultThemeLayout && (
-					<ToggleControl
-						label={ __( 'Inherit default layout' ) }
-						checked={ !! inherit }
-						onChange={ () =>
-							setAttributes( { layout: { inherit: ! inherit } } )
-						}
-					/>
-				) }
+		<>
+			<InspectorControls>
+				<PanelBody title={ __( 'Layout' ) }>
+					{ allowInheriting && !! defaultThemeLayout && (
+						<ToggleControl
+							label={ __( 'Inherit default layout' ) }
+							checked={ !! inherit }
+							onChange={ () =>
+								setAttributes( {
+									layout: { inherit: ! inherit },
+								} )
+							}
+						/>
+					) }
 
-				{ ! inherit && canBlockSwitchLayout && (
-					<LayoutTypeSwitcher
-						type={ type }
-						onChange={ onChangeType }
-					/>
-				) }
+					{ ! inherit && canBlockSwitchLayout && (
+						<LayoutTypeSwitcher
+							type={ type }
+							onChange={ onChangeType }
+						/>
+					) }
 
-				{ ! inherit && layoutType && (
-					<layoutType.edit
-						layout={ usedLayout }
-						onChange={ onChangeLayout }
-					/>
-				) }
-			</PanelBody>
-		</InspectorControls>
+					{ ! inherit && layoutType && (
+						<layoutType.edit
+							layout={ usedLayout }
+							onChange={ onChangeLayout }
+						/>
+					) }
+				</PanelBody>
+			</InspectorControls>
+			{ ! canBlockSwitchLayout && ! inherit && layoutType && (
+				<layoutType.toolBarControls
+					layout={ usedLayout }
+					onChange={ onChangeLayout }
+				/>
+			) }
+		</>
 	);
 }
 

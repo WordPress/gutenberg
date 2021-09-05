@@ -1,11 +1,11 @@
 /**
  * WordPress dependencies
  */
-import { __ } from '@wordpress/i18n';
-// import {
-// 	__experimentalToggleGroupControl as ToggleGroupControl,
-// 	__experimentalToggleGroupControlOption as ToggleGroupControlOption,
-// } from '@wordpress/components';
+import { __, _x } from '@wordpress/i18n';
+import {
+	__experimentalToggleGroupControl as ToggleGroupControl,
+	__experimentalToggleGroupControlOption as ToggleGroupControlOption,
+} from '@wordpress/components';
 
 /**
  * Internal dependencies
@@ -24,61 +24,25 @@ const justifyContentMap = {
 export default {
 	name: 'flex',
 	label: __( 'Flex' ),
-	edit: function LayoutFlexEdit( { layout = {}, onChange } ) {
-		const { justifyContent = 'left' } = layout;
+	edit: function FlexLayoutEdit( { layout = {}, onChange } ) {
 		return (
-			<BlockControls group="block" __experimentalExposeToChildren>
-				<JustifyContentControl
-					allowedControls={ [
-						'left',
-						'center',
-						'right',
-						'space-between',
-					] }
-					value={ justifyContent }
-					onChange={ ( value ) => {
-						onChange( {
-							...layout,
-							justifyContent: value,
-						} );
-					} }
-					popoverProps={ {
-						position: 'bottom right',
-						isAlternate: true,
-					} }
-				/>
-			</BlockControls>
+			<FlexLayoutJustifyContentControl
+				layout={ layout }
+				onChange={ onChange }
+			/>
 		);
-		// return (
-		// 	<ToggleGroupControl
-		// 		label={ __( 'Justify content' ) }
-		// 		value={ justifyContent }
-		// 		onChange={ ( value ) => {
-		// 			onChange( {
-		// 				...layout,
-		// 				justifyContent: value,
-		// 			} );
-		// 		} }
-		// 		isBlock
-		// 	>
-		// 		<ToggleGroupControlOption
-		// 			value="flex-start"
-		// 			label={ _x( 'Left', 'Justify content option' ) }
-		// 		/>
-		// 		<ToggleGroupControlOption
-		// 			value="center"
-		// 			label={ _x( 'Center', 'Justify content option' ) }
-		// 		/>
-		// 		<ToggleGroupControlOption
-		// 			value="flex-end"
-		// 			label={ _x( 'Right', 'Justify content option' ) }
-		// 		/>
-		// 		<ToggleGroupControlOption
-		// 			value="space-between"
-		// 			label={ _x( 'Space between', 'Justify content option' ) }
-		// 		/>
-		// 	</ToggleGroupControl>
-		// );
+	},
+	toolBarControls: function FlexLayoutToolbarControls( {
+		layout = {},
+		onChange,
+	} ) {
+		return (
+			<FlexLayoutJustifyContentControl
+				layout={ layout }
+				onChange={ onChange }
+				isToolbar
+			/>
+		);
 	},
 	save: function FlexLayoutStyle( { selector, layout } ) {
 		const blockGapSupport = useSetting( 'spacing.blockGap' );
@@ -113,3 +77,66 @@ export default {
 		return [];
 	},
 };
+
+function FlexLayoutJustifyContentControl( {
+	layout,
+	onChange,
+	isToolbar = false,
+} ) {
+	const { justifyContent = 'left' } = layout;
+	if ( isToolbar ) {
+		return (
+			<BlockControls group="block" __experimentalExposeToChildren>
+				<JustifyContentControl
+					allowedControls={ [
+						'left',
+						'center',
+						'right',
+						'space-between',
+					] }
+					value={ justifyContent }
+					onChange={ ( value ) => {
+						onChange( {
+							...layout,
+							justifyContent: value,
+						} );
+					} }
+					popoverProps={ {
+						position: 'bottom right',
+						isAlternate: true,
+					} }
+				/>
+			</BlockControls>
+		);
+	}
+	return (
+		<ToggleGroupControl
+			label={ __( 'Justify content' ) }
+			value={ justifyContent }
+			onChange={ ( value ) => {
+				onChange( {
+					...layout,
+					justifyContent: value,
+				} );
+			} }
+			isBlock
+		>
+			<ToggleGroupControlOption
+				value="left"
+				label={ _x( 'Left', 'Justify content option' ) }
+			/>
+			<ToggleGroupControlOption
+				value="center"
+				label={ _x( 'Center', 'Justify content option' ) }
+			/>
+			<ToggleGroupControlOption
+				value="right"
+				label={ _x( 'Right', 'Justify content option' ) }
+			/>
+			<ToggleGroupControlOption
+				value="space-between"
+				label={ _x( 'Space between', 'Justify content option' ) }
+			/>
+		</ToggleGroupControl>
+	);
+}
