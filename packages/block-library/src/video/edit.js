@@ -94,7 +94,11 @@ function VideoEdit( {
 			// in this case there was an error
 			// previous attributes should be removed
 			// because they may be temporary blob urls
-			setAttributes( { src: undefined, id: undefined } );
+			setAttributes( {
+				src: undefined,
+				id: undefined,
+				poster: undefined,
+			} );
 			return;
 		}
 
@@ -118,7 +122,7 @@ function VideoEdit( {
 				onReplace( embedBlock );
 				return;
 			}
-			setAttributes( { src: newSrc, id: undefined } );
+			setAttributes( { src: newSrc, id: undefined, poster: undefined } );
 		}
 	}
 
@@ -157,7 +161,7 @@ function VideoEdit( {
 	}
 
 	function onRemovePoster() {
-		setAttributes( { poster: '' } );
+		setAttributes( { poster: undefined } );
 
 		// Move focus back to the Media Upload button.
 		posterImageButton.current.focus();
