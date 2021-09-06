@@ -2,14 +2,16 @@
  * External dependencies
  */
 import { View, Text, TouchableWithoutFeedback } from 'react-native';
+import { compact } from 'lodash';
 
 /**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
 import { usePreferredColorSchemeStyle } from '@wordpress/compose';
-import { Icon } from '@wordpress/components';
+import { Icon, Picker } from '@wordpress/components';
 import { BlockIcon } from '@wordpress/block-editor';
+import { useRef } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -23,6 +25,8 @@ const EmbedPlaceholder = ( {
 	label,
 	onPress,
 	cannotEmbed,
+	fallback,
+	tryAgain,
 } ) => {
 	const containerStyle = usePreferredColorSchemeStyle(
 		styles.embed__container,
@@ -40,12 +44,57 @@ const EmbedPlaceholder = ( {
 	);
 	const embedIconErrorStyle = styles[ 'embed__icon--error' ];
 
+	const cannotEmbedMenuPickerRef = useRef();
+
+	const errorPickerOptions = {
+		retry: {
+			id: 'retryOption',
+			label: __( 'Retry' ),
+			value: 'retryOption',
+			onSelect: () => {
+				tryAgain();
+			},
+		},
+		convertToLink: {
+			id: 'convertToLinkOption',
+			label: __( 'Convert to link' ),
+			value: 'convertToLinkOption',
+			onSelect: () => {
+				fallback();
+			},
+		},
+	};
+
+	const options = compact( [
+		cannotEmbed && errorPickerOptions.retry,
+		cannotEmbed && errorPickerOptions.convertToLink,
+	] );
+
+	function onPickerSelect( value ) {
+		const selectedItem = options.find( ( item ) => item.value === value );
+		selectedItem.onSelect();
+	}
+
+	function onPickerPresent() {
+		if ( cannotEmbedMenuPickerRef.current ) {
+			cannotEmbedMenuPickerRef.current.presentPicker();
+		}
+	}
+
+	function resolveOnPressEvent() {
+		if ( cannotEmbed ) {
+			onPickerPresent();
+		} else {
+			onPress();
+		}
+	}
+
 	return (
 		<>
 			<TouchableWithoutFeedback
 				accessibilityRole={ 'button' }
 				accessibilityHint={ __( 'Double tap to add a link.' ) }
-				onPress={ onPress }
+				onPress={ resolveOnPressEvent }
 				disabled={ ! isSelected }
 			>
 				<View style={ containerStyle }>
@@ -65,8 +114,17 @@ const EmbedPlaceholder = ( {
 								{ __( 'Unable to embed media' ) }
 							</Text>
 							<Text style={ actionStyle }>
-								{ __( 'EDIT LINK' ) }
+								{ __( 'More options' ) }
 							</Text>
+							<Picker
+								title={ __(
+									'Sorry, this content could not be embedded.'
+								) }
+								ref={ cannotEmbedMenuPickerRef }
+								options={ options }
+								onChange={ onPickerSelect }
+								hideCancelButton
+							/>
 						</>
 					) : (
 						<>
