@@ -116,6 +116,12 @@ function BlockPlaceholder( { onCreate }, ref ) {
 		variant: 'tertiary',
 	};
 
+	const selectableMenus = menus?.filter(
+		( menu ) => menu.id !== selectedMenuId
+	);
+
+	const hasSelectableMenus = !! selectableMenus?.length;
+
 	return (
 		<Placeholder
 			className="wp-block-placeholder"
@@ -147,7 +153,7 @@ function BlockPlaceholder( { onCreate }, ref ) {
 								{ __( 'Add all pages' ) }
 							</Button>
 						) : undefined }
-						{ hasMenus ? (
+						{ hasSelectableMenus ? (
 							<DropdownMenu
 								text={ __( 'Copy existing menu' ) }
 								icon={ chevronDown }
@@ -155,27 +161,22 @@ function BlockPlaceholder( { onCreate }, ref ) {
 							>
 								{ ( { onClose } ) => (
 									<MenuGroup>
-										{ menus
-											.filter(
-												( menu ) =>
-													menu.id !== selectedMenuId
-											)
-											.map( ( menu ) => {
-												return (
-													<MenuItem
-														onClick={ () => {
-															setSelectedMenu(
-																menu.id
-															);
-															onCreateFromMenu();
-														} }
-														onClose={ onClose }
-														key={ menu.id }
-													>
-														{ menu.name }
-													</MenuItem>
-												);
-											} ) }
+										{ selectableMenus.map( ( menu ) => {
+											return (
+												<MenuItem
+													onClick={ () => {
+														setSelectedMenu(
+															menu.id
+														);
+														onCreateFromMenu();
+													} }
+													onClose={ onClose }
+													key={ menu.id }
+												>
+													{ menu.name }
+												</MenuItem>
+											);
+										} ) }
 									</MenuGroup>
 								) }
 							</DropdownMenu>
