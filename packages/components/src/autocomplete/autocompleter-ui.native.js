@@ -166,6 +166,9 @@ export function getAutoCompleterUI( autocompleter ) {
 										iconStyles,
 										isActive && activeIconStyles
 									);
+									const iconSource =
+										option?.value?.icon?.src ||
+										option?.value?.icon;
 
 									return (
 										<TouchableOpacity
@@ -187,9 +190,7 @@ export function getAutoCompleterUI( autocompleter ) {
 												}
 											>
 												<Icon
-													icon={
-														option?.value?.icon?.src
-													}
+													icon={ iconSource }
 													size={ 24 }
 													style={ iconStyle }
 												/>

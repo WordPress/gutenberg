@@ -21,7 +21,7 @@ import {
 	__experimentalDuotoneControl as DuotoneControl,
 	useSetting,
 } from '../components';
-import { Head } from '../components/block-list/head';
+import BlockList from '../components/block-list';
 
 const EMPTY_ARRAY = [];
 
@@ -140,7 +140,7 @@ function DuotonePanel( { attributes, setAttributes } ) {
 	}
 
 	return (
-		<BlockControls group="block">
+		<BlockControls group="block" __experimentalExposeToChildren>
 			<DuotoneControl
 				duotonePalette={ duotonePalette }
 				colorPalette={ colorPalette }
@@ -242,7 +242,7 @@ const withDuotoneStyles = createHigherOrderComponent(
 
 		const className = classnames( props?.className, id );
 
-		const element = useContext( Head.context );
+		const element = useContext( BlockList.__unstableElementContext );
 
 		return (
 			<>

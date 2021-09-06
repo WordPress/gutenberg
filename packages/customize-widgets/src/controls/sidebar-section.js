@@ -36,6 +36,9 @@ export default function getSidebarSection() {
 				'customize-widgets__sidebar-section'
 			);
 		}
+		isContextuallyActive() {
+			return this.active();
+		}
 		hasSubSectionOpened() {
 			return this.inspector.expanded();
 		}
@@ -45,7 +48,7 @@ export default function getSidebarSection() {
 				..._args,
 				completeCallback() {
 					controls.forEach( ( control ) => {
-						control.onChangeSectionExpanded( expanded, args );
+						control.onChangeSectionExpanded?.( expanded, args );
 					} );
 					_args.completeCallback?.();
 				},

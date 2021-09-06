@@ -213,6 +213,11 @@ describe( 'saveEntityRecord', () => {
 				slug: 'post-1',
 				newField: 'a',
 			} );
+
+		// Wait a few ticks – without rungen we have less control over the flow of things.
+		// @TODO: A better solution
+		await runPendingPromises();
+		await runPendingPromises();
 		await runPendingPromises();
 
 		// There should ONLY be a single hanging API call (PUT) by this point.

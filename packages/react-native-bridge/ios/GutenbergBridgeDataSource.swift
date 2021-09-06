@@ -13,6 +13,11 @@ public protocol GutenbergBridgeDataSource: class {
     /// - Returns: The HTML initial title or nil.
     func gutenbergInitialTitle() -> String?
 
+    /// Asks the data source for the initial featured image id to be presented by the editor.
+    ///
+    /// - Returns: The initial id of the post's featured image, zero if no featured image is set.
+    func gutenbergFeaturedImageId() -> NSNumber?
+
     /// Asks the data source for the post type to be presented by the editor.
     /// Return `nil` to assume a `post` type.
     ///
@@ -72,6 +77,7 @@ public extension GutenbergBridgeDataSource {
 
 public protocol GutenbergEditorSettings {
     var isFSETheme: Bool { get }
+    var galleryWithImageBlocks: Bool { get }
     var rawStyles: String? { get }
     var rawFeatures: String? { get }
     var colors: [[String: String]]? { get }

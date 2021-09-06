@@ -79,4 +79,15 @@
 	&::after {
 		content: none;
 	}
+
+	svg {
+		transition: transform cubic-bezier(0.165, 0.84, 0.44, 1) 0.2s;
+		@include reduce-motion("transition");
+	}
+
+	&.is-pressed {
+		svg {
+			transform: rotate(45deg);
+		}
+	}
 }

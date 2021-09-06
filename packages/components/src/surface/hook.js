@@ -11,7 +11,7 @@ import * as styles from './styles';
 import { useCx } from '../utils/hooks/use-cx';
 
 /**
- * @param {import('../ui/context').PolymorphicComponentProps<import('./types').Props, 'div'>} props
+ * @param {import('../ui/context').WordPressComponentProps<import('./types').Props, 'div'>} props
  */
 export function useSurface( props ) {
 	const {

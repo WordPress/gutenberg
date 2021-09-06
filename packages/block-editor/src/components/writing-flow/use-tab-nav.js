@@ -82,8 +82,11 @@ export default function useTabNav() {
 
 	const ref = useRefEffect( ( node ) => {
 		function onKeyDown( event ) {
+			if ( event.defaultPrevented ) {
+				return;
+			}
+
 			if ( event.keyCode === ESCAPE && ! hasMultiSelection() ) {
-				event.stopPropagation();
 				event.preventDefault();
 				setNavigationMode( true );
 				return;
@@ -176,17 +179,13 @@ export default function useTabNav() {
 			}
 		}
 
-		node.ownerDocument.defaultView.addEventListener(
-			'keydown',
-			preventScrollOnTab
-		);
+		const { ownerDocument } = node;
+		const { defaultView } = ownerDocument;
+		defaultView.addEventListener( 'keydown', preventScrollOnTab );
 		node.addEventListener( 'keydown', onKeyDown );
 		node.addEventListener( 'focusout', onFocusOut );
 		return () => {
-			node.ownerDocument.defaultView.removeEventListener(
-				'keydown',
-				preventScrollOnTab
-			);
+			defaultView.removeEventListener( 'keydown', preventScrollOnTab );
 			node.removeEventListener( 'keydown', onKeyDown );
 			node.removeEventListener( 'focusout', onFocusOut );
 		};

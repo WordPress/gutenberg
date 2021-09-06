@@ -22,6 +22,7 @@ const DEFAULT_QUERY = {
 	order: 'desc',
 	hide_empty: true,
 	_fields: 'id,name,count',
+	context: 'view',
 };
 
 export default function MostUsedTerms( { onSelect, taxonomy } ) {
@@ -33,7 +34,7 @@ export default function MostUsedTerms( { onSelect, taxonomy } ) {
 		);
 		return {
 			_terms: mostUsedTerms,
-			showTerms: mostUsedTerms?.length >= MAX_MOST_USED_TERMS,
+			showTerms: mostUsedTerms?.length === MAX_MOST_USED_TERMS,
 		};
 	}, [] );
 

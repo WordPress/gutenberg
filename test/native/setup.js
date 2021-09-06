@@ -40,7 +40,11 @@ jest.mock( '@wordpress/react-native-bridge', () => {
 		addEventListener: jest.fn(),
 		mediaUploadSync: jest.fn(),
 		removeEventListener: jest.fn(),
+		requestBlockTypeImpressions: jest.fn( ( callback ) => {
+			callback( {} );
+		} ),
 		requestFocalPointPickerTooltipShown: jest.fn( () => true ),
+		setBlockTypeImpressions: jest.fn(),
 		subscribeParentToggleHTMLMode: jest.fn(),
 		subscribeSetTitle: jest.fn(),
 		subscribeSetFocusOnTitle: jest.fn(),
@@ -70,16 +74,6 @@ jest.mock( '@wordpress/react-native-bridge', () => {
 			siteMediaLibrary: 'SITE_MEDIA_LIBRARY',
 		},
 		fetchRequest: jest.fn(),
-	};
-} );
-
-jest.mock( 'react-native-dark-mode', () => {
-	return {
-		initialMode: 'light',
-		eventEmitter: {
-			on: jest.fn(),
-		},
-		useDarkModeContext: () => 'light',
 	};
 } );
 

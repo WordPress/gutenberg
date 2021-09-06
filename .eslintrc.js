@@ -71,6 +71,11 @@ module.exports = {
 			{
 				paths: [
 					{
+						name: 'framer-motion',
+						message:
+							'Please use the Framer Motion API through `@wordpress/components` instead.',
+					},
+					{
 						name: 'lodash',
 						importNames: [ 'memoize' ],
 						message: 'Please use `memize` instead.',
@@ -99,7 +104,7 @@ module.exports = {
 					{
 						name: '@emotion/css',
 						message:
-							'Please use `@emotion/react` and `@emotion/styled` in order to maintain iframe support',
+							'Please use `@emotion/react` and `@emotion/styled` in order to maintain iframe support. As a replacement for the `cx` function, please use the `useCx` hook defined in `@wordpress/components` instead.',
 					},
 				],
 			},

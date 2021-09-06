@@ -25,14 +25,13 @@ import {
 import { applyFilters } from '@wordpress/hooks';
 import { select, dispatch } from '@wordpress/data';
 import { _x } from '@wordpress/i18n';
-import { blockDefault } from '@wordpress/icons';
 
 /**
  * Internal dependencies
  */
 import i18nBlockSchema from './i18n-block.json';
 import { isValidIcon, normalizeIconObject } from './utils';
-import { DEPRECATED_ENTRY_KEYS } from './constants';
+import { BLOCK_ICON_DEFAULT, DEPRECATED_ENTRY_KEYS } from './constants';
 import { store as blocksStore } from '../store';
 
 /**
@@ -122,7 +121,7 @@ import { store as blocksStore } from '../store';
 /**
  * Defined behavior of a block type.
  *
- * @typedef {Object} WPBlock
+ * @typedef {Object} WPBlockType
  *
  * @property {string}             name          Block type's namespaced name.
  * @property {string}             title         Human-readable block type label.
@@ -244,7 +243,7 @@ function getBlockSettingsFromMetadata( { textdomain, ...metadata } ) {
  * @param {string|Object} blockNameOrMetadata Block type name or its metadata.
  * @param {Object}        settings            Block settings.
  *
- * @return {?WPBlock} The block, if it has been successfully registered;
+ * @return {?WPBlockType} The block, if it has been successfully registered;
  *                    otherwise `undefined`.
  */
 export function registerBlockType( blockNameOrMetadata, settings ) {
@@ -265,7 +264,7 @@ export function registerBlockType( blockNameOrMetadata, settings ) {
 
 	settings = {
 		name,
-		icon: blockDefault,
+		icon: BLOCK_ICON_DEFAULT,
 		keywords: [],
 		attributes: {},
 		providesContext: {},
@@ -450,7 +449,7 @@ export function unregisterBlockCollection( namespace ) {
  *
  * @param {string} name Block name.
  *
- * @return {?WPBlock} The previous block value, if it has been successfully
+ * @return {?WPBlockType} The previous block value, if it has been successfully
  *                    unregistered; otherwise `undefined`.
  */
 export function unregisterBlockType( name ) {
@@ -603,7 +602,7 @@ export function hasBlockSupport( nameOrType, feature, defaultSupports ) {
  * @return {boolean} Whether the given block is a reusable block.
  */
 export function isReusableBlock( blockOrType ) {
-	return blockOrType.name === 'core/block';
+	return blockOrType?.name === 'core/block';
 }
 
 /**

@@ -2,7 +2,6 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import { motion } from 'framer-motion';
 
 /**
  * WordPress dependencies
@@ -32,7 +31,7 @@ import {
 	__experimentalUseNoRecursiveRenders as useNoRecursiveRenders,
 } from '@wordpress/block-editor';
 import { useRef, useMemo } from '@wordpress/element';
-import { Button } from '@wordpress/components';
+import { Button, __unstableMotion as motion } from '@wordpress/components';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { useMergeRefs } from '@wordpress/compose';
 import { arrowLeft } from '@wordpress/icons';
@@ -44,16 +43,10 @@ import { __ } from '@wordpress/i18n';
 import BlockInspectorButton from './block-inspector-button';
 import { store as editPostStore } from '../../store';
 
-function MaybeIframe( {
-	children,
-	contentRef,
-	isTemplateMode,
-	styles,
-	style,
-} ) {
+function MaybeIframe( { children, contentRef, shouldIframe, styles, style } ) {
 	const ref = useMouseMoveTypingReset();
 
-	if ( ! isTemplateMode ) {
+	if ( ! shouldIframe ) {
 		return (
 			<>
 				<EditorStyles styles={ styles } />
@@ -75,6 +68,7 @@ function MaybeIframe( {
 			ref={ ref }
 			contentRef={ contentRef }
 			style={ { width: '100%', height: '100%', display: 'block' } }
+			name="editor-canvas"
 		>
 			{ children }
 		</Iframe>
@@ -120,7 +114,8 @@ export default function VisualEditor( { styles } ) {
 	const { clearSelectedBlock } = useDispatch( blockEditorStore );
 	const { setIsEditingTemplate } = useDispatch( editPostStore );
 	const desktopCanvasStyles = {
-		height: '100%',
+		// We intentionally omit a 100% height here. The container is a flex item, so the 100% height is granted by default.
+		// If a percentage height is present, older browsers such as Safari 13 apply that, but do so incorrectly as the inheritance is buggy.
 		width: '100%',
 		margin: 0,
 		display: 'flex',
@@ -137,7 +132,6 @@ export default function VisualEditor( { styles } ) {
 	};
 	const resizedCanvasStyles = useResizeCanvas( deviceType, isTemplateMode );
 	const defaultLayout = useSetting( 'layout' );
-	const { contentSize, wideSize } = defaultLayout || {};
 	const previewMode = 'is-' + deviceType.toLowerCase() + '-preview';
 
 	let animatedStyles = isTemplateMode
@@ -178,80 +172,83 @@ export default function VisualEditor( { styles } ) {
 		}
 
 		if ( themeSupportsLayout ) {
-			const alignments =
-				contentSize || wideSize
-					? [ 'wide', 'full', 'left', 'center', 'right' ]
-					: [ 'left', 'center', 'right' ];
-			return {
-				type: 'default',
-				// Find a way to inject this in the support flag code (hooks).
-				alignments,
-			};
+			return defaultLayout;
 		}
+
 		return undefined;
-	}, [ isTemplateMode, themeSupportsLayout, contentSize, wideSize ] );
+	}, [ isTemplateMode, themeSupportsLayout, defaultLayout ] );
 
 	return (
-		<div
+		<BlockTools
+			__unstableContentRef={ ref }
 			className={ classnames( 'edit-post-visual-editor', {
 				'is-template-mode': isTemplateMode,
 			} ) }
 		>
 			<VisualEditorGlobalKeyboardShortcuts />
-			<BlockTools __unstableContentRef={ ref }>
-				<motion.div
-					className="edit-post-visual-editor__content-area"
-					animate={ {
-						padding: isTemplateMode ? '48px 48px 0' : '0',
-					} }
-					ref={ blockSelectionClearerRef }
-				>
-					{ isTemplateMode && (
-						<Button
-							className="edit-post-visual-editor__exit-template-mode"
-							icon={ arrowLeft }
-							onClick={ () => {
-								clearSelectedBlock();
-								setIsEditingTemplate( false );
-							} }
-						>
-							{ __( 'Back' ) }
-						</Button>
-					) }
-					<motion.div
-						animate={ animatedStyles }
-						initial={ desktopCanvasStyles }
-						className={ previewMode }
+			<motion.div
+				className="edit-post-visual-editor__content-area"
+				animate={ {
+					padding: isTemplateMode ? '48px 48px 0' : '0',
+				} }
+				ref={ blockSelectionClearerRef }
+			>
+				{ isTemplateMode && (
+					<Button
+						className="edit-post-visual-editor__exit-template-mode"
+						icon={ arrowLeft }
+						onClick={ () => {
+							clearSelectedBlock();
+							setIsEditingTemplate( false );
+						} }
 					>
-						<MaybeIframe
-							isTemplateMode={ isTemplateMode }
-							contentRef={ contentRef }
-							styles={ styles }
-							style={ { paddingBottom } }
-						>
-							{ themeSupportsLayout && ! isTemplateMode && (
-								<LayoutStyle
-									selector=".edit-post-visual-editor__post-title-wrapper, .block-editor-block-list__layout.is-root-container"
-									layout={ defaultLayout }
-								/>
-							) }
-							{ ! isTemplateMode && (
-								<div className="edit-post-visual-editor__post-title-wrapper">
-									<PostTitle />
-								</div>
-							) }
-							<RecursionProvider>
-								<BlockList __experimentalLayout={ layout } />
-							</RecursionProvider>
-						</MaybeIframe>
-					</motion.div>
+						{ __( 'Back' ) }
+					</Button>
+				) }
+				<motion.div
+					animate={ animatedStyles }
+					initial={ desktopCanvasStyles }
+					className={ previewMode }
+				>
+					<MaybeIframe
+						shouldIframe={
+							isTemplateMode ||
+							deviceType === 'Tablet' ||
+							deviceType === 'Mobile'
+						}
+						contentRef={ contentRef }
+						styles={ styles }
+						style={ { paddingBottom } }
+					>
+						{ themeSupportsLayout && ! isTemplateMode && (
+							<LayoutStyle
+								selector=".edit-post-visual-editor__post-title-wrapper, .block-editor-block-list__layout.is-root-container"
+								layout={ defaultLayout }
+							/>
+						) }
+						{ ! isTemplateMode && (
+							<div className="edit-post-visual-editor__post-title-wrapper">
+								<PostTitle />
+							</div>
+						) }
+						<RecursionProvider>
+							<BlockList
+								className={
+									isTemplateMode
+										? 'wp-site-blocks'
+										: undefined
+								}
+								__experimentalLayout={ layout }
+							/>
+						</RecursionProvider>
+					</MaybeIframe>
 				</motion.div>
-			</BlockTools>
+			</motion.div>
 			<__unstableBlockSettingsMenuFirstItem>
 				{ ( { onClose } ) => (
 					<BlockInspectorButton onClick={ onClose } />
 				) }
 			</__unstableBlockSettingsMenuFirstItem>
-		</div>
+		</BlockTools>
 	);
 }
