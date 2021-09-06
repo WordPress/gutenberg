@@ -29,7 +29,7 @@ export type ToggleGroupControlProps = Omit<
 	 *
 	 * @default false
 	 */
-	hideLabelFromVision: boolean;
+	hideLabelFromVision?: boolean;
 	/**
 	 * Determines if segments should be rendered with equal widths.
 	 *
