@@ -104,6 +104,8 @@ export default {
 
 	save: function DefaultLayoutStyle( { selector, layout = {} } ) {
 		const { contentSize, wideSize } = layout;
+		const blockGapSupport = useSetting( 'spacing.blockGap' );
+		const hasBlockGapStylesSupport = blockGapSupport !== null;
 
 		let style =
 			!! contentSize || !! wideSize
@@ -135,11 +137,16 @@ export default {
 				margin-left: 2em;
 			}
 
-			${ appendSelectors( selector, '> * + *' ) } {
-				margin-top: var( --wp--style--block-gap );
-				margin-bottom: 0;
-			}
 		`;
+
+		if ( hasBlockGapStylesSupport ) {
+			style += `
+				${ appendSelectors( selector, '> * + *' ) } {
+					margin-top: var( --wp--style--block-gap );
+					margin-bottom: 0;
+				}
+			`;
+		}
 
 		return <style>{ style }</style>;
 	},

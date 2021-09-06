@@ -103,6 +103,7 @@ class WP_Theme_JSON_Gutenberg {
 			'customMargin'  => null,
 			'customPadding' => null,
 			'units'         => null,
+			'blockGap'      => null,
 		),
 		'typography' => array(
 			'customFontSize'        => null,
@@ -818,7 +819,10 @@ class WP_Theme_JSON_Gutenberg {
 			$block_rules .= self::to_ruleset( $selector, $declarations );
 
 			if ( self::ROOT_BLOCK_SELECTOR === $selector ) {
-				$block_rules .= '.wp-site-blocks > * + * { margin-top: var( --wp--style--block-gap ); margin-bottom: 0; }';
+				$has_block_gap_support = _wp_array_get( $this->theme_json, array( 'settings', 'spacing', 'blockGap' ) ) !== null;
+				if ( $has_block_gap_support ) {
+					$block_rules .= '.wp-site-blocks > * + * { margin-top: var( --wp--style--block-gap ); margin-bottom: 0; }';
+				}
 			}
 		}
 
