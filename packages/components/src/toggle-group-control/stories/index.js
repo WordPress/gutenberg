@@ -28,27 +28,27 @@ const KNOBS_GROUPS = {
 export const _default = () => {
 	const [ alignState, setAlignState ] = useState( aligns[ 0 ] );
 	const label = text(
-		'Label',
+		`${ KNOBS_GROUPS.ToggleGroupControl }: label`,
 		'Toggle Group Control',
 		KNOBS_GROUPS.ToggleGroupControl
 	);
 	const hideLabelFromVision = boolean(
-		'Hide label from vision',
+		`${ KNOBS_GROUPS.ToggleGroupControl }: hideLabelFromVision`,
 		false,
 		KNOBS_GROUPS.ToggleGroupControl
 	);
 	const isBlock = boolean(
-		'Render `ToggleGroupControl` as a (CSS) block element',
+		`${ KNOBS_GROUPS.ToggleGroupControl }: isBlock (render as a css block element)`,
 		false,
 		KNOBS_GROUPS.ToggleGroupControl
 	);
 	const help = text(
-		'Help Text',
+		`${ KNOBS_GROUPS.ToggleGroupControl }: help`,
 		undefined,
 		KNOBS_GROUPS.ToggleGroupControl
 	);
 	const isAdaptiveWidth = boolean(
-		'Render segments with equal widths',
+		`${ KNOBS_GROUPS.ToggleGroupControl }: isAdaptiveWidth`,
 		false,
 		KNOBS_GROUPS.ToggleGroupControl
 	);
@@ -58,7 +58,7 @@ export const _default = () => {
 			key={ key }
 			value={ key }
 			label={ text(
-				'Label',
+				`${ KNOBS_GROUPS.ToggleGroupControlOption }: label`,
 				key,
 				`${ KNOBS_GROUPS.ToggleGroupControlOption }-${ index + 1 }`
 			) }
