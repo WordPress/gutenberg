@@ -18,7 +18,10 @@ import { appendSelectors } from './utils';
 export default {
 	name: 'default',
 	label: __( 'Flow' ),
-	edit: function DefaultLayoutEdit( { layout, onChange } ) {
+	inspectorControls: function DefaultLayoutInspectorControls( {
+		layout,
+		onChange,
+	} ) {
 		const { wideSize, contentSize } = layout;
 		const units = useCustomUnits( {
 			availableUnits: useSetting( 'spacing.units' ) || [

@@ -92,7 +92,7 @@ function LayoutPanel( { setAttributes, attributes, name: blockName } ) {
 					) }
 
 					{ ! inherit && layoutType && (
-						<layoutType.edit
+						<layoutType.inspectorControls
 							layout={ usedLayout }
 							onChange={ onChangeLayout }
 						/>

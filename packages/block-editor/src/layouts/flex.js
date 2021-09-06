@@ -24,7 +24,10 @@ const justifyContentMap = {
 export default {
 	name: 'flex',
 	label: __( 'Flex' ),
-	edit: function FlexLayoutEdit( { layout = {}, onChange } ) {
+	inspectorControls: function FlexLayoutInspectorControls( {
+		layout = {},
+		onChange,
+	} ) {
 		return (
 			<FlexLayoutJustifyContentControl
 				layout={ layout }
