@@ -160,8 +160,16 @@ export default {
 			return layout.alignments;
 		}
 
-		return layout.contentSize || layout.wideSize
-			? [ 'wide', 'full', 'left', 'center', 'right' ]
-			: [ 'left', 'center', 'right' ];
+		const alignments = [ 'left', 'center', 'right' ];
+
+		if ( layout.contentSize ) {
+			alignments.unshift( 'full' );
+		}
+
+		if ( layout.wideSize ) {
+			alignments.unshift( 'wide' );
+		}
+
+		return alignments;
 	},
 };
