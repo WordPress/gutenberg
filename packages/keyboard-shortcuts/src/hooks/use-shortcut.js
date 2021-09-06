@@ -1,40 +1,13 @@
 /**
  * WordPress dependencies
  */
-import {
-	createContext,
-	useContext,
-	useEffect,
-	useRef,
-} from '@wordpress/element';
+import { useContext, useEffect, useRef } from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
 import useShortcutEventMatch from './use-shortcut-event-match';
-
-const context = createContext();
-const { Provider } = context;
-
-export function ShortcutProvider( props ) {
-	const keyboardShortcuts = useRef( new Set() );
-
-	function onKeyDown( event ) {
-		if ( props.onKeyDown ) props.onKeyDown( event );
-
-		for ( const keyboardShortcut of keyboardShortcuts.current ) {
-			keyboardShortcut( event );
-		}
-	}
-
-	/* eslint-disable jsx-a11y/no-static-element-interactions */
-	return (
-		<Provider value={ keyboardShortcuts }>
-			<div { ...props } onKeyDown={ onKeyDown } />
-		</Provider>
-	);
-	/* eslint-enable jsx-a11y/no-static-element-interactions */
-}
+import { context } from '../context';
 
 /**
  * Attach a keyboard shortcut handler.

@@ -6,7 +6,10 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { forwardRef, useEffect, useRef } from '@wordpress/element';
+/**
+ * WordPress dependencies
+ */
+import { forwardRef, useEffect } from '@wordpress/element';
 import { __unstableUseNavigateRegions as useNavigateRegions } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { useMergeRefs } from '@wordpress/compose';
@@ -31,6 +34,7 @@ function InterfaceSkeleton(
 		header,
 		sidebar,
 		secondarySidebar,
+		notices,
 		content,
 		drawer,
 		actions,
@@ -40,8 +44,7 @@ function InterfaceSkeleton(
 	},
 	ref
 ) {
-	const fallbackRef = useRef();
-	const regionsClassName = useNavigateRegions( fallbackRef, shortcuts );
+	const navigateRegionsProps = useNavigateRegions( shortcuts );
 
 	useHTMLClass( 'interface-interface-skeleton__html-container' );
 
@@ -66,11 +69,12 @@ function InterfaceSkeleton(
 
 	return (
 		<div
-			ref={ useMergeRefs( [ ref, fallbackRef ] ) }
+			{ ...navigateRegionsProps }
+			ref={ useMergeRefs( [ ref, navigateRegionsProps.ref ] ) }
 			className={ classnames(
 				className,
 				'interface-interface-skeleton',
-				regionsClassName,
+				navigateRegionsProps.className,
 				!! footer && 'has-footer'
 			) }
 		>
@@ -103,6 +107,11 @@ function InterfaceSkeleton(
 							tabIndex="-1"
 						>
 							{ secondarySidebar }
+						</div>
+					) }
+					{ !! notices && (
+						<div className="interface-interface-skeleton__notices">
+							{ notices }
 						</div>
 					) }
 					<div

@@ -16,6 +16,7 @@ import {
 	store as interfaceStore,
 } from '@wordpress/interface';
 import { __ } from '@wordpress/i18n';
+import { ShortcutProvider } from '@wordpress/keyboard-shortcuts';
 
 /**
  * Internal dependencies
@@ -35,7 +36,6 @@ import Notices from '../notices';
 import Editor from '../editor';
 import UnsavedChangesWarning from './unsaved-changes-warning';
 import { store as editNavigationStore } from '../../store';
-import { ShortcutProvider } from '../../../../keyboard-shortcuts/src';
 
 const interfaceLabels = {
 	/* translators: accessibility text for the navigation screen top bar landmark region. */
