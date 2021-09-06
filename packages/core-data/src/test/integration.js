@@ -19,10 +19,6 @@ jest.mock( '@wordpress/data-controls', () => {
 		apiFetch: jest.fn(),
 	};
 } );
-const { apiFetch: actualApiFetch } = jest.requireActual(
-	'@wordpress/data-controls'
-);
-import { apiFetch } from '@wordpress/data-controls';
 
 jest.mock( '@wordpress/api-fetch', () => {
 	return {
@@ -38,10 +34,13 @@ const runPromise = async ( promise ) => {
 };
 
 const runPendingPromises = async () => {
-	jest.runAllTimers();
-	const p = new Promise( ( resolve ) => setTimeout( resolve ) );
-	jest.runAllTimers();
-	await p;
+	// @TODO: find a better way of exhausting the current event loop queue
+	for ( let i = 0; i < 100; i++ ) {
+		jest.runAllTimers();
+		const p = new Promise( ( resolve ) => setTimeout( resolve ) );
+		jest.runAllTimers();
+		await p;
+	}
 };
 
 describe( 'receiveEntityRecord', () => {
@@ -55,13 +54,11 @@ describe( 'receiveEntityRecord', () => {
 		registry.register( store );
 		registry.registerStore( 'test/resolution', {
 			actions: {
+				__unstableAcquireStoreLock: () => ( { type: 'ACQUIRE_LOCK' } ),
+				__unstableReleaseStoreLock: () => ( { type: 'RELEASE_LOCK' } ),
 				receiveEntityRecords: actions.receiveEntityRecords,
-				*getEntityRecords( ...args ) {
-					return yield controls.resolveSelect(
-						'test/resolution',
-						'getEntityRecords',
-						...args
-					);
+				getEntityRecords( ...args ) {
+					return resolvers.getEntityRecords( ...args );
 				},
 				*getEntityRecord( ...args ) {
 					return yield controls.resolveSelect(
@@ -82,12 +79,12 @@ describe( 'receiveEntityRecord', () => {
 				getEntityRecord,
 				getEntityRecords: resolvers.getEntityRecords,
 			},
+			__experimentalUseThunks: true,
 		} );
 		return registry;
 	}
 
 	beforeEach( async () => {
-		apiFetch.mockReset();
 		triggerFetch.mockReset();
 		jest.useFakeTimers();
 	} );
@@ -96,8 +93,8 @@ describe( 'receiveEntityRecord', () => {
 		const getEntityRecord = jest.fn();
 		const registry = createTestRegistry( getEntityRecord );
 
-		// Trigger resolution of postType records
-		apiFetch.mockImplementation( () => ( {
+		// // Trigger resolution of postType records
+		triggerFetch.mockImplementation( () => ( {
 			2: { slug: 'test', id: 2 },
 		} ) );
 		await runPromise(
@@ -129,7 +126,7 @@ describe( 'receiveEntityRecord', () => {
 		const registry = createTestRegistry( getEntityRecord );
 
 		// Trigger resolution of postType records
-		apiFetch.mockImplementation( () => ( {
+		triggerFetch.mockImplementation( () => ( {
 			'test-1': { slug: 'test-1', id: 2 },
 		} ) );
 		await runPromise(
@@ -165,7 +162,6 @@ describe( 'saveEntityRecord', () => {
 	}
 
 	beforeEach( async () => {
-		apiFetch.mockReset();
 		triggerFetch.mockReset();
 		jest.useFakeTimers( 'modern' );
 	} );
@@ -173,34 +169,30 @@ describe( 'saveEntityRecord', () => {
 	it( 'should not trigger any GET requests until POST/PUT is finished.', async () => {
 		const registry = createTestRegistry();
 		// Fetch post types from the API {{{
-		apiFetch.mockImplementation( () => ( {
+		triggerFetch.mockImplementation( () => ( {
 			'post-1': { slug: 'post-1' },
 		} ) );
 
 		// Trigger fetch
 		registry.select( 'core' ).getEntityRecords( 'root', 'postType' );
-		jest.runAllTimers();
-		await Promise.resolve().then( () => jest.runAllTimers() );
-		expect( apiFetch ).toBeCalledTimes( 1 );
-		expect( apiFetch ).toBeCalledWith( {
+		await runPendingPromises();
+		expect( triggerFetch ).toBeCalledTimes( 1 );
+		expect( triggerFetch ).toBeCalledWith( {
 			path: '/wp/v2/types?context=edit',
 		} );
 
 		// Select fetched results, there should be no subsequent request
-		apiFetch.mockReset();
+		triggerFetch.mockReset();
 		const results = registry
 			.select( 'core' )
 			.getEntityRecords( 'root', 'postType' );
-		expect( apiFetch ).toBeCalledTimes( 0 );
-		jest.runAllTimers();
-		expect( apiFetch ).toBeCalledTimes( 0 );
+		expect( triggerFetch ).toBeCalledTimes( 0 );
 		expect( results ).toHaveLength( 1 );
 		expect( results[ 0 ].slug ).toBe( 'post-1' );
 		// }}} Fetch post types from the API
 
 		// Save changes
-		apiFetch.mockClear();
-		apiFetch.mockImplementation( actualApiFetch );
+		triggerFetch.mockClear();
 		let resolvePromise;
 		triggerFetch.mockImplementation( function () {
 			return new Promise( ( resolve ) => {
@@ -214,10 +206,6 @@ describe( 'saveEntityRecord', () => {
 				newField: 'a',
 			} );
 
-		// Wait a few ticks – without rungen we have less control over the flow of things.
-		// @TODO: A better solution
-		await runPendingPromises();
-		await runPendingPromises();
 		await runPendingPromises();
 
 		// There should ONLY be a single hanging API call (PUT) by this point.
@@ -235,7 +223,6 @@ describe( 'saveEntityRecord', () => {
 			} )
 		);
 		triggerFetch.mockClear();
-		apiFetch.mockClear();
 
 		// The PUT is still hanging, let's call a selector now and make sure it won't trigger
 		// any requests

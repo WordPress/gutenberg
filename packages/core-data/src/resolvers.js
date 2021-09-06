@@ -9,6 +9,8 @@ import { find, includes, get, hasIn, compact, uniq } from 'lodash';
 import { addQueryArgs } from '@wordpress/url';
 import { controls } from '@wordpress/data';
 import { apiFetch } from '@wordpress/data-controls';
+import triggerFetch from '@wordpress/api-fetch';
+
 /**
  * Internal dependencies
  */
@@ -159,16 +161,24 @@ export const getEditedEntityRecord = ifNotResolved(
  * @param {string}  name  Entity name.
  * @param {Object?} query Query Object.
  */
-export function* getEntityRecords( kind, name, query = {} ) {
-	const entities = yield getKindEntities( kind );
+
+/**
+ * Requests the entity's records from the REST API.
+ *
+ * @param {string}  kind  Entity kind.
+ * @param {string}  name  Entity name.
+ * @param {Object?} query Query Object.
+ */
+export const getEntityRecords = ( kind, name, query = {} ) => async ( {
+	dispatch,
+} ) => {
+	const entities = await dispatch( getKindEntities( kind ) );
 	const entity = find( entities, { kind, name } );
 	if ( ! entity ) {
 		return;
 	}
 
-	const lock = yield controls.dispatch(
-		STORE_NAME,
-		'__unstableAcquireStoreLock',
+	const lock = await dispatch.__unstableAcquireStoreLock(
 		STORE_NAME,
 		[ 'entities', 'data', kind, name ],
 		{ exclusive: false }
@@ -193,7 +203,7 @@ export function* getEntityRecords( kind, name, query = {} ) {
 			...query,
 		} );
 
-		let records = Object.values( yield apiFetch( { path } ) );
+		let records = Object.values( await triggerFetch( { path } ) );
 		// If we request fields but the result doesn't contain the fields,
 		// explicitely set these fields as "undefined"
 		// that way we consider the query "fullfilled".
@@ -209,7 +219,8 @@ export function* getEntityRecords( kind, name, query = {} ) {
 			} );
 		}
 
-		yield receiveEntityRecords( kind, name, records, query );
+		dispatch.receiveEntityRecords( kind, name, records, query );
+
 		// When requesting all fields, the list of results can be used to
 		// resolve the `getEntityRecord` selector in addition to `getEntityRecords`.
 		// See https://github.com/WordPress/gutenberg/pull/26575
@@ -219,25 +230,21 @@ export function* getEntityRecords( kind, name, query = {} ) {
 				.filter( ( record ) => record[ key ] )
 				.map( ( record ) => [ kind, name, record[ key ] ] );
 
-			yield {
+			dispatch( {
 				type: 'START_RESOLUTIONS',
 				selectorName: 'getEntityRecord',
 				args: resolutionsArgs,
-			};
-			yield {
+			} );
+			dispatch( {
 				type: 'FINISH_RESOLUTIONS',
 				selectorName: 'getEntityRecord',
 				args: resolutionsArgs,
-			};
+			} );
 		}
 	} finally {
-		yield controls.dispatch(
-			STORE_NAME,
-			'__unstableReleaseStoreLock',
-			lock
-		);
+		dispatch.__unstableReleaseStoreLock( lock );
 	}
-}
+};
 
 getEntityRecords.shouldInvalidate = ( action, kind, name ) => {
 	return (
