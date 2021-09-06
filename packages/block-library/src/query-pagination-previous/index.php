@@ -18,20 +18,12 @@ function render_block_core_query_pagination_previous( $attributes, $content, $bl
 	$page_key = isset( $block->context['queryId'] ) ? 'query-' . $block->context['queryId'] . '-page' : 'query-page';
 	$page     = empty( $_GET[ $page_key ] ) ? 1 : (int) $_GET[ $page_key ];
 
-	$arrow_map = array(
-		'none'    => '',
-		'arrow'   => '←',
-		'chevron' => '«',
-	);
-
 	$wrapper_attributes = get_block_wrapper_attributes();
 	$default_label      = __( 'Previous Page' );
 	$label              = isset( $attributes['label'] ) && ! empty( $attributes['label'] ) ? $attributes['label'] : $default_label;
-	if ( ! empty( $attributes['arrow'] ) && array_key_exists( $attributes['arrow'], $arrow_map ) && ! empty( $arrow_map[ $attributes['arrow'] ] ) ) {
-		$arrow_attribute = $attributes['arrow'];
-		$arrow           = $arrow_map[ $attributes['arrow'] ];
-		$arrow_classes   = "wp-block-query-pagination-previous-arrow is-arrow-$arrow_attribute";
-		$label           = "<span class='$arrow_classes'>$arrow</span>$label";
+	$pagination_arrow   = get_query_pagination_arrow( $block, false );
+	if ( $pagination_arrow ) {
+		$label = $pagination_arrow . $label;
 	}
 	$content = '';
 	// Check if the pagination is for Query that inherits the global context

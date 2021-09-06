@@ -3,13 +3,13 @@
  */
 import { __, _x } from '@wordpress/i18n';
 import {
-	__experimentalSegmentedControl as SegmentedControl,
-	__experimentalSegmentedControlOption as SegmentedControlOption,
+	__experimentalToggleGroupControl as ToggleGroupControl,
+	__experimentalToggleGroupControlOption as ToggleGroupControlOption,
 } from '@wordpress/components';
 
 export function QueryPaginationArrowControls( { value, onChange } ) {
 	return (
-		<SegmentedControl
+		<ToggleGroupControl
 			label={ __( 'Arrow' ) }
 			value={ value }
 			onChange={ onChange }
@@ -18,27 +18,27 @@ export function QueryPaginationArrowControls( { value, onChange } ) {
 			) }
 			isBlock
 		>
-			<SegmentedControlOption
+			<ToggleGroupControlOption
 				value="none"
 				label={ _x(
 					'None',
 					'Arrow option for Query Pagination Next/Previous blocks'
 				) }
 			/>
-			<SegmentedControlOption
+			<ToggleGroupControlOption
 				value="arrow"
 				label={ _x(
 					'Arrow',
 					'Arrow option for Query Pagination Next/Previous blocks'
 				) }
 			/>
-			<SegmentedControlOption
+			<ToggleGroupControlOption
 				value="chevron"
 				label={ _x(
 					'Chevron',
 					'Arrow option for Query Pagination Next/Previous blocks'
 				) }
 			/>
-		</SegmentedControl>
+		</ToggleGroupControl>
 	);
 }

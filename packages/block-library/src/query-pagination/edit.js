@@ -1,15 +1,22 @@
 /**
  * WordPress dependencies
  */
+import { __ } from '@wordpress/i18n';
 import {
+	InspectorControls,
 	useBlockProps,
+	BlockContextProvider,
 	__experimentalUseInnerBlocksProps as useInnerBlocksProps,
+	store as blockEditorStore,
 } from '@wordpress/block-editor';
+import { useSelect } from '@wordpress/data';
+import { useMemo } from '@wordpress/element';
+import { PanelBody } from '@wordpress/components';
 
 /**
  * Internal dependencies
  */
-import QueryPaginationProvider from './query-pagination-provider';
+import { QueryPaginationArrowControls } from './query-pagination-arrow-controls';
 
 const TEMPLATE = [
 	[ 'core/query-pagination-previous' ],
@@ -17,7 +24,25 @@ const TEMPLATE = [
 	[ 'core/query-pagination-next' ],
 ];
 
-export default function QueryPaginationEdit( { clientId } ) {
+export default function QueryPaginationEdit( {
+	attributes: { paginationArrow },
+	setAttributes,
+	clientId,
+} ) {
+	const hasNextPreviousBlocks = useSelect( ( select ) => {
+		const { getBlocks } = select( blockEditorStore );
+		const innerBlocks = getBlocks( clientId );
+		/**
+		 * Show the `paginationArrow` control only if a
+		 * `QueryPaginationNext/Previous` block exists.
+		 */
+		return innerBlocks?.find( ( innerBlock ) => {
+			return [
+				'core/query-pagination-next',
+				'core/query-pagination-previous',
+			].includes( innerBlock.name );
+		} );
+	}, [] );
 	const blockProps = useBlockProps();
 	const innerBlocksProps = useInnerBlocksProps( blockProps, {
 		template: TEMPLATE,
@@ -28,9 +53,26 @@ export default function QueryPaginationEdit( { clientId } ) {
 		],
 		orientation: 'horizontal',
 	} );
+	const context = useMemo( () => ( { paginationArrow } ), [
+		paginationArrow,
+	] );
 	return (
-		<QueryPaginationProvider clientId={ clientId }>
-			<div { ...innerBlocksProps } />
-		</QueryPaginationProvider>
+		<>
+			{ hasNextPreviousBlocks && (
+				<InspectorControls>
+					<PanelBody title={ __( 'Settings' ) }>
+						<QueryPaginationArrowControls
+							value={ paginationArrow }
+							onChange={ ( value ) => {
+								setAttributes( { paginationArrow: value } );
+							} }
+						/>
+					</PanelBody>
+				</InspectorControls>
+			) }
+			<BlockContextProvider value={ context }>
+				<div { ...innerBlocksProps } />
+			</BlockContextProvider>
+		</>
 	);
 }

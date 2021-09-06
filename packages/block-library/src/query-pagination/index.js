@@ -18,6 +18,3 @@ export const settings = {
 	edit,
 	save,
 };
-
-export { useQueryPaginationContext } from './query-pagination-provider';
-export { QueryPaginationArrowControls } from './query-pagination-arrow-controls';
