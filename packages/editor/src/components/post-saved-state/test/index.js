@@ -6,7 +6,6 @@ import { mount, shallow } from 'enzyme';
 /**
  * WordPress dependencies
  */
-import { useViewportMatch } from '@wordpress/compose';
 import { useSelect } from '@wordpress/data';
 
 /**
@@ -83,25 +82,5 @@ describe( 'PostSavedState', () => {
 
 		expect( wrapper.childAt( 0 ).name() ).toBe( 'Icon' );
 		expect( wrapper.childAt( 1 ).text() ).toBe( 'Saved' );
-	} );
-
-	it( 'should return Save button if edits to be saved', () => {
-		useSelect.mockImplementation( () => ( {
-			isDirty: true,
-			isNew: false,
-			isSaveable: true,
-			isSaving: false,
-		} ) );
-
-		// Simulate the viewport being considered large.
-		useViewportMatch.mockImplementation( () => true );
-
-		const wrapper = shallow( <PostSavedState /> );
-
-		expect( wrapper ).toMatchSnapshot();
-		wrapper.simulate( 'click', {} );
-		expect( mockSavePost ).toHaveBeenCalled();
-		// Regression: Verify the event object is not passed to prop callback.
-		expect( mockSavePost.mock.calls[ 0 ] ).toEqual( [] );
 	} );
 } );
