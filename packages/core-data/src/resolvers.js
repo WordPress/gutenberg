@@ -28,7 +28,6 @@ import {
 	receiveThemeSupports,
 	receiveEmbedPreview,
 	receiveUserPermission,
-	receiveAutosaves,
 } from './actions';
 import { getKindEntities, DEFAULT_ENTITY_KEY } from './entities';
 import { ifNotResolved, getNormalizedCommaSeparable } from './utils';
@@ -365,20 +364,19 @@ export function* canUserEditEntityRecord( kind, name, recordId ) {
  * @param {string} postType The type of the parent post.
  * @param {number} postId   The id of the parent post.
  */
-export function* getAutosaves( postType, postId ) {
-	const { rest_base: restBase } = yield controls.resolveSelect(
-		STORE_NAME,
-		'getPostType',
-		postType
-	);
-	const autosaves = yield apiFetch( {
+export const getAutosaves = ( postType, postId ) => async ( {
+	dispatch,
+	resolveSelect,
+} ) => {
+	const { rest_base: restBase } = await resolveSelect.getPostType( postType );
+	const autosaves = await triggerFetch( {
 		path: `/wp/v2/${ restBase }/${ postId }/autosaves?context=edit`,
 	} );
 
 	if ( autosaves && autosaves.length ) {
-		yield receiveAutosaves( postId, autosaves );
+		dispatch.receiveAutosaves( postId, autosaves );
 	}
-}
+};
 
 /**
  * Request autosave data from the REST API.
@@ -389,14 +387,11 @@ export function* getAutosaves( postType, postId ) {
  * @param {string} postType The type of the parent post.
  * @param {number} postId   The id of the parent post.
  */
-export function* getAutosave( postType, postId ) {
-	yield controls.resolveSelect(
-		STORE_NAME,
-		'getAutosaves',
-		postType,
-		postId
-	);
-}
+export const getAutosave = ( postType, postId ) => async ( {
+	resolveSelect,
+} ) => {
+	await resolveSelect.getAutosaves( postType, postId );
+};
 
 /**
  * Retrieve the frontend template used for a given link.
