@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { check, minus, moreVertical } from '@wordpress/icons';
-import { __ } from '@wordpress/i18n';
+import { __, sprintf } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
@@ -12,6 +12,20 @@ import MenuGroup from '../../menu-group';
 import MenuItem from '../../menu-item';
 import { useToolsPanelHeader } from './hook';
 import { contextConnect } from '../../ui/context';
+
+const getAriaLabel = ( label, isSelected ) => {
+	return isSelected
+		? sprintf(
+				// translators: %s: The name of the control being hidden and reset e.g. "Padding".
+				__( 'Hide and reset %s' ),
+				label
+		  )
+		: sprintf(
+				// translators: %s: The name of the control to display e.g. "Padding".
+				__( 'Show %s' ),
+				label
+		  );
+};
 
 const ToolsPanelHeader = ( props, forwardedRef ) => {
 	const {
@@ -48,12 +62,22 @@ const ToolsPanelHeader = ( props, forwardedRef ) => {
 											const icon = hasValue
 												? minus
 												: check;
+
+											const itemLabel = hasValue
+												? sprintf(
+														// translators: %s: The name of the control being reset e.g. "Padding".
+														__( 'Reset %s' ),
+														label
+												  )
+												: undefined;
+
 											return (
 												<MenuItem
 													key={ label }
 													icon={ icon }
 													isSelected={ true }
 													disabled={ ! hasValue }
+													label={ itemLabel }
 													onClick={ () => {
 														toggleItem( label );
 														onClose();
@@ -71,11 +95,17 @@ const ToolsPanelHeader = ( props, forwardedRef ) => {
 								<MenuGroup>
 									{ optionalItems.map(
 										( [ label, isSelected ] ) => {
+											const itemLabel = getAriaLabel(
+												label,
+												isSelected
+											);
+
 											return (
 												<MenuItem
 													key={ label }
 													icon={ isSelected && check }
 													isSelected={ isSelected }
+													label={ itemLabel }
 													onClick={ () => {
 														toggleItem( label );
 														onClose();
