@@ -821,10 +821,13 @@ describe( 'Widgets screen', () => {
 
 		// Delete the last block and save again.
 		await pressKeyWithModifier( 'access', 'z' );
+		await page.focus( '.block-editor-writing-flow' );
 		await saveWidgets();
+		await page.focus( '.block-editor-writing-flow' );
 
 		// Undo block deletion and save again
 		await pressKeyWithModifier( 'primary', 'z' );
+		await page.focus( '.block-editor-writing-flow' );
 		await saveWidgets();
 
 		// Reload the page to make sure changes were actually saved.
