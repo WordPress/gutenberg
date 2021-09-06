@@ -5,12 +5,10 @@ import { __ } from '@wordpress/i18n';
 import {
 	InspectorControls,
 	useBlockProps,
-	BlockContextProvider,
 	__experimentalUseInnerBlocksProps as useInnerBlocksProps,
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import { useSelect } from '@wordpress/data';
-import { useMemo } from '@wordpress/element';
 import { PanelBody } from '@wordpress/components';
 
 /**
@@ -53,9 +51,6 @@ export default function QueryPaginationEdit( {
 		],
 		orientation: 'horizontal',
 	} );
-	const context = useMemo( () => ( { paginationArrow } ), [
-		paginationArrow,
-	] );
 	return (
 		<>
 			{ hasNextPreviousBlocks && (
@@ -70,9 +65,7 @@ export default function QueryPaginationEdit( {
 					</PanelBody>
 				</InspectorControls>
 			) }
-			<BlockContextProvider value={ context }>
-				<div { ...innerBlocksProps } />
-			</BlockContextProvider>
+			<div { ...innerBlocksProps } />
 		</>
 	);
 }
