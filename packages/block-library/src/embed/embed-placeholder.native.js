@@ -81,6 +81,7 @@ const EmbedPlaceholder = ( {
 		}
 	}
 
+	// when the content cannot be embedded the onPress should trigger the Picker instead of the onPress prop.
 	function resolveOnPressEvent() {
 		if ( cannotEmbed ) {
 			onPickerPresent();
