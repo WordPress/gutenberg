@@ -17,6 +17,7 @@ import {
 } from '@wordpress/block-editor';
 import { ReusableBlocksMenuItems } from '@wordpress/reusable-blocks';
 import { store as interfaceStore } from '@wordpress/interface';
+import { ShortcutProvider } from '@wordpress/keyboard-shortcuts';
 
 /**
  * Internal dependencies
@@ -100,7 +101,7 @@ export default function WidgetAreasBlockEditorProvider( {
 	);
 
 	return (
-		<>
+		<ShortcutProvider>
 			<BlockEditorKeyboardShortcuts.Register />
 			<KeyboardShortcuts.Register />
 			<SlotFillProvider>
@@ -116,6 +117,6 @@ export default function WidgetAreasBlockEditorProvider( {
 					<ReusableBlocksMenuItems rootClientId={ widgetAreaId } />
 				</BlockEditorProvider>
 			</SlotFillProvider>
-		</>
+		</ShortcutProvider>
 	);
 }

@@ -1,13 +1,7 @@
 /**
  * WordPress dependencies
  */
-import {
-	useEffect,
-	useState,
-	useMemo,
-	useCallback,
-	useRef,
-} from '@wordpress/element';
+import { useEffect, useState, useMemo, useCallback } from '@wordpress/element';
 import { AsyncModeProvider, useSelect, useDispatch } from '@wordpress/data';
 import {
 	SlotFillProvider,
@@ -32,7 +26,7 @@ import {
 } from '@wordpress/editor';
 import { __ } from '@wordpress/i18n';
 import { PluginArea } from '@wordpress/plugins';
-import { context } from '@wordpress/keyboard-shortcuts';
+import { ShortcutProvider } from '@wordpress/keyboard-shortcuts';
 
 /**
  * Internal dependencies
@@ -165,14 +159,6 @@ function Editor( { initialSettings, onError } ) {
 		}
 	}, [ isNavigationOpen ] );
 
-	const keyboardShortcuts = useRef( new Set() );
-
-	function onKeyDown( event ) {
-		for ( const keyboardShortcut of keyboardShortcuts.current ) {
-			keyboardShortcut( event );
-		}
-	}
-
 	// Don't render the Editor until the settings are set and loaded
 	if ( ! settings?.siteUrl ) {
 		return null;
@@ -193,7 +179,7 @@ function Editor( { initialSettings, onError } ) {
 	};
 
 	return (
-		<context.Provider value={ keyboardShortcuts }>
+		<ShortcutProvider>
 			<URLQueryController />
 			<SlotFillProvider>
 				<EntityProvider kind="root" type="site">
@@ -221,7 +207,6 @@ function Editor( { initialSettings, onError } ) {
 										<KeyboardShortcuts.Register />
 										<SidebarComplementaryAreaFills />
 										<InterfaceSkeleton
-											onKeyDown={ onKeyDown }
 											labels={ interfaceLabels }
 											drawer={ <NavigationSidebar /> }
 											secondarySidebar={ secondarySidebar() }
@@ -305,7 +290,7 @@ function Editor( { initialSettings, onError } ) {
 					</EntityProvider>
 				</EntityProvider>
 			</SlotFillProvider>
-		</context.Provider>
+		</ShortcutProvider>
 	);
 }
 export default Editor;

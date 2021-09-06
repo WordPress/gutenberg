@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { useCallback, useEffect } from '@wordpress/element';
+import { useEffect } from '@wordpress/element';
 import {
 	useShortcut,
 	store as keyboardShortcutsStore,
@@ -45,12 +45,9 @@ function KeyboardShortcuts() {
 		event.preventDefault();
 	} );
 
-	useShortcut(
-		'core/edit-site/toggle-list-view',
-		useCallback( () => {
-			setIsListViewOpened( ! isListViewOpen );
-		}, [ isListViewOpen, setIsListViewOpened ] )
-	);
+	useShortcut( 'core/edit-site/toggle-list-view', () => {
+		setIsListViewOpened( ! isListViewOpen );
+	} );
 
 	useShortcut( 'core/edit-site/toggle-block-settings-sidebar', ( event ) => {
 		// This shortcut has no known clashes, but use preventDefault to prevent any

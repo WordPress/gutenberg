@@ -27,11 +27,8 @@ import {
 	InterfaceSkeleton,
 	store as interfaceStore,
 } from '@wordpress/interface';
-import { useState, useEffect, useCallback, useRef } from '@wordpress/element';
-import {
-	store as keyboardShortcutsStore,
-	context,
-} from '@wordpress/keyboard-shortcuts';
+import { useState, useEffect, useCallback } from '@wordpress/element';
+import { store as keyboardShortcutsStore } from '@wordpress/keyboard-shortcuts';
 
 /**
  * Internal dependencies
@@ -185,16 +182,8 @@ function Layout( { styles } ) {
 		return null;
 	};
 
-	const keyboardShortcuts = useRef( new Set() );
-
-	function onKeyDown( event ) {
-		for ( const keyboardShortcut of keyboardShortcuts.current ) {
-			keyboardShortcut( event );
-		}
-	}
-
 	return (
-		<context.Provider value={ keyboardShortcuts }>
+		<>
 			<FullscreenMode isActive={ isFullscreenActive } />
 			<BrowserURL />
 			<UnsavedChangesWarning />
@@ -204,7 +193,6 @@ function Layout( { styles } ) {
 			<EditorKeyboardShortcutsRegister />
 			<SettingsSidebar />
 			<InterfaceSkeleton
-				onKeyDown={ onKeyDown }
 				className={ className }
 				labels={ interfaceLabels }
 				header={
@@ -289,7 +277,7 @@ function Layout( { styles } ) {
 			<WelcomeGuide />
 			<Popover.Slot />
 			<PluginArea />
-		</context.Provider>
+		</>
 	);
 }
 
