@@ -155,22 +155,27 @@ function BlockPlaceholder( { onCreate }, ref ) {
 							>
 								{ ( { onClose } ) => (
 									<MenuGroup>
-										{ menus.map( ( menu ) => {
-											return (
-												<MenuItem
-													onClick={ () => {
-														setSelectedMenu(
-															menu.id
-														);
-														onCreateFromMenu();
-													} }
-													onClose={ onClose }
-													key={ menu.id }
-												>
-													{ menu.name }
-												</MenuItem>
-											);
-										} ) }
+										{ menus
+											.filter(
+												( menu ) =>
+													menu.id !== selectedMenuId
+											)
+											.map( ( menu ) => {
+												return (
+													<MenuItem
+														onClick={ () => {
+															setSelectedMenu(
+																menu.id
+															);
+															onCreateFromMenu();
+														} }
+														onClose={ onClose }
+														key={ menu.id }
+													>
+														{ menu.name }
+													</MenuItem>
+												);
+											} ) }
 									</MenuGroup>
 								) }
 							</DropdownMenu>
