@@ -358,6 +358,10 @@ export default function NavigationLinkEdit( {
 	);
 
 	useEffect( () => {
+		// This side-effect should not create an undo level as those should
+		// only be created via user interactions. Mark this change as
+		// not persistent to avoid undo level creation.
+		// See https://github.com/WordPress/gutenberg/issues/34564.
 		__unstableMarkNextChangeAsNotPersistent();
 		setAttributes( { isTopLevelLink } );
 	}, [ isTopLevelLink ] );
