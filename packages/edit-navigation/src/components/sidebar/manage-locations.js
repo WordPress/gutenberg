@@ -17,6 +17,7 @@ import { decodeEntities } from '@wordpress/html-entities';
  * Internal dependencies
  */
 import { useMenuLocations } from '../../hooks';
+import SaveButton from './save-button';
 
 export default function ManageLocations( {
 	menus,
@@ -156,6 +157,7 @@ export default function ManageLocations( {
 						{ themeLocationCountTextModal }
 					</div>
 					{ menuLocationCard }
+					<SaveButton />
 				</Modal>
 			) }
 		</PanelBody>
