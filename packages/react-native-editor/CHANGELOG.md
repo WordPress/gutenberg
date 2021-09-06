@@ -10,6 +10,7 @@ For each user feature we should also add a importance categorization label  to i
 -->
 
 ## Unreleased
+[**] Enable embed preview for Instagram and Vimeo providers. [#34563]
 
 ## 1.61.0
 -   [**] Enable embed preview for a list of providers (for now only YouTube and Twitter) [#34446]
