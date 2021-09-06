@@ -12,6 +12,7 @@ import {
 /**
  * Internal dependencies
  */
+import { __unstableUseBlockRef as useBlockRef } from '../components/block-list/use-block-props/use-block-refs';
 import useSetting from '../components/use-setting';
 import { SPACING_SUPPORT_KEY } from './dimensions';
 import { cleanEmptyObject } from './utils';
@@ -79,6 +80,7 @@ export function useIsGapDisabled( { name: blockName } = {} ) {
  */
 export function GapEdit( props ) {
 	const {
+		clientId,
 		attributes: { style },
 		setAttributes,
 	} = props;
@@ -92,6 +94,8 @@ export function GapEdit( props ) {
 			'vw',
 		],
 	} );
+
+	const ref = useBlockRef( clientId );
 
 	if ( useIsGapDisabled( props ) ) {
 		return null;
@@ -109,6 +113,13 @@ export function GapEdit( props ) {
 		setAttributes( {
 			style: cleanEmptyObject( newStyle ),
 		} );
+
+		// In Safari, changing the `gap` CSS value on its own will not trigger the layout
+		// to be recalculated / re-rendered. To force the updated gap to re-render, here
+		// we replace the block's node with itself.
+		if ( ref.current ) {
+			ref.current.parentNode?.replaceChild( ref.current, ref.current );
+		}
 	};
 
 	return Platform.select( {
