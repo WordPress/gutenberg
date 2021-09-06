@@ -61,6 +61,8 @@ describe( 'Image Block', () => {
 		fireEvent.press( imageBlock );
 
 		const settingsButton = screen.getByA11yLabel( 'Open Settings' );
+		// Awaiting navigation event seemingly required due to React Navigation bug
+		// https://git.io/Ju35Z
 		await act( () => fireEvent.press( settingsButton ) );
 
 		const linkTargetButton = screen.getByText( 'Open in new tab' );
@@ -90,6 +92,8 @@ describe( 'Image Block', () => {
 		fireEvent.press( imageBlock );
 
 		const settingsButton = screen.getByA11yLabel( 'Open Settings' );
+		// Awaiting navigation event seemingly required due to React Navigation bug
+		// https://git.io/Ju35Z
 		await act( () => fireEvent.press( settingsButton ) );
 
 		const linkTargetButton = screen.getByText( 'Open in new tab' );
