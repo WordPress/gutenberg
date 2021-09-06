@@ -8,7 +8,7 @@ import { __ } from '@wordpress/i18n';
  * Internal dependencies
  */
 
-export default function SaveButton( ) {
+export default function SaveButton() {
 	return (
 		<Button
 			className="edit-navigation-toolbar__save-button"
