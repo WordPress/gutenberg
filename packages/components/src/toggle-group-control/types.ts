@@ -88,5 +88,6 @@ export type ToggleGroupControlButtonProps = {
 export type ToggleGroupControlBackdropProps = {
 	containerRef: MutableRefObject< HTMLElement | undefined >;
 	containerWidth?: number | null;
+	isAdaptiveWidth?: boolean;
 	state?: any;
 };

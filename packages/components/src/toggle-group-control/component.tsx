@@ -105,6 +105,7 @@ function ToggleGroupControl(
 						{ ...radio }
 						containerRef={ containerRef }
 						containerWidth={ sizes.width }
+						isAdaptiveWidth={ isAdaptiveWidth }
 					/>
 					{ children }
 				</RadioGroup>
