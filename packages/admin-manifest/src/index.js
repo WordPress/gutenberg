@@ -101,7 +101,6 @@ function getAdminBarColors() {
 	};
 }
 
-// eslint-disable-next-line @wordpress/no-global-event-listener
 window.addEventListener( 'load', () => {
 	if ( ! ( 'serviceWorker' in window.navigator ) ) {
 		return;
