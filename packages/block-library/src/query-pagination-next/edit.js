@@ -11,7 +11,7 @@ const arrowMap = {
 };
 
 export default function QueryPaginationNextEdit( {
-	attributes: { label, arrow },
+	attributes: { label },
 	setAttributes,
 	context: { paginationArrow },
 } ) {
@@ -34,7 +34,7 @@ export default function QueryPaginationNextEdit( {
 			/>
 			{ displayArrow && (
 				<span
-					className={ `wp-block-query-pagination-next-arrow is-arrow-${ arrow }` }
+					className={ `wp-block-query-pagination-next-arrow is-arrow-${ paginationArrow }` }
 				>
 					{ displayArrow }
 				</span>
