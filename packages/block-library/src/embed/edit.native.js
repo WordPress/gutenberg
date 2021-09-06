@@ -4,6 +4,7 @@
 import {
 	createUpgradedEmbedBlock,
 	getClassNames,
+	fallback,
 	getAttributesFromPreview,
 	getEmbedInfoByProvider,
 } from './util';
@@ -24,7 +25,7 @@ import classnames from 'classnames';
  */
 import { _x } from '@wordpress/i18n';
 import { useState, useEffect } from '@wordpress/element';
-import { useSelect } from '@wordpress/data';
+import { useDispatch, useSelect } from '@wordpress/data';
 import {
 	useBlockProps,
 	store as blockEditorStore,
@@ -66,6 +67,7 @@ const EmbedEdit = ( props ) => {
 	const [ isEditingURL, setIsEditingURL ] = useState(
 		isSelected && wasBlockJustInserted && ! url
 	);
+	const { invalidateResolution } = useDispatch( coreStore );
 
 	const {
 		preview,
@@ -229,6 +231,10 @@ const EmbedEdit = ( props ) => {
 							setIsEditingURL( true );
 						} }
 						cannotEmbed={ cannotEmbed }
+						fallback={ () => fallback( url, onReplace ) }
+						tryAgain={ () => {
+							invalidateResolution( 'getEmbedPreview', [ url ] );
+						} }
 					/>
 				</View>
 			) : (
