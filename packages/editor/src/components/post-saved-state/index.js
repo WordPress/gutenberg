@@ -10,7 +10,11 @@ import {
 	__unstableGetAnimateClassName as getAnimateClassName,
 	Button,
 } from '@wordpress/components';
-import { usePrevious, useViewportMatch } from '@wordpress/compose';
+import {
+	usePrevious,
+	useRefEffect,
+	useViewportMatch,
+} from '@wordpress/compose';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { useEffect, useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
@@ -22,6 +26,26 @@ import { displayShortcut } from '@wordpress/keycodes';
  */
 import PostSwitchToDraftButton from '../post-switch-to-draft-button';
 import { store as editorStore } from '../../store';
+
+function SaveButton( props ) {
+	const { savePost } = useDispatch( editorStore );
+	return (
+		<Button
+			{ ...props }
+			className="editor-post-save-draft"
+			onClick={ () => savePost() }
+			shortcut={ displayShortcut.primary( 's' ) }
+			ref={ useRefEffect(
+				( element ) => () => {
+					if ( element === element.ownerDocument.activeElement ) {
+						element.closest( '[tabindex]' )?.focus();
+					}
+				},
+				[]
+			) }
+		/>
+	);
+}
 
 /**
  * Component showing whether the post is saved or not and providing save
@@ -82,8 +106,6 @@ export default function PostSavedState( {
 		},
 		[ forceIsDirty, forceIsSaving ]
 	);
-
-	const { savePost } = useDispatch( editorStore );
 
 	const wasSaving = usePrevious( isSaving );
 
@@ -153,26 +175,11 @@ export default function PostSavedState( {
 
 	if ( ! isLargeViewport ) {
 		return (
-			<Button
-				className="editor-post-save-draft"
-				label={ label }
-				onClick={ () => savePost() }
-				shortcut={ displayShortcut.primary( 's' ) }
-				icon={ cloudUpload }
-			>
+			<SaveButton label={ label } icon={ cloudUpload }>
 				{ showIconLabels && shortLabel }
-			</Button>
+			</SaveButton>
 		);
 	}
 
-	return (
-		<Button
-			className="editor-post-save-draft"
-			onClick={ () => savePost() }
-			shortcut={ displayShortcut.primary( 's' ) }
-			variant="tertiary"
-		>
-			{ label }
-		</Button>
-	);
+	return <SaveButton variant="tertiary">{ label }</SaveButton>;
 }
