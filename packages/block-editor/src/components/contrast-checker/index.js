@@ -1,7 +1,9 @@
 /**
  * External dependencies
  */
-import tinycolor from 'tinycolor2';
+import { colord, extend } from 'colord';
+import namesPlugin from 'colord/plugins/names';
+import a11yPlugin from 'colord/plugins/a11y';
 
 /**
  * WordPress dependencies
@@ -11,14 +13,16 @@ import { __ } from '@wordpress/i18n';
 import { Notice } from '@wordpress/components';
 import { useEffect } from '@wordpress/element';
 
+extend( [ namesPlugin, a11yPlugin ] );
+
 function ContrastCheckerMessage( {
-	tinyBackgroundColor,
-	tinyTextColor,
+	colordBackgroundColor,
+	colordTextColor,
 	backgroundColor,
 	textColor,
 } ) {
 	const msg =
-		tinyBackgroundColor.getBrightness() < tinyTextColor.getBrightness()
+		colordBackgroundColor.brightness() < colordTextColor.brightness()
 			? __(
 					'This color combination may be hard for people to read. Try using a darker background color and/or a brighter text color.'
 			  )
@@ -61,16 +65,16 @@ function ContrastChecker( {
 	) {
 		return null;
 	}
-	const tinyBackgroundColor = tinycolor(
+	const colordBackgroundColor = colord(
 		backgroundColor || fallbackBackgroundColor
 	);
-	const tinyTextColor = tinycolor( textColor || fallbackTextColor );
+	const colordTextColor = colord( textColor || fallbackTextColor );
 	const hasTransparency =
-		tinyBackgroundColor.getAlpha() !== 1 || tinyTextColor.getAlpha() !== 1;
+		colordBackgroundColor.alpha() !== 1 || colordTextColor.alpha() !== 1;
 
 	if (
 		hasTransparency ||
-		tinycolor.isReadable( tinyBackgroundColor, tinyTextColor, {
+		colordTextColor.isReadable( colordBackgroundColor, {
 			level: 'AA',
 			size:
 				isLargeText || ( isLargeText !== false && fontSize >= 24 )
@@ -85,8 +89,8 @@ function ContrastChecker( {
 		<ContrastCheckerMessage
 			backgroundColor={ backgroundColor }
 			textColor={ textColor }
-			tinyBackgroundColor={ tinyBackgroundColor }
-			tinyTextColor={ tinyTextColor }
+			colordBackgroundColor={ colordBackgroundColor }
+			colordTextColor={ colordTextColor }
 		/>
 	);
 }
