@@ -517,7 +517,8 @@
 		border: none;
 	}
 
-	.wp-block-navigation-item {
+	.wp-block-navigation-item,
+	.wp-block-page-list {
 		flex-direction: column;
 		align-items: flex-start;
 	}

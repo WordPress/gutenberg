@@ -30,7 +30,8 @@ export function space( value?: SpaceInput ): string | undefined {
 
 	// test if the input has a unit, was NaN, or was one of the named CSS values (like `auto`), in which case just use that value
 	if (
-		CSS.supports?.( 'margin', value.toString() ) ||
+		( typeof window !== 'undefined' &&
+			window.CSS?.supports?.( 'margin', value.toString() ) ) ||
 		Number.isNaN( asInt )
 	) {
 		return value.toString();
