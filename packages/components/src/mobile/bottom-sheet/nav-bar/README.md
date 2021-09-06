@@ -1,6 +1,6 @@
-# BottomSheet Header
+# BottomSheet NavBar
 
-BottomSheet Header components provide styled elements for composing header UI within a `BottomSheet`.
+BottomSheet NavBar components provide styled elements for composing a NavBar UI within a `BottomSheet`. It makes several other components available, which can then be used to compose the NavBar's content.
 
 ## Usage
 
@@ -38,7 +38,8 @@ Callback invoked once the button is pressed.
 
 ## BottomSheet.NavBar.BackButton
 
-Displays a styled button to navigate backwards from a bottom sheet.
+Displays a styled button to navigate backwards from a bottom sheet. 
+Note that the backwards navigation needs to be implemented in the callback that is passed in onPress.
 
 ### Props
 
@@ -48,7 +49,8 @@ Callback invoked once the button is pressed.
 
 ## BottomSheet.NavBar.DismissButton
 
-Displays a styled button to dismiss a full screen bottom sheet.
+Displays a styled button to dismiss the bottom sheet screen.
+Note that the bottomSheet dismissal needs to be implemented in the callback that is passed in onPress.
 
 ### Props
 
@@ -58,4 +60,4 @@ Callback invoked once the button is pressed.
 
 #### iosText 
 
-Used to display iOS text if different from "Cancel". 
+Used to display iOS text if different from "Cancel".
