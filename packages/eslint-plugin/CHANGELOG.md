@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Enhancement
+
+-   The bundled `eslint-plugin-jsdoc` dependency has been updated from requiring `^34.1.0` to requiring `^36.0.8` ([#34338](https://github.com/WordPress/gutenberg/pull/34338)).
+
 ### Bug Fix
 
 -   The recommended configuration will now respect `type` imports in TypeScript files ([#34055](https://github.com/WordPress/gutenberg/pull/34055)).
