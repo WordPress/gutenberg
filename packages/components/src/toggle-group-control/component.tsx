@@ -23,7 +23,7 @@ import {
 import { useUpdateEffect, useCx } from '../utils/hooks';
 import { View } from '../view';
 import BaseControl from '../base-control';
-import Backdrop from './toggle-group-control-backdrop';
+import ToggleGroupControlBackdrop from './toggle-group-control-backdrop';
 import type { ToggleGroupControlProps } from './types';
 import ToggleGroupControlContext from './toggle-group-control-context';
 import * as styles from './styles';
@@ -101,7 +101,7 @@ function ToggleGroupControl(
 					ref={ useMergeRefs( [ containerRef, forwardedRef ] ) }
 				>
 					{ resizeListener }
-					<Backdrop
+					<ToggleGroupControlBackdrop
 						{ ...radio }
 						containerRef={ containerRef }
 						containerWidth={ sizes.width }
