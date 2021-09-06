@@ -20,7 +20,7 @@ export default function saveWithInnerBlocks( { attributes } ) {
 
 	const { caption, columns, imageCrop } = attributes;
 
-	const className = classnames( 'blocks-gallery-grid', 'has-nested-images', {
+	const className = classnames( 'has-nested-images', {
 		[ `columns-${ columns }` ]: columns !== undefined,
 		[ `columns-default` ]: columns === undefined,
 		'is-cropped': imageCrop,
