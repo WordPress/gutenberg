@@ -91,6 +91,7 @@ const ToolsPanelHeader = ( props, forwardedRef ) => {
 							) }
 							<MenuGroup>
 								<MenuItem
+									variant={ 'tertiary' }
 									onClick={ () => {
 										resetAll();
 										onClose();
