@@ -20,23 +20,51 @@ export default {
 };
 
 const aligns = [ 'Left', 'Center', 'Right', 'Justify' ];
-const alignOptions = aligns.map( ( key ) => (
-	<ToggleGroupControlOption key={ key } value={ key } label={ key } />
-) );
+const KNOBS_GROUPS = {
+	ToggleGroupControl: 'ToggleGroupControl',
+	ToggleGroupControlOption: 'ToggleGroupControlOption',
+};
 
 export const _default = () => {
 	const [ alignState, setAlignState ] = useState( aligns[ 0 ] );
-	const label = text( 'Label', 'Toggle Group Control' );
-	const hideLabelFromVision = boolean( 'Hide label from vision', false );
+	const label = text(
+		'Label',
+		'Toggle Group Control',
+		KNOBS_GROUPS.ToggleGroupControl
+	);
+	const hideLabelFromVision = boolean(
+		'Hide label from vision',
+		false,
+		KNOBS_GROUPS.ToggleGroupControl
+	);
 	const isBlock = boolean(
 		'Render `ToggleGroupControl` as a (CSS) block element',
-		false
+		false,
+		KNOBS_GROUPS.ToggleGroupControl
 	);
-	const help = text( 'Help Text' );
+	const help = text(
+		'Help Text',
+		undefined,
+		KNOBS_GROUPS.ToggleGroupControl
+	);
 	const isAdaptiveWidth = boolean(
 		'Render segments with equal widths',
-		false
+		false,
+		KNOBS_GROUPS.ToggleGroupControl
 	);
+
+	const alignOptions = aligns.map( ( key, index ) => (
+		<ToggleGroupControlOption
+			key={ key }
+			value={ key }
+			label={ text(
+				'Label',
+				key,
+				`${ KNOBS_GROUPS.ToggleGroupControlOption }-${ index + 1 }`
+			) }
+		/>
+	) );
+
 	return (
 		<View>
 			<ToggleGroupControl
