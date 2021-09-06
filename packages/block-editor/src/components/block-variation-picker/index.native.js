@@ -1,19 +1,13 @@
 /**
  * External dependencies
  */
-import {
-	ScrollView,
-	View,
-	Text,
-	TouchableWithoutFeedback,
-	Platform,
-} from 'react-native';
+import { ScrollView } from 'react-native';
 
 /**
  * WordPress dependencies
  */
 import { withSelect, useDispatch } from '@wordpress/data';
-import { compose, usePreferredColorSchemeStyle } from '@wordpress/compose';
+import { compose } from '@wordpress/compose';
 import {
 	createBlocksFromInnerBlocksTemplate,
 	store as blocksStore,
@@ -25,49 +19,15 @@ import {
 	FooterMessageControl,
 	InserterButton,
 } from '@wordpress/components';
-import { Icon, close } from '@wordpress/icons';
 import { useMemo } from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
-import styles from './style.scss';
 import { store as blockEditorStore } from '../../store';
-
-const hitSlop = { top: 22, bottom: 22, left: 22, right: 22 };
 
 function BlockVariationPicker( { isVisible, onClose, clientId, variations } ) {
 	const { replaceInnerBlocks } = useDispatch( blockEditorStore );
-	const isIOS = Platform.OS === 'ios';
-
-	const cancelButtonStyle = usePreferredColorSchemeStyle(
-		styles.cancelButton,
-		styles.cancelButtonDark
-	);
-
-	const leftButton = useMemo(
-		() => (
-			<TouchableWithoutFeedback onPress={ onClose } hitSlop={ hitSlop }>
-				<View>
-					{ isIOS ? (
-						<Text
-							style={ cancelButtonStyle }
-							maxFontSizeMultiplier={ 2 }
-						>
-							{ __( 'Cancel' ) }
-						</Text>
-					) : (
-						<Icon
-							icon={ close }
-							size={ 24 }
-							style={ styles.closeIcon }
-						/>
-					) }
-				</View>
-			</TouchableWithoutFeedback>
-		),
-		[ onClose, cancelButtonStyle ]
-	);
 
 	const onVariationSelect = ( variation ) => {
 		replaceInnerBlocks(
@@ -79,19 +39,14 @@ function BlockVariationPicker( { isVisible, onClose, clientId, variations } ) {
 
 	return useMemo(
 		() => (
-			<BottomSheet
-				isVisible={ isVisible }
-				onClose={ onClose }
-				title={ __( 'Select a layout' ) }
-				contentStyle={ styles.contentStyle }
-				leftButton={ leftButton }
-			>
-				<ScrollView
-					horizontal
-					showsHorizontalScrollIndicator={ false }
-					contentContainerStyle={ styles.contentContainerStyle }
-					style={ styles.containerStyle }
-				>
+			<BottomSheet isVisible={ isVisible } hideHeader={ true }>
+				<BottomSheet.NavBar>
+					<BottomSheet.NavBar.DismissButton onPress={ onClose } />
+					<BottomSheet.NavBar.Heading>
+						{ __( 'Select a layout' ) }
+					</BottomSheet.NavBar.Heading>
+				</BottomSheet.NavBar>
+				<ScrollView horizontal showsHorizontalScrollIndicator={ false }>
 					{ variations.map( ( v ) => {
 						return (
 							<InserterButton
