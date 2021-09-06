@@ -4,7 +4,7 @@
  * External dependencies
  */
 import { View, Platform } from 'react-native';
-import { get, pickBy, debounce, isString } from 'lodash';
+import { get, pickBy, debounce } from 'lodash';
 import memize from 'memize';
 
 /**
@@ -57,7 +57,7 @@ const gutenbergFormatNamesToAztec = {
 
 const EMPTY_PARAGRAPH_TAGS = '<p></p>';
 const DEFAULT_FONT_SIZE = 16;
-const DEFAULT_LINE_HEIGHT = 1.6;
+const DEFAULT_LINE_HEIGHT = 1.5;
 
 export class RichText extends Component {
 	constructor( {
@@ -113,9 +113,6 @@ export class RichText extends Component {
 		).bind( this );
 		this.suggestionOptions = this.suggestionOptions.bind( this );
 		this.insertString = this.insertString.bind( this );
-		this.convertFontSizeFromString = this.convertFontSizeFromString.bind(
-			this
-		);
 		this.manipulateEventCounterToForceNativeToRefresh = this.manipulateEventCounterToForceNativeToRefresh.bind(
 			this
 		);
@@ -277,13 +274,6 @@ export class RichText extends Component {
 		return html
 			.replace( openingTagRegexp, '' )
 			.replace( closingTagRegexp, '' );
-	}
-
-	// Fix for crash https://github.com/wordpress-mobile/gutenberg-mobile/issues/2991
-	convertFontSizeFromString( fontSize ) {
-		return fontSize && isString( fontSize ) && fontSize.endsWith( 'px' )
-			? parseFloat( fontSize.substring( 0, fontSize.length - 2 ) )
-			: fontSize;
 	}
 
 	/*
@@ -885,9 +875,14 @@ export class RichText extends Component {
 		return DEFAULT_FONT_SIZE;
 	}
 
-	getLineHeight( fontSize ) {
+	getLineHeight() {
 		const { baseGlobalStyles } = this.props;
 		let lineHeight = DEFAULT_LINE_HEIGHT;
+
+		// eslint-disable-next-line no-undef
+		if ( ! __DEV__ ) {
+			return;
+		}
 
 		if ( baseGlobalStyles?.typography?.lineHeight ) {
 			lineHeight = parseFloat( baseGlobalStyles?.typography?.lineHeight );
@@ -897,8 +892,7 @@ export class RichText extends Component {
 			lineHeight = parseFloat( this.props.style.lineHeight );
 		}
 
-		// TO-DO to be updated for both iOS and Android
-		return parseInt( fontSize + fontSize * lineHeight, 10 );
+		return lineHeight;
 	}
 
 	render() {
@@ -928,7 +922,7 @@ export class RichText extends Component {
 
 		const { color: defaultPlaceholderTextColor } = placeholderStyle;
 		const fontSize = this.getFontSize();
-		const lineHeight = this.getLineHeight( fontSize );
+		const lineHeight = this.getLineHeight();
 
 		const {
 			color: defaultColor,

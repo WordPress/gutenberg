@@ -41,7 +41,7 @@ class RCTAztecView: Aztec.TextView {
         get {
             return super.textAlignment
         }
-    }    
+    }
 
     private var previousContentSize: CGSize = .zero
 
@@ -592,6 +592,7 @@ class RCTAztecView: Aztec.TextView {
         }
         fontSize = size
         refreshFont()
+        refreshLineHeight()
     }
 
     @objc func setFontWeight(_ weight: String) {
@@ -603,7 +604,6 @@ class RCTAztecView: Aztec.TextView {
     }
     
     @objc func setLineHeight(_ newLineHeight: CGFloat) {
-        print(newLineHeight)
         guard lineHeight != newLineHeight else {
             return
         }
@@ -663,19 +663,20 @@ class RCTAztecView: Aztec.TextView {
     /// This method should not be called directly.  Call `refreshFont()` instead.
     ///
     private func refreshTypingAttributesAndPlaceholderFont() {
-        let currentFont = font(from: typingAttributes)        
+        let currentFont = font(from: typingAttributes)
         placeholderLabel.font = currentFont
     }
     
     /// This method refreshes the line height.
     private func refreshLineHeight() {
-        if ((lineHeight) != nil) {
-            defaultParagraphStyle.regularLineSpacing = lineHeight!
-            
+        if let lineHeight = lineHeight {
             let attributeString = NSMutableAttributedString(string: self.text)
             let style = NSMutableParagraphStyle()
+            let currentFontSize = fontSize ?? defaultFont.pointSize
+            let lineSpacing = ((currentFontSize * lineHeight) / UIScreen.main.scale) - (currentFontSize / lineHeight) / 2
 
-            style.lineSpacing = lineHeight!
+            style.lineSpacing = lineSpacing
+            defaultParagraphStyle.regularLineSpacing = lineSpacing
             textStorage.addAttribute(NSAttributedString.Key.paragraphStyle, value: style, range: NSMakeRange(0, textStorage.length))
         }
     }

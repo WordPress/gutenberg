@@ -291,7 +291,7 @@ public class ReactAztecManager extends BaseViewManager<ReactAztecText, LayoutSha
     @ReactProp(name = ViewProps.LINE_HEIGHT)
     public void setLineHeight(ReactAztecText view, float lineHeight) {
         float textSize = view.getTextSize();
-        view.setLineSpacing((lineHeight - textSize), (float) (lineHeight / textSize));
+        view.setLineSpacing(textSize * lineHeight, (float) (lineHeight / textSize));
     }
 
     @ReactProp(name = ViewProps.FONT_FAMILY)
