@@ -5,14 +5,17 @@ AlignmentMatrixControl components enable adjustments to horizontal and vertical 
 ## Usage
 
 ```jsx
-import { AlignmentMatrixControl } from '@wordpress/components';
+import { __experimentalAlignmentMatrixControl as AlignmentMatrixControl } from '@wordpress/components';
 import { useState } from '@wordpress/element';
 
 const Example = () => {
-	const [ alignment, setAlignment ] = useState( 'center center' );
+	const [alignment, setAlignment] = useState('center center');
 
 	return (
-		<AlignmentMatrixControl value={ alignment } onChange={ setAlignment } />
+		<AlignmentMatrixControl
+			value={alignment}
+			onChange={(newAlignment) => setAlignment(newAlignment)}
+		/>
 	);
 };
 ```
