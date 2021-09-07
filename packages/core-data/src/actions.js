@@ -434,12 +434,11 @@ export const saveEntityRecord = (
 								: data.status,
 					}
 				);
-				const options = {
+				updatedRecord = await __unstableFetch( {
 					path: `${ path }/autosaves`,
 					method: 'POST',
 					data,
-				};
-				updatedRecord = await __unstableFetch( options );
+				} );
 
 				// An autosave may be processed by the server as a regular save
 				// when its update is requested by the author and the post had
@@ -499,12 +498,11 @@ export const saveEntityRecord = (
 						),
 					};
 				}
-				const options = {
+				updatedRecord = await __unstableFetch( {
 					path,
 					method: recordId ? 'PUT' : 'POST',
 					data: edits,
-				};
-				updatedRecord = await __unstableFetch( options );
+				} );
 				await dispatch.receiveEntityRecords(
 					kind,
 					name,
