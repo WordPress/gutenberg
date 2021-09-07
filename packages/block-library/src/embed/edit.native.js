@@ -252,7 +252,8 @@ const EmbedEdit = ( props ) => {
 							label={ title }
 							onFocus={ onFocus }
 							preview={ preview }
-							previewable={ previewable && isProviderPreviewable }
+							isProviderPreviewable={ isProviderPreviewable }
+							previewable={ previewable }
 							type={ type }
 							url={ url }
 						/>
