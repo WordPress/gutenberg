@@ -7,6 +7,7 @@ import { __ } from '@wordpress/i18n';
  * Internal dependencies
  */
 import { appendSelectors } from './utils';
+import useSetting from '../components/use-setting';
 
 export default {
 	name: 'flex',
@@ -18,11 +19,18 @@ export default {
 	},
 
 	save: function FlexLayoutStyle( { selector } ) {
+		const blockGapSupport = useSetting( 'spacing.blockGap' );
+		const hasBlockGapStylesSupport = blockGapSupport !== null;
+
 		return (
 			<style>{ `
 				${ appendSelectors( selector ) } {
 					display: flex;
-					gap: var( --wp--style--block-gap, 0.5em );
+					gap: ${
+						hasBlockGapStylesSupport
+							? 'var( --wp--style--block-gap, 0.5em )'
+							: '0.5em'
+					};
 					flex-wrap: wrap;
 					align-items: center;
 				}

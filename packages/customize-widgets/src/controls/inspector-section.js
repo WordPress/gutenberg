@@ -16,6 +16,9 @@ export default function getInspectorSection() {
 				'customize-widgets-layout__inspector'
 			);
 		}
+		isContextuallyActive() {
+			return this.active();
+		}
 		onChangeExpanded( expanded, args ) {
 			super.onChangeExpanded( expanded, args );
 

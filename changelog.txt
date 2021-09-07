@@ -1,5 +1,12 @@
 == Changelog ==
 
+= 11.4.1 =
+
+### Bug Fixes
+
+- Post title: Remove class from old div to fix alignment. ([34489](https://github.com/WordPress/gutenberg/pull/34489))
+
+
 = 11.4.0 =
 
 ### Enhancements

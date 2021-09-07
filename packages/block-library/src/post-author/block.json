@@ -33,7 +33,8 @@
 		},
 		"color": {
 			"gradients": true,
-			"link": true
+			"link": true,
+			"__experimentalDuotone": ".wp-block-post-author__avatar img"
 		}
 	},
 	"editorStyle": "wp-block-post-author-editor",

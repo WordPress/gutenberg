@@ -42,8 +42,6 @@ const BottomSheetTextControl = ( {
 		setShowSubSheet( true );
 	};
 
-	const [ value, onChangeText ] = useState( initialValue );
-
 	const horizontalBorderStyle = usePreferredColorSchemeStyle(
 		styles.horizontalBorder,
 		styles.horizontalBorderDark
@@ -77,9 +75,8 @@ const BottomSheetTextControl = ( {
 				<PanelBody style={ horizontalBorderStyle }>
 					<TextInput
 						label={ label }
-						onChangeText={ ( text ) => onChangeText( text ) }
-						onChange={ onChange( value ) }
-						value={ value }
+						onChangeText={ ( text ) => onChange( text ) }
+						defaultValue={ initialValue }
 						multiline={ true }
 						placeholder={ placeholder }
 						placeholderTextColor={ '#87a6bc' }

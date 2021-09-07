@@ -10,18 +10,13 @@ export default function useGetMedia( innerBlockImages ) {
 
 	const imageMedia = useSelect(
 		( select ) => {
-			if (
-				! innerBlockImages?.length ||
-				innerBlockImages.some(
-					( imageBlock ) => ! imageBlock.attributes.id
-				)
-			) {
+			if ( ! innerBlockImages?.length ) {
 				return currentImageMedia;
 			}
 
-			const imageIds = innerBlockImages.map(
-				( imageBlock ) => imageBlock.attributes.id
-			);
+			const imageIds = innerBlockImages
+				.map( ( imageBlock ) => imageBlock.attributes.id )
+				.filter( ( id ) => id !== undefined );
 
 			if ( imageIds.length === 0 ) {
 				return currentImageMedia;

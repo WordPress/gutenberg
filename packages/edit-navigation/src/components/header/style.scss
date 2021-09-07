@@ -5,22 +5,50 @@
 	padding: $grid-unit-15 $grid-unit-30 $grid-unit-15 20px;
 }
 
+.edit-navigation-header__toolbar-wrapper {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+}
+
 .edit-navigation-header__title {
 	font-size: 20px;
 	padding: 0;
 	margin: 0 20px 0 0;
 }
 
+.edit-navigation-header__toolbar {
+	border: none;
+
+	// The Toolbar component adds different styles to buttons, so we reset them
+	// here to the original button styles
+	// Specificity bump needed to offset https://github.com/WordPress/gutenberg/blob/8ea29cb04412c80c9adf7c1db0e816d6a0ac1232/packages/components/src/toolbar/style.scss#L76
+	> .components-button.has-icon.has-icon.has-icon,
+	> .components-dropdown > .components-button.has-icon.has-icon {
+		height: $button-size;
+		min-width: $button-size;
+		padding: 6px;
+
+		&.is-pressed {
+			background: $gray-900;
+		}
+
+		&:focus:not(:disabled) {
+			box-shadow: 0 0 0 var(--wp-admin-border-width-focus) var(--wp-admin-theme-color), inset 0 0 0 $border-width $white;
+			outline: 1px solid transparent;
+		}
+
+		&::before {
+			display: none;
+		}
+	}
+}
+
 .edit-navigation-header__subtitle {
-	display: none;
+	display: block;
 	margin: 0;
 	font-size: 15px;
 	font-weight: normal;
-
-	// Only display on larger screens.
-	@include break-small() {
-		display: block;
-	}
 }
 
 .edit-navigation-header__actions {

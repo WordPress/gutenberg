@@ -6,8 +6,8 @@ import { Flex } from '../../flex';
 import { useCardFooter } from './hook';
 
 /**
- * @param {import('../../ui/context').PolymorphicComponentProps<import('../types').FooterProps, 'div'>} props
- * @param {import('react').Ref<any>}                                                                    forwardedRef
+ * @param {import('../../ui/context').WordPressComponentProps<import('../types').FooterProps, 'div'>} props
+ * @param {import('react').Ref<any>}                                                                  forwardedRef
  */
 function CardFooter( props, forwardedRef ) {
 	const footerProps = useCardFooter( props );

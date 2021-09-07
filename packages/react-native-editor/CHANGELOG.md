@@ -11,6 +11,10 @@ For each user feature we should also add a importance categorization label  to i
 
 ## Unreleased
 
+## 1.61.0
+-   [**] Enable embed preview for a list of providers (for now only YouTube and Twitter) [#34446]
+-   [***] Inserter: Add Inserter Block Search [https://github.com/WordPress/gutenberg/pull/33237]
+
 ## 1.60.1
 -   [*] RNmobile: Fix the cancel button on Block Variation Picker / Columns Block. [#34249]
 -   [*] Column block: Fix Android close button alignment. [#34332]
