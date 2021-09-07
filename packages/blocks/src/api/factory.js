@@ -224,7 +224,8 @@ const isPossibleTransformForSource = ( transform, direction, blocks ) => {
 		const attributes = transform.isMultiBlock
 			? blocks.map( ( block ) => block.attributes )
 			: sourceBlock.attributes;
-		if ( ! transform.isMatch( attributes ) ) {
+		const block = transform.isMultiBlock ? blocks : sourceBlock;
+		if ( ! transform.isMatch( attributes, block ) ) {
 			return false;
 		}
 	}

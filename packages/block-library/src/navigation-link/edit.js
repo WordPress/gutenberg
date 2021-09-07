@@ -291,7 +291,10 @@ export default function NavigationLinkEdit( {
 	};
 	const { showSubmenuIcon } = context;
 	const { saveEntityRecord } = useDispatch( coreStore );
-	const { insertBlock } = useDispatch( blockEditorStore );
+	const {
+		insertBlock,
+		__unstableMarkNextChangeAsNotPersistent,
+	} = useDispatch( blockEditorStore );
 	const [ isLinkOpen, setIsLinkOpen ] = useState( false );
 	const listItemRef = useRef( null );
 	const isDraggingWithin = useIsDraggingWithin( listItemRef );
@@ -354,8 +357,14 @@ export default function NavigationLinkEdit( {
 		[ clientId ]
 	);
 
-	// Store the colors from context as attributes for rendering
-	useEffect( () => setAttributes( { isTopLevelLink } ), [ isTopLevelLink ] );
+	useEffect( () => {
+		// This side-effect should not create an undo level as those should
+		// only be created via user interactions. Mark this change as
+		// not persistent to avoid undo level creation.
+		// See https://github.com/WordPress/gutenberg/issues/34564.
+		__unstableMarkNextChangeAsNotPersistent();
+		setAttributes( { isTopLevelLink } );
+	}, [ isTopLevelLink ] );
 
 	/**
 	 * Insert a link block when submenu is added.

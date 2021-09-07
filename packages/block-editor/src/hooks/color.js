@@ -222,6 +222,8 @@ export function ColorEdit( props ) {
 	const areCustomSolidsEnabled = useSetting( 'color.custom' );
 	const areCustomGradientsEnabled = useSetting( 'color.customGradient' );
 	const isLinkEnabled = useSetting( 'color.link' );
+	const isTextEnabled = useSetting( 'color.text' );
+	const isBackgroundEnabled = useSetting( 'color.background' );
 
 	// Shouldn't be needed but right now the ColorGradientsPanel
 	// can trigger both onChangeColor and onChangeBackground
@@ -242,9 +244,11 @@ export function ColorEdit( props ) {
 		( solids.length > 0 || areCustomSolidsEnabled );
 	const hasTextColor =
 		hasTextColorSupport( blockName ) &&
+		isTextEnabled &&
 		( solids.length > 0 || areCustomSolidsEnabled );
 	const hasBackgroundColor =
 		hasBackgroundColorSupport( blockName ) &&
+		isBackgroundEnabled &&
 		( solids.length > 0 || areCustomSolidsEnabled );
 	const hasGradientColor =
 		hasGradientSupport( blockName ) &&

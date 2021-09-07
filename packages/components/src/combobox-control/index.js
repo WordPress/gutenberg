@@ -62,6 +62,7 @@ function ComboboxControl( {
 		currentOption || null
 	);
 	const [ isExpanded, setIsExpanded ] = useState( false );
+	const [ inputHasFocus, setInputHasFocus ] = useState( false );
 	const [ inputValue, setInputValue ] = useState( '' );
 	const inputContainer = useRef();
 
@@ -139,7 +140,12 @@ function ComboboxControl( {
 		}
 	};
 
+	const onBlur = () => {
+		setInputHasFocus( false );
+	};
+
 	const onFocus = () => {
+		setInputHasFocus( true );
 		setIsExpanded( true );
 		onFilterValueChange( '' );
 		setInputValue( '' );
@@ -153,7 +159,9 @@ function ComboboxControl( {
 		const text = event.value;
 		setInputValue( text );
 		onFilterValueChange( text );
-		setIsExpanded( true );
+		if ( inputHasFocus ) {
+			setIsExpanded( true );
+		}
 	};
 
 	const handleOnReset = () => {
@@ -228,6 +236,7 @@ function ComboboxControl( {
 										: null
 								}
 								onFocus={ onFocus }
+								onBlur={ onBlur }
 								isExpanded={ isExpanded }
 								selectedSuggestionIndex={ matchingSuggestions.indexOf(
 									selectedSuggestion

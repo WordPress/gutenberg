@@ -5,6 +5,14 @@ import { useState } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 
+/**
+ * Retrieves the extended media info for each gallery image from the store. This is used to
+ * determine which image size options are available for the current gallery.
+ *
+ * @param {Array} innerBlockImages An array of the innerBlock images currently in the gallery.
+ *
+ * @return {Array} An array of media info options for each gallery image.
+ */
 export default function useGetMedia( innerBlockImages ) {
 	const [ currentImageMedia, setCurrentImageMedia ] = useState( [] );
 

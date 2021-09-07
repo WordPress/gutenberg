@@ -348,7 +348,7 @@ export const saveEntityRecord = (
 	name,
 	record,
 	{ isAutosave = false, __unstableFetch = triggerFetch } = {}
-) => async ( { select, dispatch } ) => {
+) => async ( { select, resolveSelect, dispatch } ) => {
 	const entities = await dispatch( getKindEntities( kind ) );
 	const entity = find( entities, { kind, name } );
 	if ( ! entity ) {
@@ -410,7 +410,7 @@ export const saveEntityRecord = (
 				// so the client just sends and receives objects.
 				const currentUser = select.getCurrentUser();
 				const currentUserId = currentUser ? currentUser.id : undefined;
-				const autosavePost = select.getAutosave(
+				const autosavePost = resolveSelect.getAutosave(
 					persistedRecord.type,
 					persistedRecord.id,
 					currentUserId

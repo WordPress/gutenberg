@@ -12,6 +12,7 @@ import { BackdropView } from './styles';
 function ToggleGroupControlBackdrop( {
 	containerRef,
 	containerWidth,
+	isAdaptiveWidth,
 	state,
 }: ToggleGroupControlBackdropProps ) {
 	const [ left, setLeft ] = useState( 0 );
@@ -43,7 +44,7 @@ function ToggleGroupControlBackdrop( {
 				setCanAnimate( true );
 			} );
 		}
-	}, [ canAnimate, containerRef, containerWidth, state ] );
+	}, [ canAnimate, containerRef, containerWidth, state, isAdaptiveWidth ] );
 
 	return (
 		<BackdropView
