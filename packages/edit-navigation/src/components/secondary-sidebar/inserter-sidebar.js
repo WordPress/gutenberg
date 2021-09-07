@@ -6,18 +6,31 @@ import { close } from '@wordpress/icons';
 import { __experimentalLibrary as Library } from '@wordpress/block-editor';
 import { useViewportMatch } from '@wordpress/compose';
 import { useRef } from '@wordpress/element';
+import { useDispatch, useSelect } from '@wordpress/data';
+
+/**
+ * Internal dependencies
+ */
+import { store as editNavigationStore } from '../../store';
 
 function InserterSidebar() {
 	const isMobileViewport = useViewportMatch( 'medium', '<' );
 
-	// Todo: make these dynamic.
-	const insertionIndex = 0;
+	const { isInserterOpened } = useSelect( ( select ) => {
+		return {
+			isInserterOpened: select( editNavigationStore ).isInserterOpened(),
+		};
+	} );
+
+	const { setIsInserterOpened } = useDispatch( editNavigationStore );
+
 	const inserterDialogRef = useRef();
 	const inserterDialogProps = {};
-	const rootClientId = '0';
 
-	// Todo: implement in store.
-	function setIsInserterOpened() {}
+	// Don't display if not opened.
+	if ( ! isInserterOpened ) {
+		return null;
+	}
 
 	return (
 		<div
@@ -35,8 +48,6 @@ function InserterSidebar() {
 				<Library
 					showInserterHelpPanel
 					shouldFocusBlock={ isMobileViewport }
-					rootClientId={ rootClientId }
-					__experimentalInsertionIndex={ insertionIndex }
 				/>
 			</div>
 		</div>

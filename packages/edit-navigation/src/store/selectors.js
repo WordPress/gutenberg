@@ -81,3 +81,14 @@ export const getMenuItemForClientId = createRegistrySelector(
 		return select( coreStore ).getMenuItem( mapping[ clientId ] );
 	}
 );
+
+/**
+ * Returns true if the inserter is opened.
+ *
+ * @param {Object} state Global application state.
+ *
+ * @return {boolean} Whether the inserter is opened.
+ */
+export function isInserterOpened( state = false ) {
+	return !! state.blockInserterPanel;
+}
