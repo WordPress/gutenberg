@@ -73,7 +73,7 @@ It returns the registered block type (`WP_Block_Type`) on success or `false` on 
 **Example:**
 
 ```php
-register_block_type(
+register_block_type_from_metadata(
 	__DIR__ . '/notice',
 	array(
 		'render_callback' => 'render_block_core_notice',
