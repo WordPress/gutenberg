@@ -40,23 +40,32 @@ function LayoutPanel( { setAttributes, attributes, name: blockName } ) {
 		return getSettings().supportsLayout;
 	}, [] );
 
-	if ( ! themeSupportsLayout ) {
-		return null;
-	}
-
+	const layoutBlockSupport = getBlockSupport(
+		blockName,
+		layoutBlockSupportKey,
+		{}
+	);
 	const {
-		allowSwitching: canBlockSwitchLayout,
+		allowSwitching,
 		allowEditing = true,
 		allowInheriting = true,
 		default: defaultBlockLayout,
-	} = getBlockSupport( blockName, layoutBlockSupportKey ) || {};
+	} = layoutBlockSupport;
 
 	if ( ! allowEditing ) {
 		return null;
 	}
 
-	const usedLayout = layout ? layout : defaultBlockLayout || {};
+	const usedLayout = layout || defaultBlockLayout || {};
 	const { inherit = false, type = 'default' } = usedLayout;
+	/**
+	 * `themeSupportsLayout` is only relevant to the `default/flow`
+	 * layout and it should not be taken into account when other
+	 * `layout` types are used.
+	 */
+	if ( type === 'default' && ! themeSupportsLayout ) {
+		return null;
+	}
 	const layoutType = getLayoutType( type );
 
 	const onChangeType = ( newType ) =>
@@ -65,33 +74,45 @@ function LayoutPanel( { setAttributes, attributes, name: blockName } ) {
 		setAttributes( { layout: newLayout } );
 
 	return (
-		<InspectorControls>
-			<PanelBody title={ __( 'Layout' ) }>
-				{ allowInheriting && !! defaultThemeLayout && (
-					<ToggleControl
-						label={ __( 'Inherit default layout' ) }
-						checked={ !! inherit }
-						onChange={ () =>
-							setAttributes( { layout: { inherit: ! inherit } } )
-						}
-					/>
-				) }
+		<>
+			<InspectorControls>
+				<PanelBody title={ __( 'Layout' ) }>
+					{ allowInheriting && !! defaultThemeLayout && (
+						<ToggleControl
+							label={ __( 'Inherit default layout' ) }
+							checked={ !! inherit }
+							onChange={ () =>
+								setAttributes( {
+									layout: { inherit: ! inherit },
+								} )
+							}
+						/>
+					) }
 
-				{ ! inherit && canBlockSwitchLayout && (
-					<LayoutTypeSwitcher
-						type={ type }
-						onChange={ onChangeType }
-					/>
-				) }
+					{ ! inherit && allowSwitching && (
+						<LayoutTypeSwitcher
+							type={ type }
+							onChange={ onChangeType }
+						/>
+					) }
 
-				{ ! inherit && layoutType && (
-					<layoutType.edit
-						layout={ usedLayout }
-						onChange={ onChangeLayout }
-					/>
-				) }
-			</PanelBody>
-		</InspectorControls>
+					{ ! inherit && layoutType && (
+						<layoutType.inspectorControls
+							layout={ usedLayout }
+							onChange={ onChangeLayout }
+							layoutBlockSupport={ layoutBlockSupport }
+						/>
+					) }
+				</PanelBody>
+			</InspectorControls>
+			{ ! inherit && layoutType && (
+				<layoutType.toolBarControls
+					layout={ usedLayout }
+					onChange={ onChangeLayout }
+					layoutBlockSupport={ layoutBlockSupport }
+				/>
+			) }
+		</>
 	);
 }
 
