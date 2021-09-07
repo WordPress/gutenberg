@@ -133,7 +133,7 @@ function parseSourceString( sourceString, { workDirectoryPath } ) {
 	}
 
 	throw new ValidationError(
-		`Invalid or unrecognized source: "${ sourceString }."`
+		`Invalid or unrecognized source: "${ sourceString }".`
 	);
 }
 
