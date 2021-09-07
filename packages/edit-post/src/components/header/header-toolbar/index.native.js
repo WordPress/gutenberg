@@ -43,7 +43,9 @@ function HeaderToolbar( {
 } ) {
 	const scrollViewRef = useRef( null );
 	const scrollToStart = () => {
-		scrollViewRef.current.scrollTo( { x: 0 } );
+		isRTL
+			? scrollViewRef.current.scrollToEnd()
+			: scrollViewRef.current.scrollTo( { x: 0 } );
 	};
 	const renderHistoryButtons = () => {
 		const buttons = [
