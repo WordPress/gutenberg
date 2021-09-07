@@ -158,7 +158,8 @@ function Navigation( {
 				isSelected
 					? InnerBlocks.DefaultAppender
 					: false,
-			__experimentalCaptureToolbars: true,
+			__experimentalCaptureToolbars:
+				attributes.orientation !== 'vertical',
 			// Template lock set to false here so that the Nav
 			// Block on the experimental menus screen does not
 			// inherit templateLock={ 'all' }.
