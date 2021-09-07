@@ -331,8 +331,12 @@ export default function NavigationLinkEdit( {
 				isAtMaxNesting:
 					getBlockParentsByBlockName( clientId, name ).length >=
 					MAX_NESTING,
+				// Temporary fix until navigation link submenus are properly deprecated.
 				isTopLevelLink:
-					getBlockParentsByBlockName( clientId, name ).length === 0,
+					getBlockParentsByBlockName( clientId, [
+						name,
+						'core/navigation-submenu',
+					] ).length === 0,
 				isParentOfSelectedBlock: hasSelectedInnerBlock(
 					clientId,
 					true
