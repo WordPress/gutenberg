@@ -77,8 +77,8 @@ const MediaReplaceFlow = ( {
 	};
 
 	const selectMedia = ( media ) => {
-		onSelect( media );
 		setMediaURLValue( media.url );
+		onSelect( media );
 		speak( __( 'The media file has been replaced' ) );
 		removeNotice( errorNoticeID );
 	};
