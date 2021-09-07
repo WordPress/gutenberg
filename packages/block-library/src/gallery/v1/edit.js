@@ -24,8 +24,10 @@ import {
 	ToggleControl,
 	withNotices,
 	RangeControl,
+	ToolbarButton,
 } from '@wordpress/components';
 import {
+	BlockControls,
 	MediaPlaceholder,
 	InspectorControls,
 	useBlockProps,
@@ -51,6 +53,7 @@ import {
 	LINK_DESTINATION_MEDIA,
 	LINK_DESTINATION_NONE,
 } from './constants';
+import ConvertGalleryModal from './convert-gallery-modal';
 
 const MAX_COLUMNS = 8;
 const linkOptions = [
@@ -99,10 +102,13 @@ function GalleryEdit( props ) {
 		mediaUpload,
 		getMedia,
 		wasBlockJustInserted,
+		__unstableGalleryWithImageBlocks,
 	} = useSelect( ( select ) => {
 		const settings = select( blockEditorStore ).getSettings();
 
 		return {
+			__unstableGalleryWithImageBlocks:
+				settings.__unstableGalleryWithImageBlocks,
 			imageSizes: settings.imageSizes,
 			mediaUpload: settings.mediaUpload,
 			getMedia: select( coreStore ).getMedia,
@@ -408,6 +414,10 @@ function GalleryEdit( props ) {
 		/>
 	);
 
+	const [ isConvertOpen, setConvertOpen ] = useState( false );
+	const openConvertModal = () => setConvertOpen( true );
+	const closeConvertModal = () => setConvertOpen( false );
+
 	const blockProps = useBlockProps();
 
 	if ( ! hasImages ) {
@@ -456,6 +466,23 @@ function GalleryEdit( props ) {
 					) }
 				</PanelBody>
 			</InspectorControls>
+			{ __unstableGalleryWithImageBlocks && (
+				<BlockControls group="block">
+					<ToolbarButton
+						onClick={ openConvertModal }
+						title={ __( 'Convert' ) }
+						label={ __( 'Convert to new gallery format' ) }
+					>
+						{ __( 'Convert' ) }
+					</ToolbarButton>
+				</BlockControls>
+			) }
+			{ isConvertOpen && (
+				<ConvertGalleryModal
+					onClose={ closeConvertModal }
+					clientId={ clientId }
+				/>
+			) }
 			{ noticeUI }
 			<Gallery
 				{ ...props }
