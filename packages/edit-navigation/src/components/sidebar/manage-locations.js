@@ -12,6 +12,7 @@ import {
 	SelectControl,
 } from '@wordpress/components';
 import { decodeEntities } from '@wordpress/html-entities';
+import apiFetch from '@wordpress/api-fetch';
 
 /**
  * Internal dependencies
@@ -31,6 +32,30 @@ export default function ManageLocations( {
 	const [ isModalOpen, setIsModalOpen ] = useState( false );
 	const openModal = () => setIsModalOpen( true );
 	const closeModal = () => setIsModalOpen( false );
+	const updateMenuLocations = () => {
+		const batchRequests = menus.map( ( { id } ) => {
+			const locations = menuLocations
+				.filter( ( menuLocation ) => menuLocation.menu === id )
+				.map( ( menuLocation ) => menuLocation.name );
+
+			return {
+				path: `__experimental/menus/${ id }`,
+				body: {
+					locations,
+				},
+				method: 'POST',
+			};
+		} );
+
+		apiFetch( {
+			path: 'batch/v1',
+			method: 'POST',
+			data: {
+				validation: 'require-all-validate',
+				requests: batchRequests,
+			},
+		} );
+	};
 
 	if ( ! menuLocations || ! menus?.length ) {
 		return <Spinner />;
@@ -159,6 +184,7 @@ export default function ManageLocations( {
 					<Button
 						className="edit-navigation-toolbar__save-button"
 						variant="primary"
+						onClick={ updateMenuLocations }
 					>
 						{ __( 'Save' ) }
 					</Button>
