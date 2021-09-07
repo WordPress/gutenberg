@@ -76,7 +76,9 @@ function DuotoneFilter( { selector, id, values } ) {
 				filter: unset !important; /* We need !important to overide rules that come from theme.json.*/
 			}
 		`;
-		return ( <style dangerouslySetInnerHTML={ { __html: unsetStylesheet } } /> );
+		return (
+			<style dangerouslySetInnerHTML={ { __html: unsetStylesheet } } />
+		);
 	}
 
 	const stylesheet = `
