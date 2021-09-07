@@ -155,7 +155,7 @@ function gutenberg_restore_group_inner_container( $block_content, $block ) {
 		'core/group' !== $block['blockName'] ||
 		WP_Theme_JSON_Resolver_Gutenberg::theme_has_support() ||
 		1 === preg_match( $group_with_inner_container_regex, $block_content ) ||
-		( isset( $block['attrs']['layout']['type'] ) && $block['attrs']['layout']['type'] !== 'default' )
+		( isset( $block['attrs']['layout']['type'] ) && 'default' !== $block['attrs']['layout']['type'] )
 	) {
 		return $block_content;
 	}
