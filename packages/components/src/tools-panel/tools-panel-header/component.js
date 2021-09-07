@@ -29,6 +29,7 @@ const getAriaLabel = ( label, isSelected ) => {
 
 const ToolsPanelHeader = ( props, forwardedRef ) => {
 	const {
+		dropdownMenuClassName,
 		hasMenuItems,
 		label: labelText,
 		menuItems,
@@ -51,7 +52,7 @@ const ToolsPanelHeader = ( props, forwardedRef ) => {
 				<DropdownMenu
 					icon={ moreVertical }
 					label={ labelText }
-					menuProps={ { style: { minWidth: '200px' } } }
+					menuProps={ { className: dropdownMenuClassName } }
 				>
 					{ ( { onClose } ) => (
 						<>
