@@ -10,6 +10,7 @@ For each user feature we should also add a importance categorization label  to i
 -->
 
 ## Unreleased
+-   [**] Embed block: Implemented the No Preview UI when an embed is successful, but we're unable to show an inline preview [#34626]
 
 ## 1.61.0
 -   [**] Enable embed preview for a list of providers (for now only YouTube and Twitter) [#34446]
