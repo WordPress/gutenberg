@@ -70,7 +70,7 @@ export default function Header( {
 						<ToolbarItem
 							ref={ inserterButton }
 							as={ Button }
-							className="edit-post-header-toolbar__inserter-toggle"
+							className="edit-navigation-header-toolbar__inserter-toggle"
 							isPrimary
 							isPressed={ isInserterOpened }
 							onMouseDown={ ( event ) => {
