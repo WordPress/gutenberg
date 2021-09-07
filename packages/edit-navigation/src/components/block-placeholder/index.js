@@ -13,7 +13,6 @@ import {
 	MenuItem,
 	Spinner,
 } from '@wordpress/components';
-import { useSelect } from '@wordpress/data';
 import {
 	forwardRef,
 	useCallback,
@@ -26,8 +25,7 @@ import { chevronDown } from '@wordpress/icons';
 /**
  * Internal dependencies
  */
-import { store as navigationStore } from '../../store';
-import { useMenuEntityProp } from '../../hooks';
+import { useMenuEntityProp, useSelectedMenuId } from '../../hooks';
 import useNavigationEntities from './use-navigation-entities';
 import menuItemsToBlocks from './menu-items-to-blocks';
 
@@ -58,9 +56,7 @@ function BlockPlaceholder( { onCreate }, ref ) {
 	const [ selectedMenu, setSelectedMenu ] = useState();
 	const [ isCreatingFromMenu, setIsCreatingFromMenu ] = useState( false );
 
-	const selectedMenuId = useSelect( ( select ) =>
-		select( navigationStore ).getSelectedMenuId()
-	);
+	const [ selectedMenuId ] = useSelectedMenuId();
 	const [ menuName ] = useMenuEntityProp( 'name', selectedMenuId );
 
 	const {
