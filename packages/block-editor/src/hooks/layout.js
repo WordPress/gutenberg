@@ -40,12 +40,17 @@ function LayoutPanel( { setAttributes, attributes, name: blockName } ) {
 		return getSettings().supportsLayout;
 	}, [] );
 
+	const layoutBlockSupport = getBlockSupport(
+		blockName,
+		layoutBlockSupportKey,
+		{}
+	);
 	const {
-		allowSwitching: canBlockSwitchLayout,
+		allowSwitching,
 		allowEditing = true,
 		allowInheriting = true,
 		default: defaultBlockLayout,
-	} = getBlockSupport( blockName, layoutBlockSupportKey ) || {};
+	} = layoutBlockSupport;
 
 	if ( ! allowEditing ) {
 		return null;
@@ -84,7 +89,7 @@ function LayoutPanel( { setAttributes, attributes, name: blockName } ) {
 						/>
 					) }
 
-					{ ! inherit && canBlockSwitchLayout && (
+					{ ! inherit && allowSwitching && (
 						<LayoutTypeSwitcher
 							type={ type }
 							onChange={ onChangeType }
@@ -95,14 +100,16 @@ function LayoutPanel( { setAttributes, attributes, name: blockName } ) {
 						<layoutType.inspectorControls
 							layout={ usedLayout }
 							onChange={ onChangeLayout }
+							layoutBlockSupport={ layoutBlockSupport }
 						/>
 					) }
 				</PanelBody>
 			</InspectorControls>
-			{ ! canBlockSwitchLayout && ! inherit && layoutType && (
+			{ ! inherit && layoutType && (
 				<layoutType.toolBarControls
 					layout={ usedLayout }
 					onChange={ onChangeLayout }
+					layoutBlockSupport={ layoutBlockSupport }
 				/>
 			) }
 		</>

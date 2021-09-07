@@ -38,13 +38,19 @@ export default {
 	toolBarControls: function FlexLayoutToolbarControls( {
 		layout = {},
 		onChange,
+		layoutBlockSupport,
 	} ) {
+		if ( layoutBlockSupport?.allowSwitching ) {
+			return null;
+		}
 		return (
-			<FlexLayoutJustifyContentControl
-				layout={ layout }
-				onChange={ onChange }
-				isToolbar
-			/>
+			<BlockControls group="block" __experimentalExposeToChildren>
+				<FlexLayoutJustifyContentControl
+					layout={ layout }
+					onChange={ onChange }
+					isToolbar
+				/>
+			</BlockControls>
 		);
 	},
 	save: function FlexLayoutStyle( { selector, layout } ) {
@@ -89,27 +95,25 @@ function FlexLayoutJustifyContentControl( {
 	const { justifyContent = 'left' } = layout;
 	if ( isToolbar ) {
 		return (
-			<BlockControls group="block" __experimentalExposeToChildren>
-				<JustifyContentControl
-					allowedControls={ [
-						'left',
-						'center',
-						'right',
-						'space-between',
-					] }
-					value={ justifyContent }
-					onChange={ ( value ) => {
-						onChange( {
-							...layout,
-							justifyContent: value,
-						} );
-					} }
-					popoverProps={ {
-						position: 'bottom right',
-						isAlternate: true,
-					} }
-				/>
-			</BlockControls>
+			<JustifyContentControl
+				allowedControls={ [
+					'left',
+					'center',
+					'right',
+					'space-between',
+				] }
+				value={ justifyContent }
+				onChange={ ( value ) => {
+					onChange( {
+						...layout,
+						justifyContent: value,
+					} );
+				} }
+				popoverProps={ {
+					position: 'bottom right',
+					isAlternate: true,
+				} }
+			/>
 		);
 	}
 	return (
