@@ -240,12 +240,6 @@
 		"parent": "plugin-sidebar-0"
 	},
 	{
-		"title": "Finishing Touches",
-		"slug": "plugin-sidebar-6-finishing-touches",
-		"markdown_source": "../docs/how-to-guides/sidebar-tutorial/plugin-sidebar-6-finishing-touches.md",
-		"parent": "plugin-sidebar-0"
-	},
-	{
 		"title": "Blocks",
 		"slug": "block-tutorial",
 		"markdown_source": "../docs/how-to-guides/block-tutorial/README.md",
