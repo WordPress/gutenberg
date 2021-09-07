@@ -57,7 +57,6 @@ const gutenbergFormatNamesToAztec = {
 
 const EMPTY_PARAGRAPH_TAGS = '<p></p>';
 const DEFAULT_FONT_SIZE = 16;
-const DEFAULT_LINE_HEIGHT = 1.5;
 
 export class RichText extends Component {
 	constructor( {
@@ -877,7 +876,7 @@ export class RichText extends Component {
 
 	getLineHeight() {
 		const { baseGlobalStyles } = this.props;
-		let lineHeight = DEFAULT_LINE_HEIGHT;
+		let lineHeight;
 
 		// eslint-disable-next-line no-undef
 		if ( ! __DEV__ ) {
