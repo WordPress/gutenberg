@@ -3,6 +3,10 @@
 
 // Styles for current version of gallery block.
 .wp-block-gallery.has-nested-images {
+	--gallery-block--gutter-size: var(
+		--wp--style--block-gap,
+		$blocks-block__margin
+	);
 	display: flex;
 	flex-wrap: wrap;
 	// Need bogus :not(#individual-image) to override long :not()

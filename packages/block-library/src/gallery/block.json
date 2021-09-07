@@ -100,7 +100,13 @@
 	},
 	"supports": {
 		"anchor": true,
-		"align": true
+		"align": true,
+		"spacing": {
+			"blockGap": true,
+			"__experimentalDefaultControls": {
+				"blockGap": true
+			}
+		}
 	},
 	"editorStyle": "wp-block-gallery-editor",
 	"style": "wp-block-gallery"
