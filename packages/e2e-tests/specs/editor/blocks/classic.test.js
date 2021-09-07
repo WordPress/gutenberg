@@ -27,7 +27,7 @@ describe( 'Classic', () => {
 		await insertBlock( 'Classic' );
 
 		// Ensure there is focus.
-		await page.click( '.mce-content-body' );
+		await page.focus( '.mce-content-body' );
 		await page.keyboard.type( 'test' );
 		// Move focus away.
 		await pressKeyWithModifier( 'shift', 'Tab' );
