@@ -7,7 +7,6 @@ import { v4 as uuid } from 'uuid';
 /**
  * WordPress dependencies
  */
-import { __unstableAwaitPromise } from '@wordpress/data-controls';
 import apiFetch from '@wordpress/api-fetch';
 import { addQueryArgs } from '@wordpress/url';
 
@@ -17,7 +16,6 @@ import { addQueryArgs } from '@wordpress/url';
 import { receiveItems, removeItems, receiveQueriedItems } from './queried-data';
 import { getKindEntities, DEFAULT_ENTITY_KEY } from './entities';
 import { createBatch } from './batch';
-import { getDispatch } from './controls';
 import { STORE_NAME } from './name';
 
 /**
@@ -556,13 +554,12 @@ export const saveEntityRecord = (
  * @return {Promise} A promise that resolves to an array containing the return
  *                   values of each function given in `requests`.
  */
-export function* __experimentalBatch( requests ) {
+export const __experimentalBatch = ( requests ) => async ( { dispatch } ) => {
 	const batch = createBatch();
-	const dispatch = yield getDispatch();
 	const api = {
 		saveEntityRecord( kind, name, record, options ) {
 			return batch.add( ( add ) =>
-				dispatch( STORE_NAME ).saveEntityRecord( kind, name, record, {
+				dispatch.saveEntityRecord( kind, name, record, {
 					...options,
 					__unstableFetch: add,
 				} )
@@ -570,38 +567,28 @@ export function* __experimentalBatch( requests ) {
 		},
 		saveEditedEntityRecord( kind, name, recordId, options ) {
 			return batch.add( ( add ) =>
-				dispatch( STORE_NAME ).saveEditedEntityRecord(
-					kind,
-					name,
-					recordId,
-					{
-						...options,
-						__unstableFetch: add,
-					}
-				)
+				dispatch.saveEditedEntityRecord( kind, name, recordId, {
+					...options,
+					__unstableFetch: add,
+				} )
 			);
 		},
 		deleteEntityRecord( kind, name, recordId, query, options ) {
 			return batch.add( ( add ) =>
-				dispatch( STORE_NAME ).deleteEntityRecord(
-					kind,
-					name,
-					recordId,
-					query,
-					{
-						...options,
-						__unstableFetch: add,
-					}
-				)
+				dispatch.deleteEntityRecord( kind, name, recordId, query, {
+					...options,
+					__unstableFetch: add,
+				} )
 			);
 		},
 	};
 	const resultPromises = requests.map( ( request ) => request( api ) );
-	const [ , ...results ] = yield __unstableAwaitPromise(
-		Promise.all( [ batch.run(), ...resultPromises ] )
-	);
+	const [ , ...results ] = await Promise.all( [
+		batch.run(),
+		...resultPromises,
+	] );
 	return results;
-}
+};
 
 /**
  * Action triggered to save an entity record's edits.
