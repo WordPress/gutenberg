@@ -16,7 +16,9 @@ export { metadata, name };
 
 export const settings = {
 	title: __( 'Widget Group' ),
-	description: __( 'A widget container.' ),
+	description: __(
+		'Create a classic widget layout with a title that’s styled by your theme for your widget areas.'
+	),
 	icon,
 	__experimentalLabel: ( { name: label } ) => label,
 	edit,
