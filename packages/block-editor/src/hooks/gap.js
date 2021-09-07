@@ -117,7 +117,13 @@ export function GapEdit( props ) {
 		// In Safari, changing the `gap` CSS value on its own will not trigger the layout
 		// to be recalculated / re-rendered. To force the updated gap to re-render, here
 		// we replace the block's node with itself.
-		if ( ref.current ) {
+		const isSafari =
+			window?.navigator.userAgent &&
+			window.navigator.userAgent.includes( 'Safari' ) &&
+			! window.navigator.userAgent.includes( 'Chrome ' ) &&
+			! window.navigator.userAgent.includes( 'Chromium ' );
+
+		if ( ref.current && isSafari ) {
 			ref.current.parentNode?.replaceChild( ref.current, ref.current );
 		}
 	};
