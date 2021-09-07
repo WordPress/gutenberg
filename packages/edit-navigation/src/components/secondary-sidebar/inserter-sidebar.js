@@ -12,9 +12,12 @@ import { useDispatch, useSelect } from '@wordpress/data';
  * Internal dependencies
  */
 import { store as editNavigationStore } from '../../store';
+import { useNavigationEditorInsertionPoint } from '../../hooks';
 
 function InserterSidebar() {
 	const isMobileViewport = useViewportMatch( 'medium', '<' );
+
+	const { rootClientId } = useNavigationEditorInsertionPoint();
 
 	const { isInserterOpened } = useSelect( ( select ) => {
 		return {
@@ -48,6 +51,8 @@ function InserterSidebar() {
 				<Library
 					showInserterHelpPanel
 					shouldFocusBlock={ isMobileViewport }
+					rootClientId={ rootClientId }
+					clientId={ rootClientId }
 				/>
 			</div>
 		</div>
