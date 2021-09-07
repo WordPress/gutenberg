@@ -7,27 +7,16 @@ import { find, includes, get, hasIn, compact, uniq } from 'lodash';
  * WordPress dependencies
  */
 import { addQueryArgs } from '@wordpress/url';
-import { controls } from '@wordpress/data';
-import { apiFetch } from '@wordpress/data-controls';
 import triggerFetch from '@wordpress/api-fetch';
 
 /**
  * Internal dependencies
  */
-import { regularFetch } from './controls';
 import { STORE_NAME } from './name';
 
 /**
  * Internal dependencies
  */
-import {
-	receiveUserQuery,
-	receiveCurrentTheme,
-	receiveCurrentUser,
-	receiveEntityRecords,
-	receiveThemeSupports,
-	receiveEmbedPreview,
-} from './actions';
 import { getKindEntities, DEFAULT_ENTITY_KEY } from './entities';
 import { ifNotResolved, getNormalizedCommaSeparable } from './utils';
 
@@ -37,22 +26,22 @@ import { ifNotResolved, getNormalizedCommaSeparable } from './utils';
  * @param {Object|undefined} query Optional object of query parameters to
  *                                 include with request.
  */
-export function* getAuthors( query ) {
+export const getAuthors = ( query ) => async ( { dispatch } ) => {
 	const path = addQueryArgs(
 		'/wp/v2/users/?who=authors&per_page=100',
 		query
 	);
-	const users = yield apiFetch( { path } );
-	yield receiveUserQuery( path, users );
-}
+	const users = await triggerFetch( { path } );
+	dispatch.receiveUserQuery( path, users );
+};
 
 /**
  * Requests the current user from the REST API.
  */
-export function* getCurrentUser() {
-	const currentUser = yield apiFetch( { path: '/wp/v2/users/me' } );
-	yield receiveCurrentUser( currentUser );
-}
+export const getCurrentUser = () => async ( { dispatch } ) => {
+	const currentUser = await triggerFetch( { path: '/wp/v2/users/me' } );
+	dispatch.receiveCurrentUser( currentUser );
+};
 
 /**
  * Requests an entity's record from the REST API.
@@ -247,39 +236,39 @@ getEntityRecords.shouldInvalidate = ( action, kind, name ) => {
 /**
  * Requests the current theme.
  */
-export function* getCurrentTheme() {
-	const activeThemes = yield apiFetch( {
+export const getCurrentTheme = () => async ( { dispatch } ) => {
+	const activeThemes = await triggerFetch( {
 		path: '/wp/v2/themes?status=active',
 	} );
-	yield receiveCurrentTheme( activeThemes[ 0 ] );
-}
+	dispatch.receiveCurrentTheme( activeThemes[ 0 ] );
+};
 
 /**
  * Requests theme supports data from the index.
  */
-export function* getThemeSupports() {
-	const activeThemes = yield apiFetch( {
+export const getThemeSupports = () => async ( { dispatch } ) => {
+	const activeThemes = await triggerFetch( {
 		path: '/wp/v2/themes?status=active',
 	} );
-	yield receiveThemeSupports( activeThemes[ 0 ].theme_supports );
-}
+	dispatch.receiveThemeSupports( activeThemes[ 0 ].theme_supports );
+};
 
 /**
  * Requests a preview from the from the Embed API.
  *
  * @param {string} url URL to get the preview for.
  */
-export function* getEmbedPreview( url ) {
+export const getEmbedPreview = ( url ) => async ( { dispatch } ) => {
 	try {
-		const embedProxyResponse = yield apiFetch( {
+		const embedProxyResponse = await triggerFetch( {
 			path: addQueryArgs( '/oembed/1.0/proxy', { url } ),
 		} );
-		yield receiveEmbedPreview( url, embedProxyResponse );
+		dispatch.receiveEmbedPreview( url, embedProxyResponse );
 	} catch ( error ) {
 		// Embed API 404s if the URL cannot be embedded, so we have to catch the error from the apiRequest here.
-		yield receiveEmbedPreview( url, false );
+		dispatch.receiveEmbedPreview( url, false );
 	}
-}
+};
 
 /**
  * Checks whether the current user can perform the given action on the given
@@ -399,17 +388,19 @@ export const getAutosave = ( postType, postId ) => async ( {
  *
  * @param {string} link Link.
  */
-export function* __experimentalGetTemplateForLink( link ) {
+export const __experimentalGetTemplateForLink = ( link ) => async ( {
+	dispatch,
+	resolveSelect,
+} ) => {
 	// Ideally this should be using an apiFetch call
 	// We could potentially do so by adding a "filter" to the `wp_template` end point.
 	// Also it seems the returned object is not a regular REST API post type.
 	let template;
 	try {
-		template = yield regularFetch(
-			addQueryArgs( link, {
-				'_wp-find-template': true,
-			} )
-		);
+		template = await window
+			.fetch( addQueryArgs( link, { '_wp-find-template': true } ) )
+			.then( ( res ) => res.json() )
+			.then( ( { data } ) => data );
 	} catch ( e ) {
 		// For non-FSE themes, it is possible that this request returns an error.
 	}
@@ -418,21 +409,18 @@ export function* __experimentalGetTemplateForLink( link ) {
 		return;
 	}
 
-	yield getEntityRecord( 'postType', 'wp_template', template.id );
-	const record = yield controls.select(
-		STORE_NAME,
-		'getEntityRecord',
+	const record = await resolveSelect.getEntityRecord(
 		'postType',
 		'wp_template',
 		template.id
 	);
 
 	if ( record ) {
-		yield receiveEntityRecords( 'postType', 'wp_template', [ record ], {
+		dispatch.receiveEntityRecords( 'postType', 'wp_template', [ record ], {
 			'find-template': link,
 		} );
 	}
-}
+};
 
 __experimentalGetTemplateForLink.shouldInvalidate = ( action ) => {
 	return (

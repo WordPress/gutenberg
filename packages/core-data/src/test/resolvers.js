@@ -16,7 +16,6 @@ import {
 	getAutosaves,
 	getCurrentUser,
 } from '../resolvers';
-import { receiveEmbedPreview, receiveCurrentUser } from '../actions';
 
 describe( 'getEntityRecord', () => {
 	const POST_TYPE = { slug: 'post' };
@@ -250,25 +249,34 @@ describe( 'getEmbedPreview', () => {
 	const UNEMBEDDABLE_URL = 'http://example.com/';
 
 	it( 'yields with fetched embed preview', async () => {
-		const fulfillment = getEmbedPreview( EMBEDDABLE_URL );
-		// Trigger generator
-		fulfillment.next();
-		// Provide apiFetch response and trigger Action
-		const received = ( await fulfillment.next( SUCCESSFUL_EMBED_RESPONSE ) )
-			.value;
-		expect( received ).toEqual(
-			receiveEmbedPreview( EMBEDDABLE_URL, SUCCESSFUL_EMBED_RESPONSE )
+		const dispatch = Object.assign( jest.fn(), {
+			receiveEmbedPreview: jest.fn(),
+		} );
+
+		// Provide response
+		triggerFetch.mockResolvedValue( SUCCESSFUL_EMBED_RESPONSE );
+
+		await getEmbedPreview( EMBEDDABLE_URL )( { dispatch } );
+
+		expect( dispatch.receiveEmbedPreview ).toHaveBeenCalledWith(
+			EMBEDDABLE_URL,
+			SUCCESSFUL_EMBED_RESPONSE
 		);
 	} );
 
 	it( 'yields false if the URL cannot be embedded', async () => {
-		const fulfillment = getEmbedPreview( UNEMBEDDABLE_URL );
-		// Trigger generator
-		fulfillment.next();
-		// Provide invalid response and trigger Action
-		const received = ( await fulfillment.throw( { status: 404 } ) ).value;
-		expect( received ).toEqual(
-			receiveEmbedPreview( UNEMBEDDABLE_URL, UNEMBEDDABLE_RESPONSE )
+		const dispatch = Object.assign( jest.fn(), {
+			receiveEmbedPreview: jest.fn(),
+		} );
+
+		// Provide response
+		triggerFetch.mockRejectedValue( { status: 404 } );
+
+		await getEmbedPreview( UNEMBEDDABLE_URL )( { dispatch } );
+
+		expect( dispatch.receiveEmbedPreview ).toHaveBeenCalledWith(
+			UNEMBEDDABLE_URL,
+			UNEMBEDDABLE_RESPONSE
 		);
 	} );
 } );
@@ -439,14 +447,17 @@ describe( 'getCurrentUser', () => {
 	};
 
 	it( 'yields with fetched user', async () => {
-		const fulfillment = getCurrentUser();
+		const dispatch = Object.assign( jest.fn(), {
+			receiveCurrentUser: jest.fn(),
+		} );
 
-		// Trigger generator
-		fulfillment.next();
+		// Provide response
+		triggerFetch.mockResolvedValue( SUCCESSFUL_RESPONSE );
 
-		// Provide apiFetch response and trigger Action
-		const received = ( await fulfillment.next( SUCCESSFUL_RESPONSE ) )
-			.value;
-		expect( received ).toEqual( receiveCurrentUser( SUCCESSFUL_RESPONSE ) );
+		await getCurrentUser()( { dispatch } );
+
+		expect( dispatch.receiveCurrentUser ).toHaveBeenCalledWith(
+			SUCCESSFUL_RESPONSE
+		);
 	} );
 } );
