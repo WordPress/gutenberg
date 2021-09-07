@@ -53,7 +53,7 @@ import {
 	LINK_DESTINATION_MEDIA,
 	LINK_DESTINATION_NONE,
 } from './constants';
-import ConvertGalleryModal from './convert-gallery-modal';
+import UpdateGalleryModal from './update-gallery-modal';
 
 const MAX_COLUMNS = 8;
 const linkOptions = [
@@ -414,9 +414,9 @@ function GalleryEdit( props ) {
 		/>
 	);
 
-	const [ isConvertOpen, setConvertOpen ] = useState( false );
-	const openConvertModal = () => setConvertOpen( true );
-	const closeConvertModal = () => setConvertOpen( false );
+	const [ isUpdateOpen, setUpdateOpen ] = useState( false );
+	const openUpdateModal = () => setUpdateOpen( true );
+	const closeUpdateModal = () => setUpdateOpen( false );
 
 	const blockProps = useBlockProps();
 
@@ -467,19 +467,19 @@ function GalleryEdit( props ) {
 				</PanelBody>
 			</InspectorControls>
 			{ __unstableGalleryWithImageBlocks && (
-				<BlockControls group="block">
+				<BlockControls group="other">
 					<ToolbarButton
-						onClick={ openConvertModal }
-						title={ __( 'Convert' ) }
-						label={ __( 'Convert to new gallery format' ) }
+						onClick={ openUpdateModal }
+						title={ __( 'Update' ) }
+						label={ __( 'Update to the new gallery format' ) }
 					>
-						{ __( 'Convert' ) }
+						{ __( 'Update' ) }
 					</ToolbarButton>
 				</BlockControls>
 			) }
-			{ isConvertOpen && (
-				<ConvertGalleryModal
-					onClose={ closeConvertModal }
+			{ isUpdateOpen && (
+				<UpdateGalleryModal
+					onClose={ closeUpdateModal }
 					clientId={ clientId }
 				/>
 			) }

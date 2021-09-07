@@ -16,7 +16,7 @@ import {
 	LINK_DESTINATION_MEDIA,
 } from './constants';
 
-export const convertGallery = ( {
+export const updateGallery = ( {
 	clientId,
 	getBlock,
 	replaceBlocks,
@@ -57,43 +57,44 @@ export const convertGallery = ( {
 	);
 };
 
-export default function ConvertGalleryModal( { onClose, clientId } ) {
+export default function UpdateGalleryModal( { onClose, clientId } ) {
 	const { getBlock } = useSelect( blockEditorStore );
 	const { replaceBlocks } = useDispatch( blockEditorStore );
 	return (
 		<Modal
 			closeLabel={ __( 'Close' ) }
 			onRequestClose={ onClose }
-			title={ __( 'Convert to new gallery format' ) }
-			className={ 'wp-block-convert-gallery-modal' }
+			title={ __( 'Update to new gallery format' ) }
+			className={ 'wp-block-update-gallery-modal' }
 			aria={ {
-				describedby: 'wp-block-convert-gallery-modal__description',
+				describedby: 'wp-block-update-gallery-modal__description',
 			} }
 		>
-			<p id={ 'wp-block-convert-gallery-modal__description' }>
+			<p id={ 'wp-block-update-gallery-modal__description' }>
 				{ __(
-					'You can convert this gallery block to a new format which provides more flexibility, like adding custom links, or custom styles, to individual images.'
+					'Updating to the new format adds the ability to add custom links or styles to individual images in the gallery, and makes it easier to add or move images around.'
 				) }
 			</p>
-			<p id={ 'wp-block-convert-gallery-modal__description' }>
+			<p>
 				{ __(
-					'There is no option to convert it back to the old format, so if you do not like the new format once converted just leave the post/page without saving.'
+					'There is no option to convert it back to the old format, so if there are problems with the new format once updated just leave the post/page without saving.'
 				) }
 			</p>
-			<div className="wp-block-convert-gallery-modal-buttons">
+
+			<div className="wp-block-update-gallery-modal-buttons">
 				<Button isTertiary onClick={ onClose }>
 					{ __( 'Cancel' ) }
 				</Button>
 				<Button
 					isPrimary
-					onClick={ convertGallery( {
+					onClick={ updateGallery( {
 						replaceBlocks,
 						getBlock,
 						clientId,
 						createBlock,
 					} ) }
 				>
-					{ __( 'Convert' ) }
+					{ __( 'Update' ) }
 				</Button>
 			</div>
 		</Modal>

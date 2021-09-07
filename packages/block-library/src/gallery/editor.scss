@@ -206,3 +206,15 @@ figure.wp-block-gallery {
 	// Some themes give all <ul> default margin instead of padding.
 	margin: 0;
 }
+
+.wp-block-update-gallery-modal {
+	max-width: 400px;
+	.wp-block-update-gallery-modal-buttons {
+		display: flex;
+		justify-content: flex-end;
+	
+		.components-button {
+			margin-left: $grid-unit-15;
+		}
+	}
+}
