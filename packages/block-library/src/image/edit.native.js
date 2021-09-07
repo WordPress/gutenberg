@@ -184,6 +184,17 @@ export class ImageEdit extends Component {
 				image.source_url;
 			setAttributes( { url } );
 		}
+
+		// The media has changed, and the previous media was set as Featured Image
+		const { id } = attributes;
+		const { id: previousId } = previousProps.attributes;
+		if (
+			!! id &&
+			id !== previousId &&
+			this.isFeaturedImage( previousId )
+		) {
+			setFeaturedImage( id );
+		}
 	}
 
 	static getDerivedStateFromProps( props, state ) {
@@ -501,6 +512,24 @@ export class ImageEdit extends Component {
 		return isFeaturedImage ? removeFeaturedButton() : setFeaturedButton();
 	}
 
+	canImageBeFeatured() {
+		// By default, it's only possible to set images that have been uploaded to a site's library as featured.
+		// The 'canImageBeFeatured' check filters out images that haven't been uploaded based on the following:
+		// - Images that are embedded in a post but are uploaded elsewhere have an id of 'undefined'.
+		// - Image that are uploading or have failed to upload are given a temporary negative ID.
+		const { attributes } = this.props;
+		return typeof attributes.id !== 'undefined' && attributes.id > 0;
+	}
+
+	isFeaturedImage( imageId = this.props.attributes.id ) {
+		const { featuredImageId } = this.props;
+		return (
+			this.canImageBeFeatured() &&
+			!! featuredImageId &&
+			featuredImageId === imageId
+		);
+	}
+
 	render() {
 		const { isCaptionSelected } = this.state;
 		const {
@@ -536,15 +565,8 @@ export class ImageEdit extends Component {
 			selectedSizeOption = 'full';
 		}
 
-		// By default, it's only possible to set images that have been uploaded to a site's library as featured.
-		// The 'canImageBeFeatured' check filters out images that haven't been uploaded based on the following:
-		// - Images that are embedded in a post but are uploaded elsewhere have an id of 'undefined'.
-		// - Image that are uploading or have failed to upload are given a temporary negative ID.
-		const canImageBeFeatured =
-			typeof attributes.id !== 'undefined' && attributes.id > 0;
-
-		const isFeaturedImage =
-			canImageBeFeatured && featuredImageId === attributes.id;
+		const canImageBeFeatured = this.canImageBeFeatured();
+		const isFeaturedImage = this.isFeaturedImage();
 
 		const getToolbarEditButton = ( open ) => (
 			<BlockControls>
