@@ -2,11 +2,14 @@
  * WordPress dependencies
  */
 import { NavigableToolbar } from '@wordpress/block-editor';
-import { DropdownMenu } from '@wordpress/components';
+import { DropdownMenu, Button, ToolbarItem } from '@wordpress/components';
 import { useViewportMatch } from '@wordpress/compose';
 import { PinnedItems } from '@wordpress/interface';
-import { __, sprintf } from '@wordpress/i18n';
+import { __, sprintf, _x } from '@wordpress/i18n';
 import { decodeEntities } from '@wordpress/html-entities';
+import { useRef } from '@wordpress/element';
+import { useSelect, useDispatch } from '@wordpress/data';
+import { plus } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -16,6 +19,7 @@ import UndoButton from './undo-button';
 import RedoButton from './redo-button';
 import MenuSwitcher from '../menu-switcher';
 import { useMenuEntityProp } from '../../hooks';
+import { store as editNavigationStore } from '../../store';
 
 export default function Header( {
 	isMenuSelected,
@@ -25,8 +29,18 @@ export default function Header( {
 	isPending,
 	navigationPost,
 } ) {
+	const inserterButton = useRef();
 	const isMediumViewport = useViewportMatch( 'medium' );
 	const [ menuName ] = useMenuEntityProp( 'name', selectedMenuId );
+
+	const { isInserterOpened } = useSelect( ( select ) => {
+		return {
+			isInserterOpened: select( editNavigationStore ).isInserterOpened(),
+		};
+	} );
+
+	const { setIsInserterOpened } = useDispatch( editNavigationStore );
+
 	let actionHeaderText;
 
 	if ( menuName ) {
@@ -53,6 +67,31 @@ export default function Header( {
 						className="edit-navigation-header__toolbar"
 						aria-label={ __( 'Document tools' ) }
 					>
+						<ToolbarItem
+							ref={ inserterButton }
+							as={ Button }
+							className="edit-post-header-toolbar__inserter-toggle"
+							isPrimary
+							isPressed={ isInserterOpened }
+							onMouseDown={ ( event ) => {
+								event.preventDefault();
+							} }
+							onClick={ () => {
+								if ( isInserterOpened ) {
+									// Focusing the inserter button closes the inserter popover
+									// @ts-ignore
+									inserterButton.current.focus();
+								} else {
+									setIsInserterOpened( true );
+								}
+							} }
+							icon={ plus }
+							label={ _x(
+								'Add block',
+								'Generic label for block inserter button'
+							) }
+						/>
+
 						<UndoButton />
 						<RedoButton />
 					</NavigableToolbar>
