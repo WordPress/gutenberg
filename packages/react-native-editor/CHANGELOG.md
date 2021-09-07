@@ -10,6 +10,7 @@ For each user feature we should also add a importance categorization label  to i
 -->
 
 ## Unreleased
+-   [**] Fix main toolbar initial position when RTL [#34617]
 
 ## 1.61.0
 -   [**] Enable embed preview for a list of providers (for now only YouTube and Twitter) [#34446]
