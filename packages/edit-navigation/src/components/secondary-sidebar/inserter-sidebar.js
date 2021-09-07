@@ -18,6 +18,8 @@ import { store as editNavigationStore } from '../../store';
 import { useNavigationEditorInsertionPoint } from '../../hooks';
 
 function InserterSidebar() {
+	const SHOW_PREVIEWS = false;
+
 	const isMobileViewport = useViewportMatch( 'medium', '<' );
 
 	const { rootClientId } = useNavigationEditorInsertionPoint();
@@ -54,10 +56,10 @@ function InserterSidebar() {
 			</div>
 			<div className="edit-widgets-layout__inserter-panel-content">
 				<Library
-					showInserterHelpPanel
 					shouldFocusBlock={ isMobileViewport }
 					rootClientId={ rootClientId }
 					clientId={ rootClientId }
+					showInserterHelpPanel={ SHOW_PREVIEWS }
 				/>
 			</div>
 		</div>
