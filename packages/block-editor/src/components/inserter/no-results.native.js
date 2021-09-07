@@ -1,35 +1,29 @@
 /**
  * External dependencies
  */
-import { View, Text } from 'react-native';
+import { View, Text, useColorScheme } from 'react-native';
 
 /**
  * WordPress dependencies
  */
-import { usePreferredColorSchemeStyle } from '@wordpress/compose';
+import { useModifiedStyle } from '@wordpress/compose';
 import { __ } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
  */
-import styles from './style.scss';
+import baseStyles from './style.scss';
 
 function InserterNoResults() {
+	const isDark = useColorScheme() === 'dark';
+	const styles = useModifiedStyle( baseStyles, {
+		dark: [ isDark ],
+	} );
 	const {
 		'inserter-search-no-results__container': containerStyle,
-		'inserter-search-no-results__text-primary': textPrimaryBaseStyle,
-		'inserter-search-no-results__text-primary--dark': textPrimaryDarkStyle,
-		'inserter-search-no-results__text-secondary': textSecondaryBaseStyle,
-		'inserter-search-no-results__text-secondary--dark': textSecondaryDarkStyle,
+		'inserter-search-no-results__text-primary': textPrimaryStyle,
+		'inserter-search-no-results__text-secondary': textSecondaryStyle,
 	} = styles;
-	const textPrimaryStyle = usePreferredColorSchemeStyle(
-		textPrimaryBaseStyle,
-		textPrimaryDarkStyle
-	);
-	const textSecondaryStyle = usePreferredColorSchemeStyle(
-		textSecondaryBaseStyle,
-		textSecondaryDarkStyle
-	);
 
 	return (
 		<View>
