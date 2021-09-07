@@ -94,6 +94,18 @@ function GalleryEdit( props ) {
 		blockEditorStore
 	);
 
+	// Remove the tools panel for v1 Gallery so we only have to support
+	// any new dimension settings, etc. for the new gallery format.
+	const toolsPanel = document.getElementsByClassName(
+		'components-tools-panel'
+	)[ 0 ];
+
+	useEffect( () => {
+		if ( toolsPanel && isSelected ) {
+			toolsPanel.style.display = 'none';
+		}
+	}, [ toolsPanel ] );
+
 	const {
 		imageSizes,
 		mediaUpload,
