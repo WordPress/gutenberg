@@ -52,6 +52,9 @@ function convertPagesToBlocks( pages ) {
 	);
 }
 
+const TOGGLE_PROPS = { variant: 'tertiary' };
+const POPOVER_PROPS = { position: 'bottom center' };
+
 function BlockPlaceholder( { onCreate }, ref ) {
 	const [ selectedMenu, setSelectedMenu ] = useState();
 	const [ isCreatingFromMenu, setIsCreatingFromMenu ] = useState( false );
@@ -108,10 +111,6 @@ function BlockPlaceholder( { onCreate }, ref ) {
 		}
 	}, [ isCreatingFromMenu, hasResolvedMenuItems ] );
 
-	const toggleProps = {
-		variant: 'tertiary',
-	};
-
 	const selectableMenus = menus?.filter(
 		( menu ) => menu.id !== selectedMenuId
 	);
@@ -120,21 +119,24 @@ function BlockPlaceholder( { onCreate }, ref ) {
 
 	return (
 		<Placeholder
-			className="wp-block-placeholder"
+			className="edit-navigation-block-placeholder"
 			label={ menuName }
 			instructions={ __(
 				'This menu is empty. You can start blank and choose what to add,' +
 					' add your existing pages, or add the content of another menu.'
 			) }
 		>
-			<div className="wp-block-placeholder__controls">
+			<div className="edit-navigation-block-placeholder__controls">
 				{ isLoading && (
 					<div ref={ ref }>
 						<Spinner />
 					</div>
 				) }
 				{ ! isLoading && (
-					<div ref={ ref } className="wp-block-placeholder__actions">
+					<div
+						ref={ ref }
+						className="edit-navigation-block-placeholder__actions"
+					>
 						<Button
 							variant="tertiary"
 							onClick={ onCreateEmptyMenu }
@@ -153,7 +155,8 @@ function BlockPlaceholder( { onCreate }, ref ) {
 							<DropdownMenu
 								text={ __( 'Copy existing menu' ) }
 								icon={ chevronDown }
-								toggleProps={ toggleProps }
+								toggleProps={ TOGGLE_PROPS }
+								popoverProps={ POPOVER_PROPS }
 							>
 								{ ( { onClose } ) => (
 									<MenuGroup>
