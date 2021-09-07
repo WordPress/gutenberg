@@ -58,7 +58,7 @@ function EditFormContent( { attributes, setAttributes, innerBlocks } ) {
 			<TextControl
 				label={ __( 'Title' ) }
 				placeholder={ getDefaultTitle( innerBlocks ) }
-				value={ attributes.title }
+				value={ attributes.title ?? '' }
 				onChange={ ( title ) => setAttributes( { title } ) }
 			/>
 		</div>
