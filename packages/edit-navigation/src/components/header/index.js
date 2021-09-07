@@ -1,7 +1,10 @@
 /**
  * WordPress dependencies
  */
-import { NavigableToolbar } from '@wordpress/block-editor';
+import {
+	NavigableToolbar,
+	store as blockEditorStore,
+} from '@wordpress/block-editor';
 import { DropdownMenu, Button, ToolbarItem } from '@wordpress/components';
 import { useViewportMatch } from '@wordpress/compose';
 import { PinnedItems } from '@wordpress/interface';
@@ -18,7 +21,10 @@ import SaveButton from './save-button';
 import UndoButton from './undo-button';
 import RedoButton from './redo-button';
 import MenuSwitcher from '../menu-switcher';
-import { useMenuEntityProp } from '../../hooks';
+import {
+	useMenuEntityProp,
+	useNavigationEditorInsertionPoint,
+} from '../../hooks';
 import { store as editNavigationStore } from '../../store';
 
 export default function Header( {
@@ -33,8 +39,13 @@ export default function Header( {
 	const isMediumViewport = useViewportMatch( 'medium' );
 	const [ menuName ] = useMenuEntityProp( 'name', selectedMenuId );
 
-	const { isInserterOpened } = useSelect( ( select ) => {
+	const { rootClientId } = useNavigationEditorInsertionPoint();
+
+	const { isInserterOpened, hasInserterItems } = useSelect( ( select ) => {
 		return {
+			hasInserterItems: select( blockEditorStore ).hasInserterItems(
+				rootClientId
+			),
 			isInserterOpened: select( editNavigationStore ).isInserterOpened(),
 		};
 	} );
@@ -92,6 +103,7 @@ export default function Header( {
 								'Toggle block inserter',
 								'Generic label for block inserter button'
 							) }
+							disabled={ ! hasInserterItems }
 						/>
 
 						<UndoButton />

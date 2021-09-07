@@ -3,7 +3,10 @@
  */
 import { Button } from '@wordpress/components';
 import { close } from '@wordpress/icons';
-import { __experimentalLibrary as Library } from '@wordpress/block-editor';
+import {
+	__experimentalLibrary as Library,
+	store as blockEditorStore,
+} from '@wordpress/block-editor';
 import { useViewportMatch } from '@wordpress/compose';
 import { useRef } from '@wordpress/element';
 import { useDispatch, useSelect } from '@wordpress/data';
@@ -19,8 +22,11 @@ function InserterSidebar() {
 
 	const { rootClientId } = useNavigationEditorInsertionPoint();
 
-	const { isInserterOpened } = useSelect( ( select ) => {
+	const { isInserterOpened, hasInserterItems } = useSelect( ( select ) => {
 		return {
+			hasInserterItems: select( blockEditorStore ).hasInserterItems(
+				rootClientId
+			),
 			isInserterOpened: select( editNavigationStore ).isInserterOpened(),
 		};
 	} );
@@ -30,8 +36,7 @@ function InserterSidebar() {
 	const inserterDialogRef = useRef();
 	const inserterDialogProps = {};
 
-	// Don't display if not opened.
-	if ( ! isInserterOpened ) {
+	if ( ! isInserterOpened || ! hasInserterItems ) {
 		return null;
 	}
 
