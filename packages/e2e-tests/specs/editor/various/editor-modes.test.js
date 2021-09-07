@@ -29,7 +29,7 @@ describe( 'Editing modes (visual/HTML)', () => {
 		let visualBlock = await page.$$(
 			'.block-editor-block-list__layout .block-editor-block-list__block.rich-text'
 		);
-		expect( visualBlock ).toHaveLength( 1 );
+		expect( visualBlock ).toHaveLength( 2 );
 
 		// Change editing mode from "Visual" to "HTML".
 		await clickBlockToolbarButton( 'Options' );
@@ -49,7 +49,7 @@ describe( 'Editing modes (visual/HTML)', () => {
 		visualBlock = await page.$$(
 			'.block-editor-block-list__layout .block-editor-block-list__block.rich-text'
 		);
-		expect( visualBlock ).toHaveLength( 1 );
+		expect( visualBlock ).toHaveLength( 2 );
 	} );
 
 	it( 'should display sidebar in HTML mode', async () => {
