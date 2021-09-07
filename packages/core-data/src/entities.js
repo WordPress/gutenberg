@@ -6,15 +6,13 @@ import { upperFirst, camelCase, map, find, get, startCase } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { controls } from '@wordpress/data';
-import { apiFetch } from '@wordpress/data-controls';
+import apiFetch from '@wordpress/api-fetch';
 import { __ } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
  */
 import { addEntities } from './actions';
-import { STORE_NAME } from './name';
 
 export const DEFAULT_ENTITY_KEY = 'id';
 
@@ -170,8 +168,8 @@ export const prePersistPostType = ( persistedRecord, edits ) => {
  *
  * @return {Promise} Entities promise
  */
-function* loadPostTypeEntities() {
-	const postTypes = yield apiFetch( { path: '/wp/v2/types?context=edit' } );
+async function loadPostTypeEntities() {
+	const postTypes = await apiFetch( { path: '/wp/v2/types?context=edit' } );
 	return map( postTypes, ( postType, name ) => {
 		const isTemplate = [ 'wp_template', 'wp_template_part' ].includes(
 			name
@@ -203,8 +201,8 @@ function* loadPostTypeEntities() {
  *
  * @return {Promise} Entities promise
  */
-function* loadTaxonomyEntities() {
-	const taxonomies = yield apiFetch( {
+async function loadTaxonomyEntities() {
+	const taxonomies = await apiFetch( {
 		path: '/wp/v2/taxonomies?context=edit',
 	} );
 	return map( taxonomies, ( taxonomy, name ) => {
@@ -252,12 +250,8 @@ export const getMethodName = (
  *
  * @return {Array} Entities
  */
-export function* getKindEntities( kind ) {
-	let entities = yield controls.select(
-		STORE_NAME,
-		'getEntitiesByKind',
-		kind
-	);
+export const getKindEntities = ( kind ) => async ( { select, dispatch } ) => {
+	let entities = select.getEntitiesByKind( kind );
 	if ( entities && entities.length !== 0 ) {
 		return entities;
 	}
@@ -267,8 +261,8 @@ export function* getKindEntities( kind ) {
 		return [];
 	}
 
-	entities = yield kindConfig.loadEntities();
-	yield addEntities( entities );
+	entities = await kindConfig.loadEntities();
+	dispatch( addEntities( entities ) );
 
 	return entities;
-}
+};
