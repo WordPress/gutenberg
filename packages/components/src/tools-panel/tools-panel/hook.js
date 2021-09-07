@@ -10,6 +10,17 @@ import * as styles from '../styles';
 import { useContextSystem } from '../../ui/context';
 import { useCx } from '../../utils/hooks/use-cx';
 
+const generateMenuItems = ( { panelItems, reset } ) => {
+	const menuItems = { default: {}, optional: {} };
+
+	panelItems.forEach( ( { hasValue, isShownByDefault, label } ) => {
+		const group = isShownByDefault ? 'default' : 'optional';
+		menuItems[ group ][ label ] = reset ? false : hasValue();
+	} );
+
+	return menuItems;
+};
+
 export function useToolsPanel( props ) {
 	const { className, resetAll, panelId, ...otherProps } = useContextSystem(
 		props,
@@ -86,13 +97,7 @@ export function useToolsPanel( props ) {
 
 	// Setup menuItems state as panel items register themselves.
 	useEffect( () => {
-		const items = { default: {}, optional: {} };
-
-		panelItems.forEach( ( { hasValue, isShownByDefault, label } ) => {
-			const group = isShownByDefault ? 'default' : 'optional';
-			items[ group ][ label ] = hasValue();
-		} );
-
+		const items = generateMenuItems( { panelItems, reset: false } );
 		setMenuItems( items );
 	}, [ panelItems ] );
 
@@ -124,13 +129,7 @@ export function useToolsPanel( props ) {
 		}
 
 		// Turn off display of all non-default items.
-		const resetMenuItems = { default: {}, optional: {} };
-
-		panelItems.forEach( ( { label, isShownByDefault } ) => {
-			const group = isShownByDefault ? 'default' : 'optional';
-			resetMenuItems[ group ][ label ] = false;
-		} );
-
+		const resetMenuItems = generateMenuItems( { panelItems, reset: true } );
 		setMenuItems( resetMenuItems );
 	};
 
