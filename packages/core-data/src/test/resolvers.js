@@ -16,10 +16,7 @@ import {
 	getAutosaves,
 	getCurrentUser,
 } from '../resolvers';
-import {
-	receiveEmbedPreview,
-	receiveCurrentUser,
-} from '../actions';
+import { receiveEmbedPreview, receiveCurrentUser } from '../actions';
 
 describe( 'getEntityRecord', () => {
 	const POST_TYPE = { slug: 'post' };
