@@ -202,7 +202,7 @@ export const deleteEntityRecord = (
 				method: 'DELETE',
 			} );
 
-			await dispatch( removeItems( kind, name, recordId, true ) );
+			dispatch( removeItems( kind, name, recordId, true ) );
 		} catch ( _error ) {
 			error = _error;
 		}
@@ -240,7 +240,7 @@ export const editEntityRecord = (
 	recordId,
 	edits,
 	options = {}
-) => async ( { select, dispatch } ) => {
+) => ( { select, dispatch } ) => {
 	const entity = select.getEntity( kind, name );
 	if ( ! entity ) {
 		throw new Error(
@@ -268,7 +268,7 @@ export const editEntityRecord = (
 		}, {} ),
 		transientEdits,
 	};
-	return await dispatch( {
+	dispatch( {
 		type: 'EDIT_ENTITY_RECORD',
 		...edit,
 		meta: {
@@ -369,7 +369,7 @@ export const saveEntityRecord = (
 				const evaluatedValue = value(
 					select.getEditedEntityRecord( kind, name, recordId )
 				);
-				await dispatch.editEntityRecord(
+				dispatch.editEntityRecord(
 					kind,
 					name,
 					recordId,
@@ -382,7 +382,7 @@ export const saveEntityRecord = (
 			}
 		}
 
-		await dispatch( {
+		dispatch( {
 			type: 'SAVE_ENTITY_RECORD_START',
 			kind,
 			name,
@@ -474,7 +474,7 @@ export const saveEntityRecord = (
 						},
 						{}
 					);
-					await dispatch.receiveEntityRecords(
+					dispatch.receiveEntityRecords(
 						kind,
 						name,
 						newRecord,
@@ -482,7 +482,7 @@ export const saveEntityRecord = (
 						true
 					);
 				} else {
-					await dispatch.receiveAutosaves(
+					dispatch.receiveAutosaves(
 						persistedRecord.id,
 						updatedRecord
 					);
@@ -503,7 +503,7 @@ export const saveEntityRecord = (
 					method: recordId ? 'PUT' : 'POST',
 					data: edits,
 				} );
-				await dispatch.receiveEntityRecords(
+				dispatch.receiveEntityRecords(
 					kind,
 					name,
 					updatedRecord,
@@ -526,7 +526,7 @@ export const saveEntityRecord = (
 
 		return updatedRecord;
 	} finally {
-		await dispatch.__unstableReleaseStoreLock( lock );
+		dispatch.__unstableReleaseStoreLock( lock );
 	}
 };
 
