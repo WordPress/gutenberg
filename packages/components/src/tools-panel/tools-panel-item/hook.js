@@ -69,7 +69,7 @@ export function useToolsPanelItem( props ) {
 	// Note: `label` is used as a key when building menu item state in
 	// `ToolsPanel`.
 	const menuGroup = isShownByDefault ? 'default' : 'optional';
-	const isMenuItemChecked = menuItems[ menuGroup ][ label ];
+	const isMenuItemChecked = menuItems?.[ menuGroup ]?.[ label ];
 	const wasMenuItemChecked = usePrevious( isMenuItemChecked );
 
 	// Determine if the panel item's corresponding menu is being toggled and
@@ -92,7 +92,7 @@ export function useToolsPanelItem( props ) {
 	// has a value. Optional items are shown when they are checked or have
 	// a value.
 	const isShown = isShownByDefault
-		? menuItems[ menuGroup ][ label ] !== undefined
+		? menuItems?.[ menuGroup ]?.[ label ] !== undefined
 		: isMenuItemChecked;
 
 	return {
