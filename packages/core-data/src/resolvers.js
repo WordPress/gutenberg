@@ -13,10 +13,6 @@ import apiFetch from '@wordpress/api-fetch';
  * Internal dependencies
  */
 import { STORE_NAME } from './name';
-
-/**
- * Internal dependencies
- */
 import { getKindEntities, DEFAULT_ENTITY_KEY } from './entities';
 import { ifNotResolved, getNormalizedCommaSeparable } from './utils';
 
@@ -131,14 +127,6 @@ export const getEditedEntityRecord = ifNotResolved(
 	getRawEntityRecord,
 	'getRawEntityRecord'
 );
-
-/**
- * Requests the entity's records from the REST API.
- *
- * @param {string}  kind  Entity kind.
- * @param {string}  name  Entity name.
- * @param {Object?} query Query Object.
- */
 
 /**
  * Requests the entity's records from the REST API.
