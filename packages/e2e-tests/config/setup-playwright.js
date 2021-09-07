@@ -59,10 +59,10 @@ beforeAll( async () => {
 	page.cookies = () => page.context().cookies();
 
 	// Initialize the environment
-	await setupBrowser();
-	await enablePageDialogAccept();
+	enablePageDialogAccept();
+	await activateTheme( 'twentytwentyone' );
 	await trashExistingPosts();
-	await activateTheme( 'twentytwenty' );
+	await setupBrowser();
 
 	// Deactivate the plugin that disables the CSS animations in case it's enabled
 	// (it is enabled for Puppeteer tests). We don't need to disable any
