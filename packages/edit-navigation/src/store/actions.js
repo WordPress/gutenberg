@@ -9,23 +9,14 @@ import { invert, omit } from 'lodash';
 import { __, sprintf } from '@wordpress/i18n';
 import { store as noticesStore } from '@wordpress/notices';
 import { serialize } from '@wordpress/blocks';
+import apiFetch from '@wordpress/api-fetch';
 
 /**
  * Internal dependencies
  */
-import {
-	getMenuItemToClientIdMapping,
-	resolveMenuItems,
-	dispatch as registryDispatch,
-	select as registrySelect,
-	apiFetch as apiFetchControl,
-} from './controls';
+import { STORE_NAME } from './constants';
 import { NAVIGATION_POST_KIND, NAVIGATION_POST_POST_TYPE } from '../constants';
-import {
-	menuItemsQuery,
-	serializeProcessing,
-	blockAttributesToMenuItem,
-} from './utils';
+import { menuItemsQuery, blockAttributesToMenuItem } from './utils';
 
 /**
  * Returns an action object used to select menu.
@@ -47,47 +38,62 @@ export function setSelectedMenuId( menuId ) {
  * @param {Object} post A navigation post to process
  * @return {Function} An action creator
  */
-export const createMissingMenuItems = serializeProcessing( function* ( post ) {
+export const createMissingMenuItems = ( post ) => async ( {
+	dispatch,
+	registry,
+} ) => {
 	const menuId = post.meta.menuId;
+	// @TODO: extract locks to a separate package?
+	const lock = await registry
+		.dispatch( 'core' )
+		.__unstableAcquireStoreLock( STORE_NAME, [ 'savingMenu' ], {
+			exclusive: false,
+		} );
+	try {
+		const mapping = await getMenuItemToClientIdMapping( registry, post.id );
+		const clientIdToMenuId = invert( mapping );
 
-	const mapping = yield getMenuItemToClientIdMapping( post.id );
-	const clientIdToMenuId = invert( mapping );
+		const stack = [ post.blocks[ 0 ] ];
+		while ( stack.length ) {
+			const block = stack.pop();
+			if ( ! ( block.clientId in clientIdToMenuId ) ) {
+				const menuItem = await apiFetch( {
+					path: `/__experimental/menu-items`,
+					method: 'POST',
+					data: {
+						title: 'Placeholder',
+						url: 'Placeholder',
+						menu_order: 0,
+					},
+				} );
 
-	const stack = [ post.blocks[ 0 ] ];
-	while ( stack.length ) {
-		const block = stack.pop();
-		if ( ! ( block.clientId in clientIdToMenuId ) ) {
-			const menuItem = yield apiFetchControl( {
-				path: `/__experimental/menu-items`,
-				method: 'POST',
-				data: {
-					title: 'Placeholder',
-					url: 'Placeholder',
-					menu_order: 1,
-				},
-			} );
+				mapping[ menuItem.id ] = block.clientId;
+				const menuItems = await registry
+					.resolveSelect( 'core' )
+					.getMenuItems( { menus: menuId, per_page: -1 } );
 
-			mapping[ menuItem.id ] = block.clientId;
-			const menuItems = yield resolveMenuItems( menuId );
-			yield registryDispatch(
-				'core',
-				'receiveEntityRecords',
-				'root',
-				'menuItem',
-				[ ...menuItems, menuItem ],
-				menuItemsQuery( menuId ),
-				false
-			);
+				await registry
+					.dispatch( 'core' )
+					.receiveEntityRecords(
+						'root',
+						'menuItem',
+						[ ...menuItems, menuItem ],
+						menuItemsQuery( menuId ),
+						false
+					);
+			}
+			stack.push( ...block.innerBlocks );
 		}
-		stack.push( ...block.innerBlocks );
-	}
 
-	yield {
-		type: 'SET_MENU_ITEM_TO_CLIENT_ID_MAPPING',
-		postId: post.id,
-		mapping,
-	};
-} );
+		dispatch( {
+			type: 'SET_MENU_ITEM_TO_CLIENT_ID_MAPPING',
+			postId: post.id,
+			mapping,
+		} );
+	} finally {
+		await registry.dispatch( 'core' ).__unstableReleaseStoreLock( lock );
+	}
+};
 
 /**
  * Converts all the blocks into menu items and submits a batch request to save everything at once.
@@ -95,66 +101,58 @@ export const createMissingMenuItems = serializeProcessing( function* ( post ) {
  * @param {Object} post A navigation post to process
  * @return {Function} An action creator
  */
-export const saveNavigationPost = serializeProcessing( function* ( post ) {
-	const menuId = post.meta.menuId;
-	const menuItemsByClientId = mapMenuItemsByClientId(
-		yield resolveMenuItems( menuId ),
-		yield getMenuItemToClientIdMapping( post.id )
-	);
-
+export const saveNavigationPost = ( post ) => async ( {
+	registry,
+	dispatch,
+} ) => {
+	const lock = await registry
+		.dispatch( 'core' )
+		.__unstableAcquireStoreLock( STORE_NAME, [ 'savingMenu' ], {
+			exclusive: true,
+		} );
 	try {
-		// Save edits to the menu, like the menu name.
-		yield registryDispatch(
-			'core',
-			'saveEditedEntityRecord',
-			'root',
-			'menu',
-			menuId
+		const menuId = post.meta.menuId;
+		const menuItems = await registry
+			.resolveSelect( 'core' )
+			.getMenuItems( { menus: menuId, per_page: -1 } );
+
+		const menuItemsByClientId = mapMenuItemsByClientId(
+			menuItems,
+			getMenuItemToClientIdMapping( registry, post.id )
 		);
 
-		const error = yield registrySelect(
-			'core',
-			'getLastEntitySaveError',
-			'root',
-			'menu',
-			menuId
-		);
+		await registry
+			.dispatch( 'core' )
+			.saveEditedEntityRecord( 'root', 'menu', menuId );
+
+		const error = registry
+			.select( 'core' )
+			.getLastEntitySaveError( 'root', 'menu', menuId );
 
 		if ( error ) {
 			throw new Error( error.message );
 		}
 
-		// saveEntityRecord for each menu item with block-based data
-		// saveEntityRecord for each deleted menu item
 		// Save blocks as menu items.
-		const batchSaveResponse = yield* batchSave(
-			menuId,
-			menuItemsByClientId,
-			post.blocks[ 0 ]
+		await dispatch(
+			batchSave( menuId, menuItemsByClientId, post.blocks[ 0 ] )
 		);
-
-		if ( ! batchSaveResponse.success ) {
-			throw new Error( batchSaveResponse.data.message );
-		}
 
 		// Clear "stub" navigation post edits to avoid a false "dirty" state.
-		yield registryDispatch(
-			'core',
-			'receiveEntityRecords',
-			NAVIGATION_POST_KIND,
-			NAVIGATION_POST_POST_TYPE,
-			[ post ],
-			undefined
-		);
+		await registry
+			.dispatch( 'core' )
+			.receiveEntityRecords(
+				NAVIGATION_POST_KIND,
+				NAVIGATION_POST_POST_TYPE,
+				[ post ],
+				undefined
+			);
 
-		yield registryDispatch(
-			noticesStore,
-			'createSuccessNotice',
-			__( 'Navigation saved.' ),
-			{
+		await registry
+			.dispatch( noticesStore )
+			.createSuccessNotice( __( 'Navigation saved.' ), {
 				type: 'snackbar',
-			}
-		);
+			} );
 	} catch ( saveError ) {
 		const errorMessage = saveError
 			? sprintf(
@@ -162,17 +160,19 @@ export const saveNavigationPost = serializeProcessing( function* ( post ) {
 					__( "Unable to save: '%s'" ),
 					saveError.message
 			  )
-			: __( 'Unable to save: An error ocurred.' );
-		yield registryDispatch(
-			noticesStore,
-			'createErrorNotice',
-			errorMessage,
-			{
+			: __( 'Unable to save: An error o1curred.' );
+		await registry
+			.dispatch( noticesStore )
+			.createErrorNotice( errorMessage, {
 				type: 'snackbar',
-			}
-		);
+			} );
+	} finally {
+		await registry.dispatch( 'core' ).__unstableReleaseStoreLock( lock );
 	}
-} );
+};
+
+const getMenuItemToClientIdMapping = ( registry, postId ) =>
+	registry.stores[ STORE_NAME ].store.getState().mapping[ postId ] || {};
 
 function mapMenuItemsByClientId( menuItems, clientIdsByMenuId ) {
 	const result = {};
@@ -188,57 +188,68 @@ function mapMenuItemsByClientId( menuItems, clientIdsByMenuId ) {
 	return result;
 }
 
-function* batchSave( menuId, menuItemsByClientId, navigationBlock ) {
+// saveEntityRecord for each menu item with block-based data
+// saveEntityRecord for each deleted menu item
+const batchSave = ( menuId, menuItemsByClientId, navigationBlock ) => async ( {
+	registry,
+} ) => {
 	const blocksList = blocksTreeToFlatList( navigationBlock.innerBlocks );
 
 	const batchTasks = [];
+
+	// Compute deletes
+	const clientIdToBlockId = Object.fromEntries(
+		blocksList.map( ( { block } ) => [
+			block.clientId,
+			getMenuItemForBlock( block ).id,
+		] )
+	);
+	const deletedMenuItems = [];
+	for ( const clientId in menuItemsByClientId ) {
+		if ( ! ( clientId in clientIdToBlockId ) ) {
+			deletedMenuItems.push( menuItemsByClientId[ clientId ].id );
+		}
+	}
+
 	// Enqueue updates
 	for ( const { block, parentId, position } of blocksList ) {
 		const menuItem = getMenuItemForBlock( block );
+		if ( deletedMenuItems.includes( menuItem.id ) ) {
+			continue;
+		}
 
 		// Update an existing navigation item.
-		yield registryDispatch(
-			'core',
-			'editEntityRecord',
-			'root',
-			'menuItem',
-			menuItem.id,
-			blockToEntityRecord( block, parentId, position ),
-			{ undoIgnore: true }
-		);
+		await registry
+			.dispatch( 'core' )
+			.editEntityRecord(
+				'root',
+				'menuItem',
+				menuItem.id,
+				blockToEntityRecord( block, parentId, position ),
+				{ undoIgnore: true }
+			);
 
-		const hasEdits = yield registrySelect(
-			'core',
-			'hasEditsForEntityRecord',
-			'root',
-			'menuItem',
-			menuItem.id
-		);
+		const hasEdits = registry
+			.select( 'core' )
+			.hasEditsForEntityRecord( 'root', 'menuItem', menuItem.id );
 
 		if ( ! hasEdits ) {
 			continue;
 		}
 
-		batchTasks.push( ( { saveEditedEntityRecord } ) =>
+		batchTasks.unshift( ( { saveEditedEntityRecord } ) =>
 			saveEditedEntityRecord( 'root', 'menuItem', menuItem.id )
 		);
 	}
-	return yield registryDispatch( 'core', '__experimentalBatch', batchTasks );
 
 	// Enqueue deletes
-	// @TODO
+	for ( const menuItemId of deletedMenuItems ) {
+		batchTasks.unshift( ( { deleteEntityRecord } ) =>
+			deleteEntityRecord( 'root', 'menuItem', menuItemId )
+		);
+	}
 
-	// Create an object like { "nav_menu_item[12]": {...}} }
-	// const computeKey = ( item ) => `nav_menu_item[${ item.id }]`;
-	// const dataObject = keyBy( dataList, computeKey );
-	//
-	// // Deleted menu items should be sent as false, e.g. { "nav_menu_item[13]": false }
-	// for ( const clientId in menuItemsByClientId ) {
-	// 	const key = computeKey( menuItemsByClientId[ clientId ] );
-	// 	if ( ! ( key in dataObject ) ) {
-	// 		dataObject[ key ] = false;
-	// 	}
-	// }
+	return await registry.dispatch( 'core' ).__experimentalBatch( batchTasks );
 
 	function blockToEntityRecord( block, parentId, position ) {
 		const menuItem = omit( getMenuItemForBlock( block ), 'menus', 'meta' );
@@ -279,7 +290,7 @@ function* batchSave( menuId, menuItemsByClientId, navigationBlock ) {
 	function getMenuItemForBlock( block ) {
 		return omit( menuItemsByClientId[ block.clientId ] || {}, '_links' );
 	}
-}
+};
 
 /**
  * Returns an action object used to open/close the inserter.
