@@ -275,8 +275,6 @@ describe( 'undo', () => {
 			await page.$( '.editor-history__undo[aria-disabled="true"]' )
 		).not.toBeNull();
 
-		await page.focus( '.block-editor-writing-flow' );
-
 		await pressKeyWithModifier( 'primaryShift', 'z' ); // Redo 1st block.
 
 		expect( await getEditedPostContent() ).toBe( firstBlock );
