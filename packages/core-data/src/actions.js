@@ -8,7 +8,7 @@ import { v4 as uuid } from 'uuid';
  * WordPress dependencies
  */
 import { __unstableAwaitPromise } from '@wordpress/data-controls';
-import triggerFetch from '@wordpress/api-fetch';
+import apiFetch from '@wordpress/api-fetch';
 import { addQueryArgs } from '@wordpress/url';
 
 /**
@@ -168,7 +168,7 @@ export const deleteEntityRecord = (
 	name,
 	recordId,
 	query,
-	{ __unstableFetch = triggerFetch } = {}
+	{ __unstableFetch = apiFetch } = {}
 ) => async ( { dispatch } ) => {
 	const entities = await dispatch( getKindEntities( kind ) );
 	const entity = find( entities, { kind, name } );
@@ -347,7 +347,7 @@ export const saveEntityRecord = (
 	kind,
 	name,
 	record,
-	{ isAutosave = false, __unstableFetch = triggerFetch } = {}
+	{ isAutosave = false, __unstableFetch = apiFetch } = {}
 ) => async ( { select, resolveSelect, dispatch } ) => {
 	const entities = await dispatch( getKindEntities( kind ) );
 	const entity = find( entities, { kind, name } );
