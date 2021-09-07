@@ -151,11 +151,11 @@ add_filter( 'render_block', 'gutenberg_render_layout_support_flag', 10, 2 );
  */
 function gutenberg_restore_group_inner_container( $block_content, $block ) {
 	$group_with_inner_container_regex = '/(^\s*<div\b[^>]*wp-block-group(\s|")[^>]*>)(\s*<div\b[^>]*wp-block-group__inner-container(\s|")[^>]*>)((.|\S|\s)*)/';
-
 	if (
 		'core/group' !== $block['blockName'] ||
 		WP_Theme_JSON_Resolver_Gutenberg::theme_has_support() ||
-		1 === preg_match( $group_with_inner_container_regex, $block_content )
+		1 === preg_match( $group_with_inner_container_regex, $block_content ) ||
+		( isset( $block['attrs']['layout']['type'] ) && $block['attrs']['layout']['type'] !== 'default' )
 	) {
 		return $block_content;
 	}
@@ -171,7 +171,8 @@ function gutenberg_restore_group_inner_container( $block_content, $block ) {
 	return $updated_content;
 }
 
-// This can be removed when plugin support requires WordPress 5.8.0+.
-if ( ! function_exists( 'wp_restore_group_inner_container' ) ) {
-	add_filter( 'render_block', 'gutenberg_restore_group_inner_container', 10, 2 );
+if ( function_exists( 'wp_restore_group_inner_container' ) ) {
+	remove_filter( 'render_block', 'wp_restore_group_inner_container', 10, 2 );
 }
+add_filter( 'render_block', 'gutenberg_restore_group_inner_container', 10, 2 );
+

@@ -28,10 +28,12 @@ function GroupEdit( { attributes, setAttributes, clientId } ) {
 	const defaultLayout = useSetting( 'layout' ) || {};
 	const { tagName: TagName = 'div', templateLock, layout = {} } = attributes;
 	const usedLayout = !! layout && layout.inherit ? defaultLayout : layout;
+	const { type = 'default' } = usedLayout;
+	const layoutSupportEnabled = themeSupportsLayout || type !== 'default';
 
 	const blockProps = useBlockProps();
 	const innerBlocksProps = useInnerBlocksProps(
-		themeSupportsLayout
+		layoutSupportEnabled
 			? blockProps
 			: { className: 'wp-block-group__inner-container' },
 		{
@@ -39,7 +41,7 @@ function GroupEdit( { attributes, setAttributes, clientId } ) {
 			renderAppender: hasInnerBlocks
 				? undefined
 				: InnerBlocks.ButtonBlockAppender,
-			__experimentalLayout: themeSupportsLayout ? usedLayout : undefined,
+			__experimentalLayout: layoutSupportEnabled ? usedLayout : undefined,
 		}
 	);
 
@@ -63,10 +65,10 @@ function GroupEdit( { attributes, setAttributes, clientId } ) {
 					}
 				/>
 			</InspectorControls>
-			{ themeSupportsLayout && <TagName { ...innerBlocksProps } /> }
+			{ layoutSupportEnabled && <TagName { ...innerBlocksProps } /> }
 			{ /* Ideally this is not needed but it's there for backward compatibility reason
 				to keep this div for themes that might rely on its presence */ }
-			{ ! themeSupportsLayout && (
+			{ ! layoutSupportEnabled && (
 				<TagName { ...blockProps }>
 					<div { ...innerBlocksProps } />
 				</TagName>
