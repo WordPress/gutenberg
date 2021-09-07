@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { check, minus, moreVertical } from '@wordpress/icons';
+import { checkSmall, reset, moreVertical } from '@wordpress/icons';
 import { __, sprintf } from '@wordpress/i18n';
 
 /**
@@ -21,7 +21,7 @@ const DefaultControlsGroup = ( { items, onClose, toggleItem } ) => {
 	return (
 		<MenuGroup>
 			{ items.map( ( [ label, hasValue ] ) => {
-				const icon = hasValue ? minus : check;
+				const icon = hasValue ? reset : checkSmall;
 				const itemLabel = hasValue
 					? sprintf(
 							// translators: %s: The name of the control being reset e.g. "Padding".
@@ -74,7 +74,7 @@ const OptionalControlsGroup = ( { items, onClose, toggleItem } ) => {
 				return (
 					<MenuItem
 						key={ label }
-						icon={ isSelected && check }
+						icon={ isSelected && checkSmall }
 						isSelected={ isSelected }
 						label={ itemLabel }
 						onClick={ () => {
