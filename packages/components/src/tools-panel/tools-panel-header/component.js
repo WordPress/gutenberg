@@ -13,18 +13,82 @@ import MenuItem from '../../menu-item';
 import { useToolsPanelHeader } from './hook';
 import { contextConnect } from '../../ui/context';
 
-const getAriaLabel = ( label, isSelected ) => {
-	return isSelected
-		? sprintf(
-				// translators: %s: The name of the control being hidden and reset e.g. "Padding".
-				__( 'Hide and reset %s' ),
-				label
-		  )
-		: sprintf(
-				// translators: %s: The name of the control to display e.g. "Padding".
-				__( 'Show %s' ),
-				label
-		  );
+const DefaultControlsGroup = ( { items, onClose, toggleItem } ) => {
+	if ( ! items.length ) {
+		return null;
+	}
+
+	return (
+		<MenuGroup>
+			{ items.map( ( [ label, hasValue ] ) => {
+				const icon = hasValue ? minus : check;
+				const itemLabel = hasValue
+					? sprintf(
+							// translators: %s: The name of the control being reset e.g. "Padding".
+							__( 'Reset %s' ),
+							label
+					  )
+					: undefined;
+
+				return (
+					<MenuItem
+						key={ label }
+						icon={ icon }
+						isSelected={ true }
+						disabled={ ! hasValue }
+						label={ itemLabel }
+						onClick={ () => {
+							toggleItem( label );
+							onClose();
+						} }
+						role="menuitemcheckbox"
+					>
+						{ label }
+					</MenuItem>
+				);
+			} ) }
+		</MenuGroup>
+	);
+};
+
+const OptionalControlsGroup = ( { items, onClose, toggleItem } ) => {
+	if ( ! items.length ) {
+		return null;
+	}
+
+	return (
+		<MenuGroup>
+			{ items.map( ( [ label, isSelected ] ) => {
+				const itemLabel = isSelected
+					? sprintf(
+							// translators: %s: The name of the control being hidden and reset e.g. "Padding".
+							__( 'Hide and reset %s' ),
+							label
+					  )
+					: sprintf(
+							// translators: %s: The name of the control to display e.g. "Padding".
+							__( 'Show %s' ),
+							label
+					  );
+
+				return (
+					<MenuItem
+						key={ label }
+						icon={ isSelected && check }
+						isSelected={ isSelected }
+						label={ itemLabel }
+						onClick={ () => {
+							toggleItem( label );
+							onClose();
+						} }
+						role="menuitemcheckbox"
+					>
+						{ label }
+					</MenuItem>
+				);
+			} ) }
+		</MenuGroup>
+	);
 };
 
 const ToolsPanelHeader = ( props, forwardedRef ) => {
@@ -56,70 +120,16 @@ const ToolsPanelHeader = ( props, forwardedRef ) => {
 				>
 					{ ( { onClose } ) => (
 						<>
-							{ !! defaultItems?.length && (
-								<MenuGroup>
-									{ defaultItems.map(
-										( [ label, hasValue ] ) => {
-											const icon = hasValue
-												? minus
-												: check;
-
-											const itemLabel = hasValue
-												? sprintf(
-														// translators: %s: The name of the control being reset e.g. "Padding".
-														__( 'Reset %s' ),
-														label
-												  )
-												: undefined;
-
-											return (
-												<MenuItem
-													key={ label }
-													icon={ icon }
-													isSelected={ true }
-													disabled={ ! hasValue }
-													label={ itemLabel }
-													onClick={ () => {
-														toggleItem( label );
-														onClose();
-													} }
-													role="menuitemcheckbox"
-												>
-													{ label }
-												</MenuItem>
-											);
-										}
-									) }
-								</MenuGroup>
-							) }
-							{ !! optionalItems?.length && (
-								<MenuGroup>
-									{ optionalItems.map(
-										( [ label, isSelected ] ) => {
-											const itemLabel = getAriaLabel(
-												label,
-												isSelected
-											);
-
-											return (
-												<MenuItem
-													key={ label }
-													icon={ isSelected && check }
-													isSelected={ isSelected }
-													label={ itemLabel }
-													onClick={ () => {
-														toggleItem( label );
-														onClose();
-													} }
-													role="menuitemcheckbox"
-												>
-													{ label }
-												</MenuItem>
-											);
-										}
-									) }
-								</MenuGroup>
-							) }
+							<DefaultControlsGroup
+								items={ defaultItems }
+								onClose={ onClose }
+								toggleItem={ toggleItem }
+							/>
+							<OptionalControlsGroup
+								items={ optionalItems }
+								onClose={ onClose }
+								toggleItem={ toggleItem }
+							/>
 							<MenuGroup>
 								<MenuItem
 									variant={ 'tertiary' }
