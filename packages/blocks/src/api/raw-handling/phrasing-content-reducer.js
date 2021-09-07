@@ -56,5 +56,18 @@ export default function phrasingContentReducer( node, doc ) {
 			node.removeAttribute( 'target' );
 			node.removeAttribute( 'rel' );
 		}
+
+		// Saves anchor elements name attribute as id
+		if ( node.name && ! node.id ) {
+			node.id = node.name;
+		}
+
+		// Keeps id only if there is an internal link pointing to it
+		if (
+			node.id &&
+			! node.ownerDocument.querySelector( `[href="#${ node.id }"]` )
+		) {
+			node.removeAttribute( 'id' );
+		}
 	}
 }
