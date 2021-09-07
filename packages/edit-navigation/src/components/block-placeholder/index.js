@@ -76,7 +76,7 @@ function BlockPlaceholder( { onCreate }, ref ) {
 		const { innerBlocks: blocks } = menuItemsToBlocks( menuItems );
 		const selectNavigationBlock = true;
 		onCreate( blocks, selectNavigationBlock );
-	} );
+	}, [ menuItems, menuItemsToBlocks, onCreate ] );
 
 	const onCreateFromMenu = () => {
 		// If we have menu items, create the block right away.
