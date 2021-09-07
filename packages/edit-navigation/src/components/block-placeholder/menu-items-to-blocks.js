@@ -6,12 +6,6 @@ import { sortBy } from 'lodash';
 /**
  * WordPress dependencies
  */
-/**
- * WordPress dependencies
- */
-/**
- * WordPress dependencies
- */
 import { createBlock } from '@wordpress/blocks';
 
 /**
