@@ -3,6 +3,16 @@
  */
 import { useMemo, useState } from '@wordpress/element';
 
+/**
+ * Keeps track of images already in the gallery to allow new innerBlocks to be identified. This
+ * is required so default gallery attributes can be applied without overwriting any custom
+ * attributes applied to existing images.
+ *
+ * @param {Array} images    Basic image block data taken from current gallery innerBlock
+ * @param {Array} imageData The related image data for each of the current gallery images.
+ *
+ * @return {Array} An array of any new images that have been added to the gallery.
+ */
 export default function useGetNewImages( images, imageData ) {
 	const [ currentImages, setCurrentImages ] = useState( [] );
 
