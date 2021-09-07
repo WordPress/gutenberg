@@ -20,7 +20,6 @@ import {
 import {
 	receiveEmbedPreview,
 	receiveUserPermission,
-	receiveAutosaves,
 	receiveCurrentUser,
 } from '../actions';
 
@@ -392,28 +391,31 @@ describe( 'getAutosaves', () => {
 		},
 	];
 
+	beforeEach( async () => {
+		triggerFetch.mockReset();
+	} );
+
 	it( 'yields with fetched autosaves', async () => {
 		const postType = 'post';
 		const postId = 1;
 		const restBase = 'posts';
 		const postEntity = { rest_base: restBase };
-		const fulfillment = getAutosaves( postType, postId );
 
-		// Trigger generator
-		fulfillment.next();
+		triggerFetch.mockImplementation( () => SUCCESSFUL_RESPONSE );
+		const dispatch = Object.assign( jest.fn(), {
+			receiveAutosaves: jest.fn(),
+		} );
+		const resolveSelect = Object.assign( jest.fn(), {
+			getPostType: jest.fn( () => postEntity ),
+		} );
+		await getAutosaves( postType, postId )( { dispatch, resolveSelect } );
 
-		// Trigger generator with the postEntity and assert that correct path is formed
-		// in the apiFetch request.
-		const { value: apiFetchAction } = fulfillment.next( postEntity );
-		expect( apiFetchAction.request ).toEqual( {
+		expect( triggerFetch ).toHaveBeenCalledWith( {
 			path: `/wp/v2/${ restBase }/${ postId }/autosaves?context=edit`,
 		} );
-
-		// Provide apiFetch response and trigger Action
-		const received = ( await fulfillment.next( SUCCESSFUL_RESPONSE ) )
-			.value;
-		expect( received ).toEqual(
-			receiveAutosaves( 1, SUCCESSFUL_RESPONSE )
+		expect( dispatch.receiveAutosaves ).toHaveBeenCalledWith(
+			1,
+			SUCCESSFUL_RESPONSE
 		);
 	} );
 
@@ -422,21 +424,20 @@ describe( 'getAutosaves', () => {
 		const postId = 1;
 		const restBase = 'posts';
 		const postEntity = { rest_base: restBase };
-		const fulfillment = getAutosaves( postType, postId );
 
-		// Trigger generator
-		fulfillment.next();
+		triggerFetch.mockImplementation( () => [] );
+		const dispatch = Object.assign( jest.fn(), {
+			receiveAutosaves: jest.fn(),
+		} );
+		const resolveSelect = Object.assign( jest.fn(), {
+			getPostType: jest.fn( () => postEntity ),
+		} );
+		await getAutosaves( postType, postId )( { dispatch, resolveSelect } );
 
-		// Trigger generator with the postEntity and assert that correct path is formed
-		// in the apiFetch request.
-		const { value: apiFetchAction } = fulfillment.next( postEntity );
-		expect( apiFetchAction.request ).toEqual( {
+		expect( triggerFetch ).toHaveBeenCalledWith( {
 			path: `/wp/v2/${ restBase }/${ postId }/autosaves?context=edit`,
 		} );
-
-		// Provide apiFetch response and trigger Action
-		const received = ( await fulfillment.next( [] ) ).value;
-		expect( received ).toBeUndefined();
+		expect( dispatch.receiveAutosaves ).not.toHaveBeenCalled();
 	} );
 } );
 
