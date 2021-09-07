@@ -141,6 +141,7 @@ export { default as ToolbarItem } from './toolbar-item';
 export {
 	ToolsPanel as __experimentalToolsPanel,
 	ToolsPanelItem as __experimentalToolsPanelItem,
+	ToolsPanelContext as __experimentalToolsPanelContext,
 } from './tools-panel';
 export { default as Tooltip } from './tooltip';
 export {
