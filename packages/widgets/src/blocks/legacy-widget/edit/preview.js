@@ -123,6 +123,7 @@ export default function Preview( { idBase, instance, isVisible } ) {
 					<iframe
 						ref={ ref }
 						className="wp-block-legacy-widget__edit-preview-iframe"
+						tabIndex="-1"
 						title={ __( 'Legacy Widget Preview' ) }
 						srcDoc={ srcDoc }
 						onLoad={ ( event ) => {
