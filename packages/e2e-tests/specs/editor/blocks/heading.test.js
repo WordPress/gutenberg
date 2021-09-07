@@ -29,7 +29,7 @@ describe( 'Heading', () => {
 	it( 'can be created by prefixing existing content with number signs and a space', async () => {
 		await clickBlockAppender();
 		await page.keyboard.type( '4' );
-		await page.keyboard.press( 'Home' );
+		await page.keyboard.press( 'ArrowLeft' );
 		await page.keyboard.type( '#### ' );
 
 		await page.waitForSelector( 'h4:text-is("4")' );
