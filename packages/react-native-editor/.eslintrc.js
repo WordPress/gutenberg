@@ -1,5 +1,8 @@
 module.exports = {
-	parser: 'babel-eslint',
+	parser: '@babel/eslint-parser',
+	parserOptions: {
+		classProperties: true,
+	},
 	env: {
 		browser: true,
 		'jest/globals': true,

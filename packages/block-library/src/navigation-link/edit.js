@@ -46,7 +46,7 @@ import { store as coreStore } from '@wordpress/core-data';
  * Internal dependencies
  */
 import { ItemSubmenuIcon } from './icons';
-import { name } from './block.json';
+import { name } from './block.json' assert { type: 'json' };
 
 const ALLOWED_BLOCKS = [ 'core/navigation-link' ];
 

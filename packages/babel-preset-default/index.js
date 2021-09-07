@@ -70,6 +70,7 @@ module.exports = ( api ) => {
 			require.resolve( '@babel/preset-typescript' ),
 		],
 		plugins: [
+			require.resolve( '@babel/plugin-syntax-import-assertions' ),
 			require.resolve( '@wordpress/warning/babel-plugin' ),
 			[
 				require.resolve( '@wordpress/babel-plugin-import-jsx-pragma' ),
