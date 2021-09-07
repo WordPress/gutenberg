@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { createBlock } from '@wordpress/blocks';
+import { createBlock, rawHandler } from '@wordpress/blocks';
 
 const legacyWidgetTransforms = [
 	{
@@ -186,7 +186,27 @@ const legacyWidgetTransforms = [
 } );
 
 const transforms = {
-	to: legacyWidgetTransforms,
+	to: [
+		...legacyWidgetTransforms,
+		{
+			type: 'block',
+			blocks: [ 'core/paragraph' ],
+			isMatch( { idBase, instance } ) {
+				return idBase === 'text' && !! instance?.raw;
+			},
+			transform( { instance } ) {
+				if ( ! instance.raw.title ) {
+					return rawHandler( { HTML: instance.raw.text } );
+				}
+				return [
+					createBlock( 'core/heading', {
+						content: instance.raw.title,
+					} ),
+					...rawHandler( { HTML: instance.raw.text } ),
+				];
+			},
+		},
+	],
 };
 
 export default transforms;

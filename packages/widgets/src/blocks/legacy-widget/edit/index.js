@@ -8,7 +8,6 @@ import classnames from 'classnames';
  */
 import {
 	useBlockProps,
-	BlockControls,
 	InspectorControls,
 	BlockIcon,
 	store as blockEditorStore,
@@ -28,7 +27,6 @@ import InspectorCard from './inspector-card';
 import Form from './form';
 import Preview from './preview';
 import NoPreview from './no-preview';
-import ConvertToBlocksButton from './convert-to-blocks-button';
 
 export default function Edit( props ) {
 	const { id, idBase } = props.attributes;
@@ -88,7 +86,6 @@ function Empty( { attributes: { id, idBase }, setAttributes } ) {
 function NotEmpty( {
 	attributes: { id, idBase, instance },
 	setAttributes,
-	clientId,
 	isSelected,
 	isWide = false,
 } ) {
@@ -136,15 +133,6 @@ function NotEmpty( {
 
 	return (
 		<>
-			{ idBase === 'text' && (
-				<BlockControls group="other">
-					<ConvertToBlocksButton
-						clientId={ clientId }
-						rawInstance={ instance.raw }
-					/>
-				</BlockControls>
-			) }
-
 			<InspectorControls>
 				<InspectorCard
 					name={ widgetType.name }
