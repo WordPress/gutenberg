@@ -51,7 +51,7 @@ $preview-image-height: 140px;
 }
 
 .block-editor-link-control__search-error {
-	margin: -$grid-unit-20/2 $grid-unit-20 $grid-unit-20; // Negative margin to bring the error a bit closer to the button.
+	margin: -$grid-unit-20 * 0.5 $grid-unit-20 $grid-unit-20; // Negative margin to bring the error a bit closer to the button.
 }
 
 .block-editor-link-control__search-actions {
@@ -68,8 +68,8 @@ $preview-image-height: 140px;
 	 *  - Horizontally, pad to the minimum of: default input padding, or the
 	 *    equivalent of the vertical padding.
 	 */
-	top: $grid-unit-20 + $border-width + ( ( 40px - $button-size ) / 2 );
-	right: $grid-unit-20 + $border-width + min($grid-unit-10, ( 40px - $button-size ) / 2);
+	top: $grid-unit-20 + $border-width + ( ( 40px - $button-size ) * 0.5 );
+	right: $grid-unit-20 + $border-width + min($grid-unit-10, (40px - $button-size ) * 0.5);
 }
 
 .components-button .block-editor-link-control__search-submit .has-icon {
@@ -168,12 +168,6 @@ $preview-image-height: 140px;
 		align-items: flex-start;
 		margin-right: $grid-unit-10;
 		overflow: hidden;
-
-		// Force text to wrap to improve UX when encountering long lines
-		// of text, particular those with no spaces.
-		// See: https://github.com/WordPress/gutenberg/issues/33586#issuecomment-888921188
-		white-space: pre-wrap;
-		word-wrap: break-word;
 		white-space: nowrap;
 		line-height: 1.5;
 	}
@@ -190,10 +184,12 @@ $preview-image-height: 140px;
 	.block-editor-link-control__search-item-icon {
 		position: relative;
 		margin-right: $grid-unit-10;
-		width: $grid-unit-40;
 		height: $grid-unit-40;
-		padding: 7px;
 		background: $gray-100;
+		display: flex;
+		flex: 0 0 $grid-unit-40;
+		justify-content: center;
+		align-items: center;
 
 		svg {
 			padding: 0;
@@ -203,6 +199,7 @@ $preview-image-height: 140px;
 		img {
 			max-width: none;
 			width: 18px;
+			height: 18px;
 		}
 	}
 
