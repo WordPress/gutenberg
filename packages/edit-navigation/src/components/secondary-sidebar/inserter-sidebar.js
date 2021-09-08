@@ -14,26 +14,24 @@ import { useDispatch, useSelect } from '@wordpress/data';
  * Internal dependencies
  */
 import { store as editNavigationStore } from '../../store';
-import { useNavigationEditorInsertionPoint } from '../../hooks';
+import { useNavigationEditorRootBlock } from '../../hooks';
 
 function InserterSidebar() {
 	const SHOW_PREVIEWS = false;
 
 	const isMobileViewport = useViewportMatch( 'medium', '<' );
 
-	const { rootClientId } = useNavigationEditorInsertionPoint();
+	const { clientId: navBlockClientId } = useNavigationEditorRootBlock();
 
 	const { hasInserterItems } = useSelect( ( select ) => {
 		return {
 			hasInserterItems: select( blockEditorStore ).hasInserterItems(
-				rootClientId
+				navBlockClientId
 			),
 		};
-	} );
+	}, [] );
 
 	const { setIsInserterOpened } = useDispatch( editNavigationStore );
-
-	const inserterDialogProps = {};
 
 	// Only concerned with whether there are items to display. If not then
 	// we shouldn't render.
@@ -42,10 +40,7 @@ function InserterSidebar() {
 	}
 
 	return (
-		<div
-			{ ...inserterDialogProps }
-			className="edit-navigation-layout__inserter-panel"
-		>
+		<div className="edit-navigation-layout__inserter-panel">
 			<div className="edit-navigation-layout__inserter-panel-header">
 				<Button
 					icon={ close }
@@ -55,8 +50,7 @@ function InserterSidebar() {
 			<div className="edit-navigation-layout__inserter-panel-content">
 				<Library
 					shouldFocusBlock={ isMobileViewport }
-					rootClientId={ rootClientId }
-					clientId={ rootClientId }
+					rootClientId={ navBlockClientId }
 					showInserterHelpPanel={ SHOW_PREVIEWS }
 				/>
 			</div>

@@ -11,17 +11,17 @@ import { plus } from '@wordpress/icons';
 /**
  * Internal dependencies
  */
-import { useNavigationEditorInsertionPoint } from '../../hooks';
+import { useNavigationEditorRootBlock } from '../../hooks';
 import { store as editNavigationStore } from '../../store';
 
 function Inserter() {
 	const inserterButton = useRef();
-	const { rootClientId } = useNavigationEditorInsertionPoint();
+	const { clientId: navBlockClientId } = useNavigationEditorRootBlock();
 
 	const { isInserterOpened, hasInserterItems } = useSelect( ( select ) => {
 		return {
 			hasInserterItems: select( blockEditorStore ).hasInserterItems(
-				rootClientId
+				navBlockClientId
 			),
 			isInserterOpened: select( editNavigationStore ).isInserterOpened(),
 		};

@@ -8,16 +8,16 @@ import { store as blockEditorStore } from '@wordpress/block-editor';
  * Internal dependencies
  */
 
-const useNavigationEditorInsertionPoint = () => {
+const useNavigationEditorRootBlock = () => {
 	return useSelect( ( select ) => {
 		const { getBlockOrder } = select( blockEditorStore );
 
 		const lockedNavigationBlock = getBlockOrder()[ 0 ];
 
 		return {
-			rootClientId: lockedNavigationBlock,
+			clientId: lockedNavigationBlock,
 		};
 	}, [] );
 };
 
-export default useNavigationEditorInsertionPoint;
+export default useNavigationEditorRootBlock;
