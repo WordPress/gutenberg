@@ -203,6 +203,8 @@ export function getGlobalStyles( rawStyles, rawFeatures ) {
 			color: {
 				palette: colors?.palette,
 				gradients,
+				text: features?.color?.text ?? true,
+				background: features?.color?.background ?? true,
 			},
 			typography: {
 				fontSizes: features?.typography?.fontSizes,
