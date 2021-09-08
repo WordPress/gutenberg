@@ -36,7 +36,7 @@ let entry = {};
 if ( process.env.WP_ENTRY ) {
 	entry = JSON.parse( process.env.WP_ENTRY );
 } else {
-	[ 'index', 'view' ].forEach( ( entryName ) => {
+	[ 'index' ].forEach( ( entryName ) => {
 		const filepath = path.resolve(
 			process.cwd(),
 			'src',
