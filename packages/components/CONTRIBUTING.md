@@ -134,7 +134,77 @@ Components can use this system via a couple of functions:
 - they can connect to the Context via `contextConnect`
 - they can read the "computed" values from the context via `useContextSystem`
 
-An example of how this is used is the [`Card` component](https://github.com/WordPress/gutenberg/blob/trunk/packages/components/src/card/card/component.js#L44-L54) — all of its subcomponents (e.g. `CardBody`, `CardHeader`...) will [use, by default, the same value for the `size` as the parent `Card` component](https://github.com/WordPress/gutenberg/blob/trunk/packages/components/src/card/card-body/hook.js#L23) — which results in all the components having all the correct spacing "auto-magically".
+An example of how this is used can be found in the [`Card` component family](https://github.com/WordPress/gutenberg/blob/trunk/packages/components/src/card). For example, this is how the `Card` component injects the `size` and `isBorderless` props down to its `CardBody` subcomponent — which makes it use the correct spacing and border settings "auto-magically".
+
+```jsx
+//=========================================================================
+// Simplified snippet from `packages/components/src/card/card/hook.js`
+//=========================================================================
+import { useContextSystem } from '../../ui/context';
+
+export function useCard( props ) {
+	// Read any derived registered prop from the Context System in the `Card` namespace
+	const derivedProps = useContextSystem( props, 'Card' );
+
+	// [...]
+
+	return computedHookProps;
+}
+
+//=========================================================================
+// Simplified snippet from `packages/components/src/card/card/component.js`
+//=========================================================================
+import { contextConnect, ContextSystemProvider } from '../../ui/context';
+
+function Card( props, forwardedRef ) {
+	const {
+		size,
+		isBorderless,
+		...otherComputedHookProps
+	} = useCard( props );
+
+	// [...]
+
+	// Prepare the additional props that should be passed to subcomponents via the Context System.
+	const contextProviderValue = useMemo( () => {
+		return {
+			// Each key in this object should match a component's registered namespace.
+			CardBody: {
+				size,
+				isBorderless,
+			},
+		};
+	}, [ isBorderless, size ] );
+
+	return (
+		{ /* Write additional values to the Context System */ }
+		<ContextSystemProvider value={ contextProviderValue }>
+			{ /* [...] */ }
+		</ContextSystemProvider>
+	);
+}
+
+// Connect to the Context System under the `Card` namespace
+const ConnectedCard = contextConnect( Card, 'Card' );
+export default ConnectedCard;
+
+//=========================================================================
+// Simplified snippet from `packages/components/src/card/card-body/hook.js`
+//=========================================================================
+import { useContextSystem } from '../../ui/context';
+
+export function useCardBody( props ) {
+	// Read any derived registered prop from the Context System in the `CardBody` namespace.
+	// If a `CardBody` component is rendered as a child of a `Card` component, the value of
+	// the `size` prop will be the one set by the parent `Card` component via the Context
+	// System (unless the prop gets explicitely set on the `CardBody` component).
+	const { size = 'medium', ...otherDerivedProps } = useContextSystem( props, 'CardBody' );
+
+	// [...]
+
+	return computedHookProps;
+}
+```
 
 #### Unit tests
 
