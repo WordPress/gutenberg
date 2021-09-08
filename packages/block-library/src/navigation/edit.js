@@ -248,6 +248,24 @@ function Navigation( {
 			<InspectorControls>
 				{ hasSubmenuIndicatorSetting && (
 					<PanelBody title={ __( 'Display settings' ) }>
+						<ToggleControl
+							checked={ attributes.isResponsive }
+							onChange={ ( value ) => {
+								setAttributes( {
+									isResponsive: value,
+								} );
+							} }
+							label={ __( 'Enable responsive menu' ) }
+						/>
+						<ToggleControl
+							checked={ attributes.openSubmenusOnClick }
+							onChange={ ( value ) => {
+								setAttributes( {
+									openSubmenusOnClick: value,
+								} );
+							} }
+							label={ __( 'Open submenus on click' ) }
+						/>
 						{ ! attributes.openSubmenusOnClick && (
 							<ToggleControl
 								checked={ attributes.showSubmenuIcon }
@@ -259,24 +277,6 @@ function Navigation( {
 								label={ __( 'Show submenu indicator icons' ) }
 							/>
 						) }
-						<ToggleControl
-							checked={ attributes.openSubmenusOnClick }
-							onChange={ ( value ) => {
-								setAttributes( {
-									openSubmenusOnClick: value,
-								} );
-							} }
-							label={ __( 'Open submenus on click' ) }
-						/>
-						<ToggleControl
-							checked={ attributes.isResponsive }
-							onChange={ ( value ) => {
-								setAttributes( {
-									isResponsive: value,
-								} );
-							} }
-							label={ __( 'Enable responsive menu' ) }
-						/>
 					</PanelBody>
 				) }
 				{ hasColorSettings && (
