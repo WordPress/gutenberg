@@ -23,13 +23,19 @@ function InserterSidebar() {
 
 	const { clientId: navBlockClientId } = useNavigationEditorRootBlock();
 
-	const { hasInserterItems } = useSelect( ( select ) => {
-		return {
-			hasInserterItems: select( blockEditorStore ).hasInserterItems(
-				navBlockClientId
-			),
-		};
-	}, [] );
+	const { hasInserterItems, selectedBlockClientId } = useSelect(
+		( select ) => {
+			return {
+				hasInserterItems: select( blockEditorStore ).hasInserterItems(
+					navBlockClientId
+				),
+				selectedBlockClientId: select(
+					blockEditorStore
+				).getSelectedBlock()?.clientId,
+			};
+		},
+		[]
+	);
 
 	const { setIsInserterOpened } = useDispatch( editNavigationStore );
 
@@ -51,6 +57,11 @@ function InserterSidebar() {
 				<Library
 					shouldFocusBlock={ isMobileViewport }
 					rootClientId={ navBlockClientId }
+					clientId={
+						navBlockClientId === selectedBlockClientId
+							? navBlockClientId
+							: undefined
+					}
 					showInserterHelpPanel={ SHOW_PREVIEWS }
 				/>
 			</div>
