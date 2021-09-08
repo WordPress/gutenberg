@@ -18,17 +18,12 @@ This component is generated automatically by its parent
 
 ## Props
 
-### `header`: `string`
+### `label`: `string`
 
-Text to be displayed within the panel header.
+Text to be displayed within the panel header. It is also passed along as the
+`label` for the panel header's `DropdownMenu`.
 
 -   Required: Yes
-
-### `menuLabel`: `string`
-
-This is passed along as the `label` for the panel header's `DropdownMenu`.
-
--   Required: No
 
 ### `resetAll`: `function`
 

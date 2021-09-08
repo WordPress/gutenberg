@@ -28,16 +28,13 @@ export const _default = () => {
 	const resetAll = () => {
 		setHeight( undefined );
 		setWidth( undefined );
+		setMinHeight( undefined );
 	};
 
 	return (
 		<PanelWrapperView>
 			<Panel>
-				<ToolsPanel
-					header="Tools Panel"
-					label="Display options"
-					resetAll={ resetAll }
-				>
+				<ToolsPanel label="Tools Panel" resetAll={ resetAll }>
 					<ToolsPanelItem
 						className="single-column"
 						hasValue={ () => !! width }
