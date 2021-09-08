@@ -131,7 +131,6 @@ export function useClipboardHandler() {
 				removeBlocks( selectedBlockClientIds );
 			} else if ( event.type === 'paste' ) {
 				if (
-					event.defaultPrevented &&
 					event.target.classList.contains(
 						'block-editor-rich-text__editable'
 					)

@@ -92,4 +92,42 @@ describe( 'Copy/cut/paste of whole blocks', () => {
 		await pressKeyWithModifier( 'primary', 'v' );
 		expect( await getEditedPostContent() ).toMatchSnapshot();
 	} );
+
+	it( 'should handle paste events once', async () => {
+		await insertBlock( 'Group' );
+		await page.click( '.block-editor-button-block-appender' );
+		await page.click( '.editor-block-list-item-paragraph' );
+		await page.keyboard.type( 'P' );
+		await page.keyboard.press( 'ArrowLeft' );
+		await page.keyboard.press( 'ArrowLeft' );
+		await pressKeyWithModifier( 'primary', 'x' );
+		await page.keyboard.press( 'Enter' );
+
+		await page.evaluate( () => {
+			window.e2eTestPasteOnce = [];
+			let oldBlocks = wp.data.select( 'core/block-editor' ).getBlocks();
+			wp.data.subscribe( () => {
+				const blocks = wp.data
+					.select( 'core/block-editor' )
+					.getBlocks();
+				if ( blocks !== oldBlocks ) {
+					window.e2eTestPasteOnce.push(
+						blocks.map( ( { clientId, name } ) => ( {
+							clientId,
+							name,
+						} ) )
+					);
+				}
+				oldBlocks = blocks;
+			} );
+		} );
+
+		await pressKeyWithModifier( 'primary', 'v' );
+
+		const blocksUpdated = await page.evaluate(
+			() => window.e2eTestPasteOnce
+		);
+
+		expect( blocksUpdated.length ).toEqual( 1 );
+	} );
 } );
