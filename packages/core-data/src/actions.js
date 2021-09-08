@@ -202,7 +202,7 @@ export const deleteEntityRecord = (
 				method: 'DELETE',
 			} );
 
-			dispatch( removeItems( kind, name, recordId, true ) );
+			await dispatch( removeItems( kind, name, recordId, true ) );
 		} catch ( _error ) {
 			error = _error;
 		}
@@ -217,7 +217,7 @@ export const deleteEntityRecord = (
 
 		return deletedRecord;
 	} finally {
-		await dispatch.__unstableReleaseStoreLock( lock );
+		dispatch.__unstableReleaseStoreLock( lock );
 	}
 };
 
