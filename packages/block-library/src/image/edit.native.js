@@ -84,6 +84,8 @@ export class ImageEdit extends Component {
 			isCaptionSelected: false,
 		};
 
+		this.replacedFeaturedImage = false;
+
 		this.finishMediaUploadWithSuccess = this.finishMediaUploadWithSuccess.bind(
 			this
 		);
@@ -177,7 +179,12 @@ export class ImageEdit extends Component {
 	}
 
 	componentDidUpdate( previousProps ) {
-		const { image, attributes, setAttributes } = this.props;
+		const {
+			image,
+			attributes,
+			setAttributes,
+			featuredImageId,
+		} = this.props;
 		if ( ! previousProps.image && image ) {
 			const url =
 				getUrlForSlug( image, attributes?.sizeSlug ) ||
@@ -185,14 +192,29 @@ export class ImageEdit extends Component {
 			setAttributes( { url } );
 		}
 
-		// The media has changed, and the previous media was set as Featured Image
 		const { id } = attributes;
 		const { id: previousId } = previousProps.attributes;
+
+		// The media changed and the previous media was set as the Featured Image,
+		// we must keep track of the previous media's featured status to act on it
+		// once the new media has a finalized ID
 		if (
 			!! id &&
 			id !== previousId &&
-			this.isFeaturedImage( previousId )
+			!! featuredImageId &&
+			featuredImageId === previousId
 		) {
+			this.replacedFeaturedImage = true;
+		}
+
+		// The media changed and now has a finalized ID (e.g. upload completed), we
+		// should attempt to replace the featured image if applicable
+		if (
+			this.replacedFeaturedImage &&
+			id !== previousId &&
+			this.canImageBeFeatured()
+		) {
+			this.replacedFeaturedImage = false;
 			setFeaturedImage( id );
 		}
 	}
