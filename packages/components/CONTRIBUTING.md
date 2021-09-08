@@ -113,7 +113,10 @@ For an example of a component that follows these requirements, take a look at [`
 
 #### TypeScript
 
-We strongly encourage using TypeScript for all new components. Components should be typed using the `WordPressComponent` type (more details about polymorphism can be found above in the "Components composition" section).
+We strongly encourage using TypeScript for all new components. Components should be typed using the `WordPressComponent` type.
+
+<!-- TODO: add to the previous paragraph once the composision section gets added to this document.
+(more details about polymorphism can be found above in the "Components composition" section). -->
 
 #### Emotion
 
