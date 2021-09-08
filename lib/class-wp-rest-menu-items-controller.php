@@ -524,49 +524,9 @@ class WP_REST_Menu_Items_Controller extends WP_REST_Posts_Controller {
 			}
 		}
 
-		// If menu id is set, valid the value of menu item position and parent id.
-		if ( ! empty( $prepared_nav_item['menu-id'] ) ) {
-			// Check if nav menu is valid.
-			if ( ! is_nav_menu( $prepared_nav_item['menu-id'] ) ) {
-				return new WP_Error( 'invalid_menu_id', __( 'Invalid menu ID.', 'gutenberg' ), array( 'status' => 400 ) );
-			}
-
-			// If menu item position is set to 0, insert as the last item in the existing menu.
-			$menu_items = wp_get_nav_menu_items( $prepared_nav_item['menu-id'], array( 'post_status' => 'publish,draft' ) );
-			if ( 0 === (int) $prepared_nav_item['menu-item-position'] ) {
-				if ( $menu_items ) {
-					$last_item = $menu_items[ count( $menu_items ) - 1 ];
-					if ( $last_item && isset( $last_item->menu_order ) ) {
-						$prepared_nav_item['menu-item-position'] = $last_item->menu_order + 1;
-					} else {
-						$prepared_nav_item['menu-item-position'] = count( $menu_items ) - 1;
-					}
-					array_push( $menu_items, $last_item );
-				} else {
-					$prepared_nav_item['menu-item-position'] = 1;
-				}
-			}
-
-			// Check if existing menu position is already in use by another menu item.
-			$menu_item_ids = array();
-			foreach ( $menu_items as $menu_item ) {
-				$menu_item_ids[] = $menu_item->ID;
-				if ( $menu_item->ID !== (int) $menu_item_db_id ) {
-					if ( (int) $prepared_nav_item['menu-item-position'] === (int) $menu_item->menu_order ) {
-						return new WP_Error( 'invalid_menu_order', __( 'Invalid menu position.', 'gutenberg' ), array( 'status' => 400 ) );
-					}
-				}
-			}
-
-			// Check if valid parent id is valid nav menu item in menu.
-			if ( $prepared_nav_item['menu-item-parent-id'] ) {
-				if ( ! is_nav_menu_item( $prepared_nav_item['menu-item-parent-id'] ) ) {
-					return new WP_Error( 'invalid_menu_item_parent', __( 'Invalid menu item parent.', 'gutenberg' ), array( 'status' => 400 ) );
-				}
-				if ( ! $menu_item_ids || ! in_array( $prepared_nav_item['menu-item-parent-id'], $menu_item_ids, true ) ) {
-					return new WP_Error( 'invalid_item_parent', __( 'Invalid menu item parent.', 'gutenberg' ), array( 'status' => 400 ) );
-				}
-			}
+		// Check if nav menu is valid.
+		if ( ! empty( $prepared_nav_item['menu-id'] ) && ! is_nav_menu( $prepared_nav_item['menu-id'] ) ) {
+			return new WP_Error( 'invalid_menu_id', __( 'Invalid menu ID.', 'gutenberg' ), array( 'status' => 400 ) );
 		}
 
 		foreach ( array( 'menu-item-object-id', 'menu-item-parent-id' ) as $key ) {
