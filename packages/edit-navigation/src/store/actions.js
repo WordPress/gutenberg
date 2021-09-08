@@ -181,8 +181,6 @@ function mapBlockIdToEntityRecord( entityIdToBlockId, entityRecords ) {
 	);
 }
 
-// saveEntityRecord for each menu item with block-based data
-// saveEntityRecord for each deleted menu item
 const createBatchSaveForEditedMenuItems = ( post ) => async ( {
 	registry,
 } ) => {
