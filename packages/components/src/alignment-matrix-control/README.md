@@ -63,7 +63,6 @@ A function that receives the updated alignment value.
 
 -   Type: `function`
 -   Required: No
--   Default: `noop`
 
 ### width
 
