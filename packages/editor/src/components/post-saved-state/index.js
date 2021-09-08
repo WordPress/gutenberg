@@ -137,7 +137,7 @@ export default function PostSavedState( {
 	return (
 		<Button
 			className={
-				isSaveable
+				isSaveable || isSaving
 					? classnames( {
 							'editor-post-save-draft': ! isSavedState,
 							'editor-post-saved-state': isSavedState,
