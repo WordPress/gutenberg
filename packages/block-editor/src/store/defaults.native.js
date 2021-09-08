@@ -13,6 +13,12 @@ const SETTINGS_DEFAULTS = {
 	__unstableGalleryWithImageBlocks: __DEV__,
 	alignWide: true,
 	supportsLayout: false,
+	__experimentalFeatures: {
+		color: {
+			text: true,
+			background: true,
+		},
+	},
 };
 
 export { PREFERENCES_DEFAULTS, SETTINGS_DEFAULTS };
