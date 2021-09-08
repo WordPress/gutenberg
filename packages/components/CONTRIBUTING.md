@@ -138,7 +138,7 @@ An example of how this is used is the [`Card` component](https://github.com/Word
 
 #### Unit tests
 
-Please refer to the [JavaScript Testing Overview docs](/docs/contributors/code/testing-overview.md).
+Please refer to the [JavaScript Testing Overview docs](/docs/contributors/code/testing-overview.md#snapshot-testing).
 
 #### Storybook
 
