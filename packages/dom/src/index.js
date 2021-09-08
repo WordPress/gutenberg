@@ -13,3 +13,4 @@ export const focus = { focusable, tabbable };
 export * from './dom';
 export * from './phrasing-content';
 export * from './data-transfer';
+export { default as safeHTML } from './safe-html';
