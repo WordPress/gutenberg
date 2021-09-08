@@ -19,6 +19,11 @@ import useInsertionPoint from './hooks/use-insertion-point';
 import InserterTabs from './tabs';
 import { store as blockEditorStore } from '../../store';
 
+/**
+ * External dependencies
+ */
+import classnames from 'classnames';
+
 function InserterMenu( {
 	rootClientId,
 	clientId,
@@ -166,8 +171,12 @@ function InserterMenu( {
 		[ blocksTab, patternsTab, reusableBlocksTab ]
 	);
 
+	const classes = classnames( 'block-editor-inserter__menu', {
+		'has-search': !! showSearch,
+	} );
+
 	return (
-		<div className="block-editor-inserter__menu">
+		<div className={ classes }>
 			<div className="block-editor-inserter__main-area">
 				{ /* the following div is necessary to fix the sticky position of the search form */ }
 				<div className="block-editor-inserter__content">

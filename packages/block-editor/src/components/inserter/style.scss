@@ -117,8 +117,7 @@ $block-inserter-tabs-height: 44px;
 
 	.components-tab-panel__tabs {
 		position: sticky;
-		// Computed based off the search input height and paddings
-		top: $grid-unit-10 + $grid-unit-20 + $grid-unit-60;
+		top: 0;
 		background: $white;
 		z-index: z-index(".block-editor-inserter__tabs .components-tab-panel__tabs");
 		border-bottom: $border-width solid $gray-300;
@@ -137,6 +136,11 @@ $block-inserter-tabs-height: 44px;
 		position: relative;
 		z-index: z-index(".block-editor-inserter__tabs .components-tab-panel__tab-content");
 	}
+}
+
+.block-editor-inserter__menu.has-search .block-editor-inserter__tabs .components-tab-panel__tabs {
+	// Computed based off the search input height and paddings
+	top: $grid-unit-10 + $grid-unit-20 + $grid-unit-60;
 }
 
 .block-editor-inserter__panel-header {
