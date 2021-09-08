@@ -142,9 +142,9 @@ Please refer to the [JavaScript Testing Overview docs](/docs/contributors/code/t
 
 #### Storybook
 
-All new components should include [Storybook](https://storybook.js.org/) stories, in order to make it easier to work on and review each component in isolation.
+All new components should add stories to the project's [Storybook](https://storybook.js.org/). Each [story](https://storybook.js.org/docs/react/get-started/whats-a-story) captures the rendered state of a UI component in isolation. This greatly simplifies working on a given component, while also serving as an interactive form of documentation.
 
-A component's stories should be showcasing its different states — for example, a `Button`'s different variants:
+A component's story should be showcasing its different states — for example, the different variants of a  `Button`:
 
 ```jsx
 import Button from '../';
@@ -158,9 +158,9 @@ export const primary = () => <Button variant="primary">Primary Button</Button>;
 export const secondary = () => <Button variant="secondary">Secondary Button</Button>;
 ```
 
-For even more flexibility while writing stories, the [`@storybook/addons-controls`](https://storybook.js.org/addons/@storybook/addon-controls) addon is a great way to interact with a component's arguments dynamically and in real time.
+A great tool to use when writing stories is the [Storybook Controls addon](https://storybook.js.org/addons/@storybook/addon-controls). Ideally props should be exposed by using this addon, which provides a graphical UI to interact dynamically with the component without needing to write code.
 
-Ideally, all of the props for the story's components should be exposed by using knobs. The default value of the knobs should coincide with the default value of the props (i.e. it should be `undefined` if a prop is not required). A story should, therefore, also explicitly show how values from the Context System are applied to (sub)components. A good example of how this may look like is the [`Card` story](https://wordpress.github.io/gutenberg/?path=/story/components-card--default) (code [here](/packages/components/src/card/stories/index.js)).
+The default value of each control should coincide with the default value of the props (i.e. it should be `undefined` if a prop is not required). A story should, therefore, also explicitly show how values from the Context System are applied to (sub)components. A good example of how this may look like is the [`Card` story](https://wordpress.github.io/gutenberg/?path=/story/components-card--default) (code [here](/packages/components/src/card/stories/index.js)).
 
 Storybook can be started on a local maching by running `npm run storybook:dev`. Alternatively, the components' catalogue (up to date with the latest code on `trunk`) can be found at [wordpress.github.io/gutenberg/](https://wordpress.github.io/gutenberg/).
 
