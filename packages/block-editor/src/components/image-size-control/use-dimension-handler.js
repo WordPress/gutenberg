@@ -29,8 +29,8 @@ export default function useDimensionHandler(
 		}
 	}, [ defaultWidth, defaultHeight ] );
 
-	// if custom values change, it means an outsider has resized the image using some other method (eg resize box)
-	// we should keep track of these values too. We need to parse customWidth as it can be a string.
+	// If custom values change, it means an outsider has resized the image using some other method (eg resize box)
+	// this keeps track of these values too. We need to parse before comparing; custom values can be strings.
 	useEffect( () => {
 		if (
 			customWidth !== undefined &&
