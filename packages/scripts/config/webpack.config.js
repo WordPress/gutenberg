@@ -36,6 +36,8 @@ let entry = {};
 if ( process.env.WP_ENTRY ) {
 	entry = JSON.parse( process.env.WP_ENTRY );
 } else {
+	// By default the script checks if `src/index.js` exists and sets it as an entry point.
+	// In the future we should add similar handling for `src/script.js` and `src/view.js`.
 	[ 'index' ].forEach( ( entryName ) => {
 		const filepath = path.resolve(
 			process.cwd(),
