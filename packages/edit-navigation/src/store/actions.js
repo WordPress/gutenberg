@@ -1,14 +1,13 @@
 /**
  * External dependencies
  */
-import { invert, omit } from 'lodash';
+import { invert } from 'lodash';
 
 /**
  * WordPress dependencies
  */
 import { __, sprintf } from '@wordpress/i18n';
 import { store as noticesStore } from '@wordpress/notices';
-import { serialize } from '@wordpress/blocks';
 import apiFetch from '@wordpress/api-fetch';
 
 /**
@@ -16,7 +15,8 @@ import apiFetch from '@wordpress/api-fetch';
  */
 import { STORE_NAME } from './constants';
 import { NAVIGATION_POST_KIND, NAVIGATION_POST_POST_TYPE } from '../constants';
-import { menuItemsQuery, blockAttributesToMenuItem } from './utils';
+import { menuItemsQuery } from './utils';
+import { blockToMenuItem } from './transform';
 
 /**
  * Returns an action object used to select menu.
@@ -256,31 +256,6 @@ const createBatchSaveForEditedMenuItems = ( post ) => async ( {
 
 	return batchTasks;
 };
-
-function blockToMenuItem( block, menuItem, parentId, position, menuId ) {
-	menuItem = omit( menuItem, 'menus', 'meta', '_links' );
-
-	let attributes;
-
-	if ( block.name === 'core/navigation-link' ) {
-		attributes = blockAttributesToMenuItem( block.attributes );
-	} else {
-		attributes = {
-			type: 'block',
-			content: serialize( block ),
-		};
-	}
-
-	return {
-		...menuItem,
-		...attributes,
-		menu_order: position,
-		menu_id: menuId,
-		parent: parentId,
-		status: 'publish',
-		_invalid: false,
-	};
-}
 
 function blocksTreeToFlatList( innerBlocks, parentBlockId = null ) {
 	return innerBlocks.flatMap( ( block, index ) =>

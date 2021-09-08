@@ -10,7 +10,8 @@ import { NAVIGATION_POST_KIND, NAVIGATION_POST_POST_TYPE } from '../constants';
 
 import { resolveMenuItems, dispatch } from './controls';
 import { buildNavigationPostId } from './utils';
-import menuItemsToBlocks from './menu-items-to-blocks';
+import { menuItemsToBlocks } from './transform';
+
 /**
  * Creates a "stub" navigation post reflecting the contents of menu with id=menuId. The
  * post is meant as a convenient to only exists in runtime and should never be saved. It

@@ -1,12 +1,42 @@
 /**
  * External dependencies
  */
-import { sortBy } from 'lodash';
+import { omit, sortBy } from 'lodash';
 
 /**
  * WordPress dependencies
  */
-import { createBlock, parse } from '@wordpress/blocks';
+import { serialize, createBlock, parse } from '@wordpress/blocks';
+
+/**
+ * Internal dependencies
+ */
+import { NEW_TAB_TARGET_ATTRIBUTE } from '../constants';
+
+export function blockToMenuItem( block, menuItem, parentId, position, menuId ) {
+	menuItem = omit( menuItem, 'menus', 'meta', '_links' );
+
+	let attributes;
+
+	if ( block.name === 'core/navigation-link' ) {
+		attributes = blockAttributesToMenuItem( block.attributes );
+	} else {
+		attributes = {
+			type: 'block',
+			content: serialize( block ),
+		};
+	}
+
+	return {
+		...menuItem,
+		...attributes,
+		menu_order: position,
+		menu_id: menuId,
+		parent: parentId,
+		status: 'publish',
+		_invalid: false,
+	};
+}
 
 /**
  * Convert a flat menu item structure to a nested blocks structure.
@@ -15,7 +45,7 @@ import { createBlock, parse } from '@wordpress/blocks';
  *
  * @return {WPBlock[]} An array of blocks.
  */
-export default function menuItemsToBlocks( menuItems ) {
+export function menuItemsToBlocks( menuItems ) {
 	if ( ! menuItems ) {
 		return null;
 	}
@@ -87,6 +117,70 @@ function mapMenuItemsToBlocks( menuItems ) {
 }
 
 /**
+ * Convert block attributes to menu item fields.
+ *
+ * Note that nav_menu_item has defaults provided in Core so in the case of undefined Block attributes
+ * we need only include a subset of values in the knowledge that the defaults will be provided in Core.
+ *
+ * See: https://core.trac.wordpress.org/browser/tags/5.7.1/src/wp-includes/nav-menu.php#L438.
+ *
+ * @param {Object}  blockAttributes               the block attributes of the block to be converted into menu item fields.
+ * @param {string}  blockAttributes.label         the visual name of the block shown in the UI.
+ * @param {string}  blockAttributes.url           the URL for the link.
+ * @param {string}  blockAttributes.description   a link description.
+ * @param {string}  blockAttributes.rel           the XFN relationship expressed in the link of this menu item.
+ * @param {string}  blockAttributes.className     the custom CSS classname attributes for this block.
+ * @param {string}  blockAttributes.title         the HTML title attribute for the block's link.
+ * @param {string}  blockAttributes.type          the type of variation of the block used (eg: 'Post', 'Custom', 'Category'...etc).
+ * @param {number}  blockAttributes.id            the ID of the entity optionally associated with the block's link (eg: the Post ID).
+ * @param {string}  blockAttributes.kind          the family of objects originally represented, such as 'post-type' or 'taxonomy'.
+ * @param {boolean} blockAttributes.opensInNewTab whether or not the block's link should open in a new tab.
+ * @return {Object} the menu item (converted from block attributes).
+ */
+export const blockAttributesToMenuItem = ( {
+	label = '',
+	url = '',
+	description,
+	rel,
+	className,
+	title: blockTitleAttr,
+	type,
+	id,
+	kind,
+	opensInNewTab,
+} ) => {
+	// For historical reasons, the `core/navigation-link` variation type is `tag`
+	// whereas WP Core expects `post_tag` as the `object` type.
+	// To avoid writing a block migration we perform a conversion here.
+	// See also inverse equivalent in `menuItemToBlockAttributes`.
+	if ( type && type === 'tag' ) {
+		type = 'post_tag';
+	}
+
+	const menuItem = {
+		title: label,
+		url,
+		description,
+		xfn: rel?.trim().split( ' ' ),
+		classes: className?.trim().split( ' ' ),
+		attr_title: blockTitleAttr,
+		object: type,
+		type: kind?.replace( '-', '_' ),
+		// Only assign object_id if it's a entity type (ie: not "custom").
+		...( id &&
+			'custom' !== type && {
+				object_id: id,
+			} ),
+		target: opensInNewTab ? NEW_TAB_TARGET_ATTRIBUTE : '',
+	};
+
+	// Filter out the empty values
+	return Object.fromEntries(
+		Object.entries( menuItem ).filter( ( [ , v ] ) => v )
+	);
+};
+
+/**
  * A WP nav_menu_item object.
  * For more documentation on the individual fields present on a menu item please see:
  * https://core.trac.wordpress.org/browser/tags/5.7.1/src/wp-includes/nav-menu.php#L789
@@ -113,7 +207,7 @@ function mapMenuItemsToBlocks( menuItems ) {
  * @param {WPNavMenuItem} menuItem the menu item to be converted to block attributes.
  * @return {Object} the block attributes converted from the WPNavMenuItem item.
  */
-function menuItemToBlockAttributes( {
+export function menuItemToBlockAttributes( {
 	title: menuItemTitleField,
 	xfn,
 	classes,
@@ -149,7 +243,7 @@ function menuItemToBlockAttributes( {
 				id: object_id,
 			} ),
 		description,
-		...( target === '_blank' && {
+		...( target === NEW_TAB_TARGET_ATTRIBUTE && {
 			opensInNewTab: true,
 		} ),
 	};
