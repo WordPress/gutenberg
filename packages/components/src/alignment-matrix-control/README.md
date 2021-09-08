@@ -28,45 +28,46 @@ The component accepts the following props:
 
 The class that will be added to the classes of the wrapper <Composite/> component.
 
--   Type: `String`
+-   Type: `string`
 -   Required: No
 
 ### id
 
 Unique ID for the component.
--  Type: `String`
+-  Type: `string`
 -  Required: No
 
 ### label
 
 If provided, sets the aria-label attribute of the wrapper <Composite/> component.
 
--   Type: `String`
+-   Type: `string`
 -   Required: No
 -   Default: `Alignment Matrix Control`
 
 ### defaultValue
 
 If provided, sets the default alignment value.
-- Type: `String`
+- Type: `string`
 - Required: No
 - Default: `center center`
 
 ### value
+
 The current alignment value.
-- Type: `String`
+- Type: `string`
 - Required: No
 
 ### onChange
 
 A function that receives the updated alignment value.
 
--   Type: `function`
+-   Type: `( nextValue: string ) => void`
 -   Required: No
 
 ### width
 
 If provided, sets the width of the wrapper <Composite/> component.
- - Type: `Number`
+ - Type: `number`
  - Required: No
  - Default: `92`
