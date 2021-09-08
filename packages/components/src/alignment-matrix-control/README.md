@@ -39,7 +39,7 @@ Unique ID for the component.
 
 ### label
 
-If provided, sets the aria-label attribute of the wrapper <Composite/> component.
+Accessible label. If provided, sets the `aria-label` attribute of the underlying <Composite/> component.
 
 -   Type: `string`
 -   Required: No
