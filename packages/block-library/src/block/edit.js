@@ -199,7 +199,7 @@ export default function ReusableBlockEdit( { attributes: { ref }, clientId } ) {
 								isPrimary
 								className="block-library-block__reusable-block-save-button"
 								onClick={ saveEditedRecords }
-								label={ __( 'Save reusable block' ) }
+								label={ __( 'Save globally' ) }
 								showTooltip
 							>
 								{ __( 'Save' ) }
