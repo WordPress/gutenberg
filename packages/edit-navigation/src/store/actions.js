@@ -112,14 +112,6 @@ export const saveNavigationPost = ( post ) => async ( {
 		} );
 	try {
 		const menuId = post.meta.menuId;
-		const menuItems = await registry
-			.resolveSelect( 'core' )
-			.getMenuItems( { menus: menuId, per_page: -1 } );
-
-		const menuItemsByClientId = mapMenuItemsByClientId(
-			menuItems,
-			getMenuItemToClientIdMapping( registry, post.id )
-		);
 
 		await registry
 			.dispatch( 'core' )
@@ -134,9 +126,10 @@ export const saveNavigationPost = ( post ) => async ( {
 		}
 
 		// Save blocks as menu items.
-		await dispatch(
-			batchSave( menuId, menuItemsByClientId, post.blocks[ 0 ] )
+		const batchTasks = await dispatch(
+			createBatchSaveForEditedMenuItems( post )
 		);
+		await registry.dispatch( 'core' ).__experimentalBatch( batchTasks );
 
 		// Clear "stub" navigation post edits to avoid a false "dirty" state.
 		await registry
@@ -190,31 +183,35 @@ function mapMenuItemsByClientId( menuItems, clientIdsByMenuId ) {
 
 // saveEntityRecord for each menu item with block-based data
 // saveEntityRecord for each deleted menu item
-const batchSave = ( menuId, menuItemsByClientId, navigationBlock ) => async ( {
+const createBatchSaveForEditedMenuItems = ( post ) => async ( {
 	registry,
 } ) => {
-	const blocksList = blocksTreeToFlatList( navigationBlock.innerBlocks );
+	const navigationBlock = post.blocks[ 0 ];
+	const menuId = post.meta.menuId;
+	const menuItems = await registry
+		.resolveSelect( 'core' )
+		.getMenuItems( { menus: menuId, per_page: -1 } );
+
+	const apiMenuItemsByClientId = mapMenuItemsByClientId(
+		menuItems,
+		getMenuItemToClientIdMapping( registry, post.id )
+	);
+
+	const blocksList = blocksTreeToFlatList(
+		apiMenuItemsByClientId,
+		navigationBlock.innerBlocks
+	);
+
+	const deletedMenuItemsIds = computeDeletedMenuItemIds(
+		apiMenuItemsByClientId,
+		blocksList
+	);
 
 	const batchTasks = [];
-
-	// Compute deletes
-	const clientIdToBlockId = Object.fromEntries(
-		blocksList.map( ( { block } ) => [
-			block.clientId,
-			getMenuItemForBlock( block ).id,
-		] )
-	);
-	const deletedMenuItems = [];
-	for ( const clientId in menuItemsByClientId ) {
-		if ( ! ( clientId in clientIdToBlockId ) ) {
-			deletedMenuItems.push( menuItemsByClientId[ clientId ].id );
-		}
-	}
-
 	// Enqueue updates
 	for ( const { block, parentId, position } of blocksList ) {
-		const menuItem = getMenuItemForBlock( block );
-		if ( deletedMenuItems.includes( menuItem.id ) ) {
+		const menuItemId = apiMenuItemsByClientId[ block.clientId ]?.id;
+		if ( ! menuItemId || deletedMenuItemsIds.includes( menuItemId ) ) {
 			continue;
 		}
 
@@ -224,73 +221,112 @@ const batchSave = ( menuId, menuItemsByClientId, navigationBlock ) => async ( {
 			.editEntityRecord(
 				'root',
 				'menuItem',
-				menuItem.id,
-				blockToEntityRecord( block, parentId, position ),
+				menuItemId,
+				blockToEntityRecord(
+					apiMenuItemsByClientId,
+					menuId,
+					block,
+					parentId,
+					position
+				),
 				{ undoIgnore: true }
 			);
 
 		const hasEdits = registry
 			.select( 'core' )
-			.hasEditsForEntityRecord( 'root', 'menuItem', menuItem.id );
+			.hasEditsForEntityRecord( 'root', 'menuItem', menuItemId );
 
 		if ( ! hasEdits ) {
 			continue;
 		}
 
 		batchTasks.unshift( ( { saveEditedEntityRecord } ) =>
-			saveEditedEntityRecord( 'root', 'menuItem', menuItem.id )
+			saveEditedEntityRecord( 'root', 'menuItem', menuItemId )
 		);
 	}
 
 	// Enqueue deletes
-	for ( const menuItemId of deletedMenuItems ) {
+	for ( const menuItemId of deletedMenuItemsIds ) {
 		batchTasks.unshift( ( { deleteEntityRecord } ) =>
-			deleteEntityRecord( 'root', 'menuItem', menuItemId )
+			deleteEntityRecord( 'root', 'menuItem', menuItemId, {
+				force: true,
+			} )
 		);
 	}
 
-	return await registry.dispatch( 'core' ).__experimentalBatch( batchTasks );
+	return batchTasks;
+};
 
-	function blockToEntityRecord( block, parentId, position ) {
-		const menuItem = omit( getMenuItemForBlock( block ), 'menus', 'meta' );
+function blockToEntityRecord(
+	apiMenuItemsByClientId,
+	menuId,
+	block,
+	parentId,
+	position
+) {
+	const menuItem = omit(
+		apiMenuItemsByClientId[ block.clientId ],
+		'menus',
+		'meta',
+		'_links'
+	);
 
-		let attributes;
+	let attributes;
 
-		if ( block.name === 'core/navigation-link' ) {
-			attributes = blockAttributesToMenuItem( block.attributes );
-		} else {
-			attributes = {
-				type: 'block',
-				content: serialize( block ),
-			};
-		}
-
-		return {
-			...menuItem,
-			...attributes,
-			position,
-			nav_menu_term_id: menuId,
-			menu_item_parent: parentId,
-			status: 'publish',
-			_invalid: false,
+	if ( block.name === 'core/navigation-link' ) {
+		attributes = blockAttributesToMenuItem(
+			apiMenuItemsByClientId,
+			block.attributes
+		);
+	} else {
+		attributes = {
+			type: 'block',
+			content: serialize( block ),
 		};
 	}
 
-	function blocksTreeToFlatList( innerBlocks, parentId = 0 ) {
-		return innerBlocks.flatMap( ( block, index ) =>
-			[ { block, parentId, position: index + 1 } ].concat(
-				blocksTreeToFlatList(
-					block.innerBlocks,
-					getMenuItemForBlock( block )?.id
-				)
-			)
-		);
-	}
+	return {
+		...menuItem,
+		...attributes,
+		position,
+		nav_menu_term_id: menuId,
+		menu_item_parent: parentId,
+		status: 'publish',
+		_invalid: false,
+	};
+}
 
-	function getMenuItemForBlock( block ) {
-		return omit( menuItemsByClientId[ block.clientId ] || {}, '_links' );
+function blocksTreeToFlatList(
+	apiMenuItemsByClientId,
+	innerBlocks,
+	parentId = 0
+) {
+	return innerBlocks.flatMap( ( block, index ) =>
+		[ { block, parentId, position: index + 1 } ].concat(
+			blocksTreeToFlatList(
+				apiMenuItemsByClientId,
+				block.innerBlocks,
+				apiMenuItemsByClientId[ block.clientId ]?.id
+			)
+		)
+	);
+}
+
+function computeDeletedMenuItemIds( apiMenuItemsByClientId, blocksList ) {
+	const clientIdToBlockId = Object.fromEntries(
+		blocksList.map( ( { block } ) => [
+			block.clientId,
+			apiMenuItemsByClientId[ block.clientId ]?.id,
+		] )
+	);
+	const deletedMenuItems = [];
+	for ( const clientId in apiMenuItemsByClientId ) {
+		if ( ! ( clientId in clientIdToBlockId ) ) {
+			deletedMenuItems.push( apiMenuItemsByClientId[ clientId ]?.id );
+		}
 	}
-};
+	return deletedMenuItems;
+}
 
 /**
  * Returns an action object used to open/close the inserter.
