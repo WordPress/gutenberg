@@ -11,10 +11,11 @@ import {
 	createContext,
 	useMemo,
 	useCallback,
+	RawHTML,
 } from '@wordpress/element';
 import {
 	getBlockType,
-	getSaveElement,
+	getSaveContent,
 	isReusableBlock,
 	isUnmodifiedDefaultBlock,
 	getUnregisteredTypeHandlerName,
@@ -30,6 +31,7 @@ import {
 } from '@wordpress/data';
 import { withViewportMatch } from '@wordpress/viewport';
 import { compose, pure, ifCondition } from '@wordpress/compose';
+import { safeHTML } from '@wordpress/dom';
 
 /**
  * Internal dependencies
@@ -218,10 +220,12 @@ function BlockListBlock( {
 	let block;
 
 	if ( ! isValid ) {
+		const saveContent = getSaveContent( blockType, attributes );
+
 		block = (
 			<Block.div>
 				<BlockInvalidWarning clientId={ clientId } />
-				<div>{ getSaveElement( blockType, attributes ) }</div>
+				<RawHTML>{ safeHTML( saveContent ) }</RawHTML>
 			</Block.div>
 		);
 	} else if ( mode === 'html' ) {
