@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { invert } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { __, sprintf } from '@wordpress/i18n';
@@ -50,52 +45,60 @@ export const createMissingMenuItems = ( post ) => async ( {
 			exclusive: false,
 		} );
 	try {
-		const mapping = await getEntityRecordToBlockIdMapping(
+		const menuItemIdToBlockId = await getEntityRecordIdToBlockIdMapping(
 			registry,
 			post.id
 		);
-		const clientIdToMenuId = invert( mapping );
+		const knownBlockIds = new Set( Object.values( menuItemIdToBlockId ) );
 
-		const stack = [ post.blocks[ 0 ] ];
-		while ( stack.length ) {
-			const block = stack.pop();
-			if ( ! ( block.clientId in clientIdToMenuId ) ) {
-				const menuItem = await apiFetch( {
-					path: `/__experimental/menu-items`,
-					method: 'POST',
-					data: {
-						title: 'Placeholder',
-						url: 'Placeholder',
-						menu_order: 0,
-					},
-				} );
-
-				mapping[ menuItem.id ] = block.clientId;
-				const menuItems = await registry
-					.resolveSelect( 'core' )
-					.getMenuItems( { menus: menuId, per_page: -1 } );
-
-				await registry
-					.dispatch( 'core' )
-					.receiveEntityRecords(
-						'root',
-						'menuItem',
-						[ ...menuItems, menuItem ],
-						menuItemsQuery( menuId ),
-						false
-					);
+		const blocks = blocksTreeToFlatList( post.blocks[ 0 ].innerBlocks );
+		for ( const { block } of blocks ) {
+			if ( ! knownBlockIds.has( block.clientId ) ) {
+				const menuItem = await dispatch(
+					createPlaceholderMenuItem( block, menuId )
+				);
+				menuItemIdToBlockId[ menuItem.id ] = block.clientId;
 			}
-			stack.push( ...block.innerBlocks );
 		}
 
 		dispatch( {
 			type: 'SET_MENU_ITEM_TO_CLIENT_ID_MAPPING',
 			postId: post.id,
-			mapping,
+			mapping: menuItemIdToBlockId,
 		} );
 	} finally {
 		await registry.dispatch( 'core' ).__unstableReleaseStoreLock( lock );
 	}
+};
+
+const createPlaceholderMenuItem = ( block, menuId ) => async ( {
+	registry,
+} ) => {
+	const menuItem = await apiFetch( {
+		path: `/__experimental/menu-items`,
+		method: 'POST',
+		data: {
+			title: 'Placeholder',
+			url: 'Placeholder',
+			menu_order: 0,
+		},
+	} );
+
+	const menuItems = await registry
+		.resolveSelect( 'core' )
+		.getMenuItems( { menus: menuId, per_page: -1 } );
+
+	await registry
+		.dispatch( 'core' )
+		.receiveEntityRecords(
+			'root',
+			'menuItem',
+			[ ...menuItems, menuItem ],
+			menuItemsQuery( menuId ),
+			false
+		);
+
+	return menuItem;
 };
 
 /**
@@ -129,8 +132,12 @@ export const saveNavigationPost = ( post ) => async ( {
 		}
 
 		// Save blocks as menu items.
+		const oldMenuItems = await registry
+			.resolveSelect( 'core' )
+			.getMenuItems( { menus: post.meta.menuId, per_page: -1 } );
+		const newMenuItems = await dispatch( computeNewMenuItems( post ) );
 		const batchTasks = await dispatch(
-			createBatchSaveForEditedMenuItems( post )
+			createBatchSave( 'root', 'menuItem', oldMenuItems, newMenuItems )
 		);
 		await registry.dispatch( 'core' ).__experimentalBatch( batchTasks );
 
@@ -167,8 +174,32 @@ export const saveNavigationPost = ( post ) => async ( {
 	}
 };
 
-const getEntityRecordToBlockIdMapping = ( registry, postId ) =>
+const getEntityRecordIdToBlockIdMapping = ( registry, postId ) =>
 	registry.stores[ STORE_NAME ].store.getState().mapping[ postId ] || {};
+
+const computeNewMenuItems = ( post ) => async ( { registry } ) => {
+	const navigationBlock = post.blocks[ 0 ];
+	const menuId = post.meta.menuId;
+	const oldEntityRecords = await registry
+		.resolveSelect( 'core' )
+		.getMenuItems( { menus: menuId, per_page: -1 } );
+
+	const blockIdToOldEntityRecord = mapBlockIdToEntityRecord(
+		getEntityRecordIdToBlockIdMapping( registry, post.id ),
+		oldEntityRecords
+	);
+
+	const blocksList = blocksTreeToFlatList( navigationBlock.innerBlocks );
+	return blocksList.map( ( { block, parentBlockId, position } ) =>
+		blockToMenuItem(
+			block,
+			blockIdToOldEntityRecord[ block.clientId ],
+			blockIdToOldEntityRecord[ parentBlockId ]?.id,
+			position,
+			menuId
+		)
+	);
+};
 
 function mapBlockIdToEntityRecord( entityIdToBlockId, entityRecords ) {
 	return Object.fromEntries(
@@ -181,72 +212,53 @@ function mapBlockIdToEntityRecord( entityIdToBlockId, entityRecords ) {
 	);
 }
 
-const createBatchSaveForEditedMenuItems = ( post ) => async ( {
-	registry,
-} ) => {
-	const navigationBlock = post.blocks[ 0 ];
-	const menuId = post.meta.menuId;
-	const menuItems = await registry
-		.resolveSelect( 'core' )
-		.getMenuItems( { menus: menuId, per_page: -1 } );
-
-	const blockIdToAPIEntity = mapBlockIdToEntityRecord(
-		getEntityRecordToBlockIdMapping( registry, post.id ),
-		menuItems
-	);
-
-	const blocksList = blocksTreeToFlatList( navigationBlock.innerBlocks );
-
-	const deletedEntityRecordsIds = computeDeletedEntityRecordsIds(
-		blockIdToAPIEntity,
-		blocksList
+const createBatchSave = (
+	kind,
+	type,
+	oldEntityRecords,
+	newEntityRecords
+) => async ( { registry } ) => {
+	const deletedEntityRecordsIds = new Set(
+		diff(
+			oldEntityRecords.map( ( { id } ) => id ),
+			newEntityRecords.map( ( { id } ) => id )
+		)
 	);
 
 	const batchTasks = [];
 	// Enqueue updates
-	for ( const { block, parentBlockId, position } of blocksList ) {
-		const entityRecordId = blockIdToAPIEntity[ block.clientId ]?.id;
+	for ( const entityRecord of newEntityRecords ) {
 		if (
-			! entityRecordId ||
-			deletedEntityRecordsIds.includes( entityRecordId )
+			! entityRecord?.id ||
+			deletedEntityRecordsIds.has( entityRecord?.id )
 		) {
 			continue;
 		}
 
-		// Update an existing navigation item.
+		// Update an existing entity record.
 		await registry
 			.dispatch( 'core' )
-			.editEntityRecord(
-				'root',
-				'menuItem',
-				entityRecordId,
-				blockToMenuItem(
-					block,
-					blockIdToAPIEntity[ block.clientId ],
-					blockIdToAPIEntity[ parentBlockId ]?.id,
-					position,
-					menuId
-				),
-				{ undoIgnore: true }
-			);
+			.editEntityRecord( kind, type, entityRecord.id, entityRecord, {
+				undoIgnore: true,
+			} );
 
 		const hasEdits = registry
 			.select( 'core' )
-			.hasEditsForEntityRecord( 'root', 'menuItem', entityRecordId );
+			.hasEditsForEntityRecord( kind, type, entityRecord.id );
 
 		if ( ! hasEdits ) {
 			continue;
 		}
 
 		batchTasks.unshift( ( { saveEditedEntityRecord } ) =>
-			saveEditedEntityRecord( 'root', 'menuItem', entityRecordId )
+			saveEditedEntityRecord( kind, type, entityRecord.id )
 		);
 	}
 
 	// Enqueue deletes
 	for ( const entityRecordId of deletedEntityRecordsIds ) {
 		batchTasks.unshift( ( { deleteEntityRecord } ) =>
-			deleteEntityRecord( 'root', 'menuItem', entityRecordId, {
+			deleteEntityRecord( kind, type, entityRecordId, {
 				force: true,
 			} )
 		);
@@ -255,21 +267,17 @@ const createBatchSaveForEditedMenuItems = ( post ) => async ( {
 	return batchTasks;
 };
 
+function diff( listA, listB ) {
+	const setB = new Set( listB );
+	return listA.filter( ( x ) => ! setB.has( x ) );
+}
+
 function blocksTreeToFlatList( innerBlocks, parentBlockId = null ) {
 	return innerBlocks.flatMap( ( block, index ) =>
 		[ { block, parentBlockId, position: index + 1 } ].concat(
 			blocksTreeToFlatList( block.innerBlocks, block.clientId )
 		)
 	);
-}
-
-function computeDeletedEntityRecordsIds( blockIdToAPIEntity, blocksList ) {
-	const editorBlocksIds = new Set(
-		blocksList.map( ( { block } ) => block.clientId )
-	);
-	return Object.entries( blockIdToAPIEntity )
-		.filter( ( [ clientId ] ) => ! editorBlocksIds.has( clientId ) )
-		.map( ( [ , entityRecord ] ) => entityRecord.id );
 }
 
 /**
