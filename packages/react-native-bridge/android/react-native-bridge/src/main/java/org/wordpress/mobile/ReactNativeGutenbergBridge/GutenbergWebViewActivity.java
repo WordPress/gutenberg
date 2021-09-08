@@ -267,6 +267,9 @@ public class GutenbergWebViewActivity extends AppCompatActivity {
 
                 String injectGutenbergObserver = getFileContentFromAssets("gutenberg-web-single-block/gutenberg-observer.js");
                 evaluateJavaScript(injectGutenbergObserver);
+
+                String customJS = getFileContentFromAssets("gutenberg-web-single-block/custom-js.js");
+                evaluateJavaScript(customJS);
             }
         });
     }
