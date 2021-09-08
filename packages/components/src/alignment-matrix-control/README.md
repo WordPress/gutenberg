@@ -52,6 +52,11 @@ If provided, sets the default alignment value.
 - Required: No
 - Default: `center center`
 
+### value
+The current alignment value.
+- Type: `String`
+- Required: No
+
 ### onChange
 
 A function that receives the updated alignment value.
