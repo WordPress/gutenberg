@@ -736,6 +736,18 @@ class WP_Theme_JSON_Gutenberg {
 			}
 		}
 
+		// Duotone filters are a special case and need to be handled differently.
+		$duotone_values = _wp_array_get( $settings, array( 'color', 'duotone' ), array() );
+		foreach ( $duotone_values as $duotone ) {
+			$slug           = gutenberg_experimental_to_kebab_case( $duotone['slug'] );
+			$duotone_id     = 'wp-preset-duotone-filter-' . $slug;
+			$duotone_colors = $duotone['colors'];
+			$declarations[] = array(
+				'name'  => '--wp--preset--duotone-filter--' . $slug,
+				'value' => gutenberg_get_duotone_filter_property( $duotone_id, $duotone_colors ),
+			);
+		}
+
 		return $declarations;
 	}
 
@@ -888,29 +900,6 @@ class WP_Theme_JSON_Gutenberg {
 		}
 
 		return $block_rules;
-	}
-
-	/**
-	 * Gets the SVGs for duotone filter support.
-	 *
-	 * @param array $settings Settings per block.
-	 *
-	 * @return string The SVGs containing the duotone filters.
-	 */
-	private function get_svg_filters( $settings ) {
-		if ( ! isset( $settings['color']['duotone'] ) ) {
-			return;
-		}
-
-		$block_svgs = '';
-
-		foreach ( $settings['color']['duotone'] as $swatch ) {
-			$duotone_id     = 'wp-duotone-filter-' . $swatch['slug'];
-			$duotone_colors = $swatch['colors'];
-			$block_svgs    .= gutenberg_get_duotone_svg_filter( $duotone_id, $duotone_colors );
-		}
-
-		return $block_svgs;
 	}
 
 	/**
@@ -1181,15 +1170,6 @@ class WP_Theme_JSON_Gutenberg {
 			default:
 				return $this->get_css_variables( $setting_nodes ) . $this->get_block_classes( $style_nodes ) . $this->get_preset_classes( $setting_nodes );
 		}
-	}
-
-	/**
-	 * Returns the SVGs for filters used by the stylesheets.
-	 *
-	 * @return string SVGs.
-	 */
-	public function get_svgs() {
-		return $this->get_svg_filters( $this->get_settings() );
 	}
 
 	/**

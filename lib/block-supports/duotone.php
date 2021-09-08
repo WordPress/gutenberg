@@ -251,47 +251,14 @@ function gutenberg_register_duotone_support( $block_type ) {
 }
 
 /**
- * Get the duotone stylesheet.
- *
- * @param string $duotone_id Unique id for the duotone filter.
- * @param string $duotone_selector Duotone selector as declared in block support.
- *
- * @return string Duotone stylesheet.
- */
-function gutenberg_get_duotone_stylesheet( $duotone_id, $duotone_selector ) {
-	$selectors        = explode( ',', $duotone_selector );
-	$selectors_scoped = array_map(
-		function ( $selector ) use ( $duotone_id ) {
-			return '.' . $duotone_id . ' ' . trim( $selector );
-		},
-		$selectors
-	);
-	$selectors_group  = implode( ', ', $selectors_scoped );
-
-	ob_start();
-
-	?>
-
-	<style>
-		<?php echo $selectors_group; ?> {
-			filter: url( <?php echo esc_url( '#' . $duotone_id ); ?> );
-		}
-	</style>
-
-	<?php
-
-	return ob_get_clean();
-}
-
-/**
- * Get the duotone SVG.
+ * Get the duotone filter property.
  *
  * @param string $duotone_id Unique id for the duotone filter.
  * @param array  $duotone_colors Array of CSS color strings that can be parsed by tinycolor.
  *
- * @return string Duotone SVG.
+ * @return string Duotone CSS filter property.
  */
-function gutenberg_get_duotone_svg_filter( $duotone_id, $duotone_colors ) {
+function gutenberg_get_duotone_filter_property( $duotone_id, $duotone_colors ) {
 	$duotone_values = array(
 		'r' => array(),
 		'g' => array(),
@@ -309,25 +276,17 @@ function gutenberg_get_duotone_svg_filter( $duotone_id, $duotone_colors ) {
 
 	?>
 
-	<svg
-		xmlns:xlink="http://www.w3.org/1999/xlink"
-		viewBox="0 0 0 0"
-		width="0"
-		height="0"
-		focusable="false"
-		role="none"
-		style="visibility: hidden; position: absolute; left: -9999px; overflow: hidden;"
-	>
+	<svg xmlns="http://www.w3.org/2000/svg">
 		<defs>
 			<filter id="<?php echo esc_attr( $duotone_id ); ?>">
 				<feColorMatrix
 					type="matrix"
-					<?php // phpcs:disable Generic.WhiteSpace.DisallowSpaceIndent ?>
-					values=".299 .587 .114 0 0
-							.299 .587 .114 0 0
-							.299 .587 .114 0 0
-							0 0 0 1 0"
-					<?php // phpcs:enable Generic.WhiteSpace.DisallowSpaceIndent ?>
+					values="
+						.299 .587 .114 0 0
+						.299 .587 .114 0 0
+						.299 .587 .114 0 0
+						0 0 0 1 0
+					"
 				/>
 				<feComponentTransfer color-interpolation-filters="sRGB" >
 					<feFuncR type="table" tableValues="<?php echo esc_attr( implode( ' ', $duotone_values['r'] ) ); ?>" />
@@ -340,7 +299,17 @@ function gutenberg_get_duotone_svg_filter( $duotone_id, $duotone_colors ) {
 
 	<?php
 
-	return ob_get_clean();
+	$svg = ob_get_clean();
+
+	// Clean up the whitespace so it can be used in a data uri.
+	$svg = preg_replace( "/(\r|\n|\t)+/", ' ', $svg );
+	$svg = preg_replace( '/> </', '><', $svg );
+	$svg = trim( $svg );
+
+	$data_uri = 'data:image/svg+xml,' . $svg . '#' . $duotone_id;
+
+	// All the variables are already escaped above, so we're not calling esc_url() here.
+	return "url('" . $data_uri . "')";
 }
 
 /**
@@ -367,30 +336,32 @@ function gutenberg_render_duotone_support( $block_content, $block ) {
 		return $block_content;
 	}
 
-	$duotone_colors = $block['attrs']['style']['color']['duotone'];
+	$duotone_id      = 'wp-duotone-filter-' . uniqid();
+	$duotone_colors  = $block['attrs']['style']['color']['duotone'];
+	$filter_property = gutenberg_get_duotone_filter_property( $duotone_id, $duotone_colors );
 
-	$duotone_id = 'wp-duotone-filter-' . uniqid();
+	$selectors = explode( ',', $duotone_support );
+	$scoped    = array();
+	foreach ( $selectors as $sel ) {
+		$scoped[] = '.' . $duotone_id . ' ' . trim( $sel );
+	}
+	$selector = implode( ', ', $scoped );
 
-	$duotone  = gutenberg_get_duotone_stylesheet( $duotone_id, $duotone_support );
-	$duotone .= gutenberg_get_duotone_svg_filter( $duotone_id, $duotone_colors );
+	$filter_style = defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG
+		? $selector . " {\n\tfilter: " . $filter_property . " !important;\n}\n"
+		: $selector . '{filter:' . $filter_property . ' !important;}';
+
+	wp_register_style( $duotone_id, false, array(), true, true );
+	wp_add_inline_style( $duotone_id, $filter_style );
+	wp_enqueue_style( $duotone_id );
 
 	// Like the layout hook, this assumes the hook only applies to blocks with a single wrapper.
-	$content = preg_replace(
+	return preg_replace(
 		'/' . preg_quote( 'class="', '/' ) . '/',
 		'class="' . $duotone_id . ' ',
 		$block_content,
 		1
 	);
-
-	add_action(
-		// Ideally we should use wp_head, but SVG defs can't be put in there.
-		'wp_footer',
-		function () use ( $duotone ) {
-			echo $duotone;
-		}
-	);
-
-	return $content;
 }
 
 // Register the block support.
