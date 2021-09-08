@@ -44,7 +44,7 @@ export default function ManageLocations( {
 				body: {
 					locations,
 				},
-				method
+				method,
 			};
 		} );
 
@@ -54,7 +54,7 @@ export default function ManageLocations( {
 				validation: 'require-all-validate',
 				requests: batchRequests,
 			},
-			method
+			method,
 		} );
 	};
 
