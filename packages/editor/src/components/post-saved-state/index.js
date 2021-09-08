@@ -136,14 +136,20 @@ export default function PostSavedState( {
 	// lost.
 	return (
 		<Button
-			className={ classnames( {
-				'editor-post-save-draft': ! isSavedState,
-				'editor-post-saved-state': isSavedState,
-				'is-saving': isSaving,
-				'is-autosaving': isAutosaving,
-				'is-saved': isSaved,
-				[ getAnimateClassName( { type: 'loading' } ) ]: isSaving,
-			} ) }
+			className={
+				isSaveable
+					? classnames( {
+							'editor-post-save-draft': ! isSavedState,
+							'editor-post-saved-state': isSavedState,
+							'is-saving': isSaving,
+							'is-autosaving': isAutosaving,
+							'is-saved': isSaved,
+							[ getAnimateClassName( {
+								type: 'loading',
+							} ) ]: isSaving,
+					  } )
+					: undefined
+			}
 			onClick={ isDisabled ? undefined : () => savePost() }
 			shortcut={ displayShortcut.primary( 's' ) }
 			variant={ isLargeViewport ? 'tertiary' : undefined }
