@@ -16,7 +16,7 @@ npm install @wordpress/dom --save
 
 ### computeCaretRect
 
-[src/index.js#L14-L14](src/index.js#L14-L14)
+[src/index.js#L13-L13](src/index.js#L13-L13)
 
 Get the rectangle for the selection in a container.
 
@@ -30,7 +30,7 @@ Get the rectangle for the selection in a container.
 
 ### documentHasSelection
 
-[src/index.js#L14-L14](src/index.js#L14-L14)
+[src/index.js#L13-L13](src/index.js#L13-L13)
 
 Check wether the current document has a selection.
 This checks both for focus in an input field and general text selection.
@@ -48,7 +48,7 @@ under the keys with the same name.
 
 ### getOffsetParent
 
-[src/index.js#L14-L14](src/index.js#L14-L14)
+[src/index.js#L13-L13](src/index.js#L13-L13)
 
 Returns the closest positioned element, or null under any of the conditions
 of the offsetParent specification. Unlike offsetParent, this function is not
@@ -68,7 +68,7 @@ limited to HTMLElement and accepts any Node (e.g. Node.TEXT_NODE).
 
 ### getRectangleFromRange
 
-[src/index.js#L14-L14](src/index.js#L14-L14)
+[src/index.js#L13-L13](src/index.js#L13-L13)
 
 Get the rectangle of a given Range.
 
@@ -82,7 +82,7 @@ Get the rectangle of a given Range.
 
 ### getScrollContainer
 
-[src/index.js#L14-L14](src/index.js#L14-L14)
+[src/index.js#L13-L13](src/index.js#L13-L13)
 
 Given a DOM node, finds the closest scrollable container node.
 
@@ -96,7 +96,7 @@ Given a DOM node, finds the closest scrollable container node.
 
 ### insertAfter
 
-[src/index.js#L14-L14](src/index.js#L14-L14)
+[src/index.js#L13-L13](src/index.js#L13-L13)
 
 Given two DOM nodes, inserts the former in the DOM as the next sibling of
 the latter.
@@ -112,7 +112,7 @@ the latter.
 
 ### isEntirelySelected
 
-[src/index.js#L14-L14](src/index.js#L14-L14)
+[src/index.js#L13-L13](src/index.js#L13-L13)
 
 Check whether the contents of the element have been entirely selected.
 Returns true if there is no possibility of selection.
@@ -127,7 +127,7 @@ Returns true if there is no possibility of selection.
 
 ### isHorizontalEdge
 
-[src/index.js#L14-L14](src/index.js#L14-L14)
+[src/index.js#L13-L13](src/index.js#L13-L13)
 
 Check whether the selection is horizontally at the edge of the container.
 
@@ -142,7 +142,7 @@ Check whether the selection is horizontally at the edge of the container.
 
 ### isTextField
 
-[src/index.js#L14-L14](src/index.js#L14-L14)
+[src/index.js#L13-L13](src/index.js#L13-L13)
 
 Check whether the given element is a text field, where text field is defined
 by the ability to select within the input, or that it is contenteditable.
@@ -159,7 +159,7 @@ See: <https://html.spec.whatwg.org/#textFieldSelection>
 
 ### isVerticalEdge
 
-[src/index.js#L14-L14](src/index.js#L14-L14)
+[src/index.js#L13-L13](src/index.js#L13-L13)
 
 Check whether the selection is vertically at the edge of the container.
 
@@ -174,7 +174,7 @@ Check whether the selection is vertically at the edge of the container.
 
 ### placeCaretAtHorizontalEdge
 
-[src/index.js#L14-L14](src/index.js#L14-L14)
+[src/index.js#L13-L13](src/index.js#L13-L13)
 
 Places the caret at start or end of a given element.
 
@@ -185,7 +185,7 @@ Places the caret at start or end of a given element.
 
 ### placeCaretAtVerticalEdge
 
-[src/index.js#L14-L14](src/index.js#L14-L14)
+[src/index.js#L13-L13](src/index.js#L13-L13)
 
 Places the caret at the top or bottom of a given element.
 
@@ -198,7 +198,7 @@ Places the caret at the top or bottom of a given element.
 
 ### remove
 
-[src/index.js#L14-L14](src/index.js#L14-L14)
+[src/index.js#L13-L13](src/index.js#L13-L13)
 
 Given a DOM node, removes it from the DOM.
 
@@ -212,7 +212,7 @@ Given a DOM node, removes it from the DOM.
 
 ### replace
 
-[src/index.js#L14-L14](src/index.js#L14-L14)
+[src/index.js#L13-L13](src/index.js#L13-L13)
 
 Given two DOM nodes, replaces the former with the latter in the DOM.
 
@@ -227,7 +227,7 @@ Given two DOM nodes, replaces the former with the latter in the DOM.
 
 ### replaceTag
 
-[src/index.js#L14-L14](src/index.js#L14-L14)
+[src/index.js#L13-L13](src/index.js#L13-L13)
 
 Replaces the given node with a new node with the given tag name.
 
@@ -242,7 +242,7 @@ Replaces the given node with a new node with the given tag name.
 
 ### safeHTML
 
-[src/index.js#L15-L15](src/index.js#L15-L15)
+[src/index.js#L14-L14](src/index.js#L14-L14)
 
 Strips scripts and on\* attributes from HTML.
 
@@ -256,7 +256,7 @@ Strips scripts and on\* attributes from HTML.
 
 ### unwrap
 
-[src/index.js#L14-L14](src/index.js#L14-L14)
+[src/index.js#L13-L13](src/index.js#L13-L13)
 
 Unwrap the given node. This means any child nodes are moved to the parent.
 
@@ -270,7 +270,7 @@ Unwrap the given node. This means any child nodes are moved to the parent.
 
 ### wrap
 
-[src/index.js#L14-L14](src/index.js#L14-L14)
+[src/index.js#L13-L13](src/index.js#L13-L13)
 
 Wraps the given node with a new node with the given tag name.
 

@@ -403,6 +403,7 @@ Renders a menu item in `Plugins` group in `More Menu` drop down,
 and can be used to activate the corresponding `PluginSidebar` component.
 The text within the component appears as the menu item label.
 
+
 **Usage**
 
 ```js
