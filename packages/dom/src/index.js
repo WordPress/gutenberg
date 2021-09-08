@@ -12,3 +12,4 @@ export const focus = { focusable, tabbable };
 
 export * from './dom';
 export * from './phrasing-content';
+export { default as safeHTML } from './safe-html';
