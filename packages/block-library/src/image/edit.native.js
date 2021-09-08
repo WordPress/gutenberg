@@ -539,7 +539,6 @@ export class ImageEdit extends Component {
 			clientId,
 			imageDefaultSize,
 			context: { imageCrop = false } = {},
-			featuredImageId,
 			wasBlockJustInserted,
 		} = this.props;
 		const { align, url, alt, id, sizeSlug, className } = attributes;
