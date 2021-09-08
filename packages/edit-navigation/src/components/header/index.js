@@ -46,21 +46,22 @@ export default function Header( {
 
 	return (
 		<div className="edit-navigation-header">
-			{ isMediumViewport && (
-				<div className="edit-navigation-header__toolbar-wrapper">
+			<div className="edit-navigation-header__toolbar-wrapper">
+				{ isMediumViewport && (
 					<h1 className="edit-navigation-header__title">
 						{ __( 'Navigation' ) }
 					</h1>
-					<NavigableToolbar
-						className="edit-navigation-header__toolbar"
-						aria-label={ __( 'Document tools' ) }
-					>
-						<Inserter />
-						<UndoButton />
-						<RedoButton />
-					</NavigableToolbar>
-				</div>
-			) }
+				) }
+				<NavigableToolbar
+					className="edit-navigation-header__toolbar"
+					aria-label={ __( 'Document tools' ) }
+				>
+					<Inserter />
+					<UndoButton />
+					<RedoButton />
+				</NavigableToolbar>
+			</div>
+
 			<h2 className="edit-navigation-header__subtitle">
 				{ isMenuSelected && decodeEntities( actionHeaderText ) }
 			</h2>
