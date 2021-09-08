@@ -223,11 +223,11 @@ const createBatchSaveForEditedMenuItems = ( post ) => async ( {
 				'menuItem',
 				entityRecordId,
 				blockToMenuItem(
-					blockIdToAPIEntity[ block.clientId ],
-					menuId,
 					block,
+					blockIdToAPIEntity[ block.clientId ],
 					blockIdToAPIEntity[ parentBlockId ]?.id,
-					position
+					position,
+					menuId
 				),
 				{ undoIgnore: true }
 			);
@@ -257,7 +257,7 @@ const createBatchSaveForEditedMenuItems = ( post ) => async ( {
 	return batchTasks;
 };
 
-function blockToMenuItem( menuItem, menuId, block, parentId, position ) {
+function blockToMenuItem( block, menuItem, parentId, position, menuId ) {
 	menuItem = omit( menuItem, 'menus', 'meta', '_links' );
 
 	let attributes;
