@@ -118,7 +118,7 @@ We strongly encourage using TypeScript for all new components. Components should
 <!-- TODO: add to the previous paragraph once the composision section gets added to this document.
 (more details about polymorphism can be found above in the "Components composition" section). -->
 
-#### Emotion
+#### Styling
 
 All new component should be styled using [Emotion](https://emotion.sh/docs/introduction).
 
