@@ -2,6 +2,8 @@
  * WordPress dependencies
  */
 import { Button } from '@wordpress/components';
+import { RawHTML } from '@wordpress/element';
+import { safeHTML } from '@wordpress/dom';
 
 const BlockView = ( { title, rawContent, renderedContent, action, actionText, className } ) => {
 	return (
@@ -14,7 +16,7 @@ const BlockView = ( { title, rawContent, renderedContent, action, actionText, cl
 				</div>
 
 				<div className="editor-block-compare__preview edit-post-visual-editor">
-					{ renderedContent }
+					<RawHTML>{ safeHTML( renderedContent ) }</RawHTML>
 				</div>
 			</div>
 

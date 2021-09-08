@@ -9,12 +9,38 @@ import {
 	ZERO_WIDTH_NO_BREAK_SPACE,
 } from './special-characters';
 
-function fromFormat( { type, attributes, unregisteredAttributes, object } ) {
+function restoreOnAttributes( attributes, isEditableTree ) {
+	if ( isEditableTree ) {
+		return attributes;
+	}
+
+	const newAttributes = {};
+
+	for ( const key in attributes ) {
+		let newKey = key;
+		if ( key.startsWith( 'data-disable-rich-text-' ) ) {
+			newKey = key.slice( 'data-disable-rich-text-'.length );
+		}
+
+		newAttributes[ newKey ] = attributes[ key ];
+	}
+
+	return newAttributes;
+}
+
+function fromFormat( { type, attributes, unregisteredAttributes, object, isEditableTree } ) {
 	const formatType = getFormatType( type );
 
 	if ( ! formatType ) {
-		return { type, attributes, object };
-	}
+ 		return {
+ 			type,
+ 			attributes: restoreOnAttributes(
+ 				attributes,
+ 				isEditableTree
+ 			),
+ 			object,
+ 		};
+ 	}
 
 	const elementAttributes = { ...unregisteredAttributes };
 
@@ -39,7 +65,7 @@ function fromFormat( { type, attributes, unregisteredAttributes, object } ) {
 	return {
 		type: formatType.tagName,
 		object: formatType.object,
-		attributes: elementAttributes,
+		attributes: restoreOnAttributes( elementAttributes, isEditableTree ),
 	};
 }
 
@@ -147,7 +173,13 @@ export function toTree( {
 				}
 
 				const parent = getParent( pointer );
-				const newNode = append( parent, fromFormat( format ) );
+				const { type, attributes, unregisteredAttributes } = format;
+				const newNode = append( parent, fromFormat( {
+					type,
+					attributes,
+					unregisteredAttributes,
+					isEditableTree,
+				} ) );
 
 				if ( isText( pointer ) && getText( pointer ).length === 0 ) {
 					remove( pointer );
@@ -177,16 +209,40 @@ export function toTree( {
 			}
 		}
 
-		if ( character !== OBJECT_REPLACEMENT_CHARACTER ) {
-			if ( character === '\n' ) {
-				pointer = append( getParent( pointer ), { type: 'br', object: true } );
-				// Ensure pointer is text node.
-				pointer = append( getParent( pointer ), '' );
-			} else if ( ! isText( pointer ) ) {
-				pointer = append( getParent( pointer ), character );
+		if ( character === OBJECT_REPLACEMENT_CHARACTER ) {
+			if ( ! isEditableTree && replacements[ i ].type === 'script' ) {
+				pointer = append(
+					getParent( pointer ),
+					fromFormat( {
+						type: 'script',
+						isEditableTree,
+					} )
+				);
+				append( pointer, {
+					html: decodeURIComponent(
+						replacements[ i ].attributes[ 'data-rich-text-script' ]
+					),
+				} );
 			} else {
-				appendText( pointer, character );
+				pointer = append(
+					getParent( pointer ),
+					fromFormat( {
+						...replacements[ i ],
+						object: true,
+						isEditableTree,
+					} )
+				);
 			}
+			// Ensure pointer is text node.
+			pointer = append( getParent( pointer ), '' );
+		} else if ( character === '\n' ) {
+			pointer = append( getParent( pointer ), { type: 'br', object: true } );
+			// Ensure pointer is text node.
+			pointer = append( getParent( pointer ), '' );
+		} else if ( ! isText( pointer ) ) {
+			pointer = append( getParent( pointer ), character );
+		} else {
+			appendText( pointer, character );
 		}
 
 		pointer = setFormatPlaceholder( pointer, i + 1 );

@@ -337,6 +337,26 @@ function createFromElement( {
 			continue;
 		}
 
+		if ( type === 'script' ) {
+			const value = {
+				formats: [ , ],
+				replacements: [
+					{
+						type,
+						attributes: {
+							'data-rich-text-script':
+								node.getAttribute( 'data-rich-text-script' ) ||
+								encodeURIComponent( node.innerHTML ),
+						},
+					},
+				],
+				text: OBJECT_REPLACEMENT_CHARACTER,
+			};
+			accumulateSelection( accumulator, node, range, value );
+			mergePair( accumulator, value );
+			continue;
+		}
+
 		if ( type === 'br' ) {
 			accumulateSelection( accumulator, node, range, createEmptyValue() );
 			accumulator.text += '\n';
@@ -573,8 +593,12 @@ function getAttributes( {
 			continue;
 		}
 
+		const safeName = /^on/i.test( name ) ?
+			'data-disable-rich-text-' + name :
+			name;
+
 		accumulator = accumulator || {};
-		accumulator[ name ] = value;
+		accumulator[ safeName ] = value;
 	}
 
 	return accumulator;

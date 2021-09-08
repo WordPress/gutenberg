@@ -7,17 +7,18 @@ import { get, reduce, size, first, last } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { Component, Fragment } from '@wordpress/element';
+import { Component, Fragment, RawHTML } from '@wordpress/element';
 import {
 	focus,
 	isTextField,
 	placeCaretAtHorizontalEdge,
 	placeCaretAtVerticalEdge,
+	safeHTML,
 } from '@wordpress/dom';
 import { BACKSPACE, DELETE, ENTER } from '@wordpress/keycodes';
 import {
 	getBlockType,
-	getSaveElement,
+	getSaveContent,
 	isReusableBlock,
 	isUnmodifiedDefaultBlock,
 	getUnregisteredTypeHandlerName,
@@ -592,7 +593,11 @@ export class BlockListBlock extends Component {
 												clientId={ clientId }
 											/>,
 											<div key="invalid-preview">
-												{ getSaveElement( blockType, attributes ) }
+												<RawHTML>
+													{ safeHTML(
+														getSaveContent( blockType, attributes )
+													) }
+												</RawHTML>
 											</div>,
 										] }
 									</BlockCrashBoundary>
