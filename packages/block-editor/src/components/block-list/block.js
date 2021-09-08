@@ -14,12 +14,18 @@ import {
 	useLayoutEffect,
 	useState,
 	useContext,
+	RawHTML,
 } from '@wordpress/element';
-import { focus, isTextField, placeCaretAtHorizontalEdge } from '@wordpress/dom';
+import {
+	focus,
+	isTextField,
+	placeCaretAtHorizontalEdge,
+	safeHTML,
+} from '@wordpress/dom';
 import { BACKSPACE, DELETE, ENTER } from '@wordpress/keycodes';
 import {
 	getBlockType,
-	getSaveElement,
+	getSaveContent,
 	isReusableBlock,
 	isUnmodifiedDefaultBlock,
 	getUnregisteredTypeHandlerName,
@@ -327,7 +333,11 @@ function BlockListBlock( {
 						clientId={ clientId }
 					/>,
 					<div key="invalid-preview">
-						{ getSaveElement( blockType, attributes ) }
+						<RawHTML>
+							{ safeHTML(
+								getSaveContent( blockType, attributes )
+							) }
+						</RawHTML>
 					</div>,
 				] }
 			</BlockCrashBoundary>

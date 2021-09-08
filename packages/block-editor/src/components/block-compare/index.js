@@ -10,7 +10,7 @@ import { diffChars } from 'diff';
  */
 import { __ } from '@wordpress/i18n';
 import { Component } from '@wordpress/element';
-import { getSaveContent, getSaveElement } from '@wordpress/blocks';
+import { getSaveContent } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
@@ -35,13 +35,6 @@ class BlockCompare extends Component {
 		} );
 	}
 
-	getOriginalContent( block ) {
-		return {
-			rawContent: block.originalContent,
-			renderedContent: getSaveElement( block.name, block.attributes ),
-		};
-	}
-
 	getConvertedContent( block ) {
 		// The convertor may return an array of items or a single item
 		const newBlocks = castArray( block );
@@ -50,14 +43,8 @@ class BlockCompare extends Component {
 		const newContent = newBlocks.map( ( item ) =>
 			getSaveContent( item.name, item.attributes, item.innerBlocks )
 		);
-		const renderedContent = newBlocks.map( ( item ) =>
-			getSaveElement( item.name, item.attributes, item.innerBlocks )
-		);
 
-		return {
-			rawContent: newContent.join( '' ),
-			renderedContent,
-		};
+		return newContent.join( '' );
 	}
 
 	render() {
@@ -68,11 +55,11 @@ class BlockCompare extends Component {
 			convertor,
 			convertButtonText,
 		} = this.props;
-		const original = this.getOriginalContent( block );
+
 		const converted = this.getConvertedContent( convertor( block ) );
 		const difference = this.getDifference(
-			original.rawContent,
-			converted.rawContent
+			block.originalContent,
+			converted
 		);
 
 		return (
@@ -82,8 +69,8 @@ class BlockCompare extends Component {
 					className="block-editor-block-compare__current"
 					action={ onKeep }
 					actionText={ __( 'Convert to HTML' ) }
-					rawContent={ original.rawContent }
-					renderedContent={ original.renderedContent }
+					rawContent={ block.originalContent }
+					renderedContent={ block.originalContent }
 				/>
 
 				<BlockView
@@ -92,7 +79,7 @@ class BlockCompare extends Component {
 					action={ onConvert }
 					actionText={ convertButtonText }
 					rawContent={ difference }
-					renderedContent={ converted.renderedContent }
+					renderedContent={ converted }
 				/>
 			</div>
 		);
