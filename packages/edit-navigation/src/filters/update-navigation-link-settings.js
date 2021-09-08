@@ -3,8 +3,8 @@
  */
 import { addFilter } from '@wordpress/hooks';
 
-function removeNavigationBlockSettingsUnsupportedFeatures( settings, name ) {
-	if ( name !== 'core/navigation' ) {
+function updateNavigationLinkSettings( settings, name ) {
+	if ( name !== 'core/navigation-link' ) {
 		return settings;
 	}
 
@@ -15,6 +15,8 @@ function removeNavigationBlockSettingsUnsupportedFeatures( settings, name ) {
 			html: false,
 			inserter: true,
 		},
+		// Make the nav link block usable globally.
+		parent: undefined,
 		// Remove any block variations.
 		variations: undefined,
 	};
@@ -23,6 +25,6 @@ function removeNavigationBlockSettingsUnsupportedFeatures( settings, name ) {
 export default () =>
 	addFilter(
 		'blocks.registerBlockType',
-		'core/edit-navigation/remove-navigation-block-settings-unsupported-features',
-		removeNavigationBlockSettingsUnsupportedFeatures
+		'core/edit-navigation/update-navigation-link-settings',
+		updateNavigationLinkSettings
 	);

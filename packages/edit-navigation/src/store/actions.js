@@ -55,7 +55,7 @@ export const createMissingMenuItems = serializeProcessing( function* ( post ) {
 	const mapping = yield getMenuItemToClientIdMapping( post.id );
 	const clientIdToMenuId = invert( mapping );
 
-	const stack = [ post.blocks[ 0 ] ];
+	const stack = post.blocks;
 	while ( stack.length ) {
 		const block = stack.pop();
 		if ( ! ( block.clientId in clientIdToMenuId ) ) {
@@ -130,7 +130,7 @@ export const saveNavigationPost = serializeProcessing( function* ( post ) {
 		const batchSaveResponse = yield* batchSave(
 			menuId,
 			menuItemsByClientId,
-			post.blocks[ 0 ]
+			post.blocks
 		);
 
 		if ( ! batchSaveResponse.success ) {
@@ -183,7 +183,7 @@ function mapMenuItemsByClientId( menuItems, clientIdsByMenuId ) {
 	return result;
 }
 
-function* batchSave( menuId, menuItemsByClientId, navigationBlock ) {
+function* batchSave( menuId, menuItemsByClientId, blocks ) {
 	const { nonce, stylesheet } = yield apiFetch( {
 		path: '/__experimental/customizer-nonces/get-save-nonce',
 	} );
@@ -202,11 +202,7 @@ function* batchSave( menuId, menuItemsByClientId, navigationBlock ) {
 	body.append( 'action', 'customize_save' );
 	body.append(
 		'customized',
-		computeCustomizedAttribute(
-			navigationBlock.innerBlocks,
-			menuId,
-			menuItemsByClientId
-		)
+		computeCustomizedAttribute( blocks, menuId, menuItemsByClientId )
 	);
 
 	return yield apiFetch( {

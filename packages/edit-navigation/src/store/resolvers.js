@@ -1,13 +1,7 @@
 /**
- * WordPress dependencies
- */
-import { createBlock } from '@wordpress/blocks';
-
-/**
  * Internal dependencies
  */
 import { NAVIGATION_POST_KIND, NAVIGATION_POST_POST_TYPE } from '../constants';
-
 import { resolveMenuItems, dispatch } from './controls';
 import { buildNavigationPostId } from './utils';
 import menuItemsToBlocks from './menu-items-to-blocks';
@@ -41,7 +35,7 @@ export function* getNavigationPostForMenu( menuId ) {
 
 	// Now let's create a proper one hydrated using actual menu items
 	const menuItems = yield resolveMenuItems( menuId );
-	const [ navigationBlock, menuItemIdToClientId ] = createNavigationBlock(
+	const { innerBlocks, mapping: menuItemIdToClientId } = menuItemsToBlocks(
 		menuItems
 	);
 	yield {
@@ -50,20 +44,20 @@ export function* getNavigationPostForMenu( menuId ) {
 		mapping: menuItemIdToClientId,
 	};
 	// Persist the actual post containing the navigation block
-	yield persistPost( createStubPost( menuId, navigationBlock ) );
+	yield persistPost( createStubPost( menuId, innerBlocks ) );
 
 	// Dispatch finishResolution to conclude startResolution dispatched earlier
 	yield dispatch( 'core', 'finishResolution', 'getEntityRecord', args );
 }
 
-const createStubPost = ( menuId, navigationBlock = null ) => {
+const createStubPost = ( menuId, blocks = [] ) => {
 	const id = buildNavigationPostId( menuId );
 	return {
 		id,
 		slug: id,
 		status: 'draft',
 		type: 'page',
-		blocks: navigationBlock ? [ navigationBlock ] : [],
+		blocks,
 		meta: {
 			menuId,
 		},
@@ -80,24 +74,3 @@ const persistPost = ( post ) =>
 		{ id: post.id },
 		false
 	);
-
-/**
- * Converts an adjacency list of menuItems into a navigation block.
- *
- * @param {Array} menuItems a list of menu items
- * @return {Object} Navigation block
- */
-function createNavigationBlock( menuItems ) {
-	const { innerBlocks, mapping: menuItemIdToClientId } = menuItemsToBlocks(
-		menuItems
-	);
-
-	const navigationBlock = createBlock(
-		'core/navigation',
-		{
-			orientation: 'vertical',
-		},
-		innerBlocks
-	);
-	return [ navigationBlock, menuItemIdToClientId ];
-}

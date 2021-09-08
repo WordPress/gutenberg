@@ -109,10 +109,7 @@ export default function Layout( { blockEditorSettings } ) {
 					value={ blocks }
 					onInput={ onInput }
 					onChange={ onChange }
-					settings={ {
-						...blockEditorSettings,
-						templateLock: 'all',
-					} }
+					settings={ blockEditorSettings }
 					useSubRegistry={ false }
 				>
 					<IsMenuNameControlFocusedContext.Provider
