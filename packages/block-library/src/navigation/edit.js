@@ -151,7 +151,7 @@ function Navigation( {
 		},
 		{
 			allowedBlocks: ALLOWED_BLOCKS,
-			orientation: attributes.orientation || 'horizontal',
+			orientation: attributes.orientation,
 			renderAppender:
 				( isImmediateParentOfSelectedBlock &&
 					! selectedBlockHasDescendants ) ||
