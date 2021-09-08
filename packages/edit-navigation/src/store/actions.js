@@ -180,12 +180,16 @@ const batchSaveMenuItems = ( post ) => async ( { dispatch, registry } ) => {
 const computeNewMenuItems = ( post, oldMenuItems ) => async ( {
 	dispatch,
 } ) => {
-	const mapping = await dispatch(
+	const entityIdToBlockId = await dispatch(
 		getEntityRecordIdToBlockIdMapping( post.id )
 	);
-	const blockIdToOldEntityRecord = mapBlockIdToEntityRecord(
-		mapping,
+	const blockIdToOldEntityRecord = Object.fromEntries(
 		oldMenuItems
+			.map( ( entityRecord ) => [
+				entityIdToBlockId[ entityRecord.id ],
+				entityRecord,
+			] )
+			.filter( ( [ blockId ] ) => blockId )
 	);
 
 	const blocksList = blocksTreeToFlatList( post.blocks[ 0 ].innerBlocks );
@@ -208,17 +212,6 @@ const resolveSelectMenuItems = ( menuId ) => async ( { registry } ) =>
 	await registry
 		.resolveSelect( 'core' )
 		.getMenuItems( { menus: menuId, per_page: -1 } );
-
-function mapBlockIdToEntityRecord( entityIdToBlockId, entityRecords ) {
-	return Object.fromEntries(
-		entityRecords
-			.map( ( entityRecord ) => [
-				entityIdToBlockId[ entityRecord.id ],
-				entityRecord,
-			] )
-			.filter( ( [ blockId ] ) => blockId )
-	);
-}
 
 const createBatchSave = (
 	kind,
