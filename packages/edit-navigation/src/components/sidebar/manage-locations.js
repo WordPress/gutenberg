@@ -13,6 +13,8 @@ import {
 } from '@wordpress/components';
 import { decodeEntities } from '@wordpress/html-entities';
 import apiFetch from '@wordpress/api-fetch';
+import { useDispatch } from '@wordpress/data';
+import { store as noticesStore } from '@wordpress/notices';
 
 /**
  * Internal dependencies
@@ -32,6 +34,10 @@ export default function ManageLocations( {
 	const [ isModalOpen, setIsModalOpen ] = useState( false );
 	const openModal = () => setIsModalOpen( true );
 	const closeModal = () => setIsModalOpen( false );
+	const { createSuccessNotice, createErrorNotice } = useDispatch(
+		noticesStore
+	);
+
 	const updateMenuLocations = () => {
 		const method = 'POST';
 		const batchRequests = menus.map( ( { id } ) => {
@@ -48,7 +54,7 @@ export default function ManageLocations( {
 			};
 		} );
 
-		apiFetch( {
+		const batchResponse = apiFetch( {
 			path: 'batch/v1',
 			data: {
 				validation: 'require-all-validate',
@@ -56,6 +62,24 @@ export default function ManageLocations( {
 			},
 			method,
 		} );
+
+		if ( batchResponse.failed ) {
+			createErrorNotice(
+				__(
+					'An error occurred while trying to update menu locations.'
+				),
+				{
+					type: 'snackbar',
+				}
+			);
+
+			return;
+		}
+
+		createSuccessNotice( __( 'Menu locations have been updated.' ), {
+			type: 'snackbar',
+		} );
+		closeModal();
 	};
 
 	if ( ! menuLocations || ! menus?.length ) {
@@ -183,7 +207,7 @@ export default function ManageLocations( {
 					</div>
 					{ menuLocationCard }
 					<Button
-						className="edit-navigation-toolbar__save-button"
+						className="edit-navigation-manage-locations__save-button"
 						variant="primary"
 						onClick={ updateMenuLocations }
 					>
