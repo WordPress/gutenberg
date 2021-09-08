@@ -45,9 +45,8 @@ export const createMissingMenuItems = ( post ) => async ( {
 			exclusive: false,
 		} );
 	try {
-		const menuItemIdToBlockId = await getEntityRecordIdToBlockIdMapping(
-			registry,
-			post.id
+		const menuItemIdToBlockId = await dispatch(
+			getEntityRecordIdToBlockIdMapping( post.id )
 		);
 		const knownBlockIds = new Set( Object.values( menuItemIdToBlockId ) );
 
@@ -73,6 +72,7 @@ export const createMissingMenuItems = ( post ) => async ( {
 
 const createPlaceholderMenuItem = ( block, menuId ) => async ( {
 	registry,
+	dispatch,
 } ) => {
 	const menuItem = await apiFetch( {
 		path: `/__experimental/menu-items`,
@@ -84,9 +84,7 @@ const createPlaceholderMenuItem = ( block, menuId ) => async ( {
 		},
 	} );
 
-	const menuItems = await registry
-		.resolveSelect( 'core' )
-		.getMenuItems( { menus: menuId, per_page: -1 } );
+	const menuItems = await dispatch( resolveSelectMenuItems( menuId ) );
 
 	await registry
 		.dispatch( 'core' )
@@ -131,15 +129,7 @@ export const saveNavigationPost = ( post ) => async ( {
 			throw new Error( error.message );
 		}
 
-		// Save blocks as menu items.
-		const oldMenuItems = await registry
-			.resolveSelect( 'core' )
-			.getMenuItems( { menus: post.meta.menuId, per_page: -1 } );
-		const newMenuItems = await dispatch( computeNewMenuItems( post ) );
-		const batchTasks = await dispatch(
-			createBatchSave( 'root', 'menuItem', oldMenuItems, newMenuItems )
-		);
-		await registry.dispatch( 'core' ).__experimentalBatch( batchTasks );
+		await dispatch( batchSaveMenuItems( post ) );
 
 		// Clear "stub" navigation post edits to avoid a false "dirty" state.
 		await registry
@@ -174,32 +164,50 @@ export const saveNavigationPost = ( post ) => async ( {
 	}
 };
 
-const getEntityRecordIdToBlockIdMapping = ( registry, postId ) =>
-	registry.stores[ STORE_NAME ].store.getState().mapping[ postId ] || {};
+const batchSaveMenuItems = ( post ) => async ( { dispatch, registry } ) => {
+	const oldMenuItems = await dispatch(
+		resolveSelectMenuItems( post.meta.menuId )
+	);
+	const newMenuItems = await dispatch(
+		computeNewMenuItems( post, oldMenuItems )
+	);
+	const batchTasks = await dispatch(
+		createBatchSave( 'root', 'menuItem', oldMenuItems, newMenuItems )
+	);
+	return await registry.dispatch( 'core' ).__experimentalBatch( batchTasks );
+};
 
-const computeNewMenuItems = ( post ) => async ( { registry } ) => {
-	const navigationBlock = post.blocks[ 0 ];
-	const menuId = post.meta.menuId;
-	const oldEntityRecords = await registry
-		.resolveSelect( 'core' )
-		.getMenuItems( { menus: menuId, per_page: -1 } );
-
+const computeNewMenuItems = ( post, oldMenuItems ) => async ( {
+	dispatch,
+} ) => {
+	const mapping = await dispatch(
+		getEntityRecordIdToBlockIdMapping( post.id )
+	);
 	const blockIdToOldEntityRecord = mapBlockIdToEntityRecord(
-		getEntityRecordIdToBlockIdMapping( registry, post.id ),
-		oldEntityRecords
+		mapping,
+		oldMenuItems
 	);
 
-	const blocksList = blocksTreeToFlatList( navigationBlock.innerBlocks );
+	const blocksList = blocksTreeToFlatList( post.blocks[ 0 ].innerBlocks );
 	return blocksList.map( ( { block, parentBlockId, position } ) =>
 		blockToMenuItem(
 			block,
 			blockIdToOldEntityRecord[ block.clientId ],
 			blockIdToOldEntityRecord[ parentBlockId ]?.id,
 			position,
-			menuId
+			post.meta.menuId
 		)
 	);
 };
+
+const getEntityRecordIdToBlockIdMapping = ( postId ) => async ( {
+	registry,
+} ) => registry.stores[ STORE_NAME ].store.getState().mapping[ postId ] || {};
+
+const resolveSelectMenuItems = ( menuId ) => async ( { registry } ) =>
+	await registry
+		.resolveSelect( 'core' )
+		.getMenuItems( { menus: menuId, per_page: -1 } );
 
 function mapBlockIdToEntityRecord( entityIdToBlockId, entityRecords ) {
 	return Object.fromEntries(
