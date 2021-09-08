@@ -8,7 +8,6 @@ import {
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import { useViewportMatch } from '@wordpress/compose';
-import { useRef } from '@wordpress/element';
 import { useDispatch, useSelect } from '@wordpress/data';
 
 /**
@@ -35,7 +34,6 @@ function InserterSidebar() {
 
 	const { setIsInserterOpened } = useDispatch( editNavigationStore );
 
-	const inserterDialogRef = useRef();
 	const inserterDialogProps = {};
 
 	if ( ! isInserterOpened || ! hasInserterItems ) {
@@ -44,7 +42,6 @@ function InserterSidebar() {
 
 	return (
 		<div
-			ref={ inserterDialogRef }
 			{ ...inserterDialogProps }
 			className="edit-widgets-layout__inserter-panel"
 		>
