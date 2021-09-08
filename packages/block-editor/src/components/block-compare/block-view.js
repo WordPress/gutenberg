@@ -5,7 +5,6 @@ import { Button } from '@wordpress/components';
 import { RawHTML } from '@wordpress/element';
 import { safeHTML } from '@wordpress/dom';
 
-
 const BlockView = ( { title, rawContent, renderedContent, action, actionText, className } ) => {
 	return (
 		<div className={ className }>
