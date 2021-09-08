@@ -1,6 +1,4 @@
 .wp-block-social-links {
-	display: flex;
-	flex-wrap: wrap;
 	padding-left: 0;
 	padding-right: 0;
 	// Some themes set text-indent on all <ul>
@@ -16,13 +14,7 @@
 		box-shadow: none;
 	}
 
-	// Vertically balance the margin of each icon.
 	.wp-social-link {
-		// This needs specificity to override some themes.
-		&.wp-social-link.wp-social-link {
-			margin: 4px 8px 4px 0;
-		}
-
 		// By setting the font size, we can scale icons and paddings consistently based on that.
 		// This also allows themes to override this, if need be.
 		a {

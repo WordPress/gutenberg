@@ -246,7 +246,7 @@ export function ImageEdit( {
 		} );
 	}
 
-	const isTemp = isTemporaryImage( id, url );
+	let isTemp = isTemporaryImage( id, url );
 
 	// Upload a temporary image on mount.
 	useEffect( () => {
@@ -264,6 +264,7 @@ export function ImageEdit( {
 				},
 				allowedTypes: ALLOWED_MEDIA_TYPES,
 				onError: ( message ) => {
+					isTemp = false;
 					noticeOperations.createErrorNotice( message );
 					setAttributes( {
 						src: undefined,

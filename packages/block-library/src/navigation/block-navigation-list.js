@@ -6,6 +6,7 @@ import {
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import { useSelect } from '@wordpress/data';
+import { useRef, useEffect, useState } from '@wordpress/element';
 
 export default function BlockNavigationList( {
 	clientId,
@@ -17,13 +18,21 @@ export default function BlockNavigationList( {
 		[ clientId ]
 	);
 
+	const listViewRef = useRef();
+	const [ minHeight, setMinHeight ] = useState( 300 );
+	useEffect( () => {
+		setMinHeight( listViewRef?.current?.clientHeight ?? 300 );
+	}, [] );
+
 	return (
-		<ListView
-			blocks={ blocks }
-			showAppender
-			showBlockMovers
-			showNestedBlocks
-			__experimentalFeatures={ __experimentalFeatures }
-		/>
+		<div style={ { minHeight } }>
+			<ListView
+				ref={ listViewRef }
+				blocks={ blocks }
+				showBlockMovers
+				showNestedBlocks
+				__experimentalFeatures={ __experimentalFeatures }
+			/>
+		</div>
 	);
 }

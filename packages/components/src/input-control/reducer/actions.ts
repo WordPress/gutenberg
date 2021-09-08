@@ -44,10 +44,7 @@ export type DragEndAction = Action< typeof DRAG_END, DragProps >;
 export type DragAction = Action< typeof DRAG, DragProps >;
 export type ResetAction = Action< typeof RESET, Partial< ValuePayload > >;
 export type UpdateAction = Action< typeof UPDATE, ValuePayload >;
-export type InvalidateAction = Action<
-	typeof INVALIDATE,
-	{ error: Error | null }
->;
+export type InvalidateAction = Action< typeof INVALIDATE, { error: unknown } >;
 
 export type ChangeEventAction =
 	| ChangeAction

@@ -184,8 +184,14 @@ const config = {
 			},
 			{
 				test: /\.svg$/,
+				issuer: /\.jsx?$/,
 				use: [ '@svgr/webpack', 'url-loader' ],
 				type: 'javascript/auto',
+			},
+			{
+				test: /\.svg$/,
+				issuer: /\.(sc|sa|c)ss$/,
+				type: 'asset/inline',
 			},
 			{
 				test: /\.(bmp|png|jpe?g|gif)$/i,

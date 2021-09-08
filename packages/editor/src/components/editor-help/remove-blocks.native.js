@@ -18,7 +18,8 @@ const RemoveBlocks = () => {
 	return (
 		<>
 			<HelpDetailImage
-				source={ require( './images/remove-blocks.png' ) }
+				source={ require( './images/options-light.png' ) }
+				sourceDarkMode={ require( './images/options-dark.png' ) }
 			/>
 			<View style={ styles.helpDetailContainer }>
 				<HelpDetailBodyText

@@ -7,6 +7,7 @@ import { BlockControls } from '@wordpress/block-editor';
 import { useDispatch } from '@wordpress/data';
 import { store as interfaceStore } from '@wordpress/interface';
 import { sprintf, __ } from '@wordpress/i18n';
+import { decodeEntities } from '@wordpress/html-entities';
 
 /**
  * Internal dependencies
@@ -27,7 +28,7 @@ export default function NameDisplay() {
 		IsMenuNameControlFocusedContext
 	);
 
-	const menuName = name ?? untitledMenu;
+	const menuName = decodeEntities( name ?? untitledMenu );
 
 	return (
 		<BlockControls>

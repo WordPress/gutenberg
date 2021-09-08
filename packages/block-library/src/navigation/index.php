@@ -256,15 +256,19 @@ function render_block_core_navigation( $attributes, $content, $block ) {
 	$inner_blocks_html = '';
 	$is_list_open      = false;
 	foreach ( $inner_blocks as $inner_block ) {
-		if ( ( 'core/navigation-link' === $inner_block->name || 'core/home-link' === $inner_block->name ) && ! $is_list_open ) {
+		if ( ( 'core/navigation-link' === $inner_block->name || 'core/home-link' === $inner_block->name || 'core/site-title' === $inner_block->name || 'core/site-logo' === $inner_block->name ) && ! $is_list_open ) {
 			$is_list_open       = true;
 			$inner_blocks_html .= '<ul class="wp-block-navigation__container">';
 		}
-		if ( 'core/navigation-link' !== $inner_block->name && 'core/home-link' !== $inner_block->name && $is_list_open ) {
+		if ( 'core/navigation-link' !== $inner_block->name && 'core/home-link' !== $inner_block->name && 'core/site-title' !== $inner_block->name && 'core/site-logo' !== $inner_block->name && $is_list_open ) {
 			$is_list_open       = false;
 			$inner_blocks_html .= '</ul>';
 		}
-		$inner_blocks_html .= $inner_block->render();
+		if ( 'core/site-title' === $inner_block->name || 'core/site-logo' === $inner_block->name ) {
+			$inner_blocks_html .= '<li class="wp-block-navigation-item">' . $inner_block->render() . '</li>';
+		} else {
+			$inner_blocks_html .= $inner_block->render();
+		}
 	}
 
 	if ( $is_list_open ) {

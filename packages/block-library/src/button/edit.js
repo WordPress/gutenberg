@@ -7,11 +7,10 @@ import classnames from 'classnames';
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { useCallback, useState, useRef } from '@wordpress/element';
+import { useCallback, useEffect, useState, useRef } from '@wordpress/element';
 import {
 	Button,
 	ButtonGroup,
-	KeyboardShortcuts,
 	PanelBody,
 	TextControl,
 	ToolbarButton,
@@ -27,7 +26,7 @@ import {
 	__experimentalGetSpacingClassesAndStyles as useSpacingProps,
 	__experimentalLinkControl as LinkControl,
 } from '@wordpress/block-editor';
-import { rawShortcut, displayShortcut } from '@wordpress/keycodes';
+import { displayShortcut, isKeyboardEvent } from '@wordpress/keycodes';
 import { link, linkOff } from '@wordpress/icons';
 import { createBlock } from '@wordpress/blocks';
 
@@ -66,88 +65,6 @@ function WidthPanel( { selectedWidth, setAttributes } ) {
 	);
 }
 
-function URLPicker( {
-	isSelected,
-	url,
-	setAttributes,
-	opensInNewTab,
-	onToggleOpenInNewTab,
-	anchorRef,
-} ) {
-	const [ isURLPickerOpen, setIsURLPickerOpen ] = useState( false );
-	const urlIsSet = !! url;
-	const urlIsSetandSelected = urlIsSet && isSelected;
-	const openLinkControl = () => {
-		setIsURLPickerOpen( true );
-		return false; // prevents default behaviour for event
-	};
-	const unlinkButton = () => {
-		setAttributes( {
-			url: undefined,
-			linkTarget: undefined,
-			rel: undefined,
-		} );
-		setIsURLPickerOpen( false );
-	};
-	const linkControl = ( isURLPickerOpen || urlIsSetandSelected ) && (
-		<Popover
-			position="bottom center"
-			onClose={ () => setIsURLPickerOpen( false ) }
-			anchorRef={ anchorRef?.current }
-		>
-			<LinkControl
-				className="wp-block-navigation-link__inline-link-input"
-				value={ { url, opensInNewTab } }
-				onChange={ ( {
-					url: newURL = '',
-					opensInNewTab: newOpensInNewTab,
-				} ) => {
-					setAttributes( { url: newURL } );
-
-					if ( opensInNewTab !== newOpensInNewTab ) {
-						onToggleOpenInNewTab( newOpensInNewTab );
-					}
-				} }
-			/>
-		</Popover>
-	);
-	return (
-		<>
-			<BlockControls group="block">
-				{ ! urlIsSet && (
-					<ToolbarButton
-						name="link"
-						icon={ link }
-						title={ __( 'Link' ) }
-						shortcut={ displayShortcut.primary( 'k' ) }
-						onClick={ openLinkControl }
-					/>
-				) }
-				{ urlIsSetandSelected && (
-					<ToolbarButton
-						name="link"
-						icon={ linkOff }
-						title={ __( 'Unlink' ) }
-						shortcut={ displayShortcut.primaryShift( 'k' ) }
-						onClick={ unlinkButton }
-						isActive={ true }
-					/>
-				) }
-			</BlockControls>
-			{ isSelected && (
-				<KeyboardShortcuts
-					bindGlobal
-					shortcuts={ {
-						[ rawShortcut.primary( 'k' ) ]: openLinkControl,
-						[ rawShortcut.primaryShift( 'k' ) ]: unlinkButton,
-					} }
-				/>
-			) }
-			{ linkControl }
-		</>
-	);
-}
-
 function ButtonEdit( props ) {
 	const {
 		attributes,
@@ -173,35 +90,66 @@ function ButtonEdit( props ) {
 		[ setAttributes ]
 	);
 
-	const onToggleOpenInNewTab = useCallback(
-		( value ) => {
-			const newLinkTarget = value ? '_blank' : undefined;
+	function onToggleOpenInNewTab( value ) {
+		const newLinkTarget = value ? '_blank' : undefined;
 
-			let updatedRel = rel;
-			if ( newLinkTarget && ! rel ) {
-				updatedRel = NEW_TAB_REL;
-			} else if ( ! newLinkTarget && rel === NEW_TAB_REL ) {
-				updatedRel = undefined;
-			}
+		let updatedRel = rel;
+		if ( newLinkTarget && ! rel ) {
+			updatedRel = NEW_TAB_REL;
+		} else if ( ! newLinkTarget && rel === NEW_TAB_REL ) {
+			updatedRel = undefined;
+		}
 
-			setAttributes( {
-				linkTarget: newLinkTarget,
-				rel: updatedRel,
-			} );
-		},
-		[ rel, setAttributes ]
-	);
+		setAttributes( {
+			linkTarget: newLinkTarget,
+			rel: updatedRel,
+		} );
+	}
 
-	const setButtonText = ( newText ) => {
+	function setButtonText( newText ) {
 		// Remove anchor tags from button text content.
 		setAttributes( { text: newText.replace( /<\/?a[^>]*>/g, '' ) } );
-	};
+	}
+
+	function onKeyDown( event ) {
+		if ( isKeyboardEvent.primary( event, 'k' ) ) {
+			startEditing( event );
+		} else if ( isKeyboardEvent.primaryShift( event, 'k' ) ) {
+			unlink();
+			richTextRef.current?.focus();
+		}
+	}
 
 	const borderProps = useBorderProps( attributes );
 	const colorProps = useColorProps( attributes );
 	const spacingProps = useSpacingProps( attributes );
 	const ref = useRef();
-	const blockProps = useBlockProps( { ref } );
+	const richTextRef = useRef();
+	const blockProps = useBlockProps( { ref, onKeyDown } );
+
+	const [ isEditingURL, setIsEditingURL ] = useState( false );
+	const isURLSet = !! url;
+	const opensInNewTab = linkTarget === '_blank';
+
+	function startEditing( event ) {
+		event.preventDefault();
+		setIsEditingURL( true );
+	}
+
+	function unlink() {
+		setAttributes( {
+			url: undefined,
+			linkTarget: undefined,
+			rel: undefined,
+		} );
+		setIsEditingURL( false );
+	}
+
+	useEffect( () => {
+		if ( ! isSelected ) {
+			setIsEditingURL( false );
+		}
+	}, [ isSelected ] );
 
 	return (
 		<>
@@ -213,6 +161,7 @@ function ButtonEdit( props ) {
 				} ) }
 			>
 				<RichText
+					ref={ richTextRef }
 					aria-label={ __( 'Button text' ) }
 					placeholder={ placeholder || __( 'Add text…' ) }
 					value={ text }
@@ -245,14 +194,58 @@ function ButtonEdit( props ) {
 					identifier="text"
 				/>
 			</div>
-			<URLPicker
-				url={ url }
-				setAttributes={ setAttributes }
-				isSelected={ isSelected }
-				opensInNewTab={ linkTarget === '_blank' }
-				onToggleOpenInNewTab={ onToggleOpenInNewTab }
-				anchorRef={ ref }
-			/>
+			<BlockControls group="block">
+				{ ! isURLSet && (
+					<ToolbarButton
+						name="link"
+						icon={ link }
+						title={ __( 'Link' ) }
+						shortcut={ displayShortcut.primary( 'k' ) }
+						onClick={ startEditing }
+					/>
+				) }
+				{ isURLSet && (
+					<ToolbarButton
+						name="link"
+						icon={ linkOff }
+						title={ __( 'Unlink' ) }
+						shortcut={ displayShortcut.primaryShift( 'k' ) }
+						onClick={ unlink }
+						isActive={ true }
+					/>
+				) }
+			</BlockControls>
+			{ isSelected && ( isEditingURL || isURLSet ) && (
+				<Popover
+					position="bottom center"
+					onClose={ () => {
+						setIsEditingURL( false );
+						richTextRef.current?.focus();
+					} }
+					anchorRef={ ref?.current }
+					focusOnMount={ isEditingURL ? 'firstElement' : false }
+				>
+					<LinkControl
+						className="wp-block-navigation-link__inline-link-input"
+						value={ { url, opensInNewTab } }
+						onChange={ ( {
+							url: newURL = '',
+							opensInNewTab: newOpensInNewTab,
+						} ) => {
+							setAttributes( { url: newURL } );
+
+							if ( opensInNewTab !== newOpensInNewTab ) {
+								onToggleOpenInNewTab( newOpensInNewTab );
+							}
+						} }
+						onRemove={ () => {
+							unlink();
+							richTextRef.current?.focus();
+						} }
+						forceIsEditingLink={ isEditingURL }
+					/>
+				</Popover>
+			) }
 			<InspectorControls>
 				<WidthPanel
 					selectedWidth={ width }

@@ -10,7 +10,7 @@ import { createBlobURL } from '@wordpress/blob';
 import { createBlock } from '@wordpress/blocks';
 import { select } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
-import { getPath } from '@wordpress/url';
+import { getFilename } from '@wordpress/url';
 
 const transforms = {
 	from: [
@@ -71,11 +71,10 @@ const transforms = {
 			type: 'block',
 			blocks: [ 'core/image' ],
 			transform: ( attributes ) => {
-				const filename = getPath( attributes.url )?.split( '/' ).pop();
-
 				return createBlock( 'core/file', {
 					href: attributes.url,
-					fileName: attributes.caption || filename,
+					fileName:
+						attributes.caption || getFilename( attributes.url ),
 					textLinkHref: attributes.url,
 					id: attributes.id,
 					anchor: attributes.anchor,

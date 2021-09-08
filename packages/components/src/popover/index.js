@@ -258,6 +258,7 @@ const Popover = (
 		__unstableBoundaryParent,
 		__unstableForcePosition,
 		__unstableForceXAlignment,
+		__unstableEditorCanvasWrapper,
 		/* eslint-enable no-unused-vars */
 		...contentProps
 	},
@@ -352,7 +353,8 @@ const Popover = (
 				relativeOffsetTop,
 				boundaryElement,
 				__unstableForcePosition,
-				__unstableForceXAlignment
+				__unstableForceXAlignment,
+				__unstableEditorCanvasWrapper
 			);
 
 			if (

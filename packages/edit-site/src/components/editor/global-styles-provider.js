@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { set, get, mergeWith, mapValues, setWith, clone } from 'lodash';
+import { set, get, has, mergeWith, mapValues, setWith, clone } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -75,8 +75,24 @@ export const useGlobalStylesReset = () => {
 const extractSupportKeys = ( supports ) => {
 	const supportKeys = [];
 	Object.keys( STYLE_PROPERTY ).forEach( ( name ) => {
+		if ( ! STYLE_PROPERTY[ name ].support ) {
+			return;
+		}
+
+		// Opting out means that, for certain support keys like background color,
+		// blocks have to explicitly set the support value false. If the key is
+		// unset, we still enable it.
+		if ( STYLE_PROPERTY[ name ].requiresOptOut ) {
+			if (
+				has( supports, STYLE_PROPERTY[ name ].support[ 0 ] ) &&
+				get( supports, STYLE_PROPERTY[ name ].support ) !== false
+			) {
+				return supportKeys.push( name );
+			}
+		}
+
 		if ( get( supports, STYLE_PROPERTY[ name ].support, false ) ) {
-			supportKeys.push( name );
+			return supportKeys.push( name );
 		}
 	} );
 	return supportKeys;

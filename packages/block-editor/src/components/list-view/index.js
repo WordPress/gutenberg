@@ -11,6 +11,7 @@ import {
 	useMemo,
 	useRef,
 	useReducer,
+	forwardRef,
 } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 
@@ -48,15 +49,19 @@ const expanded = ( state, action ) => {
  * @param {boolean}  props.showOnlyCurrentHierarchy                 Flag to limit the list to the current hierarchy of blocks.
  * @param {boolean}  props.__experimentalFeatures                   Flag to enable experimental features.
  * @param {boolean}  props.__experimentalPersistentListViewFeatures Flag to enable features for the Persistent List View experiment.
+ * @param {Object}   ref                                            Forwarded ref
  */
-export default function ListView( {
-	blocks,
-	showOnlyCurrentHierarchy,
-	onSelect = noop,
-	__experimentalFeatures,
-	__experimentalPersistentListViewFeatures,
-	...props
-} ) {
+function ListView(
+	{
+		blocks,
+		showOnlyCurrentHierarchy,
+		onSelect = noop,
+		__experimentalFeatures,
+		__experimentalPersistentListViewFeatures,
+		...props
+	},
+	ref
+) {
 	const { clientIdsTree, selectedClientIds } = useListViewClientIds(
 		blocks,
 		showOnlyCurrentHierarchy,
@@ -74,7 +79,7 @@ export default function ListView( {
 
 	const { ref: dropZoneRef, target: blockDropTarget } = useListViewDropZone();
 	const elementRef = useRef();
-	const treeGridRef = useMergeRefs( [ elementRef, dropZoneRef ] );
+	const treeGridRef = useMergeRefs( [ elementRef, dropZoneRef, ref ] );
 
 	const isMounted = useRef( false );
 	useEffect( () => {
@@ -144,3 +149,4 @@ export default function ListView( {
 		</>
 	);
 }
+export default forwardRef( ListView );

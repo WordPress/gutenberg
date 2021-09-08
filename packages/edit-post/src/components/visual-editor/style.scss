@@ -44,8 +44,9 @@
 		margin-right: auto;
 
 		// Margins between the title and the first block, or appender, do not collapse.
-		// By explicitly setting this to zero, we avoid "double margin".
-		margin-bottom: 0;
+		// However in that support block gap, the first items in post content do not have a top margin.
+		// By leveraging the gap variable, with a fallback of zero, we handle both cases.
+		margin-bottom: var(--wp--style--block-gap, 0);
 	}
 }
 

@@ -42,7 +42,7 @@ import NavigationScreen from './bottom-sheet-navigation/navigation-screen';
 import NavigationContainer from './bottom-sheet-navigation/navigation-container';
 import KeyboardAvoidingView from './keyboard-avoiding-view';
 import BottomSheetSubSheet from './sub-sheet';
-import NavigationHeader from './navigation-header';
+import NavBar from './nav-bar';
 import { BottomSheetProvider } from './bottom-sheet-context';
 
 const DEFAULT_LAYOUT_ANIMATION = LayoutAnimation.Presets.easeInEaseOut;
@@ -485,6 +485,16 @@ class BottomSheet extends Component {
 			</>
 		);
 
+		const showDragIndicator = () => {
+			// if iOS or not fullscreen show the drag indicator
+			if ( Platform.OS === 'ios' || ! this.state.isFullScreen ) {
+				return true;
+			}
+
+			// Otherwise check the allowDragIndicator
+			return this.props.allowDragIndicator;
+		};
+
 		return (
 			<Modal
 				isVisible={ isVisible }
@@ -536,7 +546,7 @@ class BottomSheet extends Component {
 						style={ styles.header }
 						onLayout={ this.onHeaderLayout }
 					>
-						{ ! ( Platform.OS === 'android' && isFullScreen ) && (
+						{ showDragIndicator() && (
 							<View style={ styles.dragIndicator } />
 						) }
 						{ ! hideHeader && getHeader() }
@@ -599,7 +609,7 @@ ThemedBottomSheet.getWidth = getWidth;
 ThemedBottomSheet.Button = Button;
 ThemedBottomSheet.Cell = Cell;
 ThemedBottomSheet.SubSheet = BottomSheetSubSheet;
-ThemedBottomSheet.NavigationHeader = NavigationHeader;
+ThemedBottomSheet.NavBar = NavBar;
 ThemedBottomSheet.CyclePickerCell = CyclePickerCell;
 ThemedBottomSheet.PickerCell = PickerCell;
 ThemedBottomSheet.SwitchCell = SwitchCell;
