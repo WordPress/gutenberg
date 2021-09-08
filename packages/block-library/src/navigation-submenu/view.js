@@ -38,7 +38,6 @@ submenuButtons.forEach( ( button ) => {
 	button.addEventListener( 'click', toggleSubmenuOnClick );
 } );
 
-/* eslint-disable @wordpress/no-global-event-listener */
 // Close on click outside.
 document.addEventListener( 'click', function ( event ) {
 	const navigationBlocks = document.querySelectorAll(
@@ -61,4 +60,3 @@ document.addEventListener( 'keyup', function ( event ) {
 		}
 	} );
 } );
-/* eslint-enable @wordpress/no-global-event-listener */
