@@ -291,6 +291,9 @@ export default function NavigationSubmenuEdit( {
 	};
 	const { showSubmenuIcon, openSubmenusOnClick } = context;
 	const { saveEntityRecord } = useDispatch( coreStore );
+	const { __unstableMarkNextChangeAsNotPersistent } = useDispatch(
+		blockEditorStore
+	);
 	const [ isLinkOpen, setIsLinkOpen ] = useState( false );
 	const listItemRef = useRef( null );
 	const isDraggingWithin = useIsDraggingWithin( listItemRef );
@@ -352,7 +355,14 @@ export default function NavigationSubmenuEdit( {
 	);
 
 	// Store the colors from context as attributes for rendering
-	useEffect( () => setAttributes( { isTopLevelItem } ), [ isTopLevelItem ] );
+	useEffect( () => {
+		// This side-effect should not create an undo level as those should
+		// only be created via user interactions. Mark this change as
+		// not persistent to avoid undo level creation.
+		// See https://github.com/WordPress/gutenberg/issues/34564.
+		__unstableMarkNextChangeAsNotPersistent();
+		setAttributes( { isTopLevelItem } );
+	}, [ isTopLevelItem ] );
 
 	/**
 	 * The hook shouldn't be necessary but due to a focus loss happening
