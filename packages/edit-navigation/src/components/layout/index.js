@@ -48,8 +48,6 @@ const interfaceLabels = {
 	secondarySidebar: __( 'Block library' ),
 };
 
-const isInserterOpened = true;
-
 export default function Layout( { blockEditorSettings } ) {
 	const contentAreaRef = useBlockSelectionClearer();
 	const [ isMenuNameControlFocused, setIsMenuNameControlFocused ] = useState(
@@ -99,15 +97,7 @@ export default function Layout( { blockEditorSettings } ) {
 		isMenuSelected
 	);
 
-	const secondarySidebar = () => {
-		// Todo: enable mode in Nav Editor store
-		// mode && mode === 'visual' &&
-		if ( isInserterOpened ) {
-			return <InserterSidebar />;
-		}
-
-		return null;
-	};
+	const secondarySidebar = () => <InserterSidebar />;
 
 	return (
 		<ErrorBoundary>
