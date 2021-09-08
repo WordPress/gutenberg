@@ -23,10 +23,10 @@ const Example = () => {
 ## Props
 
 The component accepts the following props:
+
 ### className
 
-The class that will be added with "component-alignment-matrix-control" to the classes of the wrapper <Composite/> component.
-If no className is passed only "component-alignment-matrix-control" is used.
+The class that will be added to the classes of the wrapper <Composite/> component.
 
 -   Type: `String`
 -   Required: No
@@ -36,6 +36,7 @@ If no className is passed only "component-alignment-matrix-control" is used.
 Unique ID for the component.
 -  Type: `String`
 -  Required: No
+
 ### label
 
 If provided, sets the aria-label attribute of the wrapper <Composite/> component.
@@ -43,6 +44,7 @@ If provided, sets the aria-label attribute of the wrapper <Composite/> component
 -   Type: `String`
 -   Required: No
 -   Default: `Alignment Matrix Control`
+
 ### defaultValue
 
 If provided, sets the default alignment value.
@@ -57,6 +59,7 @@ A function that receives the updated alignment value.
 -   Type: `function`
 -   Required: No
 -   Default: `noop`
+
 ### width
 
 If provided, sets the width of the wrapper <Composite/> component.
