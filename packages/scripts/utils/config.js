@@ -130,7 +130,7 @@ const getWebpackArgs = () => {
 
 		const fileArgs = getFileArgsFromCLI();
 		if ( fileArgs.length > 0 ) {
-			// Filter out all CLI arguments that are file paths.
+			// Filters out all CLI arguments that are recognized as file paths.
 			const fileArgsToRemove = new Set( fileArgs );
 			webpackArgs = webpackArgs.filter( ( cliArg ) => {
 				if ( fileArgsToRemove.has( cliArg ) ) {
@@ -140,7 +140,7 @@ const getWebpackArgs = () => {
 				return true;
 			} );
 
-			// Convert all CLI arguments that are file paths to the `entry` format supported by webpack.
+			// Converts all CLI arguments that are file paths to the `entry` format supported by webpack.
 			// It is going to be consumed in the config through the WP_ENTRY global variable.
 			const entry = {};
 			fileArgs.forEach( ( fileArg ) => {
