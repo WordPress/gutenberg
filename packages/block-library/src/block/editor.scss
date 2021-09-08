@@ -18,7 +18,7 @@
 // Styles for save button
 .components-toolbar-group {
 	.block-library-block__reusable-block-save-button {
-		margin: 8px;
+		margin: $grid-unit-10;
 		height: $grid-unit-40;
 
 		// override the default box inset properties to match height and width of the save button
