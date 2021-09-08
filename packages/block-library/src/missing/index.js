@@ -7,6 +7,7 @@ import { Button } from '@wordpress/components';
 import { getBlockType, createBlock } from '@wordpress/blocks';
 import { withDispatch } from '@wordpress/data';
 import { Warning } from '@wordpress/block-editor';
+import { safeHTML } from '@wordpress/dom';
 
 function MissingBlockWarning( { attributes, convertToHTML } ) {
 	const { originalName, originalUndelimitedContent } = attributes;
@@ -37,7 +38,7 @@ function MissingBlockWarning( { attributes, convertToHTML } ) {
 			<Warning actions={ actions }>
 				{ messageHTML }
 			</Warning>
-			<RawHTML>{ originalUndelimitedContent }</RawHTML>
+			<RawHTML>{ safeHTML( originalUndelimitedContent ) }</RawHTML>
 		</Fragment>
 	);
 }

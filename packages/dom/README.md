@@ -240,6 +240,20 @@ Replaces the given node with a new node with the given tag name.
 
 `Element`: The new node.
 
+### safeHTML
+
+[src/index.js#L14-L14](src/index.js#L14-L14)
+
+Strips scripts and on\* attributes from HTML.
+
+**Parameters**
+
+-   **html** `string`: HTML to sanitize.
+
+**Returns**
+
+`string`: The sanitized HTML.
+
 ### unwrap
 
 [src/index.js#L13-L13](src/index.js#L13-L13)

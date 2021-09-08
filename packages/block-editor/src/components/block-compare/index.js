@@ -10,7 +10,7 @@ import { diffChars } from 'diff';
  */
 import { __ } from '@wordpress/i18n';
 import { Component } from '@wordpress/element';
-import { getSaveContent, getSaveElement } from '@wordpress/blocks';
+import { getSaveContent } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
@@ -31,32 +31,20 @@ class BlockCompare extends Component {
 		} );
 	}
 
-	getOriginalContent( block ) {
-		return {
-			rawContent: block.originalContent,
-			renderedContent: getSaveElement( block.name, block.attributes ),
-		};
-	}
-
 	getConvertedContent( block ) {
 		// The convertor may return an array of items or a single item
 		const newBlocks = castArray( block );
 
 		// Get converted block details
 		const newContent = newBlocks.map( ( item ) => getSaveContent( item.name, item.attributes, item.innerBlocks ) );
-		const renderedContent = newBlocks.map( ( item ) => getSaveElement( item.name, item.attributes, item.innerBlocks ) );
 
-		return {
-			rawContent: newContent.join( '' ),
-			renderedContent,
-		};
+		return newContent.join( '' );
 	}
 
 	render() {
 		const { block, onKeep, onConvert, convertor, convertButtonText } = this.props;
-		const original = this.getOriginalContent( block );
 		const converted = this.getConvertedContent( convertor( block ) );
-		const difference = this.getDifference( original.rawContent, converted.rawContent );
+		const difference = this.getDifference( block.originalContent, converted );
 
 		return (
 			<div className="editor-block-compare__wrapper block-editor-block-compare__wrapper">
@@ -65,8 +53,8 @@ class BlockCompare extends Component {
 					className="editor-block-compare__current block-editor-block-compare__current"
 					action={ onKeep }
 					actionText={ __( 'Convert to HTML' ) }
-					rawContent={ original.rawContent }
-					renderedContent={ original.renderedContent }
+					rawContent={ block.originalContent }
+					renderedContent={ block.originalContent }
 				/>
 
 				<BlockView
@@ -75,7 +63,7 @@ class BlockCompare extends Component {
 					action={ onConvert }
 					actionText={ convertButtonText }
 					rawContent={ difference }
-					renderedContent={ converted.renderedContent }
+					renderedContent={ converted }
 				/>
 			</div>
 		);
