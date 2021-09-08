@@ -39,15 +39,7 @@ function Inserter() {
 			onMouseDown={ ( event ) => {
 				event.preventDefault();
 			} }
-			onClick={ () => {
-				if ( isInserterOpened ) {
-					// Focusing the inserter button closes the inserter popover
-					// @ts-ignore
-					inserterButton.current.focus();
-				} else {
-					setIsInserterOpened( true );
-				}
-			} }
+			onClick={ () => setIsInserterOpened( ! isInserterOpened ) }
 			icon={ plus }
 			/* translators: button label text should, if possible, be under 16
 					characters. */

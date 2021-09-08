@@ -75,3 +75,34 @@
 		display: none;
 	}
 }
+
+
+// INSERTER TOGGLE
+.edit-navigation-header-toolbar__inserter-toggle {
+
+	svg {
+		transition: transform cubic-bezier(0.165, 0.84, 0.44, 1) 0.2s;
+		@include reduce-motion("transition");
+	}
+
+	// Make the button appear like a "X" close button.
+	&.is-pressed {
+		svg {
+			transform: rotate(45deg);
+		}
+	}
+}
+
+// INSERTER PANEL
+.edit-navigation-layout__inserter-panel-header {
+	padding-top: $grid-unit-10;
+	padding-right: $grid-unit-10;
+	display: flex;
+	justify-content: flex-end;
+
+	// Hide close button within panel on larger screens as this
+	// action is provided by the inserter toggle or ESC key.
+	@include break-medium() {
+		display: none;
+	}
+}

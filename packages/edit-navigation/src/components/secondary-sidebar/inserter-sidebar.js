@@ -43,15 +43,15 @@ function InserterSidebar() {
 	return (
 		<div
 			{ ...inserterDialogProps }
-			className="edit-widgets-layout__inserter-panel"
+			className="edit-navigation-layout__inserter-panel"
 		>
-			<div className="edit-widgets-layout__inserter-panel-header">
+			<div className="edit-navigation-layout__inserter-panel-header">
 				<Button
 					icon={ close }
 					onClick={ () => setIsInserterOpened( false ) }
 				/>
 			</div>
-			<div className="edit-widgets-layout__inserter-panel-content">
+			<div className="edit-navigation-layout__inserter-panel-content">
 				<Library
 					shouldFocusBlock={ isMobileViewport }
 					rootClientId={ rootClientId }
