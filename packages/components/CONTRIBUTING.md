@@ -22,7 +22,7 @@ In these situations, one possible approach is to "soft-deprecate" a given legacy
 
 When adding new components or new props to existing components, it's recommended to prefix them with `__unstable` or `__experimental` until they're stable enough to be exposed as part of the public API.
 
-Learn more on [How to preserve backward compatibility for a React Component](https://github.com/WordPress/gutenberg/blob/trunk/docs/how-to-guides/backward-compatibility/README.md#how-to-preserve-backward-compatibility-for-a-react-component) and [Experimental and Unstable APIs](https://github.com/WordPress/gutenberg/blob/trunk/docs/contributors/code/coding-guidelines.md#experimental-and-unstable-apis).
+Learn more on [How to preserve backward compatibility for a React Component](/docs/how-to-guides/backward-compatibility/README.md#how-to-preserve-backward-compatibility-for-a-react-component) and [Experimental and Unstable APIs](/docs/contributors/code/coding-guidelines.md#experimental-and-unstable-apis).
 
 ### Components composition
 
@@ -134,7 +134,7 @@ Components can use this system via a couple of functions:
 - they can connect to the Context via `contextConnect`
 - they can read the "computed" values from the context via `useContextSystem`
 
-An example of how this is used can be found in the [`Card` component family](https://github.com/WordPress/gutenberg/blob/trunk/packages/components/src/card). For example, this is how the `Card` component injects the `size` and `isBorderless` props down to its `CardBody` subcomponent — which makes it use the correct spacing and border settings "auto-magically".
+An example of how this is used can be found in the [`Card` component family](/packages/components/src/card). For example, this is how the `Card` component injects the `size` and `isBorderless` props down to its `CardBody` subcomponent — which makes it use the correct spacing and border settings "auto-magically".
 
 ```jsx
 //=========================================================================
