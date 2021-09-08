@@ -33,6 +33,7 @@ function MissingBlockWarning( { attributes, convertToHTML } ) {
 		);
 	}
 
+
 	return (
 		<Fragment>
 			<Warning actions={ actions }>
