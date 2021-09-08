@@ -28,6 +28,7 @@ function InserterMenu( {
 	showInserterHelpPanel,
 	showMostUsedBlocks,
 	shouldFocusBlock = true,
+	showSearch = true,
 } ) {
 	const [ filterValue, setFilterValue ] = useState( '' );
 	const [ hoveredItem, setHoveredItem ] = useState( null );
@@ -170,16 +171,18 @@ function InserterMenu( {
 			<div className="block-editor-inserter__main-area">
 				{ /* the following div is necessary to fix the sticky position of the search form */ }
 				<div className="block-editor-inserter__content">
-					<SearchControl
-						className="block-editor-inserter__search"
-						onChange={ ( value ) => {
-							if ( hoveredItem ) setHoveredItem( null );
-							setFilterValue( value );
-						} }
-						value={ filterValue }
-						label={ __( 'Search for blocks and patterns' ) }
-						placeholder={ __( 'Search' ) }
-					/>
+					{ showSearch && (
+						<SearchControl
+							className="block-editor-inserter__search"
+							onChange={ ( value ) => {
+								if ( hoveredItem ) setHoveredItem( null );
+								setFilterValue( value );
+							} }
+							value={ filterValue }
+							label={ __( 'Search for blocks and patterns' ) }
+							placeholder={ __( 'Search' ) }
+						/>
+					) }
 					{ !! filterValue && (
 						<InserterSearchResults
 							filterValue={ filterValue }
