@@ -18,7 +18,15 @@ _This package assumes that your code will run in an **ES2015+** environment. If 
 
 ### ShortcutProvider
 
-Undocumented declaration.
+Handles callbacks added to context by `useShortcut`.
+
+_Parameters_
+
+-   _props_ `Object`: Props to pass to `div`.
+
+_Returns_
+
+-   `import('@wordpress/element').WPElement`: Component.
 
 ### store
 

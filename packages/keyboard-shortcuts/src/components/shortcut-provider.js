@@ -10,6 +10,13 @@ import { context } from '../context';
 
 const { Provider } = context;
 
+/**
+ * Handles callbacks added to context by `useShortcut`.
+ *
+ * @param {Object} props Props to pass to `div`.
+ *
+ * @return {import('@wordpress/element').WPElement} Component.
+ */
 export function ShortcutProvider( props ) {
 	const keyboardShortcuts = useRef( new Set() );
 
