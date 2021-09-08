@@ -33,27 +33,28 @@ export default function ManageLocations( {
 	const openModal = () => setIsModalOpen( true );
 	const closeModal = () => setIsModalOpen( false );
 	const updateMenuLocations = () => {
+		const method = 'POST';
 		const batchRequests = menus.map( ( { id } ) => {
 			const locations = menuLocations
 				.filter( ( menuLocation ) => menuLocation.menu === id )
 				.map( ( menuLocation ) => menuLocation.name );
 
 			return {
-				path: `__experimental/menus/${ id }`,
+				path: `/__experimental/menus/${ id }`,
 				body: {
 					locations,
 				},
-				method: 'POST',
+				method
 			};
 		} );
 
 		apiFetch( {
 			path: 'batch/v1',
-			method: 'POST',
 			data: {
 				validation: 'require-all-validate',
 				requests: batchRequests,
 			},
+			method
 		} );
 	};
 
