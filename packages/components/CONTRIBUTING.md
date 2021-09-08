@@ -8,7 +8,7 @@ The following is a set of guidelines for contributing to the `@wordpress/compone
 
 Contributions to the `@wordpress/components` package should follow a set of core principles and technical requirements.
 
-This set of guidelines should apply especially to newly introduced components. It is, in fact, possible that some of the older component don't respect some of these guidelines for legacy/compat reasons.
+This set of guidelines should apply especially to newly introduced components. It is, in fact, possible that some of the older components don't respect some of these guidelines for legacy/compatibility reasons.
 
 ### Compatibility
 
@@ -16,9 +16,13 @@ The `@wordpress/components` package includes components that are relied upon by 
 
 In these situations, one possible approach is to "soft-deprecate" a given legacy API. This is achieved by:
 
-1. Removing traces of the API from the docs, while still supporing it in code;
-2. Updating all places in Gutenberg that use that API;
-3. Adding deprecation warnings (only after the previous point is completed, otherwide the Browser Console will be polluted by all those warnings and some e2e tests may fail).
+1. Removing traces of the API from the docs, while still supporting it in code.
+2. Updating all places in Gutenberg that use that API.
+3. Adding deprecation warnings (only after the previous point is completed, otherwise the Browser Console will be polluted by all those warnings and some e2e tests may fail).
+
+When adding new components or new props to existing components, it's recommended to prefix them with `__unstable` or `__experimental` until they're stable enough to be exposed as part of the public API.
+
+Learn more on [How to preserve backward compatibility for a React Component](https://github.com/WordPress/gutenberg/blob/trunk/docs/how-to-guides/backward-compatibility/README.md#how-to-preserve-backward-compatibility-for-a-react-component) and [Experimental and Unstable APIs](https://github.com/WordPress/gutenberg/blob/trunk/docs/contributors/code/coding-guidelines.md#experimental-and-unstable-apis).
 
 ### Components composition
 
@@ -52,7 +56,7 @@ One way to enable reusability and composition is to extract a component's underl
 // in `hook.ts`
 function useExampleComponent( props: PolymorphicComponentProps< ExampleProps, 'div' > ) {
 	// Merge received props with the context system.
-	const { isVisible, className, ...otherProps	} = useContextSystem( props, 'Example' );
+	const { isVisible, className, ...otherProps } = useContextSystem( props, 'Example' );
 
 	// Any other reusable rendering logic (e.g. computing className, state, event listeners...)
 	const cx = useCx();
@@ -105,7 +109,7 @@ TDB -->
 
 The following are a set of technical requirements for all newly introduced components. These requirements are also retroactively being applied to existing components.
 
-For an example of a component that follows these requirements, take a look at [`ItemGroup`](/packages/components/src/item-group) as an example.
+For an example of a component that follows these requirements, take a look at [`ItemGroup`](/packages/components/src/item-group).
 
 #### TypeScript
 
@@ -153,7 +157,7 @@ export const secondary = () => <Button variant="secondary">Secondary Button</But
 
 For even more flexibility while writing stories, the [`@storybook/addons-controls`](https://storybook.js.org/addons/@storybook/addon-controls) addon is a great way to interact with a component's arguments dynamically and in real time.
 
-Ideally, all of the props for the story's components should be exposed by using knobs. The default value of the knobs should coincide with the default value of the props (i.e. it should be `undefined` if a prop is not required). A story should, therefore, also explicitely show how values from the Context System are applied to (sub)components. A good example of how this may look like is the [`Card` story](https://wordpress.github.io/gutenberg/?path=/story/components-card--default) (code [here](/packages/components/src/card/stories/index.js)).
+Ideally, all of the props for the story's components should be exposed by using knobs. The default value of the knobs should coincide with the default value of the props (i.e. it should be `undefined` if a prop is not required). A story should, therefore, also explicitly show how values from the Context System are applied to (sub)components. A good example of how this may look like is the [`Card` story](https://wordpress.github.io/gutenberg/?path=/story/components-card--default) (code [here](/packages/components/src/card/stories/index.js)).
 
 Storybook can be started on a local maching by running `npm run storybook:dev`. Alternatively, the components' catalogue (up to date with the latest code on `trunk`) can be found at [wordpress.github.io/gutenberg/](https://wordpress.github.io/gutenberg/).
 
