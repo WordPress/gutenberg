@@ -64,7 +64,7 @@ export default function UpdateGalleryModal( { onClose, clientId } ) {
 		<Modal
 			closeLabel={ __( 'Close' ) }
 			onRequestClose={ onClose }
-			title={ __( 'Update to new gallery format' ) }
+			title={ __( 'Update gallery' ) }
 			className={ 'wp-block-update-gallery-modal' }
 			aria={ {
 				describedby: 'wp-block-update-gallery-modal__description',
@@ -72,7 +72,7 @@ export default function UpdateGalleryModal( { onClose, clientId } ) {
 		>
 			<p id={ 'wp-block-update-gallery-modal__description' }>
 				{ __(
-					'Updating to the new format adds the ability to add custom links or styles to individual images in the gallery, and makes it easier to add or move images around.'
+					'Updating to the new format adds the ability to use custom links or styles on individual images in the gallery, and makes it easier to add or move them around.'
 				) }
 			</p>
 
