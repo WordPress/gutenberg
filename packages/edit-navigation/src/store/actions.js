@@ -173,9 +173,9 @@ const getEntityRecordToBlockIdMapping = ( registry, postId ) =>
 function mapBlockIdToEntityRecord( entityIdToBlockId, entityRecords ) {
 	return Object.fromEntries(
 		entityRecords
-			.map( ( menuItem ) => [
-				entityIdToBlockId[ menuItem.id ],
-				menuItem,
+			.map( ( entityRecord ) => [
+				entityIdToBlockId[ entityRecord.id ],
+				entityRecord,
 			] )
 			.filter( ( [ blockId ] ) => blockId )
 	);
@@ -222,7 +222,7 @@ const createBatchSaveForEditedMenuItems = ( post ) => async ( {
 				'root',
 				'menuItem',
 				entityRecordId,
-				blockToEntityRecord(
+				blockToMenuItem(
 					blockIdToAPIEntity,
 					menuId,
 					block,
@@ -257,7 +257,7 @@ const createBatchSaveForEditedMenuItems = ( post ) => async ( {
 	return batchTasks;
 };
 
-function blockToEntityRecord(
+function blockToMenuItem(
 	blockIdToAPIEntity,
 	menuId,
 	block,
@@ -310,7 +310,7 @@ function computeDeletedEntityRecordsIds( blockIdToAPIEntity, blocksList ) {
 	);
 	return Object.entries( blockIdToAPIEntity )
 		.filter( ( [ clientId ] ) => ! editorBlocksIds.has( clientId ) )
-		.map( ( [ , menuItem ] ) => menuItem.id );
+		.map( ( [ , entityRecord ] ) => entityRecord.id );
 }
 
 /**
