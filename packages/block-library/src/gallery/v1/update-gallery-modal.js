@@ -75,11 +75,6 @@ export default function UpdateGalleryModal( { onClose, clientId } ) {
 					'Updating to the new format adds the ability to add custom links or styles to individual images in the gallery, and makes it easier to add or move images around.'
 				) }
 			</p>
-			<p>
-				{ __(
-					'There is no option to convert it back to the old format, so if there are problems with the new format once updated just leave the post/page without saving.'
-				) }
-			</p>
 
 			<div className="wp-block-update-gallery-modal-buttons">
 				<Button isTertiary onClick={ onClose }>
