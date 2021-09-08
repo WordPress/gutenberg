@@ -214,6 +214,37 @@ const withDuotoneControls = createHigherOrderComponent(
 );
 
 /**
+ * Function that scopes a selector with another one. This works a bit like
+ * SCSS nesting except the `&` operator isn't supported.
+ *
+ * @example
+ * ```js
+ * const scope = '.a, .b .c';
+ * const selector = '> .x, .y';
+ * const merged = scopeSelector( scope, selector );
+ * // merged is '.a > .x, .a .y, .b .c > .x, .b .c .y'
+ * ```
+ *
+ * @param {string} scope    Selector to scope to.
+ * @param {string} selector Original selector.
+ *
+ * @return {string} Scoped selector.
+ */
+function scopeSelector( scope, selector ) {
+	const scopes = scope.split( ',' );
+	const selectors = selector.split( ',' );
+
+	const selectorsScoped = [];
+	scopes.forEach( ( outer ) => {
+		selectors.forEach( ( inner ) => {
+			selectorsScoped.push( `${ outer.trim() } ${ inner.trim() }` );
+		} );
+	} );
+
+	return selectorsScoped.join( ', ' );
+}
+
+/**
  * Override the default block element to include duotone styles.
  *
  * @param {Function} BlockListBlock Original component.
@@ -234,11 +265,13 @@ const withDuotoneStyles = createHigherOrderComponent(
 
 		const id = `wp-duotone-filter-${ useInstanceId( BlockListBlock ) }`;
 
-		const selectors = duotoneSupport.split( ',' );
-		const selectorsScoped = selectors.map(
-			( selector ) => `.${ id } ${ selector.trim() }`
+		// Extra .editor-styles-wrapper specificity is needed in the editor
+		// since we're not using inline styles to apply the filter. We need to
+		// override duotone applied by global styles and theme.json.
+		const selectorsGroup = scopeSelector(
+			`.editor-styles-wrapper .${ id }`,
+			duotoneSupport
 		);
-		const selectorsGroup = selectorsScoped.join( ', ' );
 
 		const className = classnames( props?.className, id );
 

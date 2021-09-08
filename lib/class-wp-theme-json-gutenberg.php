@@ -57,6 +57,7 @@ class WP_Theme_JSON_Gutenberg {
 		),
 		'color'      => array(
 			'background' => null,
+			'duotone'    => null,
 			'gradient'   => null,
 			'text'       => null,
 		),
@@ -243,6 +244,16 @@ class WP_Theme_JSON_Gutenberg {
 		'text-transform'             => array( 'typography', 'textTransform' ),
 	);
 
+	/**
+	 * Metadata for style properties that need to use the duotone selector.
+	 *
+	 * Each element is a direct mapping from the CSS property name to the
+	 * path to the value in theme.json & block attributes.
+	 */
+	const DUOTONE_PROPERTIES_METADATA = array(
+		'filter' => array( 'color', 'duotone' ),
+	);
+
 	const ELEMENTS = array(
 		'link' => 'a',
 		'h1'   => 'h1',
@@ -360,9 +371,13 @@ class WP_Theme_JSON_Gutenberg {
 	 *   },
 	 *   'core/heading': {
 	 *     'selector': 'h1'
-	 *   }
+	 *   },
 	 *   'core/group': {
 	 *     'selector': '.wp-block-group'
+	 *   },
+	 *   'core/cover': {
+	 *     'selector': '.wp-block-cover',
+	 *     'duotone': '> .wp-block-cover__image-background, > .wp-block-cover__video-background'
 	 *   }
 	 * }
 	 *
@@ -385,6 +400,13 @@ class WP_Theme_JSON_Gutenberg {
 				self::$blocks_metadata[ $block_name ]['selector'] = $block_type->supports['__experimentalSelector'];
 			} else {
 				self::$blocks_metadata[ $block_name ]['selector'] = '.wp-block-' . str_replace( '/', '-', str_replace( 'core/', '', $block_name ) );
+			}
+
+			if (
+				isset( $block_type->supports['color']['__experimentalDuotone'] ) &&
+				is_string( $block_type->supports['color']['__experimentalDuotone'] )
+			) {
+				self::$blocks_metadata[ $block_name ]['duotone'] = $block_type->supports['color']['__experimentalDuotone'];
 			}
 
 			// Assign defaults, then overwrite those that the block sets by itself.
@@ -540,16 +562,17 @@ class WP_Theme_JSON_Gutenberg {
 	 * ```
 	 *
 	 * @param array $styles Styles to process.
+	 * @param array $properties Properties metadata.
 	 *
 	 * @return array Returns the modified $declarations.
 	 */
-	private static function compute_style_properties( $styles ) {
+	private static function compute_style_properties( $styles, $properties = self::PROPERTIES_METADATA ) {
 		$declarations = array();
 		if ( empty( $styles ) ) {
 			return $declarations;
 		}
 
-		foreach ( self::PROPERTIES_METADATA as $css_property => $value_path ) {
+		foreach ( $properties as $css_property => $value_path ) {
 			$value = self::get_property_value( $styles, $value_path );
 
 			// Skip if empty and not "0" or value represents array of longhand values.
@@ -587,6 +610,36 @@ class WP_Theme_JSON_Gutenberg {
 		}
 
 		return implode( ',', $new_selectors );
+	}
+
+	/**
+	 * Function that scopes a selector with another one. This works a bit like
+	 * SCSS nesting except the `&` operator isn't supported.
+	 *
+	 * <code>
+	 * $scope = '.a, .b .c';
+	 * $selector = '> .x, .y';
+	 * $merged = scope_selector( $scope, $selector );
+	 * // $merged is '.a > .x, .a .y, .b .c > .x, .b .c .y'
+	 * </code>
+	 *
+	 * @param string $scope    Selector to scope to.
+	 * @param string $selector Original selector.
+	 *
+	 * @return string Scoped selector.
+	 */
+	private static function scope_selector( $scope, $selector ) {
+		$scopes    = explode( ',', $scope );
+		$selectors = explode( ',', $selector );
+
+		$selectors_scoped = array();
+		foreach ( $scopes as $outer ) {
+			foreach ( $selectors as $inner ) {
+				$selectors_scoped[] = trim( $outer ) . ' ' . trim( $inner );
+			}
+		}
+
+		return implode( ', ', $selectors_scoped );
 	}
 
 	/**
@@ -826,9 +879,38 @@ class WP_Theme_JSON_Gutenberg {
 					$block_rules .= '.wp-site-blocks > * + * { margin-top: var( --wp--style--block-gap ); margin-bottom: 0; }';
 				}
 			}
+
+			if ( isset( $metadata['duotone'] ) ) {
+				$selector     = self::scope_selector( $metadata['selector'], $metadata['duotone'] );
+				$declarations = self::compute_style_properties( $node, self::DUOTONE_PROPERTIES_METADATA );
+				$block_rules .= self::to_ruleset( $selector, $declarations );
+			}
 		}
 
 		return $block_rules;
+	}
+
+	/**
+	 * Gets the SVGs for duotone filter support.
+	 *
+	 * @param array $settings Settings per block.
+	 *
+	 * @return string The SVGs containing the duotone filters.
+	 */
+	private function get_svg_filters( $settings ) {
+		if ( ! isset( $settings['color']['duotone'] ) ) {
+			return;
+		}
+
+		$block_svgs = '';
+
+		foreach ( $settings['color']['duotone'] as $swatch ) {
+			$duotone_id     = 'wp-duotone-filter-' . $swatch['slug'];
+			$duotone_colors = $swatch['colors'];
+			$block_svgs    .= gutenberg_get_duotone_svg_filter( $duotone_id, $duotone_colors );
+		}
+
+		return $block_svgs;
 	}
 
 	/**
@@ -951,11 +1033,13 @@ class WP_Theme_JSON_Gutenberg {
 	 * [
 	 *   [
 	 *     'path'     => [ 'path', 'to', 'some', 'node' ],
-	 *     'selector' => 'CSS selector for some node'
+	 *     'selector' => 'CSS selector for some node',
+	 *     'duotone'  => 'CSS selector for duotone for some node'
 	 *   ],
 	 *   [
 	 *     'path'     => ['path', 'to', 'other', 'node' ],
-	 *     'selector' => 'CSS selector for other node'
+	 *     'selector' => 'CSS selector for other node',
+	 *     'duotone'  => null
 	 *   ],
 	 * ]
 	 *
@@ -996,9 +1080,15 @@ class WP_Theme_JSON_Gutenberg {
 				$selector = $selectors[ $name ]['selector'];
 			}
 
+			$duotone_selector = null;
+			if ( isset( $selectors[ $name ]['duotone'] ) ) {
+				$duotone_selector = $selectors[ $name ]['duotone'];
+			}
+
 			$nodes[] = array(
 				'path'     => array( 'styles', 'blocks', $name ),
 				'selector' => $selector,
+				'duotone'  => $duotone_selector,
 			);
 
 			if ( isset( $theme_json['styles']['blocks'][ $name ]['elements'] ) ) {
@@ -1091,6 +1181,15 @@ class WP_Theme_JSON_Gutenberg {
 			default:
 				return $this->get_css_variables( $setting_nodes ) . $this->get_block_classes( $style_nodes ) . $this->get_preset_classes( $setting_nodes );
 		}
+	}
+
+	/**
+	 * Returns the SVGs for filters used by the stylesheets.
+	 *
+	 * @return string SVGs.
+	 */
+	public function get_svgs() {
+		return $this->get_svg_filters( $this->get_settings() );
 	}
 
 	/**

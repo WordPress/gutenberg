@@ -251,47 +251,15 @@ function gutenberg_register_duotone_support( $block_type ) {
 }
 
 /**
- * Render out the duotone stylesheet and SVG.
+ * Get the duotone stylesheet.
  *
- * @param  string $block_content Rendered block content.
- * @param  array  $block         Block object.
- * @return string                Filtered block content.
+ * @param string $duotone_id Unique id for the duotone filter.
+ * @param string $duotone_selector Duotone selector as declared in block support.
+ *
+ * @return string Duotone stylesheet.
  */
-function gutenberg_render_duotone_support( $block_content, $block ) {
-	$block_type = WP_Block_Type_Registry::get_instance()->get_registered( $block['blockName'] );
-
-	$duotone_support = false;
-	if ( $block_type && property_exists( $block_type, 'supports' ) ) {
-		$duotone_support = _wp_array_get( $block_type->supports, array( 'color', '__experimentalDuotone' ), false );
-	}
-
-	$has_duotone_attribute = isset( $block['attrs']['style']['color']['duotone'] );
-
-	if (
-		! $duotone_support ||
-		! $has_duotone_attribute
-	) {
-		return $block_content;
-	}
-
-	$duotone_colors = $block['attrs']['style']['color']['duotone'];
-
-	$duotone_values = array(
-		'r' => array(),
-		'g' => array(),
-		'b' => array(),
-	);
-	foreach ( $duotone_colors as $color_str ) {
-		$color = gutenberg_tinycolor_string_to_rgb( $color_str );
-
-		$duotone_values['r'][] = $color['r'] / 255;
-		$duotone_values['g'][] = $color['g'] / 255;
-		$duotone_values['b'][] = $color['b'] / 255;
-	}
-
-	$duotone_id = 'wp-duotone-filter-' . uniqid();
-
-	$selectors        = explode( ',', $duotone_support );
+function gutenberg_get_duotone_stylesheet( $duotone_id, $duotone_selector ) {
+	$selectors        = explode( ',', $duotone_selector );
 	$selectors_scoped = array_map(
 		function ( $selector ) use ( $duotone_id ) {
 			return '.' . $duotone_id . ' ' . trim( $selector );
@@ -309,6 +277,37 @@ function gutenberg_render_duotone_support( $block_content, $block ) {
 			filter: url( <?php echo esc_url( '#' . $duotone_id ); ?> );
 		}
 	</style>
+
+	<?php
+
+	return ob_get_clean();
+}
+
+/**
+ * Get the duotone SVG.
+ *
+ * @param string $duotone_id Unique id for the duotone filter.
+ * @param array  $duotone_colors Array of CSS color strings that can be parsed by tinycolor.
+ *
+ * @return string Duotone SVG.
+ */
+function gutenberg_get_duotone_svg_filter( $duotone_id, $duotone_colors ) {
+	$duotone_values = array(
+		'r' => array(),
+		'g' => array(),
+		'b' => array(),
+	);
+	foreach ( $duotone_colors as $color_str ) {
+		$color = gutenberg_tinycolor_string_to_rgb( $color_str );
+
+		$duotone_values['r'][] = $color['r'] / 255;
+		$duotone_values['g'][] = $color['g'] / 255;
+		$duotone_values['b'][] = $color['b'] / 255;
+	}
+
+	ob_start();
+
+	?>
 
 	<svg
 		xmlns:xlink="http://www.w3.org/1999/xlink"
@@ -341,7 +340,39 @@ function gutenberg_render_duotone_support( $block_content, $block ) {
 
 	<?php
 
-	$duotone = ob_get_clean();
+	return ob_get_clean();
+}
+
+/**
+ * Render out the duotone stylesheet and SVG.
+ *
+ * @param  string $block_content Rendered block content.
+ * @param  array  $block         Block object.
+ * @return string                Filtered block content.
+ */
+function gutenberg_render_duotone_support( $block_content, $block ) {
+	$block_type = WP_Block_Type_Registry::get_instance()->get_registered( $block['blockName'] );
+
+	$duotone_support = false;
+	if ( $block_type && property_exists( $block_type, 'supports' ) ) {
+		$duotone_support = _wp_array_get( $block_type->supports, array( 'color', '__experimentalDuotone' ), false );
+	}
+
+	$has_duotone_attribute = isset( $block['attrs']['style']['color']['duotone'] );
+
+	if (
+		! $duotone_support ||
+		! $has_duotone_attribute
+	) {
+		return $block_content;
+	}
+
+	$duotone_colors = $block['attrs']['style']['color']['duotone'];
+
+	$duotone_id = 'wp-duotone-filter-' . uniqid();
+
+	$duotone  = gutenberg_get_duotone_stylesheet( $duotone_id, $duotone_support );
+	$duotone .= gutenberg_get_duotone_svg_filter( $duotone_id, $duotone_colors );
 
 	// Like the layout hook, this assumes the hook only applies to blocks with a single wrapper.
 	$content = preg_replace(

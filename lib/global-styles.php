@@ -70,6 +70,25 @@ function gutenberg_experimental_global_styles_enqueue_assets() {
 }
 
 /**
+ * Fetches the preferences for each origin (core, theme, user)
+ * and enqueues the resulting SVGs for media filter support.
+ *
+ * TODO: Is this the right way to render the SVGs? Maybe I should render them as
+ * CSS variables so they can be included in the stylesheet?
+ */
+function gutenberg_experimental_global_styles_enqueue_svg_filters() {
+	if ( ! WP_Theme_JSON_Resolver_Gutenberg::theme_has_support() ) {
+		return;
+	}
+
+	$settings = gutenberg_get_default_block_editor_settings();
+	$all      = WP_Theme_JSON_Resolver_Gutenberg::get_merged_data( $settings );
+
+	// TODO: Should this be cached like the stylesheet?
+	echo $all->get_svgs();
+}
+
+/**
  * Adds the necessary settings for the Global Styles client UI.
  *
  * @param array $settings Existing block editor settings.
@@ -335,6 +354,9 @@ if ( function_exists( 'get_block_editor_settings' ) ) {
 
 add_action( 'init', 'gutenberg_experimental_global_styles_register_user_cpt' );
 add_action( 'wp_enqueue_scripts', 'gutenberg_experimental_global_styles_enqueue_assets' );
+
+// SVG defs need to be within a container that is displayed (not inside a display: none or in the header).
+add_action( is_admin() ? 'admin_footer' : 'wp_footer', 'gutenberg_experimental_global_styles_enqueue_svg_filters' );
 
 // kses actions&filters.
 add_action( 'init', 'gutenberg_global_styles_kses_init' );
