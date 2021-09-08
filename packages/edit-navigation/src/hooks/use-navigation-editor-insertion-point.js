@@ -12,8 +12,10 @@ const useNavigationEditorInsertionPoint = () => {
 	return useSelect( ( select ) => {
 		const { getBlockOrder } = select( blockEditorStore );
 
+		const lockedNavigationBlock = getBlockOrder()[ 0 ];
+
 		return {
-			rootClientId: getBlockOrder()[ 0 ],
+			rootClientId: lockedNavigationBlock,
 		};
 	}, [] );
 };

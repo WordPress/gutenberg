@@ -1,18 +1,12 @@
 /**
  * WordPress dependencies
  */
-import {
-	NavigableToolbar,
-	store as blockEditorStore,
-} from '@wordpress/block-editor';
-import { DropdownMenu, Button, ToolbarItem } from '@wordpress/components';
+import { NavigableToolbar } from '@wordpress/block-editor';
+import { DropdownMenu } from '@wordpress/components';
 import { useViewportMatch } from '@wordpress/compose';
 import { PinnedItems } from '@wordpress/interface';
-import { __, sprintf, _x } from '@wordpress/i18n';
+import { __, sprintf } from '@wordpress/i18n';
 import { decodeEntities } from '@wordpress/html-entities';
-import { useRef } from '@wordpress/element';
-import { useSelect, useDispatch } from '@wordpress/data';
-import { plus } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -20,12 +14,9 @@ import { plus } from '@wordpress/icons';
 import SaveButton from './save-button';
 import UndoButton from './undo-button';
 import RedoButton from './redo-button';
+import Inserter from './inserter';
 import MenuSwitcher from '../menu-switcher';
-import {
-	useMenuEntityProp,
-	useNavigationEditorInsertionPoint,
-} from '../../hooks';
-import { store as editNavigationStore } from '../../store';
+import { useMenuEntityProp } from '../../hooks';
 
 export default function Header( {
 	isMenuSelected,
@@ -35,22 +26,8 @@ export default function Header( {
 	isPending,
 	navigationPost,
 } ) {
-	const inserterButton = useRef();
 	const isMediumViewport = useViewportMatch( 'medium' );
 	const [ menuName ] = useMenuEntityProp( 'name', selectedMenuId );
-
-	const { rootClientId } = useNavigationEditorInsertionPoint();
-
-	const { isInserterOpened, hasInserterItems } = useSelect( ( select ) => {
-		return {
-			hasInserterItems: select( blockEditorStore ).hasInserterItems(
-				rootClientId
-			),
-			isInserterOpened: select( editNavigationStore ).isInserterOpened(),
-		};
-	} );
-
-	const { setIsInserterOpened } = useDispatch( editNavigationStore );
 
 	let actionHeaderText;
 
@@ -78,34 +55,7 @@ export default function Header( {
 						className="edit-navigation-header__toolbar"
 						aria-label={ __( 'Document tools' ) }
 					>
-						<ToolbarItem
-							ref={ inserterButton }
-							as={ Button }
-							className="edit-navigation-header-toolbar__inserter-toggle"
-							variant="primary"
-							isPressed={ isInserterOpened }
-							onMouseDown={ ( event ) => {
-								event.preventDefault();
-							} }
-							onClick={ () => {
-								if ( isInserterOpened ) {
-									// Focusing the inserter button closes the inserter popover
-									// @ts-ignore
-									inserterButton.current.focus();
-								} else {
-									setIsInserterOpened( true );
-								}
-							} }
-							icon={ plus }
-							/* translators: button label text should, if possible, be under 16
-					characters. */
-							label={ _x(
-								'Toggle block inserter',
-								'Generic label for block inserter button'
-							) }
-							disabled={ ! hasInserterItems }
-						/>
-
+						<Inserter />
 						<UndoButton />
 						<RedoButton />
 					</NavigableToolbar>
