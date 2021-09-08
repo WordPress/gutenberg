@@ -197,10 +197,7 @@ const createBatchSaveForEditedMenuItems = ( post ) => async ( {
 		getMenuItemToClientIdMapping( registry, post.id )
 	);
 
-	const blocksList = blocksTreeToFlatList(
-		apiMenuItemsByClientId,
-		navigationBlock.innerBlocks
-	);
+	const blocksList = blocksTreeToFlatList( navigationBlock.innerBlocks );
 
 	const deletedMenuItemsIds = computeDeletedMenuItemIds(
 		apiMenuItemsByClientId,
@@ -209,7 +206,7 @@ const createBatchSaveForEditedMenuItems = ( post ) => async ( {
 
 	const batchTasks = [];
 	// Enqueue updates
-	for ( const { block, parentId, position } of blocksList ) {
+	for ( const { block, parentClientId, position } of blocksList ) {
 		const menuItemId = apiMenuItemsByClientId[ block.clientId ]?.id;
 		if ( ! menuItemId || deletedMenuItemsIds.includes( menuItemId ) ) {
 			continue;
@@ -226,7 +223,7 @@ const createBatchSaveForEditedMenuItems = ( post ) => async ( {
 					apiMenuItemsByClientId,
 					menuId,
 					block,
-					parentId,
+					apiMenuItemsByClientId[ parentClientId ]?.id,
 					position
 				),
 				{ undoIgnore: true }
@@ -296,36 +293,21 @@ function blockToEntityRecord(
 	};
 }
 
-function blocksTreeToFlatList(
-	apiMenuItemsByClientId,
-	innerBlocks,
-	parentId = 0
-) {
+function blocksTreeToFlatList( innerBlocks, parentClientId = null ) {
 	return innerBlocks.flatMap( ( block, index ) =>
-		[ { block, parentId, position: index + 1 } ].concat(
-			blocksTreeToFlatList(
-				apiMenuItemsByClientId,
-				block.innerBlocks,
-				apiMenuItemsByClientId[ block.clientId ]?.id
-			)
+		[ { block, parentClientId, position: index + 1 } ].concat(
+			blocksTreeToFlatList( block.innerBlocks, block.clientId )
 		)
 	);
 }
 
 function computeDeletedMenuItemIds( apiMenuItemsByClientId, blocksList ) {
-	const clientIdToBlockId = Object.fromEntries(
-		blocksList.map( ( { block } ) => [
-			block.clientId,
-			apiMenuItemsByClientId[ block.clientId ]?.id,
-		] )
+	const editorBlocksIds = new Set(
+		blocksList.map( ( { block } ) => block.clientId )
 	);
-	const deletedMenuItems = [];
-	for ( const clientId in apiMenuItemsByClientId ) {
-		if ( ! ( clientId in clientIdToBlockId ) ) {
-			deletedMenuItems.push( apiMenuItemsByClientId[ clientId ]?.id );
-		}
-	}
-	return deletedMenuItems;
+	return Object.entries( apiMenuItemsByClientId )
+		.filter( ( [ clientId, ] ) => ! editorBlocksIds.has( clientId ) )
+		.map( ( [ , menuItem ] ) => menuItem.id );
 }
 
 /**
