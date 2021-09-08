@@ -104,7 +104,8 @@ export function NumberControl(
 		 */
 		if ( type === inputControlActionTypes.DRAG && isDragEnabled ) {
 			const [ x, y ] = payload.delta;
-			const modifier = payload.shiftKey
+			const enableShift = payload.shiftKey && isShiftStepEnabled;
+			const modifier = enableShift
 				? parseFloat( shiftStep ) * baseStep
 				: baseStep;
 
@@ -139,7 +140,7 @@ export function NumberControl(
 
 				state.value = constrainValue(
 					add( currentValue, distance ),
-					payload.shiftKey ? modifier : null
+					enableShift ? modifier : null
 				);
 			}
 		}
