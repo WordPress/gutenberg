@@ -44,7 +44,7 @@ export default {
 			return null;
 		}
 		return (
-			<BlockControls group="block" __experimentalExposeToChildren>
+			<BlockControls group="block" __experimentalShareWithChildBlocks>
 				<FlexLayoutJustifyContentControl
 					layout={ layout }
 					onChange={ onChange }

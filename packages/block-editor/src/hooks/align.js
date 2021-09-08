@@ -140,7 +140,10 @@ export const withToolbarControls = createHigherOrderComponent(
 		return (
 			<>
 				{ blockAllowedAlignments.length > 0 && (
-					<BlockControls group="block" __experimentalExposeToChildren>
+					<BlockControls
+						group="block"
+						__experimentalShareWithChildBlocks
+					>
 						<BlockAlignmentControl
 							value={ props.attributes.align }
 							onChange={ updateAlignment }
