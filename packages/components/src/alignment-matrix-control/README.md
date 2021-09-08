@@ -9,12 +9,12 @@ import { __experimentalAlignmentMatrixControl as AlignmentMatrixControl } from '
 import { useState } from '@wordpress/element';
 
 const Example = () => {
-	const [alignment, setAlignment] = useState('center center');
+	const [ alignment, setAlignment ] = useState( 'center center' );
 
 	return (
 		<AlignmentMatrixControl
-			value={alignment}
-			onChange={(newAlignment) => setAlignment(newAlignment)}
+			value={ alignment }
+			onChange={ ( newAlignment ) => setAlignment( newAlignment ) }
 		/>
 	);
 };
