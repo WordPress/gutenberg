@@ -217,7 +217,7 @@ export const deleteEntityRecord = (
 
 		return deletedRecord;
 	} finally {
-		dispatch.__unstableReleaseStoreLock( lock );
+		await dispatch.__unstableReleaseStoreLock( lock );
 	}
 };
 
@@ -369,7 +369,7 @@ export const saveEntityRecord = (
 				const evaluatedValue = value(
 					select.getEditedEntityRecord( kind, name, recordId )
 				);
-				dispatch.editEntityRecord(
+				await dispatch.editEntityRecord(
 					kind,
 					name,
 					recordId,
@@ -474,7 +474,7 @@ export const saveEntityRecord = (
 						},
 						{}
 					);
-					dispatch.receiveEntityRecords(
+					await dispatch.receiveEntityRecords(
 						kind,
 						name,
 						newRecord,
@@ -482,7 +482,7 @@ export const saveEntityRecord = (
 						true
 					);
 				} else {
-					dispatch.receiveAutosaves(
+					await dispatch.receiveAutosaves(
 						persistedRecord.id,
 						updatedRecord
 					);
@@ -503,7 +503,7 @@ export const saveEntityRecord = (
 					method: recordId ? 'PUT' : 'POST',
 					data: edits,
 				} );
-				dispatch.receiveEntityRecords(
+				await dispatch.receiveEntityRecords(
 					kind,
 					name,
 					updatedRecord,
@@ -526,7 +526,7 @@ export const saveEntityRecord = (
 
 		return updatedRecord;
 	} finally {
-		dispatch.__unstableReleaseStoreLock( lock );
+		await dispatch.__unstableReleaseStoreLock( lock );
 	}
 };
 
