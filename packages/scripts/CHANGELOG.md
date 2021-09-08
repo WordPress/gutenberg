@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   The bundled `jest-dev-server` dependency has been updated to the next major version `^5.0.3` ([#34560](https://github.com/WordPress/gutenberg/pull/34560)).
+
 ### Bug Fixes
 
 -   Bring back support for SVG files in CSS ([#34394](https://github.com/WordPress/gutenberg/pull/34394)). It wasn't correctly migrated when integrating webpack v5.
@@ -11,8 +15,8 @@
 ### Breaking Changes
 
 -   Increase the minimum Node.js version to v12.13 matching requirements from bundled dependencies ([#33818](https://github.com/WordPress/gutenberg/pull/33818)).
--   The bundled `webpack` dependency has been updated to the next major version `^5.47.1` (see [Breaking Changes](https://webpack.js.org/migrate/5/), [##33818](https://github.com/WordPress/gutenberg/pull/#33818)).
--   The bundled `webpack-cli` dependency has been updated to the next major version `^4.7.2` ([##33818](https://github.com/WordPress/gutenberg/pull/#33818)).
+-   The bundled `webpack` dependency has been updated to the next major version `^5.47.1` (see [Breaking Changes](https://webpack.js.org/migrate/5/), [#33818](https://github.com/WordPress/gutenberg/pull/33818)).
+-   The bundled `webpack-cli` dependency has been updated to the next major version `^4.7.2` ([#33818](https://github.com/WordPress/gutenberg/pull/33818)).
 -   The bundled `css-loader` dependency has been updated from requiring `^5.1.3` to requiring `^6.2.0` ([#33818](https://github.com/WordPress/gutenberg/pull/33818)).
 -   The bundled `file-loader` dependency has been removed ([#33818](https://github.com/WordPress/gutenberg/pull/33818)).
 -   The bundled `ignore-emit-webpack-plugin` dependency has been removed ([#33818](https://github.com/WordPress/gutenberg/pull/33818)).
