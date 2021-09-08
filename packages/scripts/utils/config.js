@@ -108,7 +108,11 @@ const getWebpackArgs = () => {
 
 	const hasWebpackOutputOption =
 		hasArgInCLI( '-o' ) || hasArgInCLI( '--output' );
-	if ( hasFileArgInCLI() && ! hasWebpackOutputOption ) {
+	if (
+		! hasWebpackOutputOption &&
+		! hasArgInCLI( '--entry' ) &&
+		hasFileArgInCLI()
+	) {
 		/**
 		 * Converts a legacy path to the entry pair supported by webpack, e.g.:
 		 * `./entry-one.js` -> `[ 'entry-one', './entry-one.js] ]`
