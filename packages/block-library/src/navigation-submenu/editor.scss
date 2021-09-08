@@ -1,6 +1,10 @@
 .wp-block-navigation-submenu {
 	display: block;
 
+	.wp-block-navigation__submenu-container {
+		z-index: 28;
+	}
+
 	// Show on editor selected, even if on frontend it only stays open on focus-within.
 	&.is-selected,
 	&.has-child-selected {
