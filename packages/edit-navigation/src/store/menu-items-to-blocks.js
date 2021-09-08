@@ -118,7 +118,7 @@ function menuItemToBlockAttributes( {
 	xfn,
 	classes,
 	// eslint-disable-next-line camelcase
-	attr_title,
+	attrTitle,
 	object,
 	// eslint-disable-next-line camelcase
 	object_id,
@@ -135,36 +135,29 @@ function menuItemToBlockAttributes( {
 		object = 'tag';
 	}
 
-	return {
+	const attributes = {
 		label: menuItemTitleField?.rendered || '',
-		...( object?.length && {
-			type: object,
-		} ),
+		type: object,
 		kind: menuItemTypeField?.replace( '_', '-' ) || 'custom',
 		url: url || '',
-		...( xfn?.length &&
-			xfn.join( ' ' ).trim() && {
-				rel: xfn.join( ' ' ).trim(),
-			} ),
-		...( classes?.length &&
-			classes.join( ' ' ).trim() && {
-				className: classes.join( ' ' ).trim(),
-			} ),
-		...( attr_title?.length && {
-			title: attr_title,
-		} ),
+		rel: xfn?.join( ' ' ).trim(),
+		className: classes?.join( ' ' ).trim(),
+		title: attrTitle?.raw || attrTitle || menuItemTitleField?.raw,
 		// eslint-disable-next-line camelcase
 		...( object_id &&
 			'custom' !== object && {
 				id: object_id,
 			} ),
-		...( description?.length && {
-			description,
-		} ),
+		description,
 		...( target === '_blank' && {
 			opensInNewTab: true,
 		} ),
 	};
+
+	// Filter out the empty values
+	return Object.fromEntries(
+		Object.entries( attributes ).filter( ( [ , v ] ) => v )
+	);
 }
 
 /**

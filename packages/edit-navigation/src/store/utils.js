@@ -84,27 +84,15 @@ export const blockAttributesToMenuItem = ( {
 		type = 'post_tag';
 	}
 
-	return {
+	const menuItem = {
 		title: label,
 		url,
-		...( description?.length && {
-			description,
-		} ),
-		...( rel?.length && {
-			xfn: rel?.trim().split( ' ' ),
-		} ),
-		...( className?.length && {
-			classes: className?.trim().split( ' ' ),
-		} ),
-		...( blockTitleAttr?.length && {
-			attr_title: blockTitleAttr,
-		} ),
-		...( type?.length && {
-			object: type,
-		} ),
-		...( kind?.length && {
-			type: kind?.replace( '-', '_' ),
-		} ),
+		description,
+		xfn: rel?.trim().split( ' ' ),
+		classes: className?.trim().split( ' ' ),
+		attr_title: blockTitleAttr,
+		object: type,
+		type: kind?.replace( '-', '_' ),
 		// Only assign object_id if it's a entity type (ie: not "custom").
 		...( id &&
 			'custom' !== type && {
@@ -112,6 +100,11 @@ export const blockAttributesToMenuItem = ( {
 			} ),
 		target: opensInNewTab ? NEW_TAB_TARGET_ATTRIBUTE : '',
 	};
+
+	// Filter out the empty values
+	return Object.fromEntries(
+		Object.entries( menuItem ).filter( ( [ , v ] ) => v )
+	);
 };
 
 /**

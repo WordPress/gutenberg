@@ -223,7 +223,7 @@ const createBatchSaveForEditedMenuItems = ( post ) => async ( {
 				'menuItem',
 				entityRecordId,
 				blockToMenuItem(
-					blockIdToAPIEntity,
+					blockIdToAPIEntity[ block.clientId ],
 					menuId,
 					block,
 					blockIdToAPIEntity[ parentBlockId ]?.id,
@@ -257,27 +257,13 @@ const createBatchSaveForEditedMenuItems = ( post ) => async ( {
 	return batchTasks;
 };
 
-function blockToMenuItem(
-	blockIdToAPIEntity,
-	menuId,
-	block,
-	parentId,
-	position
-) {
-	const menuItem = omit(
-		blockIdToAPIEntity[ block.clientId ],
-		'menus',
-		'meta',
-		'_links'
-	);
+function blockToMenuItem( menuItem, menuId, block, parentId, position ) {
+	menuItem = omit( menuItem, 'menus', 'meta', '_links' );
 
 	let attributes;
 
 	if ( block.name === 'core/navigation-link' ) {
-		attributes = blockAttributesToMenuItem(
-			blockIdToAPIEntity,
-			block.attributes
-		);
+		attributes = blockAttributesToMenuItem( block.attributes );
 	} else {
 		attributes = {
 			type: 'block',
@@ -288,9 +274,9 @@ function blockToMenuItem(
 	return {
 		...menuItem,
 		...attributes,
-		position,
-		nav_menu_term_id: menuId,
-		menu_item_parent: parentId,
+		menu_order: position,
+		menu_id: menuId,
+		parent: parentId,
 		status: 'publish',
 		_invalid: false,
 	};
