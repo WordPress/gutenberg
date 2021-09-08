@@ -369,7 +369,7 @@ export const saveEntityRecord = (
 				const evaluatedValue = value(
 					select.getEditedEntityRecord( kind, name, recordId )
 				);
-				await dispatch.editEntityRecord(
+				dispatch.editEntityRecord(
 					kind,
 					name,
 					recordId,
@@ -474,7 +474,7 @@ export const saveEntityRecord = (
 						},
 						{}
 					);
-					await dispatch.receiveEntityRecords(
+					dispatch.receiveEntityRecords(
 						kind,
 						name,
 						newRecord,
@@ -482,7 +482,7 @@ export const saveEntityRecord = (
 						true
 					);
 				} else {
-					await dispatch.receiveAutosaves(
+					dispatch.receiveAutosaves(
 						persistedRecord.id,
 						updatedRecord
 					);
@@ -503,7 +503,7 @@ export const saveEntityRecord = (
 					method: recordId ? 'PUT' : 'POST',
 					data: edits,
 				} );
-				await dispatch.receiveEntityRecords(
+				dispatch.receiveEntityRecords(
 					kind,
 					name,
 					updatedRecord,
@@ -526,7 +526,7 @@ export const saveEntityRecord = (
 
 		return updatedRecord;
 	} finally {
-		await dispatch.__unstableReleaseStoreLock( lock );
+		dispatch.__unstableReleaseStoreLock( lock );
 	}
 };
 
