@@ -10,6 +10,25 @@ import {
 	ZWNBSP,
 } from './special-characters';
 
+function restoreOnAttributes( attributes, isEditableTree ) {
+	if ( isEditableTree ) {
+		return attributes;
+	}
+
+	const newAttributes = {};
+
+	for ( const key in attributes ) {
+		let newKey = key;
+		if ( key.startsWith( 'data-disable-rich-text-' ) ) {
+			newKey = key.slice( 'data-disable-rich-text-'.length );
+		}
+
+		newAttributes[ newKey ] = attributes[ key ];
+	}
+
+	return newAttributes;
+}
+
 /**
  * Converts a format object to information that can be used to create an element
  * from (type, attributes and object).
@@ -23,10 +42,11 @@ import {
  *                                             format.
  * @param  {boolean} $1.boundaryClass          Wether or not to apply a boundary
  *                                             class.
+ * @param  {boolean} $1.isEditableTree
  * @return {Object}                            Information to be used for
  *                                             element creation.
  */
-function fromFormat( { type, attributes, unregisteredAttributes, object, boundaryClass } ) {
+function fromFormat( { type, attributes, unregisteredAttributes, object, boundaryClass, isEditableTree } ) {
 	const formatType = getFormatType( type );
 
 	let elementAttributes = {};
@@ -40,7 +60,14 @@ function fromFormat( { type, attributes, unregisteredAttributes, object, boundar
 			elementAttributes = { ...attributes, ...elementAttributes };
 		}
 
-		return { type, attributes: elementAttributes, object };
+		return {
+			type,
+			attributes: restoreOnAttributes(
+				elementAttributes,
+				isEditableTree
+			),
+			object,
+		};
 	}
 
 	elementAttributes = { ...unregisteredAttributes, ...elementAttributes };
@@ -66,7 +93,7 @@ function fromFormat( { type, attributes, unregisteredAttributes, object, boundar
 	return {
 		type: formatType.tagName,
 		object: formatType.object,
-		attributes: elementAttributes,
+		attributes: restoreOnAttributes( elementAttributes, isEditableTree ),
 	};
 }
 
@@ -188,6 +215,7 @@ export function toTree( {
 					attributes,
 					unregisteredAttributes,
 					boundaryClass,
+					isEditableTree,
 				} ) );
 
 				if ( isText( pointer ) && getText( pointer ).length === 0 ) {
@@ -217,10 +245,29 @@ export function toTree( {
 		}
 
 		if ( character === OBJECT_REPLACEMENT_CHARACTER ) {
-			pointer = append( getParent( pointer ), fromFormat( {
-				...replacements[ i ],
-				object: true,
-			} ) );
+			if ( ! isEditableTree && replacements[ i ].type === 'script' ) {
+				pointer = append(
+					getParent( pointer ),
+					fromFormat( {
+						type: 'script',
+						isEditableTree,
+					} )
+				);
+				append( pointer, {
+					html: decodeURIComponent(
+						replacements[ i ].attributes[ 'data-rich-text-script' ]
+					),
+				} );
+			} else {
+				pointer = append(
+					getParent( pointer ),
+					fromFormat( {
+						...replacements[ i ],
+						object: true,
+						isEditableTree,
+					} )
+				);
+			}
 			// Ensure pointer is text node.
 			pointer = append( getParent( pointer ), '' );
 		} else if ( character === '\n' ) {

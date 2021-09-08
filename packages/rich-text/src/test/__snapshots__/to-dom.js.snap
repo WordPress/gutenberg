@@ -121,6 +121,26 @@ exports[`recordToDom should create an empty value from empty tags 1`] = `
 </body>
 `;
 
+exports[`recordToDom should disarm on* attribute 1`] = `
+<body>
+  
+  <img
+    data-disable-rich-text-onerror="alert('1')"
+  />
+  
+</body>
+`;
+
+exports[`recordToDom should disarm script 1`] = `
+<body>
+  
+  <script
+    data-rich-text-script="alert(%221%22)"
+  />
+  
+</body>
+`;
+
 exports[`recordToDom should filter format boundary attributes 1`] = `
 <body>
   <strong
