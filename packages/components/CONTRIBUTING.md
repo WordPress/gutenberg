@@ -166,7 +166,7 @@ Storybook can be started on a local maching by running `npm run storybook:dev`. 
 
 #### Documentation
 
-All components, in addition to being typed, should be using JSDoc when necessary.
+All components, in addition to being typed, should be using JSDoc when necessary — as explained in the [Coding Guidelines](/docs/contributors/code/coding-guidelines.md#javascript-documentation-using-jsdoc).
 
 Each component that is exported from the `@wordpress/components` package should include a `README.md` file, explaining how to use the component, showing examples, and documenting all the props.
 
