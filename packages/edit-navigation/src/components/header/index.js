@@ -27,6 +27,7 @@ export default function Header( {
 	navigationPost,
 } ) {
 	const isMediumViewport = useViewportMatch( 'medium' );
+
 	const [ menuName ] = useMenuEntityProp( 'name', selectedMenuId );
 
 	let actionHeaderText;
@@ -52,19 +53,25 @@ export default function Header( {
 						{ __( 'Navigation' ) }
 					</h1>
 				) }
+
 				<NavigableToolbar
 					className="edit-navigation-header__toolbar"
 					aria-label={ __( 'Document tools' ) }
 				>
 					<Inserter />
-					<UndoButton />
-					<RedoButton />
+					{ isMediumViewport && (
+						<>
+							<UndoButton />
+							<RedoButton />
+						</>
+					) }
 				</NavigableToolbar>
 			</div>
 
 			<h2 className="edit-navigation-header__subtitle">
 				{ isMenuSelected && decodeEntities( actionHeaderText ) }
 			</h2>
+
 			{ isMenuSelected && (
 				<div className="edit-navigation-header__actions">
 					<DropdownMenu
