@@ -110,38 +110,47 @@ const getWebpackArgs = () => {
 		hasArgInCLI( '-o' ) || hasArgInCLI( '--output' );
 	if ( hasFileArgInCLI() && ! hasWebpackOutputOption ) {
 		/**
-		 * Converts a path to the entry format supported by webpack, e.g.:
-		 * `./entry-one.js` -> `entry-one=./entry-one.js`
-		 * `entry-two.js` -> `entry-two=./entry-two.js`
+		 * Converts a legacy path to the entry pair supported by webpack, e.g.:
+		 * `./entry-one.js` -> `[ 'entry-one', './entry-one.js] ]`
+		 * `entry-two.js` -> `[ 'entry-two', './entry-two.js' ]`
 		 *
 		 * @param {string} path The path provided.
 		 *
-		 * @return {string} The entry format supported by webpack.
+		 * @return {string[]} The entry pair of its name and the file path.
 		 */
 		const pathToEntry = ( path ) => {
-			const entry = 'entries.' + basename( path, '.js' );
+			const entryName = basename( path, '.js' );
 
 			if ( ! path.startsWith( './' ) ) {
 				path = './' + path;
 			}
 
-			return [ '--env', [ entry, path ].join( '=' ) ];
+			return [ entryName, path ];
 		};
 
-		// The following handles the support for multiple entry points in webpack, e.g.:
-		// `wp-scripts build one.js custom=./two.js` -> `webpack one=./one.js custom=./two.js`
-		webpackArgs = webpackArgs.reduce( ( args, cliArg ) => {
-			if ( ! getFileArgsFromCLI().includes( cliArg ) ) {
-				args.push( cliArg );
-				return args;
-			}
-			if ( cliArg.includes( '=' ) ) {
-				args.push( '--env', 'entries.' + cliArg );
-			} else {
-				args.push( ...pathToEntry( cliArg ) );
-			}
-			return args;
-		}, [] );
+		const fileArgs = getFileArgsFromCLI();
+		if ( fileArgs.length > 0 ) {
+			// Filter out all CLI arguments that are file paths.
+			const fileArgsToRemove = new Set( fileArgs );
+			webpackArgs = webpackArgs.filter( ( cliArg ) => {
+				if ( fileArgsToRemove.has( cliArg ) ) {
+					fileArgsToRemove.delete( cliArg );
+					return false;
+				}
+				return true;
+			} );
+
+			// Convert all CLI arguments that are file paths to the `entry` format supported by webpack.
+			// It is going to be consumed in the config through the WP_ENTRY global variable.
+			const entry = {};
+			fileArgs.forEach( ( fileArg ) => {
+				const [ entryName, path ] = fileArg.includes( '=' )
+					? fileArg.split( '=' )
+					: pathToEntry( fileArg );
+				entry[ entryName ] = path;
+			} );
+			process.env.WP_ENTRY = JSON.stringify( entry );
+		}
 	}
 
 	if ( ! hasWebpackConfig() ) {
