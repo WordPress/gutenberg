@@ -24,7 +24,7 @@ export default function EditTemplatePartMenuButton() {
 		const selectedBlockClientId = getSelectedBlockClientId();
 		const block = getBlock( selectedBlockClientId );
 
-		if ( isTemplatePart( block ) ) {
+		if ( block && isTemplatePart( block ) ) {
 			const templateParts =
 				select( coreStore ).getEntityRecords(
 					'postType',
