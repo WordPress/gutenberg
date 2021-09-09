@@ -34,6 +34,7 @@ The class that will be added to the classes of the wrapper <Composite/> componen
 ### id
 
 Unique ID for the component.
+
 -  Type: `string`
 -  Required: No
 
