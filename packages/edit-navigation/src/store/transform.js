@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { omit, sortBy } from 'lodash';
+import { get, omit, sortBy } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -13,8 +13,30 @@ import { serialize, createBlock, parse } from '@wordpress/blocks';
  */
 import { NEW_TAB_TARGET_ATTRIBUTE } from '../constants';
 
+/**
+ * A WP nav_menu_item object.
+ * For more documentation on the individual fields present on a menu item please see:
+ * https://core.trac.wordpress.org/browser/tags/5.7.1/src/wp-includes/nav-menu.php#L789
+ *
+ * Changes made here should also be mirrored in packages/edit-navigation/src/store/utils.js.
+ *
+ * @typedef WPNavMenuItem
+ *
+ * @property {Object} title       stores the raw and rendered versions of the title/label for this menu item.
+ * @property {Array}  xfn         the XFN relationships expressed in the link of this menu item.
+ * @property {Array}  classes     the HTML class attributes for this menu item.
+ * @property {string} attr_title  the HTML title attribute for this menu item.
+ * @property {string} object      The type of object originally represented, such as 'category', 'post', or 'attachment'.
+ * @property {string} object_id   The DB ID of the original object this menu item represents, e.g. ID for posts and term_id for categories.
+ * @property {string} description The description of this menu item.
+ * @property {string} url         The URL to which this menu item points.
+ * @property {string} type        The family of objects originally represented, such as 'post_type' or 'taxonomy'.
+ * @property {string} target      The target attribute of the link element for this menu item.
+ */
+
 export function blockToMenuItem( block, menuItem, parentId, position, menuId ) {
 	menuItem = omit( menuItem, 'menus', 'meta', '_links' );
+	menuItem.content = get( menuItem.content, 'raw', menuItem.content );
 
 	let attributes;
 
@@ -31,12 +53,75 @@ export function blockToMenuItem( block, menuItem, parentId, position, menuId ) {
 		...menuItem,
 		...attributes,
 		menu_order: position,
-		menu_id: menuId,
-		parent: parentId,
+		menus: [ menuId ],
+		parent: ! parentId ? 0 : parentId,
 		status: 'publish',
-		_invalid: false,
 	};
 }
+
+/**
+ * Convert block attributes to menu item fields.
+ *
+ * Note that nav_menu_item has defaults provided in Core so in the case of undefined Block attributes
+ * we need only include a subset of values in the knowledge that the defaults will be provided in Core.
+ *
+ * See: https://core.trac.wordpress.org/browser/tags/5.7.1/src/wp-includes/nav-menu.php#L438.
+ *
+ * @param {Object}  blockAttributes               the block attributes of the block to be converted into menu item fields.
+ * @param {string}  blockAttributes.label         the visual name of the block shown in the UI.
+ * @param {string}  blockAttributes.url           the URL for the link.
+ * @param {string}  blockAttributes.description   a link description.
+ * @param {string}  blockAttributes.rel           the XFN relationship expressed in the link of this menu item.
+ * @param {string}  blockAttributes.className     the custom CSS classname attributes for this block.
+ * @param {string}  blockAttributes.title         the HTML title attribute for the block's link.
+ * @param {string}  blockAttributes.type          the type of variation of the block used (eg: 'Post', 'Custom', 'Category'...etc).
+ * @param {number}  blockAttributes.id            the ID of the entity optionally associated with the block's link (eg: the Post ID).
+ * @param {string}  blockAttributes.kind          the family of objects originally represented, such as 'post-type' or 'taxonomy'.
+ * @param {boolean} blockAttributes.opensInNewTab whether or not the block's link should open in a new tab.
+ * @return {WPNavMenuItem} the menu item (converted from block attributes).
+ */
+export const blockAttributesToMenuItem = ( {
+	label = '',
+	url = '',
+	description,
+	rel,
+	className,
+	title: blockTitleAttr,
+	type,
+	id,
+	kind,
+	opensInNewTab,
+} ) => {
+	// For historical reasons, the `core/navigation-link` variation type is `tag`
+	// whereas WP Core expects `post_tag` as the `object` type.
+	// To avoid writing a block migration we perform a conversion here.
+	// See also inverse equivalent in `menuItemToBlockAttributes`.
+	if ( type && type === 'tag' ) {
+		type = 'post_tag';
+	}
+
+	const menuItem = {
+		title: label,
+		url,
+		description,
+		xfn: rel?.trim().split( ' ' ),
+		classes: className?.trim().split( ' ' ),
+		attr_title: blockTitleAttr,
+		object: type,
+		type: kind === 'custom' ? '' : kind?.replace( '-', '_' ),
+		// Only assign object_id if it's a entity type (ie: not "custom").
+		...( id &&
+			'custom' !== type && {
+				object_id: id,
+			} ),
+		target: opensInNewTab ? NEW_TAB_TARGET_ATTRIBUTE : '',
+	};
+
+	// Filter out the empty values
+	return Object.fromEntries(
+		Object.entries( menuItem ).filter( ( [ , v ] ) => v )
+	);
+};
 
 /**
  * Convert a flat menu item structure to a nested blocks structure.
@@ -116,91 +201,8 @@ function mapMenuItemsToBlocks( menuItems ) {
 	};
 }
 
-/**
- * Convert block attributes to menu item fields.
- *
- * Note that nav_menu_item has defaults provided in Core so in the case of undefined Block attributes
- * we need only include a subset of values in the knowledge that the defaults will be provided in Core.
- *
- * See: https://core.trac.wordpress.org/browser/tags/5.7.1/src/wp-includes/nav-menu.php#L438.
- *
- * @param {Object}  blockAttributes               the block attributes of the block to be converted into menu item fields.
- * @param {string}  blockAttributes.label         the visual name of the block shown in the UI.
- * @param {string}  blockAttributes.url           the URL for the link.
- * @param {string}  blockAttributes.description   a link description.
- * @param {string}  blockAttributes.rel           the XFN relationship expressed in the link of this menu item.
- * @param {string}  blockAttributes.className     the custom CSS classname attributes for this block.
- * @param {string}  blockAttributes.title         the HTML title attribute for the block's link.
- * @param {string}  blockAttributes.type          the type of variation of the block used (eg: 'Post', 'Custom', 'Category'...etc).
- * @param {number}  blockAttributes.id            the ID of the entity optionally associated with the block's link (eg: the Post ID).
- * @param {string}  blockAttributes.kind          the family of objects originally represented, such as 'post-type' or 'taxonomy'.
- * @param {boolean} blockAttributes.opensInNewTab whether or not the block's link should open in a new tab.
- * @return {Object} the menu item (converted from block attributes).
- */
-export const blockAttributesToMenuItem = ( {
-	label = '',
-	url = '',
-	description,
-	rel,
-	className,
-	title: blockTitleAttr,
-	type,
-	id,
-	kind,
-	opensInNewTab,
-} ) => {
-	// For historical reasons, the `core/navigation-link` variation type is `tag`
-	// whereas WP Core expects `post_tag` as the `object` type.
-	// To avoid writing a block migration we perform a conversion here.
-	// See also inverse equivalent in `menuItemToBlockAttributes`.
-	if ( type && type === 'tag' ) {
-		type = 'post_tag';
-	}
-
-	const menuItem = {
-		title: label,
-		url,
-		description,
-		xfn: rel?.trim().split( ' ' ),
-		classes: className?.trim().split( ' ' ),
-		attr_title: blockTitleAttr,
-		object: type,
-		type: kind?.replace( '-', '_' ),
-		// Only assign object_id if it's a entity type (ie: not "custom").
-		...( id &&
-			'custom' !== type && {
-				object_id: id,
-			} ),
-		target: opensInNewTab ? NEW_TAB_TARGET_ATTRIBUTE : '',
-	};
-
-	// Filter out the empty values
-	return Object.fromEntries(
-		Object.entries( menuItem ).filter( ( [ , v ] ) => v )
-	);
-};
-
-/**
- * A WP nav_menu_item object.
- * For more documentation on the individual fields present on a menu item please see:
- * https://core.trac.wordpress.org/browser/tags/5.7.1/src/wp-includes/nav-menu.php#L789
- *
- * Changes made here should also be mirrored in packages/edit-navigation/src/store/utils.js.
- *
- * @typedef WPNavMenuItem
- *
- * @property {Object} title       stores the raw and rendered versions of the title/label for this menu item.
- * @property {Array}  xfn         the XFN relationships expressed in the link of this menu item.
- * @property {Array}  classes     the HTML class attributes for this menu item.
- * @property {string} attr_title  the HTML title attribute for this menu item.
- * @property {string} object      The type of object originally represented, such as 'category', 'post', or 'attachment'.
- * @property {string} object_id   The DB ID of the original object this menu item represents, e.g. ID for posts and term_id for categories.
- * @property {string} description The description of this menu item.
- * @property {string} url         The URL to which this menu item points.
- * @property {string} type        The family of objects originally represented, such as 'post_type' or 'taxonomy'.
- * @property {string} target      The target attribute of the link element for this menu item.
- */
-
+// A few parameters are using snake case, let's embrace that for convenience:
+/* eslint-disable camelcase */
 /**
  * Convert block attributes to menu item.
  *
@@ -211,10 +213,8 @@ export function menuItemToBlockAttributes( {
 	title: menuItemTitleField,
 	xfn,
 	classes,
-	// eslint-disable-next-line camelcase
-	attrTitle,
+	attr_title,
 	object,
-	// eslint-disable-next-line camelcase
 	object_id,
 	description,
 	url,
@@ -236,8 +236,7 @@ export function menuItemToBlockAttributes( {
 		url: url || '',
 		rel: xfn?.join( ' ' ).trim(),
 		className: classes?.join( ' ' ).trim(),
-		title: attrTitle?.raw || attrTitle || menuItemTitleField?.raw,
-		// eslint-disable-next-line camelcase
+		title: attr_title?.raw || attr_title || menuItemTitleField?.raw,
 		...( object_id &&
 			'custom' !== object && {
 				id: object_id,
@@ -253,6 +252,7 @@ export function menuItemToBlockAttributes( {
 		Object.entries( attributes ).filter( ( [ , v ] ) => v )
 	);
 }
+/* eslint-enable camelcase */
 
 /**
  * Creates a nested, hierarchical tree representation from unstructured data that
