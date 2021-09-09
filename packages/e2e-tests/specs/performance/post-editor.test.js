@@ -101,7 +101,7 @@ describe( 'Post Editor Performance', () => {
 		// Measuring typing performance
 		await insertBlock( 'Paragraph' );
 		let i = 20;
-		await page.context().tracing.start( {
+		await context.browser().startTracing( page, {
 			path: traceFile,
 			screenshots: false,
 			categories: [ 'devtools.timeline' ],
@@ -114,7 +114,7 @@ describe( 'Post Editor Performance', () => {
 			await page.waitForTimeout( 2000 );
 			await page.keyboard.type( 'x' );
 		}
-		await page.context().tracing.stop();
+		await context.browser().stopTracing();
 		traceResults = JSON.parse( readFile( traceFile ) );
 		const [
 			keyDownEvents,
@@ -147,7 +147,7 @@ describe( 'Post Editor Performance', () => {
 			dispatch( 'core/block-editor' ).resetBlocks( blocks );
 		} );
 		const paragraphs = await page.$$( '.wp-block' );
-		await page.context().tracing.start( {
+		await context.browser().startTracing( page, {
 			path: traceFile,
 			screenshots: false,
 			categories: [ 'devtools.timeline' ],
@@ -159,7 +159,7 @@ describe( 'Post Editor Performance', () => {
 			await page.waitForTimeout( 1000 );
 			await paragraphs[ j ].click();
 		}
-		await page.context().tracing.stop();
+		await context.browser().stopTracing();
 		traceResults = JSON.parse( readFile( traceFile ) );
 		const [ focusEvents ] = getSelectionEventDurations( traceResults );
 		results.focus = focusEvents;
@@ -169,13 +169,13 @@ describe( 'Post Editor Performance', () => {
 		// Measure time to open inserter
 		await page.waitForSelector( '.edit-post-layout' );
 		for ( let j = 0; j < 10; j++ ) {
-			await page.context().tracing.start( {
+			await context.browser().startTracing( page, {
 				path: traceFile,
 				screenshots: false,
 				categories: [ 'devtools.timeline' ],
 			} );
 			await openGlobalBlockInserter();
-			await page.context().tracing.stop();
+			await context.browser().stopTracing();
 			traceResults = JSON.parse( readFile( traceFile ) );
 			const [ mouseClickEvents ] = getClickEventDurations( traceResults );
 			for ( let k = 0; k < mouseClickEvents.length; k++ ) {
@@ -192,13 +192,13 @@ describe( 'Post Editor Performance', () => {
 			// Wait for the browser to be idle before starting the monitoring.
 			// eslint-disable-next-line no-restricted-syntax
 			await page.waitForTimeout( 500 );
-			await page.context().tracing.start( {
+			await context.browser().startTracing( page, {
 				path: traceFile,
 				screenshots: false,
 				categories: [ 'devtools.timeline' ],
 			} );
 			await page.keyboard.type( 'p' );
-			await page.context().tracing.stop();
+			await context.browser().stopTracing();
 			traceResults = JSON.parse( readFile( traceFile ) );
 			const [
 				keyDownEvents,
@@ -234,14 +234,14 @@ describe( 'Post Editor Performance', () => {
 			// Wait for the browser to be idle before starting the monitoring.
 			// eslint-disable-next-line no-restricted-syntax
 			await page.waitForTimeout( 200 );
-			await page.context().tracing.start( {
+			await context.browser().startTracing( page, {
 				path: traceFile,
 				screenshots: false,
 				categories: [ 'devtools.timeline' ],
 			} );
 			await page.hover( paragraphBlockItem );
 			await page.hover( headingBlockItem );
-			await page.context().tracing.stop();
+			await context.browser().stopTracing();
 
 			traceResults = JSON.parse( readFile( traceFile ) );
 			const [ mouseOverEvents, mouseOutEvents ] = getHoverEventDurations(

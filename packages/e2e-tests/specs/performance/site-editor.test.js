@@ -98,7 +98,7 @@ describe( 'Site Editor Performance', () => {
 		await insertBlock( 'Paragraph' );
 		i = 200;
 		const traceFile = __dirname + '/trace.json';
-		await page.tracing.start( {
+		await context.browser().startTracing( page, {
 			path: traceFile,
 			screenshots: false,
 			categories: [ 'devtools.timeline' ],
@@ -106,7 +106,7 @@ describe( 'Site Editor Performance', () => {
 		while ( i-- ) {
 			await page.keyboard.type( 'x' );
 		}
-		await page.tracing.stop();
+		await context.browser().stopTracing();
 		const traceResults = JSON.parse( readFile( traceFile ) );
 		const [
 			keyDownEvents,

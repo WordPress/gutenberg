@@ -62,17 +62,17 @@ export async function toggleGlobalBlockInserter() {
  * Moves focus to the selected block.
  */
 async function focusSelectedBlock() {
-	const blockId = await page.evaluate( () =>
-		wp.data.select( 'core/block-editor' ).getSelectedBlockClientId()
-	);
-	const blockElement = await page.waitForSelector(
-		`[data-block="${ blockId }"]`
-	);
-	// Ideally there should be a UI way to do this. (Focus the selected block)
-	await page.evaluate( ( id ) => {
-		wp.data.dispatch( 'core/block-editor' ).selectBlock( id, 0 );
-	}, blockId );
-	await blockElement.waitForElementState( 'stable' );
+	// Ideally there shouuld be a UI way to do this. (Focus the selected block)
+	await page.evaluate( () => {
+		wp.data
+			.dispatch( 'core/block-editor' )
+			.selectBlock(
+				wp.data
+					.select( 'core/block-editor' )
+					.getSelectedBlockClientId(),
+				0
+			);
+	} );
 }
 
 /**
