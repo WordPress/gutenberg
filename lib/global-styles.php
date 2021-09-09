@@ -26,7 +26,9 @@ function gutenberg_experimental_global_styles_get_stylesheet( $tree, $type = 'al
 
 	if ( $can_use_cached ) {
 		// Check if we have the styles already cached.
-		$cached = get_transient( 'gutenberg_global_styles' );
+		// It's cached by theme to make sure that theme switching
+		// is inmediately reflected.
+		$cached = get_transient( 'gutenberg_global_styles_' . get_stylesheet() );
 		if ( $cached ) {
 			return $cached;
 		}
