@@ -292,6 +292,11 @@ class EditorPage {
 		}
 	}
 
+	static getInserterPageHeight( screenHeight ) {
+		// Rough estimate of a swipe distance required to scroll one page of blocks
+		return screenHeight * 0.82;
+	}
+
 	// Attempts to find the given block button in the block inserter control.
 	async findBlockButton( blockName ) {
 		const blockAccessibilityLabel = `${ blockName } block`;
@@ -308,7 +313,7 @@ class EditorPage {
 				swipeFromTo(
 					this.driver,
 					{ x, y: size.height - 100 },
-					{ x, y: size.height - 450 }
+					{ x, y: EditorPage.getInserterPageHeight( size.height ) }
 				);
 			}
 
@@ -330,7 +335,7 @@ class EditorPage {
 				fromX: 50,
 				fromY: height,
 				toX: 50,
-				toY: height - 450,
+				toY: EditorPage.getInserterPageHeight( height ),
 				duration: 0.5,
 			} );
 		}
