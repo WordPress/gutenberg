@@ -21,7 +21,8 @@ import {
 	getColorObjectByAttributeValues,
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
-import { Popover } from '@wordpress/components';
+import { Popover, TabPanel } from '@wordpress/components';
+import { __ } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
@@ -113,7 +114,7 @@ function ColorPicker( { name, property, value, onChange } ) {
 				setColors( value, name, colors, { [ property ]: color } )
 			);
 		},
-		[ colors, onChange ]
+		[ colors, onChange, property ]
 	);
 	const activeColors = useMemo(
 		() => getActiveColors( value, name, colors ),
@@ -142,20 +143,27 @@ export default function InlineColorUI( {
 			className="components-inline-color-popover"
 			anchorRef={ anchorRef }
 		>
-			<p>Text color</p>
-			<ColorPicker
-				name={ name }
-				property="color"
-				value={ value }
-				onChange={ onChange }
-			/>
-			<p>Background color</p>
-			<ColorPicker
-				name={ name }
-				property="backgroundColor"
-				value={ value }
-				onChange={ onChange }
-			/>
+			<TabPanel
+				tabs={ [
+					{
+						name: 'color',
+						title: __( 'Text' ),
+					},
+					{
+						name: 'backgroundColor',
+						title: __( 'Background' ),
+					},
+				] }
+			>
+				{ ( tab ) => (
+					<ColorPicker
+						name={ name }
+						property={ tab.name }
+						value={ value }
+						onChange={ onChange }
+					/>
+				) }
+			</TabPanel>
 		</Popover>
 	);
 }
