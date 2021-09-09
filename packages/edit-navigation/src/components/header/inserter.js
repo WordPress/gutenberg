@@ -16,7 +16,7 @@ import { store as editNavigationStore } from '../../store';
 
 function Inserter() {
 	const inserterButton = useRef();
-	const { clientId: navBlockClientId } = useNavigationEditorRootBlock();
+	const { navBlockClientId } = useNavigationEditorRootBlock();
 
 	const { isInserterOpened, hasInserterItems } = useSelect( ( select ) => {
 		return {
