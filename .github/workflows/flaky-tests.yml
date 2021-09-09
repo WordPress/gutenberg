@@ -28,5 +28,5 @@ jobs:
               uses: ./.github/report-flaky-tests
               with:
                   repo-token: '${{ secrets.GITHUB_TOKEN }}'
-                  label: flaky-test
+                  label: '[Type] Flaky Test'
                   artifact-name: flaky-tests-report
