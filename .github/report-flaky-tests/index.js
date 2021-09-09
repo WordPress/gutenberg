@@ -220,6 +220,8 @@ ${ TEST_RESULTS_LIST.close }
 
 function renderTestErrorMessage( { testPath, testResults } ) {
 	const date = new Date().toISOString();
+	// It will look something like this without formatting:
+	// ▶ [2021-08-31T16:15:19.875Z] Test passed after 2 failed attempts on trunk
 	return `${ TEST_RESULT.open }<details>
 <summary>
 	<time datetime="${ date }"><code>[${ date }]</code></time>

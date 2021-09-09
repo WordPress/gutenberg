@@ -19,6 +19,8 @@ module.exports = {
 	],
 	reporters: [
 		...baseConfig.reporters,
+		// Report flaky tests results into artifacts for used in `report-flaky-tests` action.
+		// Currently it will only run on trunk but will roll out to all PRs when mature.
 		process.env.CI &&
 			process.env.GITHUB_EVENT_NAME !== 'pull_request' &&
 			'<rootDir>/config/flaky-tests-reporter.js',
