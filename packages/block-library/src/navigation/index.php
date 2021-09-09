@@ -218,7 +218,7 @@ function render_block_core_navigation( $attributes, $content, $block ) {
 
 	unset( $attributes['rgbTextColor'], $attributes['rgbBackgroundColor'] );
 
-	$should_load_view_script = ! empty( $attributes['isResponsive'] ) && ! wp_script_is( 'wp-block-navigation-view' );
+	$should_load_view_script = ! wp_script_is( 'wp-block-navigation-view' ) && ( ! empty( $attributes['isResponsive'] ) || $attributes['openSubmenusOnClick'] || $attributes['showSubmenuIcon'] );
 	if ( $should_load_view_script ) {
 		wp_enqueue_script( 'wp-block-navigation-view' );
 	}

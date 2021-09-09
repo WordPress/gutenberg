@@ -61,7 +61,6 @@
 		"html": false,
 		"inserter": false
 	},
-	"viewScript": "file:./view.min.js",
 	"editorStyle": "wp-block-navigation-submenu-editor",
 	"style": "wp-block-navigation-submenu"
 }
