@@ -14,7 +14,7 @@ describe( 'Block Mover Picker', () => {
 			context: {
 				isFirst: false,
 				isLast: true,
-				canMove: true,
+				cannotMove: false,
 				numberOfBlocks: 2,
 				firstIndex: 1,
 
@@ -34,7 +34,7 @@ describe( 'Block Mover Picker', () => {
 			context: {
 				isFirst: false,
 				isLast: true,
-				canMove: true,
+				cannotMove: false,
 				numberOfBlocks: 2,
 				firstIndex: 1,
 
