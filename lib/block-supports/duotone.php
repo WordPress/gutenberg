@@ -259,6 +259,8 @@ function gutenberg_register_duotone_support( $block_type ) {
  * @return string Duotone CSS filter property.
  */
 function gutenberg_get_duotone_filter_property( $duotone_id, $duotone_colors ) {
+	$filter_id = 'wp-duotone-filter-' . $duotone_id;
+
 	$duotone_values = array(
 		'r' => array(),
 		'g' => array(),
@@ -278,7 +280,7 @@ function gutenberg_get_duotone_filter_property( $duotone_id, $duotone_colors ) {
 
 	<svg xmlns="http://www.w3.org/2000/svg">
 		<defs>
-			<filter id="<?php echo esc_attr( $duotone_id ); ?>">
+			<filter id="<?php echo esc_attr( $filter_id ); ?>">
 				<feColorMatrix
 					type="matrix"
 					values="
@@ -306,7 +308,7 @@ function gutenberg_get_duotone_filter_property( $duotone_id, $duotone_colors ) {
 	$svg = preg_replace( '/> </', '><', $svg );
 	$svg = trim( $svg );
 
-	$data_uri = 'data:image/svg+xml,' . $svg . '#' . $duotone_id;
+	$data_uri = 'data:image/svg+xml,' . $svg . '#' . $filter_id;
 
 	// All the variables are already escaped above, so we're not calling esc_url() here.
 	return "url('" . $data_uri . "')";
@@ -336,14 +338,17 @@ function gutenberg_render_duotone_support( $block_content, $block ) {
 		return $block_content;
 	}
 
-	$duotone_id      = 'wp-duotone-filter-' . uniqid();
+	$duotone_id      = uniqid();
 	$duotone_colors  = $block['attrs']['style']['color']['duotone'];
 	$filter_property = gutenberg_get_duotone_filter_property( $duotone_id, $duotone_colors );
 
+	$filter_id = 'wp-duotone-filter-' . $duotone_id;
+
+	$scope     = '.' . $filter_id;
 	$selectors = explode( ',', $duotone_support );
 	$scoped    = array();
 	foreach ( $selectors as $sel ) {
-		$scoped[] = '.' . $duotone_id . ' ' . trim( $sel );
+		$scoped[] = $scope . ' ' . trim( $sel );
 	}
 	$selector = implode( ', ', $scoped );
 
@@ -351,14 +356,14 @@ function gutenberg_render_duotone_support( $block_content, $block ) {
 		? $selector . " {\n\tfilter: " . $filter_property . " !important;\n}\n"
 		: $selector . '{filter:' . $filter_property . ' !important;}';
 
-	wp_register_style( $duotone_id, false, array(), true, true );
-	wp_add_inline_style( $duotone_id, $filter_style );
-	wp_enqueue_style( $duotone_id );
+	wp_register_style( $filter_id, false, array(), true, true );
+	wp_add_inline_style( $filter_id, $filter_style );
+	wp_enqueue_style( $filter_id );
 
 	// Like the layout hook, this assumes the hook only applies to blocks with a single wrapper.
 	return preg_replace(
 		'/' . preg_quote( 'class="', '/' ) . '/',
-		'class="' . $duotone_id . ' ',
+		'class="' . $filter_id . ' ',
 		$block_content,
 		1
 	);
