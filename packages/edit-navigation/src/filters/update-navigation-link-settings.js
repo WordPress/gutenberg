@@ -17,8 +17,6 @@ function updateNavigationLinkSettings( settings, name ) {
 		},
 		// Make the nav link block usable globally.
 		parent: undefined,
-		// Remove any block variations.
-		variations: undefined,
 	};
 }
 

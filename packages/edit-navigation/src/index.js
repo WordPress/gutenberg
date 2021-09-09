@@ -1,10 +1,8 @@
 /**
  * WordPress dependencies
  */
-import {
-	registerCoreBlocks,
-	__experimentalRegisterExperimentalCoreBlocks,
-} from '@wordpress/block-library';
+import { __experimentalRegisterExperimentalCoreBlocks } from '@wordpress/block-library';
+import { unregisterBlockType } from '@wordpress/blocks';
 import { render } from '@wordpress/element';
 import { __experimentalFetchLinkSuggestions as fetchLinkSuggestions } from '@wordpress/core-data';
 
@@ -21,10 +19,11 @@ import './store';
 
 export function initialize( id, settings ) {
 	addFilters( ! settings.blockNavMenus );
-	registerCoreBlocks();
+	// registerCoreBlocks();
 
 	if ( process.env.GUTENBERG_PHASE === 2 ) {
 		__experimentalRegisterExperimentalCoreBlocks();
+		unregisterBlockType( 'core/navigation' );
 	}
 
 	settings.__experimentalFetchLinkSuggestions = ( search, searchOptions ) =>
