@@ -15,10 +15,10 @@ import { removeFormat } from '@wordpress/rich-text';
 /**
  * Internal dependencies
  */
-import { default as InlineColorUI, getActiveColor } from './inline';
+import { default as InlineColorUI, getActiveColors } from './inline';
 
-const name = 'core/text-color';
-const title = __( 'Text color' );
+const name = 'core/color';
+const title = __( 'Color' );
 
 const EMPTY_ARRAY = [];
 
@@ -38,15 +38,10 @@ function TextColorEdit( {
 	const disableIsAddingColor = useCallback( () => setIsAddingColor( false ), [
 		setIsAddingColor,
 	] );
-	const colorIndicatorStyle = useMemo( () => {
-		const activeColor = getActiveColor( name, value, colors );
-		if ( ! activeColor ) {
-			return undefined;
-		}
-		return {
-			backgroundColor: activeColor,
-		};
-	}, [ value, colors ] );
+	const colorIndicatorStyle = useMemo(
+		() => getActiveColors( value, name, colors ),
+		[ value, colors ]
+	);
 
 	const hasColorsToChoose = ! isEmpty( colors ) || ! allowCustomControl;
 	if ( ! hasColorsToChoose && ! isActive ) {
@@ -59,15 +54,10 @@ function TextColorEdit( {
 				className="format-library-text-color-button"
 				isActive={ isActive }
 				icon={
-					<>
-						<Icon icon={ textColorIcon } />
-						{ isActive && (
-							<span
-								className="format-library-text-color-button__indicator"
-								style={ colorIndicatorStyle }
-							/>
-						) }
-					</>
+					<Icon
+						icon={ textColorIcon }
+						style={ colorIndicatorStyle }
+					/>
 				}
 				title={ title }
 				// If has no colors to choose but a color is active remove the color onClick
