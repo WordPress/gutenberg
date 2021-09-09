@@ -4,7 +4,7 @@
  *
  * @see https://developer.mozilla.org/en-US/docs/Web/API/Document/caretRangeFromPoint
  *
- * @param {Document} doc The document of the range.
+ * @param {DocumentMaybeWithCaretPositionFromPoint} doc The document of the range.
  * @param {number}   x   Horizontal position within the current viewport.
  * @param {number}   y   Vertical position within the current viewport.
  *
@@ -34,3 +34,8 @@ export default function caretRangeFromPoint( doc, x, y ) {
 
 	return range;
 }
+
+/**
+ * @typedef {{caretPositionFromPoint?: (x: number, y: number)=> CaretPosition | null} & Document } DocumentMaybeWithCaretPositionFromPoint
+ * @typedef {{ readonly offset: number; readonly offsetNode: Node; getClientRect(): DOMRect | null; }} CaretPosition
+ */

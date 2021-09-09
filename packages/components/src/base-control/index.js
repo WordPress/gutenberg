@@ -16,7 +16,7 @@ import {
 
 /**
  * @typedef Props
- * @property {string}                    id                    The id of the element to which labels and help text are being generated.
+ * @property {string}                    [id]                  The id of the element to which labels and help text are being generated.
  *                                                             That element should be passed as a child.
  * @property {import('react').ReactNode} help                  If this property is added, a help text will be
  *                                                             generated using help property as the content.

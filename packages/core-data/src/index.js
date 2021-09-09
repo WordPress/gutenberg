@@ -11,8 +11,7 @@ import reducer from './reducer';
 import * as selectors from './selectors';
 import * as actions from './actions';
 import * as resolvers from './resolvers';
-import * as locksSelectors from './locks/selectors';
-import * as locksActions from './locks/actions';
+import createLocksActions from './locks/actions';
 import customControls from './controls';
 import { defaultEntities, getMethodName } from './entities';
 import { STORE_NAME } from './name';
@@ -57,13 +56,14 @@ const entityActions = defaultEntities.reduce( ( result, entity ) => {
 	return result;
 }, {} );
 
-const storeConfig = {
+const storeConfig = () => ( {
 	reducer,
 	controls: { ...customControls, ...controls },
-	actions: { ...actions, ...entityActions, ...locksActions },
-	selectors: { ...selectors, ...entitySelectors, ...locksSelectors },
+	actions: { ...actions, ...entityActions, ...createLocksActions() },
+	selectors: { ...selectors, ...entitySelectors },
 	resolvers: { ...resolvers, ...entityResolvers },
-};
+	__experimentalUseThunks: true,
+} );
 
 /**
  * Store definition for the code data namespace.
@@ -72,7 +72,7 @@ const storeConfig = {
  *
  * @type {Object}
  */
-export const store = createReduxStore( STORE_NAME, storeConfig );
+export const store = createReduxStore( STORE_NAME, storeConfig() );
 
 register( store );
 

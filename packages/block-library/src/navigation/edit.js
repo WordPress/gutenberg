@@ -46,6 +46,8 @@ const ALLOWED_BLOCKS = [
 	'core/page-list',
 	'core/spacer',
 	'core/home-link',
+	'core/site-title',
+	'core/site-logo',
 ];
 
 const LAYOUT = {
@@ -101,6 +103,7 @@ function Navigation( {
 	hasSubmenuIndicatorSetting = true,
 	hasItemJustificationControls = true,
 	hasColorSettings = true,
+	customPlaceholder: CustomPlaceholder = null,
 } ) {
 	const [ isPlaceholderShown, setIsPlaceholderShown ] = useState(
 		! hasExistingNavItems
@@ -148,7 +151,7 @@ function Navigation( {
 		},
 		{
 			allowedBlocks: ALLOWED_BLOCKS,
-			orientation: attributes.orientation || 'horizontal',
+			orientation: attributes.orientation,
 			renderAppender:
 				( isImmediateParentOfSelectedBlock &&
 					! selectedBlockHasDescendants ) ||
@@ -161,7 +164,7 @@ function Navigation( {
 			// inherit templateLock={ 'all' }.
 			templateLock: false,
 			__experimentalLayout: LAYOUT,
-			placeholder,
+			placeholder: ! CustomPlaceholder ? placeholder : undefined,
 		}
 	);
 
@@ -198,9 +201,13 @@ function Navigation( {
 	} );
 
 	if ( isPlaceholderShown ) {
+		const PlaceholderComponent = CustomPlaceholder
+			? CustomPlaceholder
+			: NavigationPlaceholder;
+
 		return (
 			<div { ...blockProps }>
-				<NavigationPlaceholder
+				<PlaceholderComponent
 					onCreate={ ( blocks, selectNavigationBlock ) => {
 						setIsPlaceholderShown( false );
 						updateInnerBlocks( blocks );

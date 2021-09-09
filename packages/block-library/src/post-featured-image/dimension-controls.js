@@ -1,41 +1,54 @@
 /**
+ * External dependencies
+ */
+import classNames from 'classnames';
+
+/**
  * WordPress dependencies
  */
 import { __, _x } from '@wordpress/i18n';
 import {
 	PanelBody,
 	__experimentalUnitControl as UnitControl,
-	BaseControl,
 	Flex,
 	FlexItem,
-	__experimentalSegmentedControl as SegmentedControl,
-	__experimentalSegmentedControlOption as SegmentedControlOption,
+	__experimentalToggleGroupControl as ToggleGroupControl,
+	__experimentalToggleGroupControlOption as ToggleGroupControlOption,
 	__experimentalUseCustomUnits as useCustomUnits,
 } from '@wordpress/components';
 import { useSetting } from '@wordpress/block-editor';
 
 const SCALE_OPTIONS = (
 	<>
-		<SegmentedControlOption
+		<ToggleGroupControlOption
 			value="cover"
 			label={ _x( 'Cover', 'Scale option for Image dimension control' ) }
 		/>
-		<SegmentedControlOption
+		<ToggleGroupControlOption
 			value="contain"
 			label={ _x(
 				'Contain',
 				'Scale option for Image dimension control'
 			) }
 		/>
-		<SegmentedControlOption
+		<ToggleGroupControlOption
 			value="fill"
-			label={ _x(
-				'Stretch',
-				'Scale option for Image dimension control'
-			) }
+			label={ _x( 'Fill', 'Scale option for Image dimension control' ) }
 		/>
 	</>
 );
+
+const scaleHelp = {
+	cover: __(
+		'Image is scaled and cropped to fill the entire space without being distorted.'
+	),
+	contain: __(
+		'Image is scaled to fill the space without clipping nor distorting.'
+	),
+	fill: __(
+		'Image will be stretched and distorted to completely fill the space.'
+	),
+};
 
 const DimensionControls = ( {
 	attributes: { width, height, scale },
@@ -60,7 +73,13 @@ const DimensionControls = ( {
 	const scaleLabel = _x( 'Scale', 'Image scaling options' );
 	return (
 		<PanelBody title={ __( 'Dimensions' ) }>
-			<Flex justify="space-between">
+			<Flex
+				justify="space-between"
+				className={ classNames(
+					'block-library-post-featured-image-dimension-controls',
+					{ 'scale-control-is-visible': !! height }
+				) }
+			>
 				<FlexItem>
 					<UnitControl
 						label={ __( 'Height' ) }
@@ -85,30 +104,19 @@ const DimensionControls = ( {
 				</FlexItem>
 			</Flex>
 			{ !! height && (
-				<>
-					<BaseControl
-						aria-label={ scaleLabel }
-						className="block-library-post-featured-image-scale-controls"
-					>
-						<div>
-							<BaseControl.VisualLabel>
-								{ scaleLabel }
-							</BaseControl.VisualLabel>
-						</div>
-						<SegmentedControl
-							label={ scaleLabel }
-							value={ scale }
-							onChange={ ( value ) => {
-								setAttributes( {
-									scale: value,
-								} );
-							} }
-							isBlock
-						>
-							{ SCALE_OPTIONS }
-						</SegmentedControl>
-					</BaseControl>
-				</>
+				<ToggleGroupControl
+					label={ scaleLabel }
+					value={ scale }
+					help={ scaleHelp[ scale ] }
+					onChange={ ( value ) => {
+						setAttributes( {
+							scale: value,
+						} );
+					} }
+					isBlock
+				>
+					{ SCALE_OPTIONS }
+				</ToggleGroupControl>
 			) }
 		</PanelBody>
 	);

@@ -8,7 +8,6 @@ import type { ComponentType } from 'react';
  * Internal dependencies
  */
 import createHigherOrderComponent from '../../utils/create-higher-order-component';
-// eslint-disable-next-line no-duplicate-imports
 import type { PropInjectingHigherOrderComponent } from '../../utils/create-higher-order-component';
 import useInstanceId from '../../hooks/use-instance-id';
 

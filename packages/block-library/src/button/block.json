@@ -68,7 +68,10 @@
 		"reusable": false,
 		"spacing": {
 			"__experimentalSkipSerialization": true,
-			"padding": true
+			"padding": [ "horizontal", "vertical" ],
+			"__experimentalDefaultControls": {
+				"padding": true
+			}
 		},
 		"__experimentalBorder": {
 			"radius": true,

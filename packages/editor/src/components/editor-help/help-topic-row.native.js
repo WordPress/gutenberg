@@ -9,11 +9,11 @@ import { useNavigation } from '@react-navigation/native';
 import { TextControl, Icon } from '@wordpress/components';
 import { chevronRight } from '@wordpress/icons';
 
-const HelpTopicRow = ( { label, icon } ) => {
+const HelpTopicRow = ( { label, icon, screenName } ) => {
 	const navigation = useNavigation();
 
 	const openSubSheet = () => {
-		navigation.navigate( label );
+		navigation.navigate( screenName );
 	};
 
 	return (

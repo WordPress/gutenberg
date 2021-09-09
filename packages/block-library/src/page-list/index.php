@@ -128,6 +128,7 @@ function block_core_page_list_build_css_font_sizes( $context ) {
 /**
  * Outputs Page list markup from an array of pages with nested children.
  *
+ * @param boolean $is_navigation_child If block is a child of Navigation block.
  * @param array   $nested_pages The array of nested pages.
  * @param array   $active_page_ancestor_ids An array of ancestor ids for active page.
  * @param array   $colors Color information for overlay styles.
@@ -135,7 +136,7 @@ function block_core_page_list_build_css_font_sizes( $context ) {
  *
  * @return string List markup.
  */
-function block_core_page_list_render_nested_page_list( $nested_pages, $active_page_ancestor_ids = array(), $colors = array(), $depth = 0 ) {
+function block_core_page_list_render_nested_page_list( $is_navigation_child, $nested_pages, $active_page_ancestor_ids = array(), $colors = array(), $depth = 0 ) {
 	if ( empty( $nested_pages ) ) {
 		return;
 	}
@@ -149,6 +150,12 @@ function block_core_page_list_render_nested_page_list( $nested_pages, $active_pa
 			$css_class .= ' has-child';
 		}
 
+		if ( $is_navigation_child ) {
+			$css_class .= ' wp-block-navigation-item';
+		}
+
+		$navigation_child_content_class = $is_navigation_child ? ' wp-block-navigation-item__content' : '';
+
 		// If this is the first level of submenus, include the overlay colors.
 		if ( 1 === $depth && isset( $colors['overlay_css_classes'], $colors['overlay_inline_styles'] ) ) {
 			$css_class .= ' ' . trim( implode( ' ', $colors['overlay_css_classes'] ) );
@@ -158,13 +165,20 @@ function block_core_page_list_render_nested_page_list( $nested_pages, $active_pa
 		}
 
 		$markup .= '<li class="wp-block-pages-list__item' . $css_class . '"' . $style_attribute . '>';
-		$markup .= '<a class="wp-block-pages-list__item__link" href="' . esc_url( $page['link'] ) . '">' . wp_kses(
+		$markup .= '<a class="wp-block-pages-list__item__link' . $navigation_child_content_class . ' "href="' . esc_url( $page['link'] ) . '">' . wp_kses(
 			$page['title'],
 			wp_kses_allowed_html( 'post' )
 		) . '</a>';
 		if ( isset( $page['children'] ) ) {
-			$markup .= '<span class="wp-block-page-list__submenu-icon"><svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 12 12" fill="none" role="img" aria-hidden="true" focusable="false"><path d="M1.50002 4L6.00002 8L10.5 4" stroke-width="1.5"></path></svg></span>';
-			$markup .= '<ul class="submenu-container">' . block_core_page_list_render_nested_page_list( $page['children'], $active_page_ancestor_ids, $colors, $depth + 1 ) . '</ul>';
+			if ( $is_navigation_child ) {
+				$markup .= '<span class="wp-block-page-list__submenu-icon wp-block-navigation__submenu-icon"><svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 12 12" fill="none" role="img" aria-hidden="true" focusable="false"><path d="M1.50002 4L6.00002 8L10.5 4" stroke-width="1.5"></path></svg></span>';
+			}
+			$markup .= '<ul class="submenu-container';
+			// Extra classname is added when the block is a child of Navigation.
+			if ( $is_navigation_child ) {
+				$markup .= ' wp-block-navigation__submenu-container';
+			}
+			$markup .= '">' . block_core_page_list_render_nested_page_list( $is_navigation_child, $page['children'], $active_page_ancestor_ids, $colors, $depth + 1 ) . '</ul>';
 		}
 		$markup .= '</li>';
 	}
@@ -258,9 +272,11 @@ function render_block_core_page_list( $attributes, $content, $block ) {
 
 	$nested_pages = block_core_page_list_nest_pages( $top_level_pages, $pages_with_children );
 
+	$is_navigation_child = array_key_exists( 'isNavigationChild', $attributes ) ? $attributes['isNavigationChild'] : ! empty( $block->context );
+
 	$wrapper_markup = '<ul %1$s>%2$s</ul>';
 
-	$items_markup = block_core_page_list_render_nested_page_list( $nested_pages, $active_page_ancestor_ids, $colors );
+	$items_markup = block_core_page_list_render_nested_page_list( $is_navigation_child, $nested_pages, $active_page_ancestor_ids, $colors );
 
 	if ( $block->context && $block->context['showSubmenuIcon'] ) {
 		$css_classes .= ' show-submenu-icons';

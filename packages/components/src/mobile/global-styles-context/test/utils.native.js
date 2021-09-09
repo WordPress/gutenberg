@@ -134,9 +134,7 @@ describe( 'getGlobalStyles', () => {
 					},
 					typography: {
 						fontSizes: RAW_FEATURES.typography.fontSizes,
-						custom: {
-							'line-height': RAW_FEATURES.custom[ 'line-height' ],
-						},
+						customLineHeight: RAW_FEATURES.custom[ 'line-height' ],
 					},
 				},
 				__experimentalGlobalStylesBaseStyles: PARSED_GLOBAL_STYLES,

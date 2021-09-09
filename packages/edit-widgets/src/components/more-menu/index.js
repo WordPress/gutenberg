@@ -1,15 +1,11 @@
 /**
  * WordPress dependencies
  */
-import {
-	DropdownMenu,
-	MenuGroup,
-	MenuItem,
-	VisuallyHidden,
-} from '@wordpress/components';
+import { MenuGroup, MenuItem, VisuallyHidden } from '@wordpress/components';
 import { useState } from '@wordpress/element';
 import { __, _x } from '@wordpress/i18n';
-import { external, moreVertical } from '@wordpress/icons';
+import { external } from '@wordpress/icons';
+import { MoreMenuDropdown, MoreMenuFeatureToggle } from '@wordpress/interface';
 import { displayShortcut } from '@wordpress/keycodes';
 import { useShortcut } from '@wordpress/keyboard-shortcuts';
 import { useViewportMatch } from '@wordpress/compose';
@@ -17,16 +13,7 @@ import { useViewportMatch } from '@wordpress/compose';
 /**
  * Internal dependencies
  */
-import FeatureToggle from './feature-toggle';
 import KeyboardShortcutHelpModal from '../keyboard-shortcut-help-modal';
-
-const POPOVER_PROPS = {
-	className: 'edit-widgets-more-menu__content',
-	position: 'bottom left',
-};
-const TOGGLE_PROPS = {
-	tooltipPosition: 'bottom',
-};
 
 export default function MoreMenu() {
 	const [
@@ -48,19 +35,13 @@ export default function MoreMenu() {
 
 	return (
 		<>
-			<DropdownMenu
-				className="edit-widgets-more-menu"
-				icon={ moreVertical }
-				/* translators: button label text should, if possible, be under 16 characters. */
-				label={ __( 'Options' ) }
-				popoverProps={ POPOVER_PROPS }
-				toggleProps={ TOGGLE_PROPS }
-			>
+			<MoreMenuDropdown>
 				{ () => (
 					<>
 						{ isLargeViewport && (
 							<MenuGroup label={ _x( 'View', 'noun' ) }>
-								<FeatureToggle
+								<MoreMenuFeatureToggle
+									scope="core/edit-widgets"
 									feature="fixedToolbar"
 									label={ __( 'Top toolbar' ) }
 									info={ __(
@@ -84,7 +65,8 @@ export default function MoreMenu() {
 							>
 								{ __( 'Keyboard shortcuts' ) }
 							</MenuItem>
-							<FeatureToggle
+							<MoreMenuFeatureToggle
+								scope="core/edit-widgets"
 								feature="welcomeGuide"
 								label={ __( 'Welcome Guide' ) }
 							/>
@@ -107,7 +89,8 @@ export default function MoreMenu() {
 							</MenuItem>
 						</MenuGroup>
 						<MenuGroup label={ __( 'Preferences' ) }>
-							<FeatureToggle
+							<MoreMenuFeatureToggle
+								scope="core/edit-widgets"
 								feature="keepCaretInsideBlock"
 								label={ __(
 									'Contain text cursor inside block'
@@ -122,7 +105,8 @@ export default function MoreMenu() {
 									'Contain text cursor inside block deactivated'
 								) }
 							/>
-							<FeatureToggle
+							<MoreMenuFeatureToggle
+								scope="core/edit-widgets"
 								feature="themeStyles"
 								info={ __(
 									'Make the editor look like your theme.'
@@ -130,7 +114,8 @@ export default function MoreMenu() {
 								label={ __( 'Use theme styles' ) }
 							/>
 							{ isLargeViewport && (
-								<FeatureToggle
+								<MoreMenuFeatureToggle
+									scope="core/edit-widgets"
 									feature="showBlockBreadcrumbs"
 									label={ __( 'Display block breadcrumbs' ) }
 									info={ __(
@@ -147,7 +132,7 @@ export default function MoreMenu() {
 						</MenuGroup>
 					</>
 				) }
-			</DropdownMenu>
+			</MoreMenuDropdown>
 			<KeyboardShortcutHelpModal
 				isModalActive={ isKeyboardShortcutsModalActive }
 				toggleModal={ toggleKeyboardShortcutsModal }

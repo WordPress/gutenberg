@@ -11,22 +11,23 @@ import {
 } from '@wordpress/block-editor';
 import { useSelect } from '@wordpress/data';
 import { useMemo } from '@wordpress/element';
+import { store as interfaceStore } from '@wordpress/interface';
 
 /**
  * Internal dependencies
  */
 import Notices from '../notices';
 import KeyboardShortcuts from '../keyboard-shortcuts';
-import { store as editWidgetsStore } from '../../store';
 
 export default function WidgetAreasBlockEditorContent( {
 	blockEditorSettings,
 } ) {
-	const { hasThemeStyles } = useSelect( ( select ) => ( {
-		hasThemeStyles: select( editWidgetsStore ).__unstableIsFeatureActive(
+	const hasThemeStyles = useSelect( ( select ) =>
+		select( interfaceStore ).isFeatureActive(
+			'core/edit-widgets',
 			'themeStyles'
-		),
-	} ) );
+		)
+	);
 
 	const styles = useMemo( () => {
 		return hasThemeStyles ? blockEditorSettings.styles : [];

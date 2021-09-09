@@ -38,7 +38,7 @@ jobs:
             - name: Npm install and build
               run: |
                   npm ci
-                  FORCE_REDUCED_MOTION=true npm run build
+                  npm run build
 
             - name: Install WordPress
               run: |

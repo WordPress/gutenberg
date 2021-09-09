@@ -12,12 +12,14 @@ import { Fragment, useEffect, useRef, useState } from '@wordpress/element';
 import {
 	BaseControl,
 	Button,
+	ExternalLink,
 	FocalPointPicker,
 	PanelBody,
 	PanelRow,
 	RangeControl,
 	ResizableBox,
 	Spinner,
+	TextareaControl,
 	ToggleControl,
 	withNotices,
 	__experimentalUseCustomUnits as useCustomUnits,
@@ -319,6 +321,7 @@ function CoverEdit( {
 		minHeightUnit,
 		style: styleAttribute,
 		url,
+		alt,
 	} = attributes;
 	const {
 		gradientClass,
@@ -487,6 +490,27 @@ function CoverEdit( {
 									setAttributes( {
 										focalPoint: newFocalPoint,
 									} )
+								}
+							/>
+						) }
+						{ url && isImageBackground && isImgElement && (
+							<TextareaControl
+								label={ __( 'Alt text (alternative text)' ) }
+								value={ alt }
+								onChange={ ( newAlt ) =>
+									setAttributes( { alt: newAlt } )
+								}
+								help={
+									<>
+										<ExternalLink href="https://www.w3.org/WAI/tutorials/images/decision-tree">
+											{ __(
+												'Describe the purpose of the image'
+											) }
+										</ExternalLink>
+										{ __(
+											'Leave empty if the image is purely decorative.'
+										) }
+									</>
 								}
 							/>
 						) }
@@ -660,7 +684,7 @@ function CoverEdit( {
 					<img
 						ref={ isDarkElement }
 						className="wp-block-cover__image-background"
-						alt=""
+						alt={ alt }
 						src={ url }
 						style={ mediaStyle }
 					/>

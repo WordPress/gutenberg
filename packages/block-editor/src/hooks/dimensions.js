@@ -14,6 +14,13 @@ import { getBlockSupport } from '@wordpress/blocks';
  */
 import InspectorControls from '../components/inspector-controls';
 import {
+	GapEdit,
+	hasGapSupport,
+	hasGapValue,
+	resetGap,
+	useIsGapDisabled,
+} from './gap';
+import {
 	MarginEdit,
 	hasMarginSupport,
 	hasMarginValue,
@@ -30,6 +37,8 @@ import {
 import { cleanEmptyObject } from './utils';
 
 export const SPACING_SUPPORT_KEY = 'spacing';
+export const ALL_SIDES = [ 'top', 'right', 'bottom', 'left' ];
+export const AXIAL_SIDES = [ 'vertical', 'horizontal' ];
 
 /**
  * Inspector controls for dimensions support.
@@ -39,6 +48,7 @@ export const SPACING_SUPPORT_KEY = 'spacing';
  * @return {WPElement} Inspector controls for spacing support features.
  */
 export function DimensionsPanel( props ) {
+	const isGapDisabled = useIsGapDisabled( props );
 	const isPaddingDisabled = useIsPaddingDisabled( props );
 	const isMarginDisabled = useIsMarginDisabled( props );
 	const isDisabled = useIsDimensionsDisabled( props );
@@ -62,6 +72,7 @@ export function DimensionsPanel( props ) {
 				...style,
 				spacing: {
 					...style?.spacing,
+					blockGap: undefined,
 					margin: undefined,
 					padding: undefined,
 				},
@@ -96,6 +107,17 @@ export function DimensionsPanel( props ) {
 						<MarginEdit { ...props } />
 					</ToolsPanelItem>
 				) }
+				{ ! isGapDisabled && (
+					<ToolsPanelItem
+						className="single-column"
+						hasValue={ () => hasGapValue( props ) }
+						label={ __( 'Block gap' ) }
+						onDeselect={ () => resetGap( props ) }
+						isShownByDefault={ defaultSpacingControls?.blockGap }
+					>
+						<GapEdit { ...props } />
+					</ToolsPanelItem>
+				) }
 			</ToolsPanel>
 		</InspectorControls>
 	);
@@ -113,7 +135,11 @@ export function hasDimensionsSupport( blockName ) {
 		return false;
 	}
 
-	return hasPaddingSupport( blockName ) || hasMarginSupport( blockName );
+	return (
+		hasGapSupport( blockName ) ||
+		hasPaddingSupport( blockName ) ||
+		hasMarginSupport( blockName )
+	);
 }
 
 /**
@@ -124,10 +150,11 @@ export function hasDimensionsSupport( blockName ) {
  * @return {boolean} If spacing support is completely disabled.
  */
 const useIsDimensionsDisabled = ( props = {} ) => {
+	const gapDisabled = useIsGapDisabled( props );
 	const paddingDisabled = useIsPaddingDisabled( props );
 	const marginDisabled = useIsMarginDisabled( props );
 
-	return paddingDisabled && marginDisabled;
+	return gapDisabled && paddingDisabled && marginDisabled;
 };
 
 /**
@@ -146,9 +173,37 @@ export function useCustomSides( blockName, feature ) {
 	const support = getBlockSupport( blockName, SPACING_SUPPORT_KEY );
 
 	// Skip when setting is boolean as theme isn't setting arbitrary sides.
-	if ( typeof support[ feature ] === 'boolean' ) {
+	if ( ! support || typeof support[ feature ] === 'boolean' ) {
 		return;
 	}
 
 	return support[ feature ];
+}
+
+/**
+ * Custom hook to determine whether the sides configured in the
+ * block support are valid. A dimension property cannot declare
+ * support for a mix of axial and individual sides.
+ *
+ * @param {string} blockName Block name.
+ * @param {string} feature   The feature custom sides relate to e.g. padding or margins.
+ *
+ * @return {boolean} If the feature has a valid configuration of sides.
+ */
+export function useIsDimensionsSupportValid( blockName, feature ) {
+	const sides = useCustomSides( blockName, feature );
+
+	if (
+		sides &&
+		sides.some( ( side ) => ALL_SIDES.includes( side ) ) &&
+		sides.some( ( side ) => AXIAL_SIDES.includes( side ) )
+	) {
+		// eslint-disable-next-line no-console
+		console.warn(
+			`The ${ feature } support for the "${ blockName }" block can not be configured to support both axial and arbitrary sides.`
+		);
+		return false;
+	}
+
+	return true;
 }

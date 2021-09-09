@@ -43,16 +43,10 @@ import { __ } from '@wordpress/i18n';
 import BlockInspectorButton from './block-inspector-button';
 import { store as editPostStore } from '../../store';
 
-function MaybeIframe( {
-	children,
-	contentRef,
-	isTemplateMode,
-	styles,
-	style,
-} ) {
+function MaybeIframe( { children, contentRef, shouldIframe, styles, style } ) {
 	const ref = useMouseMoveTypingReset();
 
-	if ( ! isTemplateMode ) {
+	if ( ! shouldIframe ) {
 		return (
 			<>
 				<EditorStyles styles={ styles } />
@@ -74,6 +68,7 @@ function MaybeIframe( {
 			ref={ ref }
 			contentRef={ contentRef }
 			style={ { width: '100%', height: '100%', display: 'block' } }
+			name="editor-canvas"
 		>
 			{ children }
 		</Iframe>
@@ -216,7 +211,11 @@ export default function VisualEditor( { styles } ) {
 					className={ previewMode }
 				>
 					<MaybeIframe
-						isTemplateMode={ isTemplateMode }
+						shouldIframe={
+							isTemplateMode ||
+							deviceType === 'Tablet' ||
+							deviceType === 'Mobile'
+						}
 						contentRef={ contentRef }
 						styles={ styles }
 						style={ { paddingBottom } }
@@ -233,7 +232,14 @@ export default function VisualEditor( { styles } ) {
 							</div>
 						) }
 						<RecursionProvider>
-							<BlockList __experimentalLayout={ layout } />
+							<BlockList
+								className={
+									isTemplateMode
+										? 'wp-site-blocks'
+										: undefined
+								}
+								__experimentalLayout={ layout }
+							/>
 						</RecursionProvider>
 					</MaybeIframe>
 				</motion.div>

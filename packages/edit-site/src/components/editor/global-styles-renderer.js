@@ -259,10 +259,11 @@ export const getNodesWithSettings = ( tree, blockSelectors ) => {
 
 	// Top-level.
 	const presets = pickPresets( tree.settings );
-	if ( ! isEmpty( presets ) ) {
+	const custom = tree.settings?.custom;
+	if ( ! isEmpty( presets ) || !! custom ) {
 		nodes.push( {
 			presets,
-			custom: tree.settings?.custom,
+			custom,
 			selector: ROOT_BLOCK_SELECTOR,
 		} );
 	}
@@ -270,10 +271,11 @@ export const getNodesWithSettings = ( tree, blockSelectors ) => {
 	// Blocks.
 	forEach( tree.settings?.blocks, ( node, blockName ) => {
 		const blockPresets = pickPresets( node );
-		if ( ! isEmpty( blockPresets ) ) {
+		const blockCustom = node.custom;
+		if ( ! isEmpty( blockPresets ) || !! blockCustom ) {
 			nodes.push( {
 				presets: blockPresets,
-				custom: node.custom,
+				custom: blockCustom,
 				selector: blockSelectors[ blockName ].selector,
 			} );
 		}
@@ -305,7 +307,8 @@ export const toStyles = ( tree, blockSelectors ) => {
 	const nodesWithStyles = getNodesWithStyles( tree, blockSelectors );
 	const nodesWithSettings = getNodesWithSettings( tree, blockSelectors );
 
-	let ruleset = '';
+	let ruleset =
+		'.wp-site-blocks > * + * { margin-top: var( --wp--style--block-gap ); margin-bottom: 0; }';
 	nodesWithStyles.forEach( ( { selector, styles } ) => {
 		const declarations = getStylesDeclarations( styles );
 

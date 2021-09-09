@@ -30,6 +30,9 @@
 		},
 		"customOverlayTextColor": {
 			"type": "string"
+		},
+		"isNavigationChild": {
+			"type": "boolean"
 		}
 	},
 	"usesContext": [

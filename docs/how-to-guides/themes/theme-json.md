@@ -222,13 +222,15 @@ The settings section has the following structure:
 			"customWidth": false
 		},
 		"color": {
+			"background": true,
 			"custom": true,
 			"customDuotone": true,
 			"customGradient": true,
 			"duotone": [],
 			"gradients": [],
 			"link": false,
-			"palette": []
+			"palette": [],
+			"text": true
 		},
 		"custom": {},
 		"layout": {
@@ -523,9 +525,11 @@ Note that the name of the variable is created by adding `--` in between each nes
 {
 	"version": 1,
 	"settings": {
-		"core/button": {
-			"border": {
-				"customRadius": false
+		"blocks": {
+			"core/button": {
+				"border": {
+					"customRadius": false
+				}
 			}
 		}
 	}
@@ -567,20 +571,22 @@ Note that the name of the variable is created by adding `--` in between each nes
 				}
 			]
 		},
-		"core/group": {
-			"color": {
-				"palette": [
-					{
-						"slug": "black",
-						"color": "#000000",
-						"name": "Black"
-					},
-					{
-						"slug": "white",
-						"color": "#FFF",
-						"name": "White"
-					}
-				]
+		"blocks": {
+			"core/group": {
+				"color": {
+					"palette": [
+						{
+							"slug": "black",
+							"color": "#000000",
+							"name": "Black"
+						},
+						{
+							"slug": "white",
+							"color": "#FFF",
+							"name": "White"
+						}
+					]
+				}
 			}
 		}
 	}
@@ -680,6 +686,7 @@ Each block declares which style properties it exposes via the [block supports me
 			"text": "value"
 		},
 		"spacing": {
+			"blockGap": "value",
 			"margin": {
 				"top": "value",
 				"right": "value",

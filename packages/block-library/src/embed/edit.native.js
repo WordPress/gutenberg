@@ -3,6 +3,7 @@
  */
 import {
 	createUpgradedEmbedBlock,
+	getClassNames,
 	getAttributesFromPreview,
 	getEmbedInfoByProvider,
 } from './util';
@@ -31,9 +32,13 @@ import {
 import { store as coreStore } from '@wordpress/core-data';
 import { View } from '@wordpress/primitives';
 
+// The inline preview feature will be released progressible, for this reason
+// the embed will only be considered previewable for the following providers list.
+const PREVIEWABLE_PROVIDERS = [ 'youtube', 'twitter' ];
+
 const EmbedEdit = ( props ) => {
 	const {
-		attributes: { providerNameSlug, previewable, responsive, url },
+		attributes: { align, providerNameSlug, previewable, responsive, url },
 		attributes,
 		isSelected,
 		onReplace,
@@ -62,12 +67,18 @@ const EmbedEdit = ( props ) => {
 		isSelected && wasBlockJustInserted && ! url
 	);
 
-	const { preview, fetching, cannotEmbed } = useSelect(
+	const {
+		preview,
+		fetching,
+		themeSupportsResponsive,
+		cannotEmbed,
+	} = useSelect(
 		( select ) => {
 			const {
 				getEmbedPreview,
 				isPreviewEmbedFallback,
 				isRequestingEmbedPreview,
+				getThemeSupports,
 			} = select( coreStore );
 			if ( ! url ) {
 				return { fetching: false, cannotEmbed: false };
@@ -97,6 +108,9 @@ const EmbedEdit = ( props ) => {
 			return {
 				preview: validPreview ? embedPreview : undefined,
 				fetching: isFetching,
+				themeSupportsResponsive: getThemeSupports()[
+					'responsive-embeds'
+				],
 				cannotEmbed: ! validPreview || previewIsFallback,
 			};
 		},
@@ -118,6 +132,21 @@ const EmbedEdit = ( props ) => {
 				allowResponsive
 			),
 		};
+	};
+
+	const toggleResponsive = () => {
+		const { allowResponsive, className } = attributes;
+		const { html } = preview;
+		const newAllowResponsive = ! allowResponsive;
+
+		setAttributes( {
+			allowResponsive: newAllowResponsive,
+			className: getClassNames(
+				html,
+				className,
+				responsive && newAllowResponsive
+			),
+		} );
 	};
 
 	useEffect( () => {
@@ -167,8 +196,25 @@ const EmbedEdit = ( props ) => {
 	}
 
 	const showEmbedPlaceholder = ! preview || cannotEmbed;
-	const { type, className: classFromPreview } = getMergedAttributes();
+
+	// Even though we set attributes that get derived from the preview,
+	// we don't access them directly because for the initial render,
+	// the `setAttributes` call will not have taken effect. If we're
+	// rendering responsive content, setting the responsive classes
+	// after the preview has been rendered can result in unwanted
+	// clipping or scrollbars. The `getAttributesFromPreview` function
+	// that `getMergedAttributes` uses is memoized so that we're not
+	const {
+		type,
+		allowResponsive,
+		className: classFromPreview,
+	} = getMergedAttributes();
 	const className = classnames( classFromPreview, props.className );
+
+	const isProviderPreviewable =
+		PREVIEWABLE_PROVIDERS.includes( providerNameSlug ) ||
+		// For WordPress embeds, we enable the inline preview for all its providers.
+		'wp-embed' === type;
 
 	return (
 		<>
@@ -189,10 +235,15 @@ const EmbedEdit = ( props ) => {
 				<>
 					<EmbedControls
 						showEditButton={ preview && ! cannotEmbed }
+						themeSupportsResponsive={ themeSupportsResponsive }
+						blockSupportsResponsive={ responsive }
+						allowResponsive={ allowResponsive }
+						toggleResponsive={ toggleResponsive }
 						switchBackToURLInput={ () => setIsEditingURL( true ) }
 					/>
 					<View { ...blockProps }>
 						<EmbedPreview
+							align={ align }
 							className={ className }
 							clientId={ clientId }
 							icon={ icon }
@@ -201,7 +252,7 @@ const EmbedEdit = ( props ) => {
 							label={ title }
 							onFocus={ onFocus }
 							preview={ preview }
-							previewable={ previewable }
+							previewable={ previewable && isProviderPreviewable }
 							type={ type }
 							url={ url }
 						/>

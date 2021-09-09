@@ -1,7 +1,7 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`PreferencesModal should match snapshot when the modal is active large viewports 1`] = `
-<WithInstanceId(Modal)
+<Modal
   className="edit-post-preferences-modal"
   closeLabel="Close"
   onRequestClose={[Function]}
@@ -30,11 +30,11 @@ exports[`PreferencesModal should match snapshot when the modal is active large v
   >
     <Component />
   </TabPanel>
-</WithInstanceId(Modal)>
+</Modal>
 `;
 
 exports[`PreferencesModal should match snapshot when the modal is active small viewports 1`] = `
-<WithInstanceId(Modal)
+<Modal
   className="edit-post-preferences-modal"
   closeLabel="Close"
   onRequestClose={[Function]}
@@ -179,14 +179,12 @@ exports[`PreferencesModal should match snapshot when the modal is active small v
             />
           </PageAttributesCheck>
         </Section>
-        <Section
+        <WithSelect(MetaBoxesSection)
           description="Add extra areas to the editor."
           title="Additional"
-        >
-          <WithSelect(MetaBoxesSection) />
-        </Section>
+        />
       </NavigationItem>
     </NavigationMenu>
   </Navigation>
-</WithInstanceId(Modal)>
+</Modal>
 `;

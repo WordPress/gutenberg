@@ -9,7 +9,7 @@ import type { CSSProperties, ReactNode } from 'react';
 /**
  * Internal dependencies
  */
-import type { PolymorphicComponentProps } from '../../ui/context';
+import type { WordPressComponentProps } from '../../ui/context';
 import { Flex, FlexItem } from '../../flex';
 import { Text } from '../../text';
 import { COLORS, rtl } from '../../utils';
@@ -251,7 +251,7 @@ const BaseLabel = styled( Text )< { labelPosition?: LabelPosition } >`
 `;
 
 export const Label = (
-	props: PolymorphicComponentProps<
+	props: WordPressComponentProps<
 		{ labelPosition?: LabelPosition; children: ReactNode },
 		'label',
 		false

@@ -52,7 +52,7 @@ export default function SiteTitleEdit( {
 				tagName="a"
 				aria-label={ __( 'Site title text' ) }
 				placeholder={ __( 'Write site title…' ) }
-				value={ title || readOnlyTitle }
+				value={ title }
 				onChange={ setTitle }
 				allowedFormats={ [] }
 				disableLineBreaks

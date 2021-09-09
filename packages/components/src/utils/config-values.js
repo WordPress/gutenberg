@@ -26,18 +26,19 @@ const CONTROL_PROPS = {
 	controlHeightLarge: `calc( ${ CONTROL_HEIGHT } * 1.2 )`,
 	controlHeightXLarge: `calc( ${ CONTROL_HEIGHT } * 1.4 )`,
 };
-const SEGMENTED_CONTROL_PROPS = {
-	segmentedControlBackgroundColor: CONTROL_PROPS.controlBackgroundColor,
-	segmentedControlBorderColor: COLORS.ui.border,
-	segmentedControlBackdropBackgroundColor: CONTROL_PROPS.controlSurfaceColor,
-	segmentedControlBackdropBorderColor: COLORS.ui.border,
-	segmentedControlBackdropBoxShadow: 'transparent',
-	segmentedControlButtonColorActive: CONTROL_PROPS.controlBackgroundColor,
+const TOGGLE_GROUP_CONTROL_PROPS = {
+	toggleGroupControlBackgroundColor: CONTROL_PROPS.controlBackgroundColor,
+	toggleGroupControlBorderColor: COLORS.ui.border,
+	toggleGroupControlBackdropBackgroundColor:
+		CONTROL_PROPS.controlSurfaceColor,
+	toggleGroupControlBackdropBorderColor: COLORS.ui.border,
+	toggleGroupControlBackdropBoxShadow: 'transparent',
+	toggleGroupControlButtonColorActive: CONTROL_PROPS.controlBackgroundColor,
 };
 
 export default {
 	...CONTROL_PROPS,
-	...SEGMENTED_CONTROL_PROPS,
+	...TOGGLE_GROUP_CONTROL_PROPS,
 	colorDivider: 'rgba(0, 0, 0, 0.1)',
 	colorScrollbarThumb: 'rgba(0, 0, 0, 0.2)',
 	colorScrollbarThumbHover: 'rgba(0, 0, 0, 0.5)',

@@ -24,6 +24,11 @@
 	"usesContext": [ "postId", "postType", "queryId" ],
 	"supports": {
 		"align": [ "left", "right", "center", "wide", "full" ],
+		"color": {
+			"__experimentalDuotone": "img",
+			"text": false,
+			"background": false
+		},
 		"html": false
 	},
 	"editorStyle": "wp-block-post-featured-image-editor",

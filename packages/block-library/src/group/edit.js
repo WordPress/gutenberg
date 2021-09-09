@@ -5,7 +5,7 @@ import { useSelect } from '@wordpress/data';
 import {
 	InnerBlocks,
 	useBlockProps,
-	InspectorAdvancedControls,
+	InspectorControls,
 	__experimentalUseInnerBlocksProps as useInnerBlocksProps,
 	useSetting,
 	store as blockEditorStore,
@@ -28,10 +28,12 @@ function GroupEdit( { attributes, setAttributes, clientId } ) {
 	const defaultLayout = useSetting( 'layout' ) || {};
 	const { tagName: TagName = 'div', templateLock, layout = {} } = attributes;
 	const usedLayout = !! layout && layout.inherit ? defaultLayout : layout;
+	const { type = 'default' } = usedLayout;
+	const layoutSupportEnabled = themeSupportsLayout || type !== 'default';
 
 	const blockProps = useBlockProps();
 	const innerBlocksProps = useInnerBlocksProps(
-		themeSupportsLayout
+		layoutSupportEnabled
 			? blockProps
 			: { className: 'wp-block-group__inner-container' },
 		{
@@ -39,13 +41,13 @@ function GroupEdit( { attributes, setAttributes, clientId } ) {
 			renderAppender: hasInnerBlocks
 				? undefined
 				: InnerBlocks.ButtonBlockAppender,
-			__experimentalLayout: themeSupportsLayout ? usedLayout : undefined,
+			__experimentalLayout: layoutSupportEnabled ? usedLayout : undefined,
 		}
 	);
 
 	return (
 		<>
-			<InspectorAdvancedControls>
+			<InspectorControls __experimentalGroup="advanced">
 				<SelectControl
 					label={ __( 'HTML element' ) }
 					options={ [
@@ -62,11 +64,11 @@ function GroupEdit( { attributes, setAttributes, clientId } ) {
 						setAttributes( { tagName: value } )
 					}
 				/>
-			</InspectorAdvancedControls>
-			{ themeSupportsLayout && <TagName { ...innerBlocksProps } /> }
+			</InspectorControls>
+			{ layoutSupportEnabled && <TagName { ...innerBlocksProps } /> }
 			{ /* Ideally this is not needed but it's there for backward compatibility reason
 				to keep this div for themes that might rely on its presence */ }
-			{ ! themeSupportsLayout && (
+			{ ! layoutSupportEnabled && (
 				<TagName { ...blockProps }>
 					<div { ...innerBlocksProps } />
 				</TagName>

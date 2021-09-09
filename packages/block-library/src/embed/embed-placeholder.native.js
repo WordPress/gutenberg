@@ -9,6 +9,7 @@ import { View, Text, TouchableWithoutFeedback } from 'react-native';
 import { __ } from '@wordpress/i18n';
 import { usePreferredColorSchemeStyle } from '@wordpress/compose';
 import { Icon } from '@wordpress/components';
+import { BlockIcon } from '@wordpress/block-editor';
 
 /**
  * Internal dependencies
@@ -36,10 +37,6 @@ const EmbedPlaceholder = ( {
 	const actionStyle = usePreferredColorSchemeStyle(
 		styles.embed__action,
 		styles[ 'embed__action--dark' ]
-	);
-	const embedIconStyle = usePreferredColorSchemeStyle(
-		styles.embed__icon,
-		styles[ 'embed__icon--dark' ]
 	);
 	const embedIconErrorStyle = styles[ 'embed__icon--error' ];
 
@@ -73,7 +70,7 @@ const EmbedPlaceholder = ( {
 						</>
 					) : (
 						<>
-							<Icon icon={ icon } fill={ embedIconStyle.fill } />
+							<BlockIcon icon={ icon } />
 							<Text style={ labelStyle }>{ label }</Text>
 							<Text style={ actionStyle }>
 								{ __( 'ADD LINK' ) }

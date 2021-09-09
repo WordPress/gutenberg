@@ -16,6 +16,7 @@ import {
 	CopyHandler,
 } from '@wordpress/block-editor';
 import { ReusableBlocksMenuItems } from '@wordpress/reusable-blocks';
+import { store as interfaceStore } from '@wordpress/interface';
 
 /**
  * Internal dependencies
@@ -48,12 +49,14 @@ export default function WidgetAreasBlockEditorProvider( {
 			reusableBlocks: ALLOW_REUSABLE_BLOCKS
 				? select( coreStore ).getEntityRecords( 'postType', 'wp_block' )
 				: [],
-			isFixedToolbarActive: select(
-				editWidgetsStore
-			).__unstableIsFeatureActive( 'fixedToolbar' ),
-			keepCaretInsideBlock: select(
-				editWidgetsStore
-			).__unstableIsFeatureActive( 'keepCaretInsideBlock' ),
+			isFixedToolbarActive: select( interfaceStore ).isFeatureActive(
+				'core/edit-widgets',
+				'fixedToolbar'
+			),
+			keepCaretInsideBlock: select( interfaceStore ).isFeatureActive(
+				'core/edit-widgets',
+				'keepCaretInsideBlock'
+			),
 		} ),
 		[]
 	);

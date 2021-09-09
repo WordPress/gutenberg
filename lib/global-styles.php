@@ -10,7 +10,7 @@
  * the corresponding stylesheet.
  *
  * @param WP_Theme_JSON_Gutenberg $tree Input tree.
- * @param string                  $type Type of stylesheet we want accepts 'all', 'block_styles', and 'css_variables'.
+ * @param string                  $type Type of stylesheet we want accepts 'all', 'block_styles', 'css_variables', and 'presets'.
  *
  * @return string Stylesheet.
  */
@@ -48,16 +48,14 @@ function gutenberg_experimental_global_styles_get_stylesheet( $tree, $type = 'al
  * and enqueues the resulting stylesheet.
  */
 function gutenberg_experimental_global_styles_enqueue_assets() {
-	if (
-		! get_theme_support( 'experimental-link-color' ) && // link color support needs the presets CSS variables regardless of the presence of theme.json file.
-		! WP_Theme_JSON_Resolver_Gutenberg::theme_has_support() ) {
-		return;
-	}
-
 	$settings = gutenberg_get_default_block_editor_settings();
 	$all      = WP_Theme_JSON_Resolver_Gutenberg::get_merged_data( $settings );
 
-	$stylesheet = gutenberg_experimental_global_styles_get_stylesheet( $all );
+	$type = 'all';
+	if ( ! WP_Theme_JSON_Resolver_Gutenberg::theme_has_support() ) {
+		$type = 'presets';
+	}
+	$stylesheet = gutenberg_experimental_global_styles_get_stylesheet( $all, $type );
 	if ( empty( $stylesheet ) ) {
 		return;
 	}
@@ -141,15 +139,17 @@ function gutenberg_experimental_global_styles_settings( $settings ) {
 		}
 
 		// Reset existing global styles.
-		foreach ( $settings['styles'] as $key => $style ) {
-			if ( isset( $style['__unstableType'] ) && 'globalStyles' === $style['__unstableType'] ) {
-				unset( $settings['styles'][ $key ] );
+		$styles_without_existing_global_styles = array();
+		foreach ( $settings['styles'] as $style ) {
+			if ( ! isset( $style['__unstableType'] ) || 'globalStyles' !== $style['__unstableType'] ) {
+				$styles_without_existing_global_styles[] = $style;
 			}
 		}
 
 		// Add the new ones.
-		$settings['styles'][] = $css_variables;
-		$settings['styles'][] = $block_styles;
+		$styles_without_existing_global_styles[] = $css_variables;
+		$styles_without_existing_global_styles[] = $block_styles;
+		$settings['styles']                      = $styles_without_existing_global_styles;
 	}
 
 	// Copied from get_block_editor_settings() at wordpress-develop/block-editor.php.
@@ -232,7 +232,7 @@ function gutenberg_experimental_global_styles_register_user_cpt() {
  * @return string Filtered post content with unsafe rules removed.
  */
 function gutenberg_global_styles_filter_post( $content ) {
-	$decoded_data        = json_decode( stripslashes( $content ), true );
+	$decoded_data        = json_decode( wp_unslash( $content ), true );
 	$json_decoding_error = json_last_error();
 	if (
 		JSON_ERROR_NONE === $json_decoding_error &&
@@ -245,7 +245,7 @@ function gutenberg_global_styles_filter_post( $content ) {
 		$data_to_encode = WP_Theme_JSON_Gutenberg::remove_insecure_properties( $decoded_data );
 
 		$data_to_encode['isGlobalStylesUserThemeJSON'] = true;
-		return wp_json_encode( $data_to_encode );
+		return wp_slash( wp_json_encode( $data_to_encode ) );
 	}
 	return $content;
 }

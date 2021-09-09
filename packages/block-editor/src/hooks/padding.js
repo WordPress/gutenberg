@@ -13,7 +13,12 @@ import {
  * Internal dependencies
  */
 import useSetting from '../components/use-setting';
-import { SPACING_SUPPORT_KEY, useCustomSides } from './dimensions';
+import {
+	AXIAL_SIDES,
+	SPACING_SUPPORT_KEY,
+	useCustomSides,
+	useIsDimensionsSupportValid,
+} from './dimensions';
 import { cleanEmptyObject } from './utils';
 
 /**
@@ -69,7 +74,9 @@ export function resetPadding( { attributes = {}, setAttributes } ) {
  */
 export function useIsPaddingDisabled( { name: blockName } = {} ) {
 	const isDisabled = ! useSetting( 'spacing.customPadding' );
-	return ! hasPaddingSupport( blockName ) || isDisabled;
+	const isInvalid = ! useIsDimensionsSupportValid( blockName, 'padding' );
+
+	return ! hasPaddingSupport( blockName ) || isDisabled || isInvalid;
 }
 
 /**
@@ -96,6 +103,8 @@ export function PaddingEdit( props ) {
 		],
 	} );
 	const sides = useCustomSides( blockName, 'padding' );
+	const splitOnAxis =
+		sides && sides.some( ( side ) => AXIAL_SIDES.includes( side ) );
 
 	if ( useIsPaddingDisabled( props ) ) {
 		return null;
@@ -139,6 +148,7 @@ export function PaddingEdit( props ) {
 					sides={ sides }
 					units={ units }
 					allowReset={ false }
+					splitOnAxis={ splitOnAxis }
 				/>
 			</>
 		),

@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { size, map, without, omit } from 'lodash';
+import { size, map, without } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -109,7 +109,7 @@ function Editor( {
 
 	const editorSettings = useMemo( () => {
 		const result = {
-			...omit( settings, [ 'styles' ] ),
+			...settings,
 			__experimentalPreferredStyleVariations: {
 				value: preferredStyleVariations,
 				onChange: updatePreferredStyleVariations,
@@ -156,7 +156,9 @@ function Editor( {
 	] );
 
 	const styles = useMemo( () => {
-		return hasThemeStyles ? settings.styles : [];
+		return hasThemeStyles && settings.styles?.length
+			? settings.styles
+			: settings.defaultEditorStyles;
 	}, [ settings, hasThemeStyles ] );
 
 	if ( ! post ) {

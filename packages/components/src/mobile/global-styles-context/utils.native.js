@@ -206,9 +206,7 @@ export function getGlobalStyles( rawStyles, rawFeatures ) {
 			},
 			typography: {
 				fontSizes: features?.typography?.fontSizes,
-				custom: {
-					'line-height': features?.custom?.[ 'line-height' ],
-				},
+				customLineHeight: features?.custom?.[ 'line-height' ],
 			},
 		},
 		__experimentalGlobalStylesBaseStyles: globalStyles,
