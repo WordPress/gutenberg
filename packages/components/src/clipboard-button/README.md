@@ -24,3 +24,35 @@ const MyClipboardButton = () => {
 	);
 };
 ```
+
+## Props
+
+The component accepts the following props:
+
+### className
+
+The class that will be added to the classes of the underlying `<Button>` component.
+
+- Type: `string`
+- Required: no
+
+### text
+
+The text that will be copied to the clipboard.
+
+- Type: `string`
+- Required: no
+
+### onCopy
+
+The function that will be called when the text is copied.
+
+-- Type: `() => void`
+-- Required: no
+
+### onFinishCopy
+
+The function that will be called when the text is copied and the copy animation is finished.
+
+-- Type: `() => void`
+-- Required: no
