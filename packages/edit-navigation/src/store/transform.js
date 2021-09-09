@@ -34,7 +34,13 @@ import { NEW_TAB_TARGET_ATTRIBUTE } from '../constants';
  * @property {string} target      The target attribute of the link element for this menu item.
  */
 
-export function blockToMenuItem( block, menuItem, parentId, position, menuId ) {
+export function blockToMenuItem(
+	block,
+	menuItem,
+	parentId,
+	blockPosition,
+	menuId
+) {
 	menuItem = omit( menuItem, 'menus', 'meta', '_links' );
 	menuItem.content = get( menuItem.content, 'raw', menuItem.content );
 
@@ -52,7 +58,7 @@ export function blockToMenuItem( block, menuItem, parentId, position, menuId ) {
 	return {
 		...menuItem,
 		...attributes,
-		menu_order: position,
+		menu_order: blockPosition + 1,
 		menus: [ menuId ],
 		parent: ! parentId ? 0 : parentId,
 		status: 'publish',

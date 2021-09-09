@@ -194,12 +194,12 @@ const computeNewMenuItems = ( post, oldMenuItems ) => async ( {
 	);
 
 	const blocksList = blocksTreeToFlatList( post.blocks[ 0 ].innerBlocks );
-	return blocksList.map( ( { block, parentBlockId, position } ) =>
+	return blocksList.map( ( { block, parentBlockId }, idx ) =>
 		blockToMenuItem(
 			block,
 			blockIdToOldEntityRecord[ block.clientId ],
 			blockIdToOldEntityRecord[ parentBlockId ]?.id,
-			position,
+			idx,
 			post.meta.menuId
 		)
 	);
@@ -337,7 +337,7 @@ function diff( listA, listB ) {
 
 function blocksTreeToFlatList( innerBlocks, parentBlockId = null ) {
 	return innerBlocks.flatMap( ( block, index ) =>
-		[ { block, parentBlockId, position: index + 1 } ].concat(
+		[ { block, parentBlockId, childIndex: index } ].concat(
 			blocksTreeToFlatList( block.innerBlocks, block.clientId )
 		)
 	);

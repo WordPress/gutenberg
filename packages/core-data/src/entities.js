@@ -117,6 +117,7 @@ export const defaultEntities = [
 		plural: 'menuItems',
 		label: __( 'Menu Item' ),
 		rawAttributes: [ 'title', 'content' ],
+		__unstablePrePersist: prePersistMenuItem,
 	},
 	{
 		name: 'menuLocation',
@@ -133,6 +134,27 @@ export const kinds = [
 	{ name: 'postType', loadEntities: loadPostTypeEntities },
 	{ name: 'taxonomy', loadEntities: loadTaxonomyEntities },
 ];
+
+/**
+ * Returns a function to be used to retrieve extra edits to apply before persisting a menu item.
+ *
+ * @param {Object} persistedRecord Already persisted Menu item
+ * @param {Object} edits           Edits.
+ * @return {Object} Updated edits.
+ */
+function prePersistMenuItem( persistedRecord, edits ) {
+	const newEdits = {
+		...persistedRecord,
+		...edits,
+	};
+	if ( Array.isArray( newEdits.menus ) ) {
+		newEdits.menus = newEdits.menus[ 0 ];
+	}
+	if ( newEdits.type === '' ) {
+		newEdits.type = 'custom';
+	}
+	return newEdits;
+}
 
 /**
  * Returns a function to be used to retrieve extra edits to apply before persisting a post type.
