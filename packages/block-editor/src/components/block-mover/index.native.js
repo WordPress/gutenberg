@@ -26,7 +26,7 @@ export const BLOCK_MOVER_DIRECTION_BOTTOM =
 export const BlockMover = ( {
 	isFirst,
 	isLast,
-	cannotMove,
+	canMove,
 	onMoveDown,
 	onMoveUp,
 	onLongMove,
@@ -86,7 +86,7 @@ export const BlockMover = ( {
 		if ( option && option.onSelect ) option.onSelect();
 	};
 
-	if ( cannotMove || ( isFirst && isLast && ! rootClientId ) ) {
+	if ( ! canMove || ( isFirst && isLast && ! rootClientId ) ) {
 		return null;
 	}
 
@@ -149,7 +149,7 @@ export default compose(
 			numberOfBlocks: blockOrder.length - 1,
 			isFirst: firstIndex === 0,
 			isLast: lastIndex === blockOrder.length - 1,
-			cannotMove: ! canMoveBlocks( clientIds, rootClientId ),
+			canMove: canMoveBlocks( clientIds, rootClientId ),
 			rootClientId,
 		};
 	} ),
