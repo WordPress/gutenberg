@@ -31,9 +31,9 @@ The editing experience is provided as a block editor wrapper around the core fun
 The Navigation Editor has two "modes" for _persistence_ ("saving" navigations) and _rendering_:
 
 1. **Default** - navigations are saved to the _existing_ (post type powered) Menus system and rendered using standard Walker classes.
-2. **Block-based** (opt _in_) - navigations continue to be _saved_ using the existing post type system, but non-link blocks are
-    - saved (see technical implementation) as blocks.
-    - the navigation is rendered using the Navigation block (as opposed to Walker) to provide access to the full power of the Navigation block (with some tradeoffs in terms of backwards compatibility).
+2. **Block-based** (opt _in_) - navigations continue to be _saved_ using the existing post type system, but:
+    - non-link blocks (anything that is not `core/navigation-link`) are saved as _blocks_ (see [technical implementation](#technical-implementation-details)).
+    - the navigation is _rendered_ using the `core/navigation` block (as opposed to Walker) to provide access to the full power of blocks (with some tradeoffs in terms of backwards compatibility).
 
 ### Default Mode
 
