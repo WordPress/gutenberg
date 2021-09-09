@@ -88,6 +88,10 @@ function WidthPanel( { selectedWidth, setAttributes } ) {
 }
 
 function ButtonEdit( props ) {
+	const { isSelected, parentWidth } = props;
+	const initialBorderRadius = props?.attributes?.style?.border?.radius;
+	const { valueUnit = 'px' } = getValueAndUnit( initialBorderRadius ) || {};
+
 	const { editorSidebarOpened, numOfButtons } = useSelect(
 		( select ) => {
 			const { isEditorSidebarOpened } = select( editPostStore );
@@ -116,40 +120,6 @@ function ButtonEdit( props ) {
 	const richTextRef = useRef();
 	const colors = useSetting( 'color.palette' ) || [];
 	const gradients = useSetting( 'color.gradients' ) || [];
-	const { isSelected, parentWidth } = props;
-	const initialBorderRadius = props?.attributes?.style?.border?.radius;
-	const { valueUnit = 'px' } = getValueAndUnit( initialBorderRadius ) || {};
-
-	const linkSettingsActions = [
-		{
-			label: __( 'Remove link' ),
-			onPress: onClearSettings,
-		},
-	];
-
-	const linkSettingsOptions = {
-		url: {
-			label: __( 'Button Link URL' ),
-			placeholder: __( 'Add URL' ),
-			autoFocus: true,
-			autoFill: true,
-		},
-		openInNewTab: {
-			label: __( 'Open in new tab' ),
-		},
-		linkRel: {
-			label: __( 'Link Rel' ),
-			placeholder: _x( 'None', 'Link rel attribute value placeholder' ),
-		},
-	};
-
-	const noFocusLinkSettingOptions = {
-		...linkSettingsOptions,
-		url: {
-			...linkSettingsOptions.url,
-			autoFocus: false,
-		},
-	};
 
 	useEffect( () => {
 		onSetMaxWidth();
@@ -192,6 +162,37 @@ function ButtonEdit( props ) {
 			}
 		}
 	}, [ isSelected, isButtonFocused ] );
+
+	const linkSettingsActions = [
+		{
+			label: __( 'Remove link' ),
+			onPress: onClearSettings,
+		},
+	];
+
+	const linkSettingsOptions = {
+		url: {
+			label: __( 'Button Link URL' ),
+			placeholder: __( 'Add URL' ),
+			autoFocus: true,
+			autoFill: true,
+		},
+		openInNewTab: {
+			label: __( 'Open in new tab' ),
+		},
+		linkRel: {
+			label: __( 'Link Rel' ),
+			placeholder: _x( 'None', 'Link rel attribute value placeholder' ),
+		},
+	};
+
+	const noFocusLinkSettingOptions = {
+		...linkSettingsOptions,
+		url: {
+			...linkSettingsOptions.url,
+			autoFocus: false,
+		},
+	};
 
 	function getBackgroundColor() {
 		const { attributes, style } = props;
@@ -458,6 +459,19 @@ function ButtonEdit( props ) {
 	const backgroundColor = getBackgroundColor();
 	const textColor = getTextColor();
 	const isFixedWidth = !! width;
+	const outLineStyles = [
+		styles.outline,
+		{
+			borderRadius: outlineBorderRadius,
+			borderColor: backgroundColor,
+		},
+	];
+	const textStyles = {
+		...richTextStyle.richText,
+		paddingLeft: isFixedWidth ? 0 : richTextStyle.richText.paddingLeft,
+		paddingRight: isFixedWidth ? 0 : richTextStyle.richText.paddingRight,
+		color: textColor,
+	};
 
 	return (
 		<View onLayout={ onLayout }>
@@ -468,32 +482,14 @@ function ButtonEdit( props ) {
 				isSelected={ isSelected }
 			>
 				{ isSelected && (
-					<View
-						pointerEvents="none"
-						style={ [
-							styles.outline,
-							{
-								borderRadius: outlineBorderRadius,
-								borderColor: backgroundColor,
-							},
-						] }
-					/>
+					<View pointerEvents="none" style={ outLineStyles } />
 				) }
 				<RichText
-					setRef={ richTextRef.curent }
+					setRef={ richTextRef?.curent }
 					placeholder={ placeholderText }
 					value={ text }
 					onChange={ onChangeText }
-					style={ {
-						...richTextStyle.richText,
-						paddingLeft: isFixedWidth
-							? 0
-							: richTextStyle.richText.paddingLeft,
-						paddingRight: isFixedWidth
-							? 0
-							: richTextStyle.richText.paddingRight,
-						color: textColor,
-					} }
+					style={ textStyles }
 					textAlign={ align }
 					placeholderTextColor={
 						style?.color || styles.placeholderTextColor.color
