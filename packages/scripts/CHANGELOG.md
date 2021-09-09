@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 18.0.1 (2021-09-09)
+
 ### Bug Fixes
 
 -   Bring back support for SVG files in CSS ([#34394](https://github.com/WordPress/gutenberg/pull/34394)). It wasn't correctly migrated when integrating webpack v5.

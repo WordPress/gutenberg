@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 17.0.0 (2021-09-09)
+
 ### Breaking Change
 
 -   Removed a min-width from the `DropdownMenu` component, allowing the menu to accommodate thin contents like vertical tools menus ([#33995](https://github.com/WordPress/gutenberg/pull/33995)).

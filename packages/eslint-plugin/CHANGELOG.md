@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 9.1.2 (2021-09-09)
+
 ### Bug Fix
 
 -   The recommended configuration will now respect `type` imports in TypeScript files ([#34055](https://github.com/WordPress/gutenberg/pull/34055)).
