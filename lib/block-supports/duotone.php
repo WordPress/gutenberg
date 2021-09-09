@@ -352,6 +352,8 @@ function gutenberg_render_duotone_support( $block_content, $block ) {
 	}
 	$selector = implode( ', ', $scoped );
 
+	// !important is needed because these styles render before global styles,
+	// and they should be overriding the duotone filters set by global styles.
 	$filter_style = defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG
 		? $selector . " {\n\tfilter: " . $filter_property . " !important;\n}\n"
 		: $selector . '{filter:' . $filter_property . ' !important;}';
