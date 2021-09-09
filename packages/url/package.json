@@ -30,9 +30,6 @@
 		"@babel/runtime": "^7.13.10",
 		"lodash": "^4.17.21"
 	},
-	"devDependencies": {
-		"react-native-url-polyfill": "^1.1.2"
-	},
 	"publishConfig": {
 		"access": "public"
 	}
