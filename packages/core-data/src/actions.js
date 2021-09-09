@@ -264,9 +264,6 @@ export const editEntityRecord = (
 				? { ...editedRecordValue, ...edits[ key ] }
 				: edits[ key ];
 			acc[ key ] = isEqual( recordValue, value ) ? undefined : value;
-			if ( ! isEqual( recordValue, value ) ) {
-				// console.log(kind, name, key, {recordValue, value})
-			}
 			return acc;
 		}, {} ),
 		transientEdits,
