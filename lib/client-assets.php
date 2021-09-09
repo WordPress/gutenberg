@@ -96,13 +96,6 @@ function gutenberg_override_script( $scripts, $handle, $src, $deps = array(), $v
 		$scripts->set_translations( $handle, 'default' );
 	}
 
-	// Remove this check once the minimum supported WordPress version is at least 5.7.
-	if ( 'wp-i18n' === $handle ) {
-		$ltr    = 'rtl' === _x( 'ltr', 'text direction', 'default' ) ? 'rtl' : 'ltr';
-		$output = sprintf( "wp.i18n.setLocaleData( { 'text direction\u0004ltr': [ '%s' ] }, 'default' );", $ltr );
-		$scripts->add_inline_script( 'wp-i18n', $output, 'after' );
-	}
-
 	/*
 	 * Wp-editor module is exposed as window.wp.editor.
 	 * Problem: there is quite some code expecting window.wp.oldEditor object available under window.wp.editor.
@@ -222,18 +215,6 @@ function gutenberg_register_vendor_scripts( $scripts ) {
 		'react-dom',
 		'https://unpkg.com/react-dom@17.0.1/umd/react-dom' . $react_suffix . '.js',
 		array( 'react' )
-	);
-
-	/*
-	 * This script registration and the corresponding function should be removed
-	 * removed once the plugin is updated to support WordPress 5.7.0 and newer.
-	 */
-	gutenberg_register_vendor_script(
-		$scripts,
-		'object-fit-polyfill',
-		'https://unpkg.com/objectFitPolyfill@2.3.5/dist/objectFitPolyfill.min.js',
-		array(),
-		'2.3.5'
 	);
 }
 add_action( 'wp_default_scripts', 'gutenberg_register_vendor_scripts' );
@@ -797,31 +778,3 @@ add_action( 'admin_footer-toplevel_page_gutenberg-edit-site', 'gutenberg_extend_
 add_action( 'admin_footer-post.php', 'gutenberg_extend_block_editor_styles_html' );
 add_action( 'admin_footer-post-new.php', 'gutenberg_extend_block_editor_styles_html' );
 add_action( 'admin_footer-widgets.php', 'gutenberg_extend_block_editor_styles_html' );
-
-/**
- * Adds a polyfill for object-fit in environments which do not support it.
- *
- * The script registration occurs in `gutenberg_register_vendor_scripts`, which
- * should be removed in coordination with this function.
- *
- * Remove this when the minimum supported version is WordPress 5.7
- *
- * @see gutenberg_register_vendor_scripts
- * @see https://developer.mozilla.org/en-US/docs/Web/CSS/object-fit
- *
- * @since 9.1.0
- *
- * @param WP_Scripts $scripts WP_Scripts object.
- */
-function gutenberg_add_object_fit_polyfill( $scripts ) {
-	did_action( 'init' ) && $scripts->add_inline_script(
-		'wp-polyfill',
-		wp_get_script_polyfill(
-			$scripts,
-			array(
-				'"objectFit" in document.documentElement.style' => 'object-fit-polyfill',
-			)
-		)
-	);
-}
-add_action( 'wp_default_scripts', 'gutenberg_add_object_fit_polyfill', 20 );

@@ -1,13 +1,14 @@
 /**
  * External dependencies
  */
-import { find, startsWith, get } from 'lodash';
+import { find, startsWith, get, camelCase, has } from 'lodash';
 
 export const BLOCK_STYLE_ATTRIBUTES = [
 	'textColor',
 	'backgroundColor',
 	'style',
 	'color',
+	'fontSize',
 ];
 
 // Mapping style properties name to native
@@ -121,6 +122,62 @@ export function getBlockColors(
 	return blockStyles;
 }
 
+export function getBlockTypography(
+	blockStyleAttributes,
+	fontSizes,
+	blockName,
+	baseGlobalStyles
+) {
+	const typographyStyles = {};
+	const customBlockStyles = blockStyleAttributes?.style?.typography || {};
+	const blockGlobalStyles = baseGlobalStyles?.blocks?.[ blockName ];
+
+	// Global styles
+	if ( blockGlobalStyles?.typography ) {
+		const fontSize = blockGlobalStyles?.typography?.fontSize;
+		const lineHeight = blockGlobalStyles?.typography?.lineHeight;
+
+		if ( fontSize ) {
+			if ( parseInt( fontSize, 10 ) ) {
+				typographyStyles.fontSize = fontSize;
+			} else {
+				const mappedFontSize = find( fontSizes, {
+					slug: fontSize,
+				} );
+
+				if ( mappedFontSize ) {
+					typographyStyles.fontSize = mappedFontSize?.size;
+				}
+			}
+		}
+
+		if ( lineHeight ) {
+			typographyStyles.lineHeight = lineHeight;
+		}
+	}
+
+	if ( blockStyleAttributes?.fontSize ) {
+		const mappedFontSize = find( fontSizes, {
+			slug: blockStyleAttributes?.fontSize,
+		} );
+
+		if ( mappedFontSize ) {
+			typographyStyles.fontSize = mappedFontSize?.size;
+		}
+	}
+
+	// Custom styles
+	if ( customBlockStyles?.fontSize ) {
+		typographyStyles.fontSize = customBlockStyles?.fontSize;
+	}
+
+	if ( customBlockStyles?.lineHeight ) {
+		typographyStyles.lineHeight = customBlockStyles?.lineHeight;
+	}
+
+	return typographyStyles;
+}
+
 export function parseStylesVariables( styles, mappedValues, customValues ) {
 	let stylesBase = styles;
 	const variables = [ 'preset', 'custom' ];
@@ -152,7 +209,15 @@ export function parseStylesVariables( styles, mappedValues, customValues ) {
 			const customValuesData = customValues ?? JSON.parse( stylesBase );
 			stylesBase = stylesBase.replace( regex, ( _$1, $2 ) => {
 				const path = $2.split( '--' );
-				return get( customValuesData, path );
+				if ( has( customValuesData, path ) ) {
+					return get( customValuesData, path );
+				}
+
+				// Check for camelcase properties
+				return get( customValuesData, [
+					...path.slice( 0, path.length - 1 ),
+					camelCase( path[ path.length - 1 ] ),
+				] );
 			} );
 		}
 	} );
@@ -161,14 +226,19 @@ export function parseStylesVariables( styles, mappedValues, customValues ) {
 }
 
 export function getMappedValues( features, palette ) {
+	const typography = features?.typography;
 	const colors = { ...palette?.theme, ...palette?.user };
+	const fontSizes = {
+		...typography?.fontSizes?.theme,
+		...typography?.fontSizes?.user,
+	};
 	const mappedValues = {
 		color: {
 			values: colors,
 			slug: 'color',
 		},
 		'font-size': {
-			values: features?.typography?.fontSizes?.theme,
+			values: fontSizes,
 			slug: 'size',
 		},
 	};
@@ -203,6 +273,8 @@ export function getGlobalStyles( rawStyles, rawFeatures ) {
 			color: {
 				palette: colors?.palette,
 				gradients,
+				text: features?.color?.text ?? true,
+				background: features?.color?.background ?? true,
 			},
 			typography: {
 				fontSizes: features?.typography?.fontSizes,

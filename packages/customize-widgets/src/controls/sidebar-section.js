@@ -36,6 +36,9 @@ export default function getSidebarSection() {
 				'customize-widgets__sidebar-section'
 			);
 		}
+		isContextuallyActive() {
+			return this.active();
+		}
 		hasSubSectionOpened() {
 			return this.inspector.expanded();
 		}
