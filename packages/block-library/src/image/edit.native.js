@@ -543,15 +543,6 @@ export class ImageEdit extends Component {
 		return typeof attributes.id !== 'undefined' && attributes.id > 0;
 	}
 
-	isFeaturedImage( imageId = this.props.attributes.id ) {
-		const { featuredImageId } = this.props;
-		return (
-			this.canImageBeFeatured() &&
-			!! featuredImageId &&
-			featuredImageId === imageId
-		);
-	}
-
 	render() {
 		const { isCaptionSelected } = this.state;
 		const {
@@ -561,6 +552,7 @@ export class ImageEdit extends Component {
 			clientId,
 			imageDefaultSize,
 			context: { imageCrop = false } = {},
+			featuredImageId,
 			wasBlockJustInserted,
 		} = this.props;
 		const { align, url, alt, id, sizeSlug, className } = attributes;
@@ -587,7 +579,8 @@ export class ImageEdit extends Component {
 		}
 
 		const canImageBeFeatured = this.canImageBeFeatured();
-		const isFeaturedImage = this.isFeaturedImage();
+		const isFeaturedImage =
+			canImageBeFeatured && featuredImageId === attributes.id;
 
 		const getToolbarEditButton = ( open ) => (
 			<BlockControls>
