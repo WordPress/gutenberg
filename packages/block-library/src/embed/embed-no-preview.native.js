@@ -168,7 +168,7 @@ const EmbedNoPreview = ( { label, icon, isSelected, onPress } ) => {
 					<Text style={ sheetTitleStyle }>
 						{ sprintf(
 							// translators: %s: embed block variant's label e.g: "Twitter".
-							__( '%s block previews are coming soon' ),
+							__( '%s embed block previews are coming soon' ),
 							label
 						) }
 					</Text>
