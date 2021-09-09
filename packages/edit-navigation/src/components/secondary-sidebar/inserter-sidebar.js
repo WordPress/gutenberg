@@ -7,7 +7,10 @@ import {
 	__experimentalLibrary as Library,
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
-import { useViewportMatch } from '@wordpress/compose';
+import {
+	useViewportMatch,
+	__experimentalUseDialog as useDialog,
+} from '@wordpress/compose';
 import { useDispatch, useSelect } from '@wordpress/data';
 
 /**
@@ -42,6 +45,10 @@ function InserterSidebar() {
 
 	const { setIsInserterOpened } = useDispatch( editNavigationStore );
 
+	const [ inserterDialogRef, inserterDialogProps ] = useDialog( {
+		onClose: () => setIsInserterOpened( false ),
+	} );
+
 	// Only concerned with whether there are items to display. If not then
 	// we shouldn't render.
 	if ( ! hasInserterItems ) {
@@ -51,7 +58,11 @@ function InserterSidebar() {
 	const isNavBlockSelected = navBlockClientId === selectedBlockClientId;
 
 	return (
-		<div className="edit-navigation-layout__inserter-panel">
+		<div
+			ref={ inserterDialogRef }
+			{ ...inserterDialogProps }
+			className="edit-navigation-layout__inserter-panel"
+		>
 			<div className="edit-navigation-layout__inserter-panel-header">
 				<Button
 					icon={ close }
