@@ -193,7 +193,18 @@ describe( 'Navigation editor', () => {
 				POST: menuPostResponse,
 			} ),
 			...getMenuItemMocks( { GET: [] } ),
-			...getPagesMocks( { GET: [ {} ] } ), // mock a single page
+			...getPagesMocks( {
+				GET: [
+					{
+						type: 'page',
+						id: 1,
+						link: 'https://example.com/1',
+						title: {
+							rendered: 'My page',
+						},
+					},
+				],
+			} ),
 		] );
 
 		await page.keyboard.type( 'Main Menu' );
@@ -354,7 +365,7 @@ describe( 'Navigation editor', () => {
 		);
 		await navBlock.click();
 		const startEmptyButton = await page.waitForXPath(
-			'//button[.="Start empty"]'
+			'//button[.="Start blank"]'
 		);
 		await startEmptyButton.click();
 

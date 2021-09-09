@@ -7,15 +7,15 @@ import { DuotonePicker, DuotoneSwatch } from '@wordpress/components';
 import { useState } from '@wordpress/element';
 
 const DUOTONE_PALETTE = [
-	{ colors: [ '#8c00b7', '#fcff41' ] name: 'Purple and yellow' slug: 'purple-yellow' },
-	{ colors: [ '#000097', '#ff4747' ] name: 'Blue and red' slug: 'blue-red' },
+	{ colors: [ '#8c00b7', '#fcff41' ], name: 'Purple and yellow', slug: 'purple-yellow' },
+	{ colors: [ '#000097', '#ff4747' ], name: 'Blue and red', slug: 'blue-red' },
 ];
 
 const COLOR_PALETTE = [
-	{ colors: [ '#ff4747' ] name: 'Red' slug: 'red' },
-	{ colors: [ '#fcff41' ] name: 'Yellow' slug: 'yellow' },
-	{ colors: [ '#000097' ] name: 'Blue' slug: 'blue' },
-	{ colors: [ '#8c00b7' ] name: 'Purple' slug: 'purple' },
+	{ color: '#ff4747', name: 'Red', slug: 'red' },
+	{ color: '#fcff41', name: 'Yellow', slug: 'yellow' },
+	{ color: '#000097', name: 'Blue', slug: 'blue' },
+	{ color: '#8c00b7', name: 'Purple', slug: 'purple' },
 ];
 
 const Example = () => {

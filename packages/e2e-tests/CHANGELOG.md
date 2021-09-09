@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 2.5.0 (2021-09-09)
+
 ### New Features
 
 -   Emulate `prefers-reduced-motion: reduce` [#34132](https://github.com/WordPress/gutenberg/pull/34132).

@@ -103,6 +103,7 @@ function Navigation( {
 	hasSubmenuIndicatorSetting = true,
 	hasItemJustificationControls = true,
 	hasColorSettings = true,
+	customPlaceholder: CustomPlaceholder = null,
 } ) {
 	const [ isPlaceholderShown, setIsPlaceholderShown ] = useState(
 		! hasExistingNavItems
@@ -150,20 +151,24 @@ function Navigation( {
 		},
 		{
 			allowedBlocks: ALLOWED_BLOCKS,
-			orientation: attributes.orientation || 'horizontal',
+			orientation: attributes.orientation,
 			renderAppender:
 				( isImmediateParentOfSelectedBlock &&
 					! selectedBlockHasDescendants ) ||
 				isSelected
 					? InnerBlocks.DefaultAppender
 					: false,
-			__experimentalCaptureToolbars: true,
+			// Ensure block toolbar is not too far removed from item
+			// being edited when in vertical mode.
+			// see: https://github.com/WordPress/gutenberg/pull/34615.
+			__experimentalCaptureToolbars:
+				attributes.orientation !== 'vertical',
 			// Template lock set to false here so that the Nav
 			// Block on the experimental menus screen does not
 			// inherit templateLock={ 'all' }.
 			templateLock: false,
 			__experimentalLayout: LAYOUT,
-			placeholder,
+			placeholder: ! CustomPlaceholder ? placeholder : undefined,
 		}
 	);
 
@@ -200,9 +205,13 @@ function Navigation( {
 	} );
 
 	if ( isPlaceholderShown ) {
+		const PlaceholderComponent = CustomPlaceholder
+			? CustomPlaceholder
+			: NavigationPlaceholder;
+
 		return (
 			<div { ...blockProps }>
-				<NavigationPlaceholder
+				<PlaceholderComponent
 					onCreate={ ( blocks, selectNavigationBlock ) => {
 						setIsPlaceholderShown( false );
 						updateInnerBlocks( blocks );
