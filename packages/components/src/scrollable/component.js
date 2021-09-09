@@ -20,7 +20,7 @@ function Scrollable( props, forwardedRef ) {
  *
  * @example
  * ```jsx
- * import { __experimentalScrollable as Scrollable } from `@wordpress/components/ui`;
+ * import { __experimentalScrollable as Scrollable } from `@wordpress/components`;
  *
  * function Example() {
  * 	return (
