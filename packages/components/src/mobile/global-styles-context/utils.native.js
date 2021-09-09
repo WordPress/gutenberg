@@ -2,6 +2,12 @@
  * External dependencies
  */
 import { find, startsWith, get, camelCase, has } from 'lodash';
+import { Dimensions } from 'react-native';
+
+/**
+ * WordPress dependencies
+ */
+import { getPxFromCssUnit } from '@wordpress/block-editor';
 
 export const BLOCK_STYLE_ATTRIBUTES = [
 	'textColor',
@@ -266,6 +272,26 @@ export function getGlobalStyles( rawStyles, rawFeatures ) {
 		customValues
 	);
 
+	// Adds normalized PX values for each of the different keys
+	const dimensions = Dimensions.get( 'window' );
+	const fontSizes = {};
+	[ 'core', 'theme', 'user' ].forEach( ( key ) => {
+		if ( features?.typography?.fontSizes[ key ] ) {
+			fontSizes[ key ] = features?.typography?.fontSizes[ key ]?.map(
+				( fontSizeObject ) => {
+					fontSizeObject.sizePx = getPxFromCssUnit(
+						fontSizeObject.size,
+						{
+							width: dimensions.width,
+							height: dimensions.height,
+						}
+					);
+					return fontSizeObject;
+				}
+			);
+		}
+	} );
+
 	return {
 		colors,
 		gradients,
@@ -277,7 +303,7 @@ export function getGlobalStyles( rawStyles, rawFeatures ) {
 				background: features?.color?.background ?? true,
 			},
 			typography: {
-				fontSizes: features?.typography?.fontSizes,
+				fontSizes,
 				customLineHeight: features?.custom?.[ 'line-height' ],
 			},
 		},
