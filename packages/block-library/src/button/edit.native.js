@@ -341,6 +341,13 @@ function ButtonEdit( props ) {
 		}
 	}
 
+	const onSetRef = useCallback(
+		( ref ) => {
+			richTextRef.current = ref;
+		},
+		[ richTextRef ]
+	);
+
 	const onUnstableOnFocus = useCallback( () => {
 		onToggleButtonFocus( true );
 	}, [ onToggleButtonFocus ] );
@@ -485,7 +492,7 @@ function ButtonEdit( props ) {
 					<View pointerEvents="none" style={ outLineStyles } />
 				) }
 				<RichText
-					setRef={ richTextRef?.curent }
+					setRef={ onSetRef }
 					placeholder={ placeholderText }
 					value={ text }
 					onChange={ onChangeText }
