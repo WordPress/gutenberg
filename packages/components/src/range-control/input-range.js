@@ -8,6 +8,7 @@ import { noop } from 'lodash';
  * WordPress dependencies
  */
 import { forwardRef } from '@wordpress/element';
+import { isRTL } from '@wordpress/i18n';
 import { UP, RIGHT, DOWN, LEFT } from '@wordpress/keycodes';
 
 /**
@@ -17,11 +18,13 @@ import { InputRange as BaseInputRange } from './styles/range-control-styles';
 import { useDebouncedHoverInteraction } from './utils';
 import { add, subtract } from '../utils/math';
 
+const _isRTL = isRTL();
+
 const operationList = {
 	[ UP ]: add,
-	[ RIGHT ]: add,
+	[ RIGHT ]: _isRTL ? subtract : add,
 	[ DOWN ]: subtract,
-	[ LEFT ]: subtract,
+	[ LEFT ]: _isRTL ? add : subtract,
 };
 
 function InputRange(
