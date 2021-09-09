@@ -647,12 +647,18 @@ class WP_REST_Menu_Items_Controller extends WP_REST_Posts_Controller {
 			$data['title'] = array();
 		}
 		if ( rest_is_field_included( 'title.raw', $fields ) ) {
-			$data['title']['raw'] = $post->post_title;
+			$data['title']['raw'] = $menu_item->title;
 		}
 		if ( rest_is_field_included( 'title.rendered', $fields ) ) {
 			add_filter( 'protected_title_format', array( $this, 'protected_title_format' ) );
 
-			$data['title']['rendered'] = get_the_title( $post->ID );
+			/** This filter is documented in wp-includes/post-template.php */
+			$title = apply_filters( 'the_title', $menu_item->title, $menu_item->ID );
+
+			/** This filter is documented in wp-includes/class-walker-nav-menu.php */
+			$title = apply_filters( 'nav_menu_item_title', $title, $menu_item, null, 0 );
+
+			$data['title']['rendered'] = $title;
 
 			remove_filter( 'protected_title_format', array( $this, 'protected_title_format' ) );
 		}

@@ -153,8 +153,8 @@ class WP_REST_Menu_Locations_Controller extends WP_REST_Controller {
 		$locations = get_nav_menu_locations();
 		$menu      = ( isset( $locations[ $location->name ] ) ) ? $locations[ $location->name ] : 0;
 
-		$fields    = $this->get_fields_for_response( $request );
-		$data      = array();
+		$fields = $this->get_fields_for_response( $request );
+		$data   = array();
 
 		if ( rest_is_field_included( 'name', $fields ) ) {
 			$data['name'] = $location->name;
