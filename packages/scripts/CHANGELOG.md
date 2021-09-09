@@ -6,6 +6,8 @@
 
 -   The bundled `jest-dev-server` dependency has been updated to the next major version `^5.0.3` ([#34560](https://github.com/WordPress/gutenberg/pull/34560)).
 
+## 18.0.1 (2021-09-09)
+
 ### Bug Fixes
 
 -   Bring back support for SVG files in CSS ([#34394](https://github.com/WordPress/gutenberg/pull/34394)). It wasn't correctly migrated when integrating webpack v5.
