@@ -21,7 +21,10 @@ function InserterSidebar() {
 
 	const isMobileViewport = useViewportMatch( 'medium', '<' );
 
-	const { clientId: navBlockClientId } = useNavigationEditorRootBlock();
+	const {
+		navBlockClientId,
+		lastNavBlockItemIndex,
+	} = useNavigationEditorRootBlock();
 
 	const { hasInserterItems, selectedBlockClientId } = useSelect(
 		( select ) => {
@@ -45,6 +48,8 @@ function InserterSidebar() {
 		return null;
 	}
 
+	const isNavBlockSelected = navBlockClientId === selectedBlockClientId;
+
 	return (
 		<div className="edit-navigation-layout__inserter-panel">
 			<div className="edit-navigation-layout__inserter-panel-header">
@@ -57,10 +62,11 @@ function InserterSidebar() {
 				<Library
 					shouldFocusBlock={ isMobileViewport }
 					rootClientId={ navBlockClientId }
-					clientId={
-						navBlockClientId === selectedBlockClientId
-							? navBlockClientId
-							: undefined
+					// If the root Nav block is selected then any items inserted by the
+					// global inserter should append after the last nav item. Otherwise
+					// simply allow default Gutenberg behaviour.
+					__experimentalInsertionIndex={
+						isNavBlockSelected ? lastNavBlockItemIndex : undefined
 					}
 					showInserterHelpPanel={ SHOW_PREVIEWS }
 				/>

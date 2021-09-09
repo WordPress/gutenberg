@@ -15,7 +15,9 @@ const useNavigationEditorRootBlock = () => {
 		const lockedNavigationBlock = getBlockOrder()[ 0 ];
 
 		return {
-			clientId: lockedNavigationBlock,
+			navBlockClientId: lockedNavigationBlock,
+			lastNavBlockItemIndex: getBlockOrder( lockedNavigationBlock )
+				.length,
 		};
 	}, [] );
 };
