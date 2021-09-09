@@ -140,7 +140,7 @@ function DuotonePanel( { attributes, setAttributes } ) {
 	}
 
 	return (
-		<BlockControls group="block">
+		<BlockControls group="block" __experimentalExposeToChildren>
 			<DuotoneControl
 				duotonePalette={ duotonePalette }
 				colorPalette={ colorPalette }

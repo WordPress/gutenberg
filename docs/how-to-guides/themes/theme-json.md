@@ -222,13 +222,15 @@ The settings section has the following structure:
 			"customWidth": false
 		},
 		"color": {
+			"background": true,
 			"custom": true,
 			"customDuotone": true,
 			"customGradient": true,
 			"duotone": [],
 			"gradients": [],
 			"link": false,
-			"palette": []
+			"palette": [],
+			"text": true
 		},
 		"custom": {},
 		"layout": {
@@ -615,7 +617,6 @@ Each block declares which style properties it exposes via the [block supports me
 			"text": "value"
 		},
 		"spacing": {
-			"blockGap": "value",
 			"margin": {
 				"top": "value",
 				"right": "value",

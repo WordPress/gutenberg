@@ -780,7 +780,9 @@ async function createChangelog( settings ) {
 	try {
 		changelog = await getChangelog( settings );
 	} catch ( error ) {
-		changelog = formats.error( error.stack );
+		if ( error instanceof Error ) {
+			changelog = formats.error( error.stack );
+		}
 	}
 
 	log( changelog );

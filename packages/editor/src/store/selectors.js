@@ -1395,13 +1395,6 @@ export const getBlock = getBlockEditorSelector( 'getBlock' );
 export const getBlocks = getBlockEditorSelector( 'getBlocks' );
 
 /**
- * @see __unstableGetBlockWithoutInnerBlocks in core/block-editor store.
- */
-export const __unstableGetBlockWithoutInnerBlocks = getBlockEditorSelector(
-	'__unstableGetBlockWithoutInnerBlocks'
-);
-
-/**
  * @see getClientIdsOfDescendants in core/block-editor store.
  */
 export const getClientIdsOfDescendants = getBlockEditorSelector(

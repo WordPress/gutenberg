@@ -24,12 +24,12 @@ import { getStyledClassNameFromKey } from './get-styled-class-name-from-key';
  * The hope is that we can improve render performance by removing functional
  * component wrappers.
  *
- * @template {import('./polymorphic-component').PolymorphicComponentProps<{}, any, any>} P
+ * @template {import('./wordpress-component').WordPressComponentProps<{}, any, any>} P
  * @param {(props: P, ref: import('react').Ref<any>) => JSX.Element | null} Component            The component to register into the Context system.
  * @param {string}                                                          namespace            The namespace to register the component under.
  * @param {Object}                                                          options
  * @param {boolean}                                                         [options.memo=false]
- * @return {import('./polymorphic-component').PolymorphicComponentFromProps<P>} The connected PolymorphicComponent
+ * @return {import('./wordpress-component').WordPressComponentFromProps<P>} The connected WordPressComponent
  */
 export function contextConnect( Component, namespace, options = {} ) {
 	/* eslint-enable jsdoc/valid-types */
@@ -65,7 +65,7 @@ export function contextConnect( Component, namespace, options = {} ) {
 	// @ts-ignore internal property
 	WrappedComponent[ CONNECT_STATIC_NAMESPACE ] = uniq( mergedNamespace );
 
-	// @ts-ignore PolymorphicComponent property
+	// @ts-ignore WordPressComponent property
 	WrappedComponent.selector = `.${ getStyledClassNameFromKey( namespace ) }`;
 
 	// @ts-ignore

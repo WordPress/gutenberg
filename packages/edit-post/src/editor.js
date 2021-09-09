@@ -156,7 +156,9 @@ function Editor( {
 	] );
 
 	const styles = useMemo( () => {
-		return hasThemeStyles ? settings.styles : [];
+		return hasThemeStyles && settings.styles?.length
+			? settings.styles
+			: settings.defaultEditorStyles;
 	}, [ settings, hasThemeStyles ] );
 
 	if ( ! post ) {

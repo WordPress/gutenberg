@@ -1,8 +1,8 @@
 /**
  * WordPress dependencies
  */
-import { useSelect, useDispatch } from '@wordpress/data';
-import { MenuItem } from '@wordpress/components';
+import { useSelect } from '@wordpress/data';
+import { MoreMenuFeatureToggle } from '@wordpress/interface';
 import { __ } from '@wordpress/i18n';
 
 /**
@@ -15,17 +15,12 @@ export default function WelcomeGuideMenuItem() {
 		( select ) => select( editPostStore ).isEditingTemplate(),
 		[]
 	);
-	const { toggleFeature } = useDispatch( editPostStore );
 
 	return (
-		<MenuItem
-			onClick={ () =>
-				toggleFeature(
-					isTemplateMode ? 'welcomeGuideTemplate' : 'welcomeGuide'
-				)
-			}
-		>
-			{ __( 'Welcome Guide' ) }
-		</MenuItem>
+		<MoreMenuFeatureToggle
+			scope="core/edit-post"
+			feature={ isTemplateMode ? 'welcomeGuideTemplate' : 'welcomeGuide' }
+			label={ __( 'Welcome Guide' ) }
+		/>
 	);
 }

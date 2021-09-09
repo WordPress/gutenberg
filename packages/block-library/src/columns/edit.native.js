@@ -274,7 +274,7 @@ function ColumnsEditContainer( {
 						orientation={
 							columnsInRow > 1 ? 'horizontal' : undefined
 						}
-						horizontal={ true }
+						horizontal={ columnsInRow > 1 }
 						allowedBlocks={ ALLOWED_BLOCKS }
 						contentResizeMode="stretch"
 						onAddBlock={ onAddBlock }

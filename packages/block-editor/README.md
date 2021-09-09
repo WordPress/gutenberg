@@ -438,9 +438,7 @@ Undocumented declaration.
 
 ### InspectorAdvancedControls
 
-_Related_
-
--   <https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/inspector-advanced-controls/README.md>
+Undocumented declaration.
 
 ### InspectorControls
 

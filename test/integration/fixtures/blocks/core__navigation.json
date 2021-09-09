@@ -4,6 +4,7 @@
 		"name": "core/navigation",
 		"isValid": true,
 		"attributes": {
+			"orientation": "horizontal",
 			"showSubmenuIcon": true,
 			"isResponsive": false
 		},

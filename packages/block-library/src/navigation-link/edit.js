@@ -10,7 +10,6 @@ import { escape } from 'lodash';
 import { createBlock } from '@wordpress/blocks';
 import { useSelect, useDispatch } from '@wordpress/data';
 import {
-	KeyboardShortcuts,
 	PanelBody,
 	Popover,
 	TextControl,
@@ -18,7 +17,7 @@ import {
 	ToolbarButton,
 	ToolbarGroup,
 } from '@wordpress/components';
-import { rawShortcut, displayShortcut } from '@wordpress/keycodes';
+import { displayShortcut, isKeyboardEvent, ENTER } from '@wordpress/keycodes';
 import { __, sprintf } from '@wordpress/i18n';
 import {
 	BlockControls,
@@ -292,7 +291,10 @@ export default function NavigationLinkEdit( {
 	};
 	const { showSubmenuIcon } = context;
 	const { saveEntityRecord } = useDispatch( coreStore );
-	const { insertBlock } = useDispatch( blockEditorStore );
+	const {
+		insertBlock,
+		__unstableMarkNextChangeAsNotPersistent,
+	} = useDispatch( blockEditorStore );
 	const [ isLinkOpen, setIsLinkOpen ] = useState( false );
 	const listItemRef = useRef( null );
 	const isDraggingWithin = useIsDraggingWithin( listItemRef );
@@ -355,8 +357,14 @@ export default function NavigationLinkEdit( {
 		[ clientId ]
 	);
 
-	// Store the colors from context as attributes for rendering
-	useEffect( () => setAttributes( { isTopLevelLink } ), [ isTopLevelLink ] );
+	useEffect( () => {
+		// This side-effect should not create an undo level as those should
+		// only be created via user interactions. Mark this change as
+		// not persistent to avoid undo level creation.
+		// See https://github.com/WordPress/gutenberg/issues/34564.
+		__unstableMarkNextChangeAsNotPersistent();
+		setAttributes( { isTopLevelLink } );
+	}, [ isTopLevelLink ] );
 
 	/**
 	 * Insert a link block when submenu is added.
@@ -467,6 +475,15 @@ export default function NavigationLinkEdit( {
 		customBackgroundColor,
 	} = getColors( context, ! isTopLevelLink );
 
+	function onKeyDown( event ) {
+		if (
+			isKeyboardEvent.primary( event, 'k' ) ||
+			( ! url && event.keyCode === ENTER )
+		) {
+			setIsLinkOpen( true );
+		}
+	}
+
 	const blockProps = useBlockProps( {
 		ref: listItemRef,
 		className: classnames( 'wp-block-navigation-item', {
@@ -486,6 +503,7 @@ export default function NavigationLinkEdit( {
 			color: ! textColor && customTextColor,
 			backgroundColor: ! backgroundColor && customBackgroundColor,
 		},
+		onKeyDown,
 	} );
 
 	if ( ! url ) {
@@ -566,13 +584,6 @@ export default function NavigationLinkEdit( {
 		<Fragment>
 			<BlockControls>
 				<ToolbarGroup>
-					<KeyboardShortcuts
-						bindGlobal
-						shortcuts={ {
-							[ rawShortcut.primary( 'k' ) ]: () =>
-								setIsLinkOpen( true ),
-						} }
-					/>
 					<ToolbarButton
 						name="link"
 						icon={ linkIcon }
@@ -626,12 +637,6 @@ export default function NavigationLinkEdit( {
 					{ /* eslint-enable */ }
 					{ ! url ? (
 						<div className="wp-block-navigation-link__placeholder-text">
-							<KeyboardShortcuts
-								shortcuts={ {
-									enter: () =>
-										isSelected && setIsLinkOpen( true ),
-								} }
-							/>
 							{ missingText }
 						</div>
 					) : (
@@ -672,12 +677,6 @@ export default function NavigationLinkEdit( {
 							onClose={ () => setIsLinkOpen( false ) }
 							anchorRef={ listItemRef.current }
 						>
-							<KeyboardShortcuts
-								bindGlobal
-								shortcuts={ {
-									escape: () => setIsLinkOpen( false ),
-								} }
-							/>
 							<LinkControl
 								className="wp-block-navigation-link__inline-link-input"
 								value={ link }

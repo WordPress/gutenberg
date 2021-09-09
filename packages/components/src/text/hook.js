@@ -23,7 +23,7 @@ import { getLineHeight } from './get-line-height';
 import { useCx } from '../utils/hooks/use-cx';
 
 /**
- * @param {import('../ui/context').PolymorphicComponentProps<import('./types').Props, 'span'>} props
+ * @param {import('../ui/context').WordPressComponentProps<import('./types').Props, 'span'>} props
  */
 export default function useText( props ) {
 	const {

@@ -11,6 +11,7 @@ import {
 	Spinner,
 	SelectControl,
 } from '@wordpress/components';
+import { decodeEntities } from '@wordpress/html-entities';
 
 /**
  * Internal dependencies
@@ -82,7 +83,7 @@ export default function ManageLocations( {
 							sprintf(
 								// translators: menu name.
 								__( 'Currently using %s' ),
-								menuOnLocation.name
+								decodeEntities( menuOnLocation.name )
 							)
 						}
 					/>
@@ -101,13 +102,13 @@ export default function ManageLocations( {
 				className="edit-navigation-manage-locations__select-menu"
 				label={ menuLocation.description }
 				labelPosition="top"
-				value={ menuLocation.menu }
+				value={ decodeEntities( menuLocation.menu ) }
 				options={ [
 					{ value: 0, label: __( 'Select a Menu' ), key: 0 },
 					...menus.map( ( { id, name } ) => ( {
 						key: id,
 						value: id,
-						label: name,
+						label: decodeEntities( name ),
 					} ) ),
 				] }
 				onChange={ ( menuId ) => {

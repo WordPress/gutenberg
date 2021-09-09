@@ -51,6 +51,7 @@ function BlockForType( {
 	baseGlobalStyles,
 } ) {
 	const defaultColors = useSetting( 'color.palette' ) || emptyArray;
+	const fontSizes = useSetting( 'typography.fontSizes' ) || emptyArray;
 	const globalStyle = useGlobalStyles();
 	const mergedStyle = useMemo( () => {
 		return getMergedGlobalStyles(
@@ -59,7 +60,8 @@ function BlockForType( {
 			wrapperProps.style,
 			attributes,
 			defaultColors,
-			name
+			name,
+			fontSizes
 		);
 	}, [
 		defaultColors,
@@ -305,7 +307,7 @@ export default compose( [
 			getBlockIndex,
 			getSettings,
 			isBlockSelected,
-			__unstableGetBlockWithoutInnerBlocks,
+			getBlock,
 			getSelectedBlockClientId,
 			getLowestCommonAncestorWithSelectedBlock,
 			getBlockParents,
@@ -315,7 +317,7 @@ export default compose( [
 		const order = getBlockIndex( clientId, rootClientId );
 		const isSelected = isBlockSelected( clientId );
 		const isInnerBlockSelected = hasSelectedInnerBlock( clientId );
-		const block = __unstableGetBlockWithoutInnerBlocks( clientId );
+		const block = getBlock( clientId );
 		const { name, attributes, isValid } = block || {};
 
 		const blockType = getBlockType( name || 'core/missing' );

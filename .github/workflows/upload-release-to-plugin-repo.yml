@@ -79,8 +79,14 @@ jobs:
             - name: Commit the Changelog update
               run: |
                   git add changelog.txt
-                  git commit -m "Update Changelog for ${TAG#v}"
-                  git push --set-upstream origin "${{ matrix.branch }}"
+                  # Remove files that are not meant to be commited
+                  # ie. release_notes.txt created on the previous step.
+                  git clean -fd
+                  # Only attempt to commit changelog if it has been modified.
+                  if ! git diff-index --quiet HEAD --; then
+                    git commit -m "Update Changelog for ${TAG#v}"
+                    git push --set-upstream origin "${{ matrix.branch }}"
+                  fi
 
             - name: Upload Changelog artifact
               uses: actions/upload-artifact@e448a9b857ee2131e752b06002bf0e093c65e571 # v2.2.2

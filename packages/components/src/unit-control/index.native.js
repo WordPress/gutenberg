@@ -94,6 +94,7 @@ function UnitControl( {
 		accessibilityHint,
 		unitButtonTextStyle,
 		unit,
+		units,
 	] );
 
 	const getAnchor = useCallback(
@@ -115,6 +116,9 @@ function UnitControl( {
 	};
 
 	const renderUnitPicker = useCallback( () => {
+		if ( units === false ) {
+			return null;
+		}
 		return (
 			<View style={ styles.unitMenu } ref={ anchorNodeRef }>
 				{ renderUnitButton }

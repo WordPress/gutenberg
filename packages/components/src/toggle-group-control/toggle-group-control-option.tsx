@@ -10,7 +10,7 @@ import { useInstanceId } from '@wordpress/compose';
 import {
 	contextConnect,
 	useContextSystem,
-	PolymorphicComponentProps,
+	WordPressComponentProps,
 } from '../ui/context';
 import ToggleGroupControlButton from './toggle-group-control-button';
 import type {
@@ -42,7 +42,7 @@ function getShowSeparator(
 }
 
 function ToggleGroupControlOption(
-	props: PolymorphicComponentProps< ToggleGroupControlOptionProps, 'input' >,
+	props: WordPressComponentProps< ToggleGroupControlOptionProps, 'input' >,
 	forwardedRef: import('react').Ref< any >
 ) {
 	const toggleGroupControlContext = useToggleGroupControlContext();

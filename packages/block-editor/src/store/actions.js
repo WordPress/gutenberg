@@ -123,6 +123,7 @@ export function* validateBlocksToTemplate( blocks ) {
  *                                 text value. See `wp.richText.create`.
  */
 
+/* eslint-disable jsdoc/valid-types */
 /**
  * Returns an action object used in signalling that selection state should be
  * reset to the specified selection.
@@ -138,6 +139,7 @@ export function resetSelection(
 	selectionEnd,
 	initialPosition
 ) {
+	/* eslint-enable jsdoc/valid-types */
 	return {
 		type: 'RESET_SELECTION',
 		selectionStart,
@@ -151,11 +153,18 @@ export function resetSelection(
  * Unlike resetBlocks, these should be appended to the existing known set, not
  * replacing.
  *
+ * @deprecated
+ *
  * @param {Object[]} blocks Array of block objects.
  *
  * @return {Object} Action object.
  */
 export function receiveBlocks( blocks ) {
+	deprecated( 'wp.data.dispatch( "core/block-editor" ).receiveBlocks', {
+		since: '5.9',
+		alternative: 'resetBlocks or insertBlocks',
+	} );
+
 	return {
 		type: 'RECEIVE_BLOCKS',
 		blocks,
@@ -202,6 +211,7 @@ export function updateBlock( clientId, updates ) {
 	};
 }
 
+/* eslint-disable jsdoc/valid-types */
 /**
  * Returns an action object used in signalling that the block with the
  * specified client ID has been selected, optionally accepting a position
@@ -215,6 +225,7 @@ export function updateBlock( clientId, updates ) {
  * @return {Object} Action object.
  */
 export function selectBlock( clientId, initialPosition = 0 ) {
+	/* eslint-enable jsdoc/valid-types */
 	return {
 		type: 'SELECT_BLOCK',
 		initialPosition,
@@ -382,6 +393,7 @@ function getBlocksWithDefaultStylesApplied( blocks, blockEditorSettings ) {
 	} );
 }
 
+/* eslint-disable jsdoc/valid-types */
 /**
  * Returns an action object signalling that a blocks should be replaced with
  * one or more replacement blocks.
@@ -401,6 +413,7 @@ export function* replaceBlocks(
 	initialPosition = 0,
 	meta
 ) {
+	/* eslint-enable jsdoc/valid-types */
 	clientIds = castArray( clientIds );
 	blocks = getBlocksWithDefaultStylesApplied(
 		castArray( blocks ),
@@ -587,6 +600,7 @@ export function insertBlock(
 	);
 }
 
+/* eslint-disable jsdoc/valid-types */
 /**
  * Returns an action object used in signalling that an array of blocks should
  * be inserted, optionally at a specific index respective a root block list.
@@ -607,6 +621,7 @@ export function* insertBlocks(
 	initialPosition = 0,
 	meta
 ) {
+	/* eslint-enable jsdoc/valid-types */
 	if ( isObject( initialPosition ) ) {
 		meta = initialPosition;
 		initialPosition = 0;
@@ -878,7 +893,8 @@ export function* mergeBlocks( firstBlockClientId, secondBlockClientId ) {
 				},
 			},
 			...blocksWithTheSameType.slice( 1 ),
-		]
+		],
+		0 // If we don't pass the `indexToSelect` it will default to the last block.
 	);
 }
 
@@ -946,6 +962,7 @@ export function removeBlock( clientId, selectPrevious ) {
 	return removeBlocks( [ clientId ], selectPrevious );
 }
 
+/* eslint-disable jsdoc/valid-types */
 /**
  * Returns an action object used in signalling that the inner blocks with the
  * specified client ID should be replaced.
@@ -962,6 +979,7 @@ export function replaceInnerBlocks(
 	updateSelection = false,
 	initialPosition = 0
 ) {
+	/* eslint-enable jsdoc/valid-types */
 	return {
 		type: 'REPLACE_INNER_BLOCKS',
 		rootClientId,

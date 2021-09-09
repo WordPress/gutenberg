@@ -30,6 +30,7 @@ export {
 	Fill,
 	Provider as SlotFillProvider,
 } from './slot-fill';
+export { default as FontSizePicker } from './font-size-picker'; // Intentionally called after slot-fill.
 export { default as __experimentalStyleProvider } from './style-provider';
 export { default as BaseControl } from './base-control';
 export { default as TextareaControl } from './textarea-control';

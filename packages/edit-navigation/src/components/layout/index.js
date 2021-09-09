@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import classnames from 'classnames';
-
-/**
  * WordPress dependencies
  */
 import {
@@ -13,7 +8,6 @@ import {
 	__unstableUseBlockSelectionClearer as useBlockSelectionClearer,
 } from '@wordpress/block-editor';
 import { Popover, SlotFillProvider, Spinner } from '@wordpress/components';
-import { useViewportMatch } from '@wordpress/compose';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { useEffect, useMemo, useState } from '@wordpress/element';
 import {
@@ -53,7 +47,6 @@ const interfaceLabels = {
 
 export default function Layout( { blockEditorSettings } ) {
 	const contentAreaRef = useBlockSelectionClearer();
-	const isLargeViewport = useViewportMatch( 'medium' );
 	const [ isMenuNameControlFocused, setIsMenuNameControlFocused ] = useState(
 		false
 	);
@@ -94,7 +87,6 @@ export default function Layout( { blockEditorSettings } ) {
 	useMenuNotifications( selectedMenuId );
 
 	const hasMenus = !! menus?.length;
-	const hasPermanentSidebar = isLargeViewport && isMenuSelected;
 
 	const isBlockEditorReady = !! (
 		hasMenus &&
@@ -133,9 +125,7 @@ export default function Layout( { blockEditorSettings } ) {
 						) }
 					>
 						<InterfaceSkeleton
-							className={ classnames( 'edit-navigation-layout', {
-								'has-permanent-sidebar': hasPermanentSidebar,
-							} ) }
+							className="edit-navigation-layout"
 							labels={ interfaceLabels }
 							header={
 								<Header
@@ -177,8 +167,7 @@ export default function Layout( { blockEditorSettings } ) {
 								</>
 							}
 							sidebar={
-								( hasPermanentSidebar ||
-									hasSidebarEnabled ) && (
+								hasSidebarEnabled && (
 									<ComplementaryArea.Slot scope="core/edit-navigation" />
 								)
 							}
@@ -190,7 +179,6 @@ export default function Layout( { blockEditorSettings } ) {
 								onSelectMenu={ selectMenu }
 								onDeleteMenu={ deleteMenu }
 								isMenuBeingDeleted={ isMenuBeingDeleted }
-								hasPermanentSidebar={ hasPermanentSidebar }
 							/>
 						) }
 					</IsMenuNameControlFocusedContext.Provider>

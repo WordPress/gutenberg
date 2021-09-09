@@ -6,7 +6,10 @@ import { Text, Image } from 'react-native';
 /**
  * WordPress dependencies
  */
-import { usePreferredColorSchemeStyle } from '@wordpress/compose';
+import {
+	usePreferredColorScheme,
+	usePreferredColorSchemeStyle,
+} from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -37,10 +40,25 @@ export const HelpDetailSectionHeadingText = ( { text } ) => {
 	);
 };
 
-export const HelpDetailImage = ( props ) => {
+export const HelpDetailImage = ( {
+	accessible,
+	accessibilityLabel,
+	source,
+	sourceDarkMode,
+} ) => {
 	const imageStyle = usePreferredColorSchemeStyle(
 		styles.helpDetailImage,
 		styles.helpDetailImageDark
 	);
-	return <Image style={ imageStyle } { ...props } />;
+	const darkModeEnabled = usePreferredColorScheme() === 'dark';
+	return (
+		<Image
+			accessible={ accessible }
+			accessibilityLabel={ accessibilityLabel }
+			source={
+				darkModeEnabled && sourceDarkMode ? sourceDarkMode : source
+			}
+			style={ imageStyle }
+		/>
+	);
 };
