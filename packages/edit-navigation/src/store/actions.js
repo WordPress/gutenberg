@@ -134,7 +134,16 @@ export const saveNavigationPost = ( post ) => async ( {
 			throw new Error( error.message );
 		}
 
-		await dispatch( batchSaveMenuItems( post ) );
+		// Batch save menu items
+		const oldMenuItems = await dispatch(
+			resolveSelectMenuItems( post.meta.menuId )
+		);
+		const newMenuItems = await dispatch(
+			computeNewMenuItems( post, oldMenuItems )
+		);
+		await dispatch(
+			batchSaveDiff( 'root', 'menuItem', oldMenuItems, newMenuItems )
+		);
 
 		// Clear "stub" navigation post edits to avoid a false "dirty" state.
 		await registry
@@ -167,52 +176,6 @@ export const saveNavigationPost = ( post ) => async ( {
 	} finally {
 		await registry.dispatch( 'core' ).__unstableReleaseStoreLock( lock );
 	}
-};
-
-const batchSaveMenuItems = ( post ) => async ( { dispatch, registry } ) => {
-	const oldMenuItems = await dispatch(
-		resolveSelectMenuItems( post.meta.menuId )
-	);
-	const newMenuItems = await dispatch(
-		computeNewMenuItems( post, oldMenuItems )
-	);
-	const annotatedBatchTasks = await dispatch(
-		createBatchTasks( 'root', 'menuItem', oldMenuItems, newMenuItems )
-	);
-	const batchTasks = annotatedBatchTasks.map( ( { task } ) => task );
-	const results = await registry
-		.dispatch( 'core' )
-		.__experimentalBatch( batchTasks );
-
-	const failedDeletes = zip( annotatedBatchTasks, results )
-		.filter( ( [ { type } ] ) => type === 'delete' )
-		.filter( ( [ , result ] ) => ! result?.hasOwnProperty( 'deleted' ) )
-		.map( ( [ { id } ] ) => id );
-
-	const failedUpdates = annotatedBatchTasks
-		.filter( ( { type } ) => type === 'update' )
-		.filter(
-			( { id } ) =>
-				id &&
-				registry
-					.select( 'core' )
-					.getLastEntitySaveError( 'root', 'menuItem', id )
-		)
-		.map( ( { id } ) => id );
-
-	const failedEntityRecordIds = [ ...failedDeletes, ...failedUpdates ];
-
-	if ( failedEntityRecordIds.length ) {
-		throw new Error(
-			sprintf(
-				/* translators: %s: List of menu items ids */
-				__( 'Could not save the following menu items: %s.' ),
-				failedEntityRecordIds.join( ', ' )
-			)
-		);
-	}
-
-	return results;
 };
 
 const computeNewMenuItems = ( post, oldMenuItems ) => async ( {
@@ -250,6 +213,61 @@ const resolveSelectMenuItems = ( menuId ) => async ( { registry } ) =>
 	await registry
 		.resolveSelect( 'core' )
 		.getMenuItems( { menus: menuId, per_page: -1 } );
+
+const batchSaveDiff = (
+	kind,
+	type,
+	oldEntityRecords,
+	newEntityRecords
+) => async ( { dispatch, registry } ) => {
+	const annotatedBatchTasks = await dispatch(
+		createBatchTasks( kind, type, oldEntityRecords, newEntityRecords )
+	);
+
+	const results = await registry
+		.dispatch( 'core' )
+		.__experimentalBatch( annotatedBatchTasks.map( ( { task } ) => task ) );
+
+	const failures = await dispatch(
+		getFailedBatchTasks( kind, type, annotatedBatchTasks, results )
+	);
+
+	if ( failures.length ) {
+		throw new Error(
+			sprintf(
+				/* translators: %s: List of numeric ids */
+				__( 'Could not save the following records: %s.' ),
+				failures.map( ( { id } ) => id ).join( ', ' )
+			)
+		);
+	}
+
+	return results;
+};
+
+const getFailedBatchTasks = (
+	kind,
+	entityType,
+	annotatedBatchTasks,
+	results
+) => async ( { registry } ) => {
+	const failedDeletes = zip( annotatedBatchTasks, results )
+		.filter( ( [ { type } ] ) => type === 'delete' )
+		.filter( ( [ , result ] ) => ! result?.hasOwnProperty( 'deleted' ) )
+		.map( ( [ task ] ) => task );
+
+	const failedUpdates = annotatedBatchTasks
+		.filter( ( { type } ) => type === 'update' )
+		.filter(
+			( { id } ) =>
+				id &&
+				registry
+					.select( 'core' )
+					.getLastEntitySaveError( kind, entityType, id )
+		);
+
+	return [ ...failedDeletes, ...failedUpdates ];
+};
 
 const createBatchTasks = (
 	kind,
