@@ -211,7 +211,7 @@ export default function ManageLocations( {
 						variant="primary"
 						onClick={ updateMenuLocations }
 					>
-						{ __( 'Save' ) }
+						{ __( 'Update' ) }
 					</Button>
 				</Modal>
 			) }
