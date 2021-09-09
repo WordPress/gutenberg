@@ -8,13 +8,21 @@ import { noop } from 'lodash';
  * WordPress dependencies
  */
 import { forwardRef } from '@wordpress/element';
+import { UP, RIGHT, DOWN, LEFT } from '@wordpress/keycodes';
 
 /**
  * Internal dependencies
  */
 import { InputRange as BaseInputRange } from './styles/range-control-styles';
 import { useDebouncedHoverInteraction } from './utils';
-import { useJumpStep } from '../utils/hooks';
+import { add, subtract } from '../utils/math';
+
+const operationList = {
+	[ UP ]: add,
+	[ RIGHT ]: add,
+	[ DOWN ]: subtract,
+	[ LEFT ]: subtract,
+};
 
 function InputRange(
 	{
@@ -23,23 +31,29 @@ function InputRange(
 		label,
 		onHideTooltip = noop,
 		onMouseLeave = noop,
-		step = 1,
 		onBlur = noop,
 		onChange = noop,
 		onFocus = noop,
 		onMouseMove = noop,
+		onShiftStep,
 		onShowTooltip = noop,
-		shiftStep = 10,
+		shiftStep,
 		value,
 		...props
 	},
 	ref
 ) {
-	const jumpStep = useJumpStep( {
-		step,
-		shiftStep,
-		isShiftStepEnabled,
-	} );
+	const onKeyDown = ( event ) => {
+		const { keyCode, shiftKey } = event;
+		props.onKeyDown?.( event );
+
+		if ( isShiftStepEnabled && shiftKey && keyCode in operationList ) {
+			event.preventDefault();
+			const modifiedStep = shiftStep * props.step;
+			const nextValue = operationList[ keyCode ]( value, modifiedStep );
+			onShiftStep( nextValue );
+		}
+	};
 
 	const hoverInteractions = useDebouncedHoverInteraction( {
 		onHide: onHideTooltip,
@@ -58,8 +72,8 @@ function InputRange(
 			onBlur={ onBlur }
 			onChange={ onChange }
 			onFocus={ onFocus }
+			onKeyDown={ onKeyDown }
 			ref={ ref }
-			step={ jumpStep }
 			tabIndex={ 0 }
 			type="range"
 			value={ value }

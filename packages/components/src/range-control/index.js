@@ -226,6 +226,7 @@ function RangeControl(
 						onFocus={ handleOnFocus }
 						onMouseMove={ onMouseMove }
 						onMouseLeave={ onMouseLeave }
+						onShiftStep={ handleOnChange }
 						ref={ setRef }
 						shiftStep={ shiftStep }
 						step={ step }
