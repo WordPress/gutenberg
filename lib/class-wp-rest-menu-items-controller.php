@@ -738,7 +738,7 @@ class WP_REST_Menu_Items_Controller extends WP_REST_Posts_Controller {
 		}
 
 		if ( rest_is_field_included( '_invalid', $fields ) ) {
-			$data['_invalid'] = (boolean) $menu_item->_invalid;
+			$data['_invalid'] = (bool) $menu_item->_invalid;
 		}
 
 		if ( in_array( 'meta', $fields, true ) ) {
