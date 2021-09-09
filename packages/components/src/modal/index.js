@@ -34,11 +34,11 @@ let openModalCount = 0;
 export default function Modal( {
 	bodyOpenClassName = 'modal-open',
 	role = 'dialog',
-	title = null,
+	title = '',
 	focusOnMount = true,
 	shouldCloseOnEsc = true,
 	shouldCloseOnClickOutside = true,
-	isDismissable, // Deprecated
+	isDismissable = false, // Deprecated
 	isDismissible = isDismissable || true,
 	/* accessibility */
 	aria = {
@@ -46,13 +46,13 @@ export default function Modal( {
 		describedby: null,
 	},
 	onRequestClose,
-	icon,
+	icon = '',
 	closeButtonLabel,
 	children,
-	style,
-	overlayClassName,
-	className,
-	contentLabel,
+	style = null,
+	overlayClassName = '',
+	className = '',
+	contentLabel = null,
 	onKeyDown,
 } ) {
 	const ref = useRef();
