@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import { zip } from 'lodash';
+
+/**
  * WordPress dependencies
  */
 import { __, sprintf } from '@wordpress/i18n';
@@ -171,10 +176,43 @@ const batchSaveMenuItems = ( post ) => async ( { dispatch, registry } ) => {
 	const newMenuItems = await dispatch(
 		computeNewMenuItems( post, oldMenuItems )
 	);
-	const batchTasks = await dispatch(
-		createBatchSave( 'root', 'menuItem', oldMenuItems, newMenuItems )
+	const annotatedBatchTasks = await dispatch(
+		createBatchTasks( 'root', 'menuItem', oldMenuItems, newMenuItems )
 	);
-	return await registry.dispatch( 'core' ).__experimentalBatch( batchTasks );
+	const batchTasks = annotatedBatchTasks.map( ( { task } ) => task );
+	const results = await registry
+		.dispatch( 'core' )
+		.__experimentalBatch( batchTasks );
+
+	const failedDeletes = zip( annotatedBatchTasks, results )
+		.filter( ( [ { type } ] ) => type === 'delete' )
+		.filter( ( [ , result ] ) => ! result?.hasOwnProperty( 'deleted' ) )
+		.map( ( [ { id } ] ) => id );
+
+	const failedUpdates = annotatedBatchTasks
+		.filter( ( { type } ) => type === 'update' )
+		.filter(
+			( { id } ) =>
+				id &&
+				registry
+					.select( 'core' )
+					.getLastEntitySaveError( 'root', 'menuItem', id )
+		)
+		.map( ( { id } ) => id );
+
+	const failedEntityRecordIds = [ ...failedDeletes, ...failedUpdates ];
+
+	if ( failedEntityRecordIds.length ) {
+		throw new Error(
+			sprintf(
+				/* translators: %s: List of menu items ids */
+				__( 'Could not save the following menu items: %s.' ),
+				failedEntityRecordIds.join( ', ' )
+			)
+		);
+	}
+
+	return results;
 };
 
 const computeNewMenuItems = ( post, oldMenuItems ) => async ( {
@@ -213,7 +251,7 @@ const resolveSelectMenuItems = ( menuId ) => async ( { registry } ) =>
 		.resolveSelect( 'core' )
 		.getMenuItems( { menus: menuId, per_page: -1 } );
 
-const createBatchSave = (
+const createBatchTasks = (
 	kind,
 	type,
 	oldEntityRecords,
@@ -251,18 +289,24 @@ const createBatchSave = (
 			continue;
 		}
 
-		batchTasks.unshift( ( { saveEditedEntityRecord } ) =>
-			saveEditedEntityRecord( kind, type, entityRecord.id )
-		);
+		batchTasks.unshift( {
+			type: 'update',
+			id: entityRecord.id,
+			task: ( { saveEditedEntityRecord } ) =>
+				saveEditedEntityRecord( kind, type, entityRecord.id ),
+		} );
 	}
 
 	// Enqueue deletes
 	for ( const entityRecordId of deletedEntityRecordsIds ) {
-		batchTasks.unshift( ( { deleteEntityRecord } ) =>
-			deleteEntityRecord( kind, type, entityRecordId, {
-				force: true,
-			} )
-		);
+		batchTasks.unshift( {
+			type: 'delete',
+			id: entityRecordId,
+			task: ( { deleteEntityRecord } ) =>
+				deleteEntityRecord( kind, type, entityRecordId, {
+					force: true,
+				} ),
+		} );
 	}
 
 	return batchTasks;
