@@ -658,8 +658,8 @@ class WP_Theme_JSON_Gutenberg {
 	 *
 	 * <code>
 	 * $settings = array(
-	 *     'color' => array(
-	 *         'palette' => array(
+	 *     'typography' => array(
+	 *         'fontFamilies' => array(
 	 *             array(
 	 *                 'slug'       => 'sansSerif',
 	 *                 'fontFamily' => '"Helvetica Neue", sans-serif',
