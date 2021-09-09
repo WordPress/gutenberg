@@ -274,66 +274,6 @@ class REST_Nav_Menu_Items_Controller_Test extends WP_Test_REST_Post_Type_Control
 	/**
 	 *
 	 */
-	public function test_create_item_change_position() {
-		wp_set_current_user( self::$admin_id );
-		$new_menu_id = wp_create_nav_menu( rand_str() );
-		$expected    = array();
-		$actual      = array();
-		for ( $i = 1; $i < 5; $i ++ ) {
-			$request = new WP_REST_Request( 'POST', '/__experimental/menu-items' );
-			$request->add_header( 'content-type', 'application/x-www-form-urlencoded' );
-			$params = $this->set_menu_item_data(
-				array(
-					'menu_order' => $i,
-					'menus'      => $new_menu_id,
-				)
-			);
-			$request->set_body_params( $params );
-			$response = rest_get_server()->dispatch( $request );
-			$this->check_create_menu_item_response( $response );
-			$data = $response->get_data();
-
-			$expected[] = $i;
-			$actual[]   = $data['menu_order'];
-		}
-		$this->assertEquals( $actual, $expected );
-	}
-
-	/**
-	 *
-	 */
-	public function test_menu_order_must_be_set() {
-		wp_set_current_user( self::$admin_id );
-		$new_menu_id = wp_create_nav_menu( rand_str() );
-
-		$request = new WP_REST_Request( 'POST', '/__experimental/menu-items' );
-		$request->add_header( 'content-type', 'application/x-www-form-urlencoded' );
-		$params = $this->set_menu_item_data(
-			array(
-				'menu_order' => 0,
-				'menus'      => $new_menu_id,
-			)
-		);
-		$request->set_body_params( $params );
-		$response = rest_get_server()->dispatch( $request );
-		$this->assertErrorResponse( 'rest_invalid_param', $response, 400 );
-
-		$request = new WP_REST_Request( 'POST', '/__experimental/menu-items' );
-		$request->add_header( 'content-type', 'application/x-www-form-urlencoded' );
-		$params = $this->set_menu_item_data(
-			array(
-				'menu_order' => 1,
-				'menus'      => $new_menu_id,
-			)
-		);
-		$request->set_body_params( $params );
-		$response = rest_get_server()->dispatch( $request );
-		$this->assertEquals( 201, $response->get_status() );
-	}
-
-	/**
-	 *
-	 */
 	public function test_create_item_invalid_position_2() {
 		wp_set_current_user( self::$admin_id );
 		$new_menu_id = wp_create_nav_menu( rand_str() );
