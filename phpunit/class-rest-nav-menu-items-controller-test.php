@@ -274,59 +274,6 @@ class REST_Nav_Menu_Items_Controller_Test extends WP_Test_REST_Post_Type_Control
 	/**
 	 *
 	 */
-	public function test_create_item_change_position() {
-		wp_set_current_user( self::$admin_id );
-		$new_menu_id = wp_create_nav_menu( rand_str() );
-		for ( $i = 1; $i < 5; $i ++ ) {
-			$request = new WP_REST_Request( 'POST', '/__experimental/menu-items' );
-			$request->add_header( 'content-type', 'application/x-www-form-urlencoded' );
-			$params = $this->set_menu_item_data(
-				array(
-					'menus' => $new_menu_id,
-				)
-			);
-			$request->set_body_params( $params );
-			$response = rest_get_server()->dispatch( $request );
-			$this->check_create_menu_item_response( $response );
-			$data = $response->get_data();
-			$this->assertEquals( $data['menu_order'], $i );
-		}
-	}
-
-	/**
-	 *
-	 */
-	public function test_create_item_invalid_position() {
-		wp_set_current_user( self::$admin_id );
-		$new_menu_id = wp_create_nav_menu( rand_str() );
-		$request     = new WP_REST_Request( 'POST', '/__experimental/menu-items' );
-		$request->add_header( 'content-type', 'application/x-www-form-urlencoded' );
-		$params = $this->set_menu_item_data(
-			array(
-				'menu_order' => 1,
-				'menus'      => $new_menu_id,
-			)
-		);
-		$request->set_body_params( $params );
-		$response = rest_get_server()->dispatch( $request );
-		$this->check_create_menu_item_response( $response );
-		$request = new WP_REST_Request( 'POST', '/__experimental/menu-items' );
-		$request->add_header( 'content-type', 'application/x-www-form-urlencoded' );
-		$params = $this->set_menu_item_data(
-			array(
-				'menu_order' => 1,
-				'menus'      => $new_menu_id,
-			)
-		);
-		$request->set_body_params( $params );
-		$response = rest_get_server()->dispatch( $request );
-
-		$this->assertErrorResponse( 'invalid_menu_order', $response, 400 );
-	}
-
-	/**
-	 *
-	 */
 	public function test_create_item_invalid_position_2() {
 		wp_set_current_user( self::$admin_id );
 		$new_menu_id = wp_create_nav_menu( rand_str() );
@@ -378,43 +325,6 @@ class REST_Nav_Menu_Items_Controller_Test extends WP_Test_REST_Post_Type_Control
 		$request->set_body_params( $params );
 		$response = rest_get_server()->dispatch( $request );
 		$this->assertErrorResponse( 'rest_invalid_param', $response, 400 );
-	}
-
-	/**
-	 *
-	 */
-	public function test_create_item_invalid_parent_menu_item() {
-		wp_set_current_user( self::$admin_id );
-		$new_menu_id = wp_create_nav_menu( rand_str() );
-		$request     = new WP_REST_Request( 'POST', '/__experimental/menu-items' );
-		$request->add_header( 'content-type', 'application/x-www-form-urlencoded' );
-		$params = $this->set_menu_item_data(
-			array(
-				'menus'  => $new_menu_id,
-				'parent' => $this->menu_item_id,
-			)
-		);
-		$request->set_body_params( $params );
-		$response = rest_get_server()->dispatch( $request );
-		$this->assertErrorResponse( 'invalid_item_parent', $response, 400 );
-	}
-
-	/**
-	 *
-	 */
-	public function test_create_item_invalid_parent_post() {
-		wp_set_current_user( self::$admin_id );
-		$post_id = self::factory()->post->create();
-		$request = new WP_REST_Request( 'POST', '/__experimental/menu-items' );
-		$request->add_header( 'content-type', 'application/x-www-form-urlencoded' );
-		$params = $this->set_menu_item_data(
-			array(
-				'parent' => $post_id,
-			)
-		);
-		$request->set_body_params( $params );
-		$response = rest_get_server()->dispatch( $request );
-		$this->assertErrorResponse( 'invalid_menu_item_parent', $response, 400 );
 	}
 
 	/**
