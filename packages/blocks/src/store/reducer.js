@@ -106,8 +106,15 @@ export function blockStyles( state = {}, action ) {
 					( blockType ) => {
 						return uniqBy(
 							[
-								...get( blockType, [ 'styles' ], [] ),
-								...get( state, [ blockType.name ], [] ),
+								...get( blockType, [ 'styles' ], [] ).map(
+									( style ) => ( {
+										...style,
+										source: 'block',
+									} )
+								),
+								...get( state, [ blockType.name ], [] ).filter(
+									( { source } ) => 'block' !== source
+								),
 							],
 							( style ) => style.name
 						);
@@ -156,8 +163,15 @@ export function blockVariations( state = {}, action ) {
 					( blockType ) => {
 						return uniqBy(
 							[
-								...get( blockType, [ 'variations' ], [] ),
-								...get( state, [ blockType.name ], [] ),
+								...get( blockType, [ 'variations' ], [] ).map(
+									( variation ) => ( {
+										...variation,
+										source: 'block',
+									} )
+								),
+								...get( state, [ blockType.name ], [] ).filter(
+									( { source } ) => 'block' !== source
+								),
 							],
 							( variation ) => variation.name
 						);
