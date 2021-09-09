@@ -301,8 +301,8 @@ class WP_Theme_JSON_Gutenberg {
 		// Internally, presets are keyed by origin.
 		$nodes = self::get_setting_nodes( $this->theme_json );
 		foreach ( $nodes as $node ) {
-			foreach ( self::PRESETS_METADATA as $preset ) {
-				$path   = array_merge( $node['path'], $preset['path'] );
+			foreach ( self::PRESETS_METADATA as $preset_meta ) {
+				$path   = array_merge( $node['path'], $preset_meta['path'] );
 				$preset = _wp_array_get( $this->theme_json, $path, null );
 				if ( null !== $preset ) {
 					gutenberg_experimental_set( $this->theme_json, $path, array( $origin => $preset ) );
@@ -683,12 +683,12 @@ class WP_Theme_JSON_Gutenberg {
 	 * </code>
 	 *
 	 * @param array $settings Settings to process.
-	 * @param array $meta One of the PRESETS_METADATA values.
+	 * @param array $preset_meta One of the PRESETS_METADATA values.
 	 *
 	 * @return array Array of presets where each key is a slug and each value is the preset value.
 	 */
-	private static function get_settings_values_by_slug( $settings, $meta ) {
-		$preset_per_origin = _wp_array_get( $settings, $meta['path'], array() );
+	private static function get_settings_values_by_slug( $settings, $preset_meta ) {
+		$preset_per_origin = _wp_array_get( $settings, $preset_meta['path'], array() );
 
 		$result = array();
 		foreach ( self::VALID_ORIGINS as $origin ) {
@@ -699,14 +699,14 @@ class WP_Theme_JSON_Gutenberg {
 				$slug = gutenberg_experimental_to_kebab_case( $preset['slug'] );
 
 				$value = '';
-				if ( isset( $meta['value_key'] ) ) {
-					$value_key = $meta['value_key'];
+				if ( isset( $preset_meta['value_key'] ) ) {
+					$value_key = $preset_meta['value_key'];
 					$value     = $preset[ $value_key ];
-				} elseif ( is_callable( $meta['value_func'] ) ) {
-					$value_func = $meta['value_func'];
+				} elseif ( is_callable( $preset_meta['value_func'] ) ) {
+					$value_func = $preset_meta['value_func'];
 					$value_args = array();
-					foreach ( $meta['value_args'] as $meta_arg ) {
-						$value_args[] = $preset[ $meta_arg ];
+					foreach ( $preset_meta['value_args'] as $preset_meta_arg ) {
+						$value_args[] = $preset[ $preset_meta_arg ];
 					}
 					$value = call_user_func_array( $value_func, $value_args );
 				} else {
@@ -724,12 +724,12 @@ class WP_Theme_JSON_Gutenberg {
 	 * Similar to get_settings_values_by_slug, but doesn't compute the value.
 	 *
 	 * @param array $settings Settings to process.
-	 * @param array $meta One of the PRESETS_METADATA values.
+	 * @param array $preset_meta One of the PRESETS_METADATA values.
 	 *
 	 * @return array Array of presets where the key and value are both the slug.
 	 */
-	private static function get_settings_slugs( $settings, $meta ) {
-		$preset_per_origin = _wp_array_get( $settings, $meta['path'], array() );
+	private static function get_settings_slugs( $settings, $preset_meta ) {
+		$preset_per_origin = _wp_array_get( $settings, $preset_meta['path'], array() );
 
 		$result = array();
 		foreach ( self::VALID_ORIGINS as $origin ) {
@@ -763,16 +763,16 @@ class WP_Theme_JSON_Gutenberg {
 		}
 
 		$stylesheet = '';
-		foreach ( self::PRESETS_METADATA as $meta ) {
-			$slugs = self::get_settings_slugs( $settings, $meta );
-			foreach ( $meta['classes'] as $class ) {
+		foreach ( self::PRESETS_METADATA as $preset_meta ) {
+			$slugs = self::get_settings_slugs( $settings, $preset_meta );
+			foreach ( $preset_meta['classes'] as $class ) {
 				foreach ( $slugs as $slug ) {
 					$stylesheet .= self::to_ruleset(
 						self::append_to_selector( $selector, '.has-' . $slug . '-' . $class['class_suffix'] ),
 						array(
 							array(
 								'name'  => $class['property_name'],
-								'value' => 'var(--wp--preset--' . $meta['css_var_infix'] . '--' . $slug . ') !important',
+								'value' => 'var(--wp--preset--' . $preset_meta['css_var_infix'] . '--' . $slug . ') !important',
 							),
 						)
 					);
@@ -801,11 +801,11 @@ class WP_Theme_JSON_Gutenberg {
 	 */
 	private static function compute_preset_vars( $settings ) {
 		$declarations = array();
-		foreach ( self::PRESETS_METADATA as $meta ) {
-			$values_by_slug = self::get_settings_values_by_slug( $settings, $meta );
+		foreach ( self::PRESETS_METADATA as $preset_meta ) {
+			$values_by_slug = self::get_settings_values_by_slug( $settings, $preset_meta );
 			foreach ( $values_by_slug as $slug => $value ) {
 				$declarations[] = array(
-					'name'  => '--wp--preset--' . $meta['css_var_infix'] . '--' . $slug,
+					'name'  => '--wp--preset--' . $preset_meta['css_var_infix'] . '--' . $slug,
 					'value' => $value,
 				);
 			}
