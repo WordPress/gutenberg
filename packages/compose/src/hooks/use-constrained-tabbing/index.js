@@ -54,12 +54,10 @@ function useConstrainedTabbing() {
 				event.preventDefault();
 				/** @type {HTMLElement} */ ( firstTabbable ).focus();
 				/*
-				 * When pressing Tab and none of the tabbables has focus, the keydown
-				 * event happens on the wrapper div: move focus on the first tabbable.
+				 * When pressing Tab and the target element is the wrapper node,
+				 * move focus on the first tabbable.
 				 */
-			} else if (
-				! tabbables.includes( /** @type {Element} */ ( event.target ) )
-			) {
+			} else if ( node === event.target ) {
 				event.preventDefault();
 				/** @type {HTMLElement} */ ( firstTabbable ).focus();
 			}
