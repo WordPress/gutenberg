@@ -128,6 +128,8 @@ function block_core_page_list_build_css_font_sizes( $context ) {
 /**
  * Outputs Page list markup from an array of pages with nested children.
  *
+ * @param boolean $open_submenus_on_click Whether to open submenus on click instead of hover.
+ * @param boolean $show_submenu_icons Whether to show submenu indicator icons.
  * @param boolean $is_navigation_child If block is a child of Navigation block.
  * @param array   $nested_pages The array of nested pages.
  * @param array   $active_page_ancestor_ids An array of ancestor ids for active page.
@@ -155,7 +157,7 @@ function block_core_page_list_render_nested_page_list( $open_submenus_on_click, 
 
 			if ( $open_submenus_on_click ) {
 				$css_class .= ' open-on-click';
-			} else if ( $show_submenu_icons ) {
+			} elseif ( $show_submenu_icons ) {
 				$css_class .= ' open-on-hover-click';
 			}
 		}
