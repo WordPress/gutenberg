@@ -49,6 +49,7 @@ Accessible label. If provided, sets the `aria-label` attribute of the underlying
 ### defaultValue
 
 If provided, sets the default alignment value.
+
 - Type: `string`
 - Required: No
 - Default: `center center`
