@@ -52,8 +52,8 @@ const GradientAnglePicker = ( { gradientAST, hasGradient, onChange } ) => {
 	};
 	return (
 		<AnglePickerControl
-			hideLabelFromVision
 			onChange={ onAngleChange }
+			labelPosition="top"
 			value={ hasGradient ? angle : '' }
 		/>
 	);
@@ -95,7 +95,7 @@ const GradientTypePicker = ( { gradientAST, hasGradient, onChange } ) => {
 		<SelectControl
 			className="components-custom-gradient-picker__type-picker"
 			label={ __( 'Type' ) }
-			labelPosition={ 'side' }
+			labelPosition="top"
 			onChange={ handleOnChange }
 			options={ GRADIENT_OPTIONS }
 			value={ hasGradient && type }
