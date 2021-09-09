@@ -320,6 +320,22 @@ describe( 'ToolsPanel', () => {
 			expect( altControlProps.onSelect ).not.toHaveBeenCalled();
 			expect( altControlProps.onDeselect ).not.toHaveBeenCalled();
 		} );
+
+		// This confirms the internal `isResetting` state when resetting all
+		// controls does not prevent subsequent individual reset requests.
+		// i.e. onDeselect callbacks are called correctly after a resetAll.
+		it( 'should call onDeselect after previous reset all', async () => {
+			renderPanel();
+
+			await selectMenuItem( 'Reset all' ); // Initial control is displayed by default.
+			await selectMenuItem( controlProps.label ); // Re-display control.
+
+			expect( controlProps.onDeselect ).not.toHaveBeenCalled();
+
+			await selectMenuItem( controlProps.label ); // Reset control.
+
+			expect( controlProps.onDeselect ).toHaveBeenCalled();
+		} );
 	} );
 
 	describe( 'grouped panel items within custom components', () => {

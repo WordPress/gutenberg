@@ -23,12 +23,6 @@ export function useToolsPanel( props ) {
 
 	const isResetting = useRef( false );
 
-	useEffect( () => {
-		if ( isResetting.current ) {
-			isResetting.current = false;
-		}
-	}, [ isResetting ] );
-
 	// Allow panel items to register themselves.
 	const [ panelItems, setPanelItems ] = useState( [] );
 
@@ -109,6 +103,12 @@ export function useToolsPanel( props ) {
 		deregisterPanelItem,
 		isResetting: isResetting.current,
 	};
+
+	// Clean up isResetting after advising panel context we were resetting
+	// all controls. This lets panel items know to skip onDeselect callbacks.
+	if ( isResetting.current ) {
+		isResetting.current = false;
+	}
 
 	return {
 		...otherProps,
