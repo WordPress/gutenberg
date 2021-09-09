@@ -68,6 +68,18 @@ exports[`Copy/cut/paste of whole blocks should cut and paste individual blocks 2
 <!-- /wp:paragraph -->"
 `;
 
+exports[`Copy/cut/paste of whole blocks should handle paste events once 1`] = `
+"<!-- wp:paragraph -->
+<p></p>
+<!-- /wp:paragraph -->
+
+<!-- wp:group -->
+<div class=\\"wp-block-group\\"><!-- wp:paragraph -->
+<p>P</p>
+<!-- /wp:paragraph --></div>
+<!-- /wp:group -->"
+`;
+
 exports[`Copy/cut/paste of whole blocks should respect inline copy in places like input fields and textareas 1`] = `
 "<!-- wp:shortcode -->
 [my-shortcode]
