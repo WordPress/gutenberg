@@ -264,6 +264,7 @@ export function registerBlockType( blockNameOrMetadata, settings ) {
 		usesContext: [],
 		supports: {},
 		styles: [],
+		variations: [],
 		save: () => null,
 		...serverSideBlockDefinitions?.[ name ],
 		...settings,

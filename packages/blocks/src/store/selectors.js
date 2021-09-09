@@ -51,15 +51,8 @@ export function __experimentalGetUnprocessedBlockTypes( state ) {
  * @return {Array} Block Types.
  */
 export const getBlockTypes = createSelector(
-	( state ) => {
-		return Object.values( state.blockTypes ).map( ( blockType ) => {
-			return {
-				...blockType,
-				variations: getBlockVariations( state, blockType.name ),
-			};
-		} );
-	},
-	( state ) => [ state.blockTypes, state.blockVariations ]
+	( state ) => Object.values( state.blockTypes ),
+	( state ) => [ state.blockTypes ]
 );
 
 /**
