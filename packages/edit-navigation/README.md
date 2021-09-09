@@ -61,9 +61,14 @@ This unlocks significant additional capabilities in the Navigation Editor. For e
 
 #### Technical Implementation details
 
-By default, `core/navigation-link` ("Navigation link") items are serialized and persisted as `nav_menu_item` posts. No serialized block HTML is stored for these standard link blocks.
+There are two types of item that can be added to a navigation:
 
-_Non_-link navigation items however, are [persisted as `nav_menu_items` with a special `type` of `block`](https://github.com/WordPress/gutenberg/blob/7fcd57c9a62c232899e287f6d96416477d810d5e/packages/edit-navigation/src/store/utils.js#L159-L166). These items have an [_additional_ `content` field which is used to store the serialized block markup](https://github.com/WordPress/gutenberg/blob/7fcd57c9a62c232899e287f6d96416477d810d5e/lib/navigation.php#L71-L101).
+1. Navigation links - these utilise the `core/navigation-link` block and are _not_ persisted as blocks.
+2. Block-based links - these are any item that is _not_ a `core/navigation-link` block. They are persisted as blocks (via a wrapper - see below).
+
+By default, Navigation link items are serialized and persisted as `nav_menu_item` posts. No serialized block HTML is stored for these standard link blocks.
+
+Block-based link items however, are [persisted as `nav_menu_items` with a special `type` of `block`](https://github.com/WordPress/gutenberg/blob/7fcd57c9a62c232899e287f6d96416477d810d5e/packages/edit-navigation/src/store/utils.js#L159-L166). These items have an [_additional_ `content` field which is used to store the serialized block markup](https://github.com/WordPress/gutenberg/blob/7fcd57c9a62c232899e287f6d96416477d810d5e/lib/navigation.php#L71-L101).
 
 When rendered on the front-end, the blocks are [`parse`d from the `content` field](https://github.com/WordPress/gutenberg/blob/7fcd57c9a62c232899e287f6d96416477d810d5e/lib/navigation.php#L191-L203) and [rendered as blocks](https://github.com/WordPress/gutenberg/blob/7fcd57c9a62c232899e287f6d96416477d810d5e/lib/navigation.php#L103-L135).
 
@@ -170,7 +175,8 @@ return (
 
 ## Glossary
 
--   **Link block** - the basic `core/navigation-link` block which is the standard block used to add links within navigations.
+-   **(Navigation) link** - the basic `core/navigation-link` block which is the standard block used to add links within navigations.
+-   **Block-based link** - any navigation item that is _not_ a `core/navigation-link` block. These are persisted as blocks but still utilise the existing Menus post type system.
 -   **Navigation block** - the root `core/navigation` block which can be used both with the Navigation Editor and outside (eg: Post / Site Editor).
 -   **Navigation editor / screen** - the new screen provided by Gutenberg to allow the user to edit navigations using a block-based UI.
 -   **Menus screen** - the current/existing [interface/screen for managing Menus](https://codex.wordpress.org/WordPress_Menu_User_Guide) in WordPress WPAdmin.
