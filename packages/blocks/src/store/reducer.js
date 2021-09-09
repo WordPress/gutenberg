@@ -42,7 +42,9 @@ export const DEFAULT_CATEGORIES = [
 ];
 
 /**
- * Reducer managing the unprocessed block types registered by block authors.
+ * Reducer managing the unprocessed block types in a form passed when registering the by block.
+ * It's for internal use only. It allows to recompute the processed block types on-demand after block type filters
+ * get added or removed.
  *
  * @param {Object} state  Current state.
  * @param {Object} action Dispatched action.
@@ -65,6 +67,7 @@ export function unprocessedBlockTypes( state = {}, action ) {
 
 /**
  * Reducer managing the processed block types with all filters applied.
+ * The state is derived from the `unprocessedBlockTypes` reducer.
  *
  * @param {Object} state  Current state.
  * @param {Object} action Dispatched action.

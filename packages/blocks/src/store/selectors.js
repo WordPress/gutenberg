@@ -33,7 +33,7 @@ const getNormalizedBlockType = ( state, nameOrType ) =>
 		: nameOrType;
 
 /**
- * Returns all the unprocessed block types.
+ * Returns all the unprocessed block types as passed during the registration.
  *
  * @param {Object} state Data state.
  *

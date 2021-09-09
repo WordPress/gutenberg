@@ -19,6 +19,13 @@ export function addBlockTypes( blockTypes ) {
 	};
 }
 
+/**
+ * Yields action objects signalling that the passed block type's settings should be stored in the state.
+ *
+ * @param {WPBlockType} blockType Unprocessed block type settings.
+ *
+ * @yield {Object} Action object.
+ */
 export function* __experimentalAddBlockType( blockType ) {
 	yield {
 		type: 'ADD_UNPROCESSED_BLOCK_TYPE',
@@ -30,6 +37,12 @@ export function* __experimentalAddBlockType( blockType ) {
 	};
 }
 
+/**
+ * Yields an action object signalling that all block types should be computed again.
+ * It uses stored unprocessed block types and all the most recent list of registration filters.
+ *
+ * @yield {Object} Action object.
+ */
 export function* __experimentalReapplyBlockTypeFilters() {
 	yield {
 		type: 'REAPPLY_BLOCK_TYPE_FILTERS',

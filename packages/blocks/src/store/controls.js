@@ -30,6 +30,15 @@ const LEGACY_CATEGORY_MAPPING = {
 	layout: 'design',
 };
 
+/**
+ * Takes the unprocessed block type data and applies all the existing filters for the registered block type.
+ * Next, it validates all the settings and performs additional processing to the block type definition.
+ *
+ * @param {WPBlockType} blockType Unprocessed block type settings.
+ * @param {Function}    select    Calls a selector given the current state and extra arguments.
+ *
+ * @return {?WPBlockType} The block, if it has been successfully registered; otherwise `undefined`.
+ */
 function processBlockType( blockType, select ) {
 	const { name } = blockType;
 
