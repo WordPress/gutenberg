@@ -284,6 +284,7 @@ export function getGlobalStyles( rawStyles, rawFeatures ) {
 						{
 							width: dimensions.width,
 							height: dimensions.height,
+							fontSize: 16,
 						}
 					);
 					return fontSizeObject;
