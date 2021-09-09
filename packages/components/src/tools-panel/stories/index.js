@@ -77,13 +77,7 @@ export const _default = () => {
 	);
 };
 
-const { Fill, Slot } = createSlotFill( 'ToolsPanelSlot' );
-
-const ToolsPanelItems = ( { children } ) => {
-	return <Fill>{ children }</Fill>;
-};
-ToolsPanelItems.Slot = Slot;
-
+const { Fill: ToolsPanelItems, Slot } = createSlotFill( 'ToolsPanelSlot' );
 const panelId = 'unique-tools-panel-id';
 
 export const WithSlotFillItems = () => {
@@ -165,7 +159,7 @@ export const WithSlotFillItems = () => {
 						resetAll={ resetAll }
 						panelId={ panelId }
 					>
-						<ToolsPanelItems.Slot />
+						<Slot />
 					</ToolsPanel>
 				</Panel>
 			</PanelWrapperView>
