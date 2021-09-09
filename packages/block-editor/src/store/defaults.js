@@ -100,26 +100,31 @@ export const SETTINGS_DEFAULTS = {
 		{
 			name: _x( 'Small', 'font size name' ),
 			size: 13,
+			sizePx: '13px',
 			slug: 'small',
 		},
 		{
 			name: _x( 'Normal', 'font size name' ),
 			size: 16,
+			sizePx: '16px',
 			slug: 'normal',
 		},
 		{
 			name: _x( 'Medium', 'font size name' ),
 			size: 20,
+			sizePx: '20px',
 			slug: 'medium',
 		},
 		{
 			name: _x( 'Large', 'font size name' ),
 			size: 36,
+			sizePx: '36px',
 			slug: 'large',
 		},
 		{
 			name: _x( 'Huge', 'font size name' ),
 			size: 42,
+			sizePx: '42px',
 			slug: 'huge',
 		},
 	],
