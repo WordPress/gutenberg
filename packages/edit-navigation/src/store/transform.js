@@ -106,15 +106,27 @@ export const blockAttributesToMenuItem = ( {
 		type = 'post_tag';
 	}
 
-	const menuItem = {
+	return {
 		title: label,
 		url,
-		description,
-		xfn: rel?.trim().split( ' ' ),
-		classes: className?.trim().split( ' ' ),
-		attr_title: blockTitleAttr,
-		object: type,
-		type: kind === 'custom' ? '' : kind?.replace( '-', '_' ),
+		...( description?.length && {
+			description,
+		} ),
+		...( rel?.length && {
+			xfn: rel?.trim().split( ' ' ),
+		} ),
+		...( className?.length && {
+			classes: className?.trim().split( ' ' ),
+		} ),
+		...( blockTitleAttr?.length && {
+			attr_title: blockTitleAttr,
+		} ),
+		...( type?.length && {
+			object: type,
+		} ),
+		...( kind?.length && {
+			type: kind?.replace( '-', '_' ),
+		} ),
 		// Only assign object_id if it's a entity type (ie: not "custom").
 		...( id &&
 			'custom' !== type && {
@@ -122,11 +134,6 @@ export const blockAttributesToMenuItem = ( {
 			} ),
 		target: opensInNewTab ? NEW_TAB_TARGET_ATTRIBUTE : '',
 	};
-
-	// Filter out the empty values
-	return Object.fromEntries(
-		Object.entries( menuItem ).filter( ( [ , v ] ) => v )
-	);
 };
 
 /**
@@ -235,28 +242,35 @@ export function menuItemToBlockAttributes( {
 		object = 'tag';
 	}
 
-	const attributes = {
+	return {
 		label: menuItemTitleField?.rendered || '',
-		type: object,
+		...( object?.length && {
+			type: object,
+		} ),
 		kind: menuItemTypeField?.replace( '_', '-' ) || 'custom',
 		url: url || '',
-		rel: xfn?.join( ' ' ).trim(),
-		className: classes?.join( ' ' ).trim(),
-		title: attr_title?.raw || attr_title || menuItemTitleField?.raw,
+		...( xfn?.length &&
+			xfn.join( ' ' ).trim() && {
+				rel: xfn.join( ' ' ).trim(),
+			} ),
+		...( classes?.length &&
+			classes.join( ' ' ).trim() && {
+				className: classes.join( ' ' ).trim(),
+			} ),
+		...( attr_title?.length && {
+			title: attr_title,
+		} ),
 		...( object_id &&
 			'custom' !== object && {
 				id: object_id,
 			} ),
-		description,
+		...( description?.length && {
+			description,
+		} ),
 		...( target === NEW_TAB_TARGET_ATTRIBUTE && {
 			opensInNewTab: true,
 		} ),
 	};
-
-	// Filter out the empty values
-	return Object.fromEntries(
-		Object.entries( attributes ).filter( ( [ , v ] ) => v )
-	);
 }
 /* eslint-enable camelcase */
 

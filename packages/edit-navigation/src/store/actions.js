@@ -75,7 +75,7 @@ export const createMissingMenuItems = ( post ) => async ( {
 	}
 };
 
-const createPlaceholderMenuItem = ( block, menuId ) => async ( {
+export const createPlaceholderMenuItem = ( block, menuId ) => async ( {
 	registry,
 	dispatch,
 } ) => {
