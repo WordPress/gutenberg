@@ -79,12 +79,7 @@ export function blockTypes( state = {}, action ) {
 		case 'ADD_BLOCK_TYPES':
 			return {
 				...state,
-				...keyBy(
-					map( action.blockTypes, ( blockType ) =>
-						omit( blockType, 'styles ' )
-					),
-					'name'
-				),
+				...keyBy( action.blockTypes, 'name' ),
 			};
 		case 'REMOVE_BLOCK_TYPES':
 			return omit( state, action.names );
