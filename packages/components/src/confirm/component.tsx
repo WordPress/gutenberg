@@ -21,35 +21,37 @@ import {
 	contextConnect,
 	WordPressComponentProps,
 } from '../ui/context';
-import { View } from '../view';
 import { Flex } from '../flex';
 import Button from '../button';
+import * as styles from './styles';
+import { useCx } from '../utils/hooks/use-cx';
 
 function Confirm(
 	props: WordPressComponentProps< OwnProps, 'div', false >,
 	forwardedRef: Ref< any >
 ) {
 	const {
-		isOpen,
+		isOpen = true,
 		message,
 		onConfirm,
 		onCancel,
-		...otherProps
+		selfClose = true,
 	} = useContextSystem( props, 'Confirm' );
 
-	const [ _isOpen, setIsOpen ] = useState( false );
+	const cx = useCx();
+	const wrapperClassName = cx( styles.wrapper );
+
+	const [ _isOpen, setIsOpen ] = useState<Boolean>();
 
 	useEffect( () => {
-		setIsOpen( isOpen || false );
+		setIsOpen( isOpen );
 	}, [ isOpen ] );
 
 	const closeAndHandle = (
 		callback: ( event: MouseEvent< HTMLButtonElement > ) => void
 	) => ( event: MouseEvent< HTMLButtonElement > ) => {
-		if ( typeof callback === 'function' ) {
-			callback( event );
-		} else {
-			// standalone/uncontrolled usage
+		callback( event );
+		if ( selfClose ) {
 			setIsOpen( false );
 		}
 	};
@@ -57,14 +59,14 @@ function Confirm(
 	return (
 		<>
 			{ _isOpen && (
-				<View ref={ forwardedRef } { ...otherProps }>
 					<Modal
 						title={ message }
+						overlayClassName={ wrapperClassName }
 						onRequestClose={ closeAndHandle( onCancel ) }
 						onKeyDown={ closeAndHandle( onCancel ) }
-						className="edit-post-keyboard-shortcut-help-modal"
 						closeButtonLabel={ __( 'Cancel' ) }
-						isDismissible={ false } // This should probably be renamed to `showCancelButton` in Modal? Food for thought.
+						isDismissible={ false }
+						forwardedRef={ forwardedRef }
 					>
 						<Flex justify="flex-end">
 							<Button
@@ -81,7 +83,6 @@ function Confirm(
 							</Button>
 						</Flex>
 					</Modal>
-				</View>
 			) }
 		</>
 	);
