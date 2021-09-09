@@ -61,19 +61,21 @@ This unlocks significant additional capabilities in the Navigation Editor. For e
 
 #### Technical Implementation details
 
-By default, `core/navigation-link` items are serialized and persisted as `nav_menu_item` posts. No serialized block HTML is stored for these standard link blocks.
+By default, `core/navigation-link` ("Navigation link") items are serialized and persisted as `nav_menu_item` posts. No serialized block HTML is stored for these standard link blocks.
 
 _Non_-link navigation items however, are [persisted as `nav_menu_items` with a special `type` of `block`](https://github.com/WordPress/gutenberg/blob/7fcd57c9a62c232899e287f6d96416477d810d5e/packages/edit-navigation/src/store/utils.js#L159-L166). These items have an [_additional_ `content` field which is used to store the serialized block markup](https://github.com/WordPress/gutenberg/blob/7fcd57c9a62c232899e287f6d96416477d810d5e/lib/navigation.php#L71-L101).
 
 When rendered on the front-end, the blocks are [`parse`d from the `content` field](https://github.com/WordPress/gutenberg/blob/7fcd57c9a62c232899e287f6d96416477d810d5e/lib/navigation.php#L191-L203) and [rendered as blocks](https://github.com/WordPress/gutenberg/blob/7fcd57c9a62c232899e287f6d96416477d810d5e/lib/navigation.php#L103-L135).
-
-If the user switches to a theme that does not support block menus, or disables this functionality, non-link blocks are no longer rendered on the frontend. Care is taken, however, to ensure that users can still see their data on the existing Menus screen.
 
 ## Backwards compatibility
 
 By design the underlying systems of the Nav Editor screen should be largely backwards compatible with the existing Menus screen. Therefore any navigations created or edited using the new Navigation Editor screen should continue to work in the existing classic Menus screen.
 
 Currently, the only exception to this would be any custom functionality added (by Plugins or otherwise) to the existing Menus screen would not be replicated in the new Navigation Editor screen. In this scenario there might be danger of some data loss.
+
+### Downgrading from block-based to classic Themes
+
+If the user switches to a theme that does not support block menus, or disables this functionality, non-link blocks are no longer rendered on the frontend. Care is taken, however, to ensure that users can still see their data on the existing Menus screen.
 
 ## Block to Menu Item mapping
 
