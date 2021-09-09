@@ -144,6 +144,10 @@ class WP_Theme_JSON_Gutenberg {
 	 *
 	 * - value_key     => the key that represents the value
 	 *
+	 * - value_func    => a function to generate the value
+	 *
+	 * - value_args    => array of keys that will be mapped to values passed to value_func
+	 *
 	 * - css_var_infix => infix to use in generating the CSS Custom Property. Example:
 	 *                   --wp--preset--<preset_infix>--<slug>: <preset_value>
 	 *
@@ -185,6 +189,13 @@ class WP_Theme_JSON_Gutenberg {
 					'property_name' => 'background',
 				),
 			),
+		),
+		array(
+			'path'          => array( 'color', 'duotone' ),
+			'value_func'    => 'gutenberg_get_duotone_filter_property',
+			'value_args'    => array( 'slug', 'colors' ),
+			'css_var_infix' => 'duotone-filter',
+			'classes'       => array(),
 		),
 		array(
 			'path'          => array( 'typography', 'fontSizes' ),
@@ -643,27 +654,93 @@ class WP_Theme_JSON_Gutenberg {
 	}
 
 	/**
-	 * Function that given an array of presets keyed by origin
-	 * and the value key of the preset returns an array where each key is
-	 * the a preset slug and each value is the preset value.
+	 * Gets preset values keyed by slugs based on settings and metadata.
 	 *
-	 * @param array  $preset_per_origin Array of presets keyed by origin.
-	 * @param string $value_key         The property of the preset that contains its value.
+	 * <code>
+	 * $settings = array(
+	 *     'color' => array(
+	 *         'palette' => array(
+	 *             array(
+	 *                 'slug'       => 'sansSerif',
+	 *                 'fontFamily' => '"Helvetica Neue", sans-serif',
+	 *             ),
+	 *             array(
+	 *                 'slug'   => 'serif',
+	 *                 'colors' => 'Georgia, serif',
+	 *             )
+	 *         ),
+	 *     ),
+	 * );
+	 * $meta = array(
+	 *    'path'      => array( 'typography', 'fontFamilies' ),
+	 *    'value_key' => 'fontFamily',
+	 * );
+	 * $values_by_slug = get_settings_values_by_slug();
+	 * // $values_by_slug === array(
+	 * //   'sans-serif' => '"Helvetica Neue", sans-serif',
+	 * //   'serif'      => 'Georgia, serif',
+	 * // );
+	 * </code>
+	 *
+	 * @param array $settings Settings to process.
+	 * @param array $meta One of the PRESETS_METADATA values.
 	 *
 	 * @return array Array of presets where each key is a slug and each value is the preset value.
 	 */
-	private static function get_merged_preset_by_slug( $preset_per_origin, $value_key ) {
+	private static function get_settings_values_by_slug( $settings, $meta ) {
+		$preset_per_origin = _wp_array_get( $settings, $meta['path'], array() );
+
 		$result = array();
 		foreach ( self::VALID_ORIGINS as $origin ) {
 			if ( ! isset( $preset_per_origin[ $origin ] ) ) {
 				continue;
 			}
 			foreach ( $preset_per_origin[ $origin ] as $preset ) {
-				// We don't want to use kebabCase here,
-				// see https://github.com/WordPress/gutenberg/issues/32347
-				// However, we need to make sure the generated class or css variable
-				// doesn't contain spaces.
-				$result[ preg_replace( '/\s+/', '-', $preset['slug'] ) ] = $preset[ $value_key ];
+				$slug = gutenberg_experimental_to_kebab_case( $preset['slug'] );
+
+				$value = '';
+				if ( isset( $meta['value_key'] ) ) {
+					$value_key = $meta['value_key'];
+					$value     = $preset[ $value_key ];
+				} elseif ( is_callable( $meta['value_func'] ) ) {
+					$value_func = $meta['value_func'];
+					$value_args = array();
+					foreach ( $meta['value_args'] as $meta_arg ) {
+						$value_args[] = $preset[ $meta_arg ];
+					}
+					$value = call_user_func_array( $value_func, $value_args );
+				} else {
+					// If we don't have a value, then don't add it to the result.
+					continue;
+				}
+
+				$result[ $slug ] = $value;
+			}
+		}
+		return $result;
+	}
+
+	/**
+	 * Similar to get_settings_values_by_slug, but doesn't compute the value.
+	 *
+	 * @param array $settings Settings to process.
+	 * @param array $meta One of the PRESETS_METADATA values.
+	 *
+	 * @return array Array of presets where the key and value are both the slug.
+	 */
+	private static function get_settings_slugs( $settings, $meta ) {
+		$preset_per_origin = _wp_array_get( $settings, $meta['path'], array() );
+
+		$result = array();
+		foreach ( self::VALID_ORIGINS as $origin ) {
+			if ( ! isset( $preset_per_origin[ $origin ] ) ) {
+				continue;
+			}
+			foreach ( $preset_per_origin[ $origin ] as $preset ) {
+				$slug = gutenberg_experimental_to_kebab_case( $preset['slug'] );
+
+				// Use the array as a set so we don't get duplicates.
+				$result[ $slug ] = $slug;
 			}
 		}
 		return $result;
@@ -686,17 +763,16 @@ class WP_Theme_JSON_Gutenberg {
 		}
 
 		$stylesheet = '';
-		foreach ( self::PRESETS_METADATA as $preset ) {
-			$preset_per_origin = _wp_array_get( $settings, $preset['path'], array() );
-			$preset_by_slug    = self::get_merged_preset_by_slug( $preset_per_origin, $preset['value_key'] );
-			foreach ( $preset['classes'] as $class ) {
-				foreach ( $preset_by_slug as $slug => $value ) {
+		foreach ( self::PRESETS_METADATA as $meta ) {
+			$slugs = self::get_settings_slugs( $settings, $meta );
+			foreach ( $meta['classes'] as $class ) {
+				foreach ( $slugs as $slug ) {
 					$stylesheet .= self::to_ruleset(
-						self::append_to_selector( $selector, '.has-' . gutenberg_experimental_to_kebab_case( $slug ) . '-' . $class['class_suffix'] ),
+						self::append_to_selector( $selector, '.has-' . $slug . '-' . $class['class_suffix'] ),
 						array(
 							array(
 								'name'  => $class['property_name'],
-								'value' => 'var(--wp--preset--' . $preset['css_var_infix'] . '--' . gutenberg_experimental_to_kebab_case( $slug ) . ') !important',
+								'value' => 'var(--wp--preset--' . $meta['css_var_infix'] . '--' . $slug . ') !important',
 							),
 						)
 					);
@@ -725,27 +801,14 @@ class WP_Theme_JSON_Gutenberg {
 	 */
 	private static function compute_preset_vars( $settings ) {
 		$declarations = array();
-		foreach ( self::PRESETS_METADATA as $preset ) {
-			$preset_per_origin = _wp_array_get( $settings, $preset['path'], array() );
-			$preset_by_slug    = self::get_merged_preset_by_slug( $preset_per_origin, $preset['value_key'] );
-			foreach ( $preset_by_slug as $slug => $value ) {
+		foreach ( self::PRESETS_METADATA as $meta ) {
+			$values_by_slug = self::get_settings_values_by_slug( $settings, $meta );
+			foreach ( $values_by_slug as $slug => $value ) {
 				$declarations[] = array(
-					'name'  => '--wp--preset--' . $preset['css_var_infix'] . '--' . gutenberg_experimental_to_kebab_case( $slug ),
+					'name'  => '--wp--preset--' . $meta['css_var_infix'] . '--' . $slug,
 					'value' => $value,
 				);
 			}
-		}
-
-		// Duotone filters are a special case and need to be handled differently.
-		$duotone_values = _wp_array_get( $settings, array( 'color', 'duotone' ), array() );
-		foreach ( $duotone_values as $duotone ) {
-			$slug           = gutenberg_experimental_to_kebab_case( $duotone['slug'] );
-			$duotone_id     = 'wp-preset-duotone-filter-' . $slug;
-			$duotone_colors = $duotone['colors'];
-			$declarations[] = array(
-				'name'  => '--wp--preset--duotone-filter--' . $slug,
-				'value' => gutenberg_get_duotone_filter_property( $duotone_id, $duotone_colors ),
-			);
 		}
 
 		return $declarations;
