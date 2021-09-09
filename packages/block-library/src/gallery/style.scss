@@ -3,24 +3,21 @@
 
 // Styles for current version of gallery block.
 .wp-block-gallery.has-nested-images {
-	--gallery-block--gutter-size: var(--wp--style--block-gap, #{$grid-unit-20});
+	--gallery-block--gap: var(--wp--style--block-gap, #{$grid-unit-20});
 	display: flex;
+	gap: var(--gallery-block--gap);
 	flex-wrap: wrap;
 	// Need bogus :not(#individual-image) to override long :not()
 	// specificity chain on default image block on front end.
 	figure.wp-block-image:not(#individual-image) {
 		// Add space between thumbnails, and unset right most thumbnails later.
-		margin: 0 var(--gallery-block--gutter-size) var(--gallery-block--gutter-size) 0;
+		margin: 0;
 
 		&:last-of-type:not(#individual-image) {
 			margin-right: 0;
 		}
 
-		width: calc(50% - (var(--gallery-block--gutter-size) / 2));
-
-		&:nth-of-type(even) {
-			margin-right: 0;
-		}
+		width: calc(50% - (var(--gallery-block--gap) / 2));
 	}
 
 	figure.wp-block-image {
@@ -95,11 +92,11 @@
 			margin-top: 0;
 			margin-bottom: auto;
 			img {
-				margin-bottom: var(--gallery-block--gutter-size);
+				margin-bottom: var(--gallery-block--gap);
 			}
 
 			figcaption {
-				bottom: var(--gallery-block--gutter-size);
+				bottom: var(--gallery-block--gap);
 			}
 		}
 	}
@@ -122,7 +119,6 @@
 	}
 
 	&.columns-1 figure.wp-block-image:not(#individual-image) {
-		margin-right: 0;
 		width: 100%;
 	}
 
@@ -130,35 +126,21 @@
 	@include break-small {
 		@for $i from 3 through 8 {
 			&.columns-#{ $i } figure.wp-block-image:not(#individual-image) {
-				margin-right: var(--gallery-block--gutter-size);
-				width: calc(#{math.div(100%, $i)} - (var(--gallery-block--gutter-size) * #{math.div($i - 1, $i)}));
+				width: calc(#{math.div(100%, $i)} - (var(--gallery-block--gap) * #{math.div($i - 1, $i)}));
 
 			}
+		}
 
-			// Prevent collapsing margin while sibling is being dragged.
-			&.columns-#{$i} figure.wp-block-image:not(#individual-image).is-dragging ~ figure.wp-block-image:not(#individual-image) {
-				margin-right: var(--gallery-block--gutter-size);
-			}
-		}
-		// Unset the right margin on every rightmost gallery item to ensure center balance.
-		@for $column-count from 1 through 8 {
-			&.columns-#{$column-count} figure.wp-block-image:not(#individual-image):nth-of-type(#{ $column-count }n) {
-				margin-right: 0;
-			}
-		}
 		// If number of columns not explicitly set default to 3 columns if 3 or more images.
 		&.columns-default {
 			figure.wp-block-image:not(#individual-image) {
-				margin-right: var(--gallery-block--gutter-size);
-				width: calc(33.33% - (var(--gallery-block--gutter-size, 16px) * #{math.div(2, 3)}));
+				width: calc(33.33% - (var(--gallery-block--gap) * #{math.div(2, 3)}));
 			}
-			figure.wp-block-image:not(#individual-image):nth-of-type(3n+3) {
-				margin-right: 0;
-			}
+
 			// If only 2 child images use 2 columns.
 			figure.wp-block-image:not(#individual-image):first-child:nth-last-child(2),
 			figure.wp-block-image:not(#individual-image):first-child:nth-last-child(2) ~ figure.wp-block-image:not(#individual-image) {
-				width: calc(50% - (var(--gallery-block--gutter-size, 16px) * 0.5));
+				width: calc(50% - (var(--gallery-block--gap) * 0.5));
 			}
 			// For a single image set to 100%.
 			figure.wp-block-image:not(#individual-image):first-child:nth-last-child(1) {
