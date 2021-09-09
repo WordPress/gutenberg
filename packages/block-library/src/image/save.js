@@ -24,6 +24,7 @@ export default function save( { attributes } ) {
 		linkTarget,
 		sizeSlug,
 		title,
+		duotone,
 	} = attributes;
 
 	const newRel = isEmpty( rel ) ? undefined : rel;
@@ -34,11 +35,16 @@ export default function save( { attributes } ) {
 		'is-resized': width || height,
 	} );
 
+	const imageClasses = classnames( {
+		[ `wp-image-${ id }` ]: id,
+		'has-filter': duotone,
+	} );
+
 	const image = (
 		<img
 			src={ url }
 			alt={ alt }
-			className={ id ? `wp-image-${ id }` : null }
+			className={ imageClasses }
 			width={ width }
 			height={ height }
 			title={ title }

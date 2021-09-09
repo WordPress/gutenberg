@@ -2,6 +2,7 @@
  * External dependencies
  */
 import { get, filter, map, pick, includes } from 'lodash';
+import classnames from 'classnames';
 
 /**
  * WordPress dependencies
@@ -66,6 +67,7 @@ export default function Image( {
 		height,
 		linkTarget,
 		sizeSlug,
+		duotone,
 	},
 	setAttributes,
 	isSelected,
@@ -400,6 +402,9 @@ export default function Image( {
 		defaultedAlt = __( 'This image has an empty alt attribute' );
 	}
 
+	const imageClasses = classnames( {
+		'has-filter': duotone,
+	} );
 	let img = (
 		// Disable reason: Image itself is not meant to be interactive, but
 		// should direct focus to block.
@@ -408,6 +413,7 @@ export default function Image( {
 			<img
 				src={ temporaryURL || url }
 				alt={ defaultedAlt }
+				className={ imageClasses }
 				onError={ () => onImageError() }
 				onLoad={ ( event ) => {
 					setNaturalSize(

@@ -195,7 +195,12 @@ class WP_Theme_JSON_Gutenberg {
 			'value_func'    => 'gutenberg_get_duotone_filter_property',
 			'value_args'    => array( 'slug', 'colors' ),
 			'css_var_infix' => 'duotone-filter',
-			'classes'       => array(),
+			'classes'       => array(
+				array(
+					'class_suffix'  => 'duotone-filter',
+					'property_name' => '--has-duotone-filter',
+				),
+			),
 		),
 		array(
 			'path'          => array( 'typography', 'fontSizes' ),
@@ -1004,6 +1009,17 @@ class WP_Theme_JSON_Gutenberg {
 			$node          = _wp_array_get( $this->theme_json, $metadata['path'], array() );
 			$preset_rules .= self::compute_preset_classes( $node, $selector );
 		}
+
+		// TODO: There is a better way to do this, I'm sure.
+		$preset_rules .= self::to_ruleset(
+			'.has-filter',
+			array(
+				array(
+					'name'  => 'filter',
+					'value' => 'var(--has-duotone-filter) !important',
+				),
+			)
+		);
 
 		return $preset_rules;
 	}

@@ -247,6 +247,12 @@ function gutenberg_register_duotone_support( $block_type ) {
 				'type' => 'object',
 			);
 		}
+
+		if ( ! array_key_exists( 'duotone', $block_type->attributes ) ) {
+			$block_type->attributes['duotone'] = array(
+				'type' => 'string',
+			);
+		}
 	}
 }
 
@@ -329,11 +335,13 @@ function gutenberg_render_duotone_support( $block_content, $block ) {
 		$duotone_support = _wp_array_get( $block_type->supports, array( 'color', '__experimentalDuotone' ), false );
 	}
 
-	$has_duotone_attribute = isset( $block['attrs']['style']['color']['duotone'] );
+	$has_custom_duotone = isset( $block['attrs']['style']['color']['duotone'] );
+	$has_named_duotone  = isset( $block['attrs']['duotone'] );
 
 	if (
 		! $duotone_support ||
-		! $has_duotone_attribute
+		! $has_custom_duotone ||
+		$has_named_duotone
 	) {
 		return $block_content;
 	}
@@ -371,11 +379,41 @@ function gutenberg_render_duotone_support( $block_content, $block ) {
 	);
 }
 
+/**
+ * Add CSS classes and inline styles for duotone to the incoming attributes.
+ * This will be applied to the block markup in the front-end.
+ *
+ * @param  WP_Block_Type $block_type       Block type.
+ * @param  array         $block_attributes Block attributes.
+ *
+ * @return array Duotone CSS classes and inline styles.
+ */
+function gutenberg_apply_duotone_support( $block_type, $block_attributes ) {
+	$has_duotone_support = _wp_array_get( $block_type->supports, array( 'color', '__experimentalDuotone' ), false );
+	$has_custom_duotone  = isset( $block_attributes['style']['color']['duotone'] );
+	$has_named_duotone   = isset( $block_attributes['duotone'] );
+
+	if (
+		! $has_duotone_support ||
+		! $has_named_duotone ||
+		$has_custom_duotone
+	) {
+		return array();
+	}
+
+	$slug = gutenberg_experimental_to_kebab_case( $block_attributes['duotone'] );
+
+	return array(
+		'class' => 'has-' . $slug . '-duotone-filter',
+	);
+}
+
 // Register the block support.
 WP_Block_Supports::get_instance()->register(
 	'duotone',
 	array(
 		'register_attribute' => 'gutenberg_register_duotone_support',
+		'apply'              => 'gutenberg_apply_duotone_support',
 	)
 );
 
