@@ -38,7 +38,7 @@ export default function ManageLocations( {
 		noticesStore
 	);
 
-	const updateMenuLocations = () => {
+	const updateMenuLocations = async () => {
 		const method = 'POST';
 		const batchRequests = menus.map( ( { id } ) => {
 			const locations = menuLocations
@@ -54,7 +54,7 @@ export default function ManageLocations( {
 			};
 		} );
 
-		const batchResponse = apiFetch( {
+		const batchResponse = await apiFetch( {
 			path: 'batch/v1',
 			data: {
 				validation: 'require-all-validate',
