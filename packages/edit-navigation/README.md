@@ -75,7 +75,7 @@ Currently, the only exception to this would be any custom functionality added (b
 
 ### Downgrading from block-based to classic Themes
 
-If the user switches to a theme that does not support block menus, or disables this functionality, non-link blocks are no longer rendered on the frontend. Care is taken, however, to ensure that users can still see their data on the existing Menus screen.
+If the user switches to a theme that does not support block menus, or disables this functionality, ~non-link blocks are no longer rendered on the frontend~ [block-based links will still be rendered on the front end](https://github.com/WordPress/gutenberg/blob/7310097da5e16159b79e6e039a2cb3812cb9055e/lib/navigation.php#L104-L135). Care is also taken to ensure that users can still see their data on the existing Menus screen.
 
 ## Block to Menu Item mapping
 
