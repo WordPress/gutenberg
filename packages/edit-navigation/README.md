@@ -69,6 +69,12 @@ When rendered on the front-end, the blocks are [`parse`d from the `content` fiel
 
 If the user switches to a theme that does not support block menus, or disables this functionality, non-link blocks are no longer rendered on the frontend. Care is taken, however, to ensure that users can still see their data on the existing Menus screen.
 
+## Backwards compatibility
+
+By design the underlying systems of the Nav Editor screen should be largely backwards compatible with the existing Menus screen. Therefore any navigations created or edited using the new Navigation Editor screen should continue to work in the existing classic Menus screen.
+
+Currently, the only exception to this would be any custom functionality added (by Plugins or otherwise) to the existing Menus screen would not be replicated in the new Navigation Editor screen. In this scenario there might be danger of some data loss.
+
 ## Block to Menu Item mapping
 
 The Navigation Editor needs to be able to map navigation items in two directions:
