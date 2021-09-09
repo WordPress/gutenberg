@@ -25,7 +25,7 @@ export const InputWithSlider = ( {
 	value,
 }: InputWithSliderProps ) => {
 	return (
-		<Spacer as={ HStack }>
+		<Spacer as={ HStack } spacing={ 4 }>
 			<NumberControlWrapper
 				min={ min }
 				max={ max }

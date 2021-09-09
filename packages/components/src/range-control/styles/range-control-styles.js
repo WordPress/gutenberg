@@ -13,6 +13,7 @@ import { COLORS, reduceMotion, rtl } from '../../utils';
 import { space } from '../../ui/utils/space';
 
 const rangeHeightValue = 30;
+const railHeight = 4;
 const rangeHeight = () =>
 	css( { height: rangeHeightValue, minHeight: rangeHeightValue } );
 const thumbSize = 9;
@@ -40,7 +41,6 @@ export const Wrapper = styled.div`
 	color: ${ COLORS.blue.medium.focus };
 	display: block;
 	flex: 1;
-	padding-top: 18px;
 	position: relative;
 	width: 100%;
 
@@ -50,13 +50,13 @@ export const Wrapper = styled.div`
 `;
 
 export const BeforeIconWrapper = styled.span`
-	margin-top: 3px;
+	margin-top: ${ railHeight }px;
 
 	${ rtl( { marginRight: 6 } ) }
 `;
 
 export const AfterIconWrapper = styled.span`
-	margin-top: 3px;
+	margin-top: ${ railHeight }px;
 
 	${ rtl( { marginLeft: 16 } ) }
 `;
@@ -80,11 +80,11 @@ export const Rail = styled.span`
 	pointer-events: none;
 	right: 0;
 	display: block;
-	height: 3px;
+	height: ${ railHeight }px;
 	position: absolute;
-	margin-top: 14px;
+	margin-top: ${ ( rangeHeightValue - railHeight ) / 2 }px;
 	top: 0;
-	border-radius: 9999px;
+	border-radius: ${ railHeight }px;
 
 	${ railBackgroundColor };
 `;
@@ -103,13 +103,13 @@ const trackBackgroundColor = ( { disabled, trackColor } ) => {
 
 export const Track = styled.span`
 	background-color: currentColor;
-	border-radius: 9999px;
+	border-radius: ${ railHeight }px;
 	box-sizing: border-box;
-	height: 3px;
+	height: ${ railHeight }px;
 	pointer-events: none;
 	display: block;
 	position: absolute;
-	margin-top: 14px;
+	margin-top: ${ ( rangeHeightValue - railHeight ) / 2 }px;
 	top: 0;
 
 	${ trackBackgroundColor };
@@ -138,7 +138,7 @@ const markFill = ( { disabled, isFilled } ) => {
 
 export const Mark = styled.span`
 	box-sizing: border-box;
-	height: 9px;
+	height: ${ thumbSize }px;
 	left: 0;
 	position: absolute;
 	top: -4px;
@@ -263,7 +263,7 @@ const tooltipPosition = ( { position } ) => {
 };
 
 export const Tooltip = styled.span`
-	background: ${ COLORS.ui.border };
+	background: rgba( 0, 0, 0, 0.8 );
 	border-radius: 2px;
 	box-sizing: border-box;
 	color: white;

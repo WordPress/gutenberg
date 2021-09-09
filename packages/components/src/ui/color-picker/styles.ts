@@ -11,11 +11,14 @@ import InnerSelectControl from '../../select-control';
 import InnerRangeControl from '../../range-control';
 import { StyledField } from '../../base-control/styles/base-control-styles';
 import { space } from '../utils/space';
+import Button from '../../button';
 import {
 	BackdropUI,
 	Container as InputControlContainer,
 	Input,
 } from '../../input-control/styles/input-control-styles';
+import InputControl from '../../input-control';
+import CONFIG from '../../utils/config-values';
 
 export const NumberControlWrapper = styled( NumberControl )`
 	${ InputControlContainer } {
@@ -45,6 +48,13 @@ export const RangeControl = styled( InnerRangeControl )`
 const inputHeightStyle = `
 &&& ${ Input } {
 	height: 40px;
+}`;
+
+// Make the Hue circle picker not go out of the bar
+const interactiveHueStyles = `
+.react-colorful__interactive {
+	width: calc( 100% - ${ space( 2 ) } );
+	margin-left: ${ space( 1 ) };
 }`;
 
 export const AuxiliaryColorArtefactWrapper = styled.div`
@@ -81,13 +91,26 @@ export const ColorfulWrapper = styled.div`
 	.react-colorful__pointer {
 		height: 16px;
 		width: 16px;
-		border: 1.5px solid #ffffff;
-		box-shadow: 0px 0px 3px rgba( 0, 0, 0, 0.25 );
+		border: ${ CONFIG.borderWidthFocus } solid rgba( 255, 255, 255, 0 );
+		box-shadow: inset 0px 0px 0px ${ CONFIG.borderWidthFocus } #ffffff;
 	}
+
+	${ interactiveHueStyles }
 
 	${ StyledField } {
 		margin-bottom: 0;
 	}
 
 	${ inputHeightStyle }
+`;
+
+export const DetailsControlButton = styled( Button )`
+	&&&& {
+		min-width: ${ space( 6 ) };
+		padding: 0;
+	}
+`;
+
+export const ColorHexInputControl = styled( InputControl )`
+	width: 8em;
 `;

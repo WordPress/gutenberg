@@ -48,7 +48,9 @@ const Example = () => {
 			marginTop={ space( 10 ) }
 		>
 			<ColorPicker { ...props } color={ color } onChange={ setColor } />
-			<div>{ colorize( color ).toHslString() }</div>
+			<div style={ { width: 200, textAlign: 'center' } }>
+				{ colorize( color ).toHslString() }
+			</div>
 			<ColorPicker { ...props } color={ color } onChange={ setColor } />
 		</Flex>
 	);
