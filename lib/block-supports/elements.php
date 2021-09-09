@@ -59,7 +59,7 @@ function gutenberg_render_elements_support( $block_content, $block ) {
 		$first_element_offset = $html_element_matches[0][1];
 		$content              = substr_replace( $block_content, ' class="' . $class_name . '"', $first_element_offset + strlen( $first_element ) - 1, 0 );
 	}
-	return $content . $style;
+	return $style . $content;
 
 }
 
