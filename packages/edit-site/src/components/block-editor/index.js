@@ -27,6 +27,7 @@ import NavigateToLink from '../navigate-to-link';
 import { SidebarInspectorFill } from '../sidebar';
 import { store as editSiteStore } from '../../store';
 import BlockInspectorButton from './block-inspector-button';
+import EditTemplatePartMenuButton from '../edit-template-part-menu-button';
 
 const LAYOUT = {
 	type: 'default',
@@ -71,6 +72,7 @@ export default function BlockEditor( { setIsInserterOpen } ) {
 			useSubRegistry={ false }
 		>
 			<TemplatePartConverter />
+			<EditTemplatePartMenuButton />
 			<__experimentalLinkControl.ViewerFill>
 				{ useCallback(
 					( fillProps ) => (
