@@ -69,6 +69,7 @@ A function that receives the updated alignment value.
 ### width
 
 If provided, sets the width of the wrapper <Composite/> component.
+
  - Type: `number`
  - Required: No
  - Default: `92`
