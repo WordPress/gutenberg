@@ -255,98 +255,10 @@ Object {
 exports[`Confirm Confirm component should render correctly 1`] = `
 Object {
   "asFragment": [Function],
-  "baseElement": .emotion-2 {
-  display: -webkit-box;
-  display: -webkit-flex;
-  display: -ms-flexbox;
-  display: flex;
-  -webkit-align-items: center;
-  -webkit-box-align: center;
-  -ms-flex-align: center;
-  align-items: center;
-  -webkit-flex-direction: row;
-  -ms-flex-direction: row;
-  flex-direction: row;
-  -webkit-box-pack: end;
-  -ms-flex-pack: end;
-  -webkit-justify-content: flex-end;
-  justify-content: flex-end;
-  width: 100%;
-}
-
-.emotion-2>*+*:not( marquee ) {
-  margin-left: calc(4px * 2);
-}
-
-.emotion-2>* {
-  min-width: 0;
-}
-
-<body
-    class="modal-open"
-  >
-    <div
-      aria-hidden="true"
-    >
-      <div
-        class="components-confirm emotion-0 emotion-1"
-        data-wp-c16t="true"
-        data-wp-component="Confirm"
-      />
-    </div>
-    <div
-      class="components-modal__screen-overlay"
-    >
-      <div
-        class="components-modal__frame edit-post-keyboard-shortcut-help-modal"
-        role="dialog"
-        tabindex="-1"
-      >
-        <div
-          class="components-modal__content"
-          role="document"
-        >
-          <div
-            class="components-modal__header"
-          >
-            <div
-              class="components-modal__header-heading-container"
-            >
-              
-              
-            </div>
-          </div>
-          <div
-            class="components-flex emotion-2 emotion-1"
-            data-wp-c16t="true"
-            data-wp-component="Flex"
-          >
-            <button
-              class="components-button is-secondary"
-              type="button"
-            >
-              Cancel
-            </button>
-            <button
-              class="components-button is-primary"
-              type="button"
-            >
-              OK
-            </button>
-          </div>
-        </div>
-      </div>
-    </div>
+  "baseElement": <body>
+    <div />
   </body>,
-  "container": <div
-    aria-hidden="true"
-  >
-    <div
-      class="components-confirm emotion-0 emotion-1"
-      data-wp-c16t="true"
-      data-wp-component="Confirm"
-    />
-  </div>,
+  "container": <div />,
   "debug": [Function],
   "findAllByAltText": [Function],
   "findAllByDisplayValue": [Function],

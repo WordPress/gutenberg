@@ -2,7 +2,7 @@
  * External dependencies
  */
 // eslint-disable-next-line no-restricted-imports
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 // eslint-disable-next-line no-restricted-imports
 import type { Ref, MouseEvent } from 'react';
 
@@ -25,28 +25,38 @@ import { View } from '../view';
 import { Flex } from '../flex';
 import Button from '../button';
 
-// @todo add type declarations for the react-confirm functions
 function Confirm(
 	props: WordPressComponentProps< OwnProps, 'div', false >,
 	forwardedRef: Ref< any >
 ) {
-	const { message, onConfirm, onCancel, ...otherProps } = useContextSystem(
-		props,
-		'Confirm'
-	);
+	const {
+		isOpen,
+		message,
+		onConfirm,
+		onCancel,
+		...otherProps
+	} = useContextSystem( props, 'Confirm' );
 
-	const [ isOpen, setIsOpen ] = useState( true );
+	const [ _isOpen, setIsOpen ] = useState( false );
+
+	useEffect( () => {
+		setIsOpen( isOpen || false );
+	}, [ isOpen ] );
 
 	const closeAndHandle = (
 		callback: ( event: MouseEvent< HTMLButtonElement > ) => void
 	) => ( event: MouseEvent< HTMLButtonElement > ) => {
-		setIsOpen( false );
-		callback( event );
+		if ( typeof callback === 'function' ) {
+			callback( event );
+		} else {
+			// standalone/uncontrolled usage
+			setIsOpen( false );
+		}
 	};
 
 	return (
 		<>
-			{ isOpen && (
+			{ _isOpen && (
 				<View ref={ forwardedRef } { ...otherProps }>
 					<Modal
 						title={ message }

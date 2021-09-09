@@ -3,7 +3,7 @@
  */
 import { __ } from '@wordpress/i18n';
 import { Component } from '@wordpress/element';
-import { VisuallyHidden, confirm } from '@wordpress/components';
+import { VisuallyHidden, Confirm } from '@wordpress/components';
 import { withInstanceId, compose } from '@wordpress/compose';
 import { withSelect, withDispatch } from '@wordpress/data';
 
@@ -24,6 +24,7 @@ export class PostVisibility extends Component {
 
 		this.state = {
 			hasPassword: !! props.password,
+			isConfirmOpen: false,
 		};
 	}
 
@@ -35,19 +36,10 @@ export class PostVisibility extends Component {
 	}
 
 	async setPrivate() {
-		if (
-			// eslint-disable-next-line no-alert
-			! ( await confirm(
-				__( 'Would you like to privately publish this post now?' )
-			) )
-		) {
-			return;
-		}
-
 		const { onUpdateVisibility, onSave } = this.props;
 
 		onUpdateVisibility( 'private' );
-		this.setState( { hasPassword: false } );
+		this.setState( { hasPassword: false, isConfirmOpen: false } );
 		onSave();
 	}
 
@@ -75,7 +67,9 @@ export class PostVisibility extends Component {
 				checked: visibility === 'public' && ! this.state.hasPassword,
 			},
 			private: {
-				onSelect: this.setPrivate,
+				onSelect: () => {
+					this.setState( { isConfirmOpen: true } );
+				},
 				checked: visibility === 'private',
 			},
 			password: {
@@ -84,68 +78,77 @@ export class PostVisibility extends Component {
 			},
 		};
 
-		return [
-			<fieldset
-				key="visibility-selector"
-				className="editor-post-visibility__dialog-fieldset"
-			>
-				<legend className="editor-post-visibility__dialog-legend">
-					{ __( 'Post Visibility' ) }
-				</legend>
-				{ visibilityOptions.map( ( { value, label, info } ) => (
-					<div
-						key={ value }
-						className="editor-post-visibility__choice"
-					>
-						<input
-							type="radio"
-							name={ `editor-post-visibility__setting-${ instanceId }` }
-							value={ value }
-							onChange={ visibilityHandlers[ value ].onSelect }
-							checked={ visibilityHandlers[ value ].checked }
-							id={ `editor-post-${ value }-${ instanceId }` }
-							aria-describedby={ `editor-post-${ value }-${ instanceId }-description` }
-							className="editor-post-visibility__dialog-radio"
-						/>
-						<label
-							htmlFor={ `editor-post-${ value }-${ instanceId }` }
-							className="editor-post-visibility__dialog-label"
-						>
-							{ label }
-						</label>
-						{
-							<p
-								id={ `editor-post-${ value }-${ instanceId }-description` }
-								className="editor-post-visibility__dialog-info"
-							>
-								{ info }
-							</p>
-						}
-					</div>
-				) ) }
-			</fieldset>,
-			this.state.hasPassword && (
-				<div
-					className="editor-post-visibility__dialog-password"
-					key="password-selector"
+		return (
+			<>
+				<Confirm
+					isOpen={ this.state.isConfirmOpen }
+					onConfirm={ this.setPrivate }
+					onCancel={ () => this.setState( { isConfirmOpen: false } ) }
+				/>
+				<fieldset
+					key="visibility-selector"
+					className="editor-post-visibility__dialog-fieldset"
 				>
-					<VisuallyHidden
-						as="label"
-						htmlFor={ `editor-post-visibility__dialog-password-input-${ instanceId }` }
+					<legend className="editor-post-visibility__dialog-legend">
+						{ __( 'Post Visibility' ) }
+					</legend>
+					{ visibilityOptions.map( ( { value, label, info } ) => (
+						<div
+							key={ value }
+							className="editor-post-visibility__choice"
+						>
+							<input
+								type="radio"
+								name={ `editor-post-visibility__setting-${ instanceId }` }
+								value={ value }
+								onChange={
+									visibilityHandlers[ value ].onSelect
+								}
+								checked={ visibilityHandlers[ value ].checked }
+								id={ `editor-post-${ value }-${ instanceId }` }
+								aria-describedby={ `editor-post-${ value }-${ instanceId }-description` }
+								className="editor-post-visibility__dialog-radio"
+							/>
+							<label
+								htmlFor={ `editor-post-${ value }-${ instanceId }` }
+								className="editor-post-visibility__dialog-label"
+							>
+								{ label }
+							</label>
+							{
+								<p
+									id={ `editor-post-${ value }-${ instanceId }-description` }
+									className="editor-post-visibility__dialog-info"
+								>
+									{ info }
+								</p>
+							}
+						</div>
+					) ) }
+				</fieldset>
+				{ this.state.hasPassword && (
+					<div
+						className="editor-post-visibility__dialog-password"
+						key="password-selector"
 					>
-						{ __( 'Create password' ) }
-					</VisuallyHidden>
-					<input
-						className="editor-post-visibility__dialog-password-input"
-						id={ `editor-post-visibility__dialog-password-input-${ instanceId }` }
-						type="text"
-						onChange={ this.updatePassword }
-						value={ password }
-						placeholder={ __( 'Use a secure password' ) }
-					/>
-				</div>
-			),
-		];
+						<VisuallyHidden
+							as="label"
+							htmlFor={ `editor-post-visibility__dialog-password-input-${ instanceId }` }
+						>
+							{ __( 'Create password' ) }
+						</VisuallyHidden>
+						<input
+							className="editor-post-visibility__dialog-password-input"
+							id={ `editor-post-visibility__dialog-password-input-${ instanceId }` }
+							type="text"
+							onChange={ this.updatePassword }
+							value={ password }
+							placeholder={ __( 'Use a secure password' ) }
+						/>
+					</div>
+				) }
+			</>
+		);
 	}
 }
 
