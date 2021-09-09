@@ -6,7 +6,7 @@ implementation subject to drastic and breaking changes.
 </div>
 <br />
 
-This component acts a wrapper and controls the display of items to be contained
+This component acts as a wrapper and controls the display of items to be contained
 within a ToolsPanel. An item is displayed if it is flagged as a default control
 or the corresponding panel menu item, provided via context, is toggled on for
 this item.
@@ -37,7 +37,7 @@ panel's menu.
 
 The supplied label is dual purpose.
 It is used as:
-1. the human readable label for the panel's dropdown menu
+1. the human-readable label for the panel's dropdown menu
 2. a key to locate the corresponding item in the panel's menu context to
 determine if the panel item should be displayed.
 
@@ -60,17 +60,16 @@ A callback to take action when this item is selected in the `ToolsPanel` menu.
 
 ### `panelId`: `string`
 
-This prop can be set to a ID representing a unique `ToolsPanel`. Before
-attempting to register with a panel, each item will ensure that it belongs to
-the current panel. This avoids issues when sharing SlotFills to inject items
-into a panel.
+Panel items will ensure they are only registering with their intended panel by
+comparing the `panelId` props set on both the item and the panel itself. This
+allows items to be injected from a shared source.
 
 -   Required: No
 
 ### `resetAllFilter`: `function`
 
 A `ToolsPanel` will collect each item's `resetAllFilter` and pass an array of
-these function through to the panel's `resetAll` callback. They can then be
-iterated over to perform additional tasks for items injected via SlotFills.
+these functions through to the panel's `resetAll` callback. They can then be
+iterated over to perform additional tasks.
 
 -   Required: No

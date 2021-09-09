@@ -28,7 +28,7 @@ Text to be displayed within the panel header. It is also passed along as the
 ### `resetAll`: `function`
 
 The `resetAll` prop provides the callback to execute when the "Reset all" menu
-item is selected. It's purpose is to facilitate resetting any control values
+item is selected. Its purpose is to facilitate resetting any control values
 for items contained within this header's panel.
 
 -   Required: Yes

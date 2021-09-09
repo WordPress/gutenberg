@@ -69,16 +69,16 @@ export function DimensionPanel( props ) {
 
 ### `label`: `string`
 
-Text to be displayed within the panel's header and as the aria label for the
+Text to be displayed within the panel's header and as the aria-label for the
 panel's dropdown menu.
 
 - Required: Yes
 
 ### `panelId`: `function`
 
-The `panelId` is passed through the `ToolsPanelContext` to panel items. This is
-be used to ensure items injected via SlotFills are only registered for their
-intended panels.
+If a `panelId` is set, it is passed through the `ToolsPanelContext` and used
+to restrict panel items. Only items with a matching `panelId` will be able
+to register themselves with this panel.
 
 - Required: No
 
