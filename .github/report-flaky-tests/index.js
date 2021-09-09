@@ -126,7 +126,6 @@ const metaData = {
 					testResults,
 				} ),
 				labels: [ label ],
-				// TODO: Maybe we can combine git blame to automatically assign issue to the original author?
 			} );
 
 			issue = response.data;
@@ -250,6 +249,11 @@ function getRunURL() {
 	return github.context.payload.workflow_run.html_url;
 }
 
+/**
+ * Copied pasted from `strip-ansi` to use without ESM.
+ * @see https://github.com/chalk/strip-ansi
+ * Licensed under MIT license.
+ */
 function stripAnsi( string ) {
 	return string.replace(
 		new RegExp(
