@@ -266,7 +266,7 @@
 		"test-e2e": "wp-scripts test-e2e --config packages/e2e-tests/jest.playwright.config.js",
 		"test-e2e:debug": "wp-scripts --inspect-brk test-e2e --config packages/e2e-tests/jest.config.js --puppeteer-devtools",
 		"test-e2e:watch": "npm run test-e2e -- --watch",
-		"test-performance": "wp-scripts test-e2e --config packages/e2e-tests/jest.performance.config.js",
+		"test-performance": "wp-scripts test-e2e --config packages/e2e-tests/jest.playwright.performance.config.js",
 		"test-php": "npm run lint-php && npm run test-unit-php",
 		"test-php:watch": "wp-env run composer run-script test:watch",
 		"test-unit": "wp-scripts test-unit-js --config test/unit/jest.config.js",
