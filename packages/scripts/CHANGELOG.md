@@ -9,6 +9,7 @@
 ### Bug Fixes
 
 -   Bring back support for SVG files in CSS ([#34394](https://github.com/WordPress/gutenberg/pull/34394)). It wasn't correctly migrated when integrating webpack v5.
+-   Convert legacy entry point arguments supported in webpack 4 for compatibility with webpack 5 ([#34264](https://github.com/WordPress/gutenberg/pull/34264)).
 
 ## 18.0.0 (2021-08-23)
 
