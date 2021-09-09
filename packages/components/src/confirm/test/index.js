@@ -50,31 +50,16 @@ describe( 'Confirm', () => {
 			expect( wrapper ).toMatchSnapshot();
 		} );
 
-		it( 'should not render if dialog is closed by clicking the `x` button', async () => {
-			const wrapper = render(
-				<Confirm onConfirm={ noop } onCancel={ noop } />
-			);
-
-			const button = await wrapper.findByLabelText( 'Close dialog' );
-
-			fireEvent.click( button );
-
-			expect( wrapper ).toMatchSnapshot();
-		} );
-
 		it( 'should not render if dialog is closed by clicking the overlay', async () => {
 			const wrapper = render(
 				<Confirm onConfirm={ noop } onCancel={ noop } />
 			);
 
 			const frame = wrapper.baseElement.querySelector(
-				'.components-modal__frame.components-confirm'
+				'.components-modal__frame'
 			);
-			/**
-			 * The overlay click is handled by detecting an onBlur from the modal frame.
-			 * See the `handeFocusOutside` function in the `ModalFrame` component
-			 * and the `withFocusOutside` HOC for moret details.
-			 */
+
+			//The overlay click is handled by detecting an onBlur from the modal frame.
 			fireEvent.blur( frame );
 
 			await waitForElementToBeRemoved( frame );
@@ -88,7 +73,7 @@ describe( 'Confirm', () => {
 			);
 
 			const frame = wrapper.baseElement.querySelector(
-				'.components-modal__frame.components-confirm'
+				'.components-modal__frame'
 			);
 
 			fireEvent.keyDown( frame, { keyCode: 27 } );
