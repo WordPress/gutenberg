@@ -173,7 +173,7 @@ export const withDataAlign = createHigherOrderComponent(
 			getBlockSupport( name, 'align' ),
 			hasBlockSupport( name, 'alignWide', true )
 		);
-		const validAlignments = useAvailableAlignments(
+		const { enabledControls: validAlignments } = useAvailableAlignments(
 			blockAllowedAlignments
 		);
 

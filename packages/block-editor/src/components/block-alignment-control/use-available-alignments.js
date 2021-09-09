@@ -30,14 +30,18 @@ export default function useAvailableAlignments( controls = DEFAULT_CONTROLS ) {
 	const layoutAlignments = layoutType.getAlignments( layout );
 
 	if ( themeSupportsLayout ) {
-		return layoutAlignments.filter( ( control ) =>
-			controls.includes( control )
-		);
+		return {
+			enabledControls: layoutAlignments.filter( ( control ) =>
+				controls.includes( control )
+			),
+			layout,
+			wideAlignmentsSupport: true,
+		};
 	}
 
 	// Starting here, it's the fallback for themes not supporting the layout config.
 	if ( layoutType.name !== 'default' ) {
-		return [];
+		return { enabledControls: [] };
 	}
 	const { alignments: availableAlignments = DEFAULT_CONTROLS } = layout;
 	const enabledControls = controls.filter(
@@ -48,5 +52,10 @@ export default function useAvailableAlignments( controls = DEFAULT_CONTROLS ) {
 			availableAlignments.includes( control )
 	);
 
-	return enabledControls;
+	return {
+		enabledControls,
+		layout,
+		// TODO check if this is the check we need to show the `doesn't support wide alignments` text.
+		wideAlignmentsSupport: layout.alignments || wideControlsEnabled,
+	};
 }
