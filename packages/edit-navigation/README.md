@@ -31,7 +31,9 @@ The editing experience is provided as a block editor wrapper around the core fun
 The Navigation Editor has two "modes" for _persistence_ ("saving" navigations) and _rendering_:
 
 1. **Default** - navigations are saved to the _existing_ (post type powered) Menus system and rendered using standard Walker classes.
-2. **Block-based** (opt _in_) - navigations continue to be _saved_ using the existing post type system, but non-link blocks are saved (see technical implementation) and _rendered_ as blocks to provide access to the full power of the Navigation block (with some tradeoffs in terms of backwards compatibility).
+2. **Block-based** (opt _in_) - navigations continue to be _saved_ using the existing post type system, but non-link blocks are
+    - saved (see technical implementation) as blocks.
+    - the navigation is rendered using the Navigation block (as opposed to Walker) to provide access to the full power of the Navigation block (with some tradeoffs in terms of backwards compatibility).
 
 ### Default Mode
 
@@ -41,7 +43,7 @@ Moreover, when the navigation is rendered on the front of the site the system co
 
 ### Block-based Mode
 
-**Important**: block-based mode has been temporarily ***disabled*** until it becomes stable. So, if a theme declares support for the `block-nav-menus` feature it will not affect the frontend.
+**Important**: block-based mode has been temporarily **_disabled_** until it becomes stable. So, if a theme declares support for the `block-nav-menus` feature it will not affect the frontend.
 
 If desired, themes are able to opt into _rendering_ complete block-based menus using the Navigation Editor. This allows for arbitrarily complex navigation block structures to be used in an existing theme whilst still ensuring the navigation data is still _saved_ to the existing (post type powered) Menus system.
 
