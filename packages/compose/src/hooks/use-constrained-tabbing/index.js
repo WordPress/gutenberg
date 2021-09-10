@@ -46,11 +46,22 @@ function useConstrainedTabbing() {
 			}
 			const firstTabbable = tabbables[ 0 ];
 			const lastTabbable = tabbables[ tabbables.length - 1 ];
+			const focusables = focus.focusable.find( node );
+			const firstFocusable = focusables[ 0 ];
+			const lastFocusable = focusables[ focusables.length - 1 ];
 
-			if ( event.shiftKey && event.target === firstTabbable ) {
+			if (
+				event.shiftKey &&
+				( event.target === firstTabbable ||
+					event.target === firstFocusable )
+			) {
 				event.preventDefault();
 				/** @type {HTMLElement} */ ( lastTabbable ).focus();
-			} else if ( ! event.shiftKey && event.target === lastTabbable ) {
+			} else if (
+				! event.shiftKey &&
+				( event.target === lastTabbable ||
+					event.target === lastFocusable )
+			) {
 				event.preventDefault();
 				/** @type {HTMLElement} */ ( firstTabbable ).focus();
 				/*
