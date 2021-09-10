@@ -524,6 +524,16 @@ class REST_Nav_Menus_Controller_Test extends WP_Test_REST_Controller_Testcase {
 		$this->assertErrorResponse( 'rest_cannot_view', $response, 403 );
 	}
 
+	public function test_it_allows_batch_requests_when_updating_menus() {
+		$rest_server = rest_get_server();
+		// This call is needed to initialize route_options.
+		$rest_server->get_routes();
+		$route_options = $rest_server->get_route_options( '/__experimental/menus/(?P<id>[\d]+)' );
+
+		$this->assertArrayHasKey( 'allow_batch', $route_options );
+		$this->assertSame( array( 'v1' => true ), $route_options['allow_batch'], 'We must allow batch requests for /__experimental/menus endpoint.' );
+	}
+
 	/**
 	 * @param WP_REST_Response $response Response Class.
 	 */
@@ -595,15 +605,5 @@ class REST_Nav_Menus_Controller_Test extends WP_Test_REST_Controller_Testcase {
 		$this->assertEqualSets( $relations, array_keys( $links ) );
 		$this->assertContains( 'wp/v2/taxonomies/' . $term->taxonomy, $links['about'][0]['href'] );
 		$this->assertEquals( add_query_arg( 'menus', $term->term_id, rest_url( 'wp/v2/menu-items' ) ), $links['https://api.w.org/post_type'][0]['href'] );
-	}
-
-	public function test_it_allows_batch_requests_when_updating_menus() {
-		$rest_server = rest_get_server();
-		// This call is needed to initialize route_options.
-		$rest_server->get_routes();
-		$route_options = $rest_server->get_route_options( '/__experimental/menus/(?P<id>[\d]+)' );
-
-		$this->assertArrayHasKey( 'allow_batch', $route_options );
-		$this->assertSame( array( 'v1' => true ), $route_options['allow_batch'] );
 	}
 }
