@@ -86,7 +86,6 @@ export function processingQueue( state, action ) {
  *
  * @param {number} state  Current state.
  * @param {Object} action Dispatched action.
- *
  * @return {Object} Updated state.
  */
 export function selectedMenuId( state = null, action ) {
@@ -101,8 +100,10 @@ export function selectedMenuId( state = null, action ) {
 /**
  * Reducer tracking whether the inserter is open.
  *
- * @param {boolean|Object} state
- * @param {Object}         action
+ * @param {boolean|Object} state        Current state.
+ * @param {Object}         action       Dispatched action.
+ * @param {string}         action.type  String indicating action type.
+ * @param {boolean}        action.value Flag indicating whether the panel should be open/close.
  */
 function blockInserterPanel( state = false, action ) {
 	switch ( action.type ) {
