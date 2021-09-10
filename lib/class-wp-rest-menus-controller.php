@@ -55,7 +55,7 @@ class WP_REST_Menus_Controller extends WP_REST_Terms_Controller {
 			$this->namespace,
 			'/' . $this->rest_base . '/(?P<id>[\d]+)',
 			array(
-				'args'   => array(
+				'args'        => array(
 					'id' => array(
 						'description' => __( 'Unique identifier for the term.', 'default' ),
 						'type'        => 'integer',
