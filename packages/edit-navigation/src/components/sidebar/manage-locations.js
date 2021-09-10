@@ -12,7 +12,7 @@ import {
 	SelectControl,
 } from '@wordpress/components';
 import { decodeEntities } from '@wordpress/html-entities';
-import apiFetch from '@wordpress/api-fetch';
+import { createBatch } from '@wordpress/core-data';
 import { useDispatch } from '@wordpress/data';
 import { store as noticesStore } from '@wordpress/notices';
 
@@ -39,47 +39,36 @@ export default function ManageLocations( {
 	);
 
 	const updateMenuLocations = async () => {
-		const method = 'POST';
-		const batchRequests = menus.map( ( { id } ) => {
+		const batch = createBatch();
+		menus.forEach( ( { id } ) => {
 			const locations = menuLocations
 				.filter( ( menuLocation ) => menuLocation.menu === id )
 				.map( ( menuLocation ) => menuLocation.name );
 
-			return {
+			batch.add( {
 				path: `/__experimental/menus/${ id }`,
-				body: {
+				data: {
 					locations,
 				},
-				method,
-			};
+				method: 'POST',
+			} );
 		} );
 
-		const batchResponse = await apiFetch( {
-			path: 'batch/v1',
-			data: {
-				validation: 'require-all-validate',
-				requests: batchRequests,
-			},
-			method,
-		} );
-
-		if ( batchResponse.failed ) {
-			createErrorNotice(
-				__(
-					'An error occurred while trying to update menu locations.'
-				),
-				{
-					type: 'snackbar',
-				}
-			);
-
+		const isSuccess = await batch.run();
+		if ( isSuccess ) {
+			createSuccessNotice( __( 'Menu locations have been updated.' ), {
+				type: 'snackbar',
+			} );
+			closeModal();
 			return;
 		}
 
-		createSuccessNotice( __( 'Menu locations have been updated.' ), {
-			type: 'snackbar',
-		} );
-		closeModal();
+		createErrorNotice(
+			__( 'An error occurred while trying to update menu locations.' ),
+			{
+				type: 'snackbar',
+			}
+		);
 	};
 
 	if ( ! menuLocations || ! menus?.length ) {
