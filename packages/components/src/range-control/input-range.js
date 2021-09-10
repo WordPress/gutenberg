@@ -16,7 +16,7 @@ import { UP, RIGHT, DOWN, LEFT } from '@wordpress/keycodes';
  */
 import { InputRange as BaseInputRange } from './styles/range-control-styles';
 import { useDebouncedHoverInteraction } from './utils';
-import { add, subtract } from '../utils/math';
+import { add, subtract, roundClamp } from '../utils/math';
 
 const _isRTL = isRTL();
 
@@ -52,9 +52,10 @@ function InputRange(
 
 		if ( isShiftStepEnabled && shiftKey && keyCode in operationList ) {
 			event.preventDefault();
-			const modifiedStep = shiftStep * props.step;
+			const { min, max, step } = props;
+			const modifiedStep = shiftStep * step;
 			const nextValue = operationList[ keyCode ]( value, modifiedStep );
-			onShiftStep( nextValue );
+			onShiftStep( roundClamp( nextValue, min, max, modifiedStep ) );
 		}
 	};
 
