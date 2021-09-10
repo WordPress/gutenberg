@@ -14,7 +14,7 @@ import { plus } from '@wordpress/icons';
 import { useNavigationEditorRootBlock } from '../../hooks';
 import { store as editNavigationStore } from '../../store';
 
-function Inserter() {
+function InserterButton() {
 	const inserterButton = useRef();
 	const { navBlockClientId } = useNavigationEditorRootBlock();
 
@@ -52,4 +52,4 @@ function Inserter() {
 	);
 }
 
-export default Inserter;
+export default InserterButton;
