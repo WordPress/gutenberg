@@ -524,6 +524,16 @@ class REST_Nav_Menus_Controller_Test extends WP_Test_REST_Controller_Testcase {
 		$this->assertErrorResponse( 'rest_cannot_view', $response, 403 );
 	}
 
+	public function test_it_allows_batch_requests_when_updating_menus() {
+		$rest_server = rest_get_server();
+		// This call is needed to initialize route_options.
+		$rest_server->get_routes();
+		$route_options = $rest_server->get_route_options( '/__experimental/menus/(?P<id>[\d]+)' );
+
+		$this->assertArrayHasKey( 'allow_batch', $route_options );
+		$this->assertSame( array( 'v1' => true ), $route_options['allow_batch'] );
+	}
+
 	/**
 	 * @param WP_REST_Response $response Response Class.
 	 */
