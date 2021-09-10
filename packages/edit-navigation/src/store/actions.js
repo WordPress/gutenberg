@@ -138,11 +138,11 @@ export const saveNavigationPost = ( post ) => async ( {
 		const oldMenuItems = await dispatch(
 			resolveSelectMenuItems( post.meta.menuId )
 		);
-		const newMenuItems = await dispatch(
-			computeNewMenuItems( post, oldMenuItems )
+		const desiredMenuItems = await dispatch(
+			getDesiredMenuItems( post, oldMenuItems )
 		);
 		await dispatch(
-			batchSaveDiff( 'root', 'menuItem', oldMenuItems, newMenuItems )
+			batchSaveDiff( 'root', 'menuItem', oldMenuItems, desiredMenuItems )
 		);
 
 		// Clear "stub" navigation post edits to avoid a false "dirty" state.
@@ -178,12 +178,13 @@ export const saveNavigationPost = ( post ) => async ( {
 	}
 };
 
-const computeNewMenuItems = ( post, oldMenuItems ) => async ( {
+const getDesiredMenuItems = ( post, oldMenuItems ) => async ( {
 	dispatch,
 } ) => {
 	const entityIdToBlockId = await dispatch(
 		getEntityRecordIdToBlockIdMapping( post.id )
 	);
+
 	const blockIdToOldEntityRecord = {};
 	for ( const oldMenuItem of oldMenuItems ) {
 		const blockId = entityIdToBlockId[ oldMenuItem.id ];
@@ -217,10 +218,10 @@ const batchSaveDiff = (
 	kind,
 	type,
 	oldEntityRecords,
-	newEntityRecords
+	desiredEntityRecords
 ) => async ( { dispatch, registry } ) => {
 	const annotatedBatchTasks = await dispatch(
-		createBatchTasks( kind, type, oldEntityRecords, newEntityRecords )
+		createBatchTasks( kind, type, oldEntityRecords, desiredEntityRecords )
 	);
 
 	const results = await registry
@@ -272,18 +273,18 @@ const createBatchTasks = (
 	kind,
 	type,
 	oldEntityRecords,
-	newEntityRecords
+	desiredEntityRecords
 ) => async ( { registry } ) => {
 	const deletedEntityRecordsIds = new Set(
 		diff(
 			oldEntityRecords.map( ( { id } ) => id ),
-			newEntityRecords.map( ( { id } ) => id )
+			desiredEntityRecords.map( ( { id } ) => id )
 		)
 	);
 
 	const batchTasks = [];
 	// Enqueue updates
-	for ( const entityRecord of newEntityRecords ) {
+	for ( const entityRecord of desiredEntityRecords ) {
 		if (
 			! entityRecord?.id ||
 			deletedEntityRecordsIds.has( entityRecord?.id )
