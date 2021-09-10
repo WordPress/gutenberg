@@ -12,6 +12,7 @@
  * @see WP_REST_Controller
  */
 class WP_REST_Menus_Controller extends WP_REST_Terms_Controller {
+
 	/**
 	 * Constructor.
 	 *
@@ -54,7 +55,7 @@ class WP_REST_Menus_Controller extends WP_REST_Terms_Controller {
 			$this->namespace,
 			'/' . $this->rest_base . '/(?P<id>[\d]+)',
 			array(
-				'args'   => array(
+				'args'        => array(
 					'id' => array(
 						'description' => __( 'Unique identifier for the term.' ),
 						'type'        => 'integer',
@@ -87,7 +88,7 @@ class WP_REST_Menus_Controller extends WP_REST_Terms_Controller {
 					),
 				),
 				'allow_batch' => array( 'v1' => true ),
-				'schema' => array( $this, 'get_public_item_schema' ),
+				'schema'      => array( $this, 'get_public_item_schema' ),
 			)
 		);
 	}
