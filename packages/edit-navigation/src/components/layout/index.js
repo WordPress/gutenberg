@@ -34,7 +34,7 @@ import Sidebar from '../sidebar';
 import Header from '../header';
 import Notices from '../notices';
 import Editor from '../editor';
-import InserterSidebar from '../secondary-sidebar/inserter-sidebar';
+import InserterSidebar from '../inserter-sidebar';
 import UnsavedChangesWarning from './unsaved-changes-warning';
 import { store as editNavigationStore } from '../../store';
 
