@@ -9,7 +9,7 @@ import {
 import { store as coreStore } from '@wordpress/core-data';
 import { MenuItem } from '@wordpress/components';
 import { isTemplatePart } from '@wordpress/blocks';
-import { __ } from '@wordpress/i18n';
+import { __, sprintf } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
@@ -17,7 +17,7 @@ import { __ } from '@wordpress/i18n';
 import { store as editSiteStore } from '../../store';
 
 export default function EditTemplatePartMenuButton() {
-	const selectedTemplatePartId = useSelect( ( select ) => {
+	const selectedTemplatePart = useSelect( ( select ) => {
 		const { getSelectedBlockClientId, getBlock } = select(
 			blockEditorStore
 		);
@@ -36,12 +36,12 @@ export default function EditTemplatePartMenuButton() {
 					part.theme === block.attributes.theme &&
 					part.slug === block.attributes.slug
 			);
-			return templatePart?.id;
+			return templatePart;
 		}
 	}, [] );
 	const { setTemplatePart } = useDispatch( editSiteStore );
 
-	if ( ! selectedTemplatePartId ) {
+	if ( ! selectedTemplatePart ) {
 		return null;
 	}
 
@@ -50,11 +50,14 @@ export default function EditTemplatePartMenuButton() {
 			{ ( { onClose } ) => (
 				<MenuItem
 					onClick={ () => {
-						setTemplatePart( selectedTemplatePartId );
+						setTemplatePart( selectedTemplatePart.id );
 						onClose();
 					} }
 				>
-					{ __( 'Edit template part' ) }
+					{
+						/* translators: %s: template part title */
+						sprintf( __( 'Edit "%s"' ), selectedTemplatePart.slug )
+					}
 				</MenuItem>
 			) }
 		</BlockSettingsMenuControls>
