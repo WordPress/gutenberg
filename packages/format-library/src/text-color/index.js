@@ -22,6 +22,37 @@ const title = __( 'Color' );
 
 const EMPTY_ARRAY = [];
 
+function getComputedStyleProperty( element, property ) {
+	const { ownerDocument } = element;
+	const { defaultView } = ownerDocument;
+	const style = defaultView.getComputedStyle( element );
+	const value = style.getPropertyValue( property );
+
+	if (
+		property === 'background-color' &&
+		value === 'rgba(0, 0, 0, 0)' &&
+		element.parentElement
+	) {
+		return getComputedStyleProperty( element.parentElement, property );
+	}
+
+	return value;
+}
+
+function fillComputedColors( element, { color, backgroundColor } ) {
+	if ( ! color && ! backgroundColor ) {
+		return;
+	}
+
+	return {
+		color: color || getComputedStyleProperty( element, 'color' ),
+		backgroundColor:
+			backgroundColor === 'rgba(0, 0, 0, 0)'
+				? getComputedStyleProperty( element, 'background-color' )
+				: backgroundColor,
+	};
+}
+
 function TextColorEdit( {
 	value,
 	onChange,
@@ -39,7 +70,11 @@ function TextColorEdit( {
 		setIsAddingColor,
 	] );
 	const colorIndicatorStyle = useMemo(
-		() => getActiveColors( value, name, colors ),
+		() =>
+			fillComputedColors(
+				contentRef.current,
+				getActiveColors( value, name, colors )
+			),
 		[ value, colors ]
 	);
 
