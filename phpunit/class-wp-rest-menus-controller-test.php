@@ -10,7 +10,7 @@
  *
  * @see WP_REST_Controller
  */
-class WP_REST_Menus_Controller_Test extends WP_REST_Menus_Controller {
+class WP_REST_Menus_Controller_Test extends WP_Test_REST_TestCase {
 	public function test_it_allows_batch_requests_when_updating_menus() {
 		$rest_server = rest_get_server();
 		// This call is needed to initialize route_options.
