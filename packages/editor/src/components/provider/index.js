@@ -24,7 +24,6 @@ import withRegistryProvider from './with-registry-provider';
 import { mediaUpload } from '../../utils';
 import ReusableBlocksButtons from '../reusable-blocks-buttons';
 import ConvertToGroupButtons from '../convert-to-group-buttons';
-import InserterMenuDownloadableBlocksPanel from '../inserter-menu-downloadable-blocks-panel';
 
 const fetchLinkSuggestions = async ( search ) => {
 	const posts = await apiFetch( {
@@ -107,7 +106,6 @@ class EditorProvider extends Component {
 				'onUpdateDefaultBlockStyles',
 				'__experimentalEnableLegacyWidgetBlock',
 				'__experimentalEnableMenuBlock',
-				'__experimentalBlockDirectory',
 				'showInserterHelpPanel',
 			] ),
 			__experimentalReusableBlocks: reusableBlocks,
@@ -138,21 +136,6 @@ class EditorProvider extends Component {
 	componentDidUpdate( prevProps ) {
 		if ( this.props.settings !== prevProps.settings ) {
 			this.props.updateEditorSettings( this.props.settings );
-		}
-
-		// When a block is installed from the inserter and is unused,
-		// it is removed when saving the post.
-		// Todo: move this to the edit-post package into a separate component.
-		if ( ! isEqual( this.props.downloadableBlocksToUninstall, prevProps.downloadableBlocksToUninstall ) ) {
-			this.props.downloadableBlocksToUninstall.forEach( ( blockType ) => {
-				this.props.uninstallBlock( blockType, noop, () => {
-					this.props.createWarningNotice(
-						__( 'Block previews can\'t uninstall.' ), {
-							id: UNINSTALL_ERROR_NOTICE_ID,
-						} );
-				} );
-				unregisterBlockType( blockType.name );
-			} );
 		}
 	}
 
@@ -195,7 +178,6 @@ class EditorProvider extends Component {
 				{ children }
 				<ReusableBlocksButtons />
 				<ConvertToGroupButtons />
-				{ editorSettings.__experimentalBlockDirectory && <InserterMenuDownloadableBlocksPanel /> }
 			</BlockEditorProvider>
 		);
 	}
@@ -211,10 +193,7 @@ export default compose( [
 			__experimentalGetReusableBlocks,
 		} = select( 'core/editor' );
 		const { canUser } = select( 'core' );
-		const { getInstalledBlockTypes } = select( 'core/block-directory' );
 		const { getBlocks } = select( 'core/block-editor' );
-
-		const downloadableBlocksToUninstall = differenceBy( getInstalledBlockTypes(), getBlocks(), 'name' );
 
 		return {
 			canUserUseUnfilteredHTML: canUserUseUnfilteredHTML(),
@@ -222,7 +201,6 @@ export default compose( [
 			blocks: getEditorBlocks(),
 			reusableBlocks: __experimentalGetReusableBlocks(),
 			hasUploadPermissions: defaultTo( canUser( 'create', 'media' ), true ),
-			downloadableBlocksToUninstall,
 		};
 	} ),
 	withDispatch( ( dispatch ) => {
@@ -234,7 +212,6 @@ export default compose( [
 			__experimentalTearDownEditor,
 		} = dispatch( 'core/editor' );
 		const { createWarningNotice } = dispatch( 'core/notices' );
-		const { uninstallBlock } = dispatch( 'core/block-directory' );
 
 		return {
 			setupEditor,
@@ -248,7 +225,6 @@ export default compose( [
 				} );
 			},
 			tearDownEditor: __experimentalTearDownEditor,
-			uninstallBlock,
 		};
 	} ),
 ] )( EditorProvider );
