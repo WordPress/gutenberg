@@ -54,7 +54,7 @@ const BLOCK_ALIGNMENTS_CONTROLS = {
 };
 
 const DEFAULT_CONTROL = 'none';
-const help = __( 'Your theme does not support wide alignments' );
+const help = __( 'The theme does not support wider alignments.' );
 
 const POPOVER_PROPS = {
 	isAlternate: true,
