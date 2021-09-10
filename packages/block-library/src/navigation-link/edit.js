@@ -315,6 +315,8 @@ export default function NavigationLinkEdit( {
 		( select ) => {
 			const {
 				getBlocks,
+				getBlockName,
+				getBlockRootClientId,
 				getClientIdsOfDescendants,
 				hasSelectedInnerBlock,
 				getSelectedBlockClientId,
@@ -329,14 +331,13 @@ export default function NavigationLinkEdit( {
 			return {
 				innerBlocks: getBlocks( clientId ),
 				isAtMaxNesting:
-					getBlockParentsByBlockName( clientId, name ).length >=
-					MAX_NESTING,
-				// Temporary fix until navigation link submenus are properly deprecated.
-				isTopLevelLink:
 					getBlockParentsByBlockName( clientId, [
 						name,
 						'core/navigation-submenu',
-					] ).length === 0,
+					] ).length >= MAX_NESTING,
+				isTopLevelLink:
+					getBlockName( getBlockRootClientId( clientId ) ) ===
+					'core/navigation',
 				isParentOfSelectedBlock: hasSelectedInnerBlock(
 					clientId,
 					true
