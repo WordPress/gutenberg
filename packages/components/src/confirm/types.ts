@@ -9,5 +9,5 @@ export interface OwnProps {
 	selfClose?: boolean;
 	message: string;
 	onConfirm: ( event: MouseEvent< HTMLButtonElement > ) => void;
-	onCancel: ( event: MouseEvent< HTMLButtonElement > ) => void;
+	onCancel?: ( event: MouseEvent< HTMLButtonElement > ) => void;
 }

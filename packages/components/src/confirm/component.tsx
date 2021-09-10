@@ -34,7 +34,7 @@ function Confirm(
 		isOpen = true,
 		message,
 		onConfirm,
-		onCancel,
+		onCancel = () => {},
 		selfClose = true,
 	} = useContextSystem( props, 'Confirm' );
 
@@ -50,9 +50,7 @@ function Confirm(
 	const handleEvent = (
 		callback: ( event: MouseEvent< HTMLButtonElement > ) => void
 	) => ( event: MouseEvent< HTMLButtonElement > ) => {
-		if ( typeof callback === 'function' ) {
-			callback( event );
-		}
+		callback( event );
 		if ( selfClose ) {
 			setIsOpen( false );
 		}
