@@ -27,6 +27,7 @@ describe( 'changing image size', () => {
 
 		expect( await getEditedPostContent() ).toMatchSnapshot();
 
+		await page.waitForSelector( '.wp-block-test-iframed-block' );
 		const text = await page.evaluate( () => {
 			return document.querySelector( '.wp-block-test-iframed-block' )
 				.innerText;
