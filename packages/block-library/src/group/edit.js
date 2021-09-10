@@ -87,7 +87,6 @@ function GroupEdit( { attributes, setAttributes, clientId } ) {
 					help={ htmlElementMessages[ TagName ] }
 				/>
 			</InspectorControls>
-
 			{ layoutSupportEnabled && <TagName { ...innerBlocksProps } /> }
 			{ /* Ideally this is not needed but it's there for backward compatibility reason
 				to keep this div for themes that might rely on its presence */ }
