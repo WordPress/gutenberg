@@ -26,9 +26,10 @@ class WP_REST_Menus_Controller extends WP_REST_Terms_Controller {
 	 * Overrides the route registration to support "allow_batch".
 	 *
 	 * @since 11.5.0
+	 *
+	 * @see register_rest_route()
 	 */
-	public function register_routes()
-	{
+	public function register_routes() {
 		register_rest_route(
 			$this->namespace,
 			'/' . $this->rest_base,
