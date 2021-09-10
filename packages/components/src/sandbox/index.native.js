@@ -154,8 +154,9 @@ const EMPTY_ARRAY = [];
 
 function Sandbox( {
 	containerStyle,
-	html = '',
 	customJS,
+	html = '',
+	lang = 'en',
 	providerUrl = '',
 	scripts = EMPTY_ARRAY,
 	styles = EMPTY_ARRAY,
@@ -185,9 +186,6 @@ function Sandbox( {
 	} );
 
 	function getHtmlDoc() {
-		// TODO: Use the device's locale
-		const lang = 'en';
-
 		// Put the html snippet into a html document, and update the state to refresh the WebView,
 		// we can use this in the future to inject custom styles or scripts.
 		// Scripts go into the body rather than the head, to support embedded content such as Instagram
