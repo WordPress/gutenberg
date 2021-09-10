@@ -12,8 +12,7 @@ const resetAll = jest.fn();
 
 // Default props for the tools panel.
 const defaultProps = {
-	header: 'Panel header',
-	label: 'Display options',
+	label: 'Panel header',
 	resetAll,
 };
 
@@ -231,9 +230,9 @@ describe( 'ToolsPanel', () => {
 			expect( menuItems[ 1 ] ).toHaveAttribute( 'aria-checked', 'false' );
 		} );
 
-		it( 'should render panel header', () => {
+		it( 'should render panel label as header text', () => {
 			renderPanel();
-			const header = screen.getByText( defaultProps.header );
+			const header = screen.getByText( defaultProps.label );
 
 			expect( header ).toBeInTheDocument();
 		} );
@@ -316,6 +315,26 @@ describe( 'ToolsPanel', () => {
 			await selectMenuItem( 'Reset all' );
 
 			expect( resetAll ).toHaveBeenCalledTimes( 1 );
+			expect( controlProps.onSelect ).not.toHaveBeenCalled();
+			expect( controlProps.onDeselect ).not.toHaveBeenCalled();
+			expect( altControlProps.onSelect ).not.toHaveBeenCalled();
+			expect( altControlProps.onDeselect ).not.toHaveBeenCalled();
+		} );
+
+		// This confirms the internal `isResetting` state when resetting all
+		// controls does not prevent subsequent individual reset requests.
+		// i.e. onDeselect callbacks are called correctly after a resetAll.
+		it( 'should call onDeselect after previous reset all', async () => {
+			renderPanel();
+
+			await selectMenuItem( 'Reset all' ); // Initial control is displayed by default.
+			await selectMenuItem( controlProps.label ); // Re-display control.
+
+			expect( controlProps.onDeselect ).not.toHaveBeenCalled();
+
+			await selectMenuItem( controlProps.label ); // Reset control.
+
+			expect( controlProps.onDeselect ).toHaveBeenCalled();
 		} );
 	} );
 
