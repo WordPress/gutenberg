@@ -30,8 +30,7 @@
 		font-family: $default-font;
 
 		// Increase specificity.
-		.wp-block-navigation-item,
-		.wp-block-navigation-submenu {
+		.wp-block-navigation-item {
 			display: block;
 			margin: $grid-unit-10 0;
 
@@ -53,13 +52,6 @@
 
 			&.block-editor-block-list__block:not([contenteditable]):focus::after {
 				display: none;
-			}
-
-			// Menu items.
-			// This needs high specificity to override inherited values.
-			&.wp-block-navigation-item.wp-block-navigation-item,
-			&.wp-block-navigation-submenu .wp-block-navigation-submenu {
-				margin-right: 0;
 			}
 
 			.wp-block-navigation-item__content.wp-block-navigation-item__content.wp-block-navigation-item__content {
