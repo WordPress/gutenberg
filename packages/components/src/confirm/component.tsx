@@ -41,16 +41,18 @@ function Confirm(
 	const cx = useCx();
 	const wrapperClassName = cx( styles.wrapper );
 
-	const [ _isOpen, setIsOpen ] = useState<Boolean>();
+	const [ _isOpen, setIsOpen ] = useState< Boolean >();
 
 	useEffect( () => {
 		setIsOpen( isOpen );
 	}, [ isOpen ] );
 
-	const closeAndHandle = (
+	const handleEvent = (
 		callback: ( event: MouseEvent< HTMLButtonElement > ) => void
 	) => ( event: MouseEvent< HTMLButtonElement > ) => {
-		callback( event );
+		if ( typeof callback === 'function' ) {
+			callback( event );
+		}
 		if ( selfClose ) {
 			setIsOpen( false );
 		}
@@ -59,30 +61,30 @@ function Confirm(
 	return (
 		<>
 			{ _isOpen && (
-					<Modal
-						title={ message }
-						overlayClassName={ wrapperClassName }
-						onRequestClose={ closeAndHandle( onCancel ) }
-						onKeyDown={ closeAndHandle( onCancel ) }
-						closeButtonLabel={ __( 'Cancel' ) }
-						isDismissible={ false }
-						forwardedRef={ forwardedRef }
-					>
-						<Flex justify="flex-end">
-							<Button
-								variant="secondary"
-								onClick={ closeAndHandle( onCancel ) }
-							>
-								{ __( 'Cancel' ) }
-							</Button>
-							<Button
-								variant="primary"
-								onClick={ closeAndHandle( onConfirm ) }
-							>
-								{ __( 'OK' ) }
-							</Button>
-						</Flex>
-					</Modal>
+				<Modal
+					title={ message }
+					overlayClassName={ wrapperClassName }
+					onRequestClose={ handleEvent( onCancel ) }
+					onKeyDown={ handleEvent( onCancel ) }
+					closeButtonLabel={ __( 'Cancel' ) }
+					isDismissible={ true }
+					forwardedRef={ forwardedRef }
+				>
+					<Flex justify="flex-end">
+						<Button
+							variant="secondary"
+							onClick={ handleEvent( onCancel ) }
+						>
+							{ __( 'Cancel' ) }
+						</Button>
+						<Button
+							variant="primary"
+							onClick={ handleEvent( onConfirm ) }
+						>
+							{ __( 'OK' ) }
+						</Button>
+					</Flex>
+				</Modal>
 			) }
 		</>
 	);

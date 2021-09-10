@@ -81,16 +81,15 @@ export class PostVisibility extends Component {
 		return (
 			<>
 				<Confirm
-					message={ __( 'This is a test for a standalone declarative Confirm' ) }
-				/>
-				<Confirm
-					message={ __( 'Would you like to privately publish this post now?' ) }
+					message={ __(
+						'Would you like to privately publish this post now?'
+					) }
 					isOpen={ this.state.isConfirmOpen }
 					onConfirm={ this.setPrivate }
 					onCancel={ () => this.setState( { isConfirmOpen: false } ) }
 					selfClose={ false }
 				/>
-  			<fieldset
+				<fieldset
 					key="visibility-selector"
 					className="editor-post-visibility__dialog-fieldset"
 				>
