@@ -17,7 +17,7 @@ import { removeFormat } from '@wordpress/rich-text';
  */
 import { default as InlineColorUI, getActiveColors } from './inline';
 
-const name = 'core/color';
+const name = 'core/text-color';
 const title = __( 'Color' );
 
 const EMPTY_ARRAY = [];
@@ -84,7 +84,7 @@ function TextColorEdit( {
 export const textColor = {
 	name,
 	title,
-	tagName: 'span',
+	tagName: 'mark',
 	className: 'has-inline-color',
 	attributes: {
 		style: 'style',
