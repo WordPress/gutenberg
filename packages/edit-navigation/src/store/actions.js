@@ -142,7 +142,12 @@ export const saveNavigationPost = ( post ) => async ( {
 			getDesiredMenuItems( post, oldMenuItems )
 		);
 		await dispatch(
-			batchSaveDiff( 'root', 'menuItem', oldMenuItems, desiredMenuItems )
+			batchSaveChanges(
+				'root',
+				'menuItem',
+				oldMenuItems,
+				desiredMenuItems
+			)
 		);
 
 		// Clear "stub" navigation post edits to avoid a false "dirty" state.
@@ -214,22 +219,22 @@ const resolveSelectMenuItems = ( menuId ) => async ( { registry } ) =>
 		.resolveSelect( 'core' )
 		.getMenuItems( { menus: menuId, per_page: -1 } );
 
-const batchSaveDiff = (
+const batchSaveChanges = (
 	kind,
 	type,
 	oldEntityRecords,
 	desiredEntityRecords
 ) => async ( { dispatch, registry } ) => {
-	const annotatedBatchTasks = await dispatch(
-		createBatchTasks( kind, type, oldEntityRecords, desiredEntityRecords )
+	const changeset = await dispatch(
+		computeChangeset( kind, type, oldEntityRecords, desiredEntityRecords )
 	);
 
 	const results = await registry
 		.dispatch( 'core' )
-		.__experimentalBatch( annotatedBatchTasks.map( ( { task } ) => task ) );
+		.__experimentalBatch( changeset.map( ( { batchTask } ) => batchTask ) );
 
 	const failures = await dispatch(
-		getFailedBatchTasks( kind, type, annotatedBatchTasks, results )
+		getFailedChanges( kind, type, changeset, results )
 	);
 
 	if ( failures.length ) {
@@ -245,31 +250,30 @@ const batchSaveDiff = (
 	return results;
 };
 
-const getFailedBatchTasks = (
-	kind,
-	entityType,
-	annotatedBatchTasks,
-	results
-) => async ( { registry } ) => {
-	const failedDeletes = zip( annotatedBatchTasks, results )
-		.filter( ( [ { type } ] ) => type === 'delete' )
-		.filter( ( [ , result ] ) => ! result?.hasOwnProperty( 'deleted' ) )
-		.map( ( [ task ] ) => task );
-
-	const failedUpdates = annotatedBatchTasks
-		.filter( ( { type } ) => type === 'update' )
+const getFailedChanges = ( kind, entityType, changeset, results ) => async ( {
+	registry,
+} ) => {
+	const failedDeletes = zip( changeset, results )
 		.filter(
-			( { id } ) =>
-				id &&
-				registry
-					.select( 'core' )
-					.getLastEntitySaveError( kind, entityType, id )
-		);
+			( [ change, result ] ) =>
+				change.type === 'delete' &&
+				! result?.hasOwnProperty( 'deleted' )
+		)
+		.map( ( [ change ] ) => change );
+
+	const failedUpdates = changeset.filter(
+		( change ) =>
+			change.type === 'update' &&
+			change.id &&
+			registry
+				.select( 'core' )
+				.getLastEntitySaveError( kind, entityType, change.id )
+	);
 
 	return [ ...failedDeletes, ...failedUpdates ];
 };
 
-const createBatchTasks = (
+const computeChangeset = (
 	kind,
 	type,
 	oldEntityRecords,
@@ -282,7 +286,7 @@ const createBatchTasks = (
 		)
 	);
 
-	const batchTasks = [];
+	const changes = [];
 	// Enqueue updates
 	for ( const entityRecord of desiredEntityRecords ) {
 		if (
@@ -307,27 +311,27 @@ const createBatchTasks = (
 			continue;
 		}
 
-		batchTasks.unshift( {
+		changes.unshift( {
 			type: 'update',
 			id: entityRecord.id,
-			task: ( { saveEditedEntityRecord } ) =>
+			batchTask: ( { saveEditedEntityRecord } ) =>
 				saveEditedEntityRecord( kind, type, entityRecord.id ),
 		} );
 	}
 
 	// Enqueue deletes
 	for ( const entityRecordId of deletedEntityRecordsIds ) {
-		batchTasks.unshift( {
+		changes.unshift( {
 			type: 'delete',
 			id: entityRecordId,
-			task: ( { deleteEntityRecord } ) =>
+			batchTask: ( { deleteEntityRecord } ) =>
 				deleteEntityRecord( kind, type, entityRecordId, {
 					force: true,
 				} ),
 		} );
 	}
 
-	return batchTasks;
+	return changes;
 };
 
 function diff( listA, listB ) {
