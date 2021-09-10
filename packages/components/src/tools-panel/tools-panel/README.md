@@ -69,7 +69,7 @@ export function DimensionPanel( props ) {
 
 ### `label`: `string`
 
-Text to be displayed within the panel's header and as the aria-label for the
+Text to be displayed within the panel's header and as the `aria-label` for the
 panel's dropdown menu.
 
 - Required: Yes
