@@ -53,7 +53,7 @@ export const DisabledWithProp = () => {
 			<Disabled isDisabled={ isDisabled }>
 				<Form />
 			</Disabled>
-			<Button isPrimary onClick={ toggleDisabled }>
+			<Button variant="primary" onClick={ toggleDisabled }>
 				Set isDisabled to { isDisabled ? 'false' : 'true' }
 			</Button>
 		</div>

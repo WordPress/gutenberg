@@ -5,43 +5,49 @@ import { useSelect } from '@wordpress/data';
 import {
 	InnerBlocks,
 	useBlockProps,
-	InspectorAdvancedControls,
+	InspectorControls,
 	__experimentalUseInnerBlocksProps as useInnerBlocksProps,
+	useSetting,
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
-import {
-	SelectControl,
-	__experimentalBoxControl as BoxControl,
-} from '@wordpress/components';
+import { SelectControl } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-const { __Visualizer: BoxControlVisualizer } = BoxControl;
 
 function GroupEdit( { attributes, setAttributes, clientId } ) {
-	const hasInnerBlocks = useSelect(
+	const { hasInnerBlocks, themeSupportsLayout } = useSelect(
 		( select ) => {
-			const { getBlock } = select( blockEditorStore );
+			const { getBlock, getSettings } = select( blockEditorStore );
 			const block = getBlock( clientId );
-			return !! ( block && block.innerBlocks.length );
+			return {
+				hasInnerBlocks: !! ( block && block.innerBlocks.length ),
+				themeSupportsLayout: getSettings()?.supportsLayout,
+			};
 		},
 		[ clientId ]
 	);
+	const defaultLayout = useSetting( 'layout' ) || {};
+	const { tagName: TagName = 'div', templateLock, layout = {} } = attributes;
+	const usedLayout = !! layout && layout.inherit ? defaultLayout : layout;
+	const { type = 'default' } = usedLayout;
+	const layoutSupportEnabled = themeSupportsLayout || type !== 'default';
+
 	const blockProps = useBlockProps();
-	const { tagName: TagName = 'div', templateLock } = attributes;
 	const innerBlocksProps = useInnerBlocksProps(
-		{
-			className: 'wp-block-group__inner-container',
-		},
+		layoutSupportEnabled
+			? blockProps
+			: { className: 'wp-block-group__inner-container' },
 		{
 			templateLock,
 			renderAppender: hasInnerBlocks
 				? undefined
 				: InnerBlocks.ButtonBlockAppender,
+			__experimentalLayout: layoutSupportEnabled ? usedLayout : undefined,
 		}
 	);
 
 	return (
 		<>
-			<InspectorAdvancedControls>
+			<InspectorControls __experimentalGroup="advanced">
 				<SelectControl
 					label={ __( 'HTML element' ) }
 					options={ [
@@ -58,14 +64,15 @@ function GroupEdit( { attributes, setAttributes, clientId } ) {
 						setAttributes( { tagName: value } )
 					}
 				/>
-			</InspectorAdvancedControls>
-			<TagName { ...blockProps }>
-				<BoxControlVisualizer
-					values={ attributes.style?.spacing?.padding }
-					showValues={ attributes.style?.visualizers?.padding }
-				/>
-				<div { ...innerBlocksProps } />
-			</TagName>
+			</InspectorControls>
+			{ layoutSupportEnabled && <TagName { ...innerBlocksProps } /> }
+			{ /* Ideally this is not needed but it's there for backward compatibility reason
+				to keep this div for themes that might rely on its presence */ }
+			{ ! layoutSupportEnabled && (
+				<TagName { ...blockProps }>
+					<div { ...innerBlocksProps } />
+				</TagName>
+			) }
 		</>
 	);
 }

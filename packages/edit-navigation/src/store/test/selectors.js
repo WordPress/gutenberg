@@ -1,15 +1,21 @@
 /**
+ * WordPress dependencies
+ */
+import { store as coreDataStore } from '@wordpress/core-data';
+
+/**
  * Internal dependencies
  */
 import {
 	getNavigationPostForMenu,
 	hasResolvedNavigationPost,
 	getMenuItemForClientId,
+	getSelectedMenuId,
 } from '../selectors';
 import {
 	NAVIGATION_POST_KIND,
 	NAVIGATION_POST_POST_TYPE,
-} from '../../utils/constants';
+} from '../../constants';
 
 import { buildNavigationPostId } from '../utils';
 
@@ -32,7 +38,7 @@ describe( 'getNavigationPostForMenu', () => {
 
 		expect( getNavigationPostForMenu( 'state', menuId ) ).toBe( 'record' );
 
-		expect( registry.select ).toHaveBeenCalledWith( 'core' );
+		expect( registry.select ).toHaveBeenCalledWith( coreDataStore );
 		expect( getEditedEntityRecord ).toHaveBeenCalledWith(
 			NAVIGATION_POST_KIND,
 			NAVIGATION_POST_POST_TYPE,
@@ -61,7 +67,7 @@ describe( 'getNavigationPostForMenu', () => {
 
 		expect( getNavigationPostForMenu( 'state', menuId ) ).toBe( null );
 
-		expect( registry.select ).toHaveBeenCalledWith( 'core' );
+		expect( registry.select ).toHaveBeenCalledWith( coreDataStore );
 		expect( getEditedEntityRecord ).not.toHaveBeenCalled();
 
 		getNavigationPostForMenu.registry = defaultRegistry;
@@ -85,7 +91,7 @@ describe( 'hasResolvedNavigationPost', () => {
 
 		expect( hasResolvedNavigationPost( 'state', menuId ) ).toBe( true );
 
-		expect( registry.select ).toHaveBeenCalledWith( 'core' );
+		expect( registry.select ).toHaveBeenCalledWith( coreDataStore );
 		expect( hasFinishedResolution ).toHaveBeenCalledWith(
 			'getEntityRecord',
 			[
@@ -124,9 +130,21 @@ describe( 'getMenuItemForClientId', () => {
 			'menuItem'
 		);
 
-		expect( registry.select ).toHaveBeenCalledWith( 'core' );
+		expect( registry.select ).toHaveBeenCalledWith( coreDataStore );
 		expect( getMenuItem ).toHaveBeenCalledWith( '123' );
 
 		getMenuItemForClientId.registry = defaultRegistry;
+	} );
+} );
+
+describe( 'getSelectedMenuId', () => {
+	it( 'returns default selected menu ID (zero)', () => {
+		const state = {};
+		expect( getSelectedMenuId( state ) ).toBe( null );
+	} );
+
+	it( 'returns selected menu ID', () => {
+		const state = { selectedMenuId: 10 };
+		expect( getSelectedMenuId( state ) ).toBe( 10 );
 	} );
 } );

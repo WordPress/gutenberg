@@ -61,11 +61,11 @@ class WP_Block_Template {
 	public $description = '';
 
 	/**
-	 * Whether it's a theme file template or a custom one.
+	 * Source of the content. `theme` and `custom` is used for now.
 	 *
-	 * @var boolean
+	 * @var string
 	 */
-	public $is_custom = false;
+	public $source = 'theme';
 
 	/**
 	 * Post Id.
@@ -80,4 +80,11 @@ class WP_Block_Template {
 	 * @var string
 	 */
 	public $status;
+
+	/**
+	 * Whether a template is, or is based upon, an existing template file.
+	 *
+	 * @var boolean
+	 */
+	public $has_theme_file;
 }

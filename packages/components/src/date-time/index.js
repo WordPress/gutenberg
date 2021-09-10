@@ -4,6 +4,7 @@
 // Needed to initialise the default datepicker styles.
 // See: https://github.com/airbnb/react-dates#initialize
 import 'react-dates/initialize';
+import { noop } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -25,10 +26,9 @@ function DateTimePicker(
 		currentDate,
 		is12Hour,
 		isInvalidDate,
-		onMonthPreviewed,
+		onMonthPreviewed = noop,
 		onChange,
 		events,
-		keepOpen,
 	},
 	ref
 ) {
@@ -53,9 +53,8 @@ function DateTimePicker(
 						currentDate={ currentDate }
 						onChange={ onChange }
 						isInvalidDate={ isInvalidDate }
-						onMonthPreviewed={ onMonthPreviewed }
 						events={ events }
-						keepOpen={ keepOpen }
+						onMonthPreviewed={ onMonthPreviewed }
 					/>
 				</>
 			) }
@@ -147,7 +146,7 @@ function DateTimePicker(
 				{ ! calendarHelpIsVisible && currentDate && (
 					<Button
 						className="components-datetime__date-reset-button"
-						isLink
+						variant="link"
 						onClick={ () => onChange( null ) }
 					>
 						{ __( 'Reset' ) }
@@ -155,7 +154,7 @@ function DateTimePicker(
 				) }
 				<Button
 					className="components-datetime__date-help-toggle"
-					isLink
+					variant="link"
 					onClick={ onClickDescriptionToggle }
 				>
 					{ calendarHelpIsVisible

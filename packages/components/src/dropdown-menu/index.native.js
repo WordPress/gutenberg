@@ -89,7 +89,6 @@ function DropdownMenu( {
 				const openOnArrowDown = ( event ) => {
 					if ( ! isOpen && event.keyCode === DOWN ) {
 						event.preventDefault();
-						event.stopPropagation();
 						onToggle();
 					}
 				};
@@ -124,7 +123,6 @@ function DropdownMenu( {
 						aria-haspopup="true"
 						aria-expanded={ isOpen }
 						label={ label }
-						showTooltip
 					>
 						{ mergedToggleProps.children }
 					</Button>

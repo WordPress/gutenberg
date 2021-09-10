@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { __, _x } from '@wordpress/i18n';
+import { __ } from '@wordpress/i18n';
 import { image as icon } from '@wordpress/icons';
 
 /**
@@ -18,14 +18,7 @@ const { name } = metadata;
 export { metadata, name };
 
 export const settings = {
-	title: _x( 'Image', 'block title' ),
-	description: __( 'Insert an image to make a visual statement.' ),
 	icon,
-	keywords: [
-		'img', // "img" is not translated as it is intended to reflect the HTML <img> tag.
-		__( 'photo' ),
-		__( 'picture' ),
-	],
 	example: {
 		attributes: {
 			sizeSlug: 'large',
@@ -34,14 +27,6 @@ export const settings = {
 			caption: __( 'Mont Blanc appears—still, snowy, and serene.' ),
 		},
 	},
-	styles: [
-		{
-			name: 'default',
-			label: _x( 'Default', 'block style' ),
-			isDefault: true,
-		},
-		{ name: 'rounded', label: _x( 'Rounded', 'block style' ) },
-	],
 	__experimentalLabel( attributes, { context } ) {
 		if ( context === 'accessibility' ) {
 			const { caption, alt, url } = attributes;

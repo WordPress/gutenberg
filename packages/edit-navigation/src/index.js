@@ -6,11 +6,12 @@ import {
 	__experimentalRegisterExperimentalCoreBlocks,
 } from '@wordpress/block-library';
 import { render } from '@wordpress/element';
+import { __experimentalFetchLinkSuggestions as fetchLinkSuggestions } from '@wordpress/core-data';
+
 /**
  * Internal dependencies
  */
 import { addFilters } from './filters';
-import fetchLinkSuggestions from './utils/fetch-link-suggestions';
 
 /**
  * Internal dependencies
@@ -26,10 +27,8 @@ export function initialize( id, settings ) {
 		__experimentalRegisterExperimentalCoreBlocks();
 	}
 
-	settings.__experimentalFetchLinkSuggestions = (
-		searchText,
-		searchOptions
-	) => fetchLinkSuggestions( searchText, searchOptions, settings );
+	settings.__experimentalFetchLinkSuggestions = ( search, searchOptions ) =>
+		fetchLinkSuggestions( search, searchOptions, settings );
 
 	render(
 		<Layout blockEditorSettings={ settings } />,

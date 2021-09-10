@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * External dependencies
  */
@@ -20,7 +21,6 @@ import { useDebounce } from '@wordpress/compose';
  */
 import Popover from '../popover';
 import Shortcut from '../shortcut';
-import { withNextComponent } from './next';
 
 /**
  * Time over children to wait before showing tooltip
@@ -169,6 +169,7 @@ function Tooltip( { children, position, text, shortcut } ) {
 	};
 	const clearOnUnmount = () => {
 		delayedSetIsOver.cancel();
+		document.removeEventListener( 'mouseup', cancelIsMouseDown );
 	};
 
 	useEffect( () => clearOnUnmount, [] );
@@ -217,4 +218,4 @@ function Tooltip( { children, position, text, shortcut } ) {
 	} );
 }
 
-export default withNextComponent( Tooltip );
+export default Tooltip;

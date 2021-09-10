@@ -7,7 +7,8 @@ import { __ } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
-import { LINK_COLOR, useEditorFeature } from '../editor/utils';
+
+import { useSetting } from '../editor/utils';
 import ColorPalettePanel from './color-palette-panel';
 
 export function useHasColorPanel( { supports } ) {
@@ -15,7 +16,7 @@ export function useHasColorPanel( { supports } ) {
 		supports.includes( 'color' ) ||
 		supports.includes( 'backgroundColor' ) ||
 		supports.includes( 'background' ) ||
-		supports.includes( LINK_COLOR )
+		supports.includes( 'linkColor' )
 	);
 }
 
@@ -26,17 +27,36 @@ export default function ColorPanel( {
 	getSetting,
 	setSetting,
 } ) {
-	const colors = useEditorFeature( 'color.palette', name );
-	const disableCustomColors = ! useEditorFeature( 'color.custom', name );
-	const gradients = useEditorFeature( 'color.gradients', name );
-	const disableCustomGradients = ! useEditorFeature(
+	const solids = useSetting( 'color.palette', name );
+	const gradients = useSetting( 'color.gradients', name );
+	const areCustomSolidsEnabled = useSetting( 'color.custom', name );
+	const areCustomGradientsEnabled = useSetting(
 		'color.customGradient',
 		name
 	);
+	const isLinkEnabled = useSetting( 'color.link', name );
+	const isTextEnabled = useSetting( 'color.text', name );
+	const isBackgroundEnabled = useSetting( 'color.background', name );
+
+	const hasLinkColor =
+		supports.includes( 'linkColor' ) &&
+		isLinkEnabled &&
+		( solids.length > 0 || areCustomSolidsEnabled );
+	const hasTextColor =
+		supports.includes( 'color' ) &&
+		isTextEnabled &&
+		( solids.length > 0 || areCustomSolidsEnabled );
+	const hasBackgroundColor =
+		supports.includes( 'backgroundColor' ) &&
+		isBackgroundEnabled &&
+		( solids.length > 0 || areCustomSolidsEnabled );
+	const hasGradientColor =
+		supports.includes( 'background' ) &&
+		( gradients.length > 0 || areCustomGradientsEnabled );
 
 	const settings = [];
 
-	if ( supports.includes( 'color' ) ) {
+	if ( hasTextColor ) {
 		const color = getStyle( name, 'color' );
 		const userColor = getStyle( name, 'color', 'user' );
 		settings.push( {
@@ -48,7 +68,7 @@ export default function ColorPanel( {
 	}
 
 	let backgroundSettings = {};
-	if ( supports.includes( 'backgroundColor' ) ) {
+	if ( hasBackgroundColor ) {
 		const backgroundColor = getStyle( name, 'backgroundColor' );
 		const userBackgroundColor = getStyle( name, 'backgroundColor', 'user' );
 		backgroundSettings = {
@@ -63,7 +83,7 @@ export default function ColorPanel( {
 	}
 
 	let gradientSettings = {};
-	if ( supports.includes( 'background' ) ) {
+	if ( hasGradientColor ) {
 		const gradient = getStyle( name, 'background' );
 		const userGradient = getStyle( name, 'background', 'user' );
 		gradientSettings = {
@@ -76,10 +96,7 @@ export default function ColorPanel( {
 		}
 	}
 
-	if (
-		supports.includes( 'background' ) ||
-		supports.includes( 'backgroundColor' )
-	) {
+	if ( hasBackgroundColor || hasGradientColor ) {
 		settings.push( {
 			...backgroundSettings,
 			...gradientSettings,
@@ -87,24 +104,25 @@ export default function ColorPanel( {
 		} );
 	}
 
-	if ( supports.includes( LINK_COLOR ) ) {
-		const color = getStyle( name, LINK_COLOR );
-		const userColor = getStyle( name, LINK_COLOR, 'user' );
+	if ( hasLinkColor ) {
+		const color = getStyle( name, 'linkColor' );
+		const userColor = getStyle( name, 'linkColor', 'user' );
 		settings.push( {
 			colorValue: color,
-			onColorChange: ( value ) => setStyle( name, LINK_COLOR, value ),
+			onColorChange: ( value ) => setStyle( name, 'linkColor', value ),
 			label: __( 'Link color' ),
 			clearable: color === userColor,
 		} );
 	}
+
 	return (
 		<PanelColorGradientSettings
 			title={ __( 'Color' ) }
 			settings={ settings }
-			colors={ colors }
+			colors={ solids }
 			gradients={ gradients }
-			disableCustomColors={ disableCustomColors }
-			disableCustomGradients={ disableCustomGradients }
+			disableCustomColors={ ! areCustomSolidsEnabled }
+			disableCustomGradients={ ! areCustomGradientsEnabled }
 		>
 			<ColorPalettePanel
 				key={ 'color-palette-panel-' + name }

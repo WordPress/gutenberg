@@ -39,6 +39,7 @@ export function apiFetch( request ) {
  */
 export function select( ...args ) {
 	deprecated( '`select` control in `@wordpress/data-controls`', {
+		since: '5.7',
 		alternative: 'built-in `resolveSelect` control in `@wordpress/data`',
 	} );
 
@@ -53,6 +54,7 @@ export function select( ...args ) {
  */
 export function syncSelect( ...args ) {
 	deprecated( '`syncSelect` control in `@wordpress/data-controls`', {
+		since: '5.7',
 		alternative: 'built-in `select` control in `@wordpress/data`',
 	} );
 
@@ -67,6 +69,7 @@ export function syncSelect( ...args ) {
  */
 export function dispatch( ...args ) {
 	deprecated( '`dispatch` control in `@wordpress/data-controls`', {
+		since: '5.7',
 		alternative: 'built-in `dispatch` control in `@wordpress/data`',
 	} );
 

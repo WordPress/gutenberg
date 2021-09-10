@@ -1,30 +1,32 @@
 /**
- * External dependencies
- */
-import { find } from 'lodash';
-
-/**
  * WordPress dependencies
  */
+import { NavigableToolbar } from '@wordpress/block-editor';
+import { DropdownMenu } from '@wordpress/components';
+import { useViewportMatch } from '@wordpress/compose';
+import { PinnedItems } from '@wordpress/interface';
 import { __, sprintf } from '@wordpress/i18n';
-import { Button, Dropdown, DropdownMenu, Popover } from '@wordpress/components';
+import { decodeEntities } from '@wordpress/html-entities';
 
 /**
  * Internal dependencies
  */
 import SaveButton from './save-button';
-import ManageLocations from './manage-locations';
+import UndoButton from './undo-button';
+import RedoButton from './redo-button';
 import MenuSwitcher from '../menu-switcher';
+import { useMenuEntityProp } from '../../hooks';
 
 export default function Header( {
+	isMenuSelected,
 	menus,
 	selectedMenuId,
 	onSelectMenu,
 	isPending,
 	navigationPost,
 } ) {
-	const selectedMenu = find( menus, { id: selectedMenuId } );
-	const menuName = selectedMenu ? selectedMenu.name : undefined;
+	const isMediumViewport = useViewportMatch( 'medium' );
+	const [ menuName ] = useMenuEntityProp( 'name', selectedMenuId );
 	let actionHeaderText;
 
 	if ( menuName ) {
@@ -40,19 +42,26 @@ export default function Header( {
 		actionHeaderText = __( 'No menus available' );
 	}
 
-	const hasMenus = !! menus?.length;
-
 	return (
 		<div className="edit-navigation-header">
-			<div className="edit-navigation-header__title-subtitle">
-				<h1 className="edit-navigation-header__title">
-					{ __( 'Navigation' ) }
-				</h1>
-				<h2 className="edit-navigation-header__subtitle">
-					{ hasMenus && actionHeaderText }
-				</h2>
-			</div>
-			{ hasMenus && (
+			{ isMediumViewport && (
+				<div className="edit-navigation-header__toolbar-wrapper">
+					<h1 className="edit-navigation-header__title">
+						{ __( 'Navigation' ) }
+					</h1>
+					<NavigableToolbar
+						className="edit-navigation-header__toolbar"
+						aria-label={ __( 'Document tools' ) }
+					>
+						<UndoButton />
+						<RedoButton />
+					</NavigableToolbar>
+				</div>
+			) }
+			<h2 className="edit-navigation-header__subtitle">
+				{ isMenuSelected && decodeEntities( actionHeaderText ) }
+			</h2>
+			{ isMenuSelected && (
 				<div className="edit-navigation-header__actions">
 					<DropdownMenu
 						icon={ null }
@@ -62,14 +71,14 @@ export default function Header( {
 								'Switch menu, or create a new menu'
 							),
 							showTooltip: false,
-							isTertiary: true,
+							variant: 'tertiary',
 							disabled: ! menus?.length,
 							__experimentalIsFocusable: true,
 						} }
 						popoverProps={ {
 							className:
 								'edit-navigation-header__menu-switcher-dropdown',
-							position: 'bottom left',
+							position: 'bottom center',
 						} }
 					>
 						{ ( { onClose } ) => (
@@ -84,24 +93,8 @@ export default function Header( {
 						) }
 					</DropdownMenu>
 
-					<Dropdown
-						contentClassName="edit-navigation-header__manage-locations"
-						position="bottom left"
-						renderToggle={ ( { isOpen, onToggle } ) => (
-							<Button
-								isTertiary
-								aria-expanded={ isOpen }
-								onClick={ onToggle }
-							>
-								{ __( 'Manage locations' ) }
-							</Button>
-						) }
-						renderContent={ () => <ManageLocations /> }
-					/>
-
 					<SaveButton navigationPost={ navigationPost } />
-
-					<Popover.Slot name="block-toolbar" />
+					<PinnedItems.Slot scope="core/edit-navigation" />
 				</div>
 			) }
 		</div>

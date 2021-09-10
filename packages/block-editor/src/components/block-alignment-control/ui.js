@@ -2,8 +2,7 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { DropdownMenu, ToolbarGroup } from '@wordpress/components';
-import { useSelect } from '@wordpress/data';
+import { ToolbarDropdownMenu, ToolbarGroup } from '@wordpress/components';
 import {
 	positionCenter,
 	positionLeft,
@@ -15,8 +14,7 @@ import {
 /**
  * Internal dependencies
  */
-import { useLayout } from '../inner-blocks/layout';
-import { store as blockEditorStore } from '../../store';
+import useAvailableAlignments from './use-available-alignments';
 
 const BLOCK_ALIGNMENTS_CONTROLS = {
 	left: {
@@ -41,9 +39,7 @@ const BLOCK_ALIGNMENTS_CONTROLS = {
 	},
 };
 
-const DEFAULT_CONTROLS = [ 'left', 'center', 'right', 'wide', 'full' ];
 const DEFAULT_CONTROL = 'center';
-const WIDE_CONTROLS = [ 'wide', 'full' ];
 
 const POPOVER_PROPS = {
 	isAlternate: true,
@@ -52,32 +48,11 @@ const POPOVER_PROPS = {
 function BlockAlignmentUI( {
 	value,
 	onChange,
-	controls = DEFAULT_CONTROLS,
+	controls,
 	isToolbar,
 	isCollapsed = true,
-	isToolbarButton = true,
 } ) {
-	const { wideControlsEnabled = false } = useSelect( ( select ) => {
-		const { getSettings } = select( blockEditorStore );
-		const settings = getSettings();
-		return {
-			wideControlsEnabled: settings.alignWide,
-		};
-	}, [] );
-	const layout = useLayout();
-	const supportsAlignments = layout.type === 'default';
-
-	if ( ! supportsAlignments ) {
-		return null;
-	}
-
-	const { alignments: availableAlignments = DEFAULT_CONTROLS } = layout;
-	const enabledControls = controls.filter(
-		( control ) =>
-			( wideControlsEnabled || ! WIDE_CONTROLS.includes( control ) ) &&
-			availableAlignments.includes( control )
-	);
-
+	const enabledControls = useAvailableAlignments( controls );
 	if ( enabledControls.length === 0 ) {
 		return null;
 	}
@@ -90,8 +65,8 @@ function BlockAlignmentUI( {
 	const defaultAlignmentControl =
 		BLOCK_ALIGNMENTS_CONTROLS[ DEFAULT_CONTROL ];
 
-	const UIComponent = isToolbar ? ToolbarGroup : DropdownMenu;
-	const extraProps = isToolbar ? { isCollapsed } : { isToolbarButton };
+	const UIComponent = isToolbar ? ToolbarGroup : ToolbarDropdownMenu;
+	const extraProps = isToolbar ? { isCollapsed } : {};
 
 	return (
 		<UIComponent

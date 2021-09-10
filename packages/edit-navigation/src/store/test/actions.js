@@ -7,7 +7,11 @@ import { store as noticesStore } from '@wordpress/notices';
 /**
  * Internal dependencies
  */
-import { createMissingMenuItems, saveNavigationPost } from '../actions';
+import {
+	createMissingMenuItems,
+	saveNavigationPost,
+	setSelectedMenuId,
+} from '../actions';
 import {
 	resolveMenuItems,
 	getMenuItemToClientIdMapping,
@@ -16,6 +20,10 @@ import {
 	apiFetch,
 } from '../controls';
 import { menuItemsQuery, computeCustomizedAttribute } from '../utils';
+import {
+	NAVIGATION_POST_KIND,
+	NAVIGATION_POST_POST_TYPE,
+} from '../../constants';
 
 jest.mock( '../utils', () => {
 	const utils = jest.requireActual( '../utils' );
@@ -355,6 +363,17 @@ describe( 'saveNavigationPost', () => {
 
 		expect( action.next( { success: true } ).value ).toEqual(
 			dispatch(
+				'core',
+				'receiveEntityRecords',
+				NAVIGATION_POST_KIND,
+				NAVIGATION_POST_POST_TYPE,
+				[ post ],
+				undefined
+			)
+		);
+
+		expect( action.next().value ).toEqual(
+			dispatch(
 				noticesStore,
 				'createSuccessNotice',
 				__( 'Navigation saved.' ),
@@ -620,5 +639,15 @@ describe( 'saveNavigationPost', () => {
 				}
 			)
 		);
+	} );
+} );
+
+describe( 'setSelectedMenuId', () => {
+	it( 'should return the SET_SELECTED_MENU_ID action', () => {
+		const menuId = 1;
+		expect( setSelectedMenuId( menuId ) ).toEqual( {
+			type: 'SET_SELECTED_MENU_ID',
+			menuId,
+		} );
 	} );
 } );

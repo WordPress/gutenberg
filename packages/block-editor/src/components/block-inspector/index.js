@@ -19,8 +19,10 @@ import { useSelect } from '@wordpress/data';
  */
 import SkipToSelectedBlock from '../skip-to-selected-block';
 import BlockCard from '../block-card';
-import InspectorControls from '../inspector-controls';
-import InspectorAdvancedControls from '../inspector-advanced-controls';
+import {
+	default as InspectorControls,
+	InspectorAdvancedControls,
+} from '../inspector-controls';
 import BlockStyles from '../block-styles';
 import MultiSelectionInspector from '../multi-selection-inspector';
 import DefaultStylePicker from '../default-style-picker';
@@ -128,18 +130,15 @@ const BlockInspectorSingleBlock = ( {
 			) }
 			<InspectorControls.Slot bubblesVirtually={ bubblesVirtually } />
 			<div>
-				<AdvancedControls
-					slotName={ InspectorAdvancedControls.slotName }
-					bubblesVirtually={ bubblesVirtually }
-				/>
+				<AdvancedControls bubblesVirtually={ bubblesVirtually } />
 			</div>
 			<SkipToSelectedBlock key="back" />
 		</div>
 	);
 };
 
-const AdvancedControls = ( { slotName, bubblesVirtually } ) => {
-	const slot = useSlot( slotName );
+const AdvancedControls = ( { bubblesVirtually } ) => {
+	const slot = useSlot( InspectorAdvancedControls.slotName );
 	const hasFills = Boolean( slot.fills && slot.fills.length );
 
 	if ( ! hasFills ) {
@@ -152,7 +151,8 @@ const AdvancedControls = ( { slotName, bubblesVirtually } ) => {
 			title={ __( 'Advanced' ) }
 			initialOpen={ false }
 		>
-			<InspectorAdvancedControls.Slot
+			<InspectorControls.Slot
+				__experimentalGroup="advanced"
 				bubblesVirtually={ bubblesVirtually }
 			/>
 		</PanelBody>

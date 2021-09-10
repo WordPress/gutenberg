@@ -1,3 +1,7 @@
+export {
+	activatePlugin as __experimentalActivatePlugin,
+	deactivatePlugin as __experimentalDeactivatePlugin,
+} from './plugins';
 export { activatePlugin } from './activate-plugin';
 export { activateTheme } from './activate-theme';
 export { arePrePublishChecksEnabled } from './are-pre-publish-checks-enabled';
@@ -11,9 +15,11 @@ export { clickMenuItem } from './click-menu-item';
 export { clickOnCloseModalButton } from './click-on-close-modal-button';
 export { clickOnMoreMenuItem } from './click-on-more-menu-item';
 export { createNewPost } from './create-new-post';
+export { createUser } from './create-user';
 export { createURL } from './create-url';
 export { deactivatePlugin } from './deactivate-plugin';
 export { deleteTheme } from './delete-theme';
+export { deleteUser } from './delete-user';
 export { disablePrePublishChecks } from './disable-pre-publish-checks';
 export { dragAndResize } from './drag-and-resize';
 export { enablePageDialogAccept } from './enable-page-dialog-accept';
@@ -77,5 +83,11 @@ export { visitAdminPage } from './visit-admin-page';
 export { waitForWindowDimensions } from './wait-for-window-dimensions';
 export { showBlockToolbar } from './show-block-toolbar';
 export { openPreviewPage } from './preview';
+export { wpDataSelect } from './wp-data-select';
+export { deleteAllWidgets } from './widgets';
+export {
+	rest as __experimentalRest,
+	batch as __experimentalBatch,
+} from './rest-api';
 
 export * from './mocks';

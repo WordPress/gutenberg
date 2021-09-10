@@ -47,6 +47,7 @@ const getStyles = (
 	const computedStyles = [
 		isStackedHorizontally && styles.horizontal,
 		horizontalAlignment && styles[ `is-aligned-${ horizontalAlignment }` ],
+		styles.overflowVisible,
 	];
 	stylesMemo[ styleName ] = computedStyles;
 	return computedStyles;
@@ -60,7 +61,7 @@ export class BlockList extends Component {
 			renderFooterAppender: this.props.renderFooterAppender,
 			renderAppender: this.props.renderAppender,
 			onDeleteBlock: this.props.onDeleteBlock,
-			contentStyle: this.props.contentstyle,
+			contentStyle: this.props.contentStyle,
 		};
 		this.renderItem = this.renderItem.bind( this );
 		this.renderBlockListFooter = this.renderBlockListFooter.bind( this );
@@ -128,6 +129,7 @@ export class BlockList extends Component {
 			onDeleteBlock,
 			contentStyle,
 			renderAppender,
+			gridProperties,
 		} = this.props;
 		const { blockWidth } = this.state;
 		if (
@@ -136,7 +138,8 @@ export class BlockList extends Component {
 			this.extraData.onDeleteBlock !== onDeleteBlock ||
 			this.extraData.contentStyle !== contentStyle ||
 			this.extraData.renderAppender !== renderAppender ||
-			this.extraData.blockWidth !== blockWidth
+			this.extraData.blockWidth !== blockWidth ||
+			this.extraData.gridProperties !== gridProperties
 		) {
 			this.extraData = {
 				parentWidth,
@@ -145,6 +148,7 @@ export class BlockList extends Component {
 				contentStyle,
 				renderAppender,
 				blockWidth,
+				gridProperties,
 			};
 		}
 		return this.extraData;
@@ -233,6 +237,7 @@ export class BlockList extends Component {
 				style={ containerStyle }
 				onAccessibilityEscape={ clearSelectedBlock }
 				onLayout={ this.onLayout }
+				testID="block-list-wrapper"
 			>
 				<KeyboardAwareFlatList
 					{ ...( Platform.OS === 'android'
@@ -257,7 +262,6 @@ export class BlockList extends Component {
 						{ flex: isRootList ? 1 : 0 },
 						! isRootList && styles.overflowVisible,
 					] }
-					horizontal={ horizontal }
 					extraData={ this.getExtraData() }
 					scrollEnabled={ isRootList }
 					contentContainerStyle={ [
@@ -310,9 +314,11 @@ export class BlockList extends Component {
 			onDeleteBlock,
 			rootClientId,
 			isStackedHorizontally,
+			blockClientIds,
 			parentWidth,
 			marginVertical = styles.defaultBlock.marginTop,
 			marginHorizontal = styles.defaultBlock.marginLeft,
+			gridProperties,
 		} = this.props;
 		const { blockWidth } = this.state;
 		return (
@@ -331,6 +337,8 @@ export class BlockList extends Component {
 					this.shouldShowInnerBlockAppender
 				}
 				blockWidth={ blockWidth }
+				gridProperties={ gridProperties }
+				items={ blockClientIds }
 			/>
 		);
 	}

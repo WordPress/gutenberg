@@ -15,8 +15,8 @@ import {
 	togglePublishSidebar,
 	openModal,
 	closeModal,
-	toggleFeature,
 	requestMetaBoxUpdates,
+	setIsListViewOpened,
 } from '../actions';
 
 describe( 'actions', () => {
@@ -89,16 +89,6 @@ describe( 'actions', () => {
 		} );
 	} );
 
-	describe( 'toggleFeature', () => {
-		it( 'should return TOGGLE_FEATURE action', () => {
-			const feature = 'name';
-			expect( toggleFeature( feature ) ).toEqual( {
-				type: 'TOGGLE_FEATURE',
-				feature,
-			} );
-		} );
-	} );
-
 	describe( 'requestMetaBoxUpdates', () => {
 		it( 'should yield the REQUEST_META_BOX_UPDATES action', () => {
 			const fulfillment = requestMetaBoxUpdates();
@@ -111,6 +101,19 @@ describe( 'actions', () => {
 			expect( fulfillment.next() ).toEqual( {
 				done: false,
 				value: controls.select( 'core/editor', 'getCurrentPost' ),
+			} );
+		} );
+	} );
+
+	describe( 'setIsListViewOpened', () => {
+		it( 'should return the SET_IS_LIST_VIEW_OPENED action', () => {
+			expect( setIsListViewOpened( true ) ).toEqual( {
+				type: 'SET_IS_LIST_VIEW_OPENED',
+				isOpen: true,
+			} );
+			expect( setIsListViewOpened( false ) ).toEqual( {
+				type: 'SET_IS_LIST_VIEW_OPENED',
+				isOpen: false,
 			} );
 		} );
 	} );

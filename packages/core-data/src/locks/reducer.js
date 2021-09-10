@@ -14,12 +14,12 @@ const DEFAULT_STATE = {
 /**
  * Reducer returning locks.
  *
- * @param  {Object} state  Current state.
- * @param  {Object} action Dispatched action.
+ * @param {Object} state  Current state.
+ * @param {Object} action Dispatched action.
  *
  * @return {Object} Updated state.
  */
-export function locks( state = DEFAULT_STATE, action ) {
+export default function locks( state = DEFAULT_STATE, action ) {
 	switch ( action.type ) {
 		case 'ENQUEUE_LOCK_REQUEST': {
 			const { request } = action;
@@ -60,5 +60,3 @@ export function locks( state = DEFAULT_STATE, action ) {
 
 	return state;
 }
-
-export default locks;

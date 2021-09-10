@@ -7,9 +7,13 @@ import classnames from 'classnames';
  * WordPress dependencies
  */
 import { useViewportMatch, useMergeRefs } from '@wordpress/compose';
-import { forwardRef, useRef } from '@wordpress/element';
+import { forwardRef } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
-import { getBlockType, withBlockContentContext } from '@wordpress/blocks';
+import {
+	getBlockType,
+	store as blocksStore,
+	withBlockContentContext,
+} from '@wordpress/blocks';
 
 /**
  * Internal dependencies
@@ -23,8 +27,8 @@ import { BlockListItems } from '../block-list';
 import { BlockContextProvider } from '../block-context';
 import { useBlockEditContext } from '../block-edit/context';
 import useBlockSync from '../provider/use-block-sync';
-import { defaultLayout, LayoutProvider } from './layout';
 import { store as blockEditorStore } from '../../store';
+import useBlockDropZone from '../use-block-drop-zone';
 
 /**
  * InnerBlocks is a component which allows a single block to have multiple blocks
@@ -47,7 +51,7 @@ function UncontrolledInnerBlocks( props ) {
 		renderAppender,
 		orientation,
 		placeholder,
-		__experimentalLayout: layout = defaultLayout,
+		__experimentalLayout,
 	} = props;
 
 	useNestedSettingsUpdate(
@@ -55,7 +59,8 @@ function UncontrolledInnerBlocks( props ) {
 		allowedBlocks,
 		templateLock,
 		captureToolbars,
-		orientation
+		orientation,
+		__experimentalLayout
 	);
 
 	useInnerBlockTemplateSync(
@@ -82,19 +87,16 @@ function UncontrolledInnerBlocks( props ) {
 	// This component needs to always be synchronous as it's the one changing
 	// the async mode depending on the block selection.
 	return (
-		<LayoutProvider value={ layout }>
-			<BlockContextProvider value={ context }>
-				<BlockListItems
-					rootClientId={ clientId }
-					renderAppender={ renderAppender }
-					__experimentalAppenderTagName={
-						__experimentalAppenderTagName
-					}
-					wrapperRef={ wrapperRef }
-					placeholder={ placeholder }
-				/>
-			</BlockContextProvider>
-		</LayoutProvider>
+		<BlockContextProvider value={ context }>
+			<BlockListItems
+				rootClientId={ clientId }
+				renderAppender={ renderAppender }
+				__experimentalAppenderTagName={ __experimentalAppenderTagName }
+				__experimentalLayout={ __experimentalLayout }
+				wrapperRef={ wrapperRef }
+				placeholder={ placeholder }
+			/>
+		</BlockContextProvider>
 	);
 }
 
@@ -137,34 +139,55 @@ const ForwardedInnerBlocks = forwardRef( ( props, ref ) => {
  * @see https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/inner-blocks/README.md
  */
 export function useInnerBlocksProps( props = {}, options = {} ) {
-	const fallbackRef = useRef();
 	const { clientId } = useBlockEditContext();
 	const isSmallScreen = useViewportMatch( 'medium', '<' );
-	const hasOverlay = useSelect(
+	const { __experimentalCaptureToolbars, hasOverlay } = useSelect(
 		( select ) => {
+			if ( ! clientId ) {
+				return {};
+			}
+
 			const {
 				getBlockName,
 				isBlockSelected,
 				hasSelectedInnerBlock,
 				isNavigationMode,
 			} = select( blockEditorStore );
+			const blockName = getBlockName( clientId );
 			const enableClickThrough = isNavigationMode() || isSmallScreen;
-			return (
-				getBlockName( clientId ) !== 'core/template' &&
-				! isBlockSelected( clientId ) &&
-				! hasSelectedInnerBlock( clientId, true ) &&
-				enableClickThrough
-			);
+			return {
+				__experimentalCaptureToolbars: select(
+					blocksStore
+				).hasBlockSupport(
+					blockName,
+					'__experimentalExposeControlsToChildren',
+					false
+				),
+				hasOverlay:
+					blockName !== 'core/template' &&
+					! isBlockSelected( clientId ) &&
+					! hasSelectedInnerBlock( clientId, true ) &&
+					enableClickThrough,
+			};
 		},
 		[ clientId, isSmallScreen ]
 	);
 
-	const ref = useMergeRefs( [ props.ref, fallbackRef ] );
+	const ref = useMergeRefs( [
+		props.ref,
+		useBlockDropZone( {
+			rootClientId: clientId,
+		} ),
+	] );
+
+	const innerBlocksProps = {
+		__experimentalCaptureToolbars,
+		...options,
+	};
 	const InnerBlocks =
-		options.value && options.onChange
+		innerBlocksProps.value && innerBlocksProps.onChange
 			? ControlledInnerBlocks
 			: UncontrolledInnerBlocks;
-
 	return {
 		...props,
 		ref,
@@ -175,12 +198,10 @@ export function useInnerBlocksProps( props = {}, options = {} ) {
 				'has-overlay': hasOverlay,
 			}
 		),
-		children: (
-			<InnerBlocks
-				{ ...options }
-				clientId={ clientId }
-				wrapperRef={ fallbackRef }
-			/>
+		children: clientId ? (
+			<InnerBlocks { ...innerBlocksProps } clientId={ clientId } />
+		) : (
+			<BlockListItems { ...options } />
 		),
 	};
 }

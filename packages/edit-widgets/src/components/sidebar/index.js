@@ -12,7 +12,11 @@ import {
 	ComplementaryArea,
 	store as interfaceStore,
 } from '@wordpress/interface';
-import { BlockInspector } from '@wordpress/block-editor';
+import {
+	BlockInspector,
+	store as blockEditorStore,
+} from '@wordpress/block-editor';
+
 import { cog } from '@wordpress/icons';
 import { Button } from '@wordpress/components';
 import { useSelect, useDispatch } from '@wordpress/data';
@@ -69,21 +73,21 @@ export default function Sidebar() {
 			getSelectedBlock,
 			getBlock,
 			getBlockParentsByBlockName,
-		} = select( 'core/block-editor' );
+		} = select( blockEditorStore );
 		const { getActiveComplementaryArea } = select( interfaceStore );
 
 		const selectedBlock = getSelectedBlock();
 
-		let activeArea = getActiveComplementaryArea( editWidgetsStore.name );
-		if ( ! activeArea ) {
+		const activeArea = getActiveComplementaryArea( editWidgetsStore.name );
+
+		let currentSelection = activeArea;
+		if ( ! currentSelection ) {
 			if ( selectedBlock ) {
-				activeArea = BLOCK_INSPECTOR_IDENTIFIER;
+				currentSelection = BLOCK_INSPECTOR_IDENTIFIER;
 			} else {
-				activeArea = WIDGET_AREAS_IDENTIFIER;
+				currentSelection = WIDGET_AREAS_IDENTIFIER;
 			}
 		}
-
-		const isSidebarOpen = !! activeArea;
 
 		let widgetAreaBlock;
 		if ( selectedBlock ) {
@@ -100,11 +104,11 @@ export default function Sidebar() {
 		}
 
 		return {
-			currentArea: activeArea,
+			currentArea: currentSelection,
 			hasSelectedNonAreaBlock: !! (
 				selectedBlock && selectedBlock.name !== 'core/widget-area'
 			),
-			isGeneralSidebarOpen: isSidebarOpen,
+			isGeneralSidebarOpen: !! activeArea,
 			selectedWidgetAreaBlock: widgetAreaBlock,
 		};
 	}, [] );
@@ -118,7 +122,7 @@ export default function Sidebar() {
 			isGeneralSidebarOpen
 		) {
 			enableComplementaryArea(
-				editWidgetsStore,
+				'core/edit-widgets',
 				BLOCK_INSPECTOR_IDENTIFIER
 			);
 		}
@@ -128,7 +132,7 @@ export default function Sidebar() {
 			isGeneralSidebarOpen
 		) {
 			enableComplementaryArea(
-				editWidgetsStore,
+				'core/edit-widgets',
 				WIDGET_AREAS_IDENTIFIER
 			);
 		}

@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { boolean, number, select, text } from '@storybook/addon-knobs';
+import { boolean, number, select, text, object } from '@storybook/addon-knobs';
 import styled from '@emotion/styled';
 
 /**
@@ -13,6 +13,7 @@ import { useState } from '@wordpress/element';
  * Internal dependencies
  */
 import UnitControl from '../';
+import { CSS_UNITS } from '../utils';
 
 export default {
 	title: 'Components/UnitControl',
@@ -41,6 +42,7 @@ function Example() {
 			'default'
 		),
 		step: number( 'step', 1 ),
+		units: object( 'units', CSS_UNITS ),
 	};
 
 	return (

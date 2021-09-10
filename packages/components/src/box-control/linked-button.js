@@ -19,8 +19,7 @@ export default function LinkedButton( { isLinked, ...props } ) {
 				<Button
 					{ ...props }
 					className="component-box-control__linked-button"
-					isPrimary={ isLinked }
-					isSecondary={ ! isLinked }
+					variant={ isLinked ? 'primary' : 'secondary' }
 					isSmall
 					icon={ isLinked ? link : linkOff }
 					iconSize={ 16 }

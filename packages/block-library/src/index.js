@@ -1,15 +1,12 @@
 /**
  * WordPress dependencies
  */
-import '@wordpress/core-data';
-import '@wordpress/block-editor';
 import {
 	registerBlockType,
 	setDefaultBlockName,
 	setFreeformContentHandlerName,
 	setUnregisteredTypeHandlerName,
 	setGroupingBlockName,
-	unstable__bootstrapServerSideBlockDefinitions, // eslint-disable-line camelcase
 } from '@wordpress/blocks';
 
 /**
@@ -36,8 +33,10 @@ import * as html from './html';
 import * as mediaText from './media-text';
 import * as navigation from './navigation';
 import * as navigationLink from './navigation-link';
+import * as homeLink from './home-link';
 import * as latestComments from './latest-comments';
 import * as latestPosts from './latest-posts';
+import * as logInOut from './loginout';
 import * as list from './list';
 import * as missing from './missing';
 import * as more from './more';
@@ -68,7 +67,7 @@ import * as siteTagline from './site-tagline';
 import * as siteTitle from './site-title';
 import * as templatePart from './template-part';
 import * as query from './query';
-import * as queryLoop from './query-loop';
+import * as postTemplate from './post-template';
 import * as queryTitle from './query-title';
 import * as queryPagination from './query-pagination';
 import * as queryPaginationNext from './query-pagination-next';
@@ -85,11 +84,11 @@ import * as postCommentDate from './post-comment-date';
 import * as postComments from './post-comments';
 import * as postCommentsCount from './post-comments-count';
 import * as postCommentsForm from './post-comments-form';
+import * as postCommentsLink from './post-comments-link';
 import * as postDate from './post-date';
 import * as postExcerpt from './post-excerpt';
 import * as postFeaturedImage from './post-featured-image';
-import * as postHierarchicalTerms from './post-hierarchical-terms';
-import * as postTags from './post-tags';
+import * as postTerms from './post-terms';
 import * as termDescription from './term-description';
 
 /**
@@ -103,10 +102,7 @@ const registerBlock = ( block ) => {
 		return;
 	}
 	const { metadata, settings, name } = block;
-	if ( metadata ) {
-		unstable__bootstrapServerSideBlockDefinitions( { [ name ]: metadata } );
-	}
-	registerBlockType( name, settings );
+	registerBlockType( { name, ...metadata }, settings );
 };
 
 /**
@@ -168,6 +164,28 @@ export const __experimentalGetCoreBlocks = () => [
 	textColumns,
 	verse,
 	video,
+
+	// Theme blocks
+	siteLogo,
+	siteTagline,
+	siteTitle,
+
+	query,
+	postTemplate,
+	queryTitle,
+	queryPagination,
+	queryPaginationNext,
+	queryPaginationNumbers,
+	queryPaginationPrevious,
+
+	postTitle,
+	postContent,
+	postDate,
+	postExcerpt,
+	postFeaturedImage,
+	postTerms,
+
+	logInOut,
 ];
 
 /**
@@ -208,27 +226,16 @@ export const registerCoreBlocks = (
  */
 export const __experimentalRegisterExperimentalCoreBlocks =
 	process.env.GUTENBERG_PHASE === 2
-		? ( enableFSEBlocks ) => {
+		? ( { enableFSEBlocks } = {} ) => {
 				[
 					navigation,
 					navigationLink,
+					homeLink,
 
 					// Register Full Site Editing Blocks.
 					...( enableFSEBlocks
 						? [
-								siteLogo,
-								siteTagline,
-								siteTitle,
 								templatePart,
-								query,
-								queryLoop,
-								queryTitle,
-								queryPagination,
-								queryPaginationNext,
-								queryPaginationNumbers,
-								queryPaginationPrevious,
-								postTitle,
-								postContent,
 								postAuthor,
 								postComment,
 								postCommentAuthor,
@@ -237,11 +244,7 @@ export const __experimentalRegisterExperimentalCoreBlocks =
 								postComments,
 								postCommentsCount,
 								postCommentsForm,
-								postDate,
-								postExcerpt,
-								postFeaturedImage,
-								postHierarchicalTerms,
-								postTags,
+								postCommentsLink,
 								postNavigationLink,
 								termDescription,
 						  ]

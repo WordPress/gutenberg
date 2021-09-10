@@ -2,6 +2,17 @@
 
 ## Unreleased
 
+## 4.0.3 (2021-04-29)
+
+### Bug Fix
+
+-   `wp-env destroy` will now work in environments which don't include the `grep` or `awk` commands, such as Windows PowerShell.
+-   Fix several permissions issues related to wp-config.php and wp-content files.
+-   Fix crash which happened when the path to wp-env's home directory contained a space.
+-   Disable Xdebug 3 for PHP versions less than 7.2 to resolve startup crash.
+
+## 4.0.0 (2021-03-17)
+
 ### Breaking Change
 
 -   Migrate from `nodegit` to `simple-git`. This change now requires you to have a `git` binary installed locally to utilize the git sources feature of wp-env.json.

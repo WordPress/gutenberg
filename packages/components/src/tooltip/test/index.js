@@ -51,11 +51,11 @@ describe( 'Tooltip', () => {
 			wrapper.simulate( 'focus', event );
 
 			const button = wrapper.find( 'button' );
-			const popover = wrapper.find( 'Popover' );
+			const popover = wrapper.find( 'ForwardRef(Popover)' );
 			expect( wrapper.type() ).toBe( 'button' );
 			expect( button.children() ).toHaveLength( 2 );
 			expect( button.childAt( 0 ).text() ).toBe( 'Hover Me!' );
-			expect( button.childAt( 1 ).name() ).toBe( 'Popover' );
+			expect( button.childAt( 1 ).name() ).toBe( 'ForwardRef(Popover)' );
 			expect( popover.prop( 'focusOnMount' ) ).toBe( false );
 			expect( popover.prop( 'position' ) ).toBe( 'bottom right' );
 			expect( popover.children().first().text() ).toBe( 'Help text' );
@@ -78,7 +78,7 @@ describe( 'Tooltip', () => {
 			const button = wrapper.find( 'button' );
 			button.simulate( 'focus', event );
 
-			const popover = wrapper.find( 'Popover' );
+			const popover = wrapper.find( 'ForwardRef(Popover)' );
 			expect( originalFocus ).toHaveBeenCalledWith( event );
 			expect( popover ).toHaveLength( 1 );
 		} );

@@ -1,7 +1,6 @@
 /**
  * WordPress dependencies
  */
-import { __, _x } from '@wordpress/i18n';
 import { share as icon } from '@wordpress/icons';
 
 /**
@@ -17,11 +16,6 @@ const { name } = metadata;
 export { metadata, name };
 
 export const settings = {
-	title: _x( 'Social Icons', 'block title' ),
-	description: __(
-		'Display icons linking to your social media profiles or websites.'
-	),
-	keywords: [ _x( 'links', 'block keywords' ) ],
 	example: {
 		innerBlocks: [
 			{
@@ -47,11 +41,6 @@ export const settings = {
 			},
 		],
 	},
-	styles: [
-		{ name: 'default', label: __( 'Default' ), isDefault: true },
-		{ name: 'logos-only', label: __( 'Logos Only' ) },
-		{ name: 'pill-shape', label: __( 'Pill Shape' ) },
-	],
 	icon,
 	edit,
 	save,

@@ -13,7 +13,7 @@ import { useState } from '@wordpress/element';
  * Internal dependencies
  */
 import RangeControl from '../index';
-import { color } from '../../utils/colors';
+import { COLORS } from '../../utils';
 
 export default { title: 'Components/RangeControl', component: RangeControl };
 
@@ -31,7 +31,7 @@ const DefaultExample = () => {
 		afterIcon: text( 'afterIcon', '' ),
 		allowReset: boolean( 'allowReset', false ),
 		beforeIcon: text( 'beforeIcon', '' ),
-		color: text( 'color', color( 'ui.theme' ) ),
+		color: text( 'color', COLORS.ui.theme ),
 		disabled: boolean( 'disabled', false ),
 		help: text( 'help', '' ),
 		label: text( 'label', 'Range Label' ),

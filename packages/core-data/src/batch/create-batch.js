@@ -67,7 +67,7 @@ export default function createBatch( processor = defaultProcessor ) {
 		 * - The thunk returns a non-promise.
 		 *
 		 * @param {any|Function} inputOrThunk Input to add or thunk to execute.
-		 
+		 *
 		 * @return {Promise|any} If given an input, returns a promise that
 		 *                       is resolved or rejected when the batch is
 		 *                       processed. If given a thunk, returns the return

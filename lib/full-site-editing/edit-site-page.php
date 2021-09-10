@@ -41,13 +41,7 @@ function gutenberg_get_editor_styles() {
 	global $editor_styles;
 
 	// Ideally the code is extracted into a reusable function.
-	$styles = array(
-		array(
-			'css' => file_get_contents(
-				ABSPATH . WPINC . '/css/dist/editor/editor-styles.css'
-			),
-		),
-	);
+	$styles = array();
 
 	if ( $editor_styles && current_theme_supports( 'editor-styles' ) ) {
 		foreach ( $editor_styles as $style ) {
@@ -95,19 +89,17 @@ function gutenberg_edit_site_init( $hook ) {
 	 */
 	$current_screen->is_block_editor( true );
 
-	$settings = array_merge(
-		gutenberg_get_common_block_editor_settings(),
-		array(
-			'alignWide'                            => get_theme_support( 'align-wide' ),
-			'siteUrl'                              => site_url(),
-			'postsPerPage'                         => get_option( 'posts_per_page' ),
-			'styles'                               => gutenberg_get_editor_styles(),
-			'defaultTemplateTypes'                 => gutenberg_get_indexed_default_template_types(),
-			'__experimentalBlockPatterns'          => WP_Block_Patterns_Registry::get_instance()->get_all_registered(),
-			'__experimentalBlockPatternCategories' => WP_Block_Pattern_Categories_Registry::get_instance()->get_all_registered(),
-		)
+	$custom_settings     = array(
+		'siteUrl'                              => site_url(),
+		'postsPerPage'                         => get_option( 'posts_per_page' ),
+		'styles'                               => gutenberg_get_editor_styles(),
+		'defaultTemplateTypes'                 => gutenberg_get_indexed_default_template_types(),
+		'defaultTemplatePartAreas'             => gutenberg_get_allowed_template_part_areas(),
+		'__experimentalBlockPatterns'          => WP_Block_Patterns_Registry::get_instance()->get_all_registered(),
+		'__experimentalBlockPatternCategories' => WP_Block_Pattern_Categories_Registry::get_instance()->get_all_registered(),
 	);
-	$settings = gutenberg_experimental_global_styles_settings( $settings );
+	$site_editor_context = new WP_Block_Editor_Context();
+	$settings            = gutenberg_get_block_editor_settings( $custom_settings, $site_editor_context );
 
 	gutenberg_initialize_editor(
 		'edit_site_editor',
@@ -115,7 +107,7 @@ function gutenberg_edit_site_init( $hook ) {
 		array(
 			'preload_paths'    => array(
 				array( '/wp/v2/media', 'OPTIONS' ),
-				'/?context=edit',
+				'/',
 				'/wp/v2/types?context=edit',
 				'/wp/v2/taxonomies?context=edit',
 				'/wp/v2/pages?context=edit',
@@ -132,6 +124,19 @@ function gutenberg_edit_site_init( $hook ) {
 		'after'
 	);
 
+	wp_enqueue_script( 'wp-edit-site' );
+	wp_enqueue_script( 'wp-format-library' );
+	wp_enqueue_style( 'wp-edit-site' );
+	wp_enqueue_style( 'wp-format-library' );
+	wp_enqueue_media();
+
+	if (
+		current_theme_supports( 'wp-block-styles' ) ||
+		( ! is_array( $editor_styles ) || count( $editor_styles ) === 0 )
+	) {
+		wp_enqueue_style( 'wp-block-library-theme' );
+	}
+
 	/**
 	 * Fires after block assets have been enqueued for the editing interface.
 	 *
@@ -144,18 +149,6 @@ function gutenberg_edit_site_init( $hook ) {
 	 */
 
 	do_action( 'enqueue_block_editor_assets' );
-
-	wp_enqueue_script( 'wp-edit-site' );
-	wp_enqueue_script( 'wp-format-library' );
-	wp_enqueue_style( 'wp-edit-site' );
-	wp_enqueue_style( 'wp-format-library' );
-
-	if (
-		current_theme_supports( 'wp-block-styles' ) ||
-		( ! is_array( $editor_styles ) || count( $editor_styles ) === 0 )
-	) {
-		wp_enqueue_style( 'wp-block-library-theme' );
-	}
 
 }
 add_action( 'admin_enqueue_scripts', 'gutenberg_edit_site_init' );

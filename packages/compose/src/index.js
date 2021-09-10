@@ -15,6 +15,7 @@ export { default as withState } from './higher-order/with-state';
 // Hooks
 export { default as useConstrainedTabbing } from './hooks/use-constrained-tabbing';
 export { default as useCopyOnClick } from './hooks/use-copy-on-click';
+export { default as useCopyToClipboard } from './hooks/use-copy-to-clipboard';
 export { default as __experimentalUseDialog } from './hooks/use-dialog';
 export { default as __experimentalUseDragging } from './hooks/use-dragging';
 export { default as useFocusOnMount } from './hooks/use-focus-on-mount';
@@ -34,3 +35,4 @@ export { default as useDebounce } from './hooks/use-debounce';
 export { default as useThrottle } from './hooks/use-throttle';
 export { default as useMergeRefs } from './hooks/use-merge-refs';
 export { default as useRefEffect } from './hooks/use-ref-effect';
+export { default as __experimentalUseDropZone } from './hooks/use-drop-zone';

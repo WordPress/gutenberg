@@ -3,6 +3,7 @@
  */
 import {
 	createJSONResponse,
+	pressKeyTimes,
 	pressKeyWithModifier,
 	setUpResponseMocking,
 	visitAdminPage,
@@ -82,12 +83,17 @@ const REST_SEARCH_ROUTES = [
 	`rest_route=${ encodeURIComponent( '/wp/v2/search' ) }`,
 ];
 
+const REST_PAGES_ROUTES = [
+	'/wp/v2/pages',
+	`rest_route=${ encodeURIComponent( '/wp/v2/pages' ) }`,
+];
+
 /**
  * Determines if a given URL matches any of a given collection of
  * routes (expressed as substrings).
  *
  * @param {string} reqUrl the full URL to be tested for matches.
- * @param {Array} routes array of strings to match against the URL.
+ * @param {Array}  routes array of strings to match against the URL.
  */
 function matchUrlToRoute( reqUrl, routes ) {
 	return routes.some( ( route ) => reqUrl.includes( route ) );
@@ -132,6 +138,10 @@ function getMenuItemMocks( responsesByMethod ) {
 
 function getSearchMocks( responsesByMethod ) {
 	return getEndpointMocks( REST_SEARCH_ROUTES, responsesByMethod );
+}
+
+function getPagesMocks( responsesByMethod ) {
+	return getEndpointMocks( REST_PAGES_ROUTES, responsesByMethod );
 }
 
 async function visitNavigationEditor() {
@@ -183,6 +193,18 @@ describe( 'Navigation editor', () => {
 				POST: menuPostResponse,
 			} ),
 			...getMenuItemMocks( { GET: [] } ),
+			...getPagesMocks( {
+				GET: [
+					{
+						type: 'page',
+						id: 1,
+						link: 'https://example.com/1',
+						title: {
+							rendered: 'My page',
+						},
+					},
+				],
+			} ),
 		] );
 
 		await page.keyboard.type( 'Main Menu' );
@@ -302,7 +324,7 @@ describe( 'Navigation editor', () => {
 
 		// Select a link block with nested links in a submenu.
 		const parentLinkXPath =
-			'//li[@aria-label="Block: Link" and contains(.,"WordPress.org")]';
+			'//div[@aria-label="Block: Custom Link" and contains(.,"WordPress.org")]';
 		const linkBlock = await page.waitForXPath( parentLinkXPath );
 		await linkBlock.click();
 
@@ -311,14 +333,14 @@ describe( 'Navigation editor', () => {
 		// Submenus are hidden using `visibility: hidden` and shown using
 		// `visibility: visible` so the visible/hidden options must be used
 		// when selecting the elements.
-		const submenuLinkXPath = `${ parentLinkXPath }//li[@aria-label="Block: Link"]`;
+		const submenuLinkXPath = `${ parentLinkXPath }//div[@aria-label="Block: Custom Link"]`;
 		const submenuLinkVisible = await page.waitForXPath( submenuLinkXPath, {
 			visible: true,
 		} );
 		expect( submenuLinkVisible ).toBeDefined();
 
 		// click in the top left corner of the canvas.
-		const canvas = await page.$( '.edit-navigation-layout__canvas' );
+		const canvas = await page.$( '.edit-navigation-layout__content-area' );
 		const boundingBox = await canvas.boundingBox();
 		await page.mouse.click( boundingBox.x + 5, boundingBox.y + 5 );
 
@@ -343,7 +365,7 @@ describe( 'Navigation editor', () => {
 		);
 		await navBlock.click();
 		const startEmptyButton = await page.waitForXPath(
-			'//button[.="Start empty"]'
+			'//button[.="Start blank"]'
 		);
 		await startEmptyButton.click();
 
@@ -352,10 +374,8 @@ describe( 'Navigation editor', () => {
 		);
 		await appender.click();
 
-		// Must be an exact match to the word 'Link' as other
-		// variations also contain the word 'Link'.
 		const linkInserterItem = await page.waitForXPath(
-			'//button[@role="option"]//span[.="Link"]'
+			'//button[@role="option"]//span[.="Custom Link"]'
 		);
 		await linkInserterItem.click();
 
@@ -382,5 +402,182 @@ describe( 'Navigation editor', () => {
 			expect( suggestionURL ).toBeTruthy();
 			await pressKeyWithModifier( 'primary', 'A' );
 		}
+	} );
+
+	describe( 'Menu name editor', () => {
+		const initialMenuName = 'Main Menu';
+		const nameEditorSelector = '.edit-navigation-name-editor__text-control';
+		const inputSelector = `${ nameEditorSelector } input`;
+
+		beforeEach( async () => {
+			const menuPostResponse = {
+				id: 4,
+				description: '',
+				name: initialMenuName,
+				slug: 'main-menu',
+				meta: [],
+				auto_add: false,
+			};
+
+			await setUpResponseMocking( [
+				...getMenuMocks( {
+					GET: [ menuPostResponse ],
+					POST: menuPostResponse,
+				} ),
+				...getMenuItemMocks( { GET: [] } ),
+			] );
+
+			await visitNavigationEditor();
+
+			// Wait for the navigation setting sidebar.
+			await page.waitForSelector( '.edit-navigation-sidebar' );
+		} );
+
+		afterEach( async () => {
+			await setUpResponseMocking( [] );
+		} );
+
+		it( 'is displayed in inspector additions', async () => {
+			const nameControl = await page.$( nameEditorSelector );
+			expect( nameControl ).toBeDefined();
+		} );
+
+		it( 'saves menu name upon clicking save button', async () => {
+			const newName = 'newName';
+			const menuPostResponse = {
+				id: 4,
+				description: '',
+				name: newName,
+				slug: 'main-menu',
+				meta: [],
+				auto_add: false,
+			};
+
+			await setUpResponseMocking( [
+				...getMenuMocks( {
+					GET: [ menuPostResponse ],
+					POST: menuPostResponse,
+				} ),
+				...getMenuItemMocks( { GET: [] } ),
+			] );
+
+			// Ensure there is focus.
+			await page.focus( inputSelector );
+			await pressKeyTimes( 'Backspace', initialMenuName.length );
+			await page.keyboard.type( newName );
+
+			const saveButton = await page.$(
+				'.edit-navigation-toolbar__save-button'
+			);
+			await saveButton.click();
+			await page.waitForSelector( '.components-snackbar' );
+			const headerSubtitle = await page.waitForSelector(
+				'.edit-navigation-header__subtitle'
+			);
+			expect( headerSubtitle ).toBeTruthy();
+			const headerSubtitleText = await headerSubtitle.evaluate(
+				( element ) => element.innerText
+			);
+			expect( headerSubtitleText ).toBe( `Editing: ${ newName }` );
+		} );
+
+		it( 'does not save a menu name upon clicking save button when name is empty', async () => {
+			const menuPostResponse = {
+				id: 4,
+				description: '',
+				name: initialMenuName,
+				slug: 'main-menu',
+				meta: [],
+				auto_add: false,
+			};
+
+			await setUpResponseMocking( [
+				...getMenuMocks( {
+					GET: [ menuPostResponse ],
+					POST: menuPostResponse,
+				} ),
+				...getMenuItemMocks( { GET: [] } ),
+			] );
+
+			// Ensure there is focus.
+			await page.focus( inputSelector );
+			await pressKeyTimes( 'Backspace', initialMenuName.length );
+
+			const saveButton = await page.$(
+				'.edit-navigation-toolbar__save-button'
+			);
+			await saveButton.click();
+			await page.waitForSelector( '.components-snackbar' );
+			const headerSubtitle = await page.waitForSelector(
+				'.edit-navigation-header__subtitle'
+			);
+			expect( headerSubtitle ).toBeTruthy();
+			const headerSubtitleText = await headerSubtitle.evaluate(
+				( element ) => element.innerText
+			);
+			expect( headerSubtitleText ).toBe(
+				`Editing: ${ initialMenuName }`
+			);
+		} );
+	} );
+
+	describe( 'Change detections', () => {
+		beforeEach( async () => {
+			const menuPostResponse = {
+				id: 4,
+				description: '',
+				name: 'Main',
+				slug: 'main-menu',
+				meta: [],
+				auto_add: false,
+			};
+
+			await setUpResponseMocking( [
+				...getMenuMocks( {
+					GET: [ menuPostResponse ],
+					POST: menuPostResponse,
+				} ),
+				...getMenuItemMocks( { GET: [] } ),
+			] );
+
+			await visitNavigationEditor();
+		} );
+
+		afterEach( async () => {
+			await setUpResponseMocking( [] );
+		} );
+
+		async function assertIsDirty( isDirty ) {
+			let hadDialog = false;
+
+			function handleOnDialog() {
+				hadDialog = true;
+			}
+
+			try {
+				page.on( 'dialog', handleOnDialog );
+				await page.reload();
+
+				// Ensure whether it was expected that dialog was encountered.
+				expect( hadDialog ).toBe( isDirty );
+			} catch ( error ) {
+				throw error;
+			} finally {
+				page.removeListener( 'dialog', handleOnDialog );
+			}
+		}
+
+		it.skip( 'should not prompt to confirm unsaved changes for the newly selected menu', async () => {
+			await assertIsDirty( false );
+		} );
+
+		it.skip( 'should prompt to confirm unsaved changes when menu name is edited', async () => {
+			await page.type(
+				'.edit-navigation-name-editor__text-control input',
+				' Menu'
+			);
+
+			await assertIsDirty( true );
+		} );
 	} );
 } );

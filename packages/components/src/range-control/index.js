@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * External dependencies
  */
@@ -17,7 +18,7 @@ import { useInstanceId } from '@wordpress/compose';
 import BaseControl from '../base-control';
 import Button from '../button';
 import Icon from '../icon';
-import { color } from '../utils/colors';
+import { COLORS } from '../utils';
 import { floatClamp, useControlledRangeValue } from './utils';
 import InputRange from './input-range';
 import RangeRail from './rail';
@@ -41,12 +42,13 @@ function RangeControl(
 		beforeIcon,
 		className,
 		currentInput,
-		color: colorProp = color( 'ui.theme' ),
+		color: colorProp = COLORS.ui.theme,
 		disabled = false,
 		help,
 		initialPosition,
 		isShiftStepEnabled = true,
 		label,
+		hideLabelFromVision = false,
 		marks = false,
 		max = 100,
 		min = 0,
@@ -194,6 +196,7 @@ function RangeControl(
 		<BaseControl
 			className={ classes }
 			label={ label }
+			hideLabelFromVision={ hideLabelFromVision }
 			id={ id }
 			help={ help }
 		>
@@ -245,10 +248,11 @@ function RangeControl(
 						style={ { width: fillValueOffset } }
 						trackColor={ trackColor }
 					/>
-					<ThumbWrapper style={ offsetStyle }>
+					<ThumbWrapper style={ offsetStyle } disabled={ disabled }>
 						<Thumb
 							aria-hidden={ true }
 							isFocused={ isThumbFocused }
+							disabled={ disabled }
 						/>
 					</ThumbWrapper>
 					{ enableTooltip && (
@@ -288,7 +292,7 @@ function RangeControl(
 						<Button
 							className="components-range-control__reset"
 							disabled={ disabled || value === undefined }
-							isSecondary
+							variant="secondary"
 							isSmall
 							onClick={ handleOnReset }
 						>

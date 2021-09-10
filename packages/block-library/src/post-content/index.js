@@ -1,7 +1,6 @@
 /**
  * WordPress dependencies
  */
-import { _x } from '@wordpress/i18n';
 import { postContent as icon } from '@wordpress/icons';
 
 /**
@@ -14,7 +13,6 @@ const { name } = metadata;
 export { metadata, name };
 
 export const settings = {
-	title: _x( 'Post Content', 'block title' ),
 	icon,
 	edit,
 };

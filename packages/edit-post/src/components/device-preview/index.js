@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { Icon, MenuGroup } from '@wordpress/components';
-import { PostPreviewButton } from '@wordpress/editor';
+import { PostPreviewButton, store as editorStore } from '@wordpress/editor';
 import { external } from '@wordpress/icons';
 import { __ } from '@wordpress/i18n';
 import { __experimentalPreviewOptions as PreviewOptions } from '@wordpress/block-editor';
@@ -23,7 +23,7 @@ export default function DevicePreview() {
 		( select ) => ( {
 			hasActiveMetaboxes: select( editPostStore ).hasMetaBoxes(),
 			isSaving: select( editPostStore ).isSavingMetaBoxes(),
-			isPostSaveable: select( 'core/editor' ).isEditedPostSaveable(),
+			isPostSaveable: select( editorStore ).isEditedPostSaveable(),
 			deviceType: select(
 				editPostStore
 			).__experimentalGetPreviewDeviceType(),

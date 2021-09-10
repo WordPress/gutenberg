@@ -12,10 +12,7 @@ If for any reason a block variaton match cannot be found, the returned informati
 The hook returns an object which contains the block's title, icon, and description. If no block type is found for the provided `clientId`, it returns `null`.
 
 ```jsx
-import {
-	BlockIcon,
-	useBlockDisplayInformation,
-} from '@wordpress/block-editor';
+import { BlockIcon, useBlockDisplayInformation } from '@wordpress/block-editor';
 
 function DemoBlockCard( { clientId } ) {
 	const blockInformation = useBlockDisplayInformation( clientId );

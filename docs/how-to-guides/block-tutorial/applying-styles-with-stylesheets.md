@@ -1,42 +1,47 @@
 # Applying Styles From a Stylesheet
 
-In the previous step, the block had applied its own styles by an inline `style` attribute. While this might be adequate for very simple components, you will quickly find that it becomes easier to write your styles by extracting them to a separate stylesheet file.
+In the [previous section](/docs/how-to-guides/block-tutorial/writing-your-first-block-type.md), the block had applied its own styles by an inline `style` attribute. While this might be adequate for very simple components, you will quickly find that it becomes easier to write your styles by extracting them to a separate stylesheet file.
 
-The editor will automatically generate a class name for each block type to simplify styling. It can be accessed from the object argument passed to the edit and save functions. In step 2, we will create a stylesheet to use that class name.
+The editor will automatically generate a class name for each block type to simplify styling. It can be accessed from the object argument passed to the edit and save functions. In this section, we will create a stylesheet to use that class name.
 
 {% codetabs %}
 {% ESNext %}
+
 ```jsx
 import { registerBlockType } from '@wordpress/blocks';
 import { useBlockProps } from '@wordpress/block-editor';
 
 registerBlockType( 'gutenberg-examples/example-02-stylesheets', {
 	apiVersion: 2,
-
 	title: 'Example: Stylesheets',
-
 	icon: 'universal-access-alt',
-
 	category: 'design',
-
 	example: {},
-
 	edit() {
 		const blockProps = useBlockProps();
 
-		return <p { ...blockProps }>Hello World, step 2 (from the editor, in green).</p>;
+		return (
+			<p { ...blockProps }>
+				Hello World (from the editor, in green).
+			</p>
+		);
 	},
-
 	save() {
 		const blockProps = useBlockProps.save();
 
-		return <p { ...blockProps }>Hello World, step 2 (from the frontend, in red).</p>;
+		return (
+			<p { ...blockProps }>
+				Hello World (from the frontend, in red).
+			</p>
+		);
 	},
 } );
 ```
+
 {% ES5 %}
+
 ```js
-( function( blocks, element, blockEditor ) {
+( function ( blocks, element, blockEditor ) {
 	var el = element.createElement;
 
 	blocks.registerBlockType( 'gutenberg-examples/example-02-stylesheets', {
@@ -45,29 +50,26 @@ registerBlockType( 'gutenberg-examples/example-02-stylesheets', {
 		icon: 'universal-access-alt',
 		category: 'design',
 		example: {},
-		edit: function( props ) {
+		edit: function ( props ) {
 			var blockProps = blockEditor.useBlockProps();
 			return el(
 				'p',
 				blockProps,
-				'Hello World, step 2 (from the editor, in green).'
+				'Hello World (from the editor, in green).'
 			);
 		},
-		save: function() {
+		save: function () {
 			var blockProps = blockEditor.useBlockProps.save();
 			return el(
 				'p',
 				blockProps,
-				'Hello World, step 2 (from the frontend, in red).'
+				'Hello World (from the frontend, in red).'
 			);
 		},
 	} );
-}(
-	window.wp.blocks,
-	window.wp.element,
-	window.wp.blockEditor,
-) );
+} )( window.wp.blocks, window.wp.element, window.wp.blockEditor );
 ```
+
 {% end %}
 
 The class name is generated using the block's name prefixed with `wp-block-`, replacing the `/` namespace separator with a single `-`.
@@ -134,7 +136,7 @@ function gutenberg_examples_02_register_block() {
 	wp_style_add_data( 'gutenberg-examples-02', 'path', dirname( __FILE__ ) . '/style.css' );
 
 	register_block_type( 'gutenberg-examples/example-02-stylesheets', array(
-		'apiVersion' => 2,
+		'api_version' => 2,
 		'style' => 'gutenberg-examples-02',
 		'editor_style' => 'gutenberg-examples-02-editor',
 		'editor_script' => 'gutenberg-examples-02',

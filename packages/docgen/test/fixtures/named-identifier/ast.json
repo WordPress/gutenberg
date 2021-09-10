@@ -12,10 +12,7 @@
 			"column": 25
 		}
 	},
-	"range": [
-		35,
-		89
-	],
+	"range": [ 35, 89 ],
 	"body": [
 		{
 			"type": "FunctionDeclaration",
@@ -31,10 +28,7 @@
 					"column": 27
 				}
 			},
-			"range": [
-				35,
-				62
-			],
+			"range": [ 35, 62 ],
 			"id": {
 				"type": "Identifier",
 				"start": 44,
@@ -49,10 +43,7 @@
 						"column": 22
 					}
 				},
-				"range": [
-					44,
-					57
-				],
+				"range": [ 44, 57 ],
 				"name": "myDeclaration"
 			},
 			"generator": false,
@@ -73,10 +64,7 @@
 						"column": 27
 					}
 				},
-				"range": [
-					60,
-					62
-				],
+				"range": [ 60, 62 ],
 				"body": []
 			},
 			"leadingComments": [
@@ -85,10 +73,7 @@
 					"value": "*\n * My declaration example.\n ",
 					"start": 0,
 					"end": 34,
-					"range": [
-						0,
-						34
-					],
+					"range": [ 0, 34 ],
 					"loc": {
 						"start": {
 							"line": 1,
@@ -116,10 +101,7 @@
 					"column": 25
 				}
 			},
-			"range": [
-				64,
-				89
-			],
+			"range": [ 64, 89 ],
 			"declaration": null,
 			"specifiers": [
 				{
@@ -136,10 +118,7 @@
 							"column": 22
 						}
 					},
-					"range": [
-						73,
-						86
-					],
+					"range": [ 73, 86 ],
 					"local": {
 						"type": "Identifier",
 						"start": 73,
@@ -154,10 +133,7 @@
 								"column": 22
 							}
 						},
-						"range": [
-							73,
-							86
-						],
+						"range": [ 73, 86 ],
 						"name": "myDeclaration"
 					},
 					"exported": {
@@ -174,10 +150,7 @@
 								"column": 22
 							}
 						},
-						"range": [
-							73,
-							86
-						],
+						"range": [ 73, 86 ],
 						"name": "myDeclaration"
 					}
 				}
@@ -192,10 +165,7 @@
 			"value": "*\n * My declaration example.\n ",
 			"start": 0,
 			"end": 34,
-			"range": [
-				0,
-				34
-			],
+			"range": [ 0, 34 ],
 			"loc": {
 				"start": {
 					"line": 1,

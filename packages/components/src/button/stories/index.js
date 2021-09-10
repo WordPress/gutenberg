@@ -30,19 +30,19 @@ export const _default = () => {
 export const primary = () => {
 	const label = text( 'Label', 'Primary Button' );
 
-	return <Button isPrimary>{ label }</Button>;
+	return <Button variant="primary">{ label }</Button>;
 };
 
 export const secondary = () => {
 	const label = text( 'Label', 'Secondary Button' );
 
-	return <Button isSecondary>{ label }</Button>;
+	return <Button variant="secondary">{ label }</Button>;
 };
 
 export const tertiary = () => {
 	const label = text( 'Label', 'Tertiary Button' );
 
-	return <Button isTertiary>{ label }</Button>;
+	return <Button variant="tertiary">{ label }</Button>;
 };
 
 export const isDestructive = () => {
@@ -64,7 +64,7 @@ export const isPrimaryDestructive = () => {
 
 	return (
 		<Button
-			isPrimary
+			variant="primary"
 			isDestructive
 			isSmall={ isSmall }
 			disabled={ disabled }
@@ -126,7 +126,7 @@ export const destructiveLink = () => {
 	const label = text( 'Label', 'Destructive Link' );
 
 	return (
-		<Button isDestructive isLink>
+		<Button isDestructive variant="link">
 			{ label }
 		</Button>
 	);
@@ -176,20 +176,20 @@ export const buttons = () => {
 			<h2>Small Buttons</h2>
 			<div className="story-buttons-container">
 				<Button isSmall>Button</Button>
-				<Button isPrimary isSmall>
+				<Button variant="primary" isSmall>
 					Primary Button
 				</Button>
-				<Button isSecondary isSmall>
+				<Button variant="secondary" isSmall>
 					Secondary Button
 				</Button>
-				<Button isTertiary isSmall>
+				<Button variant="tertiary" isSmall>
 					Tertiary Button
 				</Button>
 				<Button isSmall icon={ more } />
-				<Button isSmall isPrimary icon={ more } />
-				<Button isSmall isSecondary icon={ more } />
-				<Button isSmall isTertiary icon={ more } />
-				<Button isSmall isPrimary icon={ more }>
+				<Button isSmall variant="primary" icon={ more } />
+				<Button isSmall variant="secondary" icon={ more } />
+				<Button isSmall variant="tertiary" icon={ more } />
+				<Button isSmall variant="primary" icon={ more }>
 					Icon & Text
 				</Button>
 			</div>
@@ -197,14 +197,14 @@ export const buttons = () => {
 			<h2>Regular Buttons</h2>
 			<div className="story-buttons-container">
 				<Button>Button</Button>
-				<Button isPrimary>Primary Button</Button>
-				<Button isSecondary>Secondary Button</Button>
-				<Button isTertiary>Tertiary Button</Button>
+				<Button variant="primary">Primary Button</Button>
+				<Button variant="secondary">Secondary Button</Button>
+				<Button variant="tertiary">Tertiary Button</Button>
 				<Button icon={ more } />
-				<Button isPrimary icon={ more } />
-				<Button isSecondary icon={ more } />
-				<Button isTertiary icon={ more } />
-				<Button isPrimary icon={ more }>
+				<Button variant="primary" icon={ more } />
+				<Button variant="secondary" icon={ more } />
+				<Button variant="tertiary" icon={ more } />
+				<Button variant="primary" icon={ more }>
 					Icon & Text
 				</Button>
 			</div>

@@ -1,14 +1,12 @@
 /**
  * WordPress dependencies
  */
-import apiFetch from '@wordpress/api-fetch';
-import { addQueryArgs } from '@wordpress/url';
-import { __ } from '@wordpress/i18n';
 import {
 	registerCoreBlocks,
 	__experimentalRegisterExperimentalCoreBlocks,
 } from '@wordpress/block-library';
-import { render } from '@wordpress/element';
+import { render, unmountComponentAtNode } from '@wordpress/element';
+import { __experimentalFetchLinkSuggestions as fetchLinkSuggestions } from '@wordpress/core-data';
 
 /**
  * Internal dependencies
@@ -18,31 +16,22 @@ import './hooks';
 import './store';
 import Editor from './components/editor';
 
-const fetchLinkSuggestions = ( search, { perPage = 20 } = {} ) =>
-	apiFetch( {
-		path: addQueryArgs( '/wp/v2/search', {
-			per_page: perPage,
-			search,
-			type: 'post',
-			subtype: 'post',
-		} ),
-	} )
-		.then( ( posts ) =>
-			Promise.all(
-				posts.map( ( post ) =>
-					apiFetch( { url: post._links.self[ 0 ].href } )
-				)
-			)
-		)
-		.then( ( posts ) =>
-			posts.map( ( post ) => ( {
-				url: post.link,
-				type: post.type,
-				id: post.id,
-				slug: post.slug,
-				title: post.title.rendered || __( '(no title)' ),
-			} ) )
-		);
+/**
+ * Reinitializes the editor after the user chooses to reboot the editor after
+ * an unhandled error occurs, replacing previously mounted editor element using
+ * an initial state from prior to the crash.
+ *
+ * @param {Element} target   DOM node in which editor is rendered.
+ * @param {?Object} settings Editor settings object.
+ */
+export function reinitializeEditor( target, settings ) {
+	unmountComponentAtNode( target );
+	const reboot = reinitializeEditor.bind( null, target, settings );
+	render(
+		<Editor initialSettings={ settings } onError={ reboot } />,
+		target
+	);
+}
 
 /**
  * Initializes the site editor screen.
@@ -51,19 +40,28 @@ const fetchLinkSuggestions = ( search, { perPage = 20 } = {} ) =>
  * @param {Object} settings Editor settings.
  */
 export function initialize( id, settings ) {
-	settings.__experimentalFetchLinkSuggestions = fetchLinkSuggestions;
+	settings.__experimentalFetchLinkSuggestions = ( search, searchOptions ) =>
+		fetchLinkSuggestions( search, searchOptions, settings );
 	settings.__experimentalSpotlightEntityBlocks = [ 'core/template-part' ];
+
+	const target = document.getElementById( id );
+	const reboot = reinitializeEditor.bind( null, target, settings );
 
 	registerCoreBlocks();
 	if ( process.env.GUTENBERG_PHASE === 2 ) {
-		__experimentalRegisterExperimentalCoreBlocks( true );
+		__experimentalRegisterExperimentalCoreBlocks( {
+			enableFSEBlocks: true,
+		} );
 	}
 
 	render(
-		<Editor initialSettings={ settings } />,
-		document.getElementById( id )
+		<Editor initialSettings={ settings } onError={ reboot } />,
+		target
 	);
 }
 
 export { default as __experimentalMainDashboardButton } from './components/main-dashboard-button';
 export { default as __experimentalNavigationToggle } from './components/navigation-sidebar/navigation-toggle';
+export { default as PluginSidebar } from './components/sidebar/plugin-sidebar';
+export { default as PluginSidebarMoreMenuItem } from './components/header/plugin-sidebar-more-menu-item';
+export { default as PluginMoreMenuItem } from './components/header/plugin-more-menu-item';

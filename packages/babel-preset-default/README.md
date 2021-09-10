@@ -16,13 +16,13 @@ npm install @wordpress/babel-preset-default --save-dev
 
 ### Usage
 
-There are a number of methods to configure Babel. See [Babel's Configuration documentation](https://babeljs.io/docs/en/configuration) for more information. To use this preset, simply reference `@wordpress/default` in the `presets` option in your Babel configuration.
+There are a number of methods to configure Babel. See [Babel's Configuration documentation](https://babeljs.io/docs/en/configuration) for more information. To use this preset, simply reference `@wordpress/babel-preset-default` in the `presets` option in your Babel configuration.
 
 For example, using `.babelrc`:
 
 ```json
 {
-	"presets": [ "@wordpress/default" ]
+	"presets": [ "@wordpress/babel-preset-default" ]
 }
 ```
 
@@ -38,5 +38,15 @@ For example, if you'd like to use a new language feature proposal which has not 
 	"plugins": [ "@babel/plugin-proposal-class-properties" ]
 }
 ```
+
+### Polyfill
+
+There is a complementary `build/polyfill.js` (minified version – `build/polyfill.min.js`) file available that polyfills ECMAScript features missing in the [browsers supported](https://make.wordpress.org/core/handbook/best-practices/browser-support/) by the WordPress project ([#31279](https://github.com/WordPress/gutenberg/pull/31279)). It's a drop-in replacement for the deprecated `@babel/polyfill` package, and it's also based on [`core-js`](https://github.com/zloirock/core-js) project.
+
+This needs to be included before all your compiled Babel code. You can either prepend it to your compiled code or include it in a `<script>` before it.
+
+#### TC39 Proposals
+
+If you need to use a proposal that is not Stage 4, this polyfill will not automatically import those for you. You will have to import those from another polyfill like [`core-js`](https://github.com/zloirock/core-js) individually.
 
 <br/><br/><p align="center"><img src="https://s.w.org/style/images/codeispoetry.png?1" alt="Code is Poetry." /></p>

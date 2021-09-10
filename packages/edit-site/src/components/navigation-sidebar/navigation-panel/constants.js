@@ -51,6 +51,12 @@ export const TEMPLATES_NEW_OPTIONS = [
 	'index',
 ];
 
+export const TEMPLATE_OVERRIDES = {
+	singular: [ 'single', 'page' ],
+	index: [ 'archive', '404', 'search', 'singular', 'home' ],
+	home: [ 'front-page' ],
+};
+
 export const MENU_ROOT = 'root';
 export const MENU_CONTENT_CATEGORIES = 'content-categories';
 export const MENU_CONTENT_PAGES = 'content-pages';

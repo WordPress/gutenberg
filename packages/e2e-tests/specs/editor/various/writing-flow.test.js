@@ -29,7 +29,7 @@ const addParagraphsAndColumnsDemo = async () => {
 	await page.keyboard.press( 'Enter' );
 	await page.click( ':focus [aria-label="Two columns; equal split"]' );
 	await page.click( ':focus .block-editor-button-block-appender' );
-	await page.waitForSelector( ':focus.block-editor-inserter__search-input' );
+	await page.waitForSelector( '.block-editor-inserter__search input:focus' );
 	await page.keyboard.type( 'Paragraph' );
 	await pressKeyTimes( 'Tab', 2 ); // Tab to paragraph result.
 	await page.keyboard.press( 'Enter' ); // Insert paragraph.
@@ -40,7 +40,7 @@ const addParagraphsAndColumnsDemo = async () => {
 	// is a temporary solution.
 	await page.focus( '.wp-block[data-type="core/column"]:nth-child(2)' );
 	await page.click( ':focus .block-editor-button-block-appender' );
-	await page.waitForSelector( ':focus.block-editor-inserter__search-input' );
+	await page.waitForSelector( '.block-editor-inserter__search input:focus' );
 	await page.keyboard.type( 'Paragraph' );
 	await pressKeyTimes( 'Tab', 2 ); // Tab to paragraph result.
 	await page.keyboard.press( 'Enter' ); // Insert paragraph.
@@ -289,29 +289,28 @@ describe( 'Writing Flow', () => {
 	it( 'should navigate native inputs vertically, not horizontally', async () => {
 		// See: https://github.com/WordPress/gutenberg/issues/9626
 
-		// Title is within the editor's writing flow, and is a <textarea>
-		await page.click( '.editor-post-title' );
+		await insertBlock( 'Shortcode' );
 
 		// Should remain in title upon ArrowRight:
 		await page.keyboard.press( 'ArrowRight' );
-		let isInTitle = await page.evaluate(
-			() => !! document.activeElement.closest( '.editor-post-title' )
+		let isInShortcodeBlock = await page.evaluate(
+			() => !! document.activeElement.closest( '.wp-block-shortcode' )
 		);
-		expect( isInTitle ).toBe( true );
+		expect( isInShortcodeBlock ).toBe( true );
 
 		// Should remain in title upon modifier + ArrowDown:
 		await pressKeyWithModifier( 'primary', 'ArrowDown' );
-		isInTitle = await page.evaluate(
-			() => !! document.activeElement.closest( '.editor-post-title' )
+		isInShortcodeBlock = await page.evaluate(
+			() => !! document.activeElement.closest( '.wp-block-shortcode' )
 		);
-		expect( isInTitle ).toBe( true );
+		expect( isInShortcodeBlock ).toBe( true );
 
 		// Should navigate into blocks list upon ArrowDown:
 		await page.keyboard.press( 'ArrowDown' );
-		const isInBlock = await page.evaluate(
-			() => !! document.activeElement.closest( '[data-type]' )
+		const isInParagraphBlock = await page.evaluate(
+			() => !! document.activeElement.closest( '.wp-block-paragraph' )
 		);
-		expect( isInBlock ).toBe( true );
+		expect( isInParagraphBlock ).toBe( true );
 	} );
 
 	it( 'should not delete surrounding space when deleting a word with Backspace', async () => {
@@ -559,9 +558,6 @@ describe( 'Writing Flow', () => {
 		await clickBlockToolbarButton( 'Align' );
 		await clickButton( 'Wide width' );
 
-		// Focus the block.
-		await page.keyboard.press( 'Tab' );
-
 		// Select the previous block.
 		await page.keyboard.press( 'ArrowUp' );
 
@@ -593,5 +589,39 @@ describe( 'Writing Flow', () => {
 		);
 
 		expect( type ).toBe( 'core/image' );
+	} );
+
+	it( 'should only consider the content as one tab stop', async () => {
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.type( '/table' );
+		await page.keyboard.press( 'Enter' );
+		// Move into the placeholder UI.
+		await page.keyboard.press( 'ArrowDown' );
+		// Tab to the "Create table" button.
+		await page.keyboard.press( 'Tab' );
+		await page.keyboard.press( 'Tab' );
+		// Create the table.
+		await page.keyboard.press( 'Space' );
+		// Return focus after focus loss. This should be fixed.
+		await page.keyboard.press( 'Tab' );
+		// Navigate to the second cell.
+		await page.keyboard.press( 'ArrowRight' );
+		await page.keyboard.type( '2' );
+		// Confirm correct setup.
+		expect( await getEditedPostContent() ).toMatchSnapshot();
+		// The content should only have one tab stop.
+		await page.keyboard.press( 'Tab' );
+		expect(
+			await page.evaluate( () =>
+				document.activeElement.getAttribute( 'aria-label' )
+			)
+		).toBe( 'Post' );
+		await pressKeyWithModifier( 'shift', 'Tab' );
+		await pressKeyWithModifier( 'shift', 'Tab' );
+		expect(
+			await page.evaluate( () =>
+				document.activeElement.getAttribute( 'aria-label' )
+			)
+		).toBe( 'Table' );
 	} );
 } );

@@ -39,11 +39,16 @@ function getRowFocusables( rowElement ) {
  * Renders both a table and tbody element, used to create a tree hierarchy.
  *
  * @see https://github.com/WordPress/gutenberg/blob/HEAD/packages/components/src/tree-grid/README.md
- * @param {Object}    props          Component props.
- * @param {WPElement} props.children Children to be rendered.
- * @param {Object}    ref            A ref to the underlying DOM table element.
+ * @param {Object}    props               Component props.
+ * @param {WPElement} props.children      Children to be rendered.
+ * @param {Function}  props.onExpandRow   Callback to fire when row is expanded.
+ * @param {Function}  props.onCollapseRow Callback to fire when row is collapsed.
+ * @param {Object}    ref                 A ref to the underlying DOM table element.
  */
-function TreeGrid( { children, ...props }, ref ) {
+function TreeGrid(
+	{ children, onExpandRow = () => {}, onCollapseRow = () => {}, ...props },
+	ref
+) {
 	const onKeyDown = useCallback( ( event ) => {
 		const { keyCode, metaKey, ctrlKey, altKey, shiftKey } = event;
 
@@ -82,8 +87,47 @@ function TreeGrid( { children, ...props }, ref ) {
 				);
 			}
 
-			// Focus is either at the left or right edge of the grid. Do nothing.
+			// Focus is either at the left or right edge of the grid.
 			if ( nextIndex === currentColumnIndex ) {
+				if ( keyCode === LEFT ) {
+					// Left:
+					// If a row is focused, and it is expanded, collapses the current row.
+					if ( activeRow?.ariaExpanded === 'true' ) {
+						onCollapseRow( activeRow );
+						event.preventDefault();
+						return;
+					}
+					// If a row is focused, and it is collapsed, moves to the parent row (if there is one).
+					const level = Math.max(
+						parseInt( activeRow?.ariaLevel ?? 1, 10 ) - 1,
+						1
+					);
+					const rows = Array.from(
+						treeGridElement.querySelectorAll( '[role="row"]' )
+					);
+					let parentRow = activeRow;
+					const currentRowIndex = rows.indexOf( activeRow );
+					for ( let i = currentRowIndex; i >= 0; i-- ) {
+						if ( parseInt( rows[ i ].ariaLevel, 10 ) === level ) {
+							parentRow = rows[ i ];
+							break;
+						}
+					}
+					getRowFocusables( parentRow )?.[ 0 ]?.focus();
+				} else {
+					// Right:
+					// If a row is focused, and it is collapsed, expands the current row.
+					if ( activeRow?.ariaExpanded === 'false' ) {
+						onExpandRow( activeRow );
+						event.preventDefault();
+						return;
+					}
+					// If a row is focused, and it is expanded, focuses the rightmost cell in the row.
+					const focusableItems = getRowFocusables( activeRow );
+					if ( focusableItems.length > 0 ) {
+						focusableItems[ focusableItems.length - 1 ]?.focus();
+					}
+				}
 				// Prevent key use for anything else. For example, Voiceover
 				// will start reading text on continued use of left/right arrow
 				// keys.

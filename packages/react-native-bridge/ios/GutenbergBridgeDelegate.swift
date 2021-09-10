@@ -17,12 +17,16 @@ public struct MediaInfo: Encodable {
 /// Definition of capabilities to enable in the Block Editor
 public enum Capabilities: String {
     case contactInfoBlock
+    case layoutGridBlock
     case mediaFilesCollectionBlock
     case mentions
     case xposts
     case unsupportedBlockEditor
     case canEnableUnsupportedBlockEditor
-    case audioBlock
+    case isAudioBlockMediaUploadEnabled
+    case reusableBlock
+    case editorOnboarding
+    case firstGutenbergEditorSession
 }
 
 /// Wrapper for single block data
@@ -121,25 +125,6 @@ extension RCTLogLevel {
     }
 }
 
-public enum GutenbergUserEvent {
-
-    case editorSessionTemplateApply(_ template: String)
-    case editorSessionTemplatePreview(_ template: String)
-
-    init?(event: String, properties:[AnyHashable: Any]?) {
-        switch event {
-        case "editor_session_template_apply":
-            guard let template = properties?["template"] as? String else { return nil }
-            self = .editorSessionTemplateApply(template)
-        case "editor_session_template_preview":
-            guard let template = properties?["template"] as? String else { return nil }
-            self = .editorSessionTemplatePreview(template)
-        default:
-            return nil
-        }
-    }
-}
-
 public protocol GutenbergBridgeDelegate: class {
     /// Tells the delegate that Gutenberg had returned the requested HTML content.
     /// You can request HTML content by calling `requestHTML()` on a Gutenberg bridge instance.
@@ -179,6 +164,10 @@ public protocol GutenbergBridgeDelegate: class {
     ///
     func gutenbergDidRequestMediaUploadCancelation(for mediaID: Int32)
 
+    /// Tells the delegate that an image block requested for the featured image to be set.
+    ///
+    func gutenbergDidRequestToSetFeaturedImage(for mediaID: Int32)
+
     /// Tells the delegate that the Gutenberg module has finished loading.
     ///
     func gutenbergDidLoad()
@@ -216,10 +205,6 @@ public protocol GutenbergBridgeDelegate: class {
     ///
     func gutenbergDidRequestMediaEditor(with mediaUrl: URL, callback: @escaping MediaPickerDidPickMediaCallback)
 
-    /// Tells the delegate that the editor needs to log a custom event
-    /// - Parameter event: The event key to be logged
-    func gutenbergDidLogUserEvent(_ event: GutenbergUserEvent)
-
     /// Tells the delegate that the editor needs to render an unsupported block
     func gutenbergDidRequestUnsupportedBlockFallback(for block: Block)
 
@@ -253,6 +238,14 @@ public protocol GutenbergBridgeDelegate: class {
     func gutenbergDidRequestMediaFilesUploadCancelDialog(_ mediaFiles: [[String: Any]])
 
     func gutenbergDidRequestMediaFilesSaveCancelDialog(_ mediaFiles: [[String: Any]])
+
+    func gutenbergDidRequestPreview()
+
+    /// Tells the delegate that the editor requested the block type impression counts
+    func gutenbergDidRequestBlockTypeImpressions() -> [String: Int]
+
+    /// Tells the delegate the the editor requested setting the impression counts
+    func gutenbergDidRequestSetBlockTypeImpressions(_ impressions: [String: Int])
 }
 
 // MARK: - Optional GutenbergBridgeDelegate methods

@@ -13,13 +13,12 @@ import {
 	FormFileUpload,
 	NavigableMenu,
 	MenuItem,
-	ToolbarGroup,
 	ToolbarButton,
 	Dropdown,
 	withFilters,
 } from '@wordpress/components';
 import { withDispatch, useSelect } from '@wordpress/data';
-import { DOWN, TAB, ESCAPE } from '@wordpress/keycodes';
+import { DOWN } from '@wordpress/keycodes';
 import { compose } from '@wordpress/compose';
 import { upload, media as mediaIcon } from '@wordpress/icons';
 import { store as noticesStore } from '@wordpress/notices';
@@ -105,7 +104,6 @@ const MediaReplaceFlow = ( {
 	const openOnArrowDown = ( event ) => {
 		if ( event.keyCode === DOWN ) {
 			event.preventDefault();
-			event.stopPropagation();
 			event.target.click();
 		}
 	};
@@ -119,17 +117,15 @@ const MediaReplaceFlow = ( {
 			popoverProps={ POPOVER_PROPS }
 			contentClassName="block-editor-media-replace-flow__options"
 			renderToggle={ ( { isOpen, onToggle } ) => (
-				<ToolbarGroup className="media-replace-flow">
-					<ToolbarButton
-						ref={ editMediaButtonRef }
-						aria-expanded={ isOpen }
-						aria-haspopup="true"
-						onClick={ onToggle }
-						onKeyDown={ openOnArrowDown }
-					>
-						{ name }
-					</ToolbarButton>
-				</ToolbarGroup>
+				<ToolbarButton
+					ref={ editMediaButtonRef }
+					aria-expanded={ isOpen }
+					aria-haspopup="true"
+					onClick={ onToggle }
+					onKeyDown={ openOnArrowDown }
+				>
+					{ name }
+				</ToolbarButton>
 			) }
 			renderContent={ ( { onClose } ) => (
 				<>
@@ -167,23 +163,7 @@ const MediaReplaceFlow = ( {
 					</NavigableMenu>
 					{ onSelectURL && (
 						// eslint-disable-next-line jsx-a11y/no-noninteractive-element-interactions
-						<form
-							className="block-editor-media-flow__url-input"
-							onKeyDown={ ( event ) => {
-								if (
-									! [ TAB, ESCAPE ].includes( event.keyCode )
-								) {
-									event.stopPropagation();
-								}
-							} }
-							onKeyPress={ ( event ) => {
-								if (
-									! [ TAB, ESCAPE ].includes( event.keyCode )
-								) {
-									event.stopPropagation();
-								}
-							} }
-						>
+						<form className="block-editor-media-flow__url-input">
 							<span className="block-editor-media-replace-flow__image-url-label">
 								{ __( 'Current media URL:' ) }
 							</span>

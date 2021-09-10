@@ -2,8 +2,9 @@
  * WordPress dependencies
  */
 import { Button } from '@wordpress/components';
-import { __, sprintf } from '@wordpress/i18n';
+import { __, _x, sprintf } from '@wordpress/i18n';
 import { useDispatch, useSelect } from '@wordpress/data';
+import { store as editorStore } from '@wordpress/editor';
 
 /**
  * Internal dependencies
@@ -16,18 +17,15 @@ const SettingsHeader = ( { sidebarName } ) => {
 		openGeneralSidebar( 'edit-post/document' );
 	const openBlockSettings = () => openGeneralSidebar( 'edit-post/block' );
 
-	const documentLabel = useSelect( ( select ) => {
-		const currentPostType = select( 'core/editor' ).getCurrentPostType();
-		const postType = select( 'core' ).getPostType( currentPostType );
+	const { documentLabel, isTemplateMode } = useSelect( ( select ) => {
+		const postTypeLabel = select( editorStore ).getPostTypeLabel();
 
-		return (
-			// Disable reason: Post type labels object is shaped like this.
-			// eslint-disable-next-line camelcase
-			postType?.labels?.singular_name ??
+		return {
 			// translators: Default label for the Document sidebar tab, not selected.
-			__( 'Document' )
-		);
-	} );
+			documentLabel: postTypeLabel || _x( 'Document', 'noun' ),
+			isTemplateMode: select( editPostStore ).isEditingTemplate(),
+		};
+	}, [] );
 
 	const [ documentAriaLabel, documentActiveClass ] =
 		sidebarName === 'edit-post/document'
@@ -42,19 +40,38 @@ const SettingsHeader = ( { sidebarName } ) => {
 			: // translators: ARIA label for the Block Settings Sidebar tab, not selected.
 			  [ __( 'Block' ), '' ];
 
+	const [ templateAriaLabel, templateActiveClass ] =
+		sidebarName === 'edit-post/document'
+			? [ __( 'Template (selected)' ), 'is-active' ]
+			: [ __( 'Template' ), '' ];
+
 	/* Use a list so screen readers will announce how many tabs there are. */
 	return (
 		<ul>
-			<li>
-				<Button
-					onClick={ openDocumentSettings }
-					className={ `edit-post-sidebar__panel-tab ${ documentActiveClass }` }
-					aria-label={ documentAriaLabel }
-					data-label={ documentLabel }
-				>
-					{ documentLabel }
-				</Button>
-			</li>
+			{ ! isTemplateMode && (
+				<li>
+					<Button
+						onClick={ openDocumentSettings }
+						className={ `edit-post-sidebar__panel-tab ${ documentActiveClass }` }
+						aria-label={ documentAriaLabel }
+						data-label={ documentLabel }
+					>
+						{ documentLabel }
+					</Button>
+				</li>
+			) }
+			{ isTemplateMode && (
+				<li>
+					<Button
+						onClick={ openDocumentSettings }
+						className={ `edit-post-sidebar__panel-tab ${ templateActiveClass }` }
+						aria-label={ templateAriaLabel }
+						data-label={ __( 'Template' ) }
+					>
+						{ __( 'Template' ) }
+					</Button>
+				</li>
+			) }
 			<li>
 				<Button
 					onClick={ openBlockSettings }

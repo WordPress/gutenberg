@@ -14,7 +14,10 @@ import { isArray } from 'lodash';
  * WordPress dependencies
  */
 import { Children, cloneElement } from '@wordpress/element';
-import { withPreferredColorScheme } from '@wordpress/compose';
+import {
+	usePreferredColorScheme,
+	usePreferredColorSchemeStyle,
+} from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -80,7 +83,6 @@ export function Button( props ) {
 		disabled,
 		hint,
 		fixedRatio = true,
-		getStylesFromColorScheme,
 		isPressed,
 		'aria-disabled': ariaDisabled,
 		'data-subscript': subscript,
@@ -92,6 +94,7 @@ export function Button( props ) {
 		shortcut,
 		tooltipPosition,
 	} = props;
+	const preferredColorScheme = usePreferredColorScheme();
 
 	const isDisabled = ariaDisabled || disabled;
 
@@ -110,7 +113,7 @@ export function Button( props ) {
 		states.push( 'disabled' );
 	}
 
-	const subscriptInactive = getStylesFromColorScheme(
+	const subscriptInactive = usePreferredColorSchemeStyle(
 		styles.subscriptInactive,
 		styles.subscriptInactiveDark
 	);
@@ -118,7 +121,7 @@ export function Button( props ) {
 	const newChildren = Children.map( children, ( child ) => {
 		return child
 			? cloneElement( child, {
-					colorScheme: props.preferredColorScheme,
+					colorScheme: preferredColorScheme,
 					isPressed,
 			  } )
 			: child;
@@ -141,7 +144,7 @@ export function Button( props ) {
 
 	const newIcon = icon
 		? cloneElement( <Icon icon={ icon } size={ iconSize } />, {
-				colorScheme: props.preferredColorScheme,
+				colorScheme: preferredColorScheme,
 				isPressed,
 		  } )
 		: null;
@@ -189,10 +192,11 @@ export function Button( props ) {
 			text={ label }
 			shortcut={ shortcut }
 			position={ tooltipPosition }
+			visible={ showTooltip === true }
 		>
 			{ element }
 		</Tooltip>
 	);
 }
 
-export default withPreferredColorScheme( Button );
+export default Button;

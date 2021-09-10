@@ -7,7 +7,7 @@ import { noop } from 'lodash';
  * Internal dependencies
  */
 import UnitControl from './unit-control';
-import { LABELS } from './utils';
+import { ALL_SIDES, LABELS } from './utils';
 import { LayoutContainer, Layout } from './styles/box-control-styles';
 
 export default function BoxInputControls( {
@@ -16,6 +16,9 @@ export default function BoxInputControls( {
 	onHoverOn = noop,
 	onHoverOff = noop,
 	values,
+	selectedUnits,
+	setSelectedUnits,
+	sides,
 	...props
 } ) {
 	const createHandleOnFocus = ( side ) => ( event ) => {
@@ -34,13 +37,13 @@ export default function BoxInputControls( {
 		onChange( nextValues );
 	};
 
-	const { top, right, bottom, left } = values;
-
 	const createHandleOnChange = ( side ) => ( next, { event } ) => {
 		const { altKey } = event;
 		const nextValues = { ...values };
+		const isNumeric = ! isNaN( parseFloat( next ) );
+		const nextValue = isNumeric ? next : undefined;
 
-		nextValues[ side ] = next;
+		nextValues[ side ] = nextValue;
 
 		/**
 		 * Supports changing pair sides. For example, holding the ALT key
@@ -49,22 +52,37 @@ export default function BoxInputControls( {
 		if ( altKey ) {
 			switch ( side ) {
 				case 'top':
-					nextValues.bottom = next;
+					nextValues.bottom = nextValue;
 					break;
 				case 'bottom':
-					nextValues.top = next;
+					nextValues.top = nextValue;
 					break;
 				case 'left':
-					nextValues.right = next;
+					nextValues.right = nextValue;
 					break;
 				case 'right':
-					nextValues.left = next;
+					nextValues.left = nextValue;
 					break;
 			}
 		}
 
 		handleOnChange( nextValues );
 	};
+
+	const createHandleOnUnitChange = ( side ) => ( next ) => {
+		const newUnits = { ...selectedUnits };
+		newUnits[ side ] = next;
+		setSelectedUnits( newUnits );
+	};
+
+	// Filter sides if custom configuration provided, maintaining default order.
+	const filteredSides = sides?.length
+		? ALL_SIDES.filter( ( side ) => sides.includes( side ) )
+		: ALL_SIDES;
+
+	const first = filteredSides[ 0 ];
+	const last = filteredSides[ filteredSides.length - 1 ];
+	const only = first === last && first;
 
 	return (
 		<LayoutContainer className="component-box-control__input-controls-wrapper">
@@ -73,44 +91,25 @@ export default function BoxInputControls( {
 				align="top"
 				className="component-box-control__input-controls"
 			>
-				<UnitControl
-					{ ...props }
-					isFirst
-					value={ top }
-					onChange={ createHandleOnChange( 'top' ) }
-					onFocus={ createHandleOnFocus( 'top' ) }
-					onHoverOn={ createHandleOnHoverOn( 'top' ) }
-					onHoverOff={ createHandleOnHoverOff( 'top' ) }
-					label={ LABELS.top }
-				/>
-				<UnitControl
-					{ ...props }
-					value={ right }
-					onChange={ createHandleOnChange( 'right' ) }
-					onFocus={ createHandleOnFocus( 'right' ) }
-					onHoverOn={ createHandleOnHoverOn( 'right' ) }
-					onHoverOff={ createHandleOnHoverOff( 'right' ) }
-					label={ LABELS.right }
-				/>
-				<UnitControl
-					{ ...props }
-					value={ bottom }
-					onChange={ createHandleOnChange( 'bottom' ) }
-					onFocus={ createHandleOnFocus( 'bottom' ) }
-					onHoverOn={ createHandleOnHoverOn( 'bottom' ) }
-					onHoverOff={ createHandleOnHoverOff( 'bottom' ) }
-					label={ LABELS.bottom }
-				/>
-				<UnitControl
-					{ ...props }
-					isLast
-					value={ left }
-					onChange={ createHandleOnChange( 'left' ) }
-					onFocus={ createHandleOnFocus( 'left' ) }
-					onHoverOn={ createHandleOnHoverOn( 'left' ) }
-					onHoverOff={ createHandleOnHoverOff( 'left' ) }
-					label={ LABELS.left }
-				/>
+				{ filteredSides.map( ( side ) => (
+					<UnitControl
+						{ ...props }
+						isFirst={ first === side }
+						isLast={ last === side }
+						isOnly={ only === side }
+						value={ values[ side ] }
+						unit={
+							values[ side ] ? undefined : selectedUnits[ side ]
+						}
+						onChange={ createHandleOnChange( side ) }
+						onUnitChange={ createHandleOnUnitChange( side ) }
+						onFocus={ createHandleOnFocus( side ) }
+						onHoverOn={ createHandleOnHoverOn( side ) }
+						onHoverOff={ createHandleOnHoverOff( side ) }
+						label={ LABELS[ side ] }
+						key={ `box-control-${ side }` }
+					/>
+				) ) }
 			</Layout>
 		</LayoutContainer>
 	);

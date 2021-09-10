@@ -22,7 +22,7 @@
 }
 
 .edit-navigation-layout {
-	&.has-block-inspector {
+	&.has-permanent-sidebar {
 		margin-right: $sidebar-width;
 	}
 
@@ -30,20 +30,35 @@
 		margin: $navigation-editor-spacing-top auto 0;
 	}
 
-	.edit-navigation-layout__canvas {
-		// Provide space for the floating block toolbar.
-		padding-top: $navigation-editor-spacing-top;
+	.edit-navigation-layout__content-area {
+		// Reference element for the block popover position.
+		position: relative;
 
 		// Ensure the entire layout is full-height, the background
 		// of the editing canvas needs to be full-height for block
 		// deselection to work.
 		flex-grow: 1;
 	}
+
+	.edit-navigation-header {
+		background: $white;
+	}
 }
 
 .edit-navigation-empty-state {
-	width: $navigation-editor-width;
-	margin-top: $navigation-editor-spacing-top;
+	max-width: $navigation-editor-width;
 	margin-left: auto;
 	margin-right: auto;
+	@include break-medium() {
+		// Match the padding top of the editor canvas.
+		margin-top: $navigation-editor-spacing-top;
+	}
+}
+
+.edit-navigation-layout__overlay {
+	z-index: z-index(".edit-navigation-layout__overlay");
+	position: absolute;
+	width: 100%;
+	height: 100%;
+	background: rgba(86, 85, 85, 0.5);
 }

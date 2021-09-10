@@ -5,11 +5,7 @@ import { MenuGroup } from '@wordpress/components';
 import { __, _x } from '@wordpress/i18n';
 import { useViewportMatch } from '@wordpress/compose';
 import { displayShortcut } from '@wordpress/keycodes';
-
-/**
- * Internal dependencies
- */
-import FeatureToggle from '../feature-toggle';
+import { MoreMenuFeatureToggle } from '@wordpress/interface';
 
 function WritingMenu() {
 	const isLargeViewport = useViewportMatch( 'medium' );
@@ -19,7 +15,8 @@ function WritingMenu() {
 
 	return (
 		<MenuGroup label={ _x( 'View', 'noun' ) }>
-			<FeatureToggle
+			<MoreMenuFeatureToggle
+				scope="core/edit-post"
 				feature="fixedToolbar"
 				label={ __( 'Top toolbar' ) }
 				info={ __(
@@ -28,14 +25,16 @@ function WritingMenu() {
 				messageActivated={ __( 'Top toolbar activated' ) }
 				messageDeactivated={ __( 'Top toolbar deactivated' ) }
 			/>
-			<FeatureToggle
+			<MoreMenuFeatureToggle
+				scope="core/edit-post"
 				feature="focusMode"
 				label={ __( 'Spotlight mode' ) }
 				info={ __( 'Focus on one block at a time' ) }
 				messageActivated={ __( 'Spotlight mode activated' ) }
 				messageDeactivated={ __( 'Spotlight mode deactivated' ) }
 			/>
-			<FeatureToggle
+			<MoreMenuFeatureToggle
+				scope="core/edit-post"
 				feature="fullscreenMode"
 				label={ __( 'Fullscreen mode' ) }
 				info={ __( 'Work without distraction' ) }

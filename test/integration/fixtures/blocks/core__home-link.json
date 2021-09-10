@@ -1,0 +1,12 @@
+[
+	{
+		"clientId": "_clientId_0",
+		"name": "core/home-link",
+		"isValid": true,
+		"attributes": {
+			"label": "Home"
+		},
+		"innerBlocks": [],
+		"originalContent": ""
+	}
+]

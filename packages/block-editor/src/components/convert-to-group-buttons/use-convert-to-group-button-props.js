@@ -13,11 +13,11 @@ import { store as blockEditorStore } from '../../store';
  * Contains the properties `ConvertToGroupButton` component needs.
  *
  * @typedef {Object} ConvertToGroupButtonProps
- * @property {string[]} clientIds  An array of the selected client ids.
- * @property {boolean} isGroupable Indicates if the selected blocks can be grouped.
- * @property {boolean} isUngroupable Indicates if the selected blocks can be ungrouped.
- * @property {WPBlock[]} blocksSelection An array of the selected blocks.
- * @property {string} groupingBlockName The name of block used for handling grouping interactions.
+ * @property {string[]}  clientIds         An array of the selected client ids.
+ * @property {boolean}   isGroupable       Indicates if the selected blocks can be grouped.
+ * @property {boolean}   isUngroupable     Indicates if the selected blocks can be ungrouped.
+ * @property {WPBlock[]} blocksSelection   An array of the selected blocks.
+ * @property {string}    groupingBlockName The name of block used for handling grouping interactions.
  */
 
 /**

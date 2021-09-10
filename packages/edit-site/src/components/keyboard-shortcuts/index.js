@@ -9,18 +9,31 @@ import {
 import { useDispatch, useSelect } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
 import { store as coreStore } from '@wordpress/core-data';
+import { store as interfaceStore } from '@wordpress/interface';
 
 /**
  * Internal dependencies
  */
 import { store as editSiteStore } from '../../store';
+import { SIDEBAR_BLOCK } from '../sidebar/constants';
+import { STORE_NAME } from '../../store/constants';
 
 function KeyboardShortcuts() {
 	const isListViewOpen = useSelect( ( select ) =>
 		select( editSiteStore ).isListViewOpened()
 	);
+	const isBlockInspectorOpen = useSelect(
+		( select ) =>
+			select( interfaceStore ).getActiveComplementaryArea(
+				editSiteStore.name
+			) === SIDEBAR_BLOCK,
+		[]
+	);
 	const { redo, undo } = useDispatch( coreStore );
 	const { setIsListViewOpened } = useDispatch( editSiteStore );
+	const { enableComplementaryArea, disableComplementaryArea } = useDispatch(
+		interfaceStore
+	);
 
 	useShortcut(
 		'core/edit-site/undo',
@@ -43,12 +56,24 @@ function KeyboardShortcuts() {
 	useShortcut(
 		'core/edit-site/toggle-list-view',
 		useCallback( () => {
-			if ( isListViewOpen ) {
-				setIsListViewOpened( false );
+			setIsListViewOpened( ! isListViewOpen );
+		}, [ isListViewOpen, setIsListViewOpened ] ),
+		{ bindGlobal: true }
+	);
+
+	useShortcut(
+		'core/edit-site/toggle-block-settings-sidebar',
+		( event ) => {
+			// This shortcut has no known clashes, but use preventDefault to prevent any
+			// obscure shortcuts from triggering.
+			event.preventDefault();
+
+			if ( isBlockInspectorOpen ) {
+				disableComplementaryArea( STORE_NAME );
 			} else {
-				setIsListViewOpened( true );
+				enableComplementaryArea( STORE_NAME, SIDEBAR_BLOCK );
 			}
-		}, [ isListViewOpen, isListViewOpen ] ),
+		},
 		{ bindGlobal: true }
 	);
 
@@ -85,6 +110,16 @@ function KeyboardShortcutsRegister() {
 			keyCombination: {
 				modifier: 'access',
 				character: 'o',
+			},
+		} );
+
+		registerShortcut( {
+			name: 'core/edit-site/toggle-block-settings-sidebar',
+			category: 'global',
+			description: __( 'Show or hide the block settings sidebar.' ),
+			keyCombination: {
+				modifier: 'primaryShift',
+				character: ',',
 			},
 		} );
 	}, [ registerShortcut ] );

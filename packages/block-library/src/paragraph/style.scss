@@ -28,6 +28,11 @@
 	font-style: normal;
 }
 
+p {
+	// Break long strings of text without spaces so they don't overflow the block.
+	overflow-wrap: break-word;
+}
+
 // Prevent the dropcap from breaking out of the box when a background is applied.
 p.has-drop-cap.has-background {
 	overflow: hidden;

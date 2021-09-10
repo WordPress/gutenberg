@@ -14,4 +14,3 @@ Before starting this tutorial, you will need a plugin to hold your code. Please 
 2. [Add Meta Block](/docs/how-to-guides/metabox/meta-block-3-add.md)
 3. [Use Post Meta Data](/docs/how-to-guides/metabox/meta-block-4-use-data.md)
 4. [Finishing Touches](/docs/how-to-guides/metabox/meta-block-5-finishing.md)
-

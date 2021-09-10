@@ -5,6 +5,7 @@ import { useDispatch, useSelect } from '@wordpress/data';
 import { Button, Icon } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { wordpress } from '@wordpress/icons';
+import { store as coreDataStore } from '@wordpress/core-data';
 
 /**
  * Internal dependencies
@@ -12,9 +13,15 @@ import { wordpress } from '@wordpress/icons';
 import { store as editSiteStore } from '../../../store';
 
 function NavigationToggle( { icon, isOpen } ) {
-	const { isRequestingSiteIcon, siteIconUrl } = useSelect( ( select ) => {
-		const { getEntityRecord } = select( 'core' );
-		const { isResolving } = select( 'core/data' );
+	const {
+		isRequestingSiteIcon,
+		navigationPanelMenu,
+		siteIconUrl,
+	} = useSelect( ( select ) => {
+		const { getCurrentTemplateNavigationPanelSubMenu } = select(
+			editSiteStore
+		);
+		const { getEntityRecord, isResolving } = select( coreDataStore );
 		const siteData =
 			getEntityRecord( 'root', '__unstableBase', undefined ) || {};
 
@@ -24,11 +31,23 @@ function NavigationToggle( { icon, isOpen } ) {
 				'__unstableBase',
 				undefined,
 			] ),
+			navigationPanelMenu: getCurrentTemplateNavigationPanelSubMenu(),
 			siteIconUrl: siteData.site_icon_url,
 		};
 	}, [] );
 
-	const { setIsNavigationPanelOpened } = useDispatch( editSiteStore );
+	const {
+		openNavigationPanelToMenu,
+		setIsNavigationPanelOpened,
+	} = useDispatch( editSiteStore );
+
+	const toggleNavigationPanel = () => {
+		if ( isOpen ) {
+			setIsNavigationPanelOpened( false );
+			return;
+		}
+		openNavigationPanelToMenu( navigationPanelMenu );
+	};
 
 	let buttonIcon = <Icon size="36px" icon={ wordpress } />;
 
@@ -55,7 +74,7 @@ function NavigationToggle( { icon, isOpen } ) {
 			<Button
 				className="edit-site-navigation-toggle__button has-icon"
 				label={ __( 'Toggle navigation' ) }
-				onClick={ () => setIsNavigationPanelOpened( ! isOpen ) }
+				onClick={ toggleNavigationPanel }
 				showTooltip
 			>
 				{ buttonIcon }

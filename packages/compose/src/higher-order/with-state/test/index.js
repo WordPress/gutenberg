@@ -41,9 +41,11 @@ describe( 'withState', () => {
 		const wrapper = TestUtils.renderIntoDocument(
 			getTestComponent( EnhancedComponent )
 		);
+
 		const buttonElement = () =>
 			TestUtils.findRenderedDOMComponentWithTag( wrapper, 'button' );
 
+		expect( console ).toHaveWarned();
 		expect( buttonElement().outerHTML ).toBe( '<button>0</button>' );
 		TestUtils.Simulate.click( buttonElement() );
 		expect( buttonElement().outerHTML ).toBe( '<button>1</button>' );

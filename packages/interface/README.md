@@ -10,8 +10,7 @@ Install the module
 npm install @wordpress/interface --save
 ```
 
-_This package assumes that your code will run in an **ES2015+** environment. If you're using an environment that has limited or no support for ES2015+ such as lower versions of IE then using [core-js](https://github.com/zloirock/core-js) or [@babel/polyfill](https://babeljs.io/docs/en/next/babel-polyfill) will add support for these methods. Learn more about it in [Babel docs](https://babeljs.io/docs/en/next/caveats)._
-
+_This package assumes that your code will run in an **ES2015+** environment. If you're using an environment that has limited or no support for ES2015+ such as IE browsers then using [core-js](https://github.com/zloirock/core-js) will add polyfills for these methods._
 
 ## API Usage
 
@@ -24,18 +23,29 @@ This component was named after a [complementary landmark](https://www.w3.org/TR/
 It is possible to control which complementary is enabled by using the store:
 
 Below are some examples of how to control the active complementary area using the store:
+
 ```js
-wp.data.select( 'core/interface' ).getActiveComplementaryArea( 'core/edit-post' );
+wp.data
+	.select( 'core/interface' )
+	.getActiveComplementaryArea( 'core/edit-post' );
 // -> "edit-post/document"
 
-wp.data.dispatch( 'core/interface' ).enableComplementaryArea( 'core/edit-post', 'edit-post/block' );
+wp.data
+	.dispatch( 'core/interface' )
+	.enableComplementaryArea( 'core/edit-post', 'edit-post/block' );
 
-wp.data.select( 'core/interface' ).getActiveComplementaryArea( 'core/edit-post' );
+wp.data
+	.select( 'core/interface' )
+	.getActiveComplementaryArea( 'core/edit-post' );
 // -> "edit-post/block"
 
-wp.data.dispatch( 'core/interface' ).disableComplementaryArea( 'core/edit-post' );
+wp.data
+	.dispatch( 'core/interface' )
+	.disableComplementaryArea( 'core/edit-post' );
 
-wp.data.select( 'core/interface' ).getActiveComplementaryArea( 'core/edit-post' );
+wp.data
+	.select( 'core/interface' )
+	.getActiveComplementaryArea( 'core/edit-post' );
 // -> null
 ```
 
@@ -60,3 +70,60 @@ wp.data.select( 'core/interface' ).isItemPinned( 'core/edit-post', 'edit-post-bl
 ```
 
 <br/><br/><p align="center"><img src="https://s.w.org/style/images/codeispoetry.png?1" alt="Code is Poetry." /></p>
+
+### Preferences
+
+The interface package provides some helpers for implementing editor preferences.
+
+#### Features
+
+Features are boolean values used for toggling specific editor features on or off.
+
+Set the default values for any features on editor initialization:
+
+```js
+import { dispatch } from '@wordpress/data';
+import { store as interfaceStore } from '@wordpress/interface';
+
+function initialize() {
+	// ...
+
+	dispatch( interfaceStore ).setFeatureDefaults( 'namespace/editor-or-plugin-name', {
+		myFeatureName: true
+	} );
+
+	// ...
+}
+```
+
+Use the `toggleFeature` action and the `isFeatureActive` selector to toggle features within your app:
+
+```js
+wp.data.select( 'core/interface' ).isFeatureActive( 'namespace/editor-or-plugin-name', 'myFeatureName' ); // true
+wp.data.dispatch( 'core/interface' ).toggleFeature( 'namespace/editor-or-plugin-name', 'myFeatureName' );
+wp.data.select( 'core/interface' ).isFeatureActive( 'namespace/editor-or-plugin-name', 'myFeatureName' ); // false
+```
+
+The `MoreMenuDropdown` and `MoreMenuFeatureToggle` components help to implement an editor menu for changing preferences and feature values.
+
+```jsx
+function MyEditorMenu() {
+	return (
+		<MoreMenuDropdown>
+			{ () => (
+				<MenuGroup label={ __( 'Features' ) }>
+					<MoreMenuFeatureToggle
+						scope="namespace/editor-or-plugin-name"
+						feature="myFeatureName"
+						label={ __( 'My feature' ) }
+						info={ __( 'A really awesome feature' ) }
+						messageActivated={ __( 'My feature activated' )}
+						messageDeactivated={ __( 'My feature deactivated' )}
+					/>
+				</MenuGroup>
+			) }
+		</MoreMenuDropdown>
+	);
+}
+```
+

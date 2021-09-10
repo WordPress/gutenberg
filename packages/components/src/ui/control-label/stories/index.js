@@ -5,7 +5,7 @@ import { ControlLabel } from '../index';
 
 export default {
 	component: ControlLabel,
-	title: 'Components/ControlLabel',
+	title: 'G2 Components (Experimental)/ControlLabel',
 };
 
 export const _default = () => {

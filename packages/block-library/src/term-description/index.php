@@ -8,14 +8,18 @@
 /**
  * Renders the `core/term-description` block on the server.
  *
- * @param array    $attributes Block attributes.
- * @param string   $content    Block default content.
- * @param WP_Block $block      Block instance.
- * @return string Returns the filtered post content of the current post.
+ * @param array $attributes Block attributes.
+ *
+ * @return string Returns the description of the current taxonomy term, if available
  */
-function render_block_core_term_description( $attributes, $content, $block ) {
+function render_block_core_term_description( $attributes ) {
+	$term_description = '';
 
-	if ( ! is_category() && ! is_tag() && ! is_tax() ) {
+	if ( is_category() || is_tag() || is_tax() ) {
+		$term_description = term_description();
+	}
+
+	if ( empty( $term_description ) ) {
 		return '';
 	}
 
@@ -24,7 +28,7 @@ function render_block_core_term_description( $attributes, $content, $block ) {
 		: array();
 	$wrapper_attributes = get_block_wrapper_attributes( $extra_attributes );
 
-	return '<div ' . $wrapper_attributes . '>' . term_description() . '</div>';
+	return '<div ' . $wrapper_attributes . '>' . $term_description . '</div>';
 }
 
 /**

@@ -58,8 +58,9 @@ const FONT_WEIGHTS = [
 /**
  * Control to display unified font style and weight options.
  *
- * @param  {Object}   props Component props.
- * @return {WPElement}      Font appearance control.
+ * @param {Object} props Component props.
+ *
+ * @return {WPElement} Font appearance control.
  */
 export default function FontAppearanceControl( props ) {
 	const {
@@ -162,12 +163,42 @@ export default function FontAppearanceControl( props ) {
 		return __( 'Appearance' );
 	};
 
+	// Adjusts screen reader description based on styles or weights.
+	const getDescribedBy = () => {
+		if ( ! currentSelection ) {
+			return __( 'No selected font appearance' );
+		}
+
+		if ( ! hasFontStyles ) {
+			return sprintf(
+				// translators: %s: Currently selected font weight.
+				__( 'Currently selected font weight: %s' ),
+				currentSelection.name
+			);
+		}
+
+		if ( ! hasFontWeights ) {
+			return sprintf(
+				// translators: %s: Currently selected font style.
+				__( 'Currently selected font style: %s' ),
+				currentSelection.name
+			);
+		}
+
+		return sprintf(
+			// translators: %s: Currently selected font appearance.
+			__( 'Currently selected font appearance: %s' ),
+			currentSelection.name
+		);
+	};
+
 	return (
 		<fieldset className="components-font-appearance-control">
 			{ hasStylesOrWeights && (
 				<CustomSelectControl
 					className="components-font-appearance-control__select"
 					label={ getLabel() }
+					describedBy={ getDescribedBy() }
 					options={ selectOptions }
 					value={ currentSelection }
 					onChange={ ( { selectedItem } ) =>

@@ -1,4 +1,9 @@
 /**
+ * WordPress dependencies
+ */
+import { store as coreDataStore } from '@wordpress/core-data';
+
+/**
  * Internal dependencies
  */
 import {
@@ -71,7 +76,7 @@ describe( 'selectors', () => {
 			expect( getCanUserCreateMedia() ).toBe( true );
 			expect(
 				getCanUserCreateMedia.registry.select
-			).toHaveBeenCalledWith( 'core' );
+			).toHaveBeenCalledWith( coreDataStore );
 			expect( canUser ).toHaveBeenCalledWith( 'create', 'media' );
 		} );
 	} );

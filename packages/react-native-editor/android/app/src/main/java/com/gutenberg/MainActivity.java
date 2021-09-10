@@ -31,7 +31,10 @@ public class MainActivity extends ReactActivity {
                 capabilities.putBoolean(GutenbergProps.PROP_CAPABILITIES_MENTIONS, true);
                 capabilities.putBoolean(GutenbergProps.PROP_CAPABILITIES_XPOSTS, true);
                 capabilities.putBoolean(GutenbergProps.PROP_CAPABILITIES_UNSUPPORTED_BLOCK_EDITOR, true);
-                capabilities.putBoolean(GutenbergProps.PROP_CAPABILITIES_AUDIO_BLOCK, true);
+                capabilities.putBoolean(GutenbergProps.PROP_CAPABILITIES_REUSABLE_BLOCK, false);
+                capabilities.putBoolean(GutenbergProps.PROP_CAPABILITIES_IS_AUDIO_BLOCK_MEDIA_UPLOAD_ENABLED, true);
+                capabilities.putBoolean(GutenbergProps.PROP_CAPABILITIES_EDITOR_ONBOARDING, false);
+                capabilities.putBoolean(GutenbergProps.PROP_CAPABILITIES_FIRST_GUTENBERG_SESSION, false);
                 bundle.putBundle(GutenbergProps.PROP_CAPABILITIES, capabilities);
                 return bundle;
             }

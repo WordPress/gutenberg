@@ -87,7 +87,7 @@ export function* installBlockType( block ) {
 
 		yield loadAssets( assets );
 		const registeredBlocks = yield controls.select(
-			blocksStore.name,
+			blocksStore,
 			'getBlockTypes'
 		);
 		if ( ! registeredBlocks.some( ( i ) => i.name === block.name ) ) {
@@ -202,7 +202,7 @@ export function removeInstalledBlockType( item ) {
 /**
  * Returns an action object used to indicate install in progress.
  *
- * @param {string} blockId
+ * @param {string}  blockId
  * @param {boolean} isInstalling
  *
  * @return {Object} Action object.
@@ -218,8 +218,8 @@ export function setIsInstalling( blockId, isInstalling ) {
 /**
  * Sets an error notice to be displayed to the user for a given block.
  *
- * @param {string} blockId  The ID of the block plugin. eg: my-block
- * @param {string} message  The message shown in the notice.
+ * @param {string}  blockId The ID of the block plugin. eg: my-block
+ * @param {string}  message The message shown in the notice.
  * @param {boolean} isFatal Whether the user can recover from the error.
  *
  * @return {Object} Action object.

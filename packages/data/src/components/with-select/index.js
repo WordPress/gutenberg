@@ -13,8 +13,8 @@ import useSelect from '../use-select';
  * selectors.
  *
  * @param {Function} mapSelectToProps Function called on every state change,
- *                                   expected to return object of props to
- *                                   merge with the component's own props.
+ *                                    expected to return object of props to
+ *                                    merge with the component's own props.
  *
  * @example
  * ```js

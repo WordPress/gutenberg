@@ -6,53 +6,53 @@ Paste this code in `my-custom-format.js`:
 
 {% codetabs %}
 {% ES5 %}
+
 ```js
-( function( wp ) {
-	var MyCustomButton = function( props ) {
-		return wp.element.createElement(
-			wp.editor.RichTextToolbarButton, {
-				icon: 'editor-code',
-				title: 'Sample output',
-				onClick: function() {
-					console.log( 'toggle format' );
-				},
-			}
-		);
-	}
-	wp.richText.registerFormatType(
-		'my-custom-format/sample-output', {
+( function ( wp ) {
+	var MyCustomButton = function ( props ) {
+		return wp.element.createElement( wp.editor.RichTextToolbarButton, {
+			icon: 'editor-code',
 			title: 'Sample output',
-			tagName: 'samp',
-			className: null,
-			edit: MyCustomButton,
-		}
-	);
-} )( window.wp );
-```
-{% ESNext %}
-```js
-import { registerFormatType } from '@wordpress/rich-text';
-import { RichTextToolbarButton } from '@wordpress/block-editor';
-
-const MyCustomButton = props => {
-	return <RichTextToolbarButton
-		icon='editor-code'
-		title='Sample output'
-		onClick={ () => {
-			console.log( 'toggle format' );
-		} }
-	/>
-};
-
-registerFormatType(
-	'my-custom-format/sample-output', {
+			onClick: function () {
+				console.log( 'toggle format' );
+			},
+		} );
+	};
+	wp.richText.registerFormatType( 'my-custom-format/sample-output', {
 		title: 'Sample output',
 		tagName: 'samp',
 		className: null,
 		edit: MyCustomButton,
-	}
-);
+	} );
+} )( window.wp );
 ```
+
+{% ESNext %}
+
+```js
+import { registerFormatType } from '@wordpress/rich-text';
+import { RichTextToolbarButton } from '@wordpress/block-editor';
+
+const MyCustomButton = ( props ) => {
+	return (
+		<RichTextToolbarButton
+			icon="editor-code"
+			title="Sample output"
+			onClick={ () => {
+				console.log( 'toggle format' );
+			} }
+		/>
+	);
+};
+
+registerFormatType( 'my-custom-format/sample-output', {
+	title: 'Sample output',
+	tagName: 'samp',
+	className: null,
+	edit: MyCustomButton,
+} );
+```
+
 {% end %}
 
 **Important**: note that this code is using two new utilities (`wp.element.createElement`, and `wp.editor.RichTextToolbarButton`) so don't forget adding the corresponding `wp-element` and `wp-editor` packages to the dependencies array in the PHP file along with the existing `wp-rich-text`.
@@ -71,88 +71,76 @@ The following sample code renders the previously shown button only on Paragraph 
 
 {% codetabs %}
 {% ES5 %}
-```js
-( function( wp ) {
-	var withSelect = wp.data.withSelect;
-	var ifCondition = wp.compose.ifCondition;
-	var compose = wp.compose.compose;
-	var MyCustomButton = function( props ) {
-		return wp.element.createElement(
-			wp.editor.RichTextToolbarButton, {
-				icon: 'editor-code',
-				title: 'Sample output',
-				onClick: function() {
-					console.log( 'toggle format' );
-				},
-			}
-		);
-	}
-	var ConditionalButton = compose(
-		withSelect( function( select ) {
-			return {
-				selectedBlock: select( 'core/editor' ).getSelectedBlock()
-			}
-		} ),
-		ifCondition( function( props ) {
-			return (
-				props.selectedBlock &&
-				props.selectedBlock.name === 'core/paragraph'
-			);
-		} )
-	)( MyCustomButton );
 
-	wp.richText.registerFormatType(
-		'my-custom-format/sample-output', {
+```js
+( function ( wp ) {
+	var el = wp.element.createElement;
+	var useSelect = wp.data.useSelect;
+
+	function ConditionalButton( props ) {
+		var selectedBlock = useSelect( function ( select ) {
+			return select( 'core/block-editor' ).getSelectedBlock();
+		}, [] );
+
+		if ( selectedBlock && selectedBlock.name !== 'core/paragraph' ) {
+			return null;
+		}
+
+		return el( wp.blockEditor.RichTextToolbarButton, {
+			icon: 'editor-code',
 			title: 'Sample output',
-			tagName: 'samp',
-			className: null,
-			edit: ConditionalButton,
-		}
-	);
-} )( window.wp );
-```
-{% ESNext %}
-```js
-import { compose, ifCondition } from '@wordpress/compose';
-import { registerFormatType } from '@wordpress/rich-text';
-import { RichTextToolbarButton } from '@wordpress/block-editor';
-import { withSelect } from '@wordpress/data';
+			onClick: function () {
+				console.log( 'toggle format!' );
+			},
+		} );
+	};
 
-const MyCustomButton = props => {
-	return <RichTextToolbarButton
-		icon='editor-code'
-		title='Sample output'
-		onClick={ () => {
-			console.log( 'toggle format' );
-		} }
-	/>
-};
-
-const ConditionalButton = compose(
-	withSelect( function( select ) {
-		return {
-			selectedBlock: select( 'core/editor' ).getSelectedBlock()
-		}
-	} ),
-	ifCondition( function( props ) {
-		return (
-			props.selectedBlock &&
-			props.selectedBlock.name === 'core/paragraph'
-		);
-	} )
-)( MyCustomButton );
-
-registerFormatType(
-	'my-custom-format/sample-output', {
+	wp.richText.registerFormatType( 'my-custom-format/sample-output', {
 		title: 'Sample output',
 		tagName: 'samp',
 		className: null,
 		edit: ConditionalButton,
-	}
-);
+	} );
+} )( window.wp );
 ```
+
+{% ESNext %}
+
+```js
+import { registerFormatType } from '@wordpress/rich-text';
+import { RichTextToolbarButton } from '@wordpress/block-editor';
+import { useSelect } from '@wordpress/data';
+
+function ConditionalButton( props ) {
+	const selectedBlock = useSelect( ( select ) => {
+		return select( 'core/block-editor' ).getSelectedBlock();
+	}, [] );
+
+	if ( selectedBlock && selectedBlock.name !== 'core/paragraph' ) {
+		return null;
+	}
+
+	return (
+		<RichTextToolbarButton
+			icon="editor-code"
+			title="Sample output"
+			onClick={ () => {
+				console.log( 'toggle format' );
+			} }
+		/>
+	);
+}
+
+registerFormatType( 'my-custom-format/sample-output', {
+	title: 'Sample output',
+	tagName: 'samp',
+	className: null,
+	edit: ConditionalButton,
+} );
+```
+
 {% end %}
 
-Don't forget adding `wp-compose` and `wp-data` to the dependencies array in the PHP script.
+Don't forget adding `wp-data` to the dependencies array in the PHP script.
 
 More advanced conditions can be used, e.g., only render the button depending on specific attributes of the block.

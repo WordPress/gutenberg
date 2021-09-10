@@ -130,7 +130,7 @@ function Snackbar(
 						<Button
 							key={ index }
 							href={ url }
-							isTertiary
+							variant="tertiary"
 							onClick={ ( event ) =>
 								onActionClick( event, onClick )
 							}

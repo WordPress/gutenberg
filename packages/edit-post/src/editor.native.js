@@ -10,16 +10,15 @@ import { I18nManager } from 'react-native';
  */
 import { Component } from '@wordpress/element';
 import { EditorProvider } from '@wordpress/editor';
-import {
-	parse,
-	serialize,
-	rawHandler,
-	store as blocksStore,
-} from '@wordpress/blocks';
+import { parse, serialize, store as blocksStore } from '@wordpress/blocks';
 import { withDispatch, withSelect } from '@wordpress/data';
 import { compose } from '@wordpress/compose';
-import { subscribeSetFocusOnTitle } from '@wordpress/react-native-bridge';
-import { SlotFillProvider, Preview } from '@wordpress/components';
+import {
+	subscribeSetFocusOnTitle,
+	subscribeFeaturedImageIdNativeUpdated,
+} from '@wordpress/react-native-bridge';
+import { SlotFillProvider } from '@wordpress/components';
+import { store as coreStore } from '@wordpress/core-data';
 
 /**
  * Internal dependencies
@@ -82,11 +81,27 @@ class Editor extends Component {
 	}
 
 	componentDidMount() {
+		const { editEntityRecord, postType, postId } = this.props;
+
 		this.subscriptionParentSetFocusOnTitle = subscribeSetFocusOnTitle(
 			() => {
 				if ( this.postTitleRef ) {
 					this.postTitleRef.focus();
 				}
+			}
+		);
+
+		this.subscriptionParentFeaturedImageIdNativeUpdated = subscribeFeaturedImageIdNativeUpdated(
+			( payload ) => {
+				editEntityRecord(
+					'postType',
+					postType,
+					postId,
+					{ featured_media: payload.featuredImageId },
+					{
+						undoIgnore: true,
+					}
+				);
 			}
 		);
 	}
@@ -95,17 +110,14 @@ class Editor extends Component {
 		if ( this.subscriptionParentSetFocusOnTitle ) {
 			this.subscriptionParentSetFocusOnTitle.remove();
 		}
+
+		if ( this.subscribeFeaturedImageIdNativeUpdated ) {
+			this.subscribeFeaturedImageIdNativeUpdated.remove();
+		}
 	}
 
 	setTitleRef( titleRef ) {
 		this.postTitleRef = titleRef;
-	}
-
-	editorMode( initialHtml, editorMode ) {
-		if ( editorMode === 'preview' ) {
-			return <Preview blocks={ rawHandler( { HTML: initialHtml } ) } />;
-		}
-		return <Layout setTitleRef={ this.setTitleRef } />;
 	}
 
 	render() {
@@ -119,8 +131,8 @@ class Editor extends Component {
 			post,
 			postId,
 			postType,
+			featuredImageId,
 			initialHtml,
-			editorMode,
 			...props
 		} = this.props;
 
@@ -137,6 +149,7 @@ class Editor extends Component {
 			title: {
 				raw: props.initialTitle || '',
 			},
+			featured_media: featuredImageId,
 			content: {
 				// make sure the post content is in sync with gutenberg store
 				// to avoid marking the post as modified when simply loaded
@@ -157,7 +170,7 @@ class Editor extends Component {
 					useSubRegistry={ false }
 					{ ...props }
 				>
-					{ this.editorMode( initialHtml, editorMode ) }
+					<Layout setTitleRef={ this.setTitleRef } />
 				</EditorProvider>
 			</SlotFillProvider>
 		);
@@ -186,8 +199,10 @@ export default compose( [
 	} ),
 	withDispatch( ( dispatch ) => {
 		const { switchEditorMode } = dispatch( editPostStore );
+		const { editEntityRecord } = dispatch( coreStore );
 		return {
 			switchEditorMode,
+			editEntityRecord,
 		};
 	} ),
 ] )( Editor );

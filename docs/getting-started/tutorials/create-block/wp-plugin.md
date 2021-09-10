@@ -59,7 +59,7 @@ This will start your local WordPress site and use the current directory as your 
 
 ### Confirm Plugin Installed
 
-The generated plugin should now be listed on the Plugins admin page in your WordPress install. Switch WorPress to the plugins page and activate.
+The generated plugin should now be listed on the Plugins admin page in your WordPress install. Switch WordPress to the plugins page and activate.
 
 For more on creating a WordPress plugin see [Plugin Basics](https://developer.wordpress.org/plugins/plugin-basics/), and [Plugin Header requirements](https://developer.wordpress.org/plugins/plugin-basics/header-requirements/) for explanation and additional fields you can include in your plugin header.
 
@@ -67,7 +67,7 @@ For more on creating a WordPress plugin see [Plugin Basics](https://developer.wo
 
 The `package.json` file defines the JavaScript properties for your project. This is a standard file used by NPM for defining properties and scripts it can run, the file and process is not specific to WordPress.
 
-A `package.json` file was created with the create script, this defines the dependecies and scripts needed. You can install dependencies. The only initial dependency is the `@wordpress/scripts` package that bundles the tools and configurations needed to build blocks.
+A `package.json` file was created with the create script, this defines the dependencies and scripts needed. You can install dependencies. The only initial dependency is the `@wordpress/scripts` package that bundles the tools and configurations needed to build blocks.
 
 In `package.json`, there is a `scripts` property that defines what command to run when using `npm run (cmd)`. In our generated `package.json` file, the two main scripts point to the commands in the `wp-scripts` package:
 
@@ -92,19 +92,28 @@ To load the built script, so it is run within the editor, you need to tell WordP
 
 ```php
 function create_block_gutenpride_block_init() {
-	register_block_type_from_metadata( __DIR__ );
+	register_block_type( __DIR__ );
 }
 add_action( 'init', 'create_block_gutenpride_block_init' );
 ```
 
-The `register_block_type_from_metadata` function registers the block we are going to create and specifies the `editor_script` file handle registered from the metadata provided in `block.json` file. So now when the editor loads it will load this script.
+The `register_block_type` function registers the block we are going to create and specifies the editor script handle registered from the metadata provided in `block.json` file with the `editorScript` field. So now when the editor loads it will load this script.
 
 ```json
 {
 	"apiVersion": 2,
 	"name": "create-block/gutenpride",
 	"title": "Gutenpride",
-	"editorScript": "file:./build/index.js"
+	"category": "widgets",
+	"icon": "smiley",
+	"description": "Example block written with ESNext standard and JSX support – build step required.",
+	"supports": {
+		"html": false
+	},
+	"textdomain": "gutenpride",
+	"editorScript": "file:./build/index.js",
+	"editorStyle": "file:./build/index.css",
+	"style": "file:./build/style-index.css"
 }
 ```
 
@@ -128,6 +137,6 @@ For more info, see the build section of the [Getting Started with JavaScript tut
 
 ## Summary
 
-Hopefully, at this point, you have your plugin created and activated. We have the package.json with the `@wordpress/scripts` dependency, that defines the build and start scripts. The basic block is in place and can be added to the editor.
+Hopefully, at this point, you have your plugin created and activated. We have the `package.json` with the `@wordpress/scripts` dependency, that defines the build and start scripts. The basic block is in place and can be added to the editor.
 
 Next Section: [Anatomy of a Block](/docs/getting-started/tutorials/create-block/block-anatomy.md)

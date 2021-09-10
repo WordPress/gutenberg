@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { __, _x } from '@wordpress/i18n';
+import { __ } from '@wordpress/i18n';
 import { cover as icon } from '@wordpress/icons';
 
 /**
@@ -18,10 +18,6 @@ const { name } = metadata;
 export { metadata, name };
 
 export const settings = {
-	title: _x( 'Cover', 'block title' ),
-	description: __(
-		'Add an image or video with a text overlay — great for headers.'
-	),
 	icon,
 	example: {
 		attributes: {

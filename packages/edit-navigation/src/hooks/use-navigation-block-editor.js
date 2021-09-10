@@ -8,10 +8,7 @@ import { useEntityBlockEditor } from '@wordpress/core-data';
 /**
  * Internal dependencies
  */
-import {
-	NAVIGATION_POST_KIND,
-	NAVIGATION_POST_POST_TYPE,
-} from '../utils/constants';
+import { NAVIGATION_POST_KIND, NAVIGATION_POST_POST_TYPE } from '../constants';
 import { store as editNavigationStore } from '../store';
 
 export default function useNavigationBlockEditor( post ) {

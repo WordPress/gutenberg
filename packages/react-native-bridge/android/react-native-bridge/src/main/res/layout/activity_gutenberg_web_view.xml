@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <com.google.android.material.appbar.AppBarLayout
+        android:id="@+id/appbar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true">
+
+        <com.google.android.material.appbar.MaterialToolbar
+            android:id="@+id/toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/status_bar_color"
+            app:titleTextColor="@android:color/white"
+            app:contentInsetEnd="@dimen/toolbar_content_offset_end"
+            app:contentInsetLeft="@dimen/toolbar_content_offset"
+            app:contentInsetRight="@dimen/toolbar_content_offset_end"
+            app:contentInsetStart="@dimen/toolbar_content_offset" />
+
+    </com.google.android.material.appbar.AppBarLayout>
+
+    <WebView
+        android:id="@+id/gutenberg_web_view"
+        android:layout_below="@+id/appbar"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:visibility="visible"/>
+
+    <LinearLayout
+        android:id="@+id/foreground_view"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@android:color/white"
+        android:gravity="center"
+        android:paddingStart="@dimen/foreground_view_padding_large"
+        android:paddingEnd="@dimen/foreground_view_padding_large"
+        android:orientation="vertical">
+
+        <ImageView
+            android:id="@+id/foreground_view_image"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="@dimen/foreground_view_padding_medium"
+            android:layout_marginTop="@dimen/foreground_view_padding_medium"
+            android:src="@drawable/ube_failed"
+            android:contentDescription="@null"
+            android:visibility="gone" />
+
+        <TextView
+            android:id="@+id/foreground_view_title"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:layout_marginBottom="@dimen/foreground_view_padding_small"
+            android:text="@string/block_editor_loading_title"
+            android:textSize="@dimen/foreground_view_text_size_large" />
+
+        <TextView
+            android:id="@+id/foreground_view_subtitle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:layout_marginBottom="@dimen/foreground_view_padding_medium"
+            android:text="@string/block_editor_loading_subtitle"
+            android:textSize="@dimen/foreground_view_text_size_medium" />
+    </LinearLayout>
+
+    <ProgressBar
+        android:id="@+id/progress_bar"
+        style="@android:style/Widget.ProgressBar.Horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/progress_bar_height"
+        android:layout_alignTop="@+id/gutenberg_web_view"
+        android:indeterminate="false"
+        android:progressDrawable="@drawable/progressbar_horizontal"/>
+
+</RelativeLayout>

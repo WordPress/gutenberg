@@ -8,6 +8,7 @@ import {
 } from '@wordpress/keyboard-shortcuts';
 import { useDispatch } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
+import { store as coreStore } from '@wordpress/core-data';
 
 /**
  * Internal dependencies
@@ -15,7 +16,7 @@ import { __ } from '@wordpress/i18n';
 import { store as editWidgetsStore } from '../../store';
 
 function KeyboardShortcuts() {
-	const { redo, undo } = useDispatch( 'core' );
+	const { redo, undo } = useDispatch( coreStore );
 	const { saveEditedWidgetAreas } = useDispatch( editWidgetsStore );
 
 	useShortcut(
@@ -80,6 +81,48 @@ function KeyboardShortcutsRegister() {
 				modifier: 'primary',
 				character: 's',
 			},
+		} );
+
+		registerShortcut( {
+			name: 'core/edit-widgets/keyboard-shortcuts',
+			category: 'main',
+			description: __( 'Display these keyboard shortcuts.' ),
+			keyCombination: {
+				modifier: 'access',
+				character: 'h',
+			},
+		} );
+
+		registerShortcut( {
+			name: 'core/edit-widgets/next-region',
+			category: 'global',
+			description: __( 'Navigate to the next part of the editor.' ),
+			keyCombination: {
+				modifier: 'ctrl',
+				character: '`',
+			},
+			aliases: [
+				{
+					modifier: 'access',
+					character: 'n',
+				},
+			],
+		} );
+
+		registerShortcut( {
+			name: 'core/edit-widgets/previous-region',
+			category: 'global',
+			description: __( 'Navigate to the previous part of the editor.' ),
+			keyCombination: {
+				modifier: 'ctrlShift',
+				character: '`',
+			},
+			aliases: [
+				{
+					modifier: 'access',
+					character: 'p',
+				},
+			],
 		} );
 	}, [ registerShortcut ] );
 

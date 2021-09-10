@@ -9,6 +9,7 @@ const path = require( 'path' );
 const { hasBabelConfig } = require( '../utils' );
 
 const jestE2EConfig = {
+	testRunner: 'jest-circus/runner',
 	globalSetup: path.join( __dirname, 'jest-environment-puppeteer', 'setup' ),
 	globalTeardown: path.join(
 		__dirname,
@@ -19,6 +20,10 @@ const jestE2EConfig = {
 	setupFilesAfterEnv: [ 'expect-puppeteer' ],
 	testMatch: [ '**/specs/**/*.[jt]s', '**/?(*.)spec.[jt]s' ],
 	testPathIgnorePatterns: [ '/node_modules/' ],
+	reporters: [
+		'default',
+		path.join( __dirname, 'jest-github-actions-reporter.js' ),
+	],
 };
 
 if ( ! hasBabelConfig() ) {

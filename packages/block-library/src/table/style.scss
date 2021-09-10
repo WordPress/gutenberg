@@ -97,4 +97,36 @@
 
 		border-bottom: 1px solid $gray-100;
 	}
+
+	// Border Styles
+	//
+	// Allow any custom border color, style or width selections to be inherited
+	// from the table element that receives the border support props.
+
+	.has-border-color {
+		> *,
+		tr,
+		th,
+		td {
+			border-color: inherit;
+		}
+	}
+
+	table[style*="border-style"] {
+		> *,
+		tr,
+		th,
+		td {
+			border-style: inherit;
+		}
+	}
+
+	table[style*="border-width"] {
+		> *,
+		tr,
+		th,
+		td {
+			border-width: inherit;
+		}
+	}
 }

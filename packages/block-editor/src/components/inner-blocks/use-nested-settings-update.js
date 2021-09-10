@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { useLayoutEffect } from '@wordpress/element';
+import { useLayoutEffect, useMemo } from '@wordpress/element';
 import { useSelect, useDispatch } from '@wordpress/data';
 import isShallowEqual from '@wordpress/is-shallow-equal';
 
@@ -9,6 +9,7 @@ import isShallowEqual from '@wordpress/is-shallow-equal';
  * Internal dependencies
  */
 import { store as blockEditorStore } from '../../store';
+import { getLayoutType } from '../../layouts';
 
 /**
  * This hook is a side effect which updates the block-editor store when changes
@@ -27,13 +28,15 @@ import { store as blockEditorStore } from '../../store';
  *                                   the child block.
  * @param {string}   orientation     The direction in which the block
  *                                   should face.
+ * @param {Object}   layout          The layout object for the block container.
  */
 export default function useNestedSettingsUpdate(
 	clientId,
 	allowedBlocks,
 	templateLock,
 	captureToolbars,
-	orientation
+	orientation,
+	layout
 ) {
 	const { updateBlockListSettings } = useDispatch( blockEditorStore );
 
@@ -54,9 +57,13 @@ export default function useNestedSettingsUpdate(
 		[ clientId ]
 	);
 
+	// Memoize as inner blocks implementors often pass a new array on every
+	// render.
+	const _allowedBlocks = useMemo( () => allowedBlocks, allowedBlocks );
+
 	useLayoutEffect( () => {
 		const newSettings = {
-			allowedBlocks,
+			allowedBlocks: _allowedBlocks,
 			templateLock:
 				templateLock === undefined ? parentLock : templateLock,
 		};
@@ -67,8 +74,13 @@ export default function useNestedSettingsUpdate(
 			newSettings.__experimentalCaptureToolbars = captureToolbars;
 		}
 
+		// Orientation depends on layout,
+		// ideally the separate orientation prop should be deprecated.
 		if ( orientation !== undefined ) {
 			newSettings.orientation = orientation;
+		} else {
+			const layoutType = getLayoutType( layout?.type );
+			newSettings.orientation = layoutType.getOrientation( layout );
 		}
 
 		if ( ! isShallowEqual( blockListSettings, newSettings ) ) {
@@ -77,11 +89,12 @@ export default function useNestedSettingsUpdate(
 	}, [
 		clientId,
 		blockListSettings,
-		allowedBlocks,
+		_allowedBlocks,
 		templateLock,
 		parentLock,
 		captureToolbars,
 		orientation,
 		updateBlockListSettings,
+		layout,
 	] );
 }

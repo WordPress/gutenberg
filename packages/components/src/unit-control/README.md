@@ -1,5 +1,9 @@
 # UnitControl
 
+<div class="callout callout-alert">
+This feature is still experimental. “Experimental” means this is an early implementation subject to drastic and breaking changes.
+</div>
+
 UnitControl allows the user to set a value as well as a unit (e.g. `px`).
 
 ## Usage
@@ -104,21 +108,23 @@ Collection of available units.
 Example:
 
 ```jsx
-import { __experimentalUnitControl as UnitControl } from '@wordpress/block-editor/';
+import { __experimentalUnitControl as UnitControl } from '@wordpress/components';
+import { useState } from '@wordpress/element';
 
 const Example = () => {
 	const [ value, setValue ] = useState( '10px' );
+
 	const units = [
 		{ value: 'px', label: 'px', default: 0 },
 		{ value: '%', label: '%', default: 10 },
 		{ value: 'em', label: 'em', default: 0 },
 	];
 
-	return <UnitControl onChange={ setValue } value={ value } />;
+	return <UnitControl onChange={ setValue } value={ value } units={units} />;
 };
 ```
 
-A `default` value for (in the example above, `10` for `%`), if defined, is set as the new `value` when a unit changes. This is helpful in scenarios where changing a unit may cause drastic results, such as changing from `px` to `vh`.
+A `default` value (in the example above, `10` for `%`), if defined, is set as the new `value` when a unit changes. This is helpful in scenarios where changing a unit may cause drastic results, such as changing from `px` to `vh`.
 
 ### value
 

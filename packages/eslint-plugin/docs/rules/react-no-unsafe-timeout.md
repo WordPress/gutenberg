@@ -42,7 +42,7 @@ function MyComponent( props ) {
 	props.setTimeout( fn );
 }
 
-class MyNotComponent { 
+class MyNotComponent {
 	doAction() {
 		setTimeout( fn );
 	}

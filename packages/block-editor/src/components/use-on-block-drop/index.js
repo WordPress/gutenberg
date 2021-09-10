@@ -7,6 +7,7 @@ import {
 	pasteHandler,
 } from '@wordpress/blocks';
 import { useDispatch, useSelect } from '@wordpress/data';
+import { getFilesFromDataTransfer } from '@wordpress/dom';
 
 /**
  * Internal dependencies
@@ -38,7 +39,7 @@ export function parseDropEvent( event ) {
 	try {
 		result = Object.assign(
 			result,
-			JSON.parse( event.dataTransfer.getData( 'text' ) )
+			JSON.parse( event.dataTransfer.getData( 'wp-blocks' ) )
 		);
 	} catch ( err ) {
 		return result;
@@ -50,8 +51,8 @@ export function parseDropEvent( event ) {
 /**
  * A function that returns an event handler function for block drop events.
  *
- * @param {string} targetRootClientId        The root client id where the block(s) will be inserted.
- * @param {number} targetBlockIndex          The index where the block(s) will be inserted.
+ * @param {string}   targetRootClientId        The root client id where the block(s) will be inserted.
+ * @param {number}   targetBlockIndex          The index where the block(s) will be inserted.
  * @param {Function} getBlockIndex             A function that gets the index of a block.
  * @param {Function} getClientIdsOfDescendants A function that gets the client ids of descendant blocks.
  * @param {Function} moveBlocksToPosition      A function that moves blocks.
@@ -211,27 +212,15 @@ export function onHTMLDrop(
  * @return {Object} An object that contains the event handlers `onDrop`, `onFilesDrop` and `onHTMLDrop`.
  */
 export default function useOnBlockDrop( targetRootClientId, targetBlockIndex ) {
+	const hasUploadPermissions = useSelect(
+		( select ) => select( blockEditorStore ).getSettings().mediaUpload,
+		[]
+	);
 	const {
 		canInsertBlockType,
 		getBlockIndex,
 		getClientIdsOfDescendants,
-		hasUploadPermissions,
-	} = useSelect( ( select ) => {
-		const {
-			canInsertBlockType: _canInsertBlockType,
-			getBlockIndex: _getBlockIndex,
-			getClientIdsOfDescendants: _getClientIdsOfDescendants,
-			getSettings,
-		} = select( blockEditorStore );
-
-		return {
-			canInsertBlockType: _canInsertBlockType,
-			getBlockIndex: _getBlockIndex,
-			getClientIdsOfDescendants: _getClientIdsOfDescendants,
-			hasUploadPermissions: getSettings().mediaUpload,
-		};
-	}, [] );
-
+	} = useSelect( blockEditorStore );
 	const {
 		insertBlocks,
 		moveBlocksToPosition,
@@ -239,28 +228,39 @@ export default function useOnBlockDrop( targetRootClientId, targetBlockIndex ) {
 		clearSelectedBlock,
 	} = useDispatch( blockEditorStore );
 
-	return {
-		onDrop: onBlockDrop(
-			targetRootClientId,
-			targetBlockIndex,
-			getBlockIndex,
-			getClientIdsOfDescendants,
-			moveBlocksToPosition,
-			insertBlocks,
-			clearSelectedBlock
-		),
-		onFilesDrop: onFilesDrop(
-			targetRootClientId,
-			targetBlockIndex,
-			hasUploadPermissions,
-			updateBlockAttributes,
-			canInsertBlockType,
-			insertBlocks
-		),
-		onHTMLDrop: onHTMLDrop(
-			targetRootClientId,
-			targetBlockIndex,
-			insertBlocks
-		),
+	const _onDrop = onBlockDrop(
+		targetRootClientId,
+		targetBlockIndex,
+		getBlockIndex,
+		getClientIdsOfDescendants,
+		moveBlocksToPosition,
+		insertBlocks,
+		clearSelectedBlock
+	);
+	const _onFilesDrop = onFilesDrop(
+		targetRootClientId,
+		targetBlockIndex,
+		hasUploadPermissions,
+		updateBlockAttributes,
+		canInsertBlockType,
+		insertBlocks
+	);
+	const _onHTMLDrop = onHTMLDrop(
+		targetRootClientId,
+		targetBlockIndex,
+		insertBlocks
+	);
+
+	return ( event ) => {
+		const files = getFilesFromDataTransfer( event.dataTransfer );
+		const html = event.dataTransfer.getData( 'text/html' );
+
+		if ( files.length ) {
+			_onFilesDrop( files );
+		} else if ( html ) {
+			_onHTMLDrop( html );
+		} else {
+			_onDrop( event );
+		}
 	};
 }

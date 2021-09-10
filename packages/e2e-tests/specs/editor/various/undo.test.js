@@ -46,11 +46,17 @@ const getSelection = async () => {
 		cloneStart.setStart( document.activeElement, 0 );
 		cloneEnd.setStart( document.activeElement, 0 );
 
+		/**
+		 * Zero width non-breaking space, used as padding in the editable DOM
+		 * tree when it is empty otherwise.
+		 */
+		const ZWNBSP = '\ufeff';
+
 		return {
 			blockIndex,
 			editableIndex,
-			startOffset: cloneStart.toString().length,
-			endOffset: cloneEnd.toString().length,
+			startOffset: cloneStart.toString().replace( ZWNBSP, '' ).length,
+			endOffset: cloneEnd.toString().replace( ZWNBSP, '' ).length,
 		};
 	} );
 };

@@ -61,7 +61,9 @@ function useIsAccessibleToolbar( ref ) {
 		const onlyToolbarItem = hasOnlyToolbarItem( tabbables );
 		if ( ! onlyToolbarItem ) {
 			deprecated( 'Using custom components as toolbar controls', {
-				alternative: 'ToolbarItem or ToolbarButton components',
+				since: '5.6',
+				alternative:
+					'ToolbarItem, ToolbarButton or ToolbarDropdownMenu components',
 				link:
 					'https://developer.wordpress.org/block-editor/components/toolbar-button/#inside-blockcontrols',
 			} );
@@ -126,7 +128,7 @@ function useToolbarFocus(
 		}
 		return () => {
 			window.cancelAnimationFrame( raf );
-			if ( ! onIndexChange ) return;
+			if ( ! onIndexChange || ! ref.current ) return;
 			// When the toolbar element is unmounted and onIndexChange is passed, we
 			// pass the focused toolbar item index so it can be hydrated later.
 			const items = getAllToolbarItemsIn( ref.current );

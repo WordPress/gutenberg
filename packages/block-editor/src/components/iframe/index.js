@@ -1,14 +1,28 @@
 /**
+ * External dependencies
+ */
+import classnames from 'classnames';
+
+/**
  * WordPress dependencies
  */
 import {
 	useState,
 	createPortal,
-	useCallback,
 	forwardRef,
+	useEffect,
+	useMemo,
+	useReducer,
 } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
-import { useMergeRefs } from '@wordpress/compose';
+import { useMergeRefs, useRefEffect } from '@wordpress/compose';
+import { __experimentalStyleProvider as StyleProvider } from '@wordpress/components';
+
+/**
+ * Internal dependencies
+ */
+import { useBlockSelectionClearer } from '../block-selection-clearer';
+import { useWritingFlow } from '../writing-flow';
 
 const BODY_CLASS_NAME = 'editor-styles-wrapper';
 const BLOCK_PREFIX = 'wp-block';
@@ -40,6 +54,19 @@ function styleSheetsCompat( doc ) {
 			return;
 		}
 
+		// Generally, ignore inline styles. We add inline styles belonging to a
+		// stylesheet later, which may or may not match the selectors.
+		if ( ownerNode.tagName !== 'LINK' ) {
+			return;
+		}
+
+		// Don't try to add the reset styles, which were removed as a dependency
+		// from `edit-blocks` for the iframe since we don't need to reset admin
+		// styles.
+		if ( ownerNode.id === 'wp-reset-editor-styles-css' ) {
+			return;
+		}
+
 		const isMatch = Array.from( cssRules ).find(
 			( { selectorText } ) =>
 				selectorText &&
@@ -48,7 +75,22 @@ function styleSheetsCompat( doc ) {
 		);
 
 		if ( isMatch && ! doc.getElementById( ownerNode.id ) ) {
+			// eslint-disable-next-line no-console
+			console.error(
+				`Stylesheet ${ ownerNode.id } was not properly added.
+For blocks, use the block API's style (https://developer.wordpress.org/block-editor/reference-guides/block-api/block-metadata/#style) or editorStyle (https://developer.wordpress.org/block-editor/reference-guides/block-api/block-metadata/#editor-style).
+For themes, use add_editor_style (https://developer.wordpress.org/block-editor/how-to-guides/themes/theme-support/#editor-styles).`,
+				ownerNode.outerHTML
+			);
 			doc.head.appendChild( ownerNode.cloneNode( true ) );
+
+			// Add inline styles belonging to the stylesheet.
+			const inlineCssId = ownerNode.id.replace( '-css', '-inline-css' );
+			const inlineCssElement = document.getElementById( inlineCssId );
+
+			if ( inlineCssElement ) {
+				doc.head.appendChild( inlineCssElement.cloneNode( true ) );
+			}
 		}
 	} );
 }
@@ -99,67 +141,64 @@ function bubbleEvents( doc ) {
 	}
 }
 
-/**
- * Sets the document direction.
- *
- * Sets the `editor-styles-wrapper` class name on the body.
- *
- * Copies the `admin-color-*` class name to the body so that the admin color
- * scheme applies to components in the iframe.
- *
- * @param {Document} doc Document to add class name to.
- */
-function setBodyClassName( doc ) {
-	doc.dir = document.dir;
-	doc.body.className = BODY_CLASS_NAME;
+function useParsedAssets( html ) {
+	return useMemo( () => {
+		const doc = document.implementation.createHTMLDocument( '' );
+		doc.body.innerHTML = html;
+		return Array.from( doc.body.children );
+	}, [ html ] );
+}
 
-	for ( const name of document.body.classList ) {
-		if ( name.startsWith( 'admin-color-' ) ) {
-			doc.body.classList.add( name );
+async function loadScript( head, { id, src } ) {
+	return new Promise( ( resolve, reject ) => {
+		const script = head.ownerDocument.createElement( 'script' );
+		script.id = id;
+		if ( src ) {
+			script.src = src;
+			script.onload = () => resolve();
+			script.onerror = () => reject();
+		} else {
+			resolve();
 		}
-	}
+		head.appendChild( script );
+	} );
 }
 
-/**
- * Sets the document head and default styles.
- *
- * @param {Document} doc  Document to set the head for.
- * @param {string}   head HTML to set as the head.
- */
-function setHead( doc, head ) {
-	doc.head.innerHTML =
-		// Body margin must be overridable by themes.
-		'<style>body{margin:0}</style>' + head;
-}
-
-function Iframe( { contentRef, children, head, headHTML, ...props }, ref ) {
+function Iframe( { contentRef, children, head, tabIndex = 0, ...props }, ref ) {
+	const [ , forceRender ] = useReducer( () => ( {} ) );
 	const [ iframeDocument, setIframeDocument ] = useState();
-
-	const setRef = useCallback( ( node ) => {
-		if ( ! node ) {
-			return;
-		}
-
+	const [ bodyClasses, setBodyClasses ] = useState( [] );
+	const styles = useParsedAssets( window.__editorAssets.styles );
+	const scripts = useParsedAssets( window.__editorAssets.scripts );
+	const clearerRef = useBlockSelectionClearer();
+	const [ before, writingFlowRef, after ] = useWritingFlow();
+	const setRef = useRefEffect( ( node ) => {
 		function setDocumentIfReady() {
-			const { contentDocument } = node;
-			const { readyState, body } = contentDocument;
+			const { contentDocument, ownerDocument } = node;
+			const { readyState, documentElement } = contentDocument;
 
 			if ( readyState !== 'interactive' && readyState !== 'complete' ) {
 				return false;
 			}
 
-			if ( typeof contentRef === 'function' ) {
-				contentRef( body );
-			} else if ( contentRef ) {
-				contentRef.current = body;
-			}
-
-			setHead( contentDocument, headHTML );
-			setBodyClassName( contentDocument );
-			styleSheetsCompat( contentDocument );
 			bubbleEvents( contentDocument );
-			setBodyClassName( contentDocument );
 			setIframeDocument( contentDocument );
+			clearerRef( documentElement );
+
+			// Ideally ALL classes that are added through get_body_class should
+			// be added in the editor too, which we'll somehow have to get from
+			// the server in the future (which will run the PHP filters).
+			setBodyClasses(
+				Array.from( ownerDocument.body.classList ).filter(
+					( name ) =>
+						name.startsWith( 'admin-color-' ) ||
+						name === 'wp-embed-responsive'
+				)
+			);
+
+			contentDocument.dir = ownerDocument.dir;
+			documentElement.removeChild( contentDocument.head );
+			documentElement.removeChild( contentDocument.body );
 
 			return true;
 		}
@@ -173,18 +212,81 @@ function Iframe( { contentRef, children, head, headHTML, ...props }, ref ) {
 			setDocumentIfReady();
 		} );
 	}, [] );
+	const headRef = useRefEffect( ( element ) => {
+		scripts
+			.reduce(
+				( promise, script ) =>
+					promise.then( () => loadScript( element, script ) ),
+				Promise.resolve()
+			)
+			.finally( () => {
+				// When script are loaded, re-render blocks to allow them
+				// to initialise.
+				forceRender();
+			} );
+	}, [] );
+	const bodyRef = useMergeRefs( [ contentRef, clearerRef, writingFlowRef ] );
+
+	useEffect( () => {
+		if ( iframeDocument ) {
+			styleSheetsCompat( iframeDocument );
+		}
+	}, [ iframeDocument ] );
+
+	head = (
+		<>
+			<style>{ 'body{margin:0}' }</style>
+			{ styles.map(
+				( { tagName, href, id, rel, media, textContent } ) => {
+					const TagName = tagName.toLowerCase();
+
+					if ( TagName === 'style' ) {
+						return (
+							<TagName { ...{ id } } key={ id }>
+								{ textContent }
+							</TagName>
+						);
+					}
+
+					return (
+						<TagName { ...{ href, id, rel, media } } key={ id } />
+					);
+				}
+			) }
+			{ head }
+		</>
+	);
 
 	return (
-		<iframe
-			{ ...props }
-			ref={ useMergeRefs( [ ref, setRef ] ) }
-			tabIndex="0"
-			title={ __( 'Editor canvas' ) }
-			name="editor-canvas"
-		>
-			{ iframeDocument && createPortal( children, iframeDocument.body ) }
-			{ iframeDocument && createPortal( head, iframeDocument.head ) }
-		</iframe>
+		<>
+			{ tabIndex >= 0 && before }
+			<iframe
+				{ ...props }
+				ref={ useMergeRefs( [ ref, setRef ] ) }
+				tabIndex={ tabIndex }
+				title={ __( 'Editor canvas' ) }
+			>
+				{ iframeDocument &&
+					createPortal(
+						<>
+							<head ref={ headRef }>{ head }</head>
+							<body
+								ref={ bodyRef }
+								className={ classnames(
+									BODY_CLASS_NAME,
+									...bodyClasses
+								) }
+							>
+								<StyleProvider document={ iframeDocument }>
+									{ children }
+								</StyleProvider>
+							</body>
+						</>,
+						iframeDocument.documentElement
+					) }
+			</iframe>
+			{ tabIndex >= 0 && after }
+		</>
 	);
 }
 

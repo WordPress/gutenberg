@@ -20,6 +20,14 @@
 	background-color: rgba($white, 0.07);
 }
 
+.newIndicator {
+	height: 22;
+	left: 6;
+	position: absolute;
+	top: 6;
+	width: 22;
+}
+
 .modalIcon {
 	width: 32px;
 	height: 32px;
@@ -61,8 +69,8 @@
 	flex-direction: column;
 	justify-content: flex-start;
 	align-items: center;
-	padding-left: $grid-unit-20 / 2;
-	padding-right: $grid-unit-20 / 2;
+	padding-left: $grid-unit-20 * 0.5;
+	padding-right: $grid-unit-20 * 0.5;
 	padding-top: 0;
 	padding-bottom: 0;
 }

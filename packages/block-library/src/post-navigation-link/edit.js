@@ -64,7 +64,6 @@ export default function PostNavigationLinkEdit( {
 					onChange={ ( newLabel ) =>
 						setAttributes( { label: newLabel } )
 					}
-					keepPlaceholderOnFocus
 				/>
 			</div>
 		</>

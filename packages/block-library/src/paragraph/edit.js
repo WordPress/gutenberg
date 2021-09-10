@@ -7,24 +7,28 @@ import classnames from 'classnames';
  * WordPress dependencies
  */
 import { __, _x, isRTL } from '@wordpress/i18n';
-import { PanelBody, ToggleControl, ToolbarGroup } from '@wordpress/components';
 import {
-	AlignmentToolbar,
+	ToolbarDropdownMenu,
+	PanelBody,
+	ToggleControl,
+} from '@wordpress/components';
+import {
+	AlignmentControl,
 	BlockControls,
 	InspectorControls,
 	RichText,
 	useBlockProps,
-	__experimentalUseEditorFeature as useEditorFeature,
+	useSetting,
 } from '@wordpress/block-editor';
 import { createBlock } from '@wordpress/blocks';
 import { formatLtr } from '@wordpress/icons';
 
 const name = 'core/paragraph';
 
-function ParagraphRTLToolbar( { direction, setDirection } ) {
+function ParagraphRTLControl( { direction, setDirection } ) {
 	return (
 		isRTL() && (
-			<ToolbarGroup
+			<ToolbarDropdownMenu
 				controls={ [
 					{
 						icon: formatLtr,
@@ -51,7 +55,7 @@ function ParagraphBlock( {
 	clientId,
 } ) {
 	const { align, content, direction, dropCap, placeholder } = attributes;
-	const isDropCapFeatureEnabled = useEditorFeature( 'typography.dropCap' );
+	const isDropCapFeatureEnabled = useSetting( 'typography.dropCap' );
 	const blockProps = useBlockProps( {
 		className: classnames( {
 			'has-drop-cap': dropCap,
@@ -62,14 +66,14 @@ function ParagraphBlock( {
 
 	return (
 		<>
-			<BlockControls>
-				<AlignmentToolbar
+			<BlockControls group="block">
+				<AlignmentControl
 					value={ align }
 					onChange={ ( newAlign ) =>
 						setAttributes( { align: newAlign } )
 					}
 				/>
-				<ParagraphRTLToolbar
+				<ParagraphRTLControl
 					direction={ direction }
 					setDirection={ ( newDirection ) =>
 						setAttributes( { direction: newDirection } )
@@ -133,10 +137,7 @@ function ParagraphBlock( {
 						  )
 				}
 				data-empty={ content ? false : true }
-				placeholder={
-					placeholder ||
-					__( 'Start writing or type / to choose a block' )
-				}
+				placeholder={ placeholder || __( 'Type / to choose a block' ) }
 				__unstableEmbedURLOnPaste
 				__unstableAllowPrefixTransformations
 			/>

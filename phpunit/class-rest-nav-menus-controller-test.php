@@ -193,8 +193,12 @@ class REST_Nav_Menus_Controller_Test extends WP_Test_REST_Controller_Testcase {
 				'menu-name'   => 'test Name',
 			)
 		);
-		$request     = new WP_REST_Request( 'GET', '/__experimental/menus/' . $nav_menu_id );
-		$response    = rest_get_server()->dispatch( $request );
+
+		$this->register_nav_menu_locations( array( 'primary' ) );
+		set_theme_mod( 'nav_menu_locations', array( 'primary' => $nav_menu_id ) );
+
+		$request  = new WP_REST_Request( 'GET', '/__experimental/menus/' . $nav_menu_id );
+		$response = rest_get_server()->dispatch( $request );
 		$this->check_get_taxonomy_term_response( $response, $nav_menu_id );
 	}
 
@@ -561,6 +565,18 @@ class REST_Nav_Menus_Controller_Test extends WP_Test_REST_Controller_Testcase {
 		$this->assertEquals( $term->description, $data['description'] );
 		$this->assertFalse( isset( $data['parent'] ) );
 
+		$locations = get_nav_menu_locations();
+		if ( ! empty( $locations ) ) {
+			$menu_locations = array();
+			foreach ( $locations as $location => $menu_id ) {
+				if ( $menu_id === $term->term_id ) {
+					$menu_locations[] = $location;
+				}
+			}
+
+			$this->assertSame( $menu_locations, $data['locations'] );
+		}
+
 		$relations = array(
 			'self',
 			'collection',
@@ -572,9 +588,12 @@ class REST_Nav_Menus_Controller_Test extends WP_Test_REST_Controller_Testcase {
 			$relations[] = 'up';
 		}
 
+		if ( ! empty( $data['locations'] ) ) {
+			$relations[] = 'https://api.w.org/menu-location';
+		}
+
 		$this->assertEqualSets( $relations, array_keys( $links ) );
 		$this->assertContains( 'wp/v2/taxonomies/' . $term->taxonomy, $links['about'][0]['href'] );
 		$this->assertEquals( add_query_arg( 'menus', $term->term_id, rest_url( 'wp/v2/menu-items' ) ), $links['https://api.w.org/post_type'][0]['href'] );
 	}
-
 }

@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import classnames from 'classnames';
+
+/**
  * WordPress dependencies
  */
 import { getBlobByURL, isBlobURL } from '@wordpress/blob';
@@ -7,6 +12,7 @@ import {
 	Button,
 	Disabled,
 	PanelBody,
+	Spinner,
 	withNotices,
 } from '@wordpress/components';
 import {
@@ -43,6 +49,7 @@ function VideoEdit( {
 	isSelected,
 	noticeUI,
 	attributes,
+	className,
 	setAttributes,
 	insertBlocksAfter,
 	onReplace,
@@ -52,6 +59,7 @@ function VideoEdit( {
 	const videoPlayer = useRef();
 	const posterImageButton = useRef();
 	const { id, caption, controls, poster, src, tracks } = attributes;
+	const isTemporaryVideo = ! id && isBlobURL( src );
 	const mediaUpload = useSelect(
 		( select ) => select( blockEditorStore ).getSettings().mediaUpload
 	);
@@ -86,12 +94,22 @@ function VideoEdit( {
 			// in this case there was an error
 			// previous attributes should be removed
 			// because they may be temporary blob urls
-			setAttributes( { src: undefined, id: undefined } );
+			setAttributes( {
+				src: undefined,
+				id: undefined,
+				poster: undefined,
+			} );
 			return;
 		}
+
 		// sets the block's attribute and updates the edit component from the
 		// selected media
-		setAttributes( { src: media.url, id: media.id } );
+		setAttributes( {
+			src: media.url,
+			id: media.id,
+			poster:
+				media.image?.src !== media.icon ? media.image?.src : undefined,
+		} );
 	}
 
 	function onSelectURL( newSrc ) {
@@ -104,7 +122,7 @@ function VideoEdit( {
 				onReplace( embedBlock );
 				return;
 			}
-			setAttributes( { src: newSrc, id: undefined } );
+			setAttributes( { src: newSrc, id: undefined, poster: undefined } );
 		}
 	}
 
@@ -113,7 +131,13 @@ function VideoEdit( {
 		noticeOperations.createErrorNotice( message );
 	}
 
-	const blockProps = useBlockProps();
+	const classes = classnames( className, {
+		'is-transient': isTemporaryVideo,
+	} );
+
+	const blockProps = useBlockProps( {
+		className: classes,
+	} );
 
 	if ( ! src ) {
 		return (
@@ -137,23 +161,25 @@ function VideoEdit( {
 	}
 
 	function onRemovePoster() {
-		setAttributes( { poster: '' } );
+		setAttributes( { poster: undefined } );
 
 		// Move focus back to the Media Upload button.
-		this.posterImageButton.current.focus();
+		posterImageButton.current.focus();
 	}
 
 	const videoPosterDescription = `video-block__poster-image-description-${ instanceId }`;
 
 	return (
 		<>
-			<BlockControls>
+			<BlockControls group="block">
 				<TracksEditor
 					tracks={ tracks }
 					onChange={ ( newTracks ) => {
 						setAttributes( { tracks: newTracks } );
 					} }
 				/>
+			</BlockControls>
+			<BlockControls group="other">
 				<MediaReplaceFlow
 					mediaId={ id }
 					mediaURL={ src }
@@ -183,7 +209,7 @@ function VideoEdit( {
 								}
 								render={ ( { open } ) => (
 									<Button
-										isPrimary
+										variant="primary"
 										onClick={ open }
 										ref={ posterImageButton }
 										aria-describedby={
@@ -210,7 +236,10 @@ function VideoEdit( {
 									  ) }
 							</p>
 							{ !! poster && (
-								<Button onClick={ onRemovePoster } isTertiary>
+								<Button
+									onClick={ onRemovePoster }
+									variant="tertiary"
+								>
 									{ __( 'Remove' ) }
 								</Button>
 							) }
@@ -220,10 +249,11 @@ function VideoEdit( {
 			</InspectorControls>
 			<figure { ...blockProps }>
 				{ /*
-					Disable the video tag so the user clicking on it won't play the
+					Disable the video tag if the block is not selected
+					so the user clicking on it won't play the
 					video when the controls are enabled.
 				*/ }
-				<Disabled>
+				<Disabled isDisabled={ ! isSelected }>
 					<video
 						controls={ controls }
 						poster={ poster }
@@ -233,11 +263,12 @@ function VideoEdit( {
 						<Tracks tracks={ tracks } />
 					</video>
 				</Disabled>
+				{ isTemporaryVideo && <Spinner /> }
 				{ ( ! RichText.isEmpty( caption ) || isSelected ) && (
 					<RichText
 						tagName="figcaption"
 						aria-label={ __( 'Video caption text' ) }
-						placeholder={ __( 'Write caption…' ) }
+						placeholder={ __( 'Add caption' ) }
 						value={ caption }
 						onChange={ ( value ) =>
 							setAttributes( { caption: value } )

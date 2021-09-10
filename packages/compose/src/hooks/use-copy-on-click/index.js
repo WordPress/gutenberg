@@ -7,24 +7,41 @@ import Clipboard from 'clipboard';
  * WordPress dependencies
  */
 import { useRef, useEffect, useState } from '@wordpress/element';
+import deprecated from '@wordpress/deprecated';
 
+/* eslint-disable jsdoc/no-undefined-types */
 /**
  * Copies the text to the clipboard when the element is clicked.
  *
- * @param {Object}          ref     Reference with the element.
- * @param {string|Function} text    The text to copy.
- * @param {number}          timeout Optional timeout to reset the returned
- *                                  state. 4 seconds by default.
+ * @deprecated
+ *
+ * @param {import('react').RefObject<string | Element | NodeListOf<Element>>} ref       Reference with the element.
+ * @param {string|Function}                                                   text      The text to copy.
+ * @param {number}                                                            [timeout] Optional timeout to reset the returned
+ *                                                                                      state. 4 seconds by default.
  *
  * @return {boolean} Whether or not the text has been copied. Resets after the
  *                   timeout.
  */
 export default function useCopyOnClick( ref, text, timeout = 4000 ) {
+	/* eslint-enable jsdoc/no-undefined-types */
+	deprecated( 'wp.compose.useCopyOnClick', {
+		since: '10.3',
+		plugin: 'Gutenberg',
+		alternative: 'wp.compose.useCopyToClipboard',
+	} );
+
+	/** @type {import('react').MutableRefObject<Clipboard | undefined>} */
 	const clipboard = useRef();
 	const [ hasCopied, setHasCopied ] = useState( false );
 
 	useEffect( () => {
+		/** @type {number | undefined} */
 		let timeoutId;
+
+		if ( ! ref.current ) {
+			return;
+		}
 
 		// Clipboard listens to click events.
 		clipboard.current = new Clipboard( ref.current, {
@@ -39,7 +56,7 @@ export default function useCopyOnClick( ref, text, timeout = 4000 ) {
 
 			// Handle ClipboardJS focus bug, see https://github.com/zenorocha/clipboard.js/issues/680
 			if ( trigger ) {
-				trigger.focus();
+				/** @type {HTMLElement} */ ( trigger ).focus();
 			}
 
 			if ( timeout ) {
@@ -50,7 +67,9 @@ export default function useCopyOnClick( ref, text, timeout = 4000 ) {
 		} );
 
 		return () => {
-			clipboard.current.destroy();
+			if ( clipboard.current ) {
+				clipboard.current.destroy();
+			}
 			clearTimeout( timeoutId );
 		};
 	}, [ text, timeout, setHasCopied ] );

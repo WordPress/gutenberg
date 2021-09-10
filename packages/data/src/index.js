@@ -71,8 +71,8 @@ export { plugins };
  * register( store );
  * ```
  *
- * @return {Function}       A reducer that invokes every reducer inside the reducers
- *                          object, and constructs a state object with the same shape.
+ * @return {Function} A reducer that invokes every reducer inside the reducers
+ *                    object, and constructs a state object with the same shape.
  */
 export { combineReducers };
 

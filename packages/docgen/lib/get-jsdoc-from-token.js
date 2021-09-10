@@ -25,16 +25,38 @@ module.exports = ( token ) => {
 			spacing: 'preserve',
 		} )[ 0 ];
 		if ( jsdoc ) {
+			let paramCount = 0;
+
 			jsdoc.tags = jsdoc.tags.map( ( tag ) => {
+				const isUnqualifiedParam =
+					tag.tag === 'param' && ! tag.name.includes( '.' );
+				const index = isUnqualifiedParam ? paramCount++ : paramCount;
+
 				return {
 					...tag,
-					type: getTypeAnnotation( tag, token ),
+					type: getTypeAnnotation( tag, token, index ),
 					description:
 						tag.description === '\n'
 							? tag.description.trim()
 							: tag.description,
 				};
 			} );
+
+			if ( jsdoc.tags.length === 0 ) {
+				const potentialTypeAnnotation = getTypeAnnotation(
+					{ tag: 'type' },
+					token,
+					0
+				);
+				if ( potentialTypeAnnotation !== '' ) {
+					jsdoc.tags.push( {
+						tag: 'type',
+						type: potentialTypeAnnotation,
+						name: '',
+						description: '',
+					} );
+				}
+			}
 		}
 	}
 	return jsdoc;

@@ -12,9 +12,9 @@ import { store as keyboardShortcutsStore } from '../store';
 /**
  * Attach a keyboard shortcut handler.
  *
- * @param {string} name       Shortcut name.
+ * @param {string}   name     Shortcut name.
  * @param {Function} callback Shortcut callback.
- * @param {Object} options    Shortcut options.
+ * @param {Object}   options  Shortcut options.
  */
 function useShortcut( name, callback, options ) {
 	const shortcuts = useSelect(

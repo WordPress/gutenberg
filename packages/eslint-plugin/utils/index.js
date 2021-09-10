@@ -9,6 +9,7 @@ const {
 const { getTranslateFunctionArgs } = require( './get-translate-function-args' );
 const { getTextContentFromNode } = require( './get-text-content-from-node' );
 const { getTranslateFunctionName } = require( './get-translate-function-name' );
+const isPackageInstalled = require( './is-package-installed' );
 
 module.exports = {
 	TRANSLATION_FUNCTIONS,
@@ -17,4 +18,5 @@ module.exports = {
 	getTranslateFunctionArgs,
 	getTextContentFromNode,
 	getTranslateFunctionName,
+	isPackageInstalled,
 };

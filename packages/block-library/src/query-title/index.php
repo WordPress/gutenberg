@@ -10,13 +10,11 @@
  * For now it only supports Archive title,
  * using queried object information
  *
- * @param array    $attributes Block attributes.
- * @param string   $content    Block default content.
- * @param WP_Block $block      Block instance.
+ * @param array $attributes Block attributes.
  *
  * @return string Returns the query title based on the queried object.
  */
-function render_block_core_query_title( $attributes, $content, $block ) {
+function render_block_core_query_title( $attributes ) {
 	$type       = isset( $attributes['type'] ) ? $attributes['type'] : null;
 	$is_archive = is_archive();
 	if ( ! $type || ( 'archive' === $type && ! $is_archive ) ) {

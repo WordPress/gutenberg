@@ -6,6 +6,7 @@ import { Dropdown, Button } from '@wordpress/components';
 import { useSelect } from '@wordpress/data';
 import { info } from '@wordpress/icons';
 import { forwardRef } from '@wordpress/element';
+import { store as blockEditorStore } from '@wordpress/block-editor';
 
 /**
  * Internal dependencies
@@ -17,7 +18,7 @@ function TableOfContents(
 	ref
 ) {
 	const hasBlocks = useSelect(
-		( select ) => !! select( 'core/block-editor' ).getBlockCount(),
+		( select ) => !! select( blockEditorStore ).getBlockCount(),
 		[]
 	);
 	return (

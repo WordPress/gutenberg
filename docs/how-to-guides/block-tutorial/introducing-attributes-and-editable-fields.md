@@ -4,7 +4,7 @@ The example blocks so far are still not very interesting because they lack optio
 
 ## Attributes
 
-Until now, the `edit` and `save` functions have returned a simple representation of a paragraph element. We also learned how these functions are responsible for _describing_ the structure of the block's appearance. If the user changes a block, this structure may need to change. To achieve this, the state of a block is maintained throughout the editing session as a plain JavaScript object, and when an update occurs, the `edit` function is invoked again. Put another way: __the output of a block is a function of its attributes__.
+Until now, the `edit` and `save` functions have returned a simple representation of a paragraph element. We also learned how these functions are responsible for _describing_ the structure of the block's appearance. If the user changes a block, this structure may need to change. To achieve this, the state of a block is maintained throughout the editing session as a plain JavaScript object, and when an update occurs, the `edit` function is invoked again. Put another way: **the output of a block is a function of its attributes**.
 
 One challenge of maintaining the representation of a block as a JavaScript object is that we must be able to extract this object again from the saved content of a post. This is achieved with the block type's `attributes` property:
 
@@ -54,6 +54,7 @@ Here is the complete block definition for Example 03.
 
 {% codetabs %}
 {% ESNext %}
+
 ```jsx
 import { registerBlockType } from '@wordpress/blocks';
 import { useBlockProps, RichText } from '@wordpress/block-editor';
@@ -76,7 +77,11 @@ registerBlockType( 'gutenberg-examples/example-03-editable-esnext', {
 		},
 	},
 	edit: ( props ) => {
-		const { attributes: { content }, setAttributes, className } = props;
+		const {
+			attributes: { content },
+			setAttributes,
+			className,
+		} = props;
 		const blockProps = useBlockProps();
 		const onChangeContent = ( newContent ) => {
 			setAttributes( { content: newContent } );
@@ -92,13 +97,21 @@ registerBlockType( 'gutenberg-examples/example-03-editable-esnext', {
 	},
 	save: ( props ) => {
 		const blockProps = useBlockProps.save();
-		return <RichText.Content { ...blockProps } tagName="p" value={ props.attributes.content } />;
+		return (
+			<RichText.Content
+				{ ...blockProps }
+				tagName="p"
+				value={ props.attributes.content }
+			/>
+		);
 	},
 } );
 ```
+
 {% ES5 %}
+
 ```js
-( function( blocks, blockEditor, element ) {
+( function ( blocks, blockEditor, element ) {
 	var el = element.createElement;
 	var RichText = blockEditor.RichText;
 	var useBlockProps = blockEditor.useBlockProps;
@@ -121,7 +134,7 @@ registerBlockType( 'gutenberg-examples/example-03-editable-esnext', {
 				content: 'Hello World',
 			},
 		},
-		edit: function( props ) {
+		edit: function ( props ) {
 			var blockProps = useBlockProps();
 			var content = props.attributes.content;
 			function onChangeContent( newContent ) {
@@ -138,18 +151,18 @@ registerBlockType( 'gutenberg-examples/example-03-editable-esnext', {
 			);
 		},
 
-		save: function( props ) {
+		save: function ( props ) {
 			var blockProps = useBlockProps.save();
-			return el( RichText.Content, Object.assign( blockProps, {
-				tagName: 'p', 
-				value: props.attributes.content,
-			} ) );
+			return el(
+				RichText.Content,
+				Object.assign( blockProps, {
+					tagName: 'p',
+					value: props.attributes.content,
+				} )
+			);
 		},
 	} );
-}(
-	window.wp.blocks,
-	window.wp.blockEditor,
-	window.wp.element
-) );
+} )( window.wp.blocks, window.wp.blockEditor, window.wp.element );
 ```
+
 {% end %}

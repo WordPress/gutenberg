@@ -1,123 +1,70 @@
 /**
- * External dependencies
- */
-import {
-	FlatList,
-	View,
-	TouchableHighlight,
-	TouchableWithoutFeedback,
-	Dimensions,
-} from 'react-native';
-
-/**
  * WordPress dependencies
  */
-import { useState, useEffect } from '@wordpress/element';
-import {
-	BottomSheet,
-	BottomSheetConsumer,
-	InserterButton,
-} from '@wordpress/components';
+import { useSelect } from '@wordpress/data';
 
 /**
  * Internal dependencies
  */
-import styles from './style.scss';
+import { searchItems } from './search-items';
+import BlockTypesList from '../block-types-list';
+import InserterNoResults from './no-results';
+import { store as blockEditorStore } from '../../store';
+import useBlockTypeImpressions from './hooks/use-block-type-impressions';
 
-const MIN_COL_NUM = 3;
+const NON_BLOCK_CATEGORIES = [ 'reusable' ];
+const ALLOWED_EMBED_VARIATIONS = [ 'core/embed' ];
 
-function InserterSearchResults( { items, onSelect, onClose } ) {
-	const [ numberOfColumns, setNumberOfColumns ] = useState( MIN_COL_NUM );
-	const [ itemWidth, setItemWidth ] = useState();
-	const [ maxWidth, setMaxWidth ] = useState();
+function InserterSearchResults( {
+	filterValue,
+	onSelect,
+	listProps,
+	rootClientId,
+	isFullScreen,
+} ) {
+	const { blockTypes } = useSelect(
+		( select ) => {
+			const allItems = select( blockEditorStore ).getInserterItems(
+				rootClientId
+			);
 
-	useEffect( () => {
-		Dimensions.addEventListener( 'change', onLayout );
-		return () => {
-			Dimensions.removeEventListener( 'change', onLayout );
-		};
-	}, [] );
+			const blockItems = allItems.filter(
+				( { id, category } ) =>
+					! NON_BLOCK_CATEGORIES.includes( category ) &&
+					// We don't want to show all possible embed variations
+					// as different blocks in the inserter. We'll only show a
+					// few popular ones.
+					( category !== 'embed' ||
+						( category === 'embed' &&
+							ALLOWED_EMBED_VARIATIONS.includes( id ) ) )
+			);
 
-	function calculateItemWidth() {
-		const {
-			paddingLeft: itemPaddingLeft,
-			paddingRight: itemPaddingRight,
-		} = InserterButton.Styles.modalItem;
-		const { width } = InserterButton.Styles.modalIconWrapper;
-		return width + itemPaddingLeft + itemPaddingRight;
+			const filteredItems = searchItems( blockItems, filterValue );
+
+			return { blockTypes: filteredItems };
+		},
+		[ rootClientId, filterValue ]
+	);
+
+	const { items, trackBlockTypeSelected } = useBlockTypeImpressions(
+		blockTypes
+	);
+
+	if ( ! items || items?.length === 0 ) {
+		return <InserterNoResults />;
 	}
 
-	function onLayout() {
-		const sumLeftRightPadding =
-			styles.columnPadding.paddingLeft +
-			styles.columnPadding.paddingRight;
-
-		const bottomSheetWidth = BottomSheet.getWidth();
-		const containerTotalWidth = bottomSheetWidth - sumLeftRightPadding;
-		const itemTotalWidth = calculateItemWidth();
-
-		const columnsFitToWidth = Math.floor(
-			containerTotalWidth / itemTotalWidth
-		);
-
-		const numColumns = Math.max( MIN_COL_NUM, columnsFitToWidth );
-
-		setNumberOfColumns( numColumns );
-		setMaxWidth( containerTotalWidth / numColumns );
-
-		if ( columnsFitToWidth < MIN_COL_NUM ) {
-			const updatedItemWidth =
-				( bottomSheetWidth - 2 * sumLeftRightPadding ) / MIN_COL_NUM;
-			setItemWidth( updatedItemWidth );
-		}
-	}
+	const handleSelect = ( ...args ) => {
+		trackBlockTypeSelected( ...args );
+		onSelect( ...args );
+	};
 
 	return (
-		<BottomSheet
-			isVisible={ true }
-			onClose={ onClose }
-			hideHeader
-			hasNavigation
-		>
-			<TouchableHighlight accessible={ false }>
-				<BottomSheetConsumer>
-					{ ( { listProps, safeAreaBottomInset } ) => (
-						<FlatList
-							onLayout={ onLayout }
-							key={ `InserterUI-${ numberOfColumns }` } //re-render when numberOfColumns changes
-							keyboardShouldPersistTaps="always"
-							numColumns={ numberOfColumns }
-							data={ items }
-							ItemSeparatorComponent={ () => (
-								<TouchableWithoutFeedback accessible={ false }>
-									<View style={ styles.rowSeparator } />
-								</TouchableWithoutFeedback>
-							) }
-							keyExtractor={ ( item ) => item.name }
-							renderItem={ ( { item } ) => (
-								<InserterButton
-									{ ...{
-										item,
-										itemWidth,
-										maxWidth,
-										onSelect,
-									} }
-								/>
-							) }
-							{ ...listProps }
-							contentContainerStyle={ [
-								...listProps.contentContainerStyle,
-								{
-									paddingBottom:
-										safeAreaBottomInset ||
-										styles.list.paddingBottom,
-								},
-							] }
-						/>
-					) }
-				</BottomSheetConsumer>
-			</TouchableHighlight>
-		</BottomSheet>
+		<BlockTypesList
+			name="Blocks"
+			initialNumToRender={ isFullScreen ? 10 : 3 }
+			{ ...{ items, onSelect: handleSelect, listProps } }
+		/>
 	);
 }
 

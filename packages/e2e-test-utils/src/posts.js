@@ -13,7 +13,7 @@ import { visitAdminPage } from './visit-admin-page';
 /**
  * Navigates to the post listing screen and bulk-trashes any posts which exist.
  *
- * @param {string} postType - String slug for type of post to trash.
+ * @param {string} postType   - String slug for type of post to trash.
  * @param {string} postStatus - String status of posts to trash.
  *
  * @return {Promise} Promise resolving once posts have been trashed.

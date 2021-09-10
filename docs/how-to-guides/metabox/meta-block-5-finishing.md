@@ -17,4 +17,3 @@ add_action( 'init', 'myguten_register_template' );
 ```
 
 You can also add other block types in the array, including placeholders, or even lock down a post to a set of specific blocks. Templates are a powerful tool for controlling the editing experience, see the documentation linked above for more.
-

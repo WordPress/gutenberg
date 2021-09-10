@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { useDispatch } from '@wordpress/data';
+import { useSelect, useDispatch } from '@wordpress/data';
 import { Button } from '@wordpress/components';
 import { __experimentalLibrary as Library } from '@wordpress/block-editor';
 import { close } from '@wordpress/icons';
@@ -17,6 +17,10 @@ import { store as editSiteStore } from '../../store';
 
 export default function InserterSidebar() {
 	const { setIsInserterOpened } = useDispatch( editSiteStore );
+	const insertionPoint = useSelect(
+		( select ) => select( editSiteStore ).__experimentalGetInsertionPoint(),
+		[]
+	);
 
 	const isMobile = useViewportMatch( 'medium', '<' );
 	const [ inserterDialogRef, inserterDialogProps ] = useDialog( {
@@ -36,7 +40,14 @@ export default function InserterSidebar() {
 				/>
 			</div>
 			<div className="edit-site-editor__inserter-panel-content">
-				<Library showInserterHelpPanel shouldFocusBlock={ isMobile } />
+				<Library
+					showInserterHelpPanel
+					shouldFocusBlock={ isMobile }
+					rootClientId={ insertionPoint.rootClientId }
+					__experimentalInsertionIndex={
+						insertionPoint.insertionIndex
+					}
+				/>
 			</div>
 		</div>
 	);

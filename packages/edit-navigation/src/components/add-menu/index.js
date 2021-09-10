@@ -3,6 +3,7 @@
  */
 import { some } from 'lodash';
 import classnames from 'classnames';
+
 /**
  * WordPress dependencies
  */
@@ -12,6 +13,7 @@ import { TextControl, Button } from '@wordpress/components';
 import { useFocusOnMount } from '@wordpress/compose';
 import { __, sprintf } from '@wordpress/i18n';
 import { store as noticesStore } from '@wordpress/notices';
+import { store as coreStore } from '@wordpress/core-data';
 
 const menuNameMatches = ( menuName ) => ( menu ) =>
 	menu.name.toLowerCase() === menuName.toLowerCase();
@@ -29,7 +31,7 @@ export default function AddMenu( {
 		noticesStore
 	);
 	const [ isCreatingMenu, setIsCreatingMenu ] = useState( false );
-	const { saveMenu } = useDispatch( 'core' );
+	const { saveMenu } = useDispatch( coreStore );
 
 	const inputRef = useFocusOnMount( focusInputOnMount );
 
@@ -58,6 +60,9 @@ export default function AddMenu( {
 		setIsCreatingMenu( true );
 
 		const menu = await saveMenu( { name: menuName } );
+
+		setIsCreatingMenu( false );
+
 		if ( menu ) {
 			createInfoNotice( __( 'Menu created' ), {
 				type: 'snackbar',
@@ -67,8 +72,6 @@ export default function AddMenu( {
 				onCreate( menu.id );
 			}
 		}
-
-		setIsCreatingMenu( false );
 	};
 
 	return (
@@ -92,7 +95,7 @@ export default function AddMenu( {
 			<Button
 				className="edit-navigation-add-menu__create-menu-button"
 				type="submit"
-				isPrimary
+				variant="primary"
 				disabled={ ! menuName.length }
 				isBusy={ isCreatingMenu }
 			>
