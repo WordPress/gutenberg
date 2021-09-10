@@ -13,7 +13,6 @@ import { _x, __ } from '@wordpress/i18n';
 import { listView, plus } from '@wordpress/icons';
 import { Button } from '@wordpress/components';
 import { store as keyboardShortcutsStore } from '@wordpress/keyboard-shortcuts';
-import { store as editorStore } from '@wordpress/editor';
 import { store as coreStore } from '@wordpress/core-data';
 
 /**
@@ -26,6 +25,7 @@ import RedoButton from './undo-redo/redo';
 import DocumentActions from './document-actions';
 import TemplateDetails from '../template-details';
 import { store as editSiteStore } from '../../store';
+import useTemplateTitle from '../use-template-title';
 
 const preventDefault = ( event ) => {
 	event.preventDefault();
@@ -38,9 +38,9 @@ export default function Header( {
 	const inserterButton = useRef();
 	const {
 		deviceType,
-		entityTitle,
 		template,
 		templateType,
+		templateId,
 		isInserterOpen,
 		isListViewOpen,
 		listViewShortcut,
@@ -54,26 +54,19 @@ export default function Header( {
 			isListViewOpened,
 		} = select( editSiteStore );
 		const { getEditedEntityRecord } = select( coreStore );
-		const { __experimentalGetTemplateInfo: getTemplateInfo } = select(
-			editorStore
-		);
 		const { getShortcutRepresentation } = select( keyboardShortcutsStore );
 
 		const postType = getEditedPostType();
 		const postId = getEditedPostId();
 		const record = getEditedEntityRecord( 'postType', postType, postId );
-		const _entityTitle =
-			'wp_template' === postType
-				? getTemplateInfo( record ).title
-				: record?.slug;
 		const _isLoaded = !! postId;
 
 		return {
 			deviceType: __experimentalGetPreviewDeviceType(),
-			entityTitle: _entityTitle,
 			isLoaded: _isLoaded,
 			template: record,
 			templateType: postType,
+			templateId: postId,
 			isInserterOpen: isInserterOpened(),
 			isListViewOpen: isListViewOpened(),
 			listViewShortcut: getShortcutRepresentation(
@@ -81,6 +74,7 @@ export default function Header( {
 			),
 		};
 	}, [] );
+	const entityTitle = useTemplateTitle( templateType, templateId );
 
 	const {
 		__experimentalSetPreviewDeviceType: setPreviewDeviceType,

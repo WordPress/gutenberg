@@ -192,6 +192,15 @@ export function* setPage( page ) {
 }
 
 /**
+ * Go back to the current editing page.
+ */
+export function goBack() {
+	return {
+		type: 'GO_BACK',
+	};
+}
+
+/**
  * Displays the site homepage for editing in the editor.
  */
 export function* showHomepage() {
