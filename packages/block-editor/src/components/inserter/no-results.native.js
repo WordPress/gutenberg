@@ -17,7 +17,7 @@ import baseStyles from './style.scss';
 function InserterNoResults() {
 	const isDark = useColorScheme() === 'dark';
 	const styles = useModifiedStyle( baseStyles, {
-		dark: [ isDark ],
+		dark: isDark,
 	} );
 	const {
 		'inserter-search-no-results__container': containerStyle,

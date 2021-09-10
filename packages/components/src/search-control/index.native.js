@@ -68,9 +68,9 @@ function SearchControl( {
 	}, [] );
 
 	const styles = useModifiedStyle( baseStyles, {
-		active: [ isActive ],
-		dark: [ isDark ],
-		'active-dark': [ isActive, isDark ],
+		active: isActive,
+		dark: isDark,
+		'active-dark': isActive && isDark,
 	} );
 
 	const {

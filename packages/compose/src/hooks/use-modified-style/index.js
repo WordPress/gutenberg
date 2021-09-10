@@ -41,7 +41,7 @@ function selectModifiedStyles( styles, modifier ) {
 }
 
 /**
- * Updates a styles object with modified styles if the update conditions are met.
+ * Updates a styles object with modified styles.
  *
  * @example
  *
@@ -56,67 +56,43 @@ function selectModifiedStyles( styles, modifier ) {
  *    'block__element-A' : { height: '10px' },
  *    'block__element-B' : { 'font-family' : 'Helvetica' },
  *    'block__element-Z' : { 'z-index' : 2147483647 }
- *  },
- *  [ true, true ]
+ *  }
  * );
  * // returns
  * // {
  * //   'block_element-A' : { width: '10px', height: '10px' },
  * //   'block-element-B' : { 'font-family' : 'Helvetica' },
- * //   'block-element-C' : { visibility : 'hidden' }
+ * //   'block-element-C' : { visibility : 'hidden' },
+ * //   'block-element-Z' : { 'z-index' : 2147483647 }
  * // }
  * ```
  * @param {Object} styles
  * @param {Object} styleUpdates
- * @param {Array<boolean>} updateConditions - Boolean conditions on when to apply updates
  *
  * @return {Object} - Updated styles object
  */
-function updateStyles( styles, styleUpdates, updateConditions ) {
-	// Test if the modifier conditions are met
-	const shouldUpdate = updateConditions.every( ( should ) => should );
+function updateStyles( styles, styleUpdates ) {
+	Object.keys( styleUpdates ).forEach( ( selector ) => {
+		styles[ selector ] = {
+			...styles[ selector ],
+			...styleUpdates[ selector ],
+		};
+	} );
 
-	if ( shouldUpdate ) {
-		Object.keys( styleUpdates ).forEach( ( selector ) => {
-			styles[ selector ] = {
-				...styles[ selector ],
-				...styleUpdates[ selector ],
-			};
-		} );
-	}
 	return styles;
 }
 
 function useModifiedStyle( baseStyles, modifiers ) {
-	// Memoize the modifier selectors
-	const modifierSelectors = useMemo( () => {
-		return Object.keys( modifiers );
-	}, [] );
-
-	// Memoize the modified styles
-	const modifiedStyles = useMemo( () => {
-		const _modifiedStyles = {};
-		for ( const modifier in modifiers ) {
-			_modifiedStyles[ modifier ] = selectModifiedStyles(
-				baseStyles,
-				modifier
-			);
-		}
-		return _modifiedStyles;
-	}, [] );
-
-	const futureStyles = { ...baseStyles };
-
-	// Apply the modifiers to the future styles
-	modifierSelectors.forEach( ( modifier ) => {
-		updateStyles(
-			futureStyles,
-			modifiedStyles[ modifier ],
-			modifiers[ modifier ]
-		);
-	} );
-
-	return futureStyles;
+	return useMemo(
+		() =>
+			Object.keys( modifiers )
+				.filter( ( modifier ) => modifiers[ modifier ] )
+				.map( ( modifier ) =>
+					selectModifiedStyles( baseStyles, modifier )
+				)
+				.reduce( updateStyles, { ...baseStyles } ),
+		[ baseStyles, modifiers ].map( JSON.stringify )
+	);
 }
 
 export default useModifiedStyle;
