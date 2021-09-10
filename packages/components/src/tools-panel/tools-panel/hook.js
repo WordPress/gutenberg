@@ -22,6 +22,17 @@ export function useToolsPanel( props ) {
 	}, [ className ] );
 
 	const isResetting = useRef( false );
+	const wasResetting = isResetting.current;
+
+	// `isResetting` is cleared via this hook to effectively batch together
+	// the resetAll task. Without this, the flag is cleared after the first
+	// control updates and forces a rerender with subsequent controls then
+	// believing they need to reset, unfortunately using stale data.
+	useEffect( () => {
+		if ( wasResetting ) {
+			isResetting.current = false;
+		}
+	}, [ wasResetting ] );
 
 	// Allow panel items to register themselves.
 	const [ panelItems, setPanelItems ] = useState( [] );
@@ -103,12 +114,6 @@ export function useToolsPanel( props ) {
 		deregisterPanelItem,
 		isResetting: isResetting.current,
 	};
-
-	// Clean up isResetting after advising panel context we were resetting
-	// all controls. This lets panel items know to skip onDeselect callbacks.
-	if ( isResetting.current ) {
-		isResetting.current = false;
-	}
 
 	return {
 		...otherProps,
