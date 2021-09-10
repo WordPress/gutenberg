@@ -9,6 +9,7 @@ import {
 	MenuItem,
 } from '@wordpress/components';
 import {
+	alignNone,
 	positionCenter,
 	positionLeft,
 	positionRight,
@@ -28,7 +29,7 @@ import classNames from 'classnames';
 
 const BLOCK_ALIGNMENTS_CONTROLS = {
 	none: {
-		icon: positionCenter,
+		icon: alignNone,
 		title: __( 'None' ),
 	},
 	left: {
@@ -135,7 +136,7 @@ function BlockAlignmentUI( {
 										icon,
 										title,
 									} = BLOCK_ALIGNMENTS_CONTROLS[ control ];
-									// check when `undefined` to select `none`..
+									// If no value is provided, mark as selected the `none` option.
 									const isSelected =
 										control === value ||
 										( ! value && control === 'none' );
