@@ -43,7 +43,7 @@ function allowedBlockFilter(
 	}
 	// We don't want to show all possible embed variations
 	// as different blocks in the inserter. We'll only show a
-	// few popular ones
+	// few popular ones.
 	return category !== 'embed' || ALLOWED_EMBED_VARIATIONS.includes( id );
 }
 
