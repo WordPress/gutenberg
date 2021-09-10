@@ -163,6 +163,15 @@ function LinkControl( {
 		isEndingEditWithFocus.current = false;
 	}, [ isEditingLink ] );
 
+	// If the URL changes then:
+	// 1. sync the interal input value state.
+	// 2. cancel editing mode.
+	// see: https://github.com/WordPress/gutenberg/pull/32320.
+	useEffect( () => {
+		setIsEditingLink( false );
+		setInternalInputValue( value.url );
+	}, [ value?.url ] );
+
 	/**
 	 * Cancels editing state and marks that focus may need to be restored after
 	 * the next render, if focus was within the wrapper when editing finished.
