@@ -32,7 +32,7 @@ export function useToolsPanel( props ) {
 		if ( wasResetting ) {
 			isResetting.current = false;
 		}
-	}, wasResetting );
+	}, [ wasResetting ] );
 
 	// Allow panel items to register themselves.
 	const [ panelItems, setPanelItems ] = useState( [] );
