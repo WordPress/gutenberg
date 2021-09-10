@@ -52,7 +52,7 @@ export function useToolsPanelItem( props ) {
 		}
 
 		return () => deregisterPanelItem( label );
-	}, [] );
+	}, [ panelId ] );
 
 	const isValueSet = hasValue();
 
