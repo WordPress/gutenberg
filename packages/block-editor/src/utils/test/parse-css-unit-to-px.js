@@ -1,7 +1,7 @@
 /**
  * Internal dependencies
  */
-import { getPxFromCssUnit } from '../parse-css-unit-to-px';
+import { default as getPxFromCssUnit } from '../parse-css-unit-to-px';
 
 describe( 'getPxFromCssUnit', () => {
 	// Absolute units
