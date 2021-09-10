@@ -56,9 +56,9 @@ class WP_REST_Menus_Controller extends WP_REST_Terms_Controller {
 			'/' . $this->rest_base . '/(?P<id>[\d]+)',
 			array(
 				'args'        => array(
-					'id' => array(
-						'description' => __( 'Unique identifier for the term.' ),
-						'type'        => 'integer',
+					'description' => __( 'Unique identifier for the term.', 'default' ),
+					'id'          => array(
+						'type' => 'integer',
 					),
 				),
 				array(
@@ -83,7 +83,7 @@ class WP_REST_Menus_Controller extends WP_REST_Terms_Controller {
 						'force' => array(
 							'type'        => 'boolean',
 							'default'     => false,
-							'description' => __( 'Required to be true, as terms do not support trashing.' ),
+							'description' => __( 'Required to be true, as terms do not support trashing.', 'default' ),
 						),
 					),
 				),
