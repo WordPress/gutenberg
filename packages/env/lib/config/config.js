@@ -89,7 +89,8 @@ module.exports = async function readConfig( configPath ) {
 		env: {
 			development: {}, // No overrides needed, but it should exist.
 			tests: {
-				config: { WP_DEBUG: false, SCRIPT_DEBUG: false },
+				// Debug should be turned on so that developer warnings are
+				// caught.
 				port: 8889,
 			},
 		},

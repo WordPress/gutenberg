@@ -1076,7 +1076,7 @@ describe( 'readConfig', () => {
 				SCRIPT_DEBUG: '2',
 				TEST3: 'foo',
 				TEST: '2',
-				WP_DEBUG: false,
+				WP_DEBUG: true,
 				WP_ENVIRONMENT_TYPE: 'local',
 				WP_PHP_BINARY: 'php',
 				WP_TESTS_EMAIL: 'admin@example.org',

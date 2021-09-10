@@ -30,12 +30,12 @@ Object {
     },
     "tests": Object {
       "config": Object {
-        "SCRIPT_DEBUG": false,
+        "SCRIPT_DEBUG": true,
         "TEST": 200,
         "TEST_VAL1": 1,
         "TEST_VAL2": "hello",
         "TEST_VAL3": false,
-        "WP_DEBUG": false,
+        "WP_DEBUG": true,
         "WP_ENVIRONMENT_TYPE": "local",
         "WP_HOME": "http://localhost:1000/",
         "WP_PHP_BINARY": "php",
@@ -58,8 +58,8 @@ Object {
 
 exports[`readConfig wp config values should use default config values 1`] = `
 Object {
-  "SCRIPT_DEBUG": false,
-  "WP_DEBUG": false,
+  "SCRIPT_DEBUG": true,
+  "WP_DEBUG": true,
   "WP_ENVIRONMENT_TYPE": "local",
   "WP_HOME": "http://localhost:8889/",
   "WP_PHP_BINARY": "php",
