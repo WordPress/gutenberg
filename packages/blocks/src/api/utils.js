@@ -300,3 +300,27 @@ export function __experimentalGetBlockAttributesNamesByRole( name, role ) {
 			attributes[ attributeName ]?.__experimentalRole === role
 	);
 }
+
+/**
+ * Given block attributes, return only those which do not have the `internal`
+ * role.
+ *
+ * @param {string} name       The block's name
+ * @param {Object} attributes The block's attributes
+ * @return {Object} The attributes, stripped of any internal attributes.
+ */
+export function __experimentalStripInternalBlockAttributes( name, attributes ) {
+	const internalAttributes = __experimentalGetBlockAttributesNamesByRole(
+		name,
+		'internal'
+	);
+
+	if ( ! internalAttributes?.length ) return attributes;
+
+	return Object.keys( attributes ).reduce( ( _accumulator, attribute ) => {
+		if ( ! internalAttributes.includes( attribute ) ) {
+			_accumulator[ attribute ] = attributes[ attribute ];
+		}
+		return _accumulator;
+	}, {} );
+}
