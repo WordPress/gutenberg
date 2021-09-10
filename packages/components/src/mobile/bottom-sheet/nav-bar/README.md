@@ -11,7 +11,7 @@ export default = () => (
 	<BottomSheet>
 		<BottomSheet.NavBar>
 			<BottomSheet.NavBar.BackButton onPress={ () => {} } />
-			<BottomSheet.NavBar.Title>A Sheet Title</BottomSheet.NavBar.Title>
+			<BottomSheet.NavBar.Heading>A Sheet Title</BottomSheet.NavBar.Heading>
 			<BottomSheet.NavBar.ApplyButton onPress={ () => {} } />
 		</BottomSheet.NavBar>
 	</BottomSheet>
@@ -22,7 +22,7 @@ export default = () => (
 
 Provides structural styles for left-center-right layout for header UI.
 
-## BottomSheet.NavBar.Title
+## BottomSheet.NavBar.Heading
 
 Displays a styled title for a bottom sheet.
 
