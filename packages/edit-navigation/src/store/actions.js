@@ -184,14 +184,13 @@ const computeNewMenuItems = ( post, oldMenuItems ) => async ( {
 	const entityIdToBlockId = await dispatch(
 		getEntityRecordIdToBlockIdMapping( post.id )
 	);
-	const blockIdToOldEntityRecord = Object.fromEntries(
-		oldMenuItems
-			.map( ( entityRecord ) => [
-				entityIdToBlockId[ entityRecord.id ],
-				entityRecord,
-			] )
-			.filter( ( [ blockId ] ) => blockId )
-	);
+	const blockIdToOldEntityRecord = {};
+	for ( const oldMenuItem of oldMenuItems ) {
+		const blockId = entityIdToBlockId[ oldMenuItem.id ];
+		if ( blockId ) {
+			blockIdToOldEntityRecord[ blockId ] = oldMenuItem;
+		}
+	}
 
 	const blocksList = blocksTreeToFlatList( post.blocks[ 0 ].innerBlocks );
 	return blocksList.map( ( { block, parentBlockId }, idx ) =>
