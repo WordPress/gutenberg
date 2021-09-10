@@ -113,6 +113,7 @@ export function useClipboardHandler() {
 				return;
 			}
 
+			const eventDefaultPrevented = event.defaultPrevented;
 			event.preventDefault();
 
 			if ( event.type === 'copy' || event.type === 'cut' ) {
@@ -130,12 +131,8 @@ export function useClipboardHandler() {
 			if ( event.type === 'cut' ) {
 				removeBlocks( selectedBlockClientIds );
 			} else if ( event.type === 'paste' ) {
-				if (
-					event.target.classList.contains(
-						'block-editor-rich-text__editable'
-					)
-				) {
-					// If event originated from rich text this was already handled in rich-text/use-paste-handler.js
+				if ( eventDefaultPrevented ) {
+					// This was likely already handled in rich-text/use-paste-handler.js
 					return;
 				}
 				const {
