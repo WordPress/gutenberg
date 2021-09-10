@@ -12,7 +12,7 @@ import {
 	SelectControl,
 } from '@wordpress/components';
 import { decodeEntities } from '@wordpress/html-entities';
-import { createBatch } from '@wordpress/core-data';
+import { apiFetch } from '@wordpress/api-fetch';
 import { useDispatch } from '@wordpress/data';
 import { store as noticesStore } from '@wordpress/notices';
 
@@ -38,23 +38,45 @@ export default function ManageLocations( {
 		noticesStore
 	);
 
-	const updateMenuLocations = async () => {
-		const batch = createBatch();
-		menus.forEach( ( { id } ) => {
+	const validateBatchResponse = ( batchResponse ) => {
+		if ( batchResponse.failed ) {
+			return false;
+		}
+
+		const errorResponses = batchResponse.responses.filter( ( response ) => {
+			return 200 > response.status || 300 <= response.status;
+		} );
+
+		return 1 > errorResponses.length;
+	};
+
+	const handleUpdateMenuLocations = async () => {
+		const method = 'POST';
+		const batchRequests = menus.map( ( { id } ) => {
 			const locations = menuLocations
 				.filter( ( menuLocation ) => menuLocation.menu === id )
 				.map( ( menuLocation ) => menuLocation.name );
 
-			batch.add( {
+			return {
 				path: `/__experimental/menus/${ id }`,
-				data: {
+				body: {
 					locations,
 				},
-				method: 'POST',
-			} );
+				method,
+			};
 		} );
 
-		const isSuccess = await batch.run();
+		const batchResponse = await apiFetch( {
+			path: 'batch/v1',
+			data: {
+				validation: 'require-all-validate',
+				requests: batchRequests,
+			},
+			method,
+		} );
+
+		const isSuccess = validateBatchResponse( batchResponse );
+
 		if ( isSuccess ) {
 			createSuccessNotice( __( 'Menu locations have been updated.' ), {
 				type: 'snackbar',
@@ -65,9 +87,7 @@ export default function ManageLocations( {
 
 		createErrorNotice(
 			__( 'An error occurred while trying to update menu locations.' ),
-			{
-				type: 'snackbar',
-			}
+			{ type: 'snackbar' }
 		);
 	};
 
@@ -198,7 +218,7 @@ export default function ManageLocations( {
 					<Button
 						className="edit-navigation-manage-locations__save-button"
 						variant="primary"
-						onClick={ updateMenuLocations }
+						onClick={ handleUpdateMenuLocations }
 					>
 						{ __( 'Update' ) }
 					</Button>
