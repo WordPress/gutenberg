@@ -26,6 +26,10 @@ import {
 } from '../components/navigation-sidebar/navigation-panel/template-hierarchy';
 
 /**
+ * @typedef {'template'|'template_type'} TemplateType Template type.
+ */
+
+/**
  * Returns whether the given feature is enabled or not.
  *
  * @param {Object} state   Global application state.
@@ -123,7 +127,7 @@ function getPreviousEditedPost( state ) {
  *
  * @param {Object} state Global application state.
  *
- * @return {number?} Template type.
+ * @return {TemplateType?} Template type.
  */
 export function getEditedPostType( state ) {
 	return getCurrentEditedPost( state ).type;
@@ -134,7 +138,7 @@ export function getEditedPostType( state ) {
  *
  * @param {Object} state Global application state.
  *
- * @return {number?} Post ID.
+ * @return {string?} Post ID.
  */
 export function getEditedPostId( state ) {
 	return getCurrentEditedPost( state ).id;
@@ -145,7 +149,7 @@ export function getEditedPostId( state ) {
  *
  * @param {Object} state Global application state.
  *
- * @return {number?} Template type.
+ * @return {TemplateType?} Template type.
  */
 export function getPreviousEditedPostType( state ) {
 	return getPreviousEditedPost( state ).type;
@@ -156,7 +160,7 @@ export function getPreviousEditedPostType( state ) {
  *
  * @param {Object} state Global application state.
  *
- * @return {number?} Post ID.
+ * @return {string?} Post ID.
  */
 export function getPreviousEditedPostId( state ) {
 	return getPreviousEditedPost( state ).id;
