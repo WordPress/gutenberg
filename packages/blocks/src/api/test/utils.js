@@ -19,6 +19,7 @@ import {
 	getBlockLabel,
 	__experimentalSanitizeBlockAttributes,
 	__experimentalGetBlockAttributesNamesByRole,
+	__experimentalStripInternalBlockAttributes,
 } from '../utils';
 
 describe( 'block helpers', () => {
@@ -397,5 +398,83 @@ describe( '__experimentalGetBlockAttributesNamesByRole', () => {
 				'content'
 			)
 		).toEqual( [] );
+	} );
+} );
+
+describe( '__experimentalStripInternalBlockAttributes', () => {
+	beforeAll( () => {
+		registerBlockType( 'core/test-block-with-internal-attrs', {
+			attributes: {
+				align: {
+					type: 'string',
+				},
+				internalData: {
+					type: 'boolean',
+					__experimentalRole: 'internal',
+				},
+				productId: {
+					type: 'number',
+					__experimentalRole: 'internal',
+				},
+				color: {
+					type: 'string',
+					__experimentalRole: 'other',
+				},
+			},
+			save: noop,
+			category: 'text',
+			title: 'test block with internal attrs',
+		} );
+		registerBlockType( 'core/test-block-with-no-internal-attrs', {
+			attributes: {
+				align: { type: 'string' },
+				color: { type: 'string' },
+			},
+			save: noop,
+			category: 'text',
+			title: 'test block with no internal attrs',
+		} );
+		registerBlockType( 'core/test-block-with-no-attrs', {
+			save: noop,
+			category: 'text',
+			title: 'test block with no attrs',
+		} );
+	} );
+	afterAll( () => {
+		[
+			'core/test-block-with-internal-attrs',
+			'core/test-block-with-no-internal-attrs',
+			'core/test-block-with-no-attrs',
+		].forEach( unregisterBlockType );
+	} );
+
+	it( 'should return empty object if no attributes are passed', () => {
+		expect(
+			__experimentalStripInternalBlockAttributes(
+				'core/test-block-with-internal-attrs',
+				{}
+			)
+		).toEqual( {} );
+	} );
+	it( 'should return all attributes when block has no attributes with internal role', () => {
+		expect(
+			__experimentalStripInternalBlockAttributes(
+				'core/test-block-with-no-internal-attrs',
+				{ align: 'left', color: 'blue' }
+			)
+		).toEqual( { align: 'left', color: 'blue' } );
+	} );
+	it( 'should remove attributes with internal role and return all others', () => {
+		expect(
+			__experimentalStripInternalBlockAttributes(
+				'core/test-block-with-internal-attrs',
+				{
+					align: 'left',
+					internalData: true,
+					productId: 12345,
+					color: 'blue',
+				}
+			)
+		).toEqual( { align: 'left', color: 'blue' } );
 	} );
 } );
