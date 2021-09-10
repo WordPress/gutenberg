@@ -11,6 +11,7 @@ import BlockTypesList from '../block-types-list';
 import InserterNoResults from './no-results';
 import { store as blockEditorStore } from '../../store';
 import useBlockTypeImpressions from './hooks/use-block-type-impressions';
+import { filterInserterItems } from './utils';
 
 function InserterSearchResults( {
 	filterValue,
@@ -18,7 +19,6 @@ function InserterSearchResults( {
 	listProps,
 	rootClientId,
 	isFullScreen,
-	allowedBlockFilter = () => true,
 } ) {
 	const { blockTypes } = useSelect(
 		( select ) => {
@@ -26,11 +26,10 @@ function InserterSearchResults( {
 				rootClientId
 			);
 
-			const blockItems = allItems.filter( ( block ) =>
-				allowedBlockFilter( block, { allowReusable: true } )
-			);
-
-			const filteredItems = searchItems( blockItems, filterValue );
+			const availableItems = filterInserterItems( allItems, {
+				allowReusable: true,
+			} );
+			const filteredItems = searchItems( availableItems, filterValue );
 
 			return { blockTypes: filteredItems };
 		},

@@ -22,31 +22,9 @@ import InserterSearchResults from './search-results';
 import { store as blockEditorStore } from '../../store';
 import InserterTabs from './tabs';
 import styles from './style.scss';
+import { filterInserterItems } from './utils';
 
 const MIN_ITEMS_FOR_SEARCH = 2;
-const REUSABLE_BLOCKS_CATEGORY = 'reusable';
-const ALLOWED_EMBED_VARIATIONS = [ 'core/embed' ];
-
-function allowedBlockFilter(
-	block,
-	{ onlyReusable = false, allowReusable = false }
-) {
-	const { id, category } = block;
-	const isReusable = category === REUSABLE_BLOCKS_CATEGORY;
-
-	if ( onlyReusable ) {
-		return isReusable;
-	}
-
-	if ( isReusable ) {
-		return allowReusable;
-	}
-	// We don't want to show all possible embed variations
-	// as different blocks in the inserter. We'll only show a
-	// few popular ones.
-	return category !== 'embed' || ALLOWED_EMBED_VARIATIONS.includes( id );
-}
-
 function InserterMenu( {
 	onSelect,
 	onDismiss,
@@ -91,9 +69,9 @@ function InserterMenu( {
 			}
 
 			const allItems = getInserterItems( targetRootClientId );
-			const reusableBlockItems = allItems.filter(
-				( { category } ) => category === REUSABLE_BLOCKS_CATEGORY
-			);
+			const reusableBlockItems = filterInserterItems( allItems, {
+				onlyReusable: true,
+			} );
 
 			return {
 				items: allItems,
@@ -239,7 +217,6 @@ function InserterMenu( {
 								onSelect={ onSelectItem }
 								listProps={ listProps }
 								isFullScreen={ ! isIOS && showSearchForm }
-								allowedBlockFilter={ allowedBlockFilter }
 							/>
 						) : (
 							<InserterTabs
@@ -248,7 +225,6 @@ function InserterMenu( {
 								tabIndex={ tabIndex }
 								onSelect={ onSelectItem }
 								showReusableBlocks={ showReusableBlocks }
-								allowedBlockFilter={ allowedBlockFilter }
 							/>
 						) }
 					</TouchableHighlight>
