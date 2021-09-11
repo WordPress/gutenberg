@@ -71,16 +71,10 @@ const EmbedPlaceholder = ( {
 		selectedItem.onSelect();
 	}
 
-	function onPickerPresent() {
-		if ( cannotEmbedMenuPickerRef.current ) {
-			cannotEmbedMenuPickerRef.current.presentPicker();
-		}
-	}
-
-	// when the content cannot be embedded the onPress should trigger the Picker instead of the onPress prop.
+	// When the content cannot be embedded the onPress should trigger the Picker instead of the onPress prop.
 	function resolveOnPressEvent() {
 		if ( cannotEmbed ) {
-			onPickerPresent();
+			cannotEmbedMenuPickerRef.current?.presentPicker();
 		} else {
 			onPress();
 		}
