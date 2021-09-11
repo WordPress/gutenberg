@@ -26,21 +26,39 @@ describe( 'Confirm', () => {
 			expect( wrapper ).toMatchSnapshot();
 		} );
 
-		it( 'should not render if closed by clicking OK', async () => {
+		it( 'should not render if closed by clicking `OK`, and callback should be called', async () => {
+			const onConfirm = jest.fn().mockName('onConfirm()');
+
 			const wrapper = render(
-				<Confirm onConfirm={ noop } onCancel={ noop } />
+				<Confirm onConfirm={ onConfirm } />
 			);
 
 			const button = await wrapper.findByText( 'OK' );
 
 			fireEvent.click( button );
 
+			expect(onConfirm).toHaveBeenCalled();
 			expect( wrapper ).toMatchSnapshot();
 		} );
 
-		it( 'should not render if closed by clicking cancel', async () => {
+		it( 'should not render if closed by clicking `Cancel`, and callback should be called', async () => {
+			const onCancel = jest.fn().mockName('onCancel()');
+
 			const wrapper = render(
-				<Confirm onConfirm={ noop } onCancel={ noop } />
+				<Confirm onConfirm={ noop } onCancel={ onCancel } />
+			);
+
+			const button = await wrapper.findByText( 'Cancel' );
+
+			fireEvent.click( button );
+
+			expect( onCancel ).toHaveBeenCalled();
+			expect( wrapper ).toMatchSnapshot();
+		} );
+
+		it('should be dismissable even if an `onCancel` callback is not provided', async () => {
+			const wrapper = render(
+				<Confirm onConfirm={ noop } />
 			);
 
 			const button = await wrapper.findByText( 'Cancel' );
@@ -48,11 +66,22 @@ describe( 'Confirm', () => {
 			fireEvent.click( button );
 
 			expect( wrapper ).toMatchSnapshot();
-		} );
 
-		it( 'should not render if dialog is closed by clicking the overlay', async () => {
+		});
+
+		it('should not render if `isOpen` is set to false', async () => {
 			const wrapper = render(
-				<Confirm onConfirm={ noop } onCancel={ noop } />
+				<Confirm isOpen={ false } />
+			);
+
+			expect( wrapper ).toMatchSnapshot();
+		});
+
+		it( 'should not render if dialog is closed by clicking the overlay, and the `onCancel` callback should be called', async () => {
+			const onCancel = jest.fn().mockName('onCancel()');
+
+			const wrapper = render(
+				<Confirm onConfirm={ noop } onCancel={ onCancel } />
 			);
 
 			const frame = wrapper.baseElement.querySelector(
@@ -64,12 +93,29 @@ describe( 'Confirm', () => {
 
 			await waitForElementToBeRemoved( frame );
 
+			expect( onCancel ).toHaveBeenCalled();
 			expect( wrapper ).toMatchSnapshot();
 		} );
 
-		it( 'should not render if dialog is closed by pressing Escape', async () => {
+		it( 'should not render if dialog is closed by clicking the `x` button, and the `onCancel` callback should be called', async () => {
+			const onCancel = jest.fn().mockName('onCancel()');
+
 			const wrapper = render(
-				<Confirm onConfirm={ noop } onCancel={ noop } />
+				<Confirm onConfirm={ noop } onCancel={ onCancel } />
+			);
+
+			const button = await wrapper.findByLabelText( 'Cancel' );
+
+			fireEvent.click( button );
+
+			expect( wrapper ).toMatchSnapshot();
+		} );
+
+		it( 'should not render if dialog is closed by pressing `Escape`, and the `onCancel` callback should be called', async () => {
+			const onCancel = jest.fn().mockName('onCancel()');
+
+			const wrapper = render(
+				<Confirm onConfirm={ noop } onCancel={ onCancel } />
 			);
 
 			const frame = wrapper.baseElement.querySelector(
@@ -78,17 +124,9 @@ describe( 'Confirm', () => {
 
 			fireEvent.keyDown( frame, { keyCode: 27 } );
 
+			expect( onCancel ).toHaveBeenCalled();
 			expect( wrapper ).toMatchSnapshot();
 		} );
-
-		it.skip( 'should call the confirm callback upon confirming', () => {} );
-		it.skip( 'should call the cancel callback upon confirming', () => {} );
 	} );
-
-	/**
-	 * Confirm provides a `confirm` helper function that provides an interface
-	 * that's closer to the default native `confirm`, returning a boolean and
-	 * that can called outside of the component's render function.
-	 */
-	describe( 'Self-contained rendering using `confirm`', () => {} );
+	// @todo test that <enter> closes and calls onConfirm callback
 } );
