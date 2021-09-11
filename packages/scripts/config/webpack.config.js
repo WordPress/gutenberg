@@ -7,6 +7,7 @@ const MiniCSSExtractPlugin = require( 'mini-css-extract-plugin' );
 const TerserPlugin = require( 'terser-webpack-plugin' );
 const { CleanWebpackPlugin } = require( 'clean-webpack-plugin' );
 const browserslist = require( 'browserslist' );
+const fs = require( 'fs' );
 const path = require( 'path' );
 
 /**
@@ -30,6 +31,23 @@ const mode = isProduction ? 'production' : 'development';
 let target = 'browserslist';
 if ( ! browserslist.findConfig( '.' ) ) {
 	target += ':' + fromConfigRoot( '.browserslistrc' );
+}
+let entry = {};
+if ( process.env.WP_ENTRY ) {
+	entry = JSON.parse( process.env.WP_ENTRY );
+} else {
+	// By default the script checks if `src/index.js` exists and sets it as an entry point.
+	// In the future we should add similar handling for `src/script.js` and `src/view.js`.
+	[ 'index' ].forEach( ( entryName ) => {
+		const filepath = path.resolve(
+			process.cwd(),
+			'src',
+			`${ entryName }.js`
+		);
+		if ( fs.existsSync( filepath ) ) {
+			entry[ entryName ] = filepath;
+		}
+	} );
 }
 
 const cssLoaders = [
@@ -88,9 +106,7 @@ const getLiveReloadPort = ( inputPort ) => {
 const config = {
 	mode,
 	target,
-	entry: {
-		index: path.resolve( process.cwd(), 'src', 'index.js' ),
-	},
+	entry,
 	output: {
 		filename: '[name].js',
 		path: path.resolve( process.cwd(), 'build' ),
