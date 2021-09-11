@@ -84,7 +84,11 @@ const EmbedPlaceholder = ( {
 		<>
 			<TouchableWithoutFeedback
 				accessibilityRole={ 'button' }
-				accessibilityHint={ __( 'Double tap to add a link.' ) }
+				accessibilityHint={
+					cannotEmbed
+						? __( 'Double tap to view embed options.' )
+						: __( 'Double tap to add a link.' )
+				}
 				onPress={ resolveOnPressEvent }
 				disabled={ ! isSelected }
 			>
