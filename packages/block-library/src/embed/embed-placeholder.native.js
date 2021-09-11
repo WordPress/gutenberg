@@ -125,6 +125,7 @@ const EmbedPlaceholder = ( {
 								options={ options }
 								onChange={ onPickerSelect }
 								hideCancelButton
+								leftAlign
 							/>
 						</>
 					) : (
