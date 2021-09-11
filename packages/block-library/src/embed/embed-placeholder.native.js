@@ -51,17 +51,13 @@ const EmbedPlaceholder = ( {
 			id: 'retryOption',
 			label: __( 'Retry' ),
 			value: 'retryOption',
-			onSelect: () => {
-				tryAgain();
-			},
+			onSelect: tryAgain,
 		},
 		convertToLink: {
 			id: 'convertToLinkOption',
 			label: __( 'Convert to link' ),
 			value: 'convertToLinkOption',
-			onSelect: () => {
-				fallback();
-			},
+			onSelect: fallback,
 		},
 	};
 
