@@ -118,9 +118,7 @@ const EmbedPlaceholder = ( {
 								{ __( 'More options' ) }
 							</Text>
 							<Picker
-								title={ __(
-									'Sorry, this content could not be embedded.'
-								) }
+								title={ __( 'Embed options' ) }
 								ref={ cannotEmbedMenuPickerRef }
 								options={ options }
 								onChange={ onPickerSelect }
