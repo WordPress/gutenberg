@@ -151,14 +151,18 @@ function Navigation( {
 		},
 		{
 			allowedBlocks: ALLOWED_BLOCKS,
-			orientation: attributes.orientation || 'horizontal',
+			orientation: attributes.orientation,
 			renderAppender:
 				( isImmediateParentOfSelectedBlock &&
 					! selectedBlockHasDescendants ) ||
 				isSelected
 					? InnerBlocks.DefaultAppender
 					: false,
-			__experimentalCaptureToolbars: true,
+			// Ensure block toolbar is not too far removed from item
+			// being edited when in vertical mode.
+			// see: https://github.com/WordPress/gutenberg/pull/34615.
+			__experimentalCaptureToolbars:
+				attributes.orientation !== 'vertical',
 			// Template lock set to false here so that the Nav
 			// Block on the experimental menus screen does not
 			// inherit templateLock={ 'all' }.

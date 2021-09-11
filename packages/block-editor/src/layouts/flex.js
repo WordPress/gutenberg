@@ -1,11 +1,14 @@
 /**
  * WordPress dependencies
  */
-import { __, _x } from '@wordpress/i18n';
+import { __ } from '@wordpress/i18n';
 import {
-	__experimentalToggleGroupControl as ToggleGroupControl,
-	__experimentalToggleGroupControlOption as ToggleGroupControlOption,
-} from '@wordpress/components';
+	justifyLeft,
+	justifyCenter,
+	justifyRight,
+	justifySpaceBetween,
+} from '@wordpress/icons';
+import { Button } from '@wordpress/components';
 
 /**
  * Internal dependencies
@@ -44,7 +47,7 @@ export default {
 			return null;
 		}
 		return (
-			<BlockControls group="block" __experimentalExposeToChildren>
+			<BlockControls group="block" __experimentalShareWithChildBlocks>
 				<FlexLayoutJustifyContentControl
 					layout={ layout }
 					onChange={ onChange }
@@ -87,12 +90,40 @@ export default {
 	},
 };
 
+const justificationOptions = [
+	{
+		value: 'left',
+		icon: justifyLeft,
+		label: __( 'Justify items left' ),
+	},
+	{
+		value: 'center',
+		icon: justifyCenter,
+		label: __( 'Justify items center' ),
+	},
+	{
+		value: 'right',
+		icon: justifyRight,
+		label: __( 'Justify items right' ),
+	},
+	{
+		value: 'space-between',
+		icon: justifySpaceBetween,
+		label: __( 'Space between items' ),
+	},
+];
 function FlexLayoutJustifyContentControl( {
 	layout,
 	onChange,
 	isToolbar = false,
 } ) {
 	const { justifyContent = 'left' } = layout;
+	const onJustificationChange = ( value ) => {
+		onChange( {
+			...layout,
+			justifyContent: value,
+		} );
+	};
 	if ( isToolbar ) {
 		return (
 			<JustifyContentControl
@@ -103,12 +134,7 @@ function FlexLayoutJustifyContentControl( {
 					'space-between',
 				] }
 				value={ justifyContent }
-				onChange={ ( value ) => {
-					onChange( {
-						...layout,
-						justifyContent: value,
-					} );
-				} }
+				onChange={ onJustificationChange }
 				popoverProps={ {
 					position: 'bottom right',
 					isAlternate: true,
@@ -116,34 +142,23 @@ function FlexLayoutJustifyContentControl( {
 			/>
 		);
 	}
+
 	return (
-		<ToggleGroupControl
-			label={ __( 'Justify content' ) }
-			value={ justifyContent }
-			onChange={ ( value ) => {
-				onChange( {
-					...layout,
-					justifyContent: value,
-				} );
-			} }
-			isBlock
-		>
-			<ToggleGroupControlOption
-				value="left"
-				label={ _x( 'Left', 'Justify content option' ) }
-			/>
-			<ToggleGroupControlOption
-				value="center"
-				label={ _x( 'Center', 'Justify content option' ) }
-			/>
-			<ToggleGroupControlOption
-				value="right"
-				label={ _x( 'Right', 'Justify content option' ) }
-			/>
-			<ToggleGroupControlOption
-				value="space-between"
-				label={ _x( 'Space between', 'Justify content option' ) }
-			/>
-		</ToggleGroupControl>
+		<fieldset className="block-editor-hooks__flex-layout-justification-controls">
+			<legend>{ __( 'Justification' ) }</legend>
+			<div>
+				{ justificationOptions.map( ( { value, icon, label } ) => {
+					return (
+						<Button
+							key={ value }
+							label={ label }
+							icon={ icon }
+							isPressed={ justifyContent === value }
+							onClick={ () => onJustificationChange( value ) }
+						/>
+					);
+				} ) }
+			</div>
+		</fieldset>
 	);
 }

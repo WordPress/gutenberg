@@ -549,7 +549,7 @@ A block may want to disable the ability of being converted into a reusable block
 ```js
 supports: {
 	// Don't allow the block to be converted into a reusable block.
-	reusable: false;
+	reusable: false,
 }
 ```
 
