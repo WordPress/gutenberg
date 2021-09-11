@@ -221,22 +221,30 @@ const EmbedEdit = ( props ) => {
 	return (
 		<>
 			{ showEmbedPlaceholder ? (
-				<View { ...blockProps }>
-					<EmbedPlaceholder
-						icon={ icon }
-						isSelected={ isSelected }
-						label={ title }
-						onPress={ ( event ) => {
-							onFocus( event );
-							setIsEditingURL( true );
-						} }
-						cannotEmbed={ cannotEmbed }
-						fallback={ () => fallback( url, onReplace ) }
-						tryAgain={ () => {
-							invalidateResolution( 'getEmbedPreview', [ url ] );
-						} }
+				<>
+					<EmbedControls
+						showEditButton={ cannotEmbed }
+						switchBackToURLInput={ () => setIsEditingURL( true ) }
 					/>
-				</View>
+					<View { ...blockProps }>
+						<EmbedPlaceholder
+							icon={ icon }
+							isSelected={ isSelected }
+							label={ title }
+							onPress={ ( event ) => {
+								onFocus( event );
+								setIsEditingURL( true );
+							} }
+							cannotEmbed={ cannotEmbed }
+							fallback={ () => fallback( url, onReplace ) }
+							tryAgain={ () => {
+								invalidateResolution( 'getEmbedPreview', [
+									url,
+								] );
+							} }
+						/>
+					</View>
+				</>
 			) : (
 				<>
 					<EmbedControls
