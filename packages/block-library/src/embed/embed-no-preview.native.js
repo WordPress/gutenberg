@@ -23,7 +23,13 @@ import { BlockIcon } from '@wordpress/block-editor';
  */
 import styles from './styles.scss';
 
-const EmbedNoPreview = ( { label, icon, isSelected, onPress } ) => {
+const EmbedNoPreview = ( {
+	label,
+	icon,
+	isSelected,
+	onPress,
+	isDefaultEmbedInfo,
+} ) => {
 	const shouldRequestReview = useRef( false );
 	const [ isSheetVisible, setIsSheetVisible ] = useState( false );
 
@@ -166,11 +172,15 @@ const EmbedNoPreview = ( { label, icon, isSelected, onPress } ) => {
 						/>
 					</View>
 					<Text style={ sheetTitleStyle }>
-						{ sprintf(
-							// translators: %s: embed block variant's label e.g: "Twitter".
-							__( '%s embed block previews are coming soon' ),
-							label
-						) }
+						{ isDefaultEmbedInfo
+							? __( 'Embed block previews are coming soon' )
+							: sprintf(
+									// translators: %s: embed block variant's label e.g: "Twitter".
+									__(
+										'%s embed block previews are coming soon'
+									),
+									label
+							  ) }
 					</Text>
 					<Text style={ sheetDescriptionStyle }>
 						{ comingSoonDescription }
