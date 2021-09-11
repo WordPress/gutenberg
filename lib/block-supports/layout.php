@@ -29,7 +29,7 @@ function gutenberg_register_layout_support( $block_type ) {
  * Generates the CSS corresponding to the provided layout.
  *
  * @param string  $selector CSS selector.
- * @param array   $layout   Layout object.
+ * @param array   $layout   Layout object. The one that is passed has already checked the existance of default block layout.
  * @param boolean $has_block_gap_support Whether the theme has support for the block gap.
  *
  * @return string CSS style.
@@ -68,6 +68,13 @@ function gutenberg_get_layout_style( $selector, $layout, $has_block_gap_support 
 			$style .= "$selector > * + * { margin-top: var( --wp--style--block-gap ); margin-bottom: 0; }";
 		}
 	} elseif ( 'flex' === $layout_type ) {
+		$justify_content_options = array(
+			'left'          => 'flex-start',
+			'right'         => 'flex-end',
+			'center'        => 'center',
+			'space-between' => 'space-between',
+		);
+
 		$style  = "$selector {";
 		$style .= 'display: flex;';
 		if ( $has_block_gap_support ) {
@@ -77,6 +84,14 @@ function gutenberg_get_layout_style( $selector, $layout, $has_block_gap_support 
 		}
 		$style .= 'flex-wrap: wrap;';
 		$style .= 'align-items: center;';
+		/**
+		 * Add this style only if is not empty for backwards compatibility,
+		 * since we intend to convert blocks that had flex layout implemented
+		 * by custom css.
+		 */
+		if ( ! empty( $layout['justifyContent'] ) && array_key_exists( $layout['justifyContent'], $justify_content_options ) ) {
+			$style .= "justify-content: {$justify_content_options[ $layout['justifyContent'] ]};";
+		}
 		$style .= '}';
 
 		$style .= "$selector > * { margin: 0; }";
@@ -160,11 +175,11 @@ add_filter( 'render_block', 'gutenberg_render_layout_support_flag', 10, 2 );
  */
 function gutenberg_restore_group_inner_container( $block_content, $block ) {
 	$group_with_inner_container_regex = '/(^\s*<div\b[^>]*wp-block-group(\s|")[^>]*>)(\s*<div\b[^>]*wp-block-group__inner-container(\s|")[^>]*>)((.|\S|\s)*)/';
-
 	if (
 		'core/group' !== $block['blockName'] ||
 		WP_Theme_JSON_Resolver_Gutenberg::theme_has_support() ||
-		1 === preg_match( $group_with_inner_container_regex, $block_content )
+		1 === preg_match( $group_with_inner_container_regex, $block_content ) ||
+		( isset( $block['attrs']['layout']['type'] ) && 'default' !== $block['attrs']['layout']['type'] )
 	) {
 		return $block_content;
 	}
@@ -180,7 +195,8 @@ function gutenberg_restore_group_inner_container( $block_content, $block ) {
 	return $updated_content;
 }
 
-// This can be removed when plugin support requires WordPress 5.8.0+.
-if ( ! function_exists( 'wp_restore_group_inner_container' ) ) {
-	add_filter( 'render_block', 'gutenberg_restore_group_inner_container', 10, 2 );
+if ( function_exists( 'wp_restore_group_inner_container' ) ) {
+	remove_filter( 'render_block', 'wp_restore_group_inner_container', 10, 2 );
 }
+add_filter( 'render_block', 'gutenberg_restore_group_inner_container', 10, 2 );
+

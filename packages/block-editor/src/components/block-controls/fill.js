@@ -21,9 +21,12 @@ export default function BlockControlsFill( {
 	group = 'default',
 	controls,
 	children,
-	__experimentalExposeToChildren = false,
+	__experimentalShareWithChildBlocks = false,
 } ) {
-	const Fill = useBlockControlsFill( group, __experimentalExposeToChildren );
+	const Fill = useBlockControlsFill(
+		group,
+		__experimentalShareWithChildBlocks
+	);
 	if ( ! Fill ) {
 		return null;
 	}

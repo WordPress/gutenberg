@@ -17,10 +17,11 @@ import { appendSelectors } from './utils';
 
 export default {
 	name: 'default',
-
 	label: __( 'Flow' ),
-
-	edit: function LayoutDefaultEdit( { layout, onChange } ) {
+	inspectorControls: function DefaultLayoutInspectorControls( {
+		layout,
+		onChange,
+	} ) {
 		const { wideSize, contentSize } = layout;
 		const units = useCustomUnits( {
 			availableUnits: useSetting( 'spacing.units' ) || [
@@ -101,7 +102,9 @@ export default {
 			</>
 		);
 	},
-
+	toolBarControls: function DefaultLayoutToolbarControls() {
+		return null;
+	},
 	save: function DefaultLayoutStyle( { selector, layout = {} } ) {
 		const { contentSize, wideSize } = layout;
 		const blockGapSupport = useSetting( 'spacing.blockGap' );
@@ -115,11 +118,11 @@ export default {
 						margin-left: auto !important;
 						margin-right: auto !important;
 					}
-	
+
 					${ appendSelectors( selector, '> [data-align="wide"]' ) }  {
 						max-width: ${ wideSize ?? contentSize };
 					}
-	
+
 					${ appendSelectors( selector, '> [data-align="full"]' ) } {
 						max-width: none;
 					}
@@ -131,7 +134,7 @@ export default {
 				float: left;
 				margin-right: 2em;
 			}
-	
+
 			${ appendSelectors( selector, '> [data-align="right"]' ) } {
 				float: right;
 				margin-left: 2em;
@@ -150,18 +153,24 @@ export default {
 
 		return <style>{ style }</style>;
 	},
-
 	getOrientation() {
 		return 'vertical';
 	},
-
 	getAlignments( layout ) {
 		if ( layout.alignments !== undefined ) {
 			return layout.alignments;
 		}
 
-		return layout.contentSize || layout.wideSize
-			? [ 'wide', 'full', 'left', 'center', 'right' ]
-			: [ 'left', 'center', 'right' ];
+		const alignments = [ 'left', 'center', 'right' ];
+
+		if ( layout.contentSize ) {
+			alignments.unshift( 'full' );
+		}
+
+		if ( layout.wideSize ) {
+			alignments.unshift( 'wide' );
+		}
+
+		return alignments;
 	},
 };
