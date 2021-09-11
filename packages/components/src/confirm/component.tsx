@@ -4,7 +4,7 @@
 // eslint-disable-next-line no-restricted-imports
 import { useEffect, useState } from 'react';
 // eslint-disable-next-line no-restricted-imports
-import type { Ref, MouseEvent } from 'react';
+import type { Ref, SyntheticEvent, KeyboardEvent } from 'react';
 
 /**
  * WordPress dependencies
@@ -47,12 +47,19 @@ function Confirm(
 		setIsOpen( isOpen );
 	}, [ isOpen ] );
 
-	const handleEvent = (
-		callback: ( event: MouseEvent< HTMLButtonElement > ) => void
-	) => ( event: MouseEvent< HTMLButtonElement > ) => {
+	// @todo improve type, should handle keyboard and mousevent
+	const handleEvent = ( callback: ( event: SyntheticEvent ) => void ) => (
+		event: SyntheticEvent
+	) => {
 		callback( event );
 		if ( selfClose ) {
 			setIsOpen( false );
+		}
+	};
+
+	const handleEnter = ( event: KeyboardEvent< HTMLDivElement > ) => {
+		if ( event.key === 'Enter' ) {
+			handleEvent( onConfirm )( event );
 		}
 	};
 
@@ -63,7 +70,7 @@ function Confirm(
 					title={ message }
 					overlayClassName={ wrapperClassName }
 					onRequestClose={ handleEvent( onCancel ) }
-					onKeyDown={ handleEvent( onCancel ) }
+					onKeyDown={ handleEnter }
 					closeButtonLabel={ __( 'Cancel' ) }
 					isDismissible={ true }
 					forwardedRef={ forwardedRef }
