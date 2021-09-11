@@ -36,6 +36,7 @@ const EmbedPreview = ( {
 	previewable,
 	type,
 	url,
+	isDefaultEmbedInfo,
 } ) => {
 	const [ isCaptionSelected, setIsCaptionSelected ] = useState( false );
 
@@ -130,6 +131,7 @@ const EmbedPreview = ( {
 						icon={ icon }
 						isSelected={ isSelected }
 						onPress={ () => setIsCaptionSelected( false ) }
+						isDefaultEmbedInfo={ isDefaultEmbedInfo }
 					/>
 				) }
 				<BlockCaption

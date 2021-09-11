@@ -255,6 +255,9 @@ const EmbedEdit = ( props ) => {
 							previewable={ previewable && isProviderPreviewable }
 							type={ type }
 							url={ url }
+							isDefaultEmbedInfo={
+								! getEmbedInfoByProvider( providerNameSlug )
+							}
 						/>
 					</View>
 				</>
