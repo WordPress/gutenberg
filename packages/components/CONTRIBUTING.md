@@ -35,12 +35,64 @@ function LinkButton( { href, children } ) {
 	return <Button variant="primary" as="a" href={href}>{ children }</Button>;
 }
 ```
+-->
 
-### Composition patterns
+#### Compound components
 
-TBD — E.g. Using `children` vs custom render props vs arbitrary "data" props
+When creating components that render a list of subcomponents, prefer to expose the API using the [Compound Components](https://kentcdodds.com/blog/compound-components-with-react-hooks) technique over array props like `items` or `options`:
 
-### (Semi-)Controlled components
+```jsx
+// ❌ Don't:
+<List
+	items={ [
+		{ value: 'Item 1' },
+		{ value: 'Item 2' },
+		{ value: 'Item 3' },
+	] }
+/>
+```
+```jsx
+// ✅ Do:
+<List>
+	<ListItem value="Item 1" />
+	<ListItem value="Item 2" />
+	<ListItem value="Item 3" />
+</List>
+```
+
+When implementing this pattern, avoid using `React.Children.map` and `React.cloneElement` to map through the children and augment them. Instead, use React Context to provide state to subcomponents and connect them:
+
+```jsx
+// ❌ Don't:
+function List ( props ) {
+	const [ state, setState ] = useState();
+	return (
+		<div { ...props }>
+			{ Children.map( props.children, ( child ) => cloneElement( child, { state } ) ) ) }
+		</div>
+	);
+}
+```
+```jsx
+// ✅ Do:
+const ListContext = createContext();
+
+function List( props ) {
+	const [ state, setState ] = useState();
+	return (
+		<ListContext.Provider value={ state }>
+			<div { ...props } />
+		</ListContext.Provider>
+	);
+}
+
+function ListItem( props ) {
+	const state = useContext( ListContext );
+	...
+}
+```
+
+<!-- ### (Semi-)Controlled components
 
 TBD
 
