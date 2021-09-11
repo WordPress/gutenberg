@@ -740,8 +740,13 @@ class REST_Nav_Menu_Items_Controller_Test extends WP_Test_REST_Post_Type_Control
 			$this->assertTrue( isset( $data[ $taxonomy->rest_base ] ) );
 			$terms = wp_get_object_terms( $post->ID, $taxonomy->name, array( 'fields' => 'ids' ) );
 			sort( $terms );
-			sort( $data[ $taxonomy->rest_base ] );
-			$this->assertEquals( $terms, $data[ $taxonomy->rest_base ] );
+			if ( 'nav_menu' === $taxonomy->name ) {
+				$term_id = $terms ? array_shift( $terms ) : 0;
+				$this->assertEquals( $term_id, $data[ $taxonomy->rest_base ] );
+			} else {
+				sort( $data[ $taxonomy->rest_base ] );
+				$this->assertEquals( $terms, $data[ $taxonomy->rest_base ] );
+			}
 		}
 
 		// test links.
@@ -818,7 +823,7 @@ class REST_Nav_Menu_Items_Controller_Test extends WP_Test_REST_Post_Type_Control
 		$defaults = array(
 			'object_id'   => 0,
 			'parent'      => 0,
-			'menu_order'  => 0,
+			'menu_order'  => 1,
 			'menus'       => $this->menu_id,
 			'type'        => 'custom',
 			'title'       => 'Custom Link Title',

@@ -410,7 +410,7 @@ class WP_REST_Menu_Items_Controller extends WP_REST_Posts_Controller {
 				'menu-item-object-id'   => 0,
 				'menu-item-object'      => '',
 				'menu-item-parent-id'   => 0,
-				'menu-item-position'    => 0,
+				'menu-item-position'    => 1,
 				'menu-item-type'        => 'custom',
 				'menu-item-title'       => '',
 				'menu-item-url'         => '',
@@ -522,11 +522,6 @@ class WP_REST_Menu_Items_Controller extends WP_REST_Posts_Controller {
 			if ( empty( $prepared_nav_item['menu-item-content'] ) ) {
 				return new WP_Error( 'rest_content_required', __( 'Content required if menu item of type block.', 'gutenberg' ), array( 'status' => 400 ) );
 			}
-		}
-
-		// Check if nav menu is valid.
-		if ( ! empty( $prepared_nav_item['menu-id'] ) && ! is_nav_menu( $prepared_nav_item['menu-id'] ) ) {
-			return new WP_Error( 'invalid_menu_id', __( 'Invalid menu ID.', 'gutenberg' ), array( 'status' => 400 ) );
 		}
 
 		foreach ( array( 'menu-item-object-id', 'menu-item-parent-id' ) as $key ) {
@@ -707,8 +702,13 @@ class WP_REST_Menu_Items_Controller extends WP_REST_Posts_Controller {
 			$base = ! empty( $taxonomy->rest_base ) ? $taxonomy->rest_base : $taxonomy->name;
 
 			if ( in_array( $base, $fields, true ) ) {
-				$terms         = get_the_terms( $post, $taxonomy->name );
-				$data[ $base ] = $terms ? array_values( wp_list_pluck( $terms, 'term_id' ) ) : array();
+				$terms    = get_the_terms( $post, $taxonomy->name );
+				$term_ids = $terms ? array_values( wp_list_pluck( $terms, 'term_id' ) ) : array();
+				if ( 'nav_menu' === $taxonomy->name ) {
+					$data[ $base ] = $term_ids ? array_shift( $term_ids ) : 0;
+				} else {
+					$data[ $base ] = $term_ids;
+				}
 			}
 		}
 
@@ -919,10 +919,11 @@ class WP_REST_Menu_Items_Controller extends WP_REST_Posts_Controller {
 			'description' => __( 'The DB ID of the nav_menu_item that is this item\'s menu parent, if any, otherwise 0.', 'gutenberg' ),
 			'context'     => array( 'view', 'edit', 'embed' ),
 			'type'        => 'integer',
-			'minimum'     => 0,
-			'default'     => 0,
+			'minimum'     => 1,
+			'default'     => 1,
 		);
-		$schema['properties']['object']     = array(
+
+		$schema['properties']['object'] = array(
 			'description' => __( 'The type of object originally represented, such as "category," "post", or "attachment."', 'gutenberg' ),
 			'context'     => array( 'view', 'edit', 'embed' ),
 			'type'        => 'string',
