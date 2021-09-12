@@ -16,7 +16,6 @@ import {
 	InnerBlocks,
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
-import { useCallback } from '@wordpress/element';
 import { alignmentHelpers } from '@wordpress/components';
 
 /**
@@ -39,23 +38,20 @@ function GroupEdit( {
 	const [ resizeObserver, sizes ] = useResizeObserver();
 	const { width } = sizes || { width: 0 };
 
-	const renderAppender = useCallback(
-		() => (
-			<View
-				style={ [
-					! hasInnerBlocks && styles.groupAppender,
-					isFullWidth( align ) &&
-						! hasInnerBlocks &&
-						styles.fullwidthGroupAppender,
-					isFullWidth( align ) &&
-						hasInnerBlocks &&
-						styles.fullwidthHasInnerGroupAppender,
-				] }
-			>
-				<InnerBlocks.ButtonBlockAppender />
-			</View>
-		),
-		[ align, hasInnerBlocks ]
+	const appender = (
+		<View
+			style={ [
+				! hasInnerBlocks && styles.groupAppender,
+				isFullWidth( align ) &&
+					! hasInnerBlocks &&
+					styles.fullwidthGroupAppender,
+				isFullWidth( align ) &&
+					hasInnerBlocks &&
+					styles.fullwidthHasInnerGroupAppender,
+			] }
+		>
+			<InnerBlocks.ButtonBlockAppender />
+		</View>
 	);
 
 	if ( ! isSelected && ! hasInnerBlocks ) {
@@ -91,7 +87,7 @@ function GroupEdit( {
 		>
 			{ resizeObserver }
 			<InnerBlocks
-				renderAppender={ isSelected && renderAppender }
+				appender={ isSelected && appender }
 				parentWidth={ width }
 				blockWidth={ blockWidth }
 			/>

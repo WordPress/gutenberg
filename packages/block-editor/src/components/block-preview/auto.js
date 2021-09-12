@@ -65,7 +65,7 @@ function AutoBlockPreview( { viewportWidth, __experimentalPadding } ) {
 					} }
 				>
 					{ contentResizeListener }
-					<MemoizedBlockList renderAppender={ false } />
+					<MemoizedBlockList appender={ null } />
 				</Iframe>
 			</Disabled>
 		</div>

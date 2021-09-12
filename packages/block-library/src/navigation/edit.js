@@ -14,7 +14,6 @@ import {
 	Platform,
 } from '@wordpress/element';
 import {
-	InnerBlocks,
 	__experimentalUseInnerBlocksProps as useInnerBlocksProps,
 	InspectorControls,
 	JustifyToolbar,
@@ -152,12 +151,11 @@ function Navigation( {
 		{
 			allowedBlocks: ALLOWED_BLOCKS,
 			orientation: attributes.orientation,
-			renderAppender:
-				( isImmediateParentOfSelectedBlock &&
+			appender:
+				( ( isImmediateParentOfSelectedBlock &&
 					! selectedBlockHasDescendants ) ||
-				isSelected
-					? InnerBlocks.DefaultAppender
-					: false,
+					isSelected ) &&
+				undefined,
 			// Ensure block toolbar is not too far removed from item
 			// being edited when in vertical mode.
 			// see: https://github.com/WordPress/gutenberg/pull/34615.

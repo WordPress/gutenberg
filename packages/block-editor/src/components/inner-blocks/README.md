@@ -131,36 +131,36 @@ If locking is not set in an `InnerBlocks` area: the locking of the parent `Inner
 
 If the block is a top level block: the locking of the Custom Post Type is used.
 
-### `renderAppender`
+### `appender`
 
--   **Type:** `Component|false`
--   **Default:** - `undefined`. When `renderAppender` is not specified, the default appender is shown. If a `false` value is provided, no appender is rendered.
+-   **Type:** `Object|null|false`
+-   **Default:** - `undefined`. When `appender` is not specified, the default appender is shown. If `null` or `false` value is provided, no appender is rendered.
 
-A component to show as the trailing appender for the inner blocks list.
+A react element to show as the trailing appender for the inner blocks list.
 
 #### Notes
 
 -   For convenience two predefined appender components are exposed on `InnerBlocks` which can be used for the prop:
-    -   `InnerBlocks.ButtonBlockAppender` - display a `+` (plus) icon button as the appender.
-    -   `InnerBlocks.DefaultBlockAppender` - display the default block appender, typically the paragraph style appender when the paragraph block is allowed.
--   Consumers are also free to pass any valid component. This provides the full flexibility to define a bespoke block appender.
+    -   `<InnerBlocks.ButtonBlockAppender />` - display a `+` (plus) icon button as the appender.
+    -   `<InnerBlocks.DefaultBlockAppender />` - display the default block appender, typically the paragraph style appender when the paragraph block is allowed.
+-   Consumers are also free to pass any valid react element. This provides the full flexibility to define a bespoke block appender.
 
 #### Example usage
 
 ```jsx
 // Utilise a predefined component
 <InnerBlocks
-	renderAppender={ InnerBlocks.ButtonBlockAppender }
+	appender={ <InnerBlocks.ButtonBlockAppender /> }
 />
 
 // Don't display an appender
 <InnerBlocks
-	renderAppender={ false }
+	appender={ null }
 />
 
 // Fully custom
 <InnerBlocks
-	renderAppender={ MyAmazingAppender }
+	appender={ <MyAmazingAppender /> }
 />
 ```
 

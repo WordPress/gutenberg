@@ -60,6 +60,7 @@ export class BlockList extends Component {
 			parentWidth: this.props.parentWidth,
 			renderFooterAppender: this.props.renderFooterAppender,
 			renderAppender: this.props.renderAppender,
+			appender: this.props.appender,
 			onDeleteBlock: this.props.onDeleteBlock,
 			contentStyle: this.props.contentStyle,
 		};
@@ -108,8 +109,8 @@ export class BlockList extends Component {
 	}
 
 	shouldShowInnerBlockAppender() {
-		const { blockClientIds, renderAppender } = this.props;
-		return renderAppender && blockClientIds.length > 0;
+		const { blockClientIds, renderAppender, appender } = this.props;
+		return ( renderAppender || appender ) && blockClientIds.length > 0;
 	}
 
 	renderEmptyList() {
@@ -117,6 +118,7 @@ export class BlockList extends Component {
 			<EmptyListComponentCompose
 				rootClientId={ this.props.rootClientId }
 				renderAppender={ this.props.renderAppender }
+				appender={ this.props.appender }
 				renderFooterAppender={ this.props.renderFooterAppender }
 			/>
 		);
@@ -129,6 +131,7 @@ export class BlockList extends Component {
 			onDeleteBlock,
 			contentStyle,
 			renderAppender,
+			appender,
 			gridProperties,
 		} = this.props;
 		const { blockWidth } = this.state;
@@ -138,6 +141,7 @@ export class BlockList extends Component {
 			this.extraData.onDeleteBlock !== onDeleteBlock ||
 			this.extraData.contentStyle !== contentStyle ||
 			this.extraData.renderAppender !== renderAppender ||
+			this.extraData.appender !== appender ||
 			this.extraData.blockWidth !== blockWidth ||
 			this.extraData.gridProperties !== gridProperties
 		) {
@@ -147,6 +151,7 @@ export class BlockList extends Component {
 				onDeleteBlock,
 				contentStyle,
 				renderAppender,
+				appender,
 				blockWidth,
 				gridProperties,
 			};
@@ -298,6 +303,7 @@ export class BlockList extends Component {
 						<BlockListAppender
 							rootClientId={ this.props.rootClientId }
 							renderAppender={ this.props.renderAppender }
+							appender={ this.props.appender }
 							showSeparator
 						/>
 					</View>
@@ -434,6 +440,7 @@ class EmptyListComponent extends Component {
 			shouldShowInsertionPoint,
 			rootClientId,
 			renderAppender,
+			appender,
 			renderFooterAppender,
 		} = this.props;
 
@@ -445,7 +452,7 @@ class EmptyListComponent extends Component {
 			<View style={ styles.defaultAppender }>
 				<ReadableContentView
 					align={
-						renderAppender
+						renderAppender || appender
 							? WIDE_ALIGNMENTS.alignments.full
 							: undefined
 					}
@@ -453,6 +460,7 @@ class EmptyListComponent extends Component {
 					<BlockListAppender
 						rootClientId={ rootClientId }
 						renderAppender={ renderAppender }
+						appender={ appender }
 						showSeparator={ shouldShowInsertionPoint }
 					/>
 				</ReadableContentView>

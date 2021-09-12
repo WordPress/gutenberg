@@ -79,6 +79,7 @@ function UncontrolledInnerBlocks( props ) {
 		templateInsertUpdatesSelection,
 		orientation,
 		renderAppender,
+		appender,
 		renderFooterAppender,
 		parentWidth,
 		horizontal,
@@ -115,6 +116,7 @@ function UncontrolledInnerBlocks( props ) {
 			marginHorizontal={ marginHorizontal }
 			rootClientId={ clientId }
 			renderAppender={ renderAppender }
+			appender={ appender }
 			renderFooterAppender={ renderFooterAppender }
 			withFooter={ false }
 			orientation={ orientation }

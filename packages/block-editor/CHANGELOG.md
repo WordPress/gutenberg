@@ -13,6 +13,7 @@
 ### New Features
 
 -   `ButtonBlockerAppender` is now `ButtonBlockAppender`, the original name was a typo, but is still being exported for backward compatibility.
+-   `renderAppender` prop in `BlockListAppender` component has been deprecated in favor of `appender` prop.
 
 ## 6.1.0 (2021-05-20)
 
