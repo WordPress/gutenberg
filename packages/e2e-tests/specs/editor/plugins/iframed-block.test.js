@@ -44,10 +44,12 @@ describe( 'changing image size', () => {
 		await clickButton( 'Create' );
 		await page.waitForSelector( 'iframe[name="editor-canvas"]' );
 
-		const iframedText = await canvas().evaluate( () => {
-			return document.querySelector( '.wp-block-test-iframed-block' )
-				.innerText;
-		} );
+		const iframeElement = await canvas().waitForSelector(
+			'.wp-block-test-iframed-block'
+		);
+		const iframedText = await iframeElement.evaluate(
+			( el ) => el.textContent
+		);
 
 		// Expect the script to load in the iframe, which replaces the block
 		// text.
