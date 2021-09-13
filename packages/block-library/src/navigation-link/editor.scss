@@ -32,6 +32,9 @@
 			// We use important here because if the parent block is selected and submenus are present, they should always be visible.
 			visibility: visible !important;
 			opacity: 1 !important;
+			min-width: 200px !important;
+			height: auto !important;
+			width: auto !important;
 		}
 	}
 }

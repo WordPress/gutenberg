@@ -165,6 +165,10 @@ export default function FontAppearanceControl( props ) {
 
 	// Adjusts screen reader description based on styles or weights.
 	const getDescribedBy = () => {
+		if ( ! currentSelection ) {
+			return __( 'No selected font appearance' );
+		}
+
 		if ( ! hasFontStyles ) {
 			return sprintf(
 				// translators: %s: Currently selected font weight.

@@ -68,6 +68,7 @@ export default function EditorStyles( { styles } ) {
 		() => transformStyles( styles, EDITOR_STYLES_SELECTOR ),
 		[ styles ]
 	);
+
 	return (
 		<>
 			{ /* Use an empty style element to have a document reference,

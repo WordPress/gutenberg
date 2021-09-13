@@ -193,7 +193,18 @@ describe( 'Navigation editor', () => {
 				POST: menuPostResponse,
 			} ),
 			...getMenuItemMocks( { GET: [] } ),
-			...getPagesMocks( { GET: [ {} ] } ), // mock a single page
+			...getPagesMocks( {
+				GET: [
+					{
+						type: 'page',
+						id: 1,
+						link: 'https://example.com/1',
+						title: {
+							rendered: 'My page',
+						},
+					},
+				],
+			} ),
 		] );
 
 		await page.keyboard.type( 'Main Menu' );
@@ -304,6 +315,29 @@ describe( 'Navigation editor', () => {
 		expect( await getSerializedBlocks() ).toMatchSnapshot();
 	} );
 
+	it( 'shows the trailing block appender within the navigation block when no blocks are selected', async () => {
+		// The test requires the presence of existing menus.
+		await setUpResponseMocking( [
+			...getMenuMocks( { GET: assignMockMenuIds( menusFixture ) } ),
+			...getMenuItemMocks( { GET: menuItemsFixture } ),
+		] );
+		await visitNavigationEditor();
+
+		// Wait for at least one block to be present on the page.
+		await page.waitForSelector( '.wp-block' );
+
+		// And for this test to be valid, no blocks should be selected, which
+		// should be the case when the editor loads.
+		const selectedBlocks = await page.$$( '.wp-block.is-selected' );
+		expect( selectedBlocks.length ).toBe( 0 );
+
+		// And when no blocks are selected, the trailing appender is present.
+		const blockListAppender = await page.waitForSelector(
+			'.block-list-appender button[aria-label="Add block"]'
+		);
+		expect( blockListAppender ).toBeTruthy();
+	} );
+
 	it( 'shows a submenu when a link is selected and hides it when clicking the editor to deselect it', async () => {
 		await setUpResponseMocking( [
 			...getMenuMocks( { GET: assignMockMenuIds( menusFixture ) } ),
@@ -311,9 +345,9 @@ describe( 'Navigation editor', () => {
 		] );
 		await visitNavigationEditor();
 
-		// Select a link block with nested links in a submenu.
+		// Select a submenu block with nested links in a submenu.
 		const parentLinkXPath =
-			'//div[@aria-label="Block: Custom Link" and contains(.,"WordPress.org")]';
+			'//div[@aria-label="Block: Submenu" and contains(.,"WordPress.org")]';
 		const linkBlock = await page.waitForXPath( parentLinkXPath );
 		await linkBlock.click();
 
@@ -354,7 +388,7 @@ describe( 'Navigation editor', () => {
 		);
 		await navBlock.click();
 		const startEmptyButton = await page.waitForXPath(
-			'//button[.="Start empty"]'
+			'//button[.="Start blank"]'
 		);
 		await startEmptyButton.click();
 

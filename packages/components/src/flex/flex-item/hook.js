@@ -12,7 +12,7 @@ import * as styles from '../styles';
 import { useCx } from '../../utils/hooks/use-cx';
 
 /**
- * @param {import('../../ui/context').PolymorphicComponentProps<import('../types').FlexItemProps, 'div'>} props
+ * @param {import('../../ui/context').WordPressComponentProps<import('../types').FlexItemProps, 'div'>} props
  */
 export function useFlexItem( props ) {
 	const {

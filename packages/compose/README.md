@@ -207,7 +207,7 @@ _Parameters_
 
 _Returns_
 
--   `TFunc & import('lodash').Cancelable`: Debounced function.
+-   `import('lodash').DebouncedFunc<TFunc>`: Debounced function.
 
 ### useFocusOnMount
 
@@ -452,7 +452,7 @@ _Parameters_
 
 _Returns_
 
--   `TFunc & import('lodash').Cancelable`: Throttled function.
+-   `import('lodash').DebouncedFunc<TFunc>`: Throttled function.
 
 ### useViewportMatch
 

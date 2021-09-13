@@ -1,3 +1,5 @@
+export const BLOCK_ICON_DEFAULT = 'block-default';
+
 /**
  * Array of valid keys in a block type settings deprecation object.
  *
@@ -108,10 +110,11 @@ export const __EXPERIMENTAL_STYLE_PROPERTY = {
 	},
 	letterSpacing: {
 		value: [ 'typography', 'letterSpacing' ],
-		support: [ '__experimentalLetterSpacing' ],
+		support: [ 'typography', '__experimentalLetterSpacing' ],
 	},
 	'--wp--style--block-gap': {
 		value: [ 'spacing', 'blockGap' ],
+		support: [ 'spacing', 'blockGap' ],
 	},
 };
 
@@ -123,4 +126,11 @@ export const __EXPERIMENTAL_ELEMENTS = {
 	h4: 'h4',
 	h5: 'h5',
 	h6: 'h6',
+};
+
+export const __EXPERIMENTAL_PATHS_WITH_MERGE = {
+	'color.gradients': true,
+	'color.palette': true,
+	'typography.fontFamilies': true,
+	'typography.fontSizes': true,
 };

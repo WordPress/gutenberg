@@ -1281,9 +1281,9 @@ function selectionHelper( state = {}, action ) {
 				return state;
 			}
 
-			const indexToSelect =
-				action.indexToSelect || action.blocks.length - 1;
-			const blockToSelect = action.blocks[ indexToSelect ];
+			const blockToSelect =
+				action.blocks[ action.indexToSelect ] ||
+				action.blocks[ action.blocks.length - 1 ];
 
 			if ( ! blockToSelect ) {
 				return {};

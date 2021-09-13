@@ -8,7 +8,8 @@
 	"textdomain": "default",
 	"attributes": {
 		"orientation": {
-			"type": "string"
+			"type": "string",
+			"default": "horizontal"
 		},
 		"textColor": {
 			"type": "string"
@@ -34,6 +35,10 @@
 		"showSubmenuIcon": {
 			"type": "boolean",
 			"default": true
+		},
+		"openSubmenusOnClick":{
+			"type": "boolean",
+			"default": false
 		},
 		"isResponsive": {
 			"type": "boolean",
@@ -67,6 +72,7 @@
 		"fontSize": "fontSize",
 		"customFontSize": "customFontSize",
 		"showSubmenuIcon": "showSubmenuIcon",
+		"openSubmenusOnClick": "openSubmenusOnClick",
 		"style": "style",
 		"orientation": "orientation"
 	},

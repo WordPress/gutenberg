@@ -142,7 +142,7 @@ add_action( 'enqueue_block_editor_assets', 'random_image_enqueue_block_editor_as
 
 			return el(
 				'form',
-				Object.assing( blockProps, { onSubmit: setCategory } ),
+				Object.assign( blockProps, { onSubmit: setCategory } ),
 				children
 			);
 		},

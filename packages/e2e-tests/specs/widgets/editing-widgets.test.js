@@ -633,12 +633,14 @@ describe( 'Widgets screen', () => {
 
 		// Wait for the Legacy Widget block's preview iframe to load.
 		const frame = await new Promise( ( resolve ) => {
-			const checkFrame = async ( candidateFrame ) => {
-				const url = await candidateFrame.url();
-				if ( url.includes( 'legacy-widget-preview' ) ) {
+			const checkFrame = async () => {
+				const frameElement = await page.$(
+					'iframe.wp-block-legacy-widget__edit-preview-iframe'
+				);
+				if ( frameElement ) {
 					page.off( 'frameattached', checkFrame );
 					page.off( 'framenavigated', checkFrame );
-					resolve( candidateFrame );
+					resolve( frameElement.contentFrame() );
 				}
 			};
 			page.on( 'frameattached', checkFrame );
@@ -820,6 +822,8 @@ describe( 'Widgets screen', () => {
 		// Delete the last block and save again.
 		await pressKeyWithModifier( 'access', 'z' );
 		await saveWidgets();
+		// To do: clicking on the Snackbar causes focus loss.
+		await page.focus( '.block-editor-writing-flow' );
 
 		// Undo block deletion and save again
 		await pressKeyWithModifier( 'primary', 'z' );
@@ -887,6 +891,10 @@ async function saveWidgets() {
 	// Close the snackbar.
 	const savedSnackbar = await find( savedSnackbarQuery );
 	await savedSnackbar.click();
+	// Expect focus not to be lost.
+	await expect(
+		await page.evaluate( () => document.activeElement.className )
+	).toBe( 'components-snackbar-list edit-widgets-notices__snackbar' );
 	await expect( savedSnackbarQuery ).not.toBeFound();
 }
 

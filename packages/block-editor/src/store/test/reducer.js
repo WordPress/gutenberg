@@ -2397,6 +2397,30 @@ describe( 'state', () => {
 			expect( state.selectionEnd ).toEqual( expected.selectionEnd );
 		} );
 
+		it( 'should replace the selected block when is explicitly passed (`indexToSelect`)', () => {
+			const original = deepFreeze( {
+				selectionStart: { clientId: 'chicken' },
+				selectionEnd: { clientId: 'chicken' },
+			} );
+			const action = {
+				type: 'REPLACE_BLOCKS',
+				clientIds: [ 'chicken' ],
+				blocks: [
+					{ clientId: 'rigas' },
+					{ clientId: 'chicken' },
+					{ clientId: 'wings' },
+				],
+				indexToSelect: 0,
+			};
+			const state = selection( original, action );
+			expect( state ).toEqual(
+				expect.objectContaining( {
+					selectionStart: { clientId: 'rigas' },
+					selectionEnd: { clientId: 'rigas' },
+				} )
+			);
+		} );
+
 		it( 'should reset if replacing with empty set', () => {
 			const original = deepFreeze( {
 				selectionStart: { clientId: 'chicken' },

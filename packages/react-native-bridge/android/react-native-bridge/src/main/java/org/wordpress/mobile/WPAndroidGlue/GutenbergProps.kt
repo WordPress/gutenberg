@@ -41,6 +41,10 @@ data class GutenbergProps @JvmOverloads constructor(
                     ?.let { putSerializable(PROP_STYLES, it) }
             theme.getSerializable(PROP_FEATURES)
                     ?.let { putSerializable(PROP_FEATURES, it) }
+            theme.getSerializable(PROP_IS_FSE_THEME)
+                    ?.let { putSerializable(PROP_IS_FSE_THEME, it) }
+            theme.getSerializable(PROP_GALLERY_WITH_IMAGE_BLOCKS)
+                    ?.let { putSerializable(PROP_GALLERY_WITH_IMAGE_BLOCKS, it) }
         }
     }
 
@@ -77,6 +81,8 @@ data class GutenbergProps @JvmOverloads constructor(
         private const val PROP_GRADIENTS = "gradients"
         private const val PROP_STYLES = "rawStyles"
         private const val PROP_FEATURES = "rawFeatures"
+        private const val PROP_IS_FSE_THEME = "isFSETheme"
+        private const val PROP_GALLERY_WITH_IMAGE_BLOCKS = "galleryWithImageBlocks"
 
         const val PROP_CAPABILITIES = "capabilities"
         const val PROP_CAPABILITIES_CONTACT_INFO_BLOCK = "contactInfoBlock"

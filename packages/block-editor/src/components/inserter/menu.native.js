@@ -201,7 +201,7 @@ function InserterMenu( {
 				</>
 			}
 			hasNavigation
-			setMinHeightToMaxHeight={ showSearchForm }
+			setMinHeightToMaxHeight={ true }
 			contentStyle={ styles[ 'inserter-menu__list' ] }
 			isFullScreen={ ! isIOS && showSearchForm }
 			allowDragIndicator={ true }

@@ -14,7 +14,6 @@ import { store as interfaceStore } from '@wordpress/interface';
  */
 import './hooks';
 import './plugins';
-export { store } from './store';
 import Editor from './editor';
 
 /**
@@ -63,11 +62,8 @@ export function reinitializeEditor(
 /**
  * Initializes and returns an instance of Editor.
  *
- * The return value of this function is not necessary if we change where we
- * call initializeEditor(). This is due to metaBox timing.
- *
  * @param {string}  id           Unique identifier for editor instance.
- * @param {Object}  postType     Post type of the post to edit.
+ * @param {string}  postType     Post type of the post to edit.
  * @param {Object}  postId       ID of the post to edit.
  * @param {?Object} settings     Editor settings object.
  * @param {Object}  initialEdits Programmatic edits to apply initially, to be
@@ -170,3 +166,4 @@ export { default as PluginSidebar } from './components/sidebar/plugin-sidebar';
 export { default as PluginSidebarMoreMenuItem } from './components/header/plugin-sidebar-more-menu-item';
 export { default as __experimentalFullscreenModeClose } from './components/header/fullscreen-mode-close';
 export { default as __experimentalMainDashboardButton } from './components/header/main-dashboard-button';
+export { store } from './store';

@@ -85,6 +85,7 @@ class WP_Theme_JSON_Gutenberg {
 			'customWidth'  => null,
 		),
 		'color'      => array(
+			'background'     => null,
 			'custom'         => null,
 			'customDuotone'  => null,
 			'customGradient' => null,
@@ -92,6 +93,7 @@ class WP_Theme_JSON_Gutenberg {
 			'gradients'      => null,
 			'link'           => null,
 			'palette'        => null,
+			'text'           => null,
 		),
 		'custom'     => null,
 		'layout'     => array(
@@ -99,9 +101,11 @@ class WP_Theme_JSON_Gutenberg {
 			'wideSize'    => null,
 		),
 		'spacing'    => array(
+			'blockGap'      => null,
 			'customMargin'  => null,
 			'customPadding' => null,
 			'units'         => null,
+			'blockGap'      => null,
 		),
 		'typography' => array(
 			'customFontSize'        => null,
@@ -799,8 +803,36 @@ class WP_Theme_JSON_Gutenberg {
 	 *     style-property-one: value;
 	 *   }
 	 *
-	 * Additionally, it'll also create new rulesets
-	 * as classes for each preset value such as:
+	 * @param array $style_nodes Nodes with styles.
+	 *
+	 * @return string The new stylesheet.
+	 */
+	private function get_block_classes( $style_nodes ) {
+		$block_rules = '';
+
+		foreach ( $style_nodes as $metadata ) {
+			if ( null === $metadata['selector'] ) {
+				continue;
+			}
+
+			$node         = _wp_array_get( $this->theme_json, $metadata['path'], array() );
+			$selector     = $metadata['selector'];
+			$declarations = self::compute_style_properties( $node );
+			$block_rules .= self::to_ruleset( $selector, $declarations );
+
+			if ( self::ROOT_BLOCK_SELECTOR === $selector ) {
+				$has_block_gap_support = _wp_array_get( $this->theme_json, array( 'settings', 'spacing', 'blockGap' ) ) !== null;
+				if ( $has_block_gap_support ) {
+					$block_rules .= '.wp-site-blocks > * + * { margin-top: var( --wp--style--block-gap ); margin-bottom: 0; }';
+				}
+			}
+		}
+
+		return $block_rules;
+	}
+
+	/**
+	 * Creates new rulesets as classes for each preset value such as:
 	 *
 	 *   .has-value-color {
 	 *     color: value;
@@ -821,30 +853,14 @@ class WP_Theme_JSON_Gutenberg {
 	 *   p.has-value-gradient-background {
 	 *     background: value;
 	 *   }
-	 *
-	 * @param array $style_nodes Nodes with styles.
+
 	 * @param array $setting_nodes Nodes with settings.
 	 *
 	 * @return string The new stylesheet.
 	 */
-	private function get_block_styles( $style_nodes, $setting_nodes ) {
-		$block_rules = '';
-		foreach ( $style_nodes as $metadata ) {
-			if ( null === $metadata['selector'] ) {
-				continue;
-			}
-
-			$node         = _wp_array_get( $this->theme_json, $metadata['path'], array() );
-			$selector     = $metadata['selector'];
-			$declarations = self::compute_style_properties( $node );
-			$block_rules .= self::to_ruleset( $selector, $declarations );
-
-			if ( self::ROOT_BLOCK_SELECTOR === $selector ) {
-				$block_rules .= '.wp-site-blocks > * + * { margin-top: var( --wp--style--block-gap ); margin-bottom: 0; }';
-			}
-		}
-
+	private function get_preset_classes( $setting_nodes ) {
 		$preset_rules = '';
+
 		foreach ( $setting_nodes as $metadata ) {
 			if ( null === $metadata['selector'] ) {
 				continue;
@@ -855,7 +871,7 @@ class WP_Theme_JSON_Gutenberg {
 			$preset_rules .= self::compute_preset_classes( $node, $selector );
 		}
 
-		return $block_rules . $preset_rules;
+		return $preset_rules;
 	}
 
 	/**
@@ -1053,7 +1069,11 @@ class WP_Theme_JSON_Gutenberg {
 	 * Returns the stylesheet that results of processing
 	 * the theme.json structure this object represents.
 	 *
-	 * @param string $type Type of stylesheet we want accepts 'all', 'block_styles', and 'css_variables'.
+	 * @param string $type Type of stylesheet. It accepts:
+	 *                     'all': css variables, block classes, preset classes. The default.
+	 *                     'block_styles': only block & preset classes.
+	 *                     'css_variables': only css variables.
+	 *                     'presets': only css variables and preset classes.
 	 * @return string Stylesheet.
 	 */
 	public function get_stylesheet( $type = 'all' ) {
@@ -1063,11 +1083,13 @@ class WP_Theme_JSON_Gutenberg {
 
 		switch ( $type ) {
 			case 'block_styles':
-				return $this->get_block_styles( $style_nodes, $setting_nodes );
+				return $this->get_block_classes( $style_nodes ) . $this->get_preset_classes( $setting_nodes );
 			case 'css_variables':
 				return $this->get_css_variables( $setting_nodes );
+			case 'presets':
+				return $this->get_css_variables( $setting_nodes ) . $this->get_preset_classes( $setting_nodes );
 			default:
-				return $this->get_css_variables( $setting_nodes ) . $this->get_block_styles( $style_nodes, $setting_nodes );
+				return $this->get_css_variables( $setting_nodes ) . $this->get_block_classes( $style_nodes ) . $this->get_preset_classes( $setting_nodes );
 		}
 	}
 

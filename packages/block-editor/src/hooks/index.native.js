@@ -1,6 +1,7 @@
 /**
  * Internal dependencies
  */
+import './compat';
 import './align';
 import './anchor';
 import './custom-class-name';
