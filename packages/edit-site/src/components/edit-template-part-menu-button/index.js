@@ -18,11 +18,7 @@ import { store as editSiteStore } from '../../store';
 
 export default function EditTemplatePartMenuButton() {
 	const selectedTemplatePart = useSelect( ( select ) => {
-		const { getSelectedBlockClientId, getBlock } = select(
-			blockEditorStore
-		);
-		const selectedBlockClientId = getSelectedBlockClientId();
-		const block = getBlock( selectedBlockClientId );
+		const block = select( blockEditorStore ).getSelectedBlock();
 
 		if ( block && isTemplatePart( block ) ) {
 			const templateParts =
