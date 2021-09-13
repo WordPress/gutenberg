@@ -211,6 +211,11 @@ const EmbedEdit = ( props ) => {
 	} = getMergedAttributes();
 	const className = classnames( classFromPreview, props.className );
 
+	const isProviderPreviewable =
+		PREVIEWABLE_PROVIDERS.includes( providerNameSlug ) ||
+		// For WordPress embeds, we enable the inline preview for all its providers.
+		'wp-embed' === type;
+
 	return (
 		<>
 			{ showEmbedPlaceholder ? (
@@ -247,12 +252,8 @@ const EmbedEdit = ( props ) => {
 							label={ title }
 							onFocus={ onFocus }
 							preview={ preview }
-							previewable={
-								previewable &&
-								PREVIEWABLE_PROVIDERS.includes(
-									providerNameSlug
-								)
-							}
+							isProviderPreviewable={ isProviderPreviewable }
+							previewable={ previewable }
 							type={ type }
 							url={ url }
 						/>

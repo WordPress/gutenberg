@@ -1,0 +1,32 @@
+name: Report Flaky Tests
+
+on:
+    workflow_run:
+        workflows: ['End-to-End Tests']
+        types:
+            - completed
+
+jobs:
+    report-to-issues:
+        name: Report to GitHub issues
+        runs-on: ubuntu-latest
+        if: ${{ github.event.workflow_run.conclusion == 'success' }}
+        steps:
+            - uses: actions/checkout@5a4ac9002d0be2fb38bd78e4b4dbde5606d7042f # v2.3.4
+
+            - name: Use desired version of NodeJS
+              uses: actions/setup-node@38d90ce44d5275ad62cc48384b3d8a58c500bb5f # v2.2.2
+              with:
+                  node-version: 14
+                  cache: npm
+
+            - name: Npm install
+              run: |
+                  npm ci
+
+            - name: Report flaky tests
+              uses: ./.github/report-flaky-tests
+              with:
+                  repo-token: '${{ secrets.GITHUB_TOKEN }}'
+                  label: '[Type] Flaky Test'
+                  artifact-name: flaky-tests-report

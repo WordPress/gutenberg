@@ -131,6 +131,8 @@ describe( 'getGlobalStyles', () => {
 					color: {
 						palette: RAW_FEATURES.color.palette,
 						gradients,
+						text: true,
+						background: true,
 					},
 					typography: {
 						fontSizes: RAW_FEATURES.typography.fontSizes,

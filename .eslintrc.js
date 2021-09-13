@@ -122,12 +122,6 @@ module.exports = {
 			},
 			{
 				selector:
-					'ImportDeclaration[source.value=/^react-spring(?!\\u002Fweb.cjs)/]',
-				message:
-					'The react-spring dependency must specify CommonJS bundle: react-spring/web.cjs',
-			},
-			{
-				selector:
 					'CallExpression[callee.name="deprecated"] Property[key.name="version"][value.value=/' +
 					majorMinorRegExp +
 					'/]',

@@ -2,6 +2,7 @@
 	"version": 1,
 	"settings": {
 		"color": {
+			"background": true,
 			"palette": [
 				{
 					"name": "Black",
@@ -171,7 +172,8 @@
 			"custom": true,
 			"customDuotone": true,
 			"customGradient": true,
-			"link": false
+			"link": false,
+			"text": true
 		},
 		"typography": {
 			"dropCap": true,
@@ -211,7 +213,7 @@
 			]
 		},
 		"spacing": {
-			"blockGap": false,
+			"blockGap": null,
 			"customMargin": false,
 			"customPadding": false,
 			"units": [ "px", "em", "rem", "vh", "vw", "%" ]

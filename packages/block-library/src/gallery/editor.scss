@@ -45,7 +45,6 @@ figure.wp-block-gallery {
 	}
 	.block-editor-media-placeholder {
 		margin: 0;
-		height: 100%;
 
 		&::before {
 			box-shadow: 0 0 0 $border-width $white inset, 0 0 0 3px var(--wp-admin-theme-color) inset;
@@ -205,4 +204,16 @@ figure.wp-block-gallery {
 	padding: 0;
 	// Some themes give all <ul> default margin instead of padding.
 	margin: 0;
+}
+
+.wp-block-update-gallery-modal {
+	max-width: 400px;
+	.wp-block-update-gallery-modal-buttons {
+		display: flex;
+		justify-content: flex-end;
+
+		.components-button {
+			margin-left: $grid-unit-15;
+		}
+	}
 }

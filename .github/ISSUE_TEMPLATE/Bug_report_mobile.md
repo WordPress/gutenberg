@@ -44,7 +44,7 @@ the bug.
 -->
 
 ## WordPress information
-- WordPress version: <!-- e.g. "5.6.0". Find this in Tools → Site Health → Info → WordPress -->
+- WordPress version: <!-- e.g. "5.8.0". Find this in Tools → Site Health → Info → WordPress -->
 - Gutenberg version: <!-- e.g. "9.4.0" or "Not installed" -->
 - Are all plugins except Gutenberg deactivated? <!-- "Yes" or "No" -->
 - Are you using a default theme (e.g. Twenty Twenty-One)? <!-- "Yes" or "No" -->

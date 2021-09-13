@@ -70,7 +70,7 @@ function ButtonsEdit( {
 
 	return (
 		<>
-			<BlockControls group="block" __experimentalExposeToChildren>
+			<BlockControls group="block" __experimentalShareWithChildBlocks>
 				<JustifyContentControl
 					allowedControls={ justifyControls }
 					value={ contentJustification }
