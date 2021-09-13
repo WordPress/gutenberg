@@ -44,11 +44,22 @@
 	}
 }
 
-.edit-navigation-header__subtitle {
-	display: block;
-	margin: 0;
-	font-size: 15px;
-	font-weight: normal;
+.edit-navigation-menu-actions {
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+
+	.edit-navigation-menu-actions__subtitle-wrapper {
+		display: flex;
+		flex-direction: row;
+		justify-content: center;
+		align-items: center;
+	}
+
+	.edit-navigation-menu-actions__switcher-toggle {
+		padding: 0;
+		min-width: 0;
+	}
 }
 
 .edit-navigation-header__actions {
