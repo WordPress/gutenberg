@@ -412,7 +412,7 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 
 		if (
 			! get_theme_support( 'experimental-link-color' ) && // link color support needs the presets CSS variables regardless of the presence of theme.json file.
-			! WP_Theme_JSON_Resolver_Gutenberg::theme_has_support()
+			! self::theme_has_support()
 		) {
 			return $result;
 		}
@@ -423,6 +423,8 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 		if ( 'user' === $origin ) {
 			$result->merge( self::get_user_data() );
 		}
+
+		$result = apply_filters( 'theme_json_resolver_merged_data', $result );
 
 		return $result;
 	}
