@@ -104,7 +104,6 @@ function Navigation( {
 
 	// These props are used by the navigation editor to override specific
 	// navigation block settings.
-	hasColorSettings = true,
 	customPlaceholder: CustomPlaceholder = null,
 	customAppender: CustomAppender = null,
 } ) {
@@ -119,6 +118,8 @@ function Navigation( {
 
 	const hasItemJustificationControls =
 		useSetting( 'hasItemJustificationControls' ) ?? true; // retain original prop default of "true" if there is no setting defined.
+
+	const hasColorSettings = useSetting( 'hasColorSettings' ) ?? true; // retain original prop default of "true" if there is no setting defined.
 
 	const { selectBlock } = useDispatch( blockEditorStore );
 

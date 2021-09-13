@@ -10,13 +10,7 @@ const removeNavigationBlockEditUnsupportedFeatures = createHigherOrderComponent(
 			return <BlockEdit { ...props } />;
 		}
 
-		return (
-			<BlockEdit
-				{ ...props }
-				hasItemJustificationControls={ false }
-				hasColorSettings={ false }
-			/>
-		);
+		return <BlockEdit { ...props } />;
 	},
 	'removeNavigationBlockEditUnsupportedFeatures'
 );
