@@ -91,7 +91,7 @@ export function PaddingEdit( props ) {
 		name: blockName,
 		attributes: { style },
 		setAttributes,
-		setVisualizer,
+		__experimentalSetVisualizer: setVisualizer,
 	} = props;
 
 	const units = useCustomUnits( {

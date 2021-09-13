@@ -309,7 +309,7 @@ function CoverEdit( {
 	setAttributes,
 	setOverlayColor,
 	toggleSelection,
-	styleVisualizer,
+	__experimentalStyleVisualizer: styleVisualizer,
 } ) {
 	const {
 		contentPosition,
