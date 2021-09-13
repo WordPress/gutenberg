@@ -6,8 +6,7 @@ import { map, compact } from 'lodash';
 /**
  * WordPress dependencies
  */
-
-import { AsyncModeProvider } from '@wordpress/data';
+import { AsyncModeProvider, useSelect } from '@wordpress/data';
 
 /**
  * Internal dependencies
@@ -16,6 +15,7 @@ import ListViewBlock from './block';
 import ListViewAppender from './appender';
 import { isClientIdSelected } from './utils';
 import { useListViewContext } from './context';
+import { store as blockEditorStore } from '../../store';
 
 export default function ListViewBranch( props ) {
 	const {
@@ -32,6 +32,10 @@ export default function ListViewBranch( props ) {
 		isBranchSelected = false,
 		isLastOfBranch = false,
 	} = props;
+
+	const draggedBlockClientIds = useSelect( ( select ) =>
+		select( blockEditorStore ).getDraggedBlockClientIds()
+	);
 
 	const isTreeRoot = ! parentBlockClientId;
 	const filteredBlocks = compact( blocks );
@@ -94,9 +98,17 @@ export default function ListViewBranch( props ) {
 					}
 				};
 
+				// Make updates to the selected or dragged blocks synchronous,
+				// but asynchronous for any other block.
+				const isAsynchronous =
+					! draggedBlockClientIds.includes( clientId ) &&
+					! isSelected;
+
 				return (
-					// Make updates to the selected block synchronous.
-					<AsyncModeProvider key={ clientId } value={ ! isSelected }>
+					<AsyncModeProvider
+						key={ clientId }
+						value={ isAsynchronous }
+					>
 						<ListViewBlock
 							block={ block }
 							onClick={ selectBlockWithClientId }
