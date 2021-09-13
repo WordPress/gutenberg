@@ -466,7 +466,8 @@ function GalleryEdit( props ) {
 					) }
 				</PanelBody>
 			</InspectorControls>
-			{ __unstableGalleryWithImageBlocks && (
+			{ /* TODO: Remove platform condition when native conversion is ready */ }
+			{ Platform.isWeb && __unstableGalleryWithImageBlocks && (
 				<BlockControls group="other">
 					<ToolbarButton
 						onClick={ openUpdateModal }
@@ -477,7 +478,7 @@ function GalleryEdit( props ) {
 					</ToolbarButton>
 				</BlockControls>
 			) }
-			{ isUpdateOpen && (
+			{ Platform.isWeb && isUpdateOpen && (
 				<UpdateGalleryModal
 					onClose={ closeUpdateModal }
 					clientId={ clientId }

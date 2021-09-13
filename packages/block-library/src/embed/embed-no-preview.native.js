@@ -28,6 +28,7 @@ const EmbedNoPreview = ( {
 	icon,
 	isSelected,
 	onPress,
+	previewable,
 	isDefaultEmbedInfo,
 } ) => {
 	const shouldRequestReview = useRef( false );
@@ -120,7 +121,7 @@ const EmbedNoPreview = ( {
 		onPressContainer();
 	}
 
-	return (
+	const embedNoProviderPreview = (
 		<>
 			<TouchableWithoutFeedback
 				accessibilityRole={ 'button' }
@@ -202,6 +203,21 @@ const EmbedNoPreview = ( {
 					labelStyle={ sheetButtonStyle }
 				/>
 			</BottomSheet>
+		</>
+	);
+
+	return (
+		<>
+			{ previewable ? (
+				embedNoProviderPreview
+			) : (
+				<View style={ containerStyle }>
+					<BlockIcon icon={ icon } />
+					<Text style={ labelStyle }>
+						{ __( 'No preview available' ) }
+					</Text>
+				</View>
+			) }
 		</>
 	);
 };

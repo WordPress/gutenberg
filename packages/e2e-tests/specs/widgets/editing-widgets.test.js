@@ -822,6 +822,8 @@ describe( 'Widgets screen', () => {
 		// Delete the last block and save again.
 		await pressKeyWithModifier( 'access', 'z' );
 		await saveWidgets();
+		// To do: clicking on the Snackbar causes focus loss.
+		await page.focus( '.block-editor-writing-flow' );
 
 		// Undo block deletion and save again
 		await pressKeyWithModifier( 'primary', 'z' );
