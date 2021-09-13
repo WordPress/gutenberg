@@ -24,7 +24,6 @@ import {
 	ToggleControl,
 	withNotices,
 	__experimentalUseCustomUnits as useCustomUnits,
-	__experimentalBoxControl as BoxControl,
 	__experimentalToolsPanelItem as ToolsPanelItem,
 } from '@wordpress/components';
 import { compose, withInstanceId, useInstanceId } from '@wordpress/compose';
