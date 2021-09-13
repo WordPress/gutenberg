@@ -111,7 +111,7 @@ export const SimpleColorSwatch = ( { color, style } ) => (
 		style={ {
 			...style,
 			borderRadius: '50%',
-			border: '1px solid #ddd',
+			border: '1px solid rgba(0, 0, 0, 0.2)',
 			width: '24px',
 			height: '24px',
 			backgroundColor: color,
