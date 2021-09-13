@@ -62,7 +62,9 @@ export default function ColorPalette( {
 	const renderCustomColorPicker = () => (
 		<ColorPicker
 			color={ value }
-			onChangeComplete={ ( color ) => onChange( color.hex ) }
+			onChangeComplete={ ( { color } ) =>
+				onChange( color.toRgbString() )
+			}
 			disableAlpha={ disableAlpha }
 		/>
 	);

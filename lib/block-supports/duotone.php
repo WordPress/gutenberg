@@ -277,6 +277,17 @@ function gutenberg_tinycolor_string_to_rgb( $color_str ) {
 
 		return $rgb;
 	}
+
+	// The JS color picker considers the string "transparent" to be a hex value,
+	// so we need to handle it here as a special case.
+	if ( 'transparent' === $color_str ) {
+		return array(
+			'r' => 0,
+			'g' => 0,
+			'b' => 0,
+			'a' => 0,
+		);
+	}
 }
 
 
