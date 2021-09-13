@@ -80,6 +80,7 @@ class WP_Theme_JSON_Gutenberg {
 	const VALID_SETTINGS = array(
 		'core/navigation' => array(
 			'hasSubmenuIndicatorSetting' => null,
+			'hasItemJustificationControls' => null,
 		),
 		'border'          => array(
 			'customColor'  => null,
