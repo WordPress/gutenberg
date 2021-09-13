@@ -70,6 +70,26 @@ export const ESCAPE = 27;
 export const SPACE = 32;
 
 /**
+ * Keycode for PAGEUP key.
+ */
+export const PAGEUP = 33;
+
+/**
+ * Keycode for PAGEDOWN key.
+ */
+export const PAGEDOWN = 34;
+
+/**
+ * Keycode for END key.
+ */
+export const END = 35;
+
+/**
+ * Keycode for HOME key.
+ */
+export const HOME = 36;
+
+/**
  * Keycode for LEFT key.
  */
 export const LEFT = 37;
