@@ -322,9 +322,9 @@ describe( 'Navigation editor', () => {
 		] );
 		await visitNavigationEditor();
 
-		// Select a link block with nested links in a submenu.
+		// Select a submenu block with nested links in a submenu.
 		const parentLinkXPath =
-			'//div[@aria-label="Block: Custom Link" and contains(.,"WordPress.org")]';
+			'//div[@aria-label="Block: Submenu" and contains(.,"WordPress.org")]';
 		const linkBlock = await page.waitForXPath( parentLinkXPath );
 		await linkBlock.click();
 
