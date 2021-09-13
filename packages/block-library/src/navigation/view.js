@@ -47,7 +47,9 @@ function toggleSubmenuOnClick( event ) {
 		const parentElement = buttonToggle.closest(
 			'.wp-block-navigation-item'
 		);
-		const navigationParent = buttonToggle.closest( '.wp-block-navigation' );
+		const navigationParent = buttonToggle.closest(
+			'.wp-block-navigation__submenu-container, .wp-block-navigation__container, .wp-block-page-list'
+		);
 		navigationParent
 			.querySelectorAll( '.wp-block-navigation-item' )
 			.forEach( function ( child ) {
