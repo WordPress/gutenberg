@@ -86,7 +86,7 @@ describe( 'Heading', () => {
 		await page.keyboard.type( '#7700ff' );
 		await page.click( 'h3[data-type="core/heading"]' );
 		await page.waitForSelector(
-			'.component-color-indicator[aria-label="(Color: #7700ff)"]'
+			'.component-color-indicator[aria-label="(Color: rgb(119, 0, 255))"]'
 		);
 		expect( await getEditedPostContent() ).toMatchSnapshot();
 	} );
