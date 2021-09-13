@@ -114,24 +114,9 @@ describe( 'Site Editor Performance', () => {
 			keyUpEvents,
 		] = getTypingEventDurations( traceResults );
 
-		// Both keydown and keypress events are bubbled from the iframe to the
-		// main frame, which must be ignored. These will be the odd values in
-		// the array.
-		const _keyDownEvents = keyDownEvents.filter(
-			( v, ii ) => ii % 2 === 0
-		);
-		const _keyPressEvents = keyPressEvents.filter(
-			( v, ii ) => ii % 2 === 0
-		);
-
-		expect(
-			_keyDownEvents.length === _keyPressEvents.length &&
-				_keyPressEvents.length === keyUpEvents.length
-		).toBe( true );
-
-		for ( let j = 0; j < _keyDownEvents.length; j++ ) {
+		for ( let j = 0; j < keyDownEvents.length; j++ ) {
 			results.type.push(
-				_keyDownEvents[ j ] + _keyPressEvents[ j ] + keyUpEvents[ j ]
+				keyDownEvents[ j ] + keyPressEvents[ j ] + keyUpEvents[ j ]
 			);
 		}
 
