@@ -7,6 +7,8 @@ import warning from '@wordpress/warning';
 /**
  * Internal dependencies
  */
+import BlockSupportToolsPanel from './block-support-tools-panel';
+import BlockSupportSlotContainer from './block-support-slot-container';
 import groups from './groups';
 
 export default function InspectorControlsSlot( {
@@ -28,15 +30,14 @@ export default function InspectorControlsSlot( {
 	}
 
 	if ( label ) {
-		// Slots for block support panels will include a label for the panel
-		// header. This is passed through the fillProps to indicate when the
-		// fills require a wrapping ToolsPanel.
 		return (
-			<Slot
-				{ ...props }
-				bubblesVirtually={ bubblesVirtually }
-				fillProps={ { label } }
-			/>
+			<BlockSupportToolsPanel group={ group } label={ label }>
+				<BlockSupportSlotContainer
+					{ ...props }
+					bubblesVirtually={ bubblesVirtually }
+					Slot={ Slot }
+				/>
+			</BlockSupportToolsPanel>
 		);
 	}
 

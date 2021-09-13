@@ -1,13 +1,20 @@
 /**
+ * External dependencies
+ */
+import { isEmpty } from 'lodash';
+
+/**
  * WordPress dependencies
  */
-import { __experimentalStyleProvider as StyleProvider } from '@wordpress/components';
+import {
+	__experimentalStyleProvider as StyleProvider,
+	__experimentalToolsPanelContext as ToolsPanelContext,
+} from '@wordpress/components';
 import warning from '@wordpress/warning';
 
 /**
  * Internal dependencies
  */
-import BlockSupportToolsPanel from './block-support-tools-panel';
 import useDisplayBlockControls from '../use-display-block-controls';
 import groups from './groups';
 
@@ -29,18 +36,15 @@ export default function InspectorControlsFill( {
 		<StyleProvider document={ document }>
 			<Fill>
 				{ ( fillProps ) => {
-					// Check if the fills here represent the contents of a
-					// block support panel and require a wrapping ToolsPanel.
-					const { label } = fillProps;
-
-					if ( ! label ) {
-						return children;
-					}
-
+					// Children passed to InspectorControlsFill will not have
+					// access to any React Context whose Provider is part of
+					// the InspectorControlsSlot tree. So we re-create the
+					// Provider in this subtree.
+					const value = ! isEmpty( fillProps ) ? fillProps : null;
 					return (
-						<BlockSupportToolsPanel label={ label }>
+						<ToolsPanelContext.Provider value={ value }>
 							{ children }
-						</BlockSupportToolsPanel>
+						</ToolsPanelContext.Provider>
 					);
 				} }
 			</Fill>
