@@ -37,7 +37,6 @@ function InserterMenu( {
 } ) {
 	const [ filterValue, setFilterValue ] = useState( '' );
 	const [ showTabs, setShowTabs ] = useState( true );
-	// eslint-disable-next-line no-undef
 	const [ showSearchForm, setShowSearchForm ] = useState( true );
 	const [ tabIndex, setTabIndex ] = useState( 0 );
 
@@ -178,6 +177,13 @@ function InserterMenu( {
 		setShowTabs,
 	] );
 
+	function isFullScreen() {
+		// The bottomsheet will not re-render after setting showSeachForm to false
+		// after mounting the component. In this case the searchForm is fliped from true to false
+		// after checking the min items for search but we can make that check on the first render.
+		return ! isIOS && showSearchForm && items.length > MIN_ITEMS_FOR_SEARCH;
+	}
+
 	return (
 		<BottomSheet
 			isVisible={ true }
@@ -203,7 +209,7 @@ function InserterMenu( {
 			hasNavigation
 			setMinHeightToMaxHeight={ true }
 			contentStyle={ styles[ 'inserter-menu__list' ] }
-			isFullScreen={ ! isIOS && showSearchForm }
+			isFullScreen={ isFullScreen() }
 			allowDragIndicator={ true }
 		>
 			<BottomSheetConsumer>
@@ -218,7 +224,7 @@ function InserterMenu( {
 								filterValue={ filterValue }
 								onSelect={ onSelectItem }
 								listProps={ listProps }
-								isFullScreen={ ! isIOS && showSearchForm }
+								isFullScreen={ isFullScreen() }
 							/>
 						) : (
 							<InserterTabs
