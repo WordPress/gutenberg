@@ -11,7 +11,7 @@ import { Platform } from '@wordpress/element';
 
 const isWeb = Platform.OS === 'web';
 
-const allUnits = {
+export const allUnits = {
 	px: {
 		value: 'px',
 		label: isWeb ? 'px' : __( 'Pixels (px)' ),
@@ -151,7 +151,8 @@ export const DEFAULT_UNIT = allUnits.px;
  * @return {Array<number, string>} The extracted number and unit.
  */
 export function getParsedValue( value, unit, units ) {
-	const initialValue = unit ? `${ value }${ unit }` : value;
+	const initialValue =
+		unit && Number.isFinite( value ) ? `${ value }${ unit }` : value;
 
 	return parseUnit( initialValue, units );
 }
@@ -281,3 +282,43 @@ export const useCustomUnits = ( { units, availableUnits, defaultValues } ) => {
 
 	return usedUnits.length === 0 ? false : usedUnits;
 };
+
+/**
+ * Get available units with the unit for the currently selected value
+ * prepended if it is not available in the list of units.
+ *
+ * This is useful to ensure that the current value's unit is always
+ * accurately displayed in the UI, even if the intention is to hide
+ * the availability of that unit.
+ *
+ * @param {number|string} currentValue Selected value to parse.
+ * @param {string}        legacyUnit   Legacy unit value, if currentValue needs it appended.
+ * @param {Array<Object>} units        List of available units.
+ *
+ * @return {Array<Object>} A collection of units containing the unit for the current value.
+ */
+export function getUnitsWithCurrentUnit(
+	currentValue,
+	legacyUnit,
+	units = ALL_CSS_UNITS
+) {
+	const unitsWithCurrentUnit = [ ...units ];
+	const [ , currentUnit ] = getParsedValue(
+		currentValue,
+		legacyUnit,
+		ALL_CSS_UNITS
+	);
+
+	if (
+		currentUnit &&
+		! unitsWithCurrentUnit.some( ( unit ) => unit.value === currentUnit )
+	) {
+		const currentUnitKey = currentUnit === '%' ? 'percent' : currentUnit;
+
+		if ( allUnits[ currentUnitKey ] ) {
+			unitsWithCurrentUnit.unshift( allUnits[ currentUnitKey ] );
+		}
+	}
+
+	return unitsWithCurrentUnit;
+}
