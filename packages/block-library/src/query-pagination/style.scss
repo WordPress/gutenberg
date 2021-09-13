@@ -36,4 +36,8 @@ $pagination-margin: 0.5em;
 			transform: scaleX(1) #{"/*rtl:scaleX(-1);*/"}; // This points the arrow right for LTR and left for RTL.
 		}
 	}
+
+	&.aligncenter {
+		justify-content: center;
+	}
 }

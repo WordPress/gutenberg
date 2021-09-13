@@ -889,6 +889,10 @@ async function saveWidgets() {
 	// Close the snackbar.
 	const savedSnackbar = await find( savedSnackbarQuery );
 	await savedSnackbar.click();
+	// Expect focus not to be lost.
+	await expect(
+		await page.evaluate( () => document.activeElement.className )
+	).toBe( 'components-snackbar-list edit-widgets-notices__snackbar' );
 	await expect( savedSnackbarQuery ).not.toBeFound();
 }
 

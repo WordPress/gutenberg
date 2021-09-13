@@ -23,7 +23,13 @@ import { BlockIcon } from '@wordpress/block-editor';
  */
 import styles from './styles.scss';
 
-const EmbedNoPreview = ( { label, icon, isSelected, onPress } ) => {
+const EmbedNoPreview = ( {
+	label,
+	icon,
+	isSelected,
+	onPress,
+	previewable,
+} ) => {
 	const shouldRequestReview = useRef( false );
 	const [ isSheetVisible, setIsSheetVisible ] = useState( false );
 
@@ -114,7 +120,7 @@ const EmbedNoPreview = ( { label, icon, isSelected, onPress } ) => {
 		onPressContainer();
 	}
 
-	return (
+	const embedNoProviderPreview = (
 		<>
 			<TouchableWithoutFeedback
 				accessibilityRole={ 'button' }
@@ -192,6 +198,21 @@ const EmbedNoPreview = ( { label, icon, isSelected, onPress } ) => {
 					labelStyle={ sheetButtonStyle }
 				/>
 			</BottomSheet>
+		</>
+	);
+
+	return (
+		<>
+			{ previewable ? (
+				embedNoProviderPreview
+			) : (
+				<View style={ containerStyle }>
+					<BlockIcon icon={ icon } />
+					<Text style={ labelStyle }>
+						{ __( 'No preview available' ) }
+					</Text>
+				</View>
+			) }
 		</>
 	);
 };
