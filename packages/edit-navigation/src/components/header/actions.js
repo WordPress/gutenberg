@@ -1,11 +1,9 @@
 /**
  * WordPress dependencies
  */
-import { sprintf, __ } from '@wordpress/i18n';
+import { __ } from '@wordpress/i18n';
 import {
 	DropdownMenu,
-	MenuGroup,
-	MenuItemsChoice,
 	__experimentalText as Text,
 } from '@wordpress/components';
 import { chevronDown } from '@wordpress/icons';
@@ -15,6 +13,7 @@ import { decodeEntities } from '@wordpress/html-entities';
 /**
  * Internal dependencies
  */
+import MenuSwitcher from '../menu-switcher';
 import { useMenuEntityProp, useSelectedMenuId } from '../../hooks';
 
 export default function HeaderActions( { menus, isLoading } ) {
@@ -65,24 +64,14 @@ export default function HeaderActions( { menus, isLoading } ) {
 					} }
 				>
 					{ ( { onClose } ) => (
-						<MenuGroup>
-							<MenuItemsChoice
-								value={ selectedMenuId }
-								choices={ menus.map( ( { id, name } ) => ( {
-									value: id,
-									label: decodeEntities( name ),
-									'aria-label': sprintf(
-										/* translators: %s: The name of a menu. */
-										__( "Switch to '%s'" ),
-										name
-									),
-								} ) ) }
-								onSelect={ ( value ) => {
-									setSelectedMenuId( value );
-									onClose();
-								} }
-							/>
-						</MenuGroup>
+						<MenuSwitcher
+							menus={ menus }
+							selectedMenuId={ selectedMenuId }
+							onSelectMenu={ ( menuId ) => {
+								setSelectedMenuId( menuId );
+								onClose();
+							} }
+						/>
 					) }
 				</DropdownMenu>
 			</div>
