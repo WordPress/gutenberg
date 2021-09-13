@@ -315,6 +315,22 @@ describe( 'Navigation editor', () => {
 		expect( await getSerializedBlocks() ).toMatchSnapshot();
 	} );
 
+	it( 'shows the trailing block appender within the navigation block when no blocks are selected', async () => {
+		await setUpResponseMocking( [
+			...getMenuMocks( { GET: assignMockMenuIds( menusFixture ) } ),
+			...getMenuItemMocks( { GET: menuItemsFixture } ),
+		] );
+		await visitNavigationEditor();
+
+		const selectedBlocks = await page.$$( '.wp-block.is-selected' );
+		expect( selectedBlocks.length ).toBe( 0 );
+
+		const blockListAppender = await page.$(
+			'.block-list-appender button[aria-label="Add block"]'
+		);
+		expect( blockListAppender ).toBeTruthy();
+	} );
+
 	it( 'shows a submenu when a link is selected and hides it when clicking the editor to deselect it', async () => {
 		await setUpResponseMocking( [
 			...getMenuMocks( { GET: assignMockMenuIds( menusFixture ) } ),

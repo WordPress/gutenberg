@@ -165,4 +165,12 @@
 			padding: 0;
 		}
 	}
+
+	// Override behavior that hides the navigation block's appender when it's deselected.
+	.block-editor-block-list__block:not(.is-selected):not(.has-child-selected):not(.block-editor-block-list__layout) {
+		.block-editor-block-list__layout > .block-list-appender .block-list-appender__toggle {
+			opacity: unset;
+			transform: unset;
+		}
+	}
 }

@@ -14,7 +14,6 @@ import {
 	Platform,
 } from '@wordpress/element';
 import {
-	InnerBlocks,
 	__experimentalUseInnerBlocksProps as useInnerBlocksProps,
 	InspectorControls,
 	JustifyToolbar,
@@ -101,10 +100,14 @@ function Navigation( {
 	setOverlayBackgroundColor,
 	overlayTextColor,
 	setOverlayTextColor,
+
+	// These props are used by the navigation editor to override specific
+	// navigation block settings.
 	hasSubmenuIndicatorSetting = true,
 	hasItemJustificationControls = true,
 	hasColorSettings = true,
 	customPlaceholder: CustomPlaceholder = null,
+	customAppender: CustomAppender = null,
 } ) {
 	const [ isPlaceholderShown, setIsPlaceholderShown ] = useState(
 		! hasExistingNavItems
@@ -146,6 +149,15 @@ function Navigation( {
 
 	const placeholder = useMemo( () => <PlaceholderPreview />, [] );
 
+	// When the block is selected itself or has a top level item selected that
+	// doesn't itself have children, show the standard appender. Else show no
+	// appender.
+	const appender =
+		isSelected ||
+		( isImmediateParentOfSelectedBlock && ! selectedBlockHasDescendants )
+			? undefined
+			: false;
+
 	const innerBlocksProps = useInnerBlocksProps(
 		{
 			className: 'wp-block-navigation__container',
@@ -153,12 +165,8 @@ function Navigation( {
 		{
 			allowedBlocks: ALLOWED_BLOCKS,
 			orientation: attributes.orientation,
-			renderAppender:
-				( isImmediateParentOfSelectedBlock &&
-					! selectedBlockHasDescendants ) ||
-				isSelected
-					? InnerBlocks.DefaultAppender
-					: false,
+			renderAppender: CustomAppender || appender,
+
 			// Ensure block toolbar is not too far removed from item
 			// being edited when in vertical mode.
 			// see: https://github.com/WordPress/gutenberg/pull/34615.
