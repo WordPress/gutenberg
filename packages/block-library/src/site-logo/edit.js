@@ -11,7 +11,6 @@ import { isBlobURL } from '@wordpress/blob';
 import { useState, useRef } from '@wordpress/element';
 import { __, isRTL } from '@wordpress/i18n';
 import {
-	Icon,
 	Notice,
 	PanelBody,
 	RangeControl,
