@@ -36,7 +36,7 @@ export default function ContentNavigationItem( { item } ) {
 			const template = select(
 				coreStore
 			).__experimentalGetTemplateForLink( item.link );
-			return template?.content?.raw;
+			return template?.content;
 		},
 		[ isPreviewVisible ]
 	);

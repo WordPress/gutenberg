@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { css } from '@emotion/css';
+import { css } from '@emotion/react';
 
 /**
  * Internal dependencies
@@ -15,6 +15,7 @@ export const Card = css`
 
 export const Header = css`
 	border-bottom: 1px solid;
+	box-sizing: border-box;
 
 	&:last-child {
 		border-bottom: none;
@@ -23,8 +24,9 @@ export const Header = css`
 
 export const Footer = css`
 	border-top: 1px solid;
+	box-sizing: border-box;
 
-	&:first-child {
+	&:first-of-type {
 		border-top: none;
 	}
 `;
@@ -34,6 +36,7 @@ export const Content = css`
 `;
 
 export const Body = css`
+	box-sizing: border-box;
 	height: auto;
 	max-height: 100%;
 `;

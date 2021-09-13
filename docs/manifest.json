@@ -240,12 +240,6 @@
 		"parent": "plugin-sidebar-0"
 	},
 	{
-		"title": "Finishing Touches",
-		"slug": "plugin-sidebar-6-finishing-touches",
-		"markdown_source": "../docs/how-to-guides/sidebar-tutorial/plugin-sidebar-6-finishing-touches.md",
-		"parent": "plugin-sidebar-0"
-	},
-	{
 		"title": "Blocks",
 		"slug": "block-tutorial",
 		"markdown_source": "../docs/how-to-guides/block-tutorial/README.md",
@@ -570,6 +564,12 @@
 		"parent": "filters"
 	},
 	{
+		"title": "i18n Filters",
+		"slug": "i18n-filters",
+		"markdown_source": "../docs/reference-guides/filters/i18n-filters.md",
+		"parent": "filters"
+	},
+	{
 		"title": "Parser Filters",
 		"slug": "parser-filters",
 		"markdown_source": "../docs/reference-guides/filters/parser-filters.md",
@@ -876,6 +876,12 @@
 		"parent": "components"
 	},
 	{
+		"title": "Flyout",
+		"slug": "flyout",
+		"markdown_source": "../packages/components/src/flyout/flyout/README.md",
+		"parent": "components"
+	},
+	{
 		"title": "FocalPointPicker",
 		"slug": "focal-point-picker",
 		"markdown_source": "../packages/components/src/focal-point-picker/README.md",
@@ -1005,6 +1011,18 @@
 		"title": "IsolatedEventContainer",
 		"slug": "isolated-event-container",
 		"markdown_source": "../packages/components/src/isolated-event-container/README.md",
+		"parent": "components"
+	},
+	{
+		"title": "ItemGroup",
+		"slug": "item-group",
+		"markdown_source": "../packages/components/src/item-group/item-group/README.md",
+		"parent": "components"
+	},
+	{
+		"title": "Item",
+		"slug": "item",
+		"markdown_source": "../packages/components/src/item-group/item/README.md",
 		"parent": "components"
 	},
 	{
@@ -1140,6 +1158,12 @@
 		"parent": "components"
 	},
 	{
+		"title": "SearchControl",
+		"slug": "search-control",
+		"markdown_source": "../packages/components/src/search-control/README.md",
+		"parent": "components"
+	},
+	{
 		"title": "SelectControl",
 		"slug": "select-control",
 		"markdown_source": "../packages/components/src/select-control/README.md",
@@ -1212,6 +1236,12 @@
 		"parent": "components"
 	},
 	{
+		"title": "ToggleGroupControl",
+		"slug": "toggle-group-control",
+		"markdown_source": "../packages/components/src/toggle-group-control/README.md",
+		"parent": "components"
+	},
+	{
 		"title": "ToolbarButton",
 		"slug": "toolbar-button",
 		"markdown_source": "../packages/components/src/toolbar-button/README.md",
@@ -1239,6 +1269,24 @@
 		"title": "Toolbar",
 		"slug": "toolbar",
 		"markdown_source": "../packages/components/src/toolbar/README.md",
+		"parent": "components"
+	},
+	{
+		"title": "ToolsPanelHeader",
+		"slug": "tools-panel-header",
+		"markdown_source": "../packages/components/src/tools-panel/tools-panel-header/README.md",
+		"parent": "components"
+	},
+	{
+		"title": "ToolsPanelItem",
+		"slug": "tools-panel-item",
+		"markdown_source": "../packages/components/src/tools-panel/tools-panel-item/README.md",
+		"parent": "components"
+	},
+	{
+		"title": "ToolsPanel",
+		"slug": "tools-panel",
+		"markdown_source": "../packages/components/src/tools-panel/tools-panel/README.md",
 		"parent": "components"
 	},
 	{
@@ -1494,12 +1542,6 @@
 		"parent": "packages"
 	},
 	{
-		"title": "@wordpress/edit-navigation",
-		"slug": "packages-edit-navigation",
-		"markdown_source": "../packages/edit-navigation/README.md",
-		"parent": "packages"
-	},
-	{
 		"title": "@wordpress/edit-post",
 		"slug": "packages-edit-post",
 		"markdown_source": "../packages/edit-post/README.md",
@@ -1707,24 +1749,6 @@
 		"title": "@wordpress/react-i18n",
 		"slug": "packages-react-i18n",
 		"markdown_source": "../packages/react-i18n/README.md",
-		"parent": "packages"
-	},
-	{
-		"title": "@wordpress/react-native-aztec",
-		"slug": "packages-react-native-aztec",
-		"markdown_source": "../packages/react-native-aztec/README.md",
-		"parent": "packages"
-	},
-	{
-		"title": "@wordpress/react-native-bridge",
-		"slug": "packages-react-native-bridge",
-		"markdown_source": "../packages/react-native-bridge/README.md",
-		"parent": "packages"
-	},
-	{
-		"title": "@wordpress/react-native-editor",
-		"slug": "packages-react-native-editor",
-		"markdown_source": "../packages/react-native-editor/README.md",
 		"parent": "packages"
 	},
 	{
@@ -1983,6 +2007,12 @@
 		"title": "React Native based mobile Gutenberg",
 		"slug": "native-mobile",
 		"markdown_source": "../docs/contributors/code/native-mobile.md",
+		"parent": "code"
+	},
+	{
+		"title": "React Native Integration Test Guide",
+		"slug": "native-mobile-integration-test-guide",
+		"markdown_source": "../docs/contributors/code/native-mobile-integration-test-guide.md",
 		"parent": "code"
 	},
 	{

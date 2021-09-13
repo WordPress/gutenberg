@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { loop } from '@wordpress/icons';
+import { layout } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -14,7 +14,7 @@ const { name } = metadata;
 export { metadata, name };
 
 export const settings = {
-	icon: loop,
+	icon: layout,
 	edit,
 	save,
 };

@@ -276,6 +276,8 @@ describe( 'Template Part', () => {
 			'//button[contains(text(), "New template part")]';
 		const chooseExistingButtonSelector =
 			'//button[contains(text(), "Choose existing")]';
+		const confirmTitleButtonSelector =
+			'.wp-block-template-part__placeholder-create-new__title-form .components-button.is-primary';
 
 		it( 'Should insert new template part on creation', async () => {
 			await createNewPost();
@@ -287,6 +289,13 @@ describe( 'Template Part', () => {
 				createNewButtonSelector
 			);
 			await createNewButton.click();
+			const confirmTitleButton = await page.waitForSelector(
+				confirmTitleButtonSelector
+			);
+			await page.keyboard.press( 'Tab' );
+			await page.keyboard.press( 'Tab' );
+			await page.keyboard.type( 'Create New' );
+			await confirmTitleButton.click();
 
 			const newTemplatePart = await page.waitForSelector(
 				activatedTemplatePartSelector
@@ -307,9 +316,9 @@ describe( 'Template Part', () => {
 				chooseExistingButtonSelector
 			);
 			await chooseExistingButton.click();
-			const preview = await page.waitForXPath( testContentSelector );
-			expect( preview ).toBeTruthy();
-
+			const preview = await page.waitForSelector(
+				'[aria-label="Create New"]'
+			);
 			await preview.click();
 			await page.waitForSelector( activatedTemplatePartSelector );
 			const templatePartContent = await page.waitForXPath(

@@ -6,20 +6,22 @@
 
 ```jsx
 import { DropZone } from '@wordpress/components';
-import { withState } from '@wordpress/compose';
+import { useState } from '@wordpress/element';
 
-const MyDropZone = withState( {
-	hasDropped: false,
-} )( ( { hasDropped, setState } ) => (
-	<div>
-		{ hasDropped ? 'Dropped!' : 'Drop something here' }
-		<DropZone
-			onFilesDrop={ () => setState( { hasDropped: true } ) }
-			onHTMLDrop={ () => setState( { hasDropped: true } ) }
-			onDrop={ () => setState( { hasDropped: true } ) }
-		/>
-	</div>
-) );
+const MyDropZone = () => {
+	const [ hasDropped, setHasDropped ] = useState( false );
+
+	return (
+		<div>
+			{ hasDropped ? 'Dropped!' : 'Drop something here' }
+			<DropZone
+				onFilesDrop={ () => setHasDropped( true ) }
+				onHTMLDrop={ () => setHasDropped( true ) }
+				onDrop={ () => setHasDropped( true ) }
+			/>
+		</div>
+	);
+}
 ```
 
 ## Props

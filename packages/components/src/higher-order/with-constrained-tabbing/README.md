@@ -12,15 +12,14 @@ import {
 	TextControl,
 	Button,
 } from '@wordpress/components';
-import { withState } from '@wordpress/compose';
+import { useState } from '@wordpress/element';
 
 const ConstrainedTabbing = withConstrainedTabbing(
 	( { children } ) => children
 );
 
-const MyComponentWithConstrainedTabbing = withState( {
-	isConstrainedTabbing: false,
-} )( ( { isConstrainedTabbing, setState } ) => {
+const MyComponentWithConstrainedTabbing = () => {
+	const [ isConstrainedTabbing, setIsConstrainedTabbing ] = useState( false );
 	let form = (
 		<form>
 			<TextControl label="Input 1" onChange={ () => {} } />
@@ -32,9 +31,7 @@ const MyComponentWithConstrainedTabbing = withState( {
 	}
 
 	const toggleConstrain = () => {
-		setState( ( state ) => ( {
-			isConstrainedTabbing: ! state.isConstrainedTabbing,
-		} ) );
+		setIsConstrainedTabbing( ( state ) => ! state );
 	};
 
 	return (
@@ -46,5 +43,5 @@ const MyComponentWithConstrainedTabbing = withState( {
 			</Button>
 		</div>
 	);
-} );
+}
 ```

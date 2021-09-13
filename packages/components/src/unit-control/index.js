@@ -14,10 +14,8 @@ import { ENTER } from '@wordpress/keycodes';
 /**
  * Internal dependencies
  */
-import {
-	inputControlActionTypes,
-	composeStateReducers,
-} from '../input-control/state';
+import * as inputControlActionTypes from '../input-control/reducer/actions';
+import { composeStateReducers } from '../input-control/reducer/reducer';
 import { Root, ValueInput } from './styles/unit-control-styles';
 import UnitSelectControl from './unit-select-control';
 import { CSS_UNITS, getParsedValue, getValidParsedUnit } from './utils';

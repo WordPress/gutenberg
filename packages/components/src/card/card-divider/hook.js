@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { cx } from '@emotion/css';
-
-/**
  * WordPress dependencies
  */
 import { useMemo } from '@wordpress/element';
@@ -13,15 +8,18 @@ import { useMemo } from '@wordpress/element';
  */
 import { useContextSystem } from '../../ui/context';
 import * as styles from '../styles';
+import { useCx } from '../../utils/hooks/use-cx';
 
 /**
- * @param {import('../../ui/context').PolymorphicComponentProps<import('../../divider').DividerProps, 'hr', false>} props
+ * @param {import('../../ui/context').WordPressComponentProps<import('../../divider').DividerProps, 'hr', false>} props
  */
 export function useCardDivider( props ) {
 	const { className, ...otherProps } = useContextSystem(
 		props,
 		'CardDivider'
 	);
+
+	const cx = useCx();
 
 	const classes = useMemo(
 		() =>

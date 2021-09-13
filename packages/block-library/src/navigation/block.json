@@ -8,7 +8,8 @@
 	"textdomain": "default",
 	"attributes": {
 		"orientation": {
-			"type": "string"
+			"type": "string",
+			"default": "horizontal"
 		},
 		"textColor": {
 			"type": "string"
@@ -35,11 +36,27 @@
 			"type": "boolean",
 			"default": true
 		},
+		"openSubmenusOnClick":{
+			"type": "boolean",
+			"default": false
+		},
 		"isResponsive": {
 			"type": "boolean",
 			"default": false
 		},
 		"__unstableLocation": {
+			"type": "string"
+		},
+		"overlayBackgroundColor": {
+			"type": "string"
+		},
+		"customOverlayBackgroundColor": {
+			"type": "string"
+		},
+		"overlayTextColor": {
+			"type": "string"
+		},
+		"customOverlayTextColor": {
 			"type": "string"
 		}
 	},
@@ -48,9 +65,14 @@
 		"customTextColor": "customTextColor",
 		"backgroundColor": "backgroundColor",
 		"customBackgroundColor": "customBackgroundColor",
+		"overlayTextColor": "overlayTextColor",
+		"customOverlayTextColor": "customOverlayTextColor",
+		"overlayBackgroundColor": "overlayBackgroundColor",
+		"customOverlayBackgroundColor": "customOverlayBackgroundColor",
 		"fontSize": "fontSize",
 		"customFontSize": "customFontSize",
 		"showSubmenuIcon": "showSubmenuIcon",
+		"openSubmenusOnClick": "openSubmenusOnClick",
 		"style": "style",
 		"orientation": "orientation"
 	},
@@ -67,8 +89,7 @@
 			"__experimentalTextTransform": true,
 			"__experimentalFontFamily": true,
 			"__experimentalTextDecoration": true
-		},
-		"color": true
+		}
 	},
 	"viewScript": "file:./view.min.js",
 	"editorStyle": "wp-block-navigation-editor",

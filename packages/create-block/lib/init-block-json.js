@@ -15,6 +15,7 @@ module.exports = async ( {
 	slug,
 	namespace,
 	title,
+	version,
 	description,
 	category,
 	attributes,
@@ -35,6 +36,7 @@ module.exports = async ( {
 				{
 					apiVersion,
 					name: namespace + '/' + slug,
+					version,
 					title,
 					category,
 					icon: dashicon,

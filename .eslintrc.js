@@ -49,7 +49,7 @@ module.exports = {
 		jsdoc: {
 			mode: 'typescript',
 		},
-		'import/resolver': require.resolve( './test/lint/import-resolver' ),
+		'import/resolver': require.resolve( './tools/eslint/import-resolver' ),
 	},
 	rules: {
 		'jest/expect-expect': 'off',
@@ -70,6 +70,11 @@ module.exports = {
 			'error',
 			{
 				paths: [
+					{
+						name: 'framer-motion',
+						message:
+							'Please use the Framer Motion API through `@wordpress/components` instead.',
+					},
 					{
 						name: 'lodash',
 						importNames: [ 'memoize' ],
@@ -96,6 +101,11 @@ module.exports = {
 						message:
 							'`puppeteer-testing-library` is still experimental.',
 					},
+					{
+						name: '@emotion/css',
+						message:
+							'Please use `@emotion/react` and `@emotion/styled` in order to maintain iframe support. As a replacement for the `cx` function, please use the `useCx` hook defined in `@wordpress/components` instead.',
+					},
 				],
 			},
 		],
@@ -109,12 +119,6 @@ module.exports = {
 					'ImportDeclaration[source.value=/^@wordpress\\u002F.+\\u002F/]',
 				message:
 					'Path access on WordPress dependencies is not allowed.',
-			},
-			{
-				selector:
-					'ImportDeclaration[source.value=/^react-spring(?!\\u002Fweb.cjs)/]',
-				message:
-					'The react-spring dependency must specify CommonJS bundle: react-spring/web.cjs',
 			},
 			{
 				selector:

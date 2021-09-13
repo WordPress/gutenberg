@@ -26,7 +26,7 @@ import { isAppleOS } from './platform';
 
 /** @typedef {typeof ALT | CTRL | COMMAND | SHIFT } WPModifierPart */
 
-/** @typedef {'primary' | 'primaryShift' | 'primaryAlt' | 'secondary' | 'access' | 'ctrl' | 'alt' | 'ctrlShift' | 'shift' | 'shiftAlt'} WPKeycodeModifier */
+/** @typedef {'primary' | 'primaryShift' | 'primaryAlt' | 'secondary' | 'access' | 'ctrl' | 'alt' | 'ctrlShift' | 'shift' | 'shiftAlt' | 'undefined'} WPKeycodeModifier */
 
 /**
  * An object of handler functions for each of the possible modifier
@@ -68,6 +68,26 @@ export const ESCAPE = 27;
  * Keycode for SPACE key.
  */
 export const SPACE = 32;
+
+/**
+ * Keycode for PAGEUP key.
+ */
+export const PAGEUP = 33;
+
+/**
+ * Keycode for PAGEDOWN key.
+ */
+export const PAGEDOWN = 34;
+
+/**
+ * Keycode for END key.
+ */
+export const END = 35;
+
+/**
+ * Keycode for HOME key.
+ */
+export const HOME = 36;
 
 /**
  * Keycode for LEFT key.
@@ -144,6 +164,7 @@ export const modifiers = {
 	ctrlShift: () => [ CTRL, SHIFT ],
 	shift: () => [ SHIFT ],
 	shiftAlt: () => [ SHIFT, ALT ],
+	undefined: () => [],
 };
 
 /**
@@ -325,10 +346,21 @@ export const isKeyboardEvent = mapValues( modifiers, ( getModifiers ) => {
 			return false;
 		}
 
+		let key = event.key.toLowerCase();
+
 		if ( ! character ) {
-			return includes( mods, event.key.toLowerCase() );
+			return includes( mods, key );
 		}
 
-		return event.key === character;
+		if ( event.altKey && character.length === 1 ) {
+			key = String.fromCharCode( event.keyCode ).toLowerCase();
+		}
+
+		// For backwards compatibility.
+		if ( character === 'del' ) {
+			character = 'delete';
+		}
+
+		return key === character.toLowerCase();
 	};
 } );

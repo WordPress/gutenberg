@@ -69,6 +69,9 @@ export function usePasteHandler( props ) {
 				}
 			}
 
+			// Remove Windows-specific metadata appended within copied HTML text.
+			html = removeWindowsFragments( html );
+
 			event.preventDefault();
 
 			// Allows us to ask for this information when we get a report.
@@ -221,4 +224,18 @@ export function usePasteHandler( props ) {
 			element.removeEventListener( 'paste', _onPaste );
 		};
 	}, [] );
+}
+
+/**
+ * Normalizes a given string of HTML to remove the Windows specific "Fragment" comments
+ * and any preceeding and trailing whitespace.
+ *
+ * @param {string} html the html to be normalized
+ * @return {string} the normalized html
+ */
+function removeWindowsFragments( html ) {
+	const startReg = /.*<!--StartFragment-->/s;
+	const endReg = /<!--EndFragment-->.*/s;
+
+	return html.replace( startReg, '' ).replace( endReg, '' );
 }

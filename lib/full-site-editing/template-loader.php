@@ -110,10 +110,7 @@ function gutenberg_override_query_template( $template, $type, array $templates )
  *
  * @param string   $template_type      The current template type.
  * @param string[] $template_hierarchy (optional) The current template hierarchy, ordered by priority.
- * @return null|array {
- *  @type WP_Post|null template_post A template post object, or null if none could be found.
- *  @type int[] A list of template parts IDs for the template.
- * }
+ * @return null|WP_Block_Template A block template if found. Null if not.
  */
 function gutenberg_resolve_template( $template_type, $template_hierarchy ) {
 	if ( ! $template_type ) {
@@ -177,11 +174,7 @@ function gutenberg_get_the_template_html() {
 	$content = $wp_embed->autoembed( $content );
 	$content = do_blocks( $content );
 	$content = wptexturize( $content );
-	if ( function_exists( 'wp_filter_content_tags' ) ) {
-		$content = wp_filter_content_tags( $content );
-	} else {
-		$content = wp_make_content_images_responsive( $content );
-	}
+	$content = wp_filter_content_tags( $content );
 	$content = str_replace( ']]>', ']]&gt;', $content );
 
 	// Wrap block template in .wp-site-blocks to allow for specific descendant styles

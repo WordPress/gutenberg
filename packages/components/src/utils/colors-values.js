@@ -155,6 +155,7 @@ export const UI = {
 	background: BASE.white,
 	backgroundDisabled: LIGHT_GRAY[ 200 ],
 	border: G2.gray[ 700 ],
+	borderHover: G2.gray[ 700 ],
 	borderFocus: ADMIN.themeDark10,
 	borderDisabled: G2.gray[ 400 ],
 	borderLight: G2.gray[ 200 ],

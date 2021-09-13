@@ -18,7 +18,7 @@ import {
 	withFilters,
 } from '@wordpress/components';
 import { withDispatch, useSelect } from '@wordpress/data';
-import { DOWN, TAB, ESCAPE } from '@wordpress/keycodes';
+import { DOWN } from '@wordpress/keycodes';
 import { compose } from '@wordpress/compose';
 import { upload, media as mediaIcon } from '@wordpress/icons';
 import { store as noticesStore } from '@wordpress/notices';
@@ -104,7 +104,6 @@ const MediaReplaceFlow = ( {
 	const openOnArrowDown = ( event ) => {
 		if ( event.keyCode === DOWN ) {
 			event.preventDefault();
-			event.stopPropagation();
 			event.target.click();
 		}
 	};
@@ -164,23 +163,7 @@ const MediaReplaceFlow = ( {
 					</NavigableMenu>
 					{ onSelectURL && (
 						// eslint-disable-next-line jsx-a11y/no-noninteractive-element-interactions
-						<form
-							className="block-editor-media-flow__url-input"
-							onKeyDown={ ( event ) => {
-								if (
-									! [ TAB, ESCAPE ].includes( event.keyCode )
-								) {
-									event.stopPropagation();
-								}
-							} }
-							onKeyPress={ ( event ) => {
-								if (
-									! [ TAB, ESCAPE ].includes( event.keyCode )
-								) {
-									event.stopPropagation();
-								}
-							} }
-						>
+						<form className="block-editor-media-flow__url-input">
 							<span className="block-editor-media-replace-flow__image-url-label">
 								{ __( 'Current media URL:' ) }
 							</span>

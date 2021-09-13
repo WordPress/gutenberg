@@ -69,7 +69,7 @@ export type BodyProps = BaseSubComponentProps & {
 	/**
 	 * Determines if the component is scrollable.
 	 *
-	 * @default true
+	 * @default false
 	 */
 	isScrollable?: boolean;
 };

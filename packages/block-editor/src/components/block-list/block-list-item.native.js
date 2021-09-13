@@ -16,6 +16,8 @@ import { ReadableContentView, alignmentHelpers } from '@wordpress/components';
  */
 import BlockListBlock from './block';
 import BlockInsertionPoint from './insertion-point';
+import Grid from './grid-item';
+
 import styles from './block-list-item.native.scss';
 import { store as blockEditorStore } from '../../store';
 
@@ -104,7 +106,7 @@ export class BlockListItem extends Component {
 		];
 	}
 
-	render() {
+	renderContent() {
 		const {
 			blockAlignment,
 			clientId,
@@ -122,10 +124,6 @@ export class BlockListItem extends Component {
 		const readableContentViewStyle =
 			contentResizeMode === 'stretch' && stretchStyle;
 		const { isContainerRelated } = alignmentHelpers;
-
-		if ( ! blockWidth ) {
-			return null;
-		}
 
 		return (
 			<ReadableContentView
@@ -162,6 +160,34 @@ export class BlockListItem extends Component {
 			</ReadableContentView>
 		);
 	}
+
+	render() {
+		const {
+			gridProperties,
+			clientId,
+			parentWidth,
+			items,
+			blockWidth,
+		} = this.props;
+
+		if ( ! blockWidth ) {
+			return null;
+		}
+
+		if ( gridProperties ) {
+			return (
+				<Grid
+					numOfColumns={ gridProperties.numColumns }
+					tileCount={ items.length }
+					index={ items.indexOf( clientId ) }
+					maxWidth={ parentWidth }
+				>
+					{ this.renderContent() }
+				</Grid>
+			);
+		}
+		return this.renderContent();
+	}
 }
 
 export default compose( [
@@ -173,7 +199,7 @@ export default compose( [
 				isBlockInsertionPointVisible,
 				getSettings,
 				getBlockParents,
-				__unstableGetBlockWithoutInnerBlocks,
+				getBlock,
 			} = select( blockEditorStore );
 
 			const blockClientIds = getBlockOrder( rootClientId );
@@ -199,14 +225,11 @@ export default compose( [
 
 			const isReadOnly = getSettings().readOnly;
 
-			const block = __unstableGetBlockWithoutInnerBlocks( clientId );
-			const { attributes, name } = block || {};
+			const { attributes, name } = getBlock( clientId ) || {};
 			const { align } = attributes || {};
 			const parents = getBlockParents( clientId, true );
 			const hasParents = !! parents.length;
-			const parentBlock = hasParents
-				? __unstableGetBlockWithoutInnerBlocks( parents[ 0 ] )
-				: {};
+			const parentBlock = hasParents ? getBlock( parents[ 0 ] ) : {};
 			const { align: parentBlockAlignment } =
 				parentBlock?.attributes || {};
 			const { name: parentBlockName } = parentBlock || {};

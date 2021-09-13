@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 5.2.0 (2021-07-21)
+
 ### New feature
 
 -   `AbortError` being thrown by the default fetch handler can now be caught and handled separately in user-land. Add documentation about aborting a request ([#32530](https://github.com/WordPress/gutenberg/pull/32530)).

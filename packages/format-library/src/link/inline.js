@@ -11,6 +11,7 @@ import {
 	isCollapsed,
 	applyFormat,
 	useAnchorRef,
+	removeFormat,
 } from '@wordpress/rich-text';
 import { __experimentalLinkControl as LinkControl } from '@wordpress/block-editor';
 
@@ -47,6 +48,13 @@ function InlineLinkUI( {
 		opensInNewTab: activeAttributes.target === '_blank',
 		...nextLinkValue,
 	};
+
+	function removeLink() {
+		const newValue = removeFormat( value, 'core/link' );
+		onChange( newValue );
+		stopAddingLink();
+		speak( __( 'Link removed.' ), 'assertive' );
+	}
 
 	function onChangeLink( nextValue ) {
 		// Merge with values from state, both for the purpose of assigning the
@@ -139,6 +147,7 @@ function InlineLinkUI( {
 			<LinkControl
 				value={ linkValue }
 				onChange={ onChangeLink }
+				onRemove={ removeLink }
 				forceIsEditingLink={ addingLink }
 				hasRichPreviews
 			/>

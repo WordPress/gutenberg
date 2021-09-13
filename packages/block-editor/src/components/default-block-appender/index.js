@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import classnames from 'classnames';
+
+/**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
@@ -37,7 +42,9 @@ export function DefaultBlockAppender( {
 	return (
 		<div
 			data-root-client-id={ rootClientId || '' }
-			className="block-editor-default-block-appender"
+			className={ classnames( 'block-editor-default-block-appender', {
+				'has-visible-prompt': showPrompt,
+			} ) }
 		>
 			<p
 				tabIndex="0"

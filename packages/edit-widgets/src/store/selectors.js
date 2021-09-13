@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { get, keyBy } from 'lodash';
+import { keyBy } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -77,6 +77,27 @@ export const getWidgetAreaForWidgetId = createRegistrySelector(
 			);
 			return blockWidgetIds.includes( widgetId );
 		} );
+	}
+);
+
+/**
+ * Given a child client id, returns the parent widget area block.
+ *
+ * @param {string} clientId The client id of a block in a widget area.
+ *
+ * @return {WPBlock} The widget area block.
+ */
+export const getParentWidgetAreaBlock = createRegistrySelector(
+	( select ) => ( state, clientId ) => {
+		const { getBlock, getBlockName, getBlockParents } = select(
+			blockEditorStore
+		);
+		const blockParents = getBlockParents( clientId );
+		const widgetAreaClientId = blockParents.find(
+			( parentClientId ) =>
+				getBlockName( parentClientId ) === 'core/widget-area'
+		);
+		return getBlock( widgetAreaClientId );
 	}
 );
 
@@ -202,6 +223,18 @@ export function isInserterOpened( state ) {
 }
 
 /**
+ * Get the insertion point for the inserter.
+ *
+ * @param {Object} state Global application state.
+ *
+ * @return {Object} The root client ID and index to insert at.
+ */
+export function __experimentalGetInsertionPoint( state ) {
+	const { rootClientId, insertionIndex } = state.blockInserterPanel;
+	return { rootClientId, insertionIndex };
+}
+
+/**
  * Returns true if a block can be inserted into a widget area.
  *
  * @param {Array}  state     The open state of the widget areas.
@@ -224,19 +257,3 @@ export const canInsertBlockInWidgetArea = createRegistrySelector(
 		);
 	}
 );
-
-/**
- * Returns whether the given feature is enabled or not.
- *
- * This function is unstable, as it is mostly copied from the edit-post
- * package. Editor features and preferences have a lot of scope for
- * being generalized and refactored.
- *
- * @param {Object} state   Global application state.
- * @param {string} feature Feature slug.
- *
- * @return {boolean} Is active.
- */
-export function __unstableIsFeatureActive( state, feature ) {
-	return get( state.preferences.features, [ feature ], false );
-}

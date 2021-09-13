@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { size, map, without, omit } from 'lodash';
+import { size, map, without } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -17,6 +17,7 @@ import {
 import { StrictMode, useMemo } from '@wordpress/element';
 import { KeyboardShortcuts, SlotFillProvider } from '@wordpress/components';
 import { store as coreStore } from '@wordpress/core-data';
+import { ShortcutProvider } from '@wordpress/keyboard-shortcuts';
 
 /**
  * Internal dependencies
@@ -109,7 +110,7 @@ function Editor( {
 
 	const editorSettings = useMemo( () => {
 		const result = {
-			...omit( settings, [ 'styles' ] ),
+			...settings,
 			__experimentalPreferredStyleVariations: {
 				value: preferredStyleVariations,
 				onChange: updatePreferredStyleVariations,
@@ -156,7 +157,9 @@ function Editor( {
 	] );
 
 	const styles = useMemo( () => {
-		return hasThemeStyles ? settings.styles : [];
+		return hasThemeStyles && settings.styles?.length
+			? settings.styles
+			: settings.defaultEditorStyles;
 	}, [ settings, hasThemeStyles ] );
 
 	if ( ! post ) {
@@ -165,29 +168,31 @@ function Editor( {
 
 	return (
 		<StrictMode>
-			<EditPostSettings.Provider value={ settings }>
-				<SlotFillProvider>
-					<EditorProvider
-						settings={ editorSettings }
-						post={ post }
-						initialEdits={ initialEdits }
-						useSubRegistry={ false }
-						__unstableTemplate={
-							isTemplateMode ? template : undefined
-						}
-						{ ...props }
-					>
-						<ErrorBoundary onError={ onError }>
-							<EditorInitialization postId={ postId } />
-							<Layout styles={ styles } />
-							<KeyboardShortcuts
-								shortcuts={ preventEventDiscovery }
-							/>
-						</ErrorBoundary>
-						<PostLockedModal />
-					</EditorProvider>
-				</SlotFillProvider>
-			</EditPostSettings.Provider>
+			<ShortcutProvider>
+				<EditPostSettings.Provider value={ settings }>
+					<SlotFillProvider>
+						<EditorProvider
+							settings={ editorSettings }
+							post={ post }
+							initialEdits={ initialEdits }
+							useSubRegistry={ false }
+							__unstableTemplate={
+								isTemplateMode ? template : undefined
+							}
+							{ ...props }
+						>
+							<ErrorBoundary onError={ onError }>
+								<EditorInitialization postId={ postId } />
+								<Layout styles={ styles } />
+								<KeyboardShortcuts
+									shortcuts={ preventEventDiscovery }
+								/>
+							</ErrorBoundary>
+							<PostLockedModal />
+						</EditorProvider>
+					</SlotFillProvider>
+				</EditPostSettings.Provider>
+			</ShortcutProvider>
 		</StrictMode>
 	);
 }

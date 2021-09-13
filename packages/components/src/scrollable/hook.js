@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { cx } from '@emotion/css';
-
-/**
  * WordPress dependencies
  */
 import { useMemo } from '@wordpress/element';
@@ -13,10 +8,11 @@ import { useMemo } from '@wordpress/element';
  */
 import { useContextSystem } from '../ui/context';
 import * as styles from './styles';
+import { useCx } from '../utils/hooks/use-cx';
 
 /* eslint-disable jsdoc/valid-types */
 /**
- * @param {import('../ui/context').PolymorphicComponentProps<import('./types').Props, 'div'>} props
+ * @param {import('../ui/context').WordPressComponentProps<import('./types').Props, 'div'>} props
  */
 /* eslint-enable jsdoc/valid-types */
 export function useScrollable( props ) {
@@ -26,6 +22,8 @@ export function useScrollable( props ) {
 		smoothScroll = false,
 		...otherProps
 	} = useContextSystem( props, 'Scrollable' );
+
+	const cx = useCx();
 
 	const classes = useMemo(
 		() =>

@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { cx } from '@emotion/css';
-
-/**
  * WordPress dependencies
  */
 import deprecated from '@wordpress/deprecated';
@@ -15,12 +10,13 @@ import { useMemo } from '@wordpress/element';
 import { useContextSystem } from '../../ui/context';
 import { useSurface } from '../../surface';
 import * as styles from '../styles';
+import { useCx } from '../../utils/hooks/use-cx';
 
 /**
- * @param {import('../../ui/context').PolymorphicComponentProps<import('../types').Props, 'div'>} props
+ * @param {import('../../ui/context').WordPressComponentProps<import('../types').Props, 'div'>} props
  */
 function useDeprecatedProps( { elevation, isElevated, ...otherProps } ) {
-	/**@type {import('../../ui/context').PolymorphicComponentProps<import('../types').Props, 'div'>} */
+	/**@type {import('../../ui/context').WordPressComponentProps<import('../types').Props, 'div'>} */
 	const propsToReturn = {
 		...otherProps,
 	};
@@ -44,7 +40,7 @@ function useDeprecatedProps( { elevation, isElevated, ...otherProps } ) {
 }
 
 /**
- * @param {import('../../ui/context').PolymorphicComponentProps<import('../types').Props, 'div'>} props
+ * @param {import('../../ui/context').WordPressComponentProps<import('../types').Props, 'div'>} props
  */
 export function useCard( props ) {
 	const {
@@ -55,6 +51,8 @@ export function useCard( props ) {
 		size = 'medium',
 		...otherProps
 	} = useContextSystem( useDeprecatedProps( props ), 'Card' );
+
+	const cx = useCx();
 
 	const classes = useMemo( () => {
 		return cx(

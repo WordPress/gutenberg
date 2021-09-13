@@ -39,9 +39,8 @@ import { store as coreStore } from '@wordpress/core-data';
  * @param {WPTerm[]} terms The terms to extract of helper object.
  * @return {QueryTermsInfo} The object with the terms information.
  */
-export const getTermsInfo = ( terms ) => ( {
-	terms,
-	...terms?.reduce(
+export const getTermsInfo = ( terms ) => {
+	const mapping = terms?.reduce(
 		( accumulator, term ) => {
 			const { mapById, mapByName, names } = accumulator;
 			mapById[ term.id ] = term;
@@ -50,8 +49,13 @@ export const getTermsInfo = ( terms ) => ( {
 			return accumulator;
 		},
 		{ mapById: {}, mapByName: {}, names: [] }
-	),
-} );
+	);
+
+	return {
+		terms,
+		...mapping,
+	};
+};
 
 /**
  * Returns a helper object that contains:

@@ -8,7 +8,7 @@
 
 ```jsx
 import { withFocusReturn, TextControl, Button } from '@wordpress/components';
-import { withState } from '@wordpress/compose';
+import { useState } from '@wordpress/element';
 
 const EnhancedComponent = withFocusReturn( () => (
 	<div>
@@ -17,12 +17,11 @@ const EnhancedComponent = withFocusReturn( () => (
 	</div>
 ) );
 
-const MyComponentWithFocusReturn = withState( {
-	text: '',
-} )( ( { text, setState } ) => {
+const MyComponentWithFocusReturn = () => {
+	const [ text, setText ] = useState( '' );
 	const unmount = () => {
 		document.activeElement.blur();
-		setState( { text: '' } );
+		setText( '' );
 	};
 
 	return (
@@ -30,7 +29,7 @@ const MyComponentWithFocusReturn = withState( {
 			<TextControl
 				placeholder="Type something"
 				value={ text }
-				onChange={ ( text ) => setState( { text } ) }
+				onChange={ ( value ) => setText( value ) }
 			/>
 			{ text && <EnhancedComponent /> }
 			{ text && (
@@ -40,7 +39,7 @@ const MyComponentWithFocusReturn = withState( {
 			) }
 		</div>
 	);
-} );
+}
 ```
 
 `withFocusReturn` can optionally be called as a higher-order function creator. Provided an options object, a new higher-order function is returned.

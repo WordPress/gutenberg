@@ -7,7 +7,7 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { useState, RawHTML, useEffect, useRef } from '@wordpress/element';
+import { RawHTML } from '@wordpress/element';
 import {
 	BaseControl,
 	PanelBody,
@@ -19,8 +19,6 @@ import {
 	ToggleControl,
 	ToolbarGroup,
 } from '@wordpress/components';
-import apiFetch from '@wordpress/api-fetch';
-import { addQueryArgs } from '@wordpress/url';
 import { __, sprintf } from '@wordpress/i18n';
 import { dateI18n, format, __experimentalGetSettings } from '@wordpress/date';
 import {
@@ -49,10 +47,12 @@ import {
  */
 const CATEGORIES_LIST_QUERY = {
 	per_page: -1,
+	context: 'view',
 };
 const USERS_LIST_QUERY = {
 	per_page: -1,
 	has_published_posts: [ 'post' ],
+	context: 'view',
 };
 
 export default function LatestPostsEdit( { attributes, setAttributes } ) {
@@ -81,9 +81,13 @@ export default function LatestPostsEdit( { attributes, setAttributes } ) {
 		latestPosts,
 		defaultImageWidth,
 		defaultImageHeight,
+		categoriesList,
+		authorList,
 	} = useSelect(
 		( select ) => {
-			const { getEntityRecords, getMedia } = select( coreStore );
+			const { getEntityRecords, getMedia, getUsers } = select(
+				coreStore
+			);
 			const { getSettings } = select( blockEditorStore );
 			const { imageSizes, imageDimensions } = getSettings();
 			const catIds =
@@ -150,6 +154,12 @@ export default function LatestPostsEdit( { attributes, setAttributes } ) {
 							};
 							return { ...post, featuredImageInfo };
 					  } ),
+				categoriesList: getEntityRecords(
+					'taxonomy',
+					'category',
+					CATEGORIES_LIST_QUERY
+				),
+				authorList: getUsers( USERS_LIST_QUERY ),
 			};
 		},
 		[
@@ -161,15 +171,14 @@ export default function LatestPostsEdit( { attributes, setAttributes } ) {
 			selectedAuthor,
 		]
 	);
-	const [ categoriesList, setCategoriesList ] = useState( [] );
-	const [ authorList, setAuthorList ] = useState( [] );
-	const categorySuggestions = categoriesList.reduce(
-		( accumulator, category ) => ( {
-			...accumulator,
-			[ category.name ]: category,
-		} ),
-		{}
-	);
+	const categorySuggestions =
+		categoriesList?.reduce(
+			( accumulator, category ) => ( {
+				...accumulator,
+				[ category.name ]: category,
+			} ),
+			{}
+		) ?? {};
 	const selectCategories = ( tokens ) => {
 		const hasNoSuggestion = tokens.some(
 			( token ) =>
@@ -192,43 +201,6 @@ export default function LatestPostsEdit( { attributes, setAttributes } ) {
 		}
 		setAttributes( { categories: allCategories } );
 	};
-
-	const isStillMounted = useRef();
-
-	useEffect( () => {
-		isStillMounted.current = true;
-
-		apiFetch( {
-			path: addQueryArgs( `/wp/v2/categories`, CATEGORIES_LIST_QUERY ),
-		} )
-			.then( ( data ) => {
-				if ( isStillMounted.current ) {
-					setCategoriesList( data );
-				}
-			} )
-			.catch( () => {
-				if ( isStillMounted.current ) {
-					setCategoriesList( [] );
-				}
-			} );
-		apiFetch( {
-			path: addQueryArgs( `/wp/v2/users`, USERS_LIST_QUERY ),
-		} )
-			.then( ( data ) => {
-				if ( isStillMounted.current ) {
-					setAuthorList( data );
-				}
-			} )
-			.catch( () => {
-				if ( isStillMounted.current ) {
-					setAuthorList( [] );
-				}
-			} );
-
-		return () => {
-			isStillMounted.current = false;
-		};
-	}, [] );
 
 	const hasPosts = !! latestPosts?.length;
 	const inspectorControls = (
@@ -377,7 +349,7 @@ export default function LatestPostsEdit( { attributes, setAttributes } ) {
 								'' !== value ? Number( value ) : undefined,
 						} )
 					}
-					authorList={ authorList }
+					authorList={ authorList ?? [] }
 					selectedAuthorId={ selectedAuthor }
 				/>
 
@@ -466,7 +438,7 @@ export default function LatestPostsEdit( { attributes, setAttributes } ) {
 						'trim',
 					] );
 					let excerpt = post.excerpt.rendered;
-					const currentAuthor = authorList.find(
+					const currentAuthor = authorList?.find(
 						( author ) => author.id === post.author
 					);
 

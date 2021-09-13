@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * External dependencies
  */
@@ -15,7 +16,7 @@ import { forwardRef } from '@wordpress/element';
  */
 import Tooltip from '../tooltip';
 import Icon from '../icon';
-import VisuallyHidden from '../visually-hidden';
+import { VisuallyHidden } from '../visually-hidden';
 
 const disabledEventsOnDisabledButton = [ 'onMouseDown', 'onClick' ];
 

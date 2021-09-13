@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { css } from '@emotion/css';
+import { css } from '@emotion/react';
 
 /**
  * Internal dependencies
@@ -125,7 +125,7 @@ const gridBackgroundCombined = [
 
 /**
  * @param {string} surfaceBackgroundSize
- * @return {string} CSS.
+ * @return {import('@emotion/react').SerializedStyles} CSS.
  */
 export const getGrid = ( surfaceBackgroundSize ) => {
 	return css`

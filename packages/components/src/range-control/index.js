@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * External dependencies
  */
@@ -47,6 +48,7 @@ function RangeControl(
 		initialPosition,
 		isShiftStepEnabled = true,
 		label,
+		hideLabelFromVision = false,
 		marks = false,
 		max = 100,
 		min = 0,
@@ -194,6 +196,7 @@ function RangeControl(
 		<BaseControl
 			className={ classes }
 			label={ label }
+			hideLabelFromVision={ hideLabelFromVision }
 			id={ id }
 			help={ help }
 		>
@@ -245,10 +248,11 @@ function RangeControl(
 						style={ { width: fillValueOffset } }
 						trackColor={ trackColor }
 					/>
-					<ThumbWrapper style={ offsetStyle }>
+					<ThumbWrapper style={ offsetStyle } disabled={ disabled }>
 						<Thumb
 							aria-hidden={ true }
 							isFocused={ isThumbFocused }
+							disabled={ disabled }
 						/>
 					</ThumbWrapper>
 					{ enableTooltip && (

@@ -43,16 +43,19 @@
 
 	// Placeholder improvements.
 	.components-placeholder {
+		justify-content: flex-start;
 		min-height: auto;
 		height: 120px;
-		padding: $grid-unit-10;
+		padding: $grid-unit-15;
 
 		// Massage the label.
 		.components-placeholder__label {
+			margin-top: $grid-unit-15;
 			white-space: nowrap;
 		}
 
-		.components-placeholder__label .block-editor-block-icon {
+		.components-placeholder__label .block-editor-block-icon,
+		.components-placeholder__label > svg {
 			margin-right: $grid-unit-05;
 		}
 
@@ -77,26 +80,6 @@
 		// Hide drag and drop text.
 		.components-drop-zone__content-text {
 			display: none;
-		}
-	}
-}
-.editor-styles-wrapper {
-	.site-logo_placeholder {
-		display: flex;
-		flex-direction: row;
-		align-items: flex-start;
-		border-radius: $radius-block-ui;
-		background-color: $white;
-		box-shadow: inset 0 0 0 $border-width $gray-900;
-		padding: $grid-unit-15;
-		svg {
-			margin-right: $grid-unit-15;
-		}
-		p {
-			font-family: $default-font;
-			font-size: $default-font-size;
-			margin: 0;
-			line-height: initial;
 		}
 	}
 }

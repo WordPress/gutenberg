@@ -35,14 +35,23 @@ import { noop } from 'lodash';
  */
 import { __ } from '@wordpress/i18n';
 import { Component, createRef } from '@wordpress/element';
-import { TAB } from '@wordpress/keycodes';
+import {
+	TAB,
+	UP,
+	DOWN,
+	RIGHT,
+	LEFT,
+	PAGEUP,
+	PAGEDOWN,
+	HOME,
+	END,
+} from '@wordpress/keycodes';
 import { pure } from '@wordpress/compose';
 
 /**
  * Internal dependencies
  */
 import { calculateAlphaChange } from './utils';
-import KeyboardShortcuts from '../keyboard-shortcuts';
 
 export class Alpha extends Component {
 	constructor() {
@@ -54,6 +63,7 @@ export class Alpha extends Component {
 		this.handleChange = this.handleChange.bind( this );
 		this.handleMouseDown = this.handleMouseDown.bind( this );
 		this.handleMouseUp = this.handleMouseUp.bind( this );
+		this.handleKeyDown = this.handleKeyDown.bind( this );
 	}
 
 	componentWillUnmount() {
@@ -109,16 +119,33 @@ export class Alpha extends Component {
 		this.unbindEventListeners();
 	}
 
-	preventKeyEvents( event ) {
-		if ( event.keyCode === TAB ) {
-			return;
-		}
-		event.preventDefault();
-	}
-
 	unbindEventListeners() {
 		window.removeEventListener( 'mousemove', this.handleChange );
 		window.removeEventListener( 'mouseup', this.handleMouseUp );
+	}
+
+	handleKeyDown( event ) {
+		const { keyCode, shiftKey } = event;
+		const shortcuts = {
+			[ UP ]: () => this.increase( shiftKey ? 0.1 : 0.01 ),
+			[ RIGHT ]: () => this.increase( shiftKey ? 0.1 : 0.01 ),
+			[ PAGEUP ]: () => this.increase( 0.1 ),
+			[ END ]: () => this.increase( 1 ),
+			[ DOWN ]: () => this.decrease( shiftKey ? 0.1 : 0.01 ),
+			[ LEFT ]: () => this.decrease( shiftKey ? 0.1 : 0.01 ),
+			[ PAGEDOWN ]: () => this.decrease( 0.1 ),
+			[ HOME ]: () => this.decrease( 1 ),
+		};
+
+		for ( const code in shortcuts ) {
+			if ( code === String( keyCode ) ) {
+				shortcuts[ keyCode ]();
+			}
+		}
+
+		if ( keyCode !== TAB ) {
+			event.preventDefault();
+		}
 	}
 
 	render() {
@@ -129,54 +156,37 @@ export class Alpha extends Component {
 		};
 		const pointerLocation = { left: `${ rgb.a * 100 }%` };
 
-		const shortcuts = {
-			up: () => this.increase(),
-			right: () => this.increase(),
-			'shift+up': () => this.increase( 0.1 ),
-			'shift+right': () => this.increase( 0.1 ),
-			pageup: () => this.increase( 0.1 ),
-			end: () => this.increase( 1 ),
-			down: () => this.decrease(),
-			left: () => this.decrease(),
-			'shift+down': () => this.decrease( 0.1 ),
-			'shift+left': () => this.decrease( 0.1 ),
-			pagedown: () => this.decrease( 0.1 ),
-			home: () => this.decrease( 1 ),
-		};
-
 		return (
-			<KeyboardShortcuts shortcuts={ shortcuts }>
-				<div className="components-color-picker__alpha">
+			<div className="components-color-picker__alpha">
+				<div
+					className="components-color-picker__alpha-gradient"
+					style={ gradient }
+				/>
+				{ /* eslint-disable jsx-a11y/no-static-element-interactions */ }
+				<div
+					className="components-color-picker__alpha-bar"
+					ref={ this.container }
+					onMouseDown={ this.handleMouseDown }
+					onTouchMove={ this.handleChange }
+					onTouchStart={ this.handleChange }
+				>
 					<div
-						className="components-color-picker__alpha-gradient"
-						style={ gradient }
+						tabIndex="0"
+						role="slider"
+						aria-valuemax="1"
+						aria-valuemin="0"
+						aria-valuenow={ rgb.a }
+						aria-orientation="horizontal"
+						aria-label={ __(
+							'Alpha value, from 0 (transparent) to 1 (fully opaque).'
+						) }
+						className="components-color-picker__alpha-pointer"
+						style={ pointerLocation }
+						onKeyDown={ this.handleKeyDown }
 					/>
-					{ /* eslint-disable jsx-a11y/no-static-element-interactions */ }
-					<div
-						className="components-color-picker__alpha-bar"
-						ref={ this.container }
-						onMouseDown={ this.handleMouseDown }
-						onTouchMove={ this.handleChange }
-						onTouchStart={ this.handleChange }
-					>
-						<div
-							tabIndex="0"
-							role="slider"
-							aria-valuemax="1"
-							aria-valuemin="0"
-							aria-valuenow={ rgb.a }
-							aria-orientation="horizontal"
-							aria-label={ __(
-								'Alpha value, from 0 (transparent) to 1 (fully opaque).'
-							) }
-							className="components-color-picker__alpha-pointer"
-							style={ pointerLocation }
-							onKeyDown={ this.preventKeyEvents }
-						/>
-					</div>
-					{ /* eslint-enable jsx-a11y/no-static-element-interactions */ }
 				</div>
-			</KeyboardShortcuts>
+				{ /* eslint-enable jsx-a11y/no-static-element-interactions */ }
+			</div>
 		);
 	}
 }

@@ -156,15 +156,20 @@ function gutenberg_customize_widgets_init() {
  * @return bool Filtered decision about loading block assets.
  */
 function gutenberg_widgets_customize_load_block_editor_scripts_and_styles( $is_block_editor_screen ) {
-	if (
-		gutenberg_use_widgets_block_editor() &&
-		is_callable( 'get_current_screen' ) &&
-		'customize' === get_current_screen()->base
-	) {
-		return true;
+	if ( ! gutenberg_use_widgets_block_editor() ) {
+		return $is_block_editor_screen;
 	}
 
-	return $is_block_editor_screen;
+	if ( ! is_callable( 'get_current_screen' ) ) {
+		return $is_block_editor_screen;
+	}
+
+	$current_screen = get_current_screen();
+	if ( is_null( $current_screen ) ) {
+		return $is_block_editor_screen;
+	}
+
+	return 'customize' === $current_screen->base ? true : $is_block_editor_screen;
 }
 
 // Test for wp_use_widgets_block_editor(), as the existence of this in core

@@ -7,6 +7,7 @@ import { get } from 'lodash';
  * WordPress dependencies
  */
 import { useSelect } from '@wordpress/data';
+import { __EXPERIMENTAL_PATHS_WITH_MERGE as PATHS_WITH_MERGE } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
@@ -41,19 +42,12 @@ const deprecatedFlags = {
 		}
 
 		if ( settings.enableCustomUnits === true ) {
-			return [ 'px', 'em', 'rem', 'vh', 'vw' ];
+			return [ 'px', 'em', 'rem', 'vh', 'vw', '%' ];
 		}
 
 		return settings.enableCustomUnits;
 	},
 	'spacing.customPadding': ( settings ) => settings.enableCustomSpacing,
-};
-
-const PATHS_WITH_MERGE = {
-	'color.gradients': true,
-	'color.palette': true,
-	'typography.fontFamilies': true,
-	'typography.fontSizes': true,
 };
 
 /**

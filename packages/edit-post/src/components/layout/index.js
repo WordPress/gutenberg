@@ -12,6 +12,7 @@ import {
 	UnsavedChangesWarning,
 	EditorNotices,
 	EditorKeyboardShortcutsRegister,
+	EditorSnackbars,
 	store as editorStore,
 } from '@wordpress/editor';
 import { AsyncModeProvider, useSelect, useDispatch } from '@wordpress/data';
@@ -111,12 +112,10 @@ function Layout( { styles } ) {
 			hasActiveMetaboxes: select( editPostStore ).hasMetaBoxes(),
 			previousShortcut: select(
 				keyboardShortcutsStore
-			).getAllShortcutRawKeyCombinations(
-				'core/edit-post/previous-region'
-			),
+			).getAllShortcutKeyCombinations( 'core/edit-post/previous-region' ),
 			nextShortcut: select(
 				keyboardShortcutsStore
-			).getAllShortcutRawKeyCombinations( 'core/edit-post/next-region' ),
+			).getAllShortcutKeyCombinations( 'core/edit-post/next-region' ),
 			showIconLabels: select( editPostStore ).isFeatureActive(
 				'showIconLabels'
 			),
@@ -225,6 +224,7 @@ function Layout( { styles } ) {
 						</>
 					)
 				}
+				notices={ <EditorSnackbars /> }
 				content={
 					<>
 						<EditorNotices />

@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { css } from '@emotion/css';
+import { css } from '@emotion/react';
 
 /**
  * WordPress dependencies
@@ -17,10 +17,11 @@ import { View } from '../../view';
 import * as styles from '../styles';
 import { useCard } from './hook';
 import CONFIG from '../../utils/config-values';
+import { useCx } from '../../utils/hooks/use-cx';
 
 /**
- * @param {import('../../ui/context').PolymorphicComponentProps<import('../types').Props, 'div'>} props
- * @param {import('react').Ref<any>}                                                              forwardedRef
+ * @param {import('../../ui/context').WordPressComponentProps<import('../types').Props, 'div'>} props
+ * @param {import('react').Ref<any>}                                                            forwardedRef
  */
 function Card( props, forwardedRef ) {
 	const {
@@ -33,8 +34,10 @@ function Card( props, forwardedRef ) {
 	} = useCard( props );
 	const elevationBorderRadius = isRounded ? CONFIG.cardBorderRadius : 0;
 
+	const cx = useCx();
+
 	const elevationClassName = useMemo(
-		() => css( { borderRadius: elevationBorderRadius } ),
+		() => cx( css( { borderRadius: elevationBorderRadius } ) ),
 		[ elevationBorderRadius ]
 	);
 
@@ -53,7 +56,7 @@ function Card( props, forwardedRef ) {
 	return (
 		<ContextSystemProvider value={ contextProviderValue }>
 			<View { ...otherProps } ref={ forwardedRef }>
-				<View className={ styles.Content }>{ children }</View>
+				<View className={ cx( styles.Content ) }>{ children }</View>
 				<Elevation
 					className={ elevationClassName }
 					isInteractive={ false }

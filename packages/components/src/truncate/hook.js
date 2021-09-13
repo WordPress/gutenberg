@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { css, cx } from '@emotion/css';
+import { css } from '@emotion/react';
 
 /**
  * WordPress dependencies
@@ -14,9 +14,10 @@ import { useMemo } from '@wordpress/element';
 import { useContextSystem } from '../ui/context';
 import * as styles from './styles';
 import { TRUNCATE_ELLIPSIS, TRUNCATE_TYPE, truncateContent } from './utils';
+import { useCx } from '../utils/hooks/use-cx';
 
 /**
- * @param {import('../ui/context').PolymorphicComponentProps<import('./types').Props, 'span'>} props
+ * @param {import('../ui/context').WordPressComponentProps<import('./types').Props, 'span'>} props
  */
 export default function useTruncate( props ) {
 	const {
@@ -28,6 +29,8 @@ export default function useTruncate( props ) {
 		numberOfLines = 0,
 		...otherProps
 	} = useContextSystem( props, 'Truncate' );
+
+	const cx = useCx();
 
 	const truncatedContent = truncateContent(
 		typeof children === 'string' ? /** @type {string} */ ( children ) : '',

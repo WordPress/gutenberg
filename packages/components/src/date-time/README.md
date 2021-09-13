@@ -16,19 +16,19 @@ Render a DateTimePicker.
 
 ```jsx
 import { DateTimePicker } from '@wordpress/components';
-import { withState } from '@wordpress/compose';
+import { useState } from '@wordpress/element';
 
-const MyDateTimePicker = withState( {
-	date: new Date(),
-} )( ( { date, setState } ) => {
+const MyDateTimePicker = () => {
+	const [ date, setDate ] = useState( new Date() );
+
 	return (
 		<DateTimePicker
 			currentDate={ date }
-			onChange={ ( date ) => setState( { date } ) }
+			onChange={ ( newDate ) => setDate( newDate ) }
 			is12Hour={ true }
 		/>
 	);
-} );
+}
 ```
 
 ## Props

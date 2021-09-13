@@ -110,6 +110,12 @@ exports[`RichText should return focus when pressing formatting button 1`] = `
 <!-- /wp:paragraph -->"
 `;
 
+exports[`RichText should run input rules after composition end 1`] = `
+"<!-- wp:paragraph -->
+<p><code>a</code></p>
+<!-- /wp:paragraph -->"
+`;
+
 exports[`RichText should split rich text on paste 1`] = `
 "<!-- wp:paragraph -->
 <p>a</p>

@@ -63,12 +63,10 @@ export function subscribeUpdateHtml( callback ) {
 }
 
 export function subscribeFeaturedImageIdNativeUpdated( callback ) {
-	return isAndroid
-		? gutenbergBridgeEvents.addListener(
-				'featuredImageIdNativeUpdated',
-				callback
-		  )
-		: undefined;
+	return gutenbergBridgeEvents.addListener(
+		'featuredImageIdNativeUpdated',
+		callback
+	);
 }
 
 /**
@@ -125,8 +123,11 @@ export function subscribeAndroidModalClosed( callback ) {
 		: undefined;
 }
 
-export function subscribeUpdateTheme( callback ) {
-	return gutenbergBridgeEvents.addListener( 'updateTheme', callback );
+export function subscribeUpdateEditorSettings( callback ) {
+	return gutenbergBridgeEvents.addListener(
+		'updateEditorSettings',
+		callback
+	);
 }
 
 export function subscribePreferredColorScheme( callback ) {
@@ -157,6 +158,16 @@ export function subscribeShowNotice( callback ) {
  */
 export function subscribeReplaceBlock( callback ) {
 	return gutenbergBridgeEvents.addListener( 'replaceBlock', callback );
+}
+
+/**
+ * Subscribe a listener for handling requests to open the editor help topics page.
+ *
+ * @param {Function} callback RN Callback function to display the editor
+ *                            help topics.
+ */
+export function subscribeShowEditorHelp( callback ) {
+	return gutenbergBridgeEvents.addListener( 'showEditorHelp', callback );
 }
 
 /**
@@ -377,6 +388,30 @@ export function setFocalPointPickerTooltipShown( tooltipShown ) {
 	return RNReactNativeGutenbergBridge.setFocalPointPickerTooltipShown(
 		tooltipShown
 	);
+}
+
+export function requestPreview() {
+	RNReactNativeGutenbergBridge.requestPreview();
+}
+
+/**
+ * Request the host app provide the latest block type impression counts.
+ *
+ * @param {Function} callback Callback invoked with object containing counts for each block type.
+ * @return {void}
+ */
+export function requestBlockTypeImpressions( callback ) {
+	return RNReactNativeGutenbergBridge.requestBlockTypeImpressions( callback );
+}
+
+/**
+ * Request the host app set updated impression count for a given block type identified by name.
+ *
+ * @param {Object} impressions Key-value pairs of block type name and impression count.
+ * @return {void}
+ */
+export function setBlockTypeImpressions( impressions ) {
+	return RNReactNativeGutenbergBridge.setBlockTypeImpressions( impressions );
 }
 
 export default RNReactNativeGutenbergBridge;

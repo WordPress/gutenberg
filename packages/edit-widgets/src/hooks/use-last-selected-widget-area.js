@@ -8,6 +8,7 @@ import { store as coreStore } from '@wordpress/core-data';
 /**
  * Internal dependencies
  */
+import { store as widgetsEditorStore } from '../store';
 import { buildWidgetAreasPostId, KIND, POST_TYPE } from '../store/utils';
 
 /**
@@ -18,27 +19,24 @@ import { buildWidgetAreasPostId, KIND, POST_TYPE } from '../store/utils';
  */
 const useLastSelectedWidgetArea = () =>
 	useSelect( ( select ) => {
-		const { getBlockSelectionEnd, getBlockParents, getBlockName } = select(
+		const { getBlockSelectionEnd, getBlockName } = select(
 			blockEditorStore
 		);
-		const blockSelectionEndClientId = getBlockSelectionEnd();
+		const selectionEndClientId = getBlockSelectionEnd();
 
 		// If the selected block is a widget area, return its clientId.
-		if (
-			getBlockName( blockSelectionEndClientId ) === 'core/widget-area'
-		) {
-			return blockSelectionEndClientId;
+		if ( getBlockName( selectionEndClientId ) === 'core/widget-area' ) {
+			return selectionEndClientId;
 		}
 
-		// Otherwise, find the clientId of the top-level widget area by looking
-		// through the selected block's parents.
-		const blockParents = getBlockParents( blockSelectionEndClientId );
-		const rootWidgetAreaClientId = blockParents.find(
-			( clientId ) => getBlockName( clientId ) === 'core/widget-area'
+		const { getParentWidgetAreaBlock } = select( widgetsEditorStore );
+		const widgetAreaBlock = getParentWidgetAreaBlock(
+			selectionEndClientId
 		);
+		const widgetAreaBlockClientId = widgetAreaBlock?.clientId;
 
-		if ( rootWidgetAreaClientId ) {
-			return rootWidgetAreaClientId;
+		if ( widgetAreaBlockClientId ) {
+			return widgetAreaBlockClientId;
 		}
 
 		// If no widget area has been selected, return the clientId of the first

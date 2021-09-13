@@ -36,7 +36,7 @@ exports[`props should render correctly 1`] = `
 }
 
 <div
-  class="components-scrollable emotion-0 emotion-1 emotion-2"
+  class="components-scrollable emotion-0 emotion-1"
   data-wp-c16t="true"
   data-wp-component="Scrollable"
 >
@@ -56,6 +56,5 @@ Snapshot Diff:
       "overflow-y": "auto",
 -     "scroll-behavior": "smooth",
     },
-    Object {},
   ]
 `;

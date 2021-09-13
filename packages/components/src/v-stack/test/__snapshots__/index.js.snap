@@ -19,7 +19,7 @@ exports[`props should render alignment 1`] = `
   justify-content: center;
 }
 
-.emotion-0>*+*:not(marquee) {
+.emotion-0>*+*:not( marquee ) {
   margin-top: calc(4px * 2);
 }
 
@@ -28,15 +28,15 @@ exports[`props should render alignment 1`] = `
 }
 
 <div
-  class="components-flex components-h-stack components-v-stack emotion-0 emotion-1 emotion-2"
+  class="components-flex components-h-stack components-v-stack emotion-0 emotion-1"
   data-wp-c16t="true"
   data-wp-component="VStack"
 >
   <div
-    class="emotion-1 emotion-2"
+    class="emotion-2 emotion-1"
   />
   <div
-    class="emotion-1 emotion-2"
+    class="emotion-2 emotion-1"
   />
 </div>
 `;
@@ -59,7 +59,7 @@ exports[`props should render correctly 1`] = `
   justify-content: space-between;
 }
 
-.emotion-0>*+*:not(marquee) {
+.emotion-0>*+*:not( marquee ) {
   margin-top: calc(4px * 2);
 }
 
@@ -68,15 +68,15 @@ exports[`props should render correctly 1`] = `
 }
 
 <div
-  class="components-flex components-h-stack components-v-stack emotion-0 emotion-1 emotion-2"
+  class="components-flex components-h-stack components-v-stack emotion-0 emotion-1"
   data-wp-c16t="true"
   data-wp-component="VStack"
 >
   <div
-    class="emotion-1 emotion-2"
+    class="emotion-2 emotion-1"
   />
   <div
-    class="emotion-1 emotion-2"
+    class="emotion-2 emotion-1"
   />
 </div>
 `;
@@ -99,7 +99,7 @@ exports[`props should render spacing 1`] = `
   justify-content: space-between;
 }
 
-.emotion-0>*+*:not(marquee) {
+.emotion-0>*+*:not( marquee ) {
   margin-top: calc(4px * 5);
 }
 
@@ -108,15 +108,15 @@ exports[`props should render spacing 1`] = `
 }
 
 <div
-  class="components-flex components-h-stack components-v-stack emotion-0 emotion-1 emotion-2"
+  class="components-flex components-h-stack components-v-stack emotion-0 emotion-1"
   data-wp-c16t="true"
   data-wp-component="VStack"
 >
   <div
-    class="emotion-1 emotion-2"
+    class="emotion-2 emotion-1"
   />
   <div
-    class="emotion-1 emotion-2"
+    class="emotion-2 emotion-1"
   />
 </div>
 `;

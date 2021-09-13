@@ -34,6 +34,7 @@ export function TemplatePanel() {
 		isViewable,
 		template,
 		supportsTemplateMode,
+		canUserCreate,
 	} = useSelect( ( select ) => {
 		const {
 			isEditorPanelEnabled,
@@ -45,16 +46,14 @@ export function TemplatePanel() {
 			getEditorSettings,
 			getCurrentPostType,
 		} = select( editorStore );
-		const { getPostType, getEntityRecords } = select( coreStore );
+		const { getPostType, getEntityRecords, canUser } = select( coreStore );
 		const _isViewable =
 			getPostType( getCurrentPostType() )?.viewable ?? false;
 		const _supportsTemplateMode =
 			select( editorStore ).getEditorSettings().supportsTemplateMode &&
 			_isViewable;
 
-		const wpTemplates = getEntityRecords( 'postType', 'wp_template', {
-			per_page: -1,
-		} );
+		const wpTemplates = getEntityRecords( 'postType', 'wp_template' );
 
 		const newAvailableTemplates = fromPairs(
 			( wpTemplates || [] ).map( ( { slug, title } ) => [
@@ -72,6 +71,7 @@ export function TemplatePanel() {
 			template: _supportsTemplateMode && getEditedPostTemplate(),
 			isViewable: _isViewable,
 			supportsTemplateMode: _supportsTemplateMode,
+			canUserCreate: canUser( 'create', 'templates' ),
 		};
 	}, [] );
 
@@ -88,7 +88,8 @@ export function TemplatePanel() {
 	if (
 		! isEnabled ||
 		! isViewable ||
-		( isEmpty( availableTemplates ) && ! supportsTemplateMode )
+		( isEmpty( availableTemplates ) &&
+			( ! supportsTemplateMode || ! canUserCreate ) )
 	) {
 		return null;
 	}
@@ -128,7 +129,7 @@ export function TemplatePanel() {
 					label: templateName,
 				} ) ) }
 			/>
-			<PostTemplateActions />
+			{ canUserCreate && <PostTemplateActions /> }
 		</PanelBody>
 	);
 }

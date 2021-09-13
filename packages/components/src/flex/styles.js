@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { css } from '@emotion/css';
+import { css } from '@emotion/react';
 
 export const Flex = css`
 	display: flex;

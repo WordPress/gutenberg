@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { LayoutAnimation, TouchableHighlight } from 'react-native';
+import { AccessibilityInfo, TouchableHighlight, Platform } from 'react-native';
 
 /**
  * WordPress dependencies
@@ -9,13 +9,16 @@ import { LayoutAnimation, TouchableHighlight } from 'react-native';
 import { useEffect, useState, useCallback } from '@wordpress/element';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { createBlock } from '@wordpress/blocks';
-import { BottomSheet, BottomSheetConsumer } from '@wordpress/components';
+import {
+	BottomSheet,
+	BottomSheetConsumer,
+	SearchControl,
+} from '@wordpress/components';
 
 /**
  * Internal dependencies
  */
 import InserterSearchResults from './search-results';
-import InserterSearchForm from './search-form';
 import { store as blockEditorStore } from '../../store';
 import InserterTabs from './tabs';
 import styles from './style.scss';
@@ -34,9 +37,9 @@ function InserterMenu( {
 } ) {
 	const [ filterValue, setFilterValue ] = useState( '' );
 	const [ showTabs, setShowTabs ] = useState( true );
-	// eslint-disable-next-line no-undef
-	const [ showSearchForm, setShowSearchForm ] = useState( __DEV__ );
 	const [ tabIndex, setTabIndex ] = useState( 0 );
+
+	const isIOS = Platform.OS === 'ios';
 
 	const {
 		showInsertionPoint,
@@ -100,11 +103,6 @@ function InserterMenu( {
 		}
 		showInsertionPoint( destinationRootClientId, insertionIndex );
 
-		// Show search form if there are enough items to filter.
-		if ( items.length < MIN_ITEMS_FOR_SEARCH ) {
-			setShowSearchForm( false );
-		}
-
 		return hideInsertionPoint;
 	}, [] );
 
@@ -140,7 +138,19 @@ function InserterMenu( {
 
 	const onSelectItem = useCallback(
 		( item ) => {
-			onInsert( item );
+			// Avoid a focus loop, see https://github.com/WordPress/gutenberg/issues/30562
+			if ( Platform.OS === 'ios' ) {
+				AccessibilityInfo.isScreenReaderEnabled().then( ( enabled ) => {
+					// In testing, the bug focus loop needed a longer timeout when VoiceOver was enabled
+					const timeout = enabled ? 200 : 100;
+					// eslint-disable-next-line @wordpress/react-no-unsafe-timeout
+					setTimeout( () => {
+						onInsert( item );
+					}, timeout );
+				} );
+			} else {
+				onInsert( item );
+			}
 			onSelect( item );
 		},
 		[ onInsert, onSelect ]
@@ -148,11 +158,6 @@ function InserterMenu( {
 
 	const onChangeSearch = useCallback(
 		( value ) => {
-			if ( ! value ) {
-				LayoutAnimation.configureNext(
-					LayoutAnimation.Presets.easeInEaseOut
-				);
-			}
 			setFilterValue( value );
 		},
 		[ setFilterValue ]
@@ -166,6 +171,9 @@ function InserterMenu( {
 		setShowTabs,
 	] );
 
+	const showSearchForm = items.length > MIN_ITEMS_FOR_SEARCH;
+	const isFullScreen = ! isIOS && showSearchForm;
+
 	return (
 		<BottomSheet
 			isVisible={ true }
@@ -175,7 +183,7 @@ function InserterMenu( {
 			header={
 				<>
 					{ showSearchForm && (
-						<InserterSearchForm
+						<SearchControl
 							onChange={ onChangeSearch }
 							value={ filterValue }
 						/>
@@ -189,18 +197,24 @@ function InserterMenu( {
 				</>
 			}
 			hasNavigation
-			setMinHeightToMaxHeight={ showSearchForm }
-			contentStyle={ styles.list }
+			setMinHeightToMaxHeight={ true }
+			contentStyle={ styles[ 'inserter-menu__list' ] }
+			isFullScreen={ isFullScreen }
+			allowDragIndicator={ true }
 		>
 			<BottomSheetConsumer>
 				{ ( { listProps } ) => (
-					<TouchableHighlight accessible={ false }>
+					<TouchableHighlight
+						accessible={ false }
+						style={ styles[ 'inserter-menu__list-wrapper' ] }
+					>
 						{ ! showTabs || filterValue ? (
 							<InserterSearchResults
 								rootClientId={ rootClientId }
 								filterValue={ filterValue }
 								onSelect={ onSelectItem }
 								listProps={ listProps }
+								isFullScreen={ isFullScreen }
 							/>
 						) : (
 							<InserterTabs

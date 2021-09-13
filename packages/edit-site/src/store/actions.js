@@ -8,6 +8,7 @@ import { addQueryArgs, getPathAndQueryString } from '@wordpress/url';
 import { __ } from '@wordpress/i18n';
 import { store as noticesStore } from '@wordpress/notices';
 import { store as coreStore } from '@wordpress/core-data';
+import { store as interfaceStore } from '@wordpress/interface';
 
 /**
  * Internal dependencies
@@ -54,7 +55,7 @@ export function* setTemplate( templateId, templateSlug ) {
 	const pageContext = { templateSlug };
 	if ( ! templateSlug ) {
 		const template = yield controls.resolveSelect(
-			coreStore.name,
+			coreStore,
 			'getEntityRecord',
 			'postType',
 			'wp_template',
@@ -78,7 +79,7 @@ export function* setTemplate( templateId, templateSlug ) {
  */
 export function* addTemplate( template ) {
 	const newTemplate = yield controls.dispatch(
-		coreStore.name,
+		coreStore,
 		'saveEntityRecord',
 		'postType',
 		'wp_template',
@@ -87,7 +88,7 @@ export function* addTemplate( template ) {
 
 	if ( template.content ) {
 		yield controls.dispatch(
-			coreStore.name,
+			coreStore,
 			'editEntityRecord',
 			'postType',
 			'wp_template',
@@ -160,7 +161,7 @@ export function setHomeTemplateId( homeTemplateId ) {
 export function* setPage( page ) {
 	if ( ! page.path && page.context?.postId ) {
 		const entity = yield controls.resolveSelect(
-			coreStore.name,
+			coreStore,
 			'getEntityRecord',
 			'postType',
 			page.context.postType || 'post',
@@ -170,7 +171,7 @@ export function* setPage( page ) {
 		page.path = getPathAndQueryString( entity.link );
 	}
 	const { id: templateId, slug: templateSlug } = yield controls.resolveSelect(
-		coreStore.name,
+		coreStore,
 		'__experimentalGetTemplateForLink',
 		page.path
 	);
@@ -198,7 +199,7 @@ export function* showHomepage() {
 		show_on_front: showOnFront,
 		page_on_front: frontpageId,
 	} = yield controls.resolveSelect(
-		coreStore.name,
+		coreStore,
 		'getEntityRecord',
 		'root',
 		'site'
@@ -440,4 +441,32 @@ export function* revertTemplate( template ) {
 			{ type: 'snackbar' }
 		);
 	}
+}
+/**
+ * Returns an action object used in signalling that the user opened an editor sidebar.
+ *
+ * @param {?string} name Sidebar name to be opened.
+ *
+ * @yield {Object} Action object.
+ */
+export function* openGeneralSidebar( name ) {
+	yield controls.dispatch(
+		interfaceStore,
+		'enableComplementaryArea',
+		editSiteStoreName,
+		name
+	);
+}
+
+/**
+ * Returns an action object signalling that the user closed the sidebar.
+ *
+ * @yield {Object} Action object.
+ */
+export function* closeGeneralSidebar() {
+	yield controls.dispatch(
+		interfaceStore,
+		'disableComplementaryArea',
+		editSiteStoreName
+	);
 }

@@ -38,15 +38,7 @@ function getQueriedItemsUncached( state, query ) {
 	} = getQueryParts( query );
 	let itemIds;
 
-	if ( Array.isArray( include ) && ! stableKey ) {
-		// If the parsed query yields a set of IDs, but otherwise no filtering,
-		// it's safe to consider targeted item IDs as the include set. This
-		// doesn't guarantee that those objects have been queried, which is
-		// accounted for below in the loop `null` return.
-		itemIds = include;
-		// TODO: Avoid storing the empty stable string in reducer, since it
-		// can be computed dynamically here always.
-	} else if ( state.queries?.[ context ]?.[ stableKey ] ) {
+	if ( state.queries?.[ context ]?.[ stableKey ] ) {
 		itemIds = state.queries[ context ][ stableKey ];
 	}
 
@@ -67,6 +59,7 @@ function getQueriedItemsUncached( state, query ) {
 			continue;
 		}
 
+		// Having a target item ID doesn't guarantee that this object has been queried.
 		if ( ! state.items[ context ]?.hasOwnProperty( itemId ) ) {
 			return null;
 		}

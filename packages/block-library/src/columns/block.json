@@ -8,6 +8,10 @@
 	"attributes": {
 		"verticalAlignment": {
 			"type": "string"
+		},
+		"isStackedOnMobile": {
+			"type": "boolean",
+			"default": true
 		}
 	},
 	"supports": {

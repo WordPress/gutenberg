@@ -11,7 +11,9 @@ import {
 	__experimentalGetEntityRecordNoResolver,
 	hasEntityRecords,
 	getEntityRecords,
+	getRawEntityRecord,
 	__experimentalGetDirtyEntityRecords,
+	__experimentalGetEntitiesBeingSaved,
 	getEntityRecordNonTransientEdits,
 	getEmbedPreview,
 	isPreviewEmbedFallback,
@@ -203,6 +205,76 @@ describe( 'hasEntityRecords', () => {
 	} );
 } );
 
+describe( 'getRawEntityRecord', () => {
+	const data = {
+		someKind: {
+			someName: {
+				queriedData: {
+					items: {
+						default: {
+							post: {
+								title: {
+									raw: { html: '<h1>post</h1>' },
+									rendered:
+										'<div id="post"><h1>rendered post</h1></div>',
+								},
+							},
+						},
+					},
+					itemIsComplete: {
+						default: {
+							post: true,
+						},
+					},
+					queries: {},
+				},
+			},
+		},
+	};
+	it( 'should preserve the structure of `raw` field by default', () => {
+		const state = deepFreeze( {
+			entities: {
+				config: [
+					{
+						kind: 'someKind',
+						name: 'someName',
+					},
+				],
+				data: { ...data },
+			},
+		} );
+		expect(
+			getRawEntityRecord( state, 'someKind', 'someName', 'post' )
+		).toEqual( {
+			title: {
+				raw: { html: '<h1>post</h1>' },
+				rendered: '<div id="post"><h1>rendered post</h1></div>',
+			},
+		} );
+	} );
+	it( 'should flatten the structure of `raw` field for entities configured with rawAttributes', () => {
+		const state = deepFreeze( {
+			entities: {
+				config: [
+					{
+						kind: 'someKind',
+						name: 'someName',
+						rawAttributes: [ 'title' ],
+					},
+				],
+				data: { ...data },
+			},
+		} );
+		expect(
+			getRawEntityRecord( state, 'someKind', 'someName', 'post' )
+		).toEqual( {
+			title: {
+				html: '<h1>post</h1>',
+			},
+		} );
+	} );
+} );
+
 describe( 'getEntityRecords', () => {
 	it( 'should return null by default', () => {
 		const state = deepFreeze( {
@@ -391,6 +463,54 @@ describe( '__experimentalGetDirtyEntityRecords', () => {
 			},
 		} );
 		expect( __experimentalGetDirtyEntityRecords( state ) ).toEqual( [
+			{ kind: 'someKind', name: 'someName', key: 'someKey', title: '' },
+		] );
+	} );
+} );
+
+describe( '__experimentalGetEntitiesBeingSaved', () => {
+	it( "should return a map of objects with each raw entity record that's being saved", () => {
+		const state = deepFreeze( {
+			entities: {
+				config: [
+					{
+						kind: 'someKind',
+						name: 'someName',
+						transientEdits: { someTransientEditProperty: true },
+					},
+				],
+				data: {
+					someKind: {
+						someName: {
+							queriedData: {
+								items: {
+									default: {
+										someKey: {
+											someProperty: 'somePersistedValue',
+											someRawProperty: {
+												raw: 'somePersistedRawValue',
+											},
+											id: 'someKey',
+										},
+									},
+								},
+								itemIsComplete: {
+									default: {
+										someKey: true,
+									},
+								},
+							},
+							saving: {
+								someKey: {
+									pending: true,
+								},
+							},
+						},
+					},
+				},
+			},
+		} );
+		expect( __experimentalGetEntitiesBeingSaved( state ) ).toEqual( [
 			{ kind: 'someKind', name: 'someName', key: 'someKey', title: '' },
 		] );
 	} );

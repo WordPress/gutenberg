@@ -22,18 +22,16 @@ import {
 /**
  * WordPress dependencies
  */
-import deprecated from '@wordpress/deprecated';
 import { applyFilters } from '@wordpress/hooks';
 import { select, dispatch } from '@wordpress/data';
 import { _x } from '@wordpress/i18n';
-import { blockDefault } from '@wordpress/icons';
 
 /**
  * Internal dependencies
  */
 import i18nBlockSchema from './i18n-block.json';
 import { isValidIcon, normalizeIconObject } from './utils';
-import { DEPRECATED_ENTRY_KEYS } from './constants';
+import { BLOCK_ICON_DEFAULT, DEPRECATED_ENTRY_KEYS } from './constants';
 import { store as blocksStore } from '../store';
 
 /**
@@ -123,7 +121,7 @@ import { store as blocksStore } from '../store';
 /**
  * Defined behavior of a block type.
  *
- * @typedef {Object} WPBlock
+ * @typedef {Object} WPBlockType
  *
  * @property {string}             name          Block type's namespaced name.
  * @property {string}             title         Human-readable block type label.
@@ -245,7 +243,7 @@ function getBlockSettingsFromMetadata( { textdomain, ...metadata } ) {
  * @param {string|Object} blockNameOrMetadata Block type name or its metadata.
  * @param {Object}        settings            Block settings.
  *
- * @return {?WPBlock} The block, if it has been successfully registered;
+ * @return {?WPBlockType} The block, if it has been successfully registered;
  *                    otherwise `undefined`.
  */
 export function registerBlockType( blockNameOrMetadata, settings ) {
@@ -266,7 +264,7 @@ export function registerBlockType( blockNameOrMetadata, settings ) {
 
 	settings = {
 		name,
-		icon: blockDefault,
+		icon: BLOCK_ICON_DEFAULT,
 		keywords: [],
 		attributes: {},
 		providesContext: {},
@@ -425,27 +423,6 @@ function translateBlockSettingUsingI18nSchema(
 }
 
 /**
- * Registers a new block provided from metadata stored in `block.json` file.
- *
- * @deprecated Use `registerBlockType` instead.
- *
- * @param {Object} metadata           Block metadata loaded from `block.json`.
- * @param {Object} additionalSettings Additional block settings.
- *
- * @return {?WPBlock} The block, if it has been successfully registered;
- *                    otherwise `undefined`.
- */
-export function registerBlockTypeFromMetadata( metadata, additionalSettings ) {
-	deprecated( 'wp.blocks.registerBlockTypeFromMetadata', {
-		since: '10.7',
-		plugin: 'Gutenberg',
-		alternative: 'wp.blocks.registerBlockType',
-		version: '11.0',
-	} );
-	return registerBlockType( metadata, additionalSettings );
-}
-
-/**
  * Registers a new block collection to group blocks in the same namespace in the inserter.
  *
  * @param {string} namespace       The namespace to group blocks by in the inserter; corresponds to the block namespace.
@@ -472,7 +449,7 @@ export function unregisterBlockCollection( namespace ) {
  *
  * @param {string} name Block name.
  *
- * @return {?WPBlock} The previous block value, if it has been successfully
+ * @return {?WPBlockType} The previous block value, if it has been successfully
  *                    unregistered; otherwise `undefined`.
  */
 export function unregisterBlockType( name ) {
@@ -625,7 +602,7 @@ export function hasBlockSupport( nameOrType, feature, defaultSupports ) {
  * @return {boolean} Whether the given block is a reusable block.
  */
 export function isReusableBlock( blockOrType ) {
-	return blockOrType.name === 'core/block';
+	return blockOrType?.name === 'core/block';
 }
 
 /**

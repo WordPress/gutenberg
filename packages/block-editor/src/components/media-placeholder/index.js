@@ -36,7 +36,7 @@ const InsertFromURLPopover = ( { src, onChange, onSubmit, onClose } ) => (
 		>
 			<input
 				className="block-editor-media-placeholder__url-input-field"
-				type="url"
+				type="text"
 				aria-label={ __( 'URL' ) }
 				placeholder={ __( 'Paste or type URL' ) }
 				onChange={ onChange }
@@ -64,6 +64,7 @@ export function MediaPlaceholder( {
 	accept,
 	addToGallery,
 	multiple = false,
+	handleUpload = true,
 	dropZoneUIOnly,
 	disableDropZone,
 	disableMediaButtons,
@@ -118,6 +119,9 @@ export function MediaPlaceholder( {
 	};
 
 	const onFilesUpload = ( files ) => {
+		if ( ! handleUpload ) {
+			return onSelect( files );
+		}
 		onFilesPreUpload( files );
 		let setMedia;
 		if ( multiple ) {
@@ -317,8 +321,7 @@ export function MediaPlaceholder( {
 					return (
 						<Button
 							variant="tertiary"
-							onClick={ ( event ) => {
-								event.stopPropagation();
+							onClick={ () => {
 								open();
 							} }
 						>

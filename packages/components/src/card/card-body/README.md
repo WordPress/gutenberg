@@ -23,7 +23,7 @@ Note: This component is connected to [`Card`'s Context](/packages/components/src
 Determines if the component is scrollable.
 
 -   Required: No
--   Default: `true`
+-   Default: `false`
 
 ### `isShady`: `boolean`
 

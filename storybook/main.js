@@ -31,6 +31,9 @@ const updateEmotionAliases = ( config ) => ( {
 } );
 
 module.exports = {
+	core: {
+		builder: 'webpack5',
+	},
 	stories,
 	addons: [
 		{

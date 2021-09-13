@@ -41,7 +41,6 @@ export default function PostTemplateEdit( {
 			sticky,
 			inherit,
 		} = {},
-		queryId,
 		queryContext = [ { page: 1 } ],
 		templateSlug,
 		displayLayout: { type: layoutType = 'flex', columns = 1 } = {},
@@ -116,7 +115,6 @@ export default function PostTemplateEdit( {
 			posts?.map( ( post ) => ( {
 				postType: post.type,
 				postId: post.id,
-				queryId,
 			} ) ),
 		[ posts ]
 	);

@@ -4,7 +4,7 @@
 import { useEntityProp } from '@wordpress/core-data';
 import { SelectControl, TextControl } from '@wordpress/components';
 import { sprintf, __ } from '@wordpress/i18n';
-import { InspectorAdvancedControls } from '@wordpress/block-editor';
+import { InspectorControls } from '@wordpress/block-editor';
 import { useSelect } from '@wordpress/data';
 
 export function TemplatePartAdvancedControls( {
@@ -44,7 +44,7 @@ export function TemplatePartAdvancedControls( {
 	}, [] );
 
 	return (
-		<InspectorAdvancedControls>
+		<InspectorControls __experimentalGroup="advanced">
 			{ isEntityAvailable && (
 				<>
 					<TextControl
@@ -87,6 +87,6 @@ export function TemplatePartAdvancedControls( {
 				value={ tagName || '' }
 				onChange={ ( value ) => setAttributes( { tagName: value } ) }
 			/>
-		</InspectorAdvancedControls>
+		</InspectorControls>
 	);
 }

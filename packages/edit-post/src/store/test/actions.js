@@ -15,7 +15,6 @@ import {
 	togglePublishSidebar,
 	openModal,
 	closeModal,
-	toggleFeature,
 	requestMetaBoxUpdates,
 	setIsListViewOpened,
 } from '../actions';
@@ -86,16 +85,6 @@ describe( 'actions', () => {
 		it( 'should return CLOSE_MODAL action', () => {
 			expect( closeModal() ).toEqual( {
 				type: 'CLOSE_MODAL',
-			} );
-		} );
-	} );
-
-	describe( 'toggleFeature', () => {
-		it( 'should return TOGGLE_FEATURE action', () => {
-			const feature = 'name';
-			expect( toggleFeature( feature ) ).toEqual( {
-				type: 'TOGGLE_FEATURE',
-				feature,
 			} );
 		} );
 	} );

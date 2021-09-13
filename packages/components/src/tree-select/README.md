@@ -8,44 +8,46 @@ Render a user interface to select the parent page in a hierarchy of pages:
 
 ```jsx
 import { TreeSelect } from '@wordpress/components';
-import { withState } from '@wordpress/compose';
+import { useState } from '@wordpress/element';
 
-const MyTreeSelect = withState( {
-	page: 'p21',
-} )( ( { page, setState } ) => (
-	<TreeSelect
-		label="Parent page"
-		noOptionLabel="No parent page"
-		onChange={ ( page ) => setState( { page } ) }
-		selectedId={ page }
-		tree={ [
-			{
-				name: 'Page 1',
-				id: 'p1',
-				children: [
-					{ name: 'Descend 1 of page 1', id: 'p11' },
-					{ name: 'Descend 2 of page 1', id: 'p12' },
-				],
-			},
-			{
-				name: 'Page 2',
-				id: 'p2',
-				children: [
-					{
-						name: 'Descend 1 of page 2',
-						id: 'p21',
-						children: [
-							{
-								name: 'Descend 1 of Descend 1 of page 2',
-								id: 'p211',
-							},
-						],
-					},
-				],
-			},
-		] }
-	/>
-) );
+const MyTreeSelect = () => {
+	const [ page, setPage ] = useState( 'p21' );
+
+	return (
+		<TreeSelect
+			label="Parent page"
+			noOptionLabel="No parent page"
+			onChange={ ( newPage ) => setPage( newPage ) }
+			selectedId={ page }
+			tree={ [
+				{
+					name: 'Page 1',
+					id: 'p1',
+					children: [
+						{ name: 'Descend 1 of page 1', id: 'p11' },
+						{ name: 'Descend 2 of page 1', id: 'p12' },
+					],
+				},
+				{
+					name: 'Page 2',
+					id: 'p2',
+					children: [
+						{
+							name: 'Descend 1 of page 2',
+							id: 'p21',
+							children: [
+								{
+									name: 'Descend 1 of Descend 1 of page 2',
+									id: 'p211',
+								},
+							],
+						},
+					],
+				},
+			] }
+		/>
+	);
+}
 ```
 
 ## Props
