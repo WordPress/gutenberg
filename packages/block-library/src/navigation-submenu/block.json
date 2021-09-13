@@ -58,8 +58,7 @@
 	],
 	"supports": {
 		"reusable": false,
-		"html": false,
-		"inserter": false
+		"html": false
 	},
 	"viewScript": "file:./view.min.js",
 	"editorStyle": "wp-block-navigation-submenu-editor",
