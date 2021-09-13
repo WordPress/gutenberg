@@ -38,7 +38,7 @@ function gutenberg_render_elements_support( $block_content, $block ) {
 	}
 	$link_color_declaration = esc_html( safecss_filter_attr( "color: $link_color" ) );
 
-	$style = "<style>.$class_name a{" . $link_color_declaration . " !important;}</style>\n";
+	$style = "<style>.$class_name a{" . $link_color_declaration . ";}</style>\n";
 
 	// Like the layout hook this assumes the hook only applies to blocks with a single wrapper.
 	// Retrieve the opening tag of the first HTML element.
@@ -59,7 +59,7 @@ function gutenberg_render_elements_support( $block_content, $block ) {
 		$first_element_offset = $html_element_matches[0][1];
 		$content              = substr_replace( $block_content, ' class="' . $class_name . '"', $first_element_offset + strlen( $first_element ) - 1, 0 );
 	}
-	return $content . $style;
+	return $style . $content;
 
 }
 
