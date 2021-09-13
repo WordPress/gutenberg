@@ -420,11 +420,13 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 		$theme_support_data = WP_Theme_JSON_Gutenberg::get_from_editor_settings( $settings );
 		$result->merge( self::get_theme_data( $theme_support_data ) );
 
+		$filter_data = new WP_Theme_JSON_Gutenberg( apply_filters( 'theme_json_resolver_merged_data', $result->get_raw_data() ) );
+
+		$result->merge( $filter_data );
+
 		if ( 'user' === $origin ) {
 			$result->merge( self::get_user_data() );
 		}
-
-		$result = apply_filters( 'theme_json_resolver_merged_data', $result );
 
 		return $result;
 	}
