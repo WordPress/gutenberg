@@ -78,13 +78,16 @@ class WP_Theme_JSON_Gutenberg {
 	);
 
 	const VALID_SETTINGS = array(
-		'border'     => array(
+		'core/navigation' => array(
+			'hasSubmenuIndicatorSetting' => null,
+		),
+		'border'          => array(
 			'customColor'  => null,
 			'customRadius' => null,
 			'customStyle'  => null,
 			'customWidth'  => null,
 		),
-		'color'      => array(
+		'color'           => array(
 			'background'     => null,
 			'custom'         => null,
 			'customDuotone'  => null,
@@ -95,19 +98,19 @@ class WP_Theme_JSON_Gutenberg {
 			'palette'        => null,
 			'text'           => null,
 		),
-		'custom'     => null,
-		'layout'     => array(
+		'custom'          => null,
+		'layout'          => array(
 			'contentSize' => null,
 			'wideSize'    => null,
 		),
-		'spacing'    => array(
+		'spacing'         => array(
 			'blockGap'      => null,
 			'customMargin'  => null,
 			'customPadding' => null,
 			'units'         => null,
 			'blockGap'      => null,
 		),
-		'typography' => array(
+		'typography'      => array(
 			'customFontSize'        => null,
 			'customFontStyle'       => null,
 			'customFontWeight'      => null,
@@ -315,11 +318,14 @@ class WP_Theme_JSON_Gutenberg {
 		}
 		$schema_styles_blocks   = array();
 		$schema_settings_blocks = array();
+
 		foreach ( $valid_block_names as $block ) {
-			$schema_settings_blocks[ $block ]           = self::VALID_SETTINGS;
+			$schema_settings_blocks[ $block ]           = self::VALID_SETTINGS[ $block ] ? array_merge( self::VALID_SETTINGS, self::VALID_SETTINGS[ $block ] ) : self::VALID_SETTINGS;
 			$schema_styles_blocks[ $block ]             = self::VALID_STYLES;
 			$schema_styles_blocks[ $block ]['elements'] = $schema_styles_elements;
 		}
+
+
 		$schema['styles']             = self::VALID_STYLES;
 		$schema['styles']['blocks']   = $schema_styles_blocks;
 		$schema['styles']['elements'] = $schema_styles_elements;
