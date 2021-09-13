@@ -24,6 +24,7 @@ import {
 	PanelColorSettings,
 	ContrastChecker,
 	getColorClassName,
+	useSetting,
 } from '@wordpress/block-editor';
 import { useDispatch, withSelect, withDispatch } from '@wordpress/data';
 import { PanelBody, ToggleControl, ToolbarGroup } from '@wordpress/components';
@@ -103,7 +104,6 @@ function Navigation( {
 
 	// These props are used by the navigation editor to override specific
 	// navigation block settings.
-	hasSubmenuIndicatorSetting = true,
 	hasItemJustificationControls = true,
 	hasColorSettings = true,
 	customPlaceholder: CustomPlaceholder = null,
@@ -115,6 +115,9 @@ function Navigation( {
 	const [ isResponsiveMenuOpen, setResponsiveMenuVisibility ] = useState(
 		false
 	);
+
+	const hasSubmenuIndicatorSetting =
+		useSetting( 'hasSubmenuIndicatorSetting' ) || true; // retain original prop default of "true"
 
 	const { selectBlock } = useDispatch( blockEditorStore );
 
