@@ -384,3 +384,29 @@ CSS;
 	}
 }
 add_action( 'admin_enqueue_scripts', 'gutenberg_add_block_menu_item_styles_to_nav_menus' );
+
+
+/**
+ * Filters the Theme JSON settings for the Navigation block
+ * when used in the Nav Editor.
+ */
+
+
+$is_nav_editor_screen = true;
+
+// TODO: only apply filter when on Nav Editor screen.
+if ( $is_nav_editor_screen ) {
+	add_filter(
+		'theme_json_resolver_merged_data',
+		function( $data ) {
+
+			$data['settings']['blocks']['core/navigation'] = array(
+				'hasSubmenuIndicatorSetting'   => false,
+				'hasItemJustificationControls' => false,
+				'hasColorSettings'             => false,
+			);
+
+			return $data;
+		}
+	);
+}
