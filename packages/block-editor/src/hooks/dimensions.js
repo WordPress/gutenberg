@@ -49,8 +49,8 @@ export function DimensionsPanel( props ) {
 	const isMarginDisabled = useIsMarginDisabled( props );
 	const isDisabled = useIsDimensionsDisabled( props );
 	const isSupported = hasDimensionsSupport( props.name );
-	const setSpacingVisualizer = ( key ) => ( next ) =>
-		props.setSpacingVisualizer( ( prev ) => ( {
+	const createSetVisualizers = ( key ) => ( next ) =>
+		props.setVisualizers( ( prev ) => ( {
 			...prev,
 			[ key ]: typeof next === 'function' ? next( prev ) : next,
 		} ) );
@@ -88,7 +88,7 @@ export function DimensionsPanel( props ) {
 				>
 					<PaddingEdit
 						{ ...props }
-						setVisualizer={ setSpacingVisualizer( 'padding' ) }
+						setVisualizer={ createSetVisualizers( 'padding' ) }
 					/>
 				</ToolsPanelItem>
 			) }
@@ -103,7 +103,7 @@ export function DimensionsPanel( props ) {
 				>
 					<MarginEdit
 						{ ...props }
-						setVisualizer={ setSpacingVisualizer( 'margin' ) }
+						setVisualizer={ createSetVisualizers( 'margin' ) }
 					/>
 				</ToolsPanelItem>
 			) }

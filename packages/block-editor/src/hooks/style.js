@@ -259,7 +259,7 @@ export const withBlockControls = createHigherOrderComponent(
 	( BlockEdit ) => ( props ) => {
 		const shouldDisplayControls = useDisplayBlockControls();
 		const [ visualizers, setVisualizers ] = useState( null );
-		const setStyleVisualizer = ( key ) => ( next ) =>
+		const createSetVisualizers = ( key ) => ( next ) =>
 			setVisualizers( ( prev ) => ( {
 				...prev,
 				[ key ]: typeof next === 'function' ? next( prev ) : next,
@@ -274,8 +274,8 @@ export const withBlockControls = createHigherOrderComponent(
 						<ColorEdit { ...props } />
 						<DimensionsPanel
 							{ ...props }
-							setSpacingVisualizer={ setStyleVisualizer(
-								'spacing'
+							setVisualizers={ createSetVisualizers(
+								'dimensions'
 							) }
 						/>
 					</>
