@@ -316,16 +316,23 @@ describe( 'Navigation editor', () => {
 	} );
 
 	it( 'shows the trailing block appender within the navigation block when no blocks are selected', async () => {
+		// The test requires the presence of existing menus.
 		await setUpResponseMocking( [
 			...getMenuMocks( { GET: assignMockMenuIds( menusFixture ) } ),
 			...getMenuItemMocks( { GET: menuItemsFixture } ),
 		] );
 		await visitNavigationEditor();
 
+		// Wait for at least one block to be present on the page.
+		await page.waitForSelector( '.wp-block' );
+
+		// And for this test to be valid, no blocks should be selected, which
+		// should be the case when the editor loads.
 		const selectedBlocks = await page.$$( '.wp-block.is-selected' );
 		expect( selectedBlocks.length ).toBe( 0 );
 
-		const blockListAppender = await page.$(
+		// And when no blocks are selected, the trailing appender is present.
+		const blockListAppender = await page.waitForSelector(
 			'.block-list-appender button[aria-label="Add block"]'
 		);
 		expect( blockListAppender ).toBeTruthy();
