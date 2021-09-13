@@ -55,7 +55,7 @@
 
 .wp-block-page-list {
 	.open-on-click:focus-within {
-		.wp-block-navigation__submenu-container {
+		> .wp-block-navigation__submenu-container {
 			visibility: visible;
 			opacity: 1;
 			width: auto;

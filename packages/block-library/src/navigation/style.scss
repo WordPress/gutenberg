@@ -187,6 +187,15 @@
 		height: auto;
 		min-width: 200px;
 	}
+
+	// Show submenus on click.
+	.wp-block-navigation-submenu__toggle[aria-expanded="true"] + .wp-block-navigation__submenu-container {
+		visibility: visible;
+		opacity: 1;
+		width: auto;
+		height: auto;
+		min-width: 200px;
+	}
 }
 
 // Submenu indentation when there's a background.
