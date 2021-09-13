@@ -780,9 +780,9 @@
 		"parent": "components"
 	},
 	{
-		"title": "Confirm",
-		"slug": "confirm",
-		"markdown_source": "../packages/components/src/confirm/README.md",
+		"title": "ConfirmDialog",
+		"slug": "confirm-dialog",
+		"markdown_source": "../packages/components/src/confirm-dialog/README.md",
 		"parent": "components"
 	},
 	{

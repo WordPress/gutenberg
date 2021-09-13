@@ -26,7 +26,7 @@ import Button from '../button';
 import * as styles from './styles';
 import { useCx } from '../utils/hooks/use-cx';
 
-function Confirm(
+function ConfirmDialog(
 	props: WordPressComponentProps< OwnProps, 'div', false >,
 	forwardedRef: Ref< any >
 ) {
@@ -36,7 +36,7 @@ function Confirm(
 		onConfirm,
 		onCancel = () => {},
 		selfClose = true,
-	} = useContextSystem( props, 'Confirm' );
+	} = useContextSystem( props, 'ConfirmDialog' );
 
 	const cx = useCx();
 	const wrapperClassName = cx( styles.wrapper );
@@ -95,4 +95,4 @@ function Confirm(
 	);
 }
 
-export default contextConnect( Confirm, 'Confirm' );
+export default contextConnect( ConfirmDialog, 'Confirm' );
