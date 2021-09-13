@@ -52,7 +52,7 @@ export default function EditTemplatePartMenuButton() {
 				>
 					{
 						/* translators: %s: template part title */
-						sprintf( __( 'Edit "%s"' ), selectedTemplatePart.slug )
+						sprintf( __( 'Edit %s' ), selectedTemplatePart.slug )
 					}
 				</MenuItem>
 			) }
