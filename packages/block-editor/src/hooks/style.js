@@ -262,7 +262,8 @@ export const withBlockControls = createHigherOrderComponent(
 		const createSetVisualizers = ( key ) => ( next ) =>
 			setVisualizers( ( prev ) => ( {
 				...prev,
-				[ key ]: typeof next === 'function' ? next( prev ) : next,
+				[ key ]:
+					typeof next === 'function' ? next( prev?.[ key ] ) : next,
 			} ) );
 
 		return (

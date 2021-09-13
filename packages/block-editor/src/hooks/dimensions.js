@@ -52,7 +52,7 @@ export function DimensionsPanel( props ) {
 	const createSetVisualizers = ( key ) => ( next ) =>
 		props.setVisualizers( ( prev ) => ( {
 			...prev,
-			[ key ]: typeof next === 'function' ? next( prev ) : next,
+			[ key ]: typeof next === 'function' ? next( prev?.[ key ] ) : next,
 		} ) );
 
 	if ( isDisabled || ! isSupported ) {
