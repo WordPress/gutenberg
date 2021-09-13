@@ -16,23 +16,22 @@ import { contextConnect } from '../../ui/context';
 const ToolsPanelHeader = ( props, forwardedRef ) => {
 	const {
 		hasMenuItems,
-		header,
+		label: labelText,
 		menuItems,
-		menuLabel,
 		resetAll,
 		toggleItem,
 		...headerProps
 	} = useToolsPanelHeader( props );
 
-	if ( ! header ) {
+	if ( ! labelText ) {
 		return null;
 	}
 
 	return (
 		<h2 { ...headerProps } ref={ forwardedRef }>
-			{ header }
+			{ labelText }
 			{ hasMenuItems && (
-				<DropdownMenu icon={ moreVertical } label={ menuLabel }>
+				<DropdownMenu icon={ moreVertical } label={ labelText }>
 					{ ( { onClose } ) => (
 						<>
 							<MenuGroup label={ __( 'Display options' ) }>

@@ -37,7 +37,7 @@ import {
 const disabledBlocks = [
 	'core/more',
 	'core/freeform',
-	...( ! ALLOW_REUSABLE_BLOCKS && [ 'core/block' ] ),
+	...( ALLOW_REUSABLE_BLOCKS ? [] : [ 'core/block' ] ),
 ];
 
 /**

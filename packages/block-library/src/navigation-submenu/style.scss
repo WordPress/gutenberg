@@ -12,6 +12,15 @@
 	.wp-block-navigation__submenu-icon svg {
 		stroke: currentColor;
 	}
+
+	// Show submenus on click.
+	.wp-block-navigation-submenu__toggle[aria-expanded="true"] + .wp-block-navigation__submenu-container {
+		visibility: visible;
+		opacity: 1;
+		width: auto;
+		height: auto;
+		min-width: 200px;
+	}
 }
 
 button.wp-block-navigation-item__content {
@@ -20,4 +29,8 @@ button.wp-block-navigation-item__content {
 	color: currentColor;
 	font-size: inherit;
 	font-family: inherit;
+}
+
+.wp-block-navigation-submenu__toggle {
+	cursor: pointer;
 }

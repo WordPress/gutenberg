@@ -23,7 +23,8 @@ function Tiles( props ) {
 	const lastRow = Math.floor( lastTile / columns );
 
 	const wrappedChildren = Children.map( children, ( child, index ) => {
-		/** Since we don't have `calc()`, we must calculate our spacings here in
+		/**
+		 * Since we don't have `calc()`, we must calculate our spacings here in
 		 * order to preserve even spacing between tiles and equal width for tiles
 		 * in a given row.
 		 *
