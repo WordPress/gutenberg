@@ -62,6 +62,11 @@
 	}
 }
 
+.edit-navigation-menu-actions__switcher-dropdown {
+	// Appear below the modal overlay.
+	z-index: z-index(".components-popover.edit-navigation-menu-actions__switcher-dropdown");
+}
+
 .edit-navigation-header__actions {
 	display: flex;
 
@@ -72,11 +77,6 @@
 			margin-right: $grid-unit-15;
 		}
 	}
-}
-
-.edit-navigation-header__menu-switcher-dropdown {
-	// Appear below the modal overlay.
-	z-index: z-index(".components-popover.edit-navigation-header__menu-switcher-dropdown");
 }
 
 // Hide notices.
