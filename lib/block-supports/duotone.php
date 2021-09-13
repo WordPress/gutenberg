@@ -135,8 +135,7 @@ function gutenberg_tinycolor_hsl_to_rgb( $hsl_color ) {
 
 /**
  * Parses hex, hsl, and rgb CSS strings using the same regex as tinycolor v1.4.2
- * used in the JavaScript. Only colors output from react-color are implemented
- * and the alpha value is ignored as it is not used in duotone.
+ * used in the JavaScript. Only colors output from react-color are implemented.
  *
  * @see https://github.com/bgrins/TinyColor
  * @see https://github.com/casesandberg/react-color/
