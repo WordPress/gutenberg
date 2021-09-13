@@ -103,7 +103,7 @@ export default function PageListEdit( {
 			openSubmenusOnClick: !! context.openSubmenusOnClick,
 			showSubmenuIcon: !! context.showSubmenuIcon,
 		} );
-	}, [] );
+	}, [ context.openSubmenusOnClick, context.showSubmenuIcon ] );
 
 	useEffect( () => {
 		if ( isParentNavigation ) {
