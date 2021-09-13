@@ -65,12 +65,14 @@ function mapMenuItemsToBlocks( menuItems ) {
 			...nestedMapping,
 		};
 
+		// Create a submenu block when there are inner blocks, or just a link
+		// for a standalone item.
+		const itemBlockName = nestedBlocks?.length
+			? 'core/navigation-submenu'
+			: 'core/navigation-link';
+
 		// Create block with nested "innerBlocks".
-		const block = createBlock(
-			'core/navigation-link',
-			attributes,
-			nestedBlocks
-		);
+		const block = createBlock( itemBlockName, attributes, nestedBlocks );
 
 		// Create mapping for menuItem -> block
 		mapping[ menuItem.id ] = block.clientId;

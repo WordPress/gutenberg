@@ -35,12 +35,64 @@ function LinkButton( { href, children } ) {
 	return <Button variant="primary" as="a" href={href}>{ children }</Button>;
 }
 ```
+-->
 
-### Composition patterns
+#### Compound components
 
-TBD — E.g. Using `children` vs custom render props vs arbitrary "data" props
+When creating components that render a list of subcomponents, prefer to expose the API using the [Compound Components](https://kentcdodds.com/blog/compound-components-with-react-hooks) technique over array props like `items` or `options`:
 
-### (Semi-)Controlled components
+```jsx
+// ❌ Don't:
+<List
+	items={ [
+		{ value: 'Item 1' },
+		{ value: 'Item 2' },
+		{ value: 'Item 3' },
+	] }
+/>
+```
+```jsx
+// ✅ Do:
+<List>
+	<ListItem value="Item 1" />
+	<ListItem value="Item 2" />
+	<ListItem value="Item 3" />
+</List>
+```
+
+When implementing this pattern, avoid using `React.Children.map` and `React.cloneElement` to map through the children and augment them. Instead, use React Context to provide state to subcomponents and connect them:
+
+```jsx
+// ❌ Don't:
+function List ( props ) {
+	const [ state, setState ] = useState();
+	return (
+		<div { ...props }>
+			{ Children.map( props.children, ( child ) => cloneElement( child, { state } ) ) ) }
+		</div>
+	);
+}
+```
+```jsx
+// ✅ Do:
+const ListContext = createContext();
+
+function List( props ) {
+	const [ state, setState ] = useState();
+	return (
+		<ListContext.Provider value={ state }>
+			<div { ...props } />
+		</ListContext.Provider>
+	);
+}
+
+function ListItem( props ) {
+	const state = useContext( ListContext );
+	...
+}
+```
+
+<!-- ### (Semi-)Controlled components
 
 TBD
 
@@ -232,7 +284,7 @@ A great tool to use when writing stories is the [Storybook Controls addon](https
 
 The default value of each control should coincide with the default value of the props (i.e. it should be `undefined` if a prop is not required). A story should, therefore, also explicitly show how values from the Context System are applied to (sub)components. A good example of how this may look like is the [`Card` story](https://wordpress.github.io/gutenberg/?path=/story/components-card--default) (code [here](/packages/components/src/card/stories/index.js)).
 
-Storybook can be started on a local maching by running `npm run storybook:dev`. Alternatively, the components' catalogue (up to date with the latest code on `trunk`) can be found at [wordpress.github.io/gutenberg/](https://wordpress.github.io/gutenberg/).
+Storybook can be started on a local machine by running `npm run storybook:dev`. Alternatively, the components' catalogue (up to date with the latest code on `trunk`) can be found at [wordpress.github.io/gutenberg/](https://wordpress.github.io/gutenberg/).
 
 #### Documentation
 

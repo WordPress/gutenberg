@@ -332,7 +332,7 @@ export const isKeyboardEvent = mapValues( modifiers, ( getModifiers ) => {
 			return includes( mods, key );
 		}
 
-		if ( event.altKey ) {
+		if ( event.altKey && character.length === 1 ) {
 			key = String.fromCharCode( event.keyCode ).toLowerCase();
 		}
 
@@ -341,6 +341,6 @@ export const isKeyboardEvent = mapValues( modifiers, ( getModifiers ) => {
 			character = 'delete';
 		}
 
-		return key === character;
+		return key === character.toLowerCase();
 	};
 } );
