@@ -426,14 +426,6 @@ _Returns_
 
 -   `string`: Gradient value.
 
-### ImageEditingProvider
-
-Undocumented declaration.
-
-### ImageEditor
-
-Undocumented declaration.
-
 ### InnerBlocks
 
 _Related_

@@ -24,13 +24,13 @@ import { useViewportMatch } from '@wordpress/compose';
 import {
 	BlockControls,
 	BlockIcon,
-	ImageEditingProvider,
-	ImageEditor,
 	InspectorControls,
 	MediaPlaceholder,
 	MediaReplaceFlow,
 	useBlockProps,
 	store as blockEditorStore,
+	__experimentalImageEditor as ImageEditor,
+	__experimentalImageEditingProvider as ImageEditingProvider,
 } from '@wordpress/block-editor';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
