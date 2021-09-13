@@ -48,6 +48,7 @@ const ALLOWED_BLOCKS = [
 	'core/home-link',
 	'core/site-title',
 	'core/site-logo',
+	'core/navigation-submenu',
 ];
 
 const LAYOUT = {
@@ -252,15 +253,6 @@ function Navigation( {
 				{ hasSubmenuIndicatorSetting && (
 					<PanelBody title={ __( 'Display settings' ) }>
 						<ToggleControl
-							checked={ attributes.showSubmenuIcon }
-							onChange={ ( value ) => {
-								setAttributes( {
-									showSubmenuIcon: value,
-								} );
-							} }
-							label={ __( 'Show submenu indicator icons' ) }
-						/>
-						<ToggleControl
 							checked={ attributes.isResponsive }
 							onChange={ ( value ) => {
 								setAttributes( {
@@ -269,6 +261,26 @@ function Navigation( {
 							} }
 							label={ __( 'Enable responsive menu' ) }
 						/>
+						<ToggleControl
+							checked={ attributes.openSubmenusOnClick }
+							onChange={ ( value ) => {
+								setAttributes( {
+									openSubmenusOnClick: value,
+								} );
+							} }
+							label={ __( 'Open submenus on click' ) }
+						/>
+						{ ! attributes.openSubmenusOnClick && (
+							<ToggleControl
+								checked={ attributes.showSubmenuIcon }
+								onChange={ ( value ) => {
+									setAttributes( {
+										showSubmenuIcon: value,
+									} );
+								} }
+								label={ __( 'Show submenu indicator icons' ) }
+							/>
+						) }
 					</PanelBody>
 				) }
 				{ hasColorSettings && (
