@@ -104,7 +104,6 @@ function Navigation( {
 
 	// These props are used by the navigation editor to override specific
 	// navigation block settings.
-	hasItemJustificationControls = true,
 	hasColorSettings = true,
 	customPlaceholder: CustomPlaceholder = null,
 	customAppender: CustomAppender = null,
@@ -115,9 +114,11 @@ function Navigation( {
 	const [ isResponsiveMenuOpen, setResponsiveMenuVisibility ] = useState(
 		false
 	);
-
 	const hasSubmenuIndicatorSetting =
-		useSetting( 'hasSubmenuIndicatorSetting' ) || true; // retain original prop default of "true"
+		useSetting( 'hasSubmenuIndicatorSetting' ) ?? true; // retain original prop default of "true" if there is no setting defined.
+
+	const hasItemJustificationControls =
+		useSetting( 'hasItemJustificationControls' ) ?? true; // retain original prop default of "true" if there is no setting defined.
 
 	const { selectBlock } = useDispatch( blockEditorStore );
 
