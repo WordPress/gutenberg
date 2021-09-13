@@ -74,7 +74,7 @@ add_action( 'admin_enqueue_scripts', 'gutenberg_navigation_init' );
  * @return bool Filtered decision about loading block assets.
  */
 function gutenberg_navigation_editor_load_block_editor_scripts_and_styles( $is_block_editor_screen ) {
-	if ( is_callable( 'get_current_screen' ) && get_current_screen() && 'gutenberg_page_gutenberg-navigation' === get_current_screen()->base ) {
+	if ( is_navigation_editor_screen() ) {
 		return true;
 	}
 
@@ -82,3 +82,35 @@ function gutenberg_navigation_editor_load_block_editor_scripts_and_styles( $is_b
 }
 
 add_filter( 'should_load_block_editor_scripts_and_styles', 'gutenberg_navigation_editor_load_block_editor_scripts_and_styles' );
+
+/**
+ * Filters the Theme JSON to alter the settings of the Navigation block.
+ *
+ * @param Array $data the raw Theme JSON config at the Theme level.
+ * @return Array the amended Theme JSON config.
+ */
+function gutenberg_navigation_editor_filter_navigation_block_settings( $data ) {
+	if ( is_navigation_editor_screen() ) {
+		$data['settings']['blocks']['core/navigation'] = array(
+			'hasSubmenuIndicatorSetting'   => false,
+			'hasItemJustificationControls' => false,
+			'hasColorSettings'             => false,
+		);
+	}
+
+	return $data;
+}
+
+add_filter(
+	'theme_json_resolver_merged_data',
+	'gutenberg_navigation_editor_filter_navigation_block_settings'
+);
+
+/**
+ * Determines whether we are on the navigation editor screen.
+ *
+ * @return boolean whether or not we are on the navigation editor screen.
+ */
+function is_navigation_editor_screen() {
+	return is_callable( 'get_current_screen' ) && get_current_screen() && 'gutenberg_page_gutenberg-navigation' === get_current_screen()->base;
+}
