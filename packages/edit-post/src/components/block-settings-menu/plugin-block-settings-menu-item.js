@@ -86,6 +86,7 @@ const shouldRenderItem = ( selectedBlocks, allowedBlocks ) =>
 const PluginBlockSettingsMenuItem = ( {
 	allowedBlocks,
 	icon,
+	iconPosition,
 	label,
 	onClick,
 	small,
@@ -100,6 +101,7 @@ const PluginBlockSettingsMenuItem = ( {
 				<MenuItem
 					onClick={ compose( onClick, onClose ) }
 					icon={ icon }
+					iconPosition={ iconPosition }
 					label={ small ? label : undefined }
 					role={ role }
 				>

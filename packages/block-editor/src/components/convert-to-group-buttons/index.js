@@ -5,6 +5,7 @@ import { MenuItem } from '@wordpress/components';
 import { _x } from '@wordpress/i18n';
 import { switchToBlockType } from '@wordpress/blocks';
 import { useDispatch } from '@wordpress/data';
+import { group, ungroup } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -48,6 +49,8 @@ function ConvertToGroupButton( {
 		<>
 			{ isGroupable && (
 				<MenuItem
+					icon={ group }
+					iconPosition="left"
 					onClick={ () => {
 						onConvertToGroup();
 						onClose();
@@ -58,6 +61,8 @@ function ConvertToGroupButton( {
 			) }
 			{ isUngroupable && (
 				<MenuItem
+					icon={ ungroup }
+					iconPosition="left"
 					onClick={ () => {
 						onConvertFromGroup();
 						onClose();

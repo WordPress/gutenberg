@@ -1,3 +1,15 @@
-.block-editor-block-settings-menu__popover .components-dropdown-menu__menu {
-	padding: 0;
+.block-editor-block-settings-menu__popover {
+	.components-dropdown-menu__menu {
+		padding: 0;
+		.components-menu-item__button {
+			padding-left: $grid-unit-50;
+			/**
+			 * This is only applied to 'left' icons because 'right' icons
+			 * are rendered inside the `button`.
+			 */
+			&.has-icon {
+				padding-left: $grid-unit;
+			}
+		}
+	}
 }

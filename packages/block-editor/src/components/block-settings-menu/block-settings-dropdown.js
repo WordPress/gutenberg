@@ -9,7 +9,7 @@ import { castArray, flow, noop } from 'lodash';
 import { __ } from '@wordpress/i18n';
 import { DropdownMenu, MenuGroup, MenuItem } from '@wordpress/components';
 import { useSelect } from '@wordpress/data';
-import { moreVertical } from '@wordpress/icons';
+import { moreVertical, insertAfter, insertBefore } from '@wordpress/icons';
 
 import { Children, cloneElement, useCallback } from '@wordpress/element';
 import { serialize } from '@wordpress/blocks';
@@ -138,6 +138,8 @@ export function BlockSettingsDropdown( {
 								{ canInsertDefaultBlock && (
 									<>
 										<MenuItem
+											icon={ insertBefore }
+											iconPosition="left"
 											onClick={ flow(
 												onClose,
 												onInsertBefore
@@ -147,6 +149,8 @@ export function BlockSettingsDropdown( {
 											{ __( 'Insert before' ) }
 										</MenuItem>
 										<MenuItem
+											icon={ insertAfter }
+											iconPosition="left"
 											onClick={ flow(
 												onClose,
 												onInsertAfter

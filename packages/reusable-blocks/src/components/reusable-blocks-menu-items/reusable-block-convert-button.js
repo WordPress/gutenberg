@@ -114,6 +114,7 @@ export default function ReusableBlockConvertButton( {
 				<>
 					<MenuItem
 						icon={ reusableBlock }
+						iconPosition="left"
 						onClick={ () => {
 							setIsModalOpen( true );
 						} }
