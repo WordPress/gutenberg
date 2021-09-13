@@ -27,11 +27,10 @@ describe( 'changing image size', () => {
 
 		expect( await getEditedPostContent() ).toMatchSnapshot();
 
-		await page.waitForSelector( '.wp-block-test-iframed-block' );
-		const text = await page.evaluate( () => {
-			return document.querySelector( '.wp-block-test-iframed-block' )
-				.innerText;
-		} );
+		const element = await page.waitForSelector(
+			'.wp-block-test-iframed-block'
+		);
+		const text = await element.evaluate( ( el ) => el.textContent );
 
 		expect( text ).toBe( 'Iframed Block (set with jQuery)' );
 
