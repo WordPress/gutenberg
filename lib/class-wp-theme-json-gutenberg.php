@@ -1249,8 +1249,8 @@ class WP_Theme_JSON_Gutenberg {
 		// In those cases, we want to replace the existing with the incoming value, if it exists.
 		$to_replace   = array();
 		$to_replace[] = array( 'spacing', 'units' );
-		$to_replace[] = array( 'color', 'duotone' );
 		foreach ( self::VALID_ORIGINS as $origin ) {
+			$to_replace[] = array( 'color', 'duotone', $origin );
 			$to_replace[] = array( 'color', 'palette', $origin );
 			$to_replace[] = array( 'color', 'gradients', $origin );
 			$to_replace[] = array( 'typography', 'fontSizes', $origin );
