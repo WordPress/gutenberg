@@ -256,6 +256,10 @@ extension GutenbergViewController: GutenbergBridgeDelegate {
     func gutenbergDidRequestSetBlockTypeImpressions(_ impressions: [String: Int]) -> Void {
         print("Gutenberg requested setting block type impressions to \(impressions).")
     }
+
+    func gutenbergDidRequestCustomerSupportOptionsShow() {
+        print(#function)
+    }
 }
 
 extension GutenbergViewController: GutenbergWebDelegate {
