@@ -4,7 +4,6 @@
 import { store as blockEditorStore } from '@wordpress/block-editor';
 import { Button, ToolbarItem } from '@wordpress/components';
 import { _x } from '@wordpress/i18n';
-import { useRef } from '@wordpress/element';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { plus } from '@wordpress/icons';
 
@@ -15,7 +14,6 @@ import { useNavigationEditorRootBlock } from '../../hooks';
 import { store as editNavigationStore } from '../../store';
 
 function InserterButton() {
-	const inserterButton = useRef();
 	const { navBlockClientId } = useNavigationEditorRootBlock();
 
 	const { isInserterOpened, hasInserterItems } = useSelect(
@@ -36,7 +34,6 @@ function InserterButton() {
 
 	return (
 		<ToolbarItem
-			ref={ inserterButton }
 			as={ Button }
 			className="edit-navigation-header-toolbar__inserter-toggle"
 			variant="primary"
