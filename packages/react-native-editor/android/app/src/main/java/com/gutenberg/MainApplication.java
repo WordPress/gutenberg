@@ -259,6 +259,10 @@ public class MainApplication extends Application implements ReactApplication, Gu
                 Log.d("BlockTypeImpressions", String.format("Gutenberg requested setting block type impression to %s.", impressions));
             }
 
+            @Override
+            public void requestCustomerSupportOptionsShow() {
+                Toast.makeText(MainApplication.this, "requestCustomerSupportOptionsShow called", Toast.LENGTH_SHORT).show();
+            }
         }, isDarkMode());
 
         return new ReactNativeHost(this) {

@@ -423,4 +423,9 @@ public class RNReactNativeGutenbergBridgeModule extends ReactContextBaseJavaModu
     public void setBlockTypeImpressions(final ReadableMap impressions) {
         mGutenbergBridgeJS2Parent.setBlockTypeImpressions(impressions);
     }
+
+    @ReactMethod
+    public void requestCustomerSupportOptionsShow() {
+        mGutenbergBridgeJS2Parent.requestCustomerSupportOptionsShow();
+    }
 }

@@ -101,6 +101,7 @@ public class WPAndroidGlueCode {
     private OnFocalPointPickerTooltipShownEventListener mOnFocalPointPickerTooltipShownListener;
     private OnGutenbergDidRequestPreviewListener mOnGutenbergDidRequestPreviewListener;
     private OnBlockTypeImpressionsEventListener mOnBlockTypeImpressionsEventListener;
+    private OnCustomerSupportOptionsShowListener mOnCustomerSupportOptionsShowListener;
     private boolean mIsEditorMounted;
 
     private String mContentHtml = "";
@@ -225,6 +226,10 @@ public class WPAndroidGlueCode {
     public interface OnBlockTypeImpressionsEventListener {
         void onSetBlockTypeImpressions(Map<String, Double> impressions);
         Map<String, Double> onRequestBlockTypeImpressions();
+    }
+
+    public interface OnCustomerSupportOptionsShowListener {
+        void onCustomerSupportOptionsShow();
     }
 
     public void mediaSelectionCancelled() {
@@ -526,6 +531,11 @@ public class WPAndroidGlueCode {
                     impressions.put(key, newImpressions.getDouble(key));
                 }
                 mOnBlockTypeImpressionsEventListener.onSetBlockTypeImpressions(impressions);
+            }
+
+            @Override
+            public void requestCustomerSupportOptionsShow() {
+                mOnCustomerSupportOptionsShowListener.onCustomerSupportOptionsShow();
             }
         }, mIsDarkMode);
 
