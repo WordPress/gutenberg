@@ -92,7 +92,6 @@
 	}
 }
 
-
 // Styles for submenu flyout.
 // These are separated out with reduced specificity to allow better inheritance from Global Styles.
 .wp-block-navigation .has-child {
@@ -167,13 +166,12 @@
 		}
 	}
 
-
 	// Separating out hover and focus-within so hover works again on IE: https://davidwalsh.name/css-focus-within#comment-513401
 	// We will need to replace focus-within with a JS solution for IE keyboard support.
 
 	// Custom menu items.
-	// Show submenus on hover.
-	&:hover > .wp-block-navigation__submenu-container {
+	// Show submenus on hover unless they open on click.
+	&:where(:not(.open-on-click)):hover > .wp-block-navigation__submenu-container {
 		visibility: visible;
 		opacity: 1;
 		width: auto;
@@ -182,7 +180,7 @@
 	}
 
 	// Keep submenus open when focus is within.
-	&:focus-within > .wp-block-navigation__submenu-container {
+	&:where(:not(.open-on-click):not(.open-on-hover-click)):focus-within > .wp-block-navigation__submenu-container {
 		visibility: visible;
 		opacity: 1;
 		width: auto;
@@ -192,7 +190,9 @@
 }
 
 // Submenu indentation when there's a background.
-.wp-block-navigation.has-background .has-child .wp-block-navigation__submenu-container {
+.wp-block-navigation.has-background
+.has-child
+.wp-block-navigation__submenu-container {
 	left: 0;
 	top: 100%;
 
@@ -204,7 +204,6 @@
 		}
 	}
 }
-
 
 /**
  * Margins
@@ -226,7 +225,6 @@
 		gap: 0 0.5em;
 	}
 }
-
 
 /**
  * Paddings
@@ -252,7 +250,6 @@
 	padding: 0.5em 1em;
 }
 
-
 /**
  * Justifications.
  */
@@ -260,11 +257,12 @@
 // When justified space-between, open submenus leftward for last menu item.
 // When justified right, open all submenus leftwards.
 // This needs high specificity.
-.wp-block-navigation.items-justified-space-between .wp-block-page-list > .has-child:last-child,
+.wp-block-navigation.items-justified-space-between
+.wp-block-page-list > .has-child:last-child,
 .wp-block-navigation.items-justified-space-between > .wp-block-navigation__container > .has-child:last-child,
 .wp-block-navigation.items-justified-right .wp-block-page-list > .has-child,
-.wp-block-navigation.items-justified-right > .wp-block-navigation__container .has-child {
-
+.wp-block-navigation.items-justified-right > .wp-block-navigation__container
+.has-child {
 	// First submenu.
 	.wp-block-navigation__submenu-container {
 		left: auto;
@@ -348,7 +346,6 @@
 	}
 }
 
-
 /**
  * Mobile menu.
  */
@@ -429,7 +426,8 @@
 }
 
 // Default menu background and font color.
-.wp-block-navigation:not(.has-background) .wp-block-navigation__responsive-container.is-menu-open {
+.wp-block-navigation:not(.has-background)
+.wp-block-navigation__responsive-container.is-menu-open {
 	background-color: #fff;
 	color: #000;
 }
@@ -517,7 +515,8 @@
 		border: none;
 	}
 
-	.wp-block-navigation-item {
+	.wp-block-navigation-item,
+	.wp-block-page-list {
 		flex-direction: column;
 		align-items: flex-start;
 	}

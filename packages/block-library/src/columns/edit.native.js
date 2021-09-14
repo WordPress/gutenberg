@@ -6,7 +6,7 @@ import { dropRight, times, map, compact, delay } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { __ } from '@wordpress/i18n';
+import { __, sprintf } from '@wordpress/i18n';
 import {
 	PanelBody,
 	RangeControl,
@@ -190,9 +190,14 @@ function ColumnsEditContainer( {
 		return innerWidths.map( ( column, index ) => {
 			const { valueUnit = '%' } =
 				getValueAndUnit( column.attributes.width ) || {};
+			const label = sprintf(
+				/* translators: %d: column index. */
+				__( 'Column %d' ),
+				index + 1
+			);
 			return (
 				<UnitControl
-					label={ `Column ${ index + 1 }` }
+					label={ label }
 					settingLabel="Width"
 					key={ `${ column.clientId }-${
 						getWidths( innerWidths ).length

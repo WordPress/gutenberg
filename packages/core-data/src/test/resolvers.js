@@ -1,7 +1,9 @@
 /**
  * WordPress dependencies
  */
-import { apiFetch } from '@wordpress/data-controls';
+import triggerFetch from '@wordpress/api-fetch';
+
+jest.mock( '@wordpress/api-fetch' );
 
 /**
  * Internal dependencies
@@ -14,13 +16,6 @@ import {
 	getAutosaves,
 	getCurrentUser,
 } from '../resolvers';
-import {
-	receiveEntityRecords,
-	receiveEmbedPreview,
-	receiveUserPermission,
-	receiveAutosaves,
-	receiveCurrentUser,
-} from '../actions';
 
 describe( 'getEntityRecord', () => {
 	const POST_TYPE = { slug: 'post' };
@@ -32,68 +27,100 @@ describe( 'getEntityRecord', () => {
 			baseURLParams: { context: 'edit' },
 		},
 	];
+	beforeEach( async () => {
+		triggerFetch.mockReset();
+		jest.useFakeTimers();
+	} );
 
 	it( 'yields with requested post type', async () => {
-		const fulfillment = getEntityRecord( 'root', 'postType', 'post' );
-		// Trigger generator
-		fulfillment.next();
-		// Provide entities and acquire lock
-		expect( fulfillment.next( ENTITIES ).value.type ).toEqual(
-			'@@data/DISPATCH'
-		);
-		// trigger apiFetch
-		const { value: apiFetchAction } = fulfillment.next();
-		expect( apiFetchAction.request ).toEqual( {
+		const dispatch = Object.assign( jest.fn(), {
+			receiveEntityRecords: jest.fn(),
+			__unstableAcquireStoreLock: jest.fn(),
+			__unstableReleaseStoreLock: jest.fn(),
+		} );
+		// Provide entities
+		dispatch.mockReturnValueOnce( ENTITIES );
+
+		// Provide response
+		triggerFetch.mockImplementation( () => POST_TYPE );
+
+		await getEntityRecord( 'root', 'postType', 'post' )( { dispatch } );
+
+		// Fetch request should have been issued
+		expect( triggerFetch ).toHaveBeenCalledWith( {
 			path: '/wp/v2/types/post?context=edit',
 		} );
-		// Provide response and trigger action
-		const { value: received } = fulfillment.next( POST_TYPE );
-		expect( received ).toEqual(
-			receiveEntityRecords( 'root', 'postType', POST_TYPE )
+
+		// The record should have been received
+		expect( dispatch.receiveEntityRecords ).toHaveBeenCalledWith(
+			'root',
+			'postType',
+			POST_TYPE,
+			undefined
 		);
-		// Release lock
-		expect( fulfillment.next().value.type ).toEqual( '@@data/DISPATCH' );
+
+		// Locks should have been acquired and released
+		expect( dispatch.__unstableAcquireStoreLock ).toHaveBeenCalledTimes(
+			1
+		);
+		expect( dispatch.__unstableReleaseStoreLock ).toHaveBeenCalledTimes(
+			1
+		);
 	} );
 
 	it( 'accepts a query that overrides default api path', async () => {
 		const query = { context: 'view', _envelope: '1' };
 		const queryObj = { include: [ 'post' ], ...query };
 
-		const fulfillment = getEntityRecord(
+		const select = {
+			hasEntityRecords: jest.fn( () => {} ),
+		};
+
+		const dispatch = Object.assign( jest.fn(), {
+			receiveEntityRecords: jest.fn(),
+			__unstableAcquireStoreLock: jest.fn(),
+			__unstableReleaseStoreLock: jest.fn(),
+		} );
+		// Provide entities
+		dispatch.mockReturnValueOnce( ENTITIES );
+
+		// Provide response
+		triggerFetch.mockImplementation( () => POST_TYPE );
+
+		await getEntityRecord(
 			'root',
 			'postType',
 			'post',
 			query
-		);
-
-		// Trigger generator
-		fulfillment.next();
-
-		// Provide entities and acquire lock
-		expect( fulfillment.next( ENTITIES ).value.type ).toEqual(
-			'@@data/DISPATCH'
-		);
+		)( { dispatch, select } );
 
 		// Check resolution cache for an existing entity that fulfills the request with query
-		const {
-			value: { args: selectArgs },
-		} = fulfillment.next();
-		expect( selectArgs ).toEqual( [ 'root', 'postType', queryObj ] );
+		expect( select.hasEntityRecords ).toHaveBeenCalledWith(
+			'root',
+			'postType',
+			queryObj
+		);
 
 		// Trigger apiFetch, test that the query is present in the url
-		const { value: apiFetchAction } = fulfillment.next();
-		expect( apiFetchAction.request ).toEqual( {
+		expect( triggerFetch ).toHaveBeenCalledWith( {
 			path: '/wp/v2/types/post?context=view&_envelope=1',
 		} );
 
-		// Receive response
-		const { value: received } = fulfillment.next( POST_TYPE );
-		expect( received ).toEqual(
-			receiveEntityRecords( 'root', 'postType', POST_TYPE, queryObj )
+		// The record should have been received
+		expect( dispatch.receiveEntityRecords ).toHaveBeenCalledWith(
+			'root',
+			'postType',
+			POST_TYPE,
+			queryObj
 		);
 
-		// Release lock
-		expect( fulfillment.next().value.type ).toEqual( '@@data/DISPATCH' );
+		// Locks should have been acquired and released
+		expect( dispatch.__unstableAcquireStoreLock ).toHaveBeenCalledTimes(
+			1
+		);
+		expect( dispatch.__unstableReleaseStoreLock ).toHaveBeenCalledTimes(
+			1
+		);
 	} );
 } );
 
@@ -117,69 +144,97 @@ describe( 'getEntityRecords', () => {
 		},
 	];
 
-	it( 'yields with requested post type', async () => {
-		const fulfillment = getEntityRecords( 'root', 'postType' );
+	beforeEach( async () => {
+		triggerFetch.mockReset();
+		jest.useFakeTimers();
+	} );
 
-		// Trigger generator
-		fulfillment.next();
+	it( 'dispatches the requested post type', async () => {
+		const dispatch = Object.assign( jest.fn(), {
+			receiveEntityRecords: jest.fn(),
+			__unstableAcquireStoreLock: jest.fn(),
+			__unstableReleaseStoreLock: jest.fn(),
+		} );
+		// Provide entities
+		dispatch.mockReturnValueOnce( ENTITIES );
 
-		// Provide entities and acquire lock
-		fulfillment.next( ENTITIES );
+		// Provide response
+		triggerFetch.mockImplementation( () => POST_TYPES );
 
-		// trigger apiFetch
-		const { value: apiFetchAction } = fulfillment.next();
+		await getEntityRecords( 'root', 'postType' )( { dispatch } );
 
-		expect( apiFetchAction.request ).toEqual( {
+		// Fetch request should have been issued
+		expect( triggerFetch ).toHaveBeenCalledWith( {
 			path: '/wp/v2/types?context=edit',
 		} );
-		// Provide response and trigger action
-		const { value: received } = fulfillment.next( POST_TYPES );
-		expect( received ).toEqual(
-			receiveEntityRecords(
-				'root',
-				'postType',
-				Object.values( POST_TYPES ),
-				{}
-			)
+
+		// The record should have been received
+		expect( dispatch.receiveEntityRecords ).toHaveBeenCalledWith(
+			'root',
+			'postType',
+			Object.values( POST_TYPES ),
+			{}
 		);
 	} );
 
 	it( 'Uses state locks', async () => {
-		const fulfillment = getEntityRecords( 'root', 'postType' );
+		const dispatch = Object.assign( jest.fn(), {
+			receiveEntityRecords: jest.fn(),
+			__unstableAcquireStoreLock: jest.fn(),
+			__unstableReleaseStoreLock: jest.fn(),
+		} );
+		// Provide entities
+		dispatch.mockReturnValueOnce( ENTITIES );
 
-		// Repeat the steps from `yields with requested post type` test
-		fulfillment.next();
-		// Provide entities and acquire lock
-		expect( fulfillment.next( ENTITIES ).value.type ).toEqual(
-			'@@data/DISPATCH'
+		// Provide response
+		triggerFetch.mockImplementation( () => POST_TYPES );
+
+		await getEntityRecords( 'root', 'postType' )( { dispatch } );
+
+		// Fetch request should have been issued
+		expect( triggerFetch ).toHaveBeenCalledWith( {
+			path: '/wp/v2/types?context=edit',
+		} );
+
+		// The record should have been received
+		expect(
+			dispatch.__unstableAcquireStoreLock
+		).toHaveBeenCalledWith(
+			'core',
+			[ 'entities', 'data', 'root', 'postType' ],
+			{ exclusive: false }
 		);
-		fulfillment.next();
-		fulfillment.next( POST_TYPES );
-
-		// Resolve specific entity records
-		fulfillment.next();
-		fulfillment.next();
-
-		// Release lock
-		expect( fulfillment.next().value.type ).toEqual( '@@data/DISPATCH' );
+		expect( dispatch.__unstableReleaseStoreLock ).toHaveBeenCalledTimes(
+			1
+		);
 	} );
 
 	it( 'marks specific entity records as resolved', async () => {
-		const fulfillment = getEntityRecords( 'root', 'postType' );
+		const dispatch = Object.assign( jest.fn(), {
+			receiveEntityRecords: jest.fn(),
+			__unstableAcquireStoreLock: jest.fn(),
+			__unstableReleaseStoreLock: jest.fn(),
+		} );
+		// Provide entities
+		dispatch.mockReturnValueOnce( ENTITIES );
 
-		// Repeat the steps from `yields with requested post type` test
-		fulfillment.next();
-		fulfillment.next( ENTITIES );
-		fulfillment.next();
-		fulfillment.next( POST_TYPES );
+		// Provide response
+		triggerFetch.mockImplementation( () => POST_TYPES );
 
-		// It should mark the entity record that has an ID as resolved
-		expect( fulfillment.next().value ).toEqual( {
+		await getEntityRecords( 'root', 'postType' )( { dispatch } );
+
+		// Fetch request should have been issued
+		expect( triggerFetch ).toHaveBeenCalledWith( {
+			path: '/wp/v2/types?context=edit',
+		} );
+
+		// The record should have been received
+		expect( dispatch ).toHaveBeenCalledWith( {
 			type: 'START_RESOLUTIONS',
 			selectorName: 'getEntityRecord',
 			args: [ [ ENTITIES[ 1 ].kind, ENTITIES[ 1 ].name, 2 ] ],
 		} );
-		expect( fulfillment.next().value ).toEqual( {
+		expect( dispatch ).toHaveBeenCalledWith( {
 			type: 'FINISH_RESOLUTIONS',
 			selectorName: 'getEntityRecord',
 			args: [ [ ENTITIES[ 1 ].kind, ENTITIES[ 1 ].name, 2 ] ],
@@ -194,130 +249,136 @@ describe( 'getEmbedPreview', () => {
 	const UNEMBEDDABLE_URL = 'http://example.com/';
 
 	it( 'yields with fetched embed preview', async () => {
-		const fulfillment = getEmbedPreview( EMBEDDABLE_URL );
-		// Trigger generator
-		fulfillment.next();
-		// Provide apiFetch response and trigger Action
-		const received = ( await fulfillment.next( SUCCESSFUL_EMBED_RESPONSE ) )
-			.value;
-		expect( received ).toEqual(
-			receiveEmbedPreview( EMBEDDABLE_URL, SUCCESSFUL_EMBED_RESPONSE )
+		const dispatch = Object.assign( jest.fn(), {
+			receiveEmbedPreview: jest.fn(),
+		} );
+
+		// Provide response
+		triggerFetch.mockResolvedValue( SUCCESSFUL_EMBED_RESPONSE );
+
+		await getEmbedPreview( EMBEDDABLE_URL )( { dispatch } );
+
+		expect( dispatch.receiveEmbedPreview ).toHaveBeenCalledWith(
+			EMBEDDABLE_URL,
+			SUCCESSFUL_EMBED_RESPONSE
 		);
 	} );
 
 	it( 'yields false if the URL cannot be embedded', async () => {
-		const fulfillment = getEmbedPreview( UNEMBEDDABLE_URL );
-		// Trigger generator
-		fulfillment.next();
-		// Provide invalid response and trigger Action
-		const received = ( await fulfillment.throw( { status: 404 } ) ).value;
-		expect( received ).toEqual(
-			receiveEmbedPreview( UNEMBEDDABLE_URL, UNEMBEDDABLE_RESPONSE )
+		const dispatch = Object.assign( jest.fn(), {
+			receiveEmbedPreview: jest.fn(),
+		} );
+
+		// Provide response
+		triggerFetch.mockRejectedValue( { status: 404 } );
+
+		await getEmbedPreview( UNEMBEDDABLE_URL )( { dispatch } );
+
+		expect( dispatch.receiveEmbedPreview ).toHaveBeenCalledWith(
+			UNEMBEDDABLE_URL,
+			UNEMBEDDABLE_RESPONSE
 		);
 	} );
 } );
 
 describe( 'canUser', () => {
-	it( 'does nothing when there is an API error', () => {
-		const generator = canUser( 'create', 'media' );
-
-		let received = generator.next();
-		expect( received.done ).toBe( false );
-		expect( received.value ).toEqual(
-			apiFetch( {
-				path: '/wp/v2/media',
-				method: 'OPTIONS',
-				parse: false,
-			} )
-		);
-
-		received = generator.throw( { status: 404 } );
-		expect( received.done ).toBe( true );
-		expect( received.value ).toBeUndefined();
+	beforeEach( async () => {
+		triggerFetch.mockReset();
 	} );
 
-	it( 'receives false when the user is not allowed to perform an action', () => {
-		const generator = canUser( 'create', 'media' );
+	it( 'does nothing when there is an API error', async () => {
+		const dispatch = Object.assign( jest.fn(), {
+			receiveUserPermission: jest.fn(),
+		} );
 
-		let received = generator.next();
-		expect( received.done ).toBe( false );
-		expect( received.value ).toEqual(
-			apiFetch( {
-				path: '/wp/v2/media',
-				method: 'OPTIONS',
-				parse: false,
-			} )
+		triggerFetch.mockImplementation( () =>
+			Promise.reject( { status: 404 } )
 		);
 
-		received = generator.next( {
+		await canUser( 'create', 'media' )( { dispatch } );
+
+		expect( triggerFetch ).toHaveBeenCalledWith( {
+			path: '/wp/v2/media',
+			method: 'OPTIONS',
+			parse: false,
+		} );
+
+		expect( dispatch.receiveUserPermission ).not.toHaveBeenCalled();
+	} );
+
+	it( 'receives false when the user is not allowed to perform an action', async () => {
+		const dispatch = Object.assign( jest.fn(), {
+			receiveUserPermission: jest.fn(),
+		} );
+
+		triggerFetch.mockImplementation( () => ( {
 			headers: {
 				Allow: 'GET',
 			},
-		} );
-		expect( received.done ).toBe( false );
-		expect( received.value ).toEqual(
-			receiveUserPermission( 'create/media', false )
-		);
+		} ) );
 
-		received = generator.next();
-		expect( received.done ).toBe( true );
-		expect( received.value ).toBeUndefined();
+		await canUser( 'create', 'media' )( { dispatch } );
+
+		expect( triggerFetch ).toHaveBeenCalledWith( {
+			path: '/wp/v2/media',
+			method: 'OPTIONS',
+			parse: false,
+		} );
+
+		expect( dispatch.receiveUserPermission ).toHaveBeenCalledWith(
+			'create/media',
+			false
+		);
 	} );
 
-	it( 'receives true when the user is allowed to perform an action', () => {
-		const generator = canUser( 'create', 'media' );
+	it( 'receives true when the user is allowed to perform an action', async () => {
+		const dispatch = Object.assign( jest.fn(), {
+			receiveUserPermission: jest.fn(),
+		} );
 
-		let received = generator.next();
-		expect( received.done ).toBe( false );
-		expect( received.value ).toEqual(
-			apiFetch( {
-				path: '/wp/v2/media',
-				method: 'OPTIONS',
-				parse: false,
-			} )
-		);
-
-		received = generator.next( {
+		triggerFetch.mockImplementation( () => ( {
 			headers: {
 				Allow: 'POST, GET, PUT, DELETE',
 			},
-		} );
-		expect( received.done ).toBe( false );
-		expect( received.value ).toEqual(
-			receiveUserPermission( 'create/media', true )
-		);
+		} ) );
 
-		received = generator.next();
-		expect( received.done ).toBe( true );
-		expect( received.value ).toBeUndefined();
+		await canUser( 'create', 'media' )( { dispatch } );
+
+		expect( triggerFetch ).toHaveBeenCalledWith( {
+			path: '/wp/v2/media',
+			method: 'OPTIONS',
+			parse: false,
+		} );
+
+		expect( dispatch.receiveUserPermission ).toHaveBeenCalledWith(
+			'create/media',
+			true
+		);
 	} );
 
-	it( 'receives true when the user is allowed to perform an action on a specific resource', () => {
-		const generator = canUser( 'update', 'blocks', 123 );
+	it( 'receives true when the user is allowed to perform an action on a specific resource', async () => {
+		const dispatch = Object.assign( jest.fn(), {
+			receiveUserPermission: jest.fn(),
+		} );
 
-		let received = generator.next();
-		expect( received.done ).toBe( false );
-		expect( received.value ).toEqual(
-			apiFetch( {
-				path: '/wp/v2/blocks/123',
-				method: 'GET',
-				parse: false,
-			} )
-		);
-
-		received = generator.next( {
+		triggerFetch.mockImplementation( () => ( {
 			headers: {
 				Allow: 'POST, GET, PUT, DELETE',
 			},
-		} );
-		expect( received.done ).toBe( false );
-		expect( received.value ).toEqual(
-			receiveUserPermission( 'update/blocks/123', true )
-		);
+		} ) );
 
-		received = generator.next();
-		expect( received.done ).toBe( true );
-		expect( received.value ).toBeUndefined();
+		await canUser( 'create', 'blocks', 123 )( { dispatch } );
+
+		expect( triggerFetch ).toHaveBeenCalledWith( {
+			path: '/wp/v2/blocks/123',
+			method: 'GET',
+			parse: false,
+		} );
+
+		expect( dispatch.receiveUserPermission ).toHaveBeenCalledWith(
+			'create/blocks/123',
+			true
+		);
 	} );
 } );
 
@@ -330,28 +391,31 @@ describe( 'getAutosaves', () => {
 		},
 	];
 
+	beforeEach( async () => {
+		triggerFetch.mockReset();
+	} );
+
 	it( 'yields with fetched autosaves', async () => {
 		const postType = 'post';
 		const postId = 1;
 		const restBase = 'posts';
 		const postEntity = { rest_base: restBase };
-		const fulfillment = getAutosaves( postType, postId );
 
-		// Trigger generator
-		fulfillment.next();
+		triggerFetch.mockImplementation( () => SUCCESSFUL_RESPONSE );
+		const dispatch = Object.assign( jest.fn(), {
+			receiveAutosaves: jest.fn(),
+		} );
+		const resolveSelect = Object.assign( jest.fn(), {
+			getPostType: jest.fn( () => postEntity ),
+		} );
+		await getAutosaves( postType, postId )( { dispatch, resolveSelect } );
 
-		// Trigger generator with the postEntity and assert that correct path is formed
-		// in the apiFetch request.
-		const { value: apiFetchAction } = fulfillment.next( postEntity );
-		expect( apiFetchAction.request ).toEqual( {
+		expect( triggerFetch ).toHaveBeenCalledWith( {
 			path: `/wp/v2/${ restBase }/${ postId }/autosaves?context=edit`,
 		} );
-
-		// Provide apiFetch response and trigger Action
-		const received = ( await fulfillment.next( SUCCESSFUL_RESPONSE ) )
-			.value;
-		expect( received ).toEqual(
-			receiveAutosaves( 1, SUCCESSFUL_RESPONSE )
+		expect( dispatch.receiveAutosaves ).toHaveBeenCalledWith(
+			1,
+			SUCCESSFUL_RESPONSE
 		);
 	} );
 
@@ -360,21 +424,20 @@ describe( 'getAutosaves', () => {
 		const postId = 1;
 		const restBase = 'posts';
 		const postEntity = { rest_base: restBase };
-		const fulfillment = getAutosaves( postType, postId );
 
-		// Trigger generator
-		fulfillment.next();
+		triggerFetch.mockImplementation( () => [] );
+		const dispatch = Object.assign( jest.fn(), {
+			receiveAutosaves: jest.fn(),
+		} );
+		const resolveSelect = Object.assign( jest.fn(), {
+			getPostType: jest.fn( () => postEntity ),
+		} );
+		await getAutosaves( postType, postId )( { dispatch, resolveSelect } );
 
-		// Trigger generator with the postEntity and assert that correct path is formed
-		// in the apiFetch request.
-		const { value: apiFetchAction } = fulfillment.next( postEntity );
-		expect( apiFetchAction.request ).toEqual( {
+		expect( triggerFetch ).toHaveBeenCalledWith( {
 			path: `/wp/v2/${ restBase }/${ postId }/autosaves?context=edit`,
 		} );
-
-		// Provide apiFetch response and trigger Action
-		const received = ( await fulfillment.next( [] ) ).value;
-		expect( received ).toBeUndefined();
+		expect( dispatch.receiveAutosaves ).not.toHaveBeenCalled();
 	} );
 } );
 
@@ -384,14 +447,17 @@ describe( 'getCurrentUser', () => {
 	};
 
 	it( 'yields with fetched user', async () => {
-		const fulfillment = getCurrentUser();
+		const dispatch = Object.assign( jest.fn(), {
+			receiveCurrentUser: jest.fn(),
+		} );
 
-		// Trigger generator
-		fulfillment.next();
+		// Provide response
+		triggerFetch.mockResolvedValue( SUCCESSFUL_RESPONSE );
 
-		// Provide apiFetch response and trigger Action
-		const received = ( await fulfillment.next( SUCCESSFUL_RESPONSE ) )
-			.value;
-		expect( received ).toEqual( receiveCurrentUser( SUCCESSFUL_RESPONSE ) );
+		await getCurrentUser()( { dispatch } );
+
+		expect( dispatch.receiveCurrentUser ).toHaveBeenCalledWith(
+			SUCCESSFUL_RESPONSE
+		);
 	} );
 } );

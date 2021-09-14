@@ -2,7 +2,7 @@
 @import "./deprecated.scss";
 
 // Styles for current version of gallery block.
-.wp-block-gallery.blocks-gallery-grid.has-nested-images {
+.wp-block-gallery.has-nested-images {
 	display: flex;
 	flex-wrap: wrap;
 	// Need bogus :not(#individual-image) to override long :not()

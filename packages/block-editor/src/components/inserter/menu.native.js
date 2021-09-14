@@ -36,7 +36,6 @@ function InserterMenu( {
 } ) {
 	const [ filterValue, setFilterValue ] = useState( '' );
 	const [ showTabs, setShowTabs ] = useState( true );
-	const [ showSearchForm, setShowSearchForm ] = useState( true );
 	const [ tabIndex, setTabIndex ] = useState( 0 );
 
 	const isIOS = Platform.OS === 'ios';
@@ -102,11 +101,6 @@ function InserterMenu( {
 			}
 		}
 		showInsertionPoint( destinationRootClientId, insertionIndex );
-
-		// Show search form if there are enough items to filter.
-		if ( items.length < MIN_ITEMS_FOR_SEARCH ) {
-			setShowSearchForm( false );
-		}
 
 		return hideInsertionPoint;
 	}, [] );
@@ -176,6 +170,9 @@ function InserterMenu( {
 		setShowTabs,
 	] );
 
+	const showSearchForm = items.length > MIN_ITEMS_FOR_SEARCH;
+	const isFullScreen = ! isIOS && showSearchForm;
+
 	return (
 		<BottomSheet
 			isVisible={ true }
@@ -201,7 +198,7 @@ function InserterMenu( {
 			hasNavigation
 			setMinHeightToMaxHeight={ true }
 			contentStyle={ styles[ 'inserter-menu__list' ] }
-			isFullScreen={ ! isIOS && showSearchForm }
+			isFullScreen={ isFullScreen }
 			allowDragIndicator={ true }
 		>
 			<BottomSheetConsumer>
@@ -216,7 +213,7 @@ function InserterMenu( {
 								filterValue={ filterValue }
 								onSelect={ onSelectItem }
 								listProps={ listProps }
-								isFullScreen={ ! isIOS && showSearchForm }
+								isFullScreen={ isFullScreen }
 							/>
 						) : (
 							<InserterTabs
