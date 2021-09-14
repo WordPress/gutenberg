@@ -90,7 +90,7 @@ export const createPlaceholderMenuItem = ( block, menuId ) => async ( {
 		data: {
 			title: 'Placeholder',
 			url: 'Placeholder',
-			menu_order: 0,
+			menu_order: 1,
 		},
 	} );
 
