@@ -32,6 +32,7 @@
 		// Increase specificity.
 		.wp-block-navigation-item {
 			display: block;
+			margin: $grid-unit-10 0;
 
 			// Show submenus on click.
 			> .wp-block-navigation__submenu-container {
@@ -53,15 +54,8 @@
 				display: none;
 			}
 
-			// Menu items.
-			// This needs high specificity to override inherited values.
-			&.wp-block-navigation-item.wp-block-navigation-item {
-				margin-right: 0;
-			}
-
 			.wp-block-navigation-item__content.wp-block-navigation-item__content.wp-block-navigation-item__content {
 				padding: 0.5em 1em;
-				margin-bottom: 6px;
 				margin-right: 0;
 				border-radius: $radius-block-ui;
 
@@ -103,42 +97,40 @@
 		// Submenu icon indicator.
 		.wp-block-navigation__submenu-icon {
 			position: absolute;
-			top: 6px;
+			top: 15px;
 			left: 0;
-			padding: 6px;
+			padding: 0;
 			pointer-events: none;
 
 			svg {
 				// Point rightwards.
 				transform: rotate(-90deg);
-
 				transition: transform 0.2s ease;
 				@include reduce-motion("transition");
 			}
 		}
 
 		// Point downwards when open.
-		.is-selected.has-child > .wp-block-navigation__submenu-icon svg,
-		.has-child-selected.has-child > .wp-block-navigation__submenu-icon svg {
+		.wp-block-navigation-submenu.is-selected > .wp-block-navigation-item__content > .wp-block-navigation__submenu-icon svg,
+		.wp-block-navigation-submenu.has-child-selected > .wp-block-navigation-item__content > .wp-block-navigation__submenu-icon svg {
 			transform: rotate(0deg);
 		}
 
 		// Override inherited values to optimize menu items for the screen context.
+		.wp-block-navigation-submenu.has-child,
 		.wp-block-navigation-item.has-child {
 			cursor: default;
 			border-radius: $radius-block-ui;
 		}
 
 		// Override for deeply nested submenus.
-		.has-child .wp-block-navigation__container .wp-block-navigation__container,
 		.has-child .wp-block-navigation__container .wp-block-navigation__submenu-container {
 			left: auto;
 		}
 
-		// When editing a link with children, highlight the parent
+		// When editing a submenu with children, highlight the parent
 		// and adjust the spacing and submenu icon.
-		.wp-block-navigation-item.has-child.is-editing {
-			> .wp-block-navigation__container,
+		.wp-block-navigation-submenu.is-editing {
 			> .wp-block-navigation__submenu-container {
 				opacity: 1;
 				visibility: visible;
@@ -146,7 +138,7 @@
 				background: transparent;
 				top: auto;
 				left: auto;
-				padding-left: $grid-unit-15;
+				padding-left: $grid-unit-20 + $grid-unit-05;
 				min-width: auto;
 				width: 100%;
 				border: none;
@@ -158,10 +150,27 @@
 			}
 		}
 
-		// Add buttons
+		// Appender styles
+		.block-list-appender {
+			// Make appender rows the same height as items and center the button vertically.
+			display: flex;
+			flex-direction: column;
+			justify-content: center;
+			height: $grid-unit-50;
+			margin: $grid-unit-10 0;
+		}
+
 		.block-editor-button-block-appender.block-list-appender__toggle {
-			margin: 0 0 0 $grid-unit-20;
+			margin: 0 0 0 $grid-unit-30;
 			padding: 0;
+		}
+	}
+
+	// Override behavior that hides the navigation block's appender when it's deselected.
+	.block-editor-block-list__block:not(.is-selected):not(.has-child-selected):not(.block-editor-block-list__layout) {
+		.block-editor-block-list__layout > .block-list-appender .block-list-appender__toggle {
+			opacity: unset;
+			transform: unset;
 		}
 	}
 }

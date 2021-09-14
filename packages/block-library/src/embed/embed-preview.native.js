@@ -9,11 +9,14 @@ import classnames from 'classnames/dedupe';
  * WordPress dependencies
  */
 import { View } from '@wordpress/primitives';
-
-import { BlockCaption } from '@wordpress/block-editor';
+import {
+	BlockCaption,
+	store as blockEditorStore,
+} from '@wordpress/block-editor';
 import { __, sprintf } from '@wordpress/i18n';
 import { memo, useState } from '@wordpress/element';
 import { SandBox } from '@wordpress/components';
+import { useSelect } from '@wordpress/data';
 
 /**
  * Internal dependencies
@@ -34,10 +37,12 @@ const EmbedPreview = ( {
 	onFocus,
 	preview,
 	previewable,
+	isProviderPreviewable,
 	type,
 	url,
 } ) => {
 	const [ isCaptionSelected, setIsCaptionSelected ] = useState( false );
+	const { locale } = useSelect( blockEditorStore ).getSettings();
 
 	const wrapperStyle = styles[ 'embed-preview__wrapper' ];
 	const wrapperAlignStyle =
@@ -105,6 +110,7 @@ const EmbedPreview = ( {
 				>
 					<PreviewContent
 						html={ html }
+						lang={ locale }
 						title={ iframeTitle }
 						type={ sandboxClassnames }
 						providerUrl={ providerUrl }
@@ -122,7 +128,7 @@ const EmbedPreview = ( {
 			disabled={ ! isSelected }
 		>
 			<View>
-				{ previewable ? (
+				{ isProviderPreviewable && previewable ? (
 					embedWrapper
 				) : (
 					<EmbedNoPreview
@@ -130,6 +136,7 @@ const EmbedPreview = ( {
 						icon={ icon }
 						isSelected={ isSelected }
 						onPress={ () => setIsCaptionSelected( false ) }
+						previewable={ previewable }
 					/>
 				) }
 				<BlockCaption
