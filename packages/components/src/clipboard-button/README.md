@@ -31,7 +31,7 @@ const MyClipboardButton = () => {
 
 ## Props
 
-The component accepts the following props. Any other props will be passed the underlying `<Button/>` component. See the [Button](/packages/components/src/button/README.md#props) component for more details on the available props.
+The component accepts the following props:
 
 ### className
 
@@ -60,3 +60,7 @@ The function that will be called when the text is copied and the copy animation 
 
 -- Type: `() => void`
 -- Required: no
+
+### Inherited props
+
+Any additional props will be passed the underlying `<Button/>` component. See the [Button](/packages/components/src/button/README.md#props) component for more details on the available props.
