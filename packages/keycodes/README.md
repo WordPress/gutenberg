@@ -94,6 +94,10 @@ _Type_
 
 Keycode for DOWN key.
 
+### END
+
+Keycode for END key.
+
 ### ENTER
 
 Keycode for ENTER key.
@@ -105,6 +109,10 @@ Keycode for ESCAPE key.
 ### F10
 
 Keycode for F10 key.
+
+### HOME
+
+Keycode for HOME key.
 
 ### isKeyboardEvent
 
@@ -135,6 +143,14 @@ depending on platform.
 _Type_
 
 -   `WPModifierHandler< ( isApple: () => boolean ) => WPModifierPart[]>`
+
+### PAGEDOWN
+
+Keycode for PAGEDOWN key.
+
+### PAGEUP
+
+Keycode for PAGEUP key.
 
 ### rawShortcut
 

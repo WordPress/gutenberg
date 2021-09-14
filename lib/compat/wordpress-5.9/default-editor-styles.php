@@ -26,7 +26,10 @@ function gutenberg_extend_block_editor_settings_with_default_editor_styles( $set
 	$styles_without_core_styles = array();
 	if ( isset( $settings['styles'] ) ) {
 		foreach ( $settings['styles'] as $style ) {
-			if ( 'core' !== $style['__unstableType'] ) {
+			if (
+				! isset( $style['__unstableType'] ) ||
+				'core' !== $style['__unstableType']
+			) {
 				$styles_without_core_styles[] = $style;
 			}
 		}

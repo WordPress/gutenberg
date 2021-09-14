@@ -39,11 +39,13 @@ function ToggleGroupControlBackdrop( {
 		setLeft( offsetLeft );
 		setWidth( offsetWidth );
 
+		let requestId: number;
 		if ( ! canAnimate ) {
-			window.requestAnimationFrame( () => {
+			requestId = window.requestAnimationFrame( () => {
 				setCanAnimate( true );
 			} );
 		}
+		return () => window.cancelAnimationFrame( requestId );
 	}, [ canAnimate, containerRef, containerWidth, state, isAdaptiveWidth ] );
 
 	return (

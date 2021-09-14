@@ -292,7 +292,7 @@ export default function NavigationLinkEdit( {
 	const { showSubmenuIcon } = context;
 	const { saveEntityRecord } = useDispatch( coreStore );
 	const {
-		insertBlock,
+		replaceBlock,
 		__unstableMarkNextChangeAsNotPersistent,
 	} = useDispatch( blockEditorStore );
 	const [ isLinkOpen, setIsLinkOpen ] = useState( false );
@@ -302,18 +302,21 @@ export default function NavigationLinkEdit( {
 	const ref = useRef();
 
 	const {
+		innerBlocks,
 		isAtMaxNesting,
 		isTopLevelLink,
 		isParentOfSelectedBlock,
 		isImmediateParentOfSelectedBlock,
 		hasDescendants,
 		selectedBlockHasDescendants,
-		numberOfDescendants,
 		userCanCreatePages,
 		userCanCreatePosts,
 	} = useSelect(
 		( select ) => {
 			const {
+				getBlocks,
+				getBlockName,
+				getBlockRootClientId,
 				getClientIdsOfDescendants,
 				hasSelectedInnerBlock,
 				getSelectedBlockClientId,
@@ -326,11 +329,15 @@ export default function NavigationLinkEdit( {
 				.length;
 
 			return {
+				innerBlocks: getBlocks( clientId ),
 				isAtMaxNesting:
-					getBlockParentsByBlockName( clientId, name ).length >=
-					MAX_NESTING,
+					getBlockParentsByBlockName( clientId, [
+						name,
+						'core/navigation-submenu',
+					] ).length >= MAX_NESTING,
 				isTopLevelLink:
-					getBlockParentsByBlockName( clientId, name ).length === 0,
+					getBlockName( getBlockRootClientId( clientId ) ) ===
+					'core/navigation',
 				isParentOfSelectedBlock: hasSelectedInnerBlock(
 					clientId,
 					true
@@ -343,7 +350,6 @@ export default function NavigationLinkEdit( {
 				selectedBlockHasDescendants: !! getClientIdsOfDescendants( [
 					selectedBlockId,
 				] )?.length,
-				numberOfDescendants: descendants,
 				userCanCreatePages: select( coreStore ).canUser(
 					'create',
 					'pages'
@@ -367,12 +373,15 @@ export default function NavigationLinkEdit( {
 	}, [ isTopLevelLink ] );
 
 	/**
-	 * Insert a link block when submenu is added.
+	 * Transform to submenu block.
 	 */
-	function insertLinkBlock() {
-		const insertionPoint = numberOfDescendants;
-		const blockToInsert = createBlock( 'core/navigation-link' );
-		insertBlock( blockToInsert, insertionPoint, clientId );
+	function transformToSubmenu() {
+		const newSubmenu = createBlock(
+			'core/navigation-submenu',
+			attributes,
+			innerBlocks
+		);
+		replaceBlock( clientId, newSubmenu );
 	}
 
 	// Show the LinkControl on mount if the URL is empty
@@ -596,7 +605,7 @@ export default function NavigationLinkEdit( {
 							name="submenu"
 							icon={ addSubmenu }
 							title={ __( 'Add submenu' ) }
-							onClick={ insertLinkBlock }
+							onClick={ transformToSubmenu }
 						/>
 					) }
 				</ToolbarGroup>
