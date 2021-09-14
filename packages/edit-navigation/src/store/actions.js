@@ -145,7 +145,7 @@ export const saveNavigationPost = ( post ) => async ( {
 			.resolveSelect( 'core' )
 			.getMenuItems( { menus: post.meta.menuId, per_page: -1 } );
 
-		const desiredMenuItems = await dispatch(
+		const desiredMenuItems = dispatch(
 			getDesiredMenuItems( post, oldMenuItems )
 		);
 		await dispatch(
@@ -190,10 +190,8 @@ export const saveNavigationPost = ( post ) => async ( {
 	}
 };
 
-const getDesiredMenuItems = ( post, oldMenuItems ) => async ( {
-	dispatch,
-} ) => {
-	const entityIdToBlockId = await dispatch(
+const getDesiredMenuItems = ( post, oldMenuItems ) => ( { dispatch } ) => {
+	const entityIdToBlockId = dispatch(
 		getEntityRecordIdToBlockIdMapping( post.id )
 	);
 
@@ -217,9 +215,8 @@ const getDesiredMenuItems = ( post, oldMenuItems ) => async ( {
 	);
 };
 
-const getEntityRecordIdToBlockIdMapping = ( postId ) => async ( {
-	registry,
-} ) => registry.stores[ STORE_NAME ].store.getState().mapping[ postId ] || {};
+const getEntityRecordIdToBlockIdMapping = ( postId ) => ( { registry } ) =>
+	registry.stores[ STORE_NAME ].store.getState().mapping[ postId ] || {};
 
 const batchSaveChanges = (
 	kind,
