@@ -63,6 +63,9 @@ export const createMissingMenuItems = ( post ) => async ( {
 
 		const blocks = blocksTreeToFlatList( post.blocks[ 0 ].innerBlocks );
 		for ( const { block } of blocks ) {
+			if ( block.name !== 'core/navigation-link' ) {
+				continue;
+			}
 			if ( ! knownBlockIds.has( block.clientId ) ) {
 				const menuItem = await dispatch(
 					createPlaceholderMenuItem( block, menuId )
@@ -84,7 +87,11 @@ export const createMissingMenuItems = ( post ) => async ( {
 export const createPlaceholderMenuItem = ( block, menuId ) => async ( {
 	registry,
 } ) => {
-	const menuItem = await apiFetch( {
+	const existingMenuItems = await registry
+		.select( coreDataStore )
+		.getMenuItems( { menus: menuId, per_page: -1 } );
+
+	const createdMenuItem = await apiFetch( {
 		path: `/__experimental/menu-items`,
 		method: 'POST',
 		data: {
@@ -94,21 +101,17 @@ export const createPlaceholderMenuItem = ( block, menuId ) => async ( {
 		},
 	} );
 
-	const menuItems = await registry
-		.select( coreDataStore )
-		.getMenuItems( { menus: menuId, per_page: -1 } );
-
 	await registry
 		.dispatch( coreDataStore )
 		.receiveEntityRecords(
 			'root',
 			'menuItem',
-			[ ...menuItems, menuItem ],
+			[ ...existingMenuItems, createdMenuItem ],
 			menuItemsQuery( menuId ),
 			false
 		);
 
-	return menuItem;
+	return createdMenuItem;
 };
 
 /**
