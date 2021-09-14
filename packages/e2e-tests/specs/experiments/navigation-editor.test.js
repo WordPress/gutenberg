@@ -1,4 +1,10 @@
 /**
+ * External dependencies
+ */
+// eslint-disable-next-line no-restricted-imports
+import { find } from 'puppeteer-testing-library';
+
+/**
  * WordPress dependencies
  */
 import {
@@ -9,11 +15,6 @@ import {
 	visitAdminPage,
 } from '@wordpress/e2e-test-utils';
 import { addQueryArgs } from '@wordpress/url';
-/**
- * External dependencies
- */
-// eslint-disable-next-line no-restricted-imports
-import { find } from 'puppeteer-testing-library';
 
 /**
  * Internal dependencies
