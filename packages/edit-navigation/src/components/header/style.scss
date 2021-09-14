@@ -66,6 +66,7 @@
 	// Appear below the modal overlay.
 	z-index: z-index(".components-popover.edit-navigation-menu-actions__switcher-dropdown");
 
+	// Resetting MenuItemGroup padding so button can take full space.
 	.components-menu-group.has-hidden-separator {
 		padding: 0;
 	}
