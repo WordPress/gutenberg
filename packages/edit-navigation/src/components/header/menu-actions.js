@@ -16,7 +16,7 @@ import { decodeEntities } from '@wordpress/html-entities';
 import MenuSwitcher from '../menu-switcher';
 import { useMenuEntityProp, useSelectedMenuId } from '../../hooks';
 
-export default function HeaderActions( { menus, isLoading } ) {
+export default function MenuActions( { menus, isLoading } ) {
 	const [ selectedMenuId, setSelectedMenuId ] = useSelectedMenuId();
 	const [ menuName ] = useMenuEntityProp( 'name', selectedMenuId );
 

@@ -9,7 +9,7 @@ import { PinnedItems } from '@wordpress/interface';
 /**
  * Internal dependencies
  */
-import MenuActions from './actions';
+import MenuActions from './menu-actions';
 import NewButton from './new-button';
 import SaveButton from './save-button';
 import UndoButton from './undo-button';
