@@ -48,6 +48,43 @@ export function isNavigationCandidate( element, keyCode, hasModifier ) {
 	return tagName !== 'INPUT' && tagName !== 'TEXTAREA';
 }
 
+function getFocusableElementsBetween( target, container, isReverse ) {
+	// Since the current focus target is not guaranteed to be a text field, find
+	// all focusables. Tabbability is considered later.
+	let focusableNodes = focus.focusable.find( container );
+
+	if ( isReverse ) {
+		focusableNodes = reverse( focusableNodes );
+	}
+
+	// Consider as candidates those focusables after the current target. It's
+	// assumed this can only be reached if the target is focusable (on its
+	// keydown event), so no need to verify it exists in the set.
+	return focusableNodes.slice( focusableNodes.indexOf( target ) + 1 );
+}
+
+function getFurthestTabbable( target, container, isReverse ) {
+	const focusableNodes = reverse(
+		getFocusableElementsBetween( target, container, isReverse )
+	);
+
+	function isTabCandidate( node ) {
+		// Not a candidate if the node is not tabbable.
+		if ( ! focus.tabbable.isTabbableIndex( node ) ) {
+			return false;
+		}
+
+		// Skip focusable elements such as links within content editable nodes.
+		if ( node.isContentEditable && node.contentEditable !== 'true' ) {
+			return false;
+		}
+
+		return true;
+	}
+
+	return find( focusableNodes, isTabCandidate );
+}
+
 /**
  * Returns the optimal tab target from the given focused element in the desired
  * direction. A preference is made toward text fields, falling back to the block
@@ -201,7 +238,14 @@ export default function useArrowNav() {
 		}
 
 		function onKeyDown( event ) {
-			const { keyCode, target } = event;
+			const {
+				keyCode,
+				target,
+				shiftKey,
+				ctrlKey,
+				altKey,
+				metaKey,
+			} = event;
 			const isUp = keyCode === UP;
 			const isDown = keyCode === DOWN;
 			const isLeft = keyCode === LEFT;
@@ -210,16 +254,14 @@ export default function useArrowNav() {
 			const isHorizontal = isLeft || isRight;
 			const isVertical = isUp || isDown;
 			const isNav = isHorizontal || isVertical;
-			const isShift = event.shiftKey;
-			const hasModifier =
-				isShift || event.ctrlKey || event.altKey || event.metaKey;
+			const hasModifier = shiftKey || ctrlKey || altKey || metaKey;
 			const isNavEdge = isVertical ? isVerticalEdge : isHorizontalEdge;
 			const { ownerDocument } = node;
 			const { defaultView } = ownerDocument;
 
 			if ( hasMultiSelection() ) {
 				if ( isNav ) {
-					const action = isShift ? expandSelection : moveSelection;
+					const action = shiftKey ? expandSelection : moveSelection;
 					action( isReverse );
 					event.preventDefault();
 				}
@@ -259,10 +301,9 @@ export default function useArrowNav() {
 			// In the case of RTL scripts, right means previous and left means
 			// next, which is the exact reverse of LTR.
 			const isReverseDir = isRTL( target ) ? ! isReverse : isReverse;
-			const { keepCaretInsideBlock } = getSettings();
 			const selectedBlockClientId = getSelectedBlockClientId();
 
-			if ( isShift ) {
+			if ( shiftKey ) {
 				const selectionEndClientId = getMultiSelectedBlocksEndClientId();
 				const selectionBeforeEndClientId = getPreviousBlockClientId(
 					selectionEndClientId || selectedBlockClientId
@@ -283,11 +324,36 @@ export default function useArrowNav() {
 					expandSelection( isReverse );
 					event.preventDefault();
 				}
-			} else if (
-				isVertical &&
-				isVerticalEdge( target, isReverse ) &&
-				! keepCaretInsideBlock
-			) {
+
+				return;
+			}
+
+			const { keepCaretInsideBlock } = getSettings();
+
+			if ( keepCaretInsideBlock ) {
+				return;
+			}
+
+			const horizontalEdge =
+				defaultView.getSelection().isCollapsed &&
+				isHorizontalEdge( target, isReverseDir );
+
+			if ( isHorizontal && horizontalEdge ) {
+				const closestTabbable = getClosestTabbable(
+					target,
+					isReverseDir,
+					node
+				);
+				placeCaretAtHorizontalEdge( closestTabbable, isReverse );
+				event.preventDefault();
+				return;
+			}
+
+			if ( ! isVertical || ! isVerticalEdge( target, isReverse ) ) {
+				return;
+			}
+
+			if ( ! metaKey ) {
 				const closestTabbable = getClosestTabbable(
 					target,
 					isReverse,
@@ -303,19 +369,17 @@ export default function useArrowNav() {
 					);
 					event.preventDefault();
 				}
-			} else if (
-				isHorizontal &&
-				defaultView.getSelection().isCollapsed &&
-				isHorizontalEdge( target, isReverseDir ) &&
-				! keepCaretInsideBlock
-			) {
-				const closestTabbable = getClosestTabbable(
+			} else if ( horizontalEdge ) {
+				const furthestTabbable = getFurthestTabbable(
 					target,
-					isReverseDir,
-					node
+					node,
+					isReverse
 				);
-				placeCaretAtHorizontalEdge( closestTabbable, isReverse );
-				event.preventDefault();
+
+				if ( furthestTabbable ) {
+					placeCaretAtVerticalEdge( furthestTabbable, ! isReverse );
+					event.preventDefault();
+				}
 			}
 		}
 
