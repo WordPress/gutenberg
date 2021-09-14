@@ -694,7 +694,7 @@ class WP_REST_Menu_Items_Controller extends WP_REST_Posts_Controller {
 		if ( rest_is_field_included( 'xfn', $fields ) ) {
 			$data['xfn'] = array_map( 'sanitize_html_class', explode( ' ', $menu_item->xfn ) );
 		}
-    
+
 		if ( rest_is_field_included( 'invalid', $fields ) ) {
 			$data['invalid'] = (bool) $menu_item->_invalid;
 		}
