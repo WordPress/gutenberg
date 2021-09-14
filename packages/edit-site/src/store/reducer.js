@@ -90,6 +90,13 @@ export function editedPost( state = [], action ) {
 			];
 		case 'SET_TEMPLATE_PART':
 			return [
+				{
+					type: 'wp_template_part',
+					id: action.templatePartId,
+				},
+			];
+		case 'PUSH_TEMPLATE_PART':
+			return [
 				...state,
 				{
 					type: 'wp_template_part',
