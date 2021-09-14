@@ -84,6 +84,14 @@ export const createMissingMenuItems = ( post ) => async ( {
 	}
 };
 
+/**
+ * Creates a single placeholder menu item a specified block without an associated menuItem.
+ * Requests POST /wp/v2/menu-items once for every menu item created.
+ *
+ * @param {Object} block  The block to create a menu item based on.
+ * @param {number} menuId Menu id to embed the placeholder in.
+ * @return {Function} An action creator
+ */
 export const createPlaceholderMenuItem = ( block, menuId ) => async ( {
 	registry,
 } ) => {
@@ -192,6 +200,14 @@ export const saveNavigationPost = ( post ) => async ( {
 	}
 };
 
+/**
+ * Converts a post into a flat list of menu item entity records,
+ * representing the desired state after the save is finished.
+ *
+ * @param {Object}   post         The post.
+ * @param {Object[]} oldMenuItems The currently stored list of menu items.
+ * @return {Function} An action creator
+ */
 const getDesiredMenuItems = ( post, oldMenuItems ) => ( { dispatch } ) => {
 	const entityIdToBlockId = dispatch(
 		getEntityRecordIdToBlockIdMapping( post.id )
@@ -217,9 +233,26 @@ const getDesiredMenuItems = ( post, oldMenuItems ) => ( { dispatch } ) => {
 	);
 };
 
+/**
+ * A selector in disguise. It returns mapping between menu item ID and it's related blocks client id.
+ *
+ * @param {number} postId The id of the stub post to get the mapping for.
+ * @return {Function} An action creator
+ */
 const getEntityRecordIdToBlockIdMapping = ( postId ) => ( { registry } ) =>
 	registry.stores[ STORE_NAME ].store.getState().mapping[ postId ] || {};
 
+/**
+ * Persists the desiredEntityRecords while preserving IDs from oldEntityRecords.
+ * The batch request contains the minimal number of requests necessary to go from
+ * desiredEntityRecords to oldEntityRecords.
+ *
+ * @param {string}   kind                 Entity kind.
+ * @param {string}   type                 Entity type.
+ * @param {Object[]} oldEntityRecords     The entity records that are currently persisted.
+ * @param {Object[]} desiredEntityRecords The entity records are to be persisted.
+ * @return {Function} An action creator
+ */
 const batchSaveChanges = (
 	kind,
 	type,
@@ -251,6 +284,15 @@ const batchSaveChanges = (
 	return results;
 };
 
+/**
+ * Filters the changeset for failed operations.
+ *
+ * @param {string}   kind       Entity kind.
+ * @param {string}   entityType Entity type.
+ * @param {Object[]} changeset  The changeset.
+ * @param {Object[]} results    The results of persisting the changeset.
+ * @return {Object[]} A list of failed changeset entries.
+ */
 const getFailedChanges = ( kind, entityType, changeset, results ) => ( {
 	registry,
 } ) => {
@@ -274,6 +316,16 @@ const getFailedChanges = ( kind, entityType, changeset, results ) => ( {
 	return [ ...failedDeletes, ...failedUpdates ];
 };
 
+/**
+ * Diffs oldEntityRecords and desiredEntityRecords, returning a list of
+ * create, delete, and update tasks necessary to go from the former to the latter.
+ *
+ * @param {string}   kind                 Entity kind.
+ * @param {string}   type                 Entity type.
+ * @param {Object[]} oldEntityRecords     The entity records that are currently persisted.
+ * @param {Object[]} desiredEntityRecords The entity records are to be persisted.
+ * @return {Function} An action creator
+ */
 const prepareChangeset = (
 	kind,
 	type,
@@ -335,11 +387,26 @@ const prepareChangeset = (
 	return changes;
 };
 
+/**
+ * Returns elements of list A that are not in list B.
+ *
+ * @param {Array} listA List A.
+ * @param {Array} listB List B.
+ * @return {Array} elements of list A that are not in list B.
+ */
 function diff( listA, listB ) {
 	const setB = new Set( listB );
 	return listA.filter( ( x ) => ! setB.has( x ) );
 }
 
+/**
+ * Turns a recursive list of blocks into a flat list of blocks.
+ *
+ * @param {Object[]}    innerBlocks   A list of blocks containing zero or more inner blocks.
+ * @param {number|null} parentBlockId The id of the currently processed parent block.
+ * @return {Object} A flat list of blocks, annotated by their index and parent ID, consisting
+ * 							    of all the input blocks and all the inner blocks in the tree.
+ */
 function blocksTreeToFlatList( innerBlocks, parentBlockId = null ) {
 	return innerBlocks.flatMap( ( block, index ) =>
 		[ { block, parentBlockId, childIndex: index } ].concat(
