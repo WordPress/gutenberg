@@ -20,10 +20,9 @@ export function blockAllowed( block, { onlyReusable, allowReusable } ) {
 
 export function filterInserterItems(
 	items,
-	{ onlyReusable = false, allowReusable = false }
+	{ onlyReusable = false, allowReusable = false } = {}
 ) {
-	const allowBlock = ( block ) =>
-		blockAllowed( block, { onlyReusable, allowReusable } );
-
-	return items.filter( allowBlock );
+	return items.filter( ( block ) =>
+		blockAllowed( block, { onlyReusable, allowReusable } )
+	);
 }
