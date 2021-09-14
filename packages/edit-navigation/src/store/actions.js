@@ -71,7 +71,7 @@ export const createMissingMenuItems = ( post ) => async ( {
 			mapping: menuItemIdToBlockId,
 		} );
 	} finally {
-		await registry.dispatch( 'core' ).__unstableReleaseStoreLock( lock );
+		registry.dispatch( 'core' ).__unstableReleaseStoreLock( lock );
 	}
 };
 
@@ -179,7 +179,7 @@ export const saveNavigationPost = ( post ) => async ( {
 				type: 'snackbar',
 			} );
 	} finally {
-		await registry.dispatch( 'core' ).__unstableReleaseStoreLock( lock );
+		registry.dispatch( 'core' ).__unstableReleaseStoreLock( lock );
 	}
 };
 
