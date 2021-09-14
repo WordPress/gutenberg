@@ -24,6 +24,18 @@ export default function Header( {
 } ) {
 	const isMediumViewport = useViewportMatch( 'medium' );
 
+	if ( ! isMenuSelected ) {
+		return (
+			<div className="edit-navigation-header">
+				<div className="edit-navigation-header__toolbar-wrapper">
+					<h1 className="edit-navigation-header__title">
+						{ __( 'Navigation' ) }
+					</h1>
+				</div>
+			</div>
+		);
+	}
+
 	return (
 		<div className="edit-navigation-header">
 			<div className="edit-navigation-header__toolbar-wrapper">
@@ -47,16 +59,13 @@ export default function Header( {
 				</NavigableToolbar>
 			</div>
 
-			{ isMenuSelected && (
-				<MenuActions menus={ menus } isLoading={ isPending } />
-			) }
-			{ isMenuSelected && (
-				<div className="edit-navigation-header__actions">
-					{ isMediumViewport && <NewButton menus={ menus } /> }
-					<SaveButton navigationPost={ navigationPost } />
-					<PinnedItems.Slot scope="core/edit-navigation" />
-				</div>
-			) }
+			<MenuActions menus={ menus } isLoading={ isPending } />
+
+			<div className="edit-navigation-header__actions">
+				{ isMediumViewport && <NewButton menus={ menus } /> }
+				<SaveButton navigationPost={ navigationPost } />
+				<PinnedItems.Slot scope="core/edit-navigation" />
+			</div>
 		</div>
 	);
 }
