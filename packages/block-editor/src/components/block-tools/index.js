@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { first, last } from 'lodash';
+import { first, last, uniq } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -10,7 +10,9 @@ import { useSelect, useDispatch } from '@wordpress/data';
 import { useViewportMatch, useRefEffect } from '@wordpress/compose';
 import { Popover } from '@wordpress/components';
 import { __unstableUseShortcutEventMatch as useShortcutEventMatch } from '@wordpress/keyboard-shortcuts';
-import { useState, useRef } from '@wordpress/element';
+import { useState, useRef, useMemo } from '@wordpress/element';
+import { getBlockType } from '@wordpress/blocks';
+import { stack } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -115,14 +117,18 @@ export default function BlockTools( {
 		}
 	}
 
-	const [ draggedClientIds, setDraggedClientIds ] = useState( [] );
+	const [ draggedBlockNames, setDraggedBlockNames ] = useState( [] );
 	const draggableChipRef = useRef();
-	const isDraggingBlocks = draggedClientIds.length > 0;
-
-	function onDragStart( event ) {
-		const { srcClientIds } = parseDropEvent( event );
-		setDraggedClientIds( srcClientIds );
-	}
+	const isDraggingBlocks = draggedBlockNames.length > 0;
+	const { getBlockName } = useSelect( blockEditorStore );
+	const dragIcon = useMemo( () => {
+		const isSelectionOfSameType = uniq( draggedBlockNames ).length === 1;
+		// When selection consists of blocks of multiple types, display an
+		// appropriate icon to communicate the non-uniformity.
+		return isSelectionOfSameType
+			? getBlockType( first( draggedBlockNames ) )?.icon
+			: stack;
+	}, [ draggedBlockNames ] );
 
 	function onDragOver( event ) {
 		// If we're not dragging over an iframe, return. The global event
@@ -140,48 +146,74 @@ export default function BlockTools( {
 	}
 
 	function onDragEnd() {
-		setDraggedClientIds( [] );
+		setDraggedBlockNames( [] );
 	}
 
-	const refEffect = useRefEffect( ( element ) => {
-		const { ownerDocument } = element;
+	const refEffect = useRefEffect(
+		( element ) => {
+			const { ownerDocument } = element;
 
-		function _onDragOver( event ) {
-			const chip = draggableChipRef.current;
-			chip.style.left = event.clientX + 'px';
-			chip.style.top = event.clientY + 'px';
-		}
+			if ( ! isDraggingBlocks ) {
+				function onDragStart( event ) {
+					const { srcClientIds, blocks } = parseDropEvent( event );
 
-		function _onDragEnd() {
-			setDraggedClientIds( [] );
-		}
+					if ( srcClientIds ) {
+						setDraggedBlockNames(
+							srcClientIds.map( getBlockName )
+						);
+					} else if ( blocks ) {
+						setDraggedBlockNames(
+							blocks.map( ( { name } ) => name )
+						);
+					}
+				}
+				ownerDocument.addEventListener( 'dragstart', onDragStart );
+				return () => {
+					ownerDocument.removeEventListener(
+						'dragstart',
+						onDragStart
+					);
+				};
+			}
 
-		ownerDocument.addEventListener( 'dragover', _onDragOver );
-		ownerDocument.addEventListener( 'dragend', _onDragEnd );
-		return () => {
-			ownerDocument.removeEventListener( 'dragover', _onDragOver );
-			ownerDocument.removeEventListener( 'dragend', _onDragEnd );
-		};
-	}, [] );
+			function _onDragOver( event ) {
+				const chip = draggableChipRef.current;
+				chip.style.left = event.clientX + 'px';
+				chip.style.top = event.clientY + 'px';
+			}
+
+			function _onDragEnd() {
+				setDraggedBlockNames( [] );
+			}
+
+			ownerDocument.addEventListener( 'dragover', _onDragOver );
+			ownerDocument.addEventListener( 'dragend', _onDragEnd );
+			return () => {
+				ownerDocument.removeEventListener( 'dragover', _onDragOver );
+				ownerDocument.removeEventListener( 'dragend', _onDragEnd );
+			};
+		},
+		[ isDraggingBlocks ]
+	);
 
 	return (
 		// eslint-disable-next-line jsx-a11y/no-static-element-interactions
 		<div
 			{ ...props }
 			onKeyDown={ onKeyDown }
-			onDragStart={ onDragStart }
+			// Add these React events to listen for events in the iframe.
 			onDragOver={ isDraggingBlocks ? onDragOver : null }
 			onDragEnd={ isDraggingBlocks ? onDragEnd : null }
-			ref={ isDraggingBlocks ? refEffect : null }
+			ref={ refEffect }
 		>
 			<InsertionPoint __unstableContentRef={ __unstableContentRef }>
 				{ ( hasFixedToolbar || ! isLargeViewport ) && (
 					<BlockContextualToolbar isFixed />
 				) }
-				{ draggedClientIds.length > 0 && (
+				{ draggedBlockNames.length > 0 && (
 					<BlockDraggableChip
-						count={ draggedClientIds.length }
-						icon={ null }
+						count={ draggedBlockNames.length }
+						icon={ dragIcon }
 						ref={ draggableChipRef }
 					/>
 				) }
