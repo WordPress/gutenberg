@@ -52,7 +52,7 @@ The text that will be copied to the clipboard.
 The function that will be called when the text is copied.
 
 -- Type: `() => void`
--- Required: no
+-- Required: yes
 
 ### onFinishCopy
 
