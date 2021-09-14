@@ -7,7 +7,7 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { useCallback, useMemo, useState } from '@wordpress/element';
+import { useCallback, useMemo, useRef, useState } from '@wordpress/element';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { ENTER, SPACE } from '@wordpress/keycodes';
 import { _x } from '@wordpress/i18n';
@@ -83,6 +83,8 @@ function BlockStyles( {
 		[ setHoveredStyle ]
 	);
 
+	const stylesContainerRef = useRef();
+
 	if ( ! styles || styles.length === 0 ) {
 		return null;
 	}
@@ -113,8 +115,11 @@ function BlockStyles( {
 		onSwitch();
 	};
 
+	// const getAnchorRect = () =>
+	// 	stylesContainerRef?.current?.getBoundingClientRect();
+
 	return (
-		<div className="block-editor-block-styles">
+		<div className="block-editor-block-styles" ref={ stylesContainerRef }>
 			<div className="block-editor-block-styles__variants">
 				{ renderedStyles.map( ( style ) => {
 					const buttonText = style.label || style.name;
@@ -155,6 +160,8 @@ function BlockStyles( {
 					className="block-editor-block-styles__popover"
 					position="middle left"
 					focusOnMount={ false }
+					anchorRef={ stylesContainerRef?.current }
+					//getAnchorRect={ getAnchorRect }
 				>
 					<BlockStylesPreviewPanel
 						activeStyle={ activeStyle }
