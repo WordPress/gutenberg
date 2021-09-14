@@ -8,7 +8,7 @@ import { includes, pick } from 'lodash';
  * WordPress dependencies
  */
 import { isBlobURL } from '@wordpress/blob';
-import { useState, useRef } from '@wordpress/element';
+import { useEffect, useState, useRef } from '@wordpress/element';
 import { __, isRTL } from '@wordpress/i18n';
 import {
 	Notice,
@@ -81,6 +81,12 @@ const SiteLogo = ( {
 			...pick( getSettings(), [ 'imageEditing', 'maxWidth' ] ),
 		};
 	}, [] );
+
+	useEffect( () => {
+		if ( ! isSelected ) {
+			setIsEditingImage( false );
+		}
+	}, [ isSelected ] );
 
 	function onResizeStart() {
 		toggleSelection( false );
@@ -189,7 +195,7 @@ const SiteLogo = ( {
 		logoId && naturalWidth && naturalHeight && imageEditing;
 
 	const imgEdit =
-		canEditImage && isEditingImage && isSelected ? (
+		canEditImage && isEditingImage ? (
 			<ImageEditingProvider
 				id={ logoId }
 				url={ logoUrl }
