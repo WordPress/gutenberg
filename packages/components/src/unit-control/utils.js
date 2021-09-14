@@ -19,7 +19,7 @@ export const allUnits = {
 		a11yLabel: __( 'Pixels (px)' ),
 		step: 1,
 	},
-	percent: {
+	'%': {
 		value: '%',
 		label: isWeb ? '%' : __( 'Percentage (%)' ),
 		default: '',
@@ -129,7 +129,7 @@ export const ALL_CSS_UNITS = Object.values( allUnits );
  */
 export const CSS_UNITS = [
 	allUnits.px,
-	allUnits.percent,
+	allUnits[ '%' ],
 	allUnits.em,
 	allUnits.rem,
 	allUnits.vw,
@@ -302,6 +302,10 @@ export function getUnitsWithCurrentUnit(
 	legacyUnit,
 	units = ALL_CSS_UNITS
 ) {
+	if ( ! Array.isArray( units ) ) {
+		return units;
+	}
+
 	const unitsWithCurrentUnit = [ ...units ];
 	const [ , currentUnit ] = getParsedValue(
 		currentValue,
@@ -313,10 +317,8 @@ export function getUnitsWithCurrentUnit(
 		currentUnit &&
 		! unitsWithCurrentUnit.some( ( unit ) => unit.value === currentUnit )
 	) {
-		const currentUnitKey = currentUnit === '%' ? 'percent' : currentUnit;
-
-		if ( allUnits[ currentUnitKey ] ) {
-			unitsWithCurrentUnit.unshift( allUnits[ currentUnitKey ] );
+		if ( allUnits[ currentUnit ] ) {
+			unitsWithCurrentUnit.unshift( allUnits[ currentUnit ] );
 		}
 	}
 
