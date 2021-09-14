@@ -79,11 +79,23 @@ function BlockAlignmentUI( {
 			return;
 		}
 		const info = {};
-		if ( !! contentSize ) {
+		/**
+		 * Besides checking if `contentSize` and `wideSize` have a
+		 * value, we now show this information only if their values
+		 * are not a `css var`. This needs to change when parsing
+		 * css variables land.
+		 *
+		 * @see https://github.com/WordPress/gutenberg/pull/34710#issuecomment-918000752
+		 */
+		if ( !! contentSize && ! contentSize?.startsWith( 'var' ) ) {
 			// translators: %s: container size (i.e. 600px etc)
 			info.none = sprintf( __( 'Max %s wide' ), contentSize );
 		}
-		if ( wideAlignmentsSupport && !! wideSize ) {
+		if (
+			wideAlignmentsSupport &&
+			!! wideSize &&
+			! wideSize?.startsWith( 'var' )
+		) {
 			// translators: %s: container size (i.e. 600px etc)
 			info.wide = sprintf( __( 'Max %s wide' ), wideSize );
 		}
