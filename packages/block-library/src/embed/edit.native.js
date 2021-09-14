@@ -52,8 +52,8 @@ const EmbedEdit = ( props ) => {
 		title: _x( 'Embed', 'block title' ),
 		icon: embedContentIcon,
 	};
-	const { icon, title } =
-		getEmbedInfoByProvider( providerNameSlug ) || defaultEmbedInfo;
+	const embedInfoByProvider = getEmbedInfoByProvider( providerNameSlug );
+	const { icon, title } = embedInfoByProvider || defaultEmbedInfo;
 
 	const { wasBlockJustInserted } = useSelect(
 		( select ) => ( {
@@ -256,6 +256,7 @@ const EmbedEdit = ( props ) => {
 							previewable={ previewable }
 							type={ type }
 							url={ url }
+							isDefaultEmbedInfo={ ! embedInfoByProvider }
 						/>
 					</View>
 				</>
