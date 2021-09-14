@@ -7,7 +7,7 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import {useCallback, useMemo, useState} from '@wordpress/element';
+import { useCallback, useMemo, useState } from '@wordpress/element';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { ENTER, SPACE } from '@wordpress/keycodes';
 import { _x } from '@wordpress/i18n';
@@ -17,12 +17,11 @@ import {
 	getBlockFromExample,
 	store as blocksStore,
 } from '@wordpress/blocks';
-import { Button, Popover} from '@wordpress/components';
+import { Button, Popover } from '@wordpress/components';
 /**
  * Internal dependencies
  */
 import { getActiveStyle, replaceActiveStyle } from './utils';
-import BlockPreview from '../block-preview';
 import BlockStylesPreviewPanel from './block-styles-preview-panel';
 import { store as blockEditorStore } from '../../store';
 
@@ -98,65 +97,56 @@ function BlockStyles( {
 				},
 				...styles,
 		  ];
-
-	/* TODO
-		- get top offset of styles panel
-		- create a portal into the Editor content container `interface-interface-skeleton__content` or the block-editor__container
-		- inject the preview and assign right:0
-
-	 */
 	const activeStyle = getActiveStyle( renderedStyles, className );
+
+	const onSelectStyle = ( style ) => {
+		const styleClassName = replaceActiveStyle(
+			className,
+			activeStyle,
+			style
+		);
+		updateBlockAttributes( clientId, {
+			className: styleClassName,
+		} );
+		onHoverClassName( null );
+		setHoveredStyle( null );
+		onSwitch();
+	};
+
 	return (
 		<div className="block-editor-block-styles">
 			<div className="block-editor-block-styles__variants">
 				{ renderedStyles.map( ( style ) => {
-					const styleClassName = replaceActiveStyle(
-						className,
-						activeStyle,
-						style
-					);
 					const buttonText = style.label || style.name;
 
 					return (
 						<Button
-							className={ classnames( 'block-editor-block-styles__button', {
-								'is-active': activeStyle === style,
-							} ) }
+							className={ classnames(
+								'block-editor-block-styles__button',
+								{
+									'is-active': activeStyle === style,
+								}
+							) }
 							key={ style.name }
 							variant="secondary"
 							label={ buttonText }
 							onMouseEnter={ () => onStyleHover( style ) }
 							onMouseLeave={ () => setHoveredStyle( null ) }
-							onClick={ () => {
-								updateBlockAttributes( clientId, {
-									className: styleClassName,
-								} );
-								onHoverClassName( null );
-								setHoveredStyle( null );
-								onSwitch();
+							onKeyDown={ ( event ) => {
+								if (
+									ENTER === event.keyCode ||
+									SPACE === event.keyCode
+								) {
+									event.preventDefault();
+									onSelectStyle( style );
+								}
 							} }
-						> { buttonText } </Button>
-						// <BlockStyleItem
-						// 	genericPreviewBlock={ genericPreviewBlock }
-						// 	viewportWidth={ type.example?.viewportWidth ?? 500 }
-						// 	className={ className }
-						// 	isActive={ activeStyle === style }
-						// 	key={ style.name }
-						// 	onSelect={ () => {
-						// 		updateBlockAttributes( clientId, {
-						// 			className: styleClassName,
-						// 		} );
-						// 		onHoverClassName( null );
-						// 		onSwitch();
-						// 	} }
-						// 	onBlur={ () => onHoverClassName( null ) }
-						// 	onHover={ () => {
-						// 		onHoverClassName( styleClassName );
-						// 	} }
-						// 	style={ style }
-						// 	styleClassName={ styleClassName }
-						// 	itemRole={ itemRole }
-						// />
+							onClick={ () => onSelectStyle( style ) }
+							role={ itemRole || 'button' }
+							tabIndex="0"
+						>
+							{ buttonText }
+						</Button>
 					);
 				} ) }
 			</div>
@@ -175,59 +165,6 @@ function BlockStyles( {
 					/>
 				</Popover>
 			) }
-		</div>
-	);
-}
-
-function BlockStyleItem( {
-	genericPreviewBlock,
-	viewportWidth,
-	style,
-	isActive,
-	onBlur,
-	onHover,
-	onSelect,
-	styleClassName,
-	itemRole,
-} ) {
-	const previewBlocks = useMemo( () => {
-		return {
-			...genericPreviewBlock,
-			attributes: {
-				...genericPreviewBlock.attributes,
-				className: styleClassName,
-			},
-		};
-	}, [ genericPreviewBlock, styleClassName ] );
-
-	return (
-		<div
-			key={ style.name }
-			className={ classnames( 'block-editor-block-styles__item', {
-				'is-active': isActive,
-			} ) }
-			onClick={ () => onSelect() }
-			onKeyDown={ ( event ) => {
-				if ( ENTER === event.keyCode || SPACE === event.keyCode ) {
-					event.preventDefault();
-					onSelect();
-				}
-			} }
-			onMouseEnter={ onHover }
-			onMouseLeave={ onBlur }
-			role={ itemRole || 'button' }
-			tabIndex="0"
-			aria-label={ style.label || style.name }
-		>
-			<div className="block-editor-block-styles__item-preview">
-				<BlockPreview
-					viewportWidth={ viewportWidth }
-					blocks={ previewBlocks }
-				/>
-			</div>
-			<div className="block-editor-block-styles__item-label">
-				{ style.label || style.name }
-			</div>
 		</div>
 	);
 }
