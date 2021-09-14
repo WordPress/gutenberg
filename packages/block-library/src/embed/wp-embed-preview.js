@@ -39,14 +39,15 @@ export default function WpEmbedPreview( { html } ) {
 		 * iframe content loads or iframe's window is resized.  The event is
 		 * sent from WordPress core via the window.postMessage API.
 		 *
-		 * References: window.postMessage:
+		 * References:
+		 * window.postMessage:
 		 * https://developer.mozilla.org/en-US/docs/Web/API/Window/postMessage
 		 * WordPress core embed-template on load:
 		 * https://github.com/WordPress/WordPress/blob/HEAD/wp-includes/js/wp-embed-template.js#L143
 		 * WordPress core embed-template on resize:
 		 * https://github.com/WordPress/WordPress/blob/HEAD/wp-includes/js/wp-embed-template.js#L187
 		 *
-		 * @param {WPSyntheticEvent} event Message event.
+		 * @param {MessageEvent} event Message event.
 		 */
 		function resizeWPembeds( { data: { secret, message, value } = {} } ) {
 			if ( message !== 'height' || secret !== props[ 'data-secret' ] ) {

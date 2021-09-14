@@ -15,22 +15,18 @@ export default function useFocusableIframe() {
 		if ( ! ownerDocument ) return;
 		const { defaultView } = ownerDocument;
 		if ( ! defaultView ) return;
-		const { FocusEvent } = defaultView;
 
 		/**
 		 * Checks whether the iframe is the activeElement, inferring that it has
 		 * then received focus, and dispatches a focus event.
 		 */
 		function checkFocus() {
-			if ( ownerDocument && ownerDocument.activeElement !== element ) {
-				element.dispatchEvent(
-					new FocusEvent( 'focus', { bubbles: true } )
-				);
+			if ( ownerDocument && ownerDocument.activeElement === element ) {
+				/** @type {HTMLElement} */ ( element ).focus();
 			}
 		}
 
 		defaultView.addEventListener( 'blur', checkFocus );
-
 		return () => {
 			defaultView.removeEventListener( 'blur', checkFocus );
 		};
