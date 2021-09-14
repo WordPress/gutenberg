@@ -1,7 +1,3 @@
 .wp-block-post-title a {
 	display: inline-block;
-
-	// Inherit the styles from the main block element, so that text decoration settings
-	// for the block apply to post title links.
-	text-decoration: inherit;
 }
