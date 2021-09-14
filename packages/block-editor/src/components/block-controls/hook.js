@@ -12,7 +12,7 @@ import { store as blockEditorStore } from '../../store';
 import { useBlockEditContext } from '../block-edit/context';
 import useDisplayBlockControls from '../use-display-block-controls';
 
-export default function useBlockControlsFill( group, exposeToChildren ) {
+export default function useBlockControlsFill( group, shareWithChildBlocks ) {
 	const isDisplayed = useDisplayBlockControls();
 	const { clientId } = useBlockEditContext();
 	const isParentDisplayed = useSelect(
@@ -22,7 +22,7 @@ export default function useBlockControlsFill( group, exposeToChildren ) {
 			);
 			const { hasBlockSupport } = select( blocksStore );
 			return (
-				exposeToChildren &&
+				shareWithChildBlocks &&
 				hasBlockSupport(
 					getBlockName( clientId ),
 					'__experimentalExposeControlsToChildren',
@@ -31,7 +31,7 @@ export default function useBlockControlsFill( group, exposeToChildren ) {
 				hasSelectedInnerBlock( clientId )
 			);
 		},
-		[ exposeToChildren, clientId ]
+		[ shareWithChildBlocks, clientId ]
 	);
 
 	if ( isDisplayed ) {

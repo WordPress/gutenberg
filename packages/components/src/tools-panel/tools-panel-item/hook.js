@@ -18,6 +18,8 @@ export function useToolsPanelItem( props ) {
 		hasValue,
 		isShownByDefault,
 		label,
+		panelId,
+		resetAllFilter,
 		onDeselect = () => undefined,
 		onSelect = () => undefined,
 		...otherProps
@@ -29,22 +31,28 @@ export function useToolsPanelItem( props ) {
 	} );
 
 	const {
+		panelId: currentPanelId,
 		menuItems,
 		registerPanelItem,
 		deregisterPanelItem,
+		isResetting,
 	} = useToolsPanelContext();
 
 	// Registering the panel item allows the panel to include it in its
 	// automatically generated menu and determine its initial checked status.
 	useEffect( () => {
-		registerPanelItem( {
-			hasValue,
-			isShownByDefault,
-			label,
-		} );
+		if ( currentPanelId === panelId ) {
+			registerPanelItem( {
+				hasValue,
+				isShownByDefault,
+				label,
+				resetAllFilter,
+				panelId,
+			} );
+		}
 
 		return () => deregisterPanelItem( label );
-	}, [] );
+	}, [ panelId ] );
 
 	const isValueSet = hasValue();
 
@@ -56,6 +64,10 @@ export function useToolsPanelItem( props ) {
 	// Determine if the panel item's corresponding menu is being toggled and
 	// trigger appropriate callback if it is.
 	useEffect( () => {
+		if ( isResetting ) {
+			return;
+		}
+
 		if ( isMenuItemChecked && ! isValueSet && ! wasMenuItemChecked ) {
 			onSelect();
 		}
@@ -63,7 +75,7 @@ export function useToolsPanelItem( props ) {
 		if ( ! isMenuItemChecked && wasMenuItemChecked ) {
 			onDeselect();
 		}
-	}, [ isMenuItemChecked, wasMenuItemChecked, isValueSet ] );
+	}, [ isMenuItemChecked, wasMenuItemChecked, isValueSet, isResetting ] );
 
 	return {
 		...otherProps,
