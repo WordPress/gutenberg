@@ -639,11 +639,17 @@ class WP_REST_Menu_Items_Controller extends WP_REST_Posts_Controller {
 		// Base fields for every post.
 		$menu_item = wp_setup_nav_menu_item( $post );
 		$data      = array();
-		if ( in_array( 'id', $fields, true ) ) {
+		if ( rest_is_field_included( 'id', $fields ) ) {
 			$data['id'] = $menu_item->ID;
 		}
 
-		if ( in_array( 'title', $fields, true ) ) {
+		if ( rest_is_field_included( 'title', $fields ) ) {
+			$data['title'] = array();
+		}
+		if ( rest_is_field_included( 'title.raw', $fields ) ) {
+			$data['title']['raw'] = $menu_item->title;
+		}
+		if ( rest_is_field_included( 'title.rendered', $fields ) ) {
 			add_filter( 'protected_title_format', array( $this, 'protected_title_format' ) );
 
 			/** This filter is documented in wp-includes/post-template.php */
@@ -652,47 +658,44 @@ class WP_REST_Menu_Items_Controller extends WP_REST_Posts_Controller {
 			/** This filter is documented in wp-includes/class-walker-nav-menu.php */
 			$title = apply_filters( 'nav_menu_item_title', $title, $menu_item, null, 0 );
 
-			$data['title'] = array(
-				'raw'      => $menu_item->title,
-				'rendered' => $title,
-			);
+			$data['title']['rendered'] = $title;
 
 			remove_filter( 'protected_title_format', array( $this, 'protected_title_format' ) );
 		}
 
-		if ( in_array( 'status', $fields, true ) ) {
+		if ( rest_is_field_included( 'status', $fields ) ) {
 			$data['status'] = $menu_item->post_status;
 		}
 
-		if ( in_array( 'url', $fields, true ) ) {
+		if ( rest_is_field_included( 'url', $fields ) ) {
 			$data['url'] = $menu_item->url;
 		}
 
-		if ( in_array( 'attr_title', $fields, true ) ) {
+		if ( rest_is_field_included( 'attr_title', $fields ) ) {
 			// Same as post_excerpt.
 			$data['attr_title'] = $menu_item->attr_title;
 		}
 
-		if ( in_array( 'description', $fields, true ) ) {
+		if ( rest_is_field_included( 'description', $fields ) ) {
 			// Same as post_content.
 			$data['description'] = $menu_item->description;
 		}
 
-		if ( in_array( 'type', $fields, true ) ) {
+		if ( rest_is_field_included( 'type', $fields ) ) {
 			// Using 'item_type' since 'type' already exists.
 			$data['type'] = $menu_item->type;
 		}
 
-		if ( in_array( 'type_label', $fields, true ) ) {
+		if ( rest_is_field_included( 'type_label', $fields ) ) {
 			// Using 'item_type_label' to match up with 'item_type' - IS READ ONLY!
 			$data['type_label'] = $menu_item->type_label;
 		}
 
-		if ( in_array( 'object', $fields, true ) ) {
+		if ( rest_is_field_included( 'object', $fields ) ) {
 			$data['object'] = $menu_item->object;
 		}
 
-		if ( in_array( 'object_id', $fields, true ) ) {
+		if ( rest_is_field_included( 'object_id', $fields ) ) {
 			// Usually is a string, but lets expose as an integer.
 			$data['object_id'] = absint( $menu_item->object_id );
 		}
@@ -711,33 +714,33 @@ class WP_REST_Menu_Items_Controller extends WP_REST_Posts_Controller {
 			$data['content']['block_version'] = block_version( $menu_item->content );
 		}
 
-		if ( in_array( 'parent', $fields, true ) ) {
+		if ( rest_is_field_included( 'parent', $fields ) ) {
 			// Same as post_parent, expose as integer.
-			$data['parent'] = absint( $menu_item->menu_item_parent );
+			$data['parent'] = (int) $menu_item->post_parent;
 		}
 
-		if ( in_array( 'menu_order', $fields, true ) ) {
+		if ( rest_is_field_included( 'menu_order', $fields ) ) {
 			// Same as post_parent, expose as integer.
-			$data['menu_order'] = absint( $menu_item->menu_order );
+			$data['menu_order'] = (int) $menu_item->menu_order;
 		}
 
-		if ( in_array( 'menu_id', $fields, true ) ) {
+		if ( rest_is_field_included( 'menu_id', $fields ) ) {
 			$data['menu_id'] = $this->get_menu_id( $menu_item->ID );
 		}
 
-		if ( in_array( 'target', $fields, true ) ) {
+		if ( rest_is_field_included( 'target', $fields ) ) {
 			$data['target'] = $menu_item->target;
 		}
 
-		if ( in_array( 'classes', $fields, true ) ) {
+		if ( rest_is_field_included( 'classes', $fields ) ) {
 			$data['classes'] = (array) $menu_item->classes;
 		}
 
-		if ( in_array( 'xfn', $fields, true ) ) {
+		if ( rest_is_field_included( 'xfn', $fields ) ) {
 			$data['xfn'] = array_map( 'sanitize_html_class', explode( ' ', $menu_item->xfn ) );
 		}
 
-		if ( in_array( 'meta', $fields, true ) ) {
+		if ( rest_is_field_included( 'meta', $fields ) ) {
 			$data['meta'] = $this->meta->get_value( $menu_item->ID, $request );
 		}
 
@@ -746,7 +749,7 @@ class WP_REST_Menu_Items_Controller extends WP_REST_Posts_Controller {
 		foreach ( $taxonomies as $taxonomy ) {
 			$base = ! empty( $taxonomy->rest_base ) ? $taxonomy->rest_base : $taxonomy->name;
 
-			if ( in_array( $base, $fields, true ) ) {
+			if ( rest_is_field_included( $base, $fields ) ) {
 				$terms         = get_the_terms( $post, $taxonomy->name );
 				$data[ $base ] = $terms ? array_values( wp_list_pluck( $terms, 'term_id' ) ) : array();
 			}

@@ -257,7 +257,7 @@ describe( 'ToolsPanel', () => {
 			expect( control ).toBeInTheDocument();
 		} );
 
-		it( 'should prevent panel item rendering when toggled off via menu item', async () => {
+		it( 'should prevent optional panel item rendering when toggled off via menu item', async () => {
 			renderPanel();
 			await selectMenuItem( controlProps.label );
 			const control = screen.queryByText( 'Example control' );
@@ -265,7 +265,7 @@ describe( 'ToolsPanel', () => {
 			expect( control ).not.toBeInTheDocument();
 		} );
 
-		it( 'should prevent shown by default item rendering when toggled off via menu item', async () => {
+		it( 'should continue to render shown by default item after it is toggled off via menu item', async () => {
 			render(
 				<ToolsPanel { ...defaultProps }>
 					<ToolsPanelItem
@@ -284,7 +284,31 @@ describe( 'ToolsPanel', () => {
 			await selectMenuItem( controlProps.label );
 			const resetControl = screen.queryByText( 'Default control' );
 
-			expect( resetControl ).not.toBeInTheDocument();
+			expect( resetControl ).toBeInTheDocument();
+		} );
+
+		it( 'should render appropriate menu groups', async () => {
+			const { container } = render(
+				<ToolsPanel { ...defaultProps }>
+					<ToolsPanelItem
+						{ ...controlProps }
+						isShownByDefault={ true }
+					>
+						<div>Default control</div>
+					</ToolsPanelItem>
+					<ToolsPanelItem { ...altControlProps }>
+						<div>Optional control</div>
+					</ToolsPanelItem>
+				</ToolsPanel>
+			);
+			openDropdownMenu();
+
+			const menuGroups = container.querySelectorAll(
+				'.components-menu-group'
+			);
+
+			// Groups should be: default controls, optional controls & reset all.
+			expect( menuGroups.length ).toEqual( 3 );
 		} );
 	} );
 
