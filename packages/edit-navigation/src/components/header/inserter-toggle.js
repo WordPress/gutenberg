@@ -35,7 +35,7 @@ function InserterToggle() {
 	return (
 		<ToolbarItem
 			as={ Button }
-			className="edit-navigation-header-toolbar__inserter-toggle"
+			className="edit-navigation-header-inserter-toggle"
 			variant="primary"
 			isPressed={ isInserterOpened }
 			onMouseDown={ ( event ) => {
