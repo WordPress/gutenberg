@@ -420,11 +420,16 @@ export class ImageEdit extends Component {
 				hasPicker
 				options={ this.linkSettingsOptions }
 				showIcon={ false }
-				precursorScreenName={ blockSettingsScreens.imageOptions }
-				// TODO(David): Passing the URLs feels forced, can it be apart of the
-				// above `precursorScreen#` prop?
-				imageUrl={ image.url }
-				attachmentPageUrl={ image.link }
+				onLinkCellPressed={ ( { inputValue, navigation } ) => {
+					// TODO(David): Passing `setAttributes` throws a warning, we should avoid
+					// passing it here.
+					navigation.navigate( blockSettingsScreens.imageOptions, {
+						inputValue,
+						setAttributes: this.setMappedAttributes,
+						imageUrl: image.url,
+						attachmentPageUrl: image.link,
+					} );
+				} }
 			/>
 		);
 	}
