@@ -189,7 +189,7 @@ const SiteLogo = ( {
 		logoId && naturalWidth && naturalHeight && imageEditing;
 
 	const imgEdit =
-		canEditImage && isEditingImage ? (
+		canEditImage && isEditingImage && isSelected ? (
 			<ImageEditingProvider
 				id={ logoId }
 				url={ logoUrl }
