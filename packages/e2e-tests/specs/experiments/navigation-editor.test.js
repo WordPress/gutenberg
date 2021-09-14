@@ -684,7 +684,7 @@ describe( 'Navigation editor', () => {
 			expect( isEnabled ).toBeTruthy();
 		} );
 
-		it( 'inserter toggle toggles the inserter sidebar open and closed', async () => {
+		it( 'toggles the inserter sidebar open and closed', async () => {
 			await setUpResponseMocking( [
 				...getMenuMocks( {
 					GET: [ initialMenu ],
@@ -719,6 +719,99 @@ describe( 'Navigation editor', () => {
 				role: 'region',
 				name: 'Block library',
 			} ).toBeFound();
+
+			// Expect block search input to be focused.
+			await expect( {
+				role: 'searchbox',
+				name: 'Search for blocks and patterns',
+				focused: true,
+			} ).toBeFound();
+		} );
+
+		it( 'inserts items at end of Navigation block by default', async () => {
+			await setUpResponseMocking( [
+				...getMenuMocks( {
+					GET: [ initialMenu ],
+					POST: initialMenu,
+				} ),
+				...getMenuItemMocks( { GET: menuItemsFixture } ),
+				...getSearchMocks( { GET: searchFixture } ),
+			] );
+
+			await visitNavigationEditor();
+
+			// Wait for the block to be present.
+			await expect( {
+				role: 'document',
+				name: 'Block: Navigation',
+			} ).toBeFound();
+
+			const inserterToggle = await find( {
+				name: 'Toggle block inserter',
+				role: 'button',
+			} );
+
+			await inserterToggle.click();
+
+			// Expect the inserter sidebar to be present in the DOM.
+			await expect( {
+				role: 'region',
+				name: 'Block library',
+			} ).toBeFound();
+
+			// Add Custom Link item.
+			const customLinkOption = await find( {
+				name: 'Custom Link',
+				role: 'option',
+			} );
+
+			customLinkOption.click();
+
+			// Expect that inserter is auto-closed.
+			await expect( {
+				role: 'region',
+				name: 'Block library',
+			} ).not.toBeFound();
+
+			// Expect to be focused inside the Link UI search input.
+			await expect( {
+				role: 'combobox',
+				name: 'URL',
+				focused: true,
+			} ).toBeFound();
+
+			const itemToSelectTitle = searchFixture[ 0 ].title;
+
+			// Add Custom Link item.
+			const firstSearchSuggestion = await find( {
+				role: 'option',
+				name: `${ itemToSelectTitle } ${ searchFixture[ 0 ].subtype }`,
+			} );
+
+			await firstSearchSuggestion.click();
+
+			// Get the title/label of the last Nav item inside the Nav block.
+			const lastItemAttributes = await page.evaluate( () => {
+				const { select } = window.wp.data;
+
+				const { getBlockOrder, getBlocks } = select(
+					'core/block-editor'
+				);
+
+				const lockedNavigationBlock = getBlockOrder()[ 0 ];
+
+				const navItemBlocks = getBlocks( lockedNavigationBlock );
+
+				const { attributes } = navItemBlocks[
+					navItemBlocks.length - 1
+				];
+
+				return attributes;
+			} );
+
+			// Check the last item is the one we just inserted
+			expect( lastItemAttributes.label ).toEqual( itemToSelectTitle );
+			expect( lastItemAttributes.isTopLevelLink ).toBeTruthy();
 		} );
 	} );
 } );
