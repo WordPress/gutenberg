@@ -29,7 +29,6 @@ const bodyClass = 'is-dragging-components-draggable';
  * @property {string}                                     [elementId]                      ID for the element.
  * @property {any}                                        [transferData]                   Transfer data for the drag event.
  * @property {string}                                     [__experimentalTransferDataType] The transfer data type to set.
- * @property {import('react').ReactNode}                  __experimentalDragComponent      Component to show when dragging.
  */
 
 /**
@@ -45,10 +44,7 @@ export default function Draggable( {
 	elementId,
 	transferData,
 	__experimentalTransferDataType: transferDataType = 'text',
-	__experimentalDragComponent: dragComponent,
 } ) {
-	/** @type {import('react').MutableRefObject<HTMLDivElement | null>} */
-	const dragComponentRef = useRef( null );
 	const cleanup = useRef( () => {} );
 
 	/**
@@ -108,21 +104,7 @@ export default function Draggable( {
 
 		let x = 0;
 		let y = 0;
-		// If a dragComponent is defined, the following logic will clone the
-		// HTML node and inject it into the cloneWrapper.
-		if ( dragComponentRef.current ) {
-			// Position dragComponent at the same position as the cursor.
-			x = event.clientX;
-			y = event.clientY;
-			cloneWrapper.style.transform = `translate( ${ x }px, ${ y }px )`;
-
-			const clonedDragComponent = ownerDocument.createElement( 'div' );
-			clonedDragComponent.innerHTML = dragComponentRef.current.innerHTML;
-			cloneWrapper.appendChild( clonedDragComponent );
-
-			// Inject the cloneWrapper into the DOM.
-			ownerDocument.body.appendChild( cloneWrapper );
-		} else if ( elementId ) {
+		if ( elementId ) {
 			const element = ownerDocument.getElementById( elementId );
 
 			// Prepare element clone and append to element wrapper.
@@ -230,15 +212,6 @@ export default function Draggable( {
 				onDraggableStart: start,
 				onDraggableEnd: end,
 			} ) }
-			{ dragComponent && (
-				<div
-					className="components-draggable-drag-component-root"
-					style={ { display: 'none' } }
-					ref={ dragComponentRef }
-				>
-					{ dragComponent }
-				</div>
-			) }
 		</>
 	);
 }
