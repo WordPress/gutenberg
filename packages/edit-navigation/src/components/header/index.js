@@ -52,7 +52,7 @@ export default function Header( {
 			) }
 			{ isMenuSelected && (
 				<div className="edit-navigation-header__actions">
-					<NewButton menus={ menus } />
+					{ isMediumViewport && <NewButton menus={ menus } /> }
 					<SaveButton navigationPost={ navigationPost } />
 					<PinnedItems.Slot scope="core/edit-navigation" />
 				</div>
