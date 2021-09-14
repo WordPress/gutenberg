@@ -27,7 +27,7 @@ const MyClipboardButton = () => {
 
 ## Props
 
-The component accepts the following props:
+The component accepts the following props. Any other props will be passed the underlying `<Button/>` component. See the [Button](/packages/components/src/button/README.md#props) component for more details on the available props.
 
 ### className
 
