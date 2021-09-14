@@ -179,9 +179,6 @@ export default function TemplatePartEdit( {
 								<ToolbarButton
 									aria-expanded={ isOpen }
 									onClick={ onToggle }
-									// Disable when open to prevent odd FireFox bug causing reopening.
-									// As noted in https://github.com/WordPress/gutenberg/pull/24990#issuecomment-689094119 .
-									disabled={ isOpen }
 								>
 									{ __( 'Replace' ) }
 								</ToolbarButton>

@@ -34,6 +34,7 @@ import Sidebar from '../sidebar';
 import Header from '../header';
 import Notices from '../notices';
 import Editor from '../editor';
+import InserterSidebar from '../inserter-sidebar';
 import UnsavedChangesWarning from './unsaved-changes-warning';
 import { store as editNavigationStore } from '../../store';
 
@@ -44,6 +45,7 @@ const interfaceLabels = {
 	body: __( 'Navigation menu blocks' ),
 	/* translators: accessibility text for the navigation screen settings landmark region. */
 	sidebar: __( 'Navigation settings' ),
+	secondarySidebar: __( 'Block library' ),
 };
 
 export default function Layout( { blockEditorSettings } ) {
@@ -70,11 +72,12 @@ export default function Layout( { blockEditorSettings } ) {
 		navigationPost
 	);
 
-	const { hasSidebarEnabled } = useSelect(
+	const { hasSidebarEnabled, isInserterOpened } = useSelect(
 		( select ) => ( {
 			hasSidebarEnabled: !! select(
 				interfaceStore
 			).getActiveComplementaryArea( 'core/edit-navigation' ),
+			isInserterOpened: select( editNavigationStore ).isInserterOpened(),
 		} ),
 		[]
 	);
@@ -134,8 +137,6 @@ export default function Layout( { blockEditorSettings } ) {
 										isMenuSelected={ isMenuSelected }
 										isPending={ ! hasLoadedMenus }
 										menus={ menus }
-										selectedMenuId={ selectedMenuId }
-										onSelectMenu={ selectMenu }
 										navigationPost={ navigationPost }
 									/>
 								}
@@ -174,6 +175,9 @@ export default function Layout( { blockEditorSettings } ) {
 									hasSidebarEnabled && (
 										<ComplementaryArea.Slot scope="core/edit-navigation" />
 									)
+								}
+								secondarySidebar={
+									isInserterOpened && <InserterSidebar />
 								}
 							/>
 							{ isMenuSelected && (
