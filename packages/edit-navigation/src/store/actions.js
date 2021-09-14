@@ -167,7 +167,7 @@ export const saveNavigationPost = ( post ) => async ( {
 				undefined
 			);
 
-		await registry
+		registry
 			.dispatch( noticesStore )
 			.createSuccessNotice( __( 'Navigation saved.' ), {
 				type: 'snackbar',
@@ -180,11 +180,9 @@ export const saveNavigationPost = ( post ) => async ( {
 					saveError.message
 			  )
 			: __( 'Unable to save: An error o1curred.' );
-		await registry
-			.dispatch( noticesStore )
-			.createErrorNotice( errorMessage, {
-				type: 'snackbar',
-			} );
+		registry.dispatch( noticesStore ).createErrorNotice( errorMessage, {
+			type: 'snackbar',
+		} );
 	} finally {
 		registry.dispatch( 'core' ).__unstableReleaseStoreLock( lock );
 	}
