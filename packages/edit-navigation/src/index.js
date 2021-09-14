@@ -8,19 +8,12 @@ import {
 import { render, useMemo } from '@wordpress/element';
 import { __experimentalFetchLinkSuggestions as fetchLinkSuggestions } from '@wordpress/core-data';
 import { useDispatch } from '@wordpress/data';
+
 /**
  * Internal dependencies
  */
 import { store as editNavigationStore } from './store';
-
-/**
- * Internal dependencies
- */
 import { addFilters } from './filters';
-
-/**
- * Internal dependencies
- */
 import Layout from './components/layout';
 
 function NavEditor( { settings } ) {
