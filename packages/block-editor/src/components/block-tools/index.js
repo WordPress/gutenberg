@@ -130,9 +130,9 @@ export default function BlockTools( {
 			: stack;
 	}, [ draggedBlockNames ] );
 
-	function onDragOver( event ) {
-		// If we're not dragging over an iframe, return. The global event
-		// lister will handle positioning the drag chip.
+	function onIframeDragOver( event ) {
+		// Abort if we're not dragging over an iframe. The global event listener
+		// will handle the positioning of the drag chip.
 		if ( event.currentTarget.contains( event.target ) ) return;
 
 		const { ownerDocument } = event.target;
@@ -145,7 +145,11 @@ export default function BlockTools( {
 		element.style.top = event.clientY + rect.top + 'px';
 	}
 
-	function onDragEnd() {
+	function onIframeDragEnd( event ) {
+		// Abort if we're not dragging over an iframe. The global event listener
+		// will handle resetting the dragged state.
+		if ( event.currentTarget.contains( event.target ) ) return;
+
 		setDraggedBlockNames( [] );
 	}
 
@@ -153,44 +157,38 @@ export default function BlockTools( {
 		( element ) => {
 			const { ownerDocument } = element;
 
-			if ( ! isDraggingBlocks ) {
-				function onDragStart( event ) {
-					const { srcClientIds, blocks } = parseDropEvent( event );
-
-					if ( srcClientIds ) {
-						setDraggedBlockNames(
-							srcClientIds.map( getBlockName )
-						);
-					} else if ( blocks ) {
-						setDraggedBlockNames(
-							blocks.map( ( { name } ) => name )
-						);
-					}
+			if ( isDraggingBlocks ) {
+				function onDragOver( event ) {
+					const chip = draggableChipRef.current;
+					chip.style.left = event.clientX + 'px';
+					chip.style.top = event.clientY + 'px';
 				}
-				ownerDocument.addEventListener( 'dragstart', onDragStart );
+
+				function onDragEnd() {
+					setDraggedBlockNames( [] );
+				}
+
+				ownerDocument.addEventListener( 'dragover', onDragOver );
+				ownerDocument.addEventListener( 'dragend', onDragEnd );
 				return () => {
-					ownerDocument.removeEventListener(
-						'dragstart',
-						onDragStart
-					);
+					ownerDocument.removeEventListener( 'dragover', onDragOver );
+					ownerDocument.removeEventListener( 'dragend', onDragEnd );
 				};
 			}
 
-			function _onDragOver( event ) {
-				const chip = draggableChipRef.current;
-				chip.style.left = event.clientX + 'px';
-				chip.style.top = event.clientY + 'px';
+			function onDragStart( event ) {
+				const { srcClientIds, blocks } = parseDropEvent( event );
+
+				if ( srcClientIds ) {
+					setDraggedBlockNames( srcClientIds.map( getBlockName ) );
+				} else if ( blocks ) {
+					setDraggedBlockNames( blocks.map( ( { name } ) => name ) );
+				}
 			}
 
-			function _onDragEnd() {
-				setDraggedBlockNames( [] );
-			}
-
-			ownerDocument.addEventListener( 'dragover', _onDragOver );
-			ownerDocument.addEventListener( 'dragend', _onDragEnd );
+			ownerDocument.addEventListener( 'dragstart', onDragStart );
 			return () => {
-				ownerDocument.removeEventListener( 'dragover', _onDragOver );
-				ownerDocument.removeEventListener( 'dragend', _onDragEnd );
+				ownerDocument.removeEventListener( 'dragstart', onDragStart );
 			};
 		},
 		[ isDraggingBlocks ]
@@ -201,9 +199,8 @@ export default function BlockTools( {
 		<div
 			{ ...props }
 			onKeyDown={ onKeyDown }
-			// Add these React events to listen for events in the iframe.
-			onDragOver={ isDraggingBlocks ? onDragOver : null }
-			onDragEnd={ isDraggingBlocks ? onDragEnd : null }
+			onDragOver={ isDraggingBlocks ? onIframeDragOver : null }
+			onDragEnd={ isDraggingBlocks ? onIframeDragEnd : null }
 			ref={ refEffect }
 		>
 			<InsertionPoint __unstableContentRef={ __unstableContentRef }>
