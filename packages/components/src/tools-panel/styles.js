@@ -62,3 +62,7 @@ export const ToolsPanelItem = css`
 		max-width: 100%;
 	}
 `;
+
+export const DropdownMenu = css`
+	min-width: 200px;
+`;

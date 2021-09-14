@@ -14,6 +14,7 @@ import { decodeEntities } from '@wordpress/html-entities';
 import SaveButton from './save-button';
 import UndoButton from './undo-button';
 import RedoButton from './redo-button';
+import InserterToggle from './inserter-toggle';
 import MenuSwitcher from '../menu-switcher';
 import { useMenuEntityProp } from '../../hooks';
 
@@ -26,7 +27,9 @@ export default function Header( {
 	navigationPost,
 } ) {
 	const isMediumViewport = useViewportMatch( 'medium' );
+
 	const [ menuName ] = useMenuEntityProp( 'name', selectedMenuId );
+
 	let actionHeaderText;
 
 	if ( menuName ) {
@@ -44,23 +47,31 @@ export default function Header( {
 
 	return (
 		<div className="edit-navigation-header">
-			{ isMediumViewport && (
-				<div className="edit-navigation-header__toolbar-wrapper">
+			<div className="edit-navigation-header__toolbar-wrapper">
+				{ isMediumViewport && (
 					<h1 className="edit-navigation-header__title">
 						{ __( 'Navigation' ) }
 					</h1>
-					<NavigableToolbar
-						className="edit-navigation-header__toolbar"
-						aria-label={ __( 'Document tools' ) }
-					>
-						<UndoButton />
-						<RedoButton />
-					</NavigableToolbar>
-				</div>
-			) }
+				) }
+
+				<NavigableToolbar
+					className="edit-navigation-header__toolbar"
+					aria-label={ __( 'Document tools' ) }
+				>
+					<InserterToggle />
+					{ isMediumViewport && (
+						<>
+							<UndoButton />
+							<RedoButton />
+						</>
+					) }
+				</NavigableToolbar>
+			</div>
+
 			<h2 className="edit-navigation-header__subtitle">
 				{ isMenuSelected && decodeEntities( actionHeaderText ) }
 			</h2>
+
 			{ isMenuSelected && (
 				<div className="edit-navigation-header__actions">
 					<DropdownMenu

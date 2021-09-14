@@ -63,7 +63,10 @@ function AlignmentUI( {
 		<UIComponent
 			icon={ setIcon() }
 			label={ label }
-			toggleProps={ { describedBy } }
+			toggleProps={ {
+				describedBy,
+				className: activeAlignment ? 'is-pressed' : undefined,
+			} }
 			popoverProps={ POPOVER_PROPS }
 			controls={ alignmentControls.map( ( control ) => {
 				const { align } = control;

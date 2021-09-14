@@ -33,6 +33,7 @@ function gutenberg_reregister_core_block_types() {
 				'missing',
 				'more',
 				'navigation-link',
+				'navigation-submenu',
 				'nextpage',
 				'paragraph',
 				'preformatted',
@@ -59,6 +60,7 @@ function gutenberg_reregister_core_block_types() {
 				'loginout.php'                  => 'core/loginout',
 				'navigation.php'                => 'core/navigation',
 				'navigation-link.php'           => 'core/navigation-link',
+				'navigation-submenu.php'        => 'core/navigation-submenu',
 				'home-link.php'                 => 'core/home-link',
 				'rss.php'                       => 'core/rss',
 				'search.php'                    => 'core/search',
@@ -106,9 +108,11 @@ function gutenberg_reregister_core_block_types() {
 		__DIR__ . '/../build/widgets/blocks/'       => array(
 			'block_folders' => array(
 				'legacy-widget',
+				'widget-group',
 			),
 			'block_names'   => array(
 				'legacy-widget.php' => 'core/legacy-widget',
+				'widget-group.php'  => 'core/widget-group',
 			),
 		),
 	);
