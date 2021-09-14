@@ -113,7 +113,7 @@ describe( 'createPlaceholderMenuItem', () => {
 				},
 				url: 'http://wp.com',
 				menu_order: 1,
-				menus: [ 1 ],
+				menus: 1,
 			},
 			{
 				id: 101,
@@ -123,7 +123,7 @@ describe( 'createPlaceholderMenuItem', () => {
 				},
 				url: 'http://wp.org',
 				menu_order: 2,
-				menus: [ 1 ],
+				menus: 1,
 			},
 		];
 
@@ -145,7 +145,7 @@ describe( 'createPlaceholderMenuItem', () => {
 				},
 				url: 'http://wp.org',
 				menu_order: 2,
-				menus: [ 1 ],
+				menus: 1,
 			},
 			199
 		)( { registry, dispatch } );

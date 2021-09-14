@@ -59,7 +59,7 @@ export function blockToMenuItem(
 		...menuItem,
 		...attributes,
 		menu_order: blockPosition + 1,
-		menus: [ menuId ],
+		menus: menuId,
 		parent: ! parentId ? 0 : parentId,
 		status: 'publish',
 	};

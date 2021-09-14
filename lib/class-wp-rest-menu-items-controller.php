@@ -391,6 +391,7 @@ class WP_REST_Menu_Items_Controller extends WP_REST_Posts_Controller {
 				'menu-item-object'      => $menu_item_obj->object,
 				'menu-item-parent-id'   => $menu_item_obj->menu_item_parent,
 				'menu-item-position'    => $position,
+				'menu-item-type'        => $menu_item_obj->type,
 				'menu-item-title'       => $menu_item_obj->title,
 				'menu-item-url'         => $menu_item_obj->url,
 				'menu-item-description' => $menu_item_obj->description,
