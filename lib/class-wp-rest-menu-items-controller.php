@@ -695,6 +695,10 @@ class WP_REST_Menu_Items_Controller extends WP_REST_Posts_Controller {
 			$data['xfn'] = array_map( 'sanitize_html_class', explode( ' ', $menu_item->xfn ) );
 		}
 
+		if ( rest_is_field_included( 'invalid', $fields ) ) {
+			$data['invalid'] = (bool) $menu_item->_invalid;
+		}
+
 		if ( rest_is_field_included( 'meta', $fields ) ) {
 			$data['meta'] = $this->meta->get_value( $menu_item->ID, $request );
 		}
@@ -1007,7 +1011,7 @@ class WP_REST_Menu_Items_Controller extends WP_REST_Posts_Controller {
 			),
 		);
 
-		$schema['properties']['_invalid'] = array(
+		$schema['properties']['invalid'] = array(
 			'description' => __( 'Whether the menu item represents an object that no longer exists.', 'gutenberg' ),
 			'context'     => array( 'view', 'edit', 'embed' ),
 			'type'        => 'boolean',
