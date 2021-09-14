@@ -259,6 +259,7 @@ class BlockListBlock extends Component {
 							<BlockInvalidWarning
 								blockTitle={ title }
 								icon={ icon }
+								clientId={ clientId }
 							/>
 						) }
 						<View
