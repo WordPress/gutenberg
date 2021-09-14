@@ -3,7 +3,7 @@
  */
 import { last } from 'lodash';
 
-/** @typedef {import('puppeteer').Page} Page */
+/** @typedef {import('puppeteer-core').Page} Page */
 
 /**
  * Opens the preview page of an edited post.

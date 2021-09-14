@@ -39,7 +39,12 @@
 	},
 	"peerDependencies": {
 		"jest": ">=26",
-		"puppeteer": ">=1.19.0"
+		"puppeteer-core": ">=10.0.0"
+	},
+	"peerDependenciesMeta": {
+		"puppeteer-core": {
+			"optional": true
+		}
 	},
 	"publishConfig": {
 		"access": "public"

@@ -69,12 +69,7 @@ async function readConfig() {
 function getPuppeteer( { browser } ) {
 	switch ( browser.toLowerCase() ) {
 		case 'chromium':
-			try {
-				// eslint-disable-next-line import/no-extraneous-dependencies
-				return require( 'puppeteer' );
-			} catch ( e ) {
-				return require( 'puppeteer-core' );
-			}
+			return require( 'puppeteer-core' );
 		case 'firefox':
 			return require( 'puppeteer-firefox' );
 		default:
