@@ -517,7 +517,7 @@ export default function NavigationLinkEdit( {
 	} );
 
 	if ( ! url ) {
-		blockProps.onClick = () => setIsLinkOpen( true );
+		blockProps.onClick = () => setIsLinkOpen( ( value ) => ! value );
 	}
 
 	// Always use overlay colors for submenus
@@ -590,17 +590,23 @@ export default function NavigationLinkEdit( {
 			missingText = __( 'Add link' );
 	}
 
+	const toggleButtonRef = useRef();
+
 	return (
 		<Fragment>
 			<BlockControls>
 				<ToolbarGroup>
-					<ToolbarButton
-						name="link"
-						icon={ linkIcon }
-						title={ __( 'Link' ) }
-						shortcut={ displayShortcut.primary( 'k' ) }
-						onClick={ () => setIsLinkOpen( true ) }
-					/>
+					<div tabIndex={ -1 } ref={ toggleButtonRef }>
+						<ToolbarButton
+							name="link"
+							icon={ linkIcon }
+							title={ __( 'Link' ) }
+							shortcut={ displayShortcut.primary( 'k' ) }
+							onClick={ () =>
+								setIsLinkOpen( ( value ) => ! value )
+							}
+						/>
+					</div>
 					{ ! isAtMaxNesting && (
 						<ToolbarButton
 							name="submenu"
@@ -689,7 +695,29 @@ export default function NavigationLinkEdit( {
 					{ isLinkOpen && (
 						<Popover
 							position="bottom center"
-							onClose={ () => setIsLinkOpen( false ) }
+							onClose={ () => {
+								const {
+									ownerDocument,
+								} = toggleButtonRef.current;
+
+								if (
+									// When clicking the toggle button, focus
+									// will either move to the button or the
+									// focusable div (Safari) so do not handle
+									// closing the popover because the toggle
+									// will handle it. Focus should remain on
+									// the toggle button.
+									toggleButtonRef.current.contains(
+										ownerDocument.activeElement
+									) ||
+									listItemRef.current ===
+										ownerDocument.activeElement
+								) {
+									return;
+								}
+
+								setIsLinkOpen( false );
+							} }
 							anchorRef={ listItemRef.current }
 						>
 							<LinkControl
