@@ -109,25 +109,6 @@ export class ImageEdit extends Component {
 		);
 		this.setMappedAttributes = this.setMappedAttributes.bind( this );
 		this.onSizeChangeValue = this.onSizeChangeValue.bind( this );
-
-		this.linkSettingsOptions = {
-			url: {
-				label: __( 'Image Link URL' ),
-				placeholder: __( 'Add URL' ),
-				autoFocus: false,
-				autoFill: true,
-			},
-			openInNewTab: {
-				label: __( 'Open in new tab' ),
-			},
-			linkRel: {
-				label: __( 'Link Rel' ),
-				placeholder: _x(
-					'None',
-					'Link rel attribute value placeholder'
-				),
-			},
-		};
 	}
 
 	componentDidMount() {
@@ -390,12 +371,10 @@ export class ImageEdit extends Component {
 		return href === undefined
 			? setAttributes( {
 					...restAttributes,
-					linkDestination: LINK_DESTINATION_CUSTOM,
 			  } )
 			: setAttributes( {
 					...restAttributes,
 					href,
-					linkDestination: LINK_DESTINATION_CUSTOM,
 			  } );
 	}
 
@@ -406,6 +385,40 @@ export class ImageEdit extends Component {
 			image = {},
 		} = this.props;
 		const mappedAttributes = { ...unMappedAttributes, url };
+
+		let placeholder;
+		switch ( mappedAttributes.linkDestination ) {
+			case LINK_DESTINATION_MEDIA:
+				placeholder = __( 'Media File' );
+				break;
+			case LINK_DESTINATION_ATTACHMENT:
+				placeholder = __( 'Attachment Page' );
+				break;
+			case LINK_DESTINATION_CUSTOM:
+				placeholder = __( 'Custom URL' );
+				break;
+			default:
+				placeholder = __( 'None' );
+				break;
+		}
+
+		const linkSettingsOptions = {
+			url: {
+				placeholder,
+				autoFocus: false,
+				autoFill: true,
+			},
+			openInNewTab: {
+				label: __( 'Open in new tab' ),
+			},
+			linkRel: {
+				label: __( 'Link Rel' ),
+				placeholder: _x(
+					'None',
+					'Link rel attribute value placeholder'
+				),
+			},
+		};
 
 		return (
 			<LinkSettingsNavigation
@@ -418,7 +431,7 @@ export class ImageEdit extends Component {
 				setAttributes={ this.setMappedAttributes }
 				withBottomSheet={ false }
 				hasPicker
-				options={ this.linkSettingsOptions }
+				options={ linkSettingsOptions }
 				showIcon={ false }
 				onLinkCellPressed={ ( { inputValue, navigation } ) => {
 					// TODO(David): Passing `setAttributes` throws a warning, we should avoid
