@@ -1,8 +1,10 @@
 .block-editor-block-draggable-chip-wrapper {
-	position: absolute;
+	position: fixed;
 	// Offset position so that cursor is centered over the drag handle.
-	top: -#{$block-toolbar-height * 0.5};
+	transform: translate(-#{$block-toolbar-height * 0.5}, -#{$block-toolbar-height * 0.5});
 	left: 0;
+	pointer-events: none;
+	z-index: 1;
 }
 
 .block-editor-block-draggable-chip {

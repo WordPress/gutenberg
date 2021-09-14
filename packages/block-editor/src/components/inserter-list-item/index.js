@@ -66,7 +66,6 @@ function InserterListItem( {
 		<InserterDraggableBlocks
 			isEnabled={ isDraggable && ! item.disabled }
 			blocks={ blocks }
-			icon={ item.icon }
 		>
 			{ ( { draggable, onDragStart, onDragEnd } ) => (
 				<div

@@ -7,18 +7,21 @@ import { first, last } from 'lodash';
  * WordPress dependencies
  */
 import { useSelect, useDispatch } from '@wordpress/data';
-import { useViewportMatch } from '@wordpress/compose';
+import { useViewportMatch, useRefEffect } from '@wordpress/compose';
 import { Popover } from '@wordpress/components';
 import { __unstableUseShortcutEventMatch as useShortcutEventMatch } from '@wordpress/keyboard-shortcuts';
+import { useState, useRef } from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
 import InsertionPoint from './insertion-point';
 import BlockPopover from './block-popover';
+import BlockDraggableChip from '../block-draggable/draggable-chip';
 import { store as blockEditorStore } from '../../store';
 import BlockContextualToolbar from './block-contextual-toolbar';
 import { usePopoverScroll } from './use-popover-scroll';
+import { parseDropEvent } from '../use-on-block-drop';
 
 /**
  * Renders block tools (the block toolbar, select/navigation mode toolbar, the
@@ -112,12 +115,75 @@ export default function BlockTools( {
 		}
 	}
 
+	const [ draggedClientIds, setDraggedClientIds ] = useState( [] );
+	const draggableChipRef = useRef();
+	const isDraggingBlocks = draggedClientIds.length > 0;
+
+	function onDragStart( event ) {
+		const { srcClientIds } = parseDropEvent( event );
+		setDraggedClientIds( srcClientIds );
+	}
+
+	function onDragOver( event ) {
+		// If we're not dragging over an iframe, return. The global event
+		// lister will handle positioning the drag chip.
+		if ( event.currentTarget.contains( event.target ) ) return;
+
+		const { ownerDocument } = event.target;
+		const { defaultView } = ownerDocument;
+		const { frameElement } = defaultView;
+		const rect = frameElement.getBoundingClientRect();
+		const element = draggableChipRef.current;
+
+		element.style.left = event.clientX + rect.left + 'px';
+		element.style.top = event.clientY + rect.top + 'px';
+	}
+
+	function onDragEnd() {
+		setDraggedClientIds( [] );
+	}
+
+	const refEffect = useRefEffect( ( element ) => {
+		const { ownerDocument } = element;
+
+		function _onDragOver( event ) {
+			const chip = draggableChipRef.current;
+			chip.style.left = event.clientX + 'px';
+			chip.style.top = event.clientY + 'px';
+		}
+
+		function _onDragEnd() {
+			setDraggedClientIds( [] );
+		}
+
+		ownerDocument.addEventListener( 'dragover', _onDragOver );
+		ownerDocument.addEventListener( 'dragend', _onDragEnd );
+		return () => {
+			ownerDocument.removeEventListener( 'dragover', _onDragOver );
+			ownerDocument.removeEventListener( 'dragend', _onDragEnd );
+		};
+	}, [] );
+
 	return (
 		// eslint-disable-next-line jsx-a11y/no-static-element-interactions
-		<div { ...props } onKeyDown={ onKeyDown }>
+		<div
+			{ ...props }
+			onKeyDown={ onKeyDown }
+			onDragStart={ onDragStart }
+			onDragOver={ isDraggingBlocks ? onDragOver : null }
+			onDragEnd={ isDraggingBlocks ? onDragEnd : null }
+			ref={ isDraggingBlocks ? refEffect : null }
+		>
 			<InsertionPoint __unstableContentRef={ __unstableContentRef }>
 				{ ( hasFixedToolbar || ! isLargeViewport ) && (
 					<BlockContextualToolbar isFixed />
+				) }
+				{ draggedClientIds.length > 0 && (
+					<BlockDraggableChip
+						count={ draggedClientIds.length }
+						icon={ null }
+						ref={ draggableChipRef }
+					/>
 				) }
 				{ /* Even if the toolbar is fixed, the block popover is still
                  needed for navigation mode. */ }

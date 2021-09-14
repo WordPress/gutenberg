@@ -122,7 +122,7 @@ export default function Draggable( {
 
 			// Inject the cloneWrapper into the DOM.
 			ownerDocument.body.appendChild( cloneWrapper );
-		} else {
+		} else if ( elementId ) {
 			const element = ownerDocument.getElementById( elementId );
 
 			// Prepare element clone and append to element wrapper.

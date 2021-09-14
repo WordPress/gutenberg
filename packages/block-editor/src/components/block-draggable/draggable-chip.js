@@ -4,15 +4,16 @@
 import { _n, sprintf } from '@wordpress/i18n';
 import { Flex, FlexItem } from '@wordpress/components';
 import { dragHandle } from '@wordpress/icons';
+import { forwardRef } from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
 import BlockIcon from '../block-icon';
 
-export default function BlockDraggableChip( { count, icon } ) {
+function BlockDraggableChip( { count, icon }, ref ) {
 	return (
-		<div className="block-editor-block-draggable-chip-wrapper">
+		<div className="block-editor-block-draggable-chip-wrapper" ref={ ref }>
 			<div className="block-editor-block-draggable-chip">
 				<Flex
 					justify="center"
@@ -37,3 +38,5 @@ export default function BlockDraggableChip( { count, icon } ) {
 		</div>
 	);
 }
+
+export default forwardRef( BlockDraggableChip );
