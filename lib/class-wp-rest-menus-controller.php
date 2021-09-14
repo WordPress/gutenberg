@@ -261,11 +261,11 @@ class WP_REST_Menus_Controller extends WP_REST_Terms_Controller {
 		$fields = $this->get_fields_for_response( $request );
 		$data   = $response->get_data();
 
-		if ( in_array( 'locations', $fields, true ) ) {
+		if ( rest_is_field_included( 'locations', $fields ) ) {
 			$data['locations'] = $this->get_menu_locations( $nav_menu->term_id );
 		}
 
-		if ( in_array( 'auto_add', $fields, true ) ) {
+		if ( rest_is_field_included( 'auto_add', $fields ) ) {
 			$auto_add         = $this->get_menu_auto_add( $nav_menu->term_id );
 			$data['auto_add'] = $auto_add;
 		}

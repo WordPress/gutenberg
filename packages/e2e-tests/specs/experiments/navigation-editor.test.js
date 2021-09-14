@@ -254,18 +254,12 @@ describe( 'Navigation editor', () => {
 		await visitNavigationEditor();
 
 		// Wait for the header to show the menu name.
-		await page.waitForXPath( '//h2[contains(., "Editing: Test Menu 1")]', {
+		await page.waitForXPath( '//h2[contains(., "Test Menu 1")]', {
 			visible: true,
 		} );
 
-		// Open up the menu creation dialog and create a new menu.
-		const switchMenuButton = await page.waitForXPath(
-			'//button[.="Switch menu"]'
-		);
-		await switchMenuButton.click();
-
 		const createMenuButton = await page.waitForXPath(
-			'//button[.="Create a new menu"]'
+			'//button[.="New menu"]'
 		);
 		await createMenuButton.click();
 
@@ -305,7 +299,7 @@ describe( 'Navigation editor', () => {
 		await visitNavigationEditor();
 
 		// Wait for the header to show the menu name.
-		await page.waitForXPath( '//h2[contains(., "Editing: Test Menu 1")]', {
+		await page.waitForXPath( '//h2[contains(., "Test Menu 1")]', {
 			visible: true,
 		} );
 
@@ -495,13 +489,13 @@ describe( 'Navigation editor', () => {
 			await saveButton.click();
 			await page.waitForSelector( '.components-snackbar' );
 			const headerSubtitle = await page.waitForSelector(
-				'.edit-navigation-header__subtitle'
+				'.edit-navigation-menu-actions__subtitle'
 			);
 			expect( headerSubtitle ).toBeTruthy();
 			const headerSubtitleText = await headerSubtitle.evaluate(
 				( element ) => element.innerText
 			);
-			expect( headerSubtitleText ).toBe( `Editing: ${ newName }` );
+			expect( headerSubtitleText ).toBe( newName );
 		} );
 
 		it( 'does not save a menu name upon clicking save button when name is empty', async () => {
@@ -532,15 +526,13 @@ describe( 'Navigation editor', () => {
 			await saveButton.click();
 			await page.waitForSelector( '.components-snackbar' );
 			const headerSubtitle = await page.waitForSelector(
-				'.edit-navigation-header__subtitle'
+				'.edit-navigation-menu-actions__subtitle'
 			);
 			expect( headerSubtitle ).toBeTruthy();
 			const headerSubtitleText = await headerSubtitle.evaluate(
 				( element ) => element.innerText
 			);
-			expect( headerSubtitleText ).toBe(
-				`Editing: ${ initialMenuName }`
-			);
+			expect( headerSubtitleText ).toBe( initialMenuName );
 		} );
 	} );
 
