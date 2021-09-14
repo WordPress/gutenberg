@@ -50,6 +50,11 @@ export const createMissingMenuItems = ( post ) => async ( {
 			exclusive: false,
 		} );
 	try {
+		// Ensure all the menu items are available before we start creating placeholders.
+		await registry
+			.resolveSelect( 'core' )
+			.getMenuItems( { menus: menuId, per_page: -1 } );
+
 		const menuItemIdToBlockId = await dispatch(
 			getEntityRecordIdToBlockIdMapping( post.id )
 		);
@@ -89,7 +94,7 @@ export const createPlaceholderMenuItem = ( block, menuId ) => async ( {
 	} );
 
 	const menuItems = await registry
-		.resolveSelect( 'core' )
+		.select( 'core' )
 		.getMenuItems( { menus: menuId, per_page: -1 } );
 
 	await registry
