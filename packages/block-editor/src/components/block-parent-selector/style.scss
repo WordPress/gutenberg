@@ -33,7 +33,12 @@
 		border-radius: 4px;
 		height: 8px;
 		width: 8px;
-		margin: 0 14px;
+		margin: 0 12px;
+	}
+
+	// increase the focus indicator width
+	.block-editor-block-parent-selector__button::before {
+		left: 7px;
+		right: 7px;
 	}
 }
-
