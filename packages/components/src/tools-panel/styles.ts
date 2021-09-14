@@ -17,6 +17,23 @@ export const ToolsPanel = css`
 	margin-top: -1px;
 	padding: ${ space( 4 ) };
 	row-gap: ${ space( 6 ) };
+
+	/**
+	 * Items injected into a ToolsPanel via a virtual bubbling slot will require
+	 * an inner dom element to be injected. The following rule allows for the
+	 * CSS grid display to continue.
+	 */
+	.components-tools-panel__items-wrapper {
+		column-gap: ${ space( 4 ) };
+		display: grid;
+		grid-template-columns: 1fr 1fr;
+		row-gap: ${ space( 6 ) };
+		grid-column: span 2;
+
+		&:empty {
+			display: none;
+		}
+	}
 `;
 
 export const ToolsPanelHeader = css`
@@ -60,6 +77,14 @@ export const ToolsPanelItem = css`
 		padding-bottom: 0;
 		margin-bottom: 0;
 		max-width: 100%;
+	}
+
+	& > .components-base-control:last-child {
+		margin-bottom: 0;
+
+		.components-base-control__field {
+			margin-bottom: 0;
+		}
 	}
 `;
 

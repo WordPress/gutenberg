@@ -34,6 +34,7 @@ export default function InspectorControlsSlot( {
 			<BlockSupportToolsPanel group={ group } label={ label }>
 				<BlockSupportSlotContainer
 					{ ...props }
+					className="components-tools-panel__items-wrapper"
 					bubblesVirtually={ bubblesVirtually }
 					Slot={ Slot }
 				/>
