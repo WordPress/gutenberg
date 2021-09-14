@@ -3,7 +3,7 @@
  */
 import { __ } from '@wordpress/i18n';
 import { Component } from '@wordpress/element';
-import { VisuallyHidden, Confirm } from '@wordpress/components';
+import { VisuallyHidden, ConfirmDialog } from '@wordpress/components';
 import { withInstanceId, compose } from '@wordpress/compose';
 import { withSelect, withDispatch } from '@wordpress/data';
 
@@ -80,14 +80,13 @@ export class PostVisibility extends Component {
 
 		return (
 			<>
-				<Confirm
+				<ConfirmDialog
 					message={ __(
 						'Would you like to privately publish this post now?'
 					) }
 					isOpen={ this.state.isConfirmOpen }
 					onConfirm={ this.setPrivate }
 					onCancel={ () => this.setState( { isConfirmOpen: false } ) }
-					selfClose={ false }
 				/>
 				<fieldset
 					key="visibility-selector"
