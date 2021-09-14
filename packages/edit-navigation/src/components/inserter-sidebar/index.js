@@ -40,7 +40,7 @@ function InserterSidebar() {
 				).getSelectedBlock()?.clientId,
 			};
 		},
-		[]
+		[ navBlockClientId ]
 	);
 
 	const { setIsInserterOpened } = useDispatch( editNavigationStore );
