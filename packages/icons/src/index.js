@@ -31,7 +31,6 @@ export { default as captureVideo } from './library/capture-video';
 export { default as category } from './library/category';
 export { default as chartBar } from './library/chart-bar';
 export { default as check } from './library/check';
-export { default as checkSmall } from './library/check-small';
 export { default as chevronDown } from './library/chevron-down';
 export { default as chevronLeft } from './library/chevron-left';
 export { default as chevronRight } from './library/chevron-right';
