@@ -36,6 +36,7 @@ function ConfirmDialog(
 		message,
 		onConfirm,
 		onCancel = () => {},
+		...otherProps
 	} = useContextSystem( props, 'ConfirmDialog' );
 
 	const cx = useCx();
@@ -82,6 +83,7 @@ function ConfirmDialog(
 					closeButtonLabel={ __( 'Cancel' ) }
 					isDismissible={ true }
 					forwardedRef={ forwardedRef }
+					{ ...otherProps }
 				>
 					<Flex justify="flex-end">
 						<Button
