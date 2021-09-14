@@ -1,3 +1,25 @@
+.button {
+	margin: 0.5rem 0.25rem;
+	padding: 0.75rem;
+	align-items: center;
+	justify-content: center;
+	border: 1px solid $gray-light;
+	border-radius: 6px;
+}
+
+.buttonDark {
+	border: 1px solid $gray-dark;
+}
+
+.buttonText {
+	/* TODO: platform color */
+	font-weight: 600;
+}
+
+.buttonTextDark {
+	color: $dark-primary;
+}
+
 .container {
 	height: 100%;
 }
