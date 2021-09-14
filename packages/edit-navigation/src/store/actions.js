@@ -77,7 +77,6 @@ export const createMissingMenuItems = ( post ) => async ( {
 
 export const createPlaceholderMenuItem = ( block, menuId ) => async ( {
 	registry,
-	dispatch,
 } ) => {
 	const menuItem = await apiFetch( {
 		path: `/__experimental/menu-items`,
@@ -89,7 +88,9 @@ export const createPlaceholderMenuItem = ( block, menuId ) => async ( {
 		},
 	} );
 
-	const menuItems = await dispatch( resolveSelectMenuItems( menuId ) );
+	const menuItems = await registry
+		.resolveSelect( 'core' )
+		.getMenuItems( { menus: menuId, per_page: -1 } );
 
 	await registry
 		.dispatch( 'core' )
@@ -135,9 +136,10 @@ export const saveNavigationPost = ( post ) => async ( {
 		}
 
 		// Batch save menu items
-		const oldMenuItems = await dispatch(
-			resolveSelectMenuItems( post.meta.menuId )
-		);
+		const oldMenuItems = await registry
+			.resolveSelect( 'core' )
+			.getMenuItems( { menus: post.meta.menuId, per_page: -1 } );
+
 		const desiredMenuItems = await dispatch(
 			getDesiredMenuItems( post, oldMenuItems )
 		);
@@ -213,11 +215,6 @@ const getDesiredMenuItems = ( post, oldMenuItems ) => async ( {
 const getEntityRecordIdToBlockIdMapping = ( postId ) => async ( {
 	registry,
 } ) => registry.stores[ STORE_NAME ].store.getState().mapping[ postId ] || {};
-
-const resolveSelectMenuItems = ( menuId ) => async ( { registry } ) =>
-	await registry
-		.resolveSelect( 'core' )
-		.getMenuItems( { menus: menuId, per_page: -1 } );
 
 const batchSaveChanges = (
 	kind,
