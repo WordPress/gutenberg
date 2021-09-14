@@ -13,7 +13,7 @@ import { plus } from '@wordpress/icons';
 import { useNavigationEditorRootBlock } from '../../hooks';
 import { store as editNavigationStore } from '../../store';
 
-function InserterButton() {
+function InserterToggle() {
 	const { navBlockClientId } = useNavigationEditorRootBlock();
 
 	const { isInserterOpened, hasInserterItems } = useSelect(
@@ -54,4 +54,4 @@ function InserterButton() {
 	);
 }
 
-export default InserterButton;
+export default InserterToggle;

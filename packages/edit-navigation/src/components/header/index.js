@@ -14,7 +14,7 @@ import { decodeEntities } from '@wordpress/html-entities';
 import SaveButton from './save-button';
 import UndoButton from './undo-button';
 import RedoButton from './redo-button';
-import InserterButton from './inserter-button';
+import InserterToggle from './inserter-toggle';
 import MenuSwitcher from '../menu-switcher';
 import { useMenuEntityProp } from '../../hooks';
 
@@ -58,7 +58,7 @@ export default function Header( {
 					className="edit-navigation-header__toolbar"
 					aria-label={ __( 'Document tools' ) }
 				>
-					<InserterButton />
+					<InserterToggle />
 					{ isMediumViewport && (
 						<>
 							<UndoButton />
