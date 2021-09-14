@@ -38,46 +38,8 @@ exports[`KeyboardShortcutHelpModal should match snapshot when the modal is activ
     categoryName="block"
     title="Block shortcuts"
   />
-  <ShortcutSection
-    shortcuts={
-      Array [
-        Object {
-          "description": "Make the selected text bold.",
-          "keyCombination": Object {
-            "character": "b",
-            "modifier": "primary",
-          },
-        },
-        Object {
-          "description": "Make the selected text italic.",
-          "keyCombination": Object {
-            "character": "i",
-            "modifier": "primary",
-          },
-        },
-        Object {
-          "description": "Convert the selected text into a link.",
-          "keyCombination": Object {
-            "character": "k",
-            "modifier": "primary",
-          },
-        },
-        Object {
-          "description": "Remove a link.",
-          "keyCombination": Object {
-            "character": "k",
-            "modifier": "primaryShift",
-          },
-        },
-        Object {
-          "description": "Underline the selected text.",
-          "keyCombination": Object {
-            "character": "u",
-            "modifier": "primary",
-          },
-        },
-      ]
-    }
+  <ShortcutCategorySection
+    categoryName="text"
     title="Text formatting"
   />
 </Modal>
