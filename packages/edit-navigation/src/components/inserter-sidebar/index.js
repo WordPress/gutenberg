@@ -19,9 +19,9 @@ import { useDispatch, useSelect } from '@wordpress/data';
 import { store as editNavigationStore } from '../../store';
 import { useNavigationEditorRootBlock } from '../../hooks';
 
-function InserterSidebar() {
-	const SHOW_PREVIEWS = false;
+const SHOW_PREVIEWS = false;
 
+function InserterSidebar() {
 	const isMobileViewport = useViewportMatch( 'medium', '<' );
 
 	const {
