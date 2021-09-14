@@ -24,8 +24,12 @@ function NavEditor( { settings } ) {
 	const __experimentalSetIsInserterOpened = setIsInserterOpened;
 
 	// Provide link suggestions handler to fetch search results for Link UI.
-	const __experimentalFetchLinkSuggestions = ( search, searchOptions ) =>
-		fetchLinkSuggestions( search, searchOptions, settings );
+	const __experimentalFetchLinkSuggestions = ( search, searchOptions ) => {
+		// Bump the default number of suggestions.
+		// See https://github.com/WordPress/gutenberg/issues/34283.
+		searchOptions.perPage = 10;
+		return fetchLinkSuggestions( search, searchOptions, settings );
+	};
 
 	const editorSettings = useMemo( () => {
 		return {
