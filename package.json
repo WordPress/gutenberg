@@ -70,6 +70,7 @@
 		"@wordpress/react-i18n": "file:packages/react-i18n",
 		"@wordpress/react-native-aztec": "file:packages/react-native-aztec",
 		"@wordpress/react-native-bridge": "file:packages/react-native-bridge",
+		"@wordpress/react-native-editor": "file:packages/react-native-editor",
 		"@wordpress/redux-routine": "file:packages/redux-routine",
 		"@wordpress/reusable-blocks": "file:packages/reusable-blocks",
 		"@wordpress/rich-text": "file:packages/rich-text",
