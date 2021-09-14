@@ -525,19 +525,6 @@ class WP_REST_Menu_Items_Controller extends WP_REST_Posts_Controller {
 			}
 		}
 
-		// If menu id is set, validate the value of menu item position.
-		if ( ! empty( $prepared_nav_item['menu-id'] ) ) {
-			// Check if nav menu is valid.
-			if ( ! is_nav_menu( $prepared_nav_item['menu-id'] ) ) {
-				return new WP_Error( 'invalid_menu_id', __( 'Invalid menu ID.', 'gutenberg' ), array( 'status' => 400 ) );
-			}
-
-			// Check if menu item position is non-zero and positive.
-			if ( (int) $prepared_nav_item['menu-item-position'] < 1 ) {
-				return new WP_Error( 'invalid_menu_order', __( 'Invalid menu order.', 'gutenberg' ), array( 'status' => 400 ) );
-			}
-		}
-
 		if ( ! empty( $prepared_nav_item['menu-id'] ) && ! is_nav_menu( $prepared_nav_item['menu-id'] ) ) {
 			return new WP_Error( 'invalid_menu_id', __( 'Invalid menu ID.', 'gutenberg' ), array( 'status' => 400 ) );
 		}
