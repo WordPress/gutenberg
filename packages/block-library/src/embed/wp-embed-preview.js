@@ -20,6 +20,8 @@ export default function WpEmbedPreview( { html } ) {
 		const iframe = doc.querySelector( 'iframe' );
 		const iframeProps = {};
 
+		if ( ! iframe ) return iframeProps;
+
 		Array.from( iframe.attributes ).forEach( ( { name, value } ) => {
 			if ( name === 'style' ) return;
 			iframeProps[ attributeMap[ name ] || name ] = value;
