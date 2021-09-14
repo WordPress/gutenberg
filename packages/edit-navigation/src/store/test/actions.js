@@ -76,6 +76,8 @@ describe( 'createMissingMenuItems', () => {
 		};
 		const registry = {
 			dispatch: jest.fn( () => registryDispatch ),
+			select: jest.fn( () => ( {} ) ),
+			resolveSelect: jest.fn( () => ( { getMenuItems: () => [] } ) ),
 		};
 
 		await createMissingMenuItems( post )( { registry, dispatch } );
@@ -133,7 +135,13 @@ describe( 'createPlaceholderMenuItem', () => {
 		const registryDispatch = {
 			receiveEntityRecords: jest.fn(),
 		};
-		const registry = { dispatch: jest.fn( () => registryDispatch ) };
+		const registry = {
+			dispatch: jest.fn( () => registryDispatch ),
+			select: jest.fn( () => ( { getMenuItems: () => menuItems } ) ),
+			resolveSelect: jest.fn( () => ( {
+				getMenuItems: () => menuItems,
+			} ) ),
+		};
 		const dispatch = jest.fn( () => menuItems );
 
 		await createPlaceholderMenuItem(
