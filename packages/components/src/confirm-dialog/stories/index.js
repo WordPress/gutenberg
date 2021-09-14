@@ -8,31 +8,73 @@ import React, { useState } from 'react';
  * Internal dependencies
  */
 import Button from '../../button';
-import { Confirm, confirm } from '..';
+import { ConfirmDialog } from '..';
 
 export default {
-	component: Confirm,
-	title: 'Components (Experimental)/Confirm',
+	component: ConfirmDialog,
+	title: 'Components (Experimental)/ConfirmDialog',
 	argTypes: { proceed: { action: 'proceed' } },
 };
 
-export const _default = () => {
-	const [ confirmVal, setConfirmVal ] = useState();
+const placeholderMessage = 'Are you sure?';
 
-	async function triggerConfirm() {
-		if ( await confirm( 'Are you sure?' ) ) {
-			setConfirmVal( "Let's do it!" );
-		} else {
-			setConfirmVal( 'Ok, take your time!' );
-		}
-	}
+// Simplest usage: just declare the component with the required `onConfirm` prop.
+export const _default = () => {
+	const [ confirmVal, setConfirmVal ] = useState( 'Not confirmed' );
 
 	return (
 		<>
-			<Button variant="primary" onClick={ triggerConfirm }>
-				Trigger Confirm
+			<ConfirmDialog
+				message={ placeholderMessage }
+				onConfirm={ () => setConfirmVal( 'Confirmed!' ) }
+			/>
+			<h1>{ confirmVal }</h1>
+		</>
+	);
+};
+
+//
+export const UncontrolledAndWithExplicitOnCancel = () => {
+	const [ confirmVal, setConfirmVal ] = useState( 'Not confirmed' );
+
+	return (
+		<>
+			<ConfirmDialog
+				message={ placeholderMessage }
+				onConfirm={ () => setConfirmVal( 'Confirmed!' ) }
+				onCancel={ () => setConfirmVal( 'Cancelled' ) }
+			/>
+			<h1>{ confirmVal }</h1>
+		</>
+	);
+};
+
+export const ControlledWithExplicitOnCancel = () => {
+	const [ isOpen, setIsOpen ] = useState( false );
+	const [ confirmVal, setConfirmVal ] = useState( 'Not confirmed' );
+
+	const handleConfirm = () => {
+		setConfirmVal( 'Confirmed!' );
+		setIsOpen( false );
+	};
+
+	const handleCancel = () => {
+		setConfirmVal( 'Cancelled' );
+		setIsOpen( false );
+	};
+
+	return (
+		<>
+			<ConfirmDialog
+				message={ placeholderMessage }
+				isOpen={ isOpen }
+				onConfirm={ handleConfirm }
+				onCancel={ handleCancel }
+			/>
+			<Button variant="primary" onClick={ () => setIsOpen( true ) }>
+				Open ConfirmDialog
 			</Button>
-			{ confirmVal && <h1>{ confirmVal }</h1> }
+			<h1>{ confirmVal }</h1>
 		</>
 	);
 };

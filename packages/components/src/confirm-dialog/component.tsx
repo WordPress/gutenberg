@@ -2,7 +2,7 @@
  * External dependencies
  */
 // eslint-disable-next-line no-restricted-imports
-import { useEffect, useState } from 'react';
+import { forwardRef, useEffect, useState } from 'react';
 // eslint-disable-next-line no-restricted-imports
 import type { Ref, SyntheticEvent, KeyboardEvent } from 'react';
 
@@ -26,25 +26,34 @@ import Button from '../button';
 import * as styles from './styles';
 import { useCx } from '../utils/hooks/use-cx';
 
+// @todo add jsdoc
 function ConfirmDialog(
 	props: WordPressComponentProps< OwnProps, 'div', false >,
 	forwardedRef: Ref< any >
 ) {
 	const {
-		isOpen = true,
+		isOpen,
 		message,
 		onConfirm,
 		onCancel = () => {},
-		selfClose = true,
 	} = useContextSystem( props, 'ConfirmDialog' );
 
 	const cx = useCx();
 	const wrapperClassName = cx( styles.wrapper );
 
 	const [ _isOpen, setIsOpen ] = useState< Boolean >();
+	const [ _selfClose, setSelfClose ] = useState< Boolean >();
 
 	useEffect( () => {
-		setIsOpen( isOpen );
+
+		// We only allow the dialog to close itself if `isOpen` is *not* set.
+		// If `isOpen` is set, then it (probably) means it's controlled by a
+		// parent component. In that case, `selfClose` might do more harm than
+		// good, so we disable it.
+
+		const isIsOpenSet = typeof isOpen === 'boolean';
+		setIsOpen( isIsOpenSet ? isOpen : true );
+		setSelfClose( ! isIsOpenSet );
 	}, [ isOpen ] );
 
 	// @todo improve type, should handle keyboard and mousevent
@@ -52,7 +61,7 @@ function ConfirmDialog(
 		event: SyntheticEvent
 	) => {
 		callback( event );
-		if ( selfClose ) {
+		if ( _selfClose ) {
 			setIsOpen( false );
 		}
 	};

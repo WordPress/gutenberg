@@ -8,6 +8,6 @@ import ReactDOM from 'react-dom';
 /**
  * Internal dependencies
  */
-import Confirm from './component';
+import ConfirmDialog from './component';
 
-export { Confirm };
+export { ConfirmDialog };
