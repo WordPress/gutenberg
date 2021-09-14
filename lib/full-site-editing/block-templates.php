@@ -354,13 +354,16 @@ function gutenberg_get_block_templates( $query = array(), $template_type = 'wp_t
 		$wp_query_args['post_status'] = 'publish';
 	}
 
-	$template_query = new WP_Query( $wp_query_args );
-	$query_result   = array();
-	foreach ( $template_query->posts as $post ) {
-		$template = _gutenberg_build_template_result_from_post( $post );
+	$query_result = array();
 
-		if ( ! is_wp_error( $template ) ) {
-			$query_result[] = $template;
+	if ( isset( $query['wp_id'] ) || gutenberg_has_block_templates( $template_type, $query ) ) {
+		$template_query = new WP_Query( $wp_query_args );
+		foreach ( $template_query->posts as $post ) {
+			$template = _gutenberg_build_template_result_from_post( $post );
+
+			if ( ! is_wp_error( $template ) ) {
+				$query_result[] = $template;
+			}
 		}
 	}
 
@@ -592,3 +595,70 @@ function gutenberg_filter_wp_template_unique_post_slug( $override_slug, $slug, $
 	return $override_slug;
 }
 add_filter( 'pre_wp_unique_post_slug', 'gutenberg_filter_wp_template_unique_post_slug', 10, 5 );
+
+/**
+ * Checks if the current theme has any template objects.
+ *
+ * Checks if the current theme has any non-empty terms of the wp_template taxonomy, and if the
+ * $template_type param is set to wp_template_part, it also checks if the current theme has
+ * any non-empty terms of the wp_template_part_area taxnomy.
+ *
+ * @param string $template_type Optional. Template type to check. wp_template or wp_template_part.
+ * @param array  $query         Optional. Template query to check.
+ * @return bool True if there are any template objects. False otherwise.
+ */
+function gutenberg_has_block_templates( $template_type = 'wp_template', $query = array() ) {
+
+	$has_block_templates = _gutengerg_has_wp_template_block_templates();
+
+	if ( 'wp_template_part' === $template_type && $has_block_templates && isset( $query['area'] ) ) {
+		$has_block_templates = _gutenberg_has_wp_template_part_block_templates( $query['area'] );
+	}
+
+	return $has_block_templates;
+}
+
+/**
+ * Checks if the current theme has any non-empty terms of the wp_template taxonomy.
+ *
+ * @return bool True if there are any template objects. False otherwise.
+ */
+function _gutengerg_has_wp_template_block_templates() {
+	$term_query_args = array(
+		'taxonomy' => 'wp_theme',
+		'field'    => 'name',
+		'terms'    => wp_get_theme()->get_stylesheet(),
+        );
+
+	$has_block_templates = false;
+
+        $term_query = new WP_Term_Query( $term_query_args );
+        if ( ! empty( $term_query->terms ) ) {
+               $has_block_templates = true;
+	}
+
+	return $has_block_templates;
+}
+
+/**
+ * Checks if the current theme has any non-empty terms of the wp_template_part_area taxnomy.
+ *
+ * @param string $area Template part term to check.
+ * @return bool True if there are any template objects. False otherwise.
+ */
+function _gutenberg_has_wp_template_part_block_templates( $area ) {
+	$term_query_args = array(
+		'taxonomy' => 'wp_template_part_area',
+		'fields'   => 'name',
+		'terms'    => $area,
+	);
+
+	$has_block_templates = false;
+
+	$term_query = new WP_Term_Query( $term_query_args );
+	if ( ! empty( $term_query->terms ) ) {
+		$has_block_templates = true;
+	}
+
+	return $has_block_templates;
+}
