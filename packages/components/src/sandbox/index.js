@@ -7,7 +7,7 @@ import {
 	useState,
 	useEffect,
 } from '@wordpress/element';
-import { useFocusableIframe } from '@wordpress/compose';
+import { useFocusableIframe, useMergeRefs } from '@wordpress/compose';
 
 const observeAndResizeJS = `
 	( function() {
@@ -235,7 +235,7 @@ export default function Sandbox( {
 
 	return (
 		<iframe
-			ref={ useFocusableIframe() }
+			ref={ useMergeRefs( [ ref, useFocusableIframe() ] ) }
 			title={ title }
 			className="components-sandbox"
 			sandbox="allow-scripts allow-same-origin allow-presentation"
