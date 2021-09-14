@@ -654,7 +654,7 @@ class REST_Nav_Menu_Items_Controller_Test extends WP_Test_REST_Post_Type_Control
 		$this->assertArrayHasKey( 'title', $properties );
 		$this->assertArrayHasKey( 'type', $properties );
 		$this->assertArrayHasKey( 'xfn', $properties );
-		$this->assertArrayHasKey( '_invalid', $properties );
+		$this->assertArrayHasKey( 'invalid', $properties );
 	}
 
 	/**
