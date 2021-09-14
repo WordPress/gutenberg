@@ -18,14 +18,19 @@ function InserterButton() {
 	const inserterButton = useRef();
 	const { navBlockClientId } = useNavigationEditorRootBlock();
 
-	const { isInserterOpened, hasInserterItems } = useSelect( ( select ) => {
-		return {
-			hasInserterItems: select( blockEditorStore ).hasInserterItems(
-				navBlockClientId
-			),
-			isInserterOpened: select( editNavigationStore ).isInserterOpened(),
-		};
-	} );
+	const { isInserterOpened, hasInserterItems } = useSelect(
+		( select ) => {
+			return {
+				hasInserterItems: select( blockEditorStore ).hasInserterItems(
+					navBlockClientId
+				),
+				isInserterOpened: select(
+					editNavigationStore
+				).isInserterOpened(),
+			};
+		},
+		[ navBlockClientId ]
+	);
 
 	const { setIsInserterOpened } = useDispatch( editNavigationStore );
 
