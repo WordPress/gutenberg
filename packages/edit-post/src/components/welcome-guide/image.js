@@ -5,7 +5,7 @@ export default function WelcomeGuideImage( { nonAnimatedSrc, animatedSrc } ) {
 				srcSet={ nonAnimatedSrc }
 				media="(prefers-reduced-motion: reduce)"
 			/>
-			<img src={ animatedSrc } width="100%" height="240" alt="" />
+			<img src={ animatedSrc } width="312" height="240" alt="" />
 		</picture>
 	);
 }
