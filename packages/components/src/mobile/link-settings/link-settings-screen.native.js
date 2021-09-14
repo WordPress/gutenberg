@@ -16,11 +16,24 @@ import LinkSettings from './';
 const LinkSettingsScreen = ( props ) => {
 	const navigation = useNavigation();
 	const route = useRoute();
-	const { url = '' } = props;
+	const { imageUrl, attachmentPageUrl, setAttributes, url = '' } = props;
 	const { inputValue = url } = route.params || {};
 
 	const onLinkCellPressed = () => {
-		navigation.navigate( 'linkPicker', { inputValue } );
+		if ( props.precursorScreenName ) {
+			// TODO(David): Passing `setAttributes` throws a warning, we should avoid
+			// passing it here. Additionally, `imageUrl` and `attachmentPage` are very
+			// specific to this specific Image use case, can we relocate it into
+			// `image/edit` with a callback instead of a screen name string?
+			navigation.navigate( props.precursorScreenName, {
+				inputValue,
+				setAttributes,
+				imageUrl,
+				attachmentPageUrl,
+			} );
+		} else {
+			navigation.navigate( 'linkPicker', { inputValue } );
+		}
 	};
 
 	return useMemo( () => {

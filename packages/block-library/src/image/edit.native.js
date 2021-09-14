@@ -41,6 +41,7 @@ import {
 	BlockAlignmentToolbar,
 	BlockStyles,
 	store as blockEditorStore,
+	blockSettingsScreens,
 } from '@wordpress/block-editor';
 import { __, _x, sprintf } from '@wordpress/i18n';
 import { getProtocol, hasQueryArg } from '@wordpress/url';
@@ -402,6 +403,7 @@ export class ImageEdit extends Component {
 		const { isLinkSheetVisible } = this.state;
 		const {
 			attributes: { href: url, ...unMappedAttributes },
+			image = {},
 		} = this.props;
 		const mappedAttributes = { ...unMappedAttributes, url };
 
@@ -418,6 +420,11 @@ export class ImageEdit extends Component {
 				hasPicker
 				options={ this.linkSettingsOptions }
 				showIcon={ false }
+				precursorScreenName={ blockSettingsScreens.imageOptions }
+				// TODO(David): Passing the URLs feels forced, can it be apart of the
+				// above `precursorScreen#` prop?
+				imageUrl={ image.url }
+				attachmentPageUrl={ image.link }
 			/>
 		);
 	}
