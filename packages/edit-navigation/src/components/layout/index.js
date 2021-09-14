@@ -34,6 +34,7 @@ import Sidebar from '../sidebar';
 import Header from '../header';
 import Notices from '../notices';
 import Editor from '../editor';
+import InserterSidebar from '../secondary-sidebar/inserter-sidebar';
 import UnsavedChangesWarning from './unsaved-changes-warning';
 import { store as editNavigationStore } from '../../store';
 
@@ -44,7 +45,10 @@ const interfaceLabels = {
 	body: __( 'Navigation menu blocks' ),
 	/* translators: accessibility text for the navigation screen settings landmark region. */
 	sidebar: __( 'Navigation settings' ),
+	secondarySidebar: __( 'Block library' ),
 };
+
+const isInserterOpened = true;
 
 export default function Layout( { blockEditorSettings } ) {
 	const contentAreaRef = useBlockSelectionClearer();
@@ -94,6 +98,16 @@ export default function Layout( { blockEditorSettings } ) {
 		navigationPost &&
 		isMenuSelected
 	);
+
+	const secondarySidebar = () => {
+		// Todo: enable mode in Nav Editor store
+		// mode && mode === 'visual' &&
+		if ( isInserterOpened ) {
+			return <InserterSidebar />;
+		}
+
+		return null;
+	};
 
 	return (
 		<ErrorBoundary>
@@ -175,6 +189,7 @@ export default function Layout( { blockEditorSettings } ) {
 										<ComplementaryArea.Slot scope="core/edit-navigation" />
 									)
 								}
+								secondarySidebar={ secondarySidebar() }
 							/>
 							{ isMenuSelected && (
 								<Sidebar
