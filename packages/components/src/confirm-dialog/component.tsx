@@ -45,7 +45,6 @@ function ConfirmDialog(
 	const [ _selfClose, setSelfClose ] = useState< Boolean >();
 
 	useEffect( () => {
-
 		// We only allow the dialog to close itself if `isOpen` is *not* set.
 		// If `isOpen` is set, then it (probably) means it's controlled by a
 		// parent component. In that case, `selfClose` might do more harm than

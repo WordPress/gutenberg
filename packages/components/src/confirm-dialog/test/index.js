@@ -12,7 +12,7 @@ import {
 /**
  * Internal dependencies
  */
-import { Confirm } from '..';
+import { ConfirmDialog } from '..';
 
 const noop = () => {};
 
@@ -20,7 +20,7 @@ describe( 'Confirm', () => {
 	describe( 'Confirm component', () => {
 		it( 'should render correctly', () => {
 			const wrapper = render(
-				<Confirm onConfirm={ noop } onCancel={ noop } />
+				<ConfirmDialog onConfirm={ noop } onCancel={ noop } />
 			);
 
 			expect( wrapper ).toMatchSnapshot();
@@ -29,7 +29,7 @@ describe( 'Confirm', () => {
 		it( 'should not render if closed by clicking `OK`, and callback should be called', async () => {
 			const onConfirm = jest.fn().mockName( 'onConfirm()' );
 
-			const wrapper = render( <Confirm onConfirm={ onConfirm } /> );
+			const wrapper = render( <ConfirmDialog onConfirm={ onConfirm } /> );
 
 			const button = await wrapper.findByText( 'OK' );
 
@@ -43,7 +43,7 @@ describe( 'Confirm', () => {
 			const onCancel = jest.fn().mockName( 'onCancel()' );
 
 			const wrapper = render(
-				<Confirm onConfirm={ noop } onCancel={ onCancel } />
+				<ConfirmDialog onConfirm={ noop } onCancel={ onCancel } />
 			);
 
 			const button = await wrapper.findByText( 'Cancel' );
@@ -55,7 +55,7 @@ describe( 'Confirm', () => {
 		} );
 
 		it( 'should be dismissable even if an `onCancel` callback is not provided', async () => {
-			const wrapper = render( <Confirm onConfirm={ noop } /> );
+			const wrapper = render( <ConfirmDialog onConfirm={ noop } /> );
 
 			const button = await wrapper.findByText( 'Cancel' );
 
@@ -65,7 +65,7 @@ describe( 'Confirm', () => {
 		} );
 
 		it( 'should not render if `isOpen` is set to false', async () => {
-			const wrapper = render( <Confirm isOpen={ false } /> );
+			const wrapper = render( <ConfirmDialog isOpen={ false } /> );
 
 			expect( wrapper ).toMatchSnapshot();
 		} );
@@ -74,7 +74,7 @@ describe( 'Confirm', () => {
 			const onCancel = jest.fn().mockName( 'onCancel()' );
 
 			const wrapper = render(
-				<Confirm onConfirm={ noop } onCancel={ onCancel } />
+				<ConfirmDialog onConfirm={ noop } onCancel={ onCancel } />
 			);
 
 			const frame = wrapper.baseElement.querySelector(
@@ -94,7 +94,7 @@ describe( 'Confirm', () => {
 			const onCancel = jest.fn().mockName( 'onCancel()' );
 
 			const wrapper = render(
-				<Confirm onConfirm={ noop } onCancel={ onCancel } />
+				<ConfirmDialog onConfirm={ noop } onCancel={ onCancel } />
 			);
 
 			const button = await wrapper.findByLabelText( 'Cancel' );
@@ -108,7 +108,7 @@ describe( 'Confirm', () => {
 			const onCancel = jest.fn().mockName( 'onCancel()' );
 
 			const wrapper = render(
-				<Confirm onConfirm={ noop } onCancel={ onCancel } />
+				<ConfirmDialog onConfirm={ noop } onCancel={ onCancel } />
 			);
 
 			const frame = wrapper.baseElement.querySelector(
@@ -124,7 +124,7 @@ describe( 'Confirm', () => {
 		it( 'should not render if dialog is closed by pressing `Enter`, and the `onConfirm` callback should be called', async () => {
 			const onConfirm = jest.fn().mockName( 'onConfirm()' );
 
-			const wrapper = render( <Confirm onConfirm={ onConfirm } /> );
+			const wrapper = render( <ConfirmDialog onConfirm={ onConfirm } /> );
 
 			const frame = wrapper.baseElement.querySelector(
 				'.components-modal__frame'
