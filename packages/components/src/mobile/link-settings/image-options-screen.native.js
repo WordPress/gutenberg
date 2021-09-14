@@ -59,7 +59,7 @@ function ImageOptionsScreen( props ) {
 					<Icon icon={ chevronRight }></Icon>
 				</Cell>
 				<Cell
-					label={ __( 'Media' ) }
+					label={ __( 'Media File' ) }
 					leftAlign
 					onPress={ setLinkToUrl( imageUrl ) }
 				>
@@ -73,7 +73,7 @@ function ImageOptionsScreen( props ) {
 					<Icon icon={ chevronRight }></Icon>
 				</Cell>
 				<Cell
-					label={ __( 'Custom' ) }
+					label={ __( 'Custom URL' ) }
 					leftAlign
 					// since this is not actually editable, we treat value as a placeholder
 					value={ inputValue || __( 'Search or type URL' ) }
