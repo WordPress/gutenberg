@@ -42,6 +42,7 @@ export default function save( { attributes } ) {
 		id,
 		minHeight: minHeightProp,
 		minHeightUnit,
+		isDark,
 	} = attributes;
 	const overlayColorClass = getColorClassName(
 		'background-color',
@@ -76,6 +77,7 @@ export default function save( { attributes } ) {
 		dimRatioToClass( dimRatio ),
 		overlayColorClass,
 		{
+			'is-light': ! isDark,
 			'has-background-dim': dimRatio !== 0,
 			'has-parallax': hasParallax,
 			'is-repeated': isRepeated,

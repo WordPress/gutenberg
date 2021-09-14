@@ -102,14 +102,15 @@
 	}
 
 	.wp-block-cover__inner-container {
+		color: $white;
 		width: 100%;
 		z-index: z-index(".wp-block-cover__inner-container");
 
 	}
 
-	&.is-dark-theme {
+	&.is-light {
 		.wp-block-cover__inner-container {
-			color: $white;
+			color: $black;
 		}
 	}
 
