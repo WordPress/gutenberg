@@ -10,6 +10,9 @@
 			&.has-icon {
 				padding-left: $grid-unit;
 			}
+			.components-menu-item__item {
+				min-width: 120px;
+			}
 		}
 	}
 }
