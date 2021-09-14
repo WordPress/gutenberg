@@ -8,6 +8,7 @@ import { zip } from 'lodash';
  */
 import { __, sprintf } from '@wordpress/i18n';
 import { store as noticesStore } from '@wordpress/notices';
+import { store as coreDataStore } from '@wordpress/core-data';
 import apiFetch from '@wordpress/api-fetch';
 
 /**
@@ -45,14 +46,14 @@ export const createMissingMenuItems = ( post ) => async ( {
 	const menuId = post.meta.menuId;
 	// @TODO: extract locks to a separate package?
 	const lock = await registry
-		.dispatch( 'core' )
+		.dispatch( coreDataStore )
 		.__unstableAcquireStoreLock( STORE_NAME, [ 'savingMenu' ], {
 			exclusive: false,
 		} );
 	try {
 		// Ensure all the menu items are available before we start creating placeholders.
 		await registry
-			.resolveSelect( 'core' )
+			.resolveSelect( coreDataStore )
 			.getMenuItems( { menus: menuId, per_page: -1 } );
 
 		const menuItemIdToBlockId = await dispatch(
@@ -76,7 +77,7 @@ export const createMissingMenuItems = ( post ) => async ( {
 			mapping: menuItemIdToBlockId,
 		} );
 	} finally {
-		registry.dispatch( 'core' ).__unstableReleaseStoreLock( lock );
+		registry.dispatch( coreDataStore ).__unstableReleaseStoreLock( lock );
 	}
 };
 
@@ -94,11 +95,11 @@ export const createPlaceholderMenuItem = ( block, menuId ) => async ( {
 	} );
 
 	const menuItems = await registry
-		.select( 'core' )
+		.select( coreDataStore )
 		.getMenuItems( { menus: menuId, per_page: -1 } );
 
 	await registry
-		.dispatch( 'core' )
+		.dispatch( coreDataStore )
 		.receiveEntityRecords(
 			'root',
 			'menuItem',
@@ -121,7 +122,7 @@ export const saveNavigationPost = ( post ) => async ( {
 	dispatch,
 } ) => {
 	const lock = await registry
-		.dispatch( 'core' )
+		.dispatch( coreDataStore )
 		.__unstableAcquireStoreLock( STORE_NAME, [ 'savingMenu' ], {
 			exclusive: true,
 		} );
@@ -129,11 +130,11 @@ export const saveNavigationPost = ( post ) => async ( {
 		const menuId = post.meta.menuId;
 
 		await registry
-			.dispatch( 'core' )
+			.dispatch( coreDataStore )
 			.saveEditedEntityRecord( 'root', 'menu', menuId );
 
 		const error = registry
-			.select( 'core' )
+			.select( coreDataStore )
 			.getLastEntitySaveError( 'root', 'menu', menuId );
 
 		if ( error ) {
@@ -142,7 +143,7 @@ export const saveNavigationPost = ( post ) => async ( {
 
 		// Batch save menu items
 		const oldMenuItems = await registry
-			.resolveSelect( 'core' )
+			.resolveSelect( coreDataStore )
 			.getMenuItems( { menus: post.meta.menuId, per_page: -1 } );
 
 		const desiredMenuItems = dispatch(
@@ -159,7 +160,7 @@ export const saveNavigationPost = ( post ) => async ( {
 
 		// Clear "stub" navigation post edits to avoid a false "dirty" state.
 		await registry
-			.dispatch( 'core' )
+			.dispatch( coreDataStore )
 			.receiveEntityRecords(
 				NAVIGATION_POST_KIND,
 				NAVIGATION_POST_POST_TYPE,
@@ -184,7 +185,7 @@ export const saveNavigationPost = ( post ) => async ( {
 			type: 'snackbar',
 		} );
 	} finally {
-		registry.dispatch( 'core' ).__unstableReleaseStoreLock( lock );
+		registry.dispatch( coreDataStore ).__unstableReleaseStoreLock( lock );
 	}
 };
 
@@ -227,10 +228,10 @@ const batchSaveChanges = (
 	);
 
 	const results = await registry
-		.dispatch( 'core' )
+		.dispatch( coreDataStore )
 		.__experimentalBatch( changeset.map( ( { batchTask } ) => batchTask ) );
 
-	const failures = await dispatch(
+	const failures = dispatch(
 		getFailedChanges( kind, type, changeset, results )
 	);
 
@@ -247,7 +248,7 @@ const batchSaveChanges = (
 	return results;
 };
 
-const getFailedChanges = ( kind, entityType, changeset, results ) => async ( {
+const getFailedChanges = ( kind, entityType, changeset, results ) => ( {
 	registry,
 } ) => {
 	const failedDeletes = zip( changeset, results )
@@ -263,7 +264,7 @@ const getFailedChanges = ( kind, entityType, changeset, results ) => async ( {
 			change.type === 'update' &&
 			change.id &&
 			registry
-				.select( 'core' )
+				.select( coreDataStore )
 				.getLastEntitySaveError( kind, entityType, change.id )
 	);
 
@@ -275,7 +276,7 @@ const prepareChangeset = (
 	type,
 	oldEntityRecords,
 	desiredEntityRecords
-) => async ( { registry } ) => {
+) => ( { registry } ) => {
 	const deletedEntityRecordsIds = new Set(
 		diff(
 			oldEntityRecords.map( ( { id } ) => id ),
@@ -294,14 +295,14 @@ const prepareChangeset = (
 		}
 
 		// Update an existing entity record.
-		await registry
-			.dispatch( 'core' )
+		registry
+			.dispatch( coreDataStore )
 			.editEntityRecord( kind, type, entityRecord.id, entityRecord, {
 				undoIgnore: true,
 			} );
 
 		const hasEdits = registry
-			.select( 'core' )
+			.select( coreDataStore )
 			.hasEditsForEntityRecord( kind, type, entityRecord.id );
 
 		if ( ! hasEdits ) {
