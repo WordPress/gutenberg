@@ -385,7 +385,7 @@ extension GutenbergViewController {
     
     var showEditorHelpAction: UIAlertAction {
         return UIAlertAction(
-            title: "Help",
+            title: "Help & Support",
             style: .default,
             handler: { [unowned self] action in
                 self.showEditorHelp()
