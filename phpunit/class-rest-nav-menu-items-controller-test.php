@@ -316,7 +316,7 @@ class REST_Nav_Menu_Items_Controller_Test extends WP_Test_REST_Post_Type_Control
 		);
 		$request->set_body_params( $params );
 		$response = rest_get_server()->dispatch( $request );
-		$this->assertErrorResponse( 'invalid_menu_order', $response, 400 );
+		$this->assertErrorResponse( 'rest_invalid_param', $response, 400 );
 
 		$request = new WP_REST_Request( 'POST', '/__experimental/menu-items' );
 		$request->add_header( 'content-type', 'application/x-www-form-urlencoded' );
