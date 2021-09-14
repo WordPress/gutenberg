@@ -23,12 +23,11 @@ function InserterSidebar() {
 
 	const { rootClientId } = useNavigationEditorInsertionPoint();
 
-	const { isInserterOpened, hasInserterItems } = useSelect( ( select ) => {
+	const { hasInserterItems } = useSelect( ( select ) => {
 		return {
 			hasInserterItems: select( blockEditorStore ).hasInserterItems(
 				rootClientId
 			),
-			isInserterOpened: select( editNavigationStore ).isInserterOpened(),
 		};
 	} );
 
@@ -36,7 +35,9 @@ function InserterSidebar() {
 
 	const inserterDialogProps = {};
 
-	if ( ! isInserterOpened || ! hasInserterItems ) {
+	// Only concerned with whether there are items to display. If not then
+	// we shouldn't render.
+	if ( ! hasInserterItems ) {
 		return null;
 	}
 
