@@ -186,7 +186,7 @@ describe( 'converting menu items to blocks', () => {
 
 		expect( actual ).toEqual( [
 			expect.objectContaining( {
-				name: 'core/navigation-link',
+				name: 'core/navigation-submenu',
 				attributes: expect.objectContaining( {
 					label: 'Top Level',
 				} ),
@@ -199,13 +199,13 @@ describe( 'converting menu items to blocks', () => {
 						innerBlocks: [],
 					} ),
 					expect.objectContaining( {
-						name: 'core/navigation-link',
+						name: 'core/navigation-submenu',
 						attributes: expect.objectContaining( {
 							label: 'Child 2',
 						} ),
 						innerBlocks: [
 							expect.objectContaining( {
-								name: 'core/navigation-link',
+								name: 'core/navigation-submenu',
 								attributes: expect.objectContaining( {
 									label: 'Sub Child',
 								} ),
