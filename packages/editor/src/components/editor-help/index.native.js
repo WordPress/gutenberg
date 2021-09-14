@@ -30,6 +30,7 @@ import { store as editorStore } from '@wordpress/editor';
 import styles from './style.scss';
 import HelpDetailNavigationScreen from './help-detail-navigation-screen';
 import HelpTopicRow from './help-topic-row';
+import HelpGetSupportRow from './help-get-support-row';
 import IntroToBlocks from './intro-to-blocks';
 import AddBlocks from './add-blocks';
 import MoveBlocks from './move-blocks';
@@ -65,6 +66,7 @@ function EditorHelpTopics( { close, isVisible, onClose } ) {
 		postType === 'page'
 			? __( 'How to edit your page' )
 			: __( 'How to edit your post' );
+	const supportSubsection = __( 'Get support' );
 
 	return (
 		<BottomSheet
@@ -131,6 +133,17 @@ function EditorHelpTopics( { close, isVisible, onClose } ) {
 													);
 												}
 											) }
+											<BottomSheet.NavBar>
+												<BottomSheet.NavBar.Heading>
+													{ supportSubsection }
+												</BottomSheet.NavBar.Heading>
+											</BottomSheet.NavBar>
+											<HelpGetSupportRow
+												label={ __(
+													'See Support Options'
+												) }
+												icon={ helpFilled }
+											/>
 										</PanelBody>
 									</ScrollView>
 								);
