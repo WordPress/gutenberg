@@ -222,8 +222,8 @@ const batchSaveChanges = (
 	oldEntityRecords,
 	desiredEntityRecords
 ) => async ( { dispatch, registry } ) => {
-	const changeset = await dispatch(
-		computeChangeset( kind, type, oldEntityRecords, desiredEntityRecords )
+	const changeset = dispatch(
+		prepareChangeset( kind, type, oldEntityRecords, desiredEntityRecords )
 	);
 
 	const results = await registry
@@ -270,7 +270,7 @@ const getFailedChanges = ( kind, entityType, changeset, results ) => async ( {
 	return [ ...failedDeletes, ...failedUpdates ];
 };
 
-const computeChangeset = (
+const prepareChangeset = (
 	kind,
 	type,
 	oldEntityRecords,
