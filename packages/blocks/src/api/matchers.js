@@ -1,9 +1,4 @@
 /**
- * WordPress dependencies
- */
-import { decodeEntities } from '@wordpress/html-entities';
-
-/**
  * External dependencies
  */
 export { attr, prop, text, query } from 'hpq';
@@ -13,6 +8,20 @@ export { attr, prop, text, query } from 'hpq';
  */
 export { matcher as node } from './node';
 export { matcher as children } from './children';
+
+function replaceInnerHTMLEntities( innerHTML ) {
+	const entityRegEx = /&(amp|lt|gt);/g;
+
+	// This subset of chars are returned as HTML entities from Element.innerHTML
+	const lookUp = {
+		amp: '&',
+		lt: '<',
+		gt: '>',
+	};
+
+	// Replace entity with text equivalent.
+	return innerHTML.replace( entityRegEx, ( match, p1 ) => lookUp[ p1 ] );
+}
 
 export function html( selector, multilineTag ) {
 	return ( domNode ) => {
@@ -43,6 +52,6 @@ export function html( selector, multilineTag ) {
 			return value;
 		}
 
-		return decodeEntities( match.innerHTML );
+		return replaceInnerHTMLEntities( match.innerHTML );
 	};
 }
