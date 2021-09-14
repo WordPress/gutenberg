@@ -65,7 +65,7 @@ export const createMissingMenuItems = serializeProcessing( function* ( post ) {
 				data: {
 					title: 'Placeholder',
 					url: 'Placeholder',
-					menu_order: 0,
+					menu_order: 1,
 				},
 			} );
 
