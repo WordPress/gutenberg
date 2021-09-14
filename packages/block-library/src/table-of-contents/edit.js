@@ -22,7 +22,6 @@ import {
 	ToolbarGroup,
 } from '@wordpress/components';
 import { useDispatch, useSelect } from '@wordpress/data';
-import { store as editorStore } from '@wordpress/editor';
 import { renderToString, useEffect, useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 
@@ -61,7 +60,10 @@ export default function TableOfContentsEdit( {
 			listBlockExists: !! select( blocksStore ).getBlockType(
 				'core/list'
 			),
-			postContent: select( editorStore ).getEditedPostContent(),
+			// FIXME: @wordpress/block-library should not depend on @wordpress/editor.
+			// Blocks can be loaded into a *non-post* block editor.
+			// eslint-disable-next-line @wordpress/data-no-store-string-literals
+			postContent: select( 'core/editor' ).getEditedPostContent(),
 		} ),
 		[]
 	);

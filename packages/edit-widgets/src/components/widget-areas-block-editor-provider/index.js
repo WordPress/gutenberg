@@ -13,8 +13,11 @@ import { useMemo } from '@wordpress/element';
 import {
 	BlockEditorProvider,
 	BlockEditorKeyboardShortcuts,
+	CopyHandler,
 } from '@wordpress/block-editor';
 import { ReusableBlocksMenuItems } from '@wordpress/reusable-blocks';
+import { store as interfaceStore } from '@wordpress/interface';
+import { ShortcutProvider } from '@wordpress/keyboard-shortcuts';
 
 /**
  * Internal dependencies
@@ -24,6 +27,7 @@ import { useEntityBlockEditor, store as coreStore } from '@wordpress/core-data';
 import { buildWidgetAreasPostId, KIND, POST_TYPE } from '../../store/utils';
 import useLastSelectedWidgetArea from '../../hooks/use-last-selected-widget-area';
 import { store as editWidgetsStore } from '../../store';
+import { ALLOW_REUSABLE_BLOCKS } from '../../constants';
 
 export default function WidgetAreasBlockEditorProvider( {
 	blockEditorSettings,
@@ -43,16 +47,17 @@ export default function WidgetAreasBlockEditorProvider( {
 			),
 			widgetAreas: select( editWidgetsStore ).getWidgetAreas(),
 			widgets: select( editWidgetsStore ).getWidgets(),
-			reusableBlocks: select( coreStore ).getEntityRecords(
-				'postType',
-				'wp_block'
+			reusableBlocks: ALLOW_REUSABLE_BLOCKS
+				? select( coreStore ).getEntityRecords( 'postType', 'wp_block' )
+				: [],
+			isFixedToolbarActive: select( interfaceStore ).isFeatureActive(
+				'core/edit-widgets',
+				'fixedToolbar'
 			),
-			isFixedToolbarActive: select(
-				editWidgetsStore
-			).__unstableIsFeatureActive( 'fixedToolbar' ),
-			keepCaretInsideBlock: select(
-				editWidgetsStore
-			).__unstableIsFeatureActive( 'keepCaretInsideBlock' ),
+			keepCaretInsideBlock: select( interfaceStore ).isFeatureActive(
+				'core/edit-widgets',
+				'keepCaretInsideBlock'
+			),
 		} ),
 		[]
 	);
@@ -96,7 +101,7 @@ export default function WidgetAreasBlockEditorProvider( {
 	);
 
 	return (
-		<>
+		<ShortcutProvider>
 			<BlockEditorKeyboardShortcuts.Register />
 			<KeyboardShortcuts.Register />
 			<SlotFillProvider>
@@ -108,10 +113,10 @@ export default function WidgetAreasBlockEditorProvider( {
 					useSubRegistry={ false }
 					{ ...props }
 				>
-					{ children }
+					<CopyHandler>{ children }</CopyHandler>
 					<ReusableBlocksMenuItems rootClientId={ widgetAreaId } />
 				</BlockEditorProvider>
 			</SlotFillProvider>
-		</>
+		</ShortcutProvider>
 	);
 }

@@ -3,6 +3,7 @@
  */
 import { some } from 'lodash';
 import classnames from 'classnames';
+
 /**
  * WordPress dependencies
  */
@@ -59,6 +60,9 @@ export default function AddMenu( {
 		setIsCreatingMenu( true );
 
 		const menu = await saveMenu( { name: menuName } );
+
+		setIsCreatingMenu( false );
+
 		if ( menu ) {
 			createInfoNotice( __( 'Menu created' ), {
 				type: 'snackbar',
@@ -68,8 +72,6 @@ export default function AddMenu( {
 				onCreate( menu.id );
 			}
 		}
-
-		setIsCreatingMenu( false );
 	};
 
 	return (

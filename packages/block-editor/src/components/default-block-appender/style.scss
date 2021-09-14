@@ -38,8 +38,6 @@
 // Left side.
 .block-editor-block-list__empty-block-inserter,
 .block-editor-default-block-appender .block-editor-inserter {
-	right: $grid-unit-10; // Show to the right on mobile.
-
 	@include break-small {
 		display: flex;
 		height: 100%;
@@ -48,4 +46,9 @@
 	&:disabled {
 		display: none;
 	}
+}
+
+.block-editor-default-block-appender.has-visible-prompt .block-editor-inserter,
+.block-editor-block-list__empty-block-inserter {
+	right: 0;
 }

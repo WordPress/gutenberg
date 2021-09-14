@@ -25,6 +25,7 @@ export function useInBetweenInserter() {
 		isBlockInsertionPointVisible,
 		isMultiSelecting,
 		getSelectedBlockClientIds,
+		getTemplateLock,
 	} = useSelect( blockEditorStore );
 	const { showInsertionPoint, hideInsertionPoint } = useDispatch(
 		blockEditorStore
@@ -68,6 +69,11 @@ export function useInBetweenInserter() {
 					rootClientId = blockElement.getAttribute( 'data-block' );
 				}
 
+				// Don't set the insertion point if the template is locked.
+				if ( getTemplateLock( rootClientId ) ) {
+					return;
+				}
+
 				const orientation =
 					getBlockListSettings( rootClientId )?.orientation ||
 					'vertical';
@@ -99,6 +105,15 @@ export function useInBetweenInserter() {
 					if ( ! element ) {
 						return;
 					}
+				}
+
+				// Don't show the insertion point if a parent block has an "overlay"
+				// See https://github.com/WordPress/gutenberg/pull/34012#pullrequestreview-727762337
+				const parentOverlay = element.parentElement?.closest(
+					'.block-editor-block-content-overlay.overlay-active'
+				);
+				if ( parentOverlay ) {
+					return;
 				}
 
 				const clientId = element.id.slice( 'block-'.length );

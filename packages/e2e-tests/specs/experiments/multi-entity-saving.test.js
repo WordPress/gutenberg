@@ -66,6 +66,8 @@ describe( 'Multi-entity save flow', () => {
 		const saveA11ySelector =
 			'.edit-post-layout__toggle-entities-saved-states-panel-button';
 		const publishPanelSelector = '.editor-post-publish-panel';
+		const confirmTitleButtonSelector =
+			'.wp-block-template-part__placeholder-create-new__title-form .components-button.is-primary';
 
 		// Reusable assertions inside Post editor.
 		const assertMultiSaveEnabled = async () => {
@@ -100,13 +102,16 @@ describe( 'Multi-entity save flow', () => {
 
 			// Add a template part and edit it.
 			await insertBlock( 'Template Part' );
-			const [ createNewButton ] = await page.$x(
+			const createNewButton = await page.waitForXPath(
 				createNewButtonSelector
 			);
 			await createNewButton.click();
+			const confirmTitleButton = await page.waitForSelector(
+				confirmTitleButtonSelector
+			);
+			await confirmTitleButton.click();
+
 			await page.waitForSelector( activatedTemplatePartSelector );
-			await page.keyboard.press( 'Tab' );
-			await page.keyboard.type( 'test-template-part' );
 			await page.click( '.block-editor-button-block-appender' );
 			await page.click( '.editor-block-list-item-paragraph' );
 			await page.keyboard.type( 'some words...' );
@@ -163,6 +168,9 @@ describe( 'Multi-entity save flow', () => {
 
 			// Update template part.
 			await page.click( templatePartSelector );
+			await page.click(
+				`${ templatePartSelector } .wp-block[data-type="core/paragraph"]`
+			);
 			await page.keyboard.type( '...some more words...' );
 			await page.keyboard.press( 'Enter' );
 
@@ -243,7 +251,7 @@ describe( 'Multi-entity save flow', () => {
 			// Select the header template part via list view.
 			await page.click( '.edit-site-header-toolbar__list-view-toggle' );
 			const headerTemplatePartListViewButton = await page.waitForXPath(
-				'//button[contains(@class, "block-editor-block-navigation-block-select-button")][contains(., "Header")]'
+				'//button[contains(@class, "block-editor-list-view-block-select-button")][contains(., "Header")]'
 			);
 			headerTemplatePartListViewButton.click();
 			await page.click( 'button[aria-label="Close list view sidebar"]' );

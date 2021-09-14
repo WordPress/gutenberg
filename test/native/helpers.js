@@ -2,6 +2,7 @@
  * External dependencies
  */
 import { act, render, fireEvent } from '@testing-library/react-native';
+import { v4 as uuid } from 'uuid';
 
 /**
  * WordPress dependencies
@@ -33,13 +34,13 @@ provideToNativeHtml.mockImplementation( ( html ) => {
 	serializedHtml = html;
 } );
 
-export async function initializeEditor( { initialHtml } ) {
+export async function initializeEditor( props ) {
 	const renderResult = render(
 		<Editor
-			postId={ 0 }
+			postId={ `post-id-${ uuid() }` }
 			postType="post"
 			initialTitle="test"
-			initialHtml={ initialHtml }
+			{ ...props }
 		/>
 	);
 	const { getByTestId } = renderResult;

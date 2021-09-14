@@ -71,6 +71,9 @@ module.exports = {
 		// https://github.com/facebook/react-native/blob/HEAD/jest-preset.json#L20
 		'node_modules/(?!(simple-html-tokenizer|(jest-)?react-native|@react-native|react-clone-referenced-element))',
 	],
-	snapshotSerializers: [ 'enzyme-to-json/serializer', 'jest-emotion' ],
+	snapshotSerializers: [
+		'enzyme-to-json/serializer',
+		'@emotion/jest/serializer',
+	],
 	reporters: [ 'default', 'jest-junit' ],
 };

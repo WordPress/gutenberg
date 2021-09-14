@@ -1,0 +1,20 @@
+[
+	{
+		"blockName": "core/button",
+		"attrs": {
+			"borderRadius": 25
+		},
+		"innerBlocks": [],
+		"innerHTML": "\n<div class=\"wp-block-button\"><a class=\"wp-block-button__link\" style=\"border-radius:25px\">My button</a></div>\n",
+		"innerContent": [
+			"\n<div class=\"wp-block-button\"><a class=\"wp-block-button__link\" style=\"border-radius:25px\">My button</a></div>\n"
+		]
+	},
+	{
+		"blockName": null,
+		"attrs": {},
+		"innerBlocks": [],
+		"innerHTML": "</div>",
+		"innerContent": [ "</div>" ]
+	}
+]

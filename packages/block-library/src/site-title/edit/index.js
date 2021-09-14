@@ -18,6 +18,7 @@ import {
 } from '@wordpress/block-editor';
 import { ToggleControl, PanelBody } from '@wordpress/components';
 import { createBlock, getDefaultBlockName } from '@wordpress/blocks';
+import { decodeEntities } from '@wordpress/html-entities';
 
 /**
  * Internal dependencies
@@ -36,7 +37,7 @@ export default function SiteTitleEdit( {
 		const siteData = getEntityRecord( 'root', '__unstableBase' );
 		return {
 			canUserEdit: canUser( 'update', 'settings' ),
-			readOnlyTitle: siteData?.name,
+			readOnlyTitle: decodeEntities( siteData?.name ),
 		};
 	}, [] );
 	const TagName = level === 0 ? 'p' : `h${ level }`;
@@ -54,7 +55,7 @@ export default function SiteTitleEdit( {
 				href={ isLink ? '#site-title-pseudo-link' : undefined }
 				aria-label={ __( 'Site title text' ) }
 				placeholder={ __( 'Write site title…' ) }
-				value={ title || readOnlyTitle }
+				value={ title }
 				onChange={ setTitle }
 				allowedFormats={ [] }
 				disableLineBreaks

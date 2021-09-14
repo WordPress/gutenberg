@@ -2,9 +2,9 @@
  * WordPress dependencies
  */
 import {
-	activatePlugin,
+	__experimentalActivatePlugin as activatePlugin,
 	activateTheme,
-	deactivatePlugin,
+	__experimentalDeactivatePlugin as deactivatePlugin,
 	visitAdminPage,
 	showBlockToolbar,
 	clickBlockToolbarButton,
@@ -18,6 +18,10 @@ import {
 // eslint-disable-next-line no-restricted-imports
 import { find } from 'puppeteer-testing-library';
 
+const twentyTwentyError = `Stylesheet twentytwenty-block-editor-styles-css was not properly added.
+For blocks, use the block API's style (https://developer.wordpress.org/block-editor/reference-guides/block-api/block-metadata/#style) or editorStyle (https://developer.wordpress.org/block-editor/reference-guides/block-api/block-metadata/#editor-style).
+For themes, use add_editor_style (https://developer.wordpress.org/block-editor/how-to-guides/themes/theme-support/#editor-styles).`;
+
 describe( 'Widgets Customizer', () => {
 	beforeEach( async () => {
 		await deleteAllWidgets();
@@ -26,14 +30,14 @@ describe( 'Widgets Customizer', () => {
 		// Disable welcome guide if it is enabled.
 		const isWelcomeGuideActive = await page.evaluate( () =>
 			wp.data
-				.select( 'core/customize-widgets' )
-				.__unstableIsFeatureActive( 'welcomeGuide' )
+				.select( 'core/interface' )
+				.isFeatureActive( 'core/customize-widgets', 'welcomeGuide' )
 		);
 		if ( isWelcomeGuideActive ) {
 			await page.evaluate( () =>
 				wp.data
-					.dispatch( 'core/customize-widgets' )
-					.__unstableToggleFeature( 'welcomeGuide' )
+					.dispatch( 'core/interface' )
+					.toggleFeature( 'core/customize-widgets', 'welcomeGuide' )
 			);
 		}
 	} );
@@ -44,6 +48,20 @@ describe( 'Widgets Customizer', () => {
 		await deactivatePlugin(
 			'gutenberg-test-plugin-disables-the-css-animations'
 		);
+		// Disable the transition timing function to make it "snap".
+		// We can't disable all the transitions yet because of #32024.
+		await page.evaluateOnNewDocument( () => {
+			const style = document.createElement( 'style' );
+			style.innerHTML = `
+				* {
+					transition-timing-function: step-start !important;
+					animation-timing-function: step-start !important;
+				}
+			`;
+			window.addEventListener( 'DOMContentLoaded', () => {
+				document.head.appendChild( style );
+			} );
+		} );
 		await activatePlugin( 'gutenberg-test-widgets' );
 	} );
 
@@ -101,7 +119,7 @@ describe( 'Widgets Customizer', () => {
 		await searchOption.click();
 
 		const addedSearchBlock = await find( {
-			role: 'group',
+			role: 'document',
 			name: 'Block: Search',
 		} );
 
@@ -145,9 +163,7 @@ describe( 'Widgets Customizer', () => {
 			selector: '.widget-content *',
 		} ).toBeFound( findOptions );
 
-		expect( console ).toHaveWarned(
-			"The page delivered both an 'X-Frame-Options' header and a 'Content-Security-Policy' header with a 'frame-ancestors' directive. Although the 'X-Frame-Options' header alone would have blocked embedding, it has been ignored."
-		);
+		expect( console ).toHaveErrored( twentyTwentyError );
 	} );
 
 	it( 'should open the inspector panel', async () => {
@@ -234,9 +250,7 @@ describe( 'Widgets Customizer', () => {
 
 		await expect( inspectorHeading ).not.toBeVisible();
 
-		expect( console ).toHaveWarned(
-			"The page delivered both an 'X-Frame-Options' header and a 'Content-Security-Policy' header with a 'frame-ancestors' directive. Although the 'X-Frame-Options' header alone would have blocked embedding, it has been ignored."
-		);
+		expect( console ).toHaveErrored( twentyTwentyError );
 	} );
 
 	it( 'should handle the inserter outer section', async () => {
@@ -313,7 +327,7 @@ describe( 'Widgets Customizer', () => {
 		// Focus the block and start typing to hide the block toolbar.
 		// Shouldn't be needed if we automatically hide the toolbar on blur.
 		const paragraphBlock = await find( {
-			role: 'group',
+			role: 'document',
 			name: 'Paragraph block',
 		} );
 		await paragraphBlock.focus();
@@ -345,9 +359,7 @@ describe( 'Widgets Customizer', () => {
 			level: 2,
 		} ).not.toBeFound();
 
-		expect( console ).toHaveWarned(
-			"The page delivered both an 'X-Frame-Options' header and a 'Content-Security-Policy' header with a 'frame-ancestors' directive. Although the 'X-Frame-Options' header alone would have blocked embedding, it has been ignored."
-		);
+		expect( console ).toHaveErrored( twentyTwentyError );
 	} );
 
 	it( 'should move focus to the block', async () => {
@@ -406,7 +418,7 @@ describe( 'Widgets Customizer', () => {
 		await editParagraphWidget.click();
 
 		const firstParagraphBlock = await find( {
-			role: 'group',
+			role: 'document',
 			name: 'Paragraph block',
 			text: 'First Paragraph',
 		} );
@@ -438,15 +450,13 @@ describe( 'Widgets Customizer', () => {
 		await editHeadingWidget.click();
 
 		const headingBlock = await find( {
-			role: 'group',
+			role: 'document',
 			name: 'Block: Heading',
 			text: 'First Heading',
 		} );
 		await expect( headingBlock ).toHaveFocus();
 
-		expect( console ).toHaveWarned(
-			"The page delivered both an 'X-Frame-Options' header and a 'Content-Security-Policy' header with a 'frame-ancestors' directive. Although the 'X-Frame-Options' header alone would have blocked embedding, it has been ignored."
-		);
+		expect( console ).toHaveErrored( twentyTwentyError );
 	} );
 
 	it( 'should clear block selection', async () => {
@@ -510,9 +520,7 @@ describe( 'Widgets Customizer', () => {
 			name: 'Block tools',
 		} ).not.toBeFound();
 
-		expect( console ).toHaveWarned(
-			"The page delivered both an 'X-Frame-Options' header and a 'Content-Security-Policy' header with a 'frame-ancestors' directive. Although the 'X-Frame-Options' header alone would have blocked embedding, it has been ignored."
-		);
+		expect( console ).toHaveErrored( twentyTwentyError );
 	} );
 
 	it( 'should handle legacy widgets', async () => {
@@ -637,10 +645,6 @@ describe( 'Widgets Customizer', () => {
 			disabled: true,
 		} );
 
-		expect( console ).toHaveWarned(
-			"The page delivered both an 'X-Frame-Options' header and a 'Content-Security-Policy' header with a 'frame-ancestors' directive. Although the 'X-Frame-Options' header alone would have blocked embedding, it has been ignored."
-		);
-
 		await page.goto( createURL( '/' ) );
 
 		// Expect the saved widgets to show on frontend.
@@ -696,9 +700,68 @@ describe( 'Widgets Customizer', () => {
 		} ).toBeFound();
 		await expect( paragraphBlock ).toBeVisible();
 
-		expect( console ).toHaveWarned(
-			"The page delivered both an 'X-Frame-Options' header and a 'Content-Security-Policy' header with a 'frame-ancestors' directive. Although the 'X-Frame-Options' header alone would have blocked embedding, it has been ignored."
-		);
+		expect( console ).toHaveErrored( twentyTwentyError );
+	} );
+
+	it( 'should move (inner) blocks to another sidebar', async () => {
+		const widgetsPanel = await find( {
+			role: 'heading',
+			name: /Widgets/,
+			level: 3,
+		} );
+		await widgetsPanel.click();
+
+		const footer1Section = await find( {
+			role: 'heading',
+			name: /Footer #1/,
+			level: 3,
+		} );
+		await footer1Section.click();
+
+		await addBlock( 'Paragraph' );
+		await page.keyboard.type( 'First Paragraph' );
+
+		await showBlockToolbar();
+		await clickBlockToolbarButton( 'Options' );
+		const groupButton = await find( {
+			role: 'menuitem',
+			name: 'Group',
+		} );
+		await groupButton.click();
+
+		// Refocus the paragraph block.
+		const paragraphBlock = await find( {
+			role: 'document',
+			name: 'Paragraph block',
+			value: 'First Paragraph',
+		} );
+		await paragraphBlock.focus();
+		await showBlockToolbar();
+		await clickBlockToolbarButton( 'Move to widget area' );
+
+		const footer2Option = await find( {
+			role: 'menuitemradio',
+			name: 'Footer #2',
+		} );
+		await footer2Option.click();
+
+		// Should switch to and expand Footer #2.
+		await expect( {
+			role: 'heading',
+			name: 'Customizing ▸ Widgets Footer #2',
+		} ).toBeFound();
+
+		// The paragraph block should be moved to the new sidebar and have focus.
+		const movedParagraphBlockQuery = {
+			role: 'document',
+			name: 'Paragraph block',
+			value: 'First Paragraph',
+		};
+		await expect( movedParagraphBlockQuery ).toBeFound();
+		const movedParagraphBlock = await find( movedParagraphBlockQuery );
+		await expect( movedParagraphBlock ).toHaveFocus();
+
+		expect( console ).toHaveErrored( twentyTwentyError );
 	} );
 } );
 
@@ -761,7 +824,7 @@ async function addBlock( blockName ) {
 	await blockOption.click();
 
 	const addedBlock = await find( {
-		role: 'group',
+		role: 'document',
 		selector: '.is-selected[data-block]',
 	} );
 	await addedBlock.focus();

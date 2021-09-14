@@ -803,6 +803,29 @@ export const isSavingPost = createRegistrySelector( ( select ) => ( state ) => {
 } );
 
 /**
+ * Returns true if non-post entities are currently being saved, or false otherwise.
+ *
+ * @param {Object} state Global application state.
+ *
+ * @return {boolean} Whether non-post entities are being saved.
+ */
+export const isSavingNonPostEntityChanges = createRegistrySelector(
+	( select ) => ( state ) => {
+		const entitiesBeingSaved = select(
+			coreStore
+		).__experimentalGetEntitiesBeingSaved();
+		const { type, id } = getCurrentPost( state );
+		return some(
+			entitiesBeingSaved,
+			( entityRecord ) =>
+				entityRecord.kind !== 'postType' ||
+				entityRecord.name !== type ||
+				entityRecord.key !== id
+		);
+	}
+);
+
+/**
  * Returns true if a previous post save was attempted successfully, or false
  * otherwise.
  *
@@ -867,7 +890,7 @@ export function isPreviewingPost( state ) {
 	if ( ! isSavingPost( state ) ) {
 		return false;
 	}
-	return !! state.saving.options.isPreview;
+	return !! get( state.saving, [ 'options', 'isPreview' ] );
 }
 
 /**
@@ -1370,13 +1393,6 @@ export const getBlock = getBlockEditorSelector( 'getBlock' );
  * @see getBlocks in core/block-editor store.
  */
 export const getBlocks = getBlockEditorSelector( 'getBlocks' );
-
-/**
- * @see __unstableGetBlockWithoutInnerBlocks in core/block-editor store.
- */
-export const __unstableGetBlockWithoutInnerBlocks = getBlockEditorSelector(
-	'__unstableGetBlockWithoutInnerBlocks'
-);
 
 /**
  * @see getClientIdsOfDescendants in core/block-editor store.

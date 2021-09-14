@@ -4,6 +4,7 @@
 const { camelCase, nth, upperFirst } = require( 'lodash' );
 const fs = require( 'fs' );
 const glob = require( 'glob' ).sync;
+const { join } = require( 'path' );
 
 const baseRepoUrl = '..';
 const componentPaths = glob( 'packages/components/src/*/**/README.md', {
@@ -14,9 +15,13 @@ const componentPaths = glob( 'packages/components/src/*/**/README.md', {
 		'packages/components/src/view/README.md',
 	],
 } );
-const packagePaths = glob( 'packages/*/package.json' ).map(
-	( fileName ) => fileName.split( '/' )[ 1 ]
-);
+const packagePaths = glob( 'packages/*/package.json' )
+	.filter(
+		// Ignore private packages.
+		( fileName ) =>
+			! require( join( __dirname, '..', '..', fileName ) ).private
+	)
+	.map( ( fileName ) => fileName.split( '/' )[ 1 ] );
 
 /**
  * Generates the package manifest.

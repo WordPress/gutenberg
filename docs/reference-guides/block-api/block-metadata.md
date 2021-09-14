@@ -1,11 +1,6 @@
 # Metadata
 
-To register a new block type using metadata that can be shared between codebase that uses JavaScript and PHP, start by creating a `block.json` file. This file:
-
--   Gives a name to the block type.
--   Defines some important metadata about the registered block type (title, category, icon, description, keywords).
--   Defines the attributes of the block type.
--   Registers all the scripts and styles for your block type.
+Starting in WordPress 5.8 release, we encourage using the `block.json` metadata file as the canonical way to register block types. Here is an example `block.json` file that would define the metadata for a plugin create a notice block.
 
 **Example:**
 
@@ -19,6 +14,7 @@ To register a new block type using metadata that can be shared between codebase 
 	"icon": "star",
 	"description": "Shows warning, error or success notices…",
 	"keywords": [ "alert", "message" ],
+	"version": "1.0.3",
 	"textdomain": "my-plugin",
 	"attributes": {
 		"message": {
@@ -50,9 +46,19 @@ To register a new block type using metadata that can be shared between codebase 
 }
 ```
 
-The same file is also used when [submitting block to Block Directory](/docs/getting-started/tutorials/create-block/submitting-to-block-directory.md).
+## Benefits using the metadata file
 
-## Server-side registration
+The block definition allows code sharing between JavaScript, PHP, and other languages when processing block types stored as JSON, and registering blocks with the `block.json` metadata file provides multiple benefits on top of it.
+
+From a performance perspective, when themes support lazy loading assets, blocks registered with `block.json` will have their asset enqueuing optimized out of the box. The frontend CSS and JavaScript assets listed in the `style` or `script` properties will only be enqueued when the block is present on the page, resulting in reduced page sizes.
+
+Furthermore, because the [Block Type REST API Endpoint](https://developer.wordpress.org/rest-api/reference/block-types/) can only list blocks registered on the server, registering blocks server-side is recommended; using the `block.json` file simplifies this registration.
+
+Last, but not least, the [WordPress Plugins Directory](https://wordpress.org/plugins/) can detect `block.json` files, highlight blocks included in plugins, and extract their metadata. If you wish to [submit your block(s) to the Block Directory](/docs/getting-started/tutorials/create-block/submitting-to-block-directory.md), all blocks contained in your plugin must have a `block.json` file for the Block Directory to recognize them.
+
+## Block registration
+
+### PHP (server-side)
 
 The [`register_block_type`](https://developer.wordpress.org/reference/functions/register_block_type/) function that aims to simplify the block type registration on the server, can read metadata stored in the `block.json` file.
 
@@ -75,9 +81,60 @@ register_block_type(
 );
 ```
 
+### JavaScript (client-side)
+
+When the block is registered on the server, you only need to register the client-side settings on the client using the same block’s name.
+
+**Example:**
+
+```js
+registerBlockType( 'my-plugin/notice', {
+	edit: Edit,
+	// ...other client-side settings
+} );
+```
+
+Although registering the block also on the server with PHP is still recommended for the reasons above, if you want to register it only client-side you can now use `registerBlockType` method from `@wordpress/blocks` package to register a block type using the metadata loaded from `block.json` file.
+
+The function takes two params:
+
+-   `$blockNameOrMetadata` (`string`|`Object`) – block type name (supported previously) or the metadata object loaded from the `block.json` file with a bundler (e.g., webpack) or a custom Babel plugin.
+-   `$settings` (`Object`) – client-side block settings.
+
+It returns the registered block type (`WPBlock`) on success or `undefined` on failure.
+
+**Example:**
+
+```js
+import { registerBlockType } from '@wordpress/blocks';
+import Edit from './edit';
+import metadata from './block.json';
+
+registerBlockType( metadata, {
+	edit: Edit,
+	// ...other client-side settings
+} );
+```
+
 ## Block API
 
 This section describes all the properties that can be added to the `block.json` file to define the behavior and metadata of block types.
+
+### API Version
+
+-   Type: `number`
+-   Optional
+-   Localized: No
+-   Property: `apiVersion`
+-   Default: `1`
+
+```json
+{ "apiVersion": 2 }
+```
+
+The version of the Block API used by the block. The most recent version is `2` and it was introduced in WordPress 5.6.
+
+See the [the API versions documentation](/docs/reference-guides/block-api/block-api-versions.md) for more details.
 
 ### Name
 
@@ -191,6 +248,20 @@ This is a short description for your block, which can be translated with our tra
 ```
 
 Sometimes a block could have aliases that help users discover it while searching. For example, an image block could also want to be discovered by photo. You can do so by providing an array of unlimited terms (which are translated).
+
+### Version
+
+-   Type: `string`
+-   Optional
+-   Localized: No
+-   Property: `version`
+-   Since: `5.8.0`
+
+```json
+{ "version": "1.0.3" }
+```
+
+The current version number of the block, such as 1.0 or 1.0.3. It's similar to how plugins are versioned. This field might be used with block assets to control cache invalidation, and when the block author omits it, then the installed version of WordPress is used instead.
 
 ### Text Domain
 

@@ -17,7 +17,6 @@ import {
 } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
 import { store as coreStore } from '@wordpress/core-data';
-import { store as editorStore } from '@wordpress/editor';
 
 /**
  * Internal dependencies
@@ -50,6 +49,7 @@ export default function TemplatePartEdit( {
 		defaultWrapper,
 		area,
 		enableSelection,
+		hasResolvedReplacements,
 	} = useSelect(
 		( select ) => {
 			const {
@@ -89,7 +89,10 @@ export default function TemplatePartEdit( {
 				  )
 				: false;
 
-			const defaultWrapperElement = select( editorStore )
+			// FIXME: @wordpress/block-library should not depend on @wordpress/editor.
+			// Blocks can be loaded into a *non-post* block editor.
+			// eslint-disable-next-line @wordpress/data-no-store-string-literals
+			const defaultWrapperElement = select( 'core/editor' )
 				.__experimentalGetDefaultTemplatePartAreas()
 				.find( ( { area: value } ) => value === _area )?.area_tag;
 
@@ -100,6 +103,10 @@ export default function TemplatePartEdit( {
 				defaultWrapper: defaultWrapperElement || 'div',
 				area: _area,
 				enableSelection: _enableSelection,
+				hasResolvedReplacements: hasFinishedResolution(
+					'getEntityRecords',
+					availableReplacementArgs
+				),
 			};
 		},
 		[ templatePartId, clientId ]
@@ -157,6 +164,7 @@ export default function TemplatePartEdit( {
 						clientId={ clientId }
 						setAttributes={ setAttributes }
 						enableSelection={ enableSelection }
+						hasResolvedReplacements={ hasResolvedReplacements }
 					/>
 				</TagName>
 			) }
@@ -192,6 +200,7 @@ export default function TemplatePartEdit( {
 			) }
 			{ isEntityAvailable && (
 				<TemplatePartInnerBlocks
+					clientId={ clientId }
 					tagName={ TagName }
 					blockProps={ blockProps }
 					postId={ templatePartId }

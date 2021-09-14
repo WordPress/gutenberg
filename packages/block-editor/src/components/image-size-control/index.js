@@ -14,6 +14,11 @@ import {
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 
+/**
+ * Internal dependencies
+ */
+import useDimensionHandler from './use-dimension-handler';
+
 const IMAGE_SIZE_PRESETS = [ 25, 50, 75, 100 ];
 
 export default function ImageSizeControl( {
@@ -27,11 +32,12 @@ export default function ImageSizeControl( {
 	onChange,
 	onChangeImage = noop,
 } ) {
-	function updateDimensions( nextWidth, nextHeight ) {
-		return () => {
-			onChange( { width: nextWidth, height: nextHeight } );
-		};
-	}
+	const {
+		currentHeight,
+		currentWidth,
+		updateDimension,
+		updateDimensions,
+	} = useDimensionHandler( height, width, imageHeight, imageWidth, onChange );
 
 	return (
 		<>
@@ -53,22 +59,20 @@ export default function ImageSizeControl( {
 							type="number"
 							className="block-editor-image-size-control__width"
 							label={ __( 'Width' ) }
-							value={ width ?? imageWidth ?? '' }
+							value={ currentWidth }
 							min={ 1 }
 							onChange={ ( value ) =>
-								onChange( { width: parseInt( value, 10 ) } )
+								updateDimension( 'width', value )
 							}
 						/>
 						<TextControl
 							type="number"
 							className="block-editor-image-size-control__height"
 							label={ __( 'Height' ) }
-							value={ height ?? imageHeight ?? '' }
+							value={ currentHeight }
 							min={ 1 }
 							onChange={ ( value ) =>
-								onChange( {
-									height: parseInt( value, 10 ),
-								} )
+								updateDimension( 'height', value )
 							}
 						/>
 					</div>
@@ -83,8 +87,8 @@ export default function ImageSizeControl( {
 								);
 
 								const isCurrent =
-									width === scaledWidth &&
-									height === scaledHeight;
+									currentWidth === scaledWidth &&
+									currentHeight === scaledHeight;
 
 								return (
 									<Button
@@ -94,17 +98,19 @@ export default function ImageSizeControl( {
 											isCurrent ? 'primary' : undefined
 										}
 										isPressed={ isCurrent }
-										onClick={ updateDimensions(
-											scaledWidth,
-											scaledHeight
-										) }
+										onClick={ () =>
+											updateDimensions(
+												scaledHeight,
+												scaledWidth
+											)
+										}
 									>
 										{ scale }%
 									</Button>
 								);
 							} ) }
 						</ButtonGroup>
-						<Button isSmall onClick={ updateDimensions() }>
+						<Button isSmall onClick={ () => updateDimensions() }>
 							{ __( 'Reset' ) }
 						</Button>
 					</div>

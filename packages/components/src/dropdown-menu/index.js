@@ -96,7 +96,6 @@ function DropdownMenu( {
 
 					if ( ! isOpen && event.keyCode === DOWN ) {
 						event.preventDefault();
-						event.stopPropagation();
 						onToggle();
 					}
 				};
@@ -174,9 +173,11 @@ function DropdownMenu( {
 												indexOfSet > 0 &&
 												indexOfControl === 0,
 											'is-active': control.isActive,
+											'is-icon-only': ! control.title,
 										}
 									) }
 									icon={ control.icon }
+									label={ control.label }
 									aria-checked={
 										control.role === 'menuitemcheckbox' ||
 										control.role === 'menuitemradio'

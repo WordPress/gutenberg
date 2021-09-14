@@ -1,8 +1,8 @@
 /**
  * External dependencies
  */
-import { AccessibilityInfo, Image } from 'react-native';
-import { act, render, fireEvent } from '@testing-library/react-native';
+import { Image } from 'react-native';
+import { render, fireEvent, waitFor } from 'test/helpers';
 
 /**
  * WordPress dependencies
@@ -50,16 +50,10 @@ const attributes = {
 	url: 'mock-url',
 };
 
-const isScreenReaderEnabled = Promise.resolve( true );
 beforeAll( () => {
 	// Mock Image.getSize to avoid failed attempt to size non-existant image
 	const getSizeSpy = jest.spyOn( Image, 'getSize' );
 	getSizeSpy.mockImplementation( ( _url, callback ) => callback( 300, 200 ) );
-
-	// Mock async native module to avoid act warning
-	AccessibilityInfo.isScreenReaderEnabled = jest.fn(
-		() => isScreenReaderEnabled
-	);
 
 	// Register required blocks
 	registerBlockType( name, {
@@ -106,60 +100,50 @@ describe( 'when no media is attached', () => {
 } );
 
 describe( 'when an image is attached', () => {
-	// The skipped tests below pass but are currently skipped because multiple
-	// async findBy* queries currently cause errors in test output
-	// https://git.io/JYYGE
-
-	// eslint-disable-next-line jest/no-disabled-tests
-	it.skip( 'edits the image', async () => {
-		const { getByLabelText, findByText } = render(
+	it( 'edits the image', async () => {
+		const { getByLabelText, getByText } = render(
 			<CoverEdit
 				attributes={ attributes }
 				setAttributes={ setAttributes }
 			/>
 		);
-		// Await async update to component state to avoid act warning
-		await act( () => isScreenReaderEnabled );
+
 		fireEvent.press( getByLabelText( 'Edit image' ) );
-		const editButton = await findByText( 'Edit' );
+		const editButton = await waitFor( () => getByText( 'Edit' ) );
 		fireEvent.press( editButton );
 
 		expect( requestMediaEditor ).toHaveBeenCalled();
 	} );
 
-	// eslint-disable-next-line jest/no-disabled-tests
-	it.skip( 'replaces the image', async () => {
-		const { getByLabelText, findByText } = render(
+	it( 'replaces the image', async () => {
+		const { getByLabelText, getByText } = render(
 			<CoverEdit
 				attributes={ attributes }
 				setAttributes={ setAttributes }
 			/>
 		);
-		// Await async update to component state to avoid act warning
-		await act( () => isScreenReaderEnabled );
 		fireEvent.press( getByLabelText( 'Edit image' ) );
-		const replaceButton = await findByText( 'Replace' );
+		const replaceButton = await waitFor( () => getByText( 'Replace' ) );
 		fireEvent.press( replaceButton );
-		const mediaLibraryButton = await findByText(
-			'WordPress Media Library'
+		const mediaLibraryButton = await waitFor( () =>
+			getByText( 'WordPress Media Library' )
 		);
 		fireEvent.press( mediaLibraryButton );
 
 		expect( requestMediaPicker ).toHaveBeenCalled();
 	} );
 
-	// eslint-disable-next-line jest/no-disabled-tests
-	it.skip( 'clears the image within image edit button', async () => {
-		const { getByLabelText, findAllByText } = render(
+	it( 'clears the image within image edit button', async () => {
+		const { getByLabelText, getAllByText } = render(
 			<CoverEdit
 				attributes={ attributes }
 				setAttributes={ setAttributes }
 			/>
 		);
-		// Await async update to component state to avoid act warning
-		await act( () => isScreenReaderEnabled );
 		fireEvent.press( getByLabelText( 'Edit image' ) );
-		const clearMediaButton = await findAllByText( 'Clear Media' );
+		const clearMediaButton = await waitFor( () =>
+			getAllByText( 'Clear Media' )
+		);
 		fireEvent.press( clearMediaButton[ 0 ] );
 
 		expect( setAttributes ).toHaveBeenCalledWith(
@@ -179,9 +163,10 @@ describe( 'when an image is attached', () => {
 				setAttributes={ setAttributes }
 			/>
 		);
-		// Await async update to component state to avoid act warning
-		await act( () => isScreenReaderEnabled );
-		fireEvent.press( getByText( 'Fixed background' ) );
+		const fixedBackgroundButton = await waitFor( () =>
+			getByText( 'Fixed background' )
+		);
+		fireEvent.press( fixedBackgroundButton );
 
 		expect( setAttributes ).toHaveBeenCalledWith(
 			expect.objectContaining( {
@@ -197,9 +182,10 @@ describe( 'when an image is attached', () => {
 				setAttributes={ setAttributes }
 			/>
 		);
-		// Await async update to component state to avoid act warning
-		await act( () => isScreenReaderEnabled );
-		fireEvent.press( getByText( 'Edit focal point' ) );
+		const editFocalPointButton = await waitFor( () =>
+			getByText( 'Edit focal point' )
+		);
+		fireEvent.press( editFocalPointButton );
 		fireEvent(
 			getByTestId( 'Slider Y-Axis Position' ),
 			'valueChange',
@@ -221,9 +207,10 @@ describe( 'when an image is attached', () => {
 				setAttributes={ setAttributes }
 			/>
 		);
-		// Await async update to component state to avoid act warning
-		await act( () => isScreenReaderEnabled );
-		fireEvent.press( getByText( 'Edit focal point' ) );
+		const editFocalPointButton = await waitFor( () =>
+			getByText( 'Edit focal point' )
+		);
+		fireEvent.press( editFocalPointButton );
 		fireEvent.press(
 			getByText( ( attributes.focalPoint.x * 100 ).toString() )
 		);
@@ -244,9 +231,10 @@ describe( 'when an image is attached', () => {
 				setAttributes={ setAttributes }
 			/>
 		);
-		// Await async update to component state to avoid act warning
-		await act( () => isScreenReaderEnabled );
-		fireEvent.press( getByText( 'Edit focal point' ) );
+		const editFocalPointButton = await waitFor( () =>
+			getByText( 'Edit focal point' )
+		);
+		fireEvent.press( editFocalPointButton );
 		fireEvent.press(
 			getByText( ( attributes.focalPoint.x * 100 ).toString() )
 		);
@@ -267,9 +255,10 @@ describe( 'when an image is attached', () => {
 				setAttributes={ setAttributes }
 			/>
 		);
-		// Await async update to component state to avoid act warning
-		await act( () => isScreenReaderEnabled );
-		fireEvent.press( getByText( 'Clear Media' ) );
+		const clearMediaButton = await waitFor( () =>
+			getByText( 'Clear Media' )
+		);
+		fireEvent.press( clearMediaButton );
 
 		expect( setAttributes ).toHaveBeenCalledWith(
 			expect.objectContaining( {

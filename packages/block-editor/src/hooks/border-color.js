@@ -9,6 +9,7 @@ import classnames from 'classnames';
 import { addFilter } from '@wordpress/hooks';
 import { __ } from '@wordpress/i18n';
 import { createHigherOrderComponent } from '@wordpress/compose';
+import { useState } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -48,8 +49,18 @@ export function BorderColorEdit( props ) {
 	const colors = useSetting( 'color.palette' ) || EMPTY_ARRAY;
 	const disableCustomColors = ! useSetting( 'color.custom' );
 	const disableCustomGradients = ! useSetting( 'color.customGradient' );
+	const [ colorValue, setColorValue ] = useState(
+		() =>
+			getColorObjectByAttributeValues(
+				colors,
+				borderColor,
+				style?.border?.color
+			)?.color
+	);
 
 	const onChangeColor = ( value ) => {
+		setColorValue( value );
+
 		const colorObject = getColorObjectByColorValue( colors, value );
 		const newStyle = {
 			...style,
@@ -70,8 +81,8 @@ export function BorderColorEdit( props ) {
 
 	return (
 		<ColorGradientControl
-			label={ __( 'Border color' ) }
-			value={ borderColor || style?.border?.color }
+			label={ __( 'Color' ) }
+			colorValue={ colorValue }
 			colors={ colors }
 			gradients={ undefined }
 			disableCustomColors={ disableCustomColors }

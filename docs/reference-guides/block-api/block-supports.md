@@ -88,11 +88,12 @@ supports: {
     -   `background`: type `boolean`, default value `true`
     -   `__experimentalDuotone`: type `string`, default value undefined
     -   `gradients`: type `boolean`, default value `false`
+    -   `link`: type `boolean`, default value `false`
     -   `text`: type `boolean`, default value `true`
 
 This value signals that a block supports some of the properties related to color. When it does, the block editor will show UI controls for the user to set their values.
 
-Note that the `text` and `background` keys have a default value of `true`, so if the `color` property is present they'll also be considered enabled:
+Note that the `background` and `text` keys have a default value of `true`, so if the `color` property is present they'll also be considered enabled:
 
 ```js
 supports: {
@@ -122,7 +123,7 @@ When color support is declared, this property is enabled by default (along with 
 
 ```js
 supports: {
-    color: true // Enable both background and text
+    color: true // Enables background and text
 }
 ```
 
@@ -225,7 +226,7 @@ This property adds UI controls which allow the user to apply a gradient backgrou
 ```js
 supports: {
     color: {
-        gradient: true,
+        gradients: true,
 
         // Default values must be disabled if you don't want to use them with gradient.
         background: false,
@@ -266,7 +267,67 @@ When the block declares support for `color.gradient`, the attributes definition 
           type: 'object',
           default: {
               color: {
-                  background: 'linear-gradient(135deg,rgb(170,187,204) 0%,rgb(17,34,51) 100%)',
+                  gradient: 'linear-gradient(135deg,rgb(170,187,204) 0%,rgb(17,34,51) 100%)',
+              }
+          }
+      }
+  }
+  ```
+
+### color.link
+
+This property adds block controls which allow the user to set link color in a block, link color is disabled by default.
+
+
+```js
+supports: {
+    color: true // Enables only background and text
+}
+```
+
+To enable link color support, set to `true`.
+
+```js
+supports: {
+    color: {
+        link: true
+    }
+}
+```
+
+Link color presets are sourced from the `editor-color-palette` [theme support](/docs/how-to-guides/themes/theme-support.md#block-color-palettes).
+
+
+When the block declares support for `color.link`, the attributes definition is extended to include two new attributes: `linkColor` and `style`:
+
+- `linkColor`: attribute of `string` type with no default assigned.
+
+  When a user chooses from the list of preset link colors, the preset slug is stored in the `linkColor` attribute.
+
+  The block can apply a default preset text color by specifying its own attribute with a default e.g.:
+
+  ```js
+  attributes: {
+      linkColor: {
+          type: 'string',
+          default: 'some-preset-link-color-slug',
+      }
+  }
+  ```
+
+- `style`: attribute of `object` type with no default assigned.
+
+  When a custom link color is selected (i.e. using the custom color picker), the custom color value is stored in the `style.color.link` attribute.
+
+  The block can apply a default custom link color by specifying its own attribute with a default e.g.:
+
+  ```js
+  attributes: {
+      style: {
+          type: 'object',
+          default: {
+              color: {
+                  link: '#ff0000',
               }
           }
       }
@@ -281,7 +342,7 @@ When color support is declared, this property is enabled by default (along with 
 
 ```js
 supports: {
-    color: true // Enable both text and background
+    color: true // Enables background and text, but not link.
 }
 ```
 
@@ -290,7 +351,7 @@ To disable text color support while keeping other color supports enabled, set to
 ```js
 supports: {
     color: {
-        // Disable text color support. Background support is still enabled.
+        // Disable text color support.
         text: false
     }
 }
@@ -488,7 +549,7 @@ A block may want to disable the ability of being converted into a reusable block
 ```js
 supports: {
 	// Don't allow the block to be converted into a reusable block.
-	reusable: false;
+	reusable: false,
 }
 ```
 
@@ -524,4 +585,4 @@ supports: {
 }
 ```
 
-A spacing property may define an array of allowable sides that can be configured. When arbitrary sides are defined only UI controls for those sides are displayed.
+A spacing property may define an array of allowable sides that can be configured. When arbitrary sides are defined only UI controls for those sides are displayed. Axial sides are defined with the `vertical` and `horizontal` terms, and display a single UI control for each axial pair (for example, `vertical` controls both the top and bottom sides). A spacing property may support arbitrary individual sides **or** axial sides, but not a mix of both.

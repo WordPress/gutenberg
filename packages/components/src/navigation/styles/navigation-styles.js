@@ -14,20 +14,21 @@ import { isRTL } from '@wordpress/i18n';
 import { G2, UI } from '../../utils/colors-values';
 import Button from '../../button';
 import { Text } from '../../text';
-import { reduceMotion, space, rtl } from '../../utils';
+import { reduceMotion, rtl } from '../../utils';
+import { space } from '../../ui/utils/space';
 
 export const NavigationUI = styled.div`
 	width: 100%;
 	background-color: ${ G2.darkGray.primary };
 	box-sizing: border-box;
 	color: #f0f0f0;
-	padding: 0 ${ space( 2 ) };
+	padding: 0 ${ space( 4 ) };
 	overflow: hidden;
 `;
 
 export const MenuUI = styled.div`
-	margin-top: ${ space( 3 ) };
-	margin-bottom: ${ space( 3 ) };
+	margin-top: ${ space( 6 ) };
+	margin-bottom: ${ space( 6 ) };
 	display: flex;
 	flex-direction: column;
 	ul {
@@ -36,11 +37,11 @@ export const MenuUI = styled.div`
 		list-style: none;
 	}
 	.components-navigation__back-button {
-		margin-bottom: ${ space( 3 ) };
+		margin-bottom: ${ space( 6 ) };
 	}
 
 	.components-navigation__group + .components-navigation__group {
-		margin-top: ${ space( 3 ) };
+		margin-top: ${ space( 6 ) };
 	}
 `;
 
@@ -70,23 +71,21 @@ export const MenuTitleHeadingUI = styled( Text )`
 	color: ${ G2.gray[ 100 ] };
 	display: flex;
 	justify-content: space-between;
-	margin-bottom: ${ space( 1 ) };
+	margin-bottom: ${ space( 2 ) };
 	padding: ${ () =>
 		isRTL()
-			? `${ space( 0.5 ) } ${ space( 2 ) } ${ space( 0.5 ) } ${ space(
-					1.5
-			  ) }`
-			: `${ space( 0.5 ) } ${ space( 1.5 ) } ${ space( 0.5 ) } ${ space(
-					2
+			? `${ space( 1 ) } ${ space( 4 ) } ${ space( 1 ) } ${ space( 3 ) }`
+			: `${ space( 1 ) } ${ space( 3 ) } ${ space( 1 ) } ${ space(
+					4
 			  ) }` };
 `;
 
 export const MenuTitleActionsUI = styled.span`
-	height: ${ space( 3 ) }; // 24px, same height as the buttons inside
+	height: ${ space( 6 ) }; // 24px, same height as the buttons inside
 
 	.components-button.is-small {
 		color: ${ G2.lightGray.ui };
-		margin-right: ${ space( 0.5 ) }; // Avoid hiding the focus outline
+		margin-right: ${ space( 1 ) }; // Avoid hiding the focus outline
 		padding: 0;
 
 		&:active:not( :disabled ) {
@@ -105,11 +104,11 @@ export const MenuTitleSearchUI = styled.div`
 	position: relative;
 
 	input {
-		height: ${ space( 4.5 ) }; // 36px, same height as MenuTitle
-		margin-bottom: ${ space( 1 ) };
-		padding-left: ${ space( 4 ) }; // Leave room for the search icon
+		height: ${ space( 9 ) }; // 36px, same height as MenuTitle
+		margin-bottom: ${ space( 2 ) };
+		padding-left: ${ space( 8 ) }; // Leave room for the search icon
 		padding-right: ${ space(
-			4
+			8
 		) }; // Leave room for the close search button
 
 		&::-webkit-search-decoration,
@@ -121,7 +120,7 @@ export const MenuTitleSearchUI = styled.div`
 	}
 
 	> svg {
-		left: ${ space( 0.5 ) };
+		left: ${ space( 1 ) };
 		position: absolute;
 		top: 6px;
 	}
@@ -130,7 +129,7 @@ export const MenuTitleSearchUI = styled.div`
 		height: 30px;
 		padding: 0;
 		position: absolute;
-		right: ${ space( 1 ) };
+		right: ${ space( 2 ) };
 		top: 3px;
 
 		&:active:not( :disabled ) {
@@ -143,11 +142,11 @@ export const MenuTitleSearchUI = styled.div`
 `;
 
 export const GroupTitleUI = styled( Text )`
-	margin-top: ${ space( 1 ) };
+	margin-top: ${ space( 2 ) };
 	padding: ${ () =>
 		isRTL()
-			? `${ space( 0.5 ) } ${ space( 2 ) } ${ space( 0.5 ) } 0`
-			: `${ space( 0.5 ) } 0 ${ space( 0.5 ) } ${ space( 2 ) }` };
+			? `${ space( 1 ) } ${ space( 4 ) } ${ space( 1 ) } 0`
+			: `${ space( 1 ) } 0 ${ space( 1 ) } ${ space( 4 ) }` };
 	text-transform: uppercase;
 	color: ${ G2.gray[ 100 ] };
 `;
@@ -162,7 +161,7 @@ export const ItemBaseUI = styled.li`
 	a {
 		width: 100%;
 		color: ${ G2.lightGray.ui };
-		padding: ${ space( 1 ) } ${ space( 2 ) }; /* 8px 16px */
+		padding: ${ space( 2 ) } ${ space( 4 ) }; /* 8px 16px */
 		${ rtl( { textAlign: 'left' }, { textAlign: 'right' } ) }
 
 		&:hover,
@@ -193,7 +192,7 @@ export const ItemUI = styled.div`
 	height: auto;
 	min-height: 40px;
 	margin: 0;
-	padding: ${ space( 0.75 ) } ${ space( 2 ) };
+	padding: ${ space( 1.5 ) } ${ space( 4 ) };
 	font-weight: 400;
 	line-height: 20px;
 	width: 100%;
@@ -201,10 +200,10 @@ export const ItemUI = styled.div`
 `;
 
 export const ItemBadgeUI = styled.span`
-	margin-left: ${ () => ( isRTL() ? '0' : space( 1 ) ) };
-	margin-right: ${ () => ( isRTL() ? space( 1 ) : '0' ) };
+	margin-left: ${ () => ( isRTL() ? '0' : space( 2 ) ) };
+	margin-right: ${ () => ( isRTL() ? space( 2 ) : '0' ) };
 	display: inline-flex;
-	padding: ${ space( 0.5 ) } ${ space( 1.5 ) };
+	padding: ${ space( 1 ) } ${ space( 3 ) };
 	border-radius: 2px;
 	animation: fade-in 250ms ease-out;
 

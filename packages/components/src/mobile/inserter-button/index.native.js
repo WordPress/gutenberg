@@ -9,7 +9,8 @@ import { View, TouchableHighlight, Text } from 'react-native';
 import { Component } from '@wordpress/element';
 import { Icon } from '@wordpress/components';
 import { withPreferredColorScheme } from '@wordpress/compose';
-import { __ } from '@wordpress/i18n';
+import { __, sprintf } from '@wordpress/i18n';
+import { sparkles } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -56,6 +57,16 @@ class MenuItem extends Component {
 
 		const isClipboardBlock = item.id === 'clipboard';
 		const blockTitle = isClipboardBlock ? __( 'Copied block' ) : item.title;
+		const blockIsNew = item.isNew === true;
+		const accessibilityLabelFormat = blockIsNew
+			? // translators: Newly available block name. %s: The localized block name
+			  __( '%s block, newly available' )
+			: // translators: Block name. %s: The localized block name
+			  __( '%s block' );
+		const accessibilityLabel = sprintf(
+			accessibilityLabelFormat,
+			item.title
+		);
 
 		return (
 			<TouchableHighlight
@@ -66,7 +77,7 @@ class MenuItem extends Component {
 				underlayColor="transparent"
 				activeOpacity={ 0.5 }
 				accessibilityRole="button"
-				accessibilityLabel={ `${ item.title } block` }
+				accessibilityLabel={ accessibilityLabel }
 				onPress={ this.onPress }
 				disabled={ item.isDisabled }
 			>
@@ -80,6 +91,12 @@ class MenuItem extends Component {
 							isClipboardBlock && clipboardBlockStyles,
 						] }
 					>
+						{ blockIsNew && (
+							<Icon
+								icon={ sparkles }
+								style={ styles.newIndicator }
+							/>
+						) }
 						<View style={ modalIconStyle }>
 							<Icon
 								icon={ item.icon.src || item.icon }

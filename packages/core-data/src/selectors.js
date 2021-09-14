@@ -9,6 +9,7 @@ import { set, map, find, get, filter, compact } from 'lodash';
  */
 import { createRegistrySelector } from '@wordpress/data';
 import { addQueryArgs } from '@wordpress/url';
+import deprecated from '@wordpress/deprecated';
 
 /**
  * Internal dependencies
@@ -16,7 +17,7 @@ import { addQueryArgs } from '@wordpress/url';
 import { STORE_NAME } from './name';
 import { getQueriedItems } from './queried-data';
 import { DEFAULT_ENTITY_KEY } from './entities';
-import { getNormalizedCommaSeparable } from './utils';
+import { getNormalizedCommaSeparable, isRawAttribute } from './utils';
 
 /**
  * Shared reference to an empty array for cases where it is important to avoid
@@ -47,29 +48,24 @@ export const isRequestingEmbedPreview = createRegistrySelector(
 /**
  * Returns all available authors.
  *
+ * @deprecated since 11.3. Callers should use `select( 'core' ).getUsers({ who: 'authors' })` instead.
+ *
  * @param {Object}           state Data state.
  * @param {Object|undefined} query Optional object of query parameters to
  *                                 include with request.
  * @return {Array} Authors list.
  */
 export function getAuthors( state, query ) {
+	deprecated( "select( 'core' ).getAuthors()", {
+		since: '5.9',
+		alternative: "select( 'core' ).getUsers({ who: 'authors' })",
+	} );
+
 	const path = addQueryArgs(
 		'/wp/v2/users/?who=authors&per_page=100',
 		query
 	);
 	return getUserQueryResults( state, path );
-}
-
-/**
- * Returns all available authors.
- *
- * @param {Object} state Data state.
- * @param {number} id    The author id.
- *
- * @return {Array} Authors list.
- */
-export function __unstableGetAuthor( state, id ) {
-	return get( state, [ 'users', 'byId', id ], null );
 }
 
 /**
@@ -147,17 +143,18 @@ export function getEntityRecord( state, kind, name, key, query ) {
 	if ( ! queriedState ) {
 		return undefined;
 	}
+	const context = query?.context ?? 'default';
 
 	if ( query === undefined ) {
 		// If expecting a complete item, validate that completeness.
-		if ( ! queriedState.itemIsComplete[ key ] ) {
+		if ( ! queriedState.itemIsComplete[ context ]?.[ key ] ) {
 			return undefined;
 		}
 
-		return queriedState.items[ key ];
+		return queriedState.items[ context ][ key ];
 	}
 
-	const item = queriedState.items[ key ];
+	const item = queriedState.items[ context ]?.[ key ];
 	if ( item && query._fields ) {
 		const filteredItem = {};
 		const fields = getNormalizedCommaSeparable( query._fields );
@@ -208,14 +205,18 @@ export const getRawEntityRecord = createSelector(
 		return (
 			record &&
 			Object.keys( record ).reduce( ( accumulator, _key ) => {
-				// Because edits are the "raw" attribute values,
-				// we return those from record selectors to make rendering,
-				// comparisons, and joins with edits easier.
-				accumulator[ _key ] = get(
-					record[ _key ],
-					'raw',
-					record[ _key ]
-				);
+				if ( isRawAttribute( getEntity( state, kind, name ), _key ) ) {
+					// Because edits are the "raw" attribute values,
+					// we return those from record selectors to make rendering,
+					// comparisons, and joins with edits easier.
+					accumulator[ _key ] = get(
+						record[ _key ],
+						'raw',
+						record[ _key ]
+					);
+				} else {
+					accumulator[ _key ] = record[ _key ];
+				}
 				return accumulator;
 			}, {} )
 		);
@@ -311,6 +312,56 @@ export const __experimentalGetDirtyEntityRecords = createSelector(
 		} );
 
 		return dirtyRecords;
+	},
+	( state ) => [ state.entities.data ]
+);
+
+/**
+ * Returns the list of entities currently being saved.
+ *
+ * @param {Object} state State tree.
+ *
+ * @return {[{ title: string, key: string, name: string, kind: string }]} The list of records being saved.
+ */
+export const __experimentalGetEntitiesBeingSaved = createSelector(
+	( state ) => {
+		const {
+			entities: { data },
+		} = state;
+		const recordsBeingSaved = [];
+		Object.keys( data ).forEach( ( kind ) => {
+			Object.keys( data[ kind ] ).forEach( ( name ) => {
+				const primaryKeys = Object.keys(
+					data[ kind ][ name ].saving
+				).filter( ( primaryKey ) =>
+					isSavingEntityRecord( state, kind, name, primaryKey )
+				);
+
+				if ( primaryKeys.length ) {
+					const entity = getEntity( state, kind, name );
+					primaryKeys.forEach( ( primaryKey ) => {
+						const entityRecord = getEditedEntityRecord(
+							state,
+							kind,
+							name,
+							primaryKey
+						);
+						recordsBeingSaved.push( {
+							// We avoid using primaryKey because it's transformed into a string
+							// when it's used as an object key.
+							key:
+								entityRecord[
+									entity.key || DEFAULT_ENTITY_KEY
+								],
+							title: entity?.getTitle?.( entityRecord ) || '',
+							name,
+							kind,
+						} );
+					} );
+				}
+			} );
+		} );
+		return recordsBeingSaved;
 	},
 	( state ) => [ state.entities.data ]
 );

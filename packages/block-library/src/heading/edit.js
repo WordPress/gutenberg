@@ -25,7 +25,7 @@ function HeadingEdit( {
 	setAttributes,
 	mergeBlocks,
 	onReplace,
-	mergedStyle,
+	style,
 	clientId,
 } ) {
 	const { textAlign, content, level, placeholder } = attributes;
@@ -34,7 +34,7 @@ function HeadingEdit( {
 		className: classnames( {
 			[ `has-text-align-${ textAlign }` ]: textAlign,
 		} ),
-		style: mergedStyle,
+		style,
 	} );
 
 	return (

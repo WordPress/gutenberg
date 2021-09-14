@@ -52,7 +52,10 @@ export default class Control {
 		// a fake but unique number.
 		this.number = ++lastNumber;
 
-		this.handleFormChange = debounce( this.saveForm.bind( this ), 200 );
+		this.handleFormChange = debounce(
+			this.handleFormChange.bind( this ),
+			200
+		);
 		this.handleFormSubmit = this.handleFormSubmit.bind( this );
 
 		this.initDOM();
@@ -211,6 +214,18 @@ export default class Control {
 			}
 		} catch ( error ) {
 			this.onError( error );
+		}
+	}
+
+	/**
+	 * Perform a save when a multi widget's form is changed. Non-multi widgets
+	 * are saved manually.
+	 *
+	 * @access private
+	 */
+	handleFormChange() {
+		if ( this.idBase ) {
+			this.saveForm();
 		}
 	}
 

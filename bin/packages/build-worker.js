@@ -92,27 +92,29 @@ async function buildCSS( file ) {
 		makeDir( path.dirname( outputFile ) ),
 		readFile( file, 'utf8' ),
 	] );
+
+	const importLists = [
+		'colors',
+		'breakpoints',
+		'variables',
+		'mixins',
+		'animations',
+		'z-index',
+	]
+		// Editor styles should be excluded from the default CSS vars output.
+		.concat(
+			file.includes( 'common.scss' ) || ! file.includes( 'block-library' )
+				? [ 'default-custom-properties' ]
+				: []
+		)
+		.map( ( imported ) => `@import "${ imported }";` )
+		.join( ' ' );
+
 	const builtSass = await renderSass( {
 		file,
 		includePaths: [ path.join( PACKAGES_DIR, 'base-styles' ) ],
-		data:
-			[
-				'colors',
-				'breakpoints',
-				'variables',
-				'mixins',
-				'animations',
-				'z-index',
-			]
-				// Editor styles should be excluded from the default CSS vars output.
-				.concat(
-					file.includes( 'common.scss' ) ||
-						! file.includes( 'block-library' )
-						? [ 'default-custom-properties' ]
-						: []
-				)
-				.map( ( imported ) => `@import "${ imported }";` )
-				.join( ' ' ) + contents,
+		//
+		data: ''.concat( '@use "sass:math";', importLists, contents ),
 	} );
 
 	const result = await postcss(

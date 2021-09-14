@@ -16,7 +16,7 @@ describe( 'block mover', () => {
 		await page.keyboard.type( 'Second Paragraph' );
 
 		// Select a block so the block mover is rendered.
-		await page.focus( '.block-editor-block-list__block' );
+		await page.focus( '[data-type="core/paragraph"]' );
 
 		await showBlockToolbar();
 

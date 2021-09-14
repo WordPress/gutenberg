@@ -3,9 +3,13 @@
  */
 import { useEffect, useRef } from '@wordpress/element';
 
+/**
+ * External dependencies
+ */
+import { throttle } from 'lodash';
+
 const dragImageClass = 'components-draggable__invisible-drag-image';
 const cloneWrapperClass = 'components-draggable__clone';
-const cloneHeightTransformationBreakpoint = 700;
 const clonePadding = 0;
 const bodyClass = 'is-dragging-components-draggable';
 
@@ -81,6 +85,10 @@ export default function Draggable( {
 		);
 
 		const cloneWrapper = ownerDocument.createElement( 'div' );
+		// Reset position to 0,0. Natural stacking order will position this lower, even with a transform otherwise.
+		cloneWrapper.style.top = 0;
+		cloneWrapper.style.left = 0;
+
 		const dragImage = ownerDocument.createElement( 'div' );
 
 		// Set a fake drag image to avoid browser defaults. Remove from DOM
@@ -98,12 +106,15 @@ export default function Draggable( {
 			cloneWrapper.classList.add( cloneClassname );
 		}
 
+		let x = 0;
+		let y = 0;
 		// If a dragComponent is defined, the following logic will clone the
 		// HTML node and inject it into the cloneWrapper.
 		if ( dragComponentRef.current ) {
 			// Position dragComponent at the same position as the cursor.
-			cloneWrapper.style.top = `${ event.clientY }px`;
-			cloneWrapper.style.left = `${ event.clientX }px`;
+			x = event.clientX;
+			y = event.clientY;
+			cloneWrapper.style.transform = `translate( ${ x }px, ${ y }px )`;
 
 			const clonedDragComponent = ownerDocument.createElement( 'div' );
 			clonedDragComponent.innerHTML = dragComponentRef.current.innerHTML;
@@ -127,22 +138,10 @@ export default function Draggable( {
 			const clone = element.cloneNode( true );
 			clone.id = `clone-${ elementId }`;
 
-			if ( elementRect.height > cloneHeightTransformationBreakpoint ) {
-				// Scale down clone if original element is larger than 700px.
-				cloneWrapper.style.transform = 'scale(0.5)';
-				cloneWrapper.style.transformOrigin = 'top left';
-				// Position clone near the cursor.
-				cloneWrapper.style.top = `${ event.clientY - 100 }px`;
-				cloneWrapper.style.left = `${ event.clientX }px`;
-			} else {
-				// Position clone right over the original element (20px padding).
-				cloneWrapper.style.top = `${
-					elementTopOffset - clonePadding
-				}px`;
-				cloneWrapper.style.left = `${
-					elementLeftOffset - clonePadding
-				}px`;
-			}
+			// Position clone right over the original element (20px padding).
+			x = elementLeftOffset - clonePadding;
+			y = elementTopOffset - clonePadding;
+			cloneWrapper.style.transform = `translate( ${ x }px, ${ y }px )`;
 
 			// Hack: Remove iFrames as it's causing the embeds drag clone to freeze
 			Array.from(
@@ -160,26 +159,30 @@ export default function Draggable( {
 		let cursorTop = event.clientY;
 
 		/**
-		 * @param {import('react').DragEvent} e
+		 * @param {import('react').DragEvent<Element>} e
 		 */
 		function over( e ) {
-			cloneWrapper.style.top = `${
-				parseInt( cloneWrapper.style.top, 10 ) + e.clientY - cursorTop
-			}px`;
-			cloneWrapper.style.left = `${
-				parseInt( cloneWrapper.style.left, 10 ) + e.clientX - cursorLeft
-			}px`;
-
-			// Update cursor coordinates.
+			//Skip doing any work if mouse has not moved.
+			if ( cursorLeft === e.clientX && cursorTop === e.clientY ) {
+				return;
+			}
+			const nextX = x + e.clientX - cursorLeft;
+			const nextY = y + e.clientY - cursorTop;
+			cloneWrapper.style.transform = `translate( ${ nextX }px, ${ nextY }px )`;
 			cursorLeft = e.clientX;
 			cursorTop = e.clientY;
-
+			x = nextX;
+			y = nextY;
 			if ( onDragOver ) {
 				onDragOver( e );
 			}
 		}
 
-		ownerDocument.addEventListener( 'dragover', over );
+		// Aim for 60fps (16 ms per frame) for now. We can potentially use requestAnimationFrame (raf) instead,
+		// note that browsers may throttle raf below 60fps in certain conditions.
+		const throttledDragOver = throttle( over, 16 );
+
+		ownerDocument.addEventListener( 'dragover', throttledDragOver );
 
 		// Update cursor to 'grabbing', document wide.
 		ownerDocument.body.classList.add( bodyClass );
@@ -208,7 +211,7 @@ export default function Draggable( {
 			// Reset cursor.
 			ownerDocument.body.classList.remove( bodyClass );
 
-			ownerDocument.removeEventListener( 'dragover', over );
+			ownerDocument.removeEventListener( 'dragover', throttledDragOver );
 
 			clearTimeout( timerId );
 		};

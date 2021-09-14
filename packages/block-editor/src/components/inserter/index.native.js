@@ -10,7 +10,7 @@ import { delay } from 'lodash';
 import { __ } from '@wordpress/i18n';
 import { Dropdown, ToolbarButton, Picker } from '@wordpress/components';
 import { Component } from '@wordpress/element';
-import { withSelect } from '@wordpress/data';
+import { withDispatch, withSelect } from '@wordpress/data';
 import { compose, withPreferredColorScheme } from '@wordpress/compose';
 import { isUnmodifiedDefaultBlock } from '@wordpress/blocks';
 import {
@@ -20,6 +20,7 @@ import {
 	insertAfter,
 	insertBefore,
 } from '@wordpress/icons';
+import { setBlockTypeImpressions } from '@wordpress/react-native-bridge';
 
 /**
  * Internal dependencies
@@ -32,7 +33,7 @@ import { store as blockEditorStore } from '../../store';
 const VOICE_OVER_ANNOUNCEMENT_DELAY = 1000;
 
 const defaultRenderToggle = ( {
-	canViewEditorOnboarding,
+	displayEditorOnboardingTooltip,
 	onToggle,
 	disabled,
 	style,
@@ -40,7 +41,7 @@ const defaultRenderToggle = ( {
 } ) => (
 	<ToolbarButton
 		title={
-			canViewEditorOnboarding
+			displayEditorOnboardingTooltip
 				? __( 'Tap to add content' )
 				: __( 'Add block' )
 		}
@@ -51,7 +52,7 @@ const defaultRenderToggle = ( {
 				color={ style.color }
 			/>
 		}
-		showTooltip={ canViewEditorOnboarding }
+		showTooltip={ displayEditorOnboardingTooltip }
 		tooltipPosition="top right"
 		onClick={ onToggle }
 		extraProps={ {
@@ -161,7 +162,33 @@ export class Inserter extends Component {
 	}
 
 	onToggle( isOpen ) {
-		const { onToggle } = this.props;
+		const { blockTypeImpressions, onToggle, updateSettings } = this.props;
+
+		if ( ! isOpen ) {
+			const impressionsRemain = Object.values(
+				blockTypeImpressions
+			).some( ( count ) => count > 0 );
+
+			if ( impressionsRemain ) {
+				const decrementedImpressions = Object.entries(
+					blockTypeImpressions
+				).reduce(
+					( acc, [ blockName, count ] ) => ( {
+						...acc,
+						[ blockName ]: Math.max( count - 1, 0 ),
+					} ),
+					{}
+				);
+
+				// Persist block type impression to JavaScript store
+				updateSettings( {
+					impressions: decrementedImpressions,
+				} );
+
+				// Persist block type impression count to native app store
+				setBlockTypeImpressions( decrementedImpressions );
+			}
+		}
 
 		// Surface toggle callback to parent component
 		if ( onToggle ) {
@@ -200,7 +227,7 @@ export class Inserter extends Component {
 	 */
 	renderInserterToggle( { onToggle, isOpen } ) {
 		const {
-			canViewEditorOnboarding,
+			displayEditorOnboardingTooltip,
 			disabled,
 			renderToggle = defaultRenderToggle,
 			getStylesFromColorScheme,
@@ -247,7 +274,7 @@ export class Inserter extends Component {
 		return (
 			<>
 				{ renderToggle( {
-					canViewEditorOnboarding,
+					displayEditorOnboardingTooltip,
 					onToggle: onPress,
 					isOpen,
 					disabled,
@@ -308,6 +335,10 @@ export class Inserter extends Component {
 }
 
 export default compose( [
+	withDispatch( ( dispatch ) => {
+		const { updateSettings } = dispatch( blockEditorStore );
+		return { updateSettings };
+	} ),
 	withSelect( ( select, { clientId, isAppender, rootClientId } ) => {
 		const {
 			getBlockRootClientId,
@@ -378,8 +409,10 @@ export default compose( [
 		const insertionIndexEnd = endOfRootIndex;
 
 		return {
-			canViewEditorOnboarding: getBlockEditorSettings()
-				.canViewEditorOnboarding,
+			blockTypeImpressions: getBlockEditorSettings().impressions,
+			displayEditorOnboardingTooltip:
+				getBlockEditorSettings().editorOnboarding &&
+				getBlockEditorSettings().firstGutenbergEditorSession,
 			destinationRootClientId,
 			insertionIndexDefault: getDefaultInsertionIndex(),
 			insertionIndexBefore,

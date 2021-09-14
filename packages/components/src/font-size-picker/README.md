@@ -7,26 +7,25 @@ The component renders a user interface that allows the user to select predefined
 
 ```jsx
 import { FontSizePicker } from '@wordpress/components';
-import { withState } from '@wordpress/compose';
+import { useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 
-...
-const MyFontSizePicker = withState( {
-	fontSize: 16,
-} )( ( { fontSize, setState } ) => {
-	const fontSizes = [
-		{
-			name: __( 'Small' ),
-			slug: 'small',
-			size: 12,
-		},
-		{
-			name: __( 'Big' ),
-			slug: 'big',
-			size: 26,
-		},
-	];
-	const fallbackFontSize = 16;
+const fontSizes = [
+	{
+		name: __( 'Small' ),
+		slug: 'small',
+		size: 12,
+	},
+	{
+		name: __( 'Big' ),
+		slug: 'big',
+		size: 26,
+	},
+];
+const fallbackFontSize = 16;
+
+const MyFontSizePicker = () => {
+	const [ fontSize, setFontSize ] = useState( 12 );
 
 	return (
 		<FontSizePicker
@@ -34,11 +33,11 @@ const MyFontSizePicker = withState( {
 			value={ fontSize }
 			fallbackFontSize={ fallbackFontSize }
 			onChange={ ( newFontSize ) => {
-				setState( { fontSize: newFontSize } );
+				setFontSize( newFontSize );
 			} }
 		/>
 	);
-} );
+};
 
 ...
 

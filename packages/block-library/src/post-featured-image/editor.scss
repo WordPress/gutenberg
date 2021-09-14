@@ -25,3 +25,10 @@ div[data-type="core/post-featured-image"] {
 		}
 	}
 }
+
+.block-library-post-featured-image-dimension-controls {
+	margin-bottom: $grid-unit-10;
+	&.scale-control-is-visible {
+		margin-bottom: $grid-unit-20;
+	}
+}

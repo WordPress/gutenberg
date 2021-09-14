@@ -1,3 +1,8 @@
+/**
+ * Internal dependencies
+ */
+import { logged } from './utils';
+
 function isDev() {
 	return (
 		typeof process !== 'undefined' &&
@@ -28,6 +33,11 @@ export default function warning( message ) {
 		return;
 	}
 
+	// Skip if already logged.
+	if ( logged.has( message ) ) {
+		return;
+	}
+
 	// eslint-disable-next-line no-console
 	console.warn( message );
 
@@ -39,4 +49,6 @@ export default function warning( message ) {
 	} catch ( x ) {
 		// do nothing
 	}
+
+	logged.add( message );
 }

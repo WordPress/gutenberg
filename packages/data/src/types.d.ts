@@ -30,3 +30,11 @@ export interface WPDataReduxStoreConfig {
 export interface WPDataRegistry {
 	register: ( store: WPDataStore ) => void;
 }
+
+export interface WPDataEmitter {
+	emit: () => void;
+	subscribe: ( listener: () => void ) => () => void;
+	pause: () => void;
+	resume: () => void;
+	isPaused: boolean;
+}

@@ -10,12 +10,64 @@ For each user feature we should also add a importance categorization label  to i
 -->
 
 ## Unreleased
+-   [**] [Embed block] Implement WP embed preview component [#34004]
+-   [*] [Embed block] Fix content disappearing on Android when switching light/dark mode [#34207]
+-   [*] Embed block: Add device's locale to preview content [#33858]
+-   [**] Fix Android-only issue of main toolbar initial position being wrong when RTL [#34617]
+-   [**] Embed block: Implemented the No Preview UI when an embed is successful, but we're unable to show an inline preview [#34626]
+-   [*] Column block: Translate column width's control labels [#34777]
+
+## 1.61.0
+-   [**] Enable embed preview for a list of providers (for now only YouTube and Twitter) [#34446]
+-   [***] Inserter: Add Inserter Block Search [https://github.com/WordPress/gutenberg/pull/33237]
+
+## 1.60.1
+-   [*] RNmobile: Fix the cancel button on Block Variation Picker / Columns Block. [#34249]
+-   [*] Column block: Fix Android close button alignment. [#34332]
+
+## 1.60.0
+-   [**] Embed block: Add "Resize for smaller devices" setting. [#33654]
+
+## 1.59.2
+-   [*] Inserter: Prevent non-deterministic order of inserter items [#34078]
+-   [*] Fix missing block title of core/latest-posts block [#34116]
+
+## 1.59.1
+-   [*] Global styles - Add color to the block styles filter list [#34000]
+-   [*] Rich text - toTree - Add check in replacements before accessing its type [#34020]
+
+## 1.59.0
+-   [*] [Android] Fix UBE's inaccessible "more" toolbar item. [#33740]
+-   [*] Image block: Add a "featured" banner and ability to set or remove an image as featured. (iOS only) [#31345]
+
+## 1.58.3
+-   [*] Rich text - toTree - Add check in replacements before accessing its type [#34020]
+
+## 1.58.2
+-   [*] Fix issue with text input in alt text settings [#33845]
+
+## 1.58.1
+-   [*] Global styles: Check for undefined values and merge user colors [#33707]
+-   [*] [Embed block] Disable paragraph transform [#33745]
+
+## 1.58.0
+-   [***] New Block: Embed block. [#33452]
+
+## 1.57.0
+-   [*] Update loading and failed screens for web version of the editor [#32395]
+-   [*] Handle floating keyboard case - Fix issue with the block selector on iPad. [#33089]
+-   [**] Added color/background customization for text blocks. [#33250]
+
+## 1.56.0
+-   [*] Tweaks to the badge component's styling, including change of background color and reduced padding. [#32865]
+
+## 1.55.2
 -   [**] Fix incorrect block insertion point after blurring the post title field. [#32831]
 
 ## 1.55.1
 -   [*] Fix: RNMobile borderRadius value setting [#32717]
 -   [*] Improve unsupported block message for reusable block [#32618]
-    
+
 ## 1.55.0
 -   [*] Gallery block - Fix gallery images caption text formatting [#32351]
 -   [*] Image block: "Set as featured" button within image block settings. (Android only) [#31705]

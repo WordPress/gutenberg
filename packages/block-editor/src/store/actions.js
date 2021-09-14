@@ -44,6 +44,18 @@ function* ensureDefaultBlock() {
 	// To avoid a focus loss when removing the last block, assure there is
 	// always a default block if the last of the blocks have been removed.
 	if ( count === 0 ) {
+		const { __unstableHasCustomAppender } = yield controls.select(
+			blockEditorStoreName,
+			'getSettings'
+		);
+
+		// If there's an custom appender, don't insert default block.
+		// We have to remember to manually move the focus elsewhere to
+		// prevent it from being lost though.
+		if ( __unstableHasCustomAppender ) {
+			return;
+		}
+
 		return yield insertDefaultBlock();
 	}
 }
@@ -111,6 +123,7 @@ export function* validateBlocksToTemplate( blocks ) {
  *                                 text value. See `wp.richText.create`.
  */
 
+/* eslint-disable jsdoc/valid-types */
 /**
  * Returns an action object used in signalling that selection state should be
  * reset to the specified selection.
@@ -126,6 +139,7 @@ export function resetSelection(
 	selectionEnd,
 	initialPosition
 ) {
+	/* eslint-enable jsdoc/valid-types */
 	return {
 		type: 'RESET_SELECTION',
 		selectionStart,
@@ -139,11 +153,18 @@ export function resetSelection(
  * Unlike resetBlocks, these should be appended to the existing known set, not
  * replacing.
  *
+ * @deprecated
+ *
  * @param {Object[]} blocks Array of block objects.
  *
  * @return {Object} Action object.
  */
 export function receiveBlocks( blocks ) {
+	deprecated( 'wp.data.dispatch( "core/block-editor" ).receiveBlocks', {
+		since: '5.9',
+		alternative: 'resetBlocks or insertBlocks',
+	} );
+
 	return {
 		type: 'RECEIVE_BLOCKS',
 		blocks,
@@ -190,6 +211,7 @@ export function updateBlock( clientId, updates ) {
 	};
 }
 
+/* eslint-disable jsdoc/valid-types */
 /**
  * Returns an action object used in signalling that the block with the
  * specified client ID has been selected, optionally accepting a position
@@ -203,6 +225,7 @@ export function updateBlock( clientId, updates ) {
  * @return {Object} Action object.
  */
 export function selectBlock( clientId, initialPosition = 0 ) {
+	/* eslint-enable jsdoc/valid-types */
 	return {
 		type: 'SELECT_BLOCK',
 		initialPosition,
@@ -370,6 +393,7 @@ function getBlocksWithDefaultStylesApplied( blocks, blockEditorSettings ) {
 	} );
 }
 
+/* eslint-disable jsdoc/valid-types */
 /**
  * Returns an action object signalling that a blocks should be replaced with
  * one or more replacement blocks.
@@ -389,6 +413,7 @@ export function* replaceBlocks(
 	initialPosition = 0,
 	meta
 ) {
+	/* eslint-enable jsdoc/valid-types */
 	clientIds = castArray( clientIds );
 	blocks = getBlocksWithDefaultStylesApplied(
 		castArray( blocks ),
@@ -446,8 +471,20 @@ export function replaceBlock( clientId, block ) {
  * @return {Function} Action creator.
  */
 function createOnMove( type ) {
-	return ( clientIds, rootClientId ) => {
-		return {
+	return function* ( clientIds, rootClientId ) {
+		const canMoveBlocks = yield controls.select(
+			blockEditorStoreName,
+			'canMoveBlocks',
+			clientIds,
+			rootClientId
+		);
+
+		// If one of the blocks is locked or the parent is locked, we cannot move any block.
+		if ( ! canMoveBlocks ) {
+			return;
+		}
+
+		yield {
 			clientIds: castArray( clientIds ),
 			type,
 			rootClientId,
@@ -475,15 +512,22 @@ export function* moveBlocksToPosition(
 	toRootClientId = '',
 	index
 ) {
-	const templateLock = yield controls.select(
+	const canMoveBlocks = yield controls.select(
 		blockEditorStoreName,
-		'getTemplateLock',
+		'canMoveBlocks',
+		clientIds,
 		fromRootClientId
 	);
 
-	// If locking is equal to all on the original clientId (fromRootClientId),
-	// it is not possible to move the block to any other position.
-	if ( templateLock === 'all' ) {
+	const canRemoveBlocks = yield controls.select(
+		blockEditorStoreName,
+		'canRemoveBlocks',
+		clientIds,
+		fromRootClientId
+	);
+
+	// If one of the blocks is locked or the parent is locked, we cannot move any block.
+	if ( ! canMoveBlocks ) {
 		return;
 	}
 
@@ -501,10 +545,9 @@ export function* moveBlocksToPosition(
 		return;
 	}
 
-	// If templateLock is insert we can not remove the block from the parent.
-	// Given that here we know that we are moving the block to a different
-	// parent, the move should not be possible if the condition is true.
-	if ( templateLock === 'insert' ) {
+	// If we're moving to another block, it means we're deleting blocks from
+	// the original block, so we need to check if removing is possible.
+	if ( ! canRemoveBlocks ) {
 		return;
 	}
 
@@ -575,6 +618,7 @@ export function insertBlock(
 	);
 }
 
+/* eslint-disable jsdoc/valid-types */
 /**
  * Returns an action object used in signalling that an array of blocks should
  * be inserted, optionally at a specific index respective a root block list.
@@ -595,6 +639,7 @@ export function* insertBlocks(
 	initialPosition = 0,
 	meta
 ) {
+	/* eslint-enable jsdoc/valid-types */
 	if ( isObject( initialPosition ) ) {
 		meta = initialPosition;
 		initialPosition = 0;
@@ -866,7 +911,8 @@ export function* mergeBlocks( firstBlockClientId, secondBlockClientId ) {
 				},
 			},
 			...blocksWithTheSameType.slice( 1 ),
-		]
+		],
+		0 // If we don't pass the `indexToSelect` it will default to the last block.
 	);
 }
 
@@ -889,12 +935,14 @@ export function* removeBlocks( clientIds, selectPrevious = true ) {
 		'getBlockRootClientId',
 		clientIds[ 0 ]
 	);
-	const isLocked = yield controls.select(
+	const canRemoveBlocks = yield controls.select(
 		blockEditorStoreName,
-		'getTemplateLock',
+		'canRemoveBlocks',
+		clientIds,
 		rootClientId
 	);
-	if ( isLocked ) {
+
+	if ( ! canRemoveBlocks ) {
 		return;
 	}
 
@@ -934,6 +982,7 @@ export function removeBlock( clientId, selectPrevious ) {
 	return removeBlocks( [ clientId ], selectPrevious );
 }
 
+/* eslint-disable jsdoc/valid-types */
 /**
  * Returns an action object used in signalling that the inner blocks with the
  * specified client ID should be replaced.
@@ -950,6 +999,7 @@ export function replaceInnerBlocks(
 	updateSelection = false,
 	initialPosition = 0
 ) {
+	/* eslint-enable jsdoc/valid-types */
 	return {
 		type: 'REPLACE_INNER_BLOCKS',
 		rootClientId,

@@ -6,10 +6,8 @@ import { useCallback, useRef } from '@wordpress/element';
 import { useEntityBlockEditor } from '@wordpress/core-data';
 import {
 	BlockEditorProvider,
-	BlockEditorKeyboardShortcuts,
 	__experimentalLinkControl,
 	BlockInspector,
-	WritingFlow,
 	BlockList,
 	BlockTools,
 	__unstableBlockSettingsMenuFirstItem,
@@ -72,7 +70,6 @@ export default function BlockEditor( { setIsInserterOpen } ) {
 			onChange={ onChange }
 			useSubRegistry={ false }
 		>
-			<BlockEditorKeyboardShortcuts />
 			<TemplatePartConverter />
 			<__experimentalLinkControl.ViewerFill>
 				{ useCallback(
@@ -89,28 +86,28 @@ export default function BlockEditor( { setIsInserterOpen } ) {
 			<SidebarInspectorFill>
 				<BlockInspector />
 			</SidebarInspectorFill>
-			<div className="edit-site-visual-editor">
-				<BlockTools __unstableContentRef={ contentRef }>
-					<Iframe
-						style={ resizedCanvasStyles }
-						head={ <EditorStyles styles={ settings.styles } /> }
-						ref={ ref }
-						contentRef={ mergedRefs }
-					>
-						<WritingFlow>
-							<BlockList
-								className="edit-site-block-editor__block-list"
-								__experimentalLayout={ LAYOUT }
-							/>
-						</WritingFlow>
-					</Iframe>
-				</BlockTools>
+			<BlockTools
+				className="edit-site-visual-editor"
+				__unstableContentRef={ contentRef }
+			>
+				<Iframe
+					style={ resizedCanvasStyles }
+					head={ <EditorStyles styles={ settings.styles } /> }
+					ref={ ref }
+					contentRef={ mergedRefs }
+					name="editor-canvas"
+				>
+					<BlockList
+						className="edit-site-block-editor__block-list wp-site-blocks"
+						__experimentalLayout={ LAYOUT }
+					/>
+				</Iframe>
 				<__unstableBlockSettingsMenuFirstItem>
 					{ ( { onClose } ) => (
 						<BlockInspectorButton onClick={ onClose } />
 					) }
 				</__unstableBlockSettingsMenuFirstItem>
-			</div>
+			</BlockTools>
 		</BlockEditorProvider>
 	);
 }

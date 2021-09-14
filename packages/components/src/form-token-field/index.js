@@ -141,6 +141,10 @@ class FormTokenField extends Component {
 	onKeyDown( event ) {
 		let preventDefault = false;
 
+		if ( event.defaultPrevented ) {
+			return;
+		}
+
 		switch ( event.keyCode ) {
 			case BACKSPACE:
 				preventDefault = this.handleDeleteKey(
@@ -174,7 +178,6 @@ class FormTokenField extends Component {
 				break;
 			case ESCAPE:
 				preventDefault = this.handleEscapeKey( event );
-				event.stopPropagation();
 				break;
 			default:
 				break;

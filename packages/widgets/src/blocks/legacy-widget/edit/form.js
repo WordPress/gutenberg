@@ -8,7 +8,7 @@ import classnames from 'classnames';
 import { useRef, useEffect } from '@wordpress/element';
 import { useDispatch } from '@wordpress/data';
 import { store as noticesStore } from '@wordpress/notices';
-import { __ } from '@wordpress/i18n';
+import { __, sprintf } from '@wordpress/i18n';
 import { Popover } from '@wordpress/components';
 import { useViewportMatch } from '@wordpress/compose';
 /**
@@ -56,12 +56,16 @@ export default function Form( {
 			},
 			onChangeHasPreview,
 			onError( error ) {
+				window.console.error( error );
 				createNotice(
 					'error',
-					error?.message ??
+					sprintf(
+						/* translators: %s: the name of the affected block. */
 						__(
-							'An error occured while fetching or updating the widget.'
-						)
+							'The "%s" block was affected by errors and may not function properly. Check the developer tools for more details.'
+						),
+						idBase || id
+					)
 				);
 			},
 		} );

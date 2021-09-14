@@ -39,9 +39,8 @@ import { store as coreStore } from '@wordpress/core-data';
  * @param {WPTerm[]} terms The terms to extract of helper object.
  * @return {QueryTermsInfo} The object with the terms information.
  */
-export const getTermsInfo = ( terms ) => ( {
-	terms,
-	...terms?.reduce(
+export const getTermsInfo = ( terms ) => {
+	const mapping = terms?.reduce(
 		( accumulator, term ) => {
 			const { mapById, mapByName, names } = accumulator;
 			mapById[ term.id ] = term;
@@ -50,8 +49,13 @@ export const getTermsInfo = ( terms ) => ( {
 			return accumulator;
 		},
 		{ mapById: {}, mapByName: {}, names: [] }
-	),
-} );
+	);
+
+	return {
+		terms,
+		...mapping,
+	};
+};
 
 /**
  * Returns a helper object that contains:
@@ -88,4 +92,24 @@ export const usePostTypes = () => {
 		[ postTypes ]
 	);
 	return { postTypesTaxonomiesMap, postTypesSelectOptions };
+};
+
+/**
+ * Recurses over a list of blocks and returns the first found
+ * Query Loop block's clientId.
+ *
+ * @param {WPBlock[]} blocks The list of blocks to look through.
+ * @return {string=} The first found Query Loop's clientId.
+ */
+export const getFirstQueryClientIdFromBlocks = ( blocks ) => {
+	const blocksQueue = [ ...blocks ];
+	while ( blocksQueue.length > 0 ) {
+		const block = blocksQueue.shift();
+		if ( block.name === 'core/query' ) {
+			return block.clientId;
+		}
+		block.innerBlocks?.forEach( ( innerBlock ) => {
+			blocksQueue.push( innerBlock );
+		} );
+	}
 };

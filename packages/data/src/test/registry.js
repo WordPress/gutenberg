@@ -722,6 +722,40 @@ describe( 'createRegistry', () => {
 		} );
 	} );
 
+	describe( 'batch', () => {
+		it( 'should batch callbacks and only run the subscriber once', () => {
+			const store = registry.registerStore( 'myAwesomeReducer', {
+				reducer: ( state = 0 ) => state + 1,
+			} );
+			const listener = jest.fn();
+			subscribeWithUnsubscribe( listener );
+
+			registry.batch( () => {} );
+			expect( listener ).not.toHaveBeenCalled();
+
+			registry.batch( () => {
+				store.dispatch( { type: 'dummy' } );
+				store.dispatch( { type: 'dummy' } );
+			} );
+			expect( listener ).toHaveBeenCalledTimes( 1 );
+
+			const listener2 = jest.fn();
+			// useSelect subscribes to the stores differently,
+			// This test ensures batching works in this case as well.
+			const unsubscribe = registry.__experimentalSubscribeStore(
+				'myAwesomeReducer',
+				listener2
+			);
+			registry.batch( () => {
+				store.dispatch( { type: 'dummy' } );
+				store.dispatch( { type: 'dummy' } );
+			} );
+			unsubscribe();
+
+			expect( listener2 ).toHaveBeenCalledTimes( 1 );
+		} );
+	} );
+
 	describe( 'use', () => {
 		it( 'should pass through options object to plugin', () => {
 			const expectedOptions = {};

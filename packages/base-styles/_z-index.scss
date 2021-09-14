@@ -43,8 +43,8 @@ $z-layers: (
 	".wp-block-template-part__placeholder-preview-filter-input": 1,
 
 	// Navigation menu dropdown.
-	".has-child .wp-block-navigation-link__container": 28,
-	".has-child:hover .wp-block-navigation-link__container": 29,
+	".has-child .wp-block-navigation__submenu-container": 28,
+	".has-child:hover .wp-block-navigation__submenu-container": 29,
 
 	// Active pill button
 	".components-button {:focus or .is-primary}": 1,
@@ -73,6 +73,9 @@ $z-layers: (
 
 	// The toolbar, when contextual, should be above any adjacent nested block click overlays.
 	".block-editor-block-contextual-toolbar": 61,
+
+	// Ensures content overlay appears higher than resize containers used for image/video/etc.
+	".block-editor-block-content-overlay__overlay": 10,
 
 	// The block mover, particularly in nested contexts,
 	// should overlap most block content.
@@ -138,7 +141,6 @@ $z-layers: (
 	// ...Except for popovers immediately beneath wp-admin menu on large breakpoints
 	".components-popover.block-editor-inserter__popover": 99999,
 	".components-popover.table-of-contents__popover": 99998,
-	".components-popover.block-editor-block-navigation__popover": 99998,
 	".components-popover.customize-widgets-more-menu__content": 99998,
 	".components-popover.edit-post-more-menu__content": 99998,
 	".components-popover.edit-site-more-menu__content": 99998,

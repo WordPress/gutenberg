@@ -14,6 +14,7 @@ import {
 } from '@wordpress/blocks';
 import { useMergeRefs } from '@wordpress/compose';
 import { useSelect } from '@wordpress/data';
+import warning from '@wordpress/warning';
 
 /**
  * Internal dependencies
@@ -22,6 +23,7 @@ import useMovingAnimation from '../../use-moving-animation';
 import { BlockListBlockContext } from '../block';
 import { useFocusFirstElement } from './use-focus-first-element';
 import { useIsHovered } from './use-is-hovered';
+import { useBlockEditContext } from '../../block-edit/context';
 import { useBlockClassNames } from './use-block-class-names';
 import { useBlockDefaultClassName } from './use-block-default-class-name';
 import { useBlockCustomClassName } from './use-block-custom-class-name';
@@ -65,6 +67,7 @@ export function useBlockProps( props = {}, { __unstableIsHtml } = {} ) {
 		index,
 		mode,
 		name,
+		blockApiVersion,
 		blockTitle,
 		isPartOfSelection,
 		adjustScrolling,
@@ -89,11 +92,14 @@ export function useBlockProps( props = {}, { __unstableIsHtml } = {} ) {
 				isAncestorMultiSelected( clientId );
 			const blockName = getBlockName( clientId );
 			const rootClientId = getBlockRootClientId( clientId );
+			const blockType = getBlockType( blockName );
+
 			return {
 				index: getBlockIndex( clientId, rootClientId ),
 				mode: getBlockMode( clientId ),
 				name: blockName,
-				blockTitle: getBlockType( blockName ).title,
+				blockApiVersion: blockType?.apiVersion || 1,
+				blockTitle: blockType?.title,
 				isPartOfSelection: isSelected || isPartOfMultiSelection,
 				adjustScrolling:
 					isSelected || isFirstMultiSelectedBlock( clientId ),
@@ -128,13 +134,21 @@ export function useBlockProps( props = {}, { __unstableIsHtml } = {} ) {
 		} ),
 	] );
 
+	const blockEditContext = useBlockEditContext();
+	// Ensures it warns only inside the `edit` implementation for the block.
+	if ( blockApiVersion < 2 && clientId === blockEditContext.clientId ) {
+		warning(
+			`Block type "${ name }" must support API version 2 or higher to work correctly with "useBlockProps" method.`
+		);
+	}
+
 	return {
 		...wrapperProps,
 		...props,
 		ref: mergedRefs,
 		id: `block-${ clientId }${ htmlSuffix }`,
 		tabIndex: 0,
-		role: 'group',
+		role: 'document',
 		'aria-label': blockLabel,
 		'data-block': clientId,
 		'data-type': name,

@@ -32,7 +32,7 @@ function GroupEdit( {
 	isSelected,
 	isLastInnerBlockSelected,
 	getStylesFromColorScheme,
-	mergedStyle,
+	style,
 	blockWidth,
 } ) {
 	const { align } = attributes;
@@ -79,13 +79,13 @@ function GroupEdit( {
 		<View
 			style={ [
 				isSelected && hasInnerBlocks && styles.innerBlocks,
-				mergedStyle,
+				style,
 				isSelected &&
 					hasInnerBlocks &&
-					mergedStyle?.backgroundColor &&
+					style?.backgroundColor &&
 					styles.hasBackgroundAppender,
 				isLastInnerBlockSelected &&
-					mergedStyle?.backgroundColor &&
+					style?.backgroundColor &&
 					styles.isLastInnerBlockSelected,
 			] }
 		>

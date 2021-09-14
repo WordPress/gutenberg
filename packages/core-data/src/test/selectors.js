@@ -11,7 +11,9 @@ import {
 	__experimentalGetEntityRecordNoResolver,
 	hasEntityRecords,
 	getEntityRecords,
+	getRawEntityRecord,
 	__experimentalGetDirtyEntityRecords,
+	__experimentalGetEntitiesBeingSaved,
 	getEntityRecordNonTransientEdits,
 	getEmbedPreview,
 	isPreviewEmbedFallback,
@@ -74,10 +76,14 @@ describe.each( [
 						postType: {
 							queriedData: {
 								items: {
-									post: { slug: 'post' },
+									default: {
+										post: { slug: 'post' },
+									},
 								},
 								itemIsComplete: {
-									post: true,
+									default: {
+										post: true,
+									},
 								},
 								queries: {},
 							},
@@ -105,14 +111,18 @@ describe.each( [
 						post: {
 							queriedData: {
 								items: {
-									1: {
-										id: 1,
-										content: 'chicken',
-										author: 'bob',
+									default: {
+										1: {
+											id: 1,
+											content: 'chicken',
+											author: 'bob',
+										},
 									},
 								},
 								itemIsComplete: {
-									1: true,
+									default: {
+										1: true,
+									},
 								},
 								queries: {},
 							},
@@ -168,15 +178,21 @@ describe( 'hasEntityRecords', () => {
 						postType: {
 							queriedData: {
 								items: {
-									post: { slug: 'post' },
-									page: { slug: 'page' },
+									default: {
+										post: { slug: 'post' },
+										page: { slug: 'page' },
+									},
 								},
 								itemIsComplete: {
-									post: true,
-									page: true,
+									default: {
+										post: true,
+										page: true,
+									},
 								},
 								queries: {
-									'': [ 'post', 'page' ],
+									default: {
+										'': [ 'post', 'page' ],
+									},
 								},
 							},
 						},
@@ -186,6 +202,76 @@ describe( 'hasEntityRecords', () => {
 		} );
 
 		expect( hasEntityRecords( state, 'root', 'postType' ) ).toBe( true );
+	} );
+} );
+
+describe( 'getRawEntityRecord', () => {
+	const data = {
+		someKind: {
+			someName: {
+				queriedData: {
+					items: {
+						default: {
+							post: {
+								title: {
+									raw: { html: '<h1>post</h1>' },
+									rendered:
+										'<div id="post"><h1>rendered post</h1></div>',
+								},
+							},
+						},
+					},
+					itemIsComplete: {
+						default: {
+							post: true,
+						},
+					},
+					queries: {},
+				},
+			},
+		},
+	};
+	it( 'should preserve the structure of `raw` field by default', () => {
+		const state = deepFreeze( {
+			entities: {
+				config: [
+					{
+						kind: 'someKind',
+						name: 'someName',
+					},
+				],
+				data: { ...data },
+			},
+		} );
+		expect(
+			getRawEntityRecord( state, 'someKind', 'someName', 'post' )
+		).toEqual( {
+			title: {
+				raw: { html: '<h1>post</h1>' },
+				rendered: '<div id="post"><h1>rendered post</h1></div>',
+			},
+		} );
+	} );
+	it( 'should flatten the structure of `raw` field for entities configured with rawAttributes', () => {
+		const state = deepFreeze( {
+			entities: {
+				config: [
+					{
+						kind: 'someKind',
+						name: 'someName',
+						rawAttributes: [ 'title' ],
+					},
+				],
+				data: { ...data },
+			},
+		} );
+		expect(
+			getRawEntityRecord( state, 'someKind', 'someName', 'post' )
+		).toEqual( {
+			title: {
+				html: '<h1>post</h1>',
+			},
+		} );
 	} );
 } );
 
@@ -227,15 +313,21 @@ describe( 'getEntityRecords', () => {
 						postType: {
 							queriedData: {
 								items: {
-									post: { slug: 'post' },
-									page: { slug: 'page' },
+									default: {
+										post: { slug: 'post' },
+										page: { slug: 'page' },
+									},
 								},
 								itemIsComplete: {
-									post: true,
-									page: true,
+									default: {
+										post: true,
+										page: true,
+									},
 								},
 								queries: {
-									'': [ 'post', 'page' ],
+									default: {
+										'': [ 'post', 'page' ],
+									},
 								},
 							},
 						},
@@ -257,17 +349,23 @@ describe( 'getEntityRecords', () => {
 						post: {
 							queriedData: {
 								items: {
-									1: {
-										id: 1,
-										content: 'chicken',
-										author: 'bob',
+									default: {
+										1: {
+											id: 1,
+											content: 'chicken',
+											author: 'bob',
+										},
 									},
 								},
 								itemIsComplete: {
-									1: true,
+									default: {
+										1: true,
+									},
 								},
 								queries: {
-									'_fields=id%2Ccontent': [ 1 ],
+									default: {
+										'_fields=id%2Ccontent': [ 1 ],
+									},
 								},
 							},
 						},
@@ -335,16 +433,20 @@ describe( '__experimentalGetDirtyEntityRecords', () => {
 						someName: {
 							queriedData: {
 								items: {
-									someKey: {
-										someProperty: 'somePersistedValue',
-										someRawProperty: {
-											raw: 'somePersistedRawValue',
+									default: {
+										someKey: {
+											someProperty: 'somePersistedValue',
+											someRawProperty: {
+												raw: 'somePersistedRawValue',
+											},
+											id: 'someKey',
 										},
-										id: 'someKey',
 									},
 								},
 								itemIsComplete: {
-									someKey: true,
+									default: {
+										someKey: true,
+									},
 								},
 							},
 							edits: {
@@ -361,6 +463,54 @@ describe( '__experimentalGetDirtyEntityRecords', () => {
 			},
 		} );
 		expect( __experimentalGetDirtyEntityRecords( state ) ).toEqual( [
+			{ kind: 'someKind', name: 'someName', key: 'someKey', title: '' },
+		] );
+	} );
+} );
+
+describe( '__experimentalGetEntitiesBeingSaved', () => {
+	it( "should return a map of objects with each raw entity record that's being saved", () => {
+		const state = deepFreeze( {
+			entities: {
+				config: [
+					{
+						kind: 'someKind',
+						name: 'someName',
+						transientEdits: { someTransientEditProperty: true },
+					},
+				],
+				data: {
+					someKind: {
+						someName: {
+							queriedData: {
+								items: {
+									default: {
+										someKey: {
+											someProperty: 'somePersistedValue',
+											someRawProperty: {
+												raw: 'somePersistedRawValue',
+											},
+											id: 'someKey',
+										},
+									},
+								},
+								itemIsComplete: {
+									default: {
+										someKey: true,
+									},
+								},
+							},
+							saving: {
+								someKey: {
+									pending: true,
+								},
+							},
+						},
+					},
+				},
+			},
+		} );
+		expect( __experimentalGetEntitiesBeingSaved( state ) ).toEqual( [
 			{ kind: 'someKind', name: 'someName', key: 'someKey', title: '' },
 		] );
 	} );
@@ -475,10 +625,17 @@ describe( 'canUserEditEntityRecord', () => {
 						postType: {
 							queriedData: {
 								items: {
-									post: { slug: 'post', __unstable: 'posts' },
+									default: {
+										post: {
+											slug: 'post',
+											__unstable: 'posts',
+										},
+									},
 								},
 								itemIsComplete: {
-									post: true,
+									default: {
+										post: true,
+									},
 								},
 								queries: {},
 							},

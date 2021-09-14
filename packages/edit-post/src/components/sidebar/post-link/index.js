@@ -68,6 +68,8 @@ function PostLink( {
 					<TextControl
 						label={ __( 'URL Slug' ) }
 						value={ forceEmptyField ? '' : postSlug }
+						autoComplete="off"
+						spellCheck="false"
 						onChange={ ( newValue ) => {
 							editPermalink( newValue );
 							// When we delete the field the permalink gets
@@ -93,7 +95,11 @@ function PostLink( {
 					/>
 					<p>
 						{ __( 'The last part of the URL.' ) }{ ' ' }
-						<ExternalLink href="https://wordpress.org/support/article/writing-posts/#post-field-descriptions">
+						<ExternalLink
+							href={ __(
+								'https://wordpress.org/support/article/writing-posts/#post-field-descriptions'
+							) }
+						>
 							{ __( 'Read about permalinks' ) }
 						</ExternalLink>
 					</p>

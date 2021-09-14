@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { render, fireEvent } from '@testing-library/react';
+import { render, fireEvent, screen } from '@testing-library/react';
 
 /**
  * WordPress dependencies
@@ -188,6 +188,93 @@ describe( 'BoxControl', () => {
 				top: '100px',
 				right: undefined,
 				bottom: '100px',
+				left: undefined,
+			} );
+		} );
+	} );
+
+	describe( 'Unit selections', () => {
+		it( 'should update unlinked controls unit selection based on all input control', () => {
+			// Render control
+			render( <BoxControl /> );
+
+			// Make unit selection on all input control
+			const allUnitSelect = screen.getByLabelText( 'Select unit' );
+			allUnitSelect.focus();
+			fireEvent.change( allUnitSelect, { target: { value: 'em' } } );
+
+			// Unlink the controls
+			const unlink = screen.getByLabelText( /Unlink Sides/ );
+			fireEvent.click( unlink );
+
+			// Confirm that each individual control has the selected unit
+			const unlinkedSelects = screen.getAllByDisplayValue( 'em' );
+			expect( unlinkedSelects.length ).toEqual( 4 );
+		} );
+
+		it( 'should use individual side attribute unit when available', () => {
+			// Render control
+			const { rerender } = render( <BoxControl /> );
+
+			// Make unit selection on all input control
+			const allUnitSelect = screen.getByLabelText( 'Select unit' );
+			allUnitSelect.focus();
+			fireEvent.change( allUnitSelect, { target: { value: 'vw' } } );
+
+			// Unlink the controls
+			const unlink = screen.getByLabelText( /Unlink Sides/ );
+			fireEvent.click( unlink );
+
+			// Confirm that each individual control has the selected unit
+			const unlinkedSelects = screen.getAllByDisplayValue( 'vw' );
+			expect( unlinkedSelects.length ).toEqual( 4 );
+
+			// Rerender with individual side value & confirm unit is selected.
+			rerender( <BoxControl values={ { top: '2.5em' } } /> );
+
+			const topSelect = screen.getByDisplayValue( 'em' );
+			const otherSelects = screen.getAllByDisplayValue( 'vw' );
+
+			expect( topSelect ).toBeInTheDocument();
+			expect( otherSelects.length ).toEqual( 3 );
+		} );
+	} );
+
+	describe( 'onChange updates', () => {
+		it( 'should call onChange when values contain more than just CSS units', () => {
+			const setState = jest.fn();
+
+			render( <BoxControl onChange={ setState } /> );
+
+			const input = screen.getByLabelText( 'Box Control', {
+				selector: 'input',
+			} );
+
+			input.focus();
+			fireEvent.change( input, { target: { value: '7.5rem' } } );
+			fireEvent.keyDown( input, { keyCode: ENTER } );
+
+			expect( setState ).toHaveBeenCalledWith( {
+				top: '7.5rem',
+				right: '7.5rem',
+				bottom: '7.5rem',
+				left: '7.5rem',
+			} );
+		} );
+
+		it( 'should not pass invalid CSS unit only values to onChange', () => {
+			const setState = jest.fn();
+
+			render( <BoxControl onChange={ setState } /> );
+
+			const allUnitSelect = screen.getByLabelText( 'Select unit' );
+			allUnitSelect.focus();
+			fireEvent.change( allUnitSelect, { target: { value: 'rem' } } );
+
+			expect( setState ).toHaveBeenCalledWith( {
+				top: undefined,
+				right: undefined,
+				bottom: undefined,
 				left: undefined,
 			} );
 		} );

@@ -46,13 +46,17 @@ export function BorderPanel( props ) {
 		<InspectorControls>
 			<PanelBody
 				className="block-editor-hooks__border-controls"
-				title={ __( 'Border settings' ) }
+				title={ __( 'Border' ) }
 				initialOpen={ false }
 			>
-				{ isStyleSupported && <BorderStyleEdit { ...props } /> }
-				{ isWidthSupported && <BorderWidthEdit { ...props } /> }
-				{ isRadiusSupported && <BorderRadiusEdit { ...props } /> }
+				{ ( isWidthSupported || isStyleSupported ) && (
+					<div className="block-editor-hooks__border-controls-row">
+						{ isWidthSupported && <BorderWidthEdit { ...props } /> }
+						{ isStyleSupported && <BorderStyleEdit { ...props } /> }
+					</div>
+				) }
 				{ isColorSupported && <BorderColorEdit { ...props } /> }
+				{ isRadiusSupported && <BorderRadiusEdit { ...props } /> }
 			</PanelBody>
 		</InspectorControls>
 	);

@@ -16,6 +16,7 @@ export {
 	default as Animate,
 	getAnimateClassName as __unstableGetAnimateClassName,
 } from './animate';
+export { __unstableMotion } from './animation';
 export { default as AnglePickerControl } from './angle-picker-control';
 export {
 	default as Autocomplete,
@@ -62,14 +63,15 @@ export { DuotoneSwatch, DuotonePicker } from './duotone-picker';
 export { Elevation as __experimentalElevation } from './elevation';
 export { default as ExternalLink } from './external-link';
 export { Flex, FlexBlock, FlexItem } from './flex';
+export { Flyout as __experimentalFlyout } from './flyout';
 export { default as FocalPointPicker } from './focal-point-picker';
 export { default as FocusableIframe } from './focusable-iframe';
 export { default as FontSizePicker } from './font-size-picker';
 export { default as FormFileUpload } from './form-file-upload';
 export { default as FormToggle } from './form-toggle';
 export { default as FormTokenField } from './form-token-field';
-export { default as __experimentalGradientPicker } from './gradient-picker';
-export { default as __experimentalCustomGradientPicker } from './custom-gradient-picker';
+export { default as GradientPicker } from './gradient-picker';
+export { default as CustomGradientPicker } from './custom-gradient-picker';
 export { Grid as __experimentalGrid } from './grid';
 export { default as Guide } from './guide';
 export { default as GuidePage } from './guide/page';
@@ -77,6 +79,10 @@ export { Heading as __experimentalHeading } from './heading';
 export { HStack as __experimentalHStack } from './h-stack';
 export { default as Icon } from './icon';
 export { default as IconButton } from './button/deprecated';
+export {
+	ItemGroup as __experimentalItemGroup,
+	Item as __experimentalItem,
+} from './item-group';
 export { default as __experimentalInputControl } from './input-control';
 export { default as KeyboardShortcuts } from './keyboard-shortcuts';
 export { default as MenuGroup } from './menu-group';
@@ -107,6 +113,7 @@ export { default as RangeControl } from './range-control';
 export { default as ResizableBox } from './resizable-box';
 export { default as ResponsiveWrapper } from './responsive-wrapper';
 export { default as SandBox } from './sandbox';
+export { default as SearchControl } from './search-control';
 export { default as SelectControl } from './select-control';
 export { default as Snackbar } from './snackbar';
 export { default as SnackbarList } from './snackbar/list';
@@ -121,12 +128,21 @@ export { default as TextareaControl } from './textarea-control';
 export { default as TextHighlight } from './text-highlight';
 export { default as Tip } from './tip';
 export { default as ToggleControl } from './toggle-control';
+export {
+	ToggleGroupControl as __experimentalToggleGroupControl,
+	ToggleGroupControlOption as __experimentalToggleGroupControlOption,
+} from './toggle-group-control';
 export { default as Toolbar } from './toolbar';
 export { default as ToolbarButton } from './toolbar-button';
 export { default as ToolbarDropdownMenu } from './toolbar-dropdown-menu';
 export { default as __experimentalToolbarContext } from './toolbar-context';
 export { default as ToolbarGroup } from './toolbar-group';
 export { default as ToolbarItem } from './toolbar-item';
+export {
+	ToolsPanel as __experimentalToolsPanel,
+	ToolsPanelItem as __experimentalToolsPanelItem,
+	ToolsPanelContext as __experimentalToolsPanelContext,
+} from './tools-panel';
 export { default as Tooltip } from './tooltip';
 export {
 	default as __experimentalTreeGrid,
@@ -141,7 +157,7 @@ export {
 	useCustomUnits as __experimentalUseCustomUnits,
 	parseUnit as __experimentalParseUnit,
 } from './unit-control';
-export { default as VisuallyHidden } from './visually-hidden';
+export { VisuallyHidden } from './visually-hidden';
 export { VStack as __experimentalVStack } from './v-stack';
 export { default as IsolatedEventContainer } from './isolated-event-container';
 export {

@@ -21,6 +21,7 @@ const catchException = ( command ) => {
  */
 const {
 	publishNpmLatestDistTag,
+	publishNpmBugfixLatestDistTag,
 	publishNpmNextDistTag,
 } = require( './commands/packages' );
 const { getReleaseChangelog } = require( './commands/changelog' );
@@ -33,6 +34,14 @@ program
 		'Publishes packages to npm (latest dist-tag, production version)'
 	)
 	.action( catchException( publishNpmLatestDistTag ) );
+
+program
+	.command( 'publish-npm-packages-bugfix-latest' )
+	.alias( 'npm-bugfix' )
+	.description(
+		'Publishes bugfixes for packages to npm (latest dist-tag, production version)'
+	)
+	.action( catchException( publishNpmBugfixLatestDistTag ) );
 
 program
 	.command( 'publish-npm-packages-next' )

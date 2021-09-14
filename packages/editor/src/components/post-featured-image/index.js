@@ -220,7 +220,9 @@ const applyWithSelect = withSelect( ( select ) => {
 	const featuredImageId = getEditedPostAttribute( 'featured_media' );
 
 	return {
-		media: featuredImageId ? getMedia( featuredImageId ) : null,
+		media: featuredImageId
+			? getMedia( featuredImageId, { context: 'view' } )
+			: null,
 		currentPostId: getCurrentPostId(),
 		postType: getPostType( getEditedPostAttribute( 'type' ) ),
 		featuredImageId,

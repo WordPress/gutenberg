@@ -40,6 +40,7 @@ class TokenInput extends Component {
 			instanceId,
 			selectedSuggestionIndex,
 			className,
+			onChange,
 			...props
 		} = this.props;
 		const size = value ? value.length + 1 : 0;
@@ -51,7 +52,7 @@ class TokenInput extends Component {
 				type="text"
 				{ ...props }
 				value={ value || '' }
-				onChange={ this.onChange }
+				onChange={ onChange ? this.onChange : undefined }
 				size={ size }
 				className={ classnames(
 					className,

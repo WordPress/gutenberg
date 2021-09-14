@@ -9,7 +9,9 @@ import classnames from 'classnames';
 import {
 	RichText,
 	useBlockProps,
+	__experimentalGetBorderClassesAndStyles as getBorderClassesAndStyles,
 	__experimentalGetColorClassesAndStyles as getColorClassesAndStyles,
+	__experimentalGetSpacingClassesAndStyles as getSpacingClassesAndStyles,
 } from '@wordpress/block-editor';
 
 export default function save( { attributes, className } ) {
@@ -28,18 +30,23 @@ export default function save( { attributes, className } ) {
 		return null;
 	}
 
-	const borderRadius = style?.border?.radius;
+	const borderProps = getBorderClassesAndStyles( attributes );
 	const colorProps = getColorClassesAndStyles( attributes );
+	const spacingProps = getSpacingClassesAndStyles( attributes );
 	const buttonClasses = classnames(
 		'wp-block-button__link',
 		colorProps.className,
+		borderProps.className,
 		{
-			'no-border-radius': borderRadius === 0,
+			// For backwards compatibility add style that isn't provided via
+			// block support.
+			'no-border-radius': style?.border?.radius === 0,
 		}
 	);
 	const buttonStyle = {
-		borderRadius: borderRadius ? borderRadius : undefined,
+		...borderProps.style,
 		...colorProps.style,
+		...spacingProps.style,
 	};
 
 	// The use of a `title` attribute here is soft-deprecated, but still applied

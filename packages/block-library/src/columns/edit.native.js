@@ -6,7 +6,7 @@ import { dropRight, times, map, compact, delay } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { __ } from '@wordpress/i18n';
+import { __, sprintf } from '@wordpress/i18n';
 import {
 	PanelBody,
 	RangeControl,
@@ -107,7 +107,7 @@ function ColumnsEditContainer( {
 	const { width } = sizes || {};
 
 	const units = useCustomUnits( {
-		availableUnits: useSetting( 'layout.units' ) || [
+		availableUnits: useSetting( 'spacing.units' ) || [
 			'%',
 			'px',
 			'em',
@@ -190,9 +190,14 @@ function ColumnsEditContainer( {
 		return innerWidths.map( ( column, index ) => {
 			const { valueUnit = '%' } =
 				getValueAndUnit( column.attributes.width ) || {};
+			const label = sprintf(
+				/* translators: %d: column index. */
+				__( 'Column %d' ),
+				index + 1
+			);
 			return (
 				<UnitControl
-					label={ `Column ${ index + 1 }` }
+					label={ label }
 					settingLabel="Width"
 					key={ `${ column.clientId }-${
 						getWidths( innerWidths ).length
@@ -203,7 +208,6 @@ function ColumnsEditContainer( {
 							? 100
 							: undefined
 					}
-					decimalNum={ 1 }
 					value={ getWidths( innerWidths )[ index ] }
 					onChange={ ( nextWidth ) => {
 						onChange( nextWidth, valueUnit, column.clientId );
@@ -275,7 +279,7 @@ function ColumnsEditContainer( {
 						orientation={
 							columnsInRow > 1 ? 'horizontal' : undefined
 						}
-						horizontal={ true }
+						horizontal={ columnsInRow > 1 }
 						allowedBlocks={ ALLOWED_BLOCKS }
 						contentResizeMode="stretch"
 						onAddBlock={ onAddBlock }
@@ -442,7 +446,7 @@ const ColumnsEditContainerWrapper = withDispatch(
 )( memo( ColumnsEditContainer ) );
 
 const ColumnsEdit = ( props ) => {
-	const { clientId, isSelected } = props;
+	const { clientId, isSelected, style } = props;
 	const {
 		columnCount,
 		isDefaultColumns,
@@ -505,7 +509,7 @@ const ColumnsEdit = ( props ) => {
 	}, [] );
 
 	return (
-		<>
+		<View style={ style }>
 			<ColumnsEditContainerWrapper
 				columnCount={ columnCount }
 				innerWidths={ memoizedInnerWidths }
@@ -520,7 +524,7 @@ const ColumnsEdit = ( props ) => {
 				clientId={ clientId }
 				isVisible={ isVisible }
 			/>
-		</>
+		</View>
 	);
 };
 

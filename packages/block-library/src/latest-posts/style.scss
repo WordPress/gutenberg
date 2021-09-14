@@ -9,11 +9,13 @@
 	}
 	&.wp-block-latest-posts__list {
 		list-style: none;
+		padding-left: 0;
 
 		li {
 			clear: both;
 		}
 	}
+
 	&.is-grid {
 		display: flex;
 		flex-wrap: wrap;
@@ -41,7 +43,6 @@
 .wp-block-latest-posts__post-date,
 .wp-block-latest-posts__post-author {
 	display: block;
-	color: #555;
 	font-size: 0.8125em;
 }
 

@@ -17,9 +17,7 @@ module.exports = {
 		concatenateModules: true,
 		minimizer: [
 			new TerserPlugin( {
-				cache: true,
 				parallel: true,
-				sourceMap: true,
 				terserOptions: {
 					output: {
 						comments: /translators:/i,
@@ -37,7 +35,7 @@ module.exports = {
 	},
 	entry: {
 		index: './index.js',
-		frontend: './frontend.js',
+		view: './view.js',
 	},
 	output: {
 		filename: '[name].min.js',

@@ -81,6 +81,14 @@ The position of the label (`top`, `side`, `bottom`, or `edge`).
 -   Type: `String`
 -   Required: No
 
+### required
+
+If `true` enforces a valid number within the control's min/max range. If `false` allows an empty string as a valid value.
+
+-   Type: `Boolean`
+-   Required: No
+-   Default: `false`
+
 ### shiftStep
 
 Amount to increment by when the `SHIFT` key is held down. This shift value is a multiplier to the `step` value. For example, if the `step` value is `5`, and `shiftStep` is `10`, each jump would increment/decrement by `50`.

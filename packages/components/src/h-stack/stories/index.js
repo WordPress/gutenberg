@@ -6,7 +6,7 @@ import { HStack } from '..';
 
 export default {
 	component: HStack,
-	title: 'G2 Components (Experimental)/HStack',
+	title: 'Components (Experimental)/HStack',
 };
 
 export const _default = () => {

@@ -81,6 +81,10 @@ const setupInitHooks = () => {
 				featuredImageId,
 				colors,
 				gradients,
+				rawStyles,
+				rawFeatures,
+				galleryWithImageBlocks,
+				locale,
 			} = props;
 
 			if ( initialData === undefined && __DEV__ ) {
@@ -106,6 +110,10 @@ const setupInitHooks = () => {
 				capabilities,
 				colors,
 				gradients,
+				rawStyles,
+				rawFeatures,
+				galleryWithImageBlocks,
+				locale,
 			};
 		}
 	);
