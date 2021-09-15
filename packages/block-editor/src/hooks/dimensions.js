@@ -12,6 +12,7 @@ import { getBlockSupport } from '@wordpress/blocks';
 import InspectorControls from '../components/inspector-controls';
 import {
 	GapEdit,
+	getGapLabel,
 	hasGapSupport,
 	hasGapValue,
 	resetGap,
@@ -59,6 +60,8 @@ export function DimensionsPanel( props ) {
 		'__experimentalDefaultControls',
 	] );
 
+	const blockGapLabel = getGapLabel( props );
+
 	const createResetAllFilter = ( attribute ) => ( newAttributes ) => ( {
 		...newAttributes,
 		style: {
@@ -100,13 +103,13 @@ export function DimensionsPanel( props ) {
 				<ToolsPanelItem
 					className="single-column"
 					hasValue={ () => hasGapValue( props ) }
-					label={ __( 'Block gap' ) }
+					label={ blockGapLabel }
 					onDeselect={ () => resetGap( props ) }
 					resetAllFilter={ createResetAllFilter( 'blockGap' ) }
 					isShownByDefault={ defaultSpacingControls?.blockGap }
 					panelId={ props.clientId }
 				>
-					<GapEdit { ...props } />
+					<GapEdit { ...props } label={ blockGapLabel } />
 				</ToolsPanelItem>
 			) }
 		</InspectorControls>

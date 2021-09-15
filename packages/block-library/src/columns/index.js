@@ -79,6 +79,11 @@ export const settings = {
 			},
 		],
 	},
+	__experimentalLabel( _, { context } ) {
+		if ( context === 'blockGap' ) {
+			return __( 'Column spacing' );
+		}
+	},
 	deprecated,
 	edit,
 	save,
