@@ -67,41 +67,41 @@ export function SocialLinksEdit( props ) {
 	const usedLayout = layout || getDefaultBlockLayout( name );
 
 	// Remove icon background color if logos only style selected.
-	const logosOnly =
-		attributes.className?.indexOf( 'is-style-logos-only' ) >= 0;
+	const logosOnly = attributes.className?.indexOf( 'is-style-logos-only' ) >= 0;
 	useEffect( () => {
 		if ( logosOnly ) {
 			setAttributes( {
 				iconBackgroundColor: undefined,
 				customIconBackgroundColor: undefined,
-				preveIconBackgroundColorValue:iconBackgroundColorValue,
+				preveIconBackgroundColorValue: iconBackgroundColorValue,
 				iconBackgroundColorValue: undefined,
 			} );
 		}
 	}, [ logosOnly, setAttributes ] );
 
 	// Set the previsiounly selected bckground values of the logo for default.
-	const defaultAgain =
-		attributes.className?.indexOf( 'is-style-default' ) >= 0;
+	const defaultAgain = attributes.className?.indexOf( 'is-style-default' ) >= 0;
 	useEffect( () => {
 		if ( defaultAgain ) {
 			setAttributes( {
-				iconBackgroundColorValue:(preveIconBackgroundColorValue?preveIconBackgroundColorValue:undefined)
+				iconBackgroundColorValue: preveIconBackgroundColorValue
+					? preveIconBackgroundColorValue
+					: undefined,
 			} );
 		}
 	}, [ defaultAgain, setAttributes ] );
 
 	// Set the previsiounly selected bckground values of the logo for Pill.
-	const pillStyle =
-	attributes.className?.indexOf( 'is-style-pill-shape' ) >= 0;
+	const pillStyle = attributes.className?.indexOf( 'is-style-pill-shape' ) >= 0;
 	useEffect( () => {
-	if ( pillStyle ) {
-		setAttributes( {
-			iconBackgroundColorValue:(preveIconBackgroundColorValue?preveIconBackgroundColorValue:undefined)
-		} );
-	}
+		if ( pillStyle ) {
+			setAttributes( {
+				iconBackgroundColorValue: preveIconBackgroundColorValue
+					? preveIconBackgroundColorValue
+					: undefined,
+			} );
+		}
 	}, [ pillStyle, setAttributes ] );
-
 
 	const SocialPlaceholder = (
 		<li className="wp-block-social-links__social-placeholder">
