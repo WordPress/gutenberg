@@ -7,7 +7,7 @@ import { JSDOM } from 'jsdom';
 /**
  * Internal dependencies
  */
-import { create, REMOVE_PADDING_REGEX } from '../create';
+import { create, removeReservedCharacters } from '../create';
 import { OBJECT_REPLACEMENT_CHARACTER, ZWNBSP } from '../special-characters';
 import { createElement } from '../create-element';
 import { registerFormatType } from '../register-format-type';
@@ -124,21 +124,22 @@ describe( 'create', () => {
 		expect( value.formats[ 0 ] ).not.toBe( value.formats[ 1 ] );
 	} );
 
-	it( 'remove padding regex should match all expected padding characters', () => {
+	it( 'removeReservedCharacters should remove all reserved characters', () => {
 		expect(
-			REMOVE_PADDING_REGEX.test( OBJECT_REPLACEMENT_CHARACTER )
-		).toEqual( true );
-		expect( REMOVE_PADDING_REGEX.test( ZWNBSP ) ).toEqual( true );
+			removeReservedCharacters( `${ OBJECT_REPLACEMENT_CHARACTER }` )
+		).toEqual( '' );
+		expect( removeReservedCharacters( `${ ZWNBSP }` ) ).toEqual( '' );
 		expect(
-			`${ OBJECT_REPLACEMENT_CHARACTER }te${ ZWNBSP }st${ OBJECT_REPLACEMENT_CHARACTER }`.replace(
-				REMOVE_PADDING_REGEX,
-				''
+			removeReservedCharacters(
+				`${ OBJECT_REPLACEMENT_CHARACTER }c${ OBJECT_REPLACEMENT_CHARACTER }at${ OBJECT_REPLACEMENT_CHARACTER }`
 			)
-		).toEqual( 'test' );
+		).toEqual( 'cat' );
 		expect(
-			`te${ OBJECT_REPLACEMENT_CHARACTER }st${ ZWNBSP }${ ZWNBSP }`.replace(
-				REMOVE_PADDING_REGEX,
-				''
+			removeReservedCharacters( `${ ZWNBSP }b${ ZWNBSP }at${ ZWNBSP }` )
+		).toEqual( 'bat' );
+		expect(
+			removeReservedCharacters(
+				`te${ OBJECT_REPLACEMENT_CHARACTER }st${ ZWNBSP }${ ZWNBSP }`
 			)
 		).toEqual( 'test' );
 	} );

@@ -306,19 +306,13 @@ function collapseWhiteSpace( string ) {
 }
 
 /**
- * Matches the object replacement character or Zero width non-breaking space
- *
- * @type {RegExp}
- */
-export const REMOVE_PADDING_REGEX = /(\u{feff}?|\u{fffc}?)+/gu;
-
-/**
- * Removes padding (zero width non breaking spaces added by `toTree` and object replacement characters).
+ * Removes reserved characters used by rich-text (zero width non breaking spaces added by `toTree` and object replacement characters).
  *
  * @param {string} string
  */
-function removePadding( string ) {
-	return string.replace( REMOVE_PADDING_REGEX, '' );
+export function removeReservedCharacters( string ) {
+	//with the global flag, note that we should create a new regex each time OR reset lastIndex state.
+	return string.replace( /[\uFEFF\uFFFC]/gu, '' );
 }
 
 /**
@@ -366,11 +360,11 @@ function createFromElement( {
 		const type = node.nodeName.toLowerCase();
 
 		if ( node.nodeType === node.TEXT_NODE ) {
-			let filter = removePadding;
+			let filter = removeReservedCharacters;
 
 			if ( ! preserveWhiteSpace ) {
 				filter = ( string ) =>
-					removePadding( collapseWhiteSpace( string ) );
+					removeReservedCharacters( collapseWhiteSpace( string ) );
 			}
 
 			const text = filter( node.nodeValue );
