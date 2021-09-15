@@ -31,6 +31,14 @@ function useConstrainedTabbing() {
 		if ( ! node ) {
 			return;
 		}
+
+		const { ownerDocument } = node;
+		if ( ! ownerDocument ) return;
+
+		const trailingElement = ownerDocument.createElement( 'div' );
+		trailingElement.tabIndex = -1;
+		node.appendChild( trailingElement );
+
 		node.addEventListener( 'keydown', ( /** @type {Event} */ event ) => {
 			if ( ! ( event instanceof window.KeyboardEvent ) ) {
 				return;
@@ -41,15 +49,18 @@ function useConstrainedTabbing() {
 			}
 
 			const action = event.shiftKey ? 'findPrevious' : 'findNext';
+			const nextElement = focus.tabbable[ action ](
+				/** @type {HTMLElement} */ ( event.target )
+			);
 
 			if (
-				! node.contains(
-					/** @type {HTMLElement} */ ( focus.tabbable[ action ](
-						/** @type {HTMLElement} */ ( event.target )
-					) )
-				)
+				! node.contains( /** @type {HTMLElement} */ ( nextElement ) )
 			) {
-				/** @type {HTMLElement} */ ( node ).focus();
+				// By not preventing default behaviour, the browser will move
+				// focus from here in the right direction.
+				/** @type {HTMLElement} */ ( event.shiftKey
+					? trailingElement
+					: node ).focus();
 			}
 		} );
 	}, [] );
