@@ -40,28 +40,16 @@ function useConstrainedTabbing() {
 				return;
 			}
 
-			const tabbables = focus.tabbable.find( node );
-			if ( ! tabbables.length ) {
-				return;
-			}
-			const firstTabbable = tabbables[ 0 ];
-			const lastTabbable = tabbables[ tabbables.length - 1 ];
+			const action = event.shiftKey ? 'findPrevious' : 'findNext';
 
-			if ( event.shiftKey && event.target === firstTabbable ) {
-				event.preventDefault();
-				/** @type {HTMLElement} */ ( lastTabbable ).focus();
-			} else if ( ! event.shiftKey && event.target === lastTabbable ) {
-				event.preventDefault();
-				/** @type {HTMLElement} */ ( firstTabbable ).focus();
-				/*
-				 * When pressing Tab and none of the tabbables has focus, the keydown
-				 * event happens on the wrapper div: move focus on the first tabbable.
-				 */
-			} else if (
-				! tabbables.includes( /** @type {Element} */ ( event.target ) )
+			if (
+				! node.contains(
+					/** @type {HTMLElement} */ ( focus.tabbable[ action ](
+						/** @type {HTMLElement} */ ( event.target )
+					) )
+				)
 			) {
-				event.preventDefault();
-				/** @type {HTMLElement} */ ( firstTabbable ).focus();
+				/** @type {HTMLElement} */ ( node ).focus();
 			}
 		} );
 	}, [] );
