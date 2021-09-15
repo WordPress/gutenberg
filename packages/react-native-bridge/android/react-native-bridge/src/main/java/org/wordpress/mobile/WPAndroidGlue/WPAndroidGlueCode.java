@@ -617,6 +617,7 @@ public class WPAndroidGlueCode {
                                   OnFocalPointPickerTooltipShownEventListener onFocalPointPickerTooltipListener,
                                   OnGutenbergDidRequestPreviewListener onGutenbergDidRequestPreviewListener,
                                   OnBlockTypeImpressionsEventListener onBlockTypeImpressionsEventListener,
+                                  OnCustomerSupportOptionsShowListener onCustomerSupportOptionsShowListener,
                                   boolean isDarkMode) {
         MutableContextWrapper contextWrapper = (MutableContextWrapper) mReactRootView.getContext();
         contextWrapper.setBaseContext(viewGroup.getContext());
@@ -637,6 +638,7 @@ public class WPAndroidGlueCode {
         mOnFocalPointPickerTooltipShownListener = onFocalPointPickerTooltipListener;
         mOnGutenbergDidRequestPreviewListener = onGutenbergDidRequestPreviewListener;
         mOnBlockTypeImpressionsEventListener = onBlockTypeImpressionsEventListener;
+        mOnCustomerSupportOptionsShowListener = onCustomerSupportOptionsShowListener;
 
         sAddCookiesInterceptor.setOnAuthHeaderRequestedListener(onAuthHeaderRequestedListener);
 
