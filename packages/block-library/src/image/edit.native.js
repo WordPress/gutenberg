@@ -451,7 +451,7 @@ export class ImageEdit extends Component {
 						linkDestination: this.props.attributes.linkDestination,
 						setAttributes: this.setMappedAttributes,
 						imageUrl: this.props.attributes.url,
-						attachmentPageUrl: this.props.attributes.link,
+						attachmentPageUrl: this.props.image?.link,
 					} );
 				} }
 			/>
