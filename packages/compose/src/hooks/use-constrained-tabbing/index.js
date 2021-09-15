@@ -3,7 +3,11 @@
  */
 import { TAB } from '@wordpress/keycodes';
 import { focus } from '@wordpress/dom';
-import { useCallback } from '@wordpress/element';
+
+/**
+ * Internal dependencies
+ */
+import useRefEffect from '../use-ref-effect';
 
 /**
  * In Dialogs/modals, the tabbing must be constrained to the content of
@@ -27,45 +31,48 @@ import { useCallback } from '@wordpress/element';
  * ```
  */
 function useConstrainedTabbing() {
-	const ref = useCallback( ( /** @type {Element} */ node ) => {
-		if ( ! node ) {
-			return;
+	return useRefEffect( ( /** @type {HTMLElement} */ node ) => {
+		/** @type {number|undefined} */
+		let timeoutId;
+
+		function onKeyDown( /** @type {KeyboardEvent} */ event ) {
+			const { keyCode, shiftKey, target } = event;
+
+			if ( keyCode !== TAB ) {
+				return;
+			}
+
+			const action = shiftKey ? 'findPrevious' : 'findNext';
+			const nextElement =
+				focus.tabbable[ action ](
+					/** @type {HTMLElement} */ ( target )
+				) || null;
+
+			// If the element that is about to receive focus is outside the
+			// area, move focus to a div and insert it at the start or end of
+			// the area, depending on the direction. Without preventing default
+			// behaviour, the browser will then move focus to the next element.
+			if ( node.contains( nextElement ) ) {
+				return;
+			}
+
+			const domAction = shiftKey ? 'append' : 'prepend';
+			const { ownerDocument } = node;
+			const trap = ownerDocument.createElement( 'div' );
+
+			trap.tabIndex = -1;
+			node[ domAction ]( trap );
+			trap.focus();
+			// Remove after the browser moves focus to the next element.
+			timeoutId = setTimeout( () => node.removeChild( trap ) );
 		}
 
-		const { ownerDocument } = node;
-		if ( ! ownerDocument ) return;
-
-		const trailingElement = ownerDocument.createElement( 'div' );
-		trailingElement.tabIndex = -1;
-		node.appendChild( trailingElement );
-
-		node.addEventListener( 'keydown', ( /** @type {Event} */ event ) => {
-			if ( ! ( event instanceof window.KeyboardEvent ) ) {
-				return;
-			}
-
-			if ( event.keyCode !== TAB ) {
-				return;
-			}
-
-			const action = event.shiftKey ? 'findPrevious' : 'findNext';
-			const nextElement = focus.tabbable[ action ](
-				/** @type {HTMLElement} */ ( event.target )
-			);
-
-			if ( node.contains( /** @type {HTMLElement} */ ( nextElement ) ) ) {
-				return;
-			}
-
-			// By not preventing default behaviour, the browser will move
-			// focus from here in the right direction.
-			/** @type {HTMLElement} */ ( event.shiftKey
-				? trailingElement
-				: node ).focus();
-		} );
+		node.addEventListener( 'keydown', onKeyDown );
+		return () => {
+			node.removeEventListener( 'keydown', onKeyDown );
+			clearTimeout( timeoutId );
+		};
 	}, [] );
-
-	return ref;
 }
 
 export default useConstrainedTabbing;
