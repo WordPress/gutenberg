@@ -263,6 +263,7 @@ const EmbedEdit = ( props ) => {
 			) }
 			<EmbedBottomSheet
 				value={ url }
+				label={ title }
 				isVisible={ isEditingURL }
 				onClose={ () => setIsEditingURL( false ) }
 				onSubmit={ ( value ) => {
