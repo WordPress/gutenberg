@@ -90,6 +90,14 @@
 			stroke: currentColor;
 		}
 	}
+
+	// Styles for button toggles.
+	button.wp-block-navigation__submenu-icon.wp-block-navigation__submenu-icon.wp-block-navigation__submenu-icon.wp-block-navigation__submenu-icon {
+		padding: $grid-unit $grid-unit-20;
+		background-color: inherit;
+		color: currentColor;
+		border: none;
+	}
 }
 
 // Styles for submenu flyout.
@@ -181,6 +189,15 @@
 
 	// Keep submenus open when focus is within.
 	&:where(:not(.open-on-click):not(.open-on-hover-click)):focus-within > .wp-block-navigation__submenu-container {
+		visibility: visible;
+		opacity: 1;
+		width: auto;
+		height: auto;
+		min-width: 200px;
+	}
+
+	// Show submenus on click.
+	.wp-block-navigation-submenu__toggle[aria-expanded="true"] + .wp-block-navigation__submenu-container {
 		visibility: visible;
 		opacity: 1;
 		width: auto;
