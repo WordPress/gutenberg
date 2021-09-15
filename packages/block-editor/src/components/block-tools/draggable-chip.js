@@ -1,7 +1,6 @@
 /**
  * WordPress dependencies
  */
-import { _n, sprintf } from '@wordpress/i18n';
 import { Flex, FlexItem } from '@wordpress/components';
 import { dragHandle } from '@wordpress/icons';
 import { forwardRef } from '@wordpress/element';
@@ -11,7 +10,7 @@ import { forwardRef } from '@wordpress/element';
  */
 import BlockIcon from '../block-icon';
 
-function BlockDraggableChip( { count, icon }, ref ) {
+function BlockDraggableChip( { icon }, ref ) {
 	return (
 		<div className="block-editor-block-draggable-chip-wrapper" ref={ ref }>
 			<div className="block-editor-block-draggable-chip">
@@ -20,15 +19,7 @@ function BlockDraggableChip( { count, icon }, ref ) {
 					className="block-editor-block-draggable-chip__content"
 				>
 					<FlexItem>
-						{ icon ? (
-							<BlockIcon icon={ icon } />
-						) : (
-							sprintf(
-								/* translators: %d: Number of blocks. */
-								_n( '%d block', '%d blocks', count ),
-								count
-							)
-						) }
+						<BlockIcon icon={ icon } />
 					</FlexItem>
 					<FlexItem>
 						<BlockIcon icon={ dragHandle } />

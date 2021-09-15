@@ -10,7 +10,7 @@ import { useSelect, useDispatch } from '@wordpress/data';
 import { useViewportMatch, useRefEffect } from '@wordpress/compose';
 import { Popover } from '@wordpress/components';
 import { __unstableUseShortcutEventMatch as useShortcutEventMatch } from '@wordpress/keyboard-shortcuts';
-import { useState, useRef, useMemo } from '@wordpress/element';
+import { useState, useRef } from '@wordpress/element';
 import { getBlockType } from '@wordpress/blocks';
 import { stack } from '@wordpress/icons';
 
@@ -19,7 +19,7 @@ import { stack } from '@wordpress/icons';
  */
 import InsertionPoint from './insertion-point';
 import BlockPopover from './block-popover';
-import BlockDraggableChip from '../block-draggable/draggable-chip';
+import BlockDraggableChip from './draggable-chip';
 import { store as blockEditorStore } from '../../store';
 import BlockContextualToolbar from './block-contextual-toolbar';
 import { usePopoverScroll } from './use-popover-scroll';
@@ -27,12 +27,15 @@ import { parseDropEvent } from '../use-on-block-drop';
 
 /**
  * Renders block tools (the block toolbar, select/navigation mode toolbar, the
- * insertion point and a slot for the inline rich text toolbar). Must be wrapped
- * around the block content and editor styles wrapper or iframe.
+ * insertion point, a slot for the inline rich text toolbar, and the drag chip).
+ * Also handles block-level keyboard shortcut handling. Must be wrapped around
+ * the block content and editor styles wrapper or iframe.
  *
  * @param {Object} $0                      Props.
- * @param {Object} $0.children             The block content and style container.
- * @param {Object} $0.__unstableContentRef Ref holding the content scroll container.
+ * @param {Object} $0.children             The block content and style
+ *                                         container.
+ * @param {Object} $0.__unstableContentRef Ref holding the content scroll
+ *                                         container.
  */
 export default function BlockTools( {
 	children,
@@ -117,18 +120,9 @@ export default function BlockTools( {
 		}
 	}
 
-	const [ draggedBlockNames, setDraggedBlockNames ] = useState( [] );
+	const [ dragIcon, setDragIcon ] = useState();
 	const draggableChipRef = useRef();
-	const isDraggingBlocks = draggedBlockNames.length > 0;
 	const { getBlockName } = useSelect( blockEditorStore );
-	const dragIcon = useMemo( () => {
-		const isSelectionOfSameType = uniq( draggedBlockNames ).length === 1;
-		// When selection consists of blocks of multiple types, display an
-		// appropriate icon to communicate the non-uniformity.
-		return isSelectionOfSameType
-			? getBlockType( first( draggedBlockNames ) )?.icon
-			: stack;
-	}, [ draggedBlockNames ] );
 
 	function onIframeDragOver( event ) {
 		// Abort if we're not dragging over an iframe. The global event listener
@@ -150,14 +144,14 @@ export default function BlockTools( {
 		// will handle resetting the dragged state.
 		if ( event.currentTarget.contains( event.target ) ) return;
 
-		setDraggedBlockNames( [] );
+		setDragIcon();
 	}
 
 	const refEffect = useRefEffect(
 		( element ) => {
 			const { ownerDocument } = element;
 
-			if ( isDraggingBlocks ) {
+			if ( dragIcon ) {
 				function onDragOver( event ) {
 					const chip = draggableChipRef.current;
 					chip.style.left = event.clientX + 'px';
@@ -165,7 +159,7 @@ export default function BlockTools( {
 				}
 
 				function onDragEnd() {
-					setDraggedBlockNames( [] );
+					setDragIcon();
 				}
 
 				ownerDocument.addEventListener( 'dragover', onDragOver );
@@ -178,12 +172,25 @@ export default function BlockTools( {
 
 			function onDragStart( event ) {
 				const { srcClientIds, blocks } = parseDropEvent( event );
+				let names = [];
 
 				if ( srcClientIds ) {
-					setDraggedBlockNames( srcClientIds.map( getBlockName ) );
+					names = srcClientIds.map( getBlockName );
 				} else if ( blocks ) {
-					setDraggedBlockNames( blocks.map( ( { name } ) => name ) );
+					names = blocks.map( ( { name } ) => name );
 				}
+
+				if ( ! names.length ) {
+					return;
+				}
+
+				// When selection consists of blocks of multiple types, display an
+				// appropriate icon to communicate the non-uniformity.
+				setDragIcon(
+					uniq( names ).length === 1
+						? getBlockType( first( names ) )?.icon
+						: stack
+				);
 			}
 
 			ownerDocument.addEventListener( 'dragstart', onDragStart );
@@ -191,7 +198,7 @@ export default function BlockTools( {
 				ownerDocument.removeEventListener( 'dragstart', onDragStart );
 			};
 		},
-		[ isDraggingBlocks ]
+		[ dragIcon ]
 	);
 
 	return (
@@ -199,20 +206,18 @@ export default function BlockTools( {
 		<div
 			{ ...props }
 			onKeyDown={ onKeyDown }
-			onDragOver={ isDraggingBlocks ? onIframeDragOver : null }
-			onDragEnd={ isDraggingBlocks ? onIframeDragEnd : null }
+			// React event listeners to listen inside the iframe (the events
+			// bubble through a React portal).
+			onDragOver={ dragIcon ? onIframeDragOver : null }
+			onDragEnd={ dragIcon ? onIframeDragEnd : null }
+			// Global event listeners to track drag events on the entire page:
+			// drag may start somewhere else on the page and may also be dragged
+			// outside these boundaries.
 			ref={ refEffect }
 		>
 			<InsertionPoint __unstableContentRef={ __unstableContentRef }>
 				{ ( hasFixedToolbar || ! isLargeViewport ) && (
 					<BlockContextualToolbar isFixed />
-				) }
-				{ draggedBlockNames.length > 0 && (
-					<BlockDraggableChip
-						count={ draggedBlockNames.length }
-						icon={ dragIcon }
-						ref={ draggableChipRef }
-					/>
 				) }
 				{ /* Even if the toolbar is fixed, the block popover is still
                  needed for navigation mode. */ }
@@ -223,6 +228,12 @@ export default function BlockTools( {
 					ref={ usePopoverScroll( __unstableContentRef ) }
 				/>
 				{ children }
+				{ dragIcon && (
+					<BlockDraggableChip
+						icon={ dragIcon }
+						ref={ draggableChipRef }
+					/>
+				) }
 				{ /* Forward compatibility: a place to render block tools behind the
                  content so it can be tabbed to properly. */ }
 			</InsertionPoint>
