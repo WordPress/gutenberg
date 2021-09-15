@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { zip } from 'lodash';
+import { zip, difference } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -331,7 +331,7 @@ const prepareChangeset = (
 	desiredEntityRecords
 ) => ( { registry } ) => {
 	const deletedEntityRecordsIds = new Set(
-		diff(
+		difference(
 			oldEntityRecords.map( ( { id } ) => id ),
 			desiredEntityRecords.map( ( { id } ) => id )
 		)
@@ -384,18 +384,6 @@ const prepareChangeset = (
 
 	return changes;
 };
-
-/**
- * Returns elements of list A that are not in list B.
- *
- * @param {Array} listA List A.
- * @param {Array} listB List B.
- * @return {Array} elements of list A that are not in list B.
- */
-function diff( listA, listB ) {
-	const setB = new Set( listB );
-	return listA.filter( ( x ) => ! setB.has( x ) );
-}
 
 /**
  * Turns a recursive list of blocks into a flat list of blocks.
