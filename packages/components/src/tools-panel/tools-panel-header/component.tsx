@@ -118,7 +118,7 @@ const ToolsPanelHeader = (
 	const {
 		dropdownMenuClassName,
 		hasMenuItems,
-		hasSelectedMenuItems,
+		areOptionalControlsHidden,
 		label: labelText,
 		menuItems,
 		resetAll,
@@ -138,7 +138,7 @@ const ToolsPanelHeader = (
 			{ labelText }
 			{ hasMenuItems && (
 				<DropdownMenu
-					icon={ hasSelectedMenuItems ? moreVertical : plus }
+					icon={ areOptionalControlsHidden ? plus : moreVertical }
 					label={ labelText }
 					menuProps={ { className: dropdownMenuClassName } }
 				>

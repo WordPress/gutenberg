@@ -29,16 +29,17 @@ export function useToolsPanelHeader(
 		return cx( styles.DropdownMenu );
 	}, [] );
 
-	const { menuItems, hasMenuItems } = useToolsPanelContext();
-	const menuItemsArray = Object.entries( menuItems );
-	const hasSelectedMenuItems = menuItemsArray.some(
-		( [ , isSelected ] ) => isSelected
-	);
+	const {
+		menuItems,
+		hasMenuItems,
+		areOptionalControlsHidden,
+	} = useToolsPanelContext();
+
 	return {
 		...otherProps,
 		dropdownMenuClassName,
 		hasMenuItems,
-		hasSelectedMenuItems,
+		areOptionalControlsHidden,
 		menuItems,
 		className: classes,
 	};

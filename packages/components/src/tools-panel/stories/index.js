@@ -66,11 +66,57 @@ export const _default = () => {
 						hasValue={ () => !! minHeight }
 						label="Minimum height"
 						onDeselect={ () => setMinHeight( undefined ) }
+						isShownByDefault={ true }
 					>
 						<UnitControl
 							label="Minimum height"
 							value={ minHeight }
 							onChange={ ( next ) => setMinHeight( next ) }
+						/>
+					</ToolsPanelItem>
+				</ToolsPanel>
+			</Panel>
+		</PanelWrapperView>
+	);
+};
+
+export const WithOptionalItemsPlusIcon = () => {
+	const [ height, setHeight ] = useState();
+	const [ width, setWidth ] = useState();
+
+	const resetAll = () => {
+		setHeight( undefined );
+		setWidth( undefined );
+	};
+
+	return (
+		<PanelWrapperView>
+			<Panel>
+				<ToolsPanel label="Tools Panel" resetAll={ resetAll }>
+					<ToolsPanelItem
+						className="single-column"
+						hasValue={ () => !! width }
+						label="Width"
+						onDeselect={ () => setWidth( undefined ) }
+						isShownByDefault={ false }
+					>
+						<UnitControl
+							label="Width"
+							value={ width }
+							onChange={ ( next ) => setWidth( next ) }
+						/>
+					</ToolsPanelItem>
+					<ToolsPanelItem
+						className="single-column"
+						hasValue={ () => !! height }
+						label="Height"
+						onDeselect={ () => setHeight( undefined ) }
+						isShownByDefault={ false }
+					>
+						<UnitControl
+							label="Height"
+							value={ height }
+							onChange={ ( next ) => setHeight( next ) }
 						/>
 					</ToolsPanelItem>
 				</ToolsPanel>
