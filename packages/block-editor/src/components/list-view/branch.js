@@ -6,7 +6,7 @@ import { map, compact } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { AsyncModeProvider, useSelect } from '@wordpress/data';
+import { AsyncModeProvider } from '@wordpress/data';
 
 /**
  * Internal dependencies
@@ -15,13 +15,11 @@ import ListViewBlock from './block';
 import ListViewAppender from './appender';
 import { isClientIdSelected } from './utils';
 import { useListViewContext } from './context';
-import { store as blockEditorStore } from '../../store';
 
 export default function ListViewBranch( props ) {
 	const {
 		blocks,
 		selectBlock,
-		selectedBlockClientIds,
 		showAppender,
 		showBlockMovers,
 		showNestedBlocks,
@@ -33,23 +31,25 @@ export default function ListViewBranch( props ) {
 		isLastOfBranch = false,
 	} = props;
 
-	const draggedBlockClientIds = useSelect( ( select ) =>
-		select( blockEditorStore ).getDraggedBlockClientIds()
-	);
+	const {
+		expandedState,
+		expand,
+		collapse,
+		draggedClientIds,
+		selectedClientIds,
+	} = useListViewContext();
 
 	const isTreeRoot = ! parentBlockClientId;
 	const filteredBlocks = compact( blocks );
 	const itemHasAppender = ( parentClientId ) =>
 		showAppender &&
 		! isTreeRoot &&
-		isClientIdSelected( parentClientId, selectedBlockClientIds );
+		isClientIdSelected( parentClientId, selectedClientIds );
 	const hasAppender = itemHasAppender( parentBlockClientId );
 	// Add +1 to the rowCount to take the block appender into account.
 	const blockCount = filteredBlocks.length;
 	const rowCount = hasAppender ? blockCount + 1 : blockCount;
 	const appenderPosition = rowCount;
-
-	const { expandedState, expand, collapse } = useListViewContext();
 
 	return (
 		<>
@@ -68,7 +68,7 @@ export default function ListViewBranch( props ) {
 
 				const isSelected = isClientIdSelected(
 					clientId,
-					selectedBlockClientIds
+					selectedClientIds
 				);
 				const isSelectedBranch =
 					isBranchSelected || ( isSelected && hasNestedBranch );
@@ -100,19 +100,15 @@ export default function ListViewBranch( props ) {
 
 				// Make updates to the selected or dragged blocks synchronous,
 				// but asynchronous for any other block.
-				const isAsynchronous =
-					! draggedBlockClientIds.includes( clientId ) &&
-					! isSelected;
+				const isDragged = !! draggedClientIds?.includes( clientId );
 
 				return (
-					<AsyncModeProvider
-						key={ clientId }
-						value={ isAsynchronous }
-					>
+					<AsyncModeProvider key={ clientId } value={ ! isSelected }>
 						<ListViewBlock
 							block={ block }
 							onClick={ selectBlockWithClientId }
 							onToggleExpanded={ toggleExpanded }
+							isDragged={ isDragged }
 							isSelected={ isSelected }
 							isBranchSelected={ isSelectedBranch }
 							isLastOfSelectedBranch={ isLastOfSelectedBranch }
@@ -125,12 +121,9 @@ export default function ListViewBranch( props ) {
 							path={ updatedPath }
 							isExpanded={ isExpanded }
 						/>
-						{ hasNestedBranch && isExpanded && (
+						{ hasNestedBranch && isExpanded && ! isDragged && (
 							<ListViewBranch
 								blocks={ innerBlocks }
-								selectedBlockClientIds={
-									selectedBlockClientIds
-								}
 								selectBlock={ selectBlock }
 								isBranchSelected={ isSelectedBranch }
 								isLastOfBranch={ isLast }
