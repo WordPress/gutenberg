@@ -443,11 +443,11 @@ export class ImageEdit extends Component {
 				hasPicker
 				options={ linkSettingsOptions }
 				showIcon={ false }
-				onLinkCellPressed={ ( { inputValue, navigation } ) => {
+				onLinkCellPressed={ ( { navigation } ) => {
 					// TODO(David): Passing `setAttributes` throws a warning, we should avoid
 					// passing it here.
 					navigation.navigate( blockSettingsScreens.imageOptions, {
-						inputValue,
+						inputValue: mappedAttributes.url,
 						linkDestination: this.props.attributes.linkDestination,
 						setAttributes: this.setMappedAttributes,
 						imageUrl: this.props.attributes.url,

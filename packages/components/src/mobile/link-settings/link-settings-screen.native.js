@@ -21,7 +21,7 @@ const LinkSettingsScreen = ( props ) => {
 
 	const onLinkCellPressed = () => {
 		if ( props.onLinkCellPressed ) {
-			props.onLinkCellPressed( { inputValue, navigation } );
+			props.onLinkCellPressed( { navigation } );
 		} else {
 			navigation.navigate( 'linkPicker', { inputValue } );
 		}
