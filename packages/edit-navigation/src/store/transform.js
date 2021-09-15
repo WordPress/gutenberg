@@ -12,6 +12,7 @@ import { serialize, createBlock, parse } from '@wordpress/blocks';
  * Internal dependencies
  */
 import { NEW_TAB_TARGET_ATTRIBUTE } from '../constants';
+import { addRecordIdToBlock, getRecordIdFromBlock } from './utils';
 
 /**
  * A WP nav_menu_item object.
@@ -58,6 +59,7 @@ export function blockToMenuItem(
 	return {
 		...menuItem,
 		...attributes,
+		id: getRecordIdFromBlock( block ),
 		menu_order: blockPosition + 1,
 		menus: menuId,
 		parent: ! parentId ? 0 : parentId,
@@ -200,7 +202,10 @@ function mapMenuItemsToBlocks( menuItems ) {
 			: 'core/navigation-link';
 
 		// Create block with nested "innerBlocks".
-		const block = createBlock( itemBlockName, attributes, nestedBlocks );
+		const block = addRecordIdToBlock(
+			createBlock( itemBlockName, attributes, nestedBlocks ),
+			menuItem
+		);
 
 		// Create mapping for menuItem -> block
 		mapping[ menuItem.id ] = block.clientId;

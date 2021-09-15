@@ -43,7 +43,7 @@ export const getNavigationPostForMenu = createRegistrySelector(
 		if ( ! hasResolvedNavigationPost( state, menuId ) ) {
 			return null;
 		}
-		return select( coreStore ).getEditedEntityRecord(
+		return select( coreStore ).getEntityRecord(
 			NAVIGATION_POST_KIND,
 			NAVIGATION_POST_POST_TYPE,
 			buildNavigationPostId( menuId )
@@ -64,20 +64,6 @@ export const hasResolvedNavigationPost = createRegistrySelector(
 			NAVIGATION_POST_POST_TYPE,
 			buildNavigationPostId( menuId ),
 		] );
-	}
-);
-
-/**
- * Returns a menu item represented by the block with id clientId.
- *
- * @param {number} postId   Navigation post id
- * @param {number} clientId Block clientId
- * @return {Object|null} Menu item entity
- */
-export const getMenuItemForClientId = createRegistrySelector(
-	( select ) => ( state, postId, clientId ) => {
-		const mapping = invert( state.mapping[ postId ] );
-		return select( coreStore ).getMenuItem( mapping[ clientId ] );
 	}
 );
 

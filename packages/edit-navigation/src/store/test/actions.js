@@ -81,15 +81,6 @@ describe( 'createMissingMenuItems', () => {
 		};
 
 		await createMissingMenuItems( post )( { registry, dispatch } );
-
-		expect( dispatch ).toHaveBeenCalledWith( {
-			type: 'SET_MENU_ITEM_TO_CLIENT_ID_MAPPING',
-			postId: post.id,
-			mapping: {
-				87: 'navigation-block-client-id',
-				88: 'navigation-block-client-id2',
-			},
-		} );
 	} );
 } );
 

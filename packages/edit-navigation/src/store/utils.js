@@ -37,3 +37,35 @@ export const buildNavigationPostId = ( menuId ) =>
 export function menuItemsQuery( menuId ) {
 	return { menus: menuId, per_page: -1 };
 }
+
+/**
+ * Get the internal record id from block.
+ *
+ * @typedef  {Object} Attributes
+ * @property {string}     __internalRecordId The internal record id.
+ * @typedef  {Object} Block
+ * @property {Attributes} attributes         The attributes of the block.
+ *
+ * @param    {Block}      block              The block.
+ * @return {string} The internal record id.
+ */
+export function getRecordIdFromBlock( block ) {
+	return block.attributes.__internalRecordId;
+}
+
+/**
+ * Add internal record id to block's attributes.
+ *
+ * @param {Block}  block    The block.
+ * @param {string} recordId The record id.
+ * @return {Block} The updated block.
+ */
+export function addRecordIdToBlock( block, recordId ) {
+	return {
+		...block,
+		attributes: {
+			...( block.attributes || {} ),
+			__internalRecordId: recordId,
+		},
+	};
+}

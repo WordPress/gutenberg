@@ -16,7 +16,11 @@ import apiFetch from '@wordpress/api-fetch';
  */
 import { STORE_NAME } from './constants';
 import { NAVIGATION_POST_KIND, NAVIGATION_POST_POST_TYPE } from '../constants';
-import { menuItemsQuery } from './utils';
+import {
+	addRecordIdToBlock,
+	getRecordIdFromBlock,
+	menuItemsQuery,
+} from './utils';
 import { blockToMenuItem } from './transform';
 
 /**
@@ -55,29 +59,25 @@ export const createMissingMenuItems = ( post ) => async ( {
 			.resolveSelect( coreDataStore )
 			.getMenuItems( { menus: menuId, per_page: -1 } );
 
-		const menuItemIdToBlockId = await dispatch(
-			getEntityRecordIdToBlockIdMapping( post.id )
-		);
-		const knownBlockIds = new Set( Object.values( menuItemIdToBlockId ) );
-
-		const blocks = blocksTreeToFlatList( post.blocks[ 0 ].innerBlocks );
+		const blocks = blocksTreeToFlatList( post.blocks[ 0 ] );
 		for ( const { block } of blocks ) {
 			if ( block.name !== 'core/navigation-link' ) {
 				continue;
 			}
-			if ( ! knownBlockIds.has( block.clientId ) ) {
+			if ( ! getRecordIdFromBlock( block ) ) {
 				const menuItem = await dispatch(
 					createPlaceholderMenuItem( menuId )
 				);
-				menuItemIdToBlockId[ menuItem.id ] = block.clientId;
+				block.attributes = addRecordIdToBlock(
+					block,
+					menuItem.id
+				).attributes;
 			}
 		}
 
-		dispatch( {
-			type: 'SET_MENU_ITEM_TO_CLIENT_ID_MAPPING',
-			postId: post.id,
-			mapping: menuItemIdToBlockId,
-		} );
+		registry
+			.dispatch( coreDataStore )
+			.receiveEntityRecords( 'root', 'postType', post, undefined );
 	} finally {
 		registry.dispatch( coreDataStore ).__unstableReleaseStoreLock( lock );
 	}
@@ -155,27 +155,19 @@ export const saveNavigationPost = ( post ) => async ( {
 			.resolveSelect( coreDataStore )
 			.getMenuItems( { menus: post.meta.menuId, per_page: -1 } );
 
-		const desiredMenuItems = dispatch(
-			getDesiredMenuItems( post, oldMenuItems )
-		);
 		await dispatch(
 			batchSaveChanges(
 				'root',
 				'menuItem',
 				oldMenuItems,
-				desiredMenuItems
+				getDesiredMenuItems( post, oldMenuItems )
 			)
 		);
 
 		// Clear "stub" navigation post edits to avoid a false "dirty" state.
-		await registry
+		registry
 			.dispatch( coreDataStore )
-			.receiveEntityRecords(
-				NAVIGATION_POST_KIND,
-				NAVIGATION_POST_POST_TYPE,
-				[ post ],
-				undefined
-			);
+			.receiveEntityRecords( 'root', 'postType', post, undefined );
 
 		registry
 			.dispatch( noticesStore )
@@ -206,39 +198,25 @@ export const saveNavigationPost = ( post ) => async ( {
  * @param {Object[]} oldMenuItems The currently stored list of menu items.
  * @return {Function} An action creator
  */
-const getDesiredMenuItems = ( post, oldMenuItems ) => ( { dispatch } ) => {
-	const entityIdToBlockId = dispatch(
-		getEntityRecordIdToBlockIdMapping( post.id )
-	);
-
-	const blockIdToOldEntityRecord = {};
-	for ( const oldMenuItem of oldMenuItems ) {
-		const blockId = entityIdToBlockId[ oldMenuItem.id ];
-		if ( blockId ) {
-			blockIdToOldEntityRecord[ blockId ] = oldMenuItem;
-		}
-	}
-
-	const blocksList = blocksTreeToFlatList( post.blocks[ 0 ].innerBlocks );
-	return blocksList.map( ( { block, parentBlockId }, idx ) =>
+const getDesiredMenuItems = ( post, oldMenuItems ) => {
+	const blocksList = blocksTreeToFlatList( post.blocks[ 0 ] );
+	const items = blocksList.map( ( { block, parentBlock }, idx ) =>
 		blockToMenuItem(
 			block,
-			blockIdToOldEntityRecord[ block.clientId ],
-			blockIdToOldEntityRecord[ parentBlockId ]?.id,
+			oldMenuItems.find(
+				( record ) => record.id === getRecordIdFromBlock( block )
+			),
+			getRecordIdFromBlock( parentBlock ),
 			idx,
 			post.meta.menuId
 		)
 	);
-};
 
-/**
- * A selector in disguise. It returns mapping between menu item ID and it's related blocks client id.
- *
- * @param {number} postId The id of the stub post to get the mapping for.
- * @return {Function} An action creator
- */
-const getEntityRecordIdToBlockIdMapping = ( postId ) => ( { registry } ) =>
-	registry.stores[ STORE_NAME ].store.getState().mapping[ postId ] || {};
+	console.log( 'items', items );
+	console.log( { oldMenuItems, blocksList } );
+
+	return items;
+};
 
 /**
  * Persists the desiredEntityRecords while preserving IDs from oldEntityRecords.
@@ -388,15 +366,14 @@ const prepareChangeset = (
 /**
  * Turns a recursive list of blocks into a flat list of blocks.
  *
- * @param {Object[]}    innerBlocks   A list of blocks containing zero or more inner blocks.
- * @param {number|null} parentBlockId The id of the currently processed parent block.
+ * @param {Object} parentBlock A parent block to flatten
  * @return {Object} A flat list of blocks, annotated by their index and parent ID, consisting
  * 							    of all the input blocks and all the inner blocks in the tree.
  */
-function blocksTreeToFlatList( innerBlocks, parentBlockId = null ) {
-	return innerBlocks.flatMap( ( block, index ) =>
-		[ { block, parentBlockId, childIndex: index } ].concat(
-			blocksTreeToFlatList( block.innerBlocks, block.clientId )
+function blocksTreeToFlatList( parentBlock ) {
+	return ( parentBlock.innerBlocks || [] ).flatMap( ( innerBlock, index ) =>
+		[ { block: innerBlock, parentBlock, childIndex: index } ].concat(
+			blocksTreeToFlatList( innerBlock )
 		)
 	);
 }

@@ -42,14 +42,7 @@ export function* getNavigationPostForMenu( menuId ) {
 
 	// Now let's create a proper one hydrated using actual menu items
 	const menuItems = yield resolveMenuItems( menuId );
-	const [ navigationBlock, menuItemIdToClientId ] = createNavigationBlock(
-		menuItems
-	);
-	yield {
-		type: 'SET_MENU_ITEM_TO_CLIENT_ID_MAPPING',
-		postId: stubPost.id,
-		mapping: menuItemIdToClientId,
-	};
+	const navigationBlock = createNavigationBlock( menuItems );
 	// Persist the actual post containing the navigation block
 	yield persistPost( createStubPost( menuId, navigationBlock ) );
 
@@ -89,9 +82,7 @@ const persistPost = ( post ) =>
  * @return {Object} Navigation block
  */
 function createNavigationBlock( menuItems ) {
-	const { innerBlocks, mapping: menuItemIdToClientId } = menuItemsToBlocks(
-		menuItems
-	);
+	const { innerBlocks } = menuItemsToBlocks( menuItems );
 
 	const navigationBlock = createBlock(
 		'core/navigation',
@@ -100,5 +91,5 @@ function createNavigationBlock( menuItems ) {
 		},
 		innerBlocks
 	);
-	return [ navigationBlock, menuItemIdToClientId ];
+	return navigationBlock;
 }

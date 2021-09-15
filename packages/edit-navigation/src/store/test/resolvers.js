@@ -129,16 +129,6 @@ describe( 'getNavigationPostForMenu', () => {
 			},
 		];
 
-		expect( generator.next( menuItems ).value ).toEqual( {
-			type: 'SET_MENU_ITEM_TO_CLIENT_ID_MAPPING',
-			postId: stubPost.id,
-			mapping: {
-				100: expect.stringMatching( /client-id-\d+/ ),
-				101: expect.stringMatching( /client-id-\d+/ ),
-				102: expect.stringMatching( /client-id-\d+/ ),
-			},
-		} );
-
 		const navigationBlockStubPost = {
 			id,
 			slug: id,
