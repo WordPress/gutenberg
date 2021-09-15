@@ -50,7 +50,7 @@ theme
 ## Theme setup
 
 Create a new folder for your theme in `/wp-content/themes/`.
-In this example, the folder name is `fse-tutorial`.
+In this example, the folder name is `block-theme-tutorial`.
 
 Inside the theme folder, create the `block-templates` and `block-template-parts` folders.
 
@@ -58,7 +58,7 @@ Create a `style.css` file. The file header in the `style.css` file has [the same
 
 ```CSS
 /*
-Theme Name: FSE Tutorial
+Theme Name: Block Theme Tutorial
 Theme URI:
 Author: The WordPress team
 Author URI: https://wordpress.org/
@@ -70,7 +70,7 @@ Tested up to: 5.7
 Requires PHP: 7.0
 License: GNU General Public License v2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
-Text Domain: fse-tutorial
+Text Domain: block-theme-tutorial
 
 This theme, like WordPress, is licensed under the GPL.
 Use it to make something cool, have fun, and share what you've learned with others.
@@ -90,7 +90,7 @@ You will add most of the theme support in the `theme.json` file. The title tag i
 
 ```php
 <?php
-if ( ! function_exists( 'fse_tutorial_theme_setup' ) ) :
+if ( ! function_exists( 'block_theme_tutorial_theme_setup' ) ) :
 	/**
 	 * Sets up theme defaults and registers support for various WordPress features.
 	 *
@@ -98,7 +98,7 @@ if ( ! function_exists( 'fse_tutorial_theme_setup' ) ) :
 	 * before the init hook. The init hook is too late for some features, such as indicating
 	 * support for post thumbnails.
 	 */
-	function fse_tutorial_theme_setup() {
+	function block_theme_tutorial_theme_setup() {
 		/**
 		 * Add default posts and comments RSS feed links to <head>.
 		 */
@@ -114,15 +114,15 @@ if ( ! function_exists( 'fse_tutorial_theme_setup' ) ) :
 		add_theme_support( 'wp-block-styles' );
 	}
 endif;
-add_action( 'after_setup_theme', 'fse_tutorial_theme_setup' );
+add_action( 'after_setup_theme', 'block_theme_tutorial_theme_setup' );
 
 /**
  * Enqueue theme scripts and styles.
  */
-function fse_tutorial_theme_scripts() {
-	wp_enqueue_style( 'fse-tutorial-style', get_stylesheet_uri() );
+function block_theme_tutorial_theme_scripts() {
+	wp_enqueue_style( 'block-theme-tutorial-style', get_stylesheet_uri() );
 }
-add_action( 'wp_enqueue_scripts', 'fse_tutorial_theme_scripts' );
+add_action( 'wp_enqueue_scripts', 'block_theme_tutorial_theme_scripts' );
 ```
 
 Your theme should now include the following files and folders:
