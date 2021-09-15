@@ -9,6 +9,7 @@ import { useEffect, useMemo, useRef, useState } from '@wordpress/element';
 import * as styles from '../styles';
 import { useContextSystem } from '../../ui/context';
 import { useCx } from '../../utils/hooks/use-cx';
+import type { ToolsPanelProps, ToolPanelItem } from '../types';
 
 const generateMenuItems = ( { panelItems, reset } ) => {
 	const menuItems = { default: {}, optional: {} };
@@ -21,7 +22,7 @@ const generateMenuItems = ( { panelItems, reset } ) => {
 	return menuItems;
 };
 
-export function useToolsPanel( props ) {
+export function useToolsPanel( props: ToolsPanelProps ) {
 	const { className, resetAll, panelId, ...otherProps } = useContextSystem(
 		props,
 		'ToolsPanel'
@@ -48,7 +49,7 @@ export function useToolsPanel( props ) {
 	// Allow panel items to register themselves.
 	const [ panelItems, setPanelItems ] = useState( [] );
 
-	const registerPanelItem = ( item ) => {
+	const registerPanelItem = ( item: ToolPanelItem ) => {
 		setPanelItems( ( items ) => [ ...items, item ] );
 	};
 
@@ -103,7 +104,7 @@ export function useToolsPanel( props ) {
 
 	// Toggle the checked state of a menu item which is then used to determine
 	// display of the item within the panel.
-	const toggleItem = ( label ) => {
+	const toggleItem = ( label: string ) => {
 		const currentItem = panelItems.find( ( item ) => item.label === label );
 
 		if ( ! currentItem ) {

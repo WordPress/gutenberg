@@ -6,8 +6,12 @@ import { ToolsPanelContext } from '../context';
 import { useToolsPanel } from './hook';
 import { View } from '../../view';
 import { contextConnect } from '../../ui/context';
+import type { ToolsPanelProps, toolsPanelforwardRef } from '../types';
 
-const ToolsPanel = ( props, forwardedRef ) => {
+const ToolsPanel = (
+	props: ToolsPanelProps,
+	forwardedRef: toolsPanelforwardRef
+) => {
 	const {
 		children,
 		label,
