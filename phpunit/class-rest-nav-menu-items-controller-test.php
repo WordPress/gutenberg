@@ -36,6 +36,11 @@ class REST_Nav_Menu_Items_Controller_Test extends WP_Test_REST_Post_Type_Control
 	protected static $subscriber_id;
 
 	/**
+	 * @var int
+	 */
+	protected static $times_filters_applied;
+
+	/**
 	 *
 	 */
 	const POST_TYPE = 'nav_menu_item';
@@ -86,6 +91,8 @@ class REST_Nav_Menu_Items_Controller_Test extends WP_Test_REST_Post_Type_Control
 				'menu-item-status'    => 'publish',
 			)
 		);
+
+		self::$times_filters_applied = 0;
 	}
 
 	/**
@@ -731,6 +738,30 @@ class REST_Nav_Menu_Items_Controller_Test extends WP_Test_REST_Post_Type_Control
 		$request  = new WP_REST_Request( 'GET', '/__experimental/menu-items/' . $this->menu_item_id );
 		$response = rest_get_server()->dispatch( $request );
 		$this->assertErrorResponse( 'rest_cannot_view', $response, 403 );
+	}
+
+	/**
+	 *
+	 */
+	public function test_filters_are_only_applied_once_when_creating_a_menu_item() {
+		wp_set_current_user( self::$admin_id );
+		add_filter( 'title_save_pre', array( $this, 'count_times_filters_have_been_applied' ) );
+		add_filter( 'excerpt_save_pre', array( $this, 'count_times_filters_have_been_applied' ) );
+		add_filter( 'content_save_pre', array( $this, 'count_times_filters_have_been_applied' ) );
+
+		$request = new WP_REST_Request( 'POST', '/__experimental/menu-items' );
+		$request->add_header( 'content-type', 'application/x-www-form-urlencoded' );
+		$params = $this->set_menu_item_data();
+		$request->set_body_params( $params );
+		$response = rest_get_server()->dispatch( $request );
+
+		$this->check_create_menu_item_response( $response );
+		$this->assertSame( 3, self::$times_filters_applied, 'Callback function must be called 3 times (meaning each filter has been applied only once' );
+	}
+
+	public function count_times_filters_have_been_applied( $value ) {
+		++self::$times_filters_applied;
+		return $value;
 	}
 
 	/**
