@@ -24,7 +24,7 @@ export default function LinkCell( {
 			label={ __( 'Link to' ) }
 			// since this is not actually editable, we treat value as a placeholder
 			value={ value || placeholder || __( 'Search or type URL' ) }
-			// TODO(David): Toggling placeholder styles based on precense of custom
+			// TODO(David): Toggling placeholder styles based on presence of custom
 			// placeholder text is confusing. We need to find a better approach.
 			valueStyle={
 				!! ( value || placeholder ) ? undefined : placeholderColor
