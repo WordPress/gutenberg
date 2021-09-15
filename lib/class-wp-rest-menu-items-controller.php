@@ -916,7 +916,7 @@ class WP_REST_Menu_Items_Controller extends WP_REST_Posts_Controller {
 			'description' => __( 'The DB ID of the nav_menu_item that is this item\'s menu parent, if any, otherwise 0.', 'gutenberg' ),
 			'context'     => array( 'view', 'edit', 'embed' ),
 			'type'        => 'integer',
-			'minimum'     => 0,
+			'minimum'     => 1,
 			'default'     => 1,
 		);
 
