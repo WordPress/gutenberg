@@ -86,9 +86,9 @@ function LinkSettings( {
 	urlValue,
 	// Attributes properties
 	url,
-	label,
+	label = '',
 	linkTarget,
-	rel,
+	rel = '',
 } ) {
 	const [ urlInputValue, setUrlInputValue ] = useState( '' );
 	const [ labelInputValue, setLabelInputValue ] = useState( '' );

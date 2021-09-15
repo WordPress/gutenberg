@@ -56,7 +56,7 @@ function ImageOptionsScreen( props ) {
 				newUrl = attachmentPageUrl;
 				break;
 			default:
-				newUrl = null;
+				newUrl = '';
 				break;
 		}
 		// TODO(David): Most of the logic for updatting the attributes is contained
