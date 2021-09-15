@@ -36,7 +36,15 @@ export type Props = {
 	 */
 	onClick?: () => void;
 	/**
-	 * Flag to indicate if the menu item is disabled.
+	 * Flag to indicate if the menu item is disabled. This prop is passed down to the underlying menu component
 	 */
 	disabled?: boolean;
+	/**
+	 * String that is passed down to the underlying button component to use for aria label'.
+	 */
+	label?: string;
+	/**
+	 * String that is passed down to the underlying button component to specify the button style.
+	 */
+	variant?: string;
 };
