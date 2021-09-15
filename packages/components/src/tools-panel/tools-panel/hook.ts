@@ -57,7 +57,7 @@ export function useToolsPanel(
 
 	// Panels need to deregister on unmount to avoid orphans in menu state.
 	// This is an issue when panel items are being injected via SlotFills.
-	const deregisterPanelItem = ( label ) => {
+	const deregisterPanelItem = ( label: string ) => {
 		// When switching selections between components injecting matching
 		// controls, e.g. both panels have a "padding" control, the
 		// deregistration of the first panel doesn't occur until after the
@@ -73,7 +73,7 @@ export function useToolsPanel(
 	// This is intended for use with default panel items. They are displayed
 	// separately to optional items and have different display states,
 	//.we need to update that when their value is customized.
-	const flagItemCustomization = ( label, group = 'default' ) => {
+	const flagItemCustomization = ( label: string, group = 'default' ) => {
 		setMenuItems( {
 			...menuItems,
 			[ group ]: {
@@ -94,7 +94,6 @@ export function useToolsPanel(
 				filters.push( item.resetAllFilter );
 			}
 		} );
-
 		return filters;
 	};
 
