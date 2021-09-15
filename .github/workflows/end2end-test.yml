@@ -33,7 +33,6 @@ jobs:
               uses: actions/setup-node@38d90ce44d5275ad62cc48384b3d8a58c500bb5f # v2.2.2
               with:
                   node-version: ${{ matrix.node }}
-                  cache: npm
 
             - name: Npm install and build
               run: |
