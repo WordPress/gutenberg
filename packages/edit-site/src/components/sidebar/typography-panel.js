@@ -155,8 +155,7 @@ export default function TypographyPanel( {
 
 	return (
 		<ToolsPanel
-			label={ __( 'Typography options' ) }
-			header={ __( 'Typography' ) }
+			label={ __( 'Typography' ) }
 			resetAll={ resetAll }
 			className="typography-controls"
 		>

@@ -2,17 +2,13 @@
  * WordPress dependencies
  */
 import { getBlockSupport, hasBlockSupport } from '@wordpress/blocks';
-import {
-	__experimentalToolsPanel as ToolsPanel,
-	__experimentalToolsPanelItem as ToolsPanelItem,
-} from '@wordpress/components';
+import { __experimentalToolsPanelItem as ToolsPanelItem } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
  */
 import InspectorControls from '../components/inspector-controls';
-import { cleanEmptyObject } from './utils';
 
 import {
 	LINE_HEIGHT_SUPPORT_KEY,
@@ -78,6 +74,7 @@ export const TYPOGRAPHY_SUPPORT_KEYS = [
 ];
 
 export function TypographyPanel( props ) {
+	const { clientId } = props;
 	const isFontFamilyDisabled = useIsFontFamilyDisabled( props );
 	const isFontSizeDisabled = useIsFontSizeDisabled( props );
 	const isFontAppearanceDisabled = useIsFontAppearanceDisabled( props );
@@ -96,102 +93,127 @@ export function TypographyPanel( props ) {
 		'__experimentalDefaultControls',
 	] );
 
-	// Callback to reset all block support attributes controlled via this panel.
-	const resetAll = () => {
-		const { style } = props.attributes;
-
-		props.setAttributes( {
-			fontSize: undefined,
-			style: cleanEmptyObject( {
-				...style,
-				typography: undefined,
-			} ),
-		} );
-	};
+	const createResetAllFilter = ( attribute ) => ( newAttributes ) => ( {
+		...newAttributes,
+		style: {
+			...newAttributes.style,
+			typography: {
+				...newAttributes.style?.typography,
+				[ attribute ]: undefined,
+			},
+		},
+	} );
 
 	return (
-		<InspectorControls>
-			<ToolsPanel
-				label={ __( 'Typography options' ) }
-				header={ __( 'Typography' ) }
-				resetAll={ resetAll }
-				className="typography-controls"
-			>
-				{ ! isFontFamilyDisabled && (
-					<ToolsPanelItem
-						hasValue={ () => hasFontFamilyValue( props ) }
-						label={ __( 'Font family' ) }
-						onDeselect={ () => resetFontFamily( props ) }
-						isShownByDefault={ defaultControls?.fontFamily }
-					>
-						<FontFamilyEdit { ...props } />
-					</ToolsPanelItem>
-				) }
-				{ ! isFontSizeDisabled && (
-					<ToolsPanelItem
-						hasValue={ () => hasFontSizeValue( props ) }
-						label={ __( 'Font size' ) }
-						onDeselect={ () => resetFontSize( props ) }
-						isShownByDefault={ defaultControls?.fontSize }
-					>
-						<FontSizeEdit { ...props } />
-					</ToolsPanelItem>
-				) }
-				{ ! isFontAppearanceDisabled && (
-					<ToolsPanelItem
-						className="single-column"
-						hasValue={ () => hasFontAppearanceValue( props ) }
-						label={ __( 'Appearance' ) }
-						onDeselect={ () => resetFontAppearance( props ) }
-						isShownByDefault={ defaultControls?.fontAppearance }
-					>
-						<FontAppearanceEdit { ...props } />
-					</ToolsPanelItem>
-				) }
-				{ ! isLineHeightDisabled && (
-					<ToolsPanelItem
-						className="single-column"
-						hasValue={ () => hasLineHeightValue( props ) }
-						label={ __( 'Line height' ) }
-						onDeselect={ () => resetLineHeight( props ) }
-						isShownByDefault={ defaultControls?.lineHeight }
-					>
-						<LineHeightEdit { ...props } />
-					</ToolsPanelItem>
-				) }
-				{ ! isTextDecorationDisabled && (
-					<ToolsPanelItem
-						className="single-column"
-						hasValue={ () => hasTextDecorationValue( props ) }
-						label={ __( 'Decoration' ) }
-						onDeselect={ () => resetTextDecoration( props ) }
-						isShownByDefault={ defaultControls?.textDecoration }
-					>
-						<TextDecorationEdit { ...props } />
-					</ToolsPanelItem>
-				) }
-				{ ! isTextTransformDisabled && (
-					<ToolsPanelItem
-						className="single-column"
-						hasValue={ () => hasTextTransformValue( props ) }
-						label={ __( 'Letter case' ) }
-						onDeselect={ () => resetTextTransform( props ) }
-						isShownByDefault={ defaultControls?.textTransform }
-					>
-						<TextTransformEdit { ...props } />
-					</ToolsPanelItem>
-				) }
-				{ ! isLetterSpacingDisabled && (
-					<ToolsPanelItem
-						hasValue={ () => hasLetterSpacingValue( props ) }
-						label={ __( 'Letter-spacing' ) }
-						onDeselect={ () => resetLetterSpacing( props ) }
-						isShownByDefault={ defaultControls?.letterSpacing }
-					>
-						<LetterSpacingEdit { ...props } />
-					</ToolsPanelItem>
-				) }
-			</ToolsPanel>
+		<InspectorControls __experimentalGroup="typography">
+			{ ! isFontFamilyDisabled && (
+				<ToolsPanelItem
+					hasValue={ () => hasFontFamilyValue( props ) }
+					label={ __( 'Font family' ) }
+					onDeselect={ () => resetFontFamily( props ) }
+					isShownByDefault={ defaultControls?.fontFamily }
+					resetAllFilter={ createResetAllFilter( 'fontFamily' ) }
+					panelId={ clientId }
+				>
+					<FontFamilyEdit { ...props } />
+				</ToolsPanelItem>
+			) }
+			{ ! isFontSizeDisabled && (
+				<ToolsPanelItem
+					hasValue={ () => hasFontSizeValue( props ) }
+					label={ __( 'Font size' ) }
+					onDeselect={ () => resetFontSize( props ) }
+					isShownByDefault={ defaultControls?.fontSize }
+					resetAllFilter={ ( newAttributes ) => ( {
+						...newAttributes,
+						fontSize: undefined,
+						style: {
+							...newAttributes.style,
+							typography: {
+								...newAttributes.style?.typography,
+								fontSize: undefined,
+							},
+						},
+					} ) }
+					panelId={ clientId }
+				>
+					<FontSizeEdit { ...props } />
+				</ToolsPanelItem>
+			) }
+			{ ! isFontAppearanceDisabled && (
+				<ToolsPanelItem
+					className="single-column"
+					hasValue={ () => hasFontAppearanceValue( props ) }
+					label={ __( 'Appearance' ) }
+					onDeselect={ () => resetFontAppearance( props ) }
+					isShownByDefault={ defaultControls?.fontAppearance }
+					resetAllFilter={ ( newAttributes ) => ( {
+						...newAttributes,
+						style: {
+							...newAttributes.style,
+							typography: {
+								...newAttributes.style?.typography,
+								fontStyle: undefined,
+								fontWeight: undefined,
+							},
+						},
+					} ) }
+					panelId={ clientId }
+				>
+					<FontAppearanceEdit { ...props } />
+				</ToolsPanelItem>
+			) }
+			{ ! isLineHeightDisabled && (
+				<ToolsPanelItem
+					className="single-column"
+					hasValue={ () => hasLineHeightValue( props ) }
+					label={ __( 'Line height' ) }
+					onDeselect={ () => resetLineHeight( props ) }
+					isShownByDefault={ defaultControls?.lineHeight }
+					resetAllFilter={ createResetAllFilter( 'lineHeight' ) }
+					panelId={ clientId }
+				>
+					<LineHeightEdit { ...props } />
+				</ToolsPanelItem>
+			) }
+			{ ! isTextDecorationDisabled && (
+				<ToolsPanelItem
+					className="single-column"
+					hasValue={ () => hasTextDecorationValue( props ) }
+					label={ __( 'Decoration' ) }
+					onDeselect={ () => resetTextDecoration( props ) }
+					isShownByDefault={ defaultControls?.textDecoration }
+					resetAllFilter={ createResetAllFilter( 'textDecoration' ) }
+					panelId={ clientId }
+				>
+					<TextDecorationEdit { ...props } />
+				</ToolsPanelItem>
+			) }
+			{ ! isTextTransformDisabled && (
+				<ToolsPanelItem
+					className="single-column"
+					hasValue={ () => hasTextTransformValue( props ) }
+					label={ __( 'Letter case' ) }
+					onDeselect={ () => resetTextTransform( props ) }
+					isShownByDefault={ defaultControls?.textTransform }
+					resetAllFilter={ createResetAllFilter( 'textTransform' ) }
+					panelId={ clientId }
+				>
+					<TextTransformEdit { ...props } />
+				</ToolsPanelItem>
+			) }
+			{ ! isLetterSpacingDisabled && (
+				<ToolsPanelItem
+					hasValue={ () => hasLetterSpacingValue( props ) }
+					label={ __( 'Letter-spacing' ) }
+					onDeselect={ () => resetLetterSpacing( props ) }
+					isShownByDefault={ defaultControls?.letterSpacing }
+					resetAllFilter={ createResetAllFilter( 'letterSpacing' ) }
+					panelId={ clientId }
+				>
+					<LetterSpacingEdit { ...props } />
+				</ToolsPanelItem>
+			) }
 		</InspectorControls>
 	);
 }
