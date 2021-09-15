@@ -101,16 +101,26 @@ export const withMinimumAndMaximumLimits = () => {
 
 export const withIconBefore = () => {
 	const label = text( 'Label', 'How many columns should this use?' );
-	const icon = text( 'Icon', 'wordpress' );
+	const showIcon = boolean( 'icon', true );
 
-	return <RangeControlWithState label={ label } beforeIcon={ icon } />;
+	return (
+		<RangeControlWithState
+			label={ label }
+			beforeIcon={ showIcon ? wordpress : undefined }
+		/>
+	);
 };
 
 export const withIconAfter = () => {
 	const label = text( 'Label', 'How many columns should this use?' );
-	const icon = text( 'Icon', 'wordpress' );
+	const showIcon = boolean( 'icon', true );
 
-	return <RangeControlWithState label={ label } afterIcon={ icon } />;
+	return (
+		<RangeControlWithState
+			label={ label }
+			afterIcon={ showIcon ? wordpress : undefined }
+		/>
+	);
 };
 
 export const withReset = () => {
