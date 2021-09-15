@@ -209,6 +209,15 @@ _Returns_
 
 -   `import('lodash').DebouncedFunc<TFunc>`: Debounced function.
 
+### useFocusableIframe
+
+Dispatches a bubbling focus event when the iframe receives focus. Use
+`onFocus` as usual on the iframe or a parent element.
+
+_Returns_
+
+-   `Object`: Ref to pass to the iframe.
+
 ### useFocusOnMount
 
 Hook used to focus the first tabbable element on mount.
