@@ -35,8 +35,15 @@ function ImageOptionsScreen( props ) {
 		linkDestination,
 	} = route.params || {};
 
+	const customUrlSet =
+		!! inputValue &&
+		inputValue !== imageUrl &&
+		inputValue !== attachmentPageUrl;
+
 	function goToLinkPicker() {
-		navigation.navigate( 'linkPicker', { inputValue } );
+		navigation.navigate( 'linkPicker', {
+			inputValue: customUrlSet ? inputValue : '',
+		} );
 	}
 
 	const setLinkDestination = ( newLinkDestination ) => () => {
@@ -113,18 +120,10 @@ function ImageOptionsScreen( props ) {
 					leftAlign
 					// since this is not actually editable, we treat value as a placeholder
 					value={
-						! inputValue ||
-						inputValue === imageUrl ||
-						inputValue === attachmentPageUrl
-							? __( 'Search or type URL' )
-							: inputValue
+						customUrlSet ? inputValue : __( 'Search or type URL' )
 					}
 					valueStyle={
-						! inputValue ||
-						inputValue === imageUrl ||
-						inputValue === attachmentPageUrl
-							? styles.placeholderColor
-							: undefined
+						customUrlSet ? undefined : styles.placeholderColor
 					}
 					onPress={ goToLinkPicker }
 				>
