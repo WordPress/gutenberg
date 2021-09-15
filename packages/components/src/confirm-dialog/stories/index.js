@@ -8,7 +8,7 @@ import React, { useState } from 'react';
  * Internal dependencies
  */
 import Button from '../../button';
-import { ConfirmDialog } from '..';
+import { __experimentalConfirmDialog as ConfirmDialog } from '..';
 
 export default {
 	component: ConfirmDialog,

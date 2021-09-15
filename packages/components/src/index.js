@@ -184,4 +184,4 @@ export {
 } from './higher-order/with-focus-return';
 export { default as withNotices } from './higher-order/with-notices';
 export { default as withSpokenMessages } from './higher-order/with-spoken-messages';
-export { ConfirmDialog } from './confirm-dialog'; // @todo make it experimental
+export { ConfirmDialog as __experimentalConfirmDialog } from './confirm-dialog';

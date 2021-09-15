@@ -3,7 +3,10 @@
  */
 import { __ } from '@wordpress/i18n';
 import { Component } from '@wordpress/element';
-import { VisuallyHidden, ConfirmDialog } from '@wordpress/components';
+import {
+	VisuallyHidden,
+	__experimentalConfirmDialog as ConfirmDialog,
+} from '@wordpress/components';
 import { withInstanceId, compose } from '@wordpress/compose';
 import { withSelect, withDispatch } from '@wordpress/data';
 

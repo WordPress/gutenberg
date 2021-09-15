@@ -26,7 +26,6 @@ import Button from '../button';
 import * as styles from './styles';
 import { useCx } from '../utils/hooks/use-cx';
 
-// @todo add jsdoc
 function ConfirmDialog(
 	props: WordPressComponentProps< OwnProps, 'div', false >,
 	forwardedRef: Ref< any >
