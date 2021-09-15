@@ -67,7 +67,10 @@ export function SocialLinksEdit( props ) {
 	const usedLayout = layout || getDefaultBlockLayout( name );
 
 	// Remove icon background color if logos only style selected.
-	const logosOnly = attributes.className?.indexOf( 'is-style-logos-only' ) >= 0;
+	const logosOnly =
+		attributes.className
+				? attributes.className.indexOf( 'is-style-logos-only' ) >= 0 
+				: false;
 	useEffect( () => {
 		if ( logosOnly ) {
 			setAttributes( {
@@ -80,7 +83,10 @@ export function SocialLinksEdit( props ) {
 	}, [ logosOnly, setAttributes ] );
 
 	// Set the previsiounly selected bckground values of the logo for default.
-	const defaultAgain = attributes.className?.indexOf( 'is-style-default' ) >= 0;
+	const defaultAgain =
+		attributes.className
+				?attributes.className.indexOf( 'is-style-default' ) >= 0 
+				:false;
 	useEffect( () => {
 		if ( defaultAgain ) {
 			setAttributes( {
@@ -92,7 +98,10 @@ export function SocialLinksEdit( props ) {
 	}, [ defaultAgain, setAttributes ] );
 
 	// Set the previsiounly selected bckground values of the logo for Pill.
-	const pillStyle = attributes.className?.indexOf( 'is-style-pill-shape' ) >= 0;
+	const pillStyle =
+		attributes.className
+				?attributes.className.indexOf( 'is-style-pill-shape' ) >= 0 
+				:false;
 	useEffect( () => {
 		if ( pillStyle ) {
 			setAttributes( {
