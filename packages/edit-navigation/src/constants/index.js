@@ -17,14 +17,14 @@ export const MENU_POST_TYPE = 'menu';
  *
  * @type {string}
  */
-export const NAVIGATION_POST_KIND = 'root';
+export const NAVIGATION_POST_KIND = 'postType';
 
 /**
  * "post type" of the navigation post.
  *
  * @type {string}
  */
-export const NAVIGATION_POST_POST_TYPE = 'postType';
+export const NAVIGATION_POST_POST_TYPE = 'navigation_post';
 
 /**
  * The scope name of the editor's complementary area.
