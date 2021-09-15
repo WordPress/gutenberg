@@ -24,6 +24,7 @@ import {
 import { useSelect } from '@wordpress/data';
 import { store as editorStore } from '@wordpress/editor';
 import { usePreferredColorSchemeStyle } from '@wordpress/compose';
+import { requestCustomerSupportOptionsShow } from '@wordpress/react-native-bridge';
 
 /**
  * Internal dependencies
@@ -152,12 +153,16 @@ function EditorHelpTopics( { close, isVisible, onClose } ) {
 														'Contact support'
 													) }
 													accessibilityLabel="TODO"
+													onPress={
+														requestCustomerSupportOptionsShow
+													}
 												/>
 											}
 											{
 												<HelpGetSupportButton
 													title={ __( 'My Tickets' ) }
 													accessibilityLabel="TODO"
+													// onPress={  }
 												/>
 											}
 										</PanelBody>
