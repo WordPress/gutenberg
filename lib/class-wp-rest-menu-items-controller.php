@@ -671,7 +671,7 @@ class WP_REST_Menu_Items_Controller extends WP_REST_Posts_Controller {
 
 		if ( rest_is_field_included( 'parent', $fields ) ) {
 			// Same as post_parent, expose as integer.
-			$data['parent'] = (int) $menu_item->post_parent;
+			$data['parent'] = (int) $menu_item->menu_item_parent;
 		}
 
 		if ( rest_is_field_included( 'menu_order', $fields ) ) {
