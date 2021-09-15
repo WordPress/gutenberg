@@ -6,7 +6,6 @@ import { Pressable, Text } from 'react-native';
 /**
  * WordPress dependencies
  */
-import { requestContactCustomerSupport } from '@wordpress/react-native-bridge';
 import { usePreferredColorSchemeStyle } from '@wordpress/compose';
 
 /**
@@ -14,7 +13,7 @@ import { usePreferredColorSchemeStyle } from '@wordpress/compose';
  */
 import styles from './style.scss';
 
-const HelpGetSupportButton = ( { title } ) => {
+const HelpGetSupportButton = ( { onPress, title } ) => {
 	const buttonStyle = usePreferredColorSchemeStyle(
 		styles.button,
 		styles.buttonDark
@@ -26,10 +25,7 @@ const HelpGetSupportButton = ( { title } ) => {
 	);
 
 	return (
-		<Pressable
-			style={ buttonStyle }
-			onPress={ requestContactCustomerSupport }
-		>
+		<Pressable style={ buttonStyle } onPress={ onPress }>
 			{ /* todo: a11y */ }
 			<Text style={ textStyle }>{ title }</Text>
 		</Pressable>
