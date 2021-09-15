@@ -8,7 +8,7 @@ import React, { useState } from 'react';
  * Internal dependencies
  */
 import Button from '../../button';
-import { __experimentalConfirmDialog as ConfirmDialog } from '..';
+import { ConfirmDialog } from '..';
 
 export default {
 	component: ConfirmDialog,
@@ -50,7 +50,7 @@ export const UncontrolledAndWithExplicitOnCancel = () => {
 };
 
 // Controlled `ConfirmDialog`s require both `onConfirm` *and* `onCancel to be passed
-// It's expected that the user will then use it to hide the dialog, too (see the the
+// It's expected that the user will then use it to hide the dialog, too (see the
 // `setIsOpen` calls below).
 export const ControlledWithExplicitOnCancel = () => {
 	const [ isOpen, setIsOpen ] = useState( false );
