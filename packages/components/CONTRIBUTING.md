@@ -307,8 +307,6 @@ This component is deprecated. Please use  `{other component}` from the `{other p
 
 Description of the component.
 
-
-
 ## Usage
 
 Code example using correct markdown syntax and formatted using project's formatting rules.
