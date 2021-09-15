@@ -297,12 +297,12 @@ Each component that is exported from the `@wordpress/components` package should 
 ```
 # ComponentName
 
-** If component is experimental, add the following line: **
+If component is experimental, add the following section:
 <div class="callout callout-alert">
 This feature is still experimental. “Experimental” means this is an early implementation subject to drastic and breaking changes.
 </div>
 
-** If component is deprecated, add the following line: **
+If component is deprecated, add the following section:
 <div class="callout callout-alert">
 This component is deprecated. Please use  `{other component}` from the `{other package}` package instead.
 </div>
@@ -319,7 +319,7 @@ The component accepts the following props:
 
 ### propName
 
-Prop description. With a new line before and after the description.
+Prop description. With a new line before and after the description and before and after type/required blocks.
 
 -   Type: Typescript style type i.e `string`, `number`, `( nextValue: string ) => void`
 -   Required: Either`yes` or `no`
