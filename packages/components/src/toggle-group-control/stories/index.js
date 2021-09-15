@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import { boolean, text } from '@storybook/addon-knobs';
+
+/**
  * WordPress dependencies
  */
 import { useState } from '@wordpress/element';
@@ -6,7 +11,6 @@ import { useState } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import { __experimentalSpacer as Spacer } from '../../';
 import { ToggleGroupControl, ToggleGroupControlOption } from '../index';
 import { View } from '../../view';
 
@@ -16,52 +20,64 @@ export default {
 };
 
 const aligns = [ 'Left', 'Center', 'Right', 'Justify' ];
-const alignOptions = aligns.map( ( key ) => (
-	<ToggleGroupControlOption key={ key } value={ key } label={ key } />
-) );
+const KNOBS_GROUPS = {
+	ToggleGroupControl: 'ToggleGroupControl',
+	ToggleGroupControlOption: 'ToggleGroupControlOption',
+};
 
 export const _default = () => {
 	const [ alignState, setAlignState ] = useState( aligns[ 0 ] );
-	const label = 'Toggle Group Control';
+	const label = text(
+		`${ KNOBS_GROUPS.ToggleGroupControl }: label`,
+		'Toggle Group Control',
+		KNOBS_GROUPS.ToggleGroupControl
+	);
+	const hideLabelFromVision = boolean(
+		`${ KNOBS_GROUPS.ToggleGroupControl }: hideLabelFromVision`,
+		false,
+		KNOBS_GROUPS.ToggleGroupControl
+	);
+	const isBlock = boolean(
+		`${ KNOBS_GROUPS.ToggleGroupControl }: isBlock (render as a css block element)`,
+		false,
+		KNOBS_GROUPS.ToggleGroupControl
+	);
+	const help = text(
+		`${ KNOBS_GROUPS.ToggleGroupControl }: help`,
+		undefined,
+		KNOBS_GROUPS.ToggleGroupControl
+	);
+	const isAdaptiveWidth = boolean(
+		`${ KNOBS_GROUPS.ToggleGroupControl }: isAdaptiveWidth`,
+		false,
+		KNOBS_GROUPS.ToggleGroupControl
+	);
+
+	const alignOptions = aligns.map( ( key, index ) => (
+		<ToggleGroupControlOption
+			key={ key }
+			value={ key }
+			label={ text(
+				`${ KNOBS_GROUPS.ToggleGroupControlOption }: label`,
+				key,
+				`${ KNOBS_GROUPS.ToggleGroupControlOption }-${ index + 1 }`
+			) }
+		/>
+	) );
 
 	return (
 		<View>
-			<Spacer>
-				<ToggleGroupControl
-					isBlock
-					onChange={ setAlignState }
-					value={ alignState }
-					label={ label }
-				>
-					{ alignOptions }
-				</ToggleGroupControl>
-			</Spacer>
-			<Spacer>
-				<ToggleGroupControl label={ label } value="horizontal">
-					<ToggleGroupControlOption
-						value="horizontal"
-						label="Horizontal"
-					/>
-					<ToggleGroupControlOption
-						value="vertical"
-						label="Vertical"
-					/>
-				</ToggleGroupControl>
-			</Spacer>
-			<Spacer>
-				<ToggleGroupControl
-					isAdaptiveWidth
-					label={ label }
-					value="long"
-					hideLabelFromVision={ true }
-				>
-					<ToggleGroupControlOption value="short" label="Short" />
-					<ToggleGroupControlOption
-						value="long"
-						label="Looooooooooooong"
-					/>
-				</ToggleGroupControl>
-			</Spacer>
+			<ToggleGroupControl
+				onChange={ setAlignState }
+				value={ alignState }
+				label={ label }
+				hideLabelFromVision={ hideLabelFromVision }
+				help={ help }
+				isBlock={ isBlock }
+				isAdaptiveWidth={ isAdaptiveWidth }
+			>
+				{ alignOptions }
+			</ToggleGroupControl>
 		</View>
 	);
 };

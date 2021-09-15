@@ -7,7 +7,7 @@ import colorize, { ColorFormats } from 'tinycolor2';
  * WordPress dependencies
  */
 import { useCopyToClipboard } from '@wordpress/compose';
-import { useState } from '@wordpress/element';
+import { useState, useEffect, useRef } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 
 /**
@@ -114,6 +114,7 @@ export const ColorDisplay = ( {
 	enableAlpha,
 }: ColorDisplayProps ) => {
 	const [ copiedColor, setCopiedColor ] = useState< string | null >( null );
+	const copyTimer = useRef< number | undefined >();
 	const props = { color, enableAlpha };
 	const Component = getComponent( colorType );
 	const copyRef = useCopyToClipboard< HTMLDivElement >(
@@ -134,8 +135,25 @@ export const ColorDisplay = ( {
 				}
 			}
 		},
-		() => setCopiedColor( colorize( color ).toHex8String() )
+		() => {
+			if ( copyTimer.current ) {
+				clearTimeout( copyTimer.current );
+			}
+			setCopiedColor( colorize( color ).toHex8String() );
+			copyTimer.current = setTimeout( () => {
+				setCopiedColor( null );
+				copyTimer.current = undefined;
+			}, 3000 );
+		}
 	);
+	useEffect( () => {
+		// clear copyTimer on component unmount.
+		return () => {
+			if ( copyTimer.current ) {
+				clearTimeout( copyTimer.current );
+			}
+		};
+	}, [] );
 	return (
 		<Tooltip
 			content={

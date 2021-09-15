@@ -11,18 +11,6 @@
 	.wp-block-navigation-item {
 		background-color: inherit;
 	}
-
-	// Submenu icon indicator.
-	// The specific styles for the submenu indicator are inherited from the navigation block style.
-	.wp-block-page-list__submenu-icon {
-		display: none;
-	}
-
-	.show-submenu-icons {
-		.wp-block-page-list__submenu-icon {
-			display: inline-block;
-		}
-	}
 }
 
 .is-vertical .wp-block-navigation__container,

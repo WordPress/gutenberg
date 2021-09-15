@@ -12,8 +12,7 @@ const resetAll = jest.fn();
 
 // Default props for the tools panel.
 const defaultProps = {
-	header: 'Panel header',
-	label: 'Display options',
+	label: 'Panel header',
 	resetAll,
 };
 
@@ -231,9 +230,9 @@ describe( 'ToolsPanel', () => {
 			expect( menuItems[ 1 ] ).toHaveAttribute( 'aria-checked', 'false' );
 		} );
 
-		it( 'should render panel header', () => {
+		it( 'should render panel label as header text', () => {
 			renderPanel();
-			const header = screen.getByText( defaultProps.header );
+			const header = screen.getByText( defaultProps.label );
 
 			expect( header ).toBeInTheDocument();
 		} );
@@ -258,7 +257,7 @@ describe( 'ToolsPanel', () => {
 			expect( control ).toBeInTheDocument();
 		} );
 
-		it( 'should prevent panel item rendering when toggled off via menu item', async () => {
+		it( 'should prevent optional panel item rendering when toggled off via menu item', async () => {
 			renderPanel();
 			await selectMenuItem( controlProps.label );
 			const control = screen.queryByText( 'Example control' );
@@ -266,7 +265,7 @@ describe( 'ToolsPanel', () => {
 			expect( control ).not.toBeInTheDocument();
 		} );
 
-		it( 'should prevent shown by default item rendering when toggled off via menu item', async () => {
+		it( 'should continue to render shown by default item after it is toggled off via menu item', async () => {
 			render(
 				<ToolsPanel { ...defaultProps }>
 					<ToolsPanelItem
@@ -285,7 +284,31 @@ describe( 'ToolsPanel', () => {
 			await selectMenuItem( controlProps.label );
 			const resetControl = screen.queryByText( 'Default control' );
 
-			expect( resetControl ).not.toBeInTheDocument();
+			expect( resetControl ).toBeInTheDocument();
+		} );
+
+		it( 'should render appropriate menu groups', async () => {
+			const { container } = render(
+				<ToolsPanel { ...defaultProps }>
+					<ToolsPanelItem
+						{ ...controlProps }
+						isShownByDefault={ true }
+					>
+						<div>Default control</div>
+					</ToolsPanelItem>
+					<ToolsPanelItem { ...altControlProps }>
+						<div>Optional control</div>
+					</ToolsPanelItem>
+				</ToolsPanel>
+			);
+			openDropdownMenu();
+
+			const menuGroups = container.querySelectorAll(
+				'.components-menu-group'
+			);
+
+			// Groups should be: default controls, optional controls & reset all.
+			expect( menuGroups.length ).toEqual( 3 );
 		} );
 	} );
 
@@ -316,6 +339,26 @@ describe( 'ToolsPanel', () => {
 			await selectMenuItem( 'Reset all' );
 
 			expect( resetAll ).toHaveBeenCalledTimes( 1 );
+			expect( controlProps.onSelect ).not.toHaveBeenCalled();
+			expect( controlProps.onDeselect ).not.toHaveBeenCalled();
+			expect( altControlProps.onSelect ).not.toHaveBeenCalled();
+			expect( altControlProps.onDeselect ).not.toHaveBeenCalled();
+		} );
+
+		// This confirms the internal `isResetting` state when resetting all
+		// controls does not prevent subsequent individual reset requests.
+		// i.e. onDeselect callbacks are called correctly after a resetAll.
+		it( 'should call onDeselect after previous reset all', async () => {
+			renderPanel();
+
+			await selectMenuItem( 'Reset all' ); // Initial control is displayed by default.
+			await selectMenuItem( controlProps.label ); // Re-display control.
+
+			expect( controlProps.onDeselect ).not.toHaveBeenCalled();
+
+			await selectMenuItem( controlProps.label ); // Reset control.
+
+			expect( controlProps.onDeselect ).toHaveBeenCalled();
 		} );
 	} );
 

@@ -36,13 +36,22 @@ import { noop } from 'lodash';
 import { compose, pure, withInstanceId } from '@wordpress/compose';
 import { __ } from '@wordpress/i18n';
 import { Component, createRef } from '@wordpress/element';
-import { TAB } from '@wordpress/keycodes';
+import {
+	TAB,
+	UP,
+	DOWN,
+	RIGHT,
+	LEFT,
+	PAGEUP,
+	PAGEDOWN,
+	HOME,
+	END,
+} from '@wordpress/keycodes';
 
 /**
  * Internal dependencies
  */
 import { calculateHueChange } from './utils';
-import KeyboardShortcuts from '../keyboard-shortcuts';
 import { VisuallyHidden } from '../visually-hidden';
 
 export class Hue extends Component {
@@ -55,6 +64,7 @@ export class Hue extends Component {
 		this.handleChange = this.handleChange.bind( this );
 		this.handleMouseDown = this.handleMouseDown.bind( this );
 		this.handleMouseUp = this.handleMouseUp.bind( this );
+		this.handleKeyDown = this.handleKeyDown.bind( this );
 	}
 
 	componentWillUnmount() {
@@ -107,76 +117,74 @@ export class Hue extends Component {
 		this.unbindEventListeners();
 	}
 
-	preventKeyEvents( event ) {
-		if ( event.keyCode === TAB ) {
-			return;
-		}
-		event.preventDefault();
-	}
-
 	unbindEventListeners() {
 		window.removeEventListener( 'mousemove', this.handleChange );
 		window.removeEventListener( 'mouseup', this.handleMouseUp );
 	}
 
-	render() {
-		const { hsl = {}, instanceId } = this.props;
-
-		const pointerLocation = { left: `${ ( hsl.h * 100 ) / 360 }%` };
+	handleKeyDown( event ) {
+		const { keyCode, shiftKey } = event;
 		const shortcuts = {
-			up: () => this.increase(),
-			right: () => this.increase(),
-			'shift+up': () => this.increase( 10 ),
-			'shift+right': () => this.increase( 10 ),
-			pageup: () => this.increase( 10 ),
-			end: () => this.increase( 359 ),
-			down: () => this.decrease(),
-			left: () => this.decrease(),
-			'shift+down': () => this.decrease( 10 ),
-			'shift+left': () => this.decrease( 10 ),
-			pagedown: () => this.decrease( 10 ),
-			home: () => this.decrease( 359 ),
+			[ UP ]: () => this.increase( shiftKey ? 10 : 1 ),
+			[ RIGHT ]: () => this.increase( shiftKey ? 10 : 1 ),
+			[ PAGEUP ]: () => this.increase( 10 ),
+			[ END ]: () => this.increase( 359 ),
+			[ DOWN ]: () => this.decrease( shiftKey ? 10 : 1 ),
+			[ LEFT ]: () => this.decrease( shiftKey ? 10 : 1 ),
+			[ PAGEDOWN ]: () => this.decrease( 10 ),
+			[ HOME ]: () => this.decrease( 359 ),
 		};
 
+		for ( const code in shortcuts ) {
+			if ( code === String( keyCode ) ) {
+				shortcuts[ keyCode ]();
+			}
+		}
+
+		if ( keyCode !== TAB ) {
+			event.preventDefault();
+		}
+	}
+
+	render() {
+		const { hsl = {}, instanceId } = this.props;
+		const pointerLocation = { left: `${ ( hsl.h * 100 ) / 360 }%` };
+
 		return (
-			<KeyboardShortcuts shortcuts={ shortcuts }>
-				<div className="components-color-picker__hue">
-					<div className="components-color-picker__hue-gradient" />
-					{ /* eslint-disable jsx-a11y/no-static-element-interactions */ }
+			<div className="components-color-picker__hue">
+				<div className="components-color-picker__hue-gradient" />
+				{ /* eslint-disable jsx-a11y/no-static-element-interactions */ }
+				<div
+					className="components-color-picker__hue-bar"
+					ref={ this.container }
+					onMouseDown={ this.handleMouseDown }
+					onTouchMove={ this.handleChange }
+					onTouchStart={ this.handleChange }
+				>
 					<div
-						className="components-color-picker__hue-bar"
-						ref={ this.container }
-						onMouseDown={ this.handleMouseDown }
-						onTouchMove={ this.handleChange }
-						onTouchStart={ this.handleChange }
+						tabIndex="0"
+						role="slider"
+						aria-valuemax="1"
+						aria-valuemin="359"
+						aria-valuenow={ hsl.h }
+						aria-orientation="horizontal"
+						aria-label={ __(
+							'Hue value in degrees, from 0 to 359.'
+						) }
+						aria-describedby={ `components-color-picker__hue-description-${ instanceId }` }
+						className="components-color-picker__hue-pointer"
+						style={ pointerLocation }
+						onKeyDown={ this.handleKeyDown }
+					/>
+					<VisuallyHidden
+						as="p"
+						id={ `components-color-picker__hue-description-${ instanceId }` }
 					>
-						<div
-							tabIndex="0"
-							role="slider"
-							aria-valuemax="1"
-							aria-valuemin="359"
-							aria-valuenow={ hsl.h }
-							aria-orientation="horizontal"
-							aria-label={ __(
-								'Hue value in degrees, from 0 to 359.'
-							) }
-							aria-describedby={ `components-color-picker__hue-description-${ instanceId }` }
-							className="components-color-picker__hue-pointer"
-							style={ pointerLocation }
-							onKeyDown={ this.preventKeyEvents }
-						/>
-						<VisuallyHidden
-							as="p"
-							id={ `components-color-picker__hue-description-${ instanceId }` }
-						>
-							{ __(
-								'Move the arrow left or right to change hue.'
-							) }
-						</VisuallyHidden>
-					</div>
-					{ /* eslint-enable jsx-a11y/no-static-element-interactions */ }
+						{ __( 'Move the arrow left or right to change hue.' ) }
+					</VisuallyHidden>
 				</div>
-			</KeyboardShortcuts>
+				{ /* eslint-enable jsx-a11y/no-static-element-interactions */ }
+			</div>
 		);
 	}
 }

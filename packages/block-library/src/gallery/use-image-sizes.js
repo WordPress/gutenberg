@@ -8,6 +8,16 @@ import { get, some } from 'lodash';
  */
 import { useMemo } from '@wordpress/element';
 
+/**
+ * Calculates the image sizes that are avaible for the current gallery images in order to
+ * populate the 'Image size' selector.
+ *
+ * @param {Array}    images      Basic image block data taken from current gallery innerBlock
+ * @param {boolean}  isSelected  Is the block currently selected in the editor.
+ * @param {Function} getSettings Block editor store selector.
+ *
+ * @return {Array} An array of image size options.
+ */
 export default function useImageSizes( images, isSelected, getSettings ) {
 	return useMemo( () => getImageSizing(), [ images, isSelected ] );
 

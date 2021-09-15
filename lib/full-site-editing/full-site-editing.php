@@ -27,7 +27,7 @@ function gutenberg_supports_block_templates() {
  * Show a notice when a Full Site Editing theme is used.
  */
 function gutenberg_full_site_editing_notice() {
-	if ( ! gutenberg_is_fse_theme() ) {
+	if ( ! gutenberg_is_fse_theme() || 'themes' !== get_current_screen()->base ) {
 		return;
 	}
 	?>
