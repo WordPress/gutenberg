@@ -649,7 +649,7 @@ function _gutengerg_has_wp_template_block_templates() {
 function _gutenberg_has_wp_template_part_block_templates( $area ) {
 	$term_query_args = array(
 		'taxonomy' => 'wp_template_part_area',
-		'fields'   => 'name',
+		'field'    => 'name',
 		'terms'    => $area,
 	);
 
