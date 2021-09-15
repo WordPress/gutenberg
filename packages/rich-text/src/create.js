@@ -13,7 +13,6 @@ import { mergePair } from './concat';
 import {
 	LINE_SEPARATOR,
 	OBJECT_REPLACEMENT_CHARACTER,
-	ZWNBSP,
 } from './special-characters';
 
 /**
@@ -306,10 +305,12 @@ function collapseWhiteSpace( string ) {
 	return string.replace( /[\n\r\t]+/g, ' ' );
 }
 
-const REMOVE_PADDING_REGEX = new RegExp(
-	`[${ ZWNBSP }${ OBJECT_REPLACEMENT_CHARACTER }]`,
-	'g'
-);
+/**
+ * Matches the object replacement character or Zero width non-breaking space
+ *
+ * @type {RegExp}
+ */
+export const REMOVE_PADDING_REGEX = /(\u{feff}?|\u{fffc}?)+/gu;
 
 /**
  * Removes padding (zero width non breaking spaces added by `toTree` and object replacement characters).

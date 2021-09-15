@@ -7,7 +7,8 @@ import { JSDOM } from 'jsdom';
 /**
  * Internal dependencies
  */
-import { create } from '../create';
+import { create, REMOVE_PADDING_REGEX } from '../create';
+import { OBJECT_REPLACEMENT_CHARACTER, ZWNBSP } from '../special-characters';
 import { createElement } from '../create-element';
 import { registerFormatType } from '../register-format-type';
 import { unregisterFormatType } from '../unregister-format-type';
@@ -121,5 +122,24 @@ describe( 'create', () => {
 
 		// Format arrays per index.
 		expect( value.formats[ 0 ] ).not.toBe( value.formats[ 1 ] );
+	} );
+
+	it( 'remove padding regex should match all expected padding characters', () => {
+		expect(
+			REMOVE_PADDING_REGEX.test( OBJECT_REPLACEMENT_CHARACTER )
+		).toEqual( true );
+		expect( REMOVE_PADDING_REGEX.test( ZWNBSP ) ).toEqual( true );
+		expect(
+			`${ OBJECT_REPLACEMENT_CHARACTER }te${ ZWNBSP }st${ OBJECT_REPLACEMENT_CHARACTER }`.replace(
+				REMOVE_PADDING_REGEX,
+				''
+			)
+		).toEqual( 'test' );
+		expect(
+			`te${ OBJECT_REPLACEMENT_CHARACTER }st${ ZWNBSP }${ ZWNBSP }`.replace(
+				REMOVE_PADDING_REGEX,
+				''
+			)
+		).toEqual( 'test' );
 	} );
 } );
