@@ -50,11 +50,7 @@ export function DimensionPanel( props ) {
 	};
 
 	return (
-		<ToolsPanel
-			header={ __( 'Dimensions' ) }
-			label={ __( 'Dimensions options' ) }
-			resetAll={ resetAll }
-		>
+		<ToolsPanel label={ __( 'Dimensions' ) } resetAll={ resetAll }>
 			{ ! isPaddingDisabled && (
 				<ToolsPanelItem
 					hasValue={ () => hasPaddingValue( props ) }
@@ -73,19 +69,22 @@ export function DimensionPanel( props ) {
 
 ### `label`: `string`
 
-The label for the panel's dropdown menu.
+Text to be displayed within the panel's header and as the `aria-label` for the
+panel's dropdown menu.
 
 - Required: Yes
+
+### `panelId`: `function`
+
+If a `panelId` is set, it is passed through the `ToolsPanelContext` and used
+to restrict panel items. Only items with a matching `panelId` will be able
+to register themselves with this panel.
+
+- Required: No
 
 ### `resetAll`: `function`
 
 A function to call when the `Reset all` menu option is selected. This is passed
 through to the panel's header component.
-
-- Required: Yes
-
-### `header`: `string`
-
-Text to be displayed within the panel's header.
 
 - Required: Yes

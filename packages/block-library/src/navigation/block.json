@@ -36,6 +36,10 @@
 			"type": "boolean",
 			"default": true
 		},
+		"openSubmenusOnClick":{
+			"type": "boolean",
+			"default": false
+		},
 		"isResponsive": {
 			"type": "boolean",
 			"default": false
@@ -68,6 +72,7 @@
 		"fontSize": "fontSize",
 		"customFontSize": "customFontSize",
 		"showSubmenuIcon": "showSubmenuIcon",
+		"openSubmenusOnClick": "openSubmenusOnClick",
 		"style": "style",
 		"orientation": "orientation"
 	},

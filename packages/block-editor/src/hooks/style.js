@@ -109,9 +109,7 @@ function compileElementsStyles( selector, elements = {} ) {
 				...map(
 					elementStyles,
 					( value, property ) =>
-						`\t${ kebabCase( property ) }: ${ value }${
-							element === 'link' ? '!important' : ''
-						};`
+						`\t${ kebabCase( property ) }: ${ value };`
 				),
 				'}',
 			].join( '\n' );
