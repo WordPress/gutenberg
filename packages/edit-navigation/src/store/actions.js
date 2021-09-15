@@ -84,14 +84,13 @@ export const createMissingMenuItems = ( post ) => async ( {
 };
 
 /**
- * Creates a single placeholder menu item a specified block without an associated menuItem.
+ * Creates a single placeholder menu item.
  * Requests POST /wp/v2/menu-items once for every menu item created.
  *
- * @param {Object} block  The block to create a menu item based on.
  * @param {number} menuId Menu id to embed the placeholder in.
  * @return {Function} An action creator
  */
-export const createPlaceholderMenuItem = ( block, menuId ) => async ( {
+export const createPlaceholderMenuItem = ( menuId ) => async ( {
 	registry,
 } ) => {
 	const existingMenuItems = await registry
