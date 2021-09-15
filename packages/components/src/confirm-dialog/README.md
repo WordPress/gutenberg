@@ -36,7 +36,7 @@ function Example() {
 This is the more typical usage of letting the parent component control when the dialog is open / closed. It's activated when a boolean value is passed to `isOpen`:
   * It will not be automatically closed, you need to let it know when to open / close by updating the value of the `isOpen` prop;
   * Both `onConfirm` and the `onCancel` callbacks are mandatory props in this mode;
-  * You'll want to udpate the state that controls `isOpen` by updating it from the `onCancel` and `onConfirm` callbacks.
+  * You'll want to update the state that controls `isOpen` by updating it from the `onCancel` and `onConfirm` callbacks.
 
 
 ```jsx
