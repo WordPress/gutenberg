@@ -141,16 +141,16 @@ class WP_Theme_JSON_Resolver_Gutenberg_Test extends WP_UnitTestCase {
 
 	function test_translations_are_applied() {
 		add_filter( 'locale', array( $this, 'filter_set_locale_to_polish' ) );
-		load_textdomain( 'fse', realpath( __DIR__ . '/data/languages/themes/fse-pl_PL.mo' ) );
+		load_textdomain( 'block-theme', realpath( __DIR__ . '/data/languages/themes/block-theme-pl_PL.mo' ) );
 
-		switch_theme( 'fse' );
+		switch_theme( 'block-theme' );
 
 		$actual = WP_Theme_JSON_Resolver_Gutenberg::get_theme_data();
 
-		unload_textdomain( 'fse' );
+		unload_textdomain( 'block-theme' );
 		remove_filter( 'locale', array( $this, 'filter_set_locale_to_polish' ) );
 
-		$this->assertSame( wp_get_theme()->get( 'TextDomain' ), 'fse' );
+		$this->assertSame( wp_get_theme()->get( 'TextDomain' ), 'block-theme' );
 		$this->assertSame(
 			array(
 				'color'  => array(
@@ -205,11 +205,11 @@ class WP_Theme_JSON_Resolver_Gutenberg_Test extends WP_UnitTestCase {
 		$default = WP_Theme_JSON_Resolver_Gutenberg::theme_has_support();
 
 		// Switch to a theme that does have support.
-		switch_theme( 'fse' );
-		$fse = WP_Theme_JSON_Resolver_Gutenberg::theme_has_support();
+		switch_theme( 'block-theme' );
+		$block_theme = WP_Theme_JSON_Resolver_Gutenberg::theme_has_support();
 
 		$this->assertSame( false, $default );
-		$this->assertSame( true, $fse );
+		$this->assertSame( true, $block_theme );
 	}
 
 }
