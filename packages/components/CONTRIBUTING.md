@@ -292,6 +292,40 @@ All components, in addition to being typed, should be using JSDoc when necessary
 
 Each component that is exported from the `@wordpress/components` package should include a `README.md` file, explaining how to use the component, showing examples, and documenting all the props.
 
+```md
+# ComponentName
+
+** If component is experimental, add the following line: **
+<div class="callout callout-alert">
+This feature is still experimental. “Experimental” means this is an early implementation subject to drastic and breaking changes.
+</div>
+
+** If component is deprecated, add the following line: **
+<div class="callout callout-alert">
+This component is deprecated. Please use  `{other component}` from the `{other package}` package instead.
+</div>
+
+Description of the component.
+
+
+
+## Usage
+
+Code example using correct markdown syntax and formatted using project's formatting rules.
+
+## Props
+
+The component accepts the following props:
+
+### propName
+
+Prop description. With a new line before and after the description.
+
+-   Type: Typescript style type i.e `string`, `number`, `( nextValue: string ) => void`
+-   Required: Either`yes` or `no`
+
+```
+
 #### Folder structure
 
 As a result of the above guidelines, all new components (except for shared utilities) should _generally_ follow this folder structure:
