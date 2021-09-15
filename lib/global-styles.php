@@ -31,19 +31,17 @@ function gutenberg_experimental_global_styles_get_stylesheet( $tree, $type = 'al
 		// is inmediately reflected.
 		$cached = get_transient( $transient_name );
 		if ( $cached ) {
-			$stylesheet = get_transient( 'global_styles' );
-			if ( $stylesheet ) {
-				/**
-				 * Filters global styles.
-				 *
-				 * @param string        $stylesheet The styles.
-				 * @param WP_Theme_JSON $tree       Input tree.
-				 * @param string        $type       Type of stylesheet we want accepts 'all', 'block_styles', and 'css_variables'.
-				 *
-				 * @return string Stylesheet.
-				 */
-				return apply_filters( 'global_styles', $stylesheet, $type, $tree );
-			}
+			$stylesheet = $cached;
+			/**
+			 * Filters global styles.
+			 *
+			 * @param string        $stylesheet The styles.
+			 * @param WP_Theme_JSON $tree       Input tree.
+			 * @param string        $type       Type of stylesheet we want accepts 'all', 'block_styles', and 'css_variables'.
+			 *
+			 * @return string Stylesheet.
+			 */
+			return apply_filters( 'global_styles', $stylesheet, $type, $tree );
 		}
 	}
 
