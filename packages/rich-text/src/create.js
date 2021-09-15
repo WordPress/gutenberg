@@ -306,15 +306,18 @@ function collapseWhiteSpace( string ) {
 	return string.replace( /[\n\r\t]+/g, ' ' );
 }
 
-const ZWNBSPRegExp = new RegExp( ZWNBSP, 'g' );
+const REMOVE_PADDING_REGEX = new RegExp(
+	`[${ ZWNBSP }${ OBJECT_REPLACEMENT_CHARACTER }]`,
+	'g'
+);
 
 /**
- * Removes padding (zero width non breaking spaces) added by `toTree`.
+ * Removes padding (zero width non breaking spaces added by `toTree` and object replacement characters).
  *
  * @param {string} string
  */
 function removePadding( string ) {
-	return string.replace( ZWNBSPRegExp, '' );
+	return string.replace( REMOVE_PADDING_REGEX, '' );
 }
 
 /**
