@@ -449,6 +449,7 @@ export class ImageEdit extends Component {
 					// passing it here.
 					navigation.navigate( blockSettingsScreens.imageOptions, {
 						inputValue,
+						linkDestination: this.props.attributes.linkDestination,
 						setAttributes: this.setMappedAttributes,
 						imageUrl: image.url,
 						attachmentPageUrl: image.link,
