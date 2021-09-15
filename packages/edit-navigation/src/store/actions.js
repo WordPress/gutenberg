@@ -67,7 +67,7 @@ export const createMissingMenuItems = ( post ) => async ( {
 			}
 			if ( ! knownBlockIds.has( block.clientId ) ) {
 				const menuItem = await dispatch(
-					createPlaceholderMenuItem( block, menuId )
+					createPlaceholderMenuItem( menuId )
 				);
 				menuItemIdToBlockId[ menuItem.id ] = block.clientId;
 			}
