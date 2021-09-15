@@ -44,7 +44,6 @@ export const createMissingMenuItems = ( post ) => async ( {
 	registry,
 } ) => {
 	const menuId = post.meta.menuId;
-	// @TODO: extract locks to a separate package?
 	const lock = await registry
 		.dispatch( coreDataStore )
 		.__unstableAcquireStoreLock( STORE_NAME, [ 'savingMenu' ], {
