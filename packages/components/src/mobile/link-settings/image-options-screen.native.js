@@ -12,7 +12,6 @@ import { Icon, check, chevronRight } from '@wordpress/icons';
 /**
  * Internal dependencies
  */
-import Cell from '../bottom-sheet/cell';
 import styles from './style.scss';
 import PanelBody from '../../panel/body';
 import BottomSheet from '../bottom-sheet';
@@ -72,7 +71,7 @@ function ImageOptionsScreen( props ) {
 				</BottomSheet.NavBar.Heading>
 			</BottomSheet.NavBar>
 			<PanelBody>
-				<Cell
+				<BottomSheet.Cell
 					icon={
 						linkDestination === LINK_DESTINATION_NONE
 							? check
@@ -82,7 +81,7 @@ function ImageOptionsScreen( props ) {
 					leftAlign
 					onPress={ setLinkDestination( LINK_DESTINATION_NONE ) }
 				/>
-				<Cell
+				<BottomSheet.Cell
 					icon={
 						linkDestination === LINK_DESTINATION_MEDIA
 							? check
@@ -92,7 +91,7 @@ function ImageOptionsScreen( props ) {
 					leftAlign
 					onPress={ setLinkDestination( LINK_DESTINATION_MEDIA ) }
 				/>
-				<Cell
+				<BottomSheet.Cell
 					icon={
 						linkDestination === LINK_DESTINATION_ATTACHMENT
 							? check
@@ -104,7 +103,7 @@ function ImageOptionsScreen( props ) {
 						LINK_DESTINATION_ATTACHMENT
 					) }
 				/>
-				<Cell
+				<BottomSheet.Cell
 					icon={
 						linkDestination === LINK_DESTINATION_CUSTOM
 							? check
@@ -120,7 +119,7 @@ function ImageOptionsScreen( props ) {
 					onPress={ goToLinkPicker }
 				>
 					<Icon icon={ chevronRight }></Icon>
-				</Cell>
+				</BottomSheet.Cell>
 			</PanelBody>
 		</>
 	);
