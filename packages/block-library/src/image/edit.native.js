@@ -393,7 +393,6 @@ export class ImageEdit extends Component {
 		const { isLinkSheetVisible } = this.state;
 		const {
 			attributes: { href: url, ...unMappedAttributes },
-			image = {},
 		} = this.props;
 		const mappedAttributes = { ...unMappedAttributes, url };
 
@@ -451,8 +450,8 @@ export class ImageEdit extends Component {
 						inputValue,
 						linkDestination: this.props.attributes.linkDestination,
 						setAttributes: this.setMappedAttributes,
-						imageUrl: image.url,
-						attachmentPageUrl: image.link,
+						imageUrl: this.props.attributes.url,
+						attachmentPageUrl: this.props.attributes.link,
 					} );
 				} }
 			/>
