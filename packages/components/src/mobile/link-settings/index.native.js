@@ -224,9 +224,9 @@ function LinkSettings( {
 				{ options.url &&
 					( onLinkCellPressed ? (
 						<BottomSheet.LinkCell
-							placeholder={ options.url.placeholder }
 							showIcon={ showIcon }
 							value={ url }
+							valueMask={ options.url.valueMask }
 							onPress={ onLinkCellPressed }
 						/>
 					) : (

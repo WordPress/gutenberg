@@ -14,7 +14,7 @@ const { placeholderColor } = styles;
 
 export default function LinkCell( {
 	value,
-	placeholder,
+	valueMask,
 	onPress,
 	showIcon = true,
 } ) {
@@ -23,11 +23,9 @@ export default function LinkCell( {
 			icon={ showIcon && link }
 			label={ __( 'Link to' ) }
 			// since this is not actually editable, we treat value as a placeholder
-			value={ value || placeholder || __( 'Search or type URL' ) }
-			// TODO(David): Toggling placeholder styles based on presence of custom
-			// placeholder text is confusing. We need to find a better approach.
+			value={ valueMask || value || __( 'Search or type URL' ) }
 			valueStyle={
-				!! ( value || placeholder ) ? undefined : placeholderColor
+				!! ( value || valueMask ) ? undefined : placeholderColor
 			}
 			onPress={ onPress }
 		>

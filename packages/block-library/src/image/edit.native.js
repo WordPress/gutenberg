@@ -397,25 +397,25 @@ export class ImageEdit extends Component {
 		} = this.props;
 		const mappedAttributes = { ...unMappedAttributes, url };
 
-		let placeholder;
+		let valueMask;
 		switch ( mappedAttributes.linkDestination ) {
 			case LINK_DESTINATION_MEDIA:
-				placeholder = __( 'Media File' );
+				valueMask = __( 'Media File' );
 				break;
 			case LINK_DESTINATION_ATTACHMENT:
-				placeholder = __( 'Attachment Page' );
+				valueMask = __( 'Attachment Page' );
 				break;
 			case LINK_DESTINATION_CUSTOM:
-				placeholder = __( 'Custom URL' );
+				valueMask = __( 'Custom URL' );
 				break;
 			default:
-				placeholder = __( 'None' );
+				valueMask = __( 'None' );
 				break;
 		}
 
 		const linkSettingsOptions = {
 			url: {
-				placeholder,
+				valueMask,
 				autoFocus: false,
 				autoFill: true,
 			},
