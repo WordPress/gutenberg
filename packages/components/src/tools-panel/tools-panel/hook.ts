@@ -94,8 +94,8 @@ export function useToolsPanel(
 
 	// Track whether optional controls, if any, are displayed or not.
 	const [
-		areOptionalControlsHidden,
-		setAreOptionalControlsHidden,
+		areOptionalControlsAvailableAndHidden,
+		setAreOptionalControlsAvailableAndHidden,
 	] = useState( false );
 
 	// Where no optional menu items are active, we display a plus icon
@@ -105,10 +105,10 @@ export function useToolsPanel(
 			const optionalMenuItemsArray = Object.entries( menuItems.optional );
 			const newValue =
 				optionalMenuItemsArray.length > 0 &&
-				! Object.entries( menuItems.optional ).some(
+				! optionalMenuItemsArray.some(
 					( [ , isSelected ] ) => isSelected
 				);
-			setAreOptionalControlsHidden( newValue );
+			setAreOptionalControlsAvailableAndHidden( newValue );
 		}
 	}, [ menuItems.optional ] );
 
@@ -223,7 +223,7 @@ export function useToolsPanel(
 		registerPanelItem,
 		deregisterPanelItem,
 		flagItemCustomization,
-		areOptionalControlsHidden,
+		areOptionalControlsAvailableAndHidden,
 		hasMenuItems: !! panelItems.length,
 		isResetting: isResetting.current,
 		shouldRenderPlaceholderItems,

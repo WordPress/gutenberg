@@ -35,7 +35,10 @@ export const _default = () => {
 	return (
 		<PanelWrapperView>
 			<Panel>
-				<ToolsPanel label="Tools Panel" resetAll={ resetAll }>
+				<ToolsPanel
+					label="Tools Panel (default example)"
+					resetAll={ resetAll }
+				>
 					<ToolsPanelItem
 						className="single-column"
 						hasValue={ () => !! width }
@@ -92,7 +95,10 @@ export const WithOptionalItemsPlusIcon = () => {
 	return (
 		<PanelWrapperView>
 			<Panel>
-				<ToolsPanel label="Tools Panel" resetAll={ resetAll }>
+				<ToolsPanel
+					label="Tools Panel (with optional items only)"
+					resetAll={ resetAll }
+				>
 					<ToolsPanelItem
 						className="single-column"
 						hasValue={ () => !! width }
