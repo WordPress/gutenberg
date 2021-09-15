@@ -53,15 +53,15 @@ function useConstrainedTabbing() {
 				/** @type {HTMLElement} */ ( event.target )
 			);
 
-			if (
-				! node.contains( /** @type {HTMLElement} */ ( nextElement ) )
-			) {
-				// By not preventing default behaviour, the browser will move
-				// focus from here in the right direction.
-				/** @type {HTMLElement} */ ( event.shiftKey
-					? trailingElement
-					: node ).focus();
+			if ( node.contains( /** @type {HTMLElement} */ ( nextElement ) ) ) {
+				return;
 			}
+
+			// By not preventing default behaviour, the browser will move
+			// focus from here in the right direction.
+			/** @type {HTMLElement} */ ( event.shiftKey
+				? trailingElement
+				: node ).focus();
 		} );
 	}, [] );
 

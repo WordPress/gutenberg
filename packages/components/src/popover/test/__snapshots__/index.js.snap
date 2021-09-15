@@ -19,6 +19,9 @@ exports[`Popover should pass additional props to portaled element 1`] = `
         Hello
       </div>
     </div>
+    <div
+      tabindex="-1"
+    />
   </div>
 </span>
 `;
@@ -41,6 +44,9 @@ exports[`Popover should render content 1`] = `
         Hello
       </div>
     </div>
+    <div
+      tabindex="-1"
+    />
   </div>
 </span>
 `;
