@@ -324,6 +324,9 @@ Prop description. With a new line before and after the description and before an
 -   Type: Typescript style type i.e `string`, `number`, `( nextValue: string ) => void`
 -   Required: Either`yes` or `no`
 
+### Inherited props
+
+Add this section when there are props that are drilled down into an internal component. See [ClipboardButton](/packages/components/src/clipboard-button/README.md) for an example.
 ```
 
 #### Folder structure
