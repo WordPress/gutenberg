@@ -21,18 +21,14 @@ export default function EditTemplatePartMenuButton() {
 		const block = select( blockEditorStore ).getSelectedBlock();
 
 		if ( block && isTemplatePart( block ) ) {
-			const templateParts =
-				select( coreStore ).getEntityRecords(
-					'postType',
-					'wp_template_part'
-				) || [];
+			const { theme, slug } = block.attributes;
 
-			const templatePart = templateParts.find(
-				( part ) =>
-					part.theme === block.attributes.theme &&
-					part.slug === block.attributes.slug
+			return select( coreStore ).getEntityRecord(
+				'postType',
+				'wp_template_part',
+				// Ideally this should be an official public API.
+				`${ theme }//${ slug }`
 			);
-			return templatePart;
 		}
 	}, [] );
 	const { setTemplatePart } = useDispatch( editSiteStore );
