@@ -35,4 +35,8 @@ export type Props = {
 	 * Handler for click events.
 	 */
 	onClick?: () => void;
+	/**
+	 * Flag to indicate if the menu item is disabled.
+	 */
+	disabled?: boolean;
 };
