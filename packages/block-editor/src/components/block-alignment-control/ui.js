@@ -108,9 +108,8 @@ function BlockAlignmentUI( {
 	// Always add the `none` option.
 	enabledControls.unshift( 'none' );
 
-	function applyOrUnset( align ) {
-		return () =>
-			onChange( [ value, 'none' ].includes( align ) ? undefined : align );
+	function onChangeAlignment( align ) {
+		onChange( [ value, 'none' ].includes( align ) ? undefined : align );
 	}
 
 	const activeAlignmentControl = BLOCK_ALIGNMENTS_CONTROLS[ value ];
@@ -134,12 +133,12 @@ function BlockAlignmentUI( {
 						...BLOCK_ALIGNMENTS_CONTROLS[ control ],
 						isActive: value === control,
 						role: isCollapsed ? 'menuitemradio' : undefined,
-						onClick: applyOrUnset( control ),
+						onClick: () => onChangeAlignment( control ),
 					};
 				} ),
 		  }
 		: {
-				children: () => {
+				children: ( { onClose } ) => {
 					return (
 						<>
 							<MenuGroup className="block-editor-block-alignment-control__menu-group">
@@ -165,7 +164,10 @@ function BlockAlignmentUI( {
 												}
 											) }
 											isSelected={ isSelected }
-											onClick={ applyOrUnset( control ) }
+											onClick={ () => {
+												onChangeAlignment( control );
+												onClose();
+											} }
 											role="menuitemradio"
 											info={ alignmentsInfo[ control ] }
 										>
