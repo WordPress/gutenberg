@@ -294,7 +294,7 @@ Each component that is exported from the `@wordpress/components` package should 
 
 ##### Readme example
 
-```md
+```
 # ComponentName
 
 ** If component is experimental, add the following line: **
