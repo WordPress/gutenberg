@@ -163,18 +163,15 @@ add_action( 'setup_theme', '_delete_site_logo_on_remove_custom_logo_on_setup_the
 
 /**
  * Removes the custom_logo theme-mod when the site_logo option gets deleted.
- *
- * @param mixed $old_value The old option value.
- * @param mixed $value     The new option value.
- *
- * @return void
  */
 function _delete_custom_logo_on_remove_site_logo() {
+	$theme = get_option( 'stylesheet' );
+
 	// Unhook update and delete actions for custom_logo to prevent a loop of hooks.
 	remove_action( "update_option_theme_mods_$theme", '_delete_site_logo_on_remove_custom_logo', 10 );
 	remove_action( "delete_option_theme_mods_$theme", '_delete_site_logo_on_remove_theme_mods' );
 
-	// Remove the custom logo
+	// Remove the custom logo.
 	remove_theme_mod( 'custom_logo' );
 
 	// Restore update and delete actions.
