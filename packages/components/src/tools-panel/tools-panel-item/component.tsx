@@ -1,16 +1,22 @@
 /**
+ * External dependencies
+ */
+// eslint-disable-next-line no-restricted-imports
+import type { Ref } from 'react';
+
+/**
  * Internal dependencies
  */
 import { useToolsPanelItem } from './hook';
 import { View } from '../../view';
-import { contextConnect } from '../../ui/context';
-import type { forwardRef, ToolsPanelItemProps } from '../types';
+import { contextConnect, PolymorphicComponentProps } from '../../ui/context';
+import type { ToolsPanelItemProps } from '../types';
 
 // This wraps controls to be conditionally displayed within a tools panel. It
 // prevents props being applied to HTML elements that would make them invalid.
 const ToolsPanelItem = (
-	props: ToolsPanelItemProps,
-	forwardedRef: forwardRef
+	props: PolymorphicComponentProps< ToolsPanelItemProps, 'div' >,
+	forwardedRef: Ref< any >
 ) => {
 	const { children, isShown, ...toolsPanelItemProps } = useToolsPanelItem(
 		props

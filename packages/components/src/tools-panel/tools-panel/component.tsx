@@ -1,14 +1,23 @@
 /**
+ * External dependencies
+ */
+// eslint-disable-next-line no-restricted-imports
+import type { Ref } from 'react';
+
+/**
  * Internal dependencies
  */
 import ToolsPanelHeader from '../tools-panel-header';
 import { ToolsPanelContext } from '../context';
 import { useToolsPanel } from './hook';
 import { View } from '../../view';
-import { contextConnect } from '../../ui/context';
-import type { ToolsPanelProps, forwardRef } from '../types';
+import { contextConnect, PolymorphicComponentProps } from '../../ui/context';
+import type { ToolsPanelProps } from '../types';
 
-const ToolsPanel = ( props: ToolsPanelProps, forwardedRef: forwardRef ) => {
+const ToolsPanel = (
+	props: PolymorphicComponentProps< ToolsPanelProps, 'div' >,
+	forwardedRef: Ref< any >
+) => {
 	const {
 		children,
 		label,
