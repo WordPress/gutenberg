@@ -10,7 +10,7 @@
 		"iconColor": {
 			"type": "string"
 		},
-		"customIconColor": {
+		"customIconColor": {	
 			"type": "string"
 		},
 		"iconColorValue": {
@@ -23,6 +23,9 @@
 			"type": "string"
 		},
 		"iconBackgroundColorValue": {
+			"type": "string"
+		},
+		"preveIconBackgroundColorValue": {
 			"type": "string"
 		},
 		"openInNewTab": {
