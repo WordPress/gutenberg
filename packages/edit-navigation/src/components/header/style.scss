@@ -18,6 +18,7 @@
 }
 
 .edit-navigation-header__toolbar {
+	align-items: center;
 	border: none;
 
 	// The Toolbar component adds different styles to buttons, so we reset them
@@ -41,6 +42,15 @@
 		&::before {
 			display: none;
 		}
+	}
+
+	> .edit-navigation-header-inserter-toggle.has-icon.has-icon.has-icon {
+		margin-right: $grid-unit-10;
+		// Special dimensions for this button.
+		min-width: 32px;
+		width: 32px;
+		height: 32px;
+		padding: 0;
 	}
 }
 
