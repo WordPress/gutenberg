@@ -216,6 +216,7 @@ function RangeControl(
 						className="components-range-control__slider"
 						describedBy={ describedBy }
 						disabled={ disabled }
+						failsafeValue={ rangeFillValue }
 						id={ id }
 						isShiftStepEnabled={ isShiftStepEnabled }
 						label={ label }

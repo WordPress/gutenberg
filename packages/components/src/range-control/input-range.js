@@ -30,6 +30,7 @@ const operationList = {
 function InputRange(
 	{
 		describedBy,
+		failsafeValue,
 		isShiftStepEnabled = true,
 		label,
 		onHideTooltip = noop,
@@ -54,7 +55,10 @@ function InputRange(
 			event.preventDefault();
 			const { min, max, step } = props;
 			const modifiedStep = shiftStep * step;
-			const nextValue = operationList[ keyCode ]( value, modifiedStep );
+			const nextValue = operationList[ keyCode ](
+				failsafeValue,
+				modifiedStep
+			);
 			onShiftStep( roundClamp( nextValue, min, max, modifiedStep ) );
 		}
 	};
