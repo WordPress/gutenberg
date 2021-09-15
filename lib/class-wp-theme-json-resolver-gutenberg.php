@@ -531,3 +531,4 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 }
 
 add_action( 'switch_theme', array( 'WP_Theme_JSON_Resolver_Gutenberg', 'clean_cached_data' ) );
+add_action( 'start_previewing_theme', array( 'WP_Theme_JSON_Resolver_Gutenberg', 'clean_cached_data' ) );

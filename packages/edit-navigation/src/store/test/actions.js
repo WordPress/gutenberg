@@ -77,7 +77,7 @@ describe( 'createMissingMenuItems', () => {
 				data: {
 					title: 'Placeholder',
 					url: 'Placeholder',
-					menu_order: 0,
+					menu_order: 1,
 				},
 			} )
 		);
@@ -200,7 +200,7 @@ describe( 'createMissingMenuItems', () => {
 				data: {
 					title: 'Placeholder',
 					url: 'Placeholder',
-					menu_order: 0,
+					menu_order: 1,
 				},
 			} )
 		);

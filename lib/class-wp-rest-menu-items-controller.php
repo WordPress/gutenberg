@@ -410,7 +410,7 @@ class WP_REST_Menu_Items_Controller extends WP_REST_Posts_Controller {
 				'menu-item-object-id'   => 0,
 				'menu-item-object'      => '',
 				'menu-item-parent-id'   => 0,
-				'menu-item-position'    => 0,
+				'menu-item-position'    => 1,
 				'menu-item-type'        => 'custom',
 				'menu-item-title'       => '',
 				'menu-item-url'         => '',
@@ -524,51 +524,6 @@ class WP_REST_Menu_Items_Controller extends WP_REST_Posts_Controller {
 			}
 		}
 
-		// If menu id is set, valid the value of menu item position and parent id.
-		if ( ! empty( $prepared_nav_item['menu-id'] ) ) {
-			// Check if nav menu is valid.
-			if ( ! is_nav_menu( $prepared_nav_item['menu-id'] ) ) {
-				return new WP_Error( 'invalid_menu_id', __( 'Invalid menu ID.', 'gutenberg' ), array( 'status' => 400 ) );
-			}
-
-			// If menu item position is set to 0, insert as the last item in the existing menu.
-			$menu_items = wp_get_nav_menu_items( $prepared_nav_item['menu-id'], array( 'post_status' => 'publish,draft' ) );
-			if ( 0 === (int) $prepared_nav_item['menu-item-position'] ) {
-				if ( $menu_items ) {
-					$last_item = $menu_items[ count( $menu_items ) - 1 ];
-					if ( $last_item && isset( $last_item->menu_order ) ) {
-						$prepared_nav_item['menu-item-position'] = $last_item->menu_order + 1;
-					} else {
-						$prepared_nav_item['menu-item-position'] = count( $menu_items ) - 1;
-					}
-					array_push( $menu_items, $last_item );
-				} else {
-					$prepared_nav_item['menu-item-position'] = 1;
-				}
-			}
-
-			// Check if existing menu position is already in use by another menu item.
-			$menu_item_ids = array();
-			foreach ( $menu_items as $menu_item ) {
-				$menu_item_ids[] = $menu_item->ID;
-				if ( $menu_item->ID !== (int) $menu_item_db_id ) {
-					if ( (int) $prepared_nav_item['menu-item-position'] === (int) $menu_item->menu_order ) {
-						return new WP_Error( 'invalid_menu_order', __( 'Invalid menu position.', 'gutenberg' ), array( 'status' => 400 ) );
-					}
-				}
-			}
-
-			// Check if valid parent id is valid nav menu item in menu.
-			if ( $prepared_nav_item['menu-item-parent-id'] ) {
-				if ( ! is_nav_menu_item( $prepared_nav_item['menu-item-parent-id'] ) ) {
-					return new WP_Error( 'invalid_menu_item_parent', __( 'Invalid menu item parent.', 'gutenberg' ), array( 'status' => 400 ) );
-				}
-				if ( ! $menu_item_ids || ! in_array( $prepared_nav_item['menu-item-parent-id'], $menu_item_ids, true ) ) {
-					return new WP_Error( 'invalid_item_parent', __( 'Invalid menu item parent.', 'gutenberg' ), array( 'status' => 400 ) );
-				}
-			}
-		}
-
 		foreach ( array( 'menu-item-object-id', 'menu-item-parent-id' ) as $key ) {
 			// Note we need to allow negative-integer IDs for previewed objects not inserted yet.
 			$prepared_nav_item[ $key ] = (int) $prepared_nav_item[ $key ];
@@ -639,11 +594,17 @@ class WP_REST_Menu_Items_Controller extends WP_REST_Posts_Controller {
 		// Base fields for every post.
 		$menu_item = wp_setup_nav_menu_item( $post );
 		$data      = array();
-		if ( in_array( 'id', $fields, true ) ) {
+		if ( rest_is_field_included( 'id', $fields ) ) {
 			$data['id'] = $menu_item->ID;
 		}
 
-		if ( in_array( 'title', $fields, true ) ) {
+		if ( rest_is_field_included( 'title', $fields ) ) {
+			$data['title'] = array();
+		}
+		if ( rest_is_field_included( 'title.raw', $fields ) ) {
+			$data['title']['raw'] = $menu_item->title;
+		}
+		if ( rest_is_field_included( 'title.rendered', $fields ) ) {
 			add_filter( 'protected_title_format', array( $this, 'protected_title_format' ) );
 
 			/** This filter is documented in wp-includes/post-template.php */
@@ -652,47 +613,44 @@ class WP_REST_Menu_Items_Controller extends WP_REST_Posts_Controller {
 			/** This filter is documented in wp-includes/class-walker-nav-menu.php */
 			$title = apply_filters( 'nav_menu_item_title', $title, $menu_item, null, 0 );
 
-			$data['title'] = array(
-				'raw'      => $menu_item->title,
-				'rendered' => $title,
-			);
+			$data['title']['rendered'] = $title;
 
 			remove_filter( 'protected_title_format', array( $this, 'protected_title_format' ) );
 		}
 
-		if ( in_array( 'status', $fields, true ) ) {
+		if ( rest_is_field_included( 'status', $fields ) ) {
 			$data['status'] = $menu_item->post_status;
 		}
 
-		if ( in_array( 'url', $fields, true ) ) {
+		if ( rest_is_field_included( 'url', $fields ) ) {
 			$data['url'] = $menu_item->url;
 		}
 
-		if ( in_array( 'attr_title', $fields, true ) ) {
+		if ( rest_is_field_included( 'attr_title', $fields ) ) {
 			// Same as post_excerpt.
 			$data['attr_title'] = $menu_item->attr_title;
 		}
 
-		if ( in_array( 'description', $fields, true ) ) {
+		if ( rest_is_field_included( 'description', $fields ) ) {
 			// Same as post_content.
 			$data['description'] = $menu_item->description;
 		}
 
-		if ( in_array( 'type', $fields, true ) ) {
+		if ( rest_is_field_included( 'type', $fields ) ) {
 			// Using 'item_type' since 'type' already exists.
 			$data['type'] = $menu_item->type;
 		}
 
-		if ( in_array( 'type_label', $fields, true ) ) {
+		if ( rest_is_field_included( 'type_label', $fields ) ) {
 			// Using 'item_type_label' to match up with 'item_type' - IS READ ONLY!
 			$data['type_label'] = $menu_item->type_label;
 		}
 
-		if ( in_array( 'object', $fields, true ) ) {
+		if ( rest_is_field_included( 'object', $fields ) ) {
 			$data['object'] = $menu_item->object;
 		}
 
-		if ( in_array( 'object_id', $fields, true ) ) {
+		if ( rest_is_field_included( 'object_id', $fields ) ) {
 			// Usually is a string, but lets expose as an integer.
 			$data['object_id'] = absint( $menu_item->object_id );
 		}
@@ -711,33 +669,37 @@ class WP_REST_Menu_Items_Controller extends WP_REST_Posts_Controller {
 			$data['content']['block_version'] = block_version( $menu_item->content );
 		}
 
-		if ( in_array( 'parent', $fields, true ) ) {
+		if ( rest_is_field_included( 'parent', $fields ) ) {
 			// Same as post_parent, expose as integer.
-			$data['parent'] = absint( $menu_item->menu_item_parent );
+			$data['parent'] = (int) $menu_item->menu_item_parent;
 		}
 
-		if ( in_array( 'menu_order', $fields, true ) ) {
+		if ( rest_is_field_included( 'menu_order', $fields ) ) {
 			// Same as post_parent, expose as integer.
-			$data['menu_order'] = absint( $menu_item->menu_order );
+			$data['menu_order'] = (int) $menu_item->menu_order;
 		}
 
-		if ( in_array( 'menu_id', $fields, true ) ) {
+		if ( rest_is_field_included( 'menu_id', $fields ) ) {
 			$data['menu_id'] = $this->get_menu_id( $menu_item->ID );
 		}
 
-		if ( in_array( 'target', $fields, true ) ) {
+		if ( rest_is_field_included( 'target', $fields ) ) {
 			$data['target'] = $menu_item->target;
 		}
 
-		if ( in_array( 'classes', $fields, true ) ) {
+		if ( rest_is_field_included( 'classes', $fields ) ) {
 			$data['classes'] = (array) $menu_item->classes;
 		}
 
-		if ( in_array( 'xfn', $fields, true ) ) {
+		if ( rest_is_field_included( 'xfn', $fields ) ) {
 			$data['xfn'] = array_map( 'sanitize_html_class', explode( ' ', $menu_item->xfn ) );
 		}
 
-		if ( in_array( 'meta', $fields, true ) ) {
+		if ( rest_is_field_included( 'invalid', $fields ) ) {
+			$data['invalid'] = (bool) $menu_item->_invalid;
+		}
+
+		if ( rest_is_field_included( 'meta', $fields ) ) {
 			$data['meta'] = $this->meta->get_value( $menu_item->ID, $request );
 		}
 
@@ -746,9 +708,14 @@ class WP_REST_Menu_Items_Controller extends WP_REST_Posts_Controller {
 		foreach ( $taxonomies as $taxonomy ) {
 			$base = ! empty( $taxonomy->rest_base ) ? $taxonomy->rest_base : $taxonomy->name;
 
-			if ( in_array( $base, $fields, true ) ) {
-				$terms         = get_the_terms( $post, $taxonomy->name );
-				$data[ $base ] = $terms ? array_values( wp_list_pluck( $terms, 'term_id' ) ) : array();
+			if ( rest_is_field_included( $base, $fields ) ) {
+				$terms    = get_the_terms( $post, $taxonomy->name );
+				$term_ids = $terms ? array_values( wp_list_pluck( $terms, 'term_id' ) ) : array();
+				if ( 'nav_menu' === $taxonomy->name ) {
+					$data[ $base ] = $term_ids ? array_shift( $term_ids ) : 0;
+				} else {
+					$data[ $base ] = $term_ids;
+				}
 			}
 		}
 
@@ -959,10 +926,11 @@ class WP_REST_Menu_Items_Controller extends WP_REST_Posts_Controller {
 			'description' => __( 'The DB ID of the nav_menu_item that is this item\'s menu parent, if any, otherwise 0.', 'gutenberg' ),
 			'context'     => array( 'view', 'edit', 'embed' ),
 			'type'        => 'integer',
-			'minimum'     => 0,
-			'default'     => 0,
+			'minimum'     => 1,
+			'default'     => 1,
 		);
-		$schema['properties']['object']     = array(
+
+		$schema['properties']['object'] = array(
 			'description' => __( 'The type of object originally represented, such as "category," "post", or "attachment."', 'gutenberg' ),
 			'context'     => array( 'view', 'edit', 'embed' ),
 			'type'        => 'string',
@@ -1043,7 +1011,7 @@ class WP_REST_Menu_Items_Controller extends WP_REST_Posts_Controller {
 			),
 		);
 
-		$schema['properties']['_invalid'] = array(
+		$schema['properties']['invalid'] = array(
 			'description' => __( 'Whether the menu item represents an object that no longer exists.', 'gutenberg' ),
 			'context'     => array( 'view', 'edit', 'embed' ),
 			'type'        => 'boolean',

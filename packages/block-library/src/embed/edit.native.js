@@ -35,7 +35,7 @@ import { View } from '@wordpress/primitives';
 
 // The inline preview feature will be released progressible, for this reason
 // the embed will only be considered previewable for the following providers list.
-const PREVIEWABLE_PROVIDERS = [ 'youtube', 'twitter' ];
+const PREVIEWABLE_PROVIDERS = [ 'youtube', 'twitter', 'instagram', 'vimeo' ];
 
 const EmbedEdit = ( props ) => {
 	const {
@@ -53,8 +53,8 @@ const EmbedEdit = ( props ) => {
 		title: _x( 'Embed', 'block title' ),
 		icon: embedContentIcon,
 	};
-	const { icon, title } =
-		getEmbedInfoByProvider( providerNameSlug ) || defaultEmbedInfo;
+	const embedInfoByProvider = getEmbedInfoByProvider( providerNameSlug );
+	const { icon, title } = embedInfoByProvider || defaultEmbedInfo;
 
 	const { wasBlockJustInserted } = useSelect(
 		( select ) => ( {
@@ -266,9 +266,11 @@ const EmbedEdit = ( props ) => {
 							label={ title }
 							onFocus={ onFocus }
 							preview={ preview }
-							previewable={ previewable && isProviderPreviewable }
+							isProviderPreviewable={ isProviderPreviewable }
+							previewable={ previewable }
 							type={ type }
 							url={ url }
+							isDefaultEmbedInfo={ ! embedInfoByProvider }
 						/>
 					</View>
 				</>

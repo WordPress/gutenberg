@@ -435,6 +435,46 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 		);
 	}
 
+	function test_get_stylesheet_generates_proper_classes_from_slugs() {
+		$theme_json = new WP_Theme_JSON_Gutenberg(
+			array(
+				'version'  => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
+				'settings' => array(
+					'color' => array(
+						'palette' => array(
+							array(
+								'slug'  => 'grey',
+								'color' => 'grey',
+							),
+							array(
+								'slug'  => 'dark grey',
+								'color' => 'grey',
+							),
+							array(
+								'slug'  => 'light-grey',
+								'color' => 'grey',
+							),
+							array(
+								'slug'  => 'white2black',
+								'color' => 'grey',
+							),
+						),
+					),
+				),
+			)
+		);
+
+		$this->assertEquals(
+			'.has-grey-color{color: var(--wp--preset--color--grey) !important;}.has-dark-grey-color{color: var(--wp--preset--color--dark-grey) !important;}.has-light-grey-color{color: var(--wp--preset--color--light-grey) !important;}.has-white-2-black-color{color: var(--wp--preset--color--white-2-black) !important;}.has-grey-background-color{background-color: var(--wp--preset--color--grey) !important;}.has-dark-grey-background-color{background-color: var(--wp--preset--color--dark-grey) !important;}.has-light-grey-background-color{background-color: var(--wp--preset--color--light-grey) !important;}.has-white-2-black-background-color{background-color: var(--wp--preset--color--white-2-black) !important;}.has-grey-border-color{border-color: var(--wp--preset--color--grey) !important;}.has-dark-grey-border-color{border-color: var(--wp--preset--color--dark-grey) !important;}.has-light-grey-border-color{border-color: var(--wp--preset--color--light-grey) !important;}.has-white-2-black-border-color{border-color: var(--wp--preset--color--white-2-black) !important;}',
+			$theme_json->get_stylesheet( 'block_styles' )
+		);
+		$this->assertEquals(
+			'body{--wp--preset--color--grey: grey;--wp--preset--color--dark-grey: grey;--wp--preset--color--light-grey: grey;--wp--preset--color--white-2-black: grey;}',
+			$theme_json->get_stylesheet( 'css_variables' )
+		);
+
+	}
+
 	public function test_get_stylesheet_preset_values_are_marked_as_important() {
 		$theme_json = new WP_Theme_JSON_Gutenberg(
 			array(

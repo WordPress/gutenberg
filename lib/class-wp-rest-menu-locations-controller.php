@@ -152,11 +152,21 @@ class WP_REST_Menu_Locations_Controller extends WP_REST_Controller {
 	public function prepare_item_for_response( $location, $request ) {
 		$locations = get_nav_menu_locations();
 		$menu      = ( isset( $locations[ $location->name ] ) ) ? $locations[ $location->name ] : 0;
-		$data      = array(
-			'name'        => $location->name,
-			'description' => $location->description,
-			'menu'        => $menu,
-		);
+
+		$fields = $this->get_fields_for_response( $request );
+		$data   = array();
+
+		if ( rest_is_field_included( 'name', $fields ) ) {
+			$data['name'] = $location->name;
+		}
+
+		if ( rest_is_field_included( 'description', $fields ) ) {
+			$data['description'] = $location->description;
+		}
+
+		if ( rest_is_field_included( 'menu', $fields ) ) {
+			$data['menu'] = (int) $menu;
+		}
 
 		$context = ! empty( $request['context'] ) ? $request['context'] : 'view';
 		$data    = $this->add_additional_fields_to_object( $data, $request );

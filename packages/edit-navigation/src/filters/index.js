@@ -1,6 +1,7 @@
 /**
  * Internal dependencies
  */
+import addNavigationEditorCustomAppender from './add-navigation-editor-custom-appender';
 import addNavigationEditorPlaceholder from './add-navigation-editor-placeholder';
 import addMenuNameEditor from './add-menu-name-editor';
 import disableInsertingNonNavigationBlocks from './disable-inserting-non-navigation-blocks';
@@ -10,6 +11,7 @@ import removeSettingsUnsupportedFeatures from './remove-settings-unsupported-fea
 export const addFilters = (
 	shouldAddDisableInsertingNonNavigationBlocksFilter
 ) => {
+	addNavigationEditorCustomAppender();
 	addNavigationEditorPlaceholder();
 	addMenuNameEditor();
 	if ( shouldAddDisableInsertingNonNavigationBlocksFilter ) {

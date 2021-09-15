@@ -42,6 +42,10 @@ p.has-background {
 	padding: $block-bg-padding--v $block-bg-padding--h;
 }
 
-p.has-text-color a {
+// Use :where to contain the specificity of this rule
+// so it's easily overrideable by any theme that targets
+// links using the a element.
+// For example, this is what global styles does.
+:where(p.has-text-color:not(.has-link-color)) a {
 	color: inherit;
 }
