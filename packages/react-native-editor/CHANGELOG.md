@@ -16,6 +16,7 @@ For each user feature we should also add a importance categorization label  to i
 -   [**] Fix Android-only issue of main toolbar initial position being wrong when RTL [#34617]
 -   [**] Embed block: Implemented the No Preview UI when an embed is successful, but we're unable to show an inline preview [#34626]
 -   [*] Column block: Translate column width's control labels [#34777]
+-   [**] Enable embed preview for Instagram and Vimeo providers. [#34563]
 
 ## 1.61.0
 -   [**] Enable embed preview for a list of providers (for now only YouTube and Twitter) [#34446]

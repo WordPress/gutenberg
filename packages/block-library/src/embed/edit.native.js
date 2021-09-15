@@ -34,7 +34,7 @@ import { View } from '@wordpress/primitives';
 
 // The inline preview feature will be released progressible, for this reason
 // the embed will only be considered previewable for the following providers list.
-const PREVIEWABLE_PROVIDERS = [ 'youtube', 'twitter' ];
+const PREVIEWABLE_PROVIDERS = [ 'youtube', 'twitter', 'instagram', 'vimeo' ];
 
 const EmbedEdit = ( props ) => {
 	const {
