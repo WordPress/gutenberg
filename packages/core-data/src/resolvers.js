@@ -390,7 +390,7 @@ export const __experimentalGetTemplateForLink = ( link ) => async ( {
 			.then( ( res ) => res.json() )
 			.then( ( { data } ) => data );
 	} catch ( e ) {
-		// For non-FSE themes, it is possible that this request returns an error.
+		// For non-block themes, it is possible that this request returns an error.
 	}
 
 	if ( ! template ) {

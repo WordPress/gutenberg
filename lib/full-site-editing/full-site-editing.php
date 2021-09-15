@@ -20,7 +20,7 @@ function gutenberg_is_block_theme() {
  * @deprecated 10.9.1
  */
 function gutenberg_is_fse_theme() {
-	_deprecated_function( __FUNCTION__, '10.9.1', 'gutenberg_is_block_theme' );
+	_deprecated_function( __FUNCTION__, '11.5', 'gutenberg_is_block_theme' );
 	return gutenberg_is_block_theme();
 }
 

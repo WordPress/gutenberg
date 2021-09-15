@@ -91,7 +91,7 @@ if ( ! class_exists( 'WP_Block_Template' ) ) {
 	require __DIR__ . '/full-site-editing/class-wp-block-template.php';
 }
 
-// These are used by some FSE features
+// These are used by some block-themes features
 // as well as global styles.
 require __DIR__ . '/interface-wp-theme-json-schema.php';
 require __DIR__ . '/class-wp-theme-json-schema-v0.php';
