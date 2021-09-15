@@ -112,9 +112,19 @@ function ImageOptionsScreen( props ) {
 					label={ __( 'Custom URL' ) }
 					leftAlign
 					// since this is not actually editable, we treat value as a placeholder
-					value={ inputValue || __( 'Search or type URL' ) }
+					value={
+						! inputValue ||
+						inputValue === imageUrl ||
+						inputValue === attachmentPageUrl
+							? __( 'Search or type URL' )
+							: inputValue
+					}
 					valueStyle={
-						!! inputValue ? undefined : styles.placeholderColor
+						! inputValue ||
+						inputValue === imageUrl ||
+						inputValue === attachmentPageUrl
+							? styles.placeholderColor
+							: undefined
 					}
 					onPress={ goToLinkPicker }
 				>
