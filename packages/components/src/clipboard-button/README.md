@@ -45,7 +45,7 @@ The class that will be added to the classes of the underlying `<Button>` compone
 The text that will be copied to the clipboard.
 
 - Type: `string`
-- Required: no
+- Required: yes
 
 ### onCopy
 
