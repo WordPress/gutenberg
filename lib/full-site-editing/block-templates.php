@@ -628,13 +628,13 @@ function _gutengerg_has_wp_template_block_templates() {
 		'taxonomy' => 'wp_theme',
 		'field'    => 'name',
 		'terms'    => wp_get_theme()->get_stylesheet(),
-        );
+	);
 
 	$has_block_templates = false;
 
-        $term_query = new WP_Term_Query( $term_query_args );
-        if ( ! empty( $term_query->terms ) ) {
-               $has_block_templates = true;
+	$term_query = new WP_Term_Query( $term_query_args );
+	if ( ! empty( $term_query->terms ) ) {
+		$has_block_templates = true;
 	}
 
 	return $has_block_templates;
