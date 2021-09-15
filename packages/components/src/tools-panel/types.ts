@@ -2,9 +2,7 @@
  * External dependencies
  */
 // eslint-disable-next-line no-restricted-imports
-import type { ReactNode, Ref } from 'react';
-
-export type forwardRef = Ref< any >;
+import type { ReactNode } from 'react';
 
 export interface ToolsPanelProps {
 	label: string;

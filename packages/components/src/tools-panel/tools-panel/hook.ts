@@ -7,7 +7,7 @@ import { useEffect, useMemo, useRef, useState } from '@wordpress/element';
  * Internal dependencies
  */
 import * as styles from '../styles';
-import { useContextSystem } from '../../ui/context';
+import { useContextSystem, PolymorphicComponentProps } from '../../ui/context';
 import { useCx } from '../../utils/hooks/use-cx';
 import type { ToolsPanelProps, ToolsPanelItem } from '../types';
 
@@ -22,7 +22,9 @@ const generateMenuItems = ( { panelItems, reset } ) => {
 	return menuItems;
 };
 
-export function useToolsPanel( props: ToolsPanelProps ) {
+export function useToolsPanel(
+	props: PolymorphicComponentProps< ToolsPanelProps, 'div' >
+) {
 	const { className, resetAll, panelId, ...otherProps } = useContextSystem(
 		props,
 		'ToolsPanel'
