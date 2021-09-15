@@ -64,6 +64,7 @@ import styles from './styles.scss';
 import { getUpdatedLinkTargetSettings } from './utils';
 
 import {
+	LINK_DESTINATION_NONE,
 	LINK_DESTINATION_CUSTOM,
 	LINK_DESTINATION_ATTACHMENT,
 	LINK_DESTINATION_MEDIA,
@@ -367,13 +368,23 @@ export class ImageEdit extends Component {
 
 	setMappedAttributes( { url: href, ...restAttributes } ) {
 		const { setAttributes } = this.props;
+		let linkDestination;
+		if ( restAttributes.linkDestination ) {
+			linkDestination = restAttributes.linkDestination;
+		} else if ( ! href && ! restAttributes.linkDestination ) {
+			linkDestination = LINK_DESTINATION_NONE;
+		} else {
+			linkDestination = LINK_DESTINATION_CUSTOM;
+		}
 
 		return href === undefined
 			? setAttributes( {
 					...restAttributes,
+					linkDestination,
 			  } )
 			: setAttributes( {
 					...restAttributes,
+					linkDestination,
 					href,
 			  } );
 	}
