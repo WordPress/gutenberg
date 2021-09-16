@@ -7,6 +7,11 @@ $blocks-block__margin: 0.5em;
 }
 
 .wp-block-buttons {
+	// Specificity needed to override editor auto block margins.
+	> .wp-block.wp-block-button {
+		margin: 0;
+	}
+
 	> .block-list-appender {
 		display: inline-flex;
 		align-items: center;
