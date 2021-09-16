@@ -10,25 +10,6 @@ import { useSelect } from '@wordpress/data';
 import { isClientIdSelected } from './utils';
 import { store as blockEditorStore } from '../../store';
 
-const useListViewSelectedClientIds = (
-	__experimentalPersistentListViewFeatures
-) =>
-	useSelect(
-		( select ) => {
-			const {
-				getSelectedBlockClientId,
-				getSelectedBlockClientIds,
-			} = select( blockEditorStore );
-
-			if ( __experimentalPersistentListViewFeatures ) {
-				return getSelectedBlockClientIds();
-			}
-
-			return getSelectedBlockClientId();
-		},
-		[ __experimentalPersistentListViewFeatures ]
-	);
-
 const useListViewClientIdsTree = (
 	blocks,
 	selectedClientIds,
@@ -76,13 +57,32 @@ export default function useListViewClientIds(
 	showOnlyCurrentHierarchy,
 	__experimentalPersistentListViewFeatures
 ) {
-	const selectedClientIds = useListViewSelectedClientIds(
-		__experimentalPersistentListViewFeatures
+	const { selectedClientIds, draggedClientIds } = useSelect(
+		( select ) => {
+			const {
+				getSelectedBlockClientId,
+				getSelectedBlockClientIds,
+				getDraggedBlockClientIds,
+			} = select( blockEditorStore );
+
+			if ( __experimentalPersistentListViewFeatures ) {
+				return {
+					selectedClientIds: getSelectedBlockClientIds(),
+					draggedClientIds: getDraggedBlockClientIds(),
+				};
+			}
+
+			return {
+				selectedClientIds: getSelectedBlockClientId(),
+				draggedClientIds: getDraggedBlockClientIds(),
+			};
+		},
+		[ __experimentalPersistentListViewFeatures ]
 	);
 	const clientIdsTree = useListViewClientIdsTree(
 		blocks,
 		selectedClientIds,
 		showOnlyCurrentHierarchy
 	);
-	return { clientIdsTree, selectedClientIds };
+	return { clientIdsTree, selectedClientIds, draggedClientIds };
 }
