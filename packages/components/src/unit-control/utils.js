@@ -301,11 +301,11 @@ export const useCustomUnits = ( { units, availableUnits, defaultValues } ) => {
  * accurately displayed in the UI, even if the intention is to hide
  * the availability of that unit.
  *
- * @param {number|string} currentValue Selected value to parse.
- * @param {string}        legacyUnit   Legacy unit value, if currentValue needs it appended.
- * @param {Array<Object>} units        List of available units.
+ * @param {number|string}            currentValue Selected value to parse.
+ * @param {string}                   legacyUnit   Legacy unit value, if currentValue needs it appended.
+ * @param {Array<WPUnitControlUnit>} units        List of available units.
  *
- * @return {Array<Object>} A collection of units containing the unit for the current value.
+ * @return {Array<WPUnitControlUnit>} A collection of units containing the unit for the current value.
  */
 export function getUnitsWithCurrentUnit(
 	currentValue,
