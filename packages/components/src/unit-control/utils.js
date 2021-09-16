@@ -11,7 +11,7 @@ import { Platform } from '@wordpress/element';
 
 const isWeb = Platform.OS === 'web';
 
-export const allUnits = {
+const allUnits = {
 	px: {
 		value: 'px',
 		label: isWeb ? 'px' : __( 'Pixels (px)' ),
@@ -151,8 +151,7 @@ export const DEFAULT_UNIT = allUnits.px;
  * @return {Array<number, string>} The extracted number and unit.
  */
 export function getParsedValue( value, unit, units ) {
-	const initialValue =
-		unit && Number.isFinite( value ) ? `${ value }${ unit }` : value;
+	const initialValue = unit ? `${ value }${ unit }` : value;
 
 	return parseUnit( initialValue, units );
 }
