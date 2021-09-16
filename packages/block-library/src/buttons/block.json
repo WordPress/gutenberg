@@ -21,6 +21,7 @@
 		"__experimentalExposeControlsToChildren": true,
 		"spacing": {
 			"blockGap": true,
+			"margin": ["top", "bottom" ],
 			"__experimentalDefaultControls": {
 				"blockGap": true
 			}
