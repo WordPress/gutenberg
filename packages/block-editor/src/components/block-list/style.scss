@@ -336,6 +336,12 @@
 	margin-left: 2em;
 }
 
+.wp-site-blocks > [data-align="center"] {
+	justify-content: center;
+	margin-left: auto;
+	margin-right: auto;
+}
+
 /**
  * In-Canvas Inserter
  */
