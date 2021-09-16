@@ -131,13 +131,7 @@ export function useClipboardHandler() {
 			if ( event.type === 'cut' ) {
 				removeBlocks( selectedBlockClientIds );
 			} else if ( event.type === 'paste' ) {
-				if (
-					eventDefaultPrevented ||
-					( event.cancelable === false &&
-						event.target.classList.contains(
-							'block-editor-rich-text__editable'
-						) )
-				) {
+				if ( eventDefaultPrevented ) {
 					// This was likely already handled in rich-text/use-paste-handler.js
 					return;
 				}
