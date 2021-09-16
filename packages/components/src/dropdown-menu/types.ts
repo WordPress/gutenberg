@@ -4,6 +4,12 @@
 // eslint-disable-next-line no-restricted-imports
 import type { ReactNode } from 'react';
 
+interface DropdownMenuControl {
+	icon: string;
+	title: string;
+	isDisabled: boolean;
+	onClick: () => void;
+}
 export type Props = {
 	/**
 	 * The [Dashicon](https://developer.wordpress.org/resource/dashicons/) icon slug to be shown in the collapsed menu button.
@@ -21,14 +27,14 @@ export type Props = {
 	 * human-readable `title` string, `isDisabled` boolean flag and an `onClick` function callback to invoke when the option is selected.
 	 * A valid DropdownMenu must specify one or the other of a `controls` or `children` prop.
 	 */
-	controls?: number;
+	controls?: Array< DropdownMenuControl >;
 	/**
 	 * A [function render prop](https://reactjs.org/docs/render-props.html#using-props-other-than-render) which should return an element or
 	 * elements valid for use in a DropdownMenu: `MenuItem`, `MenuItemsChoice`, or `MenuGroup`. Its first argument is a props object including
 	 * the same values as given to a [`Dropdown`'s `renderContent`](/packages/components/src/dropdown#rendercontent) (`isOpen`, `onToggle`, `onClose`).
 	 * A valid DropdownMenu must specify one or the other of a `controls` or `children` prop.
 	 */
-	children?: ReactNode;
+	children?: ( props: any ) => ReactNode;
 	/**
 	 * A class name to apply to the dropdown menu's toggle element wrapper.
 	 *
