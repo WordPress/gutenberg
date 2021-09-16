@@ -109,7 +109,6 @@ export default function Layout( { blockEditorSettings } ) {
 					<BlockEditorKeyboardShortcuts.Register />
 					<NavigationEditorShortcuts.Register />
 					<NavigationEditorShortcuts saveBlocks={ savePost } />
-					<Notices />
 					<BlockEditorProvider
 						value={ blocks }
 						onInput={ onInput }
@@ -142,6 +141,7 @@ export default function Layout( { blockEditorSettings } ) {
 								}
 								content={
 									<>
+										<Notices />
 										{ ! hasFinishedInitialLoad && (
 											<Spinner />
 										) }
