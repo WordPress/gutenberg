@@ -1305,6 +1305,90 @@ export function canInsertBlocks( state, clientIds, rootClientId = null ) {
 }
 
 /**
+ * Determines if the given block is allowed to be deleted.
+ *
+ * @param {Object}  state        Editor state.
+ * @param {string}  clientId     The block client Id.
+ * @param {?string} rootClientId Optional root client ID of block list.
+ *
+ * @return {boolean} Whether the given block is allowed to be removed.
+ */
+export function canRemoveBlock( state, clientId, rootClientId = null ) {
+	const attributes = getBlockAttributes( state, clientId );
+
+	// attributes can be null if the block is already deleted.
+	if ( attributes === null ) {
+		return true;
+	}
+
+	const { lock } = attributes;
+	const parentIsLocked = !! getTemplateLock( state, rootClientId );
+	// If we don't have a lock on the blockType level, we differ to the parent templateLock.
+	if ( lock === undefined || lock?.remove === undefined ) {
+		return ! parentIsLocked;
+	}
+
+	// when remove is true, it means we cannot remove it.
+	return ! lock?.remove;
+}
+
+/**
+ * Determines if the given blocks are allowed to be removed.
+ *
+ * @param {Object}  state        Editor state.
+ * @param {string}  clientIds    The block client IDs to be removed.
+ * @param {?string} rootClientId Optional root client ID of block list.
+ *
+ * @return {boolean} Whether the given blocks are allowed to be removed.
+ */
+export function canRemoveBlocks( state, clientIds, rootClientId = null ) {
+	return clientIds.every( ( clientId ) =>
+		canRemoveBlock( state, clientId, rootClientId )
+	);
+}
+
+/**
+ * Determines if the given block is allowed to be moved.
+ *
+ * @param {Object}  state        Editor state.
+ * @param {string}  clientId     The block client Id.
+ * @param {?string} rootClientId Optional root client ID of block list.
+ *
+ * @return {boolean} Whether the given block is allowed to be moved.
+ */
+export function canMoveBlock( state, clientId, rootClientId = null ) {
+	const attributes = getBlockAttributes( state, clientId );
+	if ( attributes === null ) {
+		return;
+	}
+
+	const { lock } = attributes;
+	const parentIsLocked = getTemplateLock( state, rootClientId ) === 'all';
+	// If we don't have a lock on the blockType level, we differ to the parent templateLock.
+	if ( lock === undefined || lock?.move === undefined ) {
+		return ! parentIsLocked;
+	}
+
+	// when move is true, it means we cannot move it.
+	return ! lock?.move;
+}
+
+/**
+ * Determines if the given blocks are allowed to be moved.
+ *
+ * @param {Object}  state        Editor state.
+ * @param {string}  clientIds    The block client IDs to be moved.
+ * @param {?string} rootClientId Optional root client ID of block list.
+ *
+ * @return {boolean} Whether the given blocks are allowed to be moved.
+ */
+export function canMoveBlocks( state, clientIds, rootClientId = null ) {
+	return clientIds.every( ( clientId ) =>
+		canMoveBlock( state, clientId, rootClientId )
+	);
+}
+
+/**
  * Returns information about how recently and frequently a block has been inserted.
  *
  * @param {Object} state Global application state.

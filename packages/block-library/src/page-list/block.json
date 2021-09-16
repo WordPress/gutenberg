@@ -33,6 +33,12 @@
 		},
 		"isNavigationChild": {
 			"type": "boolean"
+		},
+		"showSubmenuIcon": {
+			"type": "boolean"
+		},
+		"openSubmenusOnClick" : {
+			"type": "boolean"
 		}
 	},
 	"usesContext": [
@@ -47,7 +53,8 @@
 		"fontSize",
 		"customFontSize",
 		"showSubmenuIcon",
-		"style"
+		"style",
+		"openSubmenusOnClick"
 	],
 	"supports": {
 		"reusable": false,

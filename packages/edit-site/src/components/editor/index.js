@@ -26,6 +26,7 @@ import {
 } from '@wordpress/editor';
 import { __ } from '@wordpress/i18n';
 import { PluginArea } from '@wordpress/plugins';
+import { ShortcutProvider } from '@wordpress/keyboard-shortcuts';
 
 /**
  * Internal dependencies
@@ -178,7 +179,7 @@ function Editor( { initialSettings, onError } ) {
 	};
 
 	return (
-		<>
+		<ShortcutProvider>
 			<URLQueryController />
 			<SlotFillProvider>
 				<EntityProvider kind="root" type="site">
@@ -289,7 +290,7 @@ function Editor( { initialSettings, onError } ) {
 					</EntityProvider>
 				</EntityProvider>
 			</SlotFillProvider>
-		</>
+		</ShortcutProvider>
 	);
 }
 export default Editor;
