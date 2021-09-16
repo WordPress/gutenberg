@@ -3,7 +3,7 @@
  */
 import { __ } from '@wordpress/i18n';
 import { Platform } from '@wordpress/element';
-import { getBlockSupport, getBlockType } from '@wordpress/blocks';
+import { getBlockSupport } from '@wordpress/blocks';
 import {
 	__experimentalUseCustomUnits as useCustomUnits,
 	__experimentalUnitControl as UnitControl,
@@ -61,24 +61,6 @@ export function resetGap( { attributes = {}, setAttributes } ) {
 }
 
 /**
- * Get the label for the gap control, if handled by the block's
- * `__experimentalLabel` function via the `blockGap` context string.
- *
- * Falls back to a default string.
- *
- * @param {Object} props            Block props.
- * @param {Object} props.name       Block's name.
- * @param {Object} props.attributes Block's attributes.
- * @return {string} The label for the gap control.
- */
-export function getGapLabel( { name, attributes } ) {
-	const { __experimentalLabel: getLabel } = getBlockType( name );
-	const label = getLabel && getLabel( attributes, { context: 'blockGap' } );
-
-	return label || __( 'Block spacing' );
-}
-
-/**
  * Custom hook that checks if gap settings have been disabled.
  *
  * @param {string} name The name of the block.
@@ -98,9 +80,8 @@ export function useIsGapDisabled( { name: blockName } = {} ) {
  */
 export function GapEdit( props ) {
 	const {
-		attributes: { style },
 		clientId,
-		label,
+		attributes: { style },
 		setAttributes,
 	} = props;
 
@@ -151,7 +132,7 @@ export function GapEdit( props ) {
 		web: (
 			<>
 				<UnitControl
-					label={ label || __( 'Block spacing' ) }
+					label={ __( 'Block spacing' ) }
 					min={ 0 }
 					onChange={ onChange }
 					units={ units }

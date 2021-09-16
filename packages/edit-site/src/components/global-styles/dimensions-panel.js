@@ -10,7 +10,6 @@ import {
 	__experimentalUseCustomUnits as useCustomUnits,
 } from '@wordpress/components';
 import { __experimentalUseCustomSides as useCustomSides } from '@wordpress/block-editor';
-import { getBlockType } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
@@ -43,22 +42,6 @@ function useHasGap( { name, supports } ) {
 	const settings = useSetting( 'spacing.blockGap', name );
 
 	return settings && supports.includes( '--wp--style--block-gap' );
-}
-
-/**
- * Get the label for the gap control, if handled by the block's
- * `__experimentalLabel` function via the `blockGap` context string.
- *
- * Falls back to a default string.
- *
- * @param {string} name Block's name.
- * @return {string} The label for the gap control.
- */
-export function getGapLabel( name ) {
-	const { __experimentalLabel: getLabel } = getBlockType( name );
-	const label = getLabel && getLabel( {}, { context: 'blockGap' } );
-
-	return label || __( 'Block spacing' );
 }
 
 function filterValuesBySides( values, sides ) {
@@ -143,7 +126,6 @@ export default function DimensionsPanel( { context, getStyle, setStyle } ) {
 		!! marginValues && Object.keys( marginValues ).length;
 
 	const gapValue = getStyle( name, '--wp--style--block-gap' );
-	const gapLabel = getGapLabel( name );
 
 	const setGapValue = ( newGapValue ) => {
 		setStyle( name, '--wp--style--block-gap', newGapValue );
@@ -199,12 +181,12 @@ export default function DimensionsPanel( { context, getStyle, setStyle } ) {
 				<ToolsPanelItem
 					className="single-column"
 					hasValue={ hasGapValue }
-					label={ gapLabel || __( 'Block spacing' ) }
+					label={ __( 'Block spacing' ) }
 					onDeselect={ resetGapValue }
 					isShownByDefault={ true }
 				>
 					<UnitControl
-						label={ gapLabel || __( 'Block spacing' ) }
+						label={ __( 'Block spacing' ) }
 						min={ 0 }
 						onChange={ setGapValue }
 						units={ units }
