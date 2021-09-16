@@ -153,7 +153,7 @@ function EditorHelpTopics( { close, isVisible, onClose } ) {
 											{
 												<HelpGetSupportButton
 													title={ __(
-														'Contact support'
+														'Contact Support'
 													) }
 													onPress={
 														requestContactCustomerSupport
