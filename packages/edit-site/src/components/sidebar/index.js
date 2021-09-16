@@ -3,7 +3,7 @@
  */
 import { createSlotFill, PanelBody } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-import { cog, typography } from '@wordpress/icons';
+import { cog, globalStyles } from '@wordpress/icons';
 import { useEffect } from '@wordpress/element';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { store as interfaceStore } from '@wordpress/interface';
@@ -80,7 +80,7 @@ export function SidebarComplementaryAreaFills() {
 				identifier="edit-site/global-styles"
 				title={ __( 'Global Styles' ) }
 				closeLabel={ __( 'Close global styles sidebar' ) }
-				icon={ typography }
+				icon={ globalStyles }
 			/>
 		</>
 	);

@@ -81,6 +81,7 @@ export { default as formatUnderline } from './library/format-underline';
 export { default as formatUppercase } from './library/format-uppercase';
 export { default as fullscreen } from './library/fullscreen';
 export { default as gallery } from './library/gallery';
+export { default as globalStyles } from './library/global-styles';
 export { default as globe } from './library/globe';
 export { default as grid } from './library/grid';
 export { default as group } from './library/group';
