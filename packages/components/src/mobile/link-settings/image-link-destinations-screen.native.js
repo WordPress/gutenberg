@@ -21,6 +21,33 @@ const LINK_DESTINATION_MEDIA = 'media';
 const LINK_DESTINATION_ATTACHMENT = 'attachment';
 const LINK_DESTINATION_CUSTOM = 'custom';
 
+function LinkDestination( {
+	children,
+	currentOption,
+	label,
+	option,
+	onPress,
+	value,
+	valueStyle,
+} ) {
+	return (
+		<BottomSheet.Cell
+			icon={ check }
+			iconStyle={
+				currentOption !== option && styles.unselectedOptionIcon
+			}
+			label={ label }
+			leftAlign
+			onPress={ onPress }
+			value={ value }
+			valueStyle={ valueStyle }
+			separatorType="leftMargin"
+		>
+			{ children }
+		</BottomSheet.Cell>
+	);
+}
+
 function ImageLinkDestinationsScreen( props ) {
 	const navigation = useNavigation();
 	const route = useRoute();
@@ -71,51 +98,33 @@ function ImageLinkDestinationsScreen( props ) {
 				</BottomSheet.NavBar.Heading>
 			</BottomSheet.NavBar>
 			<PanelBody>
-				<BottomSheet.Cell
-					icon={ check }
-					iconStyle={
-						linkDestination !== LINK_DESTINATION_NONE &&
-						styles.unselectedOptionIcon
-					}
+				<LinkDestination
+					currentOption={ linkDestination }
+					option={ LINK_DESTINATION_NONE }
 					label={ __( 'None' ) }
-					leftAlign
 					onPress={ setLinkDestination( LINK_DESTINATION_NONE ) }
-					separatorType="leftMargin"
 				/>
-				<BottomSheet.Cell
-					icon={ check }
-					iconStyle={
-						linkDestination !== LINK_DESTINATION_MEDIA &&
-						styles.unselectedOptionIcon
-					}
+				<LinkDestination
+					currentOption={ linkDestination }
+					option={ LINK_DESTINATION_MEDIA }
 					label={ __( 'Media File' ) }
-					leftAlign
 					onPress={ setLinkDestination( LINK_DESTINATION_MEDIA ) }
-					separatorType="leftMargin"
 				/>
 				{ !! attachmentPageUrl && (
-					<BottomSheet.Cell
-						icon={ check }
-						iconStyle={
-							linkDestination !== LINK_DESTINATION_ATTACHMENT &&
-							styles.unselectedOptionIcon
-						}
+					<LinkDestination
+						currentOption={ linkDestination }
+						option={ LINK_DESTINATION_ATTACHMENT }
 						label={ __( 'Attachment Page' ) }
-						leftAlign
 						onPress={ setLinkDestination(
 							LINK_DESTINATION_ATTACHMENT
 						) }
-						separatorType="leftMargin"
 					/>
 				) }
-				<BottomSheet.Cell
-					icon={ check }
-					iconStyle={
-						linkDestination !== LINK_DESTINATION_CUSTOM &&
-						styles.unselectedOptionIcon
-					}
+				<LinkDestination
+					currentOption={ linkDestination }
+					option={ LINK_DESTINATION_CUSTOM }
 					label={ __( 'Custom URL' ) }
-					leftAlign
+					onPress={ goToLinkPicker }
 					// since this is not actually editable, we treat value as a placeholder
 					value={
 						customUrlSet ? inputValue : __( 'Search or type URL' )
@@ -123,11 +132,9 @@ function ImageLinkDestinationsScreen( props ) {
 					valueStyle={
 						customUrlSet ? undefined : styles.placeholderTextColor
 					}
-					onPress={ goToLinkPicker }
-					separatorType="leftMargin"
 				>
 					<Icon icon={ chevronRight }></Icon>
-				</BottomSheet.Cell>
+				</LinkDestination>
 			</PanelBody>
 		</>
 	);
