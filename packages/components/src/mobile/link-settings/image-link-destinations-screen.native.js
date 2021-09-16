@@ -21,9 +21,7 @@ const LINK_DESTINATION_MEDIA = 'media';
 const LINK_DESTINATION_ATTACHMENT = 'attachment';
 const LINK_DESTINATION_CUSTOM = 'custom';
 
-// TODO(David): Rename this component, file, and screen to better communicate
-// intent
-function ImageOptionsScreen( props ) {
+function ImageLinkDestinationsScreen( props ) {
 	const navigation = useNavigation();
 	const route = useRoute();
 	const { url = '' } = props;
@@ -135,4 +133,4 @@ function ImageOptionsScreen( props ) {
 	);
 }
 
-export default ImageOptionsScreen;
+export default ImageLinkDestinationsScreen;

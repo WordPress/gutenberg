@@ -6,7 +6,7 @@ import {
 	BottomSheet,
 	ColorSettings,
 	FocalPointSettingsPanel,
-	ImageOptionsScreen,
+	ImageLinkDestinationsScreen,
 	LinkPickerScreen,
 } from '@wordpress/components';
 import { compose } from '@wordpress/compose';
@@ -80,7 +80,7 @@ function BottomSheetSettings( {
 				<BottomSheet.NavigationScreen
 					name={ blockSettingsScreens.imageOptions }
 				>
-					<ImageOptionsScreen { ...props } />
+					<ImageLinkDestinationsScreen { ...props } />
 				</BottomSheet.NavigationScreen>
 			</BottomSheet.NavigationContainer>
 		</BottomSheet>
