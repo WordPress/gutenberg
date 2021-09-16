@@ -32,8 +32,8 @@ The Navigation Editor has two "modes" for _persistence_ ("saving" navigations) a
 
 1. **Default** - navigations are saved to the _existing_ (post type powered) Menus system and rendered using standard Walker classes.
 2. **Block-based** (opt _in_) - navigations continue to be _saved_ using the existing post type system, but:
+    - the [navigation is _rendered_ using the `core/navigation` block](https://github.com/WordPress/gutenberg/blob/7fcd57c9a62c232899e287f6d96416477d810d5e/lib/navigation.php#L228) (as opposed to Walker) to provide access to the full power of blocks (with some tradeoffs in terms of backwards compatibility).
     - non-link blocks (anything that is not `core/navigation-link`) are saved as _blocks_ (see [technical implementation](#technical-implementation-details)).
-    - the navigation is _rendered_ using the `core/navigation` block (as opposed to Walker) to provide access to the full power of blocks (with some tradeoffs in terms of backwards compatibility).
 
 ### Default Mode
 
@@ -45,7 +45,7 @@ Moreover, when the navigation is rendered on the front of the site the system co
 
 **Important**: block-based mode has been temporarily **_disabled_** until it becomes stable. So, if a theme declares support for the `block-nav-menus` feature it will not affect the frontend.
 
-If desired, themes are able to opt into _rendering_ complete block-based menus using the Navigation Editor. This allows for arbitrarily complex navigation block structures to be used in an existing theme whilst still ensuring the navigation data is still _saved_ to the existing (post type powered) Menus system.
+If desired, themes are able to opt into [_rendering_ complete block-based menus](https://github.com/WordPress/gutenberg/blob/7fcd57c9a62c232899e287f6d96416477d810d5e/lib/navigation.php#L228) using the Navigation Editor. This allows for arbitrarily complex navigation block structures to be used in an existing theme whilst still ensuring the navigation data is still _saved_ to the existing (post type powered) Menus system.
 
 Themes can opt into this behaviour by declaring:
 
@@ -58,6 +58,8 @@ This unlocks significant additional capabilities in the Navigation Editor. For e
 -   `core/navigation-link`.
 -   `core/social`.
 -   `core/search`.
+
+As these items are still saved to `nav_menu_items` this ensures if we ever revert to classic (Walker-based) rendering, these items will still be rendered (as blocks).
 
 #### Technical Implementation details
 
