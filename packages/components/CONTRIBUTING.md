@@ -4,7 +4,7 @@ Thank you for taking the time to contribute.
 
 The following is a set of guidelines for contributing to the `@wordpress/components` package to be considered in addition to the general ones described in our [Contributing Policy](/CONTRIBUTING.md).
 
-This set of guidelines should apply especially to newly introduced components. It is, in fact, possible that some of the older components don't respect some of these guidelines for legacy/compatibility reasons. But, when possible, these guidelines are retroactively being applied to existing components.
+This set of guidelines should apply especially to newly introduced components. In fact, while these guidelines should also be retroactively applied to existing components, it is sometimes impossible to do so for legacy/compatibility reasons.
 
 For an example of a component that follows these requirements, take a look at [`ItemGroup`](/packages/components/src/item-group).
 
