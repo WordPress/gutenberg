@@ -25,8 +25,11 @@ const HelpGetSupportButton = ( { onPress, title } ) => {
 	);
 
 	return (
-		<Pressable style={ buttonStyle } onPress={ onPress }>
-			{ /* todo: a11y */ }
+		<Pressable
+			style={ buttonStyle }
+			onPress={ onPress }
+			accessibilityRole={ 'button' }
+		>
 			<Text style={ textStyle }>{ title }</Text>
 		</Pressable>
 	);

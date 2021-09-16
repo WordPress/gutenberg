@@ -155,7 +155,6 @@ function EditorHelpTopics( { close, isVisible, onClose } ) {
 													title={ __(
 														'Contact support'
 													) }
-													accessibilityLabel="TODO"
 													onPress={
 														requestContactCustomerSupport
 													}
@@ -164,7 +163,6 @@ function EditorHelpTopics( { close, isVisible, onClose } ) {
 											{
 												<HelpGetSupportButton
 													title={ __( 'My Tickets' ) }
-													accessibilityLabel="TODO"
 													onPress={
 														requestGotoMyCustomerSupportTickets
 													}
