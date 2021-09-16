@@ -180,8 +180,8 @@ export function hasUnits( units ) {
 /**
  * Parses a number and unit from a value.
  *
- * @param {string}        initialValue Value to parse
- * @param {Array<Object>} units        Units to derive from.
+ * @param {string}                   initialValue Value to parse
+ * @param {Array<WPUnitControlUnit>} units        Units to derive from.
  * @return {Array<number, string>} The extracted number and unit.
  */
 export function parseUnit( initialValue, units = ALL_CSS_UNITS ) {
@@ -209,10 +209,10 @@ export function parseUnit( initialValue, units = ALL_CSS_UNITS ) {
  * Parses a number and unit from a value. Validates parsed value, using fallback
  * value if invalid.
  *
- * @param {number|string} next          The next value.
- * @param {Array<Object>} units         Units to derive from.
- * @param {number|string} fallbackValue The fallback value.
- * @param {string}        fallbackUnit  The fallback value.
+ * @param {number|string}            next          The next value.
+ * @param {Array<WPUnitControlUnit>} units         Units to derive from.
+ * @param {number|string}            fallbackValue The fallback value.
+ * @param {string}                   fallbackUnit  The fallback value.
  * @return {Array<number, string>} The extracted number and unit.
  */
 export function getValidParsedUnit( next, units, fallbackValue, fallbackUnit ) {
@@ -268,10 +268,10 @@ export function filterUnitsWithSettings( settings = [], units = [] ) {
  * TODO: ideally this hook shouldn't be needed
  * https://github.com/WordPress/gutenberg/pull/31822#discussion_r633280823
  *
- * @param {Object}                  args                An object containing units, settingPath & defaultUnits.
- * @param {Array<Object>|undefined} args.units          Collection of available units.
- * @param {Array<string>|undefined} args.availableUnits The setting path. Defaults to 'spacing.units'.
- * @param {Object|undefined}        args.defaultValues  Collection of default values for defined units. Example: { px: '350', em: '15' }.
+ * @param {Object}                             args                An object containing units, settingPath & defaultUnits.
+ * @param {Array<WPUnitControlUnit>|undefined} args.units          Collection of available units.
+ * @param {Array<string>|undefined}            args.availableUnits The setting path. Defaults to 'spacing.units'.
+ * @param {Object|undefined}                   args.defaultValues  Collection of default values for defined units. Example: { px: '350', em: '15' }.
  *
  * @return {Array|boolean} Filtered units based on settings.
  */
