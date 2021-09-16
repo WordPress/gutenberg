@@ -348,18 +348,11 @@ class WP_REST_Menus_Controller extends WP_REST_Terms_Controller {
 		$term = wp_update_nav_menu_object( 0, wp_slash( (array) $prepared_term ) );
 
 		if ( is_wp_error( $term ) ) {
-			/*
-			 * If we're going to inform the client that the term already exists,
-			 * give them the identifier for future use.
-			 */
-			$term_id = $term->get_error_data( 'term_exists' );
-			if ( $term_id ) {
-				$existing_term = get_term( $term_id, $this->taxonomy );
-				$term->add_data( $existing_term->term_id, 'term_exists' );
+			// Inform client that the menu already exists and set correct status.
+			if ( isset( $term->errors['menu_exists'] ) ) {
 				$term->add_data(
 					array(
-						'status'  => 400,
-						'term_id' => $term_id,
+						'status' => 400,
 					)
 				);
 			}
