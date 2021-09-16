@@ -135,6 +135,10 @@ _Returns_
 
 -   `Promise`: Promise that responds to a request with the mock JSON response.
 
+### createMenu
+
+Undocumented declaration.
+
 ### createNewPost
 
 Creates new post.
@@ -196,6 +200,10 @@ Deactivates an active plugin.
 _Parameters_
 
 -   _slug_ `string`: Plugin slug.
+
+### deleteAllMenus
+
+Undocumented declaration.
 
 ### deleteAllWidgets
 
