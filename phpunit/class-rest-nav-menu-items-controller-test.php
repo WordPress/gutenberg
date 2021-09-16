@@ -745,9 +745,9 @@ class REST_Nav_Menu_Items_Controller_Test extends WP_Test_REST_Post_Type_Control
 	 */
 	public function test_filters_only_get_applied_once_when_creating_a_menu_item() {
 		wp_set_current_user( self::$admin_id );
-		add_filter( 'title_save_pre', array( $this, 'increment_filters_applied_counter') );
-		add_filter( 'excerpt_save_pre', array( $this, 'increment_filters_applied_counter') );
-		add_filter( 'content_save_pre', array( $this, 'increment_filters_applied_counter') );
+		add_filter( 'title_save_pre', array( $this, 'increment_filters_applied_counter' ) );
+		add_filter( 'excerpt_save_pre', array( $this, 'increment_filters_applied_counter' ) );
+		add_filter( 'content_save_pre', array( $this, 'increment_filters_applied_counter' ) );
 
 		$request = new WP_REST_Request( 'POST', '/__experimental/menu-items' );
 		$request->add_header( 'content-type', 'application/x-www-form-urlencoded' );
@@ -764,9 +764,9 @@ class REST_Nav_Menu_Items_Controller_Test extends WP_Test_REST_Post_Type_Control
 	 */
 	public function test_filters_only_get_applied_once_when_updating_a_menu_item() {
 		wp_set_current_user( self::$admin_id );
-		add_filter( 'title_save_pre', array( $this, 'increment_filters_applied_counter') );
-		add_filter( 'excerpt_save_pre', array( $this, 'increment_filters_applied_counter') );
-		add_filter( 'content_save_pre', array( $this, 'increment_filters_applied_counter') );
+		add_filter( 'title_save_pre', array( $this, 'increment_filters_applied_counter' ) );
+		add_filter( 'excerpt_save_pre', array( $this, 'increment_filters_applied_counter' ) );
+		add_filter( 'content_save_pre', array( $this, 'increment_filters_applied_counter' ) );
 
 		$request = new WP_REST_Request( 'PUT', sprintf( '/__experimental/menu-items/%d', $this->menu_item_id ) );
 		$request->add_header( 'content-type', 'application/x-www-form-urlencoded' );
