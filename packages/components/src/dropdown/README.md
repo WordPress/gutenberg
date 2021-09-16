@@ -103,7 +103,7 @@ Set this prop to `false` to disable focus switching entirely. This should only b
 
 Properties of popoverProps object will be passed as props to the `Popover` component.
 
-Use this object to access properties/features of the `Popover` component that are not already exposed in the `Dropdown`component, e.g.: the ability to have the popover without an arrow.
+Use this object to access properties/features of the `Popover` component that are not already exposed in the `Dropdown` component, e.g.: the ability to have the popover without an arrow.
 
 -   Type: `Object`
 -   Required: No
