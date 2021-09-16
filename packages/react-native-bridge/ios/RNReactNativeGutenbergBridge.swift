@@ -375,9 +375,16 @@ public class RNReactNativeGutenbergBridge: RCTEventEmitter {
     }
 
     @objc
-    func requestCustomerSupportOptionsShow() {
+    func requestContactCustomerSupport() {
         DispatchQueue.main.async {
-            self.delegate?.gutenbergDidRequestCustomerSupportOptionsShow()
+            self.delegate?.gutenbergDidRequestContactCustomerSupport()
+        }
+    }
+
+    @objc
+    func requestGotoMyCustomerSupportTickets() {
+        DispatchQueue.main.async {
+            self.delegate?.gutenbergDidRequestGotoMyCustomerSupportTickets()
         }
     }
 }
