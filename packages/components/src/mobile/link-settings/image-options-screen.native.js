@@ -66,9 +66,6 @@ function ImageOptionsScreen( props ) {
 		navigation.goBack();
 	};
 
-	// TODO(David): Non-selected items do not display an icon, which causes
-	// misalignment with the selected item. We need to update Cell to support the
-	// use case of retaining space on the left side for a conditional icon.
 	return (
 		<>
 			<BottomSheet.NavBar>
@@ -79,44 +76,47 @@ function ImageOptionsScreen( props ) {
 			</BottomSheet.NavBar>
 			<PanelBody>
 				<BottomSheet.Cell
-					icon={
-						linkDestination === LINK_DESTINATION_NONE
-							? check
-							: undefined
+					icon={ check }
+					iconStyle={
+						linkDestination !== LINK_DESTINATION_NONE &&
+						styles.unselectedOptionIcon
 					}
 					label={ __( 'None' ) }
 					leftAlign
 					onPress={ setLinkDestination( LINK_DESTINATION_NONE ) }
+					separatorType="leftMargin"
 				/>
 				<BottomSheet.Cell
-					icon={
-						linkDestination === LINK_DESTINATION_MEDIA
-							? check
-							: undefined
+					icon={ check }
+					iconStyle={
+						linkDestination !== LINK_DESTINATION_MEDIA &&
+						styles.unselectedOptionIcon
 					}
 					label={ __( 'Media File' ) }
 					leftAlign
 					onPress={ setLinkDestination( LINK_DESTINATION_MEDIA ) }
+					separatorType="leftMargin"
 				/>
 				{ !! attachmentPageUrl && (
 					<BottomSheet.Cell
-						icon={
-							linkDestination === LINK_DESTINATION_ATTACHMENT
-								? check
-								: undefined
+						icon={ check }
+						iconStyle={
+							linkDestination !== LINK_DESTINATION_ATTACHMENT &&
+							styles.unselectedOptionIcon
 						}
 						label={ __( 'Attachment Page' ) }
 						leftAlign
 						onPress={ setLinkDestination(
 							LINK_DESTINATION_ATTACHMENT
 						) }
+						separatorType="leftMargin"
 					/>
 				) }
 				<BottomSheet.Cell
-					icon={
-						linkDestination === LINK_DESTINATION_CUSTOM
-							? check
-							: undefined
+					icon={ check }
+					iconStyle={
+						linkDestination !== LINK_DESTINATION_CUSTOM &&
+						styles.unselectedOptionIcon
 					}
 					label={ __( 'Custom URL' ) }
 					leftAlign
@@ -128,6 +128,7 @@ function ImageOptionsScreen( props ) {
 						customUrlSet ? undefined : styles.placeholderColor
 					}
 					onPress={ goToLinkPicker }
+					separatorType="leftMargin"
 				>
 					<Icon icon={ chevronRight }></Icon>
 				</BottomSheet.Cell>
