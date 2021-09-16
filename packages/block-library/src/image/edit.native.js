@@ -377,11 +377,8 @@ export class ImageEdit extends Component {
 			linkDestination = LINK_DESTINATION_CUSTOM;
 		}
 
-		return href === undefined
-			? setAttributes( {
-					...restAttributes,
-					linkDestination,
-			  } )
+		return href === undefined || href === this.props.attributes.href
+			? setAttributes( restAttributes )
 			: setAttributes( {
 					...restAttributes,
 					linkDestination,
