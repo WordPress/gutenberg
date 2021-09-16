@@ -139,10 +139,17 @@ const renderPanel = () => {
 	);
 };
 
-// Helper to find the menu button and simulate a user click.
+/**
+ * Helper to find the menu button and simulate a user click.
+ *
+ * @return {HTMLElement} The menuButton.
+ */
 const openDropdownMenu = () => {
-	const menuButton = screen.getByLabelText( defaultProps.label );
+	const menuButton = screen.getByRole( 'button', {
+		name: /show([\w\s]+)options/i,
+	} );
 	fireEvent.click( menuButton );
+	return menuButton;
 };
 
 // Opens dropdown then selects the menu item by label before simulating a click.
@@ -212,7 +219,7 @@ describe( 'ToolsPanel', () => {
 		it( 'should render panel menu when at least one panel item', () => {
 			renderPanel();
 
-			const menuButton = screen.getByLabelText( defaultProps.label );
+			const menuButton = openDropdownMenu();
 			expect( menuButton ).toBeInTheDocument();
 		} );
 
@@ -507,6 +514,38 @@ describe( 'ToolsPanel', () => {
 			expect( items ).toHaveLength( 2 );
 			expect( items[ 0 ] ).toHaveTextContent( 'Item 1' );
 			expect( items[ 1 ] ).toHaveTextContent( 'Item 2' );
+		} );
+	} );
+
+	describe( 'panel header icon toggle', () => {
+		it( 'should continue to render shown by default item after it is toggled off via menu item', async () => {
+			render(
+				<ToolsPanel { ...defaultProps }>
+					<ToolsPanelItem { ...controlProps }>
+						<div>Default control</div>
+					</ToolsPanelItem>
+				</ToolsPanel>
+			);
+
+			// There are unactivated, optional menu items in the Tools Panel dropdown.
+			const optionsHiddenIcon = screen.getByRole( 'button', {
+				name: 'Show and add options',
+			} );
+
+			expect( optionsHiddenIcon ).toBeInTheDocument();
+
+			await selectMenuItem( controlProps.label );
+
+			// There are now NO unactivated, optional menu items in the Tools Panel dropdown.
+			expect(
+				screen.queryByRole( 'button', { name: 'Show and add options' } )
+			).toBeNull();
+
+			const optionsDisplayedIcon = screen.getByRole( 'button', {
+				name: 'Show options',
+			} );
+
+			expect( optionsDisplayedIcon ).toBeInTheDocument();
 		} );
 	} );
 } );
