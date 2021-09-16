@@ -415,7 +415,7 @@ supports: {
 -   Type: `boolean`
 -   Default value: `true`
 
-When the style picker is shown, a dropdown is displayed so the user can select a default style for this block type. If you prefer not to show the dropdown, set this property to `false`.
+When the style picker is shown, the user can set a default style for a block type based on the block's currently active style. If you prefer not to make this option available, set this property to `false`.
 
 ```js
 supports: {
