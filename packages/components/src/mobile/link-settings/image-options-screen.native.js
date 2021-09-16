@@ -98,18 +98,20 @@ function ImageOptionsScreen( props ) {
 					leftAlign
 					onPress={ setLinkDestination( LINK_DESTINATION_MEDIA ) }
 				/>
-				<BottomSheet.Cell
-					icon={
-						linkDestination === LINK_DESTINATION_ATTACHMENT
-							? check
-							: undefined
-					}
-					label={ __( 'Attachment Page' ) }
-					leftAlign
-					onPress={ setLinkDestination(
-						LINK_DESTINATION_ATTACHMENT
-					) }
-				/>
+				{ !! attachmentPageUrl && (
+					<BottomSheet.Cell
+						icon={
+							linkDestination === LINK_DESTINATION_ATTACHMENT
+								? check
+								: undefined
+						}
+						label={ __( 'Attachment Page' ) }
+						leftAlign
+						onPress={ setLinkDestination(
+							LINK_DESTINATION_ATTACHMENT
+						) }
+					/>
+				) }
 				<BottomSheet.Cell
 					icon={
 						linkDestination === LINK_DESTINATION_CUSTOM
