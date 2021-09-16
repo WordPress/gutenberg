@@ -9,6 +9,17 @@ import { isEmpty } from 'lodash';
 import { __, _x } from '@wordpress/i18n';
 import { Platform } from '@wordpress/element';
 
+/**
+ * An object containing the details of a unit.
+ *
+ * @typedef {Object} WPUnitControlUnit
+ * @property {string}        value       The value for the unit, used in a CSS value (e.g `px`).
+ * @property {string}        label       The label used in a dropdown selector for the unit.
+ * @property {string|number} [default]   Default value for the unit, used when switching units.
+ * @property {string}        [a11yLabel] An accessible label used by screen readers.
+ * @property {number}        [step]      A step value used when incrementing/decrementing the value.
+ */
+
 const isWeb = Platform.OS === 'web';
 
 const allUnits = {
@@ -145,9 +156,9 @@ export const DEFAULT_UNIT = allUnits.px;
  * Moving forward, ideally the value should be a string that contains both
  * the value and unit, example: '10px'
  *
- * @param {number|string} value Value
- * @param {string}        unit  Unit value
- * @param {Array<Object>} units Units to derive from.
+ * @param {number|string}            value Value
+ * @param {string}                   unit  Unit value
+ * @param {Array<WPUnitControlUnit>} units Units to derive from.
  * @return {Array<number, string>} The extracted number and unit.
  */
 export function getParsedValue( value, unit, units ) {
