@@ -41,7 +41,7 @@ Moreover, when the navigation is rendered on the front of the site the system co
 
 ### Block-based Mode
 
-**Important**: block-based mode has been temporarily ***disabled*** until it becomes stable. So, if a theme declares support for the `block-nav-menus` feature it will not affect the frontend.
+**Important**: block-based mode has been temporarily **_disabled_** until it becomes stable. So, if a theme declares support for the `block-nav-menus` feature it will not affect the frontend.
 
 If desired, themes are able to opt into _rendering_ complete block-based menus using the Navigation Editor. This allows for arbitrarily complex navigation block structures to be used in an existing theme whilst still ensuring the navigation data is still _saved_ to the existing (post type powered) Menus system.
 
@@ -165,6 +165,6 @@ return (
 -   **Navigation editor / screen** - the new screen provided by Gutenberg to allow the user to edit navigations using a block-based UI.
 -   **Menus screen** - the current/existing [interface/screen for managing Menus](https://codex.wordpress.org/WordPress_Menu_User_Guide) in WordPress WPAdmin.
 
-_This package assumes that your code will run in an **ES2015+** environment. If you're using an environment that has limited or no support for ES2015+ such as IE browsers then using [core-js](https://github.com/zloirock/core-js) will add polyfills for these methods._
+_This package assumes that your code will run in an **ES2015+** environment. If you're using an environment that has limited or no support for such language features and APIs, you should include [the polyfill shipped in `@wordpress/babel-preset-default`](https://github.com/WordPress/gutenberg/tree/HEAD/packages/babel-preset-default#polyfill) in your code._
 
 <br/><br/><p align="center"><img src="https://s.w.org/style/images/codeispoetry.png?1" alt="Code is Poetry." /></p>
