@@ -125,7 +125,7 @@ function ImageOptionsScreen( props ) {
 						customUrlSet ? inputValue : __( 'Search or type URL' )
 					}
 					valueStyle={
-						customUrlSet ? undefined : styles.placeholderColor
+						customUrlSet ? undefined : styles.placeholderTextColor
 					}
 					onPress={ goToLinkPicker }
 					separatorType="leftMargin"
