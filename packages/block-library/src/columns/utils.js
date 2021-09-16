@@ -1,4 +1,9 @@
 /**
+ * WordPress dependencies
+ */
+import { createBlock } from '@wordpress/blocks';
+
+/**
  * Returns a column width attribute value rounded to standard precision.
  * Returns `undefined` if the value is not a valid finite number.
  *
@@ -173,4 +178,85 @@ export function getWidthWithUnit( width, unit ) {
  */
 export function isPercentageUnit( unit ) {
 	return unit === '%';
+}
+
+/**
+ * Returns indexes of inner blocks that aren’t locked from removal and have no
+ * inner blocks of their own.
+ *
+ * @param {Array} blockList A block list as returned by `getBlocks`.
+ */
+export function getDispensableIndexes( blockList ) {
+	return blockList.reduce(
+		( vacants, { attributes, innerBlocks: { length } }, index ) =>
+			attributes.lock?.remove || length ? vacants : [ ...vacants, index ],
+		[]
+	);
+}
+
+/**
+ * Creates new child Column blocks by adding or removing columns and revises
+ * existant column widths to grant required or redistribute available space.
+ * When removing columns it does not remove any that are locked or have their
+ * own children.
+ *
+ * @param {Array}  currentBlocks Current inner blocks.
+ * @param {number} newCount      New column count.
+ */
+export function getRevisedColumns( currentBlocks, newCount ) {
+	const currentCount = currentBlocks.length;
+	const hasExplicitWidths = hasExplicitPercentColumnWidths( currentBlocks );
+
+	// Redistribute available width for existing inner blocks.
+	const isAddingColumn = newCount > currentCount;
+
+	let innerBlocks;
+	if ( isAddingColumn && hasExplicitWidths ) {
+		// If adding a new column, assign width to the new column equal to
+		// as if it were `1 / columns` of the total available space.
+		const newColumnWidth = toWidthPrecision( 100 / newCount );
+
+		// Redistribute in consideration of pending block insertion as
+		// constraining the available working width.
+		const widths = getRedistributedColumnWidths(
+			currentBlocks,
+			100 - newColumnWidth
+		);
+
+		innerBlocks = [
+			...getMappedColumnWidths( currentBlocks, widths ),
+			...Array.from( {
+				length: newCount - currentCount,
+			} ).map( () => {
+				return createBlock( 'core/column', {
+					width: `${ newColumnWidth }%`,
+				} );
+			} ),
+		];
+	} else if ( isAddingColumn ) {
+		innerBlocks = [
+			...currentBlocks,
+			...Array.from( {
+				length: newCount - currentCount,
+			} ).map( () => {
+				return createBlock( 'core/column' );
+			} ),
+		];
+	} else {
+		// Removes dispensable columns.
+		const dispensableIndexes = getDispensableIndexes( currentBlocks );
+		const difference = currentCount - newCount;
+		const indexesToRemove = dispensableIndexes.slice( -difference );
+		innerBlocks = currentBlocks.filter(
+			( item, index ) => ! indexesToRemove.includes( index )
+		);
+
+		if ( hasExplicitWidths ) {
+			// Redistribute as if block is already removed.
+			const widths = getRedistributedColumnWidths( innerBlocks, 100 );
+
+			innerBlocks = getMappedColumnWidths( innerBlocks, widths );
+		}
+	}
+	return innerBlocks;
 }
