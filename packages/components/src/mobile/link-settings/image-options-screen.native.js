@@ -59,9 +59,7 @@ function ImageOptionsScreen( props ) {
 				newUrl = '';
 				break;
 		}
-		// TODO(David): Most of the logic for updatting the attributes is contained
-		// within LinkSettings. We may need to create an abstracted hook.
-		// `setAttributes` is likely not enough.
+
 		setAttributes( { url: newUrl, linkDestination: newLinkDestination } );
 		navigation.goBack();
 	};
