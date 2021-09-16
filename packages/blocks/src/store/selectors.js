@@ -44,7 +44,7 @@ export const getBlockTypes = createSelector(
 		return Object.values( state.blockTypes ).map( ( blockType ) => {
 			return {
 				...blockType,
-				variations: getBlockVariations( state, blockType.name ),
+				variations: getBlockVariations( state, blockType?.name ),
 			};
 		} );
 	},
@@ -126,7 +126,7 @@ export function getActiveBlockVariation( state, blockName, attributes, scope ) {
 	const match = variations?.find( ( variation ) => {
 		if ( Array.isArray( variation.isActive ) ) {
 			const blockType = getBlockType( state, blockName );
-			const attributeKeys = Object.keys( blockType.attributes || {} );
+			const attributeKeys = Object.keys( blockType?.attributes || {} );
 			const definedAttributes = variation.isActive.filter(
 				( attribute ) => attributeKeys.includes( attribute )
 			);

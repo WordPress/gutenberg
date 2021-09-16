@@ -198,7 +198,7 @@ export function getSaveContent( blockTypeOrName, attributes, innerBlocks ) {
  */
 export function getCommentAttributes( blockType, attributes ) {
 	return reduce(
-		blockType.attributes,
+		blockType?.attributes,
 		( accumulator, attributeSchema, key ) => {
 			const value = attributes[ key ];
 			// Ignore undefined values.

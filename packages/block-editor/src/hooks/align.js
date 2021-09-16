@@ -129,7 +129,7 @@ export const withToolbarControls = createHigherOrderComponent(
 		const updateAlignment = ( nextAlign ) => {
 			if ( ! nextAlign ) {
 				const blockType = getBlockType( props.name );
-				const blockDefaultAlign = blockType.attributes?.align?.default;
+				const blockDefaultAlign = blockType?.attributes?.align?.default;
 				if ( blockDefaultAlign ) {
 					nextAlign = '';
 				}
