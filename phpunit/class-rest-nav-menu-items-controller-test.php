@@ -745,9 +745,9 @@ class REST_Nav_Menu_Items_Controller_Test extends WP_Test_REST_Post_Type_Control
 	 */
 	public function test_filters_only_get_applied_once_when_creating_a_menu_item() {
 		wp_set_current_user( self::$admin_id );
-		add_filter( 'title_save_pre', array( $this, 'count_times_filters_have_been_applied' ) );
-		add_filter( 'excerpt_save_pre', array( $this, 'count_times_filters_have_been_applied' ) );
-		add_filter( 'content_save_pre', array( $this, 'count_times_filters_have_been_applied' ) );
+		add_filter( 'title_save_pre', array( $this, 'increment_filters_applied_counter') );
+		add_filter( 'excerpt_save_pre', array( $this, 'increment_filters_applied_counter') );
+		add_filter( 'content_save_pre', array( $this, 'increment_filters_applied_counter') );
 
 		$request = new WP_REST_Request( 'POST', '/__experimental/menu-items' );
 		$request->add_header( 'content-type', 'application/x-www-form-urlencoded' );
@@ -764,9 +764,9 @@ class REST_Nav_Menu_Items_Controller_Test extends WP_Test_REST_Post_Type_Control
 	 */
 	public function test_filters_only_get_applied_once_when_updating_a_menu_item() {
 		wp_set_current_user( self::$admin_id );
-		add_filter( 'title_save_pre', array( $this, 'count_times_filters_have_been_applied' ) );
-		add_filter( 'excerpt_save_pre', array( $this, 'count_times_filters_have_been_applied' ) );
-		add_filter( 'content_save_pre', array( $this, 'count_times_filters_have_been_applied' ) );
+		add_filter( 'title_save_pre', array( $this, 'increment_filters_applied_counter') );
+		add_filter( 'excerpt_save_pre', array( $this, 'increment_filters_applied_counter') );
+		add_filter( 'content_save_pre', array( $this, 'increment_filters_applied_counter') );
 
 		$request = new WP_REST_Request( 'PUT', sprintf( '/__experimental/menu-items/%d', $this->menu_item_id ) );
 		$request->add_header( 'content-type', 'application/x-www-form-urlencoded' );
@@ -792,7 +792,7 @@ class REST_Nav_Menu_Items_Controller_Test extends WP_Test_REST_Post_Type_Control
 		$this->assertSame( 3, self::$times_filters_applied, 'Callback function must be called 3 times (meaning each filter has been applied only once)' );
 	}
 
-	public function count_times_filters_have_been_applied( $value ) {
+	public function increment_filters_applied_counter( $value ) {
 		++self::$times_filters_applied;
 		return $value;
 	}
