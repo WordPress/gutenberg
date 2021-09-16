@@ -13,6 +13,7 @@ import { mergePair } from './concat';
 import {
 	LINE_SEPARATOR,
 	OBJECT_REPLACEMENT_CHARACTER,
+	ZWNBSP,
 } from './special-characters';
 
 /**
@@ -312,7 +313,10 @@ function collapseWhiteSpace( string ) {
  */
 export function removeReservedCharacters( string ) {
 	//with the global flag, note that we should create a new regex each time OR reset lastIndex state.
-	return string.replace( /[\uFEFF\uFFFC]/gu, '' );
+	return string.replace(
+		new RegExp( `[${ ZWNBSP }${ OBJECT_REPLACEMENT_CHARACTER }]`, 'gu' ),
+		''
+	);
 }
 
 /**
