@@ -7,7 +7,7 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { useCallback, useMemo, useRef, useState } from '@wordpress/element';
+import { useCallback, useMemo, useState } from '@wordpress/element';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { ENTER, SPACE } from '@wordpress/keycodes';
 import { _x } from '@wordpress/i18n';
@@ -17,7 +17,9 @@ import {
 	getBlockFromExample,
 	store as blocksStore,
 } from '@wordpress/blocks';
-import { Button, Popover } from '@wordpress/components';
+import { Button, MenuItem, Popover } from '@wordpress/components';
+import { check } from '@wordpress/icons';
+
 /**
  * Internal dependencies
  */
@@ -61,6 +63,7 @@ function BlockStyles( {
 
 		const blockType = getBlockType( block.name );
 		const { getBlockStyles } = select( blocksStore );
+
 		return {
 			block,
 			type: blockType,
@@ -78,12 +81,13 @@ function BlockStyles( {
 	const [ hoveredStyle, setHoveredStyle ] = useState( null );
 	const onStyleHover = useCallback(
 		( item ) => {
+			if ( hoveredStyle === item ) {
+				return;
+			}
 			setHoveredStyle( item );
 		},
 		[ setHoveredStyle ]
 	);
-
-	const stylesContainerRef = useRef();
 
 	if ( ! styles || styles.length === 0 ) {
 		return null;
@@ -115,11 +119,29 @@ function BlockStyles( {
 		onSwitch();
 	};
 
-	// const getAnchorRect = () =>
-	// 	stylesContainerRef?.current?.getBoundingClientRect();
+	if ( itemRole === 'menuitem' ) {
+		return (
+			<div className="block-editor-block-styles__menu">
+				{ renderedStyles.map( ( style ) => {
+					const menuItemText = style.label || style.name;
+					return (
+						<MenuItem
+							key={ style.name }
+							icon={
+								activeStyle.name === style.name ? check : null
+							}
+							onClick={ () => onSelectStyle( style ) }
+						>
+							{ menuItemText }
+						</MenuItem>
+					);
+				} ) }
+			</div>
+		);
+	}
 
 	return (
-		<div className="block-editor-block-styles" ref={ stylesContainerRef }>
+		<div className="block-editor-block-styles">
 			<div className="block-editor-block-styles__variants">
 				{ renderedStyles.map( ( style ) => {
 					const buttonText = style.label || style.name;
@@ -129,14 +151,17 @@ function BlockStyles( {
 							className={ classnames(
 								'block-editor-block-styles__button',
 								{
-									'is-active': activeStyle === style,
+									'is-active':
+										activeStyle.name === style.name,
 								}
 							) }
 							key={ style.name }
 							variant="secondary"
 							label={ buttonText }
 							onMouseEnter={ () => onStyleHover( style ) }
+							onFocus={ () => onStyleHover( style ) }
 							onMouseLeave={ () => setHoveredStyle( null ) }
+							onBlur={ () => setHoveredStyle( null ) }
 							onKeyDown={ ( event ) => {
 								if (
 									ENTER === event.keyCode ||
@@ -147,7 +172,7 @@ function BlockStyles( {
 								}
 							} }
 							onClick={ () => onSelectStyle( style ) }
-							role={ itemRole || 'button' }
+							role="button"
 							tabIndex="0"
 						>
 							{ buttonText }
@@ -160,8 +185,6 @@ function BlockStyles( {
 					className="block-editor-block-styles__popover"
 					position="middle left"
 					focusOnMount={ false }
-					anchorRef={ stylesContainerRef?.current }
-					//getAnchorRect={ getAnchorRect }
 				>
 					<BlockStylesPreviewPanel
 						activeStyle={ activeStyle }

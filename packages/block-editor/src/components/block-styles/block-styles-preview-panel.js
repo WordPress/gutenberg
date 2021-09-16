@@ -7,7 +7,7 @@ import { useMemo } from '@wordpress/element';
  * Internal dependencies
  */
 import BlockPreview from '../block-preview';
-import { getActiveStyle, replaceActiveStyle } from './utils';
+import { replaceActiveStyle } from './utils';
 
 export default function BlockStylesPreviewPanel( {
 	genericPreviewBlock,
@@ -16,21 +16,20 @@ export default function BlockStylesPreviewPanel( {
 	className,
 	activeStyle,
 } ) {
-	const styleClassName = replaceActiveStyle(
-		className,
-		activeStyle,
-		style
-	);
+	const styleClassName = replaceActiveStyle( className, activeStyle, style );
 	const previewBlocks = useMemo( () => {
 		return {
 			...genericPreviewBlock,
 			attributes: {
 				...genericPreviewBlock.attributes,
-				className: styleClassName + ' block-editor-block-styles__block-preview-container',
+				className:
+					styleClassName +
+					' block-editor-block-styles__block-preview-container',
 			},
 		};
 	}, [ genericPreviewBlock, styleClassName ] );
 
+	// TODO: look at packages/block-editor/src/components/block-switcher/preview-block-popover.js
 	return (
 		<div className="block-editor-block-styles__preview-container">
 			<div className="block-editor-block-styles__preview-content">

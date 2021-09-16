@@ -41,11 +41,6 @@
 	width: 300px;
 }
 
-// Applied to block containers to make them stretch the width of the preview pane.
-.block-editor-block-styles__block-preview-container {
-
-}
-
 .block-editor-block-styles__preview-container {
 	display: none;
 	min-width: 300px;
@@ -85,12 +80,18 @@
 		display: inline-block;
 		min-width: calc(50% - #{$grid-unit-05});
 		margin-bottom: $grid-unit-10;
+		height: 42px;
+
+		&:focus,
+		&:hover {
+			color: var(--wp-admin-theme-color);
+			box-shadow: inset 0 0 0 1px var(--wp-admin-theme-color);
+		}
 
 		&.is-active,
-		&:focus,
-		&:hover:not(:disabled) {
+		&.is-active:hover {
 			color: $gray-900;
-			box-shadow: inset 0 0 0 1px $gray-900;
+			box-shadow: inset 0 0 0 2px $gray-900;
 		}
 	}
 }
