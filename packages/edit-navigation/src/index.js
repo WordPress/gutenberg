@@ -67,6 +67,7 @@ function setUpEditor( settings ) {
 			name: NAVIGATION_POST_POST_TYPE,
 			transientEdits: { blocks: true, selection: true },
 			label: __( 'Navigation Post' ),
+			__experimentalNoFetch: true,
 		},
 	] );
 
