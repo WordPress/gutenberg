@@ -50,7 +50,6 @@ import org.reactnative.maskedview.RNCMaskedViewPackage;
 
 import org.wordpress.android.util.AppLog;
 import org.wordpress.mobile.ReactNativeAztec.ReactAztecPackage;
-import org.wordpress.mobile.ReactNativeGutenbergBridge.BuildConfig;
 import org.wordpress.mobile.ReactNativeGutenbergBridge.GutenbergBridgeJS2Parent;
 import org.wordpress.mobile.ReactNativeGutenbergBridge.GutenbergBridgeJS2Parent.MediaSelectedCallback;
 import org.wordpress.mobile.ReactNativeGutenbergBridge.GutenbergBridgeJS2Parent.ReplaceUnsupportedBlockCallback;
@@ -101,7 +100,7 @@ public class WPAndroidGlueCode {
     private OnFocalPointPickerTooltipShownEventListener mOnFocalPointPickerTooltipShownListener;
     private OnGutenbergDidRequestPreviewListener mOnGutenbergDidRequestPreviewListener;
     private OnBlockTypeImpressionsEventListener mOnBlockTypeImpressionsEventListener;
-    private OnCustomerSupportOptionsShowListener mOnCustomerSupportOptionsShowListener;
+    private OnCustomerSupportOptionsListener mOnCustomerSupportOptionsListener;
     private boolean mIsEditorMounted;
 
     private String mContentHtml = "";
@@ -228,8 +227,8 @@ public class WPAndroidGlueCode {
         Map<String, Double> onRequestBlockTypeImpressions();
     }
 
-    public interface OnCustomerSupportOptionsShowListener {
-        void onCustomerSupportOptionsShow();
+    public interface OnCustomerSupportOptionsListener {
+        void onContactCustomerSupport();
     }
 
     public void mediaSelectionCancelled() {
@@ -534,8 +533,8 @@ public class WPAndroidGlueCode {
             }
 
             @Override
-            public void requestCustomerSupportOptionsShow() {
-                mOnCustomerSupportOptionsShowListener.onCustomerSupportOptionsShow();
+            public void requestContactCustomerSupport() {
+                mOnCustomerSupportOptionsListener.onContactCustomerSupport();
             }
         }, mIsDarkMode);
 
@@ -587,9 +586,9 @@ public class WPAndroidGlueCode {
                                     .setUseDeveloperSupport(isDebug)
                                     .setJavaScriptExecutorFactory(new HermesExecutorFactory())
                                     .setInitialLifecycleState(LifecycleState.BEFORE_CREATE);
-        if (BuildConfig.SHOULD_ATTACH_JS_BUNDLE) {
+//        if (BuildConfig.SHOULD_ATTACH_JS_BUNDLE) {
             builder.setBundleAssetName("index.android.bundle");
-        }
+//        }
         mReactInstanceManager = builder.build();
         mReactInstanceManager.addReactInstanceEventListener(context -> {
             mReactContext = context;
@@ -617,7 +616,7 @@ public class WPAndroidGlueCode {
                                   OnFocalPointPickerTooltipShownEventListener onFocalPointPickerTooltipListener,
                                   OnGutenbergDidRequestPreviewListener onGutenbergDidRequestPreviewListener,
                                   OnBlockTypeImpressionsEventListener onBlockTypeImpressionsEventListener,
-                                  OnCustomerSupportOptionsShowListener onCustomerSupportOptionsShowListener,
+                                  OnCustomerSupportOptionsListener onCustomerSupportOptionsListener,
                                   boolean isDarkMode) {
         MutableContextWrapper contextWrapper = (MutableContextWrapper) mReactRootView.getContext();
         contextWrapper.setBaseContext(viewGroup.getContext());
@@ -638,7 +637,7 @@ public class WPAndroidGlueCode {
         mOnFocalPointPickerTooltipShownListener = onFocalPointPickerTooltipListener;
         mOnGutenbergDidRequestPreviewListener = onGutenbergDidRequestPreviewListener;
         mOnBlockTypeImpressionsEventListener = onBlockTypeImpressionsEventListener;
-        mOnCustomerSupportOptionsShowListener = onCustomerSupportOptionsShowListener;
+        mOnCustomerSupportOptionsListener = onCustomerSupportOptionsListener;
 
         sAddCookiesInterceptor.setOnAuthHeaderRequestedListener(onAuthHeaderRequestedListener);
 

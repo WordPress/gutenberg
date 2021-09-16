@@ -425,7 +425,7 @@ public class RNReactNativeGutenbergBridgeModule extends ReactContextBaseJavaModu
     }
 
     @ReactMethod
-    public void requestCustomerSupportOptionsShow() {
-        mGutenbergBridgeJS2Parent.requestCustomerSupportOptionsShow();
+    public void requestContactCustomerSupport() {
+        mGutenbergBridgeJS2Parent.requestContactCustomerSupport();
     }
 }

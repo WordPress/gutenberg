@@ -6,7 +6,7 @@ import { Pressable, Text } from 'react-native';
 /**
  * WordPress dependencies
  */
-import { requestCustomerSupportOptionsShow } from '@wordpress/react-native-bridge';
+import { requestContactCustomerSupport } from '@wordpress/react-native-bridge';
 import { usePreferredColorSchemeStyle } from '@wordpress/compose';
 
 /**
@@ -28,7 +28,7 @@ const HelpGetSupportButton = ( { title } ) => {
 	return (
 		<Pressable
 			style={ buttonStyle }
-			onPress={ requestCustomerSupportOptionsShow }
+			onPress={ requestContactCustomerSupport }
 		>
 			{ /* todo: a11y */ }
 			<Text style={ textStyle }>{ title }</Text>
