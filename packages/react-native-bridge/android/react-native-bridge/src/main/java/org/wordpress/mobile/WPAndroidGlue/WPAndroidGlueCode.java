@@ -229,6 +229,7 @@ public class WPAndroidGlueCode {
 
     public interface OnCustomerSupportOptionsListener {
         void onContactCustomerSupport();
+        void onGotoMyCustomerSupportTickets();
     }
 
     public void mediaSelectionCancelled() {
@@ -535,6 +536,11 @@ public class WPAndroidGlueCode {
             @Override
             public void requestContactCustomerSupport() {
                 mOnCustomerSupportOptionsListener.onContactCustomerSupport();
+            }
+
+            @Override
+            public void requestGotoMyCustomerSupportTickets() {
+                mOnCustomerSupportOptionsListener.onGotoMyCustomerSupportTickets();
             }
         }, mIsDarkMode);
 

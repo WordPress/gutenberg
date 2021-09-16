@@ -263,6 +263,11 @@ public class MainApplication extends Application implements ReactApplication, Gu
             public void requestContactCustomerSupport() {
                 Toast.makeText(MainApplication.this, "requestContactCustomerSupport called", Toast.LENGTH_SHORT).show();
             }
+
+            @Override
+            public void requestGotoMyCustomerSupportTickets() {
+                Toast.makeText(MainApplication.this, "requestGotoMyCustomerSupportTickets called", Toast.LENGTH_SHORT).show();
+            }
         }, isDarkMode());
 
         return new ReactNativeHost(this) {
