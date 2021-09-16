@@ -3,6 +3,7 @@
  */
 // eslint-disable-next-line no-restricted-imports
 import React, { useState } from 'react';
+import { text } from '@storybook/addon-knobs';
 
 /**
  * Internal dependencies
@@ -13,10 +14,7 @@ import { ConfirmDialog } from '..';
 export default {
 	component: ConfirmDialog,
 	title: 'Components (Experimental)/ConfirmDialog',
-	argTypes: { proceed: { action: 'proceed' } },
 };
-
-const placeholderMessage = 'Are you sure?';
 
 // Simplest usage: just declare the component with the required `onConfirm` prop.
 export const _default = () => {
@@ -25,7 +23,7 @@ export const _default = () => {
 	return (
 		<>
 			<ConfirmDialog
-				message={ placeholderMessage }
+				message={ text( 'message', 'Are you sure?' ) }
 				onConfirm={ () => setConfirmVal( 'Confirmed!' ) }
 			/>
 			<h1>{ confirmVal }</h1>
@@ -33,14 +31,13 @@ export const _default = () => {
 	);
 };
 
-//
 export const UncontrolledAndWithExplicitOnCancel = () => {
 	const [ confirmVal, setConfirmVal ] = useState( 'Not confirmed' );
 
 	return (
 		<>
 			<ConfirmDialog
-				message={ placeholderMessage }
+				message={ text( 'message', 'Are you sure?' ) }
 				onConfirm={ () => setConfirmVal( 'Confirmed!' ) }
 				onCancel={ () => setConfirmVal( 'Cancelled' ) }
 			/>
@@ -52,7 +49,7 @@ export const UncontrolledAndWithExplicitOnCancel = () => {
 // Controlled `ConfirmDialog`s require both `onConfirm` *and* `onCancel to be passed
 // It's expected that the user will then use it to hide the dialog, too (see the
 // `setIsOpen` calls below).
-export const ControlledWithExplicitOnCancel = () => {
+export const Controlled = () => {
 	const [ isOpen, setIsOpen ] = useState( false );
 	const [ confirmVal, setConfirmVal ] = useState( 'Not confirmed' );
 
@@ -69,7 +66,7 @@ export const ControlledWithExplicitOnCancel = () => {
 	return (
 		<>
 			<ConfirmDialog
-				message={ placeholderMessage }
+				message={ text( 'message', 'Are you sure?' ) }
 				isOpen={ isOpen }
 				onConfirm={ handleConfirm }
 				onCancel={ handleCancel }
