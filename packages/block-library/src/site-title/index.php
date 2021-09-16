@@ -25,8 +25,6 @@ function render_block_core_site_title( $attributes ) {
 		$tag_name = 0 === $attributes['level'] ? 'p' : 'h' . $attributes['level'];
 	}
 
-	$title = $site_title;
-
 	if ( $attributes['isLink'] ) {
 		$link_attrs = array(
 			'href="' . get_bloginfo( 'url' ) . '"',
@@ -36,7 +34,7 @@ function render_block_core_site_title( $attributes ) {
 			$link_attrs[] = 'target="_blank"';
 			$link_attrs[] = 'aria-label="' . esc_attr__( '(opens in a new tab)' ) . '"';
 		}
-		$title = sprintf( '<a %1$s>%2$s</a>', implode( ' ', $link_attrs ), $site_title );
+		$site_title = sprintf( '<a %1$s>%2$s</a>', implode( ' ', $link_attrs ), $site_title );
 	}
 	$wrapper_attributes = get_block_wrapper_attributes( array( 'class' => $align_class_name ) );
 
@@ -44,7 +42,7 @@ function render_block_core_site_title( $attributes ) {
 		'<%1$s %2$s>%3$s</%1$s>',
 		$tag_name,
 		$wrapper_attributes,
-		$title
+		$site_title
 	);
 }
 

@@ -51,7 +51,7 @@ export default function SiteTitleEdit( {
 	const siteTitleContent = canUserEdit ? (
 		<TagName { ...blockProps }>
 			<RichText
-				tagName={ isLink ? 'a' : 'div' }
+				tagName={ isLink ? 'a' : 'span' }
 				href={ isLink ? '#site-title-pseudo-link' : undefined }
 				aria-label={ __( 'Site title text' ) }
 				placeholder={ __( 'Write site title…' ) }
@@ -74,9 +74,7 @@ export default function SiteTitleEdit( {
 					{ readOnlyTitle || __( 'Site Title placeholder' ) }
 				</a>
 			) : (
-				<div style={ { display: 'inline-block' } }>
-					{ title || readOnlyTitle }
-				</div>
+				<span>{ title || readOnlyTitle }</span>
 			) }
 		</TagName>
 	);
@@ -104,17 +102,15 @@ export default function SiteTitleEdit( {
 						checked={ isLink }
 					/>
 					{ isLink && (
-						<>
-							<ToggleControl
-								label={ __( 'Open in new tab' ) }
-								onChange={ ( value ) =>
-									setAttributes( {
-										linkTarget: value ? '_blank' : '_self',
-									} )
-								}
-								checked={ linkTarget === '_blank' }
-							/>
-						</>
+						<ToggleControl
+							label={ __( 'Open in new tab' ) }
+							onChange={ ( value ) =>
+								setAttributes( {
+									linkTarget: value ? '_blank' : '_self',
+								} )
+							}
+							checked={ linkTarget === '_blank' }
+						/>
 					) }
 				</PanelBody>
 			</InspectorControls>
