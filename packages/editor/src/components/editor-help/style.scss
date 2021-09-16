@@ -3,8 +3,8 @@
 	padding: 0.75rem;
 	align-items: center;
 	justify-content: center;
-	border: 1px solid $gray-light;
-	border-radius: 6px;
+	border-radius: $border-width * 6;
+	border: $border-width solid $gray-300;
 }
 
 .buttonDark {
@@ -12,12 +12,9 @@
 }
 
 .buttonText {
-	/* TODO: platform color */
 	font-weight: 600;
-}
-
-.buttonTextDark {
-	color: $dark-primary;
+	font-size: 16px;
+	color: $blue-wordpress;
 }
 
 .container {
