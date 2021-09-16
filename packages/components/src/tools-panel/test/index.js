@@ -146,7 +146,7 @@ const renderPanel = () => {
  */
 const openDropdownMenu = () => {
 	const menuButton = screen.getByRole( 'button', {
-		name: /show([\w\s]+)options/i,
+		name: /view([\w\s]+)options/i,
 	} );
 	fireEvent.click( menuButton );
 	return menuButton;
@@ -529,7 +529,7 @@ describe( 'ToolsPanel', () => {
 
 			// There are unactivated, optional menu items in the Tools Panel dropdown.
 			const optionsHiddenIcon = screen.getByRole( 'button', {
-				name: 'Show and add options',
+				name: 'View and add options',
 			} );
 
 			expect( optionsHiddenIcon ).toBeInTheDocument();
@@ -538,11 +538,11 @@ describe( 'ToolsPanel', () => {
 
 			// There are now NO unactivated, optional menu items in the Tools Panel dropdown.
 			expect(
-				screen.queryByRole( 'button', { name: 'Show and add options' } )
-			).toBeNull();
+				screen.queryByRole( 'button', { name: 'View and add options' } )
+			).not.toBeInTheDocument();
 
 			const optionsDisplayedIcon = screen.getByRole( 'button', {
-				name: 'Show options',
+				name: 'View options',
 			} );
 
 			expect( optionsDisplayedIcon ).toBeInTheDocument();

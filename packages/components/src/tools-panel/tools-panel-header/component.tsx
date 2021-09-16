@@ -137,10 +137,10 @@ const ToolsPanelHeader = (
 		: moreVertical;
 	const dropDownMenuLabelText = areOptionalControlsAvailableAndHidden
 		? _x(
-				'Show and add options',
+				'View and add options',
 				'Button label to reveal tool panel options'
 		  )
-		: _x( 'Show options', 'Button label to reveal tool panel options' );
+		: _x( 'View options', 'Button label to reveal tool panel options' );
 
 	return (
 		<h2 { ...headerProps } ref={ forwardedRef }>
