@@ -53,13 +53,15 @@ function BlockStyles( {
 	itemRole,
 } ) {
 	const selector = ( select ) => {
-		const { getBlock } = select( blockEditorStore );
+		const { getBlock, getSettings } = select( blockEditorStore );
 		const block = getBlock( clientId );
 
 		if ( ! block ) {
 			return EMPTY_OBJECT;
 		}
-
+		const settings = getSettings();
+		const preferredStyleVariations =
+			settings.__experimentalPreferredStyleVariations;
 		const blockType = getBlockType( block.name );
 		const { getBlockStyles } = select( blocksStore );
 
@@ -68,12 +70,17 @@ function BlockStyles( {
 			type: blockType,
 			styles: getBlockStyles( block.name ),
 			className: block.attributes.className || '',
+			preferredStyleName: preferredStyleVariations?.value?.[ block.name ],
 		};
 	};
 
-	const { styles, block, type, className } = useSelect( selector, [
-		clientId,
-	] );
+	const {
+		styles,
+		block,
+		type,
+		className,
+		preferredStyleName,
+	} = useSelect( selector, [ clientId ] );
 
 	const { updateBlockAttributes } = useDispatch( blockEditorStore );
 	const genericPreviewBlock = useGenericPreviewBlock( block, type );
@@ -92,8 +99,7 @@ function BlockStyles( {
 		return null;
 	}
 
-	const renderedStyles = getRenderedStyles( styles );
-
+	const renderedStyles = getRenderedStyles( styles, preferredStyleName );
 	const activeStyle = getActiveStyle( renderedStyles, className );
 
 	const onSelectStyle = ( style ) => {
