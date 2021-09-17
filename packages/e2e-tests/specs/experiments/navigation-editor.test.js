@@ -129,7 +129,6 @@ async function getSerializedBlocks() {
 		wp.data.select( 'core/block-editor' ).getBlocks()
 	);
 	const safeBlocks = replaceUnstableBlockAttributes( blocks );
-	// return serialize( safeBlocks );
 	return page.evaluate(
 		( blocksToSerialize ) => wp.blocks.serialize( blocksToSerialize ),
 		safeBlocks
