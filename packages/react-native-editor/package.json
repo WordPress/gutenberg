@@ -32,7 +32,7 @@
 		"@babel/runtime": "^7.13.10",
 		"@react-native-community/blur": "3.6.0",
 		"@react-native-community/masked-view": "https://raw.githubusercontent.com/wordpress-mobile/react-native-masked-view/80a1ff73d8dd88acb86323558e4ac1704abd5b31/react-native-community-masked-view-0.1.11-wp-1.tgz",
-		"@react-native-community/slider": "https://raw.githubusercontent.com/wordpress-mobile/react-native-slider/0cdfd04603130105e59735a553403ad0d1095538/src/react-native-community-slider-3.0.2-wp-1.tgz",
+		"@react-native-community/slider": "https://raw.githubusercontent.com/wordpress-mobile/react-native-slider/75602bf376917942019ec61fd769ca9c8f5a4522/react-native-community-slider-3.0.2-wp-1.tgz",
 		"@react-navigation/core": "5.12.0",
 		"@react-navigation/native": "5.7.0",
 		"@react-navigation/routers": "5.4.9",
