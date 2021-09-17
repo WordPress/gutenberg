@@ -41,19 +41,6 @@ export async function deleteAllMenus() {
 	);
 }
 
-export async function deleteAllObjects() {
-	[ '/wp/v2/posts', '/wp/v2/pages' ].forEach( async ( path ) => {
-		const items = await rest( { path } );
-
-		for ( const item of items ) {
-			await rest( {
-				method: 'DELETE',
-				path: `${ path }/${ item.id }?force=true`,
-			} );
-		}
-	} );
-}
-
 export async function createMenu( menu, menuItems ) {
 	// Step 1. Create the menu.
 	const menuResponse = await rest( {

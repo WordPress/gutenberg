@@ -11,11 +11,11 @@ import {
 	createJSONResponse,
 	createMenu,
 	deleteAllMenus,
-	deleteAllObjects,
 	pressKeyTimes,
 	pressKeyWithModifier,
 	setUpResponseMocking,
 	visitAdminPage,
+	__experimentalRest as rest,
 } from '@wordpress/e2e-test-utils';
 import { addQueryArgs } from '@wordpress/url';
 
@@ -160,17 +160,30 @@ function replaceUnstableBlockAttributes( blocks ) {
 	} );
 }
 
+async function deleteAllLinkedResources() {
+	[ '/wp/v2/posts', '/wp/v2/pages' ].forEach( async ( path ) => {
+		const items = await rest( { path } );
+
+		for ( const item of items ) {
+			await rest( {
+				method: 'DELETE',
+				path: `${ path }/${ item.id }?force=true`,
+			} );
+		}
+	} );
+}
+
 describe( 'Navigation editor', () => {
 	useExperimentalFeatures( [ '#gutenberg-navigation' ] );
 
 	beforeAll( async () => {
 		await deleteAllMenus();
-		await deleteAllObjects();
+		await deleteAllLinkedResources();
 	} );
 
 	afterEach( async () => {
 		await deleteAllMenus();
-		await deleteAllObjects();
+		await deleteAllLinkedResources();
 		await setUpResponseMocking( [] );
 	} );
 
