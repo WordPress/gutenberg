@@ -50,6 +50,7 @@ import org.reactnative.maskedview.RNCMaskedViewPackage;
 
 import org.wordpress.android.util.AppLog;
 import org.wordpress.mobile.ReactNativeAztec.ReactAztecPackage;
+import org.wordpress.mobile.ReactNativeGutenbergBridge.BuildConfig;
 import org.wordpress.mobile.ReactNativeGutenbergBridge.GutenbergBridgeJS2Parent;
 import org.wordpress.mobile.ReactNativeGutenbergBridge.GutenbergBridgeJS2Parent.MediaSelectedCallback;
 import org.wordpress.mobile.ReactNativeGutenbergBridge.GutenbergBridgeJS2Parent.ReplaceUnsupportedBlockCallback;
@@ -592,9 +593,9 @@ public class WPAndroidGlueCode {
                                     .setUseDeveloperSupport(isDebug)
                                     .setJavaScriptExecutorFactory(new HermesExecutorFactory())
                                     .setInitialLifecycleState(LifecycleState.BEFORE_CREATE);
-//        if (BuildConfig.SHOULD_ATTACH_JS_BUNDLE) {
+        if (BuildConfig.SHOULD_ATTACH_JS_BUNDLE) {
             builder.setBundleAssetName("index.android.bundle");
-//        }
+        }
         mReactInstanceManager = builder.build();
         mReactInstanceManager.addReactInstanceEventListener(context -> {
             mReactContext = context;
