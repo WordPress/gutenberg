@@ -126,12 +126,13 @@ export async function createMenu( menu, menuItems ) {
 
 				const parent =
 					menuItemsResponse.responses[ menuItem.parent ].body.id;
-				const menuItemId = menuItemsResponse.responses[ index ].body.id;
+				const menuItemResponse = menuItemsResponse.responses[ index ];
+				const menuItemId = menuItemResponse.body.id;
 
 				return {
 					method: 'PUT',
 					path: `${ menuItemsEndpoint }/${ menuItemId }`,
-					body: { parent },
+					body: { ...menuItemResponse.body, parent },
 				};
 			} )
 			.filter( ( request ) => !! request )

@@ -119,10 +119,45 @@ async function visitNavigationEditor() {
 	await visitAdminPage( '/admin.php', query );
 }
 
+/**
+ * Get a list of the editor's current blocks for use in a snapshot.
+ *
+ * @return {string} Block HTML.
+ */
 async function getSerializedBlocks() {
-	return page.evaluate( () =>
-		wp.blocks.serialize( wp.data.select( 'core/block-editor' ).getBlocks() )
+	const blocks = await page.evaluate( () =>
+		wp.data.select( 'core/block-editor' ).getBlocks()
 	);
+	const safeBlocks = replaceUnstableBlockAttributes( blocks );
+	// return serialize( safeBlocks );
+	return page.evaluate(
+		( blocksToSerialize ) => wp.blocks.serialize( blocksToSerialize ),
+		safeBlocks
+	);
+}
+
+/**
+ * Some block attributes contain values that are not stable from test run to
+ * test run and can't be compared with a snapshot. These are typically the
+ * ids of posts or pages that are created prior to each test run. Replace those
+ * values with their types before serializing to a snapshot.
+ *
+ * @param {Array} blocks The array of block data.
+ *
+ * @return {Array} Updated array of block data.
+ */
+function replaceUnstableBlockAttributes( blocks ) {
+	return blocks?.map( ( block ) => {
+		return {
+			...block,
+			attributes: {
+				...block.attributes,
+				id: typeof block.attributes.id,
+				url: typeof block.attributes.url,
+			},
+			innerBlocks: replaceUnstableBlockAttributes( block.innerBlocks ),
+		};
+	} );
 }
 
 describe( 'Navigation editor', () => {
@@ -292,9 +327,9 @@ describe( 'Navigation editor', () => {
 
 	it( 'displays suggestions when adding a link', async () => {
 		await createMenu( { name: 'Test Menu 1' } );
-		// await setUpResponseMocking( [
-		// 	...getSearchMocks( { GET: searchFixture } ),
-		// ] );
+		await setUpResponseMocking( [
+			...getSearchMocks( { GET: searchFixture } ),
+		] );
 
 		await visitNavigationEditor();
 
@@ -372,9 +407,7 @@ describe( 'Navigation editor', () => {
 			expect( headerSubtitleText ).toBe( newName );
 		} );
 
-		// TODO try to get this test passing consistently
-		// eslint-disable-next-line jest/no-disabled-tests
-		it.skip( 'does not save a menu name upon clicking save button when name is empty', async () => {
+		it( 'does not save a menu name upon clicking save button when name is empty', async () => {
 			await createMenu( { name: initialMenuName } );
 			await visitNavigationEditor();
 
@@ -383,7 +416,18 @@ describe( 'Navigation editor', () => {
 			await page.click( inputSelector );
 			await pressKeyTimes( 'Backspace', initialMenuName.length );
 			await page.click( '.edit-navigation-toolbar__save-button' );
-			await page.waitForSelector( '.components-snackbar' );
+			const snackbar = await page.waitForSelector(
+				'.components-snackbar'
+			);
+			const snackbarText = await snackbar.evaluate(
+				( element ) => element.innerText
+			);
+			expect( snackbarText ).toBe(
+				"Unable to save: 'A name is required for this term.'"
+			);
+			expect( console ).toHaveErrored(
+				'Failed to load resource: the server responded with a status of 500 (Internal Server Error)'
+			);
 			await page.reload();
 
 			// Expect the header to have the old name.
@@ -401,11 +445,6 @@ describe( 'Navigation editor', () => {
 		beforeEach( async () => {
 			await createMenu( { name: 'Main' } );
 			await visitNavigationEditor();
-		} );
-
-		afterEach( async () => {
-			await deleteAllMenus();
-			await setUpResponseMocking( [] );
 		} );
 
 		async function assertIsDirty( isDirty ) {
