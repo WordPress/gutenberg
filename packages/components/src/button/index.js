@@ -3,13 +3,14 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import { isArray, uniqueId } from 'lodash';
+import { isArray } from 'lodash';
 
 /**
  * WordPress dependencies
  */
 import deprecated from '@wordpress/deprecated';
 import { forwardRef } from '@wordpress/element';
+import { useInstanceId } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -86,6 +87,7 @@ export function Button( props, ref ) {
 		describedBy,
 		...additionalProps
 	} = useDeprecatedProps( props );
+	const instanceId = useInstanceId( Button );
 
 	const classes = classnames( 'components-button', className, {
 		'is-secondary': variant === 'secondary',
@@ -139,7 +141,9 @@ export function Button( props, ref ) {
 				// the tooltip is not explicitly disabled.
 				false !== showTooltip ) );
 
-	const descriptionId = describedBy ? uniqueId() : null;
+	const descriptionId = describedBy
+		? `components-button__description-${ instanceId }`
+		: null;
 
 	const describedById =
 		additionalProps[ 'aria-describedby' ] || descriptionId;
