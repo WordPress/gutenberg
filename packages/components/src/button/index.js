@@ -87,7 +87,10 @@ export function Button( props, ref ) {
 		describedBy,
 		...additionalProps
 	} = useDeprecatedProps( props );
-	const instanceId = useInstanceId( Button );
+	const instanceId = useInstanceId(
+		Button,
+		'components-button__description'
+	);
 
 	const classes = classnames( 'components-button', className, {
 		'is-secondary': variant === 'secondary',
@@ -141,9 +144,7 @@ export function Button( props, ref ) {
 				// the tooltip is not explicitly disabled.
 				false !== showTooltip ) );
 
-	const descriptionId = describedBy
-		? `components-button__description-${ instanceId }`
-		: null;
+	const descriptionId = describedBy ? instanceId : null;
 
 	const describedById =
 		additionalProps[ 'aria-describedby' ] || descriptionId;
