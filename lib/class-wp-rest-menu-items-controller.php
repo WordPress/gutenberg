@@ -442,7 +442,6 @@ class WP_REST_Menu_Items_Controller extends WP_REST_Posts_Controller {
 		);
 
 		$schema = $this->get_item_schema();
-
 		foreach ( $mapping as $original => $api_request ) {
 			if ( ! empty( $schema['properties'][ $api_request ] ) && isset( $request[ $api_request ] ) ) {
 				$check = rest_validate_value_from_schema( $request[ $api_request ], $schema['properties'][ $api_request ] );

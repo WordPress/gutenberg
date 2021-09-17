@@ -7,6 +7,7 @@ import {
 	BlockTools,
 	__unstableUseBlockSelectionClearer as useBlockSelectionClearer,
 } from '@wordpress/block-editor';
+import { useEntityBlockEditor } from '@wordpress/core-data';
 import { Popover, SlotFillProvider, Spinner } from '@wordpress/components';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { useEffect, useMemo, useState } from '@wordpress/element';
@@ -25,7 +26,6 @@ import UnselectedMenuState from './unselected-menu-state';
 import {
 	IsMenuNameControlFocusedContext,
 	useNavigationEditor,
-	useNavigationBlockEditor,
 	useMenuNotifications,
 } from '../../hooks';
 import ErrorBoundary from '../error-boundary';
@@ -68,8 +68,12 @@ export default function Layout( { blockEditorSettings } ) {
 		isMenuSelected,
 	} = useNavigationEditor();
 
-	const [ blocks, onInput, onChange ] = useNavigationBlockEditor(
-		navigationPost
+	const [ blocks, onInput, onChange ] = useEntityBlockEditor(
+		'root',
+		'postType',
+		{
+			id: navigationPost?.id,
+		}
 	);
 
 	const { hasSidebarEnabled, isInserterOpened } = useSelect(

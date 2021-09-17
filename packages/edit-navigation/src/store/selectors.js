@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { invert } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { createRegistrySelector } from '@wordpress/data';
@@ -43,7 +38,7 @@ export const getNavigationPostForMenu = createRegistrySelector(
 		if ( ! hasResolvedNavigationPost( state, menuId ) ) {
 			return null;
 		}
-		return select( coreStore ).getEntityRecord(
+		return select( coreStore ).getEditedEntityRecord(
 			NAVIGATION_POST_KIND,
 			NAVIGATION_POST_POST_TYPE,
 			buildNavigationPostId( menuId )

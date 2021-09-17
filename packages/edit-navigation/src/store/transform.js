@@ -59,6 +59,7 @@ export function blockToMenuItem(
 	return {
 		...menuItem,
 		...attributes,
+		content: attributes.content || '',
 		id: getRecordIdFromBlock( block ),
 		menu_order: blockPosition + 1,
 		menus: menuId,
@@ -151,6 +152,7 @@ export function menuItemsToBlocks( menuItems ) {
 	}
 
 	const menuTree = createDataTree( menuItems );
+
 	return mapMenuItemsToBlocks( menuTree );
 }
 
@@ -161,12 +163,10 @@ export function menuItemsToBlocks( menuItems ) {
  * @return {Object} Object containing innerBlocks and mapping.
  */
 function mapMenuItemsToBlocks( menuItems ) {
-	let mapping = {};
-
 	// The menuItem should be in menu_order sort order.
 	const sortedItems = sortBy( menuItems, 'menu_order' );
 
-	const innerBlocks = sortedItems.map( ( menuItem ) => {
+	return sortedItems.map( ( menuItem ) => {
 		if ( menuItem.type === 'block' ) {
 			const [ block ] = parse( menuItem.content.raw );
 
@@ -182,18 +182,9 @@ function mapMenuItemsToBlocks( menuItems ) {
 		const attributes = menuItemToBlockAttributes( menuItem );
 
 		// If there are children recurse to build those nested blocks.
-		const {
-			innerBlocks: nestedBlocks = [], // alias to avoid shadowing
-			mapping: nestedMapping = {}, // alias to avoid shadowing
-		} = menuItem.children?.length
+		const nestedBlocks = menuItem.children?.length
 			? mapMenuItemsToBlocks( menuItem.children )
-			: {};
-
-		// Update parent mapping with nested mapping.
-		mapping = {
-			...mapping,
-			...nestedMapping,
-		};
+			: [];
 
 		// Create a submenu block when there are inner blocks, or just a link
 		// for a standalone item.
@@ -202,21 +193,11 @@ function mapMenuItemsToBlocks( menuItems ) {
 			: 'core/navigation-link';
 
 		// Create block with nested "innerBlocks".
-		const block = addRecordIdToBlock(
+		return addRecordIdToBlock(
 			createBlock( itemBlockName, attributes, nestedBlocks ),
-			menuItem
+			menuItem.id
 		);
-
-		// Create mapping for menuItem -> block
-		mapping[ menuItem.id ] = block.clientId;
-
-		return block;
 	} );
-
-	return {
-		innerBlocks,
-		mapping,
-	};
 }
 
 // A few parameters are using snake case, let's embrace that for convenience:

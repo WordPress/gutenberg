@@ -82,14 +82,13 @@ const persistPost = ( post ) =>
  * @return {Object} Navigation block
  */
 function createNavigationBlock( menuItems ) {
-	const { innerBlocks } = menuItemsToBlocks( menuItems );
+	const innerBlocks = menuItemsToBlocks( menuItems );
 
-	const navigationBlock = createBlock(
+	return createBlock(
 		'core/navigation',
 		{
 			orientation: 'vertical',
 		},
 		innerBlocks
 	);
-	return navigationBlock;
 }
