@@ -1,11 +1,5 @@
 $pagination-margin: 0.5em;
 
-.wp-block > .wp-block-query-pagination {
-	display: flex;
-	flex-wrap: wrap;
-	flex-direction: row;
-}
-
 // Center flex items. This has an equivalent in style.scss.
 .wp-block[data-align="center"] > .wp-block-query-pagination {
 	justify-content: center;

@@ -2,7 +2,7 @@
  * External dependencies
  */
 // eslint-disable-next-line no-restricted-imports
-import { find } from 'puppeteer-testing-library';
+import { find, findAll } from 'puppeteer-testing-library';
 
 /**
  * WordPress dependencies
@@ -773,12 +773,12 @@ describe( 'Navigation editor', () => {
 				focused: true,
 			} ).toBeFound();
 
-			const itemToSelectTitle = searchFixture[ 0 ].title;
+			const [ itemToSelect ] = searchFixture;
 
 			// Add Custom Link item.
-			const firstSearchSuggestion = await find( {
+			const [ firstSearchSuggestion ] = await findAll( {
 				role: 'option',
-				name: `${ itemToSelectTitle } ${ searchFixture[ 0 ].subtype }`,
+				name: `${ itemToSelect.title } ${ itemToSelect.subtype }`,
 			} );
 
 			await firstSearchSuggestion.click();
@@ -801,7 +801,7 @@ describe( 'Navigation editor', () => {
 			} );
 
 			// Check the last item is the one we just inserted
-			expect( lastItemAttributes.label ).toEqual( itemToSelectTitle );
+			expect( lastItemAttributes.label ).toEqual( itemToSelect.title );
 			expect( lastItemAttributes.isTopLevelLink ).toBeTruthy();
 		} );
 	} );

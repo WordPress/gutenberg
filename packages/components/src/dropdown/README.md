@@ -1,8 +1,8 @@
 # Dropdown
 
-Dropdown is a React component to render a button that opens a floating content modal when clicked.
-This components takes care of updating the state of the dropdown menu (opened/closed), handles closing the menu when clicking outside
-and uses render props to render the button and the content.
+Dropdown is a React component to render a button that opens a floating content modal when clicked. 
+
+This component takes care of updating the state of the dropdown menu (opened/closed), handles closing the menu when clicking outside and uses render props to render the button and the content.
 
 ## Usage
 
@@ -41,14 +41,14 @@ className of the global container
 
 ### contentClassName
 
-If you want to target the dropdown menu for styling purposes, you need to provide a contentClassName because it's not being rendered as a children of the container node.
+If you want to target the dropdown menu for styling purposes, you need to provide a contentClassName because it's not being rendered as a child of the container node.
 
 -   Type: `String`
 -   Required: No
 
 ### position
 
-The direction in which the popover should open relative to its parent node. Specify y- and x-axis as a space-separated string. Supports `"top"`, `"bottom"` y axis, and `"left"`, `"center"`, `"right"` x axis.
+The direction in which the popover should open relative to its parent node. Specify a y- and an x-axis as a space-separated string. Supports `"top"`, `"bottom"` y-axis, and `"left"`, `"center"`, `"right"` x-axis.
 
 -   Type: `String`
 -   Required: No
@@ -76,7 +76,7 @@ A callback invoked to render the content of the dropdown menu. Its first argumen
 
 ### expandOnMobile
 
-Opt-in prop to show popovers fullscreen on mobile, pass `false` in this prop to avoid this behavior.
+Opt-in prop to show popovers fullscreen on mobile.
 
 -   Type: `Boolean`
 -   Required: No
@@ -84,17 +84,16 @@ Opt-in prop to show popovers fullscreen on mobile, pass `false` in this prop to 
 
 ### headerTitle
 
-Set this to customize the text that is shown in the dropdown's header when
-it is fullscreen on mobile.
+Set this to customize the text that is shown in the dropdown's header when it is fullscreen on mobile.
 
 -   Type: `String`
 -   Required: No
 
 ### focusOnMount
 
-By default, the _first tabblable element_ in the popover will receive focus when it mounts. This is the same as setting `focusOnMount` to `"firstElement"`. If you want to focus the container instead, you can set `focusOnMount` to `"container"`.
+By default, the _first tabbable element_ in the popover will receive focus when it mounts. This is the same as setting `focusOnMount` to `"firstElement"`. If you want to focus the container instead, you can set `focusOnMount` to `"container"`.
 
-Set this prop to `false` to disable focus changing entirely. This should only be set when an appropriately accessible substitute behavior exists.
+Set this prop to `false` to disable focus switching entirely. This should only be set when an appropriately accessible substitute behavior exists.
 
 -   Type: `String` or `Boolean`
 -   Required: No
@@ -103,7 +102,8 @@ Set this prop to `false` to disable focus changing entirely. This should only be
 ### popoverProps
 
 Properties of popoverProps object will be passed as props to the `Popover` component.
-Use this o object to access properties/feature if the `Popover` component that are not already exposed in the `Dropdown`component, e.g.: the hability to have the popover without an arrow.
+
+Use this object to access properties/features of the `Popover` component that are not already exposed in the `Dropdown` component, e.g.: the ability to have the popover without an arrow.
 
 -   Type: `Object`
 -   Required: No
@@ -118,7 +118,8 @@ A callback invoked when the popover should be closed.
 ### onToggle
 
 A callback invoked when the state of the popover changes from open to closed and vice versa.
-Function receives a boolean as a parameter. If `true`, the popover will open. If `false`, the popover will close.
+
+The callback receives a boolean as a parameter. If `true`, the popover will open. If `false`, the popover will close.
 
 -   Type: `Function`
 -   Required: No

@@ -306,15 +306,17 @@ function collapseWhiteSpace( string ) {
 	return string.replace( /[\n\r\t]+/g, ' ' );
 }
 
-const ZWNBSPRegExp = new RegExp( ZWNBSP, 'g' );
-
 /**
- * Removes padding (zero width non breaking spaces) added by `toTree`.
+ * Removes reserved characters used by rich-text (zero width non breaking spaces added by `toTree` and object replacement characters).
  *
  * @param {string} string
  */
-function removePadding( string ) {
-	return string.replace( ZWNBSPRegExp, '' );
+export function removeReservedCharacters( string ) {
+	//with the global flag, note that we should create a new regex each time OR reset lastIndex state.
+	return string.replace(
+		new RegExp( `[${ ZWNBSP }${ OBJECT_REPLACEMENT_CHARACTER }]`, 'gu' ),
+		''
+	);
 }
 
 /**
@@ -362,11 +364,11 @@ function createFromElement( {
 		const type = node.nodeName.toLowerCase();
 
 		if ( node.nodeType === node.TEXT_NODE ) {
-			let filter = removePadding;
+			let filter = removeReservedCharacters;
 
 			if ( ! preserveWhiteSpace ) {
 				filter = ( string ) =>
-					removePadding( collapseWhiteSpace( string ) );
+					removeReservedCharacters( collapseWhiteSpace( string ) );
 			}
 
 			const text = filter( node.nodeValue );
