@@ -6,6 +6,7 @@ import { find } from 'lodash';
  * WordPress dependencies
  */
 import TokenList from '@wordpress/token-list';
+import { _x } from '@wordpress/i18n';
 
 /**
  * Returns the active style from the given className.
@@ -50,4 +51,31 @@ export function replaceActiveStyle( className, activeStyle, newStyle ) {
 	list.add( 'is-style-' + newStyle.name );
 
 	return list.value;
+}
+
+/**
+ * Returns a collection of styles that can be represented on the frontend.
+ * The function checks a style collection for a default style. If none is found, it adds one to
+ * act as a fallback for when there is no active style applied to a block. The default item also serves
+ * as a switch on the frontend to deactivate non-default styles.
+ *
+ * @param {Array}          styles Block style variations.
+ *
+ * @return {Array<Object?>}       The style collection.
+ */
+export function getRenderedStyles( styles ) {
+	if ( ! styles ) {
+		return [];
+	}
+
+	return find( styles, 'isDefault' )
+		? styles
+		: [
+				{
+					name: 'default',
+					label: _x( 'Default', 'block style' ),
+					isDefault: true,
+				},
+				...styles,
+		  ];
 }

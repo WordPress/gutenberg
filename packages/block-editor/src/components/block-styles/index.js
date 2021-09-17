@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { find, noop } from 'lodash';
+import { noop } from 'lodash';
 import classnames from 'classnames';
 
 /**
@@ -10,7 +10,6 @@ import classnames from 'classnames';
 import { useCallback, useMemo, useState } from '@wordpress/element';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { ENTER, SPACE } from '@wordpress/keycodes';
-import { _x } from '@wordpress/i18n';
 import {
 	getBlockType,
 	cloneBlock,
@@ -23,7 +22,7 @@ import { check } from '@wordpress/icons';
 /**
  * Internal dependencies
  */
-import { getActiveStyle, replaceActiveStyle } from './utils';
+import { getActiveStyle, getRenderedStyles, replaceActiveStyle } from './utils';
 import BlockStylesPreviewPanel from './block-styles-preview-panel';
 import { store as blockEditorStore } from '../../store';
 
@@ -93,16 +92,8 @@ function BlockStyles( {
 		return null;
 	}
 
-	const renderedStyles = find( styles, 'isDefault' )
-		? styles
-		: [
-				{
-					name: 'default',
-					label: _x( 'Default', 'block style' ),
-					isDefault: true,
-				},
-				...styles,
-		  ];
+	const renderedStyles = getRenderedStyles( styles );
+
 	const activeStyle = getActiveStyle( renderedStyles, className );
 
 	const onSelectStyle = ( style ) => {
