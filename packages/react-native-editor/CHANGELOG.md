@@ -19,6 +19,9 @@ For each user feature we should also add a importance categorization label  to i
 -   [**] Enable embed preview for Instagram and Vimeo providers. [#34563]
 -   [**] Embed block: Add error bottom sheet with retry and convert to link actions. [#34604]
 
+## 1.61.1
+-   [*] Fix crash related to reusable blocks in the block picker. [#34873]
+
 ## 1.61.0
 -   [**] Enable embed preview for a list of providers (for now only YouTube and Twitter) [#34446]
 -   [***] Inserter: Add Inserter Block Search [https://github.com/WordPress/gutenberg/pull/33237]
