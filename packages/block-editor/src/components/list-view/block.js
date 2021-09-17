@@ -158,16 +158,18 @@ function ListViewBlock( {
 		: () => {};
 
 	const onMouseEnter = () => {
-		setIsHovered( true );
-		if ( ! draggingId ) {
-			highlightBlock( clientId, true );
+		if ( draggingId ) {
+			return;
 		}
+		setIsHovered( true );
+		highlightBlock( clientId, true );
 	};
 	const onMouseLeave = () => {
-		setIsHovered( false );
-		if ( ! draggingId ) {
-			highlightBlock( clientId, false );
+		if ( draggingId ) {
+			return;
 		}
+		setIsHovered( false );
+		highlightBlock( clientId, false );
 	};
 
 	const classes = classnames( {
