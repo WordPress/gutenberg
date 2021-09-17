@@ -148,12 +148,17 @@ async function getSerializedBlocks() {
  */
 function replaceUnstableBlockAttributes( blocks ) {
 	return blocks?.map( ( block ) => {
+		const id = block.attributes.id ? typeof block.attributes.id : undefined;
+		const url = block.attributes.url
+			? typeof block.attributes.url
+			: undefined;
+
 		return {
 			...block,
 			attributes: {
 				...block.attributes,
-				id: typeof block.attributes.id,
-				url: typeof block.attributes.url,
+				id,
+				url,
 			},
 			innerBlocks: replaceUnstableBlockAttributes( block.innerBlocks ),
 		};

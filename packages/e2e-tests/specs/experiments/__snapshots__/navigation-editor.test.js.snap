@@ -10,7 +10,7 @@ exports[`Navigation editor allows creation of a menu when there are no current m
 
 exports[`Navigation editor displays the first created menu when at least one menu exists 1`] = `
 "<!-- wp:navigation {\\"orientation\\":\\"vertical\\"} -->
-<!-- wp:navigation-link {\\"label\\":\\"Home\\",\\"type\\":\\"custom\\",\\"id\\":\\"undefined\\",\\"url\\":\\"string\\",\\"kind\\":\\"custom\\",\\"isTopLevelLink\\":true} /-->
+<!-- wp:navigation-link {\\"label\\":\\"Home\\",\\"type\\":\\"custom\\",\\"url\\":\\"string\\",\\"kind\\":\\"custom\\",\\"isTopLevelLink\\":true} /-->
 
 <!-- wp:navigation-submenu {\\"label\\":\\"About\\",\\"type\\":\\"page\\",\\"id\\":\\"number\\",\\"url\\":\\"string\\",\\"kind\\":\\"post-type\\",\\"isTopLevelItem\\":true} -->
 <!-- wp:navigation-link {\\"label\\":\\"Our team\\",\\"type\\":\\"page\\",\\"id\\":\\"number\\",\\"url\\":\\"string\\",\\"kind\\":\\"post-type\\",\\"isTopLevelLink\\":false} /-->
@@ -32,8 +32,8 @@ exports[`Navigation editor displays the first created menu when at least one men
 
 <!-- wp:navigation-link {\\"label\\":\\"Contact Us\\",\\"type\\":\\"page\\",\\"id\\":\\"number\\",\\"url\\":\\"string\\",\\"kind\\":\\"post-type\\",\\"isTopLevelLink\\":true} /-->
 
-<!-- wp:navigation-submenu {\\"label\\":\\"WordPress.org\\",\\"type\\":\\"custom\\",\\"id\\":\\"undefined\\",\\"url\\":\\"string\\",\\"kind\\":\\"custom\\",\\"isTopLevelItem\\":true} -->
-<!-- wp:navigation-link {\\"label\\":\\"Google\\",\\"type\\":\\"custom\\",\\"id\\":\\"undefined\\",\\"url\\":\\"string\\",\\"kind\\":\\"custom\\",\\"isTopLevelLink\\":false} /-->
+<!-- wp:navigation-submenu {\\"label\\":\\"WordPress.org\\",\\"type\\":\\"custom\\",\\"url\\":\\"string\\",\\"kind\\":\\"custom\\",\\"isTopLevelItem\\":true} -->
+<!-- wp:navigation-link {\\"label\\":\\"Google\\",\\"type\\":\\"custom\\",\\"url\\":\\"string\\",\\"kind\\":\\"custom\\",\\"isTopLevelLink\\":false} /-->
 <!-- /wp:navigation-submenu -->
 <!-- /wp:navigation -->"
 `;
