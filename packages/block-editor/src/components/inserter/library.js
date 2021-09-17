@@ -21,6 +21,7 @@ function InserterLibrary( {
 	showInserterHelpPanel,
 	showMostUsedBlocks = false,
 	__experimentalInsertionIndex,
+	__experimentalFilterValue,
 	onSelect = noop,
 	shouldFocusBlock = false,
 } ) {
@@ -44,6 +45,7 @@ function InserterLibrary( {
 			showInserterHelpPanel={ showInserterHelpPanel }
 			showMostUsedBlocks={ showMostUsedBlocks }
 			__experimentalInsertionIndex={ __experimentalInsertionIndex }
+			__experimentalFilterValue={ __experimentalFilterValue }
 			shouldFocusBlock={ shouldFocusBlock }
 		/>
 	);
