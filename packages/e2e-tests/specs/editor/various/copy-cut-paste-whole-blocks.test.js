@@ -103,6 +103,8 @@ describe( 'Copy/cut/paste of whole blocks', () => {
 		await page.keyboard.press( 'ArrowLeft' );
 		// Cut group
 		await pressKeyWithModifier( 'primary', 'x' );
+		expect( await getEditedPostContent() ).toMatchSnapshot();
+
 		await page.keyboard.press( 'Enter' );
 
 		await page.evaluate( () => {
@@ -146,7 +148,10 @@ describe( 'Copy/cut/paste of whole blocks', () => {
 		await page.keyboard.press( 'ArrowLeft' );
 		// Cut group
 		await pressKeyWithModifier( 'primary', 'x' );
+		expect( await getEditedPostContent() ).toMatchSnapshot();
+
 		await page.keyboard.press( 'Enter' );
+
 		// Insert a non textual element (a spacer)
 		await insertBlock( 'Spacer' );
 		// Spacer is focused

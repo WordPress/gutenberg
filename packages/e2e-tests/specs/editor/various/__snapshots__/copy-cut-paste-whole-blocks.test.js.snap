@@ -1,6 +1,8 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`Copy/cut/paste of whole blocks can copy group onto non textual element (image, spacer) 1`] = `
+exports[`Copy/cut/paste of whole blocks can copy group onto non textual element (image, spacer) 1`] = `""`;
+
+exports[`Copy/cut/paste of whole blocks can copy group onto non textual element (image, spacer) 2`] = `
 "<!-- wp:paragraph -->
 <p></p>
 <!-- /wp:paragraph -->
@@ -68,7 +70,9 @@ exports[`Copy/cut/paste of whole blocks should cut and paste individual blocks 2
 <!-- /wp:paragraph -->"
 `;
 
-exports[`Copy/cut/paste of whole blocks should handle paste events once 1`] = `
+exports[`Copy/cut/paste of whole blocks should handle paste events once 1`] = `""`;
+
+exports[`Copy/cut/paste of whole blocks should handle paste events once 2`] = `
 "<!-- wp:paragraph -->
 <p></p>
 <!-- /wp:paragraph -->
