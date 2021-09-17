@@ -62,7 +62,7 @@ export default function Header( {
 			<MenuActions menus={ menus } isLoading={ isPending } />
 
 			<div className="edit-navigation-header__actions">
-				{ isMediumViewport && <NewButton menus={ menus } /> }
+				{ isMediumViewport && <NewButton /> }
 				<SaveButton navigationPost={ navigationPost } />
 				<PinnedItems.Slot scope="core/edit-navigation" />
 			</div>
