@@ -13,7 +13,6 @@ import { Placeholder } from '@wordpress/components';
 import { group as groupIcon } from '@wordpress/icons';
 import { __ } from '@wordpress/i18n';
 import { useSelect } from '@wordpress/data';
-import { getBlockType } from '@wordpress/blocks';
 
 export default function Edit( props ) {
 	const { clientId } = props;
@@ -26,7 +25,7 @@ export default function Edit( props ) {
 			{ innerBlocks.length === 0 ? (
 				<PlaceholderContent { ...props } />
 			) : (
-				<PreviewContent { ...props } innerBlocks={ innerBlocks } />
+				<PreviewContent { ...props } />
 			) }
 		</div>
 	);
@@ -47,26 +46,18 @@ function PlaceholderContent( { clientId } ) {
 	);
 }
 
-function PreviewContent( { attributes, setAttributes, innerBlocks } ) {
+function PreviewContent( { attributes, setAttributes } ) {
 	return (
 		<>
 			<RichText
 				tagName="h2"
 				className="widget-title"
 				allowedFormats={ [] }
-				value={
-					attributes.title ?? getDefaultTitle( innerBlocks ) ?? ''
-				}
+				placeholder={ __( 'Title' ) }
+				value={ attributes.title ?? '' }
 				onChange={ ( title ) => setAttributes( { title } ) }
 			/>
 			<InnerBlocks />
 		</>
 	);
-}
-
-function getDefaultTitle( innerBlocks ) {
-	if ( innerBlocks.length === 0 ) {
-		return null;
-	}
-	return getBlockType( innerBlocks[ 0 ].name ).title;
 }
