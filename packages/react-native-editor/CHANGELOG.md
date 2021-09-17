@@ -10,6 +10,8 @@ For each user feature we should also add a importance categorization label  to i
 -->
 
 ## Unreleased
+
+## 1.62.0
 -   [**] [Embed block] Implement WP embed preview component [#34004]
 -   [*] [Embed block] Fix content disappearing on Android when switching light/dark mode [#34207]
 -   [*] Embed block: Add device's locale to preview content [#33858]
