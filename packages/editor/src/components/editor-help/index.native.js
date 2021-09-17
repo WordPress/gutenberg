@@ -163,7 +163,7 @@ function EditorHelpTopics( { close, isVisible, onClose } ) {
 											{
 												<HelpGetSupportButton
 													title={ __(
-														'All support options'
+														'All Support Options'
 													) }
 													onPress={
 														requestGotoCustomerSupportOptions
