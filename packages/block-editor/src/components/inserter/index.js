@@ -102,6 +102,7 @@ class Inserter extends Component {
 			disabled,
 			blockTitle,
 			hasSingleBlockType,
+			directInsert,
 			toggleProps,
 			hasItems,
 			renderToggle = defaultRenderToggle,
@@ -113,6 +114,7 @@ class Inserter extends Component {
 			disabled: disabled || ! hasItems,
 			blockTitle,
 			hasSingleBlockType,
+			directInsert,
 			toggleProps,
 		} );
 	}
@@ -168,12 +170,13 @@ class Inserter extends Component {
 		const {
 			position,
 			hasSingleBlockType,
+			directInsert,
 			insertOnlyAllowedBlock,
 			__experimentalIsQuick: isQuick,
 			onSelectOrClose,
 		} = this.props;
 
-		if ( hasSingleBlockType ) {
+		if ( hasSingleBlockType || directInsert ) {
 			return this.renderToggle( { onToggle: insertOnlyAllowedBlock } );
 		}
 
@@ -202,6 +205,7 @@ export default compose( [
 			getBlockRootClientId,
 			hasInserterItems,
 			__experimentalGetAllowedBlocks,
+			__experimentalGetDirectInsert,
 		} = select( blockEditorStore );
 		const { getBlockVariations } = select( blocksStore );
 
@@ -209,6 +213,8 @@ export default compose( [
 			rootClientId || getBlockRootClientId( clientId ) || undefined;
 
 		const allowedBlocks = __experimentalGetAllowedBlocks( rootClientId );
+
+		const directInsert = __experimentalGetDirectInsert( rootClientId );
 
 		const hasSingleBlockType =
 			size( allowedBlocks ) === 1 &&
@@ -226,6 +232,7 @@ export default compose( [
 			hasSingleBlockType,
 			blockTitle: allowedBlockType ? allowedBlockType.title : '',
 			allowedBlockType,
+			directInsert,
 			rootClientId,
 		};
 	} ),
@@ -238,10 +245,11 @@ export default compose( [
 					isAppender,
 					hasSingleBlockType,
 					allowedBlockType,
+					directInsert,
 					onSelectOrClose,
 				} = ownProps;
 
-				if ( ! hasSingleBlockType ) {
+				if ( ! hasSingleBlockType && ! directInsert ) {
 					return;
 				}
 
@@ -274,7 +282,9 @@ export default compose( [
 
 				const { insertBlock } = dispatch( blockEditorStore );
 
-				const blockToInsert = createBlock( allowedBlockType.name );
+				const blockToInsert = directInsert
+					? createBlock( directInsert )
+					: createBlock( allowedBlockType.name );
 
 				insertBlock( blockToInsert, getInsertionIndex(), rootClientId );
 

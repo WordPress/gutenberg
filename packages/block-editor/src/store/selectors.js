@@ -1792,6 +1792,24 @@ export const __experimentalGetAllowedBlocks = createSelector(
 	]
 );
 
+/**
+ * Returns the block to be directly inserted by the block appender.
+ *
+ * @param {Object}  state        Editor state.
+ * @param {?string} rootClientId Optional root client ID of block list.
+ *
+ * @return {string?} The block type to be directly inserted.
+ */
+export const __experimentalGetDirectInsert = createSelector(
+	( state, rootClientId = null ) => {
+		if ( ! rootClientId ) {
+			return;
+		}
+		return state.blockListSettings[ rootClientId ].directInsert;
+	},
+	( state, rootClientId ) => state.blockListSettings[ rootClientId ]
+);
+
 const checkAllowListRecursive = ( blocks, allowedBlockTypes ) => {
 	if ( isBoolean( allowedBlockTypes ) ) {
 		return allowedBlockTypes;

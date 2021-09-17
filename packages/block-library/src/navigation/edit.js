@@ -50,6 +50,8 @@ const ALLOWED_BLOCKS = [
 	'core/navigation-submenu',
 ];
 
+const DIRECT_INSERT = 'core/navigation-link';
+
 const LAYOUT = {
 	type: 'default',
 	alignments: [],
@@ -90,6 +92,7 @@ function Navigation( {
 	hasExistingNavItems,
 	isImmediateParentOfSelectedBlock,
 	isSelected,
+	onlyLinkInnerBlocks,
 	updateInnerBlocks,
 	className,
 	backgroundColor,
@@ -164,6 +167,7 @@ function Navigation( {
 		},
 		{
 			allowedBlocks: ALLOWED_BLOCKS,
+			directInsert: onlyLinkInnerBlocks ? DIRECT_INSERT : '',
 			orientation: attributes.orientation,
 			renderAppender: CustomAppender || appender,
 
@@ -366,6 +370,10 @@ export default compose( [
 			selectedBlockId,
 		] )?.length;
 
+		const onlyLinkInnerBlocks = innerBlocks.every(
+			( block ) => block.name === 'core/navigation-link'
+		);
+
 		return {
 			isImmediateParentOfSelectedBlock,
 			selectedBlockHasDescendants,
@@ -374,6 +382,7 @@ export default compose( [
 			// This prop is already available but computing it here ensures it's
 			// fresh compared to isImmediateParentOfSelectedBlock
 			isSelected: selectedBlockId === clientId,
+			onlyLinkInnerBlocks,
 		};
 	} ),
 	withDispatch( ( dispatch, { clientId } ) => {

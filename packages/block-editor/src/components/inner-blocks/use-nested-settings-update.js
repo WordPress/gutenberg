@@ -21,6 +21,8 @@ import { getLayoutType } from '../../layouts';
  * @param {string}   clientId        The client ID of the block to update.
  * @param {string[]} allowedBlocks   An array of block names which are permitted
  *                                   in inner blocks.
+ * @param {?string}  directInsert    A block name to be inserted directly by the
+ *                                   appender.
  * @param {string}   [templateLock]  The template lock specified for the inner
  *                                   blocks component. (e.g. "all")
  * @param {boolean}  captureToolbars Whether or children toolbars should be shown
@@ -33,6 +35,7 @@ import { getLayoutType } from '../../layouts';
 export default function useNestedSettingsUpdate(
 	clientId,
 	allowedBlocks,
+	directInsert,
 	templateLock,
 	captureToolbars,
 	orientation,
@@ -83,6 +86,10 @@ export default function useNestedSettingsUpdate(
 			newSettings.orientation = layoutType.getOrientation( layout );
 		}
 
+		if ( directInsert !== undefined ) {
+			newSettings.directInsert = directInsert;
+		}
+
 		if ( ! isShallowEqual( blockListSettings, newSettings ) ) {
 			updateBlockListSettings( clientId, newSettings );
 		}
@@ -90,6 +97,7 @@ export default function useNestedSettingsUpdate(
 		clientId,
 		blockListSettings,
 		_allowedBlocks,
+		directInsert,
 		templateLock,
 		parentLock,
 		captureToolbars,
