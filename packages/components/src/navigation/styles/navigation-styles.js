@@ -161,9 +161,9 @@ export const ItemBaseUI = styled.li`
 	opacity: 0.85;
 	margin-bottom: 0;
 
-	button,
-	a.components-button,
-	a {
+	> button,
+	> a.components-button,
+	> a {
 		width: 100%;
 		color: inherit;
 		opacity: 0.85;
@@ -182,13 +182,13 @@ export const ItemBaseUI = styled.li`
 		background-color: ${ UI.theme };
 		color: ${ UI.textDark };
 
-		button,
-		a {
+		> button,
+		> a {
 			color: ${ UI.textDark };
 		}
 	}
 
-	svg path {
+	> svg path {
 		color: ${ G2.lightGray.ui };
 	}
 `;
