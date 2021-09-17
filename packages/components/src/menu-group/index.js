@@ -9,13 +9,6 @@ import classnames from 'classnames';
 import { Children } from '@wordpress/element';
 import { useInstanceId } from '@wordpress/compose';
 
-/**
- * Renders a generic menu item for use inside the more menu
- *
- * @param {import('./types').Props} props
- *
- * @return {WPComponent} The component to be rendered.
- */
 export function MenuGroup( {
 	children,
 	className = '',
