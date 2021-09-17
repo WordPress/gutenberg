@@ -9,6 +9,7 @@ import { set, map, find, get, filter, compact } from 'lodash';
  */
 import { createRegistrySelector } from '@wordpress/data';
 import { addQueryArgs } from '@wordpress/url';
+import deprecated from '@wordpress/deprecated';
 
 /**
  * Internal dependencies
@@ -16,7 +17,7 @@ import { addQueryArgs } from '@wordpress/url';
 import { STORE_NAME } from './name';
 import { getQueriedItems } from './queried-data';
 import { DEFAULT_ENTITY_KEY } from './entities';
-import { getNormalizedCommaSeparable } from './utils';
+import { getNormalizedCommaSeparable, isRawAttribute } from './utils';
 
 /**
  * Shared reference to an empty array for cases where it is important to avoid
@@ -47,29 +48,24 @@ export const isRequestingEmbedPreview = createRegistrySelector(
 /**
  * Returns all available authors.
  *
+ * @deprecated since 11.3. Callers should use `select( 'core' ).getUsers({ who: 'authors' })` instead.
+ *
  * @param {Object}           state Data state.
  * @param {Object|undefined} query Optional object of query parameters to
  *                                 include with request.
  * @return {Array} Authors list.
  */
 export function getAuthors( state, query ) {
+	deprecated( "select( 'core' ).getAuthors()", {
+		since: '5.9',
+		alternative: "select( 'core' ).getUsers({ who: 'authors' })",
+	} );
+
 	const path = addQueryArgs(
 		'/wp/v2/users/?who=authors&per_page=100',
 		query
 	);
 	return getUserQueryResults( state, path );
-}
-
-/**
- * Returns all available authors.
- *
- * @param {Object} state Data state.
- * @param {number} id    The author id.
- *
- * @return {Array} Authors list.
- */
-export function __unstableGetAuthor( state, id ) {
-	return get( state, [ 'users', 'byId', id ], null );
 }
 
 /**
@@ -209,14 +205,18 @@ export const getRawEntityRecord = createSelector(
 		return (
 			record &&
 			Object.keys( record ).reduce( ( accumulator, _key ) => {
-				// Because edits are the "raw" attribute values,
-				// we return those from record selectors to make rendering,
-				// comparisons, and joins with edits easier.
-				accumulator[ _key ] = get(
-					record[ _key ],
-					'raw',
-					record[ _key ]
-				);
+				if ( isRawAttribute( getEntity( state, kind, name ), _key ) ) {
+					// Because edits are the "raw" attribute values,
+					// we return those from record selectors to make rendering,
+					// comparisons, and joins with edits easier.
+					accumulator[ _key ] = get(
+						record[ _key ],
+						'raw',
+						record[ _key ]
+					);
+				} else {
+					accumulator[ _key ] = record[ _key ];
+				}
 				return accumulator;
 			}, {} )
 		);

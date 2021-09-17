@@ -104,20 +104,26 @@ const LABEL_TYPE_MAPPING = {
  */
 const LABEL_FEATURE_MAPPING = {
 	'[Feature] Widgets Screen': 'Widgets Editor',
+	'[Feature] Widgets Customizer': 'Widgets Editor',
 	'[Feature] Design Tools': 'Design Tools',
 	'[Feature] UI Components': 'Components',
 	'[Feature] Component System': 'Components',
+	Storybook: 'Components',
 	'[Feature] Template Editing Mode': 'Template Editor',
 	'[Feature] Writing Flow': 'Block Editor',
+	'[Feature] Pattern Directory': 'Patterns',
+	'[Feature] Patterns': 'Patterns',
 	'[Feature] Blocks': 'Block Library',
 	'[Feature] Inserter': 'Block Editor',
 	'[Feature] Drag and Drop': 'Block Editor',
 	'[Feature] Block Multi Selection': 'Block Editor',
 	'[Feature] Link Editing': 'Block Editor',
+	'[Feature] Raw Handling': 'Block Editor',
 	'[Package] Edit Post': 'Post Editor',
 	'[Package] Icons': 'Icons',
 	'[Package] Block Editor': 'Block Editor',
-	'[Package] Editor': 'Editor',
+	'[Package] Block library': 'Block Library',
+	'[Package] Editor': 'Post Editor',
 	'[Package] Edit Widgets': 'Widgets Editor',
 	'[Package] Widgets Customizer': 'Widgets Editor',
 	'[Package] Components': 'Components',
@@ -127,6 +133,21 @@ const LABEL_FEATURE_MAPPING = {
 	'[Block] Legacy Widget': 'Widgets Editor',
 	'REST API Interaction': 'REST API',
 	'New Block': 'Block Library',
+	'Accessibility (a11y)': 'Accessibility',
+	'[a11y] Color Contrast': 'Accessibility',
+	'[a11y] Keyboard & Focus': 'Accessibility',
+	'[a11y] Labelling': 'Accessibility',
+	'[a11y] Zooming': 'Accessibility',
+	'[Package] E2E Tests': 'Testing',
+	'[Package] E2E Test Utils': 'Testing',
+	'Automated Testing': 'Testing',
+	'CSS Styling': 'CSS & Styling',
+	'developer-docs': 'Documentation',
+	'[Type] Documentation': 'Documentation',
+	'Global Styles': 'Global Styles',
+	'[Type] Build Tooling': 'Build Tooling',
+	'npm Packages': 'npm Packages',
+	'Gutenberg Plugin': 'Plugin',
 };
 
 /**
@@ -261,6 +282,12 @@ function getIssueType( issue ) {
 		...getTypesByLabels( labels ),
 		...getTypesByTitle( issue.title ),
 	];
+
+	// Force all tasks identified as Documentation tasks
+	// to appear under the main "Documentation" section.
+	if ( candidates.includes( 'Documentation' ) ) {
+		return 'Documentation';
+	}
 
 	return candidates.length ? candidates.sort( sortType )[ 0 ] : 'Various';
 }
@@ -512,6 +539,27 @@ function getEntry( issue ) {
 }
 
 /**
+ * Returns a formatted changelog entry for a given issue object and matching feature name, or undefined
+ * if entry should be omitted.
+ *
+ * @param {IssuesListForRepoResponseItem} issue       Issue object.
+ * @param {string}                        featureName Feature name.
+ *
+ * @return {string=} Formatted changelog entry, or undefined to omit.
+ */
+function getFeatureEntry( issue, featureName ) {
+	return getEntry( issue )
+		?.replace(
+			new RegExp( `\\[${ featureName.toLowerCase() } \- `, 'i' ),
+			'['
+		)
+		.replace(
+			new RegExp( `(?<=^- )${ featureName.toLowerCase() }: `, 'i' ),
+			''
+		);
+}
+
+/**
  * Returns the latest release for a given series
  *
  * @param {GitHub} octokit Initialized Octokit REST client.
@@ -615,6 +663,17 @@ async function getChangelog( settings ) {
 		}
 	}
 
+	return formatChangelog( pullRequests );
+}
+
+/**
+ * Formats the changelog string for a given list of pull requests.
+ *
+ * @param {IssuesListForRepoResponseItem[]} pullRequests List of pull requests.
+ *
+ * @return {string} The formatted changelog string.
+ */
+function formatChangelog( pullRequests ) {
 	let changelog = '';
 
 	const groupedPullRequests = groupBy( pullRequests, getIssueType );
@@ -644,24 +703,29 @@ async function getChangelog( settings ) {
 			const featureGroupPRs = featureGroups[ featureName ];
 
 			const featureGroupEntries = featureGroupPRs
-				.map( getEntry )
-				.filter( Boolean );
+				.map( ( issue ) => getFeatureEntry( issue, featureName ) )
+				.filter( Boolean )
+				.sort();
 
 			// Don't create feature sections when there are no PRs.
 			if ( ! featureGroupEntries.length ) {
 				return;
 			}
 
-			// Start new <ul> for the Feature group.
-			changelog += '- ' + featureName + '\n';
+			// Avoids double nesting such as "Documentation" feature under
+			// the "Documentation" section.
+			if (
+				group !== featureName &&
+				featureName !== UNKNOWN_FEATURE_FALLBACK_NAME
+			) {
+				// Start new <ul> for the Feature group.
+				changelog += '#### ' + featureName + '\n';
+			}
 
 			// Add a <li> for each PR in the Feature.
 			featureGroupEntries.forEach( ( entry ) => {
-				// Strip feature name from entry if present.
-				entry = entry && entry.replace( `[${ featureName } - `, '[' );
-
 				// Add a new bullet point to the list.
-				changelog += `  ${ entry }\n`;
+				changelog += `${ entry }\n`;
 			} );
 
 			// Close the <ul> for the Feature group.
@@ -684,11 +748,11 @@ async function getChangelog( settings ) {
 function sortFeatureGroups( featureGroups ) {
 	return Object.keys( featureGroups ).sort(
 		( featureAName, featureBName ) => {
-			// Sort "Unknown" to always be at the end
+			// Sort "uncategorized" items to *always* be at the top of the section
 			if ( featureAName === UNKNOWN_FEATURE_FALLBACK_NAME ) {
-				return 1;
-			} else if ( featureBName === UNKNOWN_FEATURE_FALLBACK_NAME ) {
 				return -1;
+			} else if ( featureBName === UNKNOWN_FEATURE_FALLBACK_NAME ) {
+				return 1;
 			}
 
 			// Sort by greatest number of PRs in the group first.
@@ -716,7 +780,9 @@ async function createChangelog( settings ) {
 	try {
 		changelog = await getChangelog( settings );
 	} catch ( error ) {
-		changelog = formats.error( error.stack );
+		if ( error instanceof Error ) {
+			changelog = formats.error( error.stack );
+		}
 	}
 
 	log( changelog );
@@ -762,4 +828,5 @@ async function getReleaseChangelog( options ) {
 	sortGroup,
 	getTypesByLabels,
 	getTypesByTitle,
+	formatChangelog,
 };

@@ -4,13 +4,14 @@
 
 import { useMergeRefs } from '@wordpress/compose';
 import { __experimentalTreeGrid as TreeGrid } from '@wordpress/components';
-import { useDispatch } from '@wordpress/data';
+import { AsyncModeProvider, useDispatch } from '@wordpress/data';
 import {
 	useCallback,
 	useEffect,
 	useMemo,
 	useRef,
 	useReducer,
+	forwardRef,
 } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 
@@ -48,16 +49,24 @@ const expanded = ( state, action ) => {
  * @param {boolean}  props.showOnlyCurrentHierarchy                 Flag to limit the list to the current hierarchy of blocks.
  * @param {boolean}  props.__experimentalFeatures                   Flag to enable experimental features.
  * @param {boolean}  props.__experimentalPersistentListViewFeatures Flag to enable features for the Persistent List View experiment.
+ * @param {Object}   ref                                            Forwarded ref
  */
-export default function ListView( {
-	blocks,
-	showOnlyCurrentHierarchy,
-	onSelect = noop,
-	__experimentalFeatures,
-	__experimentalPersistentListViewFeatures,
-	...props
-} ) {
-	const { clientIdsTree, selectedClientIds } = useListViewClientIds(
+function ListView(
+	{
+		blocks,
+		showOnlyCurrentHierarchy,
+		onSelect = noop,
+		__experimentalFeatures,
+		__experimentalPersistentListViewFeatures,
+		...props
+	},
+	ref
+) {
+	const {
+		clientIdsTree,
+		selectedClientIds,
+		draggedClientIds,
+	} = useListViewClientIds(
 		blocks,
 		showOnlyCurrentHierarchy,
 		__experimentalPersistentListViewFeatures
@@ -74,25 +83,31 @@ export default function ListView( {
 
 	const { ref: dropZoneRef, target: blockDropTarget } = useListViewDropZone();
 	const elementRef = useRef();
-	const treeGridRef = useMergeRefs( [ elementRef, dropZoneRef ] );
+	const treeGridRef = useMergeRefs( [ elementRef, dropZoneRef, ref ] );
 
 	const isMounted = useRef( false );
 	useEffect( () => {
 		isMounted.current = true;
 	}, [] );
 
-	const expand = ( clientId ) => {
-		if ( ! clientId ) {
-			return;
-		}
-		setExpandedState( { type: 'expand', clientId } );
-	};
-	const collapse = ( clientId ) => {
-		if ( ! clientId ) {
-			return;
-		}
-		setExpandedState( { type: 'collapse', clientId } );
-	};
+	const expand = useCallback(
+		( clientId ) => {
+			if ( ! clientId ) {
+				return;
+			}
+			setExpandedState( { type: 'expand', clientId } );
+		},
+		[ setExpandedState ]
+	);
+	const collapse = useCallback(
+		( clientId ) => {
+			if ( ! clientId ) {
+				return;
+			}
+			setExpandedState( { type: 'collapse', clientId } );
+		},
+		[ setExpandedState ]
+	);
 	const expandRow = ( row ) => {
 		expand( row?.dataset?.block );
 	};
@@ -105,6 +120,8 @@ export default function ListView( {
 			__experimentalFeatures,
 			__experimentalPersistentListViewFeatures,
 			isTreeGridMounted: isMounted.current,
+			draggedClientIds,
+			selectedClientIds,
 			expandedState,
 			expand,
 			collapse,
@@ -113,6 +130,8 @@ export default function ListView( {
 			__experimentalFeatures,
 			__experimentalPersistentListViewFeatures,
 			isMounted.current,
+			draggedClientIds,
+			selectedClientIds,
 			expandedState,
 			expand,
 			collapse,
@@ -120,7 +139,7 @@ export default function ListView( {
 	);
 
 	return (
-		<>
+		<AsyncModeProvider value={ true }>
 			<ListViewDropIndicator
 				listViewRef={ elementRef }
 				blockDropTarget={ blockDropTarget }
@@ -136,11 +155,11 @@ export default function ListView( {
 					<ListViewBranch
 						blocks={ clientIdsTree }
 						selectBlock={ selectEditorBlock }
-						selectedBlockClientIds={ selectedClientIds }
 						{ ...props }
 					/>
 				</ListViewContext.Provider>
 			</TreeGrid>
-		</>
+		</AsyncModeProvider>
 	);
 }
+export default forwardRef( ListView );

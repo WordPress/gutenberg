@@ -124,7 +124,7 @@ $preview-image-height: 140px;
 .block-editor-link-control__search-item {
 	position: relative;
 	display: flex;
-	align-items: center;
+	align-items: flex-start; // when link text is very long it is important this indicator remains visible and thus should be aligned top.
 	font-size: $default-font-size;
 	cursor: pointer;
 	background: $white;
@@ -168,7 +168,12 @@ $preview-image-height: 140px;
 		align-items: flex-start;
 		margin-right: $grid-unit-10;
 		overflow: hidden;
-		white-space: nowrap;
+
+		// Force text to wrap to improve UX when encountering long lines
+		// of text, particular those with no spaces.
+		// See: https://github.com/WordPress/gutenberg/issues/33586#issuecomment-888921188
+		white-space: pre-wrap;
+		word-wrap: break-word;
 	}
 
 	&.is-preview .block-editor-link-control__search-item-header {
@@ -184,13 +189,14 @@ $preview-image-height: 140px;
 		position: relative;
 		top: 0.2em;
 		margin-right: $grid-unit-10;
-		width: 18px; // half of 32px to improve perceived resolution.
-		height: 18px; // half of 32px to improve perceived resolution.
+		max-height: 24px;
+		flex-shrink: 0;
+		width: 24px;
+		display: flex;
+		justify-content: center;
 
-		svg,
 		img {
-			max-width: none;
-			width: 18px; // half of 32px to improve perceived resolution.
+			width: 16px; // favicons often have a source of 32px
 		}
 	}
 
@@ -305,7 +311,6 @@ $preview-image-height: 140px;
 
 .block-editor-link-control__search-item-bottom {
 	transition: opacity 1.5s;
-	min-height: 100px;
 	width: 100%;
 }
 
@@ -385,7 +390,7 @@ $preview-image-height: 140px;
 	align-items: center;
 	border-top: $border-width solid $gray-300;
 	margin: 0;
-	padding: $grid-unit-20 $grid-unit-30;
+	padding: $grid-unit-20;
 }
 
 .block-editor-link-control__unlink {

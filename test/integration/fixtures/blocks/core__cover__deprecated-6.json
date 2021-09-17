@@ -8,8 +8,6 @@
 			"hasParallax": false,
 			"dimRatio": 40,
 			"backgroundType": "image",
-			"title": "",
-			"contentAlign": "center",
 			"isRepeated": false
 		},
 		"innerBlocks": [
@@ -44,8 +42,6 @@
 				"x": "0.50",
 				"y": "0.40"
 			},
-			"title": "",
-			"contentAlign": "center",
 			"isRepeated": false,
 			"minHeight": 48,
 			"minHeightUnit": "vw",
@@ -73,6 +69,7 @@
 		"attributes": {
 			"url": "http://localhost:8888/wp-content/uploads/2021/02/percy.jpg",
 			"id": 134,
+			"alt": "",
 			"hasParallax": false,
 			"isRepeated": false,
 			"dimRatio": 50,

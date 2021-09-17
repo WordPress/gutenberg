@@ -31,21 +31,11 @@ export default function useSelectAll() {
 				return;
 			}
 
-			if (
-				event.target.classList.contains( 'editor-post-title__input' )
-			) {
+			if ( ! isEntirelySelected( event.target ) ) {
 				return;
 			}
 
 			const selectedClientIds = getSelectedBlockClientIds();
-
-			if (
-				selectedClientIds.length === 1 &&
-				! isEntirelySelected( event.target )
-			) {
-				return;
-			}
-
 			const [ firstSelectedClientId ] = selectedClientIds;
 			const rootClientId = getBlockRootClientId( firstSelectedClientId );
 			let blockClientIds = getBlockOrder( rootClientId );

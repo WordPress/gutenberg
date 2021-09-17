@@ -2,9 +2,9 @@
  * WordPress dependencies
  */
 import {
-	activatePlugin,
+	__experimentalActivatePlugin as activatePlugin,
 	activateTheme,
-	deactivatePlugin,
+	__experimentalDeactivatePlugin as deactivatePlugin,
 	visitAdminPage,
 	showBlockToolbar,
 	clickBlockToolbarButton,
@@ -18,6 +18,10 @@ import {
 // eslint-disable-next-line no-restricted-imports
 import { find } from 'puppeteer-testing-library';
 
+const twentyTwentyError = `Stylesheet twentytwenty-block-editor-styles-css was not properly added.
+For blocks, use the block API's style (https://developer.wordpress.org/block-editor/reference-guides/block-api/block-metadata/#style) or editorStyle (https://developer.wordpress.org/block-editor/reference-guides/block-api/block-metadata/#editor-style).
+For themes, use add_editor_style (https://developer.wordpress.org/block-editor/how-to-guides/themes/theme-support/#editor-styles).`;
+
 describe( 'Widgets Customizer', () => {
 	beforeEach( async () => {
 		await deleteAllWidgets();
@@ -26,14 +30,14 @@ describe( 'Widgets Customizer', () => {
 		// Disable welcome guide if it is enabled.
 		const isWelcomeGuideActive = await page.evaluate( () =>
 			wp.data
-				.select( 'core/customize-widgets' )
-				.__unstableIsFeatureActive( 'welcomeGuide' )
+				.select( 'core/interface' )
+				.isFeatureActive( 'core/customize-widgets', 'welcomeGuide' )
 		);
 		if ( isWelcomeGuideActive ) {
 			await page.evaluate( () =>
 				wp.data
-					.dispatch( 'core/customize-widgets' )
-					.__unstableToggleFeature( 'welcomeGuide' )
+					.dispatch( 'core/interface' )
+					.toggleFeature( 'core/customize-widgets', 'welcomeGuide' )
 			);
 		}
 	} );
@@ -44,6 +48,20 @@ describe( 'Widgets Customizer', () => {
 		await deactivatePlugin(
 			'gutenberg-test-plugin-disables-the-css-animations'
 		);
+		// Disable the transition timing function to make it "snap".
+		// We can't disable all the transitions yet because of #32024.
+		await page.evaluateOnNewDocument( () => {
+			const style = document.createElement( 'style' );
+			style.innerHTML = `
+				* {
+					transition-timing-function: step-start !important;
+					animation-timing-function: step-start !important;
+				}
+			`;
+			window.addEventListener( 'DOMContentLoaded', () => {
+				document.head.appendChild( style );
+			} );
+		} );
 		await activatePlugin( 'gutenberg-test-widgets' );
 	} );
 
@@ -101,7 +119,7 @@ describe( 'Widgets Customizer', () => {
 		await searchOption.click();
 
 		const addedSearchBlock = await find( {
-			role: 'group',
+			role: 'document',
 			name: 'Block: Search',
 		} );
 
@@ -144,6 +162,8 @@ describe( 'Widgets Customizer', () => {
 			name: 'My Search',
 			selector: '.widget-content *',
 		} ).toBeFound( findOptions );
+
+		expect( console ).toHaveErrored( twentyTwentyError );
 	} );
 
 	it( 'should open the inspector panel', async () => {
@@ -229,6 +249,8 @@ describe( 'Widgets Customizer', () => {
 		} ).toBeFound();
 
 		await expect( inspectorHeading ).not.toBeVisible();
+
+		expect( console ).toHaveErrored( twentyTwentyError );
 	} );
 
 	it( 'should handle the inserter outer section', async () => {
@@ -305,7 +327,7 @@ describe( 'Widgets Customizer', () => {
 		// Focus the block and start typing to hide the block toolbar.
 		// Shouldn't be needed if we automatically hide the toolbar on blur.
 		const paragraphBlock = await find( {
-			role: 'group',
+			role: 'document',
 			name: 'Paragraph block',
 		} );
 		await paragraphBlock.focus();
@@ -336,6 +358,8 @@ describe( 'Widgets Customizer', () => {
 			name: 'Add a block',
 			level: 2,
 		} ).not.toBeFound();
+
+		expect( console ).toHaveErrored( twentyTwentyError );
 	} );
 
 	it( 'should move focus to the block', async () => {
@@ -394,7 +418,7 @@ describe( 'Widgets Customizer', () => {
 		await editParagraphWidget.click();
 
 		const firstParagraphBlock = await find( {
-			role: 'group',
+			role: 'document',
 			name: 'Paragraph block',
 			text: 'First Paragraph',
 		} );
@@ -426,11 +450,13 @@ describe( 'Widgets Customizer', () => {
 		await editHeadingWidget.click();
 
 		const headingBlock = await find( {
-			role: 'group',
+			role: 'document',
 			name: 'Block: Heading',
 			text: 'First Heading',
 		} );
 		await expect( headingBlock ).toHaveFocus();
+
+		expect( console ).toHaveErrored( twentyTwentyError );
 	} );
 
 	it( 'should clear block selection', async () => {
@@ -493,6 +519,8 @@ describe( 'Widgets Customizer', () => {
 			role: 'toolbar',
 			name: 'Block tools',
 		} ).not.toBeFound();
+
+		expect( console ).toHaveErrored( twentyTwentyError );
 	} );
 
 	it( 'should handle legacy widgets', async () => {
@@ -671,6 +699,8 @@ describe( 'Widgets Customizer', () => {
 			selector: '*[aria-live="polite"][aria-relevant="additions text"]',
 		} ).toBeFound();
 		await expect( paragraphBlock ).toBeVisible();
+
+		expect( console ).toHaveErrored( twentyTwentyError );
 	} );
 
 	it( 'should move (inner) blocks to another sidebar', async () => {
@@ -701,7 +731,7 @@ describe( 'Widgets Customizer', () => {
 
 		// Refocus the paragraph block.
 		const paragraphBlock = await find( {
-			role: 'group',
+			role: 'document',
 			name: 'Paragraph block',
 			value: 'First Paragraph',
 		} );
@@ -723,13 +753,15 @@ describe( 'Widgets Customizer', () => {
 
 		// The paragraph block should be moved to the new sidebar and have focus.
 		const movedParagraphBlockQuery = {
-			role: 'group',
+			role: 'document',
 			name: 'Paragraph block',
 			value: 'First Paragraph',
 		};
 		await expect( movedParagraphBlockQuery ).toBeFound();
 		const movedParagraphBlock = await find( movedParagraphBlockQuery );
 		await expect( movedParagraphBlock ).toHaveFocus();
+
+		expect( console ).toHaveErrored( twentyTwentyError );
 	} );
 } );
 
@@ -792,7 +824,7 @@ async function addBlock( blockName ) {
 	await blockOption.click();
 
 	const addedBlock = await find( {
-		role: 'group',
+		role: 'document',
 		selector: '.is-selected[data-block]',
 	} );
 	await addedBlock.focus();

@@ -40,15 +40,12 @@ export const useBreakpointIndex = (
 
 		onResize();
 
-		if ( typeof document !== 'undefined' ) {
-			// Disable reason: We don't really care about what document we listen to, we just want to know that we're resizing.
-			/* eslint-disable @wordpress/no-global-event-listener */
-			document.addEventListener( 'resize', onResize );
+		if ( typeof window !== 'undefined' ) {
+			window.addEventListener( 'resize', onResize );
 		}
 		return () => {
-			if ( typeof document !== 'undefined' ) {
-				document.removeEventListener( 'resize', onResize );
-				/* eslint-enable @wordpress/no-global-event-listener */
+			if ( typeof window !== 'undefined' ) {
+				window.removeEventListener( 'resize', onResize );
 			}
 		};
 	}, [ value ] );

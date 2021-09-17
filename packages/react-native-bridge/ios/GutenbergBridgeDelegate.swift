@@ -26,6 +26,7 @@ public enum Capabilities: String {
     case isAudioBlockMediaUploadEnabled
     case reusableBlock
     case editorOnboarding
+    case firstGutenbergEditorSession
 }
 
 /// Wrapper for single block data
@@ -163,6 +164,10 @@ public protocol GutenbergBridgeDelegate: class {
     ///
     func gutenbergDidRequestMediaUploadCancelation(for mediaID: Int32)
 
+    /// Tells the delegate that an image block requested for the featured image to be set.
+    ///
+    func gutenbergDidRequestToSetFeaturedImage(for mediaID: Int32)
+
     /// Tells the delegate that the Gutenberg module has finished loading.
     ///
     func gutenbergDidLoad()
@@ -233,8 +238,14 @@ public protocol GutenbergBridgeDelegate: class {
     func gutenbergDidRequestMediaFilesUploadCancelDialog(_ mediaFiles: [[String: Any]])
 
     func gutenbergDidRequestMediaFilesSaveCancelDialog(_ mediaFiles: [[String: Any]])
-    
+
     func gutenbergDidRequestPreview()
+
+    /// Tells the delegate that the editor requested the block type impression counts
+    func gutenbergDidRequestBlockTypeImpressions() -> [String: Int]
+
+    /// Tells the delegate the the editor requested setting the impression counts
+    func gutenbergDidRequestSetBlockTypeImpressions(_ impressions: [String: Int])
 }
 
 // MARK: - Optional GutenbergBridgeDelegate methods

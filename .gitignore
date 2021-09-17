@@ -6,6 +6,7 @@ build-types
 node_modules
 gutenberg.zip
 coverage
+*-performance-results.json
 
 # Directories/files that may appear in your environment
 *.log

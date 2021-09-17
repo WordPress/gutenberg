@@ -890,7 +890,7 @@ export function isPreviewingPost( state ) {
 	if ( ! isSavingPost( state ) ) {
 		return false;
 	}
-	return !! state.saving.options.isPreview;
+	return !! get( state.saving, [ 'options', 'isPreview' ] );
 }
 
 /**
@@ -1393,13 +1393,6 @@ export const getBlock = getBlockEditorSelector( 'getBlock' );
  * @see getBlocks in core/block-editor store.
  */
 export const getBlocks = getBlockEditorSelector( 'getBlocks' );
-
-/**
- * @see __unstableGetBlockWithoutInnerBlocks in core/block-editor store.
- */
-export const __unstableGetBlockWithoutInnerBlocks = getBlockEditorSelector(
-	'__unstableGetBlockWithoutInnerBlocks'
-);
 
 /**
  * @see getClientIdsOfDescendants in core/block-editor store.

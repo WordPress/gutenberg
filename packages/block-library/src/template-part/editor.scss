@@ -20,7 +20,7 @@
 		cursor: pointer;
 		margin-top: $grid-unit-20;
 		transition: all 0.05s ease-in-out;
-		border: $border-width solid transparent;
+		border: $border-width solid $gray-300;
 		width: 100%;
 		background-color: $white;
 
@@ -37,6 +37,10 @@
 
 		&.is-placeholder {
 			min-height: 100px;
+		}
+
+		.block-editor-block-preview__container {
+			border-bottom: $border-width solid $gray-300;
 		}
 	}
 
@@ -74,6 +78,21 @@
 			&::after {
 				border: none;
 			}
+		}
+	}
+}
+
+.wp-block-template-part__placeholder-create-new__title-form {
+	.wp-block-template-part__placeholder-create-new__title-form-actions {
+		padding-top: $grid-unit-15;
+		// Unsure why these styles need to be added since we are using the Flex component with
+		// flex-end setting.  Created issue https://github.com/WordPress/gutenberg/issues/33735 to
+		// attempt document this issue.
+		display: flex;
+		justify-content: flex-end;
+
+		.components-flex-item {
+			margin-left: $grid-unit-15;
 		}
 	}
 }

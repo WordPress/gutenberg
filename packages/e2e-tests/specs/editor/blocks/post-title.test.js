@@ -28,7 +28,7 @@ describe( 'Post Title block', () => {
 		await page.waitForSelector( '.edit-post-layout' );
 		const title = await page.$eval(
 			'.editor-post-title__input',
-			( element ) => element.value
+			( element ) => element.textContent
 		);
 		expect( title ).toEqual( 'Just tweaking the post title' );
 	} );

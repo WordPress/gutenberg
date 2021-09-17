@@ -7,8 +7,6 @@ const { join } = require( 'path' );
 /**
  * WordPress dependencies
  */
-const CustomTemplatedPathPlugin = require( '@wordpress/custom-templated-path-webpack-plugin' );
-const LibraryExportDefaultPlugin = require( '@wordpress/library-export-default-webpack-plugin' );
 const {
 	camelCaseDash,
 } = require( '@wordpress/dependency-extraction-webpack-plugin/lib/util' );
@@ -31,44 +29,47 @@ const gutenbergPackages = Object.keys( dependencies )
 	)
 	.map( ( packageName ) => packageName.replace( WORDPRESS_NAMESPACE, '' ) );
 
+const exportDefaultPackages = [
+	'api-fetch',
+	'deprecated',
+	'dom-ready',
+	'redux-routine',
+	'token-list',
+	'server-side-render',
+	'shortcode',
+	'warning',
+];
+
 module.exports = {
 	...baseConfig,
 	name: 'packages',
 	entry: gutenbergPackages.reduce( ( memo, packageName ) => {
 		return {
 			...memo,
-			[ packageName ]: `./packages/${ packageName }`,
+			[ packageName ]: {
+				import: `./packages/${ packageName }`,
+				library: {
+					name: [ 'wp', camelCaseDash( packageName ) ],
+					type: 'window',
+					export: exportDefaultPackages.includes( packageName )
+						? 'default'
+						: undefined,
+				},
+			},
 		};
 	}, {} ),
 	output: {
 		devtoolNamespace: 'wp',
 		filename: './build/[name]/index.min.js',
 		path: join( __dirname, '..', '..' ),
-		library: [ 'wp', '[camelName]' ],
-		libraryTarget: 'window',
 	},
 	plugins: [
 		...plugins,
-		new CustomTemplatedPathPlugin( {
-			camelName( path, data ) {
-				return camelCaseDash( data.chunk.name );
-			},
-		} ),
-		new LibraryExportDefaultPlugin( [
-			'api-fetch',
-			'deprecated',
-			'dom-ready',
-			'redux-routine',
-			'token-list',
-			'server-side-render',
-			'shortcode',
-			'warning',
-		] ),
 		new CopyWebpackPlugin( {
 			patterns: gutenbergPackages.map( ( packageName ) => ( {
-				from: `./packages/${ packageName }/build-style/*.css`,
-				to: `./build/${ packageName }/`,
-				flatten: true,
+				from: '*.css',
+				context: `./packages/${ packageName }/build-style`,
+				to: `./build/${ packageName }`,
 				transform: stylesTransform,
 				noErrorOnMissing: true,
 			} ) ),

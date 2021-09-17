@@ -53,7 +53,7 @@ Install the module
 npm install @wordpress/compose --save
 ```
 
-_This package assumes that your code will run in an **ES2015+** environment. If you're using an environment that has limited or no support for ES2015+ such as IE browsers then using [core-js](https://github.com/zloirock/core-js) will add polyfills for these methods._
+_This package assumes that your code will run in an **ES2015+** environment. If you're using an environment that has limited or no support for such language features and APIs, you should include [the polyfill shipped in `@wordpress/babel-preset-default`](https://github.com/WordPress/gutenberg/tree/HEAD/packages/babel-preset-default#polyfill) in your code._
 
 ## API
 
@@ -128,6 +128,7 @@ This behavior is useful if we want to render a list of items asynchronously for 
 _Parameters_
 
 -   _list_ `T[]`: Source array.
+-   _config_ `AsyncListConfig`: Configuration object.
 
 _Returns_
 
@@ -185,7 +186,7 @@ _Parameters_
 
 _Returns_
 
--   `import('react').Ref<HTMLElement>`: A ref to assign to the target element.
+-   `import('react').Ref<TElementType>`: A ref to assign to the target element.
 
 ### useDebounce
 
@@ -206,7 +207,16 @@ _Parameters_
 
 _Returns_
 
--   `TFunc & import('lodash').Cancelable`: Debounced function.
+-   `import('lodash').DebouncedFunc<TFunc>`: Debounced function.
+
+### useFocusableIframe
+
+Dispatches a bubbling focus event when the iframe receives focus. Use
+`onFocus` as usual on the iframe or a parent element.
+
+_Returns_
+
+-   `Object`: Ref to pass to the iframe.
 
 ### useFocusOnMount
 
@@ -451,7 +461,7 @@ _Parameters_
 
 _Returns_
 
--   `TFunc & import('lodash').Cancelable`: Throttled function.
+-   `import('lodash').DebouncedFunc<TFunc>`: Throttled function.
 
 ### useViewportMatch
 

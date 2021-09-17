@@ -32,7 +32,7 @@ export function useHasBorderPanel( { supports, name } ) {
 		useHasBorderWidthControl( { supports, name } ),
 	];
 
-	return controls.every( Boolean );
+	return controls.some( Boolean );
 }
 
 function useHasBorderColorControl( { supports, name } ) {
@@ -123,7 +123,7 @@ export default function BorderPanel( {
 			{ hasBorderColor && (
 				<ColorGradientControl
 					label={ __( 'Color' ) }
-					value={ borderColor }
+					colorValue={ borderColor }
 					colors={ colors }
 					gradients={ undefined }
 					disableCustomColors={ disableCustomColors }

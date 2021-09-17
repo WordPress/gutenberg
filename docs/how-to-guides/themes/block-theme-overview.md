@@ -126,7 +126,7 @@ One of the most important aspects of themes (if not the most important) is the s
 
 ## Classic Themes
 
-Users of classic themes can also build custom block templates and use theme in their Pages and Custom Post Types that supports Page Templates.
+Users of classic themes can also build custom block templates and use them in their Pages and Custom Post Types that support Page Templates.
 
 Theme authors can opt-out of this feature by removing the `block-templates` theme support in their `functions.php` file.
 

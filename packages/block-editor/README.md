@@ -10,7 +10,7 @@ Install the module
 npm install @wordpress/block-editor --save
 ```
 
-_This package assumes that your code will run in an **ES2015+** environment. If you're using an environment that has limited or no support for ES2015+ such as IE browsers then using [core-js](https://github.com/zloirock/core-js) will add polyfills for these methods._
+_This package assumes that your code will run in an **ES2015+** environment. If you're using an environment that has limited or no support for such language features and APIs, you should include [the polyfill shipped in `@wordpress/babel-preset-default`](https://github.com/WordPress/gutenberg/tree/HEAD/packages/babel-preset-default#polyfill) in your code._
 
 ## Usage
 
@@ -438,9 +438,7 @@ Undocumented declaration.
 
 ### InspectorAdvancedControls
 
-_Related_
-
--   <https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/inspector-advanced-controls/README.md>
+Undocumented declaration.
 
 ### InspectorControls
 
@@ -554,6 +552,7 @@ _Properties_
 -   _\_\_experimentalBlockDirectory_ `boolean`: Whether the user has enabled the Block Directory
 -   _\_\_experimentalBlockPatterns_ `Array`: Array of objects representing the block patterns
 -   _\_\_experimentalBlockPatternCategories_ `Array`: Array of objects representing the block pattern categories
+-   _\_\_unstableGalleryWithImageBlocks_ `boolean`: Whether the user has enabled the refactored gallery block which uses InnerBlocks
 
 ### SkipToSelectedBlock
 

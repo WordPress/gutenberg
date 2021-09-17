@@ -30,6 +30,7 @@ export {
 	Fill,
 	Provider as SlotFillProvider,
 } from './slot-fill';
+export { default as FontSizePicker } from './font-size-picker'; // Intentionally called after slot-fill.
 export { default as __experimentalStyleProvider } from './style-provider';
 export { default as BaseControl } from './base-control';
 export { default as TextareaControl } from './textarea-control';
@@ -40,6 +41,7 @@ export { default as __experimentalText } from './text';
 export { default as ExternalLink } from './external-link';
 export { default as TextControl } from './text-control';
 export { default as ToggleControl } from './toggle-control';
+export { default as SandBox } from './sandbox';
 export { default as SearchControl } from './search-control';
 export { default as SelectControl } from './select-control';
 export { default as RangeControl } from './range-control';

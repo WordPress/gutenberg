@@ -83,7 +83,10 @@ function BlockListAppender( {
 			//
 			// See: https://developer.mozilla.org/en-US/docs/Web/HTML/Element/button#Clicking_and_focus
 			tabIndex={ -1 }
-			className={ classnames( 'block-list-appender', className ) }
+			className={ classnames(
+				'block-list-appender wp-block',
+				className
+			) }
 		>
 			{ appender }
 		</TagName>

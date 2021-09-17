@@ -13,6 +13,7 @@ import {
 	RichText,
 	__experimentalUseBorderProps as useBorderProps,
 	__experimentalUnitControl as UnitControl,
+	__experimentalUseColorProps as useColorProps,
 } from '@wordpress/block-editor';
 import {
 	ToolbarDropdownMenu,
@@ -26,7 +27,7 @@ import {
 	__experimentalUseCustomUnits as useCustomUnits,
 } from '@wordpress/components';
 import { useInstanceId } from '@wordpress/compose';
-import { search } from '@wordpress/icons';
+import { Icon, search } from '@wordpress/icons';
 import { __ } from '@wordpress/i18n';
 
 /**
@@ -82,6 +83,7 @@ export default function SearchEdit( {
 		borderProps.style.borderRadius = `${ borderRadius }px`;
 	}
 
+	const colorProps = useColorProps( attributes );
 	const unitControlInstanceId = useInstanceId( UnitControl );
 	const unitControlInputId = `wp-block-search__width-${ unitControlInstanceId }`;
 	const isButtonPositionInside = 'button-inside' === buttonPosition;
@@ -208,20 +210,27 @@ export default function SearchEdit( {
 		// If the button is inside the wrapper, the wrapper gets the border color styles/classes, not the button.
 		const buttonClasses = classnames(
 			'wp-block-search__button',
-			isButtonPositionInside ? undefined : borderProps.className
+			colorProps.className,
+			isButtonPositionInside ? undefined : borderProps.className,
+			buttonUseIcon ? 'has-icon' : undefined
 		);
-		const buttonStyles = isButtonPositionInside
-			? { borderRadius }
-			: borderProps.style;
+		const buttonStyles = {
+			...colorProps.style,
+			...( isButtonPositionInside
+				? { borderRadius }
+				: borderProps.style ),
+		};
 
 		return (
 			<>
 				{ buttonUseIcon && (
-					<Button
-						icon={ search }
+					<button
+						type="button"
 						className={ buttonClasses }
 						style={ buttonStyles }
-					/>
+					>
+						<Icon icon={ search } />
+					</button>
 				) }
 
 				{ ! buttonUseIcon && (

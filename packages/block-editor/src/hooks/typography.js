@@ -6,7 +6,6 @@ import { hasBlockSupport } from '@wordpress/blocks';
  * External dependencies
  */
 import { PanelBody } from '@wordpress/components';
-import { Platform } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 
 /**
@@ -83,11 +82,8 @@ export function TypographyPanel( props ) {
 }
 
 const hasTypographySupport = ( blockName ) => {
-	return (
-		Platform.OS === 'web' &&
-		TYPOGRAPHY_SUPPORT_KEYS.some( ( key ) =>
-			hasBlockSupport( blockName, key )
-		)
+	return TYPOGRAPHY_SUPPORT_KEYS.some( ( key ) =>
+		hasBlockSupport( blockName, key )
 	);
 };
 

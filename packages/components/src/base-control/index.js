@@ -16,11 +16,11 @@ import {
 
 /**
  * @typedef Props
- * @property {string}                    id                    The id of the element to which labels and help text are being generated.
+ * @property {string}                    [id]                  The id of the element to which labels and help text are being generated.
  *                                                             That element should be passed as a child.
  * @property {import('react').ReactNode} help                  If this property is added, a help text will be
  *                                                             generated using help property as the content.
- * @property {import('react').ReactNode} label                 If this property is added, a label will be generated
+ * @property {import('react').ReactNode} [label]               If this property is added, a label will be generated
  *                                                             using label property as the content.
  * @property {boolean}                   [hideLabelFromVision] If true, the label will only be visible to screen readers.
  * @property {string}                    [className]           The class that will be added with "components-base-control" to the

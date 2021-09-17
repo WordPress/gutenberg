@@ -14,10 +14,8 @@
 		margin: $grid-unit-10 0;
 	}
 
-	// Add an explicit left margin of zero and auto right margin to work in horizontal
-	// flex containers. Without it, a "space-between"-like effect from two auto margins
-	// will cause the black plus to sit in the center of what space is left.
-	margin: 0 auto 0 0;
+	// Zero out the margin that's inherited from common.scss.
+	margin-bottom: revert;
 
 	// Black square plus appender.
 	.block-list-appender__toggle {

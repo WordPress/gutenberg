@@ -275,14 +275,12 @@ export default function LogoEdit( {
 		const _siteLogoId = _siteLogo || _readOnlyLogo;
 		const mediaItem =
 			_siteLogoId &&
-			select( coreStore ).getEntityRecord( 'root', 'media', _siteLogoId, {
+			select( coreStore ).getMedia( _siteLogoId, {
 				context: 'view',
 			} );
 		const _isRequestingMediaItem =
 			_siteLogoId &&
-			! select( coreStore ).hasFinishedResolution( 'getEntityRecord', [
-				'root',
-				'media',
+			! select( coreStore ).hasFinishedResolution( 'getMedia', [
 				_siteLogoId,
 				{ context: 'view' },
 			] );

@@ -3,7 +3,10 @@
 	"compilerOptions": {
 		"rootDir": "src",
 		"declarationDir": "build-types",
-		"types": [ "gutenberg-env" ]
+		"types": [ "gutenberg-env" ],
+		// Some errors in Reakit types with TypeScript 4.3
+		// Remove the following line when they've been addressed.
+		"skipLibCheck": true
 	},
 	"references": [
 		{ "path": "../compose" },
@@ -22,6 +25,7 @@
 		"src/animate/**/*",
 		"src/base-control/**/*",
 		"src/base-field/**/*",
+		"src/button/**/*",
 		"src/card/**/*",
 		"src/dashicon/**/*",
 		"src/disabled/**/*",
@@ -34,16 +38,24 @@
 		"src/grid/**/*",
 		"src/h-stack/**/*",
 		"src/heading/**/*",
+		"src/item-group/**/*",
+		"src/input-control/**/*",
 		"src/icon/**/*",
+		"src/number-control/**/*",
+		"src/popover/**/*",
+		"src/range-control/**/*",
 		"src/scroll-lock/**/*",
 		"src/scrollable/**/*",
-		"src/segmented-control/**/*",
+		"src/select-control/**/*",
 		"src/shortcut/**/*",
+		"src/slot-fill/**/*",
 		"src/spacer/**/*",
 		"src/spinner/**/*",
 		"src/surface/**/*",
 		"src/text/**/*",
 		"src/tip/**/*",
+		"src/toggle-group-control/**/*",
+		"src/tooltip/**/*",
 		"src/truncate/**/*",
 		"src/ui/**/*",
 		"src/utils/**/*",

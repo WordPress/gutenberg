@@ -40,9 +40,11 @@
 
 # Widgets
 /packages/edit-widgets                          @draganescu @talldan @noisysocks @tellthemachines @adamziel @kevin940726
+/packages/customize-widgets                     @noisysocks
+/packages/widgets                               @noisysocks
 
 # Navigation
-/packages/edit-navigation                       @draganescu @talldan @noisysocks @tellthemachines @adamziel @kevin940726 @getdave
+/packages/edit-navigation                       @draganescu @talldan @tellthemachines @adamziel @kevin940726 @getdave
 
 # Full Site Editing
 /packages/edit-site
@@ -122,9 +124,10 @@
 # PHP
 /lib                                            @timothybjacobs @spacedmonkey
 /lib/global-styles.php                          @timothybjabocs @spacedmonkey @nosolosw
-/lib/experimental-default-theme.json            @timothybjabocs @spacedmonkey @nosolosw
+/lib/theme.json                                 @timothybjabocs @spacedmonkey @nosolosw
 /lib/class-wp-theme-json-gutenberg.php          @timothybjabocs @spacedmonkey @nosolosw
 /lib/class-wp-theme-json-resolver-gutenberg.php @timothybjabocs @spacedmonkey @nosolosw
+/lib/full-site-editing                          @janw-me
 /phpunit/class-wp-theme-json-test.php           @nosolosw
 
 # Web App

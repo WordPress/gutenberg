@@ -12,16 +12,19 @@ import { Fragment, useEffect, useRef, useState } from '@wordpress/element';
 import {
 	BaseControl,
 	Button,
+	ExternalLink,
 	FocalPointPicker,
 	PanelBody,
 	PanelRow,
 	RangeControl,
 	ResizableBox,
 	Spinner,
+	TextareaControl,
 	ToggleControl,
 	withNotices,
 	__experimentalUseCustomUnits as useCustomUnits,
 	__experimentalBoxControl as BoxControl,
+	__experimentalToolsPanelItem as ToolsPanelItem,
 } from '@wordpress/components';
 import { compose, withInstanceId, useInstanceId } from '@wordpress/compose';
 import {
@@ -319,6 +322,7 @@ function CoverEdit( {
 		minHeightUnit,
 		style: styleAttribute,
 		url,
+		alt,
 	} = attributes;
 	const {
 		gradientClass,
@@ -490,6 +494,27 @@ function CoverEdit( {
 								}
 							/>
 						) }
+						{ url && isImageBackground && isImgElement && (
+							<TextareaControl
+								label={ __( 'Alt text (alternative text)' ) }
+								value={ alt }
+								onChange={ ( newAlt ) =>
+									setAttributes( { alt: newAlt } )
+								}
+								help={
+									<>
+										<ExternalLink href="https://www.w3.org/WAI/tutorials/images/decision-tree">
+											{ __(
+												'Describe the purpose of the image'
+											) }
+										</ExternalLink>
+										{ __(
+											'Leave empty if the image is purely decorative.'
+										) }
+									</>
+								}
+							/>
+						) }
 						<PanelRow>
 							<Button
 								variant="secondary"
@@ -512,20 +537,6 @@ function CoverEdit( {
 						</PanelRow>
 					</PanelBody>
 				) }
-				<PanelBody title={ __( 'Dimensions' ) }>
-					<CoverHeightInput
-						value={ temporaryMinHeight || minHeight }
-						unit={ minHeightUnit }
-						onChange={ ( newMinHeight ) =>
-							setAttributes( { minHeight: newMinHeight } )
-						}
-						onUnitChange={ ( nextUnit ) =>
-							setAttributes( {
-								minHeightUnit: nextUnit,
-							} )
-						}
-					/>
-				</PanelBody>
 				<PanelColorGradientSettings
 					title={ __( 'Overlay' ) }
 					initialOpen={ true }
@@ -555,6 +566,37 @@ function CoverEdit( {
 						/>
 					) }
 				</PanelColorGradientSettings>
+			</InspectorControls>
+			<InspectorControls __experimentalGroup="dimensions">
+				<ToolsPanelItem
+					hasValue={ () => !! minHeight }
+					label={ __( 'Minimum height' ) }
+					onDeselect={ () =>
+						setAttributes( {
+							minHeight: undefined,
+							minHeightUnit: undefined,
+						} )
+					}
+					resetAllFilter={ () => ( {
+						minHeight: undefined,
+						minHeightUnit: undefined,
+					} ) }
+					isShownByDefault={ true }
+					panelId={ clientId }
+				>
+					<CoverHeightInput
+						value={ temporaryMinHeight || minHeight }
+						unit={ minHeightUnit }
+						onChange={ ( newMinHeight ) =>
+							setAttributes( { minHeight: newMinHeight } )
+						}
+						onUnitChange={ ( nextUnit ) =>
+							setAttributes( {
+								minHeightUnit: nextUnit,
+							} )
+						}
+					/>
+				</ToolsPanelItem>
 			</InspectorControls>
 		</>
 	);
@@ -660,7 +702,7 @@ function CoverEdit( {
 					<img
 						ref={ isDarkElement }
 						className="wp-block-cover__image-background"
-						alt=""
+						alt={ alt }
 						src={ url }
 						style={ mediaStyle }
 					/>

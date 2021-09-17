@@ -156,7 +156,10 @@ export function computeCustomizedAttribute(
 
 		let attributes;
 
-		if ( block.name === 'core/navigation-link' ) {
+		if (
+			block.name === 'core/navigation-link' ||
+			block.name === 'core/navigation-submenu'
+		) {
 			attributes = blockAttributesToMenuItem( block.attributes );
 		} else {
 			attributes = {

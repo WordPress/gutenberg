@@ -67,6 +67,7 @@ exports[`BlockAlignmentUI should match snapshot 1`] = `
   }
   toggleProps={
     Object {
+      "className": "is-pressed",
       "describedBy": "Change alignment",
     }
   }

@@ -19,7 +19,7 @@ const DAYS_PER_RELEASE = 14;
  * Returns true if the given error object represents a duplicate entry error, or
  * false otherwise.
  *
- * @param {RequestError} requestError Error to test.
+ * @param {unknown} requestError Error to test.
  *
  * @return {boolean} Whether error is a duplicate validation request error.
  */
@@ -27,7 +27,14 @@ const isDuplicateValidationError = ( requestError ) => {
 	// The included version of RequestError provides no way to access the
 	// full 'errors' array that the github REST API returns. Hopefully they
 	// resolve this soon!
-	return requestError.message.includes( 'already_exists' );
+	const errorMessage =
+		requestError &&
+		typeof requestError === 'object' &&
+		/** @type {{message?: string}} */ ( requestError ).message;
+	return (
+		typeof errorMessage === 'string' &&
+		errorMessage.includes( 'already_exists' )
+	);
 };
 
 /**

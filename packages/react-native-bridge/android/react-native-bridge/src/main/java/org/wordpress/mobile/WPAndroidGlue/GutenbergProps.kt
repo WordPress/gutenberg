@@ -19,7 +19,8 @@ data class GutenbergProps @JvmOverloads constructor(
     val translations: Bundle,
     val isDarkMode: Boolean,
     val htmlModeEnabled: Boolean,
-    val enableEditorOnboarding: Boolean
+    val enableEditorOnboarding: Boolean,
+    var firstGutenbergEditorSession: Boolean
 ) {
 
     fun getInitialProps(bundle: Bundle?) = (bundle ?: Bundle()).apply {
@@ -40,6 +41,10 @@ data class GutenbergProps @JvmOverloads constructor(
                     ?.let { putSerializable(PROP_STYLES, it) }
             theme.getSerializable(PROP_FEATURES)
                     ?.let { putSerializable(PROP_FEATURES, it) }
+            theme.getSerializable(PROP_IS_FSE_THEME)
+                    ?.let { putSerializable(PROP_IS_FSE_THEME, it) }
+            theme.getSerializable(PROP_GALLERY_WITH_IMAGE_BLOCKS)
+                    ?.let { putSerializable(PROP_GALLERY_WITH_IMAGE_BLOCKS, it) }
         }
     }
 
@@ -54,6 +59,7 @@ data class GutenbergProps @JvmOverloads constructor(
         putBoolean(PROP_CAPABILITIES_IS_AUDIO_BLOCK_MEDIA_UPLOAD_ENABLED, isAudioBlockMediaUploadEnabled)
         putBoolean(PROP_CAPABILITIES_REUSABLE_BLOCK, enableReusableBlock)
         putBoolean(PROP_CAPABILITIES_EDITOR_ONBOARDING, enableEditorOnboarding)
+        putBoolean(PROP_CAPABILITIES_FIRST_GUTENBERG_SESSION, firstGutenbergEditorSession)
     }
 
     companion object {
@@ -75,6 +81,8 @@ data class GutenbergProps @JvmOverloads constructor(
         private const val PROP_GRADIENTS = "gradients"
         private const val PROP_STYLES = "rawStyles"
         private const val PROP_FEATURES = "rawFeatures"
+        private const val PROP_IS_FSE_THEME = "isFSETheme"
+        private const val PROP_GALLERY_WITH_IMAGE_BLOCKS = "galleryWithImageBlocks"
 
         const val PROP_CAPABILITIES = "capabilities"
         const val PROP_CAPABILITIES_CONTACT_INFO_BLOCK = "contactInfoBlock"
@@ -87,5 +95,6 @@ data class GutenbergProps @JvmOverloads constructor(
         const val PROP_CAPABILITIES_IS_AUDIO_BLOCK_MEDIA_UPLOAD_ENABLED = "isAudioBlockMediaUploadEnabled"
         const val PROP_CAPABILITIES_REUSABLE_BLOCK = "reusableBlock"
         const val PROP_CAPABILITIES_EDITOR_ONBOARDING = "editorOnboarding"
+        const val PROP_CAPABILITIES_FIRST_GUTENBERG_SESSION = "firstGutenbergEditorSession"
     }
 }

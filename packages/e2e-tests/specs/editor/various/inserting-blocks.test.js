@@ -378,6 +378,7 @@ describe( 'Inserting blocks', () => {
 
 	it( 'shows block preview when hovering over block in inserter', async () => {
 		await openGlobalBlockInserter();
+		await page.waitForSelector( '.editor-block-list-item-paragraph' );
 		await page.focus( '.editor-block-list-item-paragraph' );
 		const preview = await page.waitForSelector(
 			'.block-editor-inserter__preview',

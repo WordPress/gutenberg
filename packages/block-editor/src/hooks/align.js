@@ -125,9 +125,6 @@ export const withToolbarControls = createHigherOrderComponent(
 			getBlockSupport( blockName, 'align' ),
 			hasBlockSupport( blockName, 'alignWide', true )
 		);
-		const validAlignments = useAvailableAlignments(
-			blockAllowedAlignments
-		);
 
 		const updateAlignment = ( nextAlign ) => {
 			if ( ! nextAlign ) {
@@ -140,18 +137,23 @@ export const withToolbarControls = createHigherOrderComponent(
 			props.setAttributes( { align: nextAlign } );
 		};
 
-		return [
-			validAlignments.length > 0 && props.isSelected && (
-				<BlockControls key="align-controls" group="block">
-					<BlockAlignmentControl
-						value={ props.attributes.align }
-						onChange={ updateAlignment }
-						controls={ validAlignments }
-					/>
-				</BlockControls>
-			),
-			<BlockEdit key="edit" { ...props } />,
-		];
+		return (
+			<>
+				{ blockAllowedAlignments.length > 0 && (
+					<BlockControls
+						group="block"
+						__experimentalShareWithChildBlocks
+					>
+						<BlockAlignmentControl
+							value={ props.attributes.align }
+							onChange={ updateAlignment }
+							controls={ blockAllowedAlignments }
+						/>
+					</BlockControls>
+				) }
+				<BlockEdit { ...props } />
+			</>
+		);
 	},
 	'withToolbarControls'
 );

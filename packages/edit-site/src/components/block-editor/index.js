@@ -27,6 +27,7 @@ import NavigateToLink from '../navigate-to-link';
 import { SidebarInspectorFill } from '../sidebar';
 import { store as editSiteStore } from '../../store';
 import BlockInspectorButton from './block-inspector-button';
+import EditTemplatePartMenuButton from '../edit-template-part-menu-button';
 
 const LAYOUT = {
 	type: 'default',
@@ -70,6 +71,7 @@ export default function BlockEditor( { setIsInserterOpen } ) {
 			onChange={ onChange }
 			useSubRegistry={ false }
 		>
+			<EditTemplatePartMenuButton />
 			<TemplatePartConverter />
 			<__experimentalLinkControl.ViewerFill>
 				{ useCallback(
@@ -86,26 +88,28 @@ export default function BlockEditor( { setIsInserterOpen } ) {
 			<SidebarInspectorFill>
 				<BlockInspector />
 			</SidebarInspectorFill>
-			<div className="edit-site-visual-editor">
-				<BlockTools __unstableContentRef={ contentRef }>
-					<Iframe
-						style={ resizedCanvasStyles }
-						head={ <EditorStyles styles={ settings.styles } /> }
-						ref={ ref }
-						contentRef={ mergedRefs }
-					>
-						<BlockList
-							className="edit-site-block-editor__block-list"
-							__experimentalLayout={ LAYOUT }
-						/>
-					</Iframe>
-				</BlockTools>
+			<BlockTools
+				className="edit-site-visual-editor"
+				__unstableContentRef={ contentRef }
+			>
+				<Iframe
+					style={ resizedCanvasStyles }
+					head={ <EditorStyles styles={ settings.styles } /> }
+					ref={ ref }
+					contentRef={ mergedRefs }
+					name="editor-canvas"
+				>
+					<BlockList
+						className="edit-site-block-editor__block-list wp-site-blocks"
+						__experimentalLayout={ LAYOUT }
+					/>
+				</Iframe>
 				<__unstableBlockSettingsMenuFirstItem>
 					{ ( { onClose } ) => (
 						<BlockInspectorButton onClick={ onClose } />
 					) }
 				</__unstableBlockSettingsMenuFirstItem>
-			</div>
+			</BlockTools>
 		</BlockEditorProvider>
 	);
 }

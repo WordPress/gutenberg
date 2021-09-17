@@ -3,12 +3,13 @@
  */
 import { some } from 'lodash';
 import classnames from 'classnames';
+
 /**
  * WordPress dependencies
  */
 import { useState } from '@wordpress/element';
 import { useDispatch } from '@wordpress/data';
-import { TextControl, Button } from '@wordpress/components';
+import { Button, TextControl, withNotices } from '@wordpress/components';
 import { useFocusOnMount } from '@wordpress/compose';
 import { __, sprintf } from '@wordpress/i18n';
 import { store as noticesStore } from '@wordpress/notices';
@@ -17,22 +18,23 @@ import { store as coreStore } from '@wordpress/core-data';
 const menuNameMatches = ( menuName ) => ( menu ) =>
 	menu.name.toLowerCase() === menuName.toLowerCase();
 
-export default function AddMenu( {
+function AddMenu( {
 	className,
 	menus,
 	onCreate,
 	titleText,
 	helpText,
 	focusInputOnMount = false,
+	noticeUI,
+	noticeOperations,
 } ) {
+	const inputRef = useFocusOnMount( focusInputOnMount );
 	const [ menuName, setMenuName ] = useState( '' );
-	const { createErrorNotice, createInfoNotice, removeNotice } = useDispatch(
-		noticesStore
-	);
 	const [ isCreatingMenu, setIsCreatingMenu ] = useState( false );
+	const { createInfoNotice } = useDispatch( noticesStore );
 	const { saveMenu } = useDispatch( coreStore );
 
-	const inputRef = useFocusOnMount( focusInputOnMount );
+	const { createErrorNotice, removeAllNotices } = noticeOperations;
 
 	const createMenu = async ( event ) => {
 		event.preventDefault();
@@ -41,8 +43,8 @@ export default function AddMenu( {
 			return;
 		}
 
-		// Remove any existing notices so duplicates aren't created.
-		removeNotice( 'edit-navigation-error' );
+		// Remove any existing notices.
+		removeAllNotices();
 
 		if ( some( menus, menuNameMatches( menuName ) ) ) {
 			const message = sprintf(
@@ -52,13 +54,16 @@ export default function AddMenu( {
 				),
 				menuName
 			);
-			createErrorNotice( message, { id: 'edit-navigation-error' } );
+			createErrorNotice( message );
 			return;
 		}
 
 		setIsCreatingMenu( true );
 
 		const menu = await saveMenu( { name: menuName } );
+
+		setIsCreatingMenu( false );
+
 		if ( menu ) {
 			createInfoNotice( __( 'Menu created' ), {
 				type: 'snackbar',
@@ -68,8 +73,6 @@ export default function AddMenu( {
 				onCreate( menu.id );
 			}
 		}
-
-		setIsCreatingMenu( false );
 	};
 
 	return (
@@ -77,6 +80,7 @@ export default function AddMenu( {
 			className={ classnames( 'edit-navigation-add-menu', className ) }
 			onSubmit={ createMenu }
 		>
+			{ noticeUI }
 			{ titleText && (
 				<h3 className="edit-navigation-add-menu__title">
 					{ titleText }
@@ -102,3 +106,5 @@ export default function AddMenu( {
 		</form>
 	);
 }
+
+export default withNotices( AddMenu );

@@ -16,7 +16,7 @@ function register_gutenberg_patterns() {
 
 	$patterns = array(
 		'query-standard-posts'                 => array(
-			'title'      => __( 'Standard', 'gutenberg' ),
+			'title'      => _x( 'Standard', 'Block pattern title', 'gutenberg' ),
 			'blockTypes' => array( 'core/query' ),
 			'categories' => array( 'query' ),
 			'content'    => '<!-- wp:query {"query":{"perPage":1,"pages":0,"offset":0,"postType":"post","categoryIds":[],"tagIds":[],"order":"desc","orderBy":"date","author":"","search":"","exclude":[],"sticky":"","inherit":false}} -->
@@ -34,7 +34,7 @@ function register_gutenberg_patterns() {
 							<!-- /wp:query -->',
 		),
 		'query-medium-posts'                   => array(
-			'title'      => __( 'Image at left', 'gutenberg' ),
+			'title'      => _x( 'Image at left', 'Block pattern title', 'gutenberg' ),
 			'blockTypes' => array( 'core/query' ),
 			'categories' => array( 'query' ),
 			'content'    => '<!-- wp:query {"query":{"perPage":1,"pages":0,"offset":0,"postType":"post","categoryIds":[],"tagIds":[],"order":"desc","orderBy":"date","author":"","search":"","exclude":[],"sticky":"","inherit":false}} -->
@@ -54,7 +54,7 @@ function register_gutenberg_patterns() {
 							<!-- /wp:query -->',
 		),
 		'query-small-posts'                    => array(
-			'title'      => __( 'Small image and title', 'gutenberg' ),
+			'title'      => _x( 'Small image and title', 'Block pattern title', 'gutenberg' ),
 			'blockTypes' => array( 'core/query' ),
 			'categories' => array( 'query' ),
 			'content'    => '<!-- wp:query {"query":{"perPage":1,"pages":0,"offset":0,"postType":"post","categoryIds":[],"tagIds":[],"order":"desc","orderBy":"date","author":"","search":"","exclude":[],"sticky":"","inherit":false}} -->
@@ -73,7 +73,7 @@ function register_gutenberg_patterns() {
 							<!-- /wp:query -->',
 		),
 		'query-grid-posts'                     => array(
-			'title'      => __( 'Grid', 'gutenberg' ),
+			'title'      => _x( 'Grid', 'Block pattern title', 'gutenberg' ),
 			'blockTypes' => array( 'core/query' ),
 			'categories' => array( 'query' ),
 			'content'    => '<!-- wp:query {"query":{"perPage":6,"pages":0,"offset":0,"postType":"post","categoryIds":[],"tagIds":[],"order":"desc","orderBy":"date","author":"","search":"","exclude":[],"sticky":"exclude","inherit":false},"displayLayout":{"type":"flex","columns":3}} -->
@@ -89,7 +89,7 @@ function register_gutenberg_patterns() {
 							<!-- /wp:query -->',
 		),
 		'query-large-title-posts'              => array(
-			'title'      => __( 'Large title', 'gutenberg' ),
+			'title'      => _x( 'Large title', 'Block pattern title', 'gutenberg' ),
 			'blockTypes' => array( 'core/query' ),
 			'categories' => array( 'query' ),
 			'content'    => '<!-- wp:group {"align":"full","style":{"spacing":{"padding":{"top":"100px","right":"100px","bottom":"100px","left":"100px"}},"color":{"text":"#ffffff","background":"#000000"}}} -->
@@ -113,7 +113,7 @@ function register_gutenberg_patterns() {
 							<!-- /wp:group -->',
 		),
 		'query-offset-posts'                   => array(
-			'title'      => __( 'Offset', 'gutenberg' ),
+			'title'      => _x( 'Offset', 'Block pattern title', 'gutenberg' ),
 			'blockTypes' => array( 'core/query' ),
 			'categories' => array( 'query' ),
 			'content'    => '<!-- wp:group {"style":{"spacing":{"padding":{"top":"30px","right":"30px","bottom":"30px","left":"30px"}}},"layout":{"inherit":false}} -->
@@ -147,7 +147,7 @@ function register_gutenberg_patterns() {
 		),
 		// Initial block pattern to be used with block transformations with patterns.
 		'social-links-shared-background-color' => array(
-			'title'         => __( 'Social links with a shared background color', 'gutenberg' ),
+			'title'         => _x( 'Social links with a shared background color', 'Block pattern title', 'gutenberg' ),
 			'categories'    => array( 'buttons' ),
 			'blockTypes'    => array( 'core/social-links' ),
 			'viewportWidth' => 500,

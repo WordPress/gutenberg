@@ -101,6 +101,7 @@ class BottomSheetCell extends Component {
 			onPress,
 			onLongPress,
 			label,
+			subLabel,
 			value,
 			valuePlaceholder = '',
 			icon,
@@ -146,6 +147,11 @@ class BottomSheetCell extends Component {
 			showValue || customActionButton || icon
 				? cellLabelStyle
 				: defaultMissingIconAndValue;
+
+		const defaultSubLabelStyleText = getStylesFromColorScheme(
+			styles.cellSubLabelText,
+			styles.cellSubLabelTextDark
+		);
 
 		const drawSeparator =
 			( separatorType && separatorType !== 'none' ) ||
@@ -366,7 +372,22 @@ class BottomSheetCell extends Component {
 									/>
 								</View>
 							) }
-							{ label && (
+							{ subLabel && label && (
+								<View>
+									<Text
+										style={ [
+											defaultLabelStyle,
+											labelStyle,
+										] }
+									>
+										{ label }
+									</Text>
+									<Text style={ defaultSubLabelStyleText }>
+										{ subLabel }
+									</Text>
+								</View>
+							) }
+							{ ! subLabel && label && (
 								<Text
 									style={ [ defaultLabelStyle, labelStyle ] }
 								>

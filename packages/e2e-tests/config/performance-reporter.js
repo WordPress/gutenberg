@@ -28,9 +28,14 @@ class PerformanceReporter {
 		}
 
 		const results = readFileSync( filepath, 'utf8' );
-		const { load, type, focus, inserterOpen, inserterHover } = JSON.parse(
-			results
-		);
+		const {
+			load,
+			type,
+			focus,
+			inserterOpen,
+			inserterHover,
+			inserterSearch,
+		} = JSON.parse( results );
 
 		if ( load && load.length ) {
 			// eslint-disable-next-line no-console
@@ -77,6 +82,21 @@ Slowest time to open global inserter: ${ success(
 			) }
 Fastest time to open global inserter: ${ success(
 				round( Math.min( ...inserterOpen ) ) + 'ms'
+			) }` );
+		}
+
+		if ( inserterSearch && inserterSearch.length ) {
+			// eslint-disable-next-line no-console
+			console.log( `
+${ title( 'Inserter Search Performance:' ) }
+Average time to type the inserter search input: ${ success(
+				round( average( inserterSearch ) ) + 'ms'
+			) }
+Slowest time to type the inserter search input: ${ success(
+				round( Math.max( ...inserterSearch ) ) + 'ms'
+			) }
+Fastest time to type the inserter search input: ${ success(
+				round( Math.min( ...inserterSearch ) ) + 'ms'
 			) }` );
 		}
 

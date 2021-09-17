@@ -4,14 +4,13 @@ import androidx.core.util.Consumer;
 
 import com.facebook.react.bridge.ReadableArray;
 import com.facebook.react.bridge.ReadableMap;
+import com.facebook.react.bridge.WritableMap;
 
 import org.wordpress.mobile.WPAndroidGlue.MediaOption;
 import org.wordpress.mobile.WPAndroidGlue.RequestExecutor;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 public interface GutenbergBridgeJS2Parent extends RequestExecutor {
 
@@ -54,6 +53,10 @@ public interface GutenbergBridgeJS2Parent extends RequestExecutor {
 
     interface FocalPointPickerTooltipShownCallback {
         void onRequestFocalPointPickerTooltipShown(boolean tooltipShown);
+    }
+
+    interface BlockTypeImpressionsCallback {
+        void onRequestBlockTypeImpressions(ReadableMap impressions);
     }
 
     // Ref: https://github.com/facebook/react-native/blob/HEAD/Libraries/polyfills/console.js#L376
@@ -163,5 +166,9 @@ public interface GutenbergBridgeJS2Parent extends RequestExecutor {
     void requestFocalPointPickerTooltipShown(FocalPointPickerTooltipShownCallback focalPointPickerTooltipShownCallback);
 
     void requestPreview();
+
+    void requestBlockTypeImpressions(BlockTypeImpressionsCallback blockTypeImpressionsCallback);
+
+    void setBlockTypeImpressions(ReadableMap impressions);
 
 }

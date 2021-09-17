@@ -66,6 +66,8 @@ describe( 'Multi-entity save flow', () => {
 		const saveA11ySelector =
 			'.edit-post-layout__toggle-entities-saved-states-panel-button';
 		const publishPanelSelector = '.editor-post-publish-panel';
+		const confirmTitleButtonSelector =
+			'.wp-block-template-part__placeholder-create-new__title-form .components-button.is-primary';
 
 		// Reusable assertions inside Post editor.
 		const assertMultiSaveEnabled = async () => {
@@ -104,6 +106,11 @@ describe( 'Multi-entity save flow', () => {
 				createNewButtonSelector
 			);
 			await createNewButton.click();
+			const confirmTitleButton = await page.waitForSelector(
+				confirmTitleButtonSelector
+			);
+			await confirmTitleButton.click();
+
 			await page.waitForSelector( activatedTemplatePartSelector );
 			await page.click( '.block-editor-button-block-appender' );
 			await page.click( '.editor-block-list-item-paragraph' );

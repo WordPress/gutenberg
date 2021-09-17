@@ -11,7 +11,7 @@ import * as styles from '../styles';
 import { useCx } from '../../utils/hooks/use-cx';
 
 /**
- * @param {import('../../ui/context').PolymorphicComponentProps<{ children: import('react').ReactNode }, 'div'>} props
+ * @param {import('../../ui/context').WordPressComponentProps<{ children: import('react').ReactNode }, 'div'>} props
  */
 export function useCardMedia( props ) {
 	const { className, ...otherProps } = useContextSystem( props, 'CardMedia' );
