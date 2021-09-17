@@ -25,7 +25,7 @@ jest.mock( '@wordpress/blocks', () => {
 
 describe( 'converting menu items to blocks', () => {
 	it( 'converts an flat structure of menu item objects to blocks', () => {
-		const { innerBlocks: actual } = menuItemsToBlocks( [
+		const actual = menuItemsToBlocks( [
 			{
 				id: 1,
 				title: {
@@ -77,7 +77,7 @@ describe( 'converting menu items to blocks', () => {
 	} );
 
 	it( 'converts an nested structure of menu item objects to nested blocks', () => {
-		const { innerBlocks: actual } = menuItemsToBlocks( [
+		const actual = menuItemsToBlocks( [
 			{
 				id: 1,
 				title: {
@@ -238,7 +238,7 @@ describe( 'converting menu items to blocks', () => {
 	} );
 
 	it( 'respects menu order when converting to blocks', () => {
-		const { innerBlocks: actual } = menuItemsToBlocks( [
+		const actual = menuItemsToBlocks( [
 			{
 				id: 1,
 				title: {
@@ -366,7 +366,7 @@ describe( 'converting menu items to blocks', () => {
 	} );
 
 	it( 'returns an empty array when menu items argument is an empty array', () => {
-		const { innerBlocks: actual } = menuItemsToBlocks( [] );
+		const actual = menuItemsToBlocks( [] );
 		expect( actual ).toEqual( [] );
 	} );
 } );

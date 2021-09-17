@@ -143,6 +143,7 @@ describe( 'getNavigationPostForMenu', () => {
 					innerBlocks: [
 						{
 							attributes: {
+								__internalRecordId: 100,
 								label: 'wp.com',
 								url: 'http://wp.com',
 								className: 'menu classes',
@@ -157,6 +158,7 @@ describe( 'getNavigationPostForMenu', () => {
 						},
 						{
 							attributes: {
+								__internalRecordId: 101,
 								label: 'wp.org',
 								url: 'http://wp.org',
 								opensInNewTab: true,
@@ -168,6 +170,7 @@ describe( 'getNavigationPostForMenu', () => {
 						},
 						{
 							attributes: {
+								__internalRecordId: 102,
 								label: 'My Example Page',
 								url: '/my-example-page/',
 								opensInNewTab: true,
@@ -188,7 +191,7 @@ describe( 'getNavigationPostForMenu', () => {
 			},
 		};
 
-		expect( generator.next().value ).toEqual(
+		expect( generator.next( menuItems ).value ).toEqual(
 			dispatch(
 				'core',
 				'receiveEntityRecords',
@@ -274,13 +277,8 @@ describe( 'getNavigationPostForMenu', () => {
 			},
 		];
 
-		// // Gen step: yield 'SET_MENU_ITEM_TO_CLIENT_ID_MAPPING',
-		// By feeding `menuItems` to the generator this will overload the **result** of
-		// the call to yield resolveMenuItems( menuId );
-		generator.next( menuItems );
-
 		// Gen step: yield persistPost
-		const persistPostAction = generator.next().value;
+		const persistPostAction = generator.next( menuItems ).value;
 
 		// Get the core/navigation-link blocks from the generated core/navigation block innerBlocks.
 		const blockAttrs = persistPostAction.args[ 2 ].blocks[ 0 ].innerBlocks.map(
