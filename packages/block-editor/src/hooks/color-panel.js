@@ -1,7 +1,6 @@
 /**
  * WordPress dependencies
  */
-import { __ } from '@wordpress/i18n';
 import { useState, useEffect } from '@wordpress/element';
 
 /**
@@ -55,9 +54,9 @@ export default function ColorPanel( {
 	return (
 		<InspectorControls>
 			<PanelColorGradientSettings
-				title={ __( 'Color' ) }
 				initialOpen={ false }
 				settings={ settings }
+				showTitle={ false }
 			>
 				{ enableContrastChecking && (
 					<ContrastChecker

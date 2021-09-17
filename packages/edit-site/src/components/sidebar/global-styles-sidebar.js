@@ -89,6 +89,7 @@ function GlobalStylesLevel( {
 				<NavigationMenu
 					menu={ parentMenu + '.typography' }
 					parentMenu={ parentMenu }
+					title={ __( 'Typography' ) }
 				>
 					<NavigationItem>
 						<TypographyPanel
@@ -104,6 +105,7 @@ function GlobalStylesLevel( {
 				<NavigationMenu
 					menu={ parentMenu + '.color' }
 					parentMenu={ parentMenu }
+					title={ __( 'Colors' ) }
 				>
 					<NavigationItem>
 						<ColorPanel
@@ -193,7 +195,11 @@ export default function GlobalStylesSidebar() {
 						title={ __( 'Blocks' ) }
 					/>
 				</NavigationMenu>
-				<NavigationMenu menu="blocks" parentMenu="root">
+				<NavigationMenu
+					menu="blocks"
+					parentMenu="root"
+					title={ __( 'Blocks' ) }
+				>
 					{ map( blocks, ( _, name ) => (
 						<NavigationItem
 							key={ 'menu-itemblock-' + name }
@@ -208,6 +214,7 @@ export default function GlobalStylesSidebar() {
 						key={ 'menu-block-' + name }
 						menu={ 'block-' + name }
 						parentMenu="blocks"
+						title={ getPanelTitle( name ) }
 					>
 						<GlobalStylesLevel
 							parentMenu={ 'block-' + name }
