@@ -121,7 +121,7 @@ const batchInsertPlaceholderMenuItems = ( annotatedBlocks ) => async ( {
 		.filter( ( { block } ) => ! getRecordIdFromBlock( block ) )
 		.map( ( { block } ) => async ( { saveEntityRecord } ) => {
 			const record = await saveEntityRecord( 'root', 'menuItem', {
-				title: 'Menu item',
+				title: __( 'Menu item' ),
 				url: '#placeholder',
 				menu_order: 1,
 			} );
