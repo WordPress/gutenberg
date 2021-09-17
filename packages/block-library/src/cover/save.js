@@ -35,6 +35,7 @@ export default function save( { attributes } ) {
 		dimRatio,
 		focalPoint,
 		hasParallax,
+		isDark,
 		isRepeated,
 		overlayColor,
 		url,
@@ -42,7 +43,6 @@ export default function save( { attributes } ) {
 		id,
 		minHeight: minHeightProp,
 		minHeightUnit,
-		isDark,
 	} = attributes;
 	const overlayColorClass = getColorClassName(
 		'background-color',
@@ -70,8 +70,8 @@ export default function save( { attributes } ) {
 	const objectPosition =
 		// prettier-ignore
 		focalPoint && isImgElement
-			? `${ Math.round( focalPoint.x * 100 ) }% ${ Math.round( focalPoint.y * 100 ) }%`
-			: undefined;
+			 ? `${ Math.round( focalPoint.x * 100 ) }% ${ Math.round( focalPoint.y * 100 ) }%`
+			 : undefined;
 
 	const classes = classnames(
 		dimRatioToClass( dimRatio ),

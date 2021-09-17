@@ -212,18 +212,13 @@ function ResizableCover( {
  *                               color are set, dimRatio is used to decide what is used
  *                               for background darkness checking purposes.
  * @param {?string} overlayColor String containing the overlay color value if one exists.
- *                               The default is black to match the CSS.
  * @param {?Object} elementRef   If a media background is set, elementRef should contain a reference to a
  *                               dom element that renders that media.
- * @param {?Function} setAttributes Function to set attributes on the block.
+ *
+ * @return {boolean} True if the cover background is considered "dark" and false otherwise.
  */
-function useCoverIsDark(
-	url,
-	dimRatio = 50,
-	overlayColor = '#000000',
-	elementRef,
-	setAttributes
-) {
+function useCoverIsDark( url, dimRatio = 50, overlayColor, elementRef ) {
+	const [ isDark, setIsDark ] = useState( false );
 	useEffect( () => {
 		// If opacity is lower than 50 the dominant color is the image or video color,
 		// so use that color for the dark mode computation.
@@ -231,37 +226,30 @@ function useCoverIsDark(
 			retrieveFastAverageColor().getColorAsync(
 				elementRef.current,
 				( color ) => {
-					setAttributes( {
-						isDark: color.isDark,
-					} );
+					setIsDark( color.isDark );
 				}
 			);
 		}
-	}, [ url, url && dimRatio <= 50 && elementRef.current, setAttributes ] );
+	}, [ url, url && dimRatio <= 50 && elementRef.current, setIsDark ] );
 	useEffect( () => {
 		// If opacity is greater than 50 the dominant color is the overlay color,
 		// so use that color for the dark mode computation.
 		if ( dimRatio > 50 || ! url ) {
 			if ( ! overlayColor ) {
 				// If no overlay color exists the overlay color is black (isDark )
-				setAttributes( {
-					isDark: true,
-				} );
+				setIsDark( true );
 				return;
 			}
-			setAttributes( {
-				isDark: tinycolor( overlayColor ).isDark(),
-			} );
+			setIsDark( tinycolor( overlayColor ).isDark() );
 		}
-	}, [ overlayColor, dimRatio > 50 || ! url, setAttributes ] );
+	}, [ overlayColor, dimRatio > 50 || ! url, setIsDark ] );
 	useEffect( () => {
 		if ( ! url && ! overlayColor ) {
 			// Reset isDark
-			setAttributes( {
-				isDark: false,
-			} );
+			setIsDark( false );
 		}
-	}, [ ! url && ! overlayColor, setAttributes ] );
+	}, [ ! url && ! overlayColor, setIsDark ] );
+	return isDark;
 }
 
 function mediaPosition( { x, y } ) {
@@ -329,13 +317,13 @@ function CoverEdit( {
 		dimRatio,
 		focalPoint,
 		hasParallax,
+		isDark,
 		isRepeated,
 		minHeight,
 		minHeightUnit,
 		style: styleAttribute,
 		url,
 		alt,
-		isDark,
 	} = attributes;
 	const {
 		gradientClass,
@@ -392,13 +380,16 @@ function CoverEdit( {
 	};
 
 	const isDarkElement = useRef();
-	useCoverIsDark(
+	const isCoverDark = useCoverIsDark(
 		url,
 		dimRatio,
 		overlayColor.color,
-		isDarkElement,
-		setAttributes
+		isDarkElement
 	);
+
+	useEffect( () => {
+		setAttributes( { isDark: isCoverDark } );
+	}, [ isCoverDark ] );
 
 	const isImageBackground = IMAGE_BACKGROUND_TYPE === backgroundType;
 	const isVideoBackground = VIDEO_BACKGROUND_TYPE === backgroundType;
@@ -660,6 +651,7 @@ function CoverEdit( {
 	const classes = classnames(
 		dimRatioToClass( dimRatio ),
 		{
+			'is-dark-theme': isDark,
 			'is-light': ! isDark,
 			'has-background-dim': dimRatio !== 0,
 			'is-transient': isUploadingMedia,

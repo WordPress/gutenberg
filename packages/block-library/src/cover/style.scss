@@ -18,12 +18,12 @@
 		// Mobile Safari does not support fixed background attachment properly.
 		// See also https://stackoverflow.com/questions/24154666/background-size-cover-not-working-on-ios
 		// Chrome on Android does not appear to support the attachment at all: https://issuetracker.google.com/issues/36908439
-		@supports (-webkit-overflow-scrolling: touch) {
+		@supports ( -webkit-overflow-scrolling: touch ) {
 			background-attachment: scroll;
 		}
 
 		// Remove the appearance of scrolling based on OS-level animation preferences.
-		@media (prefers-reduced-motion: reduce) {
+		@media ( prefers-reduced-motion: reduce ) {
 			background-attachment: scroll;
 		}
 	}
@@ -63,7 +63,6 @@
 		opacity: 0.5;
 	}
 
-
 	@for $i from 1 through 10 {
 		&.has-background-dim.has-background-dim-#{ $i * 10 } {
 			&:not(.has-background-gradient)::before,
@@ -102,10 +101,9 @@
 	}
 
 	.wp-block-cover__inner-container {
-		color: $white;
 		width: 100%;
 		z-index: z-index(".wp-block-cover__inner-container");
-
+		color: $white;
 	}
 
 	&.is-light {
@@ -218,8 +216,7 @@ section.wp-block-cover-image h2,
 	}
 }
 
-.wp-block-cover-image
-.wp-block-cover {
+.wp-block-cover-image .wp-block-cover {
 	&.has-left-content {
 		justify-content: flex-start;
 	}
