@@ -22,6 +22,7 @@ import { Platform } from '@wordpress/element';
 
 const isWeb = Platform.OS === 'web';
 
+/** @type {Record<string, WPUnitControlUnit>} */
 const allUnits = {
 	px: {
 		value: 'px',
