@@ -11,10 +11,11 @@ import {
 	__experimentalNavigation as Navigation,
 	__experimentalNavigationItem as NavigationItem,
 	__experimentalNavigationMenu as NavigationMenu,
+	__experimentalNavigationGroup as NavigationGroup,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { getBlockType } from '@wordpress/blocks';
-import { styles } from '@wordpress/icons';
+import { layout, brush, styles, typography } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -63,27 +64,32 @@ function GlobalStylesLevel( {
 
 	return (
 		<>
-			{ hasTypographyPanel && (
-				<NavigationItem
-					item="item-typography"
-					navigateToMenu={ parentMenu + '.typography' }
-					title={ __( 'Typography' ) }
-				/>
-			) }
-			{ hasColorPanel && (
-				<NavigationItem
-					item="item-color"
-					navigateToMenu={ parentMenu + '.color' }
-					title={ __( 'Colors' ) }
-				/>
-			) }
-			{ hasLayoutPanel && (
-				<NavigationItem
-					item="item-layout"
-					navigateToMenu={ parentMenu + '.layout' }
-					title={ __( 'Layout' ) }
-				/>
-			) }
+			<NavigationGroup>
+				{ hasTypographyPanel && (
+					<NavigationItem
+						item="item-typography"
+						navigateToMenu={ parentMenu + '.typography' }
+						icon={ typography }
+						title={ __( 'Typography' ) }
+					/>
+				) }
+				{ hasColorPanel && (
+					<NavigationItem
+						item="item-color"
+						navigateToMenu={ parentMenu + '.color' }
+						title={ __( 'Colors' ) }
+						icon={ brush }
+					/>
+				) }
+				{ hasLayoutPanel && (
+					<NavigationItem
+						item="item-layout"
+						navigateToMenu={ parentMenu + '.layout' }
+						title={ __( 'Layout' ) }
+						icon={ layout }
+					/>
+				) }
+			</NavigationGroup>
 
 			{ hasTypographyPanel && (
 				<NavigationMenu
@@ -189,11 +195,21 @@ export default function GlobalStylesSidebar() {
 						getSetting={ getSetting }
 						setSetting={ setSetting }
 					/>
-					<NavigationItem
-						item="item-blocks"
-						navigateToMenu="blocks"
-						title={ __( 'Blocks' ) }
-					/>
+					<NavigationGroup className="edit-site-global-styles-sidebar__blocks-group">
+						<NavigationItem
+							className="edit-site-global-styles-sidebar__blocks-group-help"
+							isText
+						>
+							{ __(
+								'Customize the appearance of specific blocks for the whole site'
+							) }
+						</NavigationItem>
+						<NavigationItem
+							item="item-blocks"
+							navigateToMenu="blocks"
+							title={ __( 'Blocks' ) }
+						/>
+					</NavigationGroup>
 				</NavigationMenu>
 				<NavigationMenu
 					menu="blocks"
