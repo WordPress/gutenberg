@@ -11,7 +11,7 @@ import { useSelect } from '@wordpress/data';
  * Internal dependencies
  */
 import { store as blockEditorStore } from '../../store';
-import { getActiveStyle } from '../block-styles/utils';
+import { getActiveStyle, getRenderedStyles } from '../block-styles/utils';
 
 export default function DefaultStylePicker( { clientId } ) {
 	const {
@@ -36,14 +36,17 @@ export default function DefaultStylePicker( { clientId } ) {
 							blockStyle
 						)
 				: null;
+			// The blocks styles inspector shows a default option,
+			// so make sure this component knows about it too.
+			const renderedStyles = getRenderedStyles( blockStyles );
 
 			return {
 				preferredStyle: preferredStyleVariations?.value?.[ block.name ],
 				onUpdatePreferredStyleVariations: onUpdate,
-				styles: blockStyles,
+				styles: renderedStyles,
 				blockName: block.name,
 				activeStyle: getActiveStyle(
-					blockStyles,
+					renderedStyles,
 					block.attributes.className || ''
 				),
 			};
@@ -52,13 +55,15 @@ export default function DefaultStylePicker( { clientId } ) {
 	);
 	const selectOnChange = useCallback( () => {
 		onUpdatePreferredStyleVariations( activeStyle.name );
-	}, [ activeStyle.name, onUpdatePreferredStyleVariations ] );
+	}, [ activeStyle?.name, onUpdatePreferredStyleVariations ] );
 
 	const preferredStyleLabel = useMemo( () => {
 		const preferredStyleObject = styles.find(
 			( style ) => style.name === preferredStyle
 		);
-		return preferredStyleObject?.label || preferredStyleObject?.name;
+		return preferredStyleObject
+			? preferredStyleObject?.label || preferredStyleObject?.name
+			: __( 'Not set' );
 	}, [ preferredStyle ] );
 
 	return (
@@ -70,7 +75,7 @@ export default function DefaultStylePicker( { clientId } ) {
 						{ preferredStyleLabel }
 					</span>
 				</div>
-				{ preferredStyle !== activeStyle.name && (
+				{ preferredStyle !== activeStyle?.name && (
 					<Button
 						onClick={ selectOnChange }
 						variant="link"
