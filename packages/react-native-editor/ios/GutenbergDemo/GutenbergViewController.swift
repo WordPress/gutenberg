@@ -261,7 +261,7 @@ extension GutenbergViewController: GutenbergBridgeDelegate {
         print(#function)
     }
 
-    func gutenbergDidRequestGotoMyCustomerSupportTickets() {
+    func gutenbergDidRequestGotoCustomerSupportOptions() {
         print(#function)
     }
 }

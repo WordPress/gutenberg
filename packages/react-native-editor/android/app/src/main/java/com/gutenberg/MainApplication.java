@@ -265,8 +265,8 @@ public class MainApplication extends Application implements ReactApplication, Gu
             }
 
             @Override
-            public void requestGotoMyCustomerSupportTickets() {
-                Toast.makeText(MainApplication.this, "requestGotoMyCustomerSupportTickets called", Toast.LENGTH_SHORT).show();
+            public void requestGotoCustomerSupportOptions() {
+                Toast.makeText(MainApplication.this, "requestGotoCustomerSupportOptions called", Toast.LENGTH_SHORT).show();
             }
         }, isDarkMode());
 

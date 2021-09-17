@@ -418,8 +418,8 @@ export function requestContactCustomerSupport() {
 	RNReactNativeGutenbergBridge.requestContactCustomerSupport();
 }
 
-export function requestGotoMyCustomerSupportTickets() {
-	RNReactNativeGutenbergBridge.requestGotoMyCustomerSupportTickets();
+export function requestGotoCustomerSupportOptions() {
+	RNReactNativeGutenbergBridge.requestGotoCustomerSupportOptions();
 }
 
 export default RNReactNativeGutenbergBridge;

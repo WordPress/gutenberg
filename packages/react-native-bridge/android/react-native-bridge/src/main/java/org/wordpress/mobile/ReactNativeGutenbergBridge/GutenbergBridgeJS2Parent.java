@@ -173,5 +173,5 @@ public interface GutenbergBridgeJS2Parent extends RequestExecutor {
 
     void requestContactCustomerSupport();
 
-    void requestGotoMyCustomerSupportTickets();
+    void requestGotoCustomerSupportOptions();
 }

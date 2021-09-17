@@ -26,7 +26,7 @@ import { store as editorStore } from '@wordpress/editor';
 import { usePreferredColorSchemeStyle } from '@wordpress/compose';
 import {
 	requestContactCustomerSupport,
-	requestGotoMyCustomerSupportTickets,
+	requestGotoCustomerSupportOptions,
 } from '@wordpress/react-native-bridge';
 
 /**
@@ -162,9 +162,9 @@ function EditorHelpTopics( { close, isVisible, onClose } ) {
 											}
 											{
 												<HelpGetSupportButton
-													title={ __( 'My Tickets' ) }
+													title={ __( 'All support options' ) }
 													onPress={
-														requestGotoMyCustomerSupportTickets
+														requestGotoCustomerSupportOptions
 													}
 												/>
 											}

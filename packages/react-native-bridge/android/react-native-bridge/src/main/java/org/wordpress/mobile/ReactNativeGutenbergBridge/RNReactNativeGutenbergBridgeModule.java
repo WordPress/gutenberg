@@ -430,7 +430,7 @@ public class RNReactNativeGutenbergBridgeModule extends ReactContextBaseJavaModu
     }
 
     @ReactMethod
-    public void requestGotoMyCustomerSupportTickets() {
-        mGutenbergBridgeJS2Parent.requestGotoMyCustomerSupportTickets();
+    public void requestGotoCustomerSupportOptions() {
+        mGutenbergBridgeJS2Parent.requestGotoCustomerSupportOptions();
     }
 }
