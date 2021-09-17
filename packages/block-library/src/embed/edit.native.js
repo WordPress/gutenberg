@@ -36,6 +36,9 @@ import { View } from '@wordpress/primitives';
 // The inline preview feature will be released progressible, for this reason
 // the embed will only be considered previewable for the following providers list.
 const PREVIEWABLE_PROVIDERS = [ 'youtube', 'twitter', 'instagram', 'vimeo' ];
+// Some providers are rendering the inline preview as a WordPress embed and
+// are not supported yet, so we need to disallow them with a fixed providers list.
+const NOT_PREVIEWABLE_WP_EMBED_PROVIDERS = [ 'pinterest' ];
 
 const EmbedEdit = ( props ) => {
 	const {
@@ -215,8 +218,10 @@ const EmbedEdit = ( props ) => {
 
 	const isProviderPreviewable =
 		PREVIEWABLE_PROVIDERS.includes( providerNameSlug ) ||
-		// For WordPress embeds, we enable the inline preview for all its providers.
-		'wp-embed' === type;
+		// For WordPress embeds, we enable the inline preview for all its providers
+		// except the ones that are not supported yet.
+		( 'wp-embed' === type &&
+			! NOT_PREVIEWABLE_WP_EMBED_PROVIDERS.includes( providerNameSlug ) );
 
 	return (
 		<>
