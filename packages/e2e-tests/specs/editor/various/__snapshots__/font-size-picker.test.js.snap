@@ -30,7 +30,7 @@ exports[`Font Size Picker should reset a named font size using input field 1`] =
 <!-- /wp:paragraph -->"
 `;
 
-exports[`Font Size Picker should reset a named font size using the reset button 1`] = `
+exports[`Font Size Picker should reset a named font size using panel menu item reset 1`] = `
 "<!-- wp:paragraph -->
 <p>Paragraph with font size reset using button</p>
 <!-- /wp:paragraph -->"

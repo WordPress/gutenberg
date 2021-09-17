@@ -17,6 +17,8 @@ describe( 'Font Size Picker', () => {
 	const FONT_SIZE_LABEL_SELECTOR = "//label[contains(text(), 'Font size')]";
 	const CUSTOM_FONT_SIZE_LABEL_SELECTOR =
 		"//fieldset[legend[contains(text(),'Font size')]]//label[contains(text(), 'Custom')]";
+	const TYPOGRAPHY_PANEL_MENU_SELECTOR = `//button[contains(@class, 'components-dropdown-menu__toggle') and contains(@aria-label, 'Typography')]`;
+
 	beforeEach( async () => {
 		await createNewPost();
 	} );
@@ -78,7 +80,7 @@ describe( 'Font Size Picker', () => {
 		expect( content ).toMatchSnapshot();
 	} );
 
-	it( 'should reset a named font size using the reset button', async () => {
+	it( 'should reset a named font size using panel menu item reset', async () => {
 		// Create a paragraph block with some content.
 		await clickBlockAppender();
 		await page.keyboard.type(
@@ -94,9 +96,8 @@ describe( 'Font Size Picker', () => {
 		await pressKeyTimes( 'ArrowDown', 2 );
 		await page.keyboard.press( 'Enter' );
 
-		await page.keyboard.press( 'Tab' );
-		await page.keyboard.press( 'Tab' );
-		await page.keyboard.press( 'Tab' );
+		// Open Typography ToolsPanel, font size will be first in menu and gain focus.
+		await first( await page.$x( TYPOGRAPHY_PANEL_MENU_SELECTOR ) ).click();
 
 		await page.keyboard.press( 'Enter' );
 
