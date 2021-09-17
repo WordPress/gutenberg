@@ -137,7 +137,12 @@ _Returns_
 
 ### createMenu
 
-Undocumented declaration.
+Create menus and all linked resources for the menu using the REST API.
+
+_Parameters_
+
+-   _menu_ `Object`: Rest payload for the menu
+-   _menuItems_ `?Array`: Data for any menu items to be created.
 
 ### createNewPost
 
@@ -203,7 +208,7 @@ _Parameters_
 
 ### deleteAllMenus
 
-Undocumented declaration.
+Delete all menus using the REST API
 
 ### deleteAllWidgets
 

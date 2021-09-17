@@ -30,6 +30,9 @@ const menuItemObjectMatchers = {
 	page: ( menuItem, page ) => menuItem.title === page.title.raw,
 };
 
+/**
+ * Delete all menus using the REST API
+ */
 export async function deleteAllMenus() {
 	const menus = await rest( { path: menusEndpoint } );
 
@@ -41,6 +44,12 @@ export async function deleteAllMenus() {
 	);
 }
 
+/**
+ * Create menus and all linked resources for the menu using the REST API.
+ *
+ * @param {Object} menu      Rest payload for the menu
+ * @param {?Array} menuItems Data for any menu items to be created.
+ */
 export async function createMenu( menu, menuItems ) {
 	// Step 1. Create the menu.
 	const menuResponse = await rest( {
