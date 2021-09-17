@@ -11,6 +11,7 @@ import {
 	createJSONResponse,
 	createMenu,
 	deleteAllMenus,
+	deleteAllObjects,
 	pressKeyTimes,
 	pressKeyWithModifier,
 	setUpResponseMocking,
@@ -129,10 +130,12 @@ describe( 'Navigation editor', () => {
 
 	beforeAll( async () => {
 		await deleteAllMenus();
+		await deleteAllObjects();
 	} );
 
 	afterEach( async () => {
 		await deleteAllMenus();
+		await deleteAllObjects();
 		await setUpResponseMocking( [] );
 	} );
 
@@ -188,7 +191,6 @@ describe( 'Navigation editor', () => {
 	it( 'allows creation of a menu when there are existing menu items', async () => {
 		await createMenu( { name: 'Test Menu 1' }, menuItemsFixture );
 		await createMenu( { name: 'Test Menu 2' }, menuItemsFixture );
-		await createMenu( { name: 'Test Menu 3' }, menuItemsFixture );
 		await visitNavigationEditor();
 
 		// Wait for the header to show the menu name.
@@ -221,7 +223,6 @@ describe( 'Navigation editor', () => {
 	it( 'displays the first created menu when at least one menu exists', async () => {
 		await createMenu( { name: 'Test Menu 1' }, menuItemsFixture );
 		await createMenu( { name: 'Test Menu 2' }, menuItemsFixture );
-		await createMenu( { name: 'Test Menu 3' }, menuItemsFixture );
 
 		await visitNavigationEditor();
 

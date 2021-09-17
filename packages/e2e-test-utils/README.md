@@ -205,6 +205,10 @@ _Parameters_
 
 Undocumented declaration.
 
+### deleteAllObjects
+
+Undocumented declaration.
+
 ### deleteAllWidgets
 
 Delete all the widgets in the widgets screen.
