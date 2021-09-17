@@ -164,27 +164,26 @@ function ListView(
 
 	const positionsRef = useRef( {} );
 	const positions = positionsRef.current;
-	const setPosition = ( clientId, offset ) =>
-		( positions[ clientId ] = offset );
+	const setPosition = useCallback(
+		( clientId, offset ) => ( positions[ clientId ] = offset ),
+		[ positions ]
+	);
 
 	// Used in dragging to specify a drop target
 	const lastTarget = useRef( null );
 
-	const dragStart = ( clientId ) => {
-		if ( ! draggingId && stateType === GLOBAL ) {
-			setDraggingId( clientId );
-			collapse( clientId );
-		}
-	};
-
-	const dragEnd = ( clientId ) => {
-		dropItem();
-		setDraggingId( null );
-		expand( clientId );
-	};
+	const dragStart = useCallback(
+		( clientId ) => {
+			if ( ! draggingId && stateType === GLOBAL ) {
+				setDraggingId( clientId );
+				collapse( clientId );
+			}
+		},
+		[ draggingId, stateType, setDraggingId, collapse ]
+	);
 
 	// Fired on item drop
-	const dropItem = async () => {
+	const dropItem = useCallback( async () => {
 		const target = lastTarget.current;
 		if ( ! target ) {
 			setStateType( GLOBAL );
@@ -203,73 +202,143 @@ function ListView(
 		} catch ( e ) {
 			setStateType( GLOBAL );
 		}
-	};
+	}, [ lastTarget.current, setStateType ] );
+
+	const dragEnd = useCallback(
+		( clientId ) => {
+			dropItem();
+			setDraggingId( null );
+			expand( clientId );
+		},
+		[ dropItem, setDraggingId, expand ]
+	);
+
 	// Note that this is fired on onViewportBoxUpdate instead of onDrag.
-	const moveItem = ( {
-		block,
-		translate,
-		translateX,
-		listPosition,
-		velocity,
-	} ) => {
-		const ITEM_HEIGHT = 36;
-		const LEFT_RIGHT_DRAG_THRESHOLD = 15;
-		const UP = 'up';
-		const DOWN = 'down';
+	const moveItem = useCallback(
+		( { block, translate, translateX, listPosition, velocity } ) => {
+			const ITEM_HEIGHT = 36;
+			const LEFT_RIGHT_DRAG_THRESHOLD = 15;
+			const UP = 'up';
+			const DOWN = 'down';
 
-		const { clientId } = block;
+			const { clientId } = block;
 
-		const v = velocity?.get() ?? 0;
-		if ( v === 0 ) {
-			return;
-		}
-
-		const direction = v > 0 ? DOWN : UP;
-
-		const draggingUpPastBounds =
-			positions[ listPosition + 1 ] === undefined &&
-			direction === UP &&
-			translate > 0;
-		const draggingDownPastBounds =
-			listPosition === 0 && direction === DOWN && translate < 0;
-
-		if ( draggingUpPastBounds || draggingDownPastBounds ) {
-			// If we've dragged past all items with the first or last item, don't start checking for potential swaps
-			// until we're near other items
-			return;
-		}
-
-		if (
-			( direction === DOWN && translate < 0 ) ||
-			( direction === UP && translate > 0 )
-		) {
-			//We're skipping over multiple items, wait until user catches up to the new slot
-			return;
-		}
-
-		if ( Math.abs( translate ) < ITEM_HEIGHT / 2 ) {
-			// Don't bother calculating anything if we haven't moved half a step.
-			return;
-		}
-
-		if ( Math.abs( translateX ) > LEFT_RIGHT_DRAG_THRESHOLD ) {
-			// If we move to the right or left as we drag, allow more freeform targeting
-			// so we can find a new parent container
-			const steps = Math.ceil( Math.abs( translate / ITEM_HEIGHT ) );
-			const nextIndex =
-				direction === UP ? listPosition - steps : listPosition + steps;
-
-			const targetPosition = positions[ nextIndex ];
-
-			if ( ! targetPosition ) {
+			const v = velocity?.get() ?? 0;
+			if ( v === 0 ) {
 				return;
 			}
+
+			const direction = v > 0 ? DOWN : UP;
+
+			const draggingUpPastBounds =
+				positions[ listPosition + 1 ] === undefined &&
+				direction === UP &&
+				translate > 0;
+			const draggingDownPastBounds =
+				listPosition === 0 && direction === DOWN && translate < 0;
+
+			if ( draggingUpPastBounds || draggingDownPastBounds ) {
+				// If we've dragged past all items with the first or last item, don't start checking for potential swaps
+				// until we're near other items
+				return;
+			}
+
 			if (
-				targetPosition.dropSibling &&
-				( translateX < 0 ||
-					( translateX > 0 && ! targetPosition.dropContainer ) )
+				( direction === DOWN && translate < 0 ) ||
+				( direction === UP && translate > 0 )
 			) {
-				//Insert as a sibling
+				//We're skipping over multiple items, wait until user catches up to the new slot
+				return;
+			}
+
+			if ( Math.abs( translate ) < ITEM_HEIGHT / 2 ) {
+				// Don't bother calculating anything if we haven't moved half a step.
+				return;
+			}
+
+			if ( Math.abs( translateX ) > LEFT_RIGHT_DRAG_THRESHOLD ) {
+				// If we move to the right or left as we drag, allow more freeform targeting
+				// so we can find a new parent container
+				const steps = Math.ceil( Math.abs( translate / ITEM_HEIGHT ) );
+				const nextIndex =
+					direction === UP
+						? listPosition - steps
+						: listPosition + steps;
+
+				const targetPosition = positions[ nextIndex ];
+
+				if ( ! targetPosition ) {
+					return;
+				}
+				if (
+					targetPosition.dropSibling &&
+					( translateX < 0 ||
+						( translateX > 0 && ! targetPosition.dropContainer ) )
+				) {
+					//Insert as a sibling
+					const {
+						newTree: treeWithoutDragItem,
+						removeParentId,
+					} = removeItemFromTree( clientIdsTree, clientId, rootId );
+					const { newTree, targetIndex, targetId } = addItemToTree(
+						treeWithoutDragItem,
+						targetPosition.clientId,
+						block,
+						direction === DOWN ||
+							( direction === UP &&
+								targetPosition.isLastChild &&
+								! targetPosition.dropContainer ),
+						rootId
+					);
+					lastTarget.current = {
+						clientId,
+						originalParent: removeParentId,
+						targetId,
+						targetIndex,
+					};
+					setTree( newTree );
+					return;
+				}
+
+				if (
+					targetPosition.dropContainer &&
+					( translateX > 0 ||
+						( translateX < 0 && ! targetPosition.dropSibling ) )
+				) {
+					//Nest block under parent
+					const {
+						newTree: treeWithoutDragItem,
+						removeParentId,
+					} = removeItemFromTree( clientIdsTree, clientId, rootId );
+					const newTree = addChildItemToTree(
+						treeWithoutDragItem,
+						targetPosition.clientId,
+						block
+					);
+					lastTarget.current = {
+						clientId,
+						originalParent: removeParentId,
+						targetId: targetPosition.clientId,
+						targetIndex: 0,
+					};
+					setTree( newTree );
+					return;
+				}
+			}
+
+			// If we drag straight up or down, find the next valid sibling to swap places with:
+			const [ targetPosition, nextIndex ] = findFirstValidSibling(
+				positions,
+				listPosition,
+				v
+			);
+
+			if (
+				targetPosition &&
+				Math.abs( translate ) >
+					( ITEM_HEIGHT * Math.abs( listPosition - nextIndex ) ) / 2
+			) {
+				//Sibling swap
 				const {
 					newTree: treeWithoutDragItem,
 					removeParentId,
@@ -278,10 +347,7 @@ function ListView(
 					treeWithoutDragItem,
 					targetPosition.clientId,
 					block,
-					direction === DOWN ||
-						( direction === UP &&
-							targetPosition.isLastChild &&
-							! targetPosition.dropContainer ),
+					direction === DOWN,
 					rootId
 				);
 				lastTarget.current = {
@@ -291,68 +357,10 @@ function ListView(
 					targetIndex,
 				};
 				setTree( newTree );
-				return;
 			}
-
-			if (
-				targetPosition.dropContainer &&
-				( translateX > 0 ||
-					( translateX < 0 && ! targetPosition.dropSibling ) )
-			) {
-				//Nest block under parent
-				const {
-					newTree: treeWithoutDragItem,
-					removeParentId,
-				} = removeItemFromTree( clientIdsTree, clientId, rootId );
-				const newTree = addChildItemToTree(
-					treeWithoutDragItem,
-					targetPosition.clientId,
-					block
-				);
-				lastTarget.current = {
-					clientId,
-					originalParent: removeParentId,
-					targetId: targetPosition.clientId,
-					targetIndex: 0,
-				};
-				setTree( newTree );
-				return;
-			}
-		}
-
-		// If we drag straight up or down, find the next valid sibling to swap places with:
-		const [ targetPosition, nextIndex ] = findFirstValidSibling(
-			positions,
-			listPosition,
-			v
-		);
-
-		if (
-			targetPosition &&
-			Math.abs( translate ) >
-				( ITEM_HEIGHT * Math.abs( listPosition - nextIndex ) ) / 2
-		) {
-			//Sibling swap
-			const {
-				newTree: treeWithoutDragItem,
-				removeParentId,
-			} = removeItemFromTree( clientIdsTree, clientId, rootId );
-			const { newTree, targetIndex, targetId } = addItemToTree(
-				treeWithoutDragItem,
-				targetPosition.clientId,
-				block,
-				direction === DOWN,
-				rootId
-			);
-			lastTarget.current = {
-				clientId,
-				originalParent: removeParentId,
-				targetId,
-				targetIndex,
-			};
-			setTree( newTree );
-		}
-	};
+		},
+		[ clientIdsTree, positions ]
+	);
 
 	const contextValue = useMemo(
 		() => ( {

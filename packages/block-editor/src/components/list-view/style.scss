@@ -284,7 +284,7 @@ $block-navigation-max-indent: 7;
 		cursor: grabbing;
 	}
 
-	button:hover {
+	button.is-hovered {
 		box-shadow: inset 0 0 0 var(--wp-admin-border-width-focus) var(--wp-admin-theme-color);
 	}
 

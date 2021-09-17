@@ -181,6 +181,7 @@ function ListViewBlock( {
 			withExperimentalPersistentListViewFeatures &&
 			isLastOfSelectedBranch,
 		'is-moving': draggingId === clientId, //avoid is-dragging which has an !important rule
+		'is-hovered': isHovered,
 	} );
 
 	const velocity = useMotionValue( 0 );
