@@ -1,7 +1,11 @@
 /**
  * Internal dependencies
  */
-import { getActiveStyle, replaceActiveStyle } from '../utils';
+import {
+	getActiveStyle,
+	getRenderedStyles,
+	replaceActiveStyle,
+} from '../utils';
 
 describe( 'getActiveStyle', () => {
 	it( 'Should return the undefined if no active style', () => {
@@ -72,5 +76,44 @@ describe( 'replaceActiveStyle', () => {
 		expect( replaceActiveStyle( className, activeStyle, newStyle ) ).toBe(
 			'custom-class is-style-small'
 		);
+	} );
+} );
+
+describe( 'getRenderedStyles', () => {
+	it( 'Should return styles collection if there is a default', () => {
+		const styles = [
+			{ name: 'hazlenut' },
+			{ name: 'cashew', isDefault: true },
+		];
+
+		expect( getRenderedStyles( styles ) ).toEqual( styles );
+	} );
+
+	it( 'Should add a default item to the styles collection if there is no default', () => {
+		const styles = [ { name: 'pistachio' }, { name: 'peanut' } ];
+		const defaultStyle = {
+			name: 'default',
+			label: 'default',
+			isDefault: true,
+		};
+
+		expect( getRenderedStyles( styles ) ).toEqual( [
+			defaultStyle,
+			...styles,
+		] );
+	} );
+
+	it( 'Should sort by `defaultStyleId` where passed', () => {
+		const styles = [
+			{ name: 'macadamia' },
+			{ name: 'brazil' },
+			{ name: 'almond', isDefault: true },
+		];
+
+		expect( getRenderedStyles( styles, 'brazil' ) ).toEqual( [
+			{ name: 'brazil' },
+			{ name: 'macadamia' },
+			{ name: 'almond', isDefault: true },
+		] );
 	} );
 } );

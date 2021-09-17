@@ -2,8 +2,8 @@
  * WordPress dependencies
  */
 import { store as blocksStore } from '@wordpress/blocks';
-import { useMemo, useCallback } from '@wordpress/element';
-import { __, sprintf } from '@wordpress/i18n';
+import { useCallback } from '@wordpress/element';
+import { __ } from '@wordpress/i18n';
 import { Button } from '@wordpress/components';
 import { useSelect } from '@wordpress/data';
 
@@ -18,7 +18,6 @@ export default function DefaultStylePicker( { clientId } ) {
 		activeStyle,
 		onUpdatePreferredStyleVariations,
 		preferredStyle,
-		styles,
 	} = useSelect(
 		( select ) => {
 			const { getBlock, getSettings } = select( blockEditorStore );
@@ -43,7 +42,6 @@ export default function DefaultStylePicker( { clientId } ) {
 			return {
 				preferredStyle: preferredStyleVariations?.value?.[ block.name ],
 				onUpdatePreferredStyleVariations: onUpdate,
-				styles: renderedStyles,
 				blockName: block.name,
 				activeStyle: getActiveStyle(
 					renderedStyles,
@@ -57,24 +55,9 @@ export default function DefaultStylePicker( { clientId } ) {
 		onUpdatePreferredStyleVariations( activeStyle.name );
 	}, [ activeStyle?.name, onUpdatePreferredStyleVariations ] );
 
-	const preferredStyleLabel = useMemo( () => {
-		const preferredStyleObject = styles.find(
-			( style ) => style.name === preferredStyle
-		);
-		return preferredStyleObject
-			? preferredStyleObject?.label || preferredStyleObject?.name
-			: __( 'Not set' );
-	}, [ preferredStyle ] );
-
 	return (
 		onUpdatePreferredStyleVariations && (
-			<div>
-				<div className="default-style-picker__current-default">
-					{ __( 'Default style:' ) }
-					<span className="default-style-picker__style-label">
-						{ preferredStyleLabel }
-					</span>
-				</div>
+			<div className="default-style-picker__default-switcher">
 				{ preferredStyle !== activeStyle?.name && (
 					<Button
 						onClick={ selectOnChange }
@@ -82,11 +65,7 @@ export default function DefaultStylePicker( { clientId } ) {
 						label="Set default style"
 						className="default-style-picker__style-button"
 					>
-						{ sprintf(
-							// translators: %s: the name of a block style
-							__( 'Change to %s' ),
-							activeStyle?.label || activeStyle?.name
-						) }
+						{ __( 'Make default' ) }
 					</Button>
 				) }
 			</div>

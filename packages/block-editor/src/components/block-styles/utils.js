@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { find } from 'lodash';
+import { find, sortBy } from 'lodash';
 /**
  * WordPress dependencies
  */
@@ -54,21 +54,24 @@ export function replaceActiveStyle( className, activeStyle, newStyle ) {
 }
 
 /**
- * Returns a collection of styles that can be represented on the frontend.
+ * Returns a sorted collection of styles that can be represented on the frontend.
  * The function checks a style collection for a default style. If none is found, it adds one to
  * act as a fallback for when there is no active style applied to a block. The default item also serves
  * as a switch on the frontend to deactivate non-default styles.
  *
- * @param {Array}          styles Block style variations.
+ * If there is a default selected, we move that to the start of the array.
  *
- * @return {Array<Object?>}       The style collection.
+ * @param {Array}           styles            Block style variations.
+ * @param {string}          defaultStyleId    The currently-selected default style.
+ *
+ * @return {Array<Object?>}                   The style collection.
  */
-export function getRenderedStyles( styles ) {
+export function getRenderedStyles( styles, defaultStyleId ) {
 	if ( ! styles ) {
 		return [];
 	}
 
-	return find( styles, 'isDefault' )
+	const renderedStyles = find( styles, 'isDefault' )
 		? styles
 		: [
 				{
@@ -78,4 +81,13 @@ export function getRenderedStyles( styles ) {
 				},
 				...styles,
 		  ];
+
+	if ( defaultStyleId ) {
+		return sortBy(
+			renderedStyles,
+			( style ) => style.name !== defaultStyleId
+		);
+	}
+
+	return renderedStyles;
 }
