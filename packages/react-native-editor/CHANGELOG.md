@@ -17,6 +17,10 @@ For each user feature we should also add a importance categorization label  to i
 -   [**] Embed block: Implemented the No Preview UI when an embed is successful, but we're unable to show an inline preview [#34626]
 -   [*] Column block: Translate column width's control labels [#34777]
 -   [**] Enable embed preview for Instagram and Vimeo providers. [#34563]
+-   [**] Embed block: Add error bottom sheet with retry and convert to link actions. [#34604]
+
+## 1.61.1
+-   [*] Fix crash related to reusable blocks in the block picker. [#34873]
 
 ## 1.61.0
 -   [**] Enable embed preview for a list of providers (for now only YouTube and Twitter) [#34446]

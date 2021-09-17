@@ -77,8 +77,9 @@ const MediaReplaceFlow = ( {
 	};
 
 	const selectMedia = ( media ) => {
-		onSelect( media );
 		setMediaURLValue( media.url );
+		// Calling `onSelect` after the state update since it might unmount the component.
+		onSelect( media );
 		speak( __( 'The media file has been replaced' ) );
 		removeNotice( errorNoticeID );
 	};

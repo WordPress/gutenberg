@@ -113,8 +113,7 @@ build_files=$(
 	ls build/*/*.{js,css,asset.php} \
 	build/block-library/blocks/*.php \
 	build/block-library/blocks/*/block.json \
-	build/block-library/blocks/*/*.css \
-	build/block-library/blocks/*/*.js \
+	build/block-library/blocks/*/*.{js,css,asset.php} \
 	build/edit-widgets/blocks/*/block.json \
 	build/widgets/blocks/*.php \
 	build/widgets/blocks/*/block.json \
