@@ -18,6 +18,8 @@ export function useToolsPanelItem( props ) {
 		hasValue,
 		isShownByDefault,
 		label,
+		panelId,
+		resetAllFilter,
 		onDeselect = () => undefined,
 		onSelect = () => undefined,
 		...otherProps
@@ -29,33 +31,54 @@ export function useToolsPanelItem( props ) {
 	} );
 
 	const {
+		panelId: currentPanelId,
 		menuItems,
 		registerPanelItem,
 		deregisterPanelItem,
+		flagItemCustomization,
+		isResetting,
 	} = useToolsPanelContext();
 
 	// Registering the panel item allows the panel to include it in its
 	// automatically generated menu and determine its initial checked status.
 	useEffect( () => {
-		registerPanelItem( {
-			hasValue,
-			isShownByDefault,
-			label,
-		} );
+		if ( currentPanelId === panelId ) {
+			registerPanelItem( {
+				hasValue,
+				isShownByDefault,
+				label,
+				resetAllFilter,
+				panelId,
+			} );
+		}
 
 		return () => deregisterPanelItem( label );
-	}, [] );
+	}, [ panelId ] );
 
 	const isValueSet = hasValue();
+	const wasValueSet = usePrevious( isValueSet );
+
+	// If this item represents a default control it will need to notify the
+	// panel when a custom value has been set.
+	useEffect( () => {
+		if ( isShownByDefault && isValueSet && ! wasValueSet ) {
+			flagItemCustomization( label );
+		}
+	}, [ isValueSet, wasValueSet, isShownByDefault, label ] );
 
 	// Note: `label` is used as a key when building menu item state in
 	// `ToolsPanel`.
-	const isMenuItemChecked = menuItems[ label ];
+	const menuGroup = isShownByDefault ? 'default' : 'optional';
+	const isMenuItemChecked = menuItems?.[ menuGroup ]?.[ label ];
 	const wasMenuItemChecked = usePrevious( isMenuItemChecked );
 
 	// Determine if the panel item's corresponding menu is being toggled and
 	// trigger appropriate callback if it is.
 	useEffect( () => {
+		if ( isResetting ) {
+			return;
+		}
+
 		if ( isMenuItemChecked && ! isValueSet && ! wasMenuItemChecked ) {
 			onSelect();
 		}
@@ -63,11 +86,18 @@ export function useToolsPanelItem( props ) {
 		if ( ! isMenuItemChecked && wasMenuItemChecked ) {
 			onDeselect();
 		}
-	}, [ isMenuItemChecked, wasMenuItemChecked, isValueSet ] );
+	}, [ isMenuItemChecked, wasMenuItemChecked, isValueSet, isResetting ] );
+
+	// The item is shown if it is a default control regardless of whether it
+	// has a value. Optional items are shown when they are checked or have
+	// a value.
+	const isShown = isShownByDefault
+		? menuItems?.[ menuGroup ]?.[ label ] !== undefined
+		: isMenuItemChecked;
 
 	return {
 		...otherProps,
-		isShown: isMenuItemChecked,
+		isShown,
 		className: classes,
 	};
 }

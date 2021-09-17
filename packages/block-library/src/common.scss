@@ -3,15 +3,9 @@
 // the colors override the added specificity by link states such as :hover.
 
 :root {
-	// Background colors.
-	@include background-colors();
-
-	// Foreground colors.
-	@include foreground-colors();
-
-	// Gradients
-	@include gradient-colors();
-
+	@include background-colors-deprecated();
+	@include foreground-colors-deprecated();
+	@include gradient-colors-deprecated();
 }
 
 // Font sizes.

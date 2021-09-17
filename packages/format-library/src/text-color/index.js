@@ -56,9 +56,8 @@ function TextColorEdit( {
 	return (
 		<>
 			<RichTextToolbarButton
-				key={ isActive ? 'text-color' : 'text-color-not-active' }
 				className="format-library-text-color-button"
-				name={ isActive ? 'text-color' : undefined }
+				isActive={ isActive }
 				icon={
 					<>
 						<Icon icon={ textColorIcon } />

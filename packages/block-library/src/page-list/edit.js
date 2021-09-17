@@ -69,8 +69,7 @@ export default function PageListEdit( {
 		context.customOverlayBackgroundColor,
 	] );
 
-	const { textColor, backgroundColor, showSubmenuIcon, style } =
-		context || {};
+	const { textColor, backgroundColor, style } = context || {};
 
 	const [ allowConvertToLinks, setAllowConvertToLinks ] = useState( false );
 
@@ -83,7 +82,6 @@ export default function PageListEdit( {
 				'background-color',
 				backgroundColor
 			) ]: !! backgroundColor,
-			'show-submenu-icons': !! showSubmenuIcon,
 		} ),
 		style: { ...style?.color },
 	} );
@@ -100,8 +98,12 @@ export default function PageListEdit( {
 	);
 
 	useEffect( () => {
-		setAttributes( { isNavigationChild: isParentNavigation } );
-	}, [] );
+		setAttributes( {
+			isNavigationChild: isParentNavigation,
+			openSubmenusOnClick: !! context.openSubmenusOnClick,
+			showSubmenuIcon: !! context.showSubmenuIcon,
+		} );
+	}, [ context.openSubmenusOnClick, context.showSubmenuIcon ] );
 
 	useEffect( () => {
 		if ( isParentNavigation ) {
@@ -129,6 +131,8 @@ export default function PageListEdit( {
 	const attributesWithParentStatus = {
 		...attributes,
 		isNavigationChild: isParentNavigation,
+		openSubmenusOnClick: !! context.openSubmenusOnClick,
+		showSubmenuIcon: !! context.showSubmenuIcon,
 	};
 
 	return (

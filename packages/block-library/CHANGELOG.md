@@ -2,6 +2,12 @@
 
 ## Unreleased
 
+## 6.0.0 (2021-09-09)
+
+### Breaking Change
+
+-   Remove the background-colors, foreground-colors, and gradient-colors mixins.
+
 ## 5.0.0 (2021-07-29)
 
 ### Breaking Change

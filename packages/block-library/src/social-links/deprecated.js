@@ -8,8 +8,106 @@ import classNames from 'classnames';
  */
 import { InnerBlocks, useBlockProps } from '@wordpress/block-editor';
 
+/**
+ * The specific handling by `className` below is needed because `itemsJustification`
+ * was introduced in https://github.com/WordPress/gutenberg/pull/28980/files and wasn't
+ * declared in block.json.
+ *
+ * @param {Object} attributes Block's attributes.
+ */
+const migrateWithLayout = ( attributes ) => {
+	if ( !! attributes.layout ) {
+		return attributes;
+	}
+	const { className } = attributes;
+	// Matches classes with `items-justified-` prefix.
+	const prefix = `items-justified-`;
+	const justifiedItemsRegex = new RegExp( `\\b${ prefix }[^ ]*[ ]?\\b`, 'g' );
+	const newAttributes = {
+		...attributes,
+		className: className?.replace( justifiedItemsRegex, '' ).trim(),
+	};
+	/**
+	 * Add `layout` prop only if `justifyContent` is defined, for backwards
+	 * compatibility. In other cases the block's default layout will be used.
+	 * Also noting that due to the missing attribute, it's possible for a block
+	 * to have more than one of `justified` classes.
+	 */
+	const justifyContent = className
+		?.match( justifiedItemsRegex )?.[ 0 ]
+		?.trim();
+	if ( justifyContent ) {
+		Object.assign( newAttributes, {
+			layout: {
+				type: 'flex',
+				justifyContent: justifyContent.slice( prefix.length ),
+			},
+		} );
+	}
+	return newAttributes;
+};
+
 // Social Links block deprecations.
 const deprecated = [
+	// Implement `flex` layout.
+	{
+		attributes: {
+			iconColor: {
+				type: 'string',
+			},
+			customIconColor: {
+				type: 'string',
+			},
+			iconColorValue: {
+				type: 'string',
+			},
+			iconBackgroundColor: {
+				type: 'string',
+			},
+			customIconBackgroundColor: {
+				type: 'string',
+			},
+			iconBackgroundColorValue: {
+				type: 'string',
+			},
+			openInNewTab: {
+				type: 'boolean',
+				default: false,
+			},
+			size: {
+				type: 'string',
+			},
+		},
+		supports: {
+			align: [ 'left', 'center', 'right' ],
+			anchor: true,
+			__experimentalExposeControlsToChildren: true,
+		},
+		isEligible: ( { layout } ) => ! layout,
+		migrate: migrateWithLayout,
+		save( props ) {
+			const {
+				attributes: {
+					iconBackgroundColorValue,
+					iconColorValue,
+					itemsJustification,
+					size,
+				},
+			} = props;
+
+			const className = classNames( size, {
+				'has-icon-color': iconColorValue,
+				'has-icon-background-color': iconBackgroundColorValue,
+				[ `items-justified-${ itemsJustification }` ]: itemsJustification,
+			} );
+
+			return (
+				<ul { ...useBlockProps.save( { className } ) }>
+					<InnerBlocks.Content />
+				</ul>
+			);
+		},
+	},
 	// V1. Remove CSS variable use for colors.
 	{
 		attributes: {
@@ -46,6 +144,7 @@ const deprecated = [
 			align: [ 'left', 'center', 'right' ],
 			anchor: true,
 		},
+		migrate: migrateWithLayout,
 		save: ( props ) => {
 			const {
 				attributes: {

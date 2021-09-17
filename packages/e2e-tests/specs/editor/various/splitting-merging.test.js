@@ -193,10 +193,10 @@ describe( 'splitting and merging blocks', () => {
 		await insertBlock( 'Paragraph' );
 		await page.keyboard.press( 'Backspace' );
 
-		// There is a default block:
+		// There is a default block and post title:
 		expect(
 			await page.$$( '.block-editor-block-list__block' )
-		).toHaveLength( 1 );
+		).toHaveLength( 2 );
 
 		// But the effective saved content is still empty:
 		expect( await getEditedPostContent() ).toBe( '' );
