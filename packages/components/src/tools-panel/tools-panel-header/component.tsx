@@ -1,3 +1,7 @@
+// This can be removed once typing has been completed for DropdownMenu,
+// MenuGroup & MenuItem.
+// @ts-nocheck
+
 /**
  * External dependencies
  */
