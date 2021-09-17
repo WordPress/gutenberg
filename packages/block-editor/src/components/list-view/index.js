@@ -71,11 +71,7 @@ function ListView(
 	},
 	ref
 ) {
-	const {
-		clientIdsTree,
-		selectedClientIds,
-		draggedClientIds,
-	} = useListViewClientIds(
+	const { clientIdsTree, selectedClientIds } = useListViewClientIds(
 		blocks,
 		showOnlyCurrentHierarchy,
 		__experimentalPersistentListViewFeatures
@@ -197,13 +193,13 @@ function ListView(
 		const { clientId, originalParent, targetId, targetIndex } = target;
 		lastTarget.current = null;
 		try {
+			setStateType( RESOLVING_DROP );
 			await moveBlocksToPosition(
 				[ clientId ],
 				originalParent,
 				targetId,
 				targetIndex
 			);
-			setStateType( RESOLVING_DROP );
 		} catch ( e ) {
 			setStateType( GLOBAL );
 		}
@@ -363,7 +359,6 @@ function ListView(
 			__experimentalFeatures,
 			__experimentalPersistentListViewFeatures,
 			isTreeGridMounted: isMounted.current,
-			draggedClientIds,
 			selectedClientIds,
 			expandedState,
 			expand,
@@ -374,7 +369,6 @@ function ListView(
 			__experimentalFeatures,
 			__experimentalPersistentListViewFeatures,
 			isMounted.current,
-			draggedClientIds,
 			selectedClientIds,
 			expandedState,
 			expand,

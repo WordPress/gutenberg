@@ -57,24 +57,21 @@ export default function useListViewClientIds(
 	showOnlyCurrentHierarchy,
 	__experimentalPersistentListViewFeatures
 ) {
-	const { selectedClientIds, draggedClientIds } = useSelect(
+	const { selectedClientIds } = useSelect(
 		( select ) => {
 			const {
 				getSelectedBlockClientId,
 				getSelectedBlockClientIds,
-				getDraggedBlockClientIds,
 			} = select( blockEditorStore );
 
 			if ( __experimentalPersistentListViewFeatures ) {
 				return {
 					selectedClientIds: getSelectedBlockClientIds(),
-					draggedClientIds: getDraggedBlockClientIds(),
 				};
 			}
 
 			return {
 				selectedClientIds: getSelectedBlockClientId(),
-				draggedClientIds: getDraggedBlockClientIds(),
 			};
 		},
 		[ __experimentalPersistentListViewFeatures ]
@@ -84,5 +81,5 @@ export default function useListViewClientIds(
 		selectedClientIds,
 		showOnlyCurrentHierarchy
 	);
-	return { clientIdsTree, selectedClientIds, draggedClientIds };
+	return { clientIdsTree, selectedClientIds };
 }

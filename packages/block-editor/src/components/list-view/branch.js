@@ -56,7 +56,6 @@ export default function ListViewBranch( props ) {
 		expandedState,
 		expand,
 		collapse,
-		draggedClientIds,
 		selectedClientIds,
 		isTreeGridMounted,
 		useAnimation,
@@ -123,7 +122,7 @@ export default function ListViewBranch( props ) {
 
 				// Make updates to the selected or dragged blocks synchronous,
 				// but asynchronous for any other block.
-				const isDragged = !! draggedClientIds?.includes( clientId );
+				const isDragged = draggingId === clientId;
 
 				const animateToggle =
 					useAnimation &&
