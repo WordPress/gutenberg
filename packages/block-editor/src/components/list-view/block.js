@@ -44,7 +44,6 @@ const DRAG_CONSTANTS = { left: -10, right: 10 };
 function ListViewBlock( {
 	block,
 	isSelected,
-	isDragged,
 	isBranchSelected,
 	isLastOfSelectedBranch,
 	onClick,
