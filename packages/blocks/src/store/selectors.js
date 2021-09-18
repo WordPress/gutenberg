@@ -44,7 +44,7 @@ export const getBlockTypes = createSelector(
 		return Object.values( state.blockTypes ).map( ( blockType ) => {
 			return {
 				...blockType,
-				variations: getBlockVariations( state, blockType?.name ),
+				variations: getBlockVariations( state, blockType.name ),
 			};
 		} );
 	},
