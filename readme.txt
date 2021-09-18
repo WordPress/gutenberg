@@ -37,7 +37,7 @@ It depends on the feature you want to use! Keep in mind that each version of Wor
 
 = Where can I see which Gutenberg plugin versions are included in each WordPress release? =
 
-View <a href="https://developer.wordpress.org/block-editor/principles/versions-in-wordpress/">the Versions in WordPress</a> document to get a table showing which Gutenberg plugin version is included in each WordPress release.
+View the <a href="https://developer.wordpress.org/block-editor/principles/versions-in-wordpress/">Versions in WordPress</a> document to get a table showing which Gutenberg plugin version is included in each WordPress release.
 
 = What's Next for the Project? =
 
