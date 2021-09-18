@@ -17,7 +17,7 @@ The block editor first became available in December 2018. We’re always hard at
 
 ### Discover More
 
-- **User Documentation:** Review the <a href="https://wordpress.org/support/article/wordpress-editor/">WordPress Editor documentation</a> for detailed docs on using the editor as an author to create posts, pages, and more.
+- **User Documentation:** Review the <a href="https://wordpress.org/support/article/wordpress-editor/">WordPress Editor documentation</a> for detailed instructions on using the editor as an author to create posts, pages, and more.
 
 - **Developer Documentation:** Explore the <a href="https://developer.wordpress.org/block-editor/developers/">Developer Documentation</a> for extensive tutorials, documentation, and API references on how to extend the editor.
 
