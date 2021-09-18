@@ -13,7 +13,7 @@ The Gutenberg plugin provides editing, customization, and site building features
 
 The block editor introduces a modular approach to all parts of your site: each piece of content in the editor, from a paragraph to an image gallery to a headline, is its own block. And just like physical blocks, WordPress blocks can be added, arranged, and rearranged, allowing WordPress users to create media-rich content in a visually intuitive way — and without work-arounds like shortcodes or custom HTML.
 
-The block editor first became available in December 2018, and we’re always hard at work refining the experience, creating more and better blocks, and laying the groundwork for the future phases of work. Each WordPress release comes ready to go with the stable features from multiple versions of the Gutenberg plugin so you don’t need to use the plugin to benefit from the work being done here. If you’re more adventurous and tech savvy though, the Gutenberg plugin gives you the latest and greatest so you can join us in testing bleeding-edge features, start playing with blocks, and maybe get inspired to build your own.
+The block editor first became available in December 2018. We’re always hard at work refining the experience, creating more and better blocks, and laying the groundwork for the future phases of work. Each WordPress release comes ready to go with the stable features from multiple versions of the Gutenberg plugin, so you don’t need to use the plugin to benefit from the work being done here. However, if you’re more adventurous and tech-savvy, the Gutenberg plugin gives you the latest and greatest, so you can join us in testing bleeding-edge features, start playing with blocks, and maybe get inspired to build your own.
 
 ### Discover More
 
