@@ -111,6 +111,7 @@ exports[`ColorPalette Dropdown should render it correctly 1`] = `
 >
   <div
     className="components-dropdown components-circular-option-picker__dropdown-link-action"
+    tabIndex="-1"
   >
     <ForwardRef(Button)
       aria-expanded={false}
@@ -365,7 +366,7 @@ exports[`ColorPalette should render a dynamic toolbar of colors 1`] = `
                   xmlns="http://www.w3.org/2000/svg"
                 >
                   <Path
-                    d="M18.3 5.6L9.9 16.9l-4.6-3.4-.9 1.2 5.8 4.3 9.3-12.6z"
+                    d="M16.7 7.1l-6.3 8.5-3.3-2.5-.9 1.2 4.5 3.4L17.9 8z"
                   />
                 </SVG>
               }
@@ -388,10 +389,10 @@ exports[`ColorPalette should render a dynamic toolbar of colors 1`] = `
                   xmlns="http://www.w3.org/2000/svg"
                 >
                   <Path
-                    d="M18.3 5.6L9.9 16.9l-4.6-3.4-.9 1.2 5.8 4.3 9.3-12.6z"
+                    d="M16.7 7.1l-6.3 8.5-3.3-2.5-.9 1.2 4.5 3.4L17.9 8z"
                   >
                     <path
-                      d="M18.3 5.6L9.9 16.9l-4.6-3.4-.9 1.2 5.8 4.3 9.3-12.6z"
+                      d="M16.7 7.1l-6.3 8.5-3.3-2.5-.9 1.2 4.5 3.4L17.9 8z"
                     />
                   </Path>
                 </svg>
@@ -545,6 +546,7 @@ exports[`ColorPalette should render a dynamic toolbar of colors 1`] = `
           >
             <div
               className="components-dropdown components-circular-option-picker__dropdown-link-action"
+              tabIndex="-1"
             >
               <ForwardRef(Button)
                 aria-expanded={false}

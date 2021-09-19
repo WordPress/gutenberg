@@ -7,16 +7,12 @@ import { find, includes, get, hasIn, compact, uniq } from 'lodash';
  * WordPress dependencies
  */
 import { addQueryArgs } from '@wordpress/url';
-import triggerFetch from '@wordpress/api-fetch';
+import apiFetch from '@wordpress/api-fetch';
 
 /**
  * Internal dependencies
  */
 import { STORE_NAME } from './name';
-
-/**
- * Internal dependencies
- */
 import { getKindEntities, DEFAULT_ENTITY_KEY } from './entities';
 import { ifNotResolved, getNormalizedCommaSeparable } from './utils';
 
@@ -31,7 +27,7 @@ export const getAuthors = ( query ) => async ( { dispatch } ) => {
 		'/wp/v2/users/?who=authors&per_page=100',
 		query
 	);
-	const users = await triggerFetch( { path } );
+	const users = await apiFetch( { path } );
 	dispatch.receiveUserQuery( path, users );
 };
 
@@ -39,7 +35,7 @@ export const getAuthors = ( query ) => async ( { dispatch } ) => {
  * Requests the current user from the REST API.
  */
 export const getCurrentUser = () => async ( { dispatch } ) => {
-	const currentUser = await triggerFetch( { path: '/wp/v2/users/me' } );
+	const currentUser = await apiFetch( { path: '/wp/v2/users/me' } );
 	dispatch.receiveCurrentUser( currentUser );
 };
 
@@ -106,7 +102,7 @@ export const getEntityRecord = ( kind, name, key = '', query ) => async ( {
 			}
 		}
 
-		const record = await triggerFetch( { path } );
+		const record = await apiFetch( { path } );
 		dispatch.receiveEntityRecords( kind, name, record, query );
 	} catch ( error ) {
 		// We need a way to handle and access REST API errors in state
@@ -131,14 +127,6 @@ export const getEditedEntityRecord = ifNotResolved(
 	getRawEntityRecord,
 	'getRawEntityRecord'
 );
-
-/**
- * Requests the entity's records from the REST API.
- *
- * @param {string}  kind  Entity kind.
- * @param {string}  name  Entity name.
- * @param {Object?} query Query Object.
- */
 
 /**
  * Requests the entity's records from the REST API.
@@ -181,7 +169,7 @@ export const getEntityRecords = ( kind, name, query = {} ) => async ( {
 			...query,
 		} );
 
-		let records = Object.values( await triggerFetch( { path } ) );
+		let records = Object.values( await apiFetch( { path } ) );
 		// If we request fields but the result doesn't contain the fields,
 		// explicitely set these fields as "undefined"
 		// that way we consider the query "fullfilled".
@@ -237,7 +225,7 @@ getEntityRecords.shouldInvalidate = ( action, kind, name ) => {
  * Requests the current theme.
  */
 export const getCurrentTheme = () => async ( { dispatch } ) => {
-	const activeThemes = await triggerFetch( {
+	const activeThemes = await apiFetch( {
 		path: '/wp/v2/themes?status=active',
 	} );
 	dispatch.receiveCurrentTheme( activeThemes[ 0 ] );
@@ -247,7 +235,7 @@ export const getCurrentTheme = () => async ( { dispatch } ) => {
  * Requests theme supports data from the index.
  */
 export const getThemeSupports = () => async ( { dispatch } ) => {
-	const activeThemes = await triggerFetch( {
+	const activeThemes = await apiFetch( {
 		path: '/wp/v2/themes?status=active',
 	} );
 	dispatch.receiveThemeSupports( activeThemes[ 0 ].theme_supports );
@@ -260,7 +248,7 @@ export const getThemeSupports = () => async ( { dispatch } ) => {
  */
 export const getEmbedPreview = ( url ) => async ( { dispatch } ) => {
 	try {
-		const embedProxyResponse = await triggerFetch( {
+		const embedProxyResponse = await apiFetch( {
 			path: addQueryArgs( '/oembed/1.0/proxy', { url } ),
 		} );
 		dispatch.receiveEmbedPreview( url, embedProxyResponse );
@@ -296,7 +284,7 @@ export const canUser = ( action, resource, id ) => async ( { dispatch } ) => {
 
 	let response;
 	try {
-		response = await triggerFetch( {
+		response = await apiFetch( {
 			path,
 			// Ideally this would always be an OPTIONS request, but unfortunately there's
 			// a bug in the REST API which causes the Allow header to not be sent on
@@ -359,7 +347,7 @@ export const getAutosaves = ( postType, postId ) => async ( {
 	resolveSelect,
 } ) => {
 	const { rest_base: restBase } = await resolveSelect.getPostType( postType );
-	const autosaves = await triggerFetch( {
+	const autosaves = await apiFetch( {
 		path: `/wp/v2/${ restBase }/${ postId }/autosaves?context=edit`,
 	} );
 

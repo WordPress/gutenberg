@@ -7,7 +7,8 @@ import { JSDOM } from 'jsdom';
 /**
  * Internal dependencies
  */
-import { create } from '../create';
+import { create, removeReservedCharacters } from '../create';
+import { OBJECT_REPLACEMENT_CHARACTER, ZWNBSP } from '../special-characters';
 import { createElement } from '../create-element';
 import { registerFormatType } from '../register-format-type';
 import { unregisterFormatType } from '../unregister-format-type';
@@ -121,5 +122,25 @@ describe( 'create', () => {
 
 		// Format arrays per index.
 		expect( value.formats[ 0 ] ).not.toBe( value.formats[ 1 ] );
+	} );
+
+	it( 'removeReservedCharacters should remove all reserved characters', () => {
+		expect(
+			removeReservedCharacters( `${ OBJECT_REPLACEMENT_CHARACTER }` )
+		).toEqual( '' );
+		expect( removeReservedCharacters( `${ ZWNBSP }` ) ).toEqual( '' );
+		expect(
+			removeReservedCharacters(
+				`${ OBJECT_REPLACEMENT_CHARACTER }c${ OBJECT_REPLACEMENT_CHARACTER }at${ OBJECT_REPLACEMENT_CHARACTER }`
+			)
+		).toEqual( 'cat' );
+		expect(
+			removeReservedCharacters( `${ ZWNBSP }b${ ZWNBSP }at${ ZWNBSP }` )
+		).toEqual( 'bat' );
+		expect(
+			removeReservedCharacters(
+				`te${ OBJECT_REPLACEMENT_CHARACTER }st${ ZWNBSP }${ ZWNBSP }`
+			)
+		).toEqual( 'test' );
 	} );
 } );

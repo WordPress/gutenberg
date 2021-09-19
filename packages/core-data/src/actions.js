@@ -7,8 +7,7 @@ import { v4 as uuid } from 'uuid';
 /**
  * WordPress dependencies
  */
-import { __unstableAwaitPromise } from '@wordpress/data-controls';
-import triggerFetch from '@wordpress/api-fetch';
+import apiFetch from '@wordpress/api-fetch';
 import { addQueryArgs } from '@wordpress/url';
 
 /**
@@ -17,7 +16,6 @@ import { addQueryArgs } from '@wordpress/url';
 import { receiveItems, removeItems, receiveQueriedItems } from './queried-data';
 import { getKindEntities, DEFAULT_ENTITY_KEY } from './entities';
 import { createBatch } from './batch';
-import { getDispatch } from './controls';
 import { STORE_NAME } from './name';
 
 /**
@@ -168,7 +166,7 @@ export const deleteEntityRecord = (
 	name,
 	recordId,
 	query,
-	{ __unstableFetch = triggerFetch } = {}
+	{ __unstableFetch = apiFetch } = {}
 ) => async ( { dispatch } ) => {
 	const entities = await dispatch( getKindEntities( kind ) );
 	const entity = find( entities, { kind, name } );
@@ -242,7 +240,7 @@ export const editEntityRecord = (
 	recordId,
 	edits,
 	options = {}
-) => async ( { select, dispatch } ) => {
+) => ( { select, dispatch } ) => {
 	const entity = select.getEntity( kind, name );
 	if ( ! entity ) {
 		throw new Error(
@@ -270,7 +268,7 @@ export const editEntityRecord = (
 		}, {} ),
 		transientEdits,
 	};
-	return await dispatch( {
+	dispatch( {
 		type: 'EDIT_ENTITY_RECORD',
 		...edit,
 		meta: {
@@ -347,7 +345,7 @@ export const saveEntityRecord = (
 	kind,
 	name,
 	record,
-	{ isAutosave = false, __unstableFetch = triggerFetch } = {}
+	{ isAutosave = false, __unstableFetch = apiFetch } = {}
 ) => async ( { select, resolveSelect, dispatch } ) => {
 	const entities = await dispatch( getKindEntities( kind ) );
 	const entity = find( entities, { kind, name } );
@@ -371,7 +369,7 @@ export const saveEntityRecord = (
 				const evaluatedValue = value(
 					select.getEditedEntityRecord( kind, name, recordId )
 				);
-				await dispatch.editEntityRecord(
+				dispatch.editEntityRecord(
 					kind,
 					name,
 					recordId,
@@ -384,7 +382,7 @@ export const saveEntityRecord = (
 			}
 		}
 
-		await dispatch( {
+		dispatch( {
 			type: 'SAVE_ENTITY_RECORD_START',
 			kind,
 			name,
@@ -436,12 +434,11 @@ export const saveEntityRecord = (
 								: data.status,
 					}
 				);
-				const options = {
+				updatedRecord = await __unstableFetch( {
 					path: `${ path }/autosaves`,
 					method: 'POST',
 					data,
-				};
-				updatedRecord = await __unstableFetch( options );
+				} );
 
 				// An autosave may be processed by the server as a regular save
 				// when its update is requested by the author and the post had
@@ -477,7 +474,7 @@ export const saveEntityRecord = (
 						},
 						{}
 					);
-					await dispatch.receiveEntityRecords(
+					dispatch.receiveEntityRecords(
 						kind,
 						name,
 						newRecord,
@@ -485,7 +482,7 @@ export const saveEntityRecord = (
 						true
 					);
 				} else {
-					await dispatch.receiveAutosaves(
+					dispatch.receiveAutosaves(
 						persistedRecord.id,
 						updatedRecord
 					);
@@ -501,13 +498,12 @@ export const saveEntityRecord = (
 						),
 					};
 				}
-				const options = {
+				updatedRecord = await __unstableFetch( {
 					path,
 					method: recordId ? 'PUT' : 'POST',
 					data: edits,
-				};
-				updatedRecord = await __unstableFetch( options );
-				await dispatch.receiveEntityRecords(
+				} );
+				dispatch.receiveEntityRecords(
 					kind,
 					name,
 					updatedRecord,
@@ -530,7 +526,7 @@ export const saveEntityRecord = (
 
 		return updatedRecord;
 	} finally {
-		await dispatch.__unstableReleaseStoreLock( lock );
+		dispatch.__unstableReleaseStoreLock( lock );
 	}
 };
 
@@ -556,13 +552,12 @@ export const saveEntityRecord = (
  * @return {Promise} A promise that resolves to an array containing the return
  *                   values of each function given in `requests`.
  */
-export function* __experimentalBatch( requests ) {
+export const __experimentalBatch = ( requests ) => async ( { dispatch } ) => {
 	const batch = createBatch();
-	const dispatch = yield getDispatch();
 	const api = {
 		saveEntityRecord( kind, name, record, options ) {
 			return batch.add( ( add ) =>
-				dispatch( STORE_NAME ).saveEntityRecord( kind, name, record, {
+				dispatch.saveEntityRecord( kind, name, record, {
 					...options,
 					__unstableFetch: add,
 				} )
@@ -570,38 +565,28 @@ export function* __experimentalBatch( requests ) {
 		},
 		saveEditedEntityRecord( kind, name, recordId, options ) {
 			return batch.add( ( add ) =>
-				dispatch( STORE_NAME ).saveEditedEntityRecord(
-					kind,
-					name,
-					recordId,
-					{
-						...options,
-						__unstableFetch: add,
-					}
-				)
+				dispatch.saveEditedEntityRecord( kind, name, recordId, {
+					...options,
+					__unstableFetch: add,
+				} )
 			);
 		},
 		deleteEntityRecord( kind, name, recordId, query, options ) {
 			return batch.add( ( add ) =>
-				dispatch( STORE_NAME ).deleteEntityRecord(
-					kind,
-					name,
-					recordId,
-					query,
-					{
-						...options,
-						__unstableFetch: add,
-					}
-				)
+				dispatch.deleteEntityRecord( kind, name, recordId, query, {
+					...options,
+					__unstableFetch: add,
+				} )
 			);
 		},
 	};
 	const resultPromises = requests.map( ( request ) => request( api ) );
-	const [ , ...results ] = yield __unstableAwaitPromise(
-		Promise.all( [ batch.run(), ...resultPromises ] )
-	);
+	const [ , ...results ] = await Promise.all( [
+		batch.run(),
+		...resultPromises,
+	] );
 	return results;
-}
+};
 
 /**
  * Action triggered to save an entity record's edits.

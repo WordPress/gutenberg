@@ -14,7 +14,6 @@ import {
 	Platform,
 } from '@wordpress/element';
 import {
-	InnerBlocks,
 	__experimentalUseInnerBlocksProps as useInnerBlocksProps,
 	InspectorControls,
 	JustifyToolbar,
@@ -48,6 +47,7 @@ const ALLOWED_BLOCKS = [
 	'core/home-link',
 	'core/site-title',
 	'core/site-logo',
+	'core/navigation-submenu',
 ];
 
 const LAYOUT = {
@@ -100,10 +100,14 @@ function Navigation( {
 	setOverlayBackgroundColor,
 	overlayTextColor,
 	setOverlayTextColor,
+
+	// These props are used by the navigation editor to override specific
+	// navigation block settings.
 	hasSubmenuIndicatorSetting = true,
 	hasItemJustificationControls = true,
 	hasColorSettings = true,
 	customPlaceholder: CustomPlaceholder = null,
+	customAppender: CustomAppender = null,
 } ) {
 	const [ isPlaceholderShown, setIsPlaceholderShown ] = useState(
 		! hasExistingNavItems
@@ -145,20 +149,29 @@ function Navigation( {
 
 	const placeholder = useMemo( () => <PlaceholderPreview />, [] );
 
+	// When the block is selected itself or has a top level item selected that
+	// doesn't itself have children, show the standard appender. Else show no
+	// appender.
+	const appender =
+		isSelected ||
+		( isImmediateParentOfSelectedBlock && ! selectedBlockHasDescendants )
+			? undefined
+			: false;
+
 	const innerBlocksProps = useInnerBlocksProps(
 		{
 			className: 'wp-block-navigation__container',
 		},
 		{
 			allowedBlocks: ALLOWED_BLOCKS,
-			orientation: attributes.orientation || 'horizontal',
-			renderAppender:
-				( isImmediateParentOfSelectedBlock &&
-					! selectedBlockHasDescendants ) ||
-				isSelected
-					? InnerBlocks.DefaultAppender
-					: false,
-			__experimentalCaptureToolbars: true,
+			orientation: attributes.orientation,
+			renderAppender: CustomAppender || appender,
+
+			// Ensure block toolbar is not too far removed from item
+			// being edited when in vertical mode.
+			// see: https://github.com/WordPress/gutenberg/pull/34615.
+			__experimentalCaptureToolbars:
+				attributes.orientation !== 'vertical',
 			// Template lock set to false here so that the Nav
 			// Block on the experimental menus screen does not
 			// inherit templateLock={ 'all' }.
@@ -248,15 +261,6 @@ function Navigation( {
 				{ hasSubmenuIndicatorSetting && (
 					<PanelBody title={ __( 'Display settings' ) }>
 						<ToggleControl
-							checked={ attributes.showSubmenuIcon }
-							onChange={ ( value ) => {
-								setAttributes( {
-									showSubmenuIcon: value,
-								} );
-							} }
-							label={ __( 'Show submenu indicator icons' ) }
-						/>
-						<ToggleControl
 							checked={ attributes.isResponsive }
 							onChange={ ( value ) => {
 								setAttributes( {
@@ -265,6 +269,26 @@ function Navigation( {
 							} }
 							label={ __( 'Enable responsive menu' ) }
 						/>
+						<ToggleControl
+							checked={ attributes.openSubmenusOnClick }
+							onChange={ ( value ) => {
+								setAttributes( {
+									openSubmenusOnClick: value,
+								} );
+							} }
+							label={ __( 'Open submenus on click' ) }
+						/>
+						{ ! attributes.openSubmenusOnClick && (
+							<ToggleControl
+								checked={ attributes.showSubmenuIcon }
+								onChange={ ( value ) => {
+									setAttributes( {
+										showSubmenuIcon: value,
+									} );
+								} }
+								label={ __( 'Show submenu indicator icons' ) }
+							/>
+						) }
 					</PanelBody>
 				) }
 				{ hasColorSettings && (
