@@ -61,7 +61,6 @@ export default function MenuSwitcher( {
 						onRequestClose={ closeModal }
 					>
 						<AddMenu
-							menus={ menus }
 							onCreate={ ( menuId ) => {
 								closeModal();
 								onSelectMenu( menuId );
