@@ -41,17 +41,6 @@
 		text-align: left;
 		margin-left: 0;
 		margin-right: 0;
-		.block-editor-block-list__block:not(.has-text-color) {
-			color: $white;
-		}
-	}
-
-	&.is-light {
-		.wp-block-cover__inner-container {
-			.block-editor-block-list__block:not(.has-text-color) {
-				color: $black;
-			}
-		}
 	}
 
 	.wp-block-cover__placeholder-background-options {

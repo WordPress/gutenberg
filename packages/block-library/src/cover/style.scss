@@ -103,16 +103,12 @@
 	.wp-block-cover__inner-container {
 		width: 100%;
 		z-index: z-index(".wp-block-cover__inner-container");
-		*:not(.has-text-color) {
-			color: $white;
-		}
+		color: $white;
 	}
 
 	&.is-light {
 		.wp-block-cover__inner-container {
-			*:not(.has-text-color) {
-				color: $black;
-			}
+			color: $black;
 		}
 	}
 
