@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { get, omit, sortBy } from 'lodash';
+import { get, omit, sortBy, zip } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -166,7 +166,7 @@ function mapMenuItemsToBlocks( menuItems ) {
 	// The menuItem should be in menu_order sort order.
 	const sortedItems = sortBy( menuItems, 'menu_order' );
 
-	return sortedItems.map( ( menuItem ) => {
+	const blocks = sortedItems.map( ( menuItem ) => {
 		if ( menuItem.type === 'block' ) {
 			const [ block ] = parse( menuItem.content.raw );
 
@@ -178,7 +178,6 @@ function mapMenuItemsToBlocks( menuItems ) {
 
 			return block;
 		}
-
 		const attributes = menuItemToBlockAttributes( menuItem );
 
 		// If there are children recurse to build those nested blocks.
@@ -193,11 +192,12 @@ function mapMenuItemsToBlocks( menuItems ) {
 			: 'core/navigation-link';
 
 		// Create block with nested "innerBlocks".
-		return addRecordIdToBlock(
-			createBlock( itemBlockName, attributes, nestedBlocks ),
-			menuItem.id
-		);
+		return createBlock( itemBlockName, attributes, nestedBlocks );
 	} );
+
+	return zip( blocks, sortedItems ).map( ( [ block, menuItem ] ) =>
+		addRecordIdToBlock( block, menuItem.id )
+	);
 }
 
 // A few parameters are using snake case, let's embrace that for convenience:
