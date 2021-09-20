@@ -2,11 +2,12 @@
  * External dependencies
  */
 import { View, TouchableWithoutFeedback } from 'react-native';
+import { useRoute } from '@react-navigation/native';
 
 /**
  * WordPress dependencies
  */
-import { Component } from '@wordpress/element';
+import { Component, useEffect } from '@wordpress/element';
 import {
 	requestMediaImport,
 	mediaUploadSync,
@@ -77,6 +78,86 @@ const getUrlForSlug = ( image, sizeSlug ) => {
 	}
 	return image?.media_details?.sizes?.[ sizeSlug ]?.source_url;
 };
+
+function LinkSettings( {
+	attributes,
+	dismissSheet,
+	image,
+	isLinkSheetVisible,
+	setMappedAttributes,
+} ) {
+	const route = useRoute();
+	const { href: url, ...unMappedAttributes } = attributes;
+	const mappedAttributes = { ...unMappedAttributes, url };
+
+	// Persist attributes passed from child screen
+	useEffect( () => {
+		const { linkDestination, url: newUrl } = route.params || {};
+		if ( linkDestination || newUrl ) {
+			setMappedAttributes( {
+				url: newUrl,
+				linkDestination,
+			} );
+		}
+	}, [ route.params?.url, route.params?.linkDestination ] );
+
+	let valueMask;
+	switch ( mappedAttributes.linkDestination ) {
+		case LINK_DESTINATION_MEDIA:
+			valueMask = __( 'Media File' );
+			break;
+		case LINK_DESTINATION_ATTACHMENT:
+			valueMask = __( 'Attachment Page' );
+			break;
+		case LINK_DESTINATION_CUSTOM:
+			valueMask = __( 'Custom URL' );
+			break;
+		default:
+			valueMask = __( 'None' );
+			break;
+	}
+
+	const linkSettingsOptions = {
+		url: {
+			valueMask,
+			autoFocus: false,
+			autoFill: true,
+		},
+		openInNewTab: {
+			label: __( 'Open in new tab' ),
+		},
+		linkRel: {
+			label: __( 'Link Rel' ),
+			placeholder: _x( 'None', 'Link rel attribute value placeholder' ),
+		},
+	};
+
+	return (
+		<PanelBody title={ __( 'Link Settings' ) }>
+			<LinkSettingsNavigation
+				isVisible={ isLinkSheetVisible }
+				url={ mappedAttributes.url }
+				rel={ mappedAttributes.rel }
+				label={ mappedAttributes.label }
+				linkTarget={ mappedAttributes.linkTarget }
+				onClose={ dismissSheet }
+				setAttributes={ setMappedAttributes }
+				withBottomSheet={ false }
+				hasPicker
+				options={ linkSettingsOptions }
+				showIcon={ false }
+				onLinkCellPressed={ ( { navigation } ) => {
+					navigation.navigate( blockSettingsScreens.imageOptions, {
+						inputValue: attributes.href,
+						linkDestination: attributes.linkDestination,
+						imageUrl: attributes.url,
+						attachmentPageUrl: image?.link,
+					} );
+				} }
+			/>
+		</PanelBody>
+	);
+}
 
 export class ImageEdit extends Component {
 	constructor( props ) {
@@ -386,75 +467,6 @@ export class ImageEdit extends Component {
 			  } );
 	}
 
-	getLinkSettings() {
-		const { isLinkSheetVisible } = this.state;
-		const {
-			attributes: { href: url, ...unMappedAttributes },
-		} = this.props;
-		const mappedAttributes = { ...unMappedAttributes, url };
-
-		let valueMask;
-		switch ( mappedAttributes.linkDestination ) {
-			case LINK_DESTINATION_MEDIA:
-				valueMask = __( 'Media File' );
-				break;
-			case LINK_DESTINATION_ATTACHMENT:
-				valueMask = __( 'Attachment Page' );
-				break;
-			case LINK_DESTINATION_CUSTOM:
-				valueMask = __( 'Custom URL' );
-				break;
-			default:
-				valueMask = __( 'None' );
-				break;
-		}
-
-		const linkSettingsOptions = {
-			url: {
-				valueMask,
-				autoFocus: false,
-				autoFill: true,
-			},
-			openInNewTab: {
-				label: __( 'Open in new tab' ),
-			},
-			linkRel: {
-				label: __( 'Link Rel' ),
-				placeholder: _x(
-					'None',
-					'Link rel attribute value placeholder'
-				),
-			},
-		};
-
-		return (
-			<LinkSettingsNavigation
-				isVisible={ isLinkSheetVisible }
-				url={ mappedAttributes.url }
-				rel={ mappedAttributes.rel }
-				label={ mappedAttributes.label }
-				linkTarget={ mappedAttributes.linkTarget }
-				onClose={ this.dismissSheet }
-				setAttributes={ this.setMappedAttributes }
-				withBottomSheet={ false }
-				hasPicker
-				options={ linkSettingsOptions }
-				showIcon={ false }
-				onLinkCellPressed={ ( { navigation } ) => {
-					// TODO(David): Passing `setAttributes` throws a warning, we should avoid
-					// passing it here.
-					navigation.navigate( blockSettingsScreens.imageOptions, {
-						inputValue: mappedAttributes.url,
-						linkDestination: this.props.attributes.linkDestination,
-						setAttributes: this.setMappedAttributes,
-						imageUrl: this.props.attributes.url,
-						attachmentPageUrl: this.props.image?.link,
-					} );
-				} }
-			/>
-		);
-	}
-
 	getAltTextSettings() {
 		const {
 			attributes: { alt },
@@ -613,9 +625,13 @@ export class ImageEdit extends Component {
 					) }
 					{ this.getAltTextSettings() }
 				</PanelBody>
-				<PanelBody title={ __( 'Link Settings' ) }>
-					{ this.getLinkSettings( true ) }
-				</PanelBody>
+				<LinkSettings
+					attributes={ this.props.attributes }
+					dismissSheet={ this.dismissSheet }
+					image={ this.props.image }
+					isLinkSheetVisible={ this.state.isLinkSheetVisible }
+					setMappedAttributes={ this.setMappedAttributes }
+				/>
 				<PanelBody
 					title={ __( 'Featured Image' ) }
 					titleStyle={ styles.featuredImagePanelTitle }

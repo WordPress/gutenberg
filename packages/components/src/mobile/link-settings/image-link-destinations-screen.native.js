@@ -8,6 +8,7 @@ import { useNavigation, useRoute } from '@react-navigation/native';
  */
 import { __ } from '@wordpress/i18n';
 import { Icon, check, chevronRight } from '@wordpress/icons';
+import { blockSettingsScreens } from '@wordpress/block-editor';
 
 /**
  * Internal dependencies
@@ -52,13 +53,8 @@ function ImageLinkDestinationsScreen( props ) {
 	const navigation = useNavigation();
 	const route = useRoute();
 	const { url = '' } = props;
-	const {
-		inputValue = url,
-		imageUrl,
-		attachmentPageUrl,
-		setAttributes,
-		linkDestination,
-	} = route.params || {};
+	const { inputValue = url, imageUrl, attachmentPageUrl, linkDestination } =
+		route.params || {};
 
 	const customUrlSet =
 		!! inputValue &&
@@ -85,8 +81,12 @@ function ImageLinkDestinationsScreen( props ) {
 				break;
 		}
 
-		setAttributes( { url: newUrl, linkDestination: newLinkDestination } );
-		navigation.goBack();
+		navigation.navigate( blockSettingsScreens.settings, {
+			inputValue: '', // Reset to avoid stale value in link picker input
+			text: undefined, // Reset to avoid stale value in link picker input
+			url: newUrl,
+			linkDestination: newLinkDestination,
+		} );
 	};
 
 	return (
