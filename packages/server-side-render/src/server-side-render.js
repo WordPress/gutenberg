@@ -39,9 +39,9 @@ function DefaultErrorResponsePlaceholder( { response, className } ) {
 	return <Placeholder className={ className }>{ errorMessage }</Placeholder>;
 }
 
-function DefaultLoadingResponsePlaceholder( { children } ) {
+function DefaultLoadingResponsePlaceholder( { className, children } ) {
 	return (
-		<div style={ { position: 'relative' } }>
+		<div className={ className } style={ { position: 'relative' } }>
 			<div
 				style={ {
 					position: 'absolute',
