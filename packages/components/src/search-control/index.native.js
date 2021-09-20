@@ -10,6 +10,7 @@ import {
 	useColorScheme,
 	Keyboard,
 } from 'react-native';
+import { BottomSheetTextInput } from '@gorhom/bottom-sheet';
 
 /**
  * WordPress dependencies
@@ -237,7 +238,7 @@ function SearchControl( {
 			<View style={ innerContainerStyle }>
 				<View style={ inputContainerStyle }>
 					{ renderLeftButton() }
-					<TextInput
+					<BottomSheetTextInput
 						ref={ inputRef }
 						style={ formInputStyle }
 						placeholderTextColor={ placeholderStyle?.color }

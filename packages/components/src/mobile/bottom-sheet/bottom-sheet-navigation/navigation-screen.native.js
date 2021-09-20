@@ -8,6 +8,11 @@ import {
 } from '@react-navigation/native';
 import { View, ScrollView, TouchableHighlight } from 'react-native';
 import { debounce } from 'lodash';
+import {
+	BottomSheetModal,
+	BottomSheetModalProvider,
+	BottomSheetScrollView,
+} from '@gorhom/bottom-sheet';
 
 /**
  * WordPress dependencies
@@ -81,7 +86,10 @@ const BottomSheetNavigationScreen = ( {
 		return isScrollable || isNested ? (
 			<View onLayout={ onLayout }>{ children }</View>
 		) : (
-			<ScrollView { ...listProps }>
+			<BottomSheetScrollView
+				{ ...listProps }
+				focusHook={ useFocusEffect }
+			>
 				<TouchableHighlight accessible={ false }>
 					<View onLayout={ onLayout }>
 						{ children }
@@ -96,7 +104,7 @@ const BottomSheetNavigationScreen = ( {
 						) }
 					</View>
 				</TouchableHighlight>
-			</ScrollView>
+			</BottomSheetScrollView>
 		);
 	}, [ children, isFocused, safeAreaBottomInset, listProps ] );
 };

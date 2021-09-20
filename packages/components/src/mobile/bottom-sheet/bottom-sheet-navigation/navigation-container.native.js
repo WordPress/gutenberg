@@ -55,6 +55,7 @@ const options = {
 	headerShown: false,
 	gestureEnabled: false,
 	cardStyleInterpolator: fadeConfig,
+	safeAreaInsets: { top: 0 },
 };
 
 const ANIMATION_DURATION = 190;
@@ -141,7 +142,10 @@ function BottomSheetNavigationContainer( { children, animate, main, theme } ) {
 					} }
 				>
 					{ main ? (
-						<NavigationContainer theme={ _theme }>
+						<NavigationContainer
+							theme={ _theme }
+							independent={ true }
+						>
 							<Stack.Navigator screenOptions={ options }>
 								{ screens }
 							</Stack.Navigator>

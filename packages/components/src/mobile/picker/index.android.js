@@ -81,16 +81,18 @@ export default class Picker extends Component {
 				style={ { paddingBottom: 20 } }
 				hideHeader
 			>
-				<PanelBody title={ title } style={ styles.panelBody }>
-					{ this.getOptions() }
-					{ ! hideCancelButton && (
-						<TextControl
-							label={ __( 'Cancel' ) }
-							onPress={ this.onClose }
-							separatorType={ 'none' }
-						/>
-					) }
-				</PanelBody>
+				<View style={ { marginHorizontal: 20 } }>
+					<PanelBody title={ title } style={ styles.panelBody }>
+						{ this.getOptions() }
+						{ ! hideCancelButton && (
+							<TextControl
+								label={ __( 'Cancel' ) }
+								onPress={ this.onClose }
+								separatorType={ 'none' }
+							/>
+						) }
+					</PanelBody>
+				</View>
 			</BottomSheet>
 		);
 	}

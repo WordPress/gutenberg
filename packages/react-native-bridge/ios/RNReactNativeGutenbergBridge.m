@@ -1,7 +1,7 @@
 #import <React/RCTViewManager.h>
 #import <React/RCTBridgeModule.h>
 
-@interface RCT_EXTERN_MODULE(RNReactNativeGutenbergBridge, NSObject)
+@interface RCT_EXTERN_MODULE(RNReactNativeGutenbergBridge, UIResponder)
 
 RCT_EXTERN_METHOD(provideToNative_Html:(NSString *)html title:(NSString *)title changed:(BOOL)changed contentInfo:(NSDictionary *)info)
 RCT_EXTERN_METHOD(requestMediaPickFrom:(NSString *)source filter:(NSArray<NSString *> *)filter allowMultipleSelection:(BOOL)allowMultipleSelection callback:(RCTResponseSenderBlock)callback)

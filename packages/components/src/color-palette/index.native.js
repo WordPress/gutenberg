@@ -2,7 +2,6 @@
  * External dependencies
  */
 import {
-	ScrollView,
 	TouchableWithoutFeedback,
 	View,
 	Animated,
@@ -12,6 +11,7 @@ import {
 	Text,
 } from 'react-native';
 import { map, uniq } from 'lodash';
+import { ScrollView } from 'react-native-gesture-handler';
 
 /**
  * WordPress dependencies

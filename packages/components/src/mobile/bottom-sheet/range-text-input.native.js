@@ -18,6 +18,7 @@ import {
 import { Component } from '@wordpress/element';
 import { withPreferredColorScheme } from '@wordpress/compose';
 import { __, sprintf } from '@wordpress/i18n';
+import { BottomSheetTextInput } from '@gorhom/bottom-sheet';
 
 /**
  * Internal dependencies
@@ -211,7 +212,7 @@ class RangeTextInput extends Component {
 					accessible={ false }
 				>
 					{ isIOS || hasFocus ? (
-						<TextInput
+						<BottomSheetTextInput
 							accessibilityLabel={ label }
 							ref={ ( c ) => ( this._valueTextInput = c ) }
 							style={ valueFinalStyle }

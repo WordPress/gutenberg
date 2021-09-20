@@ -52,7 +52,13 @@ module.exports = function ( api ) {
 		],
 		env: {
 			development: {
-				plugins: [ '@babel/transform-react-jsx-source' ],
+				plugins: [
+					'@babel/transform-react-jsx-source',
+					path.resolve(
+						__dirname,
+						'../../node_modules/react-native-reanimated/plugin'
+					),
+				],
 			},
 			production: {
 				plugins: [ 'transform-remove-console' ],

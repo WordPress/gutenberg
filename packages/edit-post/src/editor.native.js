@@ -4,6 +4,11 @@
 import memize from 'memize';
 import { size, map, without } from 'lodash';
 import { I18nManager } from 'react-native';
+import {
+	SafeAreaProvider,
+	initialWindowMetrics,
+} from 'react-native-safe-area-context';
+import { BottomSheetModalProvider } from '@gorhom/bottom-sheet';
 
 /**
  * WordPress dependencies
@@ -162,17 +167,21 @@ class Editor extends Component {
 		};
 
 		return (
-			<SlotFillProvider>
-				<EditorProvider
-					settings={ editorSettings }
-					post={ normalizedPost }
-					initialEdits={ initialEdits }
-					useSubRegistry={ false }
-					{ ...props }
-				>
-					<Layout setTitleRef={ this.setTitleRef } />
-				</EditorProvider>
-			</SlotFillProvider>
+			<SafeAreaProvider initialMetrics={ initialWindowMetrics }>
+				<SlotFillProvider>
+					<BottomSheetModalProvider>
+						<EditorProvider
+							settings={ editorSettings }
+							post={ normalizedPost }
+							initialEdits={ initialEdits }
+							useSubRegistry={ false }
+							{ ...props }
+						>
+							<Layout setTitleRef={ this.setTitleRef } />
+						</EditorProvider>
+					</BottomSheetModalProvider>
+				</SlotFillProvider>
+			</SafeAreaProvider>
 		);
 	}
 }

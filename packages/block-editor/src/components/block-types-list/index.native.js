@@ -7,12 +7,14 @@ import {
 	StyleSheet,
 	TouchableWithoutFeedback,
 	View,
+	useWindowDimensions,
 } from 'react-native';
+import { BottomSheetFlatList } from '@gorhom/bottom-sheet';
 
 /**
  * WordPress dependencies
  */
-import { useState, useEffect } from '@wordpress/element';
+import { useState, useEffect, useCallback } from '@wordpress/element';
 import { BottomSheet, InserterButton } from '@wordpress/components';
 
 /**
@@ -21,6 +23,14 @@ import { BottomSheet, InserterButton } from '@wordpress/components';
 import styles from './style.scss';
 
 const MIN_COL_NUM = 3;
+
+function SeparatorComponent() {
+	return (
+		<TouchableWithoutFeedback accessible={ false }>
+			<View style={ styles[ 'block-types-list__row-separator' ] } />
+		</TouchableWithoutFeedback>
+	);
+}
 
 export default function BlockTypesList( {
 	name,
@@ -32,25 +42,32 @@ export default function BlockTypesList( {
 	const [ numberOfColumns, setNumberOfColumns ] = useState( MIN_COL_NUM );
 	const [ itemWidth, setItemWidth ] = useState();
 	const [ maxWidth, setMaxWidth ] = useState();
+	const { height, width } = useWindowDimensions();
 
-	useEffect( () => {
-		Dimensions.addEventListener( 'change', onLayout );
-		onLayout();
-		return () => {
-			Dimensions.removeEventListener( 'change', onLayout );
-		};
-	}, [] );
+	// useEffect( () => {
+	// 	Dimensions.addEventListener( 'change', onLayout );
+	// 	onLayout();
+	// 	return () => {
+	// 		Dimensions.removeEventListener( 'change', onLayout );
+	// 	};
+	// }, [] );
 
 	function calculateItemWidth() {
 		const {
 			paddingLeft: itemPaddingLeft,
 			paddingRight: itemPaddingRight,
 		} = InserterButton.Styles.modalItem;
-		const { width } = InserterButton.Styles.modalIconWrapper;
-		return width + itemPaddingLeft + itemPaddingRight;
+		const {
+			width: inserterButtonWidth,
+		} = InserterButton.Styles.modalIconWrapper;
+		return inserterButtonWidth + itemPaddingLeft + itemPaddingRight;
 	}
 
-	function onLayout() {
+	useEffect( () => {
+		onLayout();
+	}, [ width ] );
+
+	const onLayout = useCallback( () => {
 		const columnStyle = styles[ 'block-types-list__column' ];
 		const sumLeftRightPadding =
 			columnStyle.paddingLeft + columnStyle.paddingRight;
@@ -73,47 +90,51 @@ export default function BlockTypesList( {
 				( bottomSheetWidth - 2 * sumLeftRightPadding ) / MIN_COL_NUM;
 			setItemWidth( updatedItemWidth );
 		}
-	}
+	}, [ width ] );
 
 	const contentContainerStyle = StyleSheet.flatten(
 		listProps.contentContainerStyle
 	);
 
+	const ItemComponent = useCallback(
+		( { item } ) => (
+			<InserterButton
+				{ ...{
+					item,
+					itemWidth,
+					maxWidth,
+					onSelect,
+				} }
+			/>
+		),
+		[]
+	);
+
+	const KeyExtractor = useCallback( ( item ) => `${ item.id }`, [] );
+
+	const containerStyle = {
+		flexGrow: 1,
+		...contentContainerStyle,
+		paddingBottom: Math.max(
+			listProps.safeAreaBottomInset,
+			contentContainerStyle.paddingBottom
+		),
+	};
+
 	return (
-		<FlatList
-			onLayout={ onLayout }
+		<BottomSheetFlatList
 			key={ `InserterUI-${ name }-${ numberOfColumns }` } //re-render when numberOfColumns changes
 			testID={ `InserterUI-${ name }` }
 			keyboardShouldPersistTaps="always"
 			numColumns={ numberOfColumns }
 			data={ items }
 			initialNumToRender={ initialNumToRender }
-			ItemSeparatorComponent={ () => (
-				<TouchableWithoutFeedback accessible={ false }>
-					<View
-						style={ styles[ 'block-types-list__row-separator' ] }
-					/>
-				</TouchableWithoutFeedback>
-			) }
-			keyExtractor={ ( item ) => item.id }
-			renderItem={ ( { item } ) => (
-				<InserterButton
-					{ ...{
-						item,
-						itemWidth,
-						maxWidth,
-						onSelect,
-					} }
-				/>
-			) }
+			ItemSeparatorComponent={ SeparatorComponent }
+			keyExtractor={ KeyExtractor }
+			renderItem={ ItemComponent }
 			{ ...listProps }
-			contentContainerStyle={ {
-				...contentContainerStyle,
-				paddingBottom: Math.max(
-					listProps.safeAreaBottomInset,
-					contentContainerStyle.paddingBottom
-				),
-			} }
+			style={ { maxHeight: 400 } }
+			contentContainerStyle={ containerStyle }
 		/>
 	);
 }
