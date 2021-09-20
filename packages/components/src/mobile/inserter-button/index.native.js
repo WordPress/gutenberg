@@ -66,6 +66,9 @@ class MenuItem extends Component {
 			item.title
 		);
 
+		// Only Embed blocks use colored versions of icons.
+		const useColoredIcon = item.category === 'embed';
+
 		return (
 			<TouchableHighlight
 				style={ [
@@ -99,6 +102,7 @@ class MenuItem extends Component {
 							<BlockIcon
 								icon={ item.icon }
 								size={ modalIconStyle.width }
+								showColors={ useColoredIcon }
 							/>
 						</View>
 					</View>
