@@ -424,7 +424,8 @@ describe( 'Navigation editor', () => {
 			expect( headerSubtitleText ).toBe( newName );
 		} );
 
-		it( 'does not save a menu name upon clicking save button when name is empty', async () => {
+		// Flaky test, see https://github.com/WordPress/gutenberg/pull/34869#issuecomment-922711557.
+		it.skip( 'does not save a menu name upon clicking save button when name is empty', async () => {
 			await createMenu( { name: initialMenuName } );
 			await visitNavigationEditor();
 
