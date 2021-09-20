@@ -32,11 +32,6 @@ it( 'navigates back from help topic detail screen', async () => {
 	const helpTopic = await screen.findByText( 'Customize blocks' );
 	fireEvent.press( helpTopic );
 
-	const detailScreenTitle1 = screen.getByText(
-		'Each block has its own settings. To find them, tap on a block. Its settings will appear on the toolbar at the bottom of the screen.'
-	);
-	expect( detailScreenTitle1 ).toBeTruthy();
-
 	const backButton = screen.getAllByA11yLabel( 'Go back' );
 	fireEvent.press( backButton[ backButton.length - 1 ] );
 
