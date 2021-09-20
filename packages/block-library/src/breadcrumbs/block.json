@@ -37,7 +37,7 @@
 		}
 	},
 	"supports": {
-		"align": true,
+		"align": [ "wide", "full" ],
 		"color": {
 			"gradients": true,
 			"link": true
