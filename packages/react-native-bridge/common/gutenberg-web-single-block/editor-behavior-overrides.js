@@ -12,10 +12,10 @@ window.addEventListener(
 		const selected = document.getSelection();
 		if (
 			selected &&
-			( window.activeElement.classList.contains(
+			( window.document.classList.contains(
 				'components-dropdown-menu__menu-item'
 			) ||
-				window.activeElement.classList.contains(
+				window.document.classList.contains(
 					'components-menu-item__button'
 				) )
 		) {
