@@ -1,8 +1,8 @@
 /**
  * WordPress dependencies
  */
-import { __ } from '@wordpress/i18n';
 import { useState, useEffect } from '@wordpress/element';
+import { __ } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
@@ -20,6 +20,7 @@ export default function ColorPanel( {
 	settings,
 	clientId,
 	enableContrastChecking = true,
+	showTitle = true,
 } ) {
 	const [ detectedBackgroundColor, setDetectedBackgroundColor ] = useState();
 	const [ detectedColor, setDetectedColor ] = useState();
@@ -58,6 +59,7 @@ export default function ColorPanel( {
 				title={ __( 'Color' ) }
 				initialOpen={ false }
 				settings={ settings }
+				showTitle={ showTitle }
 			>
 				{ enableContrastChecking && (
 					<ContrastChecker
