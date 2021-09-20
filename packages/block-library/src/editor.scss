@@ -18,6 +18,7 @@
 @import "./more/editor.scss";
 @import "./navigation/editor.scss";
 @import "./navigation-link/editor.scss";
+@import "./navigation-submenu/editor.scss";
 @import "./nextpage/editor.scss";
 @import "./page-list/editor.scss";
 @import "./paragraph/editor.scss";
@@ -48,14 +49,9 @@
 @import "./term-description/editor.scss";
 
 :root .editor-styles-wrapper {
-	// Background colors.
-	@include background-colors();
-
-	// Foreground colors.
-	@include foreground-colors();
-
-	// Gradients
-	@include gradient-colors();
+	@include background-colors-deprecated();
+	@include foreground-colors-deprecated();
+	@include gradient-colors-deprecated();
 }
 
 // Font sizes.

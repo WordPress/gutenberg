@@ -1,96 +1,75 @@
 /**
  * WordPress dependencies
  */
+import { useMergeRefs, useFocusableIframe } from '@wordpress/compose';
 import { useRef, useEffect, useMemo } from '@wordpress/element';
 
 /** @typedef {import('@wordpress/element').WPSyntheticEvent} WPSyntheticEvent */
 
+const attributeMap = {
+	class: 'className',
+	frameborder: 'frameBorder',
+	marginheight: 'marginHeight',
+	marginwidth: 'marginWidth',
+};
+
 export default function WpEmbedPreview( { html } ) {
 	const ref = useRef();
+	const props = useMemo( () => {
+		const doc = new window.DOMParser().parseFromString( html, 'text/html' );
+		const iframe = doc.querySelector( 'iframe' );
+		const iframeProps = {};
+
+		if ( ! iframe ) return iframeProps;
+
+		Array.from( iframe.attributes ).forEach( ( { name, value } ) => {
+			if ( name === 'style' ) return;
+			iframeProps[ attributeMap[ name ] || name ] = value;
+		} );
+
+		return iframeProps;
+	}, [ html ] );
 
 	useEffect( () => {
 		const { ownerDocument } = ref.current;
 		const { defaultView } = ownerDocument;
 
 		/**
-		 * Checks for WordPress embed events signaling the height change when iframe
-		 * content loads or iframe's window is resized.  The event is sent from
-		 * WordPress core via the window.postMessage API.
+		 * Checks for WordPress embed events signaling the height change when
+		 * iframe content loads or iframe's window is resized.  The event is
+		 * sent from WordPress core via the window.postMessage API.
 		 *
 		 * References:
-		 * window.postMessage: https://developer.mozilla.org/en-US/docs/Web/API/Window/postMessage
-		 * WordPress core embed-template on load: https://github.com/WordPress/WordPress/blob/HEAD/wp-includes/js/wp-embed-template.js#L143
-		 * WordPress core embed-template on resize: https://github.com/WordPress/WordPress/blob/HEAD/wp-includes/js/wp-embed-template.js#L187
+		 * window.postMessage:
+		 * https://developer.mozilla.org/en-US/docs/Web/API/Window/postMessage
+		 * WordPress core embed-template on load:
+		 * https://github.com/WordPress/WordPress/blob/HEAD/wp-includes/js/wp-embed-template.js#L143
+		 * WordPress core embed-template on resize:
+		 * https://github.com/WordPress/WordPress/blob/HEAD/wp-includes/js/wp-embed-template.js#L187
 		 *
-		 * @param {WPSyntheticEvent} event Message event.
+		 * @param {MessageEvent} event Message event.
 		 */
 		function resizeWPembeds( { data: { secret, message, value } = {} } ) {
-			if (
-				[ secret, message, value ].some(
-					( attribute ) => ! attribute
-				) ||
-				message !== 'height'
-			) {
+			if ( message !== 'height' || secret !== props[ 'data-secret' ] ) {
 				return;
 			}
 
-			ownerDocument
-				.querySelectorAll( `iframe[data-secret="${ secret }"` )
-				.forEach( ( iframe ) => {
-					if ( +iframe.height !== value ) {
-						iframe.height = value;
-					}
-				} );
-		}
-
-		/**
-		 * Checks whether the wp embed iframe is the activeElement,
-		 * if it is dispatch a focus event.
-		 */
-		function checkFocus() {
-			const { activeElement } = ownerDocument;
-
-			if (
-				activeElement.tagName !== 'IFRAME' ||
-				activeElement.parentNode !== ref.current
-			) {
-				return;
-			}
-
-			activeElement.focus();
+			ref.current.height = value;
 		}
 
 		defaultView.addEventListener( 'message', resizeWPembeds );
-		defaultView.addEventListener( 'blur', checkFocus );
-
 		return () => {
 			defaultView.removeEventListener( 'message', resizeWPembeds );
-			defaultView.removeEventListener( 'blur', checkFocus );
 		};
 	}, [] );
 
-	const __html = useMemo( () => {
-		const doc = new window.DOMParser().parseFromString( html, 'text/html' );
-		const iframe = doc.querySelector( 'iframe' );
-
-		if ( iframe ) {
-			iframe.removeAttribute( 'style' );
-		}
-
-		const blockQuote = doc.querySelector( 'blockquote' );
-
-		if ( blockQuote ) {
-			blockQuote.style.display = 'none';
-		}
-
-		return doc.body.innerHTML;
-	}, [ html ] );
-
 	return (
-		<div
-			ref={ ref }
-			className="wp-block-embed__wrapper"
-			dangerouslySetInnerHTML={ { __html } }
-		/>
+		<div className="wp-block-embed__wrapper">
+			<iframe
+				ref={ useMergeRefs( [ ref, useFocusableIframe() ] ) }
+				title={ props.title }
+				{ ...props }
+			/>
+		</div>
 	);
 }

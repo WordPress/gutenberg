@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 6.1.0 (2021-09-09)
+
 ### New Features
 
 -   Added a `batch` registry method to batch dispatch calls for performance reasons.

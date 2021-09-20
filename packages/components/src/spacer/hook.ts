@@ -6,8 +6,7 @@ import { css } from '@emotion/react';
 /**
  * Internal dependencies
  */
-import { useContextSystem } from '../ui/context';
-import type { PolymorphicComponentProps } from '../ui/context';
+import { useContextSystem, WordPressComponentProps } from '../ui/context';
 import { space } from '../ui/utils/space';
 import { useCx } from '../utils/hooks/use-cx';
 import type { Props } from './types';
@@ -15,7 +14,7 @@ import type { Props } from './types';
 const isDefined = < T >( o: T ): o is Exclude< T, null | undefined > =>
 	typeof o !== 'undefined' && o !== null;
 
-export function useSpacer( props: PolymorphicComponentProps< Props, 'div' > ) {
+export function useSpacer( props: WordPressComponentProps< Props, 'div' > ) {
 	const {
 		className,
 		margin,

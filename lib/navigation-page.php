@@ -41,7 +41,10 @@ function gutenberg_navigation_init( $hook ) {
 	$settings = array_merge(
 		gutenberg_get_default_block_editor_settings(),
 		array(
-			'blockNavMenus' => get_theme_support( 'block-nav-menus' ),
+			'blockNavMenus' => false,
+			// We should uncomment the line below when the block-nav-menus feature becomes stable.
+			// @see https://github.com/WordPress/gutenberg/issues/34265.
+			/*'blockNavMenus' => get_theme_support( 'block-nav-menus' ),*/
 		)
 	);
 	$settings = gutenberg_experimental_global_styles_settings( $settings );

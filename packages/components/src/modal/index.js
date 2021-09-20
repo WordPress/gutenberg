@@ -51,6 +51,7 @@ export default function Modal( {
 	overlayClassName,
 	className,
 	contentLabel,
+	onKeyDown,
 } ) {
 	const ref = useRef();
 	const instanceId = useInstanceId( Modal );
@@ -124,6 +125,7 @@ export default function Modal( {
 				aria-describedby={ aria.describedby }
 				tabIndex="-1"
 				{ ...( shouldCloseOnClickOutside ? focusOutsideProps : {} ) }
+				onKeyDown={ onKeyDown }
 			>
 				<div className={ 'components-modal__content' } role="document">
 					<div className="components-modal__header">

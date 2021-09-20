@@ -35,7 +35,17 @@ import { clamp, noop, throttle } from 'lodash';
  */
 import { __ } from '@wordpress/i18n';
 import { Component, createRef } from '@wordpress/element';
-import { TAB } from '@wordpress/keycodes';
+import {
+	TAB,
+	UP,
+	DOWN,
+	RIGHT,
+	LEFT,
+	PAGEUP,
+	PAGEDOWN,
+	HOME,
+	END,
+} from '@wordpress/keycodes';
 import { compose, pure, withInstanceId } from '@wordpress/compose';
 
 /**
@@ -43,7 +53,6 @@ import { compose, pure, withInstanceId } from '@wordpress/compose';
  */
 import { calculateSaturationChange } from './utils';
 import Button from '../button';
-import KeyboardShortcuts from '../keyboard-shortcuts';
 import { VisuallyHidden } from '../visually-hidden';
 
 export class Saturation extends Component {
@@ -60,6 +69,7 @@ export class Saturation extends Component {
 		this.handleChange = this.handleChange.bind( this );
 		this.handleMouseDown = this.handleMouseDown.bind( this );
 		this.handleMouseUp = this.handleMouseUp.bind( this );
+		this.handleKeyDown = this.handleKeyDown.bind( this );
 	}
 
 	componentWillUnmount() {
@@ -119,16 +129,33 @@ export class Saturation extends Component {
 		this.unbindEventListeners();
 	}
 
-	preventKeyEvents( event ) {
-		if ( event.keyCode === TAB ) {
-			return;
-		}
-		event.preventDefault();
-	}
-
 	unbindEventListeners() {
 		window.removeEventListener( 'mousemove', this.handleChange );
 		window.removeEventListener( 'mouseup', this.handleMouseUp );
+	}
+
+	handleKeyDown( event ) {
+		const { keyCode, shiftKey } = event;
+		const shortcuts = {
+			[ UP ]: () => this.brighten( shiftKey ? 0.1 : 0.01 ),
+			[ PAGEUP ]: () => this.brighten( 1 ),
+			[ DOWN ]: () => this.brighten( shiftKey ? -0.1 : -0.01 ),
+			[ PAGEDOWN ]: () => this.brighten( -1 ),
+			[ RIGHT ]: () => this.saturate( shiftKey ? 0.1 : 0.01 ),
+			[ END ]: () => this.saturate( 1 ),
+			[ LEFT ]: () => this.saturate( shiftKey ? -0.1 : -0.01 ),
+			[ HOME ]: () => this.saturate( -1 ),
+		};
+
+		for ( const code in shortcuts ) {
+			if ( code === String( keyCode ) ) {
+				shortcuts[ keyCode ]();
+			}
+		}
+
+		if ( keyCode !== TAB ) {
+			event.preventDefault();
+		}
 	}
 
 	render() {
@@ -137,51 +164,35 @@ export class Saturation extends Component {
 			top: `${ -hsv.v + 100 }%`,
 			left: `${ hsv.s }%`,
 		};
-		const shortcuts = {
-			up: () => this.brighten(),
-			'shift+up': () => this.brighten( 0.1 ),
-			pageup: () => this.brighten( 1 ),
-			down: () => this.brighten( -0.01 ),
-			'shift+down': () => this.brighten( -0.1 ),
-			pagedown: () => this.brighten( -1 ),
-			right: () => this.saturate(),
-			'shift+right': () => this.saturate( 0.1 ),
-			end: () => this.saturate( 1 ),
-			left: () => this.saturate( -0.01 ),
-			'shift+left': () => this.saturate( -0.1 ),
-			home: () => this.saturate( -1 ),
-		};
 
 		/* eslint-disable jsx-a11y/no-noninteractive-element-interactions */
 		return (
-			<KeyboardShortcuts shortcuts={ shortcuts }>
-				<div
-					style={ { background: `hsl(${ hsl.h },100%, 50%)` } }
-					className="components-color-picker__saturation-color"
-					ref={ this.container }
-					onMouseDown={ this.handleMouseDown }
-					onTouchMove={ this.handleChange }
-					onTouchStart={ this.handleChange }
-					role="application"
+			<div
+				style={ { background: `hsl(${ hsl.h },100%, 50%)` } }
+				className="components-color-picker__saturation-color"
+				ref={ this.container }
+				onMouseDown={ this.handleMouseDown }
+				onTouchMove={ this.handleChange }
+				onTouchStart={ this.handleChange }
+				role="application"
+			>
+				<div className="components-color-picker__saturation-white" />
+				<div className="components-color-picker__saturation-black" />
+				<Button
+					aria-label={ __( 'Choose a shade' ) }
+					aria-describedby={ `color-picker-saturation-${ instanceId }` }
+					className="components-color-picker__saturation-pointer"
+					style={ pointerLocation }
+					onKeyDown={ this.handleKeyDown }
+				/>
+				<VisuallyHidden
+					id={ `color-picker-saturation-${ instanceId }` }
 				>
-					<div className="components-color-picker__saturation-white" />
-					<div className="components-color-picker__saturation-black" />
-					<Button
-						aria-label={ __( 'Choose a shade' ) }
-						aria-describedby={ `color-picker-saturation-${ instanceId }` }
-						className="components-color-picker__saturation-pointer"
-						style={ pointerLocation }
-						onKeyDown={ this.preventKeyEvents }
-					/>
-					<VisuallyHidden
-						id={ `color-picker-saturation-${ instanceId }` }
-					>
-						{ __(
-							'Use your arrow keys to change the base color. Move up to lighten the color, down to darken, left to decrease saturation, and right to increase saturation.'
-						) }
-					</VisuallyHidden>
-				</div>
-			</KeyboardShortcuts>
+					{ __(
+						'Use your arrow keys to change the base color. Move up to lighten the color, down to darken, left to decrease saturation, and right to increase saturation.'
+					) }
+				</VisuallyHidden>
+			</div>
 		);
 		/* eslint-enable jsx-a11y/no-noninteractive-element-interactions */
 	}

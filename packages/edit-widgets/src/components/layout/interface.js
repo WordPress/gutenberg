@@ -65,14 +65,12 @@ function Interface( { blockEditorSettings } ) {
 			).isFeatureActive( 'core/edit-widgets', 'showBlockBreadcrumbs' ),
 			previousShortcut: select(
 				keyboardShortcutsStore
-			).getAllShortcutRawKeyCombinations(
+			).getAllShortcutKeyCombinations(
 				'core/edit-widgets/previous-region'
 			),
 			nextShortcut: select(
 				keyboardShortcutsStore
-			).getAllShortcutRawKeyCombinations(
-				'core/edit-widgets/next-region'
-			),
+			).getAllShortcutKeyCombinations( 'core/edit-widgets/next-region' ),
 		} ),
 		[]
 	);

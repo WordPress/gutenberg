@@ -16,9 +16,24 @@ figure.wp-block-gallery {
 		flex: 0 0 100%;
 	}
 
-	.components-form-file-upload {
+	> .components-form-file-upload {
 		flex-basis: 100%;
 	}
+
+	.wp-block-image {
+		.components-notice.is-error {
+			display: block;
+		}
+		.components-notice__content {
+			margin: 4px 0;
+		}
+		.components-notice__dismiss {
+			position: absolute;
+			top: 0;
+			right: 5px;
+		}
+	}
+
 	// @todo: this deserves a refactor, by being moved to the toolbar.
 	.block-editor-media-placeholder.is-appender {
 		.components-placeholder__label {
@@ -30,7 +45,6 @@ figure.wp-block-gallery {
 	}
 	.block-editor-media-placeholder {
 		margin: 0;
-		height: 100%;
 
 		&::before {
 			box-shadow: 0 0 0 $border-width $white inset, 0 0 0 3px var(--wp-admin-theme-color) inset;
@@ -190,4 +204,16 @@ figure.wp-block-gallery {
 	padding: 0;
 	// Some themes give all <ul> default margin instead of padding.
 	margin: 0;
+}
+
+.wp-block-update-gallery-modal {
+	max-width: 400px;
+	.wp-block-update-gallery-modal-buttons {
+		display: flex;
+		justify-content: flex-end;
+
+		.components-button {
+			margin-left: $grid-unit-15;
+		}
+	}
 }

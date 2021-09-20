@@ -168,7 +168,7 @@ export default function PostTitle() {
 	// The wp-block className is important for editor styles.
 	// This same block is used in both the visual and the code editor.
 	const className = classnames(
-		'wp-block editor-post-title editor-post-title__block editor-post-title__input rich-text',
+		'wp-block wp-block-post-title block-editor-block-list__block editor-post-title editor-post-title__input rich-text',
 		{
 			'is-selected': isSelected,
 			'is-focus-mode': isFocusMode,

@@ -67,6 +67,7 @@ function BlockAlignmentUI( {
 
 	const UIComponent = isToolbar ? ToolbarGroup : ToolbarDropdownMenu;
 	const extraProps = isToolbar ? { isCollapsed } : {};
+	const hasActive = enabledControls.some( ( control ) => control === value );
 
 	return (
 		<UIComponent
@@ -77,7 +78,10 @@ function BlockAlignmentUI( {
 					: defaultAlignmentControl.icon
 			}
 			label={ __( 'Align' ) }
-			toggleProps={ { describedBy: __( 'Change alignment' ) } }
+			toggleProps={ {
+				describedBy: __( 'Change alignment' ),
+				className: hasActive ? 'is-pressed' : undefined,
+			} }
 			controls={ enabledControls.map( ( control ) => {
 				return {
 					...BLOCK_ALIGNMENTS_CONTROLS[ control ],

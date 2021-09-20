@@ -1,4 +1,10 @@
 /**
+ * External dependencies
+ */
+// eslint-disable-next-line no-restricted-imports
+import { find, findAll } from 'puppeteer-testing-library';
+
+/**
  * WordPress dependencies
  */
 import {
@@ -193,7 +199,18 @@ describe( 'Navigation editor', () => {
 				POST: menuPostResponse,
 			} ),
 			...getMenuItemMocks( { GET: [] } ),
-			...getPagesMocks( { GET: [ {} ] } ), // mock a single page
+			...getPagesMocks( {
+				GET: [
+					{
+						type: 'page',
+						id: 1,
+						link: 'https://example.com/1',
+						title: {
+							rendered: 'My page',
+						},
+					},
+				],
+			} ),
 		] );
 
 		await page.keyboard.type( 'Main Menu' );
@@ -243,18 +260,12 @@ describe( 'Navigation editor', () => {
 		await visitNavigationEditor();
 
 		// Wait for the header to show the menu name.
-		await page.waitForXPath( '//h2[contains(., "Editing: Test Menu 1")]', {
+		await page.waitForXPath( '//h2[contains(., "Test Menu 1")]', {
 			visible: true,
 		} );
 
-		// Open up the menu creation dialog and create a new menu.
-		const switchMenuButton = await page.waitForXPath(
-			'//button[.="Switch menu"]'
-		);
-		await switchMenuButton.click();
-
 		const createMenuButton = await page.waitForXPath(
-			'//button[.="Create a new menu"]'
+			'//button[.="New menu"]'
 		);
 		await createMenuButton.click();
 
@@ -294,7 +305,7 @@ describe( 'Navigation editor', () => {
 		await visitNavigationEditor();
 
 		// Wait for the header to show the menu name.
-		await page.waitForXPath( '//h2[contains(., "Editing: Test Menu 1")]', {
+		await page.waitForXPath( '//h2[contains(., "Test Menu 1")]', {
 			visible: true,
 		} );
 
@@ -304,6 +315,29 @@ describe( 'Navigation editor', () => {
 		expect( await getSerializedBlocks() ).toMatchSnapshot();
 	} );
 
+	it( 'shows the trailing block appender within the navigation block when no blocks are selected', async () => {
+		// The test requires the presence of existing menus.
+		await setUpResponseMocking( [
+			...getMenuMocks( { GET: assignMockMenuIds( menusFixture ) } ),
+			...getMenuItemMocks( { GET: menuItemsFixture } ),
+		] );
+		await visitNavigationEditor();
+
+		// Wait for at least one block to be present on the page.
+		await page.waitForSelector( '.wp-block' );
+
+		// And for this test to be valid, no blocks should be selected, which
+		// should be the case when the editor loads.
+		const selectedBlocks = await page.$$( '.wp-block.is-selected' );
+		expect( selectedBlocks.length ).toBe( 0 );
+
+		// And when no blocks are selected, the trailing appender is present.
+		const blockListAppender = await page.waitForSelector(
+			'.block-list-appender button[aria-label="Add block"]'
+		);
+		expect( blockListAppender ).toBeTruthy();
+	} );
+
 	it( 'shows a submenu when a link is selected and hides it when clicking the editor to deselect it', async () => {
 		await setUpResponseMocking( [
 			...getMenuMocks( { GET: assignMockMenuIds( menusFixture ) } ),
@@ -311,9 +345,9 @@ describe( 'Navigation editor', () => {
 		] );
 		await visitNavigationEditor();
 
-		// Select a link block with nested links in a submenu.
+		// Select a submenu block with nested links in a submenu.
 		const parentLinkXPath =
-			'//div[@aria-label="Block: Custom Link" and contains(.,"WordPress.org")]';
+			'//div[@aria-label="Block: Submenu" and contains(.,"WordPress.org")]';
 		const linkBlock = await page.waitForXPath( parentLinkXPath );
 		await linkBlock.click();
 
@@ -354,7 +388,7 @@ describe( 'Navigation editor', () => {
 		);
 		await navBlock.click();
 		const startEmptyButton = await page.waitForXPath(
-			'//button[.="Start empty"]'
+			'//button[.="Start blank"]'
 		);
 		await startEmptyButton.click();
 
@@ -461,13 +495,13 @@ describe( 'Navigation editor', () => {
 			await saveButton.click();
 			await page.waitForSelector( '.components-snackbar' );
 			const headerSubtitle = await page.waitForSelector(
-				'.edit-navigation-header__subtitle'
+				'.edit-navigation-menu-actions__subtitle'
 			);
 			expect( headerSubtitle ).toBeTruthy();
 			const headerSubtitleText = await headerSubtitle.evaluate(
 				( element ) => element.innerText
 			);
-			expect( headerSubtitleText ).toBe( `Editing: ${ newName }` );
+			expect( headerSubtitleText ).toBe( newName );
 		} );
 
 		it( 'does not save a menu name upon clicking save button when name is empty', async () => {
@@ -498,15 +532,13 @@ describe( 'Navigation editor', () => {
 			await saveButton.click();
 			await page.waitForSelector( '.components-snackbar' );
 			const headerSubtitle = await page.waitForSelector(
-				'.edit-navigation-header__subtitle'
+				'.edit-navigation-menu-actions__subtitle'
 			);
 			expect( headerSubtitle ).toBeTruthy();
 			const headerSubtitleText = await headerSubtitle.evaluate(
 				( element ) => element.innerText
 			);
-			expect( headerSubtitleText ).toBe(
-				`Editing: ${ initialMenuName }`
-			);
+			expect( headerSubtitleText ).toBe( initialMenuName );
 		} );
 	} );
 
@@ -556,10 +588,12 @@ describe( 'Navigation editor', () => {
 			}
 		}
 
+		// eslint-disable-next-line jest/no-disabled-tests
 		it.skip( 'should not prompt to confirm unsaved changes for the newly selected menu', async () => {
 			await assertIsDirty( false );
 		} );
 
+		// eslint-disable-next-line jest/no-disabled-tests
 		it.skip( 'should prompt to confirm unsaved changes when menu name is edited', async () => {
 			await page.type(
 				'.edit-navigation-name-editor__text-control input',
@@ -567,6 +601,208 @@ describe( 'Navigation editor', () => {
 			);
 
 			await assertIsDirty( true );
+		} );
+	} );
+
+	describe( 'Sidebar inserter', () => {
+		const initialMenu = {
+			id: 4,
+			description: '',
+			name: 'Main Menu',
+			slug: 'main-menu',
+			meta: [],
+			auto_add: false,
+		};
+
+		it( 'disables inserter toggle when Navigation block is in placeholder state', async () => {
+			await setUpResponseMocking( [
+				...getMenuMocks( {
+					GET: [ initialMenu ],
+					POST: initialMenu,
+				} ),
+				...getMenuItemMocks( { GET: [] } ),
+			] );
+
+			await visitNavigationEditor();
+
+			// Wait for the block to be present.
+			await expect( {
+				role: 'document',
+				name: 'Block: Navigation',
+			} ).toBeFound();
+
+			// Check for the placeholder state
+			await expect( {
+				role: 'button',
+				name: 'Start blank',
+			} ).toBeFound();
+
+			// Expect the block inserter to be disabled.
+			await expect( {
+				name: 'Toggle block inserter',
+				disabled: true,
+				role: 'button',
+			} ).toBeFound();
+		} );
+
+		it( 'enables inserter toggle when Navigation block is in editable state', async () => {
+			await setUpResponseMocking( [
+				...getMenuMocks( {
+					GET: [ initialMenu ],
+					POST: initialMenu,
+				} ),
+				...getMenuItemMocks( { GET: menuItemsFixture } ),
+			] );
+
+			await visitNavigationEditor();
+
+			// Wait for the block to be present.
+			await expect( {
+				role: 'document',
+				name: 'Block: Navigation',
+			} ).toBeFound();
+
+			// Expect the block inserter to be found.
+			await expect( {
+				name: 'Toggle block inserter',
+				role: 'button',
+			} ).toBeFound();
+
+			// Work around bug where `find` with `disabled=false` doesn't return anything.
+			const isEnabled = await page.$eval(
+				'[aria-label="Toggle block inserter"]',
+				( element ) => ! element.disabled
+			);
+
+			expect( isEnabled ).toBeTruthy();
+		} );
+
+		it( 'toggles the inserter sidebar open and closed', async () => {
+			await setUpResponseMocking( [
+				...getMenuMocks( {
+					GET: [ initialMenu ],
+					POST: initialMenu,
+				} ),
+				...getMenuItemMocks( { GET: menuItemsFixture } ),
+			] );
+
+			await visitNavigationEditor();
+
+			// Wait for the block to be present.
+			await expect( {
+				role: 'document',
+				name: 'Block: Navigation',
+			} ).toBeFound();
+
+			// Expect inserter sidebar to **not** be in the DOM.
+			await expect( {
+				role: 'region',
+				name: 'Block library',
+			} ).not.toBeFound();
+
+			const inserterToggle = await find( {
+				name: 'Toggle block inserter',
+				role: 'button',
+			} );
+
+			await inserterToggle.click();
+
+			// Expect the inserter sidebar to be present in the DOM.
+			await expect( {
+				role: 'region',
+				name: 'Block library',
+			} ).toBeFound();
+
+			// Expect block search input to be focused.
+			await expect( {
+				role: 'searchbox',
+				name: 'Search for blocks and patterns',
+				focused: true,
+			} ).toBeFound();
+		} );
+
+		it( 'inserts items at end of Navigation block by default', async () => {
+			await setUpResponseMocking( [
+				...getMenuMocks( {
+					GET: [ initialMenu ],
+					POST: initialMenu,
+				} ),
+				...getMenuItemMocks( { GET: menuItemsFixture } ),
+				...getSearchMocks( { GET: searchFixture } ),
+			] );
+
+			await visitNavigationEditor();
+
+			// Wait for the block to be present.
+			await expect( {
+				role: 'document',
+				name: 'Block: Navigation',
+			} ).toBeFound();
+
+			const inserterToggle = await find( {
+				name: 'Toggle block inserter',
+				role: 'button',
+			} );
+
+			await inserterToggle.click();
+
+			// Expect the inserter sidebar to be present in the DOM.
+			await expect( {
+				role: 'region',
+				name: 'Block library',
+			} ).toBeFound();
+
+			// Add Custom Link item.
+			const customLinkOption = await find( {
+				name: 'Custom Link',
+				role: 'option',
+			} );
+
+			customLinkOption.click();
+
+			// Expect that inserter is auto-closed.
+			await expect( {
+				role: 'region',
+				name: 'Block library',
+			} ).not.toBeFound();
+
+			// Expect to be focused inside the Link UI search input.
+			await expect( {
+				role: 'combobox',
+				name: 'URL',
+				focused: true,
+			} ).toBeFound();
+
+			const [ itemToSelect ] = searchFixture;
+
+			// Add Custom Link item.
+			const [ firstSearchSuggestion ] = await findAll( {
+				role: 'option',
+				name: `${ itemToSelect.title } ${ itemToSelect.subtype }`,
+			} );
+
+			await firstSearchSuggestion.click();
+
+			// Get the title/label of the last Nav item inside the Nav block.
+			const lastItemAttributes = await page.evaluate( () => {
+				const { getBlockOrder, getBlocks } = wp.data.select(
+					'core/block-editor'
+				);
+
+				const lockedNavigationBlock = getBlockOrder()[ 0 ];
+
+				const navItemBlocks = getBlocks( lockedNavigationBlock );
+
+				const { attributes } = navItemBlocks[
+					navItemBlocks.length - 1
+				];
+
+				return attributes;
+			} );
+
+			// Check the last item is the one we just inserted
+			expect( lastItemAttributes.label ).toEqual( itemToSelect.title );
+			expect( lastItemAttributes.isTopLevelLink ).toBeTruthy();
 		} );
 	} );
 } );

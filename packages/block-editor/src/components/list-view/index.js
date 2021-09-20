@@ -4,7 +4,7 @@
 
 import { useMergeRefs } from '@wordpress/compose';
 import { __experimentalTreeGrid as TreeGrid } from '@wordpress/components';
-import { useDispatch } from '@wordpress/data';
+import { AsyncModeProvider, useDispatch } from '@wordpress/data';
 import {
 	useCallback,
 	useEffect,
@@ -62,7 +62,11 @@ function ListView(
 	},
 	ref
 ) {
-	const { clientIdsTree, selectedClientIds } = useListViewClientIds(
+	const {
+		clientIdsTree,
+		selectedClientIds,
+		draggedClientIds,
+	} = useListViewClientIds(
 		blocks,
 		showOnlyCurrentHierarchy,
 		__experimentalPersistentListViewFeatures
@@ -86,18 +90,24 @@ function ListView(
 		isMounted.current = true;
 	}, [] );
 
-	const expand = ( clientId ) => {
-		if ( ! clientId ) {
-			return;
-		}
-		setExpandedState( { type: 'expand', clientId } );
-	};
-	const collapse = ( clientId ) => {
-		if ( ! clientId ) {
-			return;
-		}
-		setExpandedState( { type: 'collapse', clientId } );
-	};
+	const expand = useCallback(
+		( clientId ) => {
+			if ( ! clientId ) {
+				return;
+			}
+			setExpandedState( { type: 'expand', clientId } );
+		},
+		[ setExpandedState ]
+	);
+	const collapse = useCallback(
+		( clientId ) => {
+			if ( ! clientId ) {
+				return;
+			}
+			setExpandedState( { type: 'collapse', clientId } );
+		},
+		[ setExpandedState ]
+	);
 	const expandRow = ( row ) => {
 		expand( row?.dataset?.block );
 	};
@@ -110,6 +120,8 @@ function ListView(
 			__experimentalFeatures,
 			__experimentalPersistentListViewFeatures,
 			isTreeGridMounted: isMounted.current,
+			draggedClientIds,
+			selectedClientIds,
 			expandedState,
 			expand,
 			collapse,
@@ -118,6 +130,8 @@ function ListView(
 			__experimentalFeatures,
 			__experimentalPersistentListViewFeatures,
 			isMounted.current,
+			draggedClientIds,
+			selectedClientIds,
 			expandedState,
 			expand,
 			collapse,
@@ -125,7 +139,7 @@ function ListView(
 	);
 
 	return (
-		<>
+		<AsyncModeProvider value={ true }>
 			<ListViewDropIndicator
 				listViewRef={ elementRef }
 				blockDropTarget={ blockDropTarget }
@@ -141,12 +155,11 @@ function ListView(
 					<ListViewBranch
 						blocks={ clientIdsTree }
 						selectBlock={ selectEditorBlock }
-						selectedBlockClientIds={ selectedClientIds }
 						{ ...props }
 					/>
 				</ListViewContext.Provider>
 			</TreeGrid>
-		</>
+		</AsyncModeProvider>
 	);
 }
 export default forwardRef( ListView );

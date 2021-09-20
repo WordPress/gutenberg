@@ -9,6 +9,14 @@ import { every } from 'lodash';
 import { useSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 
+/**
+ * Shortcode transforms don't currently have a tranform method and so can't use a selector to
+ * retrieve the data for each image being transformer, so this selector handle this post transformation.
+ *
+ * @param {Array} shortCodeTransforms An array of image data passed from the shortcode transform.
+ *
+ * @return {Array} An array of extended image data objects for each of the shortcode transform images.
+ */
 export default function useShortCodeTransform( shortCodeTransforms ) {
 	const newImageData = useSelect(
 		( select ) => {

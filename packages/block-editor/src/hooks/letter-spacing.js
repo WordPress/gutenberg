@@ -14,7 +14,8 @@ import { cleanEmptyObject } from './utils';
  * Key within block settings' supports array indicating support for letter-spacing
  * e.g. settings found in `block.json`.
  */
-export const LETTER_SPACING_SUPPORT_KEY = '__experimentalLetterSpacing';
+export const LETTER_SPACING_SUPPORT_KEY =
+	'typography.__experimentalLetterSpacing';
 
 /**
  * Inspector control panel containing the letter-spacing options.

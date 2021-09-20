@@ -90,8 +90,15 @@
 			stroke: currentColor;
 		}
 	}
-}
 
+	// Styles for button toggles.
+	button.wp-block-navigation__submenu-icon.wp-block-navigation__submenu-icon.wp-block-navigation__submenu-icon.wp-block-navigation__submenu-icon {
+		padding: $grid-unit $grid-unit-20;
+		background-color: inherit;
+		color: currentColor;
+		border: none;
+	}
+}
 
 // Styles for submenu flyout.
 // These are separated out with reduced specificity to allow better inheritance from Global Styles.
@@ -167,13 +174,12 @@
 		}
 	}
 
-
 	// Separating out hover and focus-within so hover works again on IE: https://davidwalsh.name/css-focus-within#comment-513401
 	// We will need to replace focus-within with a JS solution for IE keyboard support.
 
 	// Custom menu items.
-	// Show submenus on hover.
-	&:hover > .wp-block-navigation__submenu-container {
+	// Show submenus on hover unless they open on click.
+	&:where(:not(.open-on-click)):hover > .wp-block-navigation__submenu-container {
 		visibility: visible;
 		opacity: 1;
 		width: auto;
@@ -182,7 +188,16 @@
 	}
 
 	// Keep submenus open when focus is within.
-	&:focus-within > .wp-block-navigation__submenu-container {
+	&:where(:not(.open-on-click):not(.open-on-hover-click)):focus-within > .wp-block-navigation__submenu-container {
+		visibility: visible;
+		opacity: 1;
+		width: auto;
+		height: auto;
+		min-width: 200px;
+	}
+
+	// Show submenus on click.
+	.wp-block-navigation-submenu__toggle[aria-expanded="true"] + .wp-block-navigation__submenu-container {
 		visibility: visible;
 		opacity: 1;
 		width: auto;
@@ -192,7 +207,9 @@
 }
 
 // Submenu indentation when there's a background.
-.wp-block-navigation.has-background .has-child .wp-block-navigation__submenu-container {
+.wp-block-navigation.has-background
+.has-child
+.wp-block-navigation__submenu-container {
 	left: 0;
 	top: 100%;
 
@@ -205,22 +222,14 @@
 	}
 }
 
-
 /**
  * Margins
- * @todo: refactor this to use gap.
  */
 
 // Menu items with no background.
-.wp-block-page-list,
-.wp-block-page-list > .wp-block-navigation-item,
-.wp-block-navigation__container > .wp-block-navigation-item {
-	margin: 0 2em 0 0;
-
-	// Margin of right-most margin should be zero, for right aligned or justified items.
-	&:last-child {
-		margin-right: 0;
-	}
+.wp-block-navigation .wp-block-page-list,
+.wp-block-navigation__container {
+	gap: 0.5em 2em;
 }
 
 // Menu items with background.
@@ -228,18 +237,11 @@
 // That way if padding is set in theme.json, it still wins.
 // https://css-tricks.com/almanac/selectors/w/where/
 .wp-block-navigation:where(.has-background) {
-	.wp-block-page-list,
-	.wp-block-page-list > .wp-block-navigation-item,
-	.wp-block-navigation__container > .wp-block-navigation-item {
-		margin: 0 0.5em 0 0;
-
-		// Don't show right margin on the last child.
-		&:last-child {
-			margin: 0;
-		}
+	.wp-block-navigation .wp-block-page-list,
+	.wp-block-navigation__container {
+		gap: 0 0.5em;
 	}
 }
-
 
 /**
  * Paddings
@@ -265,7 +267,6 @@
 	padding: 0.5em 1em;
 }
 
-
 /**
  * Justifications.
  */
@@ -273,11 +274,12 @@
 // When justified space-between, open submenus leftward for last menu item.
 // When justified right, open all submenus leftwards.
 // This needs high specificity.
-.wp-block-navigation.items-justified-space-between .wp-block-page-list > .has-child:last-child,
+.wp-block-navigation.items-justified-space-between
+.wp-block-page-list > .has-child:last-child,
 .wp-block-navigation.items-justified-space-between > .wp-block-navigation__container > .has-child:last-child,
 .wp-block-navigation.items-justified-right .wp-block-page-list > .has-child,
-.wp-block-navigation.items-justified-right > .wp-block-navigation__container .has-child {
-
+.wp-block-navigation.items-justified-right > .wp-block-navigation__container
+.has-child {
 	// First submenu.
 	.wp-block-navigation__submenu-container {
 		left: auto;
@@ -357,11 +359,9 @@
 	align-items: flex-end;
 
 	.wp-block-navigation-item {
-		margin-right: 0;
 		justify-content: flex-end;
 	}
 }
-
 
 /**
  * Mobile menu.
@@ -443,7 +443,8 @@
 }
 
 // Default menu background and font color.
-.wp-block-navigation:not(.has-background) .wp-block-navigation__responsive-container.is-menu-open {
+.wp-block-navigation:not(.has-background)
+.wp-block-navigation__responsive-container.is-menu-open {
 	background-color: #fff;
 	color: #000;
 }
@@ -524,12 +525,15 @@
 		position: relative;
 		opacity: 1;
 		visibility: visible;
+		height: auto;
+		width: auto;
 
 		padding: 0 0 0 32px;
 		border: none;
 	}
 
-	.wp-block-navigation-item {
+	.wp-block-navigation-item,
+	.wp-block-page-list {
 		flex-direction: column;
 		align-items: flex-start;
 	}

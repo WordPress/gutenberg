@@ -4,6 +4,7 @@
 import {
 	createUpgradedEmbedBlock,
 	getClassNames,
+	fallback,
 	getAttributesFromPreview,
 	getEmbedInfoByProvider,
 } from './util';
@@ -24,13 +25,20 @@ import classnames from 'classnames';
  */
 import { _x } from '@wordpress/i18n';
 import { useState, useEffect } from '@wordpress/element';
-import { useSelect } from '@wordpress/data';
+import { useDispatch, useSelect } from '@wordpress/data';
 import {
 	useBlockProps,
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import { store as coreStore } from '@wordpress/core-data';
 import { View } from '@wordpress/primitives';
+
+// The inline preview feature will be released progressible, for this reason
+// the embed will only be considered previewable for the following providers list.
+const PREVIEWABLE_PROVIDERS = [ 'youtube', 'twitter', 'instagram', 'vimeo' ];
+// Some providers are rendering the inline preview as a WordPress embed and
+// are not supported yet, so we need to disallow them with a fixed providers list.
+const NOT_PREVIEWABLE_WP_EMBED_PROVIDERS = [ 'pinterest' ];
 
 const EmbedEdit = ( props ) => {
 	const {
@@ -48,8 +56,8 @@ const EmbedEdit = ( props ) => {
 		title: _x( 'Embed', 'block title' ),
 		icon: embedContentIcon,
 	};
-	const { icon, title } =
-		getEmbedInfoByProvider( providerNameSlug ) || defaultEmbedInfo;
+	const embedInfoByProvider = getEmbedInfoByProvider( providerNameSlug );
+	const { icon, title } = embedInfoByProvider || defaultEmbedInfo;
 
 	const { wasBlockJustInserted } = useSelect(
 		( select ) => ( {
@@ -62,6 +70,7 @@ const EmbedEdit = ( props ) => {
 	const [ isEditingURL, setIsEditingURL ] = useState(
 		isSelected && wasBlockJustInserted && ! url
 	);
+	const { invalidateResolution } = useDispatch( coreStore );
 
 	const {
 		preview,
@@ -207,21 +216,40 @@ const EmbedEdit = ( props ) => {
 	} = getMergedAttributes();
 	const className = classnames( classFromPreview, props.className );
 
+	const isProviderPreviewable =
+		PREVIEWABLE_PROVIDERS.includes( providerNameSlug ) ||
+		// For WordPress embeds, we enable the inline preview for all its providers
+		// except the ones that are not supported yet.
+		( 'wp-embed' === type &&
+			! NOT_PREVIEWABLE_WP_EMBED_PROVIDERS.includes( providerNameSlug ) );
+
 	return (
 		<>
 			{ showEmbedPlaceholder ? (
-				<View { ...blockProps }>
-					<EmbedPlaceholder
-						icon={ icon }
-						isSelected={ isSelected }
-						label={ title }
-						onPress={ ( event ) => {
-							onFocus( event );
-							setIsEditingURL( true );
-						} }
-						cannotEmbed={ cannotEmbed }
+				<>
+					<EmbedControls
+						showEditButton={ cannotEmbed }
+						switchBackToURLInput={ () => setIsEditingURL( true ) }
 					/>
-				</View>
+					<View { ...blockProps }>
+						<EmbedPlaceholder
+							icon={ icon }
+							isSelected={ isSelected }
+							label={ title }
+							onPress={ ( event ) => {
+								onFocus( event );
+								setIsEditingURL( true );
+							} }
+							cannotEmbed={ cannotEmbed }
+							fallback={ () => fallback( url, onReplace ) }
+							tryAgain={ () => {
+								invalidateResolution( 'getEmbedPreview', [
+									url,
+								] );
+							} }
+						/>
+					</View>
+				</>
 			) : (
 				<>
 					<EmbedControls
@@ -243,9 +271,11 @@ const EmbedEdit = ( props ) => {
 							label={ title }
 							onFocus={ onFocus }
 							preview={ preview }
+							isProviderPreviewable={ isProviderPreviewable }
 							previewable={ previewable }
 							type={ type }
 							url={ url }
+							isDefaultEmbedInfo={ ! embedInfoByProvider }
 						/>
 					</View>
 				</>

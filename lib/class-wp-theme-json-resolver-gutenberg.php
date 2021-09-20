@@ -407,10 +407,10 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 	 * @return WP_Theme_JSON_Gutenberg
 	 */
 	public static function get_merged_data( $settings = array(), $origin = 'user' ) {
-		$theme_support_data = WP_Theme_JSON_Gutenberg::get_from_editor_settings( $settings );
-
 		$result = new WP_Theme_JSON_Gutenberg();
 		$result->merge( self::get_core_data() );
+
+		$theme_support_data = WP_Theme_JSON_Gutenberg::get_from_editor_settings( $settings );
 		$result->merge( self::get_theme_data( $theme_support_data ) );
 
 		if ( 'user' === $origin ) {
@@ -524,3 +524,4 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 }
 
 add_action( 'switch_theme', array( 'WP_Theme_JSON_Resolver_Gutenberg', 'clean_cached_data' ) );
+add_action( 'start_previewing_theme', array( 'WP_Theme_JSON_Resolver_Gutenberg', 'clean_cached_data' ) );

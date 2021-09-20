@@ -143,12 +143,14 @@ export default function FontAppearanceControl( props ) {
 		return hasFontStyles ? styleOptions() : weightOptions();
 	}, [ props.options ] );
 
-	// Find current selection by comparing font style & weight against options.
-	const currentSelection = selectOptions.find(
-		( option ) =>
-			option.style.fontStyle === fontStyle &&
-			option.style.fontWeight === fontWeight
-	);
+	// Find current selection by comparing font style & weight against options,
+	// and fall back to the Default option if there is no matching option.
+	const currentSelection =
+		selectOptions.find(
+			( option ) =>
+				option.style.fontStyle === fontStyle &&
+				option.style.fontWeight === fontWeight
+		) || selectOptions[ 0 ];
 
 	// Adjusts field label in case either styles or weights are disabled.
 	const getLabel = () => {
@@ -165,6 +167,10 @@ export default function FontAppearanceControl( props ) {
 
 	// Adjusts screen reader description based on styles or weights.
 	const getDescribedBy = () => {
+		if ( ! currentSelection ) {
+			return __( 'No selected font appearance' );
+		}
+
 		if ( ! hasFontStyles ) {
 			return sprintf(
 				// translators: %s: Currently selected font weight.

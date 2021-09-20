@@ -13,6 +13,27 @@ import {
 import { SelectControl } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 
+const htmlElementMessages = {
+	header: __(
+		'The <header> element should represent introductory content, typically a group of introductory or navigational aids.'
+	),
+	main: __(
+		'The <main> element should be used for the primary content of your document only. '
+	),
+	section: __(
+		"The <section> element should represent a standalone portion of the document that can't be better represented by another element."
+	),
+	article: __(
+		'The <article> element should represent a self contained, syndicatable portion of the document.'
+	),
+	aside: __(
+		"The <aside> element should represent a portion of a document whose content is only indirectly related to the document's main content."
+	),
+	footer: __(
+		'The <footer> element should represent a footer for its nearest sectioning element (e.g.: <section>, <article>, <main> etc.).'
+	),
+};
+
 function GroupEdit( { attributes, setAttributes, clientId } ) {
 	const { hasInnerBlocks, themeSupportsLayout } = useSelect(
 		( select ) => {
@@ -28,10 +49,12 @@ function GroupEdit( { attributes, setAttributes, clientId } ) {
 	const defaultLayout = useSetting( 'layout' ) || {};
 	const { tagName: TagName = 'div', templateLock, layout = {} } = attributes;
 	const usedLayout = !! layout && layout.inherit ? defaultLayout : layout;
+	const { type = 'default' } = usedLayout;
+	const layoutSupportEnabled = themeSupportsLayout || type !== 'default';
 
 	const blockProps = useBlockProps();
 	const innerBlocksProps = useInnerBlocksProps(
-		themeSupportsLayout
+		layoutSupportEnabled
 			? blockProps
 			: { className: 'wp-block-group__inner-container' },
 		{
@@ -39,7 +62,7 @@ function GroupEdit( { attributes, setAttributes, clientId } ) {
 			renderAppender: hasInnerBlocks
 				? undefined
 				: InnerBlocks.ButtonBlockAppender,
-			__experimentalLayout: themeSupportsLayout ? usedLayout : undefined,
+			__experimentalLayout: layoutSupportEnabled ? usedLayout : undefined,
 		}
 	);
 
@@ -61,12 +84,13 @@ function GroupEdit( { attributes, setAttributes, clientId } ) {
 					onChange={ ( value ) =>
 						setAttributes( { tagName: value } )
 					}
+					help={ htmlElementMessages[ TagName ] }
 				/>
 			</InspectorControls>
-			{ themeSupportsLayout && <TagName { ...innerBlocksProps } /> }
+			{ layoutSupportEnabled && <TagName { ...innerBlocksProps } /> }
 			{ /* Ideally this is not needed but it's there for backward compatibility reason
 				to keep this div for themes that might rely on its presence */ }
-			{ ! themeSupportsLayout && (
+			{ ! layoutSupportEnabled && (
 				<TagName { ...blockProps }>
 					<div { ...innerBlocksProps } />
 				</TagName>
