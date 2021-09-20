@@ -36,9 +36,9 @@ export function useToolsPanelItem(
 	const {
 		panelId: currentPanelId,
 		menuItems,
-		registerPanelItem,
-		deregisterPanelItem,
-		flagItemCustomization,
+		registerPanelItem = () => undefined,
+		deregisterPanelItem = () => undefined,
+		flagItemCustomization = () => undefined,
 		isResetting,
 	} = useToolsPanelContext();
 

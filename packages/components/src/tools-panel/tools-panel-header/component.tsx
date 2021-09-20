@@ -1,7 +1,3 @@
-// This can be removed once typing has been completed for DropdownMenu,
-// MenuGroup & MenuItem.
-// @ts-nocheck
-
 /**
  * External dependencies
  */
@@ -22,9 +18,14 @@ import MenuGroup from '../../menu-group';
 import MenuItem from '../../menu-item';
 import { useToolsPanelHeader } from './hook';
 import { contextConnect, WordPressComponentProps } from '../../ui/context';
-import type { ToolsPanelHeaderProps } from '../types';
+import type {
+	ToolsPanelControlsGroupProps,
+	ToolsPanelHeaderProps,
+} from '../types';
 
-const DefaultControlsGroup = ( { items, onClose, toggleItem } ) => {
+const DefaultControlsGroup = ( props: ToolsPanelControlsGroupProps ) => {
+	const { items, onClose, toggleItem } = props;
+
 	if ( ! items.length ) {
 		return null;
 	}
@@ -62,7 +63,9 @@ const DefaultControlsGroup = ( { items, onClose, toggleItem } ) => {
 	);
 };
 
-const OptionalControlsGroup = ( { items, onClose, toggleItem } ) => {
+const OptionalControlsGroup = ( props: ToolsPanelControlsGroupProps ) => {
+	const { items, onClose, toggleItem } = props;
+
 	if ( ! items.length ) {
 		return null;
 	}
@@ -132,7 +135,7 @@ const ToolsPanelHeader = (
 					label={ labelText }
 					menuProps={ { className: dropdownMenuClassName } }
 				>
-					{ ( { onClose } ) => (
+					{ ( { onClose = () => undefined } ) => (
 						<>
 							<DefaultControlsGroup
 								items={ defaultItems }

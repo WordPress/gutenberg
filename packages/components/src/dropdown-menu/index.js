@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * External dependencies
  */
@@ -34,22 +35,24 @@ function mergeProps( defaultProps = {}, props = {} ) {
 	return mergedProps;
 }
 
-function DropdownMenu( {
-	children,
-	className,
-	controls,
-	icon = menu,
-	label,
-	popoverProps,
-	toggleProps,
-	menuProps,
-	disableOpenOnArrowDown = false,
-	text,
-	// The following props exist for backward compatibility.
-	menuLabel,
-	position,
-	noIcons,
-} ) {
+function DropdownMenu( dropdownMenuProps ) {
+	const {
+		children,
+		className,
+		controls,
+		icon = menu,
+		label,
+		popoverProps,
+		toggleProps,
+		menuProps,
+		disableOpenOnArrowDown = false,
+		text,
+		// The following props exist for backward compatibility.
+		menuLabel,
+		position,
+		noIcons,
+	} = dropdownMenuProps;
+
 	if ( menuLabel ) {
 		deprecated( '`menuLabel` prop in `DropdownComponent`', {
 			since: '5.3',
