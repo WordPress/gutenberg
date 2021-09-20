@@ -304,18 +304,21 @@ function RichTextWrapper(
 
 	const TagName = tagName;
 	const content = (
-		<Popover.__unstableSlotNameProvider value="__unstable-block-tools-after">
+		<>
 			{ isSelected && (
 				<keyboardShortcutContext.Provider value={ keyboardShortcuts }>
 					<inputEventContext.Provider value={ inputEvents }>
-						{ children && children( { value, onChange, onFocus } ) }
-						<FormatEdit
-							value={ value }
-							onChange={ onChange }
-							onFocus={ onFocus }
-							formatTypes={ formatTypes }
-							forwardedRef={ anchorRef }
-						/>
+						<Popover.__unstableSlotNameProvider value="__unstable-block-tools-after">
+							{ children &&
+								children( { value, onChange, onFocus } ) }
+							<FormatEdit
+								value={ value }
+								onChange={ onChange }
+								onFocus={ onFocus }
+								formatTypes={ formatTypes }
+								forwardedRef={ anchorRef }
+							/>
+						</Popover.__unstableSlotNameProvider>
 					</inputEventContext.Provider>
 				</keyboardShortcutContext.Provider>
 			) }
@@ -387,7 +390,7 @@ function RichTextWrapper(
 				onFocus={ unstableOnFocus }
 				onKeyDown={ onKeyDown }
 			/>
-		</Popover.__unstableSlotNameProvider>
+		</>
 	);
 
 	if ( ! wrapperClassName ) {
