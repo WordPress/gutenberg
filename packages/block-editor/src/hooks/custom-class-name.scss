@@ -1,3 +1,8 @@
 .additional-class-name-control__container.has-block-styles {
 	display: flex;
+	align-items: start;
+}
+
+.additional-class-name-control__block-style-dropdown {
+	margin-top: -6px; // Being the padding around the icon.
 }

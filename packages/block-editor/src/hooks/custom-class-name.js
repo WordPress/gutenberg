@@ -18,13 +18,16 @@ import { hasBlockSupport, store as blocksStore } from '@wordpress/blocks';
 import { createHigherOrderComponent } from '@wordpress/compose';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { check, moreVertical } from '@wordpress/icons';
-import { store as blockEditorStore } from '../store';
 
 /**
  * Internal dependencies
  */
 import { InspectorControls } from '../components';
-import { getActiveStyle, replaceActiveStyle } from '../components/block-styles/utils';
+import {
+	getActiveStyle,
+	replaceActiveStyle,
+} from '../components/block-styles/utils';
+import { store as blockEditorStore } from '../store';
 
 /**
  * Filters registered block settings, extending attributes with anchor using ID
@@ -130,6 +133,7 @@ export const withInspectorControl = createHigherOrderComponent(
 								/>
 								{ hasBlockStyles && (
 									<DropdownMenu
+										className="additional-class-name-control__block-style-dropdown"
 										icon={ moreVertical }
 										label={ __( 'Block style classes' ) }
 									>
@@ -146,7 +150,9 @@ export const withInspectorControl = createHigherOrderComponent(
 															style.name;
 														return (
 															<MenuItem
-																key={ style.label }
+																key={
+																	style.label
+																}
 																icon={
 																	isSelected &&
 																	check
@@ -165,7 +171,8 @@ export const withInspectorControl = createHigherOrderComponent(
 																{ style.label }
 															</MenuItem>
 														);
-												} ) }
+													}
+												) }
 											</MenuGroup>
 										) }
 									</DropdownMenu>
