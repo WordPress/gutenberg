@@ -411,17 +411,7 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 		$result->merge( self::get_core_data() );
 
 		$theme_support_data  = WP_Theme_JSON_Gutenberg::get_from_editor_settings( $settings );
-		$with_theme_supports = new WP_Theme_JSON_Gutenberg( $theme_support_data );
-		$result->merge( $with_theme_supports );
-
-		if (
-			! get_theme_support( 'experimental-link-color' ) && // link color support needs the presets CSS variables regardless of the presence of theme.json file.
-			! WP_Theme_JSON_Resolver_Gutenberg::theme_has_support()
-			) {
-			return $result;
-		}
-
-		$result->merge( self::get_theme_data() );
+		$result->merge( self::get_theme_data( $theme_support_data ) );
 
 		if ( 'user' === $origin ) {
 			$result->merge( self::get_user_data() );
