@@ -12,7 +12,7 @@ import { useCx } from '../utils/hooks/use-cx';
 
 /* eslint-disable jsdoc/valid-types */
 /**
- * @param {import('../ui/context').PolymorphicComponentProps<import('./types').Props, 'div'>} props
+ * @param {import('../ui/context').WordPressComponentProps<import('./types').Props, 'div'>} props
  */
 /* eslint-enable jsdoc/valid-types */
 export function useScrollable( props ) {

@@ -2,7 +2,6 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import { isEmpty } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -70,13 +69,7 @@ export default function PageListEdit( {
 		context.customOverlayBackgroundColor,
 	] );
 
-	useEffect( () => {
-		const isNavigationChild = isEmpty( context ) ? false : true;
-		setAttributes( { isNavigationChild } );
-	}, [] );
-
-	const { textColor, backgroundColor, showSubmenuIcon, style } =
-		context || {};
+	const { textColor, backgroundColor, style } = context || {};
 
 	const [ allowConvertToLinks, setAllowConvertToLinks ] = useState( false );
 
@@ -89,7 +82,6 @@ export default function PageListEdit( {
 				'background-color',
 				backgroundColor
 			) ]: !! backgroundColor,
-			'show-submenu-icons': !! showSubmenuIcon,
 		} ),
 		style: { ...style?.color },
 	} );
@@ -104,6 +96,14 @@ export default function PageListEdit( {
 		},
 		[ clientId ]
 	);
+
+	useEffect( () => {
+		setAttributes( {
+			isNavigationChild: isParentNavigation,
+			openSubmenusOnClick: !! context.openSubmenusOnClick,
+			showSubmenuIcon: !! context.showSubmenuIcon,
+		} );
+	}, [ context.openSubmenusOnClick, context.showSubmenuIcon ] );
 
 	useEffect( () => {
 		if ( isParentNavigation ) {
@@ -127,6 +127,14 @@ export default function PageListEdit( {
 	const openModal = () => setOpen( true );
 	const closeModal = () => setOpen( false );
 
+	// Update parent status before component first renders.
+	const attributesWithParentStatus = {
+		...attributes,
+		isNavigationChild: isParentNavigation,
+		openSubmenusOnClick: !! context.openSubmenusOnClick,
+		showSubmenuIcon: !! context.showSubmenuIcon,
+	};
+
 	return (
 		<>
 			{ allowConvertToLinks && (
@@ -145,7 +153,7 @@ export default function PageListEdit( {
 			<div { ...blockProps }>
 				<ServerSideRender
 					block="core/page-list"
-					attributes={ attributes }
+					attributes={ attributesWithParentStatus }
 				/>
 			</div>
 		</>

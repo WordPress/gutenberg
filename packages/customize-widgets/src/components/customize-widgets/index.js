@@ -3,6 +3,7 @@
  */
 import { useState, useEffect, useRef, createPortal } from '@wordpress/element';
 import { SlotFillProvider, Popover } from '@wordpress/components';
+import { ShortcutProvider } from '@wordpress/keyboard-shortcuts';
 
 /**
  * Internal dependencies
@@ -67,16 +68,21 @@ export default function CustomizeWidgets( {
 		);
 
 	return (
-		<SlotFillProvider>
-			<SidebarControls
-				sidebarControls={ sidebarControls }
-				activeSidebarControl={ activeSidebarControl }
-			>
-				<FocusControl api={ api } sidebarControls={ sidebarControls }>
-					{ activeSidebar }
-					{ popover }
-				</FocusControl>
-			</SidebarControls>
-		</SlotFillProvider>
+		<ShortcutProvider>
+			<SlotFillProvider>
+				<SidebarControls
+					sidebarControls={ sidebarControls }
+					activeSidebarControl={ activeSidebarControl }
+				>
+					<FocusControl
+						api={ api }
+						sidebarControls={ sidebarControls }
+					>
+						{ activeSidebar }
+						{ popover }
+					</FocusControl>
+				</SidebarControls>
+			</SlotFillProvider>
+		</ShortcutProvider>
 	);
 }

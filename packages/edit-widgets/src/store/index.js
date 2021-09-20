@@ -27,7 +27,6 @@ const storeConfig = {
 	selectors,
 	resolvers,
 	actions,
-	persist: [ 'preferences' ],
 };
 
 /**

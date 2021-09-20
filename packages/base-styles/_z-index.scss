@@ -43,8 +43,8 @@ $z-layers: (
 	".wp-block-template-part__placeholder-preview-filter-input": 1,
 
 	// Navigation menu dropdown.
-	".has-child .wp-block-navigation-link__container": 28,
-	".has-child:hover .wp-block-navigation-link__container": 29,
+	".has-child .wp-block-navigation__submenu-container": 28,
+	".has-child:hover .wp-block-navigation__submenu-container": 29,
 
 	// Active pill button
 	".components-button {:focus or .is-primary}": 1,
@@ -147,7 +147,7 @@ $z-layers: (
 	".components-popover.edit-widgets-more-menu__content": 99998,
 	".components-popover.block-editor-rich-text__inline-format-toolbar": 99998,
 	".components-popover.block-editor-warning__dropdown": 99998,
-	".components-popover.edit-navigation-header__menu-switcher-dropdown": 99998,
+	".components-popover.edit-navigation-menu-actions__switcher-dropdown": 99998,
 
 	".components-autocomplete__results": 1000000,
 

@@ -74,31 +74,26 @@ The following sample code renders the previously shown button only on Paragraph 
 
 ```js
 ( function ( wp ) {
-	var withSelect = wp.data.withSelect;
-	var ifCondition = wp.compose.ifCondition;
-	var compose = wp.compose.compose;
-	var MyCustomButton = function ( props ) {
-		return wp.element.createElement( wp.editor.RichTextToolbarButton, {
+	var el = wp.element.createElement;
+	var useSelect = wp.data.useSelect;
+
+	function ConditionalButton( props ) {
+		var selectedBlock = useSelect( function ( select ) {
+			return select( 'core/block-editor' ).getSelectedBlock();
+		}, [] );
+
+		if ( selectedBlock && selectedBlock.name !== 'core/paragraph' ) {
+			return null;
+		}
+
+		return el( wp.blockEditor.RichTextToolbarButton, {
 			icon: 'editor-code',
 			title: 'Sample output',
 			onClick: function () {
-				console.log( 'toggle format' );
+				console.log( 'toggle format!' );
 			},
 		} );
 	};
-	var ConditionalButton = compose(
-		withSelect( function ( select ) {
-			return {
-				selectedBlock: select( 'core/editor' ).getSelectedBlock(),
-			};
-		} ),
-		ifCondition( function ( props ) {
-			return (
-				props.selectedBlock &&
-				props.selectedBlock.name === 'core/paragraph'
-			);
-		} )
-	)( MyCustomButton );
 
 	wp.richText.registerFormatType( 'my-custom-format/sample-output', {
 		title: 'Sample output',
@@ -112,12 +107,19 @@ The following sample code renders the previously shown button only on Paragraph 
 {% ESNext %}
 
 ```js
-import { compose, ifCondition } from '@wordpress/compose';
 import { registerFormatType } from '@wordpress/rich-text';
 import { RichTextToolbarButton } from '@wordpress/block-editor';
-import { withSelect } from '@wordpress/data';
+import { useSelect } from '@wordpress/data';
 
-const MyCustomButton = ( props ) => {
+function ConditionalButton( props ) {
+	const selectedBlock = useSelect( ( select ) => {
+		return select( 'core/block-editor' ).getSelectedBlock();
+	}, [] );
+
+	if ( selectedBlock && selectedBlock.name !== 'core/paragraph' ) {
+		return null;
+	}
+
 	return (
 		<RichTextToolbarButton
 			icon="editor-code"
@@ -127,20 +129,7 @@ const MyCustomButton = ( props ) => {
 			} }
 		/>
 	);
-};
-
-const ConditionalButton = compose(
-	withSelect( function ( select ) {
-		return {
-			selectedBlock: select( 'core/editor' ).getSelectedBlock(),
-		};
-	} ),
-	ifCondition( function ( props ) {
-		return (
-			props.selectedBlock && props.selectedBlock.name === 'core/paragraph'
-		);
-	} )
-)( MyCustomButton );
+}
 
 registerFormatType( 'my-custom-format/sample-output', {
 	title: 'Sample output',
@@ -152,6 +141,6 @@ registerFormatType( 'my-custom-format/sample-output', {
 
 {% end %}
 
-Don't forget adding `wp-compose` and `wp-data` to the dependencies array in the PHP script.
+Don't forget adding `wp-data` to the dependencies array in the PHP script.
 
 More advanced conditions can be used, e.g., only render the button depending on specific attributes of the block.

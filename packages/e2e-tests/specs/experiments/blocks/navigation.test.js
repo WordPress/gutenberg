@@ -346,7 +346,7 @@ describe( 'Navigation', () => {
 			// Scope element selector to the Editor's "Content" region as otherwise it picks up on
 			// block previews.
 			const navLinkSelector =
-				'[aria-label="Editor content"][role="region"] div[aria-label="Block: Custom Link"]';
+				'[aria-label="Editor content"][role="region"] .wp-block-navigation-item';
 
 			await page.waitForSelector( navLinkSelector );
 
@@ -593,6 +593,53 @@ describe( 'Navigation', () => {
 
 		// Expect a Navigation Block with a link for "A really long page name that will not exist".
 		expect( await getEditedPostContent() ).toMatchSnapshot();
+	} );
+
+	it( 'allows navigation submenus to open on click instead of hover', async () => {
+		await mockAllMenusResponses();
+
+		// Add the navigation block.
+		await insertBlock( 'Navigation' );
+
+		await selectDropDownOption( 'Test Menu 2' );
+
+		// 	const blocks = await getAllBlocks();
+		// await selectBlockByClientId( blocks[ 0 ].clientId );
+
+		await toggleSidebar();
+
+		const [ openOnClickButton ] = await page.$x(
+			'//label[contains(text(),"Open submenus on click")]'
+		);
+
+		await openOnClickButton.click();
+
+		await saveDraft();
+
+		// Scope element selector to the Editor's "Content" region as otherwise it picks up on
+		// block previews.
+		const navSubmenuSelector =
+			'[aria-label="Editor content"][role="region"] [aria-label="Block: Submenu"]';
+
+		await page.waitForSelector( navSubmenuSelector );
+
+		const navSubmenusLength = await page.$$eval(
+			navSubmenuSelector,
+			( els ) => els.length
+		);
+
+		const navButtonTogglesSelector =
+			'[aria-label="Editor content"][role="region"] [aria-label="Block: Submenu"] button.wp-block-navigation-item__content';
+
+		await page.waitForSelector( navButtonTogglesSelector );
+
+		const navButtonTogglesLength = await page.$$eval(
+			navButtonTogglesSelector,
+			( els ) => els.length
+		);
+
+		// Assert the correct number of button toggles are present.
+		expect( navSubmenusLength ).toEqual( navButtonTogglesLength );
 	} );
 
 	// The following tests are unstable, roughly around when https://github.com/WordPress/wordpress-develop/pull/1412

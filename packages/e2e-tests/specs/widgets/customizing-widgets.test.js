@@ -18,6 +18,10 @@ import {
 // eslint-disable-next-line no-restricted-imports
 import { find } from 'puppeteer-testing-library';
 
+const twentyTwentyError = `Stylesheet twentytwenty-block-editor-styles-css was not properly added.
+For blocks, use the block API's style (https://developer.wordpress.org/block-editor/reference-guides/block-api/block-metadata/#style) or editorStyle (https://developer.wordpress.org/block-editor/reference-guides/block-api/block-metadata/#editor-style).
+For themes, use add_editor_style (https://developer.wordpress.org/block-editor/how-to-guides/themes/theme-support/#editor-styles).`;
+
 describe( 'Widgets Customizer', () => {
 	beforeEach( async () => {
 		await deleteAllWidgets();
@@ -26,14 +30,14 @@ describe( 'Widgets Customizer', () => {
 		// Disable welcome guide if it is enabled.
 		const isWelcomeGuideActive = await page.evaluate( () =>
 			wp.data
-				.select( 'core/customize-widgets' )
-				.__unstableIsFeatureActive( 'welcomeGuide' )
+				.select( 'core/interface' )
+				.isFeatureActive( 'core/customize-widgets', 'welcomeGuide' )
 		);
 		if ( isWelcomeGuideActive ) {
 			await page.evaluate( () =>
 				wp.data
-					.dispatch( 'core/customize-widgets' )
-					.__unstableToggleFeature( 'welcomeGuide' )
+					.dispatch( 'core/interface' )
+					.toggleFeature( 'core/customize-widgets', 'welcomeGuide' )
 			);
 		}
 	} );
@@ -158,6 +162,8 @@ describe( 'Widgets Customizer', () => {
 			name: 'My Search',
 			selector: '.widget-content *',
 		} ).toBeFound( findOptions );
+
+		expect( console ).toHaveErrored( twentyTwentyError );
 	} );
 
 	it( 'should open the inspector panel', async () => {
@@ -243,6 +249,8 @@ describe( 'Widgets Customizer', () => {
 		} ).toBeFound();
 
 		await expect( inspectorHeading ).not.toBeVisible();
+
+		expect( console ).toHaveErrored( twentyTwentyError );
 	} );
 
 	it( 'should handle the inserter outer section', async () => {
@@ -350,6 +358,8 @@ describe( 'Widgets Customizer', () => {
 			name: 'Add a block',
 			level: 2,
 		} ).not.toBeFound();
+
+		expect( console ).toHaveErrored( twentyTwentyError );
 	} );
 
 	it( 'should move focus to the block', async () => {
@@ -445,6 +455,8 @@ describe( 'Widgets Customizer', () => {
 			text: 'First Heading',
 		} );
 		await expect( headingBlock ).toHaveFocus();
+
+		expect( console ).toHaveErrored( twentyTwentyError );
 	} );
 
 	it( 'should clear block selection', async () => {
@@ -507,6 +519,8 @@ describe( 'Widgets Customizer', () => {
 			role: 'toolbar',
 			name: 'Block tools',
 		} ).not.toBeFound();
+
+		expect( console ).toHaveErrored( twentyTwentyError );
 	} );
 
 	it( 'should handle legacy widgets', async () => {
@@ -685,6 +699,8 @@ describe( 'Widgets Customizer', () => {
 			selector: '*[aria-live="polite"][aria-relevant="additions text"]',
 		} ).toBeFound();
 		await expect( paragraphBlock ).toBeVisible();
+
+		expect( console ).toHaveErrored( twentyTwentyError );
 	} );
 
 	it( 'should move (inner) blocks to another sidebar', async () => {
@@ -744,6 +760,8 @@ describe( 'Widgets Customizer', () => {
 		await expect( movedParagraphBlockQuery ).toBeFound();
 		const movedParagraphBlock = await find( movedParagraphBlockQuery );
 		await expect( movedParagraphBlock ).toHaveFocus();
+
+		expect( console ).toHaveErrored( twentyTwentyError );
 	} );
 } );
 

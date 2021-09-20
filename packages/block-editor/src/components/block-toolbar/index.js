@@ -124,6 +124,10 @@ export default function BlockToolbar( { hideDragHandle } ) {
 			{ shouldShowVisualToolbar && (
 				<>
 					<BlockControls.Slot
+						group="parent"
+						className="block-editor-block-toolbar__slot"
+					/>
+					<BlockControls.Slot
 						group="block"
 						className="block-editor-block-toolbar__slot"
 					/>

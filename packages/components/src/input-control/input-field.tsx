@@ -22,7 +22,7 @@ import { UP, DOWN, ENTER } from '@wordpress/keycodes';
 /**
  * Internal dependencies
  */
-import type { PolymorphicComponentProps } from '../ui/context';
+import type { WordPressComponentProps } from '../ui/context';
 import { useDragCursor } from './utils';
 import { Input } from './styles/input-control-styles';
 import { useInputControlStateReducer } from './reducer/reducer';
@@ -53,7 +53,7 @@ function InputField(
 		value: valueProp,
 		type,
 		...props
-	}: PolymorphicComponentProps< InputFieldProps, 'input', false >,
+	}: WordPressComponentProps< InputFieldProps, 'input', false >,
 	ref: Ref< HTMLInputElement >
 ) {
 	const {

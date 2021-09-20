@@ -27,9 +27,11 @@ export default function useTabNav() {
 	const focusCaptureBeforeRef = useRef();
 	const focusCaptureAfterRef = useRef();
 	const lastFocus = useRef();
-	const { hasMultiSelection, getSelectedBlockClientId } = useSelect(
-		blockEditorStore
-	);
+	const {
+		hasMultiSelection,
+		getSelectedBlockClientId,
+		getBlockCount,
+	} = useSelect( blockEditorStore );
 	const { setNavigationMode } = useDispatch( blockEditorStore );
 	const isNavigationMode = useSelect(
 		( select ) => select( blockEditorStore ).isNavigationMode(),
@@ -143,6 +145,18 @@ export default function useTabNav() {
 
 		function onFocusOut( event ) {
 			lastFocus.current = event.target;
+
+			const { ownerDocument } = node;
+
+			// If focus disappears due to there being no blocks, move focus to
+			// the writing flow wrapper.
+			if (
+				! event.relatedTarget &&
+				ownerDocument.activeElement === ownerDocument.body &&
+				getBlockCount() === 0
+			) {
+				node.focus();
+			}
 		}
 
 		// When tabbing back to an element in block list, this event handler prevents scrolling if the
@@ -179,17 +193,13 @@ export default function useTabNav() {
 			}
 		}
 
-		node.ownerDocument.defaultView.addEventListener(
-			'keydown',
-			preventScrollOnTab
-		);
+		const { ownerDocument } = node;
+		const { defaultView } = ownerDocument;
+		defaultView.addEventListener( 'keydown', preventScrollOnTab );
 		node.addEventListener( 'keydown', onKeyDown );
 		node.addEventListener( 'focusout', onFocusOut );
 		return () => {
-			node.ownerDocument.defaultView.removeEventListener(
-				'keydown',
-				preventScrollOnTab
-			);
+			defaultView.removeEventListener( 'keydown', preventScrollOnTab );
 			node.removeEventListener( 'keydown', onKeyDown );
 			node.removeEventListener( 'focusout', onFocusOut );
 		};

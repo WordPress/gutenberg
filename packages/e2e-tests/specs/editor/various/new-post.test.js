@@ -25,9 +25,12 @@ describe( 'new editor state', () => {
 			expect.stringContaining( 'post-new.php' )
 		);
 		// Should display the blank title.
-		const title = await page.$( '[placeholder="Add title"]' );
+		const title = await page.$( '[aria-label="Add title"]' );
 		expect( title ).not.toBeNull();
-		expect( title.innerHTML ).toBeFalsy();
+		// Trim padding non-breaking space
+		expect(
+			await title.evaluate( ( el ) => el.textContent.trim() )
+		).toBeFalsy();
 		// Should display the Preview button.
 		const postPreviewButton = await page.$(
 			'.editor-post-preview.components-button'
@@ -59,7 +62,7 @@ describe( 'new editor state', () => {
 		} );
 
 		expect( activeElementClasses ).toContain( 'editor-post-title__input' );
-		expect( activeElementTagName ).toEqual( 'textarea' );
+		expect( activeElementTagName ).toEqual( 'h1' );
 	} );
 
 	it( 'should not focus the title if the title exists', async () => {

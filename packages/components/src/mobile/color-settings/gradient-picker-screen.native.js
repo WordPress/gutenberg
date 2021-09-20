@@ -13,7 +13,7 @@ import { __ } from '@wordpress/i18n';
  * Internal dependencies
  */
 import CustomGradientPicker from '../../custom-gradient-picker';
-import NavigationHeader from '../bottom-sheet/navigation-header';
+import NavBar from '../bottom-sheet/nav-bar';
 
 const GradientPickerScreen = () => {
 	const navigation = useNavigation();
@@ -21,10 +21,10 @@ const GradientPickerScreen = () => {
 	const { setColor, currentValue, isGradientColor } = route.params;
 	return (
 		<View>
-			<NavigationHeader
-				screen={ __( 'Customize Gradient' ) }
-				leftButtonOnPress={ navigation.goBack }
-			/>
+			<NavBar>
+				<NavBar.BackButton onPress={ navigation.goBack } />
+				<NavBar.Heading>{ __( 'Customize Gradient' ) }</NavBar.Heading>
+			</NavBar>
 			<CustomGradientPicker
 				setColor={ setColor }
 				currentValue={ currentValue }

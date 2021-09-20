@@ -22,11 +22,15 @@ export function useToolsPanelHeader( props ) {
 		return cx( styles.ToolsPanelHeader, className );
 	}, [ className ] );
 
-	const { menuItems } = useToolsPanelContext();
-	const hasMenuItems = !! Object.entries( menuItems ).length;
+	const dropdownMenuClassName = useMemo( () => {
+		return cx( styles.DropdownMenu );
+	}, [] );
+
+	const { menuItems, hasMenuItems } = useToolsPanelContext();
 
 	return {
 		...otherProps,
+		dropdownMenuClassName,
 		hasMenuItems,
 		menuItems,
 		className: classes,

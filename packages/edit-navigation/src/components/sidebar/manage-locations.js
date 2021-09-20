@@ -11,6 +11,10 @@ import {
 	Spinner,
 	SelectControl,
 } from '@wordpress/components';
+import { decodeEntities } from '@wordpress/html-entities';
+import apiFetch from '@wordpress/api-fetch';
+import { useDispatch } from '@wordpress/data';
+import { store as noticesStore } from '@wordpress/notices';
 
 /**
  * Internal dependencies
@@ -30,6 +34,62 @@ export default function ManageLocations( {
 	const [ isModalOpen, setIsModalOpen ] = useState( false );
 	const openModal = () => setIsModalOpen( true );
 	const closeModal = () => setIsModalOpen( false );
+	const { createSuccessNotice, createErrorNotice } = useDispatch(
+		noticesStore
+	);
+
+	const validateBatchResponse = ( batchResponse ) => {
+		if ( batchResponse.failed ) {
+			return false;
+		}
+
+		const errorResponses = batchResponse.responses.filter( ( response ) => {
+			return 200 > response.status || 300 <= response.status;
+		} );
+
+		return 1 > errorResponses.length;
+	};
+
+	const handleUpdateMenuLocations = async () => {
+		const method = 'POST';
+		const batchRequests = menus.map( ( { id } ) => {
+			const locations = menuLocations
+				.filter( ( menuLocation ) => menuLocation.menu === id )
+				.map( ( menuLocation ) => menuLocation.name );
+
+			return {
+				path: `/__experimental/menus/${ id }`,
+				body: {
+					locations,
+				},
+				method,
+			};
+		} );
+
+		const batchResponse = await apiFetch( {
+			path: 'batch/v1',
+			data: {
+				validation: 'require-all-validate',
+				requests: batchRequests,
+			},
+			method,
+		} );
+
+		const isSuccess = validateBatchResponse( batchResponse );
+
+		if ( isSuccess ) {
+			createSuccessNotice( __( 'Menu locations have been updated.' ), {
+				type: 'snackbar',
+			} );
+			closeModal();
+			return;
+		}
+
+		createErrorNotice(
+			__( 'An error occurred while trying to update menu locations.' ),
+			{ type: 'snackbar' }
+		);
+	};
 
 	if ( ! menuLocations || ! menus?.length ) {
 		return <Spinner />;
@@ -82,7 +142,7 @@ export default function ManageLocations( {
 							sprintf(
 								// translators: menu name.
 								__( 'Currently using %s' ),
-								menuOnLocation.name
+								decodeEntities( menuOnLocation.name )
 							)
 						}
 					/>
@@ -101,13 +161,13 @@ export default function ManageLocations( {
 				className="edit-navigation-manage-locations__select-menu"
 				label={ menuLocation.description }
 				labelPosition="top"
-				value={ menuLocation.menu }
+				value={ decodeEntities( menuLocation.menu ) }
 				options={ [
 					{ value: 0, label: __( 'Select a Menu' ), key: 0 },
 					...menus.map( ( { id, name } ) => ( {
 						key: id,
 						value: id,
-						label: name,
+						label: decodeEntities( name ),
 					} ) ),
 				] }
 				onChange={ ( menuId ) => {
@@ -155,6 +215,13 @@ export default function ManageLocations( {
 						{ themeLocationCountTextModal }
 					</div>
 					{ menuLocationCard }
+					<Button
+						className="edit-navigation-manage-locations__save-button"
+						variant="primary"
+						onClick={ handleUpdateMenuLocations }
+					>
+						{ __( 'Update' ) }
+					</Button>
 				</Modal>
 			) }
 		</PanelBody>

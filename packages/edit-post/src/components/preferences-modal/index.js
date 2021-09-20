@@ -243,14 +243,12 @@ export default function PreferencesModal() {
 								/>
 							</PageAttributesCheck>
 						</Section>
-						<Section
+						<MetaBoxesSection
 							title={ __( 'Additional' ) }
 							description={ __(
 								'Add extra areas to the editor.'
 							) }
-						>
-							<MetaBoxesSection />
-						</Section>
+						/>
 					</>
 				),
 			},

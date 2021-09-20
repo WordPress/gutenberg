@@ -22,7 +22,13 @@ import styles from './style.scss';
 
 const MIN_COL_NUM = 3;
 
-export default function BlockTypesList( { name, items, onSelect, listProps } ) {
+export default function BlockTypesList( {
+	name,
+	items,
+	onSelect,
+	listProps,
+	initialNumToRender = 3,
+} ) {
 	const [ numberOfColumns, setNumberOfColumns ] = useState( MIN_COL_NUM );
 	const [ itemWidth, setItemWidth ] = useState();
 	const [ maxWidth, setMaxWidth ] = useState();
@@ -81,7 +87,7 @@ export default function BlockTypesList( { name, items, onSelect, listProps } ) {
 			keyboardShouldPersistTaps="always"
 			numColumns={ numberOfColumns }
 			data={ items }
-			initialNumToRender={ 3 }
+			initialNumToRender={ initialNumToRender }
 			ItemSeparatorComponent={ () => (
 				<TouchableWithoutFeedback accessible={ false }>
 					<View

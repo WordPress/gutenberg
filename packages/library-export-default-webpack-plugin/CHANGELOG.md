@@ -2,9 +2,11 @@
 
 ## Unreleased
 
+## 2.2.0 (2021-08-23)
+
 ### Deprecations
 
--   This plugin is deprecated for webpack 5. Please use [`output.library.export`](https://webpack.js.org/configuration/output/#outputlibraryexport) instead ([#33818](ttps://github.com/WordPress/gutenberg/pull/33818)).
+-   This plugin is deprecated for webpack 5. Please use [`output.library.export`](https://webpack.js.org/configuration/output/#outputlibraryexport) instead ([#33818](https://github.com/WordPress/gutenberg/pull/33818)).
 
 ## 2.0.0 (2021-01-21)
 

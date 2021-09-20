@@ -16,7 +16,7 @@ import { Platform } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import { InspectorControls, InspectorAdvancedControls } from '../components';
+import { InspectorControls } from '../components';
 
 /**
  * Regular expression matching invalid anchor characters for replacement.
@@ -107,9 +107,9 @@ export const withInspectorControl = createHigherOrderComponent(
 					<>
 						<BlockEdit { ...props } />
 						{ isWeb && (
-							<InspectorAdvancedControls>
+							<InspectorControls __experimentalGroup="advanced">
 								{ textControl }
-							</InspectorAdvancedControls>
+							</InspectorControls>
 						) }
 						{ /*
 						 * We plan to remove scoping anchors to 'core/heading' to support

@@ -54,6 +54,7 @@ const postTypeEntities = [
 	mergedEdits: {
 		meta: true,
 	},
+	rawAttributes: [ 'title', 'excerpt', 'content' ],
 } ) );
 import { EditorHelpTopics } from '@wordpress/editor';
 
@@ -89,11 +90,18 @@ class NativeEditorProvider extends Component {
 	}
 
 	componentDidMount() {
-		const { capabilities, updateSettings } = this.props;
+		const {
+			capabilities,
+			locale,
+			updateSettings,
+			galleryWithImageBlocks,
+		} = this.props;
 
 		updateSettings( {
 			...capabilities,
+			...{ __unstableGalleryWithImageBlocks: galleryWithImageBlocks },
 			...this.getThemeColors( this.props ),
+			locale,
 		} );
 
 		this.subscriptionParentGetHtml = subscribeParentGetHtml( () => {
@@ -142,8 +150,13 @@ class NativeEditorProvider extends Component {
 
 		this.subscriptionParentUpdateEditorSettings = subscribeUpdateEditorSettings(
 			( editorSettings ) => {
-				const themeColors = this.getThemeColors( editorSettings );
-				updateSettings( themeColors );
+				updateSettings( {
+					...{
+						__unstableGalleryWithImageBlocks:
+							editorSettings.galleryWithImageBlocks,
+					},
+					...this.getThemeColors( editorSettings ),
+				} );
 			}
 		);
 
@@ -160,8 +173,6 @@ class NativeEditorProvider extends Component {
 		);
 
 		this.subscriptionParentShowEditorHelp = subscribeShowEditorHelp( () => {
-			// Temporary: feature hidden from production. This is just here for testing
-			// purposes and will be replaced with actual logic in a later PR.
 			this.setState( { isHelpVisible: true } );
 		} );
 
@@ -333,6 +344,7 @@ class NativeEditorProvider extends Component {
 				<EditorHelpTopics
 					isVisible={ this.state.isHelpVisible }
 					onClose={ () => this.setState( { isHelpVisible: false } ) }
+					close={ () => this.setState( { isHelpVisible: false } ) }
 				/>
 			</>
 		);

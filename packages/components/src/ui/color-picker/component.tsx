@@ -19,7 +19,7 @@ import { __ } from '@wordpress/i18n';
 import {
 	useContextSystem,
 	contextConnect,
-	PolymorphicComponentProps,
+	WordPressComponentProps,
 } from '../context';
 import { HStack } from '../../h-stack';
 import Button from '../../button';
@@ -53,7 +53,7 @@ const getSafeColor = (
 };
 
 const ColorPicker = (
-	props: PolymorphicComponentProps< ColorPickerProps, 'div', false >,
+	props: WordPressComponentProps< ColorPickerProps, 'div', false >,
 	forwardedRef: Ref< any >
 ) => {
 	const {

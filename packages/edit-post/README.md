@@ -12,7 +12,7 @@ Install the module
 npm install @wordpress/edit-post
 ```
 
-_This package assumes that your code will run in an **ES2015+** environment. If you're using an environment that has limited or no support for ES2015+ such as IE browsers then using [core-js](https://github.com/zloirock/core-js) will add polyfills for these methods._
+_This package assumes that your code will run in an **ES2015+** environment. If you're using an environment that has limited or no support for such language features and APIs, you should include [the polyfill shipped in `@wordpress/babel-preset-default`](https://github.com/WordPress/gutenberg/tree/HEAD/packages/babel-preset-default#polyfill) in your code._
 
 ## Extending the post editor UI
 
@@ -31,13 +31,10 @@ They can be found in the global variable `wp.editPost` when defining `wp-edit-po
 
 Initializes and returns an instance of Editor.
 
-The return value of this function is not necessary if we change where we
-call initializeEditor(). This is due to metaBox timing.
-
 _Parameters_
 
 -   _id_ `string`: Unique identifier for editor instance.
--   _postType_ `Object`: Post type of the post to edit.
+-   _postType_ `string`: Post type of the post to edit.
 -   _postId_ `Object`: ID of the post to edit.
 -   _settings_ `?Object`: Editor settings object.
 -   _initialEdits_ `Object`: Programmatic edits to apply initially, to be considered as non-user-initiated (bypass for unsaved changes prompt).

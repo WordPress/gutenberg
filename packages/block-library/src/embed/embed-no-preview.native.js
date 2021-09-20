@@ -8,7 +8,7 @@ import { TouchableOpacity, TouchableWithoutFeedback, Text } from 'react-native';
  */
 import { View } from '@wordpress/primitives';
 
-import { __ } from '@wordpress/i18n';
+import { __, sprintf } from '@wordpress/i18n';
 import { useRef, useState } from '@wordpress/element';
 import { usePreferredColorSchemeStyle } from '@wordpress/compose';
 import { requestPreview } from '@wordpress/react-native-bridge';
@@ -23,7 +23,14 @@ import { BlockIcon } from '@wordpress/block-editor';
  */
 import styles from './styles.scss';
 
-const EmbedNoPreview = ( { label, icon, isSelected, onPress } ) => {
+const EmbedNoPreview = ( {
+	label,
+	icon,
+	isSelected,
+	onPress,
+	previewable,
+	isDefaultEmbedInfo,
+} ) => {
 	const shouldRequestReview = useRef( false );
 	const [ isSheetVisible, setIsSheetVisible ] = useState( false );
 
@@ -73,11 +80,19 @@ const EmbedNoPreview = ( { label, icon, isSelected, onPress } ) => {
 		postType === 'page' ? __( 'Preview page' ) : __( 'Preview post' );
 	const comingSoonDescription =
 		postType === 'page'
-			? __(
-					'We’re working hard on adding support for embed previews. In the meantime, you can preview the embedded content on the page.'
+			? sprintf(
+					// translators: %s: embed block variant's label e.g: "Twitter".
+					__(
+						'We’re working hard on adding support for %s previews. In the meantime, you can preview the embedded content on the page.'
+					),
+					label
 			  )
-			: __(
-					'We’re working hard on adding support for embed previews. In the meantime, you can preview the embedded content on the post.'
+			: sprintf(
+					// translators: %s: embed block variant's label e.g: "Twitter".
+					__(
+						'We’re working hard on adding support for %s previews. In the meantime, you can preview the embedded content on the post.'
+					),
+					label
 			  );
 
 	function onOpenSheet() {
@@ -106,7 +121,7 @@ const EmbedNoPreview = ( { label, icon, isSelected, onPress } ) => {
 		onPressContainer();
 	}
 
-	return (
+	const embedNoProviderPreview = (
 		<>
 			<TouchableWithoutFeedback
 				accessibilityRole={ 'button' }
@@ -118,7 +133,11 @@ const EmbedNoPreview = ( { label, icon, isSelected, onPress } ) => {
 					<BlockIcon icon={ icon } />
 					<Text style={ labelStyle }>{ label }</Text>
 					<Text style={ descriptionStyle }>
-						{ __( 'Embed previews not yet available' ) }
+						{ sprintf(
+							// translators: %s: embed block variant's label e.g: "Twitter".
+							__( '%s previews not yet available' ),
+							label
+						) }
 					</Text>
 					<Text style={ styles.embed__action }>
 						{ previewButtonText.toUpperCase() }
@@ -154,7 +173,15 @@ const EmbedNoPreview = ( { label, icon, isSelected, onPress } ) => {
 						/>
 					</View>
 					<Text style={ sheetTitleStyle }>
-						{ __( 'Embed block previews are coming soon' ) }
+						{ isDefaultEmbedInfo
+							? __( 'Embed block previews are coming soon' )
+							: sprintf(
+									// translators: %s: embed block variant's label e.g: "Twitter".
+									__(
+										'%s embed block previews are coming soon'
+									),
+									label
+							  ) }
 					</Text>
 					<Text style={ sheetDescriptionStyle }>
 						{ comingSoonDescription }
@@ -176,6 +203,21 @@ const EmbedNoPreview = ( { label, icon, isSelected, onPress } ) => {
 					labelStyle={ sheetButtonStyle }
 				/>
 			</BottomSheet>
+		</>
+	);
+
+	return (
+		<>
+			{ previewable ? (
+				embedNoProviderPreview
+			) : (
+				<View style={ containerStyle }>
+					<BlockIcon icon={ icon } />
+					<Text style={ labelStyle }>
+						{ __( 'No preview available' ) }
+					</Text>
+				</View>
+			) }
 		</>
 	);
 };

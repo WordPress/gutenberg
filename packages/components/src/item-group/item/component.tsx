@@ -9,11 +9,11 @@ import type { Ref } from 'react';
  */
 import type { ItemProps } from '../types';
 import { useItem } from './hook';
-import { contextConnect, PolymorphicComponentProps } from '../../ui/context';
+import { contextConnect, WordPressComponentProps } from '../../ui/context';
 import { View } from '../../view';
 
 function Item(
-	props: PolymorphicComponentProps< ItemProps, 'div' >,
+	props: WordPressComponentProps< ItemProps, 'div' >,
 	forwardedRef: Ref< any >
 ) {
 	const { role, wrapperClassName, ...otherProps } = useItem( props );

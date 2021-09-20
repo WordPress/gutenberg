@@ -11,7 +11,7 @@ import * as styles from '../styles';
 import { useCx } from '../../utils/hooks/use-cx';
 
 /**
- * @param {import('../../ui/context').PolymorphicComponentProps<import('../types').FooterProps, 'div'>} props
+ * @param {import('../../ui/context').WordPressComponentProps<import('../types').FooterProps, 'div'>} props
  */
 export function useCardFooter( props ) {
 	const {
