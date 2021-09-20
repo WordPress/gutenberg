@@ -576,7 +576,7 @@ class REST_Nav_Menu_Items_Controller_Test extends WP_Test_REST_Post_Type_Control
 		$this->check_update_menu_item_response( $response );
 		$new_data = $response->get_data();
 
-		// The type shouldn't change just because it was missing from request args
+		// The type shouldn't change just because it was missing from request args.
 		$this->assertEquals( 'block', $new_data['type'] );
 	}
 
