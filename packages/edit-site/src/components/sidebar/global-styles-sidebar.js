@@ -10,8 +10,7 @@ import {
 	Button,
 	__experimentalNavigator as Navigator,
 	__experimentalNavigatorScreen as NavigatorScreen,
-	__experimentalNavigatorLink as NavigatorLink,
-	__experimentalUseNavigatorHistory as useNavigatorHistory,
+	__experimentalUseNavigator as useNavigator,
 	__experimentalItemGroup as ItemGroup,
 	__experimentalItem as Item,
 	FlexItem,
@@ -69,14 +68,12 @@ const ScreenHeader = ( { back, title } ) => {
 		<VStack spacing={ 5 }>
 			<HStack spacing={ 2 }>
 				<View>
-					<NavigatorLink isBack to={ back }>
-						<Button
-							icon={
-								<Icon icon={ chevronLeft } variant="muted" />
-							}
-							size="small"
-						/>
-					</NavigatorLink>
+					<NavigationButton
+						path={ back }
+						icon={ <Icon icon={ chevronLeft } variant="muted" /> }
+						size="small"
+						isBack
+					/>
 				</View>
 				<Spacer>
 					<Heading level={ 5 }>{ title }</Heading>
@@ -194,10 +191,20 @@ function GlobalStylesLevelScreens( {
 	);
 }
 
-function NavigationButton( { path, icon, children, ...props } ) {
-	const history = useNavigatorHistory();
+function NavigationButton( {
+	path,
+	icon,
+	children,
+	isBack = false,
+	...props
+} ) {
+	const navigator = useNavigator();
 	return (
-		<Item isAction onClick={ () => history.push( path ) } { ...props }>
+		<Item
+			isAction
+			onClick={ () => navigator.push( path, { isBack } ) }
+			{ ...props }
+		>
 			<HStack justify="flex-start">
 				{ icon && (
 					<FlexItem>

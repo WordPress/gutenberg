@@ -55,8 +55,6 @@
 		"framer-motion": "^4.1.17",
 		"gradient-parser": "^0.1.5",
 		"highlight-words-core": "^1.2.2",
-		"history": "^4.9.0",
-		"hoist-non-react-statics": "^3.3.2",
 		"lodash": "^4.17.21",
 		"memize": "^1.1.0",
 		"moment": "^2.22.1",

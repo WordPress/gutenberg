@@ -1,27 +1,21 @@
 /**
+ * WordPress dependencies
+ */
+import { useState } from '@wordpress/element';
+
+/**
  * Internal dependencies
  */
-import NavigatorRouter from './navigator-router';
-import { contextConnect, useContextSystem } from '../ui/context';
-import { NavigatorContext } from './navigator-context';
+import { NavigatorContext } from './context';
 
-function Navigator( props, forwardedRef ) {
-	const { animationDuration = 300, children, initialPath } = useContextSystem(
-		props,
-		'Navigator'
-	);
-
-	const contextProps = {
-		animationDuration,
-	};
+function Navigator( { initialPath, children } ) {
+	const [ path, setPath ] = useState( { path: initialPath } );
 
 	return (
-		<NavigatorContext.Provider ref={ forwardedRef } value={ contextProps }>
-			<NavigatorRouter initialPath={ initialPath }>
-				{ children }
-			</NavigatorRouter>
+		<NavigatorContext.Provider value={ [ path, setPath ] }>
+			{ children }
 		</NavigatorContext.Provider>
 	);
 }
 
-export default contextConnect( Navigator, 'Navigator' );
+export default Navigator;

@@ -99,8 +99,7 @@ export { default as __experimentalNavigationMenu } from './navigation/menu';
 export {
 	Navigator as __experimentalNavigator,
 	NavigatorScreen as __experimentalNavigatorScreen,
-	useNavigatorHistory as __experimentalUseNavigatorHistory,
-	NavigatorLink as __experimentalNavigatorLink,
+	useNavigator as __experimentalUseNavigator,
 } from './navigator';
 export { default as Notice } from './notice';
 export { default as __experimentalNumberControl } from './number-control';
