@@ -7,7 +7,7 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { useCallback, useMemo, useState } from '@wordpress/element';
+import { useCallback, useMemo, useRef, useState } from '@wordpress/element';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { ENTER, SPACE } from '@wordpress/keycodes';
 import {
@@ -16,7 +16,7 @@ import {
 	getBlockFromExample,
 	store as blocksStore,
 } from '@wordpress/blocks';
-import { Button, MenuItem, Popover } from '@wordpress/components';
+import { Button, MenuItem } from '@wordpress/components';
 import { check } from '@wordpress/icons';
 
 /**
@@ -95,6 +95,8 @@ function BlockStyles( {
 		[ setHoveredStyle ]
 	);
 
+	const containerRef = useRef();
+
 	if ( ! styles || styles.length === 0 ) {
 		return null;
 	}
@@ -138,7 +140,7 @@ function BlockStyles( {
 	}
 
 	return (
-		<div className="block-editor-block-styles">
+		<div className="block-editor-block-styles" ref={ containerRef }>
 			<div className="block-editor-block-styles__variants">
 				{ renderedStyles.map( ( style ) => {
 					const buttonText = style.label || style.name;
@@ -178,19 +180,14 @@ function BlockStyles( {
 				} ) }
 			</div>
 			{ hoveredStyle && (
-				<Popover
-					className="block-editor-block-styles__popover"
-					position="middle left"
-					focusOnMount={ false }
-				>
-					<BlockStylesPreviewPanel
-						activeStyle={ activeStyle }
-						className={ className }
-						genericPreviewBlock={ genericPreviewBlock }
-						style={ hoveredStyle }
-						viewportWidth={ type.example?.viewportWidth ?? 500 }
-					/>
-				</Popover>
+				<BlockStylesPreviewPanel
+					activeStyle={ activeStyle }
+					className={ className }
+					genericPreviewBlock={ genericPreviewBlock }
+					style={ hoveredStyle }
+					viewportWidth={ type.example?.viewportWidth ?? 500 }
+					targetRef={ containerRef }
+				/>
 			) }
 		</div>
 	);

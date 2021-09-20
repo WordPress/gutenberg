@@ -1,13 +1,14 @@
 /**
  * WordPress dependencies
  */
-import { useMemo } from '@wordpress/element';
+import { useMemo, useCallback } from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
 import BlockPreview from '../block-preview';
 import { replaceActiveStyle } from './utils';
+import { Popover } from '@wordpress/components';
 
 export default function BlockStylesPreviewPanel( {
 	genericPreviewBlock,
@@ -15,6 +16,7 @@ export default function BlockStylesPreviewPanel( {
 	style,
 	className,
 	activeStyle,
+	targetRef,
 } ) {
 	const styleClassName = replaceActiveStyle( className, activeStyle, style );
 	const previewBlocks = useMemo( () => {
@@ -29,17 +31,40 @@ export default function BlockStylesPreviewPanel( {
 		};
 	}, [ genericPreviewBlock, styleClassName ] );
 
-	// TODO: look at packages/block-editor/src/components/block-switcher/preview-block-popover.js
+	const getAnchorRect = useCallback( () => {
+		if ( ! targetRef?.current || ! window.DOMRect ) {
+			return null;
+		}
+		const rect = targetRef?.current.getBoundingClientRect();
+
+		return new window.DOMRect(
+			rect.x - targetRef?.current.offsetLeft,
+			rect.y,
+			rect.width,
+			rect.height
+		);
+	}, [ targetRef?.current ] );
+
 	return (
-		<div className="block-editor-block-styles__preview-container">
-			<div className="block-editor-block-styles__preview-content">
-				<BlockPreview
-					viewportWidth={ viewportWidth }
-					blocks={ previewBlocks }
-				/>
-			</div>
-			<div className="block-editor-block-styles__preview-panel-label">
-				{ style.label || style.name }
+		<div className="block-editor-block-styles__popover__preview__parent">
+			<div className="block-editor-block-styles__popover__preview__container">
+				<Popover
+					className="block-editor-block-switcher__preview__popover"
+					focusOnMount={ false }
+					position="middle left"
+					animate={ false }
+					anchorRect={ getAnchorRect() }
+				>
+					<div className="block-editor-block-switcher__preview">
+						<div className="block-editor-block-switcher__preview-title">
+							{ style.label || style.name }
+						</div>
+						<BlockPreview
+							viewportWidth={ viewportWidth }
+							blocks={ previewBlocks }
+						/>
+					</div>
+				</Popover>
 			</div>
 		</div>
 	);
