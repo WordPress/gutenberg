@@ -1,8 +1,25 @@
 /**
+ * External dependencies
+ */
+// eslint-disable-next-line no-restricted-imports
+import type { Ref } from 'react';
+
+/**
  * Internal dependencies
  */
-import { createComponent } from '../ui/utils';
+import { contextConnect, WordPressComponentProps } from '../ui/context';
+import { View } from '../view';
 import { useSpacer } from './hook';
+import type { Props } from './types';
+
+function Spacer(
+	props: WordPressComponentProps< Props, 'div' >,
+	forwardedRef: Ref< any >
+) {
+	const spacerProps = useSpacer( props );
+
+	return <View { ...spacerProps } ref={ forwardedRef } />;
+}
 
 /**
  * `Spacer` is a primitive layout component that providers inner (`padding`) or outer (`margin`) space in-between components. It can also be used to adaptively provide space within an `HStack` or `VStack`.
@@ -27,10 +44,6 @@ import { useSpacer } from './hook';
  * }
  * ```
  */
-const Spacer = createComponent( {
-	as: 'div',
-	useHook: useSpacer,
-	name: 'Spacer',
-} );
+const ConnectedSpacer = contextConnect( Spacer, 'Spacer' );
 
-export default Spacer;
+export default ConnectedSpacer;
