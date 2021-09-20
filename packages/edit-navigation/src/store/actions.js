@@ -47,7 +47,21 @@ export const saveNavigationPost = ( post ) => async ( {
 		} );
 	try {
 		const menuId = post.meta.menuId;
-		await dispatch( saveEditedMenu( menuId ) );
+
+		// Save menu
+		await registry
+			.dispatch( coreDataStore )
+			.saveEditedEntityRecord( 'root', 'menu', menuId );
+
+		const error = registry
+			.select( coreDataStore )
+			.getLastEntitySaveError( 'root', 'menu', menuId );
+
+		if ( error ) {
+			throw new Error( error.message );
+		}
+
+		// Save menu items
 		const updatedBlocks = await dispatch(
 			batchSaveMenuItems( post.blocks[ 0 ], menuId )
 		);
@@ -86,20 +100,14 @@ export const saveNavigationPost = ( post ) => async ( {
 	}
 };
 
-const saveEditedMenu = ( menuId ) => async ( { registry } ) => {
-	await registry
-		.dispatch( coreDataStore )
-		.saveEditedEntityRecord( 'root', 'menu', menuId );
-
-	const error = registry
-		.select( coreDataStore )
-		.getLastEntitySaveError( 'root', 'menu', menuId );
-
-	if ( error ) {
-		throw new Error( error.message );
-	}
-};
-
+/**
+ * Executes appropriate insert, update, and delete operations to turn the current
+ * menu (with id=menuId) into one represented by the passed navigation block.
+ *
+ * @param {Object} navigationBlock The navigation block representing the desired state of the menu.
+ * @param {number} menuId          Menu Id to process.
+ * @return {Function} An action creator
+ */
 const batchSaveMenuItems = ( navigationBlock, menuId ) => async ( {
 	dispatch,
 	registry,
@@ -135,9 +143,9 @@ const batchSaveMenuItems = ( navigationBlock, menuId ) => async ( {
 
 /**
  * Creates a menu item for every block that doesn't have an associated menuItem.
- * Requests POST /wp/v2/menu-items once for every menu item created.
+ * Sends a batch request with one POST /wp/v2/menu-items for every created menu item.
  *
- * @param {Object} navigationBlock Blocks to create menu items for.
+ * @param {Object} navigationBlock A navigation block to find created menu items in.
  * @return {Function} An action creator
  */
 const batchInsertPlaceholderMenuItems = ( navigationBlock ) => async ( {
@@ -169,6 +177,14 @@ const batchInsertPlaceholderMenuItems = ( navigationBlock ) => async ( {
 	} );
 };
 
+/**
+ * Updates every menu item where a related block has changed.
+ * Sends a batch request with one PUT /wp/v2/menu-items for every updated menu item.
+ *
+ * @param {Object} navigationBlock A navigation block to find updated menu items in.
+ * @param {number} menuId          Menu ID.
+ * @return {Function} An action creator
+ */
 const batchUpdateMenuItems = ( navigationBlock, menuId ) => async ( {
 	registry,
 	dispatch,
@@ -230,8 +246,16 @@ const batchUpdateMenuItems = ( navigationBlock, menuId ) => async ( {
 	} );
 };
 
-const isSupportedBlock = ( { name } ) =>
-	[ 'core/navigation-link', 'core/navigation-submenu' ].includes( name );
+/**
+ * Checks if a given block should be persisted as a menu item.
+ *
+ * @param {Object} block Block to check.
+ * @return {boolean} True if a given block should be persisted as a menu item, false otherwise.
+ */
+const isSupportedBlock = ( block ) =>
+	[ 'core/navigation-link', 'core/navigation-submenu' ].includes(
+		block.name
+	);
 
 const applyEdits = ( id, edits ) => ( { registry } ) => {
 	// Update an existing entity record.
@@ -246,6 +270,13 @@ const applyEdits = ( id, edits ) => ( { registry } ) => {
 		.hasEditsForEntityRecord( 'root', 'menuItem', id );
 };
 
+/**
+ * Deletes multiple menu items.
+ * Sends a batch request with one DELETE /wp/v2/menu-items for every deleted menu item.
+ *
+ * @param {Object} deletedIds A list of menu item ids to delete
+ * @return {Function} An action creator
+ */
 const batchDeleteMenuItems = ( deletedIds ) => async ( { registry } ) => {
 	const deleteBatch = deletedIds.map(
 		( id ) => async ( { deleteEntityRecord } ) => {
@@ -266,7 +297,8 @@ const batchDeleteMenuItems = ( deletedIds ) => async ( { registry } ) => {
 };
 
 /**
- * Turns a recursive list of blocks into a flat list of blocks.
+ * Turns a recursive list of blocks into a flat list of blocks annotated with
+ * their child index and parent block.
  *
  * @param {Object} parentBlock A parent block to flatten
  * @return {Object} A flat list of blocks, annotated by their index and parent ID, consisting
@@ -286,6 +318,15 @@ function blocksTreeToList( parentBlock ) {
 	);
 }
 
+/**
+ * Maps one tree of blocks into another tree by invoking a callback on every node.
+ *
+ * @param {Object}   block       The root of the mapped tree.
+ * @param {Function} callback    The callback to invoke.
+ * @param {Object}   parentBlock Internal. The current parent block.
+ * @param {number}   idx         Internal. The current child index.
+ * @return {Object} A mapped tree.
+ */
 function mapBlocksTree( block, callback, parentBlock = null, idx = 0 ) {
 	return {
 		...callback( block, parentBlock, idx ),
