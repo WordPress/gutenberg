@@ -9,7 +9,8 @@
 			"hasParallax": false,
 			"isRepeated": false,
 			"dimRatio": 40,
-			"backgroundType": "video"
+			"backgroundType": "video",
+			"isDark": true
 		},
 		"innerBlocks": [
 			{

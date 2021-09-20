@@ -9,7 +9,8 @@
 			"hasParallax": false,
 			"isRepeated": false,
 			"dimRatio": 40,
-			"backgroundType": "image"
+			"backgroundType": "image",
+			"isDark": true
 		},
 		"innerBlocks": [
 			{
