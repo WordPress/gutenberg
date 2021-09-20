@@ -5,7 +5,7 @@
 	"name": "core/breadcrumbs",
 	"title": "Breadcrumbs",
 	"category": "design",
-	"description": "Displays breadcrumbs of a page's hierarchy",
+	"description": "Displays breadcrumbs of a page's hierarchy, or a post's categories",
 	"textdomain": "default",
 	"usesContext": [ "postId", "postType" ],
 	"attributes": {

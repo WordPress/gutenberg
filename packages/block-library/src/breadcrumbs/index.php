@@ -20,10 +20,32 @@ function render_block_core_breadcrumbs( $attributes, $content, $block ) {
 	}
 
 	$post_id      = $block->context['postId'];
-	$ancestor_ids = get_post_ancestors( $post_id );
+	$post_type    = get_post_type( $post_id );
 
-	if ( empty( $ancestor_ids ) ) {
+	if ( false === $post_type ) {
 		return '';
+	}
+
+	$ancestor_ids = array();
+	$has_post_hierarchy = is_post_type_hierarchical( $post_type );
+
+	if ( $has_post_hierarchy ) {
+		$ancestor_ids = get_post_ancestors( $post_id );
+
+		if ( empty( $ancestor_ids ) ) {
+			return '';
+		}
+	} else {
+		$terms = get_the_terms( $post_id, 'category' );
+
+		if ( ! $terms || is_wp_error( $terms ) ) {
+			return '';
+		}
+
+		$term = get_term( $terms[0], 'category' );
+
+		$ancestor_ids[] = $term->term_id;
+		$ancestor_ids   = array_merge( $ancestor_ids, get_ancestors( $term->term_id, 'category' ) );
 	}
 
 	$breadcrumbs = array();
@@ -41,12 +63,21 @@ function render_block_core_breadcrumbs( $attributes, $content, $block ) {
 		);
 	}
 
-	// Construct remaining breadcrumbs from ancestor ids.
-	foreach ( array_reverse( $ancestor_ids ) as $ancestor_id ) {
-		$breadcrumbs[] = array(
-			'url'   => get_the_permalink( $ancestor_id ),
-			'title' => get_the_title( $ancestor_id ),
-		);
+	if ( $has_post_hierarchy ) {
+		// Construct remaining breadcrumbs from ancestor ids.
+		foreach ( array_reverse( $ancestor_ids ) as $ancestor_id ) {
+			$breadcrumbs[] = array(
+				'url'   => get_the_permalink( $ancestor_id ),
+				'title' => get_the_title( $ancestor_id ),
+			);
+		}
+	} else {
+		foreach ( array_reverse( $ancestor_ids ) as $ancestor_id ) {
+			$breadcrumbs[] = array(
+				'url'   => get_category_link( $ancestor_id ),
+				'title' => get_cat_name( $ancestor_id ),
+			);
+		}
 	}
 
 	// Trim the list of breadcrumbs based on nesting level if available.

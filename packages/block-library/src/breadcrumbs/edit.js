@@ -44,7 +44,7 @@ export default function BreadcrumbsEdit( {
 		textAlign,
 	} = attributes;
 
-	const { parents, post, siteTitle } = useSelect(
+	const { categories, parents, post, siteTitle } = useSelect(
 		( select ) => {
 			const { getEntityRecord, getEditedEntityRecord } = select(
 				coreStore
@@ -57,7 +57,9 @@ export default function BreadcrumbsEdit( {
 				postId
 			);
 
+			const parentCategories = [];
 			const parentEntities = [];
+			let categoryId = currentPost?.categories?.[ 0 ];
 			let currentParentId = currentPost?.parent;
 
 			while ( currentParentId ) {
@@ -75,7 +77,23 @@ export default function BreadcrumbsEdit( {
 				}
 			}
 
+			while ( categoryId ) {
+				const nextCategory = getEntityRecord(
+					'taxonomy',
+					'category',
+					categoryId
+				);
+
+				categoryId = null;
+
+				if ( nextCategory ) {
+					parentCategories.push( nextCategory );
+					categoryId = nextCategory?.parent || null;
+				}
+			}
+
 			return {
+				categories: parentCategories,
 				post: currentPost,
 				parents: parentEntities.reverse(),
 				siteTitle: decodeEntities( siteData?.name ),
@@ -86,11 +104,22 @@ export default function BreadcrumbsEdit( {
 
 	// Construct breadcrumbs.
 	const breadcrumbs = useMemo( () => {
-		// Set breadcrumb page titles to real titles if available, and
-		// fall back to placeholder content.
-		let breadcrumbTitles = parents.length
-			? parents.map( ( parent ) => parent?.title?.rendered || ' ' )
-			: [ __( 'Top-level page' ), __( 'Child page' ) ];
+		// Set breadcrumb names to real hierarchical post titles if available, and
+		// fall back to category names, or placeholder content if neither exists.
+
+		let breadcrumbTitles;
+
+		if ( parents?.length ) {
+			breadcrumbTitles = parents.map(
+				( parent ) => parent?.title?.rendered || ' '
+			);
+		} else if ( categories?.length ) {
+			breadcrumbTitles = categories.map(
+				( category ) => category?.name || ' '
+			);
+		} else {
+			breadcrumbTitles = [ __( 'Top-level page' ), __( 'Child page' ) ];
+		}
 
 		// Prepend the site title or site title override if specified.
 		if ( showSiteTitle && siteTitle ) {
@@ -125,13 +154,14 @@ export default function BreadcrumbsEdit( {
 		);
 		return crumbs;
 	}, [
+		categories,
+		nestingLevel,
 		parents,
 		showCurrentPageTitle,
 		showLeadingSeparator,
 		showSiteTitle,
 		siteTitle,
 		siteTitleOverride,
-		nestingLevel,
 	] );
 
 	const blockProps = useBlockProps( {
