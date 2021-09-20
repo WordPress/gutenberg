@@ -9,15 +9,16 @@ https://github.com/WordPress/gutenberg/pull/34668
 window.addEventListener(
 	'focus',
 	function () {
+		const selected = document.getSelection();
 		if (
-			window.activeElement.classList.contains(
+			selected &&
+			( window.activeElement.classList.contains(
 				'components-dropdown-menu__menu-item'
 			) ||
-			window.activeElement.classList.contains(
-				'components-menu-item__button'
-			)
+				window.activeElement.classList.contains(
+					'components-menu-item__button'
+				) )
 		) {
-			const selected = document.getSelection();
 			const anchorNode = selected.anchorNode;
 			const anchorOffset = selected.anchorOffset;
 			const focusNode = selected.focusNode;
