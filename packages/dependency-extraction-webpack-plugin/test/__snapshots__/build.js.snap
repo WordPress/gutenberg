@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`Webpack \`combine-assets\` should produce expected output: Asset file should match snapshot 1`] = `"<?php return array('fileA.js' => array('dependencies' => array('lodash', 'wp-blob'), 'version' => 'bedcdcf40ea252047201aa0ee74a9377'), 'fileB.js' => array('dependencies' => array('wp-token-list'), 'version' => 'bec6f52af59733fff68cf46dbce8e226'));"`;
+exports[`Webpack \`combine-assets\` should produce expected output: Asset file should match snapshot 1`] = `"<?php return array('fileA.js' => array('dependencies' => array('lodash', 'wp-blob'), 'contentHash' => array('javascript' => '570b5a9cd959b303aa49'), 'version' => '40b55b4fec55b0e2eaed0a7a429cf093'), 'fileB.js' => array('dependencies' => array('wp-token-list'), 'contentHash' => array('javascript' => 'eeeca979ba13cceebf1e'), 'version' => 'a40928bedab5cc1bbc65873c864cee76'));"`;
 
 exports[`Webpack \`combine-assets\` should produce expected output: External modules should match snapshot 1`] = `
 Array [
@@ -28,7 +28,7 @@ Array [
 ]
 `;
 
-exports[`Webpack \`dynamic-import\` should produce expected output: Asset file should match snapshot 1`] = `"<?php return array('dependencies' => array('lodash', 'wp-blob'), 'version' => 'd56d3ad4bd3fcf9605c3d640d369cde4');"`;
+exports[`Webpack \`dynamic-import\` should produce expected output: Asset file should match snapshot 1`] = `"<?php return array('dependencies' => array('lodash', 'wp-blob'), 'contentHash' => array('javascript' => 'f51d55dafd227c5cd4c4'), 'version' => '8526b6ccfabad31c6b7bc807e95f0eb8');"`;
 
 exports[`Webpack \`dynamic-import\` should produce expected output: External modules should match snapshot 1`] = `
 Array [
@@ -48,7 +48,7 @@ Array [
 ]
 `;
 
-exports[`Webpack \`function-output-filename\` should produce expected output: Asset file should match snapshot 1`] = `"<?php return array('dependencies' => array('lodash', 'wp-blob'), 'version' => '844c4b1f2a6db3a13416e9ea339e6334');"`;
+exports[`Webpack \`function-output-filename\` should produce expected output: Asset file should match snapshot 1`] = `"<?php return array('dependencies' => array('lodash', 'wp-blob'), 'contentHash' => array('javascript' => '70ecef8e29a9e991ea49'), 'version' => '16ba3685fff1f00dffcd97d7328c7ca1');"`;
 
 exports[`Webpack \`function-output-filename\` should produce expected output: External modules should match snapshot 1`] = `
 Array [
@@ -68,7 +68,7 @@ Array [
 ]
 `;
 
-exports[`Webpack \`has-extension-suffix\` should produce expected output: Asset file should match snapshot 1`] = `"<?php return array('dependencies' => array('lodash', 'wp-blob'), 'version' => 'c35663ec29b695840a3c52d6fcc041c3');"`;
+exports[`Webpack \`has-extension-suffix\` should produce expected output: Asset file should match snapshot 1`] = `"<?php return array('dependencies' => array('lodash', 'wp-blob'), 'contentHash' => array('javascript' => 'e9538fe10757c4155ba7'), 'version' => '8a8d53419c832e2acf6e32d905451040');"`;
 
 exports[`Webpack \`has-extension-suffix\` should produce expected output: External modules should match snapshot 1`] = `
 Array [
@@ -88,15 +88,15 @@ Array [
 ]
 `;
 
-exports[`Webpack \`no-default\` should produce expected output: Asset file should match snapshot 1`] = `"<?php return array('dependencies' => array(), 'version' => 'feb97b1f3aec28878f5872b60f37567b');"`;
+exports[`Webpack \`no-default\` should produce expected output: Asset file should match snapshot 1`] = `"<?php return array('dependencies' => array(), 'contentHash' => array('javascript' => 'ccd788cc0f68ace1d46c'), 'version' => '9cce8e5ea5b37fc0ba1bbfb573accc39');"`;
 
 exports[`Webpack \`no-default\` should produce expected output: External modules should match snapshot 1`] = `Array []`;
 
-exports[`Webpack \`no-deps\` should produce expected output: Asset file should match snapshot 1`] = `"<?php return array('dependencies' => array(), 'version' => 'd77fa1fabdfc18f9520a9325e0768b24');"`;
+exports[`Webpack \`no-deps\` should produce expected output: Asset file should match snapshot 1`] = `"<?php return array('dependencies' => array(), 'contentHash' => array('javascript' => 'f797104b0e126fa34f60'), 'version' => '68f2e35cdd4b61a25e58feb4bbef9b2f');"`;
 
 exports[`Webpack \`no-deps\` should produce expected output: External modules should match snapshot 1`] = `Array []`;
 
-exports[`Webpack \`output-format-json\` should produce expected output: Asset file should match snapshot 1`] = `"{\\"dependencies\\":[\\"lodash\\"],\\"version\\":\\"c0593f49cf023b00b43d085327cd4e3b\\"}"`;
+exports[`Webpack \`output-format-json\` should produce expected output: Asset file should match snapshot 1`] = `"{\\"dependencies\\":[\\"lodash\\"],\\"contentHash\\":{\\"javascript\\":\\"0d0b71533c0e0ee9c621\\"},\\"version\\":\\"51adc4dd06393387d59725a6e1f1791b\\"}"`;
 
 exports[`Webpack \`output-format-json\` should produce expected output: External modules should match snapshot 1`] = `
 Array [
@@ -108,7 +108,7 @@ Array [
 ]
 `;
 
-exports[`Webpack \`overrides\` should produce expected output: Asset file should match snapshot 1`] = `"<?php return array('dependencies' => array('wp-blob', 'wp-script-handle-for-rxjs', 'wp-url'), 'version' => '90aabe80a22b120d4ce792caba9e2238');"`;
+exports[`Webpack \`overrides\` should produce expected output: Asset file should match snapshot 1`] = `"<?php return array('dependencies' => array('wp-blob', 'wp-script-handle-for-rxjs', 'wp-url'), 'contentHash' => array('javascript' => 'be09e2abc3d3cde27441'), 'version' => '71046f28b248fd90f22412f7cbcc7dd3');"`;
 
 exports[`Webpack \`overrides\` should produce expected output: External modules should match snapshot 1`] = `
 Array [
@@ -144,7 +144,7 @@ Array [
 ]
 `;
 
-exports[`Webpack \`wordpress\` should produce expected output: Asset file should match snapshot 1`] = `"<?php return array('dependencies' => array('lodash', 'wp-blob'), 'version' => '844c4b1f2a6db3a13416e9ea339e6334');"`;
+exports[`Webpack \`wordpress\` should produce expected output: Asset file should match snapshot 1`] = `"<?php return array('dependencies' => array('lodash', 'wp-blob'), 'contentHash' => array('javascript' => '70ecef8e29a9e991ea49'), 'version' => '16ba3685fff1f00dffcd97d7328c7ca1');"`;
 
 exports[`Webpack \`wordpress\` should produce expected output: External modules should match snapshot 1`] = `
 Array [
@@ -164,7 +164,7 @@ Array [
 ]
 `;
 
-exports[`Webpack \`wordpress-require\` should produce expected output: Asset file should match snapshot 1`] = `"<?php return array('dependencies' => array('lodash', 'wp-blob'), 'version' => '2a613fdd9e36fb13cd706b2d42a66ba3');"`;
+exports[`Webpack \`wordpress-require\` should produce expected output: Asset file should match snapshot 1`] = `"<?php return array('dependencies' => array('lodash', 'wp-blob'), 'contentHash' => array('javascript' => '3afd822fbdfbc4373796'), 'version' => 'aea98ffcf96f5638715fccd3e3d5071f');"`;
 
 exports[`Webpack \`wordpress-require\` should produce expected output: External modules should match snapshot 1`] = `
 Array [

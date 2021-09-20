@@ -183,8 +183,33 @@ class DependencyExtractionWebpackPlugin {
 			const assetData = {
 				// Get a sorted array so we can produce a stable, stringified representation.
 				dependencies: Array.from( entrypointExternalizedWpDeps ).sort(),
-				version: runtimeChunk.hash,
 			};
+
+			if ( runtimeChunk.contentHash ) {
+				// If available, copy webpack's contentHash data into the asset.
+				assetData.contentHash = runtimeChunk.contentHash;
+				// Also combine all content hashes into a "version" for back compat.
+				const hash = createHash( 'md4' );
+				for ( const key of Object.keys(
+					assetData.contentHash
+				).sort() ) {
+					hash.update(
+						`${ key }: ${ assetData.contentHash[ key ] }\n`
+					);
+				}
+				assetData.version = hash.digest( 'hex' );
+			} else {
+				// Fallback. I don't know if this can happen, but if it does handle it gracefully (for now).
+				// @todo: Make this an error when we're more confident it can't happen or we're willing to break compilation when it does.
+				const warning = new webpack.WebpackError(
+					`DependencyExtractionWebpackPlugin\nWebpack produced no contentHash for entrypoint '${ entrypointName }'`
+				);
+				compilation.warnings.push( warning );
+				assetData.contentHash = {
+					javascript: runtimeChunk.hash,
+				};
+				assetData.version = runtimeChunk.hash;
+			}
 
 			const assetString = this.stringify( assetData );
 

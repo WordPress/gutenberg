@@ -3,7 +3,7 @@
 This webpack plugin serves two purposes:
 
 -   Externalize dependencies that are available as script dependencies on modern WordPress sites.
--   Add an asset file for each entry point that declares an object with the list of WordPress script dependencies for the entry point. The asset file also contains the current version calculated for the current source code.
+-   Add an asset file for each entry point that declares an object with the list of WordPress script dependencies for the entry point. The asset file also contains the current versions calculated for the current source code.
 
 This allows JavaScript bundles produced by webpack to leverage WordPress style dependency sharing without an error-prone process of manually maintaining a dependency list.
 
@@ -56,7 +56,7 @@ const config = {
 };
 ```
 
-Each entry point in the webpack bundle will include an asset file that declares the WordPress script dependencies that should be enqueued. Such file also contains the unique version hash calculated based on the file content.
+Each entry point in the webpack bundle will include an asset file that declares the WordPress script dependencies that should be enqueued. Such file also contains the unique version hashes calculated based on the file content, and a combined hash for backwards compatibility.
 
 For example:
 
@@ -68,7 +68,7 @@ import { Component } from '@wordpress/element';
 /* bundled JavaScript output */
 
 // Webpack will also produce output/entrypoint.asset.php declaring script dependencies
-<?php return array('dependencies' => array('wp-element'), 'version' => 'dd4c2dc50d046ed9d4c063a7ca95702f');
+<?php return array('dependencies' => array('wp-element'), 'contentHash' => array('javascript' => '4a01166678672a6fe61c'), 'version' => '4b824f9ef2ed1cd20efecb129e797115');
 ```
 
 By default, the following module requests are handled:
@@ -213,9 +213,11 @@ $script_path       = 'path/to/script.js';
 $script_asset_path = 'path/to/script.asset.php';
 $script_asset      = file_exists( $script_asset_path )
 	? require( $script_asset_path )
-	: array( 'dependencies' => array(), 'version' => filemtime( $script_path ) );
+	: array( 'dependencies' => array(), 'contentHash' => array( 'javascript' => filemtime( $script_path ) ) );
 $script_url = plugins_url( $script_path, __FILE__ );
-wp_enqueue_script( 'script', $script_url, $script_asset['dependencies'], $script_asset['version'] );
+wp_enqueue_script( 'script', $script_url, $script_asset['dependencies'], $script_asset['contentHash']['javascript'] );
 ```
+
+If you have CSS produced using `mini-css-extract-plugin`, you'd make a similar call to `wp_enqueue_style()` passing `$script_asset['contentHash']['css/mini-extract']` as the version parameter.
 
 <br/><br/><p align="center"><img src="https://s.w.org/style/images/codeispoetry.png?1" alt="Code is Poetry." /></p>
