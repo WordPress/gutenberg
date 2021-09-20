@@ -12,8 +12,14 @@ import { store as blockEditorStore } from '../../store';
 import useBlockTypeImpressions from './hooks/use-block-type-impressions';
 
 const NON_BLOCK_CATEGORIES = [ 'reusable' ];
-
-const ALLOWED_EMBED_VARIATIONS = [ 'core/embed' ];
+const ALLOWED_EMBED_VARIATIONS = [
+	'core/embed',
+	'core/embed/youtube',
+	'core/embed/twitter',
+	'core/embed/wordpress',
+	'core/embed/instagram',
+	'core/embed/vimeo',
+];
 
 function BlockTypesTab( { onSelect, rootClientId, listProps } ) {
 	const clipboardBlock = useClipboardBlock( rootClientId );
