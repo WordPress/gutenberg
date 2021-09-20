@@ -11,7 +11,7 @@ import { isRTL } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
-import { G2, UI } from '../../utils/colors-values';
+import { BASE, G2, UI } from '../../utils/colors-values';
 import Button from '../../button';
 import { Text } from '../../text';
 import { reduceMotion, rtl } from '../../utils';
@@ -46,7 +46,7 @@ export const MenuUI = styled.div`
 export const MenuBackButtonUI = styled( Button )`
 	&.is-tertiary {
 		color: inherit;
-		opacity: 0.85;
+		opacity: 0.7;
 
 		&:hover:not( :disabled ) {
 			opacity: 1;
@@ -86,7 +86,7 @@ export const MenuTitleActionsUI = styled.span`
 
 	.components-button.is-small {
 		color: inherit;
-		opacity: 0.85;
+		opacity: 0.7;
 		margin-right: ${ space( 1 ) }; // Avoid hiding the focus outline
 		padding: 0;
 
@@ -158,7 +158,6 @@ export const GroupTitleUI = styled( Text )`
 export const ItemBaseUI = styled.li`
 	border-radius: 2px;
 	color: inherit;
-	opacity: 0.85;
 	margin-bottom: 0;
 
 	> button,
@@ -166,7 +165,7 @@ export const ItemBaseUI = styled.li`
 	> a {
 		width: 100%;
 		color: inherit;
-		opacity: 0.85;
+		opacity: 0.7;
 		padding: ${ space( 2 ) } ${ space( 4 ) }; /* 8px 16px */
 		${ rtl( { textAlign: 'left' }, { textAlign: 'right' } ) }
 
@@ -180,11 +179,12 @@ export const ItemBaseUI = styled.li`
 
 	&.is-active {
 		background-color: ${ UI.theme };
-		color: ${ UI.textDark };
+		color: ${ BASE.white };
 
 		> button,
 		> a {
-			color: ${ UI.textDark };
+			color: ${ BASE.white };
+			opacity: 1;
 		}
 	}
 
@@ -204,7 +204,7 @@ export const ItemUI = styled.div`
 	line-height: 20px;
 	width: 100%;
 	color: inherit;
-	opacity: 0.9;
+	opacity: 0.7;
 `;
 
 export const ItemBadgeUI = styled.span`
