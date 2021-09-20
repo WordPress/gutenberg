@@ -130,6 +130,7 @@ function BlockStyles( {
 								activeStyle.name === style.name ? check : null
 							}
 							onClick={ () => onSelectStyle( style ) }
+							className="block-editor-block-styles__item"
 						>
 							{ menuItemText }
 						</MenuItem>
@@ -148,7 +149,7 @@ function BlockStyles( {
 					return (
 						<Button
 							className={ classnames(
-								'block-editor-block-styles__button',
+								'block-editor-block-styles__item',
 								{
 									'is-active':
 										activeStyle.name === style.name,

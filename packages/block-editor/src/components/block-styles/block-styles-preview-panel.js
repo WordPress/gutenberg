@@ -49,14 +49,14 @@ export default function BlockStylesPreviewPanel( {
 		<div className="block-editor-block-styles__popover__preview__parent">
 			<div className="block-editor-block-styles__popover__preview__container">
 				<Popover
-					className="block-editor-block-switcher__preview__popover"
+					className="block-editor-block-styles__preview__popover"
 					focusOnMount={ false }
 					position="middle left"
 					animate={ false }
 					anchorRect={ getAnchorRect() }
 				>
-					<div className="block-editor-block-switcher__preview">
-						<div className="block-editor-block-switcher__preview-title">
+					<div className="block-editor-block-styles__preview">
+						<div className="block-editor-block-styles__preview-title">
 							{ style.label || style.name }
 						</div>
 						<BlockPreview
