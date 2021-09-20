@@ -410,7 +410,7 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 		$result = new WP_Theme_JSON_Gutenberg();
 		$result->merge( self::get_core_data() );
 
-		$theme_support_data  = WP_Theme_JSON_Gutenberg::get_from_editor_settings( $settings );
+		$theme_support_data = WP_Theme_JSON_Gutenberg::get_from_editor_settings( $settings );
 		$result->merge( self::get_theme_data( $theme_support_data ) );
 
 		if ( 'user' === $origin ) {
