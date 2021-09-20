@@ -595,7 +595,7 @@ class WP_Theme_JSON_Gutenberg {
 	 *
 	 * @param array  $preset_per_origin Array of presets keyed by origin.
 	 * @param string $value_key         The property of the preset that contains its value.
-	 * @param array $origins            List of origins to process.
+	 * @param array  $origins           List of origins to process.
 	 *
 	 * @return array Array of presets where each key is a slug and each value is the preset value.
 	 */
@@ -622,6 +622,7 @@ class WP_Theme_JSON_Gutenberg {
 	 *
 	 * @param array  $settings Settings to process.
 	 * @param string $selector Selector wrapping the classes.
+	 * @param array  $origins  List of origins to process.
 	 *
 	 * @return string The result of processing the presets.
 	 */
@@ -1081,7 +1082,7 @@ class WP_Theme_JSON_Gutenberg {
 	 *                         'block_styles': only block & preset classes.
 	 *                         'css_variables': only css variables.
 	 *                         'presets': only css variables and preset classes.
-	 * @param array $origins A list of origins to include. By default it includes 'core', 'theme', and 'user'.
+	 * @param array  $origins A list of origins to include. By default it includes 'core', 'theme', and 'user'.
 	 *
 	 * @return string Stylesheet.
 	 */

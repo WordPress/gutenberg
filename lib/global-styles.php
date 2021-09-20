@@ -39,9 +39,9 @@ function gutenberg_experimental_global_styles_get_stylesheet( $tree, $type = nul
 	$supports_link_color = get_theme_support( 'experimental-link-color' );
 
 	// Only modify the $type if the consumer hasn't provided any.
-	if ( $type === null && ! $supports_theme_json ) {
+	if ( null === $type && ! $supports_theme_json ) {
 		$type = 'presets';
-	} else if ( $type === null ) {
+	} elseif ( null === $type ) {
 		$type = 'all';
 	}
 
@@ -49,7 +49,7 @@ function gutenberg_experimental_global_styles_get_stylesheet( $tree, $type = nul
 	if ( ! $supports_theme_json && ! $supports_link_color ) {
 		// In this case we only enqueue the core presets (CSS Custom Properties + the classes).
 		$origins = array( 'core' );
-	} else if ( ! $supports_theme_json && $supports_link_color ) {
+	} elseif ( ! $supports_theme_json && $supports_link_color ) {
 		// For the legacy link color feauter to work, the CSS Custom Properties
 		// should be in scope (either the core or the theme ones).
 		$origins = array( 'core', 'theme' );
