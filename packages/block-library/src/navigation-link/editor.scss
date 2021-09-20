@@ -81,6 +81,11 @@
 .wp-block-navigation-link__placeholder {
 	position: relative;
 
+	// While in a placeholder state, hide any underlines the theme might add.
+	text-decoration: none !important;
+	box-shadow: none !important;
+	background-image: none !important;
+
 	// Draw a wavy underline.
 	.wp-block-navigation-link__placeholder-text {
 		$blur: 10%;
