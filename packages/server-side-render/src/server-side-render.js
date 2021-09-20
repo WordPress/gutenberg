@@ -71,7 +71,7 @@ export default function ServerSideRender( props ) {
 	const isMountedRef = useRef( true );
 	const fetchRequestRef = useRef();
 	const [ response, setResponse ] = useState( null );
-	const previousResponse = usePrevious( response );
+	const prevResponse = usePrevious( response );
 	const prevProps = usePrevious( props );
 
 	function fetchData() {
@@ -154,10 +154,8 @@ export default function ServerSideRender( props ) {
 	} else if ( ! response ) {
 		return (
 			<LoadingResponsePlaceholder { ...props }>
-				{ !! previousResponse && (
-					<RawHTML className={ className }>
-						{ previousResponse }
-					</RawHTML>
+				{ !! prevResponse && (
+					<RawHTML className={ className }>{ prevResponse }</RawHTML>
 				) }
 			</LoadingResponsePlaceholder>
 		);
