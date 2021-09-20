@@ -123,6 +123,7 @@ export default function ColorPanel( {
 			gradients={ gradients }
 			disableCustomColors={ ! areCustomSolidsEnabled }
 			disableCustomGradients={ ! areCustomGradientsEnabled }
+			showTitle={ false }
 		>
 			<ColorPalettePanel
 				key={ 'color-palette-panel-' + name }
