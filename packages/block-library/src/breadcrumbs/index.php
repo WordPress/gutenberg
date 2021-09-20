@@ -26,7 +26,7 @@ function render_block_core_breadcrumbs( $attributes, $content, $block ) {
 		return '';
 	}
 
-	$ancestor_ids = array();
+	$ancestor_ids       = array();
 	$has_post_hierarchy = is_post_type_hierarchical( $post_type );
 
 	if ( $has_post_hierarchy ) {
