@@ -23,6 +23,7 @@ export default function NewButton( { menus } ) {
 			{ isModalOpen && (
 				<Modal
 					title={ __( 'Create a new menu' ) }
+					className="edit-navigation-menu-switcher__modal"
 					onRequestClose={ () => setIsModalOpen( false ) }
 				>
 					<AddMenu
