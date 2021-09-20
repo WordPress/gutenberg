@@ -17,7 +17,7 @@ import styles from './style.scss';
 
 export function BlockIcon( {
 	icon,
-	fill,
+	fill: fillColor,
 	size,
 	showColors = false,
 	getStylesFromColorScheme,
@@ -27,6 +27,8 @@ export function BlockIcon( {
 			src: blockDefault,
 		};
 	}
+
+	const fill = fillColor || ( showColors && icon?.foreground );
 
 	const renderedIcon = (
 		<Icon
@@ -43,7 +45,6 @@ export function BlockIcon( {
 	const style = showColors
 		? {
 				backgroundColor: icon && icon.background,
-				color: icon && icon.foreground,
 		  }
 		: {};
 
