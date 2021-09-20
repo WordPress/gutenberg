@@ -93,7 +93,7 @@ describe( 'getRenderedStyles', () => {
 		const styles = [ { name: 'pistachio' }, { name: 'peanut' } ];
 		const defaultStyle = {
 			name: 'default',
-			label: 'default',
+			label: 'Default',
 			isDefault: true,
 		};
 
