@@ -434,7 +434,8 @@ describe( 'Navigation editor', () => {
 			await pressKeyTimes( 'Backspace', initialMenuName.length );
 			await page.click( '.edit-navigation-toolbar__save-button' );
 			const snackbar = await page.waitForSelector(
-				'.components-snackbar'
+				'.components-snackbar',
+				{ visible: true }
 			);
 			const snackbarText = await snackbar.evaluate(
 				( element ) => element.innerText
