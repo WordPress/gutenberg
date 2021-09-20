@@ -54,13 +54,13 @@ function render_block_core_post_navigation_link( $attributes, $content ) {
 		} elseif ( isset( $attributes['linkLabel'] ) && $attributes['linkLabel'] ) {
 			// If the label link option is enabled and there is a custom label, display it before the title.
 			if ( $label ) {
-				$link = '<span class="post-navigation-link__label">$label</span> <span class="post-navigation-link__title">%title</title>';
+				$link = '<span class="post-navigation-link__label">' . $label . '</span> <span class="post-navigation-link__title">%title</title>';
 			} else {
 				/* If the label link option is enabled and there is no custom label,
 				 * add a colon between the label and the post title.
 				 */
 				$label = 'next' === $navigation_type ? _x( 'Next:', 'label before the title of the next post' ) : _x( 'Previous:', 'label before the title of the previous post' );
-				$link = sprintf(
+				$link  = sprintf(
 					__( '<span class="post-navigation-link__label">%1$s</span> <span class="post-navigation-link__title">%2$s</span>' ),
 					$label,
 					'%title',
