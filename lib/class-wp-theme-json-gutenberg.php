@@ -595,12 +595,13 @@ class WP_Theme_JSON_Gutenberg {
 	 *
 	 * @param array  $preset_per_origin Array of presets keyed by origin.
 	 * @param string $value_key         The property of the preset that contains its value.
+	 * @param array  $origins           List of origins to process.
 	 *
 	 * @return array Array of presets where each key is a slug and each value is the preset value.
 	 */
-	private static function get_merged_preset_by_slug( $preset_per_origin, $value_key ) {
+	private static function get_merged_preset_by_slug( $preset_per_origin, $value_key, $origins ) {
 		$result = array();
-		foreach ( self::VALID_ORIGINS as $origin ) {
+		foreach ( $origins as $origin ) {
 			if ( ! isset( $preset_per_origin[ $origin ] ) ) {
 				continue;
 			}
@@ -621,10 +622,11 @@ class WP_Theme_JSON_Gutenberg {
 	 *
 	 * @param array  $settings Settings to process.
 	 * @param string $selector Selector wrapping the classes.
+	 * @param array  $origins  List of origins to process.
 	 *
 	 * @return string The result of processing the presets.
 	 */
-	private static function compute_preset_classes( $settings, $selector ) {
+	private static function compute_preset_classes( $settings, $selector, $origins ) {
 		if ( self::ROOT_BLOCK_SELECTOR === $selector ) {
 			// Classes at the global level do not need any CSS prefixed,
 			// and we don't want to increase its specificity.
@@ -634,7 +636,7 @@ class WP_Theme_JSON_Gutenberg {
 		$stylesheet = '';
 		foreach ( self::PRESETS_METADATA as $preset ) {
 			$preset_per_origin = _wp_array_get( $settings, $preset['path'], array() );
-			$preset_by_slug    = self::get_merged_preset_by_slug( $preset_per_origin, $preset['value_key'] );
+			$preset_by_slug    = self::get_merged_preset_by_slug( $preset_per_origin, $preset['value_key'], $origins );
 			foreach ( $preset['classes'] as $class ) {
 				foreach ( $preset_by_slug as $slug => $value ) {
 					$stylesheet .= self::to_ruleset(
@@ -666,14 +668,15 @@ class WP_Theme_JSON_Gutenberg {
 	 * ```
 	 *
 	 * @param array $settings Settings to process.
+	 * @param array $origins  List of origins to process.
 	 *
 	 * @return array Returns the modified $declarations.
 	 */
-	private static function compute_preset_vars( $settings ) {
+	private static function compute_preset_vars( $settings, $origins ) {
 		$declarations = array();
 		foreach ( self::PRESETS_METADATA as $preset ) {
 			$preset_per_origin = _wp_array_get( $settings, $preset['path'], array() );
-			$preset_by_slug    = self::get_merged_preset_by_slug( $preset_per_origin, $preset['value_key'] );
+			$preset_by_slug    = self::get_merged_preset_by_slug( $preset_per_origin, $preset['value_key'], $origins );
 			foreach ( $preset_by_slug as $slug => $value ) {
 				$declarations[] = array(
 					'name'  => '--wp--preset--' . $preset['css_var_infix'] . '--' . gutenberg_experimental_to_kebab_case( $slug ),
@@ -769,10 +772,11 @@ class WP_Theme_JSON_Gutenberg {
 	 *   }
 	 *
 	 * @param array $nodes Nodes with settings.
+	 * @param array $origins List of origins to process.
 	 *
 	 * @return string The new stylesheet.
 	 */
-	private function get_css_variables( $nodes ) {
+	private function get_css_variables( $nodes, $origins ) {
 		$stylesheet = '';
 		foreach ( $nodes as $metadata ) {
 			if ( null === $metadata['selector'] ) {
@@ -782,7 +786,7 @@ class WP_Theme_JSON_Gutenberg {
 			$selector = $metadata['selector'];
 
 			$node         = _wp_array_get( $this->theme_json, $metadata['path'], array() );
-			$declarations = array_merge( self::compute_preset_vars( $node ), self::compute_theme_vars( $node ) );
+			$declarations = array_merge( self::compute_preset_vars( $node, $origins ), self::compute_theme_vars( $node ) );
 
 			$stylesheet .= self::to_ruleset( $selector, $declarations );
 		}
@@ -858,10 +862,11 @@ class WP_Theme_JSON_Gutenberg {
 	 *   }
 
 	 * @param array $setting_nodes Nodes with settings.
+	 * @param array $origins       List of origins to process presets from.
 	 *
 	 * @return string The new stylesheet.
 	 */
-	private function get_preset_classes( $setting_nodes ) {
+	private function get_preset_classes( $setting_nodes, $origins ) {
 		$preset_rules = '';
 
 		foreach ( $setting_nodes as $metadata ) {
@@ -871,7 +876,7 @@ class WP_Theme_JSON_Gutenberg {
 
 			$selector      = $metadata['selector'];
 			$node          = _wp_array_get( $this->theme_json, $metadata['path'], array() );
-			$preset_rules .= self::compute_preset_classes( $node, $selector );
+			$preset_rules .= self::compute_preset_classes( $node, $selector, $origins );
 		}
 
 		return $preset_rules;
@@ -1072,27 +1077,29 @@ class WP_Theme_JSON_Gutenberg {
 	 * Returns the stylesheet that results of processing
 	 * the theme.json structure this object represents.
 	 *
-	 * @param string $type Type of stylesheet. It accepts:
-	 *                     'all': css variables, block classes, preset classes. The default.
-	 *                     'block_styles': only block & preset classes.
-	 *                     'css_variables': only css variables.
-	 *                     'presets': only css variables and preset classes.
+	 * @param string $type   Type of stylesheet. It accepts:
+	 *                         'all': css variables, block classes, preset classes. The default.
+	 *                         'block_styles': only block & preset classes.
+	 *                         'css_variables': only css variables.
+	 *                         'presets': only css variables and preset classes.
+	 * @param array  $origins A list of origins to include. By default it includes 'core', 'theme', and 'user'.
+	 *
 	 * @return string Stylesheet.
 	 */
-	public function get_stylesheet( $type = 'all' ) {
+	public function get_stylesheet( $type = 'all', $origins = self::VALID_ORIGINS ) {
 		$blocks_metadata = self::get_blocks_metadata();
 		$style_nodes     = self::get_style_nodes( $this->theme_json, $blocks_metadata );
 		$setting_nodes   = self::get_setting_nodes( $this->theme_json, $blocks_metadata );
 
 		switch ( $type ) {
 			case 'block_styles':
-				return $this->get_block_classes( $style_nodes ) . $this->get_preset_classes( $setting_nodes );
+				return $this->get_block_classes( $style_nodes ) . $this->get_preset_classes( $setting_nodes, $origins );
 			case 'css_variables':
-				return $this->get_css_variables( $setting_nodes );
+				return $this->get_css_variables( $setting_nodes, $origins );
 			case 'presets':
-				return $this->get_css_variables( $setting_nodes ) . $this->get_preset_classes( $setting_nodes );
+				return $this->get_css_variables( $setting_nodes, $origins ) . $this->get_preset_classes( $setting_nodes, $origins );
 			default:
-				return $this->get_css_variables( $setting_nodes ) . $this->get_block_classes( $style_nodes ) . $this->get_preset_classes( $setting_nodes );
+				return $this->get_css_variables( $setting_nodes, $origins ) . $this->get_block_classes( $style_nodes ) . $this->get_preset_classes( $setting_nodes, $origins );
 		}
 	}
 
