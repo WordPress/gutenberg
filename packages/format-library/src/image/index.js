@@ -48,6 +48,7 @@ function InlineUI( { value, onChange, activeObjectAttributes, contentRef } ) {
 			focusOnMount={ false }
 			anchorRef={ anchorRef }
 			className="block-editor-format-toolbar__image-popover"
+			__unstableSlotName="__unstable-block-tools-after"
 		>
 			<form
 				className="block-editor-format-toolbar__image-container-content"

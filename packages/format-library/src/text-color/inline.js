@@ -100,6 +100,7 @@ export default function InlineColorUI( {
 			onClose={ onClose }
 			className="components-inline-color-popover"
 			anchorRef={ anchorRef }
+			__unstableSlotName="__unstable-block-tools-after"
 		>
 			<ColorPicker name={ name } value={ value } onChange={ onChange } />
 		</URLPopover>
