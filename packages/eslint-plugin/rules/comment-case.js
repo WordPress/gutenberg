@@ -4,7 +4,7 @@ const createFixerFunction = ( node ) => ( arg ) => {
 
 module.exports = {
 	meta: {
-		type: 'layout',
+		type: 'problem',
 		schema: [],
 		messages: {
 			missingPunctuation:
