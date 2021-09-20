@@ -56,4 +56,4 @@ The four phases of the project are Editing, Customization, Collaboration, and Mu
 
 == Changelog ==
 
-To read the changelog for Gutenberg 11.5.2, please navigate to the <a href="https://github.com/WordPress/gutenberg/releases/tag/v11.5.2">release page</a>.
+To read the changelog for Gutenberg 11.5.0, please navigate to the <a href="https://github.com/WordPress/gutenberg/releases/tag/v11.5.0">release page</a>.
