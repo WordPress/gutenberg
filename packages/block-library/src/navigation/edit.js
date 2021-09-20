@@ -371,7 +371,9 @@ export default compose( [
 		] )?.length;
 
 		const onlyLinkInnerBlocks = innerBlocks.every(
-			( block ) => block.name === 'core/navigation-link'
+			( block ) =>
+				block.name === 'core/navigation-link' ||
+				block.name === 'core/navigation-submenu'
 		);
 
 		return {
