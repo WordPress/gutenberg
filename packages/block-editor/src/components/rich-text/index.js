@@ -26,6 +26,7 @@ import {
 } from '@wordpress/rich-text';
 import deprecated from '@wordpress/deprecated';
 import { BACKSPACE, DELETE } from '@wordpress/keycodes';
+import { Popover } from '@wordpress/components';
 
 /**
  * Internal dependencies
@@ -303,7 +304,7 @@ function RichTextWrapper(
 
 	const TagName = tagName;
 	const content = (
-		<>
+		<Popover.__unstableSlotNameProvider value="__unstable-block-tools-after">
 			{ isSelected && (
 				<keyboardShortcutContext.Provider value={ keyboardShortcuts }>
 					<inputEventContext.Provider value={ inputEvents }>
@@ -386,7 +387,7 @@ function RichTextWrapper(
 				onFocus={ unstableOnFocus }
 				onKeyDown={ onKeyDown }
 			/>
-		</>
+		</Popover.__unstableSlotNameProvider>
 	);
 
 	if ( ! wrapperClassName ) {

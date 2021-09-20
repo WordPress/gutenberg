@@ -143,7 +143,6 @@ function InlineLinkUI( {
 			focusOnMount={ focusOnMount.current }
 			onClose={ stopAddingLink }
 			position="bottom center"
-			__unstableSlotName="__unstable-block-tools-after"
 		>
 			<LinkControl
 				value={ linkValue }
