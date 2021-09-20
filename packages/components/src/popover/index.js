@@ -41,7 +41,7 @@ import { getAnimateClassName } from '../animate';
  */
 const SLOT_NAME = 'Popover';
 
-const slotNameContext = createContext( SLOT_NAME );
+const slotNameContext = createContext();
 
 function computeAnchorRect(
 	anchorRefFallback,
