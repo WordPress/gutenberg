@@ -514,7 +514,9 @@ export class ImageEdit extends Component {
 			wasBlockJustInserted,
 		} = this.props;
 		const { align, url, alt, id, sizeSlug, className } = attributes;
-		const hasImageContext = Object.keys( context ).length > 0;
+		const hasImageContext = context
+			? Object.keys( context ).length > 0
+			: false;
 
 		const imageSizes = Array.isArray( this.props.imageSizes )
 			? this.props.imageSizes
