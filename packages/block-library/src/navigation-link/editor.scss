@@ -82,7 +82,7 @@
 	position: relative;
 
 	// Draw a wavy underline.
-	.wp-block-navigation-link__placeholder-text {
+	.wp-block-navigation-link__placeholder-text span {
 		$blur: 10%;
 		$width: 6%;
 		$stop1: 30%;
@@ -94,6 +94,10 @@
 		background-position: 0 100%;
 		background-size: 6px 3px;
 		background-repeat: repeat-x;
+
+		// Since applied to a span, it doesn't change the footprint of the item,
+		// but it does vertically shift the underline to better align.
+		padding-bottom: 0.1em;
 	}
 
 	// This needs extra specificity.

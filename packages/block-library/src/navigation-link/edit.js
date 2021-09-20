@@ -646,7 +646,7 @@ export default function NavigationLinkEdit( {
 					{ /* eslint-enable */ }
 					{ ! url ? (
 						<div className="wp-block-navigation-link__placeholder-text">
-							{ missingText }
+							<span>{ missingText }</span>
 						</div>
 					) : (
 						<RichText
