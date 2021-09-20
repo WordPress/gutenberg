@@ -9,12 +9,20 @@ import { useEffect, useMemo, useRef, useState } from '@wordpress/element';
 import * as styles from '../styles';
 import { useContextSystem, WordPressComponentProps } from '../../ui/context';
 import { useCx } from '../../utils/hooks/use-cx';
-import type { ToolsPanelProps, ToolsPanelItem } from '../types';
+import type {
+	ToolsPanelItem,
+	ToolsPanelMenuItemKey,
+	ToolsPanelMenuItems,
+	ToolsPanelMenuItemsConfig,
+	ToolsPanelProps,
+} from '../types';
 
-const generateMenuItems = ( { panelItems, reset } ) => {
-	const menuItems = { default: {}, optional: {} };
+const generateMenuItems = ( config: ToolsPanelMenuItemsConfig ) => {
+	const { panelItems, reset } = config;
+	const menuItems: ToolsPanelMenuItems = { default: {}, optional: {} };
 
-	panelItems.forEach( ( { hasValue, isShownByDefault, label } ) => {
+	panelItems.forEach( ( panelItem: ToolsPanelItem ) => {
+		const { hasValue, isShownByDefault, label } = panelItem;
 		const group = isShownByDefault ? 'default' : 'optional';
 		menuItems[ group ][ label ] = reset ? false : hasValue();
 	} );
@@ -49,7 +57,7 @@ export function useToolsPanel(
 	}, [ wasResetting ] );
 
 	// Allow panel items to register themselves.
-	const [ panelItems, setPanelItems ] = useState( [] );
+	const [ panelItems, setPanelItems ] = useState( <ToolsPanelItem[]>[] );
 
 	const registerPanelItem = ( item: ToolsPanelItem ) => {
 		setPanelItems( ( items ) => [ ...items, item ] );
@@ -62,7 +70,9 @@ export function useToolsPanel(
 		// controls, e.g. both panels have a "padding" control, the
 		// deregistration of the first panel doesn't occur until after the
 		// registration of the next.
-		const index = panelItems.findIndex( ( item ) => item.label === label );
+		const index = panelItems.findIndex(
+			( item: ToolsPanelItem ) => item.label === label
+		);
 
 		if ( index !== -1 ) {
 			setPanelItems( ( items ) => items.splice( index, 1 ) );
@@ -73,7 +83,10 @@ export function useToolsPanel(
 	// This is intended for use with default panel items. They are displayed
 	// separately to optional items and have different display states,
 	//.we need to update that when their value is customized.
-	const flagItemCustomization = ( label: string, group = 'default' ) => {
+	const flagItemCustomization = (
+		label: string,
+		group: ToolsPanelMenuItemKey = 'default'
+	) => {
 		setMenuItems( {
 			...menuItems,
 			[ group ]: {
@@ -84,12 +97,15 @@ export function useToolsPanel(
 	};
 
 	// Manage and share display state of menu items representing child controls.
-	const [ menuItems, setMenuItems ] = useState( {} );
+	const [ menuItems, setMenuItems ] = useState< ToolsPanelMenuItems >( {
+		default: {},
+		optional: {},
+	} );
 
 	const getResetAllFilters = () => {
-		const filters = [];
+		const filters: Array< Function > = [];
 
-		panelItems.forEach( ( item ) => {
+		panelItems.forEach( ( item: ToolsPanelItem ) => {
 			if ( item.resetAllFilter ) {
 				filters.push( item.resetAllFilter );
 			}
@@ -99,28 +115,37 @@ export function useToolsPanel(
 
 	// Setup menuItems state as panel items register themselves.
 	useEffect( () => {
-		const items = generateMenuItems( { panelItems, reset: false } );
+		const items: ToolsPanelMenuItems = generateMenuItems( {
+			panelItems,
+			reset: false,
+		} );
 		setMenuItems( items );
 	}, [ panelItems ] );
 
 	// Toggle the checked state of a menu item which is then used to determine
 	// display of the item within the panel.
 	const toggleItem = ( label: string ) => {
-		const currentItem = panelItems.find( ( item ) => item.label === label );
+		const currentItem: ToolsPanelItem | undefined = panelItems.find(
+			( item: ToolsPanelItem ) => item.label === label
+		);
 
 		if ( ! currentItem ) {
 			return;
 		}
 
-		const menuGroup = currentItem.isShownByDefault ? 'default' : 'optional';
+		const menuGroup: ToolsPanelMenuItemKey = currentItem.isShownByDefault
+			? 'default'
+			: 'optional';
 
-		setMenuItems( {
+		const newMenuItems: ToolsPanelMenuItems = {
 			...menuItems,
 			[ menuGroup ]: {
 				...menuItems[ menuGroup ],
 				[ label ]: ! menuItems[ menuGroup ][ label ],
 			},
-		} );
+		};
+
+		setMenuItems( newMenuItems );
 	};
 
 	// Resets display of children and executes resetAll callback if available.

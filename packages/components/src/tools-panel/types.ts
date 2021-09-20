@@ -41,12 +41,29 @@ export interface ToolsPanelItemProps extends ToolsPanelItem {
 	resetAllFilter: ResetAllFilter;
 }
 
+export type ToolsPanelMenuItemKey = 'default' | 'optional';
+
+export type ToolsPanelMenuItems = {
+	[ menuItemKey in ToolsPanelMenuItemKey ]: { [ key: string ]: boolean };
+};
+
 export interface TPContext {
 	panelId?: PanelId;
-	menuItems?: { [ key: string ]: boolean };
+	menuItems?: ToolsPanelMenuItems;
 	hasMenuItems?: number;
 	registerPanelItem?: ( item: ToolsPanelItem ) => void;
 	deregisterPanelItem?: ( label: Label ) => void;
 	flagItemCustomization?: ( label: Label ) => void;
 	isResetting?: boolean;
+}
+
+export interface ToolsPanelControlsGroupProps {
+	items: [ string, boolean ][];
+	onClose: () => void;
+	toggleItem: ( label: Label ) => void;
+}
+
+export interface ToolsPanelMenuItemsConfig {
+	panelItems: ToolsPanelItem[];
+	reset: boolean;
 }
