@@ -45,13 +45,15 @@ function DefaultLoadingResponsePlaceholder( { className, children } ) {
 			<div
 				style={ {
 					position: 'absolute',
-					top: '10px',
-					right: '0',
+					top: '50%',
+					left: '50%',
+					marginTop: '-9px',
+					marginLeft: '-9px',
 				} }
 			>
 				<Spinner />
 			</div>
-			{ children }
+			<div style={ { opacity: '0.3' } }>{ children }</div>
 		</div>
 	);
 }
