@@ -1805,9 +1805,9 @@ export const __experimentalGetDirectInsert = createSelector(
 		if ( ! rootClientId ) {
 			return;
 		}
-		return state.blockListSettings[ rootClientId ].directInsert;
+		return state.blockListSettings[ rootClientId ]?.directInsert;
 	},
-	( state, rootClientId ) => state.blockListSettings[ rootClientId ]
+	( state, rootClientId ) => [ state.blockListSettings[ rootClientId ] ]
 );
 
 const checkAllowListRecursive = ( blocks, allowedBlockTypes ) => {
