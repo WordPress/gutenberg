@@ -214,7 +214,7 @@ class WP_Theme_JSON_Resolver_Gutenberg_Test extends WP_UnitTestCase {
 
 	function test_add_theme_supports_are_loaded_for_themes_without_theme_json() {
 		switch_theme( 'default' );
-		add_theme_support('custom-line-height');
+		add_theme_support( 'custom-line-height' );
 		$color_palette = array(
 			array(
 				'name'  => 'Primary',
