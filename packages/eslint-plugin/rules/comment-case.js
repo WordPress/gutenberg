@@ -1,5 +1,18 @@
-const createFixerFunction = ( node ) => ( arg ) => {
-	return arg.insertTextAfter( node, '.' );
+const createFixerFunction = ( errorType, node ) => ( arg ) => {
+	switch ( errorType ) {
+		case 'missingSpace':
+			return arg.replaceText( node, `// ${ node.value }` );
+		case 'missingPunctuation':
+			return arg.insertTextAfter( node, '.' );
+		case 'capitalLetter':
+			const trimmedComment = node.value.trim();
+			return arg.replaceText(
+				node,
+				`// ${ trimmedComment
+					.charAt( 0 )
+					.toUpperCase() }${ trimmedComment.substring( 1 ) }`
+			);
+	}
 };
 
 module.exports = {
