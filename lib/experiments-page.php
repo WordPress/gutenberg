@@ -98,7 +98,7 @@ function gutenberg_display_experiment_section() {
  */
 function gutenberg_experiments_editor_settings( $settings ) {
 	// The refactored gallery currently can't be run on sites with use_balanceTags option set.
-	// This bypass need to remain in place until this is is resolved and patch released.
+	// This bypass needs to remain in place until this is is resolved and a patch released.
 	// https://core.trac.wordpress.org/ticket/54130.
 	$balance_tags         = get_option( 'use_balanceTags' );
 	$experiments_settings = array(
