@@ -60,8 +60,7 @@
 			"type": "string"
 		},
 		"isDark": {
-			"type": "boolean",
-			"default": true
+			"type": "boolean"
 		}
 	},
 	"supports": {
