@@ -1,4 +1,10 @@
 /**
+ * External dependencies
+ */
+// eslint-disable-next-line no-restricted-imports
+import { find, findAll } from 'puppeteer-testing-library';
+
+/**
  * WordPress dependencies
  */
 import {
@@ -582,10 +588,12 @@ describe( 'Navigation editor', () => {
 			}
 		}
 
+		// eslint-disable-next-line jest/no-disabled-tests
 		it.skip( 'should not prompt to confirm unsaved changes for the newly selected menu', async () => {
 			await assertIsDirty( false );
 		} );
 
+		// eslint-disable-next-line jest/no-disabled-tests
 		it.skip( 'should prompt to confirm unsaved changes when menu name is edited', async () => {
 			await page.type(
 				'.edit-navigation-name-editor__text-control input',
@@ -593,6 +601,208 @@ describe( 'Navigation editor', () => {
 			);
 
 			await assertIsDirty( true );
+		} );
+	} );
+
+	describe( 'Sidebar inserter', () => {
+		const initialMenu = {
+			id: 4,
+			description: '',
+			name: 'Main Menu',
+			slug: 'main-menu',
+			meta: [],
+			auto_add: false,
+		};
+
+		it( 'disables inserter toggle when Navigation block is in placeholder state', async () => {
+			await setUpResponseMocking( [
+				...getMenuMocks( {
+					GET: [ initialMenu ],
+					POST: initialMenu,
+				} ),
+				...getMenuItemMocks( { GET: [] } ),
+			] );
+
+			await visitNavigationEditor();
+
+			// Wait for the block to be present.
+			await expect( {
+				role: 'document',
+				name: 'Block: Navigation',
+			} ).toBeFound();
+
+			// Check for the placeholder state
+			await expect( {
+				role: 'button',
+				name: 'Start blank',
+			} ).toBeFound();
+
+			// Expect the block inserter to be disabled.
+			await expect( {
+				name: 'Toggle block inserter',
+				disabled: true,
+				role: 'button',
+			} ).toBeFound();
+		} );
+
+		it( 'enables inserter toggle when Navigation block is in editable state', async () => {
+			await setUpResponseMocking( [
+				...getMenuMocks( {
+					GET: [ initialMenu ],
+					POST: initialMenu,
+				} ),
+				...getMenuItemMocks( { GET: menuItemsFixture } ),
+			] );
+
+			await visitNavigationEditor();
+
+			// Wait for the block to be present.
+			await expect( {
+				role: 'document',
+				name: 'Block: Navigation',
+			} ).toBeFound();
+
+			// Expect the block inserter to be found.
+			await expect( {
+				name: 'Toggle block inserter',
+				role: 'button',
+			} ).toBeFound();
+
+			// Work around bug where `find` with `disabled=false` doesn't return anything.
+			const isEnabled = await page.$eval(
+				'[aria-label="Toggle block inserter"]',
+				( element ) => ! element.disabled
+			);
+
+			expect( isEnabled ).toBeTruthy();
+		} );
+
+		it( 'toggles the inserter sidebar open and closed', async () => {
+			await setUpResponseMocking( [
+				...getMenuMocks( {
+					GET: [ initialMenu ],
+					POST: initialMenu,
+				} ),
+				...getMenuItemMocks( { GET: menuItemsFixture } ),
+			] );
+
+			await visitNavigationEditor();
+
+			// Wait for the block to be present.
+			await expect( {
+				role: 'document',
+				name: 'Block: Navigation',
+			} ).toBeFound();
+
+			// Expect inserter sidebar to **not** be in the DOM.
+			await expect( {
+				role: 'region',
+				name: 'Block library',
+			} ).not.toBeFound();
+
+			const inserterToggle = await find( {
+				name: 'Toggle block inserter',
+				role: 'button',
+			} );
+
+			await inserterToggle.click();
+
+			// Expect the inserter sidebar to be present in the DOM.
+			await expect( {
+				role: 'region',
+				name: 'Block library',
+			} ).toBeFound();
+
+			// Expect block search input to be focused.
+			await expect( {
+				role: 'searchbox',
+				name: 'Search for blocks and patterns',
+				focused: true,
+			} ).toBeFound();
+		} );
+
+		it( 'inserts items at end of Navigation block by default', async () => {
+			await setUpResponseMocking( [
+				...getMenuMocks( {
+					GET: [ initialMenu ],
+					POST: initialMenu,
+				} ),
+				...getMenuItemMocks( { GET: menuItemsFixture } ),
+				...getSearchMocks( { GET: searchFixture } ),
+			] );
+
+			await visitNavigationEditor();
+
+			// Wait for the block to be present.
+			await expect( {
+				role: 'document',
+				name: 'Block: Navigation',
+			} ).toBeFound();
+
+			const inserterToggle = await find( {
+				name: 'Toggle block inserter',
+				role: 'button',
+			} );
+
+			await inserterToggle.click();
+
+			// Expect the inserter sidebar to be present in the DOM.
+			await expect( {
+				role: 'region',
+				name: 'Block library',
+			} ).toBeFound();
+
+			// Add Custom Link item.
+			const customLinkOption = await find( {
+				name: 'Custom Link',
+				role: 'option',
+			} );
+
+			customLinkOption.click();
+
+			// Expect that inserter is auto-closed.
+			await expect( {
+				role: 'region',
+				name: 'Block library',
+			} ).not.toBeFound();
+
+			// Expect to be focused inside the Link UI search input.
+			await expect( {
+				role: 'combobox',
+				name: 'URL',
+				focused: true,
+			} ).toBeFound();
+
+			const [ itemToSelect ] = searchFixture;
+
+			// Add Custom Link item.
+			const [ firstSearchSuggestion ] = await findAll( {
+				role: 'option',
+				name: `${ itemToSelect.title } ${ itemToSelect.subtype }`,
+			} );
+
+			await firstSearchSuggestion.click();
+
+			// Get the title/label of the last Nav item inside the Nav block.
+			const lastItemAttributes = await page.evaluate( () => {
+				const { getBlockOrder, getBlocks } = wp.data.select(
+					'core/block-editor'
+				);
+
+				const lockedNavigationBlock = getBlockOrder()[ 0 ];
+
+				const navItemBlocks = getBlocks( lockedNavigationBlock );
+
+				const { attributes } = navItemBlocks[
+					navItemBlocks.length - 1
+				];
+
+				return attributes;
+			} );
+
+			// Check the last item is the one we just inserted
+			expect( lastItemAttributes.label ).toEqual( itemToSelect.title );
+			expect( lastItemAttributes.isTopLevelLink ).toBeTruthy();
 		} );
 	} );
 } );

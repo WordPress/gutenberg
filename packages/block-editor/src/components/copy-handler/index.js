@@ -113,6 +113,7 @@ export function useClipboardHandler() {
 				return;
 			}
 
+			const eventDefaultPrevented = event.defaultPrevented;
 			event.preventDefault();
 
 			if ( event.type === 'copy' || event.type === 'cut' ) {
@@ -130,6 +131,10 @@ export function useClipboardHandler() {
 			if ( event.type === 'cut' ) {
 				removeBlocks( selectedBlockClientIds );
 			} else if ( event.type === 'paste' ) {
+				if ( eventDefaultPrevented ) {
+					// This was likely already handled in rich-text/use-paste-handler.js
+					return;
+				}
 				const {
 					__experimentalCanUserUseUnfilteredHTML: canUserUseUnfilteredHTML,
 				} = getSettings();

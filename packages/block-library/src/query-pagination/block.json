@@ -23,6 +23,13 @@
 		"color": {
 			"gradients": true,
 			"link": true
+		},
+		"__experimentalLayout": {
+			"allowSwitching": false,
+			"allowInheriting": false,
+			"default": {
+				"type": "flex"
+			}
 		}
 	},
 	"editorStyle": "wp-block-query-pagination-editor",

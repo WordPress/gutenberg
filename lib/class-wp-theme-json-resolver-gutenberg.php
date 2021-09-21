@@ -410,13 +410,6 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 		$result = new WP_Theme_JSON_Gutenberg();
 		$result->merge( self::get_core_data() );
 
-		if (
-			! get_theme_support( 'experimental-link-color' ) && // link color support needs the presets CSS variables regardless of the presence of theme.json file.
-			! WP_Theme_JSON_Resolver_Gutenberg::theme_has_support()
-		) {
-			return $result;
-		}
-
 		$theme_support_data = WP_Theme_JSON_Gutenberg::get_from_editor_settings( $settings );
 		$result->merge( self::get_theme_data( $theme_support_data ) );
 

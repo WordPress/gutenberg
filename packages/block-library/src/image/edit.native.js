@@ -509,11 +509,14 @@ export class ImageEdit extends Component {
 			image,
 			clientId,
 			imageDefaultSize,
-			context: { imageCrop = false } = {},
+			context,
 			featuredImageId,
 			wasBlockJustInserted,
 		} = this.props;
 		const { align, url, alt, id, sizeSlug, className } = attributes;
+		const hasImageContext = context
+			? Object.keys( context ).length > 0
+			: false;
 
 		const imageSizes = Array.isArray( this.props.imageSizes )
 			? this.props.imageSizes
@@ -627,8 +630,10 @@ export class ImageEdit extends Component {
 
 		const additionalImageProps = {
 			height: '100%',
-			resizeMode: imageCrop ? 'cover' : 'contain',
+			resizeMode: context?.imageCrop ? 'cover' : 'contain',
 		};
+
+		const imageContainerStyles = [ hasImageContext && styles.fixedHeight ];
 
 		const getImageComponent = ( openMediaOptions, getMediaOptions ) => (
 			<Badge label={ __( 'Featured' ) } show={ isFeaturedImage }>
@@ -662,7 +667,7 @@ export class ImageEdit extends Component {
 								retryMessage,
 							} ) => {
 								return (
-									<View style={ styles.isGallery }>
+									<View style={ imageContainerStyles }>
 										<Image
 											align={
 												align && alignToFlex[ align ]
@@ -686,7 +691,9 @@ export class ImageEdit extends Component {
 											url={ url }
 											shapeStyle={ styles[ className ] }
 											width={ this.getWidth() }
-											{ ...additionalImageProps }
+											{ ...( hasImageContext
+												? additionalImageProps
+												: {} ) }
 										/>
 									</View>
 								);

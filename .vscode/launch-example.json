@@ -7,17 +7,17 @@
 			"request": "launch",
 			"port": 9003,
 			"pathMappings": {
-				"/var/www/html/wp-content/plugins/gutenberg": "${workspaceRoot}/"
+				"/var/www/html/wp-content/plugins/gutenberg": "${workspaceFolder}"
 			}
 		},
 		{
 			"type": "node",
 			"request": "launch",
 			"name": "Debug current e2e test",
-			"program": "${workspaceRoot}/node_modules/@wordpress/scripts/bin/wp-scripts.js",
+			"program": "${workspaceFolder}/node_modules/@wordpress/scripts/bin/wp-scripts.js",
 			"args": [
 				"test-e2e",
-				"--config=${workspaceRoot}/packages/e2e-tests/jest.config.js",
+				"--config=${workspaceFolder}/packages/e2e-tests/jest.config.js",
 				"--verbose=true",
 				"--runInBand",
 				"--watch",

@@ -11,7 +11,7 @@ import { isRTL } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
-import { G2, UI } from '../../utils/colors-values';
+import { BASE, G2, UI } from '../../utils/colors-values';
 import Button from '../../button';
 import { Text } from '../../text';
 import { reduceMotion, rtl } from '../../utils';
@@ -19,9 +19,7 @@ import { space } from '../../ui/utils/space';
 
 export const NavigationUI = styled.div`
 	width: 100%;
-	background-color: ${ G2.darkGray.primary };
 	box-sizing: border-box;
-	color: #f0f0f0;
 	padding: 0 ${ space( 4 ) };
 	overflow: hidden;
 `;
@@ -47,16 +45,19 @@ export const MenuUI = styled.div`
 
 export const MenuBackButtonUI = styled( Button )`
 	&.is-tertiary {
-		color: ${ G2.lightGray.ui };
+		color: inherit;
+		opacity: 0.7;
 
 		&:hover:not( :disabled ) {
-			color: #ddd;
+			opacity: 1;
 			box-shadow: none;
+			color: inherit;
 		}
 
 		&:active:not( :disabled ) {
 			background: transparent;
-			color: #ddd;
+			opacity: 1;
+			color: inherit;
 		}
 	}
 `;
@@ -68,7 +69,7 @@ export const MenuTitleUI = styled.div`
 
 export const MenuTitleHeadingUI = styled( Text )`
 	align-items: center;
-	color: ${ G2.gray[ 100 ] };
+	color: inherit;
 	display: flex;
 	justify-content: space-between;
 	margin-bottom: ${ space( 2 ) };
@@ -84,17 +85,20 @@ export const MenuTitleActionsUI = styled.span`
 	height: ${ space( 6 ) }; // 24px, same height as the buttons inside
 
 	.components-button.is-small {
-		color: ${ G2.lightGray.ui };
+		color: inherit;
+		opacity: 0.7;
 		margin-right: ${ space( 1 ) }; // Avoid hiding the focus outline
 		padding: 0;
 
 		&:active:not( :disabled ) {
 			background: none;
-			color: ${ G2.gray[ 200 ] };
+			opacity: 1;
+			color: inherit;
 		}
 		&:hover:not( :disabled ) {
 			box-shadow: none;
-			color: ${ G2.gray[ 200 ] };
+			opacity: 1;
+			color: inherit;
 		}
 	}
 `;
@@ -142,46 +146,49 @@ export const MenuTitleSearchUI = styled.div`
 `;
 
 export const GroupTitleUI = styled( Text )`
+	color: inherit;
 	margin-top: ${ space( 2 ) };
 	padding: ${ () =>
 		isRTL()
 			? `${ space( 1 ) } ${ space( 4 ) } ${ space( 1 ) } 0`
 			: `${ space( 1 ) } 0 ${ space( 1 ) } ${ space( 4 ) }` };
 	text-transform: uppercase;
-	color: ${ G2.gray[ 100 ] };
 `;
 
 export const ItemBaseUI = styled.li`
 	border-radius: 2px;
-	color: ${ G2.lightGray.ui };
+	color: inherit;
 	margin-bottom: 0;
 
-	button,
-	a.components-button,
-	a {
+	> button,
+	> a.components-button,
+	> a {
 		width: 100%;
-		color: ${ G2.lightGray.ui };
+		color: inherit;
+		opacity: 0.7;
 		padding: ${ space( 2 ) } ${ space( 4 ) }; /* 8px 16px */
 		${ rtl( { textAlign: 'left' }, { textAlign: 'right' } ) }
 
 		&:hover,
 		&:focus:not( [aria-disabled='true'] ):active,
 		&:active:not( [aria-disabled='true'] ):active {
-			color: #ddd;
+			color: inherit;
+			opacity: 1;
 		}
 	}
 
 	&.is-active {
 		background-color: ${ UI.theme };
-		color: ${ UI.textDark };
+		color: ${ BASE.white };
 
-		button,
-		a {
-			color: ${ UI.textDark };
+		> button,
+		> a {
+			color: ${ BASE.white };
+			opacity: 1;
 		}
 	}
 
-	svg path {
+	> svg path {
 		color: ${ G2.lightGray.ui };
 	}
 `;
@@ -196,7 +203,8 @@ export const ItemUI = styled.div`
 	font-weight: 400;
 	line-height: 20px;
 	width: 100%;
-	color: ${ G2.lightGray.ui };
+	color: inherit;
+	opacity: 0.7;
 `;
 
 export const ItemBadgeUI = styled.span`
