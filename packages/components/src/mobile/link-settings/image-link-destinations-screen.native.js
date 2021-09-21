@@ -69,7 +69,7 @@ function ImageLinkDestinationsScreen( props ) {
 		inputValue !== attachmentPageUrl;
 
 	function goToLinkPicker() {
-		navigation.navigate( 'linkPicker', {
+		navigation.navigate( blockSettingsScreens.linkPicker, {
 			inputValue: customUrlSet ? inputValue : '',
 		} );
 	}
