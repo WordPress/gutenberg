@@ -147,12 +147,15 @@ function LinkSettings( {
 				options={ linkSettingsOptions }
 				showIcon={ false }
 				onLinkCellPressed={ ( { navigation } ) => {
-					navigation.navigate( blockSettingsScreens.imageOptions, {
-						inputValue: attributes.href,
-						linkDestination: attributes.linkDestination,
-						imageUrl: attributes.url,
-						attachmentPageUrl: image?.link,
-					} );
+					navigation.navigate(
+						blockSettingsScreens.imageLinkDestinations,
+						{
+							inputValue: attributes.href,
+							linkDestination: attributes.linkDestination,
+							imageUrl: attributes.url,
+							attachmentPageUrl: image?.link,
+						}
+					);
 				} }
 			/>
 		</PanelBody>

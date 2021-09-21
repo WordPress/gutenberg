@@ -22,7 +22,7 @@ export const blockSettingsScreens = {
 	color: 'Color',
 	focalPoint: 'FocalPoint',
 	linkPicker: 'linkPicker',
-	imageOptions: 'imageOptions',
+	imageLinkDestinations: 'imageLinkDestinations',
 };
 
 function BottomSheetSettings( {
@@ -78,7 +78,7 @@ function BottomSheetSettings( {
 					/>
 				</BottomSheet.NavigationScreen>
 				<BottomSheet.NavigationScreen
-					name={ blockSettingsScreens.imageOptions }
+					name={ blockSettingsScreens.imageLinkDestinations }
 				>
 					<ImageLinkDestinationsScreen { ...props } />
 				</BottomSheet.NavigationScreen>
