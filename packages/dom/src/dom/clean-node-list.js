@@ -134,6 +134,8 @@ export default function cleanNodeList( nodeList, doc, schema, inline ) {
 						} else if (
 							node.parentNode &&
 							node.parentNode.nodeName === 'BODY' &&
+							// To do: figure out why this is needed.
+							tag !== 'math' &&
 							isPhrasingContent( node )
 						) {
 							cleanNodeList(

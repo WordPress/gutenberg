@@ -1,3 +1,7 @@
 @import "./image/style.scss";
 @import "./link/style.scss";
 @import "./text-color/style.scss";
+
+[contenteditable="false"] {
+	-webkit-user-modify: read-only;
+}

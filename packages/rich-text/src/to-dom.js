@@ -60,10 +60,18 @@ function append( element, child ) {
 		child = element.ownerDocument.createTextNode( child );
 	}
 
-	const { type, attributes } = child;
+	const { type, attributes, namespace, disabled } = child;
 
 	if ( type ) {
-		child = element.ownerDocument.createElement( type );
+		const inheritedNS = namespace || element.namespaceURI;
+		if ( inheritedNS ) {
+			child = element.ownerDocument.createElementNS( inheritedNS, type );
+
+			if ( namespace ) child.setAttribute( 'xmlns', namespace );
+			if ( disabled ) child.setAttribute( 'contenteditable', 'false' );
+		} else {
+			child = element.ownerDocument.createElement( type );
+		}
 
 		for ( const key in attributes ) {
 			child.setAttribute( key, attributes[ key ] );
