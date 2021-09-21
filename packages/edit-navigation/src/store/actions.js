@@ -155,9 +155,10 @@ const batchSaveMenuItems = ( navigationBlock, menuId ) => async ( {
 const batchInsertPlaceholderMenuItems = ( navigationBlock ) => async ( {
 	registry,
 } ) => {
-	const blocksWithoutRecordId = blocksTreeToList( navigationBlock )
-		.filter( isBlockSupportedInNav )
-		.filter( ( block ) => ! getRecordIdFromBlock( block ) );
+	const blocksWithoutRecordId = blocksTreeToList( navigationBlock ).filter(
+		( block ) =>
+			isBlockSupportedInNav( block ) && ! getRecordIdFromBlock( block )
+	);
 
 	const tasks = blocksWithoutRecordId.map( () => ( { saveEntityRecord } ) =>
 		saveEntityRecord( 'root', 'menuItem', {
