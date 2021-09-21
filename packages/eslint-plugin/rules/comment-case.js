@@ -79,6 +79,21 @@ module.exports = {
 						} );
 					}
 
+					// Check to see if first word starts with a capital letter.
+					if (
+						! isPrecededDirectlyByLineComment &&
+						trimmedValue.charAt( 0 ) !==
+							trimmedValue.charAt( 0 ).toUpperCase()
+					) {
+						const errorType = 'capitalLetter';
+						context.report( {
+							node,
+							loc: comment.loc,
+							messageId: errorType,
+							fix: createFixerFunction( errorType, comment ),
+						} );
+					}
+
 					const todoTypeCommentRegex = /@\w*\s/;
 					if (
 						! trimmedValue.match( todoTypeCommentRegex ) &&
