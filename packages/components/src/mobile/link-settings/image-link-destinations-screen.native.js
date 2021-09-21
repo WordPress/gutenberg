@@ -125,10 +125,7 @@ function ImageLinkDestinationsScreen( props ) {
 					option={ LINK_DESTINATION_CUSTOM }
 					label={ __( 'Custom URL' ) }
 					onPress={ goToLinkPicker }
-					// since this is not actually editable, we treat value as a placeholder
-					value={
-						customUrlSet ? inputValue : __( 'Search or type URL' )
-					}
+					value={ customUrlSet ? inputValue : '' }
 					valueStyle={
 						customUrlSet ? undefined : styles.placeholderTextColor
 					}
