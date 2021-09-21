@@ -48,7 +48,26 @@ module.exports = {
 						trimmedValue.length - 1
 					);
 
-					// Check to see if the comment contains an \@see or @todo type directive.
+					const previousComment =
+						index !== 0 ? comments[ index - 1 ] : null;
+					const nextComment =
+						index !== comments.length - 1
+							? comments[ index + 1 ]
+							: null;
+
+					const isFollowedDirectlyByLineComment =
+						nextComment &&
+						! codeBeforeComment( sourceCode, comment ) &&
+						nextComment.type === 'Line' &&
+						nextComment.loc.start.line ===
+							comment.loc.start.line + 1;
+					const isPrecededDirectlyByLineComment =
+						previousComment &&
+						! codeBeforeComment( sourceCode, comment ) &&
+						previousComment.type === 'Line' &&
+						previousComment.loc.end.line ===
+							comment.loc.start.line - 1;
+
 					const todoTypeCommentRegex = /@\w*\s/;
 					if (
 						! trimmedValue.match( todoTypeCommentRegex ) &&
