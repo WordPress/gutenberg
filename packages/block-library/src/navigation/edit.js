@@ -95,7 +95,7 @@ function Navigation( {
 	hasExistingNavItems,
 	isImmediateParentOfSelectedBlock,
 	isSelected,
-	onlyLinkInnerBlocks,
+	innerBlocks,
 	updateInnerBlocks,
 	className,
 	backgroundColor,
@@ -163,6 +163,12 @@ function Navigation( {
 		( isImmediateParentOfSelectedBlock && ! selectedBlockHasDescendants )
 			? undefined
 			: false;
+
+	const onlyLinkInnerBlocks = innerBlocks.every(
+		( block ) =>
+			block.name === 'core/navigation-link' ||
+			block.name === 'core/navigation-submenu'
+	);
 
 	const innerBlocksProps = useInnerBlocksProps(
 		{
@@ -373,12 +379,6 @@ export default compose( [
 			selectedBlockId,
 		] )?.length;
 
-		const onlyLinkInnerBlocks = innerBlocks.every(
-			( block ) =>
-				block.name === 'core/navigation-link' ||
-				block.name === 'core/navigation-submenu'
-		);
-
 		return {
 			isImmediateParentOfSelectedBlock,
 			selectedBlockHasDescendants,
@@ -387,7 +387,7 @@ export default compose( [
 			// This prop is already available but computing it here ensures it's
 			// fresh compared to isImmediateParentOfSelectedBlock
 			isSelected: selectedBlockId === clientId,
-			onlyLinkInnerBlocks,
+			innerBlocks,
 		};
 	} ),
 	withDispatch( ( dispatch, { clientId } ) => {
