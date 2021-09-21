@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { usePrevious } from '@wordpress/compose';
-import { useEffect, useMemo } from '@wordpress/element';
+import { useCallback, useEffect, useMemo } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -44,21 +44,31 @@ export function useToolsPanelItem(
 		isResetting,
 	} = useToolsPanelContext();
 
+	const hasValueCallback = useCallback( hasValue, [ panelId ] );
+	const resetAllFilterCallback = useCallback( resetAllFilter, [ panelId ] );
+
 	// Registering the panel item allows the panel to include it in its
 	// automatically generated menu and determine its initial checked status.
 	useEffect( () => {
 		if ( currentPanelId === panelId ) {
 			registerPanelItem( {
-				hasValue,
+				hasValue: hasValueCallback,
 				isShownByDefault,
 				label,
-				resetAllFilter,
+				resetAllFilter: resetAllFilterCallback,
 				panelId,
 			} );
 		}
 
 		return () => deregisterPanelItem( label );
-	}, [ panelId ] );
+	}, [
+		currentPanelId,
+		panelId,
+		isShownByDefault,
+		label,
+		hasValueCallback,
+		resetAllFilterCallback,
+	] );
 
 	const isValueSet = hasValue();
 	const wasValueSet = usePrevious( isValueSet );
