@@ -10,6 +10,7 @@ For each user feature we should also add a importance categorization label  to i
 -->
 
 ## Unreleased
+-   [**] [Embed block] Add the top 5 specific embed blocks to the Block inserter list [#34967]
 
 ## 1.62.0
 -   [**] [Embed block] Implement WP embed preview component [#34004]
