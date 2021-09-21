@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { zip, difference } from 'lodash';
+import { difference, zip } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -14,7 +14,7 @@ import { store as coreDataStore } from '@wordpress/core-data';
  * Internal dependencies
  */
 import { STORE_NAME } from './constants';
-import { addRecordIdToBlock, getRecordIdFromBlock } from './utils';
+import { addRecordIdToBlock, getRecordIdFromBlock, isBlockSupportedInNav } from './utils';
 import { blockToMenuItem, menuItemToBlockAttributes } from './transform';
 
 /**
@@ -152,7 +152,7 @@ const batchInsertPlaceholderMenuItems = ( navigationBlock ) => async ( {
 	registry,
 } ) => {
 	const blocksWithoutRecordId = blocksTreeToList( navigationBlock )
-		.filter( isSupportedBlock )
+		.filter( isBlockSupportedInNav )
 		.filter( ( block ) => ! getRecordIdFromBlock( block ) );
 
 	const tasks = blocksWithoutRecordId.map( () => ( { saveEntityRecord } ) =>
@@ -191,7 +191,7 @@ const batchUpdateMenuItems = ( navigationBlock, menuId ) => async ( {
 } ) => {
 	const updatedMenuItems = blocksTreeToAnnotatedList( navigationBlock )
 		// Filter out unsupported blocks
-		.filter( ( { block } ) => isSupportedBlock( block ) )
+		.filter( ( { block } ) => isBlockSupportedInNav( block ) )
 		// Transform the blocks into menu items
 		.map( ( { block, parentBlock, childIndex } ) =>
 			blockToMenuItem(
@@ -229,7 +229,7 @@ const batchUpdateMenuItems = ( navigationBlock, menuId ) => async ( {
 
 	// Return an updated navigation block reflecting the changes persisted in the batch update.
 	return mapBlocksTree( navigationBlock, ( block ) => {
-		if ( ! isSupportedBlock( block ) ) {
+		if ( ! isBlockSupportedInNav( block ) ) {
 			return block;
 		}
 		const updatedMenuItem = registry
@@ -245,17 +245,6 @@ const batchUpdateMenuItems = ( navigationBlock, menuId ) => async ( {
 		);
 	} );
 };
-
-/**
- * Checks if a given block should be persisted as a menu item.
- *
- * @param {Object} block Block to check.
- * @return {boolean} True if a given block should be persisted as a menu item, false otherwise.
- */
-const isSupportedBlock = ( block ) =>
-	[ 'core/navigation-link', 'core/navigation-submenu' ].includes(
-		block.name
-	);
 
 const applyEdits = ( id, edits ) => ( { registry } ) => {
 	// Update an existing entity record.

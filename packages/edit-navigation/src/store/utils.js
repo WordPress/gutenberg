@@ -69,3 +69,14 @@ export function addRecordIdToBlock( block, recordId ) {
 		},
 	};
 }
+
+/**
+ * Checks if a given block should be persisted as a menu item.
+ *
+ * @param {Object} block Block to check.
+ * @return {boolean} True if a given block should be persisted as a menu item, false otherwise.
+ */
+export const isBlockSupportedInNav = ( block ) =>
+	[ 'core/navigation-link', 'core/navigation-submenu' ].includes(
+		block.name
+	);

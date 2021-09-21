@@ -12,7 +12,11 @@ import { serialize, createBlock, parse } from '@wordpress/blocks';
  * Internal dependencies
  */
 import { NEW_TAB_TARGET_ATTRIBUTE } from '../constants';
-import { addRecordIdToBlock, getRecordIdFromBlock } from './utils';
+import {
+	addRecordIdToBlock,
+	getRecordIdFromBlock,
+	isBlockSupportedInNav,
+} from './utils';
 
 /**
  * A WP nav_menu_item object.
@@ -47,7 +51,7 @@ export function blockToMenuItem(
 
 	let attributes;
 
-	if ( block.name === 'core/navigation-link' ) {
+	if ( isBlockSupportedInNav( block ) ) {
 		attributes = blockAttributesToMenuItem( block.attributes );
 	} else {
 		attributes = {
