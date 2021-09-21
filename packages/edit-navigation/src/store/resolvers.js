@@ -10,7 +10,8 @@ import { NAVIGATION_POST_KIND, NAVIGATION_POST_POST_TYPE } from '../constants';
 
 import { resolveMenuItems, dispatch } from './controls';
 import { buildNavigationPostId } from './utils';
-import menuItemsToBlocks from './menu-items-to-blocks';
+import { menuItemsToBlocks } from './transform';
+
 /**
  * Creates a "stub" navigation post reflecting the contents of menu with id=menuId. The
  * post is meant as a convenient to only exists in runtime and should never be saved. It
@@ -41,14 +42,7 @@ export function* getNavigationPostForMenu( menuId ) {
 
 	// Now let's create a proper one hydrated using actual menu items
 	const menuItems = yield resolveMenuItems( menuId );
-	const [ navigationBlock, menuItemIdToClientId ] = createNavigationBlock(
-		menuItems
-	);
-	yield {
-		type: 'SET_MENU_ITEM_TO_CLIENT_ID_MAPPING',
-		postId: stubPost.id,
-		mapping: menuItemIdToClientId,
-	};
+	const navigationBlock = createNavigationBlock( menuItems );
 	// Persist the actual post containing the navigation block
 	yield persistPost( createStubPost( menuId, navigationBlock ) );
 
@@ -88,16 +82,13 @@ const persistPost = ( post ) =>
  * @return {Object} Navigation block
  */
 function createNavigationBlock( menuItems ) {
-	const { innerBlocks, mapping: menuItemIdToClientId } = menuItemsToBlocks(
-		menuItems
-	);
+	const innerBlocks = menuItemsToBlocks( menuItems );
 
-	const navigationBlock = createBlock(
+	return createBlock(
 		'core/navigation',
 		{
 			orientation: 'vertical',
 		},
 		innerBlocks
 	);
-	return [ navigationBlock, menuItemIdToClientId ];
 }

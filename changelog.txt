@@ -1,5 +1,21 @@
 == Changelog ==
 
+= 11.5.1 =
+
+### Bug Fixes
+
+#### Global Styles
+
+- Fix theme supports for themes without theme.json. ([34955](https://github.com/WordPress/gutenberg/pull/34955))
+
+### Various
+
+- Build plugin zip: Verify npm cache before a clean install. ([34973](https://github.com/WordPress/gutenberg/pull/34973))
+
+
+
+
+
 = 11.5.0 =
 
 ### Features

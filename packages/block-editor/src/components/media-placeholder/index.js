@@ -178,7 +178,7 @@ export function MediaPlaceholder( {
 		onFilesUpload( event.target.files );
 	};
 
-	const renderPlaceholder = ( content, onClick ) => {
+	const renderPlaceholder = ( content ) => {
 		let { instructions, title } = labels;
 
 		if ( ! mediaUpload && ! onSelectURL ) {
@@ -244,7 +244,6 @@ export function MediaPlaceholder( {
 				instructions={ instructions }
 				className={ placeholderClassName }
 				notices={ notices }
-				onClick={ onClick }
 				onDoubleClick={ onDoubleClick }
 				preview={ mediaPreview }
 			>
@@ -349,6 +348,7 @@ export function MediaPlaceholder( {
 											'block-editor-media-placeholder__button',
 											'block-editor-media-placeholder__upload-button'
 										) }
+										onClick={ openFileDialog }
 									>
 										{ __( 'Upload' ) }
 									</Button>
@@ -357,7 +357,7 @@ export function MediaPlaceholder( {
 									{ renderCancelLink() }
 								</>
 							);
-							return renderPlaceholder( content, openFileDialog );
+							return renderPlaceholder( content );
 						} }
 					/>
 				</>

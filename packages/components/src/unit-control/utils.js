@@ -9,8 +9,20 @@ import { isEmpty } from 'lodash';
 import { __, _x } from '@wordpress/i18n';
 import { Platform } from '@wordpress/element';
 
+/**
+ * An object containing the details of a unit.
+ *
+ * @typedef {Object} WPUnitControlUnit
+ * @property {string}        value       The value for the unit, used in a CSS value (e.g `px`).
+ * @property {string}        label       The label used in a dropdown selector for the unit.
+ * @property {string|number} [default]   Default value for the unit, used when switching units.
+ * @property {string}        [a11yLabel] An accessible label used by screen readers.
+ * @property {number}        [step]      A step value used when incrementing/decrementing the value.
+ */
+
 const isWeb = Platform.OS === 'web';
 
+/** @type {Record<string, WPUnitControlUnit>} */
 const allUnits = {
 	px: {
 		value: 'px',
@@ -19,7 +31,7 @@ const allUnits = {
 		a11yLabel: __( 'Pixels (px)' ),
 		step: 1,
 	},
-	percent: {
+	'%': {
 		value: '%',
 		label: isWeb ? '%' : __( 'Percentage (%)' ),
 		default: '',
@@ -129,7 +141,7 @@ export const ALL_CSS_UNITS = Object.values( allUnits );
  */
 export const CSS_UNITS = [
 	allUnits.px,
-	allUnits.percent,
+	allUnits[ '%' ],
 	allUnits.em,
 	allUnits.rem,
 	allUnits.vw,
@@ -145,9 +157,9 @@ export const DEFAULT_UNIT = allUnits.px;
  * Moving forward, ideally the value should be a string that contains both
  * the value and unit, example: '10px'
  *
- * @param {number|string} value Value
- * @param {string}        unit  Unit value
- * @param {Array<Object>} units Units to derive from.
+ * @param {number|string}            value Value
+ * @param {string}                   unit  Unit value
+ * @param {Array<WPUnitControlUnit>} units Units to derive from.
  * @return {Array<number, string>} The extracted number and unit.
  */
 export function getParsedValue( value, unit, units ) {
@@ -169,8 +181,8 @@ export function hasUnits( units ) {
 /**
  * Parses a number and unit from a value.
  *
- * @param {string}        initialValue Value to parse
- * @param {Array<Object>} units        Units to derive from.
+ * @param {string}                   initialValue Value to parse
+ * @param {Array<WPUnitControlUnit>} units        Units to derive from.
  * @return {Array<number, string>} The extracted number and unit.
  */
 export function parseUnit( initialValue, units = ALL_CSS_UNITS ) {
@@ -198,10 +210,10 @@ export function parseUnit( initialValue, units = ALL_CSS_UNITS ) {
  * Parses a number and unit from a value. Validates parsed value, using fallback
  * value if invalid.
  *
- * @param {number|string} next          The next value.
- * @param {Array<Object>} units         Units to derive from.
- * @param {number|string} fallbackValue The fallback value.
- * @param {string}        fallbackUnit  The fallback value.
+ * @param {number|string}            next          The next value.
+ * @param {Array<WPUnitControlUnit>} units         Units to derive from.
+ * @param {number|string}            fallbackValue The fallback value.
+ * @param {string}                   fallbackUnit  The fallback value.
  * @return {Array<number, string>} The extracted number and unit.
  */
 export function getValidParsedUnit( next, units, fallbackValue, fallbackUnit ) {
@@ -257,10 +269,10 @@ export function filterUnitsWithSettings( settings = [], units = [] ) {
  * TODO: ideally this hook shouldn't be needed
  * https://github.com/WordPress/gutenberg/pull/31822#discussion_r633280823
  *
- * @param {Object}                  args                An object containing units, settingPath & defaultUnits.
- * @param {Array<Object>|undefined} args.units          Collection of available units.
- * @param {Array<string>|undefined} args.availableUnits The setting path. Defaults to 'spacing.units'.
- * @param {Object|undefined}        args.defaultValues  Collection of default values for defined units. Example: { px: '350', em: '15' }.
+ * @param {Object}                             args                An object containing units, settingPath & defaultUnits.
+ * @param {Array<WPUnitControlUnit>|undefined} args.units          Collection of available units.
+ * @param {Array<string>|undefined}            args.availableUnits The setting path. Defaults to 'spacing.units'.
+ * @param {Object|undefined}                   args.defaultValues  Collection of default values for defined units. Example: { px: '350', em: '15' }.
  *
  * @return {Array|boolean} Filtered units based on settings.
  */
@@ -281,3 +293,45 @@ export const useCustomUnits = ( { units, availableUnits, defaultValues } ) => {
 
 	return usedUnits.length === 0 ? false : usedUnits;
 };
+
+/**
+ * Get available units with the unit for the currently selected value
+ * prepended if it is not available in the list of units.
+ *
+ * This is useful to ensure that the current value's unit is always
+ * accurately displayed in the UI, even if the intention is to hide
+ * the availability of that unit.
+ *
+ * @param {number|string}            currentValue Selected value to parse.
+ * @param {string}                   legacyUnit   Legacy unit value, if currentValue needs it appended.
+ * @param {Array<WPUnitControlUnit>} units        List of available units.
+ *
+ * @return {Array<WPUnitControlUnit>} A collection of units containing the unit for the current value.
+ */
+export function getUnitsWithCurrentUnit(
+	currentValue,
+	legacyUnit,
+	units = ALL_CSS_UNITS
+) {
+	if ( ! Array.isArray( units ) ) {
+		return units;
+	}
+
+	const unitsWithCurrentUnit = [ ...units ];
+	const [ , currentUnit ] = getParsedValue(
+		currentValue,
+		legacyUnit,
+		ALL_CSS_UNITS
+	);
+
+	if (
+		currentUnit &&
+		! unitsWithCurrentUnit.some( ( unit ) => unit.value === currentUnit )
+	) {
+		if ( allUnits[ currentUnit ] ) {
+			unitsWithCurrentUnit.unshift( allUnits[ currentUnit ] );
+		}
+	}
+
+	return unitsWithCurrentUnit;
+}

@@ -1,15 +1,21 @@
 /**
  * External dependencies
  */
-import { map, sortBy } from 'lodash';
+import { map } from 'lodash';
 
 /**
  * WordPress dependencies
  */
-import { Button, PanelBody, TabPanel } from '@wordpress/components';
+import {
+	Button,
+	__experimentalNavigation as Navigation,
+	__experimentalNavigationItem as NavigationItem,
+	__experimentalNavigationMenu as NavigationMenu,
+	__experimentalNavigationGroup as NavigationGroup,
+} from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { getBlockType } from '@wordpress/blocks';
-import { useMemo } from '@wordpress/element';
+import { layout, brush, styles, typography } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -29,67 +35,7 @@ import {
 	default as DimensionsPanel,
 	useHasDimensionsPanel,
 } from './dimensions-panel';
-
-function GlobalStylesPanel( {
-	wrapperPanelTitle,
-	context,
-	getStyle,
-	setStyle,
-	getSetting,
-	setSetting,
-} ) {
-	const hasBorderPanel = useHasBorderPanel( context );
-	const hasColorPanel = useHasColorPanel( context );
-	const hasTypographyPanel = useHasTypographyPanel( context );
-	const hasDimensionsPanel = useHasDimensionsPanel( context );
-
-	if ( ! hasColorPanel && ! hasTypographyPanel && ! hasDimensionsPanel ) {
-		return null;
-	}
-
-	const content = (
-		<>
-			{ hasTypographyPanel && (
-				<TypographyPanel
-					context={ context }
-					getStyle={ getStyle }
-					setStyle={ setStyle }
-				/>
-			) }
-			{ hasColorPanel && (
-				<ColorPanel
-					context={ context }
-					getStyle={ getStyle }
-					setStyle={ setStyle }
-					getSetting={ getSetting }
-					setSetting={ setSetting }
-				/>
-			) }
-			{ hasDimensionsPanel && (
-				<DimensionsPanel
-					context={ context }
-					getStyle={ getStyle }
-					setStyle={ setStyle }
-				/>
-			) }
-			{ hasBorderPanel && (
-				<BorderPanel
-					context={ context }
-					getStyle={ getStyle }
-					setStyle={ setStyle }
-				/>
-			) }
-		</>
-	);
-	if ( ! wrapperPanelTitle ) {
-		return content;
-	}
-	return (
-		<PanelBody title={ wrapperPanelTitle } initialOpen={ false }>
-			{ content }
-		</PanelBody>
-	);
-}
+import { StylePreview } from './global-styles/preview';
 
 function getPanelTitle( blockName ) {
 	const blockType = getBlockType( blockName );
@@ -103,49 +49,111 @@ function getPanelTitle( blockName ) {
 	return blockType.title;
 }
 
-function GlobalStylesBlockPanels( {
-	blocks,
+function GlobalStylesLevel( {
+	context,
 	getStyle,
 	setStyle,
 	getSetting,
 	setSetting,
+	parentMenu = 'root',
 } ) {
-	const panels = useMemo(
-		() =>
-			sortBy(
-				map( blocks, ( block, name ) => {
-					return {
-						block,
-						name,
-						wrapperPanelTitle: getPanelTitle( name ),
-					};
-				} ),
-				( { wrapperPanelTitle } ) => wrapperPanelTitle
-			),
-		[ blocks ]
-	);
+	const hasTypographyPanel = useHasTypographyPanel( context );
+	const hasColorPanel = useHasColorPanel( context );
+	const hasBorderPanel = useHasBorderPanel( context );
+	const hasDimensionsPanel = useHasDimensionsPanel( context );
+	const hasLayoutPanel = hasBorderPanel || hasDimensionsPanel;
 
-	return map( panels, ( { block, name, wrapperPanelTitle } ) => {
-		return (
-			<GlobalStylesPanel
-				key={ 'panel-' + name }
-				wrapperPanelTitle={ wrapperPanelTitle }
-				context={ block }
-				getStyle={ getStyle }
-				setStyle={ setStyle }
-				getSetting={ getSetting }
-				setSetting={ setSetting }
-			/>
-		);
-	} );
+	return (
+		<>
+			<NavigationGroup>
+				{ hasTypographyPanel && (
+					<NavigationItem
+						item="item-typography"
+						navigateToMenu={ parentMenu + '.typography' }
+						icon={ typography }
+						title={ __( 'Typography' ) }
+					/>
+				) }
+				{ hasColorPanel && (
+					<NavigationItem
+						item="item-color"
+						navigateToMenu={ parentMenu + '.color' }
+						title={ __( 'Colors' ) }
+						icon={ brush }
+					/>
+				) }
+				{ hasLayoutPanel && (
+					<NavigationItem
+						item="item-layout"
+						navigateToMenu={ parentMenu + '.layout' }
+						title={ __( 'Layout' ) }
+						icon={ layout }
+					/>
+				) }
+			</NavigationGroup>
+
+			{ hasTypographyPanel && (
+				<NavigationMenu
+					menu={ parentMenu + '.typography' }
+					parentMenu={ parentMenu }
+					title={ __( 'Typography' ) }
+				>
+					<NavigationItem>
+						<TypographyPanel
+							context={ context }
+							getStyle={ getStyle }
+							setStyle={ setStyle }
+						/>
+					</NavigationItem>
+				</NavigationMenu>
+			) }
+
+			{ hasColorPanel && (
+				<NavigationMenu
+					menu={ parentMenu + '.color' }
+					parentMenu={ parentMenu }
+					title={ __( 'Colors' ) }
+				>
+					<NavigationItem>
+						<ColorPanel
+							context={ context }
+							getStyle={ getStyle }
+							setStyle={ setStyle }
+							getSetting={ getSetting }
+							setSetting={ setSetting }
+						/>
+					</NavigationItem>
+				</NavigationMenu>
+			) }
+
+			{ hasLayoutPanel && (
+				<NavigationMenu
+					menu={ parentMenu + '.layout' }
+					parentMenu={ parentMenu }
+				>
+					<NavigationItem>
+						{ hasDimensionsPanel && (
+							<DimensionsPanel
+								context={ context }
+								getStyle={ getStyle }
+								setStyle={ setStyle }
+							/>
+						) }
+						{ hasBorderPanel && (
+							<BorderPanel
+								context={ context }
+								getStyle={ getStyle }
+								setStyle={ setStyle }
+							/>
+						) }
+					</NavigationItem>
+				</NavigationMenu>
+			) }
+		</>
+	);
 }
 
-export default function GlobalStylesSidebar( {
-	identifier,
-	title,
-	icon,
-	closeLabel,
-} ) {
+export default function GlobalStylesSidebar() {
 	const {
 		root,
 		blocks,
@@ -154,23 +162,19 @@ export default function GlobalStylesSidebar( {
 		getSetting,
 		setSetting,
 	} = useGlobalStylesContext();
-	const [ canRestart, onReset ] = useGlobalStylesReset();
 
-	if ( typeof blocks !== 'object' || ! root ) {
-		// No sidebar is shown.
-		return null;
-	}
+	const [ canRestart, onReset ] = useGlobalStylesReset();
 
 	return (
 		<DefaultSidebar
 			className="edit-site-global-styles-sidebar"
-			identifier={ identifier }
-			title={ title }
-			icon={ icon }
-			closeLabel={ closeLabel }
+			identifier="edit-site/global-styles"
+			title={ __( 'Styles' ) }
+			icon={ styles }
+			closeLabel={ __( 'Close global styles sidebar' ) }
 			header={
 				<>
-					<strong>{ title }</strong>
+					<strong>{ __( 'Styles' ) }</strong>
 					<Button
 						className="edit-site-global-styles-sidebar__reset-button"
 						isSmall
@@ -183,37 +187,68 @@ export default function GlobalStylesSidebar( {
 				</>
 			}
 		>
-			<TabPanel
-				tabs={ [
-					{ name: 'root', title: __( 'Root' ) },
-					{ name: 'block', title: __( 'By Block Type' ) },
-				] }
-			>
-				{ ( tab ) => {
-					/* Per Block Context */
-					if ( 'block' === tab.name ) {
-						return (
-							<GlobalStylesBlockPanels
-								blocks={ blocks }
-								getStyle={ getStyle }
-								setStyle={ setStyle }
-								getSetting={ getSetting }
-								setSetting={ setSetting }
-							/>
-						);
-					}
-					return (
-						<GlobalStylesPanel
-							hasWrapper={ false }
-							context={ root }
+			<Navigation>
+				<NavigationMenu>
+					<NavigationGroup>
+						<NavigationItem>
+							<StylePreview />
+						</NavigationItem>
+					</NavigationGroup>
+					<GlobalStylesLevel
+						context={ root }
+						getStyle={ getStyle }
+						setStyle={ setStyle }
+						getSetting={ getSetting }
+						setSetting={ setSetting }
+					/>
+					<NavigationGroup className="edit-site-global-styles-sidebar__blocks-group">
+						<NavigationItem
+							className="edit-site-global-styles-sidebar__blocks-group-help"
+							isText
+						>
+							{ __(
+								'Customize the appearance of specific blocks for the whole site'
+							) }
+						</NavigationItem>
+						<NavigationItem
+							item="item-blocks"
+							navigateToMenu="blocks"
+							title={ __( 'Blocks' ) }
+						/>
+					</NavigationGroup>
+				</NavigationMenu>
+				<NavigationMenu
+					menu="blocks"
+					parentMenu="root"
+					title={ __( 'Blocks' ) }
+				>
+					{ map( blocks, ( _, name ) => (
+						<NavigationItem
+							key={ 'menu-itemblock-' + name }
+							item={ 'block-' + name }
+							navigateToMenu={ 'block-' + name }
+							title={ getPanelTitle( name ) }
+						/>
+					) ) }
+				</NavigationMenu>
+				{ map( blocks, ( block, name ) => (
+					<NavigationMenu
+						key={ 'menu-block-' + name }
+						menu={ 'block-' + name }
+						parentMenu="blocks"
+						title={ getPanelTitle( name ) }
+					>
+						<GlobalStylesLevel
+							parentMenu={ 'block-' + name }
+							context={ block }
 							getStyle={ getStyle }
 							setStyle={ setStyle }
 							getSetting={ getSetting }
 							setSetting={ setSetting }
 						/>
-					);
-				} }
-			</TabPanel>
+					</NavigationMenu>
+				) ) }
+			</Navigation>
 		</DefaultSidebar>
 	);
 }
