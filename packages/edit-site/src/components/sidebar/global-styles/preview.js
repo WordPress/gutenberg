@@ -15,7 +15,6 @@ import {
 export const StylePreview = () => {
 	const { getStyle } = useGlobalStylesContext();
 	const fontFamily = getStyle( 'root', 'fontFamily' ) ?? 'serif';
-	const fontSize = getStyle( 'root', 'fontSize' ) ?? 'initial';
 	const textColor = getStyle( 'root', 'color' ) ?? 'black';
 	const linkColor = getStyle( 'root', 'linkColor' ) ?? 'blue';
 	const backgroundColor = getStyle( 'root', 'backgroundColor' ) ?? 'white';
@@ -27,8 +26,8 @@ export const StylePreview = () => {
 		>
 			<HStack spacing={ 5 }>
 				<div>
-					<span style={ { fontFamily, fontSize } }>A</span>
-					<span style={ { fontFamily, fontSize } }>a</span>
+					<span style={ { fontFamily, fontSize: '80px' } }>A</span>
+					<span style={ { fontFamily, fontSize: '80px' } }>a</span>
 				</div>
 				<VStack spacing={ 2 }>
 					<ColorIndicator colorValue={ textColor } />
