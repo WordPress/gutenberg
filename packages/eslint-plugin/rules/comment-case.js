@@ -35,6 +35,7 @@ module.exports = {
 		fixable: 'code',
 	},
 	create( context ) {
+		const sourceCode = context.getSourceCode();
 		return {
 			Program( node ) {
 				const { comments } = node;
@@ -94,6 +95,8 @@ module.exports = {
 						} );
 					}
 
+					// Check for correct punctuation.
+					// Regex to check if the comment contains an \@see or @todo type directive.
 					const todoTypeCommentRegex = /@\w*\s/;
 					if (
 						! trimmedValue.match( todoTypeCommentRegex ) &&
@@ -101,21 +104,17 @@ module.exports = {
 						lastChar !== '!' &&
 						lastChar !== '?'
 					) {
-						if (
-							index + 1 !== comments.length &&
-							comments[ index + 1 ].type === 'Line' &&
-							comments[ index + 1 ].loc.start.line ===
-								comment.loc.start.line + 1
-						) {
-							// Check if next comment is on the following line, if it is then this rule doesn't count
-							// because comments could be formatted like this.
+						// Check if next comment is on the following line, if it is then this rule doesn't count
+						// because comments could be formatted over multiple lines like this one is.
+						if ( isFollowedDirectlyByLineComment ) {
 							return;
 						}
+						const errorType = 'missingPunctuation';
 						context.report( {
 							node,
 							loc: comment.loc,
-							messageId: 'missingPunctuation',
-							fix: createFixerFunction( comment ),
+							messageId: errorType,
+							fix: createFixerFunction( errorType, comment ),
 						} );
 					}
 				} );
