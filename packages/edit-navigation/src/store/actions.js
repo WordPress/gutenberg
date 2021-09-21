@@ -14,7 +14,11 @@ import { store as coreDataStore } from '@wordpress/core-data';
  * Internal dependencies
  */
 import { STORE_NAME } from './constants';
-import { addRecordIdToBlock, getRecordIdFromBlock, isBlockSupportedInNav } from './utils';
+import {
+	addRecordIdToBlock,
+	getRecordIdFromBlock,
+	isBlockSupportedInNav,
+} from './utils';
 import { blockToMenuItem, menuItemToBlockAttributes } from './transform';
 
 /**
