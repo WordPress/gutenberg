@@ -353,7 +353,7 @@ describe( 'Navigation editor', () => {
 		const disabledUndoButton = await page.waitForSelector(
 			'button[aria-label="Undo"][aria-disabled="true"]'
 		);
-		expect( disabledUndoButton.length ).toBeTruthy();
+		expect( disabledUndoButton ).toBeTruthy();
 	} );
 
 	it( 'shows a submenu when a link is selected and hides it when clicking the editor to deselect it', async () => {
