@@ -32,8 +32,8 @@ import {
 } from './registration';
 import {
 	normalizeBlockType,
-	__experimentalStripInternalBlockAttributes,
 	__experimentalSanitizeBlockAttributes,
+	__experimentalRemoveAttributesByRole,
 } from './utils';
 
 /**
@@ -111,21 +111,21 @@ export function __experimentalCloneSanitizedBlock(
 ) {
 	const clientId = uuid();
 
-	// Merge in new attributes and strip out attributes with the `internal` role,
-	// which should not be copied during block duplication.
-	const retainedAttributes = __experimentalStripInternalBlockAttributes(
-		block.name,
-		{
-			...block.attributes,
-			...mergeAttributes,
-		}
-	);
+	// Merge in new attributes
+	block.attributes = {
+		...block.attributes,
+		...mergeAttributes,
+	};
+
+	// Strip out attributes with the `internal` role, which should not be copied during
+	// block duplication.
+	block = __experimentalRemoveAttributesByRole( block, 'internal' );
 
 	// Remove any attributes not defined in the block type, and fill in default values for
 	// misisng attributes.
 	const sanitizedAttributes = __experimentalSanitizeBlockAttributes(
 		block.name,
-		retainedAttributes
+		block.attributes
 	);
 
 	return {
