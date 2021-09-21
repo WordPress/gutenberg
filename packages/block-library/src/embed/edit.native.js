@@ -70,6 +70,9 @@ const EmbedEdit = ( props ) => {
 	const [ isEditingURL, setIsEditingURL ] = useState(
 		isSelected && wasBlockJustInserted && ! url
 	);
+	const [ showEmbedBottomSheet, setShowEmbedBottomSheet ] = useState(
+		isEditingURL
+	);
 	const { invalidateResolution } = useDispatch( coreStore );
 
 	const {
@@ -190,6 +193,10 @@ const EmbedEdit = ( props ) => {
 		}
 	}, [ preview, isEditingURL ] );
 
+	useEffect( () => setShowEmbedBottomSheet( isEditingURL ), [
+		isEditingURL,
+	] );
+
 	const blockProps = useBlockProps();
 
 	if ( fetching ) {
@@ -282,11 +289,13 @@ const EmbedEdit = ( props ) => {
 			) }
 			<EmbedBottomSheet
 				value={ url }
-				isVisible={ isEditingURL }
-				onClose={ () => setIsEditingURL( false ) }
+				isVisible={ showEmbedBottomSheet }
+				onClose={ () => {
+					setShowEmbedBottomSheet( false );
+				} }
 				onSubmit={ ( value ) => {
-					setIsEditingURL( false );
 					setAttributes( { url: value } );
+					setIsEditingURL( false );
 				} }
 			/>
 		</>
