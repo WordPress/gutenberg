@@ -192,7 +192,6 @@ const batchInsertPlaceholderMenuItems = ( navigationBlock ) => async ( {
  */
 const batchUpdateMenuItems = ( navigationBlock, menuId ) => async ( {
 	registry,
-	dispatch,
 } ) => {
 	const updatedMenuItems = blocksTreeToAnnotatedList( navigationBlock )
 		// Filter out unsupported blocks
@@ -210,9 +209,18 @@ const batchUpdateMenuItems = ( navigationBlock, menuId ) => async ( {
 			)
 		)
 		// Filter out menu items without any edits
-		.filter( ( menuItem ) =>
-			dispatch( applyEdits( menuItem.id, menuItem ) )
-		);
+		.filter( ( menuItem ) => {
+			// Update an existing entity record.
+			registry
+				.dispatch( coreDataStore )
+				.editEntityRecord( 'root', 'menuItem', menuItem.id, menuItem, {
+					undoIgnore: true,
+				} );
+
+			return registry
+				.select( coreDataStore )
+				.hasEditsForEntityRecord( 'root', 'menuItem', menuItem.id );
+		} );
 
 	// Map the edited menu items to batch tasks
 	const tasks = updatedMenuItems.map(
@@ -249,19 +257,6 @@ const batchUpdateMenuItems = ( navigationBlock, menuId ) => async ( {
 			updatedMenuItem.id
 		);
 	} );
-};
-
-const applyEdits = ( id, edits ) => ( { registry } ) => {
-	// Update an existing entity record.
-	registry
-		.dispatch( coreDataStore )
-		.editEntityRecord( 'root', 'menuItem', id, edits, {
-			undoIgnore: true,
-		} );
-
-	return registry
-		.select( coreDataStore )
-		.hasEditsForEntityRecord( 'root', 'menuItem', id );
 };
 
 /**
