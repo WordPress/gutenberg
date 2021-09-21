@@ -53,13 +53,14 @@ function AddMenu( {
 	const createMenu = async ( event ) => {
 		event.preventDefault();
 
-		if ( ! menuName.length ) {
+		if ( ! menuName.length || isCreatingMenu ) {
 			return;
 		}
 
+		setIsCreatingMenu( true );
+
 		// Remove any existing notices.
 		removeAllNotices();
-		setIsCreatingMenu( true );
 
 		const menu = await saveMenu( { name: menuName } );
 
@@ -101,6 +102,8 @@ function AddMenu( {
 				variant="primary"
 				disabled={ ! menuName.length }
 				isBusy={ isCreatingMenu }
+				/* Button is disabled but still focusable */
+				aria-disabled={ ! menuName.length || isCreatingMenu }
 			>
 				{ __( 'Create menu' ) }
 			</Button>
