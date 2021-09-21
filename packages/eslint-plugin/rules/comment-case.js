@@ -15,6 +15,13 @@ const createFixerFunction = ( errorType, node ) => ( arg ) => {
 	}
 };
 
+const codeBeforeComment = ( sourceCode, node ) => {
+	const prevToken = sourceCode.getTokenBefore( node );
+	if ( prevToken && prevToken.loc.end.line === node.loc.start.line ) {
+		return true;
+	}
+};
+
 module.exports = {
 	meta: {
 		type: 'problem',
