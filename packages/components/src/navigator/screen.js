@@ -7,40 +7,21 @@ import { motion } from 'framer-motion';
 /**
  * WordPress dependencies
  */
-import { useContext, useMemo } from '@wordpress/element';
+import { useContext } from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
 import { NavigatorContext } from './context';
-import matchPath from './match-path';
 
 const animationEnterDelay = 0;
 const animationEnterDuration = 0.14;
 const animationExitDuration = 0.14;
 const animationExitDelay = 0;
 
-function Screen( {
-	children,
-	exact = false,
-	path,
-	sensitive = false,
-	strict = false,
-} ) {
+function NavigatorScreen( { children, path } ) {
 	const [ currentPath ] = useContext( NavigatorContext );
-	const options = useMemo(
-		() => ( {
-			path,
-			exact,
-			sensitive,
-			strict,
-		} ),
-		[ path, exact, sensitive, strict ]
-	);
-
-	const isMatch = useMemo( () => {
-		return matchPath( currentPath.path, options );
-	}, [ options, currentPath.path ] );
+	const isMatch = currentPath.path === path;
 
 	if ( isMatch ) {
 		const animate = {
@@ -78,4 +59,4 @@ function Screen( {
 	return null;
 }
 
-export default Screen;
+export default NavigatorScreen;

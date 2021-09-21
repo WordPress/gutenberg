@@ -136,9 +136,9 @@ function GlobalStylesLevelScreens( {
 	return (
 		<>
 			{ hasTypographyPanel && (
-				<NavigatorScreen exact path={ parentMenu + '/typography' }>
+				<NavigatorScreen path={ parentMenu + '/typography' }>
 					<ScreenHeader
-						back={ parentMenu ?? '/' }
+						back={ parentMenu ? parentMenu : '/' }
 						title={ __( 'Typography' ) }
 					/>
 					<TypographyPanel
@@ -150,9 +150,9 @@ function GlobalStylesLevelScreens( {
 			) }
 
 			{ hasColorPanel && (
-				<NavigatorScreen exact path={ parentMenu + '/colors' }>
+				<NavigatorScreen path={ parentMenu + '/colors' }>
 					<ScreenHeader
-						back={ parentMenu ?? '/' }
+						back={ parentMenu ? parentMenu : '/' }
 						title={ __( 'Colors' ) }
 					/>
 					<ColorPanel
@@ -166,9 +166,9 @@ function GlobalStylesLevelScreens( {
 			) }
 
 			{ hasLayoutPanel && (
-				<NavigatorScreen exact path={ parentMenu + '/layout' }>
+				<NavigatorScreen path={ parentMenu + '/layout' }>
 					<ScreenHeader
-						back={ parentMenu ?? '/' }
+						back={ parentMenu ? parentMenu : '/' }
 						title={ __( 'Layout' ) }
 					/>
 					{ hasDimensionsPanel && (
@@ -252,7 +252,7 @@ export default function GlobalStylesSidebar() {
 			}
 		>
 			<Navigator initialPath="/">
-				<NavigatorScreen path="/" exact>
+				<NavigatorScreen path="/">
 					<StylePreview />
 
 					<GlobalStylesLevelMenu context={ root } />
@@ -271,7 +271,7 @@ export default function GlobalStylesSidebar() {
 					</ItemGroup>
 				</NavigatorScreen>
 
-				<NavigatorScreen path="/blocks" exact>
+				<NavigatorScreen path="/blocks">
 					<ScreenHeader back="/" title={ __( 'Blocks' ) } />
 					{ map( blocks, ( _, name ) => (
 						<NavigationButton
@@ -287,7 +287,6 @@ export default function GlobalStylesSidebar() {
 					<NavigatorScreen
 						key={ 'menu-block-' + name }
 						path={ '/blocks/' + name }
-						exact
 					>
 						<ScreenHeader
 							back="/blocks"
