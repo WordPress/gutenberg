@@ -10,6 +10,7 @@ For each user feature we should also add a importance categorization label  to i
 -->
 
 ## Unreleased
+-   [**] [Image block] Add ability to quickly link images to Media Files and Attachment Pages [#34846]
 
 ## 1.62.0
 -   [**] [Embed block] Implement WP embed preview component [#34004]
