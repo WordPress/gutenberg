@@ -220,7 +220,7 @@ You should only have to translate `port` and `pathMappings` to the format used b
 	"request": "launch",
 	"port": 9003,
 	"pathMappings": {
-		"/var/www/html/wp-content/plugins/gutenberg": "${workspaceRoot}/"
+		"/var/www/html/wp-content/plugins/gutenberg": "${workspaceFolder}/"
 	}
 }
 ```

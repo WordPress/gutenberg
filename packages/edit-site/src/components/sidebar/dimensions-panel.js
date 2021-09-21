@@ -109,7 +109,7 @@ export default function DimensionsPanel( { context, getStyle, setStyle } ) {
 	};
 	const resetPaddingValue = () => setPaddingValues( {} );
 	const hasPaddingValue = () =>
-		paddingValues && Object.keys( paddingValues ).length;
+		!! paddingValues && Object.keys( paddingValues ).length;
 
 	const marginValues = splitStyleValue( getStyle( name, 'margin' ) );
 	const marginSides = useCustomSides( name, 'margin' );
@@ -123,7 +123,7 @@ export default function DimensionsPanel( { context, getStyle, setStyle } ) {
 	};
 	const resetMarginValue = () => setMarginValues( {} );
 	const hasMarginValue = () =>
-		marginValues && Object.keys( marginValues ).length;
+		!! marginValues && Object.keys( marginValues ).length;
 
 	const gapValue = getStyle( name, '--wp--style--block-gap' );
 

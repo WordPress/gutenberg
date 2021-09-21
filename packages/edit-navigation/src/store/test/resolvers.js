@@ -85,7 +85,7 @@ describe( 'getNavigationPostForMenu', () => {
 				},
 				url: 'http://wp.com',
 				menu_order: 1,
-				menus: [ 1 ],
+				menus: 1,
 				parent: 0,
 				classes: [ 'menu', 'classes' ],
 				xfn: [ 'nofollow' ],
@@ -100,7 +100,7 @@ describe( 'getNavigationPostForMenu', () => {
 				},
 				url: 'http://wp.org',
 				menu_order: 2,
-				menus: [ 1 ],
+				menus: 1,
 				parent: 0,
 				classes: [],
 				xfn: [],
@@ -119,7 +119,7 @@ describe( 'getNavigationPostForMenu', () => {
 				object_id: 56789,
 				type: 'post-type',
 				menu_order: 3,
-				menus: [ 1 ],
+				menus: 1,
 				parent: 0,
 				classes: [],
 				xfn: [],
@@ -128,16 +128,6 @@ describe( 'getNavigationPostForMenu', () => {
 				target: '_blank',
 			},
 		];
-
-		expect( generator.next( menuItems ).value ).toEqual( {
-			type: 'SET_MENU_ITEM_TO_CLIENT_ID_MAPPING',
-			postId: stubPost.id,
-			mapping: {
-				100: expect.stringMatching( /client-id-\d+/ ),
-				101: expect.stringMatching( /client-id-\d+/ ),
-				102: expect.stringMatching( /client-id-\d+/ ),
-			},
-		} );
 
 		const navigationBlockStubPost = {
 			id,
@@ -153,6 +143,7 @@ describe( 'getNavigationPostForMenu', () => {
 					innerBlocks: [
 						{
 							attributes: {
+								__internalRecordId: 100,
 								label: 'wp.com',
 								url: 'http://wp.com',
 								className: 'menu classes',
@@ -167,6 +158,7 @@ describe( 'getNavigationPostForMenu', () => {
 						},
 						{
 							attributes: {
+								__internalRecordId: 101,
 								label: 'wp.org',
 								url: 'http://wp.org',
 								opensInNewTab: true,
@@ -178,6 +170,7 @@ describe( 'getNavigationPostForMenu', () => {
 						},
 						{
 							attributes: {
+								__internalRecordId: 102,
 								label: 'My Example Page',
 								url: '/my-example-page/',
 								opensInNewTab: true,
@@ -198,7 +191,7 @@ describe( 'getNavigationPostForMenu', () => {
 			},
 		};
 
-		expect( generator.next().value ).toEqual(
+		expect( generator.next( menuItems ).value ).toEqual(
 			dispatch(
 				'core',
 				'receiveEntityRecords',
@@ -240,7 +233,7 @@ describe( 'getNavigationPostForMenu', () => {
 				},
 				url: 'http://wp.com',
 				menu_order: 1,
-				menus: [ 1 ],
+				menus: 1,
 				parent: 0,
 				classes: [ 'menu', 'classes' ],
 				xfn: [ 'nofollow' ],
@@ -257,7 +250,7 @@ describe( 'getNavigationPostForMenu', () => {
 				},
 				url: 'http://wp.org',
 				menu_order: 2,
-				menus: [ 1 ],
+				menus: 1,
 				parent: 0,
 				classes: [],
 				xfn: [],
@@ -274,7 +267,7 @@ describe( 'getNavigationPostForMenu', () => {
 				},
 				url: 'https://wordpress.org',
 				menu_order: 3,
-				menus: [ 1 ],
+				menus: 1,
 				parent: 0,
 				classes: [],
 				xfn: [],
@@ -284,13 +277,8 @@ describe( 'getNavigationPostForMenu', () => {
 			},
 		];
 
-		// // Gen step: yield 'SET_MENU_ITEM_TO_CLIENT_ID_MAPPING',
-		// By feeding `menuItems` to the generator this will overload the **result** of
-		// the call to yield resolveMenuItems( menuId );
-		generator.next( menuItems );
-
 		// Gen step: yield persistPost
-		const persistPostAction = generator.next().value;
+		const persistPostAction = generator.next( menuItems ).value;
 
 		// Get the core/navigation-link blocks from the generated core/navigation block innerBlocks.
 		const blockAttrs = persistPostAction.args[ 2 ].blocks[ 0 ].innerBlocks.map(

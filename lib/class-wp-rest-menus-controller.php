@@ -261,11 +261,11 @@ class WP_REST_Menus_Controller extends WP_REST_Terms_Controller {
 		$fields = $this->get_fields_for_response( $request );
 		$data   = $response->get_data();
 
-		if ( in_array( 'locations', $fields, true ) ) {
+		if ( rest_is_field_included( 'locations', $fields ) ) {
 			$data['locations'] = $this->get_menu_locations( $nav_menu->term_id );
 		}
 
-		if ( in_array( 'auto_add', $fields, true ) ) {
+		if ( rest_is_field_included( 'auto_add', $fields ) ) {
 			$auto_add         = $this->get_menu_auto_add( $nav_menu->term_id );
 			$data['auto_add'] = $auto_add;
 		}
@@ -352,16 +352,18 @@ class WP_REST_Menus_Controller extends WP_REST_Terms_Controller {
 			 * If we're going to inform the client that the term already exists,
 			 * give them the identifier for future use.
 			 */
-			$term_id = $term->get_error_data( 'term_exists' );
-			if ( $term_id ) {
-				$existing_term = get_term( $term_id, $this->taxonomy );
-				$term->add_data( $existing_term->term_id, 'term_exists' );
+
+			if ( in_array( 'menu_exists', $term->get_error_codes(), true ) ) {
+				$existing_term = get_term_by( 'name', $prepared_term['menu-name'], $this->taxonomy );
+				$term->add_data( $existing_term->term_id, 'menu_exists' );
 				$term->add_data(
 					array(
 						'status'  => 400,
-						'term_id' => $term_id,
+						'term_id' => $existing_term->term_id,
 					)
 				);
+			} else {
+				$term->add_data( array( 'status' => 400 ) );
 			}
 
 			return $term;

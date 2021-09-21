@@ -39,11 +39,22 @@ function DefaultErrorResponsePlaceholder( { response, className } ) {
 	return <Placeholder className={ className }>{ errorMessage }</Placeholder>;
 }
 
-function DefaultLoadingResponsePlaceholder( { className } ) {
+function DefaultLoadingResponsePlaceholder( { children } ) {
 	return (
-		<Placeholder className={ className }>
-			<Spinner />
-		</Placeholder>
+		<div style={ { position: 'relative' } }>
+			<div
+				style={ {
+					position: 'absolute',
+					top: '50%',
+					left: '50%',
+					marginTop: '-9px',
+					marginLeft: '-9px',
+				} }
+			>
+				<Spinner />
+			</div>
+			<div style={ { opacity: '0.3' } }>{ children }</div>
+		</div>
 	);
 }
 
@@ -62,6 +73,7 @@ export default function ServerSideRender( props ) {
 	const isMountedRef = useRef( true );
 	const fetchRequestRef = useRef();
 	const [ response, setResponse ] = useState( null );
+	const prevResponse = usePrevious( response );
 	const prevProps = usePrevious( props );
 
 	function fetchData() {
@@ -142,7 +154,13 @@ export default function ServerSideRender( props ) {
 	if ( response === '' ) {
 		return <EmptyResponsePlaceholder { ...props } />;
 	} else if ( ! response ) {
-		return <LoadingResponsePlaceholder { ...props } />;
+		return (
+			<LoadingResponsePlaceholder { ...props }>
+				{ !! prevResponse && (
+					<RawHTML className={ className }>{ prevResponse }</RawHTML>
+				) }
+			</LoadingResponsePlaceholder>
+		);
 	} else if ( response.error ) {
 		return <ErrorResponsePlaceholder response={ response } { ...props } />;
 	}

@@ -126,7 +126,7 @@ export function getActiveBlockVariation( state, blockName, attributes, scope ) {
 	const match = variations?.find( ( variation ) => {
 		if ( Array.isArray( variation.isActive ) ) {
 			const blockType = getBlockType( state, blockName );
-			const attributeKeys = Object.keys( blockType.attributes || {} );
+			const attributeKeys = Object.keys( blockType?.attributes || {} );
 			const definedAttributes = variation.isActive.filter(
 				( attribute ) => attributeKeys.includes( attribute )
 			);

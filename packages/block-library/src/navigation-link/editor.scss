@@ -81,19 +81,33 @@
 .wp-block-navigation-link__placeholder {
 	position: relative;
 
+	// While in a placeholder state, hide any underlines the theme might add.
+	text-decoration: none !important;
+	box-shadow: none !important;
+	background-image: none !important;
+
 	// Draw a wavy underline.
-	.wp-block-navigation-link__placeholder-text {
+	.wp-block-navigation-link__placeholder-text span {
 		$blur: 10%;
 		$width: 6%;
 		$stop1: 30%;
 		$stop2: 64%;
 
+		--wp-underline-color: var(--wp-admin-theme-color);
+		.is-dark-theme & {
+			--wp-underline-color: #{ $dark-theme-focus };
+		}
+
 		background-image:
-			linear-gradient(45deg, transparent ($stop1 - $blur), currentColor $stop1, currentColor ($stop1 + $width), transparent ($stop1 + $width + $blur)),
-			linear-gradient(135deg, transparent ($stop2 - $blur), currentColor $stop2, currentColor ($stop2 + $width), transparent ($stop2 + $width + $blur));
+			linear-gradient(45deg, transparent ($stop1 - $blur), var(--wp-underline-color) $stop1, var(--wp-underline-color) ($stop1 + $width), transparent ($stop1 + $width + $blur)),
+			linear-gradient(135deg, transparent ($stop2 - $blur), var(--wp-underline-color) $stop2, var(--wp-underline-color) ($stop2 + $width), transparent ($stop2 + $width + $blur));
 		background-position: 0 100%;
 		background-size: 6px 3px;
 		background-repeat: repeat-x;
+
+		// Since applied to a span, it doesn't change the footprint of the item,
+		// but it does vertically shift the underline to better align.
+		padding-bottom: 0.1em;
 	}
 
 	// This needs extra specificity.

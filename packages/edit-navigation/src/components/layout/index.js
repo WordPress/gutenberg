@@ -7,6 +7,7 @@ import {
 	BlockTools,
 	__unstableUseBlockSelectionClearer as useBlockSelectionClearer,
 } from '@wordpress/block-editor';
+import { useEntityBlockEditor } from '@wordpress/core-data';
 import { Popover, SlotFillProvider, Spinner } from '@wordpress/components';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { useEffect, useMemo, useState } from '@wordpress/element';
@@ -25,7 +26,6 @@ import UnselectedMenuState from './unselected-menu-state';
 import {
 	IsMenuNameControlFocusedContext,
 	useNavigationEditor,
-	useNavigationBlockEditor,
 	useMenuNotifications,
 } from '../../hooks';
 import ErrorBoundary from '../error-boundary';
@@ -34,6 +34,7 @@ import Sidebar from '../sidebar';
 import Header from '../header';
 import Notices from '../notices';
 import Editor from '../editor';
+import InserterSidebar from '../inserter-sidebar';
 import UnsavedChangesWarning from './unsaved-changes-warning';
 import { store as editNavigationStore } from '../../store';
 
@@ -44,6 +45,7 @@ const interfaceLabels = {
 	body: __( 'Navigation menu blocks' ),
 	/* translators: accessibility text for the navigation screen settings landmark region. */
 	sidebar: __( 'Navigation settings' ),
+	secondarySidebar: __( 'Block library' ),
 };
 
 export default function Layout( { blockEditorSettings } ) {
@@ -66,15 +68,20 @@ export default function Layout( { blockEditorSettings } ) {
 		isMenuSelected,
 	} = useNavigationEditor();
 
-	const [ blocks, onInput, onChange ] = useNavigationBlockEditor(
-		navigationPost
+	const [ blocks, onInput, onChange ] = useEntityBlockEditor(
+		'root',
+		'postType',
+		{
+			id: navigationPost?.id,
+		}
 	);
 
-	const { hasSidebarEnabled } = useSelect(
+	const { hasSidebarEnabled, isInserterOpened } = useSelect(
 		( select ) => ( {
 			hasSidebarEnabled: !! select(
 				interfaceStore
 			).getActiveComplementaryArea( 'core/edit-navigation' ),
+			isInserterOpened: select( editNavigationStore ).isInserterOpened(),
 		} ),
 		[]
 	);
@@ -106,7 +113,6 @@ export default function Layout( { blockEditorSettings } ) {
 					<BlockEditorKeyboardShortcuts.Register />
 					<NavigationEditorShortcuts.Register />
 					<NavigationEditorShortcuts saveBlocks={ savePost } />
-					<Notices />
 					<BlockEditorProvider
 						value={ blocks }
 						onInput={ onInput }
@@ -134,13 +140,12 @@ export default function Layout( { blockEditorSettings } ) {
 										isMenuSelected={ isMenuSelected }
 										isPending={ ! hasLoadedMenus }
 										menus={ menus }
-										selectedMenuId={ selectedMenuId }
-										onSelectMenu={ selectMenu }
 										navigationPost={ navigationPost }
 									/>
 								}
 								content={
 									<>
+										<Notices />
 										{ ! hasFinishedInitialLoad && (
 											<Spinner />
 										) }
@@ -174,6 +179,9 @@ export default function Layout( { blockEditorSettings } ) {
 									hasSidebarEnabled && (
 										<ComplementaryArea.Slot scope="core/edit-navigation" />
 									)
+								}
+								secondarySidebar={
+									isInserterOpened && <InserterSidebar />
 								}
 							/>
 							{ isMenuSelected && (

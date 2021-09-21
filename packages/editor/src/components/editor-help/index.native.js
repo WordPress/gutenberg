@@ -73,6 +73,7 @@ function EditorHelpTopics( { close, isVisible, onClose } ) {
 			hideHeader
 			hasNavigation
 			contentStyle={ styles.contentContainer }
+			testID="editor-help-modal"
 		>
 			<BottomSheet.NavigationContainer animate main>
 				<BottomSheet.NavigationScreen
