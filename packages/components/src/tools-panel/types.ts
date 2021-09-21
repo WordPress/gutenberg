@@ -105,7 +105,9 @@ export type ToolsPanelItemProps = ToolsPanelItem & {
 export type ToolsPanelMenuItemKey = 'default' | 'optional';
 
 export type ToolsPanelMenuItems = {
-	[ menuItemKey in ToolsPanelMenuItemKey ]: { [ key: string ]: boolean };
+	[ menuItemKey in ToolsPanelMenuItemKey ]?:
+		| { [ key: string ]: boolean }
+		| undefined;
 };
 
 export type ToolsPanelContext = {

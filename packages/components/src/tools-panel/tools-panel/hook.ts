@@ -25,7 +25,7 @@ const generateMenuItems = ( {
 
 	panelItems.forEach( ( { hasValue, isShownByDefault, label } ) => {
 		const group = isShownByDefault ? 'default' : 'optional';
-		menuItems[ group ][ label ] = shouldReset ? false : hasValue();
+		menuItems[ group ]![ label ] = shouldReset ? false : hasValue();
 	} );
 
 	return menuItems;
@@ -79,10 +79,7 @@ export function useToolsPanel(
 	};
 
 	// Manage and share display state of menu items representing child controls.
-	const [ menuItems, setMenuItems ] = useState< ToolsPanelMenuItems >( {
-		default: {},
-		optional: {},
-	} );
+	const [ menuItems, setMenuItems ] = useState< ToolsPanelMenuItems >();
 
 	// Setup menuItems state as panel items register themselves.
 	useEffect( () => {
@@ -104,7 +101,7 @@ export function useToolsPanel(
 		setMenuItems( {
 			...menuItems,
 			[ group ]: {
-				...menuItems[ group ],
+				...( menuItems ? menuItems[ group ] : {} ),
 				[ label ]: true,
 			},
 		} );
@@ -121,13 +118,15 @@ export function useToolsPanel(
 
 		const menuGroup = currentItem.isShownByDefault ? 'default' : 'optional';
 
-		const newMenuItems = {
-			...menuItems,
-			[ menuGroup ]: {
-				...menuItems[ menuGroup ],
-				[ label ]: ! menuItems[ menuGroup ][ label ],
-			},
-		};
+		const newMenuItems = menuItems
+			? {
+					...menuItems,
+					[ menuGroup ]: {
+						...menuItems[ menuGroup ],
+						[ label ]: ! menuItems[ menuGroup ]![ label ],
+					},
+			  }
+			: {};
 
 		setMenuItems( newMenuItems );
 	};
