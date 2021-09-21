@@ -17,7 +17,7 @@ import { isFormatEqual } from './is-format-equal';
  *
  * @return {Object} New value with normalised formats.
  */
-export function normaliseFormats( { formats, text, start, end } ) {
+export function normaliseFormats( { formats, text, start, end, replacements } ) {
 	const refs = [];
 	const newFormats = formats.map( ( formatsAtIndex ) =>
 		formatsAtIndex.map( ( format ) => {
@@ -35,5 +35,5 @@ export function normaliseFormats( { formats, text, start, end } ) {
 		} )
 	);
 
-	return { formats: newFormats, text, start, end };
+	return { formats: newFormats, text, start, end, replacements };
 }

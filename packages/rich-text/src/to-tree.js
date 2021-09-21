@@ -85,7 +85,7 @@ export function toTree( {
 	onEndIndex,
 	isEditableTree,
 } ) {
-	const { formats, text, start, end, formatPlaceholder } = value;
+	const { formats, text, start, end, formatPlaceholder, replacements } = value;
 	const formatsLength = formats.length + 1;
 	const tree = createEmpty();
 	const multilineFormat = { type: multilineTag };

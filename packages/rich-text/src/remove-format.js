@@ -23,7 +23,7 @@ import { normaliseFormats } from './normalise-formats';
  * @return {Object} A new value with the format applied.
  */
 export function removeFormat(
-	{ formats, text, start, end },
+	{ formats, text, start, end, replacements },
 	formatType,
 	startIndex = start,
 	endIndex = end
@@ -54,7 +54,7 @@ export function removeFormat(
 		}
 	}
 
-	return normaliseFormats( { formats: newFormats, text, start, end } );
+	return normaliseFormats( { formats: newFormats, text, start, end, replacements } );
 }
 
 function filterFormats( formats, index, formatType ) {

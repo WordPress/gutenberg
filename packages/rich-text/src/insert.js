@@ -19,7 +19,7 @@ import { normaliseFormats } from './normalise-formats';
  * @return {Object} A new value with the value inserted.
  */
 export function insert(
-	{ formats, text, start, end },
+	{ formats, text, start, end, replacements },
 	valueToInsert,
 	startIndex = start,
 	endIndex = end
@@ -33,6 +33,12 @@ export function insert(
 	return normaliseFormats( {
 		formats: formats.slice( 0, startIndex ).concat( valueToInsert.formats, formats.slice( endIndex ) ),
 		text: text.slice( 0, startIndex ) + valueToInsert.text + text.slice( endIndex ),
+		replacements: replacements
+			.slice( 0, startIndex )
+			.concat(
+				valueToInsert.replacements,
+				replacements.slice( endIndex )
+			),
 		start: index,
 		end: index,
 	} );

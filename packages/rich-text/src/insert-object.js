@@ -26,10 +26,11 @@ export function insertObject(
 ) {
 	const valueToInsert = {
 		text: OBJECT_REPLACEMENT_CHARACTER,
-		formats: [ [ {
+		replacements: [ {
 			...formatToInsert,
 			object: true,
-		} ] ],
+		} ],
+		formats: [ , ],
 	};
 
 	return insert( value, valueToInsert, startIndex, endIndex );

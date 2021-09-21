@@ -16,12 +16,14 @@ describe( 'replace', () => {
 	it( 'should replace string to string', () => {
 		const record = {
 			formats: [ , , , , [ em ], [ em ], [ em ], , , , , , , ],
+			replacements: new Array( 13 ),
 			text: 'one two three',
 			start: 6,
 			end: 6,
 		};
 		const expected = {
 			formats: [ , , , , [ em ], , , , , , , ],
+			replacements: new Array( 11 ),
 			text: 'one 2 three',
 			start: 5,
 			end: 5,
@@ -36,16 +38,19 @@ describe( 'replace', () => {
 	it( 'should replace string to record', () => {
 		const record = {
 			formats: [ , , , , [ em ], [ em ], [ em ], , , , , , , ],
+			replacements: new Array( 13 ),
 			text: 'one two three',
 			start: 6,
 			end: 6,
 		};
 		const replacement = {
 			formats: [ , ],
+			replacements: new Array( 1 ),
 			text: '2',
 		};
 		const expected = {
 			formats: [ , , , , , , , , , , , ],
+			replacements: new Array( 11 ),
 			text: 'one 2 three',
 			start: 5,
 			end: 5,
@@ -60,12 +65,14 @@ describe( 'replace', () => {
 	it( 'should replace string to function', () => {
 		const record = {
 			formats: [ , , , , , , , , , , , , ],
+			replacements: new Array( 12 ),
 			text: 'abc12345#$*%',
 			start: 6,
 			end: 6,
 		};
 		const expected = {
 			formats: [ , , , , , , , , , , , , , , , , , , ],
+			replacements: new Array( 18 ),
 			text: 'abc - 12345 - #$*%',
 			start: 18,
 			end: 18,

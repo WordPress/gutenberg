@@ -22,7 +22,7 @@ import {
 const { TEXT_NODE, ELEMENT_NODE } = window.Node;
 
 function createEmptyValue() {
-	return { formats: [], text: '' };
+	return { formats: [], replacements: [], text: '' };
 }
 
 function simpleFindKey( object, value ) {
@@ -124,6 +124,7 @@ export function create( {
 	if ( typeof text === 'string' && text.length > 0 ) {
 		return {
 			formats: Array( text.length ),
+			replacements: Array( text.length ),
 			text: text,
 		};
 	}
@@ -322,6 +323,7 @@ function createFromElement( {
 			// Create a sparse array of the same length as `text`, in which
 			// formats can be added.
 			accumulator.formats.length += text.length;
+			accumulator.replacements.length += text.length;
 			continue;
 		}
 
@@ -353,7 +355,9 @@ function createFromElement( {
 				text: OBJECT_REPLACEMENT_CHARACTER,
 			};
 			accumulateSelection( accumulator, node, range, value );
-			mergePair( accumulator, value );
+			accumulator.formats.length += 1;
+			accumulator.replacements = accumulator.replacements.concat( value.replacements );
+			accumulator.text += OBJECT_REPLACEMENT_CHARACTER;
 			continue;
 		}
 
@@ -361,6 +365,7 @@ function createFromElement( {
 			accumulateSelection( accumulator, node, range, createEmptyValue() );
 			accumulator.text += '\n';
 			accumulator.formats.length += 1;
+			accumulator.replacements.length += 1;
 			continue;
 		}
 
@@ -427,17 +432,18 @@ function createFromElement( {
 		const { formats } = accumulator;
 
 		if ( format && format.attributes && text.length === 0 ) {
+			const lastReplacement = accumulator.replacements[ accumulator.replacements.length - 1 ];
 			format.object = true;
-			accumulator.text += OBJECT_REPLACEMENT_CHARACTER;
-
-			if ( formats[ start ] ) {
-				formats[ start ].unshift( format );
-			} else {
-				formats[ start ] = [ format ];
+			if ( isFormatEqual( lastReplacement, format ) ) {
+				return accumulator;
 			}
+			accumulator.text += OBJECT_REPLACEMENT_CHARACTER;
+			accumulator.replacements.push( format );
+			accumulator.formats.length += 1;
 		} else {
 			accumulator.text += text;
 			accumulator.formats.length += text.length;
+			accumulator.replacements.length += text.length;
 
 			let i = value.formats.length;
 
@@ -460,10 +466,13 @@ function createFromElement( {
 						formats[ formatIndex ] = value.formats[ i ];
 					}
 				}
+
+				if ( value.replacements[ i ] ) {
+					accumulator.replacements[ formatIndex ] = value.replacements[ i ];
+				}
 			}
 		}
 	}
-
 	return accumulator;
 }
 
@@ -551,12 +560,14 @@ function createFromMultilineElement( {
 		if ( index !== 0 || currentWrapperTags.length > 0 ) {
 			const formats = currentWrapperTags.length > 0 ? [ currentWrapperTags ] : [ , ];
 			accumulator.formats = accumulator.formats.concat( formats );
+			accumulator.replacements.length += 1;
 			accumulator.text += LINE_SEPARATOR;
 		}
 
 		accumulateSelection( accumulator, node, range, value );
 
 		accumulator.formats = accumulator.formats.concat( value.formats );
+		accumulator.replacements = accumulator.replacements.concat( value.replacements );
 		accumulator.text += value.text;
 	}
 

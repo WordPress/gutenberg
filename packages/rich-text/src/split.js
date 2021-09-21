@@ -15,17 +15,20 @@ import { replace } from './replace';
  *
  * @return {Array} An array of new values.
  */
-export function split( { formats, text, start, end }, string ) {
+export function split( { formats, text, start, end, replacements }, string ) {
 	if ( typeof string !== 'string' ) {
 		return splitAtSelection( ...arguments );
 	}
 
 	let nextStart = 0;
-
 	return text.split( string ).map( ( substring ) => {
 		const startIndex = nextStart;
 		const value = {
 			formats: formats.slice( startIndex, startIndex + substring.length ),
+			replacements: replacements.slice(
+				startIndex,
+				startIndex + substring.length
+			),
 			text: substring,
 		};
 
@@ -50,16 +53,18 @@ export function split( { formats, text, start, end }, string ) {
 }
 
 function splitAtSelection(
-	{ formats, text, start, end },
+	{ formats, text, start, end, replacements },
 	startIndex = start,
 	endIndex = end
 ) {
 	const before = {
 		formats: formats.slice( 0, startIndex ),
+		replacements: replacements.slice( 0, startIndex ),
 		text: text.slice( 0, startIndex ),
 	};
 	const after = {
 		formats: formats.slice( endIndex ),
+		replacements: replacements.slice( endIndex ),
 		text: text.slice( endIndex ),
 		start: 0,
 		end: 0,

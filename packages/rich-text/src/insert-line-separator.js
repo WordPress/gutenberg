@@ -33,6 +33,7 @@ export function insertLineSeparator(
 
 	const valueToInsert = {
 		formats,
+		replacements: [ , ],
 		text: LINE_SEPARATOR,
 	};
 

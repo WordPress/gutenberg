@@ -17,12 +17,14 @@ describe( 'insert', () => {
 	it( 'should delete and insert', () => {
 		const record = {
 			formats: [ , , , , [ em ], [ em ], [ em ], , , , , , , ],
+			replacements: new Array( 13 ),
 			text: 'one two three',
 			start: 6,
 			end: 6,
 		};
 		const expected = {
-			formats: [ , , [ { ...obj, object: true } ], [ em ], , , , , , , ],
+			formats: [ , , , [ em ], , , , , , , ],
+			replacements: [ , , { ...obj, object: true }, , , , , , , , ],
 			text: `on${ OBJECT_REPLACEMENT_CHARACTER }o three`,
 			start: 3,
 			end: 3,
@@ -31,6 +33,6 @@ describe( 'insert', () => {
 
 		expect( result ).toEqual( expected );
 		expect( result ).not.toBe( record );
-		expect( getSparseArrayLength( result.formats ) ).toBe( 2 );
+		expect( getSparseArrayLength( result.formats ) ).toBe( 1 );
 	} );
 } );

@@ -23,7 +23,7 @@ import { normaliseFormats } from './normalise-formats';
  * @return {Object} A new value with the format applied.
  */
 export function applyFormat(
-	{ formats, text, start, end },
+	{ formats, text, start, end, replacements },
 	format,
 	startIndex = start,
 	endIndex = end
@@ -59,6 +59,7 @@ export function applyFormat(
 				text,
 				start,
 				end,
+				replacements,
 				formatPlaceholder: {
 					index: startIndex,
 					format: hasType ? undefined : format,
@@ -71,7 +72,7 @@ export function applyFormat(
 		}
 	}
 
-	return normaliseFormats( { formats: newFormats, text, start, end } );
+	return normaliseFormats( { formats: newFormats, text, start, end, replacements } );
 }
 
 function applyFormats( formats, index, format ) {
