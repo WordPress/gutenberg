@@ -65,8 +65,8 @@ As these items are still saved to `nav_menu_items` this ensures if we ever rever
 
 There are two types of item that can be added to a navigation:
 
-1. Navigation links - these utilise the `core/navigation-link` block and are _not_ persisted as blocks.
-2. Block-based links - these are any item that is _not_ a `core/navigation-link` block. They are persisted as blocks (via a wrapper - see below).
+1. Navigation link blocks - these utilise the `core/navigation-link` block but are not _persisted_ as blocks.
+2. Block-based items - these are any item that is _not_ a `core/navigation-link` block. They are persisted as blocks (via a wrapper - see below).
 
 By default, Navigation link items are serialized and persisted as `nav_menu_item` posts. No serialized block HTML is stored for these standard link blocks.
 
