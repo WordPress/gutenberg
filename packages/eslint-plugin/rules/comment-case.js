@@ -68,6 +68,17 @@ module.exports = {
 						previousComment.loc.end.line ===
 							comment.loc.start.line - 1;
 
+					// Check to see if the comment starts with a space.
+					if ( value.charAt( 0 ) !== ' ' ) {
+						const errorType = 'missingSpace';
+						context.report( {
+							node,
+							loc: comment.loc,
+							messageId: errorType,
+							fix: createFixerFunction( errorType, comment ),
+						} );
+					}
+
 					const todoTypeCommentRegex = /@\w*\s/;
 					if (
 						! trimmedValue.match( todoTypeCommentRegex ) &&
