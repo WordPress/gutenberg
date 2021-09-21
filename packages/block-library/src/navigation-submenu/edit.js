@@ -50,7 +50,10 @@ import { name } from './block.json';
 
 const ALLOWED_BLOCKS = [ 'core/navigation-link', 'core/navigation-submenu' ];
 
-const DIRECT_INSERT = 'core/navigation-link';
+const DIRECT_INSERT = [
+	'core/navigation-link',
+	{ type: 'page', kind: 'post-type' },
+];
 
 const MAX_NESTING = 5;
 

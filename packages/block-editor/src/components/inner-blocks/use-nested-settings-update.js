@@ -21,7 +21,7 @@ import { getLayoutType } from '../../layouts';
  * @param {string}   clientId        The client ID of the block to update.
  * @param {string[]} allowedBlocks   An array of block names which are permitted
  *                                   in inner blocks.
- * @param {?string}  directInsert    A block name to be inserted directly by the
+ * @param {?Array}   directInsert    A block name to be inserted directly by the
  *                                   appender.
  * @param {string}   [templateLock]  The template lock specified for the inner
  *                                   blocks component. (e.g. "all")

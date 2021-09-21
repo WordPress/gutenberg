@@ -50,7 +50,10 @@ const ALLOWED_BLOCKS = [
 	'core/navigation-submenu',
 ];
 
-const DIRECT_INSERT = 'core/navigation-link';
+const DIRECT_INSERT = [
+	'core/navigation-link',
+	{ type: 'page', kind: 'post-type' },
+];
 
 const LAYOUT = {
 	type: 'default',
@@ -167,7 +170,7 @@ function Navigation( {
 		},
 		{
 			allowedBlocks: ALLOWED_BLOCKS,
-			directInsert: onlyLinkInnerBlocks ? DIRECT_INSERT : '',
+			directInsert: onlyLinkInnerBlocks ? DIRECT_INSERT : [],
 			orientation: attributes.orientation,
 			renderAppender: CustomAppender || appender,
 
