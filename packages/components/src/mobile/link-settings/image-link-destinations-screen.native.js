@@ -35,7 +35,9 @@ function LinkDestination( {
 		<BottomSheet.Cell
 			icon={ check }
 			iconStyle={
-				currentOption !== option && styles.unselectedOptionIcon
+				currentOption === option
+					? styles.selectedOptionIcon
+					: styles.unselectedOptionIcon
 			}
 			label={ label }
 			leftAlign

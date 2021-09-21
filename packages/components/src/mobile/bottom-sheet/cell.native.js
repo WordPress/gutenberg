@@ -363,7 +363,11 @@ class BottomSheetCell extends Component {
 									<Icon
 										icon={ icon }
 										size={ 24 }
-										fill={ iconStyleBase.color }
+										fill={
+											iconStyle && iconStyle.color
+												? iconStyle.color
+												: iconStyleBase.color
+										}
 										style={ iconStyle }
 										isPressed={ false }
 									/>
