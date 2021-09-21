@@ -17,7 +17,7 @@ export const MENU_POST_TYPE = 'menu';
  *
  * @type {string}
  */
-export const NAVIGATION_POST_KIND = 'postType';
+export const NAVIGATION_POST_KIND = 'root';
 
 /**
  * "post type" of the navigation post.
