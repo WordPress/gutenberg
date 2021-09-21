@@ -543,17 +543,6 @@ class WP_REST_Menu_Items_Controller extends WP_REST_Posts_Controller {
 			$prepared_nav_item[ $key ] = implode( ' ', array_map( 'sanitize_html_class', $value ) );
 		}
 
-		// Apply the same filters as when calling wp_insert_post().
-
-		/** This filter is documented in wp-includes/post.php */
-		$prepared_nav_item['menu-item-title'] = wp_unslash( apply_filters( 'title_save_pre', wp_slash( $prepared_nav_item['menu-item-title'] ) ) );
-
-		/** This filter is documented in wp-includes/post.php */
-		$prepared_nav_item['menu-item-attr-title'] = wp_unslash( apply_filters( 'excerpt_save_pre', wp_slash( $prepared_nav_item['menu-item-attr-title'] ) ) );
-
-		/** This filter is documented in wp-includes/post.php */
-		$prepared_nav_item['menu-item-description'] = wp_unslash( apply_filters( 'content_save_pre', wp_slash( $prepared_nav_item['menu-item-description'] ) ) );
-
 		// Valid url.
 		if ( '' !== $prepared_nav_item['menu-item-url'] ) {
 			$prepared_nav_item['menu-item-url'] = esc_url_raw( $prepared_nav_item['menu-item-url'] );
