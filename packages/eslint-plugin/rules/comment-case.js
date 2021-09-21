@@ -22,6 +22,8 @@ module.exports = {
 		messages: {
 			missingPunctuation:
 				'Comments must end with a period (.), exclamation mark (!), or question mark (?).',
+			missingSpace: 'Comments must have a space after the comment token.',
+			capitalLetter: 'Comments must start with a capital letter.',
 		},
 		fixable: 'code',
 	},
