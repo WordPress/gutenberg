@@ -115,8 +115,7 @@ function RangeControl(
 	const describedBy = !! help ? `${ id }__help` : undefined;
 	const enableTooltip = showTooltipProp !== false && isFinite( value );
 
-	const handleOnRangeChange = ( event ) => {
-		const nextValue = parseFloat( event.target.value );
+	const handleOnRangeChange = ( nextValue ) => {
 		setValue( nextValue );
 		onChange( nextValue );
 	};
@@ -227,7 +226,6 @@ function RangeControl(
 						onFocus={ handleOnFocus }
 						onMouseMove={ onMouseMove }
 						onMouseLeave={ onMouseLeave }
-						onShiftStep={ handleOnChange }
 						ref={ setRef }
 						shiftStep={ shiftStep }
 						step={ step }

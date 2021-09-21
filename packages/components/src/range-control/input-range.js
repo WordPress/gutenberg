@@ -7,25 +7,15 @@ import { noop } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { forwardRef } from '@wordpress/element';
-import { isRTL } from '@wordpress/i18n';
-import { UP, RIGHT, DOWN, LEFT } from '@wordpress/keycodes';
+import { forwardRef, useRef } from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
 import { InputRange as BaseInputRange } from './styles/range-control-styles';
 import { useDebouncedHoverInteraction } from './utils';
-import { add, subtract, roundClamp } from '../utils/math';
-
-const _isRTL = isRTL();
-
-const operationList = {
-	[ UP ]: add,
-	[ RIGHT ]: _isRTL ? subtract : add,
-	[ DOWN ]: subtract,
-	[ LEFT ]: _isRTL ? add : subtract,
-};
+import { useJumpStep } from '../utils/hooks';
+import { roundClamp } from '../utils/math';
 
 function InputRange(
 	{
@@ -35,33 +25,48 @@ function InputRange(
 		label,
 		onHideTooltip = noop,
 		onMouseLeave = noop,
-		onBlur = noop,
-		onChange = noop,
-		onFocus = noop,
 		onMouseMove = noop,
-		onShiftStep,
 		onShowTooltip = noop,
 		shiftStep,
-		value,
+		step,
 		...props
 	},
 	ref
 ) {
-	const onKeyDown = ( event ) => {
-		const { keyCode, shiftKey } = event;
-		props.onKeyDown?.( event );
+	const baseStep = step === 'any' ? 1 : step;
+	const jumpStep = useJumpStep( {
+		baseStep,
+		shiftStep,
+		isShiftStepEnabled,
+	} );
 
-		if ( isShiftStepEnabled && shiftKey && keyCode in operationList ) {
-			event.preventDefault();
-			const { min, max, step } = props;
-			const modifiedStep = shiftStep * step;
-			const nextValue = operationList[ keyCode ](
-				failsafeValue,
-				modifiedStep
+	const refIsMouseDown = useRef( false );
+	let onChange;
+	let onMouseDown;
+	if ( isShiftStepEnabled ) {
+		onChange = ( { target: { value: nextValue } } ) => {
+			nextValue = parseFloat( nextValue );
+			if ( jumpStep !== baseStep ) {
+				const { min, max } = props;
+				if ( ! refIsMouseDown.current ) {
+					const difference = nextValue - failsafeValue;
+					nextValue = failsafeValue + difference * jumpStep;
+				}
+				nextValue = roundClamp( nextValue, min, max, jumpStep );
+			}
+			props.onChange( nextValue );
+		};
+		// Syncs refIsMouseDown to mouse down/up events
+		onMouseDown = ( event ) => {
+			props.onMouseDown?.( event );
+			refIsMouseDown.current = true;
+			document.addEventListener(
+				'mouseup',
+				() => ( refIsMouseDown.current = false ),
+				{ once: true }
 			);
-			onShiftStep( roundClamp( nextValue, min, max, modifiedStep ) );
-		}
-	};
+		};
+	}
 
 	const hoverInteractions = useDebouncedHoverInteraction( {
 		onHide: onHideTooltip,
@@ -77,14 +82,11 @@ function InputRange(
 			aria-describedby={ describedBy }
 			aria-label={ label }
 			aria-hidden={ false }
-			onBlur={ onBlur }
 			onChange={ onChange }
-			onFocus={ onFocus }
-			onKeyDown={ onKeyDown }
+			onMouseDown={ onMouseDown }
 			ref={ ref }
 			tabIndex={ 0 }
 			type="range"
-			value={ value }
 		/>
 	);
 }
