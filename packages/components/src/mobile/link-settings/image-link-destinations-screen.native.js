@@ -2,6 +2,7 @@
  * External dependencies
  */
 import { useNavigation, useRoute } from '@react-navigation/native';
+import { StyleSheet } from 'react-native';
 
 /**
  * WordPress dependencies
@@ -9,6 +10,7 @@ import { useNavigation, useRoute } from '@react-navigation/native';
 import { __ } from '@wordpress/i18n';
 import { Icon, check, chevronRight } from '@wordpress/icons';
 import { blockSettingsScreens } from '@wordpress/block-editor';
+import { usePreferredColorSchemeStyle } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -31,14 +33,17 @@ function LinkDestination( {
 	value,
 	valueStyle,
 } ) {
+	const optionIcon = usePreferredColorSchemeStyle(
+		styles.optionIcon,
+		styles.optionIconDark
+	);
 	return (
 		<BottomSheet.Cell
 			icon={ check }
-			iconStyle={
-				currentOption === option
-					? styles.selectedOptionIcon
-					: styles.unselectedOptionIcon
-			}
+			iconStyle={ StyleSheet.flatten( [
+				optionIcon,
+				currentOption !== option && styles.unselectedOptionIcon,
+			] ) }
 			label={ label }
 			leftAlign
 			onPress={ onPress }
