@@ -30,12 +30,12 @@ The editing experience is provided as a block editor wrapper around the core fun
 
 The Navigation Editor has two "modes" for _persistence_ ("saving" navigations) and _rendering_:
 
-1. **Default** - navigations are saved to the _existing_ (post type powered) Menus system and rendered using standard Walker classes.
+1. **Classic (default)** - navigations are saved to the _existing_ (post type powered) Menus system and rendered using standard Walker classes.
 2. **Block-based** (opt _in_) - navigations continue to be _saved_ using the existing post type system, but:
     - the [navigation is _rendered_ using the `core/navigation` block](https://github.com/WordPress/gutenberg/blob/7fcd57c9a62c232899e287f6d96416477d810d5e/lib/navigation.php#L228) (as opposed to Walker) to provide access to the full power of blocks (with some tradeoffs in terms of backwards compatibility).
     - non-link blocks (anything that is not `core/navigation-link`) are saved as _blocks_ (see [technical implementation](#technical-implementation-details)).
 
-### Default Mode
+### Classic Mode
 
 In this mode, navigations created in the Navigation Editor are stored using the _existing Menu post type_ (`nav_menu_item`) system. As this method matches that used in the _existing_ Menus screen, there is a smooth upgrade path to using new Navigation Editor screen to edit navigations.
 
