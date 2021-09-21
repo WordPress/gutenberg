@@ -1,6 +1,6 @@
 .button {
-	margin: 0.5rem 0.25rem;
-	padding: 0.75rem;
+	margin: $grid-unit-05;
+	padding: $grid-unit-10;
 	align-items: center;
 	justify-content: center;
 	border-radius: $border-width * 4;
