@@ -223,6 +223,8 @@ const EmbedEdit = ( props ) => {
 		( 'wp-embed' === type &&
 			! NOT_PREVIEWABLE_WP_EMBED_PROVIDERS.includes( providerNameSlug ) );
 
+	const bottomSheetLabel = 'wp-embed' === type ? 'WordPress' : title;
+
 	return (
 		<>
 			{ showEmbedPlaceholder ? (
@@ -282,7 +284,7 @@ const EmbedEdit = ( props ) => {
 			) }
 			<EmbedBottomSheet
 				value={ url }
-				label={ title }
+				label={ bottomSheetLabel }
 				isVisible={ isEditingURL }
 				onClose={ () => setIsEditingURL( false ) }
 				onSubmit={ ( value ) => {
