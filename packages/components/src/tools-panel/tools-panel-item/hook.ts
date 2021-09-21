@@ -13,6 +13,8 @@ import { useContextSystem, WordPressComponentProps } from '../../ui/context';
 import { useCx } from '../../utils/hooks/use-cx';
 import type { ToolsPanelItemProps } from '../types';
 
+const noop = () => undefined;
+
 export function useToolsPanelItem(
 	props: WordPressComponentProps< ToolsPanelItemProps, 'div' >
 ) {
@@ -23,22 +25,22 @@ export function useToolsPanelItem(
 		label,
 		panelId,
 		resetAllFilter,
-		onDeselect = () => undefined,
-		onSelect = () => undefined,
+		onDeselect = noop,
+		onSelect = noop,
 		...otherProps
 	} = useContextSystem( props, 'ToolsPanelItem' );
 
 	const cx = useCx();
 	const classes = useMemo( () => {
 		return cx( styles.ToolsPanelItem, className );
-	}, [ styles.ToolsPanelItem, className ] );
+	}, [ className ] );
 
 	const {
 		panelId: currentPanelId,
 		menuItems,
-		registerPanelItem = () => undefined,
-		deregisterPanelItem = () => undefined,
-		flagItemCustomization = () => undefined,
+		registerPanelItem,
+		deregisterPanelItem,
+		flagItemCustomization,
 		isResetting,
 	} = useToolsPanelContext();
 
