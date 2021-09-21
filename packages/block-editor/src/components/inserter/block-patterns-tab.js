@@ -20,12 +20,16 @@ import BlockPatternList from '../block-patterns-list';
 function BlockPatternsCategory( {
 	rootClientId,
 	onInsert,
+	onSelectPattern,
 	selectedCategory,
 	onClickCategory,
+	isDraggable = true, // TODO: check docs (onSelectPattern too)
 } ) {
+	// TODO: check other usages of `usePatternState`
 	const [ allPatterns, allCategories, onClick ] = usePatternsState(
 		onInsert,
-		rootClientId
+		rootClientId,
+		onSelectPattern
 	);
 
 	// Remove any empty categories
@@ -115,7 +119,7 @@ function BlockPatternsCategory( {
 						onClickPattern={ onClick }
 						label={ patternCategory.label }
 						orientation="vertical"
-						isDraggable
+						isDraggable={ isDraggable }
 					/>
 				</PatternInserterPanel>
 			) }
@@ -127,14 +131,18 @@ function BlockPatternsTabs( {
 	rootClientId,
 	onInsert,
 	onClickCategory,
+	onSelectPattern,
 	selectedCategory,
+	isDraggable = true,
 } ) {
 	return (
 		<BlockPatternsCategory
 			rootClientId={ rootClientId }
 			selectedCategory={ selectedCategory }
 			onInsert={ onInsert }
+			onSelectPattern={ onSelectPattern }
 			onClickCategory={ onClickCategory }
+			isDraggable={ isDraggable }
 		/>
 	);
 }

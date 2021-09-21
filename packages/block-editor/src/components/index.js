@@ -140,6 +140,7 @@ export { useCanvasClickRedirect as __unstableUseCanvasClickRedirect } from './us
 export { default as useBlockDisplayInformation } from './use-block-display-information';
 export { default as __unstableIframe } from './iframe';
 export { default as __experimentalUseNoRecursiveRenders } from './use-no-recursive-renders';
+export { default as __experimentalPatternExplorer } from './pattern-explorer';
 
 /*
  * State Related Components

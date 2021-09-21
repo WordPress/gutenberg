@@ -1,0 +1,28 @@
+.block-editor-pattern-explorer {
+	display: flex;
+	&__sidebar {
+		padding-right: $grid-unit-40;
+		border-right: $border-width solid $gray-300;
+	}
+	&__preview {
+		padding-left: $grid-unit-40;
+		flex: 1;
+		&__header {
+			border-bottom: $border-width solid $gray-300;
+			display: flex;
+			justify-content: space-between;
+			align-items: center;
+			margin-bottom: $grid-unit-15;
+			padding-bottom: $grid-unit-15;
+		}
+		&__pattern {
+			.components-resizable-box__container {
+				margin: 0 auto;
+			}
+		}
+		&__settings {
+			border-bottom: $border-width solid $gray-300;
+			margin-bottom: $grid-unit-15;
+		}
+	}
+}

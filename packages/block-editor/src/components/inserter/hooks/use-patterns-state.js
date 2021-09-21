@@ -20,12 +20,13 @@ import { store as blockEditorStore } from '../../../store';
 /**
  * Retrieves the block patterns inserter state.
  *
- * @param {Function} onInsert     function called when inserter a list of blocks.
- * @param {string=}  rootClientId Insertion's root client ID.
+ * @param {Function} onInsert        function called when inserter a list of blocks.
+ * @param {string=}  rootClientId    Insertion's root client ID.
+ * @param {Function} onSelectPattern Callback function on pattern select.
  *
  * @return {Array} Returns the patterns state. (patterns, categories, onSelect handler)
  */
-const usePatternsState = ( onInsert, rootClientId ) => {
+const usePatternsState = ( onInsert, rootClientId, onSelectPattern ) => {
 	const { patternCategories, patterns } = useSelect(
 		( select ) => {
 			const { __experimentalGetAllowedPatterns, getSettings } = select(
@@ -41,20 +42,25 @@ const usePatternsState = ( onInsert, rootClientId ) => {
 	);
 	const { createSuccessNotice } = useDispatch( noticesStore );
 	const onClickPattern = useCallback( ( pattern, blocks ) => {
-		onInsert(
-			map( blocks, ( block ) => cloneBlock( block ) ),
-			pattern.name
-		);
-		createSuccessNotice(
-			sprintf(
-				/* translators: %s: block pattern title. */
-				__( 'Block pattern "%s" inserted.' ),
-				pattern.title
-			),
-			{
-				type: 'snackbar',
-			}
-		);
+		if ( onSelectPattern ) {
+			onSelectPattern( pattern );
+		}
+		if ( onInsert ) {
+			onInsert(
+				map( blocks, ( block ) => cloneBlock( block ) ),
+				pattern.name
+			);
+			createSuccessNotice(
+				sprintf(
+					/* translators: %s: block pattern title. */
+					__( 'Block pattern "%s" inserted.' ),
+					pattern.title
+				),
+				{
+					type: 'snackbar',
+				}
+			);
+		}
 	}, [] );
 
 	return [ patterns, patternCategories, onClickPattern ];

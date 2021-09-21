@@ -23,6 +23,7 @@ import { store as keyboardShortcutsStore } from '@wordpress/keyboard-shortcuts';
 /**
  * Internal dependencies
  */
+import PatternExplorerButton from '../../pattern-explorer-button';
 import { store as editPostStore } from '../../../store';
 
 const preventDefault = ( event ) => {
@@ -163,6 +164,7 @@ function HeaderToolbar() {
 						{ overflowItems }
 					</>
 				) }
+				<ToolbarItem as={ PatternExplorerButton } />
 			</div>
 		</NavigableToolbar>
 	);

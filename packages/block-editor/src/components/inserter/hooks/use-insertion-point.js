@@ -167,7 +167,12 @@ function useInsertionPoint( {
 		]
 	);
 
-	return [ destinationRootClientId, onInsertBlocks, onToggleInsertionPoint ];
+	return [
+		destinationRootClientId,
+		onInsertBlocks,
+		onToggleInsertionPoint,
+		destinationIndex,
+	];
 }
 
 export default useInsertionPoint;
