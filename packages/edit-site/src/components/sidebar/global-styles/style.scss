@@ -1,0 +1,16 @@
+.edit-site-global-styles-preview {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	min-height: 200px;
+
+	.component-color-indicator {
+		border-radius: 50%;
+		border: 0;
+		height: 25px;
+		width: 25px;
+		margin-left: 0;
+		padding: 0;
+	}
+}
+
