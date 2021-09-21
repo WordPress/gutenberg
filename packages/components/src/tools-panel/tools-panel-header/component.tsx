@@ -23,9 +23,13 @@ import type {
 	ToolsPanelHeaderProps,
 } from '../types';
 
-const DefaultControlsGroup = ( props: ToolsPanelControlsGroupProps ) => {
-	const { items, onClose, toggleItem } = props;
+const noop = () => {};
 
+const DefaultControlsGroup = ( {
+	items,
+	onClose,
+	toggleItem,
+}: ToolsPanelControlsGroupProps ) => {
 	if ( ! items.length ) {
 		return null;
 	}
@@ -63,9 +67,11 @@ const DefaultControlsGroup = ( props: ToolsPanelControlsGroupProps ) => {
 	);
 };
 
-const OptionalControlsGroup = ( props: ToolsPanelControlsGroupProps ) => {
-	const { items, onClose, toggleItem } = props;
-
+const OptionalControlsGroup = ( {
+	items,
+	onClose,
+	toggleItem,
+}: ToolsPanelControlsGroupProps ) => {
 	if ( ! items.length ) {
 		return null;
 	}
@@ -135,7 +141,7 @@ const ToolsPanelHeader = (
 					label={ labelText }
 					menuProps={ { className: dropdownMenuClassName } }
 				>
-					{ ( { onClose = () => undefined } ) => (
+					{ ( { onClose = noop } ) => (
 						<>
 							<DefaultControlsGroup
 								items={ defaultItems }

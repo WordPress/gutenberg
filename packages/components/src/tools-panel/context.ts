@@ -6,8 +6,15 @@ import { createContext, useContext } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import type { TPContext } from './types';
+import type { ToolsPanelContext as ToolsPanelContextType } from './types';
 
-export const ToolsPanelContext = createContext< TPContext >( {} );
+const noop = () => undefined;
+
+export const ToolsPanelContext = createContext< ToolsPanelContextType >( {
+	registerPanelItem: noop,
+	deregisterPanelItem: noop,
+	flagItemCustomization: noop,
+} );
+
 export const useToolsPanelContext = () =>
-	useContext< TPContext >( ToolsPanelContext );
+	useContext< ToolsPanelContextType >( ToolsPanelContext );
