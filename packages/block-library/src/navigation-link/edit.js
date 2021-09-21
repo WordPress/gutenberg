@@ -300,6 +300,7 @@ export default function NavigationLinkEdit( {
 	const isDraggingWithin = useIsDraggingWithin( listItemRef );
 	const itemLabelPlaceholder = __( 'Add link…' );
 	const ref = useRef();
+	const isMounting = useRef( true );
 
 	const {
 		innerBlocks,
@@ -384,11 +385,17 @@ export default function NavigationLinkEdit( {
 		replaceBlock( clientId, newSubmenu );
 	}
 
-	// Show the LinkControl on mount if the URL is empty
+	// Show the LinkControl on mount if the URL is empty and this is
+	// not the first time we've added the item.
 	// ( When adding a new menu item)
 	// This can't be done in the useState call because it conflicts
 	// with the autofocus behavior of the BlockListBlock component.
 	useEffect( () => {
+		if ( isMounting.current ) {
+			isMounting.current = false;
+			return;
+		}
+
 		if ( ! url ) {
 			setIsLinkOpen( true );
 		}
