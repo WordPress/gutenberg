@@ -234,6 +234,7 @@ class WP_Theme_JSON_Gutenberg {
 		'border-width'               => array( 'border', 'width' ),
 		'border-style'               => array( 'border', 'style' ),
 		'color'                      => array( 'color', 'text' ),
+		'filter'                     => array( 'color', 'duotone' ),
 		'font-family'                => array( 'typography', 'fontFamily' ),
 		'font-size'                  => array( 'typography', 'fontSize' ),
 		'font-style'                 => array( 'typography', 'fontStyle' ),
@@ -253,16 +254,6 @@ class WP_Theme_JSON_Gutenberg {
 		'--wp--style--block-gap'     => array( 'spacing', 'blockGap' ),
 		'text-decoration'            => array( 'typography', 'textDecoration' ),
 		'text-transform'             => array( 'typography', 'textTransform' ),
-	);
-
-	/**
-	 * Metadata for style properties that need to use the duotone selector.
-	 *
-	 * Each element is a direct mapping from the CSS property name to the
-	 * path to the value in theme.json & block attributes.
-	 */
-	const DUOTONE_PROPERTIES_METADATA = array(
-		'filter' => array( 'color', 'duotone' ),
 	);
 
 	const ELEMENTS = array(
@@ -388,7 +379,7 @@ class WP_Theme_JSON_Gutenberg {
 	 *   },
 	 *   'core/cover': {
 	 *     'selector': '.wp-block-cover',
-	 *     'duotone': '> .wp-block-cover__image-background, > .wp-block-cover__video-background'
+	 *     'filter': '> .wp-block-cover__image-background, > .wp-block-cover__video-background'
 	 *   }
 	 * }
 	 *
@@ -417,7 +408,7 @@ class WP_Theme_JSON_Gutenberg {
 				isset( $block_type->supports['color']['__experimentalDuotone'] ) &&
 				is_string( $block_type->supports['color']['__experimentalDuotone'] )
 			) {
-				self::$blocks_metadata[ $block_name ]['duotone'] = $block_type->supports['color']['__experimentalDuotone'];
+				self::$blocks_metadata[ $block_name ]['filter'] = $block_type->supports['color']['__experimentalDuotone'];
 			}
 
 			// Assign defaults, then overwrite those that the block sets by itself.
@@ -573,17 +564,16 @@ class WP_Theme_JSON_Gutenberg {
 	 * ```
 	 *
 	 * @param array $styles Styles to process.
-	 * @param array $properties Properties metadata.
 	 *
 	 * @return array Returns the modified $declarations.
 	 */
-	private static function compute_style_properties( $styles, $properties = self::PROPERTIES_METADATA ) {
+	private static function compute_style_properties( $styles ) {
 		$declarations = array();
 		if ( empty( $styles ) ) {
 			return $declarations;
 		}
 
-		foreach ( $properties as $css_property => $value_path ) {
+		foreach ( self::PROPERTIES_METADATA as $css_property => $value_path ) {
 			$value = self::get_property_value( $styles, $value_path );
 
 			// Skip if empty and not "0" or value represents array of longhand values.
@@ -946,6 +936,16 @@ class WP_Theme_JSON_Gutenberg {
 			$node         = _wp_array_get( $this->theme_json, $metadata['path'], array() );
 			$selector     = $metadata['selector'];
 			$declarations = self::compute_style_properties( $node );
+
+			// Some declarations may have its own registered selector.
+			foreach ( $declarations as $name => $value ) {
+				if ( isset( $metadata[ $name ] ) ) {
+					$property_selector = self::scope_selector( $metadata['selector'], $metadata[ $name ] );
+					$block_rules      .= self::to_ruleset( $property_selector, array( array( $name => $value ) ) );
+					unset( $declarations[ $name ] );
+				}
+			}
+			// The rest use the general selector.
 			$block_rules .= self::to_ruleset( $selector, $declarations );
 
 			if ( self::ROOT_BLOCK_SELECTOR === $selector ) {
@@ -955,11 +955,6 @@ class WP_Theme_JSON_Gutenberg {
 				}
 			}
 
-			if ( isset( $metadata['duotone'] ) ) {
-				$selector     = self::scope_selector( $metadata['selector'], $metadata['duotone'] );
-				$declarations = self::compute_style_properties( $node, self::DUOTONE_PROPERTIES_METADATA );
-				$block_rules .= self::to_ruleset( $selector, $declarations );
-			}
 		}
 
 		return $block_rules;
@@ -1086,12 +1081,12 @@ class WP_Theme_JSON_Gutenberg {
 	 *   [
 	 *     'path'     => [ 'path', 'to', 'some', 'node' ],
 	 *     'selector' => 'CSS selector for some node',
-	 *     'duotone'  => 'CSS selector for duotone for some node'
+	 *     'filter'   => 'CSS selector for duotone for some node'
 	 *   ],
 	 *   [
 	 *     'path'     => ['path', 'to', 'other', 'node' ],
 	 *     'selector' => 'CSS selector for other node',
-	 *     'duotone'  => null
+	 *     'filter'   => null
 	 *   ],
 	 * ]
 	 *
