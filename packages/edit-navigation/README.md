@@ -33,7 +33,7 @@ The Navigation Editor has two "modes" for _persistence_ ("saving" navigations) a
 1. **Classic (default)** - navigations are saved to the _existing_ (post type powered) Menus system and rendered using standard Walker classes.
 2. **Block-based** (opt _in_) - navigations continue to be _saved_ using the existing post type system, but:
     - the [navigation is _rendered_ using the `core/navigation` block](https://github.com/WordPress/gutenberg/blob/7fcd57c9a62c232899e287f6d96416477d810d5e/lib/navigation.php#L228) (as opposed to Walker) to provide access to the full power of blocks (with some tradeoffs in terms of backwards compatibility).
-    - non-link blocks (anything that is not `core/navigation-link`) are saved as _blocks_ (see [technical implementation](#technical-implementation-details)).
+    - non-link blocks (anything that is not `core/navigation-link`) are saved as _blocks_.
 
 ### Classic Mode
 
@@ -60,19 +60,6 @@ This unlocks significant additional capabilities in the Navigation Editor. For e
 -   `core/search`.
 
 As these items are still saved to `nav_menu_items` this ensures if we ever revert to classic (Walker-based) rendering, these items will still be rendered (as blocks).
-
-#### Technical Implementation details
-
-There are two types of item that can be added to a navigation:
-
-1. Navigation link blocks - these utilise the `core/navigation-link` block but are not _persisted_ as blocks.
-2. Block-based items - these are any item that is _not_ a `core/navigation-link` block. They are persisted as blocks (via a wrapper - see below).
-
-By default, Navigation link items are serialized and persisted as `nav_menu_item` posts. No serialized block HTML is stored for these standard link blocks.
-
-Block-based link items however, are [persisted as `nav_menu_items` with a special `type` of `block`](https://github.com/WordPress/gutenberg/blob/7fcd57c9a62c232899e287f6d96416477d810d5e/packages/edit-navigation/src/store/utils.js#L159-L166). These items have an [_additional_ `content` field which is used to store the serialized block markup](https://github.com/WordPress/gutenberg/blob/7fcd57c9a62c232899e287f6d96416477d810d5e/lib/navigation.php#L71-L101).
-
-When rendered on the front-end, the blocks are [`parse`d from the `content` field](https://github.com/WordPress/gutenberg/blob/7fcd57c9a62c232899e287f6d96416477d810d5e/lib/navigation.php#L191-L203) and [rendered as blocks](https://github.com/WordPress/gutenberg/blob/7fcd57c9a62c232899e287f6d96416477d810d5e/lib/navigation.php#L103-L135).
 
 ## Backwards compatibility
 
