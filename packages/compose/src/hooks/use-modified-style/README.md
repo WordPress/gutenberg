@@ -1,7 +1,7 @@
 # `useModifiedStyle`
 
-`useModifiedStyle` is a hook that maps a dependency array to a modified style rules . The style selectors
-should follow the BEM naming convention. The styles are only recaculated when the the mapped dependencies change.
+`useModifiedStyle` is a hook that maps a dependency array to modified style rules. The style selectors
+should follow the BEM naming convention. The styles are only recalculated when the mapped dependencies change.
 
 ## Parameters
 
@@ -16,7 +16,7 @@ A static style object.
 -   Type: `object`
 
 An object of modifier dependencies. The keys are the modifier portion of the BEM selector, and the
-values are an array of dependencies to used to enable the modifier. The modifier is enabled if every mapped dependency is truthy.
+values are an array of dependencies to be used to enable the modifier. The modifier is enabled if every mapped dependency is truthy.
 
 ## Return Object
 
@@ -56,7 +56,7 @@ const myComponent = ({isActive}) => {
 
   return (
     <div style={containerStyle} >
-      <buttton style={buttonStyle} />
+      <button style={buttonStyle} />
     </div>
   )
 
