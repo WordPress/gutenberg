@@ -8,7 +8,7 @@ import { widget as icon } from '@wordpress/icons';
  */
 import metadata from './block.json';
 import edit from './edit';
-import transforms from './transforms';
+import { transforms } from './conversion';
 
 const { name } = metadata;
 export { metadata, name };

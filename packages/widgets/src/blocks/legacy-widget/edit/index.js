@@ -136,10 +136,11 @@ function NotEmpty( {
 
 	return (
 		<>
-			{ idBase === 'text' && (
+			{ idBase && instance?.raw && (
 				<BlockControls group="other">
 					<ConvertToBlocksButton
 						clientId={ clientId }
+						idBase={ idBase }
 						rawInstance={ instance.raw }
 					/>
 				</BlockControls>
