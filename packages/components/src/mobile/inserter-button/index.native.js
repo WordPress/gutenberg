@@ -6,7 +6,7 @@ import { View, TouchableHighlight, Text } from 'react-native';
 /**
  * WordPress dependencies
  */
-import { Component } from '@wordpress/element';
+import { useCallback } from '@wordpress/element';
 import { Icon } from '@wordpress/components';
 import { withPreferredColorScheme } from '@wordpress/compose';
 import { __, sprintf } from '@wordpress/i18n';
@@ -18,26 +18,48 @@ import { BlockIcon } from '@wordpress/block-editor';
  */
 import styles from './style.scss';
 
-class MenuItem extends Component {
-	constructor() {
-		super( ...arguments );
+function MenuItem( {
+	getStylesFromColorScheme,
+	item,
+	itemWidth,
+	maxWidth,
+	onSelect,
+} ) {
+	const onPress = useCallback( () => {
+		if ( ! item.isDisabled ) {
+			onSelect( item );
+		}
+	}, [ item ] );
 
-		this.onPress = this.onPress.bind( this );
-	}
+	const modalIconWrapperStyle = getStylesFromColorScheme(
+		styles.modalIconWrapper,
+		styles.modalIconWrapperDark
+	);
+	const modalIconStyle = getStylesFromColorScheme(
+		styles.modalIcon,
+		styles.modalIconDark
+	);
+	const modalItemLabelStyle = getStylesFromColorScheme(
+		styles.modalItemLabel,
+		styles.modalItemLabelDark
+	);
 
-	onPress() {
-		const { onSelect, item } = this.props;
-		onSelect( item );
-	}
+	const clipboardBlockStyles = getStylesFromColorScheme(
+		styles.clipboardBlock,
+		styles.clipboardBlockDark
+	);
 
-	render() {
-		const {
-			getStylesFromColorScheme,
-			item,
-			itemWidth,
-			maxWidth,
-		} = this.props;
+	const isClipboardBlock = item.id === 'clipboard';
+	const blockTitle = isClipboardBlock ? __( 'Copied block' ) : item.title;
+	const blockIsNew = item.isNew === true;
+	const accessibilityLabelFormat = blockIsNew
+		? // translators: Newly available block name. %s: The localized block name
+		  __( '%s block, newly available' )
+		: // translators: Block name. %s: The localized block name
+		  __( '%s block' );
+	const accessibilityLabel = sprintf( accessibilityLabelFormat, item.title );
 
+<<<<<<< HEAD
 		const modalIconWrapperStyle = getStylesFromColorScheme(
 			styles.modalIconWrapper,
 			styles.modalIconWrapperDark
@@ -101,14 +123,48 @@ class MenuItem extends Component {
 								size={ modalIconStyle.width }
 							/>
 						</View>
+=======
+	return (
+		<TouchableHighlight
+			style={ [
+				styles.touchableArea,
+				item.isDisabled ? styles.disabled : null,
+			] }
+			underlayColor="transparent"
+			activeOpacity={ 0.5 }
+			accessibilityRole="button"
+			accessibilityLabel={ accessibilityLabel }
+			onPress={ onPress }
+			disabled={ item.isDisabled }
+		>
+			<View style={ [ styles.modalItem, { width: maxWidth } ] }>
+				<View
+					style={ [
+						modalIconWrapperStyle,
+						itemWidth && {
+							width: itemWidth,
+						},
+						isClipboardBlock && clipboardBlockStyles,
+					] }
+				>
+					{ blockIsNew && (
+						<Icon icon={ sparkles } style={ styles.newIndicator } />
+					) }
+					<View style={ modalIconStyle }>
+						<Icon
+							icon={ item.icon.src || item.icon }
+							fill={ modalIconStyle.fill }
+							size={ modalIconStyle.width }
+						/>
+>>>>>>> d157d905f6 (Migrate InserterButton to a functional component)
 					</View>
-					<Text numberOfLines={ 3 } style={ modalItemLabelStyle }>
-						{ blockTitle }
-					</Text>
 				</View>
-			</TouchableHighlight>
-		);
-	}
+				<Text numberOfLines={ 3 } style={ modalItemLabelStyle }>
+					{ blockTitle }
+				</Text>
+			</View>
+		</TouchableHighlight>
+	);
 }
 
 const InserterButton = withPreferredColorScheme( MenuItem );
