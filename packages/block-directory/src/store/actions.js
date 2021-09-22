@@ -50,11 +50,11 @@ export function receiveDownloadableBlocks( downloadableBlocks, filterValue ) {
  * @return {boolean} Whether the block was successfully installed & loaded.
  */
 export function* installBlockType( block ) {
-	const { id, assets } = block;
+	const { id } = block;
 	let success = false;
 	yield clearErrorNotice( id );
 	try {
-		yield setIsInstalling( block.id, true );
+		yield setIsInstalling( id, true );
 
 		// If we have a wp:plugin link, the plugin is installed but inactive.
 		const url = getPluginUrl( block );
@@ -71,7 +71,7 @@ export function* installBlockType( block ) {
 			const response = yield apiFetch( {
 				path: 'wp/v2/plugins',
 				data: {
-					slug: block.id,
+					slug: id,
 					status: 'active',
 				},
 				method: 'POST',
@@ -85,7 +85,7 @@ export function* installBlockType( block ) {
 			links: { ...block.links, ...links },
 		} );
 
-		yield loadAssets( assets );
+		yield loadAssets();
 		const registeredBlocks = yield controls.select(
 			blocksStore,
 			'getBlockTypes'
@@ -137,7 +137,7 @@ export function* installBlockType( block ) {
 			isDismissible: true,
 		} );
 	}
-	yield setIsInstalling( block.id, false );
+	yield setIsInstalling( id, false );
 	return success;
 }
 

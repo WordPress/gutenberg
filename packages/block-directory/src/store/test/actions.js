@@ -15,7 +15,6 @@ describe( 'actions', () => {
 	const item = {
 		id: 'block/block',
 		name: 'Test Block',
-		assets: [ 'script.js' ],
 		links: {
 			'wp:install-plugin': [
 				{
@@ -80,7 +79,6 @@ describe( 'actions', () => {
 
 			expect( generator.next().value ).toEqual( {
 				type: 'LOAD_ASSETS',
-				assets: block.assets,
 			} );
 
 			expect( generator.next().value ).toEqual( {
@@ -148,7 +146,6 @@ describe( 'actions', () => {
 
 			expect( generator.next().value ).toEqual( {
 				type: 'LOAD_ASSETS',
-				assets: inactiveBlock.assets,
 			} );
 
 			expect( generator.next().value ).toEqual( {

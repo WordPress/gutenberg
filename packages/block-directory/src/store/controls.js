@@ -50,14 +50,11 @@ export const loadAsset = ( el ) => {
 /**
  * Load the asset files for a block
  *
- * @param {Array} assets A collection of URLs for the assets.
- *
  * @return {Object} Control descriptor.
  */
-export function loadAssets( assets ) {
+export function loadAssets() {
 	return {
 		type: 'LOAD_ASSETS',
-		assets,
 	};
 }
 
