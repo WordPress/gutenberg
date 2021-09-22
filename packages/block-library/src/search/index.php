@@ -51,6 +51,23 @@ function render_block_core_search( $attributes ) {
 				$attributes['label']
 			);
 		} else {
+			// If the label text has been removed but not toggled off, add a visually hidden label with default text.
+			$label_markup = sprintf(
+				'<label for="%s" class="wp-block-search__label screen-reader-text">%s</label>',
+				$input_id,
+				__( 'Search' )
+			);
+		}
+	} else {
+		// If there is a custom label and the label is toggled off, add a visually hidden label with custom text.
+		if ( ! empty( $attributes['label'] ) ) {
+			$label_markup = sprintf(
+				'<label for="%s" class="wp-block-search__label screen-reader-text">%s</label>',
+				$input_id,
+				$attributes['label']
+			);
+		} else {
+			// If the label text has been removed and toggled off, add a visually hidden label with default text.
 			$label_markup = sprintf(
 				'<label for="%s" class="wp-block-search__label screen-reader-text">%s</label>',
 				$input_id,
