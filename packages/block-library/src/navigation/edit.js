@@ -50,10 +50,7 @@ const ALLOWED_BLOCKS = [
 	'core/navigation-submenu',
 ];
 
-const DIRECT_INSERT = [
-	'core/navigation-link',
-	{ type: 'page', kind: 'post-type' },
-];
+const DIRECT_INSERT = [ 'core/navigation-link' ];
 
 const LAYOUT = {
 	type: 'default',
