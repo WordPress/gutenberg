@@ -20,7 +20,7 @@ import {
 	__experimentalHeading as Heading,
 	__experimentalView as View,
 } from '@wordpress/components';
-import { __ } from '@wordpress/i18n';
+import { __, isRTL } from '@wordpress/i18n';
 import { getBlockType } from '@wordpress/blocks';
 import {
 	Icon,
@@ -29,6 +29,7 @@ import {
 	styles,
 	typography,
 	chevronLeft,
+	chevronRight,
 } from '@wordpress/icons';
 
 /**
@@ -70,7 +71,12 @@ const ScreenHeader = ( { back, title } ) => {
 				<View>
 					<NavigationButton
 						path={ back }
-						icon={ <Icon icon={ chevronLeft } variant="muted" /> }
+						icon={
+							<Icon
+								icon={ isRTL() ? chevronRight : chevronLeft }
+								variant="muted"
+							/>
+						}
 						size="small"
 						isBack
 					/>

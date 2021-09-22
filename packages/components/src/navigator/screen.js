@@ -9,6 +9,7 @@ import { motion } from 'framer-motion';
  */
 import { useContext } from '@wordpress/element';
 import { useReducedMotion } from '@wordpress/compose';
+import { isRTL } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
@@ -44,12 +45,20 @@ function NavigatorScreen( { children, path } ) {
 	};
 	const initial = {
 		opacity: 0,
-		x: currentPath.isBack ? -50 : 50,
+		x:
+			( isRTL() && currentPath.isBack ) ||
+			( ! isRTL() && ! currentPath.isBack )
+				? 50
+				: -50,
 	};
 	const exit = {
 		delay: animationExitDelay,
 		opacity: 0,
-		x: currentPath.isBack ? 50 : -50,
+		x:
+			( ! isRTL() && currentPath.isBack ) ||
+			( isRTL() && ! currentPath.isBack )
+				? 50
+				: -50,
 		transition: {
 			duration: animationExitDuration,
 			ease: 'easeInOut',
