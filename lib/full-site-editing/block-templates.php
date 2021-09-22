@@ -627,7 +627,7 @@ function _gutengerg_has_wp_template_block_templates() {
 	$term_query_args = array(
 		'taxonomy' => 'wp_theme',
 		'field'    => 'name',
-		'terms'    => wp_get_theme()->get_stylesheet(),
+		'name'     => wp_get_theme()->get_stylesheet(),
 	);
 
 	$has_block_templates = false;
@@ -650,7 +650,7 @@ function _gutenberg_has_wp_template_part_block_templates( $area ) {
 	$term_query_args = array(
 		'taxonomy' => 'wp_template_part_area',
 		'field'    => 'name',
-		'terms'    => $area,
+		'name'     => $area,
 	);
 
 	$has_block_templates = false;
