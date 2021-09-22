@@ -14,6 +14,10 @@ function register_gutenberg_patterns() {
 		register_block_pattern_category( 'query', array( 'label' => __( 'Query', 'gutenberg' ) ) );
 	}
 
+	if ( ! WP_Block_Pattern_Categories_Registry::get_instance()->is_registered( 'navigation' ) ) {
+		register_block_pattern_category( 'navigation', array( 'label' => __( 'Navigation', 'gutenberg' ) ) );
+	}
+
 	$patterns = array(
 		'query-standard-posts'                 => array(
 			'title'      => _x( 'Standard', 'Block pattern title', 'gutenberg' ),
@@ -156,6 +160,41 @@ function register_gutenberg_patterns() {
 								<!-- wp:social-link {"url":"#","service":"chain"} /-->
 								<!-- wp:social-link {"url":"#","service":"mail"} /--></ul>
 								<!-- /wp:social-links -->',
+		),
+		'navigation-page-links'                => array(
+			'title'      => _x( 'All pages menu', 'Block pattern title', 'gutenberg' ),
+			'categories' => array( 'navigation' ),
+			'blockTypes' => array( 'core/navigation' ),
+			'content'    => '<!-- wp:navigation --><!-- wp:page-list {"isNavigationChild":true,"showSubmenuIcon":true,"openSubmenusOnClick":false} /--><!-- /wp:navigation -->',
+		),
+		'navigation-page-links-responsive'     => array(
+			'title'         => _x( 'All pages menu (responsive)', 'Block pattern title', 'gutenberg' ),
+			'viewportWidth' => 500,
+			'categories'    => array( 'navigation' ),
+			'blockTypes'    => array( 'core/navigation' ),
+			'content'       => '<!-- wp:navigation {"isResponsive":true} --><!-- wp:page-list {"isNavigationChild":true,"showSubmenuIcon":true,"openSubmenusOnClick":false} /--><!-- /wp:navigation -->',
+		),
+		'navigation-vertical'                  => array(
+			'title'      => _x( 'Vertical navigation menu', 'Block pattern title', 'gutenberg' ),
+			'categories' => array( 'navigation' ),
+			'blockTypes' => array( 'core/navigation' ),
+			'content'    => '<!-- wp:navigation {"orientation":"vertical","style":{"typography":{"fontFamily":"var:preset|font-family|system-fonts"}},"fontSize":"extra-large"} -->
+							<!-- wp:home-link {"label":"Home"} /-->
+							<!-- wp:navigation-link {"label":"About","type":"page","kind":"post-type","isTopLevelLink":true} /-->
+							<!-- wp:navigation-link {"label":"Contact","type":"page","kind":"post-type","isTopLevelLink":true} /-->
+							<!-- wp:navigation-link {"label":"Portfolio","type":"page","kind":"post-type","isTopLevelLink":true} /-->
+							<!-- /wp:navigation -->',
+		),
+		'navigation-horizontal'                => array(
+			'title'      => _x( 'Horizontal navigation menu', 'Block pattern title', 'gutenberg' ),
+			'categories' => array( 'navigation' ),
+			'blockTypes' => array( 'core/navigation' ),
+			'content'    => '<!-- wp:navigation {"style":{"typography":{"fontFamily":"var:preset|font-family|system-fonts"}},"fontSize":"extra-large"} -->
+							<!-- wp:home-link {"label":"Home"} /-->
+							<!-- wp:navigation-link {"label":"About","type":"page","kind":"post-type","isTopLevelLink":true} /-->
+							<!-- wp:navigation-link {"label":"Contact","type":"page","kind":"post-type","isTopLevelLink":true} /-->
+							<!-- wp:navigation-link {"label":"Portfolio","type":"page","kind":"post-type","isTopLevelLink":true} /-->
+							<!-- /wp:navigation -->',
 		),
 	);
 

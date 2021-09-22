@@ -588,6 +588,9 @@ export default function NavigationLinkEdit( {
 			/* translators: label for missing values in navigation link block */
 			missingText = __( 'Add link' );
 	}
+	if ( label ) {
+		missingText = label;
+	}
 
 	return (
 		<Fragment>
