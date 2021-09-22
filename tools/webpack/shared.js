@@ -76,6 +76,20 @@ const plugins = [
 	mode === 'production' && new ReadableJsAssetsWebpackPlugin(),
 ];
 
+const pluginsNoPolyfills = [
+	// The WP_BUNDLE_ANALYZER global variable enables a utility that represents bundle
+	// content as a convenient interactive zoomable treemap.
+	process.env.WP_BUNDLE_ANALYZER && new BundleAnalyzerPlugin(),
+	new DefinePlugin( {
+		// Inject the `GUTENBERG_PHASE` global, used for feature flagging.
+		'process.env.GUTENBERG_PHASE': JSON.stringify(
+			parseInt( process.env.npm_package_config_GUTENBERG_PHASE, 10 ) || 1
+		),
+	} ),
+	new DependencyExtractionWebpackPlugin( { injectPolyfill: false } ),
+	mode === 'production' && new ReadableJsAssetsWebpackPlugin(),
+];
+
 const stylesTransform = ( content ) => {
 	if ( mode === 'production' ) {
 		return postcss( [
@@ -102,5 +116,6 @@ const stylesTransform = ( content ) => {
 module.exports = {
 	baseConfig,
 	plugins,
+	pluginsNoPolyfills,
 	stylesTransform,
 };
