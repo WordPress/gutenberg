@@ -134,7 +134,17 @@ class URLInput extends Component {
 			return;
 		}
 
-		const isInitialSuggestions = ! ( value && value.length );
+		const containsOnlyWhitespace = ! /\S/.test( value );
+
+		// Initial suggestions are those shown when no search has been made.
+		// The criteria for no search are:
+		// 1. No value.
+		// 2. Value must not be entirely whitespace.
+		const isInitialSuggestions =
+			! ( value && value.length ) && ! containsOnlyWhitespace;
+
+		// Trim only now we've determined it's not composed of purely whitespace.
+		value = value.trim();
 
 		// Allow a suggestions request if:
 		// - there are at least 2 characters in the search input (except manual searches where
@@ -219,7 +229,7 @@ class URLInput extends Component {
 
 		this.props.onChange( inputValue );
 		if ( ! this.props.disableSuggestions ) {
-			this.updateSuggestions( inputValue.trim() );
+			this.updateSuggestions( inputValue );
 		}
 	}
 
@@ -236,7 +246,7 @@ class URLInput extends Component {
 			! ( suggestions && suggestions.length )
 		) {
 			// Ensure the suggestions are updated with the current input value
-			this.updateSuggestions( value.trim() );
+			this.updateSuggestions( value );
 		}
 	}
 
