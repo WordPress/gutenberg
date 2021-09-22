@@ -28,7 +28,7 @@ export default function useBlockControlsFill( group, shareWithChildBlocks ) {
 					'__experimentalExposeControlsToChildren',
 					false
 				) &&
-				hasSelectedInnerBlock( clientId )
+				hasSelectedInnerBlock( clientId, true )
 			);
 		},
 		[ shareWithChildBlocks, clientId ]
