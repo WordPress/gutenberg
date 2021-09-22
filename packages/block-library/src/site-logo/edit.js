@@ -401,7 +401,7 @@ export default function LogoEdit( {
 			/>
 			<ToolbarGroup>
 				<ToolbarButton onClick={ onRemoveLogo }>
-					{ __( 'Remove' ) }
+					{ __( 'Reset' ) }
 				</ToolbarButton>
 			</ToolbarGroup>
 		</BlockControls>
