@@ -40,6 +40,8 @@ const PREVIEWABLE_PROVIDERS = [ 'youtube', 'twitter', 'instagram', 'vimeo' ];
 // are not supported yet, so we need to disallow them with a fixed providers list.
 const NOT_PREVIEWABLE_WP_EMBED_PROVIDERS = [ 'pinterest' ];
 
+const WP_EMBED_TYPE = 'wp-embed';
+
 const EmbedEdit = ( props ) => {
 	const {
 		attributes: { align, providerNameSlug, previewable, responsive, url },
@@ -220,10 +222,10 @@ const EmbedEdit = ( props ) => {
 		PREVIEWABLE_PROVIDERS.includes( providerNameSlug ) ||
 		// For WordPress embeds, we enable the inline preview for all its providers
 		// except the ones that are not supported yet.
-		( 'wp-embed' === type &&
+		( WP_EMBED_TYPE === type &&
 			! NOT_PREVIEWABLE_WP_EMBED_PROVIDERS.includes( providerNameSlug ) );
 
-	const bottomSheetLabel = 'wp-embed' === type ? 'WordPress' : title;
+	const bottomSheetLabel = WP_EMBED_TYPE === type ? 'WordPress' : title;
 
 	return (
 		<>
