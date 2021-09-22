@@ -7,8 +7,8 @@ import { motion } from 'framer-motion';
 /**
  * WordPress dependencies
  */
-import { useContext } from '@wordpress/element';
-import { useReducedMotion } from '@wordpress/compose';
+import { useContext, useEffect, useState } from '@wordpress/element';
+import { useReducedMotion, useFocusOnMount } from '@wordpress/compose';
 import { isRTL } from '@wordpress/i18n';
 
 /**
@@ -25,6 +25,14 @@ function NavigatorScreen( { children, path } ) {
 	const prefersReducedMotion = useReducedMotion();
 	const [ currentPath ] = useContext( NavigatorContext );
 	const isMatch = currentPath.path === path;
+	const ref = useFocusOnMount();
+
+	// This flag is used to only apply the focus on mount when the actual path changes.
+	// It avois the focus to happen on first render.
+	const [ hasPathChanged, setHasPathChanged ] = useState( false );
+	useEffect( () => {
+		setHasPathChanged( true );
+	}, [ path ] );
 
 	if ( ! isMatch ) {
 		return null;
@@ -71,7 +79,14 @@ function NavigatorScreen( { children, path } ) {
 		initial,
 	};
 
-	return <motion.div { ...animatedProps }>{ children }</motion.div>;
+	return (
+		<motion.div
+			ref={ hasPathChanged ? ref : undefined }
+			{ ...animatedProps }
+		>
+			{ children }
+		</motion.div>
+	);
 }
 
 export default NavigatorScreen;
