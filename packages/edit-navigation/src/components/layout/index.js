@@ -172,7 +172,6 @@ export default function Layout( { blockEditorSettings } ) {
 														isPending={
 															! hasLoadedMenus
 														}
-														blocks={ blocks }
 													/>
 												</BlockTools>
 											</div>
