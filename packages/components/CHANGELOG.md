@@ -2,6 +2,11 @@
 
 ## Unreleased
 
+### Breaking changes
+
+-   Removed the deprecated `position` and `menuLabel` from the `DropdownMenu` component ([#34537](https://github.com/WordPress/gutenberg/pull/34537)).
+-   Removed the deprecated `onClickOutside` prop from the `Popover` component ([#34537](https://github.com/WordPress/gutenberg/pull/34537)).
+
 ## 17.0.0 (2021-09-09)
 
 ### Breaking Change
