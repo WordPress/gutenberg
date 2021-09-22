@@ -13,8 +13,6 @@ import { useContextSystem, WordPressComponentProps } from '../../ui/context';
 import { useCx } from '../../utils/hooks/use-cx';
 import type { ToolsPanelItemProps } from '../types';
 
-const noop = () => undefined;
-
 export function useToolsPanelItem(
 	props: WordPressComponentProps< ToolsPanelItemProps, 'div' >
 ) {
@@ -25,8 +23,8 @@ export function useToolsPanelItem(
 		label,
 		panelId,
 		resetAllFilter,
-		onDeselect = noop,
-		onSelect = noop,
+		onDeselect,
+		onSelect,
 		...otherProps
 	} = useContextSystem( props, 'ToolsPanelItem' );
 
@@ -95,11 +93,11 @@ export function useToolsPanelItem(
 		}
 
 		if ( isMenuItemChecked && ! isValueSet && ! wasMenuItemChecked ) {
-			onSelect();
+			onSelect?.();
 		}
 
 		if ( ! isMenuItemChecked && wasMenuItemChecked ) {
-			onDeselect();
+			onDeselect?.();
 		}
 	}, [ isMenuItemChecked, wasMenuItemChecked, isValueSet, isResetting ] );
 
