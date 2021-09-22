@@ -165,6 +165,51 @@ describe( 'Basic rendering', () => {
 		} );
 	} );
 
+	it( 'should not allow creation of links containing only whitespace', async () => {
+		act( () => {
+			render( <LinkControl />, container );
+		} );
+
+		// Search Input UI
+		const searchInput = getURLInput();
+
+		let submitButton = queryByRole( container, 'button', {
+			name: 'Submit',
+		} );
+
+		expect( submitButton.disabled ).toBeTruthy();
+		expect( submitButton ).not.toBeNull();
+		expect( submitButton ).toBeInTheDocument();
+
+		// Simulate searching for a term
+		act( () => {
+			Simulate.change( searchInput, {
+				target: { value: '      ' },
+			} );
+		} );
+
+		// fetchFauxEntitySuggestions resolves on next "tick" of event loop
+		await eventLoopTick();
+
+		// expect( mockFetchSearchSuggestions ).not.toHaveBeenCalled();
+
+		// Commit the selected item as the current link
+		act( () => {
+			Simulate.keyDown( searchInput, { keyCode: ENTER } );
+		} );
+
+		submitButton = queryByRole( container, 'button', {
+			name: 'Submit',
+		} );
+
+		expect( searchInput ).toBeInTheDocument();
+		expect( submitButton.disabled ).toBeTruthy();
+		expect( submitButton ).not.toBeNull();
+		expect( submitButton ).toBeInTheDocument();
+
+		// console.log( container.innerHTML );
+	} );
+
 	describe( 'forceIsEditingLink', () => {
 		const isEditing = () => !! getURLInput();
 
