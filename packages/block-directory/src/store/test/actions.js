@@ -11,10 +11,11 @@ import { installBlockType, uninstallBlockType } from '../actions';
 
 describe( 'actions', () => {
 	const pluginEndpoint =
-		'https://example.com/wp-json/wp/v2/plugins/block/block';
+		'https://example.com/wp-json/wp/v2/plugins/block-block';
 	const item = {
-		id: 'block/block',
-		name: 'Test Block',
+		id: 'block-block',
+		name: 'block/block',
+		title: 'Test Block',
 		links: {
 			'wp:install-plugin': [
 				{
