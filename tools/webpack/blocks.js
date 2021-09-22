@@ -9,7 +9,11 @@ const fastGlob = require( 'fast-glob' );
 /**
  * Internal dependencies
  */
-const { baseConfig, pluginsNoPolyfills, stylesTransform } = require( './shared' );
+const {
+	baseConfig,
+	pluginsNoPolyfills,
+	stylesTransform,
+} = require( './shared' );
 
 /*
  * Matches a block's name in paths in the form
