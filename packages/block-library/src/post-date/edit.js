@@ -26,6 +26,7 @@ import {
 } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
 import { edit } from '@wordpress/icons';
+import { DOWN } from '@wordpress/keycodes';
 
 export default function PostDateEdit( {
 	attributes: { textAlign, format, isLink },
@@ -104,14 +105,23 @@ export default function PostDateEdit( {
 									is12Hour={ is12Hour }
 								/>
 							) }
-							renderToggle={ ( { isOpen, onToggle } ) => (
-								<ToolbarButton
-									aria-expanded={ isOpen }
-									icon={ edit }
-									title={ __( 'Change Date' ) }
-									onClick={ onToggle }
-								/>
-							) }
+							renderToggle={ ( { isOpen, onToggle } ) => {
+								const openOnArrowDown = ( event ) => {
+									if ( ! isOpen && event.keyCode === DOWN ) {
+										event.preventDefault();
+										onToggle();
+									}
+								};
+								return (
+									<ToolbarButton
+										aria-expanded={ isOpen }
+										icon={ edit }
+										title={ __( 'Change Date' ) }
+										onClick={ onToggle }
+										onKeyDown={ openOnArrowDown }
+									/>
+								);
+							} }
 						/>
 					</ToolbarGroup>
 				) }
