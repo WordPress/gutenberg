@@ -74,7 +74,7 @@ panel's dropdown menu.
 
 - Required: Yes
 
-### `panelId`: `function`
+### `panelId`: `string`
 
 If a `panelId` is set, it is passed through the `ToolsPanelContext` and used
 to restrict panel items. Only items with a matching `panelId` will be able
@@ -82,7 +82,7 @@ to register themselves with this panel.
 
 - Required: No
 
-### `resetAll`: `function`
+### `resetAll`: `() => void`
 
 A function to call when the `Reset all` menu option is selected. This is passed
 through to the panel's header component.
