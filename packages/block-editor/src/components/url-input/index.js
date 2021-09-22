@@ -288,7 +288,7 @@ class URLInput extends Component {
 				// Submitting while loading should trigger onSubmit
 				case ENTER: {
 					if ( this.props.onSubmit ) {
-						this.props.onSubmit();
+						this.props.onSubmit( null, event );
 					}
 
 					break;
@@ -338,10 +338,10 @@ class URLInput extends Component {
 					this.selectLink( suggestion );
 
 					if ( this.props.onSubmit ) {
-						this.props.onSubmit( suggestion );
+						this.props.onSubmit( suggestion, event );
 					}
 				} else if ( this.props.onSubmit ) {
-					this.props.onSubmit();
+					this.props.onSubmit( null, event );
 				}
 
 				break;
