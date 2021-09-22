@@ -228,8 +228,13 @@ describe( 'Basic rendering', () => {
 		} );
 
 		it( 'should display human friendly error message if value URL prop is empty when component is forced into no-editing (preview) mode', async () => {
-			// occasionally forceIsEditingLink is set explictly to `false` which causes the link UI to render
+			// Why do we need this test?
+			// Occasionally `forceIsEditingLink` is set explictly to `false` which causes the Link UI to render
 			// it's preview even if the `value` has no URL.
+			// for an example of this see the usage in the following file whereby forceIsEditingLink is used to start/stop editing mode:
+			// https://github.com/WordPress/gutenberg/blob/fa5728771df7cdc86369f7157d6aa763649937a7/packages/format-library/src/link/inline.js#L151.
+			// see also: https://github.com/WordPress/gutenberg/issues/17972.
+
 			const valueWithEmptyURL = {
 				url: '',
 				id: 123,
