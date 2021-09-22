@@ -311,10 +311,7 @@ describe( 'Navigation editor', () => {
 
 	it( 'has a disabled undo button when an existing menu is loaded', async () => {
 		// The test requires the presence of existing menus.
-		await setUpResponseMocking( [
-			...getMenuMocks( { GET: assignMockMenuIds( menusFixture ) } ),
-			...getMenuItemMocks( { GET: menuItemsFixture } ),
-		] );
+		await createMenu( { name: 'Test Menu 1' }, menuItemsFixture );
 		await visitNavigationEditor();
 
 		// Wait for at least one block to be present on the page.
