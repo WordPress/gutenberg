@@ -111,33 +111,36 @@ export function __experimentalCloneSanitizedBlock(
 ) {
 	const clientId = uuid();
 
-	// Merge in new attributes
-	block.attributes = {
-		...block.attributes,
-		...mergeAttributes,
-	};
-
-	// Strip out attributes with the `internal` role, which should not be copied during
-	// block duplication.
-	block = __experimentalRemoveAttributesByRole( block, 'internal' );
-
-	// Remove any attributes not defined in the block type, and fill in default values for
-	// misisng attributes.
-	const sanitizedAttributes = __experimentalSanitizeBlockAttributes(
-		block.name,
-		block.attributes
-	);
-
-	return {
+	// Clone the block and merge in new attributes.
+	let clonedBlock = {
 		...block,
 		clientId,
-		attributes: sanitizedAttributes,
+		attributes: {
+			...block.attributes,
+			...mergeAttributes,
+		},
 		innerBlocks:
 			newInnerBlocks ||
 			block.innerBlocks.map( ( innerBlock ) =>
 				__experimentalCloneSanitizedBlock( innerBlock )
 			),
 	};
+
+	// Strip out attributes with the `internal` role, which should not be copied during
+	// block duplication.
+	clonedBlock = __experimentalRemoveAttributesByRole(
+		clonedBlock,
+		'internal'
+	);
+
+	// Remove any attributes not defined in the block type, and fill in default values for
+	// misisng attributes.
+	clonedBlock.attributes = __experimentalSanitizeBlockAttributes(
+		clonedBlock.name,
+		clonedBlock.attributes
+	);
+
+	return clonedBlock;
 }
 
 /**
