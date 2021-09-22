@@ -87,22 +87,22 @@ function LinkSettings( {
 	setMappedAttributes,
 } ) {
 	const route = useRoute();
-	const { href: url, ...unMappedAttributes } = attributes;
-	const mappedAttributes = { ...unMappedAttributes, url };
+	const { href: url, label, linkDestination, linkTarget, rel } = attributes;
 
 	// Persist attributes passed from child screen
 	useEffect( () => {
-		const { linkDestination, url: newUrl } = route.params || {};
-		if ( linkDestination || newUrl ) {
+		const { linkDestination: newLinkDestination, url: newUrl } =
+			route.params || {};
+		if ( newLinkDestination || newUrl ) {
 			setMappedAttributes( {
 				url: newUrl,
-				linkDestination,
+				linkDestination: newLinkDestination,
 			} );
 		}
 	}, [ route.params?.url, route.params?.linkDestination ] );
 
 	let valueMask;
-	switch ( mappedAttributes.linkDestination ) {
+	switch ( linkDestination ) {
 		case LINK_DESTINATION_MEDIA:
 			valueMask = __( 'Media File' );
 			break;
@@ -136,10 +136,10 @@ function LinkSettings( {
 		<PanelBody title={ __( 'Link Settings' ) }>
 			<LinkSettingsNavigation
 				isVisible={ isLinkSheetVisible }
-				url={ mappedAttributes.url }
-				rel={ mappedAttributes.rel }
-				label={ mappedAttributes.label }
-				linkTarget={ mappedAttributes.linkTarget }
+				url={ url }
+				rel={ rel }
+				label={ label }
+				linkTarget={ linkTarget }
 				onClose={ dismissSheet }
 				setAttributes={ setMappedAttributes }
 				withBottomSheet={ false }
