@@ -309,6 +309,24 @@ describe( 'Navigation editor', () => {
 		expect( blockListAppender ).toBeTruthy();
 	} );
 
+	it( 'has a disabled undo button when an existing menu is loaded', async () => {
+		// The test requires the presence of existing menus.
+		await setUpResponseMocking( [
+			...getMenuMocks( { GET: assignMockMenuIds( menusFixture ) } ),
+			...getMenuItemMocks( { GET: menuItemsFixture } ),
+		] );
+		await visitNavigationEditor();
+
+		// Wait for at least one block to be present on the page.
+		await page.waitForSelector( '.wp-block' );
+
+		// Check whether there's a disabled undo button.
+		const disabledUndoButton = await page.waitForSelector(
+			'button[aria-label="Undo"][aria-disabled="true"]'
+		);
+		expect( disabledUndoButton ).toBeTruthy();
+	} );
+
 	it( 'shows a submenu when a link is selected and hides it when clicking the editor to deselect it', async () => {
 		await createMenu( { name: 'Test Menu 1' }, menuItemsFixture );
 		await visitNavigationEditor();
