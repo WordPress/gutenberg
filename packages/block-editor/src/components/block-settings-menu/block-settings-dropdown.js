@@ -15,7 +15,7 @@ import { Children, cloneElement, useCallback } from '@wordpress/element';
 import {
 	serialize,
 	store as blocksStore,
-	__experimentalRemoveAttributesByRole,
+	__experimentalCloneSanitizedBlock,
 } from '@wordpress/blocks';
 import { store as keyboardShortcutsStore } from '@wordpress/keyboard-shortcuts';
 import { useCopyToClipboard } from '@wordpress/compose';
@@ -39,7 +39,7 @@ const POPOVER_PROPS = {
 function CopyMenuItem( { blocks, onCopy } ) {
 	const ref = useCopyToClipboard( () => {
 		blocks = blocks.map( ( block ) =>
-			__experimentalRemoveAttributesByRole( block, 'internal' )
+			__experimentalCloneSanitizedBlock( block )
 		);
 		return serialize( blocks );
 	}, onCopy );

@@ -302,31 +302,27 @@ export function __experimentalGetBlockAttributesNamesByRole( name, role ) {
 }
 
 /**
- * Given a block, remove any attributes with the given `role`.
+ * Given attributes, remove any attributes with the given `role`.
  *
- * @param {Object} block           Block instance.
- * @param {string} role            The role of a block attribute.
+ * @param {string} name       The block's name.
+ * @param {Object} attributes The block's attributes.
+ * @param {string} role       The role of a block attribute.
  *
- * @return {Object} The block, with attributes matching the `role` removed.
+ * @return {Object} The attributes, with those matching the `role` removed.
  */
-export function __experimentalRemoveAttributesByRole( block, role ) {
+export function __experimentalRemoveAttributesByRole( name, attributes, role ) {
 	const attributesByRole = __experimentalGetBlockAttributesNamesByRole(
-		block.name,
+		name,
 		role
 	);
 	if ( ! attributesByRole?.length ) {
-		return block;
+		return attributes;
 	}
 
-	block.attributes = Object.keys( block.attributes ).reduce(
-		( _accumulator, attribute ) => {
-			if ( ! attributesByRole.includes( attribute ) ) {
-				_accumulator[ attribute ] = block.attributes[ attribute ];
-			}
-			return _accumulator;
-		},
-		{}
-	);
-
-	return block;
+	return Object.keys( attributes ).reduce( ( _accumulator, attribute ) => {
+		if ( ! attributesByRole.includes( attribute ) ) {
+			_accumulator[ attribute ] = attributes[ attribute ];
+		}
+		return _accumulator;
+	}, {} );
 }
