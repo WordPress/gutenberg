@@ -8,12 +8,14 @@ import classnames from 'classnames';
  * WordPress dependencies
  */
 import { forwardRef } from '@wordpress/element';
+// eslint-disable-next-line no-restricted-imports
+import type { Ref } from 'react';
 
 /**
  * Internal dependencies
  */
 import Label from './label';
-import { useResizeLabel, POSITIONS } from './utils';
+import { useResizeLabel, Axis, Position, POSITIONS } from './utils';
 import { Root } from './styles/resize-tooltip.styles';
 
 function ResizeTooltip(
@@ -28,9 +30,20 @@ function ResizeTooltip(
 		showPx = true,
 		zIndex = 1000,
 		...props
+	}: {
+		'aria-hidden'?: boolean;
+		axis?: Axis;
+		className?: string;
+		fadeTimeout?: number;
+		isVisible?: boolean;
+		labelRef?: Ref< HTMLDivElement >;
+		onResize?: Parameters< typeof useResizeLabel >[ 0 ][ 'onResize' ];
+		position?: Position;
+		showPx?: boolean;
+		zIndex?: number;
 	},
-	ref
-) {
+	ref: Ref< HTMLDivElement >
+): JSX.Element | null {
 	const { label, resizeListener } = useResizeLabel( {
 		axis,
 		fadeTimeout,
@@ -48,8 +61,6 @@ function ResizeTooltip(
 			{ resizeListener }
 			<Label
 				aria-hidden={ props[ 'aria-hidden' ] }
-				fadeTimeout={ fadeTimeout }
-				isVisible={ isVisible }
 				label={ label }
 				position={ position }
 				ref={ labelRef }
