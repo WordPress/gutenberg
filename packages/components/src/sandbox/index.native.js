@@ -14,6 +14,7 @@ import {
 	useState,
 	useEffect,
 } from '@wordpress/element';
+import { usePreferredColorScheme } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -153,8 +154,9 @@ const EMPTY_ARRAY = [];
 
 function Sandbox( {
 	containerStyle,
-	html = '',
 	customJS,
+	html = '',
+	lang = 'en',
 	providerUrl = '',
 	scripts = EMPTY_ARRAY,
 	styles = EMPTY_ARRAY,
@@ -162,6 +164,7 @@ function Sandbox( {
 	type,
 	url,
 } ) {
+	const colorScheme = usePreferredColorScheme();
 	const ref = useRef();
 	const [ height, setHeight ] = useState( 0 );
 	const [ contentHtml, setContentHtml ] = useState( getHtmlDoc() );
@@ -171,17 +174,18 @@ function Sandbox( {
 		windowSize.width >= windowSize.height
 	);
 	const wasLandscape = useRef( isLandscape );
-	// On Android, we need to recreate the WebView when the device rotates, otherwise it disappears.
-	// For this purpose, the key value used in the WebView will change when the device orientation gets updated.
+	// On Android, we need to recreate the WebView on any of the following actions, otherwise it disappears:
+	// - Device rotation
+	// - Light/dark mode changes
+	// For this purpose, the key prop used in the WebView will be updated with the value of the actions.
 	const key = Platform.select( {
-		android: `${ url }-${ isLandscape ? 'landscape' : 'portrait' }`,
+		android: `${ url }-${
+			isLandscape ? 'landscape' : 'portrait'
+		}-${ colorScheme }`,
 		ios: url,
 	} );
 
 	function getHtmlDoc() {
-		// TODO: Use the device's locale
-		const lang = 'en';
-
 		// Put the html snippet into a html document, and update the state to refresh the WebView,
 		// we can use this in the future to inject custom styles or scripts.
 		// Scripts go into the body rather than the head, to support embedded content such as Instagram

@@ -1,8 +1,19 @@
 /**
  * Internal dependencies
  */
-import { createComponent } from '../ui/utils';
+import { contextConnect } from '../ui/context';
+import { View } from '../view';
 import { useHStack } from './hook';
+
+/**
+ * @param {import('../ui/context').WordPressComponentProps<import('./types').Props, 'div'>} props
+ * @param {import('react').Ref<any>}                                                        forwardedRef
+ */
+function HStack( props, forwardedRef ) {
+	const hStackProps = useHStack( props );
+
+	return <View { ...hStackProps } ref={ forwardedRef } />;
+}
 
 /**
  * `HStack` (Horizontal Stack) arranges child elements in a horizontal line.
@@ -27,10 +38,6 @@ import { useHStack } from './hook';
  * }
  * ```
  */
-const HStack = createComponent( {
-	as: 'div',
-	useHook: useHStack,
-	name: 'HStack',
-} );
+const ConnectedHStack = contextConnect( HStack, 'HStack' );
 
-export default HStack;
+export default ConnectedHStack;

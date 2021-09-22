@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/block-library",
-	"version": "5.0.1",
+	"version": "6.0.0",
 	"description": "Block library for the WordPress editor.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -67,7 +67,6 @@
 		"memize": "^1.1.0",
 		"micromodal": "^0.4.6",
 		"moment": "^2.22.1",
-		"react-easy-crop": "^3.0.0",
 		"tinycolor2": "^1.4.2"
 	},
 	"publishConfig": {

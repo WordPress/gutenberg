@@ -335,10 +335,13 @@ export function ColorEdit( props ) {
 		const newLinkColorValue = colorObject?.slug
 			? `var:preset|color|${ colorObject.slug }`
 			: value;
-		const newStyle = immutableSet(
-			style,
-			[ 'elements', 'link', 'color', 'text' ],
-			newLinkColorValue
+
+		const newStyle = cleanEmptyObject(
+			immutableSet(
+				style,
+				[ 'elements', 'link', 'color', 'text' ],
+				newLinkColorValue
+			)
 		);
 		props.setAttributes( { style: newStyle } );
 	};

@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/block-editor",
-	"version": "7.0.1",
+	"version": "7.0.2",
 	"description": "Generic block editor.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -32,7 +32,9 @@
 	],
 	"dependencies": {
 		"@babel/runtime": "^7.13.10",
+		"@react-spring/web": "^9.2.4",
 		"@wordpress/a11y": "file:../a11y",
+		"@wordpress/api-fetch": "file:../api-fetch",
 		"@wordpress/blob": "file:../blob",
 		"@wordpress/block-serialization-default-parser": "file:../block-serialization-default-parser",
 		"@wordpress/blocks": "file:../blocks",
@@ -65,7 +67,7 @@
 		"lodash": "^4.17.21",
 		"memize": "^1.1.0",
 		"react-autosize-textarea": "^7.1.0",
-		"react-spring": "^8.0.19",
+		"react-easy-crop": "^3.0.0",
 		"redux-multi": "^0.1.12",
 		"rememo": "^3.0.0",
 		"tinycolor2": "^1.4.2",

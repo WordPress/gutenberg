@@ -170,13 +170,12 @@ If no value exists this prop contains the slider starting position.
 -   Required: No
 -   Platform: Web | Mobile
 
-### isShiftStepEnabled
+#### isShiftStepEnabled
 
-If true, pressing `UP` or `DOWN` along with the `SHIFT` key will increment the value by the `shiftStep` value.
+Passed as a prop to the `NumberControl` component and is only applicable if `withInputField` is true. If true, while the number input has focus, pressing `UP` or `DOWN` along with the `SHIFT` key will change the value by the `shiftStep` value.
 
 -   Type: `Boolean`
 -   Required: No
--   Default: `true`
 
 #### marks
 
@@ -286,6 +285,13 @@ The stepping interval between `min` and `max` values. Step is used both for user
 -   Type: `Number`
 -   Required: No
 -   Platform: Web
+
+#### shiftStep
+
+Passed as a prop to the `NumberControl` component and is only applicable if `withInputField` and `isShiftStepEnabled` are both true and while the number input has focus. Acts as a multiplier of `step`.
+
+-   Type: `Number`
+-   Required: No
 
 #### trackColor
 
