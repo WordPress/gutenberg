@@ -10,6 +10,7 @@ export default function getInspectorSection() {
 			this.parentSection = options.parentSection;
 
 			this.returnFocusWhenClose = null;
+			this.isOpen = false;
 		}
 		ready() {
 			this.contentContainer[ 0 ].classList.add(
@@ -17,7 +18,7 @@ export default function getInspectorSection() {
 			);
 		}
 		isContextuallyActive() {
-			return this.active();
+			return this.isOpen;
 		}
 		onChangeExpanded( expanded, args ) {
 			super.onChangeExpanded( expanded, args );
@@ -46,6 +47,7 @@ export default function getInspectorSection() {
 			}
 		}
 		open( { returnFocusWhenClose } = {} ) {
+			this.setIsOpen( true );
 			this.returnFocusWhenClose = returnFocusWhenClose;
 
 			this.expand( {
@@ -56,6 +58,17 @@ export default function getInspectorSection() {
 			this.collapse( {
 				allowMultiple: true,
 			} );
+		}
+		collapse( opt ) {
+			this.setIsOpen( false );
+			super.collapse( opt );
+		}
+		setIsOpen( value ) {
+			this.isOpen = value;
+			this.triggerActiveCallbacks();
+		}
+		triggerActiveCallbacks() {
+			this.active.callbacks.fireWith( this.active, [ false, true ] );
 		}
 	};
 }
