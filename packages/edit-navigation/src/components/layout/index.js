@@ -37,6 +37,10 @@ import Editor from '../editor';
 import InserterSidebar from '../inserter-sidebar';
 import UnsavedChangesWarning from './unsaved-changes-warning';
 import { store as editNavigationStore } from '../../store';
+import {
+	NAVIGATION_POST_KIND,
+	NAVIGATION_POST_POST_TYPE,
+} from '../../constants';
 
 const interfaceLabels = {
 	/* translators: accessibility text for the navigation screen top bar landmark region. */
@@ -69,8 +73,8 @@ export default function Layout( { blockEditorSettings } ) {
 	} = useNavigationEditor();
 
 	const [ blocks, onInput, onChange ] = useEntityBlockEditor(
-		'root',
-		'postType',
+		NAVIGATION_POST_KIND,
+		NAVIGATION_POST_POST_TYPE,
 		{
 			id: navigationPost?.id,
 		}
