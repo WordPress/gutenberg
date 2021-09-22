@@ -2,26 +2,13 @@
 /**
  * WordPress dependencies
  */
-import { useMemo } from '@wordpress/element';
+import { useState, useMemo, useEffect } from '@wordpress/element';
 
 /**
  * Pluck the modified styles by matching the modifier in the selector name.
  * The style selectors should follow the BEM naming convetion e.g.
  *    block__element--modifier
  * The return styles are keyed by the block_element only.
- *
- * @example
- * ```
- * selectModifiedStyles(
- *   {
- *    'block__element': { width: '10px' },
- *    'block__element--narrow': { width: '1px' },
- *    'block__element--wide': {width: '100px'}
- *   },
- *   'wide'
- * );
- * // returns { block_element': { width: '100px' } }
- * ```
  *
  * @param {Object} styles
  * @param {string} modifier - the base modifier without the `--` prefix
@@ -40,83 +27,56 @@ function selectModifiedStyles( styles, modifier ) {
 	}, {} );
 }
 
-/**
- * Updates a styles object with modified styles if the update conditions are met.
- *
- * @example
- *
- * ```
- * updateStyles(
- *  {
- *    'block__element-A' : { width: '10px' },
- *    'block__element-B' : { 'font-family': 'Comic Sans' },
- *    'block__element-C' : { visibility : 'hidden' }
- *  },
- *  {
- *    'block__element-A' : { height: '10px' },
- *    'block__element-B' : { 'font-family' : 'Helvetica' },
- *    'block__element-Z' : { 'z-index' : 2147483647 }
- *  },
- *  [ true, true ]
- * );
- * // returns
- * // {
- * //   'block_element-A' : { width: '10px', height: '10px' },
- * //   'block-element-B' : { 'font-family' : 'Helvetica' },
- * //   'block-element-C' : { visibility : 'hidden' }
- * // }
- * ```
- * @param {Object} styles
- * @param {Object} styleUpdates
- * @param {Array<boolean>} updateConditions - Boolean conditions on when to apply updates
- *
- * @return {Object} - Updated styles object
- */
-function updateStyles( styles, styleUpdates, updateConditions ) {
-	// Test if the modifier conditions are met
-	const shouldUpdate = updateConditions.every( ( should ) => should );
-
-	if ( shouldUpdate ) {
-		Object.keys( styleUpdates ).forEach( ( selector ) => {
-			styles[ selector ] = {
-				...styles[ selector ],
-				...styleUpdates[ selector ],
-			};
-		} );
-	}
-	return styles;
+function isModifierEnabled( modifier, states ) {
+	return states[ modifier ]?.every( ( truthy ) => truthy );
 }
 
-function useModifiedStyle( baseStyles, modifiers ) {
-	// Memoize the modifier selectors
-	const modifierSelectors = useMemo( () => {
-		return Object.keys( modifiers );
-	}, [] );
+function mergeStyles( styles, styleUpdates ) {
+	return Object.keys( styleUpdates ).reduce(
+		( mergedStyles, selector ) => ( {
+			...mergedStyles,
+			[ selector ]: {
+				...mergedStyles[ selector ],
+				...styleUpdates[ selector ],
+			},
+		} ),
+		styles
+	);
+}
 
-	// Memoize the modified styles
-	const modifiedStyles = useMemo( () => {
-		const _modifiedStyles = {};
-		for ( const modifier in modifiers ) {
-			_modifiedStyles[ modifier ] = selectModifiedStyles(
-				baseStyles,
-				modifier
-			);
-		}
-		return _modifiedStyles;
-	}, [] );
+function useModifiedStyle( baseStyles, modifierStates ) {
+	const [ styles, setStyles ] = useState( baseStyles );
+	const modifiers = Object.keys( modifierStates );
 
-	const futureStyles = { ...baseStyles };
+	const updateStyles = useMemo( () => {
+		const modifiedBaseStyles = ( modifier ) =>
+			selectModifiedStyles( baseStyles, modifier );
 
-	// Apply the modifiers to the future styles
-	modifierSelectors.forEach( ( modifier ) => {
-		updateStyles(
-			futureStyles,
-			modifiedStyles[ modifier ],
-			modifiers[ modifier ]
+		const modifiedStyles = modifiers.reduce(
+			( mergedStyles, modifier ) => ( {
+				...mergedStyles,
+				[ modifier ]: modifiedBaseStyles( modifier ),
+			} ),
+			{ ...baseStyles }
 		);
-	} );
+		return ( updatedStyles, selector ) =>
+			mergeStyles( updatedStyles, modifiedStyles[ selector ] );
+	}, [] );
 
-	return futureStyles;
+	// Convert the modified states to string to satisfy the equality check.
+	const modifiedStatesString = Object.values( modifierStates ).toString();
+	useEffect( () => {
+		const enabledModifiers = ( modifier ) =>
+			isModifierEnabled( modifier, modifierStates );
+		const activeModifiers = modifiers.filter( enabledModifiers );
+		const updatedStyles = activeModifiers.reduce( updateStyles, {
+			...styles,
+		} );
+
+		setStyles( updatedStyles );
+	}, [ modifiedStatesString ] );
+
+	return styles;
 }
 
 export default useModifiedStyle;
