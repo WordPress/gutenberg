@@ -226,6 +226,35 @@ describe( 'Basic rendering', () => {
 
 			expect( isEditing() ).toBe( false );
 		} );
+
+		it( 'should display human friendly error message if value URL prop is empty when component is forced into no-editing (preview) mode', async () => {
+			// occasionally forceIsEditingLink is set explictly to `false` which causes the link UI to render
+			// it's preview even if the `value` has no URL.
+			const valueWithEmptyURL = {
+				url: '',
+				id: 123,
+				type: 'post',
+			};
+
+			act( () => {
+				render(
+					<LinkControl
+						value={ valueWithEmptyURL }
+						forceIsEditingLink={ false }
+					/>,
+					container
+				);
+			} );
+
+			const linkPreview = queryByRole( container, 'generic', {
+				name: 'Currently selected',
+			} );
+
+			const isPreviewError = linkPreview.classList.contains( 'is-error' );
+			expect( isPreviewError ).toBe( true );
+
+			expect( queryByText( linkPreview, 'Link is empty' ) ).toBeTruthy();
+		} );
 	} );
 
 	describe( 'Unlinking', () => {
