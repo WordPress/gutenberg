@@ -450,14 +450,11 @@ export class ImageEdit extends Component {
 			: width;
 	}
 
-	setMappedAttributes( { url: href, ...restAttributes } ) {
+	setMappedAttributes( { url: href, linkDestination, ...restAttributes } ) {
 		const { setAttributes } = this.props;
-		let linkDestination;
-		if ( restAttributes.linkDestination ) {
-			linkDestination = restAttributes.linkDestination;
-		} else if ( ! href && ! restAttributes.linkDestination ) {
+		if ( ! href && ! linkDestination ) {
 			linkDestination = LINK_DESTINATION_NONE;
-		} else {
+		} else if ( ! linkDestination ) {
 			linkDestination = LINK_DESTINATION_CUSTOM;
 		}
 
