@@ -164,7 +164,7 @@ export function useToolsPanel(
 		registerPanelItem,
 		deregisterPanelItem,
 		flagItemCustomization,
-		hasMenuItems: panelItems.length,
+		hasMenuItems: !! panelItems.length,
 		isResetting: isResetting.current,
 	};
 

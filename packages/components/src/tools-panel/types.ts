@@ -111,7 +111,7 @@ export type ToolsPanelMenuItems = {
 export type ToolsPanelContext = {
 	panelId?: string;
 	menuItems?: ToolsPanelMenuItems;
-	hasMenuItems?: number;
+	hasMenuItems?: boolean;
 	registerPanelItem: ( item: ToolsPanelItem ) => void;
 	deregisterPanelItem: ( label: string ) => void;
 	flagItemCustomization: ( label: string ) => void;
