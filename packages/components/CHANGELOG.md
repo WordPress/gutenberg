@@ -10,7 +10,7 @@
 
 ### Bug Fix
 
--   Fixed rounding of value in `RangeControl` component when it looses focus while the `SHIFT` key is held. ([#34363](https://github.com/WordPress/gutenberg/issues/34363)).
+-   Fixed rounding of value in `RangeControl` component when it loses focus while the `SHIFT` key is held. ([#35020](https://github.com/WordPress/gutenberg/pull/35020)).
 
 ### Internal
 
