@@ -26,9 +26,8 @@ const LINK_DESTINATION_CUSTOM = 'custom';
 
 function LinkDestination( {
 	children,
-	currentOption,
+	isSelected,
 	label,
-	option,
 	onPress,
 	value,
 	valueStyle,
@@ -42,7 +41,7 @@ function LinkDestination( {
 			icon={ check }
 			iconStyle={ StyleSheet.flatten( [
 				optionIcon,
-				currentOption !== option && styles.unselectedOptionIcon,
+				! isSelected && styles.unselectedOptionIcon,
 			] ) }
 			label={ label }
 			leftAlign
@@ -106,21 +105,20 @@ function ImageLinkDestinationsScreen( props ) {
 			</BottomSheet.NavBar>
 			<PanelBody>
 				<LinkDestination
-					currentOption={ linkDestination }
-					option={ LINK_DESTINATION_NONE }
+					isSelected={ linkDestination === LINK_DESTINATION_NONE }
 					label={ __( 'None' ) }
 					onPress={ setLinkDestination( LINK_DESTINATION_NONE ) }
 				/>
 				<LinkDestination
-					currentOption={ linkDestination }
-					option={ LINK_DESTINATION_MEDIA }
+					isSelected={ linkDestination === LINK_DESTINATION_MEDIA }
 					label={ __( 'Media File' ) }
 					onPress={ setLinkDestination( LINK_DESTINATION_MEDIA ) }
 				/>
 				{ !! attachmentPageUrl && (
 					<LinkDestination
-						currentOption={ linkDestination }
-						option={ LINK_DESTINATION_ATTACHMENT }
+						isSelected={
+							linkDestination === LINK_DESTINATION_ATTACHMENT
+						}
 						label={ __( 'Attachment Page' ) }
 						onPress={ setLinkDestination(
 							LINK_DESTINATION_ATTACHMENT
@@ -128,8 +126,7 @@ function ImageLinkDestinationsScreen( props ) {
 					/>
 				) }
 				<LinkDestination
-					currentOption={ linkDestination }
-					option={ LINK_DESTINATION_CUSTOM }
+					isSelected={ linkDestination === LINK_DESTINATION_CUSTOM }
 					label={ __( 'Custom URL' ) }
 					onPress={ goToLinkPicker }
 					value={ customUrlSet ? inputValue : '' }
