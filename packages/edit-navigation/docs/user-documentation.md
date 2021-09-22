@@ -1,6 +1,6 @@
 Note: this documentation is a work in progress.
 
-# Block-based menu editor
+# Block-based navigation editor
 
 The Block-based Navigation Editor brings the power of blocks to the Appearance > Navigation section in the WordPress Administration Screens allowing you use blocks to create menus.
 
@@ -8,9 +8,13 @@ The Block-based Navigation Editor brings the power of blocks to the Appearance >
 
 The interface replicates the Post Editor experience, allowing you to use similar workflows like drag and drop.
 
-The editor provides access to all the menus created using the previous Menu screen in WordPress.
+The editor provides access to any menus created using the previous Menus screen in WordPress.
 
-New menus can also easily be created, providing options to easily create a menu from an existing page hierarchy, by copying an existing menu, or creating a blank menu.
+New menus can easily be created, options are provided to do so in a few different ways:
+* from an existing page hierarchy
+* by copying an existing menu
+* by creating a blank menu
+
 
 Rather than the paragraph being the go-to block, the Navigation Editor provides a link block for creating links to different types of items. Page, post, tag, category and custom links can all be created. Links can be nested to create sub-menus.
 
@@ -20,15 +24,25 @@ Rather than the paragraph being the go-to block, the Navigation Editor provides 
 2. Type the name of your menu.
 3. Choose a starting option of either 'Start blank', 'Add all pages', or 'Copy existing menu'.
 
-### How to add a block
+### How to insert a link
+
+If you'd like to link to a page, post, tag, or category:
 
 1. Click one of the `+` buttons.
 2. Select the type of link you want to add.
-3. Use the dialog to search for the item you want to link to. For a custom link, type in a URL and hit 'Enter'.
+3. Use the dialog to search for the item you want to link to.
 
-### How to add a submenu block
+For a custom link:
 
-There are two ways to create a submenu, the first option is to create a new submenu from scratch:
+1. Click one of the `+` buttons.
+2. Select the 'Custom Link' block.
+3. Using the dialog that appears, type in a URL and press 'Enter'.
+
+### How to insert a submenu
+
+There are two ways to insert a submenu.
+
+The first option is to create a new submenu from scratch:
 
 1. Click one of the `+` buttons.
 2. Select the 'Submenu' block.
