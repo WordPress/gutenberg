@@ -20,6 +20,7 @@ const fallbackVariations = [
 		title: __( 'Custom Link' ),
 		description: __( 'A link to a custom URL.' ),
 		attributes: {},
+		scope: [ 'block' ],
 	},
 	{
 		name: 'post',
@@ -27,6 +28,7 @@ const fallbackVariations = [
 		title: __( 'Post Link' ),
 		description: __( 'A link to a post.' ),
 		attributes: { type: 'post', kind: 'post-type' },
+		scope: [ 'block' ],
 	},
 	{
 		name: 'page',
@@ -34,6 +36,7 @@ const fallbackVariations = [
 		title: __( 'Page Link' ),
 		description: __( 'A link to a page.' ),
 		attributes: { type: 'page', kind: 'post-type' },
+		scope: [ 'block' ],
 	},
 	{
 		name: 'category',
@@ -41,6 +44,7 @@ const fallbackVariations = [
 		title: __( 'Category Link' ),
 		description: __( 'A link to a category.' ),
 		attributes: { type: 'category', kind: 'taxonomy' },
+		scope: [ 'block' ],
 	},
 	{
 		name: 'tag',
@@ -48,6 +52,7 @@ const fallbackVariations = [
 		title: __( 'Tag Link' ),
 		description: __( 'A link to a tag.' ),
 		attributes: { type: 'tag', kind: 'taxonomy' },
+		scope: [ 'block' ],
 	},
 ];
 

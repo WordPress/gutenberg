@@ -270,6 +270,7 @@ function build_variation_for_navigation_link( $entity, $kind ) {
 			'type' => $entity->name,
 			'kind' => $kind,
 		),
+		'scope'       => array( 'block' ),
 	);
 
 	// Tweak some value for the variations.
