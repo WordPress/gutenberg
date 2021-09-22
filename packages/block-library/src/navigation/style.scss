@@ -330,7 +330,7 @@
 // Vertical layout
 .is-vertical .wp-block-page-list, // Page list.
 .is-vertical .wp-block-navigation__container {
-	display: block;
+	display: flex;
 	flex-direction: column;
 	align-items: flex-start;
 }

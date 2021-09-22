@@ -35,6 +35,7 @@ import {
 	default as DimensionsPanel,
 	useHasDimensionsPanel,
 } from './dimensions-panel';
+import { StylePreview } from './global-styles/preview';
 
 function getPanelTitle( blockName ) {
 	const blockType = getBlockType( blockName );
@@ -188,6 +189,11 @@ export default function GlobalStylesSidebar() {
 		>
 			<Navigation>
 				<NavigationMenu>
+					<NavigationGroup>
+						<NavigationItem>
+							<StylePreview />
+						</NavigationItem>
+					</NavigationGroup>
 					<GlobalStylesLevel
 						context={ root }
 						getStyle={ getStyle }
