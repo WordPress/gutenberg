@@ -116,3 +116,10 @@
 .block-editor-block-patterns-list__list-item .has-parallax.wp-block-cover {
 	background-attachment: scroll;
 }
+
+.cover-block__cover-placeholder-container {
+	background: white;
+	.block-editor-media-placeholder {
+		box-shadow: none;
+	}
+}
