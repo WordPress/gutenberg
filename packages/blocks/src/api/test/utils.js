@@ -19,7 +19,7 @@ import {
 	getBlockLabel,
 	__experimentalSanitizeBlockAttributes,
 	__experimentalGetBlockAttributesNamesByRole,
-	__experimentalStripInternalBlockAttributes,
+	__experimentalRemoveAttributesByRole,
 } from '../utils';
 
 describe( 'block helpers', () => {
@@ -401,7 +401,7 @@ describe( '__experimentalGetBlockAttributesNamesByRole', () => {
 	} );
 } );
 
-describe( '__experimentalStripInternalBlockAttributes', () => {
+describe( '__experimentalRemoveAttributesByRole', () => {
 	beforeAll( () => {
 		registerBlockType( 'core/test-block-with-internal-attrs', {
 			attributes: {
@@ -450,30 +450,33 @@ describe( '__experimentalStripInternalBlockAttributes', () => {
 
 	it( 'should return empty object if no attributes are passed', () => {
 		expect(
-			__experimentalStripInternalBlockAttributes(
+			__experimentalRemoveAttributesByRole(
 				'core/test-block-with-internal-attrs',
-				{}
+				{},
+				'internal'
 			)
 		).toEqual( {} );
 	} );
-	it( 'should return all attributes when block has no attributes with internal role', () => {
+	it( 'should return all attributes when block has no attributes with given role', () => {
 		expect(
-			__experimentalStripInternalBlockAttributes(
+			__experimentalRemoveAttributesByRole(
 				'core/test-block-with-no-internal-attrs',
-				{ align: 'left', color: 'blue' }
+				{ align: 'left', color: 'blue' },
+				'internal'
 			)
 		).toEqual( { align: 'left', color: 'blue' } );
 	} );
-	it( 'should remove attributes with internal role and return all others', () => {
+	it( 'should remove attributes with given role and return all others', () => {
 		expect(
-			__experimentalStripInternalBlockAttributes(
+			__experimentalRemoveAttributesByRole(
 				'core/test-block-with-internal-attrs',
 				{
 					align: 'left',
 					internalData: true,
 					productId: 12345,
 					color: 'blue',
-				}
+				},
+				'internal'
 			)
 		).toEqual( { align: 'left', color: 'blue' } );
 	} );
