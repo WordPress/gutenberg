@@ -28,11 +28,6 @@ export function useToolsPanelItem(
 		...otherProps
 	} = useContextSystem( props, 'ToolsPanelItem' );
 
-	const cx = useCx();
-	const classes = useMemo( () => {
-		return cx( styles.ToolsPanelItem, className );
-	}, [ className ] );
-
 	const {
 		panelId: currentPanelId,
 		menuItems,
@@ -40,6 +35,7 @@ export function useToolsPanelItem(
 		deregisterPanelItem,
 		flagItemCustomization,
 		isResetting,
+		shouldRenderPlaceholderItems: shouldRenderPlaceholder,
 	} = useToolsPanelContext();
 
 	const hasValueCallback = useCallback( hasValue, [ panelId ] );
@@ -108,9 +104,20 @@ export function useToolsPanelItem(
 		? menuItems?.[ menuGroup ]?.[ label ] !== undefined
 		: isMenuItemChecked;
 
+	const placeholderStyle =
+		shouldRenderPlaceholder &&
+		! isShown &&
+		styles.ToolsPanelItemPlaceholder;
+
+	const cx = useCx();
+	const classes = useMemo( () => {
+		return cx( styles.ToolsPanelItem, placeholderStyle, className );
+	}, [ isShown, shouldRenderPlaceholder, className ] );
+
 	return {
 		...otherProps,
 		isShown,
+		shouldRenderPlaceholder,
 		className: classes,
 	};
 }

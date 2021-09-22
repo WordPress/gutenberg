@@ -238,6 +238,59 @@ describe( 'ToolsPanel', () => {
 		} );
 	} );
 
+	describe( 'application of is-empty class to panel', () => {
+		it( 'should include is-empty class when no controls displayed', () => {
+			const { container } = render(
+				<ToolsPanel { ...defaultProps }>
+					<ToolsPanelItem { ...altControlProps }>
+						<div>Only optional controls</div>
+					</ToolsPanelItem>
+				</ToolsPanel>
+			);
+
+			const panel = getPanel( container );
+			const isEmpty = panel.classList.contains( 'is-empty' );
+
+			expect( isEmpty ).toBe( true );
+		} );
+
+		it( 'should omit is-empty class if there are default controls', () => {
+			const { container } = render(
+				<ToolsPanel { ...defaultProps }>
+					<ToolsPanelItem
+						{ ...controlProps }
+						isShownByDefault={ true }
+					>
+						<div>Default control</div>
+					</ToolsPanelItem>
+					<ToolsPanelItem { ...altControlProps }>
+						<div>Optional control</div>
+					</ToolsPanelItem>
+				</ToolsPanel>
+			);
+
+			const panel = getPanel( container );
+			const isEmpty = panel.classList.contains( 'is-empty' );
+
+			expect( isEmpty ).toBe( false );
+		} );
+
+		it( 'should omit is-empty class if at least one optional control is displayed', () => {
+			const { container } = render(
+				<ToolsPanel { ...defaultProps }>
+					<ToolsPanelItem { ...controlProps }>
+						<div>Optional control with value and displayed</div>
+					</ToolsPanelItem>
+				</ToolsPanel>
+			);
+
+			const panel = getPanel( container );
+			const isEmpty = panel.classList.contains( 'is-empty' );
+
+			expect( isEmpty ).toBe( false );
+		} );
+	} );
+
 	describe( 'conditional rendering of panel items', () => {
 		it( 'should render panel item when it has a value', () => {
 			renderPanel();
@@ -309,6 +362,30 @@ describe( 'ToolsPanel', () => {
 
 			// Groups should be: default controls, optional controls & reset all.
 			expect( menuGroups.length ).toEqual( 3 );
+		} );
+
+		it( 'should render placeholder items when panel opts into that feature', () => {
+			const { container } = render(
+				<ToolsPanel
+					{ ...defaultProps }
+					shouldRenderPlaceholderItems={ true }
+				>
+					<ToolsPanelItem { ...altControlProps }>
+						<div>Optional control</div>
+					</ToolsPanelItem>
+				</ToolsPanel>
+			);
+
+			const optionalItem = screen.queryByText( 'Optional control' );
+			const placeholder = container.querySelector(
+				'.components-tools-panel-item'
+			);
+
+			// When rendered as a placeholder a ToolsPanelItem will just omit
+			// all the item's children. So we should still find the container
+			// element but not the text etc within.
+			expect( optionalItem ).not.toBeInTheDocument();
+			expect( placeholder ).toBeInTheDocument();
 		} );
 	} );
 

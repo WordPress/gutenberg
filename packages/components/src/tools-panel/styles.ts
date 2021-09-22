@@ -29,10 +29,10 @@ export const ToolsPanel = css`
 		grid-template-columns: 1fr 1fr;
 		row-gap: ${ space( 6 ) };
 		grid-column: span 2;
+	}
 
-		&:empty {
-			display: none;
-		}
+	&.is-empty .components-tools-panel__items-wrapper {
+		display: none;
 	}
 `;
 
@@ -86,6 +86,10 @@ export const ToolsPanelItem = css`
 			margin-bottom: 0;
 		}
 	}
+`;
+
+export const ToolsPanelItemPlaceholder = css`
+	display: none;
 `;
 
 export const DropdownMenu = css`
