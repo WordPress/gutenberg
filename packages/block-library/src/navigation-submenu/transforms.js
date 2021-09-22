@@ -8,12 +8,14 @@ const transforms = {
 		{
 			type: 'block',
 			blocks: [ 'core/navigation-link' ],
+			isMatch: ( attributes, block ) => block?.innerBlocks?.length === 0,
 			transform: ( attributes ) =>
 				createBlock( 'core/navigation-link', attributes ),
 		},
 		{
 			type: 'block',
 			blocks: [ 'core/spacer' ],
+			isMatch: ( attributes, block ) => block?.innerBlocks?.length === 0,
 			transform: () => {
 				return createBlock( 'core/spacer' );
 			},
@@ -21,6 +23,7 @@ const transforms = {
 		{
 			type: 'block',
 			blocks: [ 'core/site-logo' ],
+			isMatch: ( attributes, block ) => block?.innerBlocks?.length === 0,
 			transform: () => {
 				return createBlock( 'core/site-logo' );
 			},
@@ -28,6 +31,7 @@ const transforms = {
 		{
 			type: 'block',
 			blocks: [ 'core/home-link' ],
+			isMatch: ( attributes, block ) => block?.innerBlocks?.length === 0,
 			transform: () => {
 				return createBlock( 'core/home-link' );
 			},
@@ -35,6 +39,7 @@ const transforms = {
 		{
 			type: 'block',
 			blocks: [ 'core/social-links' ],
+			isMatch: ( attributes, block ) => block?.innerBlocks?.length === 0,
 			transform: () => {
 				return createBlock( 'core/social-links' );
 			},
@@ -42,6 +47,7 @@ const transforms = {
 		{
 			type: 'block',
 			blocks: [ 'core/search' ],
+			isMatch: ( attributes, block ) => block?.innerBlocks?.length === 0,
 			transform: () => {
 				return createBlock( 'core/search' );
 			},
