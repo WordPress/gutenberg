@@ -60,7 +60,7 @@ export default function LinkPreview( {
 				'is-rich': hasRichData,
 				'is-fetching': !! isFetching,
 				'is-preview': true,
-				'is-empty': isEmptyURL,
+				'is-error': isEmptyURL,
 			} ) }
 		>
 			<div className="block-editor-link-control__search-item-top">
