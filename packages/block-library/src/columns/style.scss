@@ -164,3 +164,10 @@
 		width: 100%;
 	}
 }
+
+// Once blocks are nested within columns that are vertically aligned, if they
+// are then aligned themselves full, wide etc they get auto margins effectively
+// shrinking their width.
+html :where(.wp-block-column[class*="is-vertically-aligned"] > .wp-block) {
+	width: 100%;
+}
