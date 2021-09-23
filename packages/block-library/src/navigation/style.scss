@@ -272,21 +272,22 @@
 // When justified space-between, open submenus leftward for last menu item.
 // When justified right, open all submenus leftwards.
 // This needs high specificity.
-.wp-block-navigation.items-justified-space-between
-.wp-block-page-list > .has-child:last-child,
-.wp-block-navigation.items-justified-space-between > .wp-block-navigation__container > .has-child:last-child,
-.wp-block-navigation.items-justified-right .wp-block-page-list > .has-child,
-.wp-block-navigation.items-justified-right > .wp-block-navigation__container
-.has-child {
-	// First submenu.
-	.wp-block-navigation__submenu-container {
-		left: auto;
-		right: 0;
-
-		// Nested submenus.
+// On smaller breakpoints, menus open downwards.
+@include break-medium {
+	.wp-block-navigation.items-justified-space-between .wp-block-page-list > .has-child:last-child,
+	.wp-block-navigation.items-justified-space-between > .wp-block-navigation__container > .has-child:last-child,
+	.wp-block-navigation.items-justified-right .wp-block-page-list > .has-child,
+	.wp-block-navigation.items-justified-right .wp-block-navigation__container .has-child {
+		// First submenu.
 		.wp-block-navigation__submenu-container {
 			left: auto;
-			right: 100%;
+			right: 0;
+
+			// Nested submenus.
+			.wp-block-navigation__submenu-container {
+				left: auto;
+				right: 100%;
+			}
 		}
 	}
 }
@@ -439,6 +440,12 @@
 		.wp-block-navigation-item {
 			color: inherit !important;
 			background: transparent !important;
+		}
+
+		// Override justification dropdown menu positioning rules.
+		.wp-block-navigation__submenu-container.wp-block-navigation__submenu-container.wp-block-navigation__submenu-container.wp-block-navigation__submenu-container {
+			right: auto;
+			left: auto;
 		}
 	}
 
