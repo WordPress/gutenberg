@@ -21,7 +21,7 @@ import { withWeakMapCache, getNormalizedCommaSeparable } from '../utils';
  *                                   item objects.
  * @property {?(number[])} include   Specific item IDs to include.
  * @property {string}      context   Scope under which the request is made;
- *                                   determines fields present in response.
+ *                                   determines returned fields in response.
  */
 
 /**
