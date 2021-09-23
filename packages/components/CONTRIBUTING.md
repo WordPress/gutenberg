@@ -293,7 +293,7 @@ All components, in addition to being typed, should be using JSDoc when necessary
 
 Each component that is exported from the `@wordpress/components` package should include a `README.md` file, explaining how to use the component, showing examples, and documenting all the props.
 
-##### Readme example
+## Readme example
 
 ```md
 # `ComponentName`
