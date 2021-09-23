@@ -95,7 +95,7 @@ export default function save( { attributes } ) {
 					dimRatioToClass( dimRatio ),
 					'wp-block-cover__gradient-background',
 					gradientClass,
-					{ 'has-background-dim': dimRatio !== 0 }
+					{ 'has-background-dim': dimRatio !== undefined }
 				) }
 				style={
 					customGradient ? { background: customGradient } : undefined

@@ -703,7 +703,7 @@ function CoverEdit( {
 						{ [ overlayColor.class ]: overlayColor.class },
 						'wp-block-cover__gradient-background',
 						gradientClass,
-						{ 'has-background-dim': dimRatio !== 0 }
+						{ 'has-background-dim': dimRatio !== undefined }
 					) }
 					style={ { backgroundImage: gradientValue, ...bgStyle } }
 				/>
