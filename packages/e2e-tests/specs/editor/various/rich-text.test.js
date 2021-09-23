@@ -384,7 +384,9 @@ describe( 'RichText', () => {
 		await pressKeyWithModifier( 'primary', 'a' );
 		await clickBlockToolbarButton( 'More' );
 
-		const button = await page.waitForXPath( `//button[text()='Color']` );
+		const button = await page.waitForXPath(
+			`//button[text()='Highlight']`
+		);
 		// Clicks may fail if the button is out of view. Assure it is before click.
 		await button.evaluate( ( element ) => element.scrollIntoView() );
 		await button.click();
