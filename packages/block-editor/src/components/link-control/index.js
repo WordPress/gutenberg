@@ -137,7 +137,7 @@ function LinkControl( {
 	);
 	const isEndingEditWithFocus = useRef( false );
 
-	const currentInputNotEmpty = currentInputValue?.trim()?.length;
+	const currentInputIsEmpty = ! currentInputValue?.trim()?.length;
 
 	useEffect( () => {
 		if (
@@ -238,7 +238,7 @@ function LinkControl( {
 										const { keyCode } = event;
 										if (
 											keyCode === ENTER &&
-											currentInputNotEmpty // disallow submitting empty values.
+											! currentInputIsEmpty // disallow submitting empty values.
 										) {
 											event.preventDefault();
 											handleSubmitButton();
@@ -247,7 +247,7 @@ function LinkControl( {
 									label={ __( 'Submit' ) }
 									icon={ keyboardReturn }
 									className="block-editor-link-control__search-submit"
-									disabled={ ! currentInputNotEmpty } // disallow submitting empty values.
+									disabled={ currentInputIsEmpty } // disallow submitting empty values.
 								/>
 							</div>
 						</LinkControlSearchInput>
