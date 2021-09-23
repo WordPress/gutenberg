@@ -86,8 +86,6 @@ function ColumnEdit( {
 	}, [] );
 
 	const onChangeWidth = ( nextWidth ) => {
-		// Rounds the number to 1 decimal place max.
-		nextWidth = Math.round( nextWidth * 10 ) / 10;
 		const widthWithUnit = getWidthWithUnit( nextWidth, widthUnit );
 
 		setAttributes( {
