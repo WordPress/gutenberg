@@ -8,6 +8,7 @@ import {
 	__experimentalRegisterExperimentalCoreBlocks,
 } from '@wordpress/block-library';
 import {
+	registerInternalWidgetIds,
 	registerLegacyWidgetBlock,
 	registerLegacyWidgetVariations,
 	registerWidgetGroupBlock,
@@ -59,6 +60,8 @@ export function initialize( editorName, blockEditorSettings ) {
 			block.name.startsWith( 'core/navigation' )
 		);
 	} );
+
+	registerInternalWidgetIds();
 	registerCoreBlocks( coreBlocks );
 	registerLegacyWidgetBlock();
 	if ( process.env.IS_GUTENBERG_PLUGIN ) {

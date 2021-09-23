@@ -27,8 +27,13 @@ export function getWidgetIdFromBlock( block ) {
  * @return {Block} The updated block.
  */
 export function addWidgetIdToBlock( block, widgetId ) {
-	block.attributes.__internalWidgetId = widgetId;
-	return block;
+	return {
+		...block,
+		attributes: {
+			...( block.attributes || {} ),
+			__internalWidgetId: widgetId,
+		},
+	};
 }
 
 /**
@@ -39,7 +44,7 @@ export function addWidgetIdToBlock( block, widgetId ) {
  *
  * @return {Object} Updated block settings.
  */
-function addAttributes( settings ) {
+function addInternalWidgetIdAttribute( settings ) {
 	return {
 		...settings,
 		attributes: {
@@ -52,8 +57,10 @@ function addAttributes( settings ) {
 	};
 }
 
-addFilter(
-	'blocks.registerBlockType',
-	'core/widget/addAttributes',
-	addAttributes
-);
+export function registerInternalWidgetIds() {
+	addFilter(
+		'blocks.registerBlockType',
+		'core/widget/addAttributes',
+		addInternalWidgetIdAttribute
+	);
+}
