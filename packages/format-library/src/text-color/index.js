@@ -18,7 +18,7 @@ import { removeFormat } from '@wordpress/rich-text';
 import { default as InlineColorUI, getActiveColors } from './inline';
 
 const name = 'core/text-color';
-const title = __( 'Color' );
+const title = __( 'Highlight' );
 
 const EMPTY_ARRAY = [];
 
