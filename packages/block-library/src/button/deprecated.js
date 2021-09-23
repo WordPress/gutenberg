@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { isEmpty, isObject, identity, mapValues, omit, pickBy } from 'lodash';
+import { omit } from 'lodash';
 import classnames from 'classnames';
 
 /**
@@ -19,21 +19,9 @@ import {
 import { compose } from '@wordpress/compose';
 
 /**
- * Removed empty nodes from nested objects.
- *
- * @param {Object} object
- * @return {Object} Object cleaned from empty nodes.
+ * Internal dependencies
  */
-export const cleanEmptyObject = ( object ) => {
-	if ( ! isObject( object ) || Array.isArray( object ) ) {
-		return object;
-	}
-	const cleanedNestedObjects = pickBy(
-		mapValues( object, cleanEmptyObject ),
-		identity
-	);
-	return isEmpty( cleanedNestedObjects ) ? undefined : cleanedNestedObjects;
-};
+import cleanEmptyObject from '../utils/clean-empty-object';
 
 const migrateBorderRadius = ( attributes ) => {
 	const { borderRadius, ...newAttributes } = attributes;
