@@ -47,8 +47,7 @@
 
 .edit-navigation-empty-state {
 	max-width: $navigation-editor-width;
-	margin-left: auto;
-	margin-right: auto;
+	margin: $grid-unit-40 auto 0 auto;
 	@include break-medium() {
 		// Match the padding top of the editor canvas.
 		margin-top: $navigation-editor-spacing-top;
