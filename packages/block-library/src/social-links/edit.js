@@ -45,7 +45,7 @@ const getDefaultBlockLayout = ( blockTypeOrName ) => {
 };
 
 export function SocialLinksEdit( props ) {
-	const [ backgroundBackup, setbackgroundBackup ] = useState( undefined );
+	const [ backgroundBackup, setbackgroundBackup ] = useState( {} );
 	const {
 		name,
 		attributes,
@@ -59,6 +59,7 @@ export function SocialLinksEdit( props ) {
 
 	const {
 		iconBackgroundColorValue,
+		customIconBackgroundColor,
 		iconColorValue,
 		openInNewTab,
 		size,
@@ -73,14 +74,18 @@ export function SocialLinksEdit( props ) {
 		: false;
 	useEffect( () => {
 		if ( logosOnly ) {
-			setbackgroundBackup( iconBackgroundColorValue );
+			setbackgroundBackup( {
+				iconBackgroundColor,
+				iconBackgroundColorValue,
+				customIconBackgroundColor,
+			} );
 			setAttributes( {
 				iconBackgroundColor: undefined,
 				customIconBackgroundColor: undefined,
 				iconBackgroundColorValue: undefined,
 			} );
 		} else {
-			setAttributes( { iconBackgroundColorValue: backgroundBackup } );
+			setAttributes( { ...backgroundBackup } );
 		}
 	}, [ logosOnly, setAttributes ] );
 
