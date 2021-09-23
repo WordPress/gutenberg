@@ -949,26 +949,9 @@ export const blocks = flow(
 	order( state = {}, action ) {
 		switch ( action.type ) {
 			case 'RECEIVE_BLOCKS': {
-				// console.log( 'HERE' );
 				const blockOrder = mapBlockOrder( action.blocks );
-
-				// console.log( {
-				// 	state,
-				// 	blockOrder,
-				// 	omitBlockOrder: omit( blockOrder, '' ),
-				// 	emptyState: state?.[ '' ] || [],
-				// } );
-
-				// console.log( {
-				// 	newState: {
-				// 		...state,
-				// 		...omit( blockOrder, '' ),
-				// 		'': ( state?.[ '' ] || [] ).concat( blockOrder ),
-				// 	},
-				// } );
-
 				return {
-					state,
+					...state,
 					...omit( blockOrder, '' ),
 					'': ( state?.[ '' ] || [] ).concat( blockOrder ),
 				};
