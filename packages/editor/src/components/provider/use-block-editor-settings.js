@@ -157,7 +157,7 @@ function useBlockEditorSettings( settings, hasTemplate ) {
 			__experimentalUndo: undo,
 			outlineMode: hasTemplate,
 			__experimentalCreateEntity: createEntity,
-			__experimentalUserCanCreate:
+			__experimentalUserCanCreateEntities:
 				userCanCreatePosts && userCanCreatePages,
 		} ),
 		[

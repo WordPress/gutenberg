@@ -51,7 +51,7 @@ function InlineLinkUI( {
 
 		return {
 			createEntity: _settings.__experimentalCreateEntity,
-			userCanCreate: _settings.__experimentalUserCanCreate,
+			userCanCreate: _settings.__experimentalUserCanCreateEntities,
 		};
 	}, [] );
 
