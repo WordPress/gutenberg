@@ -295,7 +295,7 @@ Each component that is exported from the `@wordpress/components` package should 
 ##### Readme example
 
 ```
-# ComponentName
+# `ComponentName`
 
 <!-- If component is experimental, add the following section: -->
 <div class="callout callout-alert">
