@@ -361,4 +361,37 @@ describe( 'Image', () => {
 		// broken temporary URL.
 		expect( await getEditedPostContent() ).toMatchSnapshot();
 	} );
+
+	it( 'should align right and have visible toolbar', async () => {
+		await insertBlock( 'Image' );
+		const filename1 = await upload( '.wp-block-image input[type="file"]' );
+		await waitForImage( filename1 );
+
+		const regex1 = new RegExp(
+			`<!-- wp:image {"id":\\d+,"sizeSlug":"full","linkDestination":"none"} -->\\s*<figure class="wp-block-image size-full"><img src="[^"]+\\/${ filename1 }\\.png" alt="" class="wp-image-\\d+"/></figure>\\s*<!-- \\/wp:image -->`
+		);
+		expect( await getEditedPostContent() ).toMatch( regex1 );
+
+		await clickBlockToolbarButton( 'Align' );
+		await clickButton( 'Align right' );
+
+		const regex2 = new RegExp(
+			`<!-- wp:image {"align":"right","id":\\d+,"sizeSlug":"full","linkDestination":"none"} -->\\s*<div class="wp-block-image"><figure class="alignright size-full"><img src="[^"]+\\/${ filename1 }\\.png" alt="" class="wp-image-\\d+"/></figure></div>\\s*<!-- \\/wp:image -->`
+		);
+
+		expect( await getEditedPostContent() ).toMatch( regex2 );
+
+		// Ensure that the end of the toolbar is not hidden.
+		// The page should not have to scroll horizontall to access the toolbar.
+		// See: https://github.com/WordPress/gutenberg/pull/35082.
+		await clickBlockToolbarButton( 'Options' );
+
+		const scrollLeft = await page.evaluate( () => {
+			return wp.dom.getScrollContainer(
+				document.querySelector( '.wp-block' )
+			).scrollLeft;
+		} );
+
+		expect( scrollLeft ).toBe( 0 );
+	} );
 } );
