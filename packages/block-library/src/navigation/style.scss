@@ -128,6 +128,10 @@
 				display: flex;
 				flex-grow: 1;
 
+				// Without this, the changing to zero on hover-out can cause wrapping and
+				// result in an invinite hover/hover-out loop.
+				white-space: nowrap;
+
 				// Right-align the chevron in submenus.
 				.wp-block-navigation__submenu-icon {
 					margin-right: 0;
@@ -171,9 +175,6 @@
 			}
 		}
 	}
-
-	// Separating out hover and focus-within so hover works again on IE: https://davidwalsh.name/css-focus-within#comment-513401
-	// We will need to replace focus-within with a JS solution for IE keyboard support.
 
 	// Custom menu items.
 	// Show submenus on hover unless they open on click.
