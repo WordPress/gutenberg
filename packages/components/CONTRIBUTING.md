@@ -297,7 +297,7 @@ Each component that is exported from the `@wordpress/components` package should 
 ```
 # ComponentName
 
-If component is experimental, add the following section:
+<!-- If component is experimental, add the following section: -->
 <div class="callout callout-alert">
 This feature is still experimental. “Experimental” means this is an early implementation subject to drastic and breaking changes.
 </div>
