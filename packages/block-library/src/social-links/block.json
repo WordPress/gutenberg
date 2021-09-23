@@ -25,9 +25,6 @@
 		"iconBackgroundColorValue": {
 			"type": "string"
 		},
-		"preveIconBackgroundColorValue": {
-			"type": "string"
-		},
 		"openInNewTab": {
 			"type": "boolean",
 			"default": false

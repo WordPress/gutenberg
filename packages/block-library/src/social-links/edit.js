@@ -7,7 +7,7 @@ import classNames from 'classnames';
  * WordPress dependencies
  */
 import { getBlockSupport } from '@wordpress/blocks';
-import { Fragment, useEffect } from '@wordpress/element';
+import { Fragment, useEffect,useState } from '@wordpress/element';
 import {
 	BlockControls,
 	__experimentalUseInnerBlocksProps as useInnerBlocksProps,
@@ -59,11 +59,11 @@ export function SocialLinksEdit( props ) {
 	const {
 		iconBackgroundColorValue,
 		iconColorValue,
-		preveIconBackgroundColorValue,
 		openInNewTab,
 		size,
 		layout,
 	} = attributes;
+	const [ backgroundBackup, setbackgroundBackup ] = useState( '' );
 	const usedLayout = layout || getDefaultBlockLayout( name );
 
 	// Remove icon background color if logos only style selected.
@@ -72,42 +72,16 @@ export function SocialLinksEdit( props ) {
 		: false;
 	useEffect( () => {
 		if ( logosOnly ) {
+			setbackgroundBackup( iconBackgroundColorValue );
 			setAttributes( {
 				iconBackgroundColor: undefined,
 				customIconBackgroundColor: undefined,
-				preveIconBackgroundColorValue: iconBackgroundColorValue,
 				iconBackgroundColorValue: undefined,
 			} );
+		} else {
+			setAttributes( { iconBackgroundColorValue: backgroundBackup } );
 		}
 	}, [ logosOnly, setAttributes ] );
-
-	// Set the previsiounly selected bckground values of the logo for default.
-	const defaultAgain = attributes.className
-		? attributes.className.indexOf( 'is-style-default' ) >= 0
-		: false;
-	useEffect( () => {
-		if ( defaultAgain ) {
-			setAttributes( {
-				iconBackgroundColorValue: preveIconBackgroundColorValue
-					? preveIconBackgroundColorValue
-					: undefined,
-			} );
-		}
-	}, [ defaultAgain, setAttributes ] );
-
-	// Set the previsiounly selected bckground values of the logo for Pill.
-	const pillStyle = attributes.className
-		? attributes.className.indexOf( 'is-style-pill-shape' ) >= 0
-		: false;
-	useEffect( () => {
-		if ( pillStyle ) {
-			setAttributes( {
-				iconBackgroundColorValue: preveIconBackgroundColorValue
-					? preveIconBackgroundColorValue
-					: undefined,
-			} );
-		}
-	}, [ pillStyle, setAttributes ] );
 
 	const SocialPlaceholder = (
 		<li className="wp-block-social-links__social-placeholder">
