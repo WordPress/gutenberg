@@ -76,7 +76,7 @@ function BlockSelectionButton( { clientId, rootClientId, blockElement } ) {
 	const { setNavigationMode, removeBlock } = useDispatch( blockEditorStore );
 	const ref = useRef();
 
-	const blockType = getBlockType( name );
+	const blockType = getBlockType( name ) || 'core/missing';
 	const label = getAccessibleBlockLabel(
 		blockType,
 		attributes,

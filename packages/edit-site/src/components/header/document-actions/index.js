@@ -23,9 +23,11 @@ import { useRef } from '@wordpress/element';
 import { store as blockEditorStore } from '@wordpress/block-editor';
 
 function getBlockDisplayText( block ) {
-	return block
-		? getBlockLabel( getBlockType( block.name ), block.attributes )
-		: null;
+	if ( block ) {
+		const blockType = getBlockType( block.name );
+		return blockType ? getBlockLabel( blockType, block.attributes ) : null;
+	}
+	return null;
 }
 
 function useSecondaryText() {

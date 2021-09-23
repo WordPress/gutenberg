@@ -26,6 +26,7 @@ export default function ListViewListItem( {
 	children,
 } ) {
 	const blockType = getBlockType( block.name );
+	const blockLabel = blockType ? getBlockLabel( blockType, block.attributes ) : null;
 
 	return (
 		<div className="block-editor-list-view__list-item">
@@ -38,10 +39,10 @@ export default function ListViewListItem( {
 				) }
 				onClick={ onClick }
 			>
-				<BlockIcon icon={ blockType.icon } showColors />
+				<BlockIcon icon={ blockType?.icon } showColors />
 				{ children
 					? children
-					: getBlockLabel( blockType, block.attributes ) }
+					: blockLabel }
 				{ isSelected && (
 					<VisuallyHidden as="span">
 						{ __( '(selected block)' ) }

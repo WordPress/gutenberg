@@ -86,7 +86,7 @@ function ListViewBlockSlot( props, ref ) {
 							) }
 						>
 							<ListViewExpander onClick={ onToggleExpanded } />
-							<BlockIcon icon={ blockType.icon } showColors />
+							<BlockIcon icon={ blockType?.icon } showColors />
 							{ Children.map( fills, ( fill ) =>
 								cloneElement( fill, {
 									...fill.props,

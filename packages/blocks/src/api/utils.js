@@ -54,7 +54,7 @@ export function isUnmodifiedDefaultBlock( block ) {
 	const blockType = getBlockType( defaultBlockName );
 
 	return every(
-		blockType.attributes,
+		blockType?.attributes,
 		( value, key ) =>
 			newDefaultBlock.attributes[ key ] === block.attributes[ key ]
 	);

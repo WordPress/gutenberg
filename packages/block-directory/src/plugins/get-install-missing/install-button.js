@@ -28,7 +28,7 @@ export default function InstallButton( { attributes, block, clientId } ) {
 						const [ originalBlock ] = parse(
 							attributes.originalContent
 						);
-						if ( originalBlock ) {
+						if ( originalBlock && blockType ) {
 							replaceBlock(
 								clientId,
 								createBlock(
