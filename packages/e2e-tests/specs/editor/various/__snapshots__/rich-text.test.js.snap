@@ -54,6 +54,18 @@ exports[`RichText should navigate arround emoji 1`] = `
 <!-- /wp:paragraph -->"
 `;
 
+exports[`RichText should navigate consecutive format boundaries 1`] = `
+"<!-- wp:paragraph -->
+<p><strong>1</strong><em>2</em></p>
+<!-- /wp:paragraph -->"
+`;
+
+exports[`RichText should navigate consecutive format boundaries 2`] = `
+"<!-- wp:paragraph -->
+<p><strong>1</strong>-<em>2</em></p>
+<!-- /wp:paragraph -->"
+`;
+
 exports[`RichText should not format text after code backtick 1`] = `
 "<!-- wp:paragraph -->
 <p>A <code>backtick</code> and more.</p>

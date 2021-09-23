@@ -65,22 +65,20 @@ import {
 	getPositionClassName,
 } from './shared';
 
-/**
- * Module Constants
- */
-
-const INNER_BLOCKS_TEMPLATE = [
-	[
-		'core/paragraph',
-		{
-			align: 'center',
-			fontSize: 'large',
-			placeholder: __( 'Write title…' ),
-		},
-	],
-];
-
 const { __Visualizer: BoxControlVisualizer } = BoxControl;
+
+function getInnerBlocksTemplate( attributes ) {
+	return [
+		[
+			'core/paragraph',
+			{
+				align: 'center',
+				placeholder: __( 'Write title…' ),
+				...attributes,
+			},
+		],
+	];
+}
 
 function retrieveFastAverageColor() {
 	if ( ! retrieveFastAverageColor.fastAverageColor ) {
@@ -603,12 +601,19 @@ function CoverEdit( {
 
 	const ref = useRef();
 	const blockProps = useBlockProps( { ref } );
+
+	// Check for fontSize support before we pass a fontSize attribute to the innerBlocks.
+	const hasFontSizes = !! useSetting( 'typography.fontSizes' )?.length;
+	const innerBlocksTemplate = getInnerBlocksTemplate( {
+		fontSize: hasFontSizes ? 'large' : undefined,
+	} );
+
 	const innerBlocksProps = useInnerBlocksProps(
 		{
 			className: 'wp-block-cover__inner-container',
 		},
 		{
-			template: INNER_BLOCKS_TEMPLATE,
+			template: innerBlocksTemplate,
 			templateInsertUpdatesSelection: true,
 		}
 	);

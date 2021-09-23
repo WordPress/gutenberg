@@ -11,6 +11,7 @@ import {
 	searchForBlock,
 	setBrowserViewport,
 	showBlockToolbar,
+	pressKeyWithModifier,
 } from '@wordpress/e2e-test-utils';
 
 /** @typedef {import('puppeteer').ElementHandle} ElementHandle */
@@ -352,6 +353,28 @@ describe( 'Inserting blocks', () => {
 		await insertBlock( 'Paragraph' );
 		await page.keyboard.type( 'Paragraph inside group' );
 		expect( await getEditedPostContent() ).toMatchSnapshot();
+	} );
+
+	it( 'passes the search value in the main inserter when clicking `Browse all`', async () => {
+		const INSERTER_SEARCH_SELECTOR =
+			'.block-editor-inserter__search input,.block-editor-inserter__search-input,input.block-editor-inserter__search';
+		await insertBlock( 'Group' );
+		await insertBlock( 'Paragraph' );
+		await page.keyboard.type( 'Text' );
+		await page.click( '[data-type="core/group"] [aria-label="Add block"]' );
+		await page.waitForSelector( INSERTER_SEARCH_SELECTOR );
+		await page.focus( INSERTER_SEARCH_SELECTOR );
+		await pressKeyWithModifier( 'primary', 'a' );
+		const searchTerm = 'Heading';
+		await page.keyboard.type( searchTerm );
+		const browseAll = await page.waitForXPath(
+			'//button[text()="Browse all"]'
+		);
+		await browseAll.click();
+		const availableBlocks = await page.$$(
+			'.block-editor-block-types-list__list-item'
+		);
+		expect( availableBlocks ).toHaveLength( 1 );
 	} );
 
 	// Check for regression of https://github.com/WordPress/gutenberg/issues/27586

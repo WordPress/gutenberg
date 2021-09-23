@@ -1696,60 +1696,6 @@ describe( 'state', () => {
 		} );
 
 		describe( 'blocks', () => {
-			it( 'should not reset any blocks that are not in the post', () => {
-				const actions = [
-					{
-						type: 'RESET_BLOCKS',
-						blocks: [
-							{
-								clientId: 'block1',
-								innerBlocks: [
-									{ clientId: 'block11', innerBlocks: [] },
-									{ clientId: 'block12', innerBlocks: [] },
-								],
-							},
-						],
-					},
-					{
-						type: 'RECEIVE_BLOCKS',
-						blocks: [
-							{
-								clientId: 'block2',
-								innerBlocks: [
-									{ clientId: 'block21', innerBlocks: [] },
-									{ clientId: 'block22', innerBlocks: [] },
-								],
-							},
-						],
-					},
-				];
-				const original = deepFreeze(
-					actions.reduce( blocks, undefined )
-				);
-
-				const state = blocks( original, {
-					type: 'RESET_BLOCKS',
-					blocks: [
-						{
-							clientId: 'block3',
-							innerBlocks: [
-								{ clientId: 'block31', innerBlocks: [] },
-								{ clientId: 'block32', innerBlocks: [] },
-							],
-						},
-					],
-				} );
-
-				expect( state.byClientId ).toEqual( {
-					block2: { clientId: 'block2' },
-					block21: { clientId: 'block21' },
-					block22: { clientId: 'block22' },
-					block3: { clientId: 'block3' },
-					block31: { clientId: 'block31' },
-					block32: { clientId: 'block32' },
-				} );
-			} );
-
 			describe( 'byClientId', () => {
 				it( 'should ignore updates to non-existent block', () => {
 					const original = deepFreeze(
