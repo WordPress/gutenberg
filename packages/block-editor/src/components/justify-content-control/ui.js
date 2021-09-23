@@ -70,12 +70,16 @@ function JustifyContentUI( {
 
 	const UIComponent = isToolbar ? ToolbarGroup : ToolbarDropdownMenu;
 	const extraProps = isToolbar ? { isCollapsed } : {};
+	const hasActive = allControls.some( ( { name } ) => name === value );
 
 	return (
 		<UIComponent
 			icon={ icon }
 			popoverProps={ popoverProps }
 			label={ __( 'Change items justification' ) }
+			toggleProps={ {
+				className: hasActive ? 'is-pressed' : undefined,
+			} }
 			controls={ allControls.filter( ( elem ) =>
 				allowedControls.includes( elem.name )
 			) }
