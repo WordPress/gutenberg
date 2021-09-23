@@ -82,6 +82,179 @@ const deprecated = [
 			contentPosition: {
 				type: 'string',
 			},
+			alt: {
+				type: 'string',
+				source: 'attribute',
+				selector: 'img',
+				attribute: 'alt',
+				default: '',
+			},
+		},
+		supports: {
+			anchor: true,
+			align: true,
+			html: false,
+			spacing: {
+				padding: true,
+				__experimentalDefaultControls: {
+					padding: true,
+				},
+			},
+			color: {
+				__experimentalDuotone:
+					'> .wp-block-cover__image-background, > .wp-block-cover__video-background',
+				text: false,
+				background: false,
+			},
+		},
+		save( { attributes } ) {
+			const {
+				backgroundType,
+				gradient,
+				contentPosition,
+				customGradient,
+				customOverlayColor,
+				dimRatio,
+				focalPoint,
+				hasParallax,
+				isRepeated,
+				overlayColor,
+				url,
+				alt,
+				id,
+				minHeight: minHeightProp,
+				minHeightUnit,
+			} = attributes;
+			const overlayColorClass = getColorClassName(
+				'background-color',
+				overlayColor
+			);
+			const gradientClass = __experimentalGetGradientClass( gradient );
+			const minHeight = minHeightUnit
+				? `${ minHeightProp }${ minHeightUnit }`
+				: minHeightProp;
+
+			const isImageBackground = IMAGE_BACKGROUND_TYPE === backgroundType;
+			const isVideoBackground = VIDEO_BACKGROUND_TYPE === backgroundType;
+
+			const isImgElement = ! ( hasParallax || isRepeated );
+
+			const style = {
+				...( isImageBackground && ! isImgElement
+					? backgroundImageStyles( url )
+					: {} ),
+				backgroundColor: ! overlayColorClass
+					? customOverlayColor
+					: undefined,
+				background:
+					customGradient && ! url ? customGradient : undefined,
+				minHeight: minHeight || undefined,
+			};
+
+			const objectPosition =
+				// prettier-ignore
+				focalPoint && isImgElement
+					? `${ Math.round( focalPoint.x * 100 ) }% ${ Math.round( focalPoint.y * 100 ) }%`
+					: undefined;
+
+			const classes = classnames(
+				dimRatioToClass( dimRatio ),
+				overlayColorClass,
+				{
+					'has-background-dim': dimRatio !== 0,
+					'has-parallax': hasParallax,
+					'is-repeated': isRepeated,
+					'has-background-gradient': gradient || customGradient,
+					[ gradientClass ]: ! url && gradientClass,
+					'has-custom-content-position': ! isContentPositionCenter(
+						contentPosition
+					),
+				},
+				getPositionClassName( contentPosition )
+			);
+
+			return (
+				<div { ...useBlockProps.save( { className: classes, style } ) }>
+					{ url &&
+						( gradient || customGradient ) &&
+						dimRatio !== 0 && (
+							<span
+								aria-hidden="true"
+								className={ classnames(
+									'wp-block-cover__gradient-background',
+									gradientClass
+								) }
+								style={
+									customGradient
+										? { background: customGradient }
+										: undefined
+								}
+							/>
+						) }
+					{ isImageBackground && isImgElement && url && (
+						<img
+							className={ classnames(
+								'wp-block-cover__image-background',
+								id ? `wp-image-${ id }` : null
+							) }
+							alt={ alt }
+							src={ url }
+							style={ { objectPosition } }
+							data-object-fit="cover"
+							data-object-position={ objectPosition }
+						/>
+					) }
+					{ isVideoBackground && url && (
+						<video
+							className={ classnames(
+								'wp-block-cover__video-background',
+								'intrinsic-ignore'
+							) }
+							autoPlay
+							muted
+							loop
+							playsInline
+							src={ url }
+							style={ { objectPosition } }
+							data-object-fit="cover"
+							data-object-position={ objectPosition }
+						/>
+					) }
+					<div className="wp-block-cover__inner-container">
+						<InnerBlocks.Content />
+					</div>
+				</div>
+			);
+		},
+		migrate( attributes ) {
+			return {
+				...attributes,
+				dimRatio: ! attributes.url ? 100 : attributes.dimRatio,
+			};
+		},
+	},
+	{
+		attributes: {
+			...blockAttributes,
+			isRepeated: {
+				type: 'boolean',
+				default: false,
+			},
+			minHeight: {
+				type: 'number',
+			},
+			minHeightUnit: {
+				type: 'string',
+			},
+			gradient: {
+				type: 'string',
+			},
+			customGradient: {
+				type: 'string',
+			},
+			contentPosition: {
+				type: 'string',
+			},
 		},
 		supports: {
 			align: true,
@@ -193,6 +366,12 @@ const deprecated = [
 				</div>
 			);
 		},
+		migrate( attributes ) {
+			return {
+				...attributes,
+				dimRatio: ! attributes.url ? 100 : attributes.dimRatio,
+			};
+		},
 	},
 	{
 		attributes: {
@@ -290,6 +469,12 @@ const deprecated = [
 				</div>
 			);
 		},
+		migrate( attributes ) {
+			return {
+				...attributes,
+				dimRatio: ! attributes.url ? 100 : attributes.dimRatio,
+			};
+		},
 	},
 	{
 		attributes: {
@@ -387,6 +572,12 @@ const deprecated = [
 				</div>
 			);
 		},
+		migrate( attributes ) {
+			return {
+				...attributes,
+				dimRatio: ! attributes.url ? 100 : attributes.dimRatio,
+			};
+		},
 	},
 	{
 		attributes: {
@@ -466,8 +657,13 @@ const deprecated = [
 			);
 		},
 		migrate( attributes ) {
+			const newAttribs = {
+				...attributes,
+				dimRatio: ! attributes.url ? 100 : attributes.dimRatio,
+			};
+
 			return [
-				omit( attributes, [ 'title', 'contentAlign' ] ),
+				omit( newAttribs, [ 'title', 'contentAlign' ] ),
 				[
 					createBlock( 'core/paragraph', {
 						content: attributes.title,
@@ -544,8 +740,12 @@ const deprecated = [
 			);
 		},
 		migrate( attributes ) {
+			const newAttribs = {
+				...attributes,
+				dimRatio: ! attributes.url ? 100 : attributes.dimRatio,
+			};
 			return [
-				omit( attributes, [ 'title', 'contentAlign', 'align' ] ),
+				omit( newAttribs, [ 'title', 'contentAlign', 'align' ] ),
 				[
 					createBlock( 'core/paragraph', {
 						content: attributes.title,
@@ -596,8 +796,12 @@ const deprecated = [
 			);
 		},
 		migrate( attributes ) {
+			const newAttribs = {
+				...attributes,
+				dimRatio: ! attributes.url ? 100 : attributes.dimRatio,
+			};
 			return [
-				omit( attributes, [ 'title', 'contentAlign', 'align' ] ),
+				omit( newAttribs, [ 'title', 'contentAlign', 'align' ] ),
 				[
 					createBlock( 'core/paragraph', {
 						content: attributes.title,
