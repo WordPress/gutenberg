@@ -8,6 +8,10 @@
 -   Removed the deprecated `onClickOutside` prop from the `Popover` component ([#34537](https://github.com/WordPress/gutenberg/pull/34537)).
 -   Changed `RangeControl` component to not apply `shiftStep` to inputs from its `<input type="range"/>` ([35020](https://github.com/WordPress/gutenberg/pull/35020)).
 
+### New Feature
+
+-   Add an experimental `Navigator` components ([#34904](https://github.com/WordPress/gutenberg/pull/34904)) as a replacement for the previous `Navigation` related components.
+
 ### Bug Fix
 
 -   Fixed rounding of value in `RangeControl` component when it loses focus while the `SHIFT` key is held. ([#35020](https://github.com/WordPress/gutenberg/pull/35020)).
