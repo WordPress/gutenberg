@@ -107,7 +107,7 @@ function gutenberg_apply_typography_support( $block_type, $block_attributes ) {
 	if ( $has_font_family_support ) {
 		$has_named_font_family  = array_key_exists( 'fontFamily', $block_attributes );
 		$has_custom_font_family = isset( $block_attributes['style']['typography']['fontFamily'] );
-		
+
 		if ( $has_named_font_family ) {
 			$classes[] = sprintf( 'has-%s-font-family', $block_attributes['fontFamily'] );
 		} elseif ( $has_custom_font_family ) {
