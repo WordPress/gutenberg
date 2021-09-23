@@ -21,7 +21,7 @@ export default function useClipboardBlock( destinationRootClientId ) {
 		clipboardBlock?.name,
 		destinationRootClientId
 	);
-	const blockType = getBlockType( clipboardBlock.name );
+	const blockType = getBlockType( clipboardBlock?.name );
 
 	if ( ! canAddClipboardBlock || ! blockType ) {
 		return undefined;
