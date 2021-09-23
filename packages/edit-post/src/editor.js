@@ -6,7 +6,7 @@ import { size, map, without } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { store as blocksStore } from '@wordpress/blocks';
+import { store as blocksStore, createBlock } from '@wordpress/blocks';
 import { useSelect, useDispatch } from '@wordpress/data';
 import {
 	EditorProvider,
@@ -14,7 +14,7 @@ import {
 	PostLockedModal,
 	store as editorStore,
 } from '@wordpress/editor';
-import { StrictMode, useMemo } from '@wordpress/element';
+import { StrictMode, useEffect useMemo } from '@wordpress/element';
 import { KeyboardShortcuts, SlotFillProvider } from '@wordpress/components';
 import { store as coreStore } from '@wordpress/core-data';
 import { ShortcutProvider } from '@wordpress/keyboard-shortcuts';
@@ -107,6 +107,11 @@ function Editor( {
 	const { updatePreferredStyleVariations, setIsInserterOpened } = useDispatch(
 		editPostStore
 	);
+
+	const { receiveBlocks } = useDispatch( 'core/block-editor' );
+	useEffect( () => {
+		receiveBlocks( [ createBlock( 'core/group' ) ] );
+	}, [] );
 
 	const editorSettings = useMemo( () => {
 		const result = {
