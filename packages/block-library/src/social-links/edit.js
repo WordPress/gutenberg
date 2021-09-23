@@ -45,6 +45,7 @@ const getDefaultBlockLayout = ( blockTypeOrName ) => {
 };
 
 export function SocialLinksEdit( props ) {
+	const [ backgroundBackup, setbackgroundBackup ] = useState( '' );
 	const {
 		name,
 		attributes,
@@ -63,7 +64,7 @@ export function SocialLinksEdit( props ) {
 		size,
 		layout,
 	} = attributes;
-	const [ backgroundBackup, setbackgroundBackup ] = useState( '' );
+
 	const usedLayout = layout || getDefaultBlockLayout( name );
 
 	// Remove icon background color if logos only style selected.
