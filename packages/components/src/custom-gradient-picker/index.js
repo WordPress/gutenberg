@@ -17,7 +17,7 @@ import { Flex } from '../flex';
 import SelectControl from '../select-control';
 import {
 	getGradientAstWithDefault,
-	getLinearGradientRepresentationOfARadial,
+	getLinearGradientRepresentation,
 	getGradientAstWithControlPoints,
 	getStopCssColor,
 } from './utils';
@@ -107,10 +107,8 @@ export default function CustomGradientPicker( { value, onChange } ) {
 	const gradientAST = getGradientAstWithDefault( value );
 	// On radial gradients the bar should display a linear gradient.
 	// On radial gradients the bar represents a slice of the gradient from the center until the outside.
-	const background =
-		gradientAST.type === 'radial-gradient'
-			? getLinearGradientRepresentationOfARadial( gradientAST )
-			: gradientAST.value;
+	// On liner gradients the bar represents the color stops from left to right independently of the angle.
+	const background = getLinearGradientRepresentation( gradientAST );
 	const hasGradient = gradientAST.value !== DEFAULT_GRADIENT;
 	// Control points color option may be hex from presets, custom colors will be rgb.
 	// The position should always be a percentage.

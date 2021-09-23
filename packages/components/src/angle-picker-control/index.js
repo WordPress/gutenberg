@@ -12,7 +12,7 @@ import { __ } from '@wordpress/i18n';
  * Internal dependencies
  */
 import { FlexBlock, FlexItem } from '../flex';
-import InputControl from '../input-control';
+import NumberControl from '../input-control';
 import AngleCircle from './angle-circle';
 import { Root } from './styles/angle-picker-control-styles';
 import { space } from '../ui/utils/space';
@@ -36,7 +36,7 @@ export default function AnglePickerControl( {
 	return (
 		<Root className={ classes }>
 			<FlexBlock>
-				<InputControl
+				<NumberControl
 					label={ label }
 					className="components-angle-picker-control__input-field"
 					max={ 360 }
@@ -44,6 +44,7 @@ export default function AnglePickerControl( {
 					onChange={ handleOnNumberChange }
 					step="1"
 					value={ value }
+					hideHTMLArrows
 					suffix={
 						<Spacer
 							as={ Text }
