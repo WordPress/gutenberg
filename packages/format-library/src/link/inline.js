@@ -13,7 +13,11 @@ import {
 	useAnchorRef,
 	removeFormat,
 } from '@wordpress/rich-text';
-import { __experimentalLinkControl as LinkControl } from '@wordpress/block-editor';
+import {
+	__experimentalLinkControl as LinkControl,
+	store as blockEditorStore,
+} from '@wordpress/block-editor';
+import { useSelect } from '@wordpress/data';
 
 /**
  * Internal dependencies
@@ -40,6 +44,16 @@ function InlineLinkUI( {
 	 * @type {[Object|undefined,Function]}
 	 */
 	const [ nextLinkValue, setNextLinkValue ] = useState();
+
+	const { createEntity, userCanCreate } = useSelect( ( select ) => {
+		const { getSettings } = select( blockEditorStore );
+		const _settings = getSettings();
+
+		return {
+			createEntity: _settings.__experimentalCreateEntity,
+			userCanCreate: _settings.__experimentalUserCanCreate,
+		};
+	}, [] );
 
 	const linkValue = {
 		url: activeAttributes.url,
@@ -137,6 +151,24 @@ function InlineLinkUI( {
 	// otherwise it causes a render of the content.
 	const focusOnMount = useRef( addingLink ? 'firstElement' : false );
 
+	async function handleCreate( pageTitle ) {
+		const type = 'page';
+		const postType = type || 'page';
+
+		const page = await createEntity( postType, {
+			title: pageTitle,
+			status: 'draft',
+		} );
+
+		return {
+			id: page.id,
+			type: postType,
+			title: page.title.rendered,
+			url: page.link,
+			kind: 'post-type',
+		};
+	}
+
 	return (
 		<Popover
 			anchorRef={ anchorRef }
@@ -150,6 +182,8 @@ function InlineLinkUI( {
 				onRemove={ removeLink }
 				forceIsEditingLink={ addingLink }
 				hasRichPreviews
+				createSuggestion={ createEntity && handleCreate }
+				withCreateSuggestion={ userCanCreate }
 			/>
 		</Popover>
 	);
