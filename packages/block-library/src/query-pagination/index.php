@@ -14,15 +14,13 @@
  * @return string Returns the wrapper for the Query pagination.
  */
 function render_block_core_query_pagination( $attributes, $content ) {
-	$wrapper_attributes = get_block_wrapper_attributes();
-
 	if ( empty( trim( $content ) ) ) {
 		return '';
 	}
 
 	return sprintf(
 		'<div %1$s>%2$s</div>',
-		$wrapper_attributes,
+		get_block_wrapper_attributes(),
 		$content
 	);
 }
