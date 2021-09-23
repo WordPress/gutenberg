@@ -317,12 +317,11 @@ Code example using correct markdown syntax and formatted using project's formatt
 
 The component accepts the following props:
 
-### propName
+### `propName`: Typescript style type i.e `string`, `number`, `( nextValue: string ) => void`
 
 Prop description. With a new line before and after the description and before and after type/required blocks.
 
--   Type: Typescript style type i.e `string`, `number`, `( nextValue: string ) => void`
--   Required: Either`yes` or `no`
+-   Required: Either `yes` or `no`
 
 ### Inherited props
 
