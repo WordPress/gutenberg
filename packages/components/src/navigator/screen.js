@@ -28,7 +28,7 @@ function NavigatorScreen( { children, path } ) {
 	const ref = useFocusOnMount();
 
 	// This flag is used to only apply the focus on mount when the actual path changes.
-	// It avois the focus to happen on first render.
+	// It avoids the focus to happen on the first render.
 	const [ hasPathChanged, setHasPathChanged ] = useState( false );
 	useEffect( () => {
 		setHasPathChanged( true );
