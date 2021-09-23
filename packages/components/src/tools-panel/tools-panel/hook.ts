@@ -38,6 +38,7 @@ export function useToolsPanel(
 		className,
 		resetAll,
 		panelId,
+		hasInnerWrapper,
 		shouldRenderPlaceholderItems,
 		...otherProps
 	} = useContextSystem( props, 'ToolsPanel' );
@@ -131,13 +132,16 @@ export function useToolsPanel(
 	const hasDefaultMenuItems =
 		menuItems?.default && !! Object.keys( menuItems?.default ).length;
 
-	const emptyClassName =
-		! hasDefaultMenuItems && areAllOptionalControlsHidden && 'is-empty';
+	const wrapperStyle = hasInnerWrapper && styles.ToolsPanelWithInnerWrapper;
+	const emptyStyle =
+		! hasDefaultMenuItems &&
+		areAllOptionalControlsHidden &&
+		styles.ToolsPanelHiddenInnerWrapper;
 
 	const cx = useCx();
 	const classes = useMemo( () => {
-		return cx( styles.ToolsPanel, emptyClassName, className );
-	}, [ className, emptyClassName ] );
+		return cx( styles.ToolsPanel, wrapperStyle, emptyStyle, className );
+	}, [ className, emptyStyle, wrapperStyle ] );
 
 	// Toggle the checked state of a menu item which is then used to determine
 	// display of the item within the panel.

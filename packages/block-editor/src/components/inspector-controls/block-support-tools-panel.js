@@ -50,6 +50,7 @@ export default function BlockSupportToolsPanel( { children, label } ) {
 			resetAll={ resetAll }
 			key={ clientId }
 			panelId={ clientId }
+			hasInnerWrapper={ true }
 			shouldRenderPlaceholderItems={ true } // Required to maintain fills ordering.
 		>
 			{ children }

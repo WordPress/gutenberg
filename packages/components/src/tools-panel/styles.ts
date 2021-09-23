@@ -17,21 +17,25 @@ export const ToolsPanel = css`
 	margin-top: -1px;
 	padding: ${ space( 4 ) };
 	row-gap: ${ space( 6 ) };
+`;
 
-	/**
-	 * Items injected into a ToolsPanel via a virtual bubbling slot will require
-	 * an inner dom element to be injected. The following rule allows for the
-	 * CSS grid display to continue.
-	 */
-	.components-tools-panel__items-wrapper {
+/**
+ * Items injected into a ToolsPanel via a virtual bubbling slot will require
+ * an inner dom element to be injected. The following rule allows for the
+ * CSS grid display to be re-established.
+ */
+export const ToolsPanelWithInnerWrapper = css`
+	> div {
 		column-gap: ${ space( 4 ) };
 		display: grid;
 		grid-template-columns: 1fr 1fr;
 		row-gap: ${ space( 6 ) };
 		grid-column: span 2;
 	}
+`;
 
-	&.is-empty .components-tools-panel__items-wrapper {
+export const ToolsPanelHiddenInnerWrapper = css`
+	> div {
 		display: none;
 	}
 `;
