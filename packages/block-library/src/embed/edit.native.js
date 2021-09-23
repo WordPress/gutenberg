@@ -294,6 +294,9 @@ const EmbedEdit = ( props ) => {
 					setShowEmbedBottomSheet( false );
 				} }
 				onSubmit={ ( value ) => {
+					// The order of the following calls is important, we need to update the URL attribute before changing `isEditingURL`,
+					// otherwise the side-effect that potentially replaces the block when updating the local state won't use the new URL
+					// for creating the new block.
 					setAttributes( { url: value } );
 					setIsEditingURL( false );
 				} }
