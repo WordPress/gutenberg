@@ -270,6 +270,7 @@ function updateParentInnerBlocksInTree( state, tree, updatedClientIds ) {
 			( subClientId ) => tree[ subClientId ]
 		);
 	}
+
 	// Controlled parent blocks, need a dedicated key for their inner blocks
 	// to be used when doing getBlocks( controlledBlockClientId ).
 	for ( const clientId of controlledParents ) {
@@ -949,7 +950,7 @@ export const blocks = flow(
 				return {
 					...state,
 					...omit( blockOrder, '' ),
-					'': ( state?.[ '' ] || [] ).concat( blockOrder ),
+					'': ( state?.[ '' ] || [] ).concat( blockOrder[ '' ] ),
 				};
 			}
 			case 'INSERT_BLOCKS': {
