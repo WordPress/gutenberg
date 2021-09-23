@@ -38,7 +38,7 @@ export function addWidgetIdToBlock( block, widgetId ) {
 
 /**
  * Filters registered block settings, extending attributes to include
- * `borderColor` if needed.
+ * `__internalWidgetId` if needed.
  *
  * @param {Object} settings Original block settings.
  *
