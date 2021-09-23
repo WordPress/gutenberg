@@ -417,20 +417,56 @@
 		// Give it a z-index just higher than the adminbar.
 		z-index: 100000;
 
-		padding: 24px;
+		// Add extra top padding so items don't conflict with close button.
+		padding: 72px 24px 24px 24px;
 		background-color: inherit;
 
-		.wp-block-navigation__container {
+		.wp-block-navigation__responsive-container-content {
 			display: flex;
 			flex-direction: column;
-			margin-left: auto;
-			margin-right: auto;
-			align-items: flex-start;
-			line-height: 48px;
 			padding: 0;
 
+			.wp-block-navigation__submenu-icon {
+				display: none;
+			}
+
+			// Always expand submenus inside the modal.
+			.has-child .submenu-container,
+			.has-child .wp-block-navigation__submenu-container {
+				position: relative;
+				opacity: 1;
+				visibility: visible;
+				height: auto;
+				width: auto;
+				border: none;
+				padding: 0 0 0 32px;
+
+				.items-justified-right & {
+					padding: 0 32px 0 0;
+				}
+			}
+
+			// A default padding is added to submenu items. It's not appropriate inside the modal.
+			& :where(.wp-block-navigation__submenu-container) a {
+				padding: 0;
+			}
+
+			// Default justification.
+			.wp-block-navigation__container,
+			.wp-block-navigation-item,
 			.wp-block-page-list {
 				flex-direction: column;
+				justify-content: flex-start;
+				align-items: flex-start;
+
+				// Inherit parent justifications inside the menu.
+				.items-justified-right & {
+					align-items: flex-end;
+				}
+
+				.items-justified-center & {
+					align-items: center;
+				}
 			}
 		}
 
@@ -542,31 +578,6 @@
 .is-menu-open .wp-block-navigation__responsive-container-content {
 	width: 100%;
 	height: 100%;
-}
-
-// Always show submenus fully expanded inside the modal menu.
-.wp-block-navigation .wp-block-navigation__responsive-container.is-menu-open {
-	.wp-block-navigation__submenu-icon {
-		display: none;
-	}
-
-	.has-child .submenu-container,
-	.has-child .wp-block-navigation__submenu-container {
-		position: relative;
-		opacity: 1;
-		visibility: visible;
-		height: auto;
-		width: auto;
-
-		padding: 0 0 0 32px;
-		border: none;
-	}
-
-	.wp-block-navigation-item,
-	.wp-block-page-list {
-		flex-direction: column;
-		align-items: flex-start;
-	}
 }
 
 html.has-modal-open {
