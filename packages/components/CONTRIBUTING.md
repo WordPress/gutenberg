@@ -311,7 +311,18 @@ Description of the component.
 
 ## Usage
 
-Code example using correct markdown syntax and formatted using project's formatting rules.
+Code example using correct markdown syntax and formatted using project's formatting rules. See [ItemGroup](/packages/components/src/item-group/item-group/README.md#usage) for a real-world example.
+
+```jsx
+import { ExampleComponent } from '@wordpress/components';
+
+function Example() {
+	return (
+		<ExampleComponent>
+			<p>Code is poetry</p>
+		</ExampleComponent>
+	);
+}
 
 ## Props
 
