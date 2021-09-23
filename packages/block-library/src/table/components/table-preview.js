@@ -4,9 +4,19 @@
 import { Icon } from '@wordpress/components';
 import { moreHorizontal } from '@wordpress/icons';
 
-export function TablePlaceholderPreview( props ) {
-	const { rowCount, columnCount } = props;
-
+/**
+ * TableDimensionsPreview
+ *
+ * this component is build for internal uses within the Table block. It renders a preview of the table cells
+ * to make it easier to see how the table will look with the number or rows and columns that the user has selected.
+ *
+ * @typedef TableDimensionsPreviewProps
+ * @property {number}                      rowCount    number of rows
+ * @property {number}                      columnCount number of columns
+ *
+ * @param    {TableDimensionsPreviewProps} props
+ */
+export function TableDimensionsPreview( { rowCount, columnCount } ) {
 	const containerHeight = 75;
 
 	// after we cross the threshold we display an elispis to indicate that there are more items

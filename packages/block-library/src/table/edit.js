@@ -55,7 +55,7 @@ import {
 	toggleSection,
 	isEmptyTableSection,
 } from './state';
-import { TablePlaceholderPreview } from './components/table-preview';
+import { TableDimensionsPreview } from './components/table-preview';
 
 const ALIGNMENT_CONTROLS = [
 	{
@@ -511,7 +511,7 @@ function TableEdit( {
 						className="blocks-table__placeholder-form"
 						onSubmit={ onCreateTable }
 					>
-						<TablePlaceholderPreview
+						<TableDimensionsPreview
 							columnCount={ initialColumnCount }
 							rowCount={ initialRowCount }
 						/>
