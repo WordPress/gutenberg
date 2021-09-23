@@ -17,6 +17,9 @@ const ruleTester = new RuleTester( {
 ruleTester.run( 'comment-case', rule, {
 	valid: [
 		{
+			code: `/* Same line block comment. */`,
+		},
+		{
 			code: `// My period ending comment.`,
 		},
 		{
@@ -30,6 +33,12 @@ ruleTester.run( 'comment-case', rule, {
 		},
 		{
 			code: `// @todo type comments don't need to be punctuated`,
+		},
+		{
+			code: `/* translators: some translation hint */`,
+		},
+		{
+			code: `// translators: some translation hint`,
 		},
 		{
 			code: `const someVar = 1; // Describe the var.`,
@@ -73,6 +82,21 @@ ruleTester.run( 'comment-case', rule, {
 			code: `// My comment without a period`,
 			output: `// My comment without a period.`,
 			errors: [ { messageId: 'missingPunctuation' } ],
+		},
+		{
+			code: `/* Block comment without a period */`,
+			output: `/* Block comment without a period. */`,
+			errors: [ { messageId: 'missingPunctuation' } ],
+		},
+		{
+			code: `/*Block comment without a space. */`,
+			output: `/* Block comment without a space. */`,
+			errors: [ { messageId: 'missingSpace' } ],
+		},
+		{
+			code: `/* block comment without a capital. */`,
+			output: `/* Block comment without a capital. */`,
+			errors: [ { messageId: 'capitalLetter' } ],
 		},
 		{
 			code: `//My comment without a space.`,
