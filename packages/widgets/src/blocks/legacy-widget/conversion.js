@@ -138,6 +138,14 @@ const conversion = {
 	},
 };
 
+/**
+ * Converts a widget into its equivalent block representation.
+ *
+ * @param {string} idBase      The type of the widget to convert.
+ * @param {Object} rawInstance The raw instance settings of the widget to convert.
+ *
+ * @return {Array} List of blocks, or an empty array.
+ */
 export function convertLegacyWidgetToBlocks( idBase, rawInstance ) {
 	if ( ! ( idBase in conversion ) ) {
 		return [];
@@ -161,6 +169,9 @@ export function convertLegacyWidgetToBlocks( idBase, rawInstance ) {
 	];
 }
 
+/**
+ * Block transforms for the Legacy Widget block.
+ */
 export const transforms = {
 	to: Object.entries( conversion )
 		.filter( ( [ , { to } ] ) => to !== '*' )
