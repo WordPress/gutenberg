@@ -151,7 +151,6 @@ function BlockAlignmentUI( {
 									const isSelected =
 										control === value ||
 										( ! value && control === 'none' );
-
 									return (
 										<MenuItem
 											key={ control }
@@ -169,7 +168,7 @@ function BlockAlignmentUI( {
 												onClose();
 											} }
 											role="menuitemradio"
-											info={ alignmentsInfo[ control ] }
+											info={ alignmentsInfo?.[ control ] }
 										>
 											{ title }
 										</MenuItem>
