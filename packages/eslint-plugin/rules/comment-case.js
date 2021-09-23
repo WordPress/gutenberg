@@ -52,10 +52,27 @@ module.exports = {
 			Program( node ) {
 				const { comments } = node;
 				comments.forEach( ( comment, index ) => {
-					if ( comment.type !== 'Line' ) {
+					// Regex to check if the comment contains an \@see or @todo type directive - any @ sign followed by a word.
+					const todoTypeCommentRegex = /@\w*\s/;
+					const translatorCommentRegex = /translators:/;
+
+					// Skip block comments that cross multiple lines.
+					if (
+						comment.type === 'Block' &&
+						comment.loc.start.line !== comment.loc.end.line
+					) {
 						return;
 					}
 					const { value } = comment;
+
+					// Skip translator or @see/@todo etc. comments
+					if (
+						value.match( todoTypeCommentRegex ) ||
+						value.match( translatorCommentRegex )
+					) {
+						return;
+					}
+
 					const trimmedValue = value.trim();
 					const lastChar = trimmedValue.charAt(
 						trimmedValue.length - 1
@@ -108,10 +125,7 @@ module.exports = {
 					}
 
 					// Check for correct punctuation.
-					// Regex to check if the comment contains an \@see or @todo type directive.
-					const todoTypeCommentRegex = /@\w*\s/;
 					if (
-						! trimmedValue.match( todoTypeCommentRegex ) &&
 						lastChar !== '.' &&
 						lastChar !== '!' &&
 						lastChar !== '?'
