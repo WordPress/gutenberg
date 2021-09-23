@@ -302,7 +302,7 @@ Each component that is exported from the `@wordpress/components` package should 
 This feature is still experimental. “Experimental” means this is an early implementation subject to drastic and breaking changes.
 </div>
 
-If component is deprecated, add the following section:
+<!-- If component is deprecated, add the following section: -->
 <div class="callout callout-alert">
 This component is deprecated. Please use  `{other component}` from the `{other package}` package instead.
 </div>
