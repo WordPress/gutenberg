@@ -45,7 +45,7 @@ const getDefaultBlockLayout = ( blockTypeOrName ) => {
 };
 
 export function SocialLinksEdit( props ) {
-	const [ backgroundBackup, setbackgroundBackup ] = useState( '' );
+	const [ backgroundBackup, setbackgroundBackup ] = useState( undefined );
 	const {
 		name,
 		attributes,
