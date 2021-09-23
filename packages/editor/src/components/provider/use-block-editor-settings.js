@@ -33,6 +33,8 @@ function useBlockEditorSettings( settings, hasTemplate ) {
 		reusableBlocks,
 		hasUploadPermissions,
 		canUseUnfilteredHTML,
+		userCanCreatePages,
+		userCanCreatePosts,
 	} = useSelect( ( select ) => {
 		const { canUserUseUnfilteredHTML } = select( editorStore );
 		const isWeb = Platform.OS === 'web';
@@ -61,10 +63,50 @@ function useBlockEditorSettings( settings, hasTemplate ) {
 			),
 			hasResolvedLocalSiteData: hasFinishedResolvingSiteData,
 			baseUrl: siteData?.url || '',
+			userCanCreatePages: select( coreStore ).canUser(
+				'create',
+				'pages'
+			),
+			userCanCreatePosts: select( coreStore ).canUser(
+				'create',
+				'posts'
+			),
 		};
 	}, [] );
 
 	const { undo } = useDispatch( editorStore );
+
+	const { saveEntityRecord } = useDispatch( coreStore );
+
+	/**
+	 * Creates a Post entity.
+	 * This is utilised by the Link UI to allow for on-the-fly creation of Posts/Pages.
+	 *
+	 * @param {string} postType the post type of the "post" to be created.
+	 * @param {Object} options  parameters for the post being created. These mirror those used on 3rd param of saveEntityRecord.
+	 * @return {Object} the post type object that was created.
+	 */
+	const createEntity = ( postType, options ) => {
+		const postTypeWhitelist = [ 'post', 'page' ];
+
+		if ( ! postTypeWhitelist.includes( postType ) ) {
+			return Promise.reject( {
+				message: `Only Posts and Pages may be created.`,
+			} );
+		}
+
+		const permsOnEntity =
+			postType === 'page' ? userCanCreatePages : userCanCreatePosts;
+
+		const pluralType = postType === 'page' ? 'Pages' : 'Posts';
+
+		if ( ! permsOnEntity ) {
+			return Promise.reject( {
+				message: `You do not have permission to create ${ pluralType }.`,
+			} );
+		}
+		return saveEntityRecord( 'postType', postType, options );
+	};
 
 	return useMemo(
 		() => ( {
@@ -117,6 +159,9 @@ function useBlockEditorSettings( settings, hasTemplate ) {
 			__experimentalCanUserUseUnfilteredHTML: canUseUnfilteredHTML,
 			__experimentalUndo: undo,
 			outlineMode: hasTemplate,
+			__experimentalCreateEntity: createEntity,
+			__experimentalUserCanCreate:
+				userCanCreatePosts && userCanCreatePages,
 		} ),
 		[
 			settings,
@@ -125,6 +170,9 @@ function useBlockEditorSettings( settings, hasTemplate ) {
 			canUseUnfilteredHTML,
 			undo,
 			hasTemplate,
+			userCanCreatePosts,
+			userCanCreatePages,
+			createEntity,
 		]
 	);
 }
