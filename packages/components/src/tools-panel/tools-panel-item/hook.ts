@@ -2,17 +2,20 @@
  * WordPress dependencies
  */
 import { usePrevious } from '@wordpress/compose';
-import { useEffect, useMemo } from '@wordpress/element';
+import { useCallback, useEffect, useMemo } from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
 import * as styles from '../styles';
 import { useToolsPanelContext } from '../context';
-import { useContextSystem } from '../../ui/context';
+import { useContextSystem, WordPressComponentProps } from '../../ui/context';
 import { useCx } from '../../utils/hooks/use-cx';
+import type { ToolsPanelItemProps } from '../types';
 
-export function useToolsPanelItem( props ) {
+export function useToolsPanelItem(
+	props: WordPressComponentProps< ToolsPanelItemProps, 'div' >
+) {
 	const {
 		className,
 		hasValue,
@@ -20,15 +23,15 @@ export function useToolsPanelItem( props ) {
 		label,
 		panelId,
 		resetAllFilter,
-		onDeselect = () => undefined,
-		onSelect = () => undefined,
+		onDeselect,
+		onSelect,
 		...otherProps
 	} = useContextSystem( props, 'ToolsPanelItem' );
 
 	const cx = useCx();
 	const classes = useMemo( () => {
 		return cx( styles.ToolsPanelItem, className );
-	} );
+	}, [ className ] );
 
 	const {
 		panelId: currentPanelId,
@@ -39,21 +42,31 @@ export function useToolsPanelItem( props ) {
 		isResetting,
 	} = useToolsPanelContext();
 
+	const hasValueCallback = useCallback( hasValue, [ panelId ] );
+	const resetAllFilterCallback = useCallback( resetAllFilter, [ panelId ] );
+
 	// Registering the panel item allows the panel to include it in its
 	// automatically generated menu and determine its initial checked status.
 	useEffect( () => {
 		if ( currentPanelId === panelId ) {
 			registerPanelItem( {
-				hasValue,
+				hasValue: hasValueCallback,
 				isShownByDefault,
 				label,
-				resetAllFilter,
+				resetAllFilter: resetAllFilterCallback,
 				panelId,
 			} );
 		}
 
 		return () => deregisterPanelItem( label );
-	}, [ panelId ] );
+	}, [
+		currentPanelId,
+		panelId,
+		isShownByDefault,
+		label,
+		hasValueCallback,
+		resetAllFilterCallback,
+	] );
 
 	const isValueSet = hasValue();
 	const wasValueSet = usePrevious( isValueSet );
@@ -80,11 +93,11 @@ export function useToolsPanelItem( props ) {
 		}
 
 		if ( isMenuItemChecked && ! isValueSet && ! wasMenuItemChecked ) {
-			onSelect();
+			onSelect?.();
 		}
 
 		if ( ! isMenuItemChecked && wasMenuItemChecked ) {
-			onDeselect();
+			onDeselect?.();
 		}
 	}, [ isMenuItemChecked, wasMenuItemChecked, isValueSet, isResetting ] );
 

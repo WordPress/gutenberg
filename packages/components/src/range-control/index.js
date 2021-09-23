@@ -217,7 +217,6 @@ function RangeControl(
 						describedBy={ describedBy }
 						disabled={ disabled }
 						id={ id }
-						isShiftStepEnabled={ isShiftStepEnabled }
 						label={ label }
 						max={ max }
 						min={ min }
@@ -227,7 +226,6 @@ function RangeControl(
 						onMouseMove={ onMouseMove }
 						onMouseLeave={ onMouseLeave }
 						ref={ setRef }
-						shiftStep={ shiftStep }
 						step={ step }
 						value={ inputSliderValue }
 					/>
