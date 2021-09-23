@@ -18,6 +18,7 @@ export default function save( { attributes } ) {
 	let style;
 
 	if ( width ) {
+		// Numbers are handled for backward compatibility as they can be still provided with templates.
 		let flexBasis = Number.isFinite( width ) ? width + '%' : width;
 		// In some cases we need to round the width to a shorter float.
 		if ( ! Number.isFinite( width ) && width?.endsWith( '%' ) ) {
@@ -28,7 +29,6 @@ export default function save( { attributes } ) {
 					multiplier +
 				'%';
 		}
-		// Numbers are handled for backward compatibility as they can be still provided with templates.
 		style = { flexBasis };
 	}
 
