@@ -3,10 +3,8 @@
 		"clientId": "_clientId_0",
 		"name": "core/query-pagination",
 		"isValid": true,
-		"attributes": {
-			"paginationArrow": "none"
-		},
+		"attributes": {},
 		"innerBlocks": [],
-		"originalContent": ""
+		"originalContent": "<div class=\"wp-block-query-pagination\"></div>"
 	}
 ]
