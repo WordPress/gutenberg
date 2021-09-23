@@ -55,7 +55,7 @@ const BLOCK_ALIGNMENTS_CONTROLS = {
 };
 
 const DEFAULT_CONTROL = 'none';
-const help = __( 'The theme does not support wider alignments.' );
+const help = __( 'Wider alignments are not available.' );
 
 const POPOVER_PROPS = {
 	isAlternate: true,
@@ -176,7 +176,11 @@ function BlockAlignmentUI( {
 									);
 								} ) }
 							</MenuGroup>
-							{ ! wideAlignmentsSupport && <div>{ help }</div> }
+							{ ! wideAlignmentsSupport && (
+								<div className="block-editor-block-alignment-control__help">
+									{ help }
+								</div>
+							) }
 						</>
 					);
 				},

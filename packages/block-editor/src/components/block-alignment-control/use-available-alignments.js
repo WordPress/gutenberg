@@ -55,7 +55,6 @@ export default function useAvailableAlignments( controls = DEFAULT_CONTROLS ) {
 	return {
 		enabledControls,
 		layout,
-		// TODO check if this is the check we need to show the `doesn't support wide alignments` text.
 		wideAlignmentsSupport: layout.alignments || wideControlsEnabled,
 	};
 }
