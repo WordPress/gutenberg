@@ -476,11 +476,6 @@ describe( 'Navigation editor', () => {
 	} );
 
 	describe( 'Change detections', () => {
-		beforeEach( async () => {
-			await createMenu( { name: 'Main' } );
-			await visitNavigationEditor();
-		} );
-
 		async function assertIsDirty( isDirty ) {
 			let hadDialog = false;
 
@@ -494,20 +489,23 @@ describe( 'Navigation editor', () => {
 
 				// Ensure whether it was expected that dialog was encountered.
 				expect( hadDialog ).toBe( isDirty );
-			} catch ( error ) {
-				throw error;
 			} finally {
 				page.removeListener( 'dialog', handleOnDialog );
 			}
 		}
 
-		// eslint-disable-next-line jest/no-disabled-tests
-		it.skip( 'should not prompt to confirm unsaved changes for the newly selected menu', async () => {
+		it( 'should not prompt to confirm unsaved changes for the newly selected menu', async () => {
+			await createMenu( { name: 'Main' } );
+			await visitNavigationEditor();
 			await assertIsDirty( false );
 		} );
 
-		// eslint-disable-next-line jest/no-disabled-tests
-		it.skip( 'should prompt to confirm unsaved changes when menu name is edited', async () => {
+		it( 'should prompt to confirm unsaved changes when menu name is edited', async () => {
+			await createMenu( { name: 'Main' } );
+			await visitNavigationEditor();
+
+			// Wait for at least one block to be present on the page.
+			await page.waitForSelector( '.wp-block' );
 			await page.type(
 				'.edit-navigation-name-editor__text-control input',
 				' Menu'
