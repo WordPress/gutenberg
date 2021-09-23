@@ -47,7 +47,7 @@ function render_block_core_template_part( $attributes ) {
 					'no_found_rows'  => true,
 				)
 			);
-			$template_part_post = $template_part_query->have_posts() ? $template_part_query->next_post() : 0;
+			$template_part_post  = $template_part_query->have_posts() ? $template_part_query->next_post() : 0;
 			wp_cache_set( $cache_key, $template_part_post, $cache_group );
 		}
 
