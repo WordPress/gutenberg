@@ -387,7 +387,14 @@ class MediaUpload extends Component {
 			return;
 		}
 
+		const isGallery = this.props.gallery;
 		const selection = this.frame.state().get( 'selection' );
+
+		if ( ! isGallery ) {
+			castArray( this.props.value ).forEach( ( id ) => {
+				selection.add( wp.media.attachment( id ) );
+			} );
+		}
 
 		// Load the images so they are available in the media modal.
 		const attachments = getAttachmentsCollection(
@@ -396,7 +403,7 @@ class MediaUpload extends Component {
 
 		// Once attachments are loaded, set the current selection.
 		attachments.more().done( function () {
-			if ( attachments?.models?.length ) {
+			if ( isGallery && attachments?.models?.length ) {
 				selection.add( attachments.models );
 			}
 		} );
