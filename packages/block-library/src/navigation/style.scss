@@ -335,31 +335,55 @@
 
 // Justification.
 // These target the named container class to work even with the additional mobile menu containers.
-.items-justified-center .wp-block-navigation__container {
-	justify-content: center;
+.items-justified-center {
+	.wp-block-page-list,
+	.wp-block-navigation__container {
+		justify-content: center;
+	}
 }
 
-.items-justified-right .wp-block-navigation__container {
-	justify-content: flex-end;
+.items-justified-right {
+	.wp-block-page-list,
+	.wp-block-navigation__container {
+		justify-content: flex-end;
+	}
 }
 
-.items-justified-space-between .wp-block-navigation__container {
-	justify-content: space-between;
-	flex: 1;
+.items-justified-space-between {
+	.wp-block-navigation__container {
+		justify-content: space-between;
+		flex: 1;
+	}
 }
 
 // Vertical justification.
-.is-vertical.items-justified-center > ul {
+// The vertical variant does not support space-between.
+.is-vertical.items-justified-center {
 	align-items: center;
+
+	.wp-block-navigation-item {
+		justify-content: center;
+	}
+
+	.wp-block-page-list,
+	.wp-block-navigation__container {
+		align-items: center;
+	}
 }
 
-.is-vertical.items-justified-right > ul {
+.is-vertical.items-justified-right {
 	align-items: flex-end;
 
 	.wp-block-navigation-item {
 		justify-content: flex-end;
 	}
+
+	.wp-block-page-list,
+	.wp-block-navigation__container {
+		align-items: flex-end;
+	}
 }
+
 
 /**
  * Mobile menu.
