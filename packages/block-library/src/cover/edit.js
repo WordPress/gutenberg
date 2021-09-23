@@ -64,7 +64,6 @@ import {
 	isContentPositionCenter,
 	getPositionClassName,
 } from './shared';
-import metadata from './block.json';
 
 /**
  * Module Constants
@@ -267,7 +266,6 @@ function mediaPosition( { x, y } ) {
  * @return {boolean} Is the URL a Blob URL.
  */
 const isTemporaryMedia = ( id, url ) => ! id && isBlobURL( url );
-const { description } = metadata;
 
 function CoverPlaceholder( {
 	disableMediaButtons = false,
@@ -282,7 +280,9 @@ function CoverPlaceholder( {
 			icon={ <BlockIcon icon={ icon } /> }
 			labels={ {
 				title: __( 'Cover' ),
-				instructions: description,
+				instructions: __(
+					'Drag and drop an image or video onto this block or upload one from your device. If you have an existing image or video, you can select it from your media library.'
+				),
 			} }
 			onSelect={ onSelectMedia }
 			accept="image/*,video/*"
