@@ -102,7 +102,7 @@ class Inserter extends Component {
 			disabled,
 			blockTitle,
 			hasSingleBlockType,
-			directInsert,
+			directInsertBlock,
 			toggleProps,
 			hasItems,
 			renderToggle = defaultRenderToggle,
@@ -114,7 +114,7 @@ class Inserter extends Component {
 			disabled: disabled || ! hasItems,
 			blockTitle,
 			hasSingleBlockType,
-			directInsert,
+			directInsertBlock,
 			toggleProps,
 		} );
 	}
@@ -170,13 +170,13 @@ class Inserter extends Component {
 		const {
 			position,
 			hasSingleBlockType,
-			directInsert,
+			directInsertBlock,
 			insertOnlyAllowedBlock,
 			__experimentalIsQuick: isQuick,
 			onSelectOrClose,
 		} = this.props;
 
-		if ( hasSingleBlockType || directInsert?.length ) {
+		if ( hasSingleBlockType || directInsertBlock?.length ) {
 			return this.renderToggle( { onToggle: insertOnlyAllowedBlock } );
 		}
 
@@ -205,7 +205,7 @@ export default compose( [
 			getBlockRootClientId,
 			hasInserterItems,
 			__experimentalGetAllowedBlocks,
-			__experimentalGetDirectInsert,
+			__experimentalGetDirectInsertBlock,
 		} = select( blockEditorStore );
 		const { getBlockVariations } = select( blocksStore );
 
@@ -214,7 +214,9 @@ export default compose( [
 
 		const allowedBlocks = __experimentalGetAllowedBlocks( rootClientId );
 
-		const directInsert = __experimentalGetDirectInsert( rootClientId );
+		const directInsertBlock = __experimentalGetDirectInsertBlock(
+			rootClientId
+		);
 
 		const hasSingleBlockType =
 			size( allowedBlocks ) === 1 &&
@@ -232,7 +234,7 @@ export default compose( [
 			hasSingleBlockType,
 			blockTitle: allowedBlockType ? allowedBlockType.title : '',
 			allowedBlockType,
-			directInsert,
+			directInsertBlock,
 			rootClientId,
 		};
 	} ),
@@ -245,11 +247,11 @@ export default compose( [
 					isAppender,
 					hasSingleBlockType,
 					allowedBlockType,
-					directInsert,
+					directInsertBlock,
 					onSelectOrClose,
 				} = ownProps;
 
-				if ( ! hasSingleBlockType && ! directInsert?.length ) {
+				if ( ! hasSingleBlockType && ! directInsertBlock?.length ) {
 					return;
 				}
 
@@ -282,8 +284,11 @@ export default compose( [
 
 				const { insertBlock } = dispatch( blockEditorStore );
 
-				const blockToInsert = directInsert?.length
-					? createBlock( directInsert[ 0 ], directInsert[ 1 ] )
+				const blockToInsert = directInsertBlock?.length
+					? createBlock(
+							directInsertBlock[ 0 ],
+							directInsertBlock[ 1 ]
+					  )
 					: createBlock( allowedBlockType.name );
 
 				insertBlock( blockToInsert, getInsertionIndex(), rootClientId );

@@ -1798,14 +1798,21 @@ export const __experimentalGetAllowedBlocks = createSelector(
  * @param {Object}  state        Editor state.
  * @param {?string} rootClientId Optional root client ID of block list.
  *
- * @return {string?} The block type to be directly inserted.
+ * @return {?Array} The block type to be directly inserted.
  */
-export const __experimentalGetDirectInsert = createSelector(
+export const __experimentalGetDirectInsertBlock = createSelector(
 	( state, rootClientId = null ) => {
 		if ( ! rootClientId ) {
 			return;
 		}
-		return state.blockListSettings[ rootClientId ]?.directInsert;
+		const defaultBlock =
+			state.blockListSettings[ rootClientId ]?.__experimentalDefaultBlock;
+		const directInsert =
+			state.blockListSettings[ rootClientId ]?.__experimentalDirectInsert;
+		if ( ! defaultBlock?.length || ! directInsert ) {
+			return;
+		}
+		return defaultBlock;
 	},
 	( state, rootClientId ) => [ state.blockListSettings[ rootClientId ] ]
 );

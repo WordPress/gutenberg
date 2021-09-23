@@ -50,7 +50,7 @@ const ALLOWED_BLOCKS = [
 	'core/navigation-submenu',
 ];
 
-const DIRECT_INSERT = [ 'core/navigation-link' ];
+const DEFAULT_BLOCK = [ 'core/navigation-link' ];
 
 const LAYOUT = {
 	type: 'default',
@@ -161,18 +161,14 @@ function Navigation( {
 			? undefined
 			: false;
 
-	const directInsertValue = useMemo(
-		() => ( onlyLinkInnerBlocks ? DIRECT_INSERT : [] ),
-		[ onlyLinkInnerBlocks ]
-	);
-
 	const innerBlocksProps = useInnerBlocksProps(
 		{
 			className: 'wp-block-navigation__container',
 		},
 		{
 			allowedBlocks: ALLOWED_BLOCKS,
-			directInsert: directInsertValue,
+			__experimentalDefaultBlock: DEFAULT_BLOCK,
+			__experimentalDirectInsert: onlyLinkInnerBlocks,
 			orientation: attributes.orientation,
 			renderAppender: CustomAppender || appender,
 
