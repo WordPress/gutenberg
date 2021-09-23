@@ -7,20 +7,23 @@ import { moreHorizontal } from '@wordpress/icons';
 export function TablePlaceholderPreview( props ) {
 	const { rowCount, columnCount } = props;
 
-	const heightValue = 75;
+	const containerHeight = 75;
 
-	const maxColumns = 13;
-	const maxRows = 9;
+	// after we cross the threshold we display an elispis to indicate that there are more items
+	const maxDisplayColumns = 13;
+	const maxDisplayRows = 9;
 
-	const clampedColumnCount = Math.min( columnCount, maxColumns );
-	const clampedRowCount = Math.min( rowCount, maxRows );
+	const clampedColumnCount = Math.min( columnCount, maxDisplayColumns );
+	const clampedRowCount = Math.min( rowCount, maxDisplayRows );
 
-	const gapValue =
+	const gapSize =
 		( 1 / Math.max( clampedColumnCount, clampedRowCount ) ) * 20;
 
-	const blockHeight = heightValue / clampedRowCount;
-	const widthValue = blockHeight * clampedColumnCount;
+	const cellHeight = containerHeight / clampedRowCount;
+	const containerWidth = cellHeight * clampedColumnCount;
 
+	// create two arrays that have the length of the rows and columns
+	// and contain the index of the individual items
 	const arrayOfBoxesPerRow = Array.apply(
 		null,
 		Array( clampedRowCount )
@@ -49,10 +52,10 @@ export function TablePlaceholderPreview( props ) {
 					display: 'grid',
 					gridTemplateColumns: `repeat(${ clampedColumnCount }, 1fr)`,
 					gridTemplateRows: `repeat(${ clampedRowCount }, 1fr)`,
-					gridGap: `${ gapValue }px`,
-					width: `${ widthValue }px`,
+					gridGap: `${ gapSize }px`,
+					width: `${ containerWidth }px`,
 					maxWidth: '75%',
-					height: `${ heightValue }px`,
+					height: `${ containerHeight }px`,
 				} }
 			>
 				{ arrayOfBoxesPerRow.map( ( row ) =>
@@ -60,7 +63,7 @@ export function TablePlaceholderPreview( props ) {
 						<Box
 							row={ row + 1 }
 							column={ column + 1 }
-							blockHeight={ blockHeight }
+							cellHeight={ cellHeight }
 							rowCount={ rowCount }
 							columnCount={ columnCount }
 							key={ `${ row }-${ column }` }
@@ -72,68 +75,42 @@ export function TablePlaceholderPreview( props ) {
 	);
 }
 
-function Box( { column, row, blockHeight, columnCount, rowCount } ) {
-	const maxColumns = 12;
-	const maxRows = 8;
+function Box( { column, row, cellHeight, columnCount, rowCount } ) {
+	const columnsThreshold = 12;
+	const rowsThreshold = 8;
 
-	const hasCrossedRowThreshold = rowCount > maxRows;
-	const hasCrossedColumnThreshold = columnCount > maxColumns;
+	const hasCrossedRowThreshold = rowCount > rowsThreshold;
+	const hasCrossedColumnThreshold = columnCount > columnsThreshold;
 
-	if ( hasCrossedColumnThreshold && column === maxColumns ) {
-		return (
-			<BoxWithElipsis
-				row={ row }
-				column={ column }
-				blockHeight={ blockHeight }
-				paradigm={ 'row' }
-			/>
-		);
-	}
-
-	if ( hasCrossedRowThreshold && row === maxRows ) {
-		return (
-			<BoxWithElipsis
-				row={ row }
-				column={ column }
-				blockHeight={ blockHeight }
-				paradigm={ 'column' }
-			/>
-		);
-	}
+	const shouldShowElipsis =
+		( hasCrossedColumnThreshold && column === columnsThreshold ) ||
+		( hasCrossedRowThreshold && row === rowsThreshold );
 
 	return (
 		<span
 			style={ {
-				backgroundColor: '#fff',
-				border: '1px solid #000000',
-				aspectRatio: 1,
-				gridColumn: column,
-				gridRow: row,
-			} }
-			className="blocks-table__placeholder-preview-item"
-		/>
-	);
-}
-
-const BoxWithElipsis = ( { row, column, blockHeight } ) => {
-	return (
-		<span
-			style={ {
-				aspectRatio: 1,
+				backgroundColor: shouldShowElipsis ? 'transparent' : '#fff',
+				border: shouldShowElipsis ? 'none' : '1px solid #000000',
 				gridColumn: column,
 				gridRow: row,
 				alignSelf: 'center',
 				justifyItems: 'center',
 				justifySelf: 'center',
-				lineHeight: 0,
+				height: '100%',
+				width: '100%',
+				display: 'flex',
+				alignItems: 'center',
+				justifyContent: 'center',
 			} }
 			className="blocks-table__placeholder-preview-item"
 		>
-			<Icon
-				icon={ moreHorizontal }
-				height={ blockHeight / 2 }
-				width={ blockHeight / 2 }
-			/>
+			{ shouldShowElipsis && (
+				<Icon
+					icon={ moreHorizontal }
+					height={ cellHeight / 2 }
+					width={ cellHeight / 2 }
+				/>
+			) }
 		</span>
 	);
-};
+}
