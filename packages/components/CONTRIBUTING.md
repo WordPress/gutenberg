@@ -337,6 +337,11 @@ Prop description. With a new line before and after the description and before an
 ### Inherited props
 
 Add this section when there are props that are drilled down into an internal component. See [ClipboardButton](/packages/components/src/clipboard-button/README.md) for an example.
+
+<!-- Only add the next section if the component relies on the [Context System](#context-system) -->
+## Context
+
+See examples for this section for the [ItemGroup](/packages/components/src/item-group/item-group/README.md#context) and [`Card`](/packages/components/src/card/card/README.md#context) components.
 ```
 
 #### Folder structure
