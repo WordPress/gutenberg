@@ -45,13 +45,13 @@ function InlineLinkUI( {
 	 */
 	const [ nextLinkValue, setNextLinkValue ] = useState();
 
-	const { createEntity, userCanCreate } = useSelect( ( select ) => {
+	const { createEntity, userCanCreatePages } = useSelect( ( select ) => {
 		const { getSettings } = select( blockEditorStore );
 		const _settings = getSettings();
 
 		return {
 			createEntity: _settings.__experimentalCreateEntity,
-			userCanCreate: _settings.__experimentalUserCanCreateEntities,
+			userCanCreatePages: _settings.__experimentalUserCanCreatePages,
 		};
 	}, [] );
 
@@ -193,7 +193,7 @@ function InlineLinkUI( {
 				forceIsEditingLink={ addingLink }
 				hasRichPreviews
 				createSuggestion={ createEntity && handleCreate }
-				withCreateSuggestion={ userCanCreate }
+				withCreateSuggestion={ userCanCreatePages }
 				createSuggestionButtonText={ createButtonText }
 			/>
 		</Popover>

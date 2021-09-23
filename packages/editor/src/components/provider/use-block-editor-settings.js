@@ -34,7 +34,6 @@ function useBlockEditorSettings( settings, hasTemplate ) {
 		hasUploadPermissions,
 		canUseUnfilteredHTML,
 		userCanCreatePages,
-		userCanCreatePosts,
 	} = useSelect( ( select ) => {
 		const { canUserUseUnfilteredHTML } = select( editorStore );
 		const isWeb = Platform.OS === 'web';
@@ -63,14 +62,7 @@ function useBlockEditorSettings( settings, hasTemplate ) {
 			),
 			hasResolvedLocalSiteData: hasFinishedResolvingSiteData,
 			baseUrl: siteData?.url || '',
-			userCanCreatePages: select( coreStore ).canUser(
-				'create',
-				'pages'
-			),
-			userCanCreatePosts: select( coreStore ).canUser(
-				'create',
-				'posts'
-			),
+			userCanCreatePages: canUser( 'create', 'pages' ),
 		};
 	}, [] );
 
@@ -157,8 +149,7 @@ function useBlockEditorSettings( settings, hasTemplate ) {
 			__experimentalUndo: undo,
 			outlineMode: hasTemplate,
 			__experimentalCreateEntity: createEntity,
-			__experimentalUserCanCreateEntities:
-				userCanCreatePosts && userCanCreatePages,
+			__experimentalUserCanCreatePages: userCanCreatePages,
 		} ),
 		[
 			settings,
@@ -167,7 +158,7 @@ function useBlockEditorSettings( settings, hasTemplate ) {
 			canUseUnfilteredHTML,
 			undo,
 			hasTemplate,
-			userCanCreatePosts,
+
 			userCanCreatePages,
 			createEntity,
 		]
