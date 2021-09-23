@@ -1,16 +1,28 @@
 const createFixerFunction = ( errorType, node ) => ( arg ) => {
+	const commentType = node.type;
+	const commentOpenToken = commentType === 'Line' ? '//' : '/*';
+	const commentCloseToken = commentType === 'Line' ? '' : ' */';
+	const trimmedComment = node.value.trim();
+
 	switch ( errorType ) {
 		case 'missingSpace':
-			return arg.replaceText( node, `// ${ node.value }` );
-		case 'missingPunctuation':
-			return arg.insertTextAfter( node, '.' );
-		case 'capitalLetter':
-			const trimmedComment = node.value.trim();
 			return arg.replaceText(
 				node,
-				`// ${ trimmedComment
+				`${ commentOpenToken } ${ trimmedComment }${ commentCloseToken }`
+			);
+		case 'missingPunctuation':
+			return arg.replaceText(
+				node,
+				`${ commentOpenToken } ${ trimmedComment }.${ commentCloseToken }`
+			);
+		case 'capitalLetter':
+			return arg.replaceText(
+				node,
+				`${ commentOpenToken } ${ trimmedComment
 					.charAt( 0 )
-					.toUpperCase() }${ trimmedComment.substring( 1 ) }`
+					.toUpperCase() }${ trimmedComment.substring(
+					1
+				) }${ commentCloseToken }`
 			);
 	}
 };
