@@ -87,22 +87,19 @@ function useBlockEditorSettings( settings, hasTemplate ) {
 	 * @return {Object} the post type object that was created.
 	 */
 	const createEntity = ( postType, options ) => {
-		const postTypeWhitelist = [ 'post', 'page' ];
+		// The function is intentionally left open for extension in the future.
+		// However for now we lock this down to only allow Pages.
+		const postTypeWhitelist = [ 'page' ];
 
 		if ( ! postTypeWhitelist.includes( postType ) ) {
 			return Promise.reject( {
-				message: `Only Posts and Pages may be created.`,
+				message: 'Only Pages may be created.',
 			} );
 		}
 
-		const permsOnEntity =
-			postType === 'page' ? userCanCreatePages : userCanCreatePosts;
-
-		const pluralType = postType === 'page' ? 'Pages' : 'Posts';
-
-		if ( ! permsOnEntity ) {
+		if ( ! userCanCreatePages ) {
 			return Promise.reject( {
-				message: `You do not have permission to create ${ pluralType }.`,
+				message: 'You do not have permission to create Pages.',
 			} );
 		}
 		return saveEntityRecord( 'postType', postType, options );

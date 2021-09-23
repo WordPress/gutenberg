@@ -1,8 +1,8 @@
 /**
  * WordPress dependencies
  */
-import { useState, useRef } from '@wordpress/element';
-import { __ } from '@wordpress/i18n';
+import { useState, useRef, createInterpolateElement } from '@wordpress/element';
+import { __, sprintf } from '@wordpress/i18n';
 import { withSpokenMessages, Popover } from '@wordpress/components';
 import { prependHTTP } from '@wordpress/url';
 import {
@@ -152,8 +152,7 @@ function InlineLinkUI( {
 	const focusOnMount = useRef( addingLink ? 'firstElement' : false );
 
 	async function handleCreate( pageTitle ) {
-		const type = 'page';
-		const postType = type || 'page';
+		const postType = 'page';
 
 		const page = await createEntity( postType, {
 			title: pageTitle,
@@ -167,6 +166,17 @@ function InlineLinkUI( {
 			url: page.link,
 			kind: 'post-type',
 		};
+	}
+
+	function createButtonText( searchTerm ) {
+		return createInterpolateElement(
+			sprintf(
+				/* translators: %s: search term. */
+				__( 'Create Page: <mark>%s</mark>' ),
+				searchTerm
+			),
+			{ mark: <mark /> }
+		);
 	}
 
 	return (
@@ -184,6 +194,7 @@ function InlineLinkUI( {
 				hasRichPreviews
 				createSuggestion={ createEntity && handleCreate }
 				withCreateSuggestion={ userCanCreate }
+				createSuggestionButtonText={ createButtonText }
 			/>
 		</Popover>
 	);
