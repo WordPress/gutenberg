@@ -31,7 +31,6 @@ function FontSizePicker( {
 	const navigation = useNavigation();
 
 	const { height, width } = useWindowDimensions();
-	// use fontScale to create a better
 	const cssUnitOptions = { height, width, fontSize: DEFAULT_FONT_SIZE };
 	// We need to always convert to px units because the selected value
 	// could be coming from the web where it could be stored as a different unit.
