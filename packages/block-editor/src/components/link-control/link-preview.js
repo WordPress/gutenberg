@@ -13,7 +13,7 @@ import {
 	__experimentalText as Text,
 } from '@wordpress/components';
 import { filterURLForDisplay, safeDecodeURI } from '@wordpress/url';
-import { Icon, globe, warning } from '@wordpress/icons';
+import { Icon, globe, info } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -46,7 +46,7 @@ export default function LinkPreview( {
 	if ( richData?.icon ) {
 		icon = <img src={ richData?.icon } alt="" />;
 	} else if ( isEmptyURL ) {
-		icon = <Icon icon={ warning } size={ 32 } />;
+		icon = <Icon icon={ info } size={ 32 } />;
 	} else {
 		icon = <Icon icon={ globe } />;
 	}
