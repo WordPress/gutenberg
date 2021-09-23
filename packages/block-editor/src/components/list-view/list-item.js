@@ -27,8 +27,8 @@ export default function ListViewListItem( {
 } ) {
 	const blockType = getBlockType( block.name );
 	const blockLabel = blockType
-			? getBlockLabel( blockType, block.attributes ) 
-			: null;
+		? getBlockLabel( blockType, block.attributes )
+		: null;
 
 	return (
 		<div className="block-editor-list-view__list-item">
