@@ -9,10 +9,23 @@
 	"attributes": {
 		"format": {
 			"type": "string"
+		},
+		"isLink": {
+			"type": "boolean",
+			"default": false
 		}
 	},
 	"usesContext": [ "commentId" ],
 	"supports": {
-		"html": false
+		"html": false,
+		"color": {
+			"gradients": true,
+			"link": true
+		},
+		"typography": {
+			"fontSize": true,
+			"lineHeight": true,
+			"__experimentalFontWeight": true
+		}
 	}
 }
