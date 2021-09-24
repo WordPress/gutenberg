@@ -60,19 +60,15 @@ ruleTester.run( 'comment-case', rule, {
 	invalid: [
 		{
 			code: `const someVar = 1; // Describe the var`,
-			output: `const someVar = 1; // Describe the var.`,
 			errors: [ { messageId: 'missingPunctuation' } ],
 		},
 		{
 			code: `const someVar = 1; // no capital letter.`,
-			output: `const someVar = 1; // No capital letter.`,
 			errors: [ { messageId: 'capitalLetter' } ],
 		},
 		{
 			code: `const someVar = 1; // Describe the var
 			const someOtherVar = 2; // Describe this one too`,
-			output: `const someVar = 1; // Describe the var.
-			const someOtherVar = 2; // Describe this one too.`,
 			errors: [
 				{ messageId: 'missingPunctuation' },
 				{ messageId: 'missingPunctuation' },
@@ -80,36 +76,28 @@ ruleTester.run( 'comment-case', rule, {
 		},
 		{
 			code: `// My comment without a period`,
-			output: `// My comment without a period.`,
 			errors: [ { messageId: 'missingPunctuation' } ],
 		},
 		{
 			code: `/* Block comment without a period */`,
-			output: `/* Block comment without a period. */`,
 			errors: [ { messageId: 'missingPunctuation' } ],
 		},
 		{
 			code: `/*Block comment without a space. */`,
-			output: `/* Block comment without a space. */`,
 			errors: [ { messageId: 'missingSpace' } ],
 		},
 		{
 			code: `/* block comment without a capital. */`,
-			output: `/* Block comment without a capital. */`,
 			errors: [ { messageId: 'capitalLetter' } ],
 		},
 		{
 			code: `//My comment without a space.`,
-			output: `// My comment without a space.`,
 			errors: [ { messageId: 'missingSpace' } ],
 		},
 		{
 			code: `//My multi line
 			//comments without
 			//spaces`,
-			output: `// My multi line
-			// comments without
-			// spaces`, // No period here because this test case is for a single pass.
 			errors: [
 				{ messageId: 'missingSpace' },
 				{ messageId: 'missingSpace' },
