@@ -121,6 +121,7 @@
 		// Don't take up space when the menu is collapsed.
 		width: 0;
 		height: 0;
+		overflow: hidden;
 
 		// Submenu items.
 		> .wp-block-navigation-item {
@@ -183,6 +184,7 @@
 		opacity: 1;
 		width: auto;
 		height: auto;
+		overflow: initial;
 		min-width: 200px;
 	}
 
