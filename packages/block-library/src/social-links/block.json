@@ -10,7 +10,7 @@
 		"iconColor": {
 			"type": "string"
 		},
-		"customIconColor": {	
+		"customIconColor": {
 			"type": "string"
 		},
 		"iconColorValue": {
