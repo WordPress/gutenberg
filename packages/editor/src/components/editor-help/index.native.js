@@ -154,7 +154,7 @@ function EditorHelpTopics( { close, isVisible, onClose } ) {
 											{
 												<HelpGetSupportButton
 													title={ __(
-														'Contact Support'
+														'Contact support'
 													) }
 													onPress={
 														requestContactCustomerSupport
@@ -164,7 +164,7 @@ function EditorHelpTopics( { close, isVisible, onClose } ) {
 											{
 												<HelpGetSupportButton
 													title={ __(
-														'All Support Options'
+														'More support options'
 													) }
 													onPress={
 														requestGotoCustomerSupportOptions
