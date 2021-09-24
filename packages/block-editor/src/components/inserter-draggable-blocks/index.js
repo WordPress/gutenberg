@@ -2,15 +2,23 @@
  * WordPress dependencies
  */
 import { Draggable } from '@wordpress/components';
+
 /**
  * Internal dependencies
  */
 import BlockDraggableChip from '../block-draggable/draggable-chip';
 
-const InserterDraggableBlocks = ( { isEnabled, blocks, icon, children } ) => {
+const InserterDraggableBlocks = ( {
+	isEnabled,
+	blocks,
+	icon,
+	children,
+	clone = false,
+} ) => {
 	const transferData = {
 		type: 'inserter',
 		blocks,
+		clone,
 	};
 
 	return (
