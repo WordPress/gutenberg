@@ -4,7 +4,7 @@
 // eslint-disable-next-line no-restricted-imports
 import React, { useEffect, useState } from 'react';
 // eslint-disable-next-line no-restricted-imports
-import type { Ref, SyntheticEvent, KeyboardEvent } from 'react';
+import type { Ref, MouseEvent, KeyboardEvent } from 'react';
 
 /**
  * WordPress dependencies
@@ -15,7 +15,7 @@ import { __ } from '@wordpress/i18n';
  * Internal dependencies
  */
 import Modal from '../modal';
-import type { OwnProps } from './types';
+import type { OwnProps, DialogInputEvent } from './types';
 import {
 	useContextSystem,
 	contextConnect,
@@ -54,9 +54,8 @@ function ConfirmDialog(
 		setSelfClose( ! isIsOpenSet );
 	}, [ isOpenProp ] );
 
-	// @todo improve type, should handle keyboard and mousevent
-	const handleEvent = ( callback: ( event: SyntheticEvent ) => void ) => (
-		event: SyntheticEvent
+	const handleEvent = ( callback: ( event: DialogInputEvent ) => void ) => (
+		event: DialogInputEvent
 	) => {
 		// `onCancel` is optional
 		callback?.( event );
