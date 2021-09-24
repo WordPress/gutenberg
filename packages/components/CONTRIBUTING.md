@@ -17,6 +17,7 @@ For an example of a component that follows these requirements, take a look at [`
 - [Unit tests](#unit-tests)
 - [Storybook](#storybook)
 - [Documentation](#documentation)
+- [README example](#README-example)
 - [Folder structure](#folder-structure)
 
 ## Compatibility
@@ -292,6 +293,58 @@ Storybook can be started on a local machine by running `npm run storybook:dev`. 
 All components, in addition to being typed, should be using JSDoc when necessary — as explained in the [Coding Guidelines](/docs/contributors/code/coding-guidelines.md#javascript-documentation-using-jsdoc).
 
 Each component that is exported from the `@wordpress/components` package should include a `README.md` file, explaining how to use the component, showing examples, and documenting all the props.
+
+## README example
+
+```md
+# `ComponentName`
+
+<!-- If component is experimental, add the following section: -->
+<div class="callout callout-alert">
+This feature is still experimental. “Experimental” means this is an early implementation subject to drastic and breaking changes.
+</div>
+
+<!-- If component is deprecated, add the following section: -->
+<div class="callout callout-alert">
+This component is deprecated. Please use  `{other component}` from the `{other package}` package instead.
+</div>
+
+Description of the component.
+
+## Usage
+
+Code example using correct markdown syntax and formatted using project's formatting rules. See [ItemGroup](/packages/components/src/item-group/item-group/README.md#usage) for a real-world example.
+
+```jsx
+import { ExampleComponent } from '@wordpress/components';
+
+function Example() {
+	return (
+		<ExampleComponent>
+			<p>Code is poetry</p>
+		</ExampleComponent>
+	);
+}
+
+## Props
+
+The component accepts the following props:
+
+### `propName`: Typescript style type i.e `string`, `number`, `( nextValue: string ) => void`
+
+Prop description. With a new line before and after the description and before and after type/required blocks.
+
+-   Required: Either `Yes` or `No`
+
+### Inherited props
+
+Add this section when there are props that are drilled down into an internal component. See [ClipboardButton](/packages/components/src/clipboard-button/README.md) for an example.
+
+<!-- Only add the next section if the component relies on the [Context System](#context-system) -->
+## Context
+
+See examples for this section for the [ItemGroup](/packages/components/src/item-group/item-group/README.md#context) and [`Card`](/packages/components/src/card/card/README.md#context) components.
+```
 
 ## Folder structure
 
