@@ -118,7 +118,7 @@ const ToolsPanelHeader = (
 	const {
 		dropdownMenuClassName,
 		hasMenuItems,
-		areOptionalControlsAvailableAndHidden,
+		areAllOptionalControlsHidden,
 		label: labelText,
 		menuItems,
 		resetAll,
@@ -132,10 +132,8 @@ const ToolsPanelHeader = (
 
 	const defaultItems = Object.entries( menuItems?.default || {} );
 	const optionalItems = Object.entries( menuItems?.optional || {} );
-	const dropDownMenuIcon = areOptionalControlsAvailableAndHidden
-		? plus
-		: moreVertical;
-	const dropDownMenuLabelText = areOptionalControlsAvailableAndHidden
+	const dropDownMenuIcon = areAllOptionalControlsHidden ? plus : moreVertical;
+	const dropDownMenuLabelText = areAllOptionalControlsHidden
 		? _x(
 				'View and add options',
 				'Button label to reveal tool panel options'

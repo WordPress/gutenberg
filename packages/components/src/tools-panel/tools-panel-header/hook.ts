@@ -32,14 +32,14 @@ export function useToolsPanelHeader(
 	const {
 		menuItems,
 		hasMenuItems,
-		areOptionalControlsAvailableAndHidden,
+		areAllOptionalControlsHidden,
 	} = useToolsPanelContext();
 
 	return {
 		...otherProps,
 		dropdownMenuClassName,
 		hasMenuItems,
-		areOptionalControlsAvailableAndHidden,
+		areAllOptionalControlsHidden,
 		menuItems,
 		className: classes,
 	};
