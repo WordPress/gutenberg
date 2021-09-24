@@ -121,6 +121,15 @@ describe( 'state', () => {
 					type: 'SET_TEMPLATE_PART',
 					templatePartId: 2,
 				} )
+			).toEqual( [ { id: 2, type: 'wp_template_part' } ] );
+		} );
+
+		it( 'should update when a template part is pushed', () => {
+			expect(
+				editedPost( [ { id: 1, type: 'wp_template' } ], {
+					type: 'PUSH_TEMPLATE_PART',
+					templatePartId: 2,
+				} )
 			).toEqual( [
 				{ id: 1, type: 'wp_template' },
 				{ id: 2, type: 'wp_template_part' },
