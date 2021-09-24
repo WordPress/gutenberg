@@ -25,6 +25,7 @@ class BottomSheetRangeCell extends Component {
 	constructor( props ) {
 		super( props );
 		this.onSliderChange = this.onSliderChange.bind( this );
+		this.onCompleteSliderChange = this.onCompleteSliderChange.bind( this );
 		this.onTextInputChange = this.onTextInputChange.bind( this );
 		this.a11yIncrementValue = this.a11yIncrementValue.bind( this );
 		this.a11yDecrementValue = this.a11yDecrementValue.bind( this );
@@ -56,6 +57,14 @@ class BottomSheetRangeCell extends Component {
 			sliderValue: nextValue,
 		} );
 		onChange( nextValue );
+		if ( onComplete ) {
+			onComplete( nextValue );
+		}
+	}
+
+	onCompleteSliderChange( nextValue ) {
+		const { decimalNum, onComplete } = this.props;
+		nextValue = toFixed( nextValue, decimalNum );
 		if ( onComplete ) {
 			onComplete( nextValue );
 		}
@@ -138,7 +147,6 @@ class BottomSheetRangeCell extends Component {
 			thumbTintColor = ! isIOS && '#00669b',
 			preview,
 			cellContainerStyle,
-			onComplete,
 			shouldDisplayTextInput = true,
 			unitLabel = '',
 			settingLabel = 'Value',
@@ -225,7 +233,9 @@ class BottomSheetRangeCell extends Component {
 								maximumTrackTintColor={ maximumTrackTintColor }
 								thumbTintColor={ thumbTintColor }
 								onValueChange={ this.onSliderChange }
-								onSlidingComplete={ onComplete }
+								onSlidingComplete={
+									this.onCompleteSliderChange
+								}
 								ref={ ( slider ) => {
 									this.sliderRef = slider;
 								} }
