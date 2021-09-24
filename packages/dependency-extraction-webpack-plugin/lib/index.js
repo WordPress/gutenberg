@@ -147,7 +147,9 @@ class DependencyExtractionWebpackPlugin {
 		if ( externalizedReportFile ) {
 			compilation.emitAsset(
 				externalizedReportFile,
-				new RawSource( JSON.stringify( Array.from( this.externalizedDeps ) ) ),
+				new RawSource(
+					JSON.stringify( Array.from( this.externalizedDeps ) )
+				)
 			);
 		}
 
