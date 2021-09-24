@@ -153,47 +153,6 @@ describe( 'getNavigationPostForMenu', () => {
 			.resolveSelect( editNavigationStore )
 			.getNavigationPostForMenu( menuId );
 
-		expect( stubPost ).toBeTruthy();
-		expect( stubPost.id ).toBe( 'navigation-post-123' );
-		expect( stubPost.blocks ).toHaveLength( 1 );
-		expect( stubPost.blocks[ 0 ].innerBlocks ).toHaveLength( 3 );
-	} );
-
-	it( 'creates correct core/navigation-link block variations from menu objects', async () => {
-		const menuId = 123;
-
-		const registry = createRegistryWithStores();
-		const stubPost = await registry
-			.resolveSelect( editNavigationStore )
-			.getNavigationPostForMenu( menuId );
-
-		const blocks = stubPost.blocks[ 0 ].innerBlocks;
-
-		// Post link
-		expect( blocks[ 0 ].attributes ).toEqual(
-			expect.objectContaining( {
-				id: 123,
-				type: 'post',
-			} )
-		);
-
-		// Page link
-		expect( blocks[ 1 ].attributes ).toEqual(
-			expect.objectContaining( {
-				id: 456,
-				type: 'page',
-			} )
-		);
-
-		// Custom link
-		expect( blocks[ 2 ].attributes ).toEqual(
-			expect.objectContaining( {
-				type: 'custom',
-			} )
-		);
-
-		// We should not manually create an ID unless the menu object
-		// has a `object_id` field set.
-		expect( blocks[ 2 ].attributes.id ).toBeUndefined();
+		expect( stubPost ).toMatchSnapshot();
 	} );
 } );
