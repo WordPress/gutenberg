@@ -48,8 +48,8 @@ export function TableDimensionsPreview( { rowCount, columnCount } ) {
 
 	// create two arrays that have the length of the rows and columns
 	// and contain the index of the individual items
-	const arrayOfBoxesPerRow = createArrayOfLength( clampedRowCount );
-	const arrayOfBoxesPerColumn = createArrayOfLength( clampedColumnCount );
+	const arrayOfCellsPerRow = createArrayOfLength( clampedRowCount );
+	const arrayOfCellsPerColumn = createArrayOfLength( clampedColumnCount );
 
 	return (
 		<div className="blocks-table__placeholder-preview">
@@ -63,9 +63,9 @@ export function TableDimensionsPreview( { rowCount, columnCount } ) {
 					height: `${ containerHeight }px`,
 				} }
 			>
-				{ arrayOfBoxesPerRow.map( ( row ) =>
-					arrayOfBoxesPerColumn.map( ( column ) => (
-						<Box
+				{ arrayOfCellsPerRow.map( ( row ) =>
+					arrayOfCellsPerColumn.map( ( column ) => (
+						<Cell
 							row={ row + 1 }
 							column={ column + 1 }
 							cellHeight={ cellHeight }
@@ -80,7 +80,7 @@ export function TableDimensionsPreview( { rowCount, columnCount } ) {
 	);
 }
 
-function Box( { column, row, cellHeight, columnCount, rowCount } ) {
+function Cell( { column, row, cellHeight, columnCount, rowCount } ) {
 	const columnsThreshold = 12;
 	const rowsThreshold = 8;
 
