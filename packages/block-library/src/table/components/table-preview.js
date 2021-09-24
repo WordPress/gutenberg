@@ -3,6 +3,10 @@
  */
 import { Icon } from '@wordpress/components';
 import { moreHorizontal } from '@wordpress/icons';
+/**
+ * External dependencies
+ */
+import classNames from 'classnames';
 
 /**
  * createArrayOfLength
@@ -48,27 +52,14 @@ export function TableDimensionsPreview( { rowCount, columnCount } ) {
 	const arrayOfBoxesPerColumn = createArrayOfLength( clampedColumnCount );
 
 	return (
-		<div
-			className="blocks-table__placeholder-preview"
-			style={ {
-				width: '100%',
-				height: '96px',
-				display: 'flex',
-				justifyContent: 'center',
-				alignItems: 'center',
-				backgroundColor: '#EDEFF0',
-				marginBlockEnd: '1em',
-				borderRadius: '2px',
-			} }
-		>
+		<div className="blocks-table__placeholder-preview">
 			<div
+				className="blocks-table__placeholder-preview-container"
 				style={ {
-					display: 'grid',
 					gridTemplateColumns: `repeat(${ clampedColumnCount }, 1fr)`,
 					gridTemplateRows: `repeat(${ clampedRowCount }, 1fr)`,
 					gridGap: `${ gapSize }px`,
 					width: `${ containerWidth }px`,
-					maxWidth: '75%',
 					height: `${ containerHeight }px`,
 				} }
 			>
@@ -103,20 +94,12 @@ function Box( { column, row, cellHeight, columnCount, rowCount } ) {
 	return (
 		<span
 			style={ {
-				backgroundColor: shouldShowElipsis ? 'transparent' : '#fff',
-				border: shouldShowElipsis ? 'none' : '1px solid #000000',
 				gridColumn: column,
 				gridRow: row,
-				alignSelf: 'center',
-				justifyItems: 'center',
-				justifySelf: 'center',
-				height: '100%',
-				width: '100%',
-				display: 'flex',
-				alignItems: 'center',
-				justifyContent: 'center',
 			} }
-			className="blocks-table__placeholder-preview-item"
+			className={ classNames( 'blocks-table__placeholder-preview-cell', {
+				'is-elipsis': shouldShowElipsis,
+			} ) }
 		>
 			{ shouldShowElipsis && (
 				<Icon

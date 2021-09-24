@@ -78,3 +78,41 @@
 		margin-bottom: 0;
 	}
 }
+
+.blocks-table__placeholder-preview {
+	width: 100%;
+	height: 96px;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	background-color: #edeff0;
+	margin-bottom: $grid-unit-10;
+	border-radius: 2px;
+}
+
+.blocks-table__placeholder-form .blocks-table__placeholder-preview {
+	margin-bottom: $grid-unit-20;
+}
+
+.blocks-table__placeholder-preview-container {
+	display: grid;
+	max-width: 75%;
+}
+
+.blocks-table__placeholder-preview-cell {
+	background-color: #fff;
+	border: 1px solid #000;
+	align-self: center;
+	justify-items: center;
+	justify-self: center;
+	height: 100%;
+	width: 100%;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+}
+
+.blocks-table__placeholder-preview-cell.is-elipsis {
+	background-color: transparent;
+	border: none;
+}
