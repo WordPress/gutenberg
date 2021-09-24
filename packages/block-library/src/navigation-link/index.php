@@ -130,7 +130,7 @@ function render_block_core_navigation_link( $attributes, $content, $block ) {
 	// Don't render the block's subtree if it is a draft or if the ID does not exist.
 	if ( $is_post_type && $navigation_link_has_id ) {
 		$post = get_post( $attributes['id'] );
-		if ( ! isset( $post ) || 'publish' !== $post->post_status ) {
+		if ( ! $post || 'publish' !== $post->post_status ) {
 			return '';
 		}
 	}
