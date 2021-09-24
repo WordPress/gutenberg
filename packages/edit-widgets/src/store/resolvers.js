@@ -21,7 +21,7 @@ import { transformWidgetToBlock } from './transformers';
 export const getWidgetAreas = () => async ( { dispatch, registry } ) => {
 	const query = buildWidgetAreasQuery();
 	const widgetAreas = await registry
-		.resolveSelect( 'core' )
+		.resolveSelect( coreStore )
 		.getEntityRecords( KIND, WIDGET_AREA_ENTITY_TYPE, query );
 
 	const widgetAreaBlocks = [];
