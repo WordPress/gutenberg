@@ -6,6 +6,7 @@ import { store as noticesStore } from '@wordpress/notices';
 import { store as interfaceStore } from '@wordpress/interface';
 import { getWidgetIdFromBlock } from '@wordpress/widgets';
 import { store as coreStore } from '@wordpress/core-data';
+import { store as blockEditorStore } from '@wordpress/block-editor';
 
 /**
  * Internal dependencies
@@ -361,13 +362,13 @@ export const moveBlockToWidgetArea = ( clientId, widgetAreaId ) => async ( {
 	registry,
 } ) => {
 	const sourceRootClientId = registry
-		.select( 'core/block-editor' )
+		.select( blockEditorStore )
 		.getBlockRootClientId( [ clientId ] );
 
 	// Search the top level blocks (widget areas) for the one with the matching
 	// id attribute. Makes the assumption that all top-level blocks are widget
 	// areas.
-	const widgetAreas = registry.select( 'core/block-editor' ).getBlocks();
+	const widgetAreas = registry.select( blockEditorStore ).getBlocks();
 	const destinationWidgetAreaBlock = widgetAreas.find(
 		( { attributes } ) => attributes.id === widgetAreaId
 	);
@@ -375,7 +376,7 @@ export const moveBlockToWidgetArea = ( clientId, widgetAreaId ) => async ( {
 
 	// Get the index for moving to the end of the the destination widget area.
 	const destinationInnerBlocksClientIds = registry
-		.select( 'core/block-editor' )
+		.select( blockEditorStore )
 		.getBlockOrder( destinationRootClientId );
 	const destinationIndex = destinationInnerBlocksClientIds.length;
 
@@ -390,7 +391,7 @@ export const moveBlockToWidgetArea = ( clientId, widgetAreaId ) => async ( {
 
 	// Move the block.
 	registry
-		.dispatch( 'core/block-editor' )
+		.dispatch( blockEditorStore )
 		.moveBlocksToPosition(
 			[ clientId ],
 			sourceRootClientId,
