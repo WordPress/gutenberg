@@ -79,4 +79,8 @@ function useModifiedStyle( baseStyles, modifierStates ) {
 	return styles;
 }
 
+export function createModifiedStyleHook( baseStyles ) {
+	return ( modifierStates ) => useModifiedStyle( baseStyles, modifierStates );
+}
+
 export default useModifiedStyle;

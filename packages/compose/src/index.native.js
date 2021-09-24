@@ -30,4 +30,7 @@ export { default as usePreferredColorSchemeStyle } from './hooks/use-preferred-c
 export { default as useResizeObserver } from './hooks/use-resize-observer';
 export { default as useDebounce } from './hooks/use-debounce';
 export { default as useMergeRefs } from './hooks/use-merge-refs';
-export { default as useModifiedStyle } from './hooks/use-modified-style';
+export {
+	createModifiedStyleHook,
+	default as useModifiedStyle,
+} from './hooks/use-modified-style';

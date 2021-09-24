@@ -15,7 +15,7 @@ import {
  * WordPress dependencies
  */
 import { useState, useRef, useEffect } from '@wordpress/element';
-import { useModifiedStyle } from '@wordpress/compose';
+import { createModifiedStyleHook } from '@wordpress/compose';
 import { __ } from '@wordpress/i18n';
 import { Button, Gridicons } from '@wordpress/components';
 import {
@@ -39,6 +39,8 @@ for ( const selector in platformStyles ) {
 		...platformStyles[ selector ],
 	};
 }
+
+const useModifiedStyle = createModifiedStyleHook( baseStyles );
 
 function SearchControl( {
 	value,
@@ -67,7 +69,7 @@ function SearchControl( {
 		};
 	}, [] );
 
-	const styles = useModifiedStyle( baseStyles, {
+	const styles = useModifiedStyle( {
 		active: [ isActive ],
 		dark: [ isDark ],
 		'active-dark': [ isActive, isDark ],
