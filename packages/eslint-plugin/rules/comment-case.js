@@ -1,32 +1,3 @@
-const createFixerFunction = ( errorType, node ) => ( arg ) => {
-	const commentType = node.type;
-	const commentOpenToken = commentType === 'Line' ? '//' : '/*';
-	const commentCloseToken = commentType === 'Line' ? '' : ' */';
-	const trimmedComment = node.value.trim();
-
-	switch ( errorType ) {
-		case 'missingSpace':
-			return arg.replaceText(
-				node,
-				`${ commentOpenToken } ${ trimmedComment }${ commentCloseToken }`
-			);
-		case 'missingPunctuation':
-			return arg.replaceText(
-				node,
-				`${ commentOpenToken } ${ trimmedComment }.${ commentCloseToken }`
-			);
-		case 'capitalLetter':
-			return arg.replaceText(
-				node,
-				`${ commentOpenToken } ${ trimmedComment
-					.charAt( 0 )
-					.toUpperCase() }${ trimmedComment.substring(
-					1
-				) }${ commentCloseToken }`
-			);
-	}
-};
-
 const codeBeforeComment = ( sourceCode, node ) => {
 	const prevToken = sourceCode.getTokenBefore( node );
 	if ( prevToken && prevToken.loc.end.line === node.loc.start.line ) {
@@ -100,12 +71,10 @@ module.exports = {
 
 					// Check to see if the comment starts with a space.
 					if ( value.charAt( 0 ) !== ' ' ) {
-						const errorType = 'missingSpace';
 						context.report( {
 							node,
 							loc: comment.loc,
-							messageId: errorType,
-							fix: createFixerFunction( errorType, comment ),
+							messageId: 'missingSpace',
 						} );
 					}
 
@@ -115,12 +84,10 @@ module.exports = {
 						trimmedValue.charAt( 0 ) !==
 							trimmedValue.charAt( 0 ).toUpperCase()
 					) {
-						const errorType = 'capitalLetter';
 						context.report( {
 							node,
 							loc: comment.loc,
-							messageId: errorType,
-							fix: createFixerFunction( errorType, comment ),
+							messageId: 'capitalLetter',
 						} );
 					}
 
@@ -135,12 +102,11 @@ module.exports = {
 						if ( isFollowedDirectlyByLineComment ) {
 							return;
 						}
-						const errorType = 'missingPunctuation';
+
 						context.report( {
 							node,
 							loc: comment.loc,
-							messageId: errorType,
-							fix: createFixerFunction( errorType, comment ),
+							messageId: 'missingPunctuation',
 						} );
 					}
 				} );
