@@ -23,6 +23,7 @@ export function MenuItem( props, ref ) {
 		info,
 		className,
 		icon,
+		iconPosition = 'right',
 		shortcut,
 		isSelected,
 		role = 'menuitem',
@@ -42,7 +43,9 @@ export function MenuItem( props, ref ) {
 
 	if ( icon && ! isString( icon ) ) {
 		icon = cloneElement( icon, {
-			className: 'components-menu-items__item-icon',
+			className: classnames( 'components-menu-items__item-icon', {
+				'has-icon-right': iconPosition === 'right',
+			} ),
 		} );
 	}
 
@@ -56,6 +59,7 @@ export function MenuItem( props, ref ) {
 					: undefined
 			}
 			role={ role }
+			icon={ iconPosition === 'left' ? icon : undefined }
 			className={ className }
 			{ ...buttonProps }
 		>
@@ -64,7 +68,7 @@ export function MenuItem( props, ref ) {
 				className="components-menu-item__shortcut"
 				shortcut={ shortcut }
 			/>
-			{ icon && <Icon icon={ icon } /> }
+			{ icon && iconPosition === 'right' && <Icon icon={ icon } /> }
 		</Button>
 	);
 }
