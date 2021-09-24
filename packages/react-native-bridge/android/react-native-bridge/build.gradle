@@ -23,7 +23,6 @@ def extractPackageVersion(packagejson, packageName, section) {
         def packageNameSanitized = packageName.replace("@", '').replace("/", '-')
         def fileName = dep.substring(dep.lastIndexOf('/') + 1)
         def version = fileName.replace(packageNameSanitized + '-', '').replace('.tgz', '')
-        println "$packageName, $dep => $version"
         return version
     }
 
