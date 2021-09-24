@@ -30,31 +30,26 @@ export default function useAvailableAlignments( controls = DEFAULT_CONTROLS ) {
 	const layoutAlignments = layoutType.getAlignments( layout );
 
 	if ( themeSupportsLayout ) {
-		return {
-			enabledControls: layoutAlignments.filter( ( control ) =>
-				controls.includes( control )
-			),
-			layout,
-			wideAlignmentsSupport: true,
-		};
+		return layoutAlignments.filter(
+			( { name: alignmentName } ) =>
+				alignmentName === 'none' || controls.includes( alignmentName )
+		);
 	}
 
 	// Starting here, it's the fallback for themes not supporting the layout config.
 	if ( layoutType.name !== 'default' ) {
-		return { enabledControls: [] };
+		return [];
 	}
 	const { alignments: availableAlignments = DEFAULT_CONTROLS } = layout;
-	const enabledControls = controls.filter(
-		( control ) =>
-			( layout.alignments || // Ignore the global wideAlignment check if the layout explicitely defines alignments.
-				wideControlsEnabled ||
-				! WIDE_CONTROLS.includes( control ) ) &&
-			availableAlignments.includes( control )
-	);
+	const enabledControls = controls
+		.filter(
+			( control ) =>
+				( layout.alignments || // Ignore the global wideAlignment check if the layout explicitely defines alignments.
+					wideControlsEnabled ||
+					! WIDE_CONTROLS.includes( control ) ) &&
+				availableAlignments.includes( control )
+		)
+		.map( ( enabledControl ) => ( { name: enabledControl } ) );
 
-	return {
-		enabledControls,
-		layout,
-		wideAlignmentsSupport: layout.alignments || wideControlsEnabled,
-	};
+	return enabledControls;
 }

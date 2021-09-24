@@ -173,7 +173,7 @@ export const withDataAlign = createHigherOrderComponent(
 			getBlockSupport( name, 'align' ),
 			hasBlockSupport( name, 'alignWide', true )
 		);
-		const { enabledControls: validAlignments } = useAvailableAlignments(
+		const validAlignments = useAvailableAlignments(
 			blockAllowedAlignments
 		);
 
@@ -184,7 +184,9 @@ export const withDataAlign = createHigherOrderComponent(
 		}
 
 		let wrapperProps = props.wrapperProps;
-		if ( validAlignments.includes( align ) ) {
+		if (
+			validAlignments.some( ( alignment ) => alignment.name === align )
+		) {
 			wrapperProps = { ...wrapperProps, 'data-align': align };
 		}
 
