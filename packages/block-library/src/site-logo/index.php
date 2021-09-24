@@ -168,11 +168,11 @@ function _delete_custom_logo_on_remove_site_logo() {
 	$theme = get_option( 'stylesheet' );
 
 	// Unhook update and delete actions for custom_logo to prevent a loop of hooks.
-	// Gutenberg hooks
+	// Remove Gutenberg hooks.
 	remove_action( "update_option_theme_mods_$theme", '_gutenberg_delete_site_logo_on_remove_custom_logo', 10 );
 	remove_action( "delete_option_theme_mods_$theme", '_gutenberg_delete_site_logo_on_remove_theme_mods' );
 
-	// Core hooks
+	// Remove Core hooks.
 	remove_action( "update_option_theme_mods_$theme", '_delete_site_logo_on_remove_custom_logo', 10 );
 	remove_action( "delete_option_theme_mods_$theme", '_delete_site_logo_on_remove_theme_mods' );
 
@@ -180,11 +180,11 @@ function _delete_custom_logo_on_remove_site_logo() {
 	remove_theme_mod( 'custom_logo' );
 
 	// Restore update and delete actions.
-	// Gutenberg hooks
+	// Restore Gutenberg hooks.
 	add_action( "update_option_theme_mods_$theme", '_gutenberg_delete_site_logo_on_remove_custom_logo', 10, 2 );
 	add_action( "delete_option_theme_mods_$theme", '_gutenberg_delete_site_logo_on_remove_theme_mods' );
 
-	// Core hooks
+	// Restore Core hooks.
 	add_action( "update_option_theme_mods_$theme", '_delete_site_logo_on_remove_custom_logo', 10, 2 );
 	add_action( "delete_option_theme_mods_$theme", '_delete_site_logo_on_remove_theme_mods' );
 }
