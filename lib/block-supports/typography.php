@@ -112,7 +112,7 @@ function gutenberg_apply_typography_support( $block_type, $block_attributes ) {
 			$classes[] = sprintf( 'has-%s-font-family', $block_attributes['fontFamily'] );
 		} elseif ( $has_custom_font_family ) {
 			// Before using classes, the value was serialized as a CSS Custom Property.
-			// We don't need this code path it lands in core.
+			// We don't need this code path when it lands in core.
 			$font_family_custom = $block_attributes['style']['typography']['fontFamily'];
 			if ( strpos( $font_family_custom, 'var:preset|font-family' ) !== false ) {
 				$index_to_splice  = strrpos( $font_family_custom, '|' ) + 1;
