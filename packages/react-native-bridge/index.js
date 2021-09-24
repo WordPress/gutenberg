@@ -414,4 +414,24 @@ export function setBlockTypeImpressions( impressions ) {
 	return RNReactNativeGutenbergBridge.setBlockTypeImpressions( impressions );
 }
 
+/**
+ * Request the host app to provide the current connectivity status.
+ *
+ * @param {Function} callback Callback invoked with a boolean that states if the network is connected or not.
+ * @return {void}
+ */
+export function requestConnectivityStatus( callback ) {
+	return RNReactNativeGutenbergBridge.requestConnectivityStatus( callback );
+}
+
+/**
+ * Request the host app to provide connectivity changes.
+ *
+ * @param {Function} callback Callback invoked when the connectivity changes. This callback is a boolean that states if the network is connected or not.
+ * @return {void}
+ */
+export function subscribeConnectivityChange( callback ) {
+	return gutenbergBridgeEvents.addListener( 'connectivityChange', callback );
+}
+
 export default RNReactNativeGutenbergBridge;

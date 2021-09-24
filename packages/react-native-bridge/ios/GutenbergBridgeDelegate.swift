@@ -246,6 +246,10 @@ public protocol GutenbergBridgeDelegate: class {
 
     /// Tells the delegate the the editor requested setting the impression counts
     func gutenbergDidRequestSetBlockTypeImpressions(_ impressions: [String: Int])
+
+
+    /// Tells the delegate that the editor requested the connectivity status
+    func gutenbergDidRequestConnectivityStatus() -> Bool
 }
 
 // MARK: - Optional GutenbergBridgeDelegate methods
