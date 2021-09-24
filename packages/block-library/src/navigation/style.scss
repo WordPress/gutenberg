@@ -352,7 +352,9 @@
 }
 
 .items-justified-space-between {
+	.wp-block-navigation__responsive-container-content,
 	.wp-block-navigation__container {
+		display: flex;
 		justify-content: space-between;
 		flex: 1;
 	}
@@ -490,6 +492,7 @@
 		&:not(.is-menu-open) {
 			display: flex;
 			flex-direction: row;
+			width: 100%;
 			position: relative;
 			z-index: 2;
 			background-color: inherit;
