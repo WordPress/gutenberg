@@ -105,7 +105,7 @@ function PullQuoteEdit( props ) {
 							// translators: placeholder text used for the quote
 							__( 'Add quote' )
 						}
-						textAlign="center"
+						textAlign={ textAlign }
 					/>
 					{ shouldShowCitation && (
 						<RichText
