@@ -17,7 +17,9 @@ export const BlockQuote = ( props ) => {
 
 	if ( props.textColor ) {
 		quoteStyle.color = props.textColor;
+		quoteStyle.placeholderColor = props.textColor;
 		citationStyle.color = props.textColor;
+		citationStyle.placeholderColor = props.textColor;
 	}
 
 	const newChildren = Children.map( props.children, ( child ) => {
