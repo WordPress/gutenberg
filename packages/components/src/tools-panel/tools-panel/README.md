@@ -67,6 +67,13 @@ export function DimensionPanel( props ) {
 
 ## Props
 
+### `hasInnerWrapper`: `boolean`
+
+A function to call when the `Reset all` menu option is selected. This is passed
+through to the panel's header component.
+
+- Required: No
+
 ### `label`: `string`
 
 Text to be displayed within the panel's header and as the `aria-label` for the
@@ -88,3 +95,10 @@ A function to call when the `Reset all` menu option is selected. This is passed
 through to the panel's header component.
 
 - Required: Yes
+
+### `shouldRenderPlaceholderItems`: `boolean`
+
+Advises the `ToolsPanel` that its child `ToolsPanelItem`s should render
+placeholder content instead of null when they are toggled off and hidden.
+
+- Required: No
