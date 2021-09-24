@@ -206,11 +206,12 @@ export default {
 function getAlignmentsInfo( layout ) {
 	const { contentSize, wideSize } = layout;
 	const alignmentInfo = {};
-	if ( contentSize && ! contentSize?.startsWith( 'var' ) ) {
+	const sizeRegex = /^(?!0)\d+(px|em|rem|vw|vh|%)?$/i;
+	if ( sizeRegex.test( contentSize ) ) {
 		// translators: %s: container size (i.e. 600px etc)
 		alignmentInfo.none = sprintf( __( 'Max %s wide' ), contentSize );
 	}
-	if ( wideSize && ! wideSize?.startsWith( 'var' ) ) {
+	if ( sizeRegex.test( wideSize ) ) {
 		// translators: %s: container size (i.e. 600px etc)
 		alignmentInfo.wide = sprintf( __( 'Max %s wide' ), wideSize );
 	}
