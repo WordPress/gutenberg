@@ -8,6 +8,36 @@ import { mapValues, omit } from 'lodash';
  */
 import { InnerBlocks } from '@wordpress/block-editor';
 
+/**
+ * Internal dependencies
+ */
+import cleanEmptyObject from '../utils/clean-empty-object';
+
+/**
+ * Migrates the current style.typography.fontFamily attribute,
+ * whose value was "var:preset|font-family|helvetica-arial",
+ * to the style.fontFamily attribute, whose value will be "helvetica-arial".
+ *
+ * @param {Object} attributes The current attributes
+ * @return {Object} The updated attributes.
+ */
+const oldFontFamilyMigration = ( attributes ) => {
+	if ( ! attributes?.style?.typography?.fontFamily ) {
+		return attributes;
+	}
+
+	const fontFamily = attributes.style.typography.fontFamily
+		.split( '|' )
+		.pop();
+	delete attributes.style.typography.fontFamily;
+	attributes.style = cleanEmptyObject( attributes.style );
+
+	return {
+		...attributes,
+		fontFamily,
+	};
+};
+
 const TYPOGRAPHY_PRESET_DEPRECATION_MAP = {
 	fontStyle: 'var:preset|font-style|',
 	fontWeight: 'var:preset|font-weight|',
@@ -245,6 +275,84 @@ const deprecated = [
 		},
 		save() {
 			return <InnerBlocks.Content />;
+		},
+	},
+	{
+		attributes: {
+			orientation: {
+				type: 'string',
+				default: 'horizontal',
+			},
+			textColor: {
+				type: 'string',
+			},
+			customTextColor: {
+				type: 'string',
+			},
+			rgbTextColor: {
+				type: 'string',
+			},
+			backgroundColor: {
+				type: 'string',
+			},
+			customBackgroundColor: {
+				type: 'string',
+			},
+			rgbBackgroundColor: {
+				type: 'string',
+			},
+			itemsJustification: {
+				type: 'string',
+			},
+			showSubmenuIcon: {
+				type: 'boolean',
+				default: true,
+			},
+			openSubmenusOnClick: {
+				type: 'boolean',
+				default: false,
+			},
+			isResponsive: {
+				type: 'boolean',
+				default: false,
+			},
+			__unstableLocation: {
+				type: 'string',
+			},
+			overlayBackgroundColor: {
+				type: 'string',
+			},
+			customOverlayBackgroundColor: {
+				type: 'string',
+			},
+			overlayTextColor: {
+				type: 'string',
+			},
+			customOverlayTextColor: {
+				type: 'string',
+			},
+		},
+		supports: {
+			align: [ 'wide', 'full' ],
+			anchor: true,
+			html: false,
+			inserter: true,
+			typography: {
+				fontSize: true,
+				lineHeight: true,
+				__experimentalFontStyle: true,
+				__experimentalFontWeight: true,
+				__experimentalTextTransform: true,
+				__experimentalFontFamily: true,
+				__experimentalTextDecoration: true,
+			},
+		},
+		save() {
+			return <InnerBlocks.Content />;
+		},
+		migrate: oldFontFamilyMigration,
+		isEligible( { style } ) {
+			return style?.typography?.fontFamily;
 		},
 	},
 ];
