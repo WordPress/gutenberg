@@ -55,7 +55,7 @@ import {
 	toggleSection,
 	isEmptyTableSection,
 } from './state';
-import { TableDimensionsPreview } from './components/table-preview';
+import { TableDimensionsPreview } from './components/table-dimensions-preview';
 
 const ALIGNMENT_CONTROLS = [
 	{
