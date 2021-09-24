@@ -27,7 +27,6 @@ import {
  */
 import useAvailableAlignments from './use-available-alignments';
 
-const WIDE_CONTROLS = [ 'wide', 'full' ];
 const BLOCK_ALIGNMENTS_CONTROLS = {
 	none: {
 		icon: alignNone,
@@ -56,7 +55,6 @@ const BLOCK_ALIGNMENTS_CONTROLS = {
 };
 
 const DEFAULT_CONTROL = 'none';
-const help = __( 'Wider alignments are not available.' );
 
 const POPOVER_PROPS = {
 	isAlternate: true,
@@ -74,13 +72,6 @@ function BlockAlignmentUI( {
 
 	if ( ! hasEnabledControls ) {
 		return null;
-	}
-	const wideAlignmentsSupport = enabledControls.some( ( { name } ) =>
-		WIDE_CONTROLS.includes( name )
-	);
-	// Always add the `none` option if not exists.
-	if ( ! enabledControls.some( ( { name } ) => name === 'none' ) ) {
-		enabledControls.unshift( { name: 'none' } );
 	}
 
 	function onChangeAlignment( align ) {
@@ -159,11 +150,6 @@ function BlockAlignmentUI( {
 									}
 								) }
 							</MenuGroup>
-							{ ! wideAlignmentsSupport && (
-								<div className="block-editor-block-alignment-control__help">
-									{ help }
-								</div>
-							) }
 						</>
 					);
 				},

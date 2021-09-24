@@ -157,9 +157,14 @@ export default {
 		return 'vertical';
 	},
 	getAlignments( layout ) {
+		const alignmentInfo = getAlignmentsInfo( layout );
 		if ( layout.alignments !== undefined ) {
+			if ( ! layout.alignments.includes( 'none' ) ) {
+				layout.alignments.unshift( 'none' );
+			}
 			return layout.alignments.map( ( alignment ) => ( {
 				name: alignment,
+				info: alignmentInfo[ alignment ],
 			} ) );
 		}
 		const { contentSize, wideSize } = layout;
@@ -174,32 +179,40 @@ export default {
 			alignments.unshift( { name: 'full' } );
 		}
 
-		/**
-		 * Besides checking if `contentSize` and `wideSize` have a
-		 * value, we now show this information only if their values
-		 * are not a `css var`. This needs to change when parsing
-		 * css variables land.
-		 *
-		 * @see https://github.com/WordPress/gutenberg/pull/34710#issuecomment-918000752
-		 */
 		if ( wideSize ) {
-			const wideAlignment = { name: 'wide' };
-			if ( ! wideSize?.startsWith( 'var' ) ) {
-				// translators: %s: container size (i.e. 600px etc)
-				wideAlignment.info = sprintf( __( 'Max %s wide' ), wideSize );
-			}
-			alignments.unshift( wideAlignment );
+			alignments.unshift( { name: 'wide', info: alignmentInfo.wide } );
 		}
 
-		// Add `none` alignment with info text.
-		if ( contentSize && ! contentSize?.startsWith( 'var' ) ) {
-			alignments.unshift( {
-				name: 'none',
-				// translators: %s: container size (i.e. 600px etc)
-				info: sprintf( __( 'Max %s wide' ), contentSize ),
-			} );
-		}
+		alignments.unshift( { name: 'none', info: alignmentInfo.none } );
 
 		return alignments;
 	},
 };
+
+/**
+ * Helper method to assign contextual info to clarify
+ * alignment settings.
+ *
+ * Besides checking if `contentSize` and `wideSize` have a
+ * value, we now show this information only if their values
+ * are not a `css var`. This needs to change when parsing
+ * css variables land.
+ *
+ * @see https://github.com/WordPress/gutenberg/pull/34710#issuecomment-918000752
+ *
+ * @param {Object} layout The layout object.
+ * @return {Object} An object with contextual info per alignment.
+ */
+function getAlignmentsInfo( layout ) {
+	const { contentSize, wideSize } = layout;
+	const alignmentInfo = {};
+	if ( contentSize && ! contentSize?.startsWith( 'var' ) ) {
+		// translators: %s: container size (i.e. 600px etc)
+		alignmentInfo.none = sprintf( __( 'Max %s wide' ), contentSize );
+	}
+	if ( wideSize && ! wideSize?.startsWith( 'var' ) ) {
+		// translators: %s: container size (i.e. 600px etc)
+		alignmentInfo.wide = sprintf( __( 'Max %s wide' ), wideSize );
+	}
+	return alignmentInfo;
+}
