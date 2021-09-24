@@ -345,7 +345,7 @@ Add this section when there are props that are drilled down into an internal com
 See examples for this section for the [ItemGroup](/packages/components/src/item-group/item-group/README.md#context) and [`Card`](/packages/components/src/card/card/README.md#context) components.
 ```
 
-#### Folder structure
+## Folder structure
 
 As a result of the above guidelines, all new components (except for shared utilities) should _generally_ follow this folder structure:
 
