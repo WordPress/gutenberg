@@ -3,6 +3,12 @@
  */
 import { Icon } from '@wordpress/components';
 import { moreHorizontal } from '@wordpress/icons';
+import {
+	useRef,
+	useLayoutEffect,
+	useState,
+	useEffect,
+} from '@wordpress/element';
 /**
  * External dependencies
  */
@@ -31,7 +37,8 @@ function createArrayOfLength( length ) {
  * @param    {TableDimensionsPreviewProps} props
  */
 export function TableDimensionsPreview( { rowCount, columnCount } ) {
-	const containerHeight = 75;
+	const previewAreaRef = useRef();
+	const previewContainerRef = useRef();
 
 	// after we cross the threshold we display an elispis to indicate that there are more items
 	const maxDisplayColumns = 13;
@@ -40,11 +47,80 @@ export function TableDimensionsPreview( { rowCount, columnCount } ) {
 	const clampedColumnCount = Math.min( columnCount, maxDisplayColumns );
 	const clampedRowCount = Math.min( rowCount, maxDisplayRows );
 
-	const gapSize =
-		( 1 / Math.max( clampedColumnCount, clampedRowCount ) ) * 20;
+	const gapSize = Math.max(
+		( 1 / Math.max( clampedColumnCount, clampedRowCount ) ) * 20,
+		2.5
+	);
 
-	const cellHeight = containerHeight / clampedRowCount;
-	const containerWidth = cellHeight * clampedColumnCount;
+	function calculatePreviewAreaStyles() {
+		if ( previewAreaRef.current ) {
+			setPreviewAreaStyles(
+				window.getComputedStyle( previewAreaRef.current )
+			);
+		}
+	}
+
+	const [ previewAreaStyles, setPreviewAreaStyles ] = useState( null );
+
+	useEffect( () => {
+		calculatePreviewAreaStyles();
+	}, [ previewAreaRef ] );
+
+	useLayoutEffect( () => {
+		if (
+			previewAreaRef.current &&
+			previewAreaStyles &&
+			previewContainerRef.current
+		) {
+			window.addEventListener( 'resize', calculatePreviewAreaStyles );
+
+			const maxCellHeight = 25;
+
+			const previewAreaRect = previewAreaRef.current.getBoundingClientRect();
+			const previewAreaVerticalPadding =
+				previewAreaRef.current &&
+				parseInt(
+					previewAreaStyles
+						.getPropertyValue( 'padding-top' )
+						.substring( 0, 2 )
+				);
+			const previewAreaHorizontalPadding =
+				previewAreaRef.current &&
+				parseInt(
+					previewAreaStyles
+						.getPropertyValue( 'padding-left' )
+						.substring( 0, 2 )
+				);
+			const previewAreaUsableHeight =
+				previewAreaRect.height - 2 * previewAreaVerticalPadding;
+
+			const combinedVerticalGaps = gapSize * ( clampedRowCount - 1 );
+			const containerHeight = Math.min(
+				maxCellHeight * clampedRowCount + combinedVerticalGaps,
+				previewAreaUsableHeight
+			);
+
+			const combinedHorizontalGaps = gapSize * ( clampedColumnCount - 1 );
+			const cellHeight =
+				( containerHeight - combinedVerticalGaps ) / clampedRowCount;
+			const containerWidth = Math.min(
+				cellHeight * clampedColumnCount + combinedHorizontalGaps,
+				previewAreaRect.width + 2 * previewAreaHorizontalPadding
+			);
+
+			previewContainerRef.current.style.height = `${ containerHeight }px`;
+			previewContainerRef.current.style.width = `${ containerWidth }px`;
+		}
+
+		return () => {
+			window.removeEventListener( 'resize', calculatePreviewAreaStyles );
+		};
+	}, [
+		previewAreaRef.current,
+		clampedRowCount,
+		clampedColumnCount,
+		previewAreaStyles,
+	] );
 
 	// create two arrays that have the length of the rows and columns
 	// and contain the index of the individual items
@@ -52,23 +128,21 @@ export function TableDimensionsPreview( { rowCount, columnCount } ) {
 	const arrayOfCellsPerColumn = createArrayOfLength( clampedColumnCount );
 
 	return (
-		<div className="blocks-table__placeholder-preview">
+		<div className="blocks-table__dimension-preview" ref={ previewAreaRef }>
 			<div
-				className="blocks-table__placeholder-preview-container"
+				className="blocks-table__dimension-preview-container"
 				style={ {
 					gridTemplateColumns: `repeat(${ clampedColumnCount }, 1fr)`,
 					gridTemplateRows: `repeat(${ clampedRowCount }, 1fr)`,
 					gridGap: `${ gapSize }px`,
-					width: `${ containerWidth }px`,
-					height: `${ containerHeight }px`,
 				} }
+				ref={ previewContainerRef }
 			>
 				{ arrayOfCellsPerRow.map( ( row ) =>
 					arrayOfCellsPerColumn.map( ( column ) => (
 						<Cell
 							row={ row + 1 }
 							column={ column + 1 }
-							cellHeight={ cellHeight }
 							rowCount={ rowCount }
 							columnCount={ columnCount }
 							key={ `${ row }-${ column }` }
@@ -80,7 +154,7 @@ export function TableDimensionsPreview( { rowCount, columnCount } ) {
 	);
 }
 
-function Cell( { column, row, cellHeight, columnCount, rowCount } ) {
+function Cell( { column, row, columnCount, rowCount } ) {
 	const columnsThreshold = 12;
 	const rowsThreshold = 8;
 
@@ -97,15 +171,15 @@ function Cell( { column, row, cellHeight, columnCount, rowCount } ) {
 				gridColumn: column,
 				gridRow: row,
 			} }
-			className={ classNames( 'blocks-table__placeholder-preview-cell', {
+			className={ classNames( 'blocks-table__dimension-preview-cell', {
 				'is-elipsis': shouldShowElipsis,
 			} ) }
 		>
 			{ shouldShowElipsis && (
 				<Icon
 					icon={ moreHorizontal }
-					height={ cellHeight / 2 }
-					width={ cellHeight / 2 }
+					height={ '50%' }
+					width={ '50%' }
 				/>
 			) }
 		</span>

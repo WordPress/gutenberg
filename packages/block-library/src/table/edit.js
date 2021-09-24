@@ -507,14 +507,14 @@ function TableEdit( {
 					icon={ <BlockIcon icon={ icon } showColors /> }
 					instructions={ __( 'Insert a table for sharing data.' ) }
 				>
+					<TableDimensionsPreview
+						columnCount={ initialColumnCount }
+						rowCount={ initialRowCount }
+					/>
 					<form
 						className="blocks-table__placeholder-form"
 						onSubmit={ onCreateTable }
 					>
-						<TableDimensionsPreview
-							columnCount={ initialColumnCount }
-							rowCount={ initialRowCount }
-						/>
 						<TextControl
 							type="number"
 							label={ __( 'Column count' ) }
