@@ -24,8 +24,7 @@ module.exports = {
 				const { comments } = node;
 				comments.forEach( ( comment, index ) => {
 					// Regex to check if the comment contains an \@see or @todo type directive - any @ sign followed by a word.
-					const todoTypeCommentRegex = /@\w*\s/;
-					const translatorCommentRegex = /translators:/;
+					const translatorOrTodoTypeCommentRegex = /translators:|@\w*\s/;
 
 					// Skip block comments that cross multiple lines.
 					if (
@@ -37,10 +36,7 @@ module.exports = {
 					const { value } = comment;
 
 					// Skip translator or @see/@todo etc. comments
-					if (
-						value.match( todoTypeCommentRegex ) ||
-						value.match( translatorCommentRegex )
-					) {
+					if ( value.match( translatorOrTodoTypeCommentRegex ) ) {
 						return;
 					}
 
