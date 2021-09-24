@@ -20,6 +20,8 @@ import { withWeakMapCache, getNormalizedCommaSeparable } from '../utils';
  * @property {?(string[])} fields    Target subset of fields to derive from
  *                                   item objects.
  * @property {?(number[])} include   Specific item IDs to include.
+ * @property {string}      context   Scope under which the request is made;
+ *                                   determines returned fields in response.
  */
 
 /**

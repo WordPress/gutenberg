@@ -1,13 +1,23 @@
 /**
+ * External dependencies
+ */
+// eslint-disable-next-line no-restricted-imports
+import type { Ref } from 'react';
+
+/**
  * Internal dependencies
  */
 import { useToolsPanelItem } from './hook';
 import { View } from '../../view';
-import { contextConnect } from '../../ui/context';
+import { contextConnect, WordPressComponentProps } from '../../ui/context';
+import type { ToolsPanelItemProps } from '../types';
 
 // This wraps controls to be conditionally displayed within a tools panel. It
 // prevents props being applied to HTML elements that would make them invalid.
-const ToolsPanelItem = ( props, forwardedRef ) => {
+const ToolsPanelItem = (
+	props: WordPressComponentProps< ToolsPanelItemProps, 'div' >,
+	forwardedRef: Ref< any >
+) => {
 	const { children, isShown, ...toolsPanelItemProps } = useToolsPanelItem(
 		props
 	);

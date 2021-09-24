@@ -7,21 +7,33 @@ import { useEffect, useMemo, useRef, useState } from '@wordpress/element';
  * Internal dependencies
  */
 import * as styles from '../styles';
-import { useContextSystem } from '../../ui/context';
+import { useContextSystem, WordPressComponentProps } from '../../ui/context';
 import { useCx } from '../../utils/hooks/use-cx';
+import type {
+	ToolsPanelItem,
+	ToolsPanelMenuItemKey,
+	ToolsPanelMenuItems,
+	ToolsPanelMenuItemsConfig,
+	ToolsPanelProps,
+} from '../types';
 
-const generateMenuItems = ( { panelItems, reset } ) => {
-	const menuItems = { default: {}, optional: {} };
+const generateMenuItems = ( {
+	panelItems,
+	shouldReset,
+}: ToolsPanelMenuItemsConfig ) => {
+	const menuItems: ToolsPanelMenuItems = { default: {}, optional: {} };
 
 	panelItems.forEach( ( { hasValue, isShownByDefault, label } ) => {
 		const group = isShownByDefault ? 'default' : 'optional';
-		menuItems[ group ][ label ] = reset ? false : hasValue();
+		menuItems[ group ][ label ] = shouldReset ? false : hasValue();
 	} );
 
 	return menuItems;
 };
 
-export function useToolsPanel( props ) {
+export function useToolsPanel(
+	props: WordPressComponentProps< ToolsPanelProps, 'div' >
+) {
 	const { className, resetAll, panelId, ...otherProps } = useContextSystem(
 		props,
 		'ToolsPanel'
@@ -46,15 +58,15 @@ export function useToolsPanel( props ) {
 	}, [ wasResetting ] );
 
 	// Allow panel items to register themselves.
-	const [ panelItems, setPanelItems ] = useState( [] );
+	const [ panelItems, setPanelItems ] = useState< ToolsPanelItem[] >( [] );
 
-	const registerPanelItem = ( item ) => {
+	const registerPanelItem = ( item: ToolsPanelItem ) => {
 		setPanelItems( ( items ) => [ ...items, item ] );
 	};
 
 	// Panels need to deregister on unmount to avoid orphans in menu state.
 	// This is an issue when panel items are being injected via SlotFills.
-	const deregisterPanelItem = ( label ) => {
+	const deregisterPanelItem = ( label: string ) => {
 		// When switching selections between components injecting matching
 		// controls, e.g. both panels have a "padding" control, the
 		// deregistration of the first panel doesn't occur until after the
@@ -66,11 +78,29 @@ export function useToolsPanel( props ) {
 		}
 	};
 
+	// Manage and share display state of menu items representing child controls.
+	const [ menuItems, setMenuItems ] = useState< ToolsPanelMenuItems >( {
+		default: {},
+		optional: {},
+	} );
+
+	// Setup menuItems state as panel items register themselves.
+	useEffect( () => {
+		const items = generateMenuItems( {
+			panelItems,
+			shouldReset: false,
+		} );
+		setMenuItems( items );
+	}, [ panelItems ] );
+
 	// Force a menu item to be checked.
 	// This is intended for use with default panel items. They are displayed
 	// separately to optional items and have different display states,
 	//.we need to update that when their value is customized.
-	const flagItemCustomization = ( label, group = 'default' ) => {
+	const flagItemCustomization = (
+		label: string,
+		group: ToolsPanelMenuItemKey = 'default'
+	) => {
 		setMenuItems( {
 			...menuItems,
 			[ group ]: {
@@ -80,30 +110,9 @@ export function useToolsPanel( props ) {
 		} );
 	};
 
-	// Manage and share display state of menu items representing child controls.
-	const [ menuItems, setMenuItems ] = useState( {} );
-
-	const getResetAllFilters = () => {
-		const filters = [];
-
-		panelItems.forEach( ( item ) => {
-			if ( item.resetAllFilter ) {
-				filters.push( item.resetAllFilter );
-			}
-		} );
-
-		return filters;
-	};
-
-	// Setup menuItems state as panel items register themselves.
-	useEffect( () => {
-		const items = generateMenuItems( { panelItems, reset: false } );
-		setMenuItems( items );
-	}, [ panelItems ] );
-
 	// Toggle the checked state of a menu item which is then used to determine
 	// display of the item within the panel.
-	const toggleItem = ( label ) => {
+	const toggleItem = ( label: string ) => {
 		const currentItem = panelItems.find( ( item ) => item.label === label );
 
 		if ( ! currentItem ) {
@@ -112,13 +121,26 @@ export function useToolsPanel( props ) {
 
 		const menuGroup = currentItem.isShownByDefault ? 'default' : 'optional';
 
-		setMenuItems( {
+		const newMenuItems = {
 			...menuItems,
 			[ menuGroup ]: {
 				...menuItems[ menuGroup ],
 				[ label ]: ! menuItems[ menuGroup ][ label ],
 			},
+		};
+
+		setMenuItems( newMenuItems );
+	};
+
+	const getResetAllFilters = () => {
+		const filters: Array< () => void > = [];
+
+		panelItems.forEach( ( item ) => {
+			if ( item.resetAllFilter ) {
+				filters.push( item.resetAllFilter );
+			}
 		} );
+		return filters;
 	};
 
 	// Resets display of children and executes resetAll callback if available.
@@ -129,7 +151,10 @@ export function useToolsPanel( props ) {
 		}
 
 		// Turn off display of all non-default items.
-		const resetMenuItems = generateMenuItems( { panelItems, reset: true } );
+		const resetMenuItems = generateMenuItems( {
+			panelItems,
+			shouldReset: true,
+		} );
 		setMenuItems( resetMenuItems );
 	};
 
@@ -139,7 +164,7 @@ export function useToolsPanel( props ) {
 		registerPanelItem,
 		deregisterPanelItem,
 		flagItemCustomization,
-		hasMenuItems: panelItems.length,
+		hasMenuItems: !! panelItems.length,
 		isResetting: isResetting.current,
 	};
 

@@ -1,4 +1,10 @@
 /**
+ * External dependencies
+ */
+// eslint-disable-next-line no-restricted-imports
+import type { Ref } from 'react';
+
+/**
  * WordPress dependencies
  */
 import { check, reset, moreVertical } from '@wordpress/icons';
@@ -11,9 +17,19 @@ import DropdownMenu from '../../dropdown-menu';
 import MenuGroup from '../../menu-group';
 import MenuItem from '../../menu-item';
 import { useToolsPanelHeader } from './hook';
-import { contextConnect } from '../../ui/context';
+import { contextConnect, WordPressComponentProps } from '../../ui/context';
+import type {
+	ToolsPanelControlsGroupProps,
+	ToolsPanelHeaderProps,
+} from '../types';
 
-const DefaultControlsGroup = ( { items, onClose, toggleItem } ) => {
+const noop = () => {};
+
+const DefaultControlsGroup = ( {
+	items,
+	onClose,
+	toggleItem,
+}: ToolsPanelControlsGroupProps ) => {
 	if ( ! items.length ) {
 		return null;
 	}
@@ -51,7 +67,11 @@ const DefaultControlsGroup = ( { items, onClose, toggleItem } ) => {
 	);
 };
 
-const OptionalControlsGroup = ( { items, onClose, toggleItem } ) => {
+const OptionalControlsGroup = ( {
+	items,
+	onClose,
+	toggleItem,
+}: ToolsPanelControlsGroupProps ) => {
 	if ( ! items.length ) {
 		return null;
 	}
@@ -91,7 +111,10 @@ const OptionalControlsGroup = ( { items, onClose, toggleItem } ) => {
 	);
 };
 
-const ToolsPanelHeader = ( props, forwardedRef ) => {
+const ToolsPanelHeader = (
+	props: WordPressComponentProps< ToolsPanelHeaderProps, 'h2' >,
+	forwardedRef: Ref< any >
+) => {
 	const {
 		dropdownMenuClassName,
 		hasMenuItems,
@@ -118,7 +141,7 @@ const ToolsPanelHeader = ( props, forwardedRef ) => {
 					label={ labelText }
 					menuProps={ { className: dropdownMenuClassName } }
 				>
-					{ ( { onClose } ) => (
+					{ ( { onClose = noop } ) => (
 						<>
 							<DefaultControlsGroup
 								items={ defaultItems }
