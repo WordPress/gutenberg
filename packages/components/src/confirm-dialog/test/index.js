@@ -22,47 +22,52 @@ describe( 'Confirm', () => {
 					<ConfirmDialog onConfirm={ noop } onCancel={ noop } />
 				);
 
-				expect( wrapper ).toMatchSnapshot();
+				const confirmDialog = wrapper.getByRole( 'dialog' );
+
+				expect( confirmDialog ).toBeInTheDocument();
 			} );
 
-			it( 'should not render if closed by clicking `OK`, and callback should be called', async () => {
+			it( 'should not render if closed by clicking `OK`, and the `onConfirm` callback should be called', async () => {
 				const onConfirm = jest.fn().mockName( 'onConfirm()' );
 
 				const wrapper = render(
 					<ConfirmDialog onConfirm={ onConfirm } />
 				);
 
+				const confirmDialog = wrapper.getByRole( 'dialog' );
 				const button = await wrapper.findByText( 'OK' );
 
 				fireEvent.click( button );
 
+				expect( confirmDialog ).not.toBeInTheDocument();
 				expect( onConfirm ).toHaveBeenCalled();
-				expect( wrapper ).toMatchSnapshot();
 			} );
 
-			it( 'should not render if closed by clicking `Cancel`, and callback should be called', async () => {
+			it( 'should not render if closed by clicking `Cancel`, and the `onConfirm` callback should be called', async () => {
 				const onCancel = jest.fn().mockName( 'onCancel()' );
 
 				const wrapper = render(
 					<ConfirmDialog onConfirm={ noop } onCancel={ onCancel } />
 				);
 
+				const confirmDialog = wrapper.getByRole( 'dialog' );
 				const button = await wrapper.findByText( 'Cancel' );
 
 				fireEvent.click( button );
 
+				expect( confirmDialog ).not.toBeInTheDocument();
 				expect( onCancel ).toHaveBeenCalled();
-				expect( wrapper ).toMatchSnapshot();
 			} );
 
 			it( 'should be dismissable even if an `onCancel` callback is not provided', async () => {
 				const wrapper = render( <ConfirmDialog onConfirm={ noop } /> );
 
+				const confirmDialog = wrapper.getByRole( 'dialog' );
 				const button = await wrapper.findByText( 'Cancel' );
 
 				fireEvent.click( button );
 
-				expect( wrapper ).toMatchSnapshot();
+				expect( confirmDialog ).not.toBeInTheDocument();
 			} );
 
 			it( 'should not render if dialog is closed by clicking the overlay, and the `onCancel` callback should be called', async () => {
@@ -72,17 +77,15 @@ describe( 'Confirm', () => {
 					<ConfirmDialog onConfirm={ noop } onCancel={ onCancel } />
 				);
 
-				const frame = wrapper.baseElement.querySelector(
-					'.components-modal__frame'
-				);
+				const confirmDialog = wrapper.getByRole( 'dialog' );
 
 				//The overlay click is handled by detecting an onBlur from the modal frame.
-				fireEvent.blur( frame );
+				fireEvent.blur( confirmDialog );
 
-				await waitForElementToBeRemoved( frame );
+				await waitForElementToBeRemoved( confirmDialog );
 
+				expect( confirmDialog ).not.toBeInTheDocument();
 				expect( onCancel ).toHaveBeenCalled();
-				expect( wrapper ).toMatchSnapshot();
 			} );
 
 			it( 'should not render if dialog is closed by clicking the `x` button, and the `onCancel` callback should be called', async () => {
@@ -92,11 +95,13 @@ describe( 'Confirm', () => {
 					<ConfirmDialog onConfirm={ noop } onCancel={ onCancel } />
 				);
 
+				const confirmDialog = wrapper.getByRole( 'dialog' );
 				const button = await wrapper.findByLabelText( 'Cancel' );
 
 				fireEvent.click( button );
 
-				expect( wrapper ).toMatchSnapshot();
+				expect( confirmDialog ).not.toBeInTheDocument();
+				expect( onCancel ).toHaveBeenCalled();
 			} );
 
 			it( 'should not render if dialog is closed by pressing `Escape`, and the `onCancel` callback should be called', async () => {
@@ -106,14 +111,12 @@ describe( 'Confirm', () => {
 					<ConfirmDialog onConfirm={ noop } onCancel={ onCancel } />
 				);
 
-				const frame = wrapper.baseElement.querySelector(
-					'.components-modal__frame'
-				);
+				const confirmDialog = wrapper.getByRole( 'dialog' );
 
-				fireEvent.keyDown( frame, { keyCode: 27 } );
+				fireEvent.keyDown( confirmDialog, { keyCode: 27 } );
 
+				expect( confirmDialog ).not.toBeInTheDocument();
 				expect( onCancel ).toHaveBeenCalled();
-				expect( wrapper ).toMatchSnapshot();
 			} );
 
 			it( 'should not render if dialog is closed by pressing `Enter`, and the `onConfirm` callback should be called', async () => {
@@ -123,14 +126,12 @@ describe( 'Confirm', () => {
 					<ConfirmDialog onConfirm={ onConfirm } />
 				);
 
-				const frame = wrapper.baseElement.querySelector(
-					'.components-modal__frame'
-				);
+				const confirmDialog = wrapper.getByRole( 'dialog' );
 
-				fireEvent.keyDown( frame, { keyCode: 13 } );
+				fireEvent.keyDown( confirmDialog, { keyCode: 13 } );
 
+				expect( confirmDialog ).not.toBeInTheDocument();
 				expect( onConfirm ).toHaveBeenCalled();
-				expect( wrapper ).toMatchSnapshot();
 			} );
 		} );
 	} );
@@ -145,7 +146,9 @@ describe( 'Confirm', () => {
 				/>
 			);
 
-			expect( wrapper ).toMatchSnapshot();
+			const confirmDialog = wrapper.getByRole( 'dialog' );
+
+			expect( confirmDialog ).toBeInTheDocument();
 		} );
 
 		it( 'should not render if `isOpen` is set to false', async () => {
@@ -157,17 +160,18 @@ describe( 'Confirm', () => {
 				/>
 			);
 
-			expect( wrapper ).toMatchSnapshot();
+			// `queryByRole` needs to be used here because in this scenario the
+			// dialog is never rendered.
+			const confirmDialog = wrapper.queryByRole( 'dialog' );
+
+			expect( confirmDialog ).not.toBeInTheDocument();
 		} );
 
 		it( 'should call the `onConfirm` callback if `OK`', async () => {
 			const onConfirm = jest.fn().mockName( 'onConfirm()' );
 
 			const wrapper = render(
-				<ConfirmDialog
-					isOpen={ true }
-					onConfirm={ onConfirm }
-				/>
+				<ConfirmDialog isOpen={ true } onConfirm={ onConfirm } />
 			);
 
 			const button = await wrapper.findByText( 'OK' );
