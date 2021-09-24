@@ -278,7 +278,10 @@ function CoverPlaceholder( {
 } ) {
 	const { removeAllNotices, createErrorNotice } = noticeOperations;
 	return (
-		<div className="cover-block__cover-placeholder-container" style={ style }>
+		<div
+			className="cover-block__cover-placeholder-container"
+			style={ style }
+		>
 			<MediaPlaceholder
 				icon={ <BlockIcon icon={ icon } /> }
 				labels={ {
