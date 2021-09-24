@@ -8,6 +8,14 @@
 	"textdomain": "default",
 	"usesContext": [ "commentId" ],
 	"supports": {
-		"html": false
+		"color": {
+			"link": true
+		},
+		"typography": {
+			"fontSize": true,
+			"lineHeight": true
+		},
+		"html": false,
+		"__experimentalLayout": true
 	}
 }
