@@ -26,9 +26,8 @@ function render_block_core_template_part( $attributes ) {
 	) {
 		$template_part_id   = $attributes['theme'] . '//' . $attributes['slug'];
 		$last_changed       = wp_cache_get_last_changed( 'posts' );
-		$cache_key          = "$template_part_id:$last_changed";
-		$cache_group        = 'render_block_core_template_part';
-		$template_part_post = wp_cache_get( $cache_key, $cache_group );
+		$transient          = "render_block_core_template_part:$template_part_id:$last_changed";
+		$template_part_post = get_transient( $transient );
 
 		if ( false === $template_part_post ) {
 			$template_part_query = new WP_Query(
@@ -48,7 +47,7 @@ function render_block_core_template_part( $attributes ) {
 				)
 			);
 			$template_part_post  = $template_part_query->have_posts() ? $template_part_query->next_post() : 0;
-			wp_cache_set( $cache_key, $template_part_post, $cache_group );
+			set_transient( $transient, $template_part_post, DAY_IN_SECONDS );
 		}
 
 		if ( $template_part_post ) {
