@@ -12,17 +12,6 @@ import { __, sprintf } from '@wordpress/i18n';
 import { store as editSiteStore } from '../../store';
 import useTemplateTitle from '../use-template-title';
 
-function getTemplateTypeName( templateType ) {
-	switch ( templateType ) {
-		case 'wp_template_part':
-			return __( 'template part' );
-		case 'wp_template':
-			return __( 'template' );
-		default:
-			throw new Error( 'Unknown template type' );
-	}
-}
-
 function BackButton() {
 	const {
 		isTemplatePart,
@@ -62,8 +51,7 @@ function BackButton() {
 			{ sprintf(
 				/* translators: Template name. */
 				__( 'Back to %s' ),
-				previousTemplateTitle,
-				getTemplateTypeName( previousTemplateType )
+				previousTemplateTitle
 			) }
 		</Button>
 	);
