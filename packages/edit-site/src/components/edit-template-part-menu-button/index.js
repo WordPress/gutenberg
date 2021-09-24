@@ -31,7 +31,7 @@ export default function EditTemplatePartMenuButton() {
 			);
 		}
 	}, [] );
-	const { setTemplatePart } = useDispatch( editSiteStore );
+	const { pushTemplatePart } = useDispatch( editSiteStore );
 
 	if ( ! selectedTemplatePart ) {
 		return null;
@@ -42,7 +42,7 @@ export default function EditTemplatePartMenuButton() {
 			{ ( { onClose } ) => (
 				<MenuItem
 					onClick={ () => {
-						setTemplatePart( selectedTemplatePart.id );
+						pushTemplatePart( selectedTemplatePart.id );
 						onClose();
 					} }
 				>

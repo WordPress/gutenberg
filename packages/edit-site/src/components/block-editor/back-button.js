@@ -60,8 +60,8 @@ function BackButton() {
 			} }
 		>
 			{ sprintf(
-				/* translators: 1: Template name. 2: Template type name ("template" or "template part"). */
-				__( 'Back to "%1$s" %2$s' ),
+				/* translators: Template name. */
+				__( 'Back to %s' ),
 				previousTemplateTitle,
 				getTemplateTypeName( previousTemplateType )
 			) }
