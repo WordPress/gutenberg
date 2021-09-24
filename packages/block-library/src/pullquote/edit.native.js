@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import classnames from 'classnames';
-
-/**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
@@ -70,9 +65,6 @@ function PullQuoteEdit( props ) {
 	const { textAlign, citation, value } = attributes;
 
 	const blockProps = useBlockProps( {
-		className: classnames( {
-			[ `has-text-align-${ textAlign }` ]: textAlign,
-		} ),
 		backgroundColor: getBackgroundColor( props ),
 		borderColor: getBorderColor( props ),
 	} );
@@ -121,7 +113,6 @@ function PullQuoteEdit( props ) {
 									citation: nextCitation,
 								} )
 							}
-							className="wp-block-pullquote__citation"
 							__unstableMobileNoFocusOnMount
 							textAlign={ textAlign }
 							__unstableOnSplitAtEnd={ () =>
