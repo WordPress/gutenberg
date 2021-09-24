@@ -529,7 +529,6 @@ function CoverEdit( {
 										url: undefined,
 										id: undefined,
 										backgroundType: undefined,
-										dimRatio: undefined,
 										focalPoint: undefined,
 										hasParallax: undefined,
 										isRepeated: undefined,
