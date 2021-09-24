@@ -135,6 +135,13 @@ Pass `useDefaults: false` to disable the default request handling.
 
 Force `wp-polyfill` to be included in each entry point's dependency list. This would be the same as adding `import '@wordpress/polyfill';` to each entry point.
 
+##### `externalizedReportFile`
+
+-   Type: string
+-   Default: `undefined`
+
+Pass a filename to report all externalized dependencies as an array in JSON format. It could be used for further manual or automated inspection.
+
 ##### `requestToExternal`
 
 -   Type: function
