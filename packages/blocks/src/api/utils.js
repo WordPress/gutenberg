@@ -174,7 +174,9 @@ export function getAccessibleBlockLabel(
 ) {
 	// `title` is already localized, `label` is a user-supplied value.
 	const title = blockType?.title;
-	const label = blockType ? getBlockLabel( blockType, attributes, 'accessibility' ) : '';
+	const label = blockType
+		? getBlockLabel( blockType, attributes, 'accessibility' )
+		: '';
 	const hasPosition = position !== undefined;
 
 	// getBlockLabel returns the block title as a fallback when there's no label,
