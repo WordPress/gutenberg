@@ -5,6 +5,16 @@ import { Icon } from '@wordpress/components';
 import { moreHorizontal } from '@wordpress/icons';
 
 /**
+ * createArrayOfLength
+ *
+ * @param {number} length Length of array to create.
+ * @return {Array} Array of length `length` with the index as the value.
+ */
+function createArrayOfLength( length ) {
+	return Array.apply( null, Array( length ) ).map( ( x, i ) => i );
+}
+
+/**
  * TableDimensionsPreview
  *
  * this component is build for internal uses within the Table block. It renders a preview of the table cells
@@ -34,14 +44,8 @@ export function TableDimensionsPreview( { rowCount, columnCount } ) {
 
 	// create two arrays that have the length of the rows and columns
 	// and contain the index of the individual items
-	const arrayOfBoxesPerRow = Array.apply(
-		null,
-		Array( clampedRowCount )
-	).map( ( x, i ) => i );
-	const arrayOfBoxesPerColumn = Array.apply(
-		null,
-		Array( clampedColumnCount )
-	).map( ( x, i ) => i );
+	const arrayOfBoxesPerRow = createArrayOfLength( clampedRowCount );
+	const arrayOfBoxesPerColumn = createArrayOfLength( clampedColumnCount );
 
 	return (
 		<div
