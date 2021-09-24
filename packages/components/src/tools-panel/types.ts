@@ -127,7 +127,7 @@ export type ToolsPanelContext = {
 	flagItemCustomization: ( label: string ) => void;
 	isResetting: boolean;
 	shouldRenderPlaceholderItems: boolean;
-	areAllOptionalControlsHidden?: boolean;
+	areAllOptionalControlsHidden: boolean;
 };
 
 export type ToolsPanelControlsGroupProps = {
