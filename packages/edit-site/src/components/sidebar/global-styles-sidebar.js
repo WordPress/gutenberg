@@ -146,7 +146,7 @@ function GlobalStylesLevelScreens( {
 						) }
 					/>
 					<ColorPalettePanel
-						context={ context.name }
+						contextName={ context.name }
 						getSetting={ getSetting }
 						setSetting={ setSetting }
 					/>
