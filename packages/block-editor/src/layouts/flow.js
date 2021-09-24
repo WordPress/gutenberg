@@ -6,7 +6,7 @@ import {
 	__experimentalUseCustomUnits as useCustomUnits,
 	__experimentalUnitControl as UnitControl,
 } from '@wordpress/components';
-import { __ } from '@wordpress/i18n';
+import { __, sprintf } from '@wordpress/i18n';
 import { Icon, positionCenter, stretchWide } from '@wordpress/icons';
 
 /**
@@ -158,17 +158,46 @@ export default {
 	},
 	getAlignments( layout ) {
 		if ( layout.alignments !== undefined ) {
-			return layout.alignments;
+			return layout.alignments.map( ( alignment ) => ( {
+				name: alignment,
+			} ) );
+		}
+		const { contentSize, wideSize } = layout;
+
+		const alignments = [
+			{ name: 'left' },
+			{ name: 'center' },
+			{ name: 'right' },
+		];
+
+		if ( contentSize ) {
+			alignments.unshift( { name: 'full' } );
 		}
 
-		const alignments = [ 'left', 'center', 'right' ];
-
-		if ( layout.contentSize ) {
-			alignments.unshift( 'full' );
+		/**
+		 * Besides checking if `contentSize` and `wideSize` have a
+		 * value, we now show this information only if their values
+		 * are not a `css var`. This needs to change when parsing
+		 * css variables land.
+		 *
+		 * @see https://github.com/WordPress/gutenberg/pull/34710#issuecomment-918000752
+		 */
+		if ( wideSize ) {
+			const wideAlignment = { name: 'wide' };
+			if ( ! wideSize?.startsWith( 'var' ) ) {
+				// translators: %s: container size (i.e. 600px etc)
+				wideAlignment.info = sprintf( __( 'Max %s wide' ), wideSize );
+			}
+			alignments.unshift( wideAlignment );
 		}
 
-		if ( layout.wideSize ) {
-			alignments.unshift( 'wide' );
+		// Add `none` alignment with info text.
+		if ( contentSize && ! contentSize?.startsWith( 'var' ) ) {
+			alignments.unshift( {
+				name: 'none',
+				// translators: %s: container size (i.e. 600px etc)
+				info: sprintf( __( 'Max %s wide' ), contentSize ),
+			} );
 		}
 
 		return alignments;

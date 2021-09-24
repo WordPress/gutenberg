@@ -1,7 +1,12 @@
 /**
+ * External dependencies
+ */
+import classNames from 'classnames';
+
+/**
  * WordPress dependencies
  */
-import { __, sprintf } from '@wordpress/i18n';
+import { __ } from '@wordpress/i18n';
 import {
 	ToolbarDropdownMenu,
 	ToolbarGroup,
@@ -16,17 +21,13 @@ import {
 	stretchFullWidth,
 	stretchWide,
 } from '@wordpress/icons';
-import { useMemo } from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
 import useAvailableAlignments from './use-available-alignments';
-/**
- * External dependencies
- */
-import classNames from 'classnames';
 
+const WIDE_CONTROLS = [ 'wide', 'full' ];
 const BLOCK_ALIGNMENTS_CONTROLS = {
 	none: {
 		icon: alignNone,
@@ -68,45 +69,19 @@ function BlockAlignmentUI( {
 	isToolbar,
 	isCollapsed = true,
 } ) {
-	const {
-		enabledControls,
-		layout: { contentSize, wideSize } = {},
-		wideAlignmentsSupport,
-	} = useAvailableAlignments( controls );
+	const enabledControls = useAvailableAlignments( controls );
 	const hasEnabledControls = !! enabledControls.length;
-	const alignmentsInfo = useMemo( () => {
-		if ( ! hasEnabledControls ) {
-			return;
-		}
-		const info = {};
-		/**
-		 * Besides checking if `contentSize` and `wideSize` have a
-		 * value, we now show this information only if their values
-		 * are not a `css var`. This needs to change when parsing
-		 * css variables land.
-		 *
-		 * @see https://github.com/WordPress/gutenberg/pull/34710#issuecomment-918000752
-		 */
-		if ( !! contentSize && ! contentSize?.startsWith( 'var' ) ) {
-			// translators: %s: container size (i.e. 600px etc)
-			info.none = sprintf( __( 'Max %s wide' ), contentSize );
-		}
-		if (
-			wideAlignmentsSupport &&
-			!! wideSize &&
-			! wideSize?.startsWith( 'var' )
-		) {
-			// translators: %s: container size (i.e. 600px etc)
-			info.wide = sprintf( __( 'Max %s wide' ), wideSize );
-		}
-		return info;
-	}, [ hasEnabledControls, contentSize, wideSize, wideAlignmentsSupport ] );
 
 	if ( ! hasEnabledControls ) {
 		return null;
 	}
-	// Always add the `none` option.
-	enabledControls.unshift( 'none' );
+	const wideAlignmentsSupport = enabledControls.some( ( { name } ) =>
+		WIDE_CONTROLS.includes( name )
+	);
+	// Always add the `none` option if not exists.
+	if ( ! enabledControls.some( ( { name } ) => name === 'none' ) ) {
+		enabledControls.unshift( { name: 'none' } );
+	}
 
 	function onChangeAlignment( align ) {
 		onChange( [ value, 'none' ].includes( align ) ? undefined : align );
@@ -128,12 +103,14 @@ function BlockAlignmentUI( {
 	const extraProps = isToolbar
 		? {
 				isCollapsed,
-				controls: enabledControls.map( ( control ) => {
+				controls: enabledControls.map( ( { name: controlName } ) => {
 					return {
-						...BLOCK_ALIGNMENTS_CONTROLS[ control ],
-						isActive: value === control,
+						...BLOCK_ALIGNMENTS_CONTROLS[ controlName ],
+						isActive:
+							value === controlName ||
+							( ! value && controlName === 'none' ),
 						role: isCollapsed ? 'menuitemradio' : undefined,
-						onClick: () => onChangeAlignment( control ),
+						onClick: () => onChangeAlignment( controlName ),
 					};
 				} ),
 		  }
@@ -142,38 +119,45 @@ function BlockAlignmentUI( {
 					return (
 						<>
 							<MenuGroup className="block-editor-block-alignment-control__menu-group">
-								{ enabledControls.map( ( control ) => {
-									const {
-										icon,
-										title,
-									} = BLOCK_ALIGNMENTS_CONTROLS[ control ];
-									// If no value is provided, mark as selected the `none` option.
-									const isSelected =
-										control === value ||
-										( ! value && control === 'none' );
-									return (
-										<MenuItem
-											key={ control }
-											icon={ icon }
-											iconPosition="left"
-											className={ classNames(
-												'components-dropdown-menu__menu-item',
-												{
-													'is-active': isSelected,
-												}
-											) }
-											isSelected={ isSelected }
-											onClick={ () => {
-												onChangeAlignment( control );
-												onClose();
-											} }
-											role="menuitemradio"
-											info={ alignmentsInfo?.[ control ] }
-										>
-											{ title }
-										</MenuItem>
-									);
-								} ) }
+								{ enabledControls.map(
+									( { name: controlName, info } ) => {
+										const {
+											icon,
+											title,
+										} = BLOCK_ALIGNMENTS_CONTROLS[
+											controlName
+										];
+										// If no value is provided, mark as selected the `none` option.
+										const isSelected =
+											controlName === value ||
+											( ! value &&
+												controlName === 'none' );
+										return (
+											<MenuItem
+												key={ controlName }
+												icon={ icon }
+												iconPosition="left"
+												className={ classNames(
+													'components-dropdown-menu__menu-item',
+													{
+														'is-active': isSelected,
+													}
+												) }
+												isSelected={ isSelected }
+												onClick={ () => {
+													onChangeAlignment(
+														controlName
+													);
+													onClose();
+												} }
+												role="menuitemradio"
+												info={ info }
+											>
+												{ title }
+											</MenuItem>
+										);
+									}
+								) }
 							</MenuGroup>
 							{ ! wideAlignmentsSupport && (
 								<div className="block-editor-block-alignment-control__help">
