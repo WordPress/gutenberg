@@ -33,6 +33,11 @@ export type ToolsPanelProps = {
 	 * placeholder content instead of null when they are toggled off and hidden.
 	 */
 	shouldRenderPlaceholderItems: boolean;
+	/**
+	 * Flags that the items in this ToolsPanel will be contained within an inner
+	 * wrapper element allowing the panel to lay them out accordingly.
+	 */
+	hasInnerWrapper: boolean;
 };
 
 export type ToolsPanelHeaderProps = {
