@@ -123,7 +123,7 @@ function PullQuoteEdit( props ) {
 							}
 							className="wp-block-pullquote__citation"
 							__unstableMobileNoFocusOnMount
-							textAlign="center"
+							textAlign={ textAlign }
 							__unstableOnSplitAtEnd={ () =>
 								insertBlocksAfter(
 									createBlock( 'core/paragraph' )
