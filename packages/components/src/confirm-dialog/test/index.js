@@ -1,5 +1,3 @@
-// TBD
-
 /**
  * External dependencies
  */

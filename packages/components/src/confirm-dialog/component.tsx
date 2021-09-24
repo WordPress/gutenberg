@@ -2,7 +2,7 @@
  * External dependencies
  */
 // eslint-disable-next-line no-restricted-imports
-import { forwardRef, useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 // eslint-disable-next-line no-restricted-imports
 import type { Ref, SyntheticEvent, KeyboardEvent } from 'react';
 
@@ -31,36 +31,36 @@ function ConfirmDialog(
 	forwardedRef: Ref< any >
 ) {
 	const {
-		isOpen,
+		isOpen: isOpenProp,
 		message,
 		onConfirm,
-		onCancel = () => {},
+		onCancel,
 		...otherProps
 	} = useContextSystem( props, 'ConfirmDialog' );
 
 	const cx = useCx();
 	const wrapperClassName = cx( styles.wrapper );
 
-	const [ _isOpen, setIsOpen ] = useState< Boolean >();
-	const [ _selfClose, setSelfClose ] = useState< Boolean >();
+	const [ isOpen, setIsOpen ] = useState< boolean >();
+	const [ selfClose, setSelfClose ] = useState< boolean >();
 
 	useEffect( () => {
-		// We only allow the dialog to close itself if `isOpen` is *not* set.
-		// If `isOpen` is set, then it (probably) means it's controlled by a
+		// We only allow the dialog to close itself if `isOpenProp` is *not* set.
+		// If `isOpenProp` is set, then it (probably) means it's controlled by a
 		// parent component. In that case, `selfClose` might do more harm than
 		// good, so we disable it.
-
-		const isIsOpenSet = typeof isOpen === 'boolean';
-		setIsOpen( isIsOpenSet ? isOpen : true );
+		const isIsOpenSet = typeof isOpenProp !== 'undefined';
+		setIsOpen( isIsOpenSet ? isOpenProp : true );
 		setSelfClose( ! isIsOpenSet );
-	}, [ isOpen ] );
+	}, [ isOpenProp ] );
 
 	// @todo improve type, should handle keyboard and mousevent
 	const handleEvent = ( callback: ( event: SyntheticEvent ) => void ) => (
 		event: SyntheticEvent
 	) => {
-		callback( event );
-		if ( _selfClose ) {
+		// `onCancel` is optional
+		callback?.( event );
+		if ( selfClose ) {
 			setIsOpen( false );
 		}
 	};
@@ -73,7 +73,7 @@ function ConfirmDialog(
 
 	return (
 		<>
-			{ _isOpen && (
+			{ isOpen && (
 				<Modal
 					title={ message }
 					overlayClassName={ wrapperClassName }
@@ -104,4 +104,4 @@ function ConfirmDialog(
 	);
 }
 
-export default contextConnect( ConfirmDialog, 'Confirm' );
+export default contextConnect( ConfirmDialog, 'ConfirmDialog' );

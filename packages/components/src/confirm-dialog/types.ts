@@ -5,8 +5,7 @@
 import type { SyntheticEvent } from 'react';
 
 interface Props {
-	isOpen?: undefined;
-	selfClose?: boolean;
+	isOpen: undefined;
 	message: string;
 	onConfirm: ( event: SyntheticEvent ) => void;
 	onCancel?: ( event: SyntheticEvent ) => void;
@@ -16,7 +15,6 @@ export type OwnProps =
 	| Props
 	| {
 			isOpen: boolean;
-			selfClose?: boolean;
 			message: string;
 			onConfirm: ( event: SyntheticEvent ) => void;
 			onCancel: ( event: SyntheticEvent ) => void;
