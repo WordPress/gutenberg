@@ -81,7 +81,8 @@
 		"@wordpress/viewport": "file:packages/viewport",
 		"@wordpress/warning": "file:packages/warning",
 		"@wordpress/widgets": "file:packages/widgets",
-		"@wordpress/wordcount": "file:packages/wordcount"
+		"@wordpress/wordcount": "file:packages/wordcount",
+		"react-drag-to-select": "1.0.3-rc01"
 	},
 	"devDependencies": {
 		"@actions/core": "1.4.0",

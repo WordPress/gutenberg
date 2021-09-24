@@ -2,6 +2,7 @@
  * External dependencies
  */
 import classnames from 'classnames';
+import { useSelectionContainer } from 'react-drag-to-select';
 
 /**
  * WordPress dependencies
@@ -30,7 +31,7 @@ import {
 	__unstableIframe as Iframe,
 	__experimentalUseNoRecursiveRenders as useNoRecursiveRenders,
 } from '@wordpress/block-editor';
-import { useRef, useMemo } from '@wordpress/element';
+import { useRef, useMemo, useCallback } from '@wordpress/element';
 import { Button, __unstableMotion as motion } from '@wordpress/components';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { useMergeRefs } from '@wordpress/compose';
@@ -111,7 +112,9 @@ export default function VisualEditor( { styles } ) {
 		const { getSettings } = select( blockEditorStore );
 		return getSettings().supportsLayout;
 	}, [] );
-	const { clearSelectedBlock } = useDispatch( blockEditorStore );
+	const { clearSelectedBlock, multiSelect, selectBlock } = useDispatch(
+		blockEditorStore
+	);
 	const { setIsEditingTemplate } = useDispatch( editPostStore );
 	const desktopCanvasStyles = {
 		// We intentionally omit a 100% height here. The container is a flex item, so the 100% height is granted by default.
@@ -160,6 +163,30 @@ export default function VisualEditor( { styles } ) {
 	] );
 
 	const blockSelectionClearerRef = useBlockSelectionClearer();
+
+	const onSelectionChange = useCallback( ( box ) => {
+		const blocks = Array.from( document.querySelectorAll( '.wp-block' ) );
+		const selectedBlocks = blocks
+			.filter( ( block ) =>
+				overlaps( block.getBoundingClientRect(), box )
+			)
+			.map( ( block ) => block.id.replace( 'block-', '' ) )
+			.filter( ( x ) => x );
+		if ( selectedBlocks.length === 0 ) {
+			clearSelectedBlock();
+		} else if ( selectedBlocks.length === 1 ) {
+			selectBlock( selectedBlocks[ 0 ] );
+		} else {
+			multiSelect(
+				selectedBlocks[ 0 ],
+				selectedBlocks[ selectedBlocks.length - 1 ]
+			);
+		}
+	}, [] );
+
+	const { DragSelection } = useSelectionContainer( {
+		onSelectionChange,
+	} );
 
 	const [ , RecursionProvider ] = useNoRecursiveRenders(
 		wrapperUniqueId,
@@ -220,6 +247,7 @@ export default function VisualEditor( { styles } ) {
 						styles={ styles }
 						style={ { paddingBottom } }
 					>
+						<DragSelection />
 						{ themeSupportsLayout && ! isTemplateMode && (
 							<LayoutStyle
 								selector=".edit-post-visual-editor__post-title-wrapper, .block-editor-block-list__layout.is-root-container"
@@ -251,4 +279,15 @@ export default function VisualEditor( { styles } ) {
 			</__unstableBlockSettingsMenuFirstItem>
 		</BlockTools>
 	);
+}
+
+function overlaps( a, b ) {
+	// no horizontal overlap
+	if ( a.left >= b.left + b.width || b.left >= a.left + a.width )
+		return false;
+
+	// no vertical overlap
+	if ( a.top >= b.top + b.height || b.top >= a.top + a.height ) return false;
+
+	return true;
 }
