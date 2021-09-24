@@ -31,25 +31,12 @@ const oldFontFamilyMigration = ( attributes ) => {
 const deprecated = [
 	{
 		attributes: {
-			textAlign: {
-				type: 'string',
-			},
 			level: {
 				type: 'number',
-				default: 2,
+				default: 1,
 			},
-			isLink: {
-				type: 'boolean',
-				default: false,
-			},
-			rel: {
+			textAlign: {
 				type: 'string',
-				attribute: 'rel',
-				default: '',
-			},
-			linkTarget: {
-				type: 'string',
-				default: '_self',
 			},
 		},
 		supports: {
@@ -57,15 +44,21 @@ const deprecated = [
 			html: false,
 			color: {
 				gradients: true,
+				text: false,
 				link: true,
+			},
+			spacing: {
+				padding: true,
+				margin: true,
 			},
 			typography: {
 				fontSize: true,
 				lineHeight: true,
 				__experimentalFontFamily: true,
-				__experimentalFontWeight: true,
-				__experimentalFontStyle: true,
 				__experimentalTextTransform: true,
+				__experimentalFontStyle: true,
+				__experimentalFontWeight: true,
+				__experimentalLetterSpacing: true,
 			},
 		},
 		save() {
