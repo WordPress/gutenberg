@@ -72,6 +72,9 @@ const EmbedEdit = ( props ) => {
 	const [ isEditingURL, setIsEditingURL ] = useState(
 		isSelected && wasBlockJustInserted && ! url
 	);
+	const [ showEmbedBottomSheet, setShowEmbedBottomSheet ] = useState(
+		isEditingURL
+	);
 	const { invalidateResolution } = useDispatch( coreStore );
 
 	const {
@@ -192,6 +195,10 @@ const EmbedEdit = ( props ) => {
 		}
 	}, [ preview, isEditingURL ] );
 
+	useEffect( () => setShowEmbedBottomSheet( isEditingURL ), [
+		isEditingURL,
+	] );
+
 	const blockProps = useBlockProps();
 
 	if ( fetching ) {
@@ -287,11 +294,14 @@ const EmbedEdit = ( props ) => {
 			<EmbedBottomSheet
 				value={ url }
 				label={ bottomSheetLabel }
-				isVisible={ isEditingURL }
-				onClose={ () => setIsEditingURL( false ) }
+				isVisible={ showEmbedBottomSheet }
+				onClose={ () => setShowEmbedBottomSheet( false ) }
 				onSubmit={ ( value ) => {
-					setIsEditingURL( false );
+					// The order of the following calls is important, we need to update the URL attribute before changing `isEditingURL`,
+					// otherwise the side-effect that potentially replaces the block when updating the local state won't use the new URL
+					// for creating the new block.
 					setAttributes( { url: value } );
+					setIsEditingURL( false );
 				} }
 			/>
 		</>
