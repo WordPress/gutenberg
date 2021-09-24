@@ -434,20 +434,34 @@
 				display: none;
 			}
 
-			// Always expand submenus inside the modal.
+			// Always expand/unfold submenus inside the modal.
 			.has-child .submenu-container,
 			.has-child .wp-block-navigation__submenu-container {
-				position: relative;
+				// Unset CSS that hides dropdown menus.
 				opacity: 1;
 				visibility: visible;
 				height: auto;
 				width: auto;
+				overflow: initial;
+				min-width: 200px;
+
+				// Position and style.
+				position: static;
 				border: none;
-				padding: 0 0 0 32px;
+				padding-left: 32px;
 
 				.items-justified-right & {
-					padding: 0 32px 0 0;
+					padding-left: 0;
+					padding-right: 32px;
 				}
+			}
+
+			// Space unfolded items using gap and padding for submenus.
+			.wp-block-navigation__submenu-container,
+			.wp-block-navigation__container {
+				gap: 2rem;
+				padding-top: 2rem;
+				padding-bottom: 2rem;
 			}
 
 			// A default padding is added to submenu items. It's not appropriate inside the modal.
