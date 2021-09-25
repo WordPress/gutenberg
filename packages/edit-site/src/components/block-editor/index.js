@@ -42,20 +42,13 @@ const LAYOUT = {
 };
 
 export default function BlockEditor( { setIsInserterOpen } ) {
-	const {
-		settings,
-		templateType,
-		page,
-		deviceType,
-		hasPreviousPage,
-	} = useSelect(
+	const { settings, templateType, page, deviceType } = useSelect(
 		( select ) => {
 			const {
 				getSettings,
 				getEditedPostType,
 				getPage,
 				__experimentalGetPreviewDeviceType,
-				getPreviousEditedPostId,
 			} = select( editSiteStore );
 
 			return {
@@ -63,7 +56,6 @@ export default function BlockEditor( { setIsInserterOpen } ) {
 				templateType: getEditedPostType(),
 				page: getPage(),
 				deviceType: __experimentalGetPreviewDeviceType(),
-				hasPreviousPage: !! getPreviousEditedPostId(),
 			};
 		},
 		[ setIsInserterOpen ]
@@ -77,6 +69,8 @@ export default function BlockEditor( { setIsInserterOpen } ) {
 	const ref = useMouseMoveTypingReset();
 	const contentRef = useRef();
 	const mergedRefs = useMergeRefs( [ contentRef, useTypingObserver() ] );
+
+	const isTemplatePart = templateType === 'wp_template_part';
 
 	return (
 		<BlockEditorProvider
@@ -105,7 +99,7 @@ export default function BlockEditor( { setIsInserterOpen } ) {
 			</SidebarInspectorFill>
 			<BlockTools
 				className={ classnames( 'edit-site-visual-editor', {
-					'is-focus-mode': hasPreviousPage,
+					'is-focus-mode': isTemplatePart,
 				} ) }
 				__unstableContentRef={ contentRef }
 			>

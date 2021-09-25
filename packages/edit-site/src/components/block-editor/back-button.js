@@ -4,36 +4,24 @@
 import { Button } from '@wordpress/components';
 import { arrowLeft } from '@wordpress/icons';
 import { useSelect, useDispatch } from '@wordpress/data';
-import { __, sprintf } from '@wordpress/i18n';
+import { __ } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
  */
 import { store as editSiteStore } from '../../store';
-import useTemplateTitle from '../use-template-title';
 
 function BackButton() {
-	const {
-		isTemplatePart,
-		previousTemplateType,
-		previousTemplateId,
-	} = useSelect( ( select ) => {
-		const {
-			getEditedPostType,
-			getPreviousEditedPostType,
-			getPreviousEditedPostId,
-		} = select( editSiteStore );
+	const { isTemplatePart, previousTemplateId } = useSelect( ( select ) => {
+		const { getEditedPostType, getPreviousEditedPostId } = select(
+			editSiteStore
+		);
 
 		return {
 			isTemplatePart: getEditedPostType() === 'wp_template_part',
-			previousTemplateType: getPreviousEditedPostType(),
 			previousTemplateId: getPreviousEditedPostId(),
 		};
 	}, [] );
-	const previousTemplateTitle = useTemplateTitle(
-		previousTemplateType,
-		previousTemplateId
-	);
 	const { goBack } = useDispatch( editSiteStore );
 
 	if ( ! isTemplatePart || ! previousTemplateId ) {
@@ -48,11 +36,7 @@ function BackButton() {
 				goBack();
 			} }
 		>
-			{ sprintf(
-				/* translators: Template name. */
-				__( 'Back to %s' ),
-				previousTemplateTitle
-			) }
+			{ __( 'Back' ) }
 		</Button>
 	);
 }
