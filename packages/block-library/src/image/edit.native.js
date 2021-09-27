@@ -630,7 +630,7 @@ export class ImageEdit extends Component {
 			resizeMode: context?.imageCrop ? 'cover' : 'contain',
 		};
 
-		const blockStyles = {
+		const imageBlockStyles = {
 			hideImageCaption: context?.hideImageCaption ? 'true' : 'false',
 		};
 		const getImageComponent = ( openMediaOptions, getMediaOptions ) => (
@@ -697,7 +697,7 @@ export class ImageEdit extends Component {
 						/>
 					</View>
 				</TouchableWithoutFeedback>
-				{ ! blockStyles.hideImageCaption && (
+				{ ! imageBlockStyles.hideImageCaption && (
 					<BlockCaption
 						clientId={ this.props.clientId }
 						isSelected={ this.state.isCaptionSelected }
