@@ -144,7 +144,16 @@ describe( 'Navigator', () => {
 		).not.toBeInTheDocument();
 	} );
 
-	// todo: initialPath = not found?
+	it( 'should not rended anything if the `initialPath` does not match any available screen', () => {
+		render( <MyNavigation initialPath={ PATHS.NOT_FOUND } /> );
+
+		expect(
+			getHomeScreen( { throwIfNotFound: false } )
+		).not.toBeInTheDocument();
+		expect(
+			getChildScreen( { throwIfNotFound: false } )
+		).not.toBeInTheDocument();
+	} );
 
 	it( 'should navigate across screens', () => {
 		const spy = jest.fn();
@@ -181,9 +190,32 @@ describe( 'Navigator', () => {
 			isBack: true,
 		} );
 	} );
-} );
 
-// add link to not found, navigate there to not found
+	it( 'should not rended anything if the path does not match any available screen', () => {
+		const spy = jest.fn();
+
+		render( <MyNavigation onNavigatorButtonClick={ spy } /> );
+
+		expect( getToChildScreenButton() ).toBeInTheDocument();
+
+		// Attempt to navigate to non-existing screen. No screens get rendered.
+		fireEvent.click( getToNonExistingScreenButton() );
+
+		expect(
+			getHomeScreen( { throwIfNotFound: false } )
+		).not.toBeInTheDocument();
+		expect(
+			getChildScreen( { throwIfNotFound: false } )
+		).not.toBeInTheDocument();
+
+		// Check the values passed to `navigator.push()`
+		expect( spy ).toHaveBeenCalledTimes( 1 );
+		expect( spy ).toHaveBeenNthCalledWith( 1, {
+			path: PATHS.NOT_FOUND,
+			isBack: false,
+		} );
+	} );
+} );
 
 // RTL
 
