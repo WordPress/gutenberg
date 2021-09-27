@@ -130,27 +130,6 @@ export function useToolsPanel(
 		} );
 	};
 
-	// Track whether all optional controls are displayed or not.
-	// If no optional controls are present, then none are hidden and this will
-	// be `false`.
-	const [
-		areAllOptionalControlsHidden,
-		setAreAllOptionalControlsHidden,
-	] = useState( false );
-
-	// We need to track whether any optional menu items are active to later
-	// determine whether the panel is currently empty and any inner wrapper
-	// should be hidden.
-	useEffect( () => {
-		if ( menuItems.optional ) {
-			const optionalItems = Object.entries( menuItems.optional );
-			const allControlsHidden =
-				optionalItems.length > 0 &&
-				! optionalItems.some( ( [ , isSelected ] ) => isSelected );
-			setAreAllOptionalControlsHidden( allControlsHidden );
-		}
-	}, [ menuItems.optional ] );
-
 	const cx = useCx();
 	const classes = useMemo( () => {
 		const hasDefaultMenuItems =

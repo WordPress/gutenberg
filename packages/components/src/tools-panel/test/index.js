@@ -518,11 +518,22 @@ describe( 'ToolsPanel', () => {
 	} );
 
 	describe( 'panel header icon toggle', () => {
+		const optionalControls = {
+			attributes: { value: false },
+			hasValue: jest.fn().mockImplementation( () => {
+				return !! optionalControls.attributes.value;
+			} ),
+			label: 'Optional',
+			onDeselect: jest.fn(),
+			onSelect: jest.fn(),
+			isShownByDefault: false,
+		};
+
 		it( 'should render appropriate icons for the dropdown menu', async () => {
 			render(
 				<ToolsPanel { ...defaultProps }>
-					<ToolsPanelItem { ...controlProps }>
-						<div>Default control</div>
+					<ToolsPanelItem { ...optionalControls }>
+						<div>Optional control</div>
 					</ToolsPanelItem>
 				</ToolsPanel>
 			);
@@ -534,7 +545,7 @@ describe( 'ToolsPanel', () => {
 
 			expect( optionsHiddenIcon ).toBeInTheDocument();
 
-			await selectMenuItem( controlProps.label );
+			await selectMenuItem( optionalControls.label );
 
 			// There are now NO unactivated, optional menu items in the Tools Panel dropdown.
 			expect(
