@@ -56,10 +56,21 @@ function isVisible( element ) {
  * @return {boolean} Whether element should be skipped from focusable elements.
  */
 function skipFocus( element ) {
-	return (
+	if (
 		element.nodeName.toLowerCase() === 'iframe' &&
 		element.getAttribute( 'tabindex' ) === '-1'
-	);
+	) {
+		return true;
+	}
+
+	if (
+		element.classList.contains( 'components-dropdown' ) &&
+		element.getAttribute( 'tabindex' ) === '-1'
+	) {
+		return true;
+	}
+
+	return false;
 }
 
 /**
