@@ -11,6 +11,9 @@ For each user feature we should also add a importance categorization label  to i
 
 ## Unreleased
 
+## 1.61.2
+-   [*] Image block - Fix height and border regression. [#34957]
+
 ## 1.61.1
 -   [*] Fix crash related to reusable blocks in the block picker. [#34873]
 
