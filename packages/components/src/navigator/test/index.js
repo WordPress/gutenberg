@@ -29,28 +29,48 @@ const PATHS = {
 	NOT_FOUND: '/not-found',
 };
 
-function NavigatorButton( { path, isBack = false, ...props } ) {
+function NavigatorButton( { path, isBack = false, onClick, ...props } ) {
 	const navigator = useNavigator();
 	return (
 		<button
-			onClick={ () => navigator.push( path, { isBack } ) }
+			onClick={ () => {
+				navigator.push( path, { isBack } );
+				// Used to spy on the values passed to `navigator.push`
+				onClick?.( { path, isBack } );
+			} }
 			{ ...props }
 		/>
 	);
 }
 
-const MyNavigation = ( { initialPath = PATHS.HOME } ) => (
+const MyNavigation = ( {
+	initialPath = PATHS.HOME,
+	onNavigatorButtonClick,
+} ) => (
 	<Navigator initialPath={ initialPath }>
 		<NavigatorScreen path={ PATHS.HOME }>
 			<p>This is the home screen.</p>
-			<NavigatorButton path={ PATHS.CHILD }>
+			<NavigatorButton
+				path={ PATHS.CHILD }
+				onClick={ onNavigatorButtonClick }
+			>
 				Navigate to child screen.
+			</NavigatorButton>
+			<NavigatorButton
+				path={ PATHS.NOT_FOUND }
+				onClick={ onNavigatorButtonClick }
+			>
+				Navigate to non-existing screen.
 			</NavigatorButton>
 		</NavigatorScreen>
 
 		<NavigatorScreen path={ PATHS.CHILD }>
 			<p>This is the child screen.</p>
-			<NavigatorButton path={ PATHS.HOME } isBack>
+			<NavigatorButton
+				path={ PATHS.HOME }
+				isBack
+				onClick={ onNavigatorButtonClick }
+			>
 				Go back
 			</NavigatorButton>
 		</NavigatorScreen>
