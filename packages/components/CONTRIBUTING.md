@@ -4,13 +4,23 @@ Thank you for taking the time to contribute.
 
 The following is a set of guidelines for contributing to the `@wordpress/components` package to be considered in addition to the general ones described in our [Contributing Policy](/CONTRIBUTING.md).
 
-## Core principles
+This set of guidelines should apply especially to newly introduced components. In fact, while these guidelines should also be retroactively applied to existing components, it is sometimes impossible to do so for legacy/compatibility reasons.
 
-Contributions to the `@wordpress/components` package should follow a set of core principles and technical requirements.
+For an example of a component that follows these requirements, take a look at [`ItemGroup`](/packages/components/src/item-group).
 
-This set of guidelines should apply especially to newly introduced components. It is, in fact, possible that some of the older components don't respect some of these guidelines for legacy/compatibility reasons.
+- [Compatibility](#compatibility)
+- [Compound components](#compound-components)
+- [Components & Hooks](#components--hooks)
+- [TypeScript](#typescript)
+- [Styling](#styling)
+- [Context system](#context-system)
+- [Unit tests](#unit-tests)
+- [Storybook](#storybook)
+- [Documentation](#documentation)
+- [README example](#README-example)
+- [Folder structure](#folder-structure)
 
-### Compatibility
+## Compatibility
 
 The `@wordpress/components` package includes components that are relied upon by many developers across different projects. It is, therefore, very important to avoid introducing breaking changes.
 
@@ -24,9 +34,7 @@ When adding new components or new props to existing components, it's recommended
 
 Learn more on [How to preserve backward compatibility for a React Component](/docs/how-to-guides/backward-compatibility/README.md#how-to-preserve-backward-compatibility-for-a-react-component) and [Experimental and Unstable APIs](/docs/contributors/code/coding-guidelines.md#experimental-and-unstable-apis).
 
-### Components composition
-
-<!-- ### Polymorphic Components (i.e. the `as` prop)
+<!-- ## Polymorphic Components (i.e. the `as` prop)
 
 The primary way to compose components is through the `as` prop. This prop can be used to change the underlying element used to render a component, e.g.:
 
@@ -37,7 +45,7 @@ function LinkButton( { href, children } ) {
 ```
 -->
 
-#### Compound components
+## Compound components
 
 When creating components that render a list of subcomponents, prefer to expose the API using the [Compound Components](https://kentcdodds.com/blog/compound-components-with-react-hooks) technique over array props like `items` or `options`:
 
@@ -92,15 +100,15 @@ function ListItem( props ) {
 }
 ```
 
-<!-- ### (Semi-)Controlled components
+<!-- ## (Semi-)Controlled components
 
 TBD
 
-### Layout "responsibilities"
+## Layout "responsibilities"
 
 TBD — Components' layout responsibilities and boundaries (i.e., a component should only affect the layout of its children, not its own) -->
 
-#### Components & Hooks
+## Components & Hooks
 
 One way to enable reusability and composition is to extract a component's underlying logic into a hook (living in a separate `hook.ts` file). The actual component (usually defined in a `component.tsx` file) can then invoke the hook and use its output to render the required DOM elements. For example:
 
@@ -144,7 +152,7 @@ A couple of good examples of how hooks are used for composition are:
 - the `Card` component, which builds on top of the `Surface` component by [calling the `useSurface` hook inside its own hook](/packages/components/src/card/card/hook.js);
 - the `HStack` component, which builds on top of the `Flex` component and [calls the `useFlex` hook inside its own hook](/packages/components/src/h-stack/hook.js).
 
-<!-- ### APIs Consinstency
+<!-- ## API Consinstency
 
 [To be expanded] E.g.:
 
@@ -153,30 +161,24 @@ A couple of good examples of how hooks are used for composition are:
 - Subcomponents naming conventions (e.g `CardBody` instead of `Card.Body`)
 - ...
 
-### Performance
+## Performance
 
 TDB -->
 
-### Technical requirements for new components
-
-The following are a set of technical requirements for all newly introduced components. These requirements are also retroactively being applied to existing components.
-
-For an example of a component that follows these requirements, take a look at [`ItemGroup`](/packages/components/src/item-group).
-
-#### TypeScript
+## TypeScript
 
 We strongly encourage using TypeScript for all new components. Components should be typed using the `WordPressComponent` type.
 
 <!-- TODO: add to the previous paragraph once the composision section gets added to this document.
 (more details about polymorphism can be found above in the "Components composition" section). -->
 
-#### Styling
+## Styling
 
 All new component should be styled using [Emotion](https://emotion.sh/docs/introduction).
 
 Note: Instead of using Emotion's standard `cx` function, the custom [`useCx` hook](/packages/components/src/utils/hooks/use-cx.ts) should be used instead.
 
-#### Context system
+## Context system
 
 The `@wordpress/components` context system is based on [React's `Context` API](https://reactjs.org/docs/context.html), and is a way for components to adapt to the "context" they're being rendered in.
 
@@ -258,11 +260,11 @@ export function useCardBody( props ) {
 }
 ```
 
-#### Unit tests
+## Unit tests
 
 Please refer to the [JavaScript Testing Overview docs](/docs/contributors/code/testing-overview.md#snapshot-testing).
 
-#### Storybook
+## Storybook
 
 All new components should add stories to the project's [Storybook](https://storybook.js.org/). Each [story](https://storybook.js.org/docs/react/get-started/whats-a-story) captures the rendered state of a UI component in isolation. This greatly simplifies working on a given component, while also serving as an interactive form of documentation.
 
@@ -286,13 +288,65 @@ The default value of each control should coincide with the default value of the 
 
 Storybook can be started on a local machine by running `npm run storybook:dev`. Alternatively, the components' catalogue (up to date with the latest code on `trunk`) can be found at [wordpress.github.io/gutenberg/](https://wordpress.github.io/gutenberg/).
 
-#### Documentation
+## Documentation
 
 All components, in addition to being typed, should be using JSDoc when necessary — as explained in the [Coding Guidelines](/docs/contributors/code/coding-guidelines.md#javascript-documentation-using-jsdoc).
 
 Each component that is exported from the `@wordpress/components` package should include a `README.md` file, explaining how to use the component, showing examples, and documenting all the props.
 
-#### Folder structure
+## README example
+
+```md
+# `ComponentName`
+
+<!-- If component is experimental, add the following section: -->
+<div class="callout callout-alert">
+This feature is still experimental. “Experimental” means this is an early implementation subject to drastic and breaking changes.
+</div>
+
+<!-- If component is deprecated, add the following section: -->
+<div class="callout callout-alert">
+This component is deprecated. Please use  `{other component}` from the `{other package}` package instead.
+</div>
+
+Description of the component.
+
+## Usage
+
+Code example using correct markdown syntax and formatted using project's formatting rules. See [ItemGroup](/packages/components/src/item-group/item-group/README.md#usage) for a real-world example.
+
+```jsx
+import { ExampleComponent } from '@wordpress/components';
+
+function Example() {
+	return (
+		<ExampleComponent>
+			<p>Code is poetry</p>
+		</ExampleComponent>
+	);
+}
+
+## Props
+
+The component accepts the following props:
+
+### `propName`: Typescript style type i.e `string`, `number`, `( nextValue: string ) => void`
+
+Prop description. With a new line before and after the description and before and after type/required blocks.
+
+-   Required: Either `Yes` or `No`
+
+### Inherited props
+
+Add this section when there are props that are drilled down into an internal component. See [ClipboardButton](/packages/components/src/clipboard-button/README.md) for an example.
+
+<!-- Only add the next section if the component relies on the [Context System](#context-system) -->
+## Context
+
+See examples for this section for the [ItemGroup](/packages/components/src/item-group/item-group/README.md#context) and [`Card`](/packages/components/src/card/card/README.md#context) components.
+```
+
+## Folder structure
 
 As a result of the above guidelines, all new components (except for shared utilities) should _generally_ follow this folder structure:
 

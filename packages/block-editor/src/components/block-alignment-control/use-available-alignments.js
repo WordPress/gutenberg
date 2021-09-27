@@ -10,10 +10,14 @@ import { useLayout } from '../block-list/layout';
 import { store as blockEditorStore } from '../../store';
 import { getLayoutType } from '../../layouts';
 
-const DEFAULT_CONTROLS = [ 'left', 'center', 'right', 'wide', 'full' ];
+const DEFAULT_CONTROLS = [ 'none', 'left', 'center', 'right', 'wide', 'full' ];
 const WIDE_CONTROLS = [ 'wide', 'full' ];
 
 export default function useAvailableAlignments( controls = DEFAULT_CONTROLS ) {
+	// Always add the `none` option if not exists.
+	if ( ! controls.includes( 'none' ) ) {
+		controls.unshift( 'none' );
+	}
 	const { wideControlsEnabled = false, themeSupportsLayout } = useSelect(
 		( select ) => {
 			const { getSettings } = select( blockEditorStore );
@@ -30,8 +34,8 @@ export default function useAvailableAlignments( controls = DEFAULT_CONTROLS ) {
 	const layoutAlignments = layoutType.getAlignments( layout );
 
 	if ( themeSupportsLayout ) {
-		return layoutAlignments.filter( ( control ) =>
-			controls.includes( control )
+		return layoutAlignments.filter( ( { name: alignmentName } ) =>
+			controls.includes( alignmentName )
 		);
 	}
 
@@ -40,13 +44,15 @@ export default function useAvailableAlignments( controls = DEFAULT_CONTROLS ) {
 		return [];
 	}
 	const { alignments: availableAlignments = DEFAULT_CONTROLS } = layout;
-	const enabledControls = controls.filter(
-		( control ) =>
-			( layout.alignments || // Ignore the global wideAlignment check if the layout explicitely defines alignments.
-				wideControlsEnabled ||
-				! WIDE_CONTROLS.includes( control ) ) &&
-			availableAlignments.includes( control )
-	);
+	const enabledControls = controls
+		.filter(
+			( control ) =>
+				( layout.alignments || // Ignore the global wideAlignment check if the layout explicitely defines alignments.
+					wideControlsEnabled ||
+					! WIDE_CONTROLS.includes( control ) ) &&
+				availableAlignments.includes( control )
+		)
+		.map( ( enabledControl ) => ( { name: enabledControl } ) );
 
 	return enabledControls;
 }

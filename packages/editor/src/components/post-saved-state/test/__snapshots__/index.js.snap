@@ -24,6 +24,7 @@ exports[`PostSavedState should return Save button if edits to be saved 1`] = `
 <ForwardRef(Button)
   aria-disabled={false}
   className="editor-post-save-draft"
+  label="Save draft"
   onClick={[Function]}
   shortcut="Ctrl+S"
   variant="tertiary"
