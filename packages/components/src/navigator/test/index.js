@@ -81,4 +81,31 @@ describe( 'Navigator', () => {
 			getChildScreen( { throwIfNotFound: false } )
 		).not.toBeInTheDocument();
 	} );
+
+	it( 'should show a different screen on the first render depending on the value of `initialPath`', () => {
+		render( <MyNavigation initialPath={ PATHS.CHILD } /> );
+
+		expect(
+			getHomeScreen( { throwIfNotFound: false } )
+		).not.toBeInTheDocument();
+		expect( getChildScreen() ).toBeInTheDocument();
+	} );
+
+	it( 'should ignore changes to `initialPath` after the first render', () => {
+		const { rerender } = render( <MyNavigation /> );
+
+		expect( getHomeScreen() ).toBeInTheDocument();
+		expect(
+			getChildScreen( { throwIfNotFound: false } )
+		).not.toBeInTheDocument();
+
+		rerender( <MyNavigation initialPath={ PATHS.CHILD } /> );
+
+		expect( getHomeScreen() ).toBeInTheDocument();
+		expect(
+			getChildScreen( { throwIfNotFound: false } )
+		).not.toBeInTheDocument();
+	} );
+
+	// todo: initialPath = not found?
 } );
