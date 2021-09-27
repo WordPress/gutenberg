@@ -1,14 +1,4 @@
 /**
- * WordPress dependencies
- */
-import { controls } from '@wordpress/data';
-
-/**
- * Internal dependencies
- */
-import { STORE_NAME as interfaceStoreName } from './constants';
-
-/**
  * Returns an action object used in signalling that an active area should be changed.
  *
  * @param {string} itemType Type of item.
@@ -99,21 +89,11 @@ export function unpinItem( scope, itemId ) {
  * @param {string} scope       The feature scope (e.g. core/edit-post).
  * @param {string} featureName The feature name.
  */
-export function* toggleFeature( scope, featureName ) {
-	const currentValue = yield controls.select(
-		interfaceStoreName,
-		'isFeatureActive',
-		scope,
-		featureName
-	);
-
-	yield controls.dispatch(
-		interfaceStoreName,
-		'setFeatureValue',
-		scope,
-		featureName,
-		! currentValue
-	);
+export function toggleFeature( scope, featureName ) {
+	return function ( { select, dispatch } ) {
+		const currentValue = select.isFeatureActive( scope, featureName );
+		dispatch.setFeatureValue( scope, featureName, ! currentValue );
+	};
 }
 
 /**
