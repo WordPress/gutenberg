@@ -313,7 +313,7 @@ function gutenberg_render_duotone_filter( $preset ) {
 
 	if ( ! defined( 'SCRIPT_DEBUG' ) || ! SCRIPT_DEBUG ) {
 		// Clean up the whitespace.
-		$svg = preg_replace( "/(\r|\n|\t)+/", ' ', $svg );
+		$svg = preg_replace( "/[\r\n\t ]+/", ' ', $svg );
 		$svg = preg_replace( '/> </', '><', $svg );
 		$svg = trim( $svg );
 	}
