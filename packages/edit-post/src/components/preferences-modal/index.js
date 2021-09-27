@@ -7,13 +7,20 @@ import { get } from 'lodash';
  * WordPress dependencies
  */
 import {
-	__experimentalNavigation as Navigation,
-	__experimentalNavigationMenu as NavigationMenu,
-	__experimentalNavigationItem as NavigationItem,
+	__experimentalNavigator as Navigator,
+	__experimentalNavigatorScreen as NavigatorScreen,
+	__experimentalUseNavigator as useNavigator,
+	__experimentalItemGroup as ItemGroup,
+	__experimentalItem as Item,
+	__experimentalHStack as HStack,
+	FlexItem,
 	Modal,
 	TabPanel,
+	Button,
+	Card,
+	CardBody,
 } from '@wordpress/components';
-import { __ } from '@wordpress/i18n';
+import { isRTL, __ } from '@wordpress/i18n';
 import { useViewportMatch } from '@wordpress/compose';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { useMemo, useCallback, useState } from '@wordpress/element';
@@ -26,6 +33,7 @@ import {
 	store as editorStore,
 } from '@wordpress/editor';
 import { store as coreStore } from '@wordpress/core-data';
+import { chevronLeft, chevronRight, Icon } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -43,6 +51,22 @@ import BlockManager from '../block-manager';
 
 const MODAL_NAME = 'edit-post/preferences';
 const PREFERENCES_MENU = 'preferences-menu';
+
+function NavigationButton( {
+	as: Tag = Button,
+	path,
+	isBack = false,
+	...props
+} ) {
+	const navigator = useNavigator();
+	return (
+		<Tag
+			isAction
+			onClick={ () => navigator.push( path, { isBack } ) }
+			{ ...props }
+		/>
+	);
+}
 
 export default function PreferencesModal() {
 	const isLargeViewport = useViewportMatch( 'medium' );
@@ -301,34 +325,54 @@ export default function PreferencesModal() {
 		);
 	} else {
 		modalContent = (
-			<Navigation
-				activeMenu={ activeMenu }
-				onActivateMenu={ setActiveMenu }
-			>
-				<NavigationMenu menu={ PREFERENCES_MENU }>
-					{ tabs.map( ( tab ) => {
-						return (
-							<NavigationItem
-								key={ tab.name }
-								title={ tab.title }
-								navigateToMenu={ tab.name }
-							/>
-						);
-					} ) }
-				</NavigationMenu>
-				{ sections.map( ( section ) => {
-					return (
-						<NavigationMenu
-							key={ `${ section.name }-menu` }
-							menu={ section.name }
-							title={ section.tabLabel }
-							parentMenu={ PREFERENCES_MENU }
-						>
-							<NavigationItem>{ section.content }</NavigationItem>
-						</NavigationMenu>
-					);
-				} ) }
-			</Navigation>
+			<Card isBorderless>
+				<CardBody>
+					<Navigator initialPath="/">
+						<NavigatorScreen path="/">
+							<ItemGroup>
+								{ tabs.map( ( tab ) => {
+									return (
+										<NavigationButton
+											key={ tab.name }
+											path={ tab.name }
+											as={ Item }
+										>
+											<HStack justify="space-between">
+												<FlexItem>
+													{ tab.title }
+												</FlexItem>
+												<FlexItem>
+													<Icon
+														icon={
+															isRTL()
+																? chevronLeft
+																: chevronRight
+														}
+													/>
+												</FlexItem>
+											</HStack>
+										</NavigationButton>
+									);
+								} ) }
+							</ItemGroup>
+						</NavigatorScreen>
+						{ sections.map( ( section ) => {
+							return (
+								<NavigatorScreen
+									key={ `${ section.name }-menu` }
+									path={ section.name }
+								>
+									<NavigationButton path="/">
+										{ __( 'Back' ) }
+									</NavigationButton>
+									<h2>{ section.tabLabel }</h2>
+									{ section.content }
+								</NavigatorScreen>
+							);
+						} ) }
+					</Navigator>
+				</CardBody>
+			</Card>
 		);
 	}
 	return (
