@@ -13,6 +13,7 @@ import {
 	useAnchorRef,
 	removeFormat,
 	slice,
+	replace,
 } from '@wordpress/rich-text';
 import {
 	__experimentalLinkControl as LinkControl,
@@ -179,7 +180,7 @@ function InlineLinkUI( {
 			opensInNewWindow: nextValue.opensInNewTab,
 		} );
 
-		const newText = nextValue?.title || nextValue.title || newUrl;
+		const newText = nextValue?.text || nextValue.title || newUrl;
 
 		if ( isCollapsed( value ) && ! isActive ) {
 			const toInsert = applyFormat(
@@ -190,7 +191,20 @@ function InlineLinkUI( {
 			);
 			onChange( insert( value, toInsert ) );
 		} else {
-			const newValue = applyFormat( value, format );
+			// Create a new RichTextValue with
+			// 1. the new text provided by the LinkControl.
+			// 2. the link format applied.
+			const toInsert = applyFormat(
+				create( { text: newText } ),
+				format,
+				0,
+				newText.length
+			);
+
+			// Update the existing value replacing the
+			// current text with the new RichTextValue.
+			const newValue = replace( value, text, toInsert );
+
 			newValue.start = newValue.end;
 			newValue.activeFormats = [];
 			onChange( newValue );
