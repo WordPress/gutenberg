@@ -631,13 +631,13 @@ export class ImageEdit extends Component {
 		const additionalImageProps = {
 			height: '100%',
 			resizeMode: context?.imageCrop ? 'cover' : 'contain',
+			hideImageCaption: context?.hideImageCaption ? 'true' : 'false',
+			fixedHeight: context?.fixedHeight ? 'true' : 'false',
 		};
 
-		const imageBlockStyles = {
-			hideImageCaption: context?.hideImageCaption ? 'true' : 'false',
-		};
-    
-    const imageContainerStyles = [ hasImageContext && styles.fixedHeight ];
+		const imageContainerStyles = [
+			additionalImageProps.fixedHeight && styles.fixedHeight,
+		];
 
 		const getImageComponent = ( openMediaOptions, getMediaOptions ) => (
 			<Badge label={ __( 'Featured' ) } show={ isFeaturedImage }>
@@ -705,7 +705,7 @@ export class ImageEdit extends Component {
 						/>
 					</View>
 				</TouchableWithoutFeedback>
-				{ ! imageBlockStyles.hideImageCaption && (
+				{ ! additionalImageProps.hideImageCaption && (
 					<BlockCaption
 						clientId={ this.props.clientId }
 						isSelected={ this.state.isCaptionSelected }
