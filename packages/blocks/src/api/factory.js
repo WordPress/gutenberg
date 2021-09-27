@@ -3,6 +3,7 @@
  */
 import { v4 as uuid } from 'uuid';
 import {
+	compact,
 	every,
 	castArray,
 	some,
@@ -21,6 +22,7 @@ import {
  * WordPress dependencies
  */
 import { createHooks, applyFilters } from '@wordpress/hooks';
+import warning from '@wordpress/warning';
 
 /**
  * Internal dependencies
@@ -573,18 +575,25 @@ export function switchToBlockType( blocks, name ) {
 
 /**
  * Create a block object from the example API.
+ * Can return `undefined` if the block can't be created.
  *
  * @param {string} name
  * @param {Object} example
  *
- * @return {Object} block.
+ * @return {Object|undefined} block object or undefined.
  */
 export const getBlockFromExample = ( name, example ) => {
+	if ( ! getBlockType( name ) ) {
+		warning( 'Block example used an unknown block type: ' + name );
+		return;
+	}
 	return createBlock(
 		name,
 		example.attributes,
-		map( example.innerBlocks, ( innerBlock ) =>
-			getBlockFromExample( innerBlock.name, innerBlock )
+		compact(
+			map( example.innerBlocks, ( innerBlock ) =>
+				getBlockFromExample( innerBlock.name, innerBlock )
+			)
 		)
 	);
 };

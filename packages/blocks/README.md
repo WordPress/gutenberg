@@ -298,6 +298,7 @@ _Returns_
 ### getBlockFromExample
 
 Create a block object from the example API.
+Can return `undefined` if the block can't be created.
 
 _Parameters_
 
@@ -306,7 +307,7 @@ _Parameters_
 
 _Returns_
 
--   `Object`: block.
+-   `?Object`: block object or undefined.
 
 ### getBlockMenuDefaultClassName
 
