@@ -57,11 +57,10 @@ export default function MenuSwitcher( {
 				{ isModalVisible && (
 					<Modal
 						title={ __( 'Create a new menu' ) }
+						className="edit-navigation-menu-switcher__modal"
 						onRequestClose={ closeModal }
 					>
 						<AddMenu
-							className="edit-navigation-menu-switcher__add-menu"
-							menus={ menus }
 							onCreate={ ( menuId ) => {
 								closeModal();
 								onSelectMenu( menuId );

@@ -12,13 +12,15 @@
 	}
 
 	.components-menu-items__item-icon {
-		margin-right: -2px; // This optically balances the icon.
-		margin-left: $grid-unit-30;
 		display: inline-block;
 		flex: 0 0 auto;
+		&.has-icon-right {
+			margin-right: -2px; // This optically balances the icon.
+			margin-left: $grid-unit-30;
+		}
 	}
 
-	.components-menu-item__shortcut + .components-menu-items__item-icon {
+	.components-menu-item__shortcut + .components-menu-items__item-icon.has-icon-right {
 		margin-left: $grid-unit-10;
 	}
 

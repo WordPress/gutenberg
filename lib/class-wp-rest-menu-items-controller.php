@@ -391,6 +391,7 @@ class WP_REST_Menu_Items_Controller extends WP_REST_Posts_Controller {
 				'menu-item-object'      => $menu_item_obj->object,
 				'menu-item-parent-id'   => $menu_item_obj->menu_item_parent,
 				'menu-item-position'    => $position,
+				'menu-item-type'        => $menu_item_obj->type,
 				'menu-item-title'       => $menu_item_obj->title,
 				'menu-item-url'         => $menu_item_obj->url,
 				'menu-item-description' => $menu_item_obj->description,
@@ -542,17 +543,6 @@ class WP_REST_Menu_Items_Controller extends WP_REST_Posts_Controller {
 			$prepared_nav_item[ $key ] = implode( ' ', array_map( 'sanitize_html_class', $value ) );
 		}
 
-		// Apply the same filters as when calling wp_insert_post().
-
-		/** This filter is documented in wp-includes/post.php */
-		$prepared_nav_item['menu-item-title'] = wp_unslash( apply_filters( 'title_save_pre', wp_slash( $prepared_nav_item['menu-item-title'] ) ) );
-
-		/** This filter is documented in wp-includes/post.php */
-		$prepared_nav_item['menu-item-attr-title'] = wp_unslash( apply_filters( 'excerpt_save_pre', wp_slash( $prepared_nav_item['menu-item-attr-title'] ) ) );
-
-		/** This filter is documented in wp-includes/post.php */
-		$prepared_nav_item['menu-item-description'] = wp_unslash( apply_filters( 'content_save_pre', wp_slash( $prepared_nav_item['menu-item-description'] ) ) );
-
 		// Valid url.
 		if ( '' !== $prepared_nav_item['menu-item-url'] ) {
 			$prepared_nav_item['menu-item-url'] = esc_url_raw( $prepared_nav_item['menu-item-url'] );
@@ -671,7 +661,7 @@ class WP_REST_Menu_Items_Controller extends WP_REST_Posts_Controller {
 
 		if ( rest_is_field_included( 'parent', $fields ) ) {
 			// Same as post_parent, expose as integer.
-			$data['parent'] = (int) $menu_item->post_parent;
+			$data['parent'] = (int) $menu_item->menu_item_parent;
 		}
 
 		if ( rest_is_field_included( 'menu_order', $fields ) ) {
@@ -693,6 +683,10 @@ class WP_REST_Menu_Items_Controller extends WP_REST_Posts_Controller {
 
 		if ( rest_is_field_included( 'xfn', $fields ) ) {
 			$data['xfn'] = array_map( 'sanitize_html_class', explode( ' ', $menu_item->xfn ) );
+		}
+
+		if ( rest_is_field_included( 'invalid', $fields ) ) {
+			$data['invalid'] = (bool) $menu_item->_invalid;
 		}
 
 		if ( rest_is_field_included( 'meta', $fields ) ) {
@@ -1007,7 +1001,7 @@ class WP_REST_Menu_Items_Controller extends WP_REST_Posts_Controller {
 			),
 		);
 
-		$schema['properties']['_invalid'] = array(
+		$schema['properties']['invalid'] = array(
 			'description' => __( 'Whether the menu item represents an object that no longer exists.', 'gutenberg' ),
 			'context'     => array( 'view', 'edit', 'embed' ),
 			'type'        => 'boolean',

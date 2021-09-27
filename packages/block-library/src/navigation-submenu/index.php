@@ -123,9 +123,6 @@ function block_core_navigation_submenu_render_submenu_icon() {
  * @return string Returns the post content with the legacy widget added.
  */
 function render_block_core_navigation_submenu( $attributes, $content, $block ) {
-	if ( ! wp_script_is( 'wp-block-navigation-submenu-view' ) ) {
-		wp_enqueue_script( 'wp-block-navigation-submenu-view' );
-	}
 
 	$navigation_link_has_id = isset( $attributes['id'] ) && is_numeric( $attributes['id'] );
 	$is_post_type           = isset( $attributes['kind'] ) && 'post-type' === $attributes['kind'];
