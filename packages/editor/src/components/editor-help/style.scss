@@ -1,20 +1,22 @@
 .button {
 	margin: $grid-unit-10 $grid-unit-05;
-	padding: $grid-unit-10;
 	align-items: center;
 	justify-content: center;
-	border-radius: $border-width * 4;
 	border: $border-width solid $gray-300;
 }
 
 .buttonDark {
-	border: 1px solid $gray-dark;
+	border-color: $gray-700;
 }
 
 .buttonText {
 	font-weight: 600;
 	font-size: 16px;
-	color: $blue-wordpress;
+	color: $light-primary;
+}
+
+.buttonTextDark {
+	color: $dark-primary;
 }
 
 .container {

@@ -19,13 +19,18 @@ const HelpGetSupportButton = ( { onPress, title } ) => {
 		styles.buttonDark
 	);
 
+	const textStyle = usePreferredColorSchemeStyle(
+		styles.buttonText,
+		styles.buttonTextDark
+	);
+
 	return (
 		<Pressable
 			style={ buttonStyle }
 			onPress={ onPress }
 			accessibilityRole={ 'button' }
 		>
-			<Text style={ styles.buttonText }>{ title }</Text>
+			<Text style={ textStyle }>{ title }</Text>
 		</Pressable>
 	);
 };
