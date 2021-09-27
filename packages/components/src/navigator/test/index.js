@@ -8,6 +8,21 @@ import { render, screen } from '@testing-library/react';
  */
 import { Navigator, NavigatorScreen, useNavigator } from '../';
 
+jest.mock( 'framer-motion', () => {
+	const actual = jest.requireActual( 'framer-motion' );
+	return {
+		__esModule: true,
+		...actual,
+		AnimatePresence: ( { children } ) => <div>{ children }</div>,
+		motion: {
+			...actual.motion,
+			div: require( 'react' ).forwardRef( ( { children }, ref ) => (
+				<div ref={ ref }>{ children }</div>
+			) ),
+		},
+	};
+} );
+
 const PATHS = {
 	HOME: '/',
 	CHILD: '/child',
