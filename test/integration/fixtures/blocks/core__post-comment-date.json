@@ -4,7 +4,7 @@
 		"name": "core/post-comment-date",
 		"isValid": true,
 		"attributes": {
-			"isLink" :false
+			"isLink": false
 		},
 		"innerBlocks": [],
 		"originalContent": ""
