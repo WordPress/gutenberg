@@ -184,7 +184,9 @@ export const withDataAlign = createHigherOrderComponent(
 		}
 
 		let wrapperProps = props.wrapperProps;
-		if ( validAlignments.includes( align ) ) {
+		if (
+			validAlignments.some( ( alignment ) => alignment.name === align )
+		) {
 			wrapperProps = { ...wrapperProps, 'data-align': align };
 		}
 

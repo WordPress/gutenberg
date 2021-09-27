@@ -8,10 +8,13 @@ import { useMemo } from '@wordpress/element';
  */
 import * as styles from '../styles';
 import { useToolsPanelContext } from '../context';
-import { useContextSystem } from '../../ui/context';
+import { useContextSystem, WordPressComponentProps } from '../../ui/context';
 import { useCx } from '../../utils/hooks/use-cx';
+import type { ToolsPanelHeaderProps } from '../types';
 
-export function useToolsPanelHeader( props ) {
+export function useToolsPanelHeader(
+	props: WordPressComponentProps< ToolsPanelHeaderProps, 'h2' >
+) {
 	const { className, ...otherProps } = useContextSystem(
 		props,
 		'ToolsPanelHeader'

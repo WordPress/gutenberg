@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * External dependencies
  */
@@ -33,19 +34,21 @@ function mergeProps( defaultProps = {}, props = {} ) {
 	return mergedProps;
 }
 
-function DropdownMenu( {
-	children,
-	className,
-	controls,
-	icon = menu,
-	label,
-	popoverProps,
-	toggleProps,
-	menuProps,
-	disableOpenOnArrowDown = false,
-	text,
-	noIcons,
-} ) {
+function DropdownMenu( dropdownMenuProps ) {
+	const {
+		children,
+		className,
+		controls,
+		icon = menu,
+		label,
+		popoverProps,
+		toggleProps,
+		menuProps,
+		disableOpenOnArrowDown = false,
+		text,
+		noIcons,
+	} = dropdownMenuProps;
+
 	if ( isEmpty( controls ) && ! isFunction( children ) ) {
 		return null;
 	}

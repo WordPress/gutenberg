@@ -2,7 +2,8 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import tinycolor from 'tinycolor2';
+import { colord, extend } from 'colord';
+import namesPlugin from 'colord/plugins/names';
 
 /**
  * WordPress dependencies
@@ -25,6 +26,8 @@ import BlockList from '../components/block-list';
 
 const EMPTY_ARRAY = [];
 
+extend( [ namesPlugin ] );
+
 /**
  * Convert a list of colors to an object of R, G, and B values.
  *
@@ -36,11 +39,10 @@ export function getValuesFromColors( colors = [] ) {
 	const values = { r: [], g: [], b: [] };
 
 	colors.forEach( ( color ) => {
-		// Access values directly to skip extra rounding that tinycolor.toRgb() does.
-		const tcolor = tinycolor( color );
-		values.r.push( tcolor._r / 255 );
-		values.g.push( tcolor._g / 255 );
-		values.b.push( tcolor._b / 255 );
+		const rgbColor = colord( color ).toRgb();
+		values.r.push( rgbColor.r / 255 );
+		values.g.push( rgbColor.g / 255 );
+		values.b.push( rgbColor.b / 255 );
 	} );
 
 	return values;

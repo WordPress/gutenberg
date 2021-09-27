@@ -6,6 +6,7 @@ export { default as alignCenter } from './library/align-center';
 export { default as alignJustify } from './library/align-justify';
 export { default as alignJustifyAlt } from './library/align-justify-alt';
 export { default as alignLeft } from './library/align-left';
+export { default as alignNone } from './library/align-none';
 export { default as alignRight } from './library/align-right';
 export { default as archive } from './library/archive';
 export { default as archiveTitle } from './library/archive-title';

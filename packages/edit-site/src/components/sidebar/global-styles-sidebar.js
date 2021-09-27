@@ -8,14 +8,29 @@ import { map } from 'lodash';
  */
 import {
 	Button,
-	__experimentalNavigation as Navigation,
-	__experimentalNavigationItem as NavigationItem,
-	__experimentalNavigationMenu as NavigationMenu,
-	__experimentalNavigationGroup as NavigationGroup,
+	__experimentalNavigator as Navigator,
+	__experimentalNavigatorScreen as NavigatorScreen,
+	__experimentalUseNavigator as useNavigator,
+	__experimentalItemGroup as ItemGroup,
+	__experimentalItem as Item,
+	FlexItem,
+	__experimentalHStack as HStack,
+	__experimentalVStack as VStack,
+	__experimentalSpacer as Spacer,
+	__experimentalHeading as Heading,
+	__experimentalView as View,
 } from '@wordpress/components';
-import { __ } from '@wordpress/i18n';
+import { __, isRTL } from '@wordpress/i18n';
 import { getBlockType } from '@wordpress/blocks';
-import { layout, brush, styles, typography } from '@wordpress/icons';
+import {
+	Icon,
+	layout,
+	brush,
+	styles,
+	typography,
+	chevronLeft,
+	chevronRight,
+} from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -49,14 +64,32 @@ function getPanelTitle( blockName ) {
 	return blockType.title;
 }
 
-function GlobalStylesLevel( {
-	context,
-	getStyle,
-	setStyle,
-	getSetting,
-	setSetting,
-	parentMenu = 'root',
-} ) {
+const ScreenHeader = ( { back, title } ) => {
+	return (
+		<VStack spacing={ 5 }>
+			<HStack spacing={ 2 }>
+				<View>
+					<NavigationButton
+						path={ back }
+						icon={
+							<Icon
+								icon={ isRTL() ? chevronRight : chevronLeft }
+								variant="muted"
+							/>
+						}
+						size="small"
+						isBack
+					/>
+				</View>
+				<Spacer>
+					<Heading level={ 5 }>{ title }</Heading>
+				</Spacer>
+			</HStack>
+		</VStack>
+	);
+};
+
+function GlobalStylesLevelMenu( { context, parentMenu = '' } ) {
 	const hasTypographyPanel = useHasTypographyPanel( context );
 	const hasColorPanel = useHasColorPanel( context );
 	const hasBorderPanel = useHasBorderPanel( context );
@@ -64,92 +97,129 @@ function GlobalStylesLevel( {
 	const hasLayoutPanel = hasBorderPanel || hasDimensionsPanel;
 
 	return (
+		<ItemGroup>
+			{ hasTypographyPanel && (
+				<NavigationButton
+					icon={ typography }
+					path={ parentMenu + '/typography' }
+				>
+					{ __( 'Typography' ) }
+				</NavigationButton>
+			) }
+			{ hasColorPanel && (
+				<NavigationButton
+					icon={ brush }
+					path={ parentMenu + '/colors' }
+				>
+					{ __( 'Colors' ) }
+				</NavigationButton>
+			) }
+			{ hasLayoutPanel && (
+				<NavigationButton
+					icon={ layout }
+					path={ parentMenu + '/layout' }
+				>
+					{ __( 'Layout' ) }
+				</NavigationButton>
+			) }
+		</ItemGroup>
+	);
+}
+
+function GlobalStylesLevelScreens( {
+	context,
+	getStyle,
+	setStyle,
+	getSetting,
+	setSetting,
+	parentMenu = '',
+} ) {
+	const hasTypographyPanel = useHasTypographyPanel( context );
+	const hasColorPanel = useHasColorPanel( context );
+	const hasBorderPanel = useHasBorderPanel( context );
+	const hasDimensionsPanel = useHasDimensionsPanel( context );
+	const hasLayoutPanel = hasBorderPanel || hasDimensionsPanel;
+	return (
 		<>
-			<NavigationGroup>
-				{ hasTypographyPanel && (
-					<NavigationItem
-						item="item-typography"
-						navigateToMenu={ parentMenu + '.typography' }
-						icon={ typography }
+			{ hasTypographyPanel && (
+				<NavigatorScreen path={ parentMenu + '/typography' }>
+					<ScreenHeader
+						back={ parentMenu ? parentMenu : '/' }
 						title={ __( 'Typography' ) }
 					/>
-				) }
-				{ hasColorPanel && (
-					<NavigationItem
-						item="item-color"
-						navigateToMenu={ parentMenu + '.color' }
-						title={ __( 'Colors' ) }
-						icon={ brush }
+					<TypographyPanel
+						context={ context }
+						getStyle={ getStyle }
+						setStyle={ setStyle }
 					/>
-				) }
-				{ hasLayoutPanel && (
-					<NavigationItem
-						item="item-layout"
-						navigateToMenu={ parentMenu + '.layout' }
-						title={ __( 'Layout' ) }
-						icon={ layout }
-					/>
-				) }
-			</NavigationGroup>
-
-			{ hasTypographyPanel && (
-				<NavigationMenu
-					menu={ parentMenu + '.typography' }
-					parentMenu={ parentMenu }
-					title={ __( 'Typography' ) }
-				>
-					<NavigationItem>
-						<TypographyPanel
-							context={ context }
-							getStyle={ getStyle }
-							setStyle={ setStyle }
-						/>
-					</NavigationItem>
-				</NavigationMenu>
+				</NavigatorScreen>
 			) }
 
 			{ hasColorPanel && (
-				<NavigationMenu
-					menu={ parentMenu + '.color' }
-					parentMenu={ parentMenu }
-					title={ __( 'Colors' ) }
-				>
-					<NavigationItem>
-						<ColorPanel
-							context={ context }
-							getStyle={ getStyle }
-							setStyle={ setStyle }
-							getSetting={ getSetting }
-							setSetting={ setSetting }
-						/>
-					</NavigationItem>
-				</NavigationMenu>
+				<NavigatorScreen path={ parentMenu + '/colors' }>
+					<ScreenHeader
+						back={ parentMenu ? parentMenu : '/' }
+						title={ __( 'Colors' ) }
+					/>
+					<ColorPanel
+						context={ context }
+						getStyle={ getStyle }
+						setStyle={ setStyle }
+						getSetting={ getSetting }
+						setSetting={ setSetting }
+					/>
+				</NavigatorScreen>
 			) }
 
 			{ hasLayoutPanel && (
-				<NavigationMenu
-					menu={ parentMenu + '.layout' }
-					parentMenu={ parentMenu }
-				>
-					<NavigationItem>
-						{ hasDimensionsPanel && (
-							<DimensionsPanel
-								context={ context }
-								getStyle={ getStyle }
-								setStyle={ setStyle }
-							/>
-						) }
-						{ hasBorderPanel && (
-							<BorderPanel
-								context={ context }
-								getStyle={ getStyle }
-								setStyle={ setStyle }
-							/>
-						) }
-					</NavigationItem>
-				</NavigationMenu>
+				<NavigatorScreen path={ parentMenu + '/layout' }>
+					<ScreenHeader
+						back={ parentMenu ? parentMenu : '/' }
+						title={ __( 'Layout' ) }
+					/>
+					{ hasDimensionsPanel && (
+						<DimensionsPanel
+							context={ context }
+							getStyle={ getStyle }
+							setStyle={ setStyle }
+						/>
+					) }
+					{ hasBorderPanel && (
+						<BorderPanel
+							context={ context }
+							getStyle={ getStyle }
+							setStyle={ setStyle }
+						/>
+					) }
+				</NavigatorScreen>
 			) }
 		</>
+	);
+}
+
+function NavigationButton( {
+	path,
+	icon,
+	children,
+	isBack = false,
+	...props
+} ) {
+	const navigator = useNavigator();
+	return (
+		<Item
+			isAction
+			onClick={ () => navigator.push( path, { isBack } ) }
+			{ ...props }
+		>
+			<HStack justify="flex-start">
+				{ icon && (
+					<FlexItem>
+						<Icon icon={ icon } size={ 24 } />
+					</FlexItem>
+				) }
+				<FlexItem>{ children }</FlexItem>
+			</HStack>
+		</Item>
 	);
 }
 
@@ -187,68 +257,74 @@ export default function GlobalStylesSidebar() {
 				</>
 			}
 		>
-			<Navigation>
-				<NavigationMenu>
-					<NavigationGroup>
-						<NavigationItem>
-							<StylePreview />
-						</NavigationItem>
-					</NavigationGroup>
-					<GlobalStylesLevel
-						context={ root }
+			<Navigator initialPath="/">
+				<NavigatorScreen path="/">
+					<StylePreview />
+
+					<GlobalStylesLevelMenu context={ root } />
+
+					<ItemGroup>
+						<Item>
+							<p>
+								{ __(
+									'Customize the appearance of specific blocks for the whole site'
+								) }
+							</p>
+						</Item>
+						<NavigationButton path="/blocks">
+							{ __( 'Blocks' ) }
+						</NavigationButton>
+					</ItemGroup>
+				</NavigatorScreen>
+
+				<NavigatorScreen path="/blocks">
+					<ScreenHeader back="/" title={ __( 'Blocks' ) } />
+					{ map( blocks, ( _, name ) => (
+						<NavigationButton
+							path={ '/blocks/' + name }
+							key={ 'menu-itemblock-' + name }
+						>
+							{ getPanelTitle( name ) }
+						</NavigationButton>
+					) ) }
+				</NavigatorScreen>
+
+				{ map( blocks, ( block, name ) => (
+					<NavigatorScreen
+						key={ 'menu-block-' + name }
+						path={ '/blocks/' + name }
+					>
+						<ScreenHeader
+							back="/blocks"
+							title={ getPanelTitle( name ) }
+						/>
+						<GlobalStylesLevelMenu
+							parentMenu={ '/blocks/' + name }
+							context={ block }
+						/>
+					</NavigatorScreen>
+				) ) }
+
+				<GlobalStylesLevelScreens
+					context={ root }
+					getStyle={ getStyle }
+					setStyle={ setStyle }
+					getSetting={ getSetting }
+					setSetting={ setSetting }
+				/>
+
+				{ map( blocks, ( block, name ) => (
+					<GlobalStylesLevelScreens
+						key={ 'screens-block-' + name }
+						parentMenu={ '/blocks/' + name }
+						context={ block }
 						getStyle={ getStyle }
 						setStyle={ setStyle }
 						getSetting={ getSetting }
 						setSetting={ setSetting }
 					/>
-					<NavigationGroup className="edit-site-global-styles-sidebar__blocks-group">
-						<NavigationItem
-							className="edit-site-global-styles-sidebar__blocks-group-help"
-							isText
-						>
-							{ __(
-								'Customize the appearance of specific blocks for the whole site'
-							) }
-						</NavigationItem>
-						<NavigationItem
-							item="item-blocks"
-							navigateToMenu="blocks"
-							title={ __( 'Blocks' ) }
-						/>
-					</NavigationGroup>
-				</NavigationMenu>
-				<NavigationMenu
-					menu="blocks"
-					parentMenu="root"
-					title={ __( 'Blocks' ) }
-				>
-					{ map( blocks, ( _, name ) => (
-						<NavigationItem
-							key={ 'menu-itemblock-' + name }
-							item={ 'block-' + name }
-							navigateToMenu={ 'block-' + name }
-							title={ getPanelTitle( name ) }
-						/>
-					) ) }
-				</NavigationMenu>
-				{ map( blocks, ( block, name ) => (
-					<NavigationMenu
-						key={ 'menu-block-' + name }
-						menu={ 'block-' + name }
-						parentMenu="blocks"
-						title={ getPanelTitle( name ) }
-					>
-						<GlobalStylesLevel
-							parentMenu={ 'block-' + name }
-							context={ block }
-							getStyle={ getStyle }
-							setStyle={ setStyle }
-							getSetting={ getSetting }
-							setSetting={ setSetting }
-						/>
-					</NavigationMenu>
 				) ) }
-			</Navigation>
+			</Navigator>
 		</DefaultSidebar>
 	);
 }

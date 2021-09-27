@@ -91,8 +91,15 @@ export const ColorfulWrapper = styled.div`
 	.react-colorful__pointer {
 		height: 16px;
 		width: 16px;
-		border: ${ CONFIG.borderWidthFocus } solid rgba( 255, 255, 255, 0 );
-		box-shadow: inset 0px 0px 0px ${ CONFIG.borderWidthFocus } #ffffff;
+		border: none;
+		box-shadow: 0 0 2px 0 rgba( 0, 0, 0, 0.25 );
+
+		// Shown instead of box-shadow to Windows high contrast mode.
+		outline: 2px solid transparent;
+	}
+
+	.react-colorful__pointer-fill {
+		box-shadow: inset 0 0 0 ${ CONFIG.borderWidthFocus } #fff;
 	}
 
 	${ interactiveHueStyles }

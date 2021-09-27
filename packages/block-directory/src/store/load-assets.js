@@ -49,50 +49,33 @@ export const loadAsset = ( el ) => {
 
 /**
  * Load the asset files for a block
- *
- * @param {Array} assets A collection of URLs for the assets.
- *
- * @return {Object} Control descriptor.
  */
-export function loadAssets( assets ) {
-	return {
-		type: 'LOAD_ASSETS',
-		assets,
-	};
+export async function loadAssets() {
+	/*
+	 * Fetch the current URL (post-new.php, or post.php?post=1&action=edit) and compare the
+	 * JavaScript and CSS assets loaded between the pages. This imports the required assets
+	 * for the block into the current page while not requiring that we know them up-front.
+	 * In the future this can be improved by reliance upon block.json and/or a script-loader
+	 * dependency API.
+	 */
+	const response = await apiFetch( {
+		url: document.location.href,
+		parse: false,
+	} );
+
+	const data = await response.text();
+
+	const doc = new window.DOMParser().parseFromString( data, 'text/html' );
+
+	const newAssets = Array.from(
+		doc.querySelectorAll( 'link[rel="stylesheet"],script' )
+	).filter( ( asset ) => asset.id && ! document.getElementById( asset.id ) );
+
+	/*
+	 * Load each asset in order, as they may depend upon an earlier loaded script.
+	 * Stylesheets and Inline Scripts will resolve immediately upon insertion.
+	 */
+	for ( const newAsset of newAssets ) {
+		await loadAsset( newAsset );
+	}
 }
-
-const controls = {
-	async LOAD_ASSETS() {
-		/*
-		 * Fetch the current URL (post-new.php, or post.php?post=1&action=edit) and compare the
-		 * JavaScript and CSS assets loaded between the pages. This imports the required assets
-		 * for the block into the current page while not requiring that we know them up-front.
-		 * In the future this can be improved by reliance upon block.json and/or a script-loader
-		 * dependency API.
-		 */
-		const response = await apiFetch( {
-			url: document.location.href,
-			parse: false,
-		} );
-
-		const data = await response.text();
-
-		const doc = new window.DOMParser().parseFromString( data, 'text/html' );
-
-		const newAssets = Array.from(
-			doc.querySelectorAll( 'link[rel="stylesheet"],script' )
-		).filter(
-			( asset ) => asset.id && ! document.getElementById( asset.id )
-		);
-
-		/*
-		 * Load each asset in order, as they may depend upon an earlier loaded script.
-		 * Stylesheets and Inline Scripts will resolve immediately upon insertion.
-		 */
-		for ( const newAsset of newAssets ) {
-			await loadAsset( newAsset );
-		}
-	},
-};
-
-export default controls;
