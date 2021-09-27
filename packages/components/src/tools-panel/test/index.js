@@ -518,7 +518,7 @@ describe( 'ToolsPanel', () => {
 	} );
 
 	describe( 'panel header icon toggle', () => {
-		it( 'should continue to render shown by default item after it is toggled off via menu item', async () => {
+		it( 'should render appropriate icons for the dropdown menu', async () => {
 			render(
 				<ToolsPanel { ...defaultProps }>
 					<ToolsPanelItem { ...controlProps }>
