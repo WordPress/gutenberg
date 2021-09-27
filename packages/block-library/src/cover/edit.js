@@ -25,6 +25,8 @@ import {
 	__experimentalUseCustomUnits as useCustomUnits,
 	__experimentalBoxControl as BoxControl,
 	__experimentalToolsPanelItem as ToolsPanelItem,
+	Dropdown,
+	ToolbarButton,
 } from '@wordpress/components';
 import { compose, withInstanceId, useInstanceId } from '@wordpress/compose';
 import {
@@ -49,6 +51,7 @@ import { __ } from '@wordpress/i18n';
 import { withDispatch, useSelect } from '@wordpress/data';
 import { cover as icon } from '@wordpress/icons';
 import { isBlobURL } from '@wordpress/blob';
+import colorIcon from './color-icon';
 
 /**
  * Internal dependencies
@@ -448,6 +451,68 @@ function CoverEdit( {
 					isActive={ isMinFullHeight }
 					onToggle={ toggleMinFullHeight }
 					isDisabled={ ! hasInnerBlocks }
+				/>
+			</BlockControls>
+			<BlockControls>
+				<Dropdown
+					position="bottom right"
+					className="color-dropdown"
+					popoverProps={ {
+						className: 'color-dropdown-popover',
+						isAlternate: true,
+					} }
+					renderToggle={ ( { onToggle, isOpen } ) => {
+						const openOnArrowDown = ( event ) => {
+							if ( ! isOpen && event.keyCode === '1' ) {
+								event.preventDefault();
+								onToggle();
+							}
+						};
+
+						return (
+							<ToolbarButton
+								onClick={ onToggle }
+								aria-haspopup="true"
+								aria-expanded={ isOpen }
+								onKeyDown={ openOnArrowDown }
+								label={ 'color' }
+								icon={ colorIcon }
+								showTooltip
+								disabled={ false }
+							/>
+						);
+					} }
+					renderContent={ () => (
+						<PanelColorGradientSettings
+							title={ __( 'Overlay color' ) }
+							initialOpen={ true }
+							settings={ [
+								{
+									colorValue: overlayColor.color,
+									gradientValue,
+									onColorChange: setOverlayColor,
+									onGradientChange: setGradient,
+									label: __( 'Color' ),
+								},
+							] }
+						>
+							{ !! url && (
+								<RangeControl
+									label={ __( 'Opacity' ) }
+									value={ dimRatio }
+									onChange={ ( newDimRation ) =>
+										setAttributes( {
+											dimRatio: newDimRation,
+										} )
+									}
+									min={ 0 }
+									max={ 100 }
+									step={ 10 }
+									required
+								/>
+							) }
+						</PanelColorGradientSettings>
+					) }
 				/>
 			</BlockControls>
 			<BlockControls group="other">
