@@ -39,21 +39,25 @@ function DefaultErrorResponsePlaceholder( { response, className } ) {
 	return <Placeholder className={ className }>{ errorMessage }</Placeholder>;
 }
 
-function DefaultLoadingResponsePlaceholder( { children } ) {
+function DefaultLoadingResponsePlaceholder( { children, showLoader } ) {
 	return (
 		<div style={ { position: 'relative' } }>
-			<div
-				style={ {
-					position: 'absolute',
-					top: '50%',
-					left: '50%',
-					marginTop: '-9px',
-					marginLeft: '-9px',
-				} }
-			>
-				<Spinner />
+			{ showLoader && (
+				<div
+					style={ {
+						position: 'absolute',
+						top: '50%',
+						left: '50%',
+						marginTop: '-9px',
+						marginLeft: '-9px',
+					} }
+				>
+					<Spinner />
+				</div>
+			) }
+			<div style={ { opacity: showLoader ? '0.3' : 1 } }>
+				{ children }
 			</div>
-			<div style={ { opacity: '0.3' } }>{ children }</div>
 		</div>
 	);
 }
@@ -71,6 +75,7 @@ export default function ServerSideRender( props ) {
 	} = props;
 
 	const isMountedRef = useRef( true );
+	const [ showLoader, setShowLoader ] = useState( false );
 	const fetchRequestRef = useRef();
 	const [ response, setResponse ] = useState( null );
 	const prevResponse = usePrevious( response );
@@ -151,11 +156,29 @@ export default function ServerSideRender( props ) {
 		}
 	} );
 
+	/**
+	 * Effect to handle showing the loading placeholder.
+	 * Show it only if there is no previous response or
+	 * the request takes more than one second.
+	 */
+	useEffect( () => {
+		if ( response !== null ) {
+			return;
+		}
+		const timeout = setTimeout( () => {
+			setShowLoader( true );
+		}, 1000 );
+		return () => clearTimeout( timeout );
+	}, [ response ] );
+
 	if ( response === '' ) {
 		return <EmptyResponsePlaceholder { ...props } />;
 	} else if ( ! response ) {
 		return (
-			<LoadingResponsePlaceholder { ...props }>
+			<LoadingResponsePlaceholder
+				{ ...props }
+				showLoader={ ! prevResponse || showLoader }
+			>
 				{ !! prevResponse && (
 					<RawHTML className={ className }>{ prevResponse }</RawHTML>
 				) }

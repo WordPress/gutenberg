@@ -1,7 +1,7 @@
 /**
  * Internal dependencies
  */
-import { loadAsset } from '../controls';
+import { loadAsset } from '../load-assets';
 
 describe( 'controls', () => {
 	describe( 'loadAsset', () => {

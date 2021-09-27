@@ -63,6 +63,11 @@ function PostTemplateActions() {
 
 	async function onCreateTemplate( event ) {
 		event.preventDefault();
+
+		if ( isBusy ) {
+			return;
+		}
+
 		setIsBusy( true );
 
 		const newTemplateContent =
@@ -137,7 +142,7 @@ function PostTemplateActions() {
 					} }
 					overlayClassName="edit-post-template__modal"
 				>
-					<form onSubmit={ isBusy ? undefined : onCreateTemplate }>
+					<form onSubmit={ onCreateTemplate }>
 						<Flex align="flex-start" gap={ 8 }>
 							<FlexItem>
 								<TextControl

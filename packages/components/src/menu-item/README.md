@@ -50,6 +50,14 @@ Refer to documentation for [`label`](#label).
 
 Refer to documentation for [Button's `icon` prop](/packages/components/src/icon-button/README.md#icon).
 
+### `iconPosition`
+
+-   Type: `string`
+-   Required: No
+-   Default: `'right'`
+
+Determines where to display the provided `icon`.
+
 ### `isSelected`
 
 -   Type: `boolean`

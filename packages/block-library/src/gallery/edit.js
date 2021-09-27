@@ -139,6 +139,7 @@ function GalleryEdit( props ) {
 			updateBlockAttributes( newImage.clientId, {
 				...buildImageAttributes( false, newImage.attributes ),
 				id: newImage.id,
+				align: undefined,
 			} );
 		} );
 	}, [ newImages ] );
