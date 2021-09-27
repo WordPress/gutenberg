@@ -509,7 +509,7 @@ export class ImageEdit extends Component {
 			image,
 			clientId,
 			imageDefaultSize,
-			context: { imageCrop = false } = {},
+			context,
 			featuredImageId,
 			wasBlockJustInserted,
 		} = this.props;
@@ -627,9 +627,12 @@ export class ImageEdit extends Component {
 
 		const additionalImageProps = {
 			height: '100%',
-			resizeMode: imageCrop ? 'cover' : 'contain',
+			resizeMode: context?.imageCrop ? 'cover' : 'contain',
 		};
 
+		const blockStyles = {
+			hideImageCaption: context?.hideImageCaption ? 'true' : 'false',
+		};
 		const getImageComponent = ( openMediaOptions, getMediaOptions ) => (
 			<Badge label={ __( 'Featured' ) } show={ isFeaturedImage }>
 				<TouchableWithoutFeedback
@@ -694,15 +697,19 @@ export class ImageEdit extends Component {
 						/>
 					</View>
 				</TouchableWithoutFeedback>
-				<BlockCaption
-					clientId={ this.props.clientId }
-					isSelected={ this.state.isCaptionSelected }
-					accessible
-					accessibilityLabelCreator={ this.accessibilityLabelCreator }
-					onFocus={ this.onFocusCaption }
-					onBlur={ this.props.onBlur } // always assign onBlur as props
-					insertBlocksAfter={ this.props.insertBlocksAfter }
-				/>
+				{ ! blockStyles.hideImageCaption && (
+					<BlockCaption
+						clientId={ this.props.clientId }
+						isSelected={ this.state.isCaptionSelected }
+						accessible
+						accessibilityLabelCreator={
+							this.accessibilityLabelCreator
+						}
+						onFocus={ this.onFocusCaption }
+						onBlur={ this.props.onBlur } // always assign onBlur as props
+						insertBlocksAfter={ this.props.insertBlocksAfter }
+					/>
+				) }
 			</Badge>
 		);
 
