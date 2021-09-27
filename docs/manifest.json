@@ -1068,9 +1068,9 @@
 		"parent": "components"
 	},
 	{
-		"title": "Navigator",
-		"slug": "navigator",
-		"markdown_source": "../packages/components/src/navigator/README.md",
+		"title": "NavigatorRoot",
+		"slug": "navigator-root",
+		"markdown_source": "../packages/components/src/navigator/navigator-root/README.md",
 		"parent": "components"
 	},
 	{
