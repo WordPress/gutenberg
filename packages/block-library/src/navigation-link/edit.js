@@ -15,6 +15,7 @@ import {
 	TextControl,
 	TextareaControl,
 	ToolbarButton,
+	Tooltip,
 	ToolbarGroup,
 } from '@wordpress/components';
 import { displayShortcut, isKeyboardEvent, ENTER } from '@wordpress/keycodes';
@@ -646,7 +647,12 @@ export default function NavigationLinkEdit( {
 					{ /* eslint-enable */ }
 					{ ! url ? (
 						<div className="wp-block-navigation-link__placeholder-text">
-							<span>{ missingText }</span>
+							<Tooltip
+								position="top center"
+								text={ __( 'This item is missing a link' ) }
+							>
+								<span>{ missingText }</span>
+							</Tooltip>
 						</div>
 					) : (
 						<RichText
