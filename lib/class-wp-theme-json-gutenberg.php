@@ -190,7 +190,7 @@ class WP_Theme_JSON_Gutenberg {
 		),
 		array(
 			'path'          => array( 'color', 'duotone' ),
-			'value_func'    => 'gutenberg_render_duotone_filter',
+			'value_func'    => 'gutenberg_render_duotone_filter_preset',
 			'css_var_infix' => 'duotone',
 			'classes'       => array(),
 		),
