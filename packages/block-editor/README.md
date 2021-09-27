@@ -433,7 +433,7 @@ Returns the px value of a cssUnit.
 _Parameters_
 
 -   _cssUnit_ `string`:
--   _options_ `string`:
+-   _options_ `Object`:
 
 _Returns_
 

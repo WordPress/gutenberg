@@ -206,7 +206,7 @@ function convertParsedUnitToPx( parsedUnit, options ) {
  * Returns the px value of a cssUnit.
  *
  * @param {string} cssUnit
- * @param {string} options
+ * @param {Object} options
  * @return {string} returns the cssUnit value in a simple px format.
  */
 function getPxFromCssUnit( cssUnit, options = {} ) {
