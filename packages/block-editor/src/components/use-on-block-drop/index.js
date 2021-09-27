@@ -31,7 +31,6 @@ export function parseDropEvent( event ) {
 		srcIndex: null,
 		type: null,
 		blocks: null,
-		clone: null,
 	};
 
 	if ( ! event.dataTransfer ) {
@@ -77,15 +76,14 @@ export function onBlockDrop(
 			srcClientIds: sourceClientIds,
 			type: dropType,
 			blocks,
-			clone,
 		} = parseDropEvent( event );
 
 		// If the user is inserting a block
 		if ( dropType === 'inserter' ) {
 			clearSelectedBlock();
-			const blocksToInsert = clone
-				? blocks.map( ( block ) => cloneBlock( block ) )
-				: blocks;
+			const blocksToInsert = blocks.map( ( block ) =>
+				cloneBlock( block )
+			);
 			insertBlocks(
 				blocksToInsert,
 				targetBlockIndex,
