@@ -1,0 +1,7 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`iframed multiple block stylesheets should load multiple block stylesheets in iframe 1`] = `
+"<!-- wp:test/iframed-multiple-stylesheets -->
+<div class=\\"wp-block-test-iframed-multiple-stylesheets\\">Save</div>
+<!-- /wp:test/iframed-multiple-stylesheets -->"
+`;
