@@ -23,7 +23,7 @@ function render_block_core_post_comment_date( $attributes, $content, $block ) {
 		isset( $attributes['format'] ) ? $attributes['format'] : '',
 		$block->context['commentId']
 	);
-	$link = get_comment_link( $block->context['commentId'] );
+	$link               = get_comment_link( $block->context['commentId'] );
 
 	if ( isset( $attributes['isLink'] ) && $attributes['isLink'] ) {
 		$formatted_date = sprintf( '<a href="%1s">%2s</a>', $link, $formatted_date );
