@@ -1074,6 +1074,12 @@
 		"parent": "components"
 	},
 	{
+		"title": "NavigatorScreen",
+		"slug": "navigator-screen",
+		"markdown_source": "../packages/components/src/navigator/navigator-screen/README.md",
+		"parent": "components"
+	},
+	{
 		"title": "Notice",
 		"slug": "notice",
 		"markdown_source": "../packages/components/src/notice/README.md",
