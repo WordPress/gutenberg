@@ -143,9 +143,8 @@ class WP_Theme_JSON_Gutenberg {
 	 *
 	 * - value_key     => the key that represents the value
 	 *
-	 * - value_func    => a function to generate the value
-	 *
-	 * - value_args    => array of keys that will be mapped to values passed to value_func
+	 * - value_func    => optionally, instead of value_key, a function to generate
+	 *                    the value that takes a preset as an argument
 	 *
 	 * - css_var_infix => infix to use in generating the CSS Custom Property. Example:
 	 *                   --wp--preset--<preset_infix>--<slug>: <preset_value>
@@ -191,8 +190,7 @@ class WP_Theme_JSON_Gutenberg {
 		),
 		array(
 			'path'          => array( 'color', 'duotone' ),
-			'value_func'    => 'gutenberg_get_duotone_filter_property',
-			'value_args'    => array( 'slug', 'colors' ),
+			'value_func'    => 'gutenberg_render_duotone_filter',
 			'css_var_infix' => 'duotone',
 			'classes'       => array(),
 		),
@@ -704,11 +702,7 @@ class WP_Theme_JSON_Gutenberg {
 					$value     = $preset[ $value_key ];
 				} elseif ( is_callable( $preset_meta['value_func'] ) ) {
 					$value_func = $preset_meta['value_func'];
-					$value_args = array();
-					foreach ( $preset_meta['value_args'] as $preset_meta_arg ) {
-						$value_args[] = $preset[ $preset_meta_arg ];
-					}
-					$value = call_user_func_array( $value_func, $value_args );
+					$value      = call_user_func( $value_func, $preset );
 				} else {
 					// If we don't have a value, then don't add it to the result.
 					continue;

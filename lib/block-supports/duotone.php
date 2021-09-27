@@ -253,14 +253,14 @@ function gutenberg_register_duotone_support( $block_type ) {
 /**
  * Get the duotone filter property.
  *
- * @param string $duotone_id Unique id for the duotone filter.
- * @param array  $duotone_colors Array of CSS color strings that can be parsed by tinycolor.
+ * @param array $preset Duotone preset value as seen.
  *
  * @return string Duotone CSS filter property.
  */
-function gutenberg_get_duotone_filter_property( $duotone_id, $duotone_colors ) {
-	$filter_id = 'wp-duotone-filter-' . $duotone_id;
-
+function gutenberg_render_duotone_filter( $preset ) {
+	$duotone_id     = $preset['slug'];
+	$duotone_colors = $preset['colors'];
+	$filter_id      = 'wp-duotone-filter-' . $duotone_id;
 	$duotone_values = array(
 		'r' => array(),
 		'g' => array(),
@@ -357,7 +357,12 @@ function gutenberg_render_duotone_support( $block_content, $block ) {
 
 	$duotone_id      = uniqid();
 	$duotone_colors  = $block['attrs']['style']['color']['duotone'];
-	$filter_property = gutenberg_get_duotone_filter_property( $duotone_id, $duotone_colors );
+	$filter_property = gutenberg_render_duotone_filter(
+		array(
+			'slug'   => $duotone_id,
+			'colors' => $duotone_colors,
+		)
+	);
 
 	$filter_id = 'wp-duotone-filter-' . $duotone_id;
 
