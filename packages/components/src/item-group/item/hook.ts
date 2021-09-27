@@ -13,26 +13,47 @@ import { useItemGroupContext } from '../context';
 import { useCx } from '../../utils/hooks/use-cx';
 import type { ItemProps } from '../types';
 
+function useDeprecatedProps( {
+	as,
+	isAction = false,
+	...otherProps
+}: WordPressComponentProps< ItemProps, 'div' > ) {
+	let computedAs = as;
+
+	if ( isAction ) {
+		computedAs ??= 'button';
+	}
+
+	return {
+		...otherProps,
+		as: computedAs,
+	};
+}
+
 export function useItem( props: WordPressComponentProps< ItemProps, 'div' > ) {
 	const {
-		isAction = false,
 		as: asProp,
 		className,
+		onClick,
 		role = 'listitem',
 		size: sizeProp,
 		...otherProps
-	} = useContextSystem( props, 'Item' );
+	} = useContextSystem( useDeprecatedProps( props ), 'Item' );
 
 	const { spacedAround, size: contextSize } = useItemGroupContext();
 
 	const size = sizeProp || contextSize;
 
-	const as = ( asProp || isAction ? 'button' : 'div' ) as ElementType;
+	const as =
+		asProp ||
+		( ( typeof onClick !== 'undefined'
+			? 'button'
+			: 'div' ) as ElementType );
 
 	const cx = useCx();
 
 	const classes = cx(
-		isAction && styles.unstyledButton,
+		as === 'button' && styles.unstyledButton,
 		styles.itemSizes[ size ] || styles.itemSizes.medium,
 		styles.item,
 		spacedAround && styles.spacedAround,
@@ -44,6 +65,7 @@ export function useItem( props: WordPressComponentProps< ItemProps, 'div' > ) {
 	return {
 		as,
 		className: classes,
+		onClick,
 		wrapperClassName,
 		role,
 		...otherProps,

@@ -33,12 +33,6 @@ export interface ItemGroupProps {
 
 export interface ItemProps {
 	/**
-	 * Renders the item as an interactive `button` element.
-	 *
-	 * @default false
-	 */
-	isAction?: boolean;
-	/**
 	 * Determines the amount of padding within the component.
 	 *
 	 * @default 'medium'
@@ -48,6 +42,13 @@ export interface ItemProps {
 	 * The children elements.
 	 */
 	children: React.ReactNode;
+	/**
+	 * Renders the item as an interactive `button` element.
+	 *
+	 * @default false
+	 * @deprecated
+	 */
+	isAction?: boolean;
 }
 
 export type ItemGroupContext = {
