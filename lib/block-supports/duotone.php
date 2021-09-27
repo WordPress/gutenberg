@@ -253,11 +253,11 @@ function gutenberg_register_duotone_support( $block_type ) {
 /**
  * Get the duotone filter property.
  *
- * @param array $preset Duotone preset value as seen.
+ * @param array $preset Duotone preset value as seen in theme.json.
  *
  * @return string Duotone CSS filter property.
  */
-function gutenberg_render_duotone_filter( $preset ) {
+function gutenberg_render_duotone_filter_preset( $preset ) {
 	$duotone_id     = $preset['slug'];
 	$duotone_colors = $preset['colors'];
 	$filter_id      = 'wp-duotone-filter-' . $duotone_id;
@@ -355,16 +355,12 @@ function gutenberg_render_duotone_support( $block_content, $block ) {
 		return $block_content;
 	}
 
-	$duotone_id      = uniqid();
-	$duotone_colors  = $block['attrs']['style']['color']['duotone'];
-	$filter_property = gutenberg_render_duotone_filter(
-		array(
-			'slug'   => $duotone_id,
-			'colors' => $duotone_colors,
-		)
+	$filter_preset   = array(
+		'slug'   => uniqid(),
+		'colors' => $block['attrs']['style']['color']['duotone'],
 	);
-
-	$filter_id = 'wp-duotone-filter-' . $duotone_id;
+	$filter_property = gutenberg_render_duotone_filter_preset( $filter_preset );
+	$filter_id       = 'wp-duotone-filter-' . $filter_preset['slug'];
 
 	$scope     = '.' . $filter_id;
 	$selectors = explode( ',', $duotone_support );
