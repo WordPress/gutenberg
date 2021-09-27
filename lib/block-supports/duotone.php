@@ -278,7 +278,15 @@ function gutenberg_get_duotone_filter_property( $duotone_id, $duotone_colors ) {
 
 	?>
 
-	<svg xmlns="http://www.w3.org/2000/svg">
+	<svg
+		xmlns="http://www.w3.org/2000/svg"
+		viewBox="0 0 0 0"
+		width="0"
+		height="0"
+		focusable="false"
+		role="none"
+		style="visibility: hidden; position: absolute; left: -9999px; overflow: hidden;"
+	>
 		<defs>
 			<filter id="<?php echo esc_attr( $filter_id ); ?>">
 				<feColorMatrix
@@ -303,15 +311,24 @@ function gutenberg_get_duotone_filter_property( $duotone_id, $duotone_colors ) {
 
 	$svg = ob_get_clean();
 
-	// Clean up the whitespace so it can be used in a data uri.
-	$svg = preg_replace( "/(\r|\n|\t)+/", ' ', $svg );
-	$svg = preg_replace( '/> </', '><', $svg );
-	$svg = trim( $svg );
+	if ( ! defined( 'SCRIPT_DEBUG' ) || ! SCRIPT_DEBUG ) {
+		// Clean up the whitespace.
+		$svg = preg_replace( "/(\r|\n|\t)+/", ' ', $svg );
+		$svg = preg_replace( '/> </', '><', $svg );
+		$svg = trim( $svg );
+	}
 
-	$data_uri = 'data:image/svg+xml,' . $svg . '#' . $filter_id;
+	add_action(
+		// Safari doesn't render SVG filters defined in data URIs,
+		// and SVG filters won't render in the head of a document,
+		// so the next best place to put the SVG is in the footer.
+		is_admin() ? 'admin_footer' : 'wp_footer',
+		function () use ( $svg ) {
+			echo $svg;
+		}
+	);
 
-	// All the variables are already escaped above, so we're not calling esc_url() here.
-	return "url('" . $data_uri . "')";
+	return "url('#" . $filter_id . "')";
 }
 
 /**
