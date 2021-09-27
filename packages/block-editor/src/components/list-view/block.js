@@ -33,6 +33,7 @@ import { store as blockEditorStore } from '../../store';
 export default function ListViewBlock( {
 	block,
 	isSelected,
+	isDragged,
 	isBranchSelected,
 	isLastOfSelectedBranch,
 	onClick,
@@ -48,20 +49,9 @@ export default function ListViewBlock( {
 	const cellRef = useRef( null );
 	const [ isHovered, setIsHovered ] = useState( false );
 	const { clientId } = block;
-	const { isDragging, blockParents } = useSelect(
+	const blockParents = useSelect(
 		( select ) => {
-			const {
-				isBlockBeingDragged,
-				isAncestorBeingDragged,
-				getBlockParents,
-			} = select( blockEditorStore );
-
-			return {
-				isDragging:
-					isBlockBeingDragged( clientId ) ||
-					isAncestorBeingDragged( clientId ),
-				blockParents: getBlockParents( clientId ),
-			};
+			return select( blockEditorStore ).getBlockParents( clientId );
 		},
 		[ clientId ]
 	);
@@ -128,7 +118,7 @@ export default function ListViewBlock( {
 		'is-last-of-selected-branch':
 			withExperimentalPersistentListViewFeatures &&
 			isLastOfSelectedBranch,
-		'is-dragging': isDragging,
+		'is-dragging': isDragged,
 	} );
 
 	return (

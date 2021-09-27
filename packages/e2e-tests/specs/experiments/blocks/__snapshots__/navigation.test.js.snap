@@ -40,7 +40,7 @@ exports[`Navigation Creating from existing Menus creates an empty navigation blo
 
 exports[`Navigation Creating from existing Pages allows a navigation block to be created using existing pages 1`] = `
 "<!-- wp:navigation -->
-<!-- wp:page-list {\\"isNavigationChild\\":true} /-->
+<!-- wp:page-list {\\"isNavigationChild\\":true,\\"showSubmenuIcon\\":true,\\"openSubmenusOnClick\\":false} /-->
 <!-- /wp:navigation -->"
 `;
 

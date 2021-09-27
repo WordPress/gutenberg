@@ -9,7 +9,6 @@ import { escape, pull } from 'lodash';
  */
 import { useSelect, useDispatch } from '@wordpress/data';
 import {
-	KeyboardShortcuts,
 	PanelBody,
 	Popover,
 	TextControl,
@@ -17,7 +16,7 @@ import {
 	ToolbarButton,
 	ToolbarGroup,
 } from '@wordpress/components';
-import { rawShortcut, displayShortcut } from '@wordpress/keycodes';
+import { displayShortcut, isKeyboardEvent } from '@wordpress/keycodes';
 import { __, sprintf } from '@wordpress/i18n';
 import {
 	BlockControls,
@@ -447,6 +446,12 @@ export default function NavigationSubmenuEdit( {
 		customBackgroundColor,
 	} = getColors( context, ! isTopLevelItem );
 
+	function onKeyDown( event ) {
+		if ( isKeyboardEvent.primary( event, 'k' ) ) {
+			setIsLinkOpen( true );
+		}
+	}
+
 	const blockProps = useBlockProps( {
 		ref: listItemRef,
 		className: classnames( 'wp-block-navigation-item', {
@@ -467,6 +472,7 @@ export default function NavigationSubmenuEdit( {
 			color: ! textColor && customTextColor,
 			backgroundColor: ! backgroundColor && customBackgroundColor,
 		},
+		onKeyDown,
 	} );
 
 	// Always use overlay colors for submenus
@@ -515,13 +521,6 @@ export default function NavigationSubmenuEdit( {
 		<Fragment>
 			<BlockControls>
 				<ToolbarGroup>
-					<KeyboardShortcuts
-						bindGlobal
-						shortcuts={ {
-							[ rawShortcut.primary( 'k' ) ]: () =>
-								setIsLinkOpen( true ),
-						} }
-					/>
 					{ ! openSubmenusOnClick && (
 						<ToolbarButton
 							name="link"
@@ -602,12 +601,6 @@ export default function NavigationSubmenuEdit( {
 							onClose={ () => setIsLinkOpen( false ) }
 							anchorRef={ listItemRef.current }
 						>
-							<KeyboardShortcuts
-								bindGlobal
-								shortcuts={ {
-									escape: () => setIsLinkOpen( false ),
-								} }
-							/>
 							<LinkControl
 								className="wp-block-navigation-link__inline-link-input"
 								value={ link }

@@ -17,7 +17,7 @@ Here is a summary of the guide. See each section for additional details and expl
 Download and install [Node Version Manager](https://github.com/nvm-sh/nvm) (nvm)
 
 ```
-curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.37.2/install.sh | bash
+curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.38.0/install.sh | bash
 ```
 
 Quit and restart terminal
@@ -64,7 +64,7 @@ Here are the quick instructions to install using nvm, see the [full installation
 Run the following on the command-line to install nvm:
 
 ```sh
-curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.35.3/install.sh | bash
+curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.38.0/install.sh | bash
 ```
 
 Note: On macOS, the required developer tools are not installed by default, if not already installed you may be prompted to download the install.

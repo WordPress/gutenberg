@@ -164,7 +164,12 @@ export const ColorDisplay = ( {
 				</Text>
 			}
 		>
-			<Flex justify="flex-start" gap={ space( 1 ) } ref={ copyRef }>
+			<Flex
+				justify="flex-start"
+				gap={ space( 1 ) }
+				ref={ copyRef }
+				style={ { height: 30 } }
+			>
 				<Component { ...props } />
 			</Flex>
 		</Tooltip>

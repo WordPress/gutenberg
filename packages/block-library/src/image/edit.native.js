@@ -514,6 +514,9 @@ export class ImageEdit extends Component {
 			wasBlockJustInserted,
 		} = this.props;
 		const { align, url, alt, id, sizeSlug, className } = attributes;
+		const hasImageContext = context
+			? Object.keys( context ).length > 0
+			: false;
 
 		const imageSizes = Array.isArray( this.props.imageSizes )
 			? this.props.imageSizes
@@ -633,6 +636,9 @@ export class ImageEdit extends Component {
 		const imageBlockStyles = {
 			hideImageCaption: context?.hideImageCaption ? 'true' : 'false',
 		};
+    
+    const imageContainerStyles = [ hasImageContext && styles.fixedHeight ];
+
 		const getImageComponent = ( openMediaOptions, getMediaOptions ) => (
 			<Badge label={ __( 'Featured' ) } show={ isFeaturedImage }>
 				<TouchableWithoutFeedback
@@ -665,7 +671,7 @@ export class ImageEdit extends Component {
 								retryMessage,
 							} ) => {
 								return (
-									<View style={ styles.isGallery }>
+									<View style={ imageContainerStyles }>
 										<Image
 											align={
 												align && alignToFlex[ align ]
@@ -689,7 +695,9 @@ export class ImageEdit extends Component {
 											url={ url }
 											shapeStyle={ styles[ className ] }
 											width={ this.getWidth() }
-											{ ...additionalImageProps }
+											{ ...( hasImageContext
+												? additionalImageProps
+												: {} ) }
 										/>
 									</View>
 								);

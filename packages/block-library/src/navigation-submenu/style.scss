@@ -2,24 +2,8 @@
 	position: relative;
 	display: flex;
 
-	button.wp-block-navigation__submenu-icon.wp-block-navigation__submenu-icon.wp-block-navigation__submenu-icon.wp-block-navigation__submenu-icon {
-		padding: $grid-unit $grid-unit-20;
-		background-color: inherit;
-		color: currentColor;
-		border: none;
-	}
-
 	.wp-block-navigation__submenu-icon svg {
 		stroke: currentColor;
-	}
-
-	// Show submenus on click.
-	.wp-block-navigation-submenu__toggle[aria-expanded="true"] + .wp-block-navigation__submenu-container {
-		visibility: visible;
-		opacity: 1;
-		width: auto;
-		height: auto;
-		min-width: 200px;
 	}
 }
 

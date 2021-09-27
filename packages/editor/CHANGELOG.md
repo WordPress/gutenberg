@@ -2,6 +2,11 @@
 
 ## Unreleased
 
+### Breaking changes
+
+-   Removed the deprecated `resetAutosave` action ([#34537](https://github.com/WordPress/gutenberg/pull/34537)).
+-   Removed the deprecated `getAutosave`, `hasAutosave` and `getBlockForSerialization` selectors ([#34537](https://github.com/WordPress/gutenberg/pull/34537)).
+
 ## 11.0.0 (2021-07-29)
 
 ### Breaking Change

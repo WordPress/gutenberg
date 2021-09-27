@@ -1,8 +1,19 @@
 /**
  * Internal dependencies
  */
+import { contextConnect } from '../ui/context';
+import { View } from '../view';
 import { useElevation } from './hook';
-import { createComponent } from '../ui/utils';
+
+/**
+ * @param {import('../ui/context').WordPressComponentProps<import('./types').Props, 'div'>} props
+ * @param {import('react').Ref<any>}                                                        forwardedRef
+ */
+function Elevation( props, forwardedRef ) {
+	const elevationProps = useElevation( props );
+
+	return <View { ...elevationProps } ref={ forwardedRef } />;
+}
 
 /**
  * `Elevation` is a core component that renders shadow, using the library's shadow system.
@@ -27,10 +38,6 @@ import { createComponent } from '../ui/utils';
  * }
  * ```
  */
-const Elevation = createComponent( {
-	as: 'div',
-	useHook: useElevation,
-	name: 'Elevation',
-} );
+const ConnectedElevation = contextConnect( Elevation, 'Elevation' );
 
-export default Elevation;
+export default ConnectedElevation;

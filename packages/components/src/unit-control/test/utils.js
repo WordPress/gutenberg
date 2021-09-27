@@ -5,6 +5,7 @@ import {
 	filterUnitsWithSettings,
 	useCustomUnits,
 	getValidParsedUnit,
+	getUnitsWithCurrentUnit,
 } from '../utils';
 
 describe( 'UnitControl utils', () => {
@@ -113,6 +114,63 @@ describe( 'UnitControl utils', () => {
 				101,
 				'px',
 			] );
+		} );
+	} );
+
+	describe( 'getUnitsWithCurrentUnit', () => {
+		const limitedUnits = [
+			{
+				value: 'px',
+				label: 'px',
+			},
+			{
+				value: 'em',
+				label: 'em',
+			},
+		];
+
+		it( 'should return units list with valid current unit prepended', () => {
+			const result = getUnitsWithCurrentUnit( '20%', null, limitedUnits );
+
+			expect( result ).toHaveLength( 3 );
+
+			const currentUnit = result.shift();
+			expect( currentUnit.value ).toBe( '%' );
+			expect( currentUnit.label ).toBe( '%' );
+			expect( result ).toEqual( limitedUnits );
+		} );
+
+		it( 'should return units list with valid current unit prepended using legacy values', () => {
+			const result = getUnitsWithCurrentUnit( 20, '%', limitedUnits );
+
+			expect( result ).toHaveLength( 3 );
+
+			const currentUnit = result.shift();
+			expect( currentUnit.value ).toBe( '%' );
+			expect( currentUnit.label ).toBe( '%' );
+			expect( result ).toEqual( limitedUnits );
+		} );
+
+		it( 'should return units list without invalid current unit prepended', () => {
+			const result = getUnitsWithCurrentUnit(
+				'20null',
+				null,
+				limitedUnits
+			);
+
+			expect( result ).toHaveLength( 2 );
+			expect( result ).toEqual( limitedUnits );
+		} );
+
+		it( 'should return units list without an existing current unit prepended', () => {
+			const result = getUnitsWithCurrentUnit(
+				'20em',
+				null,
+				limitedUnits
+			);
+
+			expect( result ).toHaveLength( 2 );
+			expect( result ).toEqual( limitedUnits );
 		} );
 	} );
 } );
