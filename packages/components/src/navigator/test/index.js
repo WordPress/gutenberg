@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { render, screen } from '@testing-library/react';
+import { render, screen, fireEvent } from '@testing-library/react';
 
 /**
  * Internal dependencies
@@ -72,6 +72,19 @@ const getChildScreen = ( { throwIfNotFound } = {} ) =>
 		throwIfNotFound,
 	} );
 
+const getNavigationButtonByText = ( text, { throwIfNotFound = true } = {} ) => {
+	const fnName = throwIfNotFound ? 'getByRole' : 'queryByRole';
+	return screen[ fnName ]( 'button', { name: text } );
+};
+const getToChildScreenButton = ( { throwIfNotFound } = {} ) =>
+	getNavigationButtonByText( 'Navigate to child screen.', {
+		throwIfNotFound,
+	} );
+const getToHomeScreenButton = ( { throwIfNotFound } = {} ) =>
+	getNavigationButtonByText( 'Go back', {
+		throwIfNotFound,
+	} );
+
 describe( 'Navigator', () => {
 	it( 'should render', () => {
 		render( <MyNavigation /> );
@@ -108,4 +121,35 @@ describe( 'Navigator', () => {
 	} );
 
 	// todo: initialPath = not found?
+
+	it( 'should navigate across screens', () => {
+		render( <MyNavigation /> );
+
+		expect( getToChildScreenButton() ).toBeInTheDocument();
+
+		// Navigate to child screen
+		fireEvent.click( getToChildScreenButton() );
+
+		expect(
+			getHomeScreen( { throwIfNotFound: false } )
+		).not.toBeInTheDocument();
+		expect( getChildScreen() ).toBeInTheDocument();
+		expect( getToHomeScreenButton() ).toBeInTheDocument();
+
+		// Navigate back to home screen
+		fireEvent.click( getToHomeScreenButton() );
+
+		expect(
+			getChildScreen( { throwIfNotFound: false } )
+		).not.toBeInTheDocument();
+		expect( getHomeScreen() ).toBeInTheDocument();
+
+		// TODO: spy on useNavigator to see if `isBack` is being passed?
+	} );
 } );
+
+// add link to not found, navigate there to not found
+
+// RTL
+
+// reduced motion
