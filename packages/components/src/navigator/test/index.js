@@ -96,6 +96,10 @@ const getNavigationButtonByText = ( text, { throwIfNotFound = true } = {} ) => {
 	const fnName = throwIfNotFound ? 'getByRole' : 'queryByRole';
 	return screen[ fnName ]( 'button', { name: text } );
 };
+const getToNonExistingScreenButton = ( { throwIfNotFound } = {} ) =>
+	getNavigationButtonByText( 'Navigate to non-existing screen.', {
+		throwIfNotFound,
+	} );
 const getToChildScreenButton = ( { throwIfNotFound } = {} ) =>
 	getNavigationButtonByText( 'Navigate to child screen.', {
 		throwIfNotFound,
@@ -143,7 +147,9 @@ describe( 'Navigator', () => {
 	// todo: initialPath = not found?
 
 	it( 'should navigate across screens', () => {
-		render( <MyNavigation /> );
+		const spy = jest.fn();
+
+		render( <MyNavigation onNavigatorButtonClick={ spy } /> );
 
 		expect( getToChildScreenButton() ).toBeInTheDocument();
 
@@ -164,7 +170,16 @@ describe( 'Navigator', () => {
 		).not.toBeInTheDocument();
 		expect( getHomeScreen() ).toBeInTheDocument();
 
-		// TODO: spy on useNavigator to see if `isBack` is being passed?
+		// Check the values passed to `navigator.push()`
+		expect( spy ).toHaveBeenCalledTimes( 2 );
+		expect( spy ).toHaveBeenNthCalledWith( 1, {
+			path: PATHS.CHILD,
+			isBack: false,
+		} );
+		expect( spy ).toHaveBeenNthCalledWith( 2, {
+			path: PATHS.HOME,
+			isBack: true,
+		} );
 	} );
 } );
 
