@@ -206,11 +206,7 @@ function NavigationButton( {
 } ) {
 	const navigator = useNavigator();
 	return (
-		<Item
-			isAction
-			onClick={ () => navigator.push( path, { isBack } ) }
-			{ ...props }
-		>
+		<Item onClick={ () => navigator.push( path, { isBack } ) } { ...props }>
 			<HStack justify="flex-start">
 				{ icon && (
 					<FlexItem>
