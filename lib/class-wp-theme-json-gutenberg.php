@@ -57,9 +57,11 @@ class WP_Theme_JSON_Gutenberg {
 		),
 		'color'      => array(
 			'background' => null,
-			'duotone'    => null,
 			'gradient'   => null,
 			'text'       => null,
+		),
+		'filter'     => array(
+			'duotone' => null,
 		),
 		'spacing'    => array(
 			'margin'   => null,
@@ -259,7 +261,7 @@ class WP_Theme_JSON_Gutenberg {
 	 * path to the value in theme.json & block attributes.
 	 */
 	const DUOTONE_PROPERTIES_METADATA = array(
-		'filter' => array( 'color', 'duotone' ),
+		'filter' => array( 'filter', 'duotone' ),
 	);
 
 	const ELEMENTS = array(
