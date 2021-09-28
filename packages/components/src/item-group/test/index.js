@@ -150,32 +150,5 @@ describe( 'ItemGroup', () => {
 				largeSize.firstChild
 			);
 		} );
-
-		it( 'should render a button with the isAction prop is true', () => {
-			// By default, `isAction` is `false`
-			const { rerender } = render( <Item>Code is poetry</Item> );
-
-			expect( screen.queryByRole( 'button' ) ).not.toBeInTheDocument();
-
-			rerender( <Item isAction>Code is poetry</Item> );
-
-			expect( screen.getByRole( 'button' ) ).toBeInTheDocument();
-		} );
-
-		it( 'should give priority to the `as` prop even if the isAction prop is true', () => {
-			const { rerender } = render( <Item isAction>Code is poetry</Item> );
-
-			expect( screen.getByRole( 'button' ) ).toBeInTheDocument();
-			expect( screen.queryByRole( 'label' ) ).not.toBeInTheDocument();
-
-			rerender(
-				<Item as="a" href="#" isAction>
-					Code is poetry
-				</Item>
-			);
-
-			expect( screen.queryByRole( 'button' ) ).not.toBeInTheDocument();
-			expect( screen.getByRole( 'link' ) ).toBeInTheDocument();
-		} );
 	} );
 } );

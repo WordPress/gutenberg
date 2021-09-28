@@ -42,13 +42,6 @@ export interface ItemProps {
 	 * The children elements.
 	 */
 	children: React.ReactNode;
-	/**
-	 * Renders the item as an interactive `button` element.
-	 *
-	 * @default false
-	 * @deprecated
-	 */
-	isAction?: boolean;
 }
 
 export type ItemGroupContext = {

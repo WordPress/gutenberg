@@ -13,23 +13,6 @@ import { useItemGroupContext } from '../context';
 import { useCx } from '../../utils/hooks/use-cx';
 import type { ItemProps } from '../types';
 
-function useDeprecatedProps( {
-	as,
-	isAction = false,
-	...otherProps
-}: WordPressComponentProps< ItemProps, 'div' > ) {
-	let computedAs = as;
-
-	if ( isAction ) {
-		computedAs ??= 'button';
-	}
-
-	return {
-		...otherProps,
-		as: computedAs,
-	};
-}
-
 export function useItem( props: WordPressComponentProps< ItemProps, 'div' > ) {
 	const {
 		as: asProp,
@@ -38,7 +21,7 @@ export function useItem( props: WordPressComponentProps< ItemProps, 'div' > ) {
 		role = 'listitem',
 		size: sizeProp,
 		...otherProps
-	} = useContextSystem( useDeprecatedProps( props ), 'Item' );
+	} = useContextSystem( props, 'Item' );
 
 	const { spacedAround, size: contextSize } = useItemGroupContext();
 
