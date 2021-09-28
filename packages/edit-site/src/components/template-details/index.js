@@ -4,6 +4,7 @@
 import { __ } from '@wordpress/i18n';
 import {
 	Button,
+	MenuGroup,
 	MenuItem,
 	__experimentalText as Text,
 } from '@wordpress/components';
@@ -16,6 +17,7 @@ import { store as editorStore } from '@wordpress/editor';
 import isTemplateRevertable from '../../utils/is-template-revertable';
 import { MENU_TEMPLATES } from '../navigation-sidebar/navigation-panel/constants';
 import { store as editSiteStore } from '../../store';
+import TemplateAreas from './template-areas';
 
 export default function TemplateDetails( { template, onClose } ) {
 	const { title, description } = useSelect(
@@ -43,7 +45,7 @@ export default function TemplateDetails( { template, onClose } ) {
 
 	return (
 		<>
-			<div className="edit-site-template-details">
+			<MenuGroup className="edit-site-template-details">
 				<Text size="body" weight={ 600 }>
 					{ title }
 				</Text>
@@ -56,17 +58,19 @@ export default function TemplateDetails( { template, onClose } ) {
 						{ description }
 					</Text>
 				) }
-			</div>
+			</MenuGroup>
+
+			<TemplateAreas template={ template } />
 
 			{ isTemplateRevertable( template ) && (
-				<div className="edit-site-template-details__revert">
+				<MenuGroup className="edit-site-template-details__revert">
 					<MenuItem
 						info={ __( 'Restore template to theme default' ) }
 						onClick={ revert }
 					>
 						{ __( 'Clear customizations' ) }
 					</MenuItem>
-				</div>
+				</MenuGroup>
 			) }
 
 			<Button
