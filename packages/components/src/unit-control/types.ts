@@ -12,7 +12,7 @@ export type WPUnitControlUnit = {
 	/**
 	 * Default value for the unit, used when switching units.
 	 */
-	default?: string | number;
+	default?: Value;
 	/**
 	 * An accessible label used by screen readers.
 	 */
