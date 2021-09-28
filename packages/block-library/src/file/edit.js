@@ -65,6 +65,7 @@ function FileEdit( {
 	setAttributes,
 	noticeUI,
 	noticeOperations,
+	clientId,
 } ) {
 	const {
 		id,
@@ -112,6 +113,11 @@ function FileEdit( {
 			changeDownloadButtonText( _x( 'Download', 'button label' ) );
 		}
 	}, [] );
+
+	useEffect( () => {
+		// Add a unique fileId to each file block
+		setAttributes( { fileId: `wp-block-file--media-${ clientId }` } );
+	}, [ clientId ] );
 
 	function onSelectFile( newMedia ) {
 		if ( newMedia && newMedia.url ) {

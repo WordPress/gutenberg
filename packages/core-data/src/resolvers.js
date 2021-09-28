@@ -54,7 +54,7 @@ export const getEntityRecord = ( kind, name, key = '', query ) => async ( {
 } ) => {
 	const entities = await dispatch( getKindEntities( kind ) );
 	const entity = find( entities, { kind, name } );
-	if ( ! entity ) {
+	if ( ! entity || entity?.__experimentalNoFetch ) {
 		return;
 	}
 
@@ -140,7 +140,7 @@ export const getEntityRecords = ( kind, name, query = {} ) => async ( {
 } ) => {
 	const entities = await dispatch( getKindEntities( kind ) );
 	const entity = find( entities, { kind, name } );
-	if ( ! entity ) {
+	if ( ! entity || entity?.__experimentalNoFetch ) {
 		return;
 	}
 

@@ -209,16 +209,19 @@ export const RAW_FEATURES = {
 					name: 'Small',
 					slug: 'small',
 					size: '13px',
+					sizePx: '13px',
 				},
 				{
 					name: 'Normal',
 					slug: 'normal',
 					size: '16px',
+					sizePx: '16px',
 				},
 				{
 					name: 'Huge',
 					slug: 'huge',
 					size: '42px',
+					sizePx: '42px',
 				},
 			],
 			theme: [
@@ -226,15 +229,18 @@ export const RAW_FEATURES = {
 					name: 'Normal',
 					slug: 'normal',
 					size: '18px',
+					sizePx: '18px',
 				},
 				{
 					slug: 'extra-large',
 					size: '40px',
+					sizePx: '40px',
 					name: 'Extra large',
 				},
 				{
 					slug: 'gigantic',
 					size: '144px',
+					sizePx: '144px',
 					name: 'Gigantic',
 				},
 			],

@@ -4,6 +4,7 @@
 import {
 	createUpgradedEmbedBlock,
 	getClassNames,
+	fallback,
 	getAttributesFromPreview,
 	getEmbedInfoByProvider,
 } from './util';
@@ -24,7 +25,7 @@ import classnames from 'classnames';
  */
 import { _x } from '@wordpress/i18n';
 import { useState, useEffect } from '@wordpress/element';
-import { useSelect } from '@wordpress/data';
+import { useDispatch, useSelect } from '@wordpress/data';
 import {
 	useBlockProps,
 	store as blockEditorStore,
@@ -35,6 +36,11 @@ import { View } from '@wordpress/primitives';
 // The inline preview feature will be released progressible, for this reason
 // the embed will only be considered previewable for the following providers list.
 const PREVIEWABLE_PROVIDERS = [ 'youtube', 'twitter', 'instagram', 'vimeo' ];
+// Some providers are rendering the inline preview as a WordPress embed and
+// are not supported yet, so we need to disallow them with a fixed providers list.
+const NOT_PREVIEWABLE_WP_EMBED_PROVIDERS = [ 'pinterest' ];
+
+const WP_EMBED_TYPE = 'wp-embed';
 
 const EmbedEdit = ( props ) => {
 	const {
@@ -66,6 +72,10 @@ const EmbedEdit = ( props ) => {
 	const [ isEditingURL, setIsEditingURL ] = useState(
 		isSelected && wasBlockJustInserted && ! url
 	);
+	const [ showEmbedBottomSheet, setShowEmbedBottomSheet ] = useState(
+		isEditingURL
+	);
+	const { invalidateResolution } = useDispatch( coreStore );
 
 	const {
 		preview,
@@ -185,6 +195,10 @@ const EmbedEdit = ( props ) => {
 		}
 	}, [ preview, isEditingURL ] );
 
+	useEffect( () => setShowEmbedBottomSheet( isEditingURL ), [
+		isEditingURL,
+	] );
+
 	const blockProps = useBlockProps();
 
 	if ( fetching ) {
@@ -213,24 +227,40 @@ const EmbedEdit = ( props ) => {
 
 	const isProviderPreviewable =
 		PREVIEWABLE_PROVIDERS.includes( providerNameSlug ) ||
-		// For WordPress embeds, we enable the inline preview for all its providers.
-		'wp-embed' === type;
+		// For WordPress embeds, we enable the inline preview for all its providers
+		// except the ones that are not supported yet.
+		( WP_EMBED_TYPE === type &&
+			! NOT_PREVIEWABLE_WP_EMBED_PROVIDERS.includes( providerNameSlug ) );
+
+	const bottomSheetLabel = WP_EMBED_TYPE === type ? 'WordPress' : title;
 
 	return (
 		<>
 			{ showEmbedPlaceholder ? (
-				<View { ...blockProps }>
-					<EmbedPlaceholder
-						icon={ icon }
-						isSelected={ isSelected }
-						label={ title }
-						onPress={ ( event ) => {
-							onFocus( event );
-							setIsEditingURL( true );
-						} }
-						cannotEmbed={ cannotEmbed }
+				<>
+					<EmbedControls
+						showEditButton={ cannotEmbed }
+						switchBackToURLInput={ () => setIsEditingURL( true ) }
 					/>
-				</View>
+					<View { ...blockProps }>
+						<EmbedPlaceholder
+							icon={ icon }
+							isSelected={ isSelected }
+							label={ title }
+							onPress={ ( event ) => {
+								onFocus( event );
+								setIsEditingURL( true );
+							} }
+							cannotEmbed={ cannotEmbed }
+							fallback={ () => fallback( url, onReplace ) }
+							tryAgain={ () => {
+								invalidateResolution( 'getEmbedPreview', [
+									url,
+								] );
+							} }
+						/>
+					</View>
+				</>
 			) : (
 				<>
 					<EmbedControls
@@ -263,11 +293,15 @@ const EmbedEdit = ( props ) => {
 			) }
 			<EmbedBottomSheet
 				value={ url }
-				isVisible={ isEditingURL }
-				onClose={ () => setIsEditingURL( false ) }
+				label={ bottomSheetLabel }
+				isVisible={ showEmbedBottomSheet }
+				onClose={ () => setShowEmbedBottomSheet( false ) }
 				onSubmit={ ( value ) => {
-					setIsEditingURL( false );
+					// The order of the following calls is important, we need to update the URL attribute before changing `isEditingURL`,
+					// otherwise the side-effect that potentially replaces the block when updating the local state won't use the new URL
+					// for creating the new block.
 					setAttributes( { url: value } );
+					setIsEditingURL( false );
 				} }
 			/>
 		</>

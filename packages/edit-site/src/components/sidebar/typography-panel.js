@@ -8,7 +8,6 @@ import {
 	__experimentalLetterSpacingControl as LetterSpacingControl,
 } from '@wordpress/block-editor';
 import { PanelBody, FontSizePicker } from '@wordpress/components';
-import { __ } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
@@ -76,7 +75,7 @@ export default function TypographyPanel( {
 	} );
 
 	return (
-		<PanelBody title={ __( 'Typography' ) } initialOpen={ true }>
+		<PanelBody className="edit-site-typography-panel" initialOpen={ true }>
 			{ supports.includes( 'fontFamily' ) && (
 				<FontFamilyControl
 					fontFamilies={ fontFamilies }

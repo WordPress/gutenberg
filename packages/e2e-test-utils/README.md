@@ -135,6 +135,15 @@ _Returns_
 
 -   `Promise`: Promise that responds to a request with the mock JSON response.
 
+### createMenu
+
+Create menus and all linked resources for the menu using the REST API.
+
+_Parameters_
+
+-   _menu_ `Object`: Rest payload for the menu
+-   _menuItems_ `?Array`: Data for any menu items to be created.
+
 ### createNewPost
 
 Creates new post.
@@ -196,6 +205,10 @@ Deactivates an active plugin.
 _Parameters_
 
 -   _slug_ `string`: Plugin slug.
+
+### deleteAllMenus
+
+Delete all menus using the REST API
 
 ### deleteAllWidgets
 
