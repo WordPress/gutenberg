@@ -13,6 +13,7 @@ import {
 	__experimentalFetchLinkSuggestions as fetchLinkSuggestions,
 	__experimentalFetchUrlData as fetchUrlData,
 } from '@wordpress/core-data';
+import { __ } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
@@ -74,27 +75,16 @@ function useBlockEditorSettings( settings, hasTemplate ) {
 	 * Creates a Post entity.
 	 * This is utilised by the Link UI to allow for on-the-fly creation of Posts/Pages.
 	 *
-	 * @param {string} postType the post type of the "post" to be created.
-	 * @param {Object} options  parameters for the post being created. These mirror those used on 3rd param of saveEntityRecord.
+	 * @param {Object} options parameters for the post being created. These mirror those used on 3rd param of saveEntityRecord.
 	 * @return {Object} the post type object that was created.
 	 */
-	const createEntity = ( postType, options ) => {
-		// The function is intentionally left open for extension in the future.
-		// However for now we lock this down to only allow Pages.
-		const postTypeWhitelist = [ 'page' ];
-
-		if ( ! postTypeWhitelist.includes( postType ) ) {
-			return Promise.reject( {
-				message: 'Only Pages may be created.',
-			} );
-		}
-
+	const createPageEntity = ( options ) => {
 		if ( ! userCanCreatePages ) {
 			return Promise.reject( {
-				message: 'You do not have permission to create Pages.',
+				message: __( 'You do not have permission to create Pages.' ),
 			} );
 		}
-		return saveEntityRecord( 'postType', postType, options );
+		return saveEntityRecord( 'postType', 'page', options );
 	};
 
 	return useMemo(
@@ -148,7 +138,7 @@ function useBlockEditorSettings( settings, hasTemplate ) {
 			__experimentalCanUserUseUnfilteredHTML: canUseUnfilteredHTML,
 			__experimentalUndo: undo,
 			outlineMode: hasTemplate,
-			__experimentalCreateEntity: createEntity,
+			__experimentalCreatePageEntity: createPageEntity,
 			__experimentalUserCanCreatePages: userCanCreatePages,
 		} ),
 		[
@@ -160,7 +150,7 @@ function useBlockEditorSettings( settings, hasTemplate ) {
 			hasTemplate,
 
 			userCanCreatePages,
-			createEntity,
+			createPageEntity,
 		]
 	);
 }

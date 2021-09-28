@@ -45,12 +45,12 @@ function InlineLinkUI( {
 	 */
 	const [ nextLinkValue, setNextLinkValue ] = useState();
 
-	const { createEntity, userCanCreatePages } = useSelect( ( select ) => {
+	const { createPageEntity, userCanCreatePages } = useSelect( ( select ) => {
 		const { getSettings } = select( blockEditorStore );
 		const _settings = getSettings();
 
 		return {
-			createEntity: _settings.__experimentalCreateEntity,
+			createPageEntity: _settings.__experimentalCreatePageEntity,
 			userCanCreatePages: _settings.__experimentalUserCanCreatePages,
 		};
 	}, [] );
@@ -152,16 +152,14 @@ function InlineLinkUI( {
 	const focusOnMount = useRef( addingLink ? 'firstElement' : false );
 
 	async function handleCreate( pageTitle ) {
-		const postType = 'page';
-
-		const page = await createEntity( postType, {
+		const page = await createPageEntity( {
 			title: pageTitle,
 			status: 'draft',
 		} );
 
 		return {
 			id: page.id,
-			type: postType,
+			type: page.type,
 			title: page.title.rendered,
 			url: page.link,
 			kind: 'post-type',
@@ -192,7 +190,7 @@ function InlineLinkUI( {
 				onRemove={ removeLink }
 				forceIsEditingLink={ addingLink }
 				hasRichPreviews
-				createSuggestion={ createEntity && handleCreate }
+				createSuggestion={ createPageEntity && handleCreate }
 				withCreateSuggestion={ userCanCreatePages }
 				createSuggestionButtonText={ createButtonText }
 			/>
