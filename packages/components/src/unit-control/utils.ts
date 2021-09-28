@@ -7,7 +7,7 @@ import { Platform } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import type { UseCustomUnitsProps, WPUnitControlUnit } from './types';
+import type { Value, WPUnitControlUnit } from './types';
 
 const isWeb = Platform.OS === 'web';
 
@@ -151,10 +151,10 @@ export const DEFAULT_UNIT = allUnits.px;
  * @return The extracted number and unit.
  */
 export function getParsedValue(
-	value: number | string,
+	value: Value,
 	unit?: string,
 	units?: Array< WPUnitControlUnit >
-): [ number | string, string ] {
+): [ Value, string ] {
 	const initialValue = unit ? `${ value }${ unit }` : value;
 
 	return parseUnit( initialValue, units );
@@ -180,7 +180,7 @@ export function hasUnits( units: Array< WPUnitControlUnit > | false ): boolean {
 export function parseUnit(
 	initialValue: string | number,
 	units: Array< WPUnitControlUnit > | false = ALL_CSS_UNITS
-): [ number | string, string ] {
+): [ Value, string ] {
 	const value = String( initialValue ).trim();
 
 	let num: string | number = parseFloat( value );
@@ -212,9 +212,9 @@ export function parseUnit(
  * @return The extracted value and unit.
  */
 export function getValidParsedUnit(
-	next: number | string,
+	next: Value,
 	units: Array< WPUnitControlUnit > | false,
-	fallbackValue: number | string,
+	fallbackValue: Value,
 	fallbackUnit: string
 ) {
 	const [ parsedValue, parsedUnit ] = parseUnit( next, units );
@@ -283,7 +283,11 @@ export const useCustomUnits = ( {
 	units,
 	availableUnits,
 	defaultValues,
-}: UseCustomUnitsProps ): Array< WPUnitControlUnit > | false => {
+}: {
+	units?: Array< WPUnitControlUnit >;
+	availableUnits?: Array< string >;
+	defaultValues: Record< string, string | number >;
+} ): Array< WPUnitControlUnit > | false => {
 	units = units || ALL_CSS_UNITS;
 	const usedUnits = filterUnitsWithSettings(
 		! availableUnits ? [] : availableUnits,
@@ -316,7 +320,7 @@ export const useCustomUnits = ( {
  * @return A collection of units containing the unit for the current value.
  */
 export function getUnitsWithCurrentUnit(
-	currentValue: number | string,
+	currentValue: Value,
 	legacyUnit: string | undefined,
 	units: Array< WPUnitControlUnit > | false = ALL_CSS_UNITS
 ): Array< WPUnitControlUnit > | false {
