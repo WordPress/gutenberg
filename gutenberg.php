@@ -91,6 +91,10 @@ function gutenberg_version_too_old_notice() {
  * Add a "WordPress version is too old" plugins list table notice.
  *
  * @since 11.7.0
+ *
+ * @param $links string[] Array of plugin action links.
+ * @param $file  string   Path to the plugin file relative to the plugins directory.
+ * @return string[] Updated array of plugin action links.
  */
 function gutenberg_wordpress_version_too_old_action_links_notice( $links, $file ) {
 	$plugin_basename = basename( __DIR__ ) . '/gutenberg.php';
@@ -113,6 +117,10 @@ function gutenberg_wordpress_version_too_old_action_links_notice( $links, $file 
  * Add a "Gutenberg version is too old" plugins list table notice.
  *
  * @since 11.7.0
+ *
+ * @param $links string[] Array of plugin action links.
+ * @param $file  string   Path to the plugin file relative to the plugins directory.
+ * @return string[] Updated array of plugin action links.
  */
 function gutenberg_version_too_old_action_links_notice( $links, $file ) {
 	$plugin_basename = basename( __DIR__ ) . '/gutenberg.php';
