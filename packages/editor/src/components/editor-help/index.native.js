@@ -61,6 +61,11 @@ function EditorHelpTopics( { close, isVisible, onClose } ) {
 		postType: select( editorStore ).getEditedPostAttribute( 'type' ),
 	} ) );
 
+	const title =
+		postType === 'page'
+			? __( 'How to edit your page' )
+			: __( 'How to edit your post' );
+
 	return (
 		<BottomSheet
 			isVisible={ isVisible }
@@ -68,6 +73,7 @@ function EditorHelpTopics( { close, isVisible, onClose } ) {
 			hideHeader
 			hasNavigation
 			contentStyle={ styles.contentContainer }
+			testID="editor-help-modal"
 		>
 			<BottomSheet.NavigationContainer animate main>
 				<BottomSheet.NavigationScreen
@@ -76,16 +82,15 @@ function EditorHelpTopics( { close, isVisible, onClose } ) {
 					name="help-topics"
 				>
 					<View style={ styles.container }>
-						<BottomSheet.NavigationHeader
-							isFullscreen
-							leftButtonOnPress={ close }
-							leftButtonText={ __( 'Close' ) }
-							screen={
-								postType === 'page'
-									? __( 'How to edit your page' )
-									: __( 'How to edit your post' )
-							}
-						/>
+						<BottomSheet.NavBar>
+							<BottomSheet.NavBar.DismissButton
+								onPress={ close }
+								iosText={ __( 'Close' ) }
+							/>
+							<BottomSheet.NavBar.Heading>
+								{ title }
+							</BottomSheet.NavBar.Heading>
+						</BottomSheet.NavBar>
 						<BottomSheetConsumer>
 							{ ( { listProps } ) => {
 								const contentContainerStyle = StyleSheet.flatten(

@@ -127,10 +127,10 @@ function render_block_core_navigation_link( $attributes, $content, $block ) {
 	$is_post_type           = isset( $attributes['kind'] ) && 'post-type' === $attributes['kind'];
 	$is_post_type           = $is_post_type || isset( $attributes['type'] ) && ( 'post' === $attributes['type'] || 'page' === $attributes['type'] );
 
-	// Don't render the block's subtree if it is a draft.
+	// Don't render the block's subtree if it is a draft or if the ID does not exist.
 	if ( $is_post_type && $navigation_link_has_id ) {
 		$post = get_post( $attributes['id'] );
-		if ( 'publish' !== $post->post_status ) {
+		if ( ! $post || 'publish' !== $post->post_status ) {
 			return '';
 		}
 	}
@@ -323,7 +323,7 @@ function register_block_core_navigation_link() {
 	if ( $post_types ) {
 		foreach ( $post_types as $post_type ) {
 			$variation = build_variation_for_navigation_link( $post_type, 'post-type' );
-			if ( 'post' === $variation['name'] || 'page' === $variation['name'] ) {
+			if ( $post_type->_builtin ) {
 				$built_ins[] = $variation;
 			} else {
 				$variations[] = $variation;
@@ -333,7 +333,7 @@ function register_block_core_navigation_link() {
 	if ( $taxonomies ) {
 		foreach ( $taxonomies as $taxonomy ) {
 			$variation = build_variation_for_navigation_link( $taxonomy, 'taxonomy' );
-			if ( 'category' === $variation['name'] || 'tag' === $variation['name'] || 'post_format' === $variation['name'] ) {
+			if ( $taxonomy->_builtin ) {
 				$built_ins[] = $variation;
 			} else {
 				$variations[] = $variation;

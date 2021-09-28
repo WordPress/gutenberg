@@ -17,7 +17,6 @@ import {
 	getBlockType,
 	getSaveContent,
 	isUnmodifiedDefaultBlock,
-	hasBlockSupport,
 } from '@wordpress/blocks';
 import { withFilters } from '@wordpress/components';
 import { withDispatch, withSelect, useDispatch } from '@wordpress/data';
@@ -72,6 +71,7 @@ function Block( { children, isHtml, ...props } ) {
 function BlockListBlock( {
 	mode,
 	isLocked,
+	canRemove,
 	clientId,
 	isSelected,
 	isSelectionEnabled,
@@ -100,9 +100,9 @@ function BlockListBlock( {
 			attributes={ attributes }
 			setAttributes={ setAttributes }
 			insertBlocksAfter={ isLocked ? undefined : onInsertBlocksAfter }
-			onReplace={ isLocked ? undefined : onReplace }
-			onRemove={ isLocked ? undefined : onRemove }
-			mergeBlocks={ isLocked ? undefined : onMerge }
+			onReplace={ canRemove ? onReplace : undefined }
+			onRemove={ canRemove ? onRemove : undefined }
+			mergeBlocks={ canRemove ? onMerge : undefined }
 			clientId={ clientId }
 			isSelectionEnabled={ isSelectionEnabled }
 			toggleSelection={ toggleSelection }
@@ -110,9 +110,6 @@ function BlockListBlock( {
 	);
 
 	const blockType = getBlockType( name );
-	const lightBlockWrapper =
-		blockType?.apiVersion > 1 ||
-		hasBlockSupport( blockType, 'lightBlockWrapper', false );
 
 	// Determine whether the block has props to apply to the wrapper.
 	if ( blockType?.getEditWrapperProps ) {
@@ -159,7 +156,7 @@ function BlockListBlock( {
 				</Block>
 			</>
 		);
-	} else if ( lightBlockWrapper ) {
+	} else if ( blockType?.apiVersion > 1 ) {
 		block = blockEdit;
 	} else {
 		block = <Block { ...wrapperProps }>{ blockEdit }</Block>;
@@ -195,10 +192,15 @@ const applyWithSelect = withSelect( ( select, { clientId, rootClientId } ) => {
 		isSelectionEnabled,
 		getTemplateLock,
 		__unstableGetBlockWithoutInnerBlocks,
+		canRemoveBlock,
+		canMoveBlock,
 	} = select( blockEditorStore );
 	const block = __unstableGetBlockWithoutInnerBlocks( clientId );
 	const isSelected = isBlockSelected( clientId );
 	const templateLock = getTemplateLock( rootClientId );
+	const canRemove = canRemoveBlock( clientId, rootClientId );
+	const canMove = canMoveBlock( clientId, rootClientId );
+
 	// The fallback to `{}` is a temporary fix.
 	// This function should never be called when a block is not present in
 	// the state. It happens now because the order in withSelect rendering
@@ -211,6 +213,8 @@ const applyWithSelect = withSelect( ( select, { clientId, rootClientId } ) => {
 		mode: getBlockMode( clientId ),
 		isSelectionEnabled: isSelectionEnabled(),
 		isLocked: !! templateLock,
+		canRemove,
+		canMove,
 		// Users of the editor.BlockListBlock filter used to be able to
 		// access the block prop.
 		// Ideally these blocks would rely on the clientId prop only.

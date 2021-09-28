@@ -224,6 +224,28 @@ class REST_Nav_Menus_Controller_Test extends WP_Test_REST_Controller_Testcase {
 	/**
 	 *
 	 */
+	public function test_create_item_same_name() {
+		wp_set_current_user( self::$admin_id );
+
+		wp_update_nav_menu_object(
+			0,
+			array(
+				'description' => 'This menu is so Original',
+				'menu-name'   => 'Original',
+			)
+		);
+
+		$request = new WP_REST_Request( 'POST', '/__experimental/menus' );
+		$request->set_param( 'name', 'Original' );
+		$request->set_param( 'description', 'This menu is so Original' );
+		$response = rest_get_server()->dispatch( $request );
+
+		$this->assertErrorResponse( 'menu_exists', $response, 400 );
+	}
+
+	/**
+	 *
+	 */
 	public function test_update_item() {
 		wp_set_current_user( self::$admin_id );
 
@@ -522,6 +544,16 @@ class REST_Nav_Menus_Controller_Test extends WP_Test_REST_Controller_Testcase {
 		$request  = new WP_REST_Request( 'GET', '/__experimental/menus/' . $this->menu_id );
 		$response = rest_get_server()->dispatch( $request );
 		$this->assertErrorResponse( 'rest_cannot_view', $response, 403 );
+	}
+
+	public function test_it_allows_batch_requests_when_updating_menus() {
+		$rest_server = rest_get_server();
+		// This call is needed to initialize route_options.
+		$rest_server->get_routes();
+		$route_options = $rest_server->get_route_options( '/__experimental/menus/(?P<id>[\d]+)' );
+
+		$this->assertArrayHasKey( 'allow_batch', $route_options );
+		$this->assertSame( array( 'v1' => true ), $route_options['allow_batch'] );
 	}
 
 	/**

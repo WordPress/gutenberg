@@ -102,7 +102,7 @@ Example:
 
 Collection of available units.
 
--   Type: `Array<Object>`
+-   Type: `Array<WPUnitControlUnit>`
 -   Required: No
 
 Example:

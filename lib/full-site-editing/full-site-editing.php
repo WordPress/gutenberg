@@ -11,7 +11,7 @@
  * @return boolean Whether the current theme is an FSE theme or not.
  */
 function gutenberg_is_fse_theme() {
-	return is_readable( get_stylesheet_directory() . '/block-templates/index.html' );
+	return is_readable( get_theme_file_path( '/block-templates/index.html' ) );
 }
 
 /**
@@ -27,7 +27,7 @@ function gutenberg_supports_block_templates() {
  * Show a notice when a Full Site Editing theme is used.
  */
 function gutenberg_full_site_editing_notice() {
-	if ( ! gutenberg_is_fse_theme() ) {
+	if ( ! gutenberg_is_fse_theme() || 'themes' !== get_current_screen()->base ) {
 		return;
 	}
 	?>

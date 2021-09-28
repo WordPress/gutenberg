@@ -2,6 +2,7 @@
  * WordPress dependencies
  */
 import {
+	cloneBlock,
 	findTransform,
 	getBlockTransforms,
 	pasteHandler,
@@ -80,8 +81,11 @@ export function onBlockDrop(
 		// If the user is inserting a block
 		if ( dropType === 'inserter' ) {
 			clearSelectedBlock();
+			const blocksToInsert = blocks.map( ( block ) =>
+				cloneBlock( block )
+			);
 			insertBlocks(
-				blocks,
+				blocksToInsert,
 				targetBlockIndex,
 				targetRootClientId,
 				true,

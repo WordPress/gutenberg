@@ -222,13 +222,15 @@ The settings section has the following structure:
 			"customWidth": false
 		},
 		"color": {
+			"background": true,
 			"custom": true,
 			"customDuotone": true,
 			"customGradient": true,
 			"duotone": [],
 			"gradients": [],
 			"link": false,
-			"palette": []
+			"palette": [],
+			"text": true
 		},
 		"custom": {},
 		"layout": {
@@ -279,7 +281,7 @@ To retain backward compatibility, the existing `add_theme_support` declarations 
 
 | add_theme_support           | theme.json setting                                        |
 | --------------------------- | --------------------------------------------------------- |
-| `custom-line-height`        | Set `typography.customLineHeight` to `false`.             |
+| `custom-line-height`        | Set `typography.customLineHeight` to `true`.              |
 | `custom-spacing`            | Set `spacing.customPadding` to `true`.                    |
 | `custom-units`              | Provide the list of units via `spacing.units`.            |
 | `disable-custom-colors`     | Set `color.custom` to `false`.                            |

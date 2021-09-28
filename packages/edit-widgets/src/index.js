@@ -16,6 +16,7 @@ import { __experimentalFetchLinkSuggestions as fetchLinkSuggestions } from '@wor
 import {
 	registerLegacyWidgetBlock,
 	registerLegacyWidgetVariations,
+	registerWidgetGroupBlock,
 } from '@wordpress/widgets';
 import { dispatch } from '@wordpress/data';
 import { store as interfaceStore } from '@wordpress/interface';
@@ -26,6 +27,7 @@ import { store as interfaceStore } from '@wordpress/interface';
 import './store';
 import './filters';
 import * as widgetArea from './blocks/widget-area';
+
 import Layout from './components/layout';
 import {
 	ALLOW_REUSABLE_BLOCKS,
@@ -35,7 +37,7 @@ import {
 const disabledBlocks = [
 	'core/more',
 	'core/freeform',
-	...( ! ALLOW_REUSABLE_BLOCKS && [ 'core/block' ] ),
+	...( ALLOW_REUSABLE_BLOCKS ? [] : [ 'core/block' ] ),
 ];
 
 /**
@@ -89,6 +91,8 @@ export function initialize( id, settings ) {
 	}
 	registerLegacyWidgetVariations( settings );
 	registerBlock( widgetArea );
+	registerWidgetGroupBlock();
+
 	settings.__experimentalFetchLinkSuggestions = ( search, searchOptions ) =>
 		fetchLinkSuggestions( search, searchOptions, settings );
 

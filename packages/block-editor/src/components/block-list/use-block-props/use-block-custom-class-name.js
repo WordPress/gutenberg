@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { useSelect } from '@wordpress/data';
-import { hasBlockSupport, getBlockType } from '@wordpress/blocks';
+import { getBlockType } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
@@ -32,9 +32,7 @@ export function useBlockCustomClassName( clientId ) {
 			}
 
 			const blockType = getBlockType( getBlockName( clientId ) );
-			const hasLightBlockWrapper =
-				blockType?.apiVersion > 1 ||
-				hasBlockSupport( blockType, 'lightBlockWrapper', false );
+			const hasLightBlockWrapper = blockType?.apiVersion > 1;
 
 			if ( ! hasLightBlockWrapper ) {
 				return;

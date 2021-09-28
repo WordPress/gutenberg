@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { useEffect, useState, useMemo, useCallback } from '@wordpress/element';
-import { AsyncModeProvider, useSelect, useDispatch } from '@wordpress/data';
+import { useSelect, useDispatch } from '@wordpress/data';
 import {
 	SlotFillProvider,
 	Popover,
@@ -26,6 +26,7 @@ import {
 } from '@wordpress/editor';
 import { __ } from '@wordpress/i18n';
 import { PluginArea } from '@wordpress/plugins';
+import { ShortcutProvider } from '@wordpress/keyboard-shortcuts';
 
 /**
  * Internal dependencies
@@ -168,17 +169,13 @@ function Editor( { initialSettings, onError } ) {
 			return <InserterSidebar />;
 		}
 		if ( isListViewOpen ) {
-			return (
-				<AsyncModeProvider value="true">
-					<ListViewSidebar />
-				</AsyncModeProvider>
-			);
+			return <ListViewSidebar />;
 		}
 		return null;
 	};
 
 	return (
-		<>
+		<ShortcutProvider>
 			<URLQueryController />
 			<SlotFillProvider>
 				<EntityProvider kind="root" type="site">
@@ -289,7 +286,7 @@ function Editor( { initialSettings, onError } ) {
 					</EntityProvider>
 				</EntityProvider>
 			</SlotFillProvider>
-		</>
+		</ShortcutProvider>
 	);
 }
 export default Editor;
