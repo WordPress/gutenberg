@@ -178,12 +178,12 @@ export function hasUnits( units: Array< WPUnitControlUnit > | false ): boolean {
  * @return The extracted number and unit.
  */
 export function parseUnit(
-	initialValue: string | number,
+	initialValue: Value,
 	units: Array< WPUnitControlUnit > | false = ALL_CSS_UNITS
 ): [ Value, string ] {
 	const value = String( initialValue ).trim();
 
-	let num: string | number = parseFloat( value );
+	let num: Value = parseFloat( value );
 	num = isNaN( num ) ? '' : num;
 
 	const unitMatch = value.match( /[\d.\-\+]*\s*(.*)/ )[ 1 ];
@@ -286,7 +286,7 @@ export const useCustomUnits = ( {
 }: {
 	units?: Array< WPUnitControlUnit >;
 	availableUnits?: Array< string >;
-	defaultValues: Record< string, string | number >;
+	defaultValues: Record< string, Value >;
 } ): Array< WPUnitControlUnit > | false => {
 	units = units || ALL_CSS_UNITS;
 	const usedUnits = filterUnitsWithSettings(
