@@ -26,6 +26,10 @@ import {
 } from '../components/navigation-sidebar/navigation-panel/template-hierarchy';
 
 /**
+ * @typedef {'template'|'template_type'} TemplateType Template type.
+ */
+
+/**
  * Returns whether the given feature is enabled or not.
  *
  * @param {Object} state   Global application state.
@@ -110,15 +114,23 @@ export function getHomeTemplateId( state ) {
 	return state.homeTemplateId;
 }
 
+function getCurrentEditedPost( state ) {
+	return state.editedPost[ state.editedPost.length - 1 ] || {};
+}
+
+function getPreviousEditedPost( state ) {
+	return state.editedPost[ state.editedPost.length - 2 ] || {};
+}
+
 /**
  * Returns the current edited post type (wp_template or wp_template_part).
  *
  * @param {Object} state Global application state.
  *
- * @return {number?} Template ID.
+ * @return {TemplateType?} Template type.
  */
 export function getEditedPostType( state ) {
-	return state.editedPost.type;
+	return getCurrentEditedPost( state ).type;
 }
 
 /**
@@ -126,10 +138,32 @@ export function getEditedPostType( state ) {
  *
  * @param {Object} state Global application state.
  *
- * @return {number?} Post ID.
+ * @return {string?} Post ID.
  */
 export function getEditedPostId( state ) {
-	return state.editedPost.id;
+	return getCurrentEditedPost( state ).id;
+}
+
+/**
+ * Returns the previous edited post type (wp_template or wp_template_part).
+ *
+ * @param {Object} state Global application state.
+ *
+ * @return {TemplateType?} Template type.
+ */
+export function getPreviousEditedPostType( state ) {
+	return getPreviousEditedPost( state ).type;
+}
+
+/**
+ * Returns the ID of the previous edited template or template part.
+ *
+ * @param {Object} state Global application state.
+ *
+ * @return {string?} Post ID.
+ */
+export function getPreviousEditedPostId( state ) {
+	return getPreviousEditedPost( state ).id;
 }
 
 /**
@@ -140,7 +174,7 @@ export function getEditedPostId( state ) {
  * @return {Object} Page.
  */
 export function getPage( state ) {
-	return state.editedPost.page;
+	return getCurrentEditedPost( state ).page;
 }
 
 /**
