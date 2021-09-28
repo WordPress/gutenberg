@@ -370,6 +370,7 @@ export default function PreferencesModal() {
 										icon={
 											isRTL() ? chevronRight : chevronLeft
 										}
+										isBack
 									>
 										{ __( 'Back' ) }
 									</NavigationButton>
