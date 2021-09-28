@@ -10,7 +10,6 @@ import { createBlock, rawHandler } from '@wordpress/blocks';
 
 const conversion = {
 	text: {
-		to: '*',
 		convert: ( { text } ) => rawHandler( { HTML: text } ),
 	},
 	calendar: {
@@ -154,10 +153,10 @@ export function convertLegacyWidgetToBlocks( idBase, rawInstance ) {
 	const { to, convert } = conversion[ idBase ];
 
 	let blocks;
-	if ( to === '*' ) {
-		blocks = convert ? castArray( convert( rawInstance ) ) : [];
-	} else {
+	if ( to ) {
 		blocks = [ createBlock( to, convert?.( rawInstance ) ) ];
+	} else {
+		blocks = convert ? castArray( convert( rawInstance ) ) : [];
 	}
 
 	if ( ! rawInstance.title ) {
@@ -174,7 +173,7 @@ export function convertLegacyWidgetToBlocks( idBase, rawInstance ) {
  */
 export const transforms = {
 	to: Object.entries( conversion )
-		.filter( ( [ , { to } ] ) => to !== '*' )
+		.filter( ( [ , { to } ] ) => to )
 		.map( ( [ idBase, { to } ] ) => ( {
 			type: 'block',
 			blocks: [ to ],
