@@ -97,7 +97,7 @@ export { default as __experimentalNavigationGroup } from './navigation/group';
 export { default as __experimentalNavigationItem } from './navigation/item';
 export { default as __experimentalNavigationMenu } from './navigation/menu';
 export {
-	NavigatorRoot as __experimentalNavigatorRoot,
+	NavigatorProvider as __experimentalNavigatorProvider,
 	NavigatorScreen as __experimentalNavigatorScreen,
 	useNavigator as __experimentalUseNavigator,
 } from './navigator';

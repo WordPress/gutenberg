@@ -1,10 +1,10 @@
-# `NavigatorRoot`
+# `NavigatorProvider`
 
 <div class="callout callout-alert">
 This feature is still experimental. “Experimental” means this is an early implementation subject to drastic and breaking changes.
 </div>
 
-The `NavigatorRoot` component allows rendering nested panels or menus (via the [`NavigatorScreen` component](/packages/components/src/navigator/navigator-screen/README.md)) and navigate between these different states (via the `useNavigator` hook). The Global Styles sidebar is an example of this.
+The `NavigatorProvider` component allows rendering nested panels or menus (via the [`NavigatorScreen` component](/packages/components/src/navigator/navigator-screen/README.md)) and navigate between these different states (via the `useNavigator` hook). The Global Styles sidebar is an example of this.
 
 The `Navigator*` family of components is _not_ opinionated in terms of UI, and can be composed with any UI components to navigate between the nested screens.
 
@@ -12,7 +12,7 @@ The `Navigator*` family of components is _not_ opinionated in terms of UI, and c
 
 ```jsx
 import {
-	__experimentalNavigatorRoot as NavigatorRoot,
+	__experimentalNavigatorProvider as NavigatorProvider,
 	__experimentalNavigatorScreen as NavigatorScreen,
 	__experimentalUseNavigator as useNavigator,
 } from '@wordpress/components';
@@ -32,7 +32,7 @@ function NavigatorButton( {
 }
 
 const MyNavigation = () => (
-	<NavigatorRoot initialPath="/">
+	<NavigatorProvider initialPath="/">
 		<NavigatorScreen path="/">
 			<p>This is the home screen.</p>
 			<NavigatorButton isPrimary path="/child">
@@ -46,7 +46,7 @@ const MyNavigation = () => (
 				Go back
 			</NavigatorButton>
 		</NavigatorScreen>
-	</NavigatorRoot>
+	</NavigatorProvider>
 );
 ```
 

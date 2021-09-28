@@ -8,7 +8,7 @@ import { useState } from '@wordpress/element';
  */
 import { NavigatorContext } from '../context';
 
-function NavigatorRoot( { initialPath, children } ) {
+function NavigatorProvider( { initialPath, children } ) {
 	const [ path, setPath ] = useState( { path: initialPath } );
 
 	return (
@@ -18,4 +18,4 @@ function NavigatorRoot( { initialPath, children } ) {
 	);
 }
 
-export default NavigatorRoot;
+export default NavigatorProvider;

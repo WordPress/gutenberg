@@ -4,11 +4,11 @@
 This feature is still experimental. “Experimental” means this is an early implementation subject to drastic and breaking changes.
 </div>
 
-The `NavigatorScreen` component represents a single view/screen/panel/menu and is supposed to be used in combination with [the `NavigatorRoot` component](/packages/components/src/navigator/navigator-root/README.md).
+The `NavigatorScreen` component represents a single view/screen/panel/menu and is supposed to be used in combination with [the `NavigatorProvider` component](/packages/components/src/navigator/navigator-provider/README.md).
 
 ## Usage
 
-Refer to [the `NavigatorRoot` component](/packages/components/src/navigator/navigator-root/README.md#usage) for a usage example.
+Refer to [the `NavigatorProvider` component](/packages/components/src/navigator/navigator-provider/README.md#usage) for a usage example.
 
 ## Props
 

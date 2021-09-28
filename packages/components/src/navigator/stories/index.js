@@ -2,11 +2,11 @@
  * Internal dependencies
  */
 import Button from '../../button';
-import { NavigatorRoot, NavigatorScreen, useNavigator } from '../';
+import { NavigatorProvider, NavigatorScreen, useNavigator } from '../';
 
 export default {
 	title: 'Components (Experimental)/Navigator',
-	component: NavigatorRoot,
+	component: NavigatorProvider,
 };
 
 function NavigatorButton( { path, isBack = false, ...props } ) {
@@ -20,7 +20,7 @@ function NavigatorButton( { path, isBack = false, ...props } ) {
 }
 
 const MyNavigation = () => (
-	<NavigatorRoot initialPath="/">
+	<NavigatorProvider initialPath="/">
 		<NavigatorScreen path="/">
 			<p>This is the home screen.</p>
 			<NavigatorButton isPrimary path="/child">
@@ -34,7 +34,7 @@ const MyNavigation = () => (
 				Go back
 			</NavigatorButton>
 		</NavigatorScreen>
-	</NavigatorRoot>
+	</NavigatorProvider>
 );
 
 export const _default = () => {
