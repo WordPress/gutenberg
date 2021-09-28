@@ -2,7 +2,11 @@
  * WordPress dependencies
  */
 import { useContext } from '@wordpress/element';
-import { ToolbarGroup, ToolbarButton } from '@wordpress/components';
+import {
+	ToolbarGroup,
+	ToolbarButton,
+	__experimentalText as Text,
+} from '@wordpress/components';
 import { BlockControls } from '@wordpress/block-editor';
 import { useDispatch } from '@wordpress/data';
 import { store as interfaceStore } from '@wordpress/interface';
@@ -44,7 +48,9 @@ export default function NameDisplay() {
 						setIsMenuNameEditFocused( true );
 					} }
 				>
-					{ menuName }
+					<Text limit={ 24 } ellipsizeMode="tail" truncate>
+						{ menuName }
+					</Text>
 				</ToolbarButton>
 			</ToolbarGroup>
 		</BlockControls>
