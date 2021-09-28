@@ -9,7 +9,7 @@ import { __ } from '@wordpress/i18n';
  */
 
 import { useSetting } from '../editor/utils';
-import ColorPalettePanel from './color-palette-panel';
+import Palette from './global-styles/palette';
 
 export function useHasColorPanel( { supports } ) {
 	return (
@@ -24,8 +24,6 @@ export default function ColorPanel( {
 	context: { supports, name },
 	getStyle,
 	setStyle,
-	getSetting,
-	setSetting,
 } ) {
 	const solids = useSetting( 'color.palette', name );
 	const gradients = useSetting( 'color.gradients', name );
@@ -116,21 +114,17 @@ export default function ColorPanel( {
 	}
 
 	return (
-		<PanelColorGradientSettings
-			title={ __( 'Color' ) }
-			settings={ settings }
-			colors={ solids }
-			gradients={ gradients }
-			disableCustomColors={ ! areCustomSolidsEnabled }
-			disableCustomGradients={ ! areCustomGradientsEnabled }
-			showTitle={ false }
-		>
-			<ColorPalettePanel
-				key={ 'color-palette-panel-' + name }
-				contextName={ name }
-				getSetting={ getSetting }
-				setSetting={ setSetting }
+		<>
+			<Palette contextName={ name } />
+			<PanelColorGradientSettings
+				title={ __( 'Color' ) }
+				settings={ settings }
+				colors={ solids }
+				gradients={ gradients }
+				disableCustomColors={ ! areCustomSolidsEnabled }
+				disableCustomGradients={ ! areCustomGradientsEnabled }
+				showTitle={ false }
 			/>
-		</PanelColorGradientSettings>
+		</>
 	);
 }
