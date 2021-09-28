@@ -1,9 +1,10 @@
 /*
-This is a hacky fix for a text selection quirk in the UBE. 
-It uses the 'setBaseAndExtent' method to reset the text 
-selection when certain menu items are tapped. This then 
-dismisses the text selection toolbar, preventing it from 
-blocking access to buttons. See PR for further details: 
+This is a fix for a text selection quirk in the UBE. 
+It notifies the Android app to dismiss the text selection 
+context menu when certain menu items are tapped. This is 
+done via the 'hideTextSelectionContextMenu' method, which
+is sent back to the Android app, where the dismissal is
+then handle. See PR for further details: 
 https://github.com/WordPress/gutenberg/pull/34668
 */
 window.addEventListener(
