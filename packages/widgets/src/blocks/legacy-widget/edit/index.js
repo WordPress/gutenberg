@@ -136,6 +136,7 @@ function NotEmpty( {
 
 	return (
 		<>
+			{ /* Widgets with `show_instance_in_rest = false` will have an undefined `raw`. */ }
 			{ idBase && instance?.raw && (
 				<BlockControls group="other">
 					<ConvertToBlocksButton
