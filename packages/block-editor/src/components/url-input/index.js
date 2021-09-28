@@ -137,9 +137,7 @@ class URLInput extends Component {
 		// Test search string for:
 		// 1. only whitespace characters (via inversion of test for any non-whitespace character).
 		// 2. must have a length - otherwise test from #1 will be truthy for string with no characters.
-		const containsOnlyWhitespace = !! (
-			! /\S/.test( value ) && value?.length
-		);
+		const containsOnlyWhitespace = value?.length && value.trim() === '';
 
 		// Initial suggestions are those shown when no search has been made.
 		// The criteria for no search are:
