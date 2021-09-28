@@ -1809,12 +1809,20 @@ export const __experimentalGetDirectInsertBlock = createSelector(
 			state.blockListSettings[ rootClientId ]?.__experimentalDefaultBlock;
 		const directInsert =
 			state.blockListSettings[ rootClientId ]?.__experimentalDirectInsert;
-		if ( ! defaultBlock?.length || ! directInsert ) {
+		if ( ! defaultBlock || ! directInsert ) {
 			return;
+		}
+		if ( typeof directInsert === 'function' ) {
+			return directInsert( getBlock( state, rootClientId ) )
+				? defaultBlock
+				: null;
 		}
 		return defaultBlock;
 	},
-	( state, rootClientId ) => [ state.blockListSettings[ rootClientId ] ]
+	( state, rootClientId ) => [
+		state.blockListSettings[ rootClientId ],
+		state.blocks.tree[ rootClientId ],
+	]
 );
 
 const checkAllowListRecursive = ( blocks, allowedBlockTypes ) => {
