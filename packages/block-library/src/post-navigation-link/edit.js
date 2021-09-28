@@ -24,7 +24,8 @@ export default function PostNavigationLinkEdit( {
 	let placeholder = isNext ? __( 'Next' ) : __( 'Previous' );
 
 	if ( showTitle ) {
-		placeholder = isNext ? __( 'Next:' ) : __( 'Previous:' );
+		/* translators: Label before for next and previous post. There is a space after the colon. */
+		placeholder = isNext ? __( 'Next: ' ) : __( 'Previous: ' );
 	}
 
 	const ariaLabel = isNext ? __( 'Next post' ) : __( 'Previous post' );
@@ -83,7 +84,14 @@ export default function PostNavigationLinkEdit( {
 						setAttributes( { label: newLabel } )
 					}
 				/>
-				{ showTitle && <span> { __( 'An example title' ) } </span> }
+				{ showTitle && (
+					<a
+						href="#post-navigation-pseudo-link"
+						onClick={ ( event ) => event.preventDefault() }
+					>
+						{ __( 'An example title' ) }
+					</a>
+				) }
 			</div>
 		</>
 	);
