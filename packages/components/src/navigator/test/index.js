@@ -216,7 +216,3 @@ describe( 'Navigator', () => {
 		} );
 	} );
 } );
-
-// RTL
-
-// reduced motion
