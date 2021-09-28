@@ -6,7 +6,7 @@ import { registerCoreBlocks } from '@wordpress/block-library';
 /**
  * Internal dependencies
  */
-import { convertLegacyWidgetToBlocks, transforms } from '../conversion';
+import { convertLegacyWidgetToBlocks } from '../conversion';
 
 describe( 'convertLegacyWidgetToBlocks', () => {
 	beforeAll( () => {
@@ -107,11 +107,5 @@ describe( 'convertLegacyWidgetToBlocks', () => {
 	] )( 'converting a %s widget', ( idBase, rawInstance, expectedBlocks ) => {
 		const blocks = convertLegacyWidgetToBlocks( idBase, rawInstance );
 		expect( blocks ).toEqual( expectedBlocks );
-	} );
-} );
-
-describe( 'transforms', () => {
-	it( 'matches snapshot', () => {
-		expect( transforms ).toMatchSnapshot();
 	} );
 } );
