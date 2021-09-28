@@ -2,7 +2,8 @@
  * External dependencies
  */
 import gradientParser from 'gradient-parser';
-import tinycolor from 'tinycolor2';
+import { colord, extend } from 'colord';
+import namesPlugin from 'colord/plugins/names';
 
 /**
  * Internal dependencies
@@ -13,6 +14,8 @@ import {
 	DIRECTIONAL_ORIENTATION_ANGLE_MAP,
 } from './constants';
 import { serializeGradient } from './serializer';
+
+extend( [ namesPlugin ] );
 
 export function getLinearGradientRepresentation( gradientAST ) {
 	return serializeGradient( {
@@ -68,7 +71,7 @@ export function getGradientAstWithControlPoints(
 	return {
 		...gradientAST,
 		colorStops: newControlPoints.map( ( { position, color } ) => {
-			const { r, g, b, a } = tinycolor( color ).toRgb();
+			const { r, g, b, a } = colord( color ).toRgb();
 			return {
 				length: {
 					type: '%',
