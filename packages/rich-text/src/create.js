@@ -7,7 +7,6 @@ import { select } from '@wordpress/data';
  * Internal dependencies
  */
 import { store as richTextStore } from './store';
-import { isFormatEqual } from './is-format-equal';
 import { createElement } from './create-element';
 import { mergePair } from './concat';
 import {
@@ -424,16 +423,10 @@ function createFromElement( {
 			continue;
 		}
 
-		const lastFormats =
-			accumulator.formats[ accumulator.formats.length - 1 ];
-		const lastFormat = lastFormats && lastFormats[ lastFormats.length - 1 ];
-		const newFormat = toFormat( {
+		const format = toFormat( {
 			type,
 			attributes: getAttributes( { element: node } ),
 		} );
-		const format = isFormatEqual( newFormat, lastFormat )
-			? lastFormat
-			: newFormat;
 
 		if (
 			multilineWrapperTags &&

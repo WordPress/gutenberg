@@ -14,7 +14,7 @@ import {
 } from './constants';
 import { serializeGradient } from './serializer';
 
-export function getLinearGradientRepresentationOfARadial( gradientAST ) {
+export function getLinearGradientRepresentation( gradientAST ) {
 	return serializeGradient( {
 		type: 'linear-gradient',
 		orientation: HORIZONTAL_GRADIENT_ORIENTATION,

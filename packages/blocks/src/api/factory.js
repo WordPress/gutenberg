@@ -289,7 +289,9 @@ const getBlockTypesForPossibleToTransforms = ( blocks ) => {
 
 	const sourceBlock = first( blocks );
 	const blockType = getBlockType( sourceBlock.name );
-	const transformsTo = getBlockTransforms( 'to', blockType.name );
+	const transformsTo = blockType
+		? getBlockTransforms( 'to', blockType.name )
+		: [];
 
 	// filter all 'to' transforms to find those that are possible.
 	const possibleTransforms = filter( transformsTo, ( transform ) => {
