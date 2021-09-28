@@ -97,7 +97,7 @@ function PullQuoteEdit( props ) {
 							// translators: placeholder text used for the quote
 							__( 'Add quote' )
 						}
-						textAlign={ textAlign }
+						textAlign={ textAlign ?? 'center' }
 					/>
 					{ shouldShowCitation && (
 						<RichText
@@ -114,7 +114,7 @@ function PullQuoteEdit( props ) {
 								} )
 							}
 							__unstableMobileNoFocusOnMount
-							textAlign={ textAlign }
+							textAlign={ textAlign ?? 'center' }
 							__unstableOnSplitAtEnd={ () =>
 								insertBlocksAfter(
 									createBlock( 'core/paragraph' )
