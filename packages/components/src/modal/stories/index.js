@@ -7,13 +7,14 @@ import { boolean, text } from '@storybook/addon-knobs';
  * Internal dependencies
  */
 import Button from '../../button';
-import Dashicon from '../../dashicon';
+import Icon from '../../icon';
 import Modal from '../';
 
 /**
  * WordPress dependencies
  */
 import { useState } from '@wordpress/element';
+import { wordpress } from '@wordpress/icons';
 
 export default { title: 'Components/Modal', component: Modal };
 
@@ -40,7 +41,7 @@ const ModalExample = ( props ) => {
 
 export const _default = () => {
 	const title = text( 'title', 'Title' );
-	const icon = text( 'icon', '' );
+	const showIcon = boolean( 'icon', false );
 	const isDismissible = boolean( 'isDismissible', true );
 	const focusOnMount = boolean( 'focusOnMount', true );
 	const shouldCloseOnEsc = boolean( 'shouldCloseOnEsc', true );
@@ -49,7 +50,7 @@ export const _default = () => {
 		true
 	);
 
-	const iconComponent = icon ? <Dashicon icon={ icon } /> : null;
+	const iconComponent = showIcon ? <Icon icon={ wordpress } /> : null;
 
 	const modalProps = {
 		icon: iconComponent,

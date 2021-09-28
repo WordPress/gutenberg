@@ -48,17 +48,19 @@ export default function MenuSwitcher( {
 				/>
 			</MenuGroup>
 			<MenuGroup hideSeparator>
-				<MenuItem variant="primary" onClick={ openModal }>
+				<MenuItem
+					className="edit-navigation-menu-switcher__new-button"
+					onClick={ openModal }
+				>
 					{ __( 'Create a new menu' ) }
 				</MenuItem>
 				{ isModalVisible && (
 					<Modal
 						title={ __( 'Create a new menu' ) }
+						className="edit-navigation-menu-switcher__modal"
 						onRequestClose={ closeModal }
 					>
 						<AddMenu
-							className="edit-navigation-menu-switcher__add-menu"
-							menus={ menus }
 							onCreate={ ( menuId ) => {
 								closeModal();
 								onSelectMenu( menuId );

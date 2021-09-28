@@ -29,6 +29,7 @@ const EmbedNoPreview = ( {
 	isSelected,
 	onPress,
 	previewable,
+	isDefaultEmbedInfo,
 } ) => {
 	const shouldRequestReview = useRef( false );
 	const [ isSheetVisible, setIsSheetVisible ] = useState( false );
@@ -172,11 +173,15 @@ const EmbedNoPreview = ( {
 						/>
 					</View>
 					<Text style={ sheetTitleStyle }>
-						{ sprintf(
-							// translators: %s: embed block variant's label e.g: "Twitter".
-							__( '%s block previews are coming soon' ),
-							label
-						) }
+						{ isDefaultEmbedInfo
+							? __( 'Embed block previews are coming soon' )
+							: sprintf(
+									// translators: %s: embed block variant's label e.g: "Twitter".
+									__(
+										'%s embed block previews are coming soon'
+									),
+									label
+							  ) }
 					</Text>
 					<Text style={ sheetDescriptionStyle }>
 						{ comingSoonDescription }

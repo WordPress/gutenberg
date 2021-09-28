@@ -209,7 +209,7 @@ function convertParsedUnitToPx( parsedUnit, options ) {
  * @param {string} options
  * @return {string} returns the cssUnit value in a simple px format.
  */
-export function getPxFromCssUnit( cssUnit, options = {} ) {
+function getPxFromCssUnit( cssUnit, options = {} ) {
 	if ( Number.isFinite( cssUnit ) ) {
 		return cssUnit.toFixed( 0 ) + 'px';
 	}
@@ -228,3 +228,5 @@ export function getPxFromCssUnit( cssUnit, options = {} ) {
 
 	return convertParsedUnitToPx( parsedUnit, options );
 }
+
+export default getPxFromCssUnit;

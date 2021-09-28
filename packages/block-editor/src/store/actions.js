@@ -771,7 +771,7 @@ export function* mergeBlocks( firstBlockClientId, secondBlockClientId ) {
 	const blockAType = getBlockType( blockA.name );
 
 	// Only focus the previous block if it's not mergeable
-	if ( ! blockAType.merge ) {
+	if ( blockAType && ! blockAType.merge ) {
 		yield selectBlock( blockA.clientId );
 		return;
 	}

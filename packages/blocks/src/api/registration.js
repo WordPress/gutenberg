@@ -544,7 +544,7 @@ export function getDefaultBlockName() {
  * @return {?Object} Block type.
  */
 export function getBlockType( name ) {
-	return select( blocksStore ).getBlockType( name );
+	return select( blocksStore )?.getBlockType( name );
 }
 
 /**

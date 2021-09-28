@@ -172,7 +172,7 @@ export const deleteEntityRecord = (
 	const entity = find( entities, { kind, name } );
 	let error;
 	let deletedRecord = false;
-	if ( ! entity ) {
+	if ( ! entity || entity?.__experimentalNoFetch ) {
 		return;
 	}
 
@@ -349,7 +349,7 @@ export const saveEntityRecord = (
 ) => async ( { select, resolveSelect, dispatch } ) => {
 	const entities = await dispatch( getKindEntities( kind ) );
 	const entity = find( entities, { kind, name } );
-	if ( ! entity ) {
+	if ( ! entity || entity?.__experimentalNoFetch ) {
 		return;
 	}
 	const entityIdKey = entity.key || DEFAULT_ENTITY_KEY;

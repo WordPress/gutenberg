@@ -14,7 +14,6 @@ import {
 	forwardRef,
 } from '@wordpress/element';
 import { getRectangleFromRange } from '@wordpress/dom';
-import deprecated from '@wordpress/deprecated';
 import {
 	useViewportMatch,
 	useResizeObserver,
@@ -250,7 +249,6 @@ const Popover = (
 		getAnchorRect,
 		expandOnMobile,
 		animate = true,
-		onClickOutside,
 		onFocusOutside,
 		__unstableStickyBoundaryElement,
 		__unstableSlotName = SLOT_NAME,
@@ -488,20 +486,6 @@ const Popover = (
 		// not three props that potentially do the same thing.
 		if ( type === 'focus-outside' && onFocusOutside ) {
 			onFocusOutside( event );
-		} else if ( type === 'focus-outside' && onClickOutside ) {
-			// Simulate MouseEvent using FocusEvent#relatedTarget as emulated click target.
-			const clickEvent = new window.MouseEvent( 'click' );
-
-			Object.defineProperty( clickEvent, 'target', {
-				get: () => event.relatedTarget,
-			} );
-
-			deprecated( 'Popover onClickOutside prop', {
-				since: '5.3',
-				alternative: 'onFocusOutside',
-			} );
-
-			onClickOutside( clickEvent );
 		} else if ( onClose ) {
 			onClose();
 		}

@@ -323,7 +323,7 @@ function register_block_core_navigation_link() {
 	if ( $post_types ) {
 		foreach ( $post_types as $post_type ) {
 			$variation = build_variation_for_navigation_link( $post_type, 'post-type' );
-			if ( 'post' === $variation['name'] || 'page' === $variation['name'] ) {
+			if ( $post_type->_builtin ) {
 				$built_ins[] = $variation;
 			} else {
 				$variations[] = $variation;
@@ -333,7 +333,7 @@ function register_block_core_navigation_link() {
 	if ( $taxonomies ) {
 		foreach ( $taxonomies as $taxonomy ) {
 			$variation = build_variation_for_navigation_link( $taxonomy, 'taxonomy' );
-			if ( 'category' === $variation['name'] || 'tag' === $variation['name'] || 'post_format' === $variation['name'] ) {
+			if ( $taxonomy->_builtin ) {
 				$built_ins[] = $variation;
 			} else {
 				$variations[] = $variation;

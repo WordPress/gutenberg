@@ -470,4 +470,28 @@ describe( 'RichText', () => {
 
 		expect( await getEditedPostContent() ).toMatchSnapshot();
 	} );
+
+	it( 'should navigate consecutive format boundaries', async () => {
+		await clickBlockAppender();
+		await pressKeyWithModifier( 'primary', 'b' );
+		await page.keyboard.type( '1' );
+		await pressKeyWithModifier( 'primary', 'b' );
+		await pressKeyWithModifier( 'primary', 'i' );
+		await page.keyboard.type( '2' );
+		await pressKeyWithModifier( 'primary', 'i' );
+
+		expect( await getEditedPostContent() ).toMatchSnapshot();
+
+		// Should move into the second format.
+		await page.keyboard.press( 'ArrowLeft' );
+		// Should move to the start of the second format.
+		await page.keyboard.press( 'ArrowLeft' );
+		// Should move between the first and second format.
+		await page.keyboard.press( 'ArrowLeft' );
+
+		await page.keyboard.type( '-' );
+
+		// Expect: <strong>1</strong>-<em>2</em>
+		expect( await getEditedPostContent() ).toMatchSnapshot();
+	} );
 } );

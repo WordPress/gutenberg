@@ -30,7 +30,7 @@ export {
 	Fill,
 	Provider as SlotFillProvider,
 } from './slot-fill';
-export { default as FontSizePicker } from './font-size-picker'; // Intentionally called after slot-fill.
+
 export { default as __experimentalStyleProvider } from './style-provider';
 export { default as BaseControl } from './base-control';
 export { default as TextareaControl } from './textarea-control';
@@ -66,6 +66,7 @@ export { default as Disabled } from './disabled';
 export { default as withConstrainedTabbing } from './higher-order/with-constrained-tabbing';
 export { default as withFallbackStyles } from './higher-order/with-fallback-styles';
 export { default as withFilters } from './higher-order/with-filters';
+export { default as FontSizePicker } from './font-size-picker'; // Intentionally called after slot-fill and withFilters.
 export { default as withFocusOutside } from './higher-order/with-focus-outside';
 export { default as withFocusReturn } from './higher-order/with-focus-return';
 export { default as withNotices } from './higher-order/with-notices';

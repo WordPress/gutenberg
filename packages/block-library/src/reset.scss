@@ -127,7 +127,8 @@ html :where(.editor-styles-wrapper) {
 	select:focus {
 		color: revert;
 		border-color: revert;
-		background: revert;
+		background-color: revert;
+		background-image: revert;
 		box-shadow: revert;
 		text-shadow: revert;
 		cursor: revert;

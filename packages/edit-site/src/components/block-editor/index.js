@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import classnames from 'classnames';
+
+/**
  * WordPress dependencies
  */
 import { useSelect, useDispatch } from '@wordpress/data';
@@ -27,6 +32,8 @@ import NavigateToLink from '../navigate-to-link';
 import { SidebarInspectorFill } from '../sidebar';
 import { store as editSiteStore } from '../../store';
 import BlockInspectorButton from './block-inspector-button';
+import EditTemplatePartMenuButton from '../edit-template-part-menu-button';
+import BackButton from './back-button';
 
 const LAYOUT = {
 	type: 'default',
@@ -43,6 +50,7 @@ export default function BlockEditor( { setIsInserterOpen } ) {
 				getPage,
 				__experimentalGetPreviewDeviceType,
 			} = select( editSiteStore );
+
 			return {
 				settings: getSettings( setIsInserterOpen ),
 				templateType: getEditedPostType(),
@@ -62,6 +70,8 @@ export default function BlockEditor( { setIsInserterOpen } ) {
 	const contentRef = useRef();
 	const mergedRefs = useMergeRefs( [ contentRef, useTypingObserver() ] );
 
+	const isTemplatePart = templateType === 'wp_template_part';
+
 	return (
 		<BlockEditorProvider
 			settings={ settings }
@@ -70,6 +80,7 @@ export default function BlockEditor( { setIsInserterOpen } ) {
 			onChange={ onChange }
 			useSubRegistry={ false }
 		>
+			<EditTemplatePartMenuButton />
 			<TemplatePartConverter />
 			<__experimentalLinkControl.ViewerFill>
 				{ useCallback(
@@ -87,15 +98,19 @@ export default function BlockEditor( { setIsInserterOpen } ) {
 				<BlockInspector />
 			</SidebarInspectorFill>
 			<BlockTools
-				className="edit-site-visual-editor"
+				className={ classnames( 'edit-site-visual-editor', {
+					'is-focus-mode': isTemplatePart,
+				} ) }
 				__unstableContentRef={ contentRef }
 			>
+				<BackButton />
 				<Iframe
 					style={ resizedCanvasStyles }
 					head={ <EditorStyles styles={ settings.styles } /> }
 					ref={ ref }
 					contentRef={ mergedRefs }
 					name="editor-canvas"
+					className="edit-site-visual-editor__editor-canvas"
 				>
 					<BlockList
 						className="edit-site-block-editor__block-list wp-site-blocks"
