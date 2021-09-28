@@ -19,16 +19,7 @@ window.addEventListener(
 					'components-menu-item__button'
 				) )
 		) {
-			const anchorNode = selected.anchorNode;
-			const anchorOffset = selected.anchorOffset;
-			const focusNode = selected.focusNode;
-			const focusOffset = selected.focusOffset;
-			selected.setBaseAndExtent(
-				anchorNode,
-				anchorOffset,
-				focusNode,
-				focusOffset
-			);
+			window.wpwebkit.hideTextSelectionContextMenu();
 		}
 	},
 	true
