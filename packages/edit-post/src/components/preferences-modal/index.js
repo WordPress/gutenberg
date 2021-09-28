@@ -13,6 +13,7 @@ import {
 	__experimentalItemGroup as ItemGroup,
 	__experimentalItem as Item,
 	__experimentalHStack as HStack,
+	__experimentalTruncate as Truncate,
 	FlexItem,
 	Modal,
 	TabPanel,
@@ -339,7 +340,9 @@ export default function PreferencesModal() {
 										>
 											<HStack justify="space-between">
 												<FlexItem>
-													{ tab.title }
+													<Truncate>
+														{ tab.title }
+													</Truncate>
 												</FlexItem>
 												<FlexItem>
 													<Icon
