@@ -198,6 +198,7 @@ export default function ListViewBlock( {
 							icon={ moreVertical }
 							toggleProps={ {
 								ref,
+								className: 'block-editor-list-view-block__menu',
 								tabIndex,
 								onFocus,
 							} }
