@@ -7,6 +7,7 @@
 -   Removed the deprecated `position` and `menuLabel` from the `DropdownMenu` component ([#34537](https://github.com/WordPress/gutenberg/pull/34537)).
 -   Removed the deprecated `onClickOutside` prop from the `Popover` component ([#34537](https://github.com/WordPress/gutenberg/pull/34537)).
 -   Changed `RangeControl` component to not apply `shiftStep` to inputs from its `<input type="range"/>` ([35020](https://github.com/WordPress/gutenberg/pull/35020)).
+-   Removed `isAction` prop from `Item`. The component will now rely on `onClick` to render as a `button` ([35152](https://github.com/WordPress/gutenberg/pull/35152)).
 
 ### New Feature
 
