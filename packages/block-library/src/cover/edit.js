@@ -281,7 +281,7 @@ function CoverPlaceholder( {
 			labels={ {
 				title: __( 'Cover' ),
 				instructions: __(
-					'Drag and drop an image or video onto this block or upload one from your device. If you have an existing image or video, you can select it from your media library.'
+					'Drag and drop onto this block, upload, or select an existing image or video from your media library to get started.'
 				),
 			} }
 			onSelect={ onSelectMedia }
