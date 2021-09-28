@@ -16,7 +16,7 @@ import {
  * External dependencies
  */
 // eslint-disable-next-line no-restricted-imports
-import { find } from 'puppeteer-testing-library';
+import { find, findAll } from 'puppeteer-testing-library';
 
 const twentyTwentyError = `Stylesheet twentytwenty-block-editor-styles-css was not properly added.
 For blocks, use the block API's style (https://developer.wordpress.org/block-editor/reference-guides/block-api/block-metadata/#style) or editorStyle (https://developer.wordpress.org/block-editor/reference-guides/block-api/block-metadata/#editor-style).
@@ -762,6 +762,17 @@ describe( 'Widgets Customizer', () => {
 		await expect( movedParagraphBlock ).toHaveFocus();
 
 		expect( console ).toHaveErrored( twentyTwentyError );
+	} );
+
+	it( 'should not render Block Settings sections', async () => {
+		// We add Block Settings as a section, but it shouldn't display to
+		// the user as a section on the main menu. It's simply how we
+		// integrate the G sidebar inside the customizer.
+		const findAllBlockSettingsHeader = findAll( {
+			role: 'heading',
+			name: /Block Settings/,
+		} );
+		await expect( findAllBlockSettingsHeader ).toThrowQueryEmptyError();
 	} );
 } );
 
