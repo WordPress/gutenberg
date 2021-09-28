@@ -9,6 +9,7 @@
 	&.is-placeholder {
 		min-height: auto !important;
 		padding: 0 !important;
+		border: $border-width solid  $gray-900;
 	}
 
 	&.components-placeholder h2 {
@@ -117,8 +118,10 @@
 	background-attachment: scroll;
 }
 
-.cover-block__cover-placeholder-container {
-	background: white;
+// Ensure the placeholder container styles are consistent when resizing.
+.wp-block-cover.is-placeholder .cover-block__cover-placeholder-container {
+	background: $white;
+	width: 100%;
 	.block-editor-media-placeholder {
 		box-shadow: none;
 	}
