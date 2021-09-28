@@ -138,7 +138,8 @@ class URLInput extends Component {
 		// (note: this includes whitespace).
 		const isInitialSuggestions = ! value?.length;
 
-		// Trim only now we've determined it's not composed of purely whitespace.
+		// Trim only now we've determined whether or not it originally had a "length"
+		// (even if that value was all whitespace).
 		value = value.trim();
 
 		// Allow a suggestions request if:
