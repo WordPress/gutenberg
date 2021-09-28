@@ -15,7 +15,7 @@ import {
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { getBlockType } from '@wordpress/blocks';
-import { layout, brush, styles, typography } from '@wordpress/icons';
+import { layout, color, styles, typography } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -71,7 +71,7 @@ function GlobalStylesLevelMenu( { context, parentMenu = '' } ) {
 			) }
 			{ hasColorPanel && (
 				<NavigationButton
-					icon={ brush }
+					icon={ color }
 					path={ parentMenu + '/colors' }
 				>
 					{ __( 'Colors' ) }
