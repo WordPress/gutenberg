@@ -87,7 +87,7 @@ The maximum `value` allowed.
 
 -   Type: `Number`
 -   Required: No
--   Default: Infinity
+-   Default: `Infinity`
 
 ### min
 
@@ -95,7 +95,7 @@ The minimum `value` allowed.
 
 -   Type: `Number`
 -   Required: No
--   Default: -Infinity
+-   Default: `-Infinity`
 
 ### required
 

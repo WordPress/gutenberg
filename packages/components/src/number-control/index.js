@@ -41,7 +41,11 @@ export function NumberControl(
 	ref
 ) {
 	const baseStep = step === 'any' ? 1 : parseFloat( step );
-	const jumpStep = useJumpStep( { baseStep, shiftStep, isShiftStepEnabled } );
+	const jumpStep = useJumpStep( {
+		step: baseStep,
+		shiftStep,
+		isShiftStepEnabled,
+	} );
 
 	const baseValue = roundClamp( 0, min, max, baseStep );
 	const constrainValue = ( value, stepOverride ) => {
