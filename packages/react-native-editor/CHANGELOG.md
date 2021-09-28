@@ -21,6 +21,9 @@ For each user feature we should also add a importance categorization label  to i
 -   [**] Enable embed preview for Instagram and Vimeo providers. [#34563]
 -   [**] Embed block: Add error bottom sheet with retry and convert to link actions. [#34604]
 
+## 1.61.2
+-   [*] Image block - Fix height and border regression. [#34957]
+
 ## 1.61.1
 -   [*] Fix crash related to reusable blocks in the block picker. [#34873]
 
