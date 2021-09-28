@@ -61,7 +61,6 @@ function NavigationButton( {
 	const navigator = useNavigator();
 	return (
 		<Tag
-			isAction
 			onClick={ () => navigator.push( path, { isBack } ) }
 			{ ...props }
 		/>
@@ -336,6 +335,7 @@ export default function PreferencesModal() {
 											key={ tab.name }
 											path={ tab.name }
 											as={ Item }
+											isAction
 										>
 											<HStack justify="space-between">
 												<FlexItem>
