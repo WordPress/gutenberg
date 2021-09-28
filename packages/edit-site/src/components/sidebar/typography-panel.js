@@ -50,6 +50,22 @@ function useHasLetterSpacingControl( { supports, name } ) {
 	);
 }
 
+function mergeWithoutDuplicateFontFamilies( ...fontLists ) {
+	const allFonts = fontLists.reduce( ( mergedList, fontList ) => {
+		return fontList ? mergedList.concat( ...fontList ) : mergedList;
+	}, [] );
+
+	const uniqueFonts = allFonts.reduce( ( uniqueList, font ) => {
+		if ( ! uniqueList[ font.slug ] ) {
+			uniqueList[ font.slug ] = font;
+		}
+
+		return uniqueList;
+	}, {} );
+
+	return Object.values( uniqueFonts );
+}
+
 export default function TypographyPanel( {
 	context: { supports, name },
 	getStyle,
@@ -60,7 +76,18 @@ export default function TypographyPanel( {
 		'typography.customFontSize',
 		name
 	);
-	const fontFamilies = useSetting( 'typography.fontFamilies', name );
+	const coreFontFamilies = useSetting( 'typography.fontFamilies.core', name );
+	const userFontFamilies = useSetting( 'typography.fontFamilies.user', name );
+	const themeFontFamilies = useSetting(
+		'typography.fontFamilies.theme',
+		name
+	);
+	const fontFamilies = mergeWithoutDuplicateFontFamilies(
+		themeFontFamilies,
+		userFontFamilies,
+		coreFontFamilies
+	);
+
 	const hasFontStyles =
 		useSetting( 'typography.customFontStyle', name ) &&
 		supports.includes( 'fontStyle' );
