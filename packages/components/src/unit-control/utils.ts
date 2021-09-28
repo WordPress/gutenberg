@@ -209,7 +209,7 @@ export function parseUnit(
  * @param  units         Units to derive from.
  * @param  fallbackValue The fallback value.
  * @param  fallbackUnit  The fallback value.
- * @return The extracted number and unit.
+ * @return The extracted value and unit.
  */
 export function getValidParsedUnit(
 	next: number | string,
