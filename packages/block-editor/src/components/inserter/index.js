@@ -285,10 +285,7 @@ export default compose( [
 				const { insertBlock } = dispatch( blockEditorStore );
 
 				const blockToInsert = directInsertBlock?.length
-					? createBlock(
-							directInsertBlock[ 0 ],
-							directInsertBlock[ 1 ]
-					  )
+					? createBlock( ...directInsertBlock )
 					: createBlock( allowedBlockType.name );
 
 				insertBlock( blockToInsert, getInsertionIndex(), rootClientId );
