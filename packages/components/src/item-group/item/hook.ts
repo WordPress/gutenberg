@@ -5,6 +5,11 @@
 import type { ElementType } from 'react';
 
 /**
+ * WordPress dependencies
+ */
+import { useMemo } from '@wordpress/element';
+
+/**
  * Internal dependencies
  */
 import { useContextSystem, WordPressComponentProps } from '../../ui/context';
@@ -35,12 +40,16 @@ export function useItem( props: WordPressComponentProps< ItemProps, 'div' > ) {
 
 	const cx = useCx();
 
-	const classes = cx(
-		as === 'button' && styles.unstyledButton,
-		styles.itemSizes[ size ] || styles.itemSizes.medium,
-		styles.item,
-		spacedAround && styles.spacedAround,
-		className
+	const classes = useMemo(
+		() =>
+			cx(
+				as === 'button' && styles.unstyledButton,
+				styles.itemSizes[ size ] || styles.itemSizes.medium,
+				styles.item,
+				spacedAround && styles.spacedAround,
+				className
+			),
+		[ as, className, size, spacedAround ]
 	);
 
 	const wrapperClassName = cx( styles.itemWrapper );
