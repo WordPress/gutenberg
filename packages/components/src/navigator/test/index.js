@@ -6,7 +6,7 @@ import { render, screen, fireEvent } from '@testing-library/react';
 /**
  * Internal dependencies
  */
-import { Navigator, NavigatorScreen, useNavigator } from '../';
+import { NavigatorProvider, NavigatorScreen, useNavigator } from '../';
 
 jest.mock( 'framer-motion', () => {
 	const actual = jest.requireActual( 'framer-motion' );
@@ -47,7 +47,7 @@ const MyNavigation = ( {
 	initialPath = PATHS.HOME,
 	onNavigatorButtonClick,
 } ) => (
-	<Navigator initialPath={ initialPath }>
+	<NavigatorProvider initialPath={ initialPath }>
 		<NavigatorScreen path={ PATHS.HOME }>
 			<p>This is the home screen.</p>
 			<NavigatorButton
@@ -76,7 +76,7 @@ const MyNavigation = ( {
 		</NavigatorScreen>
 
 		{ /* A `NavigatorScreen` with `path={ PATHS.NOT_FOUND }` is purposefully not included */ }
-	</Navigator>
+	</NavigatorProvider>
 );
 
 const getNavigationScreenByText = ( text, { throwIfNotFound = true } = {} ) => {

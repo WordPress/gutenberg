@@ -8,7 +8,7 @@ import { map } from 'lodash';
  */
 import {
 	Button,
-	__experimentalNavigator as Navigator,
+	__experimentalNavigatorProvider as NavigatorProvider,
 	__experimentalNavigatorScreen as NavigatorScreen,
 	__experimentalItemGroup as ItemGroup,
 	__experimentalItem as Item,
@@ -213,7 +213,7 @@ export default function GlobalStylesSidebar() {
 				</>
 			}
 		>
-			<Navigator initialPath="/">
+			<NavigatorProvider initialPath="/">
 				<NavigatorScreen path="/">
 					<StylePreview />
 
@@ -280,7 +280,7 @@ export default function GlobalStylesSidebar() {
 						setSetting={ setSetting }
 					/>
 				) ) }
-			</Navigator>
+			</NavigatorProvider>
 		</DefaultSidebar>
 	);
 }
