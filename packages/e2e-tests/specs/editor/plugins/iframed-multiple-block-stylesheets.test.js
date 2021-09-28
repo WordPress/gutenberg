@@ -7,6 +7,9 @@ import {
 	deactivatePlugin,
 	insertBlock,
 	getEditedPostContent,
+	openDocumentSettingsSidebar,
+	clickButton,
+	canvas,
 } from '@wordpress/e2e-test-utils';
 
 async function getComputedStyle( context, property ) {
@@ -35,9 +38,24 @@ describe( 'iframed multiple block stylesheets', () => {
 		await insertBlock( 'Iframed Multiple Stylesheets' );
 
 		expect( await getEditedPostContent() ).toMatchSnapshot();
-		expect( await getComputedStyle( page, 'border-width' ) ).toBe( '2px' );
-		expect( await getComputedStyle( page, 'border-color' ) ).toBe(
-			'#ff0000'
+		await openDocumentSettingsSidebar();
+		await clickButton( 'Page' );
+		await clickButton( 'Template' );
+		await clickButton( 'New' );
+		await page.keyboard.press( 'Tab' );
+		await page.keyboard.press( 'Tab' );
+		await page.keyboard.type( 'Iframed Test' );
+		await clickButton( 'Create' );
+		await page.waitForSelector( 'iframe[name="editor-canvas"]' );
+
+		// Style loaded from the main stylesheet.
+		expect( await getComputedStyle( canvas(), 'border-style' ) ).toBe(
+			'dashed'
+		);
+
+		// Style loaded from the additional stylesheet.
+		expect( await getComputedStyle( canvas(), 'border-color' ) ).toBe(
+			'rgb(255, 0, 0)'
 		);
 
 		expect( console ).toHaveErrored();

@@ -3,5 +3,5 @@
  * editor.
  */
 .wp-block-test-iframed-multiple-stylesheets {
-	border-width: 2px !important;
+	border-style: dashed;
 }
