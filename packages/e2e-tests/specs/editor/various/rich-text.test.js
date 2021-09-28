@@ -385,12 +385,16 @@ describe( 'RichText', () => {
 		await clickBlockToolbarButton( 'More' );
 
 		const button = await page.waitForXPath(
-			`//button[contains(text(), 'Text color')]`
+			`//button[text()='Highlight']`
 		);
 		// Clicks may fail if the button is out of view. Assure it is before click.
 		await button.evaluate( ( element ) => element.scrollIntoView() );
 		await button.click();
 
+		// Tab to the "Text" tab.
+		await page.keyboard.press( 'Tab' );
+		// Tab to black.
+		await page.keyboard.press( 'Tab' );
 		// Select color other than black.
 		await page.keyboard.press( 'Tab' );
 		await page.keyboard.press( 'Enter' );
