@@ -4,6 +4,7 @@ import android.annotation.SuppressLint;
 import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.os.Handler;
+import android.view.ActionMode;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -83,6 +84,20 @@ public class GutenbergWebViewActivity extends AppCompatActivity {
         mForegroundViewTitle.setText(R.string.block_editor_failed_title);
         mForegroundViewSubtitle.setText(R.string.block_editor_failed_subtitle);
         mForegroundViewImage.setVisibility(ImageView.VISIBLE);
+    }
+
+    @Override
+    public void onActionModeStarted(ActionMode mode) {
+        if (mActionMode == null) {
+            mActionMode = mode;
+        }
+        super.onActionModeStarted(mode);
+    }
+
+    @Override
+    public void onActionModeFinished(ActionMode mode) {
+        mActionMode = null;
+        super.onActionModeFinished(mode);
     }
 
     @SuppressLint("SetJavaScriptEnabled")
@@ -402,6 +417,13 @@ public class GutenbergWebViewActivity extends AppCompatActivity {
         @JavascriptInterface
         public void gutenbergReady() {
             GutenbergWebViewActivity.this.runOnUiThread(() -> onGutenbergReady());
+        }
+
+        @JavascriptInterface
+        public void hideTextSelectionContextMenu() {
+            if (mActionMode != null) {
+                GutenbergWebViewActivity.this.runOnUiThread(() -> GutenbergWebViewActivity.this.mActionMode.finish());
+            }
         }
     }
 }
