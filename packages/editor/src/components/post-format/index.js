@@ -109,7 +109,7 @@ export default function PostFormat() {
 						>
 							{ sprintf(
 								/* translators: %s: post format */
-								__( 'Apply the "%s" format.' ),
+								__( 'Apply format: %s' ),
 								suggestion.caption
 							) }
 						</Button>
