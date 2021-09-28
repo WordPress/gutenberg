@@ -134,13 +134,13 @@ class URLInput extends Component {
 			return;
 		}
 
-		// Test search string for:
-		// 1. only whitespace characters (via inversion of test for any non-whitespace character).
-		// 2. must have a length - otherwise test from #1 will be truthy for string with no characters.
+		// Test for whitespace only:
+		// 1. must have a length - otherwise test from #1 will be truthy for string with no characters.
+		// 2. if all whitespace is stripped must be empty.
 		const containsOnlyWhitespace = value?.length && value.trim() === '';
 
 		// Initial suggestions are those shown when no search has been made.
-		// The criteria for no search are:
+		// The criteria for "no search" are:
 		// 1. No value.
 		// 2. Value must not be entirely whitespace.
 		const isInitialSuggestions =
