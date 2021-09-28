@@ -429,7 +429,7 @@ class URLInput extends Component {
 
 		const inputProps = {
 			value,
-			required: false,
+			required: true,
 			className: 'block-editor-url-input__input',
 			type: 'text',
 			onChange: this.onChange,
