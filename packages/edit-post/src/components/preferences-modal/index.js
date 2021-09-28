@@ -365,7 +365,12 @@ export default function PreferencesModal() {
 									key={ `${ section.name }-menu` }
 									path={ section.name }
 								>
-									<NavigationButton path="/">
+									<NavigationButton
+										path="/"
+										icon={
+											isRTL() ? chevronRight : chevronLeft
+										}
+									>
 										{ __( 'Back' ) }
 									</NavigationButton>
 									<h2>{ section.tabLabel }</h2>
