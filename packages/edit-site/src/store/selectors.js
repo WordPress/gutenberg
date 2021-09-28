@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { get, map, keyBy } from 'lodash';
+import { get, map } from 'lodash';
 import createSelector from 'rememo';
 
 /**
@@ -10,7 +10,6 @@ import createSelector from 'rememo';
 import { store as coreDataStore } from '@wordpress/core-data';
 import { createRegistrySelector } from '@wordpress/data';
 import { uploadMedia } from '@wordpress/media-utils';
-import { isTemplatePart } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
@@ -261,40 +260,3 @@ export function __experimentalGetInsertionPoint( state ) {
 export function isListViewOpened( state ) {
 	return state.listViewPanel;
 }
-
-/**
- * Returns the template part blocks grouped by areas of the template.
- *
- * @param {Object} state Global application state.
- *
- * @return {Object} The template part blocks grouped by areas.
- */
-export const getTemplateAreaBlocksOfTemplate = createRegistrySelector(
-	( select ) => ( state, template ) => {
-		const templateParts = select(
-			coreDataStore
-		).getEntityRecords( 'postType', 'wp_template_part', { per_page: -1 } );
-		const templatePartsById = keyBy(
-			templateParts,
-			( templatePart ) => templatePart.id
-		);
-
-		const templatePartBlocksByAreas = {};
-
-		for ( const block of template.blocks ) {
-			if ( isTemplatePart( block ) ) {
-				const {
-					attributes: { theme, slug },
-				} = block;
-				const templatePartId = `${ theme }//${ slug }`;
-				const templatePart = templatePartsById[ templatePartId ];
-
-				if ( templatePart ) {
-					templatePartBlocksByAreas[ templatePart.area ] = block;
-				}
-			}
-		}
-
-		return templatePartBlocksByAreas;
-	}
-);
