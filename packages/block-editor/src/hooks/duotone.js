@@ -265,7 +265,7 @@ const withDuotoneStyles = createHigherOrderComponent(
 			return <BlockListBlock { ...props } />;
 		}
 
-		const id = `wp-duotone-filter-${ useInstanceId( BlockListBlock ) }`;
+		const id = `wp-duotone-${ useInstanceId( BlockListBlock ) }`;
 
 		// Extra .editor-styles-wrapper specificity is needed in the editor
 		// since we're not using inline styles to apply the filter. We need to

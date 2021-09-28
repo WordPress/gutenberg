@@ -261,7 +261,7 @@ function gutenberg_register_duotone_support( $block_type ) {
 function gutenberg_render_duotone_filter_preset( $preset ) {
 	$duotone_id     = $preset['slug'];
 	$duotone_colors = $preset['colors'];
-	$filter_id      = 'wp-duotone-filter-' . $duotone_id;
+	$filter_id      = 'wp-duotone-' . $duotone_id;
 	$duotone_values = array(
 		'r' => array(),
 		'g' => array(),
@@ -361,7 +361,7 @@ function gutenberg_render_duotone_support( $block_content, $block ) {
 		'colors' => $block['attrs']['style']['color']['duotone'],
 	);
 	$filter_property = gutenberg_render_duotone_filter_preset( $filter_preset );
-	$filter_id       = 'wp-duotone-filter-' . $filter_preset['slug'];
+	$filter_id       = 'wp-duotone-' . $filter_preset['slug'];
 
 	$scope     = '.' . $filter_id;
 	$selectors = explode( ',', $duotone_support );
