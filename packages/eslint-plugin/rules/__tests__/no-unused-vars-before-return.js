@@ -11,6 +11,9 @@ import rule from '../no-unused-vars-before-return';
 const ruleTester = new RuleTester( {
 	parserOptions: {
 		ecmaVersion: 6,
+		ecmaFeatures: {
+			jsx: true,
+		},
 	},
 } );
 
@@ -27,6 +30,36 @@ function example( number ) {
 	return number + foo;
 }`,
 		},
+		{
+			code: `
+function example() {
+	const { foo, bar } = doSomeCostlyOperation();
+	if ( number > 10 ) {
+		return number + bar + 1;
+	}
+
+	return number + foo;
+}`,
+		},
+		{
+			code: `
+function example() {
+	const foo = doSomeCostlyOperation();
+	if ( number > 10 ) {
+		return number + 1;
+	}
+
+	return number + foo;
+}`,
+			options: [ { excludePattern: '^do' } ],
+		},
+		{
+			code: `
+function MyComponent() {
+	const Foo = getSomeComponent();
+	return <Foo />;
+}`,
+		},
 	],
 	invalid: [
 		{
@@ -39,7 +72,66 @@ function example( number ) {
 
 	return number + foo;
 }`,
-			errors: [ { message: 'Variables should not be assigned until just prior its first reference. An early return statement may leave this variable unused.' } ],
+			errors: [
+				{
+					message:
+						'Variables should not be assigned until just prior its first reference. An early return statement may leave this variable unused.',
+				},
+			],
+		},
+		{
+			code: `
+function example() {
+	const { foo } = doSomeCostlyOperation();
+	if ( number > 10 ) {
+		return number + 1;
+	}
+
+	return number + foo;
+}`,
+			errors: [
+				{
+					message:
+						'Variables should not be assigned until just prior its first reference. An early return statement may leave this variable unused.',
+				},
+			],
+		},
+		{
+			code: `
+function example() {
+	const foo = doSomeCostlyOperation();
+	if ( number > 10 ) {
+		return number + 1;
+	}
+
+	return number + foo;
+}`,
+			options: [ { excludePattern: '^run' } ],
+			errors: [
+				{
+					message:
+						'Variables should not be assigned until just prior its first reference. An early return statement may leave this variable unused.',
+				},
+			],
+		},
+		{
+			code: `
+function example() {
+	const foo = doSomeCostlyOperation();
+	const bar = anotherCostlyOperation( foo );
+	if ( number > 10 ) {
+		return number + 1;
+	}
+
+	return number + foo + bar;
+}`,
+			options: [ { excludePattern: '^do' } ],
+			errors: [
+				{
+					message:
+						'Variables should not be assigned until just prior its first reference. An early return statement may leave this variable unused.',
+				},
+			],
 		},
 	],
 } );

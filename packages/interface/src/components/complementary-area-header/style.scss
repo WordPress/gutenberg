@@ -1,0 +1,33 @@
+.components-panel__header.interface-complementary-area-header__small {
+	background: $white;
+	padding-right: $grid-unit-05;
+
+	.interface-complementary-area-header__small-title {
+		overflow: hidden;
+		text-overflow: ellipsis;
+		white-space: nowrap;
+		width: 100%;
+	}
+
+	@include break-medium() {
+		display: none;
+	}
+}
+
+.interface-complementary-area-header {
+	background: $white;
+	padding-right: $grid-unit-05;
+
+	.components-button.has-icon {
+		display: none;
+		margin-left: auto;
+
+		~ .components-button {
+			margin-left: 0;
+		}
+
+		@include break-medium() {
+			display: flex;
+		}
+	}
+}

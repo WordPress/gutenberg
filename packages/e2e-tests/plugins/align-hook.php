@@ -17,7 +17,7 @@ function enqueue_align_plugin_script() {
 		array(
 			'wp-blocks',
 			'wp-element',
-			'wp-editor',
+			'wp-block-editor',
 			'wp-i18n',
 		),
 		filemtime( plugin_dir_path( __FILE__ ) . 'align-hook/index.js' ),

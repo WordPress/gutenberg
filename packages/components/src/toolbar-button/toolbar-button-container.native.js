@@ -3,8 +3,4 @@
  */
 import { View } from 'react-native';
 
-export default ( props ) => (
-	<View>
-		{ props.children }
-	</View>
-);
+export default ( props ) => <View>{ props.children }</View>;

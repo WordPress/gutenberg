@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import memize from 'memize';
-
-/**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
@@ -12,13 +7,16 @@ import { applyFormat, removeFormat } from '@wordpress/rich-text';
 const FORMAT_NAME = 'core/annotation';
 
 const ANNOTATION_ATTRIBUTE_PREFIX = 'annotation-text-';
-const STORE_KEY = 'core/annotations';
+/**
+ * Internal dependencies
+ */
+import { STORE_NAME } from '../store/constants';
 
 /**
  * Applies given annotations to the given record.
  *
- * @param {Object} record The record to apply annotations to.
- * @param {Array} annotations The annotation to apply.
+ * @param {Object} record      The record to apply annotations to.
+ * @param {Array}  annotations The annotation to apply.
  * @return {Object} A record with the annotations applied.
  */
 export function applyAnnotations( record, annotations = [] ) {
@@ -39,7 +37,8 @@ export function applyAnnotations( record, annotations = [] ) {
 		record = applyFormat(
 			record,
 			{
-				type: FORMAT_NAME, attributes: {
+				type: FORMAT_NAME,
+				attributes: {
 					className,
 					id,
 				},
@@ -73,7 +72,9 @@ function retrieveAnnotationPositions( formats ) {
 
 	formats.forEach( ( characterFormats, i ) => {
 		characterFormats = characterFormats || [];
-		characterFormats = characterFormats.filter( ( format ) => format.type === FORMAT_NAME );
+		characterFormats = characterFormats.filter(
+			( format ) => format.type === FORMAT_NAME
+		);
 		characterFormats.forEach( ( format ) => {
 			let { id } = format.attributes;
 			id = id.replace( ANNOTATION_ATTRIBUTE_PREFIX, '' );
@@ -97,12 +98,17 @@ function retrieveAnnotationPositions( formats ) {
 /**
  * Updates annotations in the state based on positions retrieved from RichText.
  *
- * @param {Array}    annotations           The annotations that are currently applied.
- * @param {Array}    positions             The current positions of the given annotations.
- * @param {Function} removeAnnotation      Function to remove an annotation from the state.
- * @param {Function} updateAnnotationRange Function to update an annotation range in the state.
+ * @param {Array}    annotations                   The annotations that are currently applied.
+ * @param {Array}    positions                     The current positions of the given annotations.
+ * @param {Object}   actions
+ * @param {Function} actions.removeAnnotation      Function to remove an annotation from the state.
+ * @param {Function} actions.updateAnnotationRange Function to update an annotation range in the state.
  */
-function updateAnnotationsWithPositions( annotations, positions, { removeAnnotation, updateAnnotationRange } ) {
+function updateAnnotationsWithPositions(
+	annotations,
+	positions,
+	{ removeAnnotation, updateAnnotationRange }
+) {
 	annotations.forEach( ( currentAnnotation ) => {
 		const position = positions[ currentAnnotation.id ];
 		// If we cannot find an annotation, delete it.
@@ -115,44 +121,14 @@ function updateAnnotationsWithPositions( annotations, positions, { removeAnnotat
 
 		const { start, end } = currentAnnotation;
 		if ( start !== position.start || end !== position.end ) {
-			updateAnnotationRange( currentAnnotation.id, position.start, position.end );
+			updateAnnotationRange(
+				currentAnnotation.id,
+				position.start,
+				position.end
+			);
 		}
 	} );
 }
-
-/**
- * Create prepareEditableTree memoized based on the annotation props.
- *
- * @param {Object} The props with annotations in them.
- *
- * @return {Function} The prepareEditableTree.
- */
-const createPrepareEditableTree = memize( ( props ) => {
-	const { annotations } = props;
-
-	return ( formats, text ) => {
-		if ( annotations.length === 0 ) {
-			return formats;
-		}
-
-		let record = { formats, text };
-		record = applyAnnotations( record, annotations );
-		return record.formats;
-	};
-} );
-
-/**
- * Returns the annotations as a props object. Memoized to prevent re-renders.
- *
- * @param {Array} The annotations to put in the object.
- *
- * @return {Object} The annotations props object.
- */
-const getAnnotationObject = memize( ( annotations ) => {
-	return {
-		annotations,
-	};
-} );
 
 export const annotation = {
 	name: FORMAT_NAME,
@@ -166,22 +142,51 @@ export const annotation = {
 	edit() {
 		return null;
 	},
-	__experimentalGetPropsForEditableTreePreparation( select, { richTextIdentifier, blockClientId } ) {
-		return getAnnotationObject( select( STORE_KEY ).__experimentalGetAnnotationsForRichText( blockClientId, richTextIdentifier ) );
+	__experimentalGetPropsForEditableTreePreparation(
+		select,
+		{ richTextIdentifier, blockClientId }
+	) {
+		return {
+			annotations: select(
+				STORE_NAME
+			).__experimentalGetAnnotationsForRichText(
+				blockClientId,
+				richTextIdentifier
+			),
+		};
 	},
-	__experimentalCreatePrepareEditableTree: createPrepareEditableTree,
+	__experimentalCreatePrepareEditableTree( { annotations } ) {
+		return ( formats, text ) => {
+			if ( annotations.length === 0 ) {
+				return formats;
+			}
+
+			let record = { formats, text };
+			record = applyAnnotations( record, annotations );
+			return record.formats;
+		};
+	},
 	__experimentalGetPropsForEditableTreeChangeHandler( dispatch ) {
 		return {
-			removeAnnotation: dispatch( STORE_KEY ).__experimentalRemoveAnnotation,
-			updateAnnotationRange: dispatch( STORE_KEY ).__experimentalUpdateAnnotationRange,
+			removeAnnotation: dispatch( STORE_NAME )
+				.__experimentalRemoveAnnotation,
+			updateAnnotationRange: dispatch( STORE_NAME )
+				.__experimentalUpdateAnnotationRange,
 		};
 	},
 	__experimentalCreateOnChangeEditableValue( props ) {
 		return ( formats ) => {
 			const positions = retrieveAnnotationPositions( formats );
-			const { removeAnnotation, updateAnnotationRange, annotations } = props;
+			const {
+				removeAnnotation,
+				updateAnnotationRange,
+				annotations,
+			} = props;
 
-			updateAnnotationsWithPositions( annotations, positions, { removeAnnotation, updateAnnotationRange } );
+			updateAnnotationsWithPositions( annotations, positions, {
+				removeAnnotation,
+				updateAnnotationRange,
+			} );
 		};
 	},
 };

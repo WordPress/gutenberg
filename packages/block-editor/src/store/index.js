@@ -1,29 +1,45 @@
 /**
  * WordPress dependencies
  */
-import { registerStore } from '@wordpress/data';
+import { createReduxStore, registerStore } from '@wordpress/data';
 
 /**
  * Internal dependencies
  */
 import reducer from './reducer';
-import applyMiddlewares from './middlewares';
 import * as selectors from './selectors';
 import * as actions from './actions';
 import controls from './controls';
+import { STORE_NAME } from './constants';
 
 /**
- * Module Constants
+ * Block editor data store configuration.
+ *
+ * @see https://github.com/WordPress/gutenberg/blob/HEAD/packages/data/README.md#registerStore
+ *
+ * @type {Object}
  */
-const MODULE_KEY = 'core/block-editor';
-
-const store = registerStore( MODULE_KEY, {
+export const storeConfig = {
 	reducer,
 	selectors,
 	actions,
 	controls,
+};
+
+/**
+ * Store definition for the block editor namespace.
+ *
+ * @see https://github.com/WordPress/gutenberg/blob/HEAD/packages/data/README.md#createReduxStore
+ *
+ * @type {Object}
+ */
+export const store = createReduxStore( STORE_NAME, {
+	...storeConfig,
 	persist: [ 'preferences' ],
 } );
-applyMiddlewares( store );
 
-export default store;
+// Ideally we'd use register instead of register stores.
+registerStore( STORE_NAME, {
+	...storeConfig,
+	persist: [ 'preferences' ],
+} );

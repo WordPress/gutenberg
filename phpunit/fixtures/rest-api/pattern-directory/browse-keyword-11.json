@@ -1,0 +1,50 @@
+[
+	{
+		"id": 31,
+		"title": { "rendered": "Heading and paragraph" },
+		"content": {
+			"rendered": "\n<div class=\"wp-block-group\"><div class=\"wp-block-group__inner-container\">\n<h2 class=\"has-large-font-size\"><span style=\"color:#ba0c49\" class=\"has-inline-color\"><strong>2</strong>.</span><br>Which treats of the first sally the ingenious Don Quixote made from home</h2>\n\n\n\n<p>These preliminaries settled, he did not care to put off any longer the execution of his design, urged on to it by the thought of all the world was losing by his delay, seeing what wrongs he intended to right, grievances to redress, injustices to repair, abuses to remove, and duties to discharge.</p>\n</div></div>\n",
+			"protected": false
+		},
+		"meta": {
+			"spay_email": "",
+			"wpop_description": "A heading preceded by a chapter number, and followed by a paragraph.",
+			"wpop_viewport_width": 1000
+		},
+		"category_slugs": [ "text" ],
+		"keyword_slugs": [ "core" ],
+		"pattern_content": "<!-- wp:group -->\n<div class=\"wp-block-group\"><div class=\"wp-block-group__inner-container\"><!-- wp:heading {\"fontSize\":\"large\"} -->\n<h2 class=\"has-large-font-size\"><span style=\"color:#ba0c49\" class=\"has-inline-color\"><strong>2</strong>.</span><br>Which treats of the first sally the ingenious Don Quixote made from home</h2>\n<!-- /wp:heading -->\n\n<!-- wp:paragraph -->\n<p>These preliminaries settled, he did not care to put off any longer the execution of his design, urged on to it by the thought of all the world was losing by his delay, seeing what wrongs he intended to right, grievances to redress, injustices to repair, abuses to remove, and duties to discharge.</p>\n<!-- /wp:paragraph --></div></div>\n<!-- /wp:group -->"
+	},
+	{
+		"id": 25,
+		"title": { "rendered": "Large header with a heading" },
+		"content": {
+			"rendered": "\n<div class=\"wp-block-cover alignwide has-background-dim-20 has-background-dim is-position-center-center\" style=\"background-image:url(https://s.w.org/images/core/5.5/don-quixote-06.jpg);min-height:375px;background-position:40% 26%\"><div class=\"wp-block-cover__inner-container\">\n<p class=\"has-text-align-center has-text-color\" style=\"color:#fffffa;font-size:74px;line-height:1.1\"><strong>Don Quixote</strong></p>\n</div></div>\n",
+			"protected": false
+		},
+		"meta": {
+			"spay_email": "",
+			"wpop_description": "A large hero section with an example background image and a heading in the center.",
+			"wpop_viewport_width": 1000
+		},
+		"category_slugs": [ "header" ],
+		"keyword_slugs": [ "core" ],
+		"pattern_content": "<!-- wp:cover {\"url\":\"https:\\/\\/s.w.org\\/images\\/core\\/5.5\\/don-quixote-06.jpg\",\"id\":165,\"dimRatio\":15,\"focalPoint\":{\"x\":\"0.40\",\"y\":\"0.26\"},\"minHeight\":375,\"minHeightUnit\":\"px\",\"contentPosition\":\"center center\",\"align\":\"wide\",\"className\":\"is-position-center-center\"} -->\n<div class=\"wp-block-cover alignwide has-background-dim-20 has-background-dim is-position-center-center\" style=\"background-image:url(https://s.w.org/images/core/5.5/don-quixote-06.jpg);min-height:375px;background-position:40% 26%\"><div class=\"wp-block-cover__inner-container\"><!-- wp:paragraph {\"align\":\"center\",\"placeholder\":\"Write title\\u2026\",\"style\":{\"typography\":{\"fontSize\":74,\"lineHeight\":\"1.1\"},\"color\":{\"text\":\"#fffffa\"}}} -->\n<p class=\"has-text-align-center has-text-color\" style=\"color:#fffffa;font-size:74px;line-height:1.1\"><strong>Don Quixote</strong></p>\n<!-- /wp:paragraph --></div></div>\n<!-- /wp:cover -->"
+	},
+	{
+		"id": 26,
+		"title": { "rendered": "Large header with a heading and a button" },
+		"content": {
+			"rendered": "\n<div class=\"wp-block-cover alignwide has-background-dim has-background-gradient is-position-center-center\" style=\"background:linear-gradient(135deg,rgb(249,72,72) 1%,rgb(179,22,22) 100%);min-height:575px\"><div class=\"wp-block-cover__inner-container\">\n<div class=\"wp-block-columns alignwide\">\n<div class=\"wp-block-column\" style=\"flex-basis:12%\">\n<div style=\"height:100px\" aria-hidden=\"true\" class=\"wp-block-spacer\"></div>\n</div>\n\n\n\n<div class=\"wp-block-column\">\n<div style=\"height:100px\" aria-hidden=\"true\" class=\"wp-block-spacer\"></div>\n\n\n\n<p class=\"has-text-align-left has-text-color\" style=\"color:#fffffa;font-size:68px;line-height:1.2\"><strong>Thou hast seen</strong><br><strong>nothing yet</strong></p>\n\n\n\n<div class=\"wp-block-buttons\">\n<div class=\"wp-block-button\"><a class=\"wp-block-button__link has-text-color has-background\" style=\"border-radius:3px;background-color:#fffffa;color:#00000a\">Read now</a></div>\n</div>\n\n\n\n<div style=\"height:100px\" aria-hidden=\"true\" class=\"wp-block-spacer\"></div>\n</div>\n\n\n\n<div class=\"wp-block-column\" style=\"flex-basis:12%\">\n<div style=\"height:100px\" aria-hidden=\"true\" class=\"wp-block-spacer\"></div>\n</div>\n</div>\n</div></div>\n",
+			"protected": false
+		},
+		"meta": {
+			"spay_email": "",
+			"wpop_description": "A large hero section with a bright gradient background, a big heading and a filled button.",
+			"wpop_viewport_width": 1000
+		},
+		"category_slugs": [ "header" ],
+		"keyword_slugs": [ "core" ],
+		"pattern_content": "<!-- wp:cover {\"minHeight\":575,\"minHeightUnit\":\"px\",\"customGradient\":\"linear-gradient(135deg,rgb(249,72,72) 1%,rgb(179,22,22) 100%)\",\"contentPosition\":\"center center\",\"align\":\"wide\",\"className\":\"is-position-center-center\"} -->\n<div class=\"wp-block-cover alignwide has-background-dim has-background-gradient is-position-center-center\" style=\"background:linear-gradient(135deg,rgb(249,72,72) 1%,rgb(179,22,22) 100%);min-height:575px\"><div class=\"wp-block-cover__inner-container\"><!-- wp:columns {\"align\":\"wide\"} -->\n<div class=\"wp-block-columns alignwide\"><!-- wp:column {\"width\":\"12%\"} -->\n<div class=\"wp-block-column\" style=\"flex-basis:12%\"><!-- wp:spacer -->\n<div style=\"height:100px\" aria-hidden=\"true\" class=\"wp-block-spacer\"></div>\n<!-- /wp:spacer --></div>\n<!-- /wp:column -->\n\n<!-- wp:column -->\n<div class=\"wp-block-column\"><!-- wp:spacer -->\n<div style=\"height:100px\" aria-hidden=\"true\" class=\"wp-block-spacer\"></div>\n<!-- /wp:spacer -->\n\n<!-- wp:paragraph {\"align\":\"left\",\"placeholder\":\"Write title\\u2026\",\"style\":{\"typography\":{\"fontSize\":68,\"lineHeight\":\"1.2\"},\"color\":{\"text\":\"#fffffa\"}}} -->\n<p class=\"has-text-align-left has-text-color\" style=\"color:#fffffa;font-size:68px;line-height:1.2\"><strong>Thou hast seen</strong><br><strong>nothing yet</strong></p>\n<!-- /wp:paragraph -->\n\n<!-- wp:buttons -->\n<div class=\"wp-block-buttons\"><!-- wp:button {\"borderRadius\":3,\"style\":{\"color\":{\"background\":\"#fffffa\",\"text\":\"#00000a\"}}} -->\n<div class=\"wp-block-button\"><a class=\"wp-block-button__link has-text-color has-background\" style=\"border-radius:3px;background-color:#fffffa;color:#00000a\">Read now</a></div>\n<!-- /wp:button --></div>\n<!-- /wp:buttons -->\n\n<!-- wp:spacer -->\n<div style=\"height:100px\" aria-hidden=\"true\" class=\"wp-block-spacer\"></div>\n<!-- /wp:spacer --></div>\n<!-- /wp:column -->\n\n<!-- wp:column {\"width\":\"12%\"} -->\n<div class=\"wp-block-column\" style=\"flex-basis:12%\"><!-- wp:spacer -->\n<div style=\"height:100px\" aria-hidden=\"true\" class=\"wp-block-spacer\"></div>\n<!-- /wp:spacer --></div>\n<!-- /wp:column --></div>\n<!-- /wp:columns --></div></div>\n<!-- /wp:cover -->"
+	}
+]

@@ -4,18 +4,19 @@
 
 import { replace } from './replace';
 
+/** @typedef {import('./create').RichTextValue} RichTextValue */
+
 /**
  * Split a Rich Text value in two at the given `startIndex` and `endIndex`, or
  * split at the given separator. This is similar to `String.prototype.split`.
  * Indices are retrieved from the selection if none are provided.
  *
- * @param {Object}        value   Value to modify.
- * @param {number|string} string  Start index, or string at which to split.
- * @param {number}        end     End index.
+ * @param {RichTextValue} value
+ * @param {number|string} [string] Start index, or string at which to split.
  *
- * @return {Array} An array of new values.
+ * @return {Array<RichTextValue>|undefined} An array of new values.
  */
-export function split( { formats, text, start, end }, string ) {
+export function split( { formats, replacements, text, start, end }, string ) {
 	if ( typeof string !== 'string' ) {
 		return splitAtSelection( ...arguments );
 	}
@@ -26,6 +27,10 @@ export function split( { formats, text, start, end }, string ) {
 		const startIndex = nextStart;
 		const value = {
 			formats: formats.slice( startIndex, startIndex + substring.length ),
+			replacements: replacements.slice(
+				startIndex,
+				startIndex + substring.length
+			),
 			text: substring,
 		};
 
@@ -50,16 +55,22 @@ export function split( { formats, text, start, end }, string ) {
 }
 
 function splitAtSelection(
-	{ formats, text, start, end },
+	{ formats, replacements, text, start, end },
 	startIndex = start,
 	endIndex = end
 ) {
+	if ( start === undefined || end === undefined ) {
+		return;
+	}
+
 	const before = {
 		formats: formats.slice( 0, startIndex ),
+		replacements: replacements.slice( 0, startIndex ),
 		text: text.slice( 0, startIndex ),
 	};
 	const after = {
 		formats: formats.slice( endIndex ),
+		replacements: replacements.slice( endIndex ),
 		text: text.slice( endIndex ),
 		start: 0,
 		end: 0,

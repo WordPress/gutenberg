@@ -3,9 +3,11 @@
  */
 
 import { LINE_SEPARATOR } from './special-characters';
-import { normaliseFormats } from './normalise-formats';
 import { getLineIndex } from './get-line-index';
 import { getParentLineIndex } from './get-parent-line-index';
+
+/** @typedef {import('./create').RichTextValue} RichTextValue */
+/** @typedef {import('./create').RichTextFormat} RichTextFormat */
 
 /**
  * Changes the list type of the selected indented list, if any. Looks at the
@@ -13,19 +15,19 @@ import { getParentLineIndex } from './get-parent-line-index';
  * type of this list. When multiple lines are selected, the parent lists are
  * takes and changed.
  *
- * @param {Object} value     Value to change.
- * @param {Object} newFormat The new list format object. Choose between
- *                           `{ type: 'ol' }` and `{ type: 'ul' }`.
+ * @param {RichTextValue}  value     Value to change.
+ * @param {RichTextFormat} newFormat The new list format object. Choose between
+ *                                   `{ type: 'ol' }` and `{ type: 'ul' }`.
  *
- * @return {Object} The changed value.
+ * @return {RichTextValue} The changed value.
  */
 export function changeListType( value, newFormat ) {
-	const { text, formats, start, end } = value;
+	const { text, replacements, start, end } = value;
 	const startingLineIndex = getLineIndex( value, start );
-	const startLineFormats = formats[ startingLineIndex ] || [];
-	const endLineFormats = formats[ getLineIndex( value, end ) ] || [];
+	const startLineFormats = replacements[ startingLineIndex ] || [];
+	const endLineFormats = replacements[ getLineIndex( value, end ) ] || [];
 	const startIndex = getParentLineIndex( value, startingLineIndex );
-	const newFormats = formats.slice( 0 );
+	const newReplacements = replacements.slice();
 	const startCount = startLineFormats.length - 1;
 	const endCount = endLineFormats.length - 1;
 
@@ -36,28 +38,28 @@ export function changeListType( value, newFormat ) {
 			continue;
 		}
 
-		if ( ( newFormats[ index ] || [] ).length <= startCount ) {
+		if ( ( newReplacements[ index ] || [] ).length <= startCount ) {
 			break;
 		}
 
-		if ( ! newFormats[ index ] ) {
+		if ( ! newReplacements[ index ] ) {
 			continue;
 		}
 
 		changed = true;
-		newFormats[ index ] = newFormats[ index ].map( ( format, i ) => {
-			return i < startCount || i > endCount ? format : newFormat;
-		} );
+		newReplacements[ index ] = newReplacements[ index ].map(
+			( format, i ) => {
+				return i < startCount || i > endCount ? format : newFormat;
+			}
+		);
 	}
 
 	if ( ! changed ) {
 		return value;
 	}
 
-	return normaliseFormats( {
-		text,
-		formats: newFormats,
-		start,
-		end,
-	} );
+	return {
+		...value,
+		replacements: newReplacements,
+	};
 }

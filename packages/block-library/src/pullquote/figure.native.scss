@@ -1,0 +1,16 @@
+%shared {
+	border-width: 3px 0;
+	padding: 21px 16px;
+}
+
+.light {
+	@extend %shared;
+	border-top-color: $gray-lighten-20;
+	border-bottom-color: $gray-lighten-20;
+}
+
+.dark {
+	@extend %shared;
+	border-top-color: $gray-50;
+	border-bottom-color: $gray-50;
+}

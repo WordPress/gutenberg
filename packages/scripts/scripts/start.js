@@ -7,25 +7,25 @@ const { sync: resolveBin } = require( 'resolve-bin' );
 /**
  * Internal dependencies
  */
-const {
-	getCliArgs,
-	hasCliArg,
-	hasProjectFile,
-} = require( '../utils' );
+const { getArgFromCLI, getWebpackArgs, hasArgInCLI } = require( '../utils' );
 
-const hasWebpackConfig = hasCliArg( '--config' ) ||
-	hasProjectFile( 'webpack.config.js' ) ||
-	hasProjectFile( 'webpack.config.babel.js' );
-
-if ( hasWebpackConfig ) {
-	const { status } = spawn(
-		resolveBin( 'webpack' ),
-		[ '--watch', ...getCliArgs() ],
-		{ stdio: 'inherit' }
-	);
-	process.exit( status );
-} else {
-	// eslint-disable-next-line no-console
-	console.log( 'Webpack config file is missing.' );
-	process.exit( 1 );
+if ( hasArgInCLI( '--webpack-no-externals' ) ) {
+	process.env.WP_NO_EXTERNALS = true;
 }
+
+if ( hasArgInCLI( '--webpack-bundle-analyzer' ) ) {
+	process.env.WP_BUNDLE_ANALYZER = true;
+}
+
+if ( hasArgInCLI( '--webpack--devtool' ) ) {
+	process.env.WP_DEVTOOL = getArgFromCLI( '--webpack--devtool' );
+}
+
+const { status } = spawn(
+	resolveBin( 'webpack' ),
+	[ ...getWebpackArgs(), '--watch' ],
+	{
+		stdio: 'inherit',
+	}
+);
+process.exit( status );

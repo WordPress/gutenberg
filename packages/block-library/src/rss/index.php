@@ -20,10 +20,6 @@ function render_block_core_rss( $attributes ) {
 	}
 
 	if ( ! $rss->get_item_quantity() ) {
-		// PHP 5.2 compatibility. See: http://simplepie.org/wiki/faq/i_m_getting_memory_leaks.
-		$rss->__destruct();
-		unset( $rss );
-
 		return '<div class="components-placeholder"><div class="notice notice-error">' . __( 'An error has occurred, which probably means the feed is down. Try again later.' ) . '</div></div>';
 	}
 
@@ -32,7 +28,7 @@ function render_block_core_rss( $attributes ) {
 	foreach ( $rss_items as $item ) {
 		$title = esc_html( trim( strip_tags( $item->get_title() ) ) );
 		if ( empty( $title ) ) {
-			$title = __( '(Untitled)' );
+			$title = __( '(no title)' );
 		}
 		$link = $item->get_link();
 		$link = esc_url( $link );
@@ -59,7 +55,11 @@ function render_block_core_rss( $attributes ) {
 			$author = $item->get_author();
 			if ( is_object( $author ) ) {
 				$author = $author->get_name();
-				$author = '<span class="wp-block-rss__item-author">' . __( 'by' ) . ' ' . esc_html( strip_tags( $author ) ) . '</span>';
+				$author = '<span class="wp-block-rss__item-author">' . sprintf(
+					/* translators: %s: the author. */
+					__( 'by %s' ),
+					esc_html( strip_tags( $author ) )
+				) . '</span>';
 			}
 		}
 
@@ -69,7 +69,7 @@ function render_block_core_rss( $attributes ) {
 			$excerpt = esc_attr( wp_trim_words( $excerpt, $attributes['excerptLength'], ' [&hellip;]' ) );
 
 			// Change existing [...] to [&hellip;].
-			if ( '[...]' == substr( $excerpt, -5 ) ) {
+			if ( '[...]' === substr( $excerpt, -5 ) ) {
 				$excerpt = substr( $excerpt, 0, -5 ) . '[&hellip;]';
 			}
 
@@ -79,59 +79,28 @@ function render_block_core_rss( $attributes ) {
 		$list_items .= "<li class='wp-block-rss__item'>{$title}{$date}{$author}{$excerpt}</li>";
 	}
 
-	$classes           = 'grid' === $attributes['blockLayout'] ? ' is-grid columns-' . $attributes['columns'] : '';
-	$list_items_markup = "<ul class='wp-block-rss{$classes}'>{$list_items}</ul>";
+	$classnames = array();
+	if ( isset( $attributes['blockLayout'] ) && 'grid' === $attributes['blockLayout'] ) {
+		$classnames[] = 'is-grid';
+	}
 
-	// PHP 5.2 compatibility. See: http://simplepie.org/wiki/faq/i_m_getting_memory_leaks.
-	$rss->__destruct();
-	unset( $rss );
+	if ( isset( $attributes['columns'] ) && 'grid' === $attributes['blockLayout'] ) {
+		$classnames[] = 'columns-' . $attributes['columns'];
+	}
+	$wrapper_attributes = get_block_wrapper_attributes( array( 'class' => implode( ' ', $classnames ) ) );
 
-	return $list_items_markup;
+	return sprintf( '<ul %s>%s</ul>', $wrapper_attributes, $list_items );
 }
 
 /**
  * Registers the `core/rss` block on server.
  */
 function register_block_core_rss() {
-	register_block_type( 'core/rss',
+	register_block_type_from_metadata(
+		__DIR__ . '/rss',
 		array(
-			'attributes'      => array(
-				'columns'        => array(
-					'type'    => 'number',
-					'default' => 2,
-				),
-				'blockLayout'    => array(
-					'type'    => 'string',
-					'default' => 'list',
-				),
-				'feedURL'        => array(
-					'type'    => 'string',
-					'default' => '',
-				),
-				'itemsToShow'    => array(
-					'type'    => 'number',
-					'default' => 5,
-				),
-				'displayExcerpt' => array(
-					'type'    => 'boolean',
-					'default' => false,
-				),
-				'displayAuthor'  => array(
-					'type'    => 'boolean',
-					'default' => false,
-				),
-				'displayDate'    => array(
-					'type'    => 'boolean',
-					'default' => false,
-				),
-				'excerptLength'  => array(
-					'type'    => 'number',
-					'default' => 55,
-				),
-			),
 			'render_callback' => 'render_block_core_rss',
 		)
 	);
 }
-
 add_action( 'init', 'register_block_core_rss' );

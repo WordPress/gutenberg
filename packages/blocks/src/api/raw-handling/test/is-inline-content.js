@@ -12,7 +12,9 @@ describe( 'isInlineContent', () => {
 
 	it( 'should not be inline content', () => {
 		expect( isInlineContent( '<div>test</div>' ) ).toBe( false );
-		expect( isInlineContent( '<em>test</em><div>test</div>' ) ).toBe( false );
+		expect( isInlineContent( '<em>test</em><div>test</div>' ) ).toBe(
+			false
+		);
 		expect( isInlineContent( 'test<br><br>test' ) ).toBe( false );
 		expect( isInlineContent( '<em><div>test</div></em>' ) ).toBe( false );
 		expect( isInlineContent( '<li>test</li>', 'p' ) ).toBe( false );

@@ -53,6 +53,26 @@ describe( 'selectors', () => {
 	} );
 
 	describe( 'isTipVisible', () => {
+		it( 'is tolerant to individual preferences being undefined', () => {
+			// See: https://github.com/WordPress/gutenberg/issues/14580
+			const state = {
+				guides: [],
+				preferences: {},
+			};
+			expect( isTipVisible( state, 'test/tip' ) ).toBe( false );
+		} );
+
+		it( 'is tolerant to undefined dismissedTips', () => {
+			// See: https://github.com/WordPress/gutenberg/issues/14580
+			const state = {
+				guides: [],
+				preferences: {
+					areTipsEnabled: true,
+				},
+			};
+			expect( isTipVisible( state, 'test/tip' ) ).toBe( true );
+		} );
+
 		it( 'should return true by default', () => {
 			const state = {
 				guides: [],
@@ -90,9 +110,7 @@ describe( 'selectors', () => {
 
 		it( 'should return false if the tip is in a guide and it is not the current tip', () => {
 			const state = {
-				guides: [
-					[ 'test/tip-1', 'test/tip-2', 'test/tip-3' ],
-				],
+				guides: [ [ 'test/tip-1', 'test/tip-2', 'test/tip-3' ] ],
 				preferences: {
 					areTipsEnabled: true,
 					dismissedTips: {},

@@ -1,0 +1,24 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Preformatted should preserve character newlines 1`] = `
+"<!-- wp:html -->
+<pre>1
+2</pre>
+<!-- /wp:html -->"
+`;
+
+exports[`Preformatted should preserve character newlines 2`] = `
+"<!-- wp:preformatted -->
+<pre class=\\"wp-block-preformatted\\">0
+1
+2</pre>
+<!-- /wp:preformatted -->"
+`;
+
+exports[`Preformatted should preserve white space when merging 1`] = `
+"<!-- wp:preformatted -->
+<pre class=\\"wp-block-preformatted\\">1
+2
+3</pre>
+<!-- /wp:preformatted -->"
+`;

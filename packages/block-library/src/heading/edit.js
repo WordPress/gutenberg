@@ -1,69 +1,91 @@
 /**
- * Internal dependencies
+ * External dependencies
  */
-import HeadingToolbar from './heading-toolbar';
+import classnames from 'classnames';
 
 /**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { Fragment } from '@wordpress/element';
-import { PanelBody } from '@wordpress/components';
 import { createBlock } from '@wordpress/blocks';
-import { RichText, BlockControls, InspectorControls, AlignmentToolbar } from '@wordpress/editor';
+import {
+	AlignmentControl,
+	BlockControls,
+	RichText,
+	useBlockProps,
+} from '@wordpress/block-editor';
 
-export default function HeadingEdit( {
+/**
+ * Internal dependencies
+ */
+import HeadingLevelDropdown from './heading-level-dropdown';
+
+function HeadingEdit( {
 	attributes,
 	setAttributes,
 	mergeBlocks,
-	insertBlocksAfter,
 	onReplace,
-	className,
+	style,
+	clientId,
 } ) {
-	const { align, content, level, placeholder } = attributes;
+	const { textAlign, content, level, placeholder } = attributes;
 	const tagName = 'h' + level;
+	const blockProps = useBlockProps( {
+		className: classnames( {
+			[ `has-text-align-${ textAlign }` ]: textAlign,
+		} ),
+		style,
+	} );
 
 	return (
-		<Fragment>
-			<BlockControls>
-				<HeadingToolbar minLevel={ 2 } maxLevel={ 5 } selectedLevel={ level } onChange={ ( newLevel ) => setAttributes( { level: newLevel } ) } />
+		<>
+			<BlockControls group="block">
+				<HeadingLevelDropdown
+					selectedLevel={ level }
+					onChange={ ( newLevel ) =>
+						setAttributes( { level: newLevel } )
+					}
+				/>
+				<AlignmentControl
+					value={ textAlign }
+					onChange={ ( nextAlign ) => {
+						setAttributes( { textAlign: nextAlign } );
+					} }
+				/>
 			</BlockControls>
-			<InspectorControls>
-				<PanelBody title={ __( 'Heading Settings' ) }>
-					<p>{ __( 'Level' ) }</p>
-					<HeadingToolbar minLevel={ 1 } maxLevel={ 7 } selectedLevel={ level } onChange={ ( newLevel ) => setAttributes( { level: newLevel } ) } />
-					<p>{ __( 'Text Alignment' ) }</p>
-					<AlignmentToolbar
-						value={ align }
-						onChange={ ( nextAlign ) => {
-							setAttributes( { align: nextAlign } );
-						} }
-					/>
-				</PanelBody>
-			</InspectorControls>
 			<RichText
 				identifier="content"
-				wrapperClassName="wp-block-heading"
 				tagName={ tagName }
 				value={ content }
 				onChange={ ( value ) => setAttributes( { content: value } ) }
 				onMerge={ mergeBlocks }
-				unstableOnSplit={
-					insertBlocksAfter ?
-						( before, after, ...blocks ) => {
-							setAttributes( { content: before } );
-							insertBlocksAfter( [
-								...blocks,
-								createBlock( 'core/paragraph', { content: after } ),
-							] );
-						} :
-						undefined
-				}
+				onSplit={ ( value, isOriginal ) => {
+					let block;
+
+					if ( isOriginal || value ) {
+						block = createBlock( 'core/heading', {
+							...attributes,
+							content: value,
+						} );
+					} else {
+						block = createBlock( 'core/paragraph' );
+					}
+
+					if ( isOriginal ) {
+						block.clientId = clientId;
+					}
+
+					return block;
+				} }
+				onReplace={ onReplace }
 				onRemove={ () => onReplace( [] ) }
-				style={ { textAlign: align } }
-				className={ className }
-				placeholder={ placeholder || __( 'Write heading…' ) }
+				aria-label={ __( 'Heading text' ) }
+				placeholder={ placeholder || __( 'Heading' ) }
+				textAlign={ textAlign }
+				{ ...blockProps }
 			/>
-		</Fragment>
+		</>
 	);
 }
+
+export default HeadingEdit;

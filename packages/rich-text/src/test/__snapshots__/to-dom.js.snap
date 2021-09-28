@@ -36,6 +36,7 @@ exports[`recordToDom should create a value with formatting with attributes 1`] =
 
 exports[`recordToDom should create a value with image object 1`] = `
 <body>
+  
   <img
     src=""
   />
@@ -45,7 +46,10 @@ exports[`recordToDom should create a value with image object 1`] = `
 
 exports[`recordToDom should create a value with image object and formatting 1`] = `
 <body>
-  <em>
+  <em
+    data-rich-text-format-boundary="true"
+  >
+    
     <img
       src=""
     />
@@ -57,7 +61,10 @@ exports[`recordToDom should create a value with image object and formatting 1`] 
 
 exports[`recordToDom should create a value with image object and text after 1`] = `
 <body>
-  <em>
+  <em
+    data-rich-text-format-boundary="true"
+  >
+    
     <img
       src=""
     />
@@ -103,18 +110,34 @@ exports[`recordToDom should create a value without formatting 1`] = `
 exports[`recordToDom should create an empty value 1`] = `
 <body>
   
-  <br
-    data-rich-text-padding="true"
-  />
+  ﻿
 </body>
 `;
 
 exports[`recordToDom should create an empty value from empty tags 1`] = `
 <body>
   
-  <br
-    data-rich-text-padding="true"
+  ﻿
+</body>
+`;
+
+exports[`recordToDom should disarm on* attribute 1`] = `
+<body>
+  
+  <img
+    data-disable-rich-text-onerror="alert('1')"
   />
+  
+</body>
+`;
+
+exports[`recordToDom should disarm script 1`] = `
+<body>
+  
+  <script
+    data-rich-text-script="alert(%221%22)"
+  />
+  
 </body>
 `;
 
@@ -132,8 +155,11 @@ exports[`recordToDom should filter format boundary attributes 1`] = `
 exports[`recordToDom should handle br 1`] = `
 <body>
   
-  <br />
+  <br
+    data-rich-text-line-break="true"
+  />
   
+  ﻿
 </body>
 `;
 
@@ -143,17 +169,22 @@ exports[`recordToDom should handle br with formatting 1`] = `
     data-rich-text-format-boundary="true"
   >
     
-    <br />
+    <br
+      data-rich-text-line-break="true"
+    />
     
   </em>
   
+  ﻿
 </body>
 `;
 
 exports[`recordToDom should handle br with text 1`] = `
 <body>
   te
-  <br />
+  <br
+    data-rich-text-line-break="true"
+  />
   st
 </body>
 `;
@@ -161,9 +192,13 @@ exports[`recordToDom should handle br with text 1`] = `
 exports[`recordToDom should handle double br 1`] = `
 <body>
   a
-  <br />
+  <br
+    data-rich-text-line-break="true"
+  />
   
-  <br />
+  <br
+    data-rich-text-line-break="true"
+  />
   b
 </body>
 `;
@@ -172,9 +207,7 @@ exports[`recordToDom should handle empty list value 1`] = `
 <body>
   <li>
     
-    <br
-      data-rich-text-padding="true"
-    />
+    ﻿
   </li>
 </body>
 `;
@@ -183,9 +216,7 @@ exports[`recordToDom should handle empty multiline value 1`] = `
 <body>
   <p>
     
-    <br
-      data-rich-text-padding="true"
-    />
+    ﻿
   </p>
 </body>
 `;
@@ -194,21 +225,15 @@ exports[`recordToDom should handle middle empty list value 1`] = `
 <body>
   <li>
     
-    <br
-      data-rich-text-padding="true"
-    />
+    ﻿
   </li>
   <li>
     
-    <br
-      data-rich-text-padding="true"
-    />
+    ﻿
   </li>
   <li>
     
-    <br
-      data-rich-text-padding="true"
-    />
+    ﻿
   </li>
 </body>
 `;
@@ -266,9 +291,7 @@ exports[`recordToDom should handle multiline value with empty 1`] = `
   </p>
   <p>
     
-    <br
-      data-rich-text-padding="true"
-    />
+    ﻿
   </p>
 </body>
 `;
@@ -276,15 +299,12 @@ exports[`recordToDom should handle multiline value with empty 1`] = `
 exports[`recordToDom should handle nested empty list value 1`] = `
 <body>
   <li>
-    <br
-      data-rich-text-padding="true"
-    />
+    
+    ﻿
     <ul>
       <li>
         
-        <br
-          data-rich-text-padding="true"
-        />
+        ﻿
       </li>
     </ul>
   </li>
@@ -294,9 +314,13 @@ exports[`recordToDom should handle nested empty list value 1`] = `
 exports[`recordToDom should handle selection before br 1`] = `
 <body>
   a
-  <br />
+  <br
+    data-rich-text-line-break="true"
+  />
   
-  <br />
+  <br
+    data-rich-text-line-break="true"
+  />
   b
 </body>
 `;
@@ -314,6 +338,63 @@ exports[`recordToDom should ignore formats at line separator 1`] = `
     </em>
     
   </p>
+</body>
+`;
+
+exports[`recordToDom should ignore manually added object replacement character 1`] = `
+<body>
+  test
+</body>
+`;
+
+exports[`recordToDom should ignore manually added object replacement character with formatting 1`] = `
+<body>
+  <em
+    data-rich-text-format-boundary="true"
+  >
+    hi
+  </em>
+  
+</body>
+`;
+
+exports[`recordToDom should not error with overlapping formats (1) 1`] = `
+<body>
+  <a
+    href="#"
+  >
+    <em>
+      1
+    </em>
+    <strong
+      data-rich-text-format-boundary="true"
+    >
+      2
+    </strong>
+  </a>
+  
+</body>
+`;
+
+exports[`recordToDom should not error with overlapping formats (2) 1`] = `
+<body>
+  <em>
+    <a
+      data-rich-text-format-boundary="true"
+      href="#"
+    >
+      1
+    </a>
+  </em>
+  <strong>
+    <a
+      data-rich-text-format-boundary="true"
+      href="#"
+    >
+      2
+    </a>
+  </strong>
+  
 </body>
 `;
 
@@ -343,9 +424,7 @@ exports[`recordToDom should preserve non breaking space 1`] = `
 exports[`recordToDom should remove padding 1`] = `
 <body>
   
-  <br
-    data-rich-text-padding="true"
-  />
+  ﻿
 </body>
 `;
 

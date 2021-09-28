@@ -1,23 +1,41 @@
+/** @typedef {import('./create').RichTextValue} RichTextValue */
+/** @typedef {import('./create').RichTextFormatList} RichTextFormatList */
+
 /**
  * Gets the all format objects at the start of the selection.
  *
- * @param {Object} value Value to inspect.
+ * @param {RichTextValue} value                Value to inspect.
+ * @param {Array}         EMPTY_ACTIVE_FORMATS Array to return if there are no
+ *                                             active formats.
  *
- * @return {?Object} Active format objects.
+ * @return {RichTextFormatList} Active format objects.
  */
-export function getActiveFormats( { formats, start, selectedFormat } ) {
+export function getActiveFormats(
+	{ formats, start, end, activeFormats },
+	EMPTY_ACTIVE_FORMATS = []
+) {
 	if ( start === undefined ) {
-		return [];
+		return EMPTY_ACTIVE_FORMATS;
 	}
 
-	const formatsBefore = formats[ start - 1 ] || [];
-	const formatsAfter = formats[ start ] || [];
+	if ( start === end ) {
+		// For a collapsed caret, it is possible to override the active formats.
+		if ( activeFormats ) {
+			return activeFormats;
+		}
 
-	let source = formatsAfter;
+		const formatsBefore = formats[ start - 1 ] || EMPTY_ACTIVE_FORMATS;
+		const formatsAfter = formats[ start ] || EMPTY_ACTIVE_FORMATS;
 
-	if ( formatsBefore.length > formatsAfter.length ) {
-		source = formatsBefore;
+		// By default, select the lowest amount of formats possible (which means
+		// the caret is positioned outside the format boundary). The user can
+		// then use arrow keys to define `activeFormats`.
+		if ( formatsBefore.length < formatsAfter.length ) {
+			return formatsBefore;
+		}
+
+		return formatsAfter;
 	}
 
-	return source.slice( 0, selectedFormat );
+	return formats[ start ] || EMPTY_ACTIVE_FORMATS;
 }

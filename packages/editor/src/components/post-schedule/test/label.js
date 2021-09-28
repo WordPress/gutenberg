@@ -16,13 +16,17 @@ describe( 'PostScheduleLabel', () => {
 
 	it( 'should show the post will be published immediately if it has a floating date', () => {
 		const date = '2018-09-17T01:23:45.678Z';
-		const wrapper = shallow( <PostScheduleLabel date={ date } isFloating={ true } /> );
+		const wrapper = shallow(
+			<PostScheduleLabel date={ date } isFloating={ true } />
+		);
 		expect( wrapper.text() ).toBe( 'Immediately' );
 	} );
 
 	it( 'should show the scheduled publish date if a date has been set', () => {
 		const date = '2018-09-17T01:23:45.678Z';
-		const wrapper = shallow( <PostScheduleLabel date={ date } isFloating={ false } /> );
+		const wrapper = shallow(
+			<PostScheduleLabel date={ date } isFloating={ false } />
+		);
 		expect( wrapper.text() ).not.toBe( 'Immediately' );
 	} );
 } );

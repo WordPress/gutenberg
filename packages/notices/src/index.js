@@ -1,4 +1,1 @@
-/**
- * Internal dependencies
- */
-import './store';
+export { store } from './store';

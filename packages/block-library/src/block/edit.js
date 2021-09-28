@@ -1,187 +1,148 @@
 /**
- * External dependencies
- */
-import { noop, partial } from 'lodash';
-
-/**
  * WordPress dependencies
  */
-import { Component, Fragment } from '@wordpress/element';
-import { Placeholder, Spinner, Disabled } from '@wordpress/components';
-import { withSelect, withDispatch } from '@wordpress/data';
+import { useSelect, useDispatch } from '@wordpress/data';
+import {
+	useEntityBlockEditor,
+	useEntityProp,
+	store as coreStore,
+} from '@wordpress/core-data';
+import {
+	Placeholder,
+	Spinner,
+	ToolbarGroup,
+	ToolbarButton,
+	TextControl,
+	PanelBody,
+} from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-import { BlockEdit } from '@wordpress/editor';
-import { compose } from '@wordpress/compose';
+import {
+	__experimentalUseInnerBlocksProps as useInnerBlocksProps,
+	__experimentalUseNoRecursiveRenders as useNoRecursiveRenders,
+	__experimentalBlockContentOverlay as BlockContentOverlay,
+	InnerBlocks,
+	BlockControls,
+	InspectorControls,
+	useBlockProps,
+	Warning,
+} from '@wordpress/block-editor';
+import { store as reusableBlocksStore } from '@wordpress/reusable-blocks';
+import { ungroup } from '@wordpress/icons';
 
-/**
- * Internal dependencies
- */
-import ReusableBlockEditPanel from './edit-panel';
-import ReusableBlockIndicator from './indicator';
-
-class ReusableBlockEdit extends Component {
-	constructor( { reusableBlock } ) {
-		super( ...arguments );
-
-		this.startEditing = this.startEditing.bind( this );
-		this.stopEditing = this.stopEditing.bind( this );
-		this.setAttributes = this.setAttributes.bind( this );
-		this.setTitle = this.setTitle.bind( this );
-		this.save = this.save.bind( this );
-
-		if ( reusableBlock && reusableBlock.isTemporary ) {
-			// Start in edit mode when we're working with a newly created reusable block
-			this.state = {
-				isEditing: true,
-				title: reusableBlock.title,
-				changedAttributes: {},
+export default function ReusableBlockEdit( { attributes: { ref }, clientId } ) {
+	const [ hasAlreadyRendered, RecursionProvider ] = useNoRecursiveRenders(
+		ref
+	);
+	const { isMissing, hasResolved } = useSelect(
+		( select ) => {
+			const persistedBlock = select( coreStore ).getEntityRecord(
+				'postType',
+				'wp_block',
+				ref
+			);
+			const hasResolvedBlock = select(
+				coreStore
+			).hasFinishedResolution( 'getEntityRecord', [
+				'postType',
+				'wp_block',
+				ref,
+			] );
+			return {
+				hasResolved: hasResolvedBlock,
+				isMissing: hasResolvedBlock && ! persistedBlock,
 			};
-		} else {
-			// Start in preview mode when we're working with an existing reusable block
-			this.state = {
-				isEditing: false,
-				title: null,
-				changedAttributes: null,
-			};
+		},
+		[ ref, clientId ]
+	);
+
+	const {
+		__experimentalConvertBlockToStatic: convertBlockToStatic,
+	} = useDispatch( reusableBlocksStore );
+
+	const [ blocks, onInput, onChange ] = useEntityBlockEditor(
+		'postType',
+		'wp_block',
+		{ id: ref }
+	);
+	const [ title, setTitle ] = useEntityProp(
+		'postType',
+		'wp_block',
+		'title',
+		ref
+	);
+
+	const blockProps = useBlockProps();
+
+	const innerBlocksProps = useInnerBlocksProps(
+		{},
+		{
+			value: blocks,
+			onInput,
+			onChange,
+			renderAppender: blocks?.length
+				? undefined
+				: InnerBlocks.ButtonBlockAppender,
 		}
-	}
+	);
 
-	componentDidMount() {
-		if ( ! this.props.reusableBlock ) {
-			this.props.fetchReusableBlock();
-		}
-	}
-
-	startEditing() {
-		const { reusableBlock } = this.props;
-
-		this.setState( {
-			isEditing: true,
-			title: reusableBlock.title,
-			changedAttributes: {},
-		} );
-	}
-
-	stopEditing() {
-		this.setState( {
-			isEditing: false,
-			title: null,
-			changedAttributes: null,
-		} );
-	}
-
-	setAttributes( attributes ) {
-		this.setState( ( prevState ) => {
-			if ( prevState.changedAttributes !== null ) {
-				return { changedAttributes: { ...prevState.changedAttributes, ...attributes } };
-			}
-		} );
-	}
-
-	setTitle( title ) {
-		this.setState( { title } );
-	}
-
-	save() {
-		const { reusableBlock, onUpdateTitle, updateAttributes, block, onSave } = this.props;
-		const { title, changedAttributes } = this.state;
-
-		if ( title !== reusableBlock.title ) {
-			onUpdateTitle( title );
-		}
-
-		updateAttributes( block.clientId, changedAttributes );
-		onSave();
-
-		this.stopEditing();
-	}
-
-	render() {
-		const { isSelected, reusableBlock, block, isFetching, isSaving, canUpdateBlock } = this.props;
-		const { isEditing, title, changedAttributes } = this.state;
-
-		if ( ! reusableBlock && isFetching ) {
-			return <Placeholder><Spinner /></Placeholder>;
-		}
-
-		if ( ! reusableBlock || ! block ) {
-			return <Placeholder>{ __( 'Block has been deleted or is unavailable.' ) }</Placeholder>;
-		}
-
-		let element = (
-			<BlockEdit
-				{ ...this.props }
-				isSelected={ isEditing && isSelected }
-				clientId={ block.clientId }
-				name={ block.name }
-				attributes={ { ...block.attributes, ...changedAttributes } }
-				setAttributes={ isEditing ? this.setAttributes : noop }
-			/>
-		);
-
-		if ( ! isEditing ) {
-			element = <Disabled>{ element }</Disabled>;
-		}
-
+	if ( hasAlreadyRendered ) {
 		return (
-			<Fragment>
-				{ ( isSelected || isEditing ) && (
-					<ReusableBlockEditPanel
-						isEditing={ isEditing }
-						title={ title !== null ? title : reusableBlock.title }
-						isSaving={ isSaving && ! reusableBlock.isTemporary }
-						isEditDisabled={ ! canUpdateBlock }
-						onEdit={ this.startEditing }
-						onChangeTitle={ this.setTitle }
-						onSave={ this.save }
-						onCancel={ this.stopEditing }
-					/>
-				) }
-				{ ! isSelected && ! isEditing && <ReusableBlockIndicator title={ reusableBlock.title } /> }
-				{ element }
-			</Fragment>
+			<div { ...blockProps }>
+				<Warning>
+					{ __( 'Block cannot be rendered inside itself.' ) }
+				</Warning>
+			</div>
 		);
 	}
+
+	if ( isMissing ) {
+		return (
+			<div { ...blockProps }>
+				<Warning>
+					{ __( 'Block has been deleted or is unavailable.' ) }
+				</Warning>
+			</div>
+		);
+	}
+
+	if ( ! hasResolved ) {
+		return (
+			<div { ...blockProps }>
+				<Placeholder>
+					<Spinner />
+				</Placeholder>
+			</div>
+		);
+	}
+
+	return (
+		<RecursionProvider>
+			<div { ...blockProps }>
+				<BlockControls>
+					<ToolbarGroup>
+						<ToolbarButton
+							onClick={ () => convertBlockToStatic( clientId ) }
+							label={ __( 'Convert to regular blocks' ) }
+							icon={ ungroup }
+							showTooltip
+						/>
+					</ToolbarGroup>
+				</BlockControls>
+				<InspectorControls>
+					<PanelBody>
+						<TextControl
+							label={ __( 'Name' ) }
+							value={ title }
+							onChange={ setTitle }
+						/>
+					</PanelBody>
+				</InspectorControls>
+				<BlockContentOverlay
+					clientId={ clientId }
+					wrapperProps={ innerBlocksProps }
+					className="block-library-block__reusable-block-container"
+				/>
+			</div>
+		</RecursionProvider>
+	);
 }
-
-export default compose( [
-	withSelect( ( select, ownProps ) => {
-		const {
-			__experimentalGetReusableBlock: getReusableBlock,
-			__experimentalIsFetchingReusableBlock: isFetchingReusableBlock,
-			__experimentalIsSavingReusableBlock: isSavingReusableBlock,
-		} = select( 'core/editor' );
-		const { canUser } = select( 'core' );
-		const {
-			getBlock,
-		} = select( 'core/block-editor' );
-		const { ref } = ownProps.attributes;
-		const reusableBlock = getReusableBlock( ref );
-
-		return {
-			reusableBlock,
-			isFetching: isFetchingReusableBlock( ref ),
-			isSaving: isSavingReusableBlock( ref ),
-			block: reusableBlock ? getBlock( reusableBlock.clientId ) : null,
-			canUpdateBlock: !! reusableBlock && ! reusableBlock.isTemporary && !! canUser( 'update', 'blocks', ref ),
-		};
-	} ),
-	withDispatch( ( dispatch, ownProps ) => {
-		const {
-			__experimentalFetchReusableBlocks: fetchReusableBlocks,
-			__experimentalUpdateReusableBlockTitle: updateReusableBlockTitle,
-			__experimentalSaveReusableBlock: saveReusableBlock,
-		} = dispatch( 'core/editor' );
-		const {
-			updateBlockAttributes,
-		} = dispatch( 'core/block-editor' );
-		const { ref } = ownProps.attributes;
-
-		return {
-			fetchReusableBlock: partial( fetchReusableBlocks, ref ),
-			updateAttributes: updateBlockAttributes,
-			onUpdateTitle: partial( updateReusableBlockTitle, ref ),
-			onSave: partial( saveReusableBlock, ref ),
-		};
-	} ),
-] )( ReusableBlockEdit );

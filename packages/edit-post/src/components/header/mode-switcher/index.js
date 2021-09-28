@@ -3,13 +3,15 @@
  */
 import { __ } from '@wordpress/i18n';
 import { MenuItemsChoice, MenuGroup } from '@wordpress/components';
-import { compose, ifCondition } from '@wordpress/compose';
-import { withSelect, withDispatch } from '@wordpress/data';
+import { useSelect, useDispatch } from '@wordpress/data';
+import { store as keyboardShortcutsStore } from '@wordpress/keyboard-shortcuts';
+import { store as editorStore } from '@wordpress/editor';
 
 /**
  * Internal dependencies
  */
-import shortcuts from '../../../keyboard-shortcuts';
+import { store as editPostStore } from '../../../store';
+
 /**
  * Set of available mode options.
  *
@@ -18,45 +20,55 @@ import shortcuts from '../../../keyboard-shortcuts';
 const MODES = [
 	{
 		value: 'visual',
-		label: __( 'Visual Editor' ),
+		label: __( 'Visual editor' ),
 	},
 	{
 		value: 'text',
-		label: __( 'Code Editor' ),
+		label: __( 'Code editor' ),
 	},
 ];
 
-function ModeSwitcher( { onSwitch, mode } ) {
+function ModeSwitcher() {
+	const {
+		shortcut,
+		isRichEditingEnabled,
+		isCodeEditingEnabled,
+		mode,
+	} = useSelect(
+		( select ) => ( {
+			shortcut: select(
+				keyboardShortcutsStore
+			).getShortcutRepresentation( 'core/edit-post/toggle-mode' ),
+			isRichEditingEnabled: select( editorStore ).getEditorSettings()
+				.richEditingEnabled,
+			isCodeEditingEnabled: select( editorStore ).getEditorSettings()
+				.codeEditingEnabled,
+			mode: select( editPostStore ).getEditorMode(),
+		} ),
+		[]
+	);
+	const { switchEditorMode } = useDispatch( editPostStore );
+
+	if ( ! isRichEditingEnabled || ! isCodeEditingEnabled ) {
+		return null;
+	}
+
 	const choices = MODES.map( ( choice ) => {
 		if ( choice.value !== mode ) {
-			return { ...choice, shortcut: shortcuts.toggleEditorMode.display };
+			return { ...choice, shortcut };
 		}
 		return choice;
 	} );
 
 	return (
-		<MenuGroup
-			label={ __( 'Editor' ) }
-		>
+		<MenuGroup label={ __( 'Editor' ) }>
 			<MenuItemsChoice
 				choices={ choices }
 				value={ mode }
-				onSelect={ onSwitch }
+				onSelect={ switchEditorMode }
 			/>
 		</MenuGroup>
 	);
 }
 
-export default compose( [
-	withSelect( ( select ) => ( {
-		isRichEditingEnabled: select( 'core/block-editor' ).getEditorSettings().richEditingEnabled,
-		mode: select( 'core/edit-post' ).getEditorMode(),
-	} ) ),
-	ifCondition( ( { isRichEditingEnabled } ) => isRichEditingEnabled ),
-	withDispatch( ( dispatch, ownProps ) => ( {
-		onSwitch( mode ) {
-			dispatch( 'core/edit-post' ).switchEditorMode( mode );
-			ownProps.onSelect( mode );
-		},
-	} ) ),
-] )( ModeSwitcher );
+export default ModeSwitcher;

@@ -9,12 +9,13 @@ import deepFreeze from 'deep-freeze';
 import plugin, {
 	createPersistenceInterface,
 	withLazySameState,
+	migrateFeaturePreferencesToInterfaceStore,
 } from '../';
 import objectStorage from '../storage/object';
 import { createRegistry } from '../../../';
 
 describe( 'persistence', () => {
-	let registry, originalRegisterStore;
+	let registry;
 
 	beforeAll( () => {
 		jest.spyOn( objectStorage, 'setItem' );
@@ -24,15 +25,8 @@ describe( 'persistence', () => {
 		objectStorage.clear();
 		objectStorage.setItem.mockClear();
 
-		// Since the exposed `registerStore` is a proxying function, mimic
-		// intercept of original call by adding an initial plugin.
 		// TODO: Remove the `use` function in favor of `registerGenericStore`
-		registry = createRegistry()
-			.use( ( originalRegistry ) => {
-				originalRegisterStore = jest.spyOn( originalRegistry, 'registerStore' );
-				return {};
-			} )
-			.use( plugin, { storage: objectStorage } );
+		registry = createRegistry().use( plugin, { storage: objectStorage } );
 	} );
 
 	it( 'should not mutate options', () => {
@@ -78,21 +72,27 @@ describe( 'persistence', () => {
 			},
 		} );
 
-		expect( registry.select( 'test' ).getState() ).toEqual( { a: 1, b: null } );
+		expect( registry.select( 'test' ).getState() ).toEqual( {
+			a: 1,
+			b: null,
+		} );
 	} );
 
 	it( 'should merge persisted value with default if object-like', () => {
-		const DEFAULT_STATE = deepFreeze( { preferences: { useFoo: true, useBar: true } } );
+		const DEFAULT_STATE = deepFreeze( {
+			preferences: { useFoo: true, useBar: true },
+		} );
 
 		registry = createRegistry().use( plugin, {
 			storage: {
-				getItem: () => JSON.stringify( {
-					test: {
-						preferences: {
-							useFoo: false,
+				getItem: () =>
+					JSON.stringify( {
+						test: {
+							preferences: {
+								useFoo: false,
+							},
 						},
-					},
-				} ),
+					} ),
 				setItem() {},
 			},
 		} );
@@ -129,7 +129,9 @@ describe( 'persistence', () => {
 			},
 		} );
 
-		expect( registry.select( 'test' ).getState() ).toEqual( { persisted: true } );
+		expect( registry.select( 'test' ).getState() ).toEqual( {
+			persisted: true,
+		} );
 	} );
 
 	it( 'should defer to persisted state if mismatch of object-like (initial object-like)', () => {
@@ -154,9 +156,10 @@ describe( 'persistence', () => {
 	it( 'should be reasonably tolerant to a non-object persisted state', () => {
 		registry = createRegistry().use( plugin, {
 			storage: {
-				getItem: () => JSON.stringify( {
-					test: 1,
-				} ),
+				getItem: () =>
+					JSON.stringify( {
+						test: 1,
+					} ),
 				setItem() {},
 			},
 		} );
@@ -170,17 +173,6 @@ describe( 'persistence', () => {
 		} );
 
 		expect( registry.select( 'test' ).getState() ).toBe( 1 );
-	} );
-
-	it( 'override values passed to registerStore', () => {
-		const options = { persist: true, reducer() {} };
-
-		registry.registerStore( 'test', options );
-
-		expect( originalRegisterStore ).toHaveBeenCalledWith( 'test', {
-			persist: true,
-			reducer: expect.any( Function ),
-		} );
 	} );
 
 	it( 'should not persist if option not passed', () => {
@@ -248,7 +240,10 @@ describe( 'persistence', () => {
 
 		registry.dispatch( 'test' ).setState( { ok: true } );
 
-		expect( objectStorage.setItem ).toHaveBeenCalledWith( 'WP_DATA', '{"test":{"ok":true}}' );
+		expect( objectStorage.setItem ).toHaveBeenCalledWith(
+			'WP_DATA',
+			'{"test":{"ok":true}}'
+		);
 	} );
 
 	it( 'should persist a subset of keys', () => {
@@ -269,7 +264,10 @@ describe( 'persistence', () => {
 
 		registry.dispatch( 'test' ).setState( { foo: 1, baz: 2 } );
 
-		expect( objectStorage.setItem ).toHaveBeenCalledWith( 'WP_DATA', '{"test":{"foo":1}}' );
+		expect( objectStorage.setItem ).toHaveBeenCalledWith(
+			'WP_DATA',
+			'{"test":{"foo":1}}'
+		);
 	} );
 
 	it( 'should not persist an unchanging subset', () => {
@@ -306,7 +304,10 @@ describe( 'persistence', () => {
 
 		let get, set;
 		beforeEach( () => {
-			( { get, set } = createPersistenceInterface( { storage, storageKey } ) );
+			( { get, set } = createPersistenceInterface( {
+				storage,
+				storageKey,
+			} ) );
 		} );
 
 		describe( 'get', () => {
@@ -328,22 +329,33 @@ describe( 'persistence', () => {
 			it( 'sets JSON by object', () => {
 				set( 'test', {} );
 
-				expect( objectStorage.setItem ).toHaveBeenCalledWith( storageKey, '{"test":{}}' );
+				expect( objectStorage.setItem ).toHaveBeenCalledWith(
+					storageKey,
+					'{"test":{}}'
+				);
 			} );
 
 			it( 'merges to existing', () => {
 				set( 'test1', {} );
 				set( 'test2', {} );
 
-				expect( objectStorage.setItem ).toHaveBeenCalledWith( storageKey, '{"test1":{}}' );
-				expect( objectStorage.setItem ).toHaveBeenCalledWith( storageKey, '{"test1":{},"test2":{}}' );
+				expect( objectStorage.setItem ).toHaveBeenCalledWith(
+					storageKey,
+					'{"test1":{}}'
+				);
+				expect( objectStorage.setItem ).toHaveBeenCalledWith(
+					storageKey,
+					'{"test1":{},"test2":{}}'
+				);
 			} );
 		} );
 	} );
 
 	describe( 'withLazySameState', () => {
 		it( 'should call the original reducer if action.nextState differs from state', () => {
-			const reducer = jest.fn().mockImplementation( ( state, action ) => action.nextState );
+			const reducer = jest
+				.fn()
+				.mockImplementation( ( state, action ) => action.nextState );
 			const enhanced = withLazySameState( reducer );
 
 			reducer.mockClear();
@@ -355,7 +367,9 @@ describe( 'persistence', () => {
 		} );
 
 		it( 'should not call the original reducer if action.nextState equals state', () => {
-			const reducer = jest.fn().mockImplementation( ( state, action ) => action.nextState );
+			const reducer = jest
+				.fn()
+				.mockImplementation( ( state, action ) => action.nextState );
 			const enhanced = withLazySameState( reducer );
 
 			reducer.mockClear();
@@ -364,6 +378,118 @@ describe( 'persistence', () => {
 
 			expect( state ).toBe( 1 );
 			expect( reducer ).not.toHaveBeenCalled();
+		} );
+	} );
+} );
+
+describe( 'migrateFeaturePreferencesToInterfaceStore', () => {
+	it( 'migrates preferences from the source to the interface store', () => {
+		const persistenceInterface = createPersistenceInterface( {
+			storageKey: 'test-username',
+		} );
+
+		const initialState = {
+			preferences: {
+				features: {
+					featureA: true,
+					featureB: false,
+					featureC: true,
+				},
+			},
+		};
+
+		persistenceInterface.set( 'core/test', initialState );
+
+		migrateFeaturePreferencesToInterfaceStore(
+			persistenceInterface,
+			'core/test'
+		);
+
+		expect( persistenceInterface.get() ).toEqual( {
+			'core/interface': {
+				preferences: {
+					features: {
+						'core/test': {
+							featureA: true,
+							featureB: false,
+							featureC: true,
+						},
+					},
+				},
+			},
+			'core/test': {
+				preferences: {
+					features: undefined,
+				},
+			},
+		} );
+	} );
+
+	it( 'handles multiple preferences from different stores to be migrated', () => {
+		const persistenceInterface = createPersistenceInterface( {
+			storageKey: 'test-username',
+		} );
+
+		const initialStateA = {
+			preferences: {
+				features: {
+					featureA: true,
+					featureB: false,
+					featureC: true,
+				},
+			},
+		};
+
+		const initialStateB = {
+			preferences: {
+				features: {
+					featureD: true,
+					featureE: false,
+					featureF: true,
+				},
+			},
+		};
+
+		persistenceInterface.set( 'core/test-a', initialStateA );
+		persistenceInterface.set( 'core/test-b', initialStateB );
+
+		migrateFeaturePreferencesToInterfaceStore(
+			persistenceInterface,
+			'core/test-a'
+		);
+
+		migrateFeaturePreferencesToInterfaceStore(
+			persistenceInterface,
+			'core/test-b'
+		);
+
+		expect( persistenceInterface.get() ).toEqual( {
+			'core/interface': {
+				preferences: {
+					features: {
+						'core/test-a': {
+							featureA: true,
+							featureB: false,
+							featureC: true,
+						},
+						'core/test-b': {
+							featureD: true,
+							featureE: false,
+							featureF: true,
+						},
+					},
+				},
+			},
+			'core/test-a': {
+				preferences: {
+					features: undefined,
+				},
+			},
+			'core/test-b': {
+				preferences: {
+					features: undefined,
+				},
+			},
 		} );
 	} );
 } );

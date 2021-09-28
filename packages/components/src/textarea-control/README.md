@@ -6,9 +6,9 @@ TextareaControls are TextControls that allow for multiple lines of text, and wra
 
 ## Table of contents
 
-1. [Design guidelines](http://#design-guidelines)
-2. [Development guidelines](http://#development-guidelines)
-3. [Related components](http://#related-components)
+1. [Design guidelines](#design-guidelines)
+2. [Development guidelines](#development-guidelines)
+3. [Related components](#related-components)
 
 ## Design guidelines
 
@@ -20,10 +20,10 @@ Use TextareaControl when you need to encourage users enter an amount of text tha
 
 TextareaControl should:
 
-- Stand out from the background of the page and indicate that users can input information.
-- Have clearly differentiated active/inactive states, including focus styling.
-- Make it easy to understand and address any errors via clear and direct error notices.
-- Make it easy to understand the requested information by using a clear and descriptive label.
+-   Stand out from the background of the page and indicate that users can input information.
+-   Have clearly differentiated active/inactive states, including focus styling.
+-   Make it easy to understand and address any errors via clear and direct error notices.
+-   Make it easy to understand the requested information by using a clear and descriptive label.
 
 #### When not to use TextareaControl
 
@@ -33,7 +33,7 @@ Do not use TextareaControl if you need to let users enter shorter answers (no lo
 
 **Do**
 
-Use TextareaControl to let users to enter text longer than a single line. 
+Use TextareaControl to let users to enter text longer than a single line.
 
 ![](https://wordpress.org/gutenberg/files/2019/01/TextareaControl-Answers-Dont.png)
 
@@ -55,11 +55,11 @@ Containers improve the discoverability of text fields by creating contrast betwe
 ![](https://wordpress.org/gutenberg/files/2019/01/TextareaControl-Stroke-Do.png)
 
 **Do**
-Use a stroke around the container, which clearly indicates that users can input information. 
+Use a stroke around the container, which clearly indicates that users can input information.
 
 ![](https://wordpress.org/gutenberg/files/2019/01/TextareaControl-Stroke-Dont.png)
 
-**Don’t** 
+**Don’t**
 Use unclear visual markers to indicate a text field.
 
 ### Label text
@@ -76,24 +76,27 @@ When text input isn’t accepted, an error message can display instructions on h
 
 ### Usage
 
-    import { TextareaControl } from '@wordpress/components';
-    import { withState } from '@wordpress/compose';
-    
-    const MyTextareaControl = withState( {
-        text: '',
-    } )( ( { text, setState } ) => ( 
-        <TextareaControl
-            label="Text"
-            help="Enter some text"
-            value={ text }
-            onChange={ ( text ) => setState( { text } ) }
-        />
-    ) );
+```jsx
+import { TextareaControl } from '@wordpress/components';
+import { useState } from '@wordpress/element';
 
+const MyTextareaControl = () => {
+	const [ text, setText ] = useState( '' );
+
+	return (
+		<TextareaControl
+			label="Text"
+			help="Enter some text"
+			value={ text }
+			onChange={ ( value ) => setText( value ) }
+		/>
+	);
+};
+```
 
 ### Props
 
-The set of props accepted by the component will be specified below. 
+The set of props accepted by the component will be specified below.
 
 Props not included in this set will be applied to the textarea element.
 
@@ -101,38 +104,45 @@ Props not included in this set will be applied to the textarea element.
 
 If this property is added, a label will be generated using label property as the content.
 
-- Type: `String`
-- Required: No
+-   Type: `String`
+-   Required: No
+
+#### hideLabelFromVision
+
+If true, the label will only be visible to screen readers.
+
+-   Type: `Boolean`
+-   Required: No
 
 #### help
 
 If this property is added, a help text will be generated using help property as the content.
 
-- Type: `String`
-- Required: No
+-   Type: `String|WPElement`
+-   Required: No
 
 #### rows
 
 The number of rows the textarea should contain. Defaults to four.
 
-- Type: `String`
-- Required: No
-- Default: 4
+-   Type: `String`
+-   Required: No
+-   Default: 4
 
 #### value
 
 The current value of the textarea.
 
-- Type: `String`
-- Required: Yes
+-   Type: `String`
+-   Required: Yes
 
 #### onChange
 
 A function that receives the new value of the textarea each time it changes.
 
-- Type: `function`
-- Required: Yes
+-   Type: `function`
+-   Required: Yes
 
 ## Related components
 
-- For a field where users only enter one line of text, use the `TextControl` component.
+-   For a field where users only enter one line of text, use the `TextControl` component.

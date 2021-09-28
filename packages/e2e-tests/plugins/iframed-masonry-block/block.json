@@ -1,0 +1,16 @@
+{
+	"apiVersion": 2,
+	"name": "test/iframed-masonry-block",
+	"title": "Iframed Masonry Block",
+	"category": "text",
+	"icon": "smiley",
+	"description": "",
+	"supports": {
+		"html": false
+	},
+	"textdomain": "iframed-masonry-block",
+	"editorScript": "iframed-masonry-block-editor",
+	"editorStyle": "file:./editor.css",
+	"style": "file:./style.css",
+	"script": "iframed-masonry-block-script"
+}

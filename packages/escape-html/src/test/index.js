@@ -8,13 +8,26 @@ import {
 	escapeAttribute,
 	escapeHTML,
 	isValidAttributeName,
+	escapeEditableHTML,
 } from '../';
+import __unstableEscapeGreaterThan from '../escape-greater';
+
+function testUnstableEscapeGreaterThan( implementation ) {
+	it( 'should escape greater than', () => {
+		const result = implementation( 'Chicken > Ribs' );
+		expect( result ).toBe( 'Chicken &gt; Ribs' );
+	} );
+}
 
 function testEscapeAmpersand( implementation ) {
 	it( 'should escape ampersand', () => {
-		const result = implementation( 'foo & bar &amp; &AMP; baz &#931; &#bad; &#x3A3; &#X3a3; &#xevil;' );
+		const result = implementation(
+			'foo & bar &amp; &AMP; baz &#931; &#bad; &#x3A3; &#X3a3; &#xevil;'
+		);
 
-		expect( result ).toBe( 'foo &amp; bar &amp; &AMP; baz &#931; &amp;#bad; &#x3A3; &#X3a3; &amp;#xevil;' );
+		expect( result ).toBe(
+			'foo &amp; bar &amp; &AMP; baz &#931; &amp;#bad; &#x3A3; &#X3a3; &amp;#xevil;'
+		);
 	} );
 }
 
@@ -46,9 +59,14 @@ describe( 'escapeLessThan', () => {
 	testEscapeLessThan( escapeLessThan );
 } );
 
+describe( 'escapeGreaterThan', () => {
+	testUnstableEscapeGreaterThan( __unstableEscapeGreaterThan );
+} );
+
 describe( 'escapeAttribute', () => {
 	testEscapeAmpersand( escapeAttribute );
 	testEscapeQuotationMark( escapeAttribute );
+	testUnstableEscapeGreaterThan( escapeAttribute );
 } );
 
 describe( 'escapeHTML', () => {
@@ -79,5 +97,17 @@ describe( 'isValidAttributeName', () => {
 		const result = isValidAttributeName( 'good' );
 
 		expect( result ).toBe( true );
+	} );
+} );
+
+describe( 'escapeEditableHTML', () => {
+	it( 'should escape < and all ampersands', () => {
+		const result = escapeEditableHTML(
+			'<a href="https://w.org">WP</a> & &lt;strong&gt;'
+		);
+
+		expect( result ).toBe(
+			'&lt;a href="https://w.org">WP&lt;/a> &amp; &amp;lt;strong&amp;gt;'
+		);
 	} );
 } );

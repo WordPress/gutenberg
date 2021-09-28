@@ -4,9 +4,21 @@
 import { Button } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { withSelect, withDispatch } from '@wordpress/data';
-import { compose } from '@wordpress/compose';
+import { compose, useViewportMatch } from '@wordpress/compose';
 
-function PostSwitchToDraftButton( { isSaving, isPublished, isScheduled, onClick } ) {
+/**
+ * Internal dependencies
+ */
+import { store as editorStore } from '../../store';
+
+function PostSwitchToDraftButton( {
+	isSaving,
+	isPublished,
+	isScheduled,
+	onClick,
+} ) {
+	const isMobileViewport = useViewportMatch( 'small', '<' );
+
 	if ( ! isPublished && ! isScheduled ) {
 		return null;
 	}
@@ -14,9 +26,13 @@ function PostSwitchToDraftButton( { isSaving, isPublished, isScheduled, onClick 
 	const onSwitch = () => {
 		let alertMessage;
 		if ( isPublished ) {
-			alertMessage = __( 'Are you sure you want to unpublish this post?' );
+			alertMessage = __(
+				'Are you sure you want to unpublish this post?'
+			);
 		} else if ( isScheduled ) {
-			alertMessage = __( 'Are you sure you want to unschedule this post?' );
+			alertMessage = __(
+				'Are you sure you want to unschedule this post?'
+			);
 		}
 		// eslint-disable-next-line no-alert
 		if ( window.confirm( alertMessage ) ) {
@@ -29,16 +45,20 @@ function PostSwitchToDraftButton( { isSaving, isPublished, isScheduled, onClick 
 			className="editor-post-switch-to-draft"
 			onClick={ onSwitch }
 			disabled={ isSaving }
-			isTertiary
+			variant="tertiary"
 		>
-			{ __( 'Switch to Draft' ) }
+			{ isMobileViewport ? __( 'Draft' ) : __( 'Switch to draft' ) }
 		</Button>
 	);
 }
 
 export default compose( [
 	withSelect( ( select ) => {
-		const { isSavingPost, isCurrentPostPublished, isCurrentPostScheduled } = select( 'core/editor' );
+		const {
+			isSavingPost,
+			isCurrentPostPublished,
+			isCurrentPostScheduled,
+		} = select( editorStore );
 		return {
 			isSaving: isSavingPost(),
 			isPublished: isCurrentPostPublished(),
@@ -46,7 +66,7 @@ export default compose( [
 		};
 	} ),
 	withDispatch( ( dispatch ) => {
-		const { editPost, savePost } = dispatch( 'core/editor' );
+		const { editPost, savePost } = dispatch( editorStore );
 		return {
 			onClick: () => {
 				editPost( { status: 'draft' } );
@@ -55,4 +75,3 @@ export default compose( [
 		};
 	} ),
 ] )( PostSwitchToDraftButton );
-

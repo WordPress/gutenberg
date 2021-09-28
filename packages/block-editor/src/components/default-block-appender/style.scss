@@ -1,0 +1,54 @@
+.block-editor-default-block-appender {
+	clear: both; // The appender doesn't scale well to sit next to floats, so clear them.
+
+	// Default to centered and content-width, like blocks
+	margin-left: auto;
+	margin-right: auto;
+	position: relative;
+
+	&[data-root-client-id=""] .block-editor-default-block-appender__content:hover {
+		// Outline on root-level default block appender is redundant with the
+		// WritingFlow click redirector.
+		outline: 1px solid transparent;
+	}
+
+	.block-editor-default-block-appender__content {
+		// Set the opacity of the initial block appender to the same as placeholder text in an empty Paragraph block.
+		opacity: 0.62;
+	}
+
+	// Dropzone.
+	.components-drop-zone__content-icon {
+		display: none;
+	}
+}
+
+// Empty / default block side inserter.
+.block-editor-block-list__empty-block-inserter.block-editor-block-list__empty-block-inserter, // Empty paragraph, needs specificity to override inherited popover styles.
+.block-editor-default-block-appender .block-editor-inserter { // Empty appender.
+	position: absolute;
+	top: 0;
+	height: $button-size-small + $grid-unit-10;
+
+	.block-editor-inserter__toggle {
+		margin-right: 0;
+	}
+}
+
+// Left side.
+.block-editor-block-list__empty-block-inserter,
+.block-editor-default-block-appender .block-editor-inserter {
+	@include break-small {
+		display: flex;
+		height: 100%;
+	}
+
+	&:disabled {
+		display: none;
+	}
+}
+
+.block-editor-default-block-appender.has-visible-prompt .block-editor-inserter,
+.block-editor-block-list__empty-block-inserter {
+	right: 0;
+}

@@ -1,0 +1,97 @@
+{
+	"apiVersion": 2,
+	"name": "core/navigation",
+	"title": "Navigation",
+	"category": "theme",
+	"description": "A collection of blocks that allow visitors to get around your site.",
+	"keywords": [ "menu", "navigation", "links" ],
+	"textdomain": "default",
+	"attributes": {
+		"orientation": {
+			"type": "string",
+			"default": "horizontal"
+		},
+		"textColor": {
+			"type": "string"
+		},
+		"customTextColor": {
+			"type": "string"
+		},
+		"rgbTextColor": {
+			"type": "string"
+		},
+		"backgroundColor": {
+			"type": "string"
+		},
+		"customBackgroundColor": {
+			"type": "string"
+		},
+		"rgbBackgroundColor": {
+			"type": "string"
+		},
+		"itemsJustification": {
+			"type": "string"
+		},
+		"showSubmenuIcon": {
+			"type": "boolean",
+			"default": true
+		},
+		"openSubmenusOnClick":{
+			"type": "boolean",
+			"default": false
+		},
+		"isResponsive": {
+			"type": "boolean",
+			"default": false
+		},
+		"__unstableLocation": {
+			"type": "string"
+		},
+		"overlayBackgroundColor": {
+			"type": "string"
+		},
+		"customOverlayBackgroundColor": {
+			"type": "string"
+		},
+		"overlayTextColor": {
+			"type": "string"
+		},
+		"customOverlayTextColor": {
+			"type": "string"
+		}
+	},
+	"providesContext": {
+		"textColor": "textColor",
+		"customTextColor": "customTextColor",
+		"backgroundColor": "backgroundColor",
+		"customBackgroundColor": "customBackgroundColor",
+		"overlayTextColor": "overlayTextColor",
+		"customOverlayTextColor": "customOverlayTextColor",
+		"overlayBackgroundColor": "overlayBackgroundColor",
+		"customOverlayBackgroundColor": "customOverlayBackgroundColor",
+		"fontSize": "fontSize",
+		"customFontSize": "customFontSize",
+		"showSubmenuIcon": "showSubmenuIcon",
+		"openSubmenusOnClick": "openSubmenusOnClick",
+		"style": "style",
+		"orientation": "orientation"
+	},
+	"supports": {
+		"align": [ "wide", "full" ],
+		"anchor": true,
+		"html": false,
+		"inserter": true,
+		"typography": {
+			"fontSize": true,
+			"lineHeight": true,
+			"__experimentalFontStyle": true,
+			"__experimentalFontWeight": true,
+			"__experimentalTextTransform": true,
+			"__experimentalFontFamily": true,
+			"__experimentalTextDecoration": true
+		}
+	},
+	"viewScript": "file:./view.min.js",
+	"editorStyle": "wp-block-navigation-editor",
+	"style": "wp-block-navigation"
+}

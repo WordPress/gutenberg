@@ -1,0 +1,1 @@
+export { getOptimalTextShade } from './colors';

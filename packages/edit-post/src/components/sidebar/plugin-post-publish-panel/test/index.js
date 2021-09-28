@@ -9,8 +9,6 @@ import { render } from '@wordpress/element';
  */
 import PluginPostPublishPanel from '../';
 
-jest.mock( '../../../../../../components/src/button' );
-
 describe( 'PluginPostPublishPanel', () => {
 	test( 'renders fill properly', () => {
 		const div = document.createElement( 'div' );
@@ -21,7 +19,7 @@ describe( 'PluginPostPublishPanel', () => {
 					title="My panel title"
 					initialOpen={ true }
 				>
-				My panel content
+					My panel content
 				</PluginPostPublishPanel>
 				<PluginPostPublishPanel.Slot />
 			</SlotFillProvider>,

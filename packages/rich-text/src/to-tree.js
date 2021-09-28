@@ -7,25 +7,53 @@ import { getFormatType } from './get-format-type';
 import {
 	LINE_SEPARATOR,
 	OBJECT_REPLACEMENT_CHARACTER,
+	ZWNBSP,
 } from './special-characters';
+
+function restoreOnAttributes( attributes, isEditableTree ) {
+	if ( isEditableTree ) {
+		return attributes;
+	}
+
+	const newAttributes = {};
+
+	for ( const key in attributes ) {
+		let newKey = key;
+		if ( key.startsWith( 'data-disable-rich-text-' ) ) {
+			newKey = key.slice( 'data-disable-rich-text-'.length );
+		}
+
+		newAttributes[ newKey ] = attributes[ key ];
+	}
+
+	return newAttributes;
+}
 
 /**
  * Converts a format object to information that can be used to create an element
  * from (type, attributes and object).
  *
- * @param  {Object}  $1                        Named parameters.
- * @param  {string}  $1.type                   The format type.
- * @param  {Object}  $1.attributes             The format attributes.
- * @param  {Object}  $1.unregisteredAttributes The unregistered format
- *                                             attributes.
- * @param  {boolean} $1.object                 Wether or not it is an object
- *                                             format.
- * @param  {boolean} $1.boundaryClass          Wether or not to apply a boundary
- *                                             class.
- * @return {Object}                            Information to be used for
- *                                             element creation.
+ * @param {Object}  $1                        Named parameters.
+ * @param {string}  $1.type                   The format type.
+ * @param {Object}  $1.attributes             The format attributes.
+ * @param {Object}  $1.unregisteredAttributes The unregistered format
+ *                                            attributes.
+ * @param {boolean} $1.object                 Whether or not it is an object
+ *                                            format.
+ * @param {boolean} $1.boundaryClass          Whether or not to apply a boundary
+ *                                            class.
+ * @param {boolean} $1.isEditableTree
+ *
+ * @return {Object} Information to be used for element creation.
  */
-function fromFormat( { type, attributes, unregisteredAttributes, object, boundaryClass } ) {
+function fromFormat( {
+	type,
+	attributes,
+	unregisteredAttributes,
+	object,
+	boundaryClass,
+	isEditableTree,
+} ) {
 	const formatType = getFormatType( type );
 
 	let elementAttributes = {};
@@ -39,13 +67,22 @@ function fromFormat( { type, attributes, unregisteredAttributes, object, boundar
 			elementAttributes = { ...attributes, ...elementAttributes };
 		}
 
-		return { type, attributes: elementAttributes, object };
+		return {
+			type,
+			attributes: restoreOnAttributes(
+				elementAttributes,
+				isEditableTree
+			),
+			object,
+		};
 	}
 
 	elementAttributes = { ...unregisteredAttributes, ...elementAttributes };
 
 	for ( const name in attributes ) {
-		const key = formatType.attributes ? formatType.attributes[ name ] : false;
+		const key = formatType.attributes
+			? formatType.attributes[ name ]
+			: false;
 
 		if ( key ) {
 			elementAttributes[ key ] = attributes[ name ];
@@ -65,25 +102,31 @@ function fromFormat( { type, attributes, unregisteredAttributes, object, boundar
 	return {
 		type: formatType.tagName,
 		object: formatType.object,
-		attributes: elementAttributes,
+		attributes: restoreOnAttributes( elementAttributes, isEditableTree ),
 	};
 }
 
-function getDeepestActiveFormat( value ) {
-	const activeFormats = getActiveFormats( value );
-	const { selectedFormat } = value;
+/**
+ * Checks if both arrays of formats up until a certain index are equal.
+ *
+ * @param {Array}  a     Array of formats to compare.
+ * @param {Array}  b     Array of formats to compare.
+ * @param {number} index Index to check until.
+ */
+function isEqualUntil( a, b, index ) {
+	do {
+		if ( a[ index ] !== b[ index ] ) {
+			return false;
+		}
+	} while ( index-- );
 
-	if ( selectedFormat === undefined ) {
-		return activeFormats[ activeFormats.length - 1 ];
-	}
-
-	return activeFormats[ selectedFormat - 1 ];
+	return true;
 }
 
 export function toTree( {
 	value,
 	multilineTag,
-	multilineWrapperTags = [],
+	preserveWhiteSpace,
 	createEmpty,
 	append,
 	getLastChild,
@@ -95,12 +138,14 @@ export function toTree( {
 	onStartIndex,
 	onEndIndex,
 	isEditableTree,
+	placeholder,
 } ) {
-	const { formats, text, start, end } = value;
+	const { formats, replacements, text, start, end } = value;
 	const formatsLength = formats.length + 1;
 	const tree = createEmpty();
 	const multilineFormat = { type: multilineTag };
-	const deepestActiveFormat = getDeepestActiveFormat( value );
+	const activeFormats = getActiveFormats( value );
+	const deepestActiveFormat = activeFormats[ activeFormats.length - 1 ];
 
 	let lastSeparatorFormats;
 	let lastCharacterFormats;
@@ -116,25 +161,48 @@ export function toTree( {
 
 	for ( let i = 0; i < formatsLength; i++ ) {
 		const character = text.charAt( i );
+		const shouldInsertPadding =
+			isEditableTree &&
+			// Pad the line if the line is empty.
+			( ! lastCharacter ||
+				lastCharacter === LINE_SEPARATOR ||
+				// Pad the line if the previous character is a line break, otherwise
+				// the line break won't be visible.
+				lastCharacter === '\n' );
+
 		let characterFormats = formats[ i ];
 
 		// Set multiline tags in queue for building the tree.
 		if ( multilineTag ) {
 			if ( character === LINE_SEPARATOR ) {
-				characterFormats = lastSeparatorFormats = ( characterFormats || [] ).reduce( ( accumulator, format ) => {
-					if ( character === LINE_SEPARATOR && multilineWrapperTags.indexOf( format.type ) !== -1 ) {
-						accumulator.push( format );
-						accumulator.push( multilineFormat );
-					}
-
-					return accumulator;
-				}, [ multilineFormat ] );
+				characterFormats = lastSeparatorFormats = (
+					replacements[ i ] || []
+				).reduce(
+					( accumulator, format ) => {
+						accumulator.push( format, multilineFormat );
+						return accumulator;
+					},
+					[ multilineFormat ]
+				);
 			} else {
-				characterFormats = [ ...lastSeparatorFormats, ...( characterFormats || [] ) ];
+				characterFormats = [
+					...lastSeparatorFormats,
+					...( characterFormats || [] ),
+				];
 			}
 		}
 
 		let pointer = getLastChild( tree );
+
+		if ( shouldInsertPadding && character === LINE_SEPARATOR ) {
+			let node = pointer;
+
+			while ( ! isText( node ) ) {
+				node = getLastChild( node );
+			}
+
+			append( getParent( node ), ZWNBSP );
+		}
 
 		// Set selection for the start of line.
 		if ( lastCharacter === LINE_SEPARATOR ) {
@@ -158,7 +226,12 @@ export function toTree( {
 				if (
 					pointer &&
 					lastCharacterFormats &&
-					format === lastCharacterFormats[ formatIndex ] &&
+					// Reuse the last element if all formats remain the same.
+					isEqualUntil(
+						characterFormats,
+						lastCharacterFormats,
+						formatIndex
+					) &&
 					// Do not reuse the last element if the character is a
 					// line separator.
 					( character !== LINE_SEPARATOR ||
@@ -168,29 +241,30 @@ export function toTree( {
 					return;
 				}
 
-				const { type, attributes, unregisteredAttributes, object } = format;
+				const { type, attributes, unregisteredAttributes } = format;
 
-				const boundaryClass = (
+				const boundaryClass =
 					isEditableTree &&
-					! object &&
 					character !== LINE_SEPARATOR &&
-					format === deepestActiveFormat
-				);
+					format === deepestActiveFormat;
 
 				const parent = getParent( pointer );
-				const newNode = append( parent, fromFormat( {
-					type,
-					attributes,
-					unregisteredAttributes,
-					object,
-					boundaryClass,
-				} ) );
+				const newNode = append(
+					parent,
+					fromFormat( {
+						type,
+						attributes,
+						unregisteredAttributes,
+						boundaryClass,
+						isEditableTree,
+					} )
+				);
 
 				if ( isText( pointer ) && getText( pointer ).length === 0 ) {
 					remove( pointer );
 				}
 
-				pointer = append( format.object ? parent : newNode, '' );
+				pointer = append( newNode, '' );
 			} );
 		}
 
@@ -212,16 +286,48 @@ export function toTree( {
 			}
 		}
 
-		if ( character !== OBJECT_REPLACEMENT_CHARACTER ) {
-			if ( character === '\n' ) {
-				pointer = append( getParent( pointer ), { type: 'br', object: true } );
-				// Ensure pointer is text node.
-				pointer = append( getParent( pointer ), '' );
-			} else if ( ! isText( pointer ) ) {
-				pointer = append( getParent( pointer ), character );
+		if ( character === OBJECT_REPLACEMENT_CHARACTER ) {
+			if ( ! isEditableTree && replacements[ i ]?.type === 'script' ) {
+				pointer = append(
+					getParent( pointer ),
+					fromFormat( {
+						type: 'script',
+						isEditableTree,
+					} )
+				);
+				append( pointer, {
+					html: decodeURIComponent(
+						replacements[ i ].attributes[ 'data-rich-text-script' ]
+					),
+				} );
 			} else {
-				appendText( pointer, character );
+				pointer = append(
+					getParent( pointer ),
+					fromFormat( {
+						...replacements[ i ],
+						object: true,
+						isEditableTree,
+					} )
+				);
 			}
+			// Ensure pointer is text node.
+			pointer = append( getParent( pointer ), '' );
+		} else if ( ! preserveWhiteSpace && character === '\n' ) {
+			pointer = append( getParent( pointer ), {
+				type: 'br',
+				attributes: isEditableTree
+					? {
+							'data-rich-text-line-break': 'true',
+					  }
+					: undefined,
+				object: true,
+			} );
+			// Ensure pointer is text node.
+			pointer = append( getParent( pointer ), '' );
+		} else if ( ! isText( pointer ) ) {
+			pointer = append( getParent( pointer ), character );
+		} else {
+			appendText( pointer, character );
 		}
 
 		if ( onStartIndex && start === i + 1 ) {
@@ -230,6 +336,25 @@ export function toTree( {
 
 		if ( onEndIndex && end === i + 1 ) {
 			onEndIndex( tree, pointer );
+		}
+
+		if ( shouldInsertPadding && i === text.length ) {
+			append( getParent( pointer ), ZWNBSP );
+
+			if ( placeholder && text.length === 0 ) {
+				append( getParent( pointer ), {
+					type: 'span',
+					attributes: {
+						'data-rich-text-placeholder': placeholder,
+						// Necessary to prevent the placeholder from catching
+						// selection. The placeholder is also not editable after
+						// all.
+						contenteditable: 'false',
+						style:
+							'pointer-events:none;user-select:none;-webkit-user-select:none;-moz-user-select:none;-ms-user-select:none;',
+					},
+				} );
+			}
 		}
 
 		lastCharacterFormats = characterFormats;

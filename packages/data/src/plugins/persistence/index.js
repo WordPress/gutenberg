@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { flow, merge, isPlainObject, omit } from 'lodash';
+import { merge, isPlainObject } from 'lodash';
 
 /**
  * Internal dependencies
@@ -9,15 +9,18 @@ import { flow, merge, isPlainObject, omit } from 'lodash';
 import defaultStorage from './storage/default';
 import { combineReducers } from '../../';
 
+/** @typedef {import('../../registry').WPDataRegistry} WPDataRegistry */
+
+/** @typedef {import('../../registry').WPDataPlugin} WPDataPlugin */
+
 /**
- * Persistence plugin options.
+ * @typedef {Object} WPDataPersistencePluginOptions Persistence plugin options.
  *
  * @property {Storage} storage    Persistent storage implementation. This must
  *                                at least implement `getItem` and `setItem` of
  *                                the Web Storage API.
  * @property {string}  storageKey Key on which to set in persistent storage.
  *
- * @typedef {WPDataPersistencePluginOptions}
  */
 
 /**
@@ -72,7 +75,7 @@ export function createPersistenceInterface( options ) {
 	 *
 	 * @return {Object} Persisted data.
 	 */
-	function get() {
+	function getData() {
 		if ( data === undefined ) {
 			// If unset, getItem is expected to return null. Fall back to
 			// empty object.
@@ -99,12 +102,15 @@ export function createPersistenceInterface( options ) {
 	 * @param {string} key   Key to update.
 	 * @param {*}      value Updated value.
 	 */
-	function set( key, value ) {
+	function setData( key, value ) {
 		data = { ...data, [ key ]: value };
 		storage.setItem( storageKey, JSON.stringify( data ) );
 	}
 
-	return { get, set };
+	return {
+		get: getData,
+		set: setData,
+	};
 }
 
 /**
@@ -115,20 +121,20 @@ export function createPersistenceInterface( options ) {
  *
  * @return {WPDataPlugin} Data plugin.
  */
-const persistencePlugin = function( registry, pluginOptions ) {
+function persistencePlugin( registry, pluginOptions ) {
 	const persistence = createPersistenceInterface( pluginOptions );
 
 	/**
 	 * Creates an enhanced store dispatch function, triggering the state of the
-	 * given reducer key to be persisted when changed.
+	 * given store name to be persisted when changed.
 	 *
-	 * @param {Function}       getState   Function which returns current state.
-	 * @param {string}         reducerKey Reducer key.
-	 * @param {?Array<string>} keys       Optional subset of keys to save.
+	 * @param {Function}       getState  Function which returns current state.
+	 * @param {string}         storeName Store name.
+	 * @param {?Array<string>} keys      Optional subset of keys to save.
 	 *
 	 * @return {Function} Enhanced dispatch function.
 	 */
-	function createPersistOnChange( getState, reducerKey, keys ) {
+	function createPersistOnChange( getState, storeName, keys ) {
 		let getPersistedState;
 		if ( Array.isArray( keys ) ) {
 			// Given keys, the persisted state should by produced as an object
@@ -136,42 +142,53 @@ const persistencePlugin = function( registry, pluginOptions ) {
 			// to leverage its behavior of returning the same object when none
 			// of the property values changes. This allows a strict reference
 			// equality to bypass a persistence set on an unchanging state.
-			const reducers = keys.reduce( ( result, key ) => Object.assign( result, {
-				[ key ]: ( state, action ) => action.nextState[ key ],
-			} ), {} );
+			const reducers = keys.reduce(
+				( accumulator, key ) =>
+					Object.assign( accumulator, {
+						[ key ]: ( state, action ) => action.nextState[ key ],
+					} ),
+				{}
+			);
 
-			getPersistedState = withLazySameState( combineReducers( reducers ) );
+			getPersistedState = withLazySameState(
+				combineReducers( reducers )
+			);
 		} else {
 			getPersistedState = ( state, action ) => action.nextState;
 		}
 
-		let lastState = getPersistedState( undefined, { nextState: getState() } );
+		let lastState = getPersistedState( undefined, {
+			nextState: getState(),
+		} );
 
-		return ( result ) => {
-			const state = getPersistedState( lastState, { nextState: getState() } );
+		return () => {
+			const state = getPersistedState( lastState, {
+				nextState: getState(),
+			} );
 			if ( state !== lastState ) {
-				persistence.set( reducerKey, state );
+				persistence.set( storeName, state );
 				lastState = state;
 			}
-
-			return result;
 		};
 	}
 
 	return {
-		registerStore( reducerKey, options ) {
+		registerStore( storeName, options ) {
 			if ( ! options.persist ) {
-				return registry.registerStore( reducerKey, options );
+				return registry.registerStore( storeName, options );
 			}
 
 			// Load from persistence to use as initial state.
-			const persistedState = persistence.get()[ reducerKey ];
+			const persistedState = persistence.get()[ storeName ];
 			if ( persistedState !== undefined ) {
-				let initialState = options.reducer( undefined, {
+				let initialState = options.reducer( options.initialState, {
 					type: '@@WP/PERSISTENCE_RESTORE',
 				} );
 
-				if ( isPlainObject( initialState ) && isPlainObject( persistedState ) ) {
+				if (
+					isPlainObject( initialState ) &&
+					isPlainObject( persistedState )
+				) {
 					// If state is an object, ensure that:
 					// - Other keys are left intact when persisting only a
 					//   subset of keys.
@@ -184,48 +201,91 @@ const persistencePlugin = function( registry, pluginOptions ) {
 					initialState = persistedState;
 				}
 
-				options = { ...options, initialState };
+				options = {
+					...options,
+					initialState,
+				};
 			}
 
-			const store = registry.registerStore( reducerKey, options );
+			const store = registry.registerStore( storeName, options );
 
-			store.dispatch = flow( [
-				store.dispatch,
+			store.subscribe(
 				createPersistOnChange(
 					store.getState,
-					reducerKey,
+					storeName,
 					options.persist
-				),
-			] );
+				)
+			);
 
 			return store;
 		},
 	};
-};
+}
 
 /**
- * Deprecated: Remove this function once WordPress 5.3 is released.
+ * Move the 'features' object in local storage from the sourceStoreName to the
+ * interface store.
+ *
+ * @param {Object} persistence     The persistence interface.
+ * @param {string} sourceStoreName The name of the store that has persisted
+ *                                 preferences to migrate to the interface
+ *                                 package.
+ */
+export function migrateFeaturePreferencesToInterfaceStore(
+	persistence,
+	sourceStoreName
+) {
+	const interfaceStoreName = 'core/interface';
+	const state = persistence.get();
+	const sourcePreferences = state[ sourceStoreName ]?.preferences;
+	const sourceFeatures = sourcePreferences?.features;
+
+	if ( sourceFeatures ) {
+		const targetFeatures =
+			state[ interfaceStoreName ]?.preferences?.features;
+
+		// Avoid migrating features again if they've previously been migrated.
+		if ( ! targetFeatures?.[ sourceStoreName ] ) {
+			// Set the feature values in the interface store, the features
+			// object is keyed by 'scope', which matches the store name for
+			// the source.
+			persistence.set( interfaceStoreName, {
+				preferences: {
+					features: {
+						...targetFeatures,
+						[ sourceStoreName ]: sourceFeatures,
+					},
+				},
+			} );
+
+			// Remove feature preferences from the source.
+			persistence.set( sourceStoreName, {
+				preferences: {
+					...sourcePreferences,
+					features: undefined,
+				},
+			} );
+		}
+	}
+}
+
+/**
+ * Deprecated: Remove this function and the code in WordPress Core that calls
+ * it once WordPress 6.0 is released.
  */
 
 persistencePlugin.__unstableMigrate = ( pluginOptions ) => {
 	const persistence = createPersistenceInterface( pluginOptions );
 
-	// Preferences migration to introduce the block editor module
-	const persistedState = persistence.get();
-	const coreEditorState = persistedState[ 'core/editor' ];
-	if ( coreEditorState && coreEditorState.preferences && coreEditorState.preferences.insertUsage ) {
-		const blockEditorState = {
-			preferences: {
-				insertUsage: coreEditorState.preferences.insertUsage,
-			},
-		};
-
-		persistence.set( 'core/editor', {
-			...coreEditorState,
-			preferences: omit( coreEditorState.preferences, [ 'insertUsage' ] ),
-		} );
-		persistence.set( 'core/block-editor', blockEditorState );
-	}
+	migrateFeaturePreferencesToInterfaceStore(
+		persistence,
+		'core/edit-widgets'
+	);
+	migrateFeaturePreferencesToInterfaceStore(
+		persistence,
+		'core/customize-widgets'
+	);
+	migrateFeaturePreferencesToInterfaceStore( persistence, 'core/edit-post' );
 };
 
 export default persistencePlugin;

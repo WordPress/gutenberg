@@ -29,61 +29,82 @@ describe( 'toHTMLString', () => {
 		require( '../store' );
 	} );
 
-	specWithRegistration.forEach( ( {
-		description,
-		formatName,
-		formatType,
-		html,
-		value,
-	} ) => {
-		it( description, () => {
-			if ( formatName ) {
-				registerFormatType( formatName, formatType );
+	specWithRegistration.forEach(
+		( {
+			description,
+			formatName,
+			formatType,
+			html,
+			value,
+			noToHTMLString,
+		} ) => {
+			if ( noToHTMLString ) {
+				return;
 			}
 
-			const result = toHTMLString( { value } );
+			// eslint-disable-next-line jest/valid-title
+			it( description, () => {
+				if ( formatName ) {
+					registerFormatType( formatName, formatType );
+				}
 
-			if ( formatName ) {
-				unregisterFormatType( formatName );
-			}
+				const result = toHTMLString( { value } );
 
-			expect( result ).toEqual( html );
-		} );
-	} );
+				if ( formatName ) {
+					unregisterFormatType( formatName );
+				}
+
+				expect( result ).toEqual( html );
+			} );
+		}
+	);
 
 	it( 'should extract recreate HTML 1', () => {
-		const HTML = 'one <em>two 🍒</em> <a href="#"><img src=""><strong>three</strong></a><img src="">';
+		const HTML =
+			'one <em>two 🍒</em> <a href="#"><img src=""><strong>three</strong></a><img src="">';
 		const element = createNode( `<p>${ HTML }</p>` );
 
-		expect( toHTMLString( { value: create( { element } ) } ) ).toEqual( HTML );
+		expect( toHTMLString( { value: create( { element } ) } ) ).toEqual(
+			HTML
+		);
 	} );
 
 	it( 'should extract recreate HTML 2', () => {
-		const HTML = 'one <em>two 🍒</em> <a href="#">test <img src=""><strong>three</strong></a><img src="">';
+		const HTML =
+			'one <em>two 🍒</em> <a href="#">test <img src=""><strong>three</strong></a><img src="">';
 		const element = createNode( `<p>${ HTML }</p>` );
 
-		expect( toHTMLString( { value: create( { element } ) } ) ).toEqual( HTML );
+		expect( toHTMLString( { value: create( { element } ) } ) ).toEqual(
+			HTML
+		);
 	} );
 
 	it( 'should extract recreate HTML 3', () => {
 		const HTML = '<img src="">';
 		const element = createNode( `<p>${ HTML }</p>` );
 
-		expect( toHTMLString( { value: create( { element } ) } ) ).toEqual( HTML );
+		expect( toHTMLString( { value: create( { element } ) } ) ).toEqual(
+			HTML
+		);
 	} );
 
 	it( 'should extract recreate HTML 4', () => {
 		const HTML = '<em>two 🍒</em>';
 		const element = createNode( `<p>${ HTML }</p>` );
 
-		expect( toHTMLString( { value: create( { element } ) } ) ).toEqual( HTML );
+		expect( toHTMLString( { value: create( { element } ) } ) ).toEqual(
+			HTML
+		);
 	} );
 
 	it( 'should extract recreate HTML 5', () => {
-		const HTML = '<em>If you want to learn more about how to build additional blocks, or if you are interested in helping with the project, head over to the <a href="https://github.com/WordPress/gutenberg">GitHub repository</a>.</em>';
+		const HTML =
+			'<em>If you want to learn more about how to build additional blocks, or if you are interested in helping with the project, head over to the <a href="https://github.com/WordPress/gutenberg">GitHub repository</a>.</em>';
 		const element = createNode( `<p>${ HTML }</p>` );
 
-		expect( toHTMLString( { value: create( { element } ) } ) ).toEqual( HTML );
+		expect( toHTMLString( { value: create( { element } ) } ) ).toEqual(
+			HTML
+		);
 	} );
 
 	it( 'should extract recreate HTML 6', () => {
@@ -92,7 +113,11 @@ describe( 'toHTMLString', () => {
 		const multilineTag = 'li';
 		const multilineWrapperTags = [ 'ul', 'ol' ];
 		const value = create( { element, multilineTag, multilineWrapperTags } );
-		const result = toHTMLString( { value, multilineTag, multilineWrapperTags } );
+		const result = toHTMLString( {
+			value,
+			multilineTag,
+			multilineWrapperTags,
+		} );
 
 		expect( result ).toEqual( HTML );
 	} );
@@ -101,14 +126,17 @@ describe( 'toHTMLString', () => {
 		const HTML = '<a href="a">a</a><a href="b">a</a>';
 		const element = createNode( `<p>${ HTML }</p>` );
 
-		expect( toHTMLString( { value: create( { element } ) } ) ).toEqual( HTML );
+		expect( toHTMLString( { value: create( { element } ) } ) ).toEqual(
+			HTML
+		);
 	} );
 
 	it( 'should serialize neighbouring same formats', () => {
 		const HTML = '<a href="a">a</a><a href="a">a</a>';
 		const element = createNode( `<p>${ HTML }</p>` );
-		const expectedHTML = '<a href="a">aa</a>';
 
-		expect( toHTMLString( { value: create( { element } ) } ) ).toEqual( expectedHTML );
+		expect( toHTMLString( { value: create( { element } ) } ) ).toEqual(
+			HTML
+		);
 	} );
 } );

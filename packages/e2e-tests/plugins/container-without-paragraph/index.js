@@ -1,17 +1,19 @@
-( function() {
-	wp.blocks.registerBlockType('test/container-without-paragraph', {
+( function () {
+	wp.blocks.registerBlockType( 'test/container-without-paragraph', {
 		title: 'Container without paragraph',
-		category: 'common',
+		category: 'text',
 		icon: 'yes',
 
 		edit() {
-			return wp.element.createElement(wp.editor.InnerBlocks, {
-				allowedBlocks: ['core/image', 'core/gallery']
-			});
+			return wp.element.createElement( wp.blockEditor.InnerBlocks, {
+				allowedBlocks: [ 'core/image', 'core/gallery' ],
+			} );
 		},
 
 		save() {
-			return wp.element.createElement(wp.editor.InnerBlocks.Content);
+			return wp.element.createElement(
+				wp.blockEditor.InnerBlocks.Content
+			);
 		},
-	})
+	} );
 } )();

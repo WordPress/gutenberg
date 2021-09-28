@@ -12,13 +12,15 @@ import { withSelect } from '@wordpress/data';
  * Internal dependencies
  */
 import { visibilityOptions } from './utils';
+import { store as editorStore } from '../../store';
 
 function PostVisibilityLabel( { visibility } ) {
-	const getVisibilityLabel = () => find( visibilityOptions, { value: visibility } ).label;
+	const getVisibilityLabel = () =>
+		find( visibilityOptions, { value: visibility } ).label;
 
 	return getVisibilityLabel( visibility );
 }
 
 export default withSelect( ( select ) => ( {
-	visibility: select( 'core/editor' ).getEditedPostVisibility(),
+	visibility: select( editorStore ).getEditedPostVisibility(),
 } ) )( PostVisibilityLabel );

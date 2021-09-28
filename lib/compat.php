@@ -1,93 +1,192 @@
 <?php
 /**
- * PHP and WordPress configuration compatibility functions for the Gutenberg
- * editor plugin.
+ * Temporary compatibility shims for features present in Gutenberg, pending
+ * upstream commit to the WordPress core source repository. Functions here
+ * exist only as long as necessary for corresponding WordPress support, and
+ * each should be associated with a Trac ticket.
  *
  * @package gutenberg
  */
 
-if ( ! defined( 'ABSPATH' ) ) {
-	die( 'Silence is golden.' );
+/**
+ * Backporting wp_should_load_separate_core_block_assets from WP-Core.
+ *
+ * @todo Remove this function when the minimum supported version is WordPress 5.8.
+ */
+if ( ! function_exists( 'wp_should_load_separate_core_block_assets' ) ) {
+	/**
+	 * Checks whether separate assets should be loaded for core blocks on-render.
+	 *
+	 * @since 5.8.0
+	 *
+	 * @return bool Whether separate assets will be loaded.
+	 */
+	function wp_should_load_separate_core_block_assets() {
+		if ( is_admin() || is_feed() || ( defined( 'REST_REQUEST' ) && REST_REQUEST ) ) {
+			return false;
+		}
+
+		/**
+		 * Filters the flag that decides whether separate scripts and styles
+		 * will be loaded for core blocks on-render.
+		 *
+		 * @since 5.8.0
+		 *
+		 * @param bool $load_separate_assets Whether separate assets will be loaded.
+		 *                                   Default false.
+		 */
+		return apply_filters( 'should_load_separate_core_block_assets', false );
+	}
 }
 
 /**
- * Splits a UTF-8 string into an array of UTF-8-encoded codepoints.
+ * Opt-in to separate styles loading for block themes in WordPress 5.8.
  *
- * @since 0.5.0
- * @deprecated 5.0.0 _mb_substr
- *
- * @param string $str The string to split.
- * @return string Extracted substring.
+ * @todo Remove this function when the minimum supported version is WordPress 5.8.
  */
-function _gutenberg_utf8_split( $str ) {
-	_deprecated_function( __FUNCTION__, '5.0.0', '_mb_substr' );
-
-	return _mb_substr( $str );
-}
+add_filter(
+	'separate_core_block_assets',
+	function( $load_separate_styles ) {
+		if ( function_exists( 'gutenberg_is_fse_theme' ) && gutenberg_is_fse_theme() ) {
+			return true;
+		}
+		return $load_separate_styles;
+	}
+);
 
 /**
- * Disables wpautop behavior in classic editor when post contains blocks, to
- * prevent removep from invalidating paragraph blocks.
+ * Remove the `wp_enqueue_registered_block_scripts_and_styles` hook if needed.
  *
- * @link https://core.trac.wordpress.org/ticket/45113
- * @link https://core.trac.wordpress.org/changeset/43758
- * @deprecated 5.0.0
- *
- * @param array $settings Original editor settings.
- * @return array Filtered settings.
+ * @return void
  */
-function gutenberg_disable_editor_settings_wpautop( $settings ) {
-	_deprecated_function( __FUNCTION__, '5.0.0' );
-
-	return $settings;
+function gutenberg_remove_hook_wp_enqueue_registered_block_scripts_and_styles() {
+	if ( wp_should_load_separate_core_block_assets() ) {
+		/**
+		 * Avoid enqueueing block assets of all registered blocks for all posts, instead
+		 * deferring to block render mechanics to enqueue scripts, thereby ensuring only
+		 * blocks of the content have their assets enqueued.
+		 *
+		 * This can be removed once minimum support for the plugin is outside the range
+		 * of the version associated with closure of the following ticket.
+		 *
+		 * @see https://core.trac.wordpress.org/ticket/50328
+		 *
+		 * @see WP_Block::render
+		 */
+		remove_action( 'enqueue_block_assets', 'wp_enqueue_registered_block_scripts_and_styles' );
+	}
 }
+
+add_action( 'init', 'gutenberg_remove_hook_wp_enqueue_registered_block_scripts_and_styles' );
 
 /**
- * Add rest nonce to the heartbeat response.
+ * Callback hooked to the register_block_type_args filter.
  *
- * @link https://core.trac.wordpress.org/ticket/45113
- * @link https://core.trac.wordpress.org/changeset/43939
- * @deprecated 5.0.0
+ * This hooks into block registration to inject the default context into the block object.
+ * It can be removed once the default context is added into Core.
  *
- * @param array $response Original heartbeat response.
- * @return array New heartbeat response.
+ * @param array $args Block attributes.
+ * @return array Block attributes.
  */
-function gutenberg_add_rest_nonce_to_heartbeat_response_headers( $response ) {
-	_deprecated_function( __FUNCTION__, '5.0.0' );
+function gutenberg_inject_default_block_context( $args ) {
+	if ( is_callable( $args['render_callback'] ) ) {
+		$block_render_callback   = $args['render_callback'];
+		$args['render_callback'] = function( $attributes, $content, $block = null ) use ( $block_render_callback ) {
+			global $post;
 
-	return $response;
+			// Check for null for back compatibility with WP_Block_Type->render
+			// which is unused since the introduction of WP_Block class.
+			//
+			// See:
+			// - https://core.trac.wordpress.org/ticket/49927
+			// - commit 910de8f6890c87f93359c6f2edc6c27b9a3f3292 at wordpress-develop.
+
+			if ( null === $block ) {
+				return $block_render_callback( $attributes, $content );
+			}
+
+			$registry   = WP_Block_Type_Registry::get_instance();
+			$block_type = $registry->get_registered( $block->name );
+
+			// For WordPress versions that don't support the context API.
+			if ( ! $block->context ) {
+				$block->context = array();
+			}
+
+			// Inject the post context if not done by Core.
+			$needs_post_id = ! empty( $block_type->uses_context ) && in_array( 'postId', $block_type->uses_context, true );
+			if ( $post instanceof WP_Post && $needs_post_id && ! isset( $block->context['postId'] ) && 'wp_template' !== $post->post_type && 'wp_template_part' !== $post->post_type ) {
+				$block->context['postId'] = $post->ID;
+			}
+			$needs_post_type = ! empty( $block_type->uses_context ) && in_array( 'postType', $block_type->uses_context, true );
+			if ( $post instanceof WP_Post && $needs_post_type && ! isset( $block->context['postType'] ) && 'wp_template' !== $post->post_type && 'wp_template_part' !== $post->post_type ) {
+				/*
+				* The `postType` context is largely unnecessary server-side, since the
+				* ID is usually sufficient on its own. That being said, since a block's
+				* manifest is expected to be shared between the server and the client,
+				* it should be included to consistently fulfill the expectation.
+				*/
+				$block->context['postType'] = $post->post_type;
+			}
+
+			return $block_render_callback( $attributes, $content, $block );
+		};
+	}
+	return $args;
 }
+
+add_filter( 'register_block_type_args', 'gutenberg_inject_default_block_context' );
 
 /**
- * Check if we need to load the block warning in the Classic Editor.
+ * Override post type labels for Reusable Block custom post type.
+ * The labels are different from the ones in Core.
  *
- * @deprecated 5.0.0
+ * Remove this when Core receives the new labels (minimum supported version WordPress 5.8)
+ *
+ * @return array Array of new labels for Reusable Block post type.
  */
-function gutenberg_check_if_classic_needs_warning_about_blocks() {
-	_deprecated_function( __FUNCTION__, '5.0.0' );
+function gutenberg_override_reusable_block_post_type_labels() {
+	return array(
+		'name'                     => _x( 'Reusable blocks', 'post type general name', 'gutenberg' ),
+		'singular_name'            => _x( 'Reusable block', 'post type singular name', 'gutenberg' ),
+		'menu_name'                => _x( 'Reusable blocks', 'admin menu', 'gutenberg' ),
+		'name_admin_bar'           => _x( 'Reusable block', 'add new on admin bar', 'gutenberg' ),
+		'add_new'                  => _x( 'Add New', 'Reusable block', 'gutenberg' ),
+		'add_new_item'             => __( 'Add new Reusable block', 'gutenberg' ),
+		'new_item'                 => __( 'New Reusable block', 'gutenberg' ),
+		'edit_item'                => __( 'Edit Reusable block', 'gutenberg' ),
+		'view_item'                => __( 'View Reusable block', 'gutenberg' ),
+		'all_items'                => __( 'All Reusable blocks', 'gutenberg' ),
+		'search_items'             => __( 'Search Reusable blocks', 'gutenberg' ),
+		'not_found'                => __( 'No reusable blocks found.', 'gutenberg' ),
+		'not_found_in_trash'       => __( 'No reusable blocks found in Trash.', 'gutenberg' ),
+		'filter_items_list'        => __( 'Filter reusable blocks list', 'gutenberg' ),
+		'items_list_navigation'    => __( 'Reusable blocks list navigation', 'gutenberg' ),
+		'items_list'               => __( 'Reusable blocks list', 'gutenberg' ),
+		'item_published'           => __( 'Reusable block published.', 'gutenberg' ),
+		'item_published_privately' => __( 'Reusable block published privately.', 'gutenberg' ),
+		'item_reverted_to_draft'   => __( 'Reusable block reverted to draft.', 'gutenberg' ),
+		'item_scheduled'           => __( 'Reusable block scheduled.', 'gutenberg' ),
+		'item_updated'             => __( 'Reusable block updated.', 'gutenberg' ),
+	);
 }
+add_filter( 'post_type_labels_wp_block', 'gutenberg_override_reusable_block_post_type_labels', 10, 0 );
 
 /**
- * Adds a warning to the Classic Editor when trying to edit a post containing blocks.
+ * Update allowed inline style attributes list.
  *
- * @since 3.4.0
- * @deprecated 5.0.0
+ * Note: This should be removed when the minimum required WP version is >= 5.8.
+ *
+ * @param string[] $attrs Array of allowed CSS attributes.
+ * @return string[] CSS attributes.
  */
-function gutenberg_warn_classic_about_blocks() {
-	_deprecated_function( __FUNCTION__, '5.0.0' );
-}
+function gutenberg_safe_style_attrs( $attrs ) {
+	$attrs[] = 'object-position';
+	$attrs[] = 'border-top-left-radius';
+	$attrs[] = 'border-top-right-radius';
+	$attrs[] = 'border-bottom-right-radius';
+	$attrs[] = 'border-bottom-left-radius';
 
-/**
- * Display the privacy policy help notice.
- *
- * In Gutenberg, the `edit_form_after_title` hook is not supported. Because
- * WordPress Core uses this hook to display this notice, it never displays.
- * Outputting the notice on the `admin_notices` hook allows Gutenberg to
- * consume the notice and display it with the Notices API.
- *
- * @since 4.5.0
- * @deprecated 5.0.0
- */
-function gutenberg_show_privacy_policy_help_text() {
-	_deprecated_function( __FUNCTION__, '5.0.0' );
+	return $attrs;
 }
+add_filter( 'safe_style_css', 'gutenberg_safe_style_attrs' );

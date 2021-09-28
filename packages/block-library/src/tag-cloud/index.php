@@ -13,29 +13,30 @@
  * @return string Returns the tag cloud for selected taxonomy.
  */
 function render_block_core_tag_cloud( $attributes ) {
-	$class = isset( $attributes['align'] ) ?
-		"wp-block-tag-cloud align{$attributes['align']}" :
-		'wp-block-tag-cloud';
-
-	if ( isset( $attributes['className'] ) ) {
-		$class .= ' ' . $attributes['className'];
-	}
-
-	$args = array(
+	$args      = array(
 		'echo'       => false,
 		'taxonomy'   => $attributes['taxonomy'],
 		'show_count' => $attributes['showTagCounts'],
+		'number'     => $attributes['numberOfTags'],
 	);
-
 	$tag_cloud = wp_tag_cloud( $args );
 
 	if ( ! $tag_cloud ) {
-		$tag_cloud = esc_html( __( 'No terms to show.' ) );
+		$labels    = get_taxonomy_labels( get_taxonomy( $attributes['taxonomy'] ) );
+		$tag_cloud = esc_html(
+			sprintf(
+				/* translators: %s: taxonomy name */
+				__( 'Your site doesn&#8217;t have any %s, so there&#8217;s nothing to display here at the moment.' ),
+				strtolower( $labels->name )
+			)
+		);
 	}
 
+	$wrapper_attributes = get_block_wrapper_attributes();
+
 	return sprintf(
-		'<p class="%1$s">%2$s</p>',
-		esc_attr( $class ),
+		'<p %1$s>%2$s</p>',
+		$wrapper_attributes,
 		$tag_cloud
 	);
 }
@@ -44,28 +45,11 @@ function render_block_core_tag_cloud( $attributes ) {
  * Registers the `core/tag-cloud` block on server.
  */
 function register_block_core_tag_cloud() {
-	register_block_type(
-		'core/tag-cloud',
+	register_block_type_from_metadata(
+		__DIR__ . '/tag-cloud',
 		array(
-			'attributes'      => array(
-				'taxonomy'      => array(
-					'type'    => 'string',
-					'default' => 'post_tag',
-				),
-				'className'     => array(
-					'type' => 'string',
-				),
-				'showTagCounts' => array(
-					'type'    => 'boolean',
-					'default' => false,
-				),
-				'align'         => array(
-					'type' => 'string',
-				),
-			),
 			'render_callback' => 'render_block_core_tag_cloud',
 		)
 	);
 }
-
 add_action( 'init', 'register_block_core_tag_cloud' );

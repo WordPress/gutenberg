@@ -18,7 +18,8 @@ describe( 'listReducer', () => {
 	} );
 
 	it( 'should not merge lists if it has more than one item', () => {
-		const input = '<ul><li>one</li></ul><ul><li>two</li><li>three</li></ul>';
+		const input =
+			'<ul><li>one</li></ul><ul><li>two</li><li>three</li></ul>';
 		expect( deepFilterHTML( input, [ listReducer ] ) ).toEqual( input );
 	} );
 
@@ -33,8 +34,10 @@ describe( 'listReducer', () => {
 	} );
 
 	it( 'should merge list items if nested list parent has no content', () => {
-		const input = '<ul><li>1</li><li><ul><li>1.1</li><li>1.2</li></ul></li><li>2</li></ul>';
-		const output = '<ul><li>1<ul><li>1.1</li><li>1.2</li></ul></li><li>2</li></ul>';
+		const input =
+			'<ul><li>1</li><li><ul><li>1.1</li><li>1.2</li></ul></li><li>2</li></ul>';
+		const output =
+			'<ul><li>1<ul><li>1.1</li><li>1.2</li></ul></li><li>2</li></ul>';
 		expect( deepFilterHTML( input, [ listReducer ] ) ).toEqual( output );
 	} );
 

@@ -2,47 +2,62 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { IconButton, Dropdown, MenuGroup } from '@wordpress/components';
-import { Fragment } from '@wordpress/element';
+import { MenuGroup } from '@wordpress/components';
+import {
+	ActionItem,
+	MoreMenuDropdown,
+	PinnedItems,
+} from '@wordpress/interface';
+import { useViewportMatch } from '@wordpress/compose';
 
 /**
  * Internal dependencies
  */
 import ModeSwitcher from '../mode-switcher';
-import PluginMoreMenuGroup from '../plugins-more-menu-group';
+import PreferencesMenuItem from '../preferences-menu-item';
 import ToolsMoreMenuGroup from '../tools-more-menu-group';
-import OptionsMenuItem from '../options-menu-item';
 import WritingMenu from '../writing-menu';
 
-const ariaClosed = __( 'Show more tools & options' );
-const ariaOpen = __( 'Hide more tools & options' );
+const POPOVER_PROPS = {
+	className: 'edit-post-more-menu__content',
+};
 
-const MoreMenu = () => (
-	<Dropdown
-		className="edit-post-more-menu"
-		contentClassName="edit-post-more-menu__content"
-		position="bottom left"
-		renderToggle={ ( { isOpen, onToggle } ) => (
-			<IconButton
-				icon="ellipsis"
-				label={ isOpen ? ariaOpen : ariaClosed }
-				labelPosition="bottom"
-				onClick={ onToggle }
-				aria-expanded={ isOpen }
-			/>
-		) }
-		renderContent={ ( { onClose } ) => (
-			<Fragment>
-				<WritingMenu onClose={ onClose } />
-				<ModeSwitcher onSelect={ onClose } />
-				<PluginMoreMenuGroup.Slot fillProps={ { onClose } } />
-				<ToolsMoreMenuGroup.Slot fillProps={ { onClose } } />
-				<MenuGroup>
-					<OptionsMenuItem onSelect={ onClose } />
-				</MenuGroup>
-			</Fragment>
-		) }
-	/>
-);
+const MoreMenu = ( { showIconLabels } ) => {
+	const isLargeViewport = useViewportMatch( 'large' );
+
+	return (
+		<MoreMenuDropdown
+			className="edit-post-more-menu"
+			popoverProps={ POPOVER_PROPS }
+			toggleProps={ {
+				showTooltip: ! showIconLabels,
+				...( showIconLabels && { variant: 'tertiary' } ),
+			} }
+		>
+			{ ( { onClose } ) => (
+				<>
+					{ showIconLabels && ! isLargeViewport && (
+						<PinnedItems.Slot
+							className={ showIconLabels && 'show-icon-labels' }
+							scope="core/edit-post"
+						/>
+					) }
+					<WritingMenu />
+					<ModeSwitcher />
+					<ActionItem.Slot
+						name="core/edit-post/plugin-more-menu"
+						label={ __( 'Plugins' ) }
+						as={ MenuGroup }
+						fillProps={ { onClick: onClose } }
+					/>
+					<ToolsMoreMenuGroup.Slot fillProps={ { onClose } } />
+					<MenuGroup>
+						<PreferencesMenuItem />
+					</MenuGroup>
+				</>
+			) }
+		</MoreMenuDropdown>
+	);
+};
 
 export default MoreMenu;

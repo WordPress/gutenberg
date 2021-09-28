@@ -1,36 +1,33 @@
 /**
- * External dependencies
- */
-import { mapKeys } from 'lodash';
-import memize from 'memize';
-
-/**
  * WordPress dependencies
  */
-import { select, dispatch, withSelect, withDispatch } from '@wordpress/data';
-import { addFilter } from '@wordpress/hooks';
-import { compose } from '@wordpress/compose';
-
+import { select, dispatch } from '@wordpress/data';
 /**
- * Shared reference to an empty array for cases where it is important to avoid
- * returning a new array reference on every invocation, as in a connected or
- * other pure component which performs `shouldComponentUpdate` check on props.
- * This should be used as a last resort, since the normalized data should be
- * maintained by the reducer result in state.
- *
- * @type {Array}
+ * Internal dependencies
  */
-const EMPTY_ARRAY = [];
+import { store as richTextStore } from './store';
+/**
+ * @typedef {Object} WPFormat
+ *
+ * @property {string}   name        A string identifying the format. Must be
+ *                                  unique across all registered formats.
+ * @property {string}   tagName     The HTML tag this format will wrap the
+ *                                  selection with.
+ * @property {string}   [className] A class to match the format.
+ * @property {string}   title       Name of the format.
+ * @property {Function} edit        Should return a component for the user to
+ *                                  interact with the new registered format.
+ */
 
 /**
  * Registers a new format provided a unique name and an object defining its
  * behavior.
  *
- * @param {string} name     Format name.
- * @param {Object} settings Format settings.
+ * @param {string}   name     Format name.
+ * @param {WPFormat} settings Format settings.
  *
- * @return {?WPFormat} The format, if it has been successfully registered;
- *                     otherwise `undefined`.
+ * @return {WPFormat|undefined} The format, if it has been successfully
+ *                              registered; otherwise `undefined`.
  */
 export function registerFormatType( name, settings ) {
 	settings = {
@@ -39,9 +36,7 @@ export function registerFormatType( name, settings ) {
 	};
 
 	if ( typeof settings.name !== 'string' ) {
-		window.console.error(
-			'Format names must be strings.'
-		);
+		window.console.error( 'Format names must be strings.' );
 		return;
 	}
 
@@ -52,25 +47,21 @@ export function registerFormatType( name, settings ) {
 		return;
 	}
 
-	if ( select( 'core/rich-text' ).getFormatType( settings.name ) ) {
+	if ( select( richTextStore ).getFormatType( settings.name ) ) {
 		window.console.error(
 			'Format "' + settings.name + '" is already registered.'
 		);
 		return;
 	}
 
-	if (
-		typeof settings.tagName !== 'string' ||
-		settings.tagName === ''
-	) {
-		window.console.error(
-			'Format tag names must be a string.'
-		);
+	if ( typeof settings.tagName !== 'string' || settings.tagName === '' ) {
+		window.console.error( 'Format tag names must be a string.' );
 		return;
 	}
 
 	if (
-		( typeof settings.className !== 'string' || settings.className === '' ) &&
+		( typeof settings.className !== 'string' ||
+			settings.className === '' ) &&
 		settings.className !== null
 	) {
 		window.console.error(
@@ -87,8 +78,9 @@ export function registerFormatType( name, settings ) {
 	}
 
 	if ( settings.className === null ) {
-		const formatTypeForBareElement = select( 'core/rich-text' )
-			.getFormatTypeForBareElement( settings.tagName );
+		const formatTypeForBareElement = select(
+			richTextStore
+		).getFormatTypeForBareElement( settings.tagName );
 
 		if ( formatTypeForBareElement ) {
 			window.console.error(
@@ -97,8 +89,9 @@ export function registerFormatType( name, settings ) {
 			return;
 		}
 	} else {
-		const formatTypeForClassName = select( 'core/rich-text' )
-			.getFormatTypeForClassName( settings.className );
+		const formatTypeForClassName = select(
+			richTextStore
+		).getFormatTypeForClassName( settings.className );
 
 		if ( formatTypeForClassName ) {
 			window.console.error(
@@ -117,113 +110,19 @@ export function registerFormatType( name, settings ) {
 
 	if ( 'keywords' in settings && settings.keywords.length > 3 ) {
 		window.console.error(
-			'The format "' + settings.name + '" can have a maximum of 3 keywords.'
+			'The format "' +
+				settings.name +
+				'" can have a maximum of 3 keywords.'
 		);
 		return;
 	}
 
 	if ( typeof settings.title !== 'string' ) {
-		window.console.error(
-			'Format titles must be strings.'
-		);
+		window.console.error( 'Format titles must be strings.' );
 		return;
 	}
 
-	dispatch( 'core/rich-text' ).addFormatTypes( settings );
-
-	const getFunctionStackMemoized = memize( ( previousStack = EMPTY_ARRAY, newFunction ) => {
-		return [
-			...previousStack,
-			newFunction,
-		];
-	} );
-
-	if (
-		settings.__experimentalGetPropsForEditableTreePreparation
-	) {
-		addFilter( 'experimentalRichText', name, ( OriginalComponent ) => {
-			let Component = OriginalComponent;
-			if (
-				settings.__experimentalCreatePrepareEditableTree ||
-				settings.__experimentalCreateFormatToValue ||
-				settings.__experimentalCreateValueToFormat
-			) {
-				Component = ( props ) => {
-					const additionalProps = {};
-
-					if ( settings.__experimentalCreatePrepareEditableTree ) {
-						additionalProps.prepareEditableTree = getFunctionStackMemoized(
-							props.prepareEditableTree,
-							settings.__experimentalCreatePrepareEditableTree( props[ `format_${ name }` ], {
-								richTextIdentifier: props.identifier,
-								blockClientId: props.clientId,
-							} )
-						);
-					}
-
-					if ( settings.__experimentalCreateOnChangeEditableValue ) {
-						const dispatchProps = Object.keys( props ).reduce( ( accumulator, propKey ) => {
-							const propValue = props[ propKey ];
-							const keyPrefix = `format_${ name }_dispatch_`;
-							if ( propKey.startsWith( keyPrefix ) ) {
-								const realKey = propKey.replace( keyPrefix, '' );
-
-								accumulator[ realKey ] = propValue;
-							}
-
-							return accumulator;
-						}, {} );
-
-						additionalProps.onChangeEditableValue = getFunctionStackMemoized(
-							props.onChangeEditableValue,
-							settings.__experimentalCreateOnChangeEditableValue( {
-								...props[ `format_${ name }` ],
-								...dispatchProps,
-							}, {
-								richTextIdentifier: props.identifier,
-								blockClientId: props.clientId,
-							} )
-						);
-					}
-
-					return <OriginalComponent
-						{ ...props }
-						{ ...additionalProps }
-					/>;
-				};
-			}
-
-			const hocs = [
-				withSelect( ( sel, { clientId, identifier } ) => ( {
-					[ `format_${ name }` ]: settings.__experimentalGetPropsForEditableTreePreparation(
-						sel,
-						{
-							richTextIdentifier: identifier,
-							blockClientId: clientId,
-						}
-					),
-				} ) ),
-			];
-
-			if ( settings.__experimentalGetPropsForEditableTreeChangeHandler ) {
-				hocs.push( withDispatch( ( disp, { clientId, identifier } ) => {
-					const dispatchProps = settings.__experimentalGetPropsForEditableTreeChangeHandler(
-						disp,
-						{
-							richTextIdentifier: identifier,
-							blockClientId: clientId,
-						}
-					);
-
-					return mapKeys( dispatchProps, ( value, key ) => {
-						return `format_${ name }_dispatch_${ key }`;
-					} );
-				} ) );
-			}
-
-			return compose( hocs )( Component );
-		} );
-	}
+	dispatch( richTextStore ).addFormatTypes( settings );
 
 	return settings;
 }

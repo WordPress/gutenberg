@@ -17,16 +17,19 @@ describe( 'insert', () => {
 	it( 'should delete and insert', () => {
 		const record = {
 			formats: [ , , , , [ em ], [ em ], [ em ], , , , , , , ],
+			replacements: [],
 			text: 'one two three',
 			start: 6,
 			end: 6,
 		};
 		const toInsert = {
 			formats: [ [ strong ] ],
+			replacements: [],
 			text: 'a',
 		};
 		const expected = {
 			formats: [ , , [ strong ], [ em ], , , , , , , ],
+			replacements: [],
 			text: 'onao three',
 			start: 3,
 			end: 3,
@@ -41,16 +44,19 @@ describe( 'insert', () => {
 	it( 'should insert line break with selection', () => {
 		const record = {
 			formats: [ , , ],
+			replacements: [],
 			text: 'tt',
 			start: 1,
 			end: 1,
 		};
 		const toInsert = {
 			formats: [ , ],
+			replacements: [],
 			text: '\n',
 		};
 		const expected = {
 			formats: [ , , , ],
+			replacements: [],
 			text: 't\nt',
 			start: 2,
 			end: 2,

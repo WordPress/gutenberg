@@ -3,44 +3,47 @@
  */
 import { MenuGroup } from '@wordpress/components';
 import { __, _x } from '@wordpress/i18n';
-import { ifViewportMatches } from '@wordpress/viewport';
+import { useViewportMatch } from '@wordpress/compose';
+import { displayShortcut } from '@wordpress/keycodes';
+import { MoreMenuFeatureToggle } from '@wordpress/interface';
 
-/**
- * Internal dependencies
- */
-import FeatureToggle from '../feature-toggle';
+function WritingMenu() {
+	const isLargeViewport = useViewportMatch( 'medium' );
+	if ( ! isLargeViewport ) {
+		return null;
+	}
 
-function WritingMenu( { onClose } ) {
 	return (
-		<MenuGroup
-			label={ _x( 'View', 'noun' ) }
-		>
-			<FeatureToggle
+		<MenuGroup label={ _x( 'View', 'noun' ) }>
+			<MoreMenuFeatureToggle
+				scope="core/edit-post"
 				feature="fixedToolbar"
-				label={ __( 'Top Toolbar' ) }
-				info={ __( 'Access all block and document tools in a single place' ) }
-				onToggle={ onClose }
+				label={ __( 'Top toolbar' ) }
+				info={ __(
+					'Access all block and document tools in a single place'
+				) }
 				messageActivated={ __( 'Top toolbar activated' ) }
 				messageDeactivated={ __( 'Top toolbar deactivated' ) }
 			/>
-			<FeatureToggle
+			<MoreMenuFeatureToggle
+				scope="core/edit-post"
 				feature="focusMode"
-				label={ __( 'Spotlight Mode' ) }
+				label={ __( 'Spotlight mode' ) }
 				info={ __( 'Focus on one block at a time' ) }
-				onToggle={ onClose }
 				messageActivated={ __( 'Spotlight mode activated' ) }
 				messageDeactivated={ __( 'Spotlight mode deactivated' ) }
 			/>
-			<FeatureToggle
+			<MoreMenuFeatureToggle
+				scope="core/edit-post"
 				feature="fullscreenMode"
-				label={ __( 'Fullscreen Mode' ) }
+				label={ __( 'Fullscreen mode' ) }
 				info={ __( 'Work without distraction' ) }
-				onToggle={ onClose }
 				messageActivated={ __( 'Fullscreen mode activated' ) }
 				messageDeactivated={ __( 'Fullscreen mode deactivated' ) }
+				shortcut={ displayShortcut.secondary( 'f' ) }
 			/>
 		</MenuGroup>
 	);
 }
 
-export default ifViewportMatches( 'medium' )( WritingMenu );
+export default WritingMenu;

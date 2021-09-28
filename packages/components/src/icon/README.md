@@ -9,9 +9,7 @@ Allows you to render a raw icon without any initial styling or wrappers.
 ```jsx
 import { Icon } from '@wordpress/components';
 
-const MyIcon = () => (
-	<Icon icon="screenoptions" />
-);
+const MyIcon = () => <Icon icon="screenoptions" />;
 ```
 
 #### With a function
@@ -20,7 +18,13 @@ const MyIcon = () => (
 import { Icon } from '@wordpress/components';
 
 const MyIcon = () => (
-	<Icon icon={ () => <svg><path d="M5 4v3h5.5v12h3V7H19V4z" /></svg> } />
+	<Icon
+		icon={ () => (
+			<svg>
+				<path d="M5 4v3h5.5v12h3V7H19V4z" />
+			</svg>
+		) }
+	/>
 );
 ```
 
@@ -30,9 +34,7 @@ const MyIcon = () => (
 import { MyIconComponent } from '../my-icon-component';
 import { Icon } from '@wordpress/components';
 
-const MyIcon = () => (
-	<Icon icon={ MyIconComponent } />
-);
+const MyIcon = () => <Icon icon={ MyIconComponent } />;
 ```
 
 #### With an SVG
@@ -41,7 +43,13 @@ const MyIcon = () => (
 import { Icon } from '@wordpress/components';
 
 const MyIcon = () => (
-	<Icon icon={ <svg><path d="M5 4v3h5.5v12h3V7H19V4z" /></svg> } />
+	<Icon
+		icon={
+			<svg>
+				<path d="M5 4v3h5.5v12h3V7H19V4z" />
+			</svg>
+		}
+	/>
 );
 ```
 
@@ -50,35 +58,25 @@ const MyIcon = () => (
 ```jsx
 import { Icon } from '@wordpress/components';
 
-const MyIcon = () => (
-	<Icon icon="screenoptions" className="example-class" />
-);
+const MyIcon = () => <Icon icon="screenoptions" className="example-class" />;
 ```
 
 ## Props
 
-The component accepts the following props:
+The component accepts the following props. Any additional props are passed through to the underlying icon element.
 
 ### icon
 
 The icon to render. Supported values are: Dashicons (specified as strings), functions, WPComponent instances and `null`.
 
-- Type: `String|Function|WPComponent|null`
-- Required: No
-- Default: `null`
+-   Type: `String|Function|WPComponent|null`
+-   Required: No
+-   Default: `null`
 
 ### size
 
 The size (width and height) of the icon.
 
-- Type: `Number`
-- Required: No
-- Default: `20` when a Dashicon is rendered, `24` for all other icons.
-
-### className
-
-An optional additional class name to apply to the rendered icon.
-
-- Type: `String`
-- Required: No
-- Default: `null`
+-   Type: `Number`
+-   Required: No
+-   Default: `20` when a Dashicon is rendered, `24` for all other icons.

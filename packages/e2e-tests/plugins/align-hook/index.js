@@ -1,23 +1,18 @@
-( function() {
-	var registerBlockType = wp.blocks.registerBlockType;
-	var el = wp.element.createElement;
-	var InnerBlocks = wp.editor.InnerBlocks;
-	var __ = wp.i18n.__;
-	var TEMPLATE = [
-		[ 'core/paragraph', { fontSize: 'large', content: __( 'Content…' ) } ],
-	];
+( function () {
+	const registerBlockType = wp.blocks.registerBlockType;
+	const el = wp.element.createElement;
 
-	var baseBlock = {
+	const baseBlock = {
 		icon: 'cart',
-		category: 'common',
-		edit: function( props ) {
+		category: 'text',
+		edit() {
 			return el(
 				'div',
 				{ style: { outline: '1px solid gray', padding: 5 } },
 				'Test Align Hook'
 			);
 		},
-		save: function() {
+		save() {
 			return el(
 				'div',
 				{ style: { outline: '1px solid gray', padding: 5 } },
@@ -43,7 +38,7 @@
 				title: 'Test Align True',
 				supports: {
 					align: true,
-				}
+				},
 			},
 			baseBlock
 		)
@@ -56,7 +51,7 @@
 				title: 'Test Align Array',
 				supports: {
 					align: [ 'left', 'center' ],
-				}
+				},
 			},
 			baseBlock
 		)
@@ -75,7 +70,7 @@
 				},
 				supports: {
 					align: true,
-				}
+				},
 			},
 			baseBlock
 		)

@@ -32,14 +32,14 @@ let stack;
  *    not captured. thus, we find the long string of `a`s and remember it, then
  *    reference it as a whole unit inside our pattern
  *
- *    @cite http://instanceof.me/post/52245507631/regex-emulate-atomic-grouping-with-lookahead
- *    @cite http://blog.stevenlevithan.com/archives/mimic-atomic-groups
- *    @cite https://javascript.info/regexp-infinite-backtracking-problem
+ *    @see http://instanceof.me/post/52245507631/regex-emulate-atomic-grouping-with-lookahead
+ *    @see http://blog.stevenlevithan.com/archives/mimic-atomic-groups
+ *    @see https://javascript.info/regexp-infinite-backtracking-problem
  *
  *    once browsers reliably support atomic grouping or possessive
  *    quantifiers natively we should remove this trick and simplify
  *
- * @type RegExp
+ * @type {RegExp}
  *
  * @since 3.8.0
  * @since 4.6.1 added optimization to prevent backtracking on attribute parsing
@@ -70,6 +70,83 @@ function Frame( block, tokenStart, tokenLength, prevOffset, leadingHtmlStart ) {
 	};
 }
 
+/**
+ * Parser function, that converts input HTML into a block based structure.
+ *
+ * @param {string} doc The HTML document to parse.
+ *
+ * @example
+ * Input post:
+ * ```html
+ * <!-- wp:columns {"columns":3} -->
+ * <div class="wp-block-columns has-3-columns"><!-- wp:column -->
+ * <div class="wp-block-column"><!-- wp:paragraph -->
+ * <p>Left</p>
+ * <!-- /wp:paragraph --></div>
+ * <!-- /wp:column -->
+ *
+ * <!-- wp:column -->
+ * <div class="wp-block-column"><!-- wp:paragraph -->
+ * <p><strong>Middle</strong></p>
+ * <!-- /wp:paragraph --></div>
+ * <!-- /wp:column -->
+ *
+ * <!-- wp:column -->
+ * <div class="wp-block-column"></div>
+ * <!-- /wp:column --></div>
+ * <!-- /wp:columns -->
+ * ```
+ *
+ * Parsing code:
+ * ```js
+ * import { parse } from '@wordpress/block-serialization-default-parser';
+ *
+ * parse( post ) === [
+ *     {
+ *         blockName: "core/columns",
+ *         attrs: {
+ *             columns: 3
+ *         },
+ *         innerBlocks: [
+ *             {
+ *                 blockName: "core/column",
+ *                 attrs: null,
+ *                 innerBlocks: [
+ *                     {
+ *                         blockName: "core/paragraph",
+ *                         attrs: null,
+ *                         innerBlocks: [],
+ *                         innerHTML: "\n<p>Left</p>\n"
+ *                     }
+ *                 ],
+ *                 innerHTML: '\n<div class="wp-block-column"></div>\n'
+ *             },
+ *             {
+ *                 blockName: "core/column",
+ *                 attrs: null,
+ *                 innerBlocks: [
+ *                     {
+ *                         blockName: "core/paragraph",
+ *                         attrs: null,
+ *                         innerBlocks: [],
+ *                         innerHTML: "\n<p><strong>Middle</strong></p>\n"
+ *                     }
+ *                 ],
+ *                 innerHTML: '\n<div class="wp-block-column"></div>\n'
+ *             },
+ *             {
+ *                 blockName: "core/column",
+ *                 attrs: null,
+ *                 innerBlocks: [],
+ *                 innerHTML: '\n<div class="wp-block-column"></div>\n'
+ *             }
+ *         ],
+ *         innerHTML: '\n<div class="wp-block-columns has-3-columns">\n\n\n\n</div>\n'
+ *     }
+ * ];
+ * ```
+ * @return {Array} A block-based representation of the input HTML.
+ */
 export const parse = ( doc ) => {
 	document = doc;
 	offset = 0;
@@ -90,7 +167,7 @@ function proceed() {
 	const stackDepth = stack.length;
 
 	// we may have some HTML soup before the next block
-	const leadingHtmlStart = ( startOffset > offset ) ? offset : null;
+	const leadingHtmlStart = startOffset > offset ? offset : null;
 
 	switch ( tokenType ) {
 		case 'no-more-tokens':
@@ -125,7 +202,14 @@ function proceed() {
 			// in the top-level of the document
 			if ( 0 === stackDepth ) {
 				if ( null !== leadingHtmlStart ) {
-					output.push( Freeform( document.substr( leadingHtmlStart, startOffset - leadingHtmlStart ) ) );
+					output.push(
+						Freeform(
+							document.substr(
+								leadingHtmlStart,
+								startOffset - leadingHtmlStart
+							)
+						)
+					);
 				}
 				output.push( Block( blockName, attrs, [], '', [] ) );
 				offset = startOffset + tokenLength;
@@ -136,7 +220,7 @@ function proceed() {
 			addInnerBlock(
 				Block( blockName, attrs, [], '', [] ),
 				startOffset,
-				tokenLength,
+				tokenLength
 			);
 			offset = startOffset + tokenLength;
 			return true;
@@ -149,8 +233,8 @@ function proceed() {
 					startOffset,
 					tokenLength,
 					startOffset + tokenLength,
-					leadingHtmlStart,
-				),
+					leadingHtmlStart
+				)
 			);
 			offset = startOffset + tokenLength;
 			return true;
@@ -177,7 +261,10 @@ function proceed() {
 			// otherwise we're nested and we have to close out the current
 			// block and add it as a innerBlock to the parent
 			const stackTop = stack.pop();
-			const html = document.substr( stackTop.prevOffset, startOffset - stackTop.prevOffset );
+			const html = document.substr(
+				stackTop.prevOffset,
+				startOffset - stackTop.prevOffset
+			);
 			stackTop.block.innerHTML += html;
 			stackTop.block.innerContent.push( html );
 			stackTop.prevOffset = startOffset + tokenLength;
@@ -186,7 +273,7 @@ function proceed() {
 				stackTop.block,
 				stackTop.tokenStart,
 				stackTop.tokenLength,
-				startOffset + tokenLength,
+				startOffset + tokenLength
 			);
 			offset = startOffset + tokenLength;
 			return true;
@@ -222,7 +309,7 @@ function nextToken() {
 	// we're also using a trick here because the only difference between a
 	// block opener and a block closer is the leading `/` before `wp:` (and
 	// a closer has no attributes). we can trap them both and process the
-	// match back in Javascript to see which one it was.
+	// match back in JavaScript to see which one it was.
 	const matches = tokenizer.exec( document );
 
 	// we have no more tokens
@@ -231,7 +318,15 @@ function nextToken() {
 	}
 
 	const startedAt = matches.index;
-	const [ match, closerMatch, namespaceMatch, nameMatch, attrsMatch, /* internal/unused */, voidMatch ] = matches;
+	const [
+		match,
+		closerMatch,
+		namespaceMatch,
+		nameMatch,
+		attrsMatch /* internal/unused */,
+		,
+		voidMatch,
+	] = matches;
 
 	const length = match.length;
 	const isCloser = !! closerMatch;
@@ -272,7 +367,10 @@ function addFreeform( rawLength ) {
 function addInnerBlock( block, tokenStart, tokenLength, lastOffset ) {
 	const parent = stack[ stack.length - 1 ];
 	parent.block.innerBlocks.push( block );
-	const html = document.substr( parent.prevOffset, tokenStart - parent.prevOffset );
+	const html = document.substr(
+		parent.prevOffset,
+		tokenStart - parent.prevOffset
+	);
 
 	if ( html ) {
 		parent.block.innerHTML += html;
@@ -286,7 +384,9 @@ function addInnerBlock( block, tokenStart, tokenLength, lastOffset ) {
 function addBlockFromStack( endOffset ) {
 	const { block, leadingHtmlStart, prevOffset, tokenStart } = stack.pop();
 
-	const html = endOffset ? document.substr( prevOffset, endOffset - prevOffset ) : document.substr( prevOffset );
+	const html = endOffset
+		? document.substr( prevOffset, endOffset - prevOffset )
+		: document.substr( prevOffset );
 
 	if ( html ) {
 		block.innerHTML += html;
@@ -294,7 +394,14 @@ function addBlockFromStack( endOffset ) {
 	}
 
 	if ( null !== leadingHtmlStart ) {
-		output.push( Freeform( document.substr( leadingHtmlStart, tokenStart - leadingHtmlStart ) ) );
+		output.push(
+			Freeform(
+				document.substr(
+					leadingHtmlStart,
+					tokenStart - leadingHtmlStart
+				)
+			)
+		);
 	}
 
 	output.push( block );

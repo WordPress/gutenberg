@@ -1,7 +1,12 @@
 /**
  * External dependencies
  */
-import ShallowRenderer from 'react-test-renderer/shallow';
+import TestRenderer from 'react-test-renderer';
+
+/**
+ * WordPress dependencies
+ */
+import { DOWN, ENTER, UP } from '@wordpress/keycodes';
 
 /**
  * Internal dependencies
@@ -9,18 +14,105 @@ import ShallowRenderer from 'react-test-renderer/shallow';
 import ColorPicker from '../';
 
 describe( 'ColorPicker', () => {
-	test( 'should render color picker', () => {
-		const color = '#fff';
+	const color = '#FFF';
+	let base;
 
-		const renderer = new ShallowRenderer();
-		renderer.render(
+	beforeEach( () => {
+		base = TestRenderer.create(
 			<ColorPicker
 				color={ color }
 				onChangeComplete={ () => {} }
 				disableAlpha
 			/>
 		);
+	} );
 
-		expect( renderer.getRenderOutput() ).toMatchSnapshot();
+	test( 'should render color picker', () => {
+		expect( base.toJSON() ).toMatchSnapshot();
+	} );
+
+	test( 'should only update input view for draft changes', () => {
+		const testRenderer = TestRenderer.create(
+			<ColorPicker
+				color={ color }
+				onChangeComplete={ () => {} }
+				disableAlpha
+			/>
+		);
+		testRenderer.root
+			.findByType( 'input' )
+			.props.onChange( { target: { value: '#ABC' } } );
+
+		expect( testRenderer.toJSON() ).toMatchDiffSnapshot( base.toJSON() );
+	} );
+
+	test( 'should commit changes to all views on blur', () => {
+		const testRenderer = TestRenderer.create(
+			<ColorPicker
+				color={ color }
+				onChangeComplete={ () => {} }
+				disableAlpha
+			/>
+		);
+		testRenderer.root
+			.findByType( 'input' )
+			.props.onChange( { target: { value: '#ABC' } } );
+		testRenderer.root.findByType( 'input' ).props.onBlur();
+
+		expect( testRenderer.toJSON() ).toMatchDiffSnapshot( base.toJSON() );
+	} );
+
+	test( 'should commit changes to all views on keyDown = UP', () => {
+		const testRenderer = TestRenderer.create(
+			<ColorPicker
+				color={ color }
+				onChangeComplete={ () => {} }
+				disableAlpha
+			/>
+		);
+		testRenderer.root
+			.findByType( 'input' )
+			.props.onChange( { target: { value: '#ABC' } } );
+		testRenderer.root
+			.findByType( 'input' )
+			.props.onKeyDown( { keyCode: UP } );
+
+		expect( testRenderer.toJSON() ).toMatchDiffSnapshot( base.toJSON() );
+	} );
+
+	test( 'should commit changes to all views on keyDown = DOWN', () => {
+		const testRenderer = TestRenderer.create(
+			<ColorPicker
+				color={ color }
+				onChangeComplete={ () => {} }
+				disableAlpha
+			/>
+		);
+		testRenderer.root
+			.findByType( 'input' )
+			.props.onChange( { target: { value: '#ABC' } } );
+		testRenderer.root
+			.findByType( 'input' )
+			.props.onKeyDown( { keyCode: DOWN } );
+
+		expect( testRenderer.toJSON() ).toMatchDiffSnapshot( base.toJSON() );
+	} );
+
+	test( 'should commit changes to all views on keyDown = ENTER', () => {
+		const testRenderer = TestRenderer.create(
+			<ColorPicker
+				color={ color }
+				onChangeComplete={ () => {} }
+				disableAlpha
+			/>
+		);
+		testRenderer.root
+			.findByType( 'input' )
+			.props.onChange( { target: { value: '#ABC' } } );
+		testRenderer.root
+			.findByType( 'input' )
+			.props.onKeyDown( { keyCode: ENTER } );
+
+		expect( testRenderer.toJSON() ).toMatchDiffSnapshot( base.toJSON() );
 	} );
 } );

@@ -1,35 +1,19 @@
 /**
  * WordPress dependencies
  */
-import { __ } from '@wordpress/i18n';
+import { symbol as icon } from '@wordpress/icons';
 
 /**
  * Internal dependencies
  */
+import metadata from './block.json';
 import edit from './edit';
 
-export const name = 'core/block';
+const { name } = metadata;
+
+export { metadata, name };
 
 export const settings = {
-	title: __( 'Reusable Block' ),
-
-	category: 'reusable',
-
-	description: __( 'Create content, and save it for you and other contributors to reuse across your site. Update the block, and the changes apply everywhere it’s used.' ),
-
-	attributes: {
-		ref: {
-			type: 'number',
-		},
-	},
-
-	supports: {
-		customClassName: false,
-		html: false,
-		inserter: false,
-	},
-
 	edit,
-
-	save: () => null,
+	icon,
 };

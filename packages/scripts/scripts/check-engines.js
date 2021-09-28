@@ -7,28 +7,30 @@ const { sync: resolveBin } = require( 'resolve-bin' );
 /**
  * Internal dependencies
  */
-const {
-	getCliArgs,
-	hasCliArg,
-} = require( '../utils' );
+const { getArgsFromCLI, hasArgInCLI, getPackageProp } = require( '../utils' );
 
-const args = getCliArgs();
+const getConfig = () => {
+	const hasConfig =
+		hasArgInCLI( '--package' ) ||
+		hasArgInCLI( '--node' ) ||
+		hasArgInCLI( '--npm' ) ||
+		hasArgInCLI( '--yarn' );
 
-const hasConfig = hasCliArg( '--package' ) ||
-	hasCliArg( '--node' ) ||
-	hasCliArg( '--npm' ) ||
-	hasCliArg( '--yarn' );
-const config = ! hasConfig ?
-	[
-		'--node', '>=10.0.0',
-		'--npm', '>=6.0.0',
-	] :
-	[];
+	if ( hasConfig ) {
+		return [];
+	}
+	const { node, npm } =
+		getPackageProp( 'engines' ) || require( '../package.json' ).engines;
+
+	return [ '--node', node, '--npm', npm ];
+};
 
 const result = spawn(
 	resolveBin( 'check-node-version' ),
-	[ ...config, ...args ],
-	{ stdio: 'inherit' }
+	[ ...getConfig(), ...getArgsFromCLI() ],
+	{
+		stdio: 'inherit',
+	}
 );
 
 process.exit( result.status );

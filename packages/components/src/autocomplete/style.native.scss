@@ -1,0 +1,74 @@
+.components-autocomplete {
+	width: 100%;
+	height: $mobile-header-toolbar-height;
+	overflow: hidden;
+}
+
+.components-autocomplete__background {
+	height: $mobile-header-toolbar-height;
+	background-color: $gray-0;
+}
+
+.components-autocomplete__background-dark {
+	background-color: $app-background-dark-alt;
+}
+
+.components-autocomplete__background-blur {
+	width: 100%;
+	height: $mobile-header-toolbar-height;
+}
+
+.components-autocomplete__content {
+	flex-grow: 1;
+	padding-left: 6px;
+}
+
+.components-autocomplete__item {
+	flex-direction: row;
+	align-items: center;
+	padding: 5px 12px 5px 8px;
+	margin-right: 2px;
+	margin-top: 3px;
+	margin-bottom: 3px;
+}
+
+.components-autocomplete__icon {
+	margin-right: 4px;
+	color: $gray-darken-30;
+}
+
+.components-autocomplete__icon-active {
+	color: $gray-dark;
+}
+
+.components-autocomplete__icon-active-dark {
+	color: $gray-20;
+}
+
+.components-autocomplete__text {
+	color: $gray-darken-30;
+}
+
+.components-autocomplete__text-dark {
+	color: $gray-20;
+}
+
+.components-autocomplete__text-active {
+	color: $gray-dark;
+	text-decoration: underline;
+	text-decoration-color: $gray-darken-30;
+}
+
+.components-autocomplete__text-active-dark {
+	color: $gray-20;
+	text-decoration-color: $gray-20;
+}
+
+.components-autocomplete__item-active {
+	border-radius: 22px;
+	background-color: transparentize($color: $gray-darken-20, $amount: 0.9);
+}
+
+.components-autocomplete__item-active-dark {
+	background-color: $dark-ultra-dim;
+}

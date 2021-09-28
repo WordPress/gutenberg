@@ -12,9 +12,7 @@ describe( 'PostTypeSupportCheck', () => {
 	it( 'renders its children when post type is not known', () => {
 		let postType;
 		const tree = create(
-			<PostTypeSupportCheck
-				postType={ postType }
-				supportKeys="title">
+			<PostTypeSupportCheck postType={ postType } supportKeys="title">
 				Supported
 			</PostTypeSupportCheck>
 		);
@@ -27,9 +25,7 @@ describe( 'PostTypeSupportCheck', () => {
 			supports: {},
 		};
 		const tree = create(
-			<PostTypeSupportCheck
-				postType={ postType }
-				supportKeys="title">
+			<PostTypeSupportCheck postType={ postType } supportKeys="title">
 				Supported
 			</PostTypeSupportCheck>
 		);
@@ -44,9 +40,7 @@ describe( 'PostTypeSupportCheck', () => {
 			},
 		};
 		const tree = create(
-			<PostTypeSupportCheck
-				postType={ postType }
-				supportKeys="title">
+			<PostTypeSupportCheck postType={ postType } supportKeys="title">
 				Supported
 			</PostTypeSupportCheck>
 		);
@@ -63,7 +57,8 @@ describe( 'PostTypeSupportCheck', () => {
 		const tree = create(
 			<PostTypeSupportCheck
 				postType={ postType }
-				supportKeys={ [ 'title', 'thumbnail' ] }>
+				supportKeys={ [ 'title', 'thumbnail' ] }
+			>
 				Supported
 			</PostTypeSupportCheck>
 		);
@@ -78,7 +73,8 @@ describe( 'PostTypeSupportCheck', () => {
 		const tree = create(
 			<PostTypeSupportCheck
 				postType={ postType }
-				supportKeys={ [ 'title', 'thumbnail' ] }>
+				supportKeys={ [ 'title', 'thumbnail' ] }
+			>
 				Supported
 			</PostTypeSupportCheck>
 		);

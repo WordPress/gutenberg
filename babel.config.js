@@ -1,19 +1,8 @@
-module.exports = function( api ) {
+module.exports = ( api ) => {
 	api.cache( true );
 
 	return {
 		presets: [ '@wordpress/babel-preset-default' ],
-		env: {
-			production: {
-				plugins: [
-					[
-						'@wordpress/babel-plugin-makepot',
-						{
-							output: 'languages/gutenberg.pot',
-						},
-					],
-				],
-			},
-		},
+		plugins: [ '@emotion/babel-plugin', 'babel-plugin-inline-json-import' ],
 	};
 };

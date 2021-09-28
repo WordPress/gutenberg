@@ -1,0 +1,188 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`hooks enhanceNavigationLinkVariations adds fallback variations when variations are missing 1`] = `
+Object {
+  "name": "core/navigation-link",
+  "one": "one",
+  "three": "three",
+  "two": "two",
+  "variations": Array [
+    Object {
+      "attributes": Object {},
+      "description": "A link to a custom URL.",
+      "isActive": [Function],
+      "isDefault": true,
+      "name": "link",
+      "title": "Custom Link",
+    },
+    Object {
+      "attributes": Object {
+        "kind": "post-type",
+        "type": "post",
+      },
+      "description": "A link to a post.",
+      "icon": <SVG
+        viewBox="0 0 24 24"
+        xmlns="http://www.w3.org/2000/svg"
+      >
+        <Path
+          d="M4 14.5h16V16H4zM4 18.5h9V20H4zM4 4h3c2 0 3 .86 3 2.583 0 .891-.253 1.554-.76 1.988-.505.435-1.24.652-2.204.652H5.542V12H4V4zm2.855 4c.53 0 .924-.114 1.18-.343.266-.228.398-.579.398-1.051 0-.473-.132-.82-.397-1.04-.265-.229-.67-.343-1.217-.343H5.542V8h1.313z"
+        />
+      </SVG>,
+      "isActive": [Function],
+      "name": "post",
+      "title": "Post Link",
+    },
+    Object {
+      "attributes": Object {
+        "kind": "post-type",
+        "type": "page",
+      },
+      "description": "A link to a page.",
+      "icon": <SVG
+        viewBox="0 0 24 24"
+        xmlns="http://www.w3.org/2000/svg"
+      >
+        <Path
+          d="M7 5.5h10a.5.5 0 01.5.5v12a.5.5 0 01-.5.5H7a.5.5 0 01-.5-.5V6a.5.5 0 01.5-.5zM17 4H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V6a2 2 0 00-2-2zm-1 3.75H8v1.5h8v-1.5zM8 11h8v1.5H8V11zm6 3.25H8v1.5h6v-1.5z"
+        />
+      </SVG>,
+      "isActive": [Function],
+      "name": "page",
+      "title": "Page Link",
+    },
+    Object {
+      "attributes": Object {
+        "kind": "taxonomy",
+        "type": "category",
+      },
+      "description": "A link to a category.",
+      "icon": <SVG
+        viewBox="0 0 24 24"
+        xmlns="http://www.w3.org/2000/svg"
+      >
+        <Path
+          clipRule="evenodd"
+          d="M6 5.5h3a.5.5 0 01.5.5v3a.5.5 0 01-.5.5H6a.5.5 0 01-.5-.5V6a.5.5 0 01.5-.5zM4 6a2 2 0 012-2h3a2 2 0 012 2v3a2 2 0 01-2 2H6a2 2 0 01-2-2V6zm11-.5h3a.5.5 0 01.5.5v3a.5.5 0 01-.5.5h-3a.5.5 0 01-.5-.5V6a.5.5 0 01.5-.5zM13 6a2 2 0 012-2h3a2 2 0 012 2v3a2 2 0 01-2 2h-3a2 2 0 01-2-2V6zm5 8.5h-3a.5.5 0 00-.5.5v3a.5.5 0 00.5.5h3a.5.5 0 00.5-.5v-3a.5.5 0 00-.5-.5zM15 13a2 2 0 00-2 2v3a2 2 0 002 2h3a2 2 0 002-2v-3a2 2 0 00-2-2h-3zm-9 1.5h3a.5.5 0 01.5.5v3a.5.5 0 01-.5.5H6a.5.5 0 01-.5-.5v-3a.5.5 0 01.5-.5zM4 15a2 2 0 012-2h3a2 2 0 012 2v3a2 2 0 01-2 2H6a2 2 0 01-2-2v-3z"
+          fillRule="evenodd"
+        />
+      </SVG>,
+      "isActive": [Function],
+      "name": "category",
+      "title": "Category Link",
+    },
+    Object {
+      "attributes": Object {
+        "kind": "taxonomy",
+        "type": "tag",
+      },
+      "description": "A link to a tag.",
+      "icon": <SVG
+        viewBox="0 0 24 24"
+        xmlns="http://www.w3.org/2000/svg"
+      >
+        <Path
+          d="M20.1 11.2l-6.7-6.7c-.1-.1-.3-.2-.5-.2H5c-.4-.1-.8.3-.8.7v7.8c0 .2.1.4.2.5l6.7 6.7c.2.2.5.4.7.5s.6.2.9.2c.3 0 .6-.1.9-.2.3-.1.5-.3.8-.5l5.6-5.6c.4-.4.7-1 .7-1.6.1-.6-.2-1.2-.6-1.6zM19 13.4L13.4 19c-.1.1-.2.1-.3.2-.2.1-.4.1-.6 0-.1 0-.2-.1-.3-.2l-6.5-6.5V5.8h6.8l6.5 6.5c.2.2.2.4.2.6 0 .1 0 .3-.2.5zM9 8c-.6 0-1 .4-1 1s.4 1 1 1 1-.4 1-1-.4-1-1-1z"
+        />
+      </SVG>,
+      "isActive": [Function],
+      "name": "tag",
+      "title": "Tag Link",
+    },
+  ],
+}
+`;
+
+exports[`hooks enhanceNavigationLinkVariations enhances variations with icon and isActive functions 1`] = `
+Object {
+  "extraProp": "extraProp",
+  "name": "core/navigation-link",
+  "variations": Array [
+    Object {
+      "attributes": Object {},
+      "description": "A link to a custom URL.",
+      "icon": <SVG
+        viewBox="0 0 24 24"
+        xmlns="http://www.w3.org/2000/svg"
+      >
+        <Path
+          d="M4 20h9v-1.5H4V20zm0-5.5V16h16v-1.5H4zm.8-4l.7.7 2-2V12h1V9.2l2 2 .7-.7-2-2H12v-1H9.2l2-2-.7-.7-2 2V4h-1v2.8l-2-2-.7.7 2 2H4v1h2.8l-2 2z"
+        />
+      </SVG>,
+      "isActive": [Function],
+      "name": "link",
+      "title": "Custom Link",
+    },
+    Object {
+      "attributes": Object {
+        "type": "post",
+      },
+      "description": "A link to a post.",
+      "icon": <SVG
+        viewBox="0 0 24 24"
+        xmlns="http://www.w3.org/2000/svg"
+      >
+        <Path
+          d="M4 14.5h16V16H4zM4 18.5h9V20H4zM4 4h3c2 0 3 .86 3 2.583 0 .891-.253 1.554-.76 1.988-.505.435-1.24.652-2.204.652H5.542V12H4V4zm2.855 4c.53 0 .924-.114 1.18-.343.266-.228.398-.579.398-1.051 0-.473-.132-.82-.397-1.04-.265-.229-.67-.343-1.217-.343H5.542V8h1.313z"
+        />
+      </SVG>,
+      "isActive": [Function],
+      "name": "post",
+      "title": "Post Link",
+    },
+    Object {
+      "attributes": Object {
+        "type": "page",
+      },
+      "description": "A link to a page.",
+      "icon": <SVG
+        viewBox="0 0 24 24"
+        xmlns="http://www.w3.org/2000/svg"
+      >
+        <Path
+          d="M7 5.5h10a.5.5 0 01.5.5v12a.5.5 0 01-.5.5H7a.5.5 0 01-.5-.5V6a.5.5 0 01.5-.5zM17 4H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V6a2 2 0 00-2-2zm-1 3.75H8v1.5h8v-1.5zM8 11h8v1.5H8V11zm6 3.25H8v1.5h6v-1.5z"
+        />
+      </SVG>,
+      "isActive": [Function],
+      "name": "page",
+      "title": "Page Link",
+    },
+    Object {
+      "attributes": Object {
+        "type": "category",
+      },
+      "description": "A link to a category.",
+      "icon": <SVG
+        viewBox="0 0 24 24"
+        xmlns="http://www.w3.org/2000/svg"
+      >
+        <Path
+          clipRule="evenodd"
+          d="M6 5.5h3a.5.5 0 01.5.5v3a.5.5 0 01-.5.5H6a.5.5 0 01-.5-.5V6a.5.5 0 01.5-.5zM4 6a2 2 0 012-2h3a2 2 0 012 2v3a2 2 0 01-2 2H6a2 2 0 01-2-2V6zm11-.5h3a.5.5 0 01.5.5v3a.5.5 0 01-.5.5h-3a.5.5 0 01-.5-.5V6a.5.5 0 01.5-.5zM13 6a2 2 0 012-2h3a2 2 0 012 2v3a2 2 0 01-2 2h-3a2 2 0 01-2-2V6zm5 8.5h-3a.5.5 0 00-.5.5v3a.5.5 0 00.5.5h3a.5.5 0 00.5-.5v-3a.5.5 0 00-.5-.5zM15 13a2 2 0 00-2 2v3a2 2 0 002 2h3a2 2 0 002-2v-3a2 2 0 00-2-2h-3zm-9 1.5h3a.5.5 0 01.5.5v3a.5.5 0 01-.5.5H6a.5.5 0 01-.5-.5v-3a.5.5 0 01.5-.5zM4 15a2 2 0 012-2h3a2 2 0 012 2v3a2 2 0 01-2 2H6a2 2 0 01-2-2v-3z"
+          fillRule="evenodd"
+        />
+      </SVG>,
+      "isActive": [Function],
+      "name": "category",
+      "title": "Category Link",
+    },
+    Object {
+      "attributes": Object {
+        "type": "tag",
+      },
+      "description": "A link to a tag.",
+      "icon": <SVG
+        viewBox="0 0 24 24"
+        xmlns="http://www.w3.org/2000/svg"
+      >
+        <Path
+          d="M20.1 11.2l-6.7-6.7c-.1-.1-.3-.2-.5-.2H5c-.4-.1-.8.3-.8.7v7.8c0 .2.1.4.2.5l6.7 6.7c.2.2.5.4.7.5s.6.2.9.2c.3 0 .6-.1.9-.2.3-.1.5-.3.8-.5l5.6-5.6c.4-.4.7-1 .7-1.6.1-.6-.2-1.2-.6-1.6zM19 13.4L13.4 19c-.1.1-.2.1-.3.2-.2.1-.4.1-.6 0-.1 0-.2-.1-.3-.2l-6.5-6.5V5.8h6.8l6.5 6.5c.2.2.2.4.2.6 0 .1 0 .3-.2.5zM9 8c-.6 0-1 .4-1 1s.4 1 1 1 1-.4 1-1-.4-1-1-1z"
+        />
+      </SVG>,
+      "isActive": [Function],
+      "name": "tag",
+      "title": "Tag Link",
+    },
+  ],
+}
+`;

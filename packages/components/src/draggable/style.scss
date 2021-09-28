@@ -12,9 +12,8 @@ body.is-dragging-components-draggable {
 
 .components-draggable__clone {
 	position: fixed;
-	padding: 20px;
+	padding: 0; // Should match clonePadding variable.
 	background: transparent;
 	pointer-events: none;
 	z-index: z-index(".components-draggable__clone");
-	opacity: 0.8;
 }

@@ -1,53 +1,75 @@
 /**
  * WordPress dependencies
  */
-import { Component, createRef } from '@wordpress/element';
-import { withGlobalEvents } from '@wordpress/compose';
+import { useMergeRefs, useFocusableIframe } from '@wordpress/compose';
+import { useRef, useEffect, useMemo } from '@wordpress/element';
 
-/**
- * Browser dependencies
- */
+/** @typedef {import('@wordpress/element').WPSyntheticEvent} WPSyntheticEvent */
 
-const { FocusEvent } = window;
+const attributeMap = {
+	class: 'className',
+	frameborder: 'frameBorder',
+	marginheight: 'marginHeight',
+	marginwidth: 'marginWidth',
+};
 
-class WpEmbedPreview extends Component {
-	constructor() {
-		super( ...arguments );
+export default function WpEmbedPreview( { html } ) {
+	const ref = useRef();
+	const props = useMemo( () => {
+		const doc = new window.DOMParser().parseFromString( html, 'text/html' );
+		const iframe = doc.querySelector( 'iframe' );
+		const iframeProps = {};
 
-		this.checkFocus = this.checkFocus.bind( this );
-		this.node = createRef();
-	}
+		if ( ! iframe ) return iframeProps;
 
-	/**
-	 * Checks whether the wp embed iframe is the activeElement,
-	 * if it is dispatch a focus event.
-	 */
-	checkFocus() {
-		const { activeElement } = document;
+		Array.from( iframe.attributes ).forEach( ( { name, value } ) => {
+			if ( name === 'style' ) return;
+			iframeProps[ attributeMap[ name ] || name ] = value;
+		} );
 
-		if (
-			activeElement.tagName !== 'IFRAME' ||
-			activeElement.parentNode !== this.node.current
-		) {
-			return;
+		return iframeProps;
+	}, [ html ] );
+
+	useEffect( () => {
+		const { ownerDocument } = ref.current;
+		const { defaultView } = ownerDocument;
+
+		/**
+		 * Checks for WordPress embed events signaling the height change when
+		 * iframe content loads or iframe's window is resized.  The event is
+		 * sent from WordPress core via the window.postMessage API.
+		 *
+		 * References:
+		 * window.postMessage:
+		 * https://developer.mozilla.org/en-US/docs/Web/API/Window/postMessage
+		 * WordPress core embed-template on load:
+		 * https://github.com/WordPress/WordPress/blob/HEAD/wp-includes/js/wp-embed-template.js#L143
+		 * WordPress core embed-template on resize:
+		 * https://github.com/WordPress/WordPress/blob/HEAD/wp-includes/js/wp-embed-template.js#L187
+		 *
+		 * @param {MessageEvent} event Message event.
+		 */
+		function resizeWPembeds( { data: { secret, message, value } = {} } ) {
+			if ( message !== 'height' || secret !== props[ 'data-secret' ] ) {
+				return;
+			}
+
+			ref.current.height = value;
 		}
 
-		const focusEvent = new FocusEvent( 'focus', { bubbles: true } );
-		activeElement.dispatchEvent( focusEvent );
-	}
+		defaultView.addEventListener( 'message', resizeWPembeds );
+		return () => {
+			defaultView.removeEventListener( 'message', resizeWPembeds );
+		};
+	}, [] );
 
-	render() {
-		const { html } = this.props;
-		return (
-			<div
-				ref={ this.node }
-				className="wp-block-embed__wrapper"
-				dangerouslySetInnerHTML={ { __html: html } }
+	return (
+		<div className="wp-block-embed__wrapper">
+			<iframe
+				ref={ useMergeRefs( [ ref, useFocusableIframe() ] ) }
+				title={ props.title }
+				{ ...props }
 			/>
-		);
-	}
+		</div>
+	);
 }
-
-export default withGlobalEvents( {
-	blur: 'checkFocus',
-} )( WpEmbedPreview );

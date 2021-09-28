@@ -16,7 +16,14 @@ describe( 'normaliseFormats', () => {
 
 	it( 'should normalise formats', () => {
 		const record = {
-			formats: [ , [ em ], [ { ...em }, { ...strong } ], [ em, strong ], , [ { ...em } ] ],
+			formats: [
+				,
+				[ em ],
+				[ { ...em }, { ...strong } ],
+				[ em, strong ],
+				,
+				[ { ...em } ],
+			],
 			text: 'one two three',
 		};
 		const result = normaliseFormats( deepFreeze( record ) );
@@ -26,7 +33,7 @@ describe( 'normaliseFormats', () => {
 		expect( getSparseArrayLength( result.formats ) ).toBe( 4 );
 		expect( result.formats[ 1 ][ 0 ] ).toBe( result.formats[ 2 ][ 0 ] );
 		expect( result.formats[ 1 ][ 0 ] ).toBe( result.formats[ 3 ][ 0 ] );
-		expect( result.formats[ 1 ][ 0 ] ).toBe( result.formats[ 5 ][ 0 ] );
+		expect( result.formats[ 1 ][ 0 ] ).not.toBe( result.formats[ 5 ][ 0 ] );
 		expect( result.formats[ 2 ][ 1 ] ).toBe( result.formats[ 3 ][ 1 ] );
 	} );
 } );

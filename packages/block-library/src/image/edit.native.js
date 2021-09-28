@@ -1,131 +1,243 @@
 /**
  * External dependencies
  */
-import React from 'react';
-import { View, ImageBackground, TextInput, Text, TouchableWithoutFeedback } from 'react-native';
-import {
-	subscribeMediaUpload,
-	requestMediaPickFromMediaLibrary,
-	requestMediaPickFromDeviceLibrary,
-	requestMediaPickFromDeviceCamera,
-	mediaUploadSync,
-	requestImageFailedRetryDialog,
-	requestImageUploadCancelDialog,
-} from 'react-native-gutenberg-bridge';
+import { View, TouchableWithoutFeedback } from 'react-native';
 
 /**
  * WordPress dependencies
  */
+import { Component } from '@wordpress/element';
 import {
-	Toolbar,
+	requestMediaImport,
+	mediaUploadSync,
+	requestImageFailedRetryDialog,
+	requestImageUploadCancelDialog,
+	requestImageFullscreenPreview,
+	setFeaturedImage,
+} from '@wordpress/react-native-bridge';
+import {
+	Icon,
+	PanelBody,
 	ToolbarButton,
-	Spinner,
-	Dashicon,
+	ToolbarGroup,
+	Image,
+	WIDE_ALIGNMENTS,
+	LinkSettingsNavigation,
+	BottomSheet,
+	BottomSheetTextControl,
+	BottomSheetSelectControl,
+	FooterMessageControl,
+	FooterMessageLink,
+	Badge,
 } from '@wordpress/components';
 import {
+	BlockCaption,
 	MediaPlaceholder,
-	RichText,
+	MediaUpload,
+	MediaUploadProgress,
+	MEDIA_TYPE_IMAGE,
 	BlockControls,
 	InspectorControls,
-	BottomSheet,
-	Picker,
-} from '@wordpress/editor';
-import { __ } from '@wordpress/i18n';
-import { isURL } from '@wordpress/url';
+	BlockAlignmentToolbar,
+	BlockStyles,
+	store as blockEditorStore,
+} from '@wordpress/block-editor';
+import { __, _x, sprintf } from '@wordpress/i18n';
+import { getProtocol, hasQueryArg } from '@wordpress/url';
+import { doAction, hasAction } from '@wordpress/hooks';
+import { compose, withPreferredColorScheme } from '@wordpress/compose';
+import { withSelect, withDispatch } from '@wordpress/data';
+import {
+	image as placeholderIcon,
+	replace,
+	fullscreen,
+	textColor,
+} from '@wordpress/icons';
+import { store as coreStore } from '@wordpress/core-data';
+import { store as editPostStore } from '@wordpress/edit-post';
 
 /**
  * Internal dependencies
  */
-import ImageSize from './image-size';
 import styles from './styles.scss';
+import { getUpdatedLinkTargetSettings } from './utils';
 
-const MEDIA_UPLOAD_STATE_UPLOADING = 1;
-const MEDIA_UPLOAD_STATE_SUCCEEDED = 2;
-const MEDIA_UPLOAD_STATE_FAILED = 3;
-const MEDIA_UPLOAD_STATE_RESET = 4;
+import {
+	LINK_DESTINATION_CUSTOM,
+	LINK_DESTINATION_ATTACHMENT,
+	LINK_DESTINATION_MEDIA,
+	MEDIA_ID_NO_FEATURED_IMAGE_SET,
+} from './constants';
 
-const MEDIA_UPLOAD_BOTTOM_SHEET_VALUE_CHOOSE_FROM_DEVICE = 'choose_from_device';
-const MEDIA_UPLOAD_BOTTOM_SHEET_VALUE_TAKE_PHOTO = 'take_photo';
-const MEDIA_UPLOAD_BOTTOM_SHEET_VALUE_WORD_PRESS_LIBRARY = 'wordpress_media_library';
+const getUrlForSlug = ( image, sizeSlug ) => {
+	if ( ! sizeSlug ) {
+		return undefined;
+	}
+	return image?.media_details?.sizes?.[ sizeSlug ]?.source_url;
+};
 
-const LINK_DESTINATION_CUSTOM = 'custom';
-const LINK_DESTINATION_NONE = 'none';
-
-class ImageEdit extends React.Component {
+export class ImageEdit extends Component {
 	constructor( props ) {
 		super( props );
 
 		this.state = {
-			showSettings: false,
-			progress: 0,
-			isUploadInProgress: false,
-			isUploadFailed: false,
+			isCaptionSelected: false,
 		};
 
-		this.mediaUpload = this.mediaUpload.bind( this );
-		this.addMediaUploadListener = this.addMediaUploadListener.bind( this );
-		this.removeMediaUploadListener = this.removeMediaUploadListener.bind( this );
-		this.finishMediaUploadWithSuccess = this.finishMediaUploadWithSuccess.bind( this );
-		this.finishMediaUploadWithFailure = this.finishMediaUploadWithFailure.bind( this );
+		this.finishMediaUploadWithSuccess = this.finishMediaUploadWithSuccess.bind(
+			this
+		);
+		this.finishMediaUploadWithFailure = this.finishMediaUploadWithFailure.bind(
+			this
+		);
+		this.mediaUploadStateReset = this.mediaUploadStateReset.bind( this );
+		this.onSelectMediaUploadOption = this.onSelectMediaUploadOption.bind(
+			this
+		);
 		this.updateMediaProgress = this.updateMediaProgress.bind( this );
-		this.updateAlt = this.updateAlt.bind( this );
 		this.updateImageURL = this.updateImageURL.bind( this );
 		this.onSetLinkDestination = this.onSetLinkDestination.bind( this );
+		this.onSetNewTab = this.onSetNewTab.bind( this );
+		this.onSetSizeSlug = this.onSetSizeSlug.bind( this );
 		this.onImagePressed = this.onImagePressed.bind( this );
-		this.onClearSettings = this.onClearSettings.bind( this );
+		this.onSetFeatured = this.onSetFeatured.bind( this );
+		this.onFocusCaption = this.onFocusCaption.bind( this );
+		this.updateAlignment = this.updateAlignment.bind( this );
+		this.accessibilityLabelCreator = this.accessibilityLabelCreator.bind(
+			this
+		);
+		this.setMappedAttributes = this.setMappedAttributes.bind( this );
+		this.onSizeChangeValue = this.onSizeChangeValue.bind( this );
+
+		this.linkSettingsOptions = {
+			url: {
+				label: __( 'Image Link URL' ),
+				placeholder: __( 'Add URL' ),
+				autoFocus: false,
+				autoFill: true,
+			},
+			openInNewTab: {
+				label: __( 'Open in new tab' ),
+			},
+			linkRel: {
+				label: __( 'Link Rel' ),
+				placeholder: _x(
+					'None',
+					'Link rel attribute value placeholder'
+				),
+			},
+		};
 	}
 
 	componentDidMount() {
-		const { attributes } = this.props;
+		const { attributes, setAttributes } = this.props;
+		// This will warn when we have `id` defined, while `url` is undefined.
+		// This may help track this issue: https://github.com/wordpress-mobile/WordPress-Android/issues/9768
+		// where a cancelled image upload was resulting in a subsequent crash.
+		if ( attributes.id && ! attributes.url ) {
+			// eslint-disable-next-line no-console
+			console.warn( 'Attributes has id with no url.' );
+		}
 
-		if ( attributes.id && ! isURL( attributes.url ) ) {
-			this.addMediaUploadListener();
+		// Detect any pasted image and start an upload
+		if (
+			! attributes.id &&
+			attributes.url &&
+			getProtocol( attributes.url ) === 'file:'
+		) {
+			requestMediaImport( attributes.url, ( id, url ) => {
+				if ( url ) {
+					setAttributes( { id, url } );
+				}
+			} );
+		}
+
+		// Make sure we mark any temporary images as failed if they failed while
+		// the editor wasn't open
+		if (
+			attributes.id &&
+			attributes.url &&
+			getProtocol( attributes.url ) === 'file:'
+		) {
 			mediaUploadSync();
 		}
 	}
 
 	componentWillUnmount() {
-		this.removeMediaUploadListener();
+		// this action will only exist if the user pressed the trash button on the block holder
+		if (
+			hasAction( 'blocks.onRemoveBlockCheckUpload' ) &&
+			this.state.isUploadInProgress
+		) {
+			doAction(
+				'blocks.onRemoveBlockCheckUpload',
+				this.props.attributes.id
+			);
+		}
+	}
+
+	componentDidUpdate( previousProps ) {
+		const { image, attributes, setAttributes } = this.props;
+		if ( ! previousProps.image && image ) {
+			const url =
+				getUrlForSlug( image, attributes?.sizeSlug ) ||
+				image.source_url;
+			setAttributes( { url } );
+		}
+	}
+
+	static getDerivedStateFromProps( props, state ) {
+		// Avoid a UI flicker in the toolbar by insuring that isCaptionSelected
+		// is updated immediately any time the isSelected prop becomes false
+		return {
+			isCaptionSelected: props.isSelected && state.isCaptionSelected,
+		};
+	}
+
+	accessibilityLabelCreator( caption ) {
+		// Checks if caption is empty.
+		return ( typeof caption === 'string' && caption.trim().length === 0 ) ||
+			caption === undefined ||
+			caption === null
+			? /* translators: accessibility text. Empty image caption. */
+			  'Image caption. Empty'
+			: sprintf(
+					/* translators: accessibility text. %s: image caption. */
+					__( 'Image caption. %s' ),
+					caption
+			  );
 	}
 
 	onImagePressed() {
-		const { attributes } = this.props;
+		const { attributes, image } = this.props;
 
 		if ( this.state.isUploadInProgress ) {
 			requestImageUploadCancelDialog( attributes.id );
-		} else if ( attributes.id && ! isURL( attributes.url ) ) {
+		} else if (
+			attributes.id &&
+			getProtocol( attributes.url ) === 'file:'
+		) {
 			requestImageFailedRetryDialog( attributes.id );
-		}
-	}
-
-	mediaUpload( payload ) {
-		const { attributes } = this.props;
-
-		if ( payload.mediaId !== attributes.id ) {
-			return;
+		} else if ( ! this.state.isCaptionSelected ) {
+			requestImageFullscreenPreview(
+				attributes.url,
+				image && image.source_url
+			);
 		}
 
-		switch ( payload.state ) {
-			case MEDIA_UPLOAD_STATE_UPLOADING:
-				this.updateMediaProgress( payload );
-				break;
-			case MEDIA_UPLOAD_STATE_SUCCEEDED:
-				this.finishMediaUploadWithSuccess( payload );
-				break;
-			case MEDIA_UPLOAD_STATE_FAILED:
-				this.finishMediaUploadWithFailure( payload );
-				break;
-			case MEDIA_UPLOAD_STATE_RESET:
-				this.mediaUploadStateReset( payload );
-				break;
-		}
+		this.setState( {
+			isCaptionSelected: false,
+		} );
 	}
 
 	updateMediaProgress( payload ) {
 		const { setAttributes } = this.props;
-		this.setState( { progress: payload.progress, isUploadInProgress: true, isUploadFailed: false } );
 		if ( payload.mediaUrl ) {
 			setAttributes( { url: payload.mediaUrl } );
+		}
+
+		if ( ! this.state.isUploadInProgress ) {
+			this.setState( { isUploadInProgress: true } );
 		}
 	}
 
@@ -134,46 +246,40 @@ class ImageEdit extends React.Component {
 
 		setAttributes( { url: payload.mediaUrl, id: payload.mediaServerId } );
 		this.setState( { isUploadInProgress: false } );
-
-		this.removeMediaUploadListener();
 	}
 
 	finishMediaUploadWithFailure( payload ) {
 		const { setAttributes } = this.props;
 
 		setAttributes( { id: payload.mediaId } );
-		this.setState( { isUploadInProgress: false, isUploadFailed: true } );
+		this.setState( { isUploadInProgress: false } );
 	}
 
-	mediaUploadStateReset( payload ) {
+	mediaUploadStateReset() {
 		const { setAttributes } = this.props;
 
-		setAttributes( { id: payload.mediaId, url: null } );
-		this.setState( { isUploadInProgress: false, isUploadFailed: false } );
-	}
-
-	addMediaUploadListener() {
-		//if we already have a subscription not worth doing it again
-		if ( this.subscriptionParentMediaUpload ) {
-			return;
-		}
-		this.subscriptionParentMediaUpload = subscribeMediaUpload( ( payload ) => {
-			this.mediaUpload( payload );
-		} );
-	}
-
-	removeMediaUploadListener() {
-		if ( this.subscriptionParentMediaUpload ) {
-			this.subscriptionParentMediaUpload.remove();
-		}
-	}
-
-	updateAlt( newAlt ) {
-		this.props.setAttributes( { alt: newAlt } );
+		setAttributes( { id: null, url: null } );
+		this.setState( { isUploadInProgress: false } );
 	}
 
 	updateImageURL( url ) {
-		this.props.setAttributes( { url, width: undefined, height: undefined } );
+		this.props.setAttributes( {
+			url,
+			width: undefined,
+			height: undefined,
+		} );
+	}
+
+	updateAlignment( nextAlign ) {
+		const extraUpdatedAttributes = Object.values(
+			WIDE_ALIGNMENTS.alignments
+		).includes( nextAlign )
+			? { width: undefined, height: undefined }
+			: {};
+		this.props.setAttributes( {
+			...extraUpdatedAttributes,
+			align: nextAlign,
+		} );
 	}
 
 	onSetLinkDestination( href ) {
@@ -183,218 +289,485 @@ class ImageEdit extends React.Component {
 		} );
 	}
 
-	onClearSettings() {
-		this.props.setAttributes( {
-			alt: '',
-			linkDestination: LINK_DESTINATION_NONE,
-			href: undefined,
+	onSetNewTab( value ) {
+		const updatedLinkTarget = getUpdatedLinkTargetSettings(
+			value,
+			this.props.attributes
+		);
+		this.props.setAttributes( updatedLinkTarget );
+	}
+
+	onSetSizeSlug( sizeSlug ) {
+		const { image, setAttributes } = this.props;
+
+		const url = getUrlForSlug( image, sizeSlug );
+		if ( ! url ) {
+			return null;
+		}
+		setAttributes( {
+			url,
+			width: undefined,
+			height: undefined,
+			sizeSlug,
 		} );
 	}
 
-	getMediaOptionsItems() {
-		return [
-			{ icon: 'format-image', value: MEDIA_UPLOAD_BOTTOM_SHEET_VALUE_CHOOSE_FROM_DEVICE, label: __( 'Choose from device' ) },
-			{ icon: 'camera', value: MEDIA_UPLOAD_BOTTOM_SHEET_VALUE_TAKE_PHOTO, label: __( 'Take a Photo' ) },
-			{ icon: 'wordpress-alt', value: MEDIA_UPLOAD_BOTTOM_SHEET_VALUE_WORD_PRESS_LIBRARY, label: __( 'WordPress Media Library' ) },
-		];
+	onSelectMediaUploadOption( media ) {
+		const { imageDefaultSize } = this.props;
+		const { id, url, destination } = this.props.attributes;
+		const mediaAttributes = {
+			id: media.id,
+			url: media.url,
+			caption: media.caption,
+		};
+
+		let additionalAttributes;
+		// Reset the dimension attributes if changing to a different image.
+		if ( ! media.id || media.id !== id ) {
+			additionalAttributes = {
+				width: undefined,
+				height: undefined,
+				sizeSlug: imageDefaultSize,
+			};
+		} else {
+			// Keep the same url when selecting the same file, so "Image Size" option is not changed.
+			additionalAttributes = { url };
+		}
+
+		let href;
+		switch ( destination ) {
+			case LINK_DESTINATION_MEDIA:
+				href = media.url;
+				break;
+			case LINK_DESTINATION_ATTACHMENT:
+				href = media.link;
+				break;
+		}
+		mediaAttributes.href = href;
+
+		this.props.setAttributes( {
+			...mediaAttributes,
+			...additionalAttributes,
+		} );
+	}
+
+	onFocusCaption() {
+		if ( this.props.onFocus ) {
+			this.props.onFocus();
+		}
+		if ( ! this.state.isCaptionSelected ) {
+			this.setState( {
+				isCaptionSelected: true,
+			} );
+		}
+	}
+
+	getPlaceholderIcon() {
+		return (
+			<Icon
+				icon={ placeholderIcon }
+				{ ...this.props.getStylesFromColorScheme(
+					styles.iconPlaceholder,
+					styles.iconPlaceholderDark
+				) }
+			/>
+		);
+	}
+
+	getWidth() {
+		const { attributes } = this.props;
+		const { align, width } = attributes;
+
+		return Object.values( WIDE_ALIGNMENTS.alignments ).includes( align )
+			? '100%'
+			: width;
+	}
+
+	setMappedAttributes( { url: href, ...restAttributes } ) {
+		const { setAttributes } = this.props;
+
+		return href === undefined
+			? setAttributes( {
+					...restAttributes,
+					linkDestination: LINK_DESTINATION_CUSTOM,
+			  } )
+			: setAttributes( {
+					...restAttributes,
+					href,
+					linkDestination: LINK_DESTINATION_CUSTOM,
+			  } );
+	}
+
+	getLinkSettings() {
+		const { isLinkSheetVisible } = this.state;
+		const {
+			attributes: { href: url, ...unMappedAttributes },
+		} = this.props;
+		const mappedAttributes = { ...unMappedAttributes, url };
+
+		return (
+			<LinkSettingsNavigation
+				isVisible={ isLinkSheetVisible }
+				url={ mappedAttributes.url }
+				rel={ mappedAttributes.rel }
+				label={ mappedAttributes.label }
+				linkTarget={ mappedAttributes.linkTarget }
+				onClose={ this.dismissSheet }
+				setAttributes={ this.setMappedAttributes }
+				withBottomSheet={ false }
+				hasPicker
+				options={ this.linkSettingsOptions }
+				showIcon={ false }
+			/>
+		);
+	}
+
+	getAltTextSettings() {
+		const {
+			attributes: { alt },
+		} = this.props;
+
+		const updateAlt = ( newAlt ) => {
+			this.props.setAttributes( { alt: newAlt } );
+		};
+
+		return (
+			<BottomSheetTextControl
+				initialValue={ alt }
+				onChange={ updateAlt }
+				placeholder={ __( 'Add alt text' ) }
+				label={ __( 'Alt Text' ) }
+				icon={ textColor }
+				footerNote={
+					<>
+						{ __(
+							'Describe the purpose of the image. Leave empty if the image is purely decorative. '
+						) }
+						<FooterMessageLink
+							href={
+								'https://www.w3.org/WAI/tutorials/images/decision-tree/'
+							}
+							value={ __( 'What is alt text?' ) }
+						/>
+					</>
+				}
+			/>
+		);
+	}
+
+	onSizeChangeValue( newValue ) {
+		this.onSetSizeSlug( newValue );
+	}
+
+	onSetFeatured( mediaId ) {
+		const { closeSettingsBottomSheet } = this.props;
+		setFeaturedImage( mediaId );
+		closeSettingsBottomSheet();
+	}
+
+	getFeaturedButtonPanel( isFeaturedImage ) {
+		const { attributes, getStylesFromColorScheme } = this.props;
+
+		const setFeaturedButtonStyle = getStylesFromColorScheme(
+			styles.setFeaturedButton,
+			styles.setFeaturedButtonDark
+		);
+
+		const removeFeaturedButton = () => (
+			<BottomSheet.Cell
+				label={ __( 'Remove as Featured Image ' ) }
+				labelStyle={ [
+					setFeaturedButtonStyle,
+					styles.removeFeaturedButton,
+				] }
+				cellContainerStyle={ styles.setFeaturedButtonCellContainer }
+				separatorType={ 'none' }
+				onPress={ () =>
+					this.onSetFeatured( MEDIA_ID_NO_FEATURED_IMAGE_SET )
+				}
+			/>
+		);
+
+		const setFeaturedButton = () => (
+			<BottomSheet.Cell
+				label={ __( 'Set as Featured Image ' ) }
+				labelStyle={ setFeaturedButtonStyle }
+				cellContainerStyle={ styles.setFeaturedButtonCellContainer }
+				separatorType={ 'none' }
+				onPress={ () => this.onSetFeatured( attributes.id ) }
+			/>
+		);
+
+		return isFeaturedImage ? removeFeaturedButton() : setFeaturedButton();
 	}
 
 	render() {
-		const { attributes, isSelected, setAttributes } = this.props;
-		const { url, caption, height, width, alt, href } = attributes;
+		const { isCaptionSelected } = this.state;
+		const {
+			attributes,
+			isSelected,
+			image,
+			clientId,
+			imageDefaultSize,
+			context,
+			featuredImageId,
+			wasBlockJustInserted,
+		} = this.props;
+		const { align, url, alt, id, sizeSlug, className } = attributes;
+		const hasImageContext = context
+			? Object.keys( context ).length > 0
+			: false;
 
-		const onMediaLibraryButtonPressed = () => {
-			requestMediaPickFromMediaLibrary( ( mediaId, mediaUrl ) => {
-				if ( mediaUrl ) {
-					setAttributes( { id: mediaId, url: mediaUrl } );
-				}
-			} );
-		};
+		const imageSizes = Array.isArray( this.props.imageSizes )
+			? this.props.imageSizes
+			: [];
+		// Only map available image sizes for the user to choose.
+		const sizeOptions = imageSizes
+			.filter( ( { slug } ) => getUrlForSlug( image, slug ) )
+			.map( ( { name, slug } ) => ( { value: slug, label: name } ) );
 
-		const onMediaUploadButtonPressed = () => {
-			requestMediaPickFromDeviceLibrary( ( mediaId, mediaUri ) => {
-				if ( mediaUri ) {
-					this.addMediaUploadListener( );
-					setAttributes( { url: mediaUri, id: mediaId } );
-				}
-			} );
-		};
+		let selectedSizeOption = sizeSlug || imageDefaultSize;
+		let sizeOptionsValid = sizeOptions.find(
+			( option ) => option.value === selectedSizeOption
+		);
 
-		const onMediaCaptureButtonPressed = () => {
-			requestMediaPickFromDeviceCamera( ( mediaId, mediaUri ) => {
-				if ( mediaUri ) {
-					this.addMediaUploadListener( );
-					setAttributes( { url: mediaUri, id: mediaId } );
-				}
-			} );
-		};
+		if ( ! sizeOptionsValid ) {
+			// Default to 'full' size if the default large size is not available.
+			sizeOptionsValid = sizeOptions.find(
+				( option ) => option.value === 'full'
+			);
+			selectedSizeOption = 'full';
+		}
 
-		const onImageSettingsButtonPressed = () => {
-			this.setState( { showSettings: true } );
-		};
+		// By default, it's only possible to set images that have been uploaded to a site's library as featured.
+		// The 'canImageBeFeatured' check filters out images that haven't been uploaded based on the following:
+		// - Images that are embedded in a post but are uploaded elsewhere have an id of 'undefined'.
+		// - Image that are uploading or have failed to upload are given a temporary negative ID.
+		const canImageBeFeatured =
+			typeof attributes.id !== 'undefined' && attributes.id > 0;
 
-		const onImageSettingsClose = () => {
-			this.setState( { showSettings: false } );
-		};
+		const isFeaturedImage =
+			canImageBeFeatured && featuredImageId === attributes.id;
 
-		let picker;
-
-		const onMediaOptionsButtonPressed = () => {
-			picker.presentPicker();
-		};
-
-		const toolbarEditButton = (
-			<Toolbar>
-				<ToolbarButton
-					label={ __( 'Edit image' ) }
-					icon="edit"
-					onClick={ onMediaOptionsButtonPressed }
+		const getToolbarEditButton = ( open ) => (
+			<BlockControls>
+				<ToolbarGroup>
+					<ToolbarButton
+						title={ __( 'Edit image' ) }
+						icon={ replace }
+						onClick={ open }
+					/>
+				</ToolbarGroup>
+				<BlockAlignmentToolbar
+					value={ align }
+					onChange={ this.updateAlignment }
 				/>
-			</Toolbar>
+			</BlockControls>
 		);
 
 		const getInspectorControls = () => (
-			<BottomSheet
-				isVisible={ this.state.showSettings }
-				onClose={ onImageSettingsClose }
-				hideHeader
-			>
-				<BottomSheet.Cell
-					icon={ 'admin-links' }
-					label={ __( 'Link To' ) }
-					value={ href || '' }
-					valuePlaceholder={ __( 'Add URL' ) }
-					onChangeValue={ this.onSetLinkDestination }
-					autoCapitalize="none"
-					autoCorrect={ false }
-				/>
-				<BottomSheet.Cell
-					icon={ 'editor-textcolor' }
-					label={ __( 'Alt Text' ) }
-					value={ alt || '' }
-					valuePlaceholder={ __( 'None' ) }
-					separatorType={ 'fullWidth' }
-					onChangeValue={ this.updateAlt }
-				/>
-				<BottomSheet.Cell
-					label={ __( 'Clear All Settings' ) }
-					labelStyle={ styles.clearSettingsButton }
-					separatorType={ 'none' }
-					onPress={ this.onClearSettings }
-				/>
-			</BottomSheet>
-		);
-
-		const mediaOptions = this.getMediaOptionsItems();
-
-		const getMediaOptions = () => (
-			<Picker
-				hideCancelButton={ true }
-				ref={ ( instance ) => picker = instance }
-				options={ mediaOptions }
-				onChange={ ( value ) => {
-					if ( value === MEDIA_UPLOAD_BOTTOM_SHEET_VALUE_CHOOSE_FROM_DEVICE ) {
-						onMediaUploadButtonPressed();
-					} else if ( value === MEDIA_UPLOAD_BOTTOM_SHEET_VALUE_TAKE_PHOTO ) {
-						onMediaCaptureButtonPressed();
-					} else if ( value === MEDIA_UPLOAD_BOTTOM_SHEET_VALUE_WORD_PRESS_LIBRARY ) {
-						onMediaLibraryButtonPressed();
-					}
-				} }
-			/>
+			<InspectorControls>
+				<PanelBody title={ __( 'Image settings' ) } />
+				<PanelBody style={ styles.panelBody }>
+					<BlockStyles clientId={ clientId } url={ url } />
+				</PanelBody>
+				<PanelBody>
+					{ image && sizeOptionsValid && (
+						<BottomSheetSelectControl
+							icon={ fullscreen }
+							label={ __( 'Size' ) }
+							options={ sizeOptions }
+							onChange={ this.onSizeChangeValue }
+							value={ selectedSizeOption }
+						/>
+					) }
+					{ this.getAltTextSettings() }
+				</PanelBody>
+				<PanelBody title={ __( 'Link Settings' ) }>
+					{ this.getLinkSettings( true ) }
+				</PanelBody>
+				<PanelBody
+					title={ __( 'Featured Image' ) }
+					titleStyle={ styles.featuredImagePanelTitle }
+				>
+					{ canImageBeFeatured &&
+						this.getFeaturedButtonPanel( isFeaturedImage ) }
+					<FooterMessageControl
+						label={ __(
+							'Changes to featured image will not be affected by the undo/redo buttons.'
+						) }
+						cellContainerStyle={
+							styles.setFeaturedButtonCellContainer
+						}
+					/>
+				</PanelBody>
+			</InspectorControls>
 		);
 
 		if ( ! url ) {
 			return (
-				<View style={ { flex: 1 } } >
-					{ getMediaOptions() }
+				<View style={ styles.content }>
 					<MediaPlaceholder
-						onMediaOptionsPressed={ onMediaOptionsButtonPressed }
+						allowedTypes={ [ MEDIA_TYPE_IMAGE ] }
+						onSelect={ this.onSelectMediaUploadOption }
+						icon={ this.getPlaceholderIcon() }
+						onFocus={ this.props.onFocus }
+						autoOpenMediaUpload={
+							isSelected && wasBlockJustInserted
+						}
 					/>
 				</View>
 			);
 		}
 
-		const showSpinner = this.state.isUploadInProgress;
-		const opacity = this.state.isUploadInProgress ? 0.3 : 1;
-		const progress = this.state.progress * 100;
+		const alignToFlex = {
+			left: 'flex-start',
+			center: 'center',
+			right: 'flex-end',
+			full: 'center',
+			wide: 'center',
+		};
 
-		return (
-			<TouchableWithoutFeedback onPress={ this.onImagePressed } disabled={ ! isSelected }>
-				<View style={ { flex: 1 } }>
-					{ showSpinner && <Spinner progress={ progress } /> }
-					<BlockControls>
-						{ toolbarEditButton }
-					</BlockControls>
-					<InspectorControls>
-						<ToolbarButton
-							label={ __( 'Image Settings' ) }
-							icon="admin-generic"
-							onClick={ onImageSettingsButtonPressed }
-						/>
-					</InspectorControls>
-					<ImageSize src={ url } >
-						{ ( sizes ) => {
-							const {
-								imageWidthWithinContainer,
-								imageHeightWithinContainer,
-							} = sizes;
+		const additionalImageProps = {
+			height: '100%',
+			resizeMode: context?.imageCrop ? 'cover' : 'contain',
+		};
 
-							if ( imageWidthWithinContainer === undefined ) {
+		const imageContainerStyles = [ hasImageContext && styles.fixedHeight ];
+
+		const getImageComponent = ( openMediaOptions, getMediaOptions ) => (
+			<Badge label={ __( 'Featured' ) } show={ isFeaturedImage }>
+				<TouchableWithoutFeedback
+					accessible={ ! isSelected }
+					onPress={ this.onImagePressed }
+					onLongPress={ openMediaOptions }
+					disabled={ ! isSelected }
+				>
+					<View style={ styles.content }>
+						{ isSelected && getInspectorControls() }
+						{ isSelected && getMediaOptions() }
+						{ ! this.state.isCaptionSelected &&
+							getToolbarEditButton( openMediaOptions ) }
+						<MediaUploadProgress
+							coverUrl={ url }
+							mediaId={ id }
+							onUpdateMediaProgress={ this.updateMediaProgress }
+							onFinishMediaUploadWithSuccess={
+								this.finishMediaUploadWithSuccess
+							}
+							onFinishMediaUploadWithFailure={
+								this.finishMediaUploadWithFailure
+							}
+							onMediaUploadStateReset={
+								this.mediaUploadStateReset
+							}
+							renderContent={ ( {
+								isUploadInProgress,
+								isUploadFailed,
+								retryMessage,
+							} ) => {
 								return (
-									<View style={ styles.imageContainer } >
-										<Dashicon icon={ 'format-image' } size={ 300 } />
+									<View style={ imageContainerStyles }>
+										<Image
+											align={
+												align && alignToFlex[ align ]
+											}
+											alt={ alt }
+											isSelected={
+												isSelected &&
+												! isCaptionSelected
+											}
+											isUploadFailed={ isUploadFailed }
+											isUploadInProgress={
+												isUploadInProgress
+											}
+											onSelectMediaUploadOption={
+												this.onSelectMediaUploadOption
+											}
+											openMediaOptions={
+												openMediaOptions
+											}
+											retryMessage={ retryMessage }
+											url={ url }
+											shapeStyle={ styles[ className ] }
+											width={ this.getWidth() }
+											{ ...( hasImageContext
+												? additionalImageProps
+												: {} ) }
+										/>
 									</View>
 								);
-							}
+							} }
+						/>
+					</View>
+				</TouchableWithoutFeedback>
+				<BlockCaption
+					clientId={ this.props.clientId }
+					isSelected={ this.state.isCaptionSelected }
+					accessible
+					accessibilityLabelCreator={ this.accessibilityLabelCreator }
+					onFocus={ this.onFocusCaption }
+					onBlur={ this.props.onBlur } // always assign onBlur as props
+					insertBlocksAfter={ this.props.insertBlocksAfter }
+				/>
+			</Badge>
+		);
 
-							let finalHeight = imageHeightWithinContainer;
-							if ( height > 0 && height < imageHeightWithinContainer ) {
-								finalHeight = height;
-							}
-
-							let finalWidth = imageWidthWithinContainer;
-							if ( width > 0 && width < imageWidthWithinContainer ) {
-								finalWidth = width;
-							}
-
-							return (
-								<View style={ { flex: 1 } } >
-									{ getInspectorControls() }
-									{ getMediaOptions() }
-									<ImageBackground
-										style={ { width: finalWidth, height: finalHeight, opacity } }
-										resizeMethod="scale"
-										source={ { uri: url } }
-										key={ url }
-									>
-										{ this.state.isUploadFailed &&
-											<View style={ styles.imageContainer } >
-												<Dashicon icon={ 'image-rotate' } ariaPressed={ 'dashicon-active' } />
-												<Text style={ styles.uploadFailedText }>{ __( 'Failed to insert media.\nPlease tap for options.' ) }</Text>
-											</View>
-										}
-									</ImageBackground>
-								</View>
-							);
-						} }
-					</ImageSize>
-					{ ( ! RichText.isEmpty( caption ) > 0 || isSelected ) && (
-						<View style={ { padding: 12, flex: 1 } }>
-							<TextInput
-								style={ { textAlign: 'center' } }
-								fontFamily={ this.props.fontFamily || ( styles[ 'caption-text' ].fontFamily ) }
-								underlineColorAndroid="transparent"
-								value={ caption }
-								placeholder={ __( 'Write caption…' ) }
-								onChangeText={ ( newCaption ) => setAttributes( { caption: newCaption } ) }
-							/>
-						</View>
-					) }
-				</View>
-			</TouchableWithoutFeedback>
+		return (
+			<MediaUpload
+				allowedTypes={ [ MEDIA_TYPE_IMAGE ] }
+				isReplacingMedia={ true }
+				onSelect={ this.onSelectMediaUploadOption }
+				render={ ( { open, getMediaOptions } ) => {
+					return getImageComponent( open, getMediaOptions );
+				} }
+			/>
 		);
 	}
 }
 
-export default ImageEdit;
+export default compose( [
+	withSelect( ( select, props ) => {
+		const { getMedia } = select( coreStore );
+		const { getSettings, wasBlockJustInserted } = select(
+			blockEditorStore
+		);
+		const { getEditedPostAttribute } = select( 'core/editor' );
+		const {
+			attributes: { id, url },
+			isSelected,
+			clientId,
+		} = props;
+		const { imageSizes, imageDefaultSize } = getSettings();
+		const isNotFileUrl = id && getProtocol( url ) !== 'file:';
+		const featuredImageId = getEditedPostAttribute( 'featured_media' );
+
+		const shouldGetMedia =
+			( isSelected && isNotFileUrl ) ||
+			// Edge case to update the image after uploading if the block gets unselected
+			// Check if it's the original image and not the resized one with queryparams
+			( ! isSelected &&
+				isNotFileUrl &&
+				url &&
+				! hasQueryArg( url, 'w' ) );
+
+		return {
+			image: shouldGetMedia ? getMedia( id ) : null,
+			imageSizes,
+			imageDefaultSize,
+			featuredImageId,
+			wasBlockJustInserted: wasBlockJustInserted(
+				clientId,
+				'inserter_menu'
+			),
+		};
+	} ),
+	withDispatch( ( dispatch ) => {
+		return {
+			closeSettingsBottomSheet() {
+				dispatch( editPostStore ).closeGeneralSidebar();
+			},
+		};
+	} ),
+	withPreferredColorScheme,
+] )( ImageEdit );

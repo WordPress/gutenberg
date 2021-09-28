@@ -2,85 +2,132 @@
  * External dependencies
  */
 import classnames from 'classnames';
+import { noop } from 'lodash';
 
 /**
  * WordPress dependencies
  */
-import { Component, forwardRef } from '@wordpress/element';
+import { useReducedMotion, useMergeRefs } from '@wordpress/compose';
+import { forwardRef, useRef } from '@wordpress/element';
+import { chevronUp, chevronDown } from '@wordpress/icons';
 
 /**
  * Internal dependencies
  */
 import Button from '../button';
 import Icon from '../icon';
-import { G, Path, SVG } from '../primitives';
+import { useControlledState, useUpdateEffect } from '../utils';
 
-export class PanelBody extends Component {
-	constructor( props ) {
-		super( ...arguments );
-		this.state = {
-			opened: props.initialOpen === undefined ? true : props.initialOpen,
-		};
-		this.toggle = this.toggle.bind( this );
-	}
+export function PanelBody(
+	{
+		buttonProps = {},
+		children,
+		className,
+		icon,
+		initialOpen,
+		onToggle = noop,
+		opened,
+		title,
+		scrollAfterOpen = true,
+	},
+	ref
+) {
+	const [ isOpened, setIsOpened ] = useControlledState( opened, {
+		initial: initialOpen === undefined ? true : initialOpen,
+	} );
+	const nodeRef = useRef();
 
-	toggle( event ) {
+	// Defaults to 'smooth' scrolling
+	// https://developer.mozilla.org/en-US/docs/Web/API/Element/scrollIntoView
+	const scrollBehavior = useReducedMotion() ? 'auto' : 'smooth';
+
+	const handleOnToggle = ( event ) => {
 		event.preventDefault();
-		if ( this.props.opened === undefined ) {
-			this.setState( ( state ) => ( {
-				opened: ! state.opened,
-			} ) );
+		const next = ! isOpened;
+		setIsOpened( next );
+		onToggle( next );
+	};
+
+	// Ref is used so that the effect does not re-run upon scrollAfterOpen changing value
+	const scrollAfterOpenRef = useRef();
+	scrollAfterOpenRef.current = scrollAfterOpen;
+	// Runs after initial render
+	useUpdateEffect( () => {
+		if (
+			isOpened &&
+			scrollAfterOpenRef.current &&
+			nodeRef.current?.scrollIntoView
+		) {
+			/*
+			 * Scrolls the content into view when visible.
+			 * This improves the UX when there are multiple stacking <PanelBody />
+			 * components in a scrollable container.
+			 */
+			nodeRef.current.scrollIntoView( {
+				inline: 'nearest',
+				block: 'nearest',
+				behavior: scrollBehavior,
+			} );
 		}
+	}, [ isOpened, scrollBehavior ] );
 
-		if ( this.props.onToggle ) {
-			this.props.onToggle();
-		}
-	}
+	const classes = classnames( 'components-panel__body', className, {
+		'is-opened': isOpened,
+	} );
 
-	render() {
-		const { title, children, opened, className, icon, forwardedRef } = this.props;
-		const isOpened = opened === undefined ? this.state.opened : opened;
-		const classes = classnames( 'components-panel__body', className, { 'is-opened': isOpened } );
-
-		return (
-			<div className={ classes } ref={ forwardedRef }>
-				{ !! title && (
-					<h2 className="components-panel__body-title">
-						<Button
-							className="components-panel__body-toggle"
-							onClick={ this.toggle }
-							aria-expanded={ isOpened }
-						>
-							{ /*
-								Firefox + NVDA don't announce aria-expanded because the browser
-								repaints the whole element, so this wrapping span hides that.
-							*/ }
-							<span aria-hidden="true">
-								{ isOpened ?
-									<SVG className="components-panel__arrow" width="24px" height="24px" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-										<G><Path fill="none" d="M0,0h24v24H0V0z" /></G>
-										<G><Path d="M12,8l-6,6l1.41,1.41L12,10.83l4.59,4.58L18,14L12,8z" /></G>
-									</SVG> :
-									<SVG className="components-panel__arrow" width="24px" height="24px" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-										<G><Path fill="none" d="M0,0h24v24H0V0z" /></G>
-										<G><Path d="M7.41,8.59L12,13.17l4.59-4.58L18,10l-6,6l-6-6L7.41,8.59z" /></G>
-									</SVG>
-								}
-							</span>
-							{ title }
-							{ icon && <Icon icon={ icon } className="components-panel__icon" size={ 20 } /> }
-						</Button>
-					</h2>
-				) }
-				{ isOpened && children }
-			</div>
-		);
-	}
+	return (
+		<div className={ classes } ref={ useMergeRefs( [ nodeRef, ref ] ) }>
+			<PanelBodyTitle
+				icon={ icon }
+				isOpened={ isOpened }
+				onClick={ handleOnToggle }
+				title={ title }
+				{ ...buttonProps }
+			/>
+			{ typeof children === 'function'
+				? children( { opened: isOpened } )
+				: isOpened && children }
+		</div>
+	);
 }
 
-const forwardedPanelBody = ( props, ref ) => {
-	return <PanelBody { ...props } forwardedRef={ ref } />;
-};
-forwardedPanelBody.displayName = 'PanelBody';
+const PanelBodyTitle = forwardRef(
+	( { isOpened, icon, title, ...props }, ref ) => {
+		if ( ! title ) return null;
 
-export default forwardRef( forwardedPanelBody );
+		return (
+			<h2 className="components-panel__body-title">
+				<Button
+					className="components-panel__body-toggle"
+					aria-expanded={ isOpened }
+					ref={ ref }
+					{ ...props }
+				>
+					{ /*
+					Firefox + NVDA don't announce aria-expanded because the browser
+					repaints the whole element, so this wrapping span hides that.
+				*/ }
+					<span aria-hidden="true">
+						<Icon
+							className="components-panel__arrow"
+							icon={ isOpened ? chevronUp : chevronDown }
+						/>
+					</span>
+					{ title }
+					{ icon && (
+						<Icon
+							icon={ icon }
+							className="components-panel__icon"
+							size={ 20 }
+						/>
+					) }
+				</Button>
+			</h2>
+		);
+	}
+);
+
+const ForwardedComponent = forwardRef( PanelBody );
+ForwardedComponent.displayName = 'PanelBody';
+
+export default ForwardedComponent;

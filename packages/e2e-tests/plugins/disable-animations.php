@@ -11,8 +11,8 @@
  * Enqueue CSS stylesheet disabling animations.
  */
 function enqueue_disable_animations_stylesheet() {
-	$custom_css = '* { animation-duration: 0ms !important; }';
+	$custom_css = '* { animation-duration: 0ms !important; animation-delay: 0s !important; transition-duration: 0s !important; transition-delay: 0s !important; }';
 	wp_add_inline_style( 'wp-components', $custom_css );
 }
 
-add_action( 'enqueue_block_editor_assets', 'enqueue_disable_animations_stylesheet' );
+add_action( 'admin_enqueue_scripts', 'enqueue_disable_animations_stylesheet' );

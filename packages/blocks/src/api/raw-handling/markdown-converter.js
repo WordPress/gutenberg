@@ -38,6 +38,6 @@ function slackMarkdownVariantCorrector( text ) {
  *
  * @return {string} HTML.
  */
-export default function( text ) {
+export default function markdownConverter( text ) {
 	return converter.makeHtml( slackMarkdownVariantCorrector( text ) );
 }

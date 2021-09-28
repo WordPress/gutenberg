@@ -1,20 +1,15 @@
 /**
  * WordPress dependencies
  */
-import { Component, Fragment } from '@wordpress/element';
+import { InspectorControls, useBlockProps } from '@wordpress/block-editor';
 import {
 	Disabled,
 	PanelBody,
 	RangeControl,
 	ToggleControl,
 } from '@wordpress/components';
+import ServerSideRender from '@wordpress/server-side-render';
 import { __ } from '@wordpress/i18n';
-import {
-	InspectorControls,
-	BlockAlignmentToolbar,
-	BlockControls,
-	ServerSideRender,
-} from '@wordpress/editor';
 
 /**
  * Minimum number of comments a user can show using this block.
@@ -29,90 +24,63 @@ const MIN_COMMENTS = 1;
  */
 const MAX_COMMENTS = 100;
 
-class LatestComments extends Component {
-	constructor() {
-		super( ...arguments );
+export default function LatestComments( { attributes, setAttributes } ) {
+	const {
+		commentsToShow,
+		displayAvatar,
+		displayDate,
+		displayExcerpt,
+	} = attributes;
 
-		this.setAlignment = this.setAlignment.bind( this );
-		this.setCommentsToShow = this.setCommentsToShow.bind( this );
-
-		// Create toggles for each attribute; we create them here rather than
-		// passing `this.createToggleAttribute( 'displayAvatar' )` directly to
-		// `onChange` to avoid re-renders.
-		this.toggleDisplayAvatar = this.createToggleAttribute( 'displayAvatar' );
-		this.toggleDisplayDate = this.createToggleAttribute( 'displayDate' );
-		this.toggleDisplayExcerpt = this.createToggleAttribute( 'displayExcerpt' );
-	}
-
-	createToggleAttribute( propName ) {
-		return () => {
-			const value = this.props.attributes[ propName ];
-			const { setAttributes } = this.props;
-
-			setAttributes( { [ propName ]: ! value } );
-		};
-	}
-
-	setAlignment( align ) {
-		this.props.setAttributes( { align } );
-	}
-
-	setCommentsToShow( commentsToShow ) {
-		this.props.setAttributes( { commentsToShow } );
-	}
-
-	render() {
-		const {
-			align,
-			commentsToShow,
-			displayAvatar,
-			displayDate,
-			displayExcerpt,
-		} = this.props.attributes;
-
-		return (
-			<Fragment>
-				<BlockControls>
-					<BlockAlignmentToolbar
-						value={ align }
-						onChange={ this.setAlignment }
+	return (
+		<div { ...useBlockProps() }>
+			<InspectorControls>
+				<PanelBody title={ __( 'Latest comments settings' ) }>
+					<ToggleControl
+						label={ __( 'Display avatar' ) }
+						checked={ displayAvatar }
+						onChange={ () =>
+							setAttributes( { displayAvatar: ! displayAvatar } )
+						}
 					/>
-				</BlockControls>
-				<InspectorControls>
-					<PanelBody title={ __( 'Latest Comments Settings' ) }>
-						<ToggleControl
-							label={ __( 'Display Avatar' ) }
-							checked={ displayAvatar }
-							onChange={ this.toggleDisplayAvatar }
-						/>
-						<ToggleControl
-							label={ __( 'Display Date' ) }
-							checked={ displayDate }
-							onChange={ this.toggleDisplayDate }
-						/>
-						<ToggleControl
-							label={ __( 'Display Excerpt' ) }
-							checked={ displayExcerpt }
-							onChange={ this.toggleDisplayExcerpt }
-						/>
-						<RangeControl
-							label={ __( 'Number of Comments' ) }
-							value={ commentsToShow }
-							onChange={ this.setCommentsToShow }
-							min={ MIN_COMMENTS }
-							max={ MAX_COMMENTS }
-						/>
-					</PanelBody>
-				</InspectorControls>
-				<Disabled>
-					<ServerSideRender
-						block="core/latest-comments"
-						attributes={ this.props.attributes }
+					<ToggleControl
+						label={ __( 'Display date' ) }
+						checked={ displayDate }
+						onChange={ () =>
+							setAttributes( { displayDate: ! displayDate } )
+						}
 					/>
-				</Disabled>
-			</Fragment>
-		);
-	}
+					<ToggleControl
+						label={ __( 'Display excerpt' ) }
+						checked={ displayExcerpt }
+						onChange={ () =>
+							setAttributes( {
+								displayExcerpt: ! displayExcerpt,
+							} )
+						}
+					/>
+					<RangeControl
+						label={ __( 'Number of comments' ) }
+						value={ commentsToShow }
+						onChange={ ( value ) =>
+							setAttributes( { commentsToShow: value } )
+						}
+						min={ MIN_COMMENTS }
+						max={ MAX_COMMENTS }
+						required
+					/>
+				</PanelBody>
+			</InspectorControls>
+			<Disabled>
+				<ServerSideRender
+					block="core/latest-comments"
+					attributes={ attributes }
+					// The preview uses the site's locale to make it more true to how
+					// the block appears on the frontend. Setting the locale
+					// explicitly prevents any middleware from setting it to 'user'.
+					urlQueryArgs={ { _locale: 'site' } }
+				/>
+			</Disabled>
+		</div>
+	);
 }
-
-export default LatestComments;

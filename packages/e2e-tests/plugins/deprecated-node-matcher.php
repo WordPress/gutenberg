@@ -18,7 +18,7 @@ function enqueue_deprecated_node_matcher_plugin_script() {
 			'lodash',
 			'wp-blocks',
 			'wp-element',
-			'wp-editor',
+			'wp-block-editor',
 		),
 		filemtime( plugin_dir_path( __FILE__ ) . 'deprecated-node-matcher/index.js' ),
 		true

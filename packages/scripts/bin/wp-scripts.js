@@ -3,8 +3,8 @@
 /**
  * Internal dependencies
  */
-const { getCliArgs, spawnScript } = require( '../utils' );
+const { getNodeArgsFromCLI, spawnScript } = require( '../utils' );
 
-const [ scriptName, ...nodesArgs ] = getCliArgs();
+const { scriptName, scriptArgs, nodeArgs } = getNodeArgsFromCLI();
 
-spawnScript( scriptName, nodesArgs );
+spawnScript( scriptName, scriptArgs, nodeArgs );

@@ -2,91 +2,35 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { createBlock, getPhrasingContentSchema } from '@wordpress/blocks';
-import { RichText } from '@wordpress/editor';
-import { Path, Rect, SVG } from '@wordpress/components';
+import { preformatted as icon } from '@wordpress/icons';
 
-export const name = 'core/preformatted';
+/**
+ * Internal dependencies
+ */
+import edit from './edit';
+import metadata from './block.json';
+import save from './save';
+import transforms from './transforms';
+
+const { name } = metadata;
+
+export { metadata, name };
 
 export const settings = {
-	title: __( 'Preformatted' ),
-
-	description: __( 'Add text that respects your spacing and tabs, and also allows styling.' ),
-
-	icon: <SVG viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><Path d="M0,0h24v24H0V0z" fill="none" /><Path d="M20,4H4C2.9,4,2,4.9,2,6v12c0,1.1,0.9,2,2,2h16c1.1,0,2-0.9,2-2V6C22,4.9,21.1,4,20,4z M20,18H4V6h16V18z" /><Rect x="6" y="10" width="2" height="2" /><Rect x="6" y="14" width="8" height="2" /><Rect x="16" y="14" width="2" height="2" /><Rect x="10" y="10" width="8" height="2" /></SVG>,
-
-	category: 'formatting',
-
-	attributes: {
-		content: {
-			type: 'string',
-			source: 'html',
-			selector: 'pre',
-			default: '',
+	icon,
+	example: {
+		attributes: {
+			/* eslint-disable @wordpress/i18n-no-collapsible-whitespace */
+			// translators: Sample content for the Preformatted block. Can be replaced with a more locale-adequate work.
+			content: __(
+				'EXT. XANADU - FAINT DAWN - 1940 (MINIATURE)\nWindow, very small in the distance, illuminated.\nAll around this is an almost totally black screen. Now, as the camera moves slowly towards the window which is almost a postage stamp in the frame, other forms appear;'
+			),
+			/* eslint-enable @wordpress/i18n-no-collapsible-whitespace */
 		},
 	},
-
-	transforms: {
-		from: [
-			{
-				type: 'block',
-				blocks: [ 'core/code', 'core/paragraph' ],
-				transform: ( { content } ) =>
-					createBlock( 'core/preformatted', {
-						content,
-					} ),
-			},
-			{
-				type: 'raw',
-				isMatch: ( node ) => (
-					node.nodeName === 'PRE' &&
-					! (
-						node.children.length === 1 &&
-						node.firstChild.nodeName === 'CODE'
-					)
-				),
-				schema: {
-					pre: {
-						children: getPhrasingContentSchema(),
-					},
-				},
-			},
-		],
-		to: [
-			{
-				type: 'block',
-				blocks: [ 'core/paragraph' ],
-				transform: ( attributes ) =>
-					createBlock( 'core/paragraph', attributes ),
-			},
-		],
-	},
-
-	edit( { attributes, mergeBlocks, setAttributes, className } ) {
-		const { content } = attributes;
-
-		return (
-			<RichText
-				tagName="pre"
-				value={ content.replace( /\n/g, '<br>' ) }
-				onChange={ ( nextContent ) => {
-					setAttributes( {
-						content: nextContent,
-					} );
-				} }
-				placeholder={ __( 'Write preformatted text…' ) }
-				wrapperClassName={ className }
-				onMerge={ mergeBlocks }
-			/>
-		);
-	},
-
-	save( { attributes } ) {
-		const { content } = attributes;
-
-		return <RichText.Content tagName="pre" value={ content } />;
-	},
-
+	transforms,
+	edit,
+	save,
 	merge( attributes, attributesToMerge ) {
 		return {
 			content: attributes.content + attributesToMerge.content,

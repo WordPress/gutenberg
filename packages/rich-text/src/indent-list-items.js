@@ -3,19 +3,23 @@
  */
 
 import { LINE_SEPARATOR } from './special-characters';
-import { normaliseFormats } from './normalise-formats';
 import { getLineIndex } from './get-line-index';
+import { canIndentListItems } from './can-indent-list-items';
+
+/** @typedef {import('./create').RichTextValue} RichTextValue */
+/** @typedef {import('./create').RichTextFormat} RichTextFormat */
 
 /**
  * Gets the line index of the first previous list item with higher indentation.
  *
- * @param {Object} value      Value to search.
- * @param {number} lineIndex  Line index of the list item to compare with.
+ * @param {RichTextValue} value     Value to search.
+ * @param {number}        lineIndex Line index of the list item to compare
+ *                                  with.
  *
- * @return {boolean} The line index.
+ * @return {number|void} The line index.
  */
-function getTargetLevelLineIndex( { text, formats }, lineIndex ) {
-	const startFormats = formats[ lineIndex ] || [];
+function getTargetLevelLineIndex( { text, replacements }, lineIndex ) {
+	const startFormats = replacements[ lineIndex ] || [];
 
 	let index = lineIndex;
 
@@ -24,7 +28,7 @@ function getTargetLevelLineIndex( { text, formats }, lineIndex ) {
 			continue;
 		}
 
-		const formatsAtIndex = formats[ index ] || [];
+		const formatsAtIndex = replacements[ index ] || [];
 
 		// Return the first line index that is one level higher. If the level is
 		// lower or equal, there is no result.
@@ -39,31 +43,20 @@ function getTargetLevelLineIndex( { text, formats }, lineIndex ) {
 /**
  * Indents any selected list items if possible.
  *
- * @param {Object} value      Value to change.
- * @param {Object} rootFormat
+ * @param {RichTextValue}  value      Value to change.
+ * @param {RichTextFormat} rootFormat Root format.
  *
- * @return {Object} The changed value.
+ * @return {RichTextValue} The changed value.
  */
 export function indentListItems( value, rootFormat ) {
+	if ( ! canIndentListItems( value ) ) {
+		return value;
+	}
+
 	const lineIndex = getLineIndex( value );
-
-	// There is only one line, so the line cannot be indented.
-	if ( lineIndex === undefined ) {
-		return value;
-	}
-
-	const { text, formats, start, end } = value;
 	const previousLineIndex = getLineIndex( value, lineIndex );
-	const formatsAtLineIndex = formats[ lineIndex ] || [];
-	const formatsAtPreviousLineIndex = formats[ previousLineIndex ] || [];
-
-	// The the indentation of the current line is greater than previous line,
-	// then the line cannot be furter indented.
-	if ( formatsAtLineIndex.length > formatsAtPreviousLineIndex.length ) {
-		return value;
-	}
-
-	const newFormats = formats.slice();
+	const { text, replacements, end } = value;
+	const newFormats = replacements.slice();
 	const targetLevelLineIndex = getTargetLevelLineIndex( value, lineIndex );
 
 	for ( let index = lineIndex; index < end; index++ ) {
@@ -74,13 +67,14 @@ export function indentListItems( value, rootFormat ) {
 		// Get the previous list, and if there's a child list, take over the
 		// formats. If not, duplicate the last level and create a new level.
 		if ( targetLevelLineIndex ) {
-			const targetFormats = formats[ targetLevelLineIndex ] || [];
+			const targetFormats = replacements[ targetLevelLineIndex ] || [];
 			newFormats[ index ] = targetFormats.concat(
 				( newFormats[ index ] || [] ).slice( targetFormats.length - 1 )
 			);
 		} else {
-			const targetFormats = formats[ previousLineIndex ] || [];
-			const lastformat = targetFormats[ targetFormats.length - 1 ] || rootFormat;
+			const targetFormats = replacements[ previousLineIndex ] || [];
+			const lastformat =
+				targetFormats[ targetFormats.length - 1 ] || rootFormat;
 
 			newFormats[ index ] = targetFormats.concat(
 				[ lastformat ],
@@ -89,10 +83,8 @@ export function indentListItems( value, rootFormat ) {
 		}
 	}
 
-	return normaliseFormats( {
-		text,
-		formats: newFormats,
-		start,
-		end,
-	} );
+	return {
+		...value,
+		replacements: newFormats,
+	};
 }

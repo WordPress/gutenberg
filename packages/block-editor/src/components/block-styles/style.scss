@@ -1,0 +1,67 @@
+.block-editor-block-styles {
+	display: flex;
+	flex-wrap: wrap;
+	justify-content: space-between;
+}
+
+.block-editor-block-styles__item {
+	width: calc(50% - #{ $grid-unit-05 });
+	margin: $grid-unit-05 0;
+	flex-shrink: 0;
+	cursor: pointer;
+	overflow: hidden;
+	border-radius: $radius-block-ui;
+	padding: $grid-unit-05 * 1.5;
+	display: flex;
+	flex-direction: column;
+
+	&:focus {
+		box-shadow: 0 0 0 var(--wp-admin-border-width-focus) var(--wp-admin-theme-color);
+
+		// Windows High Contrast mode will show this outline, but not the box-shadow.
+		outline: 2px solid transparent;
+	}
+
+	&:hover .block-editor-block-styles__item-preview {
+		border-color: var(--wp-admin-theme-color);
+	}
+
+	&.is-active {
+		.block-editor-block-styles__item-label {
+			font-weight: bold;
+		}
+
+		.block-editor-block-styles__item-preview {
+			margin: 0;
+			border: 2px solid $gray-900;
+		}
+	}
+
+	.block-editor-block-preview__container {
+		cursor: inherit;
+	}
+}
+
+// Show a little preview thumbnail for style variations.
+.block-editor-block-styles__item-preview {
+	outline: $border-width solid transparent; // Shown in Windows High Contrast mode.
+	padding: 0;
+	margin: 2px;
+	border-radius: $radius-block-ui;
+	display: flex;
+	overflow: hidden;
+	background: $white;
+	align-items: center;
+	flex-grow: 1;
+	min-height: 80px;
+	max-height: 160px;
+}
+
+.block-editor-block-switcher__styles__menugroup {
+	position: relative;
+}
+
+.block-editor-block-styles__item-label {
+	text-align: center;
+	padding: 4px 0;
+}

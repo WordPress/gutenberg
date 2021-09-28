@@ -1,0 +1,30 @@
+.wp-block-post-author {
+	display: flex;
+	flex-wrap: wrap;
+
+	&__byline {
+		width: 100%;
+		margin-top: 0;
+		margin-bottom: 0;
+		font-size: 0.5em;
+	}
+
+	&__avatar {
+		margin-right: 1em;
+	}
+
+	&__bio {
+		margin-bottom: 0.7em;
+		font-size: 0.7em;
+	}
+
+	&__content {
+		flex-grow: 1;
+		flex-basis: 0;
+	}
+
+	&__name {
+		font-weight: bold;
+		margin: 0;
+	}
+}

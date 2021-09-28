@@ -2,104 +2,40 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { Fragment } from '@wordpress/element';
-import { createBlock } from '@wordpress/blocks';
-import {
-	RichText,
-	BlockControls,
-	AlignmentToolbar,
-} from '@wordpress/editor';
-import { SVG, Path } from '@wordpress/components';
+import { verse as icon } from '@wordpress/icons';
 
-export const name = 'core/verse';
+/**
+ * Internal dependencies
+ */
+import deprecated from './deprecated';
+import edit from './edit';
+import metadata from './block.json';
+import save from './save';
+import transforms from './transforms';
+
+const { name } = metadata;
+
+export { metadata, name };
 
 export const settings = {
-	title: __( 'Verse' ),
-
-	description: __( 'Insert poetry. Use special spacing formats. Or quote song lyrics.' ),
-
-	icon: <SVG viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><Path fill="none" d="M0 0h24v24H0V0z" /><Path d="M3 17v4h4l11-11-4-4L3 17zm3 2H5v-1l9-9 1 1-9 9zM21 6l-3-3h-1l-2 2 4 4 2-2V6z" /></SVG>,
-
-	category: 'formatting',
-
-	keywords: [ __( 'poetry' ) ],
-
-	attributes: {
-		content: {
-			type: 'string',
-			source: 'html',
-			selector: 'pre',
-			default: '',
-		},
-		textAlign: {
-			type: 'string',
+	icon,
+	example: {
+		attributes: {
+			/* eslint-disable @wordpress/i18n-no-collapsible-whitespace */
+			// translators: Sample content for the Verse block. Can be replaced with a more locale-adequate work.
+			content: __(
+				'WHAT was he doing, the great god Pan,\n	Down in the reeds by the river?\nSpreading ruin and scattering ban,\nSplashing and paddling with hoofs of a goat,\nAnd breaking the golden lilies afloat\n    With the dragon-fly on the river.'
+			),
+			/* eslint-enable @wordpress/i18n-no-collapsible-whitespace */
 		},
 	},
-
-	transforms: {
-		from: [
-			{
-				type: 'block',
-				blocks: [ 'core/paragraph' ],
-				transform: ( attributes ) =>
-					createBlock( 'core/verse', attributes ),
-			},
-		],
-		to: [
-			{
-				type: 'block',
-				blocks: [ 'core/paragraph' ],
-				transform: ( attributes ) =>
-					createBlock( 'core/paragraph', attributes ),
-			},
-		],
-	},
-
-	edit( { attributes, setAttributes, className, mergeBlocks } ) {
-		const { textAlign, content } = attributes;
-
-		return (
-			<Fragment>
-				<BlockControls>
-					<AlignmentToolbar
-						value={ textAlign }
-						onChange={ ( nextAlign ) => {
-							setAttributes( { textAlign: nextAlign } );
-						} }
-					/>
-				</BlockControls>
-				<RichText
-					tagName="pre"
-					value={ content }
-					onChange={ ( nextContent ) => {
-						setAttributes( {
-							content: nextContent,
-						} );
-					} }
-					style={ { textAlign } }
-					placeholder={ __( 'Write…' ) }
-					wrapperClassName={ className }
-					onMerge={ mergeBlocks }
-				/>
-			</Fragment>
-		);
-	},
-
-	save( { attributes } ) {
-		const { textAlign, content } = attributes;
-
-		return (
-			<RichText.Content
-				tagName="pre"
-				style={ { textAlign } }
-				value={ content }
-			/>
-		);
-	},
-
+	transforms,
+	deprecated,
 	merge( attributes, attributesToMerge ) {
 		return {
 			content: attributes.content + attributesToMerge.content,
 		};
 	},
+	edit,
+	save,
 };

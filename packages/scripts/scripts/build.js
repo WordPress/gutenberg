@@ -7,28 +7,19 @@ const { sync: resolveBin } = require( 'resolve-bin' );
 /**
  * Internal dependencies
  */
-const {
-	getCliArgs,
-	hasCliArg,
-	hasProjectFile,
-} = require( '../utils' );
+const { getWebpackArgs, hasArgInCLI } = require( '../utils' );
 
-const hasWebpackConfig = hasCliArg( '--config' ) ||
-	hasProjectFile( 'webpack.config.js' ) ||
-	hasProjectFile( 'webpack.config.babel.js' );
+process.env.NODE_ENV = process.env.NODE_ENV || 'production';
 
-if ( hasWebpackConfig ) {
-	// Sets environment to production.
-	process.env.NODE_ENV = 'production';
-
-	const { status } = spawn(
-		resolveBin( 'webpack' ),
-		getCliArgs(),
-		{ stdio: 'inherit' }
-	);
-	process.exit( status );
-} else {
-	// eslint-disable-next-line no-console
-	console.log( 'Webpack config file is missing.' );
-	process.exit( 1 );
+if ( hasArgInCLI( '--webpack-no-externals' ) ) {
+	process.env.WP_NO_EXTERNALS = true;
 }
+
+if ( hasArgInCLI( '--webpack-bundle-analyzer' ) ) {
+	process.env.WP_BUNDLE_ANALYZER = true;
+}
+
+const { status } = spawn( resolveBin( 'webpack' ), getWebpackArgs(), {
+	stdio: 'inherit',
+} );
+process.exit( status );

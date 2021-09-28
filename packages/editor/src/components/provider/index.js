@@ -1,152 +1,125 @@
 /**
- * External dependencies
- */
-import { map } from 'lodash';
-import memize from 'memize';
-
-/**
  * WordPress dependencies
  */
-import { compose } from '@wordpress/compose';
-import { Component } from '@wordpress/element';
-import { withDispatch, withSelect } from '@wordpress/data';
+import { useEffect, useLayoutEffect, useMemo } from '@wordpress/element';
+import { useDispatch, useSelect } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
-import { BlockEditorProvider } from '@wordpress/block-editor';
+import { EntityProvider, useEntityBlockEditor } from '@wordpress/core-data';
+import {
+	BlockEditorProvider,
+	BlockContextProvider,
+} from '@wordpress/block-editor';
+import { ReusableBlocksMenuItems } from '@wordpress/reusable-blocks';
+import { store as noticesStore } from '@wordpress/notices';
 
 /**
  * Internal dependencies
  */
-import transformStyles from '../../editor-styles';
-class EditorProvider extends Component {
-	constructor( props ) {
-		super( ...arguments );
+import withRegistryProvider from './with-registry-provider';
+import { store as editorStore } from '../../store';
+import useBlockEditorSettings from './use-block-editor-settings';
 
-		this.getBlockEditorSettings = memize( this.getBlockEditorSettings, {
-			maxSize: 1,
-		} );
+function EditorProvider( {
+	__unstableTemplate,
+	post,
+	settings,
+	recovery,
+	initialEdits,
+	children,
+} ) {
+	const defaultBlockContext = useMemo( () => {
+		if ( post.type === 'wp_template' ) {
+			return {};
+		}
+		return { postId: post.id, postType: post.type };
+	}, [ post.id, post.type ] );
+	const { selection, isReady } = useSelect( ( select ) => {
+		const { getEditorSelection, __unstableIsEditorReady } = select(
+			editorStore
+		);
+		return {
+			isReady: __unstableIsEditorReady(),
+			selection: getEditorSelection(),
+		};
+	}, [] );
+	const { id, type } = __unstableTemplate ?? post;
+	const [ blocks, onInput, onChange ] = useEntityBlockEditor(
+		'postType',
+		type,
+		{ id }
+	);
+	const editorSettings = useBlockEditorSettings(
+		settings,
+		!! __unstableTemplate
+	);
+	const {
+		updatePostLock,
+		setupEditor,
+		updateEditorSettings,
+		__experimentalTearDownEditor,
+	} = useDispatch( editorStore );
+	const { createWarningNotice } = useDispatch( noticesStore );
 
+	// Initialize and tear down the editor.
+	// Ideally this should be synced on each change and not just something you do once.
+	useLayoutEffect( () => {
 		// Assume that we don't need to initialize in the case of an error recovery.
-		if ( props.recovery ) {
+		if ( recovery ) {
 			return;
 		}
 
-		props.updatePostLock( props.settings.postLock );
-		props.setupEditor( props.post, props.initialEdits, props.settings.template );
-
-		if ( props.settings.autosave ) {
-			props.createWarningNotice(
-				__( 'There is an autosave of this post that is more recent than the version below.' ),
+		updatePostLock( settings.postLock );
+		setupEditor( post, initialEdits, settings.template );
+		if ( settings.autosave ) {
+			createWarningNotice(
+				__(
+					'There is an autosave of this post that is more recent than the version below.'
+				),
 				{
 					id: 'autosave-exists',
 					actions: [
 						{
 							label: __( 'View the autosave' ),
-							url: props.settings.autosave.editLink,
+							url: settings.autosave.editLink,
 						},
 					],
 				}
 			);
 		}
-	}
 
-	getBlockEditorSettings( settings, meta, onMetaChange, reusableBlocks ) {
-		return {
-			...settings,
-			__experimentalMetaSource: {
-				value: meta,
-				onChange: onMetaChange,
-			},
-			__experimentalReusableBlocks: reusableBlocks,
+		return () => {
+			__experimentalTearDownEditor();
 		};
+	}, [] );
+
+	// Synchronize the editor settings as they change
+	useEffect( () => {
+		updateEditorSettings( settings );
+	}, [ settings ] );
+
+	if ( ! isReady ) {
+		return null;
 	}
 
-	componentDidMount() {
-		if ( ! this.props.settings.styles ) {
-			return;
-		}
-
-		const updatedStyles = transformStyles( this.props.settings.styles, '.editor-styles-wrapper' );
-
-		map( updatedStyles, ( updatedCSS ) => {
-			if ( updatedCSS ) {
-				const node = document.createElement( 'style' );
-				node.innerHTML = updatedCSS;
-				document.body.appendChild( node );
-			}
-		} );
-	}
-
-	render() {
-		const {
-			children,
-			blocks,
-			resetEditorBlocks,
-			isReady,
-			settings,
-			meta,
-			onMetaChange,
-			reusableBlocks,
-			resetEditorBlocksWithoutUndoLevel,
-		} = this.props;
-
-		if ( ! isReady ) {
-			return null;
-		}
-
-		const editorSettings = this.getBlockEditorSettings(
-			settings, meta, onMetaChange, reusableBlocks
-		);
-
-		return (
-			<BlockEditorProvider
-				value={ blocks }
-				onInput={ resetEditorBlocksWithoutUndoLevel }
-				onChange={ resetEditorBlocks }
-				settings={ editorSettings }
-			>
-				{ children }
-			</BlockEditorProvider>
-		);
-	}
+	return (
+		<EntityProvider kind="root" type="site">
+			<EntityProvider kind="postType" type={ post.type } id={ post.id }>
+				<BlockContextProvider value={ defaultBlockContext }>
+					<BlockEditorProvider
+						value={ blocks }
+						onChange={ onChange }
+						onInput={ onInput }
+						selection={ selection }
+						settings={ editorSettings }
+						useSubRegistry={ false }
+					>
+						{ children }
+						<ReusableBlocksMenuItems />
+					</BlockEditorProvider>
+				</BlockContextProvider>
+			</EntityProvider>
+		</EntityProvider>
+	);
 }
 
-export default compose( [
-	withSelect( ( select ) => {
-		const {
-			__unstableIsEditorReady: isEditorReady,
-			getEditorBlocks,
-			getEditedPostAttribute,
-			__experimentalGetReusableBlocks,
-		} = select( 'core/editor' );
-		return {
-			isReady: isEditorReady(),
-			blocks: getEditorBlocks(),
-			meta: getEditedPostAttribute( 'meta' ),
-			reusableBlocks: __experimentalGetReusableBlocks(),
-		};
-	} ),
-	withDispatch( ( dispatch ) => {
-		const {
-			setupEditor,
-			updatePostLock,
-			resetEditorBlocks,
-			editPost,
-		} = dispatch( 'core/editor' );
-		const { createWarningNotice } = dispatch( 'core/notices' );
-
-		return {
-			setupEditor,
-			updatePostLock,
-			createWarningNotice,
-			resetEditorBlocks,
-			resetEditorBlocksWithoutUndoLevel( blocks ) {
-				resetEditorBlocks( blocks, {
-					__unstableShouldCreateUndoLevel: false,
-				} );
-			},
-			onMetaChange( meta ) {
-				editPost( { meta } );
-			},
-		};
-	} ),
-] )( EditorProvider );
+export default withRegistryProvider( EditorProvider );

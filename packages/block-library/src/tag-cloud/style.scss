@@ -1,0 +1,21 @@
+.wp-block-tag-cloud {
+	&.aligncenter {
+		text-align: center;
+	}
+
+	&.alignfull {
+		padding-left: 1em;
+		padding-right: 1em;
+	}
+
+	a {
+		display: inline-block;
+		margin-right: 5px;
+	}
+
+	span {
+		display: inline-block;
+		margin-left: 5px;
+		text-decoration: none;
+	}
+}

@@ -1,0 +1,79 @@
+.columnPlaceholderNotSelected {
+	padding-top: $block-selected-to-content;
+}
+
+.columnPlaceholder {
+	flex: 1;
+	padding: $block-selected-to-content;
+	border: $border-width dashed $gray;
+	border-radius: 4px;
+}
+
+.columnPlaceholderDark {
+	border: $border-width dashed $gray-70;
+}
+
+.innerBlocksBottomSpace {
+	margin-bottom: $block-edge-to-content;
+}
+
+.is-vertically-aligned-top {
+	justify-content: flex-start;
+}
+
+.is-vertically-aligned-center {
+	justify-content: center;
+}
+
+.is-vertically-aligned-bottom {
+	justify-content: flex-end;
+}
+
+.flexBase {
+	flex: 1;
+}
+
+.columnsPreview {
+	min-height: 18px;
+	min-width: 24px;
+	border-color: $toolbar-button;
+	flex-direction: row;
+	align-self: center;
+	margin-right: 10px;
+	border-width: $border-width;
+	border-radius: $radius-block-ui;
+}
+
+.columnsPreviewDark {
+	border-color: $gray-20;
+}
+
+.columnIndicator {
+	background-color: $toolbar-button;
+}
+
+.columnIndicatorDark {
+	background-color: $gray-20;
+}
+
+.columnAppender {
+	margin-left: $grid-unit-10;
+	margin-right: $grid-unit-10;
+}
+.fullwidthColumnAppender {
+	margin-left: $grid-unit * 2.5;
+	margin-right: $grid-unit * 2.5;
+}
+.fullwidthHasInnerColumnAppender {
+	margin-left: $grid-unit-15;
+	margin-right: $grid-unit-15;
+}
+.hasInnerColumnAppender {
+	margin-left: 0;
+	margin-right: 0;
+}
+
+.wideColumnAppender {
+	margin-left: $grid-unit-10;
+	margin-right: $grid-unit-10;
+}

@@ -1,0 +1,7 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`RovingTabIndex does not render any elements other than its children 1`] = `
+<div>
+  child element
+</div>
+`;

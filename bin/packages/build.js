@@ -1,222 +1,273 @@
 /**
- * script to build WordPress packages into `build/` directory.
- *
- * Example:
- *  node ./scripts/build.js
- */
-
-/**
  * External dependencies
  */
 const fs = require( 'fs' );
 const path = require( 'path' );
-const glob = require( 'glob' );
-const babel = require( '@babel/core' );
-const chalk = require( 'chalk' );
-const mkdirp = require( 'mkdirp' );
-const sass = require( 'node-sass' );
-const postcss = require( 'postcss' );
-const deasync = require( 'deasync' );
+const glob = require( 'fast-glob' );
+const ProgressBar = require( 'progress' );
+const workerFarm = require( 'worker-farm' );
+const { Readable, Transform } = require( 'stream' );
+
+const files = process.argv.slice( 2 );
 
 /**
- * Internal dependencies
- */
-const getPackages = require( './get-packages' );
-const getBabelConfig = require( './get-babel-config' );
-
-/**
- * Module Constants
+ * Path to packages directory.
+ *
+ * @type {string}
  */
 const PACKAGES_DIR = path.resolve( __dirname, '../../packages' );
-const SRC_DIR = 'src';
-const BUILD_DIR = {
-	main: 'build',
-	module: 'build-module',
-	style: 'build-style',
-};
-const DONE = chalk.reset.inverse.bold.green( ' DONE ' );
+
+const stylesheetEntryPoints = glob.sync(
+	path.resolve( PACKAGES_DIR, '*/src/*.scss' )
+);
 
 /**
  * Get the package name for a specified file
  *
- * @param  {string} file File name
- * @return {string}      Package name
+ * @param {string} file File name.
+ *
+ * @return {string} Package name.
  */
 function getPackageName( file ) {
 	return path.relative( PACKAGES_DIR, file ).split( path.sep )[ 0 ];
 }
 
-const isJsFile = ( filepath ) => {
-	return /.\.js$/.test( filepath );
-};
-
-const isScssFile = ( filepath ) => {
-	return /.\.scss$/.test( filepath );
-};
-
 /**
- * Get Build Path for a specified file
+ * Parses all Sass import statements in a given file
  *
- * @param  {string} file        File to build
- * @param  {string} buildFolder Output folder
- * @return {string}             Build path
+ * @param {string} file File name.
+ *
+ * @return {Array} List of Import Statements in a file.
  */
-function getBuildPath( file, buildFolder ) {
-	const pkgName = getPackageName( file );
-	const pkgSrcPath = path.resolve( PACKAGES_DIR, pkgName, SRC_DIR );
-	const pkgBuildPath = path.resolve( PACKAGES_DIR, pkgName, buildFolder );
-	const relativeToSrcPath = path.relative( pkgSrcPath, file );
-	return path.resolve( pkgBuildPath, relativeToSrcPath );
+function parseImportStatements( file ) {
+	const fileContent = fs.readFileSync( file, 'utf8' );
+	return fileContent.toString().match( /@import "(.*?)"/g );
+}
+
+function isFileImportedInStyleEntry( file, importStatements ) {
+	const packageName = getPackageName( file );
+	const regex = new RegExp( `/${ packageName }/`, 'g' );
+
+	return (
+		importStatements &&
+		importStatements.find( ( importStatement ) =>
+			importStatement.match( regex )
+		)
+	);
 }
 
 /**
- * Given a list of scss and js filepaths, divide them into sets them and rebuild.
+ * Finds all stylesheet entry points that contain import statements
+ * that include the given file name
  *
- * @param {Array} files list of files to rebuild
+ * @param {string} file File name.
+ *
+ * @return {Array} List of entry points that import the styles from the file.
  */
-function buildFiles( files ) {
-	// Reduce files into a unique sets of javaScript files and scss packages.
-	const buildPaths = files.reduce( ( accumulator, filePath ) => {
-		if ( isJsFile( filePath ) ) {
-			accumulator.jsFiles.add( filePath );
-		} else if ( isScssFile( filePath ) ) {
-			const pkgName = getPackageName( filePath );
-			const pkgPath = path.resolve( PACKAGES_DIR, pkgName );
-			accumulator.scssPackagePaths.add( pkgPath );
-		}
-		return accumulator;
-	}, { jsFiles: new Set(), scssPackagePaths: new Set() } );
+function findStyleEntriesThatImportFile( file ) {
+	const entriesWithImport = stylesheetEntryPoints.reduce(
+		( acc, entryPoint ) => {
+			const styleEntryImportStatements = parseImportStatements(
+				entryPoint
+			);
 
-	buildPaths.jsFiles.forEach( buildJsFile );
-	buildPaths.scssPackagePaths.forEach( buildPackageScss );
+			if (
+				isFileImportedInStyleEntry( file, styleEntryImportStatements )
+			) {
+				acc.push( entryPoint );
+			}
+
+			return acc;
+		},
+		[]
+	);
+
+	return entriesWithImport;
 }
 
 /**
- * Build a javaScript file for the required environments (node and ES5)
+ * Returns a stream transform which maps an individual stylesheet to its
+ * package entrypoint. Unlike JavaScript which uses an external bundler to
+ * efficiently manage rebuilds by entrypoints, stylesheets are rebuilt fresh
+ * in their entirety from the build script.
  *
- * @param {string} file    File path to build
- * @param {boolean} silent Show logs
+ * @return {Transform} Stream transform instance.
  */
-function buildJsFile( file, silent ) {
-	buildJsFileFor( file, silent, 'main' );
-	buildJsFileFor( file, silent, 'module' );
-}
+function createStyleEntryTransform() {
+	const packages = new Set();
 
-/**
- * Build a package's scss styles
- *
- * @param {string} packagePath The path to the package.
- */
-function buildPackageScss( packagePath ) {
-	const srcDir = path.resolve( packagePath, SRC_DIR );
-	const scssFiles = glob.sync( `${ srcDir }/*.scss` );
+	return new Transform( {
+		objectMode: true,
+		async transform( file, encoding, callback ) {
+			// Only stylesheets are subject to this transform.
+			if ( path.extname( file ) !== '.scss' ) {
+				this.push( file );
+				callback();
+				return;
+			}
 
-	// Build scss files individually.
-	scssFiles.forEach( buildScssFile );
-}
+			// Only operate once per package, assuming entries are common.
+			const packageName = getPackageName( file );
+			if ( packages.has( packageName ) ) {
+				callback();
+				return;
+			}
 
-function buildScssFile( styleFile ) {
-	const outputFile = getBuildPath( styleFile.replace( '.scss', '.css' ), BUILD_DIR.style );
-	const outputFileRTL = getBuildPath( styleFile.replace( '.scss', '-rtl.css' ), BUILD_DIR.style );
-	mkdirp.sync( path.dirname( outputFile ) );
-	const builtSass = sass.renderSync( {
-		file: styleFile,
-		includePaths: [ path.resolve( __dirname, '../../assets/stylesheets' ) ],
-		data: (
-			[
-				'colors',
-				'breakpoints',
-				'variables',
-				'mixins',
-				'animations',
-				'z-index',
-			].map( ( imported ) => `@import "${ imported }";` ).join( ' ' )	+
-			fs.readFileSync( styleFile, 'utf8' )
-		),
+			packages.add( packageName );
+			const entries = await glob(
+				path.resolve( PACKAGES_DIR, packageName, 'src/*.scss' )
+			);
+
+			// Account for the specific case where block styles in
+			// block-library package also need rebuilding.
+			if (
+				packageName === 'block-library' &&
+				[ 'style.scss', 'editor.scss', 'theme.scss' ].includes(
+					path.basename( file )
+				)
+			) {
+				entries.push( file );
+			}
+
+			entries.forEach( ( entry ) => this.push( entry ) );
+
+			// Find other stylesheets that need to be rebuilt because
+			// they import the styles that are being transformed
+			const styleEntries = findStyleEntriesThatImportFile( file );
+
+			// Rebuild stylesheets that import the styles being transformed
+			if ( styleEntries.length ) {
+				styleEntries.forEach( ( entry ) => stream.push( entry ) );
+			}
+
+			callback();
+		},
 	} );
-
-	const postCSSSync = ( callback ) => {
-		postcss( require( './post-css-config' ) )
-			.process( builtSass.css, { from: 'src/app.css', to: 'dest/app.css' } )
-			.then( ( result ) => callback( null, result ) );
-	};
-
-	const postCSSRTLSync = ( ltrCSS, callback ) => {
-		postcss( [ require( 'rtlcss' )() ] )
-			.process( ltrCSS, { from: 'src/app.css', to: 'dest/app.css' } )
-			.then( ( result ) => callback( null, result ) );
-	};
-
-	const result = deasync( postCSSSync )();
-	fs.writeFileSync( outputFile, result.css );
-
-	const resultRTL = deasync( postCSSRTLSync )( result );
-	fs.writeFileSync( outputFileRTL, resultRTL );
 }
 
 /**
- * Build a file for a specific environment
+ * Returns a stream transform which maps an individual block.json to the
+ * index.js that imports it. Presently, babel resolves the import of json
+ * files by inlining them as a JavaScript primitive in the importing file.
+ * This transform ensures the importing file is rebuilt.
  *
- * @param {string}  file        File path to build
- * @param {boolean} silent      Show logs
- * @param {string}  environment Dist environment (node or es5)
+ * @return {Transform} Stream transform instance.
  */
-function buildJsFileFor( file, silent, environment ) {
-	const buildDir = BUILD_DIR[ environment ];
-	const destPath = getBuildPath( file, buildDir );
-	const babelOptions = getBabelConfig( environment );
-	babelOptions.sourceMaps = true;
-	babelOptions.sourceFileName = file;
+function createBlockJsonEntryTransform() {
+	const blocks = new Set();
 
-	mkdirp.sync( path.dirname( destPath ) );
-	const transformed = babel.transformFileSync( file, babelOptions );
-	fs.writeFileSync( destPath + '.map', JSON.stringify( transformed.map ) );
-	fs.writeFileSync( destPath, transformed.code + '\n//# sourceMappingURL=' + path.basename( destPath ) + '.map' );
+	return new Transform( {
+		objectMode: true,
+		async transform( file, encoding, callback ) {
+			const matches = /block-library[\/\\]src[\/\\](.*)[\/\\]block.json$/.exec(
+				file
+			);
+			const blockName = matches ? matches[ 1 ] : undefined;
 
-	if ( ! silent ) {
-		process.stdout.write(
-			chalk.green( '  \u2022 ' ) +
-				path.relative( PACKAGES_DIR, file ) +
-				chalk.green( ' \u21D2 ' ) +
-				path.relative( PACKAGES_DIR, destPath ) +
-				'\n'
-		);
-	}
-}
+			// Only block.json files in the block-library folder are subject to this transform.
+			if ( ! blockName ) {
+				this.push( file );
+				callback();
+				return;
+			}
 
-/**
- * Build the provided package path
- *
- * @param {string} packagePath absolute package path
- */
-function buildPackage( packagePath ) {
-	const srcDir = path.resolve( packagePath, SRC_DIR );
-	const jsFiles = glob.sync( `${ srcDir }/**/*.js`, {
-		ignore: [
-			`${ srcDir }/**/test/**/*.js`,
-			`${ srcDir }/**/__mocks__/**/*.js`,
-		],
-		nodir: true,
+			// Only operate once per block, assuming entries are common.
+			if ( blockName && blocks.has( blockName ) ) {
+				callback();
+				return;
+			}
+
+			blocks.add( blockName );
+			this.push( file.replace( 'block.json', 'index.js' ) );
+			callback();
+		},
 	} );
-
-	process.stdout.write( `${ path.basename( packagePath ) }\n` );
-
-	// Build js files individually.
-	jsFiles.forEach( ( file ) => buildJsFile( file, true ) );
-
-	// Build package CSS files
-	buildPackageScss( packagePath );
-
-	process.stdout.write( `${ DONE }\n` );
 }
 
-const files = process.argv.slice( 2 );
+let onFileComplete = () => {};
+
+let stream;
 
 if ( files.length ) {
-	buildFiles( files );
+	stream = new Readable( { encoding: 'utf8' } );
+	files.forEach( ( file ) => {
+		stream.push( file );
+	} );
+
+	stream.push( null );
+	stream = stream
+		.pipe( createStyleEntryTransform() )
+		.pipe( createBlockJsonEntryTransform() );
 } else {
-	process.stdout.write( chalk.inverse( '>> Building packages \n' ) );
-	getPackages()
-		.forEach( buildPackage );
-	process.stdout.write( '\n' );
+	const bar = new ProgressBar( 'Build Progress: [:bar] :percent', {
+		width: 30,
+		incomplete: ' ',
+		total: 1,
+	} );
+
+	bar.tick( 0 );
+
+	stream = glob.stream(
+		[
+			`${ PACKAGES_DIR }/*/src/**/*.{js,ts,tsx}`,
+			`${ PACKAGES_DIR }/*/src/*.scss`,
+			`${ PACKAGES_DIR }/block-library/src/**/*.js`,
+			`${ PACKAGES_DIR }/block-library/src/*/style.scss`,
+			`${ PACKAGES_DIR }/block-library/src/*/theme.scss`,
+			`${ PACKAGES_DIR }/block-library/src/*/editor.scss`,
+			`${ PACKAGES_DIR }/block-library/src/*.scss`,
+		],
+		{
+			ignore: [
+				`**/benchmark/**`,
+				`**/{__mocks__,__tests__,test}/**`,
+				`**/{storybook,stories}/**`,
+			],
+			onlyFiles: true,
+		}
+	);
+
+	// Pause to avoid data flow which would begin on the `data` event binding,
+	// but should wait until worker processing below.
+	//
+	// See: https://nodejs.org/api/stream.html#stream_two_reading_modes
+	stream.pause().on( 'data', ( file ) => {
+		bar.total = files.push( file );
+	} );
+
+	onFileComplete = () => {
+		bar.tick();
+	};
 }
+
+const worker = workerFarm( require.resolve( './build-worker' ) );
+
+let ended = false,
+	complete = 0;
+
+stream
+	.on( 'data', ( file ) =>
+		worker( file, ( error ) => {
+			onFileComplete();
+
+			if ( error ) {
+				// If an error occurs, the process can't be ended immediately since
+				// other workers are likely pending. Optimally, it would end at the
+				// earliest opportunity (after the current round of workers has had
+				// the chance to complete), but this is not made directly possible
+				// through `worker-farm`. Instead, ensure at least that when the
+				// process does exit, it exits with a non-zero code to reflect the
+				// fact that an error had occurred.
+				process.exitCode = 1;
+
+				console.error( error );
+			}
+
+			++complete;
+			if ( ended && complete === files.length ) {
+				workerFarm.end( worker );
+			}
+		} )
+	)
+	.on( 'end', () => ( ended = true ) )
+	.resume();

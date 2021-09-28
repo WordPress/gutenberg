@@ -1,22 +1,30 @@
 /**
  * External dependencies
  */
-import { shallow } from 'enzyme';
+import { mount, shallow } from 'enzyme';
 
 /**
  * Internal dependencies
  */
 import ColorPalette from '../';
 
-jest.mock( '../../button' );
-
 describe( 'ColorPalette', () => {
-	const colors = [ { name: 'red', color: '#f00' }, { name: 'white', color: '#fff' }, { name: 'blue', color: '#00f' } ];
+	const colors = [
+		{ name: 'red', color: '#f00' },
+		{ name: 'white', color: '#fff' },
+		{ name: 'blue', color: '#00f' },
+	];
 	const currentColor = '#f00';
 	const onChange = jest.fn();
 
-	const wrapper = shallow( <ColorPalette colors={ colors } value={ currentColor } onChange={ onChange } /> );
-	const buttons = wrapper.find( '.components-color-palette__item-wrapper button' );
+	const wrapper = mount(
+		<ColorPalette
+			colors={ colors }
+			value={ currentColor }
+			onChange={ onChange }
+		/>
+	);
+	const buttons = wrapper.find( 'Option button' );
 
 	beforeEach( () => {
 		onChange.mockClear();
@@ -31,7 +39,9 @@ describe( 'ColorPalette', () => {
 	} );
 
 	test( 'should call onClick on an active button with undefined', () => {
-		const activeButton = buttons.findWhere( ( button ) => button.hasClass( 'is-active' ) );
+		const activeButton = buttons.findWhere( ( button ) =>
+			button.hasClass( 'is-pressed' )
+		);
 		activeButton.simulate( 'click' );
 
 		expect( onChange ).toHaveBeenCalledTimes( 1 );
@@ -39,14 +49,16 @@ describe( 'ColorPalette', () => {
 	} );
 
 	test( 'should call onClick on an inactive button', () => {
-		const inactiveButton = buttons.findWhere( ( button ) => ! button.hasClass( 'is-active' ) ).first();
+		const inactiveButton = buttons
+			.findWhere( ( button ) => ! button.hasClass( 'is-pressed' ) )
+			.first();
 		inactiveButton.simulate( 'click' );
 
 		expect( onChange ).toHaveBeenCalledTimes( 1 );
 	} );
 
 	test( 'should call onClick with undefined, when the clearButton onClick is triggered', () => {
-		const clearButton = wrapper.find( '.components-color-palette__clear' );
+		const clearButton = wrapper.find( 'ButtonAction button' );
 
 		expect( clearButton ).toHaveLength( 1 );
 
@@ -57,7 +69,16 @@ describe( 'ColorPalette', () => {
 	} );
 
 	test( 'should allow disabling custom color picker', () => {
-		expect( shallow( <ColorPalette colors={ colors } disableCustomColors={ true } value={ currentColor } onChange={ onChange } /> ) ).toMatchSnapshot();
+		expect(
+			shallow(
+				<ColorPalette
+					colors={ colors }
+					disableCustomColors={ true }
+					value={ currentColor }
+					onChange={ onChange }
+				/>
+			)
+		).toMatchSnapshot();
 	} );
 
 	describe( 'Dropdown', () => {
@@ -71,14 +92,16 @@ describe( 'ColorPalette', () => {
 			const isOpen = true;
 			const onToggle = jest.fn();
 
-			const renderedToggleButton = shallow( dropdown.props().renderToggle( { isOpen, onToggle } ) );
+			const renderedToggleButton = shallow(
+				dropdown.props().renderToggle( { isOpen, onToggle } )
+			);
 
 			test( 'should render dropdown content', () => {
 				expect( renderedToggleButton ).toMatchSnapshot();
 			} );
 
 			test( 'should call onToggle on click.', () => {
-				renderedToggleButton.simulate( 'click' );
+				renderedToggleButton.find( 'button' ).simulate( 'click' );
 
 				expect( onToggle ).toHaveBeenCalledTimes( 1 );
 			} );

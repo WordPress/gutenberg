@@ -1,0 +1,26 @@
+
+.container {
+	height: $mobile-header-toolbar-height;
+	flex-direction: row;
+	background-color: $app-background;
+	border-top-color: #e9eff3;
+	border-top-width: 1px;
+}
+
+.containerDark {
+	background-color: $app-background-dark-alt;
+	border-top-color: $background-dark-elevated;
+}
+
+.scrollableContent {
+	flex-grow: 1; // Fixes RTL issue on Android.
+}
+
+.keyboardHideContainer {
+	padding-right: 0;
+	padding-left: 0;
+	padding-top: 4px;
+	width: 44px;
+	justify-content: center;
+	align-items: center;
+}

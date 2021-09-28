@@ -1,0 +1,66 @@
+.interface-complementary-area {
+	background: $white;
+	color: $gray-900;
+
+	@include break-small() {
+		-webkit-overflow-scrolling: touch;
+	}
+
+	@include break-medium() {
+		width: $sidebar-width;
+	}
+
+	.components-panel {
+		border: none;
+		// Make a stacking context that keeps all descendents behind the sticky header
+		position: relative;
+		z-index: z-index(".interface-complementary-area .components-panel");
+	}
+
+	.components-panel__header {
+		position: sticky;
+		top: 0;
+		z-index: z-index(".interface-complementary-area .components-panel__header");
+
+		&.edit-post-sidebar__panel-tabs {
+			top: $panel-header-height;
+
+			@include break-medium() {
+				top: 0;
+			}
+		}
+	}
+
+	p {
+		margin-top: 0;
+	}
+
+	h2,
+	h3 {
+		font-size: $default-font-size;
+		color: $gray-900;
+		margin-bottom: 1.5em;
+	}
+
+	hr {
+		border-top: none;
+		border-bottom: 1px solid $gray-100;
+		margin: 1.5em 0;
+	}
+
+	div.components-toolbar-group,
+	div.components-toolbar {
+		box-shadow: none;
+		margin-bottom: 1.5em;
+		&:last-child {
+			margin-bottom: 0;
+		}
+	}
+
+	.block-editor-skip-to-selected-block:focus {
+		top: auto;
+		right: 10px;
+		bottom: 10px;
+		left: auto;
+	}
+}

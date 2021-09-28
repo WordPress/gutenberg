@@ -2,6 +2,7 @@
  * External dependencies
  */
 import renderer from 'react-test-renderer';
+import { render, fireEvent } from '@testing-library/react';
 
 /**
  * WordPress dependencies
@@ -16,7 +17,9 @@ import withFocusReturn from '../';
 class Test extends Component {
 	render() {
 		return (
-			<div className="test">Testing</div>
+			<div className="test">
+				<textarea />
+			</div>
 		);
 	}
 }
@@ -26,12 +29,8 @@ describe( 'withFocusReturn()', () => {
 		const Composite = withFocusReturn( Test );
 		const activeElement = document.createElement( 'button' );
 		const switchFocusTo = document.createElement( 'input' );
-
-		const getInstance = ( wrapper ) => {
-			return wrapper.root.find(
-				( node ) => node.instance instanceof Component
-			).instance;
-		};
+		document.body.appendChild( activeElement );
+		document.body.appendChild( switchFocusTo );
 
 		beforeEach( () => {
 			activeElement.focus();
@@ -47,40 +46,62 @@ describe( 'withFocusReturn()', () => {
 			const wrappedElementShallow = wrappedElement.children[ 0 ];
 			expect( wrappedElementShallow.props.className ).toBe( 'test' );
 			expect( wrappedElementShallow.type ).toBe( 'div' );
-			expect( wrappedElementShallow.children[ 0 ] ).toBe( 'Testing' );
+			expect( wrappedElementShallow.children[ 0 ].type ).toBe(
+				'textarea'
+			);
 		} );
 
-		it( 'should pass additional props through to the wrapped element', () => {
-			const renderedComposite = renderer.create( <Composite test="test" /> );
+		it( 'should pass own props through to the wrapped element', () => {
+			const renderedComposite = renderer.create(
+				<Composite test="test" />
+			);
 			const wrappedElement = renderedComposite.root.findByType( Test );
 			// Ensure that the wrapped Test element has the appropriate props.
 			expect( wrappedElement.props.test ).toBe( 'test' );
 		} );
 
-		it( 'should not switch focus back to the bound focus element', () => {
-			const mountedComposite = renderer.create( <Composite /> );
+		it( 'should not pass any withFocusReturn context props through to the wrapped element', () => {
+			const renderedComposite = renderer.create(
+				<Composite test="test" />
+			);
+			const wrappedElement = renderedComposite.root.findByType( Test );
+			// Ensure that the wrapped Test element has the appropriate props.
+			expect( wrappedElement.props.focusHistory ).toBeUndefined();
+		} );
 
-			expect( getInstance( mountedComposite ).activeElementOnMount ).toBe( activeElement );
+		it( 'should not switch focus back to the bound focus element', () => {
+			const { unmount } = render( <Composite />, {
+				container: document.body.appendChild(
+					document.createElement( 'div' )
+				),
+			} );
 
 			// Change activeElement.
 			switchFocusTo.focus();
 			expect( document.activeElement ).toBe( switchFocusTo );
 
 			// Should keep focus on switchFocusTo, because it is not within HOC.
-			mountedComposite.unmount();
+			unmount();
 			expect( document.activeElement ).toBe( switchFocusTo );
 		} );
 
-		it( 'should return focus to element associated with HOC', () => {
-			const mountedComposite = renderer.create( <Composite /> );
-			expect( getInstance( mountedComposite ).activeElementOnMount ).toBe( activeElement );
+		it( 'should switch focus back when unmounted while having focus', () => {
+			const { container, unmount } = render( <Composite />, {
+				container: document.body.appendChild(
+					document.createElement( 'div' )
+				),
+			} );
 
-			// Change activeElement.
-			document.activeElement.blur();
-			expect( document.activeElement ).toBe( document.body );
+			const textarea = container.querySelector( 'textarea' );
+			fireEvent.focusIn( textarea, { target: textarea } );
+			textarea.focus();
+			expect( document.activeElement ).toBe( textarea );
 
 			// Should return to the activeElement saved with this component.
-			mountedComposite.unmount();
+			unmount();
+			render( <div></div>, {
+				container,
+			} );
 			expect( document.activeElement ).toBe( activeElement );
 		} );
 	} );

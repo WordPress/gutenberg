@@ -1,11 +1,16 @@
 /**
- * WordPress dependencies
- */
-import '@wordpress/blocks';
-
-/**
  * Internal dependencies
  */
-import './store';
-
+import './hooks';
+export {
+	getBorderClassesAndStyles as __experimentalGetBorderClassesAndStyles,
+	useBorderProps as __experimentalUseBorderProps,
+	getColorClassesAndStyles as __experimentalGetColorClassesAndStyles,
+	useColorProps as __experimentalUseColorProps,
+	useCustomSides as __experimentalUseCustomSides,
+	getSpacingClassesAndStyles as __experimentalGetSpacingClassesAndStyles,
+} from './hooks';
 export * from './components';
+export * from './utils';
+export { storeConfig, store } from './store';
+export { SETTINGS_DEFAULTS } from './store/defaults';

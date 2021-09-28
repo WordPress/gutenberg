@@ -1,0 +1,19 @@
+{
+	"apiVersion": 2,
+	"name": "core/post-comment",
+	"title": "Post Comment",
+	"category": "theme",
+	"description": "Post comment.",
+	"textdomain": "default",
+	"attributes": {
+		"commentId": {
+			"type": "number"
+		}
+	},
+	"providesContext": {
+		"commentId": "commentId"
+	},
+	"supports": {
+		"html": false
+	}
+}

@@ -1,0 +1,89 @@
+.container {
+	flex-grow: 1;
+	flex-direction: row;
+	align-items: center;
+	min-height: 48px;
+	justify-content: flex-end;
+}
+
+.rowContainer {
+	flex-direction: row;
+	align-items: center;
+}
+
+.columnContainer {
+	margin-top: 13px;
+	flex-direction: column;
+}
+
+.containerIOS {
+	padding-top: 6px;
+	padding-bottom: 6px;
+}
+
+.containerAndroid {
+	padding-top: 8px;
+	padding-bottom: 8px;
+}
+
+.cellContainerStyles {
+	flex-direction: row;
+	align-items: flex-start;
+}
+
+.cellRowStyles {
+	flex-shrink: 1;
+	min-height: 48px;
+	align-items: center;
+	justify-content: space-between;
+}
+
+.cellLabel {
+	flex: 1;
+}
+
+.cellLabelNoIcon {
+	margin-left: 0;
+}
+
+.button {
+	width: 32px;
+	height: 32px;
+	background-color: $gray-light;
+	color: #0087be;
+	border-radius: 16px;
+	margin-left: 12px;
+	align-items: center;
+	justify-content: center;
+}
+
+.buttonNoBg {
+	width: 32px;
+	height: 32px;
+	color: #87a6bc;
+	align-items: center;
+	justify-content: center;
+}
+
+.buttonNoBgTextDark {
+	color: $light-opacity-700;
+}
+
+.buttonDark {
+	background-color: $light-opacity-light-100;
+	color: #5198d9;
+}
+
+.value {
+	color: #2e4453;
+	font-size: 16px;
+}
+
+.spacings {
+	margin-left: 12px;
+	margin-right: 12px;
+}
+
+.valueTextDark {
+	color: $light-opacity-200;
+}
