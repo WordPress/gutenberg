@@ -16,6 +16,23 @@ import ListViewAppender from './appender';
 import { isClientIdSelected } from './utils';
 import { useListViewContext } from './context';
 
+function countBlocks( block, expandedState ) {
+	const isExpanded = expandedState[ block.clientId ] ?? true;
+	if ( isExpanded ) {
+		return 1 + block.innerBlocks.reduce( countReducer( expandedState ), 0 );
+	}
+	return 1;
+}
+const countReducer = ( expandedState ) => ( count, block ) => {
+	const isExpanded = expandedState[ block.clientId ] ?? true;
+	if ( isExpanded && block.innerBlocks.length > 0 ) {
+		return count + countBlocks( block, expandedState );
+	}
+	return count + 1;
+};
+
+const ITEM_HEIGHT = 36;
+
 export default function ListViewBranch( props ) {
 	const {
 		blocks,
@@ -29,6 +46,9 @@ export default function ListViewBranch( props ) {
 		path = [],
 		isBranchSelected = false,
 		isLastOfBranch = false,
+		listPosition = 0,
+		measurement,
+		globalBlockCount,
 	} = props;
 
 	const {
@@ -50,6 +70,7 @@ export default function ListViewBranch( props ) {
 	const blockCount = filteredBlocks.length;
 	const rowCount = hasAppender ? blockCount + 1 : blockCount;
 	const appenderPosition = rowCount;
+	let nextPosition = listPosition;
 
 	return (
 		<>
@@ -102,25 +123,53 @@ export default function ListViewBranch( props ) {
 				// but asynchronous for any other block.
 				const isDragged = !! draggedClientIds?.includes( clientId );
 
+				if ( index > 0 ) {
+					nextPosition += countBlocks(
+						filteredBlocks[ index - 1 ],
+						expandedState
+					);
+				}
+				const end = measurement.start + measurement.maxVisible;
+				const blockInView =
+					measurement.start <= nextPosition &&
+					nextPosition <= measurement.start + measurement.maxVisible;
+
+				const style = {
+					...( measurement.start === nextPosition
+						? { paddingTop: ITEM_HEIGHT * measurement.start }
+						: {} ),
+					...( globalBlockCount > end && end === nextPosition
+						? {
+								paddingBottom:
+									ITEM_HEIGHT * ( globalBlockCount - end ),
+						  }
+						: {} ),
+				};
 				return (
 					<AsyncModeProvider key={ clientId } value={ ! isSelected }>
-						<ListViewBlock
-							block={ block }
-							onClick={ selectBlockWithClientId }
-							onToggleExpanded={ toggleExpanded }
-							isDragged={ isDragged }
-							isSelected={ isSelected }
-							isBranchSelected={ isSelectedBranch }
-							isLastOfSelectedBranch={ isLastOfSelectedBranch }
-							level={ level }
-							position={ position }
-							rowCount={ rowCount }
-							siblingBlockCount={ blockCount }
-							showBlockMovers={ showBlockMovers }
-							terminatedLevels={ terminatedLevels }
-							path={ updatedPath }
-							isExpanded={ isExpanded }
-						/>
+						{ blockInView && (
+							<ListViewBlock
+								block={ block }
+								onClick={ selectBlockWithClientId }
+								onToggleExpanded={ toggleExpanded }
+								isDragged={ isDragged }
+								isSelected={ isSelected }
+								isBranchSelected={ isSelectedBranch }
+								isLastOfSelectedBranch={
+									isLastOfSelectedBranch
+								}
+								level={ level }
+								position={ position }
+								rowCount={ rowCount }
+								siblingBlockCount={ blockCount }
+								showBlockMovers={ showBlockMovers }
+								terminatedLevels={ terminatedLevels }
+								path={ updatedPath }
+								isExpanded={ isExpanded }
+								listPosition={ nextPosition }
+								style={ style }
+							/>
+						) }
 						{ hasNestedBranch && isExpanded && ! isDragged && (
 							<ListViewBranch
 								blocks={ innerBlocks }
@@ -134,6 +183,9 @@ export default function ListViewBranch( props ) {
 								level={ level + 1 }
 								terminatedLevels={ updatedTerminatedLevels }
 								path={ updatedPath }
+								listPosition={ nextPosition + 1 }
+								measurement={ measurement }
+								globalBlockCount={ globalBlockCount }
 							/>
 						) }
 					</AsyncModeProvider>
