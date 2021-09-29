@@ -167,33 +167,36 @@ function template_is_customized( $slug, $template_type = 'wp_template' ) {
 		return false;
 	}
 }
-	
+
 /**
- * Sets a custom slug when creating new templates and template parts.
+ * Customizes a template or template part for the currently active theme.
  *
- * @param int     $post_id Post ID.
- * @param WP_Post $post    Post object.
- * @param bool    $update  Update post or new post.
+ * @param WP_Post $post      Template or template part post object.
+ * @param string  $slug      Template or template part slug.
+ * @param bool    $overwrite Whether to overwrite existing slug. Default true.
  */
-function set_unique_slug_on_create_template( $post_id, $post, $update ) {
-	if ( ! $update && $post->post_name ) {
-		$templates = get_theme_mod( $post->post_type, array() );
-		$slug      = $post->post_name;
+function customize_template( $post, $slug, $overwrite = true ) {
+	if ( ! in_array( $post->post_type, array( 'wp_template', 'wp_template_part' ), true ) ) {
+		return;
+	}
+
+	$templates = get_theme_mod( $post->post_type, array() );
+
+	if ( ! $overwrite ) {
+		$original_slug = $slug;
 
 		if ( template_is_customized( $slug, $post->post_type ) ) {
 			$suffix = 2;
 			do {
-				$slug = _truncate_post_slug( $post->post_name, 200 - ( strlen( $suffix ) + 1 ) ) . "-$suffix";
+				$slug = _truncate_post_slug( $original_slug, 200 - ( strlen( $suffix ) + 1 ) ) . "-$suffix";
 				$suffix++;
 			} while ( template_is_customized( $slug, $post->post_type ) );
 		}
-
-		$templates[ $slug ] = $post->ID;
-		set_theme_mod( $post->post_type, $templates );
 	}
+
+	$templates[ $slug ] = $post->ID;
+	set_theme_mod( $post->post_type, $templates );
 }
-add_action( 'save_post_wp_template', 'set_unique_slug_on_create_template', 10, 3 );
-add_action( 'save_post_wp_template_part', 'set_unique_slug_on_create_template', 10, 3 );
 
 /**
  * Print the skip-link script & styles.

@@ -254,6 +254,10 @@ class Gutenberg_REST_Templates_Controller extends WP_REST_Controller {
 		if ( is_wp_error( $result ) ) {
 			return $result;
 		}
+
+		$post = get_post( $result );
+		customize_template( $post, $post->post_name, false );
+
 		$posts = gutenberg_get_block_templates( array( 'wp_id' => $result ), $this->post_type );
 		if ( ! count( $posts ) ) {
 			return new WP_Error( 'rest_template_insert_error', __( 'No templates exist with that id.', 'gutenberg' ) );
