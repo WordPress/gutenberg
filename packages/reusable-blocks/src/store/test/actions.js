@@ -106,11 +106,6 @@ describe( 'Actions', () => {
 			apiFetch.mockImplementation( async ( args ) => {
 				const { path, data } = args;
 				switch ( path ) {
-					case '/wp/v2/types?context=edit':
-						return {
-							id: 'new-id',
-							...data,
-						};
 					case '/wp/v2/reusable-blocks':
 						return {
 							id: 'new-id',
@@ -167,11 +162,6 @@ describe( 'Actions', () => {
 			apiFetch.mockImplementation( async ( args ) => {
 				const { path, data } = args;
 				switch ( path ) {
-					case '/wp/v2/types?context=edit':
-						return {
-							id: 'new-id',
-							...data,
-						};
 					case '/wp/v2/reusable-blocks/123':
 						return data;
 					default:
