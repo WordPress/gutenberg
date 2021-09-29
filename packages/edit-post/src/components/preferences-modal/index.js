@@ -7,7 +7,7 @@ import { get } from 'lodash';
  * WordPress dependencies
  */
 import {
-	__experimentalNavigator as Navigator,
+	__experimentalNavigatorProvider as NavigatorProvider,
 	__experimentalNavigatorScreen as NavigatorScreen,
 	__experimentalUseNavigator as useNavigator,
 	__experimentalItemGroup as ItemGroup,
@@ -327,7 +327,7 @@ export default function PreferencesModal() {
 		modalContent = (
 			<Card isBorderless>
 				<CardBody>
-					<Navigator initialPath="/">
+					<NavigatorProvider initialPath="/">
 						<NavigatorScreen path="/">
 							<ItemGroup>
 								{ tabs.map( ( tab ) => {
@@ -379,7 +379,7 @@ export default function PreferencesModal() {
 								</NavigatorScreen>
 							);
 						} ) }
-					</Navigator>
+					</NavigatorProvider>
 				</CardBody>
 			</Card>
 		);
