@@ -15,6 +15,15 @@ export default function Edit( { context: { commentId } } ) {
 		'content',
 		commentId
 	);
+
+	// Show a placeholder when there is no context.
+	if ( ! commentId ) {
+		return (
+			<div { ...blockProps }>{ __( 'The content of the comment.' ) }</div>
+		);
+	}
+
+	// Show a warning message when the specified comment has no content.
 	if ( ! content?.rendered ) {
 		return (
 			<div { ...blockProps }>
@@ -22,6 +31,7 @@ export default function Edit( { context: { commentId } } ) {
 			</div>
 		);
 	}
+
 	return (
 		<div { ...blockProps }>
 			<Disabled>
