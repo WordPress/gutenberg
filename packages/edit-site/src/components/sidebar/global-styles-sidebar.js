@@ -221,6 +221,9 @@ export default function GlobalStylesSidebar() {
 			header={
 				<>
 					<strong>{ __( 'Styles' ) }</strong>
+					<span className="edit-site-global-styles-sidebar__beta">
+						{ __( 'Beta' ) }
+					</span>
 					<Button
 						className="edit-site-global-styles-sidebar__reset-button"
 						isSmall
