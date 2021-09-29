@@ -28,7 +28,9 @@ When this suggestion is selected it will call the `createSuggestion` prop afford
 
 ### Data sources
 
-By default `LinkControl` utilizes the `__experimentalFetchLinkSuggestions` API from `core/block-editor` in order to retrieve search suggestions for matching post-type entities.
+By default `LinkControl` utilizes the `__experimentalFetchLinkSuggestions` API from `core/block-editor` in order to retrieve search suggestions for matching post-type entities. 
+
+By default this provides no functionality and so you must implement and provide this in your own Editor instance ([example](https://github.com/WordPress/gutenberg/blob/65c752816f46a9334b84f4801d80dea00ed76fba/packages/editor/src/components/provider/use-block-editor-settings.js#L114-L115)).
 
 ## Props
 
@@ -108,7 +110,7 @@ Whether to present initial suggestions immediately.
 -   Type: `Object`
 -   Required: No
 
-Controls the query parameters used to search for suggestion. For example, to limit a query to just `Page` types use:
+Controls the query parameters used to search for suggestions. For example, to limit a query to just `Page` types use:
 
 ```jsx
 <LinkControl
