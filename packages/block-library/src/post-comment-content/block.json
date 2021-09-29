@@ -15,7 +15,6 @@
 			"fontSize": true,
 			"lineHeight": true
 		},
-		"html": false,
-		"__experimentalLayout": true
+		"html": false
 	}
 }
