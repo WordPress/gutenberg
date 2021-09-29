@@ -37,10 +37,10 @@ function TemplatePartItem( { area, clientId } ) {
 	);
 }
 
-export default function TemplateAreas( { template } ) {
+export default function TemplateAreas() {
 	const templateAreaBlocks = useSelect(
-		( select ) => select( editSiteStore ).getTemplateAreaBlocks( template ),
-		[ template ]
+		( select ) => select( editSiteStore ).getTemplateAreaBlocks(),
+		[]
 	);
 
 	return (

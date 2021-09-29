@@ -263,14 +263,21 @@ export function isListViewOpened( state ) {
 }
 
 /**
- * Returns the template part blocks grouped by areas for a template.
+ * Returns the template part blocks grouped by areas for the current edited template.
  *
- * @param {Object} state    Global application state.
- * @param {Object} template The template object.
+ * @param {Object} state Global application state.
  * @return {Object} Template part blocks by areas.
  */
 export const getTemplateAreaBlocks = createRegistrySelector(
-	( select ) => ( state, template ) => {
+	( select ) => ( state ) => {
+		const templateType = getEditedPostType( state );
+		const templateId = getEditedPostId( state );
+		const template = select( coreDataStore ).getEditedEntityRecord(
+			'postType',
+			templateType,
+			templateId
+		);
+
 		const templateParts = select( coreDataStore ).getEntityRecords(
 			'postType',
 			'wp_template_part',
@@ -285,7 +292,7 @@ export const getTemplateAreaBlocks = createRegistrySelector(
 
 		const templatePartBlocksByAreas = {};
 
-		for ( const block of template.blocks ) {
+		for ( const block of template.blocks ?? [] ) {
 			if ( isTemplatePart( block ) ) {
 				const {
 					attributes: { theme, slug },

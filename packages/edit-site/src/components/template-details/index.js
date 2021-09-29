@@ -59,7 +59,7 @@ export default function TemplateDetails( { template, onClose } ) {
 				) }
 			</div>
 
-			<TemplateAreas template={ template } />
+			<TemplateAreas />
 
 			{ isTemplateRevertable( template ) && (
 				<div className="edit-site-template-details__revert">
