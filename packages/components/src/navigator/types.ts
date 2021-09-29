@@ -23,12 +23,23 @@ export type Navigator = {
 };
 
 export type NavigatorProviderProps = {
-	// TODO: JSDoc comments
+	/**
+	 * The initial active path.
+	 */
 	initialPath: string;
+	/**
+	 * The children elements.
+	 */
 	children: ReactNode;
 };
 
 export type NavigatorScreenProps = {
+	/**
+	 * The screen's path, matched against the current path stored in the navigator.
+	 */
 	path: string;
+	/**
+	 * The children elements.
+	 */
 	children: ReactNode;
 };
