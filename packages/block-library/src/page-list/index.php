@@ -278,16 +278,9 @@ function render_block_core_page_list( $attributes, $content, $block ) {
 			$active_page_ancestor_ids = get_post_ancestors( $page->ID );
 		}
 
-		// When showing only child pages of parent, set the pages to top level
-		// since there is no other top level page.
-		if ( $only_child_pages ) {
-			$top_level_pages[ $page->ID ] = array(
-				'page_id'   => $page->ID,
-				'title'     => $page->post_title,
-				'link'      => get_permalink( $page->ID ),
-				'is_active' => $is_active,
-			);
-		} else if ( $page->post_parent )  {
+		// Only set pages with children when only child pages is not set, since
+		// when set we want child pages to be top-level.
+		if ( $page->post_parent && ! $only_child_pages ) {
 			$pages_with_children[ $page->post_parent ][ $page->ID ] = array(
 				'page_id'   => $page->ID,
 				'title'     => $page->post_title,
