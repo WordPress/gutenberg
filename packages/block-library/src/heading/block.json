@@ -23,6 +23,13 @@
 		},
 		"placeholder": {
 			"type": "string"
+		},
+		"lock": {
+			"type": "object",
+			"default": {
+				"move": true,
+				"remove": true
+			}
 		}
 	},
 	"supports": {

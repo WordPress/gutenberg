@@ -15,6 +15,53 @@ function register_gutenberg_patterns() {
 	}
 
 	$patterns = array(
+		'template-part/header-site-logo-navigation' => array(
+			'title'      => __( 'Header with logo and navigation', 'gutenberg' ),
+			'categories'    => array( 'header' ),
+			'blockTypes' => array( 'core/template-part/header' ),
+			'content'    => '<!-- wp:group {"align":"wide","layout":{"inherit":false,"wideSize":"1000px"}} -->
+			<div class="wp-block-group alignwide"><!-- wp:columns {"verticalAlignment":null} -->
+			<div class="wp-block-columns"><!-- wp:column {"verticalAlignment":"center"} -->
+			<div class="wp-block-column is-vertically-aligned-center"><!-- wp:navigation {"itemsJustification":"center"} -->
+			<!-- wp:navigation-link {"label":"Home","type":"page","url":"Home","kind":"post-type","isTopLevelLink":true} /-->
+
+			<!-- wp:navigation-link {"label":"About us","type":"page","url":"About%20us","kind":"post-type","isTopLevelLink":true} /-->
+
+			<!-- wp:navigation-link {"label":"Contact","type":"page","url":"Contact","kind":"post-type","isTopLevelLink":true} /-->
+			<!-- /wp:navigation --></div>
+			<!-- /wp:column -->
+
+			<!-- wp:column -->
+			<div class="wp-block-column"><!-- wp:site-logo {"align":"center","width":225} /--></div>
+			<!-- /wp:column -->
+
+			<!-- wp:column {"verticalAlignment":"center"} -->
+			<div class="wp-block-column is-vertically-aligned-center"><!-- wp:social-links {"customIconColor":"#ffffff","iconColorValue":"#ffffff","customIconBackgroundColor":"#3962e3","iconBackgroundColorValue":"#3962e3","className":"has-icon-color","layout":{"type":"flex","justifyContent":"center"}} -->
+			<ul class="wp-block-social-links has-icon-color has-icon-background-color"><!-- wp:social-link {"url":"https://wordpress.org","service":"wordpress"} /-->
+
+			<!-- wp:social-link {"url":"#","service":"chain"} /-->
+
+			<!-- wp:social-link {"url":"#","service":"mail"} /--></ul>
+			<!-- /wp:social-links --></div>
+			<!-- /wp:column --></div>
+			<!-- /wp:columns --></div>
+			<!-- /wp:group -->',
+		),
+		'test'                 => array(
+			'title'      => _x( 'Image with headline and description', 'Block pattern title', 'gutenberg' ),
+			'categories' => array( 'text' ),
+			'content'    => '<!-- wp:media-text {"mediaId":569,"mediaLink":"https://wordpress.org/patterns/meteor-shower/","mediaType":"image","verticalAlignment":"bottom","style":{"color":{"background":"#f6f6f6","text":"#161616"}}} -->
+			<div class="wp-block-media-text alignwide is-stacked-on-mobile is-vertically-aligned-bottom has-text-color has-background" style="background-color:#f6f6f6;color:#161616"><figure class="wp-block-media-text__media"><img src="https://s.w.org/patterns/files/2021/06/meteor-shower-768x1024.jpg" alt="" class="wp-image-569 size-full"/></figure><div class="wp-block-media-text__content"><!-- wp:group {"style":{"spacing":{"padding":{"top":"0em","right":"1em","bottom":"1em","left":"1em"}}}} -->
+			<div class="wp-block-group" style="padding-top:0em;padding-right:1em;padding-bottom:1em;padding-left:1em"><!-- wp:heading {"style":{"typography":{"fontSize":"48px","lineHeight":"1.2"}}} -->
+			<h2 style="font-size:48px;line-height:1.2"><strong>Meteor Shower</strong></h2>
+			<!-- /wp:heading -->
+
+			<!-- wp:paragraph {"style":{"typography":{"lineHeight":"1.6"}},"fontSize":"small"} -->
+			<p class="has-small-font-size" style="line-height:1.6">I looked up at the night sky to find the stars performing a remarkable silent ballet. I watched alone for a few moments before waking my partner. The two of us quickly pulled on our slippers and walked into the backyard for a better view.</p>
+			<!-- /wp:paragraph --></div>
+			<!-- /wp:group --></div></div>
+			<!-- /wp:media-text -->',
+		),
 		'query-standard-posts'                 => array(
 			'title'      => _x( 'Standard', 'Block pattern title', 'gutenberg' ),
 			'blockTypes' => array( 'core/query' ),
