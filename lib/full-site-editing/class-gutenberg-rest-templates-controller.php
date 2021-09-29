@@ -219,6 +219,11 @@ class Gutenberg_REST_Templates_Controller extends WP_REST_Controller {
 			return $result;
 		}
 
+		if ( 'custom' !== $template->source ) {
+			$post = get_post( $result );
+			customize_template( $post, $request['id'] );
+		}
+
 		$template      = gutenberg_get_block_template( $request['id'], $this->post_type );
 		$fields_update = $this->update_additional_fields_for_object( $template, $request );
 		if ( is_wp_error( $fields_update ) ) {
