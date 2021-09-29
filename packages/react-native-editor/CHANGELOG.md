@@ -11,6 +11,10 @@ For each user feature we should also add a importance categorization label  to i
 
 ## Unreleased
 
+1.62.2
+------
+Same as 1.62.1 but with the change log. 
+ 
 1.62.1
 ------
 * [**] Image block: fix height and border regression. [https://github.com/WordPress/gutenberg/pull/34957]
