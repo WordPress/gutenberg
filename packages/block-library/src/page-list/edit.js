@@ -95,14 +95,16 @@ export default function PageListEdit( { context, clientId } ) {
 				{ showChildPageToggle && (
 					<PanelBody>
 						<ToggleControl
-							label={ __( 'List child pages' ) }
+							label={ __( 'Limit to child pages' ) }
 							checked={ !! attributes.showOnlyChildPages }
 							onChange={ () =>
 								setAttributes( {
 									showOnlyChildPages: ! attributes.showOnlyChildPages,
 								} )
 							}
-							help={ __( 'Uses parent to list child pages.' ) }
+							help={ __(
+								'When enabled, the block lists only child pages of the current page.'
+							) }
 						/>
 					</PanelBody>
 				) }
