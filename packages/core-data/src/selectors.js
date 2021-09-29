@@ -247,6 +247,7 @@ export const getRawEntityRecord = createSelector(
 	( state, kind, name, recordId, query ) => {
 		const context = query?.context ?? 'default';
 		return [
+			state.entities.config,
 			get( state.entities.data, [
 				kind,
 				name,
@@ -495,6 +496,7 @@ export const getEditedEntityRecord = createSelector(
 	( state, kind, name, recordId, query ) => {
 		const context = query?.context ?? 'default';
 		return [
+			state.entities.config,
 			get( state.entities.data, [
 				kind,
 				name,
