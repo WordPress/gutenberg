@@ -2,7 +2,7 @@
 
 Renders a link control. A link control is a controlled input which maintains a value associated with a link (HTML anchor element) and relevant settings for how that link is expected to behave.
 
-It is designed to provide a standardized UI for the creation of a link throughout the Editor.
+It is designed to provide a standardized UI for the creation of a link throughout the Editor, see History section at bottom for further background.
 
 ## Relationship to `<URLInput>`
 
@@ -543,3 +543,13 @@ If true, type of the suggestion is rendered (e.g. post, tag)
 The suggestion to render.
 
 See the [createSuggestion](#createSuggestion) section of this file to learn more about suggestions.
+
+## History
+
+Much of the context for this component can be found in [the original Issue](https://github.com/WordPress/gutenberg/issues/17557).
+
+Previously iterations of a hyperlink UI existed within the Gutenberg interface but these tended to be highly tailored to their individual use cases and were not standardized, each having their own implementation.
+
+These older UIs tended to make use of two existing components: `URLInput` and `URLPopover`. When a requirement was raised to implement a new UI for hyperlink creation, an assessment of these existing components was undertaken and it was determined that they were too opinionated as to be easily refactored to accommodate the new use cases required by the new UI. Attempting to do so would also have meant unavoidable breaking changes to the interface of `URLInput` which would have (most probably) caused breaking changes to ripple across not only the Core codebase, but also that of 3rd party Plugins.
+
+As a result, it was agreed that a new component `LinkControl` would be created to realise the new hyperlink creation interface. This new UI would begin life as an experimental component which would consume `URLInput` internally. The API of `URLInput` would be enhanced as required with "experimental" features to facilitate the implementation of the new UI.
