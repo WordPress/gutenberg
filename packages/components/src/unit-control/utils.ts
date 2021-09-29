@@ -221,6 +221,8 @@ export function getValidParsedUnit(
 	let baseValue = parsedValue;
 	let baseUnit: string;
 
+	// The parsed value from `parseUnit` should now be either a
+	// real number or an empty string. If not, use the fallback value.
 	if ( ! Number.isFinite( parsedValue ) || parsedValue === '' ) {
 		baseValue = fallbackValue;
 	}
