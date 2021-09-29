@@ -24,7 +24,7 @@ const selectMock = {
 	canInsertBlockType: jest.fn(),
 	getBlockType: jest.fn(),
 	getClipboard: jest.fn(),
-	getSettings: jest.fn( () => ( {} ) ),
+	getSettings: jest.fn( () => ( { impressions: {} } ) ),
 };
 
 describe( 'BlockTypesTab component', () => {
@@ -48,10 +48,14 @@ describe( 'BlockTypesTab component', () => {
 	it( 'shows block items', () => {
 		selectMock.getInserterItems.mockReturnValue( items );
 
-		const blockItems = items.filter(
-			( { id, category } ) =>
-				category !== 'reusable' && id !== 'core-embed/a-paragraph-embed'
-		);
+		const blockItems = items
+			.filter(
+				( { id, category } ) =>
+					category !== 'reusable' &&
+					id !== 'core-embed/a-paragraph-embed'
+			)
+			// Set `isNew` property expected from block type impressions
+			.map( ( filteredItems ) => ( { ...filteredItems, isNew: false } ) );
 		const component = shallow(
 			<BlockTypesTab
 				rootClientId={ 0 }
