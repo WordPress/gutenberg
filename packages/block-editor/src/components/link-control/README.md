@@ -19,7 +19,7 @@ The distinction between the two components is perhaps best summarized by the fol
 
 When creating links the `LinkControl` component will handle two kinds of input from users:
 
-1. Entity searches - the user may input free-text based search queries for entities retrieved from remote data sources (in the context of WordPress these are `Posts` or `Pages`). For example, a user might search for a `Page` they have just created by name (eg: About) and the UI will return a matching result if found.
+1. Entity searches - the user may input free-text based search queries for entities retrieved from remote data sources (in the context of WordPress these are post-type entities). For example, a user might search for a `Page` they have just created by name (eg: About) and the UI will return a matching result if found.
 2. Direct entry - the user may also enter any arbitrary URL-like text. This includes full URLs (https://), URL fragements (eg: `#myinternallink`), `tel` protocol links (eg: `tel: 0800 1234`) and `mailto` protocol links (eg: `mailto: hello@wordpress.org`).
 
 In addition, `<LinkControl>` also allows for on the fly creation of links based on the **current content of the `<input>` element**. When enabled, a default "Create new" search suggestion is appended to all non-URL-like search results.
@@ -28,7 +28,7 @@ When this suggestion is selected it will call the `createSuggestion` prop afford
 
 ### Data sources
 
-By default `LinkControl` utilizes the `__experimentalFetchLinkSuggestions` API from `core/block-editor` in order to retrieve search suggestions for matching post-type entities. 
+By default `LinkControl` utilizes the `__experimentalFetchLinkSuggestions` API from `core/block-editor` in order to retrieve search suggestions for matching post-type entities.
 
 By default this provides no functionality and so you must implement and provide this in your own Editor instance ([example](https://github.com/WordPress/gutenberg/blob/65c752816f46a9334b84f4801d80dea00ed76fba/packages/editor/src/components/provider/use-block-editor-settings.js#L114-L115)).
 
