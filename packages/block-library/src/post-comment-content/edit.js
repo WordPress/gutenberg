@@ -7,6 +7,15 @@ import { useEntityProp } from '@wordpress/core-data';
 import { useBlockProps, Warning } from '@wordpress/block-editor';
 import { Disabled } from '@wordpress/components';
 
+/**
+ * Renders the `core/post-comment-content` block on the editor.
+ *
+ * @param {Object} props                   React props.
+ * @param {Object} props.context           Inherited context.
+ * @param {string} props.context.commentId The comment ID.
+ *
+ * @return {import('react').ReactNode} React element.
+ */
 export default function Edit( { context: { commentId } } ) {
 	const blockProps = useBlockProps();
 	const [ content ] = useEntityProp(
