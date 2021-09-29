@@ -52,6 +52,26 @@ function getPanelTitle( blockName ) {
 	return blockType.title;
 }
 
+function BlockMenuItem( { name, context } ) {
+	const hasTypographyPanel = useHasTypographyPanel( context );
+	const hasColorPanel = useHasColorPanel( context );
+	const hasBorderPanel = useHasBorderPanel( context );
+	const hasDimensionsPanel = useHasDimensionsPanel( context );
+	const hasLayoutPanel = hasBorderPanel || hasDimensionsPanel;
+	const hasBlockMenuItem =
+		hasTypographyPanel || hasColorPanel || hasLayoutPanel;
+
+	if ( ! hasBlockMenuItem ) {
+		return null;
+	}
+
+	return (
+		<NavigationButton path={ '/blocks/' + name }>
+			{ getPanelTitle( name ) }
+		</NavigationButton>
+	);
+}
+
 function GlobalStylesLevelMenu( { context, parentMenu = '' } ) {
 	const hasTypographyPanel = useHasTypographyPanel( context );
 	const hasColorPanel = useHasColorPanel( context );
@@ -235,13 +255,12 @@ export default function GlobalStylesSidebar() {
 
 				<NavigatorScreen path="/blocks">
 					<ScreenHeader back="/" title={ __( 'Blocks' ) } />
-					{ map( blocks, ( _, name ) => (
-						<NavigationButton
-							path={ '/blocks/' + name }
+					{ map( blocks, ( block, name ) => (
+						<BlockMenuItem
+							name={ name }
+							context={ block }
 							key={ 'menu-itemblock-' + name }
-						>
-							{ getPanelTitle( name ) }
-						</NavigationButton>
+						/>
 					) ) }
 				</NavigatorScreen>
 
