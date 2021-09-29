@@ -7,7 +7,7 @@ import { Platform } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import type { Value, WPUnitControlUnit } from './types';
+import type { Value, WPUnitControlUnit, WPUnitControlUnitList } from './types';
 
 const isWeb = Platform.OS === 'web';
 
@@ -153,7 +153,7 @@ export const DEFAULT_UNIT = allUnits.px;
 export function getParsedValue(
 	value: Value,
 	unit?: string,
-	units?: Array< WPUnitControlUnit >
+	units?: WPUnitControlUnitList
 ): [ Value, string ] {
 	const initialValue = unit ? `${ value }${ unit }` : value;
 
@@ -166,7 +166,7 @@ export function getParsedValue(
  * @param  units Units to check.
  * @return Whether units are defined.
  */
-export function hasUnits( units: Array< WPUnitControlUnit > | false ): boolean {
+export function hasUnits( units: WPUnitControlUnitList ): boolean {
 	return Array.isArray( units ) && !! units.length;
 }
 
@@ -179,7 +179,7 @@ export function hasUnits( units: Array< WPUnitControlUnit > | false ): boolean {
  */
 export function parseUnit(
 	initialValue: Value,
-	units: Array< WPUnitControlUnit > | false = ALL_CSS_UNITS
+	units: WPUnitControlUnitList = ALL_CSS_UNITS
 ): [ Value, string ] {
 	const value = String( initialValue ).trim();
 
@@ -213,7 +213,7 @@ export function parseUnit(
  */
 export function getValidParsedUnit(
 	next: Value,
-	units: Array< WPUnitControlUnit > | false,
+	units: WPUnitControlUnitList,
 	fallbackValue: Value,
 	fallbackUnit: string
 ) {
@@ -260,11 +260,13 @@ export function parseA11yLabelForUnit( unit: string ): string {
  */
 export function filterUnitsWithSettings(
 	unitSetting: Array< string > = [],
-	units: Array< WPUnitControlUnit > = []
+	units: WPUnitControlUnitList
 ): Array< WPUnitControlUnit > {
-	return units.filter( ( unit ) => {
-		return unitSetting.includes( unit.value );
-	} );
+	return Array.isArray( units )
+		? units.filter( ( unit ) => {
+				return unitSetting.includes( unit.value );
+		  } )
+		: [];
 }
 
 /**
@@ -284,10 +286,10 @@ export const useCustomUnits = ( {
 	availableUnits,
 	defaultValues,
 }: {
-	units?: Array< WPUnitControlUnit >;
+	units?: WPUnitControlUnitList;
 	availableUnits?: Array< string >;
 	defaultValues: Record< string, Value >;
-} ): Array< WPUnitControlUnit > | false => {
+} ): WPUnitControlUnitList => {
 	units = units || ALL_CSS_UNITS;
 	const usedUnits = filterUnitsWithSettings(
 		! availableUnits ? [] : availableUnits,
@@ -323,7 +325,7 @@ export function getUnitsWithCurrentUnit(
 	currentValue: Value,
 	legacyUnit: string | undefined,
 	units: Array< WPUnitControlUnit > | false = ALL_CSS_UNITS
-): Array< WPUnitControlUnit > | false {
+): WPUnitControlUnitList {
 	if ( ! Array.isArray( units ) ) {
 		return units;
 	}

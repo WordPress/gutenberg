@@ -64,6 +64,15 @@ describe( 'UnitControl utils', () => {
 				filterUnitsWithSettings( preferredUnits, availableUnits )
 			).toEqual( [] );
 		} );
+
+		it( 'should return empty array where available units is set to false', () => {
+			const preferredUnits = [ '%', 'px' ];
+			const availableUnits = false;
+
+			expect(
+				filterUnitsWithSettings( preferredUnits, availableUnits )
+			).toEqual( [] );
+		} );
 	} );
 
 	describe( 'getValidParsedUnit', () => {

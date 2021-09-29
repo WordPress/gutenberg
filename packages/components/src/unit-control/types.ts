@@ -22,3 +22,5 @@ export type WPUnitControlUnit = {
 	 */
 	step?: number;
 };
+
+export type WPUnitControlUnitList = Array< WPUnitControlUnit > | false;
