@@ -21,6 +21,7 @@ import {
 	stretchFullWidth,
 	stretchWide,
 } from '@wordpress/icons';
+import { Platform } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -91,69 +92,72 @@ function BlockAlignmentUI( {
 		label: __( 'Align' ),
 		toggleProps: { describedBy: __( 'Change alignment' ) },
 	};
-	const extraProps = isToolbar
-		? {
-				isCollapsed,
-				controls: enabledControls.map( ( { name: controlName } ) => {
-					return {
-						...BLOCK_ALIGNMENTS_CONTROLS[ controlName ],
-						isActive:
-							value === controlName ||
-							( ! value && controlName === 'none' ),
-						role: isCollapsed ? 'menuitemradio' : undefined,
-						onClick: () => onChangeAlignment( controlName ),
-					};
-				} ),
-		  }
-		: {
-				children: ( { onClose } ) => {
-					return (
-						<>
-							<MenuGroup className="block-editor-block-alignment-control__menu-group">
-								{ enabledControls.map(
-									( { name: controlName, info } ) => {
-										const {
-											icon,
-											title,
-										} = BLOCK_ALIGNMENTS_CONTROLS[
-											controlName
-										];
-										// If no value is provided, mark as selected the `none` option.
-										const isSelected =
-											controlName === value ||
-											( ! value &&
-												controlName === 'none' );
-										return (
-											<MenuItem
-												key={ controlName }
-												icon={ icon }
-												iconPosition="left"
-												className={ classNames(
-													'components-dropdown-menu__menu-item',
-													{
-														'is-active': isSelected,
-													}
-												) }
-												isSelected={ isSelected }
-												onClick={ () => {
-													onChangeAlignment(
-														controlName
-													);
-													onClose();
-												} }
-												role="menuitemradio"
-												info={ info }
-											>
-												{ title }
-											</MenuItem>
-										);
-									}
-								) }
-							</MenuGroup>
-						</>
-					);
-				},
-		  };
+	const extraProps =
+		isToolbar || Platform.isNative
+			? {
+					isCollapsed: isToolbar ? isCollapsed : undefined,
+					controls: enabledControls.map(
+						( { name: controlName } ) => {
+							return {
+								...BLOCK_ALIGNMENTS_CONTROLS[ controlName ],
+								isActive:
+									value === controlName ||
+									( ! value && controlName === 'none' ),
+								role: isCollapsed ? 'menuitemradio' : undefined,
+								onClick: () => onChangeAlignment( controlName ),
+							};
+						}
+					),
+			  }
+			: {
+					children: ( { onClose } ) => {
+						return (
+							<>
+								<MenuGroup className="block-editor-block-alignment-control__menu-group">
+									{ enabledControls.map(
+										( { name: controlName, info } ) => {
+											const {
+												icon,
+												title,
+											} = BLOCK_ALIGNMENTS_CONTROLS[
+												controlName
+											];
+											// If no value is provided, mark as selected the `none` option.
+											const isSelected =
+												controlName === value ||
+												( ! value &&
+													controlName === 'none' );
+											return (
+												<MenuItem
+													key={ controlName }
+													icon={ icon }
+													iconPosition="left"
+													className={ classNames(
+														'components-dropdown-menu__menu-item',
+														{
+															'is-active': isSelected,
+														}
+													) }
+													isSelected={ isSelected }
+													onClick={ () => {
+														onChangeAlignment(
+															controlName
+														);
+														onClose();
+													} }
+													role="menuitemradio"
+													info={ info }
+												>
+													{ title }
+												</MenuItem>
+											);
+										}
+									) }
+								</MenuGroup>
+							</>
+						);
+					},
+			  };
 
 	return <UIComponent { ...commonProps } { ...extraProps } />;
 }
