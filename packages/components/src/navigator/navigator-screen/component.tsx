@@ -2,7 +2,9 @@
  * External dependencies
  */
 // eslint-disable-next-line no-restricted-imports
-import { motion } from 'framer-motion';
+import type { Ref } from 'react';
+// eslint-disable-next-line no-restricted-imports
+import { motion, MotionProps } from 'framer-motion';
 
 /**
  * WordPress dependencies
@@ -14,6 +16,12 @@ import { isRTL } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
+import {
+	contextConnect,
+	useContextSystem,
+	WordPressComponentProps,
+} from '../../ui/context';
+import { View } from '../../view';
 import { NavigatorContext } from '../context';
 import type { NavigatorScreenProps } from '../types';
 
@@ -22,7 +30,19 @@ const animationEnterDuration = 0.14;
 const animationExitDuration = 0.14;
 const animationExitDelay = 0;
 
-function NavigatorScreen( { children, path }: NavigatorScreenProps ) {
+// Props specific to `framer-motion` can't be currently passed to `NavigatorScreen`,
+// as some of them would overlap with HTML props (e.g. `onAnimationStart`, ...)
+type Props = Omit<
+	WordPressComponentProps< NavigatorScreenProps, 'div', false >,
+	keyof MotionProps
+>;
+
+function NavigatorScreen( props: Props, forwardedRef: Ref< any > ) {
+	const { children, path, ...otherProps } = useContextSystem(
+		props,
+		'NavigatorScreen'
+	);
+
 	const prefersReducedMotion = useReducedMotion();
 	const [ currentPath ] = useContext( NavigatorContext );
 	const isMatch = currentPath.path === path;
@@ -40,7 +60,11 @@ function NavigatorScreen( { children, path }: NavigatorScreenProps ) {
 	}
 
 	if ( prefersReducedMotion ) {
-		return <div>{ children }</div>;
+		return (
+			<View ref={ forwardedRef } { ...otherProps }>
+				{ children }
+			</View>
+		);
 	}
 
 	const animate = {
@@ -83,6 +107,7 @@ function NavigatorScreen( { children, path }: NavigatorScreenProps ) {
 	return (
 		<motion.div
 			ref={ hasPathChanged ? ref : undefined }
+			{ ...otherProps }
 			{ ...animatedProps }
 		>
 			{ children }
@@ -90,6 +115,10 @@ function NavigatorScreen( { children, path }: NavigatorScreenProps ) {
 	);
 }
 
-// TODO: context connect
+// TODO: docs
+const ConnectedNavigatorScreen = contextConnect(
+	NavigatorScreen,
+	'NavigatorScreen'
+);
 
-export default NavigatorScreen;
+export default ConnectedNavigatorScreen;
