@@ -16,75 +16,121 @@ import {
 } from '@wordpress/rich-text';
 import {
 	ColorPalette,
-	URLPopover,
 	getColorClassName,
 	getColorObjectByColorValue,
 	getColorObjectByAttributeValues,
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
+import { Popover, TabPanel } from '@wordpress/components';
+import { __ } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
  */
 import { textColor as settings } from './index';
 
-export function getActiveColor( formatName, formatValue, colors ) {
-	const activeColorFormat = getActiveFormat( formatValue, formatName );
-	if ( ! activeColorFormat ) {
-		return;
-	}
-	const styleColor = activeColorFormat.attributes.style;
-	if ( styleColor ) {
-		return styleColor.replace( new RegExp( `^color:\\s*` ), '' );
-	}
-	const currentClass = activeColorFormat.attributes.class;
-	if ( currentClass ) {
-		const colorSlug = currentClass.replace(
-			/.*has-([^\s]*)-color.*/,
-			'$1'
-		);
-		return getColorObjectByAttributeValues( colors, colorSlug ).color;
-	}
+function parseCSS( css = '' ) {
+	return css.split( ';' ).reduce( ( accumulator, rule ) => {
+		if ( rule ) {
+			const [ property, value ] = rule.split( ':' );
+			if ( property === 'color' ) accumulator.color = value;
+			if ( property === 'background-color' )
+				accumulator.backgroundColor = value;
+		}
+		return accumulator;
+	}, {} );
 }
 
-const ColorPicker = ( { name, value, onChange } ) => {
+function parseClassName( className = '', colorSettings ) {
+	return className.split( ' ' ).reduce( ( accumulator, name ) => {
+		const match = name.match( /^has-([^-]+)-color$/ );
+		if ( match ) {
+			const [ , colorSlug ] = name.match( /^has-([^-]+)-color$/ );
+			const colorObject = getColorObjectByAttributeValues(
+				colorSettings,
+				colorSlug
+			);
+			accumulator.color = colorObject.color;
+		}
+		return accumulator;
+	}, {} );
+}
+
+export function getActiveColors( value, name, colorSettings ) {
+	const activeColorFormat = getActiveFormat( value, name );
+
+	if ( ! activeColorFormat ) {
+		return {};
+	}
+
+	return {
+		...parseCSS( activeColorFormat.attributes.style ),
+		...parseClassName( activeColorFormat.attributes.class, colorSettings ),
+	};
+}
+
+function setColors( value, name, colorSettings, colors ) {
+	const { color, backgroundColor } = {
+		...getActiveColors( value, name, colorSettings ),
+		...colors,
+	};
+
+	if ( ! color && ! backgroundColor ) {
+		return removeFormat( value, name );
+	}
+
+	const styles = [];
+	const classNames = [];
+	const attributes = {};
+
+	if ( backgroundColor ) {
+		styles.push( [ 'background-color', backgroundColor ].join( ':' ) );
+	} else {
+		// Override default browser color for mark element.
+		styles.push( [ 'background-color', 'rgba(0, 0, 0, 0)' ].join( ':' ) );
+	}
+
+	if ( color ) {
+		const colorObject = getColorObjectByColorValue( colorSettings, color );
+
+		if ( colorObject ) {
+			classNames.push( getColorClassName( 'color', colorObject.slug ) );
+		} else {
+			styles.push( [ 'color', color ].join( ':' ) );
+		}
+	}
+
+	if ( styles.length ) attributes.style = styles.join( ';' );
+	if ( classNames.length ) attributes.class = classNames.join( ' ' );
+
+	return applyFormat( value, { type: name, attributes } );
+}
+
+function ColorPicker( { name, property, value, onChange } ) {
 	const colors = useSelect( ( select ) => {
 		const { getSettings } = select( blockEditorStore );
 		return get( getSettings(), [ 'colors' ], [] );
 	} );
 	const onColorChange = useCallback(
 		( color ) => {
-			if ( color ) {
-				const colorObject = getColorObjectByColorValue( colors, color );
-				onChange(
-					applyFormat( value, {
-						type: name,
-						attributes: colorObject
-							? {
-									class: getColorClassName(
-										'color',
-										colorObject.slug
-									),
-							  }
-							: {
-									style: `color:${ color }`,
-							  },
-					} )
-				);
-			} else {
-				onChange( removeFormat( value, name ) );
-			}
+			onChange(
+				setColors( value, name, colors, { [ property ]: color } )
+			);
 		},
-		[ colors, onChange ]
+		[ colors, onChange, property ]
 	);
-	const activeColor = useMemo( () => getActiveColor( name, value, colors ), [
-		name,
-		value,
-		colors,
-	] );
+	const activeColors = useMemo(
+		() => getActiveColors( value, name, colors ),
+		[ name, value, colors ]
+	);
 
-	return <ColorPalette value={ activeColor } onChange={ onColorChange } />;
-};
+	return (
+		<ColorPalette
+			value={ activeColors[ property ] }
+			onChange={ onColorChange }
+		/>
+	);
+}
 
 export default function InlineColorUI( {
 	name,
@@ -95,13 +141,32 @@ export default function InlineColorUI( {
 } ) {
 	const anchorRef = useAnchorRef( { ref: contentRef, value, settings } );
 	return (
-		<URLPopover
-			value={ value }
+		<Popover
 			onClose={ onClose }
 			className="components-inline-color-popover"
 			anchorRef={ anchorRef }
 		>
-			<ColorPicker name={ name } value={ value } onChange={ onChange } />
-		</URLPopover>
+			<TabPanel
+				tabs={ [
+					{
+						name: 'color',
+						title: __( 'Text' ),
+					},
+					{
+						name: 'backgroundColor',
+						title: __( 'Background' ),
+					},
+				] }
+			>
+				{ ( tab ) => (
+					<ColorPicker
+						name={ name }
+						property={ tab.name }
+						value={ value }
+						onChange={ onChange }
+					/>
+				) }
+			</TabPanel>
+		</Popover>
 	);
 }

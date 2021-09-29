@@ -1,26 +1,27 @@
 /**
  * External dependencies
  */
-import { some } from 'lodash';
 import classnames from 'classnames';
 
 /**
  * WordPress dependencies
  */
-import { useState } from '@wordpress/element';
-import { useDispatch } from '@wordpress/data';
+import { __ } from '@wordpress/i18n';
+import { useState, useEffect } from '@wordpress/element';
+import { useSelect, useDispatch } from '@wordpress/data';
 import { Button, TextControl, withNotices } from '@wordpress/components';
 import { useFocusOnMount } from '@wordpress/compose';
-import { __, sprintf } from '@wordpress/i18n';
 import { store as noticesStore } from '@wordpress/notices';
 import { store as coreStore } from '@wordpress/core-data';
 
-const menuNameMatches = ( menuName ) => ( menu ) =>
-	menu.name.toLowerCase() === menuName.toLowerCase();
+/**
+ * Internal dependencies
+ */
+import { MENU_POST_TYPE, MENU_KIND } from '../../constants';
+import { stripHTML } from '../../utils';
 
 function AddMenu( {
 	className,
-	menus,
 	onCreate,
 	titleText,
 	helpText,
@@ -36,29 +37,30 @@ function AddMenu( {
 
 	const { createErrorNotice, removeAllNotices } = noticeOperations;
 
+	const lastSaveError = useSelect( ( select ) => {
+		return select( coreStore ).getLastEntitySaveError(
+			MENU_KIND,
+			MENU_POST_TYPE
+		);
+	}, [] );
+
+	useEffect( () => {
+		if ( lastSaveError ) {
+			createErrorNotice( stripHTML( lastSaveError?.message ) );
+		}
+	}, [ lastSaveError ] );
+
 	const createMenu = async ( event ) => {
 		event.preventDefault();
 
-		if ( ! menuName.length ) {
-			return;
-		}
-
-		// Remove any existing notices.
-		removeAllNotices();
-
-		if ( some( menus, menuNameMatches( menuName ) ) ) {
-			const message = sprintf(
-				// translators: %s: the name of a menu.
-				__(
-					'The menu name %s conflicts with another menu name. Please try another.'
-				),
-				menuName
-			);
-			createErrorNotice( message );
+		if ( ! menuName.length || isCreatingMenu ) {
 			return;
 		}
 
 		setIsCreatingMenu( true );
+
+		// Remove any existing notices.
+		removeAllNotices();
 
 		const menu = await saveMenu( { name: menuName } );
 
@@ -100,6 +102,8 @@ function AddMenu( {
 				variant="primary"
 				disabled={ ! menuName.length }
 				isBusy={ isCreatingMenu }
+				/* Button is disabled but still focusable */
+				aria-disabled={ ! menuName.length || isCreatingMenu }
 			>
 				{ __( 'Create menu' ) }
 			</Button>

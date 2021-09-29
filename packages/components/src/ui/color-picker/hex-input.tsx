@@ -13,8 +13,8 @@ import { __ } from '@wordpress/i18n';
  */
 import { Text } from '../../text';
 import { Spacer } from '../../spacer';
-import InputControl from '../../input-control';
 import { space } from '../utils/space';
+import { ColorHexInputControl } from './styles';
 
 interface HexInputProps {
 	color: ColorFormats.HSLA;
@@ -35,10 +35,14 @@ export const HexInput = ( { color, onChange, enableAlpha }: HexInputProps ) => {
 		: colorized.toHexString();
 
 	return (
-		<InputControl
-			__unstableInputWidth="8em"
+		<ColorHexInputControl
 			prefix={
-				<Spacer as={ Text } marginLeft={ space( 2 ) } color="blue">
+				<Spacer
+					as={ Text }
+					marginLeft={ space( 3.5 ) }
+					color="blue"
+					lineHeight={ 1 }
+				>
 					#
 				</Spacer>
 			}

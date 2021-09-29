@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { __ } from '@wordpress/i18n';
+import { __, sprintf } from '@wordpress/i18n';
 import {
 	LinkSettingsNavigation,
 	FooterMessageLink,
@@ -11,27 +11,33 @@ import { useDispatch } from '@wordpress/data';
 import { store as noticesStore } from '@wordpress/notices';
 import { useCallback, useState } from '@wordpress/element';
 
-const linkSettingsOptions = {
-	url: {
-		label: __( 'Embed link' ),
-		placeholder: __( 'Add link' ),
-		autoFocus: true,
-		autoFill: true,
-	},
-	footer: {
-		label: (
-			<FooterMessageLink
-				href={ __( 'https://wordpress.org/support/article/embeds/' ) }
-				value={ __( 'Learn more about embeds' ) }
-			/>
-		),
-		separatorType: 'topFullWidth',
-	},
-};
-
-const EmbedBottomSheet = ( { value, isVisible, onClose, onSubmit } ) => {
+const EmbedBottomSheet = ( { value, label, isVisible, onClose, onSubmit } ) => {
 	const [ url, setURL ] = useState( value );
 	const { createErrorNotice } = useDispatch( noticesStore );
+
+	const linkSettingsOptions = {
+		url: {
+			label: sprintf(
+				// translators: %s: embed block variant's label e.g: "Twitter".
+				__( '%s link' ),
+				label
+			),
+			placeholder: __( 'Add link' ),
+			autoFocus: true,
+			autoFill: true,
+		},
+		footer: {
+			label: (
+				<FooterMessageLink
+					href={ __(
+						'https://wordpress.org/support/article/embeds/'
+					) }
+					value={ __( 'Learn more about embeds' ) }
+				/>
+			),
+			separatorType: 'topFullWidth',
+		},
+	};
 
 	const onDismiss = useCallback( () => {
 		if ( url !== '' ) {

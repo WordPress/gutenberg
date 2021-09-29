@@ -85,18 +85,16 @@
 		line-height: 0;
 		margin-left: 6px;
 
+		// Affect the button as well.
+		padding: 0;
+		background-color: inherit;
+		color: currentColor;
+		border: none;
+
 		svg {
 			display: inline-block;
 			stroke: currentColor;
 		}
-	}
-
-	// Styles for button toggles.
-	button.wp-block-navigation__submenu-icon.wp-block-navigation__submenu-icon.wp-block-navigation__submenu-icon.wp-block-navigation__submenu-icon {
-		padding: $grid-unit $grid-unit-20;
-		background-color: inherit;
-		color: currentColor;
-		border: none;
 	}
 }
 
@@ -330,7 +328,7 @@
 // Vertical layout
 .is-vertical .wp-block-page-list, // Page list.
 .is-vertical .wp-block-navigation__container {
-	display: block;
+	display: flex;
 	flex-direction: column;
 	align-items: flex-start;
 }

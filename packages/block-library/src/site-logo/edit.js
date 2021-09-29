@@ -8,7 +8,7 @@ import { includes, pick } from 'lodash';
  * WordPress dependencies
  */
 import { isBlobURL } from '@wordpress/blob';
-import { useState, useRef } from '@wordpress/element';
+import { useEffect, useState, useRef } from '@wordpress/element';
 import { __, isRTL } from '@wordpress/i18n';
 import {
 	Notice,
@@ -17,6 +17,8 @@ import {
 	ResizableBox,
 	Spinner,
 	ToggleControl,
+	ToolbarButton,
+	ToolbarGroup,
 	Placeholder,
 } from '@wordpress/components';
 import { useViewportMatch } from '@wordpress/compose';
@@ -28,10 +30,12 @@ import {
 	MediaReplaceFlow,
 	useBlockProps,
 	store as blockEditorStore,
+	__experimentalImageEditor as ImageEditor,
+	__experimentalImageEditingProvider as ImageEditingProvider,
 } from '@wordpress/block-editor';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
-import { siteLogo as icon } from '@wordpress/icons';
+import { crop, siteLogo as icon } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -52,19 +56,22 @@ const SiteLogo = ( {
 	containerRef,
 	isSelected,
 	setAttributes,
+	setLogo,
 	logoUrl,
 	siteUrl,
+	logoId,
 } ) => {
 	const clientWidth = useClientWidth( containerRef, [ align ] );
 	const isLargeViewport = useViewportMatch( 'medium' );
 	const isWideAligned = includes( [ 'wide', 'full' ], align );
 	const isResizable = ! isWideAligned && isLargeViewport;
 	const [ { naturalWidth, naturalHeight }, setNaturalSize ] = useState( {} );
+	const [ isEditingImage, setIsEditingImage ] = useState( false );
 	const { toggleSelection } = useDispatch( blockEditorStore );
 	const classes = classnames( 'custom-logo-link', {
 		'is-transient': isBlobURL( logoUrl ),
 	} );
-	const { maxWidth, title } = useSelect( ( select ) => {
+	const { imageEditing, maxWidth, title } = useSelect( ( select ) => {
 		const { getSettings } = select( blockEditorStore );
 		const siteEntities = select( coreStore ).getEditedEntityRecord(
 			'root',
@@ -72,9 +79,15 @@ const SiteLogo = ( {
 		);
 		return {
 			title: siteEntities.title,
-			...pick( getSettings(), [ 'imageSizes', 'maxWidth' ] ),
+			...pick( getSettings(), [ 'imageEditing', 'maxWidth' ] ),
 		};
 	}, [] );
+
+	useEffect( () => {
+		if ( ! isSelected ) {
+			setIsEditingImage( false );
+		}
+	}, [ isSelected ] );
 
 	function onResizeStart() {
 		toggleSelection( false );
@@ -179,6 +192,63 @@ const SiteLogo = ( {
 	}
 	/* eslint-enable no-lonely-if */
 
+	const canEditImage =
+		logoId && naturalWidth && naturalHeight && imageEditing;
+
+	const imgEdit =
+		canEditImage && isEditingImage ? (
+			<ImageEditingProvider
+				id={ logoId }
+				url={ logoUrl }
+				naturalWidth={ naturalWidth }
+				naturalHeight={ naturalHeight }
+				clientWidth={ clientWidth }
+				onSaveImage={ ( imageAttributes ) => {
+					setLogo( imageAttributes.id );
+				} }
+				isEditing={ isEditingImage }
+				onFinishEditing={ () => setIsEditingImage( false ) }
+			>
+				<ImageEditor
+					url={ logoUrl }
+					width={ currentWidth }
+					height={ currentHeight }
+					clientWidth={ clientWidth }
+					naturalHeight={ naturalHeight }
+					naturalWidth={ naturalWidth }
+				/>
+			</ImageEditingProvider>
+		) : (
+			<ResizableBox
+				size={ {
+					width: currentWidth,
+					height: currentHeight,
+				} }
+				showHandle={ isSelected }
+				minWidth={ minWidth }
+				maxWidth={ maxWidthBuffer }
+				minHeight={ minHeight }
+				maxHeight={ maxWidthBuffer / ratio }
+				lockAspectRatio
+				enable={ {
+					top: false,
+					right: showRightHandle,
+					bottom: true,
+					left: showLeftHandle,
+				} }
+				onResizeStart={ onResizeStart }
+				onResizeStop={ ( event, direction, elt, delta ) => {
+					onResizeStop();
+					setAttributes( {
+						width: parseInt( currentWidth + delta.width, 10 ),
+						height: parseInt( currentHeight + delta.height, 10 ),
+					} );
+				} }
+			>
+				{ imgWrapper }
+			</ResizableBox>
+		);
+
 	return (
 		<>
 			<InspectorControls>
@@ -217,31 +287,16 @@ const SiteLogo = ( {
 					) }
 				</PanelBody>
 			</InspectorControls>
-			<ResizableBox
-				size={ { width, height } }
-				showHandle={ isSelected }
-				minWidth={ minWidth }
-				maxWidth={ maxWidthBuffer }
-				minHeight={ minHeight }
-				maxHeight={ maxWidthBuffer / ratio }
-				lockAspectRatio
-				enable={ {
-					top: false,
-					right: showRightHandle,
-					bottom: true,
-					left: showLeftHandle,
-				} }
-				onResizeStart={ onResizeStart }
-				onResizeStop={ ( event, direction, elt, delta ) => {
-					onResizeStop();
-					setAttributes( {
-						width: parseInt( currentWidth + delta.width, 10 ),
-						height: parseInt( currentHeight + delta.height, 10 ),
-					} );
-				} }
-			>
-				{ imgWrapper }
-			</ResizableBox>
+			<BlockControls group="block">
+				{ canEditImage && ! isEditingImage && (
+					<ToolbarButton
+						onClick={ () => setIsEditingImage( true ) }
+						icon={ crop }
+						label={ __( 'Crop' ) }
+					/>
+				) }
+			</BlockControls>
+			{ imgEdit }
 		</>
 	);
 };
@@ -272,7 +327,7 @@ export default function LogoEdit( {
 		const _siteLogo = siteSettings?.site_logo;
 		const _readOnlyLogo = siteData?.site_logo;
 		const _canUserEdit = canUser( 'update', 'settings' );
-		const _siteLogoId = _siteLogo || _readOnlyLogo;
+		const _siteLogoId = _canUserEdit ? _siteLogo : _readOnlyLogo;
 		const mediaItem =
 			_siteLogoId &&
 			select( coreStore ).getMedia( _siteLogoId, {
@@ -289,6 +344,7 @@ export default function LogoEdit( {
 			canUserEdit: _canUserEdit,
 			url: siteData?.url,
 			mediaItemData: mediaItem && {
+				id: mediaItem.id,
 				url: mediaItem.source_url,
 				alt: mediaItem.alt_text,
 			},
@@ -325,6 +381,11 @@ export default function LogoEdit( {
 		setLogo( media.id );
 	};
 
+	const onRemoveLogo = () => {
+		setLogo( null );
+		setLogoUrl( undefined );
+	};
+
 	const onUploadError = ( message ) => {
 		setError( message[ 2 ] ? message[ 2 ] : null );
 	};
@@ -338,6 +399,11 @@ export default function LogoEdit( {
 				onSelect={ onSelectLogo }
 				onError={ onUploadError }
 			/>
+			<ToolbarGroup>
+				<ToolbarButton onClick={ onRemoveLogo }>
+					{ __( 'Reset' ) }
+				</ToolbarButton>
+			</ToolbarGroup>
 		</BlockControls>
 	);
 
@@ -357,6 +423,8 @@ export default function LogoEdit( {
 				isSelected={ isSelected }
 				setAttributes={ setAttributes }
 				logoUrl={ logoUrl }
+				setLogo={ setLogo }
+				logoId={ mediaItemData?.id || siteLogoId }
 				siteUrl={ url }
 			/>
 		);
