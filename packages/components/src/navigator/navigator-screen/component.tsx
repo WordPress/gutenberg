@@ -15,13 +15,14 @@ import { isRTL } from '@wordpress/i18n';
  * Internal dependencies
  */
 import { NavigatorContext } from '../context';
+import type { NavigatorScreenProps } from '../types';
 
 const animationEnterDelay = 0;
 const animationEnterDuration = 0.14;
 const animationExitDuration = 0.14;
 const animationExitDelay = 0;
 
-function NavigatorScreen( { children, path } ) {
+function NavigatorScreen( { children, path }: NavigatorScreenProps ) {
 	const prefersReducedMotion = useReducedMotion();
 	const [ currentPath ] = useContext( NavigatorContext );
 	const isMatch = currentPath.path === path;
@@ -88,5 +89,7 @@ function NavigatorScreen( { children, path } ) {
 		</motion.div>
 	);
 }
+
+// TODO: context connect
 
 export default NavigatorScreen;

@@ -7,9 +7,15 @@ import { useState } from '@wordpress/element';
  * Internal dependencies
  */
 import { NavigatorContext } from '../context';
+import type { NavigatorProviderProps, NavigatorPath } from '../types';
 
-function NavigatorProvider( { initialPath, children } ) {
-	const [ path, setPath ] = useState( { path: initialPath } );
+function NavigatorProvider( {
+	initialPath,
+	children,
+}: NavigatorProviderProps ) {
+	const [ path, setPath ] = useState< NavigatorPath >( {
+		path: initialPath,
+	} );
 
 	return (
 		<NavigatorContext.Provider value={ [ path, setPath ] }>
@@ -17,5 +23,7 @@ function NavigatorProvider( { initialPath, children } ) {
 		</NavigatorContext.Provider>
 	);
 }
+
+// TODO: context connect
 
 export default NavigatorProvider;
