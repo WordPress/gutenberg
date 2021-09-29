@@ -32,6 +32,7 @@ function createRegistryWithStores() {
 	registry.register( reusableBlocksStore );
 	registry.register( blocksStore );
 
+	// Register entity here instead of mocking API handlers for loadPostTypeEntities()
 	registry.dispatch( coreStore ).addEntities( [
 		{
 			baseURL: '/wp/v2/reusable-blocks',
@@ -46,7 +47,6 @@ function createRegistryWithStores() {
 
 describe( 'Actions', () => {
 	beforeAll( () => {
-		jest.useRealTimers();
 		registerBlockType( 'core/test-block', {
 			title: 'Test block',
 			category: 'text',
