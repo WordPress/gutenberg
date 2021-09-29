@@ -7,7 +7,7 @@ import classNames from 'classnames';
  * WordPress dependencies
  */
 import { getBlockSupport } from '@wordpress/blocks';
-import { Fragment, useEffect } from '@wordpress/element';
+import { Fragment, useEffect, useRef } from '@wordpress/element';
 import {
 	BlockControls,
 	__experimentalUseInnerBlocksProps as useInnerBlocksProps,
@@ -45,6 +45,7 @@ const getDefaultBlockLayout = ( blockTypeOrName ) => {
 };
 
 export function SocialLinksEdit( props ) {
+	const backgroundBackup = useRef( {} );
 	const {
 		name,
 		attributes,
@@ -58,23 +59,34 @@ export function SocialLinksEdit( props ) {
 
 	const {
 		iconBackgroundColorValue,
+		customIconBackgroundColor,
 		iconColorValue,
 		openInNewTab,
 		size,
 		layout,
 	} = attributes;
+
 	const usedLayout = layout || getDefaultBlockLayout( name );
 
-	// Remove icon background color if logos only style selected.
-	const logosOnly =
-		attributes.className?.indexOf( 'is-style-logos-only' ) >= 0;
+	// Remove icon background color when logos only style is selected or
+	// restore it when any other style is selected.
+	const logosOnly = attributes.className
+		? attributes.className.indexOf( 'is-style-logos-only' ) >= 0
+		: false;
 	useEffect( () => {
 		if ( logosOnly ) {
+			backgroundBackup.current = {
+				iconBackgroundColor,
+				iconBackgroundColorValue,
+				customIconBackgroundColor,
+			};
 			setAttributes( {
 				iconBackgroundColor: undefined,
 				customIconBackgroundColor: undefined,
 				iconBackgroundColorValue: undefined,
 			} );
+		} else {
+			setAttributes( { ...backgroundBackup.current } );
 		}
 	}, [ logosOnly, setAttributes ] );
 
