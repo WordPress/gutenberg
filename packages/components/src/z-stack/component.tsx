@@ -1,7 +1,6 @@
 /**
  * External dependencies
  */
-import { css, cx } from 'emotion';
 // eslint-disable-next-line no-restricted-imports
 import type { Ref, ReactNode } from 'react';
 
@@ -15,11 +14,8 @@ import { isValidElement } from '@wordpress/element';
  */
 import { getValidChildren } from '../ui/utils/get-valid-children';
 import { contextConnect, useContextSystem } from '../ui/context';
-// eslint-disable-next-line no-duplicate-imports
-import type { PolymorphicComponentProps } from '../ui/context';
-import { View } from '../view';
-import * as styles from './styles';
-const { ZStackView } = styles;
+import type { WordPressComponentProps } from '../ui/context';
+import { ZStackView, ZStackChildView } from './styles';
 
 export interface ZStackProps {
 	/**
@@ -47,7 +43,7 @@ export interface ZStackProps {
 }
 
 function ZStack(
-	props: PolymorphicComponentProps< ZStackProps, 'div' >,
+	props: WordPressComponentProps< ZStackProps, 'div' >,
 	forwardedRef: Ref< any >
 ) {
 	const {
@@ -66,27 +62,17 @@ function ZStack(
 		const zIndex = isReversed ? childrenLastIndex - index : index;
 		const offsetAmount = offset * index;
 
-		const classes = cx(
-			isLayered ? styles.positionAbsolute : styles.positionRelative,
-			css( {
-				...( isLayered
-					? { marginLeft: offsetAmount }
-					: { right: offsetAmount * -1 } ),
-			} )
-		);
-
 		const key = isValidElement( child ) ? child.key : index;
 
 		return (
-			<View
-				className={ classes }
+			<ZStackChildView
+				isLayered={ isLayered }
+				offsetAmount={ offsetAmount }
+				zIndex={ zIndex }
 				key={ key }
-				style={ {
-					zIndex,
-				} }
 			>
 				{ child }
-			</View>
+			</ZStackChildView>
 		);
 	} );
 

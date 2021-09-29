@@ -1,17 +1,17 @@
 /**
- * External dependencies
+ * WordPress dependencies
  */
-import { cx } from 'emotion';
+import { useInstanceId } from '@wordpress/compose';
 
 /**
  * Internal dependencies
  */
 import { useContextSystem } from '../context';
 import * as styles from './form-group-styles';
-import { useInstanceId } from '../utils';
+import { useCx } from '../../utils/hooks/use-cx';
 
 /**
- * @param {import('../context').PolymorphicComponentProps<import('./types').FormGroupProps, 'div'>} props
+ * @param {import('../context').WordPressComponentProps<import('./types').FormGroupProps, 'div'>} props
  */
 export function useFormGroup( props ) {
 	const {
@@ -28,6 +28,8 @@ export function useFormGroup( props ) {
 	} = useContextSystem( props, 'FormGroup' );
 
 	const id = useInstanceId( useFormGroup, 'form-group', idProp );
+
+	const cx = useCx();
 
 	const classes = cx( styles.FormGroup, className );
 

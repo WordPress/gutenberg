@@ -10,11 +10,11 @@
  * the corresponding stylesheet.
  *
  * @param WP_Theme_JSON_Gutenberg $tree Input tree.
- * @param string                  $type Type of stylesheet we want accepts 'all', 'block_styles', and 'css_variables'.
+ * @param string                  $type Type of stylesheet. It accepts 'all', 'block_styles', 'css_variables', 'presets'.
  *
  * @return string Stylesheet.
  */
-function gutenberg_experimental_global_styles_get_stylesheet( $tree, $type = 'all' ) {
+function gutenberg_experimental_global_styles_get_stylesheet( $tree, $type = null ) {
 	// Check if we can use cached.
 	$can_use_cached = (
 		( 'all' === $type ) &&
@@ -24,20 +24,43 @@ function gutenberg_experimental_global_styles_get_stylesheet( $tree, $type = 'al
 		! is_admin()
 	);
 
+	$transient_name = 'gutenberg_global_styles_' . get_stylesheet();
 	if ( $can_use_cached ) {
 		// Check if we have the styles already cached.
-		$cached = get_transient( 'global_styles' );
+		// It's cached by theme to make sure that theme switching
+		// is inmediately reflected.
+		$cached = get_transient( $transient_name );
 		if ( $cached ) {
 			return $cached;
 		}
 	}
 
-	$stylesheet = $tree->get_stylesheet( $type );
+	$supports_theme_json = WP_Theme_JSON_Resolver_Gutenberg::theme_has_support();
+	$supports_link_color = get_theme_support( 'experimental-link-color' );
+
+	// Only modify the $type if the consumer hasn't provided any.
+	if ( null === $type && ! $supports_theme_json ) {
+		$type = 'presets';
+	} elseif ( null === $type ) {
+		$type = 'all';
+	}
+
+	$origins = array( 'core', 'theme', 'user' );
+	if ( ! $supports_theme_json && ! $supports_link_color ) {
+		// In this case we only enqueue the core presets (CSS Custom Properties + the classes).
+		$origins = array( 'core' );
+	} elseif ( ! $supports_theme_json && $supports_link_color ) {
+		// For the legacy link color feauter to work, the CSS Custom Properties
+		// should be in scope (either the core or the theme ones).
+		$origins = array( 'core', 'theme' );
+	}
+
+	$stylesheet = $tree->get_stylesheet( $type, $origins );
 
 	if ( $can_use_cached ) {
 		// Cache for a minute.
 		// This cache doesn't need to be any longer, we only want to avoid spikes on high-traffic sites.
-		set_transient( 'global_styles', $stylesheet, MINUTE_IN_SECONDS );
+		set_transient( $transient_name, $stylesheet, MINUTE_IN_SECONDS );
 	}
 
 	return $stylesheet;
@@ -48,12 +71,6 @@ function gutenberg_experimental_global_styles_get_stylesheet( $tree, $type = 'al
  * and enqueues the resulting stylesheet.
  */
 function gutenberg_experimental_global_styles_enqueue_assets() {
-	if (
-		! get_theme_support( 'experimental-link-color' ) && // link color support needs the presets CSS variables regardless of the presence of theme.json file.
-		! WP_Theme_JSON_Resolver_Gutenberg::theme_has_support() ) {
-		return;
-	}
-
 	$settings = gutenberg_get_default_block_editor_settings();
 	$all      = WP_Theme_JSON_Resolver_Gutenberg::get_merged_data( $settings );
 
@@ -62,9 +79,13 @@ function gutenberg_experimental_global_styles_enqueue_assets() {
 		return;
 	}
 
-	wp_register_style( 'global-styles', false, array(), true, true );
-	wp_add_inline_style( 'global-styles', $stylesheet );
-	wp_enqueue_style( 'global-styles' );
+	if ( isset( wp_styles()->registered['global-styles'] ) ) {
+		wp_styles()->registered['global-styles']->extra['after'][0] = $stylesheet;
+	} else {
+		wp_register_style( 'global-styles', false, array(), true, true );
+		wp_add_inline_style( 'global-styles', $stylesheet );
+		wp_enqueue_style( 'global-styles' );
+	}
 }
 
 /**
@@ -130,34 +151,69 @@ function gutenberg_experimental_global_styles_settings( $settings ) {
 			'__experimentalNoWrapper' => true,
 		);
 
-		$settings['styles'][] = $css_variables;
-		$settings['styles'][] = $block_styles;
+		// Make sure the styles array exists.
+		// In some contexts, like the navigation editor, it doesn't.
+		if ( ! isset( $settings['styles'] ) ) {
+			$settings['styles'] = array();
+		}
+
+		// Reset existing global styles.
+		$styles_without_existing_global_styles = array();
+		foreach ( $settings['styles'] as $style ) {
+			if ( ! isset( $style['__unstableType'] ) || 'globalStyles' !== $style['__unstableType'] ) {
+				$styles_without_existing_global_styles[] = $style;
+			}
+		}
+
+		// Add the new ones.
+		$styles_without_existing_global_styles[] = $css_variables;
+		$styles_without_existing_global_styles[] = $block_styles;
+		$settings['styles']                      = $styles_without_existing_global_styles;
 	}
 
 	// Copied from get_block_editor_settings() at wordpress-develop/block-editor.php.
 	$settings['__experimentalFeatures'] = $consolidated->get_settings();
+
 	if ( isset( $settings['__experimentalFeatures']['color']['palette'] ) ) {
-		$settings['colors'] = $settings['__experimentalFeatures']['color']['palette'];
-		unset( $settings['__experimentalFeatures']['color']['palette'] );
+		$colors_by_origin   = $settings['__experimentalFeatures']['color']['palette'];
+		$settings['colors'] = isset( $colors_by_origin['user'] ) ?
+			$colors_by_origin['user'] : (
+				isset( $colors_by_origin['theme'] ) ?
+					$colors_by_origin['theme'] :
+					$colors_by_origin['core']
+			);
 	}
+
 	if ( isset( $settings['__experimentalFeatures']['color']['gradients'] ) ) {
-		$settings['gradients'] = $settings['__experimentalFeatures']['color']['gradients'];
-		unset( $settings['__experimentalFeatures']['color']['gradients'] );
+		$gradients_by_origin   = $settings['__experimentalFeatures']['color']['gradients'];
+		$settings['gradients'] = isset( $gradients_by_origin['user'] ) ?
+			$gradients_by_origin['user'] : (
+				isset( $gradients_by_origin['theme'] ) ?
+					$gradients_by_origin['theme'] :
+					$gradients_by_origin['core']
+			);
 	}
+
+	if ( isset( $settings['__experimentalFeatures']['typography']['fontSizes'] ) ) {
+		$font_sizes_by_origin  = $settings['__experimentalFeatures']['typography']['fontSizes'];
+		$settings['fontSizes'] = isset( $font_sizes_by_origin['user'] ) ?
+			$font_sizes_by_origin['user'] : (
+				isset( $font_sizes_by_origin['theme'] ) ?
+					$font_sizes_by_origin['theme'] :
+					$font_sizes_by_origin['core']
+			);
+	}
+
 	if ( isset( $settings['__experimentalFeatures']['color']['custom'] ) ) {
-		$settings['disableCustomColors'] = $settings['__experimentalFeatures']['color']['custom'];
+		$settings['disableCustomColors'] = ! $settings['__experimentalFeatures']['color']['custom'];
 		unset( $settings['__experimentalFeatures']['color']['custom'] );
 	}
 	if ( isset( $settings['__experimentalFeatures']['color']['customGradient'] ) ) {
-		$settings['disableCustomGradients'] = $settings['__experimentalFeatures']['color']['customGradient'];
+		$settings['disableCustomGradients'] = ! $settings['__experimentalFeatures']['color']['customGradient'];
 		unset( $settings['__experimentalFeatures']['color']['customGradient'] );
 	}
-	if ( isset( $settings['__experimentalFeatures']['typography']['fontSizes'] ) ) {
-		$settings['fontSizes'] = $settings['__experimentalFeatures']['typography']['fontSizes'];
-		unset( $settings['__experimentalFeatures']['typography']['fontSizes'] );
-	}
 	if ( isset( $settings['__experimentalFeatures']['typography']['customFontSize'] ) ) {
-		$settings['disableCustomFontSizes'] = $settings['__experimentalFeatures']['typography']['customFontSize'];
+		$settings['disableCustomFontSizes'] = ! $settings['__experimentalFeatures']['typography']['customFontSize'];
 		unset( $settings['__experimentalFeatures']['typography']['customFontSize'] );
 	}
 	if ( isset( $settings['__experimentalFeatures']['typography']['customLineHeight'] ) ) {
@@ -165,12 +221,7 @@ function gutenberg_experimental_global_styles_settings( $settings ) {
 		unset( $settings['__experimentalFeatures']['typography']['customLineHeight'] );
 	}
 	if ( isset( $settings['__experimentalFeatures']['spacing']['units'] ) ) {
-		if ( ! is_array( $settings['__experimentalFeatures']['spacing']['units'] ) ) {
-			$settings['enableCustomUnits'] = false;
-		} else {
-			$settings['enableCustomUnits'] = count( $settings['__experimentalFeatures']['spacing']['units'] ) > 0;
-		}
-		unset( $settings['__experimentalFeatures']['spacing']['units'] );
+		$settings['enableCustomUnits'] = $settings['__experimentalFeatures']['spacing']['units'];
 	}
 	if ( isset( $settings['__experimentalFeatures']['spacing']['customPadding'] ) ) {
 		$settings['enableCustomSpacing'] = $settings['__experimentalFeatures']['spacing']['customPadding'];
@@ -200,7 +251,7 @@ function gutenberg_experimental_global_styles_register_user_cpt() {
  * @return string Filtered post content with unsafe rules removed.
  */
 function gutenberg_global_styles_filter_post( $content ) {
-	$decoded_data        = json_decode( stripslashes( $content ), true );
+	$decoded_data        = json_decode( wp_unslash( $content ), true );
 	$json_decoding_error = json_last_error();
 	if (
 		JSON_ERROR_NONE === $json_decoding_error &&
@@ -209,11 +260,11 @@ function gutenberg_global_styles_filter_post( $content ) {
 		$decoded_data['isGlobalStylesUserThemeJSON']
 	) {
 		unset( $decoded_data['isGlobalStylesUserThemeJSON'] );
-		$theme_json = new WP_Theme_JSON_Gutenberg( $decoded_data );
-		$theme_json->remove_insecure_properties();
-		$data_to_encode                                = $theme_json->get_raw_data();
+
+		$data_to_encode = WP_Theme_JSON_Gutenberg::remove_insecure_properties( $decoded_data );
+
 		$data_to_encode['isGlobalStylesUserThemeJSON'] = true;
-		return wp_json_encode( $data_to_encode );
+		return wp_slash( wp_json_encode( $data_to_encode ) );
 	}
 	return $content;
 }

@@ -32,10 +32,19 @@ function gutenberg_navigation_init( $hook ) {
 			return;
 	}
 
+	$preload_paths = array(
+		'/__experimental/menu-locations',
+		array( '/wp/v2/pages', 'OPTIONS' ),
+		array( '/wp/v2/posts', 'OPTIONS' ),
+	);
+
 	$settings = array_merge(
 		gutenberg_get_default_block_editor_settings(),
 		array(
-			'blockNavMenus' => get_theme_support( 'block-nav-menus' ),
+			'blockNavMenus' => false,
+			// We should uncomment the line below when the block-nav-menus feature becomes stable.
+			// @see https://github.com/WordPress/gutenberg/issues/34265.
+			/*'blockNavMenus' => get_theme_support( 'block-nav-menus' ),*/
 		)
 	);
 	$settings = gutenberg_experimental_global_styles_settings( $settings );
@@ -46,6 +55,7 @@ function gutenberg_navigation_init( $hook ) {
 		array(
 			'initializer_name' => 'initialize',
 			'editor_settings'  => $settings,
+			'preload_paths'    => $preload_paths,
 		)
 	);
 
@@ -64,7 +74,7 @@ add_action( 'admin_enqueue_scripts', 'gutenberg_navigation_init' );
  * @return bool Filtered decision about loading block assets.
  */
 function gutenberg_navigation_editor_load_block_editor_scripts_and_styles( $is_block_editor_screen ) {
-	if ( is_callable( 'get_current_screen' ) && 'gutenberg_page_gutenberg-navigation' === get_current_screen()->base ) {
+	if ( is_callable( 'get_current_screen' ) && get_current_screen() && 'gutenberg_page_gutenberg-navigation' === get_current_screen()->base ) {
 		return true;
 	}
 

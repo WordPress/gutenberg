@@ -155,15 +155,17 @@ class WP_Theme_JSON_Resolver_Gutenberg_Test extends WP_UnitTestCase {
 			array(
 				'color'  => array(
 					'palette' => array(
-						array(
-							'slug'  => 'light',
-							'name'  => 'Jasny',
-							'color' => '#f5f7f9',
-						),
-						array(
-							'slug'  => 'dark',
-							'name'  => 'Ciemny',
-							'color' => '#000',
+						'theme' => array(
+							array(
+								'slug'  => 'light',
+								'name'  => 'Jasny',
+								'color' => '#f5f7f9',
+							),
+							array(
+								'slug'  => 'dark',
+								'name'  => 'Ciemny',
+								'color' => '#000',
+							),
 						),
 					),
 					'custom'  => false,
@@ -172,10 +174,12 @@ class WP_Theme_JSON_Resolver_Gutenberg_Test extends WP_UnitTestCase {
 					'core/paragraph' => array(
 						'color' => array(
 							'palette' => array(
-								array(
-									'slug'  => 'light',
-									'name'  => 'Jasny',
-									'color' => '#f5f7f9',
+								'theme' => array(
+									array(
+										'slug'  => 'light',
+										'name'  => 'Jasny',
+										'color' => '#f5f7f9',
+									),
 								),
 							),
 						),
@@ -206,6 +210,35 @@ class WP_Theme_JSON_Resolver_Gutenberg_Test extends WP_UnitTestCase {
 
 		$this->assertSame( false, $default );
 		$this->assertSame( true, $fse );
+	}
+
+	function test_add_theme_supports_are_loaded_for_themes_without_theme_json() {
+		switch_theme( 'default' );
+		add_theme_support( 'custom-line-height' );
+		$color_palette = array(
+			array(
+				'name'  => 'Primary',
+				'slug'  => 'primary',
+				'color' => '#F00',
+			),
+			array(
+				'name'  => 'Secondary',
+				'slug'  => 'secondary',
+				'color' => '#0F0',
+			),
+			array(
+				'name'  => 'Tertiary',
+				'slug'  => 'tertiary',
+				'color' => '#00F',
+			),
+		);
+		add_theme_support( 'editor-color-palette', $color_palette );
+		$supports = gutenberg_get_default_block_editor_settings();
+		$settings = WP_Theme_JSON_Resolver_Gutenberg::get_merged_data( $supports )->get_settings();
+
+		$this->assertSame( false, WP_Theme_JSON_Resolver_Gutenberg::theme_has_support() );
+		$this->assertSame( true, $settings['typography']['customLineHeight'] );
+		$this->assertSame( $color_palette, $settings['color']['palette']['theme'] );
 	}
 
 }

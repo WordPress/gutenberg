@@ -13,6 +13,11 @@ import { useMemo } from '@wordpress/element';
 import { createHigherOrderComponent } from '@wordpress/compose';
 import { addFilter } from '@wordpress/hooks';
 
+/**
+ * Internal dependencies
+ */
+import { store as editorStore } from '../store';
+
 /** @typedef {import('@wordpress/compose').WPHigherOrderComponent} WPHigherOrderComponent */
 /** @typedef {import('@wordpress/blocks').WPBlockSettings} WPBlockSettings */
 
@@ -39,7 +44,7 @@ const createWithMetaAttributeSource = ( metaAttributes ) =>
 	createHigherOrderComponent(
 		( BlockEdit ) => ( { attributes, setAttributes, ...props } ) => {
 			const postType = useSelect(
-				( select ) => select( 'core/editor' ).getCurrentPostType(),
+				( select ) => select( editorStore ).getCurrentPostType(),
 				[]
 			);
 			const [ meta, setMeta ] = useEntityProp(

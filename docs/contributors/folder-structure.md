@@ -124,4 +124,10 @@ The following snippet explains how the Gutenberg repository is structured omitti
     │   Configuration for the Gutenberg Mobile unit tests.
     │
     └── test/unit
-        Configuration for the Packages unit tests.
+    │   Configuration for the Packages unit tests.
+    │
+    └── tools/eslint
+    │   Configuration files for the ESLint linter.
+    │
+    └── tools/webpack
+    │   Configuration files for the webpack build.

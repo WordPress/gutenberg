@@ -7,20 +7,23 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { forwardRef, useRef } from '@wordpress/element';
+import { forwardRef, useMemo, useRef } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { ENTER } from '@wordpress/keycodes';
 
 /**
  * Internal dependencies
  */
-import {
-	inputControlActionTypes,
-	composeStateReducers,
-} from '../input-control/state';
+import * as inputControlActionTypes from '../input-control/reducer/actions';
+import { composeStateReducers } from '../input-control/reducer/reducer';
 import { Root, ValueInput } from './styles/unit-control-styles';
 import UnitSelectControl from './unit-select-control';
-import { CSS_UNITS, getParsedValue, getValidParsedUnit } from './utils';
+import {
+	CSS_UNITS,
+	getParsedValue,
+	getUnitsWithCurrentUnit,
+	getValidParsedUnit,
+} from './utils';
 import { useControlledState } from '../utils/hooks';
 
 function UnitControl(
@@ -39,12 +42,16 @@ function UnitControl(
 		size = 'default',
 		style,
 		unit: unitProp,
-		units = CSS_UNITS,
+		units: unitsProp = CSS_UNITS,
 		value: valueProp,
 		...props
 	},
 	ref
 ) {
+	const units = useMemo(
+		() => getUnitsWithCurrentUnit( valueProp, unitProp, unitsProp ),
+		[ valueProp, unitProp, unitsProp ]
+	);
 	const [ value, initialUnit ] = getParsedValue( valueProp, unitProp, units );
 	const [ unit, setUnit ] = useControlledState( unitProp, {
 		initial: initialUnit,
@@ -126,7 +133,7 @@ function UnitControl(
 	 * This allows us to tap into actions to transform the (next) state for
 	 * InputControl.
 	 *
-	 * @param {Object} state State from InputControl
+	 * @param {Object} state  State from InputControl
 	 * @param {Object} action Action triggering state change
 	 * @return {Object} The updated state to apply to InputControl
 	 */
@@ -200,5 +207,5 @@ function UnitControl(
 
 const ForwardedUnitControl = forwardRef( UnitControl );
 
-export { useCustomUnits } from './utils';
+export { parseUnit, useCustomUnits } from './utils';
 export default ForwardedUnitControl;

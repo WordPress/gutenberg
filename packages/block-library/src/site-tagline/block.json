@@ -20,9 +20,14 @@
 			"margin": true,
 			"padding": true
 		},
-		"fontSize": true,
-		"lineHeight": true,
-		"__experimentalFontFamily": true,
-		"__experimentalTextTransform": true
-	}
+		"typography": {
+			"fontSize": true,
+			"lineHeight": true,
+			"__experimentalFontFamily": true,
+			"__experimentalFontWeight": true,
+			"__experimentalTextTransform": true,
+			"__experimentalLetterSpacing": true
+		}
+	},
+	"editorStyle": "wp-block-site-tagline-editor"
 }

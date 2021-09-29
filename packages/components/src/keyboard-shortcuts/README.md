@@ -12,13 +12,12 @@ Render `<KeyboardShortcuts />` with a `shortcuts` prop object:
 
 ```jsx
 import { KeyboardShortcuts } from '@wordpress/components';
-import { withState } from '@wordpress/compose';
+import { useState } from '@wordpress/element';
 
-const MyKeyboardShortcuts = withState( {
-	isAllSelected: false,
-} )( ( { isAllSelected, setState } ) => {
+const MyKeyboardShortcuts = () => {
+	const [ isAllSelected, setIsAllSelected ] = useState( false );
 	const selectAll = () => {
-		setState( { isAllSelected: true } );
+		setIsAllSelected( true );
 	};
 
 	return (
@@ -31,7 +30,7 @@ const MyKeyboardShortcuts = withState( {
 			[cmd/ctrl + A] Combination pressed? { isAllSelected ? 'Yes' : 'No' }
 		</div>
 	);
-} );
+};
 ```
 
 ## Props

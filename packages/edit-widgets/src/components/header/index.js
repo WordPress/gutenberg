@@ -87,7 +87,7 @@ function Header() {
 							ref={ inserterButton }
 							as={ Button }
 							className="edit-widgets-header-toolbar__inserter-toggle"
-							isPrimary
+							variant="primary"
 							isPressed={ isInserterOpened }
 							onMouseDown={ ( event ) => {
 								event.preventDefault();
@@ -97,7 +97,7 @@ function Header() {
 							/* translators: button label text should, if possible, be under 16
 					characters. */
 							label={ _x(
-								'Add block',
+								'Toggle block inserter',
 								'Generic label for block inserter button'
 							) }
 						/>

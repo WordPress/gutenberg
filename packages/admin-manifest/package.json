@@ -1,0 +1,34 @@
+{
+	"name": "@wordpress/admin-manifest",
+	"version": "1.0.0",
+	"description": "Dynamically creates a Web App manifest and registers the service worker for the admin.",
+	"private": true,
+	"author": "The WordPress Contributors",
+	"license": "GPL-2.0-or-later",
+	"keywords": [
+		"wordpress",
+		"gutenberg",
+		"manifest"
+	],
+	"homepage": "https://github.com/WordPress/gutenberg/tree/HEAD/packages/admin-manifest/README.md",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/WordPress/gutenberg.git",
+		"directory": "packages/admin-manifest"
+	},
+	"bugs": {
+		"url": "https://github.com/WordPress/gutenberg/issues"
+	},
+	"engines": {
+		"node": ">=12"
+	},
+	"main": "build/index.js",
+	"module": "build-module/index.js",
+	"react-native": "src/index",
+	"dependencies": {
+		"@babel/runtime": "^7.13.10"
+	},
+	"publishConfig": {
+		"access": "public"
+	}
+}

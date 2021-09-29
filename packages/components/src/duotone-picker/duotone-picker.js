@@ -22,6 +22,7 @@ function DuotonePicker( {
 	colorPalette,
 	duotonePalette,
 	disableCustomColors,
+	disableCustomDuotone,
 	value,
 	onChange,
 } ) {
@@ -29,6 +30,7 @@ function DuotonePicker( {
 		() => getDefaultColors( colorPalette ),
 		[ colorPalette ]
 	);
+
 	return (
 		<CircularOptionPicker
 			options={ duotonePalette.map( ( { colors, slug, name } ) => {
@@ -74,10 +76,10 @@ function DuotonePicker( {
 				</CircularOptionPicker.ButtonAction>
 			}
 		>
-			{ ! disableCustomColors && (
+			{ ! disableCustomColors && ! disableCustomDuotone && (
 				<CustomDuotoneBar value={ value } onChange={ onChange } />
 			) }
-			{ colorPalette && (
+			{ ! disableCustomDuotone && (
 				<ColorListPicker
 					labels={ [ __( 'Shadows' ), __( 'Highlights' ) ] }
 					colors={ colorPalette }

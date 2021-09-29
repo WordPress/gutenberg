@@ -10,7 +10,6 @@ import { noop, get, omit, pick } from 'lodash';
  */
 import { addFilter, removeAllFilters, removeFilter } from '@wordpress/hooks';
 import { select } from '@wordpress/data';
-import { blockDefault as blockIcon } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -36,7 +35,7 @@ import {
 	serverSideBlockDefinitions,
 	unstable__bootstrapServerSideBlockDefinitions, // eslint-disable-line camelcase
 } from '../registration';
-import { DEPRECATED_ENTRY_KEYS } from '../constants';
+import { BLOCK_ICON_DEFAULT, DEPRECATED_ENTRY_KEYS } from '../constants';
 import { store as blocksStore } from '../../store';
 
 describe( 'blocks', () => {
@@ -121,9 +120,7 @@ describe( 'blocks', () => {
 			expect( console ).not.toHaveErrored();
 			expect( block ).toEqual( {
 				name: 'my-plugin/fancy-block-4',
-				icon: {
-					src: blockIcon,
-				},
+				icon: { src: BLOCK_ICON_DEFAULT },
 				attributes: {},
 				providesContext: {},
 				usesContext: [],
@@ -268,9 +265,7 @@ describe( 'blocks', () => {
 				name: 'core/test-block-with-defaults',
 				title: 'block title',
 				category: 'text',
-				icon: {
-					src: blockIcon,
-				},
+				icon: { src: BLOCK_ICON_DEFAULT },
 				attributes: {},
 				providesContext: {},
 				usesContext: [],
@@ -301,9 +296,7 @@ describe( 'blocks', () => {
 					save: noop,
 					category: 'text',
 					title: 'block title',
-					icon: {
-						src: blockIcon,
-					},
+					icon: { src: BLOCK_ICON_DEFAULT },
 					attributes: {
 						ok: {
 							type: 'boolean',
@@ -338,9 +331,7 @@ describe( 'blocks', () => {
 				name: blockName,
 				save: expect.any( Function ),
 				title: 'block title',
-				icon: {
-					src: blockIcon,
-				},
+				icon: { src: BLOCK_ICON_DEFAULT },
 				attributes: {},
 				providesContext: {},
 				usesContext: [],
@@ -371,9 +362,7 @@ describe( 'blocks', () => {
 				name: blockName,
 				save: expect.any( Function ),
 				title: 'block title',
-				icon: {
-					src: blockIcon,
-				},
+				icon: { src: BLOCK_ICON_DEFAULT },
 				attributes: {},
 				providesContext: {
 					fontSize: 'fontSize',
@@ -410,9 +399,7 @@ describe( 'blocks', () => {
 				save: expect.any( Function ),
 				title: 'block title',
 				category: 'widgets',
-				icon: {
-					src: blockIcon,
-				},
+				icon: { src: BLOCK_ICON_DEFAULT },
 				attributes: {},
 				providesContext: {},
 				usesContext: [],
@@ -636,9 +623,7 @@ describe( 'blocks', () => {
 				save: noop,
 				category: 'text',
 				title: 'block title',
-				icon: {
-					src: blockIcon,
-				},
+				icon: { src: BLOCK_ICON_DEFAULT },
 				attributes: {},
 				providesContext: {},
 				usesContext: [],
@@ -723,7 +708,7 @@ describe( 'blocks', () => {
 								...omit(
 									{
 										name,
-										icon: blockIcon,
+										icon: BLOCK_ICON_DEFAULT,
 										attributes: {},
 										providesContext: {},
 										usesContext: [],
@@ -960,9 +945,7 @@ describe( 'blocks', () => {
 					save: noop,
 					category: 'text',
 					title: 'block title',
-					icon: {
-						src: blockIcon,
-					},
+					icon: { src: BLOCK_ICON_DEFAULT },
 					attributes: {},
 					providesContext: {},
 					usesContext: [],
@@ -979,9 +962,7 @@ describe( 'blocks', () => {
 				save: noop,
 				category: 'text',
 				title: 'block title',
-				icon: {
-					src: blockIcon,
-				},
+				icon: { src: BLOCK_ICON_DEFAULT },
 				attributes: {},
 				providesContext: {},
 				usesContext: [],
@@ -1059,9 +1040,7 @@ describe( 'blocks', () => {
 				save: noop,
 				category: 'text',
 				title: 'block title',
-				icon: {
-					src: blockIcon,
-				},
+				icon: { src: BLOCK_ICON_DEFAULT },
 				attributes: {},
 				providesContext: {},
 				usesContext: [],
@@ -1085,9 +1064,7 @@ describe( 'blocks', () => {
 				save: noop,
 				category: 'text',
 				title: 'block title',
-				icon: {
-					src: blockIcon,
-				},
+				icon: { src: BLOCK_ICON_DEFAULT },
 				attributes: {},
 				providesContext: {},
 				usesContext: [],
@@ -1118,9 +1095,7 @@ describe( 'blocks', () => {
 					save: noop,
 					category: 'text',
 					title: 'block title',
-					icon: {
-						src: blockIcon,
-					},
+					icon: { src: BLOCK_ICON_DEFAULT },
 					attributes: {},
 					providesContext: {},
 					usesContext: [],
@@ -1135,9 +1110,7 @@ describe( 'blocks', () => {
 					save: noop,
 					category: 'text',
 					title: 'block title',
-					icon: {
-						src: blockIcon,
-					},
+					icon: { src: BLOCK_ICON_DEFAULT },
 					attributes: {},
 					providesContext: {},
 					usesContext: [],

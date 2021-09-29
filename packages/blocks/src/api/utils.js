@@ -1,8 +1,10 @@
 /**
  * External dependencies
  */
-import { every, has, isFunction, isString, reduce } from 'lodash';
-import { default as tinycolor, mostReadable } from 'tinycolor2';
+import { every, has, isFunction, isString, reduce, maxBy } from 'lodash';
+import { colord, extend } from 'colord';
+import namesPlugin from 'colord/plugins/names';
+import a11yPlugin from 'colord/plugins/a11y';
 
 /**
  * WordPress dependencies
@@ -14,8 +16,11 @@ import { __unstableStripHTML as stripHTML } from '@wordpress/dom';
 /**
  * Internal dependencies
  */
+import { BLOCK_ICON_DEFAULT } from './constants';
 import { getBlockType, getDefaultBlockName } from './registration';
 import { createBlock } from './factory';
+
+extend( [ namesPlugin, a11yPlugin ] );
 
 /**
  * Array of icon colors containing a color to be used if the icon color
@@ -30,9 +35,9 @@ const ICON_COLORS = [ '#191e23', '#f8f9f9' ];
  * and its attributes are equal to the default attributes
  * which means the block is unmodified.
  *
- * @param  {WPBlock} block Block Object
+ * @param {WPBlock} block Block Object
  *
- * @return {boolean}       Whether the block is an unmodified default block
+ * @return {boolean} Whether the block is an unmodified default block
  */
 export function isUnmodifiedDefaultBlock( block ) {
 	const defaultBlockName = getDefaultBlockName();
@@ -62,7 +67,7 @@ export function isUnmodifiedDefaultBlock( block ) {
 /**
  * Function that checks if the parameter is a valid icon.
  *
- * @param {*} icon  Parameter to be checked.
+ * @param {*} icon Parameter to be checked.
  *
  * @return {boolean} True if the parameter is a valid icon and false otherwise.
  */
@@ -89,23 +94,22 @@ export function isValidIcon( icon ) {
  * @return {WPBlockTypeIconDescriptor} Object describing the icon.
  */
 export function normalizeIconObject( icon ) {
+	icon = icon || BLOCK_ICON_DEFAULT;
 	if ( isValidIcon( icon ) ) {
 		return { src: icon };
 	}
 
 	if ( has( icon, [ 'background' ] ) ) {
-		const tinyBgColor = tinycolor( icon.background );
+		const colordBgColor = colord( icon.background );
 
 		return {
 			...icon,
 			foreground: icon.foreground
 				? icon.foreground
-				: mostReadable( tinyBgColor, ICON_COLORS, {
-						includeFallbackColors: true,
-						level: 'AA',
-						size: 'large',
-				  } ).toHexString(),
-			shadowColor: tinyBgColor.setAlpha( 0.3 ).toRgbString(),
+				: maxBy( ICON_COLORS, ( iconColor ) =>
+						colordBgColor.contrast( iconColor )
+				  ),
+			shadowColor: colordBgColor.alpha( 0.3 ).toRgbString(),
 		};
 	}
 
@@ -117,7 +121,7 @@ export function normalizeIconObject( icon ) {
  * it converts it to the matching block type object.
  * It passes the original object otherwise.
  *
- * @param {string|Object} blockTypeOrName  Block type or name.
+ * @param {string|Object} blockTypeOrName Block type or name.
  *
  * @return {?Object} Block type.
  */

@@ -7,7 +7,7 @@ import classnames from 'classnames';
  * WordPress dependencies
  */
 import { useEntityProp } from '@wordpress/core-data';
-import { useState } from '@wordpress/element';
+import { useRef } from '@wordpress/element';
 import { __experimentalGetSettings, dateI18n } from '@wordpress/date';
 import {
 	AlignmentControl,
@@ -16,20 +16,24 @@ import {
 	useBlockProps,
 } from '@wordpress/block-editor';
 import {
+	Dropdown,
+	ToolbarGroup,
 	ToolbarButton,
 	ToggleControl,
-	Popover,
 	DateTimePicker,
 	PanelBody,
 	CustomSelectControl,
 } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
 import { edit } from '@wordpress/icons';
+import { DOWN } from '@wordpress/keycodes';
 
-export default function PostDateEdit( { attributes, context, setAttributes } ) {
-	const { textAlign, format, isLink } = attributes;
-	const { postId, postType } = context;
-
+export default function PostDateEdit( {
+	attributes: { textAlign, format, isLink },
+	context: { postId, postType, queryId },
+	setAttributes,
+} ) {
+	const isDescendentOfQueryLoop = !! queryId;
 	const [ siteFormat ] = useEntityProp( 'root', 'site', 'date_format' );
 	const [ date, setDate ] = useEntityProp(
 		'postType',
@@ -37,7 +41,6 @@ export default function PostDateEdit( { attributes, context, setAttributes } ) {
 		'date',
 		postId
 	);
-	const [ isPickerOpen, setIsPickerOpen ] = useState( false );
 	const settings = __experimentalGetSettings();
 	// To know if the current time format is a 12 hour time, look for "a".
 	// Also make sure this "a" is not escaped by a "/".
@@ -62,18 +65,11 @@ export default function PostDateEdit( { attributes, context, setAttributes } ) {
 		} ),
 	} );
 
+	const timeRef = useRef();
+
 	let postDate = date ? (
-		<time dateTime={ dateI18n( 'c', date ) }>
+		<time dateTime={ dateI18n( 'c', date ) } ref={ timeRef }>
 			{ dateI18n( resolvedFormat, date ) }
-			{ isPickerOpen && (
-				<Popover onClose={ setIsPickerOpen.bind( null, false ) }>
-					<DateTimePicker
-						currentDate={ date }
-						onChange={ setDate }
-						is12Hour={ is12Hour }
-					/>
-				</Popover>
-			) }
 		</time>
 	) : (
 		__( 'No Date' )
@@ -98,16 +94,36 @@ export default function PostDateEdit( { attributes, context, setAttributes } ) {
 					} }
 				/>
 
-				{ date && (
-					<ToolbarButton
-						icon={ edit }
-						title={ __( 'Change Date' ) }
-						onClick={ () =>
-							setIsPickerOpen(
-								( _isPickerOpen ) => ! _isPickerOpen
-							)
-						}
-					/>
+				{ date && ! isDescendentOfQueryLoop && (
+					<ToolbarGroup>
+						<Dropdown
+							popoverProps={ { anchorRef: timeRef.current } }
+							renderContent={ () => (
+								<DateTimePicker
+									currentDate={ date }
+									onChange={ setDate }
+									is12Hour={ is12Hour }
+								/>
+							) }
+							renderToggle={ ( { isOpen, onToggle } ) => {
+								const openOnArrowDown = ( event ) => {
+									if ( ! isOpen && event.keyCode === DOWN ) {
+										event.preventDefault();
+										onToggle();
+									}
+								};
+								return (
+									<ToolbarButton
+										aria-expanded={ isOpen }
+										icon={ edit }
+										title={ __( 'Change Date' ) }
+										onClick={ onToggle }
+										onKeyDown={ openOnArrowDown }
+									/>
+								);
+							} }
+						/>
+					</ToolbarGroup>
 				) }
 			</BlockControls>
 

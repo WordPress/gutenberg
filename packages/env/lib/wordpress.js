@@ -39,7 +39,7 @@ async function checkDatabaseConnection( { dockerComposeConfigPath, debug } ) {
  *
  * @param {WPEnvironment} environment The environment to configure. Either 'development' or 'tests'.
  * @param {WPConfig}      config      The wp-env config object.
- * @param {Object} spinner A CLI spinner which indicates progress.
+ * @param {Object}        spinner     A CLI spinner which indicates progress.
  */
 async function configureWordPress( environment, config, spinner ) {
 	const installCommand = `wp core install --url="localhost:${ config.env[ environment ].port }" --title="${ config.name }" --admin_user=admin --admin_password=password --admin_email=wordpress@example.com --skip-email`;
@@ -206,7 +206,7 @@ function areCoreSourcesDifferent( coreSource1, coreSource2 ) {
  * (.git, node_modules) and configuration files (wp-config.php).
  *
  * @param {string} fromPath Path to the WordPress directory to copy.
- * @param {string} toPath Destination path.
+ * @param {string} toPath   Destination path.
  */
 async function copyCoreFiles( fromPath, toPath ) {
 	await copyDir( fromPath, toPath, {

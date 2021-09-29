@@ -8,10 +8,15 @@ import { select } from '@wordpress/data';
 import { Warning } from '@wordpress/block-editor';
 import { useCopyToClipboard } from '@wordpress/compose';
 
+/**
+ * Internal dependencies
+ */
+import { store as editorStore } from '../../store';
+
 function CopyButton( { text, children } ) {
 	const ref = useCopyToClipboard( text );
 	return (
-		<Button isSecondary ref={ ref }>
+		<Button variant="secondary" ref={ ref }>
 			{ children }
 		</Button>
 	);
@@ -45,7 +50,7 @@ class ErrorBoundary extends Component {
 			// (b) avoids the performance cost associated with unnecessary
 			// content serialization throughout the lifetime of a non-erroring
 			// application.
-			return select( 'core/editor' ).getEditedPostContent();
+			return select( editorStore ).getEditedPostContent();
 		} catch ( error ) {}
 	}
 
@@ -59,7 +64,11 @@ class ErrorBoundary extends Component {
 			<Warning
 				className="editor-error-boundary"
 				actions={ [
-					<Button key="recovery" onClick={ this.reboot } isSecondary>
+					<Button
+						key="recovery"
+						onClick={ this.reboot }
+						variant="secondary"
+					>
 						{ __( 'Attempt Recovery' ) }
 					</Button>,
 					<CopyButton key="copy-post" text={ this.getContent }>

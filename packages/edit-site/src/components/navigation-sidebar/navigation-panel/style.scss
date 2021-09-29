@@ -4,6 +4,7 @@
 	width: 0;
 	overflow: hidden;
 	background: $gray-900;
+	color: $white;
 	transition: width 100ms linear;
 	@include reduce-motion("transition");
 

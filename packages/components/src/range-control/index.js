@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * External dependencies
  */
@@ -47,6 +48,7 @@ function RangeControl(
 		initialPosition,
 		isShiftStepEnabled = true,
 		label,
+		hideLabelFromVision = false,
 		marks = false,
 		max = 100,
 		min = 0,
@@ -194,6 +196,7 @@ function RangeControl(
 		<BaseControl
 			className={ classes }
 			label={ label }
+			hideLabelFromVision={ hideLabelFromVision }
 			id={ id }
 			help={ help }
 		>
@@ -214,7 +217,6 @@ function RangeControl(
 						describedBy={ describedBy }
 						disabled={ disabled }
 						id={ id }
-						isShiftStepEnabled={ isShiftStepEnabled }
 						label={ label }
 						max={ max }
 						min={ min }
@@ -224,7 +226,6 @@ function RangeControl(
 						onMouseMove={ onMouseMove }
 						onMouseLeave={ onMouseLeave }
 						ref={ setRef }
-						shiftStep={ shiftStep }
 						step={ step }
 						value={ inputSliderValue }
 					/>
@@ -245,10 +246,11 @@ function RangeControl(
 						style={ { width: fillValueOffset } }
 						trackColor={ trackColor }
 					/>
-					<ThumbWrapper style={ offsetStyle }>
+					<ThumbWrapper style={ offsetStyle } disabled={ disabled }>
 						<Thumb
 							aria-hidden={ true }
 							isFocused={ isThumbFocused }
+							disabled={ disabled }
 						/>
 					</ThumbWrapper>
 					{ enableTooltip && (
@@ -288,7 +290,7 @@ function RangeControl(
 						<Button
 							className="components-range-control__reset"
 							disabled={ disabled || value === undefined }
-							isSecondary
+							variant="secondary"
 							isSmall
 							onClick={ handleOnReset }
 						>

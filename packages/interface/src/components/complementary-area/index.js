@@ -149,7 +149,7 @@ function ComplementaryArea( {
 							label={ title }
 							icon={ showIconLabels ? check : icon }
 							showTooltip={ ! showIconLabels }
-							isTertiary={ showIconLabels }
+							variant={ showIconLabels ? 'tertiary' : undefined }
 						/>
 					) }
 				</PinnedItems>

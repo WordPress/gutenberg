@@ -11,6 +11,7 @@
 	.components-menu-group__label {
 		padding: $grid-unit-15 $grid-unit-15 0 $grid-unit-15;
 		width: 100%;
+		box-sizing: border-box;
 	}
 }
 

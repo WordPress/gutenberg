@@ -74,7 +74,7 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 
 			$json_decoding_error = json_last_error();
 			if ( JSON_ERROR_NONE !== $json_decoding_error ) {
-				error_log( 'Error when decoding file schema: ' . json_last_error_msg() );
+				trigger_error( "Error when decoding a theme.json schema at path $file_path " . json_last_error_msg() );
 				return $config;
 			}
 
@@ -127,14 +127,13 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 		foreach ( $i18n_partial as $property => $partial_child ) {
 			if ( is_numeric( $property ) ) {
 				foreach ( $partial_child as $key => $context ) {
-					return array(
-						array(
-							'path'    => $current_path,
-							'key'     => $key,
-							'context' => $context,
-						),
+					$result[] = array(
+						'path'    => $current_path,
+						'key'     => $key,
+						'context' => $context,
 					);
 				}
+				return $result;
 			}
 			$result = array_merge(
 				$result,
@@ -151,7 +150,7 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 	 */
 	public static function get_fields_to_translate() {
 		if ( null === self::$theme_json_i18n ) {
-			$file_structure        = self::read_json_file( __DIR__ . '/experimental-i18n-theme.json' );
+			$file_structure        = self::read_json_file( __DIR__ . '/theme-i18n.json' );
 			self::$theme_json_i18n = self::extract_paths_to_translate( $file_structure );
 		}
 		return self::$theme_json_i18n;
@@ -248,9 +247,9 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 			return self::$core;
 		}
 
-		$config     = self::read_json_file( __DIR__ . '/experimental-default-theme.json' );
+		$config     = self::read_json_file( __DIR__ . '/theme.json' );
 		$config     = self::translate( $config );
-		self::$core = new WP_Theme_JSON_Gutenberg( $config );
+		self::$core = new WP_Theme_JSON_Gutenberg( $config, 'core' );
 
 		return self::$core;
 	}
@@ -273,10 +272,6 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 	public static function get_theme_data( $theme_support_data = array() ) {
 		if ( null === self::$theme ) {
 			$theme_json_data = self::read_json_file( self::get_file_path_from_theme( 'theme.json' ) );
-			// Fallback to experimental-theme.json.
-			if ( empty( $theme_json_data ) ) {
-				$theme_json_data = self::read_json_file( self::get_file_path_from_theme( 'experimental-theme.json' ) );
-			}
 			$theme_json_data = self::translate( $theme_json_data, wp_get_theme()->get( 'TextDomain' ) );
 			self::$theme     = new WP_Theme_JSON_Gutenberg( $theme_json_data );
 		}
@@ -367,8 +362,8 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 
 			$json_decoding_error = json_last_error();
 			if ( JSON_ERROR_NONE !== $json_decoding_error ) {
-				error_log( 'Error when decoding user schema: ' . json_last_error_msg() );
-				return new WP_Theme_JSON_Gutenberg( $config );
+				trigger_error( 'Error when decoding a theme.json schema for user data. ' . json_last_error_msg() );
+				return new WP_Theme_JSON_Gutenberg( $config, 'user' );
 			}
 
 			// Very important to verify if the flag isGlobalStylesUserThemeJSON is true.
@@ -382,7 +377,7 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 				$config = $decoded_data;
 			}
 		}
-		self::$user = new WP_Theme_JSON_Gutenberg( $config );
+		self::$user = new WP_Theme_JSON_Gutenberg( $config, 'user' );
 
 		return self::$user;
 	}
@@ -412,14 +407,14 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 	 * @return WP_Theme_JSON_Gutenberg
 	 */
 	public static function get_merged_data( $settings = array(), $origin = 'user' ) {
-		$theme_support_data = WP_Theme_JSON_Gutenberg::get_from_editor_settings( $settings );
-
 		$result = new WP_Theme_JSON_Gutenberg();
 		$result->merge( self::get_core_data() );
+
+		$theme_support_data = WP_Theme_JSON_Gutenberg::get_from_editor_settings( $settings );
 		$result->merge( self::get_theme_data( $theme_support_data ) );
 
 		if ( 'user' === $origin ) {
-			$result->merge( self::get_user_data(), 'update' );
+			$result->merge( self::get_user_data() );
 		}
 
 		return $result;
@@ -482,10 +477,6 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 	public static function theme_has_support() {
 		if ( ! isset( self::$theme_has_support ) ) {
 			self::$theme_has_support = (bool) self::get_file_path_from_theme( 'theme.json' );
-			if ( ! self::$theme_has_support ) {
-				// Fallback to experimental-theme.json.
-				self::$theme_has_support = (bool) self::get_file_path_from_theme( 'experimental-theme.json' );
-			}
 		}
 
 		return self::$theme_has_support;
@@ -502,16 +493,8 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 	 * @return string The whole file path or empty if the file doesn't exist.
 	 */
 	private static function get_file_path_from_theme( $file_name ) {
-		// This used to be a locate_template call.
-		// However, that method proved problematic
-		// due to its use of constants (STYLESHEETPATH)
-		// that threw errors in some scenarios.
-		//
-		// When the theme.json merge algorithm properly supports
-		// child themes, this should also fallback
-		// to the template path, as locate_template did.
 		$located   = '';
-		$candidate = get_stylesheet_directory() . '/' . $file_name;
+		$candidate = get_theme_file_path( $file_name );
 		if ( is_readable( $candidate ) ) {
 			$located = $candidate;
 		}
@@ -533,3 +516,4 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 }
 
 add_action( 'switch_theme', array( 'WP_Theme_JSON_Resolver_Gutenberg', 'clean_cached_data' ) );
+add_action( 'start_previewing_theme', array( 'WP_Theme_JSON_Resolver_Gutenberg', 'clean_cached_data' ) );

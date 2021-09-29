@@ -38,17 +38,18 @@ function App() {
 					<div className="playground__sidebar">
 						<BlockInspector />
 					</div>
-					<BlockTools>
-						<div className="editor-styles-wrapper">
-							<BlockEditorKeyboardShortcuts.Register />
-							<BlockEditorKeyboardShortcuts />
-							<WritingFlow>
-								<ObserveTyping>
-									<BlockList />
-								</ObserveTyping>
-							</WritingFlow>
-						</div>
-					</BlockTools>
+					<div className="playground__content">
+						<BlockTools>
+							<div className="editor-styles-wrapper">
+								<BlockEditorKeyboardShortcuts.Register />
+								<WritingFlow>
+									<ObserveTyping>
+										<BlockList />
+									</ObserveTyping>
+								</WritingFlow>
+							</div>
+						</BlockTools>
+					</div>
 					<Popover.Slot />
 				</BlockEditorProvider>
 			</SlotFillProvider>

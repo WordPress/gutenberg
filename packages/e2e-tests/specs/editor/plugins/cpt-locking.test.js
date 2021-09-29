@@ -123,12 +123,12 @@ describe( 'cpt locking', () => {
 			await page.click(
 				'.wp-block-column .block-editor-button-block-appender'
 			);
-			await page.type( '.block-editor-inserter__search-input', 'image' );
+			await page.type( '.block-editor-inserter__search input', 'image' );
 			await pressKeyTimes( 'Tab', 2 );
 			await page.keyboard.press( 'Enter' );
 			await page.click( '.edit-post-header-toolbar__inserter-toggle' );
 			await page.type(
-				'.block-editor-inserter__search-input',
+				'.block-editor-inserter__search input',
 				'gallery'
 			);
 			await pressKeyTimes( 'Tab', 2 );

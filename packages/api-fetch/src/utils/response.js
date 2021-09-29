@@ -66,7 +66,7 @@ export const parseResponseAndNormalizeError = (
  * Parses a response, throwing an error if parsing the response fails.
  *
  * @param {Response} response
- * @param {boolean} shouldParseResponse
+ * @param {boolean}  shouldParseResponse
  * @return {Promise<any>} Parsed response.
  */
 export function parseAndThrowError( response, shouldParseResponse = true ) {

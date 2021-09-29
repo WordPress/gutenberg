@@ -13,8 +13,8 @@
  * Returns a function which, when invoked, will return whether any handlers are
  * attached to a particular hook.
  *
- * @param  {import('.').Hooks}    hooks Hooks instance.
- * @param  {import('.').StoreKey} storeKey
+ * @param {import('.').Hooks}    hooks    Hooks instance.
+ * @param {import('.').StoreKey} storeKey
  *
  * @return {HasHook} Function that returns whether any handlers are
  *                   attached to a particular hook and optional namespace.

@@ -48,7 +48,7 @@ function NavigationPlaceholder( { onCreate }, ref ) {
 		const { innerBlocks: blocks } = menuItemsToBlocks( menuItems );
 		const selectNavigationBlock = true;
 		onCreate( blocks, selectNavigationBlock );
-	} );
+	}, [ menuItems, menuItemsToBlocks, onCreate ] );
 
 	const onCreateFromMenu = () => {
 		// If we have menu items, create the block right away.
@@ -81,7 +81,7 @@ function NavigationPlaceholder( { onCreate }, ref ) {
 	}, [ isCreatingFromMenu, hasResolvedMenuItems ] );
 
 	const toggleProps = {
-		isPrimary: true,
+		variant: 'primary',
 		className: 'wp-block-navigation-placeholder__actions__dropdown',
 	};
 	return (
@@ -132,14 +132,16 @@ function NavigationPlaceholder( { onCreate }, ref ) {
 						) : undefined }
 						{ hasPages ? (
 							<Button
-								isPrimary={ hasMenus ? false : true }
-								isTertiary={ hasMenus ? true : false }
+								variant={ hasMenus ? 'tertiary' : 'primary' }
 								onClick={ onCreateAllPages }
 							>
 								{ __( 'Add all pages' ) }
 							</Button>
 						) : undefined }
-						<Button isTertiary onClick={ onCreateEmptyMenu }>
+						<Button
+							variant="tertiary"
+							onClick={ onCreateEmptyMenu }
+						>
 							{ __( 'Start empty' ) }
 						</Button>
 					</div>

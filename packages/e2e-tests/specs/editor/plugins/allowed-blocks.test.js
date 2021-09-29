@@ -40,10 +40,14 @@ describe( 'Allowed Blocks Filter', () => {
 	} );
 
 	it( 'should remove not allowed blocks from the block manager', async () => {
-		await clickOnMoreMenuItem( 'Block Manager' );
+		await clickOnMoreMenuItem( 'Preferences' );
+		const [ blocksTab ] = await page.$x(
+			`//button[contains(text(), "Blocks")]`
+		);
+		await blocksTab.click();
 
 		const BLOCK_LABEL_SELECTOR =
-			'.edit-post-manage-blocks-modal__checklist-item .components-checkbox-control__label';
+			'.edit-post-block-manager__checklist-item .components-checkbox-control__label';
 		await page.waitForSelector( BLOCK_LABEL_SELECTOR );
 		const blocks = await page.evaluate( ( selector ) => {
 			return Array.from( document.querySelectorAll( selector ) )

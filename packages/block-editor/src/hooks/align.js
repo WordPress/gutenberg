@@ -81,8 +81,9 @@ export function getValidAlignments(
 /**
  * Filters registered block settings, extending attributes to include `align`.
  *
- * @param  {Object} settings Original block settings
- * @return {Object}          Filtered block settings
+ * @param {Object} settings Original block settings.
+ *
+ * @return {Object} Filtered block settings.
  */
 export function addAttribute( settings ) {
 	// allow blocks to specify their own attribute definition with default values if needed.
@@ -109,8 +110,9 @@ export function addAttribute( settings ) {
  * Override the default edit UI to include new toolbar controls for block
  * alignment, if block defines support.
  *
- * @param  {Function} BlockEdit Original component
- * @return {Function}           Wrapped component
+ * @param {Function} BlockEdit Original component.
+ *
+ * @return {Function} Wrapped component.
  */
 export const withToolbarControls = createHigherOrderComponent(
 	( BlockEdit ) => ( props ) => {
@@ -123,14 +125,11 @@ export const withToolbarControls = createHigherOrderComponent(
 			getBlockSupport( blockName, 'align' ),
 			hasBlockSupport( blockName, 'alignWide', true )
 		);
-		const validAlignments = useAvailableAlignments(
-			blockAllowedAlignments
-		);
 
 		const updateAlignment = ( nextAlign ) => {
 			if ( ! nextAlign ) {
 				const blockType = getBlockType( props.name );
-				const blockDefaultAlign = blockType.attributes?.align?.default;
+				const blockDefaultAlign = blockType?.attributes?.align?.default;
 				if ( blockDefaultAlign ) {
 					nextAlign = '';
 				}
@@ -138,18 +137,23 @@ export const withToolbarControls = createHigherOrderComponent(
 			props.setAttributes( { align: nextAlign } );
 		};
 
-		return [
-			validAlignments.length > 0 && props.isSelected && (
-				<BlockControls key="align-controls" group="block">
-					<BlockAlignmentControl
-						value={ props.attributes.align }
-						onChange={ updateAlignment }
-						controls={ validAlignments }
-					/>
-				</BlockControls>
-			),
-			<BlockEdit key="edit" { ...props } />,
-		];
+		return (
+			<>
+				{ blockAllowedAlignments.length > 0 && (
+					<BlockControls
+						group="block"
+						__experimentalShareWithChildBlocks
+					>
+						<BlockAlignmentControl
+							value={ props.attributes.align }
+							onChange={ updateAlignment }
+							controls={ blockAllowedAlignments }
+						/>
+					</BlockControls>
+				) }
+				<BlockEdit { ...props } />
+			</>
+		);
 	},
 	'withToolbarControls'
 );
@@ -157,8 +161,9 @@ export const withToolbarControls = createHigherOrderComponent(
 /**
  * Override the default block element to add alignment wrapper props.
  *
- * @param  {Function} BlockListBlock Original component
- * @return {Function}                Wrapped component
+ * @param {Function} BlockListBlock Original component.
+ *
+ * @return {Function} Wrapped component.
  */
 export const withDataAlign = createHigherOrderComponent(
 	( BlockListBlock ) => ( props ) => {
@@ -179,7 +184,9 @@ export const withDataAlign = createHigherOrderComponent(
 		}
 
 		let wrapperProps = props.wrapperProps;
-		if ( validAlignments.includes( align ) ) {
+		if (
+			validAlignments.some( ( alignment ) => alignment.name === align )
+		) {
 			wrapperProps = { ...wrapperProps, 'data-align': align };
 		}
 
@@ -191,10 +198,11 @@ export const withDataAlign = createHigherOrderComponent(
  * Override props assigned to save component to inject alignment class name if
  * block supports it.
  *
- * @param  {Object} props      Additional props applied to save element
- * @param  {Object} blockType  Block type
- * @param  {Object} attributes Block attributes
- * @return {Object}            Filtered props applied to save element
+ * @param {Object} props      Additional props applied to save element.
+ * @param {Object} blockType  Block type.
+ * @param {Object} attributes Block attributes.
+ *
+ * @return {Object} Filtered props applied to save element.
  */
 export function addAssignedAlign( props, blockType, attributes ) {
 	const { align } = attributes;

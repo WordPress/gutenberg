@@ -11,7 +11,7 @@ import { useDispatch, useSelect } from '@wordpress/data';
 import {
 	store as coreStore,
 	__experimentalFetchLinkSuggestions as fetchLinkSuggestions,
-	__experimentalFetchRemoteUrlData as fetchRemoteUrlData,
+	__experimentalFetchUrlData as fetchUrlData,
 } from '@wordpress/core-data';
 
 /**
@@ -36,7 +36,15 @@ function useBlockEditorSettings( settings, hasTemplate ) {
 	} = useSelect( ( select ) => {
 		const { canUserUseUnfilteredHTML } = select( editorStore );
 		const isWeb = Platform.OS === 'web';
-		const { canUser } = select( coreStore );
+		const { canUser, getUnstableBase, hasFinishedResolution } = select(
+			coreStore
+		);
+
+		const siteData = getUnstableBase();
+
+		const hasFinishedResolvingSiteData = hasFinishedResolution(
+			'getUnstableBase'
+		);
 
 		return {
 			canUseUnfilteredHTML: canUserUseUnfilteredHTML(),
@@ -51,6 +59,8 @@ function useBlockEditorSettings( settings, hasTemplate ) {
 				canUser( 'create', 'media' ),
 				true
 			),
+			hasResolvedLocalSiteData: hasFinishedResolvingSiteData,
+			baseUrl: siteData?.url || '',
 		};
 	}, [] );
 
@@ -67,6 +77,7 @@ function useBlockEditorSettings( settings, hasTemplate ) {
 				'__experimentalGlobalStylesUserEntityId',
 				'__experimentalPreferredStyleVariations',
 				'__experimentalSetIsInserterOpened',
+				'__unstableGalleryWithImageBlocks',
 				'alignWide',
 				'allowedBlockTypes',
 				'bodyPlaceholder',
@@ -102,8 +113,7 @@ function useBlockEditorSettings( settings, hasTemplate ) {
 			__experimentalReusableBlocks: reusableBlocks,
 			__experimentalFetchLinkSuggestions: ( search, searchOptions ) =>
 				fetchLinkSuggestions( search, searchOptions, settings ),
-			__experimentalFetchRemoteUrlData: ( url ) =>
-				fetchRemoteUrlData( url ),
+			__experimentalFetchRichUrlData: fetchUrlData,
 			__experimentalCanUserUseUnfilteredHTML: canUseUnfilteredHTML,
 			__experimentalUndo: undo,
 			outlineMode: hasTemplate,

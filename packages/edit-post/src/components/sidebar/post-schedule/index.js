@@ -27,7 +27,7 @@ export function PostSchedule() {
 								className="edit-post-post-schedule__toggle"
 								onClick={ onToggle }
 								aria-expanded={ isOpen }
-								isTertiary
+								variant="tertiary"
 							>
 								<PostScheduleLabel />
 							</Button>

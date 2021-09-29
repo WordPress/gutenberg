@@ -9,7 +9,7 @@ import { __ } from '@wordpress/i18n';
  */
 
 import { useSetting } from '../editor/utils';
-import ColorPalettePanel from './color-palette-panel';
+import Palette from './global-styles/palette';
 
 export function useHasColorPanel( { supports } ) {
 	return (
@@ -24,17 +24,37 @@ export default function ColorPanel( {
 	context: { supports, name },
 	getStyle,
 	setStyle,
-	getSetting,
-	setSetting,
 } ) {
-	const colors = useSetting( 'color.palette', name );
-	const disableCustomColors = ! useSetting( 'color.custom', name );
+	const solids = useSetting( 'color.palette', name );
 	const gradients = useSetting( 'color.gradients', name );
-	const disableCustomGradients = ! useSetting( 'color.customGradient', name );
+	const areCustomSolidsEnabled = useSetting( 'color.custom', name );
+	const areCustomGradientsEnabled = useSetting(
+		'color.customGradient',
+		name
+	);
+	const isLinkEnabled = useSetting( 'color.link', name );
+	const isTextEnabled = useSetting( 'color.text', name );
+	const isBackgroundEnabled = useSetting( 'color.background', name );
+
+	const hasLinkColor =
+		supports.includes( 'linkColor' ) &&
+		isLinkEnabled &&
+		( solids.length > 0 || areCustomSolidsEnabled );
+	const hasTextColor =
+		supports.includes( 'color' ) &&
+		isTextEnabled &&
+		( solids.length > 0 || areCustomSolidsEnabled );
+	const hasBackgroundColor =
+		supports.includes( 'backgroundColor' ) &&
+		isBackgroundEnabled &&
+		( solids.length > 0 || areCustomSolidsEnabled );
+	const hasGradientColor =
+		supports.includes( 'background' ) &&
+		( gradients.length > 0 || areCustomGradientsEnabled );
 
 	const settings = [];
 
-	if ( supports.includes( 'color' ) ) {
+	if ( hasTextColor ) {
 		const color = getStyle( name, 'color' );
 		const userColor = getStyle( name, 'color', 'user' );
 		settings.push( {
@@ -46,7 +66,7 @@ export default function ColorPanel( {
 	}
 
 	let backgroundSettings = {};
-	if ( supports.includes( 'backgroundColor' ) ) {
+	if ( hasBackgroundColor ) {
 		const backgroundColor = getStyle( name, 'backgroundColor' );
 		const userBackgroundColor = getStyle( name, 'backgroundColor', 'user' );
 		backgroundSettings = {
@@ -61,7 +81,7 @@ export default function ColorPanel( {
 	}
 
 	let gradientSettings = {};
-	if ( supports.includes( 'background' ) ) {
+	if ( hasGradientColor ) {
 		const gradient = getStyle( name, 'background' );
 		const userGradient = getStyle( name, 'background', 'user' );
 		gradientSettings = {
@@ -74,10 +94,7 @@ export default function ColorPanel( {
 		}
 	}
 
-	if (
-		supports.includes( 'background' ) ||
-		supports.includes( 'backgroundColor' )
-	) {
+	if ( hasBackgroundColor || hasGradientColor ) {
 		settings.push( {
 			...backgroundSettings,
 			...gradientSettings,
@@ -85,7 +102,7 @@ export default function ColorPanel( {
 		} );
 	}
 
-	if ( supports.includes( 'linkColor' ) ) {
+	if ( hasLinkColor ) {
 		const color = getStyle( name, 'linkColor' );
 		const userColor = getStyle( name, 'linkColor', 'user' );
 		settings.push( {
@@ -95,21 +112,19 @@ export default function ColorPanel( {
 			clearable: color === userColor,
 		} );
 	}
+
 	return (
-		<PanelColorGradientSettings
-			title={ __( 'Color' ) }
-			settings={ settings }
-			colors={ colors }
-			gradients={ gradients }
-			disableCustomColors={ disableCustomColors }
-			disableCustomGradients={ disableCustomGradients }
-		>
-			<ColorPalettePanel
-				key={ 'color-palette-panel-' + name }
-				contextName={ name }
-				getSetting={ getSetting }
-				setSetting={ setSetting }
+		<>
+			<Palette contextName={ name } />
+			<PanelColorGradientSettings
+				title={ __( 'Color' ) }
+				settings={ settings }
+				colors={ solids }
+				gradients={ gradients }
+				disableCustomColors={ ! areCustomSolidsEnabled }
+				disableCustomGradients={ ! areCustomGradientsEnabled }
+				showTitle={ false }
 			/>
-		</PanelColorGradientSettings>
+		</>
 	);
 }

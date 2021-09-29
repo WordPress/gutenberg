@@ -125,7 +125,7 @@ function RichTextWrapper(
 			getSelectionEnd,
 			getSettings,
 			didAutomaticChange,
-			__unstableGetBlockWithoutInnerBlocks,
+			getBlock,
 			isMultiSelecting,
 			hasMultiSelection,
 		} = select( blockEditorStore );
@@ -149,8 +149,7 @@ function RichTextWrapper(
 			// If the block of this RichText is unmodified then it's a candidate for replacing when adding a new block.
 			// In order to fix https://github.com/wordpress-mobile/gutenberg-mobile/issues/1126, let's blur on unmount in that case.
 			// This apparently assumes functionality the BlockHlder actually
-			const block =
-				clientId && __unstableGetBlockWithoutInnerBlocks( clientId );
+			const block = clientId && getBlock( clientId );
 			const shouldBlurOnUnmount =
 				block && isSelected && isUnmodifiedDefaultBlock( block );
 			extraProps = {
@@ -241,8 +240,8 @@ function RichTextWrapper(
 	 * blocks as a result of splitting the block by pasting block content in the
 	 * instance.
 	 *
-	 * @param  {Object} record       The rich text value to split.
-	 * @param  {Array}  pastedBlocks The pasted blocks to insert, if any.
+	 * @param {Object} record       The rich text value to split.
+	 * @param {Array}  pastedBlocks The pasted blocks to insert, if any.
 	 */
 	const splitValue = useCallback(
 		( record, pastedBlocks = [] ) => {

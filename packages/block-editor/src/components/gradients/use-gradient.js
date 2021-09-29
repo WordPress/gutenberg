@@ -28,8 +28,8 @@ export function __experimentalGetGradientClass( gradientSlug ) {
 /**
  * Retrieves the gradient value per slug.
  *
- * @param {Array} gradients Gradient Palette
- * @param {string} slug Gradient slug
+ * @param {Array}  gradients Gradient Palette
+ * @param {string} slug      Gradient slug
  *
  * @return {string} Gradient value.
  */
@@ -49,8 +49,8 @@ export function __experimentalGetGradientObjectByGradientValue(
 /**
  * Retrieves the gradient slug per slug.
  *
- * @param {Array} gradients Gradient Palette
- * @param {string} value Gradient value
+ * @param {Array}  gradients Gradient Palette
+ * @param {string} value     Gradient value
  * @return {string} Gradient slug.
  */
 export function getGradientSlugByValue( gradients, value ) {

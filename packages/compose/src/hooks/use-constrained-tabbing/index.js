@@ -9,7 +9,7 @@ import { useCallback } from '@wordpress/element';
  * In Dialogs/modals, the tabbing must be constrained to the content of
  * the wrapper element. This hook adds the behavior to the returned ref.
  *
- * @return {Object|Function} Element Ref.
+ * @return {import('react').RefCallback<Element>} Element Ref.
  *
  * @example
  * ```js

@@ -72,4 +72,8 @@ export type Props = {
 	 * Adjusts the CSS grid `template-rows`.
 	 */
 	templateRows?: CSSProperties[ 'gridTemplateRows' ];
+	/**
+	 * The children elements.
+	 */
+	children: React.ReactNode;
 };

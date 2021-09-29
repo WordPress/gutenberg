@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import classnames from 'classnames';
+
+/**
  * WordPress dependencies
  */
 import { useSelect, useDispatch } from '@wordpress/data';
@@ -6,10 +11,8 @@ import { useCallback, useRef } from '@wordpress/element';
 import { useEntityBlockEditor } from '@wordpress/core-data';
 import {
 	BlockEditorProvider,
-	BlockEditorKeyboardShortcuts,
 	__experimentalLinkControl,
 	BlockInspector,
-	WritingFlow,
 	BlockList,
 	BlockTools,
 	__unstableBlockSettingsMenuFirstItem,
@@ -29,6 +32,14 @@ import NavigateToLink from '../navigate-to-link';
 import { SidebarInspectorFill } from '../sidebar';
 import { store as editSiteStore } from '../../store';
 import BlockInspectorButton from './block-inspector-button';
+import EditTemplatePartMenuButton from '../edit-template-part-menu-button';
+import BackButton from './back-button';
+
+const LAYOUT = {
+	type: 'default',
+	// At the root level of the site editor, no alignments should be allowed.
+	alignments: [],
+};
 
 export default function BlockEditor( { setIsInserterOpen } ) {
 	const { settings, templateType, page, deviceType } = useSelect(
@@ -39,6 +50,7 @@ export default function BlockEditor( { setIsInserterOpen } ) {
 				getPage,
 				__experimentalGetPreviewDeviceType,
 			} = select( editSiteStore );
+
 			return {
 				settings: getSettings( setIsInserterOpen ),
 				templateType: getEditedPostType(),
@@ -58,6 +70,8 @@ export default function BlockEditor( { setIsInserterOpen } ) {
 	const contentRef = useRef();
 	const mergedRefs = useMergeRefs( [ contentRef, useTypingObserver() ] );
 
+	const isTemplatePart = templateType === 'wp_template_part';
+
 	return (
 		<BlockEditorProvider
 			settings={ settings }
@@ -66,7 +80,7 @@ export default function BlockEditor( { setIsInserterOpen } ) {
 			onChange={ onChange }
 			useSubRegistry={ false }
 		>
-			<BlockEditorKeyboardShortcuts />
+			<EditTemplatePartMenuButton />
 			<TemplatePartConverter />
 			<__experimentalLinkControl.ViewerFill>
 				{ useCallback(
@@ -83,32 +97,32 @@ export default function BlockEditor( { setIsInserterOpen } ) {
 			<SidebarInspectorFill>
 				<BlockInspector />
 			</SidebarInspectorFill>
-			<div className="edit-site-visual-editor">
-				<BlockTools __unstableContentRef={ contentRef }>
-					<Iframe
-						style={ resizedCanvasStyles }
-						head={ <EditorStyles styles={ settings.styles } /> }
-						ref={ ref }
-						contentRef={ mergedRefs }
-					>
-						<WritingFlow>
-							<BlockList
-								className="edit-site-block-editor__block-list"
-								__experimentalLayout={ {
-									type: 'default',
-									// At the root level of the site editor, no alignments should be allowed.
-									alignments: [],
-								} }
-							/>
-						</WritingFlow>
-					</Iframe>
-				</BlockTools>
+			<BlockTools
+				className={ classnames( 'edit-site-visual-editor', {
+					'is-focus-mode': isTemplatePart,
+				} ) }
+				__unstableContentRef={ contentRef }
+			>
+				<BackButton />
+				<Iframe
+					style={ resizedCanvasStyles }
+					head={ <EditorStyles styles={ settings.styles } /> }
+					ref={ ref }
+					contentRef={ mergedRefs }
+					name="editor-canvas"
+					className="edit-site-visual-editor__editor-canvas"
+				>
+					<BlockList
+						className="edit-site-block-editor__block-list wp-site-blocks"
+						__experimentalLayout={ LAYOUT }
+					/>
+				</Iframe>
 				<__unstableBlockSettingsMenuFirstItem>
 					{ ( { onClose } ) => (
 						<BlockInspectorButton onClick={ onClose } />
 					) }
 				</__unstableBlockSettingsMenuFirstItem>
-			</div>
+			</BlockTools>
 		</BlockEditorProvider>
 	);
 }

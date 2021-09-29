@@ -12,14 +12,15 @@ import {
 	UnsavedChangesWarning,
 	EditorNotices,
 	EditorKeyboardShortcutsRegister,
+	EditorSnackbars,
 	store as editorStore,
 } from '@wordpress/editor';
-import { AsyncModeProvider, useSelect, useDispatch } from '@wordpress/data';
+import { useSelect, useDispatch } from '@wordpress/data';
 import { BlockBreadcrumb } from '@wordpress/block-editor';
 import { Button, ScrollLock, Popover } from '@wordpress/components';
 import { useViewportMatch } from '@wordpress/compose';
 import { PluginArea } from '@wordpress/plugins';
-import { __ } from '@wordpress/i18n';
+import { __, _x } from '@wordpress/i18n';
 import {
 	ComplementaryArea,
 	FullscreenMode,
@@ -36,7 +37,6 @@ import TextEditor from '../text-editor';
 import VisualEditor from '../visual-editor';
 import EditPostKeyboardShortcuts from '../keyboard-shortcuts';
 import KeyboardShortcutHelpModal from '../keyboard-shortcut-help-modal';
-import ManageBlocksModal from '../manage-blocks-modal';
 import PreferencesModal from '../preferences-modal';
 import BrowserURL from '../browser-url';
 import Header from '../header';
@@ -85,9 +85,15 @@ function Layout( { styles } ) {
 		showIconLabels,
 		hasReducedUI,
 		showBlockBreadcrumbs,
+		isTemplateMode,
+		documentLabel,
 	} = useSelect( ( select ) => {
-		const editorSettings = select( editorStore ).getEditorSettings();
+		const { getEditorSettings, getPostTypeLabel } = select( editorStore );
+		const editorSettings = getEditorSettings();
+		const postTypeLabel = getPostTypeLabel();
+
 		return {
+			isTemplateMode: select( editPostStore ).isEditingTemplate(),
 			hasFixedToolbar: select( editPostStore ).isFeatureActive(
 				'fixedToolbar'
 			),
@@ -106,12 +112,10 @@ function Layout( { styles } ) {
 			hasActiveMetaboxes: select( editPostStore ).hasMetaBoxes(),
 			previousShortcut: select(
 				keyboardShortcutsStore
-			).getAllShortcutRawKeyCombinations(
-				'core/edit-post/previous-region'
-			),
+			).getAllShortcutKeyCombinations( 'core/edit-post/previous-region' ),
 			nextShortcut: select(
 				keyboardShortcutsStore
-			).getAllShortcutRawKeyCombinations( 'core/edit-post/next-region' ),
+			).getAllShortcutKeyCombinations( 'core/edit-post/next-region' ),
 			showIconLabels: select( editPostStore ).isFeatureActive(
 				'showIconLabels'
 			),
@@ -121,6 +125,8 @@ function Layout( { styles } ) {
 			showBlockBreadcrumbs: select( editPostStore ).isFeatureActive(
 				'showBlockBreadcrumbs'
 			),
+			// translators: Default label for the Document in the Block Breadcrumb.
+			documentLabel: postTypeLabel || _x( 'Document', 'noun' ),
 		};
 	}, [] );
 	const className = classnames( 'edit-post-layout', 'is-mode-' + mode, {
@@ -167,11 +173,7 @@ function Layout( { styles } ) {
 			return <InserterSidebar />;
 		}
 		if ( mode === 'visual' && isListViewOpened ) {
-			return (
-				<AsyncModeProvider value="true">
-					<ListViewSidebar />
-				</AsyncModeProvider>
-			);
+			return <ListViewSidebar />;
 		}
 		return null;
 	};
@@ -203,7 +205,7 @@ function Layout( { styles } ) {
 							{ ! isMobileViewport && ! sidebarIsOpened && (
 								<div className="edit-post-layout__toggle-sidebar-panel">
 									<Button
-										isSecondary
+										variant="secondary"
 										className="edit-post-layout__toggle-sidebar-panel-button"
 										onClick={ openSidebarPanel }
 										aria-expanded={ false }
@@ -218,6 +220,7 @@ function Layout( { styles } ) {
 						</>
 					)
 				}
+				notices={ <EditorSnackbars /> }
 				content={
 					<>
 						<EditorNotices />
@@ -227,10 +230,12 @@ function Layout( { styles } ) {
 						{ isRichEditingEnabled && mode === 'visual' && (
 							<VisualEditor styles={ styles } />
 						) }
-						<div className="edit-post-layout__metaboxes">
-							<MetaBoxes location="normal" />
-							<MetaBoxes location="advanced" />
-						</div>
+						{ ! isTemplateMode && (
+							<div className="edit-post-layout__metaboxes">
+								<MetaBoxes location="normal" />
+								<MetaBoxes location="advanced" />
+							</div>
+						) }
 						{ isMobileViewport && sidebarIsOpened && (
 							<ScrollLock />
 						) }
@@ -243,7 +248,7 @@ function Layout( { styles } ) {
 					isRichEditingEnabled &&
 					mode === 'visual' && (
 						<div className="edit-post-layout__footer">
-							<BlockBreadcrumb />
+							<BlockBreadcrumb rootLabelText={ documentLabel } />
 						</div>
 					)
 				}
@@ -263,7 +268,6 @@ function Layout( { styles } ) {
 					next: nextShortcut,
 				} }
 			/>
-			<ManageBlocksModal />
 			<PreferencesModal />
 			<KeyboardShortcutHelpModal />
 			<WelcomeGuide />

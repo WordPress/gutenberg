@@ -2,18 +2,33 @@
 	"apiVersion": 2,
 	"name": "core/post-featured-image",
 	"title": "Post Featured Image",
-	"category": "design",
+	"category": "theme",
 	"description": "Display a post's featured image.",
 	"textdomain": "default",
 	"attributes": {
 		"isLink": {
 			"type": "boolean",
 			"default": false
+		},
+		"width": {
+			"type": "string"
+		},
+		"height": {
+			"type": "string"
+		},
+		"scale": {
+			"type": "string",
+			"default": "cover"
 		}
 	},
-	"usesContext": [ "postId", "postType" ],
+	"usesContext": [ "postId", "postType", "queryId" ],
 	"supports": {
 		"align": [ "left", "right", "center", "wide", "full" ],
+		"color": {
+			"__experimentalDuotone": "img",
+			"text": false,
+			"background": false
+		},
 		"html": false
 	},
 	"editorStyle": "wp-block-post-featured-image-editor",

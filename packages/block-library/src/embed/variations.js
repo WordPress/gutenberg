@@ -206,14 +206,6 @@ const variations = [
 		attributes: { providerNameSlug: 'kickstarter', responsive: true },
 	},
 	{
-		name: 'meetup-com',
-		title: 'Meetup.com',
-		icon: embedContentIcon,
-		description: __( 'Embed Meetup.com content.' ),
-		patterns: [ /^https?:\/\/(www\.)?meetu(\.ps|p\.com)\/.+/i ],
-		attributes: { providerNameSlug: 'meetup-com', responsive: true },
-	},
-	{
 		name: 'mixcloud',
 		title: 'Mixcloud',
 		icon: embedAudioIcon,

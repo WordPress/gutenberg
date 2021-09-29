@@ -277,39 +277,47 @@ class REST_Nav_Menu_Items_Controller_Test extends WP_Test_REST_Post_Type_Control
 	public function test_create_item_change_position() {
 		wp_set_current_user( self::$admin_id );
 		$new_menu_id = wp_create_nav_menu( rand_str() );
+		$expected    = array();
+		$actual      = array();
 		for ( $i = 1; $i < 5; $i ++ ) {
 			$request = new WP_REST_Request( 'POST', '/__experimental/menu-items' );
 			$request->add_header( 'content-type', 'application/x-www-form-urlencoded' );
 			$params = $this->set_menu_item_data(
 				array(
-					'menus' => $new_menu_id,
+					'menu_order' => $i,
+					'menus'      => $new_menu_id,
 				)
 			);
 			$request->set_body_params( $params );
 			$response = rest_get_server()->dispatch( $request );
 			$this->check_create_menu_item_response( $response );
 			$data = $response->get_data();
-			$this->assertEquals( $data['menu_order'], $i );
+
+			$expected[] = $i;
+			$actual[]   = $data['menu_order'];
 		}
+		$this->assertEquals( $actual, $expected );
 	}
 
 	/**
 	 *
 	 */
-	public function test_create_item_invalid_position() {
+	public function test_menu_order_must_be_set() {
 		wp_set_current_user( self::$admin_id );
 		$new_menu_id = wp_create_nav_menu( rand_str() );
-		$request     = new WP_REST_Request( 'POST', '/__experimental/menu-items' );
+
+		$request = new WP_REST_Request( 'POST', '/__experimental/menu-items' );
 		$request->add_header( 'content-type', 'application/x-www-form-urlencoded' );
 		$params = $this->set_menu_item_data(
 			array(
-				'menu_order' => 1,
+				'menu_order' => 0,
 				'menus'      => $new_menu_id,
 			)
 		);
 		$request->set_body_params( $params );
 		$response = rest_get_server()->dispatch( $request );
-		$this->check_create_menu_item_response( $response );
+		$this->assertErrorResponse( 'rest_invalid_param', $response, 400 );
+
 		$request = new WP_REST_Request( 'POST', '/__experimental/menu-items' );
 		$request->add_header( 'content-type', 'application/x-www-form-urlencoded' );
 		$params = $this->set_menu_item_data(
@@ -320,8 +328,7 @@ class REST_Nav_Menu_Items_Controller_Test extends WP_Test_REST_Post_Type_Control
 		);
 		$request->set_body_params( $params );
 		$response = rest_get_server()->dispatch( $request );
-
-		$this->assertErrorResponse( 'invalid_menu_order', $response, 400 );
+		$this->assertEquals( 201, $response->get_status() );
 	}
 
 	/**
@@ -378,43 +385,6 @@ class REST_Nav_Menu_Items_Controller_Test extends WP_Test_REST_Post_Type_Control
 		$request->set_body_params( $params );
 		$response = rest_get_server()->dispatch( $request );
 		$this->assertErrorResponse( 'rest_invalid_param', $response, 400 );
-	}
-
-	/**
-	 *
-	 */
-	public function test_create_item_invalid_parent_menu_item() {
-		wp_set_current_user( self::$admin_id );
-		$new_menu_id = wp_create_nav_menu( rand_str() );
-		$request     = new WP_REST_Request( 'POST', '/__experimental/menu-items' );
-		$request->add_header( 'content-type', 'application/x-www-form-urlencoded' );
-		$params = $this->set_menu_item_data(
-			array(
-				'menus'  => $new_menu_id,
-				'parent' => $this->menu_item_id,
-			)
-		);
-		$request->set_body_params( $params );
-		$response = rest_get_server()->dispatch( $request );
-		$this->assertErrorResponse( 'invalid_item_parent', $response, 400 );
-	}
-
-	/**
-	 *
-	 */
-	public function test_create_item_invalid_parent_post() {
-		wp_set_current_user( self::$admin_id );
-		$post_id = self::factory()->post->create();
-		$request = new WP_REST_Request( 'POST', '/__experimental/menu-items' );
-		$request->add_header( 'content-type', 'application/x-www-form-urlencoded' );
-		$params = $this->set_menu_item_data(
-			array(
-				'parent' => $post_id,
-			)
-		);
-		$request->set_body_params( $params );
-		$response = rest_get_server()->dispatch( $request );
-		$this->assertErrorResponse( 'invalid_menu_item_parent', $response, 400 );
 	}
 
 	/**
@@ -577,6 +547,42 @@ class REST_Nav_Menu_Items_Controller_Test extends WP_Test_REST_Post_Type_Control
 	/**
 	 *
 	 */
+	public function test_update_item_preserves_type() {
+		wp_set_current_user( self::$admin_id );
+
+		$request = new WP_REST_Request( 'PUT', sprintf( '/__experimental/menu-items/%d', $this->menu_item_id ) );
+		$request->add_header( 'content-type', 'application/x-www-form-urlencoded' );
+		$params = array(
+			'status'  => 'draft',
+			'type'    => 'block',
+			'title'   => 'TEST',
+			'content' => '<!-- wp:paragraph --><p>Block content</p><!-- /wp:paragraph -->',
+		);
+		$request->set_body_params( $params );
+		$response = rest_get_server()->dispatch( $request );
+		$this->check_update_menu_item_response( $response );
+		$new_data = $response->get_data();
+		$this->assertEquals( 'block', $new_data['type'] );
+
+		$request = new WP_REST_Request( 'PUT', sprintf( '/__experimental/menu-items/%d', $this->menu_item_id ) );
+		$request->add_header( 'content-type', 'application/x-www-form-urlencoded' );
+		$params = array(
+			'status'  => 'draft',
+			'title'   => 'TEST2',
+			'content' => '<!-- wp:paragraph --><p>Block content</p><!-- /wp:paragraph -->',
+		);
+		$request->set_body_params( $params );
+		$response = rest_get_server()->dispatch( $request );
+		$this->check_update_menu_item_response( $response );
+		$new_data = $response->get_data();
+
+		// The type shouldn't change just because it was missing from request args.
+		$this->assertEquals( 'block', $new_data['type'] );
+	}
+
+	/**
+	 *
+	 */
 	public function test_update_item_clean_xfn() {
 		wp_set_current_user( self::$admin_id );
 
@@ -684,7 +690,7 @@ class REST_Nav_Menu_Items_Controller_Test extends WP_Test_REST_Post_Type_Control
 		$this->assertArrayHasKey( 'title', $properties );
 		$this->assertArrayHasKey( 'type', $properties );
 		$this->assertArrayHasKey( 'xfn', $properties );
-		$this->assertArrayHasKey( '_invalid', $properties );
+		$this->assertArrayHasKey( 'invalid', $properties );
 	}
 
 	/**
@@ -822,6 +828,8 @@ class REST_Nav_Menu_Items_Controller_Test extends WP_Test_REST_Post_Type_Control
 			$this->assertEmpty( $data['parent'] );
 		}
 
+		$this->assertFalse( $data['invalid'] );
+
 		// page attributes.
 		$this->assertEquals( $post->menu_order, $data['menu_order'] );
 
@@ -830,8 +838,13 @@ class REST_Nav_Menu_Items_Controller_Test extends WP_Test_REST_Post_Type_Control
 			$this->assertTrue( isset( $data[ $taxonomy->rest_base ] ) );
 			$terms = wp_get_object_terms( $post->ID, $taxonomy->name, array( 'fields' => 'ids' ) );
 			sort( $terms );
-			sort( $data[ $taxonomy->rest_base ] );
-			$this->assertEquals( $terms, $data[ $taxonomy->rest_base ] );
+			if ( 'nav_menu' === $taxonomy->name ) {
+				$term_id = $terms ? array_shift( $terms ) : 0;
+				$this->assertEquals( $term_id, $data[ $taxonomy->rest_base ] );
+			} else {
+				sort( $data[ $taxonomy->rest_base ] );
+				$this->assertEquals( $terms, $data[ $taxonomy->rest_base ] );
+			}
 		}
 
 		// test links.
@@ -908,7 +921,7 @@ class REST_Nav_Menu_Items_Controller_Test extends WP_Test_REST_Post_Type_Control
 		$defaults = array(
 			'object_id'   => 0,
 			'parent'      => 0,
-			'menu_order'  => 0,
+			'menu_order'  => 1,
 			'menus'       => $this->menu_id,
 			'type'        => 'custom',
 			'title'       => 'Custom Link Title',

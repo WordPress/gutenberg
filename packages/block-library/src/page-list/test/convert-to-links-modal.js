@@ -149,7 +149,7 @@ describe( 'page list convert to links', () => {
 							name: 'core/navigation-link',
 						},
 					],
-					name: 'core/navigation-link',
+					name: 'core/navigation-submenu',
 				},
 				{
 					attributes: {
@@ -193,10 +193,10 @@ describe( 'page list convert to links', () => {
 									name: 'core/navigation-link',
 								},
 							],
-							name: 'core/navigation-link',
+							name: 'core/navigation-submenu',
 						},
 					],
-					name: 'core/navigation-link',
+					name: 'core/navigation-submenu',
 				},
 			] );
 		} );
@@ -344,7 +344,7 @@ describe( 'page list convert to links', () => {
 							name: 'core/navigation-link',
 						},
 					],
-					name: 'core/navigation-link',
+					name: 'core/navigation-submenu',
 				},
 				{
 					attributes: {
@@ -388,10 +388,10 @@ describe( 'page list convert to links', () => {
 									name: 'core/navigation-link',
 								},
 							],
-							name: 'core/navigation-link',
+							name: 'core/navigation-submenu',
 						},
 					],
-					name: 'core/navigation-link',
+					name: 'core/navigation-submenu',
 				},
 			] );
 		} );

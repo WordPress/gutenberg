@@ -4,12 +4,13 @@ import android.os.Bundle
 
 data class GutenbergProps @JvmOverloads constructor(
     val enableContactInfoBlock: Boolean,
+    val enableLayoutGridBlock: Boolean,
     val enableMediaFilesCollectionBlocks: Boolean,
     val enableMentions: Boolean,
     val enableXPosts: Boolean,
     val enableUnsupportedBlockEditor: Boolean,
     val canEnableUnsupportedBlockEditor: Boolean,
-    val enableAudioBlock: Boolean,
+    val isAudioBlockMediaUploadEnabled: Boolean,
     val enableReusableBlock: Boolean,
     val localeSlug: String,
     val postType: String,
@@ -18,7 +19,8 @@ data class GutenbergProps @JvmOverloads constructor(
     val translations: Bundle,
     val isDarkMode: Boolean,
     val htmlModeEnabled: Boolean,
-    val canViewEditorOnboarding: Boolean
+    val enableEditorOnboarding: Boolean,
+    var firstGutenbergEditorSession: Boolean
 ) {
 
     fun getInitialProps(bundle: Bundle?) = (bundle ?: Bundle()).apply {
@@ -35,6 +37,14 @@ data class GutenbergProps @JvmOverloads constructor(
         editorTheme?.also { theme ->
             theme.getSerializable(PROP_COLORS)?.let { putSerializable(PROP_COLORS, it) }
             theme.getSerializable(PROP_GRADIENTS)?.let { putSerializable(PROP_GRADIENTS, it) }
+            theme.getSerializable(PROP_STYLES)
+                    ?.let { putSerializable(PROP_STYLES, it) }
+            theme.getSerializable(PROP_FEATURES)
+                    ?.let { putSerializable(PROP_FEATURES, it) }
+            theme.getSerializable(PROP_IS_FSE_THEME)
+                    ?.let { putSerializable(PROP_IS_FSE_THEME, it) }
+            theme.getSerializable(PROP_GALLERY_WITH_IMAGE_BLOCKS)
+                    ?.let { putSerializable(PROP_GALLERY_WITH_IMAGE_BLOCKS, it) }
         }
     }
 
@@ -42,12 +52,14 @@ data class GutenbergProps @JvmOverloads constructor(
         putBoolean(PROP_CAPABILITIES_MENTIONS, enableMentions)
         putBoolean(PROP_CAPABILITIES_XPOSTS, enableXPosts)
         putBoolean(PROP_CAPABILITIES_CONTACT_INFO_BLOCK, enableContactInfoBlock)
+        putBoolean(PROP_CAPABILITIES_LAYOUT_GRID_BLOCK, enableLayoutGridBlock)
         putBoolean(PROP_CAPABILITIES_MEDIAFILES_COLLECTION_BLOCK, enableMediaFilesCollectionBlocks)
         putBoolean(PROP_CAPABILITIES_UNSUPPORTED_BLOCK_EDITOR, enableUnsupportedBlockEditor)
         putBoolean(PROP_CAPABILITIES_CAN_ENABLE_UNSUPPORTED_BLOCK_EDITOR, canEnableUnsupportedBlockEditor)
-        putBoolean(PROP_CAPABILITIES_AUDIO_BLOCK, enableAudioBlock)
+        putBoolean(PROP_CAPABILITIES_IS_AUDIO_BLOCK_MEDIA_UPLOAD_ENABLED, isAudioBlockMediaUploadEnabled)
         putBoolean(PROP_CAPABILITIES_REUSABLE_BLOCK, enableReusableBlock)
-        putBoolean(PROP_CAPABILITIES_CAN_VIEW_EDITOR_ONBOARDING, canViewEditorOnboarding)
+        putBoolean(PROP_CAPABILITIES_EDITOR_ONBOARDING, enableEditorOnboarding)
+        putBoolean(PROP_CAPABILITIES_FIRST_GUTENBERG_SESSION, firstGutenbergEditorSession)
     }
 
     companion object {
@@ -67,16 +79,22 @@ data class GutenbergProps @JvmOverloads constructor(
         private const val PROP_TRANSLATIONS = "translations"
         private const val PROP_COLORS = "colors"
         private const val PROP_GRADIENTS = "gradients"
+        private const val PROP_STYLES = "rawStyles"
+        private const val PROP_FEATURES = "rawFeatures"
+        private const val PROP_IS_FSE_THEME = "isFSETheme"
+        private const val PROP_GALLERY_WITH_IMAGE_BLOCKS = "galleryWithImageBlocks"
 
         const val PROP_CAPABILITIES = "capabilities"
         const val PROP_CAPABILITIES_CONTACT_INFO_BLOCK = "contactInfoBlock"
+        const val PROP_CAPABILITIES_LAYOUT_GRID_BLOCK = "layoutGridBlock"
         const val PROP_CAPABILITIES_MEDIAFILES_COLLECTION_BLOCK = "mediaFilesCollectionBlock"
         const val PROP_CAPABILITIES_MENTIONS = "mentions"
         const val PROP_CAPABILITIES_XPOSTS = "xposts"
         const val PROP_CAPABILITIES_UNSUPPORTED_BLOCK_EDITOR = "unsupportedBlockEditor"
         const val PROP_CAPABILITIES_CAN_ENABLE_UNSUPPORTED_BLOCK_EDITOR = "canEnableUnsupportedBlockEditor"
-        const val PROP_CAPABILITIES_AUDIO_BLOCK = "audioBlock"
+        const val PROP_CAPABILITIES_IS_AUDIO_BLOCK_MEDIA_UPLOAD_ENABLED = "isAudioBlockMediaUploadEnabled"
         const val PROP_CAPABILITIES_REUSABLE_BLOCK = "reusableBlock"
-        const val PROP_CAPABILITIES_CAN_VIEW_EDITOR_ONBOARDING = "canViewEditorOnboarding"
+        const val PROP_CAPABILITIES_EDITOR_ONBOARDING = "editorOnboarding"
+        const val PROP_CAPABILITIES_FIRST_GUTENBERG_SESSION = "firstGutenbergEditorSession"
     }
 }

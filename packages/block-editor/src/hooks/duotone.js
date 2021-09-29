@@ -2,7 +2,8 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import tinycolor from 'tinycolor2';
+import { colord, extend } from 'colord';
+import namesPlugin from 'colord/plugins/names';
 
 /**
  * WordPress dependencies
@@ -11,6 +12,7 @@ import { getBlockSupport, hasBlockSupport } from '@wordpress/blocks';
 import { SVG } from '@wordpress/components';
 import { createHigherOrderComponent, useInstanceId } from '@wordpress/compose';
 import { addFilter } from '@wordpress/hooks';
+import { useContext, createPortal } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -20,6 +22,11 @@ import {
 	__experimentalDuotoneControl as DuotoneControl,
 	useSetting,
 } from '../components';
+import BlockList from '../components/block-list';
+
+const EMPTY_ARRAY = [];
+
+extend( [ namesPlugin ] );
 
 /**
  * Convert a list of colors to an object of R, G, and B values.
@@ -32,11 +39,10 @@ export function getValuesFromColors( colors = [] ) {
 	const values = { r: [], g: [], b: [] };
 
 	colors.forEach( ( color ) => {
-		// Access values directly to skip extra rounding that tinycolor.toRgb() does.
-		const tcolor = tinycolor( color );
-		values.r.push( tcolor._r / 255 );
-		values.g.push( tcolor._g / 255 );
-		values.b.push( tcolor._b / 255 );
+		const rgbColor = colord( color ).toRgb();
+		values.r.push( rgbColor.r / 255 );
+		values.g.push( rgbColor.g / 255 );
+		values.b.push( rgbColor.b / 255 );
 	} );
 
 	return values;
@@ -54,11 +60,12 @@ export function getValuesFromColors( colors = [] ) {
 /**
  * SVG and stylesheet needed for rendering the duotone filter.
  *
- * @param  {Object} props          Duotone props.
- * @param  {string} props.selector Selector to apply the filter to.
- * @param  {string} props.id       Unique id for this duotone filter.
- * @param  {Values} props.values   R, G, and B values to filter with.
- * @return {WPElement}             Duotone element.
+ * @param {Object} props          Duotone props.
+ * @param {string} props.selector Selector to apply the filter to.
+ * @param {string} props.id       Unique id for this duotone filter.
+ * @param {Values} props.values   R, G, and B values to filter with.
+ *
+ * @return {WPElement} Duotone element.
  */
 function DuotoneFilter( { selector, id, values } ) {
 	const stylesheet = `
@@ -123,15 +130,23 @@ function DuotonePanel( { attributes, setAttributes } ) {
 	const style = attributes?.style;
 	const duotone = style?.color?.duotone;
 
-	const duotonePalette = useSetting( 'color.duotone' );
-	const colorPalette = useSetting( 'color.palette' );
+	const duotonePalette = useSetting( 'color.duotone' ) || EMPTY_ARRAY;
+	const colorPalette = useSetting( 'color.palette' ) || EMPTY_ARRAY;
 	const disableCustomColors = ! useSetting( 'color.custom' );
+	const disableCustomDuotone =
+		! useSetting( 'color.customDuotone' ) ||
+		( colorPalette?.length === 0 && disableCustomColors );
+
+	if ( duotonePalette?.length === 0 && disableCustomDuotone ) {
+		return null;
+	}
 
 	return (
-		<BlockControls group="block">
+		<BlockControls group="block" __experimentalShareWithChildBlocks>
 			<DuotoneControl
 				duotonePalette={ duotonePalette }
 				colorPalette={ colorPalette }
+				disableCustomDuotone={ disableCustomDuotone }
 				disableCustomColors={ disableCustomColors }
 				value={ duotone }
 				onChange={ ( newDuotone ) => {
@@ -153,8 +168,9 @@ function DuotonePanel( { attributes, setAttributes } ) {
  * Filters registered block settings, extending attributes to include
  * the `duotone` attribute.
  *
- * @param  {Object} settings Original block settings
- * @return {Object}          Filtered block settings
+ * @param {Object} settings Original block settings.
+ *
+ * @return {Object} Filtered block settings.
  */
 function addDuotoneAttributes( settings ) {
 	if ( ! hasBlockSupport( settings, 'color.__experimentalDuotone' ) ) {
@@ -178,8 +194,9 @@ function addDuotoneAttributes( settings ) {
  * Override the default edit UI to include toolbar controls for duotone if the
  * block supports duotone.
  *
- * @param  {Function} BlockEdit Original component
- * @return {Function}           Wrapped component
+ * @param {Function} BlockEdit Original component.
+ *
+ * @return {Function} Wrapped component.
  */
 const withDuotoneControls = createHigherOrderComponent(
 	( BlockEdit ) => ( props ) => {
@@ -201,8 +218,9 @@ const withDuotoneControls = createHigherOrderComponent(
 /**
  * Override the default block element to include duotone styles.
  *
- * @param  {Function} BlockListBlock Original component
- * @return {Function}                Wrapped component
+ * @param {Function} BlockListBlock Original component.
+ *
+ * @return {Function} Wrapped component.
  */
 const withDuotoneStyles = createHigherOrderComponent(
 	( BlockListBlock ) => ( props ) => {
@@ -224,15 +242,21 @@ const withDuotoneStyles = createHigherOrderComponent(
 		);
 		const selectorsGroup = selectorsScoped.join( ', ' );
 
-		const className = classnames( props?.classname, id );
+		const className = classnames( props?.className, id );
+
+		const element = useContext( BlockList.__unstableElementContext );
 
 		return (
 			<>
-				<DuotoneFilter
-					selector={ selectorsGroup }
-					id={ id }
-					values={ getValuesFromColors( values ) }
-				/>
+				{ element &&
+					createPortal(
+						<DuotoneFilter
+							selector={ selectorsGroup }
+							id={ id }
+							values={ getValuesFromColors( values ) }
+						/>,
+						element
+					) }
 				<BlockListBlock { ...props } className={ className } />
 			</>
 		);

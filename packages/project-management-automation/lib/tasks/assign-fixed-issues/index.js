@@ -3,7 +3,7 @@
  */
 const debug = require( '../../debug' );
 
-/** @typedef {import('@actions/github').GitHub} GitHub */
+/** @typedef {ReturnType<import('@actions/github').getOctokit>} GitHub */
 /** @typedef {import('@octokit/webhooks').WebhookPayloadPullRequest} WebhookPayloadPullRequest */
 
 /**
@@ -23,7 +23,7 @@ async function assignFixedIssues( payload, octokit ) {
 			`assign-fixed-issues: Assigning issue #${ issue } to @${ payload.pull_request.user.login }`
 		);
 
-		await octokit.issues.addAssignees( {
+		await octokit.rest.issues.addAssignees( {
 			owner: payload.repository.owner.login,
 			repo: payload.repository.name,
 			issue_number: +issue,
@@ -34,7 +34,7 @@ async function assignFixedIssues( payload, octokit ) {
 			`assign-fixed-issues: Applying '[Status] In Progress' label to issue #${ issue }`
 		);
 
-		await octokit.issues.addLabels( {
+		await octokit.rest.issues.addLabels( {
 			owner: payload.repository.owner.login,
 			repo: payload.repository.name,
 			issue_number: +issue,

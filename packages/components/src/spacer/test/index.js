@@ -67,6 +67,20 @@ describe( 'props', () => {
 		);
 	} );
 
+	test( 'should override margin props from less to more specific', () => {
+		const { container } = render(
+			<Spacer
+				margin={ 10 }
+				marginX={ 3 }
+				marginRight={ 5 }
+				marginBottom={ 1 }
+			/>
+		);
+		expect( container.firstChild ).toMatchStyleDiffSnapshot(
+			base.firstChild
+		);
+	} );
+
 	test( 'should render padding', () => {
 		const { container } = render( <Spacer padding={ 5 } /> );
 		expect( container.firstChild ).toMatchStyleDiffSnapshot(
@@ -111,6 +125,20 @@ describe( 'props', () => {
 
 	test( 'should render paddingRight', () => {
 		const { container } = render( <Spacer paddingRight={ 5 } /> );
+		expect( container.firstChild ).toMatchStyleDiffSnapshot(
+			base.firstChild
+		);
+	} );
+
+	test( 'should override padding props from less to more specific', () => {
+		const { container } = render(
+			<Spacer
+				padding={ 10 }
+				paddingY={ 2 }
+				paddingTop={ 5 }
+				paddingLeft={ 3 }
+			/>
+		);
 		expect( container.firstChild ).toMatchStyleDiffSnapshot(
 			base.firstChild
 		);

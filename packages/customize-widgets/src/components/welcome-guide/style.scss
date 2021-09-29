@@ -1,22 +1,12 @@
 .customize-widgets-welcome-guide {
-	&__image {
+	&__image__wrapper {
 		background: #00a0d2;
-		height: 240px;
-		margin: 0 0 $grid-unit-10;
+		text-align: center;
+		margin-bottom: $grid-unit-10;
+	}
 
-		&__prm-r {
-			display: none;
-		}
-
-		@media (prefers-reduced-motion: reduce) {
-			&__prm-r {
-				display: block;
-			}
-
-			&__prm-np {
-				display: none;
-			}
-		}
+	&__image {
+		height: auto;
 	}
 
 	// Extra specificity to override `.wrap h1` styles.

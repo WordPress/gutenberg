@@ -2,13 +2,15 @@
  * WordPress dependencies
  */
 import {
-	activatePlugin,
+	__experimentalActivatePlugin as activatePlugin,
 	activateTheme,
 	clickBlockToolbarButton,
-	deactivatePlugin,
+	__experimentalDeactivatePlugin as deactivatePlugin,
 	showBlockToolbar,
 	visitAdminPage,
 	deleteAllWidgets,
+	pressKeyWithModifier,
+	__experimentalRest as rest,
 } from '@wordpress/e2e-test-utils';
 
 /**
@@ -18,6 +20,10 @@ import {
 import { find, findAll } from 'puppeteer-testing-library';
 import { groupBy, mapValues } from 'lodash';
 
+const twentyTwentyError = `Stylesheet twentytwenty-block-editor-styles-css was not properly added.
+For blocks, use the block API's style (https://developer.wordpress.org/block-editor/reference-guides/block-api/block-metadata/#style) or editorStyle (https://developer.wordpress.org/block-editor/reference-guides/block-api/block-metadata/#editor-style).
+For themes, use add_editor_style (https://developer.wordpress.org/block-editor/how-to-guides/themes/theme-support/#editor-styles).`;
+
 describe( 'Widgets screen', () => {
 	beforeEach( async () => {
 		await visitWidgetsScreen();
@@ -25,20 +31,20 @@ describe( 'Widgets screen', () => {
 		// Disable welcome guide if it is enabled.
 		const isWelcomeGuideActive = await page.evaluate( () =>
 			wp.data
-				.select( 'core/edit-widgets' )
-				.__unstableIsFeatureActive( 'welcomeGuide' )
+				.select( 'core/interface' )
+				.isFeatureActive( 'core/edit-widgets', 'welcomeGuide' )
 		);
 		if ( isWelcomeGuideActive ) {
 			await page.evaluate( () =>
 				wp.data
-					.dispatch( 'core/edit-widgets' )
-					.__unstableToggleFeature( 'welcomeGuide' )
+					.dispatch( 'core/interface' )
+					.toggleFeature( 'core/edit-widgets', 'welcomeGuide' )
 			);
 		}
 
 		// Wait for the widget areas to load.
 		await findAll( {
-			role: 'group',
+			role: 'document',
 			name: 'Block: Widget Area',
 		} );
 	} );
@@ -50,23 +56,17 @@ describe( 'Widgets screen', () => {
 	beforeAll( async () => {
 		// TODO: Ideally we can bundle our test theme directly in the repo.
 		await activateTheme( 'twentytwenty' );
-		await deactivatePlugin(
-			'gutenberg-test-plugin-disables-the-css-animations'
-		);
 		await deleteAllWidgets();
 	} );
 
 	afterAll( async () => {
-		await activatePlugin(
-			'gutenberg-test-plugin-disables-the-css-animations'
-		);
 		await activateTheme( 'twentytwentyone' );
 	} );
 
 	async function getBlockInGlobalInserter( blockName ) {
 		const addBlockButton = await find( {
 			role: 'button',
-			name: 'Add block',
+			name: 'Toggle block inserter',
 			pressed: false,
 		} );
 		await addBlockButton.click();
@@ -87,6 +87,12 @@ describe( 'Widgets screen', () => {
 			}
 		);
 		expect( categoryHeaders.length > 0 ).toBe( true );
+
+		const searchBox = await find( {
+			role: 'searchbox',
+			name: 'Search for blocks and patterns',
+		} );
+		await searchBox.type( blockName );
 
 		const addBlock = await find(
 			{
@@ -122,19 +128,22 @@ describe( 'Widgets screen', () => {
 		).toBe( true );
 	}
 
-	async function getInlineInserterButton() {
-		return await find( {
-			role: 'combobox',
-			name: 'Add block',
-		} );
-	}
-
 	it( 'Should insert content using the global inserter', async () => {
+		const updateButton = await find( {
+			role: 'button',
+			name: 'Update',
+		} );
+
+		// Update button should start out disabled.
+		expect(
+			await updateButton.evaluate( ( button ) => button.disabled )
+		).toBe( true );
+
 		const widgetAreas = await findAll( {
-			role: 'group',
+			role: 'document',
 			name: 'Block: Widget Area',
 		} );
-		const [ firstWidgetArea ] = widgetAreas;
+		const [ firstWidgetArea, secondWidgetArea ] = widgetAreas;
 
 		let addParagraphBlock = await getBlockInGlobalInserter( 'Paragraph' );
 		await addParagraphBlock.hover();
@@ -145,6 +154,11 @@ describe( 'Widgets screen', () => {
 		// );
 
 		await addParagraphBlock.click();
+
+		// Adding content should enable the Update button.
+		expect(
+			await updateButton.evaluate( ( button ) => button.disabled )
+		).toBe( false );
 
 		let addedParagraphBlockInFirstWidgetArea = await find(
 			{
@@ -187,34 +201,25 @@ describe( 'Widgets screen', () => {
 			'[video src="http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4"]'
 		);
 
-		/**
-		 * FIXME: There seems to have a bug when saving the widgets
-		 */
-		// await secondWidgetArea.click();
+		// Add to the second widget area.
+		await secondWidgetArea.click();
 
-		// addParagraphBlock = await getParagraphBlockInGlobalInserter();
-		// await addParagraphBlock.hover();
+		addParagraphBlock = await getBlockInGlobalInserter( 'Paragraph' );
+		await addParagraphBlock.click();
 
-		// // FIXME: The insertion point indicator is not showing when the widget area has no blocks.
-		// // await expectInsertionPointIndicatorToBeBelowLastBlock(
-		// // 	secondWidgetArea
-		// // );
-
-		// await addParagraphBlock.click();
-
-		// const addedParagraphBlockInSecondWidgetArea = await secondWidgetArea.$(
-		// 	'[data-block][data-type="core/paragraph"][aria-label^="Empty block"]'
-		// );
-
-		// expect(
-		// 	await addedParagraphBlockInSecondWidgetArea.evaluate(
-		// 		( node ) => node === document.activeElement
-		// 	)
-		// ).toBe( true );
-
-		// await page.keyboard.type( 'Third Paragraph' );
+		const addedParagraphBlockInSecondWidgetArea = await secondWidgetArea.$(
+			'[data-block][data-type="core/paragraph"][aria-label^="Empty block"]'
+		);
+		await addedParagraphBlockInSecondWidgetArea.focus();
+		await page.keyboard.type( 'Third Paragraph' );
 
 		await saveWidgets();
+
+		// The Update button should be disabled again after saving.
+		expect(
+			await updateButton.evaluate( ( button ) => button.disabled )
+		).toBe( true );
+
 		const serializedWidgetAreas = await getSerializedWidgetAreas();
 		expect( serializedWidgetAreas ).toMatchInlineSnapshot( `
 		Object {
@@ -227,13 +232,18 @@ describe( 'Widgets screen', () => {
 		<div class=\\"widget widget_block\\"><div class=\\"widget-content\\"><p><div style=\\"width: 580px;\\" class=\\"wp-video\\"><!--[if lt IE 9]><script>document.createElement('video');</script><![endif]-->
 		<video class=\\"wp-video-shortcode\\" id=\\"video-0-1\\" width=\\"580\\" height=\\"326\\" preload=\\"metadata\\" controls=\\"controls\\"><source type=\\"video/mp4\\" src=\\"http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4?_=1\\" /><a href=\\"http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4\\">http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4</a></video></div></p>
 		</div></div>",
+		  "sidebar-2": "<div class=\\"widget widget_block widget_text\\"><div class=\\"widget-content\\">
+		<p>Third Paragraph</p>
+		</div></div>",
 		}
 	` );
+
+		expect( console ).toHaveErrored( twentyTwentyError );
 	} );
 
-	it( 'Should insert content using the inline inserter', async () => {
+	it.skip( 'Should insert content using the inline inserter', async () => {
 		const [ firstWidgetArea ] = await findAll( {
-			role: 'group',
+			role: 'document',
 			name: 'Block: Widget Area',
 		} );
 
@@ -252,7 +262,10 @@ describe( 'Widgets screen', () => {
 				10
 		);
 
-		let inlineInserterButton = await getInlineInserterButton();
+		let inlineInserterButton = await find( {
+			role: 'combobox',
+			name: 'Add block',
+		} );
 		await inlineInserterButton.click();
 
 		let inlineQuickInserter = await find( {
@@ -312,13 +325,19 @@ describe( 'Widgets screen', () => {
 			secondParagraphBlockBoundingBox.y - 10
 		);
 
-		inlineInserterButton = await getInlineInserterButton();
+		// There will be 2 matches here.
+		// One is the in-between inserter,
+		// and the other one is the button block appender.
+		[ inlineInserterButton ] = await findAll( {
+			role: 'combobox',
+			name: 'Add block',
+		} );
 		await inlineInserterButton.click();
 
-		// TODO: Convert to find() API from puppeteer-testing-library.
-		const inserterSearchBox = await page.waitForSelector(
-			'aria/Search for blocks and patterns[role="searchbox"]'
-		);
+		const inserterSearchBox = await find( {
+			role: 'searchbox',
+			name: 'Search for blocks and patterns',
+		} );
 		await expect( inserterSearchBox ).toHaveFocus();
 
 		await page.keyboard.type( 'Heading' );
@@ -370,18 +389,145 @@ describe( 'Widgets screen', () => {
 	` );
 	} );
 
-	// Disable reason: We temporary skip this test until we can figure out why it fails sometimes.
-	// eslint-disable-next-line jest/no-disabled-tests
+	describe( 'Function widgets', () => {
+		async function addMarquee( nbExpectedMarquees ) {
+			const marqueeBlock = await getBlockInGlobalInserter(
+				'Marquee Greeting'
+			);
+			await marqueeBlock.click();
+			await page.waitForFunction(
+				( expectedMarquees ) => {
+					return (
+						document.querySelectorAll(
+							'[data-testid="marquee-greeting"]'
+						).length === expectedMarquees
+					);
+				},
+				{},
+				nbExpectedMarquees
+			);
+		}
+
+		async function deleteExistingMarquees() {
+			const widgetAreasHoldingMarqueeWidgets = await page.$x(
+				'//input[@data-testid="marquee-greeting"]/ancestor::div[@aria-label="Block: Widget Area"]'
+			);
+			for ( const widgetArea of widgetAreasHoldingMarqueeWidgets ) {
+				const closedPanelBody = await widgetArea.$(
+					'.components-panel__body:not(.is-opened)'
+				);
+				if ( closedPanelBody ) {
+					await closedPanelBody.focus();
+					await closedPanelBody.click();
+				}
+
+				const [ existingMarqueeWidgets ] = await widgetArea.$x(
+					'//input[@data-testid="marquee-greeting"]/ancestor::div[@data-block][contains(@class, "wp-block-legacy-widget")]'
+				);
+				if ( existingMarqueeWidgets ) {
+					await existingMarqueeWidgets.focus();
+					await pressKeyWithModifier( 'access', 'z' );
+				}
+			}
+		}
+
+		beforeAll( async () => {
+			await activatePlugin( 'gutenberg-test-marquee-widget' );
+		} );
+
+		beforeEach( async () => {
+			await deleteExistingMarquees();
+		} );
+
+		afterAll( async () => {
+			await deactivatePlugin( 'gutenberg-test-marquee-widget' );
+		} );
+
+		it( 'Should add and save the marquee widget', async () => {
+			await addMarquee( 1 );
+
+			// Use find because the input might not be visible at first.
+			const marqueeInput = await find( {
+				selector: '[data-testid="marquee-greeting"]',
+			} );
+			// Clear the input.
+			await marqueeInput.evaluate( ( input ) => {
+				input.value = '';
+			} );
+			await marqueeInput.type( 'Howdy' );
+
+			// The first marquee is saved after clicking the form save button.
+			const marqueeSaveButton = await marqueeInput.evaluateHandle(
+				( input ) =>
+					input
+						// Get the parent block element.
+						.closest( '[data-block]' )
+						// Get the save button.
+						.querySelector( 'button[type="submit"]' )
+			);
+			await marqueeSaveButton.click();
+
+			await saveWidgets();
+			let editedSerializedWidgetAreas = await getSerializedWidgetAreas();
+			await expect( editedSerializedWidgetAreas ).toMatchInlineSnapshot( `
+						Object {
+						  "sidebar-1": "<marquee>Howdy</marquee>",
+						}
+					` );
+
+			await page.reload();
+
+			editedSerializedWidgetAreas = await getSerializedWidgetAreas();
+			await expect( editedSerializedWidgetAreas ).toMatchInlineSnapshot( `
+						Object {
+						  "sidebar-1": "<marquee>Howdy</marquee>",
+						}
+					` );
+
+			await addMarquee( 2 );
+
+			const marqueeInputs = await page.$$(
+				'[data-testid="marquee-greeting"]'
+			);
+
+			expect( marqueeInputs ).toHaveLength( 2 );
+			await marqueeInputs[ 0 ].type( 'first ' );
+			await marqueeInputs[ 1 ].type( 'Second ' );
+
+			// No marquee should be changed without clicking on their "save" button.
+			// The second marquee shouldn't be stored as a widget.
+			// See #32978 for more info.
+			await saveWidgets();
+			editedSerializedWidgetAreas = await getSerializedWidgetAreas();
+			await expect( editedSerializedWidgetAreas ).toMatchInlineSnapshot( `
+						Object {
+						  "sidebar-1": "<marquee>Howdy</marquee>",
+						}
+					` );
+
+			await page.reload();
+			const marqueesAfter = await findAll( {
+				selector: '[data-testid="marquee-greeting"]',
+			} );
+			expect( marqueesAfter ).toHaveLength( 1 );
+		} );
+	} );
+
 	it.skip( 'Should duplicate the widgets', async () => {
-		let firstWidgetArea = await page.$(
-			'[aria-label="Block: Widget Area"][role="group"]'
-		);
+		let [ firstWidgetArea ] = await findAll( {
+			role: 'document',
+			name: 'Block: Widget Area',
+		} );
 
 		const addParagraphBlock = await getBlockInGlobalInserter( 'Paragraph' );
 		await addParagraphBlock.click();
 
-		let firstParagraphBlock = await firstWidgetArea.$(
-			'[data-block][data-type="core/paragraph"][aria-label^="Empty block"]'
+		let firstParagraphBlock = await find(
+			{
+				role: 'document',
+				name: /^Empty block/,
+			},
+			{ root: firstWidgetArea }
 		);
 		await firstParagraphBlock.focus();
 		await page.keyboard.type( 'First Paragraph' );
@@ -389,9 +535,10 @@ describe( 'Widgets screen', () => {
 		await saveWidgets();
 		await page.reload();
 		// Wait for the widget areas to load.
-		firstWidgetArea = await page.waitForSelector(
-			'[aria-label="Block: Widget Area"][role="group"]'
-		);
+		[ firstWidgetArea ] = await findAll( {
+			role: 'document',
+			name: 'Block: Widget Area',
+		} );
 
 		const initialSerializedWidgetAreas = await getSerializedWidgetAreas();
 		expect( initialSerializedWidgetAreas ).toMatchInlineSnapshot( `
@@ -401,8 +548,6 @@ describe( 'Widgets screen', () => {
 		</div></div>",
 		}
 	` );
-		const initialWidgets = await getWidgetAreaWidgets();
-		expect( initialWidgets[ 'sidebar-1' ].length ).toBe( 1 );
 
 		firstParagraphBlock = await firstWidgetArea.$(
 			'[data-block][data-type="core/paragraph"]'
@@ -410,21 +555,11 @@ describe( 'Widgets screen', () => {
 		await firstParagraphBlock.focus();
 
 		await showBlockToolbar();
-
-		const blockToolbar = await page.waitForSelector(
-			'[role="toolbar"][aria-label="Block tools"]'
-		);
-		const moreOptionsButton = await blockToolbar.$(
-			'button[aria-label="Options"]'
-		);
-		await moreOptionsButton.click();
-
-		const optionsMenu = await page.waitForSelector(
-			'[role="menu"][aria-label="Options"]'
-		);
-		const [ duplicateButton ] = await optionsMenu.$x(
-			'//*[@role="menuitem"][*[text()="Duplicate"]]'
-		);
+		await clickBlockToolbarButton( 'Options' );
+		const duplicateButton = await find( {
+			role: 'menuitem',
+			name: /^Duplicate/,
+		} );
 		await duplicateButton.click();
 
 		await page.waitForFunction(
@@ -448,16 +583,10 @@ describe( 'Widgets screen', () => {
 		expect( firstParagraphBlockClientId ).not.toBe(
 			duplicatedParagraphBlockClientId
 		);
-		expect(
-			await duplicatedParagraphBlock.evaluate(
-				( node ) => node.textContent
-			)
-		).toBe( 'First Paragraph' );
-		expect(
-			await duplicatedParagraphBlock.evaluate(
-				( node ) => node === document.activeElement
-			)
-		).toBe( true );
+		await expect( duplicatedParagraphBlock ).toMatchQuery( {
+			text: 'First Paragraph',
+		} );
+		await expect( duplicatedParagraphBlock ).toHaveFocus();
 
 		await saveWidgets();
 		const editedSerializedWidgetAreas = await getSerializedWidgetAreas();
@@ -471,66 +600,47 @@ describe( 'Widgets screen', () => {
 		</div></div>",
 		}
 	` );
-		const editedWidgets = await getWidgetAreaWidgets();
-		expect( editedWidgets[ 'sidebar-1' ].length ).toBe( 2 );
-		expect( editedWidgets[ 'sidebar-1' ][ 0 ] ).toBe(
-			initialWidgets[ 'sidebar-1' ][ 0 ]
+		expect( editedSerializedWidgetAreas[ 'sidebar-1' ] ).toBe(
+			[
+				initialSerializedWidgetAreas[ 'sidebar-1' ],
+				initialSerializedWidgetAreas[ 'sidebar-1' ],
+			].join( '\n' )
 		);
+
+		expect( console ).toHaveErrored( twentyTwentyError );
 	} );
 
 	it( 'Should display legacy widgets', async () => {
-		/**
-		 * Using the classic widgets screen to simulate creating legacy widgets.
-		 */
-		await activatePlugin( 'gutenberg-test-classic-widgets' );
-		await visitAdminPage( 'widgets.php' );
+		// Get the default empty instance of a legacy search widget.
+		const { instance: defaultSearchInstance } = await rest( {
+			method: 'POST',
+			path: '/wp/v2/widget-types/search/encode',
+			data: { instance: {} },
+		} );
 
-		const searchWidget = await find(
-			{
-				role: 'heading',
-				name: 'Search',
-				level: 3,
+		// Create a search widget in the first sidebar using the default instance.
+		await rest( {
+			method: 'POST',
+			path: '/wp/v2/widgets',
+			data: {
+				id_base: 'search',
+				sidebar: 'sidebar-1',
+				instance: defaultSearchInstance,
 			},
-			{
-				root: await page.$( '#widget-list' ),
-			}
-		);
-		await searchWidget.click();
-
-		const addWidgetButton = await find( {
-			role: 'button',
-			name: 'Add Widget',
 		} );
-		await addWidgetButton.click();
 
-		// Wait for the changes to be saved.
-		// TODO: Might have better ways to do this.
-		await page.waitForFunction( () => {
-			const addedSearchWidget = document.querySelector(
-				'#widgets-right .widget'
-			);
-			const spinner = addedSearchWidget.querySelector( '.spinner' );
-
-			return (
-				addedSearchWidget.classList.contains( 'open' ) &&
-				! spinner.classList.contains( 'is-active' )
-			);
-		} );
-		// FIXME: For some reasons, waiting for the spinner to disappear is not enough.
-		// eslint-disable-next-line no-restricted-syntax
-		await page.waitForTimeout( 500 );
-
-		await deactivatePlugin( 'gutenberg-test-classic-widgets' );
-		await visitWidgetsScreen();
+		await page.reload();
 
 		// Wait for the Legacy Widget block's preview iframe to load.
 		const frame = await new Promise( ( resolve ) => {
-			const checkFrame = async ( candidateFrame ) => {
-				const url = await candidateFrame.url();
-				if ( url.includes( 'legacy-widget-preview' ) ) {
+			const checkFrame = async () => {
+				const frameElement = await page.$(
+					'iframe.wp-block-legacy-widget__edit-preview-iframe'
+				);
+				if ( frameElement ) {
 					page.off( 'frameattached', checkFrame );
 					page.off( 'framenavigated', checkFrame );
-					resolve( candidateFrame );
+					resolve( frameElement.contentFrame() );
 				}
 			};
 			page.on( 'frameattached', checkFrame );
@@ -549,7 +659,7 @@ describe( 'Widgets screen', () => {
 
 		// Focus the Legacy Widget block.
 		const legacyWidget = await find( {
-			role: 'group',
+			role: 'document',
 			name: 'Block: Legacy Widget',
 		} );
 		await legacyWidget.focus();
@@ -606,9 +716,9 @@ describe( 'Widgets screen', () => {
 	` );
 	} );
 
-	it( 'allows widgets to be moved between widget areas using the dropdown in the block toolbar', async () => {
+	it.skip( 'allows widgets to be moved between widget areas using the dropdown in the block toolbar', async () => {
 		const widgetAreas = await findAll( {
-			role: 'group',
+			role: 'document',
 			name: 'Block: Widget Area',
 		} );
 		const [ firstWidgetArea, secondWidgetArea ] = widgetAreas;
@@ -621,7 +731,7 @@ describe( 'Widgets screen', () => {
 		await inserterParagraphBlock.click();
 		const addedParagraphBlockInFirstWidgetArea = await find(
 			{
-				role: 'group',
+				role: 'document',
 				name: /^Empty block/,
 			},
 			{ root: firstWidgetArea }
@@ -632,7 +742,7 @@ describe( 'Widgets screen', () => {
 		// Check that the block exists in the first widget area.
 		await find(
 			{
-				role: 'group',
+				role: 'document',
 				name: 'Paragraph block',
 				value: 'First Paragraph',
 			},
@@ -653,7 +763,7 @@ describe( 'Widgets screen', () => {
 		// Check that the block exists in the second widget area.
 		await find(
 			{
-				role: 'group',
+				role: 'document',
 				name: 'Paragraph block',
 				value: 'First Paragraph',
 			},
@@ -672,6 +782,69 @@ describe( 'Widgets screen', () => {
 		</div></div>",
 		}
 	` );
+
+		expect( console ).toHaveErrored( twentyTwentyError );
+	} );
+
+	it( 'Allows widget deletion to be undone', async () => {
+		const [ firstWidgetArea ] = await findAll( {
+			role: 'document',
+			name: 'Block: Widget Area',
+		} );
+
+		let addParagraphBlock = await getBlockInGlobalInserter( 'Paragraph' );
+		await addParagraphBlock.click();
+
+		let addedParagraphBlockInFirstWidgetArea = await find(
+			{
+				name: /^Empty block/,
+				selector: '[data-block][data-type="core/paragraph"]',
+			},
+			{
+				root: firstWidgetArea,
+			}
+		);
+		await addedParagraphBlockInFirstWidgetArea.focus();
+		await page.keyboard.type( 'First Paragraph' );
+
+		addParagraphBlock = await getBlockInGlobalInserter( 'Paragraph' );
+		await addParagraphBlock.click();
+
+		addedParagraphBlockInFirstWidgetArea = await firstWidgetArea.$(
+			'[data-block][data-type="core/paragraph"][aria-label^="Empty block"]'
+		);
+		await addedParagraphBlockInFirstWidgetArea.focus();
+		await page.keyboard.type( 'Second Paragraph' );
+
+		await saveWidgets();
+		await page.focus( '.block-editor-writing-flow' );
+
+		// Delete the last block and save again.
+		await pressKeyWithModifier( 'access', 'z' );
+		await saveWidgets();
+		// To do: clicking on the Snackbar causes focus loss.
+		await page.focus( '.block-editor-writing-flow' );
+
+		// Undo block deletion and save again
+		await pressKeyWithModifier( 'primary', 'z' );
+		await saveWidgets();
+
+		// Reload the page to make sure changes were actually saved.
+		await page.reload();
+
+		const serializedWidgetAreas = await getSerializedWidgetAreas();
+		expect( serializedWidgetAreas ).toMatchInlineSnapshot( `
+		Object {
+		  "sidebar-1": "<div class=\\"widget widget_block widget_text\\"><div class=\\"widget-content\\">
+		<p>First Paragraph</p>
+		</div></div>
+		<div class=\\"widget widget_block widget_text\\"><div class=\\"widget-content\\">
+		<p>Second Paragraph</p>
+		</div></div>",
+		}
+	` );
+
+		expect( console ).toHaveErrored( twentyTwentyError );
 	} );
 } );
 
@@ -707,20 +880,26 @@ async function saveWidgets() {
 	} );
 	await updateButton.click();
 
-	await findAll( {
+	// Expect the "Widgets saved." snackbar to appear.
+	const savedSnackbarQuery = {
+		role: 'button',
+		name: 'Dismiss this notice',
 		text: 'Widgets saved.',
-	} );
+	};
+	await expect( savedSnackbarQuery ).toBeFound();
 
-	// FIXME: The snackbar above is enough for the widget areas to get saved,
-	// but not enough for the widgets to get saved.
-	// eslint-disable-next-line no-restricted-syntax
-	await page.waitForTimeout( 500 );
+	// Close the snackbar.
+	const savedSnackbar = await find( savedSnackbarQuery );
+	await savedSnackbar.click();
+	// Expect focus not to be lost.
+	await expect(
+		await page.evaluate( () => document.activeElement.className )
+	).toBe( 'components-snackbar-list edit-widgets-notices__snackbar' );
+	await expect( savedSnackbarQuery ).not.toBeFound();
 }
 
 async function getSerializedWidgetAreas() {
-	const widgets = await page.evaluate( () =>
-		wp.data.select( 'core' ).getWidgets( { _embed: 'about' } )
-	);
+	const widgets = await rest( { path: '/wp/v2/widgets' } );
 
 	const serializedWidgetAreas = mapValues(
 		groupBy( widgets, 'sidebar' ),
@@ -732,21 +911,4 @@ async function getSerializedWidgetAreas() {
 	);
 
 	return serializedWidgetAreas;
-}
-
-async function getWidgetAreaWidgets() {
-	const widgets = await page.evaluate( () => {
-		const widgetAreas = wp.data
-			.select( 'core/edit-widgets' )
-			.getWidgetAreas();
-		const sidebars = {};
-
-		for ( const widgetArea of widgetAreas ) {
-			sidebars[ widgetArea.id ] = widgetArea.widgets;
-		}
-
-		return sidebars;
-	} );
-
-	return widgets;
 }

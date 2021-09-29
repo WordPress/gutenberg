@@ -5,7 +5,7 @@ import { regexp } from '@wordpress/shortcode';
 import deprecated from '@wordpress/deprecated';
 
 export function addActiveFormats( value, activeFormats ) {
-	if ( activeFormats.length ) {
+	if ( activeFormats?.length ) {
 		let index = value.formats.length;
 
 		while ( index-- ) {

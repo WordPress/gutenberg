@@ -2,19 +2,16 @@
  * External dependencies
  */
 import {
-	capitalize,
-	find,
 	first,
 	forEach,
 	get,
 	has,
 	isEmpty,
-	isEqual,
+	isString,
 	kebabCase,
 	map,
 	omit,
 	startsWith,
-	without,
 } from 'lodash';
 import classnames from 'classnames';
 
@@ -35,9 +32,12 @@ import { createHigherOrderComponent, useInstanceId } from '@wordpress/compose';
  */
 import { BORDER_SUPPORT_KEY, BorderPanel } from './border';
 import { COLOR_SUPPORT_KEY, ColorEdit } from './color';
-import { FONT_SIZE_SUPPORT_KEY } from './font-size';
-import { TypographyPanel, TYPOGRAPHY_SUPPORT_KEYS } from './typography';
-import { SPACING_SUPPORT_KEY, SpacingPanel } from './spacing';
+import {
+	TypographyPanel,
+	TYPOGRAPHY_SUPPORT_KEY,
+	TYPOGRAPHY_SUPPORT_KEYS,
+} from './typography';
+import { SPACING_SUPPORT_KEY, DimensionsPanel } from './dimensions';
 import useDisplayBlockControls from '../components/use-display-block-controls';
 
 const styleSupportKeys = [
@@ -67,8 +67,9 @@ function compileStyleValue( uncompiledValue ) {
 /**
  * Returns the inline styles to add depending on the style object
  *
- * @param  {Object} styles Styles configuration
- * @return {Object}        Flattened CSS variables declaration
+ * @param {Object} styles Styles configuration.
+ *
+ * @return {Object} Flattened CSS variables declaration.
  */
 export function getInlineStyles( styles = {} ) {
 	const output = {};
@@ -77,11 +78,18 @@ export function getInlineStyles( styles = {} ) {
 		const subPaths = STYLE_PROPERTY[ propKey ].properties;
 		// Ignore styles on elements because they are handled on the server.
 		if ( has( styles, path ) && 'elements' !== first( path ) ) {
-			if ( !! subPaths ) {
-				subPaths.forEach( ( suffix ) => {
-					output[
-						propKey + capitalize( suffix )
-					] = compileStyleValue( get( styles, [ ...path, suffix ] ) );
+			// Checking if style value is a string allows for shorthand css
+			// option and backwards compatibility for border radius support.
+			const styleValue = get( styles, path );
+
+			if ( !! subPaths && ! isString( styleValue ) ) {
+				Object.entries( subPaths ).forEach( ( entry ) => {
+					const [ name, subPath ] = entry;
+					const value = get( styleValue, [ subPath ] );
+
+					if ( value ) {
+						output[ name ] = compileStyleValue( value );
+					}
 				} );
 			} else {
 				output[ propKey ] = compileStyleValue( get( styles, path ) );
@@ -101,9 +109,7 @@ function compileElementsStyles( selector, elements = {} ) {
 				...map(
 					elementStyles,
 					( value, property ) =>
-						`\t${ kebabCase( property ) }: ${ value }${
-							element === 'link' ? '!important' : ''
-						};`
+						`\t${ kebabCase( property ) }: ${ value };`
 				),
 				'}',
 			].join( '\n' );
@@ -115,8 +121,9 @@ function compileElementsStyles( selector, elements = {} ) {
 /**
  * Filters registered block settings, extending attributes to include `style` attribute.
  *
- * @param  {Object} settings Original block settings
- * @return {Object}          Filtered block settings
+ * @param {Object} settings Original block settings.
+ *
+ * @return {Object} Filtered block settings.
  */
 function addAttribute( settings ) {
 	if ( ! hasStyleSupport( settings ) ) {
@@ -135,42 +142,66 @@ function addAttribute( settings ) {
 	return settings;
 }
 
-const skipSerializationPaths = {
+/**
+ * A dictionary of paths to flag skipping block support serialization as the key,
+ * with values providing the style paths to be omitted from serialization.
+ *
+ * @constant
+ * @type {Record<string, string[]>}
+ */
+const skipSerializationPathsEdit = {
 	[ `${ BORDER_SUPPORT_KEY }.__experimentalSkipSerialization` ]: [ 'border' ],
 	[ `${ COLOR_SUPPORT_KEY }.__experimentalSkipSerialization` ]: [
 		COLOR_SUPPORT_KEY,
 	],
+	[ `${ TYPOGRAPHY_SUPPORT_KEY }.__experimentalSkipSerialization` ]: [
+		TYPOGRAPHY_SUPPORT_KEY,
+	],
 	[ `${ SPACING_SUPPORT_KEY }.__experimentalSkipSerialization` ]: [
 		'spacing',
 	],
-	[ `__experimentalSkipFontSizeSerialization` ]: [ 'typography', 'fontSize' ],
-	[ `__experimentalSkipTypographySerialization` ]: without(
-		TYPOGRAPHY_SUPPORT_KEYS,
-		FONT_SIZE_SUPPORT_KEY
-	).map(
-		( feature ) =>
-			find( STYLE_PROPERTY, ( property ) =>
-				isEqual( property.support, [ feature ] )
-			)?.value
-	),
+};
+
+/**
+ * A dictionary of paths to flag skipping block support serialization as the key,
+ * with values providing the style paths to be omitted from serialization.
+ *
+ * Extends the Edit skip paths to enable skipping additional paths in just
+ * the Save component. This allows a block support to be serialized within the
+ * editor, while using an alternate approach, such as server-side rendering, when
+ * the support is saved.
+ *
+ * @constant
+ * @type {Record<string, string[]>}
+ */
+const skipSerializationPathsSave = {
+	...skipSerializationPathsEdit,
+	[ `${ SPACING_SUPPORT_KEY }` ]: [ 'spacing.blockGap' ],
 };
 
 /**
  * Override props assigned to save component to inject the CSS variables definition.
  *
- * @param  {Object} props      Additional props applied to save element
- * @param  {Object} blockType  Block type
- * @param  {Object} attributes Block attributes
- * @return {Object}            Filtered props applied to save element
+ * @param {Object}                    props      Additional props applied to save element.
+ * @param {Object}                    blockType  Block type.
+ * @param {Object}                    attributes Block attributes.
+ * @param {?Record<string, string[]>} skipPaths  An object of keys and paths to skip serialization.
+ *
+ * @return {Object} Filtered props applied to save element.
  */
-export function addSaveProps( props, blockType, attributes ) {
+export function addSaveProps(
+	props,
+	blockType,
+	attributes,
+	skipPaths = skipSerializationPathsSave
+) {
 	if ( ! hasStyleSupport( blockType ) ) {
 		return props;
 	}
 
 	let { style } = attributes;
 
-	forEach( skipSerializationPaths, ( path, indicator ) => {
+	forEach( skipPaths, ( path, indicator ) => {
 		if ( getBlockSupport( blockType, indicator ) ) {
 			style = omit( style, path );
 		}
@@ -188,8 +219,9 @@ export function addSaveProps( props, blockType, attributes ) {
  * Filters registered block settings to extend the block edit wrapper
  * to apply the desired styles and classnames properly.
  *
- * @param  {Object} settings Original block settings
- * @return {Object}          Filtered block settings
+ * @param {Object} settings Original block settings.
+ *
+ * @return {Object}.Filtered block settings.
  */
 export function addEditProps( settings ) {
 	if ( ! hasStyleSupport( settings ) ) {
@@ -203,7 +235,12 @@ export function addEditProps( settings ) {
 			props = existingGetEditWrapperProps( attributes );
 		}
 
-		return addSaveProps( props, settings, attributes );
+		return addSaveProps(
+			props,
+			settings,
+			attributes,
+			skipSerializationPathsEdit
+		);
 	};
 
 	return settings;
@@ -213,8 +250,9 @@ export function addEditProps( settings ) {
  * Override the default edit UI to include new inspector controls for
  * all the custom styles configs.
  *
- * @param  {Function} BlockEdit Original component
- * @return {Function}           Wrapped component
+ * @param {Function} BlockEdit Original component.
+ *
+ * @return {Function} Wrapped component.
  */
 export const withBlockControls = createHigherOrderComponent(
 	( BlockEdit ) => ( props ) => {
@@ -227,7 +265,7 @@ export const withBlockControls = createHigherOrderComponent(
 						<TypographyPanel { ...props } />
 						<BorderPanel { ...props } />
 						<ColorEdit { ...props } />
-						<SpacingPanel { ...props } />
+						<DimensionsPanel { ...props } />
 					</>
 				) }
 				<BlockEdit { ...props } />
@@ -240,15 +278,13 @@ export const withBlockControls = createHigherOrderComponent(
 /**
  * Override the default block element to include duotone styles.
  *
- * @param  {Function} BlockListBlock Original component
+ * @param {Function} BlockListBlock Original component
  * @return {Function}                Wrapped component
  */
 const withElementsStyles = createHigherOrderComponent(
 	( BlockListBlock ) => ( props ) => {
 		const elements = props.attributes.style?.elements;
-		if ( ! elements ) {
-			return <BlockListBlock { ...props } />;
-		}
+
 		const blockElementsContainerIdentifier = `wp-elements-${ useInstanceId(
 			BlockListBlock
 		) }`;
@@ -259,17 +295,24 @@ const withElementsStyles = createHigherOrderComponent(
 
 		return (
 			<>
-				<style
-					dangerouslySetInnerHTML={ {
-						__html: styles,
-					} }
-				/>
+				{ elements && (
+					<style
+						dangerouslySetInnerHTML={ {
+							__html: styles,
+						} }
+					/>
+				) }
+
 				<BlockListBlock
 					{ ...props }
-					className={ classnames(
-						props.classname,
-						blockElementsContainerIdentifier
-					) }
+					className={
+						elements
+							? classnames(
+									props.className,
+									blockElementsContainerIdentifier
+							  )
+							: props.className
+					}
 				/>
 			</>
 		);

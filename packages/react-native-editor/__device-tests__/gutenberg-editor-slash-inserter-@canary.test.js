@@ -8,14 +8,27 @@ import { slashInserter, shortText } from './helpers/test-data';
 const ANIMATION_TIME = 200;
 
 // helper function for asserting slash inserter presence
-async function assertSlashInserterPresent() {
-	const slashInserterElement = await editorPage.driver.elementByAccessibilityId(
-		'Slash inserter results'
-	);
-	expect( slashInserterElement ).toBeTruthy();
+async function assertSlashInserterPresent( checkIsVisible ) {
+	let areResultsDisplayed;
+	try {
+		const foundElements = await editorPage.driver.elementsByAccessibilityId(
+			'Slash inserter results'
+		);
+		areResultsDisplayed = !! foundElements.length;
+	} catch ( e ) {
+		areResultsDisplayed = false;
+	}
+	if ( checkIsVisible ) {
+		expect( areResultsDisplayed ).toBeTruthy();
+	} else {
+		expect( areResultsDisplayed ).toBeFalsy();
+	}
 }
 
-describe( 'Gutenberg Editor Slash Inserter tests', () => {
+// Due to flakiness, disabling until its more stable
+// https://github.com/wordpress-mobile/gutenberg-mobile/issues/3699
+// eslint-disable-next-line jest/no-disabled-tests
+describe.skip( 'Gutenberg Editor Slash Inserter tests', () => {
 	it( 'should show the menu after typing /', async () => {
 		await editorPage.addNewBlock( blockNames.paragraph );
 		const paragraphBlockElement = await editorPage.getBlockAtPosition(
@@ -31,7 +44,8 @@ describe( 'Gutenberg Editor Slash Inserter tests', () => {
 		);
 		await editorPage.driver.sleep( ANIMATION_TIME );
 
-		assertSlashInserterPresent();
+		assertSlashInserterPresent( true );
+
 		await editorPage.removeBlockAtPosition( blockNames.paragraph );
 	} );
 
@@ -50,7 +64,7 @@ describe( 'Gutenberg Editor Slash Inserter tests', () => {
 		);
 		await editorPage.driver.sleep( ANIMATION_TIME );
 
-		assertSlashInserterPresent();
+		assertSlashInserterPresent( true );
 
 		// Remove / character
 		if ( isAndroid() ) {
@@ -68,11 +82,8 @@ describe( 'Gutenberg Editor Slash Inserter tests', () => {
 		}
 		await editorPage.driver.sleep( ANIMATION_TIME );
 
-		// Check if the slash inserter UI exists
-		const foundElements = await editorPage.driver.elementsByAccessibilityId(
-			'Slash inserter results'
-		);
-		expect( foundElements.length ).toBe( 0 );
+		// Check if the slash inserter UI no longer exists
+		assertSlashInserterPresent( false );
 
 		await editorPage.removeBlockAtPosition( blockNames.paragraph );
 	} );
@@ -92,7 +103,7 @@ describe( 'Gutenberg Editor Slash Inserter tests', () => {
 		);
 		await editorPage.driver.sleep( ANIMATION_TIME );
 
-		assertSlashInserterPresent();
+		assertSlashInserterPresent( true );
 
 		// Find Image block button
 		const imageButtonElement = await editorPage.driver.elementByAccessibilityId(
@@ -109,10 +120,7 @@ describe( 'Gutenberg Editor Slash Inserter tests', () => {
 		).toBe( true );
 
 		// Slash inserter UI should not be present after adding a block
-		const foundElements = await editorPage.driver.elementsByAccessibilityId(
-			'Slash inserter results'
-		);
-		expect( foundElements.length ).toBe( 0 );
+		assertSlashInserterPresent( false );
 
 		// Remove image block
 		await editorPage.removeBlockAtPosition( blockNames.image );

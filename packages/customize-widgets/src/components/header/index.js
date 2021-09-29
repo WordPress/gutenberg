@@ -76,7 +76,7 @@ function Header( {
 					<ToolbarButton
 						className="customize-widgets-header-toolbar__inserter-toggle"
 						isPressed={ isInserterOpened }
-						isPrimary
+						variant="primary"
 						icon={ plus }
 						label={ _x(
 							'Add block',

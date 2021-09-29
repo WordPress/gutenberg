@@ -43,7 +43,7 @@ export default function InstallButton( { attributes, block, clientId } ) {
 			}
 			disabled={ isInstallingBlock }
 			isBusy={ isInstallingBlock }
-			isPrimary
+			variant="primary"
 		>
 			{ sprintf(
 				/* translators: %s: block name */

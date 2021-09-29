@@ -141,7 +141,7 @@ export default function EntitiesSavedStates( { close } ) {
 			<div className="entities-saved-states__panel-header">
 				<Button
 					ref={ saveButtonRef }
-					isPrimary
+					variant="primary"
 					disabled={
 						dirtyEntityRecords.length -
 							unselectedEntities.length ===

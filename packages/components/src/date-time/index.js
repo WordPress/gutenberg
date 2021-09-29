@@ -146,7 +146,7 @@ function DateTimePicker(
 				{ ! calendarHelpIsVisible && currentDate && (
 					<Button
 						className="components-datetime__date-reset-button"
-						isLink
+						variant="link"
 						onClick={ () => onChange( null ) }
 					>
 						{ __( 'Reset' ) }
@@ -154,7 +154,7 @@ function DateTimePicker(
 				) }
 				<Button
 					className="components-datetime__date-help-toggle"
-					isLink
+					variant="link"
 					onClick={ onClickDescriptionToggle }
 				>
 					{ calendarHelpIsVisible

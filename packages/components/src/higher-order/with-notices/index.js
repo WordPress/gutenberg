@@ -17,7 +17,7 @@ import NoticeList from '../../notice/list';
 /**
  * Override the default edit UI to include notices if supported.
  *
- * @param  {WPComponent} OriginalComponent Original component.
+ * @param {WPComponent} OriginalComponent Original component.
  *
  * @return {WPComponent} Wrapped component.
  */
@@ -29,7 +29,7 @@ export default createHigherOrderComponent( ( OriginalComponent ) => {
 			/**
 			 * Function passed down as a prop that adds a new notice.
 			 *
-			 * @param {Object} notice  Notice to add.
+			 * @param {Object} notice Notice to add.
 			 */
 			const createNotice = ( notice ) => {
 				const noticeToAdd = notice.id
@@ -44,7 +44,7 @@ export default createHigherOrderComponent( ( OriginalComponent ) => {
 				/**
 				 * Function passed as a prop that adds a new error notice.
 				 *
-				 * @param {string} msg  Error message of the notice.
+				 * @param {string} msg Error message of the notice.
 				 */
 				createErrorNotice: ( msg ) => {
 					createNotice( {
@@ -56,7 +56,7 @@ export default createHigherOrderComponent( ( OriginalComponent ) => {
 				/**
 				 * Removes a notice by id.
 				 *
-				 * @param {string} id  Id of the notice to remove.
+				 * @param {string} id Id of the notice to remove.
 				 */
 				removeNotice: ( id ) => {
 					setNoticeList( ( current ) =>

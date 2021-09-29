@@ -28,6 +28,7 @@ export default function BlockActions( {
 		canInsertBlockType,
 		getBlockRootClientId,
 		getBlocksByClientId,
+		canRemoveBlocks,
 		getTemplateLock,
 	} = useSelect( ( select ) => select( blockEditorStore ), [] );
 	const { getDefaultBlockName, getGroupingBlockName } = useSelect(
@@ -50,6 +51,8 @@ export default function BlockActions( {
 		rootClientId
 	);
 
+	const canRemove = canRemoveBlocks( clientIds, rootClientId );
+
 	const {
 		removeBlocks,
 		replaceBlocks,
@@ -67,6 +70,7 @@ export default function BlockActions( {
 	return children( {
 		canDuplicate,
 		canInsertDefaultBlock,
+		canRemove,
 		isLocked: !! getTemplateLock( rootClientId ),
 		rootClientId,
 		blocks,

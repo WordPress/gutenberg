@@ -59,10 +59,6 @@ const getHeading = ( index, text ) => {
 	return '#'.repeat( index ) + ' ' + text;
 };
 
-const getSymbolHeading = ( text ) => {
-	return `<a name="${ text }" href="#${ text }">#</a> **${ text }**`;
-};
-
 const getTypeOutput = ( tag ) => {
 	if ( tag.optional ) {
 		return `\`[${ tag.type }]\``;
@@ -98,7 +94,7 @@ module.exports = (
 	} );
 	if ( symbols && symbols.length > 0 ) {
 		symbols.forEach( ( symbol ) => {
-			docs.push( getSymbolHeading( symbol.name ) );
+			docs.push( getHeading( headingIndex, symbol.name ) );
 			formatDeprecated(
 				getSymbolTagsByName( symbol, 'deprecated' ),
 				docs

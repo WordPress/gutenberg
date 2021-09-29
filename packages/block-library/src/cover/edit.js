@@ -3,7 +3,8 @@
  */
 import classnames from 'classnames';
 import FastAverageColor from 'fast-average-color';
-import tinycolor from 'tinycolor2';
+import { colord, extend } from 'colord';
+import namesPlugin from 'colord/plugins/names';
 
 /**
  * WordPress dependencies
@@ -12,16 +13,19 @@ import { Fragment, useEffect, useRef, useState } from '@wordpress/element';
 import {
 	BaseControl,
 	Button,
+	ExternalLink,
 	FocalPointPicker,
 	PanelBody,
 	PanelRow,
 	RangeControl,
 	ResizableBox,
 	Spinner,
+	TextareaControl,
 	ToggleControl,
 	withNotices,
 	__experimentalUseCustomUnits as useCustomUnits,
 	__experimentalBoxControl as BoxControl,
+	__experimentalToolsPanelItem as ToolsPanelItem,
 } from '@wordpress/components';
 import { compose, withInstanceId, useInstanceId } from '@wordpress/compose';
 import {
@@ -62,22 +66,22 @@ import {
 	getPositionClassName,
 } from './shared';
 
-/**
- * Module Constants
- */
-
-const INNER_BLOCKS_TEMPLATE = [
-	[
-		'core/paragraph',
-		{
-			align: 'center',
-			fontSize: 'large',
-			placeholder: __( 'Write title…' ),
-		},
-	],
-];
+extend( [ namesPlugin ] );
 
 const { __Visualizer: BoxControlVisualizer } = BoxControl;
+
+function getInnerBlocksTemplate( attributes ) {
+	return [
+		[
+			'core/paragraph',
+			{
+				align: 'center',
+				placeholder: __( 'Write title…' ),
+				...attributes,
+			},
+		],
+	];
+}
 
 function retrieveFastAverageColor() {
 	if ( ! retrieveFastAverageColor.fastAverageColor ) {
@@ -237,7 +241,7 @@ function useCoverIsDark( url, dimRatio = 50, overlayColor, elementRef ) {
 				setIsDark( true );
 				return;
 			}
-			setIsDark( tinycolor( overlayColor ).isDark() );
+			setIsDark( colord( overlayColor ).isDark() );
 		}
 	}, [ overlayColor, dimRatio > 50 || ! url, setIsDark ] );
 	useEffect( () => {
@@ -319,6 +323,7 @@ function CoverEdit( {
 		minHeightUnit,
 		style: styleAttribute,
 		url,
+		alt,
 	} = attributes;
 	const {
 		gradientClass,
@@ -490,9 +495,30 @@ function CoverEdit( {
 								}
 							/>
 						) }
+						{ url && isImageBackground && isImgElement && (
+							<TextareaControl
+								label={ __( 'Alt text (alternative text)' ) }
+								value={ alt }
+								onChange={ ( newAlt ) =>
+									setAttributes( { alt: newAlt } )
+								}
+								help={
+									<>
+										<ExternalLink href="https://www.w3.org/WAI/tutorials/images/decision-tree">
+											{ __(
+												'Describe the purpose of the image'
+											) }
+										</ExternalLink>
+										{ __(
+											'Leave empty if the image is purely decorative.'
+										) }
+									</>
+								}
+							/>
+						) }
 						<PanelRow>
 							<Button
-								isSecondary
+								variant="secondary"
 								isSmall
 								className="block-library-cover__reset-button"
 								onClick={ () =>
@@ -512,20 +538,6 @@ function CoverEdit( {
 						</PanelRow>
 					</PanelBody>
 				) }
-				<PanelBody title={ __( 'Dimensions' ) }>
-					<CoverHeightInput
-						value={ temporaryMinHeight || minHeight }
-						unit={ minHeightUnit }
-						onChange={ ( newMinHeight ) =>
-							setAttributes( { minHeight: newMinHeight } )
-						}
-						onUnitChange={ ( nextUnit ) =>
-							setAttributes( {
-								minHeightUnit: nextUnit,
-							} )
-						}
-					/>
-				</PanelBody>
 				<PanelColorGradientSettings
 					title={ __( 'Overlay' ) }
 					initialOpen={ true }
@@ -556,17 +568,55 @@ function CoverEdit( {
 					) }
 				</PanelColorGradientSettings>
 			</InspectorControls>
+			<InspectorControls __experimentalGroup="dimensions">
+				<ToolsPanelItem
+					hasValue={ () => !! minHeight }
+					label={ __( 'Minimum height' ) }
+					onDeselect={ () =>
+						setAttributes( {
+							minHeight: undefined,
+							minHeightUnit: undefined,
+						} )
+					}
+					resetAllFilter={ () => ( {
+						minHeight: undefined,
+						minHeightUnit: undefined,
+					} ) }
+					isShownByDefault={ true }
+					panelId={ clientId }
+				>
+					<CoverHeightInput
+						value={ temporaryMinHeight || minHeight }
+						unit={ minHeightUnit }
+						onChange={ ( newMinHeight ) =>
+							setAttributes( { minHeight: newMinHeight } )
+						}
+						onUnitChange={ ( nextUnit ) =>
+							setAttributes( {
+								minHeightUnit: nextUnit,
+							} )
+						}
+					/>
+				</ToolsPanelItem>
+			</InspectorControls>
 		</>
 	);
 
 	const ref = useRef();
 	const blockProps = useBlockProps( { ref } );
+
+	// Check for fontSize support before we pass a fontSize attribute to the innerBlocks.
+	const hasFontSizes = !! useSetting( 'typography.fontSizes' )?.length;
+	const innerBlocksTemplate = getInnerBlocksTemplate( {
+		fontSize: hasFontSizes ? 'large' : undefined,
+	} );
+
 	const innerBlocksProps = useInnerBlocksProps(
 		{
 			className: 'wp-block-cover__inner-container',
 		},
 		{
-			template: INNER_BLOCKS_TEMPLATE,
+			template: innerBlocksTemplate,
 			templateInsertUpdatesSelection: true,
 		}
 	);
@@ -660,7 +710,7 @@ function CoverEdit( {
 					<img
 						ref={ isDarkElement }
 						className="wp-block-cover__image-background"
-						alt=""
+						alt={ alt }
 						src={ url }
 						style={ mediaStyle }
 					/>

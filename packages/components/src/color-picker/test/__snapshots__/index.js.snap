@@ -5,49 +5,51 @@ Snapshot Diff:
 - First value
 + Second value
 
-@@ -11,36 +11,36 @@
-          onTouchMove={[Function bound handleChange]}
-          onTouchStart={[Function bound handleChange]}
-          role="application"
+@@ -10,38 +10,38 @@
+        onTouchMove={[Function bound handleChange]}
+        onTouchStart={[Function bound handleChange]}
+        role="application"
+        style={
+          Object {
+-           "background": "hsl(210,100%, 50%)",
++           "background": "hsl(0,100%, 50%)",
+          }
+        }
+      >
+        <div
+          className="components-color-picker__saturation-white"
+        />
+        <div
+          className="components-color-picker__saturation-black"
+        />
+        <button
+-         aria-describedby="color-picker-saturation-4"
++         aria-describedby="color-picker-saturation-3"
+          aria-label="Choose a shade"
+          className="components-button components-color-picker__saturation-pointer"
+          onKeyDown={[Function bound handleKeyDown]}
           style={
             Object {
--             "background": "hsl(210,100%, 50%)",
-+             "background": "hsl(0,100%, 50%)",
+-             "left": "17%",
+-             "top": "20%",
++             "left": "0%",
++             "top": "0%",
             }
           }
-        >
-          <div
-            className="components-color-picker__saturation-white"
-          />
-          <div
-            className="components-color-picker__saturation-black"
-          />
-          <button
--           aria-describedby="color-picker-saturation-4"
-+           aria-describedby="color-picker-saturation-3"
-            aria-label="Choose a shade"
-            className="components-button components-color-picker__saturation-pointer"
-            onKeyDown={[Function preventKeyEvents]}
-            style={
-              Object {
--               "left": "17%",
--               "top": "20%",
-+               "left": "0%",
-+               "top": "0%",
-              }
-            }
-            type="button"
-          />
-          <div
-            className="components-visually-hidden"
--           id="color-picker-saturation-4"
-+           id="color-picker-saturation-3"
-          >
-            Use your arrow keys to change the base color. Move up to lighten the color, down to darken, left to decrease saturation, and right to increase saturation.
-          </div>
-        </div>
-      </div>
-@@ -56,11 +56,11 @@
+          type="button"
+        />
+        <div
+          className="components-visually-hidden css-1mm2cvy-View em57xhy0"
+          data-wp-c16t={true}
+          data-wp-component="VisuallyHidden"
+-         id="color-picker-saturation-4"
++         id="color-picker-saturation-3"
+          style={
+            Object {
+              "WebkitClipPath": "inset( 50% )",
+              "border": 0,
+              "clip": "rect(1px, 1px, 1px, 1px)",
+@@ -71,11 +71,11 @@
         >
           <div
             className="components-color-picker__active"
@@ -60,46 +62,48 @@ Snapshot Diff:
           />
         </div>
         <div
-@@ -78,29 +78,29 @@
-                onMouseDown={[Function bound handleMouseDown]}
-                onTouchMove={[Function bound handleChange]}
-                onTouchStart={[Function bound handleChange]}
-              >
-                <div
--                 aria-describedby="components-color-picker__hue-description-4"
-+                 aria-describedby="components-color-picker__hue-description-3"
-                  aria-label="Hue value in degrees, from 0 to 359."
-                  aria-orientation="horizontal"
-                  aria-valuemax="1"
-                  aria-valuemin="359"
--                 aria-valuenow={210}
-+                 aria-valuenow={0}
-                  className="components-color-picker__hue-pointer"
-                  onKeyDown={[Function preventKeyEvents]}
-                  role="slider"
-                  style={
-                    Object {
--                     "left": "58.333333333333336%",
-+                     "left": "0%",
-                    }
+@@ -92,31 +92,31 @@
+              onMouseDown={[Function bound handleMouseDown]}
+              onTouchMove={[Function bound handleChange]}
+              onTouchStart={[Function bound handleChange]}
+            >
+              <div
+-               aria-describedby="components-color-picker__hue-description-4"
++               aria-describedby="components-color-picker__hue-description-3"
+                aria-label="Hue value in degrees, from 0 to 359."
+                aria-orientation="horizontal"
+                aria-valuemax="1"
+                aria-valuemin="359"
+-               aria-valuenow={210}
++               aria-valuenow={0}
+                className="components-color-picker__hue-pointer"
+                onKeyDown={[Function bound handleKeyDown]}
+                role="slider"
+                style={
+                  Object {
+-                   "left": "58.333333333333336%",
++                   "left": "0%",
                   }
-                  tabIndex="0"
-                />
-                <p
-                  className="components-visually-hidden"
--                 id="components-color-picker__hue-description-4"
-+                 id="components-color-picker__hue-description-3"
-                >
-                  Move the arrow left or right to change hue.
-                </p>
-              </div>
-            </div>
-@@ -119,22 +119,22 @@
+                }
+                tabIndex="0"
+              />
+              <p
+                className="components-visually-hidden css-1mm2cvy-View em57xhy0"
+                data-wp-c16t={true}
+                data-wp-component="VisuallyHidden"
+-               id="components-color-picker__hue-description-4"
++               id="components-color-picker__hue-description-3"
+                style={
+                  Object {
+                    "WebkitClipPath": "inset( 50% )",
+                    "border": 0,
+                    "clip": "rect(1px, 1px, 1px, 1px)",
+@@ -149,22 +149,22 @@
             <div
-              className="components-base-control__field css-11vcxb9-StyledField e1puf3u1"
+              className="components-base-control__field css-igk9ll-StyledField e1puf3u2"
             >
               <label
-                className="components-base-control__label css-pezhm9-StyledLabel e1puf3u2"
+                className="components-base-control__label css-13ck15n-StyledLabel e1puf3u1"
 -               htmlFor="inspector-text-control-4"
 +               htmlFor="inspector-text-control-3"
               >
@@ -127,49 +131,51 @@ Snapshot Diff:
 - First value
 + Second value
 
-@@ -11,36 +11,36 @@
-          onTouchMove={[Function bound handleChange]}
-          onTouchStart={[Function bound handleChange]}
-          role="application"
+@@ -10,38 +10,38 @@
+        onTouchMove={[Function bound handleChange]}
+        onTouchStart={[Function bound handleChange]}
+        role="application"
+        style={
+          Object {
+-           "background": "hsl(210,100%, 50%)",
++           "background": "hsl(0,100%, 50%)",
+          }
+        }
+      >
+        <div
+          className="components-color-picker__saturation-white"
+        />
+        <div
+          className="components-color-picker__saturation-black"
+        />
+        <button
+-         aria-describedby="color-picker-saturation-8"
++         aria-describedby="color-picker-saturation-7"
+          aria-label="Choose a shade"
+          className="components-button components-color-picker__saturation-pointer"
+          onKeyDown={[Function bound handleKeyDown]}
           style={
             Object {
--             "background": "hsl(210,100%, 50%)",
-+             "background": "hsl(0,100%, 50%)",
+-             "left": "17%",
+-             "top": "20%",
++             "left": "0%",
++             "top": "0%",
             }
           }
-        >
-          <div
-            className="components-color-picker__saturation-white"
-          />
-          <div
-            className="components-color-picker__saturation-black"
-          />
-          <button
--           aria-describedby="color-picker-saturation-8"
-+           aria-describedby="color-picker-saturation-7"
-            aria-label="Choose a shade"
-            className="components-button components-color-picker__saturation-pointer"
-            onKeyDown={[Function preventKeyEvents]}
-            style={
-              Object {
--               "left": "17%",
--               "top": "20%",
-+               "left": "0%",
-+               "top": "0%",
-              }
-            }
-            type="button"
-          />
-          <div
-            className="components-visually-hidden"
--           id="color-picker-saturation-8"
-+           id="color-picker-saturation-7"
-          >
-            Use your arrow keys to change the base color. Move up to lighten the color, down to darken, left to decrease saturation, and right to increase saturation.
-          </div>
-        </div>
-      </div>
-@@ -56,11 +56,11 @@
+          type="button"
+        />
+        <div
+          className="components-visually-hidden css-1mm2cvy-View em57xhy0"
+          data-wp-c16t={true}
+          data-wp-component="VisuallyHidden"
+-         id="color-picker-saturation-8"
++         id="color-picker-saturation-7"
+          style={
+            Object {
+              "WebkitClipPath": "inset( 50% )",
+              "border": 0,
+              "clip": "rect(1px, 1px, 1px, 1px)",
+@@ -71,11 +71,11 @@
         >
           <div
             className="components-color-picker__active"
@@ -182,46 +188,48 @@ Snapshot Diff:
           />
         </div>
         <div
-@@ -78,29 +78,29 @@
-                onMouseDown={[Function bound handleMouseDown]}
-                onTouchMove={[Function bound handleChange]}
-                onTouchStart={[Function bound handleChange]}
-              >
-                <div
--                 aria-describedby="components-color-picker__hue-description-8"
-+                 aria-describedby="components-color-picker__hue-description-7"
-                  aria-label="Hue value in degrees, from 0 to 359."
-                  aria-orientation="horizontal"
-                  aria-valuemax="1"
-                  aria-valuemin="359"
--                 aria-valuenow={210}
-+                 aria-valuenow={0}
-                  className="components-color-picker__hue-pointer"
-                  onKeyDown={[Function preventKeyEvents]}
-                  role="slider"
-                  style={
-                    Object {
--                     "left": "58.333333333333336%",
-+                     "left": "0%",
-                    }
+@@ -92,31 +92,31 @@
+              onMouseDown={[Function bound handleMouseDown]}
+              onTouchMove={[Function bound handleChange]}
+              onTouchStart={[Function bound handleChange]}
+            >
+              <div
+-               aria-describedby="components-color-picker__hue-description-8"
++               aria-describedby="components-color-picker__hue-description-7"
+                aria-label="Hue value in degrees, from 0 to 359."
+                aria-orientation="horizontal"
+                aria-valuemax="1"
+                aria-valuemin="359"
+-               aria-valuenow={210}
++               aria-valuenow={0}
+                className="components-color-picker__hue-pointer"
+                onKeyDown={[Function bound handleKeyDown]}
+                role="slider"
+                style={
+                  Object {
+-                   "left": "58.333333333333336%",
++                   "left": "0%",
                   }
-                  tabIndex="0"
-                />
-                <p
-                  className="components-visually-hidden"
--                 id="components-color-picker__hue-description-8"
-+                 id="components-color-picker__hue-description-7"
-                >
-                  Move the arrow left or right to change hue.
-                </p>
-              </div>
-            </div>
-@@ -119,22 +119,22 @@
+                }
+                tabIndex="0"
+              />
+              <p
+                className="components-visually-hidden css-1mm2cvy-View em57xhy0"
+                data-wp-c16t={true}
+                data-wp-component="VisuallyHidden"
+-               id="components-color-picker__hue-description-8"
++               id="components-color-picker__hue-description-7"
+                style={
+                  Object {
+                    "WebkitClipPath": "inset( 50% )",
+                    "border": 0,
+                    "clip": "rect(1px, 1px, 1px, 1px)",
+@@ -149,22 +149,22 @@
             <div
-              className="components-base-control__field css-11vcxb9-StyledField e1puf3u1"
+              className="components-base-control__field css-igk9ll-StyledField e1puf3u2"
             >
               <label
-                className="components-base-control__label css-pezhm9-StyledLabel e1puf3u2"
+                className="components-base-control__label css-13ck15n-StyledLabel e1puf3u1"
 -               htmlFor="inspector-text-control-8"
 +               htmlFor="inspector-text-control-7"
               >
@@ -249,49 +257,51 @@ Snapshot Diff:
 - First value
 + Second value
 
-@@ -11,36 +11,36 @@
-          onTouchMove={[Function bound handleChange]}
-          onTouchStart={[Function bound handleChange]}
-          role="application"
+@@ -10,38 +10,38 @@
+        onTouchMove={[Function bound handleChange]}
+        onTouchStart={[Function bound handleChange]}
+        role="application"
+        style={
+          Object {
+-           "background": "hsl(210,100%, 50%)",
++           "background": "hsl(0,100%, 50%)",
+          }
+        }
+      >
+        <div
+          className="components-color-picker__saturation-white"
+        />
+        <div
+          className="components-color-picker__saturation-black"
+        />
+        <button
+-         aria-describedby="color-picker-saturation-10"
++         aria-describedby="color-picker-saturation-9"
+          aria-label="Choose a shade"
+          className="components-button components-color-picker__saturation-pointer"
+          onKeyDown={[Function bound handleKeyDown]}
           style={
             Object {
--             "background": "hsl(210,100%, 50%)",
-+             "background": "hsl(0,100%, 50%)",
+-             "left": "17%",
+-             "top": "20%",
++             "left": "0%",
++             "top": "0%",
             }
           }
-        >
-          <div
-            className="components-color-picker__saturation-white"
-          />
-          <div
-            className="components-color-picker__saturation-black"
-          />
-          <button
--           aria-describedby="color-picker-saturation-10"
-+           aria-describedby="color-picker-saturation-9"
-            aria-label="Choose a shade"
-            className="components-button components-color-picker__saturation-pointer"
-            onKeyDown={[Function preventKeyEvents]}
-            style={
-              Object {
--               "left": "17%",
--               "top": "20%",
-+               "left": "0%",
-+               "top": "0%",
-              }
-            }
-            type="button"
-          />
-          <div
-            className="components-visually-hidden"
--           id="color-picker-saturation-10"
-+           id="color-picker-saturation-9"
-          >
-            Use your arrow keys to change the base color. Move up to lighten the color, down to darken, left to decrease saturation, and right to increase saturation.
-          </div>
-        </div>
-      </div>
-@@ -56,11 +56,11 @@
+          type="button"
+        />
+        <div
+          className="components-visually-hidden css-1mm2cvy-View em57xhy0"
+          data-wp-c16t={true}
+          data-wp-component="VisuallyHidden"
+-         id="color-picker-saturation-10"
++         id="color-picker-saturation-9"
+          style={
+            Object {
+              "WebkitClipPath": "inset( 50% )",
+              "border": 0,
+              "clip": "rect(1px, 1px, 1px, 1px)",
+@@ -71,11 +71,11 @@
         >
           <div
             className="components-color-picker__active"
@@ -304,46 +314,48 @@ Snapshot Diff:
           />
         </div>
         <div
-@@ -78,29 +78,29 @@
-                onMouseDown={[Function bound handleMouseDown]}
-                onTouchMove={[Function bound handleChange]}
-                onTouchStart={[Function bound handleChange]}
-              >
-                <div
--                 aria-describedby="components-color-picker__hue-description-10"
-+                 aria-describedby="components-color-picker__hue-description-9"
-                  aria-label="Hue value in degrees, from 0 to 359."
-                  aria-orientation="horizontal"
-                  aria-valuemax="1"
-                  aria-valuemin="359"
--                 aria-valuenow={210}
-+                 aria-valuenow={0}
-                  className="components-color-picker__hue-pointer"
-                  onKeyDown={[Function preventKeyEvents]}
-                  role="slider"
-                  style={
-                    Object {
--                     "left": "58.333333333333336%",
-+                     "left": "0%",
-                    }
+@@ -92,31 +92,31 @@
+              onMouseDown={[Function bound handleMouseDown]}
+              onTouchMove={[Function bound handleChange]}
+              onTouchStart={[Function bound handleChange]}
+            >
+              <div
+-               aria-describedby="components-color-picker__hue-description-10"
++               aria-describedby="components-color-picker__hue-description-9"
+                aria-label="Hue value in degrees, from 0 to 359."
+                aria-orientation="horizontal"
+                aria-valuemax="1"
+                aria-valuemin="359"
+-               aria-valuenow={210}
++               aria-valuenow={0}
+                className="components-color-picker__hue-pointer"
+                onKeyDown={[Function bound handleKeyDown]}
+                role="slider"
+                style={
+                  Object {
+-                   "left": "58.333333333333336%",
++                   "left": "0%",
                   }
-                  tabIndex="0"
-                />
-                <p
-                  className="components-visually-hidden"
--                 id="components-color-picker__hue-description-10"
-+                 id="components-color-picker__hue-description-9"
-                >
-                  Move the arrow left or right to change hue.
-                </p>
-              </div>
-            </div>
-@@ -119,22 +119,22 @@
+                }
+                tabIndex="0"
+              />
+              <p
+                className="components-visually-hidden css-1mm2cvy-View em57xhy0"
+                data-wp-c16t={true}
+                data-wp-component="VisuallyHidden"
+-               id="components-color-picker__hue-description-10"
++               id="components-color-picker__hue-description-9"
+                style={
+                  Object {
+                    "WebkitClipPath": "inset( 50% )",
+                    "border": 0,
+                    "clip": "rect(1px, 1px, 1px, 1px)",
+@@ -149,22 +149,22 @@
             <div
-              className="components-base-control__field css-11vcxb9-StyledField e1puf3u1"
+              className="components-base-control__field css-igk9ll-StyledField e1puf3u2"
             >
               <label
-                className="components-base-control__label css-pezhm9-StyledLabel e1puf3u2"
+                className="components-base-control__label css-13ck15n-StyledLabel e1puf3u1"
 -               htmlFor="inspector-text-control-10"
 +               htmlFor="inspector-text-control-9"
               >
@@ -371,49 +383,51 @@ Snapshot Diff:
 - First value
 + Second value
 
-@@ -11,36 +11,36 @@
-          onTouchMove={[Function bound handleChange]}
-          onTouchStart={[Function bound handleChange]}
-          role="application"
+@@ -10,38 +10,38 @@
+        onTouchMove={[Function bound handleChange]}
+        onTouchStart={[Function bound handleChange]}
+        role="application"
+        style={
+          Object {
+-           "background": "hsl(210,100%, 50%)",
++           "background": "hsl(0,100%, 50%)",
+          }
+        }
+      >
+        <div
+          className="components-color-picker__saturation-white"
+        />
+        <div
+          className="components-color-picker__saturation-black"
+        />
+        <button
+-         aria-describedby="color-picker-saturation-6"
++         aria-describedby="color-picker-saturation-5"
+          aria-label="Choose a shade"
+          className="components-button components-color-picker__saturation-pointer"
+          onKeyDown={[Function bound handleKeyDown]}
           style={
             Object {
--             "background": "hsl(210,100%, 50%)",
-+             "background": "hsl(0,100%, 50%)",
+-             "left": "17%",
+-             "top": "20%",
++             "left": "0%",
++             "top": "0%",
             }
           }
-        >
-          <div
-            className="components-color-picker__saturation-white"
-          />
-          <div
-            className="components-color-picker__saturation-black"
-          />
-          <button
--           aria-describedby="color-picker-saturation-6"
-+           aria-describedby="color-picker-saturation-5"
-            aria-label="Choose a shade"
-            className="components-button components-color-picker__saturation-pointer"
-            onKeyDown={[Function preventKeyEvents]}
-            style={
-              Object {
--               "left": "17%",
--               "top": "20%",
-+               "left": "0%",
-+               "top": "0%",
-              }
-            }
-            type="button"
-          />
-          <div
-            className="components-visually-hidden"
--           id="color-picker-saturation-6"
-+           id="color-picker-saturation-5"
-          >
-            Use your arrow keys to change the base color. Move up to lighten the color, down to darken, left to decrease saturation, and right to increase saturation.
-          </div>
-        </div>
-      </div>
-@@ -56,11 +56,11 @@
+          type="button"
+        />
+        <div
+          className="components-visually-hidden css-1mm2cvy-View em57xhy0"
+          data-wp-c16t={true}
+          data-wp-component="VisuallyHidden"
+-         id="color-picker-saturation-6"
++         id="color-picker-saturation-5"
+          style={
+            Object {
+              "WebkitClipPath": "inset( 50% )",
+              "border": 0,
+              "clip": "rect(1px, 1px, 1px, 1px)",
+@@ -71,11 +71,11 @@
         >
           <div
             className="components-color-picker__active"
@@ -426,46 +440,48 @@ Snapshot Diff:
           />
         </div>
         <div
-@@ -78,29 +78,29 @@
-                onMouseDown={[Function bound handleMouseDown]}
-                onTouchMove={[Function bound handleChange]}
-                onTouchStart={[Function bound handleChange]}
-              >
-                <div
--                 aria-describedby="components-color-picker__hue-description-6"
-+                 aria-describedby="components-color-picker__hue-description-5"
-                  aria-label="Hue value in degrees, from 0 to 359."
-                  aria-orientation="horizontal"
-                  aria-valuemax="1"
-                  aria-valuemin="359"
--                 aria-valuenow={210}
-+                 aria-valuenow={0}
-                  className="components-color-picker__hue-pointer"
-                  onKeyDown={[Function preventKeyEvents]}
-                  role="slider"
-                  style={
-                    Object {
--                     "left": "58.333333333333336%",
-+                     "left": "0%",
-                    }
+@@ -92,31 +92,31 @@
+              onMouseDown={[Function bound handleMouseDown]}
+              onTouchMove={[Function bound handleChange]}
+              onTouchStart={[Function bound handleChange]}
+            >
+              <div
+-               aria-describedby="components-color-picker__hue-description-6"
++               aria-describedby="components-color-picker__hue-description-5"
+                aria-label="Hue value in degrees, from 0 to 359."
+                aria-orientation="horizontal"
+                aria-valuemax="1"
+                aria-valuemin="359"
+-               aria-valuenow={210}
++               aria-valuenow={0}
+                className="components-color-picker__hue-pointer"
+                onKeyDown={[Function bound handleKeyDown]}
+                role="slider"
+                style={
+                  Object {
+-                   "left": "58.333333333333336%",
++                   "left": "0%",
                   }
-                  tabIndex="0"
-                />
-                <p
-                  className="components-visually-hidden"
--                 id="components-color-picker__hue-description-6"
-+                 id="components-color-picker__hue-description-5"
-                >
-                  Move the arrow left or right to change hue.
-                </p>
-              </div>
-            </div>
-@@ -119,22 +119,22 @@
+                }
+                tabIndex="0"
+              />
+              <p
+                className="components-visually-hidden css-1mm2cvy-View em57xhy0"
+                data-wp-c16t={true}
+                data-wp-component="VisuallyHidden"
+-               id="components-color-picker__hue-description-6"
++               id="components-color-picker__hue-description-5"
+                style={
+                  Object {
+                    "WebkitClipPath": "inset( 50% )",
+                    "border": 0,
+                    "clip": "rect(1px, 1px, 1px, 1px)",
+@@ -149,22 +149,22 @@
             <div
-              className="components-base-control__field css-11vcxb9-StyledField e1puf3u1"
+              className="components-base-control__field css-igk9ll-StyledField e1puf3u2"
             >
               <label
-                className="components-base-control__label css-pezhm9-StyledLabel e1puf3u2"
+                className="components-base-control__label css-13ck15n-StyledLabel e1puf3u1"
 -               htmlFor="inspector-text-control-6"
 +               htmlFor="inspector-text-control-5"
               >
@@ -493,64 +509,64 @@ Snapshot Diff:
 - First value
 + Second value
 
-@@ -22,11 +22,11 @@
-          />
-          <div
-            className="components-color-picker__saturation-black"
-          />
-          <button
--           aria-describedby="color-picker-saturation-2"
-+           aria-describedby="color-picker-saturation-1"
-            aria-label="Choose a shade"
-            className="components-button components-color-picker__saturation-pointer"
-            onKeyDown={[Function preventKeyEvents]}
-            style={
-              Object {
-@@ -36,11 +36,11 @@
-            }
-            type="button"
-          />
-          <div
-            className="components-visually-hidden"
--           id="color-picker-saturation-2"
-+           id="color-picker-saturation-1"
-          >
-            Use your arrow keys to change the base color. Move up to lighten the color, down to darken, left to decrease saturation, and right to increase saturation.
-          </div>
-        </div>
-      </div>
-@@ -78,11 +78,11 @@
-                onMouseDown={[Function bound handleMouseDown]}
-                onTouchMove={[Function bound handleChange]}
-                onTouchStart={[Function bound handleChange]}
-              >
-                <div
--                 aria-describedby="components-color-picker__hue-description-2"
-+                 aria-describedby="components-color-picker__hue-description-1"
-                  aria-label="Hue value in degrees, from 0 to 359."
-                  aria-orientation="horizontal"
-                  aria-valuemax="1"
-                  aria-valuemin="359"
-                  aria-valuenow={0}
-@@ -96,11 +96,11 @@
-                  }
-                  tabIndex="0"
-                />
-                <p
-                  className="components-visually-hidden"
--                 id="components-color-picker__hue-description-2"
-+                 id="components-color-picker__hue-description-1"
-                >
-                  Move the arrow left or right to change hue.
-                </p>
-              </div>
-            </div>
-@@ -119,22 +119,22 @@
+@@ -21,11 +21,11 @@
+        />
+        <div
+          className="components-color-picker__saturation-black"
+        />
+        <button
+-         aria-describedby="color-picker-saturation-2"
++         aria-describedby="color-picker-saturation-1"
+          aria-label="Choose a shade"
+          className="components-button components-color-picker__saturation-pointer"
+          onKeyDown={[Function bound handleKeyDown]}
+          style={
+            Object {
+@@ -37,11 +37,11 @@
+        />
+        <div
+          className="components-visually-hidden css-1mm2cvy-View em57xhy0"
+          data-wp-c16t={true}
+          data-wp-component="VisuallyHidden"
+-         id="color-picker-saturation-2"
++         id="color-picker-saturation-1"
+          style={
+            Object {
+              "WebkitClipPath": "inset( 50% )",
+              "border": 0,
+              "clip": "rect(1px, 1px, 1px, 1px)",
+@@ -92,11 +92,11 @@
+              onMouseDown={[Function bound handleMouseDown]}
+              onTouchMove={[Function bound handleChange]}
+              onTouchStart={[Function bound handleChange]}
+            >
+              <div
+-               aria-describedby="components-color-picker__hue-description-2"
++               aria-describedby="components-color-picker__hue-description-1"
+                aria-label="Hue value in degrees, from 0 to 359."
+                aria-orientation="horizontal"
+                aria-valuemax="1"
+                aria-valuemin="359"
+                aria-valuenow={0}
+@@ -112,11 +112,11 @@
+              />
+              <p
+                className="components-visually-hidden css-1mm2cvy-View em57xhy0"
+                data-wp-c16t={true}
+                data-wp-component="VisuallyHidden"
+-               id="components-color-picker__hue-description-2"
++               id="components-color-picker__hue-description-1"
+                style={
+                  Object {
+                    "WebkitClipPath": "inset( 50% )",
+                    "border": 0,
+                    "clip": "rect(1px, 1px, 1px, 1px)",
+@@ -149,22 +149,22 @@
             <div
-              className="components-base-control__field css-11vcxb9-StyledField e1puf3u1"
+              className="components-base-control__field css-igk9ll-StyledField e1puf3u2"
             >
               <label
-                className="components-base-control__label css-pezhm9-StyledLabel e1puf3u2"
+                className="components-base-control__label css-13ck15n-StyledLabel e1puf3u1"
 -               htmlFor="inspector-text-control-2"
 +               htmlFor="inspector-text-control-1"
               >
@@ -579,17 +595,17 @@ exports[`ColorPicker should render color picker 1`] = `
   font-size: 13px;
 }
 
-.emotion-2 {
-  margin-bottom: 8px;
+.emotion-6 {
+  margin-bottom: calc(4px * 2);
 }
 
-.components-panel__row .emotion-2 {
+.components-panel__row .emotion-6 {
   margin-bottom: inherit;
 }
 
-.emotion-0 {
+.emotion-8 {
   display: inline-block;
-  margin-bottom: 8px;
+  margin-bottom: calc(4px * 2);
 }
 
 <div
@@ -598,44 +614,59 @@ exports[`ColorPicker should render color picker 1`] = `
   <div
     className="components-color-picker__saturation"
   >
-    <div>
+    <div
+      className="components-color-picker__saturation-color"
+      onMouseDown={[Function]}
+      onTouchMove={[Function]}
+      onTouchStart={[Function]}
+      role="application"
+      style={
+        Object {
+          "background": "hsl(0,100%, 50%)",
+        }
+      }
+    >
       <div
-        className="components-color-picker__saturation-color"
-        onMouseDown={[Function]}
-        onTouchMove={[Function]}
-        onTouchStart={[Function]}
-        role="application"
+        className="components-color-picker__saturation-white"
+      />
+      <div
+        className="components-color-picker__saturation-black"
+      />
+      <button
+        aria-describedby="color-picker-saturation-0"
+        aria-label="Choose a shade"
+        className="components-button components-color-picker__saturation-pointer"
+        onKeyDown={[Function]}
         style={
           Object {
-            "background": "hsl(0,100%, 50%)",
+            "left": "0%",
+            "top": "0%",
+          }
+        }
+        type="button"
+      />
+      <div
+        className="components-visually-hidden emotion-0 emotion-1"
+        data-wp-c16t={true}
+        data-wp-component="VisuallyHidden"
+        id="color-picker-saturation-0"
+        style={
+          Object {
+            "WebkitClipPath": "inset( 50% )",
+            "border": 0,
+            "clip": "rect(1px, 1px, 1px, 1px)",
+            "clipPath": "inset( 50% )",
+            "height": "1px",
+            "margin": "-1px",
+            "overflow": "hidden",
+            "padding": 0,
+            "position": "absolute",
+            "width": "1px",
+            "wordWrap": "normal",
           }
         }
       >
-        <div
-          className="components-color-picker__saturation-white"
-        />
-        <div
-          className="components-color-picker__saturation-black"
-        />
-        <button
-          aria-describedby="color-picker-saturation-0"
-          aria-label="Choose a shade"
-          className="components-button components-color-picker__saturation-pointer"
-          onKeyDown={[Function]}
-          style={
-            Object {
-              "left": "0%",
-              "top": "0%",
-            }
-          }
-          type="button"
-        />
-        <div
-          className="components-visually-hidden"
-          id="color-picker-saturation-0"
-        >
-          Use your arrow keys to change the base color. Move up to lighten the color, down to darken, left to decrease saturation, and right to increase saturation.
-        </div>
+        Use your arrow keys to change the base color. Move up to lighten the color, down to darken, left to decrease saturation, and right to increase saturation.
       </div>
     </div>
   </div>
@@ -660,43 +691,58 @@ exports[`ColorPicker should render color picker 1`] = `
       <div
         className="components-color-picker__toggles"
       >
-        <div>
+        <div
+          className="components-color-picker__hue"
+        >
           <div
-            className="components-color-picker__hue"
+            className="components-color-picker__hue-gradient"
+          />
+          <div
+            className="components-color-picker__hue-bar"
+            onMouseDown={[Function]}
+            onTouchMove={[Function]}
+            onTouchStart={[Function]}
           >
             <div
-              className="components-color-picker__hue-gradient"
-            />
-            <div
-              className="components-color-picker__hue-bar"
-              onMouseDown={[Function]}
-              onTouchMove={[Function]}
-              onTouchStart={[Function]}
-            >
-              <div
-                aria-describedby="components-color-picker__hue-description-0"
-                aria-label="Hue value in degrees, from 0 to 359."
-                aria-orientation="horizontal"
-                aria-valuemax="1"
-                aria-valuemin="359"
-                aria-valuenow={0}
-                className="components-color-picker__hue-pointer"
-                onKeyDown={[Function]}
-                role="slider"
-                style={
-                  Object {
-                    "left": "0%",
-                  }
+              aria-describedby="components-color-picker__hue-description-0"
+              aria-label="Hue value in degrees, from 0 to 359."
+              aria-orientation="horizontal"
+              aria-valuemax="1"
+              aria-valuemin="359"
+              aria-valuenow={0}
+              className="components-color-picker__hue-pointer"
+              onKeyDown={[Function]}
+              role="slider"
+              style={
+                Object {
+                  "left": "0%",
                 }
-                tabIndex="0"
-              />
-              <p
-                className="components-visually-hidden"
-                id="components-color-picker__hue-description-0"
-              >
-                Move the arrow left or right to change hue.
-              </p>
-            </div>
+              }
+              tabIndex="0"
+            />
+            <p
+              className="components-visually-hidden emotion-0 emotion-1"
+              data-wp-c16t={true}
+              data-wp-component="VisuallyHidden"
+              id="components-color-picker__hue-description-0"
+              style={
+                Object {
+                  "WebkitClipPath": "inset( 50% )",
+                  "border": 0,
+                  "clip": "rect(1px, 1px, 1px, 1px)",
+                  "clipPath": "inset( 50% )",
+                  "height": "1px",
+                  "margin": "-1px",
+                  "overflow": "hidden",
+                  "padding": 0,
+                  "position": "absolute",
+                  "width": "1px",
+                  "wordWrap": "normal",
+                }
+              }
+            >
+              Move the arrow left or right to change hue.
+            </p>
           </div>
         </div>
       </div>
@@ -711,10 +757,10 @@ exports[`ColorPicker should render color picker 1`] = `
           className="components-base-control components-color-picker__inputs-field emotion-4 emotion-5"
         >
           <div
-            className="components-base-control__field emotion-2 emotion-3"
+            className="components-base-control__field emotion-6 emotion-7"
           >
             <label
-              className="components-base-control__label emotion-0 emotion-1"
+              className="components-base-control__label emotion-8 emotion-9"
               htmlFor="inspector-text-control-0"
             >
               Color value in hexadecimal

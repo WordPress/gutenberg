@@ -93,9 +93,9 @@ div.components-toolbar {
 	> .components-button:first-child,
 	> div:first-child > .components-button,
 	> .components-dropdown:first-child .components-button {
-		min-width: $block-toolbar-height - $grid-unit-15 / 2;
+		min-width: $block-toolbar-height - $grid-unit-15 * 0.5;
 		padding-left: $grid-unit-15 - $border-width;
-		padding-right: $grid-unit-15 / 2;
+		padding-right: $grid-unit-15 * 0.5;
 
 		&::before {
 			left: $grid-unit-10;
@@ -109,8 +109,8 @@ div.components-toolbar {
 	> div > .components-button,
 	> .components-dropdown .components-button {
 		min-width: $block-toolbar-height - $grid-unit-15;
-		padding-left: $grid-unit-15 / 2; // 6px.
-		padding-right: $grid-unit-15 / 2;
+		padding-left: $grid-unit-15 * 0.5; // 6px.
+		padding-right: $grid-unit-15 * 0.5;
 
 		svg {
 			min-width: $button-size-small; // This is the optimal icon size, and we size the whole button after this.
@@ -127,8 +127,8 @@ div.components-toolbar {
 	> .components-button:last-child,
 	> div:last-child > .components-button,
 	> .components-dropdown:last-child .components-button {
-		min-width: $block-toolbar-height - $grid-unit-15 / 2;
-		padding-left: $grid-unit-15 / 2;
+		min-width: $block-toolbar-height - $grid-unit-15 * 0.5;
+		padding-left: $grid-unit-15 * 0.5;
 		padding-right: $grid-unit-15 - $border-width;
 
 		&::before {
