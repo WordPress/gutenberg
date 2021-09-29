@@ -4,7 +4,6 @@
 import { __ } from '@wordpress/i18n';
 import {
 	Button,
-	MenuGroup,
 	MenuItem,
 	__experimentalText as Text,
 } from '@wordpress/components';
@@ -45,7 +44,7 @@ export default function TemplateDetails( { template, onClose } ) {
 
 	return (
 		<>
-			<MenuGroup className="edit-site-template-details">
+			<div className="edit-site-template-details">
 				<Text size="body" weight={ 600 }>
 					{ title }
 				</Text>
@@ -58,19 +57,19 @@ export default function TemplateDetails( { template, onClose } ) {
 						{ description }
 					</Text>
 				) }
-			</MenuGroup>
+			</div>
 
 			<TemplateAreas template={ template } />
 
 			{ isTemplateRevertable( template ) && (
-				<MenuGroup className="edit-site-template-details__revert">
+				<div className="edit-site-template-details__revert">
 					<MenuItem
 						info={ __( 'Restore template to theme default' ) }
 						onClick={ revert }
 					>
 						{ __( 'Clear customizations' ) }
 					</MenuItem>
-				</MenuGroup>
+				</div>
 			) }
 
 			<Button
