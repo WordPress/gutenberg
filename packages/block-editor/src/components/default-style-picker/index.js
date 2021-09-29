@@ -2,73 +2,67 @@
  * WordPress dependencies
  */
 import { store as blocksStore } from '@wordpress/blocks';
-import { useCallback } from '@wordpress/element';
+import { useMemo, useCallback } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
-import { Button } from '@wordpress/components';
+import { SelectControl } from '@wordpress/components';
 import { useSelect } from '@wordpress/data';
 
 /**
  * Internal dependencies
  */
 import { store as blockEditorStore } from '../../store';
-import { getActiveStyle, getRenderedStyles } from '../block-styles/utils';
+import { getDefaultStyle } from '../block-styles/utils';
 
-export default function DefaultStylePicker( { clientId } ) {
+export default function DefaultStylePicker( { blockName } ) {
 	const {
-		activeStyle,
-		onUpdatePreferredStyleVariations,
 		preferredStyle,
+		onUpdatePreferredStyleVariations,
+		styles,
 	} = useSelect(
 		( select ) => {
-			const { getBlock, getSettings } = select( blockEditorStore );
-			const block = getBlock( clientId );
-			const settings = getSettings();
+			const settings = select( blockEditorStore ).getSettings();
 			const preferredStyleVariations =
 				settings.__experimentalPreferredStyleVariations;
-			const blockStyles = select( blocksStore ).getBlockStyles(
-				block.name
-			);
-			const onUpdate = preferredStyleVariations?.onChange
-				? ( blockStyle ) =>
-						preferredStyleVariations?.onChange(
-							block.name,
-							blockStyle
-						)
-				: null;
-			// The blocks styles inspector shows a default option,
-			// so make sure this component knows about it too.
-			const renderedStyles = getRenderedStyles( blockStyles );
-
 			return {
-				preferredStyle: preferredStyleVariations?.value?.[ block.name ],
-				onUpdatePreferredStyleVariations: onUpdate,
-				blockName: block.name,
-				activeStyle: getActiveStyle(
-					renderedStyles,
-					block.attributes.className || ''
-				),
+				preferredStyle: preferredStyleVariations?.value?.[ blockName ],
+				onUpdatePreferredStyleVariations:
+					preferredStyleVariations?.onChange ?? null,
+				styles: select( blocksStore ).getBlockStyles( blockName ),
 			};
 		},
-		[ clientId ]
+		[ blockName ]
 	);
-	const selectOnChange = useCallback( () => {
-		onUpdatePreferredStyleVariations( activeStyle.name );
-	}, [ activeStyle?.name, onUpdatePreferredStyleVariations ] );
+	const selectOptions = useMemo(
+		() => [
+			{ label: __( 'Not set' ), value: '' },
+			...styles.map( ( { label, name } ) => ( { label, value: name } ) ),
+		],
+		[ styles ]
+	);
+	const defaultStyleName = useMemo( () => getDefaultStyle( styles )?.name, [
+		styles,
+	] );
+	const selectOnChange = useCallback(
+		( blockStyle ) => {
+			onUpdatePreferredStyleVariations( blockName, blockStyle );
+		},
+		[ blockName, onUpdatePreferredStyleVariations ]
+	);
+
+	// Until the functionality is migrated to global styles,
+	// only show the default style picker if a non-default style has already been selected.
+	if ( ! preferredStyle || preferredStyle === defaultStyleName ) {
+		return null;
+	}
 
 	return (
 		onUpdatePreferredStyleVariations && (
-			<div className="default-style-picker__default-switcher">
-				{ preferredStyle !== activeStyle?.name && (
-					<Button
-						onClick={ selectOnChange }
-						variant="link"
-						label="Set default style"
-						className="default-style-picker__style-button"
-					>
-						{ __( 'Make default' ) }
-					</Button>
-				) }
-			</div>
+			<SelectControl
+				options={ selectOptions }
+				value={ preferredStyle || '' }
+				label={ __( 'Default Style' ) }
+				onChange={ selectOnChange }
+			/>
 		)
 	);
 }
