@@ -12,6 +12,8 @@ For each user feature we should also add a importance categorization label  to i
 ## Unreleased
 -   [**] [Embed block] Add the top 5 specific embed blocks to the Block inserter list [#34967]
 -   [*] [Embed block] Fix inline preview cut-off when editing URL [#35321]
+-   [**] Block inserter indicates newly available block types [#35201]
+-   [**] Block editor support articles available within the block editor help menu [#35201]
 
 1.62.2
 ------
