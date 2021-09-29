@@ -8,7 +8,7 @@ import { render, fireEvent } from 'test/helpers';
  */
 import BlockAlignmentUI from '../ui';
 
-it( 'should call onChange with undefined, when the control is already active', () => {
+it( 'should call onChange with undefined when the control is already active', () => {
 	const onChangeMock = jest.fn();
 	const screen = render(
 		<BlockAlignmentUI value="right" onChange={ onChangeMock } />
