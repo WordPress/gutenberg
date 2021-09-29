@@ -63,6 +63,7 @@ import * as socialLinks from './social-links';
 import * as socialLink from './social-link';
 
 // Full Site Editing Blocks
+import * as commentsQuery from './comments-query';
 import * as commentsTemplate from './comments-template';
 import * as siteLogo from './site-logo';
 import * as siteTagline from './site-tagline';
@@ -90,7 +91,6 @@ import * as postComments from './post-comments';
 import * as postCommentsCount from './post-comments-count';
 import * as postCommentsForm from './post-comments-form';
 import * as postCommentsLink from './post-comments-link';
-import * as postCommentsQuery from './post-comments-query';
 import * as postDate from './post-date';
 import * as postExcerpt from './post-excerpt';
 import * as postFeaturedImage from './post-featured-image';
@@ -172,6 +172,7 @@ export const __experimentalGetCoreBlocks = () => [
 	video,
 
 	// Theme blocks
+	commentsQuery,
 	commentsTemplate,
 
 	siteLogo,
@@ -186,7 +187,6 @@ export const __experimentalGetCoreBlocks = () => [
 	queryPaginationNumbers,
 	queryPaginationPrevious,
 
-	postCommentsQuery,
 	postTitle,
 	postContent,
 	postDate,
