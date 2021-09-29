@@ -1,0 +1,26 @@
+{
+	"apiVersion": 2,
+	"name": "core/comments-template",
+	"title": "Comments Template",
+	"category": "design",
+	"parent": [ "core/comments-query" ],
+	"description": "Contains the block elements used to render a comment, like the title, date, author, avator and more.",
+	"textdomain": "default",
+	"usesContext": [
+		"queryId",
+		"query",
+		"queryContext",
+		"displayLayout",
+		"templateSlug"
+	],
+	"supports": {
+		"reusable": false,
+		"html": false,
+		"align": true,
+		"__experimentalLayout": {
+			"allowEditing": false
+		}
+	},
+	"style": "wp-block-post-template",
+	"editorStyle": "wp-block-post-template-editor"
+}
