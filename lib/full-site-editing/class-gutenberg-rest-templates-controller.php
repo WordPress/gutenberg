@@ -373,6 +373,7 @@ class Gutenberg_REST_Templates_Controller extends WP_REST_Controller {
 		}
 
 		if ( 'wp_template_part' === $this->post_type ) {
+			$changes->tax_input = array();
 			if ( isset( $request['area'] ) ) {
 				$changes->tax_input['wp_template_part_area'] = gutenberg_filter_template_part_area( $request['area'] );
 			} elseif ( null !== $template && 'custom' !== $template->source && $template->area ) {
