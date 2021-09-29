@@ -115,7 +115,50 @@ function NavigatorScreen( props: Props, forwardedRef: Ref< any > ) {
 	);
 }
 
-// TODO: docs
+/**
+ * The `NavigatorScreen` component represents a single view/screen/panel/menu and is supposed to be used in combination with the `NavigatorProvider` component.
+ *
+ * @example
+ * ```jsx
+ * import {
+ *   __experimentalNavigatorProvider as NavigatorProvider,
+ *   __experimentalNavigatorScreen as NavigatorScreen,
+ *   __experimentalUseNavigator as useNavigator,
+ * } from '@wordpress/components';
+ *
+ * function NavigatorButton( {
+ *   path,
+ *   isBack = false,
+ *   ...props
+ * } ) {
+ *   const navigator = useNavigator();
+ *   return (
+ *   	<Button
+ *   	  onClick={ () => navigator.push( path, { isBack } ) }
+ *   	  { ...props }
+ *   	/>
+ *   );
+ * }
+ *
+ * const MyNavigation = () => (
+ *   <NavigatorProvider initialPath="/">
+ *     <NavigatorScreen path="/">
+ *       <p>This is the home screen.</p>
+ *   	   <NavigatorButton isPrimary path="/child">
+ *          Navigate to child screen.
+ *       </NavigatorButton>
+ *     </NavigatorScreen>
+ *
+ *     <NavigatorScreen path="/child">
+ *       <p>This is the child screen.</p>
+ *       <NavigatorButton isPrimary path="/" isBack>
+ *         Go back
+ *       </NavigatorButton>
+ *     </NavigatorScreen>
+ *   </NavigatorProvider>
+ * );
+ * ```
+ */
 const ConnectedNavigatorScreen = contextConnect(
 	NavigatorScreen,
 	'NavigatorScreen'

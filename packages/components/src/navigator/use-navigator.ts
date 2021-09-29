@@ -9,6 +9,9 @@ import { useContext } from '@wordpress/element';
 import { NavigatorContext } from './context';
 import type { Navigator } from './types';
 
+/**
+ * Retrieves a `navigator` instance.
+ */
 function useNavigator(): Navigator {
 	const [ , setPath ] = useContext( NavigatorContext );
 
