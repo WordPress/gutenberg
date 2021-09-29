@@ -13,10 +13,12 @@ import {
 	PanelBody,
 	RangeControl,
 	ToggleControl,
+	SelectControl,
 } from '@wordpress/components';
 
 import {
 	InspectorControls,
+	InspectorAdvancedControls,
 	__experimentalUseInnerBlocksProps as useInnerBlocksProps,
 	BlockControls,
 	BlockVerticalAlignmentToolbar,
@@ -52,6 +54,21 @@ import {
  */
 const ALLOWED_BLOCKS = [ 'core/column' ];
 
+const htmlElementMessages = {
+	main: __(
+		'The <main> element should be used for the primary content of your document only. '
+	),
+	section: __(
+		"The <section> element should represent a standalone portion of the document that can't be better represented by another element."
+	),
+	article: __(
+		'The <article> element should represent a self contained, syndicatable portion of the document.'
+	),
+	aside: __(
+		"The <aside> element should represent a portion of a document whose content is only indirectly related to the document's main content."
+	),
+};
+
 function ColumnsEditContainer( {
 	attributes,
 	setAttributes,
@@ -59,7 +76,11 @@ function ColumnsEditContainer( {
 	updateColumns,
 	clientId,
 } ) {
-	const { isStackedOnMobile, verticalAlignment } = attributes;
+	const {
+		isStackedOnMobile,
+		verticalAlignment,
+		tagName: TagName = 'div',
+	} = attributes;
 
 	const { count } = useSelect(
 		( select ) => {
@@ -119,6 +140,23 @@ function ColumnsEditContainer( {
 					/>
 				</PanelBody>
 			</InspectorControls>
+			<InspectorAdvancedControls>
+				<SelectControl
+					label={ __( 'HTML element' ) }
+					options={ [
+						{ label: __( 'Default (<div>)' ), value: 'div' },
+						{ label: '<main>', value: 'main' },
+						{ label: '<section>', value: 'section' },
+						{ label: '<article>', value: 'article' },
+						{ label: '<aside>', value: 'aside' },
+					] }
+					value={ TagName }
+					onChange={ ( value ) =>
+						setAttributes( { tagName: value } )
+					}
+					help={ htmlElementMessages[ TagName ] }
+				/>
+			</InspectorAdvancedControls>
 			<div { ...innerBlocksProps } />
 		</>
 	);

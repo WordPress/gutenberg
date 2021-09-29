@@ -9,7 +9,7 @@ import classnames from 'classnames';
 import { InnerBlocks, useBlockProps } from '@wordpress/block-editor';
 
 export default function save( { attributes } ) {
-	const { isStackedOnMobile, verticalAlignment } = attributes;
+	const { isStackedOnMobile, verticalAlignment, tagName: Tag } = attributes;
 
 	const className = classnames( {
 		[ `are-vertically-aligned-${ verticalAlignment }` ]: verticalAlignment,
@@ -17,8 +17,8 @@ export default function save( { attributes } ) {
 	} );
 
 	return (
-		<div { ...useBlockProps.save( { className } ) }>
+		<Tag { ...useBlockProps.save( { className } ) }>
 			<InnerBlocks.Content />
-		</div>
+		</Tag>
 	);
 }

@@ -12,6 +12,10 @@
 		"isStackedOnMobile": {
 			"type": "boolean",
 			"default": true
+		},
+		"tagName": {
+			"type": "string",
+			"default": "div"
 		}
 	},
 	"supports": {
