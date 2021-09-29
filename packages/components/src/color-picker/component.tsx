@@ -20,9 +20,9 @@ import {
 	useContextSystem,
 	contextConnect,
 	WordPressComponentProps,
-} from '../context';
-import { HStack } from '../../h-stack';
-import { Spacer } from '../../spacer';
+} from '../ui/context';
+import { HStack } from '../h-stack';
+import { Spacer } from '../spacer';
 import {
 	ColorfulWrapper,
 	SelectControl,
@@ -32,7 +32,7 @@ import {
 import { ColorDisplay } from './color-display';
 import { ColorInput } from './color-input';
 import { Picker } from './picker';
-import { useControlledValue } from '../../utils/hooks';
+import { useControlledValue } from '../utils/hooks';
 
 import type { ColorType } from './types';
 
