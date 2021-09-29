@@ -563,6 +563,104 @@ describe( 'Manual link entry', () => {
 		}
 	);
 
+	describe( 'Handling of empty values', () => {
+		const testTable = [
+			[ 'containing only spaces', '        ' ],
+			[ 'containing only tabs', '		' ],
+			[ 'from strings with no length', '' ],
+		];
+
+		it.each( testTable )(
+			'should not allow creation of links %s when using the keyboard',
+			async ( _desc, searchString ) => {
+				act( () => {
+					render( <LinkControl />, container );
+				} );
+
+				// Search Input UI
+				const searchInput = getURLInput();
+
+				let submitButton = queryByRole( container, 'button', {
+					name: 'Submit',
+				} );
+
+				expect( submitButton.disabled ).toBeTruthy();
+				expect( submitButton ).not.toBeNull();
+				expect( submitButton ).toBeInTheDocument();
+
+				// Simulate searching for a term
+				act( () => {
+					Simulate.change( searchInput, {
+						target: { value: searchString },
+					} );
+				} );
+
+				// fetchFauxEntitySuggestions resolves on next "tick" of event loop
+				await eventLoopTick();
+
+				// Attempt to submit the empty search value in the input.
+				act( () => {
+					Simulate.keyDown( searchInput, { keyCode: ENTER } );
+				} );
+
+				submitButton = queryByRole( container, 'button', {
+					name: 'Submit',
+				} );
+
+				// Verify the UI hasn't allowed submission.
+				expect( searchInput ).toBeInTheDocument();
+				expect( submitButton.disabled ).toBeTruthy();
+				expect( submitButton ).not.toBeNull();
+				expect( submitButton ).toBeInTheDocument();
+			}
+		);
+
+		it.each( testTable )(
+			'should not allow creation of links %s via the UI "submit" button',
+			async ( _desc, searchString ) => {
+				act( () => {
+					render( <LinkControl />, container );
+				} );
+
+				// Search Input UI
+				const searchInput = getURLInput();
+
+				let submitButton = queryByRole( container, 'button', {
+					name: 'Submit',
+				} );
+
+				expect( submitButton.disabled ).toBeTruthy();
+				expect( submitButton ).not.toBeNull();
+				expect( submitButton ).toBeInTheDocument();
+
+				// Simulate searching for a term
+				act( () => {
+					Simulate.change( searchInput, {
+						target: { value: searchString },
+					} );
+				} );
+
+				// fetchFauxEntitySuggestions resolves on next "tick" of event loop
+				await eventLoopTick();
+
+				// Attempt to submit the empty search value in the input.
+				act( () => {
+					Simulate.click( submitButton );
+				} );
+
+				submitButton = queryByRole( container, 'button', {
+					name: 'Submit',
+				} );
+
+				// Verify the UI hasn't allowed submission.
+				expect( searchInput ).toBeInTheDocument();
+				expect( submitButton.disabled ).toBeTruthy();
+				expect( submitButton ).not.toBeNull();
+				expect( submitButton ).toBeInTheDocument();
+			}
+		);
+	} );
+
 	describe( 'Alternative link protocols and formats', () => {
 		it.each( [
 			[ 'mailto:example123456@wordpress.org', 'mailto' ],
