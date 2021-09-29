@@ -139,7 +139,7 @@ export default function GlobalStylesProvider( { children, baseStyles } ) {
 			blockTypes: select( blocksStore ).getBlockTypes(),
 			settings: select( editSiteStore ).getSettings(),
 		};
-	} );
+	}, [] );
 	const { updateSettings } = useDispatch( editSiteStore );
 
 	const blocks = useMemo( () => getBlockMetadata( blockTypes ), [
