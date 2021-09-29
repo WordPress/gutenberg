@@ -50,6 +50,7 @@ public class GutenbergWebViewActivity extends AppCompatActivity {
     protected TextView mForegroundViewTitle;
     protected TextView mForegroundViewSubtitle;
     protected boolean mIsRedirected;
+    protected ActionMode mActionMode = null;
 
     private ProgressBar mProgressBar;
     private boolean mIsGutenbergReady;
