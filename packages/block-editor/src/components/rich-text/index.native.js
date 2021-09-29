@@ -14,6 +14,7 @@ import {
 	useCallback,
 	forwardRef,
 } from '@wordpress/element';
+import { Picker } from '@wordpress/components';
 import { useDispatch, useSelect } from '@wordpress/data';
 import {
 	pasteHandler,
@@ -39,6 +40,7 @@ import {
 } from '@wordpress/rich-text';
 import deprecated from '@wordpress/deprecated';
 import { isURL } from '@wordpress/url';
+import { __ } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
@@ -55,6 +57,7 @@ import {
 	getMultilineTag,
 	getAllowedFormats,
 	isShortcode,
+	createLinkInParagraph,
 } from './utils';
 
 const wrapperClasses = 'block-editor-rich-text';
@@ -208,6 +211,38 @@ function RichTextWrapper(
 					__unstableCreateElement( document, newValue ).childNodes
 				)
 			);
+	}
+
+	const embeddableUrlPickerRef = useRef();
+
+	let createEmbed = () => {
+	};
+	let createLink = () => {
+	};
+
+	let embeddableUrlPickerOptions = {
+		createEmbed: {
+			id: 'createEmbed',
+			label: __( 'Create embed' ),
+			value: 'createEmbed',
+			onSelect: createEmbed,
+		},
+		createLink: {
+			id: 'createLink',
+			label: __( 'Create link' ),
+			value: 'createLink',
+			onSelect: createLink,
+		},
+	};
+
+	const options = [
+		embeddableUrlPickerOptions.createEmbed,
+		embeddableUrlPickerOptions.createLink,
+	];
+
+	function onPickerSelect( value ) {
+		const selectedItem = options.find( ( item ) => item.value === value );
+		selectedItem.onSelect();
 	}
 
 	const onSelectionChange = useCallback(
@@ -445,6 +480,29 @@ function RichTextWrapper(
 				isURL( plainText.trim() )
 			) {
 				mode = 'BLOCKS';
+
+				createEmbed = () => {
+					const content = pasteHandler( {
+						HTML: html,
+						plainText,
+						mode,
+						tagName,
+						preserveWhiteSpace,
+					} );
+
+					if ( content.length > 0 ) {
+						if ( onReplace && isEmpty( value ) ) {
+							onReplace( content, content.length - 1, -1 );
+						}
+					}
+				};
+
+				createLink = () => {
+					createLinkInParagraph( plainText.trim(), onReplace );
+				};
+
+				embeddableUrlPickerRef.current?.presentPicker();
+				return;
 			}
 
 			const content = pasteHandler( {
@@ -650,6 +708,13 @@ function RichTextWrapper(
 							/>
 						) }
 					</Autocomplete>
+					<Picker
+						ref={ embeddableUrlPickerRef }
+						options={ options }
+						onChange={ onPickerSelect }
+						hideCancelButton
+						leftAlign
+					/>
 				</>
 			) }
 		</RichText>
