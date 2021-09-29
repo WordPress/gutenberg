@@ -221,7 +221,7 @@ class Gutenberg_REST_Templates_Controller extends WP_REST_Controller {
 
 		if ( 'custom' !== $template->source ) {
 			$post = get_post( $result );
-			customize_template( $post, $request['id'] );
+			customize_template( $post, $template->slug );
 		}
 
 		$template      = gutenberg_get_block_template( $request['id'], $this->post_type );
