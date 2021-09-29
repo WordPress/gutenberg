@@ -2,6 +2,12 @@
  * External dependencies
  */
 import { find, startsWith, get, camelCase, has } from 'lodash';
+import { Dimensions } from 'react-native';
+
+/**
+ * WordPress dependencies
+ */
+import { getPxFromCssUnit } from '@wordpress/block-editor';
 
 export const BLOCK_STYLE_ATTRIBUTES = [
 	'textColor',
@@ -245,6 +251,41 @@ export function getMappedValues( features, palette ) {
 	return mappedValues;
 }
 
+/**
+ * Returns the normalized fontSizes to include the sizePx value for each of the different sizes.
+ *
+ * @param {Object} fontSizes found in global styles.
+ * @return {Object} normalized sizes.
+ */
+function normalizeFontSizes( fontSizes ) {
+	// Adds normalized PX values for each of the different keys
+	if ( ! fontSizes ) {
+		return fontSizes;
+	}
+	const normalizedFontSizes = {};
+	const dimensions = Dimensions.get( 'window' );
+
+	[ 'core', 'theme', 'user' ].forEach( ( key ) => {
+		if ( fontSizes[ key ] ) {
+			normalizedFontSizes[ key ] = fontSizes[ key ]?.map(
+				( fontSizeObject ) => {
+					fontSizeObject.sizePx = getPxFromCssUnit(
+						fontSizeObject.size,
+						{
+							width: dimensions.width,
+							height: dimensions.height,
+							fontSize: 16,
+						}
+					);
+					return fontSizeObject;
+				}
+			);
+		}
+	} );
+
+	return normalizedFontSizes;
+}
+
 export function getGlobalStyles( rawStyles, rawFeatures ) {
 	const features = rawFeatures ? JSON.parse( rawFeatures ) : {};
 	const mappedValues = getMappedValues( features, features?.color?.palette );
@@ -266,6 +307,8 @@ export function getGlobalStyles( rawStyles, rawFeatures ) {
 		customValues
 	);
 
+	const fontSizes = normalizeFontSizes( features?.typography?.fontSizes );
+
 	return {
 		colors,
 		gradients,
@@ -277,7 +320,7 @@ export function getGlobalStyles( rawStyles, rawFeatures ) {
 				background: features?.color?.background ?? true,
 			},
 			typography: {
-				fontSizes: features?.typography?.fontSizes,
+				fontSizes,
 				customLineHeight: features?.custom?.[ 'line-height' ],
 			},
 		},

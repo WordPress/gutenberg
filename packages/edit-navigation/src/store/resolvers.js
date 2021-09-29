@@ -2,14 +2,13 @@
  * WordPress dependencies
  */
 import { createBlock } from '@wordpress/blocks';
+import { store as coreStore } from '@wordpress/core-data';
 
 /**
  * Internal dependencies
  */
 import { NAVIGATION_POST_KIND, NAVIGATION_POST_POST_TYPE } from '../constants';
-
-import { resolveMenuItems, dispatch } from './controls';
-import { buildNavigationPostId } from './utils';
+import { buildNavigationPostId, menuItemsQuery } from './utils';
 import { menuItemsToBlocks } from './transform';
 
 /**
@@ -22,14 +21,17 @@ import { menuItemsToBlocks } from './transform';
  * @param {number} menuId The id of menu to create a post from
  * @return {void}
  */
-export function* getNavigationPostForMenu( menuId ) {
+export const getNavigationPostForMenu = ( menuId ) => async ( {
+	registry,
+	dispatch,
+} ) => {
 	if ( ! menuId ) {
 		return;
 	}
 
 	const stubPost = createStubPost( menuId );
 	// Persist an empty post to warm up the state
-	yield persistPost( stubPost );
+	dispatch( persistPost( stubPost ) );
 
 	// Dispatch startResolution to skip the execution of the real getEntityRecord resolver - it would
 	// issue an http request and fail.
@@ -38,17 +40,21 @@ export function* getNavigationPostForMenu( menuId ) {
 		NAVIGATION_POST_POST_TYPE,
 		stubPost.id,
 	];
-	yield dispatch( 'core', 'startResolution', 'getEntityRecord', args );
+	registry.dispatch( coreStore ).startResolution( 'getEntityRecord', args );
 
 	// Now let's create a proper one hydrated using actual menu items
-	const menuItems = yield resolveMenuItems( menuId );
+	const menuItems = await registry
+		.resolveSelect( coreStore )
+		.getMenuItems( menuItemsQuery( menuId ) );
+
 	const navigationBlock = createNavigationBlock( menuItems );
 	// Persist the actual post containing the navigation block
-	yield persistPost( createStubPost( menuId, navigationBlock ) );
+	const builtPost = createStubPost( menuId, navigationBlock );
+	dispatch( persistPost( builtPost ) );
 
 	// Dispatch finishResolution to conclude startResolution dispatched earlier
-	yield dispatch( 'core', 'finishResolution', 'getEntityRecord', args );
-}
+	registry.dispatch( coreStore ).finishResolution( 'getEntityRecord', args );
+};
 
 const createStubPost = ( menuId, navigationBlock = null ) => {
 	const id = buildNavigationPostId( menuId );
@@ -64,16 +70,17 @@ const createStubPost = ( menuId, navigationBlock = null ) => {
 	};
 };
 
-const persistPost = ( post ) =>
-	dispatch(
-		'core',
-		'receiveEntityRecords',
-		NAVIGATION_POST_KIND,
-		NAVIGATION_POST_POST_TYPE,
-		post,
-		{ id: post.id },
-		false
-	);
+const persistPost = ( post ) => ( { registry } ) => {
+	registry
+		.dispatch( coreStore )
+		.receiveEntityRecords(
+			NAVIGATION_POST_KIND,
+			NAVIGATION_POST_POST_TYPE,
+			post,
+			{ id: post.id },
+			false
+		);
+};
 
 /**
  * Converts an adjacency list of menuItems into a navigation block.

@@ -1068,9 +1068,15 @@
 		"parent": "components"
 	},
 	{
-		"title": "Navigator",
-		"slug": "navigator",
-		"markdown_source": "../packages/components/src/navigator/README.md",
+		"title": "NavigatorProvider",
+		"slug": "navigator-provider",
+		"markdown_source": "../packages/components/src/navigator/navigator-provider/README.md",
+		"parent": "components"
+	},
+	{
+		"title": "NavigatorScreen",
+		"slug": "navigator-screen",
+		"markdown_source": "../packages/components/src/navigator/navigator-screen/README.md",
 		"parent": "components"
 	},
 	{

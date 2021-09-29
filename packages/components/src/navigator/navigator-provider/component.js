@@ -6,9 +6,9 @@ import { useState } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import { NavigatorContext } from './context';
+import { NavigatorContext } from '../context';
 
-function Navigator( { initialPath, children } ) {
+function NavigatorProvider( { initialPath, children } ) {
 	const [ path, setPath ] = useState( { path: initialPath } );
 
 	return (
@@ -18,4 +18,4 @@ function Navigator( { initialPath, children } ) {
 	);
 }
 
-export default Navigator;
+export default NavigatorProvider;

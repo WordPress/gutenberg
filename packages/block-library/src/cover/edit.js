@@ -3,7 +3,8 @@
  */
 import classnames from 'classnames';
 import FastAverageColor from 'fast-average-color';
-import tinycolor from 'tinycolor2';
+import { colord, extend } from 'colord';
+import namesPlugin from 'colord/plugins/names';
 
 /**
  * WordPress dependencies
@@ -64,6 +65,8 @@ import {
 	isContentPositionCenter,
 	getPositionClassName,
 } from './shared';
+
+extend( [ namesPlugin ] );
 
 const { __Visualizer: BoxControlVisualizer } = BoxControl;
 
@@ -238,7 +241,7 @@ function useCoverIsDark( url, dimRatio = 50, overlayColor, elementRef ) {
 				setIsDark( true );
 				return;
 			}
-			setIsDark( tinycolor( overlayColor ).isDark() );
+			setIsDark( colord( overlayColor ).isDark() );
 		}
 	}, [ overlayColor, dimRatio > 50 || ! url, setIsDark ] );
 	useEffect( () => {
