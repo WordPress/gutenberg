@@ -1,19 +1,34 @@
 /**
+ * External dependencies
+ */
+import { throttle } from 'lodash';
+
+/**
  * WordPress dependencies
  */
-
 import { useMergeRefs } from '@wordpress/compose';
 import { __experimentalTreeGrid as TreeGrid } from '@wordpress/components';
-import { AsyncModeProvider, useDispatch } from '@wordpress/data';
+import { AsyncModeProvider, useDispatch, useSelect } from '@wordpress/data';
 import {
 	useCallback,
 	useEffect,
+	useLayoutEffect,
 	useMemo,
 	useRef,
 	useReducer,
+	useState,
 	forwardRef,
 } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
+
+function measure( scrollContainer, setMeasurement ) {
+	const maxVisible = Math.ceil( scrollContainer.clientHeight / ITEM_HEIGHT );
+	const start = Math.floor( scrollContainer.scrollTop / ITEM_HEIGHT );
+	setMeasurement( {
+		maxVisible,
+		start,
+	} );
+}
 
 /**
  * Internal dependencies
@@ -36,6 +51,8 @@ const expanded = ( state, action ) => {
 			return state;
 	}
 };
+
+const ITEM_HEIGHT = 36;
 
 /**
  * Wrap `ListViewRows` with `TreeGrid`. ListViewRows is a
@@ -71,6 +88,11 @@ function ListView(
 		showOnlyCurrentHierarchy,
 		__experimentalPersistentListViewFeatures
 	);
+
+	const globalBlockCount = useSelect( ( select ) => {
+		return select( blockEditorStore ).getGlobalBlockCount();
+	}, [] );
+
 	const { selectBlock } = useDispatch( blockEditorStore );
 	const selectEditorBlock = useCallback(
 		( clientId ) => {
@@ -88,6 +110,29 @@ function ListView(
 	const isMounted = useRef( false );
 	useEffect( () => {
 		isMounted.current = true;
+	}, [] );
+
+	//TODO: needs tuning for scroll position
+	const [ scrollHeight, setScrollHeight ] = useState(
+		ITEM_HEIGHT * globalBlockCount
+	);
+	const [ measurement, setMeasurement ] = useState( {
+		maxVisible: 30,
+		start: 0,
+	} );
+
+	useLayoutEffect( () => {
+		const scrollContainer = elementRef.current.parentNode;
+		measure( scrollContainer, setMeasurement );
+		const measureListOnScroll = throttle( ( event ) => {
+			measure( event.target, setMeasurement );
+		}, 16 );
+		scrollContainer.addEventListener( 'scroll', measureListOnScroll );
+		return () =>
+			scrollContainer.removeEventListener(
+				'scroll',
+				measureListOnScroll
+			);
 	}, [] );
 
 	const expand = useCallback(
@@ -155,6 +200,8 @@ function ListView(
 					<ListViewBranch
 						blocks={ clientIdsTree }
 						selectBlock={ selectEditorBlock }
+						measurement={ measurement }
+						globalBlockCount={ globalBlockCount }
 						{ ...props }
 					/>
 				</ListViewContext.Provider>
