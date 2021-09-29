@@ -1,13 +1,13 @@
 @import "../../interface/src/style.scss";
 
 @import "./components/block-editor/style.scss";
+@import "./components/global-styles/style.scss";
 @import "./components/header/style.scss";
 @import "./components/header/document-actions/style.scss";
 @import "./components/header/more-menu/style.scss";
 @import "./components/navigation-sidebar/navigation-toggle/style.scss";
 @import "./components/navigation-sidebar/navigation-panel/style.scss";
 @import "./components/sidebar/style.scss";
-@import "./components/sidebar/global-styles/style.scss";
 @import "./components/sidebar/settings-header/style.scss";
 @import "./components/sidebar/template-card/style.scss";
 @import "./components/editor/style.scss";
