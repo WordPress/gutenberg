@@ -124,7 +124,7 @@ const BlockInspectorSingleBlock = ( {
 							blockName,
 							'defaultStylePicker',
 							true
-						) && <DefaultStylePicker clientId={ clientId } /> }
+						) && <DefaultStylePicker blockName={ blockName } /> }
 					</PanelBody>
 				</div>
 			) }

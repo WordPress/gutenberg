@@ -3,6 +3,7 @@
  */
 import {
 	getActiveStyle,
+	getDefaultStyle,
 	getRenderedStyles,
 	replaceActiveStyle,
 } from '../utils';
@@ -102,18 +103,25 @@ describe( 'getRenderedStyles', () => {
 			...styles,
 		] );
 	} );
+} );
 
-	it( 'Should sort by `defaultStyleId` where passed', () => {
+describe( 'getDefaultStyle', () => {
+	it( 'Should return default style object', () => {
 		const styles = [
-			{ name: 'macadamia' },
-			{ name: 'brazil' },
-			{ name: 'almond', isDefault: true },
+			{ name: 'trout' },
+			{ name: 'bream', isDefault: true },
 		];
 
-		expect( getRenderedStyles( styles, 'brazil' ) ).toEqual( [
-			{ name: 'brazil' },
-			{ name: 'macadamia' },
-			{ name: 'almond', isDefault: true },
-		] );
+		expect( getDefaultStyle( styles ) ).toEqual( styles[ 1 ] );
+	} );
+
+	it( 'Should return `undefined` if there is no default', () => {
+		const styles = [ { name: 'snapper' }, { name: 'perch' } ];
+
+		expect( getDefaultStyle( styles ) ).toBeUndefined();
+	} );
+
+	it( 'Should return `undefined` if `styles` argument is no passed', () => {
+		expect( getDefaultStyle() ).toBeUndefined();
 	} );
 } );
