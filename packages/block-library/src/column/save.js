@@ -9,7 +9,7 @@ import classnames from 'classnames';
 import { InnerBlocks, useBlockProps } from '@wordpress/block-editor';
 
 export default function save( { attributes } ) {
-	const { verticalAlignment, width } = attributes;
+	const { verticalAlignment, width, tagName: Tag } = attributes;
 
 	const wrapperClasses = classnames( {
 		[ `is-vertically-aligned-${ verticalAlignment }` ]: verticalAlignment,
@@ -33,13 +33,13 @@ export default function save( { attributes } ) {
 	}
 
 	return (
-		<div
+		<Tag
 			{ ...useBlockProps.save( {
 				className: wrapperClasses,
 				style,
 			} ) }
 		>
 			<InnerBlocks.Content />
-		</div>
+		</Tag>
 	);
 }

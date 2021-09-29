@@ -15,6 +15,10 @@
 		},
 		"templateLock": {
 			"enum": [ "all", "insert", false ]
+		},
+		"tagName": {
+			"type": "string",
+			"default": "div"
 		}
 	},
 	"supports": {

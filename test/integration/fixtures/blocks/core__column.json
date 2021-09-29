@@ -3,7 +3,9 @@
 		"clientId": "_clientId_0",
 		"name": "core/column",
 		"isValid": true,
-		"attributes": {},
+		"attributes": {
+			"tagName": "div"
+		},
 		"innerBlocks": [
 			{
 				"clientId": "_clientId_0",

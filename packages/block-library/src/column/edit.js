@@ -11,6 +11,7 @@ import {
 	BlockControls,
 	BlockVerticalAlignmentToolbar,
 	InspectorControls,
+	InspectorAdvancedControls,
 	useBlockProps,
 	useSetting,
 	__experimentalUseInnerBlocksProps as useInnerBlocksProps,
@@ -20,12 +21,30 @@ import {
 	__experimentalUseCustomUnits as useCustomUnits,
 	PanelBody,
 	__experimentalUnitControl as UnitControl,
+	SelectControl,
 } from '@wordpress/components';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { sprintf, __ } from '@wordpress/i18n';
 
+const htmlElementMessages = {
+	section: __(
+		"The <section> element should represent a standalone portion of the document that can't be better represented by another element."
+	),
+	article: __(
+		'The <article> element should represent a self contained, syndicatable portion of the document.'
+	),
+	aside: __(
+		"The <aside> element should represent a portion of a document whose content is only indirectly related to the document's main content."
+	),
+};
+
 function ColumnEdit( {
-	attributes: { verticalAlignment, width, templateLock = false },
+	attributes: {
+		verticalAlignment,
+		width,
+		templateLock = false,
+		tagName: TagName = 'div',
+	},
 	setAttributes,
 	clientId,
 } ) {
@@ -122,6 +141,22 @@ function ColumnEdit( {
 					/>
 				</PanelBody>
 			</InspectorControls>
+			<InspectorAdvancedControls>
+				<SelectControl
+					label={ __( 'HTML element' ) }
+					options={ [
+						{ label: __( 'Default (<div>)' ), value: 'div' },
+						{ label: '<section>', value: 'section' },
+						{ label: '<article>', value: 'article' },
+						{ label: '<aside>', value: 'aside' },
+					] }
+					value={ TagName }
+					onChange={ ( value ) =>
+						setAttributes( { tagName: value } )
+					}
+					help={ htmlElementMessages[ TagName ] }
+				/>
+			</InspectorAdvancedControls>
 			<div { ...innerBlocksProps } />
 		</>
 	);

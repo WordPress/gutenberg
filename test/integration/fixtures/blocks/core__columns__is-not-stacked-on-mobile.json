@@ -5,7 +5,8 @@
 		"isValid": true,
 		"attributes": {
 			"isStackedOnMobile": false,
-			"backgroundColor": "secondary"
+			"backgroundColor": "secondary",
+			"tagName": "div"
 		},
 		"innerBlocks": [
 			{
