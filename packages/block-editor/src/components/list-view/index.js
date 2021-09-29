@@ -1,10 +1,12 @@
 /**
  * WordPress dependencies
  */
-
-import { useMergeRefs } from '@wordpress/compose';
+import {
+	useMergeRefs,
+	__experimentalUseFixedWindowList as useFixedWindowList,
+} from '@wordpress/compose';
 import { __experimentalTreeGrid as TreeGrid } from '@wordpress/components';
-import { AsyncModeProvider, useDispatch } from '@wordpress/data';
+import { AsyncModeProvider, useDispatch, useSelect } from '@wordpress/data';
 import {
 	useCallback,
 	useEffect,
@@ -67,6 +69,21 @@ function ListView(
 ) {
 	const { clientIdsTree, draggedClientIds } = useListViewClientIds( blocks );
 	const { selectBlock } = useDispatch( blockEditorStore );
+	const { visibleBlockCount } = useSelect(
+		( select ) => {
+			const { getGlobalBlockCount, getClientIdsOfDescendants } = select(
+				blockEditorStore
+			);
+			const draggedBlockCount =
+				draggedClientIds?.length > 0
+					? getClientIdsOfDescendants( draggedClientIds ).length + 1
+					: 0;
+			return {
+				visibleBlockCount: getGlobalBlockCount() - draggedBlockCount,
+			};
+		},
+		[ draggedClientIds ]
+	);
 	const selectEditorBlock = useCallback(
 		( clientId ) => {
 			selectBlock( clientId );
@@ -84,6 +101,16 @@ function ListView(
 	useEffect( () => {
 		isMounted.current = true;
 	}, [] );
+
+	const [ fixedListWindow ] = useFixedWindowList(
+		elementRef,
+		36,
+		visibleBlockCount,
+		{
+			windowOverscan: 1,
+			useWindowing: __experimentalPersistentListViewFeatures,
+		}
+	);
 
 	const expand = useCallback(
 		( clientId ) => {
@@ -151,6 +178,11 @@ function ListView(
 				ref={ treeGridRef }
 				onCollapseRow={ collapseRow }
 				onExpandRow={ expandRow }
+				aria-rowcount={
+					__experimentalPersistentListViewFeatures
+						? visibleBlockCount
+						: undefined
+				}
 			>
 				<ListViewContext.Provider value={ contextValue }>
 					<ListViewBranch
@@ -158,6 +190,7 @@ function ListView(
 						selectBlock={ selectEditorBlock }
 						showNestedBlocks={ showNestedBlocks }
 						showBlockMovers={ showBlockMovers }
+						fixedListWindow={ fixedListWindow }
 						{ ...props }
 					/>
 				</ListViewContext.Provider>

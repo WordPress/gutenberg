@@ -39,6 +39,7 @@ export default function ListViewBlock( {
 	showBlockMovers,
 	path,
 	isExpanded,
+	style,
 } ) {
 	const cellRef = useRef( null );
 	const [ isHovered, setIsHovered ] = useState( false );
@@ -184,6 +185,7 @@ export default function ListViewBlock( {
 					className="block-editor-list-view-block__contents-cell"
 					colSpan={ colSpan }
 					ref={ cellRef }
+					style={ style }
 				>
 					{ ( { ref, tabIndex, onFocus } ) => (
 						<div className="block-editor-list-view-block__contents-container">

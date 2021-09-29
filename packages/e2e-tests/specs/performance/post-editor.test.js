@@ -11,9 +11,10 @@ import { sum } from 'lodash';
 import {
 	createNewPost,
 	saveDraft,
-	insertBlock,
 	openGlobalBlockInserter,
 	closeGlobalBlockInserter,
+	openListView,
+	closeListView,
 } from '@wordpress/e2e-test-utils';
 
 /**
@@ -41,6 +42,7 @@ describe( 'Post Editor Performance', () => {
 		firstBlock: [],
 		type: [],
 		focus: [],
+		listViewOpen: [],
 		inserterOpen: [],
 		inserterHover: [],
 		inserterSearch: [],
@@ -118,7 +120,9 @@ describe( 'Post Editor Performance', () => {
 
 	it( 'Typing', async () => {
 		// Measuring typing performance
-		await insertBlock( 'Paragraph' );
+		await openListView();
+		await page.click( '.edit-post-visual-editor__post-title-wrapper' );
+		await page.keyboard.press( 'Enter' );
 		let i = 20;
 		await page.tracing.start( {
 			path: traceFile,
@@ -157,6 +161,7 @@ describe( 'Post Editor Performance', () => {
 	it( 'Selecting blocks', async () => {
 		// Measuring block selection performance
 		await createNewPost();
+		await openListView();
 		await page.evaluate( () => {
 			const { createBlock } = window.wp.blocks;
 			const { dispatch } = window.wp.data;
@@ -182,6 +187,26 @@ describe( 'Post Editor Performance', () => {
 		traceResults = JSON.parse( readFile( traceFile ) );
 		const [ focusEvents ] = getSelectionEventDurations( traceResults );
 		results.focus = focusEvents;
+	} );
+
+	it( 'Opening persistent list view', async () => {
+		// Measure time to open inserter
+		await page.waitForSelector( '.edit-post-layout' );
+		for ( let j = 0; j < 10; j++ ) {
+			await page.tracing.start( {
+				path: traceFile,
+				screenshots: false,
+				categories: [ 'devtools.timeline' ],
+			} );
+			await openListView();
+			await page.tracing.stop();
+			traceResults = JSON.parse( readFile( traceFile ) );
+			const [ mouseClickEvents ] = getClickEventDurations( traceResults );
+			for ( let k = 0; k < mouseClickEvents.length; k++ ) {
+				results.listViewOpen.push( mouseClickEvents[ k ] );
+			}
+			await closeListView();
+		}
 	} );
 
 	it( 'Opening the inserter', async () => {
