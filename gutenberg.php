@@ -92,8 +92,8 @@ function gutenberg_version_too_old_notice() {
  *
  * @since 11.7.0
  *
- * @param $links string[] Array of plugin action links.
- * @param $file  string   Path to the plugin file relative to the plugins directory.
+ * @param string[] $links Array of plugin action links.
+ * @param string   $file  Path to the plugin file relative to the plugins directory.
  * @return string[] Updated array of plugin action links.
  */
 function gutenberg_wordpress_version_too_old_action_links_notice( $links, $file ) {
@@ -118,8 +118,8 @@ function gutenberg_wordpress_version_too_old_action_links_notice( $links, $file 
  *
  * @since 11.7.0
  *
- * @param $links string[] Array of plugin action links.
- * @param $file  string   Path to the plugin file relative to the plugins directory.
+ * @param string[] $links Array of plugin action links.
+ * @param string   $file  Path to the plugin file relative to the plugins directory.
  * @return string[] Updated array of plugin action links.
  */
 function gutenberg_version_too_old_action_links_notice( $links, $file ) {
