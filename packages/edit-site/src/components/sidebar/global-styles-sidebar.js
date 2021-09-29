@@ -8,29 +8,14 @@ import { map } from 'lodash';
  */
 import {
 	Button,
-	__experimentalNavigator as Navigator,
+	__experimentalNavigatorProvider as NavigatorProvider,
 	__experimentalNavigatorScreen as NavigatorScreen,
-	__experimentalUseNavigator as useNavigator,
 	__experimentalItemGroup as ItemGroup,
 	__experimentalItem as Item,
-	FlexItem,
-	__experimentalHStack as HStack,
-	__experimentalVStack as VStack,
-	__experimentalSpacer as Spacer,
-	__experimentalHeading as Heading,
-	__experimentalView as View,
 } from '@wordpress/components';
-import { __, isRTL } from '@wordpress/i18n';
+import { __ } from '@wordpress/i18n';
 import { getBlockType } from '@wordpress/blocks';
-import {
-	Icon,
-	layout,
-	brush,
-	styles,
-	typography,
-	chevronLeft,
-	chevronRight,
-} from '@wordpress/icons';
+import { layout, color, styles, typography } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -46,11 +31,14 @@ import {
 } from './typography-panel';
 import { default as BorderPanel, useHasBorderPanel } from './border-panel';
 import { default as ColorPanel, useHasColorPanel } from './color-panel';
+import ColorPalettePanel from './color-palette-panel';
 import {
 	default as DimensionsPanel,
 	useHasDimensionsPanel,
 } from './dimensions-panel';
 import { StylePreview } from './global-styles/preview';
+import NavigationButton from './global-styles/navigation-button';
+import ScreenHeader from './global-styles/screen-header';
 
 function getPanelTitle( blockName ) {
 	const blockType = getBlockType( blockName );
@@ -64,30 +52,25 @@ function getPanelTitle( blockName ) {
 	return blockType.title;
 }
 
-const ScreenHeader = ( { back, title } ) => {
+function BlockMenuItem( { name, context } ) {
+	const hasTypographyPanel = useHasTypographyPanel( context );
+	const hasColorPanel = useHasColorPanel( context );
+	const hasBorderPanel = useHasBorderPanel( context );
+	const hasDimensionsPanel = useHasDimensionsPanel( context );
+	const hasLayoutPanel = hasBorderPanel || hasDimensionsPanel;
+	const hasBlockMenuItem =
+		hasTypographyPanel || hasColorPanel || hasLayoutPanel;
+
+	if ( ! hasBlockMenuItem ) {
+		return null;
+	}
+
 	return (
-		<VStack spacing={ 5 }>
-			<HStack spacing={ 2 }>
-				<View>
-					<NavigationButton
-						path={ back }
-						icon={
-							<Icon
-								icon={ isRTL() ? chevronRight : chevronLeft }
-								variant="muted"
-							/>
-						}
-						size="small"
-						isBack
-					/>
-				</View>
-				<Spacer>
-					<Heading level={ 5 }>{ title }</Heading>
-				</Spacer>
-			</HStack>
-		</VStack>
+		<NavigationButton path={ '/blocks/' + name }>
+			{ getPanelTitle( name ) }
+		</NavigationButton>
 	);
-};
+}
 
 function GlobalStylesLevelMenu( { context, parentMenu = '' } ) {
 	const hasTypographyPanel = useHasTypographyPanel( context );
@@ -108,7 +91,7 @@ function GlobalStylesLevelMenu( { context, parentMenu = '' } ) {
 			) }
 			{ hasColorPanel && (
 				<NavigationButton
-					icon={ brush }
+					icon={ color }
 					path={ parentMenu + '/colors' }
 				>
 					{ __( 'Colors' ) }
@@ -139,6 +122,7 @@ function GlobalStylesLevelScreens( {
 	const hasBorderPanel = useHasBorderPanel( context );
 	const hasDimensionsPanel = useHasDimensionsPanel( context );
 	const hasLayoutPanel = hasBorderPanel || hasDimensionsPanel;
+
 	return (
 		<>
 			{ hasTypographyPanel && (
@@ -160,11 +144,29 @@ function GlobalStylesLevelScreens( {
 					<ScreenHeader
 						back={ parentMenu ? parentMenu : '/' }
 						title={ __( 'Colors' ) }
+						description={ __(
+							'Manage the color palette and how it applies to the elements of your site'
+						) }
 					/>
 					<ColorPanel
 						context={ context }
 						getStyle={ getStyle }
 						setStyle={ setStyle }
+					/>
+				</NavigatorScreen>
+			) }
+
+			{ hasColorPanel && (
+				<NavigatorScreen path={ parentMenu + '/colors/palette' }>
+					<ScreenHeader
+						back={ parentMenu + '/colors' }
+						title={ __( 'Color Palette' ) }
+						description={ __(
+							'Manage the color palette of your site'
+						) }
+					/>
+					<ColorPalettePanel
+						contextName={ context.name }
 						getSetting={ getSetting }
 						setSetting={ setSetting }
 					/>
@@ -197,32 +199,6 @@ function GlobalStylesLevelScreens( {
 	);
 }
 
-function NavigationButton( {
-	path,
-	icon,
-	children,
-	isBack = false,
-	...props
-} ) {
-	const navigator = useNavigator();
-	return (
-		<Item
-			isAction
-			onClick={ () => navigator.push( path, { isBack } ) }
-			{ ...props }
-		>
-			<HStack justify="flex-start">
-				{ icon && (
-					<FlexItem>
-						<Icon icon={ icon } size={ 24 } />
-					</FlexItem>
-				) }
-				<FlexItem>{ children }</FlexItem>
-			</HStack>
-		</Item>
-	);
-}
-
 export default function GlobalStylesSidebar() {
 	const {
 		root,
@@ -245,6 +221,9 @@ export default function GlobalStylesSidebar() {
 			header={
 				<>
 					<strong>{ __( 'Styles' ) }</strong>
+					<span className="edit-site-global-styles-sidebar__beta">
+						{ __( 'Beta' ) }
+					</span>
 					<Button
 						className="edit-site-global-styles-sidebar__reset-button"
 						isSmall
@@ -257,7 +236,7 @@ export default function GlobalStylesSidebar() {
 				</>
 			}
 		>
-			<Navigator initialPath="/">
+			<NavigatorProvider initialPath="/">
 				<NavigatorScreen path="/">
 					<StylePreview />
 
@@ -279,13 +258,12 @@ export default function GlobalStylesSidebar() {
 
 				<NavigatorScreen path="/blocks">
 					<ScreenHeader back="/" title={ __( 'Blocks' ) } />
-					{ map( blocks, ( _, name ) => (
-						<NavigationButton
-							path={ '/blocks/' + name }
+					{ map( blocks, ( block, name ) => (
+						<BlockMenuItem
+							name={ name }
+							context={ block }
 							key={ 'menu-itemblock-' + name }
-						>
-							{ getPanelTitle( name ) }
-						</NavigationButton>
+						/>
 					) ) }
 				</NavigatorScreen>
 
@@ -324,7 +302,7 @@ export default function GlobalStylesSidebar() {
 						setSetting={ setSetting }
 					/>
 				) ) }
-			</Navigator>
+			</NavigatorProvider>
 		</DefaultSidebar>
 	);
 }

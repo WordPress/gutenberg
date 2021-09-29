@@ -60,6 +60,9 @@ class WP_Theme_JSON_Gutenberg {
 			'gradient'   => null,
 			'text'       => null,
 		),
+		'filter'     => array(
+			'duotone' => null,
+		),
 		'spacing'    => array(
 			'margin'   => null,
 			'padding'  => null,
@@ -142,6 +145,9 @@ class WP_Theme_JSON_Gutenberg {
 	 *
 	 * - value_key     => the key that represents the value
 	 *
+	 * - value_func    => optionally, instead of value_key, a function to generate
+	 *                    the value that takes a preset as an argument
+	 *
 	 * - css_var_infix => infix to use in generating the CSS Custom Property. Example:
 	 *                   --wp--preset--<preset_infix>--<slug>: <preset_value>
 	 *
@@ -183,6 +189,12 @@ class WP_Theme_JSON_Gutenberg {
 					'property_name' => 'background',
 				),
 			),
+		),
+		array(
+			'path'          => array( 'color', 'duotone' ),
+			'value_func'    => 'gutenberg_render_duotone_filter_preset',
+			'css_var_infix' => 'duotone',
+			'classes'       => array(),
 		),
 		array(
 			'path'          => array( 'typography', 'fontSizes' ),
@@ -242,6 +254,16 @@ class WP_Theme_JSON_Gutenberg {
 		'text-transform'             => array( 'typography', 'textTransform' ),
 	);
 
+	/**
+	 * Metadata for style properties that need to use the duotone selector.
+	 *
+	 * Each element is a direct mapping from the CSS property name to the
+	 * path to the value in theme.json & block attributes.
+	 */
+	const DUOTONE_PROPERTIES_METADATA = array(
+		'filter' => array( 'filter', 'duotone' ),
+	);
+
 	const ELEMENTS = array(
 		'link' => 'a',
 		'h1'   => 'h1',
@@ -278,8 +300,8 @@ class WP_Theme_JSON_Gutenberg {
 		// Internally, presets are keyed by origin.
 		$nodes = self::get_setting_nodes( $this->theme_json );
 		foreach ( $nodes as $node ) {
-			foreach ( self::PRESETS_METADATA as $preset ) {
-				$path   = array_merge( $node['path'], $preset['path'] );
+			foreach ( self::PRESETS_METADATA as $preset_metadata ) {
+				$path   = array_merge( $node['path'], $preset_metadata['path'] );
 				$preset = _wp_array_get( $this->theme_json, $path, null );
 				if ( null !== $preset ) {
 					gutenberg_experimental_set( $this->theme_json, $path, array( $origin => $preset ) );
@@ -359,9 +381,13 @@ class WP_Theme_JSON_Gutenberg {
 	 *   },
 	 *   'core/heading': {
 	 *     'selector': 'h1'
-	 *   }
+	 *   },
 	 *   'core/group': {
 	 *     'selector': '.wp-block-group'
+	 *   },
+	 *   'core/cover': {
+	 *     'selector': '.wp-block-cover',
+	 *     'duotone': '> .wp-block-cover__image-background, > .wp-block-cover__video-background'
 	 *   }
 	 * }
 	 *
@@ -384,6 +410,13 @@ class WP_Theme_JSON_Gutenberg {
 				self::$blocks_metadata[ $block_name ]['selector'] = $block_type->supports['__experimentalSelector'];
 			} else {
 				self::$blocks_metadata[ $block_name ]['selector'] = '.wp-block-' . str_replace( '/', '-', str_replace( 'core/', '', $block_name ) );
+			}
+
+			if (
+				isset( $block_type->supports['color']['__experimentalDuotone'] ) &&
+				is_string( $block_type->supports['color']['__experimentalDuotone'] )
+			) {
+				self::$blocks_metadata[ $block_name ]['duotone'] = $block_type->supports['color']['__experimentalDuotone'];
 			}
 
 			// Assign defaults, then overwrite those that the block sets by itself.
@@ -539,16 +572,17 @@ class WP_Theme_JSON_Gutenberg {
 	 * ```
 	 *
 	 * @param array $styles Styles to process.
+	 * @param array $properties Properties metadata.
 	 *
 	 * @return array Returns the modified $declarations.
 	 */
-	private static function compute_style_properties( $styles ) {
+	private static function compute_style_properties( $styles, $properties = self::PROPERTIES_METADATA ) {
 		$declarations = array();
 		if ( empty( $styles ) ) {
 			return $declarations;
 		}
 
-		foreach ( self::PROPERTIES_METADATA as $css_property => $value_path ) {
+		foreach ( $properties as $css_property => $value_path ) {
 			$value = self::get_property_value( $styles, $value_path );
 
 			// Skip if empty and not "0" or value represents array of longhand values.
@@ -589,28 +623,120 @@ class WP_Theme_JSON_Gutenberg {
 	}
 
 	/**
-	 * Function that given an array of presets keyed by origin
-	 * and the value key of the preset returns an array where each key is
-	 * the a preset slug and each value is the preset value.
+	 * Function that scopes a selector with another one. This works a bit like
+	 * SCSS nesting except the `&` operator isn't supported.
 	 *
-	 * @param array  $preset_per_origin Array of presets keyed by origin.
-	 * @param string $value_key         The property of the preset that contains its value.
-	 * @param array  $origins           List of origins to process.
+	 * <code>
+	 * $scope = '.a, .b .c';
+	 * $selector = '> .x, .y';
+	 * $merged = scope_selector( $scope, $selector );
+	 * // $merged is '.a > .x, .a .y, .b .c > .x, .b .c .y'
+	 * </code>
+	 *
+	 * @param string $scope    Selector to scope to.
+	 * @param string $selector Original selector.
+	 *
+	 * @return string Scoped selector.
+	 */
+	private static function scope_selector( $scope, $selector ) {
+		$scopes    = explode( ',', $scope );
+		$selectors = explode( ',', $selector );
+
+		$selectors_scoped = array();
+		foreach ( $scopes as $outer ) {
+			foreach ( $selectors as $inner ) {
+				$selectors_scoped[] = trim( $outer ) . ' ' . trim( $inner );
+			}
+		}
+
+		return implode( ', ', $selectors_scoped );
+	}
+
+	/**
+	 * Gets preset values keyed by slugs based on settings and metadata.
+	 *
+	 * <code>
+	 * $settings = array(
+	 *     'typography' => array(
+	 *         'fontFamilies' => array(
+	 *             array(
+	 *                 'slug'       => 'sansSerif',
+	 *                 'fontFamily' => '"Helvetica Neue", sans-serif',
+	 *             ),
+	 *             array(
+	 *                 'slug'   => 'serif',
+	 *                 'colors' => 'Georgia, serif',
+	 *             )
+	 *         ),
+	 *     ),
+	 * );
+	 * $meta = array(
+	 *    'path'      => array( 'typography', 'fontFamilies' ),
+	 *    'value_key' => 'fontFamily',
+	 * );
+	 * $values_by_slug = get_settings_values_by_slug();
+	 * // $values_by_slug === array(
+	 * //   'sans-serif' => '"Helvetica Neue", sans-serif',
+	 * //   'serif'      => 'Georgia, serif',
+	 * // );
+	 * </code>
+	 *
+	 * @param array $settings Settings to process.
+	 * @param array $preset_metadata One of the PRESETS_METADATA values.
+	 * @param array $origins List of origins to process.
 	 *
 	 * @return array Array of presets where each key is a slug and each value is the preset value.
 	 */
-	private static function get_merged_preset_by_slug( $preset_per_origin, $value_key, $origins ) {
+	private static function get_settings_values_by_slug( $settings, $preset_metadata, $origins ) {
+		$preset_per_origin = _wp_array_get( $settings, $preset_metadata['path'], array() );
+
 		$result = array();
 		foreach ( $origins as $origin ) {
 			if ( ! isset( $preset_per_origin[ $origin ] ) ) {
 				continue;
 			}
 			foreach ( $preset_per_origin[ $origin ] as $preset ) {
-				// We don't want to use kebabCase here,
-				// see https://github.com/WordPress/gutenberg/issues/32347
-				// However, we need to make sure the generated class or css variable
-				// doesn't contain spaces.
-				$result[ preg_replace( '/\s+/', '-', $preset['slug'] ) ] = $preset[ $value_key ];
+				$slug = gutenberg_experimental_to_kebab_case( $preset['slug'] );
+
+				$value = '';
+				if ( isset( $preset_metadata['value_key'] ) ) {
+					$value_key = $preset_metadata['value_key'];
+					$value     = $preset[ $value_key ];
+				} elseif ( is_callable( $preset_metadata['value_func'] ) ) {
+					$value_func = $preset_metadata['value_func'];
+					$value      = call_user_func( $value_func, $preset );
+				} else {
+					// If we don't have a value, then don't add it to the result.
+					continue;
+				}
+
+				$result[ $slug ] = $value;
+			}
+		}
+		return $result;
+	}
+
+	/**
+	 * Similar to get_settings_values_by_slug, but doesn't compute the value.
+	 *
+	 * @param array $settings Settings to process.
+	 * @param array $preset_metadata One of the PRESETS_METADATA values.
+	 *
+	 * @return array Array of presets where the key and value are both the slug.
+	 */
+	private static function get_settings_slugs( $settings, $preset_metadata ) {
+		$preset_per_origin = _wp_array_get( $settings, $preset_metadata['path'], array() );
+
+		$result = array();
+		foreach ( self::VALID_ORIGINS as $origin ) {
+			if ( ! isset( $preset_per_origin[ $origin ] ) ) {
+				continue;
+			}
+			foreach ( $preset_per_origin[ $origin ] as $preset ) {
+				$slug = gutenberg_experimental_to_kebab_case( $preset['slug'] );
+
+				// Use the array as a set so we don't get duplicates.
+				$result[ $slug ] = $slug;
 			}
 		}
 		return $result;
@@ -634,17 +760,16 @@ class WP_Theme_JSON_Gutenberg {
 		}
 
 		$stylesheet = '';
-		foreach ( self::PRESETS_METADATA as $preset ) {
-			$preset_per_origin = _wp_array_get( $settings, $preset['path'], array() );
-			$preset_by_slug    = self::get_merged_preset_by_slug( $preset_per_origin, $preset['value_key'], $origins );
-			foreach ( $preset['classes'] as $class ) {
-				foreach ( $preset_by_slug as $slug => $value ) {
+		foreach ( self::PRESETS_METADATA as $preset_metadata ) {
+			$slugs = self::get_settings_slugs( $settings, $preset_metadata, $origins );
+			foreach ( $preset_metadata['classes'] as $class ) {
+				foreach ( $slugs as $slug ) {
 					$stylesheet .= self::to_ruleset(
-						self::append_to_selector( $selector, '.has-' . gutenberg_experimental_to_kebab_case( $slug ) . '-' . $class['class_suffix'] ),
+						self::append_to_selector( $selector, '.has-' . $slug . '-' . $class['class_suffix'] ),
 						array(
 							array(
 								'name'  => $class['property_name'],
-								'value' => 'var(--wp--preset--' . $preset['css_var_infix'] . '--' . gutenberg_experimental_to_kebab_case( $slug ) . ') !important',
+								'value' => 'var(--wp--preset--' . $preset_metadata['css_var_infix'] . '--' . $slug . ') !important',
 							),
 						)
 					);
@@ -674,12 +799,11 @@ class WP_Theme_JSON_Gutenberg {
 	 */
 	private static function compute_preset_vars( $settings, $origins ) {
 		$declarations = array();
-		foreach ( self::PRESETS_METADATA as $preset ) {
-			$preset_per_origin = _wp_array_get( $settings, $preset['path'], array() );
-			$preset_by_slug    = self::get_merged_preset_by_slug( $preset_per_origin, $preset['value_key'], $origins );
-			foreach ( $preset_by_slug as $slug => $value ) {
+		foreach ( self::PRESETS_METADATA as $preset_metadata ) {
+			$values_by_slug = self::get_settings_values_by_slug( $settings, $preset_metadata, $origins );
+			foreach ( $values_by_slug as $slug => $value ) {
 				$declarations[] = array(
-					'name'  => '--wp--preset--' . $preset['css_var_infix'] . '--' . gutenberg_experimental_to_kebab_case( $slug ),
+					'name'  => '--wp--preset--' . $preset_metadata['css_var_infix'] . '--' . $slug,
 					'value' => $value,
 				);
 			}
@@ -833,6 +957,12 @@ class WP_Theme_JSON_Gutenberg {
 					$block_rules .= '.wp-site-blocks > * + * { margin-top: var( --wp--style--block-gap ); margin-bottom: 0; }';
 				}
 			}
+
+			if ( isset( $metadata['duotone'] ) ) {
+				$selector     = self::scope_selector( $metadata['selector'], $metadata['duotone'] );
+				$declarations = self::compute_style_properties( $node, self::DUOTONE_PROPERTIES_METADATA );
+				$block_rules .= self::to_ruleset( $selector, $declarations );
+			}
 		}
 
 		return $block_rules;
@@ -959,11 +1089,13 @@ class WP_Theme_JSON_Gutenberg {
 	 * [
 	 *   [
 	 *     'path'     => [ 'path', 'to', 'some', 'node' ],
-	 *     'selector' => 'CSS selector for some node'
+	 *     'selector' => 'CSS selector for some node',
+	 *     'duotone'  => 'CSS selector for duotone for some node'
 	 *   ],
 	 *   [
 	 *     'path'     => ['path', 'to', 'other', 'node' ],
-	 *     'selector' => 'CSS selector for other node'
+	 *     'selector' => 'CSS selector for other node',
+	 *     'duotone'  => null
 	 *   ],
 	 * ]
 	 *
@@ -1004,9 +1136,15 @@ class WP_Theme_JSON_Gutenberg {
 				$selector = $selectors[ $name ]['selector'];
 			}
 
+			$duotone_selector = null;
+			if ( isset( $selectors[ $name ]['duotone'] ) ) {
+				$duotone_selector = $selectors[ $name ]['duotone'];
+			}
+
 			$nodes[] = array(
 				'path'     => array( 'styles', 'blocks', $name ),
 				'selector' => $selector,
+				'duotone'  => $duotone_selector,
 			);
 
 			if ( isset( $theme_json['styles']['blocks'][ $name ]['elements'] ) ) {
@@ -1117,8 +1255,8 @@ class WP_Theme_JSON_Gutenberg {
 		// In those cases, we want to replace the existing with the incoming value, if it exists.
 		$to_replace   = array();
 		$to_replace[] = array( 'spacing', 'units' );
-		$to_replace[] = array( 'color', 'duotone' );
 		foreach ( self::VALID_ORIGINS as $origin ) {
+			$to_replace[] = array( 'color', 'duotone', $origin );
 			$to_replace[] = array( 'color', 'palette', $origin );
 			$to_replace[] = array( 'color', 'gradients', $origin );
 			$to_replace[] = array( 'typography', 'fontSizes', $origin );

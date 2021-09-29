@@ -824,7 +824,9 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 			'version'  => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
 			'settings' => array(
 				'color'      => array(
-					'duotone'   => array(),
+					'duotone'   => array(
+						'theme' => array(),
+					),
 					'gradients' => array(
 						'theme' => array(),
 					),
@@ -912,9 +914,11 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 				'color'      => array(
 					'custom'    => false,
 					'duotone'   => array(
-						array(
-							'slug'   => 'value',
-							'colors' => array( 'red', 'green' ),
+						'theme' => array(
+							array(
+								'slug'   => 'value',
+								'colors' => array( 'red', 'green' ),
+							),
 						),
 					),
 					'gradients' => array(
