@@ -14,7 +14,6 @@ import {
 	useCallback,
 	forwardRef,
 } from '@wordpress/element';
-import { Picker } from '@wordpress/components';
 import { useDispatch, useSelect } from '@wordpress/data';
 import {
 	pasteHandler,
@@ -40,7 +39,6 @@ import {
 } from '@wordpress/rich-text';
 import deprecated from '@wordpress/deprecated';
 import { isURL } from '@wordpress/url';
-import { __ } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
@@ -59,6 +57,7 @@ import {
 	isShortcode,
 	createLinkInParagraph,
 } from './utils';
+import EmbedHandlerPicker from './embed-handler-picker';
 
 const wrapperClasses = 'block-editor-rich-text';
 const classes = 'block-editor-rich-text__editable';
@@ -121,6 +120,7 @@ function RichTextWrapper(
 	const fallbackRef = useRef();
 	const { clientId, isSelected: blockIsSelected } = useBlockEditContext();
 	const nativeProps = useNativeProps();
+	const embedHandlerPickerRef = useRef();
 	const selector = ( select ) => {
 		const {
 			isCaretWithinFormattedText,
@@ -211,38 +211,6 @@ function RichTextWrapper(
 					__unstableCreateElement( document, newValue ).childNodes
 				)
 			);
-	}
-
-	const embeddableUrlPickerRef = useRef();
-
-	let createEmbed = () => {
-	};
-	let createLink = () => {
-	};
-
-	let embeddableUrlPickerOptions = {
-		createEmbed: {
-			id: 'createEmbed',
-			label: __( 'Create embed' ),
-			value: 'createEmbed',
-			onSelect: createEmbed,
-		},
-		createLink: {
-			id: 'createLink',
-			label: __( 'Create link' ),
-			value: 'createLink',
-			onSelect: createLink,
-		},
-	};
-
-	const options = [
-		embeddableUrlPickerOptions.createEmbed,
-		embeddableUrlPickerOptions.createLink,
-	];
-
-	function onPickerSelect( value ) {
-		const selectedItem = options.find( ( item ) => item.value === value );
-		selectedItem.onSelect();
 	}
 
 	const onSelectionChange = useCallback(
@@ -480,28 +448,26 @@ function RichTextWrapper(
 				isURL( plainText.trim() )
 			) {
 				mode = 'BLOCKS';
+				// Embed handler
+				embedHandlerPickerRef.current?.presentPicker( {
+					createEmbed: () => {
+						const content = pasteHandler( {
+							HTML: html,
+							plainText,
+							mode,
+							tagName,
+							preserveWhiteSpace,
+						} );
 
-				createEmbed = () => {
-					const content = pasteHandler( {
-						HTML: html,
-						plainText,
-						mode,
-						tagName,
-						preserveWhiteSpace,
-					} );
-
-					if ( content.length > 0 ) {
-						if ( onReplace && isEmpty( value ) ) {
-							onReplace( content, content.length - 1, -1 );
+						if ( content.length > 0 ) {
+							if ( onReplace && isEmpty( value ) ) {
+								onReplace( content, content.length - 1, -1 );
+							}
 						}
-					}
-				};
-
-				createLink = () => {
-					createLinkInParagraph( plainText.trim(), onReplace );
-				};
-
-				embeddableUrlPickerRef.current?.presentPicker();
+					},
+					createLink: () =>
+						createLinkInParagraph( plainText.trim(), onReplace ),
+				} );
 				return;
 			}
 
@@ -708,13 +674,7 @@ function RichTextWrapper(
 							/>
 						) }
 					</Autocomplete>
-					<Picker
-						ref={ embeddableUrlPickerRef }
-						options={ options }
-						onChange={ onPickerSelect }
-						hideCancelButton
-						leftAlign
-					/>
+					<EmbedHandlerPicker ref={ embedHandlerPickerRef } />
 				</>
 			) }
 		</RichText>
