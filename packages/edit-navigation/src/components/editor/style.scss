@@ -31,7 +31,8 @@
 
 		// Customize/zero out the gap.
 		.wp-block-navigation__container {
-			gap: 0;
+			// This unsets flex.
+			display: block;
 		}
 
 		// Increase specificity.
@@ -77,6 +78,7 @@
 			.wp-block-navigation-link__placeholder-text {
 				padding: $grid-unit-05;
 				padding-left: $grid-unit-10;
+				line-height: 1;
 			}
 
 			.wp-block-navigation-link__label {
@@ -169,8 +171,7 @@
 		}
 
 		.block-editor-button-block-appender.block-list-appender__toggle {
-			margin: 0 0 0 $grid-unit-30;
-			padding: 0;
+			margin-left: $grid-unit-30;
 		}
 	}
 
