@@ -1307,7 +1307,13 @@ class WP_Theme_JSON_Gutenberg {
 					esc_attr( esc_html( $preset['name'] ) ) === $preset['name'] &&
 					sanitize_html_class( $preset['slug'] ) === $preset['slug']
 				) {
-					$value           = $preset[ $preset_metadata['value_key'] ];
+					$value = null;
+					if ( isset( $preset_metadata['value_key'] ) ) {
+						$value = $preset[ $preset_metadata['value_key'] ];
+					} elseif ( isset( $preset_metadata['value_func'] ) ) {
+						$value = call_user_func( $preset_metadata['value_func'], $preset );
+					}
+
 					$preset_is_valid = true;
 					foreach ( $preset_metadata['properties'] as $property ) {
 						if ( ! self::is_safe_css_declaration( $property, $value ) ) {
