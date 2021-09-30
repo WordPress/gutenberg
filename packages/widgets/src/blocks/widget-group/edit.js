@@ -18,7 +18,7 @@ export default function Edit( props ) {
 	const { clientId } = props;
 	const { innerBlocks } = useSelect(
 		( select ) => select( blockEditorStore ).getBlock( clientId ),
-		[]
+		[ clientId ]
 	);
 
 	return (
