@@ -19,13 +19,13 @@ import {
 import { transformWidgetToBlock } from './transformers';
 
 /**
- * Creates a "stub" navigation post reflecting all available widget areas. The
+ * Creates a "stub" widgets post reflecting all available widget areas. The
  * post is meant as a convenient to only exists in runtime and should never be saved. It
  * enables a convenient way of editing the widgets by using a regular post editor.
  *
  * Fetches all widgets from all widgets aras, converts them into blocks, and hydrates a new post with them.
  *
- * @return {Function} An action creator
+ * @return {Function} An action creator.
  */
 export const getWidgetAreas = () => async ( { dispatch, registry } ) => {
 	const query = buildWidgetAreasQuery();
@@ -73,7 +73,7 @@ export const getWidgetAreas = () => async ( { dispatch, registry } ) => {
 /**
  * Fetches all widgets from all widgets ares, and groups them by widget area Id.
  *
- * @return {Function} An action creator
+ * @return {Function} An action creator.
  */
 export const getWidgets = () => async ( { dispatch, registry } ) => {
 	const query = buildWidgetsQuery();

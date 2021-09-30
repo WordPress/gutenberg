@@ -50,7 +50,7 @@ export const persistStubPost = ( id, blocks ) => ( { registry } ) => {
  *
  * Creates a snackbar notice on either success or error.
  *
- * @return {Function} An action creator
+ * @return {Function} An action creator.
  */
 export const saveEditedWidgetAreas = () => async ( {
 	select,
@@ -84,7 +84,7 @@ export const saveEditedWidgetAreas = () => async ( {
  * and submits a batch request to save everything at once.
  *
  * @param {Object[]} widgetAreas Widget areas to save.
- * @return {Function} An action creator
+ * @return {Function} An action creator.
  */
 export const saveWidgetAreas = ( widgetAreas ) => async ( {
 	dispatch,
@@ -111,8 +111,8 @@ export const saveWidgetAreas = ( widgetAreas ) => async ( {
  * Converts all the blocks from a widget area specified by ID into widgets,
  * and submits a batch request to save everything at once.
  *
- * @param {number} widgetAreaId ID of widget area to process
- * @return {Function} An action creator
+ * @param {number} widgetAreaId ID of the widget area to process.
+ * @return {Function} An action creator.
  */
 export const saveWidgetArea = ( widgetAreaId ) => async ( {
 	dispatch,
