@@ -39,7 +39,7 @@ function Placeholder( {
 	isColumnLayout,
 	...additionalProps
 } ) {
-	const [ resizeListener, { width } ] = useResizeObserver();
+	const [ resizeListener, { width, height } ] = useResizeObserver();
 
 	// Since `useResizeObserver` will report a width of `null` until after the
 	// first render, avoid applying any modifier classes until width is known.
@@ -49,6 +49,9 @@ function Placeholder( {
 			'is-large': width >= 480,
 			'is-medium': width >= 160 && width < 480,
 			'is-small': width < 160,
+			'is-tall': height >= 250,
+			'is-middle': height >= 100 && height < 250,
+			'is-short': height < 100,
 		};
 	}
 

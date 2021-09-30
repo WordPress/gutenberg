@@ -9,7 +9,6 @@
 	&.is-placeholder {
 		min-height: auto !important;
 		padding: 0 !important;
-		border: $border-width solid  $gray-900;
 	}
 
 	&.components-placeholder h2 {
@@ -118,11 +117,28 @@
 	background-attachment: scroll;
 }
 
-// Ensure the placeholder container styles are consistent when resizing.
+// Resizeable placeholder
 .wp-block-cover.is-placeholder .cover-block__cover-placeholder-container {
-	background: $white;
-	width: 100%;
-	.block-editor-media-placeholder {
-		box-shadow: none;
+	.components-placeholder {
+		&.is-tall {
+			min-height: 250px;
+			.components-resizable-box__container {
+				min-height: 250px;
+			}
+		}
+
+		&.is-middle {
+			min-height: 150px;
+			.components-resizable-box__container {
+				min-height: 150px;
+			}
+		}
+
+		&.is-short {
+			min-height: 100px;
+			.components-resizable-box__container {
+				min-height: 100px;
+			}
+		}
 	}
 }
