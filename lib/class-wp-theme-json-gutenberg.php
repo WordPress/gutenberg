@@ -141,77 +141,72 @@ class WP_Theme_JSON_Gutenberg {
 	 *
 	 * This contains the necessary metadata to process them:
 	 *
-	 * - path          => where to find the preset within the settings section
+	 * - path       => where to find the preset within the settings section
 	 *
-	 * - value_key     => the key that represents the value
+	 * - value_key  => the key that represents the value
 	 *
-	 * - value_func    => optionally, instead of value_key, a function to generate
-	 *                    the value that takes a preset as an argument
+	 * - value_func => optionally, instead of value_key, a function to generate
+	 *                 the value that takes a preset as an argument
 	 *
-	 * - css_var_infix => infix to use in generating the CSS Custom Property. Example:
-	 *                   --wp--preset--<preset_infix>--<slug>: <preset_value>
+	 * - css_var    => name of the var to generate. The "$slug" substring will be
+	 *                 replaced by the slug of each preset. For example,
+	 *                 given a preset for color with two values whose slugs are "black" and "white",
+	 *                 the string "--wp--preset--color--$slug" will generate two variables:
+	 *                 "--wp--preset--color--black" and "--wp--preset--color--white".
 	 *
-	 * - classes      => array containing a structure with the classes to
-	 *                   generate for the presets. Each class should have
-	 *                   the class suffix and the property name. Example:
-	 *
-	 *                   .has-<slug>-<class_suffix> {
-	 *                       <property_name>: <preset_value>
-	 *                   }
+	 * - classes    => array containing a structure with the classes to
+	 *                 generate for the presets, where for each array item
+	 *                 the key is the class name and the value the property name.
+	 *                 The "$slug" substring will be replaced by the slug of each preset.
+	 *                 For example:
+	 *                 'classes' => array(
+	 *                   '.has-$slug-color'            => 'color',
+	 *                   '.has-$slug-background-color' => 'background-color',
+	 *                   '.has-$slug-border-color'     => 'border-color',
+	 *                 )
+	 * - properties => array of CSS properties to be used by kses to
+	 *                 validate the content of each preset
+	 *                 by means of the remove_insecure_properties method.
 	 */
 	const PRESETS_METADATA = array(
 		array(
-			'path'          => array( 'color', 'palette' ),
-			'value_key'     => 'color',
-			'css_var_infix' => 'color',
-			'classes'       => array(
-				array(
-					'class_suffix'  => 'color',
-					'property_name' => 'color',
-				),
-				array(
-					'class_suffix'  => 'background-color',
-					'property_name' => 'background-color',
-				),
-				array(
-					'class_suffix'  => 'border-color',
-					'property_name' => 'border-color',
-				),
+			'path'       => array( 'color', 'palette' ),
+			'value_key'  => 'color',
+			'css_vars'   => '--wp--preset--color--$slug',
+			'classes'    => array(
+				'.has-$slug-color'            => 'color',
+				'.has-$slug-background-color' => 'background-color',
+				'.has-$slug-border-color'     => 'border-color',
 			),
+			'properties' => array( 'color', 'background-color', 'border-color' ),
 		),
 		array(
-			'path'          => array( 'color', 'gradients' ),
-			'value_key'     => 'gradient',
-			'css_var_infix' => 'gradient',
-			'classes'       => array(
-				array(
-					'class_suffix'  => 'gradient-background',
-					'property_name' => 'background',
-				),
-			),
+			'path'       => array( 'color', 'gradients' ),
+			'value_key'  => 'gradient',
+			'css_vars'   => '--wp--preset--gradient--$slug',
+			'classes'    => array( '.has-$slug-gradient-background' => 'background' ),
+			'properties' => array( 'background' ),
 		),
 		array(
-			'path'          => array( 'color', 'duotone' ),
-			'value_func'    => 'gutenberg_render_duotone_filter_preset',
-			'css_var_infix' => 'duotone',
-			'classes'       => array(),
+			'path'       => array( 'color', 'duotone' ),
+			'value_func' => 'gutenberg_render_duotone_filter_preset',
+			'css_vars'   => '--wp--preset--duotone--$slug',
+			'classes'    => array(),
+			'properties' => array( 'filter' ),
 		),
 		array(
-			'path'          => array( 'typography', 'fontSizes' ),
-			'value_key'     => 'size',
-			'css_var_infix' => 'font-size',
-			'classes'       => array(
-				array(
-					'class_suffix'  => 'font-size',
-					'property_name' => 'font-size',
-				),
-			),
+			'path'       => array( 'typography', 'fontSizes' ),
+			'value_key'  => 'size',
+			'css_vars'   => '--wp--preset--font-size--$slug',
+			'classes'    => array( '.has-$slug-font-size' => 'font-size' ),
+			'properties' => array( 'font-size' ),
 		),
 		array(
-			'path'          => array( 'typography', 'fontFamilies' ),
-			'value_key'     => 'fontFamily',
-			'css_var_infix' => 'font-family',
-			'classes'       => array(),
+			'path'       => array( 'typography', 'fontFamilies' ),
+			'value_key'  => 'fontFamily',
+			'css_vars'   => '--wp--preset--font-family--$slug',
+			'classes'    => array(),
+			'properties' => array( 'font-family' ),
 		),
 	);
 
@@ -762,14 +757,16 @@ class WP_Theme_JSON_Gutenberg {
 		$stylesheet = '';
 		foreach ( self::PRESETS_METADATA as $preset_metadata ) {
 			$slugs = self::get_settings_slugs( $settings, $preset_metadata, $origins );
-			foreach ( $preset_metadata['classes'] as $class ) {
+			foreach ( $preset_metadata['classes'] as $class => $property ) {
 				foreach ( $slugs as $slug ) {
+					$css_var     = self::replace_slug_in_string( $preset_metadata['css_vars'], $slug );
+					$class_name  = self::replace_slug_in_string( $class, $slug );
 					$stylesheet .= self::to_ruleset(
-						self::append_to_selector( $selector, '.has-' . $slug . '-' . $class['class_suffix'] ),
+						self::append_to_selector( $selector, $class_name ),
 						array(
 							array(
-								'name'  => $class['property_name'],
-								'value' => 'var(--wp--preset--' . $preset_metadata['css_var_infix'] . '--' . $slug . ') !important',
+								'name'  => $property,
+								'value' => 'var(' . $css_var . ') !important',
 							),
 						)
 					);
@@ -778,6 +775,18 @@ class WP_Theme_JSON_Gutenberg {
 		}
 
 		return $stylesheet;
+	}
+
+	/**
+	 * Transform a slug into a CSS Custom Property.
+	 *
+	 * @param array  $input String to replace.
+	 * @param string $slug The slug value to use to generate the custom property.
+	 *
+	 * @return string The CSS Custom Property. Something along the lines of --wp--preset--color--black.
+	 */
+	private static function replace_slug_in_string( $input, $slug ) {
+		return strtr( $input, array( '$slug' => $slug ) );
 	}
 
 	/**
@@ -803,7 +812,7 @@ class WP_Theme_JSON_Gutenberg {
 			$values_by_slug = self::get_settings_values_by_slug( $settings, $preset_metadata, $origins );
 			foreach ( $values_by_slug as $slug => $value ) {
 				$declarations[] = array(
-					'name'  => '--wp--preset--' . $preset_metadata['css_var_infix'] . '--' . $slug,
+					'name'  => self::replace_slug_in_string( $preset_metadata['css_vars'], $slug ),
 					'value' => $value,
 				);
 			}
@@ -1300,10 +1309,9 @@ class WP_Theme_JSON_Gutenberg {
 				) {
 					$value                  = $single_preset[ $preset_metadata['value_key'] ];
 					$single_preset_is_valid = null;
-					if ( isset( $preset_metadata['classes'] ) && count( $preset_metadata['classes'] ) > 0 ) {
+					if ( isset( $preset_metadata['properties'] ) && count( $preset_metadata['properties'] ) > 0 ) {
 						$single_preset_is_valid = true;
-						foreach ( $preset_metadata['classes'] as $class_meta_data ) {
-							$property = $class_meta_data['property_name'];
+						foreach ( $preset_metadata['properties'] as $property ) {
 							if ( ! self::is_safe_css_declaration( $property, $value ) ) {
 								$single_preset_is_valid = false;
 								break;
