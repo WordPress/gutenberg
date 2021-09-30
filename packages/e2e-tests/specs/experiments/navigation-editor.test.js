@@ -380,11 +380,6 @@ describe( 'Navigation editor', () => {
 		);
 		await appender.click();
 
-		const linkInserterItem = await page.waitForXPath(
-			'//button[@role="option"]//span[.="Custom Link"]'
-		);
-		await linkInserterItem.click();
-
 		await page.waitForSelector( 'input[aria-label="URL"]' );
 
 		// The link suggestions should be searchable.

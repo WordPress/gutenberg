@@ -16,6 +16,7 @@ import { store as editorStore } from '@wordpress/editor';
 import isTemplateRevertable from '../../utils/is-template-revertable';
 import { MENU_TEMPLATES } from '../navigation-sidebar/navigation-panel/constants';
 import { store as editSiteStore } from '../../store';
+import TemplateAreas from './template-areas';
 
 export default function TemplateDetails( { template, onClose } ) {
 	const { title, description } = useSelect(
@@ -57,6 +58,8 @@ export default function TemplateDetails( { template, onClose } ) {
 					</Text>
 				) }
 			</div>
+
+			<TemplateAreas />
 
 			{ isTemplateRevertable( template ) && (
 				<div className="edit-site-template-details__revert">

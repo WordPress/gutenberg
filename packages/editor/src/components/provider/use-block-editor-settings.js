@@ -13,6 +13,7 @@ import {
 	__experimentalFetchLinkSuggestions as fetchLinkSuggestions,
 	__experimentalFetchUrlData as fetchUrlData,
 } from '@wordpress/core-data';
+import { __ } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
@@ -33,6 +34,7 @@ function useBlockEditorSettings( settings, hasTemplate ) {
 		reusableBlocks,
 		hasUploadPermissions,
 		canUseUnfilteredHTML,
+		userCanCreatePages,
 	} = useSelect( ( select ) => {
 		const { canUserUseUnfilteredHTML } = select( editorStore );
 		const isWeb = Platform.OS === 'web';
@@ -61,10 +63,29 @@ function useBlockEditorSettings( settings, hasTemplate ) {
 			),
 			hasResolvedLocalSiteData: hasFinishedResolvingSiteData,
 			baseUrl: siteData?.url || '',
+			userCanCreatePages: canUser( 'create', 'pages' ),
 		};
 	}, [] );
 
 	const { undo } = useDispatch( editorStore );
+
+	const { saveEntityRecord } = useDispatch( coreStore );
+
+	/**
+	 * Creates a Post entity.
+	 * This is utilised by the Link UI to allow for on-the-fly creation of Posts/Pages.
+	 *
+	 * @param {Object} options parameters for the post being created. These mirror those used on 3rd param of saveEntityRecord.
+	 * @return {Object} the post type object that was created.
+	 */
+	const createPageEntity = ( options ) => {
+		if ( ! userCanCreatePages ) {
+			return Promise.reject( {
+				message: __( 'You do not have permission to create Pages.' ),
+			} );
+		}
+		return saveEntityRecord( 'postType', 'page', options );
+	};
 
 	return useMemo(
 		() => ( {
@@ -117,6 +138,8 @@ function useBlockEditorSettings( settings, hasTemplate ) {
 			__experimentalCanUserUseUnfilteredHTML: canUseUnfilteredHTML,
 			__experimentalUndo: undo,
 			outlineMode: hasTemplate,
+			__experimentalCreatePageEntity: createPageEntity,
+			__experimentalUserCanCreatePages: userCanCreatePages,
 		} ),
 		[
 			settings,
@@ -125,6 +148,9 @@ function useBlockEditorSettings( settings, hasTemplate ) {
 			canUseUnfilteredHTML,
 			undo,
 			hasTemplate,
+
+			userCanCreatePages,
+			createPageEntity,
 		]
 	);
 }

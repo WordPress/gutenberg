@@ -824,7 +824,9 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 			'version'  => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
 			'settings' => array(
 				'color'      => array(
-					'duotone'   => array(),
+					'duotone'   => array(
+						'theme' => array(),
+					),
 					'gradients' => array(
 						'theme' => array(),
 					),
@@ -912,9 +914,11 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 				'color'      => array(
 					'custom'    => false,
 					'duotone'   => array(
-						array(
-							'slug'   => 'value',
-							'colors' => array( 'red', 'green' ),
+						'theme' => array(
+							array(
+								'slug'   => 'value',
+								'colors' => array( 'red', 'green' ),
+							),
 						),
 					),
 					'gradients' => array(
@@ -974,6 +978,11 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 						),
 					),
 					'blocks'   => array(
+						'core/image'  => array(
+							'filter' => array(
+								'duotone' => 'var:preset|duotone|blue-red',
+							),
+						),
 						'core/group'  => array(
 							'color'    => array(
 								'gradient' => 'url(\'data:image/svg+xml;base64,PHN2ZyB4bWxucz0naHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmcnIHdpZHRoPScxMCcgaGVpZ2h0PScxMCc+PHNjcmlwdD5hbGVydCgnb2snKTwvc2NyaXB0PjxsaW5lYXJHcmFkaWVudCBpZD0nZ3JhZGllbnQnPjxzdG9wIG9mZnNldD0nMTAlJyBzdG9wLWNvbG9yPScjRjAwJy8+PHN0b3Agb2Zmc2V0PSc5MCUnIHN0b3AtY29sb3I9JyNmY2MnLz4gPC9saW5lYXJHcmFkaWVudD48cmVjdCBmaWxsPSd1cmwoI2dyYWRpZW50KScgeD0nMCcgeT0nMCcgd2lkdGg9JzEwMCUnIGhlaWdodD0nMTAwJScvPjwvc3ZnPg==\')',
