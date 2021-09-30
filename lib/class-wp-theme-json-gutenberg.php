@@ -594,6 +594,7 @@ class WP_Theme_JSON_Gutenberg {
 		foreach ( $properties as $css_property => $value_path ) {
 			$value = self::get_property_value( $styles, $value_path );
 
+			// Skip protected properties that are explicitly set to `null`.
 			if ( in_array( $css_property, self::PROTECTED_PROPERTIES, true ) ) {
 				if ( _wp_array_get( $settings, $value_path, null ) === null ) {
 					continue;
