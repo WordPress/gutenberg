@@ -119,25 +119,17 @@
 
 // Resizeable placeholder
 .wp-block-cover.is-placeholder .cover-block__cover-placeholder-container {
+	.components-resizable-box__container {
+		display: none;
+	}
 	.components-placeholder {
-		&.is-tall {
+		justify-content: flex-start;
+		&.is-large {
 			min-height: 250px;
+
 			.components-resizable-box__container {
 				min-height: 250px;
-			}
-		}
-
-		&.is-middle {
-			min-height: 150px;
-			.components-resizable-box__container {
-				min-height: 150px;
-			}
-		}
-
-		&.is-short {
-			min-height: 100px;
-			.components-resizable-box__container {
-				min-height: 100px;
+				display: block;
 			}
 		}
 	}
