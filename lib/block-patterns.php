@@ -8,7 +8,7 @@
 /**
  * Register Gutenberg bundled patterns.
  */
-function register_gutenberg_patterns() {
+function gutenberg_register_gutenberg_patterns() {
 	// Register categories used for block patterns.
 	if ( ! WP_Block_Pattern_Categories_Registry::get_instance()->is_registered( 'query' ) ) {
 		register_block_pattern_category( 'query', array( 'label' => __( 'Query', 'gutenberg' ) ) );
@@ -170,7 +170,7 @@ function register_gutenberg_patterns() {
 /**
  * Deactivate the legacy patterns bundled with WordPress.
  */
-function remove_core_patterns() {
+function gutenberg_remove_core_patterns() {
 	$core_block_patterns = array(
 		'text-two-columns',
 		'two-buttons',
@@ -204,7 +204,7 @@ function remove_core_patterns() {
  *
  * @since 5.8.0
  */
-function load_remote_core_patterns() {
+function gutenberg_load_remote_core_patterns() {
 	// This is the core function that provides the same feature.
 	if ( function_exists( '_load_remote_block_patterns' ) ) {
 		return;
@@ -241,7 +241,7 @@ function load_remote_core_patterns() {
  *
  * @since 5.9.0
  */
-function load_remote_featured_patterns() {
+function gutenberg_load_remote_featured_patterns() {
 	/**
 	 * Filter to disable remote block patterns.
 	 *
@@ -280,8 +280,8 @@ add_action(
 		if ( ! get_theme_support( 'core-block-patterns' ) || ! function_exists( 'unregister_block_pattern' ) ) {
 			return;
 		}
-		remove_core_patterns();
-		register_gutenberg_patterns();
+		gutenberg_remove_core_patterns();
+		gutenberg_register_gutenberg_patterns();
 	}
 );
 
@@ -294,8 +294,8 @@ add_action(
 
 		$is_site_editor = ( function_exists( 'gutenberg_is_edit_site_page' ) && gutenberg_is_edit_site_page( $current_screen->id ) );
 		if ( $current_screen->is_block_editor || $is_site_editor ) {
-			load_remote_core_patterns();
-			load_remote_featured_patterns();
+			gutenberg_load_remote_core_patterns();
+			gutenberg_load_remote_featured_patterns();
 		}
 	}
 );
