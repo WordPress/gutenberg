@@ -235,7 +235,7 @@ public class WPAndroidGlueCode {
     }
 
     public interface OnSendEventToHostListener {
-        void onSendEventToHost(String eventName, ReadableMap properties);
+        void onSendEventToHost(String eventName, Map<String, Object> properties);
     }
 
     public void mediaSelectionCancelled() {
@@ -551,7 +551,13 @@ public class WPAndroidGlueCode {
 
             @Override
             public void sendEventToHost(String eventName,  ReadableMap properties) {
-                mOnSendEventToHostListener.onSendEventToHost(eventName, properties);
+                Map<String, Object> propertiesMap = new HashMap<>();
+                ReadableMapKeySetIterator iterator = properties.keySetIterator();
+                while (iterator.hasNextKey()) {
+                    String key = iterator.nextKey();
+                    propertiesMap.put(key, properties.getDynamic(key));
+                }
+                mOnSendEventToHostListener.onSendEventToHost(eventName, propertiesMap);
             }
         }, mIsDarkMode);
 
