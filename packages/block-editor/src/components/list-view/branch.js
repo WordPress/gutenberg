@@ -47,7 +47,7 @@ export default function ListViewBranch( props ) {
 		isBranchSelected = false,
 		isLastOfBranch = false,
 		listPosition = 0,
-		measurement,
+		windowMeasurement,
 		globalBlockCount,
 	} = props;
 
@@ -129,19 +129,20 @@ export default function ListViewBranch( props ) {
 						expandedState
 					);
 				}
-				const end = measurement.start + measurement.maxVisible;
+				const { start, maxVisible } = windowMeasurement;
+				const end = start + maxVisible;
 				const blockInView =
-					measurement.start <= nextPosition &&
-					nextPosition <= measurement.start + measurement.maxVisible;
+					start <= nextPosition && nextPosition <= start + maxVisible;
 
 				const style = {
-					...( measurement.start === nextPosition
-						? { paddingTop: ITEM_HEIGHT * measurement.start }
+					...( start === nextPosition
+						? { paddingTop: ITEM_HEIGHT * start }
 						: {} ),
 					...( globalBlockCount > end && end === nextPosition
 						? {
 								paddingBottom:
-									ITEM_HEIGHT * ( globalBlockCount - end ),
+									ITEM_HEIGHT *
+									( globalBlockCount - end - 1 ),
 						  }
 						: {} ),
 				};
@@ -184,7 +185,7 @@ export default function ListViewBranch( props ) {
 								terminatedLevels={ updatedTerminatedLevels }
 								path={ updatedPath }
 								listPosition={ nextPosition + 1 }
-								measurement={ measurement }
+								windowMeasurement={ windowMeasurement }
 								globalBlockCount={ globalBlockCount }
 							/>
 						) }
