@@ -10,6 +10,7 @@ For each user feature we should also add a importance categorization label  to i
 -->
 
 ## Unreleased
+-   [**] Embed block: Detect when an embeddable URL is pasted into an empty paragraph. [#35204]
 
 ## 1.62.0
 -   [**] [Embed block] Implement WP embed preview component [#34004]
