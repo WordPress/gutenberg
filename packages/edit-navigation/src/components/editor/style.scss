@@ -29,6 +29,11 @@
 		// This is the default font that is going to be used in the content of the areas (blocks).
 		font-family: $default-font;
 
+		// Customize/zero out the gap.
+		.wp-block-navigation__container {
+			gap: 0;
+		}
+
 		// Increase specificity.
 		.wp-block-navigation-item {
 			display: block;
@@ -75,7 +80,6 @@
 				cursor: text;
 			}
 		}
-
 
 		// Basic Page List support.
 		ul.wp-block-page-list {
@@ -157,7 +161,7 @@
 			flex-direction: column;
 			justify-content: center;
 			height: $grid-unit-50;
-			margin: $grid-unit-10 0;
+			margin: $grid-unit-10 auto $grid-unit-10 0;
 		}
 
 		.block-editor-button-block-appender.block-list-appender__toggle {
