@@ -455,7 +455,7 @@ WP_BASE_URL=http://wp.test npm run test-e2e -- --wordpress-username=admin --word
 
 ### Scenario Testing
 
-If you find that end-to-end tests pass when run locally, but fail in Travis, you may be able to isolate a CPU- or network-bound race condition by simulating a slow CPU or network:
+If you find that end-to-end tests pass when run locally, but fail in GitHub Actions, you may be able to isolate a CPU- or network-bound race condition by simulating a slow CPU or network:
 
 ```
 THROTTLE_CPU=4 npm run test-e2e
