@@ -380,6 +380,18 @@ $preview-image-height: 140px;
 	}
 }
 
+.block-editor-link-control__search-create {
+	align-items: center; // align text with icon.
+
+	.block-editor-link-control__search-item-title {
+		margin-bottom: 0;
+	}
+
+	.block-editor-link-control__search-item-icon {
+		top: 0; // cancel compensatory spacing added to default suggestions.
+	}
+}
+
 // Specificity overide
 .block-editor-link-control__search-results div[role="menu"] > .block-editor-link-control__search-item.block-editor-link-control__search-item {
 	padding: 10px;
