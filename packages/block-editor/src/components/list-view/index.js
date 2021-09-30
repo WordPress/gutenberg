@@ -127,14 +127,22 @@ function ListView(
 		}
 		const scrollContainer = elementRef.current.parentNode;
 		measureWindow( scrollContainer, setWindowMeasurement );
-		const measureListOnScroll = throttle( ( event ) => {
-			measureWindow( event.target, setWindowMeasurement );
+		const throttleMeasureList = throttle( () => {
+			measureWindow( scrollContainer, setWindowMeasurement );
 		}, 16 );
-		scrollContainer.addEventListener( 'scroll', measureListOnScroll );
+		scrollContainer.addEventListener( 'scroll', throttleMeasureList );
+		scrollContainer.ownerDocument.defaultView.addEventListener(
+			'resize',
+			throttleMeasureList
+		);
 		return () => {
 			scrollContainer.removeEventListener(
 				'scroll',
-				measureListOnScroll
+				throttleMeasureList
+			);
+			scrollContainer.ownerDocument.defaultView.removeEventListener(
+				'resize',
+				throttleMeasureList
 			);
 		};
 	}, [] );
