@@ -244,7 +244,7 @@ public protocol GutenbergBridgeDelegate: class {
     /// Tells the delegate that the editor requested the block type impression counts
     func gutenbergDidRequestBlockTypeImpressions() -> [String: Int]
 
-    /// Tells the delegate the the editor requested setting the impression counts
+    /// Tells the delegate that the editor requested setting the impression counts
     func gutenbergDidRequestSetBlockTypeImpressions(_ impressions: [String: Int])
 
     /// Tells the delegate that the editor requested to show the "Contact Support" support view.
