@@ -239,17 +239,17 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 			array(
 				'version'  => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
 				'settings' => array(
-					'spacing'    => array(
+					'spacing' => array(
 						'blockGap' => null,
 					),
 				),
 				'styles'   => array(
-					'spacing'    => array(
+					'spacing' => array(
 						'blockGap' => '1em',
 					),
-					'blocks'   => array(
+					'blocks'  => array(
 						'core/columns' => array(
-							'spacing'  => array(
+							'spacing' => array(
 								'blockGap' => '24px',
 							),
 						),
@@ -268,17 +268,17 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 			array(
 				'version'  => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
 				'settings' => array(
-					'spacing'    => array(
+					'spacing' => array(
 						'blockGap' => true,
 					),
 				),
 				'styles'   => array(
-					'spacing'    => array(
+					'spacing' => array(
 						'blockGap' => '1em',
 					),
-					'blocks'   => array(
+					'blocks'  => array(
 						'core/columns' => array(
-							'spacing'  => array(
+							'spacing' => array(
 								'blockGap' => '24px',
 							),
 						),
@@ -286,6 +286,7 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 				),
 			)
 		);
+
 		$expected = 'body{--wp--style--block-gap: 1em;}.wp-site-blocks > .alignleft { float: left; margin-right: 2em; }.wp-site-blocks > .alignright { float: right; margin-left: 2em; }.wp-site-blocks > .aligncenter { justify-content: center; margin-left: auto; margin-right: auto; }.wp-site-blocks > * + * { margin-top: var( --wp--style--block-gap ); margin-bottom: 0; }.wp-block-columns{--wp--style--block-gap: 24px;}';
 		$this->assertEquals( $expected, $theme_json->get_stylesheet() );
 		$this->assertEquals( $expected, $theme_json->get_stylesheet( 'block_styles' ) );
