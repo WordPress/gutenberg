@@ -21,11 +21,18 @@ import {
 } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 
-function measure( scrollContainer, setMeasurement ) {
-	const maxVisible = Math.ceil( scrollContainer.clientHeight / ITEM_HEIGHT );
-	const start = Math.floor( scrollContainer.scrollTop / ITEM_HEIGHT );
-	setMeasurement( {
-		maxVisible,
+const WINDOW_OVERSCAN = 1;
+const ITEM_HEIGHT = 36;
+
+function measureWindow( scrollContainer, setWindowMeasurement ) {
+	const maxVisible = Math.floor( scrollContainer.clientHeight / ITEM_HEIGHT );
+	const start = Math.max(
+		0,
+		Math.floor( scrollContainer.scrollTop / ITEM_HEIGHT ) - WINDOW_OVERSCAN
+	);
+	//avoids scroll thrashing when scrolled to bottom
+	setWindowMeasurement( {
+		maxVisible: maxVisible + WINDOW_OVERSCAN,
 		start,
 	} );
 }
@@ -51,8 +58,6 @@ const expanded = ( state, action ) => {
 			return state;
 	}
 };
-
-const ITEM_HEIGHT = 36;
 
 /**
  * Wrap `ListViewRows` with `TreeGrid`. ListViewRows is a
@@ -112,27 +117,24 @@ function ListView(
 		isMounted.current = true;
 	}, [] );
 
-	//TODO: needs tuning for scroll position
-	const [ scrollHeight, setScrollHeight ] = useState(
-		ITEM_HEIGHT * globalBlockCount
-	);
-	const [ measurement, setMeasurement ] = useState( {
+	const [ windowMeasurement, setWindowMeasurement ] = useState( {
 		maxVisible: 30,
 		start: 0,
 	} );
 
 	useLayoutEffect( () => {
 		const scrollContainer = elementRef.current.parentNode;
-		measure( scrollContainer, setMeasurement );
+		measureWindow( scrollContainer, setWindowMeasurement );
 		const measureListOnScroll = throttle( ( event ) => {
-			measure( event.target, setMeasurement );
+			measureWindow( event.target, setWindowMeasurement );
 		}, 16 );
 		scrollContainer.addEventListener( 'scroll', measureListOnScroll );
-		return () =>
+		return () => {
 			scrollContainer.removeEventListener(
 				'scroll',
 				measureListOnScroll
 			);
+		};
 	}, [] );
 
 	const expand = useCallback(
@@ -182,7 +184,6 @@ function ListView(
 			collapse,
 		]
 	);
-
 	return (
 		<AsyncModeProvider value={ true }>
 			<ListViewDropIndicator
@@ -200,7 +201,7 @@ function ListView(
 					<ListViewBranch
 						blocks={ clientIdsTree }
 						selectBlock={ selectEditorBlock }
-						measurement={ measurement }
+						windowMeasurement={ windowMeasurement }
 						globalBlockCount={ globalBlockCount }
 						{ ...props }
 					/>
