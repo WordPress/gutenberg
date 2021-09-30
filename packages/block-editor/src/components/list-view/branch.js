@@ -57,6 +57,7 @@ export default function ListViewBranch( props ) {
 		collapse,
 		draggedClientIds,
 		selectedClientIds,
+		__experimentalPersistentListViewFeatures,
 	} = useListViewContext();
 
 	const isTreeRoot = ! parentBlockClientId;
@@ -131,14 +132,21 @@ export default function ListViewBranch( props ) {
 				}
 				const { start, maxVisible } = windowMeasurement;
 				const end = start + maxVisible;
+
+				// Only use windowing for the persistent list view
 				const blockInView =
-					start <= nextPosition && nextPosition <= start + maxVisible;
+					! __experimentalPersistentListViewFeatures ||
+					( start <= nextPosition &&
+						nextPosition <= start + maxVisible );
 
 				const style = {
-					...( start === nextPosition
+					...( __experimentalPersistentListViewFeatures &&
+					start === nextPosition
 						? { paddingTop: ITEM_HEIGHT * start }
 						: {} ),
-					...( globalBlockCount > end && end === nextPosition
+					...( __experimentalPersistentListViewFeatures &&
+					globalBlockCount > end &&
+					end === nextPosition
 						? {
 								paddingBottom:
 									ITEM_HEIGHT *

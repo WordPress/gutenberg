@@ -30,7 +30,6 @@ function measureWindow( scrollContainer, setWindowMeasurement ) {
 		0,
 		Math.floor( scrollContainer.scrollTop / ITEM_HEIGHT ) - WINDOW_OVERSCAN
 	);
-	//avoids scroll thrashing when scrolled to bottom
 	setWindowMeasurement( {
 		maxVisible: maxVisible + WINDOW_OVERSCAN,
 		start,
@@ -123,6 +122,9 @@ function ListView(
 	} );
 
 	useLayoutEffect( () => {
+		if ( ! __experimentalPersistentListViewFeatures ) {
+			return;
+		}
 		const scrollContainer = elementRef.current.parentNode;
 		measureWindow( scrollContainer, setWindowMeasurement );
 		const measureListOnScroll = throttle( ( event ) => {
