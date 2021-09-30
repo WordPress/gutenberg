@@ -9,7 +9,7 @@ import { css } from '@emotion/react';
 import { COLORS, CONFIG } from '../utils';
 
 export const Card = css`
-	box-shadow: 0 0 0 1px ${ CONFIG.surfaceBorderColor };
+	box-shadow: inset 0 0 0 1px ${ CONFIG.surfaceBorderColor };
 	outline: none;
 `;
 
