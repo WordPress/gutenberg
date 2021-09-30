@@ -47,6 +47,10 @@
 				display: none;
 				right: auto;
 				box-sizing: border-box;
+				width: auto;
+				height: auto;
+				overflow: initial;
+				min-width: initial;
 			}
 
 			// Fix focus outlines.
