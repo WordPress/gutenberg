@@ -1,7 +1,7 @@
 .components-panel__header.edit-post-sidebar__panel-tabs {
 	justify-content: flex-start;
 	padding-left: 0;
-	padding-right: $grid-unit-20;
+	padding-right: $grid-unit-20 + ($grid-unit-15 * 0.5);
 	border-top: 0;
 	margin-top: 0;
 

@@ -115,6 +115,17 @@ html.interface-interface-skeleton__html-container {
 .interface-interface-skeleton__sidebar {
 	overflow: auto;
 
+	// Force the vertical scrollbar to prevent a content shift.
+	overflow-y: scroll;
+
+	// This webkit-only property makes scrollbars overlay content. It has been deprecated,
+	// but is still useful to avoid a jarring shift of the body content.
+	// It should be replaced with `scrollbar-gutter` when that becomes available.
+	// https://developer.mozilla.org/en-US/docs/Web/CSS/scrollbar-gutter
+	@supports (overflow-y: overlay) {
+		overflow-y: overlay;
+	}
+
 	@include break-medium() {
 		border-left: $border-width solid $gray-200;
 	}
