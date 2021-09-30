@@ -10,7 +10,7 @@ import { toMatchInlineSnapshot, toMatchSnapshot } from 'jest-snapshot';
 import {
 	activatePlugin,
 	activateTheme,
-	clearLocalStorage,
+	// clearLocalStorage,
 	enablePageDialogAccept,
 	isOfflineMode,
 	setBrowserViewport,
@@ -76,7 +76,7 @@ if ( process.env.CI ) {
 }
 
 async function setupBrowser() {
-	await clearLocalStorage();
+	// await clearLocalStorage();
 	await setBrowserViewport( 'large' );
 }
 
