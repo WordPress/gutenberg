@@ -1296,33 +1296,28 @@ class WP_Theme_JSON_Gutenberg {
 	private static function remove_insecure_settings( $input ) {
 		$output = array();
 		foreach ( self::PRESETS_METADATA as $preset_metadata ) {
-			$current_preset = _wp_array_get( $input, $preset_metadata['path'], null );
-			if ( null === $current_preset ) {
+			$presets = _wp_array_get( $input, $preset_metadata['path'], null );
+			if ( null === $presets ) {
 				continue;
 			}
 
 			$escaped_preset = array();
-			foreach ( $current_preset as $single_preset ) {
+			foreach ( $presets as $preset ) {
 				if (
-					esc_attr( esc_html( $single_preset['name'] ) ) === $single_preset['name'] &&
-					sanitize_html_class( $single_preset['slug'] ) === $single_preset['slug']
+					esc_attr( esc_html( $preset['name'] ) ) === $preset['name'] &&
+					sanitize_html_class( $preset['slug'] ) === $preset['slug']
 				) {
-					$value                  = $single_preset[ $preset_metadata['value_key'] ];
-					$single_preset_is_valid = null;
-					if ( isset( $preset_metadata['properties'] ) && count( $preset_metadata['properties'] ) > 0 ) {
-						$single_preset_is_valid = true;
-						foreach ( $preset_metadata['properties'] as $property ) {
-							if ( ! self::is_safe_css_declaration( $property, $value ) ) {
-								$single_preset_is_valid = false;
-								break;
-							}
+					$value           = $preset[ $preset_metadata['value_key'] ];
+					$preset_is_valid = true;
+					foreach ( $preset_metadata['properties'] as $property ) {
+						if ( ! self::is_safe_css_declaration( $property, $value ) ) {
+							$preset_is_valid = false;
+							break;
 						}
-					} else {
-						$property               = $preset_metadata['css_var_infix'];
-						$single_preset_is_valid = self::is_safe_css_declaration( $property, $value );
 					}
-					if ( $single_preset_is_valid ) {
-						$escaped_preset[] = $single_preset;
+
+					if ( $preset_is_valid ) {
+						$escaped_preset[] = $preset;
 					}
 				}
 			}
