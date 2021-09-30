@@ -179,7 +179,6 @@ export default function DimensionsPanel( { context, getStyle, setStyle } ) {
 			) }
 			{ showGapControl && (
 				<ToolsPanelItem
-					className="single-column"
 					hasValue={ hasGapValue }
 					label={ __( 'Block spacing' ) }
 					onDeselect={ resetGapValue }
@@ -187,6 +186,7 @@ export default function DimensionsPanel( { context, getStyle, setStyle } ) {
 				>
 					<UnitControl
 						label={ __( 'Block spacing' ) }
+						__unstableInputWidth="80px"
 						min={ 0 }
 						onChange={ setGapValue }
 						units={ units }
