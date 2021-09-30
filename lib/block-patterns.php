@@ -237,7 +237,7 @@ function load_remote_core_patterns() {
 }
 
 /**
- * Register featured patterns from wordpress.org/patterns.
+ * Register `Featured` (category) patterns from wordpress.org/patterns.
  *
  * @since 5.9.0
  */
@@ -255,34 +255,19 @@ function load_remote_featured_patterns() {
 		return;
 	}
 
-	// TODO: check about the `featured` name.. Should this be reserved?
-	// Also check core logic: https://developer.wordpress.org/reference/classes/wp_block_pattern_categories_registry/
-	// Do we just allow collisions/overide with categories when they have the same name? Needs checking..
-	if ( ! WP_Block_Pattern_Categories_Registry::get_instance()->is_registered( 'Featured' ) ) {
+	if ( ! WP_Block_Pattern_Categories_Registry::get_instance()->is_registered( 'featured' ) ) {
 		register_block_pattern_category( 'featured', array( 'label' => __( 'Featured', 'gutenberg' ) ) );
 	}
-
-	$request = new WP_REST_Request( 'GET', '/wp/v2/pattern-directory/patterns' );
-	// TODO: change this with new category id when created in patterns directory..
-	$request->set_param( 'category', 4 ); // temp gallery category id.
-
-	// TODO: check to update the controller here: https://github.com/WordPress/gutenberg/blob/trunk/lib/class-wp-rest-pattern-directory-controller.php#L321
-	// because it unsets the `per_page` param.
-	// $request->set_param( 'per_page', 2 );.
-
-	$response = rest_do_request( $request );
+	$request             = new WP_REST_Request( 'GET', '/wp/v2/pattern-directory/patterns' );
+	$request['category'] = 26; // This is the `Featured` category id from pattern directory.
+	$response            = rest_do_request( $request );
 	if ( $response->is_error() ) {
 		return;
 	}
 	$patterns = $response->get_data();
-	// check above comment about `per_page`.
-	$patterns = array_slice( $patterns, 0, 2 );
 	foreach ( $patterns as $pattern ) {
 		$pattern_name = sanitize_title( $pattern['title'] );
 		if ( ! WP_Block_Patterns_Registry::get_instance()->is_registered( $pattern_name ) ) {
-			// TODO: should we override this one as is done here? If not we should also add the `featured`
-			// category and also check to registere remaing categories if not already registered.
-			$pattern['categories'] = array( 'featured' );
 			register_block_pattern( $pattern_name, (array) $pattern );
 		};
 	}

@@ -37,7 +37,6 @@ function BlockPatternsCategory( {
 						pattern.categories?.includes( category.name )
 					)
 				)
-				// TODO: check if we can sort differently. Currently is the registration order.
 				.sort( ( { name: currentName }, { name: nextName } ) => {
 					if ( ! [ currentName, nextName ].includes( 'featured' ) ) {
 						return 0;
