@@ -57,7 +57,8 @@
 	],
 	"supports": {
 		"reusable": false,
-		"html": false
+		"html": false,
+		"__experimentalSlashInserter": true
 	},
 	"editorStyle": "wp-block-navigation-link-editor",
 	"style": "wp-block-navigation-link"
