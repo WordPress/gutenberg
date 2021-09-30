@@ -16,15 +16,14 @@ import { __, _n, sprintf } from '@wordpress/i18n';
  * Internal dependencies
  */
 import Subtitle from './subtitle';
-import { useSetting } from '../editor/utils';
 import NavigationButton from './navigation-button';
+import { useSetting } from './hooks';
 
-function Palette( { contextName } ) {
-	const colors = useSetting( 'color.palette', contextName );
-	const screenPath =
-		contextName === 'root'
-			? '/colors/palette'
-			: '/blocks/' + contextName + '/colors/palette';
+function Palette( { name } ) {
+	const [ colors ] = useSetting( 'color.palette', name );
+	const screenPath = ! name
+		? '/colors/palette'
+		: '/blocks/' + name + '/colors/palette';
 
 	return (
 		<div className="edit-site-global-style-palette">
