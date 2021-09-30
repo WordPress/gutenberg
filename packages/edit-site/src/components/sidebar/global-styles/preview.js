@@ -25,7 +25,7 @@ export const StylePreview = () => {
 			style={ { background: backgroundColor } }
 		>
 			<HStack spacing={ 5 }>
-				<div style={ { lineHeight: '1' } }>
+				<div>
 					<span style={ { fontFamily, fontSize: '80px' } }>A</span>
 					<span style={ { fontFamily, fontSize: '80px' } }>a</span>
 				</div>
