@@ -268,7 +268,7 @@ class WP_Theme_JSON_Gutenberg {
 	 * Protected style properties.
 	 *
 	 * These properties are only rendered if a corresponding setting in the
-	 * `PROPERTIES_METADATA` path enables it.
+	 * `PROPERTIES_METADATA` path enables it via a value other than `null`.
 	 */
 	const PROTECTED_PROPERTIES = array( '--wp--style--block-gap' );
 
@@ -594,8 +594,8 @@ class WP_Theme_JSON_Gutenberg {
 		foreach ( $properties as $css_property => $value_path ) {
 			$value = self::get_property_value( $styles, $value_path );
 
-			if ( in_array( $css_property, self::PROTECTED_PROPERTIES ) ) {
-				if ( ! _wp_array_get( $settings, $value_path, false ) ) {
+			if ( in_array( $css_property, self::PROTECTED_PROPERTIES, true ) ) {
+				if ( _wp_array_get( $settings, $value_path, null ) === null ) {
 					continue;
 				}
 			}
