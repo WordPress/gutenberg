@@ -1078,6 +1078,11 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 					),
 				),
 				'blocks'   => array(
+					'core/image' => array(
+						'filter' => array(
+							'duotone' => 'var:preset|duotone|blue-red',
+						),
+					),
 					'core/group' => array(
 						'color'    => array(
 							'text' => 'var:preset|color|dark-gray',
