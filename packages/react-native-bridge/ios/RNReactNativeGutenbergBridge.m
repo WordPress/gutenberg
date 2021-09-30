@@ -37,5 +37,6 @@ RCT_EXTERN_METHOD(requestBlockTypeImpressions:(RCTResponseSenderBlock)callback)
 RCT_EXTERN_METHOD(setBlockTypeImpressions:(NSDictionary *)impressions)
 RCT_EXTERN_METHOD(requestContactCustomerSupport)
 RCT_EXTERN_METHOD(requestGotoCustomerSupportOptions)
+RCT_EXTERN_METHOD(sendEventToHost:(NSString)eventName properties:(NSDictionary *)properties)
 
 @end
