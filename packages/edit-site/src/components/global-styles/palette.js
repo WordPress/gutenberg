@@ -16,7 +16,7 @@ import { __, _n, sprintf } from '@wordpress/i18n';
  * Internal dependencies
  */
 import Subtitle from './subtitle';
-import { useSetting } from '../../editor/utils';
+import { useSetting } from '../editor/utils';
 import NavigationButton from './navigation-button';
 
 function Palette( { contextName } ) {
