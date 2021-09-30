@@ -15,15 +15,10 @@
 				"perPage": null,
 				"pages": 0,
 				"offset": 0,
-				"postType": "post",
-				"categoryIds": [],
-				"tagIds": [],
 				"order": "desc",
 				"orderBy": "date",
 				"author": "",
 				"search": "",
-				"exclude": [],
-				"sticky": "",
 				"inherit": true
 			}
 		},
@@ -49,8 +44,6 @@
 		"color": {
 			"gradients": true,
 			"link": true
-		},
-		"__experimentalLayout": true
-	},
-	"editorStyle": "wp-block-query-editor"
+		}
+	}
 }
