@@ -22,7 +22,7 @@ function DynamicShortcut( { name } ) {
 			aliases: getShortcutAliases( name ),
 			description: getShortcutDescription( name ),
 		};
-	} );
+	}, [] );
 
 	if ( ! keyCombination ) {
 		return null;
