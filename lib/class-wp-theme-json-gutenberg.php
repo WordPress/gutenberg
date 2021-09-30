@@ -1308,14 +1308,11 @@ class WP_Theme_JSON_Gutenberg {
 					sanitize_html_class( $preset['slug'] ) === $preset['slug']
 				) {
 					$value           = $preset[ $preset_metadata['value_key'] ];
-					$preset_is_valid = null;
-					if ( isset( $preset_metadata['properties'] ) && count( $preset_metadata['properties'] ) > 0 ) {
-						$preset_is_valid = true;
-						foreach ( $preset_metadata['properties'] as $property ) {
-							if ( ! self::is_safe_css_declaration( $property, $value ) ) {
-								$preset_is_valid = false;
-								break;
-							}
+					$preset_is_valid = true;
+					foreach ( $preset_metadata['properties'] as $property ) {
+						if ( ! self::is_safe_css_declaration( $property, $value ) ) {
+							$preset_is_valid = false;
+							break;
 						}
 					}
 
