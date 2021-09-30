@@ -126,6 +126,30 @@ html.interface-interface-skeleton__html-container {
 		overflow-y: overlay;
 	}
 
+	// Custom scrollbar style.
+	$scrollbar-thumb-color: $gray-600;
+	$scrollbar-bg-color: transparent;
+
+	// Firefox specific.
+	/*scrollbar-width: thin; // 6px in 11px track.
+	scrollbar-width: initial; // 8px in 15px track on Mac, arbitrary on windows?
+	scrollbar-color: $scrollbar-thumb-color $scrollbar-bg-color;*/
+
+	// Webkit specific.
+	&::-webkit-scrollbar {
+		width: 15px; // Same as "thin" in Firefox.
+		height: 15px;
+	}
+	&::-webkit-scrollbar-track {
+		background: $scrollbar-bg-color;
+	}
+	&::-webkit-scrollbar-thumb {
+		background-color: $scrollbar-thumb-color;
+		border-radius: 30px;
+		border: 4px solid transparent;
+		background-clip: padding-box;
+	}
+
 	@include break-medium() {
 		border-left: $border-width solid $gray-200;
 	}
