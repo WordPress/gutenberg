@@ -164,6 +164,9 @@ class WP_Theme_JSON_Gutenberg {
 	 *                   '.has-$slug-background-color' => 'background-color',
 	 *                   '.has-$slug-border-color'     => 'border-color',
 	 *                 )
+	 * - properties => array of CSS properties to be used by kses to
+	 *                 validate the content of each preset
+	 *                 by means of the remove_insecure_properties method.
 	 */
 	const PRESETS_METADATA = array(
 		array(
