@@ -14,10 +14,12 @@ $vertical-tabs-width: 160px;
 		height: 70%;
 	}
 
-	// Clears spacing to flush fit the navigation component to the modal edges.
+	// Clears spacing to flush fit the navigator component to the modal edges.
 	@media (max-width: #{ ($break-medium - 1) }) {
 		.components-modal__content {
 			padding: 0;
+			// Prevents horizontal overflow from showing scrollbars.
+			overflow-x: hidden;
 
 			&::before {
 				content: none;
