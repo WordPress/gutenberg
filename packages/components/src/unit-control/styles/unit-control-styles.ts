@@ -8,6 +8,7 @@ import styled from '@emotion/styled';
  */
 import { COLORS, rtl } from '../../utils';
 import NumberControl from '../../number-control';
+import type { UnitControlLabelProps } from '../types';
 
 export const Root = styled.div`
 	box-sizing: border-box;
@@ -51,7 +52,7 @@ export const ValueInput = styled( NumberControl )`
 	}
 `;
 
-const unitSizeStyles = ( { size } ) => {
+const unitSizeStyles = ( { size }: UnitControlLabelProps ) => {
 	const sizes = {
 		default: {
 			height: 28,
@@ -70,7 +71,7 @@ const unitSizeStyles = ( { size } ) => {
 	return css( sizes[ size ] );
 };
 
-const baseUnitLabelStyles = ( props ) => {
+const baseUnitLabelStyles = ( props: UnitControlLabelProps ) => {
 	return css`
 		appearance: none;
 		background: transparent;

@@ -1,4 +1,17 @@
+/**
+ * External dependencies
+ */
+// eslint-disable-next-line no-restricted-imports
+import type { ChangeEvent } from 'react';
+
+/**
+ * Internal dependencies
+ */
+import type { InputControlLabelProps } from '../input-control/types';
+
 export type Value = number | string;
+
+export type Size = 'default' | 'small';
 
 export type WPUnitControlUnit = {
 	/**
@@ -24,3 +37,20 @@ export type WPUnitControlUnit = {
 };
 
 export type WPUnitControlUnitList = Array< WPUnitControlUnit > | false;
+
+export type UnitControlLabelProps = InputControlLabelProps;
+
+export type UnitSelectControlProps = {
+	className: string;
+	isTabbable: boolean;
+	options?: Array< WPUnitControlUnit >;
+	onChange?: (
+		nextValue: string | undefined,
+		extra: {
+			event: ChangeEvent< HTMLSelectElement >;
+			data: WPUnitControlUnit;
+		}
+	) => void;
+	size?: Size;
+	value: string;
+};

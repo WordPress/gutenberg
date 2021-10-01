@@ -3,24 +3,27 @@
  */
 import { noop } from 'lodash';
 import classnames from 'classnames';
+// eslint-disable-next-line no-restricted-imports
+import type { ChangeEvent } from 'react';
 
 /**
  * Internal dependencies
  */
 import { UnitSelect, UnitLabel } from './styles/unit-control-styles';
 import { CSS_UNITS, hasUnits } from './utils';
+import type { UnitSelectControlProps } from './types';
 
 /**
  * Renders a `select` if there are multiple units.
  * Otherwise, renders a non-selectable label.
  *
- * @param {Object}   props                     Component props.
- * @param {string}   [props.className]         Class to set on the `select` element.
- * @param {boolean}  [props.isTabbable=true]   Whether the control can be focused via keyboard navigation.
- * @param {Array}    [props.options=CSS_UNITS] Available units to select from.
- * @param {Function} [props.onChange=noop]     A callback function invoked when the value is changed.
- * @param {string}   [props.size="default"]    Size of the control option. Supports "default" and "small".
- * @param {string}   [props.value="px"]        Current unit.
+ * @param  props            Component props.
+ * @param  props.className  Class to set on the `select` element.
+ * @param  props.isTabbable Whether the control can be focused via keyboard navigation.
+ * @param  props.options    Available units to select from.
+ * @param  props.onChange   A callback function invoked when the value is changed.
+ * @param  props.size       Size of the control option. Supports "default" and "small".
+ * @param  props.value      Current unit.
  */
 export default function UnitSelectControl( {
 	className,
@@ -30,7 +33,7 @@ export default function UnitSelectControl( {
 	size = 'default',
 	value = 'px',
 	...props
-} ) {
+}: UnitSelectControlProps ) {
 	if ( ! hasUnits( options ) || options.length === 1 ) {
 		return (
 			<UnitLabel
@@ -42,7 +45,7 @@ export default function UnitSelectControl( {
 		);
 	}
 
-	const handleOnChange = ( event ) => {
+	const handleOnChange = ( event: ChangeEvent< HTMLSelectElement > ) => {
 		const { value: unitValue } = event.target;
 		const data = options.find( ( option ) => option.value === unitValue );
 
@@ -56,7 +59,7 @@ export default function UnitSelectControl( {
 			className={ classes }
 			onChange={ handleOnChange }
 			size={ size }
-			tabIndex={ isTabbable ? null : '-1' }
+			tabIndex={ isTabbable ? null : -1 }
 			value={ value }
 			{ ...props }
 		>
