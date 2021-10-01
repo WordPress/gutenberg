@@ -48,7 +48,7 @@ The tooltip text to show on focus or hover.
 
 ### delay
 
-Time in milliseconds over children to wait before showing tooltip.
+Time in milliseconds to wait before showing tooltip after the tooltip's visibility is toggled. This prop is currently only available for the web platforms.
 
 -   Type: `Number`
 -   Required: No
