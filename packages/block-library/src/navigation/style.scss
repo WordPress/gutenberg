@@ -229,7 +229,8 @@
 .wp-block-navigation,
 .wp-block-navigation .wp-block-page-list,
 .wp-block-navigation__container {
-	gap: 0.5em 2em;
+	row-gap: calc(var(--wp--style--block-gap, 2em) / 4);
+	column-gap: var(--wp--style--block-gap, 2em);
 }
 
 // Menu items with background.
@@ -240,7 +241,8 @@
 	&,
 	.wp-block-navigation .wp-block-page-list,
 	.wp-block-navigation__container {
-		gap: 0 0.5em;
+		row-gap: calc(var(--wp--style--block-gap, 0.5em) / 4);
+		column-gap: var(--wp--style--block-gap, 0.5em);
 	}
 }
 
