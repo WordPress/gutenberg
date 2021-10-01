@@ -11,7 +11,6 @@ import { sum } from 'lodash';
 import {
 	createNewPost,
 	saveDraft,
-	insertBlock,
 	openGlobalBlockInserter,
 	closeGlobalBlockInserter,
 } from '@wordpress/e2e-test-utils';
@@ -118,7 +117,9 @@ describe( 'Post Editor Performance', () => {
 
 	it( 'Typing', async () => {
 		// Measuring typing performance
-		await insertBlock( 'Paragraph' );
+		await page.click( '.edit-post-header-toolbar__list-view-toggle' );
+		await page.click( '.edit-post-visual-editor__post-title-wrapper' );
+		await page.keyboard.press( 'Enter' );
 		let i = 20;
 		await page.tracing.start( {
 			path: traceFile,
@@ -157,6 +158,7 @@ describe( 'Post Editor Performance', () => {
 	it( 'Selecting blocks', async () => {
 		// Measuring block selection performance
 		await createNewPost();
+		await page.click( '.edit-post-header-toolbar__list-view-toggle' );
 		await page.evaluate( () => {
 			const { createBlock } = window.wp.blocks;
 			const { dispatch } = window.wp.data;
