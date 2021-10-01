@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { map, compact } from 'lodash';
+import { compact } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -73,133 +73,140 @@ export default function ListViewBranch( props ) {
 	const appenderPosition = rowCount;
 	let nextPosition = listPosition;
 
+	const listItems = [];
+	for ( let index = 0; index < filteredBlocks.length; index++ ) {
+		const block = filteredBlocks[ index ];
+		const { clientId, innerBlocks } = block;
+
+		if ( index > 0 ) {
+			nextPosition += countBlocks(
+				filteredBlocks[ index - 1 ],
+				expandedState
+			);
+		}
+		const { start, maxVisible } = windowMeasurement;
+		const end = start + maxVisible;
+
+		// Only use windowing for the persistent list view
+		const blockInView =
+			! __experimentalPersistentListViewFeatures ||
+			( start <= nextPosition && nextPosition <= start + maxVisible );
+
+		if ( ! blockInView && nextPosition > start ) {
+			// found the end of the window, don't bother processing the rest of the items
+			break;
+		} else if ( ! blockInView ) {
+			// item is before beginning of window
+			continue;
+		}
+
+		const style = {
+			...( __experimentalPersistentListViewFeatures &&
+			start === nextPosition
+				? { paddingTop: ITEM_HEIGHT * start }
+				: {} ),
+			...( __experimentalPersistentListViewFeatures &&
+			globalBlockCount > end &&
+			end === nextPosition
+				? {
+						paddingBottom:
+							ITEM_HEIGHT * ( globalBlockCount - end - 1 ),
+				  }
+				: {} ),
+		};
+
+		const position = index + 1;
+		const isLastRowAtLevel = rowCount === position;
+		const updatedTerminatedLevels = isLastRowAtLevel
+			? [ ...terminatedLevels, level ]
+			: terminatedLevels;
+		const updatedPath = [ ...path, position ];
+		const hasNestedBlocks =
+			showNestedBlocks && !! innerBlocks && !! innerBlocks.length;
+		const hasNestedAppender = itemHasAppender( clientId );
+		const hasNestedBranch = hasNestedBlocks || hasNestedAppender;
+
+		const isSelected = isClientIdSelected( clientId, selectedClientIds );
+		const isSelectedBranch =
+			isBranchSelected || ( isSelected && hasNestedBranch );
+
+		// Logic needed to target the last item of a selected branch which might be deeply nested.
+		// This is currently only needed for styling purposes. See: `.is-last-of-selected-branch`.
+		const isLastBlock = index === blockCount - 1;
+		const isLast = isSelected || ( isLastOfBranch && isLastBlock );
+		const isLastOfSelectedBranch =
+			isLastOfBranch && ! hasNestedBranch && isLastBlock;
+
+		const isExpanded = hasNestedBranch
+			? expandedState[ clientId ] ?? true
+			: undefined;
+
+		const selectBlockWithClientId = ( event ) => {
+			event.stopPropagation();
+			selectBlock( clientId );
+		};
+
+		const toggleExpanded = ( event ) => {
+			event.stopPropagation();
+			if ( isExpanded === true ) {
+				collapse( clientId );
+			} else if ( isExpanded === false ) {
+				expand( clientId );
+			}
+		};
+
+		// Make updates to the selected or dragged blocks synchronous,
+		// but asynchronous for any other block.
+		const isDragged = !! draggedClientIds?.includes( clientId );
+
+		listItems.push(
+			<AsyncModeProvider key={ clientId } value={ ! isSelected }>
+				{ blockInView && (
+					<ListViewBlock
+						block={ block }
+						onClick={ selectBlockWithClientId }
+						onToggleExpanded={ toggleExpanded }
+						isDragged={ isDragged }
+						isSelected={ isSelected }
+						isBranchSelected={ isSelectedBranch }
+						isLastOfSelectedBranch={ isLastOfSelectedBranch }
+						level={ level }
+						position={ position }
+						rowCount={ rowCount }
+						siblingBlockCount={ blockCount }
+						showBlockMovers={ showBlockMovers }
+						terminatedLevels={ terminatedLevels }
+						path={ updatedPath }
+						isExpanded={ isExpanded }
+						listPosition={ nextPosition }
+						style={ style }
+					/>
+				) }
+				{ hasNestedBranch && isExpanded && ! isDragged && (
+					<ListViewBranch
+						blocks={ innerBlocks }
+						selectBlock={ selectBlock }
+						isBranchSelected={ isSelectedBranch }
+						isLastOfBranch={ isLast }
+						showAppender={ showAppender }
+						showBlockMovers={ showBlockMovers }
+						showNestedBlocks={ showNestedBlocks }
+						parentBlockClientId={ clientId }
+						level={ level + 1 }
+						terminatedLevels={ updatedTerminatedLevels }
+						path={ updatedPath }
+						listPosition={ nextPosition + 1 }
+						windowMeasurement={ windowMeasurement }
+						globalBlockCount={ globalBlockCount }
+					/>
+				) }
+			</AsyncModeProvider>
+		);
+	}
+
 	return (
 		<>
-			{ map( filteredBlocks, ( block, index ) => {
-				const { clientId, innerBlocks } = block;
-				const position = index + 1;
-				const isLastRowAtLevel = rowCount === position;
-				const updatedTerminatedLevels = isLastRowAtLevel
-					? [ ...terminatedLevels, level ]
-					: terminatedLevels;
-				const updatedPath = [ ...path, position ];
-				const hasNestedBlocks =
-					showNestedBlocks && !! innerBlocks && !! innerBlocks.length;
-				const hasNestedAppender = itemHasAppender( clientId );
-				const hasNestedBranch = hasNestedBlocks || hasNestedAppender;
-
-				const isSelected = isClientIdSelected(
-					clientId,
-					selectedClientIds
-				);
-				const isSelectedBranch =
-					isBranchSelected || ( isSelected && hasNestedBranch );
-
-				// Logic needed to target the last item of a selected branch which might be deeply nested.
-				// This is currently only needed for styling purposes. See: `.is-last-of-selected-branch`.
-				const isLastBlock = index === blockCount - 1;
-				const isLast = isSelected || ( isLastOfBranch && isLastBlock );
-				const isLastOfSelectedBranch =
-					isLastOfBranch && ! hasNestedBranch && isLastBlock;
-
-				const isExpanded = hasNestedBranch
-					? expandedState[ clientId ] ?? true
-					: undefined;
-
-				const selectBlockWithClientId = ( event ) => {
-					event.stopPropagation();
-					selectBlock( clientId );
-				};
-
-				const toggleExpanded = ( event ) => {
-					event.stopPropagation();
-					if ( isExpanded === true ) {
-						collapse( clientId );
-					} else if ( isExpanded === false ) {
-						expand( clientId );
-					}
-				};
-
-				// Make updates to the selected or dragged blocks synchronous,
-				// but asynchronous for any other block.
-				const isDragged = !! draggedClientIds?.includes( clientId );
-
-				if ( index > 0 ) {
-					nextPosition += countBlocks(
-						filteredBlocks[ index - 1 ],
-						expandedState
-					);
-				}
-				const { start, maxVisible } = windowMeasurement;
-				const end = start + maxVisible;
-
-				// Only use windowing for the persistent list view
-				const blockInView =
-					! __experimentalPersistentListViewFeatures ||
-					( start <= nextPosition &&
-						nextPosition <= start + maxVisible );
-
-				const style = {
-					...( __experimentalPersistentListViewFeatures &&
-					start === nextPosition
-						? { paddingTop: ITEM_HEIGHT * start }
-						: {} ),
-					...( __experimentalPersistentListViewFeatures &&
-					globalBlockCount > end &&
-					end === nextPosition
-						? {
-								paddingBottom:
-									ITEM_HEIGHT *
-									( globalBlockCount - end - 1 ),
-						  }
-						: {} ),
-				};
-				return (
-					<AsyncModeProvider key={ clientId } value={ ! isSelected }>
-						{ blockInView && (
-							<ListViewBlock
-								block={ block }
-								onClick={ selectBlockWithClientId }
-								onToggleExpanded={ toggleExpanded }
-								isDragged={ isDragged }
-								isSelected={ isSelected }
-								isBranchSelected={ isSelectedBranch }
-								isLastOfSelectedBranch={
-									isLastOfSelectedBranch
-								}
-								level={ level }
-								position={ position }
-								rowCount={ rowCount }
-								siblingBlockCount={ blockCount }
-								showBlockMovers={ showBlockMovers }
-								terminatedLevels={ terminatedLevels }
-								path={ updatedPath }
-								isExpanded={ isExpanded }
-								listPosition={ nextPosition }
-								style={ style }
-							/>
-						) }
-						{ hasNestedBranch && isExpanded && ! isDragged && (
-							<ListViewBranch
-								blocks={ innerBlocks }
-								selectBlock={ selectBlock }
-								isBranchSelected={ isSelectedBranch }
-								isLastOfBranch={ isLast }
-								showAppender={ showAppender }
-								showBlockMovers={ showBlockMovers }
-								showNestedBlocks={ showNestedBlocks }
-								parentBlockClientId={ clientId }
-								level={ level + 1 }
-								terminatedLevels={ updatedTerminatedLevels }
-								path={ updatedPath }
-								listPosition={ nextPosition + 1 }
-								windowMeasurement={ windowMeasurement }
-								globalBlockCount={ globalBlockCount }
-							/>
-						) }
-					</AsyncModeProvider>
-				);
-			} ) }
+			{ listItems }
 			{ hasAppender && (
 				<ListViewAppender
 					parentBlockClientId={ parentBlockClientId }
