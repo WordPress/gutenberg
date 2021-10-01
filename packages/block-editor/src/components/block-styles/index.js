@@ -7,7 +7,7 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { useCallback, useMemo, useRef, useState } from '@wordpress/element';
+import { useMemo, useRef, useState } from '@wordpress/element';
 import { useDebounce } from '@wordpress/compose';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { ENTER, SPACE } from '@wordpress/keycodes';
@@ -80,15 +80,12 @@ function BlockStyles( {
 	const [ hoveredStyle, setHoveredStyle ] = useState( null );
 	const debouncedSetHoveredStyle = useDebounce( setHoveredStyle, 250 );
 
-	const onStyleHover = useCallback(
-		( item ) => {
-			if ( hoveredStyle === item ) {
-				return;
-			}
-			debouncedSetHoveredStyle( item );
-		},
-		[ hoveredStyle ]
-	);
+	const onStyleHover = ( item ) => {
+		if ( hoveredStyle === item ) {
+			return;
+		}
+		debouncedSetHoveredStyle( item );
+	};
 
 	const containerRef = useRef();
 
