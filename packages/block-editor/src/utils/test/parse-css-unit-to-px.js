@@ -1,7 +1,10 @@
 /**
  * Internal dependencies
  */
-import { default as getPxFromCssUnit } from '../parse-css-unit-to-px';
+import {
+	default as memoizedGetPxFromCssUnit,
+	getPxFromCssUnit,
+} from '../parse-css-unit-to-px';
 
 describe( 'getPxFromCssUnit', () => {
 	// Absolute units
@@ -179,5 +182,25 @@ describe( 'getPxFromCssUnit', () => {
 
 	it( 'test not a typo function return null', () => {
 		expect( getPxFromCssUnit( 'calc(12vw * 10px' ) ).toBe( null );
+	} );
+
+	it( 'test performance of memoizedGetPxFromCssUnit function', () => {
+		const start = Date.now();
+		let i = 0;
+		const intervals = 1000;
+		while ( i < intervals ) {
+			getPxFromCssUnit( 'max(25px, 35px)', { width: 200 } );
+			i++;
+		}
+		const rawDuration = Date.now() - start;
+
+		const startM = Date.now();
+		i = 0;
+		// the memoized Version should be at 10X better then the non default one.
+		while ( i < intervals * 10 ) {
+			memoizedGetPxFromCssUnit( 'max(25px, 35px)', { width: 201 } );
+			i++;
+		}
+		expect( rawDuration > Date.now() - startM ).toBe( true );
 	} );
 } );
