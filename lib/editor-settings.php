@@ -77,7 +77,7 @@ function gutenberg_initialize_editor( $editor_name, $editor_script_handle, $sett
 	);
 
 	/**
-	 * Allows to change the preloaded data.
+	 * Allows to modify the preloaded data.
 	 *
 	 * @param string[] $preload_paths Array with the preloaded data.
 	 */

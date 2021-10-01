@@ -20,6 +20,16 @@ function gutenberg_navigation_page() {
 	<?php
 }
 
+function gutenberg_navigation_get_menus_endpoint_url($menu_id = null)
+{
+	return '/__experimental/menus?' . http_build_query(array(
+					'per_page' => 100,
+					'context' => 'edit',
+					'_locale' => 'user',
+
+			));
+}
+
 /**
  * Initialize the Gutenberg Navigation page.
  *
@@ -36,6 +46,7 @@ function gutenberg_navigation_init( $hook ) {
 		'/__experimental/menu-locations',
 		array( '/wp/v2/pages', 'OPTIONS' ),
 		array( '/wp/v2/posts', 'OPTIONS' ),
+		gutenberg_navigation_get_menus_endpoint_url(),
 	);
 
 	$settings = array_merge(
@@ -82,3 +93,9 @@ function gutenberg_navigation_editor_load_block_editor_scripts_and_styles( $is_b
 }
 
 add_filter( 'should_load_block_editor_scripts_and_styles', 'gutenberg_navigation_editor_load_block_editor_scripts_and_styles' );
+
+function gutenberg_navigation_editor_preload_menus_data($preloaded_data)
+{
+
+}
+add_filter('navigation_editor_preloaded_data', 'gutenberg_navigation_editor_preload_menus_data');
