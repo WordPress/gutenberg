@@ -69,7 +69,7 @@ export default function PostTitleEdit( {
 			);
 	}
 
-	if ( isLink ) {
+	if ( isLink && postType && postId ) {
 		titleElement =
 			userCanEdit && ! isDescendentOfQueryLoop ? (
 				<TagName { ...blockProps }>
