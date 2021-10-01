@@ -20,21 +20,29 @@ function NavigatorButton( { path, isBack = false, ...props } ) {
 }
 
 const MyNavigation = () => (
-	<NavigatorProvider initialPath="/">
-		<NavigatorScreen path="/">
-			<p>This is the home screen.</p>
-			<NavigatorButton isPrimary path="/child">
-				Navigate to child screen.
-			</NavigatorButton>
-		</NavigatorScreen>
+	<div style={ { 'overflow-x': 'hidden' } }>
+		<NavigatorProvider initialPath="/">
+			<NavigatorScreen path="/">
+				<p>This is the home screen.</p>
+				<NavigatorButton isPrimary path="/child">
+					Navigate to child screen.
+				</NavigatorButton>
+			</NavigatorScreen>
 
-		<NavigatorScreen path="/child">
-			<p>This is the child screen.</p>
-			<NavigatorButton isPrimary path="/" isBack>
-				Go back
-			</NavigatorButton>
-		</NavigatorScreen>
-	</NavigatorProvider>
+			<NavigatorScreen path="/child">
+				<p>This is the child screen.</p>
+				<NavigatorButton
+					isPrimary
+					path="/"
+					isBack
+					style={ { position: 'sticky', top: '5px' } }
+				>
+					Go back
+				</NavigatorButton>
+				<div style={ { height: '200vh', background: 'papayawhip' } } />
+			</NavigatorScreen>
+		</NavigatorProvider>
+	</div>
 );
 
 export const _default = () => {
