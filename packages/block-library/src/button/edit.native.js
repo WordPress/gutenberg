@@ -122,10 +122,6 @@ function ButtonEdit( props ) {
 	const gradients = useSetting( 'color.gradients' ) || [];
 
 	useEffect( () => {
-		onSetMaxWidth();
-	}, [] );
-
-	useEffect( () => {
 		if ( isSelected ) {
 			onToggleButtonFocus( true );
 		}
@@ -307,20 +303,23 @@ function ButtonEdit( props ) {
 		onSetMaxWidth( width );
 	}
 
-	function onSetMaxWidth( width, isParentWidthDidChange = false ) {
-		const { marginRight: spacing } = styles.defaultButton;
+	const onSetMaxWidth = useCallback(
+		( width, isParentWidthDidChange = false ) => {
+			const { marginRight: spacing } = styles.defaultButton;
 
-		const isParentWidthChanged = isParentWidthDidChange
-			? isParentWidthDidChange
-			: maxWidth !== parentWidth;
-		const isWidthChanged = maxWidth !== width;
+			const isParentWidthChanged = isParentWidthDidChange
+				? isParentWidthDidChange
+				: maxWidth !== parentWidth;
+			const isWidthChanged = maxWidth !== width;
 
-		if ( parentWidth && ! width && isParentWidthChanged ) {
-			setMaxWidth( parentWidth - spacing );
-		} else if ( ! parentWidth && width && isWidthChanged ) {
-			setMaxWidth( width - spacing );
-		}
-	}
+			if ( parentWidth && ! width && isParentWidthChanged ) {
+				setMaxWidth( parentWidth - spacing );
+			} else if ( ! parentWidth && width && isWidthChanged ) {
+				setMaxWidth( width - spacing );
+			}
+		},
+		[ maxWidth, parentWidth ]
+	);
 
 	function onRemove() {
 		const { onDeleteBlock, onReplace } = props;
@@ -350,11 +349,11 @@ function ButtonEdit( props ) {
 
 	const onUnstableOnFocus = useCallback( () => {
 		onToggleButtonFocus( true );
-	}, [ onToggleButtonFocus ] );
+	}, [] );
 
 	const onBlur = useCallback( () => {
 		onSetMaxWidth();
-	}, [ onSetMaxWidth ] );
+	}, [] );
 
 	function dismissSheet() {
 		onHideLinkSettings();
