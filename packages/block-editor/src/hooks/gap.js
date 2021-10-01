@@ -6,7 +6,7 @@ import { Platform } from '@wordpress/element';
 import { getBlockSupport } from '@wordpress/blocks';
 import {
 	__experimentalUseCustomUnits as useCustomUnits,
-	__experimentalUnitControl as UnitControl,
+	__experimentalBoxControl as BoxControl,
 } from '@wordpress/components';
 
 /**
@@ -14,7 +14,7 @@ import {
  */
 import { __unstableUseBlockRef as useBlockRef } from '../components/block-list/use-block-props/use-block-refs';
 import useSetting from '../components/use-setting';
-import { SPACING_SUPPORT_KEY } from './dimensions';
+import { AXIAL_SIDES, SPACING_SUPPORT_KEY, useCustomSides } from './dimensions';
 import { cleanEmptyObject } from './utils';
 
 /**
@@ -81,6 +81,7 @@ export function useIsGapDisabled( { name: blockName } = {} ) {
 export function GapEdit( props ) {
 	const {
 		clientId,
+		name: blockName,
 		attributes: { style },
 		setAttributes,
 	} = props;
@@ -95,6 +96,10 @@ export function GapEdit( props ) {
 		],
 	} );
 
+	const sides = useCustomSides( blockName, 'blockGap' );
+	const splitOnAxis =
+		sides && sides.some( ( side ) => AXIAL_SIDES.includes( side ) );
+
 	const ref = useBlockRef( clientId );
 
 	if ( useIsGapDisabled( props ) ) {
@@ -106,7 +111,10 @@ export function GapEdit( props ) {
 			...style,
 			spacing: {
 				...style?.spacing,
-				blockGap: next,
+				blockGap: {
+					row: next?.top,
+					column: next?.left,
+				},
 			},
 		};
 
@@ -128,15 +136,24 @@ export function GapEdit( props ) {
 		}
 	};
 
+	const boxValues = {
+		top: style?.spacing?.blockGap?.row,
+		right: style?.spacing?.blockGap?.column,
+		bottom: style?.spacing?.blockGap?.row,
+		left: style?.spacing?.blockGap?.column,
+	};
+
 	return Platform.select( {
 		web: (
 			<>
-				<UnitControl
+				<BoxControl
 					label={ __( 'Block gap' ) }
 					min={ 0 }
 					onChange={ onChange }
 					units={ units }
-					value={ style?.spacing?.blockGap }
+					values={ boxValues }
+					allowReset={ false }
+					splitOnAxis={ splitOnAxis }
 				/>
 			</>
 		),

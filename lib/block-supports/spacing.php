@@ -107,18 +107,23 @@ function gutenberg_render_spacing_gap_support( $block_content, $block ) {
 	}
 
 	$gap_value = $block['attrs']['style']['spacing']['blockGap'];
+	$styles = [];
 
-	// Skip if gap value contains unsupported characters.
-	// Regex for CSS value borrowed from `safecss_filter_attr`, and used here
-	// because we only want to match against the value, not the CSS attribute.
-	if ( preg_match( '%[\\\(&=}]|/\*%', $gap_value ) ) {
-		return $block_content;
+	if ( is_array( $gap_value ) ) {
+		foreach( $gap_value as $key => $value ) {
+			// Skip if gap value contains unsupported characters.
+			// Regex for CSS value borrowed from `safecss_filter_attr`, and used here
+			// because we only want to match against the value, not the CSS attribute.
+			if ( ! preg_match( '%[\\\(&=}]|/\*%', $value ) ) {
+				$styles[] = sprintf( '%s-gap: %s', $key, $value );
+			}
+		}
+	} else {
+		if ( ! preg_match( '%[\\\(&=}]|/\*%', $gap_value ) ) {
+			$styles[] = sprintf( 'gap: %s', $gap_value );
+		}
 	}
-
-	$style = sprintf(
-		'--wp--style--block-gap: %s',
-		esc_attr( $gap_value )
-	);
+	$style = implode( " ", $styles );
 
 	// Attempt to update an existing style attribute on the wrapper element.
 	$injected_style = preg_replace(
