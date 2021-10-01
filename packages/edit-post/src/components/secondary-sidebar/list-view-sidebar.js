@@ -6,7 +6,6 @@ import {
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import { Button } from '@wordpress/components';
-import { memo } from '@wordpress/element';
 import {
 	useFocusOnMount,
 	useFocusReturn,
@@ -72,4 +71,4 @@ function ListViewSidebar() {
 		</div>
 	);
 }
-export default memo( ListViewSidebar );
+export default ListViewSidebar;

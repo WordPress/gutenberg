@@ -16,7 +16,7 @@ import {
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { moreVertical } from '@wordpress/icons';
-import { useState, useRef, useEffect, memo } from '@wordpress/element';
+import { useState, useRef, useEffect } from '@wordpress/element';
 import { useDispatch, useSelect } from '@wordpress/data';
 
 /**
@@ -41,7 +41,7 @@ const ROW_VARIANTS = {
 };
 const DRAG_CONSTANTS = { left: -10, right: 10 };
 
-function ListViewBlock( {
+export default function ListViewBlock( {
 	block,
 	isSelected,
 	isBranchSelected,
@@ -334,16 +334,3 @@ function ListViewBlock( {
 		</TreeGridRow>
 	);
 }
-
-function shouldSkipUpdateIfDragging( prevProps, nextProps ) {
-	if ( prevProps.draggingId && nextProps.draggingId ) {
-		const samePosition = nextProps.listPosition === prevProps.listPosition;
-		const sameParent = nextProps.parentId === prevProps.parentId;
-		const expanded = nextProps.isExpanded === prevProps.isExpanded;
-		return samePosition && sameParent && expanded;
-	}
-	// If not dragging, default to native behavior of always rendering if the parent has rendered.
-	return false;
-}
-
-export default memo( ListViewBlock, shouldSkipUpdateIfDragging );

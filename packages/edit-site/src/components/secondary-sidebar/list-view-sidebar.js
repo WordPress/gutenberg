@@ -12,7 +12,6 @@ import {
 	useInstanceId,
 	useMergeRefs,
 } from '@wordpress/compose';
-import { memo } from '@wordpress/element';
 import { useDispatch } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
 import { closeSmall } from '@wordpress/icons';
@@ -71,4 +70,4 @@ function ListViewSidebar() {
 		</div>
 	);
 }
-export default memo( ListViewSidebar );
+export default ListViewSidebar;
