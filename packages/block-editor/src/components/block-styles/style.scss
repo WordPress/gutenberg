@@ -7,17 +7,20 @@
 	}
 }
 
-.block-editor-block-styles__preview__popover {
+// Do not show in narrow widths. Needs specificity.
+.block-editor-block-styles__popover.block-editor-block-styles__preview__popover {
 	display: none;
 
+	@include break-medium() {
+		display: flex;
+	}
+}
+
+.block-editor-block-styles__preview__popover {
 	// Position correctly. Needs specificity.
 	&.components-popover {
 		margin-left: $grid-unit-05;
 		margin-top: $grid-unit-15 - $border-width;
-	}
-
-	@include break-medium() {
-		display: block;
 	}
 
 	.components-popover__content {
@@ -53,8 +56,11 @@
 		color: $gray-800;
 		box-shadow: inset 0 0 0 1px $gray-400;
 		display: inline-block;
-		min-width: calc(50% - #{$grid-unit-05});
+		width: calc(50% - #{$grid-unit-05});
 		margin-bottom: $grid-unit-10;
+		white-space: nowrap;
+		overflow: hidden;
+		text-overflow: ellipsis;
 
 		&:focus,
 		&:hover {
@@ -68,4 +74,10 @@
 			box-shadow: inset 0 0 0 2px $gray-900;
 		}
 	}
+}
+
+// Try to prevent overflow in the preview container.
+.block-editor-block-styles__block-preview-container,
+.block-editor-block-styles__block-preview-container * {
+	box-sizing: border-box !important;
 }
