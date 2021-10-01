@@ -241,7 +241,7 @@
 	&,
 	.wp-block-navigation .wp-block-page-list,
 	.wp-block-navigation__container {
-		row-gap: calc(var(--wp--style--block-gap, 0.5em) / 4);
+		row-gap: calc(var(--wp--style--block-gap, 0) / 4);
 		column-gap: var(--wp--style--block-gap, 0.5em);
 	}
 }
