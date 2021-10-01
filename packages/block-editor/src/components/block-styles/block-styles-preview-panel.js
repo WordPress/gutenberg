@@ -49,7 +49,7 @@ export default function BlockStylesPreviewPanel( {
 		<div className="block-editor-block-styles__popover__preview__parent">
 			<div className="block-editor-block-styles__popover__preview__container">
 				<Popover
-					className="block-editor-block-styles__preview__popover"
+					className="block-editor-block-styles__popover block-editor-block-styles__preview__popover "
 					focusOnMount={ false }
 					position="middle left"
 					animate={ false }
