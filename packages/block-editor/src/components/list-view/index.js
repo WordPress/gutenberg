@@ -1,12 +1,18 @@
 /**
+ * External dependencies
+ */
+import { throttle } from 'lodash';
+
+/**
  * WordPress dependencies
  */
-import { useReducedMotion } from '@wordpress/compose';
+import { useMergeRefs, useReducedMotion } from '@wordpress/compose';
 import { __experimentalTreeGrid as TreeGrid } from '@wordpress/components';
-import { AsyncModeProvider, useDispatch } from '@wordpress/data';
+import { AsyncModeProvider, useDispatch, useSelect } from '@wordpress/data';
 import {
 	useCallback,
 	useEffect,
+	useLayoutEffect,
 	useMemo,
 	useRef,
 	useReducer,
@@ -40,6 +46,20 @@ const expanded = ( state, action ) => {
 			return state;
 	}
 };
+const WINDOW_OVERSCAN = 2;
+const ITEM_HEIGHT = 36;
+
+function measureWindow( scrollContainer, setWindowMeasurement ) {
+	const maxVisible = Math.floor( scrollContainer.clientHeight / ITEM_HEIGHT );
+	const start = Math.max(
+		0,
+		Math.floor( scrollContainer.scrollTop / ITEM_HEIGHT ) - WINDOW_OVERSCAN
+	);
+	setWindowMeasurement( {
+		maxVisible: maxVisible + WINDOW_OVERSCAN,
+		start,
+	} );
+}
 
 /**
  * Wrap `ListViewRows` with `TreeGrid`. ListViewRows is a
@@ -79,6 +99,10 @@ function ListView(
 	const { selectBlock, moveBlocksToPosition } = useDispatch(
 		blockEditorStore
 	);
+	const globalBlockCount = useSelect( ( select ) => {
+		return select( blockEditorStore ).getGlobalBlockCount();
+	}, [] );
+
 	const selectEditorBlock = useCallback(
 		( clientId ) => {
 			selectBlock( clientId );
@@ -91,6 +115,40 @@ function ListView(
 
 	useEffect( () => {
 		isMounted.current = true;
+	}, [] );
+
+	const [ windowMeasurement, setWindowMeasurement ] = useState( {
+		maxVisible: 30,
+		start: 0,
+	} );
+
+	const elementRef = useRef();
+	const treeGridRef = useMergeRefs( [ elementRef, ref ] );
+
+	useLayoutEffect( () => {
+		if ( ! __experimentalPersistentListViewFeatures ) {
+			return;
+		}
+		const scrollContainer = elementRef.current.parentNode;
+		measureWindow( scrollContainer, setWindowMeasurement );
+		const throttleMeasureList = throttle( () => {
+			measureWindow( scrollContainer, setWindowMeasurement );
+		}, 16 );
+		scrollContainer.addEventListener( 'scroll', throttleMeasureList );
+		scrollContainer.ownerDocument.defaultView.addEventListener(
+			'resize',
+			throttleMeasureList
+		);
+		return () => {
+			scrollContainer.removeEventListener(
+				'scroll',
+				throttleMeasureList
+			);
+			scrollContainer.ownerDocument.defaultView.removeEventListener(
+				'resize',
+				throttleMeasureList
+			);
+		};
 	}, [] );
 
 	// State and callback functions used to support expand/collapse functions
@@ -216,7 +274,6 @@ function ListView(
 	// Note that this is fired on onViewportBoxUpdate instead of onDrag.
 	const moveItem = useCallback(
 		( { block, translate, translateX, listPosition, velocity } ) => {
-			const ITEM_HEIGHT = 36;
 			const LEFT_RIGHT_DRAG_THRESHOLD = 15;
 			const UP = 'up';
 			const DOWN = 'down';
@@ -384,13 +441,12 @@ function ListView(
 			useAnimation,
 		]
 	);
-
 	return (
 		<AsyncModeProvider value={ true }>
 			<TreeGrid
 				className="block-editor-list-view-tree"
 				aria-label={ __( 'Block navigation structure' ) }
-				ref={ ref }
+				ref={ treeGridRef }
 				onCollapseRow={ collapseRow }
 				onExpandRow={ expandRow }
 				useAnimation={ useAnimation }
@@ -410,6 +466,8 @@ function ListView(
 						draggingId={ draggingId }
 						dragStart={ dragStart }
 						dragEnd={ dragEnd }
+						windowMeasurement={ windowMeasurement }
+						globalBlockCount={ globalBlockCount }
 						{ ...props }
 					/>
 				</ListViewContext.Provider>
