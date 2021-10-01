@@ -46,7 +46,7 @@ The tooltip text to show on focus or hover.
 -   Type: `String`
 -   Required: No
 
-### delay
+### delay (web only)
 
 Time in milliseconds to wait before showing tooltip after the tooltip's visibility is toggled. This prop is currently only available for the web platforms.
 
