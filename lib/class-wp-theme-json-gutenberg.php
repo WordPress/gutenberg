@@ -267,10 +267,15 @@ class WP_Theme_JSON_Gutenberg {
 	/**
 	 * Protected style properties.
 	 *
-	 * These properties are only rendered if a corresponding setting in the
-	 * `PROPERTIES_METADATA` path enables it via a value other than `null`.
+	 * These style properties are only rendered if a setting enables it
+	 * via a value other than `null`.
+	 *
+	 * Each element maps the style property to the corresponding theme.json
+	 * setting key.
 	 */
-	const PROTECTED_PROPERTIES = array( '--wp--style--block-gap' );
+	const PROTECTED_PROPERTIES = array(
+		'spacing.blockGap' => array( 'spacing', 'blockGap' )
+	);
 
 	const ELEMENTS = array(
 		'link' => 'a',
@@ -594,9 +599,14 @@ class WP_Theme_JSON_Gutenberg {
 		foreach ( $properties as $css_property => $value_path ) {
 			$value = self::get_property_value( $styles, $value_path );
 
+			// Look up protected properties, keyed by value path.
 			// Skip protected properties that are explicitly set to `null`.
-			if ( in_array( $css_property, self::PROTECTED_PROPERTIES, true ) ) {
-				if ( _wp_array_get( $settings, $value_path, null ) === null ) {
+			if ( is_array( $value_path ) ) {
+				$path_string = implode( '.', $value_path );
+				if (
+					isset( self::PROTECTED_PROPERTIES[ $path_string ] ) &&
+					_wp_array_get( $settings, self::PROTECTED_PROPERTIES[ $path_string ], null ) === null
+				) {
 					continue;
 				}
 			}
