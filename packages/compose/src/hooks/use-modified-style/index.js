@@ -44,6 +44,15 @@ function mergeStyles( styles, styleUpdates ) {
 	);
 }
 
+/**
+ * Hook to get the modified styles based on the modifier.
+ * The styles are only updated when there is a change to the modifierStates.
+ * Updating the baseStyles will not trigger a recalculation of the styles.
+ *
+ * @param {Object} baseStyles
+ * @param {Object} modifierStates
+ * @return {Object} - The modified styles
+ */
 function useModifiedStyle( baseStyles, modifierStates ) {
 	const [ styles, setStyles ] = useState( baseStyles );
 	const modifiers = Object.keys( modifierStates );
@@ -64,7 +73,7 @@ function useModifiedStyle( baseStyles, modifierStates ) {
 	}, [] );
 
 	// Convert the modified states to string to satisfy the equality check.
-	const modifiedStatesString = Object.values( modifierStates ).toString();
+	const modifiedStatesString = JSON.stringify( modifierStates );
 	useEffect( () => {
 		const enabledModifiers = ( modifier ) =>
 			isModifierEnabled( modifier, modifierStates );
@@ -79,6 +88,13 @@ function useModifiedStyle( baseStyles, modifierStates ) {
 	return styles;
 }
 
+/**
+ * Factory function for useModifiedStyle hook.
+ * The returned hook accepts the modifier states.
+ *
+ * @param {Object} baseStyles
+ * @return {Function} - Hook function
+ */
 export function createModifiedStyleHook( baseStyles ) {
 	return ( modifierStates ) => useModifiedStyle( baseStyles, modifierStates );
 }
