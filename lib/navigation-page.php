@@ -36,7 +36,6 @@ function gutenberg_navigation_init( $hook ) {
 		'/__experimental/menu-locations',
 		array( '/wp/v2/pages', 'OPTIONS' ),
 		array( '/wp/v2/posts', 'OPTIONS' ),
-		'/__experimental/menus?per_page=100&context=edit&_locale=user',
 	);
 
 	$settings = array_merge(

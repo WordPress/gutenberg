@@ -70,16 +70,24 @@ function gutenberg_initialize_editor( $editor_name, $editor_script_handle, $sett
 	 */
 	$preload_paths = apply_filters( "{$editor_name}_preload_paths", $settings['preload_paths'] );
 
-	$preload_data = array_reduce(
+	$preloaded_data = array_reduce(
 		$preload_paths,
 		'rest_preload_api_request',
 		array()
 	);
+
+	/**
+	 * Allows to change the preloaded data.
+	 *
+	 * @param string[] $preload_paths Array with the preloaded data.
+	 */
+	$preloaded_data = apply_filters( "{$editor_name}_preloaded_data", $preloaded_data );
+
 	wp_add_inline_script(
 		'wp-api-fetch',
 		sprintf(
 			'wp.apiFetch.use( wp.apiFetch.createPreloadingMiddleware( %s ) );',
-			wp_json_encode( $preload_data )
+			wp_json_encode( $preloaded_data )
 		),
 		'after'
 	);
