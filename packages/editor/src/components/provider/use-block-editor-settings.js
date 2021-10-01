@@ -148,9 +148,7 @@ function useBlockEditorSettings( settings, hasTemplate ) {
 			canUseUnfilteredHTML,
 			undo,
 			hasTemplate,
-
 			userCanCreatePages,
-			createPageEntity,
 		]
 	);
 }
