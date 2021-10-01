@@ -237,7 +237,7 @@ const cache = {};
  * Returns the px value of a cssUnit. The memoized version of getPxFromCssUnit;
  *
  * @param {string} cssUnit
- * @param {string} options
+ * @param {Object} options
  * @return {string} returns the cssUnit value in a simple px format.
  */
 function memoizedGetPxFromCssUnit( cssUnit, options = {} ) {
