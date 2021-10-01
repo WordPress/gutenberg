@@ -274,7 +274,7 @@ class WP_Theme_JSON_Gutenberg {
 	 * setting key.
 	 */
 	const PROTECTED_PROPERTIES = array(
-		'spacing.blockGap' => array( 'spacing', 'blockGap' )
+		'spacing.blockGap' => array( 'spacing', 'blockGap' ),
 	);
 
 	const ELEMENTS = array(
