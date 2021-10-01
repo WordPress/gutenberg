@@ -17,6 +17,12 @@
 	}
 }
 
+.edit-site-global-styles-sidebar {
+	> .components-panel {
+		overflow-x: hidden;
+	}
+}
+
 .edit-site-global-styles-sidebar .interface-complementary-area-header .components-button.has-icon {
 	margin-left: 0;
 }
