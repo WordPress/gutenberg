@@ -8,8 +8,8 @@ $blocks-block__margin: 1em;
 
 .wp-block-buttons {
 	// Specificity needed to override editor auto block margins.
-	> .wp-block {
-		margin-top: calc(var(--wp--style--block-gap, #{$blocks-block__margin}) * 0.5);
+	> .wp-block.wp-block-button {
+		margin: 0;
 	}
 
 	> .block-list-appender {
@@ -47,12 +47,6 @@ $blocks-block__margin: 1em;
 		margin-right: auto;
 		margin-top: 0;
 		width: 100%;
-
-		.wp-block-button {
-			// Some margin hacks are needed, since margin doesn't seem to
-			// collapse in the same way when a parent layout it flex.
-			margin-bottom: 0;
-		}
 	}
 }
 

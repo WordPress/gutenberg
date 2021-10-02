@@ -20,8 +20,8 @@
 		"align": [ "wide", "full" ],
 		"__experimentalExposeControlsToChildren": true,
 		"spacing": {
-			"blockGap": true,
-			"margin": ["top", "bottom" ],
+			"blockGap": [ "horizontal", "vertical" ],
+			"margin": [ "top", "bottom" ],
 			"__experimentalDefaultControls": {
 				"blockGap": true
 			}
