@@ -178,6 +178,26 @@ class REST_Nav_Menu_Items_Controller_Test extends WP_Test_REST_Post_Type_Control
 	}
 
 	/**
+	 *
+	 */
+	public function test_get_item_context_edit() {
+		wp_set_current_user( self::$admin_id );
+		add_action( 'wp_nav_menu_item_custom_fields', array( $this, 'render_html' ) );
+		$request = new WP_REST_Request( 'GET', sprintf( '/__experimental/menu-items/%d', $this->menu_item_id ) );
+		$request->set_param( 'context', 'edit' );
+		$response = rest_get_server()->dispatch( $request );
+
+		$this->check_get_menu_item_response( $response, 'edit' );
+		$data = $response->get_data();
+
+		$this->assertArrayHasKey( 'item_custom_fields', $data );
+		$this->assertArrayHasKey( 'rendered', $data['item_custom_fields'] );
+		$this->assertContains( 'hello there', $data['item_custom_fields']['rendered'] );
+
+		remove_action( 'wp_nav_menu_item_custom_fields', array( $this, 'render_html' ) );
+	}
+
+	/**
 	 * Test that title.raw contains the verbatim title and that title.rendered
 	 * has been passed through the_title which escapes & characters.
 	 *
@@ -672,7 +692,7 @@ class REST_Nav_Menu_Items_Controller_Test extends WP_Test_REST_Post_Type_Control
 		$response   = rest_get_server()->dispatch( $request );
 		$data       = $response->get_data();
 		$properties = $data['schema']['properties'];
-		$this->assertEquals( 19, count( $properties ) );
+		$this->assertEquals( 20, count( $properties ) );
 		$this->assertArrayHasKey( 'type_label', $properties );
 		$this->assertArrayHasKey( 'attr_title', $properties );
 		$this->assertArrayHasKey( 'classes', $properties );
@@ -691,6 +711,7 @@ class REST_Nav_Menu_Items_Controller_Test extends WP_Test_REST_Post_Type_Control
 		$this->assertArrayHasKey( 'type', $properties );
 		$this->assertArrayHasKey( 'xfn', $properties );
 		$this->assertArrayHasKey( 'invalid', $properties );
+		$this->assertArrayHasKey( 'item_custom_fields', $properties );
 	}
 
 	/**
@@ -970,5 +991,10 @@ class REST_Nav_Menu_Items_Controller_Test extends WP_Test_REST_Post_Type_Control
 		$response = rest_get_server()->dispatch( $request );
 		$new_data = $response->get_data();
 		$this->assertEquals( $params['title'], $new_data['title']['raw'] );
+	}
+
+
+	public function render_html() {
+		echo '<p>hello there</p>';
 	}
 }

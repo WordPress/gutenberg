@@ -659,6 +659,13 @@ class WP_REST_Menu_Items_Controller extends WP_REST_Posts_Controller {
 			$data['content']['block_version'] = block_version( $menu_item->content );
 		}
 
+		if ( rest_is_field_included( 'item_custom_fields', $fields ) ) {
+			$data['item_custom_fields'] = array();
+		}
+		if ( rest_is_field_included( 'item_custom_fields.rendered', $fields ) ) {
+			$data['item_custom_fields']['rendered'] = $this->get_nav_menu_item_form( $menu_item );
+		}
+
 		if ( rest_is_field_included( 'parent', $fields ) ) {
 			// Same as post_parent, expose as integer.
 			$data['parent'] = (int) $menu_item->menu_item_parent;
@@ -776,6 +783,46 @@ class WP_REST_Menu_Items_Controller extends WP_REST_Posts_Controller {
 		}
 
 		return $links;
+	}
+
+	/**
+	 * Output buffer the wp_nav_menu_item_custom_fields action.
+	 *
+	 * @param WP_Post $menu_item   Menu item data object.
+	 *
+	 * @return string
+	 */
+	protected function get_nav_menu_item_form( $menu_item ) {
+		$menu_id = $this->get_menu_id( $menu_item->ID );
+		$depth   = 0;
+
+		if ( 0 !== (int) $menu_item->menu_item_parent ) {
+			$item  = $menu_item;
+			$items = wp_get_nav_menu_items( $menu_id );
+			while ( 0 !== (int) $item->menu_item_parent ) {
+				foreach ( $items as $_item ) {
+					if ( $_item->ID === (int) $item->menu_item_parent ) {
+						$item = $_item;
+						$depth ++;
+					}
+				}
+			}
+		}
+
+		$args = array(
+			'after'       => '',
+			'before'      => '',
+			'link_after'  => '',
+			'link_before' => '',
+			'walker'      => null,
+		);
+
+		// Start an output buffer.
+		ob_start();
+		/** This action is documented in wp-admin/includes/class-walker-nav-menu-edit.php */
+		do_action( 'wp_nav_menu_item_custom_fields', $menu_item->ID, $menu_item, $depth, $args, $menu_id );
+
+		return (string) ob_get_clean();
 	}
 
 	/**
@@ -1006,6 +1053,24 @@ class WP_REST_Menu_Items_Controller extends WP_REST_Posts_Controller {
 			'context'     => array( 'view', 'edit', 'embed' ),
 			'type'        => 'boolean',
 			'readonly'    => true,
+		);
+
+		$schema['properties']['item_custom_fields'] = array(
+			'description' => __( 'HTML content of edit menu item.', 'gutenberg' ),
+			'context'     => array( 'view', 'edit', 'embed' ),
+			'type'        => 'object',
+			'arg_options' => array(
+				'sanitize_callback' => null, // Note: sanitization implemented in self::prepare_item_for_database().
+				'validate_callback' => null, // Note: validation implemented in self::prepare_item_for_database().
+			),
+			'properties'  => array(
+				'rendered' => array(
+					'description' => __( 'HTML content for rendering in menu item form.', 'gutenberg' ),
+					'type'        => 'string',
+					'context'     => array( 'edit' ),
+					'readonly'    => true,
+				),
+			),
 		);
 
 		$taxonomies = wp_list_filter( get_object_taxonomies( $this->post_type, 'objects' ), array( 'show_in_rest' => true ) );
