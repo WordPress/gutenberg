@@ -34,6 +34,8 @@ const HOME_PATH_PREFIX = `~${ path.sep }`;
  */
 module.exports = function parseConfig( config, options ) {
 	return {
+		protocol: config.protocol,
+		host: config.host,
 		port: config.port,
 		phpVersion: config.phpVersion,
 		coreSource: includeTestsPath(

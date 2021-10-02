@@ -36,6 +36,8 @@ const md5 = require( '../md5' );
  * @property {WPSource[]}                pluginSources Plugins to load in the environment.
  * @property {WPSource[]}                themeSources  Themes to load in the environment.
  * @property {number}                    port          The port to use.
+ * @property {string}                    host          The host to use.
+ * @property {string}                    protocol      The protocol to use.
  * @property {Object}                    config        Mapping of wp-config.php constants to their desired values.
  * @property {Object.<string, WPSource>} mappings      Mapping of WordPress directories to local directories which should be mounted.
  * @property {string}                    phpVersion    Version of PHP to use in the environments, of the format 0.0.
@@ -74,6 +76,8 @@ module.exports = async function readConfig( configPath ) {
 		plugins: [],
 		themes: [],
 		port: 8888,
+		host: 'localhost',
+		protocol: 'http:',
 		mappings: {},
 		config: {
 			WP_DEBUG: true,
@@ -255,6 +259,13 @@ function withOverrides( config ) {
 	config.env.tests.port =
 		getNumberFromEnvVariable( 'WP_ENV_TESTS_PORT' ) ||
 		config.env.tests.port;
+	config.env.development.host =
+		process.env.WP_ENV_HOST || config.env.development.host;
+	config.env.development.protocol =
+		process.env.WP_ENV_PROTOCOL || config.env.development.protocol;
+	config.env.tests.host = process.env.WP_ENV_HOST || config.env.tests.host;
+	config.env.tests.protocol =
+		process.env.WP_ENV_PROTOCOL || config.env.tests.protocol;
 
 	// Override PHP version with environment variable.
 	config.env.development.phpVersion =
@@ -273,6 +284,9 @@ function withOverrides( config ) {
 				if ( ! ( configKey === 'WP_HOME' && !! baseUrl.port ) ) {
 					baseUrl.port = config.env[ envKey ].port;
 				}
+
+				baseUrl.protocol = config.env[ envKey ].protocol;
+				baseUrl.host = config.env[ envKey ].host;
 
 				config.env[ envKey ].config[ configKey ] = baseUrl.toString();
 			} catch ( error ) {

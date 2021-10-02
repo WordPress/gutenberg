@@ -766,10 +766,12 @@ describe( 'readConfig', () => {
 			} );
 		} );
 
-		it( 'certain wp-config values should include the port number', async () => {
+		it( 'certain wp-config values should include the protocol, host and port', async () => {
 			readFile.mockImplementation( () =>
 				Promise.resolve(
 					JSON.stringify( {
+						protocol: 'https:',
+						host: 'w.org',
 						port: 1000,
 						testsPort: 2000,
 					} )
@@ -782,17 +784,17 @@ describe( 'readConfig', () => {
 					development: {
 						port: 1000,
 						config: {
-							WP_TESTS_DOMAIN: 'http://localhost:1000/',
-							WP_SITEURL: 'http://localhost:1000/',
-							WP_HOME: 'http://localhost:1000/',
+							WP_TESTS_DOMAIN: 'https://w.org:1000/',
+							WP_SITEURL: 'https://w.org:1000/',
+							WP_HOME: 'https://w.org:1000/',
 						},
 					},
 					tests: {
 						port: 2000,
 						config: {
-							WP_TESTS_DOMAIN: 'http://localhost:2000/',
-							WP_SITEURL: 'http://localhost:2000/',
-							WP_HOME: 'http://localhost:2000/',
+							WP_TESTS_DOMAIN: 'https://w.org:2000/',
+							WP_SITEURL: 'https://w.org:2000/',
+							WP_HOME: 'https://w.org:2000/',
 						},
 					},
 				},
@@ -897,6 +899,38 @@ describe( 'readConfig', () => {
 
 			process.env.WP_ENV_PORT = oldPort;
 			process.env.WP_ENV_TESTS_PORT = oldTestsPort;
+		} );
+
+		it( 'should use host and protocol environment values rather than config values if both are defined', async () => {
+			readFile.mockImplementation( () =>
+				Promise.resolve(
+					JSON.stringify( {
+						host: 'localhost',
+						protocol: 'http:',
+					} )
+				)
+			);
+			const oldHost = process.env.WP_ENV_HOST;
+			const oldProtocol = process.env.WP_ENV_PROTOCOL;
+			process.env.WP_ENV_HOST = 'w.org';
+			process.env.WP_ENV_PROTOCOL = 'https:';
+
+			const config = await readConfig( '.wp-env.json' );
+			expect( config ).toMatchObject( {
+				env: {
+					development: {
+						host: 'w.org',
+						protocol: 'https:',
+					},
+					tests: {
+						host: 'w.org',
+						protocol: 'https:',
+					},
+				},
+			} );
+
+			process.env.WP_ENV_HOST = oldHost;
+			process.env.WP_ENV_PROTOCOL = oldProtocol;
 		} );
 
 		it( 'should use 8888 and 8889 as the default port and testsPort values if nothing else is specified', async () => {
