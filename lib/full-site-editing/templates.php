@@ -143,7 +143,6 @@ add_action( 'admin_menu', 'gutenberg_fix_template_admin_menu_entry' );
 // Customize the `wp_template` admin list.
 add_filter( 'manage_wp_template_posts_columns', 'gutenberg_templates_lists_custom_columns' );
 add_action( 'manage_wp_template_posts_custom_column', 'gutenberg_render_templates_lists_custom_column', 10, 2 );
-add_filter( 'views_edit-wp_template', 'gutenberg_filter_templates_edit_views' );
 
 /**
  * Finds whether a template or template part slug is customized for the currently active theme.
