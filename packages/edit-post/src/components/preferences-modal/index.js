@@ -325,10 +325,10 @@ export default function PreferencesModal() {
 		);
 	} else {
 		modalContent = (
-			<Card isBorderless>
-				<CardBody>
-					<NavigatorProvider initialPath="/">
-						<NavigatorScreen path="/">
+			<NavigatorProvider initialPath="/">
+				<NavigatorScreen path="/">
+					<Card isBorderless size="small">
+						<CardBody>
 							<ItemGroup>
 								{ tabs.map( ( tab ) => {
 									return (
@@ -358,13 +358,17 @@ export default function PreferencesModal() {
 									);
 								} ) }
 							</ItemGroup>
-						</NavigatorScreen>
-						{ sections.map( ( section ) => {
-							return (
-								<NavigatorScreen
-									key={ `${ section.name }-menu` }
-									path={ section.name }
-								>
+						</CardBody>
+					</Card>
+				</NavigatorScreen>
+				{ sections.map( ( section ) => {
+					return (
+						<NavigatorScreen
+							key={ `${ section.name }-menu` }
+							path={ section.name }
+						>
+							<Card isBorderless size="large">
+								<CardBody>
 									<NavigationButton
 										path="/"
 										icon={
@@ -376,12 +380,12 @@ export default function PreferencesModal() {
 									</NavigationButton>
 									<h2>{ section.tabLabel }</h2>
 									{ section.content }
-								</NavigatorScreen>
-							);
-						} ) }
-					</NavigatorProvider>
-				</CardBody>
-			</Card>
+								</CardBody>
+							</Card>
+						</NavigatorScreen>
+					);
+				} ) }
+			</NavigatorProvider>
 		);
 	}
 	return (
