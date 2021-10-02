@@ -170,11 +170,14 @@ function template_is_customized( $slug, $template_type = 'wp_template' ) {
 /**
  * Customizes a template or template part for the currently active theme.
  *
- * @param WP_Post $post      Template or template part post object.
- * @param string  $slug      Template or template part slug.
- * @param bool    $overwrite Whether to overwrite existing slug. Default true.
+ * @param string      $slug      Template or template part identifier.
+ * @param int|WP_Post $post      Post ID or object of customized template.
+ * @param bool        $overwrite Whether to overwrite existing template. Default true.
+ *
+ * @return string The identifier of the customized template.
  */
-function customize_template( $post, $slug, $overwrite = true ) {
+function customize_template( $slug, $post, $overwrite = true ) {
+	$post = get_post( $post );
 	if ( ! in_array( $post->post_type, array( 'wp_template', 'wp_template_part' ), true ) ) {
 		return;
 	}
@@ -195,6 +198,8 @@ function customize_template( $post, $slug, $overwrite = true ) {
 
 	$templates[ $slug ] = $post->ID;
 	set_theme_mod( $post->post_type, $templates );
+
+	return $slug;
 }
 
 /**

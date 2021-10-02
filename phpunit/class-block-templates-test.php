@@ -24,30 +24,27 @@ class Block_Templates_Test extends WP_UnitTestCase {
 		switch_theme( 'test-theme' );
 		$args       = array(
 			'post_type'    => 'wp_template',
-			'post_name'    => 'my_template',
 			'post_title'   => 'My Template',
 			'post_content' => 'Content',
 			'post_excerpt' => 'Description of my template',
 		);
 		self::$post = self::factory()->post->create_and_get( $args );
-		customize_template( self::$post, self::$post->post_name, false );
+		customize_template( 'my_template', self::$post, false );
 
 		// Set up template post.
 		switch_theme( 'tt1-blocks' );
 		$args       = array(
 			'post_type'    => 'wp_template',
-			'post_name'    => 'my_template',
 			'post_title'   => 'My Template',
 			'post_content' => 'Content',
 			'post_excerpt' => 'Description of my template',
 		);
 		self::$post = self::factory()->post->create_and_get( $args );
-		customize_template( self::$post, self::$post->post_name, false );
+		customize_template( 'my_template', self::$post, false );
 
 		// Set up template part post.
 		$template_part_args       = array(
 			'post_type'    => 'wp_template_part',
-			'post_name'    => 'my_template_part',
 			'post_title'   => 'My Template Part',
 			'post_content' => 'Content',
 			'post_excerpt' => 'Description of my template part',
@@ -59,7 +56,7 @@ class Block_Templates_Test extends WP_UnitTestCase {
 		);
 		self::$template_part_post = self::factory()->post->create_and_get( $template_part_args );
 		wp_set_post_terms( self::$template_part_post->ID, WP_TEMPLATE_PART_AREA_HEADER, 'wp_template_part_area' );
-		customize_template( self::$template_part_post, self::$template_part_post->post_name, false );
+		customize_template( 'my_template_part', self::$template_part_post, false );
 	}
 
 	public static function wpTearDownAfterClass() {

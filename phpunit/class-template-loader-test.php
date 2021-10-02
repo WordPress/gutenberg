@@ -29,13 +29,12 @@ class Template_Loader_Test extends WP_UnitTestCase {
 		// Set up custom template post.
 		$args       = array(
 			'post_type'    => 'wp_template',
-			'post_name'    => 'wp-custom-template-my-block-template',
 			'post_title'   => 'My Custom Block Template',
 			'post_content' => 'Content',
 			'post_excerpt' => 'Description of my block template',
 		);
 		self::$post = self::factory()->post->create_and_get( $args );
-		customize_template( self::$post, self::$post->post_name, false );
+		customize_template( 'wp-custom-template-my-block-template', self::$post, false );
 	}
 
 	public static function wpTearDownAfterClass() {

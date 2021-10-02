@@ -534,26 +534,3 @@ function gutenberg_get_block_file_template( $id, $template_type = 'wp_template' 
 	 */
 	return apply_filters( 'get_block_file_template', $block_template, $id, $template_type );
 }
-
-/**
- * Generates a unique slug for templates or template parts.
- *
- * @param string $override_slug The filtered value of the slug (starts as `null` from apply_filter).
- * @param string $slug          The original/un-filtered slug (post_name).
- * @param int    $post_ID       Post ID.
- * @param string $post_status   No uniqueness checks are made if the post is still draft or pending.
- * @param string $post_type     Post type.
- * @return string The original, desired slug.
- */
-function gutenberg_filter_wp_template_unique_post_slug( $override_slug, $slug, $post_ID, $post_status, $post_type ) {
-	if ( 'wp_template' !== $post_type && 'wp_template_part' !== $post_type ) {
-		return $override_slug;
-	}
-
-	if ( ! $override_slug ) {
-		$override_slug = $slug;
-	}
-
-	return $override_slug;
-}
-add_filter( 'pre_wp_unique_post_slug', 'gutenberg_filter_wp_template_unique_post_slug', 10, 5 );
