@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { get, cloneDeep, set, isEqual, has } from 'lodash';
+import { get, cloneDeep, set, isEqual, has, mergeWith } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -19,8 +19,48 @@ import {
  * Internal dependencies
  */
 import { store as editSiteStore } from '../../store';
+import {
+	PRESET_METADATA,
+	getValueFromVariable,
+	getPresetVariableFromValue,
+} from '../editor/utils';
 
 const EMPTY_CONFIG = { isGlobalStylesUserThemeJSON: true, version: 1 };
+
+function mergeTreesCustomizer( objValue, srcValue ) {
+	// We only pass as arrays the presets,
+	// in which case we want the new array of values
+	// to override the old array (no merging).
+	if ( Array.isArray( srcValue ) ) {
+		return srcValue;
+	}
+}
+
+function mergeBaseAndUserConfigs( base, user ) {
+	return mergeWith( {}, base, user, mergeTreesCustomizer );
+}
+
+function addUserOriginToSettings( settingsToAdd ) {
+	PRESET_METADATA.forEach( ( { path } ) => {
+		const presetData = get( settingsToAdd, path );
+		if ( presetData ) {
+			set( settingsToAdd, path, {
+				user: presetData,
+			} );
+		}
+	} );
+	return settingsToAdd;
+}
+
+function removeUserOriginFromSettings( settingsToRemove ) {
+	PRESET_METADATA.forEach( ( { path } ) => {
+		const presetData = get( settingsToRemove, path );
+		if ( presetData ) {
+			set( settingsToRemove, path, ( presetData ?? {} ).user );
+		}
+	} );
+	return settingsToRemove;
+}
 
 function useGlobalStylesUserConfig() {
 	const globalStylesId = useSelect( ( select ) => {
@@ -39,6 +79,16 @@ function useGlobalStylesUserConfig() {
 		let parsedConfig;
 		try {
 			parsedConfig = content ? JSON.parse( content ) : {};
+			// It is very important to verify if the flag isGlobalStylesUserThemeJSON is true.
+			// If it is not true the content was not escaped and is not safe.
+			if ( ! parsedConfig.isGlobalStylesUserThemeJSON ) {
+				parsedConfig = {};
+			} else {
+				parsedConfig = {
+					...parsedConfig,
+					settings: addUserOriginToSettings( parsedConfig.settings ),
+				};
+			}
 		} catch ( e ) {
 			/* eslint-disable no-console */
 			console.error( 'Global Styles User data is not valid' );
@@ -51,7 +101,15 @@ function useGlobalStylesUserConfig() {
 	}, [ content ] );
 
 	const setConfig = useCallback(
-		( newConfig ) => setContent( JSON.stringify( newConfig ) ),
+		( newConfig ) =>
+			setContent(
+				JSON.stringify( {
+					...newConfig,
+					settings: removeUserOriginFromSettings(
+						newConfig.settings
+					),
+				} )
+			),
 		[ setContent ]
 	);
 
@@ -105,10 +163,10 @@ export function useSetting( path, blockName, source = 'all' ) {
 	let result;
 	switch ( source ) {
 		case 'all':
-			result = get( userConfig, finalPath ) ?? getBaseSetting();
+			result = get( userConfig, finalPath, {} ).user ?? getBaseSetting();
 			break;
 		case 'user':
-			result = get( userConfig, finalPath );
+			result = get( userConfig, finalPath, {} ).user;
 			break;
 		case 'base':
 			result = getBaseSetting();
@@ -122,27 +180,48 @@ export function useSetting( path, blockName, source = 'all' ) {
 
 export function useStyle( path, blockName, source = 'all' ) {
 	const [ baseConfig, userConfig, setUserConfig ] = useGlobalStylesConfig();
+	const mergedConfig = mergeBaseAndUserConfigs( baseConfig, userConfig );
 	const finalPath = ! blockName
 		? `styles.${ path }`
 		: `styles.blocks.${ blockName }.${ path }`;
 
 	const setStyle = ( newValue ) => {
 		const newUserConfig = cloneDeep( userConfig );
-		set( newUserConfig, finalPath, newValue );
+		set(
+			newUserConfig,
+			finalPath,
+			getPresetVariableFromValue(
+				mergedConfig.settings,
+				blockName,
+				path,
+				newValue
+			)
+		);
 		setUserConfig( newUserConfig );
 	};
 
 	let result;
 	switch ( source ) {
 		case 'all':
-			result =
-				get( userConfig, finalPath ) ?? get( baseConfig, finalPath );
+			result = getValueFromVariable(
+				mergedConfig.settings,
+				blockName,
+				get( userConfig, finalPath ) ?? get( baseConfig, finalPath )
+			);
 			break;
 		case 'user':
-			result = get( userConfig, finalPath );
+			result = getValueFromVariable(
+				mergedConfig.settings,
+				blockName,
+				get( userConfig, finalPath )
+			);
 			break;
 		case 'base':
-			result = get( baseConfig, finalPath );
+			result = getValueFromVariable(
+				baseConfig.settings,
+				blockName,
+				get( baseConfig, finalPath )
+			);
 			break;
 		default:
 			throw 'Unsupported source';

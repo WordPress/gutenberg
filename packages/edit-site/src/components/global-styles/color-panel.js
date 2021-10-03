@@ -30,21 +30,15 @@ export default function ColorPanel( { name } ) {
 		'color.customGradient',
 		name
 	);
-	const [ isLinkEnabled ] = useSetting( 'color.link', name );
-	const [ isTextEnabled ] = useSetting( 'color.text', name );
-	const [ isBackgroundEnabled ] = useSetting( 'color.background', name );
 
 	const hasLinkColor =
 		supports.includes( 'linkColor' ) &&
-		isLinkEnabled &&
 		( solids.length > 0 || areCustomSolidsEnabled );
 	const hasTextColor =
 		supports.includes( 'color' ) &&
-		isTextEnabled &&
 		( solids.length > 0 || areCustomSolidsEnabled );
 	const hasBackgroundColor =
 		supports.includes( 'backgroundColor' ) &&
-		isBackgroundEnabled &&
 		( solids.length > 0 || areCustomSolidsEnabled );
 	const hasGradientColor =
 		supports.includes( 'background' ) &&

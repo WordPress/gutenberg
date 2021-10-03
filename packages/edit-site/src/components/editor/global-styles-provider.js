@@ -29,7 +29,7 @@ import {
 	ROOT_BLOCK_SELECTOR,
 	ROOT_BLOCK_SUPPORTS,
 	getValueFromVariable,
-	getPresetVariable,
+	getPresetVariableFromValue,
 	PRESET_METADATA,
 } from './utils';
 import { toCustomProperties, toStyles } from './global-styles-renderer';
@@ -256,7 +256,11 @@ export default function GlobalStylesProvider( { children, baseStyles } ) {
 
 				if ( origin === 'theme' ) {
 					const value = get( themeStyles?.styles, path );
-					return getValueFromVariable( themeStyles, context, value );
+					return getValueFromVariable(
+						themeStyles.settings,
+						context,
+						value
+					);
 				}
 
 				if ( origin === 'user' ) {
@@ -265,11 +269,19 @@ export default function GlobalStylesProvider( { children, baseStyles } ) {
 					// We still need to use merged styles here because the
 					// presets used to resolve user variable may be defined a
 					// layer down ( core, theme, or user ).
-					return getValueFromVariable( mergedStyles, context, value );
+					return getValueFromVariable(
+						mergedStyles.settings,
+						context,
+						value
+					);
 				}
 
 				const value = get( mergedStyles?.styles, path );
-				return getValueFromVariable( mergedStyles, context, value );
+				return getValueFromVariable(
+					mergedStyles.settings,
+					context,
+					value
+				);
 			},
 			setStyle: ( context, propertyName, newValue ) => {
 				const newContent = { ...userStyles };
@@ -288,8 +300,8 @@ export default function GlobalStylesProvider( { children, baseStyles } ) {
 				set(
 					newStyles,
 					propertyPath,
-					getPresetVariable(
-						mergedStyles,
+					getPresetVariableFromValue(
+						mergedStyles.settings,
 						context,
 						propertyName,
 						newValue
