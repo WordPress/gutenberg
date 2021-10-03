@@ -282,6 +282,10 @@ $block-inserter-tabs-height: 44px;
 	}
 }
 
+.block-editor-inserter__quick-inserter-results {
+	overflow: hidden;
+}
+
 .block-editor-inserter__quick-inserter-results .block-editor-inserter__panel-header {
 	height: 0;
 	padding: 0;
