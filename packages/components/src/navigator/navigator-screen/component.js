@@ -1,25 +1,25 @@
 /**
- * External dependencies
- */
-// eslint-disable-next-line no-restricted-imports
-import { motion } from 'framer-motion';
-
-/**
  * WordPress dependencies
  */
-import { useContext, useEffect, useState } from '@wordpress/element';
+import { useContext, useEffect, useRef } from '@wordpress/element';
 import { useReducedMotion, useFocusOnMount } from '@wordpress/compose';
 import { isRTL } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
  */
+import {
+	__unstableAnimatePresence as AnimatePresence,
+	__unstableMotion as motion,
+} from '../../animation';
 import { NavigatorContext } from '../context';
 
-const animationEnterDelay = 0;
-const animationEnterDuration = 0.14;
-const animationExitDuration = 0.14;
-const animationExitDelay = 0;
+const motionXVector = isRTL() ? -50 : 50;
+const motionEase = [ 0, 0, 0.2, 1 ];
+const motionEnterDelay = 0;
+const motionEnterDuration = 0.14;
+const motionExitDuration = 0.14;
+const motionExitDelay = 0;
 
 function NavigatorScreen( { children, path } ) {
 	const prefersReducedMotion = useReducedMotion();
@@ -27,65 +27,52 @@ function NavigatorScreen( { children, path } ) {
 	const isMatch = currentPath.path === path;
 	const ref = useFocusOnMount();
 
-	// This flag is used to only apply the focus on mount when the actual path changes.
-	// It avoids the focus to happen on the first render.
-	const [ hasPathChanged, setHasPathChanged ] = useState( false );
-	useEffect( () => {
-		setHasPathChanged( true );
-	}, [ path ] );
+	// Denotes the initial screen.
+	const isInitial = useRef( isMatch );
+	// Sets isInitial ref to false once the screen has changed.
+	useEffect( () => () => ( isInitial.current = false ), [
+		isInitial.current && isMatch,
+	] );
 
-	if ( ! isMatch ) {
-		return null;
+	const motionProps = {};
+	if ( ! prefersReducedMotion ) {
+		const x = currentPath.isBack ? -motionXVector : motionXVector;
+		// Initial is false for first render
+		motionProps.initial = ! isInitial.current && {
+			x,
+			opacity: 0,
+		};
+		motionProps.animate = {
+			x: 0,
+			opacity: 1,
+			transition: {
+				delay: motionEnterDelay,
+				duration: motionEnterDuration,
+				ease: motionEase,
+			},
+		};
+		motionProps.exit = {
+			x: isInitial.current ? -x : x,
+			opacity: 0,
+			transition: {
+				delay: motionExitDelay,
+				duration: motionExitDuration,
+				ease: motionEase,
+			},
+		};
 	}
-
-	if ( prefersReducedMotion ) {
-		return <div>{ children }</div>;
-	}
-
-	const animate = {
-		opacity: 1,
-		transition: {
-			delay: animationEnterDelay,
-			duration: animationEnterDuration,
-			ease: 'easeInOut',
-		},
-		x: 0,
-	};
-	const initial = {
-		opacity: 0,
-		x:
-			( isRTL() && currentPath.isBack ) ||
-			( ! isRTL() && ! currentPath.isBack )
-				? 50
-				: -50,
-	};
-	const exit = {
-		delay: animationExitDelay,
-		opacity: 0,
-		x:
-			( ! isRTL() && currentPath.isBack ) ||
-			( isRTL() && ! currentPath.isBack )
-				? 50
-				: -50,
-		transition: {
-			duration: animationExitDuration,
-			ease: 'easeInOut',
-		},
-	};
-
-	const animatedProps = {
-		animate,
-		exit,
-		initial,
-	};
 
 	return (
-		<motion.div
-			ref={ hasPathChanged ? ref : undefined }
-			{ ...animatedProps }
-		>
-			{ children }
-		</motion.div>
+		<AnimatePresence>
+			{ isMatch ? (
+				<motion.div
+					ref={ ! isInitial.current ? ref : undefined }
+					{ ...motionProps }
+				>
+					{ children }
+				</motion.div>
+			) : null }
+		</AnimatePresence>
 	);
 }
 
