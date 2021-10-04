@@ -21,7 +21,7 @@ function ScreenColors( { name } ) {
 				back={ parentMenu ? parentMenu : '/' }
 				title={ __( 'Colors' ) }
 				description={ __(
-					'Manage the color palette and how it applies to the elements of your site'
+					'Manage color palettes and how they affect the different elements of the site.'
 				) }
 			/>
 			<ColorPanel
