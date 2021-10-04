@@ -55,8 +55,8 @@
 
 # Tooling
 /bin                                            @ntwb @nerrad @ajitbohra
-/bin/api-docs                                   @ntwb @nerrad @ajitbohra @nosolosw
-/docs/tool                                      @chrisvanpatten @ajitbohra @nosolosw
+/bin/api-docs                                   @ntwb @nerrad @ajitbohra @oandregal
+/docs/tool                                      @chrisvanpatten @ajitbohra @oandregal
 /packages/babel-plugin-import-jsx-pragma        @ntwb @nerrad @ajitbohra
 /packages/babel-plugin-makepot                  @ntwb @nerrad @ajitbohra
 /packages/babel-preset-default                  @gziolo @ntwb @nerrad @ajitbohra
@@ -65,7 +65,7 @@
 /packages/create-block-tutorial-template        @gziolo
 /packages/custom-templated-path-webpack-plugin  @ntwb @nerrad @ajitbohra
 /packages/dependency-extraction-webpack-plugin  @gziolo
-/packages/docgen                                @nosolosw
+/packages/docgen                                @oandregal
 /packages/e2e-test-utils                        @ntwb @nerrad @ajitbohra
 /packages/e2e-tests                             @ntwb @nerrad @ajitbohra
 /packages/eslint-plugin                         @gziolo @ntwb @nerrad @ajitbohra
@@ -127,12 +127,13 @@
 
 # PHP
 /lib                                            @timothybjacobs @spacedmonkey
-/lib/global-styles.php                          @timothybjabocs @spacedmonkey @nosolosw
-/lib/theme.json                                 @timothybjabocs @spacedmonkey @nosolosw
-/lib/class-wp-theme-json-gutenberg.php          @timothybjabocs @spacedmonkey @nosolosw
-/lib/class-wp-theme-json-resolver-gutenberg.php @timothybjabocs @spacedmonkey @nosolosw
+/lib/global-styles.php                          @timothybjabocs @spacedmonkey @oandregal
+/lib/theme.json                                 @timothybjabocs @spacedmonkey @oandregal
+/lib/theme-i18n.json                            @timothybjabocs @spacedmonkey @oandregal
+/lib/class-wp-theme-json-gutenberg.php          @timothybjabocs @spacedmonkey @oandregal
+/lib/class-wp-theme-json-resolver-gutenberg.php @timothybjabocs @spacedmonkey @oandregal
 /lib/full-site-editing                          @janw-me
-/phpunit/class-wp-theme-json-test.php           @nosolosw
+/phpunit/class-wp-theme-json-test.php           @oandregal
 
 # Web App
 /packages/admin-manifest                        @ellatrix
