@@ -1,29 +1,17 @@
 /**
- * External dependencies
- */
-import { isEmpty } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { __, _x } from '@wordpress/i18n';
 import { Platform } from '@wordpress/element';
 
 /**
- * An object containing the details of a unit.
- *
- * @typedef {Object} WPUnitControlUnit
- * @property {string}        value       The value for the unit, used in a CSS value (e.g `px`).
- * @property {string}        label       The label used in a dropdown selector for the unit.
- * @property {string|number} [default]   Default value for the unit, used when switching units.
- * @property {string}        [a11yLabel] An accessible label used by screen readers.
- * @property {number}        [step]      A step value used when incrementing/decrementing the value.
+ * Internal dependencies
  */
+import type { Value, WPUnitControlUnit, WPUnitControlUnitList } from './types';
 
 const isWeb = Platform.OS === 'web';
 
-/** @type {Record<string, WPUnitControlUnit>} */
-const allUnits = {
+const allUnits: Record< string, WPUnitControlUnit > = {
 	px: {
 		value: 'px',
 		label: isWeb ? 'px' : __( 'Pixels (px)' ),
@@ -157,12 +145,16 @@ export const DEFAULT_UNIT = allUnits.px;
  * Moving forward, ideally the value should be a string that contains both
  * the value and unit, example: '10px'
  *
- * @param {number|string}            value Value
- * @param {string}                   unit  Unit value
- * @param {Array<WPUnitControlUnit>} units Units to derive from.
- * @return {Array<number, string>} The extracted number and unit.
+ * @param  value Value
+ * @param  unit  Unit value
+ * @param  units Units to derive from.
+ * @return The extracted number and unit.
  */
-export function getParsedValue( value, unit, units ) {
+export function getParsedValue(
+	value: Value,
+	unit?: string,
+	units?: WPUnitControlUnitList
+): [ Value, string ] {
 	const initialValue = unit ? `${ value }${ unit }` : value;
 
 	return parseUnit( initialValue, units );
@@ -171,24 +163,27 @@ export function getParsedValue( value, unit, units ) {
 /**
  * Checks if units are defined.
  *
- * @param {any} units Units to check.
- * @return {boolean} Whether units are defined.
+ * @param  units Units to check.
+ * @return Whether units are defined.
  */
-export function hasUnits( units ) {
-	return ! isEmpty( units ) && units !== false;
+export function hasUnits( units: WPUnitControlUnitList ): boolean {
+	return Array.isArray( units ) && !! units.length;
 }
 
 /**
  * Parses a number and unit from a value.
  *
- * @param {string}                   initialValue Value to parse
- * @param {Array<WPUnitControlUnit>} units        Units to derive from.
- * @return {Array<number, string>} The extracted number and unit.
+ * @param  initialValue Value to parse
+ * @param  units        Units to derive from.
+ * @return The extracted number and unit.
  */
-export function parseUnit( initialValue, units = ALL_CSS_UNITS ) {
+export function parseUnit(
+	initialValue: Value,
+	units: WPUnitControlUnitList = ALL_CSS_UNITS
+): [ Value, string ] {
 	const value = String( initialValue ).trim();
 
-	let num = parseFloat( value, 10 );
+	let num: Value = parseFloat( value );
 	num = isNaN( num ) ? '' : num;
 
 	const unitMatch = value.match( /[\d.\-\+]*\s*(.*)/ )[ 1 ];
@@ -196,7 +191,7 @@ export function parseUnit( initialValue, units = ALL_CSS_UNITS ) {
 	let unit = unitMatch !== undefined ? unitMatch : '';
 	unit = unit.toLowerCase();
 
-	if ( hasUnits( units ) ) {
+	if ( hasUnits( units ) && units !== false ) {
 		const match = units.find( ( item ) => item.value === unit );
 		unit = match?.value;
 	} else {
@@ -210,18 +205,25 @@ export function parseUnit( initialValue, units = ALL_CSS_UNITS ) {
  * Parses a number and unit from a value. Validates parsed value, using fallback
  * value if invalid.
  *
- * @param {number|string}            next          The next value.
- * @param {Array<WPUnitControlUnit>} units         Units to derive from.
- * @param {number|string}            fallbackValue The fallback value.
- * @param {string}                   fallbackUnit  The fallback value.
- * @return {Array<number, string>} The extracted number and unit.
+ * @param  next          The next value.
+ * @param  units         Units to derive from.
+ * @param  fallbackValue The fallback value.
+ * @param  fallbackUnit  The fallback value.
+ * @return The extracted value and unit.
  */
-export function getValidParsedUnit( next, units, fallbackValue, fallbackUnit ) {
+export function getValidParsedUnit(
+	next: Value,
+	units: WPUnitControlUnitList,
+	fallbackValue: Value,
+	fallbackUnit: string
+) {
 	const [ parsedValue, parsedUnit ] = parseUnit( next, units );
 	let baseValue = parsedValue;
-	let baseUnit;
+	let baseUnit: string;
 
-	if ( isNaN( parsedValue ) || parsedValue === '' ) {
+	// The parsed value from `parseUnit` should now be either a
+	// real number or an empty string. If not, use the fallback value.
+	if ( ! Number.isFinite( parsedValue ) || parsedValue === '' ) {
 		baseValue = fallbackValue;
 	}
 
@@ -242,26 +244,31 @@ export function getValidParsedUnit( next, units, fallbackValue, fallbackUnit ) {
  * Takes a unit value and finds the matching accessibility label for the
  * unit abbreviation.
  *
- * @param {string} unit Unit value (example: px)
- * @return {string} a11y label for the unit abbreviation
+ * @param  unit Unit value (example: px)
+ * @return a11y label for the unit abbreviation
  */
-export function parseA11yLabelForUnit( unit ) {
+export function parseA11yLabelForUnit( unit: string ): string {
 	const match = ALL_CSS_UNITS.find( ( item ) => item.value === unit );
 	return match?.a11yLabel ? match?.a11yLabel : match?.value;
 }
 
 /**
- * Filters available units based on values defined by settings.
+ * Filters available units based on values defined by the unit setting/property.
  *
- * @param {Array} settings Collection of preferred units.
- * @param {Array} units    Collection of available units.
+ * @param  unitSetting Collection of preferred unit value strings.
+ * @param  units       Collection of available unit objects.
  *
- * @return {Array} Filtered units based on settings.
+ * @return Filtered units based on settings.
  */
-export function filterUnitsWithSettings( settings = [], units = [] ) {
-	return units.filter( ( unit ) => {
-		return settings.includes( unit.value );
-	} );
+export function filterUnitsWithSettings(
+	unitSetting: Array< string > = [],
+	units: WPUnitControlUnitList
+): Array< WPUnitControlUnit > {
+	return Array.isArray( units )
+		? units.filter( ( unit ) => {
+				return unitSetting.includes( unit.value );
+		  } )
+		: [];
 }
 
 /**
@@ -269,14 +276,22 @@ export function filterUnitsWithSettings( settings = [], units = [] ) {
  * TODO: ideally this hook shouldn't be needed
  * https://github.com/WordPress/gutenberg/pull/31822#discussion_r633280823
  *
- * @param {Object}                             args                An object containing units, settingPath & defaultUnits.
- * @param {Array<WPUnitControlUnit>|undefined} args.units          Collection of available units.
- * @param {Array<string>|undefined}            args.availableUnits The setting path. Defaults to 'spacing.units'.
- * @param {Object|undefined}                   args.defaultValues  Collection of default values for defined units. Example: { px: '350', em: '15' }.
+ * @param  args                An object containing units, settingPath & defaultUnits.
+ * @param  args.units          Collection of all potentially available units.
+ * @param  args.availableUnits Collection of unit value strings for filtering available units.
+ * @param  args.defaultValues  Collection of default values for defined units. Example: { px: '350', em: '15' }.
  *
- * @return {Array|boolean} Filtered units based on settings.
+ * @return Filtered units based on settings.
  */
-export const useCustomUnits = ( { units, availableUnits, defaultValues } ) => {
+export const useCustomUnits = ( {
+	units,
+	availableUnits,
+	defaultValues,
+}: {
+	units?: WPUnitControlUnitList;
+	availableUnits?: Array< string >;
+	defaultValues: Record< string, Value >;
+} ): WPUnitControlUnitList => {
 	units = units || ALL_CSS_UNITS;
 	const usedUnits = filterUnitsWithSettings(
 		! availableUnits ? [] : availableUnits,
@@ -302,17 +317,17 @@ export const useCustomUnits = ( { units, availableUnits, defaultValues } ) => {
  * accurately displayed in the UI, even if the intention is to hide
  * the availability of that unit.
  *
- * @param {number|string}            currentValue Selected value to parse.
- * @param {string}                   legacyUnit   Legacy unit value, if currentValue needs it appended.
- * @param {Array<WPUnitControlUnit>} units        List of available units.
+ * @param  currentValue Selected value to parse.
+ * @param  legacyUnit   Legacy unit value, if currentValue needs it appended.
+ * @param  units        List of available units.
  *
- * @return {Array<WPUnitControlUnit>} A collection of units containing the unit for the current value.
+ * @return A collection of units containing the unit for the current value.
  */
 export function getUnitsWithCurrentUnit(
-	currentValue,
-	legacyUnit,
-	units = ALL_CSS_UNITS
-) {
+	currentValue: Value,
+	legacyUnit: string | undefined,
+	units: Array< WPUnitControlUnit > | false = ALL_CSS_UNITS
+): WPUnitControlUnitList {
 	if ( ! Array.isArray( units ) ) {
 		return units;
 	}

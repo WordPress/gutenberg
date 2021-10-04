@@ -10,6 +10,16 @@ For each user feature we should also add a importance categorization label  to i
 -->
 
 ## Unreleased
+-   [**] [Embed block] Add the top 5 specific embed blocks to the Block inserter list [#34967]
+
+1.62.2
+------
+* Same as 1.62.1 but with the changelog.
+
+1.62.1
+------
+* [**] Image block: fix height and border regression. [https://github.com/WordPress/gutenberg/pull/34957]
+* [**] Column block: fix width attribute flout cutoff. [https://github.com/wordpress-mobile/gutenberg-mobile/pull/3921]
 
 ## 1.62.0
 -   [**] [Embed block] Implement WP embed preview component [#34004]
@@ -20,6 +30,9 @@ For each user feature we should also add a importance categorization label  to i
 -   [*] Column block: Translate column width's control labels [#34777]
 -   [**] Enable embed preview for Instagram and Vimeo providers. [#34563]
 -   [**] Embed block: Add error bottom sheet with retry and convert to link actions. [#34604]
+
+## 1.61.2
+-   [*] Image block - Fix height and border regression. [#34957]
 
 ## 1.61.1
 -   [*] Fix crash related to reusable blocks in the block picker. [#34873]

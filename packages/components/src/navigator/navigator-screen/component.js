@@ -14,7 +14,7 @@ import { isRTL } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
-import { NavigatorContext } from './context';
+import { NavigatorContext } from '../context';
 
 const animationEnterDelay = 0;
 const animationEnterDuration = 0.14;

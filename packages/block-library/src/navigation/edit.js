@@ -50,6 +50,16 @@ const ALLOWED_BLOCKS = [
 	'core/navigation-submenu',
 ];
 
+const DEFAULT_BLOCK = [ 'core/navigation-link' ];
+
+const DIRECT_INSERT = ( block ) => {
+	return block.innerBlocks.every(
+		( { name } ) =>
+			name === 'core/navigation-link' ||
+			name === 'core/navigation-submenu'
+	);
+};
+
 const LAYOUT = {
 	type: 'default',
 	alignments: [],
@@ -164,6 +174,8 @@ function Navigation( {
 		},
 		{
 			allowedBlocks: ALLOWED_BLOCKS,
+			__experimentalDefaultBlock: DEFAULT_BLOCK,
+			__experimentalDirectInsert: DIRECT_INSERT,
 			orientation: attributes.orientation,
 			renderAppender: CustomAppender || appender,
 

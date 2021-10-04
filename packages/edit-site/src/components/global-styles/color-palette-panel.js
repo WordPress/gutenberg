@@ -63,16 +63,18 @@ export default function ColorPalettePanel( {
 		[ contextName ]
 	);
 	return (
-		<ColorEdit
-			immutableColorSlugs={ immutableColorSlugs }
-			colors={ colors }
-			onChange={ ( newColors ) => {
-				setSetting( contextName, 'color.palette', newColors );
-			} }
-			emptyUI={ __(
-				'Colors are empty! Add some colors to create your own color palette.'
-			) }
-			canReset={ colors === userColors }
-		/>
+		<div className="edit-site-global-styles-color-palette-panel">
+			<ColorEdit
+				immutableColorSlugs={ immutableColorSlugs }
+				colors={ colors }
+				onChange={ ( newColors ) => {
+					setSetting( contextName, 'color.palette', newColors );
+				} }
+				emptyUI={ __(
+					'Colors are empty! Add some colors to create your own color palette.'
+				) }
+				canReset={ colors === userColors }
+			/>
+		</div>
 	);
 }

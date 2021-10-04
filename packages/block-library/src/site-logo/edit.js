@@ -18,6 +18,7 @@ import {
 	Spinner,
 	ToggleControl,
 	ToolbarButton,
+	ToolbarGroup,
 	Placeholder,
 } from '@wordpress/components';
 import { useViewportMatch } from '@wordpress/compose';
@@ -326,7 +327,7 @@ export default function LogoEdit( {
 		const _siteLogo = siteSettings?.site_logo;
 		const _readOnlyLogo = siteData?.site_logo;
 		const _canUserEdit = canUser( 'update', 'settings' );
-		const _siteLogoId = _siteLogo || _readOnlyLogo;
+		const _siteLogoId = _canUserEdit ? _siteLogo : _readOnlyLogo;
 		const mediaItem =
 			_siteLogoId &&
 			select( coreStore ).getMedia( _siteLogoId, {
@@ -380,6 +381,11 @@ export default function LogoEdit( {
 		setLogo( media.id );
 	};
 
+	const onRemoveLogo = () => {
+		setLogo( null );
+		setLogoUrl( undefined );
+	};
+
 	const onUploadError = ( message ) => {
 		setError( message[ 2 ] ? message[ 2 ] : null );
 	};
@@ -393,6 +399,11 @@ export default function LogoEdit( {
 				onSelect={ onSelectLogo }
 				onError={ onUploadError }
 			/>
+			<ToolbarGroup>
+				<ToolbarButton onClick={ onRemoveLogo }>
+					{ __( 'Reset' ) }
+				</ToolbarButton>
+			</ToolbarGroup>
 		</BlockControls>
 	);
 

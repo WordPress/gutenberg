@@ -28,7 +28,9 @@ function TemplateTitle() {
 		return {
 			template: _isEditing ? getEditedPostTemplate() : null,
 			isEditing: _isEditing,
-			title: getEditedPostAttribute( 'title' ),
+			title: getEditedPostAttribute( 'title' )
+				? getEditedPostAttribute( 'title' )
+				: __( 'Untitled' ),
 		};
 	}, [] );
 
