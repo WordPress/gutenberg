@@ -152,6 +152,7 @@ export function useSetting( path, blockName, source = 'all' ) {
 		if ( PATHS_WITH_MERGE[ path ] ) {
 			return result.theme ?? result.core;
 		}
+		return result;
 	};
 
 	const setSetting = ( newValue ) => {
