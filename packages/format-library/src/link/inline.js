@@ -188,6 +188,7 @@ function InlineLinkUI( {
 		const newText = nextValue?.text || nextValue.title || newUrl;
 
 		if ( isCollapsed( value ) && ! isActive ) {
+			// Scenario: we don't have any actively selected text or formats.
 			const toInsert = applyFormat(
 				create( { text: newText } ),
 				linkFormat,
@@ -196,6 +197,8 @@ function InlineLinkUI( {
 			);
 			onChange( insert( value, toInsert ) );
 		} else {
+			// Scenario: we have any active text selection or an active format
+
 			// Update the **text** (only) with the new text from the Link UI.
 			// This action retains any formats that were currently applied to
 			// the text selection (eg: bold, italic...etc).
