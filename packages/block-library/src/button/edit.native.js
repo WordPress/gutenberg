@@ -510,6 +510,7 @@ class ButtonEdit extends Component {
 								? 0
 								: richTextStyle.richText.paddingRight,
 							color: textColor,
+							fontSize: style?.fontSize,
 						} }
 						textAlign={ align }
 						placeholderTextColor={
