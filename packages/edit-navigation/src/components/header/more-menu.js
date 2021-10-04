@@ -14,9 +14,7 @@ export default function MoreMenu() {
 					<MenuItem
 						role="menuitem"
 						icon={ external }
-						href={ __(
-							'https://github.com/WordPress/gutenberg/tree/trunk/packages/edit-navigation/docs/user-documentation.md'
-						) }
+						href="https://github.com/WordPress/gutenberg/tree/trunk/packages/edit-navigation/docs/user-documentation.md"
 						target="_blank"
 						rel="noopener noreferrer"
 					>
