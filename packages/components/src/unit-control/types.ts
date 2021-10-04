@@ -2,7 +2,12 @@
  * External dependencies
  */
 // eslint-disable-next-line no-restricted-imports
-import type { ChangeEvent } from 'react';
+import type { CSSProperties, SyntheticEvent } from 'react';
+
+/**
+ * Internal dependencies
+ */
+import type { StateReducer } from '../input-control/reducer/state';
 
 export type Value = number | string;
 
@@ -33,17 +38,42 @@ export type WPUnitControlUnit = {
 
 export type WPUnitControlUnitList = Array< WPUnitControlUnit > | false;
 
-export type UnitSelectControlProps = {
-	className: string;
-	isTabbable: boolean;
-	options?: Array< WPUnitControlUnit >;
-	onChange?: (
+export interface UnitControlOnChangeCallback {
+	(
 		nextValue: string | undefined,
 		extra: {
-			event: ChangeEvent< HTMLSelectElement >;
-			data: WPUnitControlUnit;
+			event: SyntheticEvent< HTMLSelectElement | HTMLInputElement >;
+			data?: WPUnitControlUnit;
 		}
-	) => void;
+	): void;
+}
+
+export type UnitSelectControlProps = {
+	className?: string;
+	disabled?: boolean;
+	isTabbable: boolean;
+	onChange?: UnitControlOnChangeCallback;
+	options?: WPUnitControlUnitList;
 	size?: SelectSize;
-	value: string;
+	value?: string;
 };
+
+export interface UnitControlProps {
+	__unstableStateReducer?: StateReducer;
+	autoComplete?: string;
+	className?: string;
+	disabled?: boolean;
+	disableUnits?: boolean;
+	isPressEnterToChange?: boolean;
+	isResetValueOnUnitChange?: boolean;
+	isUnitSelectTabbable?: boolean;
+	label?: string;
+	onChange?: UnitControlOnChangeCallback;
+	onUnitChange?: UnitControlOnChangeCallback;
+	size?: SelectSize;
+	step?: number;
+	style?: CSSProperties;
+	unit?: string;
+	units?: WPUnitControlUnitList;
+	value: string;
+}

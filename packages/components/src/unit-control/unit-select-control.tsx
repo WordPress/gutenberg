@@ -34,7 +34,7 @@ export default function UnitSelectControl( {
 	value = 'px',
 	...props
 }: UnitSelectControlProps ) {
-	if ( ! hasUnits( options ) || options.length === 1 ) {
+	if ( ! options || ! hasUnits( options ) || options?.length === 1 ) {
 		return (
 			<UnitLabel
 				className="components-unit-control__unit-label"
@@ -59,7 +59,7 @@ export default function UnitSelectControl( {
 			className={ classes }
 			onChange={ handleOnChange }
 			selectSize={ size }
-			tabIndex={ isTabbable ? null : -1 }
+			tabIndex={ isTabbable ? undefined : -1 }
 			value={ value }
 			{ ...props }
 		>

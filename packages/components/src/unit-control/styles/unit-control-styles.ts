@@ -16,12 +16,16 @@ type SelectProps = {
 	selectSize: SelectSize;
 };
 
+type InputProps = {
+	disableUnits?: boolean;
+};
+
 export const Root = styled.div`
 	box-sizing: border-box;
 	position: relative;
 `;
 
-const paddingStyles = ( { disableUnits } ) => {
+const paddingStyles = ( { disableUnits }: InputProps ) => {
 	const value = disableUnits ? 3 : 24;
 
 	return css`
@@ -29,7 +33,7 @@ const paddingStyles = ( { disableUnits } ) => {
 	`;
 };
 
-const arrowStyles = ( { disableUnits } ) => {
+const arrowStyles = ( { disableUnits }: InputProps ) => {
 	if ( disableUnits ) return '';
 
 	return css`
