@@ -631,6 +631,7 @@ export class ImageEdit extends Component {
 		const additionalImageProps = {
 			height: '100%',
 			resizeMode: context?.imageCrop ? 'cover' : 'contain',
+			hideSettings: context?.hideSettings,
 		};
 
 		const imageContainerStyles = [ hasImageContext && styles.fixedHeight ];
