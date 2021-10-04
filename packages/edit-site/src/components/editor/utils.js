@@ -2,15 +2,6 @@
  * External dependencies
  */
 import { get, find, isString } from 'lodash';
-/**
- * WordPress dependencies
- */
-import { useSelect } from '@wordpress/data';
-import { __EXPERIMENTAL_PATHS_WITH_MERGE as PATHS_WITH_MERGE } from '@wordpress/blocks';
-/**
- * Internal dependencies
- */
-import { store as editSiteStore } from '../../store';
 
 /* Supporting data */
 export const ROOT_BLOCK_NAME = 'root';
@@ -80,19 +71,6 @@ const STYLE_PATH_TO_CSS_VAR_INFIX = {
 	'typography.fontSize': 'font-size',
 	'typography.fontFamily': 'font-family',
 };
-
-export function useSetting( path, blockName = '' ) {
-	const settings = useSelect( ( select ) => {
-		return select( editSiteStore ).getSettings();
-	} );
-	const topLevelPath = `__experimentalFeatures.${ path }`;
-	const blockPath = `__experimentalFeatures.blocks.${ blockName }.${ path }`;
-	const result = get( settings, blockPath ) ?? get( settings, topLevelPath );
-	if ( result && PATHS_WITH_MERGE[ path ] ) {
-		return result.user ?? result.theme ?? result.core;
-	}
-	return result;
-}
 
 function findInPresetsBy(
 	features,
