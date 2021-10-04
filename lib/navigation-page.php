@@ -10,44 +10,68 @@
  *
  * @since 7.8.0
  */
-function gutenberg_navigation_page() {
-	?>
+function gutenberg_navigation_page() {  ?>
 	<div
-		id="navigation-editor"
-		class="edit-navigation"
+			id="navigation-editor"
+			class="edit-navigation"
 	>
 	</div>
 	<?php
 }
 
-function gutenberg_navigation_get_menus_endpoint_url($menu_id = null)
-{
-	return '/__experimental/menus?' . http_build_query(array(
-					'per_page' => 100,
-					'context' => 'edit',
-					'_locale' => 'user',
+function gutenberg_navigation_get_menus_endpoint( $results_per_page = 100 ) {
+	return '/__experimental/menus?' . http_build_query(
+		array(
+			'per_page' => $results_per_page,
+			'context'  => 'edit',
+			'_locale'  => 'user',
+		)
+	);
+}
 
-			));
+function gutenberg_navigation_get_menu_endpoint( $menu_id ) {
+	return "/__experimental/menus/{$menu_id}?" . http_build_query(
+		array(
+			'context' => 'edit',
+		)
+	);
+}
+
+function gutenberg_navigation_get_menu_items_endpoint( $menu_id, $results_per_page = 100 ) {
+	return "/__experimental/menu-items?{$menu_id}&" . http_build_query(
+		array(
+			'per_page' => $results_per_page,
+			'context'  => 'edit',
+			'_locale'  => 'user',
+		)
+	);
 }
 
 /**
  * Initialize the Gutenberg Navigation page.
  *
- * @since 7.8.0
- *
  * @param string $hook Page.
+ * @since 7.8.0
  */
 function gutenberg_navigation_init( $hook ) {
 	if ( 'gutenberg_page_gutenberg-navigation' !== $hook ) {
-			return;
+		return;
 	}
+
+	$menus         = wp_get_nav_menus();
+	$first_menu_id = count( $menus ) ? $menus[0]->term_id : null;
 
 	$preload_paths = array(
 		'/__experimental/menu-locations',
 		array( '/wp/v2/pages', 'OPTIONS' ),
 		array( '/wp/v2/posts', 'OPTIONS' ),
-		gutenberg_navigation_get_menus_endpoint_url(),
+		gutenberg_navigation_get_menus_endpoint(),
 	);
+
+	if ( $first_menu_id ) {
+		$preload_paths[] = gutenberg_navigation_get_menu_endpoint( $first_menu_id );
+		$preload_paths[] = gutenberg_navigation_get_menu_items_endpoint( $first_menu_id );
+	}
 
 	$settings = array_merge(
 		gutenberg_get_default_block_editor_settings(),
@@ -76,6 +100,7 @@ function gutenberg_navigation_init( $hook ) {
 	wp_enqueue_style( 'wp-format-library' );
 	do_action( 'enqueue_block_editor_assets' );
 }
+
 add_action( 'admin_enqueue_scripts', 'gutenberg_navigation_init' );
 
 /**
@@ -94,8 +119,3 @@ function gutenberg_navigation_editor_load_block_editor_scripts_and_styles( $is_b
 
 add_filter( 'should_load_block_editor_scripts_and_styles', 'gutenberg_navigation_editor_load_block_editor_scripts_and_styles' );
 
-function gutenberg_navigation_editor_preload_menus_data($preloaded_data)
-{
-
-}
-add_filter('navigation_editor_preloaded_data', 'gutenberg_navigation_editor_preload_menus_data');
