@@ -28,7 +28,7 @@ function ScreenRoot() {
 				<Item>
 					<p>
 						{ __(
-							'Customize the appearance of specific blocks for the whole site'
+							'Customize the appearance of specific blocks for the whole site.'
 						) }
 					</p>
 				</Item>
