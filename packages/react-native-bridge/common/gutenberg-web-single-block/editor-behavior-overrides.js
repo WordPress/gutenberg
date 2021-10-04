@@ -9,10 +9,11 @@ https://github.com/WordPress/gutenberg/pull/34668
 */
 window.addEventListener(
 	'focus',
-	function () {
+	function ( event ) {
 		const selected = document.getSelection();
 		if (
 			selected &&
+			event.relatedTarget &&
 			( window.document.activeElement.classList.contains(
 				'components-dropdown-menu__menu-item'
 			) ||
@@ -20,8 +21,20 @@ window.addEventListener(
 					'components-menu-item__button'
 				) )
 		) {
+			hideTextSelectionContextMenuListener = () => {
+				event.relatedTarget.click();
+			};
 			window.wpwebkit.hideTextSelectionContextMenu();
 		}
 	},
 	true
 );
+
+let hideTextSelectionContextMenuListener;
+
+window.onHideTextSelectionContextMenu = () => {
+	if ( hideTextSelectionContextMenuListener ) {
+		setTimeout( hideTextSelectionContextMenuListener, 0 );
+		hideTextSelectionContextMenuListener = null;
+	}
+};

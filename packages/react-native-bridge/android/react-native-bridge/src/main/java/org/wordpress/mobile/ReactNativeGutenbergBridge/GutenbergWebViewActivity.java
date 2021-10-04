@@ -42,6 +42,7 @@ public class GutenbergWebViewActivity extends AppCompatActivity {
     private static final String INJECT_LOCAL_STORAGE_SCRIPT_TEMPLATE = "localStorage.setItem('WP_DATA_USER_%d','%s')";
     private static final String INJECT_CSS_SCRIPT_TEMPLATE = "window.injectCss('%s')";
     private static final String INJECT_GET_HTML_POST_CONTENT_SCRIPT = "window.getHTMLPostContent();";
+    private static final String INJECT_ON_HIDE_TEXT_SELECTION_CONTEXT_MENU_SCRIPT = "window.onHideTextSelectionContextMenu();";
     private static final String JAVA_SCRIPT_INTERFACE_NAME = "wpwebkit";
 
     protected WebView mWebView;
@@ -423,7 +424,12 @@ public class GutenbergWebViewActivity extends AppCompatActivity {
         @JavascriptInterface
         public void hideTextSelectionContextMenu() {
             if (mActionMode != null) {
-                GutenbergWebViewActivity.this.runOnUiThread(() -> GutenbergWebViewActivity.this.mActionMode.finish());
+                GutenbergWebViewActivity.this.runOnUiThread(() -> {
+                    GutenbergWebViewActivity.this.mActionMode.finish();
+
+                    mWebView.evaluateJavascript(INJECT_ON_HIDE_TEXT_SELECTION_CONTEXT_MENU_SCRIPT,
+                            value -> AppLog.e(AppLog.T.EDITOR, value));
+                });
             }
         }
     }
