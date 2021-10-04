@@ -227,8 +227,9 @@ function LinkControl( {
 
 	const showSettingsDrawer = !! settings?.length;
 
-	// Only show once a URL value has been committed.
-	const showTextControl = hasTextControl;
+	// Only show text control once a URL value has been committed.
+	// See https://github.com/WordPress/gutenberg/pull/33849/#issuecomment-932194927.
+	const showTextControl = value?.url && hasTextControl;
 
 	return (
 		<div
