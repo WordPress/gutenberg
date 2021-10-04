@@ -41,14 +41,23 @@ function getRowFocusables( rowElement ) {
  * Renders both a table and tbody element, used to create a tree hierarchy.
  *
  * @see https://github.com/WordPress/gutenberg/blob/HEAD/packages/components/src/tree-grid/README.md
- * @param {Object}    props               Component props.
- * @param {WPElement} props.children      Children to be rendered.
- * @param {Function}  props.onExpandRow   Callback to fire when row is expanded.
- * @param {Function}  props.onCollapseRow Callback to fire when row is collapsed.
- * @param {Object}    ref                 A ref to the underlying DOM table element.
+ * @param {Object}    props                Component props.
+ * @param {WPElement} props.children       Children to be rendered.
+ * @param {Function}  props.onExpandRow    Callback to fire when row is expanded.
+ * @param {Function}  props.onCollapseRow  Callback to fire when row is collapsed.
+ * @param {Function}  props.moveWindowUp   Callback to fire when pressing up at the top window row
+ * @param {Function}  props.moveWindowDown Callback to fire when pressing down at the bottom window row
+ * @param {Object}    ref                  A ref to the underlying DOM table element.
  */
 function TreeGrid(
-	{ children, onExpandRow = () => {}, onCollapseRow = () => {}, ...props },
+	{
+		children,
+		onExpandRow = () => {},
+		onCollapseRow = () => {},
+		moveWindowUp = () => {},
+		moveWindowDown = () => {},
+		...props
+	},
 	ref
 ) {
 	const onKeyDown = useCallback( ( event ) => {
@@ -157,8 +166,14 @@ function TreeGrid(
 				nextRowIndex = Math.min( currentRowIndex + 1, rows.length - 1 );
 			}
 
-			// Focus is either at the top or bottom edge of the grid. Do nothing.
+			// Focus is either at the top or bottom edge of the grid. Notify callbacks if tree is using windowing,
+			// otherwise do nothing.
 			if ( nextRowIndex === currentRowIndex ) {
+				if ( keyCode === UP ) {
+					moveWindowUp();
+				} else {
+					moveWindowDown();
+				}
 				// Prevent key use for anything else. For example, Voiceover
 				// will start navigating horizontally when reaching the vertical
 				// bounds of a table.

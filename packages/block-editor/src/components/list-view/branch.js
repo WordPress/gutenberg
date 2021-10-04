@@ -84,7 +84,7 @@ export default function ListViewBranch( props ) {
 				expandedState
 			);
 		}
-		const { start, maxVisible } = windowMeasurement;
+		const { start, maxVisible, focus } = windowMeasurement;
 		const end = start + maxVisible;
 
 		// Only use windowing for the persistent list view
@@ -111,6 +111,10 @@ export default function ListViewBranch( props ) {
 				  }
 				: {} ),
 		};
+		const isFocused =
+			__experimentalPersistentListViewFeatures &&
+			( ( start === nextPosition && focus === 'start' ) ||
+				( end === nextPosition && focus === 'end' ) );
 
 		const position = index + 1;
 		const isLastRowAtLevel = rowCount === position;
@@ -177,6 +181,7 @@ export default function ListViewBranch( props ) {
 						isExpanded={ isExpanded }
 						listPosition={ nextPosition }
 						style={ style }
+						isFocused={ isFocused }
 					/>
 				) }
 				{ hasNestedBranch && isExpanded && ! isDragged && (

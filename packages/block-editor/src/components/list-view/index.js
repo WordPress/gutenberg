@@ -33,6 +33,8 @@ function measureWindow( scrollContainer, setWindowMeasurement ) {
 	setWindowMeasurement( {
 		maxVisible: maxVisible + WINDOW_OVERSCAN,
 		start,
+		end: start + maxVisible,
+		focus: null,
 	} );
 }
 
@@ -119,6 +121,7 @@ function ListView(
 	const [ windowMeasurement, setWindowMeasurement ] = useState( {
 		maxVisible: 30,
 		start: 0,
+		end: 30,
 	} );
 
 	useLayoutEffect( () => {
@@ -172,6 +175,35 @@ function ListView(
 		collapse( row?.dataset?.block );
 	};
 
+	const moveWindowUp = () => {
+		setWindowMeasurement( ( lastMeasurement ) => {
+			const { start, maxVisible } = lastMeasurement;
+			const nextStart = Math.max( 0, start - 1 );
+			return {
+				start: nextStart,
+				maxVisible,
+				end: nextStart + maxVisible,
+				focus: 'start',
+			};
+		} );
+	};
+
+	const moveWindowDown = () => {
+		setWindowMeasurement( ( lastMeasurement ) => {
+			const { start, maxVisible } = lastMeasurement;
+			const nextStart = Math.min(
+				start + 1,
+				globalBlockCount - maxVisible
+			);
+			return {
+				start: nextStart,
+				maxVisible,
+				end: nextStart + maxVisible,
+				focus: 'end',
+			};
+		} );
+	};
+
 	const contextValue = useMemo(
 		() => ( {
 			__experimentalFeatures,
@@ -206,6 +238,8 @@ function ListView(
 				ref={ treeGridRef }
 				onCollapseRow={ collapseRow }
 				onExpandRow={ expandRow }
+				moveWindowUp={ moveWindowUp }
+				moveWindowDown={ moveWindowDown }
 			>
 				<ListViewContext.Provider value={ contextValue }>
 					<ListViewBranch
