@@ -95,9 +95,6 @@ export default function ListViewBranch( props ) {
 		if ( ! blockInView && nextPosition > start ) {
 			// found the end of the window, don't bother processing the rest of the items
 			break;
-		} else if ( ! blockInView ) {
-			// item is before beginning of window
-			continue;
 		}
 
 		const style = {
