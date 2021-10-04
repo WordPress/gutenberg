@@ -13,10 +13,11 @@ import type { Navigator } from './types';
  * Retrieves a `navigator` instance.
  */
 function useNavigator(): Navigator {
-	const { setNavigatorPath } = useContext( NavigatorContext );
+	const { setNavigatorPath, setIsAnimating } = useContext( NavigatorContext );
 
 	return {
 		push( path, options ) {
+			setIsAnimating( true );
 			setNavigatorPath( { path, ...options } );
 		},
 	};

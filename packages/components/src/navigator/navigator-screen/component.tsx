@@ -9,7 +9,12 @@ import { motion, MotionProps } from 'framer-motion';
 /**
  * WordPress dependencies
  */
-import { useContext, useEffect, useState } from '@wordpress/element';
+import {
+	useContext,
+	useEffect,
+	useState,
+	useCallback,
+} from '@wordpress/element';
 import { useReducedMotion, useFocusOnMount } from '@wordpress/compose';
 import { isRTL } from '@wordpress/i18n';
 
@@ -56,6 +61,11 @@ function NavigatorScreen( props: Props, forwardedRef: Ref< any > ) {
 	useEffect( () => {
 		setHasPathChanged( true );
 	}, [ path ] );
+
+	const handleAnimationComplete = useCallback(
+		() => setIsAnimating( false ),
+		[ setIsAnimating ]
+	);
 
 	if ( ! isMatch ) {
 		return null;
@@ -109,6 +119,7 @@ function NavigatorScreen( props: Props, forwardedRef: Ref< any > ) {
 	return (
 		<motion.div
 			ref={ hasPathChanged ? ref : undefined }
+			onAnimationComplete={ handleAnimationComplete }
 			{ ...otherProps }
 			{ ...animatedProps }
 		>

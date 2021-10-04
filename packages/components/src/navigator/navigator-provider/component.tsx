@@ -3,11 +3,12 @@
  */
 // eslint-disable-next-line no-restricted-imports
 import type { Ref } from 'react';
+import { css } from '@emotion/react';
 
 /**
  * WordPress dependencies
  */
-import { useState } from '@wordpress/element';
+import { useState, useMemo } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -17,6 +18,7 @@ import {
 	useContextSystem,
 	WordPressComponentProps,
 } from '../../ui/context';
+import { useCx } from '../../utils/hooks/use-cx';
 import { View } from '../../view';
 import { NavigatorContext } from '../context';
 import type { NavigatorProviderProps, NavigatorPath } from '../types';
@@ -25,19 +27,27 @@ function NavigatorProvider(
 	props: WordPressComponentProps< NavigatorProviderProps, 'div' >,
 	forwardedRef: Ref< any >
 ) {
-	const { initialPath, children, ...otherProps } = useContextSystem(
-		props,
-		'NavigatorProvider'
-	);
+	const {
+		initialPath,
+		children,
+		className,
+		...otherProps
+	} = useContextSystem( props, 'NavigatorProvider' );
 
 	const [ navigatorPath, setNavigatorPath ] = useState< NavigatorPath >( {
 		path: initialPath,
 	} );
 	const [ isAnimating, setIsAnimating ] = useState< boolean >( false );
 
+	const cx = useCx();
+	const classes = useMemo(
+		() => cx( isAnimating && css( { overflow: 'hidden' } ), className ),
+		[ className, isAnimating ]
+	);
+
 	return (
-		<View ref={ forwardedRef } { ...otherProps }>
-			<NavigatorContext.Provider value={ [ path, setPath ] }>
+		<View ref={ forwardedRef } className={ classes } { ...otherProps }>
+			<NavigatorContext.Provider
 				value={ {
 					navigatorPath,
 					setNavigatorPath,
