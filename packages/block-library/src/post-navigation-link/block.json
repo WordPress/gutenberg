@@ -19,6 +19,10 @@
 		"showTitle": {
 			"type": "boolean",
 			"default": false
+		},
+		"linkLabel": {
+			"type": "boolean",
+			"default": false
 		}
 	},
 	"supports": {
