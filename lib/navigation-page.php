@@ -38,10 +38,11 @@ function gutenberg_navigation_get_menu_endpoint( $menu_id ) {
 }
 
 function gutenberg_navigation_get_menu_items_endpoint( $menu_id, $results_per_page = 100 ) {
-	return "/__experimental/menu-items?{$menu_id}&" . http_build_query(
+	return '/__experimental/menu-items?' . http_build_query(
 		array(
-			'per_page' => $results_per_page,
 			'context'  => 'edit',
+			'menus'    => $menu_id,
+			'per_page' => $results_per_page,
 			'_locale'  => 'user',
 		)
 	);
