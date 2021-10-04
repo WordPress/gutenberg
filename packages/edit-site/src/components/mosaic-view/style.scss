@@ -1,15 +1,34 @@
 .edit-site-mosaic-view {
 	display: grid;
 	align-items: center;
-	grid-template-columns: repeat(auto-fit, 400px);
+	grid-template-columns: repeat(1, minmax(0, 1fr));
 	grid-template-rows: repeat(auto-fit, 400px);
-	grid-gap: $grid-unit-40;
 	background-color: $gray-800;
 	color: $gray-200;
-	padding: $grid-unit-40;
+	grid-gap: $grid-unit-20;
+	padding: $grid-unit-20;
 	justify-content: center;
 	min-height: 100%;
 	overflow: auto;
+
+	@include break-small() {
+		grid-template-columns: repeat(2, minmax(0, 1fr));
+	}
+
+	@include break-xlarge() {
+		grid-template-columns: repeat(3, minmax(0, 1fr));
+		grid-gap: $grid-unit-50;
+		padding: $grid-unit-50;
+	}
+
+	@include break-wide() {
+		grid-gap: $grid-unit-50 + $grid-unit-20;
+		padding: $grid-unit-50 * 2;
+	}
+
+	@include break-huge() {
+		grid-template-columns: repeat(4, minmax(0, 1fr));
+	}
 }
 
 .edit-site-mosaic-view__mosaic-item {
@@ -18,10 +37,12 @@
 	grid-template-columns: auto $button-size+$border-width-focus;
 	grid-template-rows: minmax(auto, calc(100% - 80px)) minmax(auto, 80px);
 	grid-gap: $grid-unit-20;
+
 	.components-base-control__help {
 		margin-left: $grid-unit-40;
 		color: $gray-600;
 	}
+
 	&:focus {
 		box-shadow: 0 0 0 var(--wp-admin-border-width-focus) var(--wp-admin-theme-color);
 		// Windows High Contrast mode will show this outline, but not the box-shadow.
@@ -38,9 +59,11 @@
 	color: $gray-900;
 	grid-column: span 2;
 	overflow: hidden;
+
 	&:hover {
 		cursor: pointer;
 	}
+
 	.components-spinner {
 		position: relative;
 		top: calc(50% - #{ math.div($spinner-size, 2) });
