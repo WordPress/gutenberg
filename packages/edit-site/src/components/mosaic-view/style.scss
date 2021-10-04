@@ -1,8 +1,6 @@
 .edit-site-mosaic-view {
 	display: grid;
-	align-items: center;
 	grid-template-columns: repeat(1, minmax(0, 1fr));
-	grid-template-rows: repeat(auto-fit, 400px);
 	background-color: $gray-800;
 	color: $gray-200;
 	grid-gap: $grid-unit-20;
@@ -32,25 +30,14 @@
 }
 
 .edit-site-mosaic-view__mosaic-item {
-	height: 400px;
 	display: grid;
-	grid-template-columns: auto $button-size+$border-width-focus;
+	grid-template-columns: auto $button-size;
 	grid-template-rows: minmax(auto, calc(100% - 80px)) minmax(auto, 80px);
 	grid-gap: $grid-unit-20;
 
 	.components-base-control__help {
 		margin-left: $grid-unit-40;
 		color: $gray-600;
-	}
-
-	&:focus {
-		box-shadow: 0 0 0 var(--wp-admin-border-width-focus) var(--wp-admin-theme-color);
-		// Windows High Contrast mode will show this outline, but not the box-shadow.
-		outline: 2px solid transparent;
-	}
-
-	&:hover {
-		border: $border-width solid var(--wp-admin-theme-color);
 	}
 }
 
@@ -60,8 +47,15 @@
 	grid-column: span 2;
 	overflow: hidden;
 
+	&:focus {
+		box-shadow: 0 0 0 var(--wp-admin-border-width-focus) var(--wp-admin-theme-color);
+		// Windows High Contrast mode will show this outline, but not the box-shadow.
+		outline: 2px solid transparent;
+	}
+
 	&:hover {
 		cursor: pointer;
+		box-shadow: 0 0 0 $border-width var(--wp-admin-theme-color);
 	}
 
 	.components-spinner {
@@ -71,6 +65,8 @@
 	}
 
 	.block-editor-block-preview__container {
+		// Todo: Make this the theme background color or similar
+		background: $gray-900;
 		// We have a bug on packages/block-editor/src/components/block-preview/auto.js.
 		// Because of some reason contentHeight is always 0. Even thought the iframe used for the computation has an height.
 		// It seems like useResizeObserver is not rerunning on this case.
@@ -80,13 +76,13 @@
 }
 
 .edit-site-mosaic-view__added-by-text {
-	margin-left: $grid-unit;
+	margin-left: 0;
 }
 
 .edit-site-mosaic-view__template-actions-disabled {
 	.components-base-control__label,
 	.components-base-control__help {
-		margin-left: $grid-unit-10;
+		margin-left: 0;
 	}
 }
 
