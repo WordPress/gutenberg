@@ -38,7 +38,7 @@ export default function UnitSelectControl( {
 		return (
 			<UnitLabel
 				className="components-unit-control__unit-label"
-				size={ size }
+				selectSize={ size }
 			>
 				{ value }
 			</UnitLabel>
@@ -58,7 +58,7 @@ export default function UnitSelectControl( {
 		<UnitSelect
 			className={ classes }
 			onChange={ handleOnChange }
-			size={ size }
+			selectSize={ size }
 			tabIndex={ isTabbable ? null : -1 }
 			value={ value }
 			{ ...props }

@@ -4,14 +4,9 @@
 // eslint-disable-next-line no-restricted-imports
 import type { ChangeEvent } from 'react';
 
-/**
- * Internal dependencies
- */
-import type { InputControlLabelProps } from '../input-control/types';
-
 export type Value = number | string;
 
-export type Size = 'default' | 'small';
+export type SelectSize = 'default' | 'small';
 
 export type WPUnitControlUnit = {
 	/**
@@ -38,8 +33,6 @@ export type WPUnitControlUnit = {
 
 export type WPUnitControlUnitList = Array< WPUnitControlUnit > | false;
 
-export type UnitControlLabelProps = InputControlLabelProps;
-
 export type UnitSelectControlProps = {
 	className: string;
 	isTabbable: boolean;
@@ -51,6 +44,6 @@ export type UnitSelectControlProps = {
 			data: WPUnitControlUnit;
 		}
 	) => void;
-	size?: Size;
+	size?: SelectSize;
 	value: string;
 };
