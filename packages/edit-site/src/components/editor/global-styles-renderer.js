@@ -20,7 +20,16 @@ import {
 import {
 	__EXPERIMENTAL_STYLE_PROPERTY as STYLE_PROPERTY,
 	__EXPERIMENTAL_ELEMENTS as ELEMENTS,
+	getBlockTypes,
 } from '@wordpress/blocks';
+import { useEffect } from '@wordpress/element';
+import { useSelect, useDispatch } from '@wordpress/data';
+
+/**
+ * Internal dependencies
+ */
+import { store as editSiteStore } from '../../store';
+import { useGlobalStylesConfig } from '../global-styles/hooks';
 
 /**
  * Internal dependencies
@@ -311,7 +320,6 @@ export const toStyles = ( tree, blockSelectors ) => {
 		'.wp-site-blocks > * + * { margin-top: var( --wp--style--block-gap ); margin-bottom: 0; }';
 	nodesWithStyles.forEach( ( { selector, styles } ) => {
 		const declarations = getStylesDeclarations( styles );
-
 		if ( declarations.length === 0 ) {
 			return;
 		}
@@ -332,3 +340,58 @@ export const toStyles = ( tree, blockSelectors ) => {
 
 	return ruleset;
 };
+
+const getBlockSelectors = ( blockTypes ) => {
+	const result = {};
+	blockTypes.forEach( ( blockType ) => {
+		const name = blockType.name;
+		const selector =
+			blockType?.supports?.__experimentalSelector ??
+			'.wp-block-' + name.replace( 'core/', '' ).replace( '/', '-' );
+		result[ name ] = {
+			name,
+			selector,
+		};
+	} );
+
+	return result;
+};
+
+export function useGlobalStylesRenderer() {
+	const [ , , mergedConfig ] = useGlobalStylesConfig();
+	const { getSettings } = useSelect( editSiteStore );
+	const { updateSettings } = useDispatch( editSiteStore );
+
+	useEffect( () => {
+		if ( ! mergedConfig?.styles || ! mergedConfig?.settings ) {
+			return;
+		}
+
+		const currentStoreSettings = getSettings();
+		const nonGlobalStyles = currentStoreSettings?.styles?.filter(
+			( style ) => ! style.isGlobalStyles
+		);
+		const blockSelectors = getBlockSelectors( getBlockTypes() );
+		const customProperties = toCustomProperties(
+			mergedConfig,
+			blockSelectors
+		);
+		const globalStyles = toStyles( mergedConfig, blockSelectors );
+		updateSettings( {
+			...currentStoreSettings,
+			styles: [
+				...nonGlobalStyles,
+				{
+					css: customProperties,
+					isGlobalStyles: true,
+					__experimentalNoWrapper: true,
+				},
+				{
+					css: globalStyles,
+					isGlobalStyles: true,
+				},
+			],
+			__experimentalFeatures: mergedConfig.settings,
+		} );
+	}, [ mergedConfig ] );
+}

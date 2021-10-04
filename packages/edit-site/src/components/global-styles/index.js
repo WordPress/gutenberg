@@ -1,20 +1,15 @@
 /**
- * External dependencies
- */
-import { map } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import {
 	__experimentalNavigatorProvider as NavigatorProvider,
 	__experimentalNavigatorScreen as NavigatorScreen,
 } from '@wordpress/components';
+import { getBlockTypes } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
  */
-import { useGlobalStylesContext } from '../editor/global-styles-provider';
 import ScreenRoot from './screen-root';
 import ScreenBlockList from './screen-block-list';
 import ScreenBlock from './screen-block';
@@ -48,7 +43,7 @@ function ContextScreens( { name } ) {
 }
 
 function GlobalStyles() {
-	const { blocks } = useGlobalStylesContext();
+	const blocks = getBlockTypes();
 
 	return (
 		<NavigatorProvider initialPath="/">
@@ -60,19 +55,22 @@ function GlobalStyles() {
 				<ScreenBlockList />
 			</NavigatorScreen>
 
-			{ map( blocks, ( block, name ) => (
+			{ blocks.map( ( block ) => (
 				<NavigatorScreen
-					key={ 'menu-block-' + name }
-					path={ '/blocks/' + name }
+					key={ 'menu-block-' + block.name }
+					path={ '/blocks/' + block.name }
 				>
-					<ScreenBlock name={ name } />
+					<ScreenBlock name={ block.name } />
 				</NavigatorScreen>
 			) ) }
 
 			<ContextScreens />
 
-			{ map( blocks, ( _, name ) => (
-				<ContextScreens key={ 'screens-block-' + name } name={ name } />
+			{ blocks.map( ( block ) => (
+				<ContextScreens
+					key={ 'screens-block-' + block.name }
+					name={ block.name }
+				/>
 			) ) }
 		</NavigatorProvider>
 	);

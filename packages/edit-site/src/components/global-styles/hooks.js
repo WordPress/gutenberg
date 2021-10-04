@@ -141,11 +141,14 @@ function useGlobalStylesBaseConfig() {
 	return baseConfig;
 }
 
-function useGlobalStylesConfig() {
+export function useGlobalStylesConfig() {
 	const [ userConfig, setUserConfig ] = useGlobalStylesUserConfig();
 	const baseConfig = useGlobalStylesBaseConfig();
+	const mergedConfig = useMemo( () => {
+		return mergeBaseAndUserConfigs( baseConfig, userConfig );
+	}, [ userConfig, baseConfig ] );
 
-	return [ baseConfig, userConfig, setUserConfig ];
+	return [ baseConfig, userConfig, mergedConfig, setUserConfig ];
 }
 
 export const useGlobalStylesReset = () => {
@@ -158,13 +161,18 @@ export const useGlobalStylesReset = () => {
 };
 
 export function useSetting( path, blockName, source = 'all' ) {
-	const [ baseConfig, userConfig, setUserConfig ] = useGlobalStylesConfig();
+	const [
+		baseConfig,
+		userConfig,
+		mergedConfig,
+		setUserConfig,
+	] = useGlobalStylesConfig();
 	const finalPath = ! blockName
 		? `settings.${ path }`
 		: `settings.blocks.${ blockName }.${ path }`;
 
-	const getBaseSetting = () => {
-		const result = get( baseConfig, finalPath );
+	const getSettingValue = ( configToUse ) => {
+		const result = get( configToUse, finalPath );
 		if ( PATHS_WITH_MERGE[ path ] ) {
 			return result.theme ?? result.core;
 		}
@@ -182,13 +190,13 @@ export function useSetting( path, blockName, source = 'all' ) {
 	let result;
 	switch ( source ) {
 		case 'all':
-			result = get( userConfig, finalPath, {} ).user ?? getBaseSetting();
+			result = getSettingValue( mergedConfig );
 			break;
 		case 'user':
-			result = get( userConfig, finalPath, {} ).user;
+			result = getSettingValue( userConfig );
 			break;
 		case 'base':
-			result = getBaseSetting();
+			result = getSettingValue( baseConfig );
 			break;
 		default:
 			throw 'Unsupported source';
@@ -198,8 +206,12 @@ export function useSetting( path, blockName, source = 'all' ) {
 }
 
 export function useStyle( path, blockName, source = 'all' ) {
-	const [ baseConfig, userConfig, setUserConfig ] = useGlobalStylesConfig();
-	const mergedConfig = mergeBaseAndUserConfigs( baseConfig, userConfig );
+	const [
+		baseConfig,
+		userConfig,
+		mergedConfig,
+		setUserConfig,
+	] = useGlobalStylesConfig();
 	const finalPath = ! blockName
 		? `styles.${ path }`
 		: `styles.blocks.${ blockName }.${ path }`;
