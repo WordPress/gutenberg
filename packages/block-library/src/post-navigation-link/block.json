@@ -27,6 +27,10 @@
 	},
 	"supports": {
 		"reusable": false,
-		"html": false
+		"html": false,
+		"typography": {
+			"fontSize": true,
+			"lineHeight": true
+		}
 	}
 }
