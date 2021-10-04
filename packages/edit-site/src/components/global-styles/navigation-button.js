@@ -21,7 +21,7 @@ function NavigationButton( {
 	const navigator = useNavigator();
 
 	const defaultLabel = isBack
-		? __( 'Navigate to the previous screen' )
+		? __( 'Navigate to the previous view' )
 		: undefined;
 
 	return (
