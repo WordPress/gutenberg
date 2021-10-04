@@ -77,8 +77,6 @@ export default function save( { attributes } ) {
 			'is-light': ! isDark,
 			'has-parallax': hasParallax,
 			'is-repeated': isRepeated,
-			'has-background-gradient': gradient || customGradient,
-			[ gradientClass ]: ! url && gradientClass,
 			'has-custom-content-position': ! isContentPositionCenter(
 				contentPosition
 			),
@@ -95,7 +93,11 @@ export default function save( { attributes } ) {
 					dimRatioToClass( dimRatio ),
 					'wp-block-cover__gradient-background',
 					gradientClass,
-					{ 'has-background-dim': dimRatio !== undefined }
+					{
+						'has-background-dim': dimRatio !== undefined,
+						'has-background-gradient': gradient || customGradient,
+						[ gradientClass ]: ! url && gradientClass,
+					}
 				) }
 				style={
 					customGradient ? { background: customGradient } : undefined

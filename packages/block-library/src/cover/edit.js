@@ -658,8 +658,6 @@ function CoverEdit( {
 			'is-transient': isUploadingMedia,
 			'has-parallax': hasParallax,
 			'is-repeated': isRepeated,
-			'has-background-gradient': gradientValue,
-			[ gradientClass ]: ! url && gradientClass,
 			'has-custom-content-position': ! isContentPositionCenter(
 				contentPosition
 			),
@@ -702,7 +700,11 @@ function CoverEdit( {
 						{ [ overlayColor.class ]: overlayColor.class },
 						'wp-block-cover__gradient-background',
 						gradientClass,
-						{ 'has-background-dim': dimRatio !== undefined }
+						{
+							'has-background-dim': dimRatio !== undefined,
+							'has-background-gradient': gradientValue,
+							[ gradientClass ]: ! url && gradientClass,
+						}
 					) }
 					style={ { backgroundImage: gradientValue, ...bgStyle } }
 				/>
