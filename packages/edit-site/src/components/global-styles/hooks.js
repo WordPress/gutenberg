@@ -7,8 +7,8 @@ import { get, cloneDeep, set, isEqual, has, mergeWith } from 'lodash';
  * WordPress dependencies
  */
 import { useMemo, useCallback } from '@wordpress/element';
-import { useSelect } from '@wordpress/data';
-import { useEntityProp } from '@wordpress/core-data';
+import { useSelect, useDispatch } from '@wordpress/data';
+import { store as coreStore } from '@wordpress/core-data';
 import {
 	getBlockType,
 	__EXPERIMENTAL_PATHS_WITH_MERGE as PATHS_WITH_MERGE,
@@ -63,22 +63,25 @@ function removeUserOriginFromSettings( settingsToRemove ) {
 }
 
 function useGlobalStylesUserConfig() {
-	const globalStylesId = useSelect( ( select ) => {
-		return select( editSiteStore ).getSettings()
+	const { globalStylesId, content } = useSelect( ( select ) => {
+		const _globalStylesId = select( editSiteStore ).getSettings()
 			.__experimentalGlobalStylesUserEntityId;
+		return {
+			globalStylesId: _globalStylesId,
+			content: select( coreStore ).getEditedEntityRecord(
+				'postType',
+				'wp_global_styles',
+				_globalStylesId
+			)?.content,
+		};
 	}, [] );
+	const { getEditedEntityRecord } = useSelect( coreStore );
+	const { editEntityRecord } = useDispatch( coreStore );
 
-	const [ content, setContent ] = useEntityProp(
-		'postType',
-		'wp_global_styles',
-		'content',
-		globalStylesId
-	);
-
-	const config = useMemo( () => {
+	const parseContent = ( contentToParse ) => {
 		let parsedConfig;
 		try {
-			parsedConfig = content ? JSON.parse( content ) : {};
+			parsedConfig = contentToParse ? JSON.parse( contentToParse ) : {};
 			// It is very important to verify if the flag isGlobalStylesUserThemeJSON is true.
 			// If it is not true the content was not escaped and is not safe.
 			if ( ! parsedConfig.isGlobalStylesUserThemeJSON ) {
@@ -98,19 +101,32 @@ function useGlobalStylesUserConfig() {
 		}
 
 		return parsedConfig;
+	};
+
+	const config = useMemo( () => {
+		return parseContent( content );
 	}, [ content ] );
 
 	const setConfig = useCallback(
-		( newConfig ) =>
-			setContent(
-				JSON.stringify( {
-					...newConfig,
+		( callback ) => {
+			const currentConfig = parseContent(
+				getEditedEntityRecord(
+					'postType',
+					'wp_global_styles',
+					globalStylesId
+				)?.content
+			);
+			const updatedConfig = callback( currentConfig );
+			editEntityRecord( 'postType', 'wp_global_styles', globalStylesId, {
+				content: JSON.stringify( {
+					...updatedConfig,
 					settings: removeUserOriginFromSettings(
-						newConfig.settings
+						updatedConfig.settings
 					),
-				} )
-			),
-		[ setContent ]
+				} ),
+			} );
+		},
+		[ globalStylesId ]
 	);
 
 	return [ config, setConfig ];
@@ -137,7 +153,7 @@ export const useGlobalStylesReset = () => {
 	const canReset = !! config && ! isEqual( config, EMPTY_CONFIG );
 	return [
 		canReset,
-		useCallback( () => setConfig( EMPTY_CONFIG ), [ setConfig ] ),
+		useCallback( () => setConfig( () => EMPTY_CONFIG ), [ setConfig ] ),
 	];
 };
 
@@ -156,9 +172,11 @@ export function useSetting( path, blockName, source = 'all' ) {
 	};
 
 	const setSetting = ( newValue ) => {
-		const newUserConfig = cloneDeep( userConfig );
-		set( newUserConfig, finalPath, newValue );
-		setUserConfig( newUserConfig );
+		setUserConfig( ( currentConfig ) => {
+			const newUserConfig = cloneDeep( currentConfig );
+			set( newUserConfig, finalPath, newValue );
+			return newUserConfig;
+		} );
 	};
 
 	let result;
@@ -187,18 +205,20 @@ export function useStyle( path, blockName, source = 'all' ) {
 		: `styles.blocks.${ blockName }.${ path }`;
 
 	const setStyle = ( newValue ) => {
-		const newUserConfig = cloneDeep( userConfig );
-		set(
-			newUserConfig,
-			finalPath,
-			getPresetVariableFromValue(
-				mergedConfig.settings,
-				blockName,
-				path,
-				newValue
-			)
-		);
-		setUserConfig( newUserConfig );
+		setUserConfig( ( currentConfig ) => {
+			const newUserConfig = cloneDeep( currentConfig );
+			set(
+				newUserConfig,
+				finalPath,
+				getPresetVariableFromValue(
+					mergedConfig.settings,
+					blockName,
+					path,
+					newValue
+				)
+			);
+			return newUserConfig;
+		} );
 	};
 
 	let result;
