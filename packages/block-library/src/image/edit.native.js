@@ -631,11 +631,14 @@ export class ImageEdit extends Component {
 		const additionalImageProps = {
 			height: '100%',
 			resizeMode: context?.imageCrop ? 'cover' : 'contain',
+		};
+
+		const imageBlockStyles = {
 			fixedHeight: context?.fixedHeight,
 		};
 
 		const imageContainerStyles = [
-			additionalImageProps.fixedHeight && styles.fixedHeight,
+			imageBlockStyles.fixedHeight && styles.fixedHeight,
 		];
 
 		const getImageComponent = ( openMediaOptions, getMediaOptions ) => (
