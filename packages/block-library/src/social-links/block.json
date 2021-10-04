@@ -57,7 +57,10 @@
 				"rem",
 				"vh",
 				"vw"
-			]
+			],
+			"__experimentalDefaultControls": {
+				"blockGap": true
+			}
 		}
 	},
 	"styles": [
