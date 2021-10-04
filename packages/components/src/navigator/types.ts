@@ -12,10 +12,12 @@ export type NavigatorPath = NavigatorPathOptions & {
 	path?: string;
 };
 
-export type NavigatorContext = [
-	NavigatorPath,
-	( path: NavigatorPath ) => void
-];
+export type NavigatorContext = {
+	navigatorPath: NavigatorPath;
+	setNavigatorPath: ( path: NavigatorPath ) => void;
+	isAnimating: boolean;
+	setIsAnimating: ( isAnimating: boolean ) => void;
+};
 
 // Returned by the `useNavigator` hook
 export type Navigator = {

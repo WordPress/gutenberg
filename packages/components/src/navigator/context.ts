@@ -8,5 +8,10 @@ import { createContext } from '@wordpress/element';
  */
 import type { NavigatorContext as NavigatorContextType } from './types';
 
-const initialContextValue: NavigatorContextType = [ {}, () => {} ];
+const initialContextValue: NavigatorContextType = {
+	navigatorPath: {},
+	setNavigatorPath: () => {},
+	isAnimating: false,
+	setIsAnimating: () => {},
+};
 export const NavigatorContext = createContext( initialContextValue );

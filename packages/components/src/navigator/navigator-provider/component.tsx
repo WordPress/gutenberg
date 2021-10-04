@@ -30,13 +30,21 @@ function NavigatorProvider(
 		'NavigatorProvider'
 	);
 
-	const [ path, setPath ] = useState< NavigatorPath >( {
+	const [ navigatorPath, setNavigatorPath ] = useState< NavigatorPath >( {
 		path: initialPath,
 	} );
+	const [ isAnimating, setIsAnimating ] = useState< boolean >( false );
 
 	return (
 		<View ref={ forwardedRef } { ...otherProps }>
 			<NavigatorContext.Provider value={ [ path, setPath ] }>
+				value={ {
+					navigatorPath,
+					setNavigatorPath,
+					isAnimating,
+					setIsAnimating,
+				} }
+			>
 				{ children }
 			</NavigatorContext.Provider>
 		</View>

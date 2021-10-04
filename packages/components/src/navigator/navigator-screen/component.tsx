@@ -44,7 +44,9 @@ function NavigatorScreen( props: Props, forwardedRef: Ref< any > ) {
 	);
 
 	const prefersReducedMotion = useReducedMotion();
-	const [ currentPath ] = useContext( NavigatorContext );
+	const { navigatorPath: currentPath, setIsAnimating } = useContext(
+		NavigatorContext
+	);
 	const isMatch = currentPath.path === path;
 	const ref = useFocusOnMount();
 
