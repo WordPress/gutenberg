@@ -7,18 +7,29 @@ import {
 	FlexItem,
 	__experimentalHStack as HStack,
 } from '@wordpress/components';
+import { __ } from '@wordpress/i18n';
 import { Icon } from '@wordpress/icons';
 
 function NavigationButton( {
 	path,
 	icon,
 	children,
+	label: labelProp,
 	isBack = false,
 	...props
 } ) {
 	const navigator = useNavigator();
+
+	const defaultLabel = isBack
+		? __( 'Navigate to the previous screen' )
+		: undefined;
+
 	return (
-		<Item onClick={ () => navigator.push( path, { isBack } ) } { ...props }>
+		<Item
+			onClick={ () => navigator.push( path, { isBack } ) }
+			aria-label={ labelProp ?? defaultLabel }
+			{ ...props }
+		>
 			{ icon && (
 				<HStack justify="flex-start">
 					<FlexItem>
