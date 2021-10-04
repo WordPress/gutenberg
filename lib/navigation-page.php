@@ -48,6 +48,14 @@ function gutenberg_navigation_get_menu_items_endpoint( $menu_id, $results_per_pa
 	);
 }
 
+function gutenberg_navigation_get_types_endpoint() {
+	return '/wp/v2/types?' . http_build_query(
+		array(
+			'context' => 'edit',
+		)
+	);
+}
+
 /**
  * Initialize the Gutenberg Navigation page.
  *
@@ -67,6 +75,7 @@ function gutenberg_navigation_init( $hook ) {
 		array( '/wp/v2/pages', 'OPTIONS' ),
 		array( '/wp/v2/posts', 'OPTIONS' ),
 		gutenberg_navigation_get_menus_endpoint(),
+		gutenberg_navigation_get_types_endpoint(),
 	);
 
 	if ( $first_menu_id ) {
