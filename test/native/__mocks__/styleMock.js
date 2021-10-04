@@ -135,4 +135,7 @@ module.exports = {
 	buttonNoBg: {
 		color: 'orange',
 	},
+	isSelected: {
+		color: 'blue',
+	},
 };

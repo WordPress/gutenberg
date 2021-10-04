@@ -428,12 +428,12 @@ _Returns_
 
 ### getPxFromCssUnit
 
-Returns the px value of a cssUnit.
+Returns the px value of a cssUnit. The memoized version of getPxFromCssUnit;
 
 _Parameters_
 
 -   _cssUnit_ `string`:
--   _options_ `string`:
+-   _options_ `Object`:
 
 _Returns_
 

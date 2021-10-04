@@ -33,7 +33,7 @@ import {
 } from './constants';
 import { getPostRawValue } from './reducer';
 import { cleanForSlug } from '../utils/url';
-import { getTemplatePartIcon } from './utils/get-template-part-icon';
+import { getTemplatePartIcon } from '../utils/get-template-part-icon';
 
 /**
  * Shared reference to an empty object for cases where it is important to avoid

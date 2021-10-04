@@ -44,6 +44,16 @@ exports[`Navigation Creating from existing Pages allows a navigation block to be
 <!-- /wp:navigation -->"
 `;
 
+exports[`Navigation Shows the quick inserter when the block contains non-navigation specific blocks 1`] = `
+"<!-- wp:navigation -->
+<!-- wp:navigation-link {\\"label\\":\\"WP\\",\\"url\\":\\"https://wordpress.org\\",\\"kind\\":\\"custom\\",\\"isTopLevelLink\\":true} /-->
+
+<!-- wp:site-title /-->
+
+<!-- wp:navigation-link {\\"label\\":\\"WP News\\",\\"url\\":\\"https://wordpress.org/news/\\",\\"kind\\":\\"custom\\",\\"isTopLevelLink\\":true} /-->
+<!-- /wp:navigation -->"
+`;
+
 exports[`Navigation allows an empty navigation block to be created and manually populated using a mixture of internal and external links 1`] = `
 "<!-- wp:navigation -->
 <!-- wp:navigation-link {\\"label\\":\\"WP\\",\\"url\\":\\"https://wordpress.org\\",\\"kind\\":\\"custom\\",\\"isTopLevelLink\\":true} /-->

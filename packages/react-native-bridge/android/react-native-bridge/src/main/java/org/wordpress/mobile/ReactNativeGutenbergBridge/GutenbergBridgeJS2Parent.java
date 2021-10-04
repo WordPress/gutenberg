@@ -171,4 +171,7 @@ public interface GutenbergBridgeJS2Parent extends RequestExecutor {
 
     void setBlockTypeImpressions(ReadableMap impressions);
 
+    void requestContactCustomerSupport();
+
+    void requestGotoCustomerSupportOptions();
 }

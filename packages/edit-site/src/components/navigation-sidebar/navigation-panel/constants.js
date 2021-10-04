@@ -3,6 +3,15 @@
  */
 import { __ } from '@wordpress/i18n';
 
+/**
+ * Internal dependencies
+ */
+import {
+	TEMPLATE_PART_AREA_HEADER,
+	TEMPLATE_PART_AREA_FOOTER,
+	TEMPLATE_PART_AREA_SIDEBAR,
+} from '../../../store/constants';
+
 export const TEMPLATES_PRIMARY = [
 	'index',
 	'singular',
@@ -74,10 +83,6 @@ export const MENU_TEMPLATE_PARTS_HEADERS = 'template-parts-headers';
 export const MENU_TEMPLATE_PARTS_FOOTERS = 'template-parts-footers';
 export const MENU_TEMPLATE_PARTS_SIDEBARS = 'template-parts-sidebars';
 export const MENU_TEMPLATE_PARTS_GENERAL = 'template-parts-general';
-
-export const TEMPLATE_PART_AREA_HEADER = 'header';
-export const TEMPLATE_PART_AREA_FOOTER = 'footer';
-export const TEMPLATE_PART_AREA_SIDEBAR = 'sidebar';
 
 export const TEMPLATE_PARTS_SUB_MENUS = [
 	{

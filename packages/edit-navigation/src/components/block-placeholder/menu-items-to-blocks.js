@@ -103,9 +103,10 @@ function createDataTree( dataset, id = 'id', relation = 'parent' ) {
 			...data,
 			children: [],
 		};
-	}
-	for ( const data of dataset ) {
 		if ( data[ relation ] ) {
+			hashTable[ data[ relation ] ] = hashTable[ data[ relation ] ] || {};
+			hashTable[ data[ relation ] ].children =
+				hashTable[ data[ relation ] ].children || [];
 			hashTable[ data[ relation ] ].children.push(
 				hashTable[ data[ id ] ]
 			);

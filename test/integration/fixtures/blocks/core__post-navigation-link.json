@@ -5,7 +5,8 @@
 		"isValid": true,
 		"attributes": {
 			"type": "next",
-			"showTitle": false
+			"showTitle": false,
+			"linkLabel": false
 		},
 		"innerBlocks": [],
 		"originalContent": ""
