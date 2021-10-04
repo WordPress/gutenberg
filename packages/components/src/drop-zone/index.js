@@ -3,6 +3,7 @@
  */
 import classnames from 'classnames';
 import { includes } from 'lodash';
+// eslint-disable-next-line no-restricted-imports
 import { AnimatePresence, motion } from 'framer-motion';
 
 /**
@@ -77,6 +78,7 @@ export default function DropZoneComponent( {
 			transition: {
 				type: 'tween',
 				duration: 0.2,
+				delay: 0.1,
 				delayChildren: 0.2,
 			},
 		},
@@ -98,25 +100,23 @@ export default function DropZoneComponent( {
 
 	if ( isDraggingOverElement ) {
 		children = (
-			<>
-				<motion.div
-					variants={ backdrop }
-					initial="hidden"
-					animate="show"
-					exit="exit"
-					className="components-drop-zone__content"
-				>
-					<motion.div variants={ foreground }>
-						<Icon
-							icon={ upload }
-							className="components-drop-zone__content-icon"
-						/>
-						<span className="components-drop-zone__content-text">
-							{ label ? label : __( 'Drop files to upload' ) }
-						</span>
-					</motion.div>
+			<motion.div
+				variants={ backdrop }
+				initial="hidden"
+				animate="show"
+				exit="exit"
+				className="components-drop-zone__content"
+			>
+				<motion.div variants={ foreground }>
+					<Icon
+						icon={ upload }
+						className="components-drop-zone__content-icon"
+					/>
+					<span className="components-drop-zone__content-text">
+						{ label ? label : __( 'Drop files to upload' ) }
+					</span>
 				</motion.div>
-			</>
+			</motion.div>
 		);
 	}
 

@@ -2,6 +2,7 @@
  * External dependencies
  */
 import classnames from 'classnames';
+// eslint-disable-next-line no-restricted-imports
 import { motion } from 'framer-motion';
 
 /**
@@ -287,8 +288,6 @@ function InsertionPointPopover( {
 					<motion.div
 						initial={ { scale: 0 } }
 						animate={ { scale: 1 } }
-						whileHover={ { scale: 1.12 } }
-						whileTap={ { scale: 0.9 } }
 						transition={ { delay: 0.2 } }
 						className={ classnames(
 							'block-editor-block-list__insertion-point-inserter'

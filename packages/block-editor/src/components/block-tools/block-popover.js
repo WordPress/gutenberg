@@ -3,7 +3,6 @@
  */
 import { find } from 'lodash';
 import classnames from 'classnames';
-import { motion } from 'framer-motion';
 
 /**
  * WordPress dependencies
@@ -265,17 +264,14 @@ function BlockPopover( {
 				/>
 			) }
 			{ showEmptyBlockSideInserter && (
-				<motion.div
-					whileHover={ { scale: 1.12 } }
-					className="block-editor-block-list__empty-block-inserter"
-				>
+				<div className="block-editor-block-list__empty-block-inserter">
 					<Inserter
 						position="bottom right"
 						rootClientId={ rootClientId }
 						clientId={ clientId }
 						__experimentalIsQuick
 					/>
-				</motion.div>
+				</div>
 			) }
 		</Popover>
 	);
