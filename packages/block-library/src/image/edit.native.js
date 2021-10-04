@@ -631,7 +631,6 @@ export class ImageEdit extends Component {
 		const additionalImageProps = {
 			height: '100%',
 			resizeMode: context?.imageCrop ? 'cover' : 'contain',
-			hideImageCaption: context?.hideImageCaption,
 			fixedHeight: context?.fixedHeight,
 		};
 
@@ -707,19 +706,15 @@ export class ImageEdit extends Component {
 						/>
 					</View>
 				</TouchableWithoutFeedback>
-				{ ! additionalImageProps.hideImageCaption && (
-					<BlockCaption
-						clientId={ this.props.clientId }
-						isSelected={ this.state.isCaptionSelected }
-						accessible
-						accessibilityLabelCreator={
-							this.accessibilityLabelCreator
-						}
-						onFocus={ this.onFocusCaption }
-						onBlur={ this.props.onBlur } // always assign onBlur as props
-						insertBlocksAfter={ this.props.insertBlocksAfter }
-					/>
-				) }
+				<BlockCaption
+					clientId={ this.props.clientId }
+					isSelected={ this.state.isCaptionSelected }
+					accessible
+					accessibilityLabelCreator={ this.accessibilityLabelCreator }
+					onFocus={ this.onFocusCaption }
+					onBlur={ this.props.onBlur } // always assign onBlur as props
+					insertBlocksAfter={ this.props.insertBlocksAfter }
+				/>
 			</Badge>
 		);
 
