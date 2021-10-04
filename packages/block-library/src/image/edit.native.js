@@ -645,7 +645,9 @@ export class ImageEdit extends Component {
 					disabled={ ! isSelected }
 				>
 					<View style={ styles.content }>
-						{ isSelected && getInspectorControls() }
+						{ ! additionalImageProps.hideSettings &&
+							isSelected &&
+							getInspectorControls() }
 						{ isSelected && getMediaOptions() }
 						{ ! this.state.isCaptionSelected &&
 							getToolbarEditButton( openMediaOptions ) }
@@ -702,15 +704,20 @@ export class ImageEdit extends Component {
 						/>
 					</View>
 				</TouchableWithoutFeedback>
-				<BlockCaption
-					clientId={ this.props.clientId }
-					isSelected={ this.state.isCaptionSelected }
-					accessible
-					accessibilityLabelCreator={ this.accessibilityLabelCreator }
-					onFocus={ this.onFocusCaption }
-					onBlur={ this.props.onBlur } // always assign onBlur as props
-					insertBlocksAfter={ this.props.insertBlocksAfter }
-				/>
+
+				{ ! additionalImageProps.hideSettings && (
+					<BlockCaption
+						clientId={ this.props.clientId }
+						isSelected={ this.state.isCaptionSelected }
+						accessible
+						accessibilityLabelCreator={
+							this.accessibilityLabelCreator
+						}
+						onFocus={ this.onFocusCaption }
+						onBlur={ this.props.onBlur } // always assign onBlur as props
+						insertBlocksAfter={ this.props.insertBlocksAfter }
+					/>
+				) }
 			</Badge>
 		);
 
