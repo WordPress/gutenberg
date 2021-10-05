@@ -106,7 +106,7 @@ export default function Layout( { blockEditorSettings } ) {
 			hasSubmenuIndicatorSetting: false,
 			hasItemJustificationControls: false,
 			hasColorSettings: false,
-			customPlaceholder: BlockPlaceholder,
+			placeholder: BlockPlaceholder,
 			createAppender: ( wouldNavBlockShowAppender ) =>
 				wouldNavBlockShowAppender || noBlockSelected
 					? CustomAppender

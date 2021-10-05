@@ -54,7 +54,7 @@ const CONTEXT_DEFAULTS = {
 	hasSubmenuIndicatorSetting: true,
 	hasItemJustificationControls: true,
 	hasColorSettings: true,
-	customPlaceholder: NavigationPlaceholder,
+	placeholder: NavigationPlaceholder,
 	createAppender: ( wouldNavBlockShowAppender ) =>
 		wouldNavBlockShowAppender ? undefined : false,
 };
@@ -196,8 +196,8 @@ function Navigation( {
 			templateLock: false,
 			__experimentalLayout: LAYOUT,
 			placeholder:
-				navContext.customPlaceholder ===
-				CONTEXT_DEFAULTS.customPlaceholder
+				navContext.placeholder ===
+				CONTEXT_DEFAULTS.placeholder
 					? placeholder
 					: undefined,
 		}
@@ -236,7 +236,7 @@ function Navigation( {
 	} );
 
 	if ( isPlaceholderShown ) {
-		const PlaceholderComponent = navContext.customPlaceholder;
+		const PlaceholderComponent = navContext.placeholder;
 
 		return (
 			<div { ...blockProps }>
