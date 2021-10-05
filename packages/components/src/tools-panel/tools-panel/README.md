@@ -98,7 +98,7 @@ through to the panel's header component.
 
 ### `shouldRenderPlaceholderItems`: `boolean`
 
-Advises the `ToolsPanel` that its child `ToolsPanelItem`s should render
-placeholder content instead of null when they are toggled off and hidden.
+Advises the `ToolsPanel` that all of its `ToolsPanelItem` children should render
+placeholder content (instead of `null`) when they are toggled off and hidden.
 
 - Required: No
