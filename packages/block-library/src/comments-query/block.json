@@ -14,12 +14,8 @@
 			"default": {
 				"perPage": null,
 				"pages": 0,
-				"offset": 0,
 				"order": "desc",
-				"orderBy": "date",
-				"author": "",
-				"search": "",
-				"inherit": true
+				"orderBy": "date"
 			}
 		},
 		"tagName": {
