@@ -1,12 +1,3 @@
-// Block style previews
-.block-editor-block-styles__popover__preview__parent {
-	.block-editor-block-styles__popover__preview__container {
-		position: absolute;
-		top: -$grid-unit-15;
-		left: calc(100% + #{$grid-unit-40});
-	}
-}
-
 // Do not show in narrow widths. Needs specificity.
 .block-editor-block-styles__popover.block-editor-block-styles__preview__popover {
 	display: none;
@@ -17,33 +8,19 @@
 }
 
 .block-editor-block-styles__preview__popover {
-	// Position correctly. Needs specificity.
-	&.components-popover {
-		margin-left: $grid-unit-05;
-		margin-top: $grid-unit-15 - $border-width;
+	// Overrides for InserterPreviewPanel.
+	.block-editor-inserter__preview-container {
+		left: auto;
+		right: auto;
+		position: static;
 	}
 
-	.components-popover__content {
-		box-shadow: none;
-		border: $border-width solid $gray-900;
-		background: $white;
-		border-radius: $radius-block-ui;
+	.block-editor-block-card__title.block-editor-block-card__title {
+		margin: 0;
 	}
-
-	.block-editor-block-styles__preview {
-		width: 300px;
-		height: auto;
-		max-height: 500px;
-		padding: $grid-unit-20;
+	.block-editor-block-icon {
+		display: none;
 	}
-}
-
-.block-editor-block-styles__preview-title {
-	margin-bottom: $grid-unit-15;
-	color: $gray-700;
-	text-transform: uppercase;
-	font-size: 11px;
-	font-weight: 500;
 }
 
 .block-editor-block-styles__variants {
@@ -58,9 +35,6 @@
 		display: inline-block;
 		width: calc(50% - #{$grid-unit-05});
 		margin-bottom: $grid-unit-10;
-		white-space: nowrap;
-		overflow: hidden;
-		text-overflow: ellipsis;
 
 		&:focus,
 		&:hover {
@@ -76,8 +50,11 @@
 	}
 }
 
-// Try to prevent overflow in the preview container.
+// To prevent overflow in the preview container,
+// ensure that block contents' margin and padding
+// do not add to the block container's width.
 .block-editor-block-styles__block-preview-container,
 .block-editor-block-styles__block-preview-container * {
 	box-sizing: border-box !important;
 }
+

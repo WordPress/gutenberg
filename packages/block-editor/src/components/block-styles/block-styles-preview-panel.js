@@ -6,13 +6,12 @@ import { useMemo, useCallback } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import BlockPreview from '../block-preview';
+import InserterPreviewPanel from '../inserter/preview-panel';
 import { replaceActiveStyle } from './utils';
 import { Popover } from '@wordpress/components';
 
 export default function BlockStylesPreviewPanel( {
 	genericPreviewBlock,
-	viewportWidth,
 	style,
 	className,
 	activeStyle,
@@ -22,7 +21,9 @@ export default function BlockStylesPreviewPanel( {
 	const previewBlocks = useMemo( () => {
 		return {
 			...genericPreviewBlock,
-			attributes: {
+			title: style.label || style.name,
+			description: style.description,
+			initialAttributes: {
 				...genericPreviewBlock.attributes,
 				className:
 					styleClassName +
@@ -38,6 +39,8 @@ export default function BlockStylesPreviewPanel( {
 		const rect = targetRef?.current.getBoundingClientRect();
 
 		return new window.DOMRect(
+			// The left position of the target element,
+			// minus any offset in relation to its parent container.
 			rect.x - targetRef?.current.offsetLeft,
 			rect.y,
 			rect.width,
@@ -46,26 +49,17 @@ export default function BlockStylesPreviewPanel( {
 	}, [ targetRef?.current ] );
 
 	return (
-		<div className="block-editor-block-styles__popover__preview__parent">
-			<div className="block-editor-block-styles__popover__preview__container">
-				<Popover
-					className="block-editor-block-styles__popover block-editor-block-styles__preview__popover "
-					focusOnMount={ false }
-					position="middle left"
-					animate={ false }
-					anchorRect={ getAnchorRect() }
-				>
-					<div className="block-editor-block-styles__preview">
-						<div className="block-editor-block-styles__preview-title">
-							{ style.label || style.name }
-						</div>
-						<BlockPreview
-							viewportWidth={ viewportWidth }
-							blocks={ previewBlocks }
-						/>
-					</div>
-				</Popover>
-			</div>
-		</div>
+		<Popover
+			className="block-editor-block-styles__popover block-editor-block-styles__preview__popover "
+			focusOnMount={ false }
+			position="middle left"
+			animate={ false }
+			anchorRect={ getAnchorRect() }
+		>
+			<InserterPreviewPanel
+				item={ previewBlocks }
+				isStylePreview={ true }
+			/>
+		</Popover>
 	);
 }

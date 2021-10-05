@@ -17,7 +17,11 @@ import {
 	getBlockFromExample,
 	store as blocksStore,
 } from '@wordpress/blocks';
-import { Button, MenuItem } from '@wordpress/components';
+import {
+	Button,
+	MenuItem,
+	__experimentalText as Text,
+} from '@wordpress/components';
 import { check } from '@wordpress/icons';
 
 /**
@@ -167,7 +171,14 @@ function BlockStyles( {
 							role="button"
 							tabIndex="0"
 						>
-							{ buttonText }
+							<Text
+								as="span"
+								limit={ 12 }
+								ellipsizeMode="tail"
+								truncate
+							>
+								{ buttonText }
+							</Text>
 						</Button>
 					);
 				} ) }
@@ -178,7 +189,6 @@ function BlockStyles( {
 					className={ className }
 					genericPreviewBlock={ genericPreviewBlock }
 					style={ hoveredStyle }
-					viewportWidth={ type.example?.viewportWidth ?? 500 }
 					targetRef={ containerRef }
 				/>
 			) }
