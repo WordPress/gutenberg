@@ -6,7 +6,12 @@ import { noop } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { forwardRef, useRef, useImperativeHandle } from '@wordpress/element';
+import {
+	forwardRef,
+	useRef,
+	useImperativeHandle,
+	useCallback,
+} from '@wordpress/element';
 import { Picker } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 
@@ -29,12 +34,12 @@ export default forwardRef( ( {}, ref ) => {
 	const pickerRef = useRef();
 	const pickerOptions = useRef( DEFAULT_PICKER_OPTIONS ).current;
 
-	function onPickerSelect( value ) {
+	const onPickerSelect = useCallback( ( value ) => {
 		const selectedItem = pickerOptions.find(
 			( item ) => item.value === value
 		);
 		selectedItem.onSelect();
-	}
+	}, [] );
 
 	useImperativeHandle( ref, () => ( {
 		presentPicker: ( { createEmbed, createLink } ) => {
