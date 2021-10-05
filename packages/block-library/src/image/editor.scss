@@ -52,6 +52,7 @@ figure.wp-block-image:not(.wp-block) {
 [data-align="wide"] > .wp-block-image,
 [data-align="full"] > .wp-block-image {
 	img {
+		height: auto;
 		width: 100%;
 	}
 }
