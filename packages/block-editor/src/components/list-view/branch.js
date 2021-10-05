@@ -16,17 +16,34 @@ import ListViewAppender from './appender';
 import { isClientIdSelected } from './utils';
 import { useListViewContext } from './context';
 
-function countBlocks( block, expandedState ) {
+function countBlocks( block, expandedState, draggedClientIds ) {
+	const isDragged = draggedClientIds?.includes( block.clientId );
+	if ( isDragged ) {
+		return 0;
+	}
 	const isExpanded = expandedState[ block.clientId ] ?? true;
 	if ( isExpanded ) {
-		return 1 + block.innerBlocks.reduce( countReducer( expandedState ), 0 );
+		return (
+			1 +
+			block.innerBlocks.reduce(
+				countReducer( expandedState, draggedClientIds ),
+				0
+			)
+		);
 	}
 	return 1;
 }
-const countReducer = ( expandedState ) => ( count, block ) => {
+const countReducer = ( expandedState, draggedClientIds ) => (
+	count,
+	block
+) => {
+	const isDragged = draggedClientIds?.includes( block.clientId );
+	if ( isDragged ) {
+		return count;
+	}
 	const isExpanded = expandedState[ block.clientId ] ?? true;
 	if ( isExpanded && block.innerBlocks.length > 0 ) {
-		return count + countBlocks( block, expandedState );
+		return count + countBlocks( block, expandedState, draggedClientIds );
 	}
 	return count + 1;
 };
@@ -48,7 +65,7 @@ export default function ListViewBranch( props ) {
 		isLastOfBranch = false,
 		listPosition = 0,
 		windowMeasurement,
-		globalBlockCount,
+		visibleBlockCount,
 	} = props;
 
 	const {
@@ -81,7 +98,8 @@ export default function ListViewBranch( props ) {
 		if ( index > 0 ) {
 			nextPosition += countBlocks(
 				filteredBlocks[ index - 1 ],
-				expandedState
+				expandedState,
+				draggedClientIds
 			);
 		}
 		const { start, maxVisible, focus } = windowMeasurement;
@@ -92,7 +110,8 @@ export default function ListViewBranch( props ) {
 			! __experimentalPersistentListViewFeatures ||
 			( start <= nextPosition && nextPosition <= start + maxVisible );
 
-		if ( ! blockInView && nextPosition > start ) {
+		const isDragging = draggedClientIds?.length > 0;
+		if ( ! isDragging && ! blockInView && nextPosition > start ) {
 			// found the end of the window, don't bother processing the rest of the items
 			break;
 		}
@@ -103,11 +122,11 @@ export default function ListViewBranch( props ) {
 				? { paddingTop: ITEM_HEIGHT * start }
 				: {} ),
 			...( __experimentalPersistentListViewFeatures &&
-			globalBlockCount > end &&
+			visibleBlockCount > end &&
 			end === nextPosition
 				? {
 						paddingBottom:
-							ITEM_HEIGHT * ( globalBlockCount - end - 1 ),
+							ITEM_HEIGHT * ( visibleBlockCount - end - 1 ),
 				  }
 				: {} ),
 		};
@@ -162,7 +181,7 @@ export default function ListViewBranch( props ) {
 
 		listItems.push(
 			<AsyncModeProvider key={ clientId } value={ ! isSelected }>
-				{ blockInView && (
+				{ ( isDragged || blockInView ) && (
 					<ListViewBlock
 						block={ block }
 						onClick={ selectBlockWithClientId }
@@ -199,7 +218,7 @@ export default function ListViewBranch( props ) {
 						path={ updatedPath }
 						listPosition={ nextPosition + 1 }
 						windowMeasurement={ windowMeasurement }
-						globalBlockCount={ globalBlockCount }
+						visibleBlockCount={ visibleBlockCount }
 					/>
 				) }
 			</AsyncModeProvider>
