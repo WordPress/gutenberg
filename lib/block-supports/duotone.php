@@ -261,6 +261,7 @@ function gutenberg_register_duotone_support( $block_type ) {
 function gutenberg_render_duotone_filter_preset( $preset ) {
 	$duotone_id     = $preset['slug'];
 	$duotone_colors = $preset['colors'];
+	$duotone_type   = empty( $preset['type'] ) ? 'table' : $preset['type'];
 	$filter_id      = 'wp-duotone-' . $duotone_id;
 	$duotone_values = array(
 		'r' => array(),
@@ -300,9 +301,9 @@ function gutenberg_render_duotone_filter_preset( $preset ) {
 					"
 				/>
 				<feComponentTransfer color-interpolation-filters="sRGB" >
-					<feFuncR type="table" tableValues="<?php echo esc_attr( implode( ' ', $duotone_values['r'] ) ); ?>" />
-					<feFuncG type="table" tableValues="<?php echo esc_attr( implode( ' ', $duotone_values['g'] ) ); ?>" />
-					<feFuncB type="table" tableValues="<?php echo esc_attr( implode( ' ', $duotone_values['b'] ) ); ?>" />
+					<feFuncR type="<?php echo $duotone_type; ?>" tableValues="<?php echo esc_attr( implode( ' ', $duotone_values['r'] ) ); ?>" />
+					<feFuncG type="<?php echo $duotone_type; ?>" tableValues="<?php echo esc_attr( implode( ' ', $duotone_values['g'] ) ); ?>" />
+					<feFuncB type="<?php echo $duotone_type; ?>" tableValues="<?php echo esc_attr( implode( ' ', $duotone_values['b'] ) ); ?>" />
 				</feComponentTransfer>
 			</filter>
 		</defs>
