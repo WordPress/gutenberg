@@ -156,7 +156,7 @@
 
 .block-editor-block-list__block-selection-button {
 	display: inline-flex;
-	padding: 0 ($grid-unit-15 + $border-width);
+	padding: 0 $grid-unit-15;
 	z-index: z-index(".block-editor-block-list__block-selection-button");
 
 	// Dark block UI appearance.
