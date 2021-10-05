@@ -11,7 +11,7 @@ import {
 	getNodesWithStyles,
 	toCustomProperties,
 	toStyles,
-} from '../global-styles-renderer';
+} from '../use-global-styles-output';
 import { ROOT_BLOCK_SELECTOR } from '../utils';
 
 describe( 'global styles renderer', () => {

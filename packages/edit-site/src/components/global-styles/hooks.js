@@ -23,7 +23,7 @@ import {
 	PRESET_METADATA,
 	getValueFromVariable,
 	getPresetVariableFromValue,
-} from '../editor/utils';
+} from './utils';
 
 const EMPTY_CONFIG = { isGlobalStylesUserThemeJSON: true, version: 1 };
 
