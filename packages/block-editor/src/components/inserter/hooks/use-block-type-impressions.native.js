@@ -2,7 +2,6 @@
  * WordPress dependencies
  */
 import { useSelect, useDispatch } from '@wordpress/data';
-import { setBlockTypeImpressions } from '@wordpress/react-native-bridge';
 
 /**
  * Internal dependencies
@@ -39,13 +38,9 @@ function useBlockTypeImpressions( blockTypes ) {
 				...blockTypeImpressions,
 				[ name ]: 0,
 			};
-			// Persist block type impression to JavaScript store
 			updateSettings( {
 				impressions: updatedBlockTypeImpressions,
 			} );
-
-			// Persist block type impression count to native app store
-			setBlockTypeImpressions( updatedBlockTypeImpressions );
 		}
 	};
 

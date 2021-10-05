@@ -2,6 +2,8 @@
  * WordPress dependencies
  */
 import { createRegistryControl } from '@wordpress/data';
+import { setBlockTypeImpressions } from '@wordpress/react-native-bridge';
+import { Platform } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -14,7 +16,24 @@ export const __unstableMarkAutomaticChangeFinalControl = function () {
 	};
 };
 
+export const __unstableUpdateSettings = function ( settings ) {
+	return {
+		type: 'UPDATE_SETTINGS',
+		settings,
+	};
+};
+
 const controls = {
+	UPDATE_SETTINGS( action ) {
+		if ( Platform.isNative ) {
+			const impressions = action?.settings?.impressions;
+			if ( impressions ) {
+				setBlockTypeImpressions( impressions );
+			}
+		}
+		return action;
+	},
+
 	SLEEP( { duration } ) {
 		return new Promise( ( resolve ) => {
 			setTimeout( resolve, duration );

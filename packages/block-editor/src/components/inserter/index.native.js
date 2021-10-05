@@ -20,7 +20,6 @@ import {
 	insertAfter,
 	insertBefore,
 } from '@wordpress/icons';
-import { setBlockTypeImpressions } from '@wordpress/react-native-bridge';
 
 /**
  * Internal dependencies
@@ -168,13 +167,9 @@ export class Inserter extends Component {
 					{}
 				);
 
-				// Persist block type impression to JavaScript store
 				updateSettings( {
 					impressions: decrementedImpressions,
 				} );
-
-				// Persist block type impression count to native app store
-				setBlockTypeImpressions( decrementedImpressions );
 			}
 		}
 

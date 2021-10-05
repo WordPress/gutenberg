@@ -26,7 +26,10 @@ import deprecated from '@wordpress/deprecated';
 /**
  * Internal dependencies
  */
-import { __unstableMarkAutomaticChangeFinalControl } from '../store/controls';
+import {
+	__unstableMarkAutomaticChangeFinalControl,
+	__unstableUpdateSettings,
+} from '../store/controls';
 import { STORE_NAME as blockEditorStoreName } from './constants';
 
 /**
@@ -1167,11 +1170,8 @@ export function updateBlockListSettings( clientId, settings ) {
  *
  * @return {Object} Action object
  */
-export function updateSettings( settings ) {
-	return {
-		type: 'UPDATE_SETTINGS',
-		settings,
-	};
+export function* updateSettings( settings ) {
+	return yield __unstableUpdateSettings( settings );
 }
 
 /**
