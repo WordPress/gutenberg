@@ -69,6 +69,15 @@ const variations = [
 				{},
 				[ [ 'core/post-title' ], [ 'core/post-date' ] ],
 			],
+			[
+				'core/query-pagination',
+				{},
+				[
+					[ 'core/query-pagination-previous' ],
+					[ 'core/query-pagination-numbers' ],
+					[ 'core/query-pagination-next' ],
+				],
+			],
 		],
 		scope: [ 'block' ],
 	},
@@ -82,6 +91,15 @@ const variations = [
 				'core/post-template',
 				{},
 				[ [ 'core/post-title' ], [ 'core/post-excerpt' ] ],
+			],
+			[
+				'core/query-pagination',
+				{},
+				[
+					[ 'core/query-pagination-previous' ],
+					[ 'core/query-pagination-numbers' ],
+					[ 'core/query-pagination-next' ],
+				],
 			],
 		],
 		scope: [ 'block' ],
@@ -101,6 +119,15 @@ const variations = [
 					[ 'core/post-excerpt' ],
 				],
 			],
+			[
+				'core/query-pagination',
+				{},
+				[
+					[ 'core/query-pagination-previous' ],
+					[ 'core/query-pagination-numbers' ],
+					[ 'core/query-pagination-next' ],
+				],
+			],
 		],
 		scope: [ 'block' ],
 	},
@@ -117,6 +144,15 @@ const variations = [
 					[ 'core/post-featured-image' ],
 					[ 'core/post-date' ],
 					[ 'core/post-title' ],
+				],
+			],
+			[
+				'core/query-pagination',
+				{},
+				[
+					[ 'core/query-pagination-previous' ],
+					[ 'core/query-pagination-numbers' ],
+					[ 'core/query-pagination-next' ],
 				],
 			],
 		],
