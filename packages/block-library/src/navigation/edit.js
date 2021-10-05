@@ -196,8 +196,7 @@ function Navigation( {
 			templateLock: false,
 			__experimentalLayout: LAYOUT,
 			placeholder:
-				navContext.placeholder ===
-				CONTEXT_DEFAULTS.placeholder
+				navContext.placeholder === CONTEXT_DEFAULTS.placeholder
 					? placeholder
 					: undefined,
 		}
