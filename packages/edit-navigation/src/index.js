@@ -53,11 +53,9 @@ function NavEditor( { settings } ) {
 
 /**
  * Setup and registration of editor.
- *
- * @param {Object} settings blockEditor settings.
  */
-function setUpEditor( settings ) {
-	addFilters( ! settings.blockNavMenus );
+function setUpEditor( ) {
+	addFilters();
 	registerCoreBlocks();
 
 	// Set up the navigation post entity.
@@ -83,7 +81,7 @@ function setUpEditor( settings ) {
  * @param {Object} settings blockEditor settings.
  */
 export function initialize( id, settings ) {
-	setUpEditor( settings );
+	setUpEditor();
 
 	render(
 		<NavEditor settings={ settings } />,

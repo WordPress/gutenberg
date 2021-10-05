@@ -96,6 +96,7 @@ function Navigation( {
 	selectedBlockHasDescendants,
 	attributes,
 	setAttributes,
+	context: { navigation },
 	clientId,
 	hasExistingNavItems,
 	isImmediateParentOfSelectedBlock,
@@ -111,11 +112,6 @@ function Navigation( {
 	overlayTextColor,
 	setOverlayTextColor,
 
-	// These props are used by the navigation editor to override specific
-	// navigation block settings.
-	hasSubmenuIndicatorSetting = true,
-	hasItemJustificationControls = true,
-	hasColorSettings = true,
 	customPlaceholder: CustomPlaceholder = null,
 	customAppender: CustomAppender = null,
 } ) {
@@ -125,6 +121,17 @@ function Navigation( {
 	const [ isResponsiveMenuOpen, setResponsiveMenuVisibility ] = useState(
 		false
 	);
+
+	// The context is used by the navigation editor to override specific
+	// navigation block settings.
+	const contextSettings = {
+		allowedBlocks: navigation?.allowedBlocks || ALLOWED_BLOCKS,
+		hasSubmenuIndicatorSetting:
+			navigation?.hasSubmenuIndicatorSetting ?? true,
+		hasItemJustificationControls:
+			navigation?.hasItemJustificationControls ?? true,
+		hasColorSettings: navigation?.hasColorSettings ?? true,
+	};
 
 	const { selectBlock } = useDispatch( blockEditorStore );
 
@@ -173,7 +180,7 @@ function Navigation( {
 			className: 'wp-block-navigation__container',
 		},
 		{
-			allowedBlocks: ALLOWED_BLOCKS,
+			allowedBlocks: contextSettings.allowedBlocks,
 			__experimentalDefaultBlock: DEFAULT_BLOCK,
 			__experimentalDirectInsert: DIRECT_INSERT,
 			orientation: attributes.orientation,
@@ -253,7 +260,7 @@ function Navigation( {
 	return (
 		<>
 			<BlockControls>
-				{ hasItemJustificationControls && (
+				{ contextSettings.hasItemJustificationControls && (
 					<JustifyToolbar
 						value={ attributes.itemsJustification }
 						allowedControls={ justifyAllowedControls }
@@ -270,7 +277,7 @@ function Navigation( {
 			</BlockControls>
 			{ navigatorModal }
 			<InspectorControls>
-				{ hasSubmenuIndicatorSetting && (
+				{ contextSettings.hasSubmenuIndicatorSetting && (
 					<PanelBody title={ __( 'Display settings' ) }>
 						<ToggleControl
 							checked={ attributes.isResponsive }
@@ -303,7 +310,7 @@ function Navigation( {
 						) }
 					</PanelBody>
 				) }
-				{ hasColorSettings && (
+				{ contextSettings.hasColorSettings && (
 					<PanelColorSettings
 						title={ __( 'Color' ) }
 						initialOpen={ false }
