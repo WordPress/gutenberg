@@ -50,7 +50,7 @@ function render_block_core_search( $attributes ) {
 	);
 	if ( $show_label && ! empty( $attributes['label'] ) ) {
 		$label_markup = sprintf(
-			'<label for="%s" class="wp-block-search__label">%s</label>',
+			'<label for="%1$s" class="wp-block-search__label">%2$s</label>',
 			$input_id,
 			$attributes['label']
 		);
