@@ -90,8 +90,7 @@
 	.components-drop-zone__content {
 		display: flex;
 		align-items: center;
-		top: -($grid-unit-15 * 3);
-		left: -($grid-unit-15 * 3);
+		opacity: 0.8 !important;
 		transform: none;
 	}
 
