@@ -199,7 +199,6 @@ function InsertionPointPopover( {
 		previousElement && nextElement && isInserterShown;
 
 	// Define animation variants for the line element.
-	// @todo address rtl
 	const lineVariants = {
 		// Initial position starts from the center and invisible.
 		start: {
