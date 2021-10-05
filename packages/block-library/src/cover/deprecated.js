@@ -42,6 +42,13 @@ function dimRatioToClassV1( ratio ) {
 		: 'has-background-dim-' + 10 * Math.round( ratio / 10 );
 }
 
+function migrateDimRatio( attributes ) {
+	return {
+		...attributes,
+		dimRatio: ! attributes.url ? 100 : attributes.dimRatio,
+	};
+}
+
 const blockAttributes = {
 	url: {
 		type: 'string',
@@ -235,12 +242,7 @@ const v7 = {
 			</div>
 		);
 	},
-	migrate( attributes ) {
-		return {
-			...attributes,
-			dimRatio: ! attributes.url ? 100 : attributes.dimRatio,
-		};
-	},
+	migrate: migrateDimRatio,
 };
 
 const v6 = {
@@ -374,12 +376,7 @@ const v6 = {
 			</div>
 		);
 	},
-	migrate( attributes ) {
-		return {
-			...attributes,
-			dimRatio: ! attributes.url ? 100 : attributes.dimRatio,
-		};
-	},
+	migrate: migrateDimRatio,
 };
 
 const v5 = {
@@ -476,12 +473,7 @@ const v5 = {
 			</div>
 		);
 	},
-	migrate( attributes ) {
-		return {
-			...attributes,
-			dimRatio: ! attributes.url ? 100 : attributes.dimRatio,
-		};
-	},
+	migrate: migrateDimRatio,
 };
 
 const v4 = {
@@ -578,12 +570,7 @@ const v4 = {
 			</div>
 		);
 	},
-	migrate( attributes ) {
-		return {
-			...attributes,
-			dimRatio: ! attributes.url ? 100 : attributes.dimRatio,
-		};
-	},
+	migrate: migrateDimRatio,
 };
 
 const v3 = {
