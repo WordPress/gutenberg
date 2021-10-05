@@ -49,10 +49,10 @@ function NavigatorScreen( props: Props, forwardedRef: Ref< any > ) {
 	);
 
 	const prefersReducedMotion = useReducedMotion();
-	const { navigatorPath: currentPath, setIsAnimating } = useContext(
+	const { location: currentLocation, setIsAnimating } = useContext(
 		NavigatorContext
 	);
-	const isMatch = currentPath.path === path;
+	const isMatch = currentLocation.path === path;
 	const ref = useFocusOnMount();
 
 	// This flag is used to only apply the focus on mount when the actual path changes.
@@ -91,8 +91,8 @@ function NavigatorScreen( props: Props, forwardedRef: Ref< any > ) {
 	const initial = {
 		opacity: 0,
 		x:
-			( isRTL() && currentPath.isBack ) ||
-			( ! isRTL() && ! currentPath.isBack )
+			( isRTL() && currentLocation.isBack ) ||
+			( ! isRTL() && ! currentLocation.isBack )
 				? 50
 				: -50,
 	};
@@ -100,8 +100,8 @@ function NavigatorScreen( props: Props, forwardedRef: Ref< any > ) {
 		delay: animationExitDelay,
 		opacity: 0,
 		x:
-			( ! isRTL() && currentPath.isBack ) ||
-			( isRTL() && ! currentPath.isBack )
+			( ! isRTL() && currentLocation.isBack ) ||
+			( isRTL() && ! currentLocation.isBack )
 				? 50
 				: -50,
 		transition: {

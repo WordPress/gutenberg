@@ -4,24 +4,24 @@
 // eslint-disable-next-line no-restricted-imports
 import type { ReactNode } from 'react';
 
-type NavigatorPathOptions = {
+type NavigatorLocationOptions = {
 	isBack?: boolean;
 };
 
-export type NavigatorPath = NavigatorPathOptions & {
+export type NavigatorLocation = NavigatorLocationOptions & {
 	path?: string;
 };
 
 export type NavigatorContext = {
-	navigatorPath: NavigatorPath;
-	setNavigatorPath: ( path: NavigatorPath ) => void;
+	location: NavigatorLocation;
+	setLocation: ( location: NavigatorLocation ) => void;
 	isAnimating: boolean;
 	setIsAnimating: ( isAnimating: boolean ) => void;
 };
 
 // Returned by the `useNavigator` hook
 export type Navigator = {
-	push: ( path: string, options: NavigatorPathOptions ) => void;
+	push: ( path: string, options: NavigatorLocationOptions ) => void;
 };
 
 export type NavigatorProviderProps = {

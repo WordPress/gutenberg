@@ -21,7 +21,7 @@ import {
 import { useCx } from '../../utils/hooks/use-cx';
 import { View } from '../../view';
 import { NavigatorContext } from '../context';
-import type { NavigatorProviderProps, NavigatorPath } from '../types';
+import type { NavigatorProviderProps, NavigatorLocation } from '../types';
 
 function NavigatorProvider(
 	props: WordPressComponentProps< NavigatorProviderProps, 'div' >,
@@ -34,7 +34,7 @@ function NavigatorProvider(
 		...otherProps
 	} = useContextSystem( props, 'NavigatorProvider' );
 
-	const [ navigatorPath, setNavigatorPath ] = useState< NavigatorPath >( {
+	const [ location, setLocation ] = useState< NavigatorLocation >( {
 		path: initialPath,
 	} );
 	const [ isAnimating, setIsAnimating ] = useState< boolean >( false );
@@ -49,8 +49,8 @@ function NavigatorProvider(
 		<View ref={ forwardedRef } className={ classes } { ...otherProps }>
 			<NavigatorContext.Provider
 				value={ {
-					navigatorPath,
-					setNavigatorPath,
+					location,
+					setLocation,
 					isAnimating,
 					setIsAnimating,
 				} }
