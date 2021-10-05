@@ -223,13 +223,15 @@ export function useInputAndSelection( props ) {
 			);
 		}
 
-		function onFocus() {
+		function onFocus( event ) {
 			const {
 				record,
 				isSelected,
 				onSelectionChange,
 				applyRecord,
 			} = propsRef.current;
+
+			handleSelectionChange( event );
 
 			if ( ! isSelected ) {
 				// We know for certain that on focus, the old selection is invalid.

@@ -12,7 +12,6 @@ import {
 	isHorizontalEdge,
 	isVerticalEdge,
 	placeCaretAtHorizontalEdge,
-	placeCaretAtVerticalEdge,
 	isRTL,
 } from '@wordpress/dom';
 import { UP, DOWN, LEFT, RIGHT } from '@wordpress/keycodes';
@@ -285,24 +284,38 @@ export default function useArrowNav() {
 				}
 			} else if (
 				isVertical &&
-				isVerticalEdge( target, isReverse ) &&
+				// isVerticalEdge( target, isReverse ) &&
 				! keepCaretInsideBlock
 			) {
-				const closestTabbable = getClosestTabbable(
-					target,
-					isReverse,
-					node,
-					true
-				);
+				node.contentEditable = 'true';
 
-				if ( closestTabbable ) {
-					placeCaretAtVerticalEdge(
-						closestTabbable,
-						isReverse,
-						verticalRect
+				function onSelectionChange() {
+					const selection = defaultView.getSelection();
+
+					ownerDocument.removeEventListener(
+						'selectionchange',
+						onSelectionChange
 					);
-					event.preventDefault();
+
+					if ( ! selection.rangeCount ) {
+						node.contentEditable = 'inherit';
+						return;
+					}
+
+					const range = selection.getRangeAt( 0 );
+					selection.removeAllRanges();
+					node.contentEditable = 'inherit';
+					selection.addRange( range );
+					ownerDocument.removeEventListener(
+						'selectionchange',
+						onSelectionChange
+					);
 				}
+
+				ownerDocument.addEventListener(
+					'selectionchange',
+					onSelectionChange
+				);
 			} else if (
 				isHorizontal &&
 				defaultView.getSelection().isCollapsed &&
