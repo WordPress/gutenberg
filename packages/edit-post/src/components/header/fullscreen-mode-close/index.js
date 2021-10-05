@@ -2,7 +2,6 @@
  * External dependencies
  */
 import { get } from 'lodash';
-import { motion } from 'framer-motion';
 
 /**
  * WordPress dependencies
@@ -14,6 +13,11 @@ import { addQueryArgs } from '@wordpress/url';
 import { wordpress } from '@wordpress/icons';
 import { store as editorStore } from '@wordpress/editor';
 import { store as coreStore } from '@wordpress/core-data';
+
+/**
+ * Internal dependencies
+ */
+import { __unstableMotion as motion } from '../../../../../components/src/animation';
 
 /**
  * Internal dependencies
@@ -64,7 +68,7 @@ function FullscreenModeClose( { showTooltip, icon, href } ) {
 		buttonIcon = (
 			<motion.img
 				variants={ effect }
-				alt={ __( 'Site Iconnnnn' ) }
+				alt={ __( 'Site Icon' ) }
 				className="edit-post-fullscreen-mode-close_site-icon"
 				src={ siteIconUrl }
 			/>
