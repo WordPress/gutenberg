@@ -199,44 +199,63 @@ function InsertionPointPopover( {
 		previousElement && nextElement && isInserterShown;
 
 	// Define animation variants for the line element.
+	const horizontalLine = {
+		start: {
+			width: 0,
+			top: '50%',
+			bottom: '50%',
+			x: 0,
+		},
+		rest: {
+			width: 4,
+			top: 0,
+			bottom: 0,
+			x: -2,
+		},
+		hover: {
+			width: 4,
+			top: 0,
+			bottom: 0,
+			x: -2,
+		},
+	};
+	const verticalLine = {
+		start: {
+			height: 0,
+			left: '50%',
+			right: '50%',
+			y: 0,
+		},
+		rest: {
+			height: 4,
+			left: 0,
+			right: 0,
+			y: -2,
+		},
+		hover: {
+			height: 4,
+			left: 0,
+			right: 0,
+			y: -2,
+		},
+	};
 	const lineVariants = {
 		// Initial position starts from the center and invisible.
 		start: {
-			...( isVertical && { height: 0 } ),
-			...( ! isVertical && { width: 0 } ),
-			...( isVertical && { left: '50%' } ),
-			...( isVertical && { right: '50%' } ),
-			...( isVertical && { y: 0 } ),
-			...( ! isVertical && { top: '50%' } ),
-			...( ! isVertical && { bottom: '50%' } ),
-			...( ! isVertical && { x: 0 } ),
+			...( ! isVertical ? horizontalLine.start : verticalLine.start ),
 			opacity: 0,
 		},
 		// The line expands to fill the container. If the inserter is visible it
 		// is delayed so it appears orchestrated.
 		rest: {
-			...( isVertical && { height: 4 } ),
-			...( ! isVertical && { width: 4 } ),
-			...( isVertical && { left: 0 } ),
-			...( isVertical && { right: 0 } ),
-			...( ! isVertical && { top: 0 } ),
-			...( ! isVertical && { bottom: 0 } ),
+			...( ! isVertical ? horizontalLine.rest : verticalLine.rest ),
 			opacity: 1,
-			...( isVertical && { y: -2 } ),
-			...( ! isVertical && { x: -2 } ),
 			borderRadius: '2px',
 			transition: { delay: showInsertionPointInserter ? 0.4 : 0 },
 		},
 		hover: {
-			...( isVertical && { height: 4 } ),
-			...( ! isVertical && { width: 4 } ),
-			...( isVertical && { left: 0 } ),
-			...( isVertical && { right: 0 } ),
-			...( ! isVertical && { top: 0 } ),
-			...( ! isVertical && { bottom: 0 } ),
+			...( ! isVertical ? horizontalLine.hover : verticalLine.hover ),
 			opacity: 1,
-			...( isVertical && { y: -2 } ),
-			...( ! isVertical && { x: -2 } ),
 			borderRadius: '2px',
 			transition: { delay: 0.4 },
 		},
