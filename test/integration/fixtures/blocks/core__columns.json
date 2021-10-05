@@ -5,15 +5,17 @@
 		"isValid": true,
 		"attributes": {
 			"isStackedOnMobile": true,
-			"backgroundColor": "secondary",
-			"tagName": "div"
+			"tagName": "div",
+			"backgroundColor": "secondary"
 		},
 		"innerBlocks": [
 			{
 				"clientId": "_clientId_0",
 				"name": "core/column",
 				"isValid": true,
-				"attributes": {},
+				"attributes": {
+					"tagName": "div"
+				},
 				"innerBlocks": [
 					{
 						"clientId": "_clientId_0",
@@ -44,7 +46,9 @@
 				"clientId": "_clientId_1",
 				"name": "core/column",
 				"isValid": true,
-				"attributes": {},
+				"attributes": {
+					"tagName": "div"
+				},
 				"innerBlocks": [
 					{
 						"clientId": "_clientId_0",

@@ -5,8 +5,8 @@
 		"isValid": true,
 		"attributes": {
 			"isStackedOnMobile": false,
-			"backgroundColor": "secondary",
-			"tagName": "div"
+			"tagName": "div",
+			"backgroundColor": "secondary"
 		},
 		"innerBlocks": [
 			{
@@ -46,7 +46,9 @@
 				"clientId": "_clientId_1",
 				"name": "core/column",
 				"isValid": true,
-				"attributes": {},
+				"attributes": {
+					"tagName": "div"
+				},
 				"innerBlocks": [
 					{
 						"clientId": "_clientId_0",
