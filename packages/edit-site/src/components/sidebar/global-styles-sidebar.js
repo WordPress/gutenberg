@@ -9,8 +9,7 @@ import { styles } from '@wordpress/icons';
  * Internal dependencies
  */
 import DefaultSidebar from './default-sidebar';
-import GlobalStyles from '../global-styles';
-import { useGlobalStylesReset } from '../global-styles/hooks';
+import { GlobalStylesUI, useGlobalStylesReset } from '../global-styles';
 
 export default function GlobalStylesSidebar() {
 	const [ canRestart, onReset ] = useGlobalStylesReset();
@@ -40,7 +39,7 @@ export default function GlobalStylesSidebar() {
 				</>
 			}
 		>
-			<GlobalStyles />
+			<GlobalStylesUI />
 		</DefaultSidebar>
 	);
 }
