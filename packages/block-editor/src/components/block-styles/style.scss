@@ -58,9 +58,6 @@
 		display: inline-block;
 		width: calc(50% - #{$grid-unit-05});
 		margin-bottom: $grid-unit-10;
-		white-space: nowrap;
-		overflow: hidden;
-		text-overflow: ellipsis;
 
 		&:focus,
 		&:hover {
