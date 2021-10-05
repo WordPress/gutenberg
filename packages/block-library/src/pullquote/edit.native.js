@@ -41,8 +41,12 @@ const getTextColor = ( { attributes, colors, style } ) => {
 		colors,
 		attributes.textColor
 	);
-
-	return colorObject?.color || colorProps.style?.color || style?.color;
+	return (
+		colorObject?.color ||
+		colorProps.style?.color ||
+		style?.color ||
+		style?.baseColors?.color?.text
+	);
 };
 const getBorderColor = ( props ) => {
 	const { wrapperProps, attributes } = props;
