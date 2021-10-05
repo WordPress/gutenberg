@@ -468,6 +468,9 @@ function RichTextWrapper(
 					createLink: () =>
 						createLinkInParagraph( plainText.trim(), onReplace ),
 				} );
+
+				onChange( insert( value, create( { text: plainText } ) ) );
+
 				return;
 			}
 
