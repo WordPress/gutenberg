@@ -769,11 +769,14 @@ describe( 'Widgets Customizer', () => {
 		// We add Block Settings as a section, but it shouldn't display to
 		// the user as a section on the main menu. It's simply how we
 		// integrate the G sidebar inside the customizer.
-		const findAllBlockSettingsHeader = findAll( {
-			role: 'heading',
-			name: /Block Settings/,
-			timeout: 250,
-		} );
+		const findAllBlockSettingsHeader = findAll(
+			{
+				role: 'heading',
+				name: /Block Settings/,
+				level: 3,
+			},
+			{ timeout: 0 }
+		);
 		await expect( findAllBlockSettingsHeader ).toThrowQueryEmptyError();
 	} );
 
