@@ -38,7 +38,7 @@ function ScreenHeader( { back, title, description } ) {
 				</Spacer>
 			</HStack>
 			{ description && (
-				<p className="edit-site-global-styles-screen-header__description">
+				<p className="edit-site-global-styles-header__description">
 					{ description }
 				</p>
 			) }

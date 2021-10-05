@@ -36,6 +36,7 @@
 		"@wordpress/compose": "file:../compose",
 		"@wordpress/core-data": "file:../core-data",
 		"@wordpress/data": "file:../data",
+		"@wordpress/dom": "file:../dom",
 		"@wordpress/dom-ready": "file:../dom-ready",
 		"@wordpress/element": "file:../element",
 		"@wordpress/hooks": "file:../hooks",

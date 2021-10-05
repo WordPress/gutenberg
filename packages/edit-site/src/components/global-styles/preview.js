@@ -10,9 +10,9 @@ import {
 
 /**
  * Internal dependencies
- */ import { useGlobalStylesContext } from '../../editor/global-styles-provider';
+ */ import { useGlobalStylesContext } from '../editor/global-styles-provider';
 
-export const StylePreview = () => {
+const StylesPreview = () => {
 	const { getStyle } = useGlobalStylesContext();
 	const fontFamily = getStyle( 'root', 'fontFamily' ) ?? 'serif';
 	const textColor = getStyle( 'root', 'color' ) ?? 'black';
@@ -37,3 +37,5 @@ export const StylePreview = () => {
 		</Card>
 	);
 };
+
+export default StylesPreview;

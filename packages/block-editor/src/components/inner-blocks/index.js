@@ -42,6 +42,8 @@ function UncontrolledInnerBlocks( props ) {
 	const {
 		clientId,
 		allowedBlocks,
+		__experimentalDefaultBlock,
+		__experimentalDirectInsert,
 		template,
 		templateLock,
 		wrapperRef,
@@ -57,6 +59,8 @@ function UncontrolledInnerBlocks( props ) {
 	useNestedSettingsUpdate(
 		clientId,
 		allowedBlocks,
+		__experimentalDefaultBlock,
+		__experimentalDirectInsert,
 		templateLock,
 		captureToolbars,
 		orientation,

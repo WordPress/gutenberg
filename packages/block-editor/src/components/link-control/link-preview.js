@@ -13,7 +13,7 @@ import {
 	__experimentalText as Text,
 } from '@wordpress/components';
 import { filterURLForDisplay, safeDecodeURI } from '@wordpress/url';
-import { Icon, globe } from '@wordpress/icons';
+import { Icon, globe, info } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -38,6 +38,19 @@ export default function LinkPreview( {
 	const displayURL =
 		( value && filterURLForDisplay( safeDecodeURI( value.url ), 16 ) ) ||
 		'';
+
+	const isEmptyURL = ! value.url.length;
+
+	let icon;
+
+	if ( richData?.icon ) {
+		icon = <img src={ richData?.icon } alt="" />;
+	} else if ( isEmptyURL ) {
+		icon = <Icon icon={ info } size={ 32 } />;
+	} else {
+		icon = <Icon icon={ globe } />;
+	}
+
 	return (
 		<div
 			aria-label={ __( 'Currently selected' ) }
@@ -47,6 +60,7 @@ export default function LinkPreview( {
 				'is-rich': hasRichData,
 				'is-fetching': !! isFetching,
 				'is-preview': true,
+				'is-error': isEmptyURL,
 			} ) }
 		>
 			<div className="block-editor-link-control__search-item-top">
@@ -59,22 +73,29 @@ export default function LinkPreview( {
 							}
 						) }
 					>
-						{ richData?.icon ? (
-							<img src={ richData?.icon } alt="" />
-						) : (
-							<Icon icon={ globe } />
-						) }
+						{ icon }
 					</span>
 					<span className="block-editor-link-control__search-item-details">
-						<ExternalLink
-							className="block-editor-link-control__search-item-title"
-							href={ value.url }
-						>
-							{ richData?.title || value?.title || displayURL }
-						</ExternalLink>
-						{ value?.url && (
-							<span className="block-editor-link-control__search-item-info">
-								{ displayURL }
+						{ ! isEmptyURL ? (
+							<>
+								<ExternalLink
+									className="block-editor-link-control__search-item-title"
+									href={ value.url }
+								>
+									{ richData?.title ||
+										value?.title ||
+										displayURL }
+								</ExternalLink>
+
+								{ value?.url && (
+									<span className="block-editor-link-control__search-item-info">
+										{ displayURL }
+									</span>
+								) }
+							</>
+						) : (
+							<span className="block-editor-link-control__search-item-error-notice">
+								Link is empty
 							</span>
 						) }
 					</span>

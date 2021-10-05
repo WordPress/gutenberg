@@ -132,10 +132,18 @@ const LinkControlSearchInput = forwardRef(
 					__experimentalShowInitialSuggestions={
 						showInitialSuggestions
 					}
-					onSubmit={ ( suggestion ) => {
-						onSuggestionSelected(
-							suggestion || focusedSuggestion || { url: value }
-						);
+					onSubmit={ ( suggestion, event ) => {
+						const hasSuggestion = suggestion || focusedSuggestion;
+
+						// If there is no suggestion and the value (ie: any manually entered URL) is empty
+						// then don't allow submission otherwise we get empty links.
+						if ( ! hasSuggestion && ! value?.trim()?.length ) {
+							event.preventDefault();
+						} else {
+							onSuggestionSelected(
+								hasSuggestion || { url: value }
+							);
+						}
 					} }
 					ref={ ref }
 				/>

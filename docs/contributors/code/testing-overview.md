@@ -439,23 +439,23 @@ You can additionally have the devtools automatically open for interactive debugg
 npm run test-e2e:watch -- --puppeteer-devtools
 ```
 
-### Using alternate enviornment
+### Using alternate environment
 
-If you're using a different setup than wp-env, you can provide the base URL, username and password like this:
-
-```bash
-npm run test-e2e -- --wordpress-base-url=http://localhost:8888 --wordpress-username=admin --wordpress-password=password
-```
-
-You also need to symlink all e2e test plugins to your site plugins directory:
+If using a different setup than `wp-env`, you first need to symlink the e2e test plugins to your test site, from your site's plugins directory run:
 
 ```bash
 ln -s gutenberg/packages/e2e-tests/plugins/* .
 ```
 
+Then to run the tests, specify the base URL, username, and passwords for your site. For example, if your test site is at `http://wp.test`, use:
+
+```bash
+WP_BASE_URL=http://wp.test npm run test-e2e -- --wordpress-username=admin --wordpress-password=password
+```
+
 ### Scenario Testing
 
-If you find that end-to-end tests pass when run locally, but fail in Travis, you may be able to isolate a CPU- or netowrk-bound race condition by simulating a slow CPU or network:
+If you find that end-to-end tests pass when run locally, but fail in GitHub Actions, you may be able to isolate a CPU- or network-bound race condition by simulating a slow CPU or network:
 
 ```
 THROTTLE_CPU=4 npm run test-e2e

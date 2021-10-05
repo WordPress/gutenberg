@@ -46,9 +46,7 @@ export default function PostTitleEdit( {
 	} );
 
 	let titleElement = (
-		<TagName { ...( isLink ? {} : blockProps ) }>
-			{ __( 'An example title' ) }
-		</TagName>
+		<TagName { ...blockProps }>{ __( 'An example title' ) }</TagName>
 	);
 
 	if ( postType && postId ) {
@@ -60,16 +58,16 @@ export default function PostTitleEdit( {
 					value={ rawTitle }
 					onChange={ setTitle }
 					__experimentalVersion={ 2 }
-					{ ...( isLink ? {} : blockProps ) }
+					{ ...blockProps }
 				/>
 			) : (
-				<TagName { ...( isLink ? {} : blockProps ) }>
+				<TagName { ...blockProps }>
 					<RawHTML key="html">{ fullTitle.rendered }</RawHTML>
 				</TagName>
 			);
 	}
 
-	if ( isLink ) {
+	if ( isLink && postType && postId ) {
 		titleElement =
 			userCanEdit && ! isDescendentOfQueryLoop ? (
 				<TagName { ...blockProps }>
