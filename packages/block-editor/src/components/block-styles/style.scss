@@ -71,12 +71,6 @@
 	}
 }
 
-.block-editor-block-styles__block-preview {
-	min-height: $grid-unit-60 * 3;
-	display: flex;
-	align-items: center;
-}
-
 // Try to prevent overflow in the preview container.
 .block-editor-block-styles__block-preview-container {
 	padding: $grid-unit-10;

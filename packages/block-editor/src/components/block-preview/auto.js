@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import classnames from 'classnames';
-
-/**
  * WordPress dependencies
  */
 import { Disabled } from '@wordpress/components';
@@ -21,11 +16,7 @@ import { store } from '../../store';
 // This is used to avoid rendering the block list if the sizes change.
 let MemoizedBlockList;
 
-function AutoBlockPreview( {
-	className,
-	viewportWidth,
-	__experimentalPadding,
-} ) {
+function AutoBlockPreview( { viewportWidth, __experimentalPadding } ) {
 	const [
 		containerResizeListener,
 		{ width: containerWidth },
@@ -44,12 +35,7 @@ function AutoBlockPreview( {
 	const scale = containerWidth / viewportWidth;
 
 	return (
-		<div
-			className={ classnames(
-				'block-editor-block-preview__container',
-				className
-			) }
-		>
+		<div className="block-editor-block-preview__container">
 			{ containerResizeListener }
 			<Disabled
 				className="block-editor-block-preview__content"

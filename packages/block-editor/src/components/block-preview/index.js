@@ -23,7 +23,6 @@ export function BlockPreview( {
 	viewportWidth = 1200,
 	__experimentalLive = false,
 	__experimentalOnClick,
-	className,
 } ) {
 	const originalSettings = useSelect(
 		( select ) => select( blockEditorStore ).getSettings(),
@@ -46,7 +45,6 @@ export function BlockPreview( {
 				<AutoHeightBlockPreview
 					viewportWidth={ viewportWidth }
 					__experimentalPadding={ __experimentalPadding }
-					className={ className }
 				/>
 			) }
 		</BlockEditorProvider>
