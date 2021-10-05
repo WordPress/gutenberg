@@ -39,25 +39,22 @@ import NavigationPlaceholder from './placeholder';
 import PlaceholderPreview from './placeholder-preview';
 import ResponsiveWrapper from './responsive-wrapper';
 
-const ALLOWED_BLOCKS = [
-	'core/navigation-link',
-	'core/search',
-	'core/social-links',
-	'core/page-list',
-	'core/spacer',
-	'core/home-link',
-	'core/site-title',
-	'core/site-logo',
-	'core/navigation-submenu',
-];
-
 const CONTEXT_DEFAULTS = {
-	allowedBlocks: ALLOWED_BLOCKS,
+	allowedBlocks: [
+		'core/navigation-link',
+		'core/search',
+		'core/social-links',
+		'core/page-list',
+		'core/spacer',
+		'core/home-link',
+		'core/site-title',
+		'core/site-logo',
+		'core/navigation-submenu',
+	],
 	hasSubmenuIndicatorSetting: true,
 	hasItemJustificationControls: true,
 	hasColorSettings: true,
 	customPlaceholder: NavigationPlaceholder,
-
 	createAppender: ( wouldNavBlockShowAppender ) =>
 		wouldNavBlockShowAppender ? undefined : false,
 };
