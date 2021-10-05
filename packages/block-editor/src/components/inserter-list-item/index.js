@@ -11,7 +11,6 @@ import {
 	createBlock,
 	createBlocksFromInnerBlocksTemplate,
 } from '@wordpress/blocks';
-import { __unstableMotion as motion } from '@wordpress/components';
 import { ENTER } from '@wordpress/keycodes';
 
 /**
@@ -87,66 +86,58 @@ function InserterListItem( {
 						}
 					} }
 				>
-					<motion.div
-						whileTap={ {
-							scale: 0.9,
+					<InserterListboxItem
+						isFirst={ isFirst }
+						className={ classnames(
+							'block-editor-block-types-list__item',
+							className
+						) }
+						disabled={ item.isDisabled }
+						onClick={ ( event ) => {
+							event.preventDefault();
+							onSelect(
+								item,
+								isAppleOS() ? event.metaKey : event.ctrlKey
+							);
+							onHover( null );
 						} }
-					>
-						<InserterListboxItem
-							isFirst={ isFirst }
-							className={ classnames(
-								'block-editor-block-types-list__item',
-								className
-							) }
-							disabled={ item.isDisabled }
-							onClick={ ( event ) => {
+						onKeyDown={ ( event ) => {
+							const { keyCode } = event;
+							if ( keyCode === ENTER ) {
 								event.preventDefault();
 								onSelect(
 									item,
 									isAppleOS() ? event.metaKey : event.ctrlKey
 								);
 								onHover( null );
-							} }
-							onKeyDown={ ( event ) => {
-								const { keyCode } = event;
-								if ( keyCode === ENTER ) {
-									event.preventDefault();
-									onSelect(
-										item,
-										isAppleOS()
-											? event.metaKey
-											: event.ctrlKey
-									);
-									onHover( null );
-								}
-							} }
-							onFocus={ () => {
-								if ( isDragging.current ) {
-									return;
-								}
-								onHover( item );
-							} }
-							onMouseEnter={ () => {
-								if ( isDragging.current ) {
-									return;
-								}
-								onHover( item );
-							} }
-							onMouseLeave={ () => onHover( null ) }
-							onBlur={ () => onHover( null ) }
-							{ ...props }
+							}
+						} }
+						onFocus={ () => {
+							if ( isDragging.current ) {
+								return;
+							}
+							onHover( item );
+						} }
+						onMouseEnter={ () => {
+							if ( isDragging.current ) {
+								return;
+							}
+							onHover( item );
+						} }
+						onMouseLeave={ () => onHover( null ) }
+						onBlur={ () => onHover( null ) }
+						{ ...props }
+					>
+						<span
+							className="block-editor-block-types-list__item-icon"
+							style={ itemIconStyle }
 						>
-							<span
-								className="block-editor-block-types-list__item-icon"
-								style={ itemIconStyle }
-							>
-								<BlockIcon icon={ item.icon } showColors />
-							</span>
-							<span className="block-editor-block-types-list__item-title">
-								{ item.title }
-							</span>
-						</InserterListboxItem>
-					</motion.div>
+							<BlockIcon icon={ item.icon } showColors />
+						</span>
+						<span className="block-editor-block-types-list__item-title">
+							{ item.title }
+						</span>
+					</InserterListboxItem>
 				</div>
 			) }
 		</InserterDraggableBlocks>
