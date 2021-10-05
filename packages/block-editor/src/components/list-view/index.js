@@ -95,9 +95,21 @@ function ListView(
 		__experimentalPersistentListViewFeatures
 	);
 
-	const globalBlockCount = useSelect( ( select ) => {
-		return select( blockEditorStore ).getGlobalBlockCount();
-	}, [] );
+	const { visibleBlockCount } = useSelect(
+		( select ) => {
+			const { getGlobalBlockCount, getClientIdsOfDescendants } = select(
+				blockEditorStore
+			);
+			const draggedBlockCount =
+				draggedClientIds?.length > 0
+					? getClientIdsOfDescendants( draggedClientIds ).length + 1
+					: 0;
+			return {
+				visibleBlockCount: getGlobalBlockCount() - draggedBlockCount,
+			};
+		},
+		[ draggedClientIds ]
+	);
 
 	const { selectBlock } = useDispatch( blockEditorStore );
 	const selectEditorBlock = useCallback(
@@ -193,7 +205,7 @@ function ListView(
 			const { start, maxVisible } = lastMeasurement;
 			const nextStart = Math.min(
 				start + 1,
-				globalBlockCount - maxVisible
+				visibleBlockCount - maxVisible
 			);
 			return {
 				start: nextStart,
@@ -226,6 +238,7 @@ function ListView(
 			collapse,
 		]
 	);
+
 	return (
 		<AsyncModeProvider value={ true }>
 			<ListViewDropIndicator
@@ -246,7 +259,7 @@ function ListView(
 						blocks={ clientIdsTree }
 						selectBlock={ selectEditorBlock }
 						windowMeasurement={ windowMeasurement }
-						globalBlockCount={ globalBlockCount }
+						visibleBlockCount={ visibleBlockCount }
 						{ ...props }
 					/>
 				</ListViewContext.Provider>
