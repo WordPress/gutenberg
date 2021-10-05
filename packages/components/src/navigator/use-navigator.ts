@@ -1,6 +1,7 @@
 /**
  * WordPress dependencies
  */
+import { useReducedMotion } from '@wordpress/compose';
 import { useContext } from '@wordpress/element';
 
 /**
@@ -14,10 +15,13 @@ import type { Navigator } from './types';
  */
 function useNavigator(): Navigator {
 	const { setLocation, setIsAnimating } = useContext( NavigatorContext );
+	const prefersReducedMotion = useReducedMotion();
 
 	return {
 		push( path, options ) {
-			setIsAnimating( true );
+			if ( ! prefersReducedMotion ) {
+				setIsAnimating( true );
+			}
 			setLocation( { path, ...options } );
 		},
 	};
