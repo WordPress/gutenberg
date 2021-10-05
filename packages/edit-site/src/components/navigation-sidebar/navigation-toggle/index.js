@@ -2,7 +2,11 @@
  * WordPress dependencies
  */
 import { useDispatch, useSelect } from '@wordpress/data';
-import { Button, Icon } from '@wordpress/components';
+import {
+	Button,
+	Icon,
+	__unstableMotion as motion,
+} from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { wordpress } from '@wordpress/icons';
 import { store as coreDataStore } from '@wordpress/core-data';
@@ -51,9 +55,18 @@ function NavigationToggle( { icon, isOpen } ) {
 
 	let buttonIcon = <Icon size="36px" icon={ wordpress } />;
 
+	const effect = {
+		expand: {
+			scale: 1.7,
+			borderRadius: 0,
+			transition: { type: 'tween', duration: '0.2' },
+		},
+	};
+
 	if ( siteIconUrl ) {
 		buttonIcon = (
-			<img
+			<motion.img
+				variants={ effect }
 				alt={ __( 'Site Icon' ) }
 				className="edit-site-navigation-toggle__site-icon"
 				src={ siteIconUrl }
@@ -66,10 +79,11 @@ function NavigationToggle( { icon, isOpen } ) {
 	}
 
 	return (
-		<div
+		<motion.div
 			className={
 				'edit-site-navigation-toggle' + ( isOpen ? ' is-open' : '' )
 			}
+			whileHover="expand"
 		>
 			<Button
 				className="edit-site-navigation-toggle__button has-icon"
@@ -79,7 +93,7 @@ function NavigationToggle( { icon, isOpen } ) {
 			>
 				{ buttonIcon }
 			</Button>
-		</div>
+		</motion.div>
 	);
 }
 
