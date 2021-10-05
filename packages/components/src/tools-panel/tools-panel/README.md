@@ -69,8 +69,8 @@ export function DimensionPanel( props ) {
 
 ### `hasInnerWrapper`: `boolean`
 
-A function to call when the `Reset all` menu option is selected. This is passed
-through to the panel's header component.
+Flags that the items in this ToolsPanel will be contained within an inner
+wrapper element allowing the panel to lay them out accordingly.
 
 - Required: No
 
