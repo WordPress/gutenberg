@@ -27,7 +27,7 @@ function AutoBlockPreview( { viewportWidth, __experimentalPadding } ) {
 	] = useResizeObserver();
 	const styles = useSelect( ( select ) => {
 		return select( store ).getSettings().styles;
-	} );
+	}, [] );
 
 	// Initialize on render instead of module top level, to avoid circular dependency issues.
 	MemoizedBlockList = MemoizedBlockList || pure( BlockList );
