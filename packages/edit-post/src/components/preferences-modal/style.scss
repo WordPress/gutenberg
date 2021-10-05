@@ -25,44 +25,9 @@ $vertical-tabs-width: 160px;
 		}
 	}
 
-	.components-navigation {
-		padding: 0;
+	.components-navigator-provider {
 		max-height: 100%;
 		overflow-y: auto;
-		color: $black;
-
-		> * {
-			// Matches spacing cleared from the modal content element.
-			padding: $grid-unit-30 $grid-unit-40;
-		}
-
-		.components-navigation__menu {
-			margin: 0;
-
-			.components-navigation__item {
-				& > button {
-					padding: 3px $grid-unit-20;
-					height: $grid-unit-60;
-					// Aligns button text instead of button box.
-					margin: 0 #{-$grid-unit-20};
-					width: calc(#{$grid-unit-40} + 100%);
-					&:focus {
-						font-weight: 500;
-					}
-				}
-			}
-			.components-navigation__menu-title-heading {
-				border-bottom: 1px solid $gray-300;
-				padding-left: 0;
-				padding-right: 0;
-			}
-			.components-navigation__back-button {
-				padding-left: 0;
-			}
-			.edit-post-preferences-modal__custom-fields-confirmation-button {
-				width: auto;
-			}
-		}
 	}
 
 	.edit-post-preferences__tabs {
