@@ -17,7 +17,6 @@ import { Input } from './styles/number-control-styles';
 import * as inputControlActionTypes from '../input-control/reducer/actions';
 import { composeStateReducers } from '../input-control/reducer/reducer';
 import { add, subtract, roundClamp } from '../utils/math';
-import { useJumpStep } from '../utils/hooks';
 import { isValueEmpty } from '../utils/values';
 
 export function NumberControl(
@@ -40,17 +39,12 @@ export function NumberControl(
 	},
 	ref
 ) {
-	const baseStep = step === 'any' ? 1 : parseFloat( step );
-	const jumpStep = useJumpStep( {
-		step: baseStep,
-		shiftStep,
-		isShiftStepEnabled,
-	} );
-
+	const isStepAny = step === 'any';
+	const baseStep = isStepAny ? 1 : parseFloat( step );
 	const baseValue = roundClamp( 0, min, max, baseStep );
 	const constrainValue = ( value, stepOverride ) => {
 		// When step is "any" clamp the value, otherwise round and clamp it
-		return step === 'any'
+		return isStepAny
 			? Math.min( max, Math.max( min, value ) )
 			: roundClamp( value, min, max, stepOverride ?? baseStep );
 	};
@@ -183,7 +177,7 @@ export function NumberControl(
 			min={ min }
 			ref={ ref }
 			required={ required }
-			step={ jumpStep }
+			step={ step }
 			type={ typeProp }
 			value={ valueProp }
 			__unstableStateReducer={ composeStateReducers(
