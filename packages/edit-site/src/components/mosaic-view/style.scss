@@ -33,7 +33,7 @@
 .edit-site-mosaic-view__mosaic-item {
 	display: grid;
 	grid-template-columns: auto $button-size;
-	grid-template-rows: auto 96px;
+	grid-template-rows: auto auto;
 	grid-gap: $grid-unit-20;
 
 	.components-base-control__help {
@@ -74,13 +74,8 @@
 	margin-left: 0;
 }
 
-.edit-site-mosaic-view__template-actions-disabled {
-	grid-column: span 2;
-
-	.components-base-control__label,
-	.components-base-control__help {
-		margin-left: 0;
-	}
+.edit-site .components-popover__content {
+	min-width: 240px;
 }
 
 .edit-site-mosaic-view__template-actions .components-button {

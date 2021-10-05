@@ -9,7 +9,6 @@ import {
 	__unstableComposite as Composite,
 	__unstableUseCompositeState as useCompositeState,
 	__unstableCompositeItem as CompositeItem,
-	BaseControl,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 
@@ -29,7 +28,6 @@ function TemplateContainer( { templateId, composite } ) {
 	const {
 		hasThemeFile,
 		templateAuthor,
-		templateDescription,
 		templateSlug,
 		templateSource,
 		templateTitle,
@@ -44,7 +42,6 @@ function TemplateContainer( { templateId, composite } ) {
 			return {
 				hasThemeFile: template.has_theme_file,
 				templateAuthor: template.author,
-				templateDescription: template.description,
 				templateSlug: template.slug,
 				templateSource: template.source,
 				templateTitle: template.title,
@@ -76,35 +73,20 @@ function TemplateContainer( { templateId, composite } ) {
 				templateId={ templateId }
 				onClick={ onActivateItem }
 			/>
-			{ templateSource === 'custom' && (
-				<>
-					<CheckboxControl
-						disabled={ templateSource !== 'custom' }
-						label={ templateTitle }
-						help={ templateDescription }
-						checked={ isSelected }
-						onChange={ () => toggleSelectedTemplate( templateId ) }
-					/>
-					<div>
-						<TemplateActions
-							hasThemeFile={ hasThemeFile }
-							templateAuthor={ templateAuthor }
-							templateId={ templateId }
-							templateTitle={ templateTitle }
-						/>
-					</div>
-				</>
-			) }
-			{ templateSource !== 'custom' && (
-				<BaseControl
-					help={ templateDescription }
-					className="edit-site-mosaic-view__template-actions-disabled"
-				>
-					<BaseControl.VisualLabel>
-						{ templateTitle }
-					</BaseControl.VisualLabel>
-				</BaseControl>
-			) }
+			<CheckboxControl
+				disabled={ templateSource !== 'custom' }
+				label={ templateTitle }
+				checked={ isSelected }
+				onChange={ () => toggleSelectedTemplate( templateId ) }
+			/>
+			<div>
+				<TemplateActions
+					hasThemeFile={ hasThemeFile }
+					templateAuthor={ templateAuthor }
+					templateId={ templateId }
+					templateTitle={ templateTitle }
+				/>
+			</div>
 		</CompositeItem>
 	);
 }

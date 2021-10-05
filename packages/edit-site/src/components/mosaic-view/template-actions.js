@@ -26,7 +26,7 @@ export default function TemplateActions( {
 				return theme
 					? sprintf(
 							/* translators: %s: theme name. */
-							__( '%s theme' ),
+							__( 'Theme: %s' ),
 							theme
 					  )
 					: '';
@@ -39,14 +39,32 @@ export default function TemplateActions( {
 		editSiteStore
 	);
 	const { deleteEntityRecord } = useDispatch( coreStore );
+	const { templateDescription, templateSource } = useSelect(
+		( select ) => {
+			const { getEditedEntityRecord } = select( coreStore );
+			const template = templateId
+				? getEditedEntityRecord( 'postType', 'wp_template', templateId )
+				: {};
+			return {
+				templateDescription: template.description,
+				templateSource: template.source,
+			};
+		},
+		[ templateId ]
+	);
 	return (
 		<DropdownMenu
 			className="edit-site-mosaic-view__template-actions"
 			icon={ moreVertical }
-			label={ __( 'Template actions' ) }
+			label={ __( 'Template info & actions' ) }
 		>
 			{ ( { onClose } ) => (
 				<>
+					{ templateDescription && (
+						<MenuGroup label={ __( 'Description' ) }>
+							{ templateDescription }
+						</MenuGroup>
+					) }
 					{ addedBy && (
 						<MenuGroup label={ __( 'Added by' ) }>
 							<p className="edit-site-mosaic-view__added-by-text">
@@ -54,55 +72,63 @@ export default function TemplateActions( {
 							</p>
 						</MenuGroup>
 					) }
-					<MenuGroup>
-						{ hasThemeFile ? (
-							<MenuItem
-								onClick={ () => {
-									revertTemplate(
-										storeSelect(
-											coreStore
-										).getEntityRecord(
-											'postType',
-											'wp_template',
-											templateId
-										)
-									);
-									toggleSelectedTemplate( templateId );
-									onClose();
-								} }
-							>
-								{ __( 'Clear customizations' ) }
-							</MenuItem>
-						) : (
-							<MenuItem
-								isDestructive
-								onClick={ () => {
-									if (
-										// eslint-disable-next-line no-alert
-										window.confirm(
-											sprintf(
-												/* translators: %s: template name */
-												__(
-													'Are you sure you want to delete the %s template? It may be in use by multiple pages and/or posts.'
-												),
-												templateTitle
+
+					{ templateSource === 'custom' && (
+						<MenuGroup>
+							{ hasThemeFile ? (
+								<MenuItem
+									info={ __(
+										'Restore template to theme default'
+									) }
+									onClick={ () => {
+										revertTemplate(
+											storeSelect(
+												coreStore
+											).getEntityRecord(
+												'postType',
+												'wp_template',
+												templateId
 											)
-										)
-									) {
-										deleteEntityRecord(
-											'postType',
-											'wp_template',
-											templateId
 										);
 										toggleSelectedTemplate( templateId );
 										onClose();
-									}
-								} }
-							>
-								{ __( 'Delete' ) }
-							</MenuItem>
-						) }
-					</MenuGroup>
+									} }
+								>
+									{ __( 'Clear customizations' ) }
+								</MenuItem>
+							) : (
+								<MenuItem
+									isDestructive
+									onClick={ () => {
+										if (
+											// eslint-disable-next-line no-alert
+											window.confirm(
+												sprintf(
+													/* translators: %s: template name */
+													__(
+														'Are you sure you want to delete the %s template? It may be in use by multiple pages and/or posts.'
+													),
+													templateTitle
+												)
+											)
+										) {
+											deleteEntityRecord(
+												'postType',
+												'wp_template',
+												templateId
+											);
+											toggleSelectedTemplate(
+												templateId
+											);
+											onClose();
+										}
+									} }
+								>
+									{ __( 'Delete' ) }
+								</MenuItem>
+							) }
+						</MenuGroup>
+					) }
 				</>
 			) }
 		</DropdownMenu>
