@@ -117,8 +117,9 @@ export function useToolsPanel(
 		setAreAllOptionalControlsHidden,
 	] = useState( false );
 
-	// Where no optional menu items are active, we display a plus icon
-	// to indicate the presence of further menu items.
+	// We need to track whether any optional menu items are active to later
+	// determine whether the panel is currently empty and any inner wrapper
+	// should be hidden.
 	useEffect( () => {
 		if ( menuItems.optional ) {
 			const optionalItems = Object.entries( menuItems.optional );
