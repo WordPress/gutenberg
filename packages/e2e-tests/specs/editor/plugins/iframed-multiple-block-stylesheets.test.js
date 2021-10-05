@@ -6,7 +6,6 @@ import {
 	createNewPost,
 	deactivatePlugin,
 	insertBlock,
-	getEditedPostContent,
 	openDocumentSettingsSidebar,
 	clickButton,
 	canvas,
@@ -37,7 +36,9 @@ describe( 'iframed multiple block stylesheets', () => {
 	it( 'should load multiple block stylesheets in iframe', async () => {
 		await insertBlock( 'Iframed Multiple Stylesheets' );
 
-		expect( await getEditedPostContent() ).toMatchSnapshot();
+		await page.waitForSelector(
+			'.wp-block-test-iframed-multiple-stylesheets'
+		);
 		await openDocumentSettingsSidebar();
 		await clickButton( 'Page' );
 		await clickButton( 'Template' );
