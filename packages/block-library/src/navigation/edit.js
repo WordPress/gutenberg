@@ -133,7 +133,7 @@ function Navigation( {
 
 	// The context is used by the navigation editor to override specific
 	// navigation block settings.
-	const navContext = defaults( CONTEXT_DEFAULTS, navigation );
+	const navContext = defaults( navigation, CONTEXT_DEFAULTS );
 
 	const { selectBlock } = useDispatch( blockEditorStore );
 
