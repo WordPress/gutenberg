@@ -97,6 +97,7 @@ function ColumnEdit( {
 		{ ...blockProps, 'aria-label': label },
 		{
 			templateLock,
+			allowedBlocks,
 			renderAppender: hasChildBlocks
 				? undefined
 				: InnerBlocks.ButtonBlockAppender,
