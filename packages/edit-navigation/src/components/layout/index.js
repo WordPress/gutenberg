@@ -6,7 +6,9 @@ import {
 	BlockEditorKeyboardShortcuts,
 	BlockEditorProvider,
 	BlockTools,
+	InnerBlocks,
 	__unstableUseBlockSelectionClearer as useBlockSelectionClearer,
+	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import { useEntityBlockEditor } from '@wordpress/core-data';
 import { Popover, SlotFillProvider, Spinner } from '@wordpress/components';
@@ -54,6 +56,10 @@ const interfaceLabels = {
 	secondarySidebar: __( 'Block library' ),
 };
 
+function CustomAppender() {
+	return <InnerBlocks.ButtonBlockAppender isToggle />;
+}
+
 export default function Layout( { blockEditorSettings } ) {
 	const contentAreaRef = useBlockSelectionClearer();
 	const [ isMenuNameControlFocused, setIsMenuNameControlFocused ] = useState(
@@ -82,12 +88,15 @@ export default function Layout( { blockEditorSettings } ) {
 		}
 	);
 
-	const { hasSidebarEnabled, isInserterOpened } = useSelect(
+	const { hasSidebarEnabled, isInserterOpened, noBlockSelected } = useSelect(
 		( select ) => ( {
 			hasSidebarEnabled: !! select(
 				interfaceStore
 			).getActiveComplementaryArea( 'core/edit-navigation' ),
 			isInserterOpened: select( editNavigationStore ).isInserterOpened(),
+			noBlockSelected: ! select(
+				blockEditorStore
+			).getSelectedBlockClientId(),
 		} ),
 		[]
 	);
@@ -98,6 +107,10 @@ export default function Layout( { blockEditorSettings } ) {
 			hasItemJustificationControls: false,
 			hasColorSettings: false,
 			customPlaceholder: BlockPlaceholder,
+			createAppender: ( wouldNavBlockShowAppender ) =>
+				wouldNavBlockShowAppender || noBlockSelected
+					? CustomAppender
+					: false,
 		};
 		if ( ! blockEditorSettings.blockNavMenus ) {
 			context.allowedBlocks = [
@@ -107,7 +120,7 @@ export default function Layout( { blockEditorSettings } ) {
 			];
 		}
 		return { navigation: context };
-	}, [ blockEditorSettings.blockNavMenus ] );
+	}, [ blockEditorSettings.blockNavMenus, noBlockSelected ] );
 
 	useEffect( () => {
 		if ( ! selectedMenuId && menus?.length ) {

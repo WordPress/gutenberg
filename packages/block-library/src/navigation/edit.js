@@ -57,6 +57,9 @@ const CONTEXT_DEFAULTS = {
 	hasItemJustificationControls: true,
 	hasColorSettings: true,
 	customPlaceholder: NavigationPlaceholder,
+
+	createAppender: ( wouldNavBlockShowAppender ) =>
+		wouldNavBlockShowAppender ? undefined : false,
 };
 
 const DEFAULT_BLOCK = [ 'core/navigation-link' ];
@@ -120,8 +123,6 @@ function Navigation( {
 	setOverlayBackgroundColor,
 	overlayTextColor,
 	setOverlayTextColor,
-
-	customAppender: CustomAppender = null,
 } ) {
 	const [ isPlaceholderShown, setIsPlaceholderShown ] = useState(
 		! hasExistingNavItems
@@ -170,11 +171,9 @@ function Navigation( {
 	// When the block is selected itself or has a top level item selected that
 	// doesn't itself have children, show the standard appender. Else show no
 	// appender.
-	const appender =
+	const wouldNavBlockShowAppender =
 		isSelected ||
-		( isImmediateParentOfSelectedBlock && ! selectedBlockHasDescendants )
-			? undefined
-			: false;
+		( isImmediateParentOfSelectedBlock && ! selectedBlockHasDescendants );
 
 	const innerBlocksProps = useInnerBlocksProps(
 		{
@@ -185,7 +184,9 @@ function Navigation( {
 			__experimentalDefaultBlock: DEFAULT_BLOCK,
 			__experimentalDirectInsert: DIRECT_INSERT,
 			orientation: attributes.orientation,
-			renderAppender: CustomAppender || appender,
+			renderAppender: navContext.createAppender(
+				wouldNavBlockShowAppender
+			),
 
 			// Ensure block toolbar is not too far removed from item
 			// being edited when in vertical mode.
