@@ -100,7 +100,7 @@ $block-inserter-tabs-height: 44px;
 
 .block-editor-inserter__search {
 	background: $white;
-	padding: $grid-unit-20;
+	padding: $grid-unit-20 $grid-unit-20 0 $grid-unit-20;
 	position: sticky;
 	top: 0;
 	z-index: z-index(".block-editor-inserter__search");
@@ -173,10 +173,6 @@ $block-inserter-tabs-height: 44px;
 .block-editor-inserter__block-list {
 	flex-grow: 1;
 	position: relative;
-}
-
-.block-editor-inserter__popover .block-editor-block-types-list {
-	margin: -8px;
 }
 
 .block-editor-inserter__reusable-blocks-panel {
