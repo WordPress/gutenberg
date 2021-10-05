@@ -2,7 +2,6 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import { motion } from 'framer-motion';
 
 /**
  * WordPress dependencies
@@ -12,6 +11,7 @@ import {
 	createBlock,
 	createBlocksFromInnerBlocksTemplate,
 } from '@wordpress/blocks';
+import { __unstableMotion as motion } from '@wordpress/components';
 import { ENTER } from '@wordpress/keycodes';
 
 /**

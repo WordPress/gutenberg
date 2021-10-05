@@ -2,8 +2,6 @@
  * External dependencies
  */
 import classnames from 'classnames';
-// eslint-disable-next-line no-restricted-imports
-import { motion } from 'framer-motion';
 
 /**
  * WordPress dependencies
@@ -16,7 +14,7 @@ import {
 	createContext,
 	useContext,
 } from '@wordpress/element';
-import { Popover } from '@wordpress/components';
+import { Popover, __unstableMotion as motion } from '@wordpress/components';
 import { isRTL } from '@wordpress/i18n';
 
 /**

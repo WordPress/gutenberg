@@ -7,17 +7,16 @@ import { get } from 'lodash';
  * WordPress dependencies
  */
 import { useSelect } from '@wordpress/data';
-import { Button, Icon } from '@wordpress/components';
+import {
+	Button,
+	Icon,
+	__unstableMotion as motion,
+} from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { addQueryArgs } from '@wordpress/url';
 import { wordpress } from '@wordpress/icons';
 import { store as editorStore } from '@wordpress/editor';
 import { store as coreStore } from '@wordpress/core-data';
-
-/**
- * Internal dependencies
- */
-import { __unstableMotion as motion } from '../../../../../components/src/animation';
 
 /**
  * Internal dependencies

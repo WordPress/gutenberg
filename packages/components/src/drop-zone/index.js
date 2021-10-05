@@ -3,8 +3,6 @@
  */
 import classnames from 'classnames';
 import { includes } from 'lodash';
-// eslint-disable-next-line no-restricted-imports
-import { AnimatePresence, motion } from 'framer-motion';
 
 /**
  * WordPress dependencies
@@ -14,6 +12,14 @@ import { useState } from '@wordpress/element';
 import { upload, Icon } from '@wordpress/icons';
 import { getFilesFromDataTransfer } from '@wordpress/dom';
 import { __experimentalUseDropZone as useDropZone } from '@wordpress/compose';
+
+/**
+ * Internal dependencies
+ */
+import {
+	__unstableMotion as motion,
+	__unstableAnimatePresence as AnimatePresence,
+} from '../animation';
 
 export default function DropZoneComponent( {
 	className,
