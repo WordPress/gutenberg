@@ -34,12 +34,15 @@ export default forwardRef( ( {}, ref ) => {
 	const pickerRef = useRef();
 	const pickerOptions = useRef( DEFAULT_PICKER_OPTIONS ).current;
 
-	const onPickerSelect = useCallback( ( value ) => {
-		const selectedItem = pickerOptions.find(
-			( item ) => item.value === value
-		);
-		selectedItem.onSelect();
-	}, [] );
+	const onPickerSelect = useCallback(
+		( value ) => {
+			const selectedItem = pickerOptions.find(
+				( item ) => item.value === value
+			);
+			selectedItem.onSelect();
+		},
+		[ pickerOptions ]
+	);
 
 	useImperativeHandle( ref, () => ( {
 		presentPicker: ( { createEmbed, createLink } ) => {
