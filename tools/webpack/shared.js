@@ -10,7 +10,6 @@ const postcss = require( 'postcss' );
 /**
  * WordPress dependencies
  */
-const DependencyExtractionWebpackPlugin = require( '@wordpress/dependency-extraction-webpack-plugin' );
 const ReadableJsAssetsWebpackPlugin = require( '@wordpress/readable-js-assets-webpack-plugin' );
 
 const {
@@ -72,21 +71,6 @@ const plugins = [
 			parseInt( process.env.npm_package_config_GUTENBERG_PHASE, 10 ) || 1
 		),
 	} ),
-	new DependencyExtractionWebpackPlugin( { injectPolyfill: true } ),
-	mode === 'production' && new ReadableJsAssetsWebpackPlugin(),
-];
-
-const pluginsNoPolyfills = [
-	// The WP_BUNDLE_ANALYZER global variable enables a utility that represents bundle
-	// content as a convenient interactive zoomable treemap.
-	process.env.WP_BUNDLE_ANALYZER && new BundleAnalyzerPlugin(),
-	new DefinePlugin( {
-		// Inject the `GUTENBERG_PHASE` global, used for feature flagging.
-		'process.env.GUTENBERG_PHASE': JSON.stringify(
-			parseInt( process.env.npm_package_config_GUTENBERG_PHASE, 10 ) || 1
-		),
-	} ),
-	new DependencyExtractionWebpackPlugin( { injectPolyfill: false } ),
 	mode === 'production' && new ReadableJsAssetsWebpackPlugin(),
 ];
 
@@ -116,6 +100,5 @@ const stylesTransform = ( content ) => {
 module.exports = {
 	baseConfig,
 	plugins,
-	pluginsNoPolyfills,
 	stylesTransform,
 };

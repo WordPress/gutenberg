@@ -7,13 +7,14 @@ const { join, sep } = require( 'path' );
 const fastGlob = require( 'fast-glob' );
 
 /**
+ * WordPress dependencies
+ */
+const DependencyExtractionWebpackPlugin = require( '@wordpress/dependency-extraction-webpack-plugin' );
+
+/**
  * Internal dependencies
  */
-const {
-	baseConfig,
-	pluginsNoPolyfills,
-	stylesTransform,
-} = require( './shared' );
+const { baseConfig, plugins, stylesTransform } = require( './shared' );
 
 /*
  * Matches a block's name in paths in the form
@@ -57,7 +58,8 @@ module.exports = {
 		path: join( __dirname, '..', '..' ),
 	},
 	plugins: [
-		...pluginsNoPolyfills,
+		...plugins,
+		new DependencyExtractionWebpackPlugin( { injectPolyfill: false } ),
 		new CopyWebpackPlugin( {
 			patterns: [].concat(
 				[
