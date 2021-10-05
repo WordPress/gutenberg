@@ -128,16 +128,19 @@ const EmbedEdit = ( props ) => {
 	);
 
 	/**
-	 * @return {Object} Attributes derived from the preview, merged with the current attributes.
+	 * Returns the attributes derived from the preview, merged with the current attributes.
+	 *
+	 * @param {boolean} ignorePreviousClassName Determines if the previous className attribute should be ignored when merging.
+	 * @return {Object} Merged attributes.
 	 */
-	const getMergedAttributes = () => {
+	const getMergedAttributes = ( ignorePreviousClassName = false ) => {
 		const { allowResponsive, className } = attributes;
 		return {
 			...attributes,
 			...getAttributesFromPreview(
 				preview,
 				title,
-				className,
+				ignorePreviousClassName ? undefined : className,
 				responsive,
 				allowResponsive
 			),
@@ -174,20 +177,10 @@ const EmbedEdit = ( props ) => {
 	useEffect( () => {
 		if ( preview && ! isEditingURL ) {
 			// When obtaining an incoming preview, we set the attributes derived from
-			// the preview data. In this case, we don't use the `getMergedAttributes`
-			// function because we need to specify an empty classname as the previous
-			// classname might not apply to the new preview.
-			const { allowResponsive } = attributes;
-			setAttributes( {
-				...attributes,
-				...getAttributesFromPreview(
-					preview,
-					title,
-					'',
-					responsive,
-					allowResponsive
-				),
-			} );
+			// the preview data. In this case when getting the merged attributes,
+			// we ignore the previous classname because it might not match the expected
+			// classes by the new preview.
+			setAttributes( getMergedAttributes( true ) );
 
 			if ( onReplace ) {
 				const upgradedBlock = createUpgradedEmbedBlock(
