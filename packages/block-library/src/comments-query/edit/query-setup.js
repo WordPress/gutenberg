@@ -13,15 +13,7 @@ import {
  * Internal dependencies
  */
 import { getFirstQueryClientIdFromBlocks } from '../utils';
-
-const QueryPlaceholder = () => {
-	const blockProps = useBlockProps();
-
-	// XXX: Here will be a proper placeholder
-	return (
-		<div { ...blockProps }> QueryPlacholder: Actually implement this </div>
-	);
-};
+import QueryPlaceholder from './query-placeholder';
 
 export const QueryPatternSetup = ( props ) => {
 	const { clientId, name: blockName } = props;
