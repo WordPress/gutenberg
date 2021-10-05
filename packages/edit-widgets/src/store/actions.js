@@ -44,6 +44,14 @@ export const persistStubPost = ( id, blocks ) => ( { registry } ) => {
 	return stubPost;
 };
 
+/**
+ * Converts all the blocks from edited widget areas into widgets,
+ * and submits a batch request to save everything at once.
+ *
+ * Creates a snackbar notice on either success or error.
+ *
+ * @return {Function} An action creator.
+ */
 export const saveEditedWidgetAreas = () => async ( {
 	select,
 	dispatch,
@@ -71,6 +79,13 @@ export const saveEditedWidgetAreas = () => async ( {
 	}
 };
 
+/**
+ * Converts all the blocks from specified widget areas into widgets,
+ * and submits a batch request to save everything at once.
+ *
+ * @param {Object[]} widgetAreas Widget areas to save.
+ * @return {Function} An action creator.
+ */
 export const saveWidgetAreas = ( widgetAreas ) => async ( {
 	dispatch,
 	registry,
@@ -92,6 +107,13 @@ export const saveWidgetAreas = ( widgetAreas ) => async ( {
 	}
 };
 
+/**
+ * Converts all the blocks from a widget area specified by ID into widgets,
+ * and submits a batch request to save everything at once.
+ *
+ * @param {string} widgetAreaId ID of the widget area to process.
+ * @return {Function} An action creator.
+ */
 export const saveWidgetArea = ( widgetAreaId ) => async ( {
 	dispatch,
 	select,
