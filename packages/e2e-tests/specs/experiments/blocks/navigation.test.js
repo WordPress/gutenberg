@@ -576,7 +576,7 @@ describe( 'Navigation', () => {
 		await createPageButton.click();
 
 		const draftLink = await page.waitForSelector(
-			'.wp-block-navigation-link__content'
+			'.wp-block-navigation-item__content'
 		);
 		await draftLink.click();
 

@@ -516,13 +516,9 @@ export default function NavigationLinkEdit( {
 		blockProps.onClick = () => setIsLinkOpen( true );
 	}
 
-	const classes = classnames(
-		'wp-block-navigation-link__content',
-		'wp-block-navigation-item__content',
-		{
-			'wp-block-navigation-link__placeholder': ! url,
-		}
-	);
+	const classes = classnames( 'wp-block-navigation-item__content', {
+		'wp-block-navigation-link__placeholder': ! url,
+	} );
 
 	let missingText = '';
 	switch ( type ) {
