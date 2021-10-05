@@ -192,7 +192,7 @@ function render_block_core_navigation_link( $attributes, $content, $block ) {
 	// Start anchor tag content.
 	$html .= '>' .
 		// Wrap title with span to isolate it from submenu icon.
-		'<span class="wp-block-navigation-link__label">';
+		'<span class="wp-block-navigation-item__label">';
 
 	if ( isset( $attributes['label'] ) ) {
 		$html .= wp_kses(
