@@ -167,42 +167,55 @@ export function useSetting( path, blockName, source = 'all' ) {
 		mergedConfig,
 		setUserConfig,
 	] = useGlobalStylesConfig();
-	const finalPath = ! blockName
+
+	const fullPath = ! blockName
 		? `settings.${ path }`
 		: `settings.blocks.${ blockName }.${ path }`;
-
-	const getSettingValue = ( configToUse ) => {
-		const result = get( configToUse, finalPath );
-		if ( PATHS_WITH_MERGE[ path ] ) {
-			return result.theme ?? result.core;
-		}
-		return result;
-	};
 
 	const setSetting = ( newValue ) => {
 		setUserConfig( ( currentConfig ) => {
 			const newUserConfig = cloneDeep( currentConfig );
-			set( newUserConfig, finalPath, newValue );
+			set( newUserConfig, fullPath, newValue );
 			return newUserConfig;
 		} );
 	};
 
-	let result;
-	switch ( source ) {
-		case 'all':
-			result = getSettingValue( mergedConfig );
-			break;
-		case 'user':
-			result = getSettingValue( userConfig );
-			break;
-		case 'base':
-			result = getSettingValue( baseConfig );
-			break;
-		default:
-			throw 'Unsupported source';
-	}
+	const getSettingValueForContext = ( name ) => {
+		const currentPath = ! name
+			? `settings.${ path }`
+			: `settings.blocks.${ name }.${ path }`;
 
-	return [ result, setSetting ];
+		const getSettingValue = ( configToUse ) => {
+			const result = get( configToUse, currentPath );
+			if ( PATHS_WITH_MERGE[ path ] ) {
+				return result?.theme ?? result?.core;
+			}
+			return result;
+		};
+
+		let result;
+		switch ( source ) {
+			case 'all':
+				result = getSettingValue( mergedConfig );
+				break;
+			case 'user':
+				result = getSettingValue( userConfig );
+				break;
+			case 'base':
+				result = getSettingValue( baseConfig );
+				break;
+			default:
+				throw 'Unsupported source';
+		}
+
+		return result;
+	};
+
+	// Unlike styles settings get inherited from top level settings.
+	const resultWithFallback =
+		getSettingValueForContext( blockName ) ?? getSettingValueForContext();
+
+	return [ resultWithFallback, setSetting ];
 }
 
 export function useStyle( path, blockName, source = 'all' ) {
@@ -298,23 +311,29 @@ export function getSupportedGlobalStylesPanels( name ) {
 		// Opting out means that, for certain support keys like background color,
 		// blocks have to explicitly set the support value false. If the key is
 		// unset, we still enable it.
-		if ( STYLE_PROPERTY[ name ].requiresOptOut ) {
+		if ( STYLE_PROPERTY[ styleName ].requiresOptOut ) {
 			if (
 				has(
 					blockType.supports,
-					STYLE_PROPERTY[ name ].support[ 0 ]
+					STYLE_PROPERTY[ styleName ].support[ 0 ]
 				) &&
-				get( blockType.supports, STYLE_PROPERTY[ name ].support ) !==
-					false
+				get(
+					blockType.supports,
+					STYLE_PROPERTY[ styleName ].support
+				) !== false
 			) {
-				return supportKeys.push( name );
+				return supportKeys.push( styleName );
 			}
 		}
 
 		if (
-			get( blockType.supports, STYLE_PROPERTY[ name ].support, false )
+			get(
+				blockType.supports,
+				STYLE_PROPERTY[ styleName ].support,
+				false
+			)
 		) {
-			return supportKeys.push( name );
+			return supportKeys.push( styleName );
 		}
 	} );
 
