@@ -42,6 +42,7 @@ import {
 	NAVIGATION_POST_KIND,
 	NAVIGATION_POST_POST_TYPE,
 } from '../../constants';
+import BlockPlaceholder from '../block-placeholder';
 
 const interfaceLabels = {
 	/* translators: accessibility text for the navigation screen top bar landmark region. */
@@ -96,6 +97,7 @@ export default function Layout( { blockEditorSettings } ) {
 			hasSubmenuIndicatorSetting: false,
 			hasItemJustificationControls: false,
 			hasColorSettings: false,
+			customPlaceholder: BlockPlaceholder,
 		};
 		if ( ! blockEditorSettings.blockNavMenus ) {
 			context.allowedBlocks = [

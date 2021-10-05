@@ -2,6 +2,7 @@
  * External dependencies
  */
 import classnames from 'classnames';
+import { defaults } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -49,6 +50,14 @@ const ALLOWED_BLOCKS = [
 	'core/site-logo',
 	'core/navigation-submenu',
 ];
+
+const CONTEXT_DEFAULTS = {
+	allowedBlocks: ALLOWED_BLOCKS,
+	hasSubmenuIndicatorSetting: true,
+	hasItemJustificationControls: true,
+	hasColorSettings: true,
+	customPlaceholder: NavigationPlaceholder,
+};
 
 const DEFAULT_BLOCK = [ 'core/navigation-link' ];
 
@@ -112,7 +121,6 @@ function Navigation( {
 	overlayTextColor,
 	setOverlayTextColor,
 
-	customPlaceholder: CustomPlaceholder = null,
 	customAppender: CustomAppender = null,
 } ) {
 	const [ isPlaceholderShown, setIsPlaceholderShown ] = useState(
@@ -124,14 +132,7 @@ function Navigation( {
 
 	// The context is used by the navigation editor to override specific
 	// navigation block settings.
-	const contextSettings = {
-		allowedBlocks: navigation?.allowedBlocks || ALLOWED_BLOCKS,
-		hasSubmenuIndicatorSetting:
-			navigation?.hasSubmenuIndicatorSetting ?? true,
-		hasItemJustificationControls:
-			navigation?.hasItemJustificationControls ?? true,
-		hasColorSettings: navigation?.hasColorSettings ?? true,
-	};
+	const navContext = defaults( CONTEXT_DEFAULTS, navigation );
 
 	const { selectBlock } = useDispatch( blockEditorStore );
 
@@ -180,7 +181,7 @@ function Navigation( {
 			className: 'wp-block-navigation__container',
 		},
 		{
-			allowedBlocks: contextSettings.allowedBlocks,
+			allowedBlocks: navContext.allowedBlocks,
 			__experimentalDefaultBlock: DEFAULT_BLOCK,
 			__experimentalDirectInsert: DIRECT_INSERT,
 			orientation: attributes.orientation,
@@ -196,7 +197,11 @@ function Navigation( {
 			// inherit templateLock={ 'all' }.
 			templateLock: false,
 			__experimentalLayout: LAYOUT,
-			placeholder: ! CustomPlaceholder ? placeholder : undefined,
+			placeholder:
+				navContext.customPlaceholder ===
+				CONTEXT_DEFAULTS.customPlaceholder
+					? placeholder
+					: undefined,
 		}
 	);
 
@@ -233,9 +238,7 @@ function Navigation( {
 	} );
 
 	if ( isPlaceholderShown ) {
-		const PlaceholderComponent = CustomPlaceholder
-			? CustomPlaceholder
-			: NavigationPlaceholder;
+		const PlaceholderComponent = navContext.customPlaceholder;
 
 		return (
 			<div { ...blockProps }>
@@ -260,7 +263,7 @@ function Navigation( {
 	return (
 		<>
 			<BlockControls>
-				{ contextSettings.hasItemJustificationControls && (
+				{ navContext.hasItemJustificationControls && (
 					<JustifyToolbar
 						value={ attributes.itemsJustification }
 						allowedControls={ justifyAllowedControls }
@@ -277,7 +280,7 @@ function Navigation( {
 			</BlockControls>
 			{ navigatorModal }
 			<InspectorControls>
-				{ contextSettings.hasSubmenuIndicatorSetting && (
+				{ navContext.hasSubmenuIndicatorSetting && (
 					<PanelBody title={ __( 'Display settings' ) }>
 						<ToggleControl
 							checked={ attributes.isResponsive }
@@ -310,7 +313,7 @@ function Navigation( {
 						) }
 					</PanelBody>
 				) }
-				{ contextSettings.hasColorSettings && (
+				{ navContext.hasColorSettings && (
 					<PanelColorSettings
 						title={ __( 'Color' ) }
 						initialOpen={ false }

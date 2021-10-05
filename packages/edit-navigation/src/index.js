@@ -54,7 +54,7 @@ function NavEditor( { settings } ) {
 /**
  * Setup and registration of editor.
  */
-function setUpEditor( ) {
+function setUpEditor() {
 	addFilters();
 	registerCoreBlocks();
 
