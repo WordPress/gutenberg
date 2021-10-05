@@ -5,7 +5,7 @@ $blocks-block__margin: 0.5em;
 	display: flex;
 	flex-direction: row;
 	flex-wrap: wrap;
-	column-gap: var(--wp--style--block-gap, $blocks-block__margin);
+	gap: var(--wp--style--block-gap, $blocks-block__margin);
 
 	&.is-vertical {
 		flex-direction: column;
@@ -19,11 +19,7 @@ $blocks-block__margin: 0.5em;
 	// Increased specificity to override blocks default margin.
 	> .wp-block-button {
 		display: inline-block;
-		/*rtl:ignore*/
-		margin-left: 0;
-		/*rtl:ignore*/
-		margin-right: 0;
-		margin-bottom: calc(var(--wp--style--block-gap, #{ $blocks-block__margin}) * 0.5);
+		margin: 0;
 	}
 
 	&.is-content-justification-left {
@@ -75,7 +71,6 @@ $blocks-block__margin: 0.5em;
 	/* stylelint-enable indentation */
 		margin-left: auto;
 		margin-right: auto;
-		margin-bottom: calc(var(--wp--style--block-gap, #{ $blocks-block__margin}) * 0.5);
 		width: 100%;
 	}
 }

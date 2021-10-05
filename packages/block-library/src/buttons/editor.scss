@@ -1,5 +1,5 @@
 // This variable is repeated across Button, Buttons, and Buttons editor styles.
-$blocks-block__margin: 1em;
+$blocks-block__margin: 0.5em;
 
 .wp-block > .wp-block-buttons {
 	display: flex;
@@ -8,8 +8,8 @@ $blocks-block__margin: 1em;
 
 .wp-block-buttons {
 	// Specificity needed to override editor auto block margins.
-	> .wp-block {
-		margin-top: calc(var(--wp--style--block-gap, #{$blocks-block__margin}) * 0.5);
+	> .wp-block.wp-block-button {
+		margin: 0;
 	}
 
 	> .block-list-appender {
