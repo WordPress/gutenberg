@@ -444,7 +444,7 @@ function RichTextWrapper(
 
 			if (
 				__unstableEmbedURLOnPaste &&
-				isEmpty( value ) &&
+				value?.text?.length === 0 &&
 				isURL( plainText.trim() )
 			) {
 				mode = 'BLOCKS';
