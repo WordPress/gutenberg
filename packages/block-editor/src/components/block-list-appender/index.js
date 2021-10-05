@@ -87,6 +87,8 @@ function BlockListAppender( {
 				'block-list-appender wp-block',
 				className
 			) }
+			// Many editor styles incorrectly target [data-block] instead of .wp-block.
+			data-block
 		>
 			{ appender }
 		</TagName>
