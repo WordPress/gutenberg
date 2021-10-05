@@ -60,7 +60,6 @@ function FullscreenModeClose( { showTooltip, icon, href } ) {
 			borderRadius: 0,
 			transition: { type: 'tween', duration: '0.2' },
 		},
-		press: { scale: 1.6, opacity: 0.5 },
 	};
 
 	if ( siteIconUrl ) {
@@ -84,7 +83,7 @@ function FullscreenModeClose( { showTooltip, icon, href } ) {
 	}
 
 	return (
-		<motion.div whileHover="expand" whileTap="press">
+		<motion.div whileHover="expand">
 			<Button
 				className="edit-post-fullscreen-mode-close has-icon"
 				href={
