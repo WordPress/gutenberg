@@ -15,7 +15,7 @@
 		},
 		"allowedBlocks": {
 			"type": "array"
-    	},
+		},
 		"templateLock": {
 			"enum": [ "all", "insert", false ]
 		}
