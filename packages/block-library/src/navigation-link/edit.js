@@ -22,8 +22,6 @@ import { displayShortcut, isKeyboardEvent, ENTER } from '@wordpress/keycodes';
 import { __, sprintf } from '@wordpress/i18n';
 import {
 	BlockControls,
-	InnerBlocks,
-	__experimentalUseInnerBlocksProps as useInnerBlocksProps,
 	InspectorControls,
 	RichText,
 	__experimentalLinkControl as LinkControl,
@@ -46,10 +44,7 @@ import { store as coreStore } from '@wordpress/core-data';
 /**
  * Internal dependencies
  */
-import { ItemSubmenuIcon } from './icons';
 import { name } from './block.json';
-
-const ALLOWED_BLOCKS = [ 'core/navigation-link' ];
 
 const MAX_NESTING = 5;
 
@@ -290,7 +285,6 @@ export default function NavigationLinkEdit( {
 		url,
 		opensInNewTab,
 	};
-	const { showSubmenuIcon } = context;
 	const { saveEntityRecord } = useDispatch( coreStore );
 	const {
 		replaceBlock,
@@ -307,9 +301,7 @@ export default function NavigationLinkEdit( {
 		isAtMaxNesting,
 		isTopLevelLink,
 		isParentOfSelectedBlock,
-		isImmediateParentOfSelectedBlock,
 		hasDescendants,
-		selectedBlockHasDescendants,
 		userCanCreatePages,
 		userCanCreatePosts,
 	} = useSelect(
@@ -385,13 +377,17 @@ export default function NavigationLinkEdit( {
 		replaceBlock( clientId, newSubmenu );
 	}
 
-	// Show the LinkControl on mount if the URL is empty
-	// ( When adding a new menu item)
-	// This can't be done in the useState call because it conflicts
-	// with the autofocus behavior of the BlockListBlock component.
 	useEffect( () => {
+		// Show the LinkControl on mount if the URL is empty
+		// ( When adding a new menu item)
+		// This can't be done in the useState call because it conflicts
+		// with the autofocus behavior of the BlockListBlock component.
 		if ( ! url ) {
 			setIsLinkOpen( true );
+		}
+		// If block has inner blocks, transform to Submenu.
+		if ( hasDescendants ) {
+			transformToSubmenu();
 		}
 	}, [] );
 
@@ -519,45 +515,6 @@ export default function NavigationLinkEdit( {
 	if ( ! url ) {
 		blockProps.onClick = () => setIsLinkOpen( true );
 	}
-
-	// Always use overlay colors for submenus
-	const innerBlocksColors = getColors( context, true );
-	const innerBlocksProps = useInnerBlocksProps(
-		{
-			className: classnames(
-				'wp-block-navigation-link__container',
-				'wp-block-navigation__submenu-container',
-				{
-					'is-parent-of-selected-block': isParentOfSelectedBlock,
-					'has-text-color': !! (
-						innerBlocksColors.textColor ||
-						innerBlocksColors.customTextColor
-					),
-					[ `has-${ innerBlocksColors.textColor }-color` ]: !! innerBlocksColors.textColor,
-					'has-background': !! (
-						innerBlocksColors.backgroundColor ||
-						innerBlocksColors.customBackgroundColor
-					),
-					[ `has-${ innerBlocksColors.backgroundColor }-background-color` ]: !! innerBlocksColors.backgroundColor,
-				}
-			),
-			style: {
-				color: innerBlocksColors.customTextColor,
-				backgroundColor: innerBlocksColors.customBackgroundColor,
-			},
-		},
-		{
-			allowedBlocks: ALLOWED_BLOCKS,
-			renderAppender:
-				( isSelected && hasDescendants ) ||
-				( isImmediateParentOfSelectedBlock &&
-					! selectedBlockHasDescendants ) ||
-				// Show the appender while dragging to allow inserting element between item and the appender.
-				hasDescendants
-					? InnerBlocks.DefaultAppender
-					: false,
-		}
-	);
 
 	const classes = classnames(
 		'wp-block-navigation-link__content',
@@ -733,13 +690,7 @@ export default function NavigationLinkEdit( {
 							/>
 						</Popover>
 					) }
-					{ hasDescendants && showSubmenuIcon && (
-						<span className="wp-block-navigation-link__submenu-icon wp-block-navigation__submenu-icon">
-							<ItemSubmenuIcon />
-						</span>
-					) }
 				</a>
-				<div { ...innerBlocksProps } />
 			</div>
 		</Fragment>
 	);

@@ -50,6 +50,8 @@ import { name } from './block.json';
 
 const ALLOWED_BLOCKS = [ 'core/navigation-link', 'core/navigation-submenu' ];
 
+const DEFAULT_BLOCK = [ 'core/navigation-link' ];
+
 const MAX_NESTING = 5;
 
 /**
@@ -504,6 +506,8 @@ export default function NavigationSubmenuEdit( {
 		},
 		{
 			allowedBlocks: ALLOWED_BLOCKS,
+			__experimentalDefaultBlock: DEFAULT_BLOCK,
+			__experimentalDirectInsert: true,
 			renderAppender:
 				isSelected ||
 				( isImmediateParentOfSelectedBlock &&

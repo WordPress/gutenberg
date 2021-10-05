@@ -3,7 +3,7 @@
 /**
  * External dependencies
  */
-import { View, Platform } from 'react-native';
+import { View, Platform, Dimensions } from 'react-native';
 import { get, pickBy, debounce } from 'lodash';
 import memize from 'memize';
 
@@ -15,7 +15,7 @@ import {
 	showUserSuggestions,
 	showXpostSuggestions,
 } from '@wordpress/react-native-bridge';
-import { BlockFormatControls } from '@wordpress/block-editor';
+import { BlockFormatControls, getPxFromCssUnit } from '@wordpress/block-editor';
 import { Component } from '@wordpress/element';
 import { compose, withPreferredColorScheme } from '@wordpress/compose';
 import { withSelect } from '@wordpress/data';
@@ -122,6 +122,7 @@ export class RichText extends Component {
 			activeFormats: [],
 			selectedFormat: null,
 			height: 0,
+			dimensions: Dimensions.get( 'window' ),
 		};
 		this.needsSelectionUpdate = false;
 		this.savedContent = '';
@@ -855,19 +856,26 @@ export class RichText extends Component {
 	getFontSize() {
 		const { baseGlobalStyles } = this.props;
 
-		if ( this.props.fontSize ) {
-			return parseFloat( this.props.fontSize );
+		let fontSize = DEFAULT_FONT_SIZE;
+
+		if ( baseGlobalStyles?.typography?.fontSize ) {
+			fontSize = baseGlobalStyles?.typography?.fontSize;
 		}
 
 		if ( this.props.style?.fontSize ) {
-			return parseFloat( this.props.style.fontSize );
+			fontSize = this.props.style.fontSize;
 		}
 
-		if ( baseGlobalStyles?.typography?.fontSize ) {
-			return parseFloat( baseGlobalStyles?.typography?.fontSize );
+		if ( this.props.fontSize ) {
+			fontSize = this.props.fontSize;
 		}
+		const { height, width } = this.state.dimensions;
+		const cssUnitOptions = { height, width, fontSize: DEFAULT_FONT_SIZE };
+		// We need to always convert to px units because the selected value
+		// could be coming from the web where it could be stored as a different unit.
+		const selectedPxValue = getPxFromCssUnit( fontSize, cssUnitOptions );
 
-		return DEFAULT_FONT_SIZE;
+		return parseFloat( selectedPxValue );
 	}
 
 	getLineHeight() {

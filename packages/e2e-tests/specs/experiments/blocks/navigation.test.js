@@ -246,17 +246,6 @@ async function createEmptyNavBlock() {
 	await startEmptyButton.click();
 }
 
-async function addLinkBlock() {
-	// Using 'click' here checks for regressions of https://github.com/WordPress/gutenberg/issues/18329,
-	// an issue where the block appender requires two clicks.
-	await page.click( '.wp-block-navigation .block-list-appender' );
-
-	const [ linkButton ] = await page.$x(
-		"//*[contains(@class, 'block-editor-inserter__quick-inserter')]//*[text()='Custom Link']"
-	);
-	await linkButton.click();
-}
-
 async function toggleSidebar() {
 	await page.click(
 		'.edit-post-header__settings button[aria-label="Settings"]'
@@ -414,7 +403,7 @@ describe( 'Navigation', () => {
 
 		await createEmptyNavBlock();
 
-		await addLinkBlock();
+		await page.click( '.wp-block-navigation .block-list-appender' );
 
 		// Add a link to the Link block.
 		await updateActiveNavigationLink( {
@@ -425,7 +414,7 @@ describe( 'Navigation', () => {
 
 		await showBlockToolbar();
 
-		await addLinkBlock();
+		await page.click( '.wp-block-navigation .block-list-appender' );
 
 		// After adding a new block, search input should be shown immediately.
 		// Verify that Escape would close the popover.
@@ -477,7 +466,7 @@ describe( 'Navigation', () => {
 
 		await createEmptyNavBlock();
 
-		await addLinkBlock();
+		await page.click( '.wp-block-navigation .block-list-appender' );
 
 		// Add a link to the Link block.
 		await updateActiveNavigationLink( {
@@ -487,7 +476,7 @@ describe( 'Navigation', () => {
 
 		await showBlockToolbar();
 
-		await addLinkBlock();
+		await page.click( '.wp-block-navigation .block-list-appender' );
 
 		// Wait for URL input to be focused
 		await page.waitForSelector(
@@ -548,7 +537,7 @@ describe( 'Navigation', () => {
 		// Create an empty nav block.
 		await createEmptyNavBlock();
 
-		await addLinkBlock();
+		await page.click( '.wp-block-navigation .block-list-appender' );
 
 		// Wait for URL input to be focused
 		await page.waitForSelector(
@@ -640,6 +629,46 @@ describe( 'Navigation', () => {
 
 		// Assert the correct number of button toggles are present.
 		expect( navSubmenusLength ).toEqual( navButtonTogglesLength );
+	} );
+
+	it( 'Shows the quick inserter when the block contains non-navigation specific blocks', async () => {
+		// Add the navigation block.
+		await insertBlock( 'Navigation' );
+
+		// Create an empty nav block.
+		await page.waitForSelector( '.wp-block-navigation-placeholder' );
+
+		await createEmptyNavBlock();
+
+		// Add a Link block first.
+		await page.click( '.wp-block-navigation .block-list-appender' );
+
+		// Add a link to the Link block.
+		await updateActiveNavigationLink( {
+			url: 'https://wordpress.org',
+			label: 'WP',
+			type: 'url',
+		} );
+
+		// Now add a different block type.
+		await insertBlock( 'Site Title' );
+
+		// Now try inserting another Link block via the quick inserter.
+		await page.click( '.wp-block-navigation .block-list-appender' );
+
+		const [ linkButton ] = await page.$x(
+			"//*[contains(@class, 'block-editor-inserter__quick-inserter')]//*[text()='Custom Link']"
+		);
+		await linkButton.click();
+
+		await updateActiveNavigationLink( {
+			url: 'https://wordpress.org/news/',
+			label: 'WP News',
+			type: 'url',
+		} );
+
+		// Expect a Navigation block with two links and a Site Title.
+		expect( await getEditedPostContent() ).toMatchSnapshot();
 	} );
 
 	// The following tests are unstable, roughly around when https://github.com/WordPress/wordpress-develop/pull/1412
