@@ -56,13 +56,14 @@ export default function BlockStylesPreviewPanel( {
 					anchorRect={ getAnchorRect() }
 				>
 					<div className="block-editor-block-styles__preview">
-						<div className="block-editor-block-styles__preview-title">
-							{ style.label || style.name }
-						</div>
 						<BlockPreview
 							viewportWidth={ viewportWidth }
 							blocks={ previewBlocks }
+							className="block-editor-block-styles__block-preview"
 						/>
+					</div>
+					<div className="block-editor-block-styles__preview-title">
+						{ style.label || style.name }
 					</div>
 				</Popover>
 			</div>

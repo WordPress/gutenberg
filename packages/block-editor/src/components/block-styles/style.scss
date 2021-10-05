@@ -1,10 +1,15 @@
 // Block style previews
-.block-editor-block-styles__popover__preview__parent {
-	.block-editor-block-styles__popover__preview__container {
-		position: absolute;
-		top: -$grid-unit-15;
-		left: calc(100% + #{$grid-unit-40});
-	}
+.block-editor-block-styles__popover__preview__parent .block-editor-block-styles__popover__preview__container {
+	position: absolute;
+	top: -$grid-unit-15;
+	left: calc(100% + #{$grid-unit-40});
+}
+
+.block-editor-block-styles__preview-title {
+	padding: $grid-unit-20;
+	color: $gray-900;
+	font-size: $default-font-size;
+	background: $white;
 }
 
 // Do not show in narrow widths. Needs specificity.
@@ -24,26 +29,19 @@
 	}
 
 	.components-popover__content {
-		box-shadow: none;
-		border: $border-width solid $gray-900;
-		background: $white;
-		border-radius: $radius-block-ui;
+		//box-shadow: none;
+		//background: $white;
+		background: $gray-100;
+		display: grid;
+		flex-grow: 1;
+		align-items: center;
 	}
 
 	.block-editor-block-styles__preview {
 		width: 300px;
 		height: auto;
 		max-height: 500px;
-		padding: $grid-unit-20;
 	}
-}
-
-.block-editor-block-styles__preview-title {
-	margin-bottom: $grid-unit-15;
-	color: $gray-700;
-	text-transform: uppercase;
-	font-size: 11px;
-	font-weight: 500;
 }
 
 .block-editor-block-styles__variants {
@@ -73,7 +71,17 @@
 	}
 }
 
+.block-editor-block-styles__block-preview {
+	min-height: $grid-unit-60 * 3;
+	display: flex;
+	align-items: center;
+}
+
 // Try to prevent overflow in the preview container.
+.block-editor-block-styles__block-preview-container {
+	padding: $grid-unit-10;
+}
+
 .block-editor-block-styles__block-preview-container,
 .block-editor-block-styles__block-preview-container * {
 	box-sizing: border-box !important;
