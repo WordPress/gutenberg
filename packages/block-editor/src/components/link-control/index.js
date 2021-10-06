@@ -209,7 +209,7 @@ function LinkControl( {
 		stopEditing();
 	};
 
-	const handleSubmitButton = () => {
+	const handleSubmit = () => {
 		if (
 			currentInputValue !== value?.url ||
 			internalTextValue !== value?.text
@@ -220,6 +220,17 @@ function LinkControl( {
 			} );
 		}
 		stopEditing();
+	};
+
+	const handleSubmitWithEnter = ( event ) => {
+		const { keyCode } = event;
+		if (
+			keyCode === ENTER &&
+			! currentInputIsEmpty // disallow submitting empty values.
+		) {
+			event.preventDefault();
+			handleSubmit();
+		}
 	};
 
 	const shownUnlinkControl =
@@ -257,6 +268,7 @@ function LinkControl( {
 								label="Text"
 								value={ stripHTML( internalTextValue ) }
 								onChange={ setInternalTextValue }
+								onKeyDown={ handleSubmitWithEnter }
 							/>
 						) }
 
@@ -280,17 +292,7 @@ function LinkControl( {
 						>
 							<div className="block-editor-link-control__search-actions">
 								<Button
-									onClick={ () => handleSubmitButton() }
-									onKeyDown={ ( event ) => {
-										const { keyCode } = event;
-										if (
-											keyCode === ENTER &&
-											! currentInputIsEmpty // disallow submitting empty values.
-										) {
-											event.preventDefault();
-											handleSubmitButton();
-										}
-									} }
+									onClick={ () => handleSubmit() }
 									label={ __( 'Submit' ) }
 									icon={ keyboardReturn }
 									className="block-editor-link-control__search-submit"
