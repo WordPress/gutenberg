@@ -37,6 +37,7 @@ import useBlockNavigator from './use-block-navigator';
 import NavigationPlaceholder from './placeholder';
 import PlaceholderPreview from './placeholder-preview';
 import ResponsiveWrapper from './responsive-wrapper';
+import useTemplatePartEntity from './use-template-part';
 
 const ALLOWED_BLOCKS = [
 	'core/navigation-link',
@@ -119,19 +120,30 @@ function Navigation( {
 	customPlaceholder: CustomPlaceholder = null,
 	customAppender: CustomAppender = null,
 } ) {
-	const {
-		itemsJustification,
-		isResponsive,
-		openSubmenusOnClick,
-		orientation,
-	} = attributes;
-
 	const [ isPlaceholderShown, setIsPlaceholderShown ] = useState(
 		! hasExistingNavItems
 	);
 	const [ isResponsiveMenuOpen, setResponsiveMenuVisibility ] = useState(
 		false
 	);
+
+	const {
+		slug,
+		theme,
+		area: blockArea,
+		itemsJustification,
+		isResponsive,
+		openSubmenusOnClick,
+		orientation,
+	} = attributes;
+
+	const {
+		isResolved,
+		isMissing,
+		area,
+		enableSelection,
+		hasResolvedReplacements,
+	} = useTemplatePartEntity( slug, theme, blockArea );
 
 	const { selectBlock } = useDispatch( blockEditorStore );
 
