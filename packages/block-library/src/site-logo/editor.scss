@@ -94,7 +94,7 @@
 			bottom: 0;
 			left: 0;
 			border: $border-width dashed currentColor;
-			opacity: 0.5;
+			opacity: 0.3;
 			pointer-events: none;
 
 			// Inherit border radius from style variations.
@@ -117,10 +117,25 @@
 			width: $grid-unit-60;
 			height: $grid-unit-60;
 			border-radius: 50%;
+			position: relative;
+			z-index: 1;
 
 			// @todo: needs to be icon button.
 			text-indent: 100%;
 			overflow: hidden;
+		}
+
+		// Style the placeholder illustration.
+		.components-placeholder__illustration {
+			position: absolute;
+			top: 0;
+			right: 0;
+			bottom: 0;
+			left: 0;
+			z-index: 0;
+			stroke: currentColor;
+			stroke-dasharray: 3;
+			opacity: 0.3;
 		}
 	}
 
@@ -134,5 +149,4 @@
 		color: $white;
 		opacity: 1;
 	}
-
 }
