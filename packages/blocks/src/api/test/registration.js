@@ -307,9 +307,7 @@ describe( 'blocks', () => {
 					title: 'block title',
 					icon: { src: BLOCK_ICON_DEFAULT },
 					attributes: {
-						lock: {
-							type: 'object',
-						},
+						...lockAttribute,
 						ok: {
 							type: 'boolean',
 						},
@@ -979,9 +977,7 @@ describe( 'blocks', () => {
 					title: 'block title',
 					icon: { src: BLOCK_ICON_DEFAULT },
 					attributes: {
-						lock: {
-							type: 'object',
-						},
+						...lockAttribute,
 					},
 					providesContext: {},
 					usesContext: [],
@@ -1139,9 +1135,7 @@ describe( 'blocks', () => {
 					title: 'block title',
 					icon: { src: BLOCK_ICON_DEFAULT },
 					attributes: {
-						lock: {
-							type: 'object',
-						},
+						...lockAttribute,
 					},
 					providesContext: {},
 					usesContext: [],
@@ -1158,9 +1152,7 @@ describe( 'blocks', () => {
 					title: 'block title',
 					icon: { src: BLOCK_ICON_DEFAULT },
 					attributes: {
-						lock: {
-							type: 'object',
-						},
+						...lockAttribute,
 					},
 					providesContext: {},
 					usesContext: [],
