@@ -9,14 +9,29 @@ import { css } from '@emotion/react';
 import { COLORS, CONFIG } from '../utils';
 import { space } from '../ui/utils/space';
 
+const toolsPanelGrid = {
+	container: css`
+		column-gap: ${ space( 4 ) };
+		display: grid;
+		grid-template-columns: 1fr 1fr;
+		row-gap: ${ space( 6 ) };
+	`,
+	item: {
+		halfWidth: css`
+			grid-column: span 1;
+		`,
+		fullWidth: css`
+			grid-column: span 2;
+		`,
+	},
+};
+
 export const ToolsPanel = css`
+	${ toolsPanelGrid.container };
+
 	border-top: ${ CONFIG.borderWidth } solid ${ COLORS.gray[ 200 ] };
-	column-gap: ${ space( 4 ) };
-	display: grid;
-	grid-template-columns: 1fr 1fr;
 	margin-top: -1px;
 	padding: ${ space( 4 ) };
-	row-gap: ${ space( 6 ) };
 `;
 
 /**
@@ -26,11 +41,8 @@ export const ToolsPanel = css`
  */
 export const ToolsPanelWithInnerWrapper = css`
 	> div {
-		column-gap: ${ space( 4 ) };
-		display: grid;
-		grid-template-columns: 1fr 1fr;
-		row-gap: ${ space( 6 ) };
-		grid-column: span 2;
+		${ toolsPanelGrid.container }
+		${ toolsPanelGrid.item.fullWidth }
 	}
 `;
 
@@ -45,7 +57,7 @@ export const ToolsPanelHeader = css`
 	display: flex;
 	font-size: inherit;
 	font-weight: 500;
-	grid-column: span 2;
+	${ toolsPanelGrid.item.fullWidth }
 	justify-content: space-between;
 	line-height: normal;
 
@@ -68,10 +80,10 @@ export const ToolsPanelHeader = css`
 `;
 
 export const ToolsPanelItem = css`
-	grid-column: span 2;
+	${ toolsPanelGrid.item.fullWidth }
 
 	&.single-column {
-		grid-column: span 1;
+		${ toolsPanelGrid.item.halfWidth }
 	}
 
 	/* Clear spacing in and around controls added as panel items. */
