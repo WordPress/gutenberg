@@ -123,6 +123,7 @@
 			border-radius: 50%;
 			position: relative;
 			z-index: 1;
+			visibility: hidden;
 
 			// Animation.
 			background: transparent;
@@ -132,6 +133,9 @@
 			// @todo: needs to be icon button.
 			text-indent: 100%;
 			overflow: hidden;
+		}
+		.components-button.components-button > svg {
+			color: $white;
 		}
 
 		// Style the placeholder illustration.
@@ -157,5 +161,6 @@
 		border-style: solid;
 		color: $white;
 		opacity: 1;
+		visibility: visible;
 	}
 }

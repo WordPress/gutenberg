@@ -20,6 +20,7 @@ import {
 	ToggleControl,
 	ToolbarButton,
 	Placeholder,
+	Button,
 } from '@wordpress/components';
 import { useViewportMatch } from '@wordpress/compose';
 import {
@@ -34,7 +35,7 @@ import {
 } from '@wordpress/block-editor';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
-import { crop, siteLogo as icon } from '@wordpress/icons';
+import { crop, siteLogo as icon, upload } from '@wordpress/icons';
 import { SVG, Path } from '@wordpress/primitives';
 
 /**
@@ -470,6 +471,17 @@ export default function LogoEdit( {
 						)
 					}
 					onError={ onUploadError }
+					customMediaLibraryButton={ ( { open } ) => {
+						return (
+							<Button
+								icon={ upload }
+								variant="tertiary"
+								onClick={ () => {
+									open();
+								} }
+							/>
+						);
+					} }
 				>
 					<SVG
 						className="components-placeholder__illustration"

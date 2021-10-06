@@ -76,6 +76,7 @@ export function MediaPlaceholder( {
 	onFilesPreUpload = noop,
 	onHTMLDrop = noop,
 	children,
+	customMediaLibraryButton,
 } ) {
 	const mediaUpload = useSelect( ( select ) => {
 		const { getSettings } = select( blockEditorStore );
@@ -304,6 +305,19 @@ export function MediaPlaceholder( {
 	};
 
 	const renderMediaUploadChecked = () => {
+		const defaultButton = ( { open } ) => {
+			return (
+				<Button
+					variant="tertiary"
+					onClick={ () => {
+						open();
+					} }
+				>
+					{ __( 'Media Library' ) }
+				</Button>
+			);
+		};
+		const libraryButton = customMediaLibraryButton ?? defaultButton;
 		const mediaLibraryButton = (
 			<MediaUpload
 				addToGallery={ addToGallery }
@@ -316,18 +330,7 @@ export function MediaPlaceholder( {
 						? value.map( ( { id } ) => id )
 						: value.id
 				}
-				render={ ( { open } ) => {
-					return (
-						<Button
-							variant="tertiary"
-							onClick={ () => {
-								open();
-							} }
-						>
-							{ __( 'Media Library' ) }
-						</Button>
-					);
-				} }
+				render={ libraryButton }
 			/>
 		);
 
