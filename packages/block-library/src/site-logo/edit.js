@@ -35,7 +35,7 @@ import {
 } from '@wordpress/block-editor';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
-import { crop, trash, siteLogo as icon } from '@wordpress/icons';
+import { crop, reset, siteLogo as icon } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -399,7 +399,7 @@ export default function LogoEdit( {
 				onSelect={ onSelectLogo }
 				onError={ onUploadError }
 			>
-				<MenuItem icon={ trash } onClick={ onRemoveLogo }>
+				<MenuItem icon={ reset } onClick={ onRemoveLogo }>
 					{ __( 'Reset' ) }
 				</MenuItem>
 			</MediaReplaceFlow>
