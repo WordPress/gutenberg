@@ -130,19 +130,24 @@ export function useToolsPanel(
 		}
 	}, [ menuItems.optional ] );
 
-	const hasDefaultMenuItems =
-		menuItems?.default && !! Object.keys( menuItems?.default ).length;
-
-	const wrapperStyle = hasInnerWrapper && styles.ToolsPanelWithInnerWrapper;
-	const emptyStyle =
-		! hasDefaultMenuItems &&
-		areAllOptionalControlsHidden &&
-		styles.ToolsPanelHiddenInnerWrapper;
-
 	const cx = useCx();
 	const classes = useMemo( () => {
+		const hasDefaultMenuItems =
+			menuItems?.default && !! Object.keys( menuItems?.default ).length;
+		const wrapperStyle =
+			hasInnerWrapper && styles.ToolsPanelWithInnerWrapper;
+		const emptyStyle =
+			! hasDefaultMenuItems &&
+			areAllOptionalControlsHidden &&
+			styles.ToolsPanelHiddenInnerWrapper;
+
 		return cx( styles.ToolsPanel, wrapperStyle, emptyStyle, className );
-	}, [ className, emptyStyle, wrapperStyle ] );
+	}, [
+		className,
+		hasInnerWrapper,
+		menuItems,
+		areAllOptionalControlsHidden,
+	] );
 
 	// Toggle the checked state of a menu item which is then used to determine
 	// display of the item within the panel.

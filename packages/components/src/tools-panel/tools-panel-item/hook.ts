@@ -104,13 +104,12 @@ export function useToolsPanelItem(
 		? menuItems?.[ menuGroup ]?.[ label ] !== undefined
 		: isMenuItemChecked;
 
-	const placeholderStyle =
-		shouldRenderPlaceholder &&
-		! isShown &&
-		styles.ToolsPanelItemPlaceholder;
-
 	const cx = useCx();
 	const classes = useMemo( () => {
+		const placeholderStyle =
+			shouldRenderPlaceholder &&
+			! isShown &&
+			styles.ToolsPanelItemPlaceholder;
 		return cx( styles.ToolsPanelItem, placeholderStyle, className );
 	}, [ isShown, shouldRenderPlaceholder, className ] );
 
