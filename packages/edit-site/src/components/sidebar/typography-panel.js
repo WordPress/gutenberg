@@ -154,11 +154,7 @@ export default function TypographyPanel( {
 	};
 
 	return (
-		<ToolsPanel
-			label={ __( 'Typography' ) }
-			resetAll={ resetAll }
-			className="typography-controls"
-		>
+		<ToolsPanel label={ __( 'Typography' ) } resetAll={ resetAll }>
 			{ showFontFamilyControl && (
 				<ToolsPanelItem
 					hasValue={ createHasValueCallback( 'fontFamily' ) }
