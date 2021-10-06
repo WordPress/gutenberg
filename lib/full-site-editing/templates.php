@@ -170,30 +170,39 @@ function template_is_customized( $slug, $template_type = 'wp_template' ) {
 /**
  * Customizes a template or template part for the currently active theme.
  *
- * @param string      $slug      Template or template part identifier.
- * @param int|WP_Post $post      Post ID or object of customized template.
- * @param bool        $overwrite Whether to overwrite existing template. Default true.
+ * @param string      $slug           Template or template part identifier.
+ * @param int|WP_Post $post           Post ID or object of customized template.
+ * @param bool        $overwrite_slug Whether to overwrite existing slug. Default true.
+ * @param bool        $overwrite_post Whether to overwrite existing post. Default true.
  *
- * @return string The identifier of the customized template.
+ * @return string|null The identifier of the customized template, or null if the post is an invalid type.
  */
-function customize_template( $slug, $post, $overwrite = true ) {
+function customize_template( $slug, $post, $overwrite_slug = true, $overwrite_post = true ) {
 	$post = get_post( $post );
 	if ( ! in_array( $post->post_type, array( 'wp_template', 'wp_template_part' ), true ) ) {
-		return;
+		return null;
 	}
 
 	$templates = get_theme_mod( $post->post_type, array() );
 
-	if ( ! $overwrite ) {
-		$original_slug = $slug;
+	while ( in_array( $post->ID, $templates, true ) ) {
+		$existing_slug = array_search( $post->ID, $templates, true );
 
-		if ( template_is_customized( $slug, $post->post_type ) ) {
-			$suffix = 2;
-			do {
-				$slug = _truncate_post_slug( $original_slug, 200 - ( strlen( $suffix ) + 1 ) ) . "-$suffix";
-				$suffix++;
-			} while ( template_is_customized( $slug, $post->post_type ) );
+		if ( ! $overwrite_post || $existing_slug === $slug ) {
+			return $existing_slug;
+		} else {
+			unset( $templates[ $existing_slug ] );
+			set_theme_mod( $post->post_type, $templates );
 		}
+	}
+
+	if ( ! $overwrite_slug && template_is_customized( $slug, $post->post_type ) ) {
+		$original_slug = $slug;
+		$suffix = 2;
+		do {
+			$slug = _truncate_post_slug( $original_slug, 200 - ( strlen( $suffix ) + 1 ) ) . "-$suffix";
+			$suffix++;
+		} while ( template_is_customized( $slug, $post->post_type ) );
 	}
 
 	$templates[ $slug ] = $post->ID;
