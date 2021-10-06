@@ -121,7 +121,11 @@ describe( 'blocks', () => {
 			expect( block ).toEqual( {
 				name: 'my-plugin/fancy-block-4',
 				icon: { src: BLOCK_ICON_DEFAULT },
-				attributes: {},
+				attributes: {
+					lock: {
+						type: 'object',
+					},
+				},
 				providesContext: {},
 				usesContext: [],
 				keywords: [],
@@ -266,7 +270,11 @@ describe( 'blocks', () => {
 				title: 'block title',
 				category: 'text',
 				icon: { src: BLOCK_ICON_DEFAULT },
-				attributes: {},
+				attributes: {
+					lock: {
+						type: 'object',
+					},
+				},
 				providesContext: {},
 				usesContext: [],
 				keywords: [],
@@ -298,6 +306,9 @@ describe( 'blocks', () => {
 					title: 'block title',
 					icon: { src: BLOCK_ICON_DEFAULT },
 					attributes: {
+						lock: {
+							type: 'object',
+						},
 						ok: {
 							type: 'boolean',
 						},
@@ -332,7 +343,11 @@ describe( 'blocks', () => {
 				save: expect.any( Function ),
 				title: 'block title',
 				icon: { src: BLOCK_ICON_DEFAULT },
-				attributes: {},
+				attributes: {
+					lock: {
+						type: 'object',
+					},
+				},
 				providesContext: {},
 				usesContext: [],
 				keywords: [],
@@ -363,7 +378,11 @@ describe( 'blocks', () => {
 				save: expect.any( Function ),
 				title: 'block title',
 				icon: { src: BLOCK_ICON_DEFAULT },
-				attributes: {},
+				attributes: {
+					lock: {
+						type: 'object',
+					},
+				},
 				providesContext: {
 					fontSize: 'fontSize',
 				},
@@ -400,7 +419,11 @@ describe( 'blocks', () => {
 				title: 'block title',
 				category: 'widgets',
 				icon: { src: BLOCK_ICON_DEFAULT },
-				attributes: {},
+				attributes: {
+					lock: {
+						type: 'object',
+					},
+				},
 				providesContext: {},
 				usesContext: [],
 				keywords: [],
@@ -467,7 +490,11 @@ describe( 'blocks', () => {
 						</svg>
 					),
 				},
-				attributes: {},
+				attributes: {
+					lock: {
+						type: 'object',
+					},
+				},
 				providesContext: {},
 				usesContext: [],
 				keywords: [],
@@ -497,7 +524,11 @@ describe( 'blocks', () => {
 				icon: {
 					src: 'foo',
 				},
-				attributes: {},
+				attributes: {
+					lock: {
+						type: 'object',
+					},
+				},
 				providesContext: {},
 				usesContext: [],
 				keywords: [],
@@ -541,7 +572,11 @@ describe( 'blocks', () => {
 				icon: {
 					src: MyTestIcon,
 				},
-				attributes: {},
+				attributes: {
+					lock: {
+						type: 'object',
+					},
+				},
 				providesContext: {},
 				usesContext: [],
 				keywords: [],
@@ -599,7 +634,11 @@ describe( 'blocks', () => {
 						</svg>
 					),
 				},
-				attributes: {},
+				attributes: {
+					lock: {
+						type: 'object',
+					},
+				},
 				providesContext: {},
 				usesContext: [],
 				keywords: [],
@@ -624,7 +663,11 @@ describe( 'blocks', () => {
 				category: 'text',
 				title: 'block title',
 				icon: { src: BLOCK_ICON_DEFAULT },
-				attributes: {},
+				attributes: {
+					lock: {
+						type: 'object',
+					},
+				},
 				providesContext: {},
 				usesContext: [],
 				keywords: [],
@@ -816,7 +859,11 @@ describe( 'blocks', () => {
 					src: 'palmtree',
 				},
 				keywords: [],
-				attributes: {},
+				attributes: {
+					lock: {
+						type: 'object',
+					},
+				},
 				providesContext: {},
 				usesContext: [],
 				supports: {},
@@ -882,7 +929,11 @@ describe( 'blocks', () => {
 					src: 'palmtree',
 				},
 				keywords: [ 'i18n (translated)', 'metadata (translated)' ],
-				attributes: {},
+				attributes: {
+					lock: {
+						type: 'object',
+					},
+				},
 				providesContext: {},
 				usesContext: [],
 				supports: {},
@@ -946,7 +997,11 @@ describe( 'blocks', () => {
 					category: 'text',
 					title: 'block title',
 					icon: { src: BLOCK_ICON_DEFAULT },
-					attributes: {},
+					attributes: {
+						lock: {
+							type: 'object',
+						},
+					},
 					providesContext: {},
 					usesContext: [],
 					keywords: [],
@@ -963,7 +1018,11 @@ describe( 'blocks', () => {
 				category: 'text',
 				title: 'block title',
 				icon: { src: BLOCK_ICON_DEFAULT },
-				attributes: {},
+				attributes: {
+					lock: {
+						type: 'object',
+					},
+				},
 				providesContext: {},
 				usesContext: [],
 				keywords: [],
@@ -1041,7 +1100,11 @@ describe( 'blocks', () => {
 				category: 'text',
 				title: 'block title',
 				icon: { src: BLOCK_ICON_DEFAULT },
-				attributes: {},
+				attributes: {
+					lock: {
+						type: 'object',
+					},
+				},
 				providesContext: {},
 				usesContext: [],
 				keywords: [],
@@ -1065,7 +1128,11 @@ describe( 'blocks', () => {
 				category: 'text',
 				title: 'block title',
 				icon: { src: BLOCK_ICON_DEFAULT },
-				attributes: {},
+				attributes: {
+					lock: {
+						type: 'object',
+					},
+				},
 				providesContext: {},
 				usesContext: [],
 				keywords: [],
@@ -1096,7 +1163,11 @@ describe( 'blocks', () => {
 					category: 'text',
 					title: 'block title',
 					icon: { src: BLOCK_ICON_DEFAULT },
-					attributes: {},
+					attributes: {
+						lock: {
+							type: 'object',
+						},
+					},
 					providesContext: {},
 					usesContext: [],
 					keywords: [],
@@ -1111,7 +1182,11 @@ describe( 'blocks', () => {
 					category: 'text',
 					title: 'block title',
 					icon: { src: BLOCK_ICON_DEFAULT },
-					attributes: {},
+					attributes: {
+						lock: {
+							type: 'object',
+						},
+					},
 					providesContext: {},
 					usesContext: [],
 					keywords: [],
