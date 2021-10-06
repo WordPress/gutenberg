@@ -12,7 +12,6 @@ import { useEffect, useState, useRef } from '@wordpress/element';
 import { __, isRTL } from '@wordpress/i18n';
 import {
 	MenuItem,
-	Notice,
 	PanelBody,
 	RangeControl,
 	ResizableBox,
@@ -38,6 +37,7 @@ import { useSelect, useDispatch } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 import { crop, upload } from '@wordpress/icons';
 import { SVG, Path } from '@wordpress/primitives';
+import { store as noticesStore } from '@wordpress/notices';
 
 /**
  * Internal dependencies
@@ -311,7 +311,6 @@ export default function LogoEdit( {
 } ) {
 	const { width } = attributes;
 	const [ logoUrl, setLogoUrl ] = useState();
-	const [ error, setError ] = useState();
 	const ref = useRef();
 
 	const {
@@ -375,7 +374,6 @@ export default function LogoEdit( {
 		if ( ! media.id && media.url ) {
 			// This is a temporary blob image
 			setLogo( undefined );
-			setError( null );
 			setLogoUrl( media.url );
 			return;
 		}
@@ -388,8 +386,9 @@ export default function LogoEdit( {
 		setLogoUrl( undefined );
 	};
 
+	const { createErrorNotice } = useDispatch( noticesStore );
 	const onUploadError = ( message ) => {
-		setError( message[ 2 ] ? message[ 2 ] : null );
+		createErrorNotice( message[ 2 ], { type: 'snackbar' } );
 	};
 
 	const controls = canUserEdit && logoUrl && (
@@ -441,13 +440,6 @@ export default function LogoEdit( {
 			>
 				<Placeholder
 					className={ placeholderClassName }
-					notices={
-						error && (
-							<Notice status="error" isDismissible={ false }>
-								{ error }
-							</Notice>
-						)
-					}
 					preview={ logoImage }
 				>
 					{
