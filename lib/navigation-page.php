@@ -29,7 +29,7 @@ function gutenberg_navigation_page() {
  * @return string
  */
 function gutenberg_navigation_get_menus_endpoint( $results_per_page = 100 ) {
-	return '/__experimental/menus?' . http_build_query(
+	return '/__experimental/menus?' . build_query(
 		array(
 			'per_page' => $results_per_page,
 			'context'  => 'edit',
@@ -47,7 +47,7 @@ function gutenberg_navigation_get_menus_endpoint( $results_per_page = 100 ) {
  * @return string
  */
 function gutenberg_navigation_get_menu_endpoint( $menu_id ) {
-	return "/__experimental/menus/{$menu_id}?" . http_build_query(
+	return "/__experimental/menus/{$menu_id}?" . build_query(
 		array(
 			'context' => 'edit',
 		)
@@ -64,7 +64,7 @@ function gutenberg_navigation_get_menu_endpoint( $menu_id ) {
  * @return string
  */
 function gutenberg_navigation_get_menu_items_endpoint( $menu_id, $results_per_page = 100 ) {
-	return '/__experimental/menu-items?' . http_build_query(
+	return '/__experimental/menu-items?' . build_query(
 		array(
 			'context'  => 'edit',
 			'menus'    => $menu_id,
@@ -82,7 +82,7 @@ function gutenberg_navigation_get_menu_items_endpoint( $menu_id, $results_per_pa
  * @return string
  */
 function gutenberg_navigation_get_types_endpoint() {
-	return '/wp/v2/types?' . http_build_query(
+	return '/wp/v2/types?' . build_query(
 		array(
 			'context' => 'edit',
 		)
