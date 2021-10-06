@@ -62,8 +62,12 @@ export default function save( { attributes } ) {
 		...( isImageBackground && ! isImgElement
 			? backgroundImageStyles( url )
 			: {} ),
-		backgroundColor: ! overlayColorClass ? customOverlayColor : undefined,
 		minHeight: minHeight || undefined,
+	};
+
+	const bgStyle = {
+		backgroundColor: ! overlayColorClass ? customOverlayColor : undefined,
+		background: customGradient ? customGradient : undefined,
 	};
 
 	const objectPosition =
@@ -99,9 +103,7 @@ export default function save( { attributes } ) {
 						[ gradientClass ]: ! url && gradientClass,
 					}
 				) }
-				style={
-					customGradient ? { background: customGradient } : undefined
-				}
+				style={ bgStyle }
 			/>
 
 			{ isImageBackground && isImgElement && url && (
