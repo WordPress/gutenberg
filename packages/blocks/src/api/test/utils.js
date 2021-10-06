@@ -359,10 +359,10 @@ describe( '__experimentalGetBlockAttributesNamesByRole', () => {
 			'core/test-block-3',
 		].forEach( unregisterBlockType );
 	} );
-	it( 'should return empty array if block has no attributes', () => {
+	it( 'should return lock attribute block has no other attributes', () => {
 		expect(
 			__experimentalGetBlockAttributesNamesByRole( 'core/test-block-3' )
-		).toEqual( [] );
+		).toEqual( [ 'lock' ] );
 	} );
 	it( 'should return all attribute names if no role is provided', () => {
 		expect(

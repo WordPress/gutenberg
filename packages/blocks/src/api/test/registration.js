@@ -44,6 +44,11 @@ describe( 'blocks', () => {
 		category: 'text',
 		title: 'block title',
 	};
+	const lockAttribute = {
+		lock: {
+			type: 'object',
+		},
+	};
 
 	beforeAll( () => {
 		// Initialize the block store.
@@ -122,9 +127,7 @@ describe( 'blocks', () => {
 				name: 'my-plugin/fancy-block-4',
 				icon: { src: BLOCK_ICON_DEFAULT },
 				attributes: {
-					lock: {
-						type: 'object',
-					},
+					...lockAttribute,
 				},
 				providesContext: {},
 				usesContext: [],
@@ -271,9 +274,7 @@ describe( 'blocks', () => {
 				category: 'text',
 				icon: { src: BLOCK_ICON_DEFAULT },
 				attributes: {
-					lock: {
-						type: 'object',
-					},
+					...lockAttribute,
 				},
 				providesContext: {},
 				usesContext: [],
@@ -344,9 +345,7 @@ describe( 'blocks', () => {
 				title: 'block title',
 				icon: { src: BLOCK_ICON_DEFAULT },
 				attributes: {
-					lock: {
-						type: 'object',
-					},
+					...lockAttribute,
 				},
 				providesContext: {},
 				usesContext: [],
@@ -379,9 +378,7 @@ describe( 'blocks', () => {
 				title: 'block title',
 				icon: { src: BLOCK_ICON_DEFAULT },
 				attributes: {
-					lock: {
-						type: 'object',
-					},
+					...lockAttribute,
 				},
 				providesContext: {
 					fontSize: 'fontSize',
@@ -420,9 +417,7 @@ describe( 'blocks', () => {
 				category: 'widgets',
 				icon: { src: BLOCK_ICON_DEFAULT },
 				attributes: {
-					lock: {
-						type: 'object',
-					},
+					...lockAttribute,
 				},
 				providesContext: {},
 				usesContext: [],
@@ -491,9 +486,7 @@ describe( 'blocks', () => {
 					),
 				},
 				attributes: {
-					lock: {
-						type: 'object',
-					},
+					...lockAttribute,
 				},
 				providesContext: {},
 				usesContext: [],
@@ -525,9 +518,7 @@ describe( 'blocks', () => {
 					src: 'foo',
 				},
 				attributes: {
-					lock: {
-						type: 'object',
-					},
+					...lockAttribute,
 				},
 				providesContext: {},
 				usesContext: [],
@@ -573,9 +564,7 @@ describe( 'blocks', () => {
 					src: MyTestIcon,
 				},
 				attributes: {
-					lock: {
-						type: 'object',
-					},
+					...lockAttribute,
 				},
 				providesContext: {},
 				usesContext: [],
@@ -635,9 +624,7 @@ describe( 'blocks', () => {
 					),
 				},
 				attributes: {
-					lock: {
-						type: 'object',
-					},
+					...lockAttribute,
 				},
 				providesContext: {},
 				usesContext: [],
@@ -664,9 +651,7 @@ describe( 'blocks', () => {
 				title: 'block title',
 				icon: { src: BLOCK_ICON_DEFAULT },
 				attributes: {
-					lock: {
-						type: 'object',
-					},
+					...lockAttribute,
 				},
 				providesContext: {},
 				usesContext: [],
@@ -860,9 +845,7 @@ describe( 'blocks', () => {
 				},
 				keywords: [],
 				attributes: {
-					lock: {
-						type: 'object',
-					},
+					...lockAttribute,
 				},
 				providesContext: {},
 				usesContext: [],
@@ -930,9 +913,7 @@ describe( 'blocks', () => {
 				},
 				keywords: [ 'i18n (translated)', 'metadata (translated)' ],
 				attributes: {
-					lock: {
-						type: 'object',
-					},
+					...lockAttribute,
 				},
 				providesContext: {},
 				usesContext: [],
@@ -1019,9 +1000,7 @@ describe( 'blocks', () => {
 				title: 'block title',
 				icon: { src: BLOCK_ICON_DEFAULT },
 				attributes: {
-					lock: {
-						type: 'object',
-					},
+					...lockAttribute,
 				},
 				providesContext: {},
 				usesContext: [],
@@ -1101,9 +1080,7 @@ describe( 'blocks', () => {
 				title: 'block title',
 				icon: { src: BLOCK_ICON_DEFAULT },
 				attributes: {
-					lock: {
-						type: 'object',
-					},
+					...lockAttribute,
 				},
 				providesContext: {},
 				usesContext: [],
@@ -1129,9 +1106,7 @@ describe( 'blocks', () => {
 				title: 'block title',
 				icon: { src: BLOCK_ICON_DEFAULT },
 				attributes: {
-					lock: {
-						type: 'object',
-					},
+					...lockAttribute,
 				},
 				providesContext: {},
 				usesContext: [],
