@@ -10,6 +10,7 @@ For each user feature we should also add a importance categorization label  to i
 -->
 
 ## Unreleased
+-   [*] [Embed block] Fix inline preview cut-off when editing URL [#35321]
 
 ## 1.63.0
 -   [**] [Embed block] Add the top 5 specific embed blocks to the Block inserter list [#34967]

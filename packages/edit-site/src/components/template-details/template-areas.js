@@ -43,10 +43,14 @@ export default function TemplateAreas() {
 		[]
 	);
 
+	if ( ! Object.keys( templateAreaBlocks ).length ) {
+		return null;
+	}
+
 	return (
 		<MenuGroup
 			label={ __( 'Template areas' ) }
-			className="edit-site-template-details__template-areas"
+			className="edit-site-template-details__group edit-site-template-details__template-areas"
 		>
 			{ Object.entries( templateAreaBlocks ).map(
 				( [ area, templateAreaBlock ] ) => (

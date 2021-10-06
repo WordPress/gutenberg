@@ -19,7 +19,7 @@ function ScreenColorPalette( { name } ) {
 			<ScreenHeader
 				back={ parentMenu + '/colors' }
 				title={ __( 'Color Palette' ) }
-				description={ __( 'Manage the color palette of your site' ) }
+				description={ __( 'Edit the color palette.' ) }
 			/>
 			<ColorPalettePanel
 				contextName={ name }

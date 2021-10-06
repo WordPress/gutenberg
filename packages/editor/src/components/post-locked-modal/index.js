@@ -54,7 +54,7 @@ export default function PostLockedModal() {
 			activePostLock: getActivePostLock(),
 			postType: getPostType( getEditedPostAttribute( 'type' ) ),
 		};
-	} );
+	}, [] );
 
 	useEffect( () => {
 		/**

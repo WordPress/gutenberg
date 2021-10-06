@@ -259,6 +259,19 @@ class WP_Theme_JSON_Gutenberg {
 		'filter' => array( 'filter', 'duotone' ),
 	);
 
+	/**
+	 * Protected style properties.
+	 *
+	 * These style properties are only rendered if a setting enables it
+	 * via a value other than `null`.
+	 *
+	 * Each element maps the style property to the corresponding theme.json
+	 * setting key.
+	 */
+	const PROTECTED_PROPERTIES = array(
+		'spacing.blockGap' => array( 'spacing', 'blockGap' ),
+	);
+
 	const ELEMENTS = array(
 		'link' => 'a',
 		'h1'   => 'h1',
@@ -567,11 +580,12 @@ class WP_Theme_JSON_Gutenberg {
 	 * ```
 	 *
 	 * @param array $styles Styles to process.
+	 * @param array $settings Theme settings.
 	 * @param array $properties Properties metadata.
 	 *
 	 * @return array Returns the modified $declarations.
 	 */
-	private static function compute_style_properties( $styles, $properties = self::PROPERTIES_METADATA ) {
+	private static function compute_style_properties( $styles, $settings = array(), $properties = self::PROPERTIES_METADATA ) {
 		$declarations = array();
 		if ( empty( $styles ) ) {
 			return $declarations;
@@ -579,6 +593,18 @@ class WP_Theme_JSON_Gutenberg {
 
 		foreach ( $properties as $css_property => $value_path ) {
 			$value = self::get_property_value( $styles, $value_path );
+
+			// Look up protected properties, keyed by value path.
+			// Skip protected properties that are explicitly set to `null`.
+			if ( is_array( $value_path ) ) {
+				$path_string = implode( '.', $value_path );
+				if (
+					isset( self::PROTECTED_PROPERTIES[ $path_string ] ) &&
+					_wp_array_get( $settings, self::PROTECTED_PROPERTIES[ $path_string ], null ) === null
+				) {
+					continue;
+				}
+			}
 
 			// Skip if empty and not "0" or value represents array of longhand values.
 			$has_missing_value = empty( $value ) && ! is_numeric( $value );
@@ -953,7 +979,8 @@ class WP_Theme_JSON_Gutenberg {
 
 			$node         = _wp_array_get( $this->theme_json, $metadata['path'], array() );
 			$selector     = $metadata['selector'];
-			$declarations = self::compute_style_properties( $node );
+			$settings     = _wp_array_get( $this->theme_json, array( 'settings' ) );
+			$declarations = self::compute_style_properties( $node, $settings );
 			$block_rules .= self::to_ruleset( $selector, $declarations );
 
 			if ( self::ROOT_BLOCK_SELECTOR === $selector ) {
@@ -969,7 +996,7 @@ class WP_Theme_JSON_Gutenberg {
 
 			if ( isset( $metadata['duotone'] ) ) {
 				$selector     = self::scope_selector( $metadata['selector'], $metadata['duotone'] );
-				$declarations = self::compute_style_properties( $node, self::DUOTONE_PROPERTIES_METADATA );
+				$declarations = self::compute_style_properties( $node, $settings, self::DUOTONE_PROPERTIES_METADATA );
 				$block_rules .= self::to_ruleset( $selector, $declarations );
 			}
 		}
