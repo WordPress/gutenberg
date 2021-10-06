@@ -35,7 +35,7 @@ import {
 } from '@wordpress/block-editor';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
-import { crop, siteLogo as icon, upload } from '@wordpress/icons';
+import { crop, upload } from '@wordpress/icons';
 import { SVG, Path } from '@wordpress/primitives';
 
 /**
@@ -405,7 +405,6 @@ export default function LogoEdit( {
 		</BlockControls>
 	);
 
-	const label = __( 'Site Logo' );
 	let logoImage;
 	const isLoading = siteLogoId === undefined || isRequestingMediaItem;
 	if ( isLoading ) {
@@ -427,6 +426,42 @@ export default function LogoEdit( {
 			/>
 		);
 	}
+	const placeholder = ( content ) => {
+		const placeholderClassName = classnames(
+			'block-editor-media-placeholder',
+			className
+		);
+
+		return (
+			<Placeholder
+				className={ placeholderClassName }
+				notices={
+					error && (
+						<Notice status="error" isDismissible={ false }>
+							{ error }
+						</Notice>
+					)
+				}
+				preview={ logoImage }
+			>
+				{
+					<SVG
+						className="components-placeholder__illustration"
+						fill="none"
+						xmlns="http://www.w3.org/2000/svg"
+						viewBox="0 0 60 60"
+					>
+						<Path
+							vectorEffect="non-scaling-stroke"
+							d="m61 32.622-13.555-9.137-15.888 9.859a5 5 0 0 1-5.386-.073l-9.095-5.989L1 37.5"
+						/>
+					</SVG>
+				}
+				{ content }
+			</Placeholder>
+		);
+	};
+
 	const classes = classnames( className, {
 		'is-default-size': ! width,
 	} );
@@ -439,11 +474,7 @@ export default function LogoEdit( {
 			{ controls }
 			{ !! logoUrl && logoImage }
 			{ ! logoUrl && ! canUserEdit && (
-				<Placeholder
-					className="site-logo_placeholder"
-					icon={ icon }
-					label={ label }
-				>
+				<Placeholder className="site-logo_placeholder">
 					{ isLoading && (
 						<span className="components-placeholder__preview">
 							<Spinner />
@@ -453,25 +484,12 @@ export default function LogoEdit( {
 			) }
 			{ ! logoUrl && canUserEdit && (
 				<MediaPlaceholder
-					labels={ {
-						title: label,
-						instructions: __(
-							'Upload an image, or pick one from your media library, to be your site logo'
-						),
-					} }
 					onSelect={ onSelectLogo }
 					accept={ ACCEPT_MEDIA_STRING }
 					allowedTypes={ ALLOWED_MEDIA_TYPES }
-					mediaPreview={ logoImage }
-					notices={
-						error && (
-							<Notice status="error" isDismissible={ false }>
-								{ error }
-							</Notice>
-						)
-					}
 					onError={ onUploadError }
-					customMediaLibraryButton={ ( { open } ) => {
+					placeholder={ placeholder }
+					mediaLibraryButton={ ( { open } ) => {
 						return (
 							<Button
 								icon={ upload }
@@ -482,19 +500,7 @@ export default function LogoEdit( {
 							/>
 						);
 					} }
-				>
-					<SVG
-						className="components-placeholder__illustration"
-						fill="none"
-						xmlns="http://www.w3.org/2000/svg"
-						viewBox="0 0 60 60"
-					>
-						<Path
-							vectorEffect="non-scaling-stroke"
-							d="m61 32.622-13.555-9.137-15.888 9.859a5 5 0 0 1-5.386-.073l-9.095-5.989L1 37.5"
-						/>
-					</SVG>
-				</MediaPlaceholder>
+				/>
 			) }
 		</div>
 	);

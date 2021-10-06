@@ -76,7 +76,8 @@ export function MediaPlaceholder( {
 	onFilesPreUpload = noop,
 	onHTMLDrop = noop,
 	children,
-	customMediaLibraryButton,
+	mediaLibraryButton,
+	placeholder,
 } ) {
 	const mediaUpload = useSelect( ( select ) => {
 		const { getSettings } = select( blockEditorStore );
@@ -179,7 +180,7 @@ export function MediaPlaceholder( {
 		onFilesUpload( event.target.files );
 	};
 
-	const renderPlaceholder = ( content ) => {
+	const defaultRenderPlaceholder = ( content ) => {
 		let { instructions, title } = labels;
 
 		if ( ! mediaUpload && ! onSelectURL ) {
@@ -253,6 +254,7 @@ export function MediaPlaceholder( {
 			</Placeholder>
 		);
 	};
+	const renderPlaceholder = placeholder ?? defaultRenderPlaceholder;
 
 	const renderDropZone = () => {
 		if ( disableDropZone ) {
@@ -317,8 +319,8 @@ export function MediaPlaceholder( {
 				</Button>
 			);
 		};
-		const libraryButton = customMediaLibraryButton ?? defaultButton;
-		const mediaLibraryButton = (
+		const libraryButton = mediaLibraryButton ?? defaultButton;
+		const uploadMediaLibraryButton = (
 			<MediaUpload
 				addToGallery={ addToGallery }
 				gallery={ multiple && onlyAllowsImages() }
@@ -355,7 +357,7 @@ export function MediaPlaceholder( {
 									>
 										{ __( 'Upload' ) }
 									</Button>
-									{ mediaLibraryButton }
+									{ uploadMediaLibraryButton }
 									{ renderUrlSelectionUI() }
 									{ renderCancelLink() }
 								</>
@@ -383,7 +385,7 @@ export function MediaPlaceholder( {
 					>
 						{ __( 'Upload' ) }
 					</FormFileUpload>
-					{ mediaLibraryButton }
+					{ uploadMediaLibraryButton }
 					{ renderUrlSelectionUI() }
 					{ renderCancelLink() }
 				</>
@@ -391,7 +393,7 @@ export function MediaPlaceholder( {
 			return renderPlaceholder( content );
 		}
 
-		return renderPlaceholder( mediaLibraryButton );
+		return renderPlaceholder( uploadMediaLibraryButton );
 	};
 
 	if ( dropZoneUIOnly || disableMediaButtons ) {

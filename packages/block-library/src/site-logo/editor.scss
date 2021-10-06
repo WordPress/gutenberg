@@ -83,7 +83,6 @@
 		}
 
 		// Hide items.
-		.components-placeholder__label,
 		.components-drop-zone__content-text {
 			display: none;
 		}
@@ -122,7 +121,6 @@
 			height: $grid-unit-60;
 			border-radius: 50%;
 			position: relative;
-			z-index: 1;
 			visibility: hidden;
 
 			// Animation.
@@ -145,7 +143,6 @@
 			right: 0;
 			bottom: 0;
 			left: 0;
-			z-index: 0;
 			stroke: currentColor;
 			stroke-dasharray: 3;
 			opacity: 0.3;
