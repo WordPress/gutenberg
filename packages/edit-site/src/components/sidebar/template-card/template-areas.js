@@ -52,7 +52,7 @@ export default function TemplateAreas() {
 				level={ 3 }
 				className="edit-site-template-card__template-areas-title"
 			>
-				{ __( 'Template areas' ) }
+				{ __( 'Areas' ) }
 			</Heading>
 
 			<ul className="edit-site-template-card__template-areas-list">
