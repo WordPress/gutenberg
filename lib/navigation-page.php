@@ -10,10 +10,11 @@
  *
  * @since 7.8.0
  */
-function gutenberg_navigation_page() {  ?>
+function gutenberg_navigation_page() {
+	?>
 	<div
-			id="navigation-editor"
-			class="edit-navigation"
+		id="navigation-editor"
+		class="edit-navigation"
 	>
 	</div>
 	<?php
@@ -110,7 +111,6 @@ function gutenberg_navigation_init( $hook ) {
 	wp_enqueue_style( 'wp-format-library' );
 	do_action( 'enqueue_block_editor_assets' );
 }
-
 add_action( 'admin_enqueue_scripts', 'gutenberg_navigation_init' );
 
 /**
@@ -128,4 +128,3 @@ function gutenberg_navigation_editor_load_block_editor_scripts_and_styles( $is_b
 }
 
 add_filter( 'should_load_block_editor_scripts_and_styles', 'gutenberg_navigation_editor_load_block_editor_scripts_and_styles' );
-
