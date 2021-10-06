@@ -7,20 +7,18 @@ import {
 	__experimentalLetterSpacingControl as LetterSpacingControl,
 	LineHeightControl,
 } from '@wordpress/block-editor';
-import {
-	FontSizePicker,
-	__experimentalRadio as Radio,
-	__experimentalRadioGroup as RadioGroup,
-} from '@wordpress/components';
 import { useState } from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
-import { ToolsPanel, ToolsPanelItem } from '..';
+import FontSizePicker from '../../font-size-picker';
 import Panel from '../../panel';
+import Radio from '../../radio';
+import RadioGroup from '../../radio-group';
 import { ControlLabel } from '../../ui/control-label';
 import { FormGroup } from '../../ui/form-group';
+import { ToolsPanel, ToolsPanelItem } from '..';
 
 // These options match the theme.json typography schema
 const fontFamilies = [
