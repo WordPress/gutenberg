@@ -601,7 +601,16 @@ function gutenberg_multiple_block_styles( $metadata ) {
 		if ( ! empty( $metadata[ $key ] ) && is_array( $metadata[ $key ] ) ) {
 			$default_style = array_shift( $metadata[ $key ] );
 			foreach ( $metadata[ $key ] as $handle ) {
-				wp_enqueue_block_style( $metadata['name'], array( 'handle' => $handle ) );
+				$args = array( 'handle' => $handle );
+				if ( 0 === strpos( $handle, 'file:' ) && isset( $metadata['file'] ) ) {
+					$style_path = remove_block_asset_path_prefix( $handle );
+					$args = array(
+						'handle' => $style_path,
+						'src'    => plugins_url( $style_path, $metadata['file'] ),
+					);
+				}
+
+				wp_enqueue_block_style( $metadata['name'], $args );
 			}
 
 			// Only return the 1st item in the array.
