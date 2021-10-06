@@ -6,7 +6,8 @@ import { RawHTML } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 import { useBlockProps, Warning } from '@wordpress/block-editor';
-import { Disabled } from '@wordpress/components';
+import { Icon, Disabled } from '@wordpress/components';
+import { commentContent } from '@wordpress/icons';
 
 /**
  * Renders the `core/post-comment-content` block on the editor.
@@ -21,7 +22,7 @@ export default function Edit( { context: { commentId } } ) {
 	const blockProps = useBlockProps();
 
 	// Get the comment using a custom selector. This allows us to
-	// check if the comment is ready or not.
+	// check whether the comment is still loading or ready.
 	const { comment, isLoading } = useSelect(
 		( select ) => {
 			const { getEntityRecord, hasFinishedResolution } = select(
@@ -39,10 +40,14 @@ export default function Edit( { context: { commentId } } ) {
 		[ commentId ]
 	);
 
-	// Show a loading message if it's not ready yet. This could/should
-	// be replaced by some kind of placeholder.
+	// Show a placeholder chip if the comment is not ready yet.
 	if ( isLoading ) {
-		return <div { ...blockProps }>Loading...</div>;
+		return (
+			<div { ...blockProps }>
+				<Icon icon={ commentContent } />
+				<p> { __( 'Comment Content' ) }</p>
+			</div>
+		);
 	}
 
 	// Show a sample text when there is no `commentId` in the context.
