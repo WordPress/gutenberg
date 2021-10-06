@@ -10,12 +10,16 @@ For each user feature we should also add a importance categorization label  to i
 -->
 
 ## Unreleased
--   [**] [Embed block] Add the top 5 specific embed blocks to the Block inserter list [#34967]
--   [**] Embed block: Detect when an embeddable URL is pasted into an empty paragraph. [#35204]
+-   [*] [Embed block] Fix inline preview cut-off when editing URL [#35321]
+-   [**] [Embed block] Detect when an embeddable URL is pasted into an empty paragraph. [#35204]
 
-1.62.2
-------
-* Same as 1.62.1 but with the changelog.
+## 1.63.0
+-   [**] [Embed block] Add the top 5 specific embed blocks to the Block inserter list [#34967]
+-   [*] Embed block: Fix URL update when edited after setting a bad URL of a provider [#35013]
+-   [**] Users can now contact support from inside the block editor screen. [#34890]
+
+## 1.62.2
+-   Same as 1.62.1 but with the changelog.
 
 1.62.1
 ------
