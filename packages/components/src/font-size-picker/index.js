@@ -7,21 +7,39 @@ import { isNumber, isString } from 'lodash';
  * WordPress dependencies
  */
 import { __, sprintf } from '@wordpress/i18n';
-import { textColor } from '@wordpress/icons';
-import { useMemo, forwardRef } from '@wordpress/element';
+import { settings } from '@wordpress/icons';
+import { useState, useMemo, forwardRef } from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
 import Button from '../button';
 import RangeControl from '../range-control';
+import { Flex, FlexItem } from '../flex';
 import { default as UnitControl, useCustomUnits } from '../unit-control';
 import CustomSelectControl from '../custom-select-control';
 import { VisuallyHidden } from '../visually-hidden';
 
 const DEFAULT_FONT_SIZE = 'default';
+const DEFAULT_FONT_SIZE_OPTION = {
+	slug: DEFAULT_FONT_SIZE,
+	name: __( 'Default' ),
+};
 const CUSTOM_FONT_SIZE = 'custom';
-const MAX_FONT_SIZE_DISPLAY = '25px';
+const CUSTOM_FONT_SIZE_OPTION = {
+	slug: CUSTOM_FONT_SIZE,
+	name: __( 'Custom' ),
+};
+
+function getSelectedOption( fontSizes, value ) {
+	if ( ! value ) {
+		return DEFAULT_FONT_SIZE_OPTION;
+	}
+	return (
+		fontSizes.find( ( font ) => font.size === value ) ||
+		CUSTOM_FONT_SIZE_OPTION
+	);
+}
 
 function getSelectValueFromFontSize( fontSizes, value ) {
 	if ( value ) {
@@ -36,8 +54,10 @@ function getSelectOptions( optionsArray, disableCustomFontSizes ) {
 		return null;
 	}
 	optionsArray = [
+		// TODO: check what to do with `default` option.
 		{ slug: DEFAULT_FONT_SIZE, name: __( 'Default' ) },
 		...optionsArray,
+		// TODO: check the `custom` one.. probably remove as well
 		...( disableCustomFontSizes
 			? []
 			: [ { slug: CUSTOM_FONT_SIZE, name: __( 'Custom' ) } ] ),
@@ -46,9 +66,7 @@ function getSelectOptions( optionsArray, disableCustomFontSizes ) {
 		key: option.slug,
 		name: option.name,
 		size: option.size,
-		style: {
-			fontSize: `min( ${ option.size }, ${ MAX_FONT_SIZE_DISPLAY } )`,
-		},
+		hint: option.size && parseInt( option.size ),
 	} ) );
 }
 
@@ -60,6 +78,7 @@ function FontSizePicker(
 		onChange,
 		value,
 		withSlider = false,
+		withReset = true,
 	},
 	ref
 ) {
@@ -67,16 +86,13 @@ function FontSizePicker(
 		isString( value ) ||
 		( fontSizes[ 0 ] && isString( fontSizes[ 0 ].size ) );
 
-	let noUnitsValue;
-	if ( ! hasUnits ) {
-		noUnitsValue = value;
-	} else {
-		noUnitsValue = parseInt( value );
-	}
+	const noUnitsValue = ! hasUnits ? value : parseInt( value );
 
+	// TODO: check the below logic
 	const isPixelValue =
 		isNumber( value ) || ( isString( value ) && value.endsWith( 'px' ) );
 
+	// TODO: check to use supplied available font size units
 	const units = useCustomUnits( {
 		availableUnits: [ 'px', 'em', 'rem' ],
 	} );
@@ -84,6 +100,12 @@ function FontSizePicker(
 	const options = useMemo(
 		() => getSelectOptions( fontSizes, disableCustomFontSizes ),
 		[ fontSizes, disableCustomFontSizes ]
+	);
+	const selectedOption = getSelectedOption( fontSizes, value );
+	const isCustomValue = selectedOption.slug === CUSTOM_FONT_SIZE;
+	// const isDefaultValue = selectedOption.slug === DEFAULT_FONT_SIZE;
+	const [ showCustomValueControl, setShowCustomValueControl ] = useState(
+		isCustomValue
 	);
 
 	if ( ! options ) {
@@ -98,16 +120,48 @@ function FontSizePicker(
 		options.find( ( option ) => option.key === selectedFontSizeSlug ).name
 	);
 
+	const baseClassName = 'components-font-size-picker';
+	const getHeaderHint = ( _selectedOption, _showCustomValueControl ) => {
+		if ( _showCustomValueControl ) {
+			return __( 'custom' );
+		}
+		return _selectedOption ? selectedOption.size : 'hi';
+	};
+	const headerHint = getHeaderHint( selectedOption, showCustomValueControl );
 	return (
-		<fieldset
-			className="components-font-size-picker"
-			{ ...( ref ? {} : { ref } ) }
-		>
+		<fieldset className={ baseClassName } { ...( ref ? {} : { ref } ) }>
 			<VisuallyHidden as="legend">{ __( 'Font size' ) }</VisuallyHidden>
-			<div className="components-font-size-picker__controls">
-				{ fontSizes.length > 0 && (
+			<Flex
+				justify="space-between"
+				className={ `${ baseClassName }__header` }
+			>
+				<FlexItem>
+					{ __( 'Size' ) }
+					{ headerHint && (
+						<span className={ `${ baseClassName }__header__hint` }>
+							({ headerHint })
+						</span>
+					) }
+				</FlexItem>
+				{ ! disableCustomFontSizes && (
+					<FlexItem>
+						<Button
+							icon={ settings }
+							onClick={ () => {
+								setShowCustomValueControl(
+									! showCustomValueControl
+								);
+							} }
+							isPressed={ showCustomValueControl }
+							isSmall
+						></Button>
+					</FlexItem>
+				) }
+			</Flex>
+			<div className={ `${ baseClassName }__controls` }>
+				{ fontSizes.length > 0 && ! showCustomValueControl && (
 					<CustomSelectControl
-						className={ 'components-font-size-picker__select' }
+						className={ `${ baseClassName }__select` }
 						label={ __( 'Font size' ) }
 						describedBy={ currentFontSizeSR }
 						options={ options }
@@ -115,49 +169,66 @@ function FontSizePicker(
 							( option ) => option.key === selectedFontSizeSlug
 						) }
 						onChange={ ( { selectedItem } ) => {
-							if ( hasUnits ) {
-								onChange( selectedItem.size );
-							} else {
-								onChange( Number( selectedItem.size ) );
-							}
+							onChange(
+								hasUnits
+									? selectedItem.size
+									: Number( selectedItem.size )
+							);
 						} }
+						hideLabelFromVision
 					/>
 				) }
-				{ ! withSlider && ! disableCustomFontSizes && (
-					<UnitControl
-						label={ __( 'Custom' ) }
-						labelPosition="top"
-						__unstableInputWidth="60px"
-						value={ value }
-						onChange={ ( nextSize ) => {
-							if ( 0 === parseFloat( nextSize ) || ! nextSize ) {
-								onChange( undefined );
-							} else {
-								onChange(
-									hasUnits
-										? nextSize
-										: parseInt( nextSize, 10 )
-								);
-							}
-						} }
-						units={ hasUnits ? units : false }
-					/>
-				) }
-				<Button
-					className="components-color-palette__clear"
-					disabled={ value === undefined }
-					onClick={ () => {
-						onChange( undefined );
-					} }
-					isSmall
-					variant="secondary"
-				>
-					{ __( 'Reset' ) }
-				</Button>
+				{ ! withSlider &&
+					! disableCustomFontSizes &&
+					showCustomValueControl && (
+						<Flex
+							justify="space-between"
+							className={ `${ baseClassName }__custom-size-control` }
+						>
+							<FlexItem isBlock>
+								<UnitControl
+									label={ __( 'Custom' ) }
+									labelPosition="top"
+									hideLabelFromVision
+									value={ value }
+									onChange={ ( nextSize ) => {
+										if (
+											0 === parseFloat( nextSize ) ||
+											! nextSize
+										) {
+											onChange( undefined );
+										} else {
+											onChange(
+												hasUnits
+													? nextSize
+													: parseInt( nextSize, 10 )
+											);
+										}
+									} }
+									units={ hasUnits ? units : false }
+								/>
+							</FlexItem>
+							{ withReset && (
+								<FlexItem isBlock>
+									<Button
+										className="components-color-palette__clear"
+										disabled={ value === undefined }
+										onClick={ () => {
+											onChange( undefined );
+										} }
+										isSmall
+										variant="secondary"
+									>
+										{ __( 'Reset' ) }
+									</Button>
+								</FlexItem>
+							) }
+						</Flex>
+					) }
 			</div>
 			{ withSlider && (
 				<RangeControl
-					className="components-font-size-picker__custom-input"
+					className={ `${ baseClassName }__custom-input` }
 					label={ __( 'Custom Size' ) }
 					value={ ( isPixelValue && noUnitsValue ) || '' }
 					initialPosition={ fallbackFontSize }
@@ -166,8 +237,6 @@ function FontSizePicker(
 					} }
 					min={ 12 }
 					max={ 100 }
-					beforeIcon={ textColor }
-					afterIcon={ textColor }
 				/>
 			) }
 		</fieldset>
