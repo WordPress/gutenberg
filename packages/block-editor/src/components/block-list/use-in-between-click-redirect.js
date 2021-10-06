@@ -83,22 +83,31 @@ function getClosestDescendentElementFromPointInDirection(
  * descendent if descendents are found in more than one direction (so that the
  * point falls in-between descendents).
  *
- * @param {HTMLElement} target Target element to check within.
- * @param {number}      x      X coordinate to check.
- * @param {number}      y      Y coordinate to check.
+ * @param {HTMLElement} target      Target element to check within.
+ * @param {number}      x           X coordinate to check.
+ * @param {number}      y           Y coordinate to check.
+ * @param {string}      orientation Orientation of the block list.
  *
  * @return {HTMLElement|undefined} The closest descendent element if the point
  *                                 is found to be in-between descendents.
  */
-function getClosestInBetweenDescendentElementFromPoint( target, x, y ) {
-	const directions = [
-		[ 1, 0 ],
-		[ 0, 1 ],
-		[ -1, 0 ],
-		[ 0, -1 ],
-	];
+function getClosestInBetweenDescendentElementFromPoint(
+	target,
+	x,
+	y,
+	orientation
+) {
+	const directions =
+		orientation === 'horizontal'
+			? [
+					[ 1, 0 ],
+					[ -1, 0 ],
+			  ]
+			: [
+					[ 0, 1 ],
+					[ 0, -1 ],
+			  ];
 
-	let count = 0;
 	let closestOffset;
 	let closestElement;
 
@@ -116,16 +125,10 @@ function getClosestInBetweenDescendentElementFromPoint( target, x, y ) {
 
 		const [ element, offset ] = result;
 
-		count++;
-
 		if ( ! closestOffset || offset < closestOffset ) {
 			closestOffset = offset;
 			closestElement = element;
 		}
-	}
-
-	if ( count < 2 ) {
-		return;
 	}
 
 	return closestElement;
@@ -137,9 +140,11 @@ function getClosestInBetweenDescendentElementFromPoint( target, x, y ) {
  * focusable elements are easier to focus. The redirect only happens if the
  * click happens in-between two child elements.
  *
+ * @param {string} orientation Orientation of the block list.
+ *
  * @return {Function} Ref callback.
  */
-export function useInBetweenClickRedirect() {
+export function useInBetweenClickRedirect( orientation ) {
 	return useRefEffect( ( node ) => {
 		function onMouseMove( event ) {
 			const { clientX, clientY, target } = event;
@@ -152,7 +157,8 @@ export function useInBetweenClickRedirect() {
 			const closestElement = getClosestInBetweenDescendentElementFromPoint(
 				target,
 				clientX,
-				clientY
+				clientY,
+				orientation
 			);
 
 			if ( ! closestElement ) {

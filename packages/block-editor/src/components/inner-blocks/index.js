@@ -180,10 +180,8 @@ export function useInnerBlocksProps( props = {}, options = {} ) {
 
 	const ref = useMergeRefs( [
 		props.ref,
-		useInBetweenClickRedirect(),
-		useBlockDropZone( {
-			rootClientId: clientId,
-		} ),
+		useInBetweenClickRedirect( props.orientation ),
+		useBlockDropZone( { rootClientId: clientId } ),
 	] );
 
 	const innerBlocksProps = {
