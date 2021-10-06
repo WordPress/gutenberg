@@ -444,7 +444,7 @@ function RichTextWrapper(
 
 			if (
 				__unstableEmbedURLOnPaste &&
-				value?.text?.length === 0 &&
+				isEmpty( value ) &&
 				isURL( plainText.trim() )
 			) {
 				mode = 'BLOCKS';
@@ -474,7 +474,7 @@ function RichTextWrapper(
 				return;
 			} else if (
 				__unstableEmbedURLOnPaste &&
-				value?.text?.length > 0 &&
+				! isEmpty( value ) &&
 				isURL( plainText.trim() )
 			) {
 				onChange( insert( value, create( { text: plainText } ) ) );
