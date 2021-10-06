@@ -101,7 +101,7 @@ export const TypographyPanel = () => {
 		<>
 			<div style={ { maxWidth: '280px' } }>
 				<Panel>
-					<ToolsPanel label="Typography Tools">
+					<ToolsPanel label="Typography">
 						<ToolsPanelItem
 							hasValue={ () => !! fontFamily }
 							label="Font"
