@@ -11,6 +11,15 @@
 	],
 	"textdomain": "default",
 	"attributes": {
+		"slug": {
+			"type": "string"
+		},
+		"theme": {
+			"type": "string"
+		},
+		"area": {
+			"type": "string"
+		},
 		"orientation": {
 			"type": "string",
 			"default": "horizontal"
