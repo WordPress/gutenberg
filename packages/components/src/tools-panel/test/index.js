@@ -153,6 +153,10 @@ const selectMenuItem = async ( label ) => {
 };
 
 describe( 'ToolsPanel', () => {
+	afterEach( () => {
+		controlProps.attributes.value = true;
+	} );
+
 	describe( 'basic rendering', () => {
 		it( 'should render panel', () => {
 			const { container } = renderPanel();
@@ -341,7 +345,6 @@ describe( 'ToolsPanel', () => {
 	describe( 'callbacks on menu item selection', () => {
 		beforeEach( () => {
 			jest.clearAllMocks();
-			controlProps.attributes.value = true;
 		} );
 
 		it( 'should call onDeselect callback when menu item is toggled off', async () => {
@@ -453,11 +456,6 @@ describe( 'ToolsPanel', () => {
 	} );
 
 	describe( 'rendering via SlotFills', () => {
-		beforeEach( () => {
-			jest.clearAllMocks();
-			controlProps.attributes.value = true;
-		} );
-
 		it( 'should maintain visual order of controls when toggled on and off', async () => {
 			// Multiple fills are added to better simulate panel items being
 			// injected from different locations.
