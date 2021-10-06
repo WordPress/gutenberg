@@ -697,7 +697,10 @@ class WP_Theme_JSON_Gutenberg {
 				if ( isset( $preset_metadata['value_key'] ) ) {
 					$value_key = $preset_metadata['value_key'];
 					$value     = $preset[ $value_key ];
-				} elseif ( is_callable( $preset_metadata['value_func'] ) ) {
+				} elseif (
+					isset( $preset_metadata['value_func'] ) &&
+					is_callable( $preset_metadata['value_func'] )
+				) {
 					$value_func = $preset_metadata['value_func'];
 					$value      = call_user_func( $value_func, $preset );
 				} else {
@@ -1310,7 +1313,10 @@ class WP_Theme_JSON_Gutenberg {
 					$value = null;
 					if ( isset( $preset_metadata['value_key'] ) ) {
 						$value = $preset[ $preset_metadata['value_key'] ];
-					} elseif ( isset( $preset_metadata['value_func'] ) ) {
+					} elseif (
+						isset( $preset_metadata['value_func'] ) &&
+						is_callable( $preset_metadata['value_func'] )
+					) {
 						$value = call_user_func( $preset_metadata['value_func'], $preset );
 					}
 
