@@ -24,7 +24,6 @@ import {
 import { useViewportMatch } from '@wordpress/compose';
 import {
 	BlockControls,
-	BlockIcon,
 	InspectorControls,
 	MediaPlaceholder,
 	MediaReplaceFlow,
@@ -452,7 +451,6 @@ export default function LogoEdit( {
 			) }
 			{ ! logoUrl && canUserEdit && (
 				<MediaPlaceholder
-					icon={ <BlockIcon icon={ icon } /> }
 					labels={ {
 						title: label,
 						instructions: __(

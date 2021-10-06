@@ -24,7 +24,6 @@
 		}
 	}
 
-
 	.custom-logo-link {
 		cursor: inherit;
 
@@ -42,24 +41,24 @@
 		height: auto;
 		max-width: 100%;
 	}
+}
 
-	// Placeholder improvements.
+// Provide special styling for the placeholder.
+// Mostly a proof of concept. We likely need to extract these styles
+// to a separate component that more intrinsically inherits block styles
+// and provides the on-hover upload button.
+// That would also let it work with with less specificity.
+.wp-block-site-logo.wp-block-site-logo {
 	.components-placeholder {
-		justify-content: flex-start;
+		justify-content: center;
+		align-items: center;
 		min-height: auto;
+		box-shadow: none;
 		height: 120px;
-		padding: $grid-unit-15;
+		padding: 0;
 
-		// Massage the label.
-		.components-placeholder__label {
-			margin-top: $grid-unit-15;
-			white-space: nowrap;
-		}
-
-		.components-placeholder__label .block-editor-block-icon,
-		.components-placeholder__label > svg {
-			margin-right: $grid-unit-05;
-		}
+		// Inherit border radius from style variations.
+		border-radius: inherit;
 
 		// Hide the upload button, as it's also available in the media library.
 		.components-form-file-upload {
@@ -79,9 +78,61 @@
 			justify-content: center;
 		}
 
-		// Hide drag and drop text.
+		// Hide items.
+		.components-placeholder__label,
 		.components-drop-zone__content-text {
 			display: none;
 		}
+
+		// Draw the dashed outline.
+		&::before {
+			content: "";
+			display: block;
+			position: absolute;
+			top: 0;
+			right: 0;
+			bottom: 0;
+			left: 0;
+			border: $border-width dashed currentColor;
+			opacity: 0.5;
+			pointer-events: none;
+
+			// Inherit border radius from style variations.
+			border-radius: inherit;
+		}
+
+		// Style the upload button.
+		.components-placeholder__fieldset {
+			width: auto;
+		}
+
+		color: currentColor;
+		.components-button.components-button {
+			color: inherit;
+			padding: 0;
+			margin: 0;
+			display: flex;
+			justify-content: center;
+			align-items: center;
+			width: $grid-unit-60;
+			height: $grid-unit-60;
+			border-radius: 50%;
+
+			// @todo: needs to be icon button.
+			text-indent: 100%;
+			overflow: hidden;
+		}
 	}
+
+	// Show upload button on focus/hover.
+	&.is-selected .components-button,
+	.components-placeholder:focus .components-button,
+	.components-placeholder:hover .components-button {
+		background: var(--wp-admin-theme-color);
+		border-color: var(--wp-admin-theme-color);
+		border-style: solid;
+		color: $white;
+		opacity: 1;
+	}
+
 }
