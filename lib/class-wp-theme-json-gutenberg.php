@@ -973,7 +973,8 @@ class WP_Theme_JSON_Gutenberg {
 			$settings     = _wp_array_get( $this->theme_json, array( 'settings' ) );
 			$declarations = self::compute_style_properties( $node, $settings );
 
-			// 1. Separate the ones who use the general selector and the ones who have th
+			// 1. Separate the ones who use the general selector
+			// and the ones who use the duotone selector.
 			$declarations_duotone = array();
 			foreach ( $declarations as $index => $declaration ) {
 				if ( 'filter' === $declaration['name'] ) {
@@ -982,10 +983,10 @@ class WP_Theme_JSON_Gutenberg {
 				}
 			}
 
-			// 2. Generate the general ones.
+			// 2. Generate the rules that use the general selector.
 			$block_rules .= self::to_ruleset( $selector, $declarations );
 
-			// 3. Generate the duotone ones.
+			// 3. Generate the rules that use the duotone selector.
 			if ( isset( $metadata['duotone'] ) && ! empty( $declarations_duotone ) ) {
 				$selector_duotone = self::scope_selector( $metadata['selector'], $metadata['duotone'] );
 				$block_rules     .= self::to_ruleset( $selector_duotone, $declarations_duotone );
