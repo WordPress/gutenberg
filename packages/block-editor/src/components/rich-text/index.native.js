@@ -442,9 +442,10 @@ function RichTextWrapper(
 				mode = 'BLOCKS';
 			}
 
+			const isPastedURL = isURL( plainText.trim() );
 			// When an URL is pasted in an empty paragraph then the EmbedHandlerPicker should showcase options allowing the transformation of that URL
 			// into either an Embed block or a link within the target paragraph. If the paragraph is non-empty, the URL is pasted as text.
-			if ( __unstableEmbedURLOnPaste && isURL( plainText.trim() ) ) {
+			if ( __unstableEmbedURLOnPaste && isPastedURL ) {
 				onChange( insert( value, create( { text: plainText } ) ) );
 
 				if ( ! isEmpty( value ) ) {
@@ -472,7 +473,6 @@ function RichTextWrapper(
 					createLink: () =>
 						createLinkInParagraph( plainText.trim(), onReplace ),
 				} );
-				
 				return;
 			}
 
@@ -501,7 +501,9 @@ function RichTextWrapper(
 
 				onChange( insert( value, valueToInsert ) );
 			} else if ( content.length > 0 ) {
-				if ( onReplace && isEmpty( value ) ) {
+				if ( isPastedURL ) {
+					onChange( insert( value, create( { text: plainText } ) ) );
+				} else if ( onReplace && isEmpty( value ) ) {
 					onReplace( content, content.length - 1, -1 );
 				} else {
 					splitValue( value, content );
