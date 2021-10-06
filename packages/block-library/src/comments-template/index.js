@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 // XXX: update the icon
-import { layout } from '@wordpress/icons';
+import { postComments as icon } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -15,7 +15,7 @@ const { name } = metadata;
 export { metadata, name };
 
 export const settings = {
-	icon: layout,
+	icon,
 	edit,
 	save,
 };

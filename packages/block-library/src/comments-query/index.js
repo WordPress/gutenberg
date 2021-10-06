@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 // XXX: Make a real icon here
-import { loop as icon } from '@wordpress/icons';
+import { postComments as icon } from '@wordpress/icons';
 
 /**
  * Internal dependencies
