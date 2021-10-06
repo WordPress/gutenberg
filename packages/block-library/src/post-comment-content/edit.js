@@ -3,7 +3,8 @@
  */
 import { __ } from '@wordpress/i18n';
 import { RawHTML } from '@wordpress/element';
-import { useEntityProp } from '@wordpress/core-data';
+import { useSelect } from '@wordpress/data';
+import { store as coreStore } from '@wordpress/core-data';
 import { useBlockProps, Warning } from '@wordpress/block-editor';
 import { Disabled } from '@wordpress/components';
 
@@ -18,33 +19,56 @@ import { Disabled } from '@wordpress/components';
  */
 export default function Edit( { context: { commentId } } ) {
 	const blockProps = useBlockProps();
-	const [ content ] = useEntityProp(
-		'root',
-		'comment',
-		'content',
-		commentId
+
+	// Get the comment using a custom selector. This allows us to
+	// check if the comment is ready or not.
+	const { comment, isLoading } = useSelect(
+		( select ) => {
+			const { getEntityRecord, hasFinishedResolution } = select(
+				coreStore
+			);
+			const queryArgs = [ 'root', 'comment', commentId ];
+			return {
+				comment: getEntityRecord( ...queryArgs ),
+				isLoading: ! hasFinishedResolution(
+					'getEntityRecord',
+					queryArgs
+				),
+			};
+		},
+		[ commentId ]
 	);
 
-	// Show a placeholder when there is no context.
+	// Show a loading message if it's not ready yet. This could/should
+	// be replaced by some kind of placeholder.
+	if ( isLoading ) {
+		return <div { ...blockProps }>Loading...</div>;
+	}
+
+	// Show a sample text when there is no `commentId` in the context.
 	if ( ! commentId ) {
 		return (
 			<div { ...blockProps }>{ __( 'The content of the comment.' ) }</div>
 		);
 	}
 
-	// Show a warning message when the specified comment has no content.
-	if ( ! content?.rendered ) {
+	// Show a warning message when the comment does not exist.
+	if ( ! comment ) {
 		return (
 			<div { ...blockProps }>
-				<Warning>{ __( 'Comment has no content.' ) }</Warning>
+				<Warning>
+					{ __( 'The specified comment does not exist.' ) }
+				</Warning>
 			</div>
 		);
 	}
 
+	// At this point, comment should exist and have a content attribute.
+	// Using the optional chaining operator just to avoid possible errors.
 	return (
 		<div { ...blockProps }>
 			<Disabled>
-				<RawHTML key="html">{ content.rendered }</RawHTML>
+				<RawHTML key="html">{ comment.content?.rendered }</RawHTML>
 			</Disabled>
 		</div>
 	);
