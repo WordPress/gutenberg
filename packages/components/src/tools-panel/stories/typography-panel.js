@@ -14,10 +14,10 @@ import { useState } from '@wordpress/element';
  */
 import FontSizePicker from '../../font-size-picker';
 import Panel from '../../panel';
-import Radio from '../../radio';
-import RadioGroup from '../../radio-group';
-import { ControlLabel } from '../../ui/control-label';
-import { FormGroup } from '../../ui/form-group';
+import {
+	ToggleGroupControl,
+	ToggleGroupControlOption,
+} from '../../toggle-group-control';
 import { ToolsPanel, ToolsPanelItem } from '..';
 
 // These options match the theme.json typography schema
@@ -71,20 +71,20 @@ const fontSizes = [
 
 const LetterCaseControl = ( props ) => {
 	return (
-		<FormGroup>
-			<ControlLabel>Letter Case</ControlLabel>
-			<RadioGroup label="Letter Case" { ...props }>
-				<Radio value="uppercase" aria-label="Uppercase">
-					AB
-				</Radio>
-				<Radio value="lowercase" aria-label="Lowercase">
-					ab
-				</Radio>
-				<Radio value="capitalize" aria-label="Capitalize">
-					Ab
-				</Radio>
-			</RadioGroup>
-		</FormGroup>
+		<ToggleGroupControl label="Letter Case" isBlock={ true } { ...props }>
+			{ [
+				{ value: 'uppercase', ariaLabel: 'Uppercase', label: 'AB' },
+				{ value: 'lowercase', ariaLabel: 'Lowercase', label: 'ab' },
+				{ value: 'capitalize', ariaLabel: 'Capitalize', label: 'Ab' },
+			].map( ( { value, ariaLabel, label } ) => (
+				<ToggleGroupControlOption
+					key={ value }
+					label={ label }
+					aria-label={ ariaLabel }
+					value={ value }
+				/>
+			) ) }
+		</ToggleGroupControl>
 	);
 };
 
@@ -184,7 +184,7 @@ export const TypographyPanel = () => {
 						>
 							<LetterCaseControl
 								onChange={ setTextTransform }
-								checked={ textTransform }
+								value={ textTransform }
 							/>
 						</ToolsPanelItem>
 					</ToolsPanel>
