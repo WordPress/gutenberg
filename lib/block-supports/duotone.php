@@ -301,9 +301,9 @@ function gutenberg_render_duotone_filter_preset( $preset ) {
 					"
 				/>
 				<feComponentTransfer color-interpolation-filters="sRGB" >
-					<feFuncR type="<?php echo $duotone_type; ?>" tableValues="<?php echo esc_attr( implode( ' ', $duotone_values['r'] ) ); ?>" />
-					<feFuncG type="<?php echo $duotone_type; ?>" tableValues="<?php echo esc_attr( implode( ' ', $duotone_values['g'] ) ); ?>" />
-					<feFuncB type="<?php echo $duotone_type; ?>" tableValues="<?php echo esc_attr( implode( ' ', $duotone_values['b'] ) ); ?>" />
+					<feFuncR type="<?php echo esc_attr( $duotone_type ); ?>" tableValues="<?php echo esc_attr( implode( ' ', $duotone_values['r'] ) ); ?>" />
+					<feFuncG type="<?php echo esc_attr( $duotone_type ); ?>" tableValues="<?php echo esc_attr( implode( ' ', $duotone_values['g'] ) ); ?>" />
+					<feFuncB type="<?php echo esc_attr( $duotone_type ); ?>" tableValues="<?php echo esc_attr( implode( ' ', $duotone_values['b'] ) ); ?>" />
 				</feComponentTransfer>
 			</filter>
 		</defs>
