@@ -119,6 +119,13 @@ function Navigation( {
 	customPlaceholder: CustomPlaceholder = null,
 	customAppender: CustomAppender = null,
 } ) {
+	const {
+		itemsJustification,
+		isResponsive,
+		openSubmenusOnClick,
+		orientation,
+	} = attributes;
+
 	const [ isPlaceholderShown, setIsPlaceholderShown ] = useState(
 		! hasExistingNavItems
 	);
@@ -133,9 +140,9 @@ function Navigation( {
 	const blockProps = useBlockProps( {
 		ref: navRef,
 		className: classnames( className, {
-			[ `items-justified-${ attributes.itemsJustification }` ]: attributes.itemsJustification,
-			'is-vertical': attributes.orientation === 'vertical',
-			'is-responsive': attributes.isResponsive,
+			[ `items-justified-${ itemsJustification }` ]: itemsJustification,
+			'is-vertical': orientation === 'vertical',
+			'is-responsive': isResponsive,
 			'has-text-color': !! textColor.color || !! textColor?.class,
 			[ getColorClassName(
 				'color',
@@ -176,14 +183,13 @@ function Navigation( {
 			allowedBlocks: ALLOWED_BLOCKS,
 			__experimentalDefaultBlock: DEFAULT_BLOCK,
 			__experimentalDirectInsert: DIRECT_INSERT,
-			orientation: attributes.orientation,
+			orientation,
 			renderAppender: CustomAppender || appender,
 
 			// Ensure block toolbar is not too far removed from item
 			// being edited when in vertical mode.
 			// see: https://github.com/WordPress/gutenberg/pull/34615.
-			__experimentalCaptureToolbars:
-				attributes.orientation !== 'vertical',
+			__experimentalCaptureToolbars: orientation !== 'vertical',
 			// Template lock set to false here so that the Nav
 			// Block on the experimental menus screen does not
 			// inherit templateLock={ 'all' }.
@@ -246,7 +252,7 @@ function Navigation( {
 	}
 
 	const justifyAllowedControls =
-		attributes.orientation === 'vertical'
+		orientation === 'vertical'
 			? [ 'left', 'center', 'right' ]
 			: [ 'left', 'center', 'right', 'space-between' ];
 
@@ -255,7 +261,7 @@ function Navigation( {
 			<BlockControls>
 				{ hasItemJustificationControls && (
 					<JustifyToolbar
-						value={ attributes.itemsJustification }
+						value={ itemsJustification }
 						allowedControls={ justifyAllowedControls }
 						onChange={ ( value ) =>
 							setAttributes( { itemsJustification: value } )
@@ -273,7 +279,7 @@ function Navigation( {
 				{ hasSubmenuIndicatorSetting && (
 					<PanelBody title={ __( 'Display settings' ) }>
 						<ToggleControl
-							checked={ attributes.isResponsive }
+							checked={ isResponsive }
 							onChange={ ( value ) => {
 								setAttributes( {
 									isResponsive: value,
@@ -282,7 +288,7 @@ function Navigation( {
 							label={ __( 'Enable responsive menu' ) }
 						/>
 						<ToggleControl
-							checked={ attributes.openSubmenusOnClick }
+							checked={ openSubmenusOnClick }
 							onChange={ ( value ) => {
 								setAttributes( {
 									openSubmenusOnClick: value,
@@ -352,7 +358,7 @@ function Navigation( {
 					id={ clientId }
 					onToggle={ setResponsiveMenuVisibility }
 					isOpen={ isResponsiveMenuOpen }
-					isResponsive={ attributes.isResponsive }
+					isResponsive={ isResponsive }
 				>
 					<div { ...innerBlocksProps }></div>
 				</ResponsiveWrapper>
