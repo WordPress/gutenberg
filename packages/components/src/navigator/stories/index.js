@@ -30,6 +30,10 @@ const MyNavigation = () => (
 				Navigate to child screen.
 			</NavigatorButton>
 
+			<NavigatorButton isPrimary path="/overflow-child">
+				Navigate to a screen with horizontal overflow.
+			</NavigatorButton>
+
 			<Flyout
 				trigger={ <Button>Click top open test dialog</Button> }
 				placement="bottom-start"
@@ -44,6 +48,27 @@ const MyNavigation = () => (
 			<NavigatorButton isPrimary path="/" isBack>
 				Go back
 			</NavigatorButton>
+		</NavigatorScreen>
+		<NavigatorScreen path="/overflow-child">
+			<NavigatorButton isPrimary path="/" isBack>
+				Go back
+			</NavigatorButton>
+			<div
+				style={ {
+					display: 'inline-block',
+					background: 'papayawhip',
+				} }
+			>
+				<span
+					style={ {
+						color: 'palevioletred',
+						'white-space': 'nowrap',
+						'font-size': '42vw',
+					} }
+				>
+					¯\_(ツ)_/¯
+				</span>
+			</div>
 		</NavigatorScreen>
 	</NavigatorProvider>
 );
