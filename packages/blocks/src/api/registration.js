@@ -12,6 +12,7 @@ import {
 	isObject,
 	isPlainObject,
 	isString,
+	has,
 	mapKeys,
 	omit,
 	pick,
@@ -363,6 +364,17 @@ export function registerBlockType( blockNameOrMetadata, settings ) {
 				'The icon should be a string, an element, a function, or an object following the specifications documented in https://developer.wordpress.org/block-editor/developers/block-api/block-registration/#icon-optional'
 		);
 		return;
+	}
+
+	// Handle `lock` as a "build-in" attribute.
+	// But allow blocks to specify their own with defaults.
+	if ( ! has( settings.attributes, [ 'lock', 'type' ] ) ) {
+		settings.attributes = {
+			...settings.attributes,
+			lock: {
+				type: 'object',
+			},
+		};
 	}
 
 	dispatch( blocksStore ).addBlockTypes( settings );
