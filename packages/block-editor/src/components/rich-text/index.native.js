@@ -472,6 +472,13 @@ function RichTextWrapper(
 				onChange( insert( value, create( { text: plainText } ) ) );
 
 				return;
+			} else if (
+				__unstableEmbedURLOnPaste &&
+				value?.text?.length > 0 &&
+				isURL( plainText.trim() )
+			) {
+				onChange( insert( value, create( { text: plainText } ) ) );
+				return;
 			}
 
 			const content = pasteHandler( {
