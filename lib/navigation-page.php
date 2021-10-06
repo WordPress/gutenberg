@@ -23,6 +23,8 @@ function gutenberg_navigation_page() {
 /**
  * This function returns an url for the /__experimental/menus endpoint
  *
+ * @since 11.6.0
+ *
  * @param  int $results_per_page
  * @return string
  */
@@ -39,6 +41,8 @@ function gutenberg_navigation_get_menus_endpoint( $results_per_page = 100 ) {
 /**
  * This function returns an url for the /__experimental/menus/<menu_id> endpoint
  *
+ * @since 11.6.0
+ *
  * @param  int $menu_id
  * @return string
  */
@@ -52,6 +56,8 @@ function gutenberg_navigation_get_menu_endpoint( $menu_id ) {
 
 /**
  * This function returns an url for the /__experimental/menu-items endpoint
+ *
+ * @since 11.6.0
  *
  * @param int $menu_id
  * @param int $results_per_page
@@ -70,6 +76,8 @@ function gutenberg_navigation_get_menu_items_endpoint( $menu_id, $results_per_pa
 
 /**
  * This function returns an url for the /wp/v2/types endpoint
+ *
+ * @since 11.6.0
  *
  * @return string
  */
