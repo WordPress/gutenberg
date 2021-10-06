@@ -12,6 +12,7 @@ import {
 	applyFormat,
 	useAnchorRef,
 	removeFormat,
+	slice,
 } from '@wordpress/rich-text';
 import {
 	__experimentalLinkControl as LinkControl,
@@ -24,6 +25,57 @@ import { useSelect } from '@wordpress/data';
  */
 import { createLinkFormat, isValidHref } from './utils';
 import { link as settings } from './index';
+/**
+ * External dependencies
+ */
+import { find } from 'lodash';
+
+function getFormatBoundary(
+	value,
+	format,
+	startIndex = value.start,
+	endIndex = value.end
+) {
+	const { formats } = value;
+	const newFormats = formats.slice();
+
+	const startFormat = find( newFormats[ startIndex ], {
+		type: format.type,
+	} );
+
+	if ( ! startFormat ) {
+		return {
+			start: null,
+			end: null,
+		};
+	}
+
+	const index = newFormats[ startIndex ].indexOf( startFormat );
+
+	// Walk "backwards" until the start/leading "edge" of the matching format.
+	while (
+		newFormats[ startIndex ] &&
+		newFormats[ startIndex ][ index ] === startFormat
+	) {
+		startIndex--;
+	}
+
+	endIndex++;
+
+	// Walk "forwards" until the end/trailing "edge" of the matching format.
+	while (
+		newFormats[ endIndex ] &&
+		newFormats[ endIndex ][ index ] === startFormat
+	) {
+		endIndex++;
+	}
+
+	// Return the indicies of the "edges" as the boundaries.
+	return {
+		start: startIndex + 1,
+		end: endIndex,
+	};
+}
 
 function InlineLinkUI( {
 	isActive,
@@ -35,6 +87,23 @@ function InlineLinkUI( {
 	stopAddingLink,
 	contentRef,
 } ) {
+	let formatStart = value.start;
+	let formatEnd = value.end;
+
+	// If there is no selection then manually find the boundary
+	// of the link.
+	if ( isCollapsed( value ) ) {
+		const boundary = getFormatBoundary( value, {
+			type: 'core/link',
+		} );
+
+		formatStart = boundary.start;
+		formatEnd = boundary.end;
+	}
+
+	// Grab the text content from the link format.
+	const { text = null } = slice( value, formatStart, formatEnd );
+
 	/**
 	 * Pending settings to be applied to the next link. When inserting a new
 	 * link, toggle values cannot be applied immediately, because there is not
@@ -60,6 +129,7 @@ function InlineLinkUI( {
 		type: activeAttributes.type,
 		id: activeAttributes.id,
 		opensInNewTab: activeAttributes.target === '_blank',
+		text,
 		...nextLinkValue,
 	};
 
@@ -109,8 +179,9 @@ function InlineLinkUI( {
 			opensInNewWindow: nextValue.opensInNewTab,
 		} );
 
+		const newText = nextValue?.title || nextValue.title || newUrl;
+
 		if ( isCollapsed( value ) && ! isActive ) {
-			const newText = nextValue.title || newUrl;
 			const toInsert = applyFormat(
 				create( { text: newText } ),
 				format,
@@ -193,6 +264,7 @@ function InlineLinkUI( {
 				createSuggestion={ createPageEntity && handleCreate }
 				withCreateSuggestion={ userCanCreatePages }
 				createSuggestionButtonText={ createButtonText }
+				hasTextControl
 			/>
 		</Popover>
 	);
