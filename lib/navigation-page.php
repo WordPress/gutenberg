@@ -25,7 +25,7 @@ function gutenberg_navigation_page() {
  *
  * @since 11.6.0
  *
- * @param  int $results_per_page
+ * @param  int $results_per_page Results per page.
  * @return string
  */
 function gutenberg_navigation_get_menus_endpoint( $results_per_page = 100 ) {
@@ -43,7 +43,7 @@ function gutenberg_navigation_get_menus_endpoint( $results_per_page = 100 ) {
  *
  * @since 11.6.0
  *
- * @param  int $menu_id
+ * @param  int $menu_id Menu ID.
  * @return string
  */
 function gutenberg_navigation_get_menu_endpoint( $menu_id ) {
@@ -59,8 +59,8 @@ function gutenberg_navigation_get_menu_endpoint( $menu_id ) {
  *
  * @since 11.6.0
  *
- * @param int $menu_id
- * @param int $results_per_page
+ * @param int $menu_id Menu ID.
+ * @param int $results_per_page Results per page.
  * @return string
  */
 function gutenberg_navigation_get_menu_items_endpoint( $menu_id, $results_per_page = 100 ) {
