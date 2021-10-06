@@ -442,6 +442,8 @@ function RichTextWrapper(
 				mode = 'BLOCKS';
 			}
 
+			// When an URL is pasted in an empty paragraph then the EmbedHandlerPicker should showcase options allowing the transformation of that URL
+			// into either an Embed block or a link within the target paragraph. If the paragraph is non-empty, the URL is pasted as text.
 			if (
 				__unstableEmbedURLOnPaste &&
 				isEmpty( value ) &&
