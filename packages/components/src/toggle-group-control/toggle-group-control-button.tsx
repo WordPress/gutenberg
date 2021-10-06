@@ -56,7 +56,7 @@ function ToggleGroupControlButton( {
 					{ label }
 				</LabelPlaceholderView>
 			</Radio>
-			<ToggleGroupControlSeparator isActive={ ! showSeparator } />
+			<ToggleGroupControlSeparator isActive={ isActive && ! showSeparator } />
 		</LabelView>
 	);
 }
