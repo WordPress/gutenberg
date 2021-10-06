@@ -656,8 +656,8 @@ describe( 'Navigation', () => {
 		// Now try inserting another Link block via the quick inserter.
 		await page.click( '.wp-block-navigation .block-list-appender' );
 
-		const [ linkButton ] = await page.$x(
-			"//*[contains(@class, 'block-editor-inserter__quick-inserter')]//*[text()='Custom Link']"
+		const linkButton = await page.waitForSelector(
+			'.block-editor-inserter__quick-inserter .editor-block-list-item-navigation-link'
 		);
 		await linkButton.click();
 
