@@ -30,7 +30,7 @@ export function useHasTypographyPanel( name ) {
 function useHasLineHeightControl( name ) {
 	const supports = getSupportedGlobalStylesPanels( name );
 	return (
-		useSetting( 'typography.customLineHeight', name ) &&
+		useSetting( 'typography.customLineHeight', name )[ 0 ] &&
 		supports.includes( 'lineHeight' )
 	);
 }
@@ -38,10 +38,10 @@ function useHasLineHeightControl( name ) {
 function useHasAppearanceControl( name ) {
 	const supports = getSupportedGlobalStylesPanels( name );
 	const hasFontStyles =
-		useSetting( 'typography.customFontStyle', name ) &&
+		useSetting( 'typography.customFontStyle', name )[ 0 ] &&
 		supports.includes( 'fontStyle' );
 	const hasFontWeights =
-		useSetting( 'typography.customFontWeight', name ) &&
+		useSetting( 'typography.customFontWeight', name )[ 0 ] &&
 		supports.includes( 'fontWeight' );
 	return hasFontStyles || hasFontWeights;
 }
@@ -49,7 +49,7 @@ function useHasAppearanceControl( name ) {
 function useHasLetterSpacingControl( name ) {
 	const supports = getSupportedGlobalStylesPanels( name );
 	return (
-		useSetting( 'typography.customLetterSpacing', name ) &&
+		useSetting( 'typography.customLetterSpacing', name )[ 0 ] &&
 		supports.includes( 'letterSpacing' )
 	);
 }

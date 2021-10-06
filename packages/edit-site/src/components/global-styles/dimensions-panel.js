@@ -28,21 +28,21 @@ export function useHasDimensionsPanel( name ) {
 
 function useHasPadding( name ) {
 	const supports = getSupportedGlobalStylesPanels( name );
-	const settings = useSetting( 'spacing.customPadding', name );
+	const [ settings ] = useSetting( 'spacing.customPadding', name );
 
 	return settings && supports.includes( 'padding' );
 }
 
 function useHasMargin( name ) {
 	const supports = getSupportedGlobalStylesPanels( name );
-	const settings = useSetting( 'spacing.customMargin', name );
+	const [ settings ] = useSetting( 'spacing.customMargin', name );
 
 	return settings && supports.includes( 'margin' );
 }
 
 function useHasGap( name ) {
 	const supports = getSupportedGlobalStylesPanels( name );
-	const settings = useSetting( 'spacing.blockGap', name );
+	const [ settings ] = useSetting( 'spacing.blockGap', name );
 
 	return settings && supports.includes( '--wp--style--block-gap' );
 }
