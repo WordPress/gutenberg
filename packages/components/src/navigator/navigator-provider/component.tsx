@@ -8,7 +8,7 @@ import { css } from '@emotion/react';
 /**
  * WordPress dependencies
  */
-import { useState } from '@wordpress/element';
+import { useMemo, useState } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -38,7 +38,12 @@ function NavigatorProvider(
 		path: initialPath,
 	} );
 
-	const classes = useCx()( css( { overflowX: 'hidden' } ), className );
+	const cx = useCx();
+	const classes = useMemo(
+		// Prevents horizontal overflow while animating screen transitions
+		() => cx( css( { overflowX: 'hidden' } ), className ),
+		[ className ]
+	);
 
 	return (
 		<View ref={ forwardedRef } className={ classes } { ...otherProps }>
