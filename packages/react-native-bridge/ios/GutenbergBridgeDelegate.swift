@@ -27,6 +27,10 @@ public enum Capabilities: String {
     case reusableBlock
     case editorOnboarding
     case firstGutenbergEditorSession
+    case facebookEmbed
+    case instagramEmbed
+    case loomEmbed
+    case smartframeEmbed
 }
 
 /// Wrapper for single block data
