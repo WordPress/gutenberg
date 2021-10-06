@@ -120,6 +120,11 @@
 			position: relative;
 			z-index: 1;
 
+			// Animation.
+			background: transparent;
+			transition: all 0.1s linear;
+			@include reduce-motion("transition");
+
 			// @todo: needs to be icon button.
 			text-indent: 100%;
 			overflow: hidden;
