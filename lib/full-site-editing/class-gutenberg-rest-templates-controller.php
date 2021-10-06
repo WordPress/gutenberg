@@ -351,9 +351,6 @@ class Gutenberg_REST_Templates_Controller extends WP_REST_Controller {
 			$changes->ID          = $template->wp_id;
 			$changes->post_status = 'publish';
 		}
-		if ( null !== $template && 'custom' !== $template->source ) {
-			$changes->post_name = $template->slug;
-		}
 		if ( isset( $request['content'] ) ) {
 			$changes->post_content = $request['content'];
 		} elseif ( null !== $template && 'custom' !== $template->source ) {
@@ -371,13 +368,12 @@ class Gutenberg_REST_Templates_Controller extends WP_REST_Controller {
 		}
 
 		if ( 'wp_template_part' === $this->post_type ) {
-			$changes->tax_input = array();
 			if ( isset( $request['area'] ) ) {
-				$changes->tax_input['wp_template_part_area'] = gutenberg_filter_template_part_area( $request['area'] );
+				$changes->tax_input = array( 'wp_template_part_area' => gutenberg_filter_template_part_area( $request['area'] ) );
 			} elseif ( null !== $template && 'custom' !== $template->source && $template->area ) {
-				$changes->tax_input['wp_template_part_area'] = gutenberg_filter_template_part_area( $template->area );
+				$changes->tax_input = array( 'wp_template_part_area' => gutenberg_filter_template_part_area( $template->area ) );
 			} elseif ( ! $template->area ) {
-				$changes->tax_input['wp_template_part_area'] = WP_TEMPLATE_PART_AREA_UNCATEGORIZED;
+				$changes->tax_input = array( 'wp_template_part_area' => WP_TEMPLATE_PART_AREA_UNCATEGORIZED );
 			}
 		}
 
