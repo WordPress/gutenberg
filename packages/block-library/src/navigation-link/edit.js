@@ -221,10 +221,11 @@ export const updateNavigationLinkBlockAttributes = (
 		kind: originalKind = '',
 		type: originalType = '',
 	} = blockAttributes;
+
 	const {
-		title = '',
+		title = '', // the title of any provided Post.
 		url = '',
-		text = '',
+		text = '', // provided by text input on LinkControl
 		opensInNewTab,
 		id,
 		kind: newKind = originalKind,
@@ -239,12 +240,10 @@ export const updateNavigationLinkBlockAttributes = (
 
 	let label;
 
-	if ( text ) {
-		label = text;
-	} else if ( text === '' ) {
-		// If the user deliberately cleared out the link text
-		// then reset to default to the URL.
-		label = escape( normalizedURL );
+	// If user provided text via LinkControl then use that.
+	// Otherwise fallback to the link title or URL.
+	if ( text?.trim()?.length ) {
+		label = escape( text );
 	} else {
 		label = escapeTitle
 			? escape( title )
