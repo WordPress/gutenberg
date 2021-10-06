@@ -113,7 +113,8 @@
 		.components-button.components-button {
 			color: inherit;
 			padding: 0;
-			margin: 0;
+			//top and bottom margin to push up tooltip
+			margin: 40px 0 40px 0;
 			display: flex;
 			justify-content: center;
 			align-items: center;
