@@ -444,11 +444,13 @@ function RichTextWrapper(
 
 			// When an URL is pasted in an empty paragraph then the EmbedHandlerPicker should showcase options allowing the transformation of that URL
 			// into either an Embed block or a link within the target paragraph. If the paragraph is non-empty, the URL is pasted as text.
-			if (
-				__unstableEmbedURLOnPaste &&
-				isEmpty( value ) &&
-				isURL( plainText.trim() )
-			) {
+			if ( __unstableEmbedURLOnPaste && isURL( plainText.trim() ) ) {
+				onChange( insert( value, create( { text: plainText } ) ) );
+
+				if ( ! isEmpty( value ) ) {
+					return;
+				}
+
 				mode = 'BLOCKS';
 				// Embed handler
 				embedHandlerPickerRef.current?.presentPicker( {
@@ -470,16 +472,7 @@ function RichTextWrapper(
 					createLink: () =>
 						createLinkInParagraph( plainText.trim(), onReplace ),
 				} );
-
-				onChange( insert( value, create( { text: plainText } ) ) );
-
-				return;
-			} else if (
-				__unstableEmbedURLOnPaste &&
-				! isEmpty( value ) &&
-				isURL( plainText.trim() )
-			) {
-				onChange( insert( value, create( { text: plainText } ) ) );
+				
 				return;
 			}
 
