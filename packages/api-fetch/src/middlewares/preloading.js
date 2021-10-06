@@ -72,10 +72,14 @@ function createPreloadingMiddleware( preloadedData ) {
 				cache[ method ] &&
 				cache[ method ][ path ]
 			) {
+				// Unsetting the cache key ensures that the data is only preloaded a single time
+				const cacheData = cache[ method ][ path ];
+				delete cache[ method ][ path ];
+
 				return Promise.resolve(
 					parse
-						? cache[ method ][ path ].body
-						: cache[ method ][ path ]
+						? cacheData.body
+						: cacheData
 				);
 			}
 		}
