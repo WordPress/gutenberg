@@ -1079,6 +1079,7 @@ export class RichText extends Component {
 				{ isSelected && (
 					<>
 						<FormatEdit
+							forwardedRef={ this._editor }
 							formatTypes={ formatTypes }
 							value={ record }
 							onChange={ this.onFormatChange }
