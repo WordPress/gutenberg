@@ -87,7 +87,13 @@ const emitToChild = ( children, eventName, event ) => {
 	}
 };
 
-function Tooltip( { children, position, text, shortcut } ) {
+function Tooltip( {
+	children,
+	position,
+	text,
+	shortcut,
+	delay = TOOLTIP_DELAY,
+} ) {
 	/**
 	 * Whether a mouse is currently pressed, used in determining whether
 	 * to handle a focus event as displaying the tooltip immediately.
@@ -96,7 +102,7 @@ function Tooltip( { children, position, text, shortcut } ) {
 	 */
 	const [ isMouseDown, setIsMouseDown ] = useState( false );
 	const [ isOver, setIsOver ] = useState( false );
-	const delayedSetIsOver = useDebounce( setIsOver, TOOLTIP_DELAY );
+	const delayedSetIsOver = useDebounce( setIsOver, delay );
 
 	const createMouseDown = ( event ) => {
 		// Preserve original child callback behavior
