@@ -5,12 +5,12 @@
 
 .edit-site-template-card__content {
 	flex-grow: 1;
-	margin-bottom: 4px;
+	margin-bottom: $grid-unit-05;
 }
 
 .edit-site-template-card__title {
 	font-weight: 500;
-	line-height: $grid-unit-30;
+	line-height: $icon-size;
 	&.edit-site-template-card__title {
 		margin: 0 0 $grid-unit-05;
 	}
