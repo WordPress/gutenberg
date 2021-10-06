@@ -26,40 +26,32 @@ function Palette( { name } ) {
 		: '/blocks/' + name + '/colors/palette';
 
 	return (
-		<div className="edit-site-global-style-palette">
-			<VStack spacing={ 1 }>
-				<Subtitle>{ __( 'Palette' ) }</Subtitle>
-				<ItemGroup isBordered isSeparated>
-					<NavigationButton path={ screenPath }>
-						<HStack>
-							<FlexBlock>
-								<ZStack isLayered={ false } offset={ -8 }>
-									{ colors
-										.slice( 0, 5 )
-										.map( ( { color } ) => (
-											<ColorIndicator
-												key={ color }
-												colorValue={ color }
-											/>
-										) ) }
-								</ZStack>
-							</FlexBlock>
-							<FlexItem>
-								{ sprintf(
-									// Translators: %d: Number of palette colors.
-									_n(
-										'%d color',
-										'%d colors',
-										colors.length
-									),
-									colors.length
-								) }
-							</FlexItem>
-						</HStack>
-					</NavigationButton>
-				</ItemGroup>
-			</VStack>
-		</div>
+		<VStack spacing={ 3 }>
+			<Subtitle>{ __( 'Palette' ) }</Subtitle>
+			<ItemGroup isBordered isSeparated>
+				<NavigationButton path={ screenPath }>
+					<HStack>
+						<FlexBlock>
+							<ZStack isLayered={ false } offset={ -8 }>
+								{ colors.slice( 0, 5 ).map( ( { color } ) => (
+									<ColorIndicator
+										key={ color }
+										colorValue={ color }
+									/>
+								) ) }
+							</ZStack>
+						</FlexBlock>
+						<FlexItem>
+							{ sprintf(
+								// Translators: %d: Number of palette colors.
+								_n( '%d color', '%d colors', colors.length ),
+								colors.length
+							) }
+						</FlexItem>
+					</HStack>
+				</NavigationButton>
+			</ItemGroup>
+		</VStack>
 	);
 }
 

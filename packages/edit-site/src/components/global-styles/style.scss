@@ -16,7 +16,7 @@
 	}
 }
 
-.edit-site-global-style-palette {
+.edit-site-global-styles-screen-colors {
 	margin: $grid-unit-20;
 
 	.component-color-indicator {
@@ -32,4 +32,11 @@
 
 .edit-site-global-styles-header__description {
 	padding: 0 $grid-unit-20;
+}
+
+.edit-site-global-styles-subtitle {
+	// Need to override the too specific styles for complementary areas.
+	margin-bottom: 0 !important;
+	text-transform: uppercase;
+	font-weight: 500;
 }
