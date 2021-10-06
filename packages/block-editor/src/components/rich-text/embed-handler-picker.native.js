@@ -10,6 +10,7 @@ import {
 	forwardRef,
 	useRef,
 	useImperativeHandle,
+	memo,
 	useCallback,
 } from '@wordpress/element';
 import { Picker } from '@wordpress/components';
@@ -30,7 +31,7 @@ const DEFAULT_PICKER_OPTIONS = [
 	},
 ];
 
-export default forwardRef( ( {}, ref ) => {
+const EmbedHandlerPicker = forwardRef( ( {}, ref ) => {
 	const pickerRef = useRef();
 	const pickerOptions = useRef( DEFAULT_PICKER_OPTIONS ).current;
 
@@ -62,3 +63,5 @@ export default forwardRef( ( {}, ref ) => {
 		/>
 	);
 } );
+
+export default memo( EmbedHandlerPicker );
