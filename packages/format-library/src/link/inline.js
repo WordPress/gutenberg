@@ -20,6 +20,7 @@ import {
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import { useSelect } from '@wordpress/data';
+import { __unstableStripHTML as stripHTML } from '@wordpress/dom';
 
 /**
  * Internal dependencies
@@ -88,22 +89,26 @@ function InlineLinkUI( {
 	stopAddingLink,
 	contentRef,
 } ) {
-	let formatStart = value.start;
-	let formatEnd = value.end;
+	// Default to the selection ranges on the RichTextValue object.
+	let textStart = value.start;
+	let textEnd = value.end;
 
 	// If there is no selection then manually find the boundary
-	// of the link.
+	// of the selection via the active format.
 	if ( isCollapsed( value ) ) {
 		const boundary = getFormatBoundary( value, {
 			type: 'core/link',
 		} );
 
-		formatStart = boundary.start;
-		formatEnd = boundary.end;
+		textStart = boundary.start;
+		textEnd = boundary.end;
 	}
+	// Get a RichTextValue containing the selected text content.
 
-	// Grab the text content from the link format.
-	const { text = null } = slice( value, formatStart, formatEnd );
+	const richLinkTextValue = slice( value, textStart, textEnd );
+
+	// Get the text content minus any HTML tags.
+	const text = stripHTML( richLinkTextValue.text );
 
 	/**
 	 * Pending settings to be applied to the next link. When inserting a new
@@ -170,7 +175,7 @@ function InlineLinkUI( {
 		}
 
 		const newUrl = prependHTTP( nextValue.url );
-		const format = createLinkFormat( {
+		const linkFormat = createLinkFormat( {
 			url: newUrl,
 			type: nextValue.type,
 			id:
@@ -185,25 +190,26 @@ function InlineLinkUI( {
 		if ( isCollapsed( value ) && ! isActive ) {
 			const toInsert = applyFormat(
 				create( { text: newText } ),
-				format,
+				linkFormat,
 				0,
 				newText.length
 			);
 			onChange( insert( value, toInsert ) );
 		} else {
-			// Create a new RichTextValue with
-			// 1. the new text provided by the LinkControl.
-			// 2. the link format applied.
-			const toInsert = applyFormat(
-				create( { text: newText } ),
-				format,
-				0,
-				newText.length
-			);
+			// Update the **text** (only) with the new text from the Link UI.
+			// This action retains any formats that were currently applied to
+			// the text selection (eg: bold, italic...etc).
+			let newValue = replace( richLinkTextValue, text, newText );
 
-			// Update the existing value replacing the
-			// current text with the new RichTextValue.
-			const newValue = replace( value, text, toInsert );
+			// Apply the new Link format to this new value.
+			newValue = applyFormat( newValue, linkFormat, 0, newText.length );
+
+			// Update the full existing value replacing the
+			// target text with the new RichTextValue containing:
+			// 1. The new text content.
+			// 2. The new link format.
+			// 3. Any original formats.
+			newValue = replace( value, text, newValue );
 
 			newValue.start = newValue.end;
 			newValue.activeFormats = [];
