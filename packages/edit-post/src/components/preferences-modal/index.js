@@ -371,6 +371,9 @@ export default function PreferencesModal() {
 											isRTL() ? chevronRight : chevronLeft
 										}
 										isBack
+										aria-label={ __(
+											'Navigate to the previous view'
+										) }
 									>
 										{ __( 'Back' ) }
 									</NavigationButton>

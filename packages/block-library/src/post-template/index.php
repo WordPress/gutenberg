@@ -34,6 +34,17 @@ function render_block_core_post_template( $attributes, $content, $block ) {
 		}
 	}
 
+	/**
+	 * Passing an empty array to post__in will return have_posts() as true (and all posts will be returned).
+	 * Logic should be used before hand to determine if WP_Query should be used in the event that the array
+	 * being passed to post__in is empty.
+	 *
+	 * @see https://core.trac.wordpress.org/ticket/28099
+	 */
+	if ( isset( $query_args['post__in'] ) && count( $query_args['post__in'] ) === 0 ) {
+		return '';
+	}
+
 	$query = new WP_Query( $query_args );
 
 	if ( ! $query->have_posts() ) {

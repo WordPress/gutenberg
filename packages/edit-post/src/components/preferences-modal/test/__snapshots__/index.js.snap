@@ -175,6 +175,7 @@ exports[`PreferencesModal should match snapshot when the modal is active small v
           path="general"
         >
           <NavigationButton
+            aria-label="Navigate to the previous view"
             icon={
               <SVG
                 viewBox="0 0 24 24"
@@ -229,6 +230,7 @@ exports[`PreferencesModal should match snapshot when the modal is active small v
           path="blocks"
         >
           <NavigationButton
+            aria-label="Navigate to the previous view"
             icon={
               <SVG
                 viewBox="0 0 24 24"
@@ -274,6 +276,7 @@ exports[`PreferencesModal should match snapshot when the modal is active small v
           path="panels"
         >
           <NavigationButton
+            aria-label="Navigate to the previous view"
             icon={
               <SVG
                 viewBox="0 0 24 24"
