@@ -225,7 +225,7 @@ export const updateNavigationLinkBlockAttributes = (
 	const {
 		title = '', // the title of any provided Post.
 		url = '',
-		text = '', // provided by text input on LinkControl
+
 		opensInNewTab,
 		id,
 		kind: newKind = originalKind,
@@ -238,17 +238,9 @@ export const updateNavigationLinkBlockAttributes = (
 		normalizedTitle !== normalizedURL &&
 		originalLabel !== title;
 
-	let label;
-
-	// If user provided text via LinkControl then use that.
-	// Otherwise fallback to the link title or URL.
-	if ( text?.trim()?.length ) {
-		label = escape( text );
-	} else {
-		label = escapeTitle
-			? escape( title )
-			: originalLabel || escape( normalizedURL );
-	}
+	const label = escapeTitle
+		? escape( title )
+		: originalLabel || escape( normalizedURL );
 
 	// In https://github.com/WordPress/gutenberg/pull/24670 we decided to use "tag" in favor of "post_tag"
 	const type = newType === 'post_tag' ? 'tag' : newType.replace( '-', '_' );
@@ -295,7 +287,7 @@ export default function NavigationLinkEdit( {
 	const link = {
 		url,
 		opensInNewTab,
-		text: label,
+		title: label,
 	};
 	const { saveEntityRecord } = useDispatch( coreStore );
 	const {

@@ -108,7 +108,7 @@ function InlineLinkUI( {
 	const richLinkTextValue = slice( value, textStart, textEnd );
 
 	// Get the text content minus any HTML tags.
-	const text = stripHTML( richLinkTextValue.text );
+	const richTextText = stripHTML( richLinkTextValue.text );
 
 	/**
 	 * Pending settings to be applied to the next link. When inserting a new
@@ -135,7 +135,7 @@ function InlineLinkUI( {
 		type: activeAttributes.type,
 		id: activeAttributes.id,
 		opensInNewTab: activeAttributes.target === '_blank',
-		text,
+		title: richTextText,
 		...nextLinkValue,
 	};
 
@@ -185,7 +185,7 @@ function InlineLinkUI( {
 			opensInNewWindow: nextValue.opensInNewTab,
 		} );
 
-		const newText = nextValue?.text || nextValue.title || newUrl;
+		const newText = nextValue.title || newUrl;
 
 		if ( isCollapsed( value ) && ! isActive ) {
 			// Scenario: we don't have any actively selected text or formats.
@@ -202,7 +202,7 @@ function InlineLinkUI( {
 			// Update the **text** (only) with the new text from the Link UI.
 			// This action retains any formats that were currently applied to
 			// the text selection (eg: bold, italic...etc).
-			let newValue = replace( richLinkTextValue, text, newText );
+			let newValue = replace( richLinkTextValue, richTextText, newText );
 
 			// Apply the new Link format to this new value.
 			newValue = applyFormat( newValue, linkFormat, 0, newText.length );
@@ -212,7 +212,7 @@ function InlineLinkUI( {
 			// 1. The new text content.
 			// 2. The new link format.
 			// 3. Any original formats.
-			newValue = replace( value, text, newValue );
+			newValue = replace( value, richTextText, newValue );
 
 			newValue.start = newValue.end;
 			newValue.activeFormats = [];

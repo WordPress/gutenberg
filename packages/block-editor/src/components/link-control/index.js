@@ -133,7 +133,7 @@ function LinkControl( {
 		value?.url || ''
 	);
 	const [ internalTextValue, setInternalTextValue ] = useState(
-		value?.text || ''
+		value?.title || ''
 	);
 	const currentInputValue = propInputValue || internalInputValue;
 	const [ isEditingLink, setIsEditingLink ] = useState(
@@ -180,8 +180,8 @@ function LinkControl( {
 	 * back up with state.
 	 */
 	useEffect( () => {
-		if ( value?.text && value.text !== internalTextValue ) {
-			setInternalTextValue( value.text );
+		if ( value?.title && value.title !== internalTextValue ) {
+			setInternalTextValue( value.title );
 		}
 	}, [ value ] );
 
@@ -204,7 +204,7 @@ function LinkControl( {
 	const handleSelectSuggestion = ( updatedValue ) => {
 		onChange( {
 			...updatedValue,
-			text: internalTextValue,
+			title: internalTextValue || updatedValue?.title,
 		} );
 		stopEditing();
 	};
@@ -212,11 +212,11 @@ function LinkControl( {
 	const handleSubmit = () => {
 		if (
 			currentInputValue !== value?.url ||
-			internalTextValue !== value?.text
+			internalTextValue !== value?.title
 		) {
 			onChange( {
 				url: currentInputValue,
-				text: internalTextValue,
+				title: internalTextValue,
 			} );
 		}
 		stopEditing();
