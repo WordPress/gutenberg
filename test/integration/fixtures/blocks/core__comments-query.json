@@ -1,0 +1,21 @@
+[
+	{
+		"clientId": "_clientId_0",
+		"name": "core/comments-query",
+		"isValid": true,
+		"attributes": {
+			"query": {
+				"perPage": null,
+				"pages": 0,
+				"order": "desc",
+				"orderBy": "date"
+			},
+			"tagName": "div",
+			"displayLayout": {
+				"type": "list"
+			}
+		},
+		"innerBlocks": [],
+		"originalContent": "<div class=\"wp-block-comments-query\"></div>"
+	}
+]
