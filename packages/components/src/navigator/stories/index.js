@@ -62,8 +62,8 @@ const MyNavigation = () => (
 				<span
 					style={ {
 						color: 'palevioletred',
-						'white-space': 'nowrap',
-						'font-size': '42vw',
+						whiteSpace: 'nowrap',
+						fontSize: '42vw',
 					} }
 				>
 					¯\_(ツ)_/¯
