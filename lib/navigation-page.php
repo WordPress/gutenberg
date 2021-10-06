@@ -20,6 +20,12 @@ function gutenberg_navigation_page() {
 	<?php
 }
 
+/**
+ * This function returns an url for the /__experimental/menus endpoint
+ *
+ * @param  int $results_per_page
+ * @return string
+ */
 function gutenberg_navigation_get_menus_endpoint( $results_per_page = 100 ) {
 	return '/__experimental/menus?' . http_build_query(
 		array(
@@ -30,6 +36,12 @@ function gutenberg_navigation_get_menus_endpoint( $results_per_page = 100 ) {
 	);
 }
 
+/**
+ * This function returns an url for the /__experimental/menus/<menu_id> endpoint
+ *
+ * @param  int $menu_id
+ * @return string
+ */
 function gutenberg_navigation_get_menu_endpoint( $menu_id ) {
 	return "/__experimental/menus/{$menu_id}?" . http_build_query(
 		array(
@@ -38,6 +50,13 @@ function gutenberg_navigation_get_menu_endpoint( $menu_id ) {
 	);
 }
 
+/**
+ * This function returns an url for the /__experimental/menu-items endpoint
+ *
+ * @param int $menu_id
+ * @param int $results_per_page
+ * @return string
+ */
 function gutenberg_navigation_get_menu_items_endpoint( $menu_id, $results_per_page = 100 ) {
 	return '/__experimental/menu-items?' . http_build_query(
 		array(
@@ -49,6 +68,11 @@ function gutenberg_navigation_get_menu_items_endpoint( $menu_id, $results_per_pa
 	);
 }
 
+/**
+ * This function returns an url for the /wp/v2/types endpoint
+ *
+ * @return string
+ */
 function gutenberg_navigation_get_types_endpoint() {
 	return '/wp/v2/types?' . http_build_query(
 		array(
