@@ -14,6 +14,7 @@ class Block_Templates_Test extends WP_UnitTestCase {
 	private static $template_part_post;
 
 	public static function wpSetUpBeforeClass() {
+		switch_theme( 'tt1-blocks' );
 		gutenberg_register_template_post_type();
 		gutenberg_register_template_part_post_type();
 		gutenberg_register_wp_template_part_area_taxonomy();
