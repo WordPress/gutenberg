@@ -9,13 +9,10 @@ import classnames from 'classnames';
 import {
 	__experimentalTreeGridCell as TreeGridCell,
 	__experimentalTreeGridItem as TreeGridItem,
-	MenuGroup,
-	MenuItem,
 } from '@wordpress/components';
-import { __ } from '@wordpress/i18n';
 import { moreVertical } from '@wordpress/icons';
 import { useState, useRef, useEffect } from '@wordpress/element';
-import { useDispatch, useSelect } from '@wordpress/data';
+import { useDispatch } from '@wordpress/data';
 
 /**
  * Internal dependencies
@@ -49,17 +46,8 @@ export default function ListViewBlock( {
 	const cellRef = useRef( null );
 	const [ isHovered, setIsHovered ] = useState( false );
 	const { clientId } = block;
-	const blockParents = useSelect(
-		( select ) => {
-			return select( blockEditorStore ).getBlockParents( clientId );
-		},
-		[ clientId ]
-	);
 
-	const {
-		selectBlock: selectEditorBlock,
-		toggleBlockHighlight,
-	} = useDispatch( blockEditorStore );
+	const { toggleBlockHighlight } = useDispatch( blockEditorStore );
 
 	const hasSiblings = siblingBlockCount > 0;
 	const hasRenderedMovers = showBlockMovers && hasSiblings;
@@ -204,33 +192,7 @@ export default function ListViewBlock( {
 							} }
 							disableOpenOnArrowDown
 							__experimentalSelectBlock={ onClick }
-						>
-							{ ( { onClose } ) => (
-								<MenuGroup>
-									<MenuItem
-										onClick={ async () => {
-											if ( blockParents.length ) {
-												// If the block to select is inside a dropdown, we need to open the dropdown.
-												// Otherwise focus won't transfer to the block.
-												for ( const parent of blockParents ) {
-													await selectEditorBlock(
-														parent
-													);
-												}
-											} else {
-												// If clientId is already selected, it won't be focused (see block-wrapper.js)
-												// This removes the selection first to ensure the focus will always switch.
-												await selectEditorBlock( null );
-											}
-											await selectEditorBlock( clientId );
-											onClose();
-										} }
-									>
-										{ __( 'Go to block' ) }
-									</MenuItem>
-								</MenuGroup>
-							) }
-						</BlockSettingsDropdown>
+						/>
 					) }
 				</TreeGridCell>
 			) }

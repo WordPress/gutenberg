@@ -52,6 +52,10 @@ const ListViewBlockContents = forwardRef(
 			[ clientId ]
 		);
 
+		const SelectButton = __experimentalFeatures
+			? ListViewBlockSlot
+			: ListViewBlockSelectButton;
+
 		const isBlockMoveTarget =
 			blockMovingClientId && selectedBlockInBlockEditor === clientId;
 
@@ -61,40 +65,23 @@ const ListViewBlockContents = forwardRef(
 
 		return (
 			<BlockDraggable clientIds={ [ block.clientId ] }>
-				{ ( { draggable, onDragStart, onDragEnd } ) =>
-					__experimentalFeatures ? (
-						<ListViewBlockSlot
-							ref={ ref }
-							className={ className }
-							block={ block }
-							onToggleExpanded={ onToggleExpanded }
-							isSelected={ isSelected }
-							position={ position }
-							siblingBlockCount={ siblingBlockCount }
-							level={ level }
-							draggable={ draggable && __experimentalFeatures }
-							onDragStart={ onDragStart }
-							onDragEnd={ onDragEnd }
-							{ ...props }
-						/>
-					) : (
-						<ListViewBlockSelectButton
-							ref={ ref }
-							className={ className }
-							block={ block }
-							onClick={ onClick }
-							onToggleExpanded={ onToggleExpanded }
-							isSelected={ isSelected }
-							position={ position }
-							siblingBlockCount={ siblingBlockCount }
-							level={ level }
-							draggable={ draggable }
-							onDragStart={ onDragStart }
-							onDragEnd={ onDragEnd }
-							{ ...props }
-						/>
-					)
-				}
+				{ ( { draggable, onDragStart, onDragEnd } ) => (
+					<SelectButton
+						ref={ ref }
+						className={ className }
+						block={ block }
+						onClick={ onClick }
+						onToggleExpanded={ onToggleExpanded }
+						isSelected={ isSelected }
+						position={ position }
+						siblingBlockCount={ siblingBlockCount }
+						level={ level }
+						draggable={ draggable }
+						onDragStart={ onDragStart }
+						onDragEnd={ onDragEnd }
+						{ ...props }
+					/>
+				) }
 			</BlockDraggable>
 		);
 	}
