@@ -34,7 +34,7 @@ class Template_Loader_Test extends WP_UnitTestCase {
 			'post_excerpt' => 'Description of my block template',
 		);
 		self::$post = self::factory()->post->create_and_get( $args );
-		customize_template( 'wp-custom-template-my-block-template', self::$post, false );
+		gutenberg_customize_template( 'wp-custom-template-my-block-template', self::$post, false );
 	}
 
 	public static function wpTearDownAfterClass() {

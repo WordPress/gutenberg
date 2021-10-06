@@ -30,7 +30,7 @@ class Block_Templates_Test extends WP_UnitTestCase {
 			'post_excerpt' => 'Description of my template',
 		);
 		self::$post = self::factory()->post->create_and_get( $args );
-		customize_template( 'my_template', self::$post, false );
+		gutenberg_customize_template( 'my_template', self::$post, false );
 
 		// Set up template post.
 		switch_theme( 'tt1-blocks' );
@@ -41,7 +41,7 @@ class Block_Templates_Test extends WP_UnitTestCase {
 			'post_excerpt' => 'Description of my template',
 		);
 		self::$post = self::factory()->post->create_and_get( $args );
-		customize_template( 'my_template', self::$post, false );
+		gutenberg_customize_template( 'my_template', self::$post, false );
 
 		// Set up template part post.
 		$template_part_args       = array(
@@ -57,7 +57,7 @@ class Block_Templates_Test extends WP_UnitTestCase {
 		);
 		self::$template_part_post = self::factory()->post->create_and_get( $template_part_args );
 		wp_set_post_terms( self::$template_part_post->ID, WP_TEMPLATE_PART_AREA_HEADER, 'wp_template_part_area' );
-		customize_template( 'my_template_part', self::$template_part_post, false );
+		gutenberg_customize_template( 'my_template_part', self::$template_part_post, false );
 	}
 
 	public static function wpTearDownAfterClass() {

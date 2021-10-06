@@ -152,7 +152,7 @@ add_action( 'manage_wp_template_posts_custom_column', 'gutenberg_render_template
  *
  * @return bool Whether the template is customized for the currently active theme.
  */
-function template_is_customized( $slug, $template_type = 'wp_template' ) {
+function gutenberg_is_template_customized( $slug, $template_type = 'wp_template' ) {
 	$templates = get_theme_mod( $template_type, array() );
 
 	if ( ! isset( $templates[ $slug ] ) ) {
@@ -177,7 +177,7 @@ function template_is_customized( $slug, $template_type = 'wp_template' ) {
  *
  * @return string|null The identifier of the customized template, or null if the post is an invalid type.
  */
-function customize_template( $slug, $post, $overwrite_slug = true, $overwrite_post = true ) {
+function gutenberg_customize_template( $slug, $post, $overwrite_slug = true, $overwrite_post = true ) {
 	$post = get_post( $post );
 	if ( ! in_array( $post->post_type, array( 'wp_template', 'wp_template_part' ), true ) ) {
 		return null;
@@ -196,13 +196,13 @@ function customize_template( $slug, $post, $overwrite_slug = true, $overwrite_po
 		}
 	}
 
-	if ( ! $overwrite_slug && template_is_customized( $slug, $post->post_type ) ) {
+	if ( ! $overwrite_slug && gutenberg_is_template_customized( $slug, $post->post_type ) ) {
 		$original_slug = $slug;
-		$suffix = 2;
+		$suffix        = 2;
 		do {
 			$slug = _truncate_post_slug( $original_slug, 200 - ( strlen( $suffix ) + 1 ) ) . "-$suffix";
 			$suffix++;
-		} while ( template_is_customized( $slug, $post->post_type ) );
+		} while ( gutenberg_is_template_customized( $slug, $post->post_type ) );
 	}
 
 	$templates[ $slug ] = $post->ID;

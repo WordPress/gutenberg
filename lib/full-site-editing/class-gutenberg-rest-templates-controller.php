@@ -220,7 +220,7 @@ class Gutenberg_REST_Templates_Controller extends WP_REST_Controller {
 		}
 
 		if ( 'custom' !== $template->source ) {
-			customize_template( $template->slug, $result );
+			gutenberg_customize_template( $template->slug, $result );
 		}
 
 		$template      = gutenberg_get_block_template( $request['id'], $this->post_type );
@@ -259,7 +259,7 @@ class Gutenberg_REST_Templates_Controller extends WP_REST_Controller {
 			return $result;
 		}
 
-		customize_template( $request['slug'], $result, false );
+		gutenberg_customize_template( $request['slug'], $result, false );
 
 		$posts = gutenberg_get_block_templates( array( 'wp_id' => $result ), $this->post_type );
 		if ( ! count( $posts ) ) {
