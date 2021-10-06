@@ -76,11 +76,7 @@ function createPreloadingMiddleware( preloadedData ) {
 				const cacheData = cache[ method ][ path ];
 				delete cache[ method ][ path ];
 
-				return Promise.resolve(
-					parse
-						? cacheData.body
-						: cacheData
-				);
+				return Promise.resolve( parse ? cacheData.body : cacheData );
 			}
 		}
 
