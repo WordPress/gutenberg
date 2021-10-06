@@ -25,7 +25,7 @@ import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
-import org.wordpress.android.util.AppLog;;
+import org.wordpress.android.util.AppLog;
 import org.wordpress.mobile.FileUtils;
 
 import java.util.ArrayList;
@@ -42,7 +42,8 @@ public class GutenbergWebViewActivity extends AppCompatActivity {
     private static final String INJECT_LOCAL_STORAGE_SCRIPT_TEMPLATE = "localStorage.setItem('WP_DATA_USER_%d','%s')";
     private static final String INJECT_CSS_SCRIPT_TEMPLATE = "window.injectCss('%s')";
     private static final String INJECT_GET_HTML_POST_CONTENT_SCRIPT = "window.getHTMLPostContent();";
-    private static final String INJECT_ON_HIDE_TEXT_SELECTION_CONTEXT_MENU_SCRIPT = "window.onHideTextSelectionContextMenu();";
+    private static final String INJECT_ON_SHOW_CONTEXT_MENU_SCRIPT = "window.onShowContextMenu();";
+    private static final String INJECT_ON_HIDE_CONTEXT_MENU_SCRIPT = "window.onHideContextMenu();";
     private static final String JAVA_SCRIPT_INTERFACE_NAME = "wpwebkit";
 
     protected WebView mWebView;
@@ -93,12 +94,16 @@ public class GutenbergWebViewActivity extends AppCompatActivity {
         if (mActionMode == null) {
             mActionMode = mode;
         }
+        mWebView.evaluateJavascript(INJECT_ON_SHOW_CONTEXT_MENU_SCRIPT,
+                value -> AppLog.e(AppLog.T.EDITOR, value));
         super.onActionModeStarted(mode);
     }
 
     @Override
     public void onActionModeFinished(ActionMode mode) {
         mActionMode = null;
+        mWebView.evaluateJavascript(INJECT_ON_HIDE_CONTEXT_MENU_SCRIPT,
+                value -> AppLog.e(AppLog.T.EDITOR, value));
         super.onActionModeFinished(mode);
     }
 
@@ -426,9 +431,6 @@ public class GutenbergWebViewActivity extends AppCompatActivity {
             if (mActionMode != null) {
                 GutenbergWebViewActivity.this.runOnUiThread(() -> {
                     GutenbergWebViewActivity.this.mActionMode.finish();
-
-                    mWebView.evaluateJavascript(INJECT_ON_HIDE_TEXT_SELECTION_CONTEXT_MENU_SCRIPT,
-                            value -> AppLog.e(AppLog.T.EDITOR, value));
                 });
             }
         }
