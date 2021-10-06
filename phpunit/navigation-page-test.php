@@ -1,6 +1,14 @@
 <?php
+/**
+ * This class is supposed to test the functionality of the navigation-page.php
+ *
+ * @package Gutenberg
+ */
 
 class WP_Navigation_Page_Test extends WP_UnitTestCase {
+	/**
+	 * @var WP_Navigation_Page_Test_Callback
+	 */
 	private $callback;
 
 	public function setUp() {
@@ -16,7 +24,8 @@ class WP_Navigation_Page_Test extends WP_UnitTestCase {
 		remove_filter( 'wp_get_nav_menus', array( $this->callback, 'wp_nav_menus_callback' ) );
 	}
 
-	function test_gutenberg_navigation_get_menus_endpoint() {
+	function test_gutenberg_navigation_init_function_generates_correct_preload_paths() {
+		$menu_id                = mt_rand( 1, 1000 );
 		$expected_preload_paths = array(
 			'/__experimental/menu-locations',
 			array(
@@ -29,6 +38,8 @@ class WP_Navigation_Page_Test extends WP_UnitTestCase {
 			),
 			'/__experimental/menus?per_page=100&context=edit&_locale=user',
 			'/wp/v2/types?context=edit',
+			"/__experimental/menus/{$menu_id}?context=edit",
+			"/__experimental/menu-items?context=edit&menus={$menu_id}&per_page=100&_locale=user",
 		);
 
 		$this->callback->expects( $this->once() )
@@ -36,18 +47,21 @@ class WP_Navigation_Page_Test extends WP_UnitTestCase {
 			->with( $expected_preload_paths )
 			->willReturn( array() );
 
-		$menu_id       = mt_rand( 1, 1000 );
-		$menu          = new StdClass;
+		$menu          = new stdClass();
 		$menu->term_id = $menu_id;
 		$this->callback->expects( $this->once() )
 			->method( 'wp_nav_menus_callback' )
-			->willReturn( new WP_Term() );
+			->with( array() )
+			->willReturn( array( new WP_Term( $menu ) ) );
 
 		set_current_screen( 'gutenberg_page_gutenberg-navigation' );
 		gutenberg_navigation_init( 'gutenberg_page_gutenberg-navigation' );
 	}
 }
 
+/**
+ * This is a utility test class for creating mocks of the callback functions
+ */
 class WP_Navigation_Page_Test_Callback {
 
 	public function preload_paths_callback() {}
