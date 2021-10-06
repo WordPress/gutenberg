@@ -181,6 +181,10 @@ $preview-image-height: 140px;
 		flex: 1; // fill available space.
 	}
 
+	&.is-error .block-editor-link-control__search-item-header {
+		align-items: center;
+	}
+
 	.block-editor-link-control__search-item-details {
 		overflow: hidden; // clip to force text ellipsis.
 	}
@@ -198,6 +202,12 @@ $preview-image-height: 140px;
 		img {
 			width: 16px; // favicons often have a source of 32px
 		}
+	}
+
+	&.is-error .block-editor-link-control__search-item-icon {
+		top: 0;
+		width: 32px;
+		max-height: 32px;
 	}
 
 
@@ -239,6 +249,11 @@ $preview-image-height: 140px;
 		color: $gray-700;
 		font-size: 0.9em;
 		line-height: 1.3;
+	}
+
+	.block-editor-link-control__search-item-error-notice {
+		font-style: italic;
+		font-size: 1.1em;
 	}
 
 	.block-editor-link-control__search-item-type {
@@ -377,6 +392,18 @@ $preview-image-height: 140px;
 		left: 0;
 		display: block;
 		width: 100%;
+	}
+}
+
+.block-editor-link-control__search-create {
+	align-items: center; // align text with icon.
+
+	.block-editor-link-control__search-item-title {
+		margin-bottom: 0;
+	}
+
+	.block-editor-link-control__search-item-icon {
+		top: 0; // cancel compensatory spacing added to default suggestions.
 	}
 }
 

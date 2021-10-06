@@ -61,7 +61,7 @@ export default function PostTitle() {
 			isFocusMode: focusMode,
 			hasFixedToolbar: _hasFixedToolbar,
 		};
-	} );
+	}, [] );
 
 	useEffect( () => {
 		if ( ! ref.current ) {

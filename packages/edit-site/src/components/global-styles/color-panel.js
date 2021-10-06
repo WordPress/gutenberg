@@ -9,7 +9,7 @@ import { __ } from '@wordpress/i18n';
  */
 
 import { useSetting } from '../editor/utils';
-import Palette from './global-styles/palette';
+import Palette from './palette';
 
 export function useHasColorPanel( { supports } ) {
 	return (

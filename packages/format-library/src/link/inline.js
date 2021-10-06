@@ -1,8 +1,8 @@
 /**
  * WordPress dependencies
  */
-import { useState, useRef } from '@wordpress/element';
-import { __ } from '@wordpress/i18n';
+import { useState, useRef, createInterpolateElement } from '@wordpress/element';
+import { __, sprintf } from '@wordpress/i18n';
 import { withSpokenMessages, Popover } from '@wordpress/components';
 import { prependHTTP } from '@wordpress/url';
 import {
@@ -13,7 +13,11 @@ import {
 	useAnchorRef,
 	removeFormat,
 } from '@wordpress/rich-text';
-import { __experimentalLinkControl as LinkControl } from '@wordpress/block-editor';
+import {
+	__experimentalLinkControl as LinkControl,
+	store as blockEditorStore,
+} from '@wordpress/block-editor';
+import { useSelect } from '@wordpress/data';
 
 /**
  * Internal dependencies
@@ -40,6 +44,16 @@ function InlineLinkUI( {
 	 * @type {[Object|undefined,Function]}
 	 */
 	const [ nextLinkValue, setNextLinkValue ] = useState();
+
+	const { createPageEntity, userCanCreatePages } = useSelect( ( select ) => {
+		const { getSettings } = select( blockEditorStore );
+		const _settings = getSettings();
+
+		return {
+			createPageEntity: _settings.__experimentalCreatePageEntity,
+			userCanCreatePages: _settings.__experimentalUserCanCreatePages,
+		};
+	}, [] );
 
 	const linkValue = {
 		url: activeAttributes.url,
@@ -137,6 +151,32 @@ function InlineLinkUI( {
 	// otherwise it causes a render of the content.
 	const focusOnMount = useRef( addingLink ? 'firstElement' : false );
 
+	async function handleCreate( pageTitle ) {
+		const page = await createPageEntity( {
+			title: pageTitle,
+			status: 'draft',
+		} );
+
+		return {
+			id: page.id,
+			type: page.type,
+			title: page.title.rendered,
+			url: page.link,
+			kind: 'post-type',
+		};
+	}
+
+	function createButtonText( searchTerm ) {
+		return createInterpolateElement(
+			sprintf(
+				/* translators: %s: search term. */
+				__( 'Create Page: <mark>%s</mark>' ),
+				searchTerm
+			),
+			{ mark: <mark /> }
+		);
+	}
+
 	return (
 		<Popover
 			anchorRef={ anchorRef }
@@ -150,6 +190,9 @@ function InlineLinkUI( {
 				onRemove={ removeLink }
 				forceIsEditingLink={ addingLink }
 				hasRichPreviews
+				createSuggestion={ createPageEntity && handleCreate }
+				withCreateSuggestion={ userCanCreatePages }
+				createSuggestionButtonText={ createButtonText }
 			/>
 		</Popover>
 	);

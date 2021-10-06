@@ -2,7 +2,7 @@
  * External dependencies
  */
 import styled from '@emotion/styled';
-import { text, select } from '@storybook/addon-knobs';
+import { text, select, number } from '@storybook/addon-knobs';
 
 /**
  * WordPress dependencies
@@ -30,8 +30,9 @@ export const _default = () => {
 	};
 	const tooltipText = text( 'Text', 'More information' );
 	const position = select( 'Position', positionOptions, 'top center' );
+	const delay = number( 'Delay', 700 );
 	return (
-		<Tooltip text={ tooltipText } position={ position }>
+		<Tooltip text={ tooltipText } position={ position } delay={ delay }>
 			<div
 				style={ {
 					margin: '50px auto',

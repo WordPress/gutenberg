@@ -85,9 +85,7 @@ function Placeholder() {
 	const blockProps = useBlockProps();
 	return (
 		<div { ...blockProps }>
-			<div className="wp-block-post-content__placeholder">
-				<span>{ __( 'This is a placeholder for post content.' ) }</span>
-			</div>
+			<p>{ __( 'This is a placeholder for post content.' ) }</p>
 		</div>
 	);
 }

@@ -4,6 +4,7 @@
 	justify-content: center;
 	min-height: 152px;
 	margin: $grid-unit-20;
+	line-height: 1;
 
 	.component-color-indicator {
 		border-radius: 50%;
@@ -29,6 +30,6 @@
 	}
 }
 
-.edit-site-global-styles-screen-header__description {
+.edit-site-global-styles-header__description {
 	padding: 0 $grid-unit-20;
 }
