@@ -13,21 +13,9 @@ import { store as editorStore } from '../../store';
 function SaveShortcut( { resetBlocksOnSave } ) {
 	const { resetEditorBlocks, savePost } = useDispatch( editorStore );
 	const { isEditedPostDirty, getPostEdits, isPostSavingLocked } = useSelect(
-		( select ) => {
-			const {
-				isEditedPostDirty: _isEditedPostDirty,
-				getPostEdits: _getPostEdits,
-				isPostSavingLocked: _isPostSavingLocked,
-			} = select( editorStore );
-
-			return {
-				isEditedPostDirty: _isEditedPostDirty,
-				getPostEdits: _getPostEdits,
-				isPostSavingLocked: _isPostSavingLocked,
-			};
-		},
-		[]
+		editorStore
 	);
+
 	useShortcut( 'core/editor/save', ( event ) => {
 		event.preventDefault();
 
