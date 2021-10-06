@@ -6,11 +6,10 @@
  */
 
 /**
- * Builds an array of inline styles for the search block.
+ * Builds an array of inline styles for the avatar block.
  *
  * The result will contain one entry for shared styles such as those for the
- * inner input or button and a second for the inner wrapper should the block
- * be positioning the button "inside".
+ * inner img and a second for the inner wrapper.
  *
  * @param  array $attributes The block attributes.
  *
@@ -73,7 +72,7 @@ function styles_for_comment_avatar( $attributes ) {
 }
 
 /**
- * Renders the `core/post-comment-author` block on the server.
+ * Renders the `core/comment-avatar` block on the server.
  *
  * @param array    $attributes Block attributes.
  * @param string   $content    Block default content.
