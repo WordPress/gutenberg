@@ -41,25 +41,27 @@ function mergeBaseAndUserConfigs( base, user ) {
 }
 
 function addUserOriginToSettings( settingsToAdd ) {
+	const newSettings = cloneDeep( settingsToAdd );
 	PRESET_METADATA.forEach( ( { path } ) => {
-		const presetData = get( settingsToAdd, path );
+		const presetData = get( newSettings, path );
 		if ( presetData ) {
-			set( settingsToAdd, path, {
+			set( newSettings, path, {
 				user: presetData,
 			} );
 		}
 	} );
-	return settingsToAdd;
+	return newSettings;
 }
 
 function removeUserOriginFromSettings( settingsToRemove ) {
+	const newSettings = cloneDeep( settingsToRemove );
 	PRESET_METADATA.forEach( ( { path } ) => {
-		const presetData = get( settingsToRemove, path );
+		const presetData = get( newSettings, path );
 		if ( presetData ) {
-			set( settingsToRemove, path, ( presetData ?? {} ).user );
+			set( newSettings, path, ( presetData ?? {} ).user );
 		}
 	} );
-	return settingsToRemove;
+	return newSettings;
 }
 
 function useGlobalStylesUserConfig() {
@@ -175,7 +177,11 @@ export function useSetting( path, blockName, source = 'all' ) {
 	const setSetting = ( newValue ) => {
 		setUserConfig( ( currentConfig ) => {
 			const newUserConfig = cloneDeep( currentConfig );
-			set( newUserConfig, fullPath, newValue );
+			const pathToSet = PATHS_WITH_MERGE[ path ]
+				? fullPath + '.user'
+				: fullPath;
+			set( newUserConfig, pathToSet, newValue );
+
 			return newUserConfig;
 		} );
 	};
@@ -188,7 +194,7 @@ export function useSetting( path, blockName, source = 'all' ) {
 		const getSettingValue = ( configToUse ) => {
 			const result = get( configToUse, currentPath );
 			if ( PATHS_WITH_MERGE[ path ] ) {
-				return result?.theme ?? result?.core;
+				return result?.user ?? result?.theme ?? result?.core;
 			}
 			return result;
 		};
