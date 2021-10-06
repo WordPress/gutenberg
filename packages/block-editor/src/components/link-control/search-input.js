@@ -120,6 +120,7 @@ const LinkControlSearchInput = forwardRef(
 		return (
 			<div>
 				<URLInput
+					label={ 'URL' }
 					className={ className }
 					value={ value }
 					onChange={ onInputChange }

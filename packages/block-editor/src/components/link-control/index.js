@@ -2,11 +2,12 @@
  * External dependencies
  */
 import { noop } from 'lodash';
+import classnames from 'classnames';
 
 /**
  * WordPress dependencies
  */
-import { Button, Spinner, Notice } from '@wordpress/components';
+import { Button, Spinner, Notice, TextControl } from '@wordpress/components';
 import { keyboardReturn } from '@wordpress/icons';
 import { __ } from '@wordpress/i18n';
 import { useRef, useState, useEffect } from '@wordpress/element';
@@ -119,6 +120,7 @@ function LinkControl( {
 	noURLSuggestion = false,
 	createSuggestionButtonText,
 	hasRichPreviews = false,
+	hasTextControl = false,
 } ) {
 	if ( withCreateSuggestion === undefined && createSuggestion ) {
 		withCreateSuggestion = true;
@@ -126,8 +128,12 @@ function LinkControl( {
 
 	const isMounting = useRef( true );
 	const wrapperNode = useRef();
+
 	const [ internalInputValue, setInternalInputValue ] = useState(
-		( value && value.url ) || ''
+		value?.url || ''
+	);
+	const [ internalTextValue, setInternalTextValue ] = useState(
+		value?.text || ''
 	);
 	const currentInputValue = propInputValue || internalInputValue;
 	const [ isEditingLink, setIsEditingLink ] = useState(
@@ -154,16 +160,30 @@ function LinkControl( {
 			return;
 		}
 
+		const linkURLInputIndex = 1;
+
+		// When editing, the 2nd focusable element is the Link URL input.
+		const whichFocusTarget = isEditingLink ? linkURLInputIndex : 0;
 		// When switching between editable and non editable LinkControl
-		// move focus to the first element to avoid focus loss.
+		// move focus to the most appropriate element to avoid focus loss.
 		const nextFocusTarget =
-			focus.focusable.find( wrapperNode.current )[ 0 ] ||
+			focus.focusable.find( wrapperNode.current )[ whichFocusTarget ] ||
 			wrapperNode.current;
 
 		nextFocusTarget.focus();
 
 		isEndingEditWithFocus.current = false;
 	}, [ isEditingLink ] );
+
+	/**
+	 * If the value's `text` property changes then sync this
+	 * back up with state.
+	 */
+	useEffect( () => {
+		if ( value?.text && value.text !== internalTextValue ) {
+			setInternalTextValue( value.text );
+		}
+	}, [ value ] );
 
 	/**
 	 * Cancels editing state and marks that focus may need to be restored after
@@ -182,13 +202,22 @@ function LinkControl( {
 	);
 
 	const handleSelectSuggestion = ( updatedValue ) => {
-		onChange( updatedValue );
+		onChange( {
+			...updatedValue,
+			text: internalTextValue,
+		} );
 		stopEditing();
 	};
 
 	const handleSubmitButton = () => {
-		if ( currentInputValue !== value?.url ) {
-			onChange( { url: currentInputValue } );
+		if (
+			currentInputValue !== value?.url ||
+			internalTextValue !== value?.text
+		) {
+			onChange( {
+				url: currentInputValue,
+				text: internalTextValue,
+			} );
 		}
 		stopEditing();
 	};
@@ -197,6 +226,9 @@ function LinkControl( {
 		onRemove && value && ! isEditingLink && ! isCreatingPage;
 
 	const showSettingsDrawer = !! settings?.length;
+
+	// Only show once a URL value has been committed.
+	const showTextControl = hasTextControl;
 
 	return (
 		<div
@@ -212,10 +244,24 @@ function LinkControl( {
 
 			{ ( isEditingLink || ! value ) && ! isCreatingPage && (
 				<>
-					<div className="block-editor-link-control__search-input-wrapper">
+					<div
+						className={ classnames( {
+							'block-editor-link-control__search-input-wrapper': true,
+							'has-text-control': showTextControl,
+						} ) }
+					>
+						{ showTextControl && (
+							<TextControl
+								className="block-editor-link-control__field block-editor-link-control__text-content"
+								label="Text"
+								value={ internalTextValue }
+								onChange={ setInternalTextValue }
+							/>
+						) }
+
 						<LinkControlSearchInput
 							currentLink={ value }
-							className="block-editor-link-control__search-input"
+							className="block-editor-link-control__field block-editor-link-control__search-input"
 							placeholder={ searchInputPlaceholder }
 							value={ currentInputValue }
 							withCreateSuggestion={ withCreateSuggestion }
