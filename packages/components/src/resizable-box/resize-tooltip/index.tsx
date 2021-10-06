@@ -18,6 +18,19 @@ import Label from './label';
 import { useResizeLabel, Axis, Position, POSITIONS } from './utils';
 import { Root } from './styles/resize-tooltip.styles';
 
+type ResizeTooltipProps = React.ComponentProps< typeof Root > & {
+	'aria-hidden'?: boolean;
+	axis?: Axis;
+	className?: string;
+	fadeTimeout?: number;
+	isVisible?: boolean;
+	labelRef?: Ref< HTMLDivElement >;
+	onResize?: Parameters< typeof useResizeLabel >[ 0 ][ 'onResize' ];
+	position?: Position;
+	showPx?: boolean;
+	zIndex?: number;
+};
+
 function ResizeTooltip(
 	{
 		axis,
@@ -30,18 +43,7 @@ function ResizeTooltip(
 		showPx = true,
 		zIndex = 1000,
 		...props
-	}: {
-		'aria-hidden'?: boolean;
-		axis?: Axis;
-		className?: string;
-		fadeTimeout?: number;
-		isVisible?: boolean;
-		labelRef?: Ref< HTMLDivElement >;
-		onResize?: Parameters< typeof useResizeLabel >[ 0 ][ 'onResize' ];
-		position?: Position;
-		showPx?: boolean;
-		zIndex?: number;
-	},
+	}: ResizeTooltipProps,
 	ref: Ref< HTMLDivElement >
 ): JSX.Element | null {
 	const { label, resizeListener } = useResizeLabel( {

@@ -23,17 +23,17 @@ import {
 const CORNER_OFFSET = 4;
 const CURSOR_OFFSET_TOP = CORNER_OFFSET * 2.5;
 
+type LabelProps = React.DetailedHTMLProps<
+	React.HTMLAttributes< HTMLDivElement >,
+	HTMLDivElement
+> & {
+	label?: string;
+	position: Position;
+	zIndex: number;
+};
+
 function Label(
-	{
-		label,
-		position = POSITIONS.corner,
-		zIndex = 1000,
-		...props
-	}: {
-		label?: string;
-		position: Position;
-		zIndex: number;
-	},
+	{ label, position = POSITIONS.corner, zIndex = 1000, ...props }: LabelProps,
 	ref: Ref< HTMLDivElement >
 ): JSX.Element | null {
 	const showLabel = !! label;

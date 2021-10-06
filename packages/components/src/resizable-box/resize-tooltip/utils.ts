@@ -1,4 +1,3 @@
-// @ts-check
 /**
  * External dependencies
  */
@@ -51,7 +50,7 @@ interface UseResizeLabelArgs {
  *
  * @param {UseResizeLabelArgs} props
  *
- * @return {UseResizeLabelProps} Properties for hook.
+ * @return Properties for hook.
  */
 export function useResizeLabel( {
 	axis,
@@ -197,7 +196,7 @@ interface GetSizeLabelArgs {
  *
  * @param {GetSizeLabelArgs} props
  *
- * @return {undefined | string} The rendered label.
+ * @return The rendered label.
  */
 function getSizeLabel( {
 	axis,
