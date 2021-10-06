@@ -267,9 +267,12 @@ function gutenberg_load_remote_featured_patterns() {
 	$patterns = $response->get_data();
 	foreach ( $patterns as $pattern ) {
 		$pattern_name = sanitize_title( $pattern['title'] );
-		if ( ! WP_Block_Patterns_Registry::get_instance()->is_registered( $pattern_name ) ) {
+		$registry     = WP_Block_Patterns_Registry::get_instance();
+		// Some patterns might be already registerd as `core patterns with the `core` prefix.
+		$is_registered = $registry->is_registered( $pattern_name ) || $registry->is_registered( "core/$pattern_name" );
+		if ( ! $is_registered ) {
 			register_block_pattern( $pattern_name, (array) $pattern );
-		};
+		}
 	}
 }
 
