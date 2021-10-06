@@ -8,23 +8,39 @@ then handle. See PR for further details:
 https://github.com/WordPress/gutenberg/pull/34668
 */
 window.addEventListener(
-	'focus',
-	function ( event ) {
+	'click',
+	( event ) => {
 		const selected = document.getSelection();
-		if (
-			selected &&
-			event.relatedTarget &&
-			( window.document.activeElement.classList.contains(
-				'components-dropdown-menu__menu-item'
-			) ||
-				window.document.activeElement.classList.contains(
-					'components-menu-item__button'
-				) )
-		) {
+		if ( ! selected || ! selected.toString() ) {
+			return;
+		}
+
+		// Check if the event is triggered by a dropdown
+		// toggle button.
+		const dropdownToggles = document.querySelectorAll(
+			'.components-dropdown-menu > button'
+		);
+		let currentToggle;
+		for ( const node of dropdownToggles.values() ) {
+			if ( node.contains( event.target ) ) {
+				currentToggle = node;
+				break;
+			}
+		}
+
+		// Hide text selection context menu when the click
+		// is triggered by a dropdown toggle.
+		//
+		// NOTE: The default behavior of the event is prevented
+		// because it will be dispatched after the context menu
+		// is hidden.
+		if ( currentToggle ) {
 			hideTextSelectionContextMenuListener = () => {
-				event.relatedTarget.click();
+				currentToggle.click();
 			};
+
 			window.wpwebkit.hideTextSelectionContextMenu();
+			event.preventDefault();
 		}
 	},
 	true
