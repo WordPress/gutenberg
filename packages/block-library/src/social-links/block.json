@@ -51,6 +51,7 @@
 		},
 		"spacing": {
 			"blockGap": true,
+			"margin": [ "top", "bottom" ],
 			"units": [
 				"px",
 				"em",
