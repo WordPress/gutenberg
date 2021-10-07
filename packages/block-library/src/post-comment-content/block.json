@@ -20,6 +20,12 @@
 			"fontSize": true,
 			"lineHeight": true
 		},
+		"spacing": {
+			"padding": [ "horizontal", "vertical" ],
+			"__experimentalDefaultControls": {
+				"padding": true
+			}
+		},
 		"html": false
 	}
 }
