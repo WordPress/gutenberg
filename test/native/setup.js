@@ -74,6 +74,12 @@ jest.mock( '@wordpress/react-native-bridge', () => {
 			siteMediaLibrary: 'SITE_MEDIA_LIBRARY',
 		},
 		fetchRequest: jest.fn(),
+		NativeNotice: {
+			isAvailable() {
+				return true;
+			},
+			show: jest.fn(),
+		},
 	};
 } );
 
