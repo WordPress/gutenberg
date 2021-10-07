@@ -1,0 +1,23 @@
+[
+	{
+		"blockName": "core/comment-avatar",
+		"attrs": {
+			"style": {
+				"spacing": {
+					"padding": {
+						"top": "30px",
+						"right": "30px",
+						"bottom": "30px",
+						"left": "30px"
+					}
+				},
+				"border": {
+					"radius": "100px"
+				}
+			}
+		},
+		"innerBlocks": [],
+		"innerHTML": "",
+		"innerContent": []
+	}
+]

@@ -35,7 +35,7 @@ export default ( { attributes, context: { commentId }, setAttributes } ) => {
 
 	const avatarUrls = avatars ? Object.values( avatars ) : null;
 	const sizes = avatars ? Object.keys( avatars ) : null;
-	const maxSize = sizes ? sizes[ sizes.length - 1 ] : null;
+	const maxSize = sizes ? sizes[ sizes.length - 1 ] : 96;
 	const borderProps = useBorderProps( attributes );
 
 	return (
@@ -68,9 +68,9 @@ export default ( { attributes, context: { commentId }, setAttributes } ) => {
 						lockAspectRatio
 						enable={ {
 							top: false,
-							right: isRTL() ? false : true,
+							right: ! isRTL(),
 							bottom: true,
-							left: isRTL() ? true : false,
+							left: isRTL(),
 						} }
 					>
 						<img

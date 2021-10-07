@@ -1,0 +1,26 @@
+[
+	{
+		"clientId": "_clientId_0",
+		"name": "core/comment-avatar",
+		"isValid": true,
+		"attributes": {
+			"width": 96,
+			"height": 96,
+			"style": {
+				"spacing": {
+					"padding": {
+						"top": "30px",
+						"right": "30px",
+						"bottom": "30px",
+						"left": "30px"
+					}
+				},
+				"border": {
+					"radius": "100px"
+				}
+			}
+		},
+		"innerBlocks": [],
+		"originalContent": ""
+	}
+]

@@ -15,7 +15,7 @@
  *
  * @return array Style HTML attribute.
  */
-function styles_for_comment_avatar( $attributes ) {
+function block_core_comment_avatar_set_styles( $attributes ) {
 	$has_border_radius = ! empty( $attributes['style']['border']['radius'] );
 	$has_padding       = ! empty( $attributes['style']['spacing']['padding'] );
 	$border_styles     = array();
@@ -86,11 +86,11 @@ function render_block_core_comment_avatar( $attributes, $content, $block ) {
 	$comment = get_comment( $block->context['commentId'] );
 	// We use this function in order to have the border-radius applied to the image and the padding to the wrapper.
 	// Would be better to parse get_block_wrapper_attributes() and move the border-radius to the img?
-	$inline_styles = styles_for_comment_avatar( $attributes );
+	$inline_styles = block_core_comment_avatar_set_styles( $attributes );
 
 	$width  = isset( $attributes['width'] ) ? $attributes['width'] : '96';
 	$height = isset( $attributes['height'] ) ? $attributes['height'] : '96';
-	$alt    = $comment->comment_author . __( ' Avatar' );
+	$alt    = sprintf( __( '%s Avatar' ), $comment->comment_author );
 
 	return sprintf(
 		'<div %1$s>%2$s</div>',
