@@ -47,29 +47,22 @@ export type UnitControlOnChangeCallback = InputChangeCallback<
 export type UnitSelectControlProps = {
 	className?: string;
 	disabled?: boolean;
-	isTabbable: boolean;
+	isUnitSelectTabbable: boolean;
 	onChange?: UnitControlOnChangeCallback;
-	options?: WPUnitControlUnitList;
 	size?: SelectSize;
-	value?: string;
+	unit?: string;
+	units?: WPUnitControlUnitList;
 };
 
-export interface UnitControlProps {
+export type UnitControlProps = UnitSelectControlProps & {
 	__unstableStateReducer?: StateReducer;
 	autoComplete?: string;
-	className?: string;
-	disabled?: boolean;
 	disableUnits?: boolean;
 	isPressEnterToChange?: boolean;
 	isResetValueOnUnitChange?: boolean;
-	isUnitSelectTabbable?: boolean;
 	label?: string;
-	onChange?: UnitControlOnChangeCallback;
 	onUnitChange?: UnitControlOnChangeCallback;
-	size?: SelectSize;
 	step?: number;
 	style?: CSSProperties;
-	unit?: string;
-	units?: WPUnitControlUnitList;
 	value: string;
-}
+};

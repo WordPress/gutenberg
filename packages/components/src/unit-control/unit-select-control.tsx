@@ -17,37 +17,37 @@ import type { UnitSelectControlProps } from './types';
  * Renders a `select` if there are multiple units.
  * Otherwise, renders a non-selectable label.
  *
- * @param  props            Component props.
- * @param  props.className  Class to set on the `select` element.
- * @param  props.isTabbable Whether the control can be focused via keyboard navigation.
- * @param  props.options    Available units to select from.
- * @param  props.onChange   A callback function invoked when the value is changed.
- * @param  props.size       Size of the control option. Supports "default" and "small".
- * @param  props.value      Current unit.
+ * @param  props                      Component props.
+ * @param  props.className            Class to set on the `select` element.
+ * @param  props.isUnitSelectTabbable Whether the control can be focused via keyboard navigation.
+ * @param  props.onChange             A callback function invoked when the value is changed.
+ * @param  props.size                 Size of the control option. Supports "default" and "small".
+ * @param  props.unit                 Current unit.
+ * @param  props.units                Available units to select from.
  */
 export default function UnitSelectControl( {
 	className,
-	isTabbable = true,
-	options = CSS_UNITS,
+	isUnitSelectTabbable: isTabbable = true,
 	onChange = noop,
 	size = 'default',
-	value = 'px',
+	unit = 'px',
+	units = CSS_UNITS,
 	...props
 }: UnitSelectControlProps ) {
-	if ( ! options || ! hasUnits( options ) || options?.length === 1 ) {
+	if ( ! units || ! hasUnits( units ) || units?.length === 1 ) {
 		return (
 			<UnitLabel
 				className="components-unit-control__unit-label"
 				selectSize={ size }
 			>
-				{ value }
+				{ unit }
 			</UnitLabel>
 		);
 	}
 
 	const handleOnChange = ( event: ChangeEvent< HTMLSelectElement > ) => {
 		const { value: unitValue } = event.target;
-		const data = options.find( ( option ) => option.value === unitValue );
+		const data = units.find( ( option ) => option.value === unitValue );
 
 		onChange( unitValue, { event, data } );
 	};
@@ -60,10 +60,10 @@ export default function UnitSelectControl( {
 			onChange={ handleOnChange }
 			selectSize={ size }
 			tabIndex={ isTabbable ? undefined : -1 }
-			value={ value }
+			value={ unit }
 			{ ...props }
 		>
-			{ options.map( ( option ) => (
+			{ units.map( ( option ) => (
 				<option value={ option.value } key={ option.value }>
 					{ option.label }
 				</option>

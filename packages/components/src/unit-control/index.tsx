@@ -171,11 +171,11 @@ function UnitControl(
 		<UnitSelectControl
 			aria-label={ __( 'Select unit' ) }
 			disabled={ disabled }
-			isTabbable={ isUnitSelectTabbable }
-			options={ units }
+			isUnitSelectTabbable={ isUnitSelectTabbable }
 			onChange={ handleOnUnitChange }
 			size={ size }
-			value={ unit }
+			unit={ unit }
+			units={ units }
 		/>
 	) : null;
 
