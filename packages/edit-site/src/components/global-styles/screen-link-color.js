@@ -50,7 +50,7 @@ function ScreenLinkColor( { name } ) {
 		<>
 			<ScreenHeader
 				back={ parentMenu + '/colors' }
-				title={ __( 'Link' ) }
+				title={ __( 'Links' ) }
 				description={ __(
 					'Set the link color choosing from the palette or pick your own'
 				) }

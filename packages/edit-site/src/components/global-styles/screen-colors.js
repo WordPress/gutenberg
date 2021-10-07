@@ -81,7 +81,7 @@ function LinkColorItem( { name, parentMenu } ) {
 				<FlexItem>
 					<ColorIndicator colorValue={ color } />
 				</FlexItem>
-				<FlexItem>{ __( 'Link' ) }</FlexItem>
+				<FlexItem>{ __( 'Links' ) }</FlexItem>
 			</HStack>
 		</NavigationButton>
 	);
