@@ -6,6 +6,8 @@ import { useEffect } from '@wordpress/element';
 import {
 	store as blockEditorStore,
 	InnerBlocks,
+	useBlockProps,
+	__experimentalUseInnerBlocksProps as useInnerBlocksProps,
 } from '@wordpress/block-editor';
 
 const PatternEdit = ( { attributes, clientId, isSelected } ) => {
@@ -50,7 +52,9 @@ const PatternEdit = ( { attributes, clientId, isSelected } ) => {
 		}
 	}, [ selectedPattern?.blocks ] );
 
-	return <InnerBlocks />;
+	const props = useInnerBlocksProps( useBlockProps(), {} );
+
+	return <InnerBlocks { ...props } />;
 };
 
 export default PatternEdit;
