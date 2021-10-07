@@ -149,6 +149,21 @@ function gutenberg_render_layout_support_flag( $block_content, $block ) {
 		}
 	);
 
+	// For requests via the REST API, append the styles to the end of the content.
+	// This ensures that in situations where `wp_footer` is never called, the
+	// styles are still available. This fixes an issue where layout styles are
+	// otherwise not rendered for the Post Content block within the site editor.
+	if ( defined( 'REST_REQUEST' ) && REST_REQUEST ) {
+		add_filter(
+			'wp_render_layout_support_styles',
+			function ( $layout_styles ) use ( $style ) {
+				return $layout_styles . '<style>' . $style . '</style>';
+			},
+			10,
+			1
+		);
+	}
+
 	return $content;
 }
 
@@ -163,6 +178,22 @@ if ( function_exists( 'wp_render_layout_support_flag' ) ) {
 	remove_filter( 'render_block', 'wp_render_layout_support_flag' );
 }
 add_filter( 'render_block', 'gutenberg_render_layout_support_flag', 10, 2 );
+
+/**
+ * Append the rendered layout styles to the end of post content, if registered.
+ *
+ * This is used to ensure that in responses via the REST API, where `wp_footer`
+ * is not called, that styles are still available for blocks in post content.
+ *
+ * @see gutenberg_render_layout_support_flag()
+ *
+ * @param  string $content Rendered post content.
+ * @return string          Post content with layout styles appended.
+ */
+function gutenberg_append_layout_support_to_the_content( $content ) {
+	return $content . apply_filters( 'wp_render_layout_support_styles', '' );
+}
+add_filter( 'the_content', 'gutenberg_append_layout_support_to_the_content', 10, 1 );
 
 /**
  * For themes without theme.json file, make sure
