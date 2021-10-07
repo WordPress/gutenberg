@@ -21,6 +21,25 @@ import { filePasteHandler } from './file-paste-handler';
 import { addActiveFormats, isShortcode } from './utils';
 import { splitValue } from './split-value';
 
+/** @typedef {import('@wordpress/rich-text').RichTextValue} RichTextValue */
+
+/**
+ * Replaces line separators with line breaks if not multiline.
+ * Replaces line breaks with line separators if multiline.
+ *
+ * @param {RichTextValue} value       Value to adjust.
+ * @param {boolean}       isMultiline Wether to adjust to multiline or not.
+ *
+ * @return {RichTextValue} Adjusted value.
+ */
+function adjustLines( value, isMultiline ) {
+	if ( isMultiline ) {
+		return replace( value, /\n+/g, LINE_SEPARATOR );
+	}
+
+	return replace( value, new RegExp( LINE_SEPARATOR, 'g' ), '\n' );
+}
+
 export function usePasteHandler( props ) {
 	const propsRef = useRef( props );
 	propsRef.current = props;
@@ -104,14 +123,27 @@ export function usePasteHandler( props ) {
 			}
 
 			const files = [ ...getFilesFromDataTransfer( clipboardData ) ];
-			const richTextValue = clipboardData._richTextTransferData;
+			const isInternal = clipboardData.getData( 'rich-text' ) === 'true';
 
 			// If the data comes from a rich text instance, we can directly use it
 			// without filtering the data. The filters are only meant for externally
 			// pasted content and remove inline styles.
-			if ( richTextValue ) {
-				addActiveFormats( richTextValue, value.activeFormats );
-				onChange( insert( value, richTextValue ) );
+			if ( isInternal ) {
+				const pastedMultilineTag =
+					clipboardData.getData( 'rich-text-multi-line-tag' ) ||
+					undefined;
+				let pastedValue = create( {
+					html,
+					multilineTag: pastedMultilineTag,
+					multilineWrapperTags:
+						pastedMultilineTag === 'li'
+							? [ 'ul', 'ol' ]
+							: undefined,
+					preserveWhiteSpace,
+				} );
+				pastedValue = adjustLines( pastedValue, !! multilineTag );
+				addActiveFormats( pastedValue, value.activeFormats );
+				onChange( insert( value, pastedValue ) );
 				return;
 			}
 
@@ -183,18 +215,11 @@ export function usePasteHandler( props ) {
 			if ( typeof content === 'string' ) {
 				let valueToInsert = create( { html: content } );
 
-				addActiveFormats( valueToInsert, value.activeFormats );
-
 				// If the content should be multiline, we should process text
 				// separated by a line break as separate lines.
-				if ( multilineTag ) {
-					valueToInsert = replace(
-						valueToInsert,
-						/\n+/g,
-						LINE_SEPARATOR
-					);
-				}
+				valueToInsert = adjustLines( valueToInsert, !! multilineTag );
 
+				addActiveFormats( valueToInsert, value.activeFormats );
 				onChange( insert( value, valueToInsert ) );
 			} else if ( content.length > 0 ) {
 				if ( onReplace && isEmpty( value ) ) {
