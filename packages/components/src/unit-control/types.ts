@@ -8,6 +8,7 @@ import type { CSSProperties, SyntheticEvent } from 'react';
  * Internal dependencies
  */
 import type { StateReducer } from '../input-control/reducer/state';
+import type { InputChangeCallback } from '../input-control/types';
 
 export type Value = number | string;
 
@@ -38,15 +39,10 @@ export type WPUnitControlUnit = {
 
 export type WPUnitControlUnitList = Array< WPUnitControlUnit > | false;
 
-export interface UnitControlOnChangeCallback {
-	(
-		nextValue: string | undefined,
-		extra: {
-			event: SyntheticEvent< HTMLSelectElement | HTMLInputElement >;
-			data?: WPUnitControlUnit;
-		}
-	): void;
-}
+export type UnitControlOnChangeCallback = InputChangeCallback<
+	SyntheticEvent< HTMLSelectElement | HTMLInputElement >,
+	{ data?: WPUnitControlUnit }
+>;
 
 export type UnitSelectControlProps = {
 	className?: string;
