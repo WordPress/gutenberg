@@ -52,21 +52,21 @@ function getFormatBoundary(
 	// If the start index is at the end of the boundary then
 	// it is always +1 beyond the edge. Account for that by
 	// decrementing by 1.
-	startIndex = isIndexAtEnd ? startIndex - 1 : startIndex;
+	const initialIndex = isIndexAtEnd ? startIndex - 1 : startIndex;
 
 	const targetFormat = seekTargetFormat(
 		newFormats,
-		startIndex,
+		initialIndex,
 		format.type
 	);
 
-	const index = newFormats[ startIndex ].indexOf( targetFormat );
+	const index = newFormats[ initialIndex ].indexOf( targetFormat );
 
 	// if ( isIndexInside ) {
 	// Walk the startIndex "backwards" until the end/trailing "edge" of the matching format.
 	startIndex = walkToBoundary(
 		newFormats,
-		startIndex,
+		initialIndex,
 		targetFormat,
 		index,
 		'backwards'
@@ -75,7 +75,7 @@ function getFormatBoundary(
 	// Walk the endIndex "forwards" until the end/trailing "edge" of the matching format.
 	endIndex = walkToBoundary(
 		newFormats,
-		endIndex,
+		initialIndex,
 		targetFormat,
 		index,
 		'forwards'
@@ -109,7 +109,7 @@ function walkToBoundary( formats, index, initFormat, formatIndex, direction ) {
 		}
 	}
 
-	// Restore by one to counter end of loop.
+	// Restore by one to avoid out of bounds.
 	if ( direction === 'backwards' ) {
 		index++;
 	}
