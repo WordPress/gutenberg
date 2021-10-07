@@ -20,16 +20,17 @@
 /**
  * Returns a CSS selector used to query for focusable elements.
  *
- * @param {boolean} keyboard If set, only query elements that can be focused
- *                           using the keyboard. Non-interactive elements with a
- *                           negative `tabindex` are focusable but cannot be
- *                           focused using the keyboard.
+ * @param {boolean} sequential If set, only query elements that are sequentially
+ *                             focusable. Non-interactive elements with a
+ *                             negative `tabindex` are focusable but not
+ *                             sequentially focusable.
+ *                             https://html.spec.whatwg.org/multipage/interaction.html#the-tabindex-attribute
  *
  * @return {string} CSS selector.
  */
-function buildSelector( keyboard ) {
+function buildSelector( sequential ) {
 	return [
-		keyboard ? '[tabindex]:not([tabindex^="-"])' : '[tabindex]',
+		sequential ? '[tabindex]:not([tabindex^="-"])' : '[tabindex]',
 		'a[href]',
 		'button:not([disabled])',
 		'input:not([type="hidden"]):not([disabled])',
@@ -85,21 +86,22 @@ function isValidFocusableArea( element ) {
 /**
  * Returns all focusable elements within a given context.
  *
- * @param {Element} context            Element in which to search.
+ * @param {Element} context              Element in which to search.
  * @param {Object}  [options]
- * @param {boolean} [options.keyboard] If set, only return elements that can be
- *                                     focused using the keyboard.
- *                                     Non-interactive elements with a negative
- *                                     `tabindex` are focusable but cannot be
- *                                     focused using the keyboard.
+ * @param {boolean} [options.sequential] If set, only return elements that are
+ *                                       sequentially focusable.
+ *                                       Non-interactive elements with a
+ *                                       negative `tabindex` are focusable but
+ *                                       not sequentially focusable.
+ *                                       https://html.spec.whatwg.org/multipage/interaction.html#the-tabindex-attribute
  *
  * @return {Element[]} Focusable elements.
  */
-export function find( context, { keyboard = false } = {} ) {
+export function find( context, { sequential = false } = {} ) {
 	/* eslint-disable jsdoc/no-undefined-types */
 	/** @type {NodeListOf<HTMLElement>} */
 	/* eslint-enable jsdoc/no-undefined-types */
-	const elements = context.querySelectorAll( buildSelector( keyboard ) );
+	const elements = context.querySelectorAll( buildSelector( sequential ) );
 
 	return Array.from( elements ).filter( ( element ) => {
 		if ( ! isVisible( element ) ) {

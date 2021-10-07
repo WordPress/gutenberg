@@ -25,7 +25,7 @@ import RovingTabIndexContainer from './roving-tab-index';
  */
 function getRowFocusables( rowElement ) {
 	const focusablesInRow = focus.focusable.find( rowElement, {
-		keyboard: true,
+		sequential: true,
 	} );
 
 	if ( ! focusablesInRow || ! focusablesInRow.length ) {
