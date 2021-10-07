@@ -88,3 +88,10 @@ Can be used to externally control the value of the control, like in the `MyContr
 
 -   Type: `Object`
 -   Required: No
+
+#### icon
+
+The icon for the control.
+
+-   Type: `Icon component`
+-   Required: No

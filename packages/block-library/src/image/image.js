@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { get, filter, map, last, pick, includes } from 'lodash';
+import { get, filter, map, pick, includes } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -21,22 +21,19 @@ import { useSelect, useDispatch } from '@wordpress/data';
 import {
 	BlockControls,
 	InspectorControls,
-	InspectorAdvancedControls,
 	RichText,
 	__experimentalImageSizeControl as ImageSizeControl,
 	__experimentalImageURLInputUI as ImageURLInputUI,
 	MediaReplaceFlow,
 	store as blockEditorStore,
 	BlockAlignmentControl,
+	__experimentalImageEditor as ImageEditor,
+	__experimentalImageEditingProvider as ImageEditingProvider,
 } from '@wordpress/block-editor';
 import { useEffect, useState, useRef } from '@wordpress/element';
 import { __, sprintf, isRTL } from '@wordpress/i18n';
-import { getPath } from '@wordpress/url';
-import {
-	createBlock,
-	getBlockType,
-	switchToBlockType,
-} from '@wordpress/blocks';
+import { getFilename } from '@wordpress/url';
+import { createBlock, switchToBlockType } from '@wordpress/blocks';
 import { crop, overlayText, upload } from '@wordpress/icons';
 import { store as noticesStore } from '@wordpress/notices';
 import { store as coreStore } from '@wordpress/core-data';
@@ -46,20 +43,12 @@ import { store as coreStore } from '@wordpress/core-data';
  */
 import { createUpgradedEmbedBlock } from '../embed/util';
 import useClientWidth from './use-client-width';
-import ImageEditor, { ImageEditingProvider } from './image-editing';
 import { isExternalImage } from './edit';
 
 /**
  * Module constants
  */
 import { MIN_SIZE, ALLOWED_MEDIA_TYPES } from './constants';
-
-function getFilename( url ) {
-	const path = getPath( url );
-	if ( path ) {
-		return last( path.split( '/' ) );
-	}
-}
 
 export default function Image( {
 	temporaryURL,
@@ -87,71 +76,82 @@ export default function Image( {
 	onSelectURL,
 	onUploadError,
 	containerRef,
+	context,
+	clientId,
 } ) {
 	const captionRef = useRef();
 	const prevUrl = usePrevious( url );
-	const { block, currentId, image, multiImageSelection } = useSelect(
+	const { allowResize = true } = context;
+	const { getBlock } = useSelect( blockEditorStore );
+
+	const { image, multiImageSelection } = useSelect(
 		( select ) => {
 			const { getMedia } = select( coreStore );
-			const {
-				getMultiSelectedBlockClientIds,
-				getBlockName,
-				getSelectedBlock,
-				getSelectedBlockClientId,
-			} = select( blockEditorStore );
+			const { getMultiSelectedBlockClientIds, getBlockName } = select(
+				blockEditorStore
+			);
 			const multiSelectedClientIds = getMultiSelectedBlockClientIds();
 			return {
-				block: getSelectedBlock(),
-				currentId: getSelectedBlockClientId(),
 				image: id && isSelected ? getMedia( id ) : null,
 				multiImageSelection:
 					multiSelectedClientIds.length &&
 					multiSelectedClientIds.every(
-						( clientId ) =>
-							getBlockName( clientId ) === 'core/image'
+						( _clientId ) =>
+							getBlockName( _clientId ) === 'core/image'
 					),
 			};
 		},
 		[ id, isSelected ]
 	);
-	const { imageEditing, imageSizes, maxWidth, mediaUpload } = useSelect(
+	const {
+		canInsertCover,
+		imageEditing,
+		imageSizes,
+		maxWidth,
+		mediaUpload,
+	} = useSelect(
 		( select ) => {
-			const { getSettings } = select( blockEditorStore );
-			return pick( getSettings(), [
+			const {
+				getBlockRootClientId,
+				getSettings,
+				canInsertBlockType,
+			} = select( blockEditorStore );
+
+			const rootClientId = getBlockRootClientId( clientId );
+			const settings = pick( getSettings(), [
 				'imageEditing',
 				'imageSizes',
 				'maxWidth',
 				'mediaUpload',
 			] );
-		}
+
+			return {
+				...settings,
+				canInsertCover: canInsertBlockType(
+					'core/cover',
+					rootClientId
+				),
+			};
+		},
+		[ clientId ]
 	);
 	const { replaceBlocks, toggleSelection } = useDispatch( blockEditorStore );
 	const { createErrorNotice, createSuccessNotice } = useDispatch(
 		noticesStore
 	);
 	const isLargeViewport = useViewportMatch( 'medium' );
-	const [ captionFocused, setCaptionFocused ] = useState( false );
 	const isWideAligned = includes( [ 'wide', 'full' ], align );
 	const [ { naturalWidth, naturalHeight }, setNaturalSize ] = useState( {} );
 	const [ isEditingImage, setIsEditingImage ] = useState( false );
 	const [ externalBlob, setExternalBlob ] = useState();
 	const clientWidth = useClientWidth( containerRef, [ align ] );
-	const isResizable = ! isWideAligned && isLargeViewport;
+	const isResizable = allowResize && ! ( isWideAligned && isLargeViewport );
 	const imageSizeOptions = map(
 		filter( imageSizes, ( { slug } ) =>
 			get( image, [ 'media_details', 'sizes', slug, 'source_url' ] )
 		),
 		( { name, slug } ) => ( { value: slug, label: name } )
 	);
-
-	// Check if the cover block is registered.
-	const coverBlockExists = !! getBlockType( 'core/cover' );
-
-	useEffect( () => {
-		if ( ! isSelected ) {
-			setCaptionFocused( false );
-		}
-	}, [ isSelected ] );
 
 	// If an image is externally hosted, try to fetch the image data. This may
 	// fail if the image host doesn't allow CORS with the domain. If it works,
@@ -164,7 +164,9 @@ export default function Image( {
 		window
 			.fetch( url )
 			.then( ( response ) => response.blob() )
-			.then( ( blob ) => setExternalBlob( blob ) );
+			.then( ( blob ) => setExternalBlob( blob ) )
+			// Do nothing, cannot upload.
+			.catch( () => {} );
 	}, [ id, url, isSelected, externalBlob ] );
 
 	// Focus the caption after inserting an image from the placeholder. This is
@@ -201,18 +203,6 @@ export default function Image( {
 		// This is the HTML title attribute, separate from the media object
 		// title.
 		setAttributes( { title: value } );
-	}
-
-	function onFocusCaption() {
-		if ( ! captionFocused ) {
-			setCaptionFocused( true );
-		}
-	}
-
-	function onImageClick() {
-		if ( captionFocused ) {
-			setCaptionFocused( false );
-		}
 	}
 
 	function updateAlt( newAlt ) {
@@ -279,6 +269,13 @@ export default function Image( {
 	const canEditImage = id && naturalWidth && naturalHeight && imageEditing;
 	const allowCrop = ! multiImageSelection && canEditImage && ! isEditingImage;
 
+	function switchToCover() {
+		replaceBlocks(
+			clientId,
+			switchToBlockType( getBlock( clientId ), 'core/cover' )
+		);
+	}
+
 	const controls = (
 		<>
 			<BlockControls group="block">
@@ -312,16 +309,11 @@ export default function Image( {
 						label={ __( 'Upload external image' ) }
 					/>
 				) }
-				{ ! multiImageSelection && coverBlockExists && (
+				{ ! multiImageSelection && canInsertCover && (
 					<ToolbarButton
 						icon={ overlayText }
 						label={ __( 'Add text over image' ) }
-						onClick={ () =>
-							replaceBlocks(
-								currentId,
-								switchToBlockType( block, 'core/cover' )
-							)
-						}
+						onClick={ switchToCover }
 					/>
 				) }
 			</BlockControls>
@@ -372,7 +364,7 @@ export default function Image( {
 					/>
 				</PanelBody>
 			</InspectorControls>
-			<InspectorAdvancedControls>
+			<InspectorControls __experimentalGroup="advanced">
 				<TextControl
 					label={ __( 'Title attribute' ) }
 					value={ title || '' }
@@ -390,7 +382,7 @@ export default function Image( {
 						</>
 					}
 				/>
-			</InspectorAdvancedControls>
+			</InspectorControls>
 		</>
 	);
 
@@ -417,7 +409,6 @@ export default function Image( {
 			<img
 				src={ temporaryURL || url }
 				alt={ defaultedAlt }
-				onClick={ onImageClick }
 				onError={ () => onImageError() }
 				onLoad={ ( event ) => {
 					setNaturalSize(
@@ -553,7 +544,9 @@ export default function Image( {
 			isEditing={ isEditingImage }
 			onFinishEditing={ () => setIsEditingImage( false ) }
 		>
-			{ controls }
+			{ /* Hide controls during upload to avoid component remount,
+				which causes duplicated image upload. */ }
+			{ ! temporaryURL && controls }
 			{ img }
 			{ ( ! RichText.isEmpty( caption ) || isSelected ) && (
 				<RichText
@@ -562,11 +555,9 @@ export default function Image( {
 					aria-label={ __( 'Image caption text' ) }
 					placeholder={ __( 'Add caption' ) }
 					value={ caption }
-					unstableOnFocus={ onFocusCaption }
 					onChange={ ( value ) =>
 						setAttributes( { caption: value } )
 					}
-					isSelected={ captionFocused }
 					inlineToolbar
 					__unstableOnSplitAtEnd={ () =>
 						insertBlocksAfter( createBlock( 'core/paragraph' ) )

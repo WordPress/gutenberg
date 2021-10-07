@@ -36,7 +36,12 @@ describe( 'useMergeRefs', () => {
 
 	renderCallback.history = [];
 
-	function MergedRefs( { count, tagName: TagName = 'div' } ) {
+	function MergedRefs( {
+		count,
+		tagName: TagName = 'div',
+		disable1,
+		disable2,
+	} ) {
 		function refCallback1( value ) {
 			refCallback1.history.push( value );
 		}
@@ -51,14 +56,14 @@ describe( 'useMergeRefs', () => {
 
 		renderCallback( [ refCallback1.history, refCallback2.history ] );
 
-		return (
-			<TagName
-				ref={ useMergeRefs( [
-					useCallback( refCallback1, [] ),
-					useCallback( refCallback2, [ count ] ),
-				] ) }
-			/>
-		);
+		const ref1 = useCallback( refCallback1, [] );
+		const ref2 = useCallback( refCallback2, [ count ] );
+		const mergedRefs = useMergeRefs( [
+			! disable1 && ref1,
+			! disable2 && ref2,
+		] );
+
+		return <TagName ref={ mergedRefs } />;
 	}
 
 	beforeEach( () => {
@@ -271,6 +276,55 @@ describe( 'useMergeRefs', () => {
 			],
 			[ [], [] ],
 			[ [], [ newElement, null ] ],
+		] );
+	} );
+
+	it( 'should allow disabling a ref', () => {
+		const rootElement = document.getElementById( 'root' );
+
+		ReactDOM.render( <MergedRefs disable1 />, rootElement );
+
+		const originalElement = rootElement.firstElementChild;
+
+		// Render 1: ref 1 should be disabled.
+		expect( renderCallback.history ).toEqual( [
+			[ [], [ originalElement ] ],
+		] );
+
+		ReactDOM.render( <MergedRefs disable2 />, rootElement );
+
+		// Render 2: ref 1 should be enabled and receive the ref. Note that the
+		// callback hasn't changed, so the original callback function will be
+		// called. Ref 2 should be disabled, so called with null.
+		expect( renderCallback.history ).toEqual( [
+			[ [ originalElement ], [ originalElement, null ] ],
+			[ [], [] ],
+		] );
+
+		ReactDOM.render( <MergedRefs disable1 count={ 1 } />, rootElement );
+
+		// Render 3: ref 1 should again be disabled. Ref 2 to should receive a
+		// ref with the new callback function because the count has been
+		// changed.
+		expect( renderCallback.history ).toEqual( [
+			[
+				[ originalElement, null ],
+				[ originalElement, null ],
+			],
+			[ [], [] ],
+			[ [], [ originalElement ] ],
+		] );
+
+		ReactDOM.render( null, rootElement );
+
+		// Unmount: current callback functions should receive null.
+		expect( renderCallback.history ).toEqual( [
+			[
+				[ originalElement, null ],
+				[ originalElement, null ],
+			],
+			[ [], [] ],
+			[ [], [ originalElement, null ] ],
 		] );
 	} );
 } );

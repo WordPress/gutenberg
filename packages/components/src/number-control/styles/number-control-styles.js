@@ -1,7 +1,8 @@
+// @ts-nocheck
 /**
  * External dependencies
  */
-import { css } from '@emotion/core';
+import { css } from '@emotion/react';
 import styled from '@emotion/styled';
 /**
  * Internal dependencies
@@ -12,10 +13,14 @@ const htmlArrowStyles = ( { hideHTMLArrows } ) => {
 	if ( ! hideHTMLArrows ) return ``;
 
 	return css`
-		&::-webkit-outer-spin-button,
-		&::-webkit-inner-spin-button {
+		input[type='number']::-webkit-outer-spin-button,
+		input[type='number']::-webkit-inner-spin-button {
 			-webkit-appearance: none !important;
 			margin: 0 !important;
+		}
+
+		input[type='number'] {
+			-moz-appearance: textfield;
 		}
 	`;
 };

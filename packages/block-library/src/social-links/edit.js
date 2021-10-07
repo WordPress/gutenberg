@@ -6,27 +6,23 @@ import classNames from 'classnames';
 /**
  * WordPress dependencies
  */
-
+import { getBlockSupport } from '@wordpress/blocks';
 import { Fragment, useEffect } from '@wordpress/element';
-
 import {
 	BlockControls,
 	__experimentalUseInnerBlocksProps as useInnerBlocksProps,
 	useBlockProps,
 	InspectorControls,
-	JustifyToolbar,
 	ContrastChecker,
 	PanelColorSettings,
 	withColors,
 } from '@wordpress/block-editor';
 import {
-	DropdownMenu,
 	MenuGroup,
 	MenuItem,
 	PanelBody,
 	ToggleControl,
-	ToolbarItem,
-	ToolbarGroup,
+	ToolbarDropdownMenu,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { check } from '@wordpress/icons';
@@ -40,8 +36,17 @@ const sizeOptions = [
 	{ name: __( 'Huge' ), value: 'has-huge-icon-size' },
 ];
 
+const getDefaultBlockLayout = ( blockTypeOrName ) => {
+	const layoutBlockSupportConfig = getBlockSupport(
+		blockTypeOrName,
+		'__experimentalLayout'
+	);
+	return layoutBlockSupportConfig?.default;
+};
+
 export function SocialLinksEdit( props ) {
 	const {
+		name,
 		attributes,
 		iconBackgroundColor,
 		iconColor,
@@ -54,10 +59,11 @@ export function SocialLinksEdit( props ) {
 	const {
 		iconBackgroundColorValue,
 		iconColorValue,
-		itemsJustification,
 		openInNewTab,
 		size,
+		layout,
 	} = attributes;
+	const usedLayout = layout || getDefaultBlockLayout( name );
 
 	// Remove icon background color if logos only style selected.
 	const logosOnly =
@@ -95,87 +101,59 @@ export function SocialLinksEdit( props ) {
 		'has-icon-color': iconColor.color || iconColorValue,
 		'has-icon-background-color':
 			iconBackgroundColor.color || iconBackgroundColorValue,
-		[ `items-justified-${ itemsJustification }` ]: itemsJustification,
 	} );
 
 	const blockProps = useBlockProps( { className } );
 	const innerBlocksProps = useInnerBlocksProps( blockProps, {
 		allowedBlocks: ALLOWED_BLOCKS,
-		orientation: 'horizontal',
 		placeholder: isSelected ? SelectedSocialPlaceholder : SocialPlaceholder,
 		templateLock: false,
 		__experimentalAppenderTagName: 'li',
+		__experimentalLayout: usedLayout,
 	} );
 
 	const POPOVER_PROPS = {
 		position: 'bottom right',
-		isAlternate: true,
 	};
 
 	return (
 		<Fragment>
-			<BlockControls>
-				<JustifyToolbar
-					allowedControls={ [
-						'left',
-						'center',
-						'right',
-						'space-between',
-					] }
-					value={ itemsJustification }
-					onChange={ ( value ) =>
-						setAttributes( { itemsJustification: value } )
-					}
-					popoverProps={ {
-						position: 'bottom right',
-						isAlternate: true,
-					} }
-				/>
-				<ToolbarGroup>
-					<ToolbarItem>
-						{ ( toggleProps ) => (
-							<DropdownMenu
-								label={ __( 'Size' ) }
-								text={ __( 'Size' ) }
-								icon={ null }
-								popoverProps={ POPOVER_PROPS }
-								toggleProps={ toggleProps }
-							>
-								{ ( { onClose } ) => (
-									<MenuGroup>
-										{ sizeOptions.map( ( entry ) => {
-											return (
-												<MenuItem
-													icon={
-														( size ===
-															entry.value ||
-															( ! size &&
-																entry.value ===
-																	'has-normal-icon-size' ) ) &&
-														check
-													}
-													isSelected={
-														size === entry.value
-													}
-													key={ entry.value }
-													onClick={ () => {
-														setAttributes( {
-															size: entry.value,
-														} );
-													} }
-													onClose={ onClose }
-													role="menuitemradio"
-												>
-													{ entry.name }
-												</MenuItem>
-											);
-										} ) }
-									</MenuGroup>
-								) }
-							</DropdownMenu>
-						) }
-					</ToolbarItem>
-				</ToolbarGroup>
+			<BlockControls group="other">
+				<ToolbarDropdownMenu
+					label={ __( 'Size' ) }
+					text={ __( 'Size' ) }
+					icon={ null }
+					popoverProps={ POPOVER_PROPS }
+				>
+					{ ( { onClose } ) => (
+						<MenuGroup>
+							{ sizeOptions.map( ( entry ) => {
+								return (
+									<MenuItem
+										icon={
+											( size === entry.value ||
+												( ! size &&
+													entry.value ===
+														'has-normal-icon-size' ) ) &&
+											check
+										}
+										isSelected={ size === entry.value }
+										key={ entry.value }
+										onClick={ () => {
+											setAttributes( {
+												size: entry.value,
+											} );
+										} }
+										onClose={ onClose }
+										role="menuitemradio"
+									>
+										{ entry.name }
+									</MenuItem>
+								);
+							} ) }
+						</MenuGroup>
+					) }
+				</ToolbarDropdownMenu>
 			</BlockControls>
 			<InspectorControls>
 				<PanelBody title={ __( 'Link settings' ) }>

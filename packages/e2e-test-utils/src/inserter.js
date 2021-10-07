@@ -7,7 +7,7 @@ import { canvas } from './canvas';
 // This selector is written to support the current and old inserter markup
 // because the performance tests need to be able to run across versions.
 const INSERTER_SEARCH_SELECTOR =
-	'.block-editor-inserter__search-input,input.block-editor-inserter__search';
+	'.block-editor-inserter__search input,.block-editor-inserter__search-input,input.block-editor-inserter__search';
 
 /**
  * Opens the global block inserter.
@@ -196,7 +196,7 @@ export async function insertReusableBlock( searchTerm ) {
 	await waitForInserterCloseAndContentFocus();
 	// We should wait until the block is loaded
 	await page.waitForXPath(
-		'//*[@class="block-library-block__reusable-block-container"]'
+		'//*[contains(@class,"block-library-block__reusable-block-container")]'
 	);
 }
 

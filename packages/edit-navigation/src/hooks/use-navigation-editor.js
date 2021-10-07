@@ -1,14 +1,18 @@
 /**
  * WordPress dependencies
  */
+import { __, sprintf } from '@wordpress/i18n';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { useState, useEffect } from '@wordpress/element';
+import { store as noticesStore } from '@wordpress/notices';
+import { store as coreStore } from '@wordpress/core-data';
+
 /**
  * Internal dependencies
  */
 import { store as editNavigationStore } from '../store';
-import { store as noticesStore } from '@wordpress/notices';
-import { __, sprintf } from '@wordpress/i18n';
+import { useSelectedMenuId } from './index';
+import useMenuEntity from './use-menu-entity';
 
 const getMenusData = ( select ) => {
 	const selectors = select( 'core' );
@@ -21,26 +25,28 @@ const getMenusData = ( select ) => {
 	};
 };
 export default function useNavigationEditor() {
-	const [
-		isManageLocationsModalOpen,
-		setIsManageLocationsModalOpen,
-	] = useState( false );
-	const [ openManageLocationsModal, closeManageLocationsModal ] = [
-		true,
-		false,
-	].map( ( bool ) => () => setIsManageLocationsModalOpen( bool ) );
-	const { deleteMenu: _deleteMenu } = useDispatch( 'core' );
-	const [ selectedMenuId, setSelectedMenuId ] = useState( null );
+	const { deleteMenu: _deleteMenu } = useDispatch( coreStore );
+	const [ selectedMenuId, setSelectedMenuId ] = useSelectedMenuId();
 	const [ hasFinishedInitialLoad, setHasFinishedInitialLoad ] = useState(
 		false
 	);
+	const { editedMenu, hasLoadedEditedMenu } = useMenuEntity( selectedMenuId );
 	const { menus, hasLoadedMenus } = useSelect( getMenusData, [] );
-	const [ isMenuSelected, setIsMenuSelected ] = useState( true );
+
+	/**
+	 * If the Menu being edited has been requested from API and it has
+	 * no values then it has been deleted so reset the selected menu ID.
+	 */
+	useEffect( () => {
+		if ( hasLoadedEditedMenu && ! Object.keys( editedMenu )?.length ) {
+			setSelectedMenuId( null );
+		}
+	}, [ hasLoadedEditedMenu, editedMenu ] );
 
 	const { createErrorNotice, createInfoNotice } = useDispatch( noticesStore );
 	const isMenuBeingDeleted = useSelect(
 		( select ) =>
-			select( 'core' ).isDeletingEntityRecord(
+			select( coreStore ).isDeletingEntityRecord(
 				'root',
 				'menu',
 				selectedMenuId
@@ -90,9 +96,6 @@ export default function useNavigationEditor() {
 		}
 	};
 
-	useEffect( () => setIsMenuSelected( selectedMenuId !== null ), [
-		selectedMenuId,
-	] );
 	return {
 		menus,
 		hasLoadedMenus,
@@ -102,9 +105,6 @@ export default function useNavigationEditor() {
 		isMenuBeingDeleted,
 		selectMenu: setSelectedMenuId,
 		deleteMenu,
-		openManageLocationsModal,
-		closeManageLocationsModal,
-		isManageLocationsModalOpen,
-		isMenuSelected,
+		isMenuSelected: !! selectedMenuId,
 	};
 }

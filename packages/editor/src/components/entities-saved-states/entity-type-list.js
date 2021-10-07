@@ -9,6 +9,7 @@ import { some } from 'lodash';
 import { useSelect } from '@wordpress/data';
 import { PanelBody } from '@wordpress/components';
 import { page, layout } from '@wordpress/icons';
+import { store as coreStore } from '@wordpress/core-data';
 
 /**
  * Internal dependencies
@@ -29,7 +30,7 @@ export default function EntityTypeList( {
 	const firstRecord = list[ 0 ];
 	const entity = useSelect(
 		( select ) =>
-			select( 'core' ).getEntity( firstRecord.kind, firstRecord.name ),
+			select( coreStore ).getEntity( firstRecord.kind, firstRecord.name ),
 		[ firstRecord.kind, firstRecord.name ]
 	);
 
@@ -42,7 +43,7 @@ export default function EntityTypeList( {
 			{ list.map( ( record ) => {
 				return (
 					<EntityRecordItem
-						key={ record.key || 'site' }
+						key={ record.key || record.property }
 						record={ record }
 						checked={
 							! some(
@@ -50,7 +51,8 @@ export default function EntityTypeList( {
 								( elt ) =>
 									elt.kind === record.kind &&
 									elt.name === record.name &&
-									elt.key === record.key
+									elt.key === record.key &&
+									elt.property === record.property
 							)
 						}
 						onChange={ ( value ) =>

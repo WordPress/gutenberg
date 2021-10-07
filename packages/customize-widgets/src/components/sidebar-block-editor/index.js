@@ -11,15 +11,17 @@ import { useSelect } from '@wordpress/data';
 import { useMemo, createPortal } from '@wordpress/element';
 import {
 	BlockList,
+	BlockTools,
 	BlockSelectionClearer,
 	BlockInspector,
+	CopyHandler,
 	ObserveTyping,
 	WritingFlow,
 	BlockEditorKeyboardShortcuts,
-	__experimentalBlockSettingsMenuFirstItem,
+	__unstableBlockSettingsMenuFirstItem,
 } from '@wordpress/block-editor';
-import { SlotFillProvider, Popover } from '@wordpress/components';
 import { uploadMedia } from '@wordpress/media-utils';
+import { store as interfaceStore } from '@wordpress/interface';
 
 /**
  * Internal dependencies
@@ -28,6 +30,9 @@ import BlockInspectorButton from '../block-inspector-button';
 import Header from '../header';
 import useInserter from '../inserter/use-inserter';
 import SidebarEditorProvider from './sidebar-editor-provider';
+import WelcomeGuide from '../welcome-guide';
+import KeyboardShortcuts from '../keyboard-shortcuts';
+import BlockAppender from '../block-appender';
 
 export default function SidebarBlockEditor( {
 	blockEditorSettings,
@@ -36,11 +41,32 @@ export default function SidebarBlockEditor( {
 	inspector,
 } ) {
 	const [ isInserterOpened, setIsInserterOpened ] = useInserter( inserter );
-	const hasUploadPermissions = useSelect(
-		( select ) =>
-			defaultTo( select( coreStore ).canUser( 'create', 'media' ), true ),
-		[]
-	);
+	const {
+		hasUploadPermissions,
+		isFixedToolbarActive,
+		keepCaretInsideBlock,
+		isWelcomeGuideActive,
+	} = useSelect( ( select ) => {
+		const { isFeatureActive } = select( interfaceStore );
+		return {
+			hasUploadPermissions: defaultTo(
+				select( coreStore ).canUser( 'create', 'media' ),
+				true
+			),
+			isFixedToolbarActive: isFeatureActive(
+				'core/customize-widgets',
+				'fixedToolbar'
+			),
+			keepCaretInsideBlock: isFeatureActive(
+				'core/customize-widgets',
+				'keepCaretInsideBlock'
+			),
+			isWelcomeGuideActive: isFeatureActive(
+				'core/customize-widgets',
+				'welcomeGuide'
+			),
+		};
+	}, [] );
 	const settings = useMemo( () => {
 		let mediaUploadBlockEditor;
 		if ( hasUploadPermissions ) {
@@ -54,40 +80,58 @@ export default function SidebarBlockEditor( {
 		}
 
 		return {
+			...blockEditorSettings,
 			__experimentalSetIsInserterOpened: setIsInserterOpened,
 			mediaUpload: mediaUploadBlockEditor,
+			hasFixedToolbar: isFixedToolbarActive,
+			keepCaretInsideBlock,
+			__unstableHasCustomAppender: true,
 		};
-	}, [] );
-	const parentContainer = document.getElementById(
-		'customize-theme-controls'
-	);
+	}, [
+		hasUploadPermissions,
+		blockEditorSettings,
+		isFixedToolbarActive,
+		keepCaretInsideBlock,
+		setIsInserterOpened,
+	] );
+
+	if ( isWelcomeGuideActive ) {
+		return <WelcomeGuide sidebar={ sidebar } />;
+	}
 
 	return (
 		<>
 			<BlockEditorKeyboardShortcuts.Register />
-			<SlotFillProvider>
-				<SidebarEditorProvider
+			<KeyboardShortcuts.Register />
+
+			<SidebarEditorProvider sidebar={ sidebar } settings={ settings }>
+				<KeyboardShortcuts
+					undo={ sidebar.undo }
+					redo={ sidebar.redo }
+					save={ sidebar.save }
+				/>
+
+				<Header
 					sidebar={ sidebar }
-					settings={ settings }
-				>
-					<BlockEditorKeyboardShortcuts />
+					inserter={ inserter }
+					isInserterOpened={ isInserterOpened }
+					setIsInserterOpened={ setIsInserterOpened }
+					isFixedToolbarActive={ isFixedToolbarActive }
+				/>
 
-					<Header
-						inserter={ inserter }
-						isInserterOpened={ isInserterOpened }
-						setIsInserterOpened={ setIsInserterOpened }
-					/>
-
-					<BlockSelectionClearer>
-						<WritingFlow>
-							<ObserveTyping>
-								<BlockList />
-							</ObserveTyping>
-						</WritingFlow>
-					</BlockSelectionClearer>
-				</SidebarEditorProvider>
-
-				<Popover.Slot name="block-toolbar" />
+				<CopyHandler>
+					<BlockTools>
+						<BlockSelectionClearer>
+							<WritingFlow>
+								<ObserveTyping>
+									<BlockList
+										renderAppender={ BlockAppender }
+									/>
+								</ObserveTyping>
+							</WritingFlow>
+						</BlockSelectionClearer>
+					</BlockTools>
+				</CopyHandler>
 
 				{ createPortal(
 					// This is a temporary hack to prevent button component inside <BlockInspector>
@@ -97,22 +141,16 @@ export default function SidebarBlockEditor( {
 					</form>,
 					inspector.contentContainer[ 0 ]
 				) }
+			</SidebarEditorProvider>
 
-				<__experimentalBlockSettingsMenuFirstItem>
-					{ ( { onClose } ) => (
-						<BlockInspectorButton
-							inspector={ inspector }
-							closeMenu={ onClose }
-						/>
-					) }
-				</__experimentalBlockSettingsMenuFirstItem>
-
-				{
-					// We have to portal this to the parent of both the editor and the inspector,
-					// so that the popovers will appear above both of them.
-					createPortal( <Popover.Slot />, parentContainer )
-				}
-			</SlotFillProvider>
+			<__unstableBlockSettingsMenuFirstItem>
+				{ ( { onClose } ) => (
+					<BlockInspectorButton
+						inspector={ inspector }
+						closeMenu={ onClose }
+					/>
+				) }
+			</__unstableBlockSettingsMenuFirstItem>
 		</>
 	);
 }

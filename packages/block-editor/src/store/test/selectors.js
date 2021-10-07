@@ -75,6 +75,7 @@ const {
 	__experimentalGetPatternsByBlockTypes,
 	__unstableGetClientIdWithClientIdsTree,
 	__unstableGetClientIdsTree,
+	__experimentalGetPatternTransformItems,
 	wasBlockJustInserted,
 } = selectors;
 
@@ -227,19 +228,19 @@ describe( 'selectors', () => {
 					parents: {
 						123: '',
 					},
-					cache: {
-						123: {},
+					tree: {
+						123: {
+							clientId: 123,
+							name: 'core/paragraph',
+							attributes: {},
+							innerBlocks: [],
+						},
 					},
 					controlledInnerBlocks: {},
 				},
 			};
 
-			expect( getBlock( state, 123 ) ).toEqual( {
-				clientId: 123,
-				name: 'core/paragraph',
-				attributes: {},
-				innerBlocks: [],
-			} );
+			expect( getBlock( state, 123 ) ).toBe( state.blocks.tree[ 123 ] );
 		} );
 
 		it( 'should return null if the block is not present in state', () => {
@@ -249,55 +250,19 @@ describe( 'selectors', () => {
 					attributes: {},
 					order: {},
 					parents: {},
-					cache: {},
+					tree: {
+						123: {
+							clientId: 123,
+							name: 'core/paragraph',
+							attributes: {},
+							innerBlocks: [],
+						},
+					},
 					controlledInnerBlocks: {},
 				},
 			};
 
 			expect( getBlock( state, 123 ) ).toBe( null );
-		} );
-
-		it( 'should include inner blocks', () => {
-			const state = {
-				blocks: {
-					byClientId: {
-						123: { clientId: 123, name: 'core/paragraph' },
-						456: { clientId: 456, name: 'core/paragraph' },
-					},
-					attributes: {
-						123: {},
-						456: {},
-					},
-					order: {
-						'': [ 123 ],
-						123: [ 456 ],
-						456: [],
-					},
-					parents: {
-						123: '',
-						456: 123,
-					},
-					cache: {
-						123: {},
-						456: {},
-					},
-					controlledInnerBlocks: {},
-				},
-			};
-
-			expect( getBlock( state, 123 ) ).toEqual( {
-				clientId: 123,
-				name: 'core/paragraph',
-				attributes: {},
-				innerBlocks: [
-					{
-						clientId: 456,
-						name: 'core/paragraph',
-						attributes: {},
-						innerBlocks: [],
-					},
-				],
-			} );
 		} );
 	} );
 
@@ -320,7 +285,23 @@ describe( 'selectors', () => {
 						123: '',
 						23: '',
 					},
-					cache: {
+					tree: {
+						'': {
+							innerBlocks: [
+								{
+									clientId: 123,
+									name: 'core/paragraph',
+									attributes: {},
+									innerBlocks: [],
+								},
+								{
+									clientId: 23,
+									name: 'core/heading',
+									attributes: {},
+									innerBlocks: [],
+								},
+							],
+						},
 						123: {},
 						23: {},
 					},
@@ -328,92 +309,9 @@ describe( 'selectors', () => {
 				},
 			};
 
-			expect( getBlocks( state ) ).toEqual( [
-				{
-					clientId: 123,
-					name: 'core/paragraph',
-					attributes: {},
-					innerBlocks: [],
-				},
-				{
-					clientId: 23,
-					name: 'core/heading',
-					attributes: {},
-					innerBlocks: [],
-				},
-			] );
-		} );
-		it( 'only returns a new value if the cache key of a direct child changes', () => {
-			const cacheRef = {};
-			const state = {
-				blocks: {
-					byClientId: {
-						23: { clientId: 23, name: 'core/heading' },
-					},
-					attributes: {
-						23: {},
-					},
-					order: {
-						'': [ 23 ],
-					},
-					parents: {
-						23: '',
-					},
-					cache: {
-						23: cacheRef,
-					},
-					controlledInnerBlocks: {},
-				},
-			};
-			const oldBlocks = getBlocks( state );
-
-			const newStateSameCache = {
-				blocks: {
-					byClientId: {
-						23: { clientId: 23, name: 'core/heading' },
-					},
-					attributes: {
-						23: {},
-					},
-					order: {
-						'': [ 23 ],
-					},
-					parents: {
-						23: '',
-					},
-					cache: {
-						23: cacheRef,
-					},
-					controlledInnerBlocks: {},
-				},
-			};
-			// Makes sure blocks are referentially equal if the cache key stays the same.
-			const newBlocks = getBlocks( newStateSameCache );
-			expect( oldBlocks ).toBe( newBlocks );
-
-			const newStateNewCache = {
-				blocks: {
-					byClientId: {
-						23: { clientId: 23, name: 'core/heading' },
-					},
-					attributes: {
-						23: {},
-					},
-					order: {
-						'': [ 23 ],
-					},
-					parents: {
-						23: '',
-					},
-					cache: {
-						23: {},
-					},
-					controlledInnerBlocks: {},
-				},
-			};
-			// Blocks are referentially different if the cache key changes.
-			const newBlocksNewCache = getBlocks( newStateNewCache );
-			expect( oldBlocks ).not.toBe( newBlocksNewCache );
+			expect( getBlocks( state ) ).toBe(
+				state.blocks.tree[ '' ].innerBlocks
+			);
 		} );
 	} );
 
@@ -962,6 +860,14 @@ describe( 'selectors', () => {
 						23: '',
 						123: '',
 					},
+					tree: {
+						23: {
+							clientId: 23,
+							name: 'core/heading',
+							attributes: {},
+							innerBlocks: [],
+						},
+					},
 				},
 				selection: {
 					selectionStart: {},
@@ -991,6 +897,14 @@ describe( 'selectors', () => {
 					parents: {
 						123: '',
 						23: '',
+					},
+					tree: {
+						23: {
+							clientId: 23,
+							name: 'core/heading',
+							attributes: {},
+							innerBlocks: [],
+						},
 					},
 				},
 				selection: {
@@ -1022,8 +936,13 @@ describe( 'selectors', () => {
 						123: '',
 						23: '',
 					},
-					cache: {
-						23: {},
+					tree: {
+						23: {
+							clientId: 23,
+							name: 'core/heading',
+							attributes: {},
+							innerBlocks: [],
+						},
 					},
 					controlledInnerBlocks: {},
 				},
@@ -1033,12 +952,9 @@ describe( 'selectors', () => {
 				},
 			};
 
-			expect( getSelectedBlock( state ) ).toEqual( {
-				clientId: 23,
-				name: 'core/heading',
-				attributes: {},
-				innerBlocks: [],
-			} );
+			expect( getSelectedBlock( state ) ).toEqual(
+				getBlock( state, 23 )
+			);
 		} );
 	} );
 
@@ -2246,17 +2162,20 @@ describe( 'selectors', () => {
 	} );
 
 	describe( 'isBlockInsertionPointVisible', () => {
-		it( 'should return false if insertion point is set to not show', () => {
+		it( 'should return false if no assigned insertion point', () => {
 			const state = {
-				insertionPointVisibility: false,
+				insertionPoint: null,
 			};
 
 			expect( isBlockInsertionPointVisible( state ) ).toBe( false );
 		} );
 
-		it( 'should return true if insertion point is set to show', () => {
+		it( 'should return true if assigned insertion point', () => {
 			const state = {
-				insertionPointVisibility: true,
+				insertionPoint: {
+					rootClientId: undefined,
+					index: 5,
+				},
 			};
 
 			expect( isBlockInsertionPointVisible( state ) ).toBe( true );
@@ -2556,7 +2475,11 @@ describe( 'selectors', () => {
 					attributes: {},
 					order: {},
 					parents: {},
-					cache: {},
+					tree: {
+						'': {
+							innerBlocks: [],
+						},
+					},
 				},
 				settings: {
 					__experimentalReusableBlocks: [
@@ -2632,9 +2555,19 @@ describe( 'selectors', () => {
 						block3: '',
 						block4: '',
 					},
-					cache: {
-						block3: {},
-						block4: {},
+					tree: {
+						block3: {
+							clientId: 'block3',
+							name: 'core/test-block-a',
+							attributes: {},
+							innerBlocks: [],
+						},
+						block4: {
+							clientId: 'block4',
+							name: 'core/test-block-a',
+							attributes: {},
+							innerBlocks: [],
+						},
 					},
 					controlledInnerBlocks: {},
 				},
@@ -2722,8 +2655,13 @@ describe( 'selectors', () => {
 					order: {
 						'': [ 'block1' ],
 					},
-					cache: {
-						block1: {},
+					tree: {
+						block1: {
+							clientId: 'block1',
+							name: 'core/test-block-b',
+							attributes: {},
+							innerBlocks: [],
+						},
 					},
 					controlledInnerBlocks: {},
 				},
@@ -2925,8 +2863,13 @@ describe( 'selectors', () => {
 					order: {
 						'': [ 'block1' ],
 					},
-					cache: {
-						block1: {},
+					tree: {
+						block1: {
+							clientId: 'block1',
+							name: 'core/with-tranforms-c',
+							attributes: {},
+							innerBlocks: [],
+						},
 					},
 					controlledInnerBlocks: {},
 				},
@@ -3482,6 +3425,154 @@ describe( 'selectors', () => {
 			);
 		} );
 	} );
+	describe( '__experimentalGetPatternTransformItems', () => {
+		const state = {
+			blocks: {
+				byClientId: {
+					block1: { name: 'core/test-block-a' },
+					block2: { name: 'core/test-block-b' },
+				},
+				controlledInnerBlocks: { 'block2-clientId': true },
+			},
+			blockListSettings: {
+				block1: {
+					allowedBlocks: [ 'core/test-block-b' ],
+				},
+			},
+			settings: {
+				__experimentalBlockPatterns: [
+					{
+						name: 'pattern-a',
+						blockTypes: [ 'test/block-a' ],
+						title: 'pattern a',
+						content:
+							'<!-- wp:test-block-a --><!-- /wp:test-block-a -->',
+					},
+					{
+						name: 'pattern-b',
+						blockTypes: [ 'test/block-b' ],
+						title: 'pattern b',
+						content:
+							'<!-- wp:test-block-b --><!-- /wp:test-block-b -->',
+					},
+					{
+						name: 'pattern-c',
+						title: 'pattern c',
+						blockTypes: [ 'test/block-a' ],
+						content:
+							'<!-- wp:test-block-b --><!-- /wp:test-block-b -->',
+					},
+					{
+						name: 'pattern-mix',
+						title: 'pattern mix',
+						blockTypes: [
+							'core/test-block-a',
+							'core/test-block-b',
+						],
+						content:
+							'<!-- wp:test-block-b --><!-- /wp:test-block-b -->',
+					},
+				],
+			},
+		};
+		describe( 'should return empty array', () => {
+			it( 'when no blocks are selected', () => {
+				expect(
+					__experimentalGetPatternTransformItems( state )
+				).toEqual( [] );
+			} );
+			it( 'when a selected block has inner blocks', () => {
+				const blocks = [
+					{ name: 'core/test-block-a', innerBlocks: [] },
+					{
+						name: 'core/test-block-b',
+						innerBlocks: [ { name: 'some inner block' } ],
+					},
+				];
+				expect(
+					__experimentalGetPatternTransformItems( state, blocks )
+				).toEqual( [] );
+			} );
+			it( 'when a selected block has controlled inner blocks', () => {
+				const blocks = [
+					{ name: 'core/test-block-a', innerBlocks: [] },
+					{
+						name: 'core/test-block-b',
+						clientId: 'block2-clientId',
+						innerBlocks: [],
+					},
+				];
+				expect(
+					__experimentalGetPatternTransformItems( state, blocks )
+				).toEqual( [] );
+			} );
+			it( 'when no patterns are available based on the selected blocks', () => {
+				const blocks = [
+					{ name: 'block-with-no-patterns', innerBlocks: [] },
+				];
+				expect(
+					__experimentalGetPatternTransformItems( state, blocks )
+				).toEqual( [] );
+			} );
+		} );
+		describe( 'should return proper results', () => {
+			it( 'when a single block is selected', () => {
+				const blocks = [
+					{ name: 'core/test-block-b', innerBlocks: [] },
+				];
+				const patterns = __experimentalGetPatternTransformItems(
+					state,
+					blocks
+				);
+				expect( patterns ).toHaveLength( 1 );
+				expect( patterns[ 0 ] ).toEqual(
+					expect.objectContaining( {
+						name: 'pattern-mix',
+					} )
+				);
+			} );
+			it( 'when different multiple blocks are selected', () => {
+				const blocks = [
+					{ name: 'core/test-block-b', innerBlocks: [] },
+					{ name: 'test/block-b', innerBlocks: [] },
+					{ name: 'some other block', innerBlocks: [] },
+				];
+				const patterns = __experimentalGetPatternTransformItems(
+					state,
+					blocks
+				);
+				expect( patterns ).toHaveLength( 2 );
+				expect( patterns ).toEqual(
+					expect.arrayContaining( [
+						expect.objectContaining( {
+							name: 'pattern-mix',
+						} ),
+						expect.objectContaining( {
+							name: 'pattern-b',
+						} ),
+					] )
+				);
+			} );
+			it( 'when multiple blocks are selected containing multiple times the same block', () => {
+				const blocks = [
+					{ name: 'core/test-block-b', innerBlocks: [] },
+					{ name: 'some other block', innerBlocks: [] },
+					{ name: 'core/test-block-a', innerBlocks: [] },
+					{ name: 'core/test-block-b', innerBlocks: [] },
+				];
+				const patterns = __experimentalGetPatternTransformItems(
+					state,
+					blocks
+				);
+				expect( patterns ).toHaveLength( 1 );
+				expect( patterns[ 0 ] ).toEqual(
+					expect.objectContaining( {
+						name: 'pattern-mix',
+					} )
+				);
+			} );
+		} );
+	} );
 
 	describe( 'wasBlockJustInserted', () => {
 		it( 'should return true if the client id passed to wasBlockJustInserted is found within the state', () => {
@@ -3573,6 +3664,13 @@ describe( 'getInserterItems with core blocks prioritization', () => {
 			title: 'Another Plugin Block B',
 			icon: 'test',
 		} );
+		registerBlockType( 'plugin/block-c-with-variations', {
+			save() {},
+			category: 'text',
+			title: 'Plugin Block C with variations',
+			icon: 'test',
+			variations: [ { name: 'variation-a' }, { name: 'variation-b' } ],
+		} );
 		registerBlockType( 'core/block', {
 			save() {},
 			category: 'text',
@@ -3585,13 +3683,23 @@ describe( 'getInserterItems with core blocks prioritization', () => {
 			icon: 'test',
 			keywords: [ 'testing' ],
 		} );
+		registerBlockType( 'core/test-block-with-variations', {
+			save() {},
+			category: 'text',
+			title: 'Core Block C with variations',
+			icon: 'test',
+			keywords: [ 'testing' ],
+			variations: [ { name: 'variation-a' }, { name: 'variation-b' } ],
+		} );
 	} );
 	afterEach( () => {
 		[
 			'plugin/block-a',
 			'another-plugin/block-b',
+			'plugin/block-c-with-variations',
 			'core/block',
 			'core/test-block-a',
+			'core/test-block-with-variations',
 		].forEach( unregisterBlockType );
 	} );
 	it( 'should prioritize core blocks by sorting them at the top of the returned list', () => {
@@ -3611,10 +3719,16 @@ describe( 'getInserterItems with core blocks prioritization', () => {
 		const expectedResult = [
 			'core/block',
 			'core/test-block-a',
+			'core/test-block-with-variations',
+			'core/test-block-with-variations/variation-a',
+			'core/test-block-with-variations/variation-b',
 			'plugin/block-a',
 			'another-plugin/block-b',
+			'plugin/block-c-with-variations',
+			'plugin/block-c-with-variations/variation-a',
+			'plugin/block-c-with-variations/variation-b',
 		];
-		expect( items.map( ( { name } ) => name ) ).toEqual( expectedResult );
+		expect( items.map( ( { id } ) => id ) ).toEqual( expectedResult );
 	} );
 } );
 

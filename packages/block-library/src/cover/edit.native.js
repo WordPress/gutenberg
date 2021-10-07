@@ -42,7 +42,7 @@ import {
 	MediaUploadProgress,
 	withColors,
 	__experimentalUseGradient,
-	__experimentalUseEditorFeature as useEditorFeature,
+	useSetting,
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import { compose, withPreferredColorScheme } from '@wordpress/compose';
@@ -139,7 +139,7 @@ const Cover = ( {
 	const isImage = backgroundType === MEDIA_TYPE_IMAGE;
 
 	const THEME_COLORS_COUNT = 4;
-	const colorsDefault = useEditorFeature( 'color.palette' ) || [];
+	const colorsDefault = useSetting( 'color.palette' ) || [];
 	const coverDefaultPalette = {
 		colors: colorsDefault.slice( 0, THEME_COLORS_COUNT ),
 	};

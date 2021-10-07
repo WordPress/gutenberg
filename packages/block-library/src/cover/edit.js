@@ -3,7 +3,8 @@
  */
 import classnames from 'classnames';
 import FastAverageColor from 'fast-average-color';
-import tinycolor from 'tinycolor2';
+import { colord, extend } from 'colord';
+import namesPlugin from 'colord/plugins/names';
 
 /**
  * WordPress dependencies
@@ -12,15 +13,19 @@ import { Fragment, useEffect, useRef, useState } from '@wordpress/element';
 import {
 	BaseControl,
 	Button,
+	ExternalLink,
 	FocalPointPicker,
 	PanelBody,
 	PanelRow,
 	RangeControl,
 	ResizableBox,
 	Spinner,
+	TextareaControl,
 	ToggleControl,
 	withNotices,
+	__experimentalUseCustomUnits as useCustomUnits,
 	__experimentalBoxControl as BoxControl,
+	__experimentalToolsPanelItem as ToolsPanelItem,
 } from '@wordpress/components';
 import { compose, withInstanceId, useInstanceId } from '@wordpress/compose';
 import {
@@ -32,6 +37,7 @@ import {
 	withColors,
 	ColorPalette,
 	useBlockProps,
+	useSetting,
 	__experimentalUseInnerBlocksProps as useInnerBlocksProps,
 	__experimentalUseGradient,
 	__experimentalPanelColorGradientSettings as PanelColorGradientSettings,
@@ -41,7 +47,7 @@ import {
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import { __ } from '@wordpress/i18n';
-import { withDispatch } from '@wordpress/data';
+import { withDispatch, useSelect } from '@wordpress/data';
 import { cover as icon } from '@wordpress/icons';
 import { isBlobURL } from '@wordpress/blob';
 
@@ -54,29 +60,28 @@ import {
 	IMAGE_BACKGROUND_TYPE,
 	VIDEO_BACKGROUND_TYPE,
 	COVER_MIN_HEIGHT,
-	CSS_UNITS,
 	backgroundImageStyles,
 	dimRatioToClass,
 	isContentPositionCenter,
 	getPositionClassName,
 } from './shared';
 
-/**
- * Module Constants
- */
-
-const INNER_BLOCKS_TEMPLATE = [
-	[
-		'core/paragraph',
-		{
-			align: 'center',
-			fontSize: 'large',
-			placeholder: __( 'Write title…' ),
-		},
-	],
-];
+extend( [ namesPlugin ] );
 
 const { __Visualizer: BoxControlVisualizer } = BoxControl;
+
+function getInnerBlocksTemplate( attributes ) {
+	return [
+		[
+			'core/paragraph',
+			{
+				align: 'center',
+				placeholder: __( 'Write title…' ),
+				...attributes,
+			},
+		],
+	];
+}
 
 function retrieveFastAverageColor() {
 	if ( ! retrieveFastAverageColor.fastAverageColor ) {
@@ -96,6 +101,17 @@ function CoverHeightInput( {
 	const instanceId = useInstanceId( UnitControl );
 	const inputId = `block-cover-height-input-${ instanceId }`;
 	const isPx = unit === 'px';
+
+	const units = useCustomUnits( {
+		availableUnits: useSetting( 'spacing.units' ) || [
+			'px',
+			'em',
+			'rem',
+			'vw',
+			'vh',
+		],
+		defaultValues: { px: '430', em: '20', rem: '20', vw: '20', vh: '50' },
+	} );
 
 	const handleOnChange = ( unprocessedValue ) => {
 		const inputValue =
@@ -135,7 +151,7 @@ function CoverHeightInput( {
 				step="1"
 				style={ { maxWidth: 80 } }
 				unit={ unit }
-				units={ CSS_UNITS }
+				units={ units }
 				value={ inputValue }
 			/>
 		</BaseControl>
@@ -225,7 +241,7 @@ function useCoverIsDark( url, dimRatio = 50, overlayColor, elementRef ) {
 				setIsDark( true );
 				return;
 			}
-			setIsDark( tinycolor( overlayColor ).isDark() );
+			setIsDark( colord( overlayColor ).isDark() );
 		}
 	}, [ overlayColor, dimRatio > 50 || ! url, setIsDark ] );
 	useEffect( () => {
@@ -253,7 +269,7 @@ function mediaPosition( { x, y } ) {
 const isTemporaryMedia = ( id, url ) => ! id && isBlobURL( url );
 
 function CoverPlaceholder( {
-	hasBackground = false,
+	disableMediaButtons = false,
 	children,
 	noticeUI,
 	noticeOperations,
@@ -266,14 +282,14 @@ function CoverPlaceholder( {
 			labels={ {
 				title: __( 'Cover' ),
 				instructions: __(
-					'Upload an image or video file, or pick one from your media library.'
+					'Drag and drop onto this block, upload, or select existing media from your library.'
 				),
 			} }
 			onSelect={ onSelectMedia }
 			accept="image/*,video/*"
 			allowedTypes={ ALLOWED_MEDIA_TYPES }
 			notices={ noticeUI }
-			disableMediaButtons={ hasBackground }
+			disableMediaButtons={ disableMediaButtons }
 			onError={ ( message ) => {
 				removeAllNotices();
 				createErrorNotice( message );
@@ -286,6 +302,7 @@ function CoverPlaceholder( {
 
 function CoverEdit( {
 	attributes,
+	clientId,
 	isSelected,
 	noticeUI,
 	noticeOperations,
@@ -306,6 +323,7 @@ function CoverEdit( {
 		minHeightUnit,
 		style: styleAttribute,
 		url,
+		alt,
 	} = attributes;
 	const {
 		gradientClass,
@@ -409,6 +427,13 @@ function CoverEdit( {
 		styleOfRef[ property ] = mediaPosition( value );
 	};
 
+	const hasInnerBlocks = useSelect(
+		( select ) =>
+			select( blockEditorStore ).getBlock( clientId ).innerBlocks.length >
+			0,
+		[ clientId ]
+	);
+
 	const controls = (
 		<>
 			<BlockControls group="block">
@@ -420,12 +445,12 @@ function CoverEdit( {
 							contentPosition: nextPosition,
 						} )
 					}
-					isDisabled={ ! hasBackground }
+					isDisabled={ ! hasInnerBlocks }
 				/>
 				<FullHeightAlignmentControl
 					isActive={ isMinFullHeight }
 					onToggle={ toggleMinFullHeight }
-					isDisabled={ ! hasBackground }
+					isDisabled={ ! hasInnerBlocks }
 				/>
 			</BlockControls>
 			<BlockControls group="other">
@@ -470,9 +495,30 @@ function CoverEdit( {
 								}
 							/>
 						) }
+						{ url && isImageBackground && isImgElement && (
+							<TextareaControl
+								label={ __( 'Alt text (alternative text)' ) }
+								value={ alt }
+								onChange={ ( newAlt ) =>
+									setAttributes( { alt: newAlt } )
+								}
+								help={
+									<>
+										<ExternalLink href="https://www.w3.org/WAI/tutorials/images/decision-tree">
+											{ __(
+												'Describe the purpose of the image'
+											) }
+										</ExternalLink>
+										{ __(
+											'Leave empty if the image is purely decorative.'
+										) }
+									</>
+								}
+							/>
+						) }
 						<PanelRow>
 							<Button
-								isSecondary
+								variant="secondary"
 								isSmall
 								className="block-library-cover__reset-button"
 								onClick={ () =>
@@ -492,20 +538,6 @@ function CoverEdit( {
 						</PanelRow>
 					</PanelBody>
 				) }
-				<PanelBody title={ __( 'Dimensions' ) }>
-					<CoverHeightInput
-						value={ temporaryMinHeight || minHeight }
-						unit={ minHeightUnit }
-						onChange={ ( newMinHeight ) =>
-							setAttributes( { minHeight: newMinHeight } )
-						}
-						onUnitChange={ ( nextUnit ) =>
-							setAttributes( {
-								minHeightUnit: nextUnit,
-							} )
-						}
-					/>
-				</PanelBody>
 				<PanelColorGradientSettings
 					title={ __( 'Overlay' ) }
 					initialOpen={ true }
@@ -536,22 +568,60 @@ function CoverEdit( {
 					) }
 				</PanelColorGradientSettings>
 			</InspectorControls>
+			<InspectorControls __experimentalGroup="dimensions">
+				<ToolsPanelItem
+					hasValue={ () => !! minHeight }
+					label={ __( 'Minimum height' ) }
+					onDeselect={ () =>
+						setAttributes( {
+							minHeight: undefined,
+							minHeightUnit: undefined,
+						} )
+					}
+					resetAllFilter={ () => ( {
+						minHeight: undefined,
+						minHeightUnit: undefined,
+					} ) }
+					isShownByDefault={ true }
+					panelId={ clientId }
+				>
+					<CoverHeightInput
+						value={ temporaryMinHeight || minHeight }
+						unit={ minHeightUnit }
+						onChange={ ( newMinHeight ) =>
+							setAttributes( { minHeight: newMinHeight } )
+						}
+						onUnitChange={ ( nextUnit ) =>
+							setAttributes( {
+								minHeightUnit: nextUnit,
+							} )
+						}
+					/>
+				</ToolsPanelItem>
+			</InspectorControls>
 		</>
 	);
 
 	const ref = useRef();
 	const blockProps = useBlockProps( { ref } );
+
+	// Check for fontSize support before we pass a fontSize attribute to the innerBlocks.
+	const hasFontSizes = !! useSetting( 'typography.fontSizes' )?.length;
+	const innerBlocksTemplate = getInnerBlocksTemplate( {
+		fontSize: hasFontSizes ? 'large' : undefined,
+	} );
+
 	const innerBlocksProps = useInnerBlocksProps(
 		{
 			className: 'wp-block-cover__inner-container',
 		},
 		{
-			template: INNER_BLOCKS_TEMPLATE,
+			template: innerBlocksTemplate,
 			templateInsertUpdatesSelection: true,
 		}
 	);
 
-	if ( ! hasBackground ) {
+	if ( ! hasInnerBlocks && ! hasBackground ) {
 		return (
 			<>
 				{ controls }
@@ -640,7 +710,7 @@ function CoverEdit( {
 					<img
 						ref={ isDarkElement }
 						className="wp-block-cover__image-background"
-						alt=""
+						alt={ alt }
 						src={ url }
 						style={ mediaStyle }
 					/>
@@ -658,7 +728,7 @@ function CoverEdit( {
 				) }
 				{ isUploadingMedia && <Spinner /> }
 				<CoverPlaceholder
-					hasBackground={ hasBackground }
+					disableMediaButtons
 					noticeUI={ noticeUI }
 					onSelectMedia={ onSelectMedia }
 					noticeOperations={ noticeOperations }

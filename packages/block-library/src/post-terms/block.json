@@ -1,0 +1,34 @@
+{
+	"apiVersion": 2,
+	"name": "core/post-terms",
+	"title": "Post Terms",
+	"category": "design",
+	"description": "Post terms.",
+	"textdomain": "default",
+	"attributes": {
+		"term": {
+			"type": "string"
+		},
+		"textAlign": {
+			"type": "string"
+		},
+		"separator": {
+			"type": "string",
+			"default": ", "
+		}
+	},
+	"usesContext": [ "postId", "postType" ],
+	"supports": {
+		"html": false,
+		"color": {
+			"gradients": true,
+			"link": true
+		},
+		"typography": {
+			"lineHeight": true,
+			"fontSize": true,
+			"__experimentalFontWeight": true
+		}
+	},
+	"style": "wp-block-post-terms"
+}

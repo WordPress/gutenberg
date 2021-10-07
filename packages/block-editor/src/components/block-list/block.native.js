@@ -20,7 +20,7 @@ import {
 	getBlockType,
 	__experimentalGetAccessibleBlockLabel as getAccessibleBlockLabel,
 } from '@wordpress/blocks';
-import { __experimentalUseEditorFeature as useEditorFeature } from '@wordpress/block-editor';
+import { useSetting } from '@wordpress/block-editor';
 
 /**
  * Internal dependencies
@@ -48,15 +48,20 @@ function BlockForType( {
 	parentWidth,
 	wrapperProps,
 	blockWidth,
+	baseGlobalStyles,
 } ) {
-	const defaultColors = useEditorFeature( 'color.palette' ) || emptyArray;
+	const defaultColors = useSetting( 'color.palette' ) || emptyArray;
+	const fontSizes = useSetting( 'typography.fontSizes' ) || emptyArray;
 	const globalStyle = useGlobalStyles();
 	const mergedStyle = useMemo( () => {
 		return getMergedGlobalStyles(
+			baseGlobalStyles,
 			globalStyle,
 			wrapperProps.style,
 			attributes,
-			defaultColors
+			defaultColors,
+			name,
+			fontSizes
 		);
 	}, [
 		defaultColors,
@@ -83,7 +88,7 @@ function BlockForType( {
 				// Block level styles
 				wrapperProps={ wrapperProps }
 				// inherited styles merged with block level styles
-				mergedStyle={ mergedStyle }
+				style={ mergedStyle }
 				clientId={ clientId }
 				parentWidth={ parentWidth }
 				contentStyle={ contentStyle }
@@ -193,7 +198,7 @@ class BlockListBlock extends Component {
 			attributes,
 			order + 1
 		);
-		const { isFullWidth, isWider, isContainerRelated } = alignmentHelpers;
+		const { isFullWidth, isContainerRelated } = alignmentHelpers;
 		const accessible = ! ( isSelected || isInnerBlockSelected );
 		const screenWidth = Math.floor( Dimensions.get( 'window' ).width );
 		const isScreenWidthEqual = blockWidth === screenWidth;
@@ -257,13 +262,7 @@ class BlockListBlock extends Component {
 							/>
 						) }
 						<View
-							style={ [
-								styles.neutralToolbar,
-								! isFullWidthToolbar &&
-									isContainerRelated( name ) &&
-									isWider( screenWidth, 'mobile' ) &&
-									styles.containerToolbar,
-							] }
+							style={ styles.neutralToolbar }
 							ref={ this.anchorNodeRef }
 						>
 							{ isSelected && (
@@ -306,8 +305,9 @@ export default compose( [
 	withSelect( ( select, { clientId, rootClientId } ) => {
 		const {
 			getBlockIndex,
+			getSettings,
 			isBlockSelected,
-			__unstableGetBlockWithoutInnerBlocks,
+			getBlock,
 			getSelectedBlockClientId,
 			getLowestCommonAncestorWithSelectedBlock,
 			getBlockParents,
@@ -317,7 +317,7 @@ export default compose( [
 		const order = getBlockIndex( clientId, rootClientId );
 		const isSelected = isBlockSelected( clientId );
 		const isInnerBlockSelected = hasSelectedInnerBlock( clientId );
-		const block = __unstableGetBlockWithoutInnerBlocks( clientId );
+		const block = getBlock( clientId );
 		const { name, attributes, isValid } = block || {};
 
 		const blockType = getBlockType( name || 'core/missing' );
@@ -353,6 +353,9 @@ export default compose( [
 			isDescendantOfParentSelected ||
 			isParentSelected ||
 			parentId === '';
+		const baseGlobalStyles = getSettings()
+			?.__experimentalGlobalStylesBaseStyles;
+
 		return {
 			icon,
 			name: name || 'core/missing',
@@ -366,6 +369,7 @@ export default compose( [
 			isParentSelected,
 			firstToSelectId,
 			isTouchable,
+			baseGlobalStyles,
 			wrapperProps: getWrapperProps(
 				attributes,
 				blockType.getEditWrapperProps

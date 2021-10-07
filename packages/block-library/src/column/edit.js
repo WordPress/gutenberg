@@ -12,28 +12,40 @@ import {
 	BlockVerticalAlignmentToolbar,
 	InspectorControls,
 	useBlockProps,
+	useSetting,
 	__experimentalUseInnerBlocksProps as useInnerBlocksProps,
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import {
+	__experimentalUseCustomUnits as useCustomUnits,
 	PanelBody,
 	__experimentalUnitControl as UnitControl,
 } from '@wordpress/components';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { sprintf, __ } from '@wordpress/i18n';
 
-/**
- * Internal dependencies
- */
-import { CSS_UNITS } from '../columns/utils';
-
 function ColumnEdit( {
-	attributes: { verticalAlignment, width, templateLock = false },
+	attributes: {
+		verticalAlignment,
+		width,
+		templateLock = false,
+		allowedBlocks,
+	},
 	setAttributes,
 	clientId,
 } ) {
 	const classes = classnames( 'block-core-columns', {
 		[ `is-vertically-aligned-${ verticalAlignment }` ]: verticalAlignment,
+	} );
+
+	const units = useCustomUnits( {
+		availableUnits: useSetting( 'spacing.units' ) || [
+			'%',
+			'px',
+			'em',
+			'rem',
+			'vw',
+		],
 	} );
 
 	const { columnsIds, hasChildBlocks, rootClientId } = useSelect(
@@ -85,6 +97,7 @@ function ColumnEdit( {
 		{ ...blockProps, 'aria-label': label },
 		{
 			templateLock,
+			allowedBlocks,
 			renderAppender: hasChildBlocks
 				? undefined
 				: InnerBlocks.ButtonBlockAppender,
@@ -111,7 +124,7 @@ function ColumnEdit( {
 								0 > parseFloat( nextWidth ) ? '0' : nextWidth;
 							setAttributes( { width: nextWidth } );
 						} }
-						units={ CSS_UNITS }
+						units={ units }
 					/>
 				</PanelBody>
 			</InspectorControls>

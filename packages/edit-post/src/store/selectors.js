@@ -44,8 +44,9 @@ export const isEditorSidebarOpened = createRegistrySelector(
 /**
  * Returns true if the plugin sidebar is opened.
  *
- * @param {Object} state Global application state
- * @return {boolean}     Whether the plugin sidebar is opened.
+ * @param {Object} state Global application state.
+ *
+ * @return {boolean} Whether the plugin sidebar is opened.
  */
 export const isPluginSidebarOpened = createRegistrySelector(
 	( select ) => () => {
@@ -155,8 +156,8 @@ export function isEditorPanelEnabled( state, panelName ) {
  * Returns true if the given panel is open, or false otherwise. Panels are
  * closed by default.
  *
- * @param  {Object}  state     Global application state.
- * @param  {string}  panelName A string that identifies the panel.
+ * @param {Object} state     Global application state.
+ * @param {string} panelName A string that identifies the panel.
  *
  * @return {boolean} Whether or not the panel is open.
  */
@@ -171,8 +172,8 @@ export function isEditorPanelOpened( state, panelName ) {
 /**
  * Returns true if a modal is active, or false otherwise.
  *
- * @param  {Object}  state 	   Global application state.
- * @param  {string}  modalName A string that uniquely identifies the modal.
+ * @param {Object} state     Global application state.
+ * @param {string} modalName A string that uniquely identifies the modal.
  *
  * @return {boolean} Whether the modal is active.
  */
@@ -188,21 +189,26 @@ export function isModalActive( state, modalName ) {
  *
  * @return {boolean} Is active.
  */
-export function isFeatureActive( state, feature ) {
-	return get( state.preferences.features, [ feature ], false );
-}
+export const isFeatureActive = createRegistrySelector(
+	( select ) => ( state, feature ) => {
+		return select( interfaceStore ).isFeatureActive(
+			'core/edit-post',
+			feature
+		);
+	}
+);
 
 /**
  * Returns true if the plugin item is pinned to the header.
  * When the value is not set it defaults to true.
  *
- * @param  {Object}  state      Global application state.
- * @param  {string}  pluginName Plugin item name.
+ * @param {Object} state      Global application state.
+ * @param {string} pluginName Plugin item name.
  *
  * @return {boolean} Whether the plugin item is pinned.
  */
 export const isPluginItemPinned = createRegistrySelector(
-	( select ) => ( pluginName ) => {
+	( select ) => ( state, pluginName ) => {
 		return select( interfaceStore ).isItemPinned(
 			'core/edit-post',
 			pluginName
@@ -286,7 +292,7 @@ export const getAllMetaBoxes = createSelector(
 /**
  * Returns true if the post is using Meta Boxes
  *
- * @param  {Object} state Global application state
+ * @param {Object} state Global application state
  *
  * @return {boolean} Whether there are metaboxes or not.
  */
@@ -297,7 +303,7 @@ export function hasMetaBoxes( state ) {
 /**
  * Returns true if the Meta Boxes are being saved.
  *
- * @param   {Object}  state Global application state.
+ * @param {Object} state Global application state.
  *
  * @return {boolean} Whether the metaboxes are being saved.
  */
@@ -313,29 +319,67 @@ export function isSavingMetaBoxes( state ) {
  * @return {string} Device type.
  */
 export function __experimentalGetPreviewDeviceType( state ) {
-	return state.isEditingTemplate ? 'Desktop' : state.deviceType;
+	return state.deviceType;
 }
 
 /**
  * Returns true if the inserter is opened.
  *
- * @param  {Object}  state Global application state.
+ * @param {Object} state Global application state.
  *
  * @return {boolean} Whether the inserter is opened.
  */
 export function isInserterOpened( state ) {
-	return state.isInserterOpened;
+	return !! state.blockInserterPanel;
+}
+
+/**
+ * Get the insertion point for the inserter.
+ *
+ * @param {Object} state Global application state.
+ *
+ * @return {Object} The root client ID, index to insert at and starting filter value.
+ */
+export function __experimentalGetInsertionPoint( state ) {
+	const {
+		rootClientId,
+		insertionIndex,
+		filterValue,
+	} = state.blockInserterPanel;
+	return { rootClientId, insertionIndex, filterValue };
+}
+
+/**
+ * Returns true if the list view is opened.
+ *
+ * @param {Object} state Global application state.
+ *
+ * @return {boolean} Whether the list view is opened.
+ */
+export function isListViewOpened( state ) {
+	return state.listViewPanel;
 }
 
 /**
  * Returns true if the template editing mode is enabled.
  *
- * @param  {Object}  state Global application state.
+ * @param {Object} state Global application state.
  *
  * @return {boolean} Whether we're editing the template.
  */
 export function isEditingTemplate( state ) {
 	return state.isEditingTemplate;
+}
+
+/**
+ * Returns true if meta boxes are initialized.
+ *
+ * @param {Object} state Global application state.
+ *
+ * @return {boolean} Whether meta boxes are initialized.
+ */
+export function areMetaBoxesInitialized( state ) {
+	return state.metaBoxes.initialized;
 }
 
 /**
@@ -349,13 +393,21 @@ export const getEditedPostTemplate = createRegistrySelector(
 			'template'
 		);
 		if ( currentTemplate ) {
-			return select( coreStore )
+			const templateWithSameSlug = select( coreStore )
 				.getEntityRecords( 'postType', 'wp_template' )
 				?.find( ( template ) => template.slug === currentTemplate );
+			if ( ! templateWithSameSlug ) {
+				return templateWithSameSlug;
+			}
+			return select( coreStore ).getEditedEntityRecord(
+				'postType',
+				'wp_template',
+				templateWithSameSlug.id
+			);
 		}
 
 		const post = select( editorStore ).getCurrentPost();
-		if ( post.link && post.status !== 'auto-draft' ) {
+		if ( post.link ) {
 			return select( coreStore ).__experimentalGetTemplateForLink(
 				post.link
 			);

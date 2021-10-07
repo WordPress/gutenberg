@@ -1,7 +1,7 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`DotTip should render correctly 1`] = `
-<Popover
+<ForwardRef(Popover)
   aria-label="Editor tips"
   className="nux-dot-tip"
   focusOnMount="container"
@@ -17,7 +17,7 @@ exports[`DotTip should render correctly 1`] = `
   </p>
   <p>
     <ForwardRef(Button)
-      isLink={true}
+      variant="link"
     >
       Got it
     </ForwardRef(Button)>
@@ -36,5 +36,5 @@ exports[`DotTip should render correctly 1`] = `
     }
     label="Disable tips"
   />
-</Popover>
+</ForwardRef(Popover)>
 `;

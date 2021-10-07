@@ -21,11 +21,11 @@ import { __ } from '@wordpress/i18n';
 /**
  * @typedef WPLinkSearchOptions
  *
- * @property {boolean}             [isInitialSuggestions] Displays initial search suggestions, when true.
- * @property {WPLinkSearchType}    [type]                 Filters by search type.
- * @property {string}              [subtype]              Slug of the post-type or taxonomy.
- * @property {number}              [page]                 Which page of results to return.
- * @property {number}              [perPage]              Search results per page.
+ * @property {boolean}          [isInitialSuggestions] Displays initial search suggestions, when true.
+ * @property {WPLinkSearchType} [type]                 Filters by search type.
+ * @property {string}           [subtype]              Slug of the post-type or taxonomy.
+ * @property {number}           [page]                 Which page of results to return.
+ * @property {number}           [perPage]              Search results per page.
  */
 
 /**
@@ -140,7 +140,16 @@ const fetchLinkSuggestions = async (
 					type: 'post-format',
 					subtype,
 				} ),
-			} ).catch( () => [] )
+			} )
+				.then( ( results ) => {
+					return results.map( ( result ) => {
+						return {
+							...result,
+							meta: { kind: 'taxonomy', subtype },
+						};
+					} );
+				} )
+				.catch( () => [] )
 		);
 	}
 

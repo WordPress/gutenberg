@@ -1,23 +1,29 @@
 /**
  * WordPress dependencies
  */
-import { render, unmountComponentAtNode } from '@wordpress/element';
+import { dispatch } from '@wordpress/data';
 
 /**
  * Internal dependencies
  */
-import SidebarBlockEditor from '../components/sidebar-block-editor';
 import SidebarAdapter from '../components/sidebar-block-editor/sidebar-adapter';
 import getInserterOuterSection from './inserter-outer-section';
+import { store as customizeWidgetsStore } from '../store';
 
 const getInserterId = ( controlId ) => `widgets-inserter-${ controlId }`;
 
-export default function getSidebarControl( blockEditorSettings ) {
+export default function getSidebarControl() {
 	const {
 		wp: { customize },
 	} = window;
 
 	return class SidebarControl extends customize.Control {
+		constructor( ...args ) {
+			super( ...args );
+
+			this.subscribers = new Set();
+		}
+
 		ready() {
 			const InserterOuterSection = getInserterOuterSection();
 			this.inserter = new InserterOuterSection(
@@ -30,34 +36,29 @@ export default function getSidebarControl( blockEditorSettings ) {
 
 			this.inspector = this.sectionInstance.inspector;
 
-			this.render();
+			this.sidebarAdapter = new SidebarAdapter( this.setting, customize );
 		}
+
+		subscribe( callback ) {
+			this.subscribers.add( callback );
+
+			return () => {
+				this.subscribers.delete( callback );
+			};
+		}
+
 		onChangeSectionExpanded( expanded, args ) {
 			if ( ! args.unchanged ) {
 				// Close the inserter when the section collapses.
 				if ( ! expanded ) {
-					this.inserter.close();
+					dispatch( customizeWidgetsStore ).setIsInserterOpened(
+						false
+					);
 				}
 
-				this.render();
-			}
-		}
-		render() {
-			if ( this.sectionInstance.expanded() ) {
-				render(
-					<SidebarBlockEditor
-						blockEditorSettings={ blockEditorSettings }
-						sidebar={
-							new SidebarAdapter( this.setting, customize )
-						}
-						inserter={ this.inserter }
-						inspector={ this.inspector }
-					/>,
-					this.container[ 0 ]
+				this.subscribers.forEach( ( subscriber ) =>
+					subscriber( expanded, args )
 				);
-			} else if ( ! this.sectionInstance.hasSubSectionOpened() ) {
-				// Don't unmount the node when the sub section (inspector) is opened.
-				unmountComponentAtNode( this.container[ 0 ] );
 			}
 		}
 	};

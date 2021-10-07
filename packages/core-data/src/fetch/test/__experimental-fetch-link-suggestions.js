@@ -40,12 +40,14 @@ jest.mock( '@wordpress/api-fetch', () =>
 						title: 'Gallery',
 						url: 'http://wordpress.local/type/gallery/',
 						type: 'post-format',
+						kind: 'taxonomy',
 					},
 					{
 						id: 'quote',
 						title: 'Quote',
 						url: 'http://wordpress.local/type/quote/',
 						type: 'post-format',
+						kind: 'taxonomy',
 					},
 				] );
 			case '/wp/v2/search?search=&per_page=3&type=post&subtype=page':
@@ -131,12 +133,14 @@ describe( 'fetchLinkSuggestions', () => {
 					title: 'Gallery',
 					url: 'http://wordpress.local/type/gallery/',
 					type: 'post-format',
+					kind: 'taxonomy',
 				},
 				{
 					id: 'quote',
 					title: 'Quote',
 					url: 'http://wordpress.local/type/quote/',
 					type: 'post-format',
+					kind: 'taxonomy',
 				},
 			] )
 		);
@@ -179,12 +183,14 @@ describe( 'fetchLinkSuggestions', () => {
 					title: 'Gallery',
 					url: 'http://wordpress.local/type/gallery/',
 					type: 'post-format',
+					kind: 'taxonomy',
 				},
 				{
 					id: 'quote',
 					title: 'Quote',
 					url: 'http://wordpress.local/type/quote/',
 					type: 'post-format',
+					kind: 'taxonomy',
 				},
 			] )
 		);

@@ -1,3 +1,9 @@
+// @ts-nocheck
+/**
+ * WordPress dependencies
+ */
+import { forwardRef } from '@wordpress/element';
+
 /**
  * Internal dependencies
  */
@@ -20,13 +26,12 @@ export function Fill( props ) {
 		</>
 	);
 }
-
-export function Slot( { bubblesVirtually, ...props } ) {
+export const Slot = forwardRef( ( { bubblesVirtually, ...props }, ref ) => {
 	if ( bubblesVirtually ) {
-		return <BubblesVirtuallySlot { ...props } />;
+		return <BubblesVirtuallySlot { ...props } ref={ ref } />;
 	}
 	return <BaseSlot { ...props } />;
-}
+} );
 
 export function Provider( { children, ...props } ) {
 	return (

@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { DropdownMenu, ToolbarGroup } from '@wordpress/components';
+import { ToolbarDropdownMenu, ToolbarGroup } from '@wordpress/components';
 import {
 	justifyLeft,
 	justifyCenter,
@@ -24,7 +24,6 @@ function JustifyContentUI( {
 	value,
 	popoverProps,
 	isToolbar,
-	isToolbarButton = true,
 } ) {
 	// If the control is already selected we want a click
 	// again on the control to deselect the item, so we
@@ -69,8 +68,8 @@ function JustifyContentUI( {
 		},
 	];
 
-	const UIComponent = isToolbar ? ToolbarGroup : DropdownMenu;
-	const extraProps = isToolbar ? { isCollapsed } : { isToolbarButton };
+	const UIComponent = isToolbar ? ToolbarGroup : ToolbarDropdownMenu;
+	const extraProps = isToolbar ? { isCollapsed } : {};
 
 	return (
 		<UIComponent

@@ -2,6 +2,7 @@
  * WordPress dependencies
  */
 import {
+	cloneBlock,
 	findTransform,
 	getBlockTransforms,
 	pasteHandler,
@@ -51,8 +52,8 @@ export function parseDropEvent( event ) {
 /**
  * A function that returns an event handler function for block drop events.
  *
- * @param {string} targetRootClientId        The root client id where the block(s) will be inserted.
- * @param {number} targetBlockIndex          The index where the block(s) will be inserted.
+ * @param {string}   targetRootClientId        The root client id where the block(s) will be inserted.
+ * @param {number}   targetBlockIndex          The index where the block(s) will be inserted.
  * @param {Function} getBlockIndex             A function that gets the index of a block.
  * @param {Function} getClientIdsOfDescendants A function that gets the client ids of descendant blocks.
  * @param {Function} moveBlocksToPosition      A function that moves blocks.
@@ -80,8 +81,11 @@ export function onBlockDrop(
 		// If the user is inserting a block
 		if ( dropType === 'inserter' ) {
 			clearSelectedBlock();
+			const blocksToInsert = blocks.map( ( block ) =>
+				cloneBlock( block )
+			);
 			insertBlocks(
-				blocks,
+				blocksToInsert,
 				targetBlockIndex,
 				targetRootClientId,
 				true,
@@ -212,27 +216,15 @@ export function onHTMLDrop(
  * @return {Object} An object that contains the event handlers `onDrop`, `onFilesDrop` and `onHTMLDrop`.
  */
 export default function useOnBlockDrop( targetRootClientId, targetBlockIndex ) {
+	const hasUploadPermissions = useSelect(
+		( select ) => select( blockEditorStore ).getSettings().mediaUpload,
+		[]
+	);
 	const {
 		canInsertBlockType,
 		getBlockIndex,
 		getClientIdsOfDescendants,
-		hasUploadPermissions,
-	} = useSelect( ( select ) => {
-		const {
-			canInsertBlockType: _canInsertBlockType,
-			getBlockIndex: _getBlockIndex,
-			getClientIdsOfDescendants: _getClientIdsOfDescendants,
-			getSettings,
-		} = select( blockEditorStore );
-
-		return {
-			canInsertBlockType: _canInsertBlockType,
-			getBlockIndex: _getBlockIndex,
-			getClientIdsOfDescendants: _getClientIdsOfDescendants,
-			hasUploadPermissions: getSettings().mediaUpload,
-		};
-	}, [] );
-
+	} = useSelect( blockEditorStore );
 	const {
 		insertBlocks,
 		moveBlocksToPosition,

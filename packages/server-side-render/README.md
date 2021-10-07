@@ -18,7 +18,7 @@ Install the module
 npm install @wordpress/server-side-render --save
 ```
 
-_This package assumes that your code will run in an **ES2015+** environment. If you're using an environment that has limited or no support for ES2015+ such as lower versions of IE then using [core-js](https://github.com/zloirock/core-js) or [@babel/polyfill](https://babeljs.io/docs/en/next/babel-polyfill) will add support for these methods. Learn more about it in [Babel docs](https://babeljs.io/docs/en/next/caveats)._
+_This package assumes that your code will run in an **ES2015+** environment. If you're using an environment that has limited or no support for such language features and APIs, you should include [the polyfill shipped in `@wordpress/babel-preset-default`](https://github.com/WordPress/gutenberg/tree/HEAD/packages/babel-preset-default#polyfill) in your code._
 
 ## Usage
 
@@ -57,6 +57,25 @@ The HTTP request method to use, either 'GET' or 'POST'. It's 'GET' by default. T
 -   Type: `String`
 -   Required: No
 
+#### Example:
+
+```php
+function add_rest_method( $endpoints ) {
+    if ( is_wp_version_compatible( '5.5' ) ) {
+        return $endpoints;
+    }
+
+    foreach ( $endpoints as $route => $handler ) {
+        if ( isset( $endpoints[ $route ][0] ) ) {
+            $endpoints[ $route ][0]['methods'] = [ WP_REST_Server::READABLE, WP_REST_Server::CREATABLE ];
+        }
+    }
+
+    return $endpoints;
+}
+add_filter( 'rest_endpoints', 'add_rest_method');
+```
+
 ### urlQueryArgs
 
 Query arguments to apply to the request URL.
@@ -67,24 +86,32 @@ E.g: `{ post_id: 12 }`.
 
 ### EmptyResponsePlaceholder
 
-This is a [render prop](https://reactjs.org/docs/render-props.html). When the api response is empty, the value of this prop is rendered. The render prop will receive the value of the api response as well as all props passed into `ServerSideRenderer`.
+The component is rendered when the API response is empty. The component will receive the value of the API response, and all props passed into `ServerSideRenderer`.
 
--   Type: `WPElement`
+-   Type: `Component`
 -   Required: No
 
 ### ErrorResponsePlaceholder
 
-This is a [render prop](https://reactjs.org/docs/render-props.html). When the api response is an error, the value of this prop is rendered. The render prop will receive the value of the api response as well as all props passed into `ServerSideRenderer`.
+The component is rendered when the API response is an error. The component will receive the value of the API response, and all props passed into `ServerSideRenderer`.
 
--   Type: `WPElement`
+-   Type: `Component`
 -   Required: No
 
 ### LoadingResponsePlaceholder
 
-This is a [render prop](https://reactjs.org/docs/render-props.html). While the request is being processed (loading state), the value of this prop is rendered. The render prop will receive the value of the api response as well as all props passed into `ServerSideRenderer`.
+The component is rendered while the API request is being processed (loading state). The component will receive the value of the API response, and all props passed into `ServerSideRenderer`.
 
--   Type: `WPElement`
+-   Type: `Component`
 -   Required: No
+
+#### Example usage
+
+```jsx
+const MyServerSideRender = () => (
+	<ServerSideRender LoadingResponsePlaceholder={ MyAmazingPlaceholder } />
+);
+```
 
 ## Usage
 

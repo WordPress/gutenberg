@@ -193,8 +193,12 @@ class REST_Nav_Menus_Controller_Test extends WP_Test_REST_Controller_Testcase {
 				'menu-name'   => 'test Name',
 			)
 		);
-		$request     = new WP_REST_Request( 'GET', '/__experimental/menus/' . $nav_menu_id );
-		$response    = rest_get_server()->dispatch( $request );
+
+		$this->register_nav_menu_locations( array( 'primary' ) );
+		set_theme_mod( 'nav_menu_locations', array( 'primary' => $nav_menu_id ) );
+
+		$request  = new WP_REST_Request( 'GET', '/__experimental/menus/' . $nav_menu_id );
+		$response = rest_get_server()->dispatch( $request );
 		$this->check_get_taxonomy_term_response( $response, $nav_menu_id );
 	}
 
@@ -215,6 +219,28 @@ class REST_Nav_Menus_Controller_Test extends WP_Test_REST_Controller_Testcase {
 		$this->assertEquals( 'My Awesome menus', $data['name'] );
 		$this->assertEquals( 'This menu is so awesome.', $data['description'] );
 		$this->assertEquals( 'my-awesome-menus', $data['slug'] );
+	}
+
+	/**
+	 *
+	 */
+	public function test_create_item_same_name() {
+		wp_set_current_user( self::$admin_id );
+
+		wp_update_nav_menu_object(
+			0,
+			array(
+				'description' => 'This menu is so Original',
+				'menu-name'   => 'Original',
+			)
+		);
+
+		$request = new WP_REST_Request( 'POST', '/__experimental/menus' );
+		$request->set_param( 'name', 'Original' );
+		$request->set_param( 'description', 'This menu is so Original' );
+		$response = rest_get_server()->dispatch( $request );
+
+		$this->assertErrorResponse( 'menu_exists', $response, 400 );
 	}
 
 	/**
@@ -520,6 +546,16 @@ class REST_Nav_Menus_Controller_Test extends WP_Test_REST_Controller_Testcase {
 		$this->assertErrorResponse( 'rest_cannot_view', $response, 403 );
 	}
 
+	public function test_it_allows_batch_requests_when_updating_menus() {
+		$rest_server = rest_get_server();
+		// This call is needed to initialize route_options.
+		$rest_server->get_routes();
+		$route_options = $rest_server->get_route_options( '/__experimental/menus/(?P<id>[\d]+)' );
+
+		$this->assertArrayHasKey( 'allow_batch', $route_options );
+		$this->assertSame( array( 'v1' => true ), $route_options['allow_batch'] );
+	}
+
 	/**
 	 * @param WP_REST_Response $response Response Class.
 	 */
@@ -561,6 +597,18 @@ class REST_Nav_Menus_Controller_Test extends WP_Test_REST_Controller_Testcase {
 		$this->assertEquals( $term->description, $data['description'] );
 		$this->assertFalse( isset( $data['parent'] ) );
 
+		$locations = get_nav_menu_locations();
+		if ( ! empty( $locations ) ) {
+			$menu_locations = array();
+			foreach ( $locations as $location => $menu_id ) {
+				if ( $menu_id === $term->term_id ) {
+					$menu_locations[] = $location;
+				}
+			}
+
+			$this->assertSame( $menu_locations, $data['locations'] );
+		}
+
 		$relations = array(
 			'self',
 			'collection',
@@ -572,9 +620,12 @@ class REST_Nav_Menus_Controller_Test extends WP_Test_REST_Controller_Testcase {
 			$relations[] = 'up';
 		}
 
+		if ( ! empty( $data['locations'] ) ) {
+			$relations[] = 'https://api.w.org/menu-location';
+		}
+
 		$this->assertEqualSets( $relations, array_keys( $links ) );
 		$this->assertContains( 'wp/v2/taxonomies/' . $term->taxonomy, $links['about'][0]['href'] );
 		$this->assertEquals( add_query_arg( 'menus', $term->term_id, rest_url( 'wp/v2/menu-items' ) ), $links['https://api.w.org/post_type'][0]['href'] );
 	}
-
 }

@@ -62,7 +62,8 @@ function useIsAccessibleToolbar( ref ) {
 		if ( ! onlyToolbarItem ) {
 			deprecated( 'Using custom components as toolbar controls', {
 				since: '5.6',
-				alternative: 'ToolbarItem or ToolbarButton components',
+				alternative:
+					'ToolbarItem, ToolbarButton or ToolbarDropdownMenu components',
 				link:
 					'https://developer.wordpress.org/block-editor/components/toolbar-button/#inside-blockcontrols',
 			} );
@@ -99,10 +100,7 @@ function useToolbarFocus(
 	}, [] );
 
 	// Focus on toolbar when pressing alt+F10 when the toolbar is visible
-	useShortcut( 'core/block-editor/focus-toolbar', focusToolbar, {
-		bindGlobal: true,
-		eventName: 'keydown',
-	} );
+	useShortcut( 'core/block-editor/focus-toolbar', focusToolbar );
 
 	useEffect( () => {
 		if ( initialFocusOnMount ) {
@@ -127,7 +125,7 @@ function useToolbarFocus(
 		}
 		return () => {
 			window.cancelAnimationFrame( raf );
-			if ( ! onIndexChange ) return;
+			if ( ! onIndexChange || ! ref.current ) return;
 			// When the toolbar element is unmounted and onIndexChange is passed, we
 			// pass the focused toolbar item index so it can be hydrated later.
 			const items = getAllToolbarItemsIn( ref.current );

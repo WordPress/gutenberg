@@ -65,6 +65,7 @@ function FileEdit( {
 	setAttributes,
 	noticeUI,
 	noticeOperations,
+	clientId,
 } ) {
 	const {
 		id,
@@ -112,6 +113,11 @@ function FileEdit( {
 			changeDownloadButtonText( _x( 'Download', 'button label' ) );
 		}
 	}, [] );
+
+	useEffect( () => {
+		// Add a unique fileId to each file block
+		setAttributes( { fileId: `wp-block-file--media-${ clientId }` } );
+	}, [ clientId ] );
 
 	function onSelectFile( newMedia ) {
 		if ( newMedia && newMedia.url ) {
@@ -274,8 +280,7 @@ function FileEdit( {
 				) }
 				<div className={ 'wp-block-file__content-wrapper' }>
 					<RichText
-						style={ { display: 'inline-block' } }
-						tagName="a" // must be block-level or else cursor disappears
+						tagName="a"
 						value={ fileName }
 						placeholder={ __( 'Write file name…' ) }
 						withoutInteractiveFormatting

@@ -8,31 +8,31 @@ exports[`Notice should match snapshot 1`] = `
     className="components-notice__content"
   >
     Example
-    <ForwardRef(Button)
-      className="components-notice__action"
-      href="https://example.com"
-      isLink={true}
-      isSecondary={false}
+    <div
+      className="components-notice__actions"
     >
-      More information
-    </ForwardRef(Button)>
-    <ForwardRef(Button)
-      className="components-notice__action"
-      isLink={false}
-      isSecondary={true}
-      onClick={[Function]}
-    >
-      Cancel
-    </ForwardRef(Button)>
-    <ForwardRef(Button)
-      className="components-notice__action"
-      isLink={false}
-      isPrimary={true}
-      isSecondary={true}
-      onClick={[Function]}
-    >
-      Submit
-    </ForwardRef(Button)>
+      <ForwardRef(Button)
+        className="components-notice__action"
+        href="https://example.com"
+        variant="link"
+      >
+        More information
+      </ForwardRef(Button)>
+      <ForwardRef(Button)
+        className="components-notice__action"
+        onClick={[Function]}
+        variant="secondary"
+      >
+        Cancel
+      </ForwardRef(Button)>
+      <ForwardRef(Button)
+        className="components-notice__action"
+        onClick={[Function]}
+        variant="primary"
+      >
+        Submit
+      </ForwardRef(Button)>
+    </div>
   </div>
   <ForwardRef(Button)
     className="components-notice__dismiss"

@@ -20,20 +20,20 @@ export const POSITIONS = {
 /**
  * @typedef {Object} UseResizeLabelProps
  *
- * @property {undefined|string} label The label value.
- * @property {Function} resizeListener Element to be rendered for resize listening events.
+ * @property {undefined|string} label          The label value.
+ * @property {Function}         resizeListener Element to be rendered for resize listening events.
  */
 
 /**
  * Custom hook that manages resize listener events. It also provides a label
  * based on current resize width x height values.
  *
- * @param {Object} props
- * @param {string} props.axis Only shows the label corresponding to the axis.
- * @param {number} props.fadeTimeout Duration (ms) before deactivating the resize label.
- * @param {boolean} props.onResize Callback when a resize occurs. Provides { width, height } callback.
- * @param {string} props.position Adjusts label value.
- * @param {boolean} props.showPx Whether to add `PX` to the label.
+ * @param {Object}  props
+ * @param {string}  props.axis        Only shows the label corresponding to the axis.
+ * @param {number}  props.fadeTimeout Duration (ms) before deactivating the resize label.
+ * @param {boolean} props.onResize    Callback when a resize occurs. Provides { width, height } callback.
+ * @param {string}  props.position    Adjusts label value.
+ * @param {boolean} props.showPx      Whether to add `PX` to the label.
  *
  * @return {UseResizeLabelProps} Properties for hook.
  */
@@ -69,6 +69,7 @@ export function useResizeLabel( {
 	 * Cached dimension values to check for width/height updates from the
 	 * sizes property from useResizeAware()
 	 */
+	const { width, height } = sizes;
 	const heightRef = useRef( height );
 	const widthRef = useRef( width );
 
@@ -77,8 +78,6 @@ export function useResizeLabel( {
 	 * both width and height values have changed at (roughly) the same time.
 	 */
 	const moveTimeoutRef = useRef();
-
-	const { width, height } = sizes;
 
 	const unsetMoveXY = () => {
 		/*
@@ -160,14 +159,14 @@ export function useResizeLabel( {
 /**
  * Gets the resize label based on width and height values (as well as recent changes).
  *
- * @param {Object} props
- * @param {string} props.axis Only shows the label corresponding to the axis.
- * @param {number} props.height Height value.
- * @param {boolean} props.moveX Recent width (x axis) changes.
- * @param {boolean} props.moveY Recent width (y axis) changes.
- * @param {string} props.position Adjusts label value.
- * @param {boolean} props.showPx Whether to add `PX` to the label.
- * @param {number} props.width Width value.
+ * @param {Object}  props
+ * @param {string}  props.axis     Only shows the label corresponding to the axis.
+ * @param {number}  props.height   Height value.
+ * @param {boolean} props.moveX    Recent width (x axis) changes.
+ * @param {boolean} props.moveY    Recent width (y axis) changes.
+ * @param {string}  props.position Adjusts label value.
+ * @param {boolean} props.showPx   Whether to add `PX` to the label.
+ * @param {number}  props.width    Width value.
  *
  * @return {undefined | string} The rendered label.
  */

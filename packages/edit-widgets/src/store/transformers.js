@@ -2,17 +2,14 @@
  * WordPress dependencies
  */
 import { createBlock, parse, serialize } from '@wordpress/blocks';
+import { addWidgetIdToBlock } from '@wordpress/widgets';
 
-function addWidgetIdToBlock( block, widgetId ) {
-	return {
-		...block,
-		attributes: {
-			...( block.attributes || {} ),
-			__internalWidgetId: widgetId,
-		},
-	};
-}
-
+/**
+ * Converts a widget entity record into a block.
+ *
+ * @param {Object} widget The widget entity record.
+ * @return {Object} a block (converted from the entity record).
+ */
 export function transformWidgetToBlock( widget ) {
 	if ( widget.id_base === 'block' ) {
 		const parsedBlocks = parse( widget.instance.raw.content );
@@ -43,10 +40,21 @@ export function transformWidgetToBlock( widget ) {
 	);
 }
 
+/**
+ * Converts a block to a widget entity record.
+ *
+ * @param {Object}  block         The block.
+ * @param {Object?} relatedWidget A related widget entity record from the API (optional).
+ * @return {Object} the widget object (converted from block).
+ */
 export function transformBlockToWidget( block, relatedWidget = {} ) {
 	let widget;
 
-	if ( block.name === 'core/legacy-widget' ) {
+	const isValidLegacyWidgetBlock =
+		block.name === 'core/legacy-widget' &&
+		( block.attributes.id || block.attributes.instance );
+
+	if ( isValidLegacyWidgetBlock ) {
 		widget = {
 			...relatedWidget,
 			id: block.attributes.id ?? relatedWidget.id,
@@ -64,13 +72,6 @@ export function transformBlockToWidget( block, relatedWidget = {} ) {
 			},
 		};
 	}
-
-	// Delete deprecated properties.
-	delete widget.description;
-	delete widget.name;
-	delete widget.number;
-	delete widget.settings;
-	delete widget.widget_class;
 
 	// Delete read-only properties.
 	delete widget.rendered;

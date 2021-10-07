@@ -14,7 +14,7 @@ import { replace } from './replace';
  * @param {RichTextValue} value
  * @param {number|string} [string] Start index, or string at which to split.
  *
- * @return {Array<RichTextValue>} An array of new values.
+ * @return {Array<RichTextValue>|undefined} An array of new values.
  */
 export function split( { formats, replacements, text, start, end }, string ) {
 	if ( typeof string !== 'string' ) {
@@ -59,6 +59,10 @@ function splitAtSelection(
 	startIndex = start,
 	endIndex = end
 ) {
+	if ( start === undefined || end === undefined ) {
+		return;
+	}
+
 	const before = {
 		formats: formats.slice( 0, startIndex ),
 		replacements: replacements.slice( 0, startIndex ),

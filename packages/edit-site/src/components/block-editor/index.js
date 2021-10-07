@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import classnames from 'classnames';
+
+/**
  * WordPress dependencies
  */
 import { useSelect, useDispatch } from '@wordpress/data';
@@ -6,19 +11,17 @@ import { useCallback, useRef } from '@wordpress/element';
 import { useEntityBlockEditor } from '@wordpress/core-data';
 import {
 	BlockEditorProvider,
-	BlockEditorKeyboardShortcuts,
 	__experimentalLinkControl,
 	BlockInspector,
-	WritingFlow,
 	BlockList,
+	BlockTools,
+	__unstableBlockSettingsMenuFirstItem,
 	__experimentalUseResizeCanvas as useResizeCanvas,
-	__unstableUseBlockSelectionClearer as useBlockSelectionClearer,
 	__unstableUseTypingObserver as useTypingObserver,
 	__unstableUseMouseMoveTypingReset as useMouseMoveTypingReset,
 	__unstableEditorStyles as EditorStyles,
 	__unstableIframe as Iframe,
 } from '@wordpress/block-editor';
-import { Popover } from '@wordpress/components';
 import { useMergeRefs } from '@wordpress/compose';
 
 /**
@@ -28,6 +31,15 @@ import TemplatePartConverter from '../template-part-converter';
 import NavigateToLink from '../navigate-to-link';
 import { SidebarInspectorFill } from '../sidebar';
 import { store as editSiteStore } from '../../store';
+import BlockInspectorButton from './block-inspector-button';
+import EditTemplatePartMenuButton from '../edit-template-part-menu-button';
+import BackButton from './back-button';
+
+const LAYOUT = {
+	type: 'default',
+	// At the root level of the site editor, no alignments should be allowed.
+	alignments: [],
+};
 
 export default function BlockEditor( { setIsInserterOpen } ) {
 	const { settings, templateType, page, deviceType } = useSelect(
@@ -38,6 +50,7 @@ export default function BlockEditor( { setIsInserterOpen } ) {
 				getPage,
 				__experimentalGetPreviewDeviceType,
 			} = select( editSiteStore );
+
 			return {
 				settings: getSettings( setIsInserterOpen ),
 				templateType: getEditedPostType(),
@@ -55,17 +68,9 @@ export default function BlockEditor( { setIsInserterOpen } ) {
 	const resizedCanvasStyles = useResizeCanvas( deviceType, true );
 	const ref = useMouseMoveTypingReset();
 	const contentRef = useRef();
-	const mergedRefs = useMergeRefs( [
-		contentRef,
-		useBlockSelectionClearer(),
-		useTypingObserver(),
-	] );
+	const mergedRefs = useMergeRefs( [ contentRef, useTypingObserver() ] );
 
-	// Allow scrolling "through" popovers over the canvas. This is only called
-	// for as long as the pointer is over a popover.
-	function onWheel( { deltaX, deltaY } ) {
-		contentRef.current.scrollBy( deltaX, deltaY );
-	}
+	const isTemplatePart = templateType === 'wp_template_part';
 
 	return (
 		<BlockEditorProvider
@@ -75,7 +80,7 @@ export default function BlockEditor( { setIsInserterOpen } ) {
 			onChange={ onChange }
 			useSubRegistry={ false }
 		>
-			<BlockEditorKeyboardShortcuts />
+			<EditTemplatePartMenuButton />
 			<TemplatePartConverter />
 			<__experimentalLinkControl.ViewerFill>
 				{ useCallback(
@@ -92,27 +97,32 @@ export default function BlockEditor( { setIsInserterOpen } ) {
 			<SidebarInspectorFill>
 				<BlockInspector />
 			</SidebarInspectorFill>
-			<div className="edit-site-visual-editor" onWheel={ onWheel }>
-				<Popover.Slot name="block-toolbar" />
+			<BlockTools
+				className={ classnames( 'edit-site-visual-editor', {
+					'is-focus-mode': isTemplatePart,
+				} ) }
+				__unstableContentRef={ contentRef }
+			>
+				<BackButton />
 				<Iframe
 					style={ resizedCanvasStyles }
-					headHTML={ window.__editorStyles.html }
 					head={ <EditorStyles styles={ settings.styles } /> }
 					ref={ ref }
 					contentRef={ mergedRefs }
+					name="editor-canvas"
+					className="edit-site-visual-editor__editor-canvas"
 				>
-					<WritingFlow>
-						<BlockList
-							className="edit-site-block-editor__block-list"
-							__experimentalLayout={ {
-								type: 'default',
-								// At the root level of the site editor, no alignments should be allowed.
-								alignments: [],
-							} }
-						/>
-					</WritingFlow>
+					<BlockList
+						className="edit-site-block-editor__block-list wp-site-blocks"
+						__experimentalLayout={ LAYOUT }
+					/>
 				</Iframe>
-			</div>
+				<__unstableBlockSettingsMenuFirstItem>
+					{ ( { onClose } ) => (
+						<BlockInspectorButton onClick={ onClose } />
+					) }
+				</__unstableBlockSettingsMenuFirstItem>
+			</BlockTools>
 		</BlockEditorProvider>
 	);
 }

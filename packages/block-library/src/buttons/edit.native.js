@@ -26,7 +26,6 @@ import { name as buttonBlockName } from '../button/';
 import styles from './editor.scss';
 
 const ALLOWED_BLOCKS = [ buttonBlockName ];
-const BUTTONS_TEMPLATE = [ [ 'core/button' ] ];
 
 const layoutProp = { type: 'default', alignments: [] };
 
@@ -41,11 +40,10 @@ export default function ButtonsEdit( {
 	const [ maxWidth, setMaxWidth ] = useState( 0 );
 	const { marginLeft: spacing } = styles.spacing;
 
-	const { getBlockOrder, isInnerButtonSelected, shouldDelete } = useSelect(
+	const { isInnerButtonSelected, shouldDelete } = useSelect(
 		( select ) => {
 			const {
 				getBlockCount,
-				getBlockOrder: _getBlockOrder,
 				getBlockParents,
 				getSelectedBlockClientId,
 			} = select( blockEditorStore );
@@ -56,7 +54,6 @@ export default function ButtonsEdit( {
 			);
 
 			return {
-				getBlockOrder: _getBlockOrder,
 				isInnerButtonSelected: selectedBlockParents[ 0 ] === clientId,
 				// The purpose of `shouldDelete` check is giving the ability to
 				// pass to mobile toolbar function called `onDelete` which removes
@@ -68,6 +65,14 @@ export default function ButtonsEdit( {
 		[ clientId ]
 	);
 
+	const preferredStyle = useSelect( ( select ) => {
+		const preferredStyleVariations = select(
+			blockEditorStore
+		).getSettings().__experimentalPreferredStyleVariations;
+		return preferredStyleVariations?.value?.[ buttonBlockName ];
+	}, [] );
+
+	const { getBlockOrder } = useSelect( blockEditorStore );
 	const { insertBlock, removeBlock, selectBlock } = useDispatch(
 		blockEditorStore
 	);
@@ -135,7 +140,16 @@ export default function ButtonsEdit( {
 			{ resizeObserver }
 			<InnerBlocks
 				allowedBlocks={ ALLOWED_BLOCKS }
-				template={ BUTTONS_TEMPLATE }
+				template={ [
+					[
+						buttonBlockName,
+						{
+							className:
+								preferredStyle &&
+								`is-style-${ preferredStyle }`,
+						},
+					],
+				] }
 				renderFooterAppender={
 					shouldRenderFooterAppender && renderFooterAppender.current
 				}

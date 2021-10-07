@@ -31,7 +31,7 @@
  * with a store.
  *
  * @param {Function} registrySelector Function receiving a registry `select`
- * function and returning a state selector.
+ *                                    function and returning a state selector.
  *
  * @return {Function} Registry selector that can be registered with a store.
  */

@@ -19,6 +19,7 @@ import { __ } from '@wordpress/i18n';
 import {
 	__experimentalUseInnerBlocksProps as useInnerBlocksProps,
 	__experimentalUseNoRecursiveRenders as useNoRecursiveRenders,
+	__experimentalBlockContentOverlay as BlockContentOverlay,
 	InnerBlocks,
 	BlockControls,
 	InspectorControls,
@@ -70,6 +71,8 @@ export default function ReusableBlockEdit( { attributes: { ref }, clientId } ) {
 		ref
 	);
 
+	const blockProps = useBlockProps();
+
 	const innerBlocksProps = useInnerBlocksProps(
 		{},
 		{
@@ -81,8 +84,6 @@ export default function ReusableBlockEdit( { attributes: { ref }, clientId } ) {
 				: InnerBlocks.ButtonBlockAppender,
 		}
 	);
-
-	const blockProps = useBlockProps();
 
 	if ( hasAlreadyRendered ) {
 		return (
@@ -136,9 +137,11 @@ export default function ReusableBlockEdit( { attributes: { ref }, clientId } ) {
 						/>
 					</PanelBody>
 				</InspectorControls>
-				<div className="block-library-block__reusable-block-container">
-					{ <div { ...innerBlocksProps } /> }
-				</div>
+				<BlockContentOverlay
+					clientId={ clientId }
+					wrapperProps={ innerBlocksProps }
+					className="block-library-block__reusable-block-container"
+				/>
 			</div>
 		</RecursionProvider>
 	);

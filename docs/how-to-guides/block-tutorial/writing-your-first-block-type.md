@@ -70,7 +70,7 @@ registerBlockType( 'gutenberg-examples/example-01-basic-esnext', {
 		const blockProps = useBlockProps( { style: blockStyle } );
 
 		return (
-			<div { ...blockProps }>Hello World, step 1 (from the editor).</div>
+			<div { ...blockProps }>Hello World (from the editor).</div>
 		);
 	},
 	save() {
@@ -78,7 +78,7 @@ registerBlockType( 'gutenberg-examples/example-01-basic-esnext', {
 
 		return (
 			<div { ...blockProps }>
-				Hello World, step 1 (from the frontend).
+				Hello World (from the frontend).
 			</div>
 		);
 	},
@@ -109,7 +109,7 @@ registerBlockType( 'gutenberg-examples/example-01-basic-esnext', {
 			return el(
 				'p',
 				blockProps,
-				'Hello World, step 1 (from the editor).'
+				'Hello World (from the editor).'
 			);
 		},
 		save: function () {
@@ -117,7 +117,7 @@ registerBlockType( 'gutenberg-examples/example-01-basic-esnext', {
 			return el(
 				'p',
 				blockProps,
-				'Hello World, step 1 (from the frontend).'
+				'Hello World (from the frontend).'
 			);
 		},
 	} );
@@ -126,7 +126,7 @@ registerBlockType( 'gutenberg-examples/example-01-basic-esnext', {
 
 {% end %}
 
-_By now you should be able to see `Hello World, step 1 (from the editor).` in the admin side and `Hello World, step 1 (from the frontend).` on the frontend side._
+_By now you should be able to see `Hello World (from the editor).` in the admin side and `Hello World (from the frontend).` on the frontend side._
 
 Once a block is registered, you should immediately see that it becomes available as an option in the editor inserter dialog, using values from `title`, `icon`, and `category` to organize its display. You can choose an icon from any included in the built-in [Dashicons icon set](https://developer.wordpress.org/resource/dashicons/), or provide a [custom svg element](/docs/reference-guides/block-api/block-registration.md#icon-optional).
 

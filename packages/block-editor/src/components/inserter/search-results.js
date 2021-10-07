@@ -17,7 +17,7 @@ import { speak } from '@wordpress/a11y';
  */
 import BlockTypesList from '../block-types-list';
 import BlockPatternsList from '../block-patterns-list';
-import __experimentalInserterMenuExtension from '../inserter-menu-extension';
+import __unstableInserterMenuExtension from '../inserter-menu-extension';
 import InserterPanel from './panel';
 import InserterNoResults from './no-results';
 import useInsertionPoint from './hooks/use-insertion-point';
@@ -26,6 +26,15 @@ import useBlockTypesState from './hooks/use-block-types-state';
 import { searchBlockItems, searchItems } from './search-items';
 import InserterListbox from '../inserter-listbox';
 
+const INITIAL_INSERTER_RESULTS = 9;
+/**
+ * Shared reference to an empty array for cases where it is important to avoid
+ * returning a new array reference on every invocation and rerendering the component.
+ *
+ * @type {Array}
+ */
+const EMPTY_ARRAY = [];
+
 function InserterSearchResults( {
 	filterValue,
 	onSelect,
@@ -33,6 +42,7 @@ function InserterSearchResults( {
 	rootClientId,
 	clientId,
 	isAppender,
+	__experimentalInsertionIndex,
 	maxBlockPatterns,
 	maxBlockTypes,
 	showBlockDirectory = false,
@@ -46,6 +56,7 @@ function InserterSearchResults( {
 		rootClientId,
 		clientId,
 		isAppender,
+		insertionIndex: __experimentalInsertionIndex,
 		shouldFocusBlock,
 	} );
 	const [
@@ -99,7 +110,14 @@ function InserterSearchResults( {
 		debouncedSpeak( resultsFoundMessage );
 	}, [ filterValue, debouncedSpeak ] );
 
-	const currentShownPatterns = useAsyncList( filteredBlockPatterns );
+	const currentShownBlockTypes = useAsyncList( filteredBlockTypes, {
+		step: INITIAL_INSERTER_RESULTS,
+	} );
+	const currentShownPatterns = useAsyncList(
+		currentShownBlockTypes.length === filteredBlockTypes.length
+			? filteredBlockPatterns
+			: EMPTY_ARRAY
+	);
 
 	const hasItems =
 		! isEmpty( filteredBlockTypes ) || ! isEmpty( filteredBlockPatterns );
@@ -115,7 +133,7 @@ function InserterSearchResults( {
 					}
 				>
 					<BlockTypesList
-						items={ filteredBlockTypes }
+						items={ currentShownBlockTypes }
 						onSelect={ onSelectBlockType }
 						onHover={ onHover }
 						label={ __( 'Blocks' ) }
@@ -149,7 +167,7 @@ function InserterSearchResults( {
 			) }
 
 			{ showBlockDirectory && (
-				<__experimentalInserterMenuExtension.Slot
+				<__unstableInserterMenuExtension.Slot
 					fillProps={ {
 						onSelect: onSelectBlockType,
 						onHover,
@@ -167,7 +185,7 @@ function InserterSearchResults( {
 						}
 						return null;
 					} }
-				</__experimentalInserterMenuExtension.Slot>
+				</__unstableInserterMenuExtension.Slot>
 			) }
 		</InserterListbox>
 	);

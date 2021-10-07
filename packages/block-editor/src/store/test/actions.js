@@ -42,7 +42,6 @@ const {
 	resetBlocks,
 	selectBlock,
 	selectPreviousBlock,
-	__unstableSetInsertionPoint,
 	showInsertionPoint,
 	startMultiSelect,
 	startTyping,
@@ -148,14 +147,58 @@ describe( 'actions', () => {
 		} );
 	} );
 	describe( 'multiSelect', () => {
-		it( 'should return MULTI_SELECT action', () => {
+		it( 'should return MULTI_SELECT action if blocks have the same root client id', () => {
 			const start = 'start';
 			const end = 'end';
-			const fulfillment = multiSelect( start, end );
-			expect( fulfillment.next().value ).toEqual( {
+			const multiSelectGenerator = multiSelect( start, end );
+
+			expect( multiSelectGenerator.next().value ).toEqual(
+				controls.select(
+					blockEditorStoreName,
+					'getBlockRootClientId',
+					start
+				)
+			);
+
+			expect( multiSelectGenerator.next( 'parent' ).value ).toEqual(
+				controls.select(
+					blockEditorStoreName,
+					'getBlockRootClientId',
+					end
+				)
+			);
+
+			expect( multiSelectGenerator.next( 'parent' ).value ).toEqual( {
 				type: 'MULTI_SELECT',
 				start,
 				end,
+			} );
+		} );
+
+		it( 'should return undefined if blocks have different root client ids', () => {
+			const start = 'start';
+			const end = 'end';
+			const multiSelectGenerator = multiSelect( start, end );
+
+			expect( multiSelectGenerator.next().value ).toEqual(
+				controls.select(
+					blockEditorStoreName,
+					'getBlockRootClientId',
+					start
+				)
+			);
+
+			expect( multiSelectGenerator.next( 'parent' ).value ).toEqual(
+				controls.select(
+					blockEditorStoreName,
+					'getBlockRootClientId',
+					end
+				)
+			);
+
+			expect( multiSelectGenerator.next( 'another parent' ) ).toEqual( {
+				done: true,
+				value: undefined,
 			} );
 		} );
 	} );
@@ -741,30 +784,10 @@ describe( 'actions', () => {
 		} );
 	} );
 
-	describe( '__unstableSetInsertionPoint', () => {
-		it( 'should return the SET_INSERTION_POINT action', () => {
-			expect( __unstableSetInsertionPoint() ).toEqual( {
-				type: 'SET_INSERTION_POINT',
-			} );
-			expect( __unstableSetInsertionPoint( 'rootClientId', 2 ) ).toEqual(
-				{
-					type: 'SET_INSERTION_POINT',
-					rootClientId: 'rootClientId',
-					index: 2,
-				}
-			);
-		} );
-	} );
-
 	describe( 'showInsertionPoint', () => {
 		it( 'should return the SHOW_INSERTION_POINT action', () => {
 			expect( showInsertionPoint() ).toEqual( {
 				type: 'SHOW_INSERTION_POINT',
-			} );
-			expect( showInsertionPoint( 'rootClientId', 2 ) ).toEqual( {
-				type: 'SHOW_INSERTION_POINT',
-				rootClientId: 'rootClientId',
-				index: 2,
 			} );
 		} );
 	} );
@@ -782,59 +805,35 @@ describe( 'actions', () => {
 			const clientId = 'clientId';
 			const clientIds = [ clientId ];
 
-			const result = Array.from( removeBlocks( clientIds ) );
+			const removeBlocksGenerator = removeBlocks( clientIds );
 
-			expect( result ).toEqual( [
+			expect( removeBlocksGenerator.next().value ).toEqual(
 				controls.select(
 					blockEditorStoreName,
 					'getBlockRootClientId',
 					clientId
-				),
+				)
+			);
+			expect( removeBlocksGenerator.next().value ).toEqual(
 				controls.select(
 					blockEditorStoreName,
-					'getTemplateLock',
-					undefined
-				),
-				selectPreviousBlock( clientId ),
-				{
-					type: 'REMOVE_BLOCKS',
+					'canRemoveBlocks',
 					clientIds,
-				},
-				controls.select( blockEditorStoreName, 'getBlockCount' ),
-			] );
+					undefined
+				)
+			);
+			expect( removeBlocksGenerator.next( true ).value ).toEqual(
+				selectPreviousBlock( clientId )
+			);
+
+			expect( removeBlocksGenerator.next().value ).toEqual( {
+				type: 'REMOVE_BLOCKS',
+				clientIds,
+			} );
 		} );
 	} );
 
 	describe( 'moveBlocksToPosition', () => {
-		it( 'should yield MOVE_BLOCKS_TO_POSITION action if locking is insert and move is not changing the root block', () => {
-			const moveBlockToPositionGenerator = moveBlocksToPosition(
-				[ 'chicken' ],
-				'ribs',
-				'ribs',
-				5
-			);
-
-			expect( moveBlockToPositionGenerator.next().value ).toEqual(
-				controls.select(
-					blockEditorStoreName,
-					'getTemplateLock',
-					'ribs'
-				)
-			);
-
-			expect(
-				moveBlockToPositionGenerator.next( 'insert' ).value
-			).toEqual( {
-				type: 'MOVE_BLOCKS_TO_POSITION',
-				fromRootClientId: 'ribs',
-				toRootClientId: 'ribs',
-				clientIds: [ 'chicken' ],
-				index: 5,
-			} );
-
-			expect( moveBlockToPositionGenerator.next().done ).toBe( true );
-		} );
-
 		it( 'should not yield MOVE_BLOCKS_TO_POSITION action if locking is all', () => {
 			const moveBlockToPositionGenerator = moveBlocksToPosition(
 				[ 'chicken' ],
@@ -843,37 +842,25 @@ describe( 'actions', () => {
 				5
 			);
 
-			expect( moveBlockToPositionGenerator.next().value ).toEqual(
+			expect( moveBlockToPositionGenerator.next( true ).value ).toEqual(
 				controls.select(
 					blockEditorStoreName,
-					'getTemplateLock',
+					'canMoveBlocks',
+					[ 'chicken' ],
 					'ribs'
 				)
-			);
-
-			expect( moveBlockToPositionGenerator.next( 'all' ) ).toEqual( {
-				done: true,
-				value: undefined,
-			} );
-		} );
-
-		it( 'should not yield MOVE_BLOCKS_TO_POSITION action if locking is insert and move is changing the root block', () => {
-			const moveBlockToPositionGenerator = moveBlocksToPosition(
-				[ 'chicken' ],
-				'ribs',
-				'chicken-ribs',
-				5
 			);
 
 			expect( moveBlockToPositionGenerator.next().value ).toEqual(
 				controls.select(
 					blockEditorStoreName,
-					'getTemplateLock',
+					'canRemoveBlocks',
+					[ 'chicken' ],
 					'ribs'
 				)
 			);
 
-			expect( moveBlockToPositionGenerator.next( 'insert' ) ).toEqual( {
+			expect( moveBlockToPositionGenerator.next() ).toEqual( {
 				done: true,
 				value: undefined,
 			} );
@@ -886,16 +873,25 @@ describe( 'actions', () => {
 				'chicken-ribs',
 				5
 			);
-
 			expect( moveBlockToPositionGenerator.next().value ).toEqual(
 				controls.select(
 					blockEditorStoreName,
-					'getTemplateLock',
+					'canMoveBlocks',
+					[ 'chicken' ],
 					'ribs'
 				)
 			);
 
-			expect( moveBlockToPositionGenerator.next().value ).toEqual(
+			expect( moveBlockToPositionGenerator.next( true ).value ).toEqual(
+				controls.select(
+					blockEditorStoreName,
+					'canRemoveBlocks',
+					[ 'chicken' ],
+					'ribs'
+				)
+			);
+
+			expect( moveBlockToPositionGenerator.next( true ).value ).toEqual(
 				controls.select(
 					blockEditorStoreName,
 					'canInsertBlocks',
@@ -929,12 +925,21 @@ describe( 'actions', () => {
 			expect( moveBlockToPositionGenerator.next().value ).toEqual(
 				controls.select(
 					blockEditorStoreName,
-					'getTemplateLock',
+					'canMoveBlocks',
+					[ 'chicken' ],
 					'ribs'
 				)
 			);
 
-			expect( moveBlockToPositionGenerator.next().value ).toEqual(
+			expect( moveBlockToPositionGenerator.next( true ).value ).toEqual(
+				controls.select(
+					blockEditorStoreName,
+					'canRemoveBlocks',
+					[ 'chicken' ],
+					'ribs'
+				)
+			);
+			expect( moveBlockToPositionGenerator.next( true ).value ).toEqual(
 				controls.select(
 					blockEditorStoreName,
 					'canInsertBlocks',
@@ -962,12 +967,22 @@ describe( 'actions', () => {
 			expect( moveBlockToPositionGenerator.next().value ).toEqual(
 				controls.select(
 					blockEditorStoreName,
-					'getTemplateLock',
+					'canMoveBlocks',
+					'chicken',
 					'ribs'
 				)
 			);
 
-			expect( moveBlockToPositionGenerator.next().value ).toEqual( {
+			expect( moveBlockToPositionGenerator.next( true ).value ).toEqual(
+				controls.select(
+					blockEditorStoreName,
+					'canRemoveBlocks',
+					'chicken',
+					'ribs'
+				)
+			);
+
+			expect( moveBlockToPositionGenerator.next( true ).value ).toEqual( {
 				type: 'MOVE_BLOCKS_TO_POSITION',
 				fromRootClientId: 'ribs',
 				toRootClientId: 'ribs',
@@ -983,55 +998,64 @@ describe( 'actions', () => {
 		it( 'should return REMOVE_BLOCKS action', () => {
 			const clientId = 'myclientid';
 
-			const result = Array.from( removeBlock( clientId ) );
-
-			expect( result ).toEqual( [
+			const removeBlockGenerator = removeBlock( clientId );
+			expect( removeBlockGenerator.next().value ).toEqual(
 				controls.select(
 					blockEditorStoreName,
 					'getBlockRootClientId',
 					clientId
-				),
+				)
+			);
+			expect( removeBlockGenerator.next().value ).toEqual(
 				controls.select(
 					blockEditorStoreName,
-					'getTemplateLock',
+					'canRemoveBlocks',
+					[ clientId ],
 					undefined
-				),
-				selectPreviousBlock( clientId ),
-				{
-					type: 'REMOVE_BLOCKS',
-					clientIds: [ clientId ],
-				},
-				controls.select( blockEditorStoreName, 'getBlockCount' ),
-			] );
+				)
+			);
+			expect( removeBlockGenerator.next( true ).value ).toEqual(
+				selectPreviousBlock( clientId )
+			);
+
+			expect( removeBlockGenerator.next().value ).toEqual( {
+				type: 'REMOVE_BLOCKS',
+				clientIds: [ clientId ],
+			} );
 		} );
 
 		it( 'should return REMOVE_BLOCKS action, opting out of select previous', () => {
 			const clientId = 'myclientid';
 
-			const result = Array.from( removeBlock( clientId, false ) );
+			const removeBlocksGenerator = removeBlocks( [ clientId ], false );
 
-			expect( result ).toEqual( [
+			expect( removeBlocksGenerator.next().value ).toEqual(
 				controls.select(
 					blockEditorStoreName,
 					'getBlockRootClientId',
 					clientId
-				),
+				)
+			);
+			expect( removeBlocksGenerator.next().value ).toEqual(
 				controls.select(
 					blockEditorStoreName,
-					'getTemplateLock',
+					'canRemoveBlocks',
+					[ clientId ],
 					undefined
-				),
+				)
+			);
+			expect( removeBlocksGenerator.next( true ).value ).toEqual(
 				controls.select(
 					blockEditorStoreName,
 					'getPreviousBlockClientId',
-					'myclientid'
-				),
-				{
-					type: 'REMOVE_BLOCKS',
-					clientIds: [ clientId ],
-				},
-				controls.select( blockEditorStoreName, 'getBlockCount' ),
-			] );
+					clientId
+				)
+			);
+
+			expect( removeBlocksGenerator.next().value ).toEqual( {
+				type: 'REMOVE_BLOCKS',
+				clientIds: [ clientId ],
+			} );
 		} );
 	} );
 

@@ -10,12 +10,13 @@ import { forEach, without } from 'lodash';
  */
 class Listener {
 	constructor() {
+		/** @type {any} */
 		this.listeners = {};
 
 		this.handleEvent = this.handleEvent.bind( this );
 	}
 
-	add( eventType, instance ) {
+	add( /** @type {any} */ eventType, /** @type {any} */ instance ) {
 		if ( ! this.listeners[ eventType ] ) {
 			// Adding first listener for this type, so bind event.
 			window.addEventListener( eventType, this.handleEvent );
@@ -25,7 +26,7 @@ class Listener {
 		this.listeners[ eventType ].push( instance );
 	}
 
-	remove( eventType, instance ) {
+	remove( /** @type {any} */ eventType, /** @type {any} */ instance ) {
 		this.listeners[ eventType ] = without(
 			this.listeners[ eventType ],
 			instance
@@ -38,7 +39,7 @@ class Listener {
 		}
 	}
 
-	handleEvent( event ) {
+	handleEvent( /** @type {any} */ event ) {
 		forEach( this.listeners[ event.type ], ( instance ) => {
 			instance.handleEvent( event );
 		} );

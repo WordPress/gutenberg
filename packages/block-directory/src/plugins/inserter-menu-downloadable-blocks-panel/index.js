@@ -6,7 +6,7 @@ import { debounce } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { __experimentalInserterMenuExtension } from '@wordpress/block-editor';
+import { __unstableInserterMenuExtension } from '@wordpress/block-editor';
 import { useState } from '@wordpress/element';
 
 /**
@@ -19,7 +19,7 @@ function InserterMenuDownloadableBlocksPanel() {
 	const debouncedSetFilterValue = debounce( setFilterValue, 400 );
 
 	return (
-		<__experimentalInserterMenuExtension>
+		<__unstableInserterMenuExtension>
 			{ ( {
 				onSelect,
 				onHover,
@@ -46,7 +46,7 @@ function InserterMenuDownloadableBlocksPanel() {
 					/>
 				);
 			} }
-		</__experimentalInserterMenuExtension>
+		</__unstableInserterMenuExtension>
 	);
 }
 

@@ -1,23 +1,23 @@
 /**
- * External dependencies
+ * A WP nav_menu_item object.
+ * For more documentation on the individual fields present on a menu item please see:
+ * https://core.trac.wordpress.org/browser/tags/5.7.1/src/wp-includes/nav-menu.php#L789
+ *
+ * Changes made here should also be mirrored in packages/block-library/src/navigation/map-menu-items-to-blocks.js.
+ *
+ * @typedef WPNavMenuItem
+ *
+ * @property {Object} title       stores the raw and rendered versions of the title/label for this menu item.
+ * @property {Array}  xfn         the XFN relationships expressed in the link of this menu item.
+ * @property {Array}  classes     the HTML class attributes for this menu item.
+ * @property {string} attr_title  the HTML title attribute for this menu item.
+ * @property {string} object      The type of object originally represented, such as 'category', 'post', or 'attachment'.
+ * @property {string} object_id   The DB ID of the original object this menu item represents, e.g. ID for posts and term_id for categories.
+ * @property {string} description The description of this menu item.
+ * @property {string} url         The URL to which this menu item points.
+ * @property {string} type        The family of objects originally represented, such as 'post_type' or 'taxonomy'.
+ * @property {string} target      The target attribute of the link element for this menu item.
  */
-import { keyBy, omit } from 'lodash';
-
-/**
- * WordPress dependencies
- */
-import { serialize } from '@wordpress/blocks';
-
-/**
- * Internal dependencies
- */
-import {
-	getNavigationPostForMenu,
-	getPendingActions,
-	isProcessingPost,
-} from './controls';
-
-import { NEW_TAB_TARGET_ATTRIBUTE } from '../constants';
 
 /**
  * Builds an ID for a new navigation post.
@@ -39,136 +39,44 @@ export function menuItemsQuery( menuId ) {
 }
 
 /**
- * This wrapper guarantees serial execution of data processing actions.
+ * Get the internal record id from block.
  *
- * Examples:
- * * saveNavigationPost() needs to wait for all the missing items to be created.
- * * Concurrent createMissingMenuItems() could result in sending more requests than required.
+ * @typedef  {Object} Attributes
+ * @property {string}     __internalRecordId The internal record id.
+ * @typedef  {Object} Block
+ * @property {Attributes} attributes         The attributes of the block.
  *
- * @param {Function} callback An action creator to wrap
- * @return {Function} Original callback wrapped in a serial execution context
+ * @param    {Block}      block              The block.
+ * @return {string} The internal record id.
  */
-export function serializeProcessing( callback ) {
-	return function* ( post ) {
-		const postId = post.id;
-		const isProcessing = yield isProcessingPost( postId );
+export function getRecordIdFromBlock( block ) {
+	return block.attributes.__internalRecordId;
+}
 
-		if ( isProcessing ) {
-			yield {
-				type: 'ENQUEUE_AFTER_PROCESSING',
-				postId,
-				action: callback,
-			};
-			return { status: 'pending' };
-		}
-		yield {
-			type: 'POP_PENDING_ACTION',
-			postId,
-			action: callback,
-		};
-
-		yield {
-			type: 'START_PROCESSING_POST',
-			postId,
-		};
-
-		try {
-			yield* callback(
-				// re-select the post as it could be outdated by now
-				yield getNavigationPostForMenu( post.meta.menuId )
-			);
-		} finally {
-			yield {
-				type: 'FINISH_PROCESSING_POST',
-				postId,
-				action: callback,
-			};
-
-			const pendingActions = yield getPendingActions( postId );
-			if ( pendingActions.length ) {
-				const serializedCallback = serializeProcessing(
-					pendingActions[ 0 ]
-				);
-
-				yield* serializedCallback( post );
-			}
-		}
+/**
+ * Add internal record id to block's attributes.
+ *
+ * @param {Block}  block    The block.
+ * @param {string} recordId The record id.
+ * @return {Block} The updated block.
+ */
+export function addRecordIdToBlock( block, recordId ) {
+	return {
+		...block,
+		attributes: {
+			...( block.attributes || {} ),
+			__internalRecordId: recordId,
+		},
 	};
 }
 
-export function computeCustomizedAttribute(
-	blocks,
-	menuId,
-	menuItemsByClientId
-) {
-	const blocksList = blocksTreeToFlatList( blocks );
-	const dataList = blocksList.map( ( { block, parentId, position } ) =>
-		blockToRequestItem( block, parentId, position )
+/**
+ * Checks if a given block should be persisted as a menu item.
+ *
+ * @param {Object} block Block to check.
+ * @return {boolean} True if a given block should be persisted as a menu item, false otherwise.
+ */
+export const isBlockSupportedInNav = ( block ) =>
+	[ 'core/navigation-link', 'core/navigation-submenu' ].includes(
+		block.name
 	);
-
-	// Create an object like { "nav_menu_item[12]": {...}} }
-	const computeKey = ( item ) => `nav_menu_item[${ item.id }]`;
-	const dataObject = keyBy( dataList, computeKey );
-
-	// Deleted menu items should be sent as false, e.g. { "nav_menu_item[13]": false }
-	for ( const clientId in menuItemsByClientId ) {
-		const key = computeKey( menuItemsByClientId[ clientId ] );
-		if ( ! ( key in dataObject ) ) {
-			dataObject[ key ] = false;
-		}
-	}
-
-	return JSON.stringify( dataObject );
-
-	function blocksTreeToFlatList( innerBlocks, parentId = 0 ) {
-		return innerBlocks.flatMap( ( block, index ) =>
-			[ { block, parentId, position: index + 1 } ].concat(
-				blocksTreeToFlatList(
-					block.innerBlocks,
-					getMenuItemForBlock( block )?.id
-				)
-			)
-		);
-	}
-
-	function blockToRequestItem( block, parentId, position ) {
-		const menuItem = omit( getMenuItemForBlock( block ), 'menus', 'meta' );
-
-		let attributes;
-
-		if ( block.name === 'core/navigation-link' ) {
-			attributes = {
-				type: 'custom',
-				title: block.attributes?.label,
-				original_title: '',
-				url: block.attributes.url,
-				description: block.attributes.description,
-				xfn: block.attributes.rel?.split( ' ' ),
-				classes: block.attributes.className?.split( ' ' ),
-				attr_title: block.attributes.title,
-				target: block.attributes.opensInNewTab
-					? NEW_TAB_TARGET_ATTRIBUTE
-					: '',
-			};
-		} else {
-			attributes = {
-				type: 'block',
-				content: serialize( block ),
-			};
-		}
-
-		return {
-			...menuItem,
-			...attributes,
-			position,
-			nav_menu_term_id: menuId,
-			menu_item_parent: parentId,
-			status: 'publish',
-			_invalid: false,
-		};
-	}
-
-	function getMenuItemForBlock( block ) {
-		return omit( menuItemsByClientId[ block.clientId ] || {}, '_links' );
-	}
-}

@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { size, map, without, omit } from 'lodash';
+import { size, map, without } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -12,9 +12,12 @@ import {
 	EditorProvider,
 	ErrorBoundary,
 	PostLockedModal,
+	store as editorStore,
 } from '@wordpress/editor';
 import { StrictMode, useMemo } from '@wordpress/element';
 import { KeyboardShortcuts, SlotFillProvider } from '@wordpress/components';
+import { store as coreStore } from '@wordpress/core-data';
+import { ShortcutProvider } from '@wordpress/keyboard-shortcuts';
 
 /**
  * Internal dependencies
@@ -46,60 +49,64 @@ function Editor( {
 		keepCaretInsideBlock,
 		isTemplateMode,
 		template,
-	} = useSelect( ( select ) => {
-		const {
-			isFeatureActive,
-			getPreference,
-			__experimentalGetPreviewDeviceType,
-			isEditingTemplate,
-			getEditedPostTemplate,
-		} = select( editPostStore );
-		const { getEntityRecord, getPostType, getEntityRecords } = select(
-			'core'
-		);
-		const { getEditorSettings } = select( 'core/editor' );
-		const { getBlockTypes } = select( blocksStore );
-		const isTemplate = [ 'wp_template', 'wp_template_part' ].includes(
-			postType
-		);
-		// Ideally the initializeEditor function should be called using the ID of the REST endpoint.
-		// to avoid the special case.
-		let postObject;
-		if ( isTemplate ) {
-			const posts = getEntityRecords( 'postType', postType, {
-				wp_id: postId,
-			} );
-			postObject = posts?.[ 0 ];
-		} else {
-			postObject = getEntityRecord( 'postType', postType, postId );
-		}
-		const supportsTemplateMode = getEditorSettings().supportsTemplateMode;
-		const isViewable = getPostType( postType )?.viewable ?? false;
+	} = useSelect(
+		( select ) => {
+			const {
+				isFeatureActive,
+				getPreference,
+				__experimentalGetPreviewDeviceType,
+				isEditingTemplate,
+				getEditedPostTemplate,
+			} = select( editPostStore );
+			const { getEntityRecord, getPostType, getEntityRecords } = select(
+				coreStore
+			);
+			const { getEditorSettings } = select( editorStore );
+			const { getBlockTypes } = select( blocksStore );
+			const isTemplate = [ 'wp_template', 'wp_template_part' ].includes(
+				postType
+			);
+			// Ideally the initializeEditor function should be called using the ID of the REST endpoint.
+			// to avoid the special case.
+			let postObject;
+			if ( isTemplate ) {
+				const posts = getEntityRecords( 'postType', postType, {
+					wp_id: postId,
+				} );
+				postObject = posts?.[ 0 ];
+			} else {
+				postObject = getEntityRecord( 'postType', postType, postId );
+			}
+			const supportsTemplateMode = getEditorSettings()
+				.supportsTemplateMode;
+			const isViewable = getPostType( postType )?.viewable ?? false;
 
-		return {
-			hasFixedToolbar:
-				isFeatureActive( 'fixedToolbar' ) ||
-				__experimentalGetPreviewDeviceType() !== 'Desktop',
-			focusMode: isFeatureActive( 'focusMode' ),
-			hasReducedUI: isFeatureActive( 'reducedUI' ),
-			hasThemeStyles: isFeatureActive( 'themeStyles' ),
-			preferredStyleVariations: getPreference(
-				'preferredStyleVariations'
-			),
-			hiddenBlockTypes: getPreference( 'hiddenBlockTypes' ),
-			blockTypes: getBlockTypes(),
-			__experimentalLocalAutosaveInterval: getPreference(
-				'localAutosaveInterval'
-			),
-			keepCaretInsideBlock: isFeatureActive( 'keepCaretInsideBlock' ),
-			isTemplateMode: isEditingTemplate(),
-			template:
-				supportsTemplateMode && isViewable
-					? getEditedPostTemplate()
-					: null,
-			post: postObject,
-		};
-	} );
+			return {
+				hasFixedToolbar:
+					isFeatureActive( 'fixedToolbar' ) ||
+					__experimentalGetPreviewDeviceType() !== 'Desktop',
+				focusMode: isFeatureActive( 'focusMode' ),
+				hasReducedUI: isFeatureActive( 'reducedUI' ),
+				hasThemeStyles: isFeatureActive( 'themeStyles' ),
+				preferredStyleVariations: getPreference(
+					'preferredStyleVariations'
+				),
+				hiddenBlockTypes: getPreference( 'hiddenBlockTypes' ),
+				blockTypes: getBlockTypes(),
+				__experimentalLocalAutosaveInterval: getPreference(
+					'localAutosaveInterval'
+				),
+				keepCaretInsideBlock: isFeatureActive( 'keepCaretInsideBlock' ),
+				isTemplateMode: isEditingTemplate(),
+				template:
+					supportsTemplateMode && isViewable
+						? getEditedPostTemplate()
+						: null,
+				post: postObject,
+			};
+		},
+		[ postType, postId ]
+	);
 
 	const { updatePreferredStyleVariations, setIsInserterOpened } = useDispatch(
 		editPostStore
@@ -107,7 +114,7 @@ function Editor( {
 
 	const editorSettings = useMemo( () => {
 		const result = {
-			...omit( settings, [ 'styles' ] ),
+			...settings,
 			__experimentalPreferredStyleVariations: {
 				value: preferredStyleVariations,
 				onChange: updatePreferredStyleVariations,
@@ -154,7 +161,9 @@ function Editor( {
 	] );
 
 	const styles = useMemo( () => {
-		return hasThemeStyles ? settings.styles : [];
+		return hasThemeStyles && settings.styles?.length
+			? settings.styles
+			: settings.defaultEditorStyles;
 	}, [ settings, hasThemeStyles ] );
 
 	if ( ! post ) {
@@ -163,29 +172,31 @@ function Editor( {
 
 	return (
 		<StrictMode>
-			<EditPostSettings.Provider value={ settings }>
-				<SlotFillProvider>
-					<EditorProvider
-						settings={ editorSettings }
-						post={ post }
-						initialEdits={ initialEdits }
-						useSubRegistry={ false }
-						__unstableTemplate={
-							isTemplateMode ? template : undefined
-						}
-						{ ...props }
-					>
-						<ErrorBoundary onError={ onError }>
-							<EditorInitialization postId={ postId } />
-							<Layout styles={ styles } />
-							<KeyboardShortcuts
-								shortcuts={ preventEventDiscovery }
-							/>
-						</ErrorBoundary>
-						<PostLockedModal />
-					</EditorProvider>
-				</SlotFillProvider>
-			</EditPostSettings.Provider>
+			<ShortcutProvider>
+				<EditPostSettings.Provider value={ settings }>
+					<SlotFillProvider>
+						<EditorProvider
+							settings={ editorSettings }
+							post={ post }
+							initialEdits={ initialEdits }
+							useSubRegistry={ false }
+							__unstableTemplate={
+								isTemplateMode ? template : undefined
+							}
+							{ ...props }
+						>
+							<ErrorBoundary onError={ onError }>
+								<EditorInitialization postId={ postId } />
+								<Layout styles={ styles } />
+								<KeyboardShortcuts
+									shortcuts={ preventEventDiscovery }
+								/>
+							</ErrorBoundary>
+							<PostLockedModal />
+						</EditorProvider>
+					</SlotFillProvider>
+				</EditPostSettings.Provider>
+			</ShortcutProvider>
 		</StrictMode>
 	);
 }

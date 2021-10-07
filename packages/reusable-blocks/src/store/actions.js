@@ -38,7 +38,7 @@ export function* __experimentalDeleteReusableBlock( id ) {
 /**
  * Returns an action descriptor for SET_EDITING_REUSABLE_BLOCK action.
  *
- * @param {string} clientId The clientID of the reusable block to target.
+ * @param {string}  clientId  The clientID of the reusable block to target.
  * @param {boolean} isEditing Whether the block should be in editing state.
  * @return {Object} Action descriptor.
  */

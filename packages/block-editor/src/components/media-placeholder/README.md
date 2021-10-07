@@ -188,6 +188,15 @@ Callback called when urls can be configured. No media insertion from url will be
 -   Required: No
 -   Platform: Web
 
+### handleUpload
+
+When set to false the handling of the upload is left to the calling component.
+
+-   Type: `Boolean`
+-   Required: No
+-   Default: `true`
+-   Platform: Web
+
 ## Extend
 
 It includes a `wp.hooks` filter `editor.MediaPlaceholder` that enables developers to replace or extend it.

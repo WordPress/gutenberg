@@ -18,7 +18,6 @@ import {
 	getBlockType,
 	getFreeformContentHandlerName,
 	getUnregisteredTypeHandlerName,
-	hasBlockSupport,
 } from './registration';
 import { isUnmodifiedDefaultBlock, normalizeBlockType } from './utils';
 import BlockContentProvider from '../block-content-provider';
@@ -91,9 +90,9 @@ export function getBlockProps( props = {} ) {
  * Given a block type containing a save render implementation and attributes, returns the
  * enhanced element to be saved or string when raw HTML expected.
  *
- * @param {string|Object} blockTypeOrName   Block type or name.
- * @param {Object}        attributes        Block attributes.
- * @param {?Array}        innerBlocks       Nested blocks.
+ * @param {string|Object} blockTypeOrName Block type or name.
+ * @param {Object}        attributes      Block attributes.
+ * @param {?Array}        innerBlocks     Nested blocks.
  *
  * @return {Object|string} Save element or raw HTML string.
  */
@@ -118,14 +117,10 @@ export function getSaveElement(
 
 	let element = save( { attributes, innerBlocks } );
 
-	const hasLightBlockWrapper =
-		blockType.apiVersion > 1 ||
-		hasBlockSupport( blockType, 'lightBlockWrapper', false );
-
 	if (
 		isObject( element ) &&
 		hasFilter( 'blocks.getSaveContent.extraProps' ) &&
-		! hasLightBlockWrapper
+		! ( blockType.apiVersion > 1 )
 	) {
 		/**
 		 * Filters the props applied to the block save result element.
@@ -196,7 +191,7 @@ export function getSaveContent( blockTypeOrName, attributes, innerBlocks ) {
  * This function returns only those attributes which are needed to persist and
  * which cannot be matched from the block content.
  *
- * @param {Object<string,*>} blockType     Block type.
+ * @param {Object<string,*>} blockType  Block type.
  * @param {Object<string,*>} attributes Attributes from in-memory block data.
  *
  * @return {Object<string,*>} Subset of attributes for comment serialization.

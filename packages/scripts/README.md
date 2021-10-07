@@ -16,7 +16,7 @@ You only need to install one npm module:
 npm install @wordpress/scripts --save-dev
 ```
 
-**Note**: This package requires Node.js 12.0.0 or later, and `npm` 6.9.0 or later. It is not compatible with older versions.
+**Note**: This package requires Node.js 12.13.0 or later, and `npm` 6.9.0 or later. It is not compatible with older versions.
 
 ## Setup
 
@@ -150,7 +150,7 @@ This is how you execute the script with presented setup:
 
 When you run commands similar to the `npm run format:src` example above, you can provide a file, a directory, or `glob` syntax or any combination of them.
 
-By default, files located in `build`, `node_modules`, and `vendor` folders are ignored.
+By default, files located in `build`, `node_modules`, and `vendor` folders are ignored. You can customize the list of ignored files and directories by adding them to a `.prettierignore` file in your project.
 
 ### `lint-js`
 

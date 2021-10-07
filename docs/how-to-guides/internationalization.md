@@ -99,7 +99,9 @@ Common functions available, these mirror their PHP counterparts are:
 -   `_n( '%s Comment', '%s Comments', numberOfComments, 'my-text-domain' )` - Translate and retrieve the singular or plural form based on the supplied number.
 -   `_x( 'Default', 'block style', 'my-text-domain' )` - Translate a certain string with some additional context.
 
-**Note:** Every string displayed to the user should be wrapped in an i18n function.
+<div class="callout callout-alert">
+<strong>Note:</strong> Every string displayed to the user should be wrapped in an i18n function.
+</div>
 
 After all strings in your code is wrapped, the final step is to tell WordPress your JavaScript contains translations, using the [wp_set_script_translations()](https://developer.wordpress.org/reference/functions/wp_set_script_translations/) function.
 

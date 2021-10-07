@@ -19,6 +19,7 @@
 		width: 120px;
 
 		img {
+			height: auto;
 			width: 100%;
 		}
 	}
@@ -38,21 +39,25 @@
 
 	img {
 		display: block;
+		height: auto;
 		max-width: 100%;
 	}
 
 	// Placeholder improvements.
 	.components-placeholder {
+		justify-content: flex-start;
 		min-height: auto;
 		height: 120px;
-		padding: $grid-unit-10;
+		padding: $grid-unit-15;
 
 		// Massage the label.
 		.components-placeholder__label {
+			margin-top: $grid-unit-15;
 			white-space: nowrap;
 		}
 
-		.components-placeholder__label .block-editor-block-icon {
+		.components-placeholder__label .block-editor-block-icon,
+		.components-placeholder__label > svg {
 			margin-right: $grid-unit-05;
 		}
 

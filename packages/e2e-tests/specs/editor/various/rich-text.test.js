@@ -385,21 +385,27 @@ describe( 'RichText', () => {
 		await clickBlockToolbarButton( 'More' );
 
 		const button = await page.waitForXPath(
-			`//button[contains(text(), 'Text color')]`
+			`//button[text()='Highlight']`
 		);
 		// Clicks may fail if the button is out of view. Assure it is before click.
 		await button.evaluate( ( element ) => element.scrollIntoView() );
 		await button.click();
 
+		// Tab to the "Text" tab.
+		await page.keyboard.press( 'Tab' );
+		// Tab to black.
+		await page.keyboard.press( 'Tab' );
 		// Select color other than black.
 		await page.keyboard.press( 'Tab' );
 		await page.keyboard.press( 'Enter' );
 
 		expect( await getEditedPostContent() ).toMatchSnapshot();
 
+		// Dismiss color picker popover
+		await page.keyboard.press( 'Escape' );
+
 		// Navigate to the block.
 		await page.keyboard.press( 'Tab' );
-		await pressKeyWithModifier( 'primary', 'a' );
 
 		// Copy the colored text.
 		await pressKeyWithModifier( 'primary', 'c' );
@@ -425,6 +431,71 @@ describe( 'RichText', () => {
 		await page.keyboard.type( '1' );
 
 		// Expect '1🍓'.
+		expect( await getEditedPostContent() ).toMatchSnapshot();
+	} );
+
+	it( 'should show/hide toolbar when entering/exiting format', async () => {
+		const blockToolbarSelector = '.block-editor-block-toolbar';
+		await clickBlockAppender();
+		await page.keyboard.type( '1' );
+		expect( await page.$( blockToolbarSelector ) ).toBe( null );
+		await pressKeyWithModifier( 'primary', 'b' );
+		expect( await page.$( blockToolbarSelector ) ).not.toBe( null );
+		await page.keyboard.type( '2' );
+		expect( await page.$( blockToolbarSelector ) ).not.toBe( null );
+		await pressKeyWithModifier( 'primary', 'b' );
+		expect( await page.$( blockToolbarSelector ) ).toBe( null );
+		await page.keyboard.type( '3' );
+		await page.keyboard.press( 'ArrowLeft' );
+		expect( await page.$( blockToolbarSelector ) ).toBe( null );
+		await page.keyboard.press( 'ArrowLeft' );
+		expect( await page.$( blockToolbarSelector ) ).not.toBe( null );
+		await page.keyboard.press( 'ArrowLeft' );
+		expect( await page.$( blockToolbarSelector ) ).not.toBe( null );
+		await page.keyboard.press( 'ArrowLeft' );
+		expect( await page.$( blockToolbarSelector ) ).toBe( null );
+	} );
+
+	it( 'should run input rules after composition end', async () => {
+		await clickBlockAppender();
+		// Puppeteer doesn't support composition, so emulate it by inserting
+		// text in the DOM directly, setting selection in the right place, and
+		// firing `compositionend`.
+		// See https://github.com/puppeteer/puppeteer/issues/4981.
+		await page.evaluate( () => {
+			document.activeElement.textContent = '`a`';
+			const selection = window.getSelection();
+			selection.selectAllChildren( document.activeElement );
+			selection.collapseToEnd();
+			document.activeElement.dispatchEvent(
+				new CompositionEvent( 'compositionend' )
+			);
+		} );
+
+		expect( await getEditedPostContent() ).toMatchSnapshot();
+	} );
+
+	it( 'should navigate consecutive format boundaries', async () => {
+		await clickBlockAppender();
+		await pressKeyWithModifier( 'primary', 'b' );
+		await page.keyboard.type( '1' );
+		await pressKeyWithModifier( 'primary', 'b' );
+		await pressKeyWithModifier( 'primary', 'i' );
+		await page.keyboard.type( '2' );
+		await pressKeyWithModifier( 'primary', 'i' );
+
+		expect( await getEditedPostContent() ).toMatchSnapshot();
+
+		// Should move into the second format.
+		await page.keyboard.press( 'ArrowLeft' );
+		// Should move to the start of the second format.
+		await page.keyboard.press( 'ArrowLeft' );
+		// Should move between the first and second format.
+		await page.keyboard.press( 'ArrowLeft' );
+
+		await page.keyboard.type( '-' );
+
+		// Expect: <strong>1</strong>-<em>2</em>
 		expect( await getEditedPostContent() ).toMatchSnapshot();
 	} );
 } );

@@ -10,10 +10,128 @@ For each user feature we should also add a importance categorization label  to i
 -->
 
 ## Unreleased
+-   [*] [Embed block] Fix inline preview cut-off when editing URL [#35321]
 
+## 1.63.0
+-   [**] [Embed block] Add the top 5 specific embed blocks to the Block inserter list [#34967]
+-   [*] Embed block: Fix URL update when edited after setting a bad URL of a provider [#35013]
+-   [**] Users can now contact support from inside the block editor screen. [#34890]
+
+## 1.62.2
+-   Same as 1.62.1 but with the changelog.
+
+## 1.62.1
+-   [**] Image block: fix height and border regression. [https://github.com/WordPress/gutenberg/pull/34957]
+-   [**] Column block: fix width attribute flout cutoff. [https://github.com/wordpress-mobile/gutenberg-mobile/pull/3921]
+
+## 1.62.0
+-   [**] [Embed block] Implement WP embed preview component [#34004]
+-   [*] [Embed block] Fix content disappearing on Android when switching light/dark mode [#34207]
+-   [*] Embed block: Add device's locale to preview content [#33858]
+-   [**] Fix Android-only issue of main toolbar initial position being wrong when RTL [#34617]
+-   [**] Embed block: Implemented the No Preview UI when an embed is successful, but we're unable to show an inline preview [#34626]
+-   [*] Column block: Translate column width's control labels [#34777]
+-   [**] Enable embed preview for Instagram and Vimeo providers. [#34563]
+-   [**] Embed block: Add error bottom sheet with retry and convert to link actions. [#34604]
+
+## 1.61.2
+-   [*] Image block - Fix height and border regression. [#34957]
+
+## 1.61.1
+-   [*] Fix crash related to reusable blocks in the block picker. [#34873]
+
+## 1.61.0
+-   [**] Enable embed preview for a list of providers (for now only YouTube and Twitter) [#34446]
+-   [***] Inserter: Add Inserter Block Search [https://github.com/WordPress/gutenberg/pull/33237]
+
+## 1.60.1
+-   [*] RNmobile: Fix the cancel button on Block Variation Picker / Columns Block. [#34249]
+-   [*] Column block: Fix Android close button alignment. [#34332]
+
+## 1.60.0
+-   [**] Embed block: Add "Resize for smaller devices" setting. [#33654]
+
+## 1.59.2
+-   [*] Inserter: Prevent non-deterministic order of inserter items [#34078]
+-   [*] Fix missing block title of core/latest-posts block [#34116]
+
+## 1.59.1
+-   [*] Global styles - Add color to the block styles filter list [#34000]
+-   [*] Rich text - toTree - Add check in replacements before accessing its type [#34020]
+
+## 1.59.0
+-   [*] [Android] Fix UBE's inaccessible "more" toolbar item. [#33740]
+-   [*] Image block: Add a "featured" banner and ability to set or remove an image as featured. (iOS only) [#31345]
+
+## 1.58.3
+-   [*] Rich text - toTree - Add check in replacements before accessing its type [#34020]
+
+## 1.58.2
+-   [*] Fix issue with text input in alt text settings [#33845]
+
+## 1.58.1
+-   [*] Global styles: Check for undefined values and merge user colors [#33707]
+-   [*] [Embed block] Disable paragraph transform [#33745]
+
+## 1.58.0
+-   [***] New Block: Embed block. [#33452]
+
+## 1.57.0
+-   [*] Update loading and failed screens for web version of the editor [#32395]
+-   [*] Handle floating keyboard case - Fix issue with the block selector on iPad. [#33089]
+-   [**] Added color/background customization for text blocks. [#33250]
+
+## 1.56.0
+-   [*] Tweaks to the badge component's styling, including change of background color and reduced padding. [#32865]
+
+## 1.55.2
+-   [**] Fix incorrect block insertion point after blurring the post title field. [#32831]
+
+## 1.55.1
+-   [*] Fix: RNMobile borderRadius value setting [#32717]
+-   [*] Improve unsupported block message for reusable block [#32618]
+
+## 1.55.0
+-   [*] Gallery block - Fix gallery images caption text formatting [#32351]
+-   [*] Image block: "Set as featured" button within image block settings. (Android only) [#31705]
+-   [***] Audio block now available on WP.com sites on the free plan. [#31966]
+
+## 1.54.0
+-   [***] Slash inserter [#29772]
+-   [*] Audio block: Add Insert from URL functionality. [#27817]
+-   [*] The BottomSheet Cell component now supports the help prop so that a hint can be supplied to all Cell based components. [#30885]
+-   [***] Enable reusable block only in WP.com sites [#31744]
+
+## 1.53.1
+
+-   [*] Fix missing title for some unsupported blocks [#31743]
+
+## 1.53.0
+
+-   [*] Bottom-sheet: Add custom header [#30291]
+-   [*] Fixes color picker rendering bug when scrolling [#30994]
+-   [*] Add enableCaching param to fetch request on Android [#31186]
+-   [***] Add reusable blocks to the inserter menu. [#28495]
+
+## 1.52.2
+
+-   [*] Disabled featured image banner on iOS. [#31681]
+
+## 1.52.1
+
+-   [*] Fixes for the generated localized strings files.
+
+## 1.52.0
+
+-   [***] Search block now available on mobile! [https://github.com/WordPress/gutenberg/pull/30783]
 -   [*] Image block: Add a "featured" banner. (Android only) [#30806]
 -   [**] The media upload options of the Image, Video and Gallery block automatically opens when the respective block is inserted. [#29546]
+-   [**] The media upload options of the File and Audio block automatically opens when the respective block is inserted. [#31025]
+-   [*] Fixed a bug where the Search block was stealing focus from the Image block upon updating image asset [#31393]
 
+## 1.51.1
+
+-   [*] Updates relative block-support asset path [#31184]
 
 ## 1.51.0
 
@@ -22,10 +140,10 @@ For each user feature we should also add a importance categorization label  to i
 
 ## 1.50.1
 
--   [x] Truncate rangecell screenreader decimals] [#30678]
--   [x] Fix Quote block citation [#30548]
--   [xx] Fix crash from non-adjustable unit RangeCell a11y activation [#30636]
--   [xx] Fix Unsupported Block Editor on Android [#30650]
+-   [*] Truncate rangecell screenreader decimals] [#30678]
+-   [*] Fix Quote block citation [#30548]
+-   [**] Fix crash from non-adjustable unit RangeCell a11y activation [#30636]
+-   [**] Fix Unsupported Block Editor on Android [#30650]
 
 ## 1.50.0
 

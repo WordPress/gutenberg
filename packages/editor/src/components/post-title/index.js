@@ -1,7 +1,6 @@
 /**
  * External dependencies
  */
-import TextareaAutosize from 'react-autosize-textarea';
 import classnames from 'classnames';
 
 /**
@@ -12,14 +11,16 @@ import { useEffect, useRef, useState } from '@wordpress/element';
 import { decodeEntities } from '@wordpress/html-entities';
 import { ENTER } from '@wordpress/keycodes';
 import { useSelect, useDispatch } from '@wordpress/data';
-import { VisuallyHidden } from '@wordpress/components';
-import { useInstanceId } from '@wordpress/compose';
 import { pasteHandler } from '@wordpress/blocks';
+import { store as blockEditorStore } from '@wordpress/block-editor';
+import { __unstableUseRichText as useRichText } from '@wordpress/rich-text';
+import { useMergeRefs } from '@wordpress/compose';
 
 /**
  * Internal dependencies
  */
 import PostTypeSupportCheck from '../post-type-support-check';
+import { store as editorStore } from '../../store';
 
 /**
  * Constants
@@ -27,15 +28,14 @@ import PostTypeSupportCheck from '../post-type-support-check';
 const REGEXP_NEWLINES = /[\r\n]+/g;
 
 export default function PostTitle() {
-	const instanceId = useInstanceId( PostTitle );
 	const ref = useRef();
 	const [ isSelected, setIsSelected ] = useState( false );
-	const { editPost } = useDispatch( 'core/editor' );
+	const { editPost } = useDispatch( editorStore );
 	const {
 		insertDefaultBlock,
 		clearSelectedBlock,
 		insertBlocks,
-	} = useDispatch( 'core/block-editor' );
+	} = useDispatch( blockEditorStore );
 	const {
 		isCleanNewPost,
 		title,
@@ -46,8 +46,8 @@ export default function PostTitle() {
 		const {
 			getEditedPostAttribute,
 			isCleanNewPost: _isCleanNewPost,
-		} = select( 'core/editor' );
-		const { getSettings } = select( 'core/block-editor' );
+		} = select( editorStore );
+		const { getSettings } = select( blockEditorStore );
 		const {
 			titlePlaceholder,
 			focusMode,
@@ -61,7 +61,7 @@ export default function PostTitle() {
 			isFocusMode: focusMode,
 			hasFixedToolbar: _hasFixedToolbar,
 		};
-	} );
+	}, [] );
 
 	useEffect( () => {
 		if ( ! ref.current ) {
@@ -92,6 +92,8 @@ export default function PostTitle() {
 		editPost( { title: newTitle } );
 	}
 
+	const [ selection, setSelection ] = useState( {} );
+
 	function onSelect() {
 		setIsSelected( true );
 		clearSelectedBlock();
@@ -99,10 +101,11 @@ export default function PostTitle() {
 
 	function onUnselect() {
 		setIsSelected( false );
+		setSelection( {} );
 	}
 
-	function onChange( event ) {
-		onUpdate( event.target.value.replace( REGEXP_NEWLINES, ' ' ) );
+	function onChange( value ) {
+		onUpdate( value.replace( REGEXP_NEWLINES, ' ' ) );
 	}
 
 	function onKeyDown( event ) {
@@ -165,38 +168,52 @@ export default function PostTitle() {
 	// The wp-block className is important for editor styles.
 	// This same block is used in both the visual and the code editor.
 	const className = classnames(
-		'wp-block editor-post-title editor-post-title__block',
+		'wp-block wp-block-post-title block-editor-block-list__block editor-post-title editor-post-title__input rich-text',
 		{
 			'is-selected': isSelected,
 			'is-focus-mode': isFocusMode,
 			'has-fixed-toolbar': hasFixedToolbar,
 		}
 	);
-	const decodedPlaceholder = decodeEntities( placeholder );
+	const decodedPlaceholder =
+		decodeEntities( placeholder ) || __( 'Add title' );
+	const { ref: richTextRef } = useRichText( {
+		value: title,
+		onChange,
+		placeholder: decodedPlaceholder,
+		selectionStart: selection.start,
+		selectionEnd: selection.end,
+		onSelectionChange( newStart, newEnd ) {
+			setSelection( ( sel ) => {
+				const { start, end } = sel;
+				if ( start === newStart && end === newEnd ) {
+					return sel;
+				}
+				return {
+					start: newStart,
+					end: newEnd,
+				};
+			} );
+		},
+		__unstableDisableFormats: true,
+		preserveWhiteSpace: true,
+	} );
 
+	/* eslint-disable jsx-a11y/heading-has-content, jsx-a11y/no-noninteractive-element-interactions */
 	return (
 		<PostTypeSupportCheck supportKeys="title">
-			<div className={ className }>
-				<VisuallyHidden
-					as="label"
-					htmlFor={ `post-title-${ instanceId }` }
-				>
-					{ decodedPlaceholder || __( 'Add title' ) }
-				</VisuallyHidden>
-				<TextareaAutosize
-					ref={ ref }
-					id={ `post-title-${ instanceId }` }
-					className="editor-post-title__input"
-					value={ title }
-					onChange={ onChange }
-					placeholder={ decodedPlaceholder || __( 'Add title' ) }
-					onFocus={ onSelect }
-					onBlur={ onUnselect }
-					onKeyDown={ onKeyDown }
-					onKeyPress={ onUnselect }
-					onPaste={ onPaste }
-				/>
-			</div>
+			<h1
+				ref={ useMergeRefs( [ richTextRef, ref ] ) }
+				contentEditable
+				className={ className }
+				aria-label={ decodedPlaceholder }
+				onFocus={ onSelect }
+				onBlur={ onUnselect }
+				onKeyDown={ onKeyDown }
+				onKeyPress={ onUnselect }
+				onPaste={ onPaste }
+			/>
 		</PostTypeSupportCheck>
 	);
+	/* eslint-enable jsx-a11y/heading-has-content, jsx-a11y/no-noninteractive-element-interactions */
 }

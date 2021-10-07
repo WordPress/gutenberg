@@ -16,7 +16,7 @@ import { sprintf, __ } from '@wordpress/i18n';
 import ColorGradientControl from './control';
 import { getColorObjectByColorValue } from '../colors';
 import { __experimentalGetGradientObjectByGradientValue } from '../gradients';
-import useEditorFeature from '../use-editor-feature';
+import useSetting from '../use-setting';
 
 // translators: first %s: The type of color or gradient (e.g. background, overlay...), second %s: the color name or value (e.g. red or #ff0000)
 const colorIndicatorAriaLabel = __( '(%s: color %s)' );
@@ -89,6 +89,7 @@ export const PanelColorGradientSettingsInner = ( {
 	children,
 	settings,
 	title,
+	showTitle = true,
 	...props
 } ) => {
 	if (
@@ -120,13 +121,14 @@ export const PanelColorGradientSettingsInner = ( {
 			/>
 		</span>
 	);
+
 	return (
 		<PanelBody
 			className={ classnames(
 				'block-editor-panel-color-gradient-settings',
 				className
 			) }
-			title={ titleElement }
+			title={ showTitle ? titleElement : undefined }
 			{ ...props }
 		>
 			{ settings.map( ( setting, index ) => (
@@ -148,12 +150,10 @@ export const PanelColorGradientSettingsInner = ( {
 
 const PanelColorGradientSettingsSelect = ( props ) => {
 	const colorGradientSettings = {};
-	colorGradientSettings.colors = useEditorFeature( 'color.palette' );
-	colorGradientSettings.gradients = useEditorFeature( 'color.gradients' );
-	colorGradientSettings.disableCustomColors = ! useEditorFeature(
-		'color.custom'
-	);
-	colorGradientSettings.disableCustomGradients = ! useEditorFeature(
+	colorGradientSettings.colors = useSetting( 'color.palette' );
+	colorGradientSettings.gradients = useSetting( 'color.gradients' );
+	colorGradientSettings.disableCustomColors = ! useSetting( 'color.custom' );
+	colorGradientSettings.disableCustomGradients = ! useSetting(
 		'color.customGradient'
 	);
 	return (

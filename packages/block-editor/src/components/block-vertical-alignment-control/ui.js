@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { _x } from '@wordpress/i18n';
-import { ToolbarGroup, DropdownMenu } from '@wordpress/components';
+import { ToolbarGroup, ToolbarDropdownMenu } from '@wordpress/components';
 
 /**
  * Internal dependencies
@@ -37,7 +37,6 @@ function BlockVerticalAlignmentUI( {
 	controls = DEFAULT_CONTROLS,
 	isCollapsed = true,
 	isToolbar,
-	isToolbarButton = true,
 } ) {
 	function applyOrUnset( align ) {
 		return () => onChange( value === align ? undefined : align );
@@ -47,8 +46,8 @@ function BlockVerticalAlignmentUI( {
 	const defaultAlignmentControl =
 		BLOCK_ALIGNMENTS_CONTROLS[ DEFAULT_CONTROL ];
 
-	const UIComponent = isToolbar ? ToolbarGroup : DropdownMenu;
-	const extraProps = isToolbar ? { isCollapsed } : { isToolbarButton };
+	const UIComponent = isToolbar ? ToolbarGroup : ToolbarDropdownMenu;
+	const extraProps = isToolbar ? { isCollapsed } : {};
 
 	return (
 		<UIComponent

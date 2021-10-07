@@ -1,7 +1,6 @@
 /**
  * WordPress dependencies
  */
-import { __, _x } from '@wordpress/i18n';
 import { postContent as icon } from '@wordpress/icons';
 
 /**
@@ -14,9 +13,6 @@ const { name } = metadata;
 export { metadata, name };
 
 export const settings = {
-	title: _x( 'Post Comment Content', 'block title' ),
-	description: __( 'Post Comment Content' ),
 	icon,
 	edit,
-	parent: [ 'core/post-comment' ],
 };

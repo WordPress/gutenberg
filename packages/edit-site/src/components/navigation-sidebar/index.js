@@ -19,7 +19,7 @@ export const {
 export default function NavigationSidebar() {
 	const isNavigationOpen = useSelect( ( select ) => {
 		return select( editSiteStore ).isNavigationOpened();
-	} );
+	}, [] );
 
 	return (
 		<>

@@ -213,7 +213,7 @@ describe( 'align', () => {
 			act( () => {
 				wrapper = renderer.create(
 					<BlockEditorProvider
-						settings={ { alignWide: true } }
+						settings={ { alignWide: true, supportsLayout: false } }
 						value={ [] }
 					>
 						<EnhancedComponent

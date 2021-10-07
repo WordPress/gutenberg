@@ -38,6 +38,7 @@ function MediaPlaceholder( props ) {
 		labels = {},
 		icon,
 		onSelect,
+		onFocus,
 		__experimentalOnlyMediaLibrary,
 		isAppender,
 		disableMediaButtons,
@@ -49,6 +50,7 @@ function MediaPlaceholder( props ) {
 		backgroundColor,
 		hideContent,
 		autoOpenMediaUpload,
+		onSelectURL,
 	} = props;
 
 	// use ref to keep media array current for callbacks during rerenders
@@ -156,6 +158,7 @@ function MediaPlaceholder( props ) {
 			<MediaUpload
 				allowedTypes={ allowedTypes }
 				onSelect={ setMedia }
+				onSelectURL={ onSelectURL }
 				__experimentalOnlyMediaLibrary={
 					__experimentalOnlyMediaLibrary
 				}
@@ -173,7 +176,7 @@ function MediaPlaceholder( props ) {
 							accessibilityRole={ 'button' }
 							accessibilityHint={ accessibilityHint }
 							onPress={ ( event ) => {
-								props.onFocus( event );
+								onFocus?.( event );
 								open();
 							} }
 						>

@@ -15,7 +15,16 @@
 /packages/block-library/src/gallery             @mkevins
 /packages/block-library/src/social-links        @mkaz
 /packages/block-library/src/social-link         @mkaz
-/packages/block-library/src/image               @ajlende
+/packages/block-library/src/navigation          @tellthemachines
+/packages/block-library/src/navigation-link     @tellthemachines
+/packages/block-library/src/navigation-submenu  @tellthemachines
+/packages/block-library/src/page-list           @tellthemachines
+
+# Duotone
+/lib/block-supports/duotone.php                       @ajlende
+/packages/block-editor/src/components/duotone-control @ajlende
+/packages/block-editor/src/hooks/duotone.js           @ajlende
+/packages/components/src/duotone-picker               @ajlende
 
 # Editor
 /packages/annotations                           @atimmer
@@ -35,17 +44,19 @@
 
 # Widgets
 /packages/edit-widgets                          @draganescu @talldan @noisysocks @tellthemachines @adamziel @kevin940726
+/packages/customize-widgets                     @noisysocks
+/packages/widgets                               @noisysocks
 
 # Navigation
-/packages/edit-navigation                       @draganescu @talldan @noisysocks @tellthemachines @adamziel @kevin940726
+/packages/edit-navigation                       @draganescu @talldan @tellthemachines @adamziel @kevin940726 @getdave
 
 # Full Site Editing
 /packages/edit-site
 
 # Tooling
 /bin                                            @ntwb @nerrad @ajitbohra
-/bin/api-docs                                   @ntwb @nerrad @ajitbohra @nosolosw
-/docs/tool                                      @chrisvanpatten @ajitbohra @nosolosw
+/bin/api-docs                                   @ntwb @nerrad @ajitbohra @oandregal
+/docs/tool                                      @chrisvanpatten @ajitbohra @oandregal
 /packages/babel-plugin-import-jsx-pragma        @ntwb @nerrad @ajitbohra
 /packages/babel-plugin-makepot                  @ntwb @nerrad @ajitbohra
 /packages/babel-preset-default                  @gziolo @ntwb @nerrad @ajitbohra
@@ -54,7 +65,7 @@
 /packages/create-block-tutorial-template        @gziolo
 /packages/custom-templated-path-webpack-plugin  @ntwb @nerrad @ajitbohra
 /packages/dependency-extraction-webpack-plugin  @gziolo
-/packages/docgen                                @nosolosw
+/packages/docgen                                @oandregal
 /packages/e2e-test-utils                        @ntwb @nerrad @ajitbohra
 /packages/e2e-tests                             @ntwb @nerrad @ajitbohra
 /packages/eslint-plugin                         @gziolo @ntwb @nerrad @ajitbohra
@@ -116,11 +127,18 @@
 
 # PHP
 /lib                                            @timothybjacobs @spacedmonkey
-/lib/global-styles.php                          @timothybjabocs @spacedmonkey @nosolosw
-/lib/experimental-default-theme.json            @timothybjabocs @spacedmonkey @nosolosw
-/lib/class-wp-theme-json.php                    @timothybjabocs @spacedmonkey @nosolosw
-/lib/class-wp-theme-json-resolver.php           @timothybjabocs @spacedmonkey @nosolosw
-/phpunit/class-wp-theme-json-test.php           @nosolosw
+/lib/global-styles.php                          @timothybjabocs @spacedmonkey @oandregal
+/lib/theme.json                                 @timothybjabocs @spacedmonkey @oandregal
+/lib/theme-i18n.json                            @timothybjabocs @spacedmonkey @oandregal
+/lib/class-wp-theme-json-gutenberg.php          @timothybjabocs @spacedmonkey @oandregal
+/lib/class-wp-theme-json-resolver-gutenberg.php @timothybjabocs @spacedmonkey @oandregal
+/lib/full-site-editing                          @janw-me
+/phpunit/class-wp-theme-json-test.php           @oandregal
+
+# Web App
+/packages/admin-manifest                        @ellatrix
+/lib/pwa.php                                    @ellatrix
+/lib/service-worker.js                          @ellatrix
 
 # Native (Unowned)
 *.native.js                                     @ghost

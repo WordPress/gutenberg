@@ -113,7 +113,9 @@ const Notice = ( { onNoticeHidden, content, id, status } ) => {
 			>
 				<TouchableWithoutFeedback onPress={ onHide }>
 					<View style={ styles.noticeContent }>
-						<Text style={ textStyles }>{ content }</Text>
+						<Text numberOfLines={ 3 } style={ textStyles }>
+							{ content }
+						</Text>
 					</View>
 				</TouchableWithoutFeedback>
 				{ isIOS && (

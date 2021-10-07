@@ -76,7 +76,7 @@ function findReleaseBranchName( packageJsonPath ) {
  * Calculates version bump for the packages based on the content
  * from the provided CHANGELOG file split into individual lines.
  *
- * @param {string[]} lines                                 Changelog content split into lines.
+ * @param {string[]}                  lines                Changelog content split into lines.
  * @param {('patch'|'minor'|'major')} [minimumVersionBump] Minimum version bump for the package.
  *                                                         Defaults to `patch`.
  *
@@ -116,6 +116,7 @@ function calculateVersionBumpFromChangelog(
 		if (
 			lineNormalized.startsWith( '### deprecation' ) ||
 			lineNormalized.startsWith( '### enhancement' ) ||
+			lineNormalized.startsWith( '### new api' ) ||
 			lineNormalized.startsWith( '### new feature' )
 		) {
 			versionBump = 'minor';

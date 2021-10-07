@@ -229,7 +229,7 @@ class VideoEdit extends Component {
 						icon={ this.getIcon( ICON_TYPE.PLACEHOLDER ) }
 						onFocus={ this.props.onFocus }
 						autoOpenMediaUpload={
-							isSelected && ! src && wasBlockJustInserted
+							isSelected && wasBlockJustInserted
 						}
 					/>
 				</View>

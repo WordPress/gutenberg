@@ -1,7 +1,11 @@
 {
 	"apiVersion": 2,
 	"name": "core/group",
+	"title": "Group",
 	"category": "design",
+	"description": "Combine blocks into a group.",
+	"keywords": [ "container", "wrapper", "row", "section" ],
+	"textdomain": "default",
 	"attributes": {
 		"tagName": {
 			"type": "string",
@@ -20,7 +24,10 @@
 			"link": true
 		},
 		"spacing": {
-			"padding": true
+			"padding": true,
+			"__experimentalDefaultControls": {
+				"padding": true
+			}
 		},
 		"__experimentalBorder": {
 			"color": true,

@@ -20,7 +20,7 @@ import {
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import { useEffect } from '@wordpress/element';
-import { __ } from '@wordpress/i18n';
+import { __, _x } from '@wordpress/i18n';
 import { useSelect } from '@wordpress/data';
 import { audio as icon } from '@wordpress/icons';
 import { createBlock } from '@wordpress/blocks';
@@ -97,9 +97,7 @@ function AudioEdit( {
 
 	function getAutoplayHelp( checked ) {
 		return checked
-			? __(
-					'Note: Autoplaying audio may cause usability issues for some visitors.'
-			  )
+			? __( 'Autoplay may cause usability issues for some users.' )
 			: null;
 	}
 
@@ -159,7 +157,7 @@ function AudioEdit( {
 						checked={ loop }
 					/>
 					<SelectControl
-						label={ __( 'Preload' ) }
+						label={ _x( 'Preload', 'noun; Audio block parameter' ) }
 						value={ preload || '' }
 						// `undefined` is required for the preload attribute to be unset.
 						onChange={ ( value ) =>
@@ -171,17 +169,21 @@ function AudioEdit( {
 							{ value: '', label: __( 'Browser default' ) },
 							{ value: 'auto', label: __( 'Auto' ) },
 							{ value: 'metadata', label: __( 'Metadata' ) },
-							{ value: 'none', label: __( 'None' ) },
+							{
+								value: 'none',
+								label: _x( 'None', '"Preload" value' ),
+							},
 						] }
 					/>
 				</PanelBody>
 			</InspectorControls>
 			<figure { ...blockProps }>
 				{ /*
-					Disable the audio tag so the user clicking on it won't play the
+					Disable the audio tag if the block is not selected
+					so the user clicking on it won't play the
 					file or change the position slider when the controls are enabled.
 				*/ }
-				<Disabled>
+				<Disabled isDisabled={ ! isSelected }>
 					<audio controls="controls" src={ src } />
 				</Disabled>
 				{ ( ! RichText.isEmpty( caption ) || isSelected ) && (

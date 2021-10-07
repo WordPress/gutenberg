@@ -4,10 +4,13 @@
 import { __, sprintf } from '@wordpress/i18n';
 import { store as noticesStore } from '@wordpress/notices';
 import { store as interfaceStore } from '@wordpress/interface';
+import { getWidgetIdFromBlock } from '@wordpress/widgets';
+import { store as coreStore } from '@wordpress/core-data';
+import { store as blockEditorStore } from '@wordpress/block-editor';
+
 /**
  * Internal dependencies
  */
-import { dispatch, select } from './controls';
 import { transformBlockToWidget } from './transformers';
 import {
 	buildWidgetAreaPostId,
@@ -23,46 +26,50 @@ import { STORE_NAME as editWidgetsStoreName } from './constants';
  * Persists a stub post with given ID to core data store. The post is meant to be in-memory only and
  * shouldn't be saved via the API.
  *
- * @param  {string} id Post ID.
- * @param  {Array}  blocks Blocks the post should consist of.
+ * @param {string} id     Post ID.
+ * @param {Array}  blocks Blocks the post should consist of.
  * @return {Object} The post object.
  */
-export const persistStubPost = function* ( id, blocks ) {
+export const persistStubPost = ( id, blocks ) => ( { registry } ) => {
 	const stubPost = createStubPost( id, blocks );
-	yield dispatch(
-		'core',
-		'receiveEntityRecords',
-		KIND,
-		POST_TYPE,
-		stubPost,
-		{ id: stubPost.id },
-		false
-	);
+	registry
+		.dispatch( coreStore )
+		.receiveEntityRecords(
+			KIND,
+			POST_TYPE,
+			stubPost,
+			{ id: stubPost.id },
+			false
+		);
 	return stubPost;
 };
 
-export function* saveEditedWidgetAreas() {
-	const editedWidgetAreas = yield select(
-		editWidgetsStoreName,
-		'getEditedWidgetAreas'
-	);
+/**
+ * Converts all the blocks from edited widget areas into widgets,
+ * and submits a batch request to save everything at once.
+ *
+ * Creates a snackbar notice on either success or error.
+ *
+ * @return {Function} An action creator.
+ */
+export const saveEditedWidgetAreas = () => async ( {
+	select,
+	dispatch,
+	registry,
+} ) => {
+	const editedWidgetAreas = select.getEditedWidgetAreas();
 	if ( ! editedWidgetAreas?.length ) {
 		return;
 	}
 	try {
-		yield* saveWidgetAreas( editedWidgetAreas );
-		yield dispatch(
-			noticesStore,
-			'createSuccessNotice',
-			__( 'Widgets saved.' ),
-			{
+		await dispatch.saveWidgetAreas( editedWidgetAreas );
+		registry
+			.dispatch( noticesStore )
+			.createSuccessNotice( __( 'Widgets saved.' ), {
 				type: 'snackbar',
-			}
-		);
+			} );
 	} catch ( e ) {
-		yield dispatch(
-			noticesStore,
-			'createErrorNotice',
+		registry.dispatch( noticesStore ).createErrorNotice(
 			/* translators: %s: The error message. */
 			sprintf( __( 'There was an error. %s' ), e.message ),
 			{
@@ -70,41 +77,72 @@ export function* saveEditedWidgetAreas() {
 			}
 		);
 	}
-}
+};
 
-export function* saveWidgetAreas( widgetAreas ) {
+/**
+ * Converts all the blocks from specified widget areas into widgets,
+ * and submits a batch request to save everything at once.
+ *
+ * @param {Object[]} widgetAreas Widget areas to save.
+ * @return {Function} An action creator.
+ */
+export const saveWidgetAreas = ( widgetAreas ) => async ( {
+	dispatch,
+	registry,
+} ) => {
 	try {
 		for ( const widgetArea of widgetAreas ) {
-			yield* saveWidgetArea( widgetArea.id );
+			await dispatch.saveWidgetArea( widgetArea.id );
 		}
 	} finally {
 		// saveEditedEntityRecord resets the resolution status, let's fix it manually
-		yield dispatch(
-			'core',
-			'finishResolution',
-			'getEntityRecord',
-			KIND,
-			WIDGET_AREA_ENTITY_TYPE,
-			buildWidgetAreasQuery()
-		);
+		await registry
+			.dispatch( coreStore )
+			.finishResolution(
+				'getEntityRecord',
+				KIND,
+				WIDGET_AREA_ENTITY_TYPE,
+				buildWidgetAreasQuery()
+			);
 	}
-}
+};
 
-export function* saveWidgetArea( widgetAreaId ) {
-	const widgets = yield select( editWidgetsStoreName, 'getWidgets' );
+/**
+ * Converts all the blocks from a widget area specified by ID into widgets,
+ * and submits a batch request to save everything at once.
+ *
+ * @param {string} widgetAreaId ID of the widget area to process.
+ * @return {Function} An action creator.
+ */
+export const saveWidgetArea = ( widgetAreaId ) => async ( {
+	dispatch,
+	select,
+	registry,
+} ) => {
+	const widgets = select.getWidgets();
 
-	const post = yield select(
-		'core',
-		'getEditedEntityRecord',
-		KIND,
-		POST_TYPE,
-		buildWidgetAreaPostId( widgetAreaId )
+	const post = registry
+		.select( coreStore )
+		.getEditedEntityRecord(
+			KIND,
+			POST_TYPE,
+			buildWidgetAreaPostId( widgetAreaId )
+		);
+
+	// Get all widgets from this area
+	const areaWidgets = Object.values( widgets ).filter(
+		( { sidebar } ) => sidebar === widgetAreaId
 	);
 
-	// Remove all duplicate reference widget instances
+	// Remove all duplicate reference widget instances for legacy widgets.
+	// Why? We filter out the widgets with duplicate IDs to prevent adding more than one instance of a widget
+	// implemented using a function. WordPress doesn't support having more than one instance of these, if you try to
+	// save multiple instances of these in different sidebars you will run into undefined behaviors.
 	const usedReferenceWidgets = [];
-	const widgetsBlocks = post.blocks.filter( ( { attributes: { id } } ) => {
-		if ( id ) {
+	const widgetsBlocks = post.blocks.filter( ( block ) => {
+		const { id } = block.attributes;
+
+		if ( block.name === 'core/legacy-widget' && id ) {
 			if ( usedReferenceWidgets.includes( id ) ) {
 				return false;
 			}
@@ -113,38 +151,48 @@ export function* saveWidgetArea( widgetAreaId ) {
 		return true;
 	} );
 
+	// Determine which widgets have been deleted. We can tell if a widget is
+	// deleted and not just moved to a different area by looking to see if
+	// getWidgetAreaForWidgetId() finds something.
+	const deletedWidgets = [];
+	for ( const widget of areaWidgets ) {
+		const widgetsNewArea = select.getWidgetAreaForWidgetId( widget.id );
+		if ( ! widgetsNewArea ) {
+			deletedWidgets.push( widget );
+		}
+	}
+
 	const batchMeta = [];
 	const batchTasks = [];
 	const sidebarWidgetsIds = [];
 	for ( let i = 0; i < widgetsBlocks.length; i++ ) {
 		const block = widgetsBlocks[ i ];
-		const widgetId = block.attributes.__internalWidgetId;
+		const widgetId = getWidgetIdFromBlock( block );
 		const oldWidget = widgets[ widgetId ];
 		const widget = transformBlockToWidget( block, oldWidget );
+
 		// We'll replace the null widgetId after save, but we track it here
 		// since order is important.
 		sidebarWidgetsIds.push( widgetId );
 
-		if ( widgetId ) {
-			yield dispatch(
-				'core',
-				'editEntityRecord',
+		// Check oldWidget as widgetId might refer to an ID which has been
+		// deleted, e.g. if a deleted block is restored via undo after saving.
+		if ( oldWidget ) {
+			// Update an existing widget.
+			registry.dispatch( coreStore ).editEntityRecord(
 				'root',
 				'widget',
 				widgetId,
 				{
 					...widget,
 					sidebar: widgetAreaId,
-				}
+				},
+				{ undoIgnore: true }
 			);
 
-			const hasEdits = yield select(
-				'core',
-				'hasEditsForEntityRecord',
-				'root',
-				'widget',
-				widgetId
-			);
+			const hasEdits = registry
+				.select( coreStore )
+				.hasEditsForEntityRecord( 'root', 'widget', widgetId );
 
 			if ( ! hasEdits ) {
 				continue;
@@ -154,6 +202,7 @@ export function* saveWidgetArea( widgetAreaId ) {
 				saveEditedEntityRecord( 'root', 'widget', widgetId )
 			);
 		} else {
+			// Create a new widget.
 			batchTasks.push( ( { saveEntityRecord } ) =>
 				saveEntityRecord( 'root', 'widget', {
 					...widget,
@@ -168,22 +217,34 @@ export function* saveWidgetArea( widgetAreaId ) {
 			clientId: block.clientId,
 		} );
 	}
+	for ( const widget of deletedWidgets ) {
+		batchTasks.push( ( { deleteEntityRecord } ) =>
+			deleteEntityRecord( 'root', 'widget', widget.id, {
+				force: true,
+			} )
+		);
+	}
 
-	const records = yield dispatch( 'core', '__experimentalBatch', batchTasks );
+	const records = await registry
+		.dispatch( coreStore )
+		.__experimentalBatch( batchTasks );
+	const preservedRecords = records.filter(
+		( record ) => ! record.hasOwnProperty( 'deleted' )
+	);
 
 	const failedWidgetNames = [];
 
-	for ( let i = 0; i < records.length; i++ ) {
-		const widget = records[ i ];
+	for ( let i = 0; i < preservedRecords.length; i++ ) {
+		const widget = preservedRecords[ i ];
 		const { block, position } = batchMeta[ i ];
 
-		const error = yield select(
-			'core',
-			'getLastEntitySaveError',
-			'root',
-			'widget',
-			widget.id
-		);
+		// Set __internalWidgetId on the block. This will be persisted to the
+		// store when we dispatch receiveEntityRecords( post ) below.
+		post.blocks[ position ].attributes.__internalWidgetId = widget.id;
+
+		const error = registry
+			.select( coreStore )
+			.getLastEntitySaveError( 'root', 'widget', widget.id );
 		if ( error ) {
 			failedWidgetNames.push( block.attributes?.name || block?.name );
 		}
@@ -203,62 +264,45 @@ export function* saveWidgetArea( widgetAreaId ) {
 		);
 	}
 
-	yield dispatch(
-		'core',
-		'editEntityRecord',
+	registry.dispatch( coreStore ).editEntityRecord(
 		KIND,
 		WIDGET_AREA_ENTITY_TYPE,
 		widgetAreaId,
 		{
 			widgets: sidebarWidgetsIds,
-		}
+		},
+		{ undoIgnore: true }
 	);
 
-	yield* trySaveWidgetArea( widgetAreaId );
+	dispatch( trySaveWidgetArea( widgetAreaId ) );
 
-	yield dispatch(
-		'core',
-		'receiveEntityRecords',
-		KIND,
-		POST_TYPE,
-		post,
-		undefined
-	);
-}
+	registry
+		.dispatch( coreStore )
+		.receiveEntityRecords( KIND, POST_TYPE, post, undefined );
+};
 
-function* trySaveWidgetArea( widgetAreaId ) {
-	const saveErrorBefore = yield select(
-		'core',
-		'getLastEntitySaveError',
-		KIND,
-		WIDGET_AREA_ENTITY_TYPE,
-		widgetAreaId
-	);
-	yield dispatch(
-		'core',
-		'saveEditedEntityRecord',
-		KIND,
-		WIDGET_AREA_ENTITY_TYPE,
-		widgetAreaId
-	);
-	const saveErrorAfter = yield select(
-		'core',
-		'getLastEntitySaveError',
-		KIND,
-		WIDGET_AREA_ENTITY_TYPE,
-		widgetAreaId
-	);
+const trySaveWidgetArea = ( widgetAreaId ) => ( { registry } ) => {
+	const saveErrorBefore = registry
+		.select( coreStore )
+		.getLastEntitySaveError( KIND, WIDGET_AREA_ENTITY_TYPE, widgetAreaId );
+	registry
+		.dispatch( coreStore )
+		.saveEditedEntityRecord( KIND, WIDGET_AREA_ENTITY_TYPE, widgetAreaId );
+	const saveErrorAfter = registry
+		.select( coreStore )
+		.getLastEntitySaveError( KIND, WIDGET_AREA_ENTITY_TYPE, widgetAreaId );
 	if ( saveErrorAfter && saveErrorBefore !== saveErrorAfter ) {
 		throw new Error( saveErrorAfter );
 	}
-}
+};
 
 /**
  * Sets the clientId stored for a particular widgetId.
  *
- * @param  {number} clientId  Client id.
- * @param  {number} widgetId  Widget id.
- * @return {Object}           Action.
+ * @param {number} clientId Client id.
+ * @param {number} widgetId Widget id.
+ *
+ * @return {Object} Action.
  */
 export function setWidgetIdForClientId( clientId, widgetId ) {
 	return {
@@ -271,8 +315,9 @@ export function setWidgetIdForClientId( clientId, widgetId ) {
 /**
  * Sets the open state of all the widget areas.
  *
- * @param  {Object} widgetAreasOpenState The open states of all the widget areas.
- * @return {Object}                      Action.
+ * @param {Object} widgetAreasOpenState The open states of all the widget areas.
+ *
+ * @return {Object} Action.
  */
 export function setWidgetAreasOpenState( widgetAreasOpenState ) {
 	return {
@@ -284,9 +329,10 @@ export function setWidgetAreasOpenState( widgetAreasOpenState ) {
 /**
  * Sets the open state of the widget area.
  *
- * @param  {string}  clientId   The clientId of the widget area.
- * @param  {boolean} isOpen     Whether the widget area should be opened.
- * @return {Object}             Action.
+ * @param {string}  clientId The clientId of the widget area.
+ * @param {boolean} isOpen   Whether the widget area should be opened.
+ *
+ * @return {Object} Action.
  */
 export function setIsWidgetAreaOpen( clientId, isOpen ) {
 	return {
@@ -299,7 +345,13 @@ export function setIsWidgetAreaOpen( clientId, isOpen ) {
 /**
  * Returns an action object used to open/close the inserter.
  *
- * @param {boolean} value A boolean representing whether the inserter should be opened or closed.
+ * @param {boolean|Object} value                Whether the inserter should be
+ *                                              opened (true) or closed (false).
+ *                                              To specify an insertion point,
+ *                                              use an object.
+ * @param {string}         value.rootClientId   The root client ID to insert at.
+ * @param {number}         value.insertionIndex The index to insert at.
+ *
  * @return {Object} Action object.
  */
 export function setIsInserterOpened( value ) {
@@ -312,15 +364,13 @@ export function setIsInserterOpened( value ) {
 /**
  * Returns an action object signalling that the user closed the sidebar.
  *
- * @yield {Object} Action object.
+ * @return {Object} Action creator.
  */
-export function* closeGeneralSidebar() {
-	yield dispatch(
-		interfaceStore.name,
-		'disableComplementaryArea',
-		editWidgetsStoreName
-	);
-}
+export const closeGeneralSidebar = () => ( { registry } ) => {
+	registry
+		.dispatch( interfaceStore )
+		.disableComplementaryArea( editWidgetsStoreName );
+};
 
 /**
  * Action that handles moving a block between widget areas
@@ -328,53 +378,46 @@ export function* closeGeneralSidebar() {
  * @param {string} clientId     The clientId of the block to move.
  * @param {string} widgetAreaId The id of the widget area to move the block to.
  */
-export function* moveBlockToWidgetArea( clientId, widgetAreaId ) {
-	const sourceRootClientId = yield select(
-		'core/block-editor',
-		'getBlockRootClientId',
-		[ clientId ]
-	);
+export const moveBlockToWidgetArea = ( clientId, widgetAreaId ) => async ( {
+	dispatch,
+	select,
+	registry,
+} ) => {
+	const sourceRootClientId = registry
+		.select( blockEditorStore )
+		.getBlockRootClientId( [ clientId ] );
 
 	// Search the top level blocks (widget areas) for the one with the matching
 	// id attribute. Makes the assumption that all top-level blocks are widget
 	// areas.
-	const widgetAreas = yield select( 'core/block-editor', 'getBlocks' );
+	const widgetAreas = registry.select( blockEditorStore ).getBlocks();
 	const destinationWidgetAreaBlock = widgetAreas.find(
 		( { attributes } ) => attributes.id === widgetAreaId
 	);
 	const destinationRootClientId = destinationWidgetAreaBlock.clientId;
 
 	// Get the index for moving to the end of the the destination widget area.
-	const destinationInnerBlocksClientIds = yield select(
-		'core/block-editor',
-		'getBlockOrder',
-		destinationRootClientId
-	);
+	const destinationInnerBlocksClientIds = registry
+		.select( blockEditorStore )
+		.getBlockOrder( destinationRootClientId );
 	const destinationIndex = destinationInnerBlocksClientIds.length;
 
 	// Reveal the widget area, if it's not open.
-	const isDestinationWidgetAreaOpen = yield select(
-		editWidgetsStoreName,
-		'getIsWidgetAreaOpen',
+	const isDestinationWidgetAreaOpen = select.getIsWidgetAreaOpen(
 		destinationRootClientId
 	);
 
 	if ( ! isDestinationWidgetAreaOpen ) {
-		yield dispatch(
-			editWidgetsStoreName,
-			'setIsWidgetAreaOpen',
-			destinationRootClientId,
-			true
-		);
+		dispatch.setIsWidgetAreaOpen( destinationRootClientId, true );
 	}
 
 	// Move the block.
-	yield dispatch(
-		'core/block-editor',
-		'moveBlocksToPosition',
-		[ clientId ],
-		sourceRootClientId,
-		destinationRootClientId,
-		destinationIndex
-	);
-}
+	registry
+		.dispatch( blockEditorStore )
+		.moveBlocksToPosition(
+			[ clientId ],
+			sourceRootClientId,
+			destinationRootClientId,
+			destinationIndex
+		);
+};

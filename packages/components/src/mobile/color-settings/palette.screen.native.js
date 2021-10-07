@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { View, Text } from 'react-native';
+import { View, Text, TouchableWithoutFeedback } from 'react-native';
 
 /**
  * WordPress dependencies
@@ -20,11 +20,13 @@ import { useRoute, useNavigation } from '@react-navigation/native';
  */
 import ColorPalette from '../../color-palette';
 import ColorIndicator from '../../color-indicator';
-import NavigationHeader from '../bottom-sheet/navigation-header';
+import NavBar from '../bottom-sheet/nav-bar';
 import SegmentedControls from '../segmented-control';
 import { colorsUtils } from './utils';
 
 import styles from './style.scss';
+
+const HIT_SLOP = { top: 22, bottom: 22, left: 22, right: 22 };
 
 const PaletteScreen = () => {
 	const route = useRoute();
@@ -50,6 +52,14 @@ const PaletteScreen = () => {
 		styles.horizontalSeparator,
 		styles.horizontalSeparatorDark
 	);
+	const clearButtonStyle = usePreferredColorSchemeStyle(
+		styles.clearButton,
+		styles.clearButtonDark
+	);
+	const selectedColorTextStyle = usePreferredColorSchemeStyle(
+		styles.colorText,
+		styles.colorTextDark
+	);
 
 	const isSolidSegment = currentSegment === segments[ 0 ];
 	const isCustomGadientShown = ! isSolidSegment && isGradientColor;
@@ -67,6 +77,15 @@ const PaletteScreen = () => {
 		}
 	};
 
+	function onClear() {
+		setCurrentValue( undefined );
+		if ( isSolidSegment ) {
+			onColorChange( '' );
+		} else {
+			onGradientChange( '' );
+		}
+	}
+
 	function onCustomPress() {
 		if ( isSolidSegment ) {
 			navigation.navigate( colorsUtils.screens.picker, {
@@ -80,6 +99,16 @@ const PaletteScreen = () => {
 				currentValue,
 			} );
 		}
+	}
+
+	function getClearButton() {
+		return (
+			<TouchableWithoutFeedback onPress={ onClear } hitSlop={ HIT_SLOP }>
+				<View style={ styles.clearButtonContainer }>
+					<Text style={ clearButtonStyle }>{ __( 'Reset' ) }</Text>
+				</View>
+			</TouchableWithoutFeedback>
+		);
 	}
 
 	function getFooter() {
@@ -97,6 +126,7 @@ const PaletteScreen = () => {
 							/>
 						)
 					}
+					addonRight={ currentValue && getClearButton() }
 				/>
 			);
 		}
@@ -110,22 +140,34 @@ const PaletteScreen = () => {
 						/>
 					) }
 				</View>
-				<Text
-					style={ styles.selectColorText }
-					maxFontSizeMultiplier={ 2 }
-				>
-					{ __( 'Select a color' ) }
-				</Text>
-				<View style={ styles.flex } />
+				{ currentValue ? (
+					<Text
+						style={ selectedColorTextStyle }
+						maxFontSizeMultiplier={ 2 }
+						selectable
+					>
+						{ currentValue.toUpperCase() }
+					</Text>
+				) : (
+					<Text
+						style={ styles.selectColorText }
+						maxFontSizeMultiplier={ 2 }
+					>
+						{ __( 'Select a color above' ) }
+					</Text>
+				) }
+				<View style={ styles.flex }>
+					{ currentValue && getClearButton() }
+				</View>
 			</View>
 		);
 	}
 	return (
 		<View>
-			<NavigationHeader
-				screen={ label }
-				leftButtonOnPress={ navigation.goBack }
-			/>
+			<NavBar>
+				<NavBar.BackButton onPress={ navigation.goBack } />
+				<NavBar.Heading>{ label } </NavBar.Heading>
+			</NavBar>
 			<ColorPalette
 				setColor={ setColor }
 				activeColor={ currentValue }

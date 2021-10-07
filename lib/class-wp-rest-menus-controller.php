@@ -12,6 +12,7 @@
  * @see WP_REST_Controller
  */
 class WP_REST_Menus_Controller extends WP_REST_Terms_Controller {
+
 	/**
 	 * Constructor.
 	 *
@@ -21,6 +22,77 @@ class WP_REST_Menus_Controller extends WP_REST_Terms_Controller {
 		parent::__construct( $taxonomy );
 		$this->namespace = '__experimental';
 	}
+
+	/**
+	 * Overrides the route registration to support "allow_batch".
+	 *
+	 * @since 11.5.0
+	 *
+	 * @see register_rest_route()
+	 */
+	public function register_routes() {
+		register_rest_route(
+			$this->namespace,
+			'/' . $this->rest_base,
+			array(
+				array(
+					'methods'             => WP_REST_Server::READABLE,
+					'callback'            => array( $this, 'get_items' ),
+					'permission_callback' => array( $this, 'get_items_permissions_check' ),
+					'args'                => $this->get_collection_params(),
+				),
+				array(
+					'methods'             => WP_REST_Server::CREATABLE,
+					'callback'            => array( $this, 'create_item' ),
+					'permission_callback' => array( $this, 'create_item_permissions_check' ),
+					'args'                => $this->get_endpoint_args_for_item_schema( WP_REST_Server::CREATABLE ),
+				),
+				'schema' => array( $this, 'get_public_item_schema' ),
+			)
+		);
+
+		register_rest_route(
+			$this->namespace,
+			'/' . $this->rest_base . '/(?P<id>[\d]+)',
+			array(
+				'args'        => array(
+					'id' => array(
+						'description' => __( 'Unique identifier for the term.', 'default' ),
+						'type'        => 'integer',
+					),
+				),
+				array(
+					'methods'             => WP_REST_Server::READABLE,
+					'callback'            => array( $this, 'get_item' ),
+					'permission_callback' => array( $this, 'get_item_permissions_check' ),
+					'args'                => array(
+						'context' => $this->get_context_param( array( 'default' => 'view' ) ),
+					),
+				),
+				array(
+					'methods'             => WP_REST_Server::EDITABLE,
+					'callback'            => array( $this, 'update_item' ),
+					'permission_callback' => array( $this, 'update_item_permissions_check' ),
+					'args'                => $this->get_endpoint_args_for_item_schema( WP_REST_Server::EDITABLE ),
+				),
+				array(
+					'methods'             => WP_REST_Server::DELETABLE,
+					'callback'            => array( $this, 'delete_item' ),
+					'permission_callback' => array( $this, 'delete_item_permissions_check' ),
+					'args'                => array(
+						'force' => array(
+							'type'        => 'boolean',
+							'default'     => false,
+							'description' => __( 'Required to be true, as terms do not support trashing.', 'default' ),
+						),
+					),
+				),
+				'allow_batch' => array( 'v1' => true ),
+				'schema'      => array( $this, 'get_public_item_schema' ),
+			)
+		);
+	}
+
 
 	/**
 	 * Checks if a request has access to read terms in the specified taxonomy.
@@ -189,7 +261,11 @@ class WP_REST_Menus_Controller extends WP_REST_Terms_Controller {
 		$fields = $this->get_fields_for_response( $request );
 		$data   = $response->get_data();
 
-		if ( in_array( 'auto_add', $fields, true ) ) {
+		if ( rest_is_field_included( 'locations', $fields ) ) {
+			$data['locations'] = $this->get_menu_locations( $nav_menu->term_id );
+		}
+
+		if ( rest_is_field_included( 'auto_add', $fields ) ) {
 			$auto_add         = $this->get_menu_auto_add( $nav_menu->term_id );
 			$data['auto_add'] = $auto_add;
 		}
@@ -215,16 +291,14 @@ class WP_REST_Menus_Controller extends WP_REST_Terms_Controller {
 	protected function prepare_links( $term ) {
 		$links = parent::prepare_links( $term );
 
-		$locations = get_nav_menu_locations();
+		$locations = $this->get_menu_locations( $term->term_id );
 		$rest_base = 'menu-locations';
-		foreach ( $locations as $menu_name => $menu_id ) {
-			if ( $term->term_id === $menu_id ) {
-				$url                                        = rest_url( sprintf( '__experimental/%s/%s', $rest_base, $menu_name ) );
-				$links['https://api.w.org/menu-location'][] = array(
-					'href'       => $url,
-					'embeddable' => true,
-				);
-			}
+		foreach ( $locations as $location ) {
+			$url                                        = rest_url( sprintf( '__experimental/%s/%s', $rest_base, $location ) );
+			$links['https://api.w.org/menu-location'][] = array(
+				'href'       => $url,
+				'embeddable' => true,
+			);
 		}
 
 		return $links;
@@ -278,16 +352,18 @@ class WP_REST_Menus_Controller extends WP_REST_Terms_Controller {
 			 * If we're going to inform the client that the term already exists,
 			 * give them the identifier for future use.
 			 */
-			$term_id = $term->get_error_data( 'term_exists' );
-			if ( $term_id ) {
-				$existing_term = get_term( $term_id, $this->taxonomy );
-				$term->add_data( $existing_term->term_id, 'term_exists' );
+
+			if ( in_array( 'menu_exists', $term->get_error_codes(), true ) ) {
+				$existing_term = get_term_by( 'name', $prepared_term['menu-name'], $this->taxonomy );
+				$term->add_data( $existing_term->term_id, 'menu_exists' );
 				$term->add_data(
 					array(
 						'status'  => 400,
-						'term_id' => $term_id,
+						'term_id' => $existing_term->term_id,
 					)
 				);
+			} else {
+				$term->add_data( array( 'status' => 400 ) );
 			}
 
 			return $term;
@@ -529,6 +605,28 @@ class WP_REST_Menus_Controller extends WP_REST_Terms_Controller {
 		do_action( 'wp_update_nav_menu', $menu_id );
 
 		return $update;
+	}
+
+	/**
+	 * Returns names of the locations assigned to the menu.
+	 *
+	 * @since 5.8.0
+	 *
+	 * @param int $menu_id The menu id.
+	 *
+	 * @return string[] $menu_locations The locations assigned to the menu.
+	 */
+	protected function get_menu_locations( $menu_id ) {
+		$locations      = get_nav_menu_locations();
+		$menu_locations = array();
+
+		foreach ( $locations as $location => $assigned_menu_id ) {
+			if ( $menu_id === $assigned_menu_id ) {
+				$menu_locations[] = $location;
+			}
+		}
+
+		return $menu_locations;
 	}
 
 	/**

@@ -5,6 +5,7 @@ import {
 	getColorObjectByAttributeValues,
 	getColorObjectByColorValue,
 	getColorClassName,
+	getMostReadableColor,
 } from '../utils';
 
 describe( 'color utils', () => {
@@ -110,9 +111,61 @@ describe( 'color utils', () => {
 		} );
 
 		it( 'should return a class name with the color slug in kebab case', () => {
-			expect( getColorClassName( 'background', 'Light Purple' ) ).toBe(
-				'has-light-purple-background'
+			expect(
+				getColorClassName( 'background', 'Light   Purple veryDark' )
+			).toBe( 'has-light-purple-very-dark-background' );
+		} );
+
+		it( 'should return the correct class name if the color slug is not a string', () => {
+			expect( getColorClassName( 'background', 123456 ) ).toBe(
+				'has-123456-background'
 			);
+		} );
+
+		it( 'should return the correct class name if the color slug contains special characters', () => {
+			expect( getColorClassName( 'background', '#abcdef' ) ).toBe(
+				'has-abcdef-background'
+			);
+		} );
+	} );
+
+	describe( 'getMostReadableColor', () => {
+		it( 'should return the most readable color', () => {
+			expect(
+				getMostReadableColor(
+					[
+						{
+							name: 'Red',
+							slug: 'red',
+							color: 'red',
+						},
+						{
+							name: 'Black',
+							slug: 'black',
+							color: 'black',
+						},
+					],
+					'#f3f3f3'
+				)
+			).toBe( 'black' );
+
+			expect(
+				getMostReadableColor(
+					[
+						{
+							name: 'C1',
+							slug: 'c1',
+							color: '#39373b',
+						},
+						{
+							name: 'C2',
+							slug: 'c2',
+							color: '#a25de6',
+						},
+					],
+					'#9853ff'
+				)
+			).toBe( '#39373b' );
 		} );
 	} );
 } );
