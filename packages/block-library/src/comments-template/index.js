@@ -1,7 +1,6 @@
 /**
  * WordPress dependencies
  */
-// XXX: update the icon
 import { postComments as icon } from '@wordpress/icons';
 
 /**
