@@ -12,14 +12,14 @@ import { useState } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import ColorPicker from '..';
+import { ColorPicker } from '..';
 import { Flex } from '../../flex';
 import { Spacer } from '../../spacer';
 import { space } from '../../ui/utils/space';
 
 export default {
 	component: ColorPicker,
-	title: 'Components (Experimental)/ColorPicker',
+	title: 'Components/ColorPicker',
 };
 
 const PROP_UNSET = 'unset';

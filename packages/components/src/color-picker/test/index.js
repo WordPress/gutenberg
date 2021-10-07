@@ -6,7 +6,7 @@ import { render, fireEvent } from '@testing-library/react';
 /**
  * Internal dependencies
  */
-import ColorPicker from '..';
+import { ColorPicker } from '..';
 
 /**
  * Ordinarily we'd try to select the compnoent by role but the silder role appears

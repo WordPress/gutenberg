@@ -43,7 +43,7 @@ type LegacyColor =
  * @deprecated
  */
 export interface LegacyProps {
-	color: LegacyColor;
+	color: LegacyColor | undefined;
 	/**
 	 * @deprecated
 	 */
