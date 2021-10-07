@@ -17,19 +17,31 @@
  *  - https://w3c.github.io/html/editing.html#data-model
  */
 
-const SELECTOR = [
-	'[tabindex]',
-	'a[href]',
-	'button:not([disabled])',
-	'input:not([type="hidden"]):not([disabled])',
-	'select:not([disabled])',
-	'textarea:not([disabled])',
-	'iframe',
-	'object',
-	'embed',
-	'area[href]',
-	'[contenteditable]:not([contenteditable=false])',
-].join( ',' );
+/**
+ * Returns a CSS selector used to query for focusable elements.
+ *
+ * @param {boolean} keyboard If set, only query elements that can be focused
+ *                           using the keyboard. Non-interactive elements with a
+ *                           negative `tabindex` are focusable but cannot be
+ *                           focused using the keyboard.
+ *
+ * @return {string} CSS selector.
+ */
+function buildSelector( keyboard ) {
+	return [
+		keyboard ? '[tabindex]:not([tabindex^="-"])' : '[tabindex]',
+		'a[href]',
+		'button:not([disabled])',
+		'input:not([type="hidden"]):not([disabled])',
+		'select:not([disabled])',
+		'textarea:not([disabled])',
+		'iframe:not([tabindex^="-"])',
+		'object',
+		'embed',
+		'area[href]',
+		'[contenteditable]:not([contenteditable=false])',
+	].join( ',' );
+}
 
 /**
  * Returns true if the specified element is visible (i.e. neither display: none
@@ -45,32 +57,6 @@ function isVisible( element ) {
 		element.offsetHeight > 0 ||
 		element.getClientRects().length > 0
 	);
-}
-
-/**
- * Returns true if the specified element should be skipped from focusable elements.
- * For now it rather specific for `iframes` and  if tabindex attribute is set to -1.
- *
- * @param {Element} element DOM element to test.
- *
- * @return {boolean} Whether element should be skipped from focusable elements.
- */
-function skipFocus( element ) {
-	if (
-		element.nodeName.toLowerCase() === 'iframe' &&
-		element.getAttribute( 'tabindex' ) === '-1'
-	) {
-		return true;
-	}
-
-	if (
-		element.classList.contains( 'components-dropdown' ) &&
-		element.getAttribute( 'tabindex' ) === '-1'
-	) {
-		return true;
-	}
-
-	return false;
 }
 
 /**
@@ -99,18 +85,24 @@ function isValidFocusableArea( element ) {
 /**
  * Returns all focusable elements within a given context.
  *
- * @param {Element} context Element in which to search.
+ * @param {Element} context            Element in which to search.
+ * @param {Object}  [options]
+ * @param {boolean} [options.keyboard] If set, only return elements that can be
+ *                                     focused using the keyboard.
+ *                                     Non-interactive elements with a negative
+ *                                     `tabindex` are focusable but cannot be
+ *                                     focused using the keyboard.
  *
  * @return {Element[]} Focusable elements.
  */
-export function find( context ) {
+export function find( context, { keyboard = false } = {} ) {
 	/* eslint-disable jsdoc/no-undefined-types */
 	/** @type {NodeListOf<HTMLElement>} */
 	/* eslint-enable jsdoc/no-undefined-types */
-	const elements = context.querySelectorAll( SELECTOR );
+	const elements = context.querySelectorAll( buildSelector( keyboard ) );
 
 	return Array.from( elements ).filter( ( element ) => {
-		if ( ! isVisible( element ) || skipFocus( element ) ) {
+		if ( ! isVisible( element ) ) {
 			return false;
 		}
 
