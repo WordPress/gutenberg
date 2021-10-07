@@ -550,14 +550,8 @@ public class WPAndroidGlueCode {
             }
 
             @Override
-            public void sendEventToHost(String eventName,  ReadableMap properties) {
-                Map<String, Object> propertiesMap = new HashMap<>();
-                ReadableMapKeySetIterator iterator = properties.keySetIterator();
-                while (iterator.hasNextKey()) {
-                    String key = iterator.nextKey();
-                    propertiesMap.put(key, properties.getDynamic(key));
-                }
-                mOnSendEventToHostListener.onSendEventToHost(eventName, propertiesMap);
+            public void sendEventToHost(String eventName, ReadableMap properties) {
+                mOnSendEventToHostListener.onSendEventToHost(eventName, properties.toHashMap());
             }
         }, mIsDarkMode);
 
