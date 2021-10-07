@@ -102,8 +102,7 @@ function gutenberg_experimental_global_styles_settings( $settings ) {
 		is_callable( 'get_current_screen' ) &&
 		function_exists( 'gutenberg_is_edit_site_page' ) &&
 		gutenberg_is_edit_site_page( get_current_screen()->id ) &&
-		WP_Theme_JSON_Resolver_Gutenberg::theme_has_support() &&
-		gutenberg_supports_block_templates()
+		gutenberg_experimental_is_site_editor_available()
 	) {
 		$context = 'site-editor';
 	}
@@ -232,16 +231,23 @@ function gutenberg_experimental_global_styles_settings( $settings ) {
 }
 
 /**
+ * Whether or not the Site Editor is available.
+ *
+ * @return boolean
+ */
+function gutenberg_experimental_is_site_editor_available() {
+	return gutenberg_is_fse_theme();
+}
+
+/**
  * Register CPT to store/access user data.
  *
- * @return array|undefined
+ * @return void
  */
 function gutenberg_experimental_global_styles_register_user_cpt() {
-	if ( ! WP_Theme_JSON_Resolver_Gutenberg::theme_has_support() ) {
-		return;
+	if ( gutenberg_experimental_is_site_editor_available() ) {
+		WP_Theme_JSON_Resolver_Gutenberg::register_user_custom_post_type();
 	}
-
-	WP_Theme_JSON_Resolver_Gutenberg::register_user_custom_post_type();
 }
 
 /**
