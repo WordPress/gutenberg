@@ -245,7 +245,7 @@ function gutenberg_experimental_is_global_styles_available_to_user() {
 /**
  * Register CPT to store/access user data.
  *
- * @return array|undefined
+ * @return void
  */
 function gutenberg_experimental_global_styles_register_user_cpt() {
 	if ( gutenberg_experimental_is_global_styles_available_to_user() ) {
