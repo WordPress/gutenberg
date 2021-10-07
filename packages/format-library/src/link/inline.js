@@ -203,12 +203,11 @@ function InlineLinkUI( {
 				// If we're not updating the text then ignore
 				newValue = applyFormat( value, linkFormat );
 			} else {
-				// Update the **text** (only) with the new text from the Link UI.
-				// This action retains any formats that were currently applied to
-				// the text selection (eg: bold, italic...etc).
-				newValue = replace( richLinkTextValue, richTextText, newText );
+				// Create new RichText value for the new text in order that we
+				// can apply formats to it.
+				newValue = create( { text: newText } );
 
-				// Apply the new Link format to this new value.
+				// Apply the new Link format to this new text value.
 				newValue = applyFormat(
 					newValue,
 					linkFormat,
@@ -220,7 +219,9 @@ function InlineLinkUI( {
 				// target text with the new RichTextValue containing:
 				// 1. The new text content.
 				// 2. The new link format.
-				// 3. Any original formats.
+				// Note original formats will be lost when applying this change.
+				// That is expected behaviour.
+				// See: https://github.com/WordPress/gutenberg/pull/33849#issuecomment-936134179.
 				newValue = replace( value, richTextText, newValue );
 			}
 
