@@ -8,7 +8,7 @@ import { View, TouchableHighlight, Text } from 'react-native';
  */
 import { useCallback } from '@wordpress/element';
 import { Icon } from '@wordpress/components';
-import { withPreferredColorScheme } from '@wordpress/compose';
+import { usePreferredColorSchemeStyle } from '@wordpress/compose';
 import { __, sprintf } from '@wordpress/i18n';
 import { sparkles } from '@wordpress/icons';
 import { BlockIcon } from '@wordpress/block-editor';
@@ -21,13 +21,22 @@ import { NativeNotice } from '@wordpress/react-native-bridge';
  */
 import styles from './style.scss';
 
-function MenuItem( {
-	getStylesFromColorScheme,
-	item,
-	itemWidth,
-	maxWidth,
-	onSelect,
-} ) {
+function InserterButton( { item, itemWidth, maxWidth, onSelect } ) {
+	const modalIconWrapperStyle = usePreferredColorSchemeStyle(
+		styles.modalIconWrapper,
+		styles.modalIconWrapperDark
+	);
+	const modalIconStyle = styles.modalIcon;
+	const modalItemLabelStyle = usePreferredColorSchemeStyle(
+		styles.modalItemLabel,
+		styles.modalItemLabelDark
+	);
+
+	const clipboardBlockStyles = usePreferredColorSchemeStyle(
+		styles.clipboardBlock,
+		styles.clipboardBlockDark
+	);
+
 	const isClipboardBlock = item.id === 'clipboard';
 	const blockTitle = isClipboardBlock ? __( 'Copied block' ) : item.title;
 	const blockIsNew = item.isNew === true;
@@ -37,21 +46,6 @@ function MenuItem( {
 		: // translators: Block name. %s: The localized block name
 		  __( '%s block' );
 	const accessibilityLabel = sprintf( accessibilityLabelFormat, item.title );
-
-	const modalIconWrapperStyle = getStylesFromColorScheme(
-		styles.modalIconWrapper,
-		styles.modalIconWrapperDark
-	);
-	const modalIconStyle = styles.modalIcon;
-	const modalItemLabelStyle = getStylesFromColorScheme(
-		styles.modalItemLabel,
-		styles.modalItemLabelDark
-	);
-
-	const clipboardBlockStyles = getStylesFromColorScheme(
-		styles.clipboardBlock,
-		styles.clipboardBlockDark
-	);
 
 	const isNativeNoticeAvailable = NativeNotice.isAvailable;
 	const shouldDisableTouch =
@@ -123,8 +117,6 @@ function MenuItem( {
 		</TouchableHighlight>
 	);
 }
-
-const InserterButton = withPreferredColorScheme( MenuItem );
 
 InserterButton.Styles = {
 	modalItem: styles.modalItem,
