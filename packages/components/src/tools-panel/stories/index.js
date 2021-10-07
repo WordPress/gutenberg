@@ -169,6 +169,8 @@ export const WithSlotFillItems = () => {
 	);
 };
 
+export { TypographyPanel } from './typography-panel';
+
 const PanelWrapperView = styled.div`
 	max-width: 260px;
 	font-size: 13px;
