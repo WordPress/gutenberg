@@ -44,10 +44,6 @@
 }
 
 // Provide special styling for the placeholder.
-// Mostly a proof of concept. We likely need to extract these styles
-// to a separate component that more intrinsically inherits block styles
-// and provides the on-hover upload button.
-// That would also let it work with with less specificity.
 .wp-block-site-logo.wp-block-site-logo {
 	// Inherit border radius from style variations.
 	.components-placeholder,
@@ -113,8 +109,6 @@
 		.components-button.components-button {
 			color: inherit;
 			padding: 0;
-			//top and bottom margin to push up tooltip
-			margin: 40px 0 40px 0;
 			display: flex;
 			justify-content: center;
 			align-items: center;
@@ -128,11 +122,8 @@
 			background: transparent;
 			transition: all 0.1s linear;
 			@include reduce-motion("transition");
-
-			// @todo: needs to be icon button.
-			text-indent: 100%;
-			overflow: hidden;
 		}
+
 		.components-button.components-button > svg {
 			color: $white;
 		}
@@ -150,10 +141,8 @@
 		}
 	}
 
-	// Show upload button on focus/hover.
-	&.is-selected .components-button,
-	.components-placeholder:focus .components-button,
-	.components-placeholder:hover .components-button {
+	// Show upload button on block selection.
+	&.is-selected .components-button.components-button {
 		background: var(--wp-admin-theme-color);
 		border-color: var(--wp-admin-theme-color);
 		border-style: solid;

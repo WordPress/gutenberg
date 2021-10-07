@@ -18,7 +18,6 @@ import {
 	Spinner,
 	ToggleControl,
 	ToolbarButton,
-	Tooltip,
 	Placeholder,
 	Button,
 } from '@wordpress/components';
@@ -433,41 +432,39 @@ export default function LogoEdit( {
 		);
 
 		return (
-			<Tooltip
-				position="top center"
-				text={ __( 'Click, or drag and drop, to add a site logo' ) }
-				delay={ 0 }
+			<Placeholder
+				className={ placeholderClassName }
+				preview={ logoImage }
 			>
-				<Placeholder
-					className={ placeholderClassName }
-					preview={ logoImage }
-				>
-					{
-						<SVG
-							className="components-placeholder__illustration"
-							fill="none"
-							xmlns="http://www.w3.org/2000/svg"
-							viewBox="0 0 60 60"
-						>
-							<Path
-								vectorEffect="non-scaling-stroke"
-								d="m61 32.622-13.555-9.137-15.888 9.859a5 5 0 0 1-5.386-.073l-9.095-5.989L1 37.5"
-							/>
-						</SVG>
-					}
-					{ content }
-				</Placeholder>
-			</Tooltip>
+				{
+					<SVG
+						className="components-placeholder__illustration"
+						fill="none"
+						xmlns="http://www.w3.org/2000/svg"
+						viewBox="0 0 60 60"
+					>
+						<Path
+							vectorEffect="non-scaling-stroke"
+							d="m61 32.622-13.555-9.137-15.888 9.859a5 5 0 0 1-5.386-.073l-9.095-5.989L1 37.5"
+						/>
+					</SVG>
+				}
+				{ content }
+			</Placeholder>
 		);
 	};
 
 	const classes = classnames( className, {
 		'is-default-size': ! width,
 	} );
+
 	const blockProps = useBlockProps( {
 		ref,
 		className: classes,
 	} );
+
+	const label = __( 'Add a site logo' );
+
 	return (
 		<div { ...blockProps }>
 			{ controls }
@@ -492,7 +489,10 @@ export default function LogoEdit( {
 						return (
 							<Button
 								icon={ upload }
-								variant="tertiary"
+								variant="primary"
+								label={ label }
+								showTooltip
+								tooltipPosition="top center"
 								onClick={ () => {
 									open();
 								} }
