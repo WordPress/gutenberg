@@ -2,7 +2,7 @@
 	{
 		"blockName": "core/pattern",
 		"attrs": {
-			"slug": "text-two-columns"
+			"slug": "core/text-two-columns"
 		},
 		"innerBlocks": [],
 		"innerHTML": "",
