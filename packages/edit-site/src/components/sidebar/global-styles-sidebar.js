@@ -9,10 +9,17 @@ import { styles } from '@wordpress/icons';
  * Internal dependencies
  */
 import DefaultSidebar from './default-sidebar';
-import { GlobalStylesUI, useGlobalStylesReset } from '../global-styles';
+import {
+	useGlobalStylesIsEnabled,
+	GlobalStylesUI,
+	useGlobalStylesReset,
+} from '../global-styles';
 
 export default function GlobalStylesSidebar() {
 	const [ canRestart, onReset ] = useGlobalStylesReset();
+	if ( ! useGlobalStylesIsEnabled() ) {
+		return null;
+	}
 
 	return (
 		<DefaultSidebar
