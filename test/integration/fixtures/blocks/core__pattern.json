@@ -4,7 +4,7 @@
 		"name": "core/pattern",
 		"isValid": true,
 		"attributes": {
-			"slug": "quadrat/search-results"
+			"slug": "text-two-columns"
 		},
 		"innerBlocks": [],
 		"originalContent": ""

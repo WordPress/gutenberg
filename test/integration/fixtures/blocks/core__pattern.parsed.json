@@ -2,7 +2,7 @@
 	{
 		"blockName": "core/pattern",
 		"attrs": {
-			"slug": "quadrat/search-results"
+			"slug": "text-two-columns"
 		},
 		"innerBlocks": [],
 		"innerHTML": "",
