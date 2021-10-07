@@ -605,7 +605,7 @@ function gutenberg_multiple_block_styles( $metadata ) {
 				if ( 0 === strpos( $handle, 'file:' ) && isset( $metadata['file'] ) ) {
 					$style_path = remove_block_asset_path_prefix( $handle );
 					$args       = array(
-						'handle' => $style_path,
+						'handle' => sanitize_key( "{$metadata['name']}-{$style_path}" ),
 						'src'    => plugins_url( $style_path, $metadata['file'] ),
 					);
 				}
