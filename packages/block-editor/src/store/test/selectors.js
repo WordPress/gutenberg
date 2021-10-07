@@ -2515,6 +2515,7 @@ describe( 'selectors', () => {
 				keywords: [ 'testing' ],
 				variations: [],
 				isDisabled: false,
+				alreadyPresentInPost: false,
 				utility: 1,
 				frecency: 0,
 			} );
@@ -2791,7 +2792,7 @@ describe( 'selectors', () => {
 			expect( items ).toHaveLength( 2 );
 			const returnedProps = Object.keys( items[ 0 ] );
 			// Verify we have only the wanted props.
-			expect( returnedProps ).toHaveLength( 6 );
+			expect( returnedProps ).toHaveLength( 7 );
 			expect( returnedProps ).toEqual(
 				expect.arrayContaining( [
 					'id',
@@ -2800,6 +2801,7 @@ describe( 'selectors', () => {
 					'icon',
 					'frecency',
 					'isDisabled',
+					'alreadyPresentInPost',
 				] )
 			);
 			expect( items ).toEqual(
@@ -2887,10 +2889,12 @@ describe( 'selectors', () => {
 					expect.objectContaining( {
 						name: 'core/with-tranforms-b',
 						isDisabled: false,
+						alreadyPresentInPost: false,
 					} ),
 					expect.objectContaining( {
 						name: 'core/with-tranforms-c',
 						isDisabled: true,
+						alreadyPresentInPost: true,
 					} ),
 				] )
 			);

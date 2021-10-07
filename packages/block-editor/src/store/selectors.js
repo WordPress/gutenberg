@@ -1496,11 +1496,13 @@ const buildBlockTypeItem = ( state, { buildScope = 'inserter' } ) => (
 	const id = blockType.name;
 
 	let isDisabled = false;
+	let alreadyPresentInPost = false;
 	if ( ! hasBlockSupport( blockType.name, 'multiple', true ) ) {
-		isDisabled = some(
+		alreadyPresentInPost = some(
 			getBlocksByClientId( state, getClientIdsWithDescendants( state ) ),
 			{ name: blockType.name }
 		);
+		isDisabled = alreadyPresentInPost;
 	}
 
 	const { time, count = 0 } = getInsertUsage( state, id ) || {};
@@ -1510,6 +1512,7 @@ const buildBlockTypeItem = ( state, { buildScope = 'inserter' } ) => (
 		title: blockType.title,
 		icon: blockType.icon,
 		isDisabled,
+		alreadyPresentInPost,
 		frecency: calculateFrecency( time, count ),
 	};
 	if ( buildScope === 'transform' ) return blockItemBase;
