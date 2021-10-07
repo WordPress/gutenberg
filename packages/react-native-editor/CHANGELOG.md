@@ -23,8 +23,8 @@ For each user feature we should also add a importance categorization label  to i
 
 1.62.1
 ------
-* [**] Image block: fix height and border regression. [#34957]
-* [**] Column block: fix width attribute flout cutoff. [#34604]
+-   [**] Image block: fix height and border regression. [#34957]
+-   [**] Column block: fix width attribute flout cutoff. [#34604]
 
 ## 1.62.0
 -   [**] [Embed block] Implement WP embed preview component [#34004]
