@@ -209,7 +209,6 @@ exports[`ToggleGroupControl should render correctly 1`] = `
       >
         <button
           aria-checked="false"
-          aria-label="R"
           class="emotion-10 components-toggle-group-control-option"
           data-value="rigas"
           data-wp-c16t="true"
@@ -241,7 +240,6 @@ exports[`ToggleGroupControl should render correctly 1`] = `
       >
         <button
           aria-checked="false"
-          aria-label="J"
           class="emotion-10 components-toggle-group-control-option"
           data-value="jack"
           data-wp-c16t="true"
