@@ -70,17 +70,19 @@ export const ToolsPanelHeader = css`
 		margin: 0;
 	}
 
-	.components-dropdown-menu {
+	/* Tweak dropdown menu and toggle button for better alignment */
+	> div {
 		margin-top: ${ space( -1 ) };
 		margin-bottom: ${ space( -1 ) };
 		height: ${ space( 6 ) };
-	}
 
-	.components-dropdown-menu__toggle {
-		padding: 0;
-		height: ${ space( 6 ) };
-		min-width: ${ space( 6 ) };
-		width: ${ space( 6 ) };
+		/* first-child used to overcome specificity of menu toggle styles */
+		> button:first-child {
+			padding: 0;
+			height: ${ space( 6 ) };
+			min-width: ${ space( 6 ) };
+			width: ${ space( 6 ) };
+		}
 	}
 `;
 
