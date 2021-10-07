@@ -118,7 +118,7 @@ function UnitControl(
 			unit
 		);
 
-		refParsedValue.current = parsedValue?.toString();
+		refParsedValue.current = parsedValue.toString();
 
 		if ( isPressEnterToChange && parsedUnit !== unit ) {
 			const data = Array.isArray( units )
