@@ -23,9 +23,17 @@ const EMPTY_ARRAY = [];
 
 export default function ColorPalettePanel( { name } ) {
 	const [ colors, setColors ] = useSetting( 'color.palette', name );
-	const userColors = useSetting( 'color.palette', name, 'user' );
-	const baseGlobalPalette = useSetting( 'color.palette', undefined, 'base' );
-	const baseContextualPalette = useSetting( 'color.palette', name, 'base' );
+	const [ userColors ] = useSetting( 'color.palette', name, 'user' );
+	const [ baseGlobalPalette ] = useSetting(
+		'color.palette',
+		undefined,
+		'base'
+	);
+	const [ baseContextualPalette ] = useSetting(
+		'color.palette',
+		name,
+		'base'
+	);
 	const immutableColorSlugs = useMemo( () => {
 		const basePalette = baseContextualPalette ?? baseGlobalPalette;
 		if ( ! basePalette ) {
