@@ -2,7 +2,8 @@
  * Internal dependencies
  */
 import Button from '../../button';
-import { CardBody, CardHeader } from '../../card';
+import { Card, CardBody, CardHeader } from '../../card';
+import { HStack } from '../../h-stack';
 import { Flyout } from '../../flyout';
 import { NavigatorProvider, NavigatorScreen, useNavigator } from '../';
 
@@ -21,57 +22,73 @@ function NavigatorButton( { path, isBack = false, ...props } ) {
 	);
 }
 
-const MyNavigation = () => (
-	<NavigatorProvider initialPath="/">
-		<NavigatorScreen path="/">
-			<p>This is the home screen.</p>
+const MyNavigation = () => {
+	return (
+		<NavigatorProvider initialPath="/">
+			<NavigatorScreen path="/">
+				<Card>
+					<CardBody>
+						<p>This is the home screen.</p>
 
-			<NavigatorButton isPrimary path="/child">
-				Navigate to child screen.
-			</NavigatorButton>
+						<HStack justify="flex-start" wrap>
+							<NavigatorButton isPrimary path="/child">
+								Navigate to child screen.
+							</NavigatorButton>
 
-			<NavigatorButton isPrimary path="/overflow-child">
-				Navigate to a screen with horizontal overflow.
-			</NavigatorButton>
+							<NavigatorButton path="/overflow-child">
+								Navigate to screen with horizontal overflow.
+							</NavigatorButton>
 
-			<Flyout
-				trigger={ <Button>Click top open test dialog</Button> }
-				placement="bottom-start"
-			>
-				<CardHeader>Go</CardHeader>
-				<CardBody>Stuff</CardBody>
-			</Flyout>
-		</NavigatorScreen>
+							<Flyout
+								trigger={ <Button>Open test dialog</Button> }
+								placement="bottom-start"
+							>
+								<CardHeader>Go</CardHeader>
+								<CardBody>Stuff</CardBody>
+							</Flyout>
+						</HStack>
+					</CardBody>
+				</Card>
+			</NavigatorScreen>
 
-		<NavigatorScreen path="/child">
-			<p>This is the child screen.</p>
-			<NavigatorButton isPrimary path="/" isBack>
-				Go back
-			</NavigatorButton>
-		</NavigatorScreen>
-		<NavigatorScreen path="/overflow-child">
-			<NavigatorButton isPrimary path="/" isBack>
-				Go back
-			</NavigatorButton>
-			<div
-				style={ {
-					display: 'inline-block',
-					background: 'papayawhip',
-				} }
-			>
-				<span
-					style={ {
-						color: 'palevioletred',
-						whiteSpace: 'nowrap',
-						fontSize: '42vw',
-					} }
-				>
-					¯\_(ツ)_/¯
-				</span>
-			</div>
-		</NavigatorScreen>
-	</NavigatorProvider>
-);
+			<NavigatorScreen path="/child">
+				<Card>
+					<CardBody>
+						<p>This is the child screen.</p>
+						<NavigatorButton isPrimary path="/" isBack>
+							Go back
+						</NavigatorButton>
+					</CardBody>
+				</Card>
+			</NavigatorScreen>
+			<NavigatorScreen path="/overflow-child">
+				<Card>
+					<CardBody>
+						<NavigatorButton isPrimary path="/" isBack>
+							Go back
+						</NavigatorButton>
+						<div
+							style={ {
+								display: 'inline-block',
+								background: 'papayawhip',
+							} }
+						>
+							<span
+								style={ {
+									color: 'palevioletred',
+									whiteSpace: 'nowrap',
+									fontSize: '42vw',
+								} }
+							>
+								¯\_(ツ)_/¯
+							</span>
+						</div>
+					</CardBody>
+				</Card>
+			</NavigatorScreen>
+		</NavigatorProvider>
+	);
+};
 
 export const _default = () => {
 	return <MyNavigation />;
