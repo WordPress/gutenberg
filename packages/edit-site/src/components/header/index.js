@@ -141,27 +141,22 @@ export default function Header( {
 			</div>
 
 			<div className="edit-site-header_center">
-				{ 'wp_template' === templateType && (
-					<DocumentActions
-						entityTitle={ entityTitle }
-						entityLabel="template"
-						isLoaded={ isLoaded }
-					>
-						{ ( { onClose } ) => (
-							<TemplateDetails
-								template={ template }
-								onClose={ onClose }
-							/>
-						) }
-					</DocumentActions>
-				) }
-				{ 'wp_template_part' === templateType && (
-					<DocumentActions
-						entityTitle={ entityTitle }
-						entityLabel="template part"
-						isLoaded={ isLoaded }
-					/>
-				) }
+				<DocumentActions
+					entityTitle={ entityTitle }
+					entityLabel={
+						templateType === 'wp_template_part'
+							? 'template part'
+							: 'template'
+					}
+					isLoaded={ isLoaded }
+				>
+					{ ( { onClose } ) => (
+						<TemplateDetails
+							template={ template }
+							onClose={ onClose }
+						/>
+					) }
+				</DocumentActions>
 			</div>
 
 			<div className="edit-site-header_end">
