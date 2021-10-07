@@ -48,7 +48,7 @@ const PatternEdit = ( { attributes, clientId, isSelected } ) => {
 			__unstableMarkNextChangeAsNotPersistent();
 			replaceInnerBlocks( clientId, selectedPattern.blocks );
 		}
-	}, [] );
+	}, [ selectedPattern?.blocks ] );
 
 	return <InnerBlocks />;
 };
