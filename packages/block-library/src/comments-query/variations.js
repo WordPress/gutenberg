@@ -8,6 +8,7 @@ const QUERY_DEFAULT_ATTRIBUTES = {
 	query: {
 		perPage: 3,
 		pages: 0,
+		offset: 0,
 		order: 'desc',
 		orderBy: 'date',
 	},
