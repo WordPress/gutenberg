@@ -129,21 +129,13 @@ function gutenberg_experimental_global_styles_settings( $settings ) {
 
 	if ( 'mobile' === $context ) {
 		$settings['__experimentalStyles'] = $consolidated->get_raw_data()['styles'];
-	}
-
-	if ( 'site-editor' === $context ) {
+	} elseif ( 'site-editor' === $context ) {
 		$theme       = WP_Theme_JSON_Resolver_Gutenberg::get_merged_data( $settings, 'theme' );
 		$user_cpt_id = WP_Theme_JSON_Resolver_Gutenberg::get_user_custom_post_type_id();
 
 		$settings['__experimentalGlobalStylesUserEntityId'] = $user_cpt_id;
 		$settings['__experimentalGlobalStylesBaseStyles']   = $theme->get_raw_data();
-	}
-
-	if (
-		'site-editor' !== $context &&
-		'mobile' !== $context &&
-		( WP_Theme_JSON_Resolver_Gutenberg::theme_has_support() || get_theme_support( 'experimental-link-color' ) )
-	) {
+	} else {
 		$block_styles  = array( 'css' => gutenberg_experimental_global_styles_get_stylesheet( $consolidated, 'block_styles' ) );
 		$css_variables = array(
 			'css'                     => gutenberg_experimental_global_styles_get_stylesheet( $consolidated, 'css_variables' ),
