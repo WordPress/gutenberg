@@ -27,20 +27,11 @@ interface UseResizeLabelProps {
 	resizeListener: JSX.Element;
 }
 
-/**
- * Custom hook that manages resize listener events. It also provides a label
- * based on current resize width x height values.
- */
 interface UseResizeLabelArgs {
-	/** Only shows the label corresponding to the axis. */
 	axis?: Axis;
-	/** Duration (ms) before deactivating the resize label. */
 	fadeTimeout: number;
-	/** Callback when a resize occurs. Provides { width, height } callback. */
 	onResize( data: { width: number | null; height: number | null } ): void;
-	/** Adjusts label value. */
 	position: Position;
-	/** Whether to add `PX` to the label. */
 	showPx: boolean;
 }
 
@@ -48,7 +39,12 @@ interface UseResizeLabelArgs {
  * Custom hook that manages resize listener events. It also provides a label
  * based on current resize width x height values.
  *
- * @param {UseResizeLabelArgs} props
+ * @param  props
+ * @param  props.axis        Only shows the label corresponding to the axis.
+ * @param  props.fadeTimeout Duration (ms) before deactivating the resize label.
+ * @param  props.onResize    Callback when a resize occurs. Provides { width, height } callback.
+ * @param  props.position    Adjusts label value.
+ * @param  props.showPx      Whether to add `PX` to the label.
  *
  * @return Properties for hook.
  */
@@ -171,30 +167,27 @@ export function useResizeLabel( {
 	};
 }
 
-/**
- * Gets the resize label based on width and height values (as well as recent changes).
- */
 interface GetSizeLabelArgs {
-	/** Only shows the label corresponding to the axis. */
 	axis?: Axis;
-	/** Height value. */
 	height: number | null;
-	/** Recent width (x axis) changes. */
 	moveX: boolean;
-	/** Recent width (y axis) changes. */
 	moveY: boolean;
-	/** Adjusts label value. */
 	position: Position;
-	/** Whether to add `PX` to the label. */
 	showPx: boolean;
-	/** Width value. */
 	width: number | null;
 }
 
 /**
  * Gets the resize label based on width and height values (as well as recent changes).
  *
- * @param {GetSizeLabelArgs} props
+ * @param  props
+ * @param  props.axis     Only shows the label corresponding to the axis.
+ * @param  props.height   Height value.
+ * @param  props.moveX    Recent width (x axis) changes.
+ * @param  props.moveY    Recent width (y axis) changes.
+ * @param  props.position Adjusts label value.
+ * @param  props.showPx   Whether to add `PX` to the label.
+ * @param  props.width    Width value.
  *
  * @return The rendered label.
  */
