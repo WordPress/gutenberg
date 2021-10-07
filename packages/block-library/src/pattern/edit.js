@@ -9,10 +9,12 @@ import {
 } from '@wordpress/block-editor';
 
 const PatternEdit = ( { attributes, clientId, isSelected } ) => {
-	const selectedPattern = useSelect( ( select ) =>
-		select( blockEditorStore ).__experimentalGetParsedPattern(
-			attributes.slug
-		)
+	const selectedPattern = useSelect(
+		( select ) =>
+			select( blockEditorStore ).__experimentalGetParsedPattern(
+				attributes.slug
+			),
+		[ attributes.slug ]
 	);
 
 	const hasSelection = useSelect(
