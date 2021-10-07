@@ -32,14 +32,20 @@ function ConfirmDialog(
 ) {
 	const {
 		isOpen: isOpenProp,
+		title,
 		message,
 		onConfirm,
 		onCancel,
 		...otherProps
 	} = useContextSystem( props, 'ConfirmDialog' );
 
+	const hasTitle = !! title;
 	const cx = useCx();
-	const wrapperClassName = cx( styles.wrapper );
+	const wrapperClassNames = cx(
+		styles.wrapper,
+		! hasTitle && styles.withoutTitle
+	);
+	const buttonsWrapperClassNames = cx( styles.buttonsWrapper );
 
 	const [ isOpen, setIsOpen ] = useState< boolean >();
 	const [ selfClose, setSelfClose ] = useState< boolean >();
@@ -74,8 +80,8 @@ function ConfirmDialog(
 		<>
 			{ isOpen && (
 				<Modal
-					title={ message }
-					overlayClassName={ wrapperClassName }
+					title={ title }
+					overlayClassName={ wrapperClassNames }
 					onRequestClose={ handleEvent( onCancel ) }
 					onKeyDown={ handleEnter }
 					closeButtonLabel={ __( 'Cancel' ) }
@@ -83,7 +89,11 @@ function ConfirmDialog(
 					forwardedRef={ forwardedRef }
 					{ ...otherProps }
 				>
-					<Flex justify="flex-end">
+					<p>{ message }</p>
+					<Flex
+						justify="flex-end"
+						className={ buttonsWrapperClassNames }
+					>
 						<Button
 							variant="tertiary"
 							onClick={ handleEvent( onCancel ) }

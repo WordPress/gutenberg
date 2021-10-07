@@ -16,6 +16,9 @@ export default {
 	title: 'Components (Experimental)/ConfirmDialog',
 };
 
+const daText = () =>
+	text( 'message', 'Would you like to privetely publish the post now?' );
+
 // Simplest usage: just declare the component with the required `onConfirm` prop.
 export const _default = () => {
 	const [ confirmVal, setConfirmVal ] = useState( 'Not confirmed' );
@@ -23,7 +26,50 @@ export const _default = () => {
 	return (
 		<>
 			<ConfirmDialog
-				message={ text( 'message', 'Are you sure?' ) }
+				message={ daText() }
+				onConfirm={ () => setConfirmVal( 'Confirmed!' ) }
+			/>
+			<h1>{ confirmVal }</h1>
+		</>
+	);
+};
+
+export const WithTitle = () => {
+	const [ confirmVal, setConfirmVal ] = useState( 'Not confirmed' );
+
+	return (
+		<>
+			<ConfirmDialog
+				title="Are you sure?"
+				message={ daText() }
+				onConfirm={ () => setConfirmVal( 'Confirmed!' ) }
+			/>
+			<h1>{ confirmVal }</h1>
+		</>
+	);
+};
+
+export const WithJSXMessage = () => {
+	const [ confirmVal, setConfirmVal ] = useState( 'Not confirmed' );
+
+	return (
+		<>
+			<ConfirmDialog
+				message={ <h1>{ daText() }</h1> }
+				onConfirm={ () => setConfirmVal( 'Confirmed!' ) }
+			/>
+			<h1>{ confirmVal }</h1>
+		</>
+	);
+};
+
+export const VeeeryLongMessage = () => {
+	const [ confirmVal, setConfirmVal ] = useState( 'Not confirmed' );
+
+	return (
+		<>
+			<ConfirmDialog
+				message={ daText().repeat( 20 ) }
 				onConfirm={ () => setConfirmVal( 'Confirmed!' ) }
 			/>
 			<h1>{ confirmVal }</h1>
@@ -37,7 +83,7 @@ export const UncontrolledAndWithExplicitOnCancel = () => {
 	return (
 		<>
 			<ConfirmDialog
-				message={ text( 'message', 'Are you sure?' ) }
+				message={ daText() }
 				onConfirm={ () => setConfirmVal( 'Confirmed!' ) }
 				onCancel={ () => setConfirmVal( 'Cancelled' ) }
 			/>
@@ -66,7 +112,7 @@ export const Controlled = () => {
 	return (
 		<>
 			<ConfirmDialog
-				message={ text( 'message', 'Are you sure?' ) }
+				message={ daText() }
 				isOpen={ isOpen }
 				onConfirm={ handleConfirm }
 				onCancel={ handleCancel }
