@@ -415,6 +415,12 @@ Jest will look for test files with any of the following popular naming conventio
 -   Files with `.js` (or `.ts`) suffix directly located in `test` folders.
 -   Files with `.test.js` (or `.test.ts`) suffix.
 
+#### Failed Test Artifacts
+
+When tests fail, both a screenshot and an HTML snapshot will be taken of the page and stored in the `artifacts/` directory at the root of your project. These snapshots may help debug failed tests during development or when running tests in a CI environment.
+
+The `artifacts/` directory can be customized by defining the `WP_ARTIFACTS_PATH` environment variable.
+
 #### Advanced information
 
 It uses [Jest](https://jestjs.io/) behind the scenes and you are able to use all of its [CLI options](https://jestjs.io/docs/en/cli.html). You can also run `./node_modules/.bin/wp-scripts test:unit --help` or `npm run test:unit:help` (as mentioned above) to view all of the available options. By default, it uses the set of recommended options defined in [@wordpress/jest-preset-default](https://www.npmjs.com/package/@wordpress/jest-preset-default) npm package. You can override them with your own options as described in [Jest documentation](https://jestjs.io/docs/en/configuration). Learn more in the [Advanced Usage](#advanced-usage) section.
