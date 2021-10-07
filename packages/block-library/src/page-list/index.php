@@ -281,6 +281,12 @@ function render_block_core_page_list( $attributes, $content, $block ) {
 		}
 	}
 
+	// If thare are no top level pages, there is nothing to show.
+	// Return early and empty to trigger EmptyResponsePlaceholder.
+	if ( empty( $top_level_pages ) ) {
+		return;
+	}
+
 	$colors          = block_core_page_list_build_css_colors( $attributes, $block->context );
 	$font_sizes      = block_core_page_list_build_css_font_sizes( $block->context );
 	$classes         = array_merge(
