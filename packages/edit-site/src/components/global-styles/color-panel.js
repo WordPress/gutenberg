@@ -8,10 +8,11 @@ import { __ } from '@wordpress/i18n';
  * Internal dependencies
  */
 
-import { useSetting } from '../editor/utils';
+import { getSupportedGlobalStylesPanels, useSetting, useStyle } from './hooks';
 import Palette from './palette';
 
-export function useHasColorPanel( { supports } ) {
+export function useHasColorPanel( name ) {
+	const supports = getSupportedGlobalStylesPanels( name );
 	return (
 		supports.includes( 'color' ) ||
 		supports.includes( 'backgroundColor' ) ||
@@ -20,21 +21,19 @@ export function useHasColorPanel( { supports } ) {
 	);
 }
 
-export default function ColorPanel( {
-	context: { supports, name },
-	getStyle,
-	setStyle,
-} ) {
-	const solids = useSetting( 'color.palette', name );
-	const gradients = useSetting( 'color.gradients', name );
-	const areCustomSolidsEnabled = useSetting( 'color.custom', name );
-	const areCustomGradientsEnabled = useSetting(
+export default function ColorPanel( { name } ) {
+	const supports = getSupportedGlobalStylesPanels( name );
+	const [ solids ] = useSetting( 'color.palette', name );
+	const [ gradients ] = useSetting( 'color.gradients', name );
+	const [ areCustomSolidsEnabled ] = useSetting( 'color.custom', name );
+	const [ areCustomGradientsEnabled ] = useSetting(
 		'color.customGradient',
 		name
 	);
-	const isLinkEnabled = useSetting( 'color.link', name );
-	const isTextEnabled = useSetting( 'color.text', name );
-	const isBackgroundEnabled = useSetting( 'color.background', name );
+
+	const [ isLinkEnabled ] = useSetting( 'color.link', name );
+	const [ isTextEnabled ] = useSetting( 'color.text', name );
+	const [ isBackgroundEnabled ] = useSetting( 'color.background', name );
 
 	const hasLinkColor =
 		supports.includes( 'linkColor' ) &&
@@ -52,14 +51,34 @@ export default function ColorPanel( {
 		supports.includes( 'background' ) &&
 		( gradients.length > 0 || areCustomGradientsEnabled );
 
-	const settings = [];
+	const [ color, setColor ] = useStyle( 'color.text', name );
+	const [ userColor ] = useStyle( 'color.text', name, 'user' );
+	const [ backgroundColor, setBackgroundColor ] = useStyle(
+		'color.background',
+		name
+	);
+	const [ userBackgroundColor ] = useStyle(
+		'color.background',
+		name,
+		'user'
+	);
+	const [ gradient, setGradient ] = useStyle( 'color.gradient', name );
+	const [ userGradient ] = useStyle( 'color.gradient', name, 'user' );
+	const [ linkColor, setLinkColor ] = useStyle(
+		'elements.link.color.text',
+		name
+	);
+	const [ userLinkColor ] = useStyle(
+		'elements.link.color.text',
+		name,
+		'user'
+	);
 
+	const settings = [];
 	if ( hasTextColor ) {
-		const color = getStyle( name, 'color' );
-		const userColor = getStyle( name, 'color', 'user' );
 		settings.push( {
 			colorValue: color,
-			onColorChange: ( value ) => setStyle( name, 'color', value ),
+			onColorChange: setColor,
 			label: __( 'Text color' ),
 			clearable: color === userColor,
 		} );
@@ -67,12 +86,9 @@ export default function ColorPanel( {
 
 	let backgroundSettings = {};
 	if ( hasBackgroundColor ) {
-		const backgroundColor = getStyle( name, 'backgroundColor' );
-		const userBackgroundColor = getStyle( name, 'backgroundColor', 'user' );
 		backgroundSettings = {
 			colorValue: backgroundColor,
-			onColorChange: ( value ) =>
-				setStyle( name, 'backgroundColor', value ),
+			onColorChange: setBackgroundColor,
 		};
 		if ( backgroundColor ) {
 			backgroundSettings.clearable =
@@ -82,12 +98,9 @@ export default function ColorPanel( {
 
 	let gradientSettings = {};
 	if ( hasGradientColor ) {
-		const gradient = getStyle( name, 'background' );
-		const userGradient = getStyle( name, 'background', 'user' );
 		gradientSettings = {
 			gradientValue: gradient,
-			onGradientChange: ( value ) =>
-				setStyle( name, 'background', value ),
+			onGradientChange: setGradient,
 		};
 		if ( gradient ) {
 			gradientSettings.clearable = gradient === userGradient;
@@ -103,13 +116,11 @@ export default function ColorPanel( {
 	}
 
 	if ( hasLinkColor ) {
-		const color = getStyle( name, 'linkColor' );
-		const userColor = getStyle( name, 'linkColor', 'user' );
 		settings.push( {
-			colorValue: color,
-			onColorChange: ( value ) => setStyle( name, 'linkColor', value ),
+			colorValue: linkColor,
+			onColorChange: setLinkColor,
 			label: __( 'Link color' ),
-			clearable: color === userColor,
+			clearable: linkColor === userLinkColor,
 		} );
 	}
 

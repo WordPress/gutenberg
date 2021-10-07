@@ -14,32 +14,35 @@ import { __experimentalUseCustomSides as useCustomSides } from '@wordpress/block
 /**
  * Internal dependencies
  */
-import { useSetting } from '../editor/utils';
+import { getSupportedGlobalStylesPanels, useSetting, useStyle } from './hooks';
 
 const AXIAL_SIDES = [ 'horizontal', 'vertical' ];
 
-export function useHasDimensionsPanel( context ) {
-	const hasPadding = useHasPadding( context );
-	const hasMargin = useHasMargin( context );
-	const hasGap = useHasGap( context );
+export function useHasDimensionsPanel( name ) {
+	const hasPadding = useHasPadding( name );
+	const hasMargin = useHasMargin( name );
+	const hasGap = useHasGap( name );
 
 	return hasPadding || hasMargin || hasGap;
 }
 
-function useHasPadding( { name, supports } ) {
-	const settings = useSetting( 'spacing.customPadding', name );
+function useHasPadding( name ) {
+	const supports = getSupportedGlobalStylesPanels( name );
+	const [ settings ] = useSetting( 'spacing.customPadding', name );
 
 	return settings && supports.includes( 'padding' );
 }
 
-function useHasMargin( { name, supports } ) {
-	const settings = useSetting( 'spacing.customMargin', name );
+function useHasMargin( name ) {
+	const supports = getSupportedGlobalStylesPanels( name );
+	const [ settings ] = useSetting( 'spacing.customMargin', name );
 
 	return settings && supports.includes( 'margin' );
 }
 
-function useHasGap( { name, supports } ) {
-	const settings = useSetting( 'spacing.blockGap', name );
+function useHasGap( name ) {
+	const supports = getSupportedGlobalStylesPanels( name );
+	const [ settings ] = useSetting( 'spacing.blockGap', name );
 
 	return settings && supports.includes( '--wp--style--block-gap' );
 }
@@ -82,13 +85,12 @@ function splitStyleValue( value ) {
 	return value;
 }
 
-export default function DimensionsPanel( { context, getStyle, setStyle } ) {
-	const { name } = context;
-	const showPaddingControl = useHasPadding( context );
-	const showMarginControl = useHasMargin( context );
-	const showGapControl = useHasGap( context );
+export default function DimensionsPanel( { name } ) {
+	const showPaddingControl = useHasPadding( name );
+	const showMarginControl = useHasMargin( name );
+	const showGapControl = useHasGap( name );
 	const units = useCustomUnits( {
-		availableUnits: useSetting( 'spacing.units', name ) || [
+		availableUnits: useSetting( 'spacing.units', name )[ 0 ] || [
 			'%',
 			'px',
 			'em',
@@ -97,7 +99,8 @@ export default function DimensionsPanel( { context, getStyle, setStyle } ) {
 		],
 	} );
 
-	const paddingValues = splitStyleValue( getStyle( name, 'padding' ) );
+	const [ rawPadding, setRawPadding ] = useStyle( 'spacing.padding', name );
+	const paddingValues = splitStyleValue( rawPadding );
 	const paddingSides = useCustomSides( name, 'padding' );
 	const isAxialPadding =
 		paddingSides &&
@@ -105,13 +108,14 @@ export default function DimensionsPanel( { context, getStyle, setStyle } ) {
 
 	const setPaddingValues = ( newPaddingValues ) => {
 		const padding = filterValuesBySides( newPaddingValues, paddingSides );
-		setStyle( name, 'padding', padding );
+		setRawPadding( padding );
 	};
 	const resetPaddingValue = () => setPaddingValues( {} );
 	const hasPaddingValue = () =>
 		!! paddingValues && Object.keys( paddingValues ).length;
 
-	const marginValues = splitStyleValue( getStyle( name, 'margin' ) );
+	const [ rawMargin, setRawMargin ] = useStyle( 'spacing.margin', name );
+	const marginValues = splitStyleValue( rawMargin );
 	const marginSides = useCustomSides( name, 'margin' );
 	const isAxialMargin =
 		marginSides &&
@@ -119,17 +123,13 @@ export default function DimensionsPanel( { context, getStyle, setStyle } ) {
 
 	const setMarginValues = ( newMarginValues ) => {
 		const margin = filterValuesBySides( newMarginValues, marginSides );
-		setStyle( name, 'margin', margin );
+		setRawMargin( margin );
 	};
 	const resetMarginValue = () => setMarginValues( {} );
 	const hasMarginValue = () =>
 		!! marginValues && Object.keys( marginValues ).length;
 
-	const gapValue = getStyle( name, '--wp--style--block-gap' );
-
-	const setGapValue = ( newGapValue ) => {
-		setStyle( name, '--wp--style--block-gap', newGapValue );
-	};
+	const [ gapValue, setGapValue ] = useStyle( 'spacing.blockGap', name );
 	const resetGapValue = () => setGapValue( undefined );
 	const hasGapValue = () => !! gapValue;
 

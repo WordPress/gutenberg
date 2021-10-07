@@ -11,7 +11,7 @@ import {
 	getNodesWithStyles,
 	toCustomProperties,
 	toStyles,
-} from '../global-styles-renderer';
+} from '../use-global-styles-output';
 import { ROOT_BLOCK_SELECTOR } from '../utils';
 
 describe( 'global styles renderer', () => {
@@ -55,16 +55,7 @@ describe( 'global styles renderer', () => {
 			};
 			const blockSelectors = {
 				'core/heading': {
-					selector: 'h1,h2,h3,h4,h5,h6',
-					elements: {
-						link: 'h1 a,h2 a,h3 a,h4 a,h5 a,h6 a',
-						h1: 'h1',
-						h2: 'h2',
-						h3: 'h3',
-						h4: 'h4',
-						h5: 'h5',
-						h6: 'h6',
-					},
+					selector: '.my-heading1, .my-heading2',
 				},
 			};
 			expect( getNodesWithStyles( tree, blockSelectors ) ).toEqual( [
@@ -93,7 +84,7 @@ describe( 'global styles renderer', () => {
 							text: 'blue',
 						},
 					},
-					selector: 'h1,h2,h3,h4,h5,h6',
+					selector: '.my-heading1, .my-heading2',
 				},
 				{
 					styles: {
@@ -101,7 +92,7 @@ describe( 'global styles renderer', () => {
 							fontSize: '42px',
 						},
 					},
-					selector: 'h1',
+					selector: '.my-heading1 h1, .my-heading2 h1',
 				},
 				{
 					styles: {
@@ -109,7 +100,7 @@ describe( 'global styles renderer', () => {
 							fontSize: '23px',
 						},
 					},
-					selector: 'h2',
+					selector: '.my-heading1 h2, .my-heading2 h2',
 				},
 			] );
 		} );

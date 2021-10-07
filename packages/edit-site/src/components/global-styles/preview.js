@@ -10,14 +10,14 @@ import {
 
 /**
  * Internal dependencies
- */ import { useGlobalStylesContext } from '../editor/global-styles-provider';
+ */
+import { useStyle } from './hooks';
 
 const StylesPreview = () => {
-	const { getStyle } = useGlobalStylesContext();
-	const fontFamily = getStyle( 'root', 'fontFamily' ) ?? 'serif';
-	const textColor = getStyle( 'root', 'color' ) ?? 'black';
-	const linkColor = getStyle( 'root', 'linkColor' ) ?? 'blue';
-	const backgroundColor = getStyle( 'root', 'backgroundColor' ) ?? 'white';
+	const [ fontFamily = 'serif' ] = useStyle( 'typography.fontFamily' );
+	const [ textColor = 'black' ] = useStyle( 'color.text' );
+	const [ linkColor = 'blue' ] = useStyle( 'elements.link.color.text' );
+	const [ backgroundColor = 'white' ] = useStyle( 'color.background' );
 
 	return (
 		<Card
@@ -25,10 +25,7 @@ const StylesPreview = () => {
 			style={ { background: backgroundColor } }
 		>
 			<HStack spacing={ 5 }>
-				<div>
-					<span style={ { fontFamily, fontSize: '80px' } }>A</span>
-					<span style={ { fontFamily, fontSize: '80px' } }>a</span>
-				</div>
+				<div style={ { fontFamily, fontSize: '80px' } }>Aa</div>
 				<VStack spacing={ 2 }>
 					<ColorIndicator colorValue={ textColor } />
 					<ColorIndicator colorValue={ linkColor } />
