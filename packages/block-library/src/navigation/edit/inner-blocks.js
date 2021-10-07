@@ -43,6 +43,7 @@ const LAYOUT = {
 };
 
 export default function NavigationInnerBlocks( {
+	isVisible,
 	templatePartId: id,
 	clientId,
 	appender: CustomAppender,
@@ -88,11 +89,10 @@ export default function NavigationInnerBlocks( {
 	// When the block is selected itself or has a top level item selected that
 	// doesn't itself have children, show the standard appender. Else show no
 	// appender.
-	const appender =
+	const parentOrChildHasSelection =
 		isSelected ||
-		( isImmediateParentOfSelectedBlock && ! selectedBlockHasDescendants )
-			? undefined
-			: false;
+		( isImmediateParentOfSelectedBlock && ! selectedBlockHasDescendants );
+	const appender = isVisible && parentOrChildHasSelection ? undefined : false;
 
 	const placeholder = useMemo( () => <PlaceholderPreview />, [] );
 
@@ -119,7 +119,8 @@ export default function NavigationInnerBlocks( {
 			// inherit templateLock={ 'all' }.
 			templateLock: false,
 			__experimentalLayout: LAYOUT,
-			placeholder: hasCustomPlaceholder ? undefined : placeholder,
+			placeholder:
+				! isVisible || hasCustomPlaceholder ? undefined : placeholder,
 		}
 	);
 

@@ -111,9 +111,10 @@ function Navigation( {
 	const hasExistingNavItems = !! innerBlocks.length;
 	const { selectBlock } = useDispatch( blockEditorStore );
 
-	const [ isPlaceholderShown, setIsPlaceholderShown ] = useState(
-		! hasExistingNavItems
-	);
+	const [
+		isNavigationPlaceholderShown,
+		setIsNavigationPlaceholderShown,
+	] = useState( ! hasExistingNavItems );
 
 	const [ isResponsiveMenuOpen, setResponsiveMenuVisibility ] = useState(
 		false
@@ -223,39 +224,9 @@ function Navigation( {
 		);
 	}
 
-	if ( isTemplatePartPlaceholderShown ) {
-		return (
-			<div { ...blockProps }>
-				<TemplatePartPlaceholder
-					area={ area }
-					clientId={ clientId }
-					setAttributes={ setAttributes }
-					enableSelection={ enableSelection }
-					hasResolvedReplacements={ hasResolvedReplacements }
-				/>
-			</div>
-		);
-	}
-
-	if ( isPlaceholderShown ) {
-		const PlaceholderComponent = CustomPlaceholder
-			? CustomPlaceholder
-			: NavigationPlaceholder;
-
-		return (
-			<div { ...blockProps }>
-				<PlaceholderComponent
-					onCreate={ ( blocks, selectNavigationBlock ) => {
-						setIsPlaceholderShown( false );
-						updateInnerBlocks( blocks );
-						if ( selectNavigationBlock ) {
-							selectBlock( clientId );
-						}
-					} }
-				/>
-			</div>
-		);
-	}
+	const PlaceholderComponent = CustomPlaceholder
+		? CustomPlaceholder
+		: NavigationPlaceholder;
 
 	const justifyAllowedControls =
 		orientation === 'vertical'
@@ -360,19 +331,47 @@ function Navigation( {
 				) }
 			</InspectorControls>
 			<nav { ...blockProps }>
+				{ isTemplatePartPlaceholderShown && (
+					<TemplatePartPlaceholder
+						area={ area }
+						clientId={ clientId }
+						setAttributes={ setAttributes }
+						enableSelection={ enableSelection }
+						hasResolvedReplacements={ hasResolvedReplacements }
+					/>
+				) }
+				{ ! hasExistingNavItems &&
+					! isTemplatePartPlaceholderShown &&
+					isNavigationPlaceholderShown && (
+						<PlaceholderComponent
+							onCreate={ ( blocks, selectNavigationBlock ) => {
+								setIsNavigationPlaceholderShown( false );
+								updateInnerBlocks( blocks );
+								if ( selectNavigationBlock ) {
+									selectBlock( clientId );
+								}
+							} }
+						/>
+					) }
 				<ResponsiveWrapper
 					id={ clientId }
 					onToggle={ setResponsiveMenuVisibility }
 					isOpen={ isResponsiveMenuOpen }
 					isResponsive={ isResponsive }
 				>
-					<NavigationInnerBlocks
-						templatePartId={ templatePartId }
-						clientId={ clientId }
-						appender={ CustomAppender }
-						hasCustomPlaceholder={ !! CustomPlaceholder }
-						orientation={ orientation }
-					/>
+					{ isEntityAvailable && (
+						<NavigationInnerBlocks
+							isVisible={
+								hasExistingNavItems ||
+								! isNavigationPlaceholderShown
+							}
+							templatePartId={ templatePartId }
+							clientId={ clientId }
+							appender={ CustomAppender }
+							hasCustomPlaceholder={ !! CustomPlaceholder }
+							orientation={ orientation }
+						/>
+					) }
 				</ResponsiveWrapper>
 			</nav>
 		</RecursionProvider>
