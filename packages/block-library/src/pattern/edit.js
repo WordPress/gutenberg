@@ -32,11 +32,11 @@ const PatternEdit = ( { attributes, clientId, isSelected } ) => {
 	// This replaces the Pattern block wrapper with the content of the pattern.
 	// This change won't be saved unless further changes are made to the InnerBlocks.
 	useEffect( () => {
-		if ( selectedPattern?.blocks ) {
+		if ( hasSelection && selectedPattern?.blocks ) {
 			__unstableMarkNextChangeAsNotPersistent();
 			replaceBlocks( clientId, selectedPattern.blocks );
 		}
-	}, [ hasSelection ] );
+	}, [ hasSelection, selectedPattern?.blocks ] );
 
 	// Run this effect when the component loads.
 	// This adds the Pattern block template as InnerBlocks.
