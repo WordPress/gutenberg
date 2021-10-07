@@ -40,40 +40,114 @@ function getFormatBoundary(
 	const { formats } = value;
 	const newFormats = formats.slice();
 
-	const startFormat = find( newFormats[ startIndex ], {
+	// Which edge?
+	const isIndexAtEnd = ! find( newFormats[ startIndex + 1 ], {
 		type: format.type,
 	} );
 
-	if ( ! startFormat ) {
-		return {
-			start: null,
-			end: null,
-		};
+	const isIndexAtStart = ! find( newFormats[ startIndex - 1 ], {
+		type: format.type,
+	} );
+
+	const isIndexInside = ! isIndexAtStart && ! isIndexAtEnd;
+
+	if ( isIndexAtStart ) {
+		const startFormat = find( newFormats[ startIndex ], {
+			type: format.type,
+		} );
+
+		const index = newFormats[ startIndex ].indexOf( startFormat );
+
+		// Walk "forwards" until the end/trailing "edge" of the matching format.
+		while (
+			newFormats[ endIndex ] &&
+			newFormats[ endIndex ][ index ] === startFormat
+		) {
+			endIndex++;
+		}
 	}
 
-	const index = newFormats[ startIndex ].indexOf( startFormat );
+	if ( isIndexAtEnd ) {
+		// Endindex is always +1 over the edge of the format boundary
+		// so to find the first format we decrement by 1.
+		startIndex = endIndex - 1;
 
-	// Walk "backwards" until the start/leading "edge" of the matching format.
-	while (
-		newFormats[ startIndex ] &&
-		newFormats[ startIndex ][ index ] === startFormat
-	) {
-		startIndex--;
+		const endFormat = find( newFormats[ startIndex ], {
+			type: format.type,
+		} );
+
+		const index = newFormats[ startIndex ].indexOf( endFormat );
+
+		// Walk the startIndex "backwards" until the end/trailing "edge" of the matching format.
+		while (
+			newFormats[ startIndex ] &&
+			newFormats[ startIndex ][ index ] === endFormat
+		) {
+			startIndex--;
+		}
 	}
 
-	endIndex++;
+	if ( isIndexInside ) {
+		const startFormat = find( newFormats[ startIndex ], {
+			type: format.type,
+		} );
 
-	// Walk "forwards" until the end/trailing "edge" of the matching format.
-	while (
-		newFormats[ endIndex ] &&
-		newFormats[ endIndex ][ index ] === startFormat
-	) {
-		endIndex++;
+		const index = newFormats[ startIndex ].indexOf( startFormat );
+
+		while (
+			newFormats[ startIndex ] &&
+			newFormats[ startIndex ][ index ] === startFormat
+		) {
+			startIndex--;
+		}
+
+		while (
+			newFormats[ endIndex ] &&
+			newFormats[ endIndex ][ index ] === startFormat
+		) {
+			endIndex++;
+		}
 	}
 
-	// Return the indicies of the "edges" as the boundaries.
+	// if ( startIndex > 0 ) {
+	// 	startIndex--;
+	// }
+
+	// const startFormat = find( newFormats[ startIndex ], {
+	// 	type: format.type,
+	// } );
+
+	// if ( ! startFormat ) {
+	// 	return {
+	// 		start: null,
+	// 		end: null,
+	// 	};
+	// }
+
+	// const index = newFormats[ startIndex ].indexOf( startFormat );
+
+	// // Walk "backwards" until the start/leading "edge" of the matching format.
+	// while (
+	// 	newFormats[ startIndex ] &&
+	// 	newFormats[ startIndex ][ index ] === startFormat
+	// ) {
+	// 	startIndex--;
+	// }
+
+	// startIndex++;
+	// //endIndex++;
+
+	// // Walk "forwards" until the end/trailing "edge" of the matching format.
+	// while (
+	// 	newFormats[ endIndex ] &&
+	// 	newFormats[ endIndex ][ index ] === startFormat
+	// ) {
+	// 	endIndex++;
+	// }
+
+	// // Return the indicies of the "edges" as the boundaries.
 	return {
-		start: startIndex + 1,
+		start: startIndex,
 		end: endIndex,
 	};
 }
