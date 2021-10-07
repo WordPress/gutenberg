@@ -1003,7 +1003,8 @@ class WP_Theme_JSON_Gutenberg {
 
 				$has_block_gap_support = _wp_array_get( $this->theme_json, array( 'settings', 'spacing', 'blockGap' ) ) !== null;
 				if ( $has_block_gap_support ) {
-					$block_rules .= '.wp-site-blocks > * + * { margin-top: var( --wp--style--block-gap ); margin-bottom: 0; }';
+					$block_rules .= '.wp-site-blocks > * { margin-top: 0; margin-bottom: 0; }';
+					$block_rules .= '.wp-site-blocks > * + * { margin-top: var( --wp--style--block-gap ); }';
 				}
 			}
 		}
