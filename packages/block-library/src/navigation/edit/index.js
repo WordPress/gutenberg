@@ -6,15 +6,8 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
+import { useState, useEffect, useRef, Platform } from '@wordpress/element';
 import {
-	useState,
-	useEffect,
-	useMemo,
-	useRef,
-	Platform,
-} from '@wordpress/element';
-import {
-	__experimentalUseInnerBlocksProps as useInnerBlocksProps,
 	InspectorControls,
 	JustifyToolbar,
 	BlockControls,
@@ -27,7 +20,7 @@ import {
 	getColorClassName,
 	Warning,
 } from '@wordpress/block-editor';
-import { useDispatch, withSelect, withDispatch } from '@wordpress/data';
+import { useDispatch, useSelect, withDispatch } from '@wordpress/data';
 import { PanelBody, ToggleControl, ToolbarGroup } from '@wordpress/components';
 import { compose } from '@wordpress/compose';
 import { __, sprintf } from '@wordpress/i18n';
@@ -38,39 +31,12 @@ import { __, sprintf } from '@wordpress/i18n';
 import useBlockNavigator from '../use-block-navigator';
 import useTemplatePartEntity from '../use-template-part';
 import NavigationPlaceholder from './placeholder';
-import PlaceholderPreview from './placeholder-preview';
 import ResponsiveWrapper from './responsive-wrapper';
 
 // TODO - refactor these to somewhere common?
 import { createTemplatePartId } from '../../template-part/edit/utils/create-template-part-id';
 import TemplatePartPlaceholder from '../../template-part/edit/placeholder';
-
-const ALLOWED_BLOCKS = [
-	'core/navigation-link',
-	'core/search',
-	'core/social-links',
-	'core/page-list',
-	'core/spacer',
-	'core/home-link',
-	'core/site-title',
-	'core/site-logo',
-	'core/navigation-submenu',
-];
-
-const DEFAULT_BLOCK = [ 'core/navigation-link' ];
-
-const DIRECT_INSERT = ( block ) => {
-	return block.innerBlocks.every(
-		( { name } ) =>
-			name === 'core/navigation-link' ||
-			name === 'core/navigation-submenu'
-	);
-};
-
-const LAYOUT = {
-	type: 'default',
-	alignments: [],
-};
+import NavigationInnerBlocks from './inner-blocks';
 
 function getComputedStyle( node ) {
 	return node.ownerDocument.defaultView.getComputedStyle( node );
@@ -100,14 +66,9 @@ function detectColors( colorsDetectionElement, setColor, setBackground ) {
 }
 
 function Navigation( {
-	innerBlocks,
-	selectedBlockHasDescendants,
 	attributes,
 	setAttributes,
 	clientId,
-	hasExistingNavItems,
-	isImmediateParentOfSelectedBlock,
-	isSelected,
 	updateInnerBlocks,
 	className,
 	backgroundColor,
@@ -142,14 +103,21 @@ function Navigation( {
 	const [ hasAlreadyRendered, RecursionProvider ] = useNoRecursiveRenders(
 		templatePartId
 	);
+
+	const innerBlocks = useSelect(
+		( select ) => select( blockEditorStore ).getBlocks( clientId ),
+		[ clientId ]
+	);
+	const hasExistingNavItems = !! innerBlocks.length;
+	const { selectBlock } = useDispatch( blockEditorStore );
+
 	const [ isPlaceholderShown, setIsPlaceholderShown ] = useState(
 		! hasExistingNavItems
 	);
+
 	const [ isResponsiveMenuOpen, setResponsiveMenuVisibility ] = useState(
 		false
 	);
-
-	const { selectBlock } = useDispatch( blockEditorStore );
 
 	const {
 		isResolved,
@@ -168,8 +136,6 @@ function Navigation( {
 	const isTemplatePartPlaceholderShown = ! slug;
 	const isEntityAvailable =
 		! isTemplatePartPlaceholderShown && ! isMissing && isResolved;
-
-	const placeholder = useMemo( () => <PlaceholderPreview />, [] );
 
 	const blockProps = useBlockProps( {
 		ref: navRef,
@@ -193,39 +159,6 @@ function Navigation( {
 			backgroundColor: ! backgroundColor?.slug && backgroundColor?.color,
 		},
 	} );
-
-	// When the block is selected itself or has a top level item selected that
-	// doesn't itself have children, show the standard appender. Else show no
-	// appender.
-	const appender =
-		isSelected ||
-		( isImmediateParentOfSelectedBlock && ! selectedBlockHasDescendants )
-			? undefined
-			: false;
-
-	const innerBlocksProps = useInnerBlocksProps(
-		{
-			className: 'wp-block-navigation__container',
-		},
-		{
-			allowedBlocks: ALLOWED_BLOCKS,
-			__experimentalDefaultBlock: DEFAULT_BLOCK,
-			__experimentalDirectInsert: DIRECT_INSERT,
-			orientation,
-			renderAppender: CustomAppender || appender,
-
-			// Ensure block toolbar is not too far removed from item
-			// being edited when in vertical mode.
-			// see: https://github.com/WordPress/gutenberg/pull/34615.
-			__experimentalCaptureToolbars: orientation !== 'vertical',
-			// Template lock set to false here so that the Nav
-			// Block on the experimental menus screen does not
-			// inherit templateLock={ 'all' }.
-			templateLock: false,
-			__experimentalLayout: LAYOUT,
-			placeholder: ! CustomPlaceholder ? placeholder : undefined,
-		}
-	);
 
 	// Turn on contrast checker for web only since it's not supported on mobile yet.
 	const enableContrastChecking = Platform.OS === 'web';
@@ -433,7 +366,13 @@ function Navigation( {
 					isOpen={ isResponsiveMenuOpen }
 					isResponsive={ isResponsive }
 				>
-					<div { ...innerBlocksProps }></div>
+					<NavigationInnerBlocks
+						templatePartId={ templatePartId }
+						clientId={ clientId }
+						appender={ CustomAppender }
+						hasCustomPlaceholder={ !! CustomPlaceholder }
+						orientation={ orientation }
+					/>
 				</ResponsiveWrapper>
 			</nav>
 		</RecursionProvider>
@@ -441,34 +380,6 @@ function Navigation( {
 }
 
 export default compose( [
-	withSelect( ( select, { clientId } ) => {
-		const innerBlocks = select( blockEditorStore ).getBlocks( clientId );
-		const {
-			getClientIdsOfDescendants,
-			hasSelectedInnerBlock,
-			getSelectedBlockClientId,
-			getBlocks,
-		} = select( blockEditorStore );
-		const isImmediateParentOfSelectedBlock = hasSelectedInnerBlock(
-			clientId,
-			false
-		);
-		const selectedBlockId = getSelectedBlockClientId();
-		const selectedBlockHasDescendants = !! getClientIdsOfDescendants( [
-			selectedBlockId,
-		] )?.length;
-
-		return {
-			innerBlocks: getBlocks( clientId ),
-			isImmediateParentOfSelectedBlock,
-			selectedBlockHasDescendants,
-			hasExistingNavItems: !! innerBlocks.length,
-
-			// This prop is already available but computing it here ensures it's
-			// fresh compared to isImmediateParentOfSelectedBlock
-			isSelected: selectedBlockId === clientId,
-		};
-	} ),
 	withDispatch( ( dispatch, { clientId } ) => {
 		return {
 			updateInnerBlocks( blocks ) {
