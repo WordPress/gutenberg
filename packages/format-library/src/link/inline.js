@@ -37,33 +37,45 @@ function getFormatBoundary(
 	startIndex = value.start,
 	endIndex = value.end
 ) {
+	const EMPTY_BOUNDARIES = {
+		start: null,
+		end: null,
+	};
+
 	const { formats } = value;
 	const newFormats = formats.slice();
 
 	// If there are no matching formats *at* the reputed "end"
 	// then we are already at the end of the format.
-	// Note: this is because endIndex is always +1 more than the end of the format.
+	// This is because endIndex is always +1 more than the
+	// end of the format itself.
 	const isIndexAtEnd = ! find( newFormats[ endIndex ], {
 		type: format.type,
 	} );
 
-	// If we're not at either end then we're in the middle.
-
-	// If the start index is at the end of the boundary then
-	// it is always +1 beyond the edge. Account for that by
-	// decrementing by 1.
+	// Account for endindex being +1 (see above).
 	const initialIndex = isIndexAtEnd ? startIndex - 1 : startIndex;
 
-	const targetFormat = seekTargetFormat(
+	// Retrieve a reference to the target format object
+	// at the initial index.
+	const targetFormat = getTargetFormatObjectReference(
 		newFormats,
 		initialIndex,
 		format.type
 	);
 
+	if ( ! targetFormat ) {
+		return EMPTY_BOUNDARIES;
+	}
+
 	const index = newFormats[ initialIndex ].indexOf( targetFormat );
 
-	// if ( isIndexInside ) {
-	// Walk the startIndex "backwards" until the end/trailing "edge" of the matching format.
+	// If not found...
+	if ( index === -1 ) {
+		return EMPTY_BOUNDARIES;
+	}
+
+	// Walk the startIndex "backwards" to the leading "edge" of the matching format.
 	startIndex = walkToBoundary(
 		newFormats,
 		initialIndex,
@@ -72,7 +84,7 @@ function getFormatBoundary(
 		'backwards'
 	);
 
-	// Walk the endIndex "forwards" until the end/trailing "edge" of the matching format.
+	// Walk the endIndex "forwards" until the trailing "edge" of the matching format.
 	endIndex = walkToBoundary(
 		newFormats,
 		initialIndex,
@@ -91,7 +103,9 @@ function getFormatBoundary(
 	};
 }
 
-function seekTargetFormat( formats, index, type ) {
+// Retrieve a reference to the target format object
+// at the initial index.
+function getTargetFormatObjectReference( formats, index, type ) {
 	return find( formats[ index ], {
 		type,
 	} );
