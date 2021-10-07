@@ -1,13 +1,7 @@
 /**
  * External dependencies
  */
-import {
-	View,
-	TouchableHighlight,
-	Text,
-	ToastAndroid,
-	Platform,
-} from 'react-native';
+import { View, TouchableHighlight, Text } from 'react-native';
 
 /**
  * WordPress dependencies
@@ -18,6 +12,7 @@ import { withPreferredColorScheme } from '@wordpress/compose';
 import { __, sprintf } from '@wordpress/i18n';
 import { sparkles } from '@wordpress/icons';
 import { BlockIcon } from '@wordpress/block-editor';
+import { NativeNotice } from '@wordpress/react-native-bridge';
 // import { useSelect } from '@wordpress/data';
 // import { store as editorStore } from '@wordpress/editor';
 
@@ -58,9 +53,10 @@ function MenuItem( {
 		styles.clipboardBlockDark
 	);
 
-	const isIOS = Platform.OS === 'ios';
+	const isNativeNoticeAvailable = NativeNotice.isAvailable;
 	const shouldDisableTouch =
-		item.isDisabled && ( isIOS || ! item.alreadyPresentInPost );
+		item.isDisabled &&
+		( ! isNativeNoticeAvailable || ! item.alreadyPresentInPost );
 
 	// const { postType } = useSelect( ( select ) => ( {
 	// 	postType: select( editorStore ).getEditedPostAttribute( 'type' ),
@@ -70,9 +66,8 @@ function MenuItem( {
 	const onPress = useCallback( () => {
 		if ( ! item.isDisabled ) {
 			onSelect( item );
-		} else if ( item.alreadyPresentInPost && ! isIOS ) {
-			// Type of block doesn't support multiple instances. We only have a mechanism to
-			// display it in Android
+		} else if ( item.alreadyPresentInPost && isNativeNoticeAvailable ) {
+			// Type of block doesn't support multiple instances.
 
 			const disabledMessage =
 				postType === 'page'
@@ -81,9 +76,9 @@ function MenuItem( {
 					: // translators: %s: name of the block. e.g: "More"
 					  __( 'You already have a %s block on this post.' );
 
-			ToastAndroid.show(
+			NativeNotice.show(
 				sprintf( disabledMessage, blockTitle ),
-				ToastAndroid.SHORT
+				NativeNotice.LENGTH_SHORT
 			);
 		}
 	}, [ item ] );

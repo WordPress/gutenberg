@@ -423,3 +423,4 @@ export function requestGotoCustomerSupportOptions() {
 }
 
 export default RNReactNativeGutenbergBridge;
+export { NativeNotice } from './modules/NativeNotice';
