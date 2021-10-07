@@ -8,7 +8,7 @@ import { __ } from '@wordpress/i18n';
  * Internal dependencies
  */
 import { useHasBorderPanel } from './border-panel';
-import { useHasColorPanel } from './color-panel';
+import { useHasColorPanel } from './color-utils';
 import { useHasDimensionsPanel } from './dimensions-panel';
 import { useHasTypographyPanel } from './typography-panel';
 import ScreenHeader from './header';

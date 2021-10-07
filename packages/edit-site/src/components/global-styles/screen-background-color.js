@@ -1,27 +1,17 @@
 /**
  * WordPress dependencies
  */
-import { __experimentalPanelColorGradientSettings as PanelColorGradientSettings } from '@wordpress/block-editor';
 import { __ } from '@wordpress/i18n';
+import { __experimentalPanelColorGradientSettings as PanelColorGradientSettings } from '@wordpress/block-editor';
 
 /**
  * Internal dependencies
  */
-
+import ScreenHeader from './header';
 import { getSupportedGlobalStylesPanels, useSetting, useStyle } from './hooks';
-import Palette from './palette';
 
-export function useHasColorPanel( name ) {
-	const supports = getSupportedGlobalStylesPanels( name );
-	return (
-		supports.includes( 'color' ) ||
-		supports.includes( 'backgroundColor' ) ||
-		supports.includes( 'background' ) ||
-		supports.includes( 'linkColor' )
-	);
-}
-
-export default function ColorPanel( { name } ) {
+function ScreenBackgroundColor( { name } ) {
+	const parentMenu = name === undefined ? '' : '/blocks/' + name;
 	const supports = getSupportedGlobalStylesPanels( name );
 	const [ solids ] = useSetting( 'color.palette', name );
 	const [ gradients ] = useSetting( 'color.gradients', name );
@@ -31,18 +21,8 @@ export default function ColorPanel( { name } ) {
 		name
 	);
 
-	const [ isLinkEnabled ] = useSetting( 'color.link', name );
-	const [ isTextEnabled ] = useSetting( 'color.text', name );
 	const [ isBackgroundEnabled ] = useSetting( 'color.background', name );
 
-	const hasLinkColor =
-		supports.includes( 'linkColor' ) &&
-		isLinkEnabled &&
-		( solids.length > 0 || areCustomSolidsEnabled );
-	const hasTextColor =
-		supports.includes( 'color' ) &&
-		isTextEnabled &&
-		( solids.length > 0 || areCustomSolidsEnabled );
 	const hasBackgroundColor =
 		supports.includes( 'backgroundColor' ) &&
 		isBackgroundEnabled &&
@@ -50,9 +30,6 @@ export default function ColorPanel( { name } ) {
 	const hasGradientColor =
 		supports.includes( 'background' ) &&
 		( gradients.length > 0 || areCustomGradientsEnabled );
-
-	const [ color, setColor ] = useStyle( 'color.text', name );
-	const [ userColor ] = useStyle( 'color.text', name, 'user' );
 	const [ backgroundColor, setBackgroundColor ] = useStyle(
 		'color.background',
 		name
@@ -64,26 +41,12 @@ export default function ColorPanel( { name } ) {
 	);
 	const [ gradient, setGradient ] = useStyle( 'color.gradient', name );
 	const [ userGradient ] = useStyle( 'color.gradient', name, 'user' );
-	const [ linkColor, setLinkColor ] = useStyle(
-		'elements.link.color.text',
-		name
-	);
-	const [ userLinkColor ] = useStyle(
-		'elements.link.color.text',
-		name,
-		'user'
-	);
 
-	const settings = [];
-	if ( hasTextColor ) {
-		settings.push( {
-			colorValue: color,
-			onColorChange: setColor,
-			label: __( 'Text color' ),
-			clearable: color === userColor,
-		} );
+	if ( ! hasBackgroundColor && ! hasGradientColor ) {
+		return null;
 	}
 
+	const settings = [];
 	let backgroundSettings = {};
 	if ( hasBackgroundColor ) {
 		backgroundSettings = {
@@ -107,26 +70,22 @@ export default function ColorPanel( { name } ) {
 		}
 	}
 
-	if ( hasBackgroundColor || hasGradientColor ) {
-		settings.push( {
-			...backgroundSettings,
-			...gradientSettings,
-			label: __( 'Background color' ),
-		} );
-	}
-
-	if ( hasLinkColor ) {
-		settings.push( {
-			colorValue: linkColor,
-			onColorChange: setLinkColor,
-			label: __( 'Link color' ),
-			clearable: linkColor === userLinkColor,
-		} );
-	}
+	settings.push( {
+		...backgroundSettings,
+		...gradientSettings,
+		label: __( 'Background color' ),
+	} );
 
 	return (
 		<>
-			<Palette contextName={ name } />
+			<ScreenHeader
+				back={ parentMenu + '/colors' }
+				title={ __( 'Background' ) }
+				description={ __(
+					'Set the background color choosing from the palette or pick your own'
+				) }
+			/>
+
 			<PanelColorGradientSettings
 				title={ __( 'Color' ) }
 				settings={ settings }
@@ -139,3 +98,5 @@ export default function ColorPanel( { name } ) {
 		</>
 	);
 }
+
+export default ScreenBackgroundColor;
