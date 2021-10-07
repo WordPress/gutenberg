@@ -104,21 +104,14 @@ export function usePasteHandler( props ) {
 			}
 
 			const files = [ ...getFilesFromDataTransfer( clipboardData ) ];
-			const isInternal = clipboardData.getData( 'rich-text' ) === 'true';
+			const richTextValue = clipboardData._richTextTransferData;
 
 			// If the data comes from a rich text instance, we can directly use it
 			// without filtering the data. The filters are only meant for externally
 			// pasted content and remove inline styles.
-			if ( isInternal ) {
-				const pastedValue = create( {
-					html,
-					multilineTag,
-					multilineWrapperTags:
-						multilineTag === 'li' ? [ 'ul', 'ol' ] : undefined,
-					preserveWhiteSpace,
-				} );
-				addActiveFormats( pastedValue, value.activeFormats );
-				onChange( insert( value, pastedValue ) );
+			if ( richTextValue ) {
+				addActiveFormats( richTextValue, value.activeFormats );
+				onChange( insert( value, richTextValue ) );
 				return;
 			}
 
