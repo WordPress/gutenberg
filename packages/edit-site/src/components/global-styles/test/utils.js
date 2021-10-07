@@ -1,7 +1,7 @@
 /**
  * Internal dependencies
  */
-import { getPresetVariable, getValueFromVariable } from '../utils';
+import { getPresetVariableFromValue, getValueFromVariable } from '../utils';
 
 describe( 'editor utils', () => {
 	const styles = {
@@ -49,15 +49,15 @@ describe( 'editor utils', () => {
 		isGlobalStylesUserThemeJSON: true,
 	};
 
-	describe( 'getPresetVariable', () => {
+	describe( 'getPresetVariableFromValue', () => {
 		const context = 'root';
-		const propertyName = 'color';
+		const propertyName = 'color.text';
 		const value = '#007cba';
 
 		describe( 'when a provided global style (e.g. fontFamily, color,etc.) does not exist', () => {
 			it( 'returns the originally provided value', () => {
-				const actual = getPresetVariable(
-					styles,
+				const actual = getPresetVariableFromValue(
+					styles.settings,
 					context,
 					'fakePropertyName',
 					value
@@ -68,8 +68,8 @@ describe( 'editor utils', () => {
 
 		describe( 'when a global style is cleared by the user', () => {
 			it( 'returns an undefined preset variable', () => {
-				const actual = getPresetVariable(
-					styles,
+				const actual = getPresetVariableFromValue(
+					styles.settings,
 					context,
 					propertyName,
 					undefined
@@ -82,8 +82,8 @@ describe( 'editor utils', () => {
 			describe( 'and it is not a preset value (e.g. custom color)', () => {
 				it( 'returns the originally provided value', () => {
 					const customValue = '#6e4545';
-					const actual = getPresetVariable(
-						styles,
+					const actual = getPresetVariableFromValue(
+						styles.settings,
 						context,
 						propertyName,
 						customValue
@@ -94,8 +94,8 @@ describe( 'editor utils', () => {
 
 			describe( 'and it is a preset value', () => {
 				it( 'returns the preset variable', () => {
-					const actual = getPresetVariable(
-						styles,
+					const actual = getPresetVariableFromValue(
+						styles.settings,
 						context,
 						propertyName,
 						value
@@ -110,7 +110,7 @@ describe( 'editor utils', () => {
 		describe( 'when provided an invalid variable', () => {
 			it( 'returns the originally provided value', () => {
 				const actual = getValueFromVariable(
-					styles,
+					styles.settings,
 					'root',
 					undefined
 				);
@@ -122,7 +122,7 @@ describe( 'editor utils', () => {
 		describe( 'when provided a preset variable', () => {
 			it( 'retrieves the correct preset value', () => {
 				const actual = getValueFromVariable(
-					styles,
+					styles.settings,
 					'root',
 					'var:preset|color|primary'
 				);
@@ -134,7 +134,7 @@ describe( 'editor utils', () => {
 		describe( 'when provided a custom variable', () => {
 			it( 'retrieves the correct custom value', () => {
 				const actual = getValueFromVariable(
-					styles,
+					styles.settings,
 					'root',
 					'var(--wp--custom--color--secondary)'
 				);

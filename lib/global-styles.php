@@ -274,6 +274,7 @@ function gutenberg_global_styles_filter_post( $content ) {
  */
 function gutenberg_global_styles_kses_init_filters() {
 	add_filter( 'content_save_pre', 'gutenberg_global_styles_filter_post' );
+	add_filter( 'safe_style_css', 'gutenberg_global_styles_include_support_for_duotone', 10, 2 );
 }
 
 /**
@@ -343,6 +344,18 @@ function gutenberg_global_styles_include_support_for_wp_variables( $allow_css, $
 		return $allow_css;
 	}
 	return ! ! preg_match( '/^var\(--wp-[a-zA-Z0-9\-]+\)$/', trim( $parts[1] ) );
+}
+
+/**
+ * This is for using kses to test user data.
+ *
+ * @param array $atts Allowed CSS property names, according to kses.
+ *
+ * @return array The new allowed CSS property names.
+ */
+function gutenberg_global_styles_include_support_for_duotone( $atts ) {
+	$atts[] = 'filter';
+	return $atts;
 }
 
 // The else clause can be removed when plugin support requires WordPress 5.8.0+.
