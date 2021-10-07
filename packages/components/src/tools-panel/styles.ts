@@ -61,7 +61,8 @@ export const ToolsPanelHeader = css`
 	justify-content: space-between;
 	line-height: normal;
 
-	.components-tools-panel & {
+	/* Required to meet specificity requirements to ensure zero margin */
+	&& {
 		margin: 0;
 	}
 
