@@ -137,7 +137,7 @@ $preview-image-height: 140px;
 
 	&:hover,
 	&:focus {
-		background-color: $gray-300;
+		background-color: $gray-100;
 	}
 
 	// The added specificity is needed to override.
@@ -407,7 +407,7 @@ $preview-image-height: 140px;
 	}
 }
 
-// Specificity overide
+// Specificity override
 .block-editor-link-control__search-results div[role="menu"] > .block-editor-link-control__search-item.block-editor-link-control__search-item {
 	padding: 10px;
 }
