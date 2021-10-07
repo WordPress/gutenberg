@@ -96,6 +96,9 @@
 		}
 
 		// Draw the dashed outline.
+		// By setting the dashed border to currentColor, we ensure it's visible
+		// against any background color.
+		color: currentColor;
 		&::before {
 			content: "";
 			display: block;
@@ -117,7 +120,6 @@
 			width: auto;
 		}
 
-		color: currentColor;
 		.components-button.components-button {
 			color: inherit;
 			padding: 0;
