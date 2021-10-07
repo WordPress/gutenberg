@@ -32,8 +32,8 @@ export default function EditTemplatePartMenuButton() {
 function EditTemplatePartMenuItem( { selectedClientIds, onClose } ) {
 	const selectedTemplatePart = useSelect(
 		( select ) => {
-			const [ block ] = select( blockEditorStore ).getBlocksByClientId(
-				selectedClientIds
+			const block = select( blockEditorStore ).getBlock(
+				selectedClientIds[ 0 ]
 			);
 
 			if ( block && isTemplatePart( block ) ) {
