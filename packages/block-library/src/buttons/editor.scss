@@ -7,7 +7,12 @@ $blocks-block__margin: 0.5em;
 }
 
 .wp-block-buttons {
-	// Specificity needed to override editor auto block margins.
+	// Override editor auto block margins for button as well as the block appender.
+	> .wp-block {
+		margin: 0;
+	}
+
+	// Specificity needed in some themes to override editor auto block margins for the button.
 	> .wp-block.wp-block-button {
 		margin: 0;
 	}
