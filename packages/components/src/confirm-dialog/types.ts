@@ -8,18 +8,19 @@ export type DialogInputEvent =
 	| KeyboardEvent< HTMLDivElement >
 	| MouseEvent< HTMLButtonElement >;
 
-interface Props {
-	isOpen: undefined;
+interface BaseProps {
+	title?: string;
 	message: string;
 	onConfirm: ( event: DialogInputEvent ) => void;
 	onCancel?: ( event: DialogInputEvent ) => void;
 }
 
-export type OwnProps =
-	| Props
-	| {
-			isOpen: boolean;
-			message: string;
-			onConfirm: ( event: DialogInputEvent ) => void;
-			onCancel: ( event: DialogInputEvent ) => void;
-	  };
+interface ControlledProps extends BaseProps {
+	isOpen: boolean;
+}
+
+interface UncontrolledProps extends BaseProps {
+	isOpen?: undefined;
+}
+
+export type OwnProps = ControlledProps | UncontrolledProps;

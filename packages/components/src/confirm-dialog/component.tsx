@@ -85,7 +85,7 @@ function ConfirmDialog(
 				>
 					<Flex justify="flex-end">
 						<Button
-							variant="secondary"
+							variant="tertiary"
 							onClick={ handleEvent( onCancel ) }
 						>
 							{ __( 'Cancel' ) }
