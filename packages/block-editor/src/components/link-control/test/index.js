@@ -226,6 +226,40 @@ describe( 'Basic rendering', () => {
 
 			expect( isEditing() ).toBe( false );
 		} );
+
+		it( 'should display human friendly error message if value URL prop is empty when component is forced into no-editing (preview) mode', async () => {
+			// Why do we need this test?
+			// Occasionally `forceIsEditingLink` is set explictly to `false` which causes the Link UI to render
+			// it's preview even if the `value` has no URL.
+			// for an example of this see the usage in the following file whereby forceIsEditingLink is used to start/stop editing mode:
+			// https://github.com/WordPress/gutenberg/blob/fa5728771df7cdc86369f7157d6aa763649937a7/packages/format-library/src/link/inline.js#L151.
+			// see also: https://github.com/WordPress/gutenberg/issues/17972.
+
+			const valueWithEmptyURL = {
+				url: '',
+				id: 123,
+				type: 'post',
+			};
+
+			act( () => {
+				render(
+					<LinkControl
+						value={ valueWithEmptyURL }
+						forceIsEditingLink={ false }
+					/>,
+					container
+				);
+			} );
+
+			const linkPreview = queryByRole( container, 'generic', {
+				name: 'Currently selected',
+			} );
+
+			const isPreviewError = linkPreview.classList.contains( 'is-error' );
+			expect( isPreviewError ).toBe( true );
+
+			expect( queryByText( linkPreview, 'Link is empty' ) ).toBeTruthy();
+		} );
 	} );
 
 	describe( 'Unlinking', () => {
@@ -562,6 +596,104 @@ describe( 'Manual link entry', () => {
 			);
 		}
 	);
+
+	describe( 'Handling of empty values', () => {
+		const testTable = [
+			[ 'containing only spaces', '        ' ],
+			[ 'containing only tabs', '		' ],
+			[ 'from strings with no length', '' ],
+		];
+
+		it.each( testTable )(
+			'should not allow creation of links %s when using the keyboard',
+			async ( _desc, searchString ) => {
+				act( () => {
+					render( <LinkControl />, container );
+				} );
+
+				// Search Input UI
+				const searchInput = getURLInput();
+
+				let submitButton = queryByRole( container, 'button', {
+					name: 'Submit',
+				} );
+
+				expect( submitButton.disabled ).toBeTruthy();
+				expect( submitButton ).not.toBeNull();
+				expect( submitButton ).toBeInTheDocument();
+
+				// Simulate searching for a term
+				act( () => {
+					Simulate.change( searchInput, {
+						target: { value: searchString },
+					} );
+				} );
+
+				// fetchFauxEntitySuggestions resolves on next "tick" of event loop
+				await eventLoopTick();
+
+				// Attempt to submit the empty search value in the input.
+				act( () => {
+					Simulate.keyDown( searchInput, { keyCode: ENTER } );
+				} );
+
+				submitButton = queryByRole( container, 'button', {
+					name: 'Submit',
+				} );
+
+				// Verify the UI hasn't allowed submission.
+				expect( searchInput ).toBeInTheDocument();
+				expect( submitButton.disabled ).toBeTruthy();
+				expect( submitButton ).not.toBeNull();
+				expect( submitButton ).toBeInTheDocument();
+			}
+		);
+
+		it.each( testTable )(
+			'should not allow creation of links %s via the UI "submit" button',
+			async ( _desc, searchString ) => {
+				act( () => {
+					render( <LinkControl />, container );
+				} );
+
+				// Search Input UI
+				const searchInput = getURLInput();
+
+				let submitButton = queryByRole( container, 'button', {
+					name: 'Submit',
+				} );
+
+				expect( submitButton.disabled ).toBeTruthy();
+				expect( submitButton ).not.toBeNull();
+				expect( submitButton ).toBeInTheDocument();
+
+				// Simulate searching for a term
+				act( () => {
+					Simulate.change( searchInput, {
+						target: { value: searchString },
+					} );
+				} );
+
+				// fetchFauxEntitySuggestions resolves on next "tick" of event loop
+				await eventLoopTick();
+
+				// Attempt to submit the empty search value in the input.
+				act( () => {
+					Simulate.click( submitButton );
+				} );
+
+				submitButton = queryByRole( container, 'button', {
+					name: 'Submit',
+				} );
+
+				// Verify the UI hasn't allowed submission.
+				expect( searchInput ).toBeInTheDocument();
+				expect( submitButton.disabled ).toBeTruthy();
+				expect( submitButton ).not.toBeNull();
+				expect( submitButton ).toBeInTheDocument();
+			}
+		);
+	} );
 
 	describe( 'Alternative link protocols and formats', () => {
 		it.each( [

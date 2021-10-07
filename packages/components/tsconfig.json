@@ -46,6 +46,7 @@
 		"src/menu-item/**/*",
 		"src/menu-group/**/*",
 		"src/navigable-container/**/*",
+		"src/navigator/**/*",
 		"src/number-control/**/*",
 		"src/popover/**/*",
 		"src/range-control/**/*",

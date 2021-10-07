@@ -72,5 +72,5 @@ function useCurrentPageContext() {
 		}
 
 		return null;
-	} );
+	}, [] );
 }

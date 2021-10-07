@@ -101,7 +101,7 @@ export const dropdown = () => (
 	</Flyout>
 );
 
-export const SimpleColorSwatch = ( { color, style } ) => (
+const SimpleColorSwatch = ( { color, style } ) => (
 	<div
 		style={ {
 			...style,

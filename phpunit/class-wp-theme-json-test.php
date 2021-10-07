@@ -234,6 +234,64 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 		);
 	}
 
+	function test_get_stylesheet_skips_disabled_protected_properties() {
+		$theme_json = new WP_Theme_JSON_Gutenberg(
+			array(
+				'version'  => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
+				'settings' => array(
+					'spacing' => array(
+						'blockGap' => null,
+					),
+				),
+				'styles'   => array(
+					'spacing' => array(
+						'blockGap' => '1em',
+					),
+					'blocks'  => array(
+						'core/columns' => array(
+							'spacing' => array(
+								'blockGap' => '24px',
+							),
+						),
+					),
+				),
+			)
+		);
+
+		$expected = '.wp-site-blocks > .alignleft { float: left; margin-right: 2em; }.wp-site-blocks > .alignright { float: right; margin-left: 2em; }.wp-site-blocks > .aligncenter { justify-content: center; margin-left: auto; margin-right: auto; }';
+		$this->assertEquals( $expected, $theme_json->get_stylesheet() );
+		$this->assertEquals( $expected, $theme_json->get_stylesheet( 'block_styles' ) );
+	}
+
+	function test_get_stylesheet_renders_enabled_protected_properties() {
+		$theme_json = new WP_Theme_JSON_Gutenberg(
+			array(
+				'version'  => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
+				'settings' => array(
+					'spacing' => array(
+						'blockGap' => true,
+					),
+				),
+				'styles'   => array(
+					'spacing' => array(
+						'blockGap' => '1em',
+					),
+					'blocks'  => array(
+						'core/columns' => array(
+							'spacing' => array(
+								'blockGap' => '24px',
+							),
+						),
+					),
+				),
+			)
+		);
+
+		$expected = 'body{--wp--style--block-gap: 1em;}.wp-site-blocks > .alignleft { float: left; margin-right: 2em; }.wp-site-blocks > .alignright { float: right; margin-left: 2em; }.wp-site-blocks > .aligncenter { justify-content: center; margin-left: auto; margin-right: auto; }.wp-site-blocks > * + * { margin-top: var( --wp--style--block-gap ); margin-bottom: 0; }.wp-block-columns{--wp--style--block-gap: 24px;}';
+		$this->assertEquals( $expected, $theme_json->get_stylesheet() );
+		$this->assertEquals( $expected, $theme_json->get_stylesheet( 'block_styles' ) );
+	}
+
 	function test_get_stylesheet() {
 		$theme_json = new WP_Theme_JSON_Gutenberg(
 			array(
@@ -824,7 +882,9 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 			'version'  => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
 			'settings' => array(
 				'color'      => array(
-					'duotone'   => array(),
+					'duotone'   => array(
+						'theme' => array(),
+					),
 					'gradients' => array(
 						'theme' => array(),
 					),
@@ -912,9 +972,11 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 				'color'      => array(
 					'custom'    => false,
 					'duotone'   => array(
-						array(
-							'slug'   => 'value',
-							'colors' => array( 'red', 'green' ),
+						'theme' => array(
+							array(
+								'slug'   => 'value',
+								'colors' => array( 'red', 'green' ),
+							),
 						),
 					),
 					'gradients' => array(
@@ -974,6 +1036,16 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 						),
 					),
 					'blocks'   => array(
+						'core/image'  => array(
+							'filter' => array(
+								'duotone' => 'var:preset|duotone|blue-red',
+							),
+						),
+						'core/cover'  => array(
+							'filter' => array(
+								'duotone' => 'var(--wp--preset--duotone--blue-red, var(--fallback-unsafe))',
+							),
+						),
 						'core/group'  => array(
 							'color'    => array(
 								'gradient' => 'url(\'data:image/svg+xml;base64,PHN2ZyB4bWxucz0naHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmcnIHdpZHRoPScxMCcgaGVpZ2h0PScxMCc+PHNjcmlwdD5hbGVydCgnb2snKTwvc2NyaXB0PjxsaW5lYXJHcmFkaWVudCBpZD0nZ3JhZGllbnQnPjxzdG9wIG9mZnNldD0nMTAlJyBzdG9wLWNvbG9yPScjRjAwJy8+PHN0b3Agb2Zmc2V0PSc5MCUnIHN0b3AtY29sb3I9JyNmY2MnLz4gPC9saW5lYXJHcmFkaWVudD48cmVjdCBmaWxsPSd1cmwoI2dyYWRpZW50KScgeD0nMCcgeT0nMCcgd2lkdGg9JzEwMCUnIGhlaWdodD0nMTAwJScvPjwvc3ZnPg==\')',
@@ -1011,6 +1083,11 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 					),
 				),
 				'blocks'   => array(
+					'core/image' => array(
+						'filter' => array(
+							'duotone' => 'var:preset|duotone|blue-red',
+						),
+					),
 					'core/group' => array(
 						'color'    => array(
 							'text' => 'var:preset|color|dark-gray',

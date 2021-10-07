@@ -11,6 +11,7 @@ import { isBlobURL } from '@wordpress/blob';
 import { useEffect, useState, useRef } from '@wordpress/element';
 import { __, isRTL } from '@wordpress/i18n';
 import {
+	MenuItem,
 	Notice,
 	PanelBody,
 	RangeControl,
@@ -34,7 +35,7 @@ import {
 } from '@wordpress/block-editor';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
-import { crop, siteLogo as icon } from '@wordpress/icons';
+import { crop, reset, siteLogo as icon } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -326,7 +327,7 @@ export default function LogoEdit( {
 		const _siteLogo = siteSettings?.site_logo;
 		const _readOnlyLogo = siteData?.site_logo;
 		const _canUserEdit = canUser( 'update', 'settings' );
-		const _siteLogoId = _siteLogo || _readOnlyLogo;
+		const _siteLogoId = _canUserEdit ? _siteLogo : _readOnlyLogo;
 		const mediaItem =
 			_siteLogoId &&
 			select( coreStore ).getMedia( _siteLogoId, {
@@ -380,6 +381,11 @@ export default function LogoEdit( {
 		setLogo( media.id );
 	};
 
+	const onRemoveLogo = () => {
+		setLogo( null );
+		setLogoUrl( undefined );
+	};
+
 	const onUploadError = ( message ) => {
 		setError( message[ 2 ] ? message[ 2 ] : null );
 	};
@@ -392,7 +398,11 @@ export default function LogoEdit( {
 				accept={ ACCEPT_MEDIA_STRING }
 				onSelect={ onSelectLogo }
 				onError={ onUploadError }
-			/>
+			>
+				<MenuItem icon={ reset } onClick={ onRemoveLogo }>
+					{ __( 'Reset' ) }
+				</MenuItem>
+			</MediaReplaceFlow>
 		</BlockControls>
 	);
 

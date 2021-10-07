@@ -27,6 +27,7 @@ export const ROOT_BLOCK_SUPPORTS = [
 	'lineHeight',
 	'textDecoration',
 	'textTransform',
+	'padding',
 ];
 
 export const PRESET_METADATA = [

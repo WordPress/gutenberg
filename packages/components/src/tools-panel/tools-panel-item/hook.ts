@@ -88,7 +88,7 @@ export function useToolsPanelItem(
 	// Determine if the panel item's corresponding menu is being toggled and
 	// trigger appropriate callback if it is.
 	useEffect( () => {
-		if ( isResetting ) {
+		if ( isResetting || currentPanelId !== panelId ) {
 			return;
 		}
 
@@ -99,7 +99,14 @@ export function useToolsPanelItem(
 		if ( ! isMenuItemChecked && wasMenuItemChecked ) {
 			onDeselect?.();
 		}
-	}, [ isMenuItemChecked, wasMenuItemChecked, isValueSet, isResetting ] );
+	}, [
+		currentPanelId,
+		isMenuItemChecked,
+		isResetting,
+		isValueSet,
+		panelId,
+		wasMenuItemChecked,
+	] );
 
 	// The item is shown if it is a default control regardless of whether it
 	// has a value. Optional items are shown when they are checked or have
