@@ -90,7 +90,8 @@ function render_block_core_comment_avatar( $attributes, $content, $block ) {
 
 	$width  = isset( $attributes['width'] ) ? $attributes['width'] : '96';
 	$height = isset( $attributes['height'] ) ? $attributes['height'] : '96';
-	$alt    = sprintf( __( '%s Avatar' ), $comment->comment_author );
+	/* translators: %s is the Comment Author name */
+	$alt = sprintf( __( '%s Avatar' ), $comment->comment_author );
 
 	return sprintf(
 		'<div %1$s>%2$s</div>',
