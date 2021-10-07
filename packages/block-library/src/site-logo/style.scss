@@ -12,8 +12,8 @@
 	}
 
 	// Inherit border radius from style variations.
-	&.is-default-size a,
-	&.is-default-size img {
+	a,
+	img {
 		border-radius: inherit;
 	}
 

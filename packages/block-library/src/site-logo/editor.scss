@@ -51,14 +51,26 @@
 		border-radius: inherit;
 	}
 
+	// Match the default logo size.
+	&.is-default-size .components-placeholder {
+		height: 120px;
+		width: 120px;
+	}
+
 	.components-placeholder {
 		justify-content: center;
 		align-items: center;
-		min-height: auto;
 		box-shadow: none;
-		height: 120px;
 		padding: 0;
 
+		// Provide a minimum size for the placeholder, for when the logo is resized.
+		// @todo: resizing is currently only possible by adding an image, resizing,
+		// and then removing the image again. We might want to enable resizing on the
+		// placeholder itself.
+		min-height: $grid-unit-60;
+		min-width: $grid-unit-60;
+		height: 100%;
+		width: 100%;
 
 		// Hide the upload button, as it's also available in the media library.
 		.components-form-file-upload {
@@ -135,6 +147,8 @@
 			right: 0;
 			bottom: 0;
 			left: 0;
+			width: 100%;
+			height: 100%;
 			stroke: currentColor;
 			stroke-dasharray: 3;
 			opacity: 0.3;
