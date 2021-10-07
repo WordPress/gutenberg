@@ -6,6 +6,10 @@ import { css } from '@emotion/react';
 /**
  * Internal dependencies
  */
+import {
+	StyledField as BaseControlField,
+	Wrapper as BaseControlWrapper,
+} from '../base-control/styles/base-control-styles';
 import { COLORS, CONFIG } from '../utils';
 import { space } from '../ui/utils/space';
 
@@ -96,10 +100,11 @@ export const ToolsPanelItem = css`
 		max-width: 100%;
 	}
 
-	& > .components-base-control:last-child {
+	/* Remove BaseControl components margins and leave spacing to grid layout */
+	&& > ${ BaseControlWrapper } {
 		margin-bottom: 0;
 
-		.components-base-control__field {
+		${ BaseControlField } {
 			margin-bottom: 0;
 		}
 	}
