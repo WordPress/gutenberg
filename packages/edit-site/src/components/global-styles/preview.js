@@ -18,11 +18,12 @@ const StylesPreview = () => {
 	const [ textColor = 'black' ] = useStyle( 'color.text' );
 	const [ linkColor = 'blue' ] = useStyle( 'elements.link.color.text' );
 	const [ backgroundColor = 'white' ] = useStyle( 'color.background' );
+	const [ gradientValue ] = useStyle( 'color.gradient' );
 
 	return (
 		<Card
 			className="edit-site-global-styles-preview"
-			style={ { background: backgroundColor } }
+			style={ { background: gradientValue ?? backgroundColor } }
 		>
 			<HStack spacing={ 5 }>
 				<div style={ { fontFamily, fontSize: '80px' } }>Aa</div>

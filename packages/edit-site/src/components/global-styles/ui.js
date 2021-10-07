@@ -16,6 +16,9 @@ import ScreenBlock from './screen-block';
 import ScreenTypography from './screen-typography';
 import ScreenColors from './screen-colors';
 import ScreenColorPalette from './screen-color-palette';
+import ScreenBackgroundColor from './screen-background-color';
+import ScreenTextColor from './screen-text-color';
+import ScreenLinkColor from './screen-link-color';
 import ScreenLayout from './screen-layout';
 
 function ContextScreens( { name } ) {
@@ -33,6 +36,18 @@ function ContextScreens( { name } ) {
 
 			<NavigatorScreen path={ parentMenu + '/colors/palette' }>
 				<ScreenColorPalette name={ name } />
+			</NavigatorScreen>
+
+			<NavigatorScreen path={ parentMenu + '/colors/background' }>
+				<ScreenBackgroundColor name={ name } />
+			</NavigatorScreen>
+
+			<NavigatorScreen path={ parentMenu + '/colors/text' }>
+				<ScreenTextColor name={ name } />
+			</NavigatorScreen>
+
+			<NavigatorScreen path={ parentMenu + '/colors/link' }>
+				<ScreenLinkColor name={ name } />
 			</NavigatorScreen>
 
 			<NavigatorScreen path={ parentMenu + '/layout' }>
