@@ -7,6 +7,11 @@
 	"description": "Post comment content",
 	"textdomain": "default",
 	"usesContext": [ "commentId" ],
+	"attributes": {
+		"textAlign": {
+			"type": "string"
+		}
+	},
 	"supports": {
 		"color": {
 			"link": true
