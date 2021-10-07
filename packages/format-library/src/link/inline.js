@@ -20,7 +20,6 @@ import {
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import { useSelect } from '@wordpress/data';
-import { __unstableStripHTML as stripHTML } from '@wordpress/dom';
 
 /**
  * Internal dependencies
@@ -108,7 +107,7 @@ function InlineLinkUI( {
 	const richLinkTextValue = slice( value, textStart, textEnd );
 
 	// Get the text content minus any HTML tags.
-	const richTextText = stripHTML( richLinkTextValue.text );
+	const richTextText = richLinkTextValue.text;
 
 	/**
 	 * Pending settings to be applied to the next link. When inserting a new
