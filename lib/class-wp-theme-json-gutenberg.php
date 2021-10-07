@@ -247,16 +247,7 @@ class WP_Theme_JSON_Gutenberg {
 		'--wp--style--block-gap'     => array( 'spacing', 'blockGap' ),
 		'text-decoration'            => array( 'typography', 'textDecoration' ),
 		'text-transform'             => array( 'typography', 'textTransform' ),
-	);
-
-	/**
-	 * Metadata for style properties that need to use the duotone selector.
-	 *
-	 * Each element is a direct mapping from the CSS property name to the
-	 * path to the value in theme.json & block attributes.
-	 */
-	const DUOTONE_PROPERTIES_METADATA = array(
-		'filter' => array( 'filter', 'duotone' ),
+		'filter'                     => array( 'filter', 'duotone' ),
 	);
 
 	/**
@@ -981,7 +972,25 @@ class WP_Theme_JSON_Gutenberg {
 			$selector     = $metadata['selector'];
 			$settings     = _wp_array_get( $this->theme_json, array( 'settings' ) );
 			$declarations = self::compute_style_properties( $node, $settings );
+
+			// 1. Separate the ones who use the general selector
+			// and the ones who use the duotone selector.
+			$declarations_duotone = array();
+			foreach ( $declarations as $index => $declaration ) {
+				if ( 'filter' === $declaration['name'] ) {
+					unset( $declarations[ $index ] );
+					$declarations_duotone[] = $declaration;
+				}
+			}
+
+			// 2. Generate the rules that use the general selector.
 			$block_rules .= self::to_ruleset( $selector, $declarations );
+
+			// 3. Generate the rules that use the duotone selector.
+			if ( isset( $metadata['duotone'] ) && ! empty( $declarations_duotone ) ) {
+				$selector_duotone = self::scope_selector( $metadata['selector'], $metadata['duotone'] );
+				$block_rules     .= self::to_ruleset( $selector_duotone, $declarations_duotone );
+			}
 
 			if ( self::ROOT_BLOCK_SELECTOR === $selector ) {
 				$block_rules .= '.wp-site-blocks > .alignleft { float: left; margin-right: 2em; }';
@@ -992,12 +1001,6 @@ class WP_Theme_JSON_Gutenberg {
 				if ( $has_block_gap_support ) {
 					$block_rules .= '.wp-site-blocks > * + * { margin-top: var( --wp--style--block-gap ); margin-bottom: 0; }';
 				}
-			}
-
-			if ( isset( $metadata['duotone'] ) ) {
-				$selector     = self::scope_selector( $metadata['selector'], $metadata['duotone'] );
-				$declarations = self::compute_style_properties( $node, $settings, self::DUOTONE_PROPERTIES_METADATA );
-				$block_rules .= self::to_ruleset( $selector, $declarations );
 			}
 		}
 
