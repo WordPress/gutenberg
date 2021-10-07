@@ -19,7 +19,6 @@ import { compose } from '@wordpress/compose';
 /**
  * Internal dependencies
  */
-import { textFormattingShortcuts } from './config';
 import Shortcut from './shortcut';
 import DynamicShortcut from './dynamic-shortcut';
 import { store as editPostStore } from '../../store';
@@ -132,9 +131,9 @@ export function KeyboardShortcutHelpModal( { isModalActive, toggleModal } ) {
 					},
 				] }
 			/>
-			<ShortcutSection
+			<ShortcutCategorySection
 				title={ __( 'Text formatting' ) }
-				shortcuts={ textFormattingShortcuts }
+				categoryName="text"
 			/>
 		</Modal>
 	);

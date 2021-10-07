@@ -6,7 +6,6 @@ import { createBlock } from '@wordpress/blocks';
 import {
 	RichText,
 	BlockControls,
-	RichTextShortcut,
 	useBlockProps,
 } from '@wordpress/block-editor';
 import { ToolbarButton } from '@wordpress/components';
@@ -29,12 +28,65 @@ import {
 	formatOutdent,
 	formatOutdentRTL,
 } from '@wordpress/icons';
+import { useEffect } from '@wordpress/element';
+import {
+	store as keyboardShortcutsStore,
+	useShortcut,
+} from '@wordpress/keyboard-shortcuts';
+import { useDispatch } from '@wordpress/data';
 
 /**
  * Internal dependencies
  */
 import { name } from './';
 import OrderedListSettings from './ordered-list-settings';
+
+function Shortcuts( { onChange, value, tagName } ) {
+	const { registerShortcut } = useDispatch( keyboardShortcutsStore );
+
+	useShortcut( 'core/block-library/list/indent', ( event ) => {
+		onChange( indentListItems( value, { type: tagName } ) );
+		event.preventDefault();
+	} );
+	useShortcut( 'core/block-library/list/outdent', ( event ) => {
+		onChange( outdentListItems( value ) );
+		event.preventDefault();
+	} );
+	useEffect( () => {
+		registerShortcut( {
+			name: 'core/block-library/list/indent',
+			category: 'text',
+			description: __( 'Indent the list item.' ),
+			keyCombination: {
+				modifier: 'primary',
+				character: 'm',
+			},
+			aliases: [
+				{
+					modifier: 'primary',
+					character: ']',
+				},
+			],
+		} );
+		registerShortcut( {
+			name: 'core/block-library/list/outdent',
+			category: 'text',
+			description: __( 'Outdent the list item.' ),
+			keyCombination: {
+				modifier: 'primaryShift',
+				character: 'm',
+			},
+			aliases: [
+				{
+					modifier: 'primary',
+					character: '[',
+				},
+			],
+		} );
+	}, [ registerShortcut ] );
+
+	return null;
+}
 
 export default function ListEdit( {
 	attributes,
@@ -48,34 +100,7 @@ export default function ListEdit( {
 
 	const controls = ( { value, onChange, onFocus } ) => (
 		<>
-			<RichTextShortcut
-				type="primary"
-				character="["
-				onUse={ () => {
-					onChange( outdentListItems( value ) );
-				} }
-			/>
-			<RichTextShortcut
-				type="primary"
-				character="]"
-				onUse={ () => {
-					onChange( indentListItems( value, { type: tagName } ) );
-				} }
-			/>
-			<RichTextShortcut
-				type="primary"
-				character="m"
-				onUse={ () => {
-					onChange( indentListItems( value, { type: tagName } ) );
-				} }
-			/>
-			<RichTextShortcut
-				type="primaryShift"
-				character="m"
-				onUse={ () => {
-					onChange( outdentListItems( value ) );
-				} }
-			/>
+			<Shortcuts { ...{ value, onChange, tagName } } />
 			<BlockControls group="block">
 				<ToolbarButton
 					icon={ isRTL() ? formatListBulletsRTL : formatListBullets }

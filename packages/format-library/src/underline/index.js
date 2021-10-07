@@ -3,10 +3,13 @@
  */
 import { __ } from '@wordpress/i18n';
 import { toggleFormat } from '@wordpress/rich-text';
+import { __unstableRichTextInputEvent } from '@wordpress/block-editor';
+import { useDispatch } from '@wordpress/data';
+import { useEffect } from '@wordpress/element';
 import {
-	RichTextShortcut,
-	__unstableRichTextInputEvent,
-} from '@wordpress/block-editor';
+	store as keyboardShortcutsStore,
+	useShortcut,
+} from '@wordpress/keyboard-shortcuts';
 
 const name = 'core/underline';
 
@@ -18,7 +21,7 @@ export const underline = {
 	attributes: {
 		style: 'style',
 	},
-	edit( { value, onChange } ) {
+	edit: function Edit( { value, onChange } ) {
 		const onToggle = () => {
 			onChange(
 				toggleFormat( value, {
@@ -30,18 +33,29 @@ export const underline = {
 			);
 		};
 
+		const { registerShortcut } = useDispatch( keyboardShortcutsStore );
+
+		useShortcut( name, ( event ) => {
+			onToggle();
+			event.preventDefault();
+		} );
+		useEffect( () => {
+			registerShortcut( {
+				name,
+				category: 'text',
+				description: __( 'Make the selected text italic.' ),
+				keyCombination: {
+					modifier: 'primary',
+					character: 'u',
+				},
+			} );
+		}, [ registerShortcut ] );
+
 		return (
-			<>
-				<RichTextShortcut
-					type="primary"
-					character="u"
-					onUse={ onToggle }
-				/>
-				<__unstableRichTextInputEvent
-					inputType="formatUnderline"
-					onInput={ onToggle }
-				/>
-			</>
+			<__unstableRichTextInputEvent
+				inputType="formatUnderline"
+				onInput={ onToggle }
+			/>
 		);
 	},
 };

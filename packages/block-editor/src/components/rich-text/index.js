@@ -42,12 +42,10 @@ import { useInputRules } from './use-input-rules';
 import { useEnter } from './use-enter';
 import { useFormatTypes } from './use-format-types';
 import { useRemoveBrowserShortcuts } from './use-remove-browser-shortcuts';
-import { useShortcuts } from './use-shortcuts';
 import { useInputEvents } from './use-input-events';
 import FormatEdit from './format-edit';
 import { getMultilineTag, getAllowedFormats } from './utils';
 
-export const keyboardShortcutContext = createContext();
 export const inputEventContext = createContext();
 
 /**
@@ -255,7 +253,6 @@ function RichTextWrapper(
 	useCaretInFormat( { value } );
 	useMarkPersistent( { html: adjustedValue, value } );
 
-	const keyboardShortcuts = useRef( new Set() );
 	const inputEvents = useRef( new Set() );
 
 	function onKeyDown( event ) {
@@ -305,18 +302,16 @@ function RichTextWrapper(
 	const content = (
 		<>
 			{ isSelected && (
-				<keyboardShortcutContext.Provider value={ keyboardShortcuts }>
-					<inputEventContext.Provider value={ inputEvents }>
-						{ children && children( { value, onChange, onFocus } ) }
-						<FormatEdit
-							value={ value }
-							onChange={ onChange }
-							onFocus={ onFocus }
-							formatTypes={ formatTypes }
-							forwardedRef={ anchorRef }
-						/>
-					</inputEventContext.Provider>
-				</keyboardShortcutContext.Provider>
+				<inputEventContext.Provider value={ inputEvents }>
+					{ children && children( { value, onChange, onFocus } ) }
+					<FormatEdit
+						value={ value }
+						onChange={ onChange }
+						onFocus={ onFocus }
+						formatTypes={ formatTypes }
+						forwardedRef={ anchorRef }
+					/>
+				</inputEventContext.Provider>
 			) }
 			{ isSelected && hasFormats && (
 				<FormatToolbarContainer
@@ -343,7 +338,6 @@ function RichTextWrapper(
 						onReplace,
 					} ),
 					useRemoveBrowserShortcuts(),
-					useShortcuts( keyboardShortcuts ),
 					useInputEvents( inputEvents ),
 					useUndoAutomaticChange(),
 					usePasteHandler( {

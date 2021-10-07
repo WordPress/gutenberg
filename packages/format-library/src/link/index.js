@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { useState } from '@wordpress/element';
+import { useState, useEffect } from '@wordpress/element';
 import {
 	getTextContent,
 	applyFormat,
@@ -11,13 +11,15 @@ import {
 	isCollapsed,
 } from '@wordpress/rich-text';
 import { isURL, isEmail } from '@wordpress/url';
-import {
-	RichTextToolbarButton,
-	RichTextShortcut,
-} from '@wordpress/block-editor';
+import { RichTextToolbarButton } from '@wordpress/block-editor';
 import { decodeEntities } from '@wordpress/html-entities';
 import { link as linkIcon, linkOff } from '@wordpress/icons';
 import { speak } from '@wordpress/a11y';
+import { useDispatch } from '@wordpress/data';
+import {
+	store as keyboardShortcutsStore,
+	useShortcut,
+} from '@wordpress/keyboard-shortcuts';
 
 /**
  * Internal dependencies
@@ -70,14 +72,39 @@ function Edit( {
 		speak( __( 'Link removed.' ), 'assertive' );
 	}
 
+	const { registerShortcut } = useDispatch( keyboardShortcutsStore );
+
+	useShortcut( name, ( event ) => {
+		addLink();
+		event.preventDefault();
+	} );
+	useShortcut( name + '/remove', ( event ) => {
+		onRemoveFormat();
+		event.preventDefault();
+	} );
+	useEffect( () => {
+		registerShortcut( {
+			name,
+			category: 'text',
+			description: __( 'Convert the selected text into a link.' ),
+			keyCombination: {
+				modifier: 'primary',
+				character: 'k',
+			},
+		} );
+		registerShortcut( {
+			name: name + '/remove',
+			category: 'text',
+			description: __( 'Remove a link.' ),
+			keyCombination: {
+				modifier: 'primaryShift',
+				character: 'k',
+			},
+		} );
+	}, [ registerShortcut ] );
+
 	return (
 		<>
-			<RichTextShortcut type="primary" character="k" onUse={ addLink } />
-			<RichTextShortcut
-				type="primaryShift"
-				character="k"
-				onUse={ onRemoveFormat }
-			/>
 			{ isActive && (
 				<RichTextToolbarButton
 					name="link"
