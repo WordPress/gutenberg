@@ -139,11 +139,7 @@ function gutenberg_experimental_global_styles_settings( $settings ) {
 		$settings['__experimentalGlobalStylesBaseStyles']   = $theme->get_raw_data();
 	}
 
-	if (
-		'site-editor' !== $context &&
-		'mobile' !== $context &&
-		( WP_Theme_JSON_Resolver_Gutenberg::theme_has_support() || get_theme_support( 'experimental-link-color' ) )
-	) {
+	if ( 'all' === $context ) {
 		$block_styles  = array( 'css' => gutenberg_experimental_global_styles_get_stylesheet( $consolidated, 'block_styles' ) );
 		$css_variables = array(
 			'css'                     => gutenberg_experimental_global_styles_get_stylesheet( $consolidated, 'css_variables' ),
