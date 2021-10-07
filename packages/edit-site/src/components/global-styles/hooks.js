@@ -345,9 +345,3 @@ export function getSupportedGlobalStylesPanels( name ) {
 
 	return supportKeys;
 }
-
-export function useGlobalStylesIsEnabled() {
-	return useSelect( ( select ) => {
-		return select( editSiteStore ).getSettings().isGlobalStylesUIEnabled;
-	}, [] );
-}
