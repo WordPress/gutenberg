@@ -2,12 +2,8 @@
  * WordPress dependencies
  */
 import { Draggable } from '@wordpress/components';
-/**
- * Internal dependencies
- */
-import BlockDraggableChip from '../block-draggable/draggable-chip';
 
-const InserterDraggableBlocks = ( { isEnabled, blocks, icon, children } ) => {
+const InserterDraggableBlocks = ( { isEnabled, blocks, children } ) => {
 	const transferData = {
 		type: 'inserter',
 		blocks,
@@ -17,9 +13,6 @@ const InserterDraggableBlocks = ( { isEnabled, blocks, icon, children } ) => {
 		<Draggable
 			__experimentalTransferDataType="wp-blocks"
 			transferData={ transferData }
-			__experimentalDragComponent={
-				<BlockDraggableChip count={ blocks.length } icon={ icon } />
-			}
 		>
 			{ ( { onDraggableStart, onDraggableEnd } ) => {
 				return children( {

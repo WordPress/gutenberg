@@ -236,8 +236,9 @@ Undocumented declaration.
 ### BlockTools
 
 Renders block tools (the block toolbar, select/navigation mode toolbar, the
-insertion point and a slot for the inline rich text toolbar). Must be wrapped
-around the block content and editor styles wrapper or iframe.
+insertion point, a slot for the inline rich text toolbar, and the drag chip).
+Also handles block-level keyboard shortcut handling. Must be wrapped around
+the block content and editor styles wrapper or iframe.
 
 _Parameters_
 

@@ -95,52 +95,6 @@ For themes, use add_editor_style (https://developer.wordpress.org/block-editor/h
 	} );
 }
 
-/**
- * Bubbles some event types (keydown, keypress, and dragover) to parent document
- * document to ensure that the keyboard shortcuts and drag and drop work.
- *
- * Ideally, we should remove event bubbling in the future. Keyboard shortcuts
- * should be context dependent, e.g. actions on blocks like Cmd+A should not
- * work globally outside the block editor.
- *
- * @param {Document} doc Document to attach listeners to.
- */
-function bubbleEvents( doc ) {
-	const { defaultView } = doc;
-	const { frameElement } = defaultView;
-
-	function bubbleEvent( event ) {
-		const prototype = Object.getPrototypeOf( event );
-		const constructorName = prototype.constructor.name;
-		const Constructor = window[ constructorName ];
-
-		const init = {};
-
-		for ( const key in event ) {
-			init[ key ] = event[ key ];
-		}
-
-		if ( event instanceof defaultView.MouseEvent ) {
-			const rect = frameElement.getBoundingClientRect();
-			init.clientX += rect.left;
-			init.clientY += rect.top;
-		}
-
-		const newEvent = new Constructor( event.type, init );
-		const cancelled = ! frameElement.dispatchEvent( newEvent );
-
-		if ( cancelled ) {
-			event.preventDefault();
-		}
-	}
-
-	const eventTypes = [ 'dragover' ];
-
-	for ( const name of eventTypes ) {
-		doc.addEventListener( name, bubbleEvent );
-	}
-}
-
 function useParsedAssets( html ) {
 	return useMemo( () => {
 		const doc = document.implementation.createHTMLDocument( '' );
@@ -181,7 +135,6 @@ function Iframe( { contentRef, children, head, tabIndex = 0, ...props }, ref ) {
 				return false;
 			}
 
-			bubbleEvents( contentDocument );
 			setIframeDocument( contentDocument );
 			clearerRef( documentElement );
 
