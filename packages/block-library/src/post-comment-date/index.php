@@ -25,7 +25,7 @@ function render_block_core_post_comment_date( $attributes, $content, $block ) {
 	);
 	$link               = get_comment_link( $block->context['commentId'] );
 
-	if ( isset( $attributes['isLink'] ) && $attributes['isLink'] ) {
+	if ( ! empty( $attributes['isLink'] ) ) {
 		$formatted_date = sprintf( '<a href="%1s">%2s</a>', $link, $formatted_date );
 	}
 
