@@ -42,6 +42,7 @@ const MediaReplaceFlow = ( {
 	name = __( 'Replace' ),
 	createNotice,
 	removeNotice,
+	children,
 } ) => {
 	const [ mediaURLValue, setMediaURLValue ] = useState( mediaURL );
 	const mediaUpload = useSelect( ( select ) => {
@@ -161,6 +162,7 @@ const MediaReplaceFlow = ( {
 								} }
 							/>
 						</MediaUploadCheck>
+						{ children }
 					</NavigableMenu>
 					{ onSelectURL && (
 						// eslint-disable-next-line jsx-a11y/no-noninteractive-element-interactions
