@@ -25,7 +25,7 @@ describe( 'ToggleGroupControl', () => {
 	} );
 	it( 'should call onChange with proper value', () => {
 		const mockOnChange = jest.fn();
-		const { getByLabelText } = render(
+		const { getAllByText } = render(
 			<ToggleGroupControl
 				value="jack"
 				onChange={ mockOnChange }
@@ -34,7 +34,7 @@ describe( 'ToggleGroupControl', () => {
 				{ options }
 			</ToggleGroupControl>
 		);
-		const firstButton = getByLabelText( 'R' );
+		const firstButton = getAllByText( 'R' )[ 0 ];
 		fireEvent.click( firstButton );
 		expect( mockOnChange ).toHaveBeenCalledWith( 'rigas' );
 	} );
