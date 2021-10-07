@@ -7,7 +7,7 @@ import { escape as escapeString, find, get, uniqBy } from 'lodash';
  * WordPress dependencies
  */
 import { __, _x, sprintf } from '@wordpress/i18n';
-import { useMemo, useState } from '@wordpress/element';
+import { useEffect, useMemo, useState } from '@wordpress/element';
 import { FormTokenField, withFilters } from '@wordpress/components';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
@@ -87,6 +87,7 @@ function findOrCreateTerm( termName, restBase ) {
 }
 
 function FlatTermSelector( { slug } ) {
+	const [ values, setValues ] = useState( [] );
 	const [ search, setSearch ] = useState( '' );
 	const debouncedSearch = useDebounce( setSearch, 500 );
 
@@ -96,12 +97,17 @@ function FlatTermSelector( { slug } ) {
 		taxonomy,
 		hasAssignAction,
 		hasCreateAction,
+		hasResolvedTerms,
 	} = useSelect(
 		( select ) => {
 			const { getCurrentPost, getEditedPostAttribute } = select(
 				editorStore
 			);
-			const { getEntityRecords, getTaxonomy } = select( coreStore );
+			const {
+				getEntityRecords,
+				getTaxonomy,
+				hasFinishedResolution,
+			} = select( coreStore );
 			const post = getCurrentPost();
 			const _taxonomy = getTaxonomy( slug );
 			const _termIds = _taxonomy
@@ -110,7 +116,7 @@ function FlatTermSelector( { slug } ) {
 
 			const query = {
 				...DEFAULT_QUERY,
-				include: _termIds,
+				include: _termIds.join( ',' ),
 				per_page: _termIds.length,
 			};
 
@@ -140,6 +146,11 @@ function FlatTermSelector( { slug } ) {
 				terms: _termIds.length
 					? getEntityRecords( 'taxonomy', slug, query )
 					: EMPTY_ARRAY,
+				hasResolvedTerms: hasFinishedResolution( 'getEntityRecords', [
+					'taxonomy',
+					slug,
+					query,
+				] ),
 			};
 		},
 		[ slug ]
@@ -161,9 +172,18 @@ function FlatTermSelector( { slug } ) {
 		[ search ]
 	);
 
-	const values = useMemo( () => {
-		return ( terms ?? [] ).map( ( term ) => unescapeString( term.name ) );
-	}, [ terms ] );
+	// Update terms state only after the selectors are resolved.
+	// We're using this to avoid terms temporarily disappearing on slow networks
+	// while core data makes REST API requests.
+	useEffect( () => {
+		if ( hasResolvedTerms ) {
+			const newValues = terms.map( ( term ) =>
+				unescapeString( term.name )
+			);
+
+			setValues( newValues );
+		}
+	}, [ terms, hasResolvedTerms ] );
 
 	const suggestions = useMemo( () => {
 		return ( searchResults ?? [] ).map( ( term ) =>
@@ -182,7 +202,7 @@ function FlatTermSelector( { slug } ) {
 	}
 
 	function onChange( termNames ) {
-		const availableTerms = [ ...terms, ...searchResults ];
+		const availableTerms = [ ...terms, ...( searchResults ?? [] ) ];
 		const uniqueTerms = uniqBy( termNames, ( term ) => term.toLowerCase() );
 		const newTermNames = uniqueTerms.filter(
 			( termName ) =>
@@ -190,6 +210,10 @@ function FlatTermSelector( { slug } ) {
 					isSameTermName( term.name, termName )
 				)
 		);
+
+		// Optimistically update term values.
+		// The selector will always re-fetch terms later.
+		setValues( uniqueTerms );
 
 		if ( newTermNames.length === 0 ) {
 			return onUpdateTerms(
