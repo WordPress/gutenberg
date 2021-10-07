@@ -102,7 +102,7 @@ function gutenberg_experimental_global_styles_settings( $settings ) {
 		is_callable( 'get_current_screen' ) &&
 		function_exists( 'gutenberg_is_edit_site_page' ) &&
 		gutenberg_is_edit_site_page( get_current_screen()->id ) &&
-		gutenberg_experimental_is_global_styles_available_to_user()
+		gutenberg_experimental_is_site_editor_available()
 	) {
 		$context = 'site-editor';
 	}
@@ -170,8 +170,6 @@ function gutenberg_experimental_global_styles_settings( $settings ) {
 		$settings['styles']                      = $styles_without_existing_global_styles;
 	}
 
-	$settings['isGlobalStylesUIEnabled'] = gutenberg_experimental_is_global_styles_available_to_user();
-
 	// Copied from get_block_editor_settings() at wordpress-develop/block-editor.php.
 	$settings['__experimentalFeatures'] = $consolidated->get_settings();
 
@@ -233,13 +231,12 @@ function gutenberg_experimental_global_styles_settings( $settings ) {
 }
 
 /**
- * Whether or not the Global Styles sidebar is available to the user
- * and the user CPT is registered.
+ * Whether or not the Site Editor is available.
  *
  * @return boolean
  */
-function gutenberg_experimental_is_global_styles_available_to_user() {
-	return WP_Theme_JSON_Resolver_Gutenberg::theme_has_support() || gutenberg_supports_block_templates();
+function gutenberg_experimental_is_site_editor_available() {
+	return gutenberg_is_fse_theme();
 }
 
 /**
@@ -248,7 +245,7 @@ function gutenberg_experimental_is_global_styles_available_to_user() {
  * @return void
  */
 function gutenberg_experimental_global_styles_register_user_cpt() {
-	if ( gutenberg_experimental_is_global_styles_available_to_user() ) {
+	if ( gutenberg_experimental_is_site_editor_available() ) {
 		WP_Theme_JSON_Resolver_Gutenberg::register_user_custom_post_type();
 	}
 }
