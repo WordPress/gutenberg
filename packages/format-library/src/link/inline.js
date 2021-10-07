@@ -197,21 +197,32 @@ function InlineLinkUI( {
 			onChange( insert( value, toInsert ) );
 		} else {
 			// Scenario: we have any active text selection or an active format
+			let newValue;
 
-			// Update the **text** (only) with the new text from the Link UI.
-			// This action retains any formats that were currently applied to
-			// the text selection (eg: bold, italic...etc).
-			let newValue = replace( richLinkTextValue, richTextText, newText );
+			if ( newText === richTextText ) {
+				// If we're not updating the text then ignore
+				newValue = applyFormat( value, linkFormat );
+			} else {
+				// Update the **text** (only) with the new text from the Link UI.
+				// This action retains any formats that were currently applied to
+				// the text selection (eg: bold, italic...etc).
+				newValue = replace( richLinkTextValue, richTextText, newText );
 
-			// Apply the new Link format to this new value.
-			newValue = applyFormat( newValue, linkFormat, 0, newText.length );
+				// Apply the new Link format to this new value.
+				newValue = applyFormat(
+					newValue,
+					linkFormat,
+					0,
+					newText.length
+				);
 
-			// Update the full existing value replacing the
-			// target text with the new RichTextValue containing:
-			// 1. The new text content.
-			// 2. The new link format.
-			// 3. Any original formats.
-			newValue = replace( value, richTextText, newValue );
+				// Update the full existing value replacing the
+				// target text with the new RichTextValue containing:
+				// 1. The new text content.
+				// 2. The new link format.
+				// 3. Any original formats.
+				newValue = replace( value, richTextText, newValue );
+			}
 
 			newValue.start = newValue.end;
 			newValue.activeFormats = [];
