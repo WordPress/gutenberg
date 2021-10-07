@@ -184,9 +184,13 @@ export default function ServerSideRender( props ) {
 
 	if ( hasEmptyResponse || ! hasResponse ) {
 		return <EmptyResponsePlaceholder { ...props } />;
-	} else if ( hasError ) {
+	}
+
+	if ( hasError ) {
 		return <ErrorResponsePlaceholder response={ response } { ...props } />;
-	} else if ( isLoading ) {
+	}
+
+	if ( isLoading ) {
 		return (
 			<LoadingResponsePlaceholder { ...props } showLoader={ showLoader }>
 				{ hasResponse && (
