@@ -52,7 +52,7 @@ function ScreenLinkColor( { name } ) {
 				back={ parentMenu + '/colors' }
 				title={ __( 'Links' ) }
 				description={ __(
-					'Set the link color choosing from the palette or pick your own'
+					'Set the default color used for links across the site.'
 				) }
 			/>
 

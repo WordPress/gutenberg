@@ -17,7 +17,9 @@ function ScreenColorPalette( { name } ) {
 			<ScreenHeader
 				back={ parentMenu + '/colors' }
 				title={ __( 'Color Palette' ) }
-				description={ __( 'Edit the color palette.' ) }
+				description={ __(
+					'Color palettes are used to provide default color options for blocks and various design tools. Here you can edit the colors with their labels.'
+				) }
 			/>
 			<ColorPalettePanel name={ name } />
 		</>

@@ -82,7 +82,7 @@ function ScreenBackgroundColor( { name } ) {
 				back={ parentMenu + '/colors' }
 				title={ __( 'Background' ) }
 				description={ __(
-					'Set the background color choosing from the palette or pick your own'
+					'Set a background color or gradient for the whole website.'
 				) }
 			/>
 
