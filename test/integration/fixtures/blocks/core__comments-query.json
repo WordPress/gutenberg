@@ -5,8 +5,9 @@
 		"isValid": true,
 		"attributes": {
 			"query": {
-				"perPage": null,
-				"pages": 0,
+				"perPage": 4,
+				"pages": 1,
+				"offset": 0,
 				"order": "desc",
 				"orderBy": "date"
 			},
