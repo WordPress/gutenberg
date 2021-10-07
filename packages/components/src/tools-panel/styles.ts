@@ -103,7 +103,7 @@ export const ToolsPanelItem = css`
 	}
 
 	/* Remove BaseControl components margins and leave spacing to grid layout */
-	&& > ${ BaseControlWrapper } {
+	&& ${ BaseControlWrapper } {
 		margin-bottom: 0;
 
 		${ BaseControlField } {
