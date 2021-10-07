@@ -1,4 +1,4 @@
 export default function CommentsTemplateEdit() {
-	// XXX: actually implement this
+	// XXX TODO: actually implement this
 	return <div> Here go the comments... </div>;
 }

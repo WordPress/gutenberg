@@ -20,16 +20,6 @@ import QueryToolbar from './toolbar';
 
 const TEMPLATE = [ [ 'core/comments-template' ] ];
 
-/**
- * This component renders the "content" of the Comments Query. It is a simple
- * container for rendering the `core/comments-template` component. It should be
- * rendered once the user has selected a comments pattern in the editor.
- *
- * @param {Object}   props                 Component props.
- * @param {Object}   [props.attributes]    Attributes passed from parent component.
- * @param {Function} [props.setAttributes] A callback used to set the attributes.
- *                                         Passed from parent comonent.
- */
 export default function CommentsQueryEdit( { attributes, setAttributes } ) {
 	const { query, tagName: TagName = 'div', layout = {} } = attributes;
 
@@ -52,7 +42,7 @@ export default function CommentsQueryEdit( { attributes, setAttributes } ) {
 
 	return (
 		<>
-			{ /* XXX: Add query inspector controls here */ }
+			{ /* XXX TODO: Add query inspector controls here */ }
 			<BlockControls>
 				<QueryToolbar
 					attributes={ attributes }

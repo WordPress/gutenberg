@@ -8,39 +8,10 @@ import {
 	BaseControl,
 	__experimentalNumberControl as NumberControl,
 } from '@wordpress/components';
-import { useInstanceId } from '@wordpress/compose';
 import { __ } from '@wordpress/i18n';
-import { settings, list, grid } from '@wordpress/icons';
+import { settings } from '@wordpress/icons';
 
-// XXX: This needs adjusting becaue I've just
-//  copy pasted from query-toolbar in core/query
-export default function QueryToolbar( {
-	attributes: { query, displayLayout },
-	setQuery,
-	setDisplayLayout,
-} ) {
-	const maxPageInputId = useInstanceId(
-		QueryToolbar,
-		'blocks-query-pagination-max-page-input'
-	);
-	const displayLayoutControls = [
-		{
-			icon: list,
-			title: __( 'List view' ),
-			onClick: () => setDisplayLayout( { type: 'list' } ),
-			isActive: displayLayout?.type === 'list',
-		},
-		{
-			icon: grid,
-			title: __( 'Grid view' ),
-			onClick: () =>
-				setDisplayLayout( {
-					type: 'flex',
-					columns: displayLayout?.columns || 3,
-				} ),
-			isActive: displayLayout?.type === 'flex',
-		},
-	];
+export default function QueryToolbar( { attributes: { query }, setQuery } ) {
 	return (
 		<>
 			{ ! query.inherit && (
@@ -64,15 +35,16 @@ export default function QueryToolbar( {
 										min={ 1 }
 										max={ 100 }
 										onChange={ ( value ) => {
+											const num = parseInt( value, 10 );
 											if (
-												isNaN( value ) ||
-												value < 1 ||
-												value > 100
+												isNaN( num ) ||
+												num < 1 ||
+												num > 100
 											) {
 												return;
 											}
 											setQuery( {
-												perPage: value,
+												perPage: num,
 											} );
 										} }
 										step="1"
@@ -88,14 +60,15 @@ export default function QueryToolbar( {
 										min={ 0 }
 										max={ 100 }
 										onChange={ ( value ) => {
+											const num = parseInt( value, 10 );
 											if (
-												isNaN( value ) ||
-												value < 0 ||
-												value > 100
+												isNaN( num ) ||
+												num < 0 ||
+												num > 100
 											) {
 												return;
 											}
-											setQuery( { offset: value } );
+											setQuery( { offset: num } );
 										} }
 										step="1"
 										value={ query.offset }
@@ -103,22 +76,23 @@ export default function QueryToolbar( {
 									/>
 								</BaseControl>
 								<BaseControl
-									id={ maxPageInputId }
 									help={ __(
 										'Limit the pages you want to show, even if the query has more results. To show all pages use 0 (zero).'
 									) }
 								>
 									<NumberControl
-										id={ maxPageInputId }
 										__unstableInputWidth="60px"
 										label={ __( 'Max page to show' ) }
 										labelPosition="edge"
 										min={ 0 }
 										onChange={ ( value ) => {
-											if ( isNaN( value ) || value < 0 ) {
+											const num = parseInt( value, 10 );
+											if ( isNaN( num ) || num < 0 ) {
 												return;
 											}
-											setQuery( { pages: value } );
+											setQuery( {
+												pages: num,
+											} );
 										} }
 										step="1"
 										value={ query.pages }
@@ -130,7 +104,6 @@ export default function QueryToolbar( {
 					/>
 				</ToolbarGroup>
 			) }
-			<ToolbarGroup controls={ displayLayoutControls } />
 		</>
 	);
 }
