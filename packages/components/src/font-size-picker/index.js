@@ -66,8 +66,23 @@ function getSelectOptions( optionsArray, disableCustomFontSizes ) {
 		key: option.slug,
 		name: option.name,
 		size: option.size,
-		hint: option.size && parseInt( option.size ),
+		hint:
+			option.size &&
+			isSimpleCssValue( option.size ) &&
+			parseInt( option.size ),
 	} ) );
+}
+
+/**
+ * Some themes use css vars for their font sizes, so until we
+ * have the way of calculating them don't display them.
+ *
+ * @param {*} value The value that is checked.
+ * @return {boolean} Whether the value is a simple css value.
+ */
+function isSimpleCssValue( value ) {
+	const sizeRegex = /^(?!0)\d+(px|em|rem|vw|vh|%)?$/i;
+	return sizeRegex.test( value );
 }
 
 function FontSizePicker(
@@ -121,11 +136,19 @@ function FontSizePicker(
 	);
 
 	const baseClassName = 'components-font-size-picker';
+	// TODO: check to remove function or put it outside the component..
 	const getHeaderHint = ( _selectedOption, _showCustomValueControl ) => {
 		if ( _showCustomValueControl ) {
 			return __( 'custom' );
 		}
-		return _selectedOption ? selectedOption.size : 'hi';
+		// TODO take into account if control is `select` or `toggleGroup`..
+		let hint = _selectedOption?.size;
+		if ( selectedOption.slug === CUSTOM_FONT_SIZE ) {
+			hint = value;
+		}
+		if ( isSimpleCssValue( hint ) ) {
+			return hint;
+		}
 	};
 	const headerHint = getHeaderHint( selectedOption, showCustomValueControl );
 	return (
@@ -174,6 +197,9 @@ function FontSizePicker(
 									? selectedItem.size
 									: Number( selectedItem.size )
 							);
+							if ( selectedItem.key === CUSTOM_FONT_SIZE ) {
+								setShowCustomValueControl( true );
+							}
 						} }
 						hideLabelFromVision
 					/>
