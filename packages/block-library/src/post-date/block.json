@@ -15,6 +15,9 @@
 		"isLink": {
 			"type": "boolean",
 			"default": false
+		},
+		"label": {
+			"type": "string"
 		}
 	},
 	"usesContext": [ "postId", "postType", "queryId" ],

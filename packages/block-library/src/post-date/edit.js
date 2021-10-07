@@ -14,6 +14,7 @@ import {
 	BlockControls,
 	InspectorControls,
 	useBlockProps,
+	RichText,
 } from '@wordpress/block-editor';
 import {
 	Dropdown,
@@ -29,7 +30,7 @@ import { edit } from '@wordpress/icons';
 import { DOWN } from '@wordpress/keycodes';
 
 export default function PostDateEdit( {
-	attributes: { textAlign, format, isLink },
+	attributes: { textAlign, format, isLink, label },
 	context: { postId, postType, queryId },
 	setAttributes,
 } ) {
@@ -84,6 +85,7 @@ export default function PostDateEdit( {
 			</a>
 		);
 	}
+
 	return (
 		<>
 			<BlockControls group="block">
@@ -155,7 +157,19 @@ export default function PostDateEdit( {
 					/>
 				</PanelBody>
 			</InspectorControls>
-			<div { ...blockProps }>{ postDate }</div>
+			<div { ...blockProps }>
+				<RichText
+					className="wp-block-post-date__label"
+					tagName="span"
+					aria-label={ __( 'Label before the date' ) }
+					placeholder={ __( 'Add a label before the date:' ) }
+					value={ label }
+					onChange={ ( newLabel ) =>
+						setAttributes( { label: newLabel } )
+					}
+				/>
+				{ postDate }
+			</div>
 		</>
 	);
 }

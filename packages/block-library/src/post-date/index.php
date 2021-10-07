@@ -25,10 +25,12 @@ function render_block_core_post_date( $attributes, $content, $block ) {
 	if ( isset( $attributes['isLink'] ) && $attributes['isLink'] ) {
 		$formatted_date = sprintf( '<a href="%1s">%2s</a>', get_the_permalink( $post_ID ), $formatted_date );
 	}
+	$label = empty( $attributes['label'] ) ? '' : $attributes['label'];
 
 	return sprintf(
-		'<div %1$s><time datetime="%2$s">%3$s</time></div>',
+		'<div %1$s>%2$s<time datetime="%3$s">%4$s</time></div>',
 		$wrapper_attributes,
+		$label,
 		get_the_date( 'c', $post_ID ),
 		$formatted_date
 	);
