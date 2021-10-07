@@ -21,7 +21,7 @@ export default function EditTemplatePartMenuButton() {
 		<BlockSettingsMenuControls>
 			{ ( { selectedClientIds, onClose } ) => (
 				<EditTemplatePartMenuItem
-					selectedClientIds={ selectedClientIds }
+					selectedClientId={ selectedClientIds[ 0 ] }
 					onClose={ onClose }
 				/>
 			) }
@@ -29,11 +29,11 @@ export default function EditTemplatePartMenuButton() {
 	);
 }
 
-function EditTemplatePartMenuItem( { selectedClientIds, onClose } ) {
+function EditTemplatePartMenuItem( { selectedClientId, onClose } ) {
 	const selectedTemplatePart = useSelect(
 		( select ) => {
 			const block = select( blockEditorStore ).getBlock(
-				selectedClientIds[ 0 ]
+				selectedClientId
 			);
 
 			if ( block && isTemplatePart( block ) ) {
@@ -47,7 +47,7 @@ function EditTemplatePartMenuItem( { selectedClientIds, onClose } ) {
 				);
 			}
 		},
-		[ selectedClientIds ]
+		[ selectedClientId ]
 	);
 
 	const { pushTemplatePart } = useDispatch( editSiteStore );
