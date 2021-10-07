@@ -1,15 +1,10 @@
 /**
  * WordPress dependencies
  */
-import { store as blockEditorStore } from '@wordpress/block-editor';
 import { store as coreStore } from '@wordpress/core-data';
 import { useSelect } from '@wordpress/data';
 
-export default function useTemplatePartEntity( theme, slug, blockArea ) {
-	// Replicates `createTemplatePartId` in the template part block.
-	// TODO: refactor it.
-	const templatePartId = theme && slug ? theme + '//' + slug : null;
-
+export default function useTemplatePartEntity( templatePartId, blockArea ) {
 	return useSelect(
 		( select ) => {
 			const {

@@ -19,25 +19,31 @@ import {
 	JustifyToolbar,
 	BlockControls,
 	useBlockProps,
+	__experimentalUseNoRecursiveRenders as useNoRecursiveRenders,
 	store as blockEditorStore,
 	withColors,
 	PanelColorSettings,
 	ContrastChecker,
 	getColorClassName,
+	Warning,
 } from '@wordpress/block-editor';
 import { useDispatch, withSelect, withDispatch } from '@wordpress/data';
 import { PanelBody, ToggleControl, ToolbarGroup } from '@wordpress/components';
 import { compose } from '@wordpress/compose';
-import { __ } from '@wordpress/i18n';
+import { __, sprintf } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
  */
-import useBlockNavigator from './use-block-navigator';
+import useBlockNavigator from '../use-block-navigator';
+import useTemplatePartEntity from '../use-template-part';
 import NavigationPlaceholder from './placeholder';
 import PlaceholderPreview from './placeholder-preview';
 import ResponsiveWrapper from './responsive-wrapper';
-import useTemplatePartEntity from './use-template-part';
+
+// TODO - refactor these to somewhere common?
+import { createTemplatePartId } from '../../template-part/edit/utils/create-template-part-id';
+import TemplatePartPlaceholder from '../../template-part/edit/placeholder';
 
 const ALLOWED_BLOCKS = [
 	'core/navigation-link',
@@ -94,6 +100,7 @@ function detectColors( colorsDetectionElement, setColor, setBackground ) {
 }
 
 function Navigation( {
+	innerBlocks,
 	selectedBlockHasDescendants,
 	attributes,
 	setAttributes,
@@ -120,13 +127,6 @@ function Navigation( {
 	customPlaceholder: CustomPlaceholder = null,
 	customAppender: CustomAppender = null,
 } ) {
-	const [ isPlaceholderShown, setIsPlaceholderShown ] = useState(
-		! hasExistingNavItems
-	);
-	const [ isResponsiveMenuOpen, setResponsiveMenuVisibility ] = useState(
-		false
-	);
-
 	const {
 		slug,
 		theme,
@@ -137,17 +137,39 @@ function Navigation( {
 		orientation,
 	} = attributes;
 
+	// Replicates `createTemplatePartId` in the template part block.
+	const templatePartId = createTemplatePartId( theme, slug );
+	const [ hasAlreadyRendered, RecursionProvider ] = useNoRecursiveRenders(
+		templatePartId
+	);
+	const [ isPlaceholderShown, setIsPlaceholderShown ] = useState(
+		! hasExistingNavItems
+	);
+	const [ isResponsiveMenuOpen, setResponsiveMenuVisibility ] = useState(
+		false
+	);
+
+	const { selectBlock } = useDispatch( blockEditorStore );
+
 	const {
 		isResolved,
 		isMissing,
 		area,
 		enableSelection,
 		hasResolvedReplacements,
-	} = useTemplatePartEntity( slug, theme, blockArea );
-
-	const { selectBlock } = useDispatch( blockEditorStore );
+	} = useTemplatePartEntity( templatePartId, blockArea );
 
 	const navRef = useRef();
+
+	const { navigatorToolbarButton, navigatorModal } = useBlockNavigator(
+		clientId
+	);
+
+	const isTemplatePartPlaceholderShown = ! slug;
+	const isEntityAvailable =
+		! isTemplatePartPlaceholderShown && ! isMissing && isResolved;
+
+	const placeholder = useMemo( () => <PlaceholderPreview />, [] );
 
 	const blockProps = useBlockProps( {
 		ref: navRef,
@@ -171,12 +193,6 @@ function Navigation( {
 			backgroundColor: ! backgroundColor?.slug && backgroundColor?.color,
 		},
 	} );
-
-	const { navigatorToolbarButton, navigatorModal } = useBlockNavigator(
-		clientId
-	);
-
-	const placeholder = useMemo( () => <PlaceholderPreview />, [] );
 
 	// When the block is selected itself or has a top level item selected that
 	// doesn't itself have children, show the standard appender. Else show no
@@ -243,6 +259,51 @@ function Navigation( {
 		}
 	} );
 
+	// We don't want to render a missing state if we have any inner blocks.
+	// A new template part is automatically created if we have any inner blocks but no entity.
+	if (
+		innerBlocks.length === 0 &&
+		( ( slug && ! theme ) || ( slug && isMissing ) )
+	) {
+		return (
+			<div { ...blockProps }>
+				<Warning>
+					{ sprintf(
+						/* translators: %s: Template part slug */
+						__(
+							'Navigation block has been deleted or is unavailable: %s'
+						),
+						slug
+					) }
+				</Warning>
+			</div>
+		);
+	}
+
+	if ( isEntityAvailable && hasAlreadyRendered ) {
+		return (
+			<div { ...blockProps }>
+				<Warning>
+					{ __( 'Block cannot be rendered inside itself.' ) }
+				</Warning>
+			</div>
+		);
+	}
+
+	if ( isTemplatePartPlaceholderShown ) {
+		return (
+			<div { ...blockProps }>
+				<TemplatePartPlaceholder
+					area={ area }
+					clientId={ clientId }
+					setAttributes={ setAttributes }
+					enableSelection={ enableSelection }
+					hasResolvedReplacements={ hasResolvedReplacements }
+				/>
+			</div>
+		);
+	}
+
 	if ( isPlaceholderShown ) {
 		const PlaceholderComponent = CustomPlaceholder
 			? CustomPlaceholder
@@ -269,7 +330,7 @@ function Navigation( {
 			: [ 'left', 'center', 'right', 'space-between' ];
 
 	return (
-		<>
+		<RecursionProvider>
 			<BlockControls>
 				{ hasItemJustificationControls && (
 					<JustifyToolbar
@@ -375,7 +436,7 @@ function Navigation( {
 					<div { ...innerBlocksProps }></div>
 				</ResponsiveWrapper>
 			</nav>
-		</>
+		</RecursionProvider>
 	);
 }
 
@@ -386,6 +447,7 @@ export default compose( [
 			getClientIdsOfDescendants,
 			hasSelectedInnerBlock,
 			getSelectedBlockClientId,
+			getBlocks,
 		} = select( blockEditorStore );
 		const isImmediateParentOfSelectedBlock = hasSelectedInnerBlock(
 			clientId,
@@ -397,6 +459,7 @@ export default compose( [
 		] )?.length;
 
 		return {
+			innerBlocks: getBlocks( clientId ),
 			isImmediateParentOfSelectedBlock,
 			selectedBlockHasDescendants,
 			hasExistingNavItems: !! innerBlocks.length,

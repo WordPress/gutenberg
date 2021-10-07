@@ -23,9 +23,9 @@ import { navigation, chevronDown, Icon } from '@wordpress/icons';
 /**
  * Internal dependencies
  */
-import useNavigationEntities from './use-navigation-entities';
+import useNavigationEntities from '../use-navigation-entities';
 import PlaceholderPreview from './placeholder-preview';
-import menuItemsToBlocks from './menu-items-to-blocks';
+import menuItemsToBlocks from '../menu-items-to-blocks';
 
 function NavigationPlaceholder( { onCreate }, ref ) {
 	const [ selectedMenu, setSelectedMenu ] = useState();
