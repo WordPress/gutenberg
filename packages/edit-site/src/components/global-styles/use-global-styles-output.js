@@ -232,12 +232,15 @@ export const getNodesWithStyles = ( tree, blockSelectors ) => {
 		forEach( node?.elements, ( value, elementName ) => {
 			if (
 				!! value &&
-				!! blockSelectors?.[ blockName ]?.elements?.[ elementName ]
+				!! blockSelectors?.[ blockName ] &&
+				!! ELEMENTS?.[ elementName ]
 			) {
 				nodes.push( {
 					styles: value,
-					selector:
-						blockSelectors[ blockName ].elements[ elementName ],
+					selector: blockSelectors[ blockName ].selector
+						.split( ',' )
+						.map( ( sel ) => sel + ' ' + ELEMENTS[ elementName ] )
+						.join( ',' ),
 				} );
 			}
 		} );
