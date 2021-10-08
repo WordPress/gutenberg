@@ -44,7 +44,7 @@ function ColumnEdit( {
 		width,
 		templateLock = false,
 		allowedBlocks,
-    tagName,
+		tagName,
 	},
 	setAttributes,
 	clientId,
