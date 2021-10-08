@@ -107,31 +107,32 @@ function gutenberg_render_spacing_gap_support( $block_content, $block ) {
 	}
 
 	$gap_value = $block['attrs']['style']['spacing']['blockGap'];
+	var_dump($gap_value);
 	$styles = [];
 	if ( is_array( $gap_value ) ) {
 
 		// This is messy I know.. just testing
 		if (
-			preg_match( '%[\\\(&=}]|/\*%', $gap_value['column'] ) &&
-			preg_match( '%[\\\(&=}]|/\*%', $gap_value['row'] )
+			! preg_match( '%[\\\(&=}]|/\*%', $gap_value['column'] ) &&
+			! preg_match( '%[\\\(&=}]|/\*%', $gap_value['row'] )
 		) {
-			$styles[] = sprintf( '--wp--style--block-gap: %s %s', esc_attr( $gap_value['row'] ), esc_attr( $gap_value['column'] ) );
+			$styles[] = sprintf( '--wp--style--block-gap: %s %s;', esc_attr( $gap_value['row'] ), esc_attr( $gap_value['column'] ) );
 		}
 
 		if ( ! preg_match( '%[\\\(&=}]|/\*%', $gap_value['row'] ) ) {
-			$styles[] = sprintf( '--wp--style--block-row-gap: %s', esc_attr( $gap_value['row'] ) );
+			$styles[] = sprintf( '--wp--style--block-row-gap: %s;', esc_attr( $gap_value['row'] ) );
 		}
 
-		if ( preg_match( '%[\\\(&=}]|/\*%', $gap_value['column'] ) ) {
-			$styles[] = sprintf( '--wp--style--block-column-gap: %s', esc_attr( $gap_value['column'] ) );
+		if ( ! preg_match( '%[\\\(&=}]|/\*%', $gap_value['column'] ) ) {
+			$styles[] = sprintf( '--wp--style--block-column-gap: %s;', esc_attr( $gap_value['column'] ) );
 		}
 
 	} else {
 
-		if ( preg_match( '%[\\\(&=}]|/\*%', $gap_value ) ) {
-			$styles[] = sprintf( '--wp--style--block-gap: %s %s', esc_attr( $gap_value ), esc_attr( $gap_value ) );
-			$styles[] = sprintf( '--wp--style--block-row-gap: %s', esc_attr( $gap_value ) );
-			$styles[] = sprintf( '--wp--style--block-column-gap: %s', esc_attr( $gap_value ) );
+		if ( ! preg_match( '%[\\\(&=}]|/\*%', $gap_value ) ) {
+			$styles[] = sprintf( '--wp--style--block-gap: %s %s;', esc_attr( $gap_value ), esc_attr( $gap_value ) );
+			$styles[] = sprintf( '--wp--style--block-row-gap: %s;', esc_attr( $gap_value ) );
+			$styles[] = sprintf( '--wp--style--block-column-gap: %s;', esc_attr( $gap_value ) );
 		}
 
 	}
@@ -149,6 +150,7 @@ function gutenberg_render_spacing_gap_support( $block_content, $block ) {
 //	);
 
 	$style = implode( ' ', $styles );
+
 
 	// Attempt to update an existing style attribute on the wrapper element.
 	$injected_style = preg_replace(
