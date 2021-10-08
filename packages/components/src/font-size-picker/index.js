@@ -47,13 +47,11 @@ function FontSizePicker(
 		availableUnits: [ 'px', 'em', 'rem' ],
 	} );
 
-	/**
-	 * We use the select control if the available font sizes are `more` than five
-	 * and when are `less` than five but there is at least on font size that has
-	 * not a simple css var (eg. 'calc', 'var', etc..).
-	 *
-	 * This will need to be updated when we'll have the way of calculating them.
-	 */
+	// The main font size UI displays a toggle group when the presets are less
+	// than six and a select control when they are more.
+	//
+	// A select control is also used when the value of a preset cannot be
+	// immediately computed (eg. 'calc', 'var').
 	const useSelectControl =
 		fontSizes?.length > 5 ||
 		fontSizes.some( ( { size } ) => ! isSimpleCssValue( size ) );
@@ -74,12 +72,11 @@ function FontSizePicker(
 	);
 	const headerHint = useMemo( () => {
 		if ( showCustomValueControl ) {
-			return `(${ __( 'custom' ) })`;
+			return `(${ __( 'Custom' ) })`;
 		}
-		/**
-		 * If we have a custom value that is not available in
-		 * the font sizes, show it as a hint if a simple css value.
-		 */
+
+		// If we have a custom value that is not available in the font sizes,
+		// show it as a hint as long as it's a simple CSS value.
 		if ( isCustomValue ) {
 			return isSimpleCssValue( value ) && `(${ value })`;
 		}
