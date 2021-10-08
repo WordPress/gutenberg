@@ -107,18 +107,48 @@ function gutenberg_render_spacing_gap_support( $block_content, $block ) {
 	}
 
 	$gap_value = $block['attrs']['style']['spacing']['blockGap'];
+	$styles = [];
+	if ( is_array( $gap_value ) ) {
+
+		// This is messy I know.. just testing
+		if (
+			preg_match( '%[\\\(&=}]|/\*%', $gap_value['column'] ) &&
+			preg_match( '%[\\\(&=}]|/\*%', $gap_value['row'] )
+		) {
+			$styles[] = sprintf( '--wp--style--block-gap: %s %s', esc_attr( $gap_value['row'] ), esc_attr( $gap_value['column'] ) );
+		}
+
+		if ( ! preg_match( '%[\\\(&=}]|/\*%', $gap_value['row'] ) ) {
+			$styles[] = sprintf( '--wp--style--block-row-gap: %s', esc_attr( $gap_value['row'] ) );
+		}
+
+		if ( preg_match( '%[\\\(&=}]|/\*%', $gap_value['column'] ) ) {
+			$styles[] = sprintf( '--wp--style--block-column-gap: %s', esc_attr( $gap_value['column'] ) );
+		}
+
+	} else {
+
+		if ( preg_match( '%[\\\(&=}]|/\*%', $gap_value ) ) {
+			$styles[] = sprintf( '--wp--style--block-gap: %s %s', esc_attr( $gap_value ), esc_attr( $gap_value ) );
+			$styles[] = sprintf( '--wp--style--block-row-gap: %s', esc_attr( $gap_value ) );
+			$styles[] = sprintf( '--wp--style--block-column-gap: %s', esc_attr( $gap_value ) );
+		}
+
+	}
 
 	// Skip if gap value contains unsupported characters.
 	// Regex for CSS value borrowed from `safecss_filter_attr`, and used here
 	// because we only want to match against the value, not the CSS attribute.
-	if ( preg_match( '%[\\\(&=}]|/\*%', $gap_value ) ) {
-		return $block_content;
-	}
+//	if ( preg_match( '%[\\\(&=}]|/\*%', $gap_value ) ) {
+//		return $block_content;
+//	}
 
-	$style = sprintf(
-		'--wp--style--block-gap: %s',
-		esc_attr( $gap_value )
-	);
+//	$style = sprintf(
+//		'--wp--style--block-gap: %s',
+//		esc_attr( $gap_value )
+//	);
+
+	$style = implode( ' ', $styles );
 
 	// Attempt to update an existing style attribute on the wrapper element.
 	$injected_style = preg_replace(

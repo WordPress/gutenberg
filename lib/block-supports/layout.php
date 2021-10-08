@@ -66,7 +66,7 @@ function gutenberg_get_layout_style( $selector, $layout, $has_block_gap_support 
 		$style .= "$selector .alignright { float: right; margin-left: 2em; }";
 		if ( $has_block_gap_support ) {
 			$style .= "$selector > * { margin-top: 0; margin-bottom: 0; }";
-			$style .= "$selector > * + * { margin-top: var( --wp--style--block-gap ); margin-bottom: 0; }";
+			$style .= "$selector > * + * { margin-top: var( --wp--style--block-row-gap ); margin-bottom: 0; }";
 		}
 	} elseif ( 'flex' === $layout_type ) {
 		$layout_orientation = isset( $layout['orientation'] ) ? $layout['orientation'] : 'horizontal';
@@ -89,9 +89,9 @@ function gutenberg_get_layout_style( $selector, $layout, $has_block_gap_support 
 		$style  = "$selector {";
 		$style .= 'display: flex;';
 		if ( $has_block_gap_support ) {
-			$style .= 'gap: var( --wp--style--block-gap, 0.5em );';
+			$style .= 'gap: var( --wp--style--block-row-gap, 0.5em ) var( --wp--style--block-column-gap, 0.5em );';
 		} else {
-			$style .= 'gap: 0.5em;';
+			$style .= 'gap: 0.5em 0.5em;';
 		}
 		$style .= "flex-wrap: $flex_wrap;";
 		if ( 'horizontal' === $layout_orientation ) {

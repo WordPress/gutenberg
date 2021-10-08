@@ -44,7 +44,7 @@ function useHasGap( name ) {
 	const supports = getSupportedGlobalStylesPanels( name );
 	const [ settings ] = useSetting( 'spacing.blockGap', name );
 
-	return settings && supports.includes( '--wp--style--block-gap' );
+	return settings && supports.includes( '--wp--style--block' );
 }
 
 function filterValuesBySides( values, sides ) {

@@ -46,7 +46,7 @@
 
 	// Add extra margin at the top, to push down the Title area in the post editor.
 	margin-top: 4rem;
-	margin-bottom: var(--wp--style--block-gap);
+	margin-bottom: var(--wp--style--block-row-gap);
 }
 
 .edit-post-visual-editor__exit-template-mode {

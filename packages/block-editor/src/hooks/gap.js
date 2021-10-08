@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import { isObject } from 'lodash';
+
+/**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
@@ -7,6 +12,7 @@ import { getBlockSupport } from '@wordpress/blocks';
 import {
 	__experimentalUseCustomUnits as useCustomUnits,
 	__experimentalBoxControl as BoxControl,
+	__experimentalUnitControl as UnitControl,
 } from '@wordpress/components';
 
 /**
@@ -97,6 +103,8 @@ export function GapEdit( props ) {
 	} );
 
 	const sides = useCustomSides( blockName, 'blockGap' );
+	const splitOnAxis =
+		sides && sides.some( ( side ) => AXIAL_SIDES.includes( side ) );
 	const ref = useBlockRef( clientId );
 
 	if ( useIsGapDisabled( props ) ) {
@@ -104,12 +112,22 @@ export function GapEdit( props ) {
 	}
 
 	const onChange = ( next ) => {
-		const newValue = `${ next?.top } ${ next?.left }`;
+		// TODO: make this less bad
+		if ( ! isObject( next ) ) {
+			next = {
+				top: next,
+				left: next,
+			};
+		}
+
 		const newStyle = {
 			...style,
 			spacing: {
 				...style?.spacing,
-				blockGap: newValue,
+				blockGap: {
+					row: next?.top,
+					column: next?.left,
+				},
 			},
 		};
 
@@ -131,29 +149,37 @@ export function GapEdit( props ) {
 		}
 	};
 
-	const blockGapValue = style?.spacing?.blockGap;
-	const splitOnAxis =
-		sides && sides.some( ( side ) => AXIAL_SIDES.includes( side ) );
-	const splitValues = blockGapValue ? blockGapValue.split( ' ' ) : [];
 	const boxValues = {
-		top: splitValues[ 0 ],
-		right: splitValues[ 1 ],
-		bottom: splitValues[ 0 ],
-		left: splitValues[ 1 ],
+		top: style?.spacing?.blockGap?.row,
+		right: style?.spacing?.blockGap?.column,
+		bottom: style?.spacing?.blockGap?.row,
+		left: style?.spacing?.blockGap?.column,
 	};
 
 	return Platform.select( {
 		web: (
 			<>
-				<BoxControl
-					label={ __( 'Block spacing' ) }
-					min={ 0 }
-					onChange={ onChange }
-					units={ units }
-					values={ boxValues }
-					allowReset={ false }
-					splitOnAxis={ splitOnAxis }
-				/>
+				{ splitOnAxis ? (
+					<BoxControl
+						label={ __( 'Block spacing' ) }
+						min={ 0 }
+						onChange={ onChange }
+						units={ units }
+						sides={ sides }
+						values={ boxValues }
+						allowReset={ false }
+						splitOnAxis={ splitOnAxis }
+					/>
+				) : (
+					<UnitControl
+						label={ __( 'Block spacing' ) }
+						__unstableInputWidth="80px"
+						min={ 0 }
+						onChange={ onChange }
+						units={ units }
+						value={ style?.spacing?.blockGap }
+					/>
+				) }
 			</>
 		),
 		native: null,

@@ -149,7 +149,7 @@ export default {
 					margin-bottom: 0;
 				}
 				${ appendSelectors( selector, '> * + *' ) } {
-					margin-top: var( --wp--style--block-gap );
+					margin-top: var( --wp--style--block-column-gap );
 				}
 			`;
 		}

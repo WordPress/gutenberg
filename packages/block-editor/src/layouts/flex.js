@@ -133,8 +133,8 @@ export default {
 					display: flex;
 					gap: ${
 						hasBlockGapStylesSupport
-							? 'var( --wp--style--block-gap, 0.5em )'
-							: '0.5em'
+							? 'var( --wp--style--block-row-gap, 0.5em ) var( --wp--style--block-column-gap, 0.5em )'
+							: '0.5em 0.5em'
 					};
 					flex-wrap: ${ flexWrap };
 					${ orientation === 'horizontal' ? rowOrientation : columnOrientation }

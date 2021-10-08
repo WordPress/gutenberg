@@ -115,6 +115,10 @@ export const __EXPERIMENTAL_STYLE_PROPERTY = {
 	'--wp--style--block-gap': {
 		value: [ 'spacing', 'blockGap' ],
 		support: [ 'spacing', 'blockGap' ],
+		properties: {
+			'--wp--style--block-column-gap': 'column',
+			'--wp--style--block-row-gap': 'row',
+		},
 	},
 };
 

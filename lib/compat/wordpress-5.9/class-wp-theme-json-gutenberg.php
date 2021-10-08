@@ -147,37 +147,39 @@ class WP_Theme_JSON_Gutenberg {
 	 * path to the value in theme.json & block attributes.
 	 */
 	const PROPERTIES_METADATA = array(
-		'background'                 => array( 'color', 'gradient' ),
-		'background-color'           => array( 'color', 'background' ),
-		'border-radius'              => array( 'border', 'radius' ),
-		'border-top-left-radius'     => array( 'border', 'radius', 'topLeft' ),
-		'border-top-right-radius'    => array( 'border', 'radius', 'topRight' ),
-		'border-bottom-left-radius'  => array( 'border', 'radius', 'bottomLeft' ),
-		'border-bottom-right-radius' => array( 'border', 'radius', 'bottomRight' ),
-		'border-color'               => array( 'border', 'color' ),
-		'border-width'               => array( 'border', 'width' ),
-		'border-style'               => array( 'border', 'style' ),
-		'color'                      => array( 'color', 'text' ),
-		'font-family'                => array( 'typography', 'fontFamily' ),
-		'font-size'                  => array( 'typography', 'fontSize' ),
-		'font-style'                 => array( 'typography', 'fontStyle' ),
-		'font-weight'                => array( 'typography', 'fontWeight' ),
-		'letter-spacing'             => array( 'typography', 'letterSpacing' ),
-		'line-height'                => array( 'typography', 'lineHeight' ),
-		'margin'                     => array( 'spacing', 'margin' ),
-		'margin-top'                 => array( 'spacing', 'margin', 'top' ),
-		'margin-right'               => array( 'spacing', 'margin', 'right' ),
-		'margin-bottom'              => array( 'spacing', 'margin', 'bottom' ),
-		'margin-left'                => array( 'spacing', 'margin', 'left' ),
-		'padding'                    => array( 'spacing', 'padding' ),
-		'padding-top'                => array( 'spacing', 'padding', 'top' ),
-		'padding-right'              => array( 'spacing', 'padding', 'right' ),
-		'padding-bottom'             => array( 'spacing', 'padding', 'bottom' ),
-		'padding-left'               => array( 'spacing', 'padding', 'left' ),
-		'--wp--style--block-gap'     => array( 'spacing', 'blockGap' ),
-		'text-decoration'            => array( 'typography', 'textDecoration' ),
-		'text-transform'             => array( 'typography', 'textTransform' ),
-		'filter'                     => array( 'filter', 'duotone' ),
+		'background'                    => array( 'color', 'gradient' ),
+		'background-color'              => array( 'color', 'background' ),
+		'border-radius'                 => array( 'border', 'radius' ),
+		'border-top-left-radius'        => array( 'border', 'radius', 'topLeft' ),
+		'border-top-right-radius'       => array( 'border', 'radius', 'topRight' ),
+		'border-bottom-left-radius'     => array( 'border', 'radius', 'bottomLeft' ),
+		'border-bottom-right-radius'    => array( 'border', 'radius', 'bottomRight' ),
+		'border-color'                  => array( 'border', 'color' ),
+		'border-width'                  => array( 'border', 'width' ),
+		'border-style'                  => array( 'border', 'style' ),
+		'color'                         => array( 'color', 'text' ),
+		'font-family'                   => array( 'typography', 'fontFamily' ),
+		'font-size'                     => array( 'typography', 'fontSize' ),
+		'font-style'                    => array( 'typography', 'fontStyle' ),
+		'font-weight'                   => array( 'typography', 'fontWeight' ),
+		'letter-spacing'                => array( 'typography', 'letterSpacing' ),
+		'line-height'                   => array( 'typography', 'lineHeight' ),
+		'margin'                        => array( 'spacing', 'margin' ),
+		'margin-top'                    => array( 'spacing', 'margin', 'top' ),
+		'margin-right'                  => array( 'spacing', 'margin', 'right' ),
+		'margin-bottom'                 => array( 'spacing', 'margin', 'bottom' ),
+		'margin-left'                   => array( 'spacing', 'margin', 'left' ),
+		'padding'                       => array( 'spacing', 'padding' ),
+		'padding-top'                   => array( 'spacing', 'padding', 'top' ),
+		'padding-right'                 => array( 'spacing', 'padding', 'right' ),
+		'padding-bottom'                => array( 'spacing', 'padding', 'bottom' ),
+		'padding-left'                  => array( 'spacing', 'padding', 'left' ),
+		'--wp--style--block-gap'        => array( 'spacing', 'blockGap' ),
+		'--wp--style--block-row-gap'    => array( 'spacing', 'blockGap', 'row'),
+		'--wp--style--block-column-gap' => array( 'spacing', 'blockGap', 'column' ),
+		'text-decoration'               => array( 'typography', 'textDecoration' ),
+		'text-transform'                => array( 'typography', 'textTransform' ),
+		'filter'                        => array( 'filter', 'duotone' ),
 	);
 
 	/**
@@ -743,7 +745,7 @@ class WP_Theme_JSON_Gutenberg {
 				$has_block_gap_support = _wp_array_get( $this->theme_json, array( 'settings', 'spacing', 'blockGap' ) ) !== null;
 				if ( $has_block_gap_support ) {
 					$block_rules .= '.wp-site-blocks > * { margin-top: 0; margin-bottom: 0; }';
-					$block_rules .= '.wp-site-blocks > * + * { margin-top: var( --wp--style--block-gap ); }';
+					$block_rules .= '.wp-site-blocks > * + * { margin-top: var( --wp--style--block-column-gap ); }';
 				}
 			}
 		}
