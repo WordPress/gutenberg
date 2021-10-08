@@ -77,9 +77,9 @@ function gutenberg_initialize_editor( $editor_name, $editor_script_handle, $sett
 	);
 
 	/**
-	 * Filters the array of data that has been preloaded
+	 * Filters the array of data that has been preloaded.
 	 *
-	 * @param Array $preload_data Array of the preloaded data
+	 * @param Array $preload_data Array containing the preloaded data.
 	 */
 	$preload_data = apply_filters( "{$editor_name}_preload_data", $preload_data );
 
