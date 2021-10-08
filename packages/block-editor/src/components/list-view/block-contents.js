@@ -12,8 +12,6 @@ import { forwardRef } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import { useListViewContext } from './context';
-import ListViewBlockSlot from './block-slot';
 import ListViewBlockSelectButton from './block-select-button';
 import BlockDraggable from '../block-draggable';
 import { store as blockEditorStore } from '../../store';
@@ -32,8 +30,6 @@ const ListViewBlockContents = forwardRef(
 		},
 		ref
 	) => {
-		const { __experimentalFeatures } = useListViewContext();
-
 		const { clientId } = block;
 
 		const { blockMovingClientId, selectedBlockInBlockEditor } = useSelect(
@@ -52,10 +48,6 @@ const ListViewBlockContents = forwardRef(
 			[ clientId ]
 		);
 
-		const SelectButton = __experimentalFeatures
-			? ListViewBlockSlot
-			: ListViewBlockSelectButton;
-
 		const isBlockMoveTarget =
 			blockMovingClientId && selectedBlockInBlockEditor === clientId;
 
@@ -66,7 +58,7 @@ const ListViewBlockContents = forwardRef(
 		return (
 			<BlockDraggable clientIds={ [ block.clientId ] }>
 				{ ( { draggable, onDragStart, onDragEnd } ) => (
-					<SelectButton
+					<ListViewBlockSelectButton
 						ref={ ref }
 						className={ className }
 						block={ block }
