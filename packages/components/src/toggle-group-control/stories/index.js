@@ -26,7 +26,7 @@ const KNOBS_GROUPS = {
 };
 
 const _default = ( { options } ) => {
-	const [ alignState, setAlignState ] = useState( options[ 0 ].value );
+	const [ value, setValue ] = useState( options[ 0 ].value );
 	const label = text(
 		`${ KNOBS_GROUPS.ToggleGroupControl }: label`,
 		'Toggle Group Control',
@@ -54,7 +54,7 @@ const _default = ( { options } ) => {
 		KNOBS_GROUPS.ToggleGroupControl
 	);
 
-	const alignOptions = options.map( ( opt, index ) => (
+	const controlOptions = options.map( ( opt, index ) => (
 		<ToggleGroupControlOption
 			key={ opt.value }
 			value={ opt.value }
@@ -74,15 +74,15 @@ const _default = ( { options } ) => {
 	return (
 		<View>
 			<ToggleGroupControl
-				onChange={ setAlignState }
-				value={ alignState }
+				onChange={ setValue }
+				value={ value }
 				label={ label }
 				hideLabelFromVision={ hideLabelFromVision }
 				help={ help }
 				isBlock={ isBlock }
 				isAdaptiveWidth={ isAdaptiveWidth }
 			>
-				{ alignOptions }
+				{ controlOptions }
 			</ToggleGroupControl>
 		</View>
 	);
@@ -109,7 +109,7 @@ WithAriaLabel.args = {
 
 export const WithReset = () => {
 	const [ alignState, setAlignState ] = useState();
-	const aligns = Default.args.options.map( ( item ) => item.label );
+	const aligns = [ 'Left', 'Center', 'Right' ];
 	const alignOptions = aligns.map( ( key, index ) => (
 		<ToggleGroupControlOption
 			key={ key }
