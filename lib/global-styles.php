@@ -127,7 +127,7 @@ function gutenberg_experimental_global_styles_settings( $settings ) {
 
 		$settings['__experimentalGlobalStylesUserEntityId']           = $user_cpt_id;
 		$settings['__experimentalGlobalStylesBaseConfig']['styles']   = $theme->get_raw_data()['styles'];
-		$settings['__experimentalGlobalStylesBaseConfig']['settings'] = $theme->get_raw_data()['settings'];
+		$settings['__experimentalGlobalStylesBaseConfig']['settings'] = $theme->get_settings();
 	}
 
 	if ( 'other' === $context ) {
