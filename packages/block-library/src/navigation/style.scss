@@ -235,8 +235,8 @@
 }
 
 // Submenu indentation when there's a background.
-.wp-block-navigation.has-background,
-.has-child,
+.wp-block-navigation.has-background
+.has-child
 .wp-block-navigation__submenu-container {
 	left: 0;
 	top: 100%;

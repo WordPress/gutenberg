@@ -41,6 +41,27 @@
 	background-color: inherit;
 }
 
+// Only show the flyout on hover if the parent menu item is selected.
+.wp-block-navigation:not(.is-selected):not(.has-child-selected):where(:not(.is-tree-view))
+.has-child:hover {
+	> .wp-block-navigation__submenu-container {
+		opacity: 0;
+		visibility: hidden;
+	}
+}
+
+// Styles for submenu flyout.
+.wp-block-navigation:where(:not(.is-tree-view))
+.has-child {
+	&.is-selected,
+	&.has-child-selected {
+		> .wp-block-navigation__submenu-container {
+			display: flex;
+			opacity: 1;
+			visibility: visible;
+		}
+	}
+}
 
 // Show a submenu when generally dragging (is-dragging-components-draggable) if that
 // submenu has children (has-child) and is being dragged within (is-dragging-within).
@@ -493,30 +514,6 @@ body.editor-styles-wrapper
 .is-menu-open .wp-block-navigation__responsive-container-content * {
 	.block-list-appender {
 		margin-top: $grid-unit-20;
-	}
-}
-
-// Styles for dropdown style menu.
-.wp-block-navigation:where(:not(.is-tree-view)) {
-	// Styles for submenu flyout.
-	.has-child {
-		&.is-selected,
-		&.has-child-selected {
-			> .wp-block-navigation__submenu-container {
-				display: flex;
-				opacity: 1;
-				visibility: visible;
-			}
-		}
-	}
-
-	// Only show the flyout on hover if the parent menu item is selected.
-	.wp-block-navigation:not(.is-selected):not(.has-child-selected)
-	.has-child:hover {
-		> .wp-block-navigation__submenu-container {
-			opacity: 0;
-			visibility: hidden;
-		}
 	}
 }
 
