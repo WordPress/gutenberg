@@ -32,7 +32,10 @@ public class RNReactNativeGutenbergBridgePackage implements ReactPackage {
         mRNReactNativeGutenbergBridgeModule = new RNReactNativeGutenbergBridgeModule(reactContext,
                 mGutenbergBridgeJS2Parent,
                 mIsDarkMode);
-        return Arrays.<NativeModule>asList(mRNReactNativeGutenbergBridgeModule, new NativeNoticeModule(reactContext));
+        return Arrays.<NativeModule>asList(
+                mRNReactNativeGutenbergBridgeModule,
+                new NativeNoticeModule(reactContext, mGutenbergBridgeJS2Parent)
+        );
     }
 
     @Override

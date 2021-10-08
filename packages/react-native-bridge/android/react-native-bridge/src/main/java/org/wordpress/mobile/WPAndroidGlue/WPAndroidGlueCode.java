@@ -102,6 +102,7 @@ public class WPAndroidGlueCode {
     private OnGutenbergDidRequestPreviewListener mOnGutenbergDidRequestPreviewListener;
     private OnBlockTypeImpressionsEventListener mOnBlockTypeImpressionsEventListener;
     private OnCustomerSupportOptionsListener mOnCustomerSupportOptionsListener;
+    private OnNativeNoticeListener mOnNativeNoticeListener;
     private boolean mIsEditorMounted;
 
     private String mContentHtml = "";
@@ -231,6 +232,10 @@ public class WPAndroidGlueCode {
     public interface OnCustomerSupportOptionsListener {
         void onContactCustomerSupport();
         void onGotoCustomerSupportOptions();
+    }
+
+    public interface OnNativeNoticeListener {
+        void showNotice(String message, int duration);
     }
 
     public void mediaSelectionCancelled() {
@@ -543,6 +548,13 @@ public class WPAndroidGlueCode {
             public void requestGotoCustomerSupportOptions() {
                 mOnCustomerSupportOptionsListener.onGotoCustomerSupportOptions();
             }
+
+            @Override
+            public void showNotice(String message, int duration) {
+                if (mOnNativeNoticeListener != null) {
+                    mOnNativeNoticeListener.showNotice(message, duration);
+                }
+            }
         }, mIsDarkMode);
 
         return Arrays.asList(
@@ -624,6 +636,7 @@ public class WPAndroidGlueCode {
                                   OnGutenbergDidRequestPreviewListener onGutenbergDidRequestPreviewListener,
                                   OnBlockTypeImpressionsEventListener onBlockTypeImpressionsEventListener,
                                   OnCustomerSupportOptionsListener onCustomerSupportOptionsListener,
+                                  OnNativeNoticeListener onNativeNoticeListener,
                                   boolean isDarkMode) {
         MutableContextWrapper contextWrapper = (MutableContextWrapper) mReactRootView.getContext();
         contextWrapper.setBaseContext(viewGroup.getContext());
@@ -645,6 +658,7 @@ public class WPAndroidGlueCode {
         mOnGutenbergDidRequestPreviewListener = onGutenbergDidRequestPreviewListener;
         mOnBlockTypeImpressionsEventListener = onBlockTypeImpressionsEventListener;
         mOnCustomerSupportOptionsListener = onCustomerSupportOptionsListener;
+        mOnNativeNoticeListener = onNativeNoticeListener;
 
         sAddCookiesInterceptor.setOnAuthHeaderRequestedListener(onAuthHeaderRequestedListener);
 
