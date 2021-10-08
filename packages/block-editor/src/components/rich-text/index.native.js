@@ -442,40 +442,6 @@ function RichTextWrapper(
 				mode = 'BLOCKS';
 			}
 
-			const isPastedURL = isURL( plainText.trim() );
-			// When an URL is pasted in an empty paragraph then the EmbedHandlerPicker should showcase options allowing the transformation of that URL
-			// into either an Embed block or a link within the target paragraph. If the paragraph is non-empty, the URL is pasted as text.
-			if ( __unstableEmbedURLOnPaste && isPastedURL ) {
-				onChange( insert( value, create( { text: plainText } ) ) );
-
-				if ( ! isEmpty( value ) ) {
-					return;
-				}
-
-				mode = 'BLOCKS';
-				// Embed handler
-				embedHandlerPickerRef.current?.presentPicker( {
-					createEmbed: () => {
-						const content = pasteHandler( {
-							HTML: html,
-							plainText,
-							mode,
-							tagName,
-							preserveWhiteSpace,
-						} );
-
-						if ( content.length > 0 ) {
-							if ( onReplace && isEmpty( value ) ) {
-								onReplace( content, content.length - 1, -1 );
-							}
-						}
-					},
-					createLink: () =>
-						createLinkInParagraph( plainText.trim(), onReplace ),
-				} );
-				return;
-			}
-
 			const content = pasteHandler( {
 				HTML: html,
 				plainText,
@@ -483,6 +449,7 @@ function RichTextWrapper(
 				tagName,
 				preserveWhiteSpace,
 			} );
+			const isPastedURL = isURL( plainText.trim() );
 
 			if ( typeof content === 'string' ) {
 				let valueToInsert = create( { html: content } );
@@ -503,6 +470,38 @@ function RichTextWrapper(
 			} else if ( content.length > 0 ) {
 				if ( isPastedURL ) {
 					onChange( insert( value, create( { text: plainText } ) ) );
+
+					if ( ! isEmpty( value ) ) {
+						return;
+					}
+
+					const firstBlock = content[ 0 ];
+					const { name } = firstBlock;
+
+					// When an URL is pasted in an empty paragraph then the EmbedHandlerPicker should showcase options allowing the transformation of that URL
+					// into either an Embed block or a link within the target paragraph. If the paragraph is non-empty, the URL is pasted as text.
+					if ( __unstableEmbedURLOnPaste && name === 'core/embed' ) {
+						mode = 'BLOCKS';
+						// Embed handler
+						embedHandlerPickerRef.current?.presentPicker( {
+							createEmbed: () => {
+								if ( content.length > 0 ) {
+									if ( onReplace ) {
+										onReplace(
+											content,
+											content.length - 1,
+											-1
+										);
+									}
+								}
+							},
+							createLink: () =>
+								createLinkInParagraph(
+									plainText.trim(),
+									onReplace
+								),
+						} );
+					}
 				} else if ( onReplace && isEmpty( value ) ) {
 					onReplace( content, content.length - 1, -1 );
 				} else {
