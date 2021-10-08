@@ -45,7 +45,6 @@ function ToggleGroupControlButton( {
 			<Radio
 				{ ...props }
 				as="button"
-				aria-label={ label }
 				className={ classes }
 				data-value={ value }
 				ref={ forwardedRef }
