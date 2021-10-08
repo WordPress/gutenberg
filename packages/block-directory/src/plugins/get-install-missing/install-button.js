@@ -13,8 +13,9 @@ import { store as blockEditorStore } from '@wordpress/block-editor';
 import { store as blockDirectoryStore } from '../../store';
 
 export default function InstallButton( { attributes, block, clientId } ) {
-	const isInstallingBlock = useSelect( ( select ) =>
-		select( blockDirectoryStore ).isInstalling( block.id )
+	const isInstallingBlock = useSelect(
+		( select ) => select( blockDirectoryStore ).isInstalling( block.id ),
+		[ block.id ]
 	);
 	const { installBlockType } = useDispatch( blockDirectoryStore );
 	const { replaceBlock } = useDispatch( blockEditorStore );
@@ -28,7 +29,7 @@ export default function InstallButton( { attributes, block, clientId } ) {
 						const [ originalBlock ] = parse(
 							attributes.originalContent
 						);
-						if ( originalBlock ) {
+						if ( originalBlock && blockType ) {
 							replaceBlock(
 								clientId,
 								createBlock(

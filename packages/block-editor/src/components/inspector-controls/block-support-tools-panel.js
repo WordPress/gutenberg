@@ -21,7 +21,7 @@ export default function BlockSupportToolsPanel( { children, label, header } ) {
 			clientId: selectedBlockClientId,
 			attributes: getBlockAttributes( selectedBlockClientId ),
 		};
-	} );
+	}, [] );
 	const { updateBlockAttributes } = useDispatch( blockEditorStore );
 
 	const resetAll = ( resetFilters = [] ) => {

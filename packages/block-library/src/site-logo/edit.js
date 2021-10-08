@@ -11,6 +11,7 @@ import { isBlobURL } from '@wordpress/blob';
 import { useEffect, useState, useRef } from '@wordpress/element';
 import { __, isRTL } from '@wordpress/i18n';
 import {
+	MenuItem,
 	Notice,
 	PanelBody,
 	RangeControl,
@@ -18,7 +19,6 @@ import {
 	Spinner,
 	ToggleControl,
 	ToolbarButton,
-	ToolbarGroup,
 	Placeholder,
 } from '@wordpress/components';
 import { useViewportMatch } from '@wordpress/compose';
@@ -35,7 +35,7 @@ import {
 } from '@wordpress/block-editor';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
-import { crop, siteLogo as icon } from '@wordpress/icons';
+import { crop, reset, siteLogo as icon } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -398,12 +398,11 @@ export default function LogoEdit( {
 				accept={ ACCEPT_MEDIA_STRING }
 				onSelect={ onSelectLogo }
 				onError={ onUploadError }
-			/>
-			<ToolbarGroup>
-				<ToolbarButton onClick={ onRemoveLogo }>
+			>
+				<MenuItem icon={ reset } onClick={ onRemoveLogo }>
 					{ __( 'Reset' ) }
-				</ToolbarButton>
-			</ToolbarGroup>
+				</MenuItem>
+			</MediaReplaceFlow>
 		</BlockControls>
 	);
 

@@ -12,12 +12,13 @@ import { PanelBody, FontSizePicker } from '@wordpress/components';
 /**
  * Internal dependencies
  */
-import { useSetting } from '../editor/utils';
+import { getSupportedGlobalStylesPanels, useSetting, useStyle } from './hooks';
 
-export function useHasTypographyPanel( { supports, name } ) {
-	const hasLineHeight = useHasLineHeightControl( { supports, name } );
-	const hasFontAppearance = useHasAppearanceControl( { supports, name } );
-	const hasLetterSpacing = useHasLetterSpacingControl( { supports, name } );
+export function useHasTypographyPanel( name ) {
+	const hasLineHeight = useHasLineHeightControl( name );
+	const hasFontAppearance = useHasAppearanceControl( name );
+	const hasLetterSpacing = useHasLetterSpacingControl( name );
+	const supports = getSupportedGlobalStylesPanels( name );
 	return (
 		hasLineHeight ||
 		hasFontAppearance ||
@@ -26,92 +27,109 @@ export function useHasTypographyPanel( { supports, name } ) {
 	);
 }
 
-function useHasLineHeightControl( { supports, name } ) {
+function useHasLineHeightControl( name ) {
+	const supports = getSupportedGlobalStylesPanels( name );
 	return (
-		useSetting( 'typography.customLineHeight', name ) &&
+		useSetting( 'typography.customLineHeight', name )[ 0 ] &&
 		supports.includes( 'lineHeight' )
 	);
 }
 
-function useHasAppearanceControl( { supports, name } ) {
+function useHasAppearanceControl( name ) {
+	const supports = getSupportedGlobalStylesPanels( name );
 	const hasFontStyles =
-		useSetting( 'typography.customFontStyle', name ) &&
+		useSetting( 'typography.customFontStyle', name )[ 0 ] &&
 		supports.includes( 'fontStyle' );
 	const hasFontWeights =
-		useSetting( 'typography.customFontWeight', name ) &&
+		useSetting( 'typography.customFontWeight', name )[ 0 ] &&
 		supports.includes( 'fontWeight' );
 	return hasFontStyles || hasFontWeights;
 }
 
-function useHasLetterSpacingControl( { supports, name } ) {
+function useHasLetterSpacingControl( name ) {
+	const supports = getSupportedGlobalStylesPanels( name );
 	return (
-		useSetting( 'typography.customLetterSpacing', name ) &&
+		useSetting( 'typography.customLetterSpacing', name )[ 0 ] &&
 		supports.includes( 'letterSpacing' )
 	);
 }
 
-export default function TypographyPanel( {
-	context: { supports, name },
-	getStyle,
-	setStyle,
-} ) {
-	const fontSizes = useSetting( 'typography.fontSizes', name );
+export default function TypographyPanel( { name } ) {
+	const supports = getSupportedGlobalStylesPanels( name );
+	const [ fontSizes ] = useSetting( 'typography.fontSizes', name );
 	const disableCustomFontSizes = ! useSetting(
 		'typography.customFontSize',
 		name
-	);
-	const fontFamilies = useSetting( 'typography.fontFamilies', name );
+	)[ 0 ];
+	const [ fontFamilies ] = useSetting( 'typography.fontFamilies', name );
 	const hasFontStyles =
-		useSetting( 'typography.customFontStyle', name ) &&
+		useSetting( 'typography.customFontStyle', name )[ 0 ] &&
 		supports.includes( 'fontStyle' );
 	const hasFontWeights =
-		useSetting( 'typography.customFontWeight', name ) &&
+		useSetting( 'typography.customFontWeight', name )[ 0 ] &&
 		supports.includes( 'fontWeight' );
-	const hasLineHeightEnabled = useHasLineHeightControl( { supports, name } );
-	const hasAppearanceControl = useHasAppearanceControl( { supports, name } );
-	const hasLetterSpacingControl = useHasLetterSpacingControl( {
-		supports,
-		name,
-	} );
+	const hasLineHeightEnabled = useHasLineHeightControl( name );
+	const hasAppearanceControl = useHasAppearanceControl( name );
+	const hasLetterSpacingControl = useHasLetterSpacingControl( name );
+
+	const [ fontFamily, setFontFamily ] = useStyle(
+		'typography.fontFamily',
+		name
+	);
+	const [ fontSize, setFontSize ] = useStyle( 'typography.fontSize', name );
+
+	const [ fontStyle, setFontStyle ] = useStyle(
+		'typography.fontStyle',
+		name
+	);
+	const [ fontWeight, setFontWeight ] = useStyle(
+		'typography.fontWeight',
+		name
+	);
+	const [ lineHeight, setLineHeight ] = useStyle(
+		'typography.lineHeight',
+		name
+	);
+	const [ letterSpacing, setLetterSpacing ] = useStyle(
+		'typography.letterSpacing',
+		name
+	);
 
 	return (
 		<PanelBody className="edit-site-typography-panel" initialOpen={ true }>
 			{ supports.includes( 'fontFamily' ) && (
 				<FontFamilyControl
 					fontFamilies={ fontFamilies }
-					value={ getStyle( name, 'fontFamily' ) }
-					onChange={ ( value ) =>
-						setStyle( name, 'fontFamily', value )
-					}
+					value={ fontFamily }
+					onChange={ setFontFamily }
 				/>
 			) }
 			{ supports.includes( 'fontSize' ) && (
 				<FontSizePicker
-					value={ getStyle( name, 'fontSize' ) }
-					onChange={ ( value ) =>
-						setStyle( name, 'fontSize', value )
-					}
+					value={ fontSize }
+					onChange={ setFontSize }
 					fontSizes={ fontSizes }
 					disableCustomFontSizes={ disableCustomFontSizes }
 				/>
 			) }
 			{ hasLineHeightEnabled && (
 				<LineHeightControl
-					value={ getStyle( name, 'lineHeight' ) }
-					onChange={ ( value ) =>
-						setStyle( name, 'lineHeight', value )
-					}
+					value={ lineHeight }
+					onChange={ setLineHeight }
 				/>
 			) }
 			{ hasAppearanceControl && (
 				<FontAppearanceControl
 					value={ {
-						fontStyle: getStyle( name, 'fontStyle' ),
-						fontWeight: getStyle( name, 'fontWeight' ),
+						fontStyle,
+						fontWeight,
 					} }
-					onChange={ ( { fontStyle, fontWeight } ) => {
-						setStyle( name, 'fontStyle', fontStyle );
-						setStyle( name, 'fontWeight', fontWeight );
+					onChange={ ( {
+						fontStyle: newFontStyle,
+						fontWeight: newFontWeight,
+					} ) => {
+						setFontStyle( newFontStyle );
+						setFontWeight( newFontWeight );
 					} }
 					hasFontStyles={ hasFontStyles }
 					hasFontWeights={ hasFontWeights }
@@ -119,10 +137,8 @@ export default function TypographyPanel( {
 			) }
 			{ hasLetterSpacingControl && (
 				<LetterSpacingControl
-					value={ getStyle( name, 'letterSpacing' ) }
-					onChange={ ( value ) =>
-						setStyle( name, 'letterSpacing', value )
-					}
+					value={ letterSpacing }
+					onChange={ setLetterSpacing }
 				/>
 			) }
 		</PanelBody>

@@ -108,7 +108,7 @@ const withMultipleValidation = createHigherOrderComponent( ( BlockEdit ) => {
 					),
 				] }
 			>
-				<strong>{ blockType.title }: </strong>
+				<strong>{ blockType?.title }: </strong>
 				{ __( 'This block can only be used once.' ) }
 			</Warning>,
 		];

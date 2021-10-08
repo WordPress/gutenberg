@@ -102,8 +102,7 @@ function gutenberg_experimental_global_styles_settings( $settings ) {
 		is_callable( 'get_current_screen' ) &&
 		function_exists( 'gutenberg_is_edit_site_page' ) &&
 		gutenberg_is_edit_site_page( get_current_screen()->id ) &&
-		WP_Theme_JSON_Resolver_Gutenberg::theme_has_support() &&
-		gutenberg_supports_block_templates()
+		gutenberg_experimental_is_site_editor_available()
 	) {
 		$context = 'site-editor';
 	}
@@ -140,11 +139,7 @@ function gutenberg_experimental_global_styles_settings( $settings ) {
 		$settings['__experimentalGlobalStylesBaseStyles']   = $theme->get_raw_data();
 	}
 
-	if (
-		'site-editor' !== $context &&
-		'mobile' !== $context &&
-		( WP_Theme_JSON_Resolver_Gutenberg::theme_has_support() || get_theme_support( 'experimental-link-color' ) )
-	) {
+	if ( 'all' === $context ) {
 		$block_styles  = array( 'css' => gutenberg_experimental_global_styles_get_stylesheet( $consolidated, 'block_styles' ) );
 		$css_variables = array(
 			'css'                     => gutenberg_experimental_global_styles_get_stylesheet( $consolidated, 'css_variables' ),
@@ -232,16 +227,23 @@ function gutenberg_experimental_global_styles_settings( $settings ) {
 }
 
 /**
+ * Whether or not the Site Editor is available.
+ *
+ * @return boolean
+ */
+function gutenberg_experimental_is_site_editor_available() {
+	return gutenberg_is_fse_theme();
+}
+
+/**
  * Register CPT to store/access user data.
  *
- * @return array|undefined
+ * @return void
  */
 function gutenberg_experimental_global_styles_register_user_cpt() {
-	if ( ! WP_Theme_JSON_Resolver_Gutenberg::theme_has_support() ) {
-		return;
+	if ( gutenberg_experimental_is_site_editor_available() ) {
+		WP_Theme_JSON_Resolver_Gutenberg::register_user_custom_post_type();
 	}
-
-	WP_Theme_JSON_Resolver_Gutenberg::register_user_custom_post_type();
 }
 
 /**
@@ -274,6 +276,7 @@ function gutenberg_global_styles_filter_post( $content ) {
  */
 function gutenberg_global_styles_kses_init_filters() {
 	add_filter( 'content_save_pre', 'gutenberg_global_styles_filter_post' );
+	add_filter( 'safe_style_css', 'gutenberg_global_styles_include_support_for_duotone', 10, 2 );
 }
 
 /**
@@ -343,6 +346,18 @@ function gutenberg_global_styles_include_support_for_wp_variables( $allow_css, $
 		return $allow_css;
 	}
 	return ! ! preg_match( '/^var\(--wp-[a-zA-Z0-9\-]+\)$/', trim( $parts[1] ) );
+}
+
+/**
+ * This is for using kses to test user data.
+ *
+ * @param array $atts Allowed CSS property names, according to kses.
+ *
+ * @return array The new allowed CSS property names.
+ */
+function gutenberg_global_styles_include_support_for_duotone( $atts ) {
+	$atts[] = 'filter';
+	return $atts;
 }
 
 // The else clause can be removed when plugin support requires WordPress 5.8.0+.

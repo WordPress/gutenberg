@@ -1,16 +1,7 @@
 /**
  * External dependencies
  */
-import { get, find, forEach, camelCase, isString } from 'lodash';
-/**
- * WordPress dependencies
- */
-import { useSelect } from '@wordpress/data';
-import { __EXPERIMENTAL_PATHS_WITH_MERGE as PATHS_WITH_MERGE } from '@wordpress/blocks';
-/**
- * Internal dependencies
- */
-import { store as editSiteStore } from '../../store';
+import { get, find, isString } from 'lodash';
 
 /* Supporting data */
 export const ROOT_BLOCK_NAME = 'root';
@@ -72,52 +63,28 @@ export const PRESET_METADATA = [
 	},
 ];
 
-const STYLE_PROPERTIES_TO_CSS_VAR_INFIX = {
-	linkColor: 'color',
-	backgroundColor: 'color',
-	background: 'gradient',
+const STYLE_PATH_TO_CSS_VAR_INFIX = {
+	'color.background': 'color',
+	'color.text': 'color',
+	'elements.link.color.text': 'color',
+	'color.gradient': 'gradient',
+	'typography.fontSize': 'font-size',
+	'typography.fontFamily': 'font-family',
 };
 
-function getPresetMetadataFromStyleProperty( styleProperty ) {
-	if ( ! getPresetMetadataFromStyleProperty.MAP ) {
-		getPresetMetadataFromStyleProperty.MAP = {};
-		PRESET_METADATA.forEach( ( { cssVarInfix }, index ) => {
-			getPresetMetadataFromStyleProperty.MAP[ camelCase( cssVarInfix ) ] =
-				PRESET_METADATA[ index ];
-		} );
-		forEach( STYLE_PROPERTIES_TO_CSS_VAR_INFIX, ( value, key ) => {
-			getPresetMetadataFromStyleProperty.MAP[ key ] =
-				getPresetMetadataFromStyleProperty.MAP[ value ];
-		} );
-	}
-	return getPresetMetadataFromStyleProperty.MAP[ styleProperty ];
-}
-
-export function useSetting( path, blockName = '' ) {
-	const settings = useSelect( ( select ) => {
-		return select( editSiteStore ).getSettings();
-	} );
-	const topLevelPath = `__experimentalFeatures.${ path }`;
-	const blockPath = `__experimentalFeatures.blocks.${ blockName }.${ path }`;
-	const result = get( settings, blockPath ) ?? get( settings, topLevelPath );
-	if ( result && PATHS_WITH_MERGE[ path ] ) {
-		return result.user ?? result.theme ?? result.core;
-	}
-	return result;
-}
-
 function findInPresetsBy(
-	styles,
-	context,
+	features,
+	blockName,
 	presetPath,
 	presetProperty,
 	presetValueValue
 ) {
 	// Block presets take priority above root level presets.
 	const orderedPresetsByOrigin = [
-		get( styles, [ 'settings', 'blocks', context, ...presetPath ] ),
-		get( styles, [ 'settings', ...presetPath ] ),
+		get( features, [ 'blocks', blockName, ...presetPath ] ),
+		get( features, presetPath ),
 	];
+
 	for ( const presetByOrigin of orderedPresetsByOrigin ) {
 		if ( presetByOrigin ) {
 			// Preset origins ordered by priority.
@@ -136,8 +103,8 @@ function findInPresetsBy(
 						}
 						// if there is a highest priority preset with the same slug but different value the preset we found was overwritten and should be ignored.
 						const highestPresetObjectWithSameSlug = findInPresetsBy(
-							styles,
-							context,
+							features,
+							blockName,
 							presetPath,
 							'slug',
 							presetObject.slug
@@ -157,50 +124,57 @@ function findInPresetsBy(
 	}
 }
 
-export function getPresetVariable( styles, context, propertyName, value ) {
-	if ( ! value ) {
-		return value;
+export function getPresetVariableFromValue(
+	features,
+	blockName,
+	variableStylePath,
+	presetPropertyValue
+) {
+	if ( ! presetPropertyValue ) {
+		return presetPropertyValue;
 	}
 
-	const metadata = getPresetMetadataFromStyleProperty( propertyName );
+	const cssVarInfix = STYLE_PATH_TO_CSS_VAR_INFIX[ variableStylePath ];
+
+	const metadata = find( PRESET_METADATA, [ 'cssVarInfix', cssVarInfix ] );
+
 	if ( ! metadata ) {
 		// The property doesn't have preset data
 		// so the value should be returned as it is.
-		return value;
+		return presetPropertyValue;
 	}
-	const { valueKey, path, cssVarInfix } = metadata;
+	const { valueKey, path } = metadata;
 
 	const presetObject = findInPresetsBy(
-		styles,
-		context,
+		features,
+		blockName,
 		path,
 		valueKey,
-		value
+		presetPropertyValue
 	);
 
 	if ( ! presetObject ) {
 		// Value wasn't found in the presets,
 		// so it must be a custom value.
-		return value;
+		return presetPropertyValue;
 	}
 
 	return `var:preset|${ cssVarInfix }|${ presetObject.slug }`;
 }
 
 function getValueFromPresetVariable(
-	styles,
+	features,
 	blockName,
 	variable,
 	[ presetType, slug ]
 ) {
-	presetType = camelCase( presetType );
-	const metadata = getPresetMetadataFromStyleProperty( presetType );
+	const metadata = find( PRESET_METADATA, [ 'cssVarInfix', presetType ] );
 	if ( ! metadata ) {
 		return variable;
 	}
 
 	const presetObject = findInPresetsBy(
-		styles,
+		features,
 		blockName,
 		metadata.path,
 		'slug',
@@ -210,54 +184,63 @@ function getValueFromPresetVariable(
 	if ( presetObject ) {
 		const { valueKey } = metadata;
 		const result = presetObject[ valueKey ];
-		return getValueFromVariable( styles, blockName, result );
+		return getValueFromVariable( features, blockName, result );
 	}
 
 	return variable;
 }
 
-function getValueFromCustomVariable( styles, blockName, variable, path ) {
+function getValueFromCustomVariable( features, blockName, variable, path ) {
 	const result =
-		get( styles, [ 'settings', 'blocks', blockName, 'custom', ...path ] ) ??
-		get( styles, [ 'settings', 'custom', ...path ] );
+		get( features, [ 'blocks', blockName, 'custom', ...path ] ) ??
+		get( features, [ 'custom', ...path ] );
 	if ( ! result ) {
 		return variable;
 	}
 	// A variable may reference another variable so we need recursion until we find the value.
-	return getValueFromVariable( styles, blockName, result );
+	return getValueFromVariable( features, blockName, result );
 }
 
-export function getValueFromVariable( styles, blockName, variable ) {
+export function getValueFromVariable( features, blockName, variable ) {
 	if ( ! variable || ! isString( variable ) ) {
 		return variable;
 	}
+	const USER_VALUE_PREFIX = 'var:';
+	const THEME_VALUE_PREFIX = 'var(--wp--';
+	const THEME_VALUE_SUFFIX = ')';
 
 	let parsedVar;
-	const INTERNAL_REFERENCE_PREFIX = 'var:';
-	const CSS_REFERENCE_PREFIX = 'var(--wp--';
-	const CSS_REFERENCE_SUFFIX = ')';
-	if ( variable.startsWith( INTERNAL_REFERENCE_PREFIX ) ) {
-		parsedVar = variable
-			.slice( INTERNAL_REFERENCE_PREFIX.length )
-			.split( '|' );
+
+	if ( variable.startsWith( USER_VALUE_PREFIX ) ) {
+		parsedVar = variable.slice( USER_VALUE_PREFIX.length ).split( '|' );
 	} else if (
-		variable.startsWith( CSS_REFERENCE_PREFIX ) &&
-		variable.endsWith( CSS_REFERENCE_SUFFIX )
+		variable.startsWith( THEME_VALUE_PREFIX ) &&
+		variable.endsWith( THEME_VALUE_SUFFIX )
 	) {
 		parsedVar = variable
-			.slice( CSS_REFERENCE_PREFIX.length, -CSS_REFERENCE_SUFFIX.length )
+			.slice( THEME_VALUE_PREFIX.length, -THEME_VALUE_SUFFIX.length )
 			.split( '--' );
 	} else {
-		// Value is raw.
+		// We don't know how to parse the value: either is raw of uses complex CSS such as `calc(1px * var(--wp--variable) )`
 		return variable;
 	}
 
 	const [ type, ...path ] = parsedVar;
 	if ( type === 'preset' ) {
-		return getValueFromPresetVariable( styles, blockName, variable, path );
+		return getValueFromPresetVariable(
+			features,
+			blockName,
+			variable,
+			path
+		);
 	}
 	if ( type === 'custom' ) {
-		return getValueFromCustomVariable( styles, blockName, variable, path );
+		return getValueFromCustomVariable(
+			features,
+			blockName,
+			variable,
+			path
+		);
 	}
 	return variable;
 }
