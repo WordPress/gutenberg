@@ -15,10 +15,14 @@
 	// Use position relative for row animation.
 	position: relative;
 
-	&.is-selected .block-editor-list-view-block-contents {
+	&.is-selected {
 		background: var(--wp-admin-theme-color);
+	}
+	&.is-selected .block-editor-list-view-block-contents,
+	&.is-selected .components-button.has-icon {
 		color: $white;
-
+	}
+	&.is-selected .block-editor-list-view-block-contents {
 		// Hide selection styles while a user is dragging blocks/files etc.
 		.is-dragging-components-draggable & {
 			background: none;
@@ -26,30 +30,31 @@
 		}
 	}
 	&.is-selected .block-editor-list-view-block-contents:focus {
-		box-shadow:
-			inset 0 0 0 1px $white,
-			0 0 0 var(--wp-admin-border-width-focus) var(--wp-admin-theme-color);
-
-		// Hide focus styles while a user is dragging blocks/files etc.
-		.is-dragging-components-draggable & {
-			box-shadow: none;
+		&::after {
+			box-shadow:
+				inset 0 0 0 1px $white,
+				0 0 0 var(--wp-admin-border-width-focus) var(--wp-admin-theme-color);
 		}
 	}
+	&.is-selected .block-editor-list-view-block__menu:focus {
+		box-shadow: inset 0 0 0 var(--wp-admin-border-width-focus) $white;
+	}
 
+	&.is-branch-selected:not(.is-selected) {
+		// Lighten a CSS variable without introducing a new SASS variable
+		background:
+			linear-gradient(transparentize($white, 0.1), transparentize($white, 0.1)),
+			linear-gradient(var(--wp-admin-theme-color), var(--wp-admin-theme-color));
+	}
 	&.is-branch-selected.is-selected .block-editor-list-view-block-contents {
 		border-radius: 2px 2px 0 0;
 	}
-
 	&[aria-expanded="false"] {
 		&.is-branch-selected.is-selected .block-editor-list-view-block-contents {
 			border-radius: 2px;
 		}
 	}
 	&.is-branch-selected:not(.is-selected) .block-editor-list-view-block-contents {
-		// Lighten a CSS variable without introducing a new SASS variable
-		background:
-			linear-gradient(transparentize($white, 0.1), transparentize($white, 0.1)),
-			linear-gradient(var(--wp-admin-theme-color), var(--wp-admin-theme-color));
 		border-radius: 0;
 	}
 	&.is-branch-selected.is-last-of-selected-branch .block-editor-list-view-block-contents {
@@ -89,9 +94,17 @@
 		}
 	}
 
-	.block-editor-list-view-block-contents,
-	.block-editor-list-view-block__menu {
-		&:focus {
+	.block-editor-list-view-block-contents:focus {
+		box-shadow: none;
+
+		&::after {
+			content: "";
+			position: absolute;
+			top: 0;
+			right: -(24px + 5px); // Icon size + padding.
+			bottom: 0;
+			left: 0;
+			border-radius: inherit;
 			box-shadow: inset 0 0 0 var(--wp-admin-border-width-focus) var(--wp-admin-theme-color);
 			z-index: 1;
 
@@ -99,6 +112,15 @@
 			.is-dragging-components-draggable & {
 				box-shadow: none;
 			}
+		}
+	}
+	.block-editor-list-view-block__menu:focus {
+		box-shadow: inset 0 0 0 var(--wp-admin-border-width-focus) var(--wp-admin-theme-color);
+		z-index: 1;
+
+		// Hide focus styles while a user is dragging blocks/files etc.
+		.is-dragging-components-draggable & {
+			box-shadow: none;
 		}
 	}
 
@@ -125,7 +147,7 @@
 		line-height: 0;
 		width: $button-size;
 		opacity: 0;
-		vertical-align: top;
+		vertical-align: middle;
 		@include reduce-motion("transition");
 
 		// Show on hover, visible, and show above to keep the hit area size.
@@ -142,6 +164,14 @@
 			width: 24px;
 			min-width: 24px;
 			padding: 0;
+		}
+	}
+
+	.block-editor-list-view-block__menu-cell {
+		padding-right: 5px;
+
+		.components-button.has-icon {
+			height: 24px;
 		}
 	}
 
