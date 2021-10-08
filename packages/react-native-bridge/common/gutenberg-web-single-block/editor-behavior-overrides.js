@@ -51,10 +51,7 @@ window.addEventListener(
 		// is hidden.
 		if ( currentToggle ) {
 			event.stopPropagation();
-			hideContextMenuListeners.push( () =>
-				// setTimeout( () => currentToggle.click(), 500 )
-				currentToggle.click()
-			);
+			hideContextMenuListeners.push( () => currentToggle.click() );
 			window.wpwebkit.hideTextSelectionContextMenu();
 		}
 	},
