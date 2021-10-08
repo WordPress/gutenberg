@@ -13,6 +13,10 @@ import type { FormElementProps } from '../utils/types';
 
 export type ToggleGroupControlOptionProps = {
 	value: ReactText;
+	/**
+	 * Label for the option. If needed, the `aria-label` prop can be used in addition
+	 * to specify a different label for assistive technologies.
+	 */
 	label: string;
 };
 
@@ -74,12 +78,13 @@ export type ToggleGroupControlButtonProps = {
 	className?: string;
 	forwardedRef?: Ref< any >;
 	/**
-	 * Renders `ToggleGroupControl` is a (CSS) block element.
+	 * Renders `ToggleGroupControl` as a (CSS) block element.
 	 *
 	 * @default false
 	 */
 	isBlock?: boolean;
 	label: string;
+	'aria-label'?: string;
 	showSeparator?: boolean;
 	value?: ReactText;
 	state?: any;

@@ -20,19 +20,19 @@ export default {
 	title: 'Components/ToggleGroupControl',
 };
 
-const aligns = [ 'Left', 'Center', 'Right', 'Justify' ];
 const KNOBS_GROUPS = {
 	ToggleGroupControl: 'ToggleGroupControl',
 	ToggleGroupControlOption: 'ToggleGroupControlOption',
 };
 
-export const _default = () => {
-	const [ alignState, setAlignState ] = useState( aligns[ 0 ] );
+const _default = ( { options } ) => {
+	const [ value, setValue ] = useState( options[ 0 ].value );
 	const label = text(
 		`${ KNOBS_GROUPS.ToggleGroupControl }: label`,
 		'Toggle Group Control',
 		KNOBS_GROUPS.ToggleGroupControl
 	);
+
 	const hideLabelFromVision = boolean(
 		`${ KNOBS_GROUPS.ToggleGroupControl }: hideLabelFromVision`,
 		false,
@@ -54,13 +54,18 @@ export const _default = () => {
 		KNOBS_GROUPS.ToggleGroupControl
 	);
 
-	const alignOptions = aligns.map( ( key, index ) => (
+	const controlOptions = options.map( ( opt, index ) => (
 		<ToggleGroupControlOption
-			key={ key }
-			value={ key }
+			key={ opt.value }
+			value={ opt.value }
 			label={ text(
 				`${ KNOBS_GROUPS.ToggleGroupControlOption }: label`,
-				key,
+				opt.label,
+				`${ KNOBS_GROUPS.ToggleGroupControlOption }-${ index + 1 }`
+			) }
+			aria-label={ text(
+				`${ KNOBS_GROUPS.ToggleGroupControlOption }: aria-label`,
+				opt[ 'aria-label' ],
 				`${ KNOBS_GROUPS.ToggleGroupControlOption }-${ index + 1 }`
 			) }
 		/>
@@ -69,22 +74,42 @@ export const _default = () => {
 	return (
 		<View>
 			<ToggleGroupControl
-				onChange={ setAlignState }
-				value={ alignState }
+				onChange={ setValue }
+				value={ value }
 				label={ label }
 				hideLabelFromVision={ hideLabelFromVision }
 				help={ help }
 				isBlock={ isBlock }
 				isAdaptiveWidth={ isAdaptiveWidth }
 			>
-				{ alignOptions }
+				{ controlOptions }
 			</ToggleGroupControl>
 		</View>
 	);
 };
 
+export const Default = _default.bind( {} );
+Default.args = {
+	options: [
+		{ value: 'left', label: 'Left' },
+		{ value: 'center', label: 'Center' },
+		{ value: 'right', label: 'Right' },
+		{ value: 'justify', label: 'Justify' },
+	],
+};
+
+export const WithAriaLabel = _default.bind( {} );
+WithAriaLabel.args = {
+	...Default.args,
+	options: [
+		{ value: 'asc', label: 'A→Z', 'aria-label': 'Ascending' },
+		{ value: 'desc', label: 'Z→A', 'aria-label': 'Descending' },
+	],
+};
+
 export const WithReset = () => {
 	const [ alignState, setAlignState ] = useState();
+	const aligns = [ 'Left', 'Center', 'Right' ];
 	const alignOptions = aligns.map( ( key, index ) => (
 		<ToggleGroupControlOption
 			key={ key }
