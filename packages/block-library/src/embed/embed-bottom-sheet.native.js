@@ -52,8 +52,8 @@ const EmbedBottomSheet = ( { value, label, isVisible, onClose, onSubmit } ) => {
 					onSubmit( value );
 				}
 			}
-		} else if ( value !== '' ) {
-			// Resets the URL when new value is empty and URL was already defined.
+		} else {
+			// Resets the URL when new value is empty
 			onSubmit( '' );
 		}
 	}, [ url, onSubmit, value ] );
