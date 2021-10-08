@@ -28,13 +28,12 @@ function gutenberg_register_layout_support( $block_type ) {
 /**
  * Generates the CSS corresponding to the provided layout.
  *
- * @param string  $selector CSS selector.
  * @param array   $layout   Layout object. The one that is passed has already checked the existance of default block layout.
  * @param boolean $has_block_gap_support Whether the theme has support for the block gap.
  *
  * @return string CSS style.
  */
-function gutenberg_get_layout_style( $selector, $layout, $has_block_gap_support = false ) {
+function gutenberg_get_layout_style( $layout, $has_block_gap_support = false ) {
 	$layout_type = isset( $layout['type'] ) ? $layout['type'] : 'default';
 
 	$style = '';
@@ -52,21 +51,21 @@ function gutenberg_get_layout_style( $selector, $layout, $has_block_gap_support 
 
 		$style = '';
 		if ( $content_size || $wide_size ) {
-			$style  = "$selector > * {";
+			$style  = '.{{ placeholder }} > * {';
 			$style .= 'max-width: ' . esc_html( $all_max_width_value ) . ';';
 			$style .= 'margin-left: auto !important;';
 			$style .= 'margin-right: auto !important;';
 			$style .= '}';
 
-			$style .= "$selector > .alignwide { max-width: " . esc_html( $wide_max_width_value ) . ';}';
-			$style .= "$selector .alignfull { max-width: none; }";
+			$style .= '.{{ placeholder }} > .alignwide { max-width: ' . esc_html( $wide_max_width_value ) . ';}';
+			$style .= '.{{ placeholder }} .alignfull { max-width: none; }';
 		}
 
-		$style .= "$selector .alignleft { float: left; margin-right: 2em; }";
-		$style .= "$selector .alignright { float: right; margin-left: 2em; }";
+		$style .= '.{{ placeholder }} .alignleft { float: left; margin-right: 2em; }';
+		$style .= '.{{ placeholder }} .alignright { float: right; margin-left: 2em; }';
 		if ( $has_block_gap_support ) {
-			$style .= "$selector > * { margin-top: 0; margin-bottom: 0; }";
-			$style .= "$selector > * + * { margin-top: var( --wp--style--block-gap ); margin-bottom: 0; }";
+			$style .= '.{{ placeholder }} > * { margin-top: 0; margin-bottom: 0; }';
+			$style .= '.{{ placeholder }} > * + * { margin-top: var( --wp--style--block-gap ); margin-bottom: 0; }';
 		}
 	} elseif ( 'flex' === $layout_type ) {
 		$justify_content_options = array(
@@ -76,7 +75,7 @@ function gutenberg_get_layout_style( $selector, $layout, $has_block_gap_support 
 			'space-between' => 'space-between',
 		);
 
-		$style  = "$selector {";
+		$style  = '.{{ placeholder }} {';
 		$style .= 'display: flex;';
 		if ( $has_block_gap_support ) {
 			$style .= 'gap: var( --wp--style--block-gap, 0.5em );';
@@ -95,7 +94,7 @@ function gutenberg_get_layout_style( $selector, $layout, $has_block_gap_support 
 		}
 		$style .= '}';
 
-		$style .= "$selector > * { margin: 0; }";
+		$style .= '{{ placeholder }} > * { margin: 0; }';
 	}
 
 	return $style;
@@ -129,25 +128,15 @@ function gutenberg_render_layout_support_flag( $block_content, $block ) {
 		$used_layout = $default_layout;
 	}
 
-	$id    = uniqid();
-	$style = gutenberg_get_layout_style( ".wp-container-$id", $used_layout, $has_block_gap_support );
+	$style = gutenberg_get_layout_style( $used_layout, $has_block_gap_support );
+	$class_name = gutenberg_render_block_support_style( 'wp-container-', '<style>' . $style . '</style>' );
 	// This assumes the hook only applies to blocks with a single wrapper.
 	// I think this is a reasonable limitation for that particular hook.
 	$content = preg_replace(
 		'/' . preg_quote( 'class="', '/' ) . '/',
-		'class="wp-container-' . $id . ' ',
+		'class="' . $class_name . ' ',
 		$block_content,
 		1
-	);
-
-	// Ideally styles should be loaded in the head, but blocks may be parsed
-	// after that, so loading in the footer for now.
-	// See https://core.trac.wordpress.org/ticket/53494.
-	add_action(
-		'wp_footer',
-		function () use ( $style ) {
-			echo '<style>' . $style . '</style>';
-		}
 	);
 
 	return $content;

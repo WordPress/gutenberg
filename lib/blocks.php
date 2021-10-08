@@ -620,3 +620,59 @@ function gutenberg_multiple_block_styles( $metadata ) {
 	return $metadata;
 }
 add_filter( 'block_type_metadata', 'gutenberg_multiple_block_styles' );
+
+/**
+ * Render block support styles and inject into wp_footer, and append
+ * to the end of post content for REST API requests.
+ *
+ * @param string $name    The identified for a class name or id
+ * @param string $content The content to be rendered
+ *
+ * @return string The class name with an id appended
+ */
+function gutenberg_render_block_support_style( $name, $content, $action = 'wp_footer' ) {
+	$unique_name = $name . uniqid();
+
+	$output = str_replace( '{{ placeholder }}', $unique_name, $content );
+
+	// Ideally styles should be loaded in the head, but blocks may be parsed
+	// after that, so loading in the footer for now.
+	// See https://core.trac.wordpress.org/ticket/53494.
+	add_action(
+		$action,
+		function () use ( $output ) {
+			echo $output;
+		}
+	);
+
+	// For requests via the REST API, append the styles to the end of the content.
+	// This ensures that in situations where `wp_footer` is never called, the
+	// styles are still available. This fixes an issue where layout styles are
+	// otherwise not rendered for the Post Content block within the site editor.
+	if ( defined( 'REST_REQUEST' ) && REST_REQUEST ) {
+		add_filter(
+			'wp_render_block_support_styles',
+			function ( $block_support_styles ) use ( $output ) {
+				return $block_support_styles . $output;
+			},
+			10,
+			1
+		);
+	}
+
+	return $unique_name;
+}
+
+/**
+ * Append the rendered block support styles to the end of post content, if registered.
+ *
+ * This is used to ensure that in responses via the REST API, where `wp_footer`
+ * is not called, that styles are still available for blocks in post content.
+ *
+ * @param  string $content Rendered post content.
+ * @return string          Post content with layout styles appended.
+ */
+function gutenberg_append_block_support_styles_to_the_content( $content ) {
+	return $content . apply_filters( 'wp_render_block_support_styles', '' );
+}
+add_filter( 'the_content', 'gutenberg_append_block_support_styles_to_the_content', 10, 1 );
