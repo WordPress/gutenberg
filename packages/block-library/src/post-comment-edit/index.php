@@ -20,7 +20,7 @@ function render_block_core_post_comment_edit( $attributes, $content, $block ) {
 	}
 
 	$edit_comment_link = get_edit_comment_link( $block->context['commentId'] );
-	$open_in_new_tab   = $attributes['openInNewTab'] === true;
+	$open_in_new_tab   = true === $attributes['openInNewTab'];
 
 	$link_atts = '';
 
@@ -43,9 +43,9 @@ function render_block_core_post_comment_edit( $attributes, $content, $block ) {
 function register_block_core_post_comment_edit() {
 	register_block_type_from_metadata(
 		__DIR__ . '/post-comment-edit',
-		[
+		array(
 			'render_callback' => 'render_block_core_post_comment_edit',
-		]
+		)
 	);
 }
 
