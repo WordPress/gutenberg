@@ -78,14 +78,6 @@ export default function ListViewBlock( {
 		}
 	}, [] );
 
-	// If ListView has experimental features (such as drag and drop) enabled,
-	// leave the focus handling as it was before, to avoid accidental regressions.
-	useEffect( () => {
-		if ( withExperimentalFeatures && isSelected ) {
-			cellRef.current.focus();
-		}
-	}, [ withExperimentalFeatures, isSelected ] );
-
 	const highlightBlock = withExperimentalPersistentListViewFeatures
 		? toggleBlockHighlight
 		: () => {};
