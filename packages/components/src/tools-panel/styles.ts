@@ -77,7 +77,7 @@ export const ToolsPanelHeader = css`
 		height: ${ space( 6 ) };
 
 		/* first-child used to overcome specificity of menu toggle styles */
-		> button:first-child {
+		> button:first-of-type {
 			padding: 0;
 			height: ${ space( 6 ) };
 			min-width: ${ space( 6 ) };
