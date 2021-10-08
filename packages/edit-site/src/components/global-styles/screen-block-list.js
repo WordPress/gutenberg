@@ -1,27 +1,24 @@
 /**
  * WordPress dependencies
  */
-import { getBlockType } from '@wordpress/blocks';
+import { getBlockTypes } from '@wordpress/blocks';
 import { __ } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
  */
-import { useGlobalStylesContext } from '../editor/global-styles-provider';
 import { useHasBorderPanel } from './border-panel';
-import { useHasColorPanel } from './color-panel';
+import { useHasColorPanel } from './color-utils';
 import { useHasDimensionsPanel } from './dimensions-panel';
 import { useHasTypographyPanel } from './typography-panel';
 import ScreenHeader from './header';
 import NavigationButton from './navigation-button';
 
 function BlockMenuItem( { block } ) {
-	const { blocks } = useGlobalStylesContext();
-	const context = blocks[ block.name ];
-	const hasTypographyPanel = useHasTypographyPanel( context );
-	const hasColorPanel = useHasColorPanel( context );
-	const hasBorderPanel = useHasBorderPanel( context );
-	const hasDimensionsPanel = useHasDimensionsPanel( context );
+	const hasTypographyPanel = useHasTypographyPanel( block.name );
+	const hasColorPanel = useHasColorPanel( block.name );
+	const hasBorderPanel = useHasBorderPanel( block.name );
+	const hasDimensionsPanel = useHasDimensionsPanel( block.name );
 	const hasLayoutPanel = hasBorderPanel || hasDimensionsPanel;
 	const hasBlockMenuItem =
 		hasTypographyPanel || hasColorPanel || hasLayoutPanel;
@@ -38,15 +35,16 @@ function BlockMenuItem( { block } ) {
 }
 
 function ScreenBlockList() {
-	const { blocks } = useGlobalStylesContext();
-	const visibleBlocks = Object.keys( blocks )
-		.map( ( name ) => getBlockType( name ) )
-		.filter( ( blockType ) => !! blockType );
-
 	return (
 		<>
-			<ScreenHeader back="/" title={ __( 'Blocks' ) } />
-			{ visibleBlocks.map( ( block ) => (
+			<ScreenHeader
+				back="/"
+				title={ __( 'Blocks' ) }
+				description={ __(
+					'Customize the appearance of specific blocks and for the whole site.'
+				) }
+			/>
+			{ getBlockTypes().map( ( block ) => (
 				<BlockMenuItem
 					block={ block }
 					key={ 'menu-itemblock-' + block.name }

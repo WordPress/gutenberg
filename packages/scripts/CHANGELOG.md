@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Breaking Changes
+
+- The webpack config was updated to no longer include the polyfill by default when creating the `assets.php` file. If your usage requires the `wp-polyfill`, you must explicitly set it as a dependency. ([#34536](https://github.com/WordPress/gutenberg/pull/35436)]
+
 ### Enhancements
 
 -   The bundled `jest-dev-server` dependency has been updated to the next major version `^5.0.3` ([#34560](https://github.com/WordPress/gutenberg/pull/34560)).

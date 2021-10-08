@@ -10,12 +10,6 @@
 
 	overflow: hidden;
 
-	// Overrides the default padding applied in editor styles otherwise preview centering break.
-	&.editor-styles-wrapper {
-		padding: 0;
-		margin: 0;
-	}
-
 	.block-editor-block-preview__content {
 		// This element receives inline styles for width, height, and transform-scale.
 		// Those inline styles are calculated to fit a perfect thumbnail.
@@ -39,17 +33,6 @@
 		.reusable-block-indicator,
 		.block-list-appender {
 			display: none;
-		}
-
-		// Reset default editor padding
-		.block-editor-block-list__layout.is-root-container {
-			padding-left: 0;
-			padding-right: 0;
-
-			> .wp-block[data-align="full"] {
-				margin-left: 0;
-				margin-right: 0;
-			}
 		}
 	}
 }

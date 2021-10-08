@@ -282,7 +282,7 @@ function CoverPlaceholder( {
 			labels={ {
 				title: __( 'Cover' ),
 				instructions: __(
-					'Upload an image or video file, or pick one from your media library.'
+					'Drag and drop onto this block, upload, or select existing media from your library.'
 				),
 			} }
 			onSelect={ onSelectMedia }
@@ -318,6 +318,7 @@ function CoverEdit( {
 		dimRatio,
 		focalPoint,
 		hasParallax,
+		isDark,
 		isRepeated,
 		minHeight,
 		minHeightUnit,
@@ -380,12 +381,16 @@ function CoverEdit( {
 	};
 
 	const isDarkElement = useRef();
-	const isDark = useCoverIsDark(
+	const isCoverDark = useCoverIsDark(
 		url,
 		dimRatio,
 		overlayColor.color,
 		isDarkElement
 	);
+
+	useEffect( () => {
+		setAttributes( { isDark: isCoverDark } );
+	}, [ isCoverDark ] );
 
 	const isImageBackground = IMAGE_BACKGROUND_TYPE === backgroundType;
 	const isVideoBackground = VIDEO_BACKGROUND_TYPE === backgroundType;
@@ -655,6 +660,7 @@ function CoverEdit( {
 		dimRatioToClass( dimRatio ),
 		{
 			'is-dark-theme': isDark,
+			'is-light': ! isDark,
 			'has-background-dim': dimRatio !== 0,
 			'is-transient': isUploadingMedia,
 			'has-parallax': hasParallax,

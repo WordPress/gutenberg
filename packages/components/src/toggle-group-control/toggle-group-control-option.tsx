@@ -23,22 +23,21 @@ function getShowSeparator(
 	toggleGroupControlContext: ToggleGroupControlContextProps,
 	index: number
 ) {
-	const { currentId, items } = toggleGroupControlContext;
+	const { currentId, items, state } = toggleGroupControlContext;
+	if ( items.length < 3 ) {
+		return false;
+	}
+	const targetNodeExists =
+		items.find( ( { id } ) => id === currentId )?.ref?.current?.dataset
+			?.value === state;
 	const isLast = index === items.length - 1;
+	// If no target node exists, don't show the separator after the last item.
+	if ( ! targetNodeExists ) {
+		return ! isLast;
+	}
 	const isActive = items[ index ]?.id === currentId;
 	const isNextActive = items[ index + 1 ]?.id === currentId;
-
-	let showSeparator = true;
-
-	if ( items.length < 3 ) {
-		showSeparator = false;
-	}
-
-	if ( isActive || isNextActive || isLast ) {
-		showSeparator = false;
-	}
-
-	return showSeparator;
+	return ! ( isActive || isNextActive || isLast );
 }
 
 function ToggleGroupControlOption(

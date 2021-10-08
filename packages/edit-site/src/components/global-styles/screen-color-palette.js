@@ -6,12 +6,10 @@ import { __ } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
-import { useGlobalStylesContext } from '../editor/global-styles-provider';
 import ColorPalettePanel from './color-palette-panel';
 import ScreenHeader from './header';
 
 function ScreenColorPalette( { name } ) {
-	const { getSetting, setSetting } = useGlobalStylesContext();
 	const parentMenu = name === undefined ? '' : '/blocks/' + name;
 
 	return (
@@ -19,13 +17,11 @@ function ScreenColorPalette( { name } ) {
 			<ScreenHeader
 				back={ parentMenu + '/colors' }
 				title={ __( 'Color Palette' ) }
-				description={ __( 'Edit the color palette.' ) }
+				description={ __(
+					'Color palettes are used to provide default color options for blocks and various design tools. Here you can edit the colors with their labels.'
+				) }
 			/>
-			<ColorPalettePanel
-				contextName={ name }
-				getSetting={ getSetting }
-				setSetting={ setSetting }
-			/>
+			<ColorPalettePanel name={ name } />
 		</>
 	);
 }

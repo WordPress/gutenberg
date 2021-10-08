@@ -13,6 +13,11 @@ export type ToolsPanelProps = {
 	 */
 	children: ReactNode;
 	/**
+	 * Flags that the items in this ToolsPanel will be contained within an inner
+	 * wrapper element allowing the panel to lay them out accordingly.
+	 */
+	hasInnerWrapper: boolean;
+	/**
 	 * Text to be displayed within the panel's header and as the `aria-label`
 	 * for the panel's dropdown menu.
 	 */
@@ -28,6 +33,11 @@ export type ToolsPanelProps = {
 	 * passed through to the panel's header component.
 	 */
 	resetAll: ResetAll;
+	/**
+	 * Advises the `ToolsPanel` that its child `ToolsPanelItem`s should render
+	 * placeholder content instead of null when they are toggled off and hidden.
+	 */
+	shouldRenderPlaceholderItems: boolean;
 };
 
 export type ToolsPanelHeaderProps = {
@@ -116,6 +126,7 @@ export type ToolsPanelContext = {
 	deregisterPanelItem: ( label: string ) => void;
 	flagItemCustomization: ( label: string ) => void;
 	isResetting: boolean;
+	shouldRenderPlaceholderItems: boolean;
 };
 
 export type ToolsPanelControlsGroupProps = {

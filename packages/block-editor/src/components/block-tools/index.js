@@ -128,8 +128,11 @@ export default function BlockTools( {
 					ref={ usePopoverScroll( __unstableContentRef ) }
 				/>
 				{ children }
-				{ /* Forward compatibility: a place to render block tools behind the
-                 content so it can be tabbed to properly. */ }
+				{ /* Used for inline rich text popovers. */ }
+				<Popover.Slot
+					name="__unstable-block-tools-after"
+					ref={ usePopoverScroll( __unstableContentRef ) }
+				/>
 			</InsertionPoint>
 		</div>
 	);

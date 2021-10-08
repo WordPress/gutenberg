@@ -154,6 +154,9 @@ export default function PageListEdit( {
 				<ServerSideRender
 					block="core/page-list"
 					attributes={ attributesWithParentStatus }
+					EmptyResponsePlaceholder={ () => (
+						<span>{ __( 'Page List: No pages to show.' ) }</span>
+					) }
 				/>
 			</div>
 		</>
