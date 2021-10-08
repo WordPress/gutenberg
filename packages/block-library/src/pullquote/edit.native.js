@@ -49,14 +49,8 @@ const getTextColor = ( { attributes, colors, style } ) => {
 	);
 };
 const getBorderColor = ( props ) => {
-	const { wrapperProps, attributes } = props;
-	const { className } = attributes;
-
-	// Checking for the is-style-solid-color we can better approximate the pull quote style.
-	const defaultColor =
-		className?.search( 'is-style-solid-color' ) !== -1
-			? getBackgroundColor( props )
-			: getTextColor( props );
+	const { wrapperProps } = props;
+	const defaultColor = getTextColor( props );
 
 	return wrapperProps?.style?.borderColor || defaultColor;
 };
