@@ -2,6 +2,7 @@
 	margin: 0 0 1em 0;
 
 	img {
+		height: auto;
 		max-width: 100%;
 	}
 
@@ -15,6 +16,7 @@
 
 	&.alignfull img,
 	&.alignwide img {
+		height: auto;
 		width: 100%;
 	}
 

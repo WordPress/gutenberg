@@ -10,7 +10,7 @@ import { useDispatch, useSelect } from '@wordpress/data';
 import { store as blockEditorStore } from '../../store';
 import { cleanEmptyObject } from '../../hooks/utils';
 
-export default function BlockSupportToolsPanel( { children, label, header } ) {
+export default function BlockSupportToolsPanel( { children, label } ) {
 	const { clientId, attributes } = useSelect( ( select ) => {
 		const { getBlockAttributes, getSelectedBlockClientId } = select(
 			blockEditorStore
@@ -21,7 +21,7 @@ export default function BlockSupportToolsPanel( { children, label, header } ) {
 			clientId: selectedBlockClientId,
 			attributes: getBlockAttributes( selectedBlockClientId ),
 		};
-	} );
+	}, [] );
 	const { updateBlockAttributes } = useDispatch( blockEditorStore );
 
 	const resetAll = ( resetFilters = [] ) => {
@@ -47,10 +47,11 @@ export default function BlockSupportToolsPanel( { children, label, header } ) {
 	return (
 		<ToolsPanel
 			label={ label }
-			header={ header }
 			resetAll={ resetAll }
 			key={ clientId }
 			panelId={ clientId }
+			hasInnerWrapper={ true }
+			shouldRenderPlaceholderItems={ true } // Required to maintain fills ordering.
 		>
 			{ children }
 		</ToolsPanel>

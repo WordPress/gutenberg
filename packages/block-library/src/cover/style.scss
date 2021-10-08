@@ -63,7 +63,6 @@
 		opacity: 0.5;
 	}
 
-
 	@for $i from 1 through 10 {
 		&.has-background-dim.has-background-dim-#{ $i * 10 } {
 			&:not(.has-background-gradient)::before,
@@ -105,6 +104,12 @@
 		width: 100%;
 		z-index: z-index(".wp-block-cover__inner-container");
 		color: $white;
+	}
+
+	&.is-light {
+		.wp-block-cover__inner-container {
+			color: $black;
+		}
 	}
 
 	p,

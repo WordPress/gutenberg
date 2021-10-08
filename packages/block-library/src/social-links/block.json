@@ -48,6 +48,20 @@
 			"default": {
 				"type": "flex"
 			}
+		},
+		"spacing": {
+			"blockGap": true,
+			"margin": [ "top", "bottom" ],
+			"units": [
+				"px",
+				"em",
+				"rem",
+				"vh",
+				"vw"
+			],
+			"__experimentalDefaultControls": {
+				"blockGap": true
+			}
 		}
 	},
 	"styles": [

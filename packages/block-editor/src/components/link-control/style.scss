@@ -132,12 +132,16 @@ $preview-image-height: 140px;
 	border: none;
 	text-align: left;
 	padding: $grid-unit-15 $grid-unit-20;
-	border-radius: 5px;
+	border-radius: 2px;
 	height: auto;
 
 	&:hover,
 	&:focus {
-		background-color: $gray-300;
+		background-color: $gray-100;
+
+		.block-editor-link-control__search-item-type {
+			background: $white;
+		}
 	}
 
 	// The added specificity is needed to override.
@@ -181,6 +185,10 @@ $preview-image-height: 140px;
 		flex: 1; // fill available space.
 	}
 
+	&.is-error .block-editor-link-control__search-item-header {
+		align-items: center;
+	}
+
 	.block-editor-link-control__search-item-details {
 		overflow: hidden; // clip to force text ellipsis.
 	}
@@ -198,6 +206,12 @@ $preview-image-height: 140px;
 		img {
 			width: 16px; // favicons often have a source of 32px
 		}
+	}
+
+	&.is-error .block-editor-link-control__search-item-icon {
+		top: 0;
+		width: 32px;
+		max-height: 32px;
 	}
 
 
@@ -221,7 +235,7 @@ $preview-image-height: 140px;
 
 		mark {
 			font-weight: 700;
-			color: $black;
+			color: inherit;
 			background-color: transparent;
 		}
 
@@ -241,9 +255,14 @@ $preview-image-height: 140px;
 		line-height: 1.3;
 	}
 
+	.block-editor-link-control__search-item-error-notice {
+		font-style: italic;
+		font-size: 1.1em;
+	}
+
 	.block-editor-link-control__search-item-type {
 		display: block;
-		padding: 3px 8px;
+		padding: 3px 6px;
 		margin-left: auto;
 		font-size: 0.9em;
 		background-color: $gray-100;
@@ -380,7 +399,19 @@ $preview-image-height: 140px;
 	}
 }
 
-// Specificity overide
+.block-editor-link-control__search-create {
+	align-items: center; // align text with icon.
+
+	.block-editor-link-control__search-item-title {
+		margin-bottom: 0;
+	}
+
+	.block-editor-link-control__search-item-icon {
+		top: 0; // cancel compensatory spacing added to default suggestions.
+	}
+}
+
+// Specificity override
 .block-editor-link-control__search-results div[role="menu"] > .block-editor-link-control__search-item.block-editor-link-control__search-item {
 	padding: 10px;
 }

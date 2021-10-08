@@ -39,7 +39,13 @@ const htmlElementMessages = {
 };
 
 function ColumnEdit( {
-	attributes: { verticalAlignment, width, templateLock = false, tagName },
+	attributes: {
+		verticalAlignment,
+		width,
+		templateLock = false,
+		allowedBlocks,
+    tagName,
+	},
 	setAttributes,
 	clientId,
 } ) {
@@ -106,6 +112,7 @@ function ColumnEdit( {
 		{ ...blockProps, 'aria-label': label },
 		{
 			templateLock,
+			allowedBlocks,
 			renderAppender: hasChildBlocks
 				? undefined
 				: InnerBlocks.ButtonBlockAppender,
