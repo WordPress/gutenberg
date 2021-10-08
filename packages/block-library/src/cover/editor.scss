@@ -119,6 +119,7 @@
 
 // Resizeable placeholder
 .wp-block-cover.is-placeholder .cover-block__cover-placeholder-container {
+	width: 100%;
 	.components-resizable-box__container {
 		display: none;
 	}
