@@ -112,7 +112,6 @@ function gutenberg_navigation_init( $hook ) {
 	);
 
 	if ( $first_menu_id ) {
-		$preload_paths[] = gutenberg_navigation_get_menu_endpoint( $first_menu_id );
 		$preload_paths[] = gutenberg_navigation_get_menu_items_endpoint( $first_menu_id );
 	}
 
@@ -160,3 +159,25 @@ function gutenberg_navigation_editor_load_block_editor_scripts_and_styles( $is_b
 }
 
 add_filter( 'should_load_block_editor_scripts_and_styles', 'gutenberg_navigation_editor_load_block_editor_scripts_and_styles' );
+
+function gutenberg_navigation_editor_preload_menus( $preload_data ) {
+	$menus_data_path = gutenberg_navigation_get_menus_endpoint();
+	$menus_data      = empty( $preload_data[ $menus_data_path ] ) ? array() : $preload_data[ $menus_data_path ];
+	if ( ! $menus_data ) {
+		return $preload_data;
+	}
+
+	wp_add_inline_script(
+		'wp-edit-navigation',
+		sprintf(
+			'wp.apiFetch.use( wp.editNavigation.createMenuPreloadingMiddleware( %s ) );',
+			wp_json_encode( $menus_data )
+		),
+		'after'
+	);
+
+	unset( $preload_data[ $menus_data_path ] );
+	return $preload_data;
+}
+
+add_filter( 'navigation_editor_preload_data', 'gutenberg_navigation_editor_preload_menus' );
