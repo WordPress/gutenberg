@@ -187,10 +187,10 @@ function Navigation( {
 			className: 'wp-block-navigation__container',
 		},
 		{
+			orientation,
 			allowedBlocks: ALLOWED_BLOCKS,
 			__experimentalDefaultBlock: DEFAULT_BLOCK,
 			__experimentalDirectInsert: DIRECT_INSERT,
-			orientation,
 			renderAppender: CustomAppender || appender,
 
 			// Ensure block toolbar is not too far removed from item
