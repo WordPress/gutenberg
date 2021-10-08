@@ -235,6 +235,7 @@
 }
 
 @mixin input-control {
+	color: #2c3338 !important;
 	font-family: $default-font;
 	padding: 6px 8px;
 	@include input-style__neutral();
