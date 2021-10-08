@@ -11,6 +11,7 @@ For each user feature we should also add a importance categorization label  to i
 
 ## Unreleased
 -   [*] [Embed block] Fix inline preview cut-off when editing URL [#35321]
+-   [*] [Embed block] Fix URL not editable after dismissing the edit URL bottom sheet with empty value [#35460]
 
 ## 1.63.0
 -   [**] [Embed block] Add the top 5 specific embed blocks to the Block inserter list [#34967]
