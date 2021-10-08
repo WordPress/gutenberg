@@ -9,6 +9,22 @@
 	&.is-placeholder {
 		min-height: auto !important;
 		padding: 0 !important;
+
+		// Resizeable placeholder
+		.components-resizable-box__container {
+			display: none;
+		}
+		.components-placeholder {
+			&.is-large {
+				min-height: 250px;
+				justify-content: flex-start;
+				z-index: z-index(".wp-block-cover.is-placeholder .components-placeholder.is-large");
+				+ .components-resizable-box__container {
+					min-height: 250px;
+					display: block;
+				}
+			}
+		}
 	}
 
 	&.components-placeholder h2 {
@@ -115,23 +131,4 @@
 // doesn't work with the transforms that are applied to resize the block in that context.
 .block-editor-block-patterns-list__list-item .has-parallax.wp-block-cover {
 	background-attachment: scroll;
-}
-
-// Resizeable placeholder
-.wp-block-cover.is-placeholder .cover-block__cover-placeholder-container {
-	width: 100%;
-	.components-resizable-box__container {
-		display: none;
-	}
-	.components-placeholder {
-		justify-content: flex-start;
-		&.is-large {
-			min-height: 250px;
-
-			.components-resizable-box__container {
-				min-height: 250px;
-				display: block;
-			}
-		}
-	}
 }
