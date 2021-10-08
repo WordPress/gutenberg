@@ -13,6 +13,7 @@ import { useState } from '@wordpress/element';
  */
 import { ToggleGroupControl, ToggleGroupControlOption } from '../index';
 import { View } from '../../view';
+import Button from '../../button';
 
 export default {
 	component: ToggleGroupControl,
@@ -78,6 +79,36 @@ export const _default = () => {
 			>
 				{ alignOptions }
 			</ToggleGroupControl>
+		</View>
+	);
+};
+
+export const WithReset = () => {
+	const [ alignState, setAlignState ] = useState();
+	const alignOptions = aligns.map( ( key, index ) => (
+		<ToggleGroupControlOption
+			key={ key }
+			value={ key }
+			label={ text(
+				`${ KNOBS_GROUPS.ToggleGroupControlOption }: label`,
+				key,
+				`${ KNOBS_GROUPS.ToggleGroupControlOption }-${ index + 1 }`
+			) }
+		/>
+	) );
+	return (
+		<View>
+			<ToggleGroupControl
+				onChange={ setAlignState }
+				value={ alignState }
+				label={ 'Toggle Group Control' }
+				hideLabelFromVision
+			>
+				{ alignOptions }
+			</ToggleGroupControl>
+			<Button onClick={ () => setAlignState( undefined ) } isTertiary>
+				Reset
+			</Button>
 		</View>
 	);
 };
