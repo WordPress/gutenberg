@@ -6,19 +6,19 @@ import styled from '@emotion/styled';
 /**
  * Internal dependencies
  */
-import NumberControl from '../../number-control';
-import InnerSelectControl from '../../select-control';
-import InnerRangeControl from '../../range-control';
-import { StyledField } from '../../base-control/styles/base-control-styles';
-import { space } from '../utils/space';
-import Button from '../../button';
+import NumberControl from '../number-control';
+import InnerSelectControl from '../select-control';
+import InnerRangeControl from '../range-control';
+import { StyledField } from '../base-control/styles/base-control-styles';
+import { space } from '../ui/utils/space';
+import Button from '../button';
 import {
 	BackdropUI,
 	Container as InputControlContainer,
 	Input,
-} from '../../input-control/styles/input-control-styles';
-import InputControl from '../../input-control';
-import CONFIG from '../../utils/config-values';
+} from '../input-control/styles/input-control-styles';
+import InputControl from '../input-control';
+import CONFIG from '../utils/config-values';
 
 export const NumberControlWrapper = styled( NumberControl )`
 	${ InputControlContainer } {
@@ -112,7 +112,7 @@ export const ColorfulWrapper = styled.div`
 `;
 
 export const DetailsControlButton = styled( Button )`
-	&&&& {
+	&&&&& {
 		min-width: ${ space( 6 ) };
 		padding: 0;
 	}

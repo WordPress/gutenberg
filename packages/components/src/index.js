@@ -39,7 +39,7 @@ export { default as ClipboardButton } from './clipboard-button';
 export { default as __experimentalColorEdit } from './color-edit';
 export { default as ColorIndicator } from './color-indicator';
 export { default as ColorPalette } from './color-palette';
-export { default as ColorPicker } from './color-picker';
+export { ColorPicker } from './color-picker';
 export { default as ComboboxControl } from './combobox-control';
 export {
 	Composite as __unstableComposite,

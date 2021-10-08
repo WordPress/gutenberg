@@ -1,10 +1,10 @@
 /**
  * Internal dependencies
  */
-import { HStack } from '../../h-stack';
-import { Text } from '../../text';
-import { Spacer } from '../../spacer';
-import { space } from '../utils/space';
+import { HStack } from '../h-stack';
+import { Text } from '../text';
+import { Spacer } from '../spacer';
+import { space } from '../ui/utils/space';
 import { RangeControl, NumberControlWrapper } from './styles';
 
 interface InputWithSliderProps {

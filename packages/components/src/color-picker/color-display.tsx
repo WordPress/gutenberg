@@ -13,11 +13,11 @@ import { __ } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
-import { Text } from '../../text';
-import { Flex, FlexItem } from '../../flex';
-import { Tooltip } from '../tooltip';
+import { Text } from '../text';
+import { Flex, FlexItem } from '../flex';
+import { Tooltip } from '../ui/tooltip';
 import type { ColorType } from './types';
-import { space } from '../utils/space';
+import { space } from '../ui/utils/space';
 
 interface ColorDisplayProps {
 	color: ColorFormats.HSLA;
