@@ -3,7 +3,7 @@
  */
 import { InnerBlocks, useBlockProps } from '@wordpress/block-editor';
 
-export default function CommentSave( {
+export default function CommentsQuerySave( {
 	attributes: { tagName: Tag = 'div' },
 } ) {
 	return (
