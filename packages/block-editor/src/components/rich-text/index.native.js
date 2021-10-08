@@ -485,14 +485,12 @@ function RichTextWrapper(
 						// Embed handler
 						embedHandlerPickerRef.current?.presentPicker( {
 							createEmbed: () => {
-								if ( content.length > 0 ) {
-									if ( onReplace ) {
-										onReplace(
-											content,
-											content.length - 1,
-											-1
-										);
-									}
+								if ( onReplace ) {
+									onReplace(
+										content,
+										content.length - 1,
+										-1
+									);
 								}
 							},
 							createLink: () =>
