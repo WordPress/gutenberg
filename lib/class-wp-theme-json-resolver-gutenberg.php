@@ -283,6 +283,7 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 				$parent_theme_json_class_instance = new WP_Theme_JSON_Gutenberg( $parent_theme_json_data );
 
 				// Merge the child theme.json into the parent theme.json.
+				// The child theme takes precedence over the parent.
 				$parent_theme_json_class_instance->merge( self::$theme );
 				self::$theme = $parent_theme_json_class_instance;
 			}
