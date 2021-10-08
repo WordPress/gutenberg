@@ -75,6 +75,14 @@ function gutenberg_initialize_editor( $editor_name, $editor_script_handle, $sett
 		'rest_preload_api_request',
 		array()
 	);
+
+	/**
+	 * Filters the array of data that has been preloaded
+	 *
+	 * @param Array $preload_data Array of the preloaded data
+	 */
+	$preload_data = apply_filters( "{$editor_name}_preload_data", $preload_data );
+
 	wp_add_inline_script(
 		'wp-api-fetch',
 		sprintf(
