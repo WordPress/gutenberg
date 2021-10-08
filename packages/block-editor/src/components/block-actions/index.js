@@ -28,12 +28,11 @@ export default function BlockActions( {
 		canInsertBlockType,
 		getBlockRootClientId,
 		getBlocksByClientId,
+		canMoveBlocks,
 		canRemoveBlocks,
-		getTemplateLock,
-	} = useSelect( ( select ) => select( blockEditorStore ), [] );
+	} = useSelect( blockEditorStore );
 	const { getDefaultBlockName, getGroupingBlockName } = useSelect(
-		( select ) => select( blocksStore ),
-		[]
+		blocksStore
 	);
 
 	const blocks = getBlocksByClientId( clientIds );
@@ -51,6 +50,7 @@ export default function BlockActions( {
 		rootClientId
 	);
 
+	const canMove = canMoveBlocks( clientIds, rootClientId );
 	const canRemove = canRemoveBlocks( clientIds, rootClientId );
 
 	const {
@@ -70,8 +70,8 @@ export default function BlockActions( {
 	return children( {
 		canDuplicate,
 		canInsertDefaultBlock,
+		canMove,
 		canRemove,
-		isLocked: !! getTemplateLock( rootClientId ),
 		rootClientId,
 		blocks,
 		onDuplicate() {
