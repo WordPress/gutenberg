@@ -28,7 +28,7 @@ import { splitValue } from './split-value';
  * Replaces line breaks with line separators if multiline.
  *
  * @param {RichTextValue} value       Value to adjust.
- * @param {boolean}       isMultiline Wether to adjust to multiline or not.
+ * @param {boolean}       isMultiline Whether to adjust to multiline or not.
  *
  * @return {RichTextValue} Adjusted value.
  */
