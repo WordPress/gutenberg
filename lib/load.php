@@ -84,6 +84,7 @@ require __DIR__ . '/compat.php';
 require __DIR__ . '/compat/wordpress-5.8/index.php';
 require __DIR__ . '/compat/wordpress-5.8.1/index.php';
 require __DIR__ . '/compat/wordpress-5.9/default-editor-styles.php';
+require __DIR__ . '/compat/wordpress-5.9/get-global-styles-and-settings.php';
 require __DIR__ . '/utils.php';
 require __DIR__ . '/editor-settings.php';
 
