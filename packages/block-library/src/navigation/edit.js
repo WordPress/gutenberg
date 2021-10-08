@@ -26,7 +26,12 @@ import {
 	getColorClassName,
 } from '@wordpress/block-editor';
 import { useDispatch, withSelect, withDispatch } from '@wordpress/data';
-import { PanelBody, ToggleControl, ToolbarGroup } from '@wordpress/components';
+import {
+	PanelBody,
+	ToggleControl,
+	SelectControl,
+	ToolbarGroup,
+} from '@wordpress/components';
 import { compose } from '@wordpress/compose';
 import { __ } from '@wordpress/i18n';
 
@@ -135,6 +140,9 @@ function Navigation( {
 		className: classnames( className, {
 			[ `items-justified-${ attributes.itemsJustification }` ]: attributes.itemsJustification,
 			'is-vertical': attributes.orientation === 'vertical',
+			'is-accordion':
+				attributes.orientation === 'vertical' &&
+				attributes.expandEffect === 'accordion',
 			'is-responsive': attributes.isResponsive,
 			'has-text-color': !! textColor.color || !! textColor?.class,
 			[ getColorClassName(
@@ -299,6 +307,25 @@ function Navigation( {
 									} );
 								} }
 								label={ __( 'Show submenu indicator icons' ) }
+							/>
+						) }
+						{ attributes.orientation === 'vertical' && (
+							<SelectControl
+								label={ __( 'Expand submenus as' ) }
+								value={ attributes.expandEffect }
+								options={ [
+									{
+										value: 'dropdown',
+										label: __( 'Dropdown' ),
+									},
+									{
+										value: 'accordion',
+										label: __( 'Accordion' ),
+									},
+								] }
+								onChange={ ( expandEffect ) => {
+									setAttributes( { expandEffect } );
+								} }
 							/>
 						) }
 					</PanelBody>

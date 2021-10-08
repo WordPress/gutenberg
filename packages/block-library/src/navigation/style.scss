@@ -145,7 +145,43 @@
 		a {
 			margin: 0;
 		}
+	}
 
+	// Separating out hover and focus-within so hover works again on IE: https://davidwalsh.name/css-focus-within#comment-513401
+	// We will need to replace focus-within with a JS solution for IE keyboard support.
+
+	// Custom menu items.
+	// Show submenus on hover unless they open on click.
+	&:where(:not(.open-on-click)):hover > .wp-block-navigation__submenu-container {
+		visibility: visible;
+		opacity: 1;
+		width: auto;
+		height: auto;
+		min-width: 200px;
+	}
+
+	// Keep submenus open when focus is within.
+	&:where(:not(.open-on-click):not(.open-on-hover-click)):focus-within > .wp-block-navigation__submenu-container {
+		visibility: visible;
+		opacity: 1;
+		width: auto;
+		height: auto;
+		min-width: 200px;
+	}
+
+	// Show submenus on click.
+	.wp-block-navigation-submenu__toggle[aria-expanded="true"] + .wp-block-navigation__submenu-container {
+		visibility: visible;
+		opacity: 1;
+		width: auto;
+		height: auto;
+		min-width: 200px;
+	}
+}
+
+// Styles for dropdown style menu.
+.wp-block-navigation:where(:not(.is-accordion)) .has-child {
+	:where(.wp-block-navigation__submenu-container) {
 		// Submenu indentation when there's no background.
 		left: -1em;
 		top: 100%;
@@ -196,14 +232,19 @@
 		height: auto;
 		min-width: 200px;
 	}
+}
 
-	// Show submenus on click.
-	.wp-block-navigation-submenu__toggle[aria-expanded="true"] + .wp-block-navigation__submenu-container {
-		visibility: visible;
-		opacity: 1;
-		width: auto;
-		height: auto;
-		min-width: 200px;
+// Styles for submenu accordion.
+// These are separated out with reduced specificity to allow better inheritance from Global Styles.
+.wp-block-navigation:where(.is-accordion) .has-child {
+	display: block;
+	margin: $grid-unit-10 0;
+
+	// We use :where to keep specificity minimal, yet still scope it to only the navigation block.
+	// That way if padding is set in theme.json, it still wins.
+	// https://css-tricks.com/almanac/selectors/w/where/
+	:where(.wp-block-navigation__submenu-container) {
+		position: relative;
 	}
 }
 
