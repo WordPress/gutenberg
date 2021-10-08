@@ -44,7 +44,7 @@ const KEYS = {
 
 const root = process.env.GITHUB_WORKSPACE || process.cwd();
 const ARTIFACTS_PATH =
-	process.env.WP_ARTIFACTS_PATH || path.join( root, 'artifacts' );
+	path.resolve( root, process.env.WP_ARTIFACTS_PATH || 'artifacts' );
 
 class PuppeteerEnvironment extends NodeEnvironment {
 	// Jest is not available here, so we have to reverse engineer
@@ -172,7 +172,7 @@ class PuppeteerEnvironment extends NodeEnvironment {
 		await this.global.jestPuppeteer.resetBrowser();
 
 		try {
-			await mkdir( ARTIFACTS_PATH );
+			await mkdir( ARTIFACTS_PATH, { recursive: true } );
 		} catch ( err ) {
 			if ( err.code !== 'EEXIST' ) {
 				throw err;
