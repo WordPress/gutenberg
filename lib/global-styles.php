@@ -97,12 +97,11 @@ function gutenberg_experimental_global_styles_enqueue_assets() {
  */
 function gutenberg_experimental_global_styles_settings( $settings ) {
 	// Set what is the context for this data request.
-	$context = 'all';
+	$context = 'other';
 	if (
 		is_callable( 'get_current_screen' ) &&
 		function_exists( 'gutenberg_is_edit_site_page' ) &&
-		gutenberg_is_edit_site_page( get_current_screen()->id ) &&
-		gutenberg_experimental_is_site_editor_available()
+		gutenberg_is_edit_site_page( get_current_screen()->id )
 	) {
 		$context = 'site-editor';
 	}
@@ -111,27 +110,18 @@ function gutenberg_experimental_global_styles_settings( $settings ) {
 		defined( 'REST_REQUEST' ) &&
 		REST_REQUEST &&
 		isset( $_GET['context'] ) &&
-		'mobile' === $_GET['context'] &&
-		WP_Theme_JSON_Resolver_Gutenberg::theme_has_support()
+		'mobile' === $_GET['context']
 	) {
 		$context = 'mobile';
 	}
 
-	$origin = 'theme';
-	if (
-		WP_Theme_JSON_Resolver_Gutenberg::theme_has_support() &&
-		gutenberg_supports_block_templates()
-	) {
-		// Only lookup for the user data if we need it.
-		$origin = 'user';
-	}
-	$consolidated = WP_Theme_JSON_Resolver_Gutenberg::get_merged_data( $settings, $origin );
+	$consolidated = WP_Theme_JSON_Resolver_Gutenberg::get_merged_data( $settings );
 
-	if ( 'mobile' === $context ) {
+	if ( 'mobile' === $context && WP_Theme_JSON_Resolver_Gutenberg::theme_has_support() ) {
 		$settings['__experimentalStyles'] = $consolidated->get_raw_data()['styles'];
 	}
 
-	if ( 'site-editor' === $context ) {
+	if ( 'site-editor' === $context && gutenberg_experimental_is_site_editor_available() ) {
 		$theme       = WP_Theme_JSON_Resolver_Gutenberg::get_merged_data( $settings, 'theme' );
 		$user_cpt_id = WP_Theme_JSON_Resolver_Gutenberg::get_user_custom_post_type_id();
 
@@ -139,7 +129,7 @@ function gutenberg_experimental_global_styles_settings( $settings ) {
 		$settings['__experimentalGlobalStylesBaseStyles']   = $theme->get_raw_data();
 	}
 
-	if ( 'all' === $context ) {
+	if ( 'other' === $context ) {
 		$block_styles  = array( 'css' => gutenberg_experimental_global_styles_get_stylesheet( $consolidated, 'block_styles' ) );
 		$css_variables = array(
 			'css'                     => gutenberg_experimental_global_styles_get_stylesheet( $consolidated, 'css_variables' ),
