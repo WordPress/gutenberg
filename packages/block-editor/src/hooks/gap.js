@@ -6,7 +6,7 @@ import { Platform } from '@wordpress/element';
 import { getBlockSupport } from '@wordpress/blocks';
 import {
 	__experimentalUseCustomUnits as useCustomUnits,
-	__experimentalUnitControl as UnitControl,
+	__experimentalBoxControl as BoxControl,
 } from '@wordpress/components';
 
 /**
@@ -14,7 +14,7 @@ import {
  */
 import { __unstableUseBlockRef as useBlockRef } from '../components/block-list/use-block-props/use-block-refs';
 import useSetting from '../components/use-setting';
-import { SPACING_SUPPORT_KEY } from './dimensions';
+import { AXIAL_SIDES, SPACING_SUPPORT_KEY, useCustomSides } from './dimensions';
 import { cleanEmptyObject } from './utils';
 
 /**
@@ -82,6 +82,7 @@ export function GapEdit( props ) {
 	const {
 		clientId,
 		attributes: { style },
+		name: blockName,
 		setAttributes,
 	} = props;
 
@@ -95,6 +96,7 @@ export function GapEdit( props ) {
 		],
 	} );
 
+	const sides = useCustomSides( blockName, 'blockGap' );
 	const ref = useBlockRef( clientId );
 
 	if ( useIsGapDisabled( props ) ) {
@@ -102,11 +104,12 @@ export function GapEdit( props ) {
 	}
 
 	const onChange = ( next ) => {
+		const newValue = `${ next?.top } ${ next?.left }`;
 		const newStyle = {
 			...style,
 			spacing: {
 				...style?.spacing,
-				blockGap: next,
+				blockGap: newValue,
 			},
 		};
 
@@ -128,16 +131,28 @@ export function GapEdit( props ) {
 		}
 	};
 
+	const blockGapValue = style?.spacing?.blockGap;
+	const splitOnAxis =
+		sides && sides.some( ( side ) => AXIAL_SIDES.includes( side ) );
+	const splitValues = blockGapValue ? blockGapValue.split( ' ' ) : [];
+	const boxValues = {
+		top: splitValues[ 0 ],
+		right: splitValues[ 1 ],
+		bottom: splitValues[ 0 ],
+		left: splitValues[ 1 ],
+	};
+
 	return Platform.select( {
 		web: (
 			<>
-				<UnitControl
+				<BoxControl
 					label={ __( 'Block spacing' ) }
-					__unstableInputWidth="80px"
 					min={ 0 }
 					onChange={ onChange }
 					units={ units }
-					value={ style?.spacing?.blockGap }
+					values={ boxValues }
+					allowReset={ false }
+					splitOnAxis={ splitOnAxis }
 				/>
 			</>
 		),
