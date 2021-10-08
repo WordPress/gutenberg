@@ -33,6 +33,13 @@ describe( 'stripHTML', () => {
 			expect( stripHTML( input ) ).toBe( output );
 		} );
 
+		it( 'should preserve trailing spaces with HTML', () => {
+			const input =
+				'<strong>Here is some text</strong> with <em>trailing spaces</em>.          ';
+			const output = 'Here is some text with trailing spaces.          ';
+			expect( stripHTML( input ) ).toBe( output );
+		} );
+
 		it( 'should preserve consequtive spaces within string', () => {
 			const input =
 				'<strong>Here is some          text</strong> with                  <em>a lot of spaces inside</em>.';
