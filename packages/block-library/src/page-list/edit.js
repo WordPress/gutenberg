@@ -13,7 +13,7 @@ import {
 	getColorClassName,
 } from '@wordpress/block-editor';
 import ServerSideRender from '@wordpress/server-side-render';
-import { Placeholder, ToolbarButton } from '@wordpress/components';
+import { ToolbarButton } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { useEffect, useState } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
@@ -28,10 +28,6 @@ import ConvertToLinksModal from './convert-to-links-modal';
 // We only show the edit option when page count is <= MAX_PAGE_COUNT
 // Performance of Navigation Links is not good past this value.
 const MAX_PAGE_COUNT = 100;
-
-const EmptyResponsePlaceholder = () => (
-	<Placeholder label={ __( 'No pages to show.' ) } />
-);
 
 export default function PageListEdit( {
 	context,
@@ -158,7 +154,9 @@ export default function PageListEdit( {
 				<ServerSideRender
 					block="core/page-list"
 					attributes={ attributesWithParentStatus }
-					EmptyResponsePlaceholder={ EmptyResponsePlaceholder }
+					EmptyResponsePlaceholder={ () => (
+						<span>{ __( 'Page List: No pages to show.' ) }</span>
+					) }
 				/>
 			</div>
 		</>
