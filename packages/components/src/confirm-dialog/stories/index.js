@@ -17,7 +17,7 @@ export default {
 };
 
 const daText = () =>
-	text( 'message', 'Would you like to privetely publish the post now?' );
+	text( 'message', 'Would you like to privately publish the post now?' );
 
 // Simplest usage: just declare the component with the required `onConfirm` prop.
 export const _default = () => {
