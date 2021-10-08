@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+### New Features
+-	Add the block slug in PascalCase to the list of strings that can be used in templates ([#35462](https://github.com/WordPress/gutenberg/pull/35462))
+
 ## 2.5.0 (2021-07-21)
 
 ### Enhancements
