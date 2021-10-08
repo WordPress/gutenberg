@@ -83,6 +83,15 @@ If onChange is called without any parameter, it should reset the value, attendin
 -   Type: `function`
 -   Required: Yes
 
+### showResetButton
+
+If `true`, a reset button will be displayed alongside the predefined and custom
+font size fields.
+
+-   Type: `Boolean`
+-   Required: no
+-   Default: `true`
+
 ### value
 
 The current font size value.

@@ -60,7 +60,7 @@ function FontSizePicker(
 		onChange,
 		value,
 		withSlider = false,
-		allowReset = true,
+		showResetButton = true,
 	},
 	ref
 ) {
@@ -144,7 +144,7 @@ function FontSizePicker(
 						units={ hasUnits ? units : false }
 					/>
 				) }
-				{ allowReset && (
+				{ showResetButton && (
 					<Button
 						className="components-color-palette__clear"
 						disabled={ value === undefined }
