@@ -68,7 +68,7 @@ export default function TemplateDetails( { template, onClose } ) {
 			<TemplateAreas />
 
 			{ isTemplateRevertable( template ) && (
-				<MenuGroup className="edit-site-template-details__group">
+				<MenuGroup className="edit-site-template-details__group edit-site-template-details__revert">
 					<MenuItem
 						className="edit-site-template-details__revert-button"
 						info={ __( 'Restore template to theme default' ) }
