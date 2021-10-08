@@ -239,6 +239,11 @@ function ListView(
 		]
 	);
 
+	// When using the windowing technique, screenreader should announce total rows instead of actual table rows rendered.
+	const ariaRowCount = __experimentalPersistentListViewFeatures
+		? { 'aria-rowcount': visibleBlockCount }
+		: {};
+
 	return (
 		<AsyncModeProvider value={ true }>
 			<ListViewDropIndicator
@@ -253,6 +258,7 @@ function ListView(
 				onExpandRow={ expandRow }
 				moveWindowUp={ moveWindowUp }
 				moveWindowDown={ moveWindowDown }
+				{ ...ariaRowCount }
 			>
 				<ListViewContext.Provider value={ contextValue }>
 					<ListViewBranch
