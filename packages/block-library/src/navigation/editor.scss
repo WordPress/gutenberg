@@ -524,7 +524,10 @@ body.editor-styles-wrapper
 	// Increase specificity.
 	.wp-block-navigation-item {
 		display: block;
-		margin: $grid-unit-10 0;
+
+		&.wp-block {
+			margin: #{$grid-unit-05 + 1px} $grid-unit-05 $grid-unit-05 $grid-unit-05;
+		}
 
 		// Show submenus on click.
 		> .wp-block-navigation__submenu-container {
@@ -547,21 +550,25 @@ body.editor-styles-wrapper
 		}
 
 		.wp-block-navigation-item__content.wp-block-navigation-item__content.wp-block-navigation-item__content {
+			position: relative;
 			padding: 0.5em 1em;
 			margin-right: 0;
 			border-radius: $radius-block-ui;
 
 			&:hover {
-				box-shadow: 0 0 0 $border-width $gray-300;
+				box-shadow: 0 0 0 $border-width $gray-600;
 			}
 		}
 
+		.wp-block-navigation-item__label,
+		.wp-block-navigation-item__placeholder-text,
 		.wp-block-navigation-link__label,
 		.wp-block-navigation-link__placeholder-text {
 			padding: $grid-unit-05;
 			padding-left: $grid-unit-10;
 		}
 
+		.wp-block-navigation-item__label,
 		.wp-block-navigation-link__label {
 			// Without this Links with submenus display a pointer.
 			cursor: text;
@@ -588,7 +595,8 @@ body.editor-styles-wrapper
 	// Submenu icon indicator.
 	.wp-block-navigation__submenu-icon {
 		position: absolute;
-		top: 15px;
+		top: 50%;
+		margin-top: -7px;
 		left: 0;
 		padding: 0;
 		pointer-events: none;

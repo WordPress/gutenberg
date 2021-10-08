@@ -255,9 +255,11 @@
  */
 
 // Menu items with no background.
-.wp-block-navigation .wp-block-page-list,
-.wp-block-navigation__container {
-	gap: 0.5em 2em;
+.wp-block-navigation:where(:not(.is-tree-view)) {
+	.wp-block-page-list,
+	.wp-block-navigation__container {
+		gap: 0.5em 2em;
+	}
 }
 
 // Menu items with background.
