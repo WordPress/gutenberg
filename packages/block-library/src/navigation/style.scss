@@ -148,7 +148,7 @@
 	}
 }
 
-// Styles for dropdown style menu.
+// Styles for when tree view isn't active.
 .wp-block-navigation:where(:not(.is-tree-view)) .has-child {
 	:where(.wp-block-navigation__submenu-container) {
 		// Submenu indentation when there's no background.
@@ -157,7 +157,7 @@
 
 		// Indentation for all submenus.
 		// Nested submenus sit to the left on large breakpoints.
-		// On smaller breakpoints, they open vertically, tree-view-style.
+		// On smaller breakpoints, they open vertically, accordion-style.
 		@include break-medium {
 			.wp-block-navigation__submenu-container {
 				left: 100%;
