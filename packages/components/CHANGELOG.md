@@ -12,6 +12,7 @@
 ### New Feature
 
 -   Add an experimental `Navigator` components ([#34904](https://github.com/WordPress/gutenberg/pull/34904)) as a replacement for the previous `Navigation` related components.
+-   Added `showResetButton` prop to `FontSizePicker` component allowing optional display of the reset button ([35451](https://github.com/WordPress/gutenberg/pull/35451)).
 
 ### Bug Fix
 
