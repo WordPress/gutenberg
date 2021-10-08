@@ -36,10 +36,6 @@
 			"type": "boolean",
 			"default": true
 		},
-		"expandEffect":{
-			"type": "string",
-			"default": "dropdown"
-		},
 		"openSubmenusOnClick":{
 			"type": "boolean",
 			"default": false

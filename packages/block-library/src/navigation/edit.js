@@ -29,11 +29,12 @@ import { useDispatch, withSelect, withDispatch } from '@wordpress/data';
 import {
 	PanelBody,
 	ToggleControl,
-	SelectControl,
 	ToolbarGroup,
+	ToolbarButton,
 } from '@wordpress/components';
 import { compose } from '@wordpress/compose';
 import { __ } from '@wordpress/i18n';
+import { listView as treeIcon } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -118,6 +119,9 @@ function Navigation( {
 
 	// These props are used by the navigation editor to override specific
 	// navigation block settings.
+	defaultToTreeView = false,
+	hasTreeViewSetting = true,
+
 	hasSubmenuIndicatorSetting = true,
 	hasItemJustificationControls = true,
 	hasColorSettings = true,
@@ -131,18 +135,20 @@ function Navigation( {
 		false
 	);
 
+	const [ isTreeView, setIsTreeView ] = useState( defaultToTreeView );
+
 	const { selectBlock } = useDispatch( blockEditorStore );
 
 	const navRef = useRef();
+
+	const orientation = isTreeView ? 'vertical' : attributes.orientation;
 
 	const blockProps = useBlockProps( {
 		ref: navRef,
 		className: classnames( className, {
 			[ `items-justified-${ attributes.itemsJustification }` ]: attributes.itemsJustification,
-			'is-vertical': attributes.orientation === 'vertical',
-			'is-accordion':
-				attributes.orientation === 'vertical' &&
-				attributes.expandEffect === 'accordion',
+			'is-vertical': orientation === 'vertical',
+			'is-tree-view': isTreeView,
 			'is-responsive': attributes.isResponsive,
 			'has-text-color': !! textColor.color || !! textColor?.class,
 			[ getColorClassName(
@@ -184,14 +190,13 @@ function Navigation( {
 			allowedBlocks: ALLOWED_BLOCKS,
 			__experimentalDefaultBlock: DEFAULT_BLOCK,
 			__experimentalDirectInsert: DIRECT_INSERT,
-			orientation: attributes.orientation,
+			orientation,
 			renderAppender: CustomAppender || appender,
 
 			// Ensure block toolbar is not too far removed from item
 			// being edited when in vertical mode.
 			// see: https://github.com/WordPress/gutenberg/pull/34615.
-			__experimentalCaptureToolbars:
-				attributes.orientation !== 'vertical',
+			__experimentalCaptureToolbars: orientation !== 'vertical',
 			// Template lock set to false here so that the Nav
 			// Block on the experimental menus screen does not
 			// inherit templateLock={ 'all' }.
@@ -254,7 +259,7 @@ function Navigation( {
 	}
 
 	const justifyAllowedControls =
-		attributes.orientation === 'vertical'
+		orientation === 'vertical'
 			? [ 'left', 'center', 'right' ]
 			: [ 'left', 'center', 'right', 'space-between' ];
 
@@ -272,6 +277,14 @@ function Navigation( {
 							position: 'bottom right',
 							isAlternate: true,
 						} }
+					/>
+				) }
+				{ hasTreeViewSetting && (
+					<ToolbarButton
+						name="tree-view"
+						icon={ treeIcon }
+						title={ __( 'Tree view' ) }
+						onClick={ () => setIsTreeView( ! isTreeView ) }
 					/>
 				) }
 				<ToolbarGroup>{ navigatorToolbarButton }</ToolbarGroup>
@@ -307,25 +320,6 @@ function Navigation( {
 									} );
 								} }
 								label={ __( 'Show submenu indicator icons' ) }
-							/>
-						) }
-						{ attributes.orientation === 'vertical' && (
-							<SelectControl
-								label={ __( 'Expand submenus as' ) }
-								value={ attributes.expandEffect }
-								options={ [
-									{
-										value: 'dropdown',
-										label: __( 'Dropdown' ),
-									},
-									{
-										value: 'accordion',
-										label: __( 'Accordion' ),
-									},
-								] }
-								onChange={ ( expandEffect ) => {
-									setAttributes( { expandEffect } );
-								} }
 							/>
 						) }
 					</PanelBody>

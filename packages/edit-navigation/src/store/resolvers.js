@@ -95,7 +95,6 @@ function createNavigationBlock( menuItems ) {
 		'core/navigation',
 		{
 			orientation: 'vertical',
-			expandEffect: 'accordion',
 		},
 		innerBlocks
 	);

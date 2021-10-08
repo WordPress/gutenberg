@@ -497,7 +497,7 @@ body.editor-styles-wrapper
 }
 
 // Styles for dropdown style menu.
-.wp-block-navigation:where(:not(.is-accordion)) {
+.wp-block-navigation:where(:not(.is-tree-view)) {
 	// Styles for submenu flyout.
 	.has-child {
 		&.is-selected,
@@ -520,8 +520,8 @@ body.editor-styles-wrapper
 	}
 }
 
-// Styles for accordion style menu.
-.wp-block-navigation.is-accordion {
+// Styles for tree-view style menu.
+.wp-block-navigation.is-tree-view {
 	padding: 0;
 
 	// Increase specificity.
@@ -570,7 +570,6 @@ body.editor-styles-wrapper
 			cursor: text;
 		}
 	}
-
 
 	// Basic Page List support.
 	ul.wp-block-page-list {
