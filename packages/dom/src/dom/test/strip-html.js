@@ -4,7 +4,7 @@
 import stripHTML from '../strip-html';
 
 describe( 'stripHTML', () => {
-	it( 'should strip basic HTML', () => {
+	it( 'should strip valid HTML', () => {
 		const input =
 			'<strong>Here is some text</strong> that contains <em>HTML markup</em>.';
 		const output = 'Here is some text that contains HTML markup.';
@@ -29,6 +29,21 @@ describe( 'stripHTML', () => {
 		const input =
 			'<strong>      Here is some text</strong> with <em>leading spaces</em>.';
 		const output = '      Here is some text with leading spaces.';
+		expect( stripHTML( input ) ).toBe( output );
+	} );
+
+	it( 'should preserve new lines in multi-line HTML string', () => {
+		const input = `<div>
+        Here is some
+        <em>text</em>
+        with new lines
+        </div>`;
+
+		const output = `
+        Here is some
+        text
+        with new lines
+        `;
 		expect( stripHTML( input ) ).toBe( output );
 	} );
 } );
