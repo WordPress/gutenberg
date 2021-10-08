@@ -4,7 +4,7 @@
 
 ### Breaking Changes
 
-- The webpack config was update to no longer include the polyfill by default when creating the assets.php file. If your usage requires the wp-polyfill, you must explictly set it as a dependency. ([#34536](https://github.com/WordPress/gutenberg/pull/35436)]
+- The webpack config was updated to no longer include the polyfill by default when creating the `assets.php` file. If your usage requires the `wp-polyfill`, you must explicitly set it as a dependency. ([#34536](https://github.com/WordPress/gutenberg/pull/35436)]
 
 ### Enhancements
 
