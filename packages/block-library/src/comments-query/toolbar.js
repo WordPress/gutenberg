@@ -11,13 +11,16 @@ import {
 import { __ } from '@wordpress/i18n';
 import { settings } from '@wordpress/icons';
 
-export default function QueryToolbar( { attributes: { query }, setQuery } ) {
+export default function CommentsQueryToolbar( {
+	attributes: { query },
+	setQuery,
+} ) {
 	return (
 		<>
 			{ ! query.inherit && (
 				<ToolbarGroup>
 					<Dropdown
-						contentClassName="block-library-query-toolbar__popover"
+						contentClassName="block-library-comments-query-toolbar__popover"
 						renderToggle={ ( { onToggle } ) => (
 							<ToolbarButton
 								icon={ settings }
