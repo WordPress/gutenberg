@@ -377,7 +377,7 @@ We enforce that all tests run serially in the current process using [--runInBand
 
 When tests fail, both a screenshot and an HTML snapshot will be taken of the page and stored in the `artifacts/` directory at the root of your project. These snapshots may help debug failed tests during development or when running tests in a CI environment.
 
-The `artifacts/` directory can be customized by defining the `WP_ARTIFACTS_PATH` environment variable.
+The `artifacts/` directory can be customized by setting the `WP_ARTIFACTS_PATH` environment variable to the relative path of the desired directory within your project's root. For example: to change the default directory from `artifacts/` to `my/custom/artifacts`, you could use `WP_ARTIFACTS_PATH=my/custom/artifacts npm run test:e2e`.
 
 #### Advanced information
 
