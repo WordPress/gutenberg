@@ -13,7 +13,7 @@ import { useMemo } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import PlaceholderPreview from './placeholder-preview';
+import PlaceholderPreview from './placeholder/placeholder-preview';
 
 const ALLOWED_BLOCKS = [
 	'core/navigation-link',

@@ -20,9 +20,8 @@ import {
 	getColorClassName,
 	Warning,
 } from '@wordpress/block-editor';
-import { useDispatch, useSelect, withDispatch } from '@wordpress/data';
+import { useDispatch, useSelect } from '@wordpress/data';
 import { PanelBody, ToggleControl, ToolbarGroup } from '@wordpress/components';
-import { compose } from '@wordpress/compose';
 import { __, sprintf } from '@wordpress/i18n';
 
 /**
@@ -30,11 +29,8 @@ import { __, sprintf } from '@wordpress/i18n';
  */
 import useBlockNavigator from '../use-block-navigator';
 import useTemplatePartEntity from '../use-template-part';
-import NavigationPlaceholder from './placeholder';
+import Placeholder from './placeholder';
 import ResponsiveWrapper from './responsive-wrapper';
-
-// TODO - refactor these to somewhere common?
-import TemplatePartPlaceholder from '../../template-part/edit/placeholder';
 import NavigationInnerBlocks from './inner-blocks';
 
 function getComputedStyle( node ) {
@@ -68,7 +64,6 @@ function Navigation( {
 	attributes,
 	setAttributes,
 	clientId,
-	updateInnerBlocks,
 	className,
 	backgroundColor,
 	setBackgroundColor,
@@ -108,10 +103,9 @@ function Navigation( {
 	const hasExistingNavItems = !! innerBlocks.length;
 	const { selectBlock } = useDispatch( blockEditorStore );
 
-	const [
-		isNavigationPlaceholderShown,
-		setIsNavigationPlaceholderShown,
-	] = useState( ! hasExistingNavItems );
+	const [ isPlaceholderShown, setIsPlaceholderShown ] = useState(
+		! hasExistingNavItems
+	);
 
 	const [ isResponsiveMenuOpen, setResponsiveMenuVisibility ] = useState(
 		false
@@ -131,9 +125,7 @@ function Navigation( {
 		clientId
 	);
 
-	const isTemplatePartPlaceholderShown = ! slug;
-	const isEntityAvailable =
-		! isTemplatePartPlaceholderShown && ! isMissing && isResolved;
+	const isEntityAvailable = ! isMissing && isResolved;
 
 	const blockProps = useBlockProps( {
 		ref: navRef,
@@ -220,7 +212,7 @@ function Navigation( {
 
 	const PlaceholderComponent = CustomPlaceholder
 		? CustomPlaceholder
-		: NavigationPlaceholder;
+		: Placeholder;
 
 	const justifyAllowedControls =
 		orientation === 'vertical'
@@ -325,28 +317,18 @@ function Navigation( {
 				) }
 			</InspectorControls>
 			<nav { ...blockProps }>
-				{ isTemplatePartPlaceholderShown && (
-					<TemplatePartPlaceholder
+				{ ! isEntityAvailable && isPlaceholderShown && (
+					<PlaceholderComponent
+						onFinish={ ( newAttributes ) => {
+							setIsPlaceholderShown( false );
+							setAttributes( newAttributes );
+							selectBlock( clientId );
+						} }
 						area={ area }
-						clientId={ clientId }
-						setAttributes={ setAttributes }
 						enableSelection={ enableSelection }
 						hasResolvedReplacements={ hasResolvedReplacements }
 					/>
 				) }
-				{ ! hasExistingNavItems &&
-					! isTemplatePartPlaceholderShown &&
-					isNavigationPlaceholderShown && (
-						<PlaceholderComponent
-							onCreate={ ( blocks, selectNavigationBlock ) => {
-								setIsNavigationPlaceholderShown( false );
-								updateInnerBlocks( blocks );
-								if ( selectNavigationBlock ) {
-									selectBlock( clientId );
-								}
-							} }
-						/>
-					) }
 				<ResponsiveWrapper
 					id={ clientId }
 					onToggle={ setResponsiveMenuVisibility }
@@ -356,8 +338,7 @@ function Navigation( {
 					{ isEntityAvailable && (
 						<NavigationInnerBlocks
 							isVisible={
-								hasExistingNavItems ||
-								! isNavigationPlaceholderShown
+								hasExistingNavItems || ! isPlaceholderShown
 							}
 							templatePartId={ templatePartId }
 							clientId={ clientId }
@@ -372,25 +353,9 @@ function Navigation( {
 	);
 }
 
-export default compose( [
-	withDispatch( ( dispatch, { clientId } ) => {
-		return {
-			updateInnerBlocks( blocks ) {
-				if ( blocks?.length === 0 ) {
-					return false;
-				}
-				dispatch( blockEditorStore ).replaceInnerBlocks(
-					clientId,
-					blocks,
-					true
-				);
-			},
-		};
-	} ),
-	withColors(
-		{ textColor: 'color' },
-		{ backgroundColor: 'color' },
-		{ overlayBackgroundColor: 'color' },
-		{ overlayTextColor: 'color' }
-	),
-] )( Navigation );
+export default withColors(
+	{ textColor: 'color' },
+	{ backgroundColor: 'color' },
+	{ overlayBackgroundColor: 'color' },
+	{ overlayTextColor: 'color' }
+)( Navigation );
