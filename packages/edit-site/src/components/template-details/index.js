@@ -59,6 +59,7 @@ export default function TemplateDetails( { template, onClose } ) {
 					<Text
 						size="body"
 						className="edit-site-template-details__description"
+						as="p"
 					>
 						{ description }
 					</Text>
