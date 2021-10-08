@@ -7,11 +7,10 @@
 .components-font-size-picker__controls {
 	max-width: $sidebar-width - ( 2 * $grid-unit-20 );
 	align-items: center;
+	margin-top: $grid-unit-10;
 	margin-bottom: $grid-unit-30;
 
 	.components-unit-control-wrapper {
-		margin-top: $grid-unit-10; // to be removed...
-
 		.components-input-control__label {
 			font-weight: 300;
 			padding-bottom: 0 !important;
@@ -50,7 +49,6 @@
 
 	.components-color-palette__clear {
 		height: 30px;
-		margin-top: $grid-unit-10;
 	}
 }
 

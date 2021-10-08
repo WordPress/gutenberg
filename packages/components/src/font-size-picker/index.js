@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { isNumber, isString } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { __, sprintf } from '@wordpress/i18n';
@@ -19,71 +14,17 @@ import { Flex, FlexItem } from '../flex';
 import { default as UnitControl, useCustomUnits } from '../unit-control';
 import CustomSelectControl from '../custom-select-control';
 import { VisuallyHidden } from '../visually-hidden';
-
-const DEFAULT_FONT_SIZE = 'default';
-const DEFAULT_FONT_SIZE_OPTION = {
-	slug: DEFAULT_FONT_SIZE,
-	name: __( 'Default' ),
-};
-const CUSTOM_FONT_SIZE = 'custom';
-const CUSTOM_FONT_SIZE_OPTION = {
-	slug: CUSTOM_FONT_SIZE,
-	name: __( 'Custom' ),
-};
-
-function getSelectedOption( fontSizes, value ) {
-	if ( ! value ) {
-		return DEFAULT_FONT_SIZE_OPTION;
-	}
-	return (
-		fontSizes.find( ( font ) => font.size === value ) ||
-		CUSTOM_FONT_SIZE_OPTION
-	);
-}
-
-function getSelectValueFromFontSize( fontSizes, value ) {
-	if ( value ) {
-		const fontSizeValue = fontSizes.find( ( font ) => font.size === value );
-		return fontSizeValue ? fontSizeValue.slug : CUSTOM_FONT_SIZE;
-	}
-	return DEFAULT_FONT_SIZE;
-}
-
-function getSelectOptions( optionsArray, disableCustomFontSizes ) {
-	if ( disableCustomFontSizes && ! optionsArray.length ) {
-		return null;
-	}
-	optionsArray = [
-		// TODO: check what to do with `default` option.
-		{ slug: DEFAULT_FONT_SIZE, name: __( 'Default' ) },
-		...optionsArray,
-		// TODO: check the `custom` one.. probably remove as well
-		...( disableCustomFontSizes
-			? []
-			: [ { slug: CUSTOM_FONT_SIZE, name: __( 'Custom' ) } ] ),
-	];
-	return optionsArray.map( ( option ) => ( {
-		key: option.slug,
-		name: option.name,
-		size: option.size,
-		hint:
-			option.size &&
-			isSimpleCssValue( option.size ) &&
-			parseInt( option.size ),
-	} ) );
-}
-
-/**
- * Some themes use css vars for their font sizes, so until we
- * have the way of calculating them don't display them.
- *
- * @param {*} value The value that is checked.
- * @return {boolean} Whether the value is a simple css value.
- */
-function isSimpleCssValue( value ) {
-	const sizeRegex = /^(?!0)\d+(px|em|rem|vw|vh|%)?$/i;
-	return sizeRegex.test( value );
-}
+import {
+	ToggleGroupControl,
+	ToggleGroupControlOption,
+} from '../toggle-group-control';
+import {
+	getFontSizeOptions,
+	getSelectedOption,
+	splitValueAndUnitFromSize,
+	isSimpleCssValue,
+	CUSTOM_FONT_SIZE,
+} from './utils';
 
 function FontSizePicker(
 	{
@@ -97,60 +38,78 @@ function FontSizePicker(
 	},
 	ref
 ) {
-	const hasUnits =
-		isString( value ) ||
-		( fontSizes[ 0 ] && isString( fontSizes[ 0 ].size ) );
-
+	const hasUnits = [ typeof value, typeof fontSizes?.[ 0 ].size ].includes(
+		'string'
+	);
 	const noUnitsValue = ! hasUnits ? value : parseInt( value );
-
-	// TODO: check the below logic
-	const isPixelValue =
-		isNumber( value ) || ( isString( value ) && value.endsWith( 'px' ) );
-
-	// TODO: check to use supplied available font size units
+	const isPixelValue = typeof value === 'number' || value?.endsWith?.( 'px' );
 	const units = useCustomUnits( {
 		availableUnits: [ 'px', 'em', 'rem' ],
 	} );
 
+	/**
+	 * We use the select control if the available font sizes are `more` than five
+	 * and when are `less` than five but there is at least on font size that has
+	 * not a simple css var (eg. 'calc', 'var', etc..).
+	 *
+	 * This will need to be updated when we'll have the way of calculating them.
+	 */
+	const useSelectControl =
+		fontSizes?.length > 5 ||
+		fontSizes.some( ( { size } ) => ! isSimpleCssValue( size ) );
+
 	const options = useMemo(
-		() => getSelectOptions( fontSizes, disableCustomFontSizes ),
-		[ fontSizes, disableCustomFontSizes ]
+		() =>
+			getFontSizeOptions(
+				useSelectControl,
+				fontSizes,
+				disableCustomFontSizes
+			),
+		[ useSelectControl, fontSizes, disableCustomFontSizes ]
 	);
 	const selectedOption = getSelectedOption( fontSizes, value );
 	const isCustomValue = selectedOption.slug === CUSTOM_FONT_SIZE;
-	// const isDefaultValue = selectedOption.slug === DEFAULT_FONT_SIZE;
 	const [ showCustomValueControl, setShowCustomValueControl ] = useState(
-		isCustomValue
+		! disableCustomFontSizes && isCustomValue
 	);
+	const headerHint = useMemo( () => {
+		if ( showCustomValueControl ) {
+			return `(${ __( 'custom' ) })`;
+		}
+		/**
+		 * If we have a custom value that is not available in
+		 * the font sizes, show it as a hint if a simple css value.
+		 */
+		if ( isCustomValue ) {
+			return isSimpleCssValue( value ) && `(${ value })`;
+		}
+		if ( useSelectControl ) {
+			return (
+				isSimpleCssValue( selectedOption?.size ) &&
+				`(${ selectedOption?.size })`
+			);
+		}
+		// Calculate the `hint` for toggle group control.
+		let hint = selectedOption.name;
+		if ( typeof selectedOption.size === 'string' ) {
+			const [ , unit ] = splitValueAndUnitFromSize( selectedOption.size );
+			hint += `(${ unit })`;
+		}
+		return hint;
+	}, [ showCustomValueControl, selectedOption?.slug, value, isCustomValue ] );
 
 	if ( ! options ) {
 		return null;
 	}
 
-	const selectedFontSizeSlug = getSelectValueFromFontSize( fontSizes, value );
-
+	// This is used for select control only. We need to add support
+	// for ToggleGroupControl.
 	const currentFontSizeSR = sprintf(
 		// translators: %s: Currently selected font size.
 		__( 'Currently selected font size: %s' ),
-		options.find( ( option ) => option.key === selectedFontSizeSlug ).name
+		selectedOption.name
 	);
-
 	const baseClassName = 'components-font-size-picker';
-	// TODO: check to remove function or put it outside the component..
-	const getHeaderHint = ( _selectedOption, _showCustomValueControl ) => {
-		if ( _showCustomValueControl ) {
-			return __( 'custom' );
-		}
-		// TODO take into account if control is `select` or `toggleGroup`..
-		let hint = _selectedOption?.size;
-		if ( selectedOption.slug === CUSTOM_FONT_SIZE ) {
-			hint = value;
-		}
-		if ( isSimpleCssValue( hint ) ) {
-			return hint;
-		}
-	};
-	const headerHint = getHeaderHint( selectedOption, showCustomValueControl );
 	return (
 		<fieldset className={ baseClassName } { ...( ref ? {} : { ref } ) }>
 			<VisuallyHidden as="legend">{ __( 'Font size' ) }</VisuallyHidden>
@@ -162,7 +121,7 @@ function FontSizePicker(
 					{ __( 'Size' ) }
 					{ headerHint && (
 						<span className={ `${ baseClassName }__header__hint` }>
-							({ headerHint })
+							{ headerHint }
 						</span>
 					) }
 				</FlexItem>
@@ -182,27 +141,51 @@ function FontSizePicker(
 				) }
 			</Flex>
 			<div className={ `${ baseClassName }__controls` }>
-				{ fontSizes.length > 0 && ! showCustomValueControl && (
-					<CustomSelectControl
-						className={ `${ baseClassName }__select` }
+				{ !! fontSizes.length &&
+					useSelectControl &&
+					! showCustomValueControl && (
+						<CustomSelectControl
+							className={ `${ baseClassName }__select` }
+							label={ __( 'Font size' ) }
+							hideLabelFromVision
+							describedBy={ currentFontSizeSR }
+							options={ options }
+							value={ options.find(
+								( option ) => option.key === selectedOption.slug
+							) }
+							onChange={ ( { selectedItem } ) => {
+								onChange(
+									hasUnits
+										? selectedItem.size
+										: Number( selectedItem.size )
+								);
+								if ( selectedItem.key === CUSTOM_FONT_SIZE ) {
+									setShowCustomValueControl( true );
+								}
+							} }
+						/>
+					) }
+				{ ! useSelectControl && ! showCustomValueControl && (
+					<ToggleGroupControl
 						label={ __( 'Font size' ) }
-						describedBy={ currentFontSizeSR }
-						options={ options }
-						value={ options.find(
-							( option ) => option.key === selectedFontSizeSlug
-						) }
-						onChange={ ( { selectedItem } ) => {
-							onChange(
-								hasUnits
-									? selectedItem.size
-									: Number( selectedItem.size )
-							);
-							if ( selectedItem.key === CUSTOM_FONT_SIZE ) {
-								setShowCustomValueControl( true );
-							}
-						} }
 						hideLabelFromVision
-					/>
+						value={ value }
+						onChange={ ( newValue ) => {
+							// TODO: related to `reset`. Should we show the button?
+							onChange(
+								hasUnits ? newValue : Number( newValue )
+							);
+						} }
+						isBlock
+					>
+						{ options.map( ( option ) => (
+							<ToggleGroupControlOption
+								key={ option.key }
+								value={ option.value }
+								label={ option.label }
+							/>
+						) ) }
+					</ToggleGroupControl>
 				) }
 				{ ! withSlider &&
 					! disableCustomFontSizes &&
