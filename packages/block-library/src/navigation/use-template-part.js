@@ -4,7 +4,7 @@
 import { store as coreStore } from '@wordpress/core-data';
 import { useSelect } from '@wordpress/data';
 
-export default function useTemplatePartEntity( templatePartId, blockArea ) {
+export default function useTemplatePartEntity( templatePartId, areaAttribute ) {
 	return useSelect(
 		( select ) => {
 			const {
@@ -22,7 +22,7 @@ export default function useTemplatePartEntity( templatePartId, blockArea ) {
 				? getEditedEntityRecord( ...getEntityArgs )
 				: null;
 
-			const _area = entityRecord?.area || blockArea;
+			const _area = entityRecord?.area || areaAttribute;
 
 			// Check whether other entities exist for switching/selection.
 			const availableReplacementArgs = [
@@ -55,6 +55,6 @@ export default function useTemplatePartEntity( templatePartId, blockArea ) {
 				),
 			};
 		},
-		[ templatePartId, blockArea ]
+		[ templatePartId, areaAttribute ]
 	);
 }
