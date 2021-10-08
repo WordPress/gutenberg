@@ -273,7 +273,7 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 		if ( null === self::$theme ) {
 			$theme_json_data = self::read_json_file( self::get_file_path_from_theme( 'theme.json' ) );
 			$theme_json_data = self::translate( $theme_json_data, wp_get_theme()->get( 'TextDomain' ) );
-			self::$theme = new WP_Theme_JSON_Gutenberg( $theme_json_data );
+			self::$theme     = new WP_Theme_JSON_Gutenberg( $theme_json_data );
 
 			// If this is a child theme we want to combine the theme.json from the child with the theme.json with the parent.
 			if ( wp_get_theme()->parent() ) {
