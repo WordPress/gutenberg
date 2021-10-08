@@ -373,6 +373,12 @@ This script automatically detects the best config to start Puppeteer but sometim
 
 We enforce that all tests run serially in the current process using [--runInBand](https://jestjs.io/docs/en/cli#runinband) Jest CLI option to avoid conflicts between tests caused by the fact that they share the same WordPress instance.
 
+#### Failed Test Artifacts
+
+When tests fail, both a screenshot and an HTML snapshot will be taken of the page and stored in the `artifacts/` directory at the root of your project. These snapshots may help debug failed tests during development or when running tests in a CI environment.
+
+The `artifacts/` directory can be customized by defining the `WP_ARTIFACTS_PATH` environment variable.
+
 #### Advanced information
 
 It uses [Jest](https://jestjs.io/) behind the scenes and you are able to use all of its [CLI options](https://jestjs.io/docs/en/cli.html). You can also run `./node_modules/.bin/wp-scripts test:e2e --help` or `npm run test:e2e:help` (as mentioned above) to view all of the available options. Learn more in the [Advanced Usage](#advanced-usage) section.
@@ -414,12 +420,6 @@ Jest will look for test files with any of the following popular naming conventio
 -   Files with `.js` (or `.ts`) suffix located at any level of depth in `__tests__` folders.
 -   Files with `.js` (or `.ts`) suffix directly located in `test` folders.
 -   Files with `.test.js` (or `.test.ts`) suffix.
-
-#### Failed Test Artifacts
-
-When tests fail, both a screenshot and an HTML snapshot will be taken of the page and stored in the `artifacts/` directory at the root of your project. These snapshots may help debug failed tests during development or when running tests in a CI environment.
-
-The `artifacts/` directory can be customized by defining the `WP_ARTIFACTS_PATH` environment variable.
 
 #### Advanced information
 
