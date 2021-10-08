@@ -43,8 +43,10 @@ const KEYS = {
 };
 
 const root = process.env.GITHUB_WORKSPACE || process.cwd();
-const ARTIFACTS_PATH =
-	path.resolve( root, process.env.WP_ARTIFACTS_PATH || 'artifacts' );
+const ARTIFACTS_PATH = path.resolve(
+	root,
+	process.env.WP_ARTIFACTS_PATH || 'artifacts'
+);
 
 class PuppeteerEnvironment extends NodeEnvironment {
 	// Jest is not available here, so we have to reverse engineer
