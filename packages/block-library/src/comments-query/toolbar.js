@@ -20,7 +20,6 @@ export default function CommentsQueryToolbar( {
 			{ ! query.inherit && (
 				<ToolbarGroup>
 					<Dropdown
-						contentClassName="block-library-comments-query-toolbar__popover"
 						renderToggle={ ( { onToggle } ) => (
 							<ToolbarButton
 								icon={ settings }
