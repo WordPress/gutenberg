@@ -31,14 +31,14 @@
 
 		// Customize/zero out the gap.
 		.wp-block-navigation__container {
-			// This unsets flex.
-			display: block;
+			display: flex;
+			gap: 0;
 		}
 
 		// Increase specificity.
 		.wp-block-navigation-item {
 			display: block;
-			margin: $grid-unit-10 0;
+			margin: $grid-unit-05 0;
 
 			// Show submenus on click.
 			> .wp-block-navigation__submenu-container {
@@ -133,11 +133,6 @@
 			border-radius: $radius-block-ui;
 		}
 
-		// Use flex layout to calculate menu item length based on content.
-		.wp-block-navigation__container {
-			display: flex;
-		}
-
 		// Override for deeply nested submenus.
 		.has-child .wp-block-navigation__container .wp-block-navigation__submenu-container {
 			left: auto;
@@ -157,7 +152,8 @@
 				min-width: auto;
 				width: 100%;
 				border: none;
-				display: block;
+				display: flex;
+				align-items: flex-start;
 
 				&::before {
 					display: none;
