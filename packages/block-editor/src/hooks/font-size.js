@@ -144,7 +144,7 @@ export function FontSizeEdit( props ) {
 		<FontSizePicker
 			onChange={ onChange }
 			value={ fontSizeValue }
-			allowReset={ false }
+			showResetButton={ false }
 		/>
 	);
 }
