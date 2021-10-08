@@ -318,6 +318,7 @@ function CoverEdit( {
 		dimRatio,
 		focalPoint,
 		hasParallax,
+		isDark,
 		isRepeated,
 		minHeight,
 		minHeightUnit,
@@ -380,12 +381,16 @@ function CoverEdit( {
 	};
 
 	const isDarkElement = useRef();
-	const isDark = useCoverIsDark(
+	const isCoverDark = useCoverIsDark(
 		url,
 		dimRatio,
 		overlayColor.color,
 		isDarkElement
 	);
+
+	useEffect( () => {
+		setAttributes( { isDark: isCoverDark } );
+	}, [ isCoverDark ] );
 
 	const isImageBackground = IMAGE_BACKGROUND_TYPE === backgroundType;
 	const isVideoBackground = VIDEO_BACKGROUND_TYPE === backgroundType;
@@ -655,6 +660,7 @@ function CoverEdit( {
 		dimRatioToClass( dimRatio ),
 		{
 			'is-dark-theme': isDark,
+			'is-light': ! isDark,
 			'has-background-dim': dimRatio !== 0,
 			'is-transient': isUploadingMedia,
 			'has-parallax': hasParallax,
