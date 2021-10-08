@@ -326,9 +326,7 @@ const Popover = (
 
 			let boundaryElement;
 			if ( __unstableBoundaryParent ) {
-				boundaryElement = containerRef.current.closest(
-					'.popover-slot'
-				)?.parentNode;
+				boundaryElement = containerRef.current.parentElement;
 			}
 
 			const usedContentSize = ! contentSize.height
