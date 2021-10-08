@@ -39,12 +39,7 @@ const htmlElementMessages = {
 };
 
 function ColumnEdit( {
-	attributes: {
-		verticalAlignment,
-		width,
-		templateLock = false,
-		tagName: TagName = 'div',
-	},
+	attributes: { verticalAlignment, width, templateLock = false, tagName },
 	setAttributes,
 	clientId,
 } ) {
@@ -150,11 +145,11 @@ function ColumnEdit( {
 						{ label: '<article>', value: 'article' },
 						{ label: '<aside>', value: 'aside' },
 					] }
-					value={ TagName }
+					value={ tagName }
 					onChange={ ( value ) =>
 						setAttributes( { tagName: value } )
 					}
-					help={ htmlElementMessages[ TagName ] }
+					help={ htmlElementMessages[ tagName ] }
 				/>
 			</InspectorAdvancedControls>
 			<div { ...innerBlocksProps } />

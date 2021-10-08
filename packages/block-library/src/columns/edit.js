@@ -76,11 +76,7 @@ function ColumnsEditContainer( {
 	updateColumns,
 	clientId,
 } ) {
-	const {
-		isStackedOnMobile,
-		verticalAlignment,
-		tagName: TagName = 'div',
-	} = attributes;
+	const { isStackedOnMobile, verticalAlignment, tagName } = attributes;
 
 	const { count } = useSelect(
 		( select ) => {
@@ -150,11 +146,11 @@ function ColumnsEditContainer( {
 						{ label: '<article>', value: 'article' },
 						{ label: '<aside>', value: 'aside' },
 					] }
-					value={ TagName }
+					value={ tagName }
 					onChange={ ( value ) =>
 						setAttributes( { tagName: value } )
 					}
-					help={ htmlElementMessages[ TagName ] }
+					help={ htmlElementMessages[ tagName ] }
 				/>
 			</InspectorAdvancedControls>
 			<div { ...innerBlocksProps } />
