@@ -5,18 +5,30 @@
 	align-items: center;
 	margin-bottom: $grid-unit-30;
 
+	// Leave the spacing to the ToolsPanel grid layout.
+	.components-tools-panel & {
+		margin-bottom: 0;
+	}
+
 	.components-unit-control-wrapper {
 		margin-right: $grid-unit-10;
+
+		// Remove margin when reset button has been omitted.
+		&:last-child {
+			margin-right: 0;
+		}
 
 		.components-input-control__label {
 			font-weight: 300;
 			padding-bottom: 0 !important;
 			margin-bottom: $grid-unit-10 !important;
+			line-height: 1.4; // Make label line-height consistent between inputs.
 		}
 	}
 
 	.components-custom-select-control__button {
 		min-width: 120px;
+		width: 100%; // Allow the button to stretch when reset button is omitted.
 	}
 
 	// Apply the same height as the isSmall Reset button.
@@ -46,6 +58,7 @@
 
 	// Allow the font-size picker dropdown to grow in width.
 	.components-font-size-picker__select {
+		flex: 1;
 		margin-right: $grid-unit-10;
 	}
 
