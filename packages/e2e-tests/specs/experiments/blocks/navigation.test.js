@@ -654,6 +654,8 @@ describe( 'Navigation', () => {
 		await insertBlock( 'Site Title' );
 
 		// Now try inserting another Link block via the quick inserter.
+		await page.focus( '.wp-block-navigation .block-list-appender' );
+
 		await page.click( '.wp-block-navigation .block-list-appender' );
 
 		const linkButton = await page.waitForSelector(
