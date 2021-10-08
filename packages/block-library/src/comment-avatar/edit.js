@@ -10,6 +10,7 @@ import {
 	InspectorControls,
 	__experimentalUseBorderProps as useBorderProps,
 	__experimentalImageSizeControl as ImageSizeControl,
+	__experimentalGetSpacingClassesAndStyles as useSpacingProps,
 	useBlockProps,
 } from '@wordpress/block-editor';
 import { PanelBody, ResizableBox } from '@wordpress/components';
@@ -37,7 +38,7 @@ export default ( { attributes, context: { commentId }, setAttributes } ) => {
 	const sizes = avatars ? Object.keys( avatars ) : null;
 	const maxSize = sizes ? sizes[ sizes.length - 1 ] : 96;
 	const borderProps = useBorderProps( attributes );
-
+	const spacingProps = useSpacingProps( attributes );
 	return (
 		<>
 			<InspectorControls>
@@ -77,6 +78,7 @@ export default ( { attributes, context: { commentId }, setAttributes } ) => {
 							className={ classnames(
 								className,
 								borderProps.className,
+								spacingProps.className,
 								{
 									// For backwards compatibility add style that isn't
 									// provided via block support.
@@ -86,6 +88,7 @@ export default ( { attributes, context: { commentId }, setAttributes } ) => {
 							) }
 							style={ {
 								...borderProps.style,
+								...spacingProps.style,
 							} }
 							src={ avatarUrls[ avatarUrls.length - 1 ] }
 							alt={ `${ authorName } ${ __( 'Avatar' ) }` }

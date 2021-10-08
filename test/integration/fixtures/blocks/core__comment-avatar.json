@@ -4,19 +4,20 @@
 		"name": "core/comment-avatar",
 		"isValid": true,
 		"attributes": {
-			"width": 96,
-			"height": 96,
+			"width": 152,
+			"height": 152,
+			"className": "additional-class",
 			"style": {
+				"border": {
+					"radius": "65px"
+				},
 				"spacing": {
 					"padding": {
-						"top": "30px",
-						"right": "30px",
-						"bottom": "30px",
-						"left": "30px"
+						"top": "10px",
+						"right": "10px",
+						"bottom": "10px",
+						"left": "10px"
 					}
-				},
-				"border": {
-					"radius": "100px"
 				}
 			}
 		},
