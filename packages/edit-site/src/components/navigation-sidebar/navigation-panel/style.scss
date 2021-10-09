@@ -117,6 +117,14 @@
 	}
 }
 
+.edit-site-navigation-panel__template-parts .components-navigation__menu-title-heading {
+	text-transform: capitalize;
+}
+
+.edit-site-navigation-panel__template-part-item .components-navigation__item-title {
+	text-transform: capitalize;
+}
+
 .components-navigation__item + .edit-site-navigation-panel__template-item {
 	margin-top: $grid-unit-20;
 }

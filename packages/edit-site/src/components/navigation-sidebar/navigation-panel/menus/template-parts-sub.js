@@ -17,6 +17,7 @@ import { MENU_TEMPLATE_PARTS } from '../constants';
 export default function TemplatePartsSubMenu( { menu, title, templateParts } ) {
 	return (
 		<NavigationMenu
+			className="edit-site-navigation-panel__template-parts"
 			menu={ menu }
 			title={ title }
 			parentMenu={ MENU_TEMPLATE_PARTS }
