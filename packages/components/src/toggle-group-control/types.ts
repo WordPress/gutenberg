@@ -88,6 +88,7 @@ export type ToggleGroupControlButtonProps = {
 	showSeparator?: boolean;
 	value?: ReactText;
 	state?: any;
+	disabled?: boolean;
 };
 
 export type ToggleGroupControlBackdropProps = {

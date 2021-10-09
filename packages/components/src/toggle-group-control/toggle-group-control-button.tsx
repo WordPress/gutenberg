@@ -16,12 +16,7 @@ import * as styles from './styles';
 import type { ToggleGroupControlButtonProps } from './types';
 import { useCx } from '../utils/hooks';
 
-const {
-	ButtonContentView,
-	LabelPlaceholderView,
-	LabelView,
-	SeparatorView,
-} = styles;
+const { ButtonContentView, LabelView, SeparatorView } = styles;
 
 function ToggleGroupControlButton( {
 	className,
@@ -38,7 +33,7 @@ function ToggleGroupControlButton( {
 	const classes = cx(
 		styles.buttonView,
 		className,
-		isActive && styles.buttonActive
+		props.disabled ? styles.buttonDisabled : isActive && styles.buttonActive
 	);
 	return (
 		<LabelView className={ labelViewClasses } data-active={ isActive }>
@@ -52,9 +47,6 @@ function ToggleGroupControlButton( {
 				value={ value }
 			>
 				<ButtonContentView>{ label }</ButtonContentView>
-				<LabelPlaceholderView aria-hidden>
-					{ label }
-				</LabelPlaceholderView>
 			</Radio>
 			<ToggleGroupControlSeparator isActive={ ! showSeparator } />
 		</LabelView>

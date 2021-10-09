@@ -68,7 +68,7 @@ export const buttonView = css`
 	background: transparent;
 	border: none;
 	border-radius: ${ CONFIG.controlBorderRadius };
-	color: ${ COLORS.gray[ 700 ] };
+	color: ${ COLORS.ui.label };
 	cursor: pointer;
 	display: flex;
 	height: 100%;
@@ -98,13 +98,13 @@ export const buttonActive = css`
 	color: ${ COLORS.white };
 `;
 
+export const buttonDisabled = css`
+	color: ${ COLORS.ui.textDisabled };
+`;
+
 export const ButtonContentView = styled.div`
 	font-size: ${ CONFIG.fontSize };
 	line-height: 1;
-	position: absolute;
-	top: 50%;
-	left: 50%;
-	transform: translate( -50%, -50% );
 `;
 
 export const SeparatorView = styled.div`
@@ -120,14 +120,6 @@ export const SeparatorView = styled.div`
 
 export const separatorActive = css`
 	background: transparent;
-`;
-
-export const LabelPlaceholderView = styled.div`
-	font-size: ${ CONFIG.fontSize };
-	font-weight: bold;
-	height: 0;
-	overflow: hidden;
-	visibility: hidden;
 `;
 
 export const medium = css`

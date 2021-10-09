@@ -27,17 +27,12 @@ function ToggleGroupControlBackdrop( {
 		 * Workaround for Reakit
 		 */
 		const targetNode = containerNode.querySelector(
-			`[data-value="${ state }"]`
-		);
+			'[data-active="true"]'
+		) as HTMLElement;
 		if ( ! targetNode ) return;
 
-		const { x: parentX } = containerNode.getBoundingClientRect();
-		const { width: offsetWidth, x } = targetNode.getBoundingClientRect();
-		const borderWidth = 1;
-		const offsetLeft = x - parentX - borderWidth;
-
-		setLeft( offsetLeft );
-		setWidth( offsetWidth );
+		setLeft( targetNode.offsetLeft );
+		setWidth( targetNode.offsetWidth );
 
 		let requestId: number;
 		if ( ! canAnimate ) {
