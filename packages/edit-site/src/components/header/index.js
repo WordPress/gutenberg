@@ -62,15 +62,11 @@ export default function Header( {
 		const postType = getEditedPostType();
 		const postId = getEditedPostId();
 		const record = getEditedEntityRecord( 'postType', postType, postId );
-		const _entityTitle =
-			'wp_template' === postType
-				? getTemplateInfo( record ).title
-				: record?.slug;
 		const _isLoaded = !! postId;
 
 		return {
 			deviceType: __experimentalGetPreviewDeviceType(),
-			entityTitle: _entityTitle,
+			entityTitle: getTemplateInfo( record ).title,
 			isLoaded: _isLoaded,
 			template: record,
 			templateType: postType,
