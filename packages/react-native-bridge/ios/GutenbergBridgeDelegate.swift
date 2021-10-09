@@ -256,6 +256,9 @@ public protocol GutenbergBridgeDelegate: class {
 
     /// Tells the delegate that the editor requested to show the "My Tickets" support view.
     func gutenbergDidRequestGotoCustomerSupportOptions()
+    
+    /// Tells the delegate that the editor requested to show a native Notice
+    func gutenbergDidRequestShowNotice(_ message:String, duration:Int)
 }
 
 // MARK: - Optional GutenbergBridgeDelegate methods

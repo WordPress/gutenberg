@@ -264,6 +264,10 @@ extension GutenbergViewController: GutenbergBridgeDelegate {
     func gutenbergDidRequestGotoCustomerSupportOptions() {
         print(#function)
     }
+    
+    func gutenbergDidRequestShowNotice(_ message:String, duration:Int) {
+        print(#function)
+    }
 }
 
 extension GutenbergViewController: GutenbergWebDelegate {

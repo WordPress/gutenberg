@@ -434,9 +434,7 @@ export function requestGotoCustomerSupportOptions() {
  * @param {number} duration Use nativeNoticeLength to define the duration of it.
  */
 export function showNativeNotice( message, duration ) {
-	if ( isAndroid ) {
-		RNReactNativeGutenbergBridge.showNotice( message, duration );
-	}
+	RNReactNativeGutenbergBridge.showNotice( message, duration );
 }
 
 export default RNReactNativeGutenbergBridge;
