@@ -13,6 +13,11 @@ const gutenbergBridgeEvents = new NativeEventEmitter(
 
 export const { isInitialColorSchemeDark } = RNReactNativeGutenbergBridge;
 
+export const nativeNoticeLength = {
+	long: RNReactNativeGutenbergBridge.NOTICE_LENGTH_LONG,
+	short: RNReactNativeGutenbergBridge.NOTICE_LENGTH_SHORT,
+};
+
 export const mediaSources = {
 	deviceLibrary: 'DEVICE_MEDIA_LIBRARY',
 	deviceCamera: 'DEVICE_CAMERA',
@@ -422,5 +427,16 @@ export function requestGotoCustomerSupportOptions() {
 	RNReactNativeGutenbergBridge.requestGotoCustomerSupportOptions();
 }
 
+/**
+ * Show a Notice natively. This is a short message briefly displayed on the screen.
+ *
+ * @param {string} message The message to be displayed
+ * @param {number} duration Use nativeNoticeLength to define the duration of it.
+ */
+export function showNativeNotice( message, duration ) {
+	if ( isAndroid ) {
+		RNReactNativeGutenbergBridge.showNotice( message, duration );
+	}
+}
+
 export default RNReactNativeGutenbergBridge;
-export { NativeNotice } from './modules/NativeNotice';

@@ -5,8 +5,6 @@ import com.facebook.react.bridge.NativeModule;
 import com.facebook.react.bridge.ReactApplicationContext;
 import com.facebook.react.uimanager.ViewManager;
 
-import org.wordpress.mobile.ReactNativeGutenbergBridge.NativeNotice.NativeNoticeModule;
-
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -32,10 +30,7 @@ public class RNReactNativeGutenbergBridgePackage implements ReactPackage {
         mRNReactNativeGutenbergBridgeModule = new RNReactNativeGutenbergBridgeModule(reactContext,
                 mGutenbergBridgeJS2Parent,
                 mIsDarkMode);
-        return Arrays.<NativeModule>asList(
-                mRNReactNativeGutenbergBridgeModule,
-                new NativeNoticeModule(reactContext, mGutenbergBridgeJS2Parent)
-        );
+        return Arrays.<NativeModule>asList(mRNReactNativeGutenbergBridgeModule);
     }
 
     @Override

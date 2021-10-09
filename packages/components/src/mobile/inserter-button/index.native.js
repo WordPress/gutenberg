@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { View, TouchableHighlight, Text } from 'react-native';
+import { View, TouchableHighlight, Text, Platform } from 'react-native';
 
 /**
  * WordPress dependencies
@@ -12,7 +12,10 @@ import { usePreferredColorSchemeStyle } from '@wordpress/compose';
 import { __, sprintf } from '@wordpress/i18n';
 import { sparkles } from '@wordpress/icons';
 import { BlockIcon } from '@wordpress/block-editor';
-import { NativeNotice } from '@wordpress/react-native-bridge';
+import {
+	showNativeNotice,
+	nativeNoticeLength,
+} from '@wordpress/react-native-bridge';
 // import { useSelect } from '@wordpress/data';
 // import { store as editorStore } from '@wordpress/editor';
 
@@ -47,32 +50,35 @@ function InserterButton( { item, itemWidth, maxWidth, onSelect } ) {
 		  __( '%s block' );
 	const accessibilityLabel = sprintf( accessibilityLabelFormat, item.title );
 
-	const isNativeNoticeAvailable = NativeNotice.isAvailable;
+	// Message is only displayed in Android for now
+	const isIOS = Platform.OS === 'ios';
 	const shouldDisableTouch =
-		item.isDisabled &&
-		( ! isNativeNoticeAvailable || ! item.alreadyPresentInPost );
+		item.isDisabled && ( isIOS || ! item.alreadyPresentInPost );
 
 	// const { postType } = useSelect( ( select ) => ( {
 	// 	postType: select( editorStore ).getEditedPostAttribute( 'type' ),
 	// } ) );
-	const postType = 'page';
+	// const postType = 'page';
 
 	const onPress = useCallback( () => {
 		if ( ! item.isDisabled ) {
 			onSelect( item );
-		} else if ( item.alreadyPresentInPost && isNativeNoticeAvailable ) {
+		} else if ( item.alreadyPresentInPost && ! isIOS ) {
 			// Type of block doesn't support multiple instances.
 
+			// const disabledMessage =
+			// 	postType === 'page'
+			// 		? // translators: %s: name of the block. e.g: "More"
+			// 		  __( 'You already have a %s block on this page.' )
+			// 		: // translators: %s: name of the block. e.g: "More"
+			// 		  __( 'You already have a %s block on this post.' );
 			const disabledMessage =
-				postType === 'page'
-					? // translators: %s: name of the block. e.g: "More"
-					  __( 'You already have a %s block on this page.' )
-					: // translators: %s: name of the block. e.g: "More"
-					  __( 'You already have a %s block on this post.' );
+				// translators: %s: name of the block. e.g: "More"
+				__( 'You already have a %s block on this post/page.' );
 
-			NativeNotice.show(
+			showNativeNotice(
 				sprintf( disabledMessage, blockTitle ),
-				NativeNotice.LENGTH_SHORT
+				nativeNoticeLength.short
 			);
 		}
 	}, [ item ] );

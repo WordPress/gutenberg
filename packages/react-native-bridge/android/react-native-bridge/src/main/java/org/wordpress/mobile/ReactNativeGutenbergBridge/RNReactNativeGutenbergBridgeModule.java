@@ -1,6 +1,7 @@
 package org.wordpress.mobile.ReactNativeGutenbergBridge;
 
 import android.os.Bundle;
+import android.widget.Toast;
 
 import androidx.annotation.Nullable;
 
@@ -92,6 +93,8 @@ public class RNReactNativeGutenbergBridgeModule extends ReactContextBaseJavaModu
     public Map<String, Object> getConstants() {
         final HashMap<String, Object> constants = new HashMap<>();
         constants.put("isInitialColorSchemeDark", mIsDarkMode);
+        constants.put("NOTICE_LENGTH_LONG", Toast.LENGTH_LONG);
+        constants.put("NOTICE_LENGTH_SHORT", Toast.LENGTH_SHORT);
         return constants;
     }
 
@@ -432,5 +435,10 @@ public class RNReactNativeGutenbergBridgeModule extends ReactContextBaseJavaModu
     @ReactMethod
     public void requestGotoCustomerSupportOptions() {
         mGutenbergBridgeJS2Parent.requestGotoCustomerSupportOptions();
+    }
+
+    @ReactMethod
+    public void showNotice(String message, int duration) {
+        this.mGutenbergBridgeJS2Parent.showNotice(message, duration);
     }
 }
