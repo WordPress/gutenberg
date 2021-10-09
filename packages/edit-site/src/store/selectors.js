@@ -302,7 +302,7 @@ export function isListViewOpened( state ) {
  * @param {Object} state Global application state.
  * @return {Array} Template parts and their blocks in an array.
  */
-export const getTemplateParts = createRegistrySelector(
+export const getCurrentTemplateTemplateParts = createRegistrySelector(
 	( select ) => ( state ) => {
 		const templateType = getEditedPostType( state );
 		const templateId = getEditedPostId( state );
