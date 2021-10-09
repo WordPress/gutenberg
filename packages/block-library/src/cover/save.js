@@ -43,6 +43,7 @@ export default function save( { attributes } ) {
 		id,
 		minHeight: minHeightProp,
 		minHeightUnit,
+		style: styleAttribute,
 	} = attributes;
 	const overlayColorClass = getColorClassName(
 		'background-color',
@@ -57,6 +58,8 @@ export default function save( { attributes } ) {
 	const isVideoBackground = VIDEO_BACKGROUND_TYPE === backgroundType;
 
 	const isImgElement = ! ( hasParallax || isRepeated );
+
+	const hasCustomPadding = !! styleAttribute?.spacing?.padding;
 
 	const style = {
 		...( isImageBackground && ! isImgElement
@@ -79,6 +82,7 @@ export default function save( { attributes } ) {
 		{
 			'is-light': ! isDark,
 			'has-background-dim': dimRatio !== 0,
+			'has-custom-padding': hasCustomPadding,
 			'has-parallax': hasParallax,
 			'is-repeated': isRepeated,
 			'has-background-gradient': gradient || customGradient,
