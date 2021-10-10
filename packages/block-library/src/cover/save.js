@@ -63,7 +63,6 @@ export default function save( { attributes } ) {
 			? backgroundImageStyles( url )
 			: {} ),
 		backgroundColor: ! overlayColorClass ? customOverlayColor : undefined,
-		background: customGradient && ! url ? customGradient : undefined,
 		minHeight: minHeight || undefined,
 	};
 
@@ -74,11 +73,8 @@ export default function save( { attributes } ) {
 			 : undefined;
 
 	const classes = classnames(
-		dimRatioToClass( dimRatio ),
-		overlayColorClass,
 		{
 			'is-light': ! isDark,
-			'has-background-dim': dimRatio !== 0,
 			'has-parallax': hasParallax,
 			'is-repeated': isRepeated,
 			'has-background-gradient': gradient || customGradient,
@@ -92,20 +88,20 @@ export default function save( { attributes } ) {
 
 	return (
 		<div { ...useBlockProps.save( { className: classes, style } ) }>
-			{ url && ( gradient || customGradient ) && dimRatio !== 0 && (
-				<span
-					aria-hidden="true"
-					className={ classnames(
-						'wp-block-cover__gradient-background',
-						gradientClass
-					) }
-					style={
-						customGradient
-							? { background: customGradient }
-							: undefined
-					}
-				/>
-			) }
+			<span
+				aria-hidden="true"
+				className={ classnames(
+					overlayColorClass,
+					dimRatioToClass( dimRatio ),
+					'wp-block-cover__gradient-background',
+					gradientClass,
+					{ 'has-background-dim': dimRatio !== 0 }
+				) }
+				style={
+					customGradient ? { background: customGradient } : undefined
+				}
+			/>
+
 			{ isImageBackground && isImgElement && url && (
 				<img
 					className={ classnames(
