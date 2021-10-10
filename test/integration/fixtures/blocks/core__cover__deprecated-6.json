@@ -31,18 +31,19 @@
 	{
 		"clientId": "_clientId_1",
 		"name": "core/cover",
-		"isValid": true,
+		"isValid": false,
 		"attributes": {
 			"url": "https://example.com/some-background-image.png",
 			"id": 1933,
+			"alt": "",
 			"hasParallax": false,
+			"isRepeated": false,
 			"dimRatio": 0,
 			"backgroundType": "image",
 			"focalPoint": {
 				"x": "0.50",
 				"y": "0.40"
 			},
-			"isRepeated": false,
 			"minHeight": 48,
 			"minHeightUnit": "vw",
 			"align": "full"
@@ -69,13 +70,13 @@
 		"attributes": {
 			"url": "http://localhost:8888/wp-content/uploads/2021/02/percy.jpg",
 			"id": 134,
-			"alt": "",
 			"hasParallax": false,
-			"isRepeated": false,
 			"dimRatio": 50,
 			"backgroundType": "image",
 			"contentPosition": "bottom right",
-			"isDark": true
+			"isDark": true,
+			"isRepeated": false,
+			"alt": ""
 		},
 		"innerBlocks": [
 			{
