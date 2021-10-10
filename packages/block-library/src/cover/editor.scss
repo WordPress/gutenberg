@@ -16,11 +16,11 @@
 		}
 		.components-placeholder {
 			&.is-large {
-				min-height: 250px;
+				min-height: 240px;
 				justify-content: flex-start;
 				z-index: z-index(".wp-block-cover.is-placeholder .components-placeholder.is-large");
 				+ .components-resizable-box__container {
-					min-height: 250px;
+					min-height: 240px;
 					display: block;
 				}
 			}
