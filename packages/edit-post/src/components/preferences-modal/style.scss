@@ -23,13 +23,17 @@ $vertical-tabs-width: 160px;
 				content: none;
 			}
 		}
+		// Keep the navigator component from overflowing the modal content area
+		// to ensure that sticky position elements stick where intended.
+		.components-navigator-provider {
+			height: 100%;
+			// This may become obselete if the component itself adopts the rule.
+			> .components-navigator-screen {
+				max-height: 100%;
+			}
+		}
 	}
 
-	.components-navigator-provider {
-		// Ensurance that sticky position coordinates are relative to the
-		// rectangle of the modal content.
-		max-height: 100%;
-	}
 
 	.edit-post-preferences__tabs {
 		.components-tab-panel__tabs {
