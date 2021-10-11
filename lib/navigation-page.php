@@ -157,7 +157,7 @@ function gutenberg_navigation_editor_preload_menus( $preload_data ) {
 			array()
 			:
 			array(
-					$menus_data_path => $preload_data[ $menus_data_path ]
+				$menus_data_path => $preload_data[ $menus_data_path ],
 			);
 
 	if ( ! $menus_data ) {

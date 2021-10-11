@@ -58,10 +58,22 @@ class WP_Navigation_Page_Test extends WP_UnitTestCase {
 	}
 
 	function test_gutenberg_navigation_editor_preload_menus_function_returns_correct_data() {
-		gutenberg_navigation_editor_preload_menus(array());
-		$this->addToAssertionCount(1);
+		$menus_endpoint = gutenberg_navigation_get_menus_endpoint();
+		$preload_data   = array(
+			'/__experimental/menu-locations' => array( 'some menu locations' ),
+			'OPTIONS'                        => array(
+				array( 'some options requests' ),
+			),
+			$menus_endpoint                  => ( 'some menus' ),
+		);
+
+		$result = gutenberg_navigation_editor_preload_menus( $preload_data );
+		$this->assertArrayHasKey( '/__experimental/menu-locations', $result );
+		$this->assertArrayHasKey( 'OPTIONS', $result );
+		$this->assertArrayNotHasKey( $menus_endpoint, $result );
 	}
 }
+
 
 /**
  * This is a utility test class for creating mocks of the callback functions
