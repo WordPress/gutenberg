@@ -53,7 +53,7 @@ function InlineLinkUI( {
 	}
 	// Get a RichTextValue containing the selected text content.
 
-	const richLinkTextValue = slice( value, textStart, textEnd );
+	const richLinkTextValue = slice( value, textStart, textEnd + 1 );
 
 	// Get the text content minus any HTML tags.
 	const richTextText = richLinkTextValue.text;
