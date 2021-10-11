@@ -23,10 +23,13 @@ import styles from './theme.scss';
 // apply it to the container 'div' but we don't have a proper proposal for cascading styling yet.
 export function CodeEdit( props ) {
 	const { attributes, setAttributes, onFocus, onBlur, style } = props;
-	const codeStyle = [
-		usePreferredColorSchemeStyle( styles.blockCode, styles.blockCodeDark ),
-		style?.fontSize && { fontSize: parseFloat( style.fontSize ) },
-	];
+	const codeStyle = {
+		...usePreferredColorSchemeStyle(
+			styles.blockCode,
+			styles.blockCodeDark
+		),
+		...( style?.fontSize && { fontSize: style.fontSize } ),
+	};
 
 	const placeholderStyle = usePreferredColorSchemeStyle(
 		styles.placeholder,

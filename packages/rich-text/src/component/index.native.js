@@ -757,6 +757,12 @@ export class RichText extends Component {
 				this.manipulateEventCounterToForceNativeToRefresh(); // force a refresh on the native side
 			}
 
+			// For font size changes from a prop value a force refresh
+			// is needed without the selection update
+			if ( nextProps?.fontSize !== this.props?.fontSize ) {
+				this.manipulateEventCounterToForceNativeToRefresh(); // force a refresh on the native side
+			}
+
 			if (
 				nextProps?.style?.fontSize !== this.props?.style?.fontSize ||
 				nextProps?.style?.lineHeight !== this.props?.style?.lineHeight
