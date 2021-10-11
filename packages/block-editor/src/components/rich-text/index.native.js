@@ -442,6 +442,19 @@ function RichTextWrapper(
 				mode = 'BLOCKS';
 			}
 
+			const isPastedURL = isURL( plainText.trim() );
+			const presentEmbedHandlerPicker = () =>
+				embedHandlerPickerRef.current?.presentPicker( {
+					createEmbed: () =>
+						onReplace( content, content.length - 1, -1 ),
+					createLink: () =>
+						createLinkInParagraph( plainText.trim(), onReplace ),
+				} );
+
+			if ( __unstableEmbedURLOnPaste && isPastedURL ) {
+				mode = 'BLOCKS';
+			}
+
 			const content = pasteHandler( {
 				HTML: html,
 				plainText,
@@ -449,7 +462,6 @@ function RichTextWrapper(
 				tagName,
 				preserveWhiteSpace,
 			} );
-			const isPastedURL = isURL( plainText.trim() );
 
 			if ( typeof content === 'string' ) {
 				let valueToInsert = create( { html: content } );
@@ -468,41 +480,30 @@ function RichTextWrapper(
 
 				onChange( insert( value, valueToInsert ) );
 			} else if ( content.length > 0 ) {
-				if ( isPastedURL ) {
-					onChange( insert( value, create( { text: plainText } ) ) );
-
-					if ( ! isEmpty( value ) ) {
+				// When an URL is pasted in an empty paragraph then the EmbedHandlerPicker should showcase options allowing the transformation of that URL
+				// into either an Embed block or a link within the target paragraph. If the paragraph is non-empty, the URL is pasted as text.
+				const canPasteEmbed =
+					isPastedURL &&
+					content.length === 1 &&
+					content[ 0 ].name === 'core/embed';
+				if ( onReplace && isEmpty( value ) ) {
+					if ( canPasteEmbed ) {
+						onChange(
+							insert( value, create( { text: plainText } ) )
+						);
+						if ( __unstableEmbedURLOnPaste ) {
+							presentEmbedHandlerPicker();
+						}
 						return;
 					}
-
-					const derivedBlock = content[ 0 ];
-					const { name } = derivedBlock;
-
-					// When an URL is pasted in an empty paragraph then the EmbedHandlerPicker should showcase options allowing the transformation of that URL
-					// into either an Embed block or a link within the target paragraph. If the paragraph is non-empty, the URL is pasted as text.
-					if ( __unstableEmbedURLOnPaste && name === 'core/embed' ) {
-						mode = 'BLOCKS';
-						// Embed handler
-						embedHandlerPickerRef.current?.presentPicker( {
-							createEmbed: () => {
-								if ( onReplace ) {
-									onReplace(
-										content,
-										content.length - 1,
-										-1
-									);
-								}
-							},
-							createLink: () =>
-								createLinkInParagraph(
-									plainText.trim(),
-									onReplace
-								),
-						} );
-					}
-				} else if ( onReplace && isEmpty( value ) ) {
 					onReplace( content, content.length - 1, -1 );
 				} else {
+					if ( canPasteEmbed ) {
+						onChange(
+							insert( value, create( { text: plainText } ) )
+						);
+						return;
+					}
 					splitValue( value, content );
 				}
 			}
