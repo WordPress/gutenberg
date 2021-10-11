@@ -11,7 +11,10 @@ import { __ } from '@wordpress/i18n';
 import { useState } from '@wordpress/element';
 import { upload, Icon } from '@wordpress/icons';
 import { getFilesFromDataTransfer } from '@wordpress/dom';
-import { __experimentalUseDropZone as useDropZone } from '@wordpress/compose';
+import {
+	__experimentalUseDropZone as useDropZone,
+	useReducedMotion,
+} from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -73,6 +76,7 @@ export default function DropZoneComponent( {
 			setIsDraggingOverElement( false );
 		},
 	} );
+	const disableMotion = useReducedMotion();
 
 	let children;
 
@@ -108,9 +112,9 @@ export default function DropZoneComponent( {
 		children = (
 			<motion.div
 				variants={ backdrop }
-				initial="hidden"
+				initial={ disableMotion ? 'show' : 'hidden' }
 				animate="show"
-				exit="exit"
+				exit={ disableMotion ? 'show' : 'exit' }
 				className="components-drop-zone__content"
 			>
 				<motion.div variants={ foreground }>
@@ -139,7 +143,11 @@ export default function DropZoneComponent( {
 
 	return (
 		<div ref={ ref } className={ classes }>
-			<AnimatePresence>{ children }</AnimatePresence>
+			{ disableMotion ? (
+				children
+			) : (
+				<AnimatePresence>{ children }</AnimatePresence>
+			) }
 		</div>
 	);
 }
