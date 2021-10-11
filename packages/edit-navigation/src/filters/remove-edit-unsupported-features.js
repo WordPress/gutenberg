@@ -6,18 +6,20 @@ import { createHigherOrderComponent } from '@wordpress/compose';
 
 const removeNavigationBlockEditUnsupportedFeatures = createHigherOrderComponent(
 	( BlockEdit ) => ( props ) => {
-		if ( props.name !== 'core/navigation' ) {
-			return <BlockEdit { ...props } />;
+		if ( props.name === 'core/navigation' ) {
+			return (
+				<BlockEdit
+					{ ...props }
+					hasSubmenuIndicatorSetting={ false }
+					hasItemJustificationControls={ false }
+					hasColorSettings={ false }
+				/>
+			);
+		} else if ( props.name === 'core/navigation-link' ) {
+			return <BlockEdit { ...props } allowPlaceholderLabels={ false } />;
 		}
 
-		return (
-			<BlockEdit
-				{ ...props }
-				hasSubmenuIndicatorSetting={ false }
-				hasItemJustificationControls={ false }
-				hasColorSettings={ false }
-			/>
-		);
+		return <BlockEdit { ...props } />;
 	},
 	'removeNavigationBlockEditUnsupportedFeatures'
 );

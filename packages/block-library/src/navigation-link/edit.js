@@ -270,6 +270,9 @@ export default function NavigationLinkEdit( {
 	onReplace,
 	context,
 	clientId,
+	// These props are used by the navigation editor to override specific
+	// navigation block settings.
+	allowPlaceholderLabels = true,
 } ) {
 	const {
 		label,
@@ -437,11 +440,22 @@ export default function NavigationLinkEdit( {
 	 * Removes the current link if set.
 	 */
 	function removeLink() {
-		// Reset the specific url and id
-		setAttributes( {
-			url: '',
-			id: '',
-		} );
+		if ( allowPlaceholderLabels ) {
+			// Reset the specific url and id
+			setAttributes( {
+				url: '',
+				id: '',
+			} );
+		} else {
+			// Reset all attributes that comprise the link.
+			setAttributes( {
+				url: '',
+				label: '',
+				id: '',
+				kind: '',
+				type: '',
+			} );
+		}
 
 		// Close the link editing UI.
 		setIsLinkOpen( false );
@@ -539,7 +553,7 @@ export default function NavigationLinkEdit( {
 			/* translators: label for missing values in navigation link block */
 			missingText = __( 'Add link' );
 	}
-	if ( label ) {
+	if ( allowPlaceholderLabels && label ) {
 		missingText = label;
 	}
 
