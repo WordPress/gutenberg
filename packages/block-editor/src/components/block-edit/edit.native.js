@@ -31,10 +31,15 @@ export const Edit = ( props ) => {
 
 	const blockContext = useContext( BlockContext );
 
+	const blockUsesContext = [
+		...blockType.usesContext,
+		...blockType.usesNativeInnerBlockContext,
+	];
+
 	// Assign context values using the block type's declared context needs.
 	const context = useMemo( () => {
-		return blockType && blockType.usesContext
-			? pick( blockContext, blockType.usesContext )
+		return blockType && blockUsesContext
+			? pick( blockContext, blockUsesContext )
 			: DEFAULT_BLOCK_CONTEXT;
 	}, [ blockType, blockContext ] );
 
