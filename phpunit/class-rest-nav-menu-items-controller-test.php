@@ -547,6 +547,42 @@ class REST_Nav_Menu_Items_Controller_Test extends WP_Test_REST_Post_Type_Control
 	/**
 	 *
 	 */
+	public function test_update_item_preserves_type() {
+		wp_set_current_user( self::$admin_id );
+
+		$request = new WP_REST_Request( 'PUT', sprintf( '/__experimental/menu-items/%d', $this->menu_item_id ) );
+		$request->add_header( 'content-type', 'application/x-www-form-urlencoded' );
+		$params = array(
+			'status'  => 'draft',
+			'type'    => 'block',
+			'title'   => 'TEST',
+			'content' => '<!-- wp:paragraph --><p>Block content</p><!-- /wp:paragraph -->',
+		);
+		$request->set_body_params( $params );
+		$response = rest_get_server()->dispatch( $request );
+		$this->check_update_menu_item_response( $response );
+		$new_data = $response->get_data();
+		$this->assertEquals( 'block', $new_data['type'] );
+
+		$request = new WP_REST_Request( 'PUT', sprintf( '/__experimental/menu-items/%d', $this->menu_item_id ) );
+		$request->add_header( 'content-type', 'application/x-www-form-urlencoded' );
+		$params = array(
+			'status'  => 'draft',
+			'title'   => 'TEST2',
+			'content' => '<!-- wp:paragraph --><p>Block content</p><!-- /wp:paragraph -->',
+		);
+		$request->set_body_params( $params );
+		$response = rest_get_server()->dispatch( $request );
+		$this->check_update_menu_item_response( $response );
+		$new_data = $response->get_data();
+
+		// The type shouldn't change just because it was missing from request args.
+		$this->assertEquals( 'block', $new_data['type'] );
+	}
+
+	/**
+	 *
+	 */
 	public function test_update_item_clean_xfn() {
 		wp_set_current_user( self::$admin_id );
 
@@ -900,5 +936,39 @@ class REST_Nav_Menu_Items_Controller_Test extends WP_Test_REST_Post_Type_Control
 		);
 
 		return wp_parse_args( $args, $defaults );
+	}
+
+	public function test_create_item_properly_handles_slashed_data() {
+		wp_set_current_user( self::$admin_id );
+
+		$request = new WP_REST_Request( 'POST', '/__experimental/menu-items' );
+		$request->add_header( 'content-type', 'application/x-www-form-urlencoded' );
+		$parameters = $this->set_menu_item_data(
+			array(
+				'title' => 'Some \\\'title',
+			)
+		);
+		$request->set_body_params( $parameters );
+		$response = rest_get_server()->dispatch( $request );
+		$data     = $response->get_data();
+		$post     = get_post( $data['id'] );
+		$this->assertSame( $parameters['title'], $post->post_title );
+	}
+
+	public function test_update_item_properly_handles_slashed_data() {
+		wp_set_current_user( self::$admin_id );
+
+		$request = new WP_REST_Request( 'PUT', sprintf( '/__experimental/menu-items/%d', $this->menu_item_id ) );
+		$request->add_header( 'content-type', 'application/x-www-form-urlencoded' );
+		$title  = 'Some \\\'title';
+		$params = $this->set_menu_item_data(
+			array(
+				'title' => $title,
+			)
+		);
+		$request->set_body_params( $params );
+		$response = rest_get_server()->dispatch( $request );
+		$new_data = $response->get_data();
+		$this->assertEquals( $params['title'], $new_data['title']['raw'] );
 	}
 }

@@ -2,7 +2,8 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import tinycolor from 'tinycolor2';
+import { colord, extend } from 'colord';
+import namesPlugin from 'colord/plugins/names';
 
 /**
  * WordPress dependencies
@@ -25,6 +26,8 @@ import BlockList from '../components/block-list';
 
 const EMPTY_ARRAY = [];
 
+extend( [ namesPlugin ] );
+
 /**
  * Convert a list of colors to an object of R, G, and B values.
  *
@@ -36,11 +39,10 @@ export function getValuesFromColors( colors = [] ) {
 	const values = { r: [], g: [], b: [] };
 
 	colors.forEach( ( color ) => {
-		// Access values directly to skip extra rounding that tinycolor.toRgb() does.
-		const tcolor = tinycolor( color );
-		values.r.push( tcolor._r / 255 );
-		values.g.push( tcolor._g / 255 );
-		values.b.push( tcolor._b / 255 );
+		const rgbColor = colord( color ).toRgb();
+		values.r.push( rgbColor.r / 255 );
+		values.g.push( rgbColor.g / 255 );
+		values.b.push( rgbColor.b / 255 );
 	} );
 
 	return values;
@@ -214,6 +216,37 @@ const withDuotoneControls = createHigherOrderComponent(
 );
 
 /**
+ * Function that scopes a selector with another one. This works a bit like
+ * SCSS nesting except the `&` operator isn't supported.
+ *
+ * @example
+ * ```js
+ * const scope = '.a, .b .c';
+ * const selector = '> .x, .y';
+ * const merged = scopeSelector( scope, selector );
+ * // merged is '.a > .x, .a .y, .b .c > .x, .b .c .y'
+ * ```
+ *
+ * @param {string} scope    Selector to scope to.
+ * @param {string} selector Original selector.
+ *
+ * @return {string} Scoped selector.
+ */
+function scopeSelector( scope, selector ) {
+	const scopes = scope.split( ',' );
+	const selectors = selector.split( ',' );
+
+	const selectorsScoped = [];
+	scopes.forEach( ( outer ) => {
+		selectors.forEach( ( inner ) => {
+			selectorsScoped.push( `${ outer.trim() } ${ inner.trim() }` );
+		} );
+	} );
+
+	return selectorsScoped.join( ', ' );
+}
+
+/**
  * Override the default block element to include duotone styles.
  *
  * @param {Function} BlockListBlock Original component.
@@ -232,13 +265,15 @@ const withDuotoneStyles = createHigherOrderComponent(
 			return <BlockListBlock { ...props } />;
 		}
 
-		const id = `wp-duotone-filter-${ useInstanceId( BlockListBlock ) }`;
+		const id = `wp-duotone-${ useInstanceId( BlockListBlock ) }`;
 
-		const selectors = duotoneSupport.split( ',' );
-		const selectorsScoped = selectors.map(
-			( selector ) => `.${ id } ${ selector.trim() }`
+		// Extra .editor-styles-wrapper specificity is needed in the editor
+		// since we're not using inline styles to apply the filter. We need to
+		// override duotone applied by global styles and theme.json.
+		const selectorsGroup = scopeSelector(
+			`.editor-styles-wrapper .${ id }`,
+			duotoneSupport
 		);
-		const selectorsGroup = selectorsScoped.join( ', ' );
 
 		const className = classnames( props?.className, id );
 

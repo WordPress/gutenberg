@@ -56,7 +56,6 @@ export const _default = () => {
 			},
 			PROP_UNSET
 		),
-		isAction: boolean( 'Item 1: isAction', true ),
 	};
 
 	// Do not pass the `size` prop when its value is `undefined`.
@@ -68,16 +67,14 @@ export const _default = () => {
 
 	return (
 		<ItemGroup style={ { width: '350px' } } { ...itemGroupProps }>
-			<Item { ...itemProps } onClick={ () => alert( 'WordPress.org' ) }>
+			<Item { ...itemProps }>Code is Poetry (no click handlers)</Item>
+			<Item onClick={ () => alert( 'WordPress.org' ) }>
 				Code is Poetry — Click me!
 			</Item>
-			<Item isAction onClick={ () => alert( 'WordPress.org' ) }>
+			<Item onClick={ () => alert( 'WordPress.org' ) }>
 				Code is Poetry — Click me!
 			</Item>
-			<Item isAction onClick={ () => alert( 'WordPress.org' ) }>
-				Code is Poetry — Click me!
-			</Item>
-			<Item isAction onClick={ () => alert( 'WordPress.org' ) }>
+			<Item onClick={ () => alert( 'WordPress.org' ) }>
 				Code is Poetry — Click me!
 			</Item>
 		</ItemGroup>
@@ -90,23 +87,21 @@ export const dropdown = () => (
 		trigger={ <Button>Open Popover</Button> }
 	>
 		<ItemGroup style={ { padding: 4 } }>
-			<Item isAction onClick={ () => alert( 'WordPress.org' ) }>
+			<Item>Code is Poetry (no click handlers)</Item>
+			<Item onClick={ () => alert( 'WordPress.org' ) }>
 				Code is Poetry — Click me!
 			</Item>
-			<Item isAction onClick={ () => alert( 'WordPress.org' ) }>
+			<Item onClick={ () => alert( 'WordPress.org' ) }>
 				Code is Poetry — Click me!
 			</Item>
-			<Item isAction onClick={ () => alert( 'WordPress.org' ) }>
-				Code is Poetry — Click me!
-			</Item>
-			<Item isAction onClick={ () => alert( 'WordPress.org' ) }>
+			<Item onClick={ () => alert( 'WordPress.org' ) }>
 				Code is Poetry — Click me!
 			</Item>
 		</ItemGroup>
 	</Flyout>
 );
 
-export const SimpleColorSwatch = ( { color, style } ) => (
+const SimpleColorSwatch = ( { color, style } ) => (
 	<div
 		style={ {
 			...style,
@@ -141,7 +136,7 @@ export const complexLayouts = () => {
 
 	return (
 		<ItemGroup isBordered isSeparated style={ { width: '250px' } }>
-			<Item isAction onClick={ () => alert( 'Color palette' ) }>
+			<Item onClick={ () => alert( 'Color palette' ) }>
 				<HStack>
 					<FlexBlock>
 						<ZStack isLayered={ false } offset={ -8 }>
@@ -156,7 +151,7 @@ export const complexLayouts = () => {
 				</HStack>
 			</Item>
 
-			<Item isAction onClick={ () => alert( 'Single color setting' ) }>
+			<Item onClick={ () => alert( 'Single color setting' ) }>
 				<HStack justify="flex-start">
 					<FlexItem
 						as={ SimpleColorSwatch }
@@ -169,10 +164,7 @@ export const complexLayouts = () => {
 				</HStack>
 			</Item>
 
-			<Item
-				isAction
-				onClick={ () => alert( 'Single typography setting' ) }
-			>
+			<Item onClick={ () => alert( 'Single typography setting' ) }>
 				<HStack justify="flex-start">
 					<FlexItem>
 						<Icon icon={ typography } size={ 24 } />

@@ -53,6 +53,7 @@ export default function InserterSidebar() {
 					__experimentalInsertionIndex={
 						insertionPoint.insertionIndex
 					}
+					__experimentalFilterValue={ insertionPoint.filterValue }
 				/>
 			</div>
 		</div>

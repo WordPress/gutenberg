@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { get, map } from 'lodash';
+import { get, map, keyBy } from 'lodash';
 import createSelector from 'rememo';
 
 /**
@@ -10,6 +10,7 @@ import createSelector from 'rememo';
 import { store as coreDataStore } from '@wordpress/core-data';
 import { createRegistrySelector } from '@wordpress/data';
 import { uploadMedia } from '@wordpress/media-utils';
+import { isTemplatePart } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
@@ -24,6 +25,10 @@ import {
 	getTemplateLocation,
 	isTemplateSuperseded,
 } from '../components/navigation-sidebar/navigation-panel/template-hierarchy';
+
+/**
+ * @typedef {'template'|'template_type'} TemplateType Template type.
+ */
 
 /**
  * Returns whether the given feature is enabled or not.
@@ -110,15 +115,23 @@ export function getHomeTemplateId( state ) {
 	return state.homeTemplateId;
 }
 
+function getCurrentEditedPost( state ) {
+	return state.editedPost[ state.editedPost.length - 1 ] || {};
+}
+
+function getPreviousEditedPost( state ) {
+	return state.editedPost[ state.editedPost.length - 2 ] || {};
+}
+
 /**
  * Returns the current edited post type (wp_template or wp_template_part).
  *
  * @param {Object} state Global application state.
  *
- * @return {number?} Template ID.
+ * @return {TemplateType?} Template type.
  */
 export function getEditedPostType( state ) {
-	return state.editedPost.type;
+	return getCurrentEditedPost( state ).type;
 }
 
 /**
@@ -126,10 +139,32 @@ export function getEditedPostType( state ) {
  *
  * @param {Object} state Global application state.
  *
- * @return {number?} Post ID.
+ * @return {string?} Post ID.
  */
 export function getEditedPostId( state ) {
-	return state.editedPost.id;
+	return getCurrentEditedPost( state ).id;
+}
+
+/**
+ * Returns the previous edited post type (wp_template or wp_template_part).
+ *
+ * @param {Object} state Global application state.
+ *
+ * @return {TemplateType?} Template type.
+ */
+export function getPreviousEditedPostType( state ) {
+	return getPreviousEditedPost( state ).type;
+}
+
+/**
+ * Returns the ID of the previous edited template or template part.
+ *
+ * @param {Object} state Global application state.
+ *
+ * @return {string?} Post ID.
+ */
+export function getPreviousEditedPostId( state ) {
+	return getPreviousEditedPost( state ).id;
 }
 
 /**
@@ -140,7 +175,7 @@ export function getEditedPostId( state ) {
  * @return {Object} Page.
  */
 export function getPage( state ) {
-	return state.editedPost.page;
+	return getCurrentEditedPost( state ).page;
 }
 
 /**
@@ -239,11 +274,15 @@ export function isInserterOpened( state ) {
  *
  * @param {Object} state Global application state.
  *
- * @return {Object} The root client ID and index to insert at.
+ * @return {Object} The root client ID, index to insert at and starting filter value.
  */
 export function __experimentalGetInsertionPoint( state ) {
-	const { rootClientId, insertionIndex } = state.blockInserterPanel;
-	return { rootClientId, insertionIndex };
+	const {
+		rootClientId,
+		insertionIndex,
+		filterValue,
+	} = state.blockInserterPanel;
+	return { rootClientId, insertionIndex, filterValue };
 }
 
 /**
@@ -256,3 +295,51 @@ export function __experimentalGetInsertionPoint( state ) {
 export function isListViewOpened( state ) {
 	return state.listViewPanel;
 }
+
+/**
+ * Returns the template part blocks grouped by areas for the current edited template.
+ *
+ * @param {Object} state Global application state.
+ * @return {Object} Template part blocks by areas.
+ */
+export const getTemplateAreaBlocks = createRegistrySelector(
+	( select ) => ( state ) => {
+		const templateType = getEditedPostType( state );
+		const templateId = getEditedPostId( state );
+		const template = select( coreDataStore ).getEditedEntityRecord(
+			'postType',
+			templateType,
+			templateId
+		);
+
+		const templateParts = select( coreDataStore ).getEntityRecords(
+			'postType',
+			'wp_template_part',
+			{
+				per_page: -1,
+			}
+		);
+		const templatePartsById = keyBy(
+			templateParts,
+			( templatePart ) => templatePart.id
+		);
+
+		const templatePartBlocksByAreas = {};
+
+		for ( const block of template.blocks ?? [] ) {
+			if ( isTemplatePart( block ) ) {
+				const {
+					attributes: { theme, slug },
+				} = block;
+				const templatePartId = `${ theme }//${ slug }`;
+				const templatePart = templatePartsById[ templatePartId ];
+
+				if ( templatePart ) {
+					templatePartBlocksByAreas[ templatePart.area ] = block;
+				}
+			}
+		}
+
+		return templatePartBlocksByAreas;
+	}
+);

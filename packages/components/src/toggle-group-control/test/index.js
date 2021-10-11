@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { render, fireEvent } from '@testing-library/react';
+import { render, fireEvent, screen } from '@testing-library/react';
 
 /**
  * Internal dependencies
@@ -25,7 +25,7 @@ describe( 'ToggleGroupControl', () => {
 	} );
 	it( 'should call onChange with proper value', () => {
 		const mockOnChange = jest.fn();
-		const { getByLabelText } = render(
+		render(
 			<ToggleGroupControl
 				value="jack"
 				onChange={ mockOnChange }
@@ -34,8 +34,8 @@ describe( 'ToggleGroupControl', () => {
 				{ options }
 			</ToggleGroupControl>
 		);
-		const firstButton = getByLabelText( 'R' );
-		fireEvent.click( firstButton );
+		const firstRadio = screen.getByRole( 'radio', { name: 'R' } );
+		fireEvent.click( firstRadio );
 		expect( mockOnChange ).toHaveBeenCalledWith( 'rigas' );
 	} );
 } );

@@ -85,18 +85,16 @@
 		line-height: 0;
 		margin-left: 6px;
 
+		// Affect the button as well.
+		padding: 0;
+		background-color: inherit;
+		color: currentColor;
+		border: none;
+
 		svg {
 			display: inline-block;
 			stroke: currentColor;
 		}
-	}
-
-	// Styles for button toggles.
-	button.wp-block-navigation__submenu-icon.wp-block-navigation__submenu-icon.wp-block-navigation__submenu-icon.wp-block-navigation__submenu-icon {
-		padding: $grid-unit $grid-unit-20;
-		background-color: inherit;
-		color: currentColor;
-		border: none;
 	}
 }
 
@@ -123,12 +121,17 @@
 		// Don't take up space when the menu is collapsed.
 		width: 0;
 		height: 0;
+		overflow: hidden;
 
 		// Submenu items.
 		> .wp-block-navigation-item {
 			> a {
 				display: flex;
 				flex-grow: 1;
+
+				// Without this, the changing to zero on hover-out can cause wrapping and
+				// result in an invinite hover/hover-out loop.
+				white-space: nowrap;
 
 				// Right-align the chevron in submenus.
 				.wp-block-navigation__submenu-icon {
@@ -174,9 +177,6 @@
 		}
 	}
 
-	// Separating out hover and focus-within so hover works again on IE: https://davidwalsh.name/css-focus-within#comment-513401
-	// We will need to replace focus-within with a JS solution for IE keyboard support.
-
 	// Custom menu items.
 	// Show submenus on hover unless they open on click.
 	&:where(:not(.open-on-click)):hover > .wp-block-navigation__submenu-container {
@@ -184,6 +184,7 @@
 		opacity: 1;
 		width: auto;
 		height: auto;
+		overflow: initial;
 		min-width: 200px;
 	}
 
@@ -274,21 +275,22 @@
 // When justified space-between, open submenus leftward for last menu item.
 // When justified right, open all submenus leftwards.
 // This needs high specificity.
-.wp-block-navigation.items-justified-space-between
-.wp-block-page-list > .has-child:last-child,
-.wp-block-navigation.items-justified-space-between > .wp-block-navigation__container > .has-child:last-child,
-.wp-block-navigation.items-justified-right .wp-block-page-list > .has-child,
-.wp-block-navigation.items-justified-right > .wp-block-navigation__container
-.has-child {
-	// First submenu.
-	.wp-block-navigation__submenu-container {
-		left: auto;
-		right: 0;
-
-		// Nested submenus.
+// On smaller breakpoints, menus open downwards.
+@include break-medium {
+	.wp-block-navigation.items-justified-space-between .wp-block-page-list > .has-child:last-child,
+	.wp-block-navigation.items-justified-space-between > .wp-block-navigation__container > .has-child:last-child,
+	.wp-block-navigation.items-justified-right .wp-block-page-list > .has-child,
+	.wp-block-navigation.items-justified-right .wp-block-navigation__container .has-child {
+		// First submenu.
 		.wp-block-navigation__submenu-container {
 			left: auto;
-			right: 100%;
+			right: 0;
+
+			// Nested submenus.
+			.wp-block-navigation__submenu-container {
+				left: auto;
+				right: 100%;
+			}
 		}
 	}
 }
@@ -330,38 +332,64 @@
 // Vertical layout
 .is-vertical .wp-block-page-list, // Page list.
 .is-vertical .wp-block-navigation__container {
-	display: block;
+	display: flex;
 	flex-direction: column;
 	align-items: flex-start;
 }
 
 // Justification.
 // These target the named container class to work even with the additional mobile menu containers.
-.items-justified-center .wp-block-navigation__container {
-	justify-content: center;
+.items-justified-center {
+	.wp-block-page-list,
+	.wp-block-navigation__container {
+		justify-content: center;
+	}
 }
 
-.items-justified-right .wp-block-navigation__container {
-	justify-content: flex-end;
+.items-justified-right {
+	.wp-block-page-list,
+	.wp-block-navigation__container {
+		justify-content: flex-end;
+	}
 }
 
-.items-justified-space-between .wp-block-navigation__container {
-	justify-content: space-between;
-	flex: 1;
+.items-justified-space-between {
+	.wp-block-navigation__responsive-container-content,
+	.wp-block-navigation__container {
+		display: flex;
+		justify-content: space-between;
+		flex: 1;
+	}
 }
 
 // Vertical justification.
-.is-vertical.items-justified-center > ul {
+// The vertical variant does not support space-between.
+.is-vertical.items-justified-center {
 	align-items: center;
+
+	.wp-block-navigation-item {
+		justify-content: center;
+	}
+
+	.wp-block-page-list,
+	.wp-block-navigation__container {
+		align-items: center;
+	}
 }
 
-.is-vertical.items-justified-right > ul {
+.is-vertical.items-justified-right {
 	align-items: flex-end;
 
 	.wp-block-navigation-item {
 		justify-content: flex-end;
 	}
+
+	.wp-block-page-list,
+	.wp-block-navigation__container {
+		align-items: flex-end;
+	}
 }
+
 
 /**
  * Mobile menu.
@@ -393,20 +421,70 @@
 		// Give it a z-index just higher than the adminbar.
 		z-index: 100000;
 
-		padding: 24px;
+		// Add extra top padding so items don't conflict with close button.
+		padding: 72px 24px 24px 24px;
 		background-color: inherit;
 
-		.wp-block-navigation__container {
+		.wp-block-navigation__responsive-container-content {
 			display: flex;
 			flex-direction: column;
-			margin-left: auto;
-			margin-right: auto;
-			align-items: flex-start;
-			line-height: 48px;
 			padding: 0;
 
+			.wp-block-navigation__submenu-icon {
+				display: none;
+			}
+
+			// Always expand/unfold submenus inside the modal.
+			.has-child .submenu-container,
+			.has-child .wp-block-navigation__submenu-container {
+				// Unset CSS that hides dropdown menus.
+				opacity: 1;
+				visibility: visible;
+				height: auto;
+				width: auto;
+				overflow: initial;
+				min-width: 200px;
+
+				// Position and style.
+				position: static;
+				border: none;
+				padding-left: 32px;
+
+				.items-justified-right & {
+					padding-left: 0;
+					padding-right: 32px;
+				}
+			}
+
+			// Space unfolded items using gap and padding for submenus.
+			.wp-block-navigation__submenu-container,
+			.wp-block-navigation__container {
+				gap: 2rem;
+				padding-top: 2rem;
+				padding-bottom: 2rem;
+			}
+
+			// A default padding is added to submenu items. It's not appropriate inside the modal.
+			& :where(.wp-block-navigation__submenu-container) a {
+				padding: 0;
+			}
+
+			// Default justification.
+			.wp-block-navigation__container,
+			.wp-block-navigation-item,
 			.wp-block-page-list {
 				flex-direction: column;
+				justify-content: flex-start;
+				align-items: flex-start;
+
+				// Inherit parent justifications inside the menu.
+				.items-justified-right & {
+					align-items: flex-end;
+				}
+
+				.items-justified-center & {
+					align-items: center;
+				}
 			}
 		}
 
@@ -418,12 +496,19 @@
 			color: inherit !important;
 			background: transparent !important;
 		}
+
+		// Override justification dropdown menu positioning rules.
+		.wp-block-navigation__submenu-container.wp-block-navigation__submenu-container.wp-block-navigation__submenu-container.wp-block-navigation__submenu-container {
+			right: auto;
+			left: auto;
+		}
 	}
 
 	@include break-small() {
 		&:not(.is-menu-open) {
 			display: flex;
 			flex-direction: row;
+			width: 100%;
 			position: relative;
 			z-index: 2;
 			background-color: inherit;
@@ -512,31 +597,6 @@
 .is-menu-open .wp-block-navigation__responsive-container-content {
 	width: 100%;
 	height: 100%;
-}
-
-// Always show submenus fully expanded inside the modal menu.
-.wp-block-navigation .wp-block-navigation__responsive-container.is-menu-open {
-	.wp-block-navigation__submenu-icon {
-		display: none;
-	}
-
-	.has-child .submenu-container,
-	.has-child .wp-block-navigation__submenu-container {
-		position: relative;
-		opacity: 1;
-		visibility: visible;
-		height: auto;
-		width: auto;
-
-		padding: 0 0 0 32px;
-		border: none;
-	}
-
-	.wp-block-navigation-item,
-	.wp-block-page-list {
-		flex-direction: column;
-		align-items: flex-start;
-	}
 }
 
 html.has-modal-open {

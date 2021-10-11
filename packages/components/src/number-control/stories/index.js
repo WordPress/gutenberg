@@ -32,7 +32,7 @@ function Example() {
 		placeholder: text( 'placeholder', 0 ),
 		required: boolean( 'required', false ),
 		shiftStep: number( 'shiftStep', 10 ),
-		step: number( 'step', 1 ),
+		step: text( 'step', 1 ),
 	};
 
 	return (

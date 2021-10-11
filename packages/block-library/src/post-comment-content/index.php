@@ -17,11 +17,14 @@ function render_block_core_post_comment_content( $attributes, $content, $block )
 	if ( ! isset( $block->context['commentId'] ) ) {
 		return '';
 	}
-	$wrapper_attributes = get_block_wrapper_attributes();
+	$comment_text = get_comment_text( $block->context['commentId'] );
+	if ( ! $comment_text ) {
+		return '';
+	}
 	return sprintf(
 		'<div %1$s>%2$s</div>',
-		$wrapper_attributes,
-		get_comment_text( $block->context['commentId'] )
+		get_block_wrapper_attributes(),
+		$comment_text
 	);
 }
 

@@ -7,7 +7,6 @@ import { select } from '@wordpress/data';
  * Internal dependencies
  */
 import { store as richTextStore } from './store';
-import { isFormatEqual } from './is-format-equal';
 import { createElement } from './create-element';
 import { mergePair } from './concat';
 import {
@@ -424,16 +423,10 @@ function createFromElement( {
 			continue;
 		}
 
-		const lastFormats =
-			accumulator.formats[ accumulator.formats.length - 1 ];
-		const lastFormat = lastFormats && lastFormats[ lastFormats.length - 1 ];
-		const newFormat = toFormat( {
+		const format = toFormat( {
 			type,
 			attributes: getAttributes( { element: node } ),
 		} );
-		const format = isFormatEqual( newFormat, lastFormat )
-			? lastFormat
-			: newFormat;
 
 		if (
 			multilineWrapperTags &&
@@ -518,7 +511,7 @@ function createFromElement( {
  *                                            multiline.
  * @param {Array}   [$1.multilineWrapperTags] Tags where lines can be found if
  *                                            nesting is possible.
- * @param {boolean} [$1.currentWrapperTags]   Whether to prepend a line
+ * @param {Array}   [$1.currentWrapperTags]   Whether to prepend a line
  *                                            separator.
  * @param {boolean} [$1.preserveWhiteSpace]   Whether or not to collapse white
  *                                            space characters.

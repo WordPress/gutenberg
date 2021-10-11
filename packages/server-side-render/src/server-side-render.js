@@ -39,21 +39,25 @@ function DefaultErrorResponsePlaceholder( { response, className } ) {
 	return <Placeholder className={ className }>{ errorMessage }</Placeholder>;
 }
 
-function DefaultLoadingResponsePlaceholder( { children } ) {
+function DefaultLoadingResponsePlaceholder( { children, showLoader } ) {
 	return (
 		<div style={ { position: 'relative' } }>
-			<div
-				style={ {
-					position: 'absolute',
-					top: '50%',
-					left: '50%',
-					marginTop: '-9px',
-					marginLeft: '-9px',
-				} }
-			>
-				<Spinner />
+			{ showLoader && (
+				<div
+					style={ {
+						position: 'absolute',
+						top: '50%',
+						left: '50%',
+						marginTop: '-9px',
+						marginLeft: '-9px',
+					} }
+				>
+					<Spinner />
+				</div>
+			) }
+			<div style={ { opacity: showLoader ? '0.3' : 1 } }>
+				{ children }
 			</div>
-			<div style={ { opacity: '0.3' } }>{ children }</div>
 		</div>
 	);
 }
@@ -71,18 +75,18 @@ export default function ServerSideRender( props ) {
 	} = props;
 
 	const isMountedRef = useRef( true );
+	const [ showLoader, setShowLoader ] = useState( false );
 	const fetchRequestRef = useRef();
 	const [ response, setResponse ] = useState( null );
-	const prevResponse = usePrevious( response );
 	const prevProps = usePrevious( props );
+	const [ isLoading, setIsLoading ] = useState( false );
 
 	function fetchData() {
 		if ( ! isMountedRef.current ) {
 			return;
 		}
-		if ( null !== response ) {
-			setResponse( null );
-		}
+
+		setIsLoading( true );
 
 		const sanitizedAttributes =
 			attributes &&
@@ -125,6 +129,14 @@ export default function ServerSideRender( props ) {
 						errorMsg: error.message,
 					} );
 				}
+			} )
+			.finally( () => {
+				if (
+					isMountedRef.current &&
+					fetchRequest === fetchRequestRef.current
+				) {
+					setIsLoading( false );
+				}
 			} ) );
 
 		return fetchRequest;
@@ -151,18 +163,41 @@ export default function ServerSideRender( props ) {
 		}
 	} );
 
-	if ( response === '' ) {
+	/**
+	 * Effect to handle showing the loading placeholder.
+	 * Show it only if there is no previous response or
+	 * the request takes more than one second.
+	 */
+	useEffect( () => {
+		if ( ! isLoading ) {
+			return;
+		}
+		const timeout = setTimeout( () => {
+			setShowLoader( true );
+		}, 1000 );
+		return () => clearTimeout( timeout );
+	}, [ isLoading ] );
+
+	const hasResponse = !! response;
+	const hasEmptyResponse = response === '';
+	const hasError = response?.error;
+
+	if ( hasEmptyResponse || ! hasResponse ) {
 		return <EmptyResponsePlaceholder { ...props } />;
-	} else if ( ! response ) {
+	}
+
+	if ( hasError ) {
+		return <ErrorResponsePlaceholder response={ response } { ...props } />;
+	}
+
+	if ( isLoading ) {
 		return (
-			<LoadingResponsePlaceholder { ...props }>
-				{ !! prevResponse && (
-					<RawHTML className={ className }>{ prevResponse }</RawHTML>
+			<LoadingResponsePlaceholder { ...props } showLoader={ showLoader }>
+				{ hasResponse && (
+					<RawHTML className={ className }>{ response }</RawHTML>
 				) }
 			</LoadingResponsePlaceholder>
 		);
-	} else if ( response.error ) {
-		return <ErrorResponsePlaceholder response={ response } { ...props } />;
 	}
 
 	return <RawHTML className={ className }>{ response }</RawHTML>;

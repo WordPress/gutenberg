@@ -9,7 +9,6 @@ import {
 	pressKeyWithModifier,
 	insertBlock,
 	clickBlockToolbarButton,
-	clickButton,
 } from '@wordpress/e2e-test-utils';
 
 const getActiveBlockName = async () =>
@@ -556,7 +555,10 @@ describe( 'Writing Flow', () => {
 		await page.keyboard.type( '/image' );
 		await page.keyboard.press( 'Enter' );
 		await clickBlockToolbarButton( 'Align' );
-		await clickButton( 'Wide width' );
+		const wideButton = await page.waitForXPath(
+			`//button[contains(@class,'components-dropdown-menu__menu-item')]//span[contains(text(), 'Wide width')]`
+		);
+		await wideButton.click();
 
 		// Select the previous block.
 		await page.keyboard.press( 'ArrowUp' );

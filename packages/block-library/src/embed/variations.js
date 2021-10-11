@@ -24,6 +24,7 @@ import {
 	embedAmazonIcon,
 	embedAnimotoIcon,
 	embedDailymotionIcon,
+	embedPinterestIcon,
 } from './icons';
 
 /** @typedef {import('@wordpress/blocks').WPBlockVariation} WPBlockVariation */
@@ -206,14 +207,6 @@ const variations = [
 		attributes: { providerNameSlug: 'kickstarter', responsive: true },
 	},
 	{
-		name: 'meetup-com',
-		title: 'Meetup.com',
-		icon: embedContentIcon,
-		description: __( 'Embed Meetup.com content.' ),
-		patterns: [ /^https?:\/\/(www\.)?meetu(\.ps|p\.com)\/.+/i ],
-		attributes: { providerNameSlug: 'meetup-com', responsive: true },
-	},
-	{
 		name: 'mixcloud',
 		title: 'Mixcloud',
 		icon: embedAudioIcon,
@@ -336,6 +329,17 @@ const variations = [
 			/^https?:\/\/(www\.)?(a\.co|z\.cn)\/.+/i,
 		],
 		attributes: { providerNameSlug: 'amazon-kindle' },
+	},
+	{
+		name: 'pinterest',
+		title: 'Pinterest',
+		icon: embedPinterestIcon,
+		keywords: [ __( 'social' ), __( 'bookmark' ) ],
+		description: __( 'Embed Pinterest pins, boards, and profiles.' ),
+		patterns: [
+			/^https?:\/\/([a-z]{2}|www)\.pinterest\.com(\.(au|mx))?\/.*/i,
+		],
+		attributes: { providerNameSlug: 'pinterest' },
 	},
 ];
 

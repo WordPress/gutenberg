@@ -182,12 +182,6 @@ add_action( 'save_post_wp_template', 'set_unique_slug_on_create_template' );
  * @return void
  */
 function gutenberg_the_skip_link() {
-
-	// Early exit if on WP 5.8+.
-	if ( function_exists( 'the_block_template_skip_link' ) ) {
-		return;
-	}
-
 	// Early exit if not a block theme.
 	if ( ! gutenberg_supports_block_templates() ) {
 		return;
@@ -244,7 +238,7 @@ function gutenberg_the_skip_link() {
 	<script>
 	( function() {
 		var skipLinkTarget = document.querySelector( 'main' ),
-			parentEl,
+			sibling,
 			skipLinkTargetID,
 			skipLink;
 
@@ -255,10 +249,10 @@ function gutenberg_the_skip_link() {
 
 		// Get the site wrapper.
 		// The skip-link will be injected in the beginning of it.
-		parentEl = document.querySelector( '.wp-site-blocks' );
+		sibling = document.querySelector( '.wp-site-blocks' );
 
 		// Early exit if the root element was not found.
-		if ( ! parentEl ) {
+		if ( ! sibling ) {
 			return;
 		}
 
@@ -276,9 +270,11 @@ function gutenberg_the_skip_link() {
 		skipLink.innerHTML = '<?php esc_html_e( 'Skip to content', 'gutenberg' ); ?>';
 
 		// Inject the skip link.
-		parentEl.insertAdjacentElement( 'afterbegin', skipLink );
+		sibling.parentElement.insertBefore( skipLink, sibling );
 	}() );
 	</script>
 	<?php
 }
+
+remove_action( 'wp_footer', 'the_block_template_skip_link' );
 add_action( 'wp_footer', 'gutenberg_the_skip_link' );

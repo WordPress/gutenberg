@@ -426,6 +426,19 @@ _Returns_
 
 -   `string`: Gradient value.
 
+### getPxFromCssUnit
+
+Returns the px value of a cssUnit. The memoized version of getPxFromCssUnit;
+
+_Parameters_
+
+-   _cssUnit_ `string`:
+-   _options_ `Object`:
+
+_Returns_
+
+-   `string`: returns the cssUnit value in a simple px format.
+
 ### InnerBlocks
 
 _Related_

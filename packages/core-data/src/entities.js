@@ -116,6 +116,7 @@ export const defaultEntities = [
 		baseURLParams: { context: 'edit' },
 		plural: 'menuItems',
 		label: __( 'Menu Item' ),
+		rawAttributes: [ 'title', 'content' ],
 	},
 	{
 		name: 'menuLocation',
