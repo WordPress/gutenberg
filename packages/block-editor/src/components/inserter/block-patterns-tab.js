@@ -31,11 +31,18 @@ function BlockPatternsCategory( {
 	// Remove any empty categories
 	const populatedCategories = useMemo(
 		() =>
-			allCategories.filter( ( category ) =>
-				allPatterns.some( ( pattern ) =>
-					pattern.categories?.includes( category.name )
+			allCategories
+				.filter( ( category ) =>
+					allPatterns.some( ( pattern ) =>
+						pattern.categories?.includes( category.name )
+					)
 				)
-			),
+				.sort( ( { name: currentName }, { name: nextName } ) => {
+					if ( ! [ currentName, nextName ].includes( 'featured' ) ) {
+						return 0;
+					}
+					return currentName === 'featured' ? -1 : 1;
+				} ),
 		[ allPatterns, allCategories ]
 	);
 
