@@ -31,6 +31,9 @@ import useBlockNavigator from '../use-block-navigator';
 import useTemplatePartEntity from '../use-template-part';
 import Placeholder from './placeholder';
 import ResponsiveWrapper from './responsive-wrapper';
+
+// TODO - refactor these to somewhere common?
+import { createTemplatePartId } from '../../template-part/edit/utils/create-template-part-id';
 import NavigationInnerBlocks from './inner-blocks';
 
 function getComputedStyle( node ) {
@@ -84,6 +87,7 @@ function Navigation( {
 } ) {
 	const {
 		slug,
+		theme,
 		area: blockArea,
 		itemsJustification,
 		isResponsive,
@@ -91,7 +95,8 @@ function Navigation( {
 		orientation,
 	} = attributes;
 
-	const templatePartId = slug;
+	// Replicates `createTemplatePartId` in the template part block.
+	const templatePartId = createTemplatePartId( theme, slug );
 	const [ hasAlreadyRendered, RecursionProvider ] = useNoRecursiveRenders(
 		templatePartId
 	);
@@ -184,7 +189,10 @@ function Navigation( {
 
 	// We don't want to render a missing state if we have any inner blocks.
 	// A new template part is automatically created if we have any inner blocks but no entity.
-	if ( innerBlocks.length === 0 && isMissing ) {
+	if (
+		innerBlocks.length === 0 &&
+		( ( slug && ! theme ) || ( slug && isMissing ) )
+	) {
 		return (
 			<div { ...blockProps }>
 				<Warning>
