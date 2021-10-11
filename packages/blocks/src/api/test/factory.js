@@ -428,27 +428,7 @@ describe( 'block factory', () => {
 	} );
 
 	describe( '__experimentalCloneSanitizedBlock', () => {
-		it( 'should sanitize attributes not defined in the block type', () => {
-			registerBlockType( 'core/test-block', {
-				...defaultBlockSettings,
-				attributes: {
-					align: {
-						type: 'string',
-					},
-				},
-			} );
-
-			const block = createBlock( 'core/test-block', {
-				notDefined: 'not-defined',
-			} );
-
-			const clonedBlock = __experimentalCloneSanitizedBlock( block, {
-				notDefined2: 'not-defined-2',
-			} );
-
-			expect( clonedBlock.attributes ).toEqual( {} );
-		} );
-		it( 'should not duplicate internal attributes, but fallback to available defaults', () => {
+		it( 'should not duplicate internal attributes', () => {
 			registerBlockType( 'core/test-block', {
 				...defaultBlockSettings,
 				attributes: {
@@ -456,24 +436,174 @@ describe( 'block factory', () => {
 						type: 'string',
 						__experimentalRole: 'internal',
 					},
-					internalAttributeWithDefault: {
+					contentAttribute: {
 						type: 'string',
-						__experimentalRole: 'internal',
-						default: 'default-value',
+						__experimentalRole: 'content',
+					},
+					attributeWithNoRole: {
+						type: 'string',
 					},
 				},
 			} );
 
 			const block = createBlock( 'core/test-block', {
-				internalAttribute: 'unique-value',
-				internalAttributeWithDefault: 'unique-non-default-value',
+				internalAttribute: 'this-should-not-be-copied',
+				contentAttribute: 'some content',
+				attributeWithNoRole: 'another attribute',
 			} );
 
 			const clonedBlock = __experimentalCloneSanitizedBlock( block, {} );
 
 			expect( clonedBlock.attributes ).toEqual( {
-				internalAttributeWithDefault: 'default-value',
+				contentAttribute: 'some content',
+				attributeWithNoRole: 'another attribute',
 			} );
+		} );
+
+		it( 'should merge attributes into the existing block', () => {
+			registerBlockType( 'core/test-block', {
+				attributes: {
+					align: {
+						type: 'string',
+					},
+					isDifferent: {
+						type: 'boolean',
+						default: false,
+					},
+					includesDefault: {
+						type: 'boolean',
+						default: true,
+					},
+					includesFalseyDefault: {
+						type: 'number',
+						default: 0,
+					},
+					content: {
+						type: 'array',
+						source: 'children',
+					},
+					defaultContent: {
+						type: 'array',
+						source: 'children',
+						default: 'test',
+					},
+					unknownDefaultContent: {
+						type: 'array',
+						source: 'children',
+						default: 1,
+					},
+					htmlContent: {
+						source: 'html',
+					},
+				},
+				save: noop,
+				category: 'text',
+				title: 'test block',
+			} );
+			const block = deepFreeze(
+				createBlock( 'core/test-block', { align: 'left' }, [
+					createBlock( 'core/test-block' ),
+				] )
+			);
+
+			const clonedBlock = __experimentalCloneSanitizedBlock( block, {
+				isDifferent: true,
+				htmlContent: 'test',
+			} );
+
+			expect( clonedBlock.name ).toEqual( block.name );
+			expect( clonedBlock.attributes ).toEqual( {
+				includesDefault: true,
+				includesFalseyDefault: 0,
+				align: 'left',
+				isDifferent: true,
+				content: [],
+				defaultContent: [ 'test' ],
+				unknownDefaultContent: [],
+				htmlContent: 'test',
+			} );
+			expect( clonedBlock.innerBlocks ).toHaveLength( 1 );
+			expect( typeof clonedBlock.clientId ).toBe( 'string' );
+			expect( clonedBlock.clientId ).not.toBe( block.clientId );
+		} );
+
+		it( 'should replace inner blocks of the existing block', () => {
+			registerBlockType( 'core/test-block', {
+				attributes: {
+					align: {
+						type: 'string',
+					},
+					isDifferent: {
+						type: 'boolean',
+						default: false,
+					},
+				},
+				save: noop,
+				category: 'text',
+				title: 'test block',
+			} );
+			const block = deepFreeze(
+				createBlock( 'core/test-block', { align: 'left' }, [
+					createBlock( 'core/test-block', { align: 'right' } ),
+					createBlock( 'core/test-block', { align: 'left' } ),
+				] )
+			);
+
+			const clonedBlock = __experimentalCloneSanitizedBlock(
+				block,
+				undefined,
+				[ createBlock( 'core/test-block' ) ]
+			);
+
+			expect( clonedBlock.innerBlocks ).toHaveLength( 1 );
+			expect(
+				clonedBlock.innerBlocks[ 0 ].attributes
+			).not.toHaveProperty( 'align' );
+		} );
+
+		it( 'should clone innerBlocks if innerBlocks are not passed', () => {
+			registerBlockType( 'core/test-block', {
+				attributes: {
+					align: {
+						type: 'string',
+					},
+					isDifferent: {
+						type: 'boolean',
+						default: false,
+					},
+				},
+				save: noop,
+				category: 'text',
+				title: 'test block',
+			} );
+			const block = deepFreeze(
+				createBlock( 'core/test-block', { align: 'left' }, [
+					createBlock( 'core/test-block', { align: 'right' } ),
+					createBlock( 'core/test-block', { align: 'left' } ),
+				] )
+			);
+
+			const clonedBlock = __experimentalCloneSanitizedBlock( block );
+
+			expect( clonedBlock.innerBlocks ).toHaveLength( 2 );
+			expect( clonedBlock.innerBlocks[ 0 ].clientId ).not.toBe(
+				block.innerBlocks[ 0 ].clientId
+			);
+			expect( clonedBlock.innerBlocks[ 0 ].attributes ).not.toBe(
+				block.innerBlocks[ 0 ].attributes
+			);
+			expect( clonedBlock.innerBlocks[ 0 ].attributes ).toEqual(
+				block.innerBlocks[ 0 ].attributes
+			);
+			expect( clonedBlock.innerBlocks[ 1 ].clientId ).not.toBe(
+				block.innerBlocks[ 1 ].clientId
+			);
+			expect( clonedBlock.innerBlocks[ 1 ].attributes ).not.toBe(
+				block.innerBlocks[ 1 ].attributes
+			);
+			expect( clonedBlock.innerBlocks[ 1 ].attributes ).toEqual(
+				block.innerBlocks[ 1 ].attributes
+			);
 		} );
 	} );
 

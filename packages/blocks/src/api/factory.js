@@ -95,8 +95,9 @@ export function createBlocksFromInnerBlocksTemplate(
 }
 
 /**
- * Given a block object, returns a copy of the block object while sanitizing its attributes,
+ * Given a block object, returns a copy of the block object,
  * optionally merging new attributes and/or replacing its inner blocks.
+ * Attributes with the `internal` role are not copied into the new object.
  *
  * @param {Object} block           Block instance.
  * @param {Object} mergeAttributes Block attributes.
@@ -122,17 +123,10 @@ export function __experimentalCloneSanitizedBlock(
 		'internal'
 	);
 
-	// Remove any attributes not defined in the block type, and fill in default values for
-	// misisng attributes.
-	const sanitizedAttributes = __experimentalSanitizeBlockAttributes(
-		block.name,
-		retainedAttributes
-	);
-
 	return {
 		...block,
 		clientId,
-		attributes: sanitizedAttributes,
+		attributes: retainedAttributes,
 		innerBlocks:
 			newInnerBlocks ||
 			block.innerBlocks.map( ( innerBlock ) =>
