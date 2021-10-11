@@ -451,7 +451,7 @@ function RichTextWrapper(
 						createLinkInParagraph( plainText.trim(), onReplace ),
 				} );
 
-			if ( __unstableEmbedURLOnPaste && isPastedURL ) {
+			if ( isPastedURL ) {
 				mode = 'BLOCKS';
 			}
 
