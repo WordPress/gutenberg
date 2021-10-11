@@ -95,7 +95,9 @@
 		}
 	},
 	"providesContext": {
-		"allowResize": "allowResize",
+		"allowResize": "allowResize"
+	},
+	"providesNativeInnerBlockContext": {
 		"imageCrop": "imageCrop"
 	},
 	"supports": {
