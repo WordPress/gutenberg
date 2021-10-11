@@ -18,12 +18,17 @@ const ToolsPanelItem = (
 	props: WordPressComponentProps< ToolsPanelItemProps, 'div' >,
 	forwardedRef: Ref< any >
 ) => {
-	const { children, isShown, ...toolsPanelItemProps } = useToolsPanelItem(
-		props
-	);
+	const {
+		children,
+		isShown,
+		shouldRenderPlaceholder,
+		...toolsPanelItemProps
+	} = useToolsPanelItem( props );
 
 	if ( ! isShown ) {
-		return null;
+		return shouldRenderPlaceholder ? (
+			<View { ...toolsPanelItemProps } ref={ forwardedRef } />
+		) : null;
 	}
 
 	return (

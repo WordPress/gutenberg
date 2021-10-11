@@ -1,7 +1,15 @@
 /**
+ * External dependencies
+ */
+import { isEmpty } from 'lodash';
+
+/**
  * WordPress dependencies
  */
-import { __experimentalStyleProvider as StyleProvider } from '@wordpress/components';
+import {
+	__experimentalStyleProvider as StyleProvider,
+	__experimentalToolsPanelContext as ToolsPanelContext,
+} from '@wordpress/components';
 import warning from '@wordpress/warning';
 
 /**
@@ -26,7 +34,20 @@ export default function InspectorControlsFill( {
 
 	return (
 		<StyleProvider document={ document }>
-			<Fill>{ children }</Fill>
+			<Fill>
+				{ ( fillProps ) => {
+					// Children passed to InspectorControlsFill will not have
+					// access to any React Context whose Provider is part of
+					// the InspectorControlsSlot tree. So we re-create the
+					// Provider in this subtree.
+					const value = ! isEmpty( fillProps ) ? fillProps : null;
+					return (
+						<ToolsPanelContext.Provider value={ value }>
+							{ children }
+						</ToolsPanelContext.Provider>
+					);
+				} }
+			</Fill>
 		</StyleProvider>
 	);
 }

@@ -122,6 +122,12 @@ export default function useMultiSelection() {
 				return;
 			}
 
+			// The block refs might not be immediately available
+			// when dragging blocks into another block.
+			if ( ! startRef.current || ! endRef.current ) {
+				return;
+			}
+
 			// For some browsers, like Safari, it is important that focus happens
 			// BEFORE selection.
 			node.focus();

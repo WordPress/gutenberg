@@ -30,6 +30,11 @@ function BlockHTML( { clientId } ) {
 	const { updateBlock } = useDispatch( blockEditorStore );
 	const onChange = () => {
 		const blockType = getBlockType( block.name );
+
+		if ( ! blockType ) {
+			return;
+		}
+
 		const attributes = getBlockAttributes(
 			blockType,
 			html,

@@ -27,7 +27,8 @@
 		}
 	},
 	"supports": {
-		"anchor": true
+		"anchor": true,
+		"__experimentalSlashInserter": true
 	},
 	"styles": [
 		{

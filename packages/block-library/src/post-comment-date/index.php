@@ -19,14 +19,21 @@ function render_block_core_post_comment_date( $attributes, $content, $block ) {
 	}
 
 	$wrapper_attributes = get_block_wrapper_attributes();
+	$formatted_date     = get_comment_date(
+		isset( $attributes['format'] ) ? $attributes['format'] : '',
+		$block->context['commentId']
+	);
+	$link               = get_comment_link( $block->context['commentId'] );
+
+	if ( ! empty( $attributes['isLink'] ) ) {
+		$formatted_date = sprintf( '<a href="%1s">%2s</a>', $link, $formatted_date );
+	}
+
 	return sprintf(
 		'<div %1$s><time datetime="%2$s">%3$s</time></div>',
 		$wrapper_attributes,
 		get_comment_date( 'c', $block->context['commentId'] ),
-		get_comment_date(
-			isset( $attributes['format'] ) ? $attributes['format'] : '',
-			$block->context['commentId']
-		)
+		$formatted_date
 	);
 }
 
