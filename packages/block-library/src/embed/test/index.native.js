@@ -22,9 +22,32 @@ import * as paragraph from '../../paragraph';
 import * as embed from '..';
 import { registerBlock } from '../..';
 
-const modalDismissEvent = Platform.OS === 'ios' ? 'onDismiss' : 'onModalHide';
+// Override modal mock to prevent unmounting it when is not visible.
+// This is required to be able to trigger onClose and onDismiss events when
+// the modal is dismissed.
+jest.mock( 'react-native-modal', () => {
+	const mockComponent = require( 'react-native/jest/mockComponent' );
+	return mockComponent( 'react-native-modal' );
+} );
+const MODAL_DISMISS_EVENT = Platform.OS === 'ios' ? 'onDismiss' : 'onModalHide';
+
+const RICH_TEXT_EMBED_SUCCESS_RESPONSE = {
+	url: 'https://twitter.com/notnownikki',
+	html: '<p>Mock success response.</p>',
+	type: 'rich',
+	provider_name: 'Twitter',
+	provider_url: 'https://twitter.com',
+	version: '1.0',
+};
+const RICH_TEXT_EMBED_HTML = `<!-- wp:embed {"url":"https://twitter.com/notnownikki","type":"rich","providerNameSlug":"twitter","responsive":true} -->
+<figure class="wp-block-embed is-type-rich is-provider-twitter wp-block-embed-twitter"><div class="wp-block-embed__wrapper">
+https://twitter.com/notnownikki
+</div></figure>
+<!-- /wp:embed -->`;
 
 beforeAll( () => {
+	// Paragraph block needs to be registered because by default a paragraph
+	// block is added to empty posts.
 	registerBlock( paragraph );
 	registerBlock( embed );
 } );
@@ -79,7 +102,7 @@ describe( 'Embed block', () => {
 		} );
 
 		// Dismiss the edit URL modal
-		fireEvent( getByTestId( 'embed-edit-url-modal' ), modalDismissEvent );
+		fireEvent( getByTestId( 'embed-edit-url-modal' ), MODAL_DISMISS_EVENT );
 
 		expect( getEditorHtml() ).toBe( '<!-- wp:embed {"url":""} /-->' );
 	} );
@@ -93,13 +116,13 @@ describe( 'Embed block', () => {
 		} = await initializeEditor( {
 			initialHtml: '',
 		} );
-		const expectedURL = 'http://www.wordpress.org';
+		const expectedURL = 'https://twitter.com/notnownikki';
 
 		// Return mocked responses for the oembed endpoint.
 		fetchRequest.mockImplementation( ( { path } ) => {
 			let response = {};
 			if ( path.startsWith( '/oembed/1.0/proxy' ) ) {
-				response = { data: '<p>embed preview</p>' };
+				response = RICH_TEXT_EMBED_SUCCESS_RESPONSE;
 			}
 			return Promise.resolve( response );
 		} );
@@ -111,21 +134,24 @@ describe( 'Embed block', () => {
 		fireEvent.press( await waitFor( () => getByText( `Embed` ) ) );
 
 		// Wait for edit URL modal to be visible
-		await waitFor( () => {
-			const modal = getByTestId( 'embed-edit-url-modal' );
-			return modal.props.isVisible;
-		} );
+		const embedEditURLModal = getByTestId( 'embed-edit-url-modal' );
+		await waitFor( () => embedEditURLModal.props.isVisible );
 
 		// Set an URL
-		const textInput = getByPlaceholderText( 'Add link' );
-		fireEvent( textInput, 'focus' );
-		fireEvent.changeText( textInput, expectedURL );
+		const linkTextInput = getByPlaceholderText( 'Add link' );
+		fireEvent( linkTextInput, 'focus' );
+		fireEvent.changeText( linkTextInput, expectedURL );
 
 		// Dismiss the edit URL modal
-		fireEvent( getByTestId( 'embed-edit-url-modal' ), modalDismissEvent );
+		fireEvent( embedEditURLModal, 'backdropPress' );
+		fireEvent( embedEditURLModal, MODAL_DISMISS_EVENT );
 
-		expect( getEditorHtml() ).toBe(
-			`<!-- wp:embed {"url":"${ expectedURL }"} /-->`
+		// Wait for edit URL button to be present
+		const editURLButton = await waitFor( () =>
+			getByA11yLabel( 'Edit URL' )
 		);
+
+		expect( editURLButton ).toBeDefined();
+		expect( getEditorHtml() ).toBe( RICH_TEXT_EMBED_HTML );
 	} );
 } );
