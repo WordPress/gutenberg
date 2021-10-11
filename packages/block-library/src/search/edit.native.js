@@ -342,6 +342,7 @@ export default function SearchEdit( {
 	const baseButtonStyles = {
 		...style?.baseColors?.blocks?.[ 'core/button' ]?.color,
 		...attributes?.style?.color,
+		...( style?.color && { text: style.color } ),
 	};
 
 	const richTextButtonContainerStyle = [
@@ -361,18 +362,11 @@ export default function SearchEdit( {
 			color: baseButtonStyles.text,
 			placeholderColor: baseButtonStyles.text,
 		} ),
-		...( style?.color && {
-			color: style.color,
-			placeholderColor: style.color,
-		} ),
 	};
 
 	const iconStyles = {
 		...styles.icon,
-		...( baseButtonStyles && { fill: baseButtonStyles.text } ),
-		...( style?.color && {
-			fill: style.color,
-		} ),
+		...( baseButtonStyles?.text && { fill: baseButtonStyles.text } ),
 	};
 
 	const renderButton = () => {
