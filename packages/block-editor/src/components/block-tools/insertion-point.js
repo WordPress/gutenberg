@@ -15,6 +15,7 @@ import {
 	useContext,
 } from '@wordpress/element';
 import { Popover, __unstableMotion as motion } from '@wordpress/components';
+import { useReducedMotion } from '@wordpress/compose';
 import { isRTL } from '@wordpress/i18n';
 
 /**
@@ -173,6 +174,7 @@ function InsertionPointPopover( {
 	}, [ previousElement, nextElement ] );
 
 	const popoverScrollRef = usePopoverScroll( __unstableContentRef );
+	const disableMotion = useReducedMotion();
 
 	const className = classnames(
 		'block-editor-block-list__insertion-point',
@@ -261,6 +263,16 @@ function InsertionPointPopover( {
 		},
 	};
 
+	const inserterVariants = {
+		start: {
+			scale: disableMotion ? 1 : 0,
+		},
+		rest: {
+			scale: 1,
+			transition: { delay: 0.2 },
+		},
+	};
+
 	/* eslint-disable jsx-a11y/no-static-element-interactions, jsx-a11y/click-events-have-key-events */
 	// While ideally it would be enough to capture the
 	// bubbling focus event from the Inserter, due to the
@@ -281,8 +293,8 @@ function InsertionPointPopover( {
 			__unstableSlotName={ __unstablePopoverSlot || null }
 		>
 			<motion.div
-				layout
-				initial="start"
+				layout={ ! disableMotion }
+				initial={ disableMotion ? 'rest' : 'start' }
 				animate="rest"
 				whileHover="hover"
 				whileTap="pressed"
@@ -302,9 +314,7 @@ function InsertionPointPopover( {
 				/>
 				{ showInsertionPointInserter && (
 					<motion.div
-						initial={ { scale: 0 } }
-						animate={ { scale: 1 } }
-						transition={ { delay: 0.2 } }
+						variants={ inserterVariants }
 						className={ classnames(
 							'block-editor-block-list__insertion-point-inserter'
 						) }
