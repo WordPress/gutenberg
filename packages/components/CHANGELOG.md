@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Change
+
+-   Removed the separator shown between items. ([#35497](https://github.com/WordPress/gutenberg/pull/35497)).
+
 ### Breaking Changes
 
 -   Removed the deprecated `position` and `menuLabel` from the `DropdownMenu` component ([#34537](https://github.com/WordPress/gutenberg/pull/34537)).
