@@ -24,7 +24,7 @@ class WP_Navigation_Page_Test extends WP_UnitTestCase {
 		remove_filter( 'wp_get_nav_menus', array( $this->callback, 'wp_nav_menus_callback' ) );
 	}
 
-	function test_gutenberg_navigation_init_function_generates_correct_preload_paths() {
+	public function test_gutenberg_navigation_init_function_generates_correct_preload_paths() {
 		$menu_id                = mt_rand( 1, 1000 );
 		$expected_preload_paths = array(
 			'/__experimental/menu-locations',
@@ -57,7 +57,7 @@ class WP_Navigation_Page_Test extends WP_UnitTestCase {
 		gutenberg_navigation_init( 'gutenberg_page_gutenberg-navigation' );
 	}
 
-	function test_gutenberg_navigation_editor_preload_menus_function_returns_correct_data() {
+	public function test_gutenberg_navigation_editor_preload_menus_function_returns_correct_data() {
 		$menus_endpoint = gutenberg_navigation_get_menus_endpoint();
 		$preload_data   = array(
 			'/__experimental/menu-locations' => array( 'some menu locations' ),
