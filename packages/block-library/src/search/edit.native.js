@@ -350,9 +350,11 @@ export default function SearchEdit( {
 		isLongButton && styles.buttonContainerWide,
 		baseButtonStyles?.background && {
 			backgroundColor: baseButtonStyles.background,
+			borderWidth: 0,
 		},
 		style?.backgroundColor && {
 			backgroundColor: style.backgroundColor,
+			borderWidth: 0,
 		},
 	];
 
