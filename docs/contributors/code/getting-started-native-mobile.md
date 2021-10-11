@@ -15,13 +15,13 @@ For a developer experience closer to the one the project maintainers current hav
 
 Note that the OS platform used by the maintainers is macOS but the tools and setup should be usable in other platforms too.
 
-## Clone the project
+## First time set up
+
+### Clone the project
 
 ```sh
 git clone https://github.com/WordPress/gutenberg.git
 ```
-
-## Set up
 
 Note that the commands described here should be run in the top-level directory of the cloned project. Before running the demo app, you need to download and install the project dependencies. This is done via the following command:
 
@@ -30,7 +30,153 @@ nvm install
 npm ci
 ```
 
-## Run
+If you have an existing checkout, try cleaning node_modules to avoid potential errors:
+
+```sh
+npm run distclean
+npm ci
+```
+
+### Unit Tests
+
+Unit tests should work at this point.
+
+```sh
+npm run native test
+```
+
+### iOS
+
+The easiest way to figure out what needs to be installed is using the [react native doctor](https://reactnative.dev/blog/2019/11/18/react-native-doctor). From your checkout, or relative to /packages/react-native-editor folder, run:
+
+```
+npx @react-native-community/cli doctor
+```
+
+See if doctor can fix both common and iOS issues. At this stage Android will still have ❌s for items.
+
+Once all common and iOS issues are resolved, try:
+
+```sh
+npm run native start:reset #starts metro
+```
+
+In another terminal type:
+
+```
+npm run native ios
+```
+
+After waiting for everything to build we should see XCode bring up the iPhone simulator with the Block editor visible.
+
+### Android
+
+For ease of setup it's ideal to use Android Studio for all JDK and SDK package management. The first step is downloading [Android Studio](https://developer.android.com/studio):
+
+#### Download packages
+
+Next, open an existing project with Android Studio and select the gutenberg folder you cloned. Click on the cube with the down arrow in the top toolbar.
+
+We can download SDK platforms, packages and other tools on this screen. Specific versions are hidden behind this the "Show package details" checkbox, make sure this is checked, since our build requires specific versions for E2E and development:
+
+Check all related packages from https://github.com/WordPress/gutenberg/blob/trunk/packages/react-native-editor/android/build.gradle. Then click on "Apply" to download items. There may be other related dependecies from build.gradle files in node_modules. If you don’t want to dig through files, stack traces will complain of missing packages, but it does take quite a number of tries if you go through this route.
+
+For good measure, let’s also set the project SDK in Android Studio in File > Project Structure to match what is specified in react-native-editor build.gradle.
+
+#### Update Paths
+
+Export the following env variables and update $PATH
+
+```sh
+export JAVA_HOME=/Applications/Android\ Studio.app/Contents/jre/jdk/Contents/Home
+export ANDROID_HOME=/Users/{your-username}/Library/Android/sdk
+export ANDROID_AVD_HOME=/Users/{your-username}/.android/avd
+export ANDROID_SDK_ROOT=/Users/{your-username}/Library/Android/sdk
+export ANDROID_NDK=/Users/{your-username}/Library/Android/ndk
+export PATH=$PATH:$ANDROID_HOME/tools:$ANDROID_HOME/platform-tools
+```
+
+Save, then source in a terminal, or open a new terminal to pick up the environment changes.
+
+#### Create a device image
+
+Next, let’s create a virtual device image. In Android Studio's top toolbar, click on the tiny phone icon with an android to the bottom-right.
+
+This brings up the “Android Virtual Device Manager” or (AVD). Click on “Create Virtual Device”.
+
+Pick a phone type of your choice. This is the targetSdkVersion set in the [build.gradle](https://github.com/WordPress/gutenberg/blob/trunk/packages/react-native-editor/android/build.gradle#L8) file.
+
+There are some advanced settings we can toggle, but it appears to work okay with out of the box defaults. Click finish.
+
+#### Putting it all together
+
+Start metro:
+
+```
+npm run native start:reset
+```
+
+In another terminal run the following. The emulator doesn’t need to be launched previously.
+
+```
+npm run native android
+```
+
+After a bit of a wait, we should see the Android emulator with the Block Editor running.
+
+### E2E Tests
+
+#### Install Appium
+
+[Appium](https://appium.io/) has it own doctor tool. Run this with:
+
+```sh
+npx appium-doctor
+```
+
+Resolve any required dependencies.
+
+#### iOS E2E
+
+If we know we can run the iOS local environment without issue, E2Es for iOS are straightforward. Stop any running metro processes. This was launched previously with `npm run native start:reset`.
+
+Then in terminal type:
+
+```sh
+npm run native test:e2e:ios:local
+```
+
+Passing a filename should also work to run a subset of tests:
+
+```
+npm run native test:e2e:ios:local gutenberg-editor-gallery.test.js
+```
+
+If all things go well, we should see the iOS iPhone simulator being driven by Appium in the Block Editor.
+
+### Android E2E
+
+**Create a new virtual device()** that matches the device specified in [packages/react-native-editor/__device-tests__/helpers/caps.js](https://github.com/WordPress/gutenberg/blob/trunk/packages/react-native-editor/__device-tests__/helpers/caps.js#L30) At the time of this writing, this would be a Pixel 3 XL image, using Android 9 (API 28).
+
+Start the virtual device first. Go back to the AVD by clicking on the phone icon, then click the green play button.
+
+Make sure no metro processes are running. This was launched previously with `npm run native start:reset`.
+
+Then in a terminal run:
+
+```sh
+npm run native test:e2e:android:local
+```
+
+Passing a filename should also work to run a subset of tests:
+
+```sh
+npm run native test:e2e:android:local gutenberg-editor-gallery.test.js
+```
+
+If all things go well, we should see the Android simulator being driven by Appium in the Block Editor.
+
+## Quick Start
 
 ```sh
 npm run native start:reset
