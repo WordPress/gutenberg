@@ -153,6 +153,7 @@ export { default as postContent } from './library/post-content';
 export { default as postComments } from './library/post-comments';
 export { default as postCommentsCount } from './library/post-comments-count';
 export { default as postCommentsForm } from './library/post-comments-form';
+export { default as postCommentsAuthor } from './library/post-comments-author';
 export { default as postDate } from './library/post-date';
 export { default as postExcerpt } from './library/post-excerpt';
 export { default as postFeaturedImage } from './library/post-featured-image';
