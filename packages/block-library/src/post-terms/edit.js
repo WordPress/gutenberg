@@ -53,11 +53,7 @@ export default function PostTermsEdit( {
 	} );
 
 	if ( ! hasPost || ! term ) {
-		return (
-			<div { ...blockProps }>
-				{ __( 'Post Terms' ) }
-			</div>
-		);
+		return <div { ...blockProps }>{ __( 'Post Terms' ) }</div>;
 	}
 
 	return (
