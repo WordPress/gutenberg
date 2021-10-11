@@ -2,7 +2,50 @@
 
 What follows is a set of questions that have come up from the last few years of Gutenberg development. If you have any questions you’d like to have answered and included here, [just open up a GitHub issue](https://github.com/WordPress/gutenberg/issues) with your question. We’d love the chance to answer and provide clarity to questions we might not have thought to answer. For a look back historically, please see Matt's November 2018 post [WordPress 5.0: A Gutenberg FAQ](https://ma.tt/2018/11/a-gutenberg-faq/).
 
+
+## Table of Contents
+
+<!-- toc -->
+
+- [What is Gutenberg?](#what-is-gutenberg)
+- [What’s on the roadmap long term?](#whats-on-the-roadmap-long-term)
+- [When was Gutenberg started?](#when-was-gutenberg-started)
+- [When was Gutenberg merged into WordPress?](#when-was-gutenberg-merged-into-wordpress)
+- [What are “blocks” and why are we using them?](#what-are-blocks-and-why-are-we-using-them)
+- [What is the writing experience like?](#what-is-the-writing-experience-like)
+- [Are there Keyboard Shortcuts for Gutenberg?](#are-there-keyboard-shortcuts-for-gutenberg)
+  * [Editor shortcuts](#editor-shortcuts)
+  * [Selection shortcuts](#selection-shortcuts)
+  * [Block shortcuts](#block-shortcuts)
+  * [Text formatting](#text-formatting)
+- [Is Gutenberg built on top of TinyMCE?](#is-gutenberg-built-on-top-of-tinymce)
+- [What browsers does Gutenberg support?](#what-browsers-does-gutenberg-support)
+- [How do I make my own block?](#how-do-i-make-my-own-block)
+- [Does Gutenberg involve editing posts/pages in the front-end?](#does-gutenberg-involve-editing-postspages-in-the-front-end)
+- [Given Gutenberg is built in JavaScript, how do old meta boxes (PHP) work?](#given-gutenberg-is-built-in-javascript-how-do-old-meta-boxes-php-work)
+- [How can plugins extend the Gutenberg UI?](#how-can-plugins-extend-the-gutenberg-ui)
+- [Are Custom Post Types still supported?](#are-custom-post-types-still-supported)
+- [Does Gutenberg support columns?](#does-gutenberg-support-columns)
+- [Does Gutenberg support nested blocks?](#does-gutenberg-support-nested-blocks)
+- [Does drag and drop work for rearranging blocks?](#does-drag-and-drop-work-for-rearranging-blocks)
+- [Can themes _style_ blocks?](#can-themes-_style_-blocks)
+- [How do block styles work in both the front-end and back-end?](#how-do-block-styles-work-in-both-the-front-end-and-back-end)
+- [What are block variations? Are they the same as block styles?](#what-are-block-variations-are-they-the-same-as-block-styles)
+- [How do editor styles work?](#how-do-editor-styles-work)
+- [Should I be concerned that Gutenberg will make my plugin obsolete?](#should-i-be-concerned-that-gutenberg-will-make-my-plugin-obsolete)
+- [Is it possible to opt out of Gutenberg for my site?](#is-it-possible-to-opt-out-of-gutenberg-for-my-site)
+- [How do custom TinyMCE buttons work in Gutenberg?](#how-do-custom-tinymce-buttons-work-in-gutenberg)
+- [How do shortcodes work in Gutenberg?](#how-do-shortcodes-work-in-gutenberg)
+- [Should I move shortcodes to content blocks?](#should-i-move-shortcodes-to-content-blocks)
+- [Is Gutenberg made to be properly accessible?](#is-gutenberg-made-to-be-properly-accessible)
+- [How is data stored? I've seen HTML comments, what is their purpose?](#how-is-data-stored-ive-seen-html-comments-what-is-their-purpose)
+- [How can I parse the post content back out into blocks in PHP or JS?](#how-can-i-parse-the-post-content-back-out-into-blocks-in-php-or-js)
+- [WordPress is already the world's most popular publishing platform. Why change the editor at all?](#wordpress-is-already-the-worlds-most-popular-publishing-platform-why-change-the-editor-at-all)
+
+<!-- tocstop -->
+
 ## What is Gutenberg?
+
 
 “Gutenberg” is the name of the project to create a new editor experience for WordPress — contributors have been working on it since January 2017 and it’s one of the most significant changes to WordPress in years. It’s built on the idea of using “blocks” to write and design posts and pages. This will serve as the foundation for future improvements to WordPress, including blocks as a way not just to design posts and pages, but also entire sites. The overall goal is to simplify the first-time user experience of WordPress — for those who are writing, editing, publishing, and designing web pages. The editing experience is intended to give users a better visual representation of what their post or page will look like when they hit publish. Originally, this was the kickoff goal:
 

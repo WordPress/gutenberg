@@ -5,11 +5,12 @@
 import type { Ref } from 'react';
 // eslint-disable-next-line no-restricted-imports
 import { motion, MotionProps } from 'framer-motion';
+import { css } from '@emotion/react';
 
 /**
  * WordPress dependencies
  */
-import { useContext, useEffect, useState } from '@wordpress/element';
+import { useContext, useEffect, useState, useMemo } from '@wordpress/element';
 import { useReducedMotion, useFocusOnMount } from '@wordpress/compose';
 import { isRTL } from '@wordpress/i18n';
 
@@ -21,6 +22,7 @@ import {
 	useContextSystem,
 	WordPressComponentProps,
 } from '../../ui/context';
+import { useCx } from '../../utils/hooks/use-cx';
 import { View } from '../../view';
 import { NavigatorContext } from '../context';
 import type { NavigatorScreenProps } from '../types';
@@ -38,7 +40,7 @@ type Props = Omit<
 >;
 
 function NavigatorScreen( props: Props, forwardedRef: Ref< any > ) {
-	const { children, path, ...otherProps } = useContextSystem(
+	const { children, className, path, ...otherProps } = useContextSystem(
 		props,
 		'NavigatorScreen'
 	);
@@ -47,6 +49,13 @@ function NavigatorScreen( props: Props, forwardedRef: Ref< any > ) {
 	const [ currentPath ] = useContext( NavigatorContext );
 	const isMatch = currentPath.path === path;
 	const ref = useFocusOnMount();
+
+	const cx = useCx();
+	const classes = useMemo(
+		// Ensures horizontal overflow is visually accessible
+		() => cx( css( { overflowX: 'auto' } ), className ),
+		[ className ]
+	);
 
 	// This flag is used to only apply the focus on mount when the actual path changes.
 	// It avoids the focus to happen on the first render.
@@ -61,7 +70,7 @@ function NavigatorScreen( props: Props, forwardedRef: Ref< any > ) {
 
 	if ( prefersReducedMotion ) {
 		return (
-			<View ref={ forwardedRef } { ...otherProps }>
+			<View ref={ forwardedRef } className={ classes } { ...otherProps }>
 				{ children }
 			</View>
 		);
@@ -107,6 +116,7 @@ function NavigatorScreen( props: Props, forwardedRef: Ref< any > ) {
 	return (
 		<motion.div
 			ref={ hasPathChanged ? ref : undefined }
+			className={ classes }
 			{ ...otherProps }
 			{ ...animatedProps }
 		>

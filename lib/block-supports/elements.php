@@ -59,8 +59,18 @@ function gutenberg_render_elements_support( $block_content, $block ) {
 		$first_element_offset = $html_element_matches[0][1];
 		$content              = substr_replace( $block_content, ' class="' . $class_name . '"', $first_element_offset + strlen( $first_element ) - 1, 0 );
 	}
-	return $style . $content;
 
+	// Ideally styles should be loaded in the head, but blocks may be parsed
+	// after that, so loading in the footer for now.
+	// See https://core.trac.wordpress.org/ticket/53494.
+	add_action(
+		'wp_footer',
+		function () use ( $style ) {
+			echo $style;
+		}
+	);
+
+	return $content;
 }
 
 // Remove WordPress core filter to avoid rendering duplicate elements stylesheet.

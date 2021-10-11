@@ -6,6 +6,8 @@ This feature is still experimental. “Experimental” means this is an early im
 
 `ToggleGroupControl` is a form component that lets users choose options represented in horizontal segments. To render options for this control use `ToggleGroupControlOption` component.
 
+Only use this control when you know for sure the labels of items inside won't wrap. For items with longer labels, you can consider a `SelectControl` or a `CustomSelectControl` component instead.
+
 ## Usage
 
 ```js
@@ -76,3 +78,19 @@ The value of the `ToggleGroupControl`.
 -   Required: No
 
 If this property is added, a help text will be generated using help property as the content.
+
+## ToggleGroupControlOption
+
+### Props
+
+#### `label`
+
+-   Type: `string`
+
+Label for the option. If needed, the `aria-label` prop can be used in addition to specify a different label for assistive technologies.
+
+#### `value`
+
+-   Type: `string | number`
+
+The value of the `ToggleGroupControlOption`.

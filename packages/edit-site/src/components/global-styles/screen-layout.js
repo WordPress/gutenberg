@@ -6,17 +6,14 @@ import { __ } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
-import { useGlobalStylesContext } from '../editor/global-styles-provider';
 import BorderPanel, { useHasBorderPanel } from './border-panel';
 import DimensionsPanel, { useHasDimensionsPanel } from './dimensions-panel';
 import ScreenHeader from './header';
 
 function ScreenLayout( { name } ) {
-	const { root, blocks, getStyle, setStyle } = useGlobalStylesContext();
-	const context = name === undefined ? root : blocks[ name ];
 	const parentMenu = name === undefined ? '' : '/blocks/' + name;
-	const hasBorderPanel = useHasBorderPanel( context );
-	const hasDimensionsPanel = useHasDimensionsPanel( context );
+	const hasBorderPanel = useHasBorderPanel( name );
+	const hasDimensionsPanel = useHasDimensionsPanel( name );
 
 	return (
 		<>
@@ -24,20 +21,8 @@ function ScreenLayout( { name } ) {
 				back={ parentMenu ? parentMenu : '/' }
 				title={ __( 'Layout' ) }
 			/>
-			{ hasDimensionsPanel && (
-				<DimensionsPanel
-					context={ context }
-					getStyle={ getStyle }
-					setStyle={ setStyle }
-				/>
-			) }
-			{ hasBorderPanel && (
-				<BorderPanel
-					context={ context }
-					getStyle={ getStyle }
-					setStyle={ setStyle }
-				/>
-			) }
+			{ hasDimensionsPanel && <DimensionsPanel name={ name } /> }
+			{ hasBorderPanel && <BorderPanel name={ name } /> }
 		</>
 	);
 }

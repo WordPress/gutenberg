@@ -38,7 +38,6 @@ const getDisabledElement = ( { eventHandlers, child, childrenWithPopover } ) =>
 			{ cloneElement( child, {
 				children: childrenWithPopover,
 			} ) }
-			,
 		</span>,
 		eventHandlers
 	);

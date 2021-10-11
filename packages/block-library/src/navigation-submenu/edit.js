@@ -576,7 +576,7 @@ export default function NavigationSubmenuEdit( {
 						<RichText
 							ref={ ref }
 							identifier="label"
-							className="wp-block-navigation-link__label"
+							className="wp-block-navigation-item__label"
 							value={ label }
 							onChange={ ( labelValue ) =>
 								setAttributes( { label: labelValue } )

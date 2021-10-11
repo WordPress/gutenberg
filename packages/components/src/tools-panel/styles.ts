@@ -9,14 +9,47 @@ import { css } from '@emotion/react';
 import { COLORS, CONFIG } from '../utils';
 import { space } from '../ui/utils/space';
 
+const toolsPanelGrid = {
+	container: css`
+		column-gap: ${ space( 4 ) };
+		display: grid;
+		grid-template-columns: 1fr 1fr;
+		row-gap: ${ space( 6 ) };
+	`,
+	item: {
+		halfWidth: css`
+			grid-column: span 1;
+		`,
+		fullWidth: css`
+			grid-column: span 2;
+		`,
+	},
+};
+
 export const ToolsPanel = css`
+	${ toolsPanelGrid.container };
+
 	border-top: ${ CONFIG.borderWidth } solid ${ COLORS.gray[ 200 ] };
-	column-gap: ${ space( 4 ) };
-	display: grid;
-	grid-template-columns: 1fr 1fr;
 	margin-top: -1px;
 	padding: ${ space( 4 ) };
-	row-gap: ${ space( 6 ) };
+`;
+
+/**
+ * Items injected into a ToolsPanel via a virtual bubbling slot will require
+ * an inner dom element to be injected. The following rule allows for the
+ * CSS grid display to be re-established.
+ */
+export const ToolsPanelWithInnerWrapper = css`
+	> div {
+		${ toolsPanelGrid.container }
+		${ toolsPanelGrid.item.fullWidth }
+	}
+`;
+
+export const ToolsPanelHiddenInnerWrapper = css`
+	> div {
+		display: none;
+	}
 `;
 
 export const ToolsPanelHeader = css`
@@ -24,7 +57,7 @@ export const ToolsPanelHeader = css`
 	display: flex;
 	font-size: inherit;
 	font-weight: 500;
-	grid-column: span 2;
+	${ toolsPanelGrid.item.fullWidth }
 	justify-content: space-between;
 	line-height: normal;
 
@@ -47,10 +80,10 @@ export const ToolsPanelHeader = css`
 `;
 
 export const ToolsPanelItem = css`
-	grid-column: span 2;
+	${ toolsPanelGrid.item.fullWidth }
 
 	&.single-column {
-		grid-column: span 1;
+		${ toolsPanelGrid.item.halfWidth }
 	}
 
 	/* Clear spacing in and around controls added as panel items. */
@@ -61,6 +94,18 @@ export const ToolsPanelItem = css`
 		margin-bottom: 0;
 		max-width: 100%;
 	}
+
+	& > .components-base-control:last-child {
+		margin-bottom: 0;
+
+		.components-base-control__field {
+			margin-bottom: 0;
+		}
+	}
+`;
+
+export const ToolsPanelItemPlaceholder = css`
+	display: none;
 `;
 
 export const DropdownMenu = css`

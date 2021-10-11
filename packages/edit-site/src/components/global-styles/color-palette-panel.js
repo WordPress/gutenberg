@@ -1,20 +1,14 @@
 /**
- * External dependencies
- */
-import { get } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { __experimentalColorEdit as ColorEdit } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-import { useSelect } from '@wordpress/data';
+import { useMemo } from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
-import { useSetting } from '../editor/utils';
-import { store as editSiteStore } from '../../store';
+import { useSetting } from './hooks';
 
 /**
  * Shared reference to an empty array for cases where it is important to avoid
@@ -27,49 +21,33 @@ import { store as editSiteStore } from '../../store';
  */
 const EMPTY_ARRAY = [];
 
-export default function ColorPalettePanel( {
-	contextName,
-	getSetting,
-	setSetting,
-} ) {
-	const colors = useSetting( 'color.palette', contextName );
-	const userColors = getSetting( contextName, 'color.palette' );
-	const immutableColorSlugs = useSelect(
-		( select ) => {
-			const baseStyles = select( editSiteStore ).getSettings()
-				.__experimentalGlobalStylesBaseStyles;
-			const contextualBasePalette = get( baseStyles, [
-				'settings',
-				'blocks',
-				contextName,
-				'color',
-				'palette',
-			] );
-			const globalPalette = get( baseStyles, [
-				'settings',
-				'color',
-				'palette',
-			] );
-			const basePalette =
-				contextualBasePalette?.theme ??
-				contextualBasePalette?.core ??
-				globalPalette?.theme ??
-				globalPalette?.core;
-			if ( ! basePalette ) {
-				return EMPTY_ARRAY;
-			}
-			return basePalette.map( ( { slug } ) => slug );
-		},
-		[ contextName ]
+export default function ColorPalettePanel( { name } ) {
+	const [ colors, setColors ] = useSetting( 'color.palette', name );
+	const [ userColors ] = useSetting( 'color.palette', name, 'user' );
+	const [ baseGlobalPalette ] = useSetting(
+		'color.palette',
+		undefined,
+		'base'
 	);
+	const [ baseContextualPalette ] = useSetting(
+		'color.palette',
+		name,
+		'base'
+	);
+	const immutableColorSlugs = useMemo( () => {
+		const basePalette = baseContextualPalette ?? baseGlobalPalette;
+		if ( ! basePalette ) {
+			return EMPTY_ARRAY;
+		}
+		return basePalette.map( ( { slug } ) => slug );
+	}, [ baseContextualPalette, baseGlobalPalette ] );
+
 	return (
 		<div className="edit-site-global-styles-color-palette-panel">
 			<ColorEdit
 				immutableColorSlugs={ immutableColorSlugs }
 				colors={ colors }
-				onChange={ ( newColors ) => {
-					setSetting( contextName, 'color.palette', newColors );
-				} }
+				onChange={ setColors }
 				emptyUI={ __(
 					'Colors are empty! Add some colors to create your own color palette.'
 				) }

@@ -205,4 +205,4 @@ function ColorPicker( {
 	);
 }
 
-export default ColorPicker;
+export { ColorPicker };

@@ -33,7 +33,7 @@ export default function BlockStylesMenu( { hoveredBlock, onSwitch } ) {
 			{ hoveredClassName && (
 				<PreviewBlockPopover
 					blocks={
-						blockType.example
+						blockType && blockType.example
 							? getBlockFromExample( blockType.name, {
 									attributes: {
 										...blockType.example.attributes,
