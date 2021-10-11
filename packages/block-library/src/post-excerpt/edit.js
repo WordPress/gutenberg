@@ -60,7 +60,7 @@ export default function PostExcerptEditor( {
 		return (
 			<div { ...blockProps }>
 				<Warning>
-					{ __( 'Post excerpt block: no post found.' ) }
+					{ __( 'Post excerpt' ) }
 				</Warning>
 			</div>
 		);

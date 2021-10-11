@@ -72,7 +72,7 @@ export default function PostDateEdit( {
 			{ dateI18n( resolvedFormat, date ) }
 		</time>
 	) : (
-		__( 'No Date' )
+		__( 'Post date' )
 	);
 	if ( isLink && date ) {
 		postDate = (
