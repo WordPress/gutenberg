@@ -70,8 +70,6 @@ export { default as __experimentalLinkControlSearchResults } from './link-contro
 export { default as __experimentalLinkControlSearchItem } from './link-control/search-item';
 export { default as LineHeightControl } from './line-height-control';
 export { default as __experimentalListView } from './list-view';
-export { ListViewBlockFill as __experimentalListViewBlockFill } from './list-view/block-slot';
-export { default as __experimentalListViewEditor } from './list-view/editor';
 export { default as MediaReplaceFlow } from './media-replace-flow';
 export { default as MediaPlaceholder } from './media-placeholder';
 export { default as MediaUpload } from './media-upload';
