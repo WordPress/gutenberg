@@ -2395,7 +2395,7 @@ describe( 'Controlling link title text', () => {
 		);
 	} );
 
-	it( 'should allow `ENTER` keypress withint text field to trigger commit/submission of value', async () => {
+	it( 'should allow `ENTER` keypress within the text field to trigger commit/submission of value', async () => {
 		const textValue = 'My new text value';
 		const mockOnChange = jest.fn();
 		act( () => {
