@@ -13,15 +13,13 @@ import { __, sprintf } from '@wordpress/i18n';
 import { sparkles } from '@wordpress/icons';
 import { BlockIcon } from '@wordpress/block-editor';
 import { showNotice, nativeNoticeLength } from '@wordpress/react-native-bridge';
-// import { useSelect } from '@wordpress/data';
-// import { store as editorStore } from '@wordpress/editor';
 
 /**
  * Internal dependencies
  */
 import styles from './style.scss';
 
-function InserterButton( { item, itemWidth, maxWidth, onSelect } ) {
+function InserterButton( { item, itemWidth, maxWidth, onSelect, postType } ) {
 	const modalIconWrapperStyle = usePreferredColorSchemeStyle(
 		styles.modalIconWrapper,
 		styles.modalIconWrapperDark
@@ -52,26 +50,17 @@ function InserterButton( { item, itemWidth, maxWidth, onSelect } ) {
 	const shouldDisableTouch =
 		item.isDisabled && ( isIOS || ! item.alreadyPresentInPost );
 
-	// const { postType } = useSelect( ( select ) => ( {
-	// 	postType: select( editorStore ).getEditedPostAttribute( 'type' ),
-	// } ) );
-	// const postType = 'page';
-
 	const onPress = useCallback( () => {
 		if ( ! item.isDisabled ) {
 			onSelect( item );
 		} else if ( item.alreadyPresentInPost && ! isIOS ) {
 			// Type of block doesn't support multiple instances.
-
-			// const disabledMessage =
-			// 	postType === 'page'
-			// 		? // translators: %s: name of the block. e.g: "More"
-			// 		  __( 'You already have a %s block on this page.' )
-			// 		: // translators: %s: name of the block. e.g: "More"
-			// 		  __( 'You already have a %s block on this post.' );
 			const disabledMessage =
-				// translators: %s: name of the block. e.g: "More"
-				__( 'You already have a %s block on this post/page.' );
+				postType === 'page'
+					? // translators: %s: name of the block. e.g: "More"
+					  __( 'You already have a %s block on this page.' )
+					: // translators: %s: name of the block. e.g: "More"
+					  __( 'You already have a %s block on this post.' );
 
 			showNotice(
 				sprintf( disabledMessage, blockTitle ),

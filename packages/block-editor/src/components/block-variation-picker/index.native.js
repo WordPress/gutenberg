@@ -26,13 +26,14 @@ import {
 	InserterButton,
 } from '@wordpress/components';
 import { Icon, close } from '@wordpress/icons';
-import { useMemo } from '@wordpress/element';
+import { useMemo, useContext } from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
 import styles from './style.scss';
 import { store as blockEditorStore } from '../../store';
+import BlockContext from '../block-context';
 
 const hitSlop = { top: 22, bottom: 22, left: 22, right: 22 };
 
@@ -44,6 +45,8 @@ function BlockVariationPicker( { isVisible, onClose, clientId, variations } ) {
 		styles.cancelButton,
 		styles.cancelButtonDark
 	);
+
+	const { postType } = useContext( BlockContext );
 
 	const leftButton = useMemo(
 		() => (
@@ -98,6 +101,7 @@ function BlockVariationPicker( { isVisible, onClose, clientId, variations } ) {
 								item={ v }
 								key={ v.name }
 								onSelect={ () => onVariationSelect( v ) }
+								postType={ postType }
 							/>
 						);
 					} ) }
