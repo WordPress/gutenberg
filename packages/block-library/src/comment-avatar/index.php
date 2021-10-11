@@ -17,8 +17,8 @@ function render_block_core_comment_avatar( $attributes, $content, $block ) {
 	if ( ! isset( $block->context['commentId'] ) ) {
 		return '';
 	}
-	$comment = get_comment( $block->context['commentId'] );
 
+	$comment = get_comment( $block->context['commentId'] );
 	if ( ! $comment ) {
 		return '';
 	}
