@@ -102,7 +102,7 @@ public class WPAndroidGlueCode {
     private OnGutenbergDidRequestPreviewListener mOnGutenbergDidRequestPreviewListener;
     private OnBlockTypeImpressionsEventListener mOnBlockTypeImpressionsEventListener;
     private OnCustomerSupportOptionsListener mOnCustomerSupportOptionsListener;
-    private OnNativeNoticeListener mOnNativeNoticeListener;
+    private OnNoticeListener mOnNoticeListener;
     private boolean mIsEditorMounted;
 
     private String mContentHtml = "";
@@ -234,7 +234,7 @@ public class WPAndroidGlueCode {
         void onGotoCustomerSupportOptions();
     }
 
-    public interface OnNativeNoticeListener {
+    public interface OnNoticeListener {
         void showNotice(String message, int duration);
     }
 
@@ -551,8 +551,8 @@ public class WPAndroidGlueCode {
 
             @Override
             public void showNotice(String message, int duration) {
-                if (mOnNativeNoticeListener != null) {
-                    mOnNativeNoticeListener.showNotice(message, duration);
+                if (mOnNoticeListener != null) {
+                    mOnNoticeListener.showNotice(message, duration);
                 }
             }
         }, mIsDarkMode);
@@ -636,7 +636,7 @@ public class WPAndroidGlueCode {
                                   OnGutenbergDidRequestPreviewListener onGutenbergDidRequestPreviewListener,
                                   OnBlockTypeImpressionsEventListener onBlockTypeImpressionsEventListener,
                                   OnCustomerSupportOptionsListener onCustomerSupportOptionsListener,
-                                  OnNativeNoticeListener onNativeNoticeListener,
+                                  OnNoticeListener onNoticeListener,
                                   boolean isDarkMode) {
         MutableContextWrapper contextWrapper = (MutableContextWrapper) mReactRootView.getContext();
         contextWrapper.setBaseContext(viewGroup.getContext());
@@ -658,7 +658,7 @@ public class WPAndroidGlueCode {
         mOnGutenbergDidRequestPreviewListener = onGutenbergDidRequestPreviewListener;
         mOnBlockTypeImpressionsEventListener = onBlockTypeImpressionsEventListener;
         mOnCustomerSupportOptionsListener = onCustomerSupportOptionsListener;
-        mOnNativeNoticeListener = onNativeNoticeListener;
+        mOnNoticeListener = onNoticeListener;
 
         sAddCookiesInterceptor.setOnAuthHeaderRequestedListener(onAuthHeaderRequestedListener);
 
