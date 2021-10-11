@@ -6,29 +6,55 @@ div[data-type="core/post-featured-image"] {
 	}
 }
 
-.editor-styles-wrapper {
-	.post-featured-image_placeholder {
-		display: flex;
-		flex-direction: row;
-		align-items: center;
-		border-radius: $radius-block-ui;
-		background-color: $white;
-		box-shadow: inset 0 0 0 $border-width $gray-900;
-		padding: $grid-unit-15;
-		svg {
-			margin-right: $grid-unit-15;
-		}
-		p {
-			font-family: $default-font;
-			font-size: $default-font-size;
-			margin: 0;
-		}
-	}
-}
-
 .block-library-post-featured-image-dimension-controls {
 	margin-bottom: $grid-unit-10;
 	&.scale-control-is-visible {
 		margin-bottom: $grid-unit-20;
+	}
+}
+.wp-block-post-featured-image {
+	.components-placeholder {
+		justify-content: center;
+		align-items: center;
+		box-shadow: none;
+		padding: 0;
+
+		// Provide a minimum size for the placeholder, for when the logo is resized.
+		// @todo: resizing is currently only possible by adding an image, resizing,
+		// and then removing the image again. We might want to enable resizing on the
+		// placeholder itself.
+		min-height: $grid-unit-60;
+		min-width: $grid-unit-60;
+		height: $grid-unit * 20;
+		width: 100%;
+
+		&::before {
+			content: "";
+			display: block;
+			position: absolute;
+			top: 0;
+			right: 0;
+			bottom: 0;
+			left: 0;
+			border: $border-width dashed currentColor;
+			opacity: 0.3;
+			pointer-events: none;
+
+			// Inherit border radius from style variations.
+			border-radius: inherit;
+		}
+	}
+
+	.components-placeholder__illustration {
+		position: absolute;
+		top: 0;
+		right: 0;
+		bottom: 0;
+		left: 0;
+		width: 100%;
+		height: 100%;
+		stroke: currentColor;
+		stroke-dasharray: 3;
+		opacity: 0.3;
 	}
 }
