@@ -1,4 +1,3 @@
-
 /**
  * The purpose of this function is to create a middleware that is responsible for preloading menu-related data.
  * It uses data that is returned from the /__experimental/menus endpoint for requests
