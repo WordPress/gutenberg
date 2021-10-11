@@ -4,9 +4,9 @@
 import { useEntityProp, store as coreStore } from '@wordpress/core-data';
 import { useSelect } from '@wordpress/data';
 import {
+	Icon,
 	ToggleControl,
 	PanelBody,
-	Placeholder,
 	withNotices,
 } from '@wordpress/components';
 import {
@@ -19,7 +19,6 @@ import {
 } from '@wordpress/block-editor';
 import { __, sprintf } from '@wordpress/i18n';
 import { postFeaturedImage } from '@wordpress/icons';
-import { SVG, Path } from '@wordpress/primitives';
 
 /**
  * Internal dependencies
@@ -28,21 +27,10 @@ import DimensionControls from './dimension-controls';
 
 const ALLOWED_MEDIA_TYPES = [ 'image' ];
 const placeholderChip = (
-	<Placeholder className={ 'block-editor-media-placeholder' }>
-		{
-			<SVG
-				className="components-placeholder__illustration"
-				fill="none"
-				xmlns="http://www.w3.org/2000/svg"
-				viewBox="0 0 60 60"
-			>
-				<Path
-					vectorEffect="non-scaling-stroke"
-					d="m61 32.622-13.555-9.137-15.888 9.859a5 5 0 0 1-5.386-.073l-9.095-5.989L1 37.5"
-				/>
-			</SVG>
-		}
-	</Placeholder>
+	<div className="post-featured-image_placeholder">
+		<Icon icon={ postFeaturedImage } />
+		<p> { __( 'Featured Image' ) }</p>
+	</div>
 );
 
 function PostFeaturedImageDisplay( {
