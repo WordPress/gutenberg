@@ -49,60 +49,64 @@ function Editor( {
 		keepCaretInsideBlock,
 		isTemplateMode,
 		template,
-	} = useSelect( ( select ) => {
-		const {
-			isFeatureActive,
-			getPreference,
-			__experimentalGetPreviewDeviceType,
-			isEditingTemplate,
-			getEditedPostTemplate,
-		} = select( editPostStore );
-		const { getEntityRecord, getPostType, getEntityRecords } = select(
-			coreStore
-		);
-		const { getEditorSettings } = select( editorStore );
-		const { getBlockTypes } = select( blocksStore );
-		const isTemplate = [ 'wp_template', 'wp_template_part' ].includes(
-			postType
-		);
-		// Ideally the initializeEditor function should be called using the ID of the REST endpoint.
-		// to avoid the special case.
-		let postObject;
-		if ( isTemplate ) {
-			const posts = getEntityRecords( 'postType', postType, {
-				wp_id: postId,
-			} );
-			postObject = posts?.[ 0 ];
-		} else {
-			postObject = getEntityRecord( 'postType', postType, postId );
-		}
-		const supportsTemplateMode = getEditorSettings().supportsTemplateMode;
-		const isViewable = getPostType( postType )?.viewable ?? false;
+	} = useSelect(
+		( select ) => {
+			const {
+				isFeatureActive,
+				getPreference,
+				__experimentalGetPreviewDeviceType,
+				isEditingTemplate,
+				getEditedPostTemplate,
+			} = select( editPostStore );
+			const { getEntityRecord, getPostType, getEntityRecords } = select(
+				coreStore
+			);
+			const { getEditorSettings } = select( editorStore );
+			const { getBlockTypes } = select( blocksStore );
+			const isTemplate = [ 'wp_template', 'wp_template_part' ].includes(
+				postType
+			);
+			// Ideally the initializeEditor function should be called using the ID of the REST endpoint.
+			// to avoid the special case.
+			let postObject;
+			if ( isTemplate ) {
+				const posts = getEntityRecords( 'postType', postType, {
+					wp_id: postId,
+				} );
+				postObject = posts?.[ 0 ];
+			} else {
+				postObject = getEntityRecord( 'postType', postType, postId );
+			}
+			const supportsTemplateMode = getEditorSettings()
+				.supportsTemplateMode;
+			const isViewable = getPostType( postType )?.viewable ?? false;
 
-		return {
-			hasFixedToolbar:
-				isFeatureActive( 'fixedToolbar' ) ||
-				__experimentalGetPreviewDeviceType() !== 'Desktop',
-			focusMode: isFeatureActive( 'focusMode' ),
-			hasReducedUI: isFeatureActive( 'reducedUI' ),
-			hasThemeStyles: isFeatureActive( 'themeStyles' ),
-			preferredStyleVariations: getPreference(
-				'preferredStyleVariations'
-			),
-			hiddenBlockTypes: getPreference( 'hiddenBlockTypes' ),
-			blockTypes: getBlockTypes(),
-			__experimentalLocalAutosaveInterval: getPreference(
-				'localAutosaveInterval'
-			),
-			keepCaretInsideBlock: isFeatureActive( 'keepCaretInsideBlock' ),
-			isTemplateMode: isEditingTemplate(),
-			template:
-				supportsTemplateMode && isViewable
-					? getEditedPostTemplate()
-					: null,
-			post: postObject,
-		};
-	} );
+			return {
+				hasFixedToolbar:
+					isFeatureActive( 'fixedToolbar' ) ||
+					__experimentalGetPreviewDeviceType() !== 'Desktop',
+				focusMode: isFeatureActive( 'focusMode' ),
+				hasReducedUI: isFeatureActive( 'reducedUI' ),
+				hasThemeStyles: isFeatureActive( 'themeStyles' ),
+				preferredStyleVariations: getPreference(
+					'preferredStyleVariations'
+				),
+				hiddenBlockTypes: getPreference( 'hiddenBlockTypes' ),
+				blockTypes: getBlockTypes(),
+				__experimentalLocalAutosaveInterval: getPreference(
+					'localAutosaveInterval'
+				),
+				keepCaretInsideBlock: isFeatureActive( 'keepCaretInsideBlock' ),
+				isTemplateMode: isEditingTemplate(),
+				template:
+					supportsTemplateMode && isViewable
+						? getEditedPostTemplate()
+						: null,
+				post: postObject,
+			};
+		},
+		[ postType, postId ]
+	);
 
 	const { updatePreferredStyleVariations, setIsInserterOpened } = useDispatch(
 		editPostStore

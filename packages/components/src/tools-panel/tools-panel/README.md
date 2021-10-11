@@ -67,6 +67,13 @@ export function DimensionPanel( props ) {
 
 ## Props
 
+### `hasInnerWrapper`: `boolean`
+
+Flags that the items in this ToolsPanel will be contained within an inner
+wrapper element allowing the panel to lay them out accordingly.
+
+- Required: No
+
 ### `label`: `string`
 
 Text to be displayed within the panel's header and as the `aria-label` for the
@@ -88,3 +95,10 @@ A function to call when the `Reset all` menu option is selected. This is passed
 through to the panel's header component.
 
 - Required: Yes
+
+### `shouldRenderPlaceholderItems`: `boolean`
+
+Advises the `ToolsPanel` that all of its `ToolsPanelItem` children should render
+placeholder content (instead of `null`) when they are toggled off and hidden.
+
+- Required: No

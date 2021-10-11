@@ -16,7 +16,7 @@ import { LEFT, RIGHT } from '@wordpress/keycodes';
  * Internal dependencies
  */
 import Button from '../button';
-import ColorPicker from '../color-picker';
+import { ColorPicker } from '../color-picker';
 import Dropdown from '../dropdown';
 import { VisuallyHidden } from '../visually-hidden';
 

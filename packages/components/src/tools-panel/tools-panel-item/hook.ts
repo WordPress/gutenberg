@@ -28,11 +28,6 @@ export function useToolsPanelItem(
 		...otherProps
 	} = useContextSystem( props, 'ToolsPanelItem' );
 
-	const cx = useCx();
-	const classes = useMemo( () => {
-		return cx( styles.ToolsPanelItem, className );
-	}, [ className ] );
-
 	const {
 		panelId: currentPanelId,
 		menuItems,
@@ -40,6 +35,7 @@ export function useToolsPanelItem(
 		deregisterPanelItem,
 		flagItemCustomization,
 		isResetting,
+		shouldRenderPlaceholderItems: shouldRenderPlaceholder,
 	} = useToolsPanelContext();
 
 	const hasValueCallback = useCallback( hasValue, [ panelId ] );
@@ -88,7 +84,7 @@ export function useToolsPanelItem(
 	// Determine if the panel item's corresponding menu is being toggled and
 	// trigger appropriate callback if it is.
 	useEffect( () => {
-		if ( isResetting ) {
+		if ( isResetting || currentPanelId !== panelId ) {
 			return;
 		}
 
@@ -99,7 +95,14 @@ export function useToolsPanelItem(
 		if ( ! isMenuItemChecked && wasMenuItemChecked ) {
 			onDeselect?.();
 		}
-	}, [ isMenuItemChecked, wasMenuItemChecked, isValueSet, isResetting ] );
+	}, [
+		currentPanelId,
+		isMenuItemChecked,
+		isResetting,
+		isValueSet,
+		panelId,
+		wasMenuItemChecked,
+	] );
 
 	// The item is shown if it is a default control regardless of whether it
 	// has a value. Optional items are shown when they are checked or have
@@ -108,9 +111,19 @@ export function useToolsPanelItem(
 		? menuItems?.[ menuGroup ]?.[ label ] !== undefined
 		: isMenuItemChecked;
 
+	const cx = useCx();
+	const classes = useMemo( () => {
+		const placeholderStyle =
+			shouldRenderPlaceholder &&
+			! isShown &&
+			styles.ToolsPanelItemPlaceholder;
+		return cx( styles.ToolsPanelItem, placeholderStyle, className );
+	}, [ isShown, shouldRenderPlaceholder, className ] );
+
 	return {
 		...otherProps,
 		isShown,
+		shouldRenderPlaceholder,
 		className: classes,
 	};
 }

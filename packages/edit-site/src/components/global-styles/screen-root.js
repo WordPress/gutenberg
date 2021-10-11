@@ -12,23 +12,20 @@ import { __ } from '@wordpress/i18n';
  */
 import StylesPreview from './preview';
 import NavigationButton from './navigation-button';
-import { useGlobalStylesContext } from '../editor/global-styles-provider';
 import ContextMenu from './context-menu';
 
 function ScreenRoot() {
-	const { root } = useGlobalStylesContext();
-
 	return (
 		<>
 			<StylesPreview />
 
-			<ContextMenu context={ root } />
+			<ContextMenu />
 
 			<ItemGroup>
 				<Item>
 					<p>
 						{ __(
-							'Customize the appearance of specific blocks for the whole site'
+							'Customize the appearance of specific blocks for the whole site.'
 						) }
 					</p>
 				</Item>

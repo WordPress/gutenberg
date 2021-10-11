@@ -6,13 +6,10 @@ import { __ } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
-import { useGlobalStylesContext } from '../editor/global-styles-provider';
 import TypographyPanel from './typography-panel';
 import ScreenHeader from './header';
 
 function ScreenTypography( { name } ) {
-	const { root, blocks, getStyle, setStyle } = useGlobalStylesContext();
-	const context = name === undefined ? root : blocks[ name ];
 	const parentMenu = name === undefined ? '' : '/blocks/' + name;
 
 	return (
@@ -20,12 +17,11 @@ function ScreenTypography( { name } ) {
 			<ScreenHeader
 				back={ parentMenu ? parentMenu : '/' }
 				title={ __( 'Typography' ) }
+				description={ __(
+					'Manage the fonts used on the website and the default aspect of different global elements.'
+				) }
 			/>
-			<TypographyPanel
-				context={ context }
-				getStyle={ getStyle }
-				setStyle={ setStyle }
-			/>
+			<TypographyPanel name={ name } />
 		</>
 	);
 }

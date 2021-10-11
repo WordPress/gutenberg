@@ -22,5 +22,5 @@
 			"lineHeight": true
 		}
 	},
-	"style": "wp-block-post-comments-form"
+	"style": [ "wp-block-post-comments-form", "wp-block-buttons", "wp-block-button" ]
 }

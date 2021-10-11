@@ -14,9 +14,8 @@ Refer to [the `NavigatorProvider` component](/packages/components/src/navigator/
 
 The component accepts the following props:
 
-### `path`
+### `path`: `string`
 
--   Type: `string`
+The screen's path, matched against the current path stored in the navigator.
+
 -   Required: Yes
-
-The path of the current screen.

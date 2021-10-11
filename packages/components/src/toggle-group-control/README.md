@@ -76,3 +76,19 @@ The value of the `ToggleGroupControl`.
 -   Required: No
 
 If this property is added, a help text will be generated using help property as the content.
+
+## ToggleGroupControlOption
+
+### Props
+
+#### `label`
+
+-   Type: `string`
+
+Label for the option. If needed, the `aria-label` prop can be used in addition to specify a different label for assistive technologies.
+
+#### `value`
+
+-   Type: `string | number`
+
+The value of the `ToggleGroupControlOption`.

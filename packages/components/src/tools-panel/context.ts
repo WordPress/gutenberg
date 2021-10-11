@@ -14,6 +14,7 @@ export const ToolsPanelContext = createContext< ToolsPanelContextType >( {
 	menuItems: { default: {}, optional: {} },
 	hasMenuItems: false,
 	isResetting: false,
+	shouldRenderPlaceholderItems: false,
 	registerPanelItem: noop,
 	deregisterPanelItem: noop,
 	flagItemCustomization: noop,

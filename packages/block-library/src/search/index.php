@@ -43,20 +43,17 @@ function render_block_core_search( $attributes ) {
 	// Border color classes need to be applied to the elements that have a border color.
 	$border_color_classes = get_border_color_classes_for_block_core_search( $attributes );
 
-	if ( $show_label ) {
-		if ( ! empty( $attributes['label'] ) ) {
-			$label_markup = sprintf(
-				'<label for="%s" class="wp-block-search__label">%s</label>',
-				$input_id,
-				$attributes['label']
-			);
-		} else {
-			$label_markup = sprintf(
-				'<label for="%s" class="wp-block-search__label screen-reader-text">%s</label>',
-				$input_id,
-				__( 'Search' )
-			);
-		}
+	$label_markup = sprintf(
+		'<label for="%1$s" class="wp-block-search__label screen-reader-text">%2$s</label>',
+		$input_id,
+		empty( $attributes['label'] ) ? __( 'Search' ) : $attributes['label']
+	);
+	if ( $show_label && ! empty( $attributes['label'] ) ) {
+		$label_markup = sprintf(
+			'<label for="%1$s" class="wp-block-search__label">%2$s</label>',
+			$input_id,
+			$attributes['label']
+		);
 	}
 
 	if ( $show_input ) {

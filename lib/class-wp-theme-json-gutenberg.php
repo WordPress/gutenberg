@@ -247,16 +247,7 @@ class WP_Theme_JSON_Gutenberg {
 		'--wp--style--block-gap'     => array( 'spacing', 'blockGap' ),
 		'text-decoration'            => array( 'typography', 'textDecoration' ),
 		'text-transform'             => array( 'typography', 'textTransform' ),
-	);
-
-	/**
-	 * Metadata for style properties that need to use the duotone selector.
-	 *
-	 * Each element is a direct mapping from the CSS property name to the
-	 * path to the value in theme.json & block attributes.
-	 */
-	const DUOTONE_PROPERTIES_METADATA = array(
-		'filter' => array( 'filter', 'duotone' ),
+		'filter'                     => array( 'filter', 'duotone' ),
 	);
 
 	/**
@@ -723,7 +714,10 @@ class WP_Theme_JSON_Gutenberg {
 				if ( isset( $preset_metadata['value_key'] ) ) {
 					$value_key = $preset_metadata['value_key'];
 					$value     = $preset[ $value_key ];
-				} elseif ( is_callable( $preset_metadata['value_func'] ) ) {
+				} elseif (
+					isset( $preset_metadata['value_func'] ) &&
+					is_callable( $preset_metadata['value_func'] )
+				) {
 					$value_func = $preset_metadata['value_func'];
 					$value      = call_user_func( $value_func, $preset );
 				} else {
@@ -981,23 +975,37 @@ class WP_Theme_JSON_Gutenberg {
 			$selector     = $metadata['selector'];
 			$settings     = _wp_array_get( $this->theme_json, array( 'settings' ) );
 			$declarations = self::compute_style_properties( $node, $settings );
+
+			// 1. Separate the ones who use the general selector
+			// and the ones who use the duotone selector.
+			$declarations_duotone = array();
+			foreach ( $declarations as $index => $declaration ) {
+				if ( 'filter' === $declaration['name'] ) {
+					unset( $declarations[ $index ] );
+					$declarations_duotone[] = $declaration;
+				}
+			}
+
+			// 2. Generate the rules that use the general selector.
 			$block_rules .= self::to_ruleset( $selector, $declarations );
 
+			// 3. Generate the rules that use the duotone selector.
+			if ( isset( $metadata['duotone'] ) && ! empty( $declarations_duotone ) ) {
+				$selector_duotone = self::scope_selector( $metadata['selector'], $metadata['duotone'] );
+				$block_rules     .= self::to_ruleset( $selector_duotone, $declarations_duotone );
+			}
+
 			if ( self::ROOT_BLOCK_SELECTOR === $selector ) {
+				$block_rules .= 'body { margin: 0; }';
 				$block_rules .= '.wp-site-blocks > .alignleft { float: left; margin-right: 2em; }';
 				$block_rules .= '.wp-site-blocks > .alignright { float: right; margin-left: 2em; }';
 				$block_rules .= '.wp-site-blocks > .aligncenter { justify-content: center; margin-left: auto; margin-right: auto; }';
 
 				$has_block_gap_support = _wp_array_get( $this->theme_json, array( 'settings', 'spacing', 'blockGap' ) ) !== null;
 				if ( $has_block_gap_support ) {
-					$block_rules .= '.wp-site-blocks > * + * { margin-top: var( --wp--style--block-gap ); margin-bottom: 0; }';
+					$block_rules .= '.wp-site-blocks > * { margin-top: 0; margin-bottom: 0; }';
+					$block_rules .= '.wp-site-blocks > * + * { margin-top: var( --wp--style--block-gap ); }';
 				}
-			}
-
-			if ( isset( $metadata['duotone'] ) ) {
-				$selector     = self::scope_selector( $metadata['selector'], $metadata['duotone'] );
-				$declarations = self::compute_style_properties( $node, $settings, self::DUOTONE_PROPERTIES_METADATA );
-				$block_rules .= self::to_ruleset( $selector, $declarations );
 			}
 		}
 
@@ -1334,7 +1342,16 @@ class WP_Theme_JSON_Gutenberg {
 					esc_attr( esc_html( $preset['name'] ) ) === $preset['name'] &&
 					sanitize_html_class( $preset['slug'] ) === $preset['slug']
 				) {
-					$value           = $preset[ $preset_metadata['value_key'] ];
+					$value = null;
+					if ( isset( $preset_metadata['value_key'] ) ) {
+						$value = $preset[ $preset_metadata['value_key'] ];
+					} elseif (
+						isset( $preset_metadata['value_func'] ) &&
+						is_callable( $preset_metadata['value_func'] )
+					) {
+						$value = call_user_func( $preset_metadata['value_func'], $preset );
+					}
+
 					$preset_is_valid = true;
 					foreach ( $preset_metadata['properties'] as $property ) {
 						if ( ! self::is_safe_css_declaration( $property, $value ) ) {
