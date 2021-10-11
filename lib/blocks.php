@@ -625,23 +625,18 @@ add_filter( 'block_type_metadata', 'gutenberg_multiple_block_styles' );
  * Render block support styles and inject into wp_footer, and append
  * to the end of post content for REST API requests.
  *
- * @param string $name    The identified for a class name or id
- * @param string $content The content to be rendered
+ * @param string $content The content to be rendered.
+ * @param string $action  The type of action to use, e.g. `wp_footer` or `admin_footer`.
  *
- * @return string The class name with an id appended
  */
-function gutenberg_render_block_support_style( $name, $content, $action = 'wp_footer' ) {
-	$unique_name = $name . uniqid();
-
-	$output = str_replace( '{{ placeholder }}', $unique_name, $content );
-
+function gutenberg_render_block_support_style( $content, $action = 'wp_footer' ) {
 	// Ideally styles should be loaded in the head, but blocks may be parsed
 	// after that, so loading in the footer for now.
 	// See https://core.trac.wordpress.org/ticket/53494.
 	add_action(
 		$action,
-		function () use ( $output ) {
-			echo $output;
+		function () use ( $content ) {
+			echo $content;
 		}
 	);
 
@@ -652,15 +647,13 @@ function gutenberg_render_block_support_style( $name, $content, $action = 'wp_fo
 	if ( defined( 'REST_REQUEST' ) && REST_REQUEST ) {
 		add_filter(
 			'wp_render_block_support_styles',
-			function ( $block_support_styles ) use ( $output ) {
-				return $block_support_styles . $output;
+			function ( $block_support_styles ) use ( $content ) {
+				return $block_support_styles . $content;
 			},
 			10,
 			1
 		);
 	}
-
-	return $unique_name;
 }
 
 /**
