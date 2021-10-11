@@ -37,7 +37,10 @@ import {
 	useRef,
 	createInterpolateElement,
 } from '@wordpress/element';
-import { placeCaretAtHorizontalEdge } from '@wordpress/dom';
+import {
+	placeCaretAtHorizontalEdge,
+	__unstableStripHTML as stripHTML,
+} from '@wordpress/dom';
 import { link as linkIcon, addSubmenu } from '@wordpress/icons';
 import { store as coreStore } from '@wordpress/core-data';
 
@@ -287,7 +290,7 @@ export default function NavigationLinkEdit( {
 	const link = {
 		url,
 		opensInNewTab,
-		title: label,
+		title: stripHTML( label ), // don't allow HTML to display inside the <LinkControl>
 	};
 	const { saveEntityRecord } = useDispatch( coreStore );
 	const {
@@ -618,7 +621,9 @@ export default function NavigationLinkEdit( {
 							className="wp-block-navigation-item__label"
 							value={ label }
 							onChange={ ( labelValue ) =>
-								setAttributes( { label: labelValue } )
+								setAttributes( {
+									label: labelValue,
+								} )
 							}
 							onMerge={ mergeBlocks }
 							onReplace={ onReplace }
