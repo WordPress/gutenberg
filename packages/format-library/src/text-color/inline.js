@@ -29,7 +29,7 @@ import { __ } from '@wordpress/i18n';
  */
 import { textColor as settings } from './index';
 
-function parseCSS( css = '' ) {
+export function parseCSS( css = '' ) {
 	return css.split( ';' ).reduce( ( accumulator, rule ) => {
 		if ( rule ) {
 			const [ property, value ] = rule.split( ':' );

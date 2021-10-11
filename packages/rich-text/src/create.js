@@ -43,14 +43,6 @@ function createEmptyValue() {
 	};
 }
 
-function simpleFindKey( object, value ) {
-	for ( const key in object ) {
-		if ( object[ key ] === value ) {
-			return key;
-		}
-	}
-}
-
 function toFormat( { type, attributes } ) {
 	let formatType;
 
@@ -94,15 +86,25 @@ function toFormat( { type, attributes } ) {
 
 	const registeredAttributes = {};
 	const unregisteredAttributes = {};
+	const _attributes = { ...attributes };
 
-	for ( const name in attributes ) {
-		const key = simpleFindKey( formatType.attributes, name );
+	for ( const key in formatType.attributes ) {
+		const name = formatType.attributes[ key ];
+		registeredAttributes[ key ] = _attributes[ name ];
+		delete _attributes[ name ];
 
-		if ( key ) {
-			registeredAttributes[ key ] = attributes[ name ];
-		} else {
-			unregisteredAttributes[ name ] = attributes[ name ];
+		if ( formatType.__unstableFilterAttributeValue ) {
+			registeredAttributes[
+				key
+			] = formatType.__unstableFilterAttributeValue(
+				key,
+				registeredAttributes[ key ]
+			);
 		}
+	}
+
+	for ( const name in _attributes ) {
+		unregisteredAttributes[ name ] = attributes[ name ];
 	}
 
 	return {

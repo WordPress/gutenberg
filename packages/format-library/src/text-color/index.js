@@ -125,5 +125,11 @@ export const textColor = {
 		style: 'style',
 		class: 'class',
 	},
+	__unstableFilterAttributeValue( key, value ) {
+		if ( key !== 'style' ) return value;
+		if ( value && ! value.includes( 'background-color' ) ) return value;
+		const addedCSS = [ 'background-color', 'rgba(0, 0, 0, 0)' ].join( ':' );
+		return value ? [ value, addedCSS ].join( ';' ) : addedCSS;
+	},
 	edit: TextColorEdit,
 };
