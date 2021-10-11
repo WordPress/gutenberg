@@ -451,7 +451,7 @@ function RichTextWrapper(
 			} );
 			const isPastedURL = isURL( plainText.trim() );
 
-			if ( typeof content === 'string' ) {
+			if ( typeof content === 'string' && ! isPastedURL ) {
 				let valueToInsert = create( { html: content } );
 
 				addActiveFormats( valueToInsert, activeFormats );
@@ -480,7 +480,10 @@ function RichTextWrapper(
 
 					// When an URL is pasted in an empty paragraph then the EmbedHandlerPicker should showcase options allowing the transformation of that URL
 					// into either an Embed block or a link within the target paragraph. If the paragraph is non-empty, the URL is pasted as text.
-					if ( __unstableEmbedURLOnPaste && name === 'core/embed' ) {
+					if (
+						__unstableEmbedURLOnPaste &&
+						( name === 'core/embed' || typeof content === 'string' )
+					) {
 						mode = 'BLOCKS';
 						// Embed handler
 						embedHandlerPickerRef.current?.presentPicker( {
