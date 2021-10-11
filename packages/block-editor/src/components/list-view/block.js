@@ -53,7 +53,7 @@ export default function ListViewBlock( {
 	const hasRenderedMovers = showBlockMovers && hasSiblings;
 	const moverCellClassName = classnames(
 		'block-editor-list-view-block__mover-cell',
-		{ 'is-visible': isHovered }
+		{ 'is-visible': isHovered || isSelected }
 	);
 	const {
 		__experimentalFeatures: withExperimentalFeatures,
@@ -62,7 +62,7 @@ export default function ListViewBlock( {
 	} = useListViewContext();
 	const listViewBlockSettingsClassName = classnames(
 		'block-editor-list-view-block__menu-cell',
-		{ 'is-visible': isHovered }
+		{ 'is-visible': isHovered || isSelected }
 	);
 
 	// If ListView has experimental features related to the Persistent List View,
