@@ -2274,3 +2274,62 @@ describe( 'Rich link previews', () => {
 		mockFetchRichUrlData = undefined;
 	} );
 } );
+
+describe( 'Controlling link title text', () => {
+	const selectedLink = first( fauxEntitySuggestions );
+
+	it( 'should not show a means to alter the link text by default', async () => {
+		act( () => {
+			render(
+				<LinkControl value={ selectedLink } forceIsEditingLink />,
+				container
+			);
+		} );
+
+		expect(
+			queryByRole( container, 'textbox', { name: 'Text' } )
+		).toBeFalsy();
+	} );
+
+	it.each( [ null, undefined, '   ' ] )(
+		'should not show the link text input when the URL is `%s`',
+		async ( urlValue ) => {
+			const selectedLinkWithoutURL = {
+				...first( fauxEntitySuggestions ),
+				url: urlValue,
+			};
+
+			act( () => {
+				render(
+					<LinkControl
+						value={ selectedLinkWithoutURL }
+						forceIsEditingLink
+						hasTextControl
+					/>,
+					container
+				);
+			} );
+
+			expect(
+				queryByRole( container, 'textbox', { name: 'Text' } )
+			).toBeFalsy();
+		}
+	);
+
+	it( 'should show a means to alter the link text when hasTextControl prop is truthy', async () => {
+		act( () => {
+			render(
+				<LinkControl
+					value={ selectedLink }
+					forceIsEditingLink
+					hasTextControl={ true }
+				/>,
+				container
+			);
+		} );
+
+		expect(
+			queryByRole( container, 'textbox', { name: 'Text' } )
+		).toBeTruthy();
+	} );
+} );

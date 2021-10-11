@@ -238,9 +238,10 @@ function LinkControl( {
 
 	const showSettingsDrawer = !! settings?.length;
 
-	// Only show text control once a URL value has been committed.
+	// Only show text control once a URL value has been committed
+	// and it isn't just empty whitespace.
 	// See https://github.com/WordPress/gutenberg/pull/33849/#issuecomment-932194927.
-	const showTextControl = value?.url && hasTextControl;
+	const showTextControl = value?.url?.trim()?.length && hasTextControl;
 
 	return (
 		<div
