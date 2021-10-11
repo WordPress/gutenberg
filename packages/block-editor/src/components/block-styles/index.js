@@ -189,7 +189,6 @@ function BlockStyles( {
 					className={ className }
 					genericPreviewBlock={ genericPreviewBlock }
 					style={ hoveredStyle }
-					viewportWidth={ type.example?.viewportWidth ?? 500 }
 					targetRef={ containerRef }
 				/>
 			) }

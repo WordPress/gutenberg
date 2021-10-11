@@ -12,7 +12,6 @@ import { Popover } from '@wordpress/components';
 
 export default function BlockStylesPreviewPanel( {
 	genericPreviewBlock,
-	viewportWidth,
 	style,
 	className,
 	activeStyle,
@@ -22,7 +21,9 @@ export default function BlockStylesPreviewPanel( {
 	const previewBlocks = useMemo( () => {
 		return {
 			...genericPreviewBlock,
-			attributes: {
+			title: style.label || style.name,
+			description: style.description,
+			initialAttributes: {
 				...genericPreviewBlock.attributes,
 				className:
 					styleClassName +
@@ -56,14 +57,7 @@ export default function BlockStylesPreviewPanel( {
 			anchorRect={ getAnchorRect() }
 		>
 			<InserterPreviewPanel
-				viewportWidth={ viewportWidth }
-				item={ {
-					title: style.label || style.name,
-					name: style.name,
-					description: style.description,
-					attributes: style.attributes,
-				} }
-				blocks={ previewBlocks }
+				item={ previewBlocks }
 				isStylePreview={ true }
 			/>
 		</Popover>
