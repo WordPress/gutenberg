@@ -12,7 +12,7 @@ import {
 	store as blockEditorStore,
 	Warning,
 } from '@wordpress/block-editor';
-import { useEntityProp, useEntityBlockEditor } from '@wordpress/core-data';
+import { useEntityBlockEditor, store as coreStore } from '@wordpress/core-data';
 
 /**
  * Internal dependencies
@@ -20,12 +20,16 @@ import { useEntityProp, useEntityBlockEditor } from '@wordpress/core-data';
 import { useCanEditEntity } from '../utils/hooks';
 
 function ReadOnlyContent( { userCanEdit, postType, postId } ) {
-	const [ , , content ] = useEntityProp(
-		'postType',
-		postType,
-		'content',
-		postId
-	);
+	const { content, blockSupportsStyles } = useSelect( ( select ) => {
+		const { getEntityRecord } = select( coreStore );
+		const currentPost = getEntityRecord( 'postType', postType, postId );
+
+		return {
+			content: currentPost?.content,
+			blockSupportsStyles: currentPost?.block_supports_styles,
+		};
+	} );
+
 	const blockProps = useBlockProps();
 	return content?.protected && ! userCanEdit ? (
 		<div { ...blockProps }>
@@ -34,6 +38,9 @@ function ReadOnlyContent( { userCanEdit, postType, postId } ) {
 	) : (
 		<div { ...blockProps }>
 			<RawHTML key="html">{ content?.rendered }</RawHTML>
+			<RawHTML key="footer-styles">
+				{ blockSupportsStyles ? blockSupportsStyles : null }
+			</RawHTML>
 		</div>
 	);
 }
