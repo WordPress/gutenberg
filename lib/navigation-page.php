@@ -148,7 +148,7 @@ add_filter( 'should_load_block_editor_scripts_and_styles', 'gutenberg_navigation
  * This function removes menu-related data from the "common" preloading middleware and calls
  * createMenuPreloadingMiddleware middleware because we need to use custom preloading logic for menus.
  *
- * @param $preload_data Array containing the preloaded data.
+ * @param Array $preload_data Array containing the preloaded data.
  * @return array Filtered preload data.
  */
 function gutenberg_navigation_editor_preload_menus( $preload_data ) {
