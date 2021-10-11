@@ -60,9 +60,13 @@ export function createMenuPreloadingMiddleware( preloadedData ) {
 			return id === menuId;
 		} );
 
-		if ( menu ) {
+		if ( 0 < menu.length ) {
 			menuDataLoaded = true;
-			return sendSuccessResponse( menu );
+			// We don't have headers because we "emulate" this request
+			return sendSuccessResponse(
+				{ body: menu[ 0 ], headers: {} },
+				parse
+			);
 		}
 
 		return next( options );
