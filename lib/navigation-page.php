@@ -169,7 +169,13 @@ add_filter( 'should_load_block_editor_scripts_and_styles', 'gutenberg_navigation
  */
 function gutenberg_navigation_editor_preload_menus( $preload_data ) {
 	$menus_data_path = gutenberg_navigation_get_menus_endpoint();
-	$menus_data      = empty( $preload_data[ $menus_data_path ] ) ? array() : $preload_data[ $menus_data_path ];
+	$menus_data      = empty( $preload_data[ $menus_data_path ] ) ?
+			array()
+			:
+			array(
+					$menus_data_path => $preload_data[ $menus_data_path ]
+			);
+
 	if ( ! $menus_data ) {
 		return $preload_data;
 	}

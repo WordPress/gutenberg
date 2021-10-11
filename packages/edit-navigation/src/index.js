@@ -90,3 +90,5 @@ export function initialize( id, settings ) {
 		document.getElementById( id )
 	);
 }
+
+export { createMenuPreloadingMiddleware } from './utils';
