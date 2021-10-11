@@ -301,7 +301,7 @@ describe( 'Inserting blocks', () => {
 	} );
 
 	// Check for regression of https://github.com/WordPress/gutenberg/issues/25785
-	it.skip( 'inserts a block should show a blue line indicator', async () => {
+	it( 'inserts a block should show a blue line indicator', async () => {
 		// First insert a random Paragraph.
 		await insertBlock( 'Paragraph' );
 		await page.keyboard.type( 'First paragraph' );

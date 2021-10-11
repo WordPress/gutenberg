@@ -10,6 +10,7 @@ import {
 import { __ } from '@wordpress/i18n';
 import { wordpress } from '@wordpress/icons';
 import { store as coreDataStore } from '@wordpress/core-data';
+import { useReducedMotion } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -45,6 +46,8 @@ function NavigationToggle( { icon, isOpen } ) {
 		setIsNavigationPanelOpened,
 	} = useDispatch( editSiteStore );
 
+	const disableMotion = useReducedMotion();
+
 	const toggleNavigationPanel = () => {
 		if ( isOpen ) {
 			setIsNavigationPanelOpened( false );
@@ -66,7 +69,7 @@ function NavigationToggle( { icon, isOpen } ) {
 	if ( siteIconUrl ) {
 		buttonIcon = (
 			<motion.img
-				variants={ effect }
+				variants={ ! disableMotion && effect }
 				alt={ __( 'Site Icon' ) }
 				className="edit-site-navigation-toggle__site-icon"
 				src={ siteIconUrl }
