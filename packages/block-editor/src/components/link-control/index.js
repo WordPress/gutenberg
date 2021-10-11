@@ -293,7 +293,7 @@ function LinkControl( {
 						>
 							<div className="block-editor-link-control__search-actions">
 								<Button
-									onClick={ () => handleSubmit() }
+									onClick={ handleSubmit }
 									label={ __( 'Submit' ) }
 									icon={ keyboardReturn }
 									className="block-editor-link-control__search-submit"
