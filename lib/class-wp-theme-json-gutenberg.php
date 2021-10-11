@@ -736,6 +736,7 @@ class WP_Theme_JSON_Gutenberg {
 	 *
 	 * @param array $settings Settings to process.
 	 * @param array $preset_metadata One of the PRESETS_METADATA values.
+	 * @param array $origins List of origins to process.
 	 *
 	 * @return array Array of presets where the key and value are both the slug.
 	 */
