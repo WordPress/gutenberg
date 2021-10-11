@@ -38,7 +38,6 @@ class WP_Navigation_Page_Test extends WP_UnitTestCase {
 			),
 			'/__experimental/menus?per_page=100&context=edit&_locale=user',
 			'/wp/v2/types?context=edit',
-			"/__experimental/menus/{$menu_id}?context=edit",
 			"/__experimental/menu-items?context=edit&menus={$menu_id}&per_page=100&_locale=user",
 		);
 
@@ -56,6 +55,11 @@ class WP_Navigation_Page_Test extends WP_UnitTestCase {
 
 		set_current_screen( 'gutenberg_page_gutenberg-navigation' );
 		gutenberg_navigation_init( 'gutenberg_page_gutenberg-navigation' );
+	}
+
+	function test_gutenberg_navigation_editor_preload_menus_function_returns_correct_data() {
+		gutenberg_navigation_editor_preload_menus(array());
+		$this->addToAssertionCount(1);
 	}
 }
 
