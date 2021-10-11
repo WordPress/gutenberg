@@ -2,9 +2,9 @@
 
 ## Unreleased
 
-### Change
+### Enhancements
 
--   Removed the separator shown between items. ([#35497](https://github.com/WordPress/gutenberg/pull/35497)).
+-   Removed the separator shown between `ToggleGroupControl` items ([#35497](https://github.com/WordPress/gutenberg/pull/35497)).
 
 ### Breaking Changes
 
