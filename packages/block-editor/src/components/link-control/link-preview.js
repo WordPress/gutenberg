@@ -41,8 +41,8 @@ export default function LinkPreview( {
 	const displayURL =
 		( value && filterURLForDisplay( safeDecodeURI( value.url ), 16 ) ) ||
 		'';
-	const displayTitle =
-		richData?.title || value?.text || value?.title || displayURL;
+
+	const displayTitle = richData?.title || value?.title || displayURL;
 
 	const isEmptyURL = ! value.url.length;
 
