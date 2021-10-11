@@ -201,6 +201,53 @@ describe( 'getFormatBoundary', () => {
 		}
 	);
 
+	it( 'should handle values with pointers at 0 with formats that start at zero-th index', () => {
+		const record = {
+			formats: [
+				[ linkFormat ], // 0
+				[ linkFormat ],
+				[ linkFormat ],
+				[ linkFormat ],
+				[ linkFormat ],
+				[ linkFormat ], // 5
+				[ boldFormat ],
+				[ boldFormat ],
+				null,
+				null,
+				null,
+				null,
+				null,
+				null,
+				null,
+				[ boldFormat ],
+				[ boldFormat ],
+				[ boldFormat ],
+				null,
+				null,
+				null,
+				null,
+				null,
+				null,
+				null,
+				[ italicFormat ],
+				[ italicFormat ],
+				[ italicFormat ],
+				[ italicFormat ],
+				[ italicFormat ],
+				null,
+			],
+
+			text: "Lorem ok let's try again dolor.",
+			start: 0,
+			end: 0,
+		};
+
+		expect( getFormatBoundary( record, { type: 'core/link' } ) ).toEqual( {
+			start: 0,
+			end: 5,
+		} );
+	} );
+
 	it( 'should return empty bounds if value has no formats', () => {
 		const record = {
 			formats: [],
