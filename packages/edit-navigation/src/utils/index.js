@@ -9,6 +9,9 @@ export function createMenuPreloadingMiddleware( preloadedData ) {
 		return result;
 	}, /** @type {Record<string, any>} */ ( {} ) );
 
+	let menusDataLoaded = false;
+	let menuDataLoaded = false;
+
 	return ( options, next ) => {
 		const { parse = true } = options;
 		if ( 'string' !== typeof options.path ) {
@@ -21,8 +24,13 @@ export function createMenuPreloadingMiddleware( preloadedData ) {
 		}
 
 		const path = getStablePath( options.path );
-		if ( cache[ path ] ) {
+		if ( ! menusDataLoaded && cache[ path ] ) {
+			menusDataLoaded = true;
 			return sendSuccessResponse( cache[ path ], parse );
+		}
+
+		if ( menuDataLoaded ) {
+			return next( options );
 		}
 
 		const matches = path.match(
@@ -48,6 +56,7 @@ export function createMenuPreloadingMiddleware( preloadedData ) {
 		} );
 
 		if ( menu ) {
+			menuDataLoaded = true;
 			return sendSuccessResponse( menu );
 		}
 
@@ -55,6 +64,13 @@ export function createMenuPreloadingMiddleware( preloadedData ) {
 	};
 }
 
+/**
+ * This is a helper function that sends a success response.
+ *
+ * @param {Object}  responseData An object with the menu data
+ * @param {boolean} parse        A boolean that controls whether to send a response or just the response data
+ * @return {Object} Resolved promise
+ */
 function sendSuccessResponse( responseData, parse ) {
 	return Promise.resolve(
 		parse
