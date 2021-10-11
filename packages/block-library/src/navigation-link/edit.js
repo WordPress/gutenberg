@@ -290,7 +290,7 @@ export default function NavigationLinkEdit( {
 	const link = {
 		url,
 		opensInNewTab,
-		title: stripHTML( label ), // don't allow HTML to display inside the <LinkControl>
+		title: label && stripHTML( label ), // don't allow HTML to display inside the <LinkControl>
 	};
 	const { saveEntityRecord } = useDispatch( coreStore );
 	const {
