@@ -463,7 +463,7 @@ function RichTextWrapper(
 				preserveWhiteSpace,
 			} );
 
-			if ( typeof content === 'string' ) {
+			if ( typeof content === 'string' && ! isPastedURL ) {
 				let valueToInsert = create( { html: content } );
 
 				addActiveFormats( valueToInsert, activeFormats );
