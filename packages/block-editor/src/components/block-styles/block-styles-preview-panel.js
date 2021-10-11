@@ -6,7 +6,7 @@ import { useMemo, useCallback } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import BlockPreview from '../block-preview';
+import InserterPreviewPanel from '../inserter/preview-panel';
 import { replaceActiveStyle } from './utils';
 import { Popover } from '@wordpress/components';
 
@@ -38,6 +38,8 @@ export default function BlockStylesPreviewPanel( {
 		const rect = targetRef?.current.getBoundingClientRect();
 
 		return new window.DOMRect(
+			// The left position of the target element,
+			// minus any offset in relation to its parent container.
 			rect.x - targetRef?.current.offsetLeft,
 			rect.y,
 			rect.width,
@@ -46,27 +48,24 @@ export default function BlockStylesPreviewPanel( {
 	}, [ targetRef?.current ] );
 
 	return (
-		<div className="block-editor-block-styles__popover__preview__parent">
-			<div className="block-editor-block-styles__popover__preview__container">
-				<Popover
-					className="block-editor-block-styles__popover block-editor-block-styles__preview__popover "
-					focusOnMount={ false }
-					position="middle left"
-					animate={ false }
-					anchorRect={ getAnchorRect() }
-				>
-					<div className="block-editor-block-styles__preview">
-						<BlockPreview
-							viewportWidth={ viewportWidth }
-							blocks={ previewBlocks }
-							className="block-editor-block-styles__block-preview"
-						/>
-					</div>
-					<div className="block-editor-block-styles__preview-title">
-						{ style.label || style.name }
-					</div>
-				</Popover>
-			</div>
-		</div>
+		<Popover
+			className="block-editor-block-styles__popover block-editor-block-styles__preview__popover "
+			focusOnMount={ false }
+			position="middle left"
+			animate={ false }
+			anchorRect={ getAnchorRect() }
+		>
+			<InserterPreviewPanel
+				viewportWidth={ viewportWidth }
+				item={ {
+					title: style.label || style.name,
+					name: style.name,
+					description: style.description,
+					attributes: style.attributes,
+				} }
+				blocks={ previewBlocks }
+				isStylePreview={ true }
+			/>
+		</Popover>
 	);
 }
