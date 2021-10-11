@@ -428,12 +428,12 @@ export function requestGotoCustomerSupportOptions() {
 }
 
 /**
- * Show a Notice natively. This is a short message briefly displayed on the screen.
+ * Show a Notice. This is a short message briefly displayed on the screen.
  *
  * @param {string} message The message to be displayed
  * @param {number} duration Use nativeNoticeLength to define the duration of it.
  */
-export function showNativeNotice( message, duration ) {
+export function showNotice( message, duration ) {
 	RNReactNativeGutenbergBridge.showNotice( message, duration );
 }
 

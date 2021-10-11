@@ -12,10 +12,7 @@ import { usePreferredColorSchemeStyle } from '@wordpress/compose';
 import { __, sprintf } from '@wordpress/i18n';
 import { sparkles } from '@wordpress/icons';
 import { BlockIcon } from '@wordpress/block-editor';
-import {
-	showNativeNotice,
-	nativeNoticeLength,
-} from '@wordpress/react-native-bridge';
+import { showNotice, nativeNoticeLength } from '@wordpress/react-native-bridge';
 // import { useSelect } from '@wordpress/data';
 // import { store as editorStore } from '@wordpress/editor';
 
@@ -76,7 +73,7 @@ function InserterButton( { item, itemWidth, maxWidth, onSelect } ) {
 				// translators: %s: name of the block. e.g: "More"
 				__( 'You already have a %s block on this post/page.' );
 
-			showNativeNotice(
+			showNotice(
 				sprintf( disabledMessage, blockTitle ),
 				nativeNoticeLength.short
 			);
