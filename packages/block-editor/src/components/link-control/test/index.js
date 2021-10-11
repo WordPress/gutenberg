@@ -2333,24 +2333,37 @@ describe( 'Controlling link title text', () => {
 		).toBeTruthy();
 	} );
 
-	it( "should ensure text input reflects currenty link value's `title` property", async () => {
-		const titleValue = 'Testing';
-		const linkWithTitle = { ...selectedLink, title: titleValue };
-		act( () => {
-			render(
-				<LinkControl
-					value={ linkWithTitle }
-					forceIsEditingLink
-					hasTextControl
-				/>,
-				container
-			);
-		} );
+	it.each( [
+		[ '', 'Testing' ],
+		[ '(with leading and traling whitespace)', '    Testing    ' ],
+		[
+			// Note: link control should always preserve the original value.
+			// The consumer is responsible for filtering or otherwise handling the value.
+			'(when containing HTML)',
+			'<strong>Yes this</strong> <em>is</em> expected behaviour',
+		],
+	] )(
+		"should ensure text input reflects currenty link value's `title` property %s",
+		async ( _unused, titleValue ) => {
+			const linkWithTitle = { ...selectedLink, title: titleValue };
+			act( () => {
+				render(
+					<LinkControl
+						value={ linkWithTitle }
+						forceIsEditingLink
+						hasTextControl
+					/>,
+					container
+				);
+			} );
 
-		const textInput = queryByRole( container, 'textbox', { name: 'Text' } );
+			const textInput = queryByRole( container, 'textbox', {
+				name: 'Text',
+			} );
 
-		expect( textInput.value ).toEqual( titleValue );
-	} );
+			expect( textInput.value ).toEqual( titleValue );
+		}
+	);
 
 	it( "should ensure title value matching the text input's current value is included in onChange handler value on commit", async () => {
 		const mockOnChange = jest.fn();
