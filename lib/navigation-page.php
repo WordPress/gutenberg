@@ -39,22 +39,6 @@ function gutenberg_navigation_get_menus_endpoint( $results_per_page = 100 ) {
 }
 
 /**
- * This function returns an url for the /__experimental/menus/<menu_id> endpoint
- *
- * @since 11.6.0
- *
- * @param  int $menu_id Menu ID.
- * @return string
- */
-function gutenberg_navigation_get_menu_endpoint( $menu_id ) {
-	return "/__experimental/menus/{$menu_id}?" . build_query(
-		array(
-			'context' => 'edit',
-		)
-	);
-}
-
-/**
  * This function returns an url for the /__experimental/menu-items endpoint
  *
  * @since 11.6.0
