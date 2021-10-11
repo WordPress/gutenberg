@@ -40,16 +40,17 @@ exports[`PreferencesModal should match snapshot when the modal is active small v
   onRequestClose={[Function]}
   title="Preferences"
 >
-  <Card
-    isBorderless={true}
+  <NavigatorProvider
+    initialPath="/"
   >
-    <CardBody>
-      <NavigatorProvider
-        initialPath="/"
+    <NavigatorScreen
+      path="/"
+    >
+      <Card
+        isBorderless={true}
+        size="small"
       >
-        <NavigatorScreen
-          path="/"
-        >
+        <CardBody>
           <ItemGroup>
             <NavigationButton
               as={
@@ -169,10 +170,22 @@ exports[`PreferencesModal should match snapshot when the modal is active small v
               </HStack>
             </NavigationButton>
           </ItemGroup>
-        </NavigatorScreen>
-        <NavigatorScreen
-          key="general-menu"
-          path="general"
+        </CardBody>
+      </Card>
+    </NavigatorScreen>
+    <NavigatorScreen
+      key="general-menu"
+      path="general"
+    >
+      <Card
+        isBorderless={true}
+        size="large"
+      >
+        <CardHeader
+          direction="column"
+          gap="6"
+          isBorderless={false}
+          size="small"
         >
           <NavigationButton
             aria-label="Navigate to the previous view"
@@ -191,9 +204,18 @@ exports[`PreferencesModal should match snapshot when the modal is active small v
           >
             Back
           </NavigationButton>
-          <h2>
-            General
-          </h2>
+          <Spacer
+            marginBottom="0"
+            marginLeft="4"
+          >
+            <Text
+              as="h2"
+            >
+              General
+            </Text>
+          </Spacer>
+        </CardHeader>
+        <CardBody>
           <Section
             description="Customize options related to the block editor interface and editing flow."
             title="Appearance"
@@ -224,10 +246,22 @@ exports[`PreferencesModal should match snapshot when the modal is active small v
               label="Display block breadcrumbs"
             />
           </Section>
-        </NavigatorScreen>
-        <NavigatorScreen
-          key="blocks-menu"
-          path="blocks"
+        </CardBody>
+      </Card>
+    </NavigatorScreen>
+    <NavigatorScreen
+      key="blocks-menu"
+      path="blocks"
+    >
+      <Card
+        isBorderless={true}
+        size="large"
+      >
+        <CardHeader
+          direction="column"
+          gap="6"
+          isBorderless={false}
+          size="small"
         >
           <NavigationButton
             aria-label="Navigate to the previous view"
@@ -246,9 +280,18 @@ exports[`PreferencesModal should match snapshot when the modal is active small v
           >
             Back
           </NavigationButton>
-          <h2>
-            Blocks
-          </h2>
+          <Spacer
+            marginBottom="0"
+            marginLeft="4"
+          >
+            <Text
+              as="h2"
+            >
+              Blocks
+            </Text>
+          </Spacer>
+        </CardHeader>
+        <CardBody>
           <Section
             description="Customize how you interact with blocks in the block library and editing canvas."
             title="Block interactions"
@@ -270,10 +313,22 @@ exports[`PreferencesModal should match snapshot when the modal is active small v
           >
             <WithSelect(BlockManager) />
           </Section>
-        </NavigatorScreen>
-        <NavigatorScreen
-          key="panels-menu"
-          path="panels"
+        </CardBody>
+      </Card>
+    </NavigatorScreen>
+    <NavigatorScreen
+      key="panels-menu"
+      path="panels"
+    >
+      <Card
+        isBorderless={true}
+        size="large"
+      >
+        <CardHeader
+          direction="column"
+          gap="6"
+          isBorderless={false}
+          size="small"
         >
           <NavigationButton
             aria-label="Navigate to the previous view"
@@ -292,9 +347,18 @@ exports[`PreferencesModal should match snapshot when the modal is active small v
           >
             Back
           </NavigationButton>
-          <h2>
-            Panels
-          </h2>
+          <Spacer
+            marginBottom="0"
+            marginLeft="4"
+          >
+            <Text
+              as="h2"
+            >
+              Panels
+            </Text>
+          </Spacer>
+        </CardHeader>
+        <CardBody>
           <Section
             description="Choose what displays in the panel."
             title="Document settings"
@@ -339,9 +403,9 @@ exports[`PreferencesModal should match snapshot when the modal is active small v
             description="Add extra areas to the editor."
             title="Additional"
           />
-        </NavigatorScreen>
-      </NavigatorProvider>
-    </CardBody>
-  </Card>
+        </CardBody>
+      </Card>
+    </NavigatorScreen>
+  </NavigatorProvider>
 </Modal>
 `;
