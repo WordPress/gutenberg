@@ -124,6 +124,11 @@ export function getFormatBoundary(
 	};
 
 	const { formats } = value;
+
+	if ( ! formats ) {
+		return EMPTY_BOUNDARIES;
+	}
+
 	const newFormats = formats.slice();
 
 	// If there are no matching formats *at* the reputed "end"
@@ -207,6 +212,8 @@ function walkToBoundary( formats, index, initFormat, formatIndex, direction ) {
 	// Restore by one to avoid out of bounds.
 	if ( direction === 'backwards' ) {
 		index++;
+	} else {
+		index--;
 	}
 
 	return index;

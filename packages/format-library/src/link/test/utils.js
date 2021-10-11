@@ -1,7 +1,7 @@
 /**
  * Internal dependencies
  */
-import { isValidHref } from '../utils';
+import { isValidHref, getFormatBoundary } from '../utils';
 
 describe( 'isValidHref', () => {
 	it( 'returns true if the href cannot be recognised as a url or an anchor link', () => {
@@ -93,6 +93,153 @@ describe( 'isValidHref', () => {
 			expect( isValidHref( '#no-it-isnt?' ) ).toBe( false );
 			expect( isValidHref( '#no-it isnt' ) ).toBe( false );
 			expect( isValidHref( '#no-it-isnt/' ) ).toBe( false );
+		} );
+	} );
+} );
+
+describe( 'getFormatBoundary', () => {
+	const boldFormat = {
+		type: 'core/bold',
+	};
+
+	const italicFormat = {
+		type: 'core/italic',
+	};
+
+	const linkFormat = {
+		type: 'core/link',
+		attributes: {
+			url: 'http://www.wordpress.org',
+			type: 'URL',
+			id: 'www.wordpress.org',
+		},
+	};
+	it.each( [
+		[ 'inside', [ 8, 8 ] ],
+		[ 'start', [ 6, 6 ] ],
+		[ 'end', [ 10, 10 ] ],
+		[ 'insideStart', [ 7, 7 ] ],
+		[ 'insideEnd', [ 9, 9 ] ],
+	] )(
+		'should find bounds of a format from %s of a collapsed RichTextValue',
+		( _ignored, [ start, end ] ) => {
+			const record = {
+				formats: [
+					null,
+					[ italicFormat ],
+					[ italicFormat ],
+					[ italicFormat ],
+					null,
+					null,
+					[ linkFormat, italicFormat ], // 6
+					[ linkFormat ],
+					[ linkFormat, boldFormat ],
+					[ linkFormat, boldFormat ],
+					[ linkFormat, italicFormat ], // 10
+					null,
+					null,
+					[ boldFormat ],
+					[ boldFormat ],
+					[ boldFormat ],
+					null,
+					null,
+				],
+
+				text: 'Lorem ipsum dolor.',
+				start,
+				end,
+			};
+
+			expect(
+				getFormatBoundary( record, { type: 'core/link' } )
+			).toEqual( {
+				start: 6,
+				end: 10,
+			} );
+		}
+	);
+
+	it.each( [
+		[ 'at the bounds', [ 6, 10 ] ],
+		[ 'inside the bounds', [ 7, 8 ] ],
+	] )(
+		'should find bounds of a format beginning %s of a non-collapsed RichTextValue',
+		( _ignored, [ start, end ] ) => {
+			const record = {
+				formats: [
+					null,
+					[ italicFormat ],
+					[ italicFormat ],
+					[ italicFormat ],
+					null,
+					null,
+					[ linkFormat, italicFormat ], // 6
+					[ linkFormat ],
+					[ linkFormat, boldFormat ],
+					[ linkFormat, boldFormat ],
+					[ linkFormat, italicFormat ], // 10
+					null,
+					null,
+					[ boldFormat ],
+					[ boldFormat ],
+					[ boldFormat ],
+					null,
+					null,
+				],
+
+				text: 'Lorem ipsum dolor.',
+				start,
+				end,
+			};
+
+			expect(
+				getFormatBoundary( record, { type: 'core/link' } )
+			).toEqual( {
+				start: 6,
+				end: 10,
+			} );
+		}
+	);
+
+	it( 'should return empty bounds if value has no formats', () => {
+		const record = {
+			formats: [],
+			text: 'Lorem ipsum dolor.',
+			start: 8,
+			end: 8,
+		};
+
+		expect( getFormatBoundary( record, { type: 'core/link' } ) ).toEqual( {
+			start: null,
+			end: null,
+		} );
+	} );
+
+	it( 'should return empty bounds if start is beyond the format boundary', () => {
+		const record = {
+			formats: [],
+			text: 'Lorem ipsum dolor.',
+			start: 1,
+			end: 8,
+		};
+
+		expect( getFormatBoundary( record, { type: 'core/link' } ) ).toEqual( {
+			start: null,
+			end: null,
+		} );
+	} );
+
+	it( 'should return empty bounds if end is beyond the format boundary', () => {
+		const record = {
+			formats: [],
+			text: 'Lorem ipsum dolor.',
+			start: 8,
+			end: 14,
+		};
+
+		expect( getFormatBoundary( record, { type: 'core/link' } ) ).toEqual( {
+			start: null,
+			end: null,
 		} );
 	} );
 } );
