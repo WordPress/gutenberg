@@ -2278,7 +2278,7 @@ describe( 'Rich link previews', () => {
 describe( 'Controlling link title text', () => {
 	const selectedLink = first( fauxEntitySuggestions );
 
-	it( 'should not show a means to alter the link text by default', async () => {
+	it( 'should not show a means to alter the link title text by default', async () => {
 		act( () => {
 			render(
 				<LinkControl value={ selectedLink } forceIsEditingLink />,
@@ -2292,7 +2292,7 @@ describe( 'Controlling link title text', () => {
 	} );
 
 	it.each( [ null, undefined, '   ' ] )(
-		'should not show the link text input when the URL is `%s`',
+		'should not show the link title text input when the URL is `%s`',
 		async ( urlValue ) => {
 			const selectedLinkWithoutURL = {
 				...first( fauxEntitySuggestions ),
@@ -2316,13 +2316,13 @@ describe( 'Controlling link title text', () => {
 		}
 	);
 
-	it( 'should show a means to alter the link text when hasTextControl prop is truthy', async () => {
+	it( 'should show a text input to alter the link title text when hasTextControl prop is truthy', async () => {
 		act( () => {
 			render(
 				<LinkControl
 					value={ selectedLink }
 					forceIsEditingLink
-					hasTextControl={ true }
+					hasTextControl
 				/>,
 				container
 			);
@@ -2331,5 +2331,108 @@ describe( 'Controlling link title text', () => {
 		expect(
 			queryByRole( container, 'textbox', { name: 'Text' } )
 		).toBeTruthy();
+	} );
+
+	it( "should ensure text input reflects currenty link value's `title` property", async () => {
+		const titleValue = 'Testing';
+		const linkWithTitle = { ...selectedLink, title: titleValue };
+		act( () => {
+			render(
+				<LinkControl
+					value={ linkWithTitle }
+					forceIsEditingLink
+					hasTextControl
+				/>,
+				container
+			);
+		} );
+
+		const textInput = queryByRole( container, 'textbox', { name: 'Text' } );
+
+		expect( textInput.value ).toEqual( titleValue );
+	} );
+
+	it( "should ensure title value matching the text input's current value is included in onChange handler value on commit", async () => {
+		const mockOnChange = jest.fn();
+		const textValue = 'My new text value';
+
+		act( () => {
+			render(
+				<LinkControl
+					value={ selectedLink }
+					forceIsEditingLink
+					hasTextControl
+					onChange={ mockOnChange }
+				/>,
+				container
+			);
+		} );
+
+		let textInput = queryByRole( container, 'textbox', { name: 'Text' } );
+
+		act( () => {
+			Simulate.change( textInput, {
+				target: { value: textValue },
+			} );
+		} );
+
+		textInput = queryByRole( container, 'textbox', { name: 'Text' } );
+
+		expect( textInput.value ).toEqual( textValue );
+
+		const submitButton = queryByRole( container, 'button', {
+			name: 'Submit',
+		} );
+
+		act( () => {
+			Simulate.click( submitButton );
+		} );
+
+		expect( mockOnChange ).toHaveBeenCalledWith(
+			expect.objectContaining( {
+				title: textValue,
+			} )
+		);
+	} );
+
+	it( 'should allow `ENTER` keypress withint text field to trigger commit/submission of value', async () => {
+		const textValue = 'My new text value';
+		const mockOnChange = jest.fn();
+		act( () => {
+			render(
+				<LinkControl
+					value={ selectedLink }
+					forceIsEditingLink
+					hasTextControl
+					onChange={ mockOnChange }
+				/>,
+				container
+			);
+		} );
+
+		const textInput = queryByRole( container, 'textbox', { name: 'Text' } );
+
+		expect( textInput ).toBeTruthy();
+
+		act( () => {
+			Simulate.change( textInput, {
+				target: { value: textValue },
+			} );
+		} );
+
+		// Attempt to submit the empty search value in the input.
+		act( () => {
+			Simulate.keyDown( textInput, { keyCode: ENTER } );
+		} );
+
+		expect( mockOnChange ).toHaveBeenCalledWith( {
+			title: textValue,
+			url: selectedLink.url,
+		} );
+
+		// The text input should not be showing as the form is submitted.
+		expect(
+			queryByRole( container, 'textbox', { name: 'Text' } )
+		).toBeFalsy();
 	} );
 } );
