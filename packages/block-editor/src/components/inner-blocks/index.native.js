@@ -134,12 +134,12 @@ function UncontrolledInnerBlocks( props ) {
 	// Wrap context provider if (and only if) block has context to provide.
 	const blockType = getBlockType( block.name );
 
-	const blockProvidesContext = {
+	const blockProvidesContext = blockType && {
 		...blockType.providesContext,
 		...blockType.providesNativeInnerBlockContext,
 	};
 
-	if ( blockType && blockProvidesContext ) {
+	if ( blockProvidesContext ) {
 		const context = getBlockContext( block.attributes, blockType );
 
 		blockList = (
