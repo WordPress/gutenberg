@@ -1,7 +1,7 @@
 .components-font-size-picker__header {
 	&__hint {
-		padding-left: $grid-unit-05;
-		font-weight: 200;
+		margin-left: $grid-unit-05;
+		color: $gray-700;
 	}
 }
 .components-font-size-picker__controls {

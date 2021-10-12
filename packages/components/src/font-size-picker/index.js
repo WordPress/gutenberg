@@ -52,18 +52,18 @@ function FontSizePicker(
 	//
 	// A select control is also used when the value of a preset cannot be
 	// immediately computed (eg. 'calc', 'var').
-	const useSelectControl =
+	const shouldUseSelectControl =
 		fontSizes?.length > 5 ||
 		fontSizes.some( ( { size } ) => ! isSimpleCssValue( size ) );
 
 	const options = useMemo(
 		() =>
 			getFontSizeOptions(
-				useSelectControl,
+				shouldUseSelectControl,
 				fontSizes,
 				disableCustomFontSizes
 			),
-		[ useSelectControl, fontSizes, disableCustomFontSizes ]
+		[ shouldUseSelectControl, fontSizes, disableCustomFontSizes ]
 	);
 	const selectedOption = getSelectedOption( fontSizes, value );
 	const isCustomValue = selectedOption.slug === CUSTOM_FONT_SIZE;
@@ -80,7 +80,7 @@ function FontSizePicker(
 		if ( isCustomValue ) {
 			return isSimpleCssValue( value ) && `(${ value })`;
 		}
-		if ( useSelectControl ) {
+		if ( shouldUseSelectControl ) {
 			return (
 				isSimpleCssValue( selectedOption?.size ) &&
 				`(${ selectedOption?.size })`
@@ -139,7 +139,7 @@ function FontSizePicker(
 			</Flex>
 			<div className={ `${ baseClassName }__controls` }>
 				{ !! fontSizes.length &&
-					useSelectControl &&
+					shouldUseSelectControl &&
 					! showCustomValueControl && (
 						<CustomSelectControl
 							className={ `${ baseClassName }__select` }
@@ -162,7 +162,7 @@ function FontSizePicker(
 							} }
 						/>
 					) }
-				{ ! useSelectControl && ! showCustomValueControl && (
+				{ ! shouldUseSelectControl && ! showCustomValueControl && (
 					<ToggleGroupControl
 						label={ __( 'Font size' ) }
 						hideLabelFromVision
