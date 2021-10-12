@@ -70,7 +70,8 @@ export default function Header( {
 
 		return {
 			deviceType: __experimentalGetPreviewDeviceType(),
-			entityTitle: _entityTitle,
+			// Special case for the default template.
+			entityTitle: record?.slug === 'index' ? __( 'Main' ) : _entityTitle,
 			isLoaded: _isLoaded,
 			template: record,
 			templateType: postType,
