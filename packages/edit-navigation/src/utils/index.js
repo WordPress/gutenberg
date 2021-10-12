@@ -56,9 +56,7 @@ export function createMenuPreloadingMiddleware( preloadedData ) {
 		}
 
 		const menuId = parseInt( matches[ 1 ] );
-		const menu = menuData.filter( ( { id } ) => {
-			return id === menuId;
-		} );
+		const menu = menuData.filter( ( { id } ) => id === menuId );
 
 		if ( 0 < menu.length ) {
 			menuDataLoaded = true;
