@@ -1,42 +1,21 @@
 /**
- * External dependencies
- */
-import { throttle } from 'lodash';
-
-/**
  * WordPress dependencies
  */
-import { useMergeRefs } from '@wordpress/compose';
+import {
+	useMergeRefs,
+	__experimentalUseFixedWindowList as useFixedWindowList,
+} from '@wordpress/compose';
 import { __experimentalTreeGrid as TreeGrid } from '@wordpress/components';
 import { AsyncModeProvider, useDispatch, useSelect } from '@wordpress/data';
 import {
 	useCallback,
 	useEffect,
-	useLayoutEffect,
 	useMemo,
 	useRef,
 	useReducer,
-	useState,
 	forwardRef,
 } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
-
-const WINDOW_OVERSCAN = 1;
-const ITEM_HEIGHT = 36;
-
-function measureWindow( scrollContainer, setWindowMeasurement ) {
-	const maxVisible = Math.floor( scrollContainer.clientHeight / ITEM_HEIGHT );
-	const start = Math.max(
-		0,
-		Math.floor( scrollContainer.scrollTop / ITEM_HEIGHT ) - WINDOW_OVERSCAN
-	);
-	setWindowMeasurement( {
-		maxVisible: maxVisible + WINDOW_OVERSCAN,
-		start,
-		end: start + maxVisible,
-		focus: null,
-	} );
-}
 
 /**
  * Internal dependencies
@@ -130,37 +109,15 @@ function ListView(
 		isMounted.current = true;
 	}, [] );
 
-	const [ windowMeasurement, setWindowMeasurement ] = useState( {
-		maxVisible: 30,
-		start: 0,
-		end: 30,
-	} );
-
-	useLayoutEffect( () => {
-		if ( ! __experimentalPersistentListViewFeatures ) {
-			return;
+	const [ fixedListWindow ] = useFixedWindowList(
+		elementRef,
+		36,
+		visibleBlockCount,
+		{
+			windowOverscan: 1,
+			useWindowing: __experimentalPersistentListViewFeatures,
 		}
-		const scrollContainer = elementRef.current.parentNode;
-		measureWindow( scrollContainer, setWindowMeasurement );
-		const throttleMeasureList = throttle( () => {
-			measureWindow( scrollContainer, setWindowMeasurement );
-		}, 16 );
-		scrollContainer.addEventListener( 'scroll', throttleMeasureList );
-		scrollContainer.ownerDocument.defaultView.addEventListener(
-			'resize',
-			throttleMeasureList
-		);
-		return () => {
-			scrollContainer.removeEventListener(
-				'scroll',
-				throttleMeasureList
-			);
-			scrollContainer.ownerDocument.defaultView.removeEventListener(
-				'resize',
-				throttleMeasureList
-			);
-		};
-	}, [] );
+	);
 
 	const expand = useCallback(
 		( clientId ) => {
@@ -187,35 +144,6 @@ function ListView(
 		collapse( row?.dataset?.block );
 	};
 
-	const moveWindowUp = () => {
-		setWindowMeasurement( ( lastMeasurement ) => {
-			const { start, maxVisible } = lastMeasurement;
-			const nextStart = Math.max( 0, start - 1 );
-			return {
-				start: nextStart,
-				maxVisible,
-				end: nextStart + maxVisible,
-				focus: 'start',
-			};
-		} );
-	};
-
-	const moveWindowDown = () => {
-		setWindowMeasurement( ( lastMeasurement ) => {
-			const { start, maxVisible } = lastMeasurement;
-			const nextStart = Math.min(
-				start + 1,
-				visibleBlockCount - maxVisible
-			);
-			return {
-				start: nextStart,
-				maxVisible,
-				end: nextStart + maxVisible,
-				focus: 'end',
-			};
-		} );
-	};
-
 	const contextValue = useMemo(
 		() => ( {
 			__experimentalFeatures,
@@ -239,11 +167,6 @@ function ListView(
 		]
 	);
 
-	// When using the windowing technique, screenreader should announce total rows instead of actual table rows rendered.
-	const ariaRowCount = __experimentalPersistentListViewFeatures
-		? { 'aria-rowcount': visibleBlockCount }
-		: {};
-
 	return (
 		<AsyncModeProvider value={ true }>
 			<ListViewDropIndicator
@@ -256,16 +179,17 @@ function ListView(
 				ref={ treeGridRef }
 				onCollapseRow={ collapseRow }
 				onExpandRow={ expandRow }
-				moveWindowUp={ moveWindowUp }
-				moveWindowDown={ moveWindowDown }
-				{ ...ariaRowCount }
+				aria-rowcount={
+					__experimentalPersistentListViewFeatures
+						? visibleBlockCount
+						: undefined
+				}
 			>
 				<ListViewContext.Provider value={ contextValue }>
 					<ListViewBranch
 						blocks={ clientIdsTree }
 						selectBlock={ selectEditorBlock }
-						windowMeasurement={ windowMeasurement }
-						visibleBlockCount={ visibleBlockCount }
+						fixedListWindow={ fixedListWindow }
 						{ ...props }
 					/>
 				</ListViewContext.Provider>
