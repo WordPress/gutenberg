@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 18.1.0 (2021-10-12)
+
 ### Enhancements
 
 -   The bundled `jest-dev-server` dependency has been updated to the next major version `^5.0.3` ([#34560](https://github.com/WordPress/gutenberg/pull/34560)).

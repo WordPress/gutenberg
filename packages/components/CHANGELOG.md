@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 18.0.0 (2021-10-12)
+
 ### Breaking Changes
 
 -   Removed the deprecated `position` and `menuLabel` from the `DropdownMenu` component ([#34537](https://github.com/WordPress/gutenberg/pull/34537)).
