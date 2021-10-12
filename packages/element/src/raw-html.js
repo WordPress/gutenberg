@@ -12,16 +12,20 @@ import { createElement } from './react';
  * To preserve additional props, a `div` wrapper _will_ be created if any props
  * aside from `children` are passed.
  *
- * @param {RawHTMLProps} props Children should be a string of HTML. Other props
- *                             will be passed through to div wrapper.
+ * @param {RawHTMLProps} props Children should be a string of HTML or an array
+ *                             of strings. Other props will be passed through
+ *                             to the div wrapper.
  *
  * @return {JSX.Element} Dangerously-rendering component.
  */
 export default function RawHTML( { children, ...props } ) {
+	// Concatenate into a single string if children is an array.
+	const rawHtml = Array.isArray( children ) ? children.join( '' ) : children;
+
 	// The DIV wrapper will be stripped by serializer, unless there are
 	// non-children props present.
 	return createElement( 'div', {
-		dangerouslySetInnerHTML: { __html: children },
+		dangerouslySetInnerHTML: { __html: rawHtml },
 		...props,
 	} );
 }
