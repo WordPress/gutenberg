@@ -45,8 +45,6 @@ export type UnitControlOnChangeCallback = InputChangeCallback<
 >;
 
 export type UnitSelectControlProps = {
-	className?: string;
-	disabled?: boolean;
 	isUnitSelectTabbable: boolean;
 	onChange?: UnitControlOnChangeCallback;
 	size?: SelectSize;

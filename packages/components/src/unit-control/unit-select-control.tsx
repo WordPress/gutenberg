@@ -9,6 +9,7 @@ import type { ChangeEvent } from 'react';
 /**
  * Internal dependencies
  */
+import type { WordPressComponentProps } from '../ui/context';
 import { UnitSelect, UnitLabel } from './styles/unit-control-styles';
 import { CSS_UNITS, hasUnits } from './utils';
 import type { UnitSelectControlProps } from './types';
@@ -33,7 +34,7 @@ export default function UnitSelectControl( {
 	unit = 'px',
 	units = CSS_UNITS,
 	...props
-}: UnitSelectControlProps ) {
+}: WordPressComponentProps< UnitSelectControlProps, 'select', false > ) {
 	if ( ! units || ! hasUnits( units ) || units?.length === 1 ) {
 		return (
 			<UnitLabel

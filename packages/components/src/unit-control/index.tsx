@@ -21,6 +21,7 @@ import { ENTER } from '@wordpress/keycodes';
 /**
  * Internal dependencies
  */
+import type { WordPressComponentProps } from '../ui/context';
 import * as inputControlActionTypes from '../input-control/reducer/actions';
 import { composeStateReducers } from '../input-control/reducer/reducer';
 import { Root, ValueInput } from './styles/unit-control-styles';
@@ -54,7 +55,7 @@ function UnitControl(
 		units: unitsProp = CSS_UNITS,
 		value: valueProp,
 		...props
-	}: UnitControlProps,
+	}: WordPressComponentProps< UnitControlProps, 'input', false >,
 	forwardedRef: Ref< any >
 ) {
 	const units = useMemo(
