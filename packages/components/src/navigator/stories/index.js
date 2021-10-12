@@ -22,6 +22,7 @@ function NavigatorButton( { path, isBack = false, ...props } ) {
 	const navigator = useNavigator();
 	return (
 		<Button
+			variant="secondary"
 			onClick={ () => navigator.push( path, { isBack } ) }
 			{ ...props }
 		/>
@@ -41,7 +42,7 @@ const MyNavigation = () => {
 						<p>This is the home screen.</p>
 
 						<HStack justify="flex-start" wrap>
-							<NavigatorButton variant="primary" path="/child">
+							<NavigatorButton path="/child">
 								Navigate to child screen.
 							</NavigatorButton>
 
@@ -54,7 +55,11 @@ const MyNavigation = () => {
 							</NavigatorButton>
 
 							<Flyout
-								trigger={ <Button>Open test dialog</Button> }
+								trigger={
+									<Button variant="primary">
+										Open test dialog
+									</Button>
+								}
 								placement="bottom-start"
 							>
 								<CardHeader>Go</CardHeader>
