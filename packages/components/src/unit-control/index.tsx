@@ -2,7 +2,12 @@
  * External dependencies
  */
 // eslint-disable-next-line no-restricted-imports
-import type { KeyboardEvent, Ref, SyntheticEvent } from 'react';
+import type {
+	FocusEventHandler,
+	KeyboardEvent,
+	Ref,
+	SyntheticEvent,
+} from 'react';
 import { noop, omit } from 'lodash';
 import classnames from 'classnames';
 
@@ -133,7 +138,7 @@ function UnitControl(
 		}
 	};
 
-	const handleOnBlur = mayUpdateUnit;
+	const handleOnBlur: FocusEventHandler< HTMLInputElement > = mayUpdateUnit;
 
 	const handleOnKeyDown = ( event: KeyboardEvent< HTMLInputElement > ) => {
 		const { keyCode } = event;
