@@ -628,7 +628,7 @@ add_filter( 'block_type_metadata', 'gutenberg_multiple_block_styles' );
  * @param string $content The content to be rendered.
  * @param string $action  The type of action to use, e.g. `wp_footer` or `admin_footer`.
  */
-function gutenberg_render_block_support_style( $content, $action = 'wp_footer' ) {
+function gutenberg_render_block_supports_style( $content, $action = 'wp_footer' ) {
 	// Ideally styles should be loaded in the head, but blocks may be parsed
 	// after that, so loading in the footer for now.
 	// See https://core.trac.wordpress.org/ticket/53494.

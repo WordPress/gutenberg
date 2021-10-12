@@ -367,7 +367,7 @@ function gutenberg_render_duotone_support( $block_content, $block ) {
 		? $selector . " {\n\tfilter: " . $filter_property . " !important;\n}\n"
 		: $selector . '{filter:' . $filter_property . ' !important;}';
 
-	gutenberg_render_block_support_style( $svg . '<style>' . $filter_style . '</style>' );
+	gutenberg_render_block_supports_style( $svg . '<style>' . $filter_style . '</style>' );
 
 	// Like the layout hook, this assumes the hook only applies to blocks with a single wrapper.
 	return preg_replace(

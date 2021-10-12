@@ -60,7 +60,7 @@ function gutenberg_render_elements_support( $block_content, $block ) {
 		$content              = substr_replace( $block_content, ' class="' . $class_name . '"', $first_element_offset + strlen( $first_element ) - 1, 0 );
 	}
 
-	gutenberg_render_block_support_style( $style );
+	gutenberg_render_block_supports_style( $style );
 
 	return $content;
 }

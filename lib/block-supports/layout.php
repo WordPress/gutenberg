@@ -140,7 +140,7 @@ function gutenberg_render_layout_support_flag( $block_content, $block ) {
 		1
 	);
 
-	gutenberg_render_block_support_style( '<style>' . $style . '</style>' );
+	gutenberg_render_block_supports_style( '<style>' . $style . '</style>' );
 
 	return $content;
 }
