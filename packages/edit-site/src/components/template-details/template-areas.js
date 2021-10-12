@@ -15,7 +15,12 @@ import { store as editSiteStore } from '../../store';
 import { TEMPLATE_PART_AREA_TO_NAME } from '../../store/constants';
 
 function TemplatePartItemMore( { onClose, templatePart } ) {
-	const { revertTemplate } = useDispatch( editSiteStore );
+	const { pushTemplatePart, revertTemplate } = useDispatch( editSiteStore );
+
+	function editTemplatePart() {
+		pushTemplatePart( templatePart.id );
+		onClose();
+	}
 
 	function clearCustomizations() {
 		revertTemplate( templatePart );
@@ -25,15 +30,12 @@ function TemplatePartItemMore( { onClose, templatePart } ) {
 	return (
 		<>
 			<MenuGroup>
-				<MenuItem onClick={ onClose }>
+				<MenuItem onClick={ editTemplatePart }>
 					{ sprintf(
 						/* translators: %s: template part title */
 						__( 'Edit %s' ),
 						templatePart.title?.rendered
 					) }
-				</MenuItem>
-				<MenuItem onClick={ onClose }>
-					{ __( 'Discard unsaved changes' ) }
 				</MenuItem>
 			</MenuGroup>
 			<MenuGroup>
