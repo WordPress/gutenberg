@@ -15,8 +15,6 @@ export async function publishPost() {
 	// Publish the post
 	await page.click( '.editor-post-publish-button' );
 
-	// A success notice should show up
-	return page.waitForXPath(
-		'//div[contains(@class, "components-snackbar__content") and contains(text(),"Post published.")]'
-	);
+	// `PostPublishPanelPostpublish` will be visible after the post is published.
+	return page.waitForSelector( '.post-publish-panel__postpublish' );
 }
