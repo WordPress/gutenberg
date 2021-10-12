@@ -94,8 +94,8 @@ const MyNavigation = () => {
 								className={ cx(
 									css( `
 										color: palevioletred;
-										whiteSpace: nowrap;
-										fontSize: 42vw;
+										white-space: nowrap;
+										font-size: 42vw;
 									` )
 								) }
 							>
