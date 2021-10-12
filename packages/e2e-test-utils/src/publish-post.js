@@ -16,5 +16,7 @@ export async function publishPost() {
 	await page.click( '.editor-post-publish-button' );
 
 	// A success notice should show up
-	return page.waitForSelector( '.components-snackbar' );
+	return page.waitForXPath(
+		'//div[contains(@class, "components-snackbar__content") and contains(text(),"Post published.")]'
+	);
 }
