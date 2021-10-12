@@ -19,7 +19,6 @@ public class RNReactNativeGutenbergBridge: RCTEventEmitter {
             }
         }
     }
-    
     // MARK: - Messaging methods
 
     @objc
@@ -381,14 +380,14 @@ public class RNReactNativeGutenbergBridge: RCTEventEmitter {
             self.delegate?.gutenbergDidRequestContactCustomerSupport()
         }
     }
-    
+
     @objc
     func requestGotoCustomerSupportOptions() {
         DispatchQueue.main.async {
             self.delegate?.gutenbergDidRequestGotoCustomerSupportOptions()
         }
     }
-    
+
     @objc
     func showNotice(_ message:String, duration:Int) {
         DispatchQueue.main.async {
