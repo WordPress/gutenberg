@@ -289,6 +289,7 @@ function gutenberg_maybe_inline_styles() {
 		if ( wp_styles()->get_data( $handle, 'path' ) && file_exists( $wp_styles->registered[ $handle ]->extra['path'] ) ) {
 			$styles[] = array(
 				'handle' => $handle,
+				'src'    => $wp_styles->registered[ $handle ]->src,
 				'path'   => $wp_styles->registered[ $handle ]->extra['path'],
 				'size'   => filesize( $wp_styles->registered[ $handle ]->extra['path'] ),
 			);
@@ -322,6 +323,31 @@ function gutenberg_maybe_inline_styles() {
 
 			// Get the styles if we don't already have them.
 			$style['css'] = file_get_contents( $style['path'] );
+
+			// Check if the style contains relative URLs that need to be modified.
+			// URLs relative to the stylesheet's path should be converted to relative to the site's root.
+			$has_src_results = preg_match_all( '#url\s*\(\s*[\'"]?\s*([^\'"\)]+)#', $style['css'], $src_results );
+			if ( $has_src_results ) {
+				// Loop through the URLs to find relative ones.
+				foreach ( $src_results[1] as $src_index => $src_result ) {
+					// Skip if this is an absolute URL.
+					if ( 0 === strpos( $src_result, 'http' ) ) {
+						continue;
+					}
+
+					// Build the absolute URL.
+					$absolute_url = dirname( $style['src'] ) . '/' . ltrim( $src_result, './' );
+					// Convert to URL related to the site root.
+					$relative_url = wp_make_link_relative( $absolute_url );
+
+					// Replace the URL in the CSS.
+					$style['css'] = str_replace(
+						$src_results[0][ $src_index ],
+						str_replace( $src_result, $relative_url, $src_results[0][ $src_index ] ),
+						$style['css']
+					);
+				}
+			}
 
 			// Set `src` to `false` and add styles inline.
 			$wp_styles->registered[ $style['handle'] ]->src = false;
