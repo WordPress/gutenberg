@@ -64,7 +64,7 @@ export function replaceActiveStyle( className, activeStyle, newStyle ) {
  * @return {Array<Object?>}        The style collection.
  */
 export function getRenderedStyles( styles ) {
-	if ( ! styles ) {
+	if ( ! styles || styles.length === 0 ) {
 		return [];
 	}
 

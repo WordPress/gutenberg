@@ -7,7 +7,7 @@ import { MenuGroup } from '@wordpress/components';
 /**
  * Internal dependencies
  */
-import BlockStyles from '../block-styles';
+import BlockStylesMenuItems from '../block-styles/menu-items';
 
 export default function BlockStylesMenu( { hoveredBlock, onSwitch } ) {
 	const { clientId } = hoveredBlock;
@@ -17,11 +17,7 @@ export default function BlockStylesMenu( { hoveredBlock, onSwitch } ) {
 			label={ __( 'Styles' ) }
 			className="block-editor-block-switcher__styles__menugroup"
 		>
-			<BlockStyles
-				clientId={ clientId }
-				onSwitch={ onSwitch }
-				itemRole="menuitem"
-			/>
+			<BlockStylesMenuItems clientId={ clientId } onSwitch={ onSwitch } />
 		</MenuGroup>
 	);
 }

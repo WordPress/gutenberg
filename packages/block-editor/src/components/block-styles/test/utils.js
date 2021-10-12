@@ -81,6 +81,14 @@ describe( 'replaceActiveStyle', () => {
 } );
 
 describe( 'getRenderedStyles', () => {
+	it( 'Should return an empty array if styles is falsy', () => {
+		expect( getRenderedStyles( null ) ).toEqual( [] );
+	} );
+
+	it( 'Should return an empty array if styles array is empty', () => {
+		expect( getRenderedStyles( [] ) ).toEqual( [] );
+	} );
+
 	it( 'Should return styles collection if there is a default', () => {
 		const styles = [
 			{ name: 'hazlenut' },

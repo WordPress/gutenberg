@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { useMemo, useCallback } from '@wordpress/element';
+import { useMemo } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -15,7 +15,6 @@ export default function BlockStylesPreviewPanel( {
 	style,
 	className,
 	activeStyle,
-	targetRef,
 } ) {
 	const styleClassName = replaceActiveStyle( className, activeStyle, style );
 	const previewBlocks = useMemo( () => {
@@ -32,29 +31,12 @@ export default function BlockStylesPreviewPanel( {
 		};
 	}, [ genericPreviewBlock, styleClassName ] );
 
-	const getAnchorRect = useCallback( () => {
-		if ( ! targetRef?.current || ! window.DOMRect ) {
-			return null;
-		}
-		const rect = targetRef?.current.getBoundingClientRect();
-
-		return new window.DOMRect(
-			// The left position of the target element,
-			// minus any offset in relation to its parent container.
-			rect.x - targetRef?.current.offsetLeft,
-			rect.y,
-			rect.width,
-			rect.height
-		);
-	}, [ targetRef?.current ] );
-
 	return (
 		<Popover
 			className="block-editor-block-styles__popover block-editor-block-styles__preview__popover "
 			focusOnMount={ false }
 			position="middle left"
 			animate={ false }
-			anchorRect={ getAnchorRect() }
 		>
 			<InserterPreviewPanel
 				item={ previewBlocks }

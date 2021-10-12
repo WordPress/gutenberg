@@ -8,6 +8,14 @@
 }
 
 .block-editor-block-styles__preview__popover {
+	@include break-medium() {
+		// The right position equals the sidebar width plus the
+		// left offset of .block-editor-inserter__preview-container.
+		// We need the !important to override the Popover inline styles.
+		right: calc(#{$sidebar-width} + #{$grid-unit-20}) !important;
+		left: auto !important;
+	}
+
 	// Overrides for InserterPreviewPanel.
 	.block-editor-inserter__preview-container {
 		left: auto;

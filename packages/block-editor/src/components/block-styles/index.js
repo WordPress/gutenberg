@@ -7,139 +7,58 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { useMemo, useRef, useState } from '@wordpress/element';
+import { useState } from '@wordpress/element';
 import { useDebounce } from '@wordpress/compose';
-import { useSelect, useDispatch } from '@wordpress/data';
 import { ENTER, SPACE } from '@wordpress/keycodes';
-import {
-	getBlockType,
-	cloneBlock,
-	getBlockFromExample,
-	store as blocksStore,
-} from '@wordpress/blocks';
-import {
-	Button,
-	MenuItem,
-	__experimentalText as Text,
-} from '@wordpress/components';
-import { check } from '@wordpress/icons';
+import { Button, __experimentalText as Text } from '@wordpress/components';
 
 /**
  * Internal dependencies
  */
-import { getActiveStyle, getRenderedStyles, replaceActiveStyle } from './utils';
-import BlockStylesPreviewPanel from './block-styles-preview-panel';
-import { store as blockEditorStore } from '../../store';
+import BlockStylesPreviewPanel from './preview-panel';
+import useStylesForBlocks from './use-styles-for-block';
 
-const EMPTY_OBJECT = {};
-
-function useGenericPreviewBlock( block, type ) {
-	return useMemo( () => {
-		const example = type?.example;
-		const blockName = type?.name;
-
-		if ( example && blockName ) {
-			return getBlockFromExample( blockName, {
-				attributes: example.attributes,
-				innerBlocks: example.innerBlocks,
-			} );
-		}
-
-		if ( block ) {
-			return cloneBlock( block );
-		}
-	}, [ type?.example ? block?.name : block, type ] );
-}
-
-function BlockStyles( {
+// Block Styles component for the Settings Sidebar.
+export default function BlockStyles( {
 	clientId,
 	onSwitch = noop,
 	onHoverClassName = noop,
-	itemRole,
 } ) {
-	const selector = ( select ) => {
-		const { getBlock } = select( blockEditorStore );
-		const block = getBlock( clientId );
-
-		if ( ! block ) {
-			return EMPTY_OBJECT;
-		}
-		const blockType = getBlockType( block.name );
-		const { getBlockStyles } = select( blocksStore );
-
-		return {
-			block,
-			type: blockType,
-			styles: getBlockStyles( block.name ),
-			className: block.attributes.className || '',
-		};
-	};
-
-	const { styles, block, type, className } = useSelect( selector, [
+	const {
+		onSelect,
+		stylesToRender,
+		activeStyle,
+		genericPreviewBlock,
+		className,
+	} = useStylesForBlocks( {
 		clientId,
-	] );
-
-	const { updateBlockAttributes } = useDispatch( blockEditorStore );
-	const genericPreviewBlock = useGenericPreviewBlock( block, type );
+		onSwitch,
+	} );
 	const [ hoveredStyle, setHoveredStyle ] = useState( null );
 	const debouncedSetHoveredStyle = useDebounce( setHoveredStyle, 250 );
 
-	const onStyleHover = ( item ) => {
+	if ( ! stylesToRender || stylesToRender.length === 0 ) {
+		return null;
+	}
+
+	const onSelectStylePreview = ( style ) => {
+		onSelect( style );
+		onHoverClassName( null );
+		setHoveredStyle( null );
+	};
+
+	const styleItemHandler = ( item ) => {
 		if ( hoveredStyle === item ) {
 			return;
 		}
 		debouncedSetHoveredStyle( item );
+		onHoverClassName( item?.name ?? null );
 	};
-
-	const containerRef = useRef();
-
-	if ( ! styles || styles.length === 0 ) {
-		return null;
-	}
-
-	const renderedStyles = getRenderedStyles( styles );
-	const activeStyle = getActiveStyle( renderedStyles, className );
-
-	const onSelectStyle = ( style ) => {
-		const styleClassName = replaceActiveStyle(
-			className,
-			activeStyle,
-			style
-		);
-		updateBlockAttributes( clientId, {
-			className: styleClassName,
-		} );
-		onHoverClassName( null );
-		setHoveredStyle( null );
-		onSwitch();
-	};
-
-	if ( itemRole === 'menuitem' ) {
-		return (
-			<div className="block-editor-block-styles__menu">
-				{ renderedStyles.map( ( style ) => {
-					const menuItemText = style.label || style.name;
-					return (
-						<MenuItem
-							key={ style.name }
-							icon={
-								activeStyle.name === style.name ? check : null
-							}
-							onClick={ () => onSelectStyle( style ) }
-							className="block-editor-block-styles__item"
-						>
-							{ menuItemText }
-						</MenuItem>
-					);
-				} ) }
-			</div>
-		);
-	}
 
 	return (
-		<div className="block-editor-block-styles" ref={ containerRef }>
+		<div className="block-editor-block-styles">
 			<div className="block-editor-block-styles__variants">
-				{ renderedStyles.map( ( style ) => {
+				{ stylesToRender.map( ( style ) => {
 					const buttonText = style.label || style.name;
 
 					return (
@@ -154,20 +73,20 @@ function BlockStyles( {
 							key={ style.name }
 							variant="secondary"
 							label={ buttonText }
-							onMouseEnter={ () => onStyleHover( style ) }
-							onFocus={ () => onStyleHover( style ) }
-							onMouseLeave={ () => onStyleHover( null ) }
-							onBlur={ () => onStyleHover( null ) }
+							onMouseEnter={ () => styleItemHandler( style ) }
+							onFocus={ () => styleItemHandler( style ) }
+							onMouseLeave={ () => styleItemHandler( null ) }
+							onBlur={ () => styleItemHandler( null ) }
 							onKeyDown={ ( event ) => {
 								if (
 									ENTER === event.keyCode ||
 									SPACE === event.keyCode
 								) {
 									event.preventDefault();
-									onSelectStyle( style );
+									onSelectStylePreview( style );
 								}
 							} }
-							onClick={ () => onSelectStyle( style ) }
+							onClick={ () => onSelectStylePreview( style ) }
 							role="button"
 							tabIndex="0"
 						>
@@ -189,11 +108,8 @@ function BlockStyles( {
 					className={ className }
 					genericPreviewBlock={ genericPreviewBlock }
 					style={ hoveredStyle }
-					targetRef={ containerRef }
 				/>
 			) }
 		</div>
 	);
 }
-
-export default BlockStyles;
