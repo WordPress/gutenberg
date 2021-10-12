@@ -152,24 +152,6 @@ exports[`ToggleGroupControl should render correctly 1`] = `
   visibility: hidden;
 }
 
-.emotion-15 {
-  background: rgba(0, 0, 0, 0.1);
-  height: calc( 100% - 4px - 4px );
-  position: absolute;
-  right: 0;
-  top: 4px;
-  -webkit-transition: background 200ms linear;
-  transition: background 200ms linear;
-  width: 1px;
-  background: transparent;
-}
-
-@media ( prefers-reduced-motion: reduce ) {
-  .emotion-15 {
-    transition-duration: 0ms;
-  }
-}
-
 <div
   class="components-base-control emotion-0 emotion-1"
 >
@@ -230,10 +212,6 @@ exports[`ToggleGroupControl should render correctly 1`] = `
             R
           </div>
         </button>
-        <div
-          aria-hidden="true"
-          class="emotion-15 emotion-16"
-        />
       </div>
       <div
         class="emotion-8 emotion-9"
@@ -262,10 +240,6 @@ exports[`ToggleGroupControl should render correctly 1`] = `
             J
           </div>
         </button>
-        <div
-          aria-hidden="true"
-          class="emotion-15 emotion-16"
-        />
       </div>
     </div>
   </div>
