@@ -8,14 +8,14 @@ import { throttle } from 'lodash';
  */
 import { useState, useLayoutEffect } from '@wordpress/element';
 import { getScrollContainer } from '@wordpress/dom';
+import { PAGEUP, PAGEDOWN, HOME, END } from '@wordpress/keycodes';
 
-const DEFAULT_WINDOW_OVERSCAN = 1;
 const DEFAULT_INIT_WINDOW_SIZE = 30;
 
 /**
  * @typedef {Object} WPFixedWindowList
  *
- * @property {number}                  maxRendered  Maximum number of items that may be rendered in the window
+ * @property {number}                  visibleItems Items visible in the current viewport
  * @property {number}                  start        Start index of the window
  * @property {number}                  end          End index of the window
  * @property {(index:number)=>boolean} itemInView   Returns true if item is in the window
@@ -45,12 +45,11 @@ export default function useFixedWindowList(
 	totalItems,
 	options
 ) {
-	const windowOverscan = options?.windowOverscan ?? DEFAULT_WINDOW_OVERSCAN;
 	const initWindowSize = options?.initWindowSize ?? DEFAULT_INIT_WINDOW_SIZE;
 	const useWindowing = options?.useWindowing ?? true;
 
 	const [ fixedListWindow, setFixedListWindow ] = useState( {
-		maxRendered: initWindowSize,
+		visibleItems: initWindowSize,
 		start: 0,
 		end: initWindowSize,
 		itemInView: ( /** @type {number} */ index ) => {
@@ -72,6 +71,7 @@ export default function useFixedWindowList(
 			const visibleItems = Math.ceil(
 				scrollContainer.clientHeight / itemHeight
 			);
+			const windowOverscan = options?.windowOverscan ?? visibleItems;
 			const start = Math.max(
 				0,
 				Math.floor( scrollContainer.scrollTop / itemHeight ) -
@@ -82,7 +82,7 @@ export default function useFixedWindowList(
 				start + visibleItems + windowOverscan
 			);
 			setFixedListWindow( {
-				maxRendered: visibleItems + windowOverscan * 2,
+				visibleItems,
 				start,
 				end,
 				itemInView: ( index ) => {
@@ -95,6 +95,32 @@ export default function useFixedWindowList(
 						: 0,
 			} );
 		};
+		const handleKeyDown = ( /** @type {KeyboardEvent} */ event ) => {
+			switch ( event.keyCode ) {
+				case HOME: {
+					return scrollContainer?.scrollTo( { top: 0 } );
+				}
+				case END: {
+					return scrollContainer?.scrollTo( {
+						top: totalItems * itemHeight,
+					} );
+				}
+				case PAGEUP: {
+					return scrollContainer?.scrollTo( {
+						top:
+							scrollContainer.scrollTop -
+							fixedListWindow.visibleItems * itemHeight,
+					} );
+				}
+				case PAGEDOWN: {
+					return scrollContainer?.scrollTo( {
+						top:
+							scrollContainer.scrollTop +
+							fixedListWindow.visibleItems * itemHeight,
+					} );
+				}
+			}
+		};
 
 		measureWindow();
 		const throttleMeasureList = throttle( () => {
@@ -105,6 +131,14 @@ export default function useFixedWindowList(
 			'resize',
 			throttleMeasureList
 		);
+		scrollContainer?.ownerDocument?.defaultView?.addEventListener(
+			'resize',
+			throttleMeasureList
+		);
+		scrollContainer?.ownerDocument?.defaultView?.addEventListener(
+			'keydown',
+			handleKeyDown
+		);
 		return () => {
 			scrollContainer?.removeEventListener(
 				'scroll',
@@ -113,6 +147,10 @@ export default function useFixedWindowList(
 			scrollContainer?.ownerDocument?.defaultView?.removeEventListener(
 				'resize',
 				throttleMeasureList
+			);
+			scrollContainer?.ownerDocument?.defaultView?.removeEventListener(
+				'keydown',
+				handleKeyDown
 			);
 		};
 	}, [ totalItems, itemHeight, elementRef ] );
