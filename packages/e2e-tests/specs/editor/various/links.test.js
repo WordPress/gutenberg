@@ -725,6 +725,48 @@ describe( 'Links', () => {
 			// the text input to reflect that value.
 			expect( textInputValue ).toBe( textToSelect );
 		} );
+
+		it( 'should allow for modification of link text via Link UI', async () => {
+			const changedLinkText =
+				'    link text that was modified via the Link UI to include spaces     ';
+			await createAndReselectLink();
+			// Make a collapsed selection inside the link
+			await page.keyboard.press( 'ArrowLeft' );
+			await page.keyboard.press( 'ArrowRight' );
+			await showBlockToolbar();
+			const [ editButton ] = await page.$x( '//button[text()="Edit"]' );
+			await editButton.click();
+			await waitForAutoFocus();
+
+			await pressKeyWithModifier( 'shift', 'Tab' );
+
+			// Tabbing back should land us in the text input.
+			const textInputValue = await page.evaluate(
+				() => document.activeElement.value
+			);
+
+			// Link was created on text value "Gutenberg". We expect
+			// the text input to reflect that value.
+			expect( textInputValue ).toBe( 'Gutenberg' );
+
+			// Select all the link text in the input
+			await pressKeyWithModifier( 'primary', 'a' );
+
+			// Modify the link text value
+			await page.keyboard.type( changedLinkText );
+
+			// Submit the change
+			await page.keyboard.press( 'Enter' );
+
+			// Check the created link reflects the link text
+			const actualLinkText = await page.evaluate(
+				() =>
+					document.querySelector(
+						'.block-editor-rich-text__editable a'
+					).textContent
+			);
+			expect( actualLinkText ).toBe( changedLinkText );
+		} );
 	} );
 
 	describe( 'Disabling Link UI active state', () => {
