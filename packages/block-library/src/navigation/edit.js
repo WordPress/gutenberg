@@ -282,6 +282,17 @@ function Navigation( {
 							label={ __( 'Enable responsive menu' ) }
 						/>
 						<ToggleControl
+							checked={ attributes.isHiddenByDefault }
+							onChange={ ( value ) => {
+								setAttributes( {
+									isHiddenByDefault: value,
+								} );
+							} }
+							label={ __(
+								'Always hide Navigation Menu behind toggle'
+							) }
+						/>
+						<ToggleControl
 							checked={ attributes.openSubmenusOnClick }
 							onChange={ ( value ) => {
 								setAttributes( {
@@ -353,6 +364,7 @@ function Navigation( {
 					onToggle={ setResponsiveMenuVisibility }
 					isOpen={ isResponsiveMenuOpen }
 					isResponsive={ attributes.isResponsive }
+					isHiddenByDefault={ attributes.isHiddenByDefault }
 				>
 					<div { ...innerBlocksProps }></div>
 				</ResponsiveWrapper>
