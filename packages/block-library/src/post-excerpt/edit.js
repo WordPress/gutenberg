@@ -59,7 +59,7 @@ export default function PostExcerptEditor( {
 	if ( ! postType || ! postId ) {
 		return (
 			<div { ...blockProps }>
-				{ __( 'Post excerpt block: no post found.' ) }
+				{ __( 'Post Excerpt' ) }
 			</div>
 		);
 	}
