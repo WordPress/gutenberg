@@ -41,19 +41,25 @@ function InlineLinkUI( {
 	let textStart = value.start;
 	let textEnd = value.end;
 
-	// If there is no selection then manually find the boundary
-	// of the selection via the active format.
-	if ( isCollapsed( value ) ) {
+	// On the condition that:
+	// 1. we have an active format
+	// 2. there is no range to the selection
+	// ...then manually find the boundaries of the selection via the
+	// boundaries of the active format.
+	if ( isCollapsed( value ) && isActive ) {
 		const boundary = getFormatBoundary( value, {
 			type: 'core/link',
 		} );
 
 		textStart = boundary.start;
-		textEnd = boundary.end;
-	}
-	// Get a RichTextValue containing the selected text content.
 
-	const richLinkTextValue = slice( value, textStart, textEnd + 1 );
+		// Text *selection* always extends +1 beyond the edge of the format.
+		// We account for that here.
+		textEnd = boundary.end + 1;
+	}
+
+	// Get a RichTextValue containing the selected text content.
+	const richLinkTextValue = slice( value, textStart, textEnd );
 
 	// Get the text content minus any HTML tags.
 	const richTextText = richLinkTextValue.text;
@@ -134,7 +140,6 @@ function InlineLinkUI( {
 		} );
 
 		const newText = nextValue.title || newUrl;
-
 		if ( isCollapsed( value ) && ! isActive ) {
 			// Scenario: we don't have any actively selected text or formats.
 			const toInsert = applyFormat(
