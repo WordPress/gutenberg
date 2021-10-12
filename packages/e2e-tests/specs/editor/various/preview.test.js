@@ -25,6 +25,9 @@ import {
  * @return {Promise} Promise resolving once selector is visible on page.
  */
 async function waitForPreviewDropdownOpen( editorPage ) {
+	await editorPage.waitForSelector(
+		'.block-editor-post-preview__button-toggle:not([disabled]'
+	);
 	await editorPage.click( '.block-editor-post-preview__button-toggle' );
 	return editorPage.waitForSelector(
 		'.edit-post-header-preview__button-external'
