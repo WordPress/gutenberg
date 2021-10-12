@@ -59,7 +59,13 @@ const options = {
 
 const ANIMATION_DURATION = 190;
 
-function BottomSheetNavigationContainer( { children, animate, main, theme } ) {
+function BottomSheetNavigationContainer( {
+	children,
+	animate,
+	main,
+	theme,
+	style,
+} ) {
 	const Stack = useRef( createStackNavigator() ).current;
 	const context = useContext( BottomSheetNavigationContext );
 	const [ currentHeight, setCurrentHeight ] = useState(
@@ -129,11 +135,7 @@ function BottomSheetNavigationContainer( { children, animate, main, theme } ) {
 
 	return useMemo( () => {
 		return (
-			<View
-				style={ {
-					height: currentHeight,
-				} }
-			>
+			<View style={ [ style, { height: currentHeight } ] }>
 				<BottomSheetNavigationProvider
 					value={ {
 						setHeight,
