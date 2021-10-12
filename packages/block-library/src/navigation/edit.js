@@ -281,17 +281,17 @@ function Navigation( {
 							} }
 							label={ __( 'Enable responsive menu' ) }
 						/>
-						<ToggleControl
-							checked={ attributes.isHiddenByDefault }
-							onChange={ ( value ) => {
-								setAttributes( {
-									isHiddenByDefault: value,
-								} );
-							} }
-							label={ __(
-								'Always hide Navigation Menu behind toggle'
-							) }
-						/>
+						{ attributes.isResponsive && (
+							<ToggleControl
+								checked={ attributes.isHiddenByDefault }
+								onChange={ ( value ) => {
+									setAttributes( {
+										isHiddenByDefault: value,
+									} );
+								} }
+								label={ __( 'Always on burger menu' ) }
+							/>
+						) }
 						<ToggleControl
 							checked={ attributes.openSubmenusOnClick }
 							onChange={ ( value ) => {
