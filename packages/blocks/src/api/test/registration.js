@@ -8,9 +8,8 @@ import { noop, get, omit, pick } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { addFilter, removeAllFilters } from '@wordpress/hooks';
+import { addFilter, removeAllFilters, removeFilter } from '@wordpress/hooks';
 import { select } from '@wordpress/data';
-import { blockDefault as blockIcon } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -36,7 +35,7 @@ import {
 	serverSideBlockDefinitions,
 	unstable__bootstrapServerSideBlockDefinitions, // eslint-disable-line camelcase
 } from '../registration';
-import { DEPRECATED_ENTRY_KEYS } from '../constants';
+import { BLOCK_ICON_DEFAULT, DEPRECATED_ENTRY_KEYS } from '../constants';
 import { store as blocksStore } from '../../store';
 
 describe( 'blocks', () => {
@@ -121,9 +120,7 @@ describe( 'blocks', () => {
 			expect( console ).not.toHaveErrored();
 			expect( block ).toEqual( {
 				name: 'my-plugin/fancy-block-4',
-				icon: {
-					src: blockIcon,
-				},
+				icon: { src: BLOCK_ICON_DEFAULT },
 				attributes: {},
 				providesContext: {},
 				usesContext: [],
@@ -268,9 +265,7 @@ describe( 'blocks', () => {
 				name: 'core/test-block-with-defaults',
 				title: 'block title',
 				category: 'text',
-				icon: {
-					src: blockIcon,
-				},
+				icon: { src: BLOCK_ICON_DEFAULT },
 				attributes: {},
 				providesContext: {},
 				usesContext: [],
@@ -301,9 +296,7 @@ describe( 'blocks', () => {
 					save: noop,
 					category: 'text',
 					title: 'block title',
-					icon: {
-						src: blockIcon,
-					},
+					icon: { src: BLOCK_ICON_DEFAULT },
 					attributes: {
 						ok: {
 							type: 'boolean',
@@ -338,9 +331,7 @@ describe( 'blocks', () => {
 				name: blockName,
 				save: expect.any( Function ),
 				title: 'block title',
-				icon: {
-					src: blockIcon,
-				},
+				icon: { src: BLOCK_ICON_DEFAULT },
 				attributes: {},
 				providesContext: {},
 				usesContext: [],
@@ -371,9 +362,7 @@ describe( 'blocks', () => {
 				name: blockName,
 				save: expect.any( Function ),
 				title: 'block title',
-				icon: {
-					src: blockIcon,
-				},
+				icon: { src: BLOCK_ICON_DEFAULT },
 				attributes: {},
 				providesContext: {
 					fontSize: 'fontSize',
@@ -410,9 +399,7 @@ describe( 'blocks', () => {
 				save: expect.any( Function ),
 				title: 'block title',
 				category: 'widgets',
-				icon: {
-					src: blockIcon,
-				},
+				icon: { src: BLOCK_ICON_DEFAULT },
 				attributes: {},
 				providesContext: {},
 				usesContext: [],
@@ -636,9 +623,7 @@ describe( 'blocks', () => {
 				save: noop,
 				category: 'text',
 				title: 'block title',
-				icon: {
-					src: blockIcon,
-				},
+				icon: { src: BLOCK_ICON_DEFAULT },
 				attributes: {},
 				providesContext: {},
 				usesContext: [],
@@ -723,7 +708,7 @@ describe( 'blocks', () => {
 								...omit(
 									{
 										name,
-										icon: blockIcon,
+										icon: BLOCK_ICON_DEFAULT,
 										attributes: {},
 										providesContext: {},
 										usesContext: [],
@@ -800,6 +785,125 @@ describe( 'blocks', () => {
 				expect( block1.attributes ).not.toEqual( block2.attributes );
 			} );
 		} );
+
+		test( 'registers block from metadata', () => {
+			const Edit = () => 'test';
+			const block = registerBlockType(
+				{
+					name: 'test/block-from-metadata',
+					title: 'Block from metadata',
+					category: 'text',
+					icon: 'palmtree',
+					variations: [
+						{
+							name: 'variation',
+							title: 'Variation Title',
+							description: 'Variation description',
+							keywords: [ 'variation' ],
+						},
+					],
+				},
+				{
+					edit: Edit,
+					save: noop,
+				}
+			);
+			expect( block ).toEqual( {
+				name: 'test/block-from-metadata',
+				title: 'Block from metadata',
+				category: 'text',
+				icon: {
+					src: 'palmtree',
+				},
+				keywords: [],
+				attributes: {},
+				providesContext: {},
+				usesContext: [],
+				supports: {},
+				styles: [],
+				variations: [
+					{
+						name: 'variation',
+						title: 'Variation Title',
+						description: 'Variation description',
+						keywords: [ 'variation' ],
+					},
+				],
+				edit: Edit,
+				save: noop,
+			} );
+		} );
+		test( 'registers block from metadata with translation', () => {
+			addFilter(
+				'i18n.gettext_with_context_test',
+				'test/mark-as-translated',
+				( value ) => value + ' (translated)'
+			);
+
+			const Edit = () => 'test';
+			const block = registerBlockType(
+				{
+					name: 'test/block-from-metadata-i18n',
+					title: 'I18n title from metadata',
+					description: 'I18n description from metadata',
+					keywords: [ 'i18n', 'metadata' ],
+					styles: [
+						{
+							name: 'i18n-style',
+							label: 'I18n Style Label',
+						},
+					],
+					variations: [
+						{
+							name: 'i18n-variation',
+							title: 'I18n Variation Title',
+							description: 'I18n variation description',
+							keywords: [ 'variation' ],
+						},
+					],
+					textdomain: 'test',
+					icon: 'palmtree',
+				},
+				{
+					edit: Edit,
+					save: noop,
+				}
+			);
+			removeFilter(
+				'i18n.gettext_with_context_test',
+				'test/mark-as-translated'
+			);
+
+			expect( block ).toEqual( {
+				name: 'test/block-from-metadata-i18n',
+				title: 'I18n title from metadata (translated)',
+				description: 'I18n description from metadata (translated)',
+				icon: {
+					src: 'palmtree',
+				},
+				keywords: [ 'i18n (translated)', 'metadata (translated)' ],
+				attributes: {},
+				providesContext: {},
+				usesContext: [],
+				supports: {},
+				styles: [
+					{
+						name: 'i18n-style',
+						label: 'I18n Style Label (translated)',
+					},
+				],
+				variations: [
+					{
+						name: 'i18n-variation',
+						title: 'I18n Variation Title (translated)',
+						description: 'I18n variation description (translated)',
+						keywords: [ 'variation (translated)' ],
+					},
+				],
+				edit: Edit,
+				save: noop,
+			} );
+		} );
 	} );
 
 	describe( 'registerBlockCollection()', () => {
@@ -841,9 +945,7 @@ describe( 'blocks', () => {
 					save: noop,
 					category: 'text',
 					title: 'block title',
-					icon: {
-						src: blockIcon,
-					},
+					icon: { src: BLOCK_ICON_DEFAULT },
 					attributes: {},
 					providesContext: {},
 					usesContext: [],
@@ -860,9 +962,7 @@ describe( 'blocks', () => {
 				save: noop,
 				category: 'text',
 				title: 'block title',
-				icon: {
-					src: blockIcon,
-				},
+				icon: { src: BLOCK_ICON_DEFAULT },
 				attributes: {},
 				providesContext: {},
 				usesContext: [],
@@ -940,9 +1040,7 @@ describe( 'blocks', () => {
 				save: noop,
 				category: 'text',
 				title: 'block title',
-				icon: {
-					src: blockIcon,
-				},
+				icon: { src: BLOCK_ICON_DEFAULT },
 				attributes: {},
 				providesContext: {},
 				usesContext: [],
@@ -966,9 +1064,7 @@ describe( 'blocks', () => {
 				save: noop,
 				category: 'text',
 				title: 'block title',
-				icon: {
-					src: blockIcon,
-				},
+				icon: { src: BLOCK_ICON_DEFAULT },
 				attributes: {},
 				providesContext: {},
 				usesContext: [],
@@ -999,9 +1095,7 @@ describe( 'blocks', () => {
 					save: noop,
 					category: 'text',
 					title: 'block title',
-					icon: {
-						src: blockIcon,
-					},
+					icon: { src: BLOCK_ICON_DEFAULT },
 					attributes: {},
 					providesContext: {},
 					usesContext: [],
@@ -1016,9 +1110,7 @@ describe( 'blocks', () => {
 					save: noop,
 					category: 'text',
 					title: 'block title',
-					icon: {
-						src: blockIcon,
-					},
+					icon: { src: BLOCK_ICON_DEFAULT },
 					attributes: {},
 					providesContext: {},
 					usesContext: [],

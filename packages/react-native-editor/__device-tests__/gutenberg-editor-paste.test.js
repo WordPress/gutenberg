@@ -70,6 +70,9 @@ describe( 'Gutenberg Editor paste tests', () => {
 
 		const text = await editorPage.getTextForParagraphBlockAtPosition( 2 );
 		expect( text ).toBe( testData.pastePlainText );
+
+		await editorPage.removeBlockAtPosition( blockNames.paragraph, 2 );
+		await editorPage.removeBlockAtPosition( blockNames.paragraph, 1 );
 	} );
 
 	it( 'copies styled text from one paragraph block and pastes in another', async () => {

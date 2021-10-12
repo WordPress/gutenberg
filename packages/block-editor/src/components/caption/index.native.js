@@ -18,7 +18,7 @@ const Caption = ( {
 	onBlur,
 	onChange,
 	onFocus,
-	placeholder = __( 'Write caption…' ),
+	placeholder = __( 'Add caption' ),
 	placeholderTextColor,
 	shouldDisplay = true,
 	style,

@@ -11,13 +11,14 @@ import {
 	getPreference,
 	isEditorPanelOpened,
 	isModalActive,
-	isFeatureActive,
 	hasMetaBoxes,
 	isSavingMetaBoxes,
 	getActiveMetaBoxLocations,
 	isMetaBoxLocationActive,
 	isEditorPanelEnabled,
 	isEditorPanelRemoved,
+	isInserterOpened,
+	isListViewOpened,
 } from '../selectors';
 
 describe( 'selectors', () => {
@@ -237,51 +238,6 @@ describe( 'selectors', () => {
 		} );
 	} );
 
-	describe( 'isFeatureActive', () => {
-		it( 'is tolerant to an undefined features preference', () => {
-			// See: https://github.com/WordPress/gutenberg/issues/14580
-			const state = {
-				preferences: {},
-			};
-
-			expect( isFeatureActive( state, 'chicken' ) ).toBe( false );
-		} );
-
-		it( 'should return true if feature is active', () => {
-			const state = {
-				preferences: {
-					features: {
-						chicken: true,
-					},
-				},
-			};
-
-			expect( isFeatureActive( state, 'chicken' ) ).toBe( true );
-		} );
-
-		it( 'should return false if feature is not active', () => {
-			const state = {
-				preferences: {
-					features: {
-						chicken: false,
-					},
-				},
-			};
-
-			expect( isFeatureActive( state, 'chicken' ) ).toBe( false );
-		} );
-
-		it( 'should return false if feature is not referred', () => {
-			const state = {
-				preferences: {
-					features: {},
-				},
-			};
-
-			expect( isFeatureActive( state, 'chicken' ) ).toBe( false );
-		} );
-	} );
-
 	describe( 'hasMetaBoxes', () => {
 		it( 'should return true if there are active meta boxes', () => {
 			const state = {
@@ -376,6 +332,28 @@ describe( 'selectors', () => {
 			const result = isMetaBoxLocationActive( state, 'side' );
 
 			expect( result ).toBe( true );
+		} );
+	} );
+
+	describe( 'isInserterOpened', () => {
+		it( 'returns the block inserter panel isOpened state', () => {
+			const state = {
+				blockInserterPanel: true,
+			};
+			expect( isInserterOpened( state ) ).toBe( true );
+			state.blockInserterPanel = false;
+			expect( isInserterOpened( state ) ).toBe( false );
+		} );
+	} );
+
+	describe( 'isListViewOpened', () => {
+		it( 'returns the list view panel isOpened state', () => {
+			const state = {
+				listViewPanel: true,
+			};
+			expect( isListViewOpened( state ) ).toBe( true );
+			state.listViewPanel = false;
+			expect( isListViewOpened( state ) ).toBe( false );
 		} );
 	} );
 } );

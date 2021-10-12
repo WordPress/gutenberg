@@ -10,7 +10,7 @@
 /**
  * Registers a custom script for the plugin.
  */
-function enqueue_container_without_paragraph_plugin_script() {
+function enqueue_inner_blocks_templates_plugin_script() {
 	wp_enqueue_script(
 		'gutenberg-test-inner-blocks-templates',
 		plugins_url( 'inner-blocks-templates/index.js', __FILE__ ),
@@ -27,4 +27,4 @@ function enqueue_container_without_paragraph_plugin_script() {
 	);
 }
 
-add_action( 'init', 'enqueue_container_without_paragraph_plugin_script' );
+add_action( 'init', 'enqueue_inner_blocks_templates_plugin_script' );

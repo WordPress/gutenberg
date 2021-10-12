@@ -5,43 +5,70 @@ import { useSelect } from '@wordpress/data';
 import {
 	InnerBlocks,
 	useBlockProps,
-	InspectorAdvancedControls,
+	InspectorControls,
 	__experimentalUseInnerBlocksProps as useInnerBlocksProps,
+	useSetting,
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
-import {
-	SelectControl,
-	__experimentalBoxControl as BoxControl,
-} from '@wordpress/components';
+import { SelectControl } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-const { __Visualizer: BoxControlVisualizer } = BoxControl;
+
+const htmlElementMessages = {
+	header: __(
+		'The <header> element should represent introductory content, typically a group of introductory or navigational aids.'
+	),
+	main: __(
+		'The <main> element should be used for the primary content of your document only. '
+	),
+	section: __(
+		"The <section> element should represent a standalone portion of the document that can't be better represented by another element."
+	),
+	article: __(
+		'The <article> element should represent a self contained, syndicatable portion of the document.'
+	),
+	aside: __(
+		"The <aside> element should represent a portion of a document whose content is only indirectly related to the document's main content."
+	),
+	footer: __(
+		'The <footer> element should represent a footer for its nearest sectioning element (e.g.: <section>, <article>, <main> etc.).'
+	),
+};
 
 function GroupEdit( { attributes, setAttributes, clientId } ) {
-	const hasInnerBlocks = useSelect(
+	const { hasInnerBlocks, themeSupportsLayout } = useSelect(
 		( select ) => {
-			const { getBlock } = select( blockEditorStore );
+			const { getBlock, getSettings } = select( blockEditorStore );
 			const block = getBlock( clientId );
-			return !! ( block && block.innerBlocks.length );
+			return {
+				hasInnerBlocks: !! ( block && block.innerBlocks.length ),
+				themeSupportsLayout: getSettings()?.supportsLayout,
+			};
 		},
 		[ clientId ]
 	);
+	const defaultLayout = useSetting( 'layout' ) || {};
+	const { tagName: TagName = 'div', templateLock, layout = {} } = attributes;
+	const usedLayout = !! layout && layout.inherit ? defaultLayout : layout;
+	const { type = 'default' } = usedLayout;
+	const layoutSupportEnabled = themeSupportsLayout || type !== 'default';
+
 	const blockProps = useBlockProps();
-	const { tagName: TagName = 'div', templateLock } = attributes;
 	const innerBlocksProps = useInnerBlocksProps(
-		{
-			className: 'wp-block-group__inner-container',
-		},
+		layoutSupportEnabled
+			? blockProps
+			: { className: 'wp-block-group__inner-container' },
 		{
 			templateLock,
 			renderAppender: hasInnerBlocks
 				? undefined
 				: InnerBlocks.ButtonBlockAppender,
+			__experimentalLayout: layoutSupportEnabled ? usedLayout : undefined,
 		}
 	);
 
 	return (
 		<>
-			<InspectorAdvancedControls>
+			<InspectorControls __experimentalGroup="advanced">
 				<SelectControl
 					label={ __( 'HTML element' ) }
 					options={ [
@@ -57,15 +84,17 @@ function GroupEdit( { attributes, setAttributes, clientId } ) {
 					onChange={ ( value ) =>
 						setAttributes( { tagName: value } )
 					}
+					help={ htmlElementMessages[ TagName ] }
 				/>
-			</InspectorAdvancedControls>
-			<TagName { ...blockProps }>
-				<BoxControlVisualizer
-					values={ attributes.style?.spacing?.padding }
-					showValues={ attributes.style?.visualizers?.padding }
-				/>
-				<div { ...innerBlocksProps } />
-			</TagName>
+			</InspectorControls>
+			{ layoutSupportEnabled && <TagName { ...innerBlocksProps } /> }
+			{ /* Ideally this is not needed but it's there for backward compatibility reason
+				to keep this div for themes that might rely on its presence */ }
+			{ ! layoutSupportEnabled && (
+				<TagName { ...blockProps }>
+					<div { ...innerBlocksProps } />
+				</TagName>
+			) }
 		</>
 	);
 }

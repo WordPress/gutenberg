@@ -25,17 +25,25 @@ import { getActiveStyle, replaceActiveStyle } from './utils';
 import BlockPreview from '../block-preview';
 import { store as blockEditorStore } from '../../store';
 
-const useGenericPreviewBlock = ( block, type ) =>
-	useMemo(
-		() =>
-			type.example
-				? getBlockFromExample( block.name, {
-						attributes: type.example.attributes,
-						innerBlocks: type.example.innerBlocks,
-				  } )
-				: cloneBlock( block ),
-		[ type.example ? block.name : block, type ]
-	);
+const EMPTY_OBJECT = {};
+
+function useGenericPreviewBlock( block, type ) {
+	return useMemo( () => {
+		const example = type?.example;
+		const blockName = type?.name;
+
+		if ( example && blockName ) {
+			return getBlockFromExample( blockName, {
+				attributes: example.attributes,
+				innerBlocks: example.innerBlocks,
+			} );
+		}
+
+		if ( block ) {
+			return cloneBlock( block );
+		}
+	}, [ type?.example ? block?.name : block, type ] );
+}
 
 function BlockStyles( {
 	clientId,
@@ -45,9 +53,14 @@ function BlockStyles( {
 } ) {
 	const selector = ( select ) => {
 		const { getBlock } = select( blockEditorStore );
-		const { getBlockStyles } = select( blocksStore );
 		const block = getBlock( clientId );
+
+		if ( ! block ) {
+			return EMPTY_OBJECT;
+		}
+
 		const blockType = getBlockType( block.name );
+		const { getBlockStyles } = select( blocksStore );
 		return {
 			block,
 			type: blockType,
@@ -90,6 +103,7 @@ function BlockStyles( {
 				return (
 					<BlockStyleItem
 						genericPreviewBlock={ genericPreviewBlock }
+						viewportWidth={ type.example?.viewportWidth ?? 500 }
 						className={ className }
 						isActive={ activeStyle === style }
 						key={ style.name }
@@ -114,6 +128,7 @@ function BlockStyles( {
 
 function BlockStyleItem( {
 	genericPreviewBlock,
+	viewportWidth,
 	style,
 	isActive,
 	onBlur,
@@ -152,7 +167,10 @@ function BlockStyleItem( {
 			aria-label={ style.label || style.name }
 		>
 			<div className="block-editor-block-styles__item-preview">
-				<BlockPreview viewportWidth={ 500 } blocks={ previewBlocks } />
+				<BlockPreview
+					viewportWidth={ viewportWidth }
+					blocks={ previewBlocks }
+				/>
 			</div>
 			<div className="block-editor-block-styles__item-label">
 				{ style.label || style.name }

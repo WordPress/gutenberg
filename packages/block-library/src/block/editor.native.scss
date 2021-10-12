@@ -1,7 +1,7 @@
 .titleContainer {
 	flex-direction: row;
 	align-items: center;
-	padding-bottom: 12;
+	padding-bottom: 28;
 }
 
 .title {
@@ -21,7 +21,7 @@
 	position: absolute;
 	left: -$block-selected-to-content + $block-selected-border-width;
 	right: -$block-selected-to-content + $block-selected-border-width;
-	bottom: 0;
+	bottom: 16;
 }
 
 .separatorDark {
@@ -92,6 +92,24 @@
 
 .infoTitleDark {
 	color: $white;
+}
+
+.infoDescription {
+	padding-bottom: 24;
+	font-size: 16;
+	color: $gray-darken-20;
+}
+
+.infoDescriptionDark {
+	color: $gray-20;
+}
+
+.actionButton {
+	color: $blue-50;
+}
+
+.actionButtonDark {
+	color: $blue-30;
 }
 
 .spinner {

@@ -27,7 +27,7 @@ if ( SelectedBlockCount > 1 ) {
 }
 ```
 
- _Note:_ In this example, we detect if more than one block is selected with `getSelectedBlockCount()` before using the `MultiSelectionInspector` component.
+_Note:_ In this example, we detect if more than one block is selected with `getSelectedBlockCount()` before using the `MultiSelectionInspector` component.
 
 ## Related components
 

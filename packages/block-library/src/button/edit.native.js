@@ -2,30 +2,36 @@
  * External dependencies
  */
 import { View, AccessibilityInfo, Platform, Text } from 'react-native';
+
 /**
  * WordPress dependencies
  */
-import { withInstanceId, compose } from '@wordpress/compose';
-import { __ } from '@wordpress/i18n';
+import { useCallback, useEffect, useState, useRef } from '@wordpress/element';
+import { useSelect, useDispatch } from '@wordpress/data';
+import { __, _x } from '@wordpress/i18n';
 import {
 	RichText,
-	withColors,
 	InspectorControls,
 	BlockControls,
-	withGradient,
 	store as blockEditorStore,
+	getColorObjectByAttributeValues,
+	getGradientValueBySlug,
+	__experimentalGetColorClassesAndStyles as getColorClassesAndStyles,
+	useSetting,
 } from '@wordpress/block-editor';
 import {
 	PanelBody,
-	RangeControl,
 	ToolbarGroup,
 	ToolbarButton,
 	LinkSettingsNavigation,
+	UnitControl,
+	getValueAndUnit,
 	BottomSheetSelectControl,
+	CSS_UNITS,
+	filterUnitsWithSettings,
 } from '@wordpress/components';
-import { Component } from '@wordpress/element';
-import { withSelect, withDispatch } from '@wordpress/data';
 import { link } from '@wordpress/icons';
+import { store as editPostStore } from '@wordpress/edit-post';
 
 /**
  * Internal dependencies
@@ -33,8 +39,6 @@ import { link } from '@wordpress/icons';
 import richTextStyle from './rich-text.scss';
 import styles from './editor.scss';
 import ColorBackground from './color-background';
-import ColorEdit from './color-edit';
-import getColorAndStyleProps from './color-props';
 
 const MIN_BORDER_RADIUS_VALUE = 0;
 const MAX_BORDER_RADIUS_VALUE = 50;
@@ -83,163 +87,207 @@ function WidthPanel( { selectedWidth, setAttributes } ) {
 	);
 }
 
-class ButtonEdit extends Component {
-	constructor( props ) {
-		super( props );
-		this.onChangeText = this.onChangeText.bind( this );
-		this.onChangeBorderRadius = this.onChangeBorderRadius.bind( this );
-		this.onClearSettings = this.onClearSettings.bind( this );
-		this.onLayout = this.onLayout.bind( this );
-		this.onSetMaxWidth = this.onSetMaxWidth.bind( this );
-		this.dismissSheet = this.dismissSheet.bind( this );
-		this.onShowLinkSettings = this.onShowLinkSettings.bind( this );
-		this.onHideLinkSettings = this.onHideLinkSettings.bind( this );
-		this.onToggleButtonFocus = this.onToggleButtonFocus.bind( this );
-		this.onPlaceholderTextWidth = this.onPlaceholderTextWidth.bind( this );
-		this.setRef = this.setRef.bind( this );
-		this.onRemove = this.onRemove.bind( this );
-		this.getPlaceholderWidth = this.getPlaceholderWidth.bind( this );
+function ButtonEdit( props ) {
+	const { isSelected, parentWidth } = props;
+	const initialBorderRadius = props?.attributes?.style?.border?.radius;
+	const { valueUnit = 'px' } = getValueAndUnit( initialBorderRadius ) || {};
 
-		this.state = {
-			maxWidth: INITIAL_MAX_WIDTH,
-			isLinkSheetVisible: false,
-			isButtonFocused: true,
-			placeholderTextWidth: 0,
-		};
+	const { editorSidebarOpened, numOfButtons } = useSelect(
+		( select ) => {
+			const { isEditorSidebarOpened } = select( editPostStore );
+			const { getBlockCount, getBlockRootClientId } = select(
+				blockEditorStore
+			);
+			const parentId = getBlockRootClientId( clientId );
+			const blockCount = getBlockCount( parentId );
+			const currentIsEditorSidebarOpened = isEditorSidebarOpened();
 
-		this.linkSettingsActions = [
-			{
-				label: __( 'Remove link' ),
-				onPress: this.onClearSettings,
-			},
-		];
+			return {
+				editorSidebarOpened: isSelected && currentIsEditorSidebarOpened,
+				numOfButtons: blockCount,
+			};
+		},
+		[ clientId, isSelected ]
+	);
 
-		this.linkSettingsOptions = {
-			url: {
-				label: __( 'Button Link URL' ),
-				placeholder: __( 'Add URL' ),
-				autoFocus: true,
-				autoFill: true,
-			},
-			openInNewTab: {
-				label: __( 'Open in new tab' ),
-			},
-			linkRel: {
-				label: __( 'Link Rel' ),
-				placeholder: __( 'None' ),
-			},
-		};
+	const { closeGeneralSidebar } = useDispatch( editPostStore );
+	const [ maxWidth, setMaxWidth ] = useState( INITIAL_MAX_WIDTH );
+	const [ isLinkSheetVisible, setIsLinkSheetVisible ] = useState( false );
+	const [ isButtonFocused, setIsButtonFocused ] = useState( true );
+	const [ placeholderTextWidth, setPlaceholderTextWidth ] = useState( 0 );
+	const [ borderRadiusUnit, setBorderRadiusUnit ] = useState( valueUnit );
 
-		this.noFocusLinkSettingOptions = {
-			...this.linkSettingsOptions,
-			url: {
-				...this.linkSettingsOptions.url,
-				autoFocus: false,
-			},
-		};
-	}
+	const richTextRef = useRef();
+	const colors = useSetting( 'color.palette' ) || [];
+	const gradients = useSetting( 'color.gradients' ) || [];
 
-	componentDidMount() {
-		this.onSetMaxWidth();
-	}
-
-	componentDidUpdate( prevProps, prevState ) {
-		const { isSelected, editorSidebarOpened, parentWidth } = this.props;
-		const { isLinkSheetVisible, isButtonFocused } = this.state;
-
-		if ( isSelected && ! prevProps.isSelected ) {
-			this.onToggleButtonFocus( true );
+	useEffect( () => {
+		if ( isSelected ) {
+			onToggleButtonFocus( true );
 		}
+	}, [ isSelected ] );
 
-		if ( prevProps.parentWidth !== parentWidth ) {
-			this.onSetMaxWidth( null, true );
-		}
+	useEffect( () => {
+		onSetMaxWidth( null, true );
+	}, [ parentWidth ] );
 
+	useEffect( () => {
 		// Blur `RichText` on Android when link settings sheet or button settings sheet is opened,
 		// to avoid flashing caret after closing one of them
-		if (
-			( ! prevProps.editorSidebarOpened && editorSidebarOpened ) ||
-			( ! prevState.isLinkSheetVisible && isLinkSheetVisible )
-		) {
-			if ( Platform.OS === 'android' && this.richTextRef ) {
-				this.richTextRef.blur();
-				this.onToggleButtonFocus( false );
+		if ( editorSidebarOpened || isLinkSheetVisible ) {
+			if ( Platform.OS === 'android' && richTextRef?.current ) {
+				richTextRef.current.blur();
+				onToggleButtonFocus( false );
 			}
 		}
+	}, [ editorSidebarOpened, isLinkSheetVisible ] );
 
-		if ( this.richTextRef ) {
+	useEffect( () => {
+		if ( richTextRef?.current ) {
 			if ( ! isSelected && isButtonFocused ) {
-				this.onToggleButtonFocus( false );
+				onToggleButtonFocus( false );
 			}
 
 			if ( isSelected && ! isButtonFocused ) {
 				AccessibilityInfo.isScreenReaderEnabled().then( ( enabled ) => {
 					if ( enabled ) {
-						this.onToggleButtonFocus( true );
-						this.richTextRef.focus();
+						onToggleButtonFocus( true );
+						richTextRef?.current.focus();
 					}
 				} );
 			}
 		}
-	}
+	}, [ isSelected, isButtonFocused ] );
 
-	getBackgroundColor() {
-		const { backgroundColor, attributes, gradientValue } = this.props;
-		const { customGradient } = attributes;
+	const linkSettingsActions = [
+		{
+			label: __( 'Remove link' ),
+			onPress: onClearSettings,
+		},
+	];
 
-		if ( customGradient || gradientValue ) {
-			return customGradient || gradientValue;
+	const linkSettingsOptions = {
+		url: {
+			label: __( 'Button Link URL' ),
+			placeholder: __( 'Add URL' ),
+			autoFocus: true,
+			autoFill: true,
+		},
+		openInNewTab: {
+			label: __( 'Open in new tab' ),
+		},
+		linkRel: {
+			label: __( 'Link Rel' ),
+			placeholder: _x( 'None', 'Link rel attribute value placeholder' ),
+		},
+	};
+
+	const noFocusLinkSettingOptions = {
+		...linkSettingsOptions,
+		url: {
+			...linkSettingsOptions.url,
+			autoFocus: false,
+		},
+	};
+
+	function getBackgroundColor() {
+		const { attributes, style } = props;
+		const { backgroundColor, gradient } = attributes;
+
+		// Return named gradient value if available.
+		const gradientValue = getGradientValueBySlug( gradients, gradient );
+
+		if ( gradientValue ) {
+			return gradientValue;
 		}
-		const colorAndStyleProps = getColorAndStyleProps( attributes );
+
+		const colorProps = getColorClassesAndStyles( attributes );
+
+		// Retrieve named color object to force inline styles for themes that
+		// do not load their color stylesheets in the editor.
+		const colorObject = getColorObjectByAttributeValues(
+			colors,
+			backgroundColor
+		);
+
 		return (
-			colorAndStyleProps.style?.backgroundColor ||
-			colorAndStyleProps.style?.background ||
-			// We still need the `backgroundColor.color` to support colors from the color pallete (not custom ones)
-			backgroundColor.color ||
+			colorObject?.color ||
+			colorProps.style?.backgroundColor ||
+			colorProps.style?.background ||
+			style?.backgroundColor ||
 			styles.defaultButton.backgroundColor
 		);
 	}
 
-	getTextColor() {
-		const { textColor, attributes } = this.props;
-		const colorAndStyleProps = getColorAndStyleProps( attributes );
+	function getTextColor() {
+		const { attributes, style } = props;
+		const colorProps = getColorClassesAndStyles( attributes );
+
+		// Retrieve named color object to force inline styles for themes that
+		// do not load their color stylesheets in the editor.
+		const colorObject = getColorObjectByAttributeValues(
+			colors,
+			attributes.textColor
+		);
 
 		return (
-			colorAndStyleProps.style?.color ||
-			// We still need the `textColor.color` to support colors from the color pallete (not custom ones)
-			textColor.color ||
+			colorObject?.color ||
+			colorProps.style?.color ||
+			style?.color ||
 			styles.defaultButton.color
 		);
 	}
 
-	onChangeText( value ) {
-		const { setAttributes } = this.props;
+	function onChangeText( value ) {
+		const { setAttributes } = props;
 		setAttributes( { text: value } );
 	}
 
-	onChangeBorderRadius( value ) {
-		const { setAttributes } = this.props;
-		setAttributes( {
-			borderRadius: value,
-		} );
+	function onChangeBorderRadius( newRadius ) {
+		const { setAttributes, attributes } = props;
+		const { style } = attributes;
+		const newStyle = getNewStyle( style, newRadius, borderRadiusUnit );
+
+		setAttributes( { style: newStyle } );
 	}
 
-	onShowLinkSettings() {
-		this.setState( { isLinkSheetVisible: true } );
+	function onChangeBorderRadiusUnit( newRadiusUnit ) {
+		const { setAttributes, attributes } = props;
+		const { style } = attributes;
+		const newBorderRadius = getBorderRadiusValue(
+			attributes?.style?.border?.radius
+		);
+		const newStyle = getNewStyle( style, newBorderRadius, newRadiusUnit );
+		setAttributes( { style: newStyle } );
+		setBorderRadiusUnit( newRadiusUnit );
 	}
 
-	onHideLinkSettings() {
-		this.setState( { isLinkSheetVisible: false } );
+	function getNewStyle( style, radius, radiusUnit ) {
+		return {
+			...style,
+			border: {
+				...style?.border,
+				radius: `${ radius }${ radiusUnit }`, // Store the value with the unit so that it works as expected.
+			},
+		};
 	}
 
-	onToggleButtonFocus( value ) {
-		if ( value !== this.state.isButtonFocused ) {
-			this.setState( { isButtonFocused: value } );
+	function onShowLinkSettings() {
+		setIsLinkSheetVisible( true );
+	}
+
+	function onHideLinkSettings() {
+		setIsLinkSheetVisible( false );
+	}
+
+	function onToggleButtonFocus( value ) {
+		if ( value !== isButtonFocused ) {
+			setIsButtonFocused( value );
 		}
 	}
 
-	onClearSettings() {
-		const { setAttributes } = this.props;
+	function onClearSettings() {
+		const { setAttributes } = props;
 
 		setAttributes( {
 			url: '',
@@ -247,35 +295,34 @@ class ButtonEdit extends Component {
 			linkTarget: '',
 		} );
 
-		this.onHideLinkSettings();
+		onHideLinkSettings();
 	}
 
-	onLayout( { nativeEvent } ) {
+	function onLayout( { nativeEvent } ) {
 		const { width } = nativeEvent.layout;
-		this.onSetMaxWidth( width );
+		onSetMaxWidth( width );
 	}
 
-	onSetMaxWidth( width, isParentWidthDidChange = false ) {
-		const { maxWidth } = this.state;
-		const { parentWidth } = this.props;
-		const { marginRight: spacing } = styles.defaultButton;
+	const onSetMaxWidth = useCallback(
+		( width, isParentWidthDidChange = false ) => {
+			const { marginRight: spacing } = styles.defaultButton;
 
-		const isParentWidthChanged = isParentWidthDidChange
-			? isParentWidthDidChange
-			: maxWidth !== parentWidth;
-		const isWidthChanged = maxWidth !== width;
+			const isParentWidthChanged = isParentWidthDidChange
+				? isParentWidthDidChange
+				: maxWidth !== parentWidth;
+			const isWidthChanged = maxWidth !== width;
 
-		if ( parentWidth && ! width && isParentWidthChanged ) {
-			this.setState( {
-				maxWidth: parentWidth - spacing,
-			} );
-		} else if ( ! parentWidth && width && isWidthChanged ) {
-			this.setState( { maxWidth: width - spacing } );
-		}
-	}
+			if ( parentWidth && ! width && isParentWidthChanged ) {
+				setMaxWidth( parentWidth - spacing );
+			} else if ( ! parentWidth && width && isWidthChanged ) {
+				setMaxWidth( width - spacing );
+			}
+		},
+		[ maxWidth, parentWidth ]
+	);
 
-	onRemove() {
-		const { numOfButtons, onDeleteBlock, onReplace } = this.props;
+	function onRemove() {
+		const { onDeleteBlock, onReplace } = props;
 
 		if ( numOfButtons === 1 ) {
 			onDeleteBlock();
@@ -284,236 +331,233 @@ class ButtonEdit extends Component {
 		}
 	}
 
-	dismissSheet() {
-		this.onHideLinkSettings();
-		this.props.closeSettingsBottomSheet();
+	function onPlaceholderTextWidth( { nativeEvent } ) {
+		const textWidth =
+			nativeEvent.lines[ 0 ] && nativeEvent.lines[ 0 ].width;
+
+		if ( textWidth && textWidth !== placeholderTextWidth ) {
+			setPlaceholderTextWidth( Math.min( textWidth, maxWidth ) );
+		}
 	}
 
-	getLinkSettings( isCompatibleWithSettings ) {
-		const { isLinkSheetVisible } = this.state;
-		const { attributes, setAttributes } = this.props;
+	const onSetRef = useCallback(
+		( ref ) => {
+			richTextRef.current = ref;
+		},
+		[ richTextRef ]
+	);
+
+	const onUnstableOnFocus = useCallback( () => {
+		onToggleButtonFocus( true );
+	}, [] );
+
+	const onBlur = useCallback( () => {
+		onSetMaxWidth();
+	}, [] );
+
+	function dismissSheet() {
+		onHideLinkSettings();
+		closeGeneralSidebar();
+	}
+
+	function getLinkSettings( isCompatibleWithSettings ) {
+		const { attributes, setAttributes } = props;
 		return (
 			<LinkSettingsNavigation
 				isVisible={ isLinkSheetVisible }
 				url={ attributes.url }
 				rel={ attributes.rel }
 				linkTarget={ attributes.linkTarget }
-				onClose={ this.dismissSheet }
+				onClose={ dismissSheet }
 				setAttributes={ setAttributes }
 				withBottomSheet={ ! isCompatibleWithSettings }
 				hasPicker
-				actions={ this.linkSettingsActions }
+				actions={ linkSettingsActions }
 				options={
 					isCompatibleWithSettings
-						? this.linkSettingsOptions
-						: this.noFocusLinkSettingOptions
+						? linkSettingsOptions
+						: noFocusLinkSettingOptions
 				}
 				showIcon={ ! isCompatibleWithSettings }
 			/>
 		);
 	}
 
-	setRef( richText ) {
-		this.richTextRef = richText;
-	}
-
 	// Render `Text` with `placeholderText` styled as a placeholder
 	// to calculate its width which then is set as a `minWidth`
-	getPlaceholderWidth( placeholderText ) {
+	function getPlaceholderWidth( placeholderText ) {
 		return (
 			<Text
 				style={ styles.placeholder }
-				onTextLayout={ this.onPlaceholderTextWidth }
+				onTextLayout={ onPlaceholderTextWidth }
 			>
 				{ placeholderText }
 			</Text>
 		);
 	}
 
-	onPlaceholderTextWidth( { nativeEvent } ) {
-		const { maxWidth, placeholderTextWidth } = this.state;
-		const textWidth =
-			nativeEvent.lines[ 0 ] && nativeEvent.lines[ 0 ].width;
-
-		if ( textWidth && textWidth !== placeholderTextWidth ) {
-			this.setState( {
-				placeholderTextWidth: Math.min( textWidth, maxWidth ),
-			} );
+	function getBorderRadiusValue( currentBorderRadius, defaultBorderRadius ) {
+		const valueAndUnit = getValueAndUnit( currentBorderRadius );
+		if ( Number.isInteger( parseInt( valueAndUnit?.valueToConvert ) ) ) {
+			return parseFloat( valueAndUnit.valueToConvert );
 		}
+		return defaultBorderRadius;
 	}
 
-	render() {
-		const {
-			attributes,
-			isSelected,
-			clientId,
-			onReplace,
-			mergeBlocks,
-			parentWidth,
-			setAttributes,
-		} = this.props;
-		const {
-			placeholder,
-			text,
-			borderRadius,
-			url,
-			align = 'center',
-			width,
-		} = attributes;
-		const { maxWidth, isButtonFocused, placeholderTextWidth } = this.state;
-		const { paddingTop: spacing, borderWidth } = styles.defaultButton;
+	const {
+		attributes,
+		clientId,
+		onReplace,
+		mergeBlocks,
+		setAttributes,
+		style,
+	} = props;
+	const {
+		placeholder,
+		text,
+		style: buttonStyle,
+		url,
+		align = 'center',
+		width,
+	} = attributes;
+	const { paddingTop: spacing, borderWidth } = styles.defaultButton;
 
-		if ( parentWidth === 0 ) {
-			return null;
-		}
+	if ( parentWidth === 0 ) {
+		return null;
+	}
 
-		const borderRadiusValue = Number.isInteger( borderRadius )
-			? borderRadius
-			: styles.defaultButton.borderRadius;
-		const outlineBorderRadius =
-			borderRadiusValue > 0
-				? borderRadiusValue + spacing + borderWidth
-				: 0;
+	const currentBorderRadius = buttonStyle?.border?.radius;
+	const borderRadiusValue = getBorderRadiusValue(
+		currentBorderRadius,
+		styles.defaultButton.borderRadius
+	);
 
-		// To achieve proper expanding and shrinking `RichText` on iOS, there is a need to set a `minWidth`
-		// value at least on 1 when `RichText` is focused or when is not focused, but `RichText` value is
-		// different than empty string.
-		let minWidth =
-			isButtonFocused || ( ! isButtonFocused && text && text !== '' )
-				? MIN_WIDTH
-				: placeholderTextWidth;
-		if ( width ) {
-			// Set the width of the button.
-			minWidth = Math.floor(
-				maxWidth * ( width / 100 ) - MIN_WIDTH_MARGINS[ width ]
-			);
-		}
-		// To achieve proper expanding and shrinking `RichText` on Android, there is a need to set
-		// a `placeholder` as an empty string when `RichText` is focused,
-		// because `AztecView` is calculating a `minWidth` based on placeholder text.
-		const placeholderText =
-			isButtonFocused || ( ! isButtonFocused && text && text !== '' )
-				? ''
-				: placeholder || __( 'Add text…' );
+	const buttonBorderRadiusValue =
+		borderRadiusUnit === 'px' || borderRadiusUnit === '%'
+			? borderRadiusValue
+			: Math.floor( 14 * borderRadiusValue ); // lets assume that the font size is set to 14px; TO get a nicer preview.
+	const outlineBorderRadius =
+		buttonBorderRadiusValue > 0
+			? buttonBorderRadiusValue + spacing + borderWidth
+			: 0;
 
-		const backgroundColor = this.getBackgroundColor();
-		const textColor = this.getTextColor();
-
-		return (
-			<View onLayout={ this.onLayout }>
-				{ this.getPlaceholderWidth( placeholderText ) }
-				<ColorBackground
-					borderRadiusValue={ borderRadiusValue }
-					backgroundColor={ backgroundColor }
-					isSelected={ isSelected }
-				>
-					{ isSelected && (
-						<View
-							pointerEvents="none"
-							style={ [
-								styles.outline,
-								{
-									borderRadius: outlineBorderRadius,
-									borderColor: backgroundColor,
-								},
-							] }
-						/>
-					) }
-					<RichText
-						setRef={ this.setRef }
-						placeholder={ placeholderText }
-						value={ text }
-						onChange={ this.onChangeText }
-						style={ {
-							...richTextStyle.richText,
-							color: textColor,
-						} }
-						textAlign={ align }
-						placeholderTextColor={
-							styles.placeholderTextColor.color
-						}
-						identifier="text"
-						tagName="p"
-						minWidth={ minWidth } // The minimum Button size.
-						maxWidth={ maxWidth } // The width of the screen.
-						id={ clientId }
-						isSelected={ isButtonFocused }
-						withoutInteractiveFormatting
-						unstableOnFocus={ () =>
-							this.onToggleButtonFocus( true )
-						}
-						__unstableMobileNoFocusOnMount={ ! isSelected }
-						selectionColor={ textColor }
-						onBlur={ () => {
-							this.onSetMaxWidth();
-						} }
-						onReplace={ onReplace }
-						onRemove={ this.onRemove }
-						onMerge={ mergeBlocks }
-					/>
-				</ColorBackground>
-
-				{ isSelected && (
-					<>
-						<BlockControls>
-							<ToolbarGroup>
-								<ToolbarButton
-									title={ __( 'Edit link' ) }
-									icon={ link }
-									onClick={ this.onShowLinkSettings }
-									isActive={ url }
-								/>
-							</ToolbarGroup>
-						</BlockControls>
-						{ this.getLinkSettings( false ) }
-						<ColorEdit { ...this.props } />
-						<InspectorControls>
-							<PanelBody title={ __( 'Border Settings' ) }>
-								<RangeControl
-									label={ __( 'Border Radius' ) }
-									minimumValue={ MIN_BORDER_RADIUS_VALUE }
-									maximumValue={ MAX_BORDER_RADIUS_VALUE }
-									value={ borderRadiusValue }
-									onChange={ this.onChangeBorderRadius }
-								/>
-							</PanelBody>
-							<WidthPanel
-								selectedWidth={ width }
-								setAttributes={ setAttributes }
-							/>
-							<PanelBody title={ __( 'Link Settings' ) }>
-								{ this.getLinkSettings( true ) }
-							</PanelBody>
-						</InspectorControls>
-					</>
-				) }
-			</View>
+	// To achieve proper expanding and shrinking `RichText` on iOS, there is a need to set a `minWidth`
+	// value at least on 1 when `RichText` is focused or when is not focused, but `RichText` value is
+	// different than empty string.
+	let minWidth =
+		isButtonFocused || ( ! isButtonFocused && text && text !== '' )
+			? MIN_WIDTH
+			: placeholderTextWidth;
+	if ( width ) {
+		// Set the width of the button.
+		minWidth = Math.floor(
+			maxWidth * ( width / 100 ) - MIN_WIDTH_MARGINS[ width ]
 		);
 	}
+	// To achieve proper expanding and shrinking `RichText` on Android, there is a need to set
+	// a `placeholder` as an empty string when `RichText` is focused,
+	// because `AztecView` is calculating a `minWidth` based on placeholder text.
+	const placeholderText =
+		isButtonFocused || ( ! isButtonFocused && text && text !== '' )
+			? ''
+			: placeholder || __( 'Add text…' );
+
+	const backgroundColor = getBackgroundColor();
+	const textColor = getTextColor();
+	const isFixedWidth = !! width;
+	const outLineStyles = [
+		styles.outline,
+		{
+			borderRadius: outlineBorderRadius,
+			borderColor: backgroundColor,
+		},
+	];
+	const textStyles = {
+		...richTextStyle.richText,
+		paddingLeft: isFixedWidth ? 0 : richTextStyle.richText.paddingLeft,
+		paddingRight: isFixedWidth ? 0 : richTextStyle.richText.paddingRight,
+		color: textColor,
+	};
+
+	return (
+		<View onLayout={ onLayout }>
+			{ getPlaceholderWidth( placeholderText ) }
+			<ColorBackground
+				borderRadiusValue={ buttonBorderRadiusValue }
+				backgroundColor={ backgroundColor }
+				isSelected={ isSelected }
+			>
+				{ isSelected && (
+					<View pointerEvents="none" style={ outLineStyles } />
+				) }
+				<RichText
+					setRef={ onSetRef }
+					placeholder={ placeholderText }
+					value={ text }
+					onChange={ onChangeText }
+					style={ textStyles }
+					textAlign={ align }
+					placeholderTextColor={
+						style?.color || styles.placeholderTextColor.color
+					}
+					identifier="text"
+					tagName="p"
+					minWidth={ minWidth } // The minimum Button size.
+					maxWidth={ isFixedWidth ? minWidth : maxWidth } // The width of the screen.
+					id={ clientId }
+					isSelected={ isButtonFocused }
+					withoutInteractiveFormatting
+					unstableOnFocus={ onUnstableOnFocus }
+					__unstableMobileNoFocusOnMount={ ! isSelected }
+					selectionColor={ textColor }
+					onBlur={ onBlur }
+					onReplace={ onReplace }
+					onRemove={ onRemove }
+					onMerge={ mergeBlocks }
+				/>
+			</ColorBackground>
+
+			{ isSelected && (
+				<>
+					<BlockControls>
+						<ToolbarGroup>
+							<ToolbarButton
+								title={ __( 'Edit link' ) }
+								icon={ link }
+								onClick={ onShowLinkSettings }
+								isActive={ url }
+							/>
+						</ToolbarGroup>
+					</BlockControls>
+					{ getLinkSettings( false ) }
+					<InspectorControls>
+						<PanelBody title={ __( 'Border Settings' ) }>
+							<UnitControl
+								label={ __( 'Border Radius' ) }
+								min={ MIN_BORDER_RADIUS_VALUE }
+								max={ MAX_BORDER_RADIUS_VALUE }
+								value={ borderRadiusValue }
+								onChange={ onChangeBorderRadius }
+								onUnitChange={ onChangeBorderRadiusUnit }
+								unit={ borderRadiusUnit }
+								units={ filterUnitsWithSettings(
+									[ 'px', 'em', 'rem' ],
+									CSS_UNITS
+								) }
+							/>
+						</PanelBody>
+						<WidthPanel
+							selectedWidth={ width }
+							setAttributes={ setAttributes }
+						/>
+						<PanelBody title={ __( 'Link Settings' ) }>
+							{ getLinkSettings( true ) }
+						</PanelBody>
+					</InspectorControls>
+				</>
+			) }
+		</View>
+	);
 }
 
-export default compose( [
-	withInstanceId,
-	withGradient,
-	withColors( 'backgroundColor', { textColor: 'color' } ),
-	withSelect( ( select, { clientId, isSelected } ) => {
-		const { isEditorSidebarOpened } = select( 'core/edit-post' );
-		const { getBlockCount, getBlockRootClientId } = select(
-			blockEditorStore
-		);
-		const parentId = getBlockRootClientId( clientId );
-		const numOfButtons = getBlockCount( parentId );
-
-		return {
-			editorSidebarOpened: isSelected && isEditorSidebarOpened(),
-			numOfButtons,
-		};
-	} ),
-	withDispatch( ( dispatch ) => {
-		return {
-			closeSettingsBottomSheet() {
-				dispatch( 'core/edit-post' ).closeGeneralSidebar();
-			},
-		};
-	} ),
-] )( ButtonEdit );
+export default ButtonEdit;

@@ -16,7 +16,7 @@ import { Platform } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import { InspectorControls, InspectorAdvancedControls } from '../components';
+import { InspectorControls } from '../components';
 
 /**
  * Regular expression matching invalid anchor characters for replacement.
@@ -79,19 +79,19 @@ export const withInspectorControl = createHigherOrderComponent(
 									'Enter a word or two — without spaces — to make a unique web address just for this block, called an “anchor.” Then, you’ll be able to link directly to this section of your page.'
 								) }
 
-								<ExternalLink
-									href={
-										__( 'https://wordpress.org/support/article/page-jumps/' )
-									}
-								>
-									{ __( 'Learn more about anchors' ) }
-								</ExternalLink>
+								{ isWeb && (
+									<ExternalLink
+										href={
+											__( 'https://wordpress.org/support/article/page-jumps/' )
+										}
+									>
+										{ __( 'Learn more about anchors' ) }
+									</ExternalLink>
+								) }
 							</>
 						}
 						value={ props.attributes.anchor || '' }
-						valuePlaceholder={
-							! isWeb ? __( 'Add an anchor' ) : null
-						}
+						placeholder={ ! isWeb ? __( 'Add an anchor' ) : null }
 						onChange={ ( nextValue ) => {
 							nextValue = nextValue.replace( ANCHOR_REGEX, '-' );
 							props.setAttributes( {
@@ -107,9 +107,9 @@ export const withInspectorControl = createHigherOrderComponent(
 					<>
 						<BlockEdit { ...props } />
 						{ isWeb && (
-							<InspectorAdvancedControls>
+							<InspectorControls __experimentalGroup="advanced">
 								{ textControl }
-							</InspectorAdvancedControls>
+							</InspectorControls>
 						) }
 						{ /*
 						 * We plan to remove scoping anchors to 'core/heading' to support

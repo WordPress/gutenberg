@@ -29,11 +29,11 @@ describe( 'NavigationToggle', () => {
 		it( 'should display a user uploaded site icon if it exists', () => {
 			useSelect.mockImplementation( ( cb ) => {
 				return cb( () => ( {
-					isResolving: () => false,
-					isFeatureActive: () => true,
+					getCurrentTemplateNavigationPanelSubMenu: () => 'root',
 					getEntityRecord: () => ( {
 						site_icon_url: 'https://fakeUrl.com',
 					} ),
+					isResolving: () => false,
 				} ) );
 			} );
 
@@ -48,11 +48,11 @@ describe( 'NavigationToggle', () => {
 		it( 'should display a default site icon if no user uploaded site icon exists', () => {
 			useSelect.mockImplementation( ( cb ) => {
 				return cb( () => ( {
-					isResolving: () => false,
-					isFeatureActive: () => true,
+					getCurrentTemplateNavigationPanelSubMenu: () => 'root',
 					getEntityRecord: () => ( {
 						site_icon_url: '',
 					} ),
+					isResolving: () => false,
 				} ) );
 			} );
 

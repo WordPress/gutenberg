@@ -1,7 +1,0 @@
-.components-flex.example-only-show-outline {
-	box-shadow: 0 0 0 1px pink;
-}
-
-.components-flex.example-only-show-outline > * {
-	box-shadow: 0 0 0 1px pink;
-}

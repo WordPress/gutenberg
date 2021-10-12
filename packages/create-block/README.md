@@ -90,10 +90,10 @@ $ npm run build
 Builds the code for production. [Learn more](/packages/scripts#build).
 
 ```bash
-$ npm run format:js
+$ npm run format
 ```
 
-Formats JavaScript files. [Learn more](/packages/scripts#format-js).
+Formats files. [Learn more](/packages/scripts#format).
 
 ```bash
 $ npm run lint:css
@@ -177,7 +177,7 @@ The following configurable variables are used with the template files. Template 
 -   `title` (no default) - a display title for your block.
 -   `description` (no default) - a short description for your block.
 -   `dashicon` (no default) - an icon property thats makes it easier to identify a block, see https://developer.wordpress.org/resource/dashicons/.
--   `category` (default: `'widgets'`) - blocks are grouped into categories to help users browse and discover them. The categories provided by core are `text`, `media`, `design`, `widgets`, and `embed`.
+-   `category` (default: `'widgets'`) - blocks are grouped into categories to help users browse and discover them. The categories provided by core are `text`, `media`, `design`, `widgets`, `theme`, and `embed`.
 -   `attributes` (no default) - see https://developer.wordpress.org/block-editor/developers/block-api/block-attributes/.
 -   `supports` (no default) - optional block extended support features, see https://developer.wordpress.org/block-editor/developers/block-api/block-supports/.
 -   `author` (default: `'The WordPress Contributors'`)
@@ -190,9 +190,5 @@ The following configurable variables are used with the template files. Template 
 -   `editorScript` (default: `'file:./build/index.js'`)
 -   `editorStyle` (default: `'file:./build/index.css'`)
 -   `style` (default: `'file:./build/style-index.css'`)
-
-## WP-CLI
-
-Another way of making a developer’s life easier is to use [WP-CLI](https://wp-cli.org), which provides a command-line interface for many actions you might perform on the WordPress instance. One of the commands `wp scaffold block` was used as the baseline for this tool and ES5 template in particular.
 
 <br/><br/><p align="center"><img src="https://s.w.org/style/images/codeispoetry.png?1" alt="Code is Poetry." /></p>

@@ -12,10 +12,7 @@ var color = '';
 sprintf( __( 'Color: %s' ), color );
 
 var address = '';
-sprintf(
-	__( 'Address: %s' ),
-	address
-);
+sprintf( __( 'Address: %s' ), address );
 
 // translators: %s: Name
 var name = '';
@@ -33,6 +30,6 @@ var address = '';
 sprintf(
 	// translators: %s: Address.
 	__( 'Address: %s' ),
-	address,
+	address
 );
 ```

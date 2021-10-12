@@ -1,18 +1,15 @@
 /**
- * External dependencies
- */
-import { groupBy, sortBy } from 'lodash';
-
-/**
  * WordPress dependencies
  */
-import { parse, createBlock } from '@wordpress/blocks';
+import { createBlock } from '@wordpress/blocks';
+import { store as coreStore } from '@wordpress/core-data';
 
 /**
  * Internal dependencies
  */
-import { resolveMenuItems, dispatch } from './controls';
-import { KIND, POST_TYPE, buildNavigationPostId } from './utils';
+import { NAVIGATION_POST_KIND, NAVIGATION_POST_POST_TYPE } from '../constants';
+import { buildNavigationPostId, menuItemsQuery } from './utils';
+import { menuItemsToBlocks } from './transform';
 
 /**
  * Creates a "stub" navigation post reflecting the contents of menu with id=menuId. The
@@ -24,36 +21,40 @@ import { KIND, POST_TYPE, buildNavigationPostId } from './utils';
  * @param {number} menuId The id of menu to create a post from
  * @return {void}
  */
-export function* getNavigationPostForMenu( menuId ) {
+export const getNavigationPostForMenu = ( menuId ) => async ( {
+	registry,
+	dispatch,
+} ) => {
 	if ( ! menuId ) {
 		return;
 	}
 
 	const stubPost = createStubPost( menuId );
 	// Persist an empty post to warm up the state
-	yield persistPost( stubPost );
+	dispatch( persistPost( stubPost ) );
 
 	// Dispatch startResolution to skip the execution of the real getEntityRecord resolver - it would
 	// issue an http request and fail.
-	const args = [ KIND, POST_TYPE, stubPost.id ];
-	yield dispatch( 'core', 'startResolution', 'getEntityRecord', args );
+	const args = [
+		NAVIGATION_POST_KIND,
+		NAVIGATION_POST_POST_TYPE,
+		stubPost.id,
+	];
+	registry.dispatch( coreStore ).startResolution( 'getEntityRecord', args );
 
 	// Now let's create a proper one hydrated using actual menu items
-	const menuItems = yield resolveMenuItems( menuId );
-	const [ navigationBlock, menuItemIdToClientId ] = createNavigationBlock(
-		menuItems
-	);
-	yield {
-		type: 'SET_MENU_ITEM_TO_CLIENT_ID_MAPPING',
-		postId: stubPost.id,
-		mapping: menuItemIdToClientId,
-	};
+	const menuItems = await registry
+		.resolveSelect( coreStore )
+		.getMenuItems( menuItemsQuery( menuId ) );
+
+	const navigationBlock = createNavigationBlock( menuItems );
 	// Persist the actual post containing the navigation block
-	yield persistPost( createStubPost( menuId, navigationBlock ) );
+	const builtPost = createStubPost( menuId, navigationBlock );
+	dispatch( persistPost( builtPost ) );
 
 	// Dispatch finishResolution to conclude startResolution dispatched earlier
-	yield dispatch( 'core', 'finishResolution', 'getEntityRecord', args );
-}
+	registry.dispatch( coreStore ).finishResolution( 'getEntityRecord', args );
+};
 
 const createStubPost = ( menuId, navigationBlock = null ) => {
 	const id = buildNavigationPostId( menuId );
@@ -69,16 +70,17 @@ const createStubPost = ( menuId, navigationBlock = null ) => {
 	};
 };
 
-const persistPost = ( post ) =>
-	dispatch(
-		'core',
-		'receiveEntityRecords',
-		KIND,
-		POST_TYPE,
-		post,
-		{ id: post.id },
-		false
-	);
+const persistPost = ( post ) => ( { registry } ) => {
+	registry
+		.dispatch( coreStore )
+		.receiveEntityRecords(
+			NAVIGATION_POST_KIND,
+			NAVIGATION_POST_POST_TYPE,
+			post,
+			{ id: post.id },
+			false
+		);
+};
 
 /**
  * Converts an adjacency list of menuItems into a navigation block.
@@ -87,62 +89,13 @@ const persistPost = ( post ) =>
  * @return {Object} Navigation block
  */
 function createNavigationBlock( menuItems ) {
-	const itemsByParentID = groupBy( menuItems, 'parent' );
-	const menuItemIdToClientId = {};
-	const menuItemsToTreeOfBlocks = ( items ) => {
-		const innerBlocks = [];
-		if ( ! items ) {
-			return;
-		}
+	const innerBlocks = menuItemsToBlocks( menuItems );
 
-		const sortedItems = sortBy( items, 'menu_order' );
-		for ( const item of sortedItems ) {
-			let menuItemInnerBlocks = [];
-			if ( itemsByParentID[ item.id ]?.length ) {
-				menuItemInnerBlocks = menuItemsToTreeOfBlocks(
-					itemsByParentID[ item.id ]
-				);
-			}
-			const block = convertMenuItemToBlock( item, menuItemInnerBlocks );
-			menuItemIdToClientId[ item.id ] = block.clientId;
-			innerBlocks.push( block );
-		}
-		return innerBlocks;
-	};
-
-	// menuItemsToTreeOfBlocks takes an array of top-level menu items and recursively creates all their innerBlocks
-	const innerBlocks = menuItemsToTreeOfBlocks( itemsByParentID[ 0 ] || [] );
-	const navigationBlock = createBlock(
+	return createBlock(
 		'core/navigation',
 		{
 			orientation: 'vertical',
 		},
 		innerBlocks
 	);
-	return [ navigationBlock, menuItemIdToClientId ];
-}
-
-function convertMenuItemToBlock( menuItem, innerBlocks = [] ) {
-	if ( menuItem.type === 'block' ) {
-		const [ block ] = parse( menuItem.content.raw );
-
-		if ( ! block ) {
-			return createBlock( 'core/freeform', {
-				originalContent: menuItem.content.raw,
-			} );
-		}
-
-		return createBlock( block.name, block.attributes, innerBlocks );
-	}
-
-	const attributes = {
-		label: menuItem.title.rendered,
-		url: menuItem.url,
-		title: menuItem.attr_title,
-		className: menuItem.classes.join( ' ' ),
-		description: menuItem.description,
-		rel: menuItem.xfn.join( ' ' ),
-	};
-
-	return createBlock( 'core/navigation-link', attributes, innerBlocks );
 }

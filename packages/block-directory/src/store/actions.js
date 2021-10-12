@@ -2,15 +2,14 @@
  * WordPress dependencies
  */
 import { store as blocksStore } from '@wordpress/blocks';
-import { __ } from '@wordpress/i18n';
-import { controls } from '@wordpress/data';
-import { apiFetch } from '@wordpress/data-controls';
+import { __, sprintf } from '@wordpress/i18n';
+import apiFetch from '@wordpress/api-fetch';
 import { store as noticesStore } from '@wordpress/notices';
 
 /**
  * Internal dependencies
  */
-import { loadAssets } from './controls';
+import { loadAssets } from './load-assets';
 import getPluginUrl from './utils/get-plugin-url';
 
 /**
@@ -49,53 +48,59 @@ export function receiveDownloadableBlocks( downloadableBlocks, filterValue ) {
  *
  * @return {boolean} Whether the block was successfully installed & loaded.
  */
-export function* installBlockType( block ) {
-	const { id, assets } = block;
+export const installBlockType = ( block ) => async ( {
+	registry,
+	dispatch,
+} ) => {
+	const { id } = block;
 	let success = false;
-	yield clearErrorNotice( id );
+	dispatch.clearErrorNotice( id );
 	try {
-		yield setIsInstalling( block.id, true );
+		dispatch.setIsInstalling( id, true );
 
 		// If we have a wp:plugin link, the plugin is installed but inactive.
 		const url = getPluginUrl( block );
 		let links = {};
 		if ( url ) {
-			yield apiFetch( {
-				url,
-				data: {
-					status: 'active',
-				},
+			await apiFetch( {
 				method: 'PUT',
+				url,
+				data: { status: 'active' },
 			} );
 		} else {
-			const response = yield apiFetch( {
-				path: 'wp/v2/plugins',
-				data: {
-					slug: block.id,
-					status: 'active',
-				},
+			const response = await apiFetch( {
 				method: 'POST',
+				path: 'wp/v2/plugins',
+				data: { slug: id, status: 'active' },
 			} );
 			// Add the `self` link for newly-installed blocks.
 			links = response._links;
 		}
 
-		yield addInstalledBlockType( {
+		dispatch.addInstalledBlockType( {
 			...block,
 			links: { ...block.links, ...links },
 		} );
 
-		yield loadAssets( assets );
-		const registeredBlocks = yield controls.select(
-			blocksStore.name,
-			'getBlockTypes'
-		);
+		await loadAssets();
+		const registeredBlocks = registry.select( blocksStore ).getBlockTypes();
 		if ( ! registeredBlocks.some( ( i ) => i.name === block.name ) ) {
 			throw new Error(
 				__( 'Error registering block. Try reloading the page.' )
 			);
 		}
 
+		registry.dispatch( noticesStore ).createInfoNotice(
+			sprintf(
+				// translators: %s is the block title.
+				__( 'Block %s installed and added.' ),
+				block.title
+			),
+			{
+				speak: true,
+				type: 'snackbar',
+			}
+		);
 		success = true;
 	} catch ( error ) {
 		let message = error.message || __( 'An error occurred.' );
@@ -118,39 +123,43 @@ export function* installBlockType( block ) {
 			message = fatalAPIErrors[ error.code ];
 		}
 
-		yield setErrorNotice( id, message, isFatal );
+		dispatch.setErrorNotice( id, message, isFatal );
+		registry.dispatch( noticesStore ).createErrorNotice( message, {
+			speak: true,
+			isDismissible: true,
+		} );
 	}
-	yield setIsInstalling( block.id, false );
+	dispatch.setIsInstalling( id, false );
 	return success;
-}
+};
 
 /**
  * Action triggered to uninstall a block plugin.
  *
  * @param {Object} block The blockType object.
  */
-export function* uninstallBlockType( block ) {
+export const uninstallBlockType = ( block ) => async ( {
+	registry,
+	dispatch,
+} ) => {
 	try {
-		yield apiFetch( {
-			url: getPluginUrl( block ),
-			data: {
-				status: 'inactive',
-			},
+		const url = getPluginUrl( block );
+		await apiFetch( {
 			method: 'PUT',
+			url,
+			data: { status: 'inactive' },
 		} );
-		yield apiFetch( {
-			url: getPluginUrl( block ),
+		await apiFetch( {
 			method: 'DELETE',
+			url,
 		} );
-		yield removeInstalledBlockType( block );
+		dispatch.removeInstalledBlockType( block );
 	} catch ( error ) {
-		yield controls.dispatch(
-			noticesStore,
-			'createErrorNotice',
-			error.message || __( 'An error occurred.' )
-		);
+		registry
+			.dispatch( noticesStore )
+			.createErrorNotice( error.message || __( 'An error occurred.' ) );
 	}
-}
+};
 
 /**
  * Returns an action object used to add a block type to the "newly installed"
@@ -185,7 +194,7 @@ export function removeInstalledBlockType( item ) {
 /**
  * Returns an action object used to indicate install in progress.
  *
- * @param {string} blockId
+ * @param {string}  blockId
  * @param {boolean} isInstalling
  *
  * @return {Object} Action object.
@@ -201,8 +210,8 @@ export function setIsInstalling( blockId, isInstalling ) {
 /**
  * Sets an error notice to be displayed to the user for a given block.
  *
- * @param {string} blockId  The ID of the block plugin. eg: my-block
- * @param {string} message  The message shown in the notice.
+ * @param {string}  blockId The ID of the block plugin. eg: my-block
+ * @param {string}  message The message shown in the notice.
  * @param {boolean} isFatal Whether the user can recover from the error.
  *
  * @return {Object} Action object.

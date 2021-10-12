@@ -43,6 +43,7 @@ class TokenFieldWrapper extends Component {
 				value={ this.state.tokens }
 				displayTransform={ unescapeAndFormatSpaces }
 				onChange={ this.onTokensChange }
+				{ ...this.props }
 			/>
 		);
 	}

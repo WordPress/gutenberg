@@ -30,4 +30,4 @@ ToolbarGroup will pass all HTML props to the underlying element.
 
 ## Related components
 
-* ToolbarGroup may contain [ToolbarButton](/packages/components/src/toolbar-button/README.md) and [ToolbarItem](/packages/components/src/toolbar-Item/README.md) as children.
+-   ToolbarGroup may contain [ToolbarButton](/packages/components/src/toolbar-button/README.md) and [ToolbarItem](/packages/components/src/toolbar-Item/README.md) as children.

@@ -1,0 +1,35 @@
+.edit-post-template__modal {
+	.components-base-control {
+		@include break-medium() {
+			width: $grid-unit * 40;
+		}
+	}
+
+	.components-modal__header {
+		border-bottom: none;
+	}
+
+	.components-modal__content::before {
+		margin-bottom: $grid-unit-05;
+	}
+}
+
+.edit-post-template__modal-actions {
+	margin-top: $grid-unit-15;
+}
+
+.edit-post-template-modal__tip {
+	padding: $grid-unit-20 $grid-unit-30;
+	background: $gray-100;
+	border-radius: $radius-block-ui;
+
+	@include break-medium() {
+		width: $grid-unit * 30;
+	}
+}
+
+.edit-post-template__actions {
+	button:not(:last-child) {
+		margin-right: $grid-unit-10;
+	}
+}

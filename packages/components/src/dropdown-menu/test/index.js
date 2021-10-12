@@ -73,7 +73,6 @@ describe( 'DropdownMenu', () => {
 			button.focus();
 			fireEvent.keyDown( button, {
 				keyCode: DOWN,
-				stopPropagation: () => {},
 				preventDefault: () => {},
 			} );
 			const menu = getNavigableMenu( dropdownMenuContainer );
@@ -95,7 +94,6 @@ describe( 'DropdownMenu', () => {
 			button.focus();
 			fireEvent.keyDown( button, {
 				keyCode: DOWN,
-				stopPropagation: () => {},
 				preventDefault: () => {},
 			} );
 

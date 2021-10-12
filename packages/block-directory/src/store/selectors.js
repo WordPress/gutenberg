@@ -18,13 +18,7 @@ import hasBlockType from './utils/has-block-type';
  * @return {boolean} Whether a request is in progress for the blocks list.
  */
 export function isRequestingDownloadableBlocks( state, filterValue ) {
-	if (
-		! state.downloadableBlocks[ filterValue ] ||
-		! state.downloadableBlocks[ filterValue ].isRequesting
-	) {
-		return false;
-	}
-	return state.downloadableBlocks[ filterValue ].isRequesting;
+	return state.downloadableBlocks[ filterValue ]?.isRequesting ?? false;
 }
 
 /**
@@ -36,13 +30,7 @@ export function isRequestingDownloadableBlocks( state, filterValue ) {
  * @return {Array} Downloadable blocks.
  */
 export function getDownloadableBlocks( state, filterValue ) {
-	if (
-		! state.downloadableBlocks[ filterValue ] ||
-		! state.downloadableBlocks[ filterValue ].results
-	) {
-		return [];
-	}
-	return state.downloadableBlocks[ filterValue ].results;
+	return state.downloadableBlocks[ filterValue ]?.results ?? [];
 }
 
 /**

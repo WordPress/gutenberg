@@ -1,4 +1,9 @@
 /**
+ * WordPress dependencies
+ */
+import { store as coreDataStore } from '@wordpress/core-data';
+
+/**
  * Internal dependencies
  */
 import {
@@ -8,10 +13,13 @@ import {
 	getHomeTemplateId,
 	getEditedPostType,
 	getEditedPostId,
+	getPreviousEditedPostType,
+	getPreviousEditedPostId,
 	getPage,
 	getNavigationPanelActiveMenu,
 	isNavigationOpened,
 	isInserterOpened,
+	isListViewOpened,
 } from '../selectors';
 
 describe( 'selectors', () => {
@@ -70,7 +78,7 @@ describe( 'selectors', () => {
 			expect( getCanUserCreateMedia() ).toBe( true );
 			expect(
 				getCanUserCreateMedia.registry.select
-			).toHaveBeenCalledWith( 'core' );
+			).toHaveBeenCalledWith( coreDataStore );
 			expect( canUser ).toHaveBeenCalledWith( 'create', 'media' );
 		} );
 	} );
@@ -120,22 +128,51 @@ describe( 'selectors', () => {
 
 	describe( 'getEditedPostId', () => {
 		it( 'returns the template ID', () => {
-			const state = { editedPost: { id: 10 } };
+			const state = { editedPost: [ { id: 10 } ] };
 			expect( getEditedPostId( state ) ).toBe( 10 );
 		} );
 	} );
 
 	describe( 'getEditedPostType', () => {
 		it( 'returns the template type', () => {
-			const state = { editedPost: { type: 'wp_template' } };
+			const state = { editedPost: [ { type: 'wp_template' } ] };
 			expect( getEditedPostType( state ) ).toBe( 'wp_template' );
+		} );
+	} );
+
+	describe( 'getPreviousEditedPostId', () => {
+		it( 'returns the previous template ID', () => {
+			const state = { editedPost: [ { id: 10 }, { id: 20 } ] };
+			expect( getPreviousEditedPostId( state ) ).toBe( 10 );
+		} );
+
+		it( 'returns undefined when there are no previous pages', () => {
+			const state = { editedPost: [ { id: 10 } ] };
+			expect( getPreviousEditedPostId( state ) ).toBeUndefined();
+		} );
+	} );
+
+	describe( 'getPreviousEditedPostType', () => {
+		it( 'returns the previous template type', () => {
+			const state = {
+				editedPost: [
+					{ type: 'wp_template' },
+					{ type: 'wp_template_part' },
+				],
+			};
+			expect( getPreviousEditedPostType( state ) ).toBe( 'wp_template' );
+		} );
+
+		it( 'returns undefined when there are no previous pages', () => {
+			const state = { editedPost: [ { type: 'wp_template' } ] };
+			expect( getPreviousEditedPostType( state ) ).toBeUndefined();
 		} );
 	} );
 
 	describe( 'getPage', () => {
 		it( 'returns the page object', () => {
 			const page = {};
-			const state = { editedPost: { page } };
+			const state = { editedPost: [ { page } ] };
 			expect( getPage( state ) ).toBe( page );
 		} );
 	} );
@@ -168,6 +205,17 @@ describe( 'selectors', () => {
 			expect( isInserterOpened( state ) ).toBe( true );
 			state.blockInserterPanel = false;
 			expect( isInserterOpened( state ) ).toBe( false );
+		} );
+	} );
+
+	describe( 'isListViewOpened', () => {
+		it( 'returns the list view panel isOpened state', () => {
+			const state = {
+				listViewPanel: true,
+			};
+			expect( isListViewOpened( state ) ).toBe( true );
+			state.listViewPanel = false;
+			expect( isListViewOpened( state ) ).toBe( false );
 		} );
 	} );
 } );

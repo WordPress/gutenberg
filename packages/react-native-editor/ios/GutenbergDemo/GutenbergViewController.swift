@@ -143,6 +143,10 @@ extension GutenbergViewController: GutenbergBridgeDelegate {
         print("Gutenberg request for media uploads to be resync")
     }
 
+    func gutenbergDidRequestToSetFeaturedImage(for mediaID: Int32) {
+        print("Gutenberg request to set featured image")
+    }
+
     func gutenbergDidRequestMediaUploadActionDialog(for mediaID: Int32) {
         guard let progress = mediaUploadCoordinator.progressForUpload(mediaID: mediaID) else {
             return
@@ -210,10 +214,6 @@ extension GutenbergViewController: GutenbergBridgeDelegate {
         callback([MediaInfo(id: 1, url: "https://cldup.com/Fz-ASbo2s3.jpg", type: "image")])
     }
 
-    func gutenbergDidLogUserEvent(_ event: GutenbergUserEvent) {
-        print("Gutenberg loged user event")
-    }
-
     func gutenbergDidRequestUnsupportedBlockFallback(for block: Block) {
         print("Requesting Fallback for \(block)")
         let controller = try! WebViewController(block: block, userId: "0")
@@ -237,28 +237,32 @@ extension GutenbergViewController: GutenbergBridgeDelegate {
         print(#function)
     }
 
-    func gutenbergDidRequestMediaFilesEditorLoad(_ mediaFiles: [String], blockId: String) {
-        print(#function)
-    }
-
-    func gutenbergDidRequestMediaFilesFailedRetryDialog(_ mediaFiles: [String]) {
-        print(#function)
-    }
-
-    func gutenbergDidRequestMediaFilesUploadCancelDialog(_ mediaFiles: [String]) {
-        print(#function)
-    }
-
-    func gutenbergDidRequestMediaFilesSaveCancelDialog(_ mediaFiles: [String]) {
-        print(#function)
-	}
-
     func gutenbergDidRequestFocalPointPickerTooltipShown() -> Bool {
         return false;
     }
 
     func gutenbergDidRequestSetFocalPointPickerTooltipShown(_ tooltipShown: Bool) {
         print("Gutenberg requested setting tooltip flag")
+    }
+
+    func gutenbergDidRequestPreview() {
+        print(#function)
+    }
+
+    func gutenbergDidRequestBlockTypeImpressions() -> [String: Int] {
+        return [:]
+    }
+
+    func gutenbergDidRequestSetBlockTypeImpressions(_ impressions: [String: Int]) -> Void {
+        print("Gutenberg requested setting block type impressions to \(impressions).")
+    }
+
+    func gutenbergDidRequestContactCustomerSupport() {
+        print(#function)
+    }
+
+    func gutenbergDidRequestGotoCustomerSupportOptions() {
+        print(#function)
     }
 }
 
@@ -283,10 +287,6 @@ extension GutenbergViewController: GutenbergWebDelegate {
 }
 
 extension GutenbergViewController: GutenbergBridgeDataSource {
-    var isPreview: Bool {
-        return false
-    }
-
     func gutenbergLocale() -> String? {
         return Locale.preferredLanguages.first ?? "en"
     }
@@ -303,6 +303,10 @@ extension GutenbergViewController: GutenbergBridgeDataSource {
         return nil
     }
 
+    func gutenbergFeaturedImageId() -> NSNumber? {
+        return nil
+    }
+
     func gutenbergCapabilities() -> [Capabilities : Bool] {
         return [
             .mentions: true,
@@ -310,7 +314,14 @@ extension GutenbergViewController: GutenbergBridgeDataSource {
             .unsupportedBlockEditor: unsupportedBlockEnabled,
             .canEnableUnsupportedBlockEditor: unsupportedBlockCanBeActivated,
             .mediaFilesCollectionBlock: true,
-            .audioBlock: true
+            .isAudioBlockMediaUploadEnabled: true,
+            .reusableBlock: false,
+            .editorOnboarding: false,
+            .firstGutenbergEditorSession: false,
+            .facebookEmbed: true,
+            .instagramEmbed: true,
+            .loomEmbed: true,
+            .smartframeEmbed: true,
         ]
     }
 
@@ -318,7 +329,7 @@ extension GutenbergViewController: GutenbergBridgeDataSource {
         return ExampleAttachmentDelegate()
     }
 
-    func gutenbergEditorTheme() -> GutenbergEditorTheme? {
+    func gutenbergEditorSettings() -> GutenbergEditorSettings? {
         return nil
     }
 
@@ -369,6 +380,7 @@ extension GutenbergViewController {
         alert.addAction(toggleHTMLModeAction)
         alert.addAction(updateHtmlAction)
         alert.addAction(unsupportedBlockUIAction)
+        alert.addAction(showEditorHelpAction)
         alert.addAction(cancelAction)
 
         present(alert, animated: true)
@@ -381,6 +393,16 @@ extension GutenbergViewController {
             handler: { [unowned self] action in
                 self.toggleHTMLMode(action)
         })
+    }
+    
+    var showEditorHelpAction: UIAlertAction {
+        return UIAlertAction(
+            title: "Help & Support",
+            style: .default,
+            handler: { [unowned self] action in
+                self.showEditorHelp()
+            }
+        )
     }
 
     var updateHtmlAction: UIAlertAction {
@@ -426,5 +448,9 @@ extension GutenbergViewController {
     func toggleHTMLMode(_ action: UIAlertAction) {
         htmlMode = !htmlMode
         gutenberg.toggleHTMLMode()
+    }
+    
+    func showEditorHelp() {
+        gutenberg.showEditorHelp()
     }
 }

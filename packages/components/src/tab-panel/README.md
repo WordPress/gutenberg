@@ -1,8 +1,8 @@
 # TabPanel
 
-TabPanel is a React component to render an ARIA-compliant TabPanel. 
+TabPanel is a React component to render an ARIA-compliant TabPanel.
 
-TabPanels organize content across different screens, data sets, and interactions. It has two sections: a list of tabs, and the view to show when tabs are chosen. 
+TabPanels organize content across different screens, data sets, and interactions. It has two sections: a list of tabs, and the view to show when tabs are chosen.
 
 ![The “Document” tab selected in the sidebar TabPanel.](https://wordpress.org/gutenberg/files/2019/01/s_E36D9C9B8FFA15A1A8CE224E422535A12B016F88884089575F9998E52016A49F_1541785098230_TabPanel.png)
 
@@ -18,7 +18,8 @@ TabPanels organize content across different screens, data sets, and interactions
 TabPanels organize and allow navigation between groups of content that are related and at the same level of hierarchy.
 
 #### Tabs in a set
-As a set, all tabs are unified by a shared topic. For clarity, each tab should contain content that is distinct from all the other tabs in a set. 
+
+As a set, all tabs are unified by a shared topic. For clarity, each tab should contain content that is distinct from all the other tabs in a set.
 
 ### Anatomy
 
@@ -62,7 +63,8 @@ const onSelect = ( tabName ) => {
 };
 
 const MyTabPanel = () => (
-	<TabPanel className="my-tab-panel"
+	<TabPanel
+		className="my-tab-panel"
 		activeClass="active-tab"
 		onSelect={ onSelect }
 		tabs={ [
@@ -76,10 +78,9 @@ const MyTabPanel = () => (
 				title: 'Tab 2',
 				className: 'tab-two',
 			},
-		] }>
-		{
-			( tab ) => <p>{ tab.title }</p>
-		}
+		] }
+	>
+		{ ( tab ) => <p>{ tab.title }</p> }
 	</TabPanel>
 );
 ```
@@ -92,59 +93,59 @@ The component accepts the following props:
 
 The class to give to the outer container for the TabPanel
 
-- Type: `String`
-- Required: No
-- Default: ''
+-   Type: `String`
+-   Required: No
+-   Default: ''
 
 #### orientation
 
 The orientation of the tablist (`vertical` or `horizontal`)
 
-- Type: `String`
-- Required: No
-- Default: `horizontal`
+-   Type: `String`
+-   Required: No
+-   Default: `horizontal`
 
 #### onSelect
 
 The function called when a tab has been selected. It is passed the `tabName` as an argument.
 
-- Type: `Function`
-- Required: No
-- Default: `noop`
+-   Type: `Function`
+-   Required: No
+-   Default: `noop`
 
 #### tabs
 
 An array of objects containing the following properties:
 
-- `name`: `(string)` Defines the key for the tab.
-- `title`:`(string)` Defines the translated text for the tab.
-- `className`:`(string)` Optional. Defines the class to put on the tab.
+-   `name`: `(string)` Defines the key for the tab.
+-   `title`:`(string)` Defines the translated text for the tab.
+-   `className`:`(string)` Optional. Defines the class to put on the tab.
 
->> **Note:** Other fields may be added to the object and accessed from the child function if desired.
+> > **Note:** Other fields may be added to the object and accessed from the child function if desired.
 
-- Type: `Array`
-- Required: Yes
+-   Type: `Array`
+-   Required: Yes
 
 #### activeClass
 
 The class to add to the active tab
 
-- Type: `String`
-- Required: No
-- Default: `is-active`
+-   Type: `String`
+-   Required: No
+-   Default: `is-active`
 
 #### initialTabName
 
 Optionally provide a tab name for a tab to be selected upon mounting of component. If this prop is not set, the first tab will be selected by default.
 
-- Type: `String`
-- Required: No
-- Default: none
+-   Type: `String`
+-   Required: No
+-   Default: none
 
 #### children
 
 A function which renders the tabviews given the selected tab. The function is passed the active tab object as an argument as defined the the tabs prop.
 The element to which the tooltip should anchor.
 
-- Type: (`Object`) => `Element`
-- Required: Yes
+-   Type: (`Object`) => `Element`
+-   Required: Yes

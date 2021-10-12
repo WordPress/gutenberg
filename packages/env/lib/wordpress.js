@@ -19,35 +19,6 @@ const copyDir = util.promisify( require( 'copy-dir' ) );
  */
 
 /**
- * Makes the WordPress content directories (wp-content, wp-content/plugins,
- * wp-content/themes) owned by the www-data user. This ensures that WordPress
- * can write to these directories.
- *
- * This is necessary when running wp-env with `"core": null` because Docker
- * will automatically create these directories as the root user when binding
- * volumes during `docker-compose up`, and `docker-compose up` doesn't support
- * the `-u` option.
- *
- * See https://github.com/docker-library/wordpress/issues/436.
- *
- * @param {WPEnvironment} environment The environment to check. Either 'development' or 'tests'.
- * @param {WPConfig}      config      The wp-env config object.
- */
-async function makeContentDirectoriesWritable(
-	environment,
-	{ dockerComposeConfigPath, debug }
-) {
-	await dockerCompose.exec(
-		environment === 'development' ? 'wordpress' : 'tests-wordpress',
-		'chown www-data:www-data wp-content wp-content/plugins wp-content/themes',
-		{
-			config: dockerComposeConfigPath,
-			log: debug,
-		}
-	);
-}
-
-/**
  * Checks a WordPress database connection. An error is thrown if the test is
  * unsuccessful.
  *
@@ -68,7 +39,7 @@ async function checkDatabaseConnection( { dockerComposeConfigPath, debug } ) {
  *
  * @param {WPEnvironment} environment The environment to configure. Either 'development' or 'tests'.
  * @param {WPConfig}      config      The wp-env config object.
- * @param {Object} spinner A CLI spinner which indicates progress.
+ * @param {Object}        spinner     A CLI spinner which indicates progress.
  */
 async function configureWordPress( environment, config, spinner ) {
 	const installCommand = `wp core install --url="localhost:${ config.env[ environment ].port }" --title="${ config.name }" --admin_user=admin --admin_password=password --admin_email=wordpress@example.com --skip-email`;
@@ -235,7 +206,7 @@ function areCoreSourcesDifferent( coreSource1, coreSource2 ) {
  * (.git, node_modules) and configuration files (wp-config.php).
  *
  * @param {string} fromPath Path to the WordPress directory to copy.
- * @param {string} toPath Destination path.
+ * @param {string} toPath   Destination path.
  */
 async function copyCoreFiles( fromPath, toPath ) {
 	await copyDir( fromPath, toPath, {
@@ -259,7 +230,6 @@ async function copyCoreFiles( fromPath, toPath ) {
 
 module.exports = {
 	hasSameCoreSource,
-	makeContentDirectoriesWritable,
 	checkDatabaseConnection,
 	configureWordPress,
 	resetDatabase,

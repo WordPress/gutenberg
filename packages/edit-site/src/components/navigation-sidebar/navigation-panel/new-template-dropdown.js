@@ -15,6 +15,8 @@ import {
 import { useDispatch, useSelect } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
 import { Icon, plus } from '@wordpress/icons';
+import { store as editorStore } from '@wordpress/editor';
+import { store as coreStore } from '@wordpress/core-data';
 
 /**
  * Internal dependencies
@@ -27,8 +29,8 @@ export default function NewTemplateDropdown() {
 	const { defaultTemplateTypes, templates } = useSelect( ( select ) => {
 		const {
 			__experimentalGetDefaultTemplateTypes: getDefaultTemplateTypes,
-		} = select( 'core/editor' );
-		const templateEntities = select( 'core' ).getEntityRecords(
+		} = select( editorStore );
+		const templateEntities = select( coreStore ).getEntityRecords(
 			'postType',
 			'wp_template'
 		);
@@ -79,7 +81,7 @@ export default function NewTemplateDropdown() {
 			toggleProps={ {
 				children: <Icon icon={ plus } />,
 				isSmall: true,
-				isTertiary: true,
+				variant: 'tertiary',
 			} }
 		>
 			{ ( { onClose } ) => (

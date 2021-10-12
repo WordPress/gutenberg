@@ -2,6 +2,16 @@
 
 ## Unreleased
 
+### Bug Fix
+
+-   Provide more complete mocks of browser timing functions. ([#35368](https://github.com/WordPress/gutenberg/pull/35368))
+
+## 7.1.1 (2021-09-09)
+
+### Bug Fix
+
+-   Restore the default setting for the `verbose` option. In effect, each test won't get reported during the run ([#34327](https://github.com/WordPress/gutenberg/pull/34327)).
+
 ## 7.0.0 (2021-01-21)
 
 ### Breaking Changes

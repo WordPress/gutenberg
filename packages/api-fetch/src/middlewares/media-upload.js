@@ -12,24 +12,35 @@ import {
 } from '../utils/response';
 
 /**
+ * @param {import('../types').APIFetchOptions} options
+ * @return {boolean} True if the request is for media upload.
+ */
+function isMediaUploadRequest( options ) {
+	const isCreateMethod = !! options.method && options.method === 'POST';
+	const isMediaEndpoint =
+		( !! options.path && options.path.indexOf( '/wp/v2/media' ) !== -1 ) ||
+		( !! options.url && options.url.indexOf( '/wp/v2/media' ) !== -1 );
+
+	return isMediaEndpoint && isCreateMethod;
+}
+
+/**
  * Middleware handling media upload failures and retries.
  *
- * @param {Object}   options Fetch options.
- * @param {Function} next    [description]
- *
- * @return {*} The evaluated result of the remaining middleware chain.
+ * @type {import('../types').APIFetchMiddleware}
  */
-function mediaUploadMiddleware( options, next ) {
-	const isMediaUploadRequest =
-		( options.path && options.path.indexOf( '/wp/v2/media' ) !== -1 ) ||
-		( options.url && options.url.indexOf( '/wp/v2/media' ) !== -1 );
-
-	if ( ! isMediaUploadRequest ) {
-		return next( options, next );
+const mediaUploadMiddleware = ( options, next ) => {
+	if ( ! isMediaUploadRequest( options ) ) {
+		return next( options );
 	}
+
 	let retries = 0;
 	const maxRetries = 5;
 
+	/**
+	 * @param {string} attachmentId
+	 * @return {Promise<any>} Processed post response.
+	 */
 	const postProcess = ( attachmentId ) => {
 		retries++;
 		return next( {
@@ -78,6 +89,6 @@ function mediaUploadMiddleware( options, next ) {
 		.then( ( response ) =>
 			parseResponseAndNormalizeError( response, options.parse )
 		);
-}
+};
 
 export default mediaUploadMiddleware;

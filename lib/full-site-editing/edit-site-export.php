@@ -18,9 +18,10 @@ function _remove_theme_attribute_from_content( $template_content ) {
 	$new_content         = '';
 	$template_blocks     = parse_blocks( $template_content );
 
-	foreach ( $template_blocks as $key => $block ) {
+	$blocks = _gutenberg_flatten_blocks( $template_blocks );
+	foreach ( $blocks as $key => $block ) {
 		if ( 'core/template-part' === $block['blockName'] && isset( $block['attrs']['theme'] ) ) {
-			unset( $template_blocks[ $key ]['attrs']['theme'] );
+			unset( $blocks[ $key ]['attrs']['theme'] );
 			$has_updated_content = true;
 		}
 	}

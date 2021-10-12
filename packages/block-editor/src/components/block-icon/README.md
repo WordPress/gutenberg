@@ -11,7 +11,6 @@ The rendered an [Icon](https://github.com/WordPress/gutenberg/tree/HEAD/packages
 1. [Development guidelines](#development-guidelines)
 2. [Related components](#related-components)
 
-
 ## Development guidelines
 
 ### Usage
@@ -21,7 +20,7 @@ Renders a block icon with default style.
 ```jsx
 import { BlockIcon } from '@wordpress/block-editor';
 
-const MyBlockIcon = () => <BlockIcon icon={ icon } />
+const MyBlockIcon = () => <BlockIcon icon={ icon } />;
 ```
 
 ## Related components

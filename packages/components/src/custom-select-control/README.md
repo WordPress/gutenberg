@@ -21,7 +21,7 @@ These are the same as [the ones for `SelectControl`s](/packages/components/src/s
  * WordPress dependencies
  */
 import { CustomSelectControl } from '@wordpress/components';
-import { useState } from '@wordpress/compose';
+import { useState } from '@wordpress/element';
 
 const options = [
 	{
@@ -92,6 +92,13 @@ The label for the control.
 
 -   Type: `String`
 -   Required: Yes
+
+#### describedBy
+
+Pass in a description that will be shown to screen readers associated with the select trigger button. If no value is passed, the text "Currently selected: selectedItem.name" will be used fully translated.
+
+-   Type: `String`
+-   Required: No
 
 #### options
 

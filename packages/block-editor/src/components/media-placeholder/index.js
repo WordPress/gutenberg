@@ -36,7 +36,7 @@ const InsertFromURLPopover = ( { src, onChange, onSubmit, onClose } ) => (
 		>
 			<input
 				className="block-editor-media-placeholder__url-input-field"
-				type="url"
+				type="text"
 				aria-label={ __( 'URL' ) }
 				placeholder={ __( 'Paste or type URL' ) }
 				onChange={ onChange }
@@ -64,6 +64,7 @@ export function MediaPlaceholder( {
 	accept,
 	addToGallery,
 	multiple = false,
+	handleUpload = true,
 	dropZoneUIOnly,
 	disableDropZone,
 	disableMediaButtons,
@@ -75,6 +76,8 @@ export function MediaPlaceholder( {
 	onFilesPreUpload = noop,
 	onHTMLDrop = noop,
 	children,
+	mediaLibraryButton,
+	placeholder,
 } ) {
 	const mediaUpload = useSelect( ( select ) => {
 		const { getSettings } = select( blockEditorStore );
@@ -118,6 +121,9 @@ export function MediaPlaceholder( {
 	};
 
 	const onFilesUpload = ( files ) => {
+		if ( ! handleUpload ) {
+			return onSelect( files );
+		}
 		onFilesPreUpload( files );
 		let setMedia;
 		if ( multiple ) {
@@ -174,7 +180,7 @@ export function MediaPlaceholder( {
 		onFilesUpload( event.target.files );
 	};
 
-	const renderPlaceholder = ( content, onClick ) => {
+	const defaultRenderPlaceholder = ( content ) => {
 		let { instructions, title } = labels;
 
 		if ( ! mediaUpload && ! onSelectURL ) {
@@ -240,7 +246,6 @@ export function MediaPlaceholder( {
 				instructions={ instructions }
 				className={ placeholderClassName }
 				notices={ notices }
-				onClick={ onClick }
 				onDoubleClick={ onDoubleClick }
 				preview={ mediaPreview }
 			>
@@ -249,6 +254,7 @@ export function MediaPlaceholder( {
 			</Placeholder>
 		);
 	};
+	const renderPlaceholder = placeholder ?? defaultRenderPlaceholder;
 
 	const renderDropZone = () => {
 		if ( disableDropZone ) {
@@ -266,7 +272,7 @@ export function MediaPlaceholder( {
 				<Button
 					className="block-editor-media-placeholder__cancel-button"
 					title={ __( 'Cancel' ) }
-					isLink
+					variant="link"
 					onClick={ onCancel }
 				>
 					{ __( 'Cancel' ) }
@@ -283,7 +289,7 @@ export function MediaPlaceholder( {
 						className="block-editor-media-placeholder__button"
 						onClick={ openURLInput }
 						isPressed={ isURLInputVisible }
-						isTertiary
+						variant="tertiary"
 					>
 						{ __( 'Insert from URL' ) }
 					</Button>
@@ -301,7 +307,20 @@ export function MediaPlaceholder( {
 	};
 
 	const renderMediaUploadChecked = () => {
-		const mediaLibraryButton = (
+		const defaultButton = ( { open } ) => {
+			return (
+				<Button
+					variant="tertiary"
+					onClick={ () => {
+						open();
+					} }
+				>
+					{ __( 'Media Library' ) }
+				</Button>
+			);
+		};
+		const libraryButton = mediaLibraryButton ?? defaultButton;
+		const uploadMediaLibraryButton = (
 			<MediaUpload
 				addToGallery={ addToGallery }
 				gallery={ multiple && onlyAllowsImages() }
@@ -313,19 +332,7 @@ export function MediaPlaceholder( {
 						? value.map( ( { id } ) => id )
 						: value.id
 				}
-				render={ ( { open } ) => {
-					return (
-						<Button
-							isTertiary
-							onClick={ ( event ) => {
-								event.stopPropagation();
-								open();
-							} }
-						>
-							{ __( 'Media Library' ) }
-						</Button>
-					);
-				} }
+				render={ libraryButton }
 			/>
 		);
 
@@ -341,20 +348,21 @@ export function MediaPlaceholder( {
 							const content = (
 								<>
 									<Button
-										isPrimary
+										variant="primary"
 										className={ classnames(
 											'block-editor-media-placeholder__button',
 											'block-editor-media-placeholder__upload-button'
 										) }
+										onClick={ openFileDialog }
 									>
 										{ __( 'Upload' ) }
 									</Button>
-									{ mediaLibraryButton }
+									{ uploadMediaLibraryButton }
 									{ renderUrlSelectionUI() }
 									{ renderCancelLink() }
 								</>
 							);
-							return renderPlaceholder( content, openFileDialog );
+							return renderPlaceholder( content );
 						} }
 					/>
 				</>
@@ -366,7 +374,7 @@ export function MediaPlaceholder( {
 				<>
 					{ renderDropZone() }
 					<FormFileUpload
-						isPrimary
+						variant="primary"
 						className={ classnames(
 							'block-editor-media-placeholder__button',
 							'block-editor-media-placeholder__upload-button'
@@ -377,7 +385,7 @@ export function MediaPlaceholder( {
 					>
 						{ __( 'Upload' ) }
 					</FormFileUpload>
-					{ mediaLibraryButton }
+					{ uploadMediaLibraryButton }
 					{ renderUrlSelectionUI() }
 					{ renderCancelLink() }
 				</>
@@ -385,12 +393,13 @@ export function MediaPlaceholder( {
 			return renderPlaceholder( content );
 		}
 
-		return renderPlaceholder( mediaLibraryButton );
+		return renderPlaceholder( uploadMediaLibraryButton );
 	};
 
 	if ( dropZoneUIOnly || disableMediaButtons ) {
 		if ( dropZoneUIOnly ) {
 			deprecated( 'wp.blockEditor.MediaPlaceholder dropZoneUIOnly prop', {
+				since: '5.4',
 				alternative: 'disableMediaButtons',
 			} );
 		}

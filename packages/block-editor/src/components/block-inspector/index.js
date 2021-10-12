@@ -12,15 +12,17 @@ import {
 	PanelBody,
 	__experimentalUseSlot as useSlot,
 } from '@wordpress/components';
-import { withSelect } from '@wordpress/data';
+import { useSelect } from '@wordpress/data';
 
 /**
  * Internal dependencies
  */
 import SkipToSelectedBlock from '../skip-to-selected-block';
 import BlockCard from '../block-card';
-import InspectorControls from '../inspector-controls';
-import InspectorAdvancedControls from '../inspector-advanced-controls';
+import {
+	default as InspectorControls,
+	InspectorAdvancedControls,
+} from '../inspector-controls';
 import BlockStyles from '../block-styles';
 import MultiSelectionInspector from '../multi-selection-inspector';
 import DefaultStylePicker from '../default-style-picker';
@@ -29,14 +31,40 @@ import useBlockDisplayInformation from '../use-block-display-information';
 import { store as blockEditorStore } from '../../store';
 
 const BlockInspector = ( {
-	blockType,
-	count,
-	hasBlockStyles,
-	selectedBlockClientId,
-	selectedBlockName,
 	showNoBlockSelectedMessage = true,
 	bubblesVirtually = true,
 } ) => {
+	const {
+		count,
+		hasBlockStyles,
+		selectedBlockName,
+		selectedBlockClientId,
+		blockType,
+	} = useSelect( ( select ) => {
+		const {
+			getSelectedBlockClientId,
+			getSelectedBlockCount,
+			getBlockName,
+		} = select( blockEditorStore );
+		const { getBlockStyles } = select( blocksStore );
+
+		const _selectedBlockClientId = getSelectedBlockClientId();
+		const _selectedBlockName =
+			_selectedBlockClientId && getBlockName( _selectedBlockClientId );
+		const _blockType =
+			_selectedBlockName && getBlockType( _selectedBlockName );
+		const blockStyles =
+			_selectedBlockName && getBlockStyles( _selectedBlockName );
+
+		return {
+			count: getSelectedBlockCount(),
+			selectedBlockClientId: _selectedBlockClientId,
+			selectedBlockName: _selectedBlockName,
+			blockType: _blockType,
+			hasBlockStyles: blockStyles && blockStyles.length > 0,
+		};
+	}, [] );
+
 	if ( count > 1 ) {
 		return (
 			<div className="block-editor-block-inspector">
@@ -101,19 +129,21 @@ const BlockInspectorSingleBlock = ( {
 				</div>
 			) }
 			<InspectorControls.Slot bubblesVirtually={ bubblesVirtually } />
+			<InspectorControls.Slot
+				__experimentalGroup="dimensions"
+				bubblesVirtually={ bubblesVirtually }
+				label={ __( 'Dimensions' ) }
+			/>
 			<div>
-				<AdvancedControls
-					slotName={ InspectorAdvancedControls.slotName }
-					bubblesVirtually={ bubblesVirtually }
-				/>
+				<AdvancedControls bubblesVirtually={ bubblesVirtually } />
 			</div>
 			<SkipToSelectedBlock key="back" />
 		</div>
 	);
 };
 
-const AdvancedControls = ( { slotName, bubblesVirtually } ) => {
-	const slot = useSlot( slotName );
+const AdvancedControls = ( { bubblesVirtually } ) => {
+	const slot = useSlot( InspectorAdvancedControls.slotName );
 	const hasFills = Boolean( slot.fills && slot.fills.length );
 
 	if ( ! hasFills ) {
@@ -126,32 +156,12 @@ const AdvancedControls = ( { slotName, bubblesVirtually } ) => {
 			title={ __( 'Advanced' ) }
 			initialOpen={ false }
 		>
-			<InspectorAdvancedControls.Slot
+			<InspectorControls.Slot
+				__experimentalGroup="advanced"
 				bubblesVirtually={ bubblesVirtually }
 			/>
 		</PanelBody>
 	);
 };
 
-export default withSelect( ( select ) => {
-	const {
-		getSelectedBlockClientId,
-		getSelectedBlockCount,
-		getBlockName,
-	} = select( blockEditorStore );
-	const { getBlockStyles } = select( blocksStore );
-	const selectedBlockClientId = getSelectedBlockClientId();
-	const selectedBlockName =
-		selectedBlockClientId && getBlockName( selectedBlockClientId );
-	const blockType =
-		selectedBlockClientId && getBlockType( selectedBlockName );
-	const blockStyles =
-		selectedBlockClientId && getBlockStyles( selectedBlockName );
-	return {
-		count: getSelectedBlockCount(),
-		hasBlockStyles: blockStyles && blockStyles.length > 0,
-		selectedBlockName,
-		selectedBlockClientId,
-		blockType,
-	};
-} )( BlockInspector );
+export default BlockInspector;

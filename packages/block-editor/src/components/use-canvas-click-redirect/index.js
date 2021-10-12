@@ -37,6 +37,13 @@ export function useCanvasClickRedirect() {
 				return;
 			}
 
+			const { bottom } = target.getBoundingClientRect();
+
+			// Ensure the click is below the last block.
+			if ( event.clientY < bottom ) {
+				return;
+			}
+
 			placeCaretAtHorizontalEdge( target, true );
 			event.preventDefault();
 		}

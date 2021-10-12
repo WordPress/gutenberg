@@ -3,22 +3,19 @@
 /**
  * External dependencies
  */
-/**
- * WordPress dependencies
- */
-import RCTAztecView from '@wordpress/react-native-aztec';
-import { View, Platform } from 'react-native';
-import {
-	showUserSuggestions,
-	showXpostSuggestions,
-} from '@wordpress/react-native-bridge';
-import { get, pickBy, debounce, isString } from 'lodash';
+import { View, Platform, Dimensions } from 'react-native';
+import { get, pickBy, debounce } from 'lodash';
 import memize from 'memize';
 
 /**
  * WordPress dependencies
  */
-import { BlockFormatControls } from '@wordpress/block-editor';
+import RCTAztecView from '@wordpress/react-native-aztec';
+import {
+	showUserSuggestions,
+	showXpostSuggestions,
+} from '@wordpress/react-native-bridge';
+import { BlockFormatControls, getPxFromCssUnit } from '@wordpress/block-editor';
 import { Component } from '@wordpress/element';
 import { compose, withPreferredColorScheme } from '@wordpress/compose';
 import { withSelect } from '@wordpress/data';
@@ -59,6 +56,7 @@ const gutenbergFormatNamesToAztec = {
 };
 
 const EMPTY_PARAGRAPH_TAGS = '<p></p>';
+const DEFAULT_FONT_SIZE = 16;
 
 export class RichText extends Component {
 	constructor( {
@@ -114,13 +112,17 @@ export class RichText extends Component {
 		).bind( this );
 		this.suggestionOptions = this.suggestionOptions.bind( this );
 		this.insertString = this.insertString.bind( this );
-		this.convertFontSizeFromString = this.convertFontSizeFromString.bind(
+		this.manipulateEventCounterToForceNativeToRefresh = this.manipulateEventCounterToForceNativeToRefresh.bind(
+			this
+		);
+		this.shouldDropEventFromAztec = this.shouldDropEventFromAztec.bind(
 			this
 		);
 		this.state = {
 			activeFormats: [],
 			selectedFormat: null,
 			height: 0,
+			dimensions: Dimensions.get( 'window' ),
 		};
 		this.needsSelectionUpdate = false;
 		this.savedContent = '';
@@ -221,7 +223,7 @@ export class RichText extends Component {
 
 	insertString( record, string ) {
 		if ( record && string ) {
-			this.lastEventCount = undefined;
+			this.manipulateEventCounterToForceNativeToRefresh(); // force a refresh on the native side
 			const toInsert = insert( record, string );
 			this.onFormatChange( toInsert );
 		}
@@ -274,17 +276,14 @@ export class RichText extends Component {
 			.replace( closingTagRegexp, '' );
 	}
 
-	// Fix for crash https://github.com/wordpress-mobile/gutenberg-mobile/issues/2991
-	convertFontSizeFromString( fontSize ) {
-		return fontSize && isString( fontSize ) && fontSize.endsWith( 'px' )
-			? parseFloat( fontSize.substring( 0, fontSize.length - 2 ) )
-			: fontSize;
-	}
-
 	/*
 	 * Handles any case where the content of the AztecRN instance has changed
 	 */
 	onChangeFromAztec( event ) {
+		if ( this.shouldDropEventFromAztec( event, 'onChange' ) ) {
+			return;
+		}
+
 		const contentWithoutRootTag = this.removeRootTagsProduceByAztec(
 			unescapeSpaces( event.nativeEvent.text )
 		);
@@ -341,6 +340,12 @@ export class RichText extends Component {
 			return;
 		}
 
+		// Add stubs for conformance in downstream autocompleters logic
+		this.customEditableOnKeyDown?.( {
+			preventDefault: () => undefined,
+			...event,
+		} );
+
 		this.handleDelete( event );
 		this.handleEnter( event );
 		this.handleTriggerKeyCodes( event );
@@ -365,6 +370,10 @@ export class RichText extends Component {
 	}
 
 	handleDelete( event ) {
+		if ( this.shouldDropEventFromAztec( event, 'handleDelete' ) ) {
+			return;
+		}
+
 		const { keyCode } = event;
 
 		if ( keyCode !== DELETE && keyCode !== BACKSPACE ) {
@@ -592,7 +601,22 @@ export class RichText extends Component {
 		this.props.onSelectionChange( start, end );
 	}
 
+	shouldDropEventFromAztec( event, logText ) {
+		const shouldDrop =
+			! this.isIOS && event.nativeEvent.eventCount <= this.lastEventCount;
+		if ( shouldDrop ) {
+			window.console.log(
+				`Dropping ${ logText } from Aztec as its event counter is older than latest sent to the native side. Got ${ event.nativeEvent.eventCount } but lastEventCount is ${ this.lastEventCount }.`
+			);
+		}
+		return shouldDrop;
+	}
+
 	onSelectionChangeFromAztec( start, end, text, event ) {
+		if ( this.shouldDropEventFromAztec( event, 'onSelectionChange' ) ) {
+			return;
+		}
+
 		// `end` can be less than `start` on iOS
 		// Let's fix that here so `rich-text/slice` can work properly
 		const realStart = Math.min( start, end );
@@ -667,13 +691,28 @@ export class RichText extends Component {
 		return value;
 	}
 
+	manipulateEventCounterToForceNativeToRefresh() {
+		if ( this.isIOS ) {
+			this.lastEventCount = undefined;
+			return;
+		}
+
+		if ( typeof this.lastEventCount !== 'undefined' ) {
+			this.lastEventCount += 100; // bump by a hundred, hopefully native hasn't bombarded the JS side in the meantime.
+		} else {
+			window.console.warn(
+				"Tried to bump the RichText native event counter but was 'undefined'. Aborting bump."
+			);
+		}
+	}
+
 	shouldComponentUpdate( nextProps ) {
 		if (
 			nextProps.tagName !== this.props.tagName ||
 			nextProps.reversed !== this.props.reversed ||
 			nextProps.start !== this.props.start
 		) {
-			this.lastEventCount = undefined;
+			this.manipulateEventCounterToForceNativeToRefresh(); // force a refresh on the native side
 			this.value = undefined;
 			return true;
 		}
@@ -703,7 +742,7 @@ export class RichText extends Component {
 				this.needsSelectionUpdate = true;
 			}
 
-			this.lastEventCount = undefined; // force a refresh on the native side
+			this.manipulateEventCounterToForceNativeToRefresh(); // force a refresh on the native side
 		}
 
 		if ( ! this.comesFromAztec ) {
@@ -715,7 +754,15 @@ export class RichText extends Component {
 				nextProps.__unstableIsSelected
 			) {
 				this.needsSelectionUpdate = true;
-				this.lastEventCount = undefined; // force a refresh on the native side
+				this.manipulateEventCounterToForceNativeToRefresh(); // force a refresh on the native side
+			}
+
+			if (
+				nextProps?.style?.fontSize !== this.props?.style?.fontSize ||
+				nextProps?.style?.lineHeight !== this.props?.style?.lineHeight
+			) {
+				this.needsSelectionUpdate = true;
+				this.manipulateEventCounterToForceNativeToRefresh(); // force a refresh on the native side
 			}
 		}
 
@@ -748,7 +795,6 @@ export class RichText extends Component {
 	componentDidUpdate( prevProps ) {
 		if ( this.props.value !== this.value ) {
 			this.value = this.props.value;
-			this.lastEventCount = undefined;
 		}
 		const { __unstableIsSelected: isSelected } = this.props;
 
@@ -772,7 +818,7 @@ export class RichText extends Component {
 		let value = this.valueToFormat( record );
 
 		if ( value === undefined ) {
-			this.lastEventCount = undefined; // force a refresh on the native side
+			this.manipulateEventCounterToForceNativeToRefresh(); // force a refresh on the native side
 			value = '';
 		}
 		// On android if content is empty we need to send no content or else the placeholder will not show.
@@ -793,9 +839,63 @@ export class RichText extends Component {
 					extraAttributes += ` start=${ this.props.start }`;
 				}
 			}
-			value = `<${ tagName } ${ extraAttributes }>${ value }</${ tagName }>`;
+			value = `<${ tagName }${ extraAttributes }>${ value }</${ tagName }>`;
 		}
 		return value;
+	}
+
+	getEditableProps() {
+		return {
+			// Overridable props.
+			style: {},
+			className: 'rich-text',
+			onKeyDown: () => null,
+		};
+	}
+
+	getFontSize() {
+		const { baseGlobalStyles } = this.props;
+
+		let fontSize = DEFAULT_FONT_SIZE;
+
+		if ( baseGlobalStyles?.typography?.fontSize ) {
+			fontSize = baseGlobalStyles?.typography?.fontSize;
+		}
+
+		if ( this.props.style?.fontSize ) {
+			fontSize = this.props.style.fontSize;
+		}
+
+		if ( this.props.fontSize ) {
+			fontSize = this.props.fontSize;
+		}
+		const { height, width } = this.state.dimensions;
+		const cssUnitOptions = { height, width, fontSize: DEFAULT_FONT_SIZE };
+		// We need to always convert to px units because the selected value
+		// could be coming from the web where it could be stored as a different unit.
+		const selectedPxValue = getPxFromCssUnit( fontSize, cssUnitOptions );
+
+		return parseFloat( selectedPxValue );
+	}
+
+	getLineHeight() {
+		const { baseGlobalStyles } = this.props;
+		let lineHeight;
+
+		// eslint-disable-next-line no-undef
+		if ( ! __DEV__ ) {
+			return;
+		}
+
+		if ( baseGlobalStyles?.typography?.lineHeight ) {
+			lineHeight = parseFloat( baseGlobalStyles?.typography?.lineHeight );
+		}
+
+		if ( this.props.style?.lineHeight ) {
+			lineHeight = parseFloat( this.props.style.lineHeight );
+		}
+
+		return lineHeight;
 	}
 
 	render() {
@@ -811,10 +911,12 @@ export class RichText extends Component {
 			parentBlockStyles,
 			accessibilityLabel,
 			disableEditingMenu = false,
+			baseGlobalStyles,
 		} = this.props;
 
 		const record = this.getRecord();
 		const html = this.getHtmlToRender( record, tagName );
+		const editableProps = this.getEditableProps();
 
 		const placeholderStyle = getStylesFromColorScheme(
 			styles.richTextPlaceholder,
@@ -822,6 +924,8 @@ export class RichText extends Component {
 		);
 
 		const { color: defaultPlaceholderTextColor } = placeholderStyle;
+		const fontSize = this.getFontSize();
+		const lineHeight = this.getLineHeight();
 
 		const {
 			color: defaultColor,
@@ -884,6 +988,12 @@ export class RichText extends Component {
 				backgroundColor: style.backgroundColor,
 			};
 
+		const EditableView = ( props ) => {
+			this.customEditableOnKeyDown = props?.onKeyDown;
+
+			return <></>;
+		};
+
 		return (
 			<View style={ containerStyles }>
 				{ children &&
@@ -892,6 +1002,8 @@ export class RichText extends Component {
 						value: record,
 						onChange: this.onFormatChange,
 						onFocus: () => {},
+						editableProps,
+						editableTagName: EditableView,
 					} ) }
 				<RCTAztecView
 					accessibilityLabel={ accessibilityLabel }
@@ -914,11 +1026,14 @@ export class RichText extends Component {
 						text: html,
 						eventCount: this.lastEventCount,
 						selection,
-						linkTextColor: defaultTextDecorationColor,
+						linkTextColor:
+							style?.linkColor || defaultTextDecorationColor,
 					} }
 					placeholder={ this.props.placeholder }
 					placeholderTextColor={
+						style?.placeholderColor ||
 						this.props.placeholderTextColor ||
+						( baseGlobalStyles && baseGlobalStyles?.color?.text ) ||
 						defaultPlaceholderTextColor
 					}
 					deleteEnter={ this.props.deleteEnter }
@@ -926,9 +1041,13 @@ export class RichText extends Component {
 					onFocus={ this.onFocus }
 					onBlur={ this.onBlur }
 					onKeyDown={ this.onKeyDown }
-					triggerKeyCodes={ this.suggestionOptions().map(
-						( op ) => op.triggerChar
-					) }
+					triggerKeyCodes={
+						disableEditingMenu
+							? []
+							: this.suggestionOptions().map(
+									( op ) => op.triggerChar
+							  )
+					}
 					onPaste={ this.onPaste }
 					activeFormats={ this.getActiveFormatNames( record ) }
 					onContentSizeChange={ this.onContentSizeChange }
@@ -940,15 +1059,13 @@ export class RichText extends Component {
 					color={
 						( style && style.color ) ||
 						( parentBlockStyles && parentBlockStyles.color ) ||
+						( baseGlobalStyles && baseGlobalStyles?.color?.text ) ||
 						defaultColor
 					}
 					maxImagesWidth={ 200 }
 					fontFamily={ this.props.fontFamily || defaultFontFamily }
-					fontSize={
-						this.props.fontSize ||
-						( style &&
-							this.convertFontSizeFromString( style.fontSize ) )
-					}
+					fontSize={ fontSize }
+					lineHeight={ lineHeight }
 					fontWeight={ this.props.fontWeight }
 					fontStyle={ this.props.fontStyle }
 					disableEditingMenu={ disableEditingMenu }
@@ -1007,11 +1124,15 @@ export default compose( [
 			'childrenStyles',
 		] );
 
+		const settings = getSettings();
+		const baseGlobalStyles = settings?.__experimentalGlobalStylesBaseStyles;
+
 		return {
 			areMentionsSupported:
 				getSettings( 'capabilities' ).mentions === true,
 			areXPostsSupported: getSettings( 'capabilities' ).xposts === true,
 			...{ parentBlockStyles },
+			baseGlobalStyles,
 		};
 	} ),
 	withPreferredColorScheme,

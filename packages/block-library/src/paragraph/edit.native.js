@@ -4,7 +4,7 @@
 import { __ } from '@wordpress/i18n';
 import { createBlock } from '@wordpress/blocks';
 import {
-	AlignmentToolbar,
+	AlignmentControl,
 	BlockControls,
 	RichText,
 	store as blockEditorStore,
@@ -19,7 +19,6 @@ function ParagraphBlock( {
 	mergeBlocks,
 	onReplace,
 	setAttributes,
-	mergedStyle,
 	style,
 	clientId,
 } ) {
@@ -30,7 +29,11 @@ function ParagraphBlock( {
 	const { align, content, placeholder } = attributes;
 
 	const styles = {
-		...mergedStyle,
+		...( style?.baseColors && {
+			color: style.baseColors?.color?.text,
+			placeholderColor: style.color || style.baseColors?.color?.text,
+			linkColor: style.baseColors?.elements?.link?.color?.text,
+		} ),
 		...style,
 	};
 
@@ -39,8 +42,8 @@ function ParagraphBlock( {
 	}, [] );
 	return (
 		<>
-			<BlockControls>
-				<AlignmentToolbar
+			<BlockControls group="block">
+				<AlignmentControl
 					value={ align }
 					isRTL={ isRTL }
 					onChange={ onAlignmentChange }

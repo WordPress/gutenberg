@@ -1,22 +1,33 @@
 {
 	"apiVersion": 2,
 	"name": "core/columns",
+	"title": "Columns",
 	"category": "design",
+	"description": "Display content in multiple columns, with blocks added to each column.",
+	"textdomain": "default",
 	"attributes": {
 		"verticalAlignment": {
 			"type": "string"
+		},
+		"isStackedOnMobile": {
+			"type": "boolean",
+			"default": true
 		}
 	},
 	"supports": {
 		"anchor": true,
-		"align": [
-			"wide",
-			"full"
-		],
+		"align": [ "wide", "full" ],
 		"html": false,
 		"color": {
 			"gradients": true,
 			"link": true
+		},
+		"spacing": {
+			"blockGap": true,
+			"margin": [ "top", "bottom" ],
+			"__experimentalDefaultControls": {
+				"blockGap": true
+			}
 		}
 	},
 	"editorStyle": "wp-block-columns-editor",

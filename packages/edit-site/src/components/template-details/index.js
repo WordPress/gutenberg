@@ -1,23 +1,34 @@
 /**
  * WordPress dependencies
  */
-import { __, sprintf } from '@wordpress/i18n';
-import { Button, __experimentalText as Text } from '@wordpress/components';
+import { __ } from '@wordpress/i18n';
+import {
+	Button,
+	MenuGroup,
+	MenuItem,
+	__experimentalHeading as Heading,
+	__experimentalText as Text,
+} from '@wordpress/components';
 import { useDispatch, useSelect } from '@wordpress/data';
+import { store as editorStore } from '@wordpress/editor';
 
 /**
  * Internal dependencies
  */
+import isTemplateRevertable from '../../utils/is-template-revertable';
 import { MENU_TEMPLATES } from '../navigation-sidebar/navigation-panel/constants';
 import { store as editSiteStore } from '../../store';
+import TemplateAreas from './template-areas';
 
 export default function TemplateDetails( { template, onClose } ) {
 	const { title, description } = useSelect(
 		( select ) =>
-			select( 'core/editor' ).__experimentalGetTemplateInfo( template ),
+			select( editorStore ).__experimentalGetTemplateInfo( template ),
 		[]
 	);
-	const { openNavigationPanelToMenu } = useDispatch( editSiteStore );
+	const { openNavigationPanelToMenu, revertTemplate } = useDispatch(
+		editSiteStore
+	);
 
 	if ( ! template ) {
 		return null;
@@ -28,33 +39,45 @@ export default function TemplateDetails( { template, onClose } ) {
 		openNavigationPanelToMenu( MENU_TEMPLATES );
 	};
 
-	return (
-		<>
-			<div className="edit-site-template-details">
-				<Text variant="sectionheading">
-					{ __( 'Template details' ) }
-				</Text>
+	const revert = () => {
+		revertTemplate( template );
+		onClose();
+	};
 
-				{ title && (
-					<Text variant="body">
-						{ sprintf(
-							/* translators: %s: Name of the template. */
-							__( 'Name: %s' ),
-							title
-						) }
-					</Text>
-				) }
+	return (
+		<div className="edit-site-template-details">
+			<div className="edit-site-template-details__group">
+				<Heading
+					level={ 4 }
+					weight={ 600 }
+					className="edit-site-template-details__title"
+				>
+					{ title }
+				</Heading>
 
 				{ description && (
-					<Text variant="body">
-						{ sprintf(
-							/* translators: %s: Description of the template. */
-							__( 'Description: %s' ),
-							description
-						) }
+					<Text
+						size="body"
+						className="edit-site-template-details__description"
+					>
+						{ description }
 					</Text>
 				) }
 			</div>
+
+			<TemplateAreas />
+
+			{ isTemplateRevertable( template ) && (
+				<MenuGroup className="edit-site-template-details__group">
+					<MenuItem
+						className="edit-site-template-details__revert-button"
+						info={ __( 'Restore template to theme default' ) }
+						onClick={ revert }
+					>
+						{ __( 'Clear customizations' ) }
+					</MenuItem>
+				</MenuGroup>
+			) }
 
 			<Button
 				className="edit-site-template-details__show-all-button"
@@ -65,6 +88,6 @@ export default function TemplateDetails( { template, onClose } ) {
 			>
 				{ __( 'Browse all templates' ) }
 			</Button>
-		</>
+		</div>
 	);
 }

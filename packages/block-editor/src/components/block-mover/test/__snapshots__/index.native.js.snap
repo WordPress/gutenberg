@@ -5,40 +5,44 @@ exports[`Block Mover Picker should match snapshot 1`] = `
   <ForwardRef(ToolbarButton)
     extraProps={
       Object {
-        "hint": "Double tap to move the block up",
+        "hint": "Double tap to move the block to the left",
       }
     }
     icon={
       <SVG
-        viewBox="-2 -2 24 24"
+        viewBox="0 0 24 24"
         xmlns="http://www.w3.org/2000/svg"
       >
         <Path
-          d="M11 18H9V6l-4 4-2-1 7-7 7 7-2 1-4-4v12z"
+          d="M20 10.8H6.7l4.1-4.5-1.1-1.1-5.8 6.3 5.8 5.8 1.1-1.1-4-3.9H20z"
         />
       </SVG>
     }
+    isDisabled={false}
+    onClick={[MockFunction]}
     onLongPress={[Function]}
-    title="Move block up from row NaN to row NaN"
+    title="Move block left from position 2 to position 1"
   />
   <ForwardRef(ToolbarButton)
     extraProps={
       Object {
-        "hint": "Double tap to move the block down",
+        "hint": "Double tap to move the block to the right",
       }
     }
     icon={
       <SVG
-        viewBox="-2 -2 24 24"
+        viewBox="0 0 24 24"
         xmlns="http://www.w3.org/2000/svg"
       >
         <Path
-          d="M9 2h2v12l4-4 2 1-7 7-7-7 2-1 4 4V2z"
+          d="M14.3 6.7l-1.1 1.1 4 4H4v1.5h13.3l-4.1 4.4 1.1 1.1 5.8-6.3z"
         />
       </SVG>
     }
+    isDisabled={true}
+    onClick={[MockFunction]}
     onLongPress={[Function]}
-    title="Move block down from row NaN to row NaN"
+    title="Move block right"
   />
   <Picker
     hideCancelButton={true}

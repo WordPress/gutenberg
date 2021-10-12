@@ -15,7 +15,7 @@ describe( 'adding patterns', () => {
 	} );
 
 	it( 'should insert a block pattern', async () => {
-		await insertPattern( 'Two buttons' );
+		await insertPattern( 'Social links with a shared background color' );
 
 		expect( await getEditedPostContent() ).toMatchSnapshot();
 	} );

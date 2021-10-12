@@ -2,7 +2,7 @@
  * External dependencies
  */
 const { writeFile } = require( 'fs' ).promises;
-const { snakeCase } = require( 'lodash' );
+const { snakeCase, camelCase, upperFirst } = require( 'lodash' );
 const makeDir = require( 'make-dir' );
 const { render } = require( 'mustache' );
 const { dirname, join } = require( 'path' );
@@ -53,6 +53,7 @@ module.exports = async (
 		namespaceSnakeCase: snakeCase( namespace ),
 		slug,
 		slugSnakeCase: snakeCase( slug ),
+		slugPascalCase: upperFirst( camelCase( slug ) ),
 		title,
 		description,
 		dashicon,
@@ -118,8 +119,8 @@ module.exports = async (
 		code( '  $ npm run build' );
 		info( '    Builds the code for production.' );
 		info( '' );
-		code( '  $ npm run format:js' );
-		info( '    Formats JavaScript files.' );
+		code( '  $ npm run format' );
+		info( '    Formats files.' );
 		info( '' );
 		code( '  $ npm run lint:css' );
 		info( '    Lints CSS files.' );

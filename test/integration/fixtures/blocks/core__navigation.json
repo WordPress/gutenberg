@@ -1,0 +1,15 @@
+[
+	{
+		"clientId": "_clientId_0",
+		"name": "core/navigation",
+		"isValid": true,
+		"attributes": {
+			"orientation": "horizontal",
+			"showSubmenuIcon": true,
+			"openSubmenusOnClick": false,
+			"isResponsive": false
+		},
+		"innerBlocks": [],
+		"originalContent": ""
+	}
+]

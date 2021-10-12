@@ -1,20 +1,25 @@
 /**
- * WordPress dependencies
- */
-import { createSlotFill } from '@wordpress/components';
-
-/**
  * Internal dependencies
  */
-import useDisplayBlockControls from '../use-display-block-controls';
+import InspectorControlsFill from './fill';
+import InspectorControlsSlot from './slot';
 
-const { Fill, Slot } = createSlotFill( 'InspectorControls' );
+const InspectorControls = InspectorControlsFill;
 
-function InspectorControls( { children } ) {
-	return useDisplayBlockControls() ? <Fill>{ children }</Fill> : null;
-}
+InspectorControls.Slot = InspectorControlsSlot;
 
-InspectorControls.Slot = Slot;
+// This is just here for backward compatibility.
+export const InspectorAdvancedControls = ( props ) => {
+	return (
+		<InspectorControlsFill { ...props } __experimentalGroup="advanced" />
+	);
+};
+InspectorAdvancedControls.Slot = ( props ) => {
+	return (
+		<InspectorControlsSlot { ...props } __experimentalGroup="advanced" />
+	);
+};
+InspectorAdvancedControls.slotName = 'InspectorAdvancedControls';
 
 /**
  * @see https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/inspector-controls/README.md

@@ -8,8 +8,8 @@ import {
 	getAttributesFromPreview,
 	getEmbedInfoByProvider,
 } from './util';
-import { settings } from './index';
 import EmbedControls from './embed-controls';
+import { embedContentIcon } from './icons';
 import EmbedLoading from './embed-loading';
 import EmbedPlaceholder from './embed-placeholder';
 import EmbedPreview from './embed-preview';
@@ -22,21 +22,12 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { __, sprintf } from '@wordpress/i18n';
+import { __, _x, sprintf } from '@wordpress/i18n';
 import { useState, useEffect } from '@wordpress/element';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { useBlockProps } from '@wordpress/block-editor';
 import { store as coreStore } from '@wordpress/core-data';
-
-function getResponsiveHelp( checked ) {
-	return checked
-		? __(
-				'This embed will preserve its aspect ratio when the browser is resized.'
-		  )
-		: __(
-				'This embed may not preserve its aspect ratio when the browser is resized.'
-		  );
-}
+import { View } from '@wordpress/primitives';
 
 const EmbedEdit = ( props ) => {
 	const {
@@ -51,18 +42,19 @@ const EmbedEdit = ( props ) => {
 		onReplace,
 		setAttributes,
 		insertBlocksAfter,
+		onFocus,
 	} = props;
 
 	const defaultEmbedInfo = {
-		title: settings.title,
-		icon: settings.icon,
+		title: _x( 'Embed', 'block title' ),
+		icon: embedContentIcon,
 	};
 	const { icon, title } =
 		getEmbedInfoByProvider( providerNameSlug ) || defaultEmbedInfo;
 
 	const [ url, setURL ] = useState( attributesUrl );
 	const [ isEditingURL, setIsEditingURL ] = useState( false );
-	const { invalidateResolution } = useDispatch( 'core/data' );
+	const { invalidateResolution } = useDispatch( coreStore );
 
 	const {
 		preview,
@@ -179,9 +171,9 @@ const EmbedEdit = ( props ) => {
 
 	if ( fetching ) {
 		return (
-			<div { ...blockProps }>
+			<View { ...blockProps }>
 				<EmbedLoading />
-			</div>
+			</View>
 		);
 	}
 
@@ -190,12 +182,14 @@ const EmbedEdit = ( props ) => {
 
 	// No preview, or we can't embed the current URL, or we've clicked the edit button.
 	const showEmbedPlaceholder = ! preview || cannotEmbed || isEditingURL;
+
 	if ( showEmbedPlaceholder ) {
 		return (
-			<div { ...blockProps }>
+			<View { ...blockProps }>
 				<EmbedPlaceholder
 					icon={ icon }
 					label={ label }
+					onFocus={ onFocus }
 					onSubmit={ ( event ) => {
 						if ( event ) {
 							event.preventDefault();
@@ -209,12 +203,10 @@ const EmbedEdit = ( props ) => {
 					onChange={ ( event ) => setURL( event.target.value ) }
 					fallback={ () => fallback( url, onReplace ) }
 					tryAgain={ () => {
-						invalidateResolution( 'core', 'getEmbedPreview', [
-							url,
-						] );
+						invalidateResolution( 'getEmbedPreview', [ url ] );
 					} }
 				/>
-			</div>
+			</View>
 		);
 	}
 
@@ -225,6 +217,7 @@ const EmbedEdit = ( props ) => {
 	// after the preview has been rendered can result in unwanted
 	// clipping or scrollbars. The `getAttributesFromPreview` function
 	// that `getMergedAttributes` uses is memoized so that we're not
+	// calculating them on every render.
 	const {
 		caption,
 		type,
@@ -240,11 +233,10 @@ const EmbedEdit = ( props ) => {
 				themeSupportsResponsive={ themeSupportsResponsive }
 				blockSupportsResponsive={ responsive }
 				allowResponsive={ allowResponsive }
-				getResponsiveHelp={ getResponsiveHelp }
 				toggleResponsive={ toggleResponsive }
 				switchBackToURLInput={ () => setIsEditingURL( true ) }
 			/>
-			<div { ...blockProps }>
+			<View { ...blockProps }>
 				<EmbedPreview
 					preview={ preview }
 					previewable={ previewable }
@@ -260,7 +252,7 @@ const EmbedEdit = ( props ) => {
 					label={ label }
 					insertBlocksAfter={ insertBlocksAfter }
 				/>
-			</div>
+			</View>
 		</>
 	);
 };

@@ -1,5 +1,4 @@
-`useFocusOnMount`
-=================
+# `useFocusOnMount`
 
 Hook used to focus the first tabbable element on mount.
 
@@ -7,7 +6,7 @@ Hook used to focus the first tabbable element on mount.
 
 ### `ref`
 
-- Type: `Object|Function`
+-   Type: `Object|Function`
 
 A React ref that must be passed to the DOM element where the behavior should be attached.
 
@@ -17,12 +16,12 @@ A React ref that must be passed to the DOM element where the behavior should be 
 import { useFocusOnMount } from '@wordpress/compose';
 
 const WithFocusOnMount = () => {
-	const ref = useFocusOnMount()
+	const ref = useFocusOnMount();
 	return (
 		<div ref={ ref }>
 			<Button />
 			<Button />
-		</div> 
+		</div>
 	);
 };
 ```

@@ -1,0 +1,13 @@
+[
+	{
+		"clientId": "_clientId_0",
+		"name": "core/loginout",
+		"isValid": true,
+		"attributes": {
+			"displayLoginAsForm": false,
+			"redirectToCurrent": true
+		},
+		"innerBlocks": [],
+		"originalContent": ""
+	}
+]

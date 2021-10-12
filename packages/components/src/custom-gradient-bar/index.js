@@ -76,6 +76,8 @@ export default function CustomGradientBar( {
 	hasGradient,
 	value: controlPoints,
 	onChange,
+	disableInserter = false,
+	disableAlpha = false,
 } ) {
 	const gradientPickerDomRef = useRef();
 
@@ -129,24 +131,28 @@ export default function CustomGradientBar( {
 			onMouseLeave={ onMouseLeave }
 		>
 			<div className="components-custom-gradient-picker__markers-container">
-				{ ( isMovingInserter || isInsertingControlPoint ) && (
-					<ControlPoints.InsertPoint
-						insertPosition={ gradientBarState.insertPosition }
-						value={ controlPoints }
-						onChange={ onChange }
-						onOpenInserter={ () => {
-							gradientBarStateDispatch( {
-								type: 'OPEN_INSERTER',
-							} );
-						} }
-						onCloseInserter={ () => {
-							gradientBarStateDispatch( {
-								type: 'CLOSE_INSERTER',
-							} );
-						} }
-					/>
-				) }
+				{ ! disableInserter &&
+					( isMovingInserter || isInsertingControlPoint ) && (
+						<ControlPoints.InsertPoint
+							disableAlpha={ disableAlpha }
+							insertPosition={ gradientBarState.insertPosition }
+							value={ controlPoints }
+							onChange={ onChange }
+							onOpenInserter={ () => {
+								gradientBarStateDispatch( {
+									type: 'OPEN_INSERTER',
+								} );
+							} }
+							onCloseInserter={ () => {
+								gradientBarStateDispatch( {
+									type: 'CLOSE_INSERTER',
+								} );
+							} }
+						/>
+					) }
 				<ControlPoints
+					disableAlpha={ disableAlpha }
+					disableRemove={ disableInserter }
 					gradientPickerDomRef={ gradientPickerDomRef }
 					ignoreMarkerPosition={
 						isInsertingControlPoint
