@@ -6,9 +6,7 @@
  * @return {string} The text content with any html removed.
  */
 export default function stripHTML( html ) {
-	const document = new window.DOMParser().parseFromString(
-		html,
-		'text/html'
-	);
-	return document.body.textContent || '';
+	const doc = document.implementation.createHTMLDocument( '' );
+	doc.body.innerHTML = html;
+	return doc.body.textContent || '';
 }
