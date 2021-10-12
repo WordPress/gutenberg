@@ -251,17 +251,16 @@ function gutenberg_register_duotone_support( $block_type ) {
 }
 
 /**
- * Renders the duotone filter SVG and returns the CSS filter property to
- * reference the rendered SVG.
+ * Renders the Duotone filter SVG
  *
  * @param array $preset Duotone preset value as seen in theme.json.
  *
- * @return string Duotone CSS filter property.
+ * @return string The Duotone filter SVG markup.
  */
 function gutenberg_render_duotone_filter_preset( $preset ) {
-	$duotone_id     = $preset['slug'];
+	$filter_id      = $preset['slug'];
 	$duotone_colors = $preset['colors'];
-	$filter_id      = 'wp-duotone-' . $duotone_id;
+
 	$duotone_values = array(
 		'r' => array(),
 		'g' => array(),
@@ -319,17 +318,7 @@ function gutenberg_render_duotone_filter_preset( $preset ) {
 		$svg = trim( $svg );
 	}
 
-	add_action(
-		// Safari doesn't render SVG filters defined in data URIs,
-		// and SVG filters won't render in the head of a document,
-		// so the next best place to put the SVG is in the footer.
-		is_admin() ? 'admin_footer' : 'wp_footer',
-		function () use ( $svg ) {
-			echo $svg;
-		}
-	);
-
-	return "url('#" . $filter_id . "')";
+	return $svg;
 }
 
 /**
@@ -357,11 +346,12 @@ function gutenberg_render_duotone_support( $block_content, $block ) {
 	}
 
 	$filter_preset   = array(
-		'slug'   => uniqid(),
+		'slug'   => 'wp-duotone-' . uniqid(),
 		'colors' => $block['attrs']['style']['color']['duotone'],
 	);
-	$filter_property = gutenberg_render_duotone_filter_preset( $filter_preset );
-	$filter_id       = 'wp-duotone-' . $filter_preset['slug'];
+	$svg             = gutenberg_render_duotone_filter_preset( $filter_preset );
+	$filter_id       = $filter_preset['slug'];
+	$filter_property = "url('#" . $filter_id . "')";
 
 	$scope     = '.' . $filter_id;
 	$selectors = explode( ',', $duotone_support );
@@ -377,9 +367,7 @@ function gutenberg_render_duotone_support( $block_content, $block ) {
 		? $selector . " {\n\tfilter: " . $filter_property . " !important;\n}\n"
 		: $selector . '{filter:' . $filter_property . ' !important;}';
 
-	wp_register_style( $filter_id, false, array(), true, true );
-	wp_add_inline_style( $filter_id, $filter_style );
-	wp_enqueue_style( $filter_id );
+	gutenberg_render_block_support_style( $svg . '<style>' . $filter_style . '</style>' );
 
 	// Like the layout hook, this assumes the hook only applies to blocks with a single wrapper.
 	return preg_replace(

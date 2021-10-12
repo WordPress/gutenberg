@@ -36,12 +36,11 @@ function ReadOnlyContent( { userCanEdit, postType, postId } ) {
 			<Warning>{ __( 'This content is password protected.' ) }</Warning>
 		</div>
 	) : (
-		<div { ...blockProps }>
-			<RawHTML key="html">{ content?.rendered }</RawHTML>
-			<RawHTML key="footer-styles">
-				{ blockSupportsStyles ? blockSupportsStyles : null }
-			</RawHTML>
-		</div>
+		<RawHTML { ...blockProps } key="html">
+			{ blockSupportsStyles && content?.rendered
+				? content.rendered + blockSupportsStyles
+				: content?.rendered }
+		</RawHTML>
 	);
 }
 
