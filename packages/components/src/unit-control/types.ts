@@ -2,7 +2,7 @@
  * External dependencies
  */
 // eslint-disable-next-line no-restricted-imports
-import type { CSSProperties, SyntheticEvent } from 'react';
+import type { SyntheticEvent } from 'react';
 
 /**
  * Internal dependencies
@@ -45,22 +45,54 @@ export type UnitControlOnChangeCallback = InputChangeCallback<
 >;
 
 export type UnitSelectControlProps = {
+	/**
+	 * Whether the control can be focused via keyboard navigation.
+	 */
 	isUnitSelectTabbable: boolean;
+	/**
+	 * A callback function invoked when the value is changed.
+	 */
 	onChange?: UnitControlOnChangeCallback;
+	/**
+	 * Size of the control option. Supports "default" and "small".
+	 */
 	size?: SelectSize;
+	/**
+	 * Current unit.
+	 */
 	unit?: string;
+	/**
+	 * Available units to select from.
+	 */
 	units?: WPUnitControlUnitList;
 };
 
 export type UnitControlProps = UnitSelectControlProps & {
 	__unstableStateReducer?: StateReducer;
-	autoComplete?: string;
+	/**
+	 * If true, the unit `<select>` is hidden.
+	 */
 	disableUnits?: boolean;
+	/**
+	 * If true, the `ENTER` key press is required in order to trigger an `onChange`.
+	 * If enabled, a change is also triggered when tabbing away (`onBlur`).
+	 */
 	isPressEnterToChange?: boolean;
+	/**
+	 * If true, and the selected unit provides a `default` value, this value is set
+	 * when changing units.
+	 */
 	isResetValueOnUnitChange?: boolean;
+	/**
+	 * If this property is added, a label will be generated using label property as the content.
+	 */
 	label?: string;
+	/**
+	 * Callback when the `unit` changes.
+	 */
 	onUnitChange?: UnitControlOnChangeCallback;
-	step?: number;
-	style?: CSSProperties;
+	/**
+	 * Current value. To set a unit, provide a unit with a value through the `value` prop.
+	 */
 	value: string;
 };

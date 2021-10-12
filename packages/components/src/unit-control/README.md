@@ -37,6 +37,14 @@ If true, the `ENTER` key press is required in order to trigger an `onChange`. If
 -   Required: No
 -   Default: `false`
 
+## isResetValueOnUnitChange
+
+If true, and the selected unit provides a `default` value, this value is set when changing units.
+
+-   Type: `Boolean`
+-   Required: No
+-   Default: `false`
+
 ### isUnitSelectTabbable
 
 Determines if the unit `<select>` is tabbable.
