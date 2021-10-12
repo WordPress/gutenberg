@@ -44,7 +44,7 @@ function ScreenTextColor( { name } ) {
 				back={ parentMenu + '/colors' }
 				title={ __( 'Text' ) }
 				description={ __(
-					'Set the text color choosing from the palette or pick your own'
+					'Set the default color used for text across the site.'
 				) }
 			/>
 

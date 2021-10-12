@@ -250,6 +250,12 @@ function render_block_core_page_list( $attributes, $content, $block ) {
 		)
 	);
 
+	// If thare are no pages, there is nothing to show.
+	// Return early and empty to trigger EmptyResponsePlaceholder.
+	if ( empty( $all_pages ) ) {
+		return;
+	}
+
 	$top_level_pages = array();
 
 	$pages_with_children = array();

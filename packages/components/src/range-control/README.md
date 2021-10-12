@@ -272,7 +272,7 @@ The value to revert to if the Reset button is clicked (enabled by `allowReset`)
 
 #### showTooltip
 
-Forcing the Tooltip UI to show or hide.
+Forcing the Tooltip UI to show or hide. This is overriden to `false` when `step` is set to the special string value `any`.
 
 -   Type: `Boolean`
 -   Required: No
@@ -280,9 +280,9 @@ Forcing the Tooltip UI to show or hide.
 
 #### step
 
-The stepping interval between `min` and `max` values. Step is used both for user interface and validation purposes.
+The minimum amount by which `value` changes. It is also a factor in validation as `value` must be a multiple of `step` (offset by `min`) to be valid. Accepts the special string value `any` that voids the validation constraint and overrides both `withInputField` and `showTooltip` props to `false`.
 
--   Type: `Number`
+-   Type: `Number | "any"`
 -   Required: No
 -   Platform: Web
 
@@ -311,7 +311,7 @@ The current value of the range slider.
 
 #### withInputField
 
-Determines if the `input` number field will render next to the RangeControl.
+Determines if the `input` number field will render next to the RangeControl. This is overriden to `false` when `step` is set to the special string value `any`.
 
 -   Type: `Boolean`
 -   Required: No
