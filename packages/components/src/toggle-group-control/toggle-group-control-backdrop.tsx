@@ -29,7 +29,11 @@ function ToggleGroupControlBackdrop( {
 		const targetNode = containerNode.querySelector(
 			`[data-value="${ state }"]`
 		);
-		if ( ! targetNode ) return;
+		if ( ! targetNode ) {
+			setLeft( 0 );
+			setWidth( 0 );
+			return;
+		}
 
 		const { x: parentX } = containerNode.getBoundingClientRect();
 		const { width: offsetWidth, x } = targetNode.getBoundingClientRect();
