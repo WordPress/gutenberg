@@ -2,9 +2,15 @@
 
 ## Unreleased
 
+### New Features
+
+-   Added support for `step="any"` in `NumberControl` and `RangeControl` ([#34542](https://github.com/WordPress/gutenberg/pull/34542)).
+
 ### Enhancements
 
 -   Removed the separator shown between `ToggleGroupControl` items ([#35497](https://github.com/WordPress/gutenberg/pull/35497)).
+
+## 18.0.0 (2021-10-12)
 
 ### Breaking Changes
 
@@ -16,7 +22,6 @@
 ### New Features
 
 -   Add an experimental `Navigator` components ([#34904](https://github.com/WordPress/gutenberg/pull/34904)) as a replacement for the previous `Navigation` related components.
--   Added support for `step="any"` in `NumberControl` and `RangeControl` ([#34542](https://github.com/WordPress/gutenberg/pull/34542)).
 -   Update the `ColorPicker` component to the latest design ([#35220](https://github.com/WordPress/gutenberg/pull/35220))
 
 ### Bug Fix
