@@ -3,7 +3,7 @@
  */
 import { DropdownMenu, FlexItem, FlexBlock, Flex } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-import { styles, moreHorizontal } from '@wordpress/icons';
+import { styles, moreVertical } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -31,7 +31,7 @@ export default function GlobalStylesSidebar() {
 					</FlexBlock>
 					<FlexItem>
 						<DropdownMenu
-							icon={ moreHorizontal }
+							icon={ moreVertical }
 							label={ __( 'More Global Styles Actions' ) }
 							toggleProps={ { disabled: ! canReset } }
 							controls={ [
