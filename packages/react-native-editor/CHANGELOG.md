@@ -11,6 +11,9 @@ For each user feature we should also add a importance categorization label  to i
 
 ## Unreleased
 
+## 1.63.1
+-   [*] Fixed erroneous overflow within editor Help screens. [#35552]
+
 ## 1.63.0
 -   [**] [Embed block] Add the top 5 specific embed blocks to the Block inserter list [#34967]
 -   [*] Embed block: Fix URL update when edited after setting a bad URL of a provider [#35013]
