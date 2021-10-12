@@ -642,20 +642,15 @@ function gutenberg_render_block_supports_style( $content, $action = 'wp_footer' 
 		}
 	);
 
-	// For requests via the REST API, append the styles to the end of the content.
-	// This ensures that in situations where `wp_footer` is never called, the
-	// styles are still available. This fixes an issue where layout styles are
-	// otherwise not rendered for the Post Content block within the site editor.
-	if ( defined( 'REST_REQUEST' ) && REST_REQUEST ) {
-		add_filter(
-			'wp_render_block_supports_styles',
-			function ( $block_supports_styles ) use ( $content ) {
-				return $block_supports_styles . $content;
-			},
-			10,
-			1
-		);
-	}
+	// Register styles to be rendered in REST API responses.
+	add_filter(
+		'wp_render_block_supports_styles',
+		function ( $block_supports_styles ) use ( $content ) {
+			return $block_supports_styles . $content;
+		},
+		10,
+		1
+	);
 }
 
 /**
@@ -680,13 +675,13 @@ function gutenberg_render_block_supports_styles_to_api_response() {
 function gutenberg_register_block_supports_styles_api_field() {
 	$post_types = get_post_types( array( 'public' => true ) );
 
-	foreach( $post_types as $post_type ) {
+	foreach ( $post_types as $post_type ) {
 		register_rest_field(
 			$post_type,
 			'block_supports_styles',
 			array(
 				'get_callback' => 'gutenberg_render_block_supports_styles_to_api_response',
-				'schema' => array( 'type' => 'string' ),
+				'schema'       => array( 'type' => 'string' ),
 			)
 		);
 	}
