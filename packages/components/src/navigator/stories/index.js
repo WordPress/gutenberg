@@ -166,20 +166,10 @@ function Sticky( {
 function MetaphorIpsum( { quantity } ) {
 	const cx = useCx();
 	const list = [
-		'A pan of the particle is assumed to be an untorn trout. We can assume that any instance of a lawyer can be construed as a peevish page. A dietician is a plushest pamphlet. The testy aunt comes from an ebon halibut.',
-		'A dish is the basement of a romania. If this was somewhat unclear, their picture was, in this moment, a rustred sink. A precipitation is a bridgeless need. Before begonias, aprils were only snowflakes.',
-		'Those toes are nothing more than violets. A blithesome map without ghanas is truly a equinox of sicklied squirrels. Those acknowledgments are nothing more than brians. Their salad was, in this moment, a steadfast step-grandmother.',
-		'However, a profit can hardly be considered a doughy subway without also being a maid. They were lost without the pictured melody that composed their cheese. The halibut of a betty becomes a model care. A match is a sunlike owner.',
 		'A loopy clarinet’s year comes with it the thought that the fenny step-son is an ophthalmologist. The literature would have us believe that a glabrate country is not but a rhythm. A beech is a rub from the right perspective. In ancient times few can name an unglossed walrus that isn’t an unspilt trial.',
 		'Authors often misinterpret the afterthought as a roseless mother-in-law, when in actuality it feels more like an uncapped thunderstorm. In recent years, some posit the tarry bottle to be less than acerb. They were lost without the unkissed timbale that composed their customer. A donna is a springtime breath.',
 		'It’s an undeniable fact, really; their museum was, in this moment, a snotty beef. The swordfishes could be said to resemble prowessed lasagnas. However, the rainier authority comes from a cureless soup. Unfortunately, that is wrong; on the contrary, the cover is a powder.',
 	];
-	// Shuffle the list
-	for ( let i = list.length - 1; i > 0; i-- ) {
-		// eslint-disable-next-line no-restricted-syntax
-		const randomIndex = Math.floor( Math.random() * ( i + 1 ) );
-		[ list[ i ], list[ randomIndex ] ] = [ list[ randomIndex ], list[ i ] ];
-	}
 	quantity = Math.min( list.length, quantity );
 	return (
 		<>
