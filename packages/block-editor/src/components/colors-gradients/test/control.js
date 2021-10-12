@@ -27,8 +27,16 @@ const getButtonWithAriaLabelStartPredicate = ( ariaLabelStart ) => (
 	);
 };
 
-const colorTabButtonPredicate = getButtonWithTestPredicate( 'Solid' );
-const gradientTabButtonPredicate = getButtonWithTestPredicate( 'Gradient' );
+const getTabWithTestPredicate = ( text ) => ( element ) => {
+	return (
+		element.type === 'button' &&
+		element.props[ 'aria-label' ] &&
+		element.props[ 'aria-label' ] === text
+	);
+};
+
+const colorTabButtonPredicate = getTabWithTestPredicate( 'Solid' );
+const gradientTabButtonPredicate = getTabWithTestPredicate( 'Gradient' );
 
 describe( 'ColorPaletteControl', () => {
 	it( 'renders tabs if it is possible to select a color and a gradient rendering a color picker at the start', async () => {

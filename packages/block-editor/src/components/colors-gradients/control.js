@@ -128,6 +128,8 @@ function ColorGradientControlInner( {
 						<ToggleGroupControl
 							value={ currentTab }
 							onChange={ setCurrentTab }
+							label={ __( 'Select color type' ) }
+							hideLabelFromVision
 							isBlock
 						>
 							<ToggleGroupControlOption
