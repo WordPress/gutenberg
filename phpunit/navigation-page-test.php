@@ -67,7 +67,7 @@ class WP_Navigation_Page_Test extends WP_UnitTestCase {
 			$menus_endpoint                  => ( 'some menus' ),
 		);
 
-		$result = gutenberg_navigation_editor_preload_menus( $preload_data );
+		$result = gutenberg_navigation_editor_preload_menus( $preload_data, 'navigation_editor' );
 		$this->assertArrayHasKey( '/__experimental/menu-locations', $result );
 		$this->assertArrayHasKey( 'OPTIONS', $result );
 		$this->assertArrayNotHasKey( $menus_endpoint, $result );
