@@ -7,6 +7,9 @@ import { compact } from 'lodash';
  * WordPress dependencies
  */
 import { AsyncModeProvider } from '@wordpress/data';
+import {
+	__experimentalTreeGridRow as TreeGridRow,
+} from '@wordpress/components';
 
 /**
  * Internal dependencies
@@ -47,8 +50,6 @@ const countReducer = ( expandedState, draggedClientIds ) => (
 	}
 	return count + 1;
 };
-
-const ITEM_HEIGHT = 36;
 
 export default function ListViewBranch( props ) {
 	const {
@@ -109,27 +110,6 @@ export default function ListViewBranch( props ) {
 		const blockInView =
 			! __experimentalPersistentListViewFeatures ||
 			( start <= nextPosition && nextPosition <= start + maxVisible );
-
-		const isDragging = draggedClientIds?.length > 0;
-		if ( ! isDragging && ! blockInView && nextPosition > start ) {
-			// found the end of the window, don't bother processing the rest of the items
-			break;
-		}
-
-		const style = {
-			...( __experimentalPersistentListViewFeatures &&
-			start === nextPosition
-				? { paddingTop: ITEM_HEIGHT * start }
-				: {} ),
-			...( __experimentalPersistentListViewFeatures &&
-			visibleBlockCount > end &&
-			end === nextPosition
-				? {
-						paddingBottom:
-							ITEM_HEIGHT * ( visibleBlockCount - end - 1 ),
-				  }
-				: {} ),
-		};
 		const isFocused =
 			__experimentalPersistentListViewFeatures &&
 			( ( start === nextPosition && focus === 'start' ) ||
@@ -199,9 +179,15 @@ export default function ListViewBranch( props ) {
 						path={ updatedPath }
 						isExpanded={ isExpanded }
 						listPosition={ nextPosition }
-						style={ style }
 						isFocused={ isFocused }
 					/>
+				) }
+				{ ! blockInView && (
+					<TreeGridRow>
+						<td className={ 'list-item-placeholder' }>
+							Placeholder
+						</td>
+					</TreeGridRow>
 				) }
 				{ hasNestedBranch && isExpanded && ! isDragged && (
 					<ListViewBranch
