@@ -85,7 +85,7 @@ function Placeholder() {
 	const blockProps = useBlockProps();
 	return (
 		<div { ...blockProps }>
-			<p>{ __( 'Post content' ) }</p>
+			<p>{ __( 'Post Content' ) }</p>
 		</div>
 	);
 }
