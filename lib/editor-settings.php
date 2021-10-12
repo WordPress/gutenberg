@@ -81,7 +81,9 @@ function gutenberg_initialize_editor( $editor_name, $editor_script_handle, $sett
 	 *
 	 * The dynamic portion of the hook name, `$editor_name`, refers to the type of block editor.
 	 *
-	 * @param Array $preload_data Array containing the preloaded data.
+	 * @param array $preload_data Array containing the preloaded data.
+	 * @param string $editor_name Current editor name.
+	 * @param array Array containing the filtered preloaded data.
 	 */
 	$preload_data = apply_filters( 'block_editor_preload_data', $preload_data, $editor_name );
 

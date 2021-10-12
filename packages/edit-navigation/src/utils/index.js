@@ -46,10 +46,6 @@ export function createMenuPreloadingMiddleware( preloadedData ) {
 		}
 
 		const key = Object.keys( cache )?.[ 0 ];
-		if ( ! key ) {
-			return next( options );
-		}
-
 		const menuData = cache[ key ]?.body;
 		if ( ! menuData ) {
 			return next( options );
