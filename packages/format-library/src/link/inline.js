@@ -37,29 +37,7 @@ function InlineLinkUI( {
 	stopAddingLink,
 	contentRef,
 } ) {
-	// Default to the selection ranges on the RichTextValue object.
-	let textStart = value.start;
-	let textEnd = value.end;
-
-	// On the condition that:
-	// 1. we have an active format
-	// 2. there is no range to the selection
-	// ...then manually find the boundaries of the selection via the
-	// boundaries of the active format.
-	if ( isCollapsed( value ) && isActive ) {
-		const boundary = getFormatBoundary( value, {
-			type: 'core/link',
-		} );
-
-		textStart = boundary.start;
-
-		// Text *selection* always extends +1 beyond the edge of the format.
-		// We account for that here.
-		textEnd = boundary.end + 1;
-	}
-
-	// Get a RichTextValue containing the selected text content.
-	const richLinkTextValue = slice( value, textStart, textEnd );
+	const richLinkTextValue = getRichTextValueFromSelection( value, isActive );
 
 	// Get the text content minus any HTML tags.
 	const richTextText = richLinkTextValue.text;
@@ -169,8 +147,8 @@ function InlineLinkUI( {
 					newText.length
 				);
 
-				// Update the full existing value replacing the
-				// target text with the new RichTextValue containing:
+				// Update the original (full) RichTextValue replacing the
+				// target text with the *new* RichTextValue containing:
 				// 1. The new text content.
 				// 2. The new link format.
 				// Note original formats will be lost when applying this change.
@@ -256,6 +234,32 @@ function InlineLinkUI( {
 			/>
 		</Popover>
 	);
+}
+
+function getRichTextValueFromSelection( value, isActive ) {
+	// Default to the selection ranges on the RichTextValue object.
+	let textStart = value.start;
+	let textEnd = value.end;
+
+	// On the condition that:
+	// 1. we have an active format
+	// 2. there is no range to the selection
+	// ...then manually find the boundaries of the selection via the
+	// boundaries of the active format.
+	if ( isCollapsed( value ) && isActive ) {
+		const boundary = getFormatBoundary( value, {
+			type: 'core/link',
+		} );
+
+		textStart = boundary.start;
+
+		// Text *selection* always extends +1 beyond the edge of the format.
+		// We account for that here.
+		textEnd = boundary.end + 1;
+	}
+
+	// Get a RichTextValue containing the selected text content.
+	return slice( value, textStart, textEnd );
 }
 
 export default withSpokenMessages( InlineLinkUI );
