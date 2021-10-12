@@ -16,7 +16,7 @@ const rangeHeightValue = 30;
 const railHeight = 4;
 const rangeHeight = () =>
 	css( { height: rangeHeightValue, minHeight: rangeHeightValue } );
-const thumbSize = 9;
+const thumbSize = 12;
 
 export const Root = styled.div`
 	-webkit-tap-highlight-color: transparent;
