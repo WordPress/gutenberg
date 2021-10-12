@@ -81,11 +81,11 @@ export default function useFixedWindowList(
 				totalItems - 1,
 				start + visibleItems + windowOverscan
 			);
-			setFixedListWindow( {
+			const nextWindow = {
 				visibleItems,
 				start,
 				end,
-				itemInView: ( index ) => {
+				itemInView: ( /** @type {number} */ index ) => {
 					return start <= index && index <= end;
 				},
 				startPadding: itemHeight * start,
@@ -93,7 +93,8 @@ export default function useFixedWindowList(
 					totalItems > end
 						? itemHeight * ( totalItems - end - 1 )
 						: 0,
-			} );
+			};
+			setFixedListWindow( nextWindow );
 		};
 		const handleKeyDown = ( /** @type {KeyboardEvent} */ event ) => {
 			switch ( event.keyCode ) {

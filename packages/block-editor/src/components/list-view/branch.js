@@ -101,32 +101,9 @@ export default function ListViewBranch( props ) {
 		}
 
 		const usesWindowing = __experimentalPersistentListViewFeatures;
-		const {
-			start,
-			end,
-			itemInView,
-			startPadding,
-			endPadding,
-		} = fixedListWindow;
+		const { itemInView } = fixedListWindow;
 
 		const blockInView = ! usesWindowing || itemInView( nextPosition );
-
-		const isDragging = draggedClientIds?.length > 0;
-		if (
-			usesWindowing &&
-			! isDragging &&
-			! blockInView &&
-			nextPosition > start
-		) {
-			// found the end of the window, don't bother processing the rest of the items
-			break;
-		}
-		const style = usesWindowing
-			? {
-					paddingTop: start === nextPosition ? startPadding : 0,
-					paddingBottom: end === nextPosition ? endPadding : 0,
-			  }
-			: undefined;
 
 		const position = index + 1;
 		const isLastRowAtLevel = rowCount === position;
@@ -192,8 +169,14 @@ export default function ListViewBranch( props ) {
 						path={ updatedPath }
 						isExpanded={ isExpanded }
 						listPosition={ nextPosition }
-						style={ style }
 					/>
+				) }
+				{ ! isDragged && ! blockInView && (
+					<tr>
+						<td style={ { height: 36, padding: 0 } }>
+							Placeholder
+						</td>
+					</tr>
 				) }
 				{ hasNestedBranch && isExpanded && ! isDragged && (
 					<ListViewBranch
