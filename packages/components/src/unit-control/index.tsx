@@ -225,6 +225,22 @@ function UnitControl(
 	);
 }
 
+/**
+ * `UnitControl` allows the user to set a value as well as a unit (e.g. `px`).
+ *
+ *
+ * @example
+ * ```jsx
+ * import { __experimentalUnitControl as UnitControl } from '@wordpress/components';
+ * import { useState } from '@wordpress/element';
+ *
+ * const Example = () => {
+ *   const [ value, setValue ] = useState( '10px' );
+ *
+ *   return <UnitControl onChange={ setValue } value={ value } />;
+ * };
+ * ```
+ */
 const ForwardedUnitControl = forwardRef( UnitControl );
 
 export { parseUnit, useCustomUnits } from './utils';
