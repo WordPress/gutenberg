@@ -227,6 +227,31 @@ function block_core_page_list_nest_pages( $current_level, $children ) {
 }
 
 /**
+ * Determines if page should be classified as top-level or child page. Broken
+ * out to this function to explain instead of a complex if statement.
+ * When only_child_pages is true, force child pages to be considered top level.
+ * Thy are top level since the parent is not shown (only child pages).
+ *
+ * @param int     $page_parent_id Parent id of the page being tested.
+ * @param boolean $only_child_pages Only showing child pages.
+ * @param int     $parent_id Top level parent id for child pages, needed so we can nest grand children.
+ * @return boolean True if page should be considered a child page.
+ */
+function block_core_page_list_treat_as_child( $page_parent_id, $only_child_pages, $parent_id ) {
+	if ( ! $page_parent_id ) {
+		return false;
+	}
+
+	// Check only child pages, and id matches parent, then it is top level and
+	// should not be treated like a child page.
+	if ( $only_child_pages && ( $page_parent_id === $parent_id ) ) {
+		return false;
+	}
+
+	return true;
+}
+
+/**
  * Renders the `core/page-list` block on server.
  *
  * @param array $attributes The block attributes.
@@ -278,9 +303,8 @@ function render_block_core_page_list( $attributes, $content, $block ) {
 			$active_page_ancestor_ids = get_post_ancestors( $page->ID );
 		}
 
-		// Only set pages with children when only child pages is not set, since
-		// when set we want child pages to be top-level.
-		if ( $page->post_parent && ! $only_child_pages ) {
+		// See function for logic when pages are treated like child pages.
+		if ( block_core_page_list_treat_as_child( $page->post_parent, $only_child_pages, $parent_id ) ) {
 			$pages_with_children[ $page->post_parent ][ $page->ID ] = array(
 				'page_id'   => $page->ID,
 				'title'     => $page->post_title,
