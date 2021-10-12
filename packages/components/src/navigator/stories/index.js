@@ -1,10 +1,16 @@
 /**
+ * External dependencies
+ */
+import { css } from '@emotion/react';
+
+/**
  * Internal dependencies
  */
 import Button from '../../button';
 import { Card, CardBody, CardFooter, CardHeader } from '../../card';
 import { HStack } from '../../h-stack';
 import { Flyout } from '../../flyout';
+import { useCx } from '../../utils/hooks/use-cx';
 import { NavigatorProvider, NavigatorScreen, useNavigator } from '../';
 
 export default {
@@ -22,104 +28,111 @@ function NavigatorButton( { path, isBack = false, ...props } ) {
 	);
 }
 
-const MyNavigation = () => (
-	<NavigatorProvider
-		initialPath="/"
-		style={ { height: '100vh', maxHeight: '450px' } }
-	>
-		<NavigatorScreen path="/">
-			<Card>
-				<CardBody>
-					<p>This is the home screen.</p>
+const MyNavigation = () => {
+	const cx = useCx();
+	return (
+		<NavigatorProvider
+			initialPath="/"
+			className={ cx( css( `height: 100vh; max-height: 450px;` ) ) }
+		>
+			<NavigatorScreen path="/">
+				<Card>
+					<CardBody>
+						<p>This is the home screen.</p>
 
-					<HStack justify="flex-start" wrap>
-						<NavigatorButton variant="primary" path="/child">
-							Navigate to child screen.
+						<HStack justify="flex-start" wrap>
+							<NavigatorButton variant="primary" path="/child">
+								Navigate to child screen.
+							</NavigatorButton>
+
+							<NavigatorButton path="/overflow-child">
+								Navigate to screen with horizontal overflow.
+							</NavigatorButton>
+
+							<NavigatorButton path="/stickies">
+								Navigate to screen with sticky content.
+							</NavigatorButton>
+
+							<Flyout
+								trigger={ <Button>Open test dialog</Button> }
+								placement="bottom-start"
+							>
+								<CardHeader>Go</CardHeader>
+								<CardBody>Stuff</CardBody>
+							</Flyout>
+						</HStack>
+					</CardBody>
+				</Card>
+			</NavigatorScreen>
+
+			<NavigatorScreen path="/child">
+				<Card>
+					<CardBody>
+						<p>This is the child screen.</p>
+						<NavigatorButton path="/" isBack>
+							Go back
 						</NavigatorButton>
+					</CardBody>
+				</Card>
+			</NavigatorScreen>
 
-						<NavigatorButton path="/overflow-child">
-							Navigate to screen with horizontal overflow.
+			<NavigatorScreen path="/overflow-child">
+				<Card>
+					<CardBody>
+						<NavigatorButton path="/" isBack>
+							Go back
 						</NavigatorButton>
-
-						<NavigatorButton path="/stickies">
-							Navigate to screen with sticky content.
-						</NavigatorButton>
-
-						<Flyout
-							trigger={ <Button>Open test dialog</Button> }
-							placement="bottom-start"
+						<div
+							className={ cx(
+								css( `
+									display: inline-block;
+									background: papayawhip;
+								` )
+							) }
 						>
-							<CardHeader>Go</CardHeader>
-							<CardBody>Stuff</CardBody>
-						</Flyout>
-					</HStack>
-				</CardBody>
-			</Card>
-		</NavigatorScreen>
+							<span
+								className={ cx(
+									css( `
+										color: palevioletred;
+										whiteSpace: nowrap;
+										fontSize: 42vw;
+									` )
+								) }
+							>
+								¯\_(ツ)_/¯
+							</span>
+						</div>
+					</CardBody>
+				</Card>
+			</NavigatorScreen>
 
-		<NavigatorScreen path="/child">
-			<Card>
-				<CardBody>
-					<p>This is the child screen.</p>
-					<NavigatorButton path="/" isBack>
-						Go back
-					</NavigatorButton>
-				</CardBody>
-			</Card>
-		</NavigatorScreen>
-
-		<NavigatorScreen path="/overflow-child">
-			<Card>
-				<CardBody>
-					<NavigatorButton path="/" isBack>
-						Go back
-					</NavigatorButton>
-					<div
-						style={ {
-							display: 'inline-block',
-							background: 'papayawhip',
-						} }
-					>
-						<span
-							style={ {
-								color: 'palevioletred',
-								whiteSpace: 'nowrap',
-								fontSize: '42vw',
-							} }
-						>
-							¯\_(ツ)_/¯
-						</span>
-					</div>
-				</CardBody>
-			</Card>
-		</NavigatorScreen>
-
-		<NavigatorScreen path="/stickies">
-			<Card>
-				<Sticky as={ CardHeader } z="2">
-					<NavigatorButton path="/" isBack>
-						Go back
-					</NavigatorButton>
-				</Sticky>
-				<CardBody>
-					<Sticky top="69px" colors="papayawhip/peachpuff">
-						<h2>A wild sticky element appears</h2>
+			<NavigatorScreen path="/stickies">
+				<Card>
+					<Sticky as={ CardHeader } z="2">
+						<NavigatorButton path="/" isBack>
+							Go back
+						</NavigatorButton>
 					</Sticky>
-					<MetaphorIpsum quantity={ 3 } />
-				</CardBody>
-				<CardBody>
-					<Sticky top="69px" colors="azure/paleturquoise">
-						<h2>Another wild sticky element appears</h2>
+					<CardBody>
+						<Sticky top="69px" colors="papayawhip/peachpuff">
+							<h2>A wild sticky element appears</h2>
+						</Sticky>
+						<MetaphorIpsum quantity={ 3 } />
+					</CardBody>
+					<CardBody>
+						<Sticky top="69px" colors="azure/paleturquoise">
+							<h2>Another wild sticky element appears</h2>
+						</Sticky>
+						<MetaphorIpsum quantity={ 3 } />
+					</CardBody>
+					<Sticky as={ CardFooter } colors="mistyrose/pink">
+						<Button variant="primary">Primary noop</Button>
 					</Sticky>
-					<MetaphorIpsum quantity={ 3 } />
-				</CardBody>
-				<Sticky as={ CardFooter } colors="mistyrose/pink">
-					<Button variant="primary">Primary noop</Button>
-				</Sticky>
-			</Card>
-		</NavigatorScreen>
-	</NavigatorProvider>
-);
+				</Card>
+			</NavigatorScreen>
+		</NavigatorProvider>
+	);
+};
 
 export const _default = () => {
 	return <MyNavigation />;
@@ -129,26 +142,29 @@ function Sticky( {
 	as: Tag = 'div',
 	bottom = 0,
 	colors = 'whitesmoke/lightgrey',
-	style,
 	top = 0,
 	z: zIndex = 1,
 	...props
 } ) {
+	const cx = useCx();
 	const [ bgColor, dotColor ] = colors.split( '/' );
-	const strictStyle = {
-		top,
-		bottom,
-		zIndex,
-		display: 'flex',
-		position: 'sticky',
-		background: `radial-gradient(${ dotColor } 1px, ${ bgColor } 2px) 50%/1em 1em`,
-		textAlign: 'center',
-	};
-	const propsOut = { ...props, style: { ...style, ...strictStyle } };
+	const className = cx(
+		css( {
+			top,
+			bottom,
+			zIndex,
+			display: 'flex',
+			position: 'sticky',
+			background: `radial-gradient(${ dotColor } 1px, ${ bgColor } 2px) 50%/1em 1em`,
+		} ),
+		props.className
+	);
+	const propsOut = { ...props, className };
 	return <Tag { ...propsOut } />;
 }
 
 function MetaphorIpsum( { quantity } ) {
+	const cx = useCx();
 	const list = [
 		'A pan of the particle is assumed to be an untorn trout. We can assume that any instance of a lawyer can be construed as a peevish page. A dietician is a plushest pamphlet. The testy aunt comes from an ebon halibut.',
 		'A dish is the basement of a romania. If this was somewhat unclear, their picture was, in this moment, a rustred sink. A precipitation is a bridgeless need. Before begonias, aprils were only snowflakes.',
@@ -168,7 +184,7 @@ function MetaphorIpsum( { quantity } ) {
 	return (
 		<>
 			{ list.slice( 0, quantity ).map( ( text, key ) => (
-				<p style={ { maxWidth: '20em' } } key={ key }>
+				<p className={ cx( css( `max-width: 20em;` ) ) } key={ key }>
 					{ text }
 				</p>
 			) ) }
