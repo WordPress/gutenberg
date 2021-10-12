@@ -560,7 +560,7 @@
 .wp-block-navigation__responsive-container-open {
 	display: flex;
 
-	&:not(.always-on) {
+	&:not(.always-shown) {
 		@include break-small {
 			display: none;
 		}

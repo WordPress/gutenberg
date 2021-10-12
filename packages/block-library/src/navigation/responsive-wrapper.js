@@ -31,7 +31,7 @@ export default function ResponsiveWrapper( {
 	);
 	const openButtonClasses = classnames(
 		'wp-block-navigation__responsive-container-open',
-		{ 'always-on': isHiddenByDefault }
+		{ 'always-shown': isHiddenByDefault }
 	);
 
 	const modalId = `${ id }-modal`;

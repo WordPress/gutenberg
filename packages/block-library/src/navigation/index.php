@@ -304,7 +304,7 @@ function render_block_core_navigation( $attributes, $content, $block ) {
 	);
 	$open_button_classes          = array(
 		'wp-block-navigation__responsive-container-open',
-		$is_hidden_by_default ? 'always-on' : '',
+		$is_hidden_by_default ? 'always-shown' : '',
 	);
 
 	$responsive_container_markup = sprintf(
