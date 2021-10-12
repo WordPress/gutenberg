@@ -139,7 +139,6 @@ export function getSaveElement(
 	let element = save( { attributes, innerBlocks } );
 
 	if (
-		! blockType.apiVersion &&
 		isObject( element ) &&
 		hasFilter( 'blocks.getSaveContent.extraProps' ) &&
 		! ( blockType.apiVersion > 1 )
