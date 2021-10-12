@@ -40,7 +40,10 @@ const PatternEdit = ( { attributes, clientId, isSelected } ) => {
 	useEffect( () => {
 		if ( hasSelection && selectedPattern?.blocks ) {
 			__unstableMarkNextChangeAsNotPersistent();
-			replaceBlocks( clientId, createBlock( 'core/group', {}, selectedPattern.blocks ) );
+			replaceBlocks(
+				clientId,
+				createBlock( 'core/group', {}, selectedPattern.blocks )
+			);
 		}
 	}, [ hasSelection, selectedPattern?.blocks ] );
 
