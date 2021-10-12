@@ -9,6 +9,7 @@ import {
 	useBlockProps,
 	__experimentalUseInnerBlocksProps as useInnerBlocksProps,
 } from '@wordpress/block-editor';
+import { createBlock } from '@wordpress/blocks';
 
 const PatternEdit = ( { attributes, clientId, isSelected } ) => {
 	const selectedPattern = useSelect(
@@ -33,12 +34,13 @@ const PatternEdit = ( { attributes, clientId, isSelected } ) => {
 	} = useDispatch( blockEditorStore );
 
 	// Run this effect when the block, or any of its InnerBlocks are selected.
-	// This replaces the Pattern block wrapper with the content of the pattern.
+	// This replaces the Pattern block wrapper with a Group block.
+	// This ensures the markup structure and alignment are consistent between editor and view.
 	// This change won't be saved unless further changes are made to the InnerBlocks.
 	useEffect( () => {
 		if ( hasSelection && selectedPattern?.blocks ) {
 			__unstableMarkNextChangeAsNotPersistent();
-			replaceBlocks( clientId, selectedPattern.blocks );
+			replaceBlocks( clientId, createBlock( 'core/group', {}, selectedPattern.blocks ) );
 		}
 	}, [ hasSelection, selectedPattern?.blocks ] );
 

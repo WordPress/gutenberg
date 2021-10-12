@@ -8,7 +8,7 @@
 /**
  *  Registers the `core/pattern` block on the server.
  *
- * @return void 
+ * @return void
  */
 function register_block_core_pattern() {
 	register_block_type_from_metadata(
@@ -22,7 +22,7 @@ function register_block_core_pattern() {
 /**
  * Renders the `core/pattern` block on the server.
  *
- * @param array    $attributes Block attributes.
+ * @param array $attributes Block attributes.
  *
  * @return string Returns the output of the pattern.
  */
@@ -30,7 +30,7 @@ function render_block_core_pattern( $attributes ) {
 	$slug = $attributes['slug'];
 	if ( class_exists( 'WP_Block_Patterns_Registry' ) && WP_Block_Patterns_Registry::get_instance()->is_registered( $slug ) ) {
 		$pattern = WP_Block_Patterns_Registry::get_instance()->get_registered( $slug );
-		return do_blocks( $pattern['content'] );
+		return do_blocks( '<!-- wp:group --><div class="wp-block-group">' . $pattern['content'] . '</div><!-- /wp:group -->' );
 	}
 }
 
