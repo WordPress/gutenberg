@@ -58,7 +58,7 @@ export function createMenuPreloadingMiddleware( preloadedData ) {
 		const menuId = parseInt( matches[ 1 ] );
 		const menu = menuData.filter( ( { id } ) => id === menuId );
 
-		if ( 0 < menu.length ) {
+		if ( menu.length > 0 ) {
 			menuDataLoaded = true;
 			// We don't have headers because we "emulate" this request
 			return sendSuccessResponse(
