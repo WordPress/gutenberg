@@ -12,6 +12,7 @@ For each user feature we should also add a importance categorization label  to i
 ## Unreleased
 
 ## 1.63.1
+-   [*] Fixed missing modal backdrop for Android help section [#35557]
 -   [*] Fixed erroneous overflow within editor Help screens. [#35552]
 
 ## 1.63.0
