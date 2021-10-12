@@ -329,16 +329,22 @@ async function runPerformanceTests( branches, options ) {
 		for ( const branch of branches ) {
 			const medians = mapValues(
 				{
-					serverResponse: rawResults.map( ( r ) => r.serverResponse ),
-					firstPaint: rawResults.map( ( r ) => r.firstPaint ),
+					serverResponse: rawResults.map(
+						( r ) => r[ branch ].serverResponse
+					),
+					firstPaint: rawResults.map(
+						( r ) => r[ branch ].firstPaint
+					),
 					domContentLoaded: rawResults.map(
-						( r ) => r.domContentLoaded
+						( r ) => r[ branch ].domContentLoaded
 					),
-					loaded: rawResults.map( ( r ) => r.loaded ),
+					loaded: rawResults.map( ( r ) => r[ branch ].loaded ),
 					firstContentfulPaint: rawResults.map(
-						( r ) => r.firstContentfulPaint
+						( r ) => r[ branch ].firstContentfulPaint
 					),
-					firstBlock: rawResults.map( ( r ) => r.firstBlock ),
+					firstBlock: rawResults.map(
+						( r ) => r[ branch ].firstBlock
+					),
 					type: rawResults.map( ( r ) => r[ branch ].type ),
 					minType: rawResults.map( ( r ) => r[ branch ].minType ),
 					maxType: rawResults.map( ( r ) => r[ branch ].maxType ),
