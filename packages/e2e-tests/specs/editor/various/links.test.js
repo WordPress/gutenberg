@@ -642,6 +642,89 @@ describe( 'Links', () => {
 			// the text input to reflect that value.
 			expect( textValue ).toBe( 'Gutenberg' );
 		} );
+
+		it( 'should allow text input when the link has a valid URL value', async () => {
+			await createAndReselectLink();
+			// Make a collapsed selection inside the link
+			await page.keyboard.press( 'ArrowLeft' );
+			await page.keyboard.press( 'ArrowRight' );
+			await showBlockToolbar();
+			const [ editButton ] = await page.$x( '//button[text()="Edit"]' );
+			await editButton.click();
+			await waitForAutoFocus();
+
+			await pressKeyWithModifier( 'shift', 'Tab' );
+
+			// Tabbing back should land us in the text input.
+			const { isTextInput, textValue } = await page.evaluate( () => {
+				const el = document.activeElement;
+
+				return {
+					isTextInput: el.matches( 'input[type="text"]' ),
+					textValue: el.value,
+				};
+			} );
+
+			// Let's check we've focused a text input.
+			expect( isTextInput ).toBe( true );
+
+			// Link was created on text value "Gutenberg". We expect
+			// the text input to reflect that value.
+			expect( textValue ).toBe( 'Gutenberg' );
+		} );
+
+		it( 'should preserve trailing/leading whitespace from linked text in text input', async () => {
+			const textToSelect = `         spaces     `;
+			const textWithWhitespace = `Text with leading and trailing${ textToSelect }`;
+
+			// Create a block with some text
+			await clickBlockAppender();
+			await page.keyboard.type( textWithWhitespace );
+
+			// Use arrow keys to select only the text with the leading
+			// and trailing whitespace.
+			for ( let index = 0; index < textToSelect.length; index++ ) {
+				await pressKeyWithModifier( 'shift', 'ArrowLeft' );
+			}
+
+			// Click on the Link button
+			await page.click( 'button[aria-label="Link"]' );
+
+			// Wait for the URL field to auto-focus
+			await waitForAutoFocus();
+
+			// Type a URL
+			await page.keyboard.type( 'https://wordpress.org/gutenberg' );
+
+			// Click on the Submit button
+			await page.keyboard.press( 'Enter' );
+
+			// Reselect the link.
+			await pressKeyWithModifier( 'shiftAlt', 'ArrowLeft' );
+
+			// Make a collapsed selection inside the link
+			await page.keyboard.press( 'ArrowLeft' );
+			await page.keyboard.press( 'ArrowRight' );
+
+			await showBlockToolbar();
+
+			const [ editButton ] = await page.$x( '//button[text()="Edit"]' );
+
+			await editButton.click();
+
+			await waitForAutoFocus();
+
+			await pressKeyWithModifier( 'shift', 'Tab' );
+
+			// Tabbing back should land us in the text input.
+			const textInputValue = await page.evaluate(
+				() => document.activeElement.value
+			);
+
+			// Link was created on text value "Gutenberg". We expect
+			// the text input to reflect that value.
+			expect( textInputValue ).toBe( textToSelect );
+		} );
 	} );
 
 	describe( 'Disabling Link UI active state', () => {
