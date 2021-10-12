@@ -1,14 +1,9 @@
 $pagination-margin: 0.5em;
 .wp-block-query-pagination {
-	display: flex;
-	flex-direction: row;
-	flex-wrap: wrap;
-
 	// Increased specificity to override blocks default margin.
 	> .wp-block-query-pagination-next,
 	> .wp-block-query-pagination-previous,
 	> .wp-block-query-pagination-numbers {
-		display: inline-block;
 		/*rtl:ignore*/
 		margin-right: $pagination-margin;
 		margin-bottom: $pagination-margin;
@@ -35,5 +30,9 @@ $pagination-margin: 0.5em;
 			// Flip for RTL.
 			transform: scaleX(1) #{"/*rtl:scaleX(-1);*/"}; // This points the arrow right for LTR and left for RTL.
 		}
+	}
+
+	&.aligncenter {
+		justify-content: center;
 	}
 }

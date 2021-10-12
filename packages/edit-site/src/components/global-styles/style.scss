@@ -1,0 +1,35 @@
+.edit-site-global-styles-preview {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	min-height: 152px;
+	margin: $grid-unit-20;
+	line-height: 1;
+
+	.component-color-indicator {
+		border-radius: 50%;
+		border: 0;
+		height: 36px;
+		width: 36px;
+		margin-left: 0;
+		padding: 0;
+	}
+}
+
+.edit-site-global-style-palette {
+	margin: $grid-unit-20;
+
+	.component-color-indicator {
+		display: block;
+		border-radius: 50%;
+		border: 0;
+		height: 24px;
+		width: 24px;
+		margin-left: 0;
+		padding: 0;
+	}
+}
+
+.edit-site-global-styles-header__description {
+	padding: 0 $grid-unit-20;
+}

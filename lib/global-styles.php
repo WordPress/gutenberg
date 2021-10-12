@@ -10,11 +10,11 @@
  * the corresponding stylesheet.
  *
  * @param WP_Theme_JSON_Gutenberg $tree Input tree.
- * @param string                  $type Type of stylesheet we want accepts 'all', 'block_styles', 'css_variables', and 'presets'.
+ * @param string                  $type Type of stylesheet. It accepts 'all', 'block_styles', 'css_variables', 'presets'.
  *
  * @return string Stylesheet.
  */
-function gutenberg_experimental_global_styles_get_stylesheet( $tree, $type = 'all' ) {
+function gutenberg_experimental_global_styles_get_stylesheet( $tree, $type = null ) {
 	// Check if we can use cached.
 	$can_use_cached = (
 		( 'all' === $type ) &&
@@ -24,20 +24,43 @@ function gutenberg_experimental_global_styles_get_stylesheet( $tree, $type = 'al
 		! is_admin()
 	);
 
+	$transient_name = 'gutenberg_global_styles_' . get_stylesheet();
 	if ( $can_use_cached ) {
 		// Check if we have the styles already cached.
-		$cached = get_transient( 'gutenberg_global_styles' );
+		// It's cached by theme to make sure that theme switching
+		// is inmediately reflected.
+		$cached = get_transient( $transient_name );
 		if ( $cached ) {
 			return $cached;
 		}
 	}
 
-	$stylesheet = $tree->get_stylesheet( $type );
+	$supports_theme_json = WP_Theme_JSON_Resolver_Gutenberg::theme_has_support();
+	$supports_link_color = get_theme_support( 'experimental-link-color' );
+
+	// Only modify the $type if the consumer hasn't provided any.
+	if ( null === $type && ! $supports_theme_json ) {
+		$type = 'presets';
+	} elseif ( null === $type ) {
+		$type = 'all';
+	}
+
+	$origins = array( 'core', 'theme', 'user' );
+	if ( ! $supports_theme_json && ! $supports_link_color ) {
+		// In this case we only enqueue the core presets (CSS Custom Properties + the classes).
+		$origins = array( 'core' );
+	} elseif ( ! $supports_theme_json && $supports_link_color ) {
+		// For the legacy link color feauter to work, the CSS Custom Properties
+		// should be in scope (either the core or the theme ones).
+		$origins = array( 'core', 'theme' );
+	}
+
+	$stylesheet = $tree->get_stylesheet( $type, $origins );
 
 	if ( $can_use_cached ) {
 		// Cache for a minute.
 		// This cache doesn't need to be any longer, we only want to avoid spikes on high-traffic sites.
-		set_transient( 'gutenberg_global_styles', $stylesheet, MINUTE_IN_SECONDS );
+		set_transient( $transient_name, $stylesheet, MINUTE_IN_SECONDS );
 	}
 
 	return $stylesheet;
@@ -51,11 +74,7 @@ function gutenberg_experimental_global_styles_enqueue_assets() {
 	$settings = gutenberg_get_default_block_editor_settings();
 	$all      = WP_Theme_JSON_Resolver_Gutenberg::get_merged_data( $settings );
 
-	$type = 'all';
-	if ( ! WP_Theme_JSON_Resolver_Gutenberg::theme_has_support() ) {
-		$type = 'presets';
-	}
-	$stylesheet = gutenberg_experimental_global_styles_get_stylesheet( $all, $type );
+	$stylesheet = gutenberg_experimental_global_styles_get_stylesheet( $all );
 	if ( empty( $stylesheet ) ) {
 		return;
 	}
@@ -78,13 +97,11 @@ function gutenberg_experimental_global_styles_enqueue_assets() {
  */
 function gutenberg_experimental_global_styles_settings( $settings ) {
 	// Set what is the context for this data request.
-	$context = 'all';
+	$context = 'other';
 	if (
 		is_callable( 'get_current_screen' ) &&
 		function_exists( 'gutenberg_is_edit_site_page' ) &&
-		gutenberg_is_edit_site_page( get_current_screen()->id ) &&
-		WP_Theme_JSON_Resolver_Gutenberg::theme_has_support() &&
-		gutenberg_supports_block_templates()
+		gutenberg_is_edit_site_page( get_current_screen()->id )
 	) {
 		$context = 'site-editor';
 	}
@@ -93,27 +110,18 @@ function gutenberg_experimental_global_styles_settings( $settings ) {
 		defined( 'REST_REQUEST' ) &&
 		REST_REQUEST &&
 		isset( $_GET['context'] ) &&
-		'mobile' === $_GET['context'] &&
-		WP_Theme_JSON_Resolver_Gutenberg::theme_has_support()
+		'mobile' === $_GET['context']
 	) {
 		$context = 'mobile';
 	}
 
-	$origin = 'theme';
-	if (
-		WP_Theme_JSON_Resolver_Gutenberg::theme_has_support() &&
-		gutenberg_supports_block_templates()
-	) {
-		// Only lookup for the user data if we need it.
-		$origin = 'user';
-	}
-	$consolidated = WP_Theme_JSON_Resolver_Gutenberg::get_merged_data( $settings, $origin );
+	$consolidated = WP_Theme_JSON_Resolver_Gutenberg::get_merged_data( $settings );
 
-	if ( 'mobile' === $context ) {
+	if ( 'mobile' === $context && WP_Theme_JSON_Resolver_Gutenberg::theme_has_support() ) {
 		$settings['__experimentalStyles'] = $consolidated->get_raw_data()['styles'];
 	}
 
-	if ( 'site-editor' === $context ) {
+	if ( 'site-editor' === $context && gutenberg_experimental_is_site_editor_available() ) {
 		$theme       = WP_Theme_JSON_Resolver_Gutenberg::get_merged_data( $settings, 'theme' );
 		$user_cpt_id = WP_Theme_JSON_Resolver_Gutenberg::get_user_custom_post_type_id();
 
@@ -121,11 +129,7 @@ function gutenberg_experimental_global_styles_settings( $settings ) {
 		$settings['__experimentalGlobalStylesBaseStyles']   = $theme->get_raw_data();
 	}
 
-	if (
-		'site-editor' !== $context &&
-		'mobile' !== $context &&
-		( WP_Theme_JSON_Resolver_Gutenberg::theme_has_support() || get_theme_support( 'experimental-link-color' ) )
-	) {
+	if ( 'other' === $context ) {
 		$block_styles  = array( 'css' => gutenberg_experimental_global_styles_get_stylesheet( $consolidated, 'block_styles' ) );
 		$css_variables = array(
 			'css'                     => gutenberg_experimental_global_styles_get_stylesheet( $consolidated, 'css_variables' ),
@@ -213,16 +217,23 @@ function gutenberg_experimental_global_styles_settings( $settings ) {
 }
 
 /**
+ * Whether or not the Site Editor is available.
+ *
+ * @return boolean
+ */
+function gutenberg_experimental_is_site_editor_available() {
+	return gutenberg_is_fse_theme();
+}
+
+/**
  * Register CPT to store/access user data.
  *
- * @return array|undefined
+ * @return void
  */
 function gutenberg_experimental_global_styles_register_user_cpt() {
-	if ( ! WP_Theme_JSON_Resolver_Gutenberg::theme_has_support() ) {
-		return;
+	if ( gutenberg_experimental_is_site_editor_available() ) {
+		WP_Theme_JSON_Resolver_Gutenberg::register_user_custom_post_type();
 	}
-
-	WP_Theme_JSON_Resolver_Gutenberg::register_user_custom_post_type();
 }
 
 /**

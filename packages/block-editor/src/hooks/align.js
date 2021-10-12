@@ -129,7 +129,7 @@ export const withToolbarControls = createHigherOrderComponent(
 		const updateAlignment = ( nextAlign ) => {
 			if ( ! nextAlign ) {
 				const blockType = getBlockType( props.name );
-				const blockDefaultAlign = blockType.attributes?.align?.default;
+				const blockDefaultAlign = blockType?.attributes?.align?.default;
 				if ( blockDefaultAlign ) {
 					nextAlign = '';
 				}
@@ -140,7 +140,10 @@ export const withToolbarControls = createHigherOrderComponent(
 		return (
 			<>
 				{ blockAllowedAlignments.length > 0 && (
-					<BlockControls group="block" __experimentalExposeToChildren>
+					<BlockControls
+						group="block"
+						__experimentalShareWithChildBlocks
+					>
 						<BlockAlignmentControl
 							value={ props.attributes.align }
 							onChange={ updateAlignment }
@@ -181,7 +184,9 @@ export const withDataAlign = createHigherOrderComponent(
 		}
 
 		let wrapperProps = props.wrapperProps;
-		if ( validAlignments.includes( align ) ) {
+		if (
+			validAlignments.some( ( alignment ) => alignment.name === align )
+		) {
 			wrapperProps = { ...wrapperProps, 'data-align': align };
 		}
 

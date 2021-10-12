@@ -24,7 +24,7 @@ export const NAVIGATION_POST_KIND = 'root';
  *
  * @type {string}
  */
-export const NAVIGATION_POST_POST_TYPE = 'postType';
+export const NAVIGATION_POST_POST_TYPE = 'navigationPost';
 
 /**
  * The scope name of the editor's complementary area.

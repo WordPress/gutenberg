@@ -35,8 +35,9 @@ function Header() {
 			),
 		[ widgetAreaClientId ]
 	);
-	const isInserterOpened = useSelect( ( select ) =>
-		select( editWidgetsStore ).isInserterOpened()
+	const isInserterOpened = useSelect(
+		( select ) => select( editWidgetsStore ).isInserterOpened(),
+		[]
 	);
 	const { setIsWidgetAreaOpen, setIsInserterOpened } = useDispatch(
 		editWidgetsStore

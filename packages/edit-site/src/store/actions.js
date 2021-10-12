@@ -8,6 +8,7 @@ import { addQueryArgs, getPathAndQueryString } from '@wordpress/url';
 import { __ } from '@wordpress/i18n';
 import { store as noticesStore } from '@wordpress/notices';
 import { store as coreStore } from '@wordpress/core-data';
+import { store as interfaceStore } from '@wordpress/interface';
 
 /**
  * Internal dependencies
@@ -121,13 +122,27 @@ export function* removeTemplate( templateId ) {
 /**
  * Returns an action object used to set a template part.
  *
- * @param {number} templatePartId The template part ID.
+ * @param {string} templatePartId The template part ID.
  *
  * @return {Object} Action object.
  */
 export function setTemplatePart( templatePartId ) {
 	return {
 		type: 'SET_TEMPLATE_PART',
+		templatePartId,
+	};
+}
+
+/**
+ * Returns an action object used to push a template part to navigation history.
+ *
+ * @param {string} templatePartId The template part ID.
+ *
+ * @return {Object} Action object.
+ */
+export function pushTemplatePart( templatePartId ) {
+	return {
+		type: 'PUSH_TEMPLATE_PART',
 		templatePartId,
 	};
 }
@@ -188,6 +203,15 @@ export function* setPage( page ) {
 		templateId,
 	};
 	return templateId;
+}
+
+/**
+ * Go back to the current editing page.
+ */
+export function goBack() {
+	return {
+		type: 'GO_BACK',
+	};
 }
 
 /**
@@ -440,4 +464,32 @@ export function* revertTemplate( template ) {
 			{ type: 'snackbar' }
 		);
 	}
+}
+/**
+ * Returns an action object used in signalling that the user opened an editor sidebar.
+ *
+ * @param {?string} name Sidebar name to be opened.
+ *
+ * @yield {Object} Action object.
+ */
+export function* openGeneralSidebar( name ) {
+	yield controls.dispatch(
+		interfaceStore,
+		'enableComplementaryArea',
+		editSiteStoreName,
+		name
+	);
+}
+
+/**
+ * Returns an action object signalling that the user closed the sidebar.
+ *
+ * @yield {Object} Action object.
+ */
+export function* closeGeneralSidebar() {
+	yield controls.dispatch(
+		interfaceStore,
+		'disableComplementaryArea',
+		editSiteStoreName
+	);
 }

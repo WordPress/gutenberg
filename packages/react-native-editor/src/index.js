@@ -84,6 +84,7 @@ const setupInitHooks = () => {
 				rawStyles,
 				rawFeatures,
 				galleryWithImageBlocks,
+				locale,
 			} = props;
 
 			if ( initialData === undefined && __DEV__ ) {
@@ -112,6 +113,7 @@ const setupInitHooks = () => {
 				rawStyles,
 				rawFeatures,
 				galleryWithImageBlocks,
+				locale,
 			};
 		}
 	);

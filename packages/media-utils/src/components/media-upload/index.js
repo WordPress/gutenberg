@@ -387,15 +387,26 @@ class MediaUpload extends Component {
 			return;
 		}
 
-		if ( ! this.props.gallery ) {
-			const selection = this.frame.state().get( 'selection' );
+		const isGallery = this.props.gallery;
+		const selection = this.frame.state().get( 'selection' );
+
+		if ( ! isGallery ) {
 			castArray( this.props.value ).forEach( ( id ) => {
 				selection.add( wp.media.attachment( id ) );
 			} );
 		}
 
-		// load the images so they are available in the media modal.
-		getAttachmentsCollection( castArray( this.props.value ) ).more();
+		// Load the images so they are available in the media modal.
+		const attachments = getAttachmentsCollection(
+			castArray( this.props.value )
+		);
+
+		// Once attachments are loaded, set the current selection.
+		attachments.more().done( function () {
+			if ( isGallery && attachments?.models?.length ) {
+				selection.add( attachments.models );
+			}
+		} );
 	}
 
 	onClose() {

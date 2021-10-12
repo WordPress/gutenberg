@@ -65,12 +65,12 @@ function mapMenuItemsToBlocks( menuItems ) {
 			...nestedMapping,
 		};
 
+		const blockType = menuItem.children?.length
+			? 'core/navigation-submenu'
+			: 'core/navigation-link';
+
 		// Create block with nested "innerBlocks".
-		const block = createBlock(
-			'core/navigation-link',
-			attributes,
-			nestedBlocks
-		);
+		const block = createBlock( blockType, attributes, nestedBlocks );
 
 		// Create mapping for menuItem -> block
 		mapping[ menuItem.id ] = block.clientId;
@@ -189,9 +189,10 @@ function createDataTree( dataset, id = 'id', relation = 'parent' ) {
 			...data,
 			children: [],
 		};
-	}
-	for ( const data of dataset ) {
 		if ( data[ relation ] ) {
+			hashTable[ data[ relation ] ] = hashTable[ data[ relation ] ] || {};
+			hashTable[ data[ relation ] ].children =
+				hashTable[ data[ relation ] ].children || [];
 			hashTable[ data[ relation ] ].children.push(
 				hashTable[ data[ id ] ]
 			);

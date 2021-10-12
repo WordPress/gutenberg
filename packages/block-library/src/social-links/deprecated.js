@@ -78,6 +78,11 @@ const deprecated = [
 				type: 'string',
 			},
 		},
+		supports: {
+			align: [ 'left', 'center', 'right' ],
+			anchor: true,
+			__experimentalExposeControlsToChildren: true,
+		},
 		isEligible: ( { layout } ) => ! layout,
 		migrate: migrateWithLayout,
 		save( props ) {

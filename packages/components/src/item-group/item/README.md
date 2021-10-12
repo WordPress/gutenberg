@@ -29,12 +29,11 @@ function Example() {
 
 ## Props
 
-### `isAction`: `boolean`
+### `onClick`: `React.MouseEventHandler<HTMLDivElement>`
 
-Renders the item as an interactive `button` element.
+Even handler for processing `click` events. When defined, the `Item` component will render as a `button` (unless differently specified via the `as` prop).
 
 - Required: No
-- Default: `false`
 
 ### `size`: `'small' | 'medium' | 'large'`
 

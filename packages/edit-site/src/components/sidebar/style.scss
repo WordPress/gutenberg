@@ -38,3 +38,43 @@
 		margin-bottom: 0;
 	}
 }
+
+.edit-site-global-styles-sidebar .components-navigation__menu-title-heading {
+	font-size: $default-font-size * 1.2;
+	font-weight: 500;
+}
+
+.edit-site-global-styles-sidebar .components-navigation__item > button span {
+	font-weight: 500;
+}
+
+.edit-site-typography-panel,
+.edit-site-global-styles-sidebar .block-editor-panel-color-gradient-settings {
+	border: 0;
+}
+
+.edit-site-global-styles-sidebar__blocks-group {
+	padding-top: $grid-unit-30;
+	border-top: $border-width solid $gray-200;
+}
+
+.edit-site-global-styles-sidebar__blocks-group-help {
+	padding: 0 $grid-unit-20;
+}
+
+.edit-site-global-styles-color-palette-panel {
+	padding: $grid-unit-20;
+}
+
+.edit-site-global-styles-sidebar__beta {
+	display: inline-flex;
+	margin-left: $grid-unit-10;
+	padding: 0 $grid-unit-10;
+	height: $grid-unit-30;
+	border-radius: $radius-block-ui;
+	background-color: $black;
+	color: $white;
+	align-items: center;
+	font-size: $helptext-font-size;
+	line-height: 1;
+}
