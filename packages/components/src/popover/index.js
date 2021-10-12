@@ -12,6 +12,8 @@ import {
 	useState,
 	useLayoutEffect,
 	forwardRef,
+	createContext,
+	useContext,
 } from '@wordpress/element';
 import { getRectangleFromRange } from '@wordpress/dom';
 import {
@@ -37,6 +39,8 @@ import { getAnimateClassName } from '../animate';
  * @type {string}
  */
 const SLOT_NAME = 'Popover';
+
+const slotNameContext = createContext();
 
 function computeAnchorRect(
 	anchorRefFallback,
@@ -267,7 +271,8 @@ const Popover = (
 	const containerRef = useRef();
 	const isMobileViewport = useViewportMatch( 'medium', '<' );
 	const [ animateOrigin, setAnimateOrigin ] = useState();
-	const slot = useSlot( __unstableSlotName );
+	const slotName = useContext( slotNameContext ) || __unstableSlotName;
+	const slot = useSlot( slotName );
 	const isExpanded = expandOnMobile && isMobileViewport;
 	const [ containerResizeListener, contentSize ] = useResizeObserver();
 	noArrow = isExpanded || noArrow;
@@ -326,9 +331,7 @@ const Popover = (
 
 			let boundaryElement;
 			if ( __unstableBoundaryParent ) {
-				boundaryElement = containerRef.current.closest(
-					'.popover-slot'
-				)?.parentNode;
+				boundaryElement = containerRef.current.parentElement;
 			}
 
 			const usedContentSize = ! contentSize.height
@@ -552,7 +555,7 @@ const Popover = (
 	);
 
 	if ( slot.ref ) {
-		content = <Fill name={ __unstableSlotName }>{ content }</Fill>;
+		content = <Fill name={ slotName }>{ content }</Fill>;
 	}
 
 	if ( anchorRef || anchorRect ) {
@@ -576,5 +579,6 @@ function PopoverSlot( { name = SLOT_NAME }, ref ) {
 }
 
 PopoverContainer.Slot = forwardRef( PopoverSlot );
+PopoverContainer.__unstableSlotNameProvider = slotNameContext.Provider;
 
 export default PopoverContainer;

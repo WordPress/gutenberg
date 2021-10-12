@@ -20,7 +20,12 @@ import {
  * Internal dependencies
  */
 import { siteEditor } from '../../experimental-features';
-import { readFile, deleteFile, getTypingEventDurations } from './utils';
+import {
+	readFile,
+	deleteFile,
+	getTypingEventDurations,
+	getLoadingDurations,
+} from './utils';
 
 jest.setTimeout( 1000000 );
 
@@ -39,7 +44,12 @@ describe( 'Site Editor Performance', () => {
 
 	it( 'Loading', async () => {
 		const results = {
-			load: [],
+			serverResponse: [],
+			firstPaint: [],
+			domContentLoaded: [],
+			loaded: [],
+			firstContentfulPaint: [],
+			firstBlock: [],
 			type: [],
 			focus: [],
 			inserterOpen: [],
@@ -78,14 +88,26 @@ describe( 'Site Editor Performance', () => {
 
 		// Measuring loading time
 		while ( i-- ) {
-			const startTime = new Date();
 			await page.reload();
 			await page.waitForSelector( '.edit-site-visual-editor', {
 				timeout: 120000,
 			} );
 			await canvas().waitForSelector( '.wp-block', { timeout: 120000 } );
+			const {
+				serverResponse,
+				firstPaint,
+				domContentLoaded,
+				loaded,
+				firstContentfulPaint,
+				firstBlock,
+			} = await getLoadingDurations();
 
-			results.load.push( new Date() - startTime );
+			results.serverResponse.push( serverResponse );
+			results.firstPaint.push( firstPaint );
+			results.domContentLoaded.push( domContentLoaded );
+			results.loaded.push( loaded );
+			results.firstContentfulPaint.push( firstContentfulPaint );
+			results.firstBlock.push( firstBlock );
 		}
 
 		// Measuring typing performance inside the post content.

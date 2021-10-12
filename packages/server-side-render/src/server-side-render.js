@@ -78,16 +78,15 @@ export default function ServerSideRender( props ) {
 	const [ showLoader, setShowLoader ] = useState( false );
 	const fetchRequestRef = useRef();
 	const [ response, setResponse ] = useState( null );
-	const prevResponse = usePrevious( response );
 	const prevProps = usePrevious( props );
+	const [ isLoading, setIsLoading ] = useState( false );
 
 	function fetchData() {
 		if ( ! isMountedRef.current ) {
 			return;
 		}
-		if ( null !== response ) {
-			setResponse( null );
-		}
+
+		setIsLoading( true );
 
 		const sanitizedAttributes =
 			attributes &&
@@ -130,6 +129,14 @@ export default function ServerSideRender( props ) {
 						errorMsg: error.message,
 					} );
 				}
+			} )
+			.finally( () => {
+				if (
+					isMountedRef.current &&
+					fetchRequest === fetchRequestRef.current
+				) {
+					setIsLoading( false );
+				}
 			} ) );
 
 		return fetchRequest;
@@ -162,30 +169,35 @@ export default function ServerSideRender( props ) {
 	 * the request takes more than one second.
 	 */
 	useEffect( () => {
-		if ( response !== null ) {
+		if ( ! isLoading ) {
 			return;
 		}
 		const timeout = setTimeout( () => {
 			setShowLoader( true );
 		}, 1000 );
 		return () => clearTimeout( timeout );
-	}, [ response ] );
+	}, [ isLoading ] );
 
-	if ( response === '' ) {
+	const hasResponse = !! response;
+	const hasEmptyResponse = response === '';
+	const hasError = response?.error;
+
+	if ( hasEmptyResponse || ! hasResponse ) {
 		return <EmptyResponsePlaceholder { ...props } />;
-	} else if ( ! response ) {
+	}
+
+	if ( hasError ) {
+		return <ErrorResponsePlaceholder response={ response } { ...props } />;
+	}
+
+	if ( isLoading ) {
 		return (
-			<LoadingResponsePlaceholder
-				{ ...props }
-				showLoader={ ! prevResponse || showLoader }
-			>
-				{ !! prevResponse && (
-					<RawHTML className={ className }>{ prevResponse }</RawHTML>
+			<LoadingResponsePlaceholder { ...props } showLoader={ showLoader }>
+				{ hasResponse && (
+					<RawHTML className={ className }>{ response }</RawHTML>
 				) }
 			</LoadingResponsePlaceholder>
 		);
-	} else if ( response.error ) {
-		return <ErrorResponsePlaceholder response={ response } { ...props } />;
 	}
 
 	return <RawHTML className={ className }>{ response }</RawHTML>;

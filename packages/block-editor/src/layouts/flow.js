@@ -144,9 +144,12 @@ export default {
 
 		if ( hasBlockGapStylesSupport ) {
 			style += `
+				${ appendSelectors( selector, '> *' ) } {
+					margin-top: 0;
+					margin-bottom: 0;
+				}
 				${ appendSelectors( selector, '> * + *' ) } {
 					margin-top: var( --wp--style--block-gap );
-					margin-bottom: 0;
 				}
 			`;
 		}

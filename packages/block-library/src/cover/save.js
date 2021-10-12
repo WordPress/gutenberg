@@ -35,6 +35,7 @@ export default function save( { attributes } ) {
 		dimRatio,
 		focalPoint,
 		hasParallax,
+		isDark,
 		isRepeated,
 		overlayColor,
 		url,
@@ -61,26 +62,25 @@ export default function save( { attributes } ) {
 		...( isImageBackground && ! isImgElement
 			? backgroundImageStyles( url )
 			: {} ),
-		backgroundColor: ! overlayColorClass ? customOverlayColor : undefined,
-		background: customGradient && ! url ? customGradient : undefined,
 		minHeight: minHeight || undefined,
+	};
+
+	const bgStyle = {
+		backgroundColor: ! overlayColorClass ? customOverlayColor : undefined,
+		background: customGradient ? customGradient : undefined,
 	};
 
 	const objectPosition =
 		// prettier-ignore
 		focalPoint && isImgElement
-			? `${ Math.round( focalPoint.x * 100 ) }% ${ Math.round( focalPoint.y * 100 ) }%`
-			: undefined;
+			 ? `${ Math.round( focalPoint.x * 100 ) }% ${ Math.round( focalPoint.y * 100 ) }%`
+			 : undefined;
 
 	const classes = classnames(
-		dimRatioToClass( dimRatio ),
-		overlayColorClass,
 		{
-			'has-background-dim': dimRatio !== 0,
+			'is-light': ! isDark,
 			'has-parallax': hasParallax,
 			'is-repeated': isRepeated,
-			'has-background-gradient': gradient || customGradient,
-			[ gradientClass ]: ! url && gradientClass,
 			'has-custom-content-position': ! isContentPositionCenter(
 				contentPosition
 			),
@@ -90,20 +90,22 @@ export default function save( { attributes } ) {
 
 	return (
 		<div { ...useBlockProps.save( { className: classes, style } ) }>
-			{ url && ( gradient || customGradient ) && dimRatio !== 0 && (
-				<span
-					aria-hidden="true"
-					className={ classnames(
-						'wp-block-cover__gradient-background',
-						gradientClass
-					) }
-					style={
-						customGradient
-							? { background: customGradient }
-							: undefined
+			<span
+				aria-hidden="true"
+				className={ classnames(
+					overlayColorClass,
+					dimRatioToClass( dimRatio ),
+					'wp-block-cover__gradient-background',
+					gradientClass,
+					{
+						'has-background-dim': dimRatio !== undefined,
+						'has-background-gradient': gradient || customGradient,
+						[ gradientClass ]: ! url && gradientClass,
 					}
-				/>
-			) }
+				) }
+				style={ bgStyle }
+			/>
+
 			{ isImageBackground && isImgElement && url && (
 				<img
 					className={ classnames(
