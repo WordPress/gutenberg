@@ -44,6 +44,11 @@ const RICH_TEXT_EMBED_HTML = `<!-- wp:embed {"url":"https://twitter.com/notnowni
 https://twitter.com/notnownikki
 </div></figure>
 <!-- /wp:embed -->`;
+const RICH_TEXT_EMBED_HTML_WITH_CAPTION = `<!-- wp:embed {"url":"https://twitter.com/notnownikki","type":"rich","providerNameSlug":"twitter","responsive":true} -->
+<figure class="wp-block-embed is-type-rich is-provider-twitter wp-block-embed-twitter"><div class="wp-block-embed__wrapper">
+https://twitter.com/notnownikki
+</div><figcaption>Caption</figcaption></figure>
+<!-- /wp:embed -->`;
 
 beforeAll( () => {
 	// Paragraph block needs to be registered because by default a paragraph
@@ -153,5 +158,53 @@ describe( 'Embed block', () => {
 
 		expect( editURLButton ).toBeDefined();
 		expect( getEditorHtml() ).toBe( RICH_TEXT_EMBED_HTML );
+	} );
+
+	it( 'sets an Embed block caption', async () => {
+		const {
+			getByA11yLabel,
+			getByText,
+			getByPlaceholderText,
+			getByTestId,
+		} = await initializeEditor( {
+			initialHtml: '',
+		} );
+		const expectedURL = 'https://twitter.com/notnownikki';
+		const expectedCaption = 'Caption';
+
+		// Return mocked responses for the oembed endpoint.
+		fetchRequest.mockImplementation( ( { path } ) => {
+			let response = {};
+			if ( path.startsWith( '/oembed/1.0/proxy' ) ) {
+				response = RICH_TEXT_EMBED_SUCCESS_RESPONSE;
+			}
+			return Promise.resolve( response );
+		} );
+
+		// Open the inserter menu
+		fireEvent.press( await waitFor( () => getByA11yLabel( 'Add block' ) ) );
+
+		// Insert an embed block
+		fireEvent.press( await waitFor( () => getByText( `Embed` ) ) );
+
+		// Wait for edit URL modal to be visible
+		const embedEditURLModal = getByTestId( 'embed-edit-url-modal' );
+		await waitFor( () => embedEditURLModal.props.isVisible );
+
+		// Set an URL
+		const linkTextInput = getByPlaceholderText( 'Add link' );
+		fireEvent( linkTextInput, 'focus' );
+		fireEvent.changeText( linkTextInput, expectedURL );
+
+		// Dismiss the edit URL modal
+		fireEvent( embedEditURLModal, 'backdropPress' );
+		fireEvent( embedEditURLModal, MODAL_DISMISS_EVENT );
+
+		// Set a caption
+		const caption = getByTestId( 'embed-caption' );
+		fireEvent( caption, 'focus' );
+		fireEvent.changeText( caption, expectedCaption );
+
+		expect( getEditorHtml() ).toBe( RICH_TEXT_EMBED_HTML_WITH_CAPTION );
 	} );
 } );
