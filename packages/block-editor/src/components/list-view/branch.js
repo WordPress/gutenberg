@@ -48,8 +48,6 @@ const countReducer = ( expandedState, draggedClientIds ) => (
 	return count + 1;
 };
 
-const ITEM_HEIGHT = 36;
-
 export default function ListViewBranch( props ) {
 	const {
 		blocks,
@@ -64,8 +62,7 @@ export default function ListViewBranch( props ) {
 		isBranchSelected = false,
 		isLastOfBranch = false,
 		listPosition = 0,
-		windowMeasurement,
-		visibleBlockCount,
+		fixedListWindow,
 	} = props;
 
 	const {
@@ -102,38 +99,34 @@ export default function ListViewBranch( props ) {
 				draggedClientIds
 			);
 		}
-		const { start, maxVisible, focus } = windowMeasurement;
-		const end = start + maxVisible;
 
-		// Only use windowing for the persistent list view
-		const blockInView =
-			! __experimentalPersistentListViewFeatures ||
-			( start <= nextPosition && nextPosition <= start + maxVisible );
+		const usesWindowing = __experimentalPersistentListViewFeatures;
+		const {
+			start,
+			end,
+			itemInView,
+			startPadding,
+			endPadding,
+		} = fixedListWindow;
+
+		const blockInView = ! usesWindowing || itemInView( nextPosition );
 
 		const isDragging = draggedClientIds?.length > 0;
-		if ( ! isDragging && ! blockInView && nextPosition > start ) {
+		if (
+			usesWindowing &&
+			! isDragging &&
+			! blockInView &&
+			nextPosition > start
+		) {
 			// found the end of the window, don't bother processing the rest of the items
 			break;
 		}
-
-		const style = {
-			...( __experimentalPersistentListViewFeatures &&
-			start === nextPosition
-				? { paddingTop: ITEM_HEIGHT * start }
-				: {} ),
-			...( __experimentalPersistentListViewFeatures &&
-			visibleBlockCount > end &&
-			end === nextPosition
-				? {
-						paddingBottom:
-							ITEM_HEIGHT * ( visibleBlockCount - end - 1 ),
-				  }
-				: {} ),
-		};
-		const isFocused =
-			__experimentalPersistentListViewFeatures &&
-			( ( start === nextPosition && focus === 'start' ) ||
-				( end === nextPosition && focus === 'end' ) );
+		const style = usesWindowing
+			? {
+					paddingTop: start === nextPosition ? startPadding : 0,
+					paddingBottom: end === nextPosition ? endPadding : 0,
+			  }
+			: undefined;
 
 		const position = index + 1;
 		const isLastRowAtLevel = rowCount === position;
@@ -200,7 +193,6 @@ export default function ListViewBranch( props ) {
 						isExpanded={ isExpanded }
 						listPosition={ nextPosition }
 						style={ style }
-						isFocused={ isFocused }
 					/>
 				) }
 				{ hasNestedBranch && isExpanded && ! isDragged && (
@@ -217,8 +209,7 @@ export default function ListViewBranch( props ) {
 						terminatedLevels={ updatedTerminatedLevels }
 						path={ updatedPath }
 						listPosition={ nextPosition + 1 }
-						windowMeasurement={ windowMeasurement }
-						visibleBlockCount={ visibleBlockCount }
+						fixedListWindow={ fixedListWindow }
 					/>
 				) }
 			</AsyncModeProvider>
