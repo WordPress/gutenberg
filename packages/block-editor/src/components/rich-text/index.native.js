@@ -451,7 +451,11 @@ function RichTextWrapper(
 						createLinkInParagraph( plainText.trim(), onReplace ),
 				} );
 
-			if ( isPastedURL ) {
+			if (
+				__unstableEmbedURLOnPaste &&
+				isEmpty( value ) &&
+				isPastedURL
+			) {
 				mode = 'BLOCKS';
 			}
 
@@ -463,7 +467,7 @@ function RichTextWrapper(
 				preserveWhiteSpace,
 			} );
 
-			if ( typeof content === 'string' && ! isPastedURL ) {
+			if ( typeof content === 'string' ) {
 				let valueToInsert = create( { html: content } );
 
 				addActiveFormats( valueToInsert, activeFormats );
