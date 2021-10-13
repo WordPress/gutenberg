@@ -91,7 +91,7 @@ type DialogInputEvent =
 
 - Required: No
 
-An optional `title` for the dialog. Setting a title will render it in an area at the top of the dialog, making it a bit taller. It will also show an `x` close button at the top-right corner, which wouldn't be shown otherwise.
+An optional `title` for the dialog. Setting a title will render it in a title bar at the top of the dialog, making it a bit taller. The bar will also include an `x` close button at the top-right corner.
 
 ### `children`: `React.ReactNode`
 
