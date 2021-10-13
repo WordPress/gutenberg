@@ -19,7 +19,7 @@ Allows the component to be used standalone, just by declaring it as part of anot
   * It will be automatically closed when when clicking the _cancel_ button, by pressing the `ESC` key, or by clicking outside the dialog focus (i.e, the overlay);
   * `onCancel` is not mandatory but can be passed. Even if passed, the dialog will still be able to close itself.
 
-Activating this mode is as simple as omitting the `isOpen` prop. The only mandatory prop, in this case, is the `onConfirm` callback.
+Activating this mode is as simple as omitting the `isOpen` prop. The only mandatory prop, in this case, is the `onConfirm` callback. The message is passed as the `children`. You can pass any JSX you'd like, which allows to further format the message or include sub-component if you'd like:
 
 ```jsx
 import {
@@ -28,7 +28,9 @@ import {
 
 function Example() {
   return (
-    <ConfirmDialog onConfirm={ () => console.debug(' Confirmed! ') } />
+    <ConfirmDialog onConfirm={ () => console.debug(' Confirmed! ') }>
+      Are you sure? <strong>This action cannot be undone!</strong>
+    </ConfirmDialog>
   );
 }
 ```
@@ -64,7 +66,9 @@ function Example() {
       isOpen={ isOpen }
       onConfirm={ handleConfirm }
       onCancel={ handleCancel }
-    />
+    >
+      Are you sure? <strong>This action cannot be undone!</strong>
+    </ConfirmDialog>
   );
 }
 ```
@@ -83,7 +87,27 @@ type DialogInputEvent =
 
 ## Props
 
+### `title`: `string`
+
+- Required: No
+
+An optional `title` for the dialog. Setting a title will render it in an area at the top of the dialog, making it a bit taller. It will also show an `x` close button at the top-right corner, which wouldn't be shown otherwise.
+
+### `children`: `React.ReactNode`
+
+- Required: Yes
+
+The actual message for the dialog. It's passed as children and any valid `ReactNode` is accepted:
+
+```jsx
+<ConfirmDialog>
+ Are you sure? <strong>This action cannot be undone!</strong>
+</ConfirmDialog>
+```
+
 ### `isOpen`: `boolean`
+
+- Required: No
 
 Defines if the dialog is open (displayed) or closed (not rendered/displayed). It also implicitly toggles the controlled mode if set or the uncontrolled mode if it's not set.
 
@@ -95,10 +119,12 @@ The callback that's called when the user confirms. A confirmation can happen whe
 
 ### `onCancel`: `( event: DialogInputEvent ) => void`
 
-- Required: Yes if `isOpen` is set, No if `isOpen` is not set
+- Required: Only if `isOpen` is not set
 
 The callback that's called when the user cancels. A cancellation can happen when the `Cancel` button is clicked, when the `ESC` key is pressed, or when a click outside of the dialog focus is detected (i.e. in the overlay).
 
 It's not required if `isOpen` is not set (uncontrolled mode), as the component will take care of closing itself, but you can still pass a callback if something must be done upon cancelling (the component will still close itself in this case).
 
 If `isOpen` is set (controlled mode), then it's required, and you need to set the state that defines `isOpen` to `false` as part of this callback if you want the dialog to close when the user cancels.
+
+`isOpen` is set when its value is `boolean` (`true` or `false`) and not set if it's `undefined`.
