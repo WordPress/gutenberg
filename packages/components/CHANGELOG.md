@@ -31,6 +31,7 @@
 ### Internal
 
 -   Deleted the `createComponent` utility function ([#34929](https://github.com/WordPress/gutenberg/pull/34929)).
+-   Deleted the `useJumpStep` utility function ([#35561](https://github.com/WordPress/gutenberg/pull/35561)).
 
 ## 17.0.0 (2021-09-09)
 
