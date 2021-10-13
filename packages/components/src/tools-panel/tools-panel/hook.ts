@@ -92,27 +92,6 @@ export function useToolsPanel(
 		setMenuItems( items );
 	}, [ panelItems ] );
 
-	// Track whether optional controls, if any, are displayed or not.
-	// Default state is that all optional controls, if any, are hidden.
-	const [
-		areAllOptionalControlsHidden,
-		setAreAllOptionalControlsHidden,
-	] = useState( true );
-
-	// Where no optional menu items are active, we display a plus icon
-	// to indicate the presence of further menu items.
-	useEffect( () => {
-		if ( menuItems.optional ) {
-			const optionalMenuItemsArray = Object.entries( menuItems.optional );
-			const newValue =
-				optionalMenuItemsArray.length > 0 &&
-				! optionalMenuItemsArray.some(
-					( [ , isSelected ] ) => isSelected
-				);
-			setAreAllOptionalControlsHidden( newValue );
-		}
-	}, [ menuItems.optional ] );
-
 	// Force a menu item to be checked.
 	// This is intended for use with default panel items. They are displayed
 	// separately to optional items and have different display states,
@@ -129,6 +108,25 @@ export function useToolsPanel(
 			},
 		} );
 	};
+
+	// Whether all optional menu items are hidden or not must be tracked
+	// in order to later determine if the panel display is empty and handle
+	// conditional display of a plus icon to indicate the presence of further
+	// menu items.
+	const [
+		areAllOptionalControlsHidden,
+		setAreAllOptionalControlsHidden,
+	] = useState( false );
+
+	useEffect( () => {
+		if ( menuItems.optional ) {
+			const optionalItems = Object.entries( menuItems.optional );
+			const allControlsHidden =
+				optionalItems.length > 0 &&
+				! optionalItems.some( ( [ , isSelected ] ) => isSelected );
+			setAreAllOptionalControlsHidden( allControlsHidden );
+		}
+	}, [ menuItems.optional ] );
 
 	const cx = useCx();
 	const classes = useMemo( () => {
