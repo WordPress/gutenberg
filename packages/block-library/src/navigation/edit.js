@@ -281,11 +281,11 @@ function Navigation( {
 						<ToggleGroupControl
 							label={
 								<div>
-									<h4>Overlay Menu</h4>
+									<h4>{ __( 'Overlay Menu' ) }</h4>
 									<p>
-										Controls whether the menu collapses into
-										a toggle button opening an overlay for
-										navigation.
+										{ __(
+											'Controls whether the menu collapses into a toggle button opening an overlay for navigation.'
+										) }
 									</p>
 								</div>
 							}
@@ -296,21 +296,21 @@ function Navigation( {
 						>
 							<ToggleGroupControlOption
 								value="never"
-								label="Never"
-								aria-label="Never"
+								label={ __( 'Never' ) }
+								aria-label={ __( 'Never' ) }
 							/>
 							<ToggleGroupControlOption
 								value="mobile"
-								label="Mobile"
-								aria-label="Mobile"
+								label={ __( 'Mobile' ) }
+								aria-label={ __( 'Mobile' ) }
 							/>
 							<ToggleGroupControlOption
 								value="always"
-								label="Always"
-								aria-label="Always"
+								label={ __( 'Always' ) }
+								aria-label={ __( 'Always' ) }
 							/>
 						</ToggleGroupControl>
-						<h4>Submenus</h4>
+						<h4>{ __( 'Submenus' ) }</h4>
 						<ToggleControl
 							checked={ attributes.openSubmenusOnClick }
 							onChange={ ( value ) => {
