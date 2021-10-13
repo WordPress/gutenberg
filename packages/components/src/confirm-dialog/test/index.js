@@ -38,7 +38,7 @@ describe( 'Confirm', () => {
 				const dialog = wrapper.getByRole( 'dialog' );
 				const xCloseButton = wrapper.getByLabelText( 'Cancel' );
 				const elementsTexts = [ 'Are you sure?', 'OK', 'Cancel' ];
-				if ( typeof title === 'string' ) elementsTexts.push( title );
+				if ( title ) elementsTexts.push( title );
 
 				expect( dialog ).toBeInTheDocument();
 
@@ -48,6 +48,12 @@ describe( 'Confirm', () => {
 				} );
 
 				expect( xCloseButton ).toBeInTheDocument();
+
+				if ( title ) {
+					expect( xCloseButton ).toBeVisible();
+				} else {
+					expect( xCloseButton ).not.toBeVisible();
+				}
 			};
 
 			it( 'should render correctly with title', () => {
@@ -146,7 +152,11 @@ describe( 'Confirm', () => {
 				const onCancel = jest.fn().mockName( 'onCancel()' );
 
 				const wrapper = render(
-					<ConfirmDialog onConfirm={ noop } onCancel={ onCancel }>
+					<ConfirmDialog
+						title="Hi there!"
+						onConfirm={ noop }
+						onCancel={ onCancel }
+					>
 						Are you sure?
 					</ConfirmDialog>
 				);
@@ -156,6 +166,7 @@ describe( 'Confirm', () => {
 
 				fireEvent.click( button );
 
+				expect( button ).toBeVisible();
 				expect( confirmDialog ).not.toBeInTheDocument();
 				expect( onCancel ).toHaveBeenCalled();
 			} );
