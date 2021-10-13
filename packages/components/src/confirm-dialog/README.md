@@ -73,8 +73,6 @@ function Example() {
 
 Multiple `ConfirmDialog's is an edge case that's currently not officially supported by this component. At the moment, new instances will end up closing the last instance due to the way the `Modal` is implemented.
 
-Suppose you need to handle multiple confirmations without discarding other instances. In that case, it might be better to have a singleton wrapper component that provides a context-based API to trigger the dialog, keeping track of multiple instances. Here's an [example](https://github.com/WordPress/gutenberg/pull/34153#issuecomment-908342367).
-
 ## Custom Types
 
 ```ts
@@ -95,7 +93,7 @@ Defines if the dialog is open (displayed) or closed (not rendered/displayed). It
 
 The callback that's called when the user confirms. A confirmation can happen when the `OK` button is clicked or when `Enter` is pressed.
 
-### `onCancel`: `(event: DialogInputEvent ) => void`
+### `onCancel`: `( event: DialogInputEvent ) => void`
 
 - Required: Yes if `isOpen` is set, No if `isOpen` is not set
 
