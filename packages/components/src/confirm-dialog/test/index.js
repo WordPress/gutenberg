@@ -37,7 +37,7 @@ describe( 'Confirm', () => {
 
 				const dialog = wrapper.getByRole( 'dialog' );
 				const xCloseButton = wrapper.getByLabelText( 'Cancel' );
-				const elementsTexts = [ 'Are you sure?', 'OKf', 'Cancel' ];
+				const elementsTexts = [ 'Are you sure?', 'OK', 'Cancel' ];
 				if ( typeof title === 'string' ) elementsTexts.push( title );
 
 				expect( dialog ).toBeInTheDocument();
@@ -81,7 +81,7 @@ describe( 'Confirm', () => {
 				);
 
 				const confirmDialog = wrapper.getByRole( 'dialog' );
-				const button = await wrapper.findByText( 'OK' );
+				const button = wrapper.getByText( 'OK' );
 
 				fireEvent.click( button );
 
@@ -99,7 +99,7 @@ describe( 'Confirm', () => {
 				);
 
 				const confirmDialog = wrapper.getByRole( 'dialog' );
-				const button = await wrapper.findByText( 'Cancel' );
+				const button = wrapper.getByText( 'Cancel' );
 
 				fireEvent.click( button );
 
@@ -115,7 +115,7 @@ describe( 'Confirm', () => {
 				);
 
 				const confirmDialog = wrapper.getByRole( 'dialog' );
-				const button = await wrapper.findByText( 'Cancel' );
+				const button = wrapper.getByText( 'Cancel' );
 
 				fireEvent.click( button );
 
@@ -152,7 +152,7 @@ describe( 'Confirm', () => {
 				);
 
 				const confirmDialog = wrapper.getByRole( 'dialog' );
-				const button = await wrapper.findByLabelText( 'Cancel' );
+				const button = wrapper.getByLabelText( 'Cancel' );
 
 				fireEvent.click( button );
 
@@ -240,7 +240,7 @@ describe( 'Confirm', () => {
 				</ConfirmDialog>
 			);
 
-			const button = await wrapper.findByText( 'OK' );
+			const button = wrapper.getByText( 'OK' );
 
 			fireEvent.click( button );
 
@@ -260,7 +260,7 @@ describe( 'Confirm', () => {
 				</ConfirmDialog>
 			);
 
-			const button = await wrapper.findByText( 'Cancel' );
+			const button = wrapper.getByText( 'Cancel' );
 
 			fireEvent.click( button );
 
@@ -312,7 +312,7 @@ describe( 'Confirm', () => {
 				</ConfirmDialog>
 			);
 
-			const button = await wrapper.findByLabelText( 'Cancel' );
+			const button = wrapper.getByLabelText( 'Cancel' );
 
 			fireEvent.click( button );
 
