@@ -278,8 +278,9 @@ function Navigation( {
 			<InspectorControls>
 				{ hasSubmenuIndicatorSetting && (
 					<PanelBody title={ __( 'Display' ) }>
+						<h3>{ __( 'Overlay Menu' ) }</h3>
 						<ToggleGroupControl
-							label={ __( 'Overlay Menu' ) }
+							label={ __( 'Configure overlay menu' ) }
 							value={ attributes.overlayMenu }
 							help={ __(
 								'Controls whether the menu collapses into a toggle button opening an overlay for navigation.'
@@ -288,6 +289,7 @@ function Navigation( {
 								setAttributes( { overlayMenu: value } )
 							}
 							isBlock
+							hideLabelFromVision
 						>
 							<ToggleGroupControlOption
 								value="never"
