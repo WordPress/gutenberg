@@ -294,17 +294,14 @@ function Navigation( {
 							<ToggleGroupControlOption
 								value="never"
 								label={ __( 'Off' ) }
-								aria-label={ __( 'Off' ) }
 							/>
 							<ToggleGroupControlOption
 								value="mobile"
 								label={ __( 'Mobile' ) }
-								aria-label={ __( 'Mobile' ) }
 							/>
 							<ToggleGroupControlOption
 								value="always"
 								label={ __( 'Always' ) }
-								aria-label={ __( 'Always' ) }
 							/>
 						</ToggleGroupControl>
 						<h3>{ __( 'Submenus' ) }</h3>
