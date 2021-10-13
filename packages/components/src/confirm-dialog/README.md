@@ -4,9 +4,9 @@
 This feature is still experimental. "Experimental" means this is an early implementation subject to drastic and breaking changes.
 </div>
 
-`ConfirmDialog` displays a confirmation dialog as a `Modal`, with `OK` and `Cancel` buttons. It's confirmed by clicking `OK` or by pressing the `Enter` key. It's cancelled by clicking `Cancel` or by pressing the `ESC` key or clicking outside the dialog focus (i.e, the overlay).
+`ConfirmDialog` is built of top of [`Modal`](/packages/components/src/modal/README.md] and displays a confirmation dialog, with _confirm_ and _cancel_ buttons.
 
-It's built on top of `Modal`, so you can override any of the `Modal` props if you'd like. This also means that it's added as a child of the `body` element in the DOM tree through a React `Portal`, regardless of where it's declared in the React tree.
+The dialog is confirmed by clicking the _confirm_ button or by pressing the `Enter` key. It is cancelled (closed) by clicking the _cancel_ button, by pressing the `ESC` key, or by clicking outside the dialog focus (i.e, the overlay).
 
 ## Usage
 
