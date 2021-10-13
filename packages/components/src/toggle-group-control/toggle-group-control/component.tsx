@@ -2,6 +2,8 @@
  * External dependencies
  */
 // eslint-disable-next-line no-restricted-imports
+import type { Ref } from 'react';
+// eslint-disable-next-line no-restricted-imports
 import { RadioGroup, useRadioState } from 'reakit';
 import useResizeAware from 'react-resize-aware';
 
@@ -32,7 +34,7 @@ const noop = () => {};
 
 function ToggleGroupControl(
 	props: WordPressComponentProps< ToggleGroupControlProps, 'input' >,
-	forwardedRef: import('react').Ref< any >
+	forwardedRef: Ref< any >
 ) {
 	const {
 		className,

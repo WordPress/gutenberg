@@ -2,6 +2,8 @@
  * External dependencies
  */
 // eslint-disable-next-line no-restricted-imports
+import type { Ref } from 'react';
+// eslint-disable-next-line no-restricted-imports
 import { Radio } from 'reakit';
 
 /**
@@ -27,7 +29,7 @@ const { ButtonContentView, LabelPlaceholderView, LabelView } = styles;
 
 function ToggleGroupControlOption(
 	props: WordPressComponentProps< ToggleGroupControlOptionProps, 'button' >,
-	forwardedRef: import('react').Ref< any >
+	forwardedRef: Ref< any >
 ) {
 	const toggleGroupControlContext = useToggleGroupControlContext();
 	const id = useInstanceId(
