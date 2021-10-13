@@ -519,7 +519,7 @@ Note that the name of the variable is created by adding `--` in between each nes
 }
 ```
 
-- Disable border radius for the button block (borders only work in the plugin so far):
+- Disable border radius for the button block:
 
 ```json
 {
