@@ -16,7 +16,7 @@ The dialog is confirmed by clicking the _confirm_ button or by pressing the `Ent
 
 Allows the component to be used standalone, just by declaring it as part of another React's component render method:
   * It will be automatically open (displayed) upon mounting;
-  * It will automatically close itself when the `x`, `Cancel`, `Confirm` or overlay is clicked;
+  * It will be automatically closed when when clicking the _cancel_ button, by pressing the `ESC` key, or by clicking outside the dialog focus (i.e, the overlay);
   * `onCancel` is not mandatory but can be passed. Even if passed, the dialog will still be able to close itself.
 
 Activating this mode is as simple as omitting the `isOpen` prop. The only mandatory prop, in this case, is the `onConfirm` callback.
