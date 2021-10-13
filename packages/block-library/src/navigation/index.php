@@ -218,7 +218,12 @@ function render_block_core_navigation( $attributes, $content, $block ) {
 
 	unset( $attributes['rgbTextColor'], $attributes['rgbBackgroundColor'] );
 
-	$should_load_view_script = ! wp_script_is( 'wp-block-navigation-view' ) && ( ( ! empty( $attributes['overlayMenu'] ) && 'never' !== $attributes['overlayMenu'] ) || $attributes['openSubmenusOnClick'] || $attributes['showSubmenuIcon'] );
+	/**
+	 * This is for backwards compatibility after `isResponsive` attribute has been removed.
+	 */
+	$has_old_responsive_attribute = ! empty( $attributes['isResponsive'] ) && $attributes['isResponsive'];
+	$is_responsive_menu           = isset( $attributes['overlayMenu'] ) && 'never' !== $attributes['overlayMenu'] || $has_old_responsive_attribute;
+	$should_load_view_script      = ! wp_script_is( 'wp-block-navigation-view' ) && ( $is_responsive_menu || $attributes['openSubmenusOnClick'] || $attributes['showSubmenuIcon'] );
 	if ( $should_load_view_script ) {
 		wp_enqueue_script( 'wp-block-navigation-view' );
 	}
@@ -250,7 +255,7 @@ function render_block_core_navigation( $attributes, $content, $block ) {
 		$font_sizes['css_classes'],
 		( isset( $attributes['orientation'] ) && 'vertical' === $attributes['orientation'] ) ? array( 'is-vertical' ) : array(),
 		isset( $attributes['itemsJustification'] ) ? array( 'items-justified-' . $attributes['itemsJustification'] ) : array(),
-		isset( $attributes['overlayMenu'] ) && 'never' !== $attributes['overlayMenu'] ? array( 'is-responsive' ) : array()
+		$is_responsive_menu ? array( 'is-responsive' ) : array()
 	);
 
 	$inner_blocks_html = '';
@@ -288,7 +293,7 @@ function render_block_core_navigation( $attributes, $content, $block ) {
 
 	// Determine whether or not navigation elements should be wrapped in the markup required to make it responsive,
 	// return early if they don't.
-	if ( ! isset( $attributes['overlayMenu'] ) || 'never' === $attributes['overlayMenu'] ) {
+	if ( ! $is_responsive_menu ) {
 		return sprintf(
 			'<nav %1$s>%2$s</nav>',
 			$wrapper_attributes,
