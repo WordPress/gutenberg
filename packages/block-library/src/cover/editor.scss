@@ -9,6 +9,22 @@
 	&.is-placeholder {
 		min-height: auto !important;
 		padding: 0 !important;
+
+		// Resizeable placeholder for placeholder.
+		.block-library-cover__resize-container {
+			display: none;
+		}
+		.components-placeholder {
+			&.is-large {
+				min-height: 240px;
+				justify-content: flex-start;
+				z-index: z-index(".wp-block-cover.is-placeholder .components-placeholder.is-large");
+				+ .block-library-cover__resize-container {
+					min-height: 240px;
+					display: block;
+				}
+			}
+		}
 	}
 
 	&.components-placeholder h2 {
@@ -64,6 +80,7 @@
 	left: 0;
 	right: 0;
 	bottom: 0;
+	min-height: 50px;
 }
 
 .block-library-cover__resize-container:not(.is-resizing) {

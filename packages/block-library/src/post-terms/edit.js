@@ -52,20 +52,8 @@ export default function PostTermsEdit( {
 		} ),
 	} );
 
-	if ( ! hasPost ) {
-		return (
-			<div { ...blockProps }>
-				{ __( 'Post Terms block: post not found.' ) }
-			</div>
-		);
-	}
-
-	if ( ! term ) {
-		return (
-			<div { ...blockProps }>
-				{ __( 'Post Terms block: no term specified.' ) }
-			</div>
-		);
+	if ( ! hasPost || ! term ) {
+		return <div { ...blockProps }>{ __( 'Post Terms' ) }</div>;
 	}
 
 	return (
