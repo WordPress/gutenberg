@@ -39,15 +39,15 @@ describe( 'Card', () => {
 		} );
 
 		it( 'should remove borders when the isBorderless prop is true', () => {
-			const { rerender, container } = render(
+			const { container: withBorders } = render(
 				<Card>Code is Poetry</Card>
 			);
-			expect( container.firstChild ).not.toHaveStyle(
-				'box-shadow: none'
+
+			const { container: withoutBorders } = render(
+				<Card isBorderless>Code is Poetry</Card>
 			);
 
-			rerender( <Card isBorderless={ true }>Code is Poetry</Card> );
-			expect( container.firstChild ).toHaveStyle( 'box-shadow: none' );
+			expect( withBorders ).toMatchDiffSnapshot( withoutBorders );
 		} );
 
 		it( 'should add rounded border when the isRounded prop is true', () => {
