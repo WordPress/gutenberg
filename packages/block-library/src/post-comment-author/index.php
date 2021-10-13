@@ -29,7 +29,7 @@ function render_block_core_post_comment_author( $attributes, $content, $block ) 
 	return sprintf(
 		'<div %1$s>%2$s</div>',
 		$wrapper_attributes,
-		$comment_author,
+		$comment_author
 	);
 }
 
