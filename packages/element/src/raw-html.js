@@ -23,8 +23,8 @@ export default function RawHTML( { children, ...props } ) {
 
 	// Cast children as an array, and concatenate each element if it is a string.
 	Children.toArray( children ).forEach( ( child ) => {
-		if ( typeof child === 'string' ) {
-			rawHtml += child.trim();
+		if ( typeof child === 'string' && child.trim() !== '' ) {
+			rawHtml += child;
 		}
 	} );
 
