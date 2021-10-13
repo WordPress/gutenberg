@@ -28,8 +28,8 @@ import {
 
 function Example() {
   return (
-    <ConfirmDialog onConfirm={ () => console.debug(' Confirmed! ') }>
-  )
+    <ConfirmDialog onConfirm={ () => console.debug(' Confirmed! ') } />
+  );
 }
 ```
 
