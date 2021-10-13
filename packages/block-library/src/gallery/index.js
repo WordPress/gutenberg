@@ -7,7 +7,7 @@ import { gallery as icon } from '@wordpress/icons';
  * Internal dependencies
  */
 import deprecated from './deprecated';
-import edit from './edit-wrapper';
+import edit from './edit';
 import metadata from './block.json';
 import save from './save';
 import transforms from './transforms';
