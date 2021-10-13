@@ -67,7 +67,7 @@ function Example() {
 
 ### Unsupported: Multiple instances
 
-Multiple `ConfirmDialog's is an edge case that's currently not officially supported by this component. At the moment, new instances will end up closing the last instance due to the way the `Modal` is implemented (more specifically, because of the use of the `onFocusOutside` to detect a blur in order to close it). This will end up automatically cancelling the previous instance, which might or might not be what you want.
+Multiple `ConfirmDialog's is an edge case that's currently not officially supported by this component. At the moment, new instances will end up closing the last instance due to the way the `Modal` is implemented.
 
 Suppose you need to handle multiple confirmations without discarding other instances. In that case, it might be better to have a singleton wrapper component that provides a context-based API to trigger the dialog, keeping track of multiple instances. Here's an [example](https://github.com/WordPress/gutenberg/pull/34153#issuecomment-908342367).
 
