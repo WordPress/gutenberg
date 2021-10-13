@@ -23,19 +23,20 @@ export default function Edit( { attributes, context, setAttributes } ) {
 				const user = getEntityRecord( 'root', 'user', comment.author );
 				return user?.name ?? __( 'Anonymous' );
 			}
-			if ( isLink ) {
-				return (
-					<a
-						href="#comment-date-pseudo-link"
-						onClick={ ( event ) => event.preventDefault() }
-					>
-						{ authorName }
-					</a>
-				);
-			}
 			return authorName ?? '';
 		},
-		[ commentId, isLink ]
+		[ commentId ]
+	);
+
+	const displayAuthor = isLink ? (
+		<a
+			href="#comment-author-pseudo-link"
+			onClick={ ( event ) => event.preventDefault() }
+		>
+			{ displayName }
+		</a>
+	) : (
+		displayName
 	);
 
 	return (
@@ -60,7 +61,7 @@ export default function Edit( { attributes, context, setAttributes } ) {
 					) }
 				</PanelBody>
 			</InspectorControls>
-			<div { ...blockProps }>{ displayName }</div>
+			<div { ...blockProps }>{ displayAuthor }</div>
 		</>
 	);
 }
