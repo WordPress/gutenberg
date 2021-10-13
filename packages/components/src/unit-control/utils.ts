@@ -327,7 +327,7 @@ export const useCustomUnits = ( {
 export function getUnitsWithCurrentUnit(
 	currentValue: Value,
 	legacyUnit: string | undefined,
-	units: Array< WPUnitControlUnit > | false = ALL_CSS_UNITS
+	units: WPUnitControlUnitList = ALL_CSS_UNITS
 ): WPUnitControlUnitList {
 	if ( ! Array.isArray( units ) ) {
 		return units;
