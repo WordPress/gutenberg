@@ -60,7 +60,10 @@ describe( 'Meta boxes', () => {
 		await page.waitForNavigation();
 
 		// Check the the dynamic block appears.
-		const latestPostsBlock = await page.waitForSelector( '.wp-block-latest-posts' );
+		const latestPostsBlock = await page.waitForSelector(
+			'.wp-block-latest-posts'
+		);
+		
 		expect(
 			await latestPostsBlock.evaluate( ( block ) => block.textContent )
 		).toContain( 'A published post' );
