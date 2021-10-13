@@ -277,22 +277,17 @@ function Navigation( {
 			{ navigatorModal }
 			<InspectorControls>
 				{ hasSubmenuIndicatorSetting && (
-					<PanelBody title={ __( 'Display settings' ) }>
+					<PanelBody title={ __( 'Display' ) }>
 						<ToggleGroupControl
-							label={
-								<div>
-									<h4>{ __( 'Overlay Menu' ) }</h4>
-									<p>
-										{ __(
-											'Controls whether the menu collapses into a toggle button opening an overlay for navigation.'
-										) }
-									</p>
-								</div>
-							}
+							label={ __( 'Overlay Menu' ) }
 							value={ attributes.overlayMenu }
+							help={ __(
+								'Controls whether the menu collapses into a toggle button opening an overlay for navigation.'
+							) }
 							onChange={ ( value ) =>
 								setAttributes( { overlayMenu: value } )
 							}
+							isBlock
 						>
 							<ToggleGroupControlOption
 								value="never"
@@ -310,7 +305,7 @@ function Navigation( {
 								aria-label={ __( 'Always' ) }
 							/>
 						</ToggleGroupControl>
-						<h4>{ __( 'Submenus' ) }</h4>
+						<h3>{ __( 'Submenus' ) }</h3>
 						<ToggleControl
 							checked={ attributes.openSubmenusOnClick }
 							onChange={ ( value ) => {
