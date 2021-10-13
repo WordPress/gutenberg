@@ -85,7 +85,7 @@ function gutenberg_navigation_init( $hook ) {
 	}
 
 	$menus         = wp_get_nav_menus();
-	$first_menu_id = count( $menus ) ? $menus[0]->term_id : null;
+	$first_menu_id = ! empty( $menus ) ? $menus[0]->term_id : null;
 
 	$preload_paths = array(
 		'/__experimental/menu-locations',
