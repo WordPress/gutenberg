@@ -17,7 +17,7 @@ describe( 'RawHTML', () => {
 		expect( container.innerHTML ).toBe( expected );
 	} );
 
-	it( 'creates wrapper if assigned other props', () => {
+	it( 'adds other props to container element', () => {
 		const html = '<p>So scary!</p>';
 		const { container } = render(
 			<RawHTML className="foo">{ html }</RawHTML>
@@ -40,6 +40,26 @@ describe( 'RawHTML', () => {
 		);
 
 		const expected = '<div><p>So scary!</p><p>Extra paragraph</p></div>';
+		expect( container.innerHTML ).toBe( expected );
+	} );
+
+	it( 'renders an empty container if there are no children', () => {
+		const { container } = render( <RawHTML></RawHTML> );
+
+		const expected = '<div></div>';
+		expect( container.innerHTML ).toBe( expected );
+	} );
+
+	it( 'ignores non-string based children', () => {
+		const html = '<p>So scary!</p>';
+		const { container } = render(
+			<RawHTML>
+				{ html }
+				<p>Ignore this!</p>
+			</RawHTML>
+		);
+
+		const expected = '<div><p>So scary!</p></div>';
 		expect( container.innerHTML ).toBe( expected );
 	} );
 } );

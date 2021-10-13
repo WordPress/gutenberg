@@ -1,7 +1,7 @@
 /**
  * Internal dependencies
  */
-import { createElement } from './react';
+import { Children, createElement } from './react';
 
 // Disable reason: JSDoc linter doesn't seem to parse the union (`&`) correctly.
 /** @typedef {{children: string} & import('react').ComponentPropsWithoutRef<'div'>} RawHTMLProps */
@@ -19,11 +19,15 @@ import { createElement } from './react';
  * @return {JSX.Element} Dangerously-rendering component.
  */
 export default function RawHTML( { children, ...props } ) {
-	// Concatenate into a single string if children is an array.
-	const rawHtml = Array.isArray( children ) ? children.join( '' ) : children;
+	let rawHtml = '';
 
-	// The DIV wrapper will be stripped by serializer, unless there are
-	// non-children props present.
+	// Cast children as an array, and concatenate each element if it is a string.
+	Children.toArray( children ).forEach( ( child ) => {
+		if ( typeof child === 'string' ) {
+			rawHtml += child.trim();
+		}
+	} );
+
 	return createElement( 'div', {
 		dangerouslySetInnerHTML: { __html: rawHtml },
 		...props,
