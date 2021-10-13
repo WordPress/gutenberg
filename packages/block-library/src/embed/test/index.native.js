@@ -117,78 +117,162 @@ describe( 'Embed block', () => {
 		);
 	} );
 
-	it( 'sets empty URL when dismissing edit URL modal', async () => {
-		const {
-			getByA11yLabel,
-			getByText,
-			getByTestId,
-		} = await initializeEditor( {
-			initialHtml: '',
+	describe( 'Set URL upon block insertion', () => {
+		it( 'sets empty URL when dismissing edit URL modal', async () => {
+			const {
+				getByA11yLabel,
+				getByText,
+				getByTestId,
+			} = await initializeEditor( {
+				initialHtml: '',
+			} );
+
+			// Open the inserter menu
+			fireEvent.press(
+				await waitFor( () => getByA11yLabel( 'Add block' ) )
+			);
+
+			// Insert an embed block
+			fireEvent.press( await waitFor( () => getByText( `Embed` ) ) );
+
+			// Wait for edit URL modal to be visible
+			const embedEditURLModal = getByTestId( 'embed-edit-url-modal' );
+			await waitFor( () => embedEditURLModal.props.isVisible );
+
+			// Dismiss the edit URL modal
+			fireEvent( embedEditURLModal, 'backdropPress' );
+			fireEvent( embedEditURLModal, MODAL_DISMISS_EVENT );
+
+			expect( getEditorHtml() ).toBe( '<!-- wp:embed {"url":""} /-->' );
 		} );
 
-		// Open the inserter menu
-		fireEvent.press( await waitFor( () => getByA11yLabel( 'Add block' ) ) );
+		it( 'sets a valid URL when dismissing edit URL modal', async () => {
+			const {
+				getByA11yLabel,
+				getByText,
+				getByPlaceholderText,
+				getByTestId,
+			} = await initializeEditor( {
+				initialHtml: '',
+			} );
+			const expectedURL = 'https://twitter.com/notnownikki';
 
-		// Insert an embed block
-		fireEvent.press( await waitFor( () => getByText( `Embed` ) ) );
+			// Return mocked responses for the oembed endpoint.
+			fetchRequest.mockImplementation( ( { path } ) => {
+				let response = {};
+				if ( path.startsWith( '/oembed/1.0/proxy' ) ) {
+					response = RICH_TEXT_EMBED_SUCCESS_RESPONSE;
+				}
+				return Promise.resolve( response );
+			} );
 
-		// Wait for edit URL modal to be visible
-		await waitFor( () => {
-			const modal = getByTestId( 'embed-edit-url-modal' );
-			return modal.props.isVisible;
+			// Open the inserter menu
+			fireEvent.press(
+				await waitFor( () => getByA11yLabel( 'Add block' ) )
+			);
+
+			// Insert an embed block
+			fireEvent.press( await waitFor( () => getByText( `Embed` ) ) );
+
+			// Wait for edit URL modal to be visible
+			const embedEditURLModal = getByTestId( 'embed-edit-url-modal' );
+			await waitFor( () => embedEditURLModal.props.isVisible );
+
+			// Set an URL
+			const linkTextInput = getByPlaceholderText( 'Add link' );
+			fireEvent( linkTextInput, 'focus' );
+			fireEvent.changeText( linkTextInput, expectedURL );
+
+			// Dismiss the edit URL modal
+			fireEvent( embedEditURLModal, 'backdropPress' );
+			fireEvent( embedEditURLModal, MODAL_DISMISS_EVENT );
+
+			// Wait for edit URL button to be present
+			const editURLButton = await waitFor( () =>
+				getByA11yLabel( 'Edit URL' )
+			);
+
+			expect( editURLButton ).toBeDefined();
+			expect( getEditorHtml() ).toBe( RICH_TEXT_EMBED_HTML );
 		} );
-
-		// Dismiss the edit URL modal
-		fireEvent( getByTestId( 'embed-edit-url-modal' ), MODAL_DISMISS_EVENT );
-
-		expect( getEditorHtml() ).toBe( '<!-- wp:embed {"url":""} /-->' );
 	} );
 
-	it( 'sets a valid URL when dismissing edit URL modal', async () => {
-		const {
-			getByA11yLabel,
-			getByText,
-			getByPlaceholderText,
-			getByTestId,
-		} = await initializeEditor( {
-			initialHtml: '',
+	describe( 'Set URL by tapping on the block', () => {
+		it( 'sets empty URL when dismissing edit URL modal', async () => {
+			const waitForElement = ( { getByA11yLabel } ) =>
+				getByA11yLabel( /Embed Block\. Row 1/ );
+			const { element, getByText, getByTestId } = await initializeEditor(
+				{ initialHtml: '<!-- wp:embed /-->' },
+				{ waitForElement }
+			);
+
+			// Select block
+			fireEvent.press( element );
+
+			// Edit URL
+			fireEvent.press( await waitFor( () => getByText( 'ADD LINK' ) ) );
+
+			// Wait for edit URL modal to be visible
+			const embedEditURLModal = getByTestId( 'embed-edit-url-modal' );
+			await waitFor( () => embedEditURLModal.props.isVisible );
+
+			// Dismiss the edit URL modal
+			fireEvent( embedEditURLModal, 'backdropPress' );
+			fireEvent( embedEditURLModal, MODAL_DISMISS_EVENT );
+
+			expect( getEditorHtml() ).toBe( '<!-- wp:embed {"url":""} /-->' );
 		} );
-		const expectedURL = 'https://twitter.com/notnownikki';
 
-		// Return mocked responses for the oembed endpoint.
-		fetchRequest.mockImplementation( ( { path } ) => {
-			let response = {};
-			if ( path.startsWith( '/oembed/1.0/proxy' ) ) {
-				response = RICH_TEXT_EMBED_SUCCESS_RESPONSE;
-			}
-			return Promise.resolve( response );
+		it( 'sets a valid URL when dismissing edit URL modal', async () => {
+			const waitForElement = ( { getByA11yLabel } ) =>
+				getByA11yLabel( /Embed Block\. Row 1/ );
+			const {
+				element,
+				getByA11yLabel,
+				getByText,
+				getByPlaceholderText,
+				getByTestId,
+			} = await initializeEditor(
+				{ initialHtml: '<!-- wp:embed /-->' },
+				{ waitForElement }
+			);
+			const expectedURL = 'https://twitter.com/notnownikki';
+
+			// Return mocked responses for the oembed endpoint.
+			fetchRequest.mockImplementation( ( { path } ) => {
+				let response = {};
+				if ( path.startsWith( '/oembed/1.0/proxy' ) ) {
+					response = RICH_TEXT_EMBED_SUCCESS_RESPONSE;
+				}
+				return Promise.resolve( response );
+			} );
+
+			// Select block
+			fireEvent.press( element );
+
+			// Edit URL
+			fireEvent.press( getByText( 'ADD LINK' ) );
+
+			// Wait for edit URL modal to be visible
+			const embedEditURLModal = getByTestId( 'embed-edit-url-modal' );
+			await waitFor( () => embedEditURLModal.props.isVisible );
+
+			// Set an URL
+			const linkTextInput = getByPlaceholderText( 'Add link' );
+			fireEvent( linkTextInput, 'focus' );
+			fireEvent.changeText( linkTextInput, expectedURL );
+
+			// Dismiss the edit URL modal
+			fireEvent( embedEditURLModal, 'backdropPress' );
+			fireEvent( embedEditURLModal, MODAL_DISMISS_EVENT );
+
+			// Wait for edit URL button to be present
+			const editURLButton = await waitFor( () =>
+				getByA11yLabel( 'Edit URL' )
+			);
+
+			expect( editURLButton ).toBeDefined();
+			expect( getEditorHtml() ).toBe( RICH_TEXT_EMBED_HTML );
 		} );
-
-		// Open the inserter menu
-		fireEvent.press( await waitFor( () => getByA11yLabel( 'Add block' ) ) );
-
-		// Insert an embed block
-		fireEvent.press( await waitFor( () => getByText( `Embed` ) ) );
-
-		// Wait for edit URL modal to be visible
-		const embedEditURLModal = getByTestId( 'embed-edit-url-modal' );
-		await waitFor( () => embedEditURLModal.props.isVisible );
-
-		// Set an URL
-		const linkTextInput = getByPlaceholderText( 'Add link' );
-		fireEvent( linkTextInput, 'focus' );
-		fireEvent.changeText( linkTextInput, expectedURL );
-
-		// Dismiss the edit URL modal
-		fireEvent( embedEditURLModal, 'backdropPress' );
-		fireEvent( embedEditURLModal, MODAL_DISMISS_EVENT );
-
-		// Wait for edit URL button to be present
-		const editURLButton = await waitFor( () =>
-			getByA11yLabel( 'Edit URL' )
-		);
-
-		expect( editURLButton ).toBeDefined();
-		expect( getEditorHtml() ).toBe( RICH_TEXT_EMBED_HTML );
 	} );
 } );
