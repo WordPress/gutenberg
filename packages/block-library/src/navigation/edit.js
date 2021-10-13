@@ -281,7 +281,7 @@ function Navigation( {
 						<ToggleGroupControl
 							label={
 								<div>
-									<h5>Overlay Menu</h5>
+									<h4>Overlay Menu</h4>
 									<p>
 										Controls whether the menu collapses into
 										a toggle button opening an overlay for
@@ -310,6 +310,7 @@ function Navigation( {
 								aria-label="Always"
 							/>
 						</ToggleGroupControl>
+						<h4>Submenus</h4>
 						<ToggleControl
 							checked={ attributes.openSubmenusOnClick }
 							onChange={ ( value ) => {
