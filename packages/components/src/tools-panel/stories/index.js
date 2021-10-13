@@ -96,7 +96,7 @@ export const WithOptionalItemsPlusIcon = () => {
 		<PanelWrapperView>
 			<Panel>
 				<ToolsPanel
-					label="Tools Panel (with optional items only)"
+					label="Tools Panel (optional items only)"
 					resetAll={ resetAll }
 				>
 					<ToolsPanelItem
