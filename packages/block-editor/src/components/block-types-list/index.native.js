@@ -12,14 +12,13 @@ import {
 /**
  * WordPress dependencies
  */
-import { useState, useEffect, useContext } from '@wordpress/element';
+import { useState, useEffect } from '@wordpress/element';
 import { BottomSheet, InserterButton } from '@wordpress/components';
 
 /**
  * Internal dependencies
  */
 import styles from './style.scss';
-import BlockContext from '../block-context';
 
 const MIN_COL_NUM = 3;
 
@@ -41,8 +40,6 @@ export default function BlockTypesList( {
 			Dimensions.removeEventListener( 'change', onLayout );
 		};
 	}, [] );
-
-	const { postType } = useContext( BlockContext );
 
 	function calculateItemWidth() {
 		const {
@@ -106,7 +103,6 @@ export default function BlockTypesList( {
 						itemWidth,
 						maxWidth,
 						onSelect,
-						postType,
 					} }
 				/>
 			) }

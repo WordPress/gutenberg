@@ -6,7 +6,12 @@ import { AccessibilityInfo, TouchableHighlight, Platform } from 'react-native';
 /**
  * WordPress dependencies
  */
-import { useEffect, useState, useCallback } from '@wordpress/element';
+import {
+	useEffect,
+	useState,
+	useCallback,
+	useContext,
+} from '@wordpress/element';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { createBlock } from '@wordpress/blocks';
 import {
@@ -14,6 +19,8 @@ import {
 	BottomSheetConsumer,
 	SearchControl,
 } from '@wordpress/components';
+import { __, sprintf } from '@wordpress/i18n';
+import { showNotice, nativeNoticeLength } from '@wordpress/react-native-bridge';
 
 /**
  * Internal dependencies
@@ -23,6 +30,7 @@ import { store as blockEditorStore } from '../../store';
 import InserterTabs from './tabs';
 import styles from './style.scss';
 import { filterInserterItems } from './utils';
+import BlockContext from '../block-context';
 
 const MIN_ITEMS_FOR_SEARCH = 2;
 function InserterMenu( {
@@ -135,24 +143,43 @@ function InserterMenu( {
 		[ insertBlock, destinationRootClientId, insertionIndex ]
 	);
 
+	const { postType } = useContext( BlockContext );
+
 	const onSelectItem = useCallback(
 		( item ) => {
-			// Avoid a focus loop, see https://github.com/WordPress/gutenberg/issues/30562
-			if ( Platform.OS === 'ios' ) {
-				AccessibilityInfo.isScreenReaderEnabled().then( ( enabled ) => {
-					// In testing, the bug focus loop needed a longer timeout when VoiceOver was enabled
-					const timeout = enabled ? 200 : 100;
-					// eslint-disable-next-line @wordpress/react-no-unsafe-timeout
-					setTimeout( () => {
-						onInsert( item );
-					}, timeout );
-				} );
-			} else {
-				onInsert( item );
+			if ( ! item.isDisabled ) {
+				// Avoid a focus loop, see https://github.com/WordPress/gutenberg/issues/30562
+				if ( isIOS ) {
+					AccessibilityInfo.isScreenReaderEnabled().then(
+						( enabled ) => {
+							// In testing, the bug focus loop needed a longer timeout when VoiceOver was enabled
+							const timeout = enabled ? 200 : 100;
+							// eslint-disable-next-line @wordpress/react-no-unsafe-timeout
+							setTimeout( () => {
+								onInsert( item );
+							}, timeout );
+						}
+					);
+				} else {
+					onInsert( item );
+				}
+				onSelect( item );
+			} else if ( item.alreadyPresentInPost ) {
+				// Type of block doesn't support multiple instances.
+				const disabledMessage =
+					postType === 'page'
+						? // translators: %s: name of the block. e.g: "More"
+						  __( 'You already have a %s block on this page.' )
+						: // translators: %s: name of the block. e.g: "More"
+						  __( 'You already have a %s block on this post.' );
+
+				showNotice(
+					sprintf( disabledMessage, item.title ),
+					nativeNoticeLength.short
+				);
 			}
-			onSelect( item );
 		},
-		[ onInsert, onSelect ]
+		[ onInsert, onSelect, postType, isIOS ]
 	);
 
 	const onChangeSearch = useCallback(

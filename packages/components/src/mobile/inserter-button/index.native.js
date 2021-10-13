@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { View, TouchableHighlight, Text, Platform } from 'react-native';
+import { View, TouchableHighlight, Text } from 'react-native';
 
 /**
  * WordPress dependencies
@@ -12,14 +12,13 @@ import { usePreferredColorSchemeStyle } from '@wordpress/compose';
 import { __, sprintf } from '@wordpress/i18n';
 import { sparkles } from '@wordpress/icons';
 import { BlockIcon } from '@wordpress/block-editor';
-import { showNotice, nativeNoticeLength } from '@wordpress/react-native-bridge';
 
 /**
  * Internal dependencies
  */
 import styles from './style.scss';
 
-function InserterButton( { item, itemWidth, maxWidth, onSelect, postType } ) {
+function InserterButton( { item, itemWidth, maxWidth, onSelect } ) {
 	const modalIconWrapperStyle = usePreferredColorSchemeStyle(
 		styles.modalIconWrapper,
 		styles.modalIconWrapperDark
@@ -45,28 +44,8 @@ function InserterButton( { item, itemWidth, maxWidth, onSelect, postType } ) {
 		  __( '%s block' );
 	const accessibilityLabel = sprintf( accessibilityLabelFormat, item.title );
 
-	// Message is only displayed in Android for now
-	const isIOS = Platform.OS === 'ios';
-	const shouldDisableTouch =
-		item.isDisabled && ( isIOS || ! item.alreadyPresentInPost );
-
 	const onPress = useCallback( () => {
-		if ( ! item.isDisabled ) {
-			onSelect( item );
-		} else if ( item.alreadyPresentInPost && ! isIOS ) {
-			// Type of block doesn't support multiple instances.
-			const disabledMessage =
-				postType === 'page'
-					? // translators: %s: name of the block. e.g: "More"
-					  __( 'You already have a %s block on this page.' )
-					: // translators: %s: name of the block. e.g: "More"
-					  __( 'You already have a %s block on this post.' );
-
-			showNotice(
-				sprintf( disabledMessage, blockTitle ),
-				nativeNoticeLength.short
-			);
-		}
+		onSelect( item );
 	}, [ item ] );
 
 	return (
@@ -80,7 +59,7 @@ function InserterButton( { item, itemWidth, maxWidth, onSelect, postType } ) {
 			accessibilityRole="button"
 			accessibilityLabel={ accessibilityLabel }
 			onPress={ onPress }
-			disabled={ shouldDisableTouch }
+			disabled={ item.isDisabled && ! item.alreadyPresentInPost }
 		>
 			<View style={ [ styles.modalItem, { width: maxWidth } ] }>
 				<View
