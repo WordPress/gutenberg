@@ -9,8 +9,20 @@ import { css } from '@emotion/react';
 import { COLORS, CONFIG } from '../utils';
 
 export const Card = css`
-	box-shadow: inset 0 0 0 1px ${ CONFIG.surfaceBorderColor };
 	outline: none;
+
+	&::before {
+		content: '';
+
+		box-shadow: inset 0 0 0 1px ${ CONFIG.surfaceBorderColor };
+		position: absolute;
+		top: 0;
+		right: 0;
+		bottom: 0;
+		left: 0;
+
+		pointer-events: none;
+	}
 `;
 
 export const Header = css`
@@ -77,7 +89,9 @@ export const borderColor = css`
 `;
 
 export const boxShadowless = css`
-	box-shadow: none;
+	&::before {
+		content: none;
+	}
 `;
 
 export const borderless = css`
