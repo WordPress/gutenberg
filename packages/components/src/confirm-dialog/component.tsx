@@ -4,7 +4,7 @@
 // eslint-disable-next-line no-restricted-imports
 import React, { useEffect, useState } from 'react';
 // eslint-disable-next-line no-restricted-imports
-import type { Ref, MouseEvent, KeyboardEvent } from 'react';
+import type { Ref, KeyboardEvent } from 'react';
 
 /**
  * WordPress dependencies
