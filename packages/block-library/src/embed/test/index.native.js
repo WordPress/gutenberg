@@ -6,6 +6,7 @@ import {
 	initializeEditor,
 	fireEvent,
 	waitFor,
+	within,
 } from 'test/helpers';
 import { Platform } from 'react-native';
 
@@ -45,6 +46,10 @@ https://twitter.com/notnownikki
 </div></figure>
 <!-- /wp:embed -->`;
 
+const MOST_USED_PROVIDERS = embed.settings.variations.filter( ( { name } ) =>
+	[ 'youtube', 'twitter', 'wordpress', 'vimeo' ].includes( name )
+);
+
 beforeAll( () => {
 	// Paragraph block needs to be registered because by default a paragraph
 	// block is added to empty posts.
@@ -60,24 +65,56 @@ afterAll( () => {
 } );
 
 describe( 'Embed block', () => {
-	it( 'inserts an embed block', async () => {
-		const { getByA11yLabel, getByText } = await initializeEditor( {
-			initialHtml: '',
+	describe( 'Block insertion', () => {
+		it( 'inserts generic embed block', async () => {
+			const { getByA11yLabel, getByText } = await initializeEditor( {
+				initialHtml: '',
+			} );
+
+			// Open the inserter menu
+			fireEvent.press(
+				await waitFor( () => getByA11yLabel( 'Add block' ) )
+			);
+
+			// Insert an embed block
+			fireEvent.press( await waitFor( () => getByText( `Embed` ) ) );
+
+			// Get the embed block
+			const embedblock = await waitFor( () =>
+				getByA11yLabel( /Embed Block\. Row 1/ )
+			);
+			const embedBlockName = within( embedblock ).getByText( 'Embed' );
+
+			expect( embedBlockName ).toBeDefined();
+			expect( getEditorHtml() ).toBe( '<!-- wp:embed /-->' );
 		} );
 
-		// Open the inserter menu
-		fireEvent.press( await waitFor( () => getByA11yLabel( 'Add block' ) ) );
+		MOST_USED_PROVIDERS.forEach( ( { attributes, title } ) =>
+			it( `inserts ${ title } embed block`, async () => {
+				const { getByA11yLabel, getByText } = await initializeEditor( {
+					initialHtml: '',
+				} );
 
-		// Insert an embed block
-		fireEvent.press( await waitFor( () => getByText( `Embed` ) ) );
+				// Open the inserter menu
+				fireEvent.press(
+					await waitFor( () => getByA11yLabel( 'Add block' ) )
+				);
 
-		// Get the embed block
-		const embedblock = await waitFor( () =>
-			getByA11yLabel( /Embed Block\. Row 1/ )
+				// Insert a specific embed block
+				fireEvent.press( await waitFor( () => getByText( title ) ) );
+
+				// Get the embed block
+				const embedblock = await waitFor( () =>
+					getByA11yLabel( /Embed Block\. Row 1/ )
+				);
+				const embedBlockName = within( embedblock ).getByText( title );
+
+				expect( embedBlockName ).toBeDefined();
+				expect( getEditorHtml() ).toBe(
+					`<!-- wp:embed ${ JSON.stringify( attributes ) } /-->`
+				);
+			} )
 		);
-
-		expect( embedblock ).toBeDefined();
-		expect( getEditorHtml() ).toBe( '<!-- wp:embed /-->' );
 	} );
 
 	it( 'sets empty URL when dismissing edit URL modal', async () => {
