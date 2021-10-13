@@ -168,7 +168,6 @@ function FontSizePicker(
 						hideLabelFromVision
 						value={ value }
 						onChange={ ( newValue ) => {
-							// TODO: related to `reset`. Should we show the button?
 							onChange(
 								hasUnits ? newValue : Number( newValue )
 							);
