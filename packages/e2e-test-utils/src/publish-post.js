@@ -12,6 +12,9 @@ import { openPublishPanel } from './open-publish-panel';
 export async function publishPost() {
 	await openPublishPanel();
 
+	// Dismiss any previous snackbar.
+	await page.click( '.components-snackbar' );
+
 	// Publish the post
 	await page.click( '.editor-post-publish-button' );
 
