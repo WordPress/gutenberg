@@ -18,6 +18,7 @@ function ToggleGroupControlBackdrop( {
 	const [ left, setLeft ] = useState( 0 );
 	const [ width, setWidth ] = useState( 0 );
 	const [ canAnimate, setCanAnimate ] = useState( false );
+	const [ renderBackdrop, setRenderBackdrop ] = useState( true );
 
 	useEffect( () => {
 		const containerNode = containerRef?.current;
@@ -29,9 +30,8 @@ function ToggleGroupControlBackdrop( {
 		const targetNode = containerNode.querySelector(
 			`[data-value="${ state }"]`
 		);
+		setRenderBackdrop( !! targetNode );
 		if ( ! targetNode ) {
-			setLeft( 0 );
-			setWidth( 0 );
 			return;
 		}
 
@@ -51,6 +51,10 @@ function ToggleGroupControlBackdrop( {
 		}
 		return () => window.cancelAnimationFrame( requestId );
 	}, [ canAnimate, containerRef, containerWidth, state, isAdaptiveWidth ] );
+
+	if ( ! renderBackdrop ) {
+		return null;
+	}
 
 	return (
 		<BackdropView
