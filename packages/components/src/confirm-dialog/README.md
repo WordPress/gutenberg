@@ -60,8 +60,12 @@ function Example() {
   }
 
   return (
-    <ConfirmDialog isOpen={ isOpen } onConfirm={ handleConfirm } onCancel={ handleCancel }>
-  )
+    <ConfirmDialog
+      isOpen={ isOpen }
+      onConfirm={ handleConfirm }
+      onCancel={ handleCancel }
+    />
+  );
 }
 ```
 
