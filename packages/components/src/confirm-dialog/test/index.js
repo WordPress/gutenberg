@@ -16,8 +16,50 @@ const noop = () => {};
 
 describe( 'Confirm', () => {
 	describe( 'Confirm component', () => {
+		describe( 'Structure', () => {
+			/**
+			 * Helper method to check the structure of the dialog only for the elements
+			 * we care about.
+			 *
+			 * @param { string } title The title of the dialog. If set, that means we'll
+			 *                         make sure it's rendered, too.
+			 */
+			const shouldRenderCorrectly = ( title ) => {
+				const wrapper = render(
+					<ConfirmDialog
+						title={ title }
+						onConfirm={ noop }
+						onCancel={ noop }
+					>
+						Are you sure?
+					</ConfirmDialog>
+				);
+
+				const dialog = wrapper.getByRole( 'dialog' );
+				const xCloseButton = wrapper.getByLabelText( 'Cancel' );
+				const elementsTexts = [ 'Are you sure?', 'OKf', 'Cancel' ];
+				if ( typeof title === 'string' ) elementsTexts.push( title );
+
+				expect( dialog ).toBeInTheDocument();
+
+				elementsTexts.forEach( ( txt ) => {
+					const el = wrapper.getByText( txt );
+					expect( el ).toBeInTheDocument();
+				} );
+
+				expect( xCloseButton ).toBeInTheDocument();
+			};
+
+			it( 'should render correctly with title', () => {
+				shouldRenderCorrectly( 'Hi there!' );
+			} );
+			it( 'should render correctly without title', () => {
+				shouldRenderCorrectly();
+			} );
+		} );
+
 		describe( 'When uncontrolled', () => {
-			it( 'should render correctly', () => {
+			it( 'should render', () => {
 				const wrapper = render(
 					<ConfirmDialog onConfirm={ noop } onCancel={ noop }>
 						Are you sure?
@@ -155,7 +197,7 @@ describe( 'Confirm', () => {
 	} );
 
 	describe( 'When controlled (isOpen is not `undefined`)', () => {
-		it( 'should render correctly when `isOpen` is set to `true`', async () => {
+		it( 'should render when `isOpen` is set to `true`', async () => {
 			const wrapper = render(
 				<ConfirmDialog
 					isOpen={ true }
