@@ -30,7 +30,7 @@ function render_block_core_pattern( $attributes ) {
 	$slug = $attributes['slug'];
 	if ( class_exists( 'WP_Block_Patterns_Registry' ) && WP_Block_Patterns_Registry::get_instance()->is_registered( $slug ) ) {
 		$pattern = WP_Block_Patterns_Registry::get_instance()->get_registered( $slug );
-		return do_blocks( '<!-- wp:group --><div class="wp-block-group">' . $pattern['content'] . '</div><!-- /wp:group -->' );
+		return do_blocks( '<div>' . $pattern['content'] . '</div>' );
 	}
 }
 
