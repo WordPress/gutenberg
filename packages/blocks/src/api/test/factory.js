@@ -90,9 +90,12 @@ describe( 'block factory', () => {
 			registerBlockType( 'core/test-block', {
 				...defaultBlockSettings,
 				attributes: {
-					content: {
+					childrenContent: {
 						type: 'array',
 						source: 'children',
+					},
+					nodeContent: {
+						source: 'node',
 					},
 				},
 			} );
@@ -100,7 +103,8 @@ describe( 'block factory', () => {
 			const block = createBlock( 'core/test-block' );
 
 			expect( block.attributes ).toEqual( {
-				content: [],
+				childrenContent: [],
+				nodeContent: [],
 			} );
 		} );
 
@@ -176,6 +180,14 @@ describe( 'block factory', () => {
 			} );
 
 			expect( block.attributes ).toEqual( {} );
+		} );
+
+		it( 'throws error if the block is not registered', () => {
+			expect( () => {
+				createBlock( 'core/not-registered-test-block', {} );
+			} ).toThrowErrorMatchingInlineSnapshot(
+				`"Block type 'core/not-registered-test-block' is not registered."`
+			);
 		} );
 	} );
 

@@ -15,6 +15,7 @@ import {
 	isFunction,
 	isEmpty,
 	map,
+	reduce,
 } from 'lodash';
 
 /**
@@ -32,7 +33,6 @@ import {
 } from './registration';
 import {
 	normalizeBlockType,
-	__experimentalSanitizeBlockAttributes,
 	__experimentalRemoveAttributesByRole,
 } from './utils';
 
@@ -46,9 +46,37 @@ import {
  * @return {Object} Block object.
  */
 export function createBlock( name, attributes = {}, innerBlocks = [] ) {
-	const sanitizedAttributes = __experimentalSanitizeBlockAttributes(
-		name,
-		attributes
+	// Get the type definition associated with a registered block.
+	const blockType = getBlockType( name );
+
+	if ( undefined === blockType ) {
+		throw new Error( `Block type '${ name }' is not registered.` );
+	}
+
+	const sanitizedAttributes = reduce(
+		blockType.attributes,
+		( accumulator, schema, key ) => {
+			const value = attributes[ key ];
+
+			if ( undefined !== value ) {
+				accumulator[ key ] = value;
+			} else if ( schema.hasOwnProperty( 'default' ) ) {
+				accumulator[ key ] = schema.default;
+			}
+
+			if ( [ 'node', 'children' ].indexOf( schema.source ) !== -1 ) {
+				// Ensure value passed is always an array, which we're expecting in
+				// the RichText component to handle the deprecated value.
+				if ( typeof accumulator[ key ] === 'string' ) {
+					accumulator[ key ] = [ accumulator[ key ] ];
+				} else if ( ! Array.isArray( accumulator[ key ] ) ) {
+					accumulator[ key ] = [];
+				}
+			}
+
+			return accumulator;
+		},
+		{}
 	);
 
 	const clientId = uuid();
