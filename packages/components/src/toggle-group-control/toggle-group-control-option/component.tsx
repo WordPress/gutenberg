@@ -81,7 +81,31 @@ function ToggleGroupControlOption(
 		</LabelView>
 	);
 }
-export default contextConnect(
+
+/**
+ * `ToggleGroupControlOption` is a form component and is meant to be used as a
+ * child of `ToggleGroupControl`.
+ *
+ * @example
+ * ```jsx
+ * import {
+ *   __experimentalToggleGroupControl as ToggleGroupControl,
+ *   __experimentalToggleGroupControlOption as ToggleGroupControlOption,
+ * } from '@wordpress/components';
+ *
+ * function Example() {
+ *   return (
+ *     <ToggleGroupControl label="my label" value="vertical" isBlock>
+ *       <ToggleGroupControlOption value="horizontal" label="Horizontal" />
+ *       <ToggleGroupControlOption value="vertical" label="Vertical" />
+ *     </ToggleGroupControl>
+ *   );
+ * }
+ * ```
+ */
+const ConnectedToggleGroupControlOption = contextConnect(
 	ToggleGroupControlOption,
 	'ToggleGroupControlOption'
 );
+
+export default ConnectedToggleGroupControlOption;

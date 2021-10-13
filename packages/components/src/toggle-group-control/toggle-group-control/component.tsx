@@ -114,4 +114,35 @@ function ToggleGroupControl(
 	);
 }
 
-export default contextConnect( ToggleGroupControl, 'ToggleGroupControl' );
+/**
+ * `ToggleGroupControl` is a form component that lets users choose options
+ * represented in horizontal segments. To render options for this control use
+ * `ToggleGroupControlOption` component.
+ *
+ * Only use this control when you know for sure the labels of items inside won't
+ * wrap. For items with longer labels, you can consider a `SelectControl` or a
+ * `CustomSelectControl` component instead.
+ *
+ * @example
+ * ```jsx
+ * import {
+ *   __experimentalToggleGroupControl as ToggleGroupControl,
+ *   __experimentalToggleGroupControlOption as ToggleGroupControlOption,
+ * } from '@wordpress/components';
+ *
+ * function Example() {
+ *   return (
+ *     <ToggleGroupControl label="my label" value="vertical" isBlock>
+ *       <ToggleGroupControlOption value="horizontal" label="Horizontal" />
+ *       <ToggleGroupControlOption value="vertical" label="Vertical" />
+ *     </ToggleGroupControl>
+ *   );
+ * }
+ * ```
+ */
+const ConnectedToggleGroupControl = contextConnect(
+	ToggleGroupControl,
+	'ToggleGroupControl'
+);
+
+export default ConnectedToggleGroupControl;
