@@ -59,9 +59,7 @@ export default function PostExcerptEditor( {
 	if ( ! postType || ! postId ) {
 		return (
 			<div { ...blockProps }>
-				<Warning>
-					{ __( 'Post excerpt block: no post found.' ) }
-				</Warning>
+				<Warning>{ __( 'Post Excerpt' ) }</Warning>
 			</div>
 		);
 	}

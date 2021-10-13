@@ -11,9 +11,9 @@ import { __ } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
-import { Text } from '../../text';
-import { Spacer } from '../../spacer';
-import { space } from '../utils/space';
+import { Text } from '../text';
+import { Spacer } from '../spacer';
+import { space } from '../ui/utils/space';
 import { ColorHexInputControl } from './styles';
 
 interface HexInputProps {

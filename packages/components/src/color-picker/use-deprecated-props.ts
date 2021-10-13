@@ -43,7 +43,7 @@ type LegacyColor =
  * @deprecated
  */
 export interface LegacyProps {
-	color: LegacyColor;
+	color: LegacyColor | undefined;
 	/**
 	 * @deprecated
 	 */
@@ -69,7 +69,10 @@ function isLegacyProps( props: any ): props is LegacyProps {
 
 function getColorFromLegacyProps(
 	props: LegacyProps
-): ColorFormats.HSL | ColorFormats.HSLA {
+): ColorFormats.HSL | ColorFormats.HSLA | undefined {
+	if ( ! props.color ) {
+		return undefined;
+	}
 	if ( typeof props.color === 'string' ) {
 		return colorize( props.color ).toHsl();
 	}

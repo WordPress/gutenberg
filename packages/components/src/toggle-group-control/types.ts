@@ -85,7 +85,6 @@ export type ToggleGroupControlButtonProps = {
 	isBlock?: boolean;
 	label: string;
 	'aria-label'?: string;
-	showSeparator?: boolean;
 	value?: ReactText;
 	state?: any;
 };

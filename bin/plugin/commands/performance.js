@@ -29,33 +29,43 @@ const config = require( '../config' );
 /**
  * @typedef WPRawPerformanceResults
  *
- * @property {number[]} load           Load Time.
- * @property {number[]} type           Average type time.
- * @property {number[]} focus          Average block selection time.
- * @property {number[]} inserterOpen   Average time to open global inserter.
- * @property {number[]} inserterSearch Average time to search the inserter.
- * @property {number[]} inserterHover  Average time to move mouse between two block item in the inserter.
+ * @property {number[]} serverResponse       Represents the time the server takes to respond.
+ * @property {number[]} firstPaint           Represents the time when the user agent first rendered after navigation.
+ * @property {number[]} domContentLoaded     Represents the time immediately after the document's DOMContentLoaded event completes.
+ * @property {number[]} loaded               Represents the time when the load event of the current document is completed.
+ * @property {number[]} firstContentfulPaint Represents the time when the browser first renders any text or media.
+ * @property {number[]} firstBlock           Represents the time when Puppeteer first sees a block selector in the DOM.
+ * @property {number[]} type                 Average type time.
+ * @property {number[]} focus                Average block selection time.
+ * @property {number[]} inserterOpen         Average time to open global inserter.
+ * @property {number[]} inserterSearch       Average time to search the inserter.
+ * @property {number[]} inserterHover        Average time to move mouse between two block item in the inserter.
  */
 
 /**
  * @typedef WPPerformanceResults
  *
- * @property {number=} load              Load Time.
- * @property {number=} type              Average type time.
- * @property {number=} minType           Minium type time.
- * @property {number=} maxType           Maximum type time.
- * @property {number=} focus             Average block selection time.
- * @property {number=} minFocus          Min block selection time.
- * @property {number=} maxFocus          Max block selection time.
- * @property {number=} inserterOpen      Average time to open global inserter.
- * @property {number=} minInserterOpen   Min time to open global inserter.
- * @property {number=} maxInserterOpen   Max time to open global inserter.
- * @property {number=} inserterSearch    Average time to open global inserter.
- * @property {number=} minInserterSearch Min time to open global inserter.
- * @property {number=} maxInserterSearch Max time to open global inserter.
- * @property {number=} inserterHover     Average time to move mouse between two block item in the inserter.
- * @property {number=} minInserterHover  Min time to move mouse between two block item in the inserter.
- * @property {number=} maxInserterHover  Max time to move mouse between two block item in the inserter.
+ * @property {number=} serverResponse       Represents the time the server takes to respond.
+ * @property {number=} firstPaint           Represents the time when the user agent first rendered after navigation.
+ * @property {number=} domContentLoaded     Represents the time immediately after the document's DOMContentLoaded event completes.
+ * @property {number=} loaded               Represents the time when the load event of the current document is completed.
+ * @property {number=} firstContentfulPaint Represents the time when the browser first renders any text or media.
+ * @property {number=} firstBlock           Represents the time when Puppeteer first sees a block selector in the DOM.
+ * @property {number=} type                 Average type time.
+ * @property {number=} minType              Minium type time.
+ * @property {number=} maxType              Maximum type time.
+ * @property {number=} focus                Average block selection time.
+ * @property {number=} minFocus             Min block selection time.
+ * @property {number=} maxFocus             Max block selection time.
+ * @property {number=} inserterOpen         Average time to open global inserter.
+ * @property {number=} minInserterOpen      Min time to open global inserter.
+ * @property {number=} maxInserterOpen      Max time to open global inserter.
+ * @property {number=} inserterSearch       Average time to open global inserter.
+ * @property {number=} minInserterSearch    Min time to open global inserter.
+ * @property {number=} maxInserterSearch    Max time to open global inserter.
+ * @property {number=} inserterHover        Average time to move mouse between two block item in the inserter.
+ * @property {number=} minInserterHover     Min time to move mouse between two block item in the inserter.
+ * @property {number=} maxInserterHover     Max time to move mouse between two block item in the inserter.
  */
 
 /**
@@ -105,7 +115,12 @@ function formatTime( number ) {
  */
 function curateResults( results ) {
 	return {
-		load: average( results.load ),
+		serverResponse: average( results.serverResponse ),
+		firstPaint: average( results.firstPaint ),
+		domContentLoaded: average( results.domContentLoaded ),
+		loaded: average( results.loaded ),
+		firstContentfulPaint: average( results.firstContentfulPaint ),
+		firstBlock: average( results.firstBlock ),
 		type: average( results.type ),
 		minType: Math.min( ...results.type ),
 		maxType: Math.max( ...results.type ),
@@ -314,7 +329,22 @@ async function runPerformanceTests( branches, options ) {
 		for ( const branch of branches ) {
 			const medians = mapValues(
 				{
-					load: rawResults.map( ( r ) => r[ branch ].load ),
+					serverResponse: rawResults.map(
+						( r ) => r[ branch ].serverResponse
+					),
+					firstPaint: rawResults.map(
+						( r ) => r[ branch ].firstPaint
+					),
+					domContentLoaded: rawResults.map(
+						( r ) => r[ branch ].domContentLoaded
+					),
+					loaded: rawResults.map( ( r ) => r[ branch ].loaded ),
+					firstContentfulPaint: rawResults.map(
+						( r ) => r[ branch ].firstContentfulPaint
+					),
+					firstBlock: rawResults.map(
+						( r ) => r[ branch ].firstBlock
+					),
 					type: rawResults.map( ( r ) => r[ branch ].type ),
 					minType: rawResults.map( ( r ) => r[ branch ].minType ),
 					maxType: rawResults.map( ( r ) => r[ branch ].maxType ),
@@ -359,6 +389,11 @@ async function runPerformanceTests( branches, options ) {
 
 	// 5- Formatting the results.
 	log( '\n>> 🎉 Results.\n' );
+
+	log(
+		'\nPlease note that client side metrics EXCLUDE the server response time.\n'
+	);
+
 	for ( const testSuite of testSuites ) {
 		log( `\n>> ${ testSuite }\n` );
 

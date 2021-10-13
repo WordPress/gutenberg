@@ -1,5 +1,4 @@
 .wp-block-post-featured-image {
-	line-height: 0;
 	margin-left: 0;
 	margin-right: 0;
 	a {
@@ -9,6 +8,7 @@
 		max-width: 100%;
 		width: 100%;
 		height: auto;
+		vertical-align: bottom;
 	}
 
 	&.alignwide img,

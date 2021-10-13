@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 6.0.0 (2021-10-12)
+
 ### Breaking Change
 
 -   Removed the `minus` icon, which was only used once in the block editor, in favor of the new `reset` icon which offers a more refined vector.
