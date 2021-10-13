@@ -315,7 +315,7 @@ function Navigation( {
 									openSubmenusOnClick: value,
 								} );
 							} }
-							label={ __( 'Open submenus on click' ) }
+							label={ __( 'Open on click' ) }
 						/>
 						{ ! attributes.openSubmenusOnClick && (
 							<ToggleControl
@@ -325,7 +325,7 @@ function Navigation( {
 										showSubmenuIcon: value,
 									} );
 								} }
-								label={ __( 'Show submenu indicator icons' ) }
+								label={ __( 'Show icons' ) }
 							/>
 						) }
 					</PanelBody>
