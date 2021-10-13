@@ -19,7 +19,9 @@ describe( 'Confirm', () => {
 		describe( 'When uncontrolled', () => {
 			it( 'should render correctly', () => {
 				const wrapper = render(
-					<ConfirmDialog onConfirm={ noop } onCancel={ noop } />
+					<ConfirmDialog onConfirm={ noop } onCancel={ noop }>
+						Are you sure?
+					</ConfirmDialog>
 				);
 
 				const confirmDialog = wrapper.getByRole( 'dialog' );
@@ -31,7 +33,9 @@ describe( 'Confirm', () => {
 				const onConfirm = jest.fn().mockName( 'onConfirm()' );
 
 				const wrapper = render(
-					<ConfirmDialog onConfirm={ onConfirm } />
+					<ConfirmDialog onConfirm={ onConfirm }>
+						Are you sure?
+					</ConfirmDialog>
 				);
 
 				const confirmDialog = wrapper.getByRole( 'dialog' );
@@ -47,7 +51,9 @@ describe( 'Confirm', () => {
 				const onCancel = jest.fn().mockName( 'onCancel()' );
 
 				const wrapper = render(
-					<ConfirmDialog onConfirm={ noop } onCancel={ onCancel } />
+					<ConfirmDialog onConfirm={ noop } onCancel={ onCancel }>
+						Are you sure?
+					</ConfirmDialog>
 				);
 
 				const confirmDialog = wrapper.getByRole( 'dialog' );
@@ -60,7 +66,11 @@ describe( 'Confirm', () => {
 			} );
 
 			it( 'should be dismissable even if an `onCancel` callback is not provided', async () => {
-				const wrapper = render( <ConfirmDialog onConfirm={ noop } /> );
+				const wrapper = render(
+					<ConfirmDialog onConfirm={ noop }>
+						Are you sure?
+					</ConfirmDialog>
+				);
 
 				const confirmDialog = wrapper.getByRole( 'dialog' );
 				const button = await wrapper.findByText( 'Cancel' );
@@ -74,7 +84,9 @@ describe( 'Confirm', () => {
 				const onCancel = jest.fn().mockName( 'onCancel()' );
 
 				const wrapper = render(
-					<ConfirmDialog onConfirm={ noop } onCancel={ onCancel } />
+					<ConfirmDialog onConfirm={ noop } onCancel={ onCancel }>
+						Are you sure?
+					</ConfirmDialog>
 				);
 
 				const confirmDialog = wrapper.getByRole( 'dialog' );
@@ -92,7 +104,9 @@ describe( 'Confirm', () => {
 				const onCancel = jest.fn().mockName( 'onCancel()' );
 
 				const wrapper = render(
-					<ConfirmDialog onConfirm={ noop } onCancel={ onCancel } />
+					<ConfirmDialog onConfirm={ noop } onCancel={ onCancel }>
+						Are you sure?
+					</ConfirmDialog>
 				);
 
 				const confirmDialog = wrapper.getByRole( 'dialog' );
@@ -108,7 +122,9 @@ describe( 'Confirm', () => {
 				const onCancel = jest.fn().mockName( 'onCancel()' );
 
 				const wrapper = render(
-					<ConfirmDialog onConfirm={ noop } onCancel={ onCancel } />
+					<ConfirmDialog onConfirm={ noop } onCancel={ onCancel }>
+						Are you sure?
+					</ConfirmDialog>
 				);
 
 				const confirmDialog = wrapper.getByRole( 'dialog' );
@@ -123,7 +139,9 @@ describe( 'Confirm', () => {
 				const onConfirm = jest.fn().mockName( 'onConfirm()' );
 
 				const wrapper = render(
-					<ConfirmDialog onConfirm={ onConfirm } />
+					<ConfirmDialog onConfirm={ onConfirm }>
+						Are you sure?
+					</ConfirmDialog>
 				);
 
 				const confirmDialog = wrapper.getByRole( 'dialog' );
@@ -143,7 +161,9 @@ describe( 'Confirm', () => {
 					isOpen={ true }
 					onConfirm={ noop }
 					onCancel={ noop }
-				/>
+				>
+					Are you sure?
+				</ConfirmDialog>
 			);
 
 			const confirmDialog = wrapper.getByRole( 'dialog' );
@@ -157,7 +177,9 @@ describe( 'Confirm', () => {
 					isOpen={ false }
 					onConfirm={ noop }
 					onCancel={ noop }
-				/>
+				>
+					Are you sure?
+				</ConfirmDialog>
 			);
 
 			// `queryByRole` needs to be used here because in this scenario the
@@ -171,7 +193,9 @@ describe( 'Confirm', () => {
 			const onConfirm = jest.fn().mockName( 'onConfirm()' );
 
 			const wrapper = render(
-				<ConfirmDialog isOpen={ true } onConfirm={ onConfirm } />
+				<ConfirmDialog isOpen={ true } onConfirm={ onConfirm }>
+					Are you sure?
+				</ConfirmDialog>
 			);
 
 			const button = await wrapper.findByText( 'OK' );
@@ -189,7 +213,9 @@ describe( 'Confirm', () => {
 					isOpen={ true }
 					onConfirm={ noop }
 					onCancel={ onCancel }
-				/>
+				>
+					Are you sure?
+				</ConfirmDialog>
 			);
 
 			const button = await wrapper.findByText( 'Cancel' );
@@ -209,7 +235,9 @@ describe( 'Confirm', () => {
 					isOpen={ true }
 					onConfirm={ noop }
 					onCancel={ onCancel }
-				/>
+				>
+					Are you sure?
+				</ConfirmDialog>
 			);
 
 			const frame = wrapper.baseElement.querySelector(
@@ -237,7 +265,9 @@ describe( 'Confirm', () => {
 					isOpen={ true }
 					onConfirm={ noop }
 					onCancel={ onCancel }
-				/>
+				>
+					Are you sure?
+				</ConfirmDialog>
 			);
 
 			const button = await wrapper.findByLabelText( 'Cancel' );
@@ -251,7 +281,9 @@ describe( 'Confirm', () => {
 			const onCancel = jest.fn().mockName( 'onCancel()' );
 
 			const wrapper = render(
-				<ConfirmDialog onConfirm={ noop } onCancel={ onCancel } />
+				<ConfirmDialog onConfirm={ noop } onCancel={ onCancel }>
+					Are you sure?
+				</ConfirmDialog>
 			);
 
 			const frame = wrapper.baseElement.querySelector(
@@ -271,7 +303,9 @@ describe( 'Confirm', () => {
 					isOpen={ true }
 					onConfirm={ onConfirm }
 					onCancel={ noop }
-				/>
+				>
+					Are you sure?
+				</ConfirmDialog>
 			);
 
 			const frame = wrapper.baseElement.querySelector(

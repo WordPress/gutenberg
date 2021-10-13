@@ -33,9 +33,9 @@ function ConfirmDialog(
 	const {
 		isOpen: isOpenProp,
 		title,
-		message,
 		onConfirm,
 		onCancel,
+		children,
 		...otherProps
 	} = useContextSystem( props, 'ConfirmDialog' );
 
@@ -89,7 +89,7 @@ function ConfirmDialog(
 					forwardedRef={ forwardedRef }
 					{ ...otherProps }
 				>
-					<p>{ message }</p>
+					<p>{ children }</p>
 					<Flex
 						justify="flex-end"
 						className={ buttonsWrapperClassNames }

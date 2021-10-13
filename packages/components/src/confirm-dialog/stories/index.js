@@ -25,10 +25,9 @@ export const _default = () => {
 
 	return (
 		<>
-			<ConfirmDialog
-				message={ daText() }
-				onConfirm={ () => setConfirmVal( 'Confirmed!' ) }
-			/>
+			<ConfirmDialog onConfirm={ () => setConfirmVal( 'Confirmed!' ) }>
+				{ daText() }
+			</ConfirmDialog>
 			<h1>{ confirmVal }</h1>
 		</>
 	);
@@ -41,9 +40,10 @@ export const WithTitle = () => {
 		<>
 			<ConfirmDialog
 				title="Are you sure?"
-				message={ daText() }
 				onConfirm={ () => setConfirmVal( 'Confirmed!' ) }
-			/>
+			>
+				{ daText() }
+			</ConfirmDialog>
 			<h1>{ confirmVal }</h1>
 		</>
 	);
@@ -54,10 +54,9 @@ export const WithJSXMessage = () => {
 
 	return (
 		<>
-			<ConfirmDialog
-				message={ <h1>{ daText() }</h1> }
-				onConfirm={ () => setConfirmVal( 'Confirmed!' ) }
-			/>
+			<ConfirmDialog onConfirm={ () => setConfirmVal( 'Confirmed!' ) }>
+				{ <h1>{ daText() }</h1> }
+			</ConfirmDialog>
 			<h1>{ confirmVal }</h1>
 		</>
 	);
@@ -68,10 +67,9 @@ export const VeeeryLongMessage = () => {
 
 	return (
 		<>
-			<ConfirmDialog
-				message={ daText().repeat( 20 ) }
-				onConfirm={ () => setConfirmVal( 'Confirmed!' ) }
-			/>
+			<ConfirmDialog onConfirm={ () => setConfirmVal( 'Confirmed!' ) }>
+				{ daText().repeat( 20 ) }
+			</ConfirmDialog>
 			<h1>{ confirmVal }</h1>
 		</>
 	);
@@ -83,10 +81,11 @@ export const UncontrolledAndWithExplicitOnCancel = () => {
 	return (
 		<>
 			<ConfirmDialog
-				message={ daText() }
 				onConfirm={ () => setConfirmVal( 'Confirmed!' ) }
 				onCancel={ () => setConfirmVal( 'Cancelled' ) }
-			/>
+			>
+				{ daText() }
+			</ConfirmDialog>
 			<h1>{ confirmVal }</h1>
 		</>
 	);
@@ -112,11 +111,12 @@ export const Controlled = () => {
 	return (
 		<>
 			<ConfirmDialog
-				message={ daText() }
 				isOpen={ isOpen }
 				onConfirm={ handleConfirm }
 				onCancel={ handleCancel }
-			/>
+			>
+				message={ daText() }
+			</ConfirmDialog>
 			<Button variant="primary" onClick={ () => setIsOpen( true ) }>
 				Open ConfirmDialog
 			</Button>

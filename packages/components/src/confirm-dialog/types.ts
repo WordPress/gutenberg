@@ -10,7 +10,7 @@ export type DialogInputEvent =
 
 type BaseProps = {
 	title?: string;
-	message: ReactNode;
+	children: ReactNode;
 	onConfirm: ( event: DialogInputEvent ) => void;
 };
 
