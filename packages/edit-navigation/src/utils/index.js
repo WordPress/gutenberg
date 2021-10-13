@@ -3,7 +3,7 @@
  * It uses data that is returned from the /__experimental/menus endpoint for requests
  * to the /__experimental/menu/<menuId> endpoint, because the data is the same.
  * This way, we can avoid making additional REST API requests.
- * This middleware can be removed if/when we implement caching at the wordpress/data level.
+ * This middleware can be removed if/when we implement caching at the wordpress/core-data level.
  *
  * @param {Object} preloadedData
  * @return {Function} Preloading middleware.
