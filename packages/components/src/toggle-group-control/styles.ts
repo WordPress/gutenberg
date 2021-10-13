@@ -107,17 +107,6 @@ export const ButtonContentView = styled.div`
 	transform: translate( -50%, -50% );
 `;
 
-export const SeparatorView = styled.div`
-	background: ${ CONFIG.colorDivider };
-	height: calc( 100% - 4px - 4px );
-	position: absolute;
-	right: 0;
-	top: 4px;
-	transition: background ${ CONFIG.transitionDuration } linear;
-	${ reduceMotion( 'transition' ) }
-	width: 1px;
-`;
-
 export const separatorActive = css`
 	background: transparent;
 `;

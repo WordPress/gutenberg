@@ -198,7 +198,6 @@ function ResizableCover( {
 				onResizeStop( elt.clientHeight );
 				setIsResizing( false );
 			} }
-			minHeight={ COVER_MIN_HEIGHT }
 			{ ...props }
 		/>
 	);
@@ -274,6 +273,7 @@ function CoverPlaceholder( {
 	noticeUI,
 	noticeOperations,
 	onSelectMedia,
+	style,
 } ) {
 	const { removeAllNotices, createErrorNotice } = noticeOperations;
 	return (
@@ -294,6 +294,7 @@ function CoverPlaceholder( {
 				removeAllNotices();
 				createErrorNotice( message );
 			} }
+			style={ style }
 		>
 			{ children }
 		</MediaPlaceholder>
@@ -406,13 +407,11 @@ function CoverEdit( {
 	const style = {
 		...( isImageBackground && ! isImgElement
 			? backgroundImageStyles( url )
-			: {
-					backgroundImage: gradientValue ? gradientValue : undefined,
-			  } ),
-		backgroundColor: overlayColor.color,
+			: undefined ),
 		minHeight: temporaryMinHeight || minHeightWithUnit || undefined,
 	};
 
+	const bgStyle = { backgroundColor: overlayColor.color };
 	const mediaStyle = {
 		objectPosition:
 			focalPoint && isImgElement
@@ -531,7 +530,6 @@ function CoverEdit( {
 										url: undefined,
 										id: undefined,
 										backgroundType: undefined,
-										dimRatio: undefined,
 										focalPoint: undefined,
 										hasParallax: undefined,
 										isRepeated: undefined,
@@ -556,21 +554,19 @@ function CoverEdit( {
 						},
 					] }
 				>
-					{ !! url && (
-						<RangeControl
-							label={ __( 'Opacity' ) }
-							value={ dimRatio }
-							onChange={ ( newDimRation ) =>
-								setAttributes( {
-									dimRatio: newDimRation,
-								} )
-							}
-							min={ 0 }
-							max={ 100 }
-							step={ 10 }
-							required
-						/>
-					) }
+					<RangeControl
+						label={ __( 'Opacity' ) }
+						value={ dimRatio }
+						onChange={ ( newDimRation ) =>
+							setAttributes( {
+								dimRatio: newDimRation,
+							} )
+						}
+						min={ 0 }
+						max={ 100 }
+						step={ 10 }
+						required
+					/>
 				</PanelColorGradientSettings>
 			</InspectorControls>
 			<InspectorControls __experimentalGroup="dimensions">
@@ -641,6 +637,7 @@ function CoverEdit( {
 						noticeUI={ noticeUI }
 						onSelectMedia={ onSelectMedia }
 						noticeOperations={ noticeOperations }
+						style={ { minHeight: temporaryMinHeight || minHeight } }
 					>
 						<div className="wp-block-cover__placeholder-background-options">
 							<ColorPalette
@@ -651,23 +648,32 @@ function CoverEdit( {
 							/>
 						</div>
 					</CoverPlaceholder>
+					<ResizableCover
+						className="block-library-cover__resize-container"
+						onResizeStart={ () => {
+							setAttributes( { minHeightUnit: 'px' } );
+							toggleSelection( false );
+						} }
+						onResize={ setTemporaryMinHeight }
+						onResizeStop={ ( newMinHeight ) => {
+							toggleSelection( true );
+							setAttributes( { minHeight: newMinHeight } );
+							setTemporaryMinHeight( null );
+						} }
+						showHandle={ isSelected }
+					/>
 				</div>
 			</>
 		);
 	}
 
 	const classes = classnames(
-		dimRatioToClass( dimRatio ),
 		{
 			'is-dark-theme': isDark,
 			'is-light': ! isDark,
-			'has-background-dim': dimRatio !== 0,
 			'is-transient': isUploadingMedia,
 			'has-parallax': hasParallax,
 			'is-repeated': isRepeated,
-			[ overlayColor.class ]: overlayColor.class,
-			'has-background-gradient': gradientValue,
-			[ gradientClass ]: ! url && gradientClass,
 			'has-custom-content-position': ! isContentPositionCenter(
 				contentPosition
 			),
@@ -702,16 +708,23 @@ function CoverEdit( {
 					} }
 					showHandle={ isSelected }
 				/>
-				{ url && gradientValue && dimRatio !== 0 && (
-					<span
-						aria-hidden="true"
-						className={ classnames(
-							'wp-block-cover__gradient-background',
-							gradientClass
-						) }
-						style={ { backgroundImage: gradientValue } }
-					/>
-				) }
+
+				<span
+					aria-hidden="true"
+					className={ classnames(
+						dimRatioToClass( dimRatio ),
+						{ [ overlayColor.class ]: overlayColor.class },
+						'wp-block-cover__gradient-background',
+						gradientClass,
+						{
+							'has-background-dim': dimRatio !== undefined,
+							'has-background-gradient': gradientValue,
+							[ gradientClass ]: ! url && gradientClass,
+						}
+					) }
+					style={ { backgroundImage: gradientValue, ...bgStyle } }
+				/>
+
 				{ url && isImageBackground && isImgElement && (
 					<img
 						ref={ isDarkElement }

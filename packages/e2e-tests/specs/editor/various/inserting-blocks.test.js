@@ -136,12 +136,10 @@ describe( 'Inserting blocks', () => {
 		await page.mouse.move( rect.x + rect.width / 2, rect.y - 10, {
 			steps: 10,
 		} );
-		await page.waitForSelector(
+		const lineInserter = await page.waitForSelector(
 			'.block-editor-block-list__insertion-point .block-editor-inserter__toggle'
 		);
-		await page.click(
-			'.block-editor-block-list__insertion-point .block-editor-inserter__toggle'
-		);
+		await lineInserter.click();
 		// [TODO]: Search input should be focused immediately. It shouldn't be
 		// necessary to have `waitForFunction`.
 		await page.waitForFunction(
@@ -288,13 +286,10 @@ describe( 'Inserting blocks', () => {
 		await page.mouse.move( rect.x + rect.width / 2, rect.y - 10, {
 			steps: 10,
 		} );
-		await page.waitForSelector(
+		const insertionLine = await page.waitForSelector(
 			'.block-editor-block-list__insertion-point .block-editor-inserter__toggle'
 		);
-		await page.click(
-			'.block-editor-block-list__insertion-point .block-editor-inserter__toggle'
-		);
-
+		await insertionLine.click();
 		const browseAll = await page.waitForSelector(
 			'button.block-editor-inserter__quick-inserter-expand'
 		);
@@ -329,7 +324,7 @@ describe( 'Inserting blocks', () => {
 		await headingButton.hover();
 
 		// Should show the blue line indicator somewhere.
-		const indicator = await page.$(
+		const indicator = await page.waitForSelector(
 			'.block-editor-block-list__insertion-point-indicator'
 		);
 		const indicatorRect = await indicator.boundingBox();
