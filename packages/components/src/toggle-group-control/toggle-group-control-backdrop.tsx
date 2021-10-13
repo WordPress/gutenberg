@@ -18,7 +18,7 @@ function ToggleGroupControlBackdrop( {
 	const [ left, setLeft ] = useState( 0 );
 	const [ width, setWidth ] = useState( 0 );
 	const [ canAnimate, setCanAnimate ] = useState( false );
-	const [ renderBackdrop, setRenderBackdrop ] = useState( true );
+	const [ renderBackdrop, setRenderBackdrop ] = useState( false );
 
 	useEffect( () => {
 		const containerNode = containerRef?.current;
