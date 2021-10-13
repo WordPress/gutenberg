@@ -2,25 +2,26 @@
  * External dependencies
  */
 // eslint-disable-next-line no-restricted-imports
-import type { MouseEvent, KeyboardEvent } from 'react';
+import type { MouseEvent, KeyboardEvent, ReactNode } from 'react';
 
 export type DialogInputEvent =
 	| KeyboardEvent< HTMLDivElement >
 	| MouseEvent< HTMLButtonElement >;
 
-interface BaseProps {
+type BaseProps = {
 	title?: string;
-	message: React.ReactNode;
+	message: ReactNode;
 	onConfirm: ( event: DialogInputEvent ) => void;
-	onCancel?: ( event: DialogInputEvent ) => void;
-}
+};
 
-interface ControlledProps extends BaseProps {
+type ControlledProps = BaseProps & {
+	onCancel: ( event: DialogInputEvent ) => void;
 	isOpen: boolean;
-}
+};
 
-interface UncontrolledProps extends BaseProps {
-	isOpen?: undefined;
-}
+type UncontrolledProps = BaseProps & {
+	onCancel?: ( event: DialogInputEvent ) => void;
+	isOpen?: never;
+};
 
 export type OwnProps = ControlledProps | UncontrolledProps;
