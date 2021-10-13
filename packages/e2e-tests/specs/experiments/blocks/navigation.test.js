@@ -598,7 +598,7 @@ describe( 'Navigation', () => {
 		await toggleSidebar();
 
 		const [ openOnClickButton ] = await page.$x(
-			'//label[contains(text(),"Open submenus on click")]'
+			'//label[contains(text(),"Open on click")]'
 		);
 
 		await openOnClickButton.click();
