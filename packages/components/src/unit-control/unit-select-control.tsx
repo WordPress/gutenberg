@@ -14,18 +14,6 @@ import { UnitSelect, UnitLabel } from './styles/unit-control-styles';
 import { CSS_UNITS, hasUnits } from './utils';
 import type { UnitSelectControlProps } from './types';
 
-/**
- * Renders a `select` if there are multiple units.
- * Otherwise, renders a non-selectable label.
- *
- * @param  props                      Component props.
- * @param  props.className            Class to set on the `select` element.
- * @param  props.isUnitSelectTabbable Whether the control can be focused via keyboard navigation.
- * @param  props.onChange             A callback function invoked when the value is changed.
- * @param  props.size                 Size of the control option. Supports "default" and "small".
- * @param  props.unit                 Current unit.
- * @param  props.units                Available units to select from.
- */
 export default function UnitSelectControl( {
 	className,
 	isUnitSelectTabbable: isTabbable = true,

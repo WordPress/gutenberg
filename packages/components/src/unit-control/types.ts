@@ -47,14 +47,20 @@ export type UnitControlOnChangeCallback = InputChangeCallback<
 export type UnitSelectControlProps = {
 	/**
 	 * Whether the control can be focused via keyboard navigation.
+	 *
+	 * @default true
 	 */
 	isUnitSelectTabbable?: boolean;
 	/**
 	 * A callback function invoked when the value is changed.
+	 *
+	 * @default noop
 	 */
 	onChange?: UnitControlOnChangeCallback;
 	/**
 	 * Size of the control option. Supports "default" and "small".
+	 *
+	 * @default 'default'
 	 */
 	size?: SelectSize;
 	/**
@@ -63,6 +69,8 @@ export type UnitSelectControlProps = {
 	unit?: string;
 	/**
 	 * Available units to select from.
+	 *
+	 * @default CSS_UNITS
 	 */
 	units?: WPUnitControlUnitList;
 };
@@ -70,17 +78,23 @@ export type UnitSelectControlProps = {
 export type UnitControlProps = UnitSelectControlProps & {
 	__unstableStateReducer?: StateReducer;
 	/**
-	 * If true, the unit `<select>` is hidden.
+	 * If `true`, the unit `<select>` is hidden.
+	 *
+	 * @default false
 	 */
 	disableUnits?: boolean;
 	/**
-	 * If true, the `ENTER` key press is required in order to trigger an `onChange`.
+	 * If `true`, the `ENTER` key press is required in order to trigger an `onChange`.
 	 * If enabled, a change is also triggered when tabbing away (`onBlur`).
+	 *
+	 * @default false
 	 */
 	isPressEnterToChange?: boolean;
 	/**
-	 * If true, and the selected unit provides a `default` value, this value is set
+	 * If `true`, and the selected unit provides a `default` value, this value is set
 	 * when changing units.
+	 *
+	 * @default false
 	 */
 	isResetValueOnUnitChange?: boolean;
 	/**
@@ -89,6 +103,8 @@ export type UnitControlProps = UnitSelectControlProps & {
 	label?: string;
 	/**
 	 * Callback when the `unit` changes.
+	 *
+	 * @default noop
 	 */
 	onUnitChange?: UnitControlOnChangeCallback;
 	/**
