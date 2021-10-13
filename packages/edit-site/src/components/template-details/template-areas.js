@@ -13,18 +13,25 @@ import { moreVertical } from '@wordpress/icons';
  */
 import { store as editSiteStore } from '../../store';
 import { TEMPLATE_PART_AREA_TO_NAME } from '../../store/constants';
+import isTemplateRevertable from '../../utils/is-template-revertable';
 
-function TemplatePartItemMore( { onClose, templatePart } ) {
+function TemplatePartItemMore( {
+	onClose,
+	templatePart,
+	closeTemplateDetailsDropdown,
+} ) {
 	const { pushTemplatePart, revertTemplate } = useDispatch( editSiteStore );
 
 	function editTemplatePart() {
 		pushTemplatePart( templatePart.id );
 		onClose();
+		closeTemplateDetailsDropdown();
 	}
 
 	function clearCustomizations() {
 		revertTemplate( templatePart );
 		onClose();
+		closeTemplateDetailsDropdown();
 	}
 
 	return (
@@ -38,19 +45,25 @@ function TemplatePartItemMore( { onClose, templatePart } ) {
 					) }
 				</MenuItem>
 			</MenuGroup>
-			<MenuGroup>
-				<MenuItem
-					info={ __( 'Restore template to theme default' ) }
-					onClick={ clearCustomizations }
-				>
-					{ __( 'Clear customizations' ) }
-				</MenuItem>
-			</MenuGroup>
+			{ isTemplateRevertable( templatePart ) && (
+				<MenuGroup>
+					<MenuItem
+						info={ __( 'Restore template to theme default' ) }
+						onClick={ clearCustomizations }
+					>
+						{ __( 'Clear customizations' ) }
+					</MenuItem>
+				</MenuGroup>
+			) }
 		</>
 	);
 }
 
-function TemplatePartItem( { templatePart, clientId } ) {
+function TemplatePartItem( {
+	templatePart,
+	clientId,
+	closeTemplateDetailsDropdown,
+} ) {
 	const { selectBlock, toggleBlockHighlight } = useDispatch(
 		blockEditorStore
 	);
@@ -86,6 +99,9 @@ function TemplatePartItem( { templatePart, clientId } ) {
 					<TemplatePartItemMore
 						onClose={ onClose }
 						templatePart={ templatePart }
+						closeTemplateDetailsDropdown={
+							closeTemplateDetailsDropdown
+						}
 					/>
 				) }
 			</DropdownMenu>
@@ -93,7 +109,7 @@ function TemplatePartItem( { templatePart, clientId } ) {
 	);
 }
 
-export default function TemplateAreas() {
+export default function TemplateAreas( { closeTemplateDetailsDropdown } ) {
 	const templateParts = useSelect(
 		( select ) => select( editSiteStore ).getCurrentTemplateTemplateParts(),
 		[]
@@ -113,6 +129,9 @@ export default function TemplateAreas() {
 					key={ templatePart.area }
 					clientId={ block.clientId }
 					templatePart={ templatePart }
+					closeTemplateDetailsDropdown={
+						closeTemplateDetailsDropdown
+					}
 				/>
 			) ) }
 		</MenuGroup>

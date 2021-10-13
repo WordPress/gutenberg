@@ -80,7 +80,7 @@ export default function TemplateDetails( { template, onClose } ) {
 				) }
 			</div>
 
-			<TemplateAreas />
+			<TemplateAreas closeTemplateDetailsDropdown={ onClose } />
 
 			{ isTemplateRevertable( template ) && (
 				<MenuGroup className="edit-site-template-details__group edit-site-template-details__revert">
