@@ -90,6 +90,7 @@ function ColorGradientControlInner( {
 	colorValue,
 	gradientValue,
 	clearable,
+	showTitle = true,
 } ) {
 	const canChooseAColor =
 		onColorChange && ( ! isEmpty( colors ) || ! disableCustomColors );
@@ -112,18 +113,20 @@ function ColorGradientControlInner( {
 		>
 			<fieldset>
 				<VStack space={ 3 }>
-					<legend>
-						<div className="block-editor-color-gradient-control__color-indicator">
-							<BaseControl.VisualLabel>
-								<VisualLabel
-									currentTab={ currentTab }
-									label={ label }
-									colorValue={ colorValue }
-									gradientValue={ gradientValue }
-								/>
-							</BaseControl.VisualLabel>
-						</div>
-					</legend>
+					{ showTitle && (
+						<legend>
+							<div className="block-editor-color-gradient-control__color-indicator">
+								<BaseControl.VisualLabel>
+									<VisualLabel
+										currentTab={ currentTab }
+										label={ label }
+										colorValue={ colorValue }
+										gradientValue={ gradientValue }
+									/>
+								</BaseControl.VisualLabel>
+							</div>
+						</legend>
+					) }
 					{ canChooseAColor && canChooseAGradient && (
 						<ToggleGroupControl
 							value={ currentTab }

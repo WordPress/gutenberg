@@ -3,6 +3,10 @@
  */
 import { __ } from '@wordpress/i18n';
 import { __experimentalPanelColorGradientSettings as PanelColorGradientSettings } from '@wordpress/block-editor';
+import {
+	ColorIndicator,
+	__experimentalHStack as HStack,
+} from '@wordpress/components';
 
 /**
  * Internal dependencies
@@ -50,7 +54,12 @@ function ScreenLinkColor( { name } ) {
 		<>
 			<ScreenHeader
 				back={ parentMenu + '/colors' }
-				title={ __( 'Links' ) }
+				title={
+					<HStack justify="flex-start" spacing={ 3 }>
+						<span>{ __( 'Links' ) }</span>
+						<ColorIndicator colorValue={ linkColor } />
+					</HStack>
+				}
 				description={ __(
 					'Set the default color used for links across the site.'
 				) }

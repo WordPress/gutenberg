@@ -3,6 +3,10 @@
  */
 import { __ } from '@wordpress/i18n';
 import { __experimentalPanelColorGradientSettings as PanelColorGradientSettings } from '@wordpress/block-editor';
+import {
+	ColorIndicator,
+	__experimentalHStack as HStack,
+} from '@wordpress/components';
 
 /**
  * Internal dependencies
@@ -80,7 +84,14 @@ function ScreenBackgroundColor( { name } ) {
 		<>
 			<ScreenHeader
 				back={ parentMenu + '/colors' }
-				title={ __( 'Background' ) }
+				title={
+					<HStack justify="flex-start" spacing={ 3 }>
+						<span>{ __( 'Background' ) }</span>
+						<ColorIndicator
+							colorValue={ gradient ?? backgroundColor }
+						/>
+					</HStack>
+				}
 				description={ __(
 					'Set a background color or gradient for the whole website.'
 				) }
