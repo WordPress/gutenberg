@@ -10,6 +10,9 @@ For each user feature we should also add a importance categorization label  to i
 -->
 
 ## Unreleased
+-   [*] [Embed block] Fix inline preview cut-off when editing URL [#35321]
+-   [*] [Unsupported Block Editor] Fix text selection bug for Android [#34668]
+-   [*] [Embed block] Fix URL not editable after dismissing the edit URL bottom sheet with empty value [#35460]
 
 ## 1.63.1
 -   [*] Fixed missing modal backdrop for Android help section [#35557]
@@ -25,7 +28,7 @@ For each user feature we should also add a importance categorization label  to i
 
 ## 1.62.1
 -   [**] Image block: fix height and border regression. [https://github.com/WordPress/gutenberg/pull/34957]
--   [**] Column block: fix width attribute flout cutoff. [https://github.com/wordpress-mobile/gutenberg-mobile/pull/3921]
+-   [**] Column block: fix width float attribute cut off. [#35061]
 
 ## 1.62.0
 -   [**] [Embed block] Implement WP embed preview component [#34004]

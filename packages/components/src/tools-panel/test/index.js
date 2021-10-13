@@ -7,7 +7,9 @@ import { render, screen, fireEvent } from '@testing-library/react';
  * Internal dependencies
  */
 import { ToolsPanel, ToolsPanelItem } from '../';
+import { createSlotFill, Provider as SlotFillProvider } from '../../slot-fill';
 
+const { Fill: ToolsPanelItems, Slot } = createSlotFill( 'ToolsPanelSlot' );
 const resetAll = jest.fn();
 
 // Default props for the tools panel.
@@ -151,6 +153,10 @@ const selectMenuItem = async ( label ) => {
 };
 
 describe( 'ToolsPanel', () => {
+	afterEach( () => {
+		controlProps.attributes.value = true;
+	} );
+
 	describe( 'basic rendering', () => {
 		it( 'should render panel', () => {
 			const { container } = renderPanel();
@@ -310,12 +316,35 @@ describe( 'ToolsPanel', () => {
 			// Groups should be: default controls, optional controls & reset all.
 			expect( menuGroups.length ).toEqual( 3 );
 		} );
+
+		it( 'should render placeholder items when panel opts into that feature', () => {
+			const { container } = render(
+				<ToolsPanel
+					{ ...defaultProps }
+					shouldRenderPlaceholderItems={ true }
+				>
+					<ToolsPanelItem { ...altControlProps }>
+						<div>Optional control</div>
+					</ToolsPanelItem>
+				</ToolsPanel>
+			);
+
+			const optionalItem = screen.queryByText( 'Optional control' );
+			const placeholder = container.querySelector(
+				'.components-tools-panel-item'
+			);
+
+			// When rendered as a placeholder a ToolsPanelItem will just omit
+			// all the item's children. So we should still find the container
+			// element but not the text etc within.
+			expect( optionalItem ).not.toBeInTheDocument();
+			expect( placeholder ).toBeInTheDocument();
+		} );
 	} );
 
 	describe( 'callbacks on menu item selection', () => {
 		beforeEach( () => {
 			jest.clearAllMocks();
-			controlProps.attributes.value = true;
 		} );
 
 		it( 'should call onDeselect callback when menu item is toggled off', async () => {
@@ -423,6 +452,61 @@ describe( 'ToolsPanel', () => {
 
 			expect( altItem ).toBeInTheDocument();
 			expect( altMenuItem ).toHaveAttribute( 'aria-checked', 'false' );
+		} );
+	} );
+
+	describe( 'rendering via SlotFills', () => {
+		it( 'should maintain visual order of controls when toggled on and off', async () => {
+			// Multiple fills are added to better simulate panel items being
+			// injected from different locations.
+			render(
+				<SlotFillProvider>
+					<ToolsPanelItems>
+						<ToolsPanelItem { ...altControlProps }>
+							<div>Item 1</div>
+						</ToolsPanelItem>
+					</ToolsPanelItems>
+					<ToolsPanelItems>
+						<ToolsPanelItem { ...controlProps }>
+							<div>Item 2</div>
+						</ToolsPanelItem>
+					</ToolsPanelItems>
+					<ToolsPanel { ...defaultProps }>
+						<Slot />
+					</ToolsPanel>
+				</SlotFillProvider>
+			);
+
+			// Only the second item should be shown initially as it has a value.
+			const firstItem = screen.queryByText( 'Item 1' );
+			const secondItem = screen.getByText( 'Item 2' );
+
+			expect( firstItem ).not.toBeInTheDocument();
+			expect( secondItem ).toBeInTheDocument();
+
+			// Toggle on the first item.
+			await selectMenuItem( altControlProps.label );
+
+			// The order of items should be as per their original source order.
+			let items = screen.getAllByText( /Item [1-2]/ );
+
+			expect( items ).toHaveLength( 2 );
+			expect( items[ 0 ] ).toHaveTextContent( 'Item 1' );
+			expect( items[ 1 ] ).toHaveTextContent( 'Item 2' );
+
+			// Then toggle off both items.
+			await selectMenuItem( controlProps.label );
+			await selectMenuItem( altControlProps.label );
+
+			// Toggle on controls again and ensure order remains.
+			await selectMenuItem( controlProps.label );
+			await selectMenuItem( altControlProps.label );
+
+			items = screen.getAllByText( /Item [1-2]/ );
+
+			expect( items ).toHaveLength( 2 );
+			expect( items[ 0 ] ).toHaveTextContent( 'Item 1' );
+			expect( items[ 1 ] ).toHaveTextContent( 'Item 2' );
 		} );
 	} );
 } );

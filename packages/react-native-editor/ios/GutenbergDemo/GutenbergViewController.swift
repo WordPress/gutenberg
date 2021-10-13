@@ -318,6 +318,10 @@ extension GutenbergViewController: GutenbergBridgeDataSource {
             .reusableBlock: false,
             .editorOnboarding: false,
             .firstGutenbergEditorSession: false,
+            .facebookEmbed: true,
+            .instagramEmbed: true,
+            .loomEmbed: true,
+            .smartframeEmbed: true,
         ]
     }
 

@@ -166,7 +166,7 @@ function render_block_core_navigation_link( $attributes, $content, $block ) {
 		)
 	);
 	$html               = '<li ' . $wrapper_attributes . '>' .
-		'<a class="wp-block-navigation-link__content wp-block-navigation-item__content" ';
+		'<a class="wp-block-navigation-item__content" ';
 
 	// Start appending HTML attributes to anchor tag.
 	if ( isset( $attributes['url'] ) ) {
@@ -192,7 +192,7 @@ function render_block_core_navigation_link( $attributes, $content, $block ) {
 	// Start anchor tag content.
 	$html .= '>' .
 		// Wrap title with span to isolate it from submenu icon.
-		'<span class="wp-block-navigation-link__label">';
+		'<span class="wp-block-navigation-item__label">';
 
 	if ( isset( $attributes['label'] ) ) {
 		$html .= wp_kses(
@@ -220,7 +220,7 @@ function render_block_core_navigation_link( $attributes, $content, $block ) {
 
 	if ( isset( $block->context['showSubmenuIcon'] ) && $block->context['showSubmenuIcon'] && $has_submenu ) {
 		// The submenu icon can be hidden by a CSS rule on the Navigation Block.
-		$html .= '<span class="wp-block-navigation-link__submenu-icon wp-block-navigation__submenu-icon">' . block_core_navigation_link_render_submenu_icon() . '</span>';
+		$html .= '<span class="wp-block-navigation__submenu-icon">' . block_core_navigation_link_render_submenu_icon() . '</span>';
 	}
 
 	$html .= '</a>';
@@ -233,7 +233,7 @@ function render_block_core_navigation_link( $attributes, $content, $block ) {
 		}
 
 		$html .= sprintf(
-			'<ul class="wp-block-navigation-link__container wp-block-navigation__submenu-container">%s</ul>',
+			'<ul class="wp-block-navigation__submenu-container">%s</ul>',
 			$inner_blocks_html
 		);
 	}

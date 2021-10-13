@@ -16,19 +16,13 @@ import * as styles from './styles';
 import type { ToggleGroupControlButtonProps } from './types';
 import { useCx } from '../utils/hooks';
 
-const {
-	ButtonContentView,
-	LabelPlaceholderView,
-	LabelView,
-	SeparatorView,
-} = styles;
+const { ButtonContentView, LabelPlaceholderView, LabelView } = styles;
 
 function ToggleGroupControlButton( {
 	className,
 	forwardedRef,
 	isBlock = false,
 	label,
-	showSeparator,
 	value,
 	...props
 }: ToggleGroupControlButtonProps ) {
@@ -45,7 +39,7 @@ function ToggleGroupControlButton( {
 			<Radio
 				{ ...props }
 				as="button"
-				aria-label={ label }
+				aria-label={ props[ 'aria-label' ] ?? label }
 				className={ classes }
 				data-value={ value }
 				ref={ forwardedRef }
@@ -56,17 +50,8 @@ function ToggleGroupControlButton( {
 					{ label }
 				</LabelPlaceholderView>
 			</Radio>
-			<ToggleGroupControlSeparator isActive={ ! showSeparator } />
 		</LabelView>
 	);
 }
-
-const ToggleGroupControlSeparator = memo(
-	( { isActive }: { isActive: boolean } ) => {
-		const cx = useCx();
-		const classes = cx( isActive && styles.separatorActive );
-		return <SeparatorView aria-hidden className={ classes } />;
-	}
-);
 
 export default memo( ToggleGroupControlButton );

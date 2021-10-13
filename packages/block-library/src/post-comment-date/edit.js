@@ -4,11 +4,15 @@
 import { useEntityProp } from '@wordpress/core-data';
 import { __experimentalGetSettings, dateI18n } from '@wordpress/date';
 import { InspectorControls, useBlockProps } from '@wordpress/block-editor';
-import { PanelBody, CustomSelectControl } from '@wordpress/components';
+import {
+	PanelBody,
+	CustomSelectControl,
+	ToggleControl,
+} from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 
 export default function Edit( { attributes, context, setAttributes } ) {
-	const { className, format } = attributes;
+	const { className, format, isLink } = attributes;
 	const { commentId } = context;
 
 	const settings = __experimentalGetSettings();
@@ -23,6 +27,23 @@ export default function Edit( { attributes, context, setAttributes } ) {
 	);
 	const resolvedFormat = format || siteDateFormat || settings.formats.date;
 	const blockProps = useBlockProps( { className } );
+
+	let commentDate = (
+		<time dateTime={ dateI18n( 'c', date ) }>
+			{ dateI18n( resolvedFormat, date ) }
+		</time>
+	);
+
+	if ( isLink ) {
+		commentDate = (
+			<a
+				href="#comment-date-pseudo-link"
+				onClick={ ( event ) => event.preventDefault() }
+			>
+				{ commentDate }
+			</a>
+		);
+	}
 
 	return (
 		<>
@@ -42,13 +63,15 @@ export default function Edit( { attributes, context, setAttributes } ) {
 						) }
 					/>
 				</PanelBody>
+				<PanelBody title={ __( 'Link settings' ) }>
+					<ToggleControl
+						label={ __( 'Link to comment' ) }
+						onChange={ () => setAttributes( { isLink: ! isLink } ) }
+						checked={ isLink }
+					/>
+				</PanelBody>
 			</InspectorControls>
-
-			<div { ...blockProps }>
-				<time dateTime={ dateI18n( 'c', date ) }>
-					{ dateI18n( resolvedFormat, date ) }
-				</time>
-			</div>
+			<div { ...blockProps }>{ commentDate }</div>
 		</>
 	);
 }
