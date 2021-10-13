@@ -47,5 +47,7 @@
 
 .edit-site-editor__list-view-panel-content {
 	overflow-y: auto;
+	overflow-x: auto;
+	max-width: 350px;
 	padding: $grid-unit-10;
 }
