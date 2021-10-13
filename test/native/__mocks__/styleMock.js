@@ -138,4 +138,10 @@ module.exports = {
 	isSelected: {
 		color: 'blue',
 	},
+	'embed-no-preview__help-icon': {
+		fill: 'gray',
+	},
+	'embed-no-preview__sheet-icon': {
+		fill: 'gray',
+	},
 };
