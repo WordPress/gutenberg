@@ -13,6 +13,13 @@ const getUnitSelect = () =>
 const getUnitLabel = () =>
 	document.body.querySelector( '.components-unit-control__unit-label' );
 
+const toggleCustomInput = () => {
+	const toggleCustom = screen.getByLabelText( 'Toggle custom size display', {
+		selector: 'button',
+	} );
+	fireEvent.click( toggleCustom );
+};
+
 describe( 'FontSizePicker', () => {
 	describe( 'onChange values', () => {
 		it( 'should not use units when the initial value is a number', () => {
@@ -84,6 +91,7 @@ describe( 'FontSizePicker', () => {
 				/>
 			);
 
+			toggleCustomInput();
 			const unitSelect = getUnitSelect();
 			const unitLabel = getUnitLabel();
 			const input = screen.getByLabelText( 'Custom', {
@@ -119,6 +127,7 @@ describe( 'FontSizePicker', () => {
 				/>
 			);
 
+			toggleCustomInput();
 			const unitSelect = getUnitSelect();
 			const unitLabel = getUnitLabel();
 			const input = screen.getByLabelText( 'Custom', {

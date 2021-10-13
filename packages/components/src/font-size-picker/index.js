@@ -38,7 +38,7 @@ function FontSizePicker(
 	},
 	ref
 ) {
-	const hasUnits = [ typeof value, typeof fontSizes?.[ 0 ].size ].includes(
+	const hasUnits = [ typeof value, typeof fontSizes?.[ 0 ]?.size ].includes(
 		'string'
 	);
 	const noUnitsValue = ! hasUnits ? value : parseInt( value );
@@ -53,7 +53,7 @@ function FontSizePicker(
 	// A select control is also used when the value of a preset cannot be
 	// immediately computed (eg. 'calc', 'var').
 	const shouldUseSelectControl =
-		fontSizes?.length > 5 ||
+		fontSizes.length > 5 ||
 		fontSizes.some( ( { size } ) => ! isSimpleCssValue( size ) );
 
 	const options = useMemo(
@@ -125,6 +125,8 @@ function FontSizePicker(
 				{ ! disableCustomFontSizes && (
 					<FlexItem>
 						<Button
+							label={ __( 'Toggle custom size display' ) }
+							showTooltip={ false }
 							icon={ settings }
 							onClick={ () => {
 								setShowCustomValueControl(
@@ -133,7 +135,7 @@ function FontSizePicker(
 							} }
 							isPressed={ showCustomValueControl }
 							isSmall
-						></Button>
+						/>
 					</FlexItem>
 				) }
 			</Flex>
