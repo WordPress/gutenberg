@@ -11,10 +11,10 @@ import {
 	contextConnect,
 	useContextSystem,
 	WordPressComponentProps,
-} from '../ui/context';
+} from '../../ui/context';
 import ToggleGroupControlButton from './toggle-group-control-button';
-import type { ToggleGroupControlOptionProps } from './types';
-import { useToggleGroupControlContext } from './toggle-group-control-context';
+import type { ToggleGroupControlOptionProps } from '../types';
+import { useToggleGroupControlContext } from '../context';
 
 function ToggleGroupControlOption(
 	props: WordPressComponentProps< ToggleGroupControlOptionProps, 'input' >,

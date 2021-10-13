@@ -19,13 +19,13 @@ import {
 	contextConnect,
 	useContextSystem,
 	WordPressComponentProps,
-} from '../ui/context';
-import { useUpdateEffect, useCx } from '../utils/hooks';
-import { View } from '../view';
-import BaseControl from '../base-control';
+} from '../../ui/context';
+import { useUpdateEffect, useCx } from '../../utils/hooks';
+import { View } from '../../view';
+import BaseControl from '../../base-control';
 import ToggleGroupControlBackdrop from './toggle-group-control-backdrop';
-import type { ToggleGroupControlProps } from './types';
-import ToggleGroupControlContext from './toggle-group-control-context';
+import type { ToggleGroupControlProps } from '../types';
+import ToggleGroupControlContext from '../context';
 import * as styles from './styles';
 
 const noop = () => {};

@@ -6,7 +6,7 @@ import { useState, useEffect, memo } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import type { ToggleGroupControlBackdropProps } from './types';
+import type { ToggleGroupControlBackdropProps } from '../types';
 import { BackdropView } from './styles';
 
 function ToggleGroupControlBackdrop( {

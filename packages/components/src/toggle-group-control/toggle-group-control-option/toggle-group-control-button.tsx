@@ -13,8 +13,8 @@ import { memo } from '@wordpress/element';
  * Internal dependencies
  */
 import * as styles from './styles';
-import type { ToggleGroupControlButtonProps } from './types';
-import { useCx } from '../utils/hooks';
+import type { ToggleGroupControlButtonProps } from '../types';
+import { useCx } from '../../utils/hooks';
 
 const { ButtonContentView, LabelPlaceholderView, LabelView } = styles;
 
