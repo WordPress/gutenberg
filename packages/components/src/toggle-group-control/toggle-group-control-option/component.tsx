@@ -18,10 +18,7 @@ import {
 	useContextSystem,
 	WordPressComponentProps,
 } from '../../ui/context';
-import type {
-	ToggleGroupControlOptionProps,
-	ToggleGroupControlButtonProps,
-} from '../types';
+import type { ToggleGroupControlOptionProps } from '../types';
 import { useToggleGroupControlContext } from '../context';
 import * as styles from './styles';
 import { useCx } from '../../utils/hooks';
@@ -29,7 +26,7 @@ import { useCx } from '../../utils/hooks';
 const { ButtonContentView, LabelPlaceholderView, LabelView } = styles;
 
 function ToggleGroupControlOption(
-	props: WordPressComponentProps< ToggleGroupControlOptionProps, 'input' >,
+	props: WordPressComponentProps< ToggleGroupControlOptionProps, 'button' >,
 	forwardedRef: import('react').Ref< any >
 ) {
 	const toggleGroupControlContext = useToggleGroupControlContext();
@@ -42,13 +39,7 @@ function ToggleGroupControlOption(
 		'ToggleGroupControlOption'
 	);
 
-	const {
-		className,
-		isBlock = false,
-		label,
-		value,
-		...radioProps
-	}: ToggleGroupControlButtonProps = {
+	const { className, isBlock = false, label, value, ...radioProps } = {
 		...toggleGroupControlContext,
 		...buttonProps,
 	};
