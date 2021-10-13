@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { View, TouchableHighlight, Text } from 'react-native';
+import { View, TouchableHighlight, Text, Platform } from 'react-native';
 
 /**
  * WordPress dependencies
@@ -43,6 +43,7 @@ function InserterButton( { item, itemWidth, maxWidth, onSelect } ) {
 		: // translators: Block name. %s: The localized block name
 		  __( '%s block' );
 	const accessibilityLabel = sprintf( accessibilityLabelFormat, item.title );
+	const isIOS = Platform.OS === 'ios';
 
 	const onPress = useCallback( () => {
 		onSelect( item );
@@ -59,7 +60,9 @@ function InserterButton( { item, itemWidth, maxWidth, onSelect } ) {
 			accessibilityRole="button"
 			accessibilityLabel={ accessibilityLabel }
 			onPress={ onPress }
-			disabled={ item.isDisabled && ! item.alreadyPresentInPost }
+			disabled={
+				item.isDisabled && ( ! item.alreadyPresentInPost || isIOS )
+			}
 		>
 			<View style={ [ styles.modalItem, { width: maxWidth } ] }>
 				<View
