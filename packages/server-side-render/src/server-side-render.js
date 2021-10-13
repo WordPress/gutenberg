@@ -12,7 +12,6 @@ import { __, sprintf } from '@wordpress/i18n';
 import apiFetch from '@wordpress/api-fetch';
 import { addQueryArgs } from '@wordpress/url';
 import { Placeholder, Spinner } from '@wordpress/components';
-import { __experimentalSanitizeBlockAttributes } from '@wordpress/blocks';
 
 export function rendererPath( block, attributes = null, urlQueryArgs = {} ) {
 	return addQueryArgs( `/wp/v2/block-renderer/${ block }`, {
@@ -88,20 +87,12 @@ export default function ServerSideRender( props ) {
 
 		setIsLoading( true );
 
-		const sanitizedAttributes =
-			attributes &&
-			__experimentalSanitizeBlockAttributes( block, attributes );
-
 		// If httpMethod is 'POST', send the attributes in the request body instead of the URL.
 		// This allows sending a larger attributes object than in a GET request, where the attributes are in the URL.
 		const isPostRequest = 'POST' === httpMethod;
-		const urlAttributes = isPostRequest
-			? null
-			: sanitizedAttributes ?? null;
+		const urlAttributes = isPostRequest ? null : attributes ?? null;
 		const path = rendererPath( block, urlAttributes, urlQueryArgs );
-		const data = isPostRequest
-			? { attributes: sanitizedAttributes ?? null }
-			: null;
+		const data = isPostRequest ? { attributes: attributes ?? null } : null;
 
 		// Store the latest fetch request so that when we process it, we can
 		// check if it is the current request, to avoid race conditions on slow networks.
