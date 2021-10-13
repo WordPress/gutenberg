@@ -218,7 +218,7 @@ function render_block_core_navigation( $attributes, $content, $block ) {
 
 	unset( $attributes['rgbTextColor'], $attributes['rgbBackgroundColor'] );
 
-	$should_load_view_script = ! wp_script_is( 'wp-block-navigation-view' ) && ( ! empty( $attributes['isResponsive'] ) || $attributes['openSubmenusOnClick'] || $attributes['showSubmenuIcon'] );
+	$should_load_view_script = ! wp_script_is( 'wp-block-navigation-view' ) && ( ( ! empty( $attributes['overlayMenu'] ) && 'never' !== $attributes['overlayMenu'] ) || $attributes['openSubmenusOnClick'] || $attributes['showSubmenuIcon'] );
 	if ( $should_load_view_script ) {
 		wp_enqueue_script( 'wp-block-navigation-view' );
 	}
@@ -250,7 +250,7 @@ function render_block_core_navigation( $attributes, $content, $block ) {
 		$font_sizes['css_classes'],
 		( isset( $attributes['orientation'] ) && 'vertical' === $attributes['orientation'] ) ? array( 'is-vertical' ) : array(),
 		isset( $attributes['itemsJustification'] ) ? array( 'items-justified-' . $attributes['itemsJustification'] ) : array(),
-		isset( $attributes['isResponsive'] ) && true === $attributes['isResponsive'] ? array( 'is-responsive' ) : array()
+		isset( $attributes['overlayMenu'] ) && 'never' !== $attributes['overlayMenu'] ? array( 'is-responsive' ) : array()
 	);
 
 	$inner_blocks_html = '';
@@ -288,7 +288,7 @@ function render_block_core_navigation( $attributes, $content, $block ) {
 
 	// Determine whether or not navigation elements should be wrapped in the markup required to make it responsive,
 	// return early if they don't.
-	if ( ! isset( $attributes['isResponsive'] ) || false === $attributes['isResponsive'] ) {
+	if ( ! isset( $attributes['overlayMenu'] ) || 'never' === $attributes['overlayMenu'] ) {
 		return sprintf(
 			'<nav %1$s>%2$s</nav>',
 			$wrapper_attributes,
@@ -296,7 +296,7 @@ function render_block_core_navigation( $attributes, $content, $block ) {
 		);
 	}
 
-	$is_hidden_by_default = isset( $attributes['isHiddenByDefault'] ) && true === $attributes['isHiddenByDefault'];
+	$is_hidden_by_default = isset( $attributes['overlayMenu'] ) && 'always' === $attributes['overlayMenu'];
 
 	$responsive_container_classes = array(
 		'wp-block-navigation__responsive-container',

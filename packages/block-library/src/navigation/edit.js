@@ -26,7 +26,13 @@ import {
 	getColorClassName,
 } from '@wordpress/block-editor';
 import { useDispatch, withSelect, withDispatch } from '@wordpress/data';
-import { PanelBody, ToggleControl, ToolbarGroup } from '@wordpress/components';
+import {
+	PanelBody,
+	ToggleControl,
+	__experimentalToggleGroupControl as ToggleGroupControl,
+	__experimentalToggleGroupControlOption as ToggleGroupControlOption,
+	ToolbarGroup,
+} from '@wordpress/components';
 import { compose } from '@wordpress/compose';
 import { __ } from '@wordpress/i18n';
 
@@ -135,7 +141,7 @@ function Navigation( {
 		className: classnames( className, {
 			[ `items-justified-${ attributes.itemsJustification }` ]: attributes.itemsJustification,
 			'is-vertical': attributes.orientation === 'vertical',
-			'is-responsive': attributes.isResponsive,
+			'is-responsive': 'never' !== attributes.overlayMenu,
 			'has-text-color': !! textColor.color || !! textColor?.class,
 			[ getColorClassName(
 				'color',
@@ -272,26 +278,38 @@ function Navigation( {
 			<InspectorControls>
 				{ hasSubmenuIndicatorSetting && (
 					<PanelBody title={ __( 'Display settings' ) }>
-						<ToggleControl
-							checked={ attributes.isResponsive }
-							onChange={ ( value ) => {
-								setAttributes( {
-									isResponsive: value,
-								} );
-							} }
-							label={ __( 'Enable responsive menu' ) }
-						/>
-						{ attributes.isResponsive && (
-							<ToggleControl
-								checked={ attributes.isHiddenByDefault }
-								onChange={ ( value ) => {
-									setAttributes( {
-										isHiddenByDefault: value,
-									} );
-								} }
-								label={ __( 'Always on burger menu' ) }
+						<ToggleGroupControl
+							label={
+								<div>
+									<h5>Overlay Menu</h5>
+									<p>
+										Controls whether the menu collapses into
+										a toggle button opening an overlay for
+										navigation.
+									</p>
+								</div>
+							}
+							value={ attributes.overlayMenu }
+							onChange={ ( value ) =>
+								setAttributes( { overlayMenu: value } )
+							}
+						>
+							<ToggleGroupControlOption
+								value="never"
+								label="Never"
+								aria-label="Never"
 							/>
-						) }
+							<ToggleGroupControlOption
+								value="mobile"
+								label="Mobile"
+								aria-label="Mobile"
+							/>
+							<ToggleGroupControlOption
+								value="always"
+								label="Always"
+								aria-label="Always"
+							/>
+						</ToggleGroupControl>
 						<ToggleControl
 							checked={ attributes.openSubmenusOnClick }
 							onChange={ ( value ) => {
@@ -363,8 +381,8 @@ function Navigation( {
 					id={ clientId }
 					onToggle={ setResponsiveMenuVisibility }
 					isOpen={ isResponsiveMenuOpen }
-					isResponsive={ attributes.isResponsive }
-					isHiddenByDefault={ attributes.isHiddenByDefault }
+					isResponsive={ 'never' !== attributes.overlayMenu }
+					isHiddenByDefault={ 'always' === attributes.overlayMenu }
 				>
 					<div { ...innerBlocksProps }></div>
 				</ResponsiveWrapper>
