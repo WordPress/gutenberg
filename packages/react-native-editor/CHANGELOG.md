@@ -14,6 +14,7 @@ For each user feature we should also add a importance categorization label  to i
 -   [*] [Unsupported Block Editor] Fix text selection bug for Android [#34668]
 -   [*] Fixed missing modal backdrop for Android help section [#35557]
 -   [*] Fixed erroneous overflow within editor Help screens. [#35552]
+-   [*] [Embed block] Fix URL not editable after dismissing the edit URL bottom sheet with empty value [#35460]
 
 ## 1.63.0
 -   [**] [Embed block] Add the top 5 specific embed blocks to the Block inserter list [#34967]
