@@ -61,6 +61,7 @@ function InserterButton( { item, itemWidth, maxWidth, onSelect } ) {
 			accessibilityLabel={ accessibilityLabel }
 			onPress={ onPress }
 			disabled={
+				// We display a message on why the button is disabled in Android (not yet available in iOS)
 				item.isDisabled && ( ! item.alreadyPresentInPost || isIOS )
 			}
 		>
