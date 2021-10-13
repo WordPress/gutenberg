@@ -60,7 +60,7 @@ function ConfirmDialog(
 		setSelfClose( ! isIsOpenSet );
 	}, [ isOpenProp ] );
 
-	const handleEvent = ( callback: ( event: DialogInputEvent ) => void ) => (
+	const handleEvent = ( callback?: ( event: DialogInputEvent ) => void ) => (
 		event: DialogInputEvent
 	) => {
 		// `onCancel` is optional
