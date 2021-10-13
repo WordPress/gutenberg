@@ -63,7 +63,7 @@ describe( 'Meta boxes', () => {
 		const latestPostsBlock = await page.waitForSelector(
 			'.wp-block-latest-posts'
 		);
-		
+
 		expect(
 			await latestPostsBlock.evaluate( ( block ) => block.textContent )
 		).toContain( 'A published post' );
