@@ -3,12 +3,14 @@
  */
 import { __ } from '@wordpress/i18n';
 import { useSelect } from '@wordpress/data';
-import { useBlockProps } from '@wordpress/block-editor';
+import { InspectorControls, useBlockProps } from '@wordpress/block-editor';
 import { store as coreStore } from '@wordpress/core-data';
+import { PanelBody, ToggleControl } from '@wordpress/components';
 
-export default function Edit( { attributes, context } ) {
-	const { className } = attributes;
+export default function Edit( { attributes, context, setAttributes } ) {
+	const { className, isLink, linkTarget } = attributes;
 	const { commentId } = context;
+	const blockProps = useBlockProps( { className } );
 
 	const displayName = useSelect(
 		( select ) => {
@@ -21,15 +23,44 @@ export default function Edit( { attributes, context } ) {
 				const user = getEntityRecord( 'root', 'user', comment.author );
 				return user?.name ?? __( 'Anonymous' );
 			}
-
+			if ( isLink ) {
+				return (
+					<a
+						href="#comment-date-pseudo-link"
+						onClick={ ( event ) => event.preventDefault() }
+					>
+						{ authorName }
+					</a>
+				);
+			}
 			return authorName ?? '';
 		},
-		[ commentId ]
+		[ commentId, isLink ]
 	);
 
 	return (
-		<div { ...useBlockProps() }>
-			<p className={ className }>{ displayName }</p>
-		</div>
+		<>
+			<InspectorControls>
+				<PanelBody title={ __( 'Link settings' ) }>
+					<ToggleControl
+						label={ __( 'Link to authors URL' ) }
+						onChange={ () => setAttributes( { isLink: ! isLink } ) }
+						checked={ isLink }
+					/>
+					{ isLink && (
+						<ToggleControl
+							label={ __( 'Open in new tab' ) }
+							onChange={ ( value ) =>
+								setAttributes( {
+									linkTarget: value ? '_blank' : '_self',
+								} )
+							}
+							checked={ linkTarget === '_blank' }
+						/>
+					) }
+				</PanelBody>
+			</InspectorControls>
+			<div { ...blockProps }>{ displayName }</div>
+		</>
 	);
 }
