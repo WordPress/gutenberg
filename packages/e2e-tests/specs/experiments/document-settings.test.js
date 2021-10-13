@@ -79,7 +79,7 @@ describe( 'Document Settings', () => {
 			// Navigate to a template part
 			await navigationPanel.open();
 			await navigationPanel.backToRoot();
-			await navigationPanel.navigate( [ 'Template Parts', 'Headers' ] );
+			await navigationPanel.navigate( [ 'Template Parts', 'headers' ] );
 			await navigationPanel.clickItemByText( 'header' );
 
 			// Evaluate the document settings title
