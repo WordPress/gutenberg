@@ -283,7 +283,7 @@ function Navigation( {
 							label={ __( 'Configure overlay menu' ) }
 							value={ attributes.overlayMenu }
 							help={ __(
-								'Controls whether the menu collapses into a toggle button opening an overlay for navigation.'
+								'Collapses the navigation options in a menu icon opening an overlay.'
 							) }
 							onChange={ ( value ) =>
 								setAttributes( { overlayMenu: value } )
@@ -293,8 +293,8 @@ function Navigation( {
 						>
 							<ToggleGroupControlOption
 								value="never"
-								label={ __( 'Never' ) }
-								aria-label={ __( 'Never' ) }
+								label={ __( 'Off' ) }
+								aria-label={ __( 'Off' ) }
 							/>
 							<ToggleGroupControlOption
 								value="mobile"
