@@ -70,14 +70,20 @@ export const ToolsPanelHeader = css`
 		margin: 0;
 	}
 
-	/* Tweak dropdown menu and toggle button for better alignment */
-	> div {
+	/**
+	 * The targeting of dropdown menu component classes here is a temporary
+	 * measure only.
+	 *
+	 * The following styles should be replaced once the DropdownMenu has been
+	 * refactored and can be targeted via component interpolation.
+	 */
+	.components-dropdown-menu {
 		margin-top: ${ space( -1 ) };
 		margin-bottom: ${ space( -1 ) };
 		height: ${ space( 6 ) };
 
 		/* first-child used to overcome specificity of menu toggle styles */
-		> button:first-of-type {
+		.components-dropdown-menu__toggle {
 			padding: 0;
 			height: ${ space( 6 ) };
 			min-width: ${ space( 6 ) };
