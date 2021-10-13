@@ -48,7 +48,7 @@ export type UnitSelectControlProps = {
 	/**
 	 * Whether the control can be focused via keyboard navigation.
 	 */
-	isUnitSelectTabbable: boolean;
+	isUnitSelectTabbable?: boolean;
 	/**
 	 * A callback function invoked when the value is changed.
 	 */
