@@ -205,6 +205,8 @@ wp-env start --xdebug=profile,trace,debug
 
 You can see a reference on each of the Xdebug modes and what they do in the [Xdebug documentation](https://xdebug.org/docs/all_settings#mode).
 
+_Since we are only installing Xdebug 3, Xdebug is only supported for PHP versions greater than or equal to 7.2 (the default). Xdebug won't be installed if `phpVersion` is set to a legacy version._
+
 ### Xdebug IDE support
 
 To connect to Xdebug from your IDE, you can use these IDE settings. This bit of JSON was tested for VS Code's `launch.json` format (which you can [learn more about here](https://code.visualstudio.com/docs/editor/debugging#_launchjson-attributes)) along with [this PHP Debug extension](https://marketplace.visualstudio.com/items?itemName=felixfbecker.php-debug). Its path mapping also points to a specific plugin -- you should update this to point to the source you are working with inside of the wp-env instance.
@@ -218,7 +220,7 @@ You should only have to translate `port` and `pathMappings` to the format used b
 	"request": "launch",
 	"port": 9003,
 	"pathMappings": {
-		"/var/www/html/wp-content/plugins/gutenberg": "${workspaceRoot}/"
+		"/var/www/html/wp-content/plugins/gutenberg": "${workspaceFolder}/"
 	}
 }
 ```
@@ -348,6 +350,29 @@ wp> ^C
 ✔ Ran `wp shell` in 'tests-cli'. (in 16s 400ms)
 ```
 
+#### Installing a plugin or theme on the development instance
+
+```sh
+wp-env run cli plugin install custom-post-type-ui
+
+Creating 500cd328b649d63e882d5c4695871d04_cli_run ... done
+Installing Custom Post Type UI (1.9.2)
+Downloading installation package from https://downloads.wordpress.org/plugin/custom-post-type-ui.zip...
+The authenticity of custom-post-type-ui.zip could not be verified as no signature was found.
+Unpacking the package...
+Installing the plugin...
+Plugin installed successfully.
+Success: Installed 1 of 1 plugins.
+✔ Ran `plugin install custom-post-type-ui` in 'cli'. (in 6s 483ms)
+```
+
+**NOTE**: Depending on your host OS, you may experience errors when trying to install plugins or themes (e.g. `Warning: Could not create directory.`). This is typically because the user ID used within the container does not have write access to the mounted directories created by `wp-env`. To resolve this, run the `docker-compose` command directly from the directory created by `wp-env` and add `-u $(id -u)` and `-e HOME=/tmp` the `run` command as options:
+
+```sh
+$ cd ~/wp-env/500cd328b649d63e882d5c4695871d04
+$ docker-compose run --rm -u $(id -u) -e HOME=/tmp cli [plugin|theme] install <plugin|theme>
+```
+
 ### `wp-env destroy`
 
 ```sh
@@ -399,7 +424,7 @@ Several types of strings can be passed into the `core`, `plugins`, `themes`, and
 | ----------------- | ----------------------------- | -------------------------------------------------------- |
 | Relative path     | `.<path>\|~<path>`            | `"./a/directory"`, `"../a/directory"`, `"~/a/directory"` |
 | Absolute path     | `/<path>\|<letter>:\<path>`   | `"/a/directory"`, `"C:\\a\\directory"`                   |
-| GitHub repository | `<owner>/<repo>[#<ref>]`      | `"WordPress/WordPress"`, `"WordPress/gutenberg#trunk"`  |
+| GitHub repository | `<owner>/<repo>[#<ref>]`      | `"WordPress/WordPress"`, `"WordPress/gutenberg#trunk"`   |
 | ZIP File          | `http[s]://<host>/<path>.zip` | `"https://wordpress.org/wordpress-5.4-beta2.zip"`        |
 
 Remote sources will be downloaded into a temporary directory located in `~/.wp-env`.

@@ -54,7 +54,7 @@
 	// Since it's not clickable, though, don't show a hover state.
 	&,
 	.block-editor-block-icon.has-colors {
-		color: $gray-900 !important;
+		color: $gray-900;
 	}
 }
 
@@ -70,6 +70,7 @@
 		margin: 0 auto;
 		display: flex;
 		align-items: center;
+		min-width: 100%;
 	}
 
 	// Position the focus style correctly.
@@ -93,7 +94,6 @@
 	padding: 0;
 
 	.components-menu-group {
-		padding: $grid-unit-20;
 		margin: 0;
 	}
 }
@@ -149,6 +149,7 @@
 	.block-editor-block-switcher__preview {
 		width: 300px;
 		height: auto;
+		max-height: 500px;
 		padding: $grid-unit-20;
 	}
 }
@@ -179,6 +180,45 @@
 
 		.block-editor-block-switcher__transform {
 			padding: $grid-unit-15;
+		}
+	}
+}
+
+.block-editor-block-switcher__preview-patterns-container {
+	padding-bottom: $grid-unit-20;
+
+	.block-editor-block-switcher__preview-patterns-container-list__list-item {
+		margin-top: $grid-unit-20;
+
+		.block-editor-block-preview__container {
+			cursor: pointer;
+		}
+
+		.block-editor-block-switcher__preview-patterns-container-list__item {
+			height: 100%;
+			border-radius: $radius-block-ui;
+			transition: all 0.05s ease-in-out;
+			position: relative;
+			border: $border-width solid transparent;
+
+			&:hover,
+			&:focus {
+				box-shadow: inset 0 0 0 1px $white, 0 0 0 var(--wp-admin-border-width-focus) var(--wp-admin-theme-color);
+
+				// Windows High Contrast mode will show this outline, but not the box-shadow.
+				outline: 2px solid transparent;
+			}
+
+			&:hover {
+				box-shadow: inset 0 0 0 1px $white, 0 0 0 var(--wp-admin-border-width-focus) $gray-900;
+			}
+
+			.block-editor-block-switcher__preview-patterns-container-list__item-title {
+				padding: $grid-unit-05;
+				font-size: 12px;
+				text-align: center;
+				cursor: pointer;
+			}
 		}
 	}
 }

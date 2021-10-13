@@ -258,4 +258,13 @@ describe( 'split', () => {
 			);
 		} );
 	} );
+
+	it( 'should not split without selection', () => {
+		const record = {
+			formats: [],
+			replacements: [],
+			text: '',
+		};
+		expect( split( deepFreeze( record ) ) ).toBe( undefined );
+	} );
 } );

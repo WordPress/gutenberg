@@ -17,10 +17,8 @@ import {
 import BlockStyles from '../block-styles';
 import PreviewBlockPopover from './preview-block-popover';
 
-export default function BlockStylesMenu( {
-	hoveredBlock: { name, clientId },
-	onSwitch,
-} ) {
+export default function BlockStylesMenu( { hoveredBlock, onSwitch } ) {
+	const { name, clientId } = hoveredBlock;
 	const [ hoveredClassName, setHoveredClassName ] = useState();
 	const blockType = useSelect(
 		( select ) => select( blocksStore ).getBlockType( name ),
@@ -35,7 +33,7 @@ export default function BlockStylesMenu( {
 			{ hoveredClassName && (
 				<PreviewBlockPopover
 					blocks={
-						blockType.example
+						blockType && blockType.example
 							? getBlockFromExample( blockType.name, {
 									attributes: {
 										...blockType.example.attributes,
@@ -43,7 +41,7 @@ export default function BlockStylesMenu( {
 									},
 									innerBlocks: blockType.example.innerBlocks,
 							  } )
-							: cloneBlock( blockType, {
+							: cloneBlock( hoveredBlock, {
 									className: hoveredClassName,
 							  } )
 					}

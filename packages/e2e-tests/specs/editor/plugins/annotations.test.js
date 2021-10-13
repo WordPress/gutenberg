@@ -34,7 +34,7 @@ describe( 'Using Plugins API', () => {
 	 * Annotates the text in the first block from start to end.
 	 *
 	 * @param {number} start Position to start the annotation.
-	 * @param {number} end Position to end the annotation.
+	 * @param {number} end   Position to end the annotation.
 	 *
 	 * @return {void}
 	 */
@@ -52,7 +52,7 @@ describe( 'Using Plugins API', () => {
 		 )[ 0 ];
 		await addAnnotationButton.click();
 		await page.evaluate( () =>
-			document.querySelector( '[contenteditable]' ).focus()
+			document.querySelector( '.wp-block-paragraph' ).focus()
 		);
 	}
 
@@ -91,7 +91,7 @@ describe( 'Using Plugins API', () => {
 	 * @return {Promise<string>} Inner HTML.
 	 */
 	async function getRichTextInnerHTML() {
-		const htmlContent = await page.$$( '*[contenteditable]' );
+		const htmlContent = await page.$$( '.wp-block-paragraph' );
 		return await page.evaluate( ( el ) => {
 			return el.innerHTML;
 		}, htmlContent[ 0 ] );
@@ -139,7 +139,7 @@ describe( 'Using Plugins API', () => {
 			await page.keyboard.type( 'D' );
 
 			await removeAnnotations();
-			const htmlContent = await page.$$( '*[contenteditable]' );
+			const htmlContent = await page.$$( '.wp-block-paragraph' );
 			const html = await page.evaluate( ( el ) => {
 				return el.innerHTML;
 			}, htmlContent[ 0 ] );

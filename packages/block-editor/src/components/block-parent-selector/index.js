@@ -10,6 +10,7 @@ import { useRef } from '@wordpress/element';
 /**
  * Internal dependencies
  */
+import useBlockDisplayInformation from '../use-block-display-information';
 import BlockIcon from '../block-icon';
 import { useShowMoversGestures } from '../block-toolbar/utils';
 import { store as blockEditorStore } from '../../store';
@@ -24,36 +25,34 @@ export default function BlockParentSelector() {
 	const { selectBlock, toggleBlockHighlight } = useDispatch(
 		blockEditorStore
 	);
-	const {
-		parentBlockType,
-		firstParentClientId,
-		shouldHide,
-		hasReducedUI,
-	} = useSelect( ( select ) => {
-		const {
-			getBlockName,
-			getBlockParents,
-			getSelectedBlockClientId,
-			getSettings,
-		} = select( blockEditorStore );
-		const { hasBlockSupport } = select( blocksStore );
-		const selectedBlockClientId = getSelectedBlockClientId();
-		const parents = getBlockParents( selectedBlockClientId );
-		const _firstParentClientId = parents[ parents.length - 1 ];
-		const parentBlockName = getBlockName( _firstParentClientId );
-		const _parentBlockType = getBlockType( parentBlockName );
-		const settings = getSettings();
-		return {
-			parentBlockType: _parentBlockType,
-			firstParentClientId: _firstParentClientId,
-			shouldHide: ! hasBlockSupport(
-				_parentBlockType,
-				'__experimentalParentSelector',
-				true
-			),
-			hasReducedUI: settings.hasReducedUI,
-		};
-	}, [] );
+	const { firstParentClientId, shouldHide, hasReducedUI } = useSelect(
+		( select ) => {
+			const {
+				getBlockName,
+				getBlockParents,
+				getSelectedBlockClientId,
+				getSettings,
+			} = select( blockEditorStore );
+			const { hasBlockSupport } = select( blocksStore );
+			const selectedBlockClientId = getSelectedBlockClientId();
+			const parents = getBlockParents( selectedBlockClientId );
+			const _firstParentClientId = parents[ parents.length - 1 ];
+			const parentBlockName = getBlockName( _firstParentClientId );
+			const _parentBlockType = getBlockType( parentBlockName );
+			const settings = getSettings();
+			return {
+				firstParentClientId: _firstParentClientId,
+				shouldHide: ! hasBlockSupport(
+					_parentBlockType,
+					'__experimentalParentSelector',
+					true
+				),
+				hasReducedUI: settings.hasReducedUI,
+			};
+		},
+		[]
+	);
+	const blockInformation = useBlockDisplayInformation( firstParentClientId );
 
 	// Allows highlighting the parent block outline when focusing or hovering
 	// the parent block selector within the child.
@@ -68,32 +67,28 @@ export default function BlockParentSelector() {
 		},
 	} );
 
-	if ( shouldHide ) {
+	if ( shouldHide || firstParentClientId === undefined ) {
 		return null;
 	}
 
-	if ( firstParentClientId !== undefined ) {
-		return (
-			<div
-				className="block-editor-block-parent-selector"
-				key={ firstParentClientId }
-				ref={ nodeRef }
-				{ ...showMoversGestures }
-			>
-				<ToolbarButton
-					className="block-editor-block-parent-selector__button"
-					onClick={ () => selectBlock( firstParentClientId ) }
-					label={ sprintf(
-						/* translators: %s: Name of the block's parent. */
-						__( 'Select %s' ),
-						parentBlockType.title
-					) }
-					showTooltip
-					icon={ <BlockIcon icon={ parentBlockType.icon } /> }
-				/>
-			</div>
-		);
-	}
-
-	return null;
+	return (
+		<div
+			className="block-editor-block-parent-selector"
+			key={ firstParentClientId }
+			ref={ nodeRef }
+			{ ...showMoversGestures }
+		>
+			<ToolbarButton
+				className="block-editor-block-parent-selector__button"
+				onClick={ () => selectBlock( firstParentClientId ) }
+				label={ sprintf(
+					/* translators: %s: Name of the block's parent. */
+					__( 'Select %s' ),
+					blockInformation.title
+				) }
+				showTooltip
+				icon={ <BlockIcon icon={ blockInformation.icon } /> }
+			/>
+		</div>
+	);
 }

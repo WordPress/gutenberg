@@ -11,3 +11,29 @@
 		padding: 6px;
 	}
 }
+
+.edit-site-visual-editor {
+	position: relative;
+	background-color: $gray-800;
+
+	&.is-focus-mode {
+		padding: 48px 48px 0;
+	}
+}
+
+.edit-site-visual-editor__editor-canvas {
+	border-radius: 2px 2px 0 0;
+}
+
+.edit-site-visual-editor__back-button {
+	position: absolute;
+	top: $grid-unit-10;
+	left: $grid-unit-10;
+	color: $white;
+
+	&:active:not([aria-disabled="true"]),
+	&:focus:not([aria-disabled="true"]),
+	&:hover {
+		color: $gray-100;
+	}
+}

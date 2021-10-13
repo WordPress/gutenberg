@@ -1,9 +1,30 @@
 .wp-block-cover {
+	/* Extra specificity needed because the reset.css applied in the editor context is overriding this rule. */
+	.editor-styles-wrapper & {
+		box-sizing: border-box;
+	}
+
 	// Override default cover styles
 	// because we're not ready yet to show the cover block.
 	&.is-placeholder {
 		min-height: auto !important;
 		padding: 0 !important;
+
+		// Resizeable placeholder for placeholder.
+		.block-library-cover__resize-container {
+			display: none;
+		}
+		.components-placeholder {
+			&.is-large {
+				min-height: 240px;
+				justify-content: flex-start;
+				z-index: z-index(".wp-block-cover.is-placeholder .components-placeholder.is-large");
+				+ .block-library-cover__resize-container {
+					min-height: 240px;
+					display: block;
+				}
+			}
+		}
 	}
 
 	&.components-placeholder h2 {
@@ -45,7 +66,7 @@
 
 [data-align="left"] > .wp-block-cover,
 [data-align="right"] > .wp-block-cover {
-	max-width: $content-width / 2;
+	max-width: $content-width * 0.5;
 	width: 100%;
 }
 
@@ -59,9 +80,21 @@
 	left: 0;
 	right: 0;
 	bottom: 0;
+	min-height: 50px;
 }
 
 .block-library-cover__resize-container:not(.is-resizing) {
 	// Important is used to have higher specificity than the inline style set by re-resizable library.
 	height: auto !important;
+}
+
+// When uploading background images, show a transparent overlay.
+.wp-block-cover > .components-drop-zone .components-drop-zone__content {
+	opacity: 0.8 !important;
+}
+
+// Remove the parallax fixed background when in the patterns preview panel as it
+// doesn't work with the transforms that are applied to resize the block in that context.
+.block-editor-block-patterns-list__list-item .has-parallax.wp-block-cover {
+	background-attachment: scroll;
 }

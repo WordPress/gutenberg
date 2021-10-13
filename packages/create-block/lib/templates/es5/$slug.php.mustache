@@ -1,22 +1,24 @@
 <?php
 /**
- * Plugin Name:     {{title}}
+ * Plugin Name:       {{title}}
 {{#description}}
- * Description:     {{description}}
+ * Description:       {{description}}
 {{/description}}
- * Version:         {{version}}
+ * Requires at least: 5.7
+ * Requires PHP:      7.0
+ * Version:           {{version}}
 {{#author}}
- * Author:          {{author}}
+ * Author:            {{author}}
 {{/author}}
 {{#license}}
- * License:         {{license}}
+ * License:           {{license}}
 {{/license}}
 {{#licenseURI}}
- * License URI:     {{{licenseURI}}}
+ * License URI:       {{{licenseURI}}}
 {{/licenseURI}}
- * Text Domain:     {{textdomain}}
+ * Text Domain:       {{textdomain}}
  *
- * @package         {{namespace}}
+ * @package           {{namespace}}
  */
 
 /**
@@ -33,6 +35,7 @@ function {{namespaceSnakeCase}}_{{slugSnakeCase}}_block_init() {
 		'{{namespace}}-{{slug}}-block-editor',
 		plugins_url( $index_js, __FILE__ ),
 		array(
+			'wp-block-editor',
 			'wp-blocks',
 			'wp-i18n',
 			'wp-element',

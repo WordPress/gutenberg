@@ -6,18 +6,33 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { useState } from '@wordpress/element';
 import {
-	InnerBlocks,
+	useState,
+	useEffect,
+	useMemo,
+	useRef,
+	Platform,
+} from '@wordpress/element';
+import {
 	__experimentalUseInnerBlocksProps as useInnerBlocksProps,
 	InspectorControls,
 	JustifyToolbar,
 	BlockControls,
 	useBlockProps,
 	store as blockEditorStore,
+	withColors,
+	PanelColorSettings,
+	ContrastChecker,
+	getColorClassName,
 } from '@wordpress/block-editor';
 import { useDispatch, withSelect, withDispatch } from '@wordpress/data';
-import { PanelBody, ToggleControl, ToolbarGroup } from '@wordpress/components';
+import {
+	PanelBody,
+	ToggleControl,
+	__experimentalToggleGroupControl as ToggleGroupControl,
+	__experimentalToggleGroupControlOption as ToggleGroupControlOption,
+	ToolbarGroup,
+} from '@wordpress/components';
 import { compose } from '@wordpress/compose';
 import { __ } from '@wordpress/i18n';
 
@@ -25,9 +40,63 @@ import { __ } from '@wordpress/i18n';
  * Internal dependencies
  */
 import useBlockNavigator from './use-block-navigator';
-
 import NavigationPlaceholder from './placeholder';
 import PlaceholderPreview from './placeholder-preview';
+import ResponsiveWrapper from './responsive-wrapper';
+
+const ALLOWED_BLOCKS = [
+	'core/navigation-link',
+	'core/search',
+	'core/social-links',
+	'core/page-list',
+	'core/spacer',
+	'core/home-link',
+	'core/site-title',
+	'core/site-logo',
+	'core/navigation-submenu',
+];
+
+const DEFAULT_BLOCK = [ 'core/navigation-link' ];
+
+const DIRECT_INSERT = ( block ) => {
+	return block.innerBlocks.every(
+		( { name } ) =>
+			name === 'core/navigation-link' ||
+			name === 'core/navigation-submenu'
+	);
+};
+
+const LAYOUT = {
+	type: 'default',
+	alignments: [],
+};
+
+function getComputedStyle( node ) {
+	return node.ownerDocument.defaultView.getComputedStyle( node );
+}
+
+function detectColors( colorsDetectionElement, setColor, setBackground ) {
+	if ( ! colorsDetectionElement ) {
+		return;
+	}
+	setColor( getComputedStyle( colorsDetectionElement ).color );
+
+	let backgroundColorNode = colorsDetectionElement;
+	let backgroundColor = getComputedStyle( backgroundColorNode )
+		.backgroundColor;
+	while (
+		backgroundColor === 'rgba(0, 0, 0, 0)' &&
+		backgroundColorNode.parentNode &&
+		backgroundColorNode.parentNode.nodeType ===
+			backgroundColorNode.parentNode.ELEMENT_NODE
+	) {
+		backgroundColorNode = backgroundColorNode.parentNode;
+		backgroundColor = getComputedStyle( backgroundColorNode )
+			.backgroundColor;
+	}
+
+	setBackground( backgroundColor );
+}
 
 function Navigation( {
 	selectedBlockHasDescendants,
@@ -39,64 +108,137 @@ function Navigation( {
 	isSelected,
 	updateInnerBlocks,
 	className,
+	backgroundColor,
+	setBackgroundColor,
+	textColor,
+	setTextColor,
+	overlayBackgroundColor,
+	setOverlayBackgroundColor,
+	overlayTextColor,
+	setOverlayTextColor,
+
+	// These props are used by the navigation editor to override specific
+	// navigation block settings.
 	hasSubmenuIndicatorSetting = true,
-	hasItemJustificationControls = attributes.orientation === 'horizontal',
-	hasListViewModal = true,
+	hasItemJustificationControls = true,
+	hasColorSettings = true,
+	customPlaceholder: CustomPlaceholder = null,
+	customAppender: CustomAppender = null,
 } ) {
 	const [ isPlaceholderShown, setIsPlaceholderShown ] = useState(
 		! hasExistingNavItems
 	);
+	const [ isResponsiveMenuOpen, setResponsiveMenuVisibility ] = useState(
+		false
+	);
 
 	const { selectBlock } = useDispatch( blockEditorStore );
 
+	const navRef = useRef();
+
 	const blockProps = useBlockProps( {
+		ref: navRef,
 		className: classnames( className, {
 			[ `items-justified-${ attributes.itemsJustification }` ]: attributes.itemsJustification,
 			'is-vertical': attributes.orientation === 'vertical',
+			'is-responsive': 'never' !== attributes.overlayMenu,
+			'has-text-color': !! textColor.color || !! textColor?.class,
+			[ getColorClassName(
+				'color',
+				textColor?.slug
+			) ]: !! textColor?.slug,
+			'has-background': !! backgroundColor.color || backgroundColor.class,
+			[ getColorClassName(
+				'background-color',
+				backgroundColor?.slug
+			) ]: !! backgroundColor?.slug,
 		} ),
+		style: {
+			color: ! textColor?.slug && textColor?.color,
+			backgroundColor: ! backgroundColor?.slug && backgroundColor?.color,
+		},
 	} );
 
 	const { navigatorToolbarButton, navigatorModal } = useBlockNavigator(
 		clientId
 	);
 
+	const placeholder = useMemo( () => <PlaceholderPreview />, [] );
+
+	// When the block is selected itself or has a top level item selected that
+	// doesn't itself have children, show the standard appender. Else show no
+	// appender.
+	const appender =
+		isSelected ||
+		( isImmediateParentOfSelectedBlock && ! selectedBlockHasDescendants )
+			? undefined
+			: false;
+
 	const innerBlocksProps = useInnerBlocksProps(
 		{
 			className: 'wp-block-navigation__container',
 		},
 		{
-			allowedBlocks: [
-				'core/navigation-link',
-				'core/search',
-				'core/social-links',
-				'core/page-list',
-				'core/spacer',
-			],
-			orientation: attributes.orientation || 'horizontal',
-			renderAppender:
-				( isImmediateParentOfSelectedBlock &&
-					! selectedBlockHasDescendants ) ||
-				isSelected
-					? InnerBlocks.DefaultAppender
-					: false,
-			__experimentalAppenderTagName: 'li',
-			__experimentalCaptureToolbars: true,
+			allowedBlocks: ALLOWED_BLOCKS,
+			__experimentalDefaultBlock: DEFAULT_BLOCK,
+			__experimentalDirectInsert: DIRECT_INSERT,
+			orientation: attributes.orientation,
+			renderAppender: CustomAppender || appender,
+
+			// Ensure block toolbar is not too far removed from item
+			// being edited when in vertical mode.
+			// see: https://github.com/WordPress/gutenberg/pull/34615.
+			__experimentalCaptureToolbars:
+				attributes.orientation !== 'vertical',
 			// Template lock set to false here so that the Nav
 			// Block on the experimental menus screen does not
 			// inherit templateLock={ 'all' }.
 			templateLock: false,
-			__experimentalLayout: {
-				type: 'default',
-				alignments: [],
-			},
-			placeholder: <PlaceholderPreview />,
+			__experimentalLayout: LAYOUT,
+			placeholder: ! CustomPlaceholder ? placeholder : undefined,
 		}
 	);
 
+	// Turn on contrast checker for web only since it's not supported on mobile yet.
+	const enableContrastChecking = Platform.OS === 'web';
+
+	const [ detectedBackgroundColor, setDetectedBackgroundColor ] = useState();
+	const [ detectedColor, setDetectedColor ] = useState();
+	const [
+		detectedOverlayBackgroundColor,
+		setDetectedOverlayBackgroundColor,
+	] = useState();
+	const [ detectedOverlayColor, setDetectedOverlayColor ] = useState();
+
+	useEffect( () => {
+		if ( ! enableContrastChecking ) {
+			return;
+		}
+		detectColors(
+			navRef.current,
+			setDetectedColor,
+			setDetectedBackgroundColor
+		);
+		const subMenuElement = navRef.current.querySelector(
+			'[data-type="core/navigation-link"] [data-type="core/navigation-link"]'
+		);
+		if ( subMenuElement ) {
+			detectColors(
+				subMenuElement,
+				setDetectedOverlayColor,
+				setDetectedOverlayBackgroundColor
+			);
+		}
+	} );
+
 	if ( isPlaceholderShown ) {
+		const PlaceholderComponent = CustomPlaceholder
+			? CustomPlaceholder
+			: NavigationPlaceholder;
+
 		return (
 			<div { ...blockProps }>
-				<NavigationPlaceholder
+				<PlaceholderComponent
 					onCreate={ ( blocks, selectNavigationBlock ) => {
 						setIsPlaceholderShown( false );
 						updateInnerBlocks( blocks );
@@ -109,12 +251,18 @@ function Navigation( {
 		);
 	}
 
+	const justifyAllowedControls =
+		attributes.orientation === 'vertical'
+			? [ 'left', 'center', 'right' ]
+			: [ 'left', 'center', 'right', 'space-between' ];
+
 	return (
 		<>
 			<BlockControls>
 				{ hasItemJustificationControls && (
 					<JustifyToolbar
 						value={ attributes.itemsJustification }
+						allowedControls={ justifyAllowedControls }
 						onChange={ ( value ) =>
 							setAttributes( { itemsJustification: value } )
 						}
@@ -124,28 +272,115 @@ function Navigation( {
 						} }
 					/>
 				) }
-				{ hasListViewModal && (
-					<ToolbarGroup>{ navigatorToolbarButton }</ToolbarGroup>
-				) }
+				<ToolbarGroup>{ navigatorToolbarButton }</ToolbarGroup>
 			</BlockControls>
-			{ hasListViewModal && navigatorModal }
+			{ navigatorModal }
 			<InspectorControls>
 				{ hasSubmenuIndicatorSetting && (
-					<PanelBody title={ __( 'Display settings' ) }>
+					<PanelBody title={ __( 'Display' ) }>
+						<h3>{ __( 'Overlay Menu' ) }</h3>
+						<ToggleGroupControl
+							label={ __( 'Configure overlay menu' ) }
+							value={ attributes.overlayMenu }
+							help={ __(
+								'Collapses the navigation options in a menu icon opening an overlay.'
+							) }
+							onChange={ ( value ) =>
+								setAttributes( { overlayMenu: value } )
+							}
+							isBlock
+							hideLabelFromVision
+						>
+							<ToggleGroupControlOption
+								value="never"
+								label={ __( 'Off' ) }
+							/>
+							<ToggleGroupControlOption
+								value="mobile"
+								label={ __( 'Mobile' ) }
+							/>
+							<ToggleGroupControlOption
+								value="always"
+								label={ __( 'Always' ) }
+							/>
+						</ToggleGroupControl>
+						<h3>{ __( 'Submenus' ) }</h3>
 						<ToggleControl
-							checked={ attributes.showSubmenuIcon }
+							checked={ attributes.openSubmenusOnClick }
 							onChange={ ( value ) => {
 								setAttributes( {
-									showSubmenuIcon: value,
+									openSubmenusOnClick: value,
 								} );
 							} }
-							label={ __( 'Show submenu indicator icons' ) }
+							label={ __( 'Open on click' ) }
 						/>
+						{ ! attributes.openSubmenusOnClick && (
+							<ToggleControl
+								checked={ attributes.showSubmenuIcon }
+								onChange={ ( value ) => {
+									setAttributes( {
+										showSubmenuIcon: value,
+									} );
+								} }
+								label={ __( 'Show icons' ) }
+							/>
+						) }
 					</PanelBody>
+				) }
+				{ hasColorSettings && (
+					<PanelColorSettings
+						title={ __( 'Color' ) }
+						initialOpen={ false }
+						colorSettings={ [
+							{
+								value: textColor.color,
+								onChange: setTextColor,
+								label: __( 'Text' ),
+							},
+							{
+								value: backgroundColor.color,
+								onChange: setBackgroundColor,
+								label: __( 'Background' ),
+							},
+							{
+								value: overlayTextColor.color,
+								onChange: setOverlayTextColor,
+								label: __( 'Overlay text' ),
+							},
+							{
+								value: overlayBackgroundColor.color,
+								onChange: setOverlayBackgroundColor,
+								label: __( 'Overlay background' ),
+							},
+						] }
+					>
+						{ enableContrastChecking && (
+							<>
+								<ContrastChecker
+									backgroundColor={ detectedBackgroundColor }
+									textColor={ detectedColor }
+								/>
+								<ContrastChecker
+									backgroundColor={
+										detectedOverlayBackgroundColor
+									}
+									textColor={ detectedOverlayColor }
+								/>
+							</>
+						) }
+					</PanelColorSettings>
 				) }
 			</InspectorControls>
 			<nav { ...blockProps }>
-				<ul { ...innerBlocksProps } />
+				<ResponsiveWrapper
+					id={ clientId }
+					onToggle={ setResponsiveMenuVisibility }
+					isOpen={ isResponsiveMenuOpen }
+					isResponsive={ 'never' !== attributes.overlayMenu }
+					isHiddenByDefault={ 'always' === attributes.overlayMenu }
+				>
+					<div { ...innerBlocksProps }></div>
+				</ResponsiveWrapper>
 			</nav>
 		</>
 	);
@@ -167,10 +402,15 @@ export default compose( [
 		const selectedBlockHasDescendants = !! getClientIdsOfDescendants( [
 			selectedBlockId,
 		] )?.length;
+
 		return {
 			isImmediateParentOfSelectedBlock,
 			selectedBlockHasDescendants,
 			hasExistingNavItems: !! innerBlocks.length,
+
+			// This prop is already available but computing it here ensures it's
+			// fresh compared to isImmediateParentOfSelectedBlock
+			isSelected: selectedBlockId === clientId,
 		};
 	} ),
 	withDispatch( ( dispatch, { clientId } ) => {
@@ -187,4 +427,10 @@ export default compose( [
 			},
 		};
 	} ),
+	withColors(
+		{ textColor: 'color' },
+		{ backgroundColor: 'color' },
+		{ overlayBackgroundColor: 'color' },
+		{ overlayTextColor: 'color' }
+	),
 ] )( Navigation );

@@ -27,11 +27,22 @@ async function clone( repositoryUrl ) {
 }
 
 /**
+ * Fetches changes from the repository.
+ *
+ * @param {string}          gitWorkingDirectoryPath Local repository path.
+ * @param {string[]|Object} options                 Git options to apply.
+ */
+async function fetch( gitWorkingDirectoryPath, options = [] ) {
+	const simpleGit = SimpleGit( gitWorkingDirectoryPath );
+	await simpleGit.fetch( options );
+}
+
+/**
  * Commits changes to the repository.
  *
- * @param {string} gitWorkingDirectoryPath Local repository path.
- * @param {string} message Commit message.
- * @param {string[]} filesToAdd Files to add.
+ * @param {string}   gitWorkingDirectoryPath Local repository path.
+ * @param {string}   message                 Commit message.
+ * @param {string[]} filesToAdd              Files to add.
  *
  * @return {Promise<string>} Commit Hash
  */
@@ -48,7 +59,7 @@ async function commit( gitWorkingDirectoryPath, message, filesToAdd = [] ) {
  * Creates a local branch.
  *
  * @param {string} gitWorkingDirectoryPath Local repository path.
- * @param {string} branchName Branch Name
+ * @param {string} branchName              Branch Name
  */
 async function createLocalBranch( gitWorkingDirectoryPath, branchName ) {
 	const simpleGit = SimpleGit( gitWorkingDirectoryPath );
@@ -59,7 +70,7 @@ async function createLocalBranch( gitWorkingDirectoryPath, branchName ) {
  * Checkout a local branch.
  *
  * @param {string} gitWorkingDirectoryPath Local repository path.
- * @param {string} branchName Branch Name
+ * @param {string} branchName              Branch Name
  */
 async function checkoutRemoteBranch( gitWorkingDirectoryPath, branchName ) {
 	const simpleGit = SimpleGit( gitWorkingDirectoryPath );
@@ -71,7 +82,7 @@ async function checkoutRemoteBranch( gitWorkingDirectoryPath, branchName ) {
  * Creates a local tag.
  *
  * @param {string} gitWorkingDirectoryPath Local repository path.
- * @param {string} tagName Tag Name
+ * @param {string} tagName                 Tag Name
  */
 async function createLocalTag( gitWorkingDirectoryPath, tagName ) {
 	const simpleGit = SimpleGit( gitWorkingDirectoryPath );
@@ -82,7 +93,7 @@ async function createLocalTag( gitWorkingDirectoryPath, tagName ) {
  * Pushes a local branch to the origin.
  *
  * @param {string} gitWorkingDirectoryPath Local repository path.
- * @param {string} branchName Branch Name
+ * @param {string} branchName              Branch Name
  */
 async function pushBranchToOrigin( gitWorkingDirectoryPath, branchName ) {
 	const simpleGit = SimpleGit( gitWorkingDirectoryPath );
@@ -113,7 +124,7 @@ async function discardLocalChanges( gitWorkingDirectoryPath ) {
  * Reset local branch against the origin.
  *
  * @param {string} gitWorkingDirectoryPath Local repository path.
- * @param {string} branchName Branch Name
+ * @param {string} branchName              Branch Name
  */
 async function resetLocalBranchAgainstOrigin(
 	gitWorkingDirectoryPath,
@@ -129,7 +140,7 @@ async function resetLocalBranchAgainstOrigin(
  * Cherry-picks a commit into trunk
  *
  * @param {string} gitWorkingDirectoryPath Local repository path.
- * @param {string} commitHash Branch Name
+ * @param {string} commitHash              Branch Name
  */
 async function cherrypickCommitIntoBranch(
 	gitWorkingDirectoryPath,
@@ -144,7 +155,7 @@ async function cherrypickCommitIntoBranch(
  * Replaces the local branch's content with the content from another branch.
  *
  * @param {string} gitWorkingDirectoryPath Local repository path.
- * @param {string} sourceBranchName Branch Name
+ * @param {string} sourceBranchName        Branch Name
  */
 async function replaceContentFromRemoteBranch(
 	gitWorkingDirectoryPath,
@@ -166,6 +177,7 @@ module.exports = {
 	checkoutRemoteBranch,
 	createLocalBranch,
 	createLocalTag,
+	fetch,
 	pushBranchToOrigin,
 	pushTagsToOrigin,
 	discardLocalChanges,

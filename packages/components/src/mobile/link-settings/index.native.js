@@ -295,7 +295,7 @@ function LinkSettings( {
 				<PanelBody style={ styles.linkSettingsPanel }>
 					<FooterMessageControl
 						label={ options.footer.label }
-						textAlign="left"
+						separatorType={ options.footer.separatorType }
 					/>
 				</PanelBody>
 			) }

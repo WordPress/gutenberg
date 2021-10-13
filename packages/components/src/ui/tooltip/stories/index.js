@@ -1,12 +1,12 @@
 /**
  * Internal dependencies
  */
-import { Text } from '../../index';
+import { Text } from '../../../text';
 import { Tooltip } from '../index';
 
 export default {
 	component: Tooltip,
-	title: 'G2 Components (Experimental)/Tooltip',
+	title: 'Components (Experimental)/Tooltip',
 };
 
 export const _default = () => {

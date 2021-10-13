@@ -1,5 +1,4 @@
-`useConstrainedTabbing`
-======================
+# `useConstrainedTabbing`
 
 In Dialogs/modals, the tabbing must be constrained to the content of the wrapper element. To achieve this behavior you can use the `useConstrainedTabbing` hook.
 
@@ -7,7 +6,7 @@ In Dialogs/modals, the tabbing must be constrained to the content of the wrapper
 
 ### `ref`
 
-- Type: `Object|Function`
+-   Type: `Object|Function`
 
 A function reference that must be passed to the DOM element where constrained tabbing should be enabled.
 
@@ -17,12 +16,12 @@ A function reference that must be passed to the DOM element where constrained ta
 import { useConstrainedTabbing } from '@wordpress/compose';
 
 const ConstrainedTabbingExample = () => {
-	const ref = useConstrainedTabbing()
+	const ref = useConstrainedTabbing();
 	return (
 		<div ref={ ref }>
 			<Button />
 			<Button />
-		</div> 
+		</div>
 	);
 };
 ```

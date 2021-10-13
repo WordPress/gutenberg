@@ -12,10 +12,7 @@
 			"column": 21
 		}
 	},
-	"range": [
-		63,
-		84
-	],
+	"range": [ 63, 84 ],
 	"declaration": null,
 	"specifiers": [
 		{
@@ -32,10 +29,7 @@
 					"column": 18
 				}
 			},
-			"range": [
-				72,
-				81
-			],
+			"range": [ 72, 81 ],
 			"local": {
 				"type": "Identifier",
 				"start": 72,
@@ -50,10 +44,7 @@
 						"column": 18
 					}
 				},
-				"range": [
-					72,
-					81
-				],
+				"range": [ 72, 81 ],
 				"name": "variables"
 			},
 			"exported": {
@@ -70,10 +61,7 @@
 						"column": 18
 					}
 				},
-				"range": [
-					72,
-					81
-				],
+				"range": [ 72, 81 ],
 				"name": "variables"
 			}
 		}

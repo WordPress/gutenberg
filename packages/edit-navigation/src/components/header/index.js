@@ -1,133 +1,73 @@
 /**
- * External dependencies
- */
-import { find } from 'lodash';
-
-/**
  * WordPress dependencies
  */
-import { __, sprintf } from '@wordpress/i18n';
-import {
-	Button,
-	Dropdown,
-	DropdownMenu,
-	MenuGroup,
-	MenuItemsChoice,
-	Popover,
-} from '@wordpress/components';
+import { __ } from '@wordpress/i18n';
+import { NavigableToolbar } from '@wordpress/block-editor';
+import { useViewportMatch } from '@wordpress/compose';
+import { PinnedItems } from '@wordpress/interface';
 
 /**
  * Internal dependencies
  */
+import MenuActions from './menu-actions';
+import NewButton from './new-button';
 import SaveButton from './save-button';
-import ManageLocations from './manage-locations';
-import AddMenu from '../add-menu';
+import UndoButton from './undo-button';
+import RedoButton from './redo-button';
+import InserterToggle from './inserter-toggle';
+import MoreMenu from './more-menu';
 
 export default function Header( {
+	isMenuSelected,
 	menus,
-	selectedMenuId,
-	onSelectMenu,
 	isPending,
 	navigationPost,
 } ) {
-	const selectedMenu = find( menus, { id: selectedMenuId } );
-	const menuName = selectedMenu ? selectedMenu.name : undefined;
-	let actionHeaderText;
+	const isMediumViewport = useViewportMatch( 'medium' );
 
-	if ( menuName ) {
-		actionHeaderText = sprintf(
-			// translators: Name of the menu being edited, e.g. 'Main Menu'.
-			__( 'Editing: %s' ),
-			menuName
+	if ( ! isMenuSelected ) {
+		return (
+			<div className="edit-navigation-header">
+				<div className="edit-navigation-header__toolbar-wrapper">
+					<h1 className="edit-navigation-header__title">
+						{ __( 'Navigation' ) }
+					</h1>
+				</div>
+			</div>
 		);
-	} else if ( isPending ) {
-		// Loading text won't be displayed if menus are preloaded.
-		actionHeaderText = __( 'Loading …' );
-	} else {
-		actionHeaderText = __( 'No menus available' );
 	}
-
-	const hasMenus = !! menus?.length;
 
 	return (
 		<div className="edit-navigation-header">
-			<div className="edit-navigation-header__title-subtitle">
-				<h1 className="edit-navigation-header__title">
-					{ __( 'Navigation' ) }
-				</h1>
-				<h2 className="edit-navigation-header__subtitle">
-					{ hasMenus && actionHeaderText }
-				</h2>
+			<div className="edit-navigation-header__toolbar-wrapper">
+				{ isMediumViewport && (
+					<h1 className="edit-navigation-header__title">
+						{ __( 'Navigation' ) }
+					</h1>
+				) }
+
+				<NavigableToolbar
+					className="edit-navigation-header__toolbar"
+					aria-label={ __( 'Document tools' ) }
+				>
+					<InserterToggle />
+					{ isMediumViewport && (
+						<>
+							<UndoButton />
+							<RedoButton />
+						</>
+					) }
+				</NavigableToolbar>
 			</div>
-			{ hasMenus && (
-				<div className="edit-navigation-header__actions">
-					<DropdownMenu
-						icon={ null }
-						toggleProps={ {
-							showTooltip: false,
-							children: __( 'Select menu' ),
-							isTertiary: true,
-							disabled: ! menus?.length,
-							__experimentalIsFocusable: true,
-						} }
-						popoverProps={ {
-							position: 'bottom left',
-						} }
-					>
-						{ () => (
-							<MenuGroup>
-								<MenuItemsChoice
-									value={ selectedMenuId }
-									onSelect={ onSelectMenu }
-									choices={ menus.map( ( menu ) => ( {
-										value: menu.id,
-										label: menu.name,
-									} ) ) }
-								/>
-							</MenuGroup>
-						) }
-					</DropdownMenu>
 
-					<Dropdown
-						position="bottom left"
-						renderToggle={ ( { isOpen, onToggle } ) => (
-							<Button
-								isTertiary
-								aria-expanded={ isOpen }
-								onClick={ onToggle }
-							>
-								{ __( 'Add new' ) }
-							</Button>
-						) }
-						renderContent={ () => (
-							<AddMenu
-								className="edit-navigation-header__add-menu"
-								menus={ menus }
-								onCreate={ onSelectMenu }
-							/>
-						) }
-					/>
+			<MenuActions menus={ menus } isLoading={ isPending } />
 
-					<Dropdown
-						contentClassName="edit-navigation-header__manage-locations"
-						position="bottom left"
-						renderToggle={ ( { isOpen, onToggle } ) => (
-							<Button
-								isTertiary
-								aria-expanded={ isOpen }
-								onClick={ onToggle }
-							>
-								{ __( 'Manage locations' ) }
-							</Button>
-						) }
-						renderContent={ () => <ManageLocations /> }
-					/>
-
-					<SaveButton navigationPost={ navigationPost } />
-
-					<Popover.Slot name="block-toolbar" />
-				</div>
-			) }
+			<div className="edit-navigation-header__actions">
+				{ isMediumViewport && <NewButton /> }
+				<SaveButton navigationPost={ navigationPost } />
+				<PinnedItems.Slot scope="core/edit-navigation" />
+				<MoreMenu />
+			</div>
 		</div>
 	);
 }

@@ -16,6 +16,7 @@ function TextControl( {
 	instanceId,
 	onChange,
 	type = 'text',
+	placeholder,
 	...props
 } ) {
 	const id = `inspector-text-control-${ instanceId }`;
@@ -31,6 +32,7 @@ function TextControl( {
 			value={ value }
 			onChangeValue={ onChange }
 			aria-describedby={ !! help ? id + '__help' : undefined }
+			valuePlaceholder={ placeholder }
 			{ ...props }
 		/>
 	);

@@ -1,0 +1,30 @@
+[
+	{
+		"blockName": "core/cover",
+		"attrs": {
+			"url": "data:image/jpeg;base64,/9j/2wBDAAMCAgICAgMCAgIDAwMDBAYEBAQEBAgGBgUGCQgKCgkICQkKDA8MCgsOCwkJDRENDg8QEBEQCgwSExIQEw8QEBD/yQALCAABAAEBAREA/8wABgAQEAX/2gAIAQEAAD8A0s8g/9k=",
+			"dimRatio": 40
+		},
+		"innerBlocks": [
+			{
+				"blockName": "core/paragraph",
+				"attrs": {
+					"align": "center",
+					"placeholder": "Write title…",
+					"fontSize": "large"
+				},
+				"innerBlocks": [],
+				"innerHTML": "\n        <p class=\"has-text-align-center has-large-font-size\">\n                Guten Berg!\n        </p>\n    ",
+				"innerContent": [
+					"\n        <p class=\"has-text-align-center has-large-font-size\">\n                Guten Berg!\n        </p>\n    "
+				]
+			}
+		],
+		"innerHTML": "\n<div class=\"wp-block-cover\">\n    <span aria-hidden=\"true\" class=\"has-background-dim-40 wp-block-cover__gradient-background has-background-dim\"></span>\n    <img class=\"wp-block-cover__image-background\" alt=\"\" src=\"data:image/jpeg;base64,/9j/2wBDAAMCAgICAgMCAgIDAwMDBAYEBAQEBAgGBgUGCQgKCgkICQkKDA8MCgsOCwkJDRENDg8QEBEQCgwSExIQEw8QEBD/yQALCAABAAEBAREA/8wABgAQEAX/2gAIAQEAAD8A0s8g/9k=\" data-object-fit=\"cover\"/>\n    <div class=\"wp-block-cover__inner-container\">\n        \n    </div>\n</div>\n",
+		"innerContent": [
+			"\n<div class=\"wp-block-cover\">\n    <span aria-hidden=\"true\" class=\"has-background-dim-40 wp-block-cover__gradient-background has-background-dim\"></span>\n    <img class=\"wp-block-cover__image-background\" alt=\"\" src=\"data:image/jpeg;base64,/9j/2wBDAAMCAgICAgMCAgIDAwMDBAYEBAQEBAgGBgUGCQgKCgkICQkKDA8MCgsOCwkJDRENDg8QEBEQCgwSExIQEw8QEBD/yQALCAABAAEBAREA/8wABgAQEAX/2gAIAQEAAD8A0s8g/9k=\" data-object-fit=\"cover\"/>\n    <div class=\"wp-block-cover__inner-container\">\n        ",
+			null,
+			"\n    </div>\n</div>\n"
+		]
+	}
+]

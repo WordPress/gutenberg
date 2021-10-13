@@ -39,7 +39,7 @@ describe( 'Meta boxes', () => {
 		await page.waitForSelector( '.editor-post-save-draft' );
 	} );
 
-	it( 'Should render dynamic blocks when the meta box uses the excerpt for front end rendering', async () => {
+	it.skip( 'Should render dynamic blocks when the meta box uses the excerpt for front end rendering', async () => {
 		// Publish a post so there's something for the latest posts dynamic block to render.
 		await page.type( '.editor-post-title__input', 'A published post' );
 		await insertBlock( 'Paragraph' );

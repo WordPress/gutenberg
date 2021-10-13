@@ -1,12 +1,22 @@
 /**
+ * WordPress dependencies
+ */
+import { store as coreDataStore } from '@wordpress/core-data';
+
+/**
  * Internal dependencies
  */
 import {
 	getNavigationPostForMenu,
 	hasResolvedNavigationPost,
-	getMenuItemForClientId,
+	getSelectedMenuId,
 } from '../selectors';
-import { KIND, POST_TYPE, buildNavigationPostId } from '../utils';
+import {
+	NAVIGATION_POST_KIND,
+	NAVIGATION_POST_POST_TYPE,
+} from '../../constants';
+
+import { buildNavigationPostId } from '../utils';
 
 describe( 'getNavigationPostForMenu', () => {
 	it( 'gets navigation post for menu', () => {
@@ -27,10 +37,10 @@ describe( 'getNavigationPostForMenu', () => {
 
 		expect( getNavigationPostForMenu( 'state', menuId ) ).toBe( 'record' );
 
-		expect( registry.select ).toHaveBeenCalledWith( 'core' );
+		expect( registry.select ).toHaveBeenCalledWith( coreDataStore );
 		expect( getEditedEntityRecord ).toHaveBeenCalledWith(
-			KIND,
-			POST_TYPE,
+			NAVIGATION_POST_KIND,
+			NAVIGATION_POST_POST_TYPE,
 			buildNavigationPostId( menuId )
 		);
 
@@ -56,7 +66,7 @@ describe( 'getNavigationPostForMenu', () => {
 
 		expect( getNavigationPostForMenu( 'state', menuId ) ).toBe( null );
 
-		expect( registry.select ).toHaveBeenCalledWith( 'core' );
+		expect( registry.select ).toHaveBeenCalledWith( coreDataStore );
 		expect( getEditedEntityRecord ).not.toHaveBeenCalled();
 
 		getNavigationPostForMenu.registry = defaultRegistry;
@@ -80,44 +90,28 @@ describe( 'hasResolvedNavigationPost', () => {
 
 		expect( hasResolvedNavigationPost( 'state', menuId ) ).toBe( true );
 
-		expect( registry.select ).toHaveBeenCalledWith( 'core' );
+		expect( registry.select ).toHaveBeenCalledWith( coreDataStore );
 		expect( hasFinishedResolution ).toHaveBeenCalledWith(
 			'getEntityRecord',
-			[ KIND, POST_TYPE, buildNavigationPostId( menuId ) ]
+			[
+				NAVIGATION_POST_KIND,
+				NAVIGATION_POST_POST_TYPE,
+				buildNavigationPostId( menuId ),
+			]
 		);
 
 		hasResolvedNavigationPost.registry = defaultRegistry;
 	} );
 } );
 
-describe( 'getMenuItemForClientId', () => {
-	it( 'gets menu item for client id', () => {
-		const getMenuItem = jest.fn( () => 'menuItem' );
+describe( 'getSelectedMenuId', () => {
+	it( 'returns default selected menu ID (zero)', () => {
+		const state = {};
+		expect( getSelectedMenuId( state ) ).toBe( null );
+	} );
 
-		const registry = {
-			select: jest.fn( () => ( {
-				getMenuItem,
-			} ) ),
-		};
-
-		const state = {
-			mapping: {
-				postId: {
-					123: 'clientId',
-				},
-			},
-		};
-
-		const defaultRegistry = getMenuItemForClientId.registry;
-		getMenuItemForClientId.registry = registry;
-
-		expect( getMenuItemForClientId( state, 'postId', 'clientId' ) ).toBe(
-			'menuItem'
-		);
-
-		expect( registry.select ).toHaveBeenCalledWith( 'core' );
-		expect( getMenuItem ).toHaveBeenCalledWith( '123' );
-
-		getMenuItemForClientId.registry = defaultRegistry;
+	it( 'returns selected menu ID', () => {
+		const state = { selectedMenuId: 10 };
+		expect( getSelectedMenuId( state ) ).toBe( 10 );
 	} );
 } );

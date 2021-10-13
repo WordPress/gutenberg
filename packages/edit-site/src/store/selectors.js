@@ -1,14 +1,34 @@
 /**
  * External dependencies
  */
-import { get } from 'lodash';
+import { get, map, keyBy } from 'lodash';
 import createSelector from 'rememo';
 
 /**
  * WordPress dependencies
  */
+import { store as coreDataStore } from '@wordpress/core-data';
 import { createRegistrySelector } from '@wordpress/data';
 import { uploadMedia } from '@wordpress/media-utils';
+import { isTemplatePart } from '@wordpress/blocks';
+
+/**
+ * Internal dependencies
+ */
+import {
+	MENU_ROOT,
+	MENU_TEMPLATE_PARTS,
+	MENU_TEMPLATES_UNUSED,
+	TEMPLATE_PARTS_SUB_MENUS,
+} from '../components/navigation-sidebar/navigation-panel/constants';
+import {
+	getTemplateLocation,
+	isTemplateSuperseded,
+} from '../components/navigation-sidebar/navigation-panel/template-hierarchy';
+
+/**
+ * @typedef {'template'|'template_type'} TemplateType Template type.
+ */
 
 /**
  * Returns whether the given feature is enabled or not.
@@ -41,7 +61,7 @@ export function __experimentalGetPreviewDeviceType( state ) {
  * @return {Object} Whether the current user can create media or not.
  */
 export const getCanUserCreateMedia = createRegistrySelector( ( select ) => () =>
-	select( 'core' ).canUser( 'create', 'media' )
+	select( coreDataStore ).canUser( 'create', 'media' )
 );
 
 /**
@@ -95,15 +115,23 @@ export function getHomeTemplateId( state ) {
 	return state.homeTemplateId;
 }
 
+function getCurrentEditedPost( state ) {
+	return state.editedPost[ state.editedPost.length - 1 ] || {};
+}
+
+function getPreviousEditedPost( state ) {
+	return state.editedPost[ state.editedPost.length - 2 ] || {};
+}
+
 /**
  * Returns the current edited post type (wp_template or wp_template_part).
  *
  * @param {Object} state Global application state.
  *
- * @return {number?} Template ID.
+ * @return {TemplateType?} Template type.
  */
 export function getEditedPostType( state ) {
-	return state.editedPost.type;
+	return getCurrentEditedPost( state ).type;
 }
 
 /**
@@ -111,10 +139,32 @@ export function getEditedPostType( state ) {
  *
  * @param {Object} state Global application state.
  *
- * @return {number?} Post ID.
+ * @return {string?} Post ID.
  */
 export function getEditedPostId( state ) {
-	return state.editedPost.id;
+	return getCurrentEditedPost( state ).id;
+}
+
+/**
+ * Returns the previous edited post type (wp_template or wp_template_part).
+ *
+ * @param {Object} state Global application state.
+ *
+ * @return {TemplateType?} Template type.
+ */
+export function getPreviousEditedPostType( state ) {
+	return getPreviousEditedPost( state ).type;
+}
+
+/**
+ * Returns the ID of the previous edited template or template part.
+ *
+ * @param {Object} state Global application state.
+ *
+ * @return {string?} Post ID.
+ */
+export function getPreviousEditedPostId( state ) {
+	return getPreviousEditedPost( state ).id;
 }
 
 /**
@@ -125,7 +175,7 @@ export function getEditedPostId( state ) {
  * @return {Object} Page.
  */
 export function getPage( state ) {
-	return state.editedPost.page;
+	return getCurrentEditedPost( state ).page;
 }
 
 /**
@@ -138,6 +188,64 @@ export function getPage( state ) {
 export function getNavigationPanelActiveMenu( state ) {
 	return state.navigationPanel.menu;
 }
+
+/**
+ * Returns the current template or template part's corresponding
+ * navigation panel's sub menu, to be used with `openNavigationPanelToMenu`.
+ *
+ * @param {Object} state Global application state.
+ *
+ * @return {string} The current template or template part's sub menu.
+ */
+export const getCurrentTemplateNavigationPanelSubMenu = createRegistrySelector(
+	( select ) => ( state ) => {
+		const templateType = getEditedPostType( state );
+		const templateId = getEditedPostId( state );
+		const template = templateId
+			? select( coreDataStore ).getEntityRecord(
+					'postType',
+					templateType,
+					templateId
+			  )
+			: null;
+
+		if ( ! template ) {
+			return MENU_ROOT;
+		}
+
+		if ( 'wp_template_part' === templateType ) {
+			return (
+				TEMPLATE_PARTS_SUB_MENUS.find(
+					( submenu ) => submenu.area === template?.area
+				)?.menu || MENU_TEMPLATE_PARTS
+			);
+		}
+
+		const templates = select( coreDataStore ).getEntityRecords(
+			'postType',
+			'wp_template',
+			{
+				per_page: -1,
+			}
+		);
+		const showOnFront = select( coreDataStore ).getEditedEntityRecord(
+			'root',
+			'site'
+		).show_on_front;
+
+		if (
+			isTemplateSuperseded(
+				template.slug,
+				map( templates, 'slug' ),
+				showOnFront
+			)
+		) {
+			return MENU_TEMPLATES_UNUSED;
+		}
+
+		return getTemplateLocation( template.slug );
+	}
+);
 
 /**
  * Returns the current opened/closed state of the navigation panel.
@@ -158,7 +266,23 @@ export function isNavigationOpened( state ) {
  * @return {boolean} True if the inserter panel should be open; false if closed.
  */
 export function isInserterOpened( state ) {
-	return state.blockInserterPanel;
+	return !! state.blockInserterPanel;
+}
+
+/**
+ * Get the insertion point for the inserter.
+ *
+ * @param {Object} state Global application state.
+ *
+ * @return {Object} The root client ID, index to insert at and starting filter value.
+ */
+export function __experimentalGetInsertionPoint( state ) {
+	const {
+		rootClientId,
+		insertionIndex,
+		filterValue,
+	} = state.blockInserterPanel;
+	return { rootClientId, insertionIndex, filterValue };
 }
 
 /**
@@ -171,3 +295,51 @@ export function isInserterOpened( state ) {
 export function isListViewOpened( state ) {
 	return state.listViewPanel;
 }
+
+/**
+ * Returns the template part blocks grouped by areas for the current edited template.
+ *
+ * @param {Object} state Global application state.
+ * @return {Object} Template part blocks by areas.
+ */
+export const getTemplateAreaBlocks = createRegistrySelector(
+	( select ) => ( state ) => {
+		const templateType = getEditedPostType( state );
+		const templateId = getEditedPostId( state );
+		const template = select( coreDataStore ).getEditedEntityRecord(
+			'postType',
+			templateType,
+			templateId
+		);
+
+		const templateParts = select( coreDataStore ).getEntityRecords(
+			'postType',
+			'wp_template_part',
+			{
+				per_page: -1,
+			}
+		);
+		const templatePartsById = keyBy(
+			templateParts,
+			( templatePart ) => templatePart.id
+		);
+
+		const templatePartBlocksByAreas = {};
+
+		for ( const block of template.blocks ?? [] ) {
+			if ( isTemplatePart( block ) ) {
+				const {
+					attributes: { theme, slug },
+				} = block;
+				const templatePartId = `${ theme }//${ slug }`;
+				const templatePart = templatePartsById[ templatePartId ];
+
+				if ( templatePart ) {
+					templatePartBlocksByAreas[ templatePart.area ] = block;
+				}
+			}
+		}
+
+		return templatePartBlocksByAreas;
+	}
+);

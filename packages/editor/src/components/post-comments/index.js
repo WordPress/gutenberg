@@ -6,6 +6,11 @@ import { CheckboxControl } from '@wordpress/components';
 import { compose } from '@wordpress/compose';
 import { withSelect, withDispatch } from '@wordpress/data';
 
+/**
+ * Internal dependencies
+ */
+import { store as editorStore } from '../../store';
+
 function PostComments( { commentStatus = 'open', ...props } ) {
 	const onToggleComments = () =>
 		props.editPost( {
@@ -24,12 +29,12 @@ function PostComments( { commentStatus = 'open', ...props } ) {
 export default compose( [
 	withSelect( ( select ) => {
 		return {
-			commentStatus: select( 'core/editor' ).getEditedPostAttribute(
+			commentStatus: select( editorStore ).getEditedPostAttribute(
 				'comment_status'
 			),
 		};
 	} ),
 	withDispatch( ( dispatch ) => ( {
-		editPost: dispatch( 'core/editor' ).editPost,
+		editPost: dispatch( editorStore ).editPost,
 	} ) ),
 ] )( PostComments );

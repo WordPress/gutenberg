@@ -1,22 +1,30 @@
 /**
+ * External dependencies
+ */
+import { AccessibilityInfo, TouchableHighlight, Platform } from 'react-native';
+
+/**
  * WordPress dependencies
  */
-import { useEffect, useCallback } from '@wordpress/element';
+import { useEffect, useState, useCallback } from '@wordpress/element';
 import { useSelect, useDispatch } from '@wordpress/data';
+import { createBlock } from '@wordpress/blocks';
 import {
-	createBlock,
-	rawHandler,
-	store as blocksStore,
-} from '@wordpress/blocks';
-import { getClipboard } from '@wordpress/components';
+	BottomSheet,
+	BottomSheetConsumer,
+	SearchControl,
+} from '@wordpress/components';
 
 /**
  * Internal dependencies
  */
-
 import InserterSearchResults from './search-results';
 import { store as blockEditorStore } from '../../store';
+import InserterTabs from './tabs';
+import styles from './style.scss';
+import { filterInserterItems } from './utils';
 
+const MIN_ITEMS_FOR_SEARCH = 2;
 function InserterMenu( {
 	onSelect,
 	onDismiss,
@@ -26,6 +34,12 @@ function InserterMenu( {
 	shouldReplaceBlock,
 	insertionIndex,
 } ) {
+	const [ filterValue, setFilterValue ] = useState( '' );
+	const [ showTabs, setShowTabs ] = useState( true );
+	const [ tabIndex, setTabIndex ] = useState( 0 );
+
+	const isIOS = Platform.OS === 'ios';
+
 	const {
 		showInsertionPoint,
 		hideInsertionPoint,
@@ -36,40 +50,40 @@ function InserterMenu( {
 		insertDefaultBlock,
 	} = useDispatch( blockEditorStore );
 
-	const {
-		items,
-		destinationRootClientId,
-		getBlockOrder,
-		getBlockCount,
-		canInsertBlockType,
-	} = useSelect( ( select ) => {
-		const {
-			getInserterItems,
-			getBlockRootClientId,
-			getBlockSelectionEnd,
-			...selectBlockEditorStore
-		} = select( blockEditorStore );
+	const { items, destinationRootClientId, showReusableBlocks } = useSelect(
+		( select ) => {
+			const {
+				getInserterItems,
+				getBlockRootClientId,
+				getBlockSelectionEnd,
+			} = select( blockEditorStore );
 
-		let targetRootClientId = rootClientId;
-		if ( ! targetRootClientId && ! clientId && ! isAppender ) {
-			const end = getBlockSelectionEnd();
-			if ( end ) {
-				targetRootClientId = getBlockRootClientId( end ) || undefined;
+			let targetRootClientId = rootClientId;
+			if ( ! targetRootClientId && ! clientId && ! isAppender ) {
+				const end = getBlockSelectionEnd();
+				if ( end ) {
+					targetRootClientId =
+						getBlockRootClientId( end ) || undefined;
+				}
 			}
+
+			const allItems = getInserterItems( targetRootClientId );
+			const reusableBlockItems = filterInserterItems( allItems, {
+				onlyReusable: true,
+			} );
+
+			return {
+				items: allItems,
+				destinationRootClientId: targetRootClientId,
+				showReusableBlocks: !! reusableBlockItems.length,
+			};
 		}
+	);
 
-		return {
-			items: getInserterItems( targetRootClientId ),
-			destinationRootClientId: targetRootClientId,
-			getBlockOrder: selectBlockEditorStore.getBlockOrder,
-			getBlockCount: selectBlockEditorStore.getBlockCount,
-			canInsertBlockType: selectBlockEditorStore.canInsertBlockType,
-		};
-	} );
-
-	const { getBlockType } = useSelect( ( select ) => select( blocksStore ) );
+	const { getBlockOrder, getBlockCount } = useSelect( blockEditorStore );
 
 	useEffect( () => {
+		// Show/Hide insertion point on Mount/Dismount
 		if ( shouldReplaceBlock ) {
 			const count = getBlockCount();
 			// Check if there is a rootClientId because that means it is a nested replaceable block
@@ -86,14 +100,14 @@ function InserterMenu( {
 				removeBlock( blockToReplace, false );
 			}
 		}
-		// Show/Hide insertion point on Mount/Dismount
 		showInsertionPoint( destinationRootClientId, insertionIndex );
+
 		return hideInsertionPoint;
 	}, [] );
 
 	const onClose = useCallback( () => {
-		// If should replace but didn't insert any block
-		// re-insert default block.
+		// if should replace but didn't insert any block
+		// re-insert default block
 		if ( shouldReplaceBlock ) {
 			insertDefaultBlock( {}, destinationRootClientId, insertionIndex );
 		}
@@ -110,57 +124,110 @@ function InserterMenu( {
 				innerBlocks
 			);
 
-			insertBlock( newBlock, insertionIndex, destinationRootClientId );
+			insertBlock(
+				newBlock,
+				insertionIndex,
+				destinationRootClientId,
+				true,
+				{ source: 'inserter_menu' }
+			);
 		},
 		[ insertBlock, destinationRootClientId, insertionIndex ]
 	);
 
-	/**
-	 * Processes the inserter items to check
-	 * if there's any copied block in the clipboard
-	 * to add it as an extra item
-	 */
-	function getItems() {
-		// Filter out reusable blocks (they will be added in another tab)
-		const itemsToDisplay = items.filter(
-			( { name } ) => name !== 'core/block'
-		);
+	const onSelectItem = useCallback(
+		( item ) => {
+			// Avoid a focus loop, see https://github.com/WordPress/gutenberg/issues/30562
+			if ( Platform.OS === 'ios' ) {
+				AccessibilityInfo.isScreenReaderEnabled().then( ( enabled ) => {
+					// In testing, the bug focus loop needed a longer timeout when VoiceOver was enabled
+					const timeout = enabled ? 200 : 100;
+					// eslint-disable-next-line @wordpress/react-no-unsafe-timeout
+					setTimeout( () => {
+						onInsert( item );
+					}, timeout );
+				} );
+			} else {
+				onInsert( item );
+			}
+			onSelect( item );
+		},
+		[ onInsert, onSelect ]
+	);
 
-		const clipboard = getClipboard();
-		let clipboardBlock = rawHandler( { HTML: clipboard } )[ 0 ];
+	const onChangeSearch = useCallback(
+		( value ) => {
+			setFilterValue( value );
+		},
+		[ setFilterValue ]
+	);
 
-		const canAddClipboardBlock = canInsertBlockType(
-			clipboardBlock?.name,
-			destinationRootClientId
-		);
+	const onKeyboardShow = useCallback( () => setShowTabs( false ), [
+		setShowTabs,
+	] );
 
-		if ( ! canAddClipboardBlock ) {
-			return itemsToDisplay;
-		}
+	const onKeyboardHide = useCallback( () => setShowTabs( true ), [
+		setShowTabs,
+	] );
 
-		const { icon, name } = getBlockType( clipboardBlock.name );
-		const { attributes: initialAttributes, innerBlocks } = clipboardBlock;
-
-		clipboardBlock = {
-			id: 'clipboard',
-			name,
-			icon,
-			initialAttributes,
-			innerBlocks,
-		};
-
-		return [ clipboardBlock, ...itemsToDisplay ];
-	}
+	const showSearchForm = items.length > MIN_ITEMS_FOR_SEARCH;
+	const isFullScreen = ! isIOS && showSearchForm;
 
 	return (
-		<InserterSearchResults
+		<BottomSheet
+			isVisible={ true }
 			onClose={ onClose }
-			items={ getItems() }
-			onSelect={ ( item ) => {
-				onInsert( item );
-				onSelect( item );
-			} }
-		/>
+			onKeyboardShow={ onKeyboardShow }
+			onKeyboardHide={ onKeyboardHide }
+			header={
+				<>
+					{ showSearchForm && (
+						<SearchControl
+							onChange={ onChangeSearch }
+							value={ filterValue }
+						/>
+					) }
+					{ showTabs && ! filterValue && (
+						<InserterTabs.Control
+							onChangeTab={ setTabIndex }
+							showReusableBlocks={ showReusableBlocks }
+						/>
+					) }
+				</>
+			}
+			hasNavigation
+			setMinHeightToMaxHeight={ true }
+			contentStyle={ styles[ 'inserter-menu__list' ] }
+			isFullScreen={ isFullScreen }
+			allowDragIndicator={ true }
+		>
+			<BottomSheetConsumer>
+				{ ( { listProps } ) => (
+					<TouchableHighlight
+						accessible={ false }
+						style={ styles[ 'inserter-menu__list-wrapper' ] }
+					>
+						{ ! showTabs || filterValue ? (
+							<InserterSearchResults
+								rootClientId={ rootClientId }
+								filterValue={ filterValue }
+								onSelect={ onSelectItem }
+								listProps={ listProps }
+								isFullScreen={ isFullScreen }
+							/>
+						) : (
+							<InserterTabs
+								rootClientId={ rootClientId }
+								listProps={ listProps }
+								tabIndex={ tabIndex }
+								onSelect={ onSelectItem }
+								showReusableBlocks={ showReusableBlocks }
+							/>
+						) }
+					</TouchableHighlight>
+				) }
+			</BottomSheetConsumer>
+		</BottomSheet>
 	);
 }
 

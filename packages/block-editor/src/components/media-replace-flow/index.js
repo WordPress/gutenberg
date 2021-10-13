@@ -13,13 +13,12 @@ import {
 	FormFileUpload,
 	NavigableMenu,
 	MenuItem,
-	ToolbarGroup,
 	ToolbarButton,
 	Dropdown,
 	withFilters,
 } from '@wordpress/components';
 import { withDispatch, useSelect } from '@wordpress/data';
-import { DOWN, TAB, ESCAPE } from '@wordpress/keycodes';
+import { DOWN } from '@wordpress/keycodes';
 import { compose } from '@wordpress/compose';
 import { upload, media as mediaIcon } from '@wordpress/icons';
 import { store as noticesStore } from '@wordpress/notices';
@@ -43,6 +42,7 @@ const MediaReplaceFlow = ( {
 	name = __( 'Replace' ),
 	createNotice,
 	removeNotice,
+	children,
 } ) => {
 	const [ mediaURLValue, setMediaURLValue ] = useState( mediaURL );
 	const mediaUpload = useSelect( ( select ) => {
@@ -78,8 +78,9 @@ const MediaReplaceFlow = ( {
 	};
 
 	const selectMedia = ( media ) => {
-		onSelect( media );
 		setMediaURLValue( media.url );
+		// Calling `onSelect` after the state update since it might unmount the component.
+		onSelect( media );
 		speak( __( 'The media file has been replaced' ) );
 		removeNotice( errorNoticeID );
 	};
@@ -105,7 +106,6 @@ const MediaReplaceFlow = ( {
 	const openOnArrowDown = ( event ) => {
 		if ( event.keyCode === DOWN ) {
 			event.preventDefault();
-			event.stopPropagation();
 			event.target.click();
 		}
 	};
@@ -119,17 +119,15 @@ const MediaReplaceFlow = ( {
 			popoverProps={ POPOVER_PROPS }
 			contentClassName="block-editor-media-replace-flow__options"
 			renderToggle={ ( { isOpen, onToggle } ) => (
-				<ToolbarGroup className="media-replace-flow">
-					<ToolbarButton
-						ref={ editMediaButtonRef }
-						aria-expanded={ isOpen }
-						aria-haspopup="true"
-						onClick={ onToggle }
-						onKeyDown={ openOnArrowDown }
-					>
-						{ name }
-					</ToolbarButton>
-				</ToolbarGroup>
+				<ToolbarButton
+					ref={ editMediaButtonRef }
+					aria-expanded={ isOpen }
+					aria-haspopup="true"
+					onClick={ onToggle }
+					onKeyDown={ openOnArrowDown }
+				>
+					{ name }
+				</ToolbarButton>
 			) }
 			renderContent={ ( { onClose } ) => (
 				<>
@@ -164,26 +162,11 @@ const MediaReplaceFlow = ( {
 								} }
 							/>
 						</MediaUploadCheck>
+						{ children }
 					</NavigableMenu>
 					{ onSelectURL && (
 						// eslint-disable-next-line jsx-a11y/no-noninteractive-element-interactions
-						<form
-							className="block-editor-media-flow__url-input"
-							onKeyDown={ ( event ) => {
-								if (
-									! [ TAB, ESCAPE ].includes( event.keyCode )
-								) {
-									event.stopPropagation();
-								}
-							} }
-							onKeyPress={ ( event ) => {
-								if (
-									! [ TAB, ESCAPE ].includes( event.keyCode )
-								) {
-									event.stopPropagation();
-								}
-							} }
-						>
+						<form className="block-editor-media-flow__url-input">
 							<span className="block-editor-media-replace-flow__image-url-label">
 								{ __( 'Current media URL:' ) }
 							</span>

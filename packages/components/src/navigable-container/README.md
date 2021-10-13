@@ -4,7 +4,7 @@
 
 `NavigableContainer` is exported as two classes: `NavigableMenu` and `TabbableContainer`. `NavigableContainer` itself is **not** exported. `NavigableMenu` and `TabbableContainer` have the props listed below. Any other props will be passed through to the `div`.
 
-----
+---
 
 ## Props
 
@@ -14,24 +14,24 @@ These are the props that `NavigableMenu` and `TabbableContainer`. Any props whic
 
 A callback invoked when the menu navigates to one of its children passing the index and child as an argument
 
-- Type: `Function`
-- Required: No
+-   Type: `Function`
+-   Required: No
 
 ### cycle
 
 A boolean which tells the component whether or not to cycle from the end back to the beginning and vice versa.
 
-- Type: `Boolean`
-- Required: No
-- default: true
+-   Type: `Boolean`
+-   Required: No
+-   default: true
 
 ### orientation (NavigableMenu only)
 
 The orientation of the menu. It could be "vertical", "horizontal" or "both"
 
-- Type: `String`
-- Required: No
-- Default: `"vertical"`
+-   Type: `String`
+-   Required: No
+-   Default: `"vertical"`
 
 ## Classes
 
@@ -46,7 +46,11 @@ A `TabbableContainer` will only be navigated using the `tab` key. Every intended
 ### Usage
 
 ```jsx
-import { NavigableMenu, TabbableContainer, Button } from '@wordpress/components';
+import {
+	NavigableMenu,
+	TabbableContainer,
+	Button,
+} from '@wordpress/components';
 
 function onNavigate( index, target ) {
 	console.log( `Navigates to ${ index }`, target );
@@ -56,17 +60,25 @@ const MyNavigableContainer = () => (
 	<div>
 		<span>Navigable Menu:</span>
 		<NavigableMenu onNavigate={ onNavigate } orientation="horizontal">
-			<Button isSecondary>Item 1</Button>
-			<Button isSecondary>Item 2</Button>
-			<Button isSecondary>Item 3</Button>
+			<Button variant="secondary">Item 1</Button>
+			<Button variant="secondary">Item 2</Button>
+			<Button variant="secondary">Item 3</Button>
 		</NavigableMenu>
-		
+
 		<span>Tabbable Container:</span>
 		<TabbableContainer onNavigate={ onNavigate }>
-			<Button isSecondary tabIndex="0">Section 1</Button>
-			<Button isSecondary tabIndex="0">Section 2</Button>
-			<Button isSecondary tabIndex="0">Section 3</Button>
-			<Button isSecondary tabIndex="0">Section 4</Button>
+			<Button variant="secondary" tabIndex="0">
+				Section 1
+			</Button>
+			<Button variant="secondary" tabIndex="0">
+				Section 2
+			</Button>
+			<Button variant="secondary" tabIndex="0">
+				Section 3
+			</Button>
+			<Button variant="secondary" tabIndex="0">
+				Section 4
+			</Button>
 		</TabbableContainer>
 	</div>
 );

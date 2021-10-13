@@ -16,7 +16,7 @@ import { edit, close, chevronDown, chevronUp, plus } from '@wordpress/icons';
  */
 import Dropdown from '../dropdown';
 import CircularOptionPicker from '../circular-option-picker';
-import ColorPicker from '../color-picker';
+import { ColorPicker } from '../color-picker';
 import Button from '../button';
 import TextControl from '../text-control';
 import BaseControl from '../base-control';
@@ -136,7 +136,7 @@ function ColorOption( {
 									onConfirm();
 								}
 							} }
-							isPrimary
+							variant="primary"
 						>
 							{ confirmLabel }
 						</Button>
@@ -314,7 +314,7 @@ export default function ColorEdit( {
 				{ !! canReset && (
 					<Button
 						isSmall
-						isSecondary
+						variant="secondary"
 						className="components-color-edit__reset-button"
 						onClick={ () => onChange() }
 					>

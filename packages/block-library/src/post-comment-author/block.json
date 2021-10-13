@@ -1,7 +1,11 @@
 {
 	"apiVersion": 2,
 	"name": "core/post-comment-author",
+	"title": "Post Comment Author",
 	"category": "design",
+	"parent": [ "core/post-comment" ],
+	"description": "Post comment author.",
+	"textdomain": "default",
 	"usesContext": [ "commentId" ],
 	"supports": {
 		"html": false

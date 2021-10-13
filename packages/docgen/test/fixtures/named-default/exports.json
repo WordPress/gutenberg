@@ -12,10 +12,7 @@
 			"column": 49
 		}
 	},
-	"range": [
-		0,
-		49
-	],
+	"range": [ 0, 49 ],
 	"declaration": null,
 	"specifiers": [
 		{
@@ -32,10 +29,7 @@
 					"column": 16
 				}
 			},
-			"range": [
-				9,
-				16
-			],
+			"range": [ 9, 16 ],
 			"local": {
 				"type": "Identifier",
 				"start": 9,
@@ -50,10 +44,7 @@
 						"column": 16
 					}
 				},
-				"range": [
-					9,
-					16
-				],
+				"range": [ 9, 16 ],
 				"name": "default"
 			},
 			"exported": {
@@ -70,10 +61,7 @@
 						"column": 16
 					}
 				},
-				"range": [
-					9,
-					16
-				],
+				"range": [ 9, 16 ],
 				"name": "default"
 			}
 		}
@@ -92,10 +80,7 @@
 				"column": 48
 			}
 		},
-		"range": [
-			24,
-			48
-		],
+		"range": [ 24, 48 ],
 		"value": "./named-default-module",
 		"raw": "'./named-default-module'"
 	}

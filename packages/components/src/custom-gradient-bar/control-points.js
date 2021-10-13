@@ -2,6 +2,7 @@
  * External dependencies
  */
 import classnames from 'classnames';
+import { colord } from 'colord';
 
 /**
  * WordPress dependencies
@@ -10,15 +11,15 @@ import { useInstanceId } from '@wordpress/compose';
 import { useEffect, useRef, useState } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
 import { plus } from '@wordpress/icons';
+import { LEFT, RIGHT } from '@wordpress/keycodes';
 
 /**
  * Internal dependencies
  */
 import Button from '../button';
-import ColorPicker from '../color-picker';
+import { ColorPicker } from '../color-picker';
 import Dropdown from '../dropdown';
-import KeyboardShortcuts from '../keyboard-shortcuts';
-import VisuallyHidden from '../visually-hidden';
+import { VisuallyHidden } from '../visually-hidden';
 
 import {
 	addControlPoint,
@@ -36,46 +37,11 @@ import {
 	KEYBOARD_CONTROL_POINT_VARIATION,
 } from './constants';
 
-function ControlPointKeyboardMove( { value: position, onChange, children } ) {
-	const shortcuts = {
-		right( event ) {
-			// Stop propagation of the key press event to avoid focus moving
-			// to another editor area.
-			event.stopPropagation();
-			const newPosition = clampPercent(
-				position + KEYBOARD_CONTROL_POINT_VARIATION
-			);
-			onChange( newPosition );
-		},
-		left( event ) {
-			// Stop propagation of the key press event to avoid focus moving
-			// to another editor area.
-			event.stopPropagation();
-			const newPosition = clampPercent(
-				position - KEYBOARD_CONTROL_POINT_VARIATION
-			);
-			onChange( newPosition );
-		},
-	};
-
-	return (
-		<KeyboardShortcuts shortcuts={ shortcuts }>
-			{ children }
-		</KeyboardShortcuts>
-	);
-}
-
-function ControlPointButton( {
-	isOpen,
-	position,
-	color,
-	onChange,
-	...additionalProps
-} ) {
+function ControlPointButton( { isOpen, position, color, ...additionalProps } ) {
 	const instanceId = useInstanceId( ControlPointButton );
 	const descriptionId = `components-custom-gradient-picker__control-point-button-description-${ instanceId }`;
 	return (
-		<ControlPointKeyboardMove value={ position } onChange={ onChange }>
+		<>
 			<Button
 				aria-label={ sprintf(
 					// translators: %1$s: gradient position e.g: 70, %2$s: gradient color code e.g: rgb(52,121,151).
@@ -104,11 +70,13 @@ function ControlPointButton( {
 					'Use your left or right arrow keys or drag and drop with the mouse to change the gradient position. Press the button to change the color or remove the control point.'
 				) }
 			</VisuallyHidden>
-		</ControlPointKeyboardMove>
+		</>
 	);
 }
 
 function ControlPoints( {
+	disableRemove,
+	disableAlpha,
 	gradientPickerDomRef,
 	ignoreMarkerPosition,
 	value: controlPoints,
@@ -206,49 +174,74 @@ function ControlPoints( {
 									);
 								}
 							} }
+							onKeyDown={ ( event ) => {
+								if ( event.keyCode === LEFT ) {
+									// Stop propagation of the key press event to avoid focus moving
+									// to another editor area.
+									event.stopPropagation();
+									onChange(
+										updateControlPointPosition(
+											controlPoints,
+											index,
+											clampPercent(
+												point.position -
+													KEYBOARD_CONTROL_POINT_VARIATION
+											)
+										)
+									);
+								} else if ( event.keyCode === RIGHT ) {
+									// Stop propagation of the key press event to avoid focus moving
+									// to another editor area.
+									event.stopPropagation();
+									onChange(
+										updateControlPointPosition(
+											controlPoints,
+											index,
+											clampPercent(
+												point.position +
+													KEYBOARD_CONTROL_POINT_VARIATION
+											)
+										)
+									);
+								}
+							} }
 							isOpen={ isOpen }
 							position={ point.position }
 							color={ point.color }
-							onChange={ ( newPosition ) => {
-								onChange(
-									updateControlPointPosition(
-										controlPoints,
-										index,
-										newPosition
-									)
-								);
-							} }
 						/>
 					) }
 					renderContent={ ( { onClose } ) => (
 						<>
 							<ColorPicker
+								disableAlpha={ disableAlpha }
 								color={ point.color }
-								onChangeComplete={ ( { color } ) => {
+								onChangeComplete={ ( { rgb } ) => {
 									onChange(
 										updateControlPointColor(
 											controlPoints,
 											index,
-											color.toRgbString()
+											colord( rgb ).toRgbString()
 										)
 									);
 								} }
 							/>
-							<Button
-								className="components-custom-gradient-picker__remove-control-point"
-								onClick={ () => {
-									onChange(
-										removeControlPoint(
-											controlPoints,
-											index
-										)
-									);
-									onClose();
-								} }
-								isLink
-							>
-								{ __( 'Remove Control Point' ) }
-							</Button>
+							{ ! disableRemove && (
+								<Button
+									className="components-custom-gradient-picker__remove-control-point"
+									onClick={ () => {
+										onChange(
+											removeControlPoint(
+												controlPoints,
+												index
+											)
+										);
+										onClose();
+									} }
+									variant="link"
+								>
+									{ __( 'Remove Control Point' ) }
+								</Button>
+							) }
 						</>
 					) }
 					popoverProps={ COLOR_POPOVER_PROPS }
@@ -264,6 +257,7 @@ function InsertPoint( {
 	onOpenInserter,
 	onCloseInserter,
 	insertPosition,
+	disableAlpha,
 } ) {
 	const [ alreadyInsertedPoint, setAlreadyInsertedPoint ] = useState( false );
 	return (
@@ -297,13 +291,14 @@ function InsertPoint( {
 			) }
 			renderContent={ () => (
 				<ColorPicker
-					onChangeComplete={ ( { color } ) => {
+					disableAlpha={ disableAlpha }
+					onChangeComplete={ ( { rgb } ) => {
 						if ( ! alreadyInsertedPoint ) {
 							onChange(
 								addControlPoint(
 									controlPoints,
 									insertPosition,
-									color.toRgbString()
+									colord( rgb ).toRgbString()
 								)
 							);
 							setAlreadyInsertedPoint( true );
@@ -312,7 +307,7 @@ function InsertPoint( {
 								updateControlPointColorByPosition(
 									controlPoints,
 									insertPosition,
-									color.toRgbString()
+									colord( rgb ).toRgbString()
 								)
 							);
 						}

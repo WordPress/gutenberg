@@ -68,27 +68,11 @@ module.exports = async function destroy( { spinner, debug } ) {
 
 	const directoryHash = path.basename( workDirectoryPath );
 
-	spinner.text = 'Removing docker networks and volumes.';
-	const getVolumes = `docker volume ls | grep "${ directoryHash }" | awk '/ / { print $2 }'`;
-	const removeVolumes = `docker volume rm $(${ getVolumes })`;
+	spinner.text = 'Removing docker volumes.';
+	await removeDockerItems( 'volume', directoryHash );
 
-	const getNetworks = `docker network ls | grep "${ directoryHash }" | awk '/ / { print $1 }'`;
-	const removeNetworks = `docker network rm $(${ getNetworks })`;
-
-	const command = `${ removeVolumes } && ${ removeNetworks }`;
-
-	if ( debug ) {
-		spinner.info(
-			`Running command to remove volumes and networks:\n${ command }\n`
-		);
-	}
-
-	const { stdout } = await exec( command );
-	if ( debug && stdout ) {
-		// Disable reason: Logging information in debug mode.
-		// eslint-disable-next-line no-console
-		console.log( `Removed volumes and networks:\n${ stdout }` );
-	}
+	spinner.text = 'Removing docker networks.';
+	await removeDockerItems( 'network', directoryHash );
 
 	spinner.text = 'Removing local files.';
 
@@ -96,3 +80,22 @@ module.exports = async function destroy( { spinner, debug } ) {
 
 	spinner.text = 'Removed WordPress environment.';
 };
+
+/**
+ * Removes docker items, like networks or volumes, matching the given name.
+ *
+ * @param {string} itemType The item type, like "network" or "volume"
+ * @param {string} name     Remove items whose name match this string.
+ */
+async function removeDockerItems( itemType, name ) {
+	const { stdout: items } = await exec(
+		`docker ${ itemType } ls -q --filter name=${ name }`
+	);
+	if ( items ) {
+		await exec(
+			`docker ${ itemType } rm ${ items
+				.split( '\n' ) // TODO: use os.EOL?
+				.join( ' ' ) }`
+		);
+	}
+}
