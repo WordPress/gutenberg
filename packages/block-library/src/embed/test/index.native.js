@@ -51,6 +51,8 @@ const VIDEO_EMBED_SUCCESS_RESPONSE = {
 };
 
 // Embed block HTML examples
+const EMPTY_EMBED_HTML = '<!-- wp:embed /-->';
+const EMPTY_URL_EMBED_HTML = '<!-- wp:embed {"url":""} /-->';
 const RICH_TEXT_EMBED_HTML = `<!-- wp:embed {"url":"https://twitter.com/notnownikki","type":"rich","providerNameSlug":"twitter","responsive":true} -->
 <figure class="wp-block-embed is-type-rich is-provider-twitter wp-block-embed-twitter"><div class="wp-block-embed__wrapper">
 https://twitter.com/notnownikki
@@ -103,8 +105,11 @@ afterAll( () => {
 describe( 'Embed block', () => {
 	describe( 'Block insertion', () => {
 		it( 'inserts generic embed block', async () => {
+			const initialHtml = '';
+			const expectedHtml = EMPTY_EMBED_HTML;
+
 			const { getByA11yLabel, getByText } = await initializeEditor( {
-				initialHtml: '',
+				initialHtml,
 			} );
 
 			// Open the inserter menu
@@ -122,13 +127,18 @@ describe( 'Embed block', () => {
 			const embedBlockName = within( embedblock ).getByText( 'Embed' );
 
 			expect( embedBlockName ).toBeDefined();
-			expect( getEditorHtml() ).toBe( '<!-- wp:embed /-->' );
+			expect( getEditorHtml() ).toBe( expectedHtml );
 		} );
 
 		MOST_USED_PROVIDERS.forEach( ( { attributes, title } ) =>
 			it( `inserts ${ title } embed block`, async () => {
+				const initialHtml = '';
+				const expectedHtml = `<!-- wp:embed ${ JSON.stringify(
+					attributes
+				) } /-->`;
+
 				const { getByA11yLabel, getByText } = await initializeEditor( {
-					initialHtml: '',
+					initialHtml,
 				} );
 
 				// Open the inserter menu
@@ -146,22 +156,21 @@ describe( 'Embed block', () => {
 				const embedBlockName = within( embedblock ).getByText( title );
 
 				expect( embedBlockName ).toBeDefined();
-				expect( getEditorHtml() ).toBe(
-					`<!-- wp:embed ${ JSON.stringify( attributes ) } /-->`
-				);
+				expect( getEditorHtml() ).toBe( expectedHtml );
 			} )
 		);
 	} );
 
 	describe( 'Set URL upon block insertion', () => {
 		it( 'sets empty URL when dismissing edit URL modal', async () => {
+			const initialHtml = '';
+			const expectedHtml = EMPTY_URL_EMBED_HTML;
+
 			const {
 				getByA11yLabel,
 				getByText,
 				getByTestId,
-			} = await initializeEditor( {
-				initialHtml: '',
-			} );
+			} = await initializeEditor( { initialHtml } );
 
 			// Open the inserter menu
 			fireEvent.press(
@@ -179,19 +188,20 @@ describe( 'Embed block', () => {
 			fireEvent( embedEditURLModal, 'backdropPress' );
 			fireEvent( embedEditURLModal, MODAL_DISMISS_EVENT );
 
-			expect( getEditorHtml() ).toBe( '<!-- wp:embed {"url":""} /-->' );
+			expect( getEditorHtml() ).toBe( expectedHtml );
 		} );
 
 		it( 'sets a valid URL when dismissing edit URL modal', async () => {
+			const initialHtml = '';
+			const expectedHtml = RICH_TEXT_EMBED_HTML;
+			const expectedURL = 'https://twitter.com/notnownikki';
+
 			const {
 				getByA11yLabel,
 				getByText,
 				getByPlaceholderText,
 				getByTestId,
-			} = await initializeEditor( {
-				initialHtml: '',
-			} );
-			const expectedURL = 'https://twitter.com/notnownikki';
+			} = await initializeEditor( { initialHtml } );
 
 			// Open the inserter menu
 			fireEvent.press(
@@ -220,16 +230,19 @@ describe( 'Embed block', () => {
 			);
 
 			expect( editURLButton ).toBeDefined();
-			expect( getEditorHtml() ).toBe( RICH_TEXT_EMBED_HTML );
+			expect( getEditorHtml() ).toBe( expectedHtml );
 		} );
 	} );
 
 	describe( 'Set URL by tapping on an empty block', () => {
 		it( 'sets empty URL when dismissing edit URL modal', async () => {
+			const initialHtml = EMPTY_EMBED_HTML;
+			const expectedHtml = EMPTY_URL_EMBED_HTML;
+
 			const waitForElement = ( { getByA11yLabel } ) =>
 				getByA11yLabel( /Embed Block\. Row 1/ );
 			const { element, getByText, getByTestId } = await initializeEditor(
-				{ initialHtml: '<!-- wp:embed /-->' },
+				{ initialHtml },
 				{ waitForElement }
 			);
 
@@ -247,10 +260,14 @@ describe( 'Embed block', () => {
 			fireEvent( embedEditURLModal, 'backdropPress' );
 			fireEvent( embedEditURLModal, MODAL_DISMISS_EVENT );
 
-			expect( getEditorHtml() ).toBe( '<!-- wp:embed {"url":""} /-->' );
+			expect( getEditorHtml() ).toBe( expectedHtml );
 		} );
 
 		it( 'sets a valid URL when dismissing edit URL modal', async () => {
+			const initialHtml = EMPTY_EMBED_HTML;
+			const expectedHtml = RICH_TEXT_EMBED_HTML;
+			const expectedURL = 'https://twitter.com/notnownikki';
+
 			const waitForElement = ( { getByA11yLabel } ) =>
 				getByA11yLabel( /Embed Block\. Row 1/ );
 			const {
@@ -259,11 +276,7 @@ describe( 'Embed block', () => {
 				getByText,
 				getByPlaceholderText,
 				getByTestId,
-			} = await initializeEditor(
-				{ initialHtml: '<!-- wp:embed /-->' },
-				{ waitForElement }
-			);
-			const expectedURL = 'https://twitter.com/notnownikki';
+			} = await initializeEditor( { initialHtml }, { waitForElement } );
 
 			// Select block
 			fireEvent.press( element );
@@ -290,22 +303,21 @@ describe( 'Embed block', () => {
 			);
 
 			expect( editURLButton ).toBeDefined();
-			expect( getEditorHtml() ).toBe( RICH_TEXT_EMBED_HTML );
+			expect( getEditorHtml() ).toBe( expectedHtml );
 		} );
 	} );
 
 	describe( 'Edit URL', () => {
 		it( 'keeps the previous URL if no URL is set', async () => {
+			const initialHtml = RICH_TEXT_EMBED_HTML;
+
 			const waitForElement = ( { getByA11yLabel } ) =>
 				getByA11yLabel( /Embed Block\. Row 1/ );
 			const {
 				element,
 				getByA11yLabel,
 				getByTestId,
-			} = await initializeEditor(
-				{ initialHtml: RICH_TEXT_EMBED_HTML },
-				{ waitForElement }
-			);
+			} = await initializeEditor( { initialHtml }, { waitForElement } );
 
 			// Select block
 			fireEvent.press( element );
@@ -323,10 +335,15 @@ describe( 'Embed block', () => {
 			fireEvent( embedEditURLModal, 'backdropPress' );
 			fireEvent( embedEditURLModal, MODAL_DISMISS_EVENT );
 
-			expect( getEditorHtml() ).toBe( RICH_TEXT_EMBED_HTML );
+			expect( getEditorHtml() ).toBe( initialHtml );
 		} );
 
 		it( 'replaces URL', async () => {
+			const initialHtml = RICH_TEXT_EMBED_HTML;
+			const expectedHtml = VIDEO_EMBED_HTML;
+			const initialURL = 'https://twitter.com/notnownikki';
+			const expectedURL = 'https://www.youtube.com/watch?v=lXMskKTw3Bc';
+
 			const waitForElement = ( { getByA11yLabel } ) =>
 				getByA11yLabel( /Embed Block\. Row 1/ );
 			const {
@@ -334,12 +351,7 @@ describe( 'Embed block', () => {
 				getByA11yLabel,
 				getByDisplayValue,
 				getByTestId,
-			} = await initializeEditor(
-				{ initialHtml: RICH_TEXT_EMBED_HTML },
-				{ waitForElement }
-			);
-			const previousURL = 'https://twitter.com/notnownikki';
-			const expectedURL = 'https://www.youtube.com/watch?v=lXMskKTw3Bc';
+			} = await initializeEditor( { initialHtml }, { waitForElement } );
 
 			// Select block
 			fireEvent.press( element );
@@ -355,11 +367,11 @@ describe( 'Embed block', () => {
 
 			// Start editing link
 			fireEvent.press(
-				getByA11yLabel( `Twitter link, ${ previousURL }` )
+				getByA11yLabel( `Twitter link, ${ initialURL }` )
 			);
 
 			// Replace URL
-			const linkTextInput = getByDisplayValue( previousURL );
+			const linkTextInput = getByDisplayValue( initialURL );
 			fireEvent( linkTextInput, 'focus' );
 			fireEvent.changeText( linkTextInput, expectedURL );
 
@@ -373,7 +385,7 @@ describe( 'Embed block', () => {
 			);
 
 			expect( youtubeLinkField ).toBeDefined();
-			expect( getEditorHtml() ).toBe( VIDEO_EMBED_HTML );
+			expect( getEditorHtml() ).toBe( expectedHtml );
 		} );
 
 		it( 'keeps the previous URL if an invalid URL is set', async () => {
