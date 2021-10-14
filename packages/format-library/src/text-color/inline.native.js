@@ -2,7 +2,6 @@
  * External dependencies
  */
 import { get } from 'lodash';
-import { Text } from 'react-native';
 
 /**
  * WordPress dependencies
@@ -16,22 +15,14 @@ import {
 	applyFormat,
 	removeFormat,
 	getActiveFormat,
-	useAnchorRef,
 } from '@wordpress/rich-text';
 import {
-	ColorPalette,
 	getColorClassName,
-	getColorObjectByColorValue,
 	getColorObjectByAttributeValues,
 	store as blockEditorStore,
 	useSetting,
 } from '@wordpress/block-editor';
-import {
-	BottomSheet,
-	BottomSheetConsumer,
-	ColorSettings,
-} from '@wordpress/components';
-import { __ } from '@wordpress/i18n';
+import { BottomSheet, ColorSettings } from '@wordpress/components';
 
 /**
  * Internal dependencies
@@ -83,7 +74,7 @@ export function getActiveColors( value, name, colorSettings ) {
 
 function setColors( value, name, colorSettings, colors ) {
 	const { color, backgroundColor } = {
-		// ...getActiveColors( value, name, colorSettings ),
+		...getActiveColors( value, name, colorSettings ),
 		...colors,
 	};
 
@@ -114,10 +105,6 @@ function setColors( value, name, colorSettings, colors ) {
 	}
 
 	if ( styles.length ) attributes.style = styles.join( ';' );
-	if ( classNames.length ) attributes.class = classNames.join( ' ' );
-	console.log( value );
-	console.log( name );
-	console.log( attributes );
 	return applyFormat( value, { type: name, attributes } );
 }
 
@@ -134,10 +121,13 @@ function ColorPicker( { name, value, onChange } ) {
 	} );
 	const onColorChange = useCallback(
 		( color ) => {
-			console.log( color );
-			onChange(
-				setColors( value, name, colors, { [ property ]: color } )
-			);
+			if ( color !== '' ) {
+				onChange(
+					setColors( value, name, colors, { [ property ]: color } )
+				);
+			} else {
+				onChange( removeFormat( value, name ) );
+			}
 		},
 		[ colors, onChange, property ]
 	);
@@ -151,26 +141,12 @@ function ColorPicker( { name, value, onChange } ) {
 			colorValue={ activeColors[ property ] }
 			onColorChange={ onColorChange }
 			defaultSettings={ colorSettings }
+			hideNavigation
 		/>
 	);
-
-	// return (
-	// 	<ColorPalette
-	// 		value={ activeColors[ property ] }
-	// 		onChange={ onColorChange }
-	// 	/>
-	// );
 }
 
-export default function InlineColorUI( {
-	name,
-	value,
-	onChange,
-	onClose,
-	contentRef,
-} ) {
-	const anchorRef = useAnchorRef( { ref: contentRef, value, settings } );
-
+export default function InlineColorUI( { name, value, onChange, onClose } ) {
 	return (
 		<BottomSheet
 			isVisible
@@ -178,11 +154,10 @@ export default function InlineColorUI( {
 			hideHeader
 			contentStyle={ { paddingLeft: 0, paddingRight: 0 } }
 			hasNavigation
-			// contentStyle={ styles.contentStyle }
-			// leftButton={ leftButton }
+			leftButton={ null }
 		>
 			<BottomSheet.NavigationContainer animate main>
-				<BottomSheet.NavigationScreen name={ 'text-color' }>
+				<BottomSheet.NavigationScreen name="text-color">
 					<ColorPicker
 						name={ name }
 						value={ value }
@@ -192,34 +167,4 @@ export default function InlineColorUI( {
 			</BottomSheet.NavigationContainer>
 		</BottomSheet>
 	);
-
-	// return (
-	// 	<Popover
-	// 		onClose={ onClose }
-	// 		className="components-inline-color-popover"
-	// 		anchorRef={ anchorRef }
-	// 	>
-	// 		<TabPanel
-	// 			tabs={ [
-	// 				{
-	// 					name: 'color',
-	// 					title: __( 'Text' ),
-	// 				},
-	// 				{
-	// 					name: 'backgroundColor',
-	// 					title: __( 'Background' ),
-	// 				},
-	// 			] }
-	// 		>
-	// 			{ ( tab ) => (
-	// 				<ColorPicker
-	// 					name={ name }
-	// 					property={ tab.name }
-	// 					value={ value }
-	// 					onChange={ onChange }
-	// 				/>
-	// 			) }
-	// 		</TabPanel>
-	// 	</Popover>
-	// );
 }

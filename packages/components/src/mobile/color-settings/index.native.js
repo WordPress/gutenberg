@@ -28,6 +28,7 @@ const ColorSettingsMemo = memo(
 		gradientValue,
 		onGradientChange,
 		label,
+		hideNavigation,
 	} ) => {
 		useEffect( () => {
 			shouldEnableBottomSheetMaxHeight( true );
@@ -44,6 +45,7 @@ const ColorSettingsMemo = memo(
 						gradientValue,
 						onGradientChange,
 						label,
+						hideNavigation,
 					} }
 				>
 					<PaletteScreen />
