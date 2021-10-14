@@ -1525,8 +1525,9 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 			array(
 				'templateParts' => array(
 					array(
-						'name' => 'small-header',
-						'area' => 'header',
+						'name'  => 'small-header',
+						'title' => 'Small Header',
+						'area'  => 'header',
 					),
 				),
 			)
@@ -1538,7 +1539,8 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 			$template_parts,
 			array(
 				'small-header' => array(
-					'area' => 'header',
+					'title' => 'Small Header',
+					'area'  => 'header',
 				),
 			)
 		);
