@@ -109,8 +109,23 @@ function render_block_core_breadcrumbs( $attributes, $content, $block ) {
 		);
 	}
 
-	$align_class_name   = empty( $attributes['textAlign'] ) ? '' : "has-text-align-{$attributes['textAlign']}";
-	$wrapper_attributes = get_block_wrapper_attributes( array( 'class' => $align_class_name ) );
+	$classnames = '';
+
+	if ( ! empty( $attributes['contentJustification'] ) ) {
+		if ( 'left' === $attributes['contentJustification'] ) {
+			$classnames = 'is-content-justification-left';
+		}
+
+		if ( 'center' === $attributes['contentJustification'] ) {
+			$classnames = 'is-content-justification-center';
+		}
+
+		if ( 'right' === $attributes['contentJustification'] ) {
+			$classnames = 'is-content-justification-right';
+		}
+	}
+
+	$wrapper_attributes = get_block_wrapper_attributes( array( 'class' => $classnames ) );
 
 	return sprintf(
 		'<nav %1$s><ol itemscope itemtype="https://schema.org/BreadcrumbList">%2$s</ol></nav>',

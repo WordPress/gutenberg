@@ -9,6 +9,9 @@
 	"textdomain": "default",
 	"usesContext": [ "postId", "postType" ],
 	"attributes": {
+		"contentJustification": {
+			"type": "string"
+		},
 		"nestingLevel": {
 			"type": "number",
 			"default": 0
@@ -31,9 +34,6 @@
 		},
 		"siteTitleOverride": {
 			"type": "string"
-		},
-		"textAlign": {
-			"type": "string"
 		}
 	},
 	"supports": {
@@ -44,7 +44,11 @@
 		},
 		"html": false,
 		"spacing": {
-			"padding": true
+			"padding": true,
+			"blockGap": true,
+			"__experimentalDefaultControls": {
+				"blockGap": true
+			}
 		},
 		"typography": {
 			"fontSize": true,

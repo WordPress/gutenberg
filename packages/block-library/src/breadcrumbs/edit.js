@@ -8,9 +8,9 @@ import classnames from 'classnames';
  */
 import { useSelect } from '@wordpress/data';
 import {
-	AlignmentControl,
 	BlockControls,
 	InspectorControls,
+	JustifyContentControl,
 	useBlockProps,
 } from '@wordpress/block-editor';
 import {
@@ -66,13 +66,13 @@ export default function BreadcrumbsEdit( {
 	context: { postType, postId },
 } ) {
 	const {
+		contentJustification,
 		nestingLevel,
 		separator,
 		showCurrentPageTitle,
 		showLeadingSeparator,
 		showSiteTitle,
 		siteTitleOverride,
-		textAlign,
 	} = attributes;
 
 	const { categories, parents, post, siteTitle } = useSelect(
@@ -193,17 +193,22 @@ export default function BreadcrumbsEdit( {
 
 	const blockProps = useBlockProps( {
 		className: classnames( {
-			[ `has-text-align-${ textAlign }` ]: textAlign,
+			[ `is-content-justification-${ contentJustification }` ]: contentJustification,
 		} ),
 	} );
 
 	return (
 		<>
 			<BlockControls group="block">
-				<AlignmentControl
-					value={ textAlign }
-					onChange={ ( nextAlign ) => {
-						setAttributes( { textAlign: nextAlign } );
+				<JustifyContentControl
+					allowedControls={ [ 'left', 'center', 'right' ] }
+					value={ contentJustification }
+					onChange={ ( value ) =>
+						setAttributes( { contentJustification: value } )
+					}
+					popoverProps={ {
+						position: 'bottom right',
+						isAlternate: true,
 					} }
 				/>
 			</BlockControls>
