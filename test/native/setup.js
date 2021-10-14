@@ -173,6 +173,10 @@ jest.mock(
 		} ) ),
 	} )
 );
+jest.mock( 'react-native/Libraries/Components/Clipboard/Clipboard', () => ( {
+	getString: jest.fn( () => Promise.resolve( '' ) ),
+	setString: jest.fn(),
+} ) );
 
 // Silences the warning: dispatchCommand was called with a ref that isn't a native
 // component. Use React.forwardRef to get access to the underlying native component.
