@@ -119,12 +119,12 @@ function gutenberg_experimental_global_styles_settings( $settings ) {
 	}
 
 	if ( 'site-editor' === $context && gutenberg_experimental_is_site_editor_available() ) {
+		$theme       = WP_Theme_JSON_Resolver_Gutenberg::get_merged_data( $settings, 'theme' );
 		$user_cpt_id = WP_Theme_JSON_Resolver_Gutenberg::get_user_custom_post_type_id();
-		$tree        = WP_Theme_JSON_Resolver_Gutenberg::get_merged_data( $settings, 'theme' );
 
 		$settings['__experimentalGlobalStylesUserEntityId']           = $user_cpt_id;
-		$settings['__experimentalGlobalStylesBaseConfig']['styles']   = $tree->get_raw_data()['styles'];
-		$settings['__experimentalGlobalStylesBaseConfig']['settings'] = $tree->get_settings();
+		$settings['__experimentalGlobalStylesBaseConfig']['styles']   = $theme->get_raw_data()['styles'];
+		$settings['__experimentalGlobalStylesBaseConfig']['settings'] = $theme->get_settings();
 	}
 
 	if ( 'other' === $context ) {
