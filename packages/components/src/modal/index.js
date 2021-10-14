@@ -8,7 +8,12 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { createPortal, useEffect, useRef } from '@wordpress/element';
+import {
+	createPortal,
+	useEffect,
+	useRef,
+	forwardRef,
+} from '@wordpress/element';
 import {
 	useInstanceId,
 	useFocusReturn,
@@ -31,31 +36,32 @@ import Button from '../button';
 // Used to count the number of open modals.
 let openModalCount = 0;
 
-export default function Modal( {
-	bodyOpenClassName = 'modal-open',
-	role = 'dialog',
-	title = '',
-	focusOnMount = true,
-	shouldCloseOnEsc = true,
-	shouldCloseOnClickOutside = true,
-	isDismissable = false, // Deprecated
-	isDismissible = isDismissable || true,
-	/* accessibility */
-	aria = {
-		labelledby: null,
-		describedby: null,
-	},
-	onRequestClose,
-	icon = '',
-	closeButtonLabel,
-	children,
-	style = null,
-	overlayClassName = '',
-	className = '',
-	contentLabel = null,
-	onKeyDown,
-	forwardedRef,
-} ) {
+const Modal = ( props, forwardedRef ) => {
+	const {
+		bodyOpenClassName = 'modal-open',
+		role = 'dialog',
+		title = '',
+		focusOnMount = true,
+		shouldCloseOnEsc = true,
+		shouldCloseOnClickOutside = true,
+		isDismissable = false, // Deprecated
+		isDismissible = isDismissable || true,
+		/* accessibility */
+		aria = {
+			labelledby: null,
+			describedby: null,
+		},
+		onRequestClose,
+		icon = '',
+		closeButtonLabel,
+		children,
+		style = null,
+		overlayClassName = '',
+		className = '',
+		contentLabel = null,
+		onKeyDown,
+	} = props;
+
 	const ref = useRef();
 	const instanceId = useInstanceId( Modal );
 	const headingId = title
@@ -166,4 +172,6 @@ export default function Modal( {
 		</div>,
 		document.body
 	);
-}
+};
+
+export default forwardRef( Modal );

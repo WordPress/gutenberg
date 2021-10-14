@@ -22,7 +22,6 @@ import {
 	WordPressComponentProps,
 } from '../ui/context';
 import { Flex } from '../flex';
-import { VStack } from '../v-stack';
 import Button from '../button';
 import * as styles from './styles';
 import { useCx } from '../utils/hooks/use-cx';
@@ -46,7 +45,6 @@ function ConfirmDialog(
 		styles.wrapper,
 		! hasTitle && styles.withoutTitle
 	);
-	const buttonsWrapperClassName = cx( styles.buttonsWrapper );
 	const stackedMarginWrapperClassName = cx( styles.stackedMarginWrapper );
 
 	const [ isOpen, setIsOpen ] = useState< boolean >();
@@ -88,7 +86,7 @@ function ConfirmDialog(
 					onKeyDown={ handleEnter }
 					closeButtonLabel={ __( 'Cancel' ) }
 					isDismissible={ true }
-					forwardedRef={ forwardedRef }
+					ref={ forwardedRef }
 					{ ...otherProps }
 				>
 					<div className={ stackedMarginWrapperClassName }>
