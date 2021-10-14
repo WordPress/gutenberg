@@ -79,13 +79,13 @@ function getSelectOptions( optionsArray, disableCustomFontSizes ) {
 }
 
 function getToggleGroupOptions( optionsArray ) {
-	return optionsArray.map( ( { slug, size } ) => {
+	return optionsArray.map( ( { slug, size, name } ) => {
 		let label = size;
 		if ( typeof size === 'string' ) {
 			const [ numericValue ] = splitValueAndUnitFromSize( size );
 			label = numericValue;
 		}
-		return { key: slug, value: size, label };
+		return { key: slug, value: size, label, name };
 	} );
 }
 

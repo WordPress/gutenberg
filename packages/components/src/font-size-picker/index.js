@@ -181,6 +181,7 @@ function FontSizePicker(
 								key={ option.key }
 								value={ option.value }
 								label={ option.label }
+								aria-label={ option.name }
 							/>
 						) ) }
 					</ToggleGroupControl>
