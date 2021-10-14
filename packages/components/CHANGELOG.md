@@ -10,6 +10,11 @@
 
 -   Removed the separator shown between `ToggleGroupControl` items ([#35497](https://github.com/WordPress/gutenberg/pull/35497)).
 
+### Experimental
+
+-   Removed the `fieldset` wrapper from the `FontAppearanceControl` component ([35461](https://github.com/WordPress/gutenberg/pull/35461)).
+-   Refactored the `ToggleGroupControl` component's structure and embedded `ToggleGroupControlButton` directly into `ToggleGroupControlOption` ([#35600](https://github.com/WordPress/gutenberg/pull/35600)).
+
 ## 18.0.0 (2021-10-12)
 
 ### Breaking Changes
@@ -31,6 +36,7 @@
 ### Internal
 
 -   Deleted the `createComponent` utility function ([#34929](https://github.com/WordPress/gutenberg/pull/34929)).
+-   Deleted the `useJumpStep` utility function ([#35561](https://github.com/WordPress/gutenberg/pull/35561)).
 
 ## 17.0.0 (2021-09-09)
 

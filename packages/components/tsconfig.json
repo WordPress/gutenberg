@@ -6,7 +6,8 @@
 		"types": [ "gutenberg-env" ],
 		// Some errors in Reakit types with TypeScript 4.3
 		// Remove the following line when they've been addressed.
-		"skipLibCheck": true
+		"skipLibCheck": true,
+		"strictNullChecks": true
 	},
 	"references": [
 		{ "path": "../compose" },
@@ -50,6 +51,7 @@
 		"src/number-control/**/*",
 		"src/popover/**/*",
 		"src/range-control/**/*",
+		"src/resizable-box/**/*",
 		"src/scroll-lock/**/*",
 		"src/scrollable/**/*",
 		"src/select-control/**/*",
@@ -65,6 +67,7 @@
 		"src/tooltip/**/*",
 		"src/truncate/**/*",
 		"src/ui/**/*",
+		"src/unit-control/**/*",
 		"src/utils/**/*",
 		"src/v-stack/**/*",
 		"src/view/**/*",

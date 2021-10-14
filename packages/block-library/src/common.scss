@@ -8,26 +8,12 @@
 	@include gradient-colors-deprecated();
 }
 
-// Font sizes.
-.has-small-font-size {
-	font-size: 0.8125em;
-}
-
-.has-regular-font-size, // Not used now, kept because of backward compatibility.
-.has-normal-font-size {
+// Font sizes (not used now, kept because of backward compatibility).
+.has-regular-font-size {
 	font-size: 1em;
 }
 
-.has-medium-font-size {
-	font-size: 1.25em;
-}
-
-.has-large-font-size {
-	font-size: 2.25em;
-}
-
-.has-larger-font-size, // Not used now, kept because of backward compatibility.
-.has-huge-font-size {
+.has-larger-font-size {
 	font-size: 2.625em;
 }
 
