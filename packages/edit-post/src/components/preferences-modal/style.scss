@@ -27,13 +27,8 @@ $vertical-tabs-width: 160px;
 		// to ensure that sticky position elements stick where intended.
 		.components-navigator-provider {
 			height: 100%;
-			// This may become obselete if the component itself adopts the rule.
-			> .components-navigator-screen {
-				max-height: 100%;
-			}
 		}
 	}
-
 
 	.edit-post-preferences__tabs {
 		.components-tab-panel__tabs {
