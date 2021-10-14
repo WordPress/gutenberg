@@ -9,7 +9,7 @@ buildscript {
         jSoupVersion = '1.10.3'
         wordpressUtilsVersion = '1.22'
         espressoVersion = '3.0.1'
-        aztecVersion = '941-2f19466228b2290105b111881dfbabc454be19c2'
+        aztecVersion = 'v1.4.0'
         willPublishReactNativeAztecBinary = properties["willPublishReactNativeAztecBinary"]?.toBoolean() ?: false
     }
 }
