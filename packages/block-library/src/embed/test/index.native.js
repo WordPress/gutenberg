@@ -282,31 +282,28 @@ describe( 'Embed block', () => {
 	} );
 
 	it( 'sets an Embed block caption', async () => {
+		const waitForElement = ( { getByA11yLabel } ) =>
+			getByA11yLabel( /Embed Block\. Row 1/ );
 		const {
-			getByA11yLabel,
+			element,
 			getByText,
 			getByPlaceholderText,
 			getByTestId,
-		} = await initializeEditor( {
-			initialHtml: '',
-		} );
+		} = await initializeEditor(
+			{
+				initialHtml: '<!-- wp:embed /-->',
+			},
+			{ waitForElement }
+		);
+
 		const expectedURL = 'https://twitter.com/notnownikki';
 		const expectedCaption = 'Caption';
 
-		// Return mocked responses for the oembed endpoint.
-		fetchRequest.mockImplementation( ( { path } ) => {
-			let response = {};
-			if ( path.startsWith( '/oembed/1.0/proxy' ) ) {
-				response = RICH_TEXT_EMBED_SUCCESS_RESPONSE;
-			}
-			return Promise.resolve( response );
-		} );
+		// Select block
+		fireEvent.press( element );
 
-		// Open the inserter menu
-		fireEvent.press( await waitFor( () => getByA11yLabel( 'Add block' ) ) );
-
-		// Insert an embed block
-		fireEvent.press( await waitFor( () => getByText( `Embed` ) ) );
+		// Edit URL
+		fireEvent.press( getByText( 'ADD LINK' ) );
 
 		// Wait for edit URL modal to be visible
 		const embedEditURLModal = getByTestId( 'embed-edit-url-modal' );
@@ -322,7 +319,7 @@ describe( 'Embed block', () => {
 		fireEvent( embedEditURLModal, MODAL_DISMISS_EVENT );
 
 		// Set a caption
-		const caption = getByTestId( 'embed-caption' );
+		const caption = await waitFor( () => getByTestId( 'embed-caption' ) );
 		fireEvent( caption, 'focus' );
 		fireEvent.changeText( caption, expectedCaption );
 

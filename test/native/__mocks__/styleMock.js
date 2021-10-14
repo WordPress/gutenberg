@@ -72,7 +72,7 @@ module.exports = {
 	richTextPlaceholder: {
 		color: 'gray',
 	},
-	unsupportedBlockIcon: {
+	çç: {
 		color: 'white',
 	},
 	infoIcon: {
