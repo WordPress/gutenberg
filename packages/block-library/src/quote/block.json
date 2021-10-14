@@ -28,7 +28,10 @@
 	},
 	"supports": {
 		"anchor": true,
-		"__experimentalSlashInserter": true
+		"__experimentalSlashInserter": true,
+		"typography": {
+			"fontSize": true
+		}
 	},
 	"styles": [
 		{
