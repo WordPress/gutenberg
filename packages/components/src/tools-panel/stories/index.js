@@ -221,6 +221,114 @@ export const WithSlotFillItems = () => {
 	);
 };
 
+export const WithCustomColumns = () => {
+	const [ size, setSize ] = useState();
+	const [ width, setWidth ] = useState();
+	const [ height, setHeight ] = useState();
+	const [ depth, setDepth ] = useState();
+	const [ padding, setPadding ] = useState();
+	const [ margin, setMargin ] = useState();
+
+	const resetAll = () => {
+		setSize( undefined );
+		setWidth( undefined );
+		setHeight( undefined );
+		setDepth( undefined );
+		setPadding( undefined );
+		setMargin( undefined );
+	};
+
+	return (
+		<PanelWrapperView>
+			<Panel>
+				<ToolsPanel
+					label="Tools Panel (custom columns)"
+					resetAll={ resetAll }
+					columns={ 3 }
+				>
+					<ToolsPanelItem
+						hasValue={ () => !! size }
+						label="Size"
+						onDeselect={ () => setSize( undefined ) }
+						isShownByDefault={ true }
+					>
+						<UnitControl
+							label="Size"
+							value={ size }
+							onChange={ ( next ) => setSize( next ) }
+						/>
+					</ToolsPanelItem>
+					<ToolsPanelItem
+						gridColumn="span 1"
+						hasValue={ () => !! width }
+						label="Width"
+						onDeselect={ () => setWidth( undefined ) }
+						isShownByDefault={ true }
+					>
+						<UnitControl
+							label="Width"
+							value={ width }
+							onChange={ ( next ) => setWidth( next ) }
+						/>
+					</ToolsPanelItem>
+					<ToolsPanelItem
+						gridColumn="span 1"
+						hasValue={ () => !! height }
+						label="Height"
+						onDeselect={ () => setHeight( undefined ) }
+						isShownByDefault={ true }
+					>
+						<UnitControl
+							label="Height"
+							value={ height }
+							onChange={ ( next ) => setHeight( next ) }
+						/>
+					</ToolsPanelItem>
+					<ToolsPanelItem
+						gridColumn="span 1"
+						hasValue={ () => !! depth }
+						label="Depth"
+						onDeselect={ () => setDepth( undefined ) }
+						isShownByDefault={ true }
+					>
+						<UnitControl
+							label="Depth"
+							value={ depth }
+							onChange={ ( next ) => setDepth( next ) }
+						/>
+					</ToolsPanelItem>
+					<ToolsPanelItem
+						gridColumn="span 2"
+						hasValue={ () => !! padding }
+						label="Padding"
+						onDeselect={ () => setPadding( undefined ) }
+						isShownByDefault={ true }
+					>
+						<UnitControl
+							label="Padding"
+							value={ padding }
+							onChange={ ( next ) => setPadding( next ) }
+						/>
+					</ToolsPanelItem>
+					<ToolsPanelItem
+						gridColumn="span 1"
+						hasValue={ () => !! margin }
+						label="Margin"
+						onDeselect={ () => setMargin( undefined ) }
+						isShownByDefault={ true }
+					>
+						<UnitControl
+							label="Margin"
+							value={ margin }
+							onChange={ ( next ) => setMargin( next ) }
+						/>
+					</ToolsPanelItem>
+				</ToolsPanel>
+			</Panel>
+		</PanelWrapperView>
+	);
+};
+
 export { TypographyPanel } from './typography-panel';
 
 const PanelWrapperView = styled.div`
