@@ -56,6 +56,11 @@ const RICH_TEXT_EMBED_HTML = `<!-- wp:embed {"url":"https://twitter.com/notnowni
 https://twitter.com/notnownikki
 </div></figure>
 <!-- /wp:embed -->`;
+const VIDEO_EMBED_HTML = `<!-- wp:embed {"url":"https://www.youtube.com/watch?v=lXMskKTw3Bc","type":"video","providerNameSlug":"youtube","responsive":true,"className":"wp-embed-aspect-16-9 wp-has-aspect-ratio"} -->
+<figure class="wp-block-embed is-type-video is-provider-youtube wp-block-embed-youtube wp-embed-aspect-16-9 wp-has-aspect-ratio"><div class="wp-block-embed__wrapper">
+https://www.youtube.com/watch?v=lXMskKTw3Bc
+</div></figure>
+<!-- /wp:embed -->`;
 
 const MOST_USED_PROVIDERS = embed.settings.variations.filter( ( { name } ) =>
 	[ 'youtube', 'twitter', 'wordpress', 'vimeo' ].includes( name )
@@ -286,6 +291,89 @@ describe( 'Embed block', () => {
 
 			expect( editURLButton ).toBeDefined();
 			expect( getEditorHtml() ).toBe( RICH_TEXT_EMBED_HTML );
+		} );
+	} );
+
+	describe( 'Edit URL', () => {
+		it( 'keeps the previous URL if no URL is set', async () => {
+			const waitForElement = ( { getByA11yLabel } ) =>
+				getByA11yLabel( /Embed Block\. Row 1/ );
+			const {
+				element,
+				getByA11yLabel,
+				getByTestId,
+			} = await initializeEditor(
+				{ initialHtml: RICH_TEXT_EMBED_HTML },
+				{ waitForElement }
+			);
+
+			// Select block
+			fireEvent.press( element );
+
+			// Edit URL
+			fireEvent.press(
+				await waitFor( () => getByA11yLabel( 'Edit URL' ) )
+			);
+
+			// Wait for edit URL modal to be visible
+			const embedEditURLModal = getByTestId( 'embed-edit-url-modal' );
+			await waitFor( () => embedEditURLModal.props.isVisible );
+
+			// Dismiss the edit URL modal
+			fireEvent( embedEditURLModal, 'backdropPress' );
+			fireEvent( embedEditURLModal, MODAL_DISMISS_EVENT );
+
+			expect( getEditorHtml() ).toBe( RICH_TEXT_EMBED_HTML );
+		} );
+
+		it( 'replaces URL', async () => {
+			const waitForElement = ( { getByA11yLabel } ) =>
+				getByA11yLabel( /Embed Block\. Row 1/ );
+			const {
+				element,
+				getByA11yLabel,
+				getByDisplayValue,
+				getByTestId,
+			} = await initializeEditor(
+				{ initialHtml: RICH_TEXT_EMBED_HTML },
+				{ waitForElement }
+			);
+			const previousURL = 'https://twitter.com/notnownikki';
+			const expectedURL = 'https://www.youtube.com/watch?v=lXMskKTw3Bc';
+
+			// Select block
+			fireEvent.press( element );
+
+			// Edit URL
+			fireEvent.press(
+				await waitFor( () => getByA11yLabel( 'Edit URL' ) )
+			);
+
+			// Wait for edit URL modal to be visible
+			const embedEditURLModal = getByTestId( 'embed-edit-url-modal' );
+			await waitFor( () => embedEditURLModal.props.isVisible );
+
+			// Start editing link
+			fireEvent.press(
+				getByA11yLabel( `Twitter link, ${ previousURL }` )
+			);
+
+			// Replace URL
+			const linkTextInput = getByDisplayValue( previousURL );
+			fireEvent( linkTextInput, 'focus' );
+			fireEvent.changeText( linkTextInput, expectedURL );
+
+			// Dismiss the edit URL modal
+			fireEvent( embedEditURLModal, 'backdropPress' );
+			fireEvent( embedEditURLModal, MODAL_DISMISS_EVENT );
+
+			// Get YouTube link field
+			const youtubeLinkField = await waitFor( () =>
+				getByA11yLabel( `YouTube link, ${ expectedURL }` )
+			);
+
+			expect( youtubeLinkField ).toBeDefined();
+			expect( getEditorHtml() ).toBe( VIDEO_EMBED_HTML );
 		} );
 	} );
 } );
