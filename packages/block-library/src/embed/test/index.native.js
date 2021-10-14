@@ -32,6 +32,7 @@ jest.mock( 'react-native-modal', () => {
 } );
 const MODAL_DISMISS_EVENT = Platform.OS === 'ios' ? 'onDismiss' : 'onModalHide';
 
+// oEmbed response mocks
 const RICH_TEXT_EMBED_SUCCESS_RESPONSE = {
 	url: 'https://twitter.com/notnownikki',
 	html: '<p>Mock success response.</p>',
@@ -40,6 +41,16 @@ const RICH_TEXT_EMBED_SUCCESS_RESPONSE = {
 	provider_url: 'https://twitter.com',
 	version: '1.0',
 };
+const VIDEO_EMBED_SUCCESS_RESPONSE = {
+	url: 'https://www.youtube.com/watch?v=lXMskKTw3Bc',
+	html: '<iframe width="16" height="9"></iframe>',
+	type: 'video',
+	provider_name: 'YouTube',
+	provider_url: 'https://youtube.com',
+	version: '1.0',
+};
+
+// Embed block HTML examples
 const RICH_TEXT_EMBED_HTML = `<!-- wp:embed {"url":"https://twitter.com/notnownikki","type":"rich","providerNameSlug":"twitter","responsive":true} -->
 <figure class="wp-block-embed is-type-rich is-provider-twitter wp-block-embed-twitter"><div class="wp-block-embed__wrapper">
 https://twitter.com/notnownikki
@@ -50,11 +61,31 @@ const MOST_USED_PROVIDERS = embed.settings.variations.filter( ( { name } ) =>
 	[ 'youtube', 'twitter', 'wordpress', 'vimeo' ].includes( name )
 );
 
+// Return specified mocked responses for the oembed endpoint.
+const mockEmbedResponses = ( mockedResponses ) => {
+	fetchRequest.mockImplementation( ( { path } ) => {
+		const matchedEmbedResponse = mockedResponses.find(
+			( mockedResponse ) =>
+				path ===
+				`/oembed/1.0/proxy?url=${ encodeURIComponent(
+					mockedResponse.url
+				) }`
+		);
+		return Promise.resolve( matchedEmbedResponse || {} );
+	} );
+};
+
 beforeAll( () => {
 	// Paragraph block needs to be registered because by default a paragraph
 	// block is added to empty posts.
 	registerBlock( paragraph );
 	registerBlock( embed );
+
+	// Mock embed responses
+	mockEmbedResponses( [
+		RICH_TEXT_EMBED_SUCCESS_RESPONSE,
+		VIDEO_EMBED_SUCCESS_RESPONSE,
+	] );
 } );
 
 afterAll( () => {
@@ -157,15 +188,6 @@ describe( 'Embed block', () => {
 			} );
 			const expectedURL = 'https://twitter.com/notnownikki';
 
-			// Return mocked responses for the oembed endpoint.
-			fetchRequest.mockImplementation( ( { path } ) => {
-				let response = {};
-				if ( path.startsWith( '/oembed/1.0/proxy' ) ) {
-					response = RICH_TEXT_EMBED_SUCCESS_RESPONSE;
-				}
-				return Promise.resolve( response );
-			} );
-
 			// Open the inserter menu
 			fireEvent.press(
 				await waitFor( () => getByA11yLabel( 'Add block' ) )
@@ -197,7 +219,7 @@ describe( 'Embed block', () => {
 		} );
 	} );
 
-	describe( 'Set URL by tapping on the block', () => {
+	describe( 'Set URL by tapping on an empty block', () => {
 		it( 'sets empty URL when dismissing edit URL modal', async () => {
 			const waitForElement = ( { getByA11yLabel } ) =>
 				getByA11yLabel( /Embed Block\. Row 1/ );
@@ -237,15 +259,6 @@ describe( 'Embed block', () => {
 				{ waitForElement }
 			);
 			const expectedURL = 'https://twitter.com/notnownikki';
-
-			// Return mocked responses for the oembed endpoint.
-			fetchRequest.mockImplementation( ( { path } ) => {
-				let response = {};
-				if ( path.startsWith( '/oembed/1.0/proxy' ) ) {
-					response = RICH_TEXT_EMBED_SUCCESS_RESPONSE;
-				}
-				return Promise.resolve( response );
-			} );
 
 			// Select block
 			fireEvent.press( element );
