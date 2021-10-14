@@ -308,7 +308,7 @@ This feature is still experimental. “Experimental” means this is an early im
 
 <!-- If component is deprecated, add the following section: -->
 <div class="callout callout-alert">
-This component is deprecated. Please use  `{other component}` from the `{other package}` package instead.
+This component is deprecated. Please use `{other component}` from the `{other package}` package instead.
 </div>
 
 Description of the component.
