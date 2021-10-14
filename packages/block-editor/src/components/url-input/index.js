@@ -90,7 +90,7 @@ class URLInput extends Component {
 			! this.isUpdatingSuggestions &&
 			! this.props.__experimentalShowInitialSuggestions
 		) {
-			this.updateSuggestions( value.trim() );
+			this.updateSuggestions( value );
 		}
 	}
 
