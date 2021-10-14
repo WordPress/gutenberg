@@ -2,13 +2,13 @@
 	{
 		"blockName": "core/cover",
 		"attrs": {
-			"url": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAACklEQVR4nGMAAQAABQABDQottAAAAABJRU5ErkJggg==",
+			"url": "http://localhost:8888/wp-content/uploads/foo.jpg",
 			"id": 35
 		},
 		"innerBlocks": [],
-		"innerHTML": "\n<div class=\"wp-block-cover has-background-dim\" style=\"background-image:url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAACklEQVR4nGMAAQAABQABDQottAAAAABJRU5ErkJggg==)\"><p class=\"wp-block-cover-text\"><strong>Cover Block</strong></p></div>\n",
+		"innerHTML": "\n<div class=\"wp-block-cover has-background-dim\" style=\"background-image:url(http://localhost:8888/wp-content/uploads/foo.jpg)\"><p class=\"wp-block-cover-text\"><strong>Cover Block</strong></p></div>\n",
 		"innerContent": [
-			"\n<div class=\"wp-block-cover has-background-dim\" style=\"background-image:url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAACklEQVR4nGMAAQAABQABDQottAAAAABJRU5ErkJggg==)\"><p class=\"wp-block-cover-text\"><strong>Cover Block</strong></p></div>\n"
+			"\n<div class=\"wp-block-cover has-background-dim\" style=\"background-image:url(http://localhost:8888/wp-content/uploads/foo.jpg)\"><p class=\"wp-block-cover-text\"><strong>Cover Block</strong></p></div>\n"
 		]
 	}
 ]

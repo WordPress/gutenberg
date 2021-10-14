@@ -3,9 +3,9 @@
 		"blockName": "core/image",
 		"attrs": {},
 		"innerBlocks": [],
-		"innerHTML": "\n<figure class=\"wp-block-image\"><img src=\"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAACklEQVR4nGMAAQAABQABDQottAAAAABJRU5ErkJggg==\" alt=\"\" /></figure>\n",
+		"innerHTML": "\n<figure class=\"wp-block-image\"><img src=\"http://localhost:8888/wp-content/uploads/foo.png\" alt=\"\" /></figure>\n",
 		"innerContent": [
-			"\n<figure class=\"wp-block-image\"><img src=\"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAACklEQVR4nGMAAQAABQABDQottAAAAABJRU5ErkJggg==\" alt=\"\" /></figure>\n"
+			"\n<figure class=\"wp-block-image\"><img src=\"http://localhost:8888/wp-content/uploads/foo.png\" alt=\"\" /></figure>\n"
 		]
 	}
 ]

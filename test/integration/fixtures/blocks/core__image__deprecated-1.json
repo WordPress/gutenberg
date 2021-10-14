@@ -5,11 +5,11 @@
 		"isValid": true,
 		"attributes": {
 			"align": "left",
-			"url": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAACklEQVR4nGMAAQAABQABDQottAAAAABJRU5ErkJggg==",
+			"url": "http://localhost:8888/wp-content/uploads/foo.png",
 			"alt": "",
 			"caption": ""
 		},
 		"innerBlocks": [],
-		"originalContent": "<figure class=\"wp-block-image alignleft\" style=\"max-width:50%\">\n\t<img src=\"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAACklEQVR4nGMAAQAABQABDQottAAAAABJRU5ErkJggg==\" alt=\"\" />\n</figure>"
+		"originalContent": "<figure class=\"wp-block-image alignleft\" style=\"max-width:50%\">\n\t<img src=\"http://localhost:8888/wp-content/uploads/foo.png\" alt=\"\" />\n</figure>"
 	}
 ]

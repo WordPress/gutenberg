@@ -5,9 +5,9 @@
 			"align": "left"
 		},
 		"innerBlocks": [],
-		"innerHTML": "\n<figure class=\"wp-block-image alignleft\" style=\"max-width:50%\">\n\t<img src=\"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAACklEQVR4nGMAAQAABQABDQottAAAAABJRU5ErkJggg==\" alt=\"\" />\n</figure>\n",
+		"innerHTML": "\n<figure class=\"wp-block-image alignleft\" style=\"max-width:50%\">\n\t<img src=\"http://localhost:8888/wp-content/uploads/foo.png\" alt=\"\" />\n</figure>\n",
 		"innerContent": [
-			"\n<figure class=\"wp-block-image alignleft\" style=\"max-width:50%\">\n\t<img src=\"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAACklEQVR4nGMAAQAABQABDQottAAAAABJRU5ErkJggg==\" alt=\"\" />\n</figure>\n"
+			"\n<figure class=\"wp-block-image alignleft\" style=\"max-width:50%\">\n\t<img src=\"http://localhost:8888/wp-content/uploads/foo.png\" alt=\"\" />\n</figure>\n"
 		]
 	}
 ]

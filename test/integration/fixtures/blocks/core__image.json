@@ -4,11 +4,11 @@
 		"name": "core/image",
 		"isValid": true,
 		"attributes": {
-			"url": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAACklEQVR4nGMAAQAABQABDQottAAAAABJRU5ErkJggg==",
+			"url": "http://localhost:8888/wp-content/uploads/foo.png",
 			"alt": "",
 			"caption": ""
 		},
 		"innerBlocks": [],
-		"originalContent": "<figure class=\"wp-block-image\"><img src=\"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAACklEQVR4nGMAAQAABQABDQottAAAAABJRU5ErkJggg==\" alt=\"\" /></figure>"
+		"originalContent": "<figure class=\"wp-block-image\"><img src=\"http://localhost:8888/wp-content/uploads/foo.png\" alt=\"\" /></figure>"
 	}
 ]

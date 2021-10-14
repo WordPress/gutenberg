@@ -5,11 +5,11 @@
 		"isValid": true,
 		"attributes": {
 			"align": "center",
-			"url": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAACklEQVR4nGMAAQAABQABDQottAAAAABJRU5ErkJggg==",
+			"url": "http://localhost:8888/wp-content/uploads/foo.png",
 			"alt": "",
 			"caption": "Give it a try. Press the \"really wide\" button on the image toolbar."
 		},
 		"innerBlocks": [],
-		"originalContent": "<div class=\"wp-block-image\"><figure class=\"aligncenter\"><img src=\"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAACklEQVR4nGMAAQAABQABDQottAAAAABJRU5ErkJggg==\" alt=\"\" /><figcaption>Give it a try. Press the &quot;really wide&quot; button on the image toolbar.</figcaption></figure></div>"
+		"originalContent": "<div class=\"wp-block-image\"><figure class=\"aligncenter\"><img src=\"http://localhost:8888/wp-content/uploads/foo.png\" alt=\"\" /><figcaption>Give it a try. Press the &quot;really wide&quot; button on the image toolbar.</figcaption></figure></div>"
 	}
 ]

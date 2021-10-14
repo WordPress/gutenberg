@@ -4,7 +4,7 @@
 		"name": "core/image",
 		"isValid": true,
 		"attributes": {
-			"url": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAACklEQVR4nGMAAQAABQABDQottAAAAABJRU5ErkJggg==",
+			"url": "http://localhost:8888/wp-content/uploads/foo.png",
 			"alt": "",
 			"caption": "",
 			"href": "https://wordpress.org/",
@@ -12,6 +12,6 @@
 			"linkDestination": "custom"
 		},
 		"innerBlocks": [],
-		"originalContent": "<figure class=\"wp-block-image\"><a class=\"custom-link\" href=\"https://wordpress.org/\"><img src=\"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAACklEQVR4nGMAAQAABQABDQottAAAAABJRU5ErkJggg==\" alt=\"\" /></a></figure>"
+		"originalContent": "<figure class=\"wp-block-image\"><a class=\"custom-link\" href=\"https://wordpress.org/\"><img src=\"http://localhost:8888/wp-content/uploads/foo.png\" alt=\"\" /></a></figure>"
 	}
 ]
