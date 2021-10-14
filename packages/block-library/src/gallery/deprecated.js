@@ -188,9 +188,6 @@ const v1 = {
 			</div>
 		);
 	},
-	isEligible( { imageCount } ) {
-		return ! imageCount;
-	},
 	migrate( { images, imageCrop, linkTo, sizeSlug, columns, caption } ) {
 		const imageBlocks = images.map( ( image ) => {
 			return getImageBlock( image, sizeSlug, linkTo );
@@ -202,7 +199,6 @@ const v1 = {
 				imageCrop,
 				linkTo,
 				sizeSlug,
-				imageCount: imageBlocks.length,
 				allowResize: false,
 				isGrouped: true,
 			},
@@ -464,9 +460,6 @@ const v3 = {
 			</ul>
 		);
 	},
-	isEligible( { imageCount } ) {
-		return ! imageCount;
-	},
 	migrate( { images, imageCrop, linkTo, sizeSlug, columns, caption } ) {
 		const imageBlocks = images.map( ( image ) => {
 			return getImageBlock( image, sizeSlug, linkTo );
@@ -479,7 +472,6 @@ const v3 = {
 				imageCrop,
 				linkTo,
 				sizeSlug,
-				imageCount: imageBlocks.length,
 				allowResize: false,
 				isGrouped: true,
 			},
@@ -568,7 +560,6 @@ const v4 = {
 				imageCrop,
 				linkTo,
 				sizeSlug,
-				imageCount: imageBlocks.length,
 				allowResize: false,
 				isGrouped: true,
 			},
@@ -730,11 +721,8 @@ const v5 = {
 	supports: {
 		align: true,
 	},
-	isEligible( { linkTo, imageCount } ) {
-		return (
-			! imageCount &&
-			( ! linkTo || linkTo === 'attachment' || linkTo === 'media' )
-		);
+	isEligible( { linkTo } ) {
+		return ! linkTo || linkTo === 'attachment' || linkTo === 'media';
 	},
 	migrate( attributes ) {
 		let linkTo = attributes.linkTo;
@@ -751,7 +739,6 @@ const v5 = {
 				imageCrop: attributes.imageCrop,
 				linkTo,
 				sizeSlug: attributes.sizeSlug,
-				imageCount: imageBlocks.length,
 				allowResize: false,
 				isGrouped: true,
 			},
@@ -986,9 +973,6 @@ const v6 = {
 			</figure>
 		);
 	},
-	isEligible( { imageCount } ) {
-		return ! imageCount;
-	},
 	migrate( { images, imageCrop, linkTo, sizeSlug, columns, caption } ) {
 		if ( linkTo === 'post' ) {
 			linkTo = 'attachment';
@@ -1005,7 +989,6 @@ const v6 = {
 				imageCrop,
 				linkTo,
 				sizeSlug,
-				imageCount: imageBlocks.length,
 				allowResize: false,
 				isGrouped: true,
 			},

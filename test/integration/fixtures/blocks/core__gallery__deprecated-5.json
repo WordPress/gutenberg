@@ -8,7 +8,6 @@
 			"imageCrop": true,
 			"linkTo": "media",
 			"sizeSlug": "large",
-			"imageCount": 3,
 			"allowResize": false,
 			"isGrouped": true
 		},
