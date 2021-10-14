@@ -62,15 +62,11 @@ export default function Header( {
 		const postType = getEditedPostType();
 		const postId = getEditedPostId();
 		const record = getEditedEntityRecord( 'postType', postType, postId );
-		const _entityTitle =
-			'wp_template' === postType
-				? getTemplateInfo( record ).title
-				: record?.slug;
 		const _isLoaded = !! postId;
 
 		return {
 			deviceType: __experimentalGetPreviewDeviceType(),
-			entityTitle: _entityTitle,
+			entityTitle: getTemplateInfo( record ).title,
 			isLoaded: _isLoaded,
 			template: record,
 			templateType: postType,
@@ -141,27 +137,22 @@ export default function Header( {
 			</div>
 
 			<div className="edit-site-header_center">
-				{ 'wp_template' === templateType && (
-					<DocumentActions
-						entityTitle={ entityTitle }
-						entityLabel="template"
-						isLoaded={ isLoaded }
-					>
-						{ ( { onClose } ) => (
-							<TemplateDetails
-								template={ template }
-								onClose={ onClose }
-							/>
-						) }
-					</DocumentActions>
-				) }
-				{ 'wp_template_part' === templateType && (
-					<DocumentActions
-						entityTitle={ entityTitle }
-						entityLabel="template part"
-						isLoaded={ isLoaded }
-					/>
-				) }
+				<DocumentActions
+					entityTitle={ entityTitle }
+					entityLabel={
+						templateType === 'wp_template_part'
+							? 'template part'
+							: 'template'
+					}
+					isLoaded={ isLoaded }
+				>
+					{ ( { onClose } ) => (
+						<TemplateDetails
+							template={ template }
+							onClose={ onClose }
+						/>
+					) }
+				</DocumentActions>
 			</div>
 
 			<div className="edit-site-header_end">

@@ -116,7 +116,7 @@ function CoverHeightInput( {
 	const handleOnChange = ( unprocessedValue ) => {
 		const inputValue =
 			unprocessedValue !== ''
-				? parseInt( unprocessedValue, 10 )
+				? parseFloat( unprocessedValue )
 				: undefined;
 
 		if ( isNaN( inputValue ) && inputValue !== undefined ) {
@@ -148,7 +148,6 @@ function CoverHeightInput( {
 				onBlur={ handleOnBlur }
 				onChange={ handleOnChange }
 				onUnitChange={ onUnitChange }
-				step="1"
 				style={ { maxWidth: 80 } }
 				unit={ unit }
 				units={ units }
@@ -198,7 +197,6 @@ function ResizableCover( {
 				onResizeStop( elt.clientHeight );
 				setIsResizing( false );
 			} }
-			minHeight={ COVER_MIN_HEIGHT }
 			{ ...props }
 		/>
 	);
@@ -274,6 +272,7 @@ function CoverPlaceholder( {
 	noticeUI,
 	noticeOperations,
 	onSelectMedia,
+	style,
 } ) {
 	const { removeAllNotices, createErrorNotice } = noticeOperations;
 	return (
@@ -294,6 +293,7 @@ function CoverPlaceholder( {
 				removeAllNotices();
 				createErrorNotice( message );
 			} }
+			style={ style }
 		>
 			{ children }
 		</MediaPlaceholder>
@@ -636,6 +636,12 @@ function CoverEdit( {
 						noticeUI={ noticeUI }
 						onSelectMedia={ onSelectMedia }
 						noticeOperations={ noticeOperations }
+						style={ {
+							minHeight:
+								temporaryMinHeight ||
+								minHeightWithUnit ||
+								undefined,
+						} }
 					>
 						<div className="wp-block-cover__placeholder-background-options">
 							<ColorPalette
@@ -646,6 +652,20 @@ function CoverEdit( {
 							/>
 						</div>
 					</CoverPlaceholder>
+					<ResizableCover
+						className="block-library-cover__resize-container"
+						onResizeStart={ () => {
+							setAttributes( { minHeightUnit: 'px' } );
+							toggleSelection( false );
+						} }
+						onResize={ setTemporaryMinHeight }
+						onResizeStop={ ( newMinHeight ) => {
+							toggleSelection( true );
+							setAttributes( { minHeight: newMinHeight } );
+							setTemporaryMinHeight( null );
+						} }
+						showHandle={ isSelected }
+					/>
 				</div>
 			</>
 		);

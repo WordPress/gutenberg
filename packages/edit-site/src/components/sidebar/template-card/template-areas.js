@@ -46,6 +46,10 @@ export default function TemplateAreas() {
 		[]
 	);
 
+	if ( ! Object.keys( templateAreaBlocks ).length ) {
+		return null;
+	}
+
 	return (
 		<section className="edit-site-template-card__template-areas">
 			<Heading

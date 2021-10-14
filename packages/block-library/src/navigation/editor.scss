@@ -397,12 +397,6 @@ $color-control-label-height: 20px;
 		}
 	}
 }
-.components-button.wp-block-navigation__responsive-container-open {
-	@include break-small {
-		display: none;
-	}
-}
-
 // Emulate the fullscreen editing inside the editor.
 // Most of this can be removed when the iframe lands.
 

@@ -31,7 +31,7 @@ function ToggleGroupControlOption(
 	);
 	return (
 		<ToggleGroupControlButton
-			ref={ forwardedRef }
+			forwardedRef={ forwardedRef }
 			{ ...{
 				...toggleGroupControlContext,
 				...buttonProps,
