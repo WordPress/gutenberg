@@ -116,7 +116,7 @@ function CoverHeightInput( {
 	const handleOnChange = ( unprocessedValue ) => {
 		const inputValue =
 			unprocessedValue !== ''
-				? parseInt( unprocessedValue, 10 )
+				? parseFloat( unprocessedValue )
 				: undefined;
 
 		if ( isNaN( inputValue ) && inputValue !== undefined ) {
@@ -148,7 +148,6 @@ function CoverHeightInput( {
 				onBlur={ handleOnBlur }
 				onChange={ handleOnChange }
 				onUnitChange={ onUnitChange }
-				step="1"
 				style={ { maxWidth: 80 } }
 				unit={ unit }
 				units={ units }
@@ -637,7 +636,12 @@ function CoverEdit( {
 						noticeUI={ noticeUI }
 						onSelectMedia={ onSelectMedia }
 						noticeOperations={ noticeOperations }
-						style={ { minHeight: temporaryMinHeight || minHeight } }
+						style={ {
+							minHeight:
+								temporaryMinHeight ||
+								minHeightWithUnit ||
+								undefined,
+						} }
 					>
 						<div className="wp-block-cover__placeholder-background-options">
 							<ColorPalette
