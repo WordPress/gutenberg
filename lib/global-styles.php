@@ -9,12 +9,12 @@
  * Takes a tree adhering to the theme.json schema and generates
  * the corresponding stylesheet.
  *
- * @param string                  $type Type of stylesheet. It accepts 'all', 'block_styles', 'css_variables', 'presets'.
  * @param WP_Theme_JSON_Gutenberg $tree Input tree.
+ * @param string                  $type Type of stylesheet. It accepts 'all', 'block_styles', 'css_variables', 'presets'.
  *
  * @return string Stylesheet.
  */
-function gutenberg_experimental_global_styles_get_stylesheet( $type, $tree ) {
+function gutenberg_experimental_global_styles_get_stylesheet( $tree, $type = null ) {
 	// Check if we can use cached.
 	$can_use_cached = (
 		( 'all' === $type ) &&
@@ -128,9 +128,9 @@ function gutenberg_experimental_global_styles_settings( $settings ) {
 	}
 
 	if ( 'other' === $context ) {
-		$block_styles  = array( 'css' => gutenberg_experimental_global_styles_get_stylesheet( 'block_styles', $consolidated ) );
+		$block_styles  = array( 'css' => gutenberg_experimental_global_styles_get_stylesheet( $consolidated, 'block_styles' ) );
 		$css_variables = array(
-			'css'                     => gutenberg_experimental_global_styles_get_stylesheet( 'css_variables', $consolidated ),
+			'css'                     => gutenberg_experimental_global_styles_get_stylesheet( $consolidated, 'css_variables' ),
 			'__experimentalNoWrapper' => true,
 		);
 
