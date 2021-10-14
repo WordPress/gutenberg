@@ -112,9 +112,10 @@ function gutenberg_experimental_global_styles_settings( $settings ) {
 		$context = 'mobile';
 	}
 
+	$consolidated = WP_Theme_JSON_Resolver_Gutenberg::get_merged_data( $settings );
+
 	if ( 'mobile' === $context && WP_Theme_JSON_Resolver_Gutenberg::theme_has_support() ) {
-		$tree                             = WP_Theme_JSON_Resolver_Gutenberg::get_merged_data( $settings );
-		$settings['__experimentalStyles'] = $tree->get_raw_data()['styles'];
+		$settings['__experimentalStyles'] = $consolidated->get_raw_data()['styles'];
 	}
 
 	if ( 'site-editor' === $context && gutenberg_experimental_is_site_editor_available() ) {
@@ -127,10 +128,9 @@ function gutenberg_experimental_global_styles_settings( $settings ) {
 	}
 
 	if ( 'other' === $context ) {
-		$tree          = WP_Theme_JSON_Resolver_Gutenberg::get_merged_data( $settings );
-		$block_styles  = array( 'css' => gutenberg_experimental_global_styles_get_stylesheet( 'block_styles', $tree ) );
+		$block_styles  = array( 'css' => gutenberg_experimental_global_styles_get_stylesheet( 'block_styles', $consolidated ) );
 		$css_variables = array(
-			'css'                     => gutenberg_experimental_global_styles_get_stylesheet( 'css_variables', $tree ),
+			'css'                     => gutenberg_experimental_global_styles_get_stylesheet( 'css_variables', $consolidated ),
 			'__experimentalNoWrapper' => true,
 		);
 
@@ -155,8 +155,7 @@ function gutenberg_experimental_global_styles_settings( $settings ) {
 	}
 
 	// Copied from get_block_editor_settings() at wordpress-develop/block-editor.php.
-	$tree                               = WP_Theme_JSON_Resolver_Gutenberg::get_merged_data( $settings );
-	$settings['__experimentalFeatures'] = $tree->get_settings();
+	$settings['__experimentalFeatures'] = $consolidated->get_settings();
 
 	if ( isset( $settings['__experimentalFeatures']['color']['palette'] ) ) {
 		$colors_by_origin   = $settings['__experimentalFeatures']['color']['palette'];
