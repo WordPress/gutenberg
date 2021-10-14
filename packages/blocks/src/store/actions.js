@@ -163,7 +163,17 @@ export function* __experimentalRegisterBlockType( blockType ) {
 
 /**
  * Yields an action object signaling that all block types should be computed again.
- * It uses stored unprocessed block types and all the most recent list of registration filters.
+ * It uses stored unprocessed block types and all the most recent list of registered filters.
+ *
+ * It addresses the issue where third party block filters get registered after third party blocks. A sample sequence:
+ *   1. Filter A.
+ *   2. Block B.
+ *   3. Block C.
+ *   4. Filter D.
+ *   5. Filter E.
+ *   6. Block F.
+ *   7. Filter G.
+ * In this scenario some filters would not get applied for all blocks because they are registered too late.
  *
  * @yield {Object} Action object.
  */
