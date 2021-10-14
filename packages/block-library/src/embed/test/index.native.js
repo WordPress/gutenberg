@@ -375,5 +375,54 @@ describe( 'Embed block', () => {
 			expect( youtubeLinkField ).toBeDefined();
 			expect( getEditorHtml() ).toBe( VIDEO_EMBED_HTML );
 		} );
+
+		it( 'keeps the previous URL if an invalid URL is set', async () => {
+			const initialHtml = RICH_TEXT_EMBED_HTML;
+			const previousURL = 'https://twitter.com/notnownikki';
+			const invalidURL = 'http://';
+
+			const waitForElement = ( { getByA11yLabel } ) =>
+				getByA11yLabel( /Embed Block\. Row 1/ );
+			const {
+				element,
+				getByA11yLabel,
+				getByDisplayValue,
+				getByTestId,
+				getByText,
+			} = await initializeEditor( { initialHtml }, { waitForElement } );
+
+			// Select block
+			fireEvent.press( element );
+
+			// Edit URL
+			fireEvent.press(
+				await waitFor( () => getByA11yLabel( 'Edit URL' ) )
+			);
+
+			// Wait for edit URL modal to be visible
+			const embedEditURLModal = getByTestId( 'embed-edit-url-modal' );
+			await waitFor( () => embedEditURLModal.props.isVisible );
+
+			// Start editing link
+			fireEvent.press(
+				getByA11yLabel( `Twitter link, ${ previousURL }` )
+			);
+
+			// Replace URL
+			const linkTextInput = getByDisplayValue( previousURL );
+			fireEvent( linkTextInput, 'focus' );
+			fireEvent.changeText( linkTextInput, invalidURL );
+
+			// Dismiss the edit URL modal
+			fireEvent( embedEditURLModal, 'backdropPress' );
+			fireEvent( embedEditURLModal, MODAL_DISMISS_EVENT );
+
+			const errorNotice = await waitFor( () =>
+				getByText( 'Invalid URL. Please enter a valid URL.' )
+			);
+
+			expect( errorNotice ).toBeDefined();
+			expect( getEditorHtml() ).toBe( initialHtml );
+		} );
 	} );
 } );
