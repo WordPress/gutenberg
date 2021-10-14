@@ -7,6 +7,16 @@ import { InspectorControls, useBlockProps } from '@wordpress/block-editor';
 import { store as coreStore } from '@wordpress/core-data';
 import { PanelBody, ToggleControl } from '@wordpress/components';
 
+/**
+ * Renders the `core/post-comment-author` block on the editor.
+ *
+ * @param {Object} props               React props.
+ * @param {Object} props.setAttributes Callback for updating block attributes.
+ * @param {Object} props.attributes    Block attributes.
+ * @param {Object} props.context       Inherited context.
+ *
+ * @return {JSX.Element} React element.
+ */
 export default function Edit( { attributes, context, setAttributes } ) {
 	const { className, isLink, linkTarget } = attributes;
 	const { commentId } = context;
