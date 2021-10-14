@@ -34,7 +34,7 @@ provideToNativeHtml.mockImplementation( ( html ) => {
 	serializedHtml = html;
 } );
 
-export async function initializeEditor( props ) {
+export async function initializeEditor( props, { waitForElement } = {} ) {
 	const renderResult = render(
 		<Editor
 			postId={ `post-id-${ uuid() }` }
@@ -58,6 +58,13 @@ export async function initializeEditor( props ) {
 			},
 		},
 	} );
+
+	// In some cases, we need to wait for an element to be present before
+	// considering the initialization finished.
+	if ( waitForElement ) {
+		const element = await waitFor( () => waitForElement( renderResult ) );
+		return { ...renderResult, element };
+	}
 
 	return renderResult;
 }
