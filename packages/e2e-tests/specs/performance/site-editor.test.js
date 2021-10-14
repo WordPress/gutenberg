@@ -13,6 +13,7 @@ import {
 	canvas,
 	createNewPost,
 	saveDraft,
+	openListView,
 } from '@wordpress/e2e-test-utils';
 
 /**
@@ -116,7 +117,7 @@ describe( 'Site Editor Performance', () => {
 		await canvas().click(
 			'[data-type="core/post-content"] [data-type="core/paragraph"]'
 		);
-		await page.click( '.edit-site-header-toolbar__list-view-toggle' );
+		await openListView();
 		await canvas().click(
 			'[data-type="core/post-content"] [data-type="core/paragraph"]'
 		);

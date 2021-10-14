@@ -40,6 +40,7 @@ const config = require( '../config' );
  * @property {number[]} inserterOpen         Average time to open global inserter.
  * @property {number[]} inserterSearch       Average time to search the inserter.
  * @property {number[]} inserterHover        Average time to move mouse between two block item in the inserter.
+ * @property {number[]} listViewOpen         Average time to open listView
  */
 
 /**
@@ -66,6 +67,9 @@ const config = require( '../config' );
  * @property {number=} inserterHover        Average time to move mouse between two block item in the inserter.
  * @property {number=} minInserterHover     Min time to move mouse between two block item in the inserter.
  * @property {number=} maxInserterHover     Max time to move mouse between two block item in the inserter.
+ * @property {number=} listViewOpen         Average time to open list view.
+ * @property {number=} minListViewOpen      Min time to open list view.
+ * @property {number=} maxListViewOpen      Max time to open list view.
  */
 
 /**
@@ -136,6 +140,9 @@ function curateResults( results ) {
 		inserterHover: average( results.inserterHover ),
 		minInserterHover: Math.min( ...results.inserterHover ),
 		maxInserterHover: Math.max( ...results.inserterHover ),
+		listViewOpen: average( results.listViewOpen ),
+		minListViewOpen: Math.min( ...results.listViewOpen ),
+		maxListViewOpen: Math.max( ...results.listViewOpen ),
 	};
 }
 
@@ -377,6 +384,15 @@ async function runPerformanceTests( branches, options ) {
 					),
 					maxInserterHover: rawResults.map(
 						( r ) => r[ branch ].maxInserterHover
+					),
+					listViewOpen: rawResults.map(
+						( r ) => r[ branch ].listViewOpen
+					),
+					minListViewOpen: rawResults.map(
+						( r ) => r[ branch ].minListViewOpen
+					),
+					maxListViewOpen: rawResults.map(
+						( r ) => r[ branch ].maxListViewOpen
 					),
 				},
 				median

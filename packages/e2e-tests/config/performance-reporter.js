@@ -37,6 +37,7 @@ class PerformanceReporter {
 			firstBlock,
 			type,
 			focus,
+			listViewOpen,
 			inserterOpen,
 			inserterHover,
 			inserterSearch,
@@ -87,6 +88,21 @@ Slowest time to select a block: ${ success(
 			) }
 Fastest time to select a block: ${ success(
 				round( Math.min( ...focus ) ) + 'ms'
+			) }` );
+		}
+
+		if ( listViewOpen && listViewOpen.length ) {
+			// eslint-disable-next-line no-console
+			console.log( `
+${ title( 'Opening List View Performance:' ) }
+Average time to open list view: ${ success(
+				round( average( listViewOpen ) ) + 'ms'
+			) }
+Slowest time to open list view: ${ success(
+				round( Math.max( ...listViewOpen ) ) + 'ms'
+			) }
+Fastest time to open list view: ${ success(
+				round( Math.min( ...listViewOpen ) ) + 'ms'
 			) }` );
 		}
 
