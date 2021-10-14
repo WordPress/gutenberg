@@ -16,7 +16,7 @@ import { chevronLeft, chevronRight, Icon } from '@wordpress/icons';
 /**
  * Internal dependencies
  */
-import StylesPreview from './preview';
+import GlobalStylesVariationSelector from './variation-selector';
 import { NavigationButton } from './navigation-button';
 import ContextMenu from './context-menu';
 
@@ -24,7 +24,7 @@ function ScreenRoot() {
 	return (
 		<Card size="small">
 			<CardBody>
-				<StylesPreview />
+				<GlobalStylesVariationSelector />
 			</CardBody>
 
 			<CardBody>

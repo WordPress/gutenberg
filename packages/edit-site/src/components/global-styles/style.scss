@@ -1,8 +1,8 @@
-.edit-site-global-styles-preview__dropdown {
+.edit-site-global-styles-variation-selector {
 	display: block;
 }
 
-.edit-site-global-styles-preview__popover > .components-popover__content {
+.edit-site-global-styles-variation-selector__popover > .components-popover__content {
 	width: 200px;
 }
 
@@ -10,7 +10,8 @@
 	display: flex;
 	align-items: center;
 	justify-content: center;
-	min-height: 152px;
+	// The VStack component is reset the min-height, so we need important here.
+	min-height: 152px !important;
 	line-height: 1;
 	cursor: pointer;
 }
