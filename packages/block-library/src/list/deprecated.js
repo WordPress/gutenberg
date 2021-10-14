@@ -6,7 +6,7 @@ import { RichText, useBlockProps } from '@wordpress/block-editor';
 /**
  * Internal dependencies
  */
-import oldFontFamilyMigration from '../utils/old-font-family-migration';
+import migrateFontFamily from '../utils/migrate-font-family';
 
 const deprecated = [
 	{
@@ -62,7 +62,7 @@ const deprecated = [
 				</TagName>
 			);
 		},
-		migrate: oldFontFamilyMigration,
+		migrate: migrateFontFamily,
 		isEligible( { style } ) {
 			return style?.typography?.fontFamily;
 		},

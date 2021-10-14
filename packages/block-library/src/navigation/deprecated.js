@@ -11,7 +11,7 @@ import { InnerBlocks } from '@wordpress/block-editor';
 /**
  * Internal dependencies
  */
-import oldFontFamilyMigration from '../utils/old-font-family-migration';
+import migrateFontFamily from '../utils/migrate-font-family';
 
 const TYPOGRAPHY_PRESET_DEPRECATION_MAP = {
 	fontStyle: 'var:preset|font-style|',
@@ -325,7 +325,7 @@ const deprecated = [
 		save() {
 			return <InnerBlocks.Content />;
 		},
-		migrate: oldFontFamilyMigration,
+		migrate: migrateFontFamily,
 		isEligible( { style } ) {
 			return style?.typography?.fontFamily;
 		},

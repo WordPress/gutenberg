@@ -21,7 +21,7 @@ import { compose } from '@wordpress/compose';
 /**
  * Internal dependencies
  */
-import oldFontFamilyMigration from '../utils/old-font-family-migration';
+import migrateFontFamily from '../utils/migrate-font-family';
 
 const migrateBorderRadius = ( attributes ) => {
 	const { borderRadius, ...newAttributes } = attributes;
@@ -981,7 +981,7 @@ const deprecated = [
 				</div>
 			);
 		},
-		migrate: oldFontFamilyMigration,
+		migrate: migrateFontFamily,
 		isEligible( { style } ) {
 			return style?.typography?.fontFamily;
 		},

@@ -1,7 +1,7 @@
 /**
  * Internal dependencies
  */
-import oldFontFamilyMigration from '../utils/old-font-family-migration';
+import migrateFontFamily from '../utils/migrate-font-family';
 
 const deprecated = [
 	{
@@ -39,7 +39,7 @@ const deprecated = [
 		save() {
 			return null;
 		},
-		migrate: oldFontFamilyMigration,
+		migrate: migrateFontFamily,
 		isEligible( { style } ) {
 			return style?.typography?.fontFamily;
 		},
