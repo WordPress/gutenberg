@@ -1,0 +1,7 @@
+{
+	"main": "../build/jsx-runtime.js",
+	"module": "../build-module/jsx-runtime.js",
+	"react-native": "../src/jsx-runtime.js",
+	"types": "./jsx-runtime.d.ts",
+	"sideEffects": false
+}
