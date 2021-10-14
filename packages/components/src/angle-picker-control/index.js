@@ -48,6 +48,7 @@ export default function AnglePickerControl( {
 					suffix={
 						<Spacer
 							as={ Text }
+							marginBottom={ 0 }
 							marginRight={ space( 3 ) }
 							style={ {
 								color: 'var( --wp-admin-theme-color )',
