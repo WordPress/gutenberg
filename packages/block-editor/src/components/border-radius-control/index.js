@@ -62,7 +62,10 @@ export default function BorderRadiusControl( { onChange, values } ) {
 	const toggleLinked = () => setIsLinked( ! isLinked );
 
 	const handleSliderChange = ( next ) => {
-		onChange( next !== undefined ? `${ next }${ unit }` : undefined );
+		const currentUnit = unit || 'px';
+		onChange(
+			next !== undefined ? `${ next }${ currentUnit }` : undefined
+		);
 	};
 
 	return (
