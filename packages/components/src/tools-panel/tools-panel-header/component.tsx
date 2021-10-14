@@ -7,8 +7,8 @@ import type { Ref } from 'react';
 /**
  * WordPress dependencies
  */
-import { check, reset, moreVertical } from '@wordpress/icons';
-import { __, sprintf } from '@wordpress/i18n';
+import { check, reset, moreVertical, plus } from '@wordpress/icons';
+import { __, _x, sprintf } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
@@ -118,6 +118,7 @@ const ToolsPanelHeader = (
 	const {
 		dropdownMenuClassName,
 		hasMenuItems,
+		areAllOptionalControlsHidden,
 		label: labelText,
 		menuItems,
 		resetAll,
@@ -131,14 +132,21 @@ const ToolsPanelHeader = (
 
 	const defaultItems = Object.entries( menuItems?.default || {} );
 	const optionalItems = Object.entries( menuItems?.optional || {} );
+	const dropDownMenuIcon = areAllOptionalControlsHidden ? plus : moreVertical;
+	const dropDownMenuLabelText = areAllOptionalControlsHidden
+		? _x(
+				'View and add options',
+				'Button label to reveal tool panel options'
+		  )
+		: _x( 'View options', 'Button label to reveal tool panel options' );
 
 	return (
 		<h2 { ...headerProps } ref={ forwardedRef }>
 			{ labelText }
 			{ hasMenuItems && (
 				<DropdownMenu
-					icon={ moreVertical }
-					label={ labelText }
+					icon={ dropDownMenuIcon }
+					label={ dropDownMenuLabelText }
 					menuProps={ { className: dropdownMenuClassName } }
 				>
 					{ ( { onClose = noop } ) => (
