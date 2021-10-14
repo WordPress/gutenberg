@@ -949,6 +949,7 @@ Within this field themes can list the template parts present in the `block-templ
 Currently block variations exist for "header" and "footer" values of the area term, any other values and template parts not defined in the json will default to the general template part block. Variations will be denoted by specific icons within the editor's interface, will default to the corresponding semantic HTML element for the wrapper (this can also be overridden by the `tagName` attribute set on the template part block), and will contextualize the template part allowing more custom flows in future editor improvements.
 
 - name: mandatory.
+- title: optional, translatable.
 - area: optional, will be set to `uncategorized` by default and trigger no block variation.
 
 ```json
@@ -957,6 +958,7 @@ Currently block variations exist for "header" and "footer" values of the area te
 	"templateParts": [
 		{
 			"name": "my-template-part",
+			"title": "Header",
 			"area": "header"
 		}
 	]
