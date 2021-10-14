@@ -1,9 +1,18 @@
+.edit-site-global-styles-preview__dropdown {
+	display: block;
+}
+
+.edit-site-global-styles-preview__popover > .components-popover__content {
+	width: 200px;
+}
+
 .edit-site-global-styles-preview {
 	display: flex;
 	align-items: center;
 	justify-content: center;
 	min-height: 152px;
 	line-height: 1;
+	cursor: pointer;
 }
 
 .edit-site-typography-panel__preview {
