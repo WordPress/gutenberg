@@ -13,7 +13,6 @@ import {
 	__experimentalItemGroup as ItemGroup,
 	__experimentalItem as Item,
 	__experimentalHStack as HStack,
-	__experimentalSpacer as Spacer,
 	__experimentalText as Text,
 	__experimentalTruncate as Truncate,
 	FlexItem,
@@ -373,8 +372,8 @@ export default function PreferencesModal() {
 							<Card isBorderless size="large">
 								<CardHeader
 									isBorderless={ false }
+									justify="left"
 									size="small"
-									direction="column"
 									gap="6"
 								>
 									<NavigationButton
@@ -386,14 +385,10 @@ export default function PreferencesModal() {
 										aria-label={ __(
 											'Navigate to the previous view'
 										) }
-									>
-										{ __( 'Back' ) }
-									</NavigationButton>
-									<Spacer marginBottom="0" marginLeft="4">
-										<Text as="h2">
-											{ section.tabLabel }
-										</Text>
-									</Spacer>
+									/>
+									<Text size="16" color="#1d2327">
+										{ section.tabLabel }
+									</Text>
 								</CardHeader>
 								<CardBody>{ section.content }</CardBody>
 							</Card>
