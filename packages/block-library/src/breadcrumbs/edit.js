@@ -24,10 +24,41 @@ import { __ } from '@wordpress/i18n';
 import { store as coreStore } from '@wordpress/core-data';
 import { decodeEntities } from '@wordpress/html-entities';
 
-/**
- * Internal dependencies
- */
-import { buildBreadcrumb } from './utils';
+function Breadcrumb( {
+	crumbTitle,
+	separator,
+	showSeparator,
+	addLeadingSeparator,
+} ) {
+	let separatorSpan;
+	let crumbAnchor;
+
+	if ( separator ) {
+		separatorSpan = (
+			<span className="wp-block-breadcrumbs__separator">
+				{ separator }
+			</span>
+		);
+	}
+
+	if ( crumbTitle ) {
+		/* eslint-disable jsx-a11y/anchor-is-valid */
+		crumbAnchor = (
+			<a href="#" onClick={ ( event ) => event.preventDefault() }>
+				{ crumbTitle }
+			</a>
+		);
+		/* eslint-enable */
+	}
+
+	return (
+		<li className="wp-block-breadcrumbs__item">
+			{ addLeadingSeparator ? separatorSpan : null }
+			{ crumbAnchor }
+			{ showSeparator ? separatorSpan : null }
+		</li>
+	);
+}
 
 export default function BreadcrumbsEdit( {
 	attributes,
@@ -140,19 +171,15 @@ export default function BreadcrumbsEdit( {
 			breadcrumbTitles.push( post?.title || __( 'Current page' ) );
 		}
 
-		const crumbs = [];
-		crumbs.push(
-			...breadcrumbTitles.map( ( item, index ) =>
-				buildBreadcrumb( {
-					crumbTitle: item,
-					separator,
-					showSeparator: index < breadcrumbTitles.length - 1,
-					addLeadingSeparator: index === 0 && showLeadingSeparator,
-					key: index,
-				} )
-			)
-		);
-		return crumbs;
+		return breadcrumbTitles.map( ( item, index ) => (
+			<Breadcrumb
+				crumbTitle={ item }
+				separator={ separator }
+				showSeparator={ index < breadcrumbTitles.length - 1 }
+				addLeadingSeparator={ index === 0 && showLeadingSeparator }
+				key={ index }
+			/>
+		) );
 	}, [
 		categories,
 		nestingLevel,
@@ -181,7 +208,7 @@ export default function BreadcrumbsEdit( {
 				/>
 			</BlockControls>
 			<InspectorControls>
-				<PanelBody title={ __( 'Breadcrumbs' ) }>
+				<PanelBody title={ __( 'Display' ) }>
 					<RangeControl
 						label={ __( 'Nesting level' ) }
 						help={ __(
