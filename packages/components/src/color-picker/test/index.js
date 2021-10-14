@@ -121,7 +121,7 @@ describe( 'ColorPicker', () => {
 		await sleep( 1 );
 
 		expect( onChange ).toHaveBeenCalledWith(
-			expect.stringContaining( 'rgba' )
+			expect.stringMatching( /^#([a-fA-F0-9]{8})$/ )
 		);
 	} );
 
@@ -154,7 +154,7 @@ describe( 'ColorPicker', () => {
 		await sleep( 1 );
 
 		expect( onChange ).toHaveBeenCalledWith(
-			expect.stringContaining( '#' )
+			expect.stringMatching( /^#([a-fA-F0-9]{6})$/ )
 		);
 	} );
 } );

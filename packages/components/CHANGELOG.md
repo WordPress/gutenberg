@@ -20,6 +20,7 @@
 ### Breaking Changes
 
 -   The `color` property a `tinycolor2` color object passed on `onChangeComplete` property of the `ColorPicker` component was removed. Please use the new `onChange` property that accepts a string color representation ([#35562](https://github.com/WordPress/gutenberg/pull/35562)).
+
 ## 18.0.0 (2021-10-12)
 
 ### Breaking Changes

@@ -82,11 +82,7 @@ const ColorPicker = (
 
 	const handleChange = useCallback(
 		( nextValue: Colord ) => {
-			debouncedSetColor(
-				nextValue.alpha() < 1
-					? nextValue.toRgbString()
-					: nextValue.toHex()
-			);
+			debouncedSetColor( nextValue.toHex() );
 		},
 		[ debouncedSetColor ]
 	);

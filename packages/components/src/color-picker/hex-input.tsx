@@ -29,8 +29,6 @@ export const HexInput = ( { color, onChange, enableAlpha }: HexInputProps ) => {
 		}
 	};
 
-	const value = color.toHex();
-
 	return (
 		<ColorHexInputControl
 			prefix={
@@ -43,7 +41,7 @@ export const HexInput = ( { color, onChange, enableAlpha }: HexInputProps ) => {
 					#
 				</Spacer>
 			}
-			value={ value.slice( 1 ).toUpperCase() }
+			value={ color.toHex().slice( 1 ).toUpperCase() }
 			onChange={ ( nextValue ) => {
 				onChange( colord( '#' + nextValue ) );
 			} }
