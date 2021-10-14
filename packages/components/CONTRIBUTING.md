@@ -59,6 +59,7 @@ When creating components that render a list of subcomponents, prefer to expose t
 	] }
 />
 ```
+
 ```jsx
 // ✅ Do:
 <List>
@@ -81,6 +82,7 @@ function List ( props ) {
 	);
 }
 ```
+
 ```jsx
 // ✅ Do:
 const ListContext = createContext();
@@ -325,6 +327,7 @@ function Example() {
 		</ExampleComponent>
 	);
 }
+```
 
 ## Props
 
@@ -335,6 +338,8 @@ The component accepts the following props:
 Prop description. With a new line before and after the description and before and after type/required blocks.
 
 -   Required: Either `Yes` or `No`
+<!-- If the prop has a default value, add the following line: -->
+-   Default: [default value]
 
 ### Inherited props
 
@@ -344,14 +349,17 @@ Add this section when there are props that are drilled down into an internal com
 ## Context
 
 See examples for this section for the [ItemGroup](/packages/components/src/item-group/item-group/README.md#context) and [`Card`](/packages/components/src/card/card/README.md#context) components.
-```
 
 ## Folder structure
 
 As a result of the above guidelines, all new components (except for shared utilities) should _generally_ follow this folder structure:
 
-```
+```text
 component-name/
+├── stories
+│   └── index.js
+├── test
+│   └── index.js
 ├── component.tsx
 ├── context.ts
 ├── hook.ts
@@ -361,28 +369,28 @@ component-name/
 └── types.ts
 ```
 
-In case of a family of components (e.g. `Card` and `CardBody`, `CardFooter`, `CardHeader` ...), each component's implementation should live in a separate subfolder:
+In case of a family of components (e.g. `Card` and `CardBody`, `CardFooter`, `CardHeader` ...), each component's implementation should live in a separate subfolder, while code common to the whole family of components (e.g types, utils, context...) should live in the family of components root folder:
 
-```
+```text
 component-family-name/
 ├── sub-component-name/
 │   ├── index.ts
 │   ├── component.tsx
 │   ├── hook.ts
 │   ├── README.md
-│   ├── styles.ts
-│   └── types.ts
+│   └── styles.ts
 ├── sub-component-name/
 │   ├── index.ts
 │   ├── component.tsx
 │   ├── hook.ts
 │   ├── README.md
-│   ├── styles.ts
-│   └── types.ts
+│   └── styles.ts
 ├── stories
 │   └── index.js
 ├── test
 │   └── index.js
 ├── context.ts
-└── index.ts
+├── index.ts
+├── types.ts
+└── utils.ts
 ```
