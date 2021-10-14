@@ -117,12 +117,11 @@ $block-inserter-tabs-height: 44px;
 .block-editor-inserter__tabs {
 	display: flex;
 	flex-direction: column;
-	margin-top: -$grid-unit-10;
 
 	.components-tab-panel__tabs {
 		position: sticky;
 		// Computed based off the search input height and paddings
-		top: $grid-unit-10 + $grid-unit-20 + $grid-unit-60;
+		top: $grid-unit-20 + $grid-unit-60;
 		background: $white;
 		z-index: z-index(".block-editor-inserter__tabs .components-tab-panel__tabs");
 		border-bottom: $border-width solid $gray-300;
