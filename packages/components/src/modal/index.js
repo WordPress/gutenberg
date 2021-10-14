@@ -107,7 +107,7 @@ export default function Modal( {
 	return createPortal(
 		// eslint-disable-next-line jsx-a11y/no-static-element-interactions
 		<div
-			ref={ useMergeRefs([ ref, forwardedRef ] ) }
+			ref={ useMergeRefs( [ ref, forwardedRef ] ) }
 			className={ classnames(
 				'components-modal__screen-overlay',
 				overlayClassName
