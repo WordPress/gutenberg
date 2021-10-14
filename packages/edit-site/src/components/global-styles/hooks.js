@@ -137,7 +137,7 @@ function useGlobalStylesUserConfig() {
 function useGlobalStylesBaseConfig() {
 	const baseConfig = useSelect( ( select ) => {
 		return select( editSiteStore ).getSettings()
-			.__experimentalGlobalStylesBaseStyles;
+			.__experimentalGlobalStylesBaseConfig;
 	}, [] );
 
 	return baseConfig;
