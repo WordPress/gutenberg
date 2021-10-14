@@ -29,9 +29,10 @@ const clickFontSizeButtonByLabel = async ( label ) => {
 };
 
 // Clicks the button to toggle between custom size input and the control for the presets.
-const toggleCustomInput = async () => {
+const toggleCustomInput = async ( showCustomInput ) => {
+	const label = showCustomInput ? 'Set custom size' : 'Use size preset';
 	const toggleButton = await page.waitForXPath(
-		"//button[@aria-label='Toggle custom size display']"
+		`//button[@aria-label='${ label }']`
 	);
 	return toggleButton.click();
 };
@@ -68,7 +69,7 @@ describe( 'Font Size Picker', () => {
 		await clickBlockAppender();
 		await page.keyboard.type( 'Paragraph to be made "small"' );
 
-		await toggleCustomInput();
+		await toggleCustomInput( true );
 		await clickCustomInput();
 		// This should be the "small" font-size of the editor defaults.
 		await page.keyboard.type( '13' );
@@ -84,7 +85,7 @@ describe( 'Font Size Picker', () => {
 		await clickBlockAppender();
 		await page.keyboard.type( 'Paragraph to be made "small"' );
 
-		await toggleCustomInput();
+		await toggleCustomInput( true );
 		await clickCustomInput();
 		await page.keyboard.type( '23' );
 		expect( await getEditedPostContent() ).toMatchInlineSnapshot( `
@@ -102,7 +103,7 @@ describe( 'Font Size Picker', () => {
 		);
 
 		await clickFontSizeButtonByLabel( 'Small' );
-		await toggleCustomInput();
+		await toggleCustomInput( true );
 
 		await page.keyboard.press( 'Tab' );
 		await page.keyboard.press( 'Tab' );
@@ -124,7 +125,7 @@ describe( 'Font Size Picker', () => {
 		);
 
 		await clickFontSizeButtonByLabel( 'Small' );
-		await toggleCustomInput();
+		await toggleCustomInput( true );
 		await clickCustomInput();
 		await pressKeyWithModifier( 'primary', 'A' );
 		await page.keyboard.press( 'Backspace' );
@@ -145,7 +146,7 @@ describe( 'Font Size Picker', () => {
 		await clickBlockAppender();
 		await page.keyboard.type( 'Paragraph to be made "small"' );
 
-		await toggleCustomInput();
+		await toggleCustomInput( true );
 		await clickCustomInput();
 		await page.keyboard.type( '23' );
 		await page.keyboard.press( 'Backspace' );

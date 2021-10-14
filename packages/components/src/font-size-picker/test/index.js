@@ -13,10 +13,9 @@ const getUnitSelect = () =>
 const getUnitLabel = () =>
 	document.body.querySelector( '.components-unit-control__unit-label' );
 
-const toggleCustomInput = () => {
-	const toggleCustom = screen.getByLabelText( 'Toggle custom size display', {
-		selector: 'button',
-	} );
+const toggleCustomInput = ( showCustomInput ) => {
+	const label = showCustomInput ? 'Set custom size' : 'Use size preset';
+	const toggleCustom = screen.getByLabelText( label, { selector: 'button' } );
 	fireEvent.click( toggleCustom );
 };
 
@@ -91,7 +90,7 @@ describe( 'FontSizePicker', () => {
 				/>
 			);
 
-			toggleCustomInput();
+			toggleCustomInput( true );
 			const unitSelect = getUnitSelect();
 			const unitLabel = getUnitLabel();
 			const input = screen.getByLabelText( 'Custom', {
@@ -127,7 +126,7 @@ describe( 'FontSizePicker', () => {
 				/>
 			);
 
-			toggleCustomInput();
+			toggleCustomInput( true );
 			const unitSelect = getUnitSelect();
 			const unitLabel = getUnitLabel();
 			const input = screen.getByLabelText( 'Custom', {

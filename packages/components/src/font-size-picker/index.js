@@ -125,7 +125,11 @@ function FontSizePicker(
 				{ ! disableCustomFontSizes && (
 					<FlexItem>
 						<Button
-							label={ __( 'Toggle custom size display' ) }
+							label={
+								showCustomValueControl
+									? __( 'Use size preset' )
+									: __( 'Set custom size' )
+							}
 							showTooltip={ false }
 							icon={ settings }
 							onClick={ () => {
