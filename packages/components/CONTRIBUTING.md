@@ -59,6 +59,7 @@ When creating components that render a list of subcomponents, prefer to expose t
 	] }
 />
 ```
+
 ```jsx
 // ✅ Do:
 <List>
@@ -81,6 +82,7 @@ function List ( props ) {
 	);
 }
 ```
+
 ```jsx
 // ✅ Do:
 const ListContext = createContext();
@@ -352,7 +354,7 @@ See examples for this section for the [ItemGroup](/packages/components/src/item-
 
 As a result of the above guidelines, all new components (except for shared utilities) should _generally_ follow this folder structure:
 
-```
+```text
 component-name/
 ├── component.tsx
 ├── context.ts
@@ -365,7 +367,7 @@ component-name/
 
 In case of a family of components (e.g. `Card` and `CardBody`, `CardFooter`, `CardHeader` ...), each component's implementation should live in a separate subfolder, while code common to the whole family of components (e.g types, utils, context...) should live in the family of components root folder:
 
-```
+```text
 component-family-name/
 ├── sub-component-name/
 │   ├── index.ts
