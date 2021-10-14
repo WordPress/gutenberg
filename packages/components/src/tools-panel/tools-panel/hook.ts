@@ -36,6 +36,7 @@ export function useToolsPanel(
 ) {
 	const {
 		className,
+		columns = 2,
 		resetAll,
 		panelId,
 		hasInnerWrapper,
@@ -133,7 +134,7 @@ export function useToolsPanel(
 		const hasDefaultMenuItems =
 			menuItems?.default && !! Object.keys( menuItems?.default ).length;
 		const wrapperStyle =
-			hasInnerWrapper && styles.ToolsPanelWithInnerWrapper;
+			hasInnerWrapper && styles.ToolsPanelWithInnerWrapper( columns );
 		const emptyStyle =
 			! hasDefaultMenuItems &&
 			areAllOptionalControlsHidden &&
@@ -209,6 +210,7 @@ export function useToolsPanel(
 
 	return {
 		...otherProps,
+		columns,
 		panelContext,
 		resetAllItems,
 		toggleItem,

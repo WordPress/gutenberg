@@ -13,6 +13,11 @@ export type ToolsPanelProps = {
 	 */
 	children: ReactNode;
 	/**
+	 * Definition of columns for the ToolsPanel's grid layout. Also used to
+	 * default panel items to span the full panel's width.
+	 */
+	columns: number;
+	/**
 	 * Flags that the items in this ToolsPanel will be contained within an inner
 	 * wrapper element allowing the panel to lay them out accordingly.
 	 */
@@ -100,6 +105,12 @@ export type ToolsPanelItemProps = ToolsPanelItem & {
 	 * The child elements.
 	 */
 	children?: ReactNode;
+	/**
+	 * Allows panel items to define which column to occupy within the panel's
+	 * grid or how many columns it should span. This maps to the CSS grid-column
+	 * property.
+	 */
+	gridColumn?: string;
 	/**
 	 * Called when this item is deselected in the `ToolsPanel` menu. This is
 	 * normally used to reset the panel item control's value.

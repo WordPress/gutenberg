@@ -67,6 +67,14 @@ export function DimensionPanel( props ) {
 
 ## Props
 
+### `columns`: `number`
+
+This defines the number of columns in the `ToolsPanel` grid layout. Items
+contained within are set to span all columns by default.
+
+- Required: No
+- Default: `2`
+
 ### `hasInnerWrapper`: `boolean`
 
 Flags that the items in this ToolsPanel will be contained within an inner

@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import { css } from '@emotion/react';
+
+/**
  * WordPress dependencies
  */
 import { usePrevious } from '@wordpress/compose';
@@ -18,6 +23,7 @@ export function useToolsPanelItem(
 ) {
 	const {
 		className,
+		gridColumn,
 		hasValue,
 		isShownByDefault,
 		label,
@@ -117,8 +123,15 @@ export function useToolsPanelItem(
 			shouldRenderPlaceholder &&
 			! isShown &&
 			styles.ToolsPanelItemPlaceholder;
-		return cx( styles.ToolsPanelItem, placeholderStyle, className );
-	}, [ isShown, shouldRenderPlaceholder, className ] );
+		const columnClass = css( { gridColumn } );
+
+		return cx(
+			styles.ToolsPanelItem,
+			placeholderStyle,
+			className,
+			columnClass
+		);
+	}, [ isShown, shouldRenderPlaceholder, className, gridColumn ] );
 
 	return {
 		...otherProps,
