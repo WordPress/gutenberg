@@ -148,7 +148,7 @@ export function addBlockTypes( blockTypes ) {
  *
  * @yield {Object} Action object.
  */
-export function* __experimentalAddBlockType( blockType ) {
+export function* __experimentalRegisterBlockType( blockType ) {
 	yield {
 		type: 'ADD_UNPROCESSED_BLOCK_TYPE',
 		blockType,

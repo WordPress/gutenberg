@@ -270,7 +270,7 @@ export function registerBlockType( blockNameOrMetadata, settings ) {
 		...settings,
 	};
 
-	dispatch( blocksStore ).__experimentalAddBlockType( blockType );
+	dispatch( blocksStore ).__experimentalRegisterBlockType( blockType );
 
 	return select( blocksStore ).getBlockType( name );
 }
