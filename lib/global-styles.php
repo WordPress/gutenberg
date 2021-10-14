@@ -5,7 +5,7 @@
  * @package gutenberg
  */
 
- /**
+/**
  * Takes a tree adhering to the theme.json schema and generates
  * the corresponding stylesheet.
  *
