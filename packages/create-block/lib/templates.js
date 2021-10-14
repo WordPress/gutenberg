@@ -3,6 +3,8 @@
  */
 const { command } = require( 'execa' );
 const glob = require( 'fast-glob' );
+const { resolve } = require('path');
+const { existsSync } = require('fs');
 const { mkdtemp, readFile } = require( 'fs' ).promises;
 const { fromPairs, isObject } = require( 'lodash' );
 const npmPackageArg = require( 'npm-package-arg' );
@@ -117,6 +119,7 @@ const configToTemplate = async ( {
 };
 
 const getBlockTemplate = async ( templateName ) => {
+
 	if ( predefinedBlockTemplates[ templateName ] ) {
 		return await configToTemplate(
 			predefinedBlockTemplates[ templateName ]
@@ -124,7 +127,11 @@ const getBlockTemplate = async ( templateName ) => {
 	}
 
 	try {
-		return await configToTemplate( require( templateName ) );
+		if ( existsSync( resolve( templateName ) ) ) {
+			return await configToTemplate( require( resolve( templateName ) ) )
+		} else {
+			return await configToTemplate( require( templateName ) );
+		}
 	} catch ( error ) {
 		if ( error instanceof CLIError ) {
 			throw error;
