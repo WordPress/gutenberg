@@ -40,13 +40,20 @@
 			"fontSize": true,
 			"lineHeight": true,
 			"__experimentalFontFamily": true,
-			"__experimentalTextTransform": true,
 			"__experimentalFontStyle": true,
 			"__experimentalFontWeight": true,
 			"__experimentalLetterSpacing": true,
+			"__experimentalTextTransform": true,
+			"__experimentalTextDecoration": true,
 			"__experimentalDefaultControls": {
 				"fontSize": true,
-				"lineHeight": true
+				"lineHeight": true,
+				"__experimentalFontFamily": true,
+				"__experimentalFontStyle": true,
+				"__experimentalFontWeight": true,
+				"__experimentalLetterSpacing": true,
+				"__experimentalTextTransform": true,
+				"__experimentalTextDecoration": true
 			}
 		}
 	},
