@@ -336,6 +336,8 @@ The component accepts the following props:
 Prop description. With a new line before and after the description and before and after type/required blocks.
 
 -   Required: Either `Yes` or `No`
+<!-- If the prop has a default value, add the following line: -->
+-   Default: [default value]
 
 ### Inherited props
 
