@@ -123,9 +123,10 @@ const Example = () => {
 
 A `default` value (in the example above, `10` for `%`), if defined, is set as the new `value` when a unit changes. This is helpful in scenarios where changing a unit may cause drastic results, such as changing from `px` to `vh`.
 
-### `value`: `string`
+### `value`: `number | string`
 
-Current value. To set a unit, provide a unit with a value through the `value` prop.
+Current value. If passed as a string, the current unit will be inferred from this value.
+For example, a `value` of `50%` will set the current unit to `%`.
 
 Example:
 

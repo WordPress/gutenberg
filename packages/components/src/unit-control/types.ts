@@ -108,7 +108,8 @@ export type UnitControlProps = UnitSelectControlProps & {
 	 */
 	onUnitChange?: UnitControlOnChangeCallback;
 	/**
-	 * Current value. To set a unit, provide a unit with a value through the `value` prop.
+	 * Current value. If passed as a string, the current unit will be inferred from this value.
+	 * For example, a `value` of "50%" will set the current unit to `%`.
 	 */
-	value: string;
+	value: Value;
 };
