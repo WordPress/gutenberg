@@ -60,7 +60,7 @@ function gutenberg_get_global_styles( $path = array(), $block_name = '', $origin
 	}
 
 	$theme_supports = gutenberg_get_default_block_editor_settings();
-	$styles         = WP_Theme_JSON_Resolver_Gutenberg::get_merged_data( $theme_supports, $origin )['styles'];
+	$styles         = WP_Theme_JSON_Resolver_Gutenberg::get_merged_data( $theme_supports, $origin )->get_raw_data()['styles'];
 
 	return _wp_array_get( $styles, $path, $styles );
 }
