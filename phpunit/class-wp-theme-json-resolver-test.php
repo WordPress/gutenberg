@@ -202,6 +202,15 @@ class WP_Theme_JSON_Resolver_Gutenberg_Test extends WP_UnitTestCase {
 				),
 			)
 		);
+		$this->assertSame(
+			$actual->get_template_parts(),
+			array(
+				'small-header' => array(
+					'title' => 'Mały nagłówek',
+					'area'  => 'header',
+				),
+			)
+		);
 	}
 
 	function test_switching_themes_recalculates_data() {
