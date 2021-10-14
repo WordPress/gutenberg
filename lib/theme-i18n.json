@@ -102,5 +102,10 @@
 		{
 			"title": "Custom template name"
 		}
+	],
+	"templateParts": [
+		{
+			"Title": "Template part name"
+		}
 	]
 }
