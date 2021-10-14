@@ -40,7 +40,7 @@ export const _default = () => {
 					resetAll={ resetAll }
 				>
 					<ToolsPanelItem
-						className="single-column"
+						gridColumn="span 1"
 						hasValue={ () => !! width }
 						label="Width"
 						onDeselect={ () => setWidth( undefined ) }
@@ -53,7 +53,7 @@ export const _default = () => {
 						/>
 					</ToolsPanelItem>
 					<ToolsPanelItem
-						className="single-column"
+						gridColumn="span 1"
 						hasValue={ () => !! height }
 						label="Height"
 						onDeselect={ () => setHeight( undefined ) }
@@ -100,7 +100,7 @@ export const WithOptionalItemsPlusIcon = () => {
 					resetAll={ resetAll }
 				>
 					<ToolsPanelItem
-						className="single-column"
+						gridColumn="span 1"
 						hasValue={ () => !! width }
 						label="Width"
 						onDeselect={ () => setWidth( undefined ) }
@@ -113,7 +113,7 @@ export const WithOptionalItemsPlusIcon = () => {
 						/>
 					</ToolsPanelItem>
 					<ToolsPanelItem
-						className="single-column"
+						gridColumn="span 1"
 						hasValue={ () => !! height }
 						label="Height"
 						onDeselect={ () => setHeight( undefined ) }
@@ -162,7 +162,7 @@ export const WithSlotFillItems = () => {
 		<SlotFillProvider>
 			<ToolsPanelItems>
 				<ToolsPanelItem
-					className="single-column"
+					gridColumn="span 1"
 					hasValue={ () => !! width }
 					label="Injected Width"
 					onDeselect={ () => updateAttribute( 'width', undefined ) }
@@ -178,7 +178,7 @@ export const WithSlotFillItems = () => {
 					/>
 				</ToolsPanelItem>
 				<ToolsPanelItem
-					className="single-column"
+					gridColumn="span 1"
 					hasValue={ () => !! height }
 					label="Injected Height"
 					onDeselect={ () => updateAttribute( 'height', undefined ) }
