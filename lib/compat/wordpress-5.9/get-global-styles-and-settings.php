@@ -23,13 +23,14 @@ function gutenberg_get_global_settings( $path = array(), $block_name = '', $orig
 		$path = array_merge( array( 'blocks', $block_name ), $path );
 	}
 
-	$theme_supports = gutenberg_get_default_block_editor_settings();
-
 	if ( 'base' === $origin ) {
-		$settings = WP_Theme_JSON_Resolver_Gutenberg::get_merged_data( $theme_supports, 'theme' )->get_settings();
+		$origin = 'theme';
 	} else {
-		$settings = WP_Theme_JSON_Resolver_Gutenberg::get_merged_data( $theme_supports )->get_settings();
+		$origin = 'user';
 	}
+
+	$theme_supports = gutenberg_get_default_block_editor_settings();
+	$settings       = WP_Theme_JSON_Resolver_Gutenberg::get_merged_data( $theme_supports, $origin )->get_settings();
 
 	return _wp_array_get( $settings, $path, $settings );
 }
