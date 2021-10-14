@@ -40,7 +40,7 @@ describe( 'stripHTML', () => {
 			expect( stripHTML( input ) ).toBe( output );
 		} );
 
-		it( 'should preserve consequtive spaces within string', () => {
+		it( 'should preserve consecutive spaces within string', () => {
 			const input =
 				'<strong>Here is some          text</strong> with                  <em>a lot of spaces inside</em>.';
 			const output =
