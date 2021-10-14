@@ -8,7 +8,7 @@ import {
 	waitFor,
 	within,
 } from 'test/helpers';
-import { Platform } from 'react-native';
+import { Clipboard, Platform } from 'react-native';
 
 /**
  * WordPress dependencies
@@ -232,6 +232,51 @@ describe( 'Embed block', () => {
 			expect( editURLButton ).toBeDefined();
 			expect( getEditorHtml() ).toBe( expectedHtml );
 		} );
+
+		it( 'auto-pastes the URL from clipboard', async () => {
+			const initialHtml = '';
+			const expectedHtml = RICH_TEXT_EMBED_HTML;
+			const clipboardURL = 'https://twitter.com/notnownikki';
+
+			// Mock clipboard
+			Clipboard.getString.mockResolvedValue( clipboardURL );
+
+			const {
+				getByA11yLabel,
+				getByText,
+				getByTestId,
+			} = await initializeEditor( { initialHtml } );
+
+			// Open the inserter menu
+			fireEvent.press(
+				await waitFor( () => getByA11yLabel( 'Add block' ) )
+			);
+
+			// Insert an embed block
+			fireEvent.press( await waitFor( () => getByText( `Embed` ) ) );
+
+			// Wait for edit URL modal to be visible
+			const embedEditURLModal = getByTestId( 'embed-edit-url-modal' );
+			await waitFor( () => embedEditURLModal.props.isVisible );
+
+			// Get embed link
+			const embedLink = await waitFor( () => getByText( clipboardURL ) );
+
+			// Dismiss the edit URL modal
+			fireEvent( embedEditURLModal, 'backdropPress' );
+			fireEvent( embedEditURLModal, MODAL_DISMISS_EVENT );
+
+			// Wait for edit URL button to be present
+			const editURLButton = await waitFor( () =>
+				getByA11yLabel( 'Edit URL' )
+			);
+
+			expect( embedLink ).toBeDefined();
+			expect( editURLButton ).toBeDefined();
+			expect( getEditorHtml() ).toBe( expectedHtml );
+
+			Clipboard.getString.mockReset();
+		} );
 	} );
 
 	describe( 'Set URL by tapping on an empty block', () => {
@@ -304,6 +349,52 @@ describe( 'Embed block', () => {
 
 			expect( editURLButton ).toBeDefined();
 			expect( getEditorHtml() ).toBe( expectedHtml );
+		} );
+
+		it( 'auto-pastes the URL from clipboard', async () => {
+			const initialHtml = EMPTY_EMBED_HTML;
+			const expectedHtml = RICH_TEXT_EMBED_HTML;
+			const clipboardURL = 'https://twitter.com/notnownikki';
+
+			// Mock clipboard
+			Clipboard.getString.mockResolvedValue( clipboardURL );
+
+			const waitForElement = ( { getByA11yLabel } ) =>
+				getByA11yLabel( /Embed Block\. Row 1/ );
+			const {
+				element,
+				getByA11yLabel,
+				getByText,
+				getByTestId,
+			} = await initializeEditor( { initialHtml }, { waitForElement } );
+
+			// Select block
+			fireEvent.press( element );
+
+			// Edit URL
+			fireEvent.press( getByText( 'ADD LINK' ) );
+
+			// Wait for edit URL modal to be visible
+			const embedEditURLModal = getByTestId( 'embed-edit-url-modal' );
+			await waitFor( () => embedEditURLModal.props.isVisible );
+
+			// Get embed link
+			const embedLink = await waitFor( () => getByText( clipboardURL ) );
+
+			// Dismiss the edit URL modal
+			fireEvent( embedEditURLModal, 'backdropPress' );
+			fireEvent( embedEditURLModal, MODAL_DISMISS_EVENT );
+
+			// Wait for edit URL button to be present
+			const editURLButton = await waitFor( () =>
+				getByA11yLabel( 'Edit URL' )
+			);
+
+			expect( embedLink ).toBeDefined();
+			expect( editURLButton ).toBeDefined();
+			expect( getEditorHtml() ).toBe( expectedHtml );
+
+			Clipboard.getString.mockReset();
 		} );
 	} );
 
