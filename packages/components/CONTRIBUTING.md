@@ -298,7 +298,7 @@ Each component that is exported from the `@wordpress/components` package should 
 
 ## README example
 
-```md
+```markdown
 # `ComponentName`
 
 <!-- If component is experimental, add the following section: -->
@@ -308,7 +308,7 @@ This feature is still experimental. “Experimental” means this is an early im
 
 <!-- If component is deprecated, add the following section: -->
 <div class="callout callout-alert">
-This component is deprecated. Please use  `{other component}` from the `{other package}` package instead.
+This component is deprecated. Please use `{other component}` from the `{other package}` package instead.
 </div>
 
 Description of the component.
@@ -317,17 +317,17 @@ Description of the component.
 
 Code example using correct markdown syntax and formatted using project's formatting rules. See [ItemGroup](/packages/components/src/item-group/item-group/README.md#usage) for a real-world example.
 
-```jsx
-import { ExampleComponent } from '@wordpress/components';
+	```jsx
+	import { ExampleComponent } from '@wordpress/components';
 
-function Example() {
-	return (
-		<ExampleComponent>
-			<p>Code is poetry</p>
-		</ExampleComponent>
-	);
-}
-```
+	function Example() {
+		return (
+			<ExampleComponent>
+				<p>Code is poetry</p>
+			</ExampleComponent>
+		);
+	}
+	```
 
 ## Props
 
@@ -349,6 +349,7 @@ Add this section when there are props that are drilled down into an internal com
 ## Context
 
 See examples for this section for the [ItemGroup](/packages/components/src/item-group/item-group/README.md#context) and [`Card`](/packages/components/src/card/card/README.md#context) components.
+```
 
 ## Folder structure
 
