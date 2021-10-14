@@ -752,19 +752,19 @@ class WP_REST_Menu_Items_Controller extends WP_REST_Posts_Controller {
 		$links = parent::prepare_links( $menu_item );
 		if ( ! empty( $menu_item->object_id ) ) {
 			if ( 'post_type' === $menu_item->type ) {
-				$url = rest_get_route_for_post( $menu_item->object_id );
-				if ( $url ) {
+				$path = rest_get_route_for_post( $menu_item->object_id );
+				if ( $path ) {
 					$links['https://api.w.org/object'][] = array(
-						'href'       => $url,
+						'href'       => rest_url( $path ),
 						'post_type'  => $menu_item->type,
 						'embeddable' => true,
 					);
 				}
 			} elseif ( 'taxonomy' === $menu_item->type ) {
-				$url = rest_get_route_for_term( $menu_item->object_id );
-				if ( $url ) {
+				$path = rest_get_route_for_term( $menu_item->object_id );
+				if ( $path ) {
 					$links['https://api.w.org/object'][] = array(
-						'href'       => $url,
+						'href'       => rest_url( $path ),
 						'taxonomy'   => $menu_item->type,
 						'embeddable' => true,
 					);
