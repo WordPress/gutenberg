@@ -22,6 +22,7 @@ import {
 	WordPressComponentProps,
 } from '../ui/context';
 import { Flex } from '../flex';
+import { VStack } from '../v-stack';
 import Button from '../button';
 import * as styles from './styles';
 import { useCx } from '../utils/hooks/use-cx';
@@ -45,7 +46,8 @@ function ConfirmDialog(
 		styles.wrapper,
 		! hasTitle && styles.withoutTitle
 	);
-	const buttonsWrapperClassNames = cx( styles.buttonsWrapper );
+	const buttonsWrapperClassName = cx( styles.buttonsWrapper );
+	const stackedMarginWrapperClassName = cx( styles.stackedMarginWrapper );
 
 	const [ isOpen, setIsOpen ] = useState< boolean >();
 	const [ selfClose, setSelfClose ] = useState< boolean >();
@@ -89,24 +91,23 @@ function ConfirmDialog(
 					forwardedRef={ forwardedRef }
 					{ ...otherProps }
 				>
-					<p>{ children }</p>
-					<Flex
-						justify="flex-end"
-						className={ buttonsWrapperClassNames }
-					>
-						<Button
-							variant="tertiary"
-							onClick={ handleEvent( onCancel ) }
-						>
-							{ __( 'Cancel' ) }
-						</Button>
-						<Button
-							variant="primary"
-							onClick={ handleEvent( onConfirm ) }
-						>
-							{ __( 'OK' ) }
-						</Button>
-					</Flex>
+					<div className={ stackedMarginWrapperClassName }>
+						<p>{ children }</p>
+						<Flex direction="row" justify="flex-end">
+							<Button
+								variant="tertiary"
+								onClick={ handleEvent( onCancel ) }
+							>
+								{ __( 'Cancel' ) }
+							</Button>
+							<Button
+								variant="primary"
+								onClick={ handleEvent( onConfirm ) }
+							>
+								{ __( 'OK' ) }
+							</Button>
+						</Flex>
+					</div>
 				</Modal>
 			) }
 		</>
