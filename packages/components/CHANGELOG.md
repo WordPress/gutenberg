@@ -10,6 +10,10 @@
 
 -   Removed the separator shown between `ToggleGroupControl` items ([#35497](https://github.com/WordPress/gutenberg/pull/35497)).
 
+### Experimental
+
+-   Removed the `fieldset` wrapper from the `FontAppearanceControl` component ([35461](https://github.com/WordPress/gutenberg/pull/35461)).
+
 ## 18.0.0 (2021-10-12)
 
 ### Breaking Changes
