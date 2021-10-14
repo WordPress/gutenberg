@@ -44,31 +44,20 @@ export const ToolsPanel = css`
  * CSS grid display to be re-established.
  */
 export const ToolsPanelWithInnerWrapper = css`
-	> div {
+	> div:not( :first-of-type ) {
 		${ toolsPanelGrid.container }
 		${ toolsPanelGrid.item.fullWidth }
 	}
 `;
 
 export const ToolsPanelHiddenInnerWrapper = css`
-	> div {
+	> div:not( :first-of-type ) {
 		display: none;
 	}
 `;
 
 export const ToolsPanelHeader = css`
-	align-items: center;
-	display: flex;
-	font-size: inherit;
-	font-weight: 500;
 	${ toolsPanelGrid.item.fullWidth }
-	justify-content: space-between;
-	line-height: normal;
-
-	/* Required to meet specificity requirements to ensure zero margin */
-	&& {
-		margin: 0;
-	}
 
 	/**
 	 * The targeting of dropdown menu component classes here is a temporary
@@ -89,6 +78,17 @@ export const ToolsPanelHeader = css`
 			min-width: ${ space( 6 ) };
 			width: ${ space( 6 ) };
 		}
+	}
+`;
+
+export const ToolsPanelHeading = css`
+	font-size: inherit;
+	font-weight: 500;
+	line-height: normal;
+
+	/* Required to meet specificity requirements to ensure zero margin */
+	&& {
+		margin: 0;
 	}
 `;
 
