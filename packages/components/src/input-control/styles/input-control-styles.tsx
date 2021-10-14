@@ -317,6 +317,8 @@ export const Prefix = styled.span`
 `;
 
 export const Suffix = styled.span`
+	align-items: center;
+	align-self: stretch;
 	box-sizing: border-box;
-	display: block;
+	display: flex;
 `;
