@@ -8,6 +8,9 @@ const path = require( 'path' );
  */
 const { readConfig } = require( '../config' );
 
+/**
+ * Logs the path to where wp-env files are installed.
+ */
 module.exports = async function installPath() {
 	const { workDirectoryPath } = await readConfig(
 		path.resolve( '.wp-env.json' )
