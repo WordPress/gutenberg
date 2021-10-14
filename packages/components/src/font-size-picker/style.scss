@@ -3,7 +3,15 @@
 		margin-left: $grid-unit-05;
 		color: $gray-700;
 	}
+
+	// This button is inheriting padding and min-width.
+	// @todo: we should refactor it to not need to unset this.
+	.components-button.is-small.has-icon:not(.has-text) {
+		min-width: $icon-size;
+		padding: 0;
+	}
 }
+
 .components-font-size-picker__controls {
 	max-width: $sidebar-width - ( 2 * $grid-unit-20 );
 	align-items: center;
