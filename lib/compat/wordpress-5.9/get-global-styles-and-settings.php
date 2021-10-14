@@ -71,13 +71,12 @@ function gutenberg_get_global_styles( $path = array(), $block_name = '', $origin
  *                         It accepts 'all', 'block_styles', 'css_variables', 'presets'.
  *                         If empty, it'll resolve to all (theme with theme.json support)
  *                         or 'presets' (theme without theme.json support).
- * @param array  $settings Existing settings to retrofit. Optional.
- *                         If empty, the function will retrieve the settings itself.
  *
  * @return string Stylesheet.
  */
-function gutenberg_get_global_stylesheet( $type = '', $settings = array() ) {
+function gutenberg_get_global_stylesheet( $type = '' ) {
 	// Return cached value if it can be used and exists.
+	// It's cached by theme to make sure that theme switching clears the cache.
 	$can_use_cached = (
 		( 'all' === $type ) &&
 		( ! defined( 'WP_DEBUG' ) || ! WP_DEBUG ) &&
@@ -85,17 +84,12 @@ function gutenberg_get_global_stylesheet( $type = '', $settings = array() ) {
 		( ! defined( 'REST_REQUEST' ) || ! REST_REQUEST ) &&
 		! is_admin()
 	);
-	// It's cached by theme to make sure that theme switching is inmediately reflected.
 	$transient_name = 'gutenberg_global_styles_' . get_stylesheet();
 	if ( $can_use_cached ) {
 		$cached = get_transient( $transient_name );
 		if ( $cached ) {
 			return $cached;
 		}
-	}
-
-	if ( empty( $settings ) ) {
-		$settings = gutenberg_get_default_block_editor_settings();
 	}
 
 	$supports_theme_json = WP_Theme_JSON_Resolver_Gutenberg::theme_has_support();
@@ -116,8 +110,9 @@ function gutenberg_get_global_stylesheet( $type = '', $settings = array() ) {
 		$origins = array( 'core', 'theme' );
 	}
 
-	$tree       = WP_Theme_JSON_Resolver_Gutenberg::get_merged_data( $settings );
-	$stylesheet = $tree->get_stylesheet( $type, $origins );
+	$theme_supports = gutenberg_get_default_block_editor_settings();
+	$tree           = WP_Theme_JSON_Resolver_Gutenberg::get_merged_data( $theme_supports );
+	$stylesheet     = $tree->get_stylesheet( $type, $origins );
 
 	if ( $can_use_cached ) {
 		// Cache for a minute.
