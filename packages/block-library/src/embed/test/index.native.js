@@ -325,4 +325,30 @@ describe( 'Embed block', () => {
 
 		expect( getEditorHtml() ).toBe( RICH_TEXT_EMBED_HTML_WITH_CAPTION );
 	} );
+
+	it( 'Block settings', async () => {
+		const waitForElement = ( { getByA11yLabel } ) =>
+			getByA11yLabel( /Embed Block\. Row 1/ );
+		const { element, getByA11yLabel } = await initializeEditor(
+			{
+				initialHtml:
+					'<!-- wp:embed {"url":"https://twitter.com/notnownikki"} /-->',
+			},
+			{ waitForElement }
+		);
+
+		// Select block
+		fireEvent.press( element );
+
+		const settingsButton = await waitFor( () =>
+			getByA11yLabel( 'Open Settings' )
+		);
+		fireEvent.press( settingsButton );
+
+		const resizeToggleControl = await waitFor( () =>
+			getByA11yLabel( /Resize for smaller devices/ )
+		);
+
+		fireEvent.press( resizeToggleControl );
+	} );
 } );
