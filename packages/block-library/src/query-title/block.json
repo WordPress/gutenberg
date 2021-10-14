@@ -37,8 +37,7 @@
 			"__experimentalTextDecoration": true,
 			"__experimentalDefaultControls": {
 				"fontSize": true,
-				"__experimentalFontStyle": true,
-				"__experimentalFontWeight": true,
+				"fontAppearance": true,
 				"__experimentalTextTransform": true
 			}
 		}

@@ -43,7 +43,7 @@
 			"__experimentalTextDecoration": true,
 			"__experimentalDefaultControls": {
 				"fontSize": true,
-				"__experimentalFontStyle": true
+				"fontAppearance": true
 			}
 		},
 		"__experimentalBorder": {
