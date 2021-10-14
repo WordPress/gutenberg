@@ -127,7 +127,8 @@ export const textColor = {
 	},
 	__unstableFilterAttributeValue( key, value ) {
 		if ( key !== 'style' ) return value;
-		if ( value && ! value.includes( 'background-color' ) ) return value;
+		// We should not add a background-color if it's already set
+		if ( value && value.includes( 'background-color' ) ) return value;
 		const addedCSS = [ 'background-color', 'rgba(0, 0, 0, 0)' ].join( ':' );
 		return value ? [ value, addedCSS ].join( ';' ) : addedCSS;
 	},
