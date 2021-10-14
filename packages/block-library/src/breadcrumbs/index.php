@@ -19,8 +19,8 @@ function render_block_core_breadcrumbs( $attributes, $content, $block ) {
 		return '';
 	}
 
-	$post_id      = $block->context['postId'];
-	$post_type    = get_post_type( $post_id );
+	$post_id   = $block->context['postId'];
+	$post_type = get_post_type( $post_id );
 
 	if ( false === $post_type ) {
 		return '';
