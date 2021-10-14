@@ -22,7 +22,7 @@ import { GlobalStylesContext } from './context';
 const EMPTY_CONFIG = { isGlobalStylesUserThemeJSON: true, version: 1 };
 
 export const useGlobalStylesReset = () => {
-	const { merged: config, setUserConfig } = useContext( GlobalStylesContext );
+	const { user: config, setUserConfig } = useContext( GlobalStylesContext );
 	const canReset = !! config && ! isEqual( config, EMPTY_CONFIG );
 	return [
 		canReset,
