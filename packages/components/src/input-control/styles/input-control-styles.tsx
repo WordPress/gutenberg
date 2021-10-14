@@ -145,14 +145,18 @@ const fontSizeStyles = ( { inputSize: size }: InputProps ) => {
 const sizeStyles = ( { inputSize: size }: InputProps ) => {
 	const sizes = {
 		default: {
-			height: 30,
+			height: 40,
 			lineHeight: 1,
-			minHeight: 30,
+			minHeight: 40,
+			paddingLeft: 16,
+			paddingRight: 16,
 		},
 		small: {
 			height: 24,
 			lineHeight: 1,
 			minHeight: 24,
+			paddingLeft: 8,
+			paddingRight: 8,
 		},
 	};
 
@@ -205,8 +209,6 @@ export const Input = styled.input< InputProps >`
 		display: block;
 		margin: 0;
 		outline: none;
-		padding-left: 8px;
-		padding-right: 8px;
 		width: 100%;
 
 		${ dragStyles }
