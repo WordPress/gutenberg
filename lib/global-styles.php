@@ -292,11 +292,12 @@ function gutenberg_global_styles_include_support_for_wp_variables( $allow_css, $
  * Register webfonts defined in theme.json.
  */
 function gutenberg_register_webfonts_from_theme_json() {
-	if ( function_exists( 'wp_register_webfonts' ) ) {
-		$theme_settings = WP_Theme_JSON_Resolver_Gutenberg::get_theme_data()->get_settings();
-		if ( ! empty( $theme_settings['typography'] ) && ! empty( $theme_settings['typography']['webfonts'] ) ) {
-			wp_register_webfonts( $theme_settings['typography']['webfonts'] );
-		}
+	if ( ! function_exists( 'wp_register_webfonts' ) ) {
+		return;
+	}
+	$theme_settings = WP_Theme_JSON_Resolver_Gutenberg::get_theme_data()->get_settings();
+	if ( ! empty( $theme_settings['typography'] ) && ! empty( $theme_settings['typography']['webfonts'] ) ) {
+		wp_register_webfonts( $theme_settings['typography']['webfonts'] );
 	}
 }
 
