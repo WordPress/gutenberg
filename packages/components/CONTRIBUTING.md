@@ -356,6 +356,10 @@ As a result of the above guidelines, all new components (except for shared utili
 
 ```text
 component-name/
+├── stories
+│   └── index.js
+├── test
+│   └── index.js
 ├── component.tsx
 ├── context.ts
 ├── hook.ts
