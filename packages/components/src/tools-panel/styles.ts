@@ -58,6 +58,7 @@ export const ToolsPanelHiddenInnerWrapper = css`
 
 export const ToolsPanelHeader = css`
 	${ toolsPanelGrid.item.fullWidth }
+	gap: ${ space( 2 ) };
 
 	/**
 	 * The targeting of dropdown menu component classes here is a temporary
@@ -67,8 +68,7 @@ export const ToolsPanelHeader = css`
 	 * refactored and can be targeted via component interpolation.
 	 */
 	.components-dropdown-menu {
-		margin-top: ${ space( -1 ) };
-		margin-bottom: ${ space( -1 ) };
+		margin: ${ space( -1 ) } 0;
 		height: ${ space( 6 ) };
 
 		/* first-child used to overcome specificity of menu toggle styles */
