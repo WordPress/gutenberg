@@ -361,7 +361,7 @@ component-name/
 └── types.ts
 ```
 
-In case of a family of components (e.g. `Card` and `CardBody`, `CardFooter`, `CardHeader` ...), each component's implementation should live in a separate subfolder:
+In case of a family of components (e.g. `Card` and `CardBody`, `CardFooter`, `CardHeader` ...), each component's implementation should live in a separate subfolder, while code common to the whole family of components (e.g types, utils, context...) should live in the family of components root folder:
 
 ```
 component-family-name/
@@ -370,19 +370,19 @@ component-family-name/
 │   ├── component.tsx
 │   ├── hook.ts
 │   ├── README.md
-│   ├── styles.ts
-│   └── types.ts
+│   └── styles.ts
 ├── sub-component-name/
 │   ├── index.ts
 │   ├── component.tsx
 │   ├── hook.ts
 │   ├── README.md
-│   ├── styles.ts
-│   └── types.ts
+│   └── styles.ts
 ├── stories
 │   └── index.js
 ├── test
 │   └── index.js
 ├── context.ts
-└── index.ts
+├── index.ts
+├── types.ts
+└── utils.ts
 ```
