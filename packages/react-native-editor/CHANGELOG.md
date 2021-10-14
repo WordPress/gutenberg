@@ -10,6 +10,8 @@ For each user feature we should also add a importance categorization label  to i
 -->
 
 ## Unreleased
+
+## 1.64.0
 -   [*] [Embed block] Fix inline preview cut-off when editing URL [#35321]
 -   [**] [Embed block] Detect when an embeddable URL is pasted into an empty paragraph. [#35204]
 -   [*] [Unsupported Block Editor] Fix text selection bug for Android [#34668]
