@@ -161,11 +161,17 @@ function gutenberg_parse_blocks_from_menu_items( $menu_items, $menu_items_by_par
 	$blocks = array();
 
 	foreach ( $menu_items as $menu_item ) {
+		$opens_in_new_tab = null !== $menu_item->target && '_blank' === $menu_item->target;
+		$rel              = ( null !== $menu_item->xfn && '' !== $menu_item->xfn ) ? $menu_item->xfn : null;
+
 		$block = array(
 			'blockName' => 'core/navigation-link',
 			'attrs'     => array(
-				'label' => $menu_item->title,
-				'url'   => $menu_item->url,
+				'label'         => $menu_item->title,
+				'opensInNewTab' => $opens_in_new_tab,
+				'rel'           => $rel,
+				'title'         => $menu_item->title,
+				'url'           => $menu_item->url,
 			),
 		);
 
