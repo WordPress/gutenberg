@@ -44,25 +44,22 @@ function gutenberg_get_global_settings( $path = array(), $block_name = '', $orig
  * @param string $origin            Which origin to take data from. Optional.
  *                                  It can be 'all' (core, theme, and user) or 'base' (core and theme).
  *                                  If empty or unknown, 'all' is used.
- * @param array  $existing_settings Existing settings to retrofit. Optional.
- *                                  If empty, the function will retrieve the settings by itself.
  *
  * @return array The styles to retrieve.
  */
-function gutenberg_get_global_styles( $path = array(), $block_name = '', $origin = 'all', $existing_settings = array() ) {
+function gutenberg_get_global_styles( $path = array(), $block_name = '', $origin = 'all' ) {
 	if ( '' !== $block_name ) {
 		$path = array_merge( array( 'blocks', $block_name ), $path );
 	}
 
-	if ( empty( $existing_settings ) ) {
-		$existing_settings = gutenberg_get_default_block_editor_settings();
+	if ( 'base' === $origin ) {
+		$origin = 'theme';
+	} else {
+		$origin = 'user';
 	}
 
-	if ( 'base' === $origin ) {
-		$styles = WP_Theme_JSON_Resolver_Gutenberg::get_merged_data( $existing_settings, 'theme' )['styles'];
-	} else {
-		$styles = WP_Theme_JSON_Resolver_Gutenberg::get_merged_data( $existing_settings )['styles'];
-	}
+	$theme_supports = gutenberg_get_default_block_editor_settings();
+	$styles         = WP_Theme_JSON_Resolver_Gutenberg::get_merged_data( $theme_supports, $origin )['styles'];
 
 	return _wp_array_get( $styles, $path, $styles );
 }
