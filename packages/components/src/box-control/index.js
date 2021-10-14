@@ -39,6 +39,7 @@ import { useControlledState } from '../utils/hooks';
 
 const defaultInputProps = {
 	min: 0,
+	size: 'small',
 };
 
 function useUniqueId( idProp ) {
