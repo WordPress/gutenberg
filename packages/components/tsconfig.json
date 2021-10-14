@@ -67,6 +67,7 @@
 		"src/tooltip/**/*",
 		"src/truncate/**/*",
 		"src/ui/**/*",
+		"src/unit-control/**/*",
 		"src/utils/**/*",
 		"src/v-stack/**/*",
 		"src/view/**/*",
