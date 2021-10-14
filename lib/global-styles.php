@@ -57,10 +57,11 @@ function gutenberg_experimental_global_styles_settings( $settings ) {
 
 	if ( 'site-editor' === $context && gutenberg_experimental_is_site_editor_available() ) {
 		$user_cpt_id = WP_Theme_JSON_Resolver_Gutenberg::get_user_custom_post_type_id();
+		$tree        = WP_Theme_JSON_Resolver_Gutenberg::get_merged_data( $settings, 'theme' );
 
 		$settings['__experimentalGlobalStylesUserEntityId']           = $user_cpt_id;
 		$settings['__experimentalGlobalStylesBaseConfig']['styles']   = gutenberg_get_global_styles( array(), '', 'base', $settings );
-		$settings['__experimentalGlobalStylesBaseConfig']['settings'] = gutenberg_get_global_settings( array(), '', 'base', $settings );
+		$settings['__experimentalGlobalStylesBaseConfig']['settings'] = $tree->get_settings();
 	}
 
 	if ( 'other' === $context ) {
@@ -91,7 +92,8 @@ function gutenberg_experimental_global_styles_settings( $settings ) {
 	}
 
 	// Copied from get_block_editor_settings() at wordpress-develop/block-editor.php.
-	$settings['__experimentalFeatures'] = gutenberg_get_global_settings( array(), '', 'all', $settings );
+	$tree                               = WP_Theme_JSON_Resolver_Gutenberg::get_merged_data( $settings );
+	$settings['__experimentalFeatures'] = $tree->get_settings();
 
 	if ( isset( $settings['__experimentalFeatures']['color']['palette'] ) ) {
 		$colors_by_origin   = $settings['__experimentalFeatures']['color']['palette'];

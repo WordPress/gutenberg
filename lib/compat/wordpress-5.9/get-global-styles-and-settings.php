@@ -15,24 +15,20 @@
  * @param string $origin            Which origin to take data from. Optional.
  *                                  It can be 'all' (core, theme, and user) or 'base' (core and theme).
  *                                  If empty or unknown, 'all' is used.
- * @param array  $existing_settings Existing settings to retrofit. Optional.
- *                                  If empty, the function will retrieve the settings by itself.
  *
  * @return array The settings to retrieve.
  */
-function gutenberg_get_global_settings( $path = array(), $block_name = '', $origin = 'all', $existing_settings = array() ) {
+function gutenberg_get_global_settings( $path = array(), $block_name = '', $origin = 'all' ) {
 	if ( '' !== $block_name ) {
 		$path = array_merge( array( 'blocks', $block_name ), $path );
 	}
 
-	if ( empty( $existing_settings ) ) {
-		$existing_settings = gutenberg_get_default_block_editor_settings();
-	}
+	$theme_supports = gutenberg_get_default_block_editor_settings();
 
 	if ( 'base' === $origin ) {
-		$settings = WP_Theme_JSON_Resolver_Gutenberg::get_merged_data( $existing_settings, 'theme' )->get_settings();
+		$settings = WP_Theme_JSON_Resolver_Gutenberg::get_merged_data( $theme_supports, 'theme' )->get_settings();
 	} else {
-		$settings = WP_Theme_JSON_Resolver_Gutenberg::get_merged_data( $existing_settings )->get_settings();
+		$settings = WP_Theme_JSON_Resolver_Gutenberg::get_merged_data( $theme_supports )->get_settings();
 	}
 
 	return _wp_array_get( $settings, $path, $settings );
