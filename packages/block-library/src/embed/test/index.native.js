@@ -444,4 +444,33 @@ describe( 'Embed block', () => {
 			expect( getEditorHtml() ).toMatchSnapshot();
 		} );
 	} );
+
+	describe( 'alignment options', () => {
+		[
+			'Align left',
+			'Align center',
+			'Align right',
+			'Wide width',
+			'Full width',
+		].forEach( ( alignmentOption ) =>
+			it( `sets ${ alignmentOption } option`, async () => {
+				const {
+					getByA11yLabel,
+					getByText,
+				} = await initializeWithEmbedBlock( RICH_TEXT_EMBED_HTML );
+
+				// Open alignment options
+				fireEvent.press(
+					await waitFor( () => getByA11yLabel( 'Align' ) )
+				);
+
+				// Select alignment option
+				fireEvent.press(
+					await waitFor( () => getByText( alignmentOption ) )
+				);
+
+				expect( getEditorHtml() ).toMatchSnapshot();
+			} )
+		);
+	} );
 } );
