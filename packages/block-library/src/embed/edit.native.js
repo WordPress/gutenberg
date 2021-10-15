@@ -108,16 +108,9 @@ const EmbedEdit = ( props ) => {
 			const validPreview =
 				!! embedPreview && ! badEmbedProvider && ! wordpressCantEmbed;
 
-			// `isRequestingEmbedPreview` is returning false just before an
-			// `apiFetch` is triggered. We're assuming that a fetch is happening
-			// if there is an `attributesUrl` set but there is no data in
-			// `embedPreview` which represents the response returned from the API.
-			const isFetching =
-				isRequestingEmbedPreview( url ) || ( url && ! embedPreview );
-
 			return {
 				preview: validPreview ? embedPreview : undefined,
-				fetching: isFetching,
+				fetching: isRequestingEmbedPreview( url ),
 				themeSupportsResponsive: getThemeSupports()[
 					'responsive-embeds'
 				],
