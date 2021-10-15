@@ -182,9 +182,9 @@ exports[`PreferencesModal should match snapshot when the modal is active small v
         size="large"
       >
         <CardHeader
-          direction="column"
           gap="6"
           isBorderless={false}
+          justify="left"
           size="small"
         >
           <NavigationButton
@@ -201,19 +201,12 @@ exports[`PreferencesModal should match snapshot when the modal is active small v
             }
             isBack={true}
             path="/"
+          />
+          <Text
+            size="16"
           >
-            Back
-          </NavigationButton>
-          <Spacer
-            marginBottom="0"
-            marginLeft="4"
-          >
-            <Text
-              as="h2"
-            >
-              General
-            </Text>
-          </Spacer>
+            General
+          </Text>
         </CardHeader>
         <CardBody>
           <Section
@@ -258,9 +251,9 @@ exports[`PreferencesModal should match snapshot when the modal is active small v
         size="large"
       >
         <CardHeader
-          direction="column"
           gap="6"
           isBorderless={false}
+          justify="left"
           size="small"
         >
           <NavigationButton
@@ -277,19 +270,12 @@ exports[`PreferencesModal should match snapshot when the modal is active small v
             }
             isBack={true}
             path="/"
+          />
+          <Text
+            size="16"
           >
-            Back
-          </NavigationButton>
-          <Spacer
-            marginBottom="0"
-            marginLeft="4"
-          >
-            <Text
-              as="h2"
-            >
-              Blocks
-            </Text>
-          </Spacer>
+            Blocks
+          </Text>
         </CardHeader>
         <CardBody>
           <Section
@@ -325,9 +311,9 @@ exports[`PreferencesModal should match snapshot when the modal is active small v
         size="large"
       >
         <CardHeader
-          direction="column"
           gap="6"
           isBorderless={false}
+          justify="left"
           size="small"
         >
           <NavigationButton
@@ -344,19 +330,12 @@ exports[`PreferencesModal should match snapshot when the modal is active small v
             }
             isBack={true}
             path="/"
+          />
+          <Text
+            size="16"
           >
-            Back
-          </NavigationButton>
-          <Spacer
-            marginBottom="0"
-            marginLeft="4"
-          >
-            <Text
-              as="h2"
-            >
-              Panels
-            </Text>
-          </Spacer>
+            Panels
+          </Text>
         </CardHeader>
         <CardBody>
           <Section
