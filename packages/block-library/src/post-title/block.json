@@ -35,6 +35,9 @@
 			"gradients": true,
 			"link": true
 		},
+		"spacing": {
+			"margin": [ "top", "bottom" ]
+		},
 		"typography": {
 			"fontSize": true,
 			"lineHeight": true,
