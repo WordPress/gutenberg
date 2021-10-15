@@ -4,7 +4,7 @@
 import { getBlockType } from '@wordpress/blocks';
 import { Draggable } from '@wordpress/components';
 import { useSelect, useDispatch } from '@wordpress/data';
-import { useEffect, useRef } from '@wordpress/element';
+import { useEffect, useRef, useCallback } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -61,6 +61,31 @@ const BlockDraggable = ( {
 		};
 	}, [] );
 
+	const draggableOnDragStart = useCallback(
+		( event ) => {
+			startDraggingBlocks( clientIds );
+			isDragging.current = true;
+
+			startScrolling( event );
+
+			if ( onDragStart ) {
+				onDragStart();
+			}
+		},
+		[ clientIds, startScrolling, onDragStart ]
+	);
+
+	const draggableOnDragEnd = useCallback( () => {
+		stopDraggingBlocks();
+		isDragging.current = false;
+
+		stopScrolling();
+
+		if ( onDragEnd ) {
+			onDragEnd();
+		}
+	}, [ stopDraggingBlocks, isDragging, stopScrolling, onDragEnd ] );
+
 	if ( ! isDraggable ) {
 		return children( { isDraggable: false } );
 	}
@@ -76,27 +101,9 @@ const BlockDraggable = ( {
 			cloneClassname={ cloneClassname }
 			__experimentalTransferDataType="wp-blocks"
 			transferData={ transferData }
-			onDragStart={ ( event ) => {
-				startDraggingBlocks( clientIds );
-				isDragging.current = true;
-
-				startScrolling( event );
-
-				if ( onDragStart ) {
-					onDragStart();
-				}
-			} }
+			onDragStart={ draggableOnDragStart }
 			onDragOver={ scrollOnDragOver }
-			onDragEnd={ () => {
-				stopDraggingBlocks();
-				isDragging.current = false;
-
-				stopScrolling();
-
-				if ( onDragEnd ) {
-					onDragEnd();
-				}
-			} }
+			onDragEnd={ draggableOnDragEnd }
 			__experimentalDragComponent={
 				<BlockDraggableChip count={ clientIds.length } icon={ icon } />
 			}

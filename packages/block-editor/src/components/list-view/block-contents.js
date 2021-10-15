@@ -7,7 +7,7 @@ import classnames from 'classnames';
  * WordPress dependencies
  */
 import { useSelect } from '@wordpress/data';
-import { forwardRef } from '@wordpress/element';
+import { forwardRef, useMemo } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -55,8 +55,12 @@ const ListViewBlockContents = forwardRef(
 			'is-dropping-before': isBlockMoveTarget,
 		} );
 
+		const clientIds = useMemo( () => [ block.clientId ], [
+			block.clientId,
+		] );
+
 		return (
-			<BlockDraggable clientIds={ [ block.clientId ] }>
+			<BlockDraggable clientIds={ clientIds }>
 				{ ( { draggable, onDragStart, onDragEnd } ) => (
 					<ListViewBlockSelectButton
 						ref={ ref }
