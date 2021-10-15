@@ -104,7 +104,7 @@ Pass in a description that will be shown to screen readers associated with the s
 
 The options that can be chosen from.
 
--   Type: `Array<{ key: String, name: String, style: ?{}, className: ?String, hint: ?String|Number, ...rest }>`
+-   Type: `Array<{ key: String, name: String, style: ?{}, className: ?String, ...rest }>`
 -   Required: Yes
 
 #### onChange
