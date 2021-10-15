@@ -1,13 +1,10 @@
 [
 	{
-		"blockName": "core/comment-avatar",
+		"blockName": "core/post-comment-avatar",
 		"attrs": {
-			"width": 152,
-			"height": 152,
+			"width": 170,
+			"height": 170,
 			"style": {
-				"border": {
-					"radius": "65px"
-				},
 				"spacing": {
 					"padding": {
 						"top": "10px",
@@ -15,9 +12,11 @@
 						"bottom": "10px",
 						"left": "10px"
 					}
+				},
+				"border": {
+					"radius": "100%"
 				}
-			},
-			"className": "additional-class"
+			}
 		},
 		"innerBlocks": [],
 		"innerHTML": "",
