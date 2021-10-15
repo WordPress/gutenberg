@@ -50,9 +50,16 @@ const VIDEO_EMBED_SUCCESS_RESPONSE = {
 	version: '1.0',
 };
 
+const RICH_TEXT_EMBED_ERROR_RESPONSE = null;
+
 // Embed block HTML examples
 const EMPTY_EMBED_HTML = '<!-- wp:embed /-->';
 const EMPTY_URL_EMBED_HTML = '<!-- wp:embed {"url":""} /-->';
+const RICH_TEXT_ERROR_EMBED_HTML = `<!-- wp:embed {"url":"https://twitter.com/testing","type":"rich","providerNameSlug":"twitter","responsive":true} -->
+<figure class="wp-block-embed is-type-rich is-provider-twitter wp-block-embed-twitter"><div class="wp-block-embed__wrapper">
+https://twitter.com/testing
+</div></figure>
+<!-- /wp:embed -->`;
 const RICH_TEXT_EMBED_HTML = `<!-- wp:embed {"url":"https://twitter.com/notnownikki","type":"rich","providerNameSlug":"twitter","responsive":true} -->
 <figure class="wp-block-embed is-type-rich is-provider-twitter wp-block-embed-twitter"><div class="wp-block-embed__wrapper">
 https://twitter.com/notnownikki
@@ -109,6 +116,7 @@ beforeAll( () => {
 	mockEmbedResponses( [
 		RICH_TEXT_EMBED_SUCCESS_RESPONSE,
 		VIDEO_EMBED_SUCCESS_RESPONSE,
+		RICH_TEXT_EMBED_ERROR_RESPONSE,
 	] );
 } );
 
@@ -615,5 +623,25 @@ describe( 'Embed block', () => {
 		fireEvent.press( resizeToggleControl );
 
 		expect( getEditorHtml() ).toBe( expectedHtml );
+	} );
+
+	it( 'Cannot embed should be shown on the placeholder if EmbedPreview data is null', async () => {
+		const initialHtml = RICH_TEXT_ERROR_EMBED_HTML;
+
+		const waitForElement = ( { getByA11yLabel } ) =>
+			getByA11yLabel( /Embed Block\. Row 1/ );
+		const { element, getByText } = await initializeEditor(
+			{
+				initialHtml,
+			},
+			{ waitForElement }
+		);
+
+		// Select block
+		fireEvent.press( element );
+
+		const cannotEmbedText = getByText( 'Unable to embed media' );
+
+		expect( cannotEmbedText ).toBeDefined();
 	} );
 } );
