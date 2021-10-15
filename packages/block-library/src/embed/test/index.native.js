@@ -15,6 +15,8 @@ import { Clipboard, Platform } from 'react-native';
  */
 import { getBlockTypes, unregisterBlockType } from '@wordpress/blocks';
 import fetchRequest from '@wordpress/api-fetch';
+import { store as coreStore } from '@wordpress/core-data';
+import { dispatch } from '@wordpress/data';
 
 /**
  * Internal dependencies
@@ -48,6 +50,14 @@ const VIDEO_EMBED_SUCCESS_RESPONSE = {
 	provider_name: 'YouTube',
 	provider_url: 'https://youtube.com',
 	version: '1.0',
+};
+const MOCK_BAD_WORDPRESS_RESPONSE = {
+	code: 'oembed_invalid_url',
+	message: 'Not Found',
+	data: {
+		status: 404,
+	},
+	html: false,
 };
 
 // Embed block HTML examples
@@ -124,7 +134,13 @@ beforeAll( () => {
 	// block is added to empty posts.
 	registerBlock( paragraph );
 	registerBlock( embed );
+} );
 
+beforeEach( () => {
+	// Invalidate embed preview resolutions
+	dispatch( coreStore ).invalidateResolutionForStoreSelector(
+		'getEmbedPreview'
+	);
 	// Mock embed responses
 	mockEmbedResponses( [
 		RICH_TEXT_EMBED_SUCCESS_RESPONSE,
@@ -472,5 +488,69 @@ describe( 'Embed block', () => {
 				expect( getEditorHtml() ).toMatchSnapshot();
 			} )
 		);
+	} );
+
+	describe( 'retry', () => {
+		it( 'retries loading the preview if initial request failed', async () => {
+			// Return bad response for the first request to oembed endpoint
+			// and success response for the rest of requests.
+			let isFirstEmbedRequest = true;
+			fetchRequest.mockImplementation( ( { path } ) => {
+				let response = {};
+				const isEmbedRequest = path.startsWith( '/oembed/1.0/proxy' );
+				if ( isEmbedRequest ) {
+					if ( isFirstEmbedRequest ) {
+						isFirstEmbedRequest = false;
+						response = MOCK_BAD_WORDPRESS_RESPONSE;
+					} else {
+						response = RICH_TEXT_EMBED_SUCCESS_RESPONSE;
+					}
+				}
+				return Promise.resolve( response );
+			} );
+
+			const {
+				getByA11yLabel,
+				getByText,
+			} = await initializeWithEmbedBlock( RICH_TEXT_EMBED_HTML );
+
+			// Retry request
+			fireEvent.press( getByText( 'More options' ) );
+			fireEvent.press( getByText( 'Retry' ) );
+
+			// Wait for edit URL button to be present
+			const editURLButton = await waitFor( () =>
+				getByA11yLabel( 'Edit URL' )
+			);
+
+			expect( editURLButton ).toBeDefined();
+			expect( getEditorHtml() ).toMatchSnapshot();
+		} );
+		it( 'converts to link if preview request failed', async () => {
+			// Return bad response for requests to oembed endpoint.
+			fetchRequest.mockImplementation( ( { path } ) => {
+				const isEmbedRequest = path.startsWith( '/oembed/1.0/proxy' );
+				return Promise.resolve(
+					isEmbedRequest ? MOCK_BAD_WORDPRESS_RESPONSE : {}
+				);
+			} );
+
+			const {
+				getByA11yLabel,
+				getByText,
+			} = await initializeWithEmbedBlock( RICH_TEXT_EMBED_HTML );
+
+			// Convert embed to link
+			fireEvent.press( getByText( 'More options' ) );
+			fireEvent.press( getByText( 'Convert to link' ) );
+
+			// Get paragraph block where the link is created
+			const paragraphBlock = await waitFor( () =>
+				getByA11yLabel( /Paragraph Block\. Row 1/ )
+			);
+
+			expect( paragraphBlock ).toBeDefined();
+			expect( getEditorHtml() ).toMatchSnapshot();
+		} );
 	} );
 } );

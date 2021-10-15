@@ -147,4 +147,7 @@ module.exports = {
 	fullAlignment: {
 		width: '100%',
 	},
+	'embed__icon--error': {
+		fill: 'red',
+	},
 };

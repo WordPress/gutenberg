@@ -74,6 +74,20 @@ exports[`Embed block insertion inserts YouTube embed block 1`] = `"<!-- wp:embed
 
 exports[`Embed block insertion inserts generic embed block 1`] = `"<!-- wp:embed /-->"`;
 
+exports[`Embed block retry converts to link if preview request failed 1`] = `
+"<!-- wp:paragraph -->
+<p><a href=\\"https://twitter.com/notnownikki\\">https://twitter.com/notnownikki</a></p>
+<!-- /wp:paragraph -->"
+`;
+
+exports[`Embed block retry retries loading the preview if initial request failed 1`] = `
+"<!-- wp:embed {\\"url\\":\\"https://twitter.com/notnownikki\\",\\"type\\":\\"rich\\",\\"providerNameSlug\\":\\"twitter\\",\\"responsive\\":true} -->
+<figure class=\\"wp-block-embed is-type-rich is-provider-twitter wp-block-embed-twitter\\"><div class=\\"wp-block-embed__wrapper\\">
+https://twitter.com/notnownikki
+</div></figure>
+<!-- /wp:embed -->"
+`;
+
 exports[`Embed block set URL upon block insertion auto-pastes the URL from clipboard 1`] = `
 "<!-- wp:embed {\\"url\\":\\"https://twitter.com/notnownikki\\",\\"type\\":\\"rich\\",\\"providerNameSlug\\":\\"twitter\\",\\"responsive\\":true} -->
 <figure class=\\"wp-block-embed is-type-rich is-provider-twitter wp-block-embed-twitter\\"><div class=\\"wp-block-embed__wrapper\\">
