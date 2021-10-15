@@ -66,7 +66,7 @@ function ListViewBlockSelectButton(
 				onDragStart={ onDragStart }
 				onDragEnd={ onDragEnd }
 				draggable={ draggable }
-				href={ `#block-${ blockInformation?.anchor ?? clientId }` }
+				href={ `#block-${ clientId }` }
 			>
 				<ListViewExpander onClick={ onToggleExpanded } />
 				<BlockIcon icon={ blockInformation?.icon } showColors />
