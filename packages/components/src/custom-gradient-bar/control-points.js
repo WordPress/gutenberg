@@ -213,14 +213,14 @@ function ControlPoints( {
 					renderContent={ ( { onClose } ) => (
 						<>
 							<ColorPicker
-								disableAlpha={ disableAlpha }
+								enableAlpha={ ! disableAlpha }
 								color={ point.color }
-								onChangeComplete={ ( { rgb } ) => {
+								onChange={ ( color ) => {
 									onChange(
 										updateControlPointColor(
 											controlPoints,
 											index,
-											colord( rgb ).toRgbString()
+											colord( color ).toRgbString()
 										)
 									);
 								} }
@@ -291,14 +291,14 @@ function InsertPoint( {
 			) }
 			renderContent={ () => (
 				<ColorPicker
-					disableAlpha={ disableAlpha }
-					onChangeComplete={ ( { rgb } ) => {
+					enableAlpha={ ! disableAlpha }
+					onChange={ ( color ) => {
 						if ( ! alreadyInsertedPoint ) {
 							onChange(
 								addControlPoint(
 									controlPoints,
 									insertPosition,
-									colord( rgb ).toRgbString()
+									colord( color ).toRgbString()
 								)
 							);
 							setAlreadyInsertedPoint( true );
@@ -307,7 +307,7 @@ function InsertPoint( {
 								updateControlPointColorByPosition(
 									controlPoints,
 									insertPosition,
-									colord( rgb ).toRgbString()
+									colord( color ).toRgbString()
 								)
 							);
 						}

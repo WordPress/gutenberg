@@ -3,7 +3,6 @@
 exports[`ColorPalette Dropdown .renderContent should render dropdown content 1`] = `
 <ColorPicker
   color="#f00"
-  enableAlpha={false}
   onChange={[Function]}
 />
 `;
