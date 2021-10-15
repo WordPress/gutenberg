@@ -125,6 +125,15 @@ export const textColor = {
 		style: 'style',
 		class: 'class',
 	},
+	/*
+	 * Since this format relies on the <mark> tag, it's important to
+	 * prevent the default yellow background color applied by most
+	 * browsers. The solution is to detect when this format is used with a
+	 * text color but no background color, and in such cases to override
+	 * the default styling with a transparent background.
+	 *
+	 * @see https://github.com/WordPress/gutenberg/pull/35516
+	 */
 	__unstableFilterAttributeValue( key, value ) {
 		if ( key !== 'style' ) return value;
 		// We should not add a background-color if it's already set
