@@ -69,6 +69,12 @@ https://twitter.com/notnownikki
 </div><figcaption>Caption</figcaption></figure>
 <!-- /wp:embed -->`;
 
+const RICH_TEXT_EMBED_HTML_WITH_ALLOW_RESPONSIVE_SET_TO_FALSE = `<!-- wp:embed {"url":"https://twitter.com/notnownikki","type":"rich","providerNameSlug":"twitter","allowResponsive":false,"responsive":true} -->
+<figure class="wp-block-embed is-type-rich is-provider-twitter wp-block-embed-twitter"><div class="wp-block-embed__wrapper">
+https://twitter.com/notnownikki
+</div></figure>
+<!-- /wp:embed -->`;
+
 const MOST_USED_PROVIDERS = embed.settings.variations.filter( ( { name } ) =>
 	[ 'youtube', 'twitter', 'wordpress', 'vimeo' ].includes( name )
 );
@@ -76,6 +82,12 @@ const MOST_USED_PROVIDERS = embed.settings.variations.filter( ( { name } ) =>
 // Return specified mocked responses for the oembed endpoint.
 const mockEmbedResponses = ( mockedResponses ) => {
 	fetchRequest.mockImplementation( ( { path } ) => {
+		if ( path === '/wp/v2/themes?status=active' ) {
+			return Promise.resolve( [
+				{ theme_supports: { 'responsive-embeds': true } },
+			] );
+		}
+
 		const matchedEmbedResponse = mockedResponses.find(
 			( mockedResponse ) =>
 				path ===
@@ -575,13 +587,15 @@ describe( 'Embed block', () => {
 		expect( getEditorHtml() ).toBe( expectedHtml );
 	} );
 
-	it( 'Block settings', async () => {
+	it( 'Toggle resize for smaller devices media settings', async () => {
+		const initialHtml = RICH_TEXT_EMBED_HTML;
+		const expectedHtml = RICH_TEXT_EMBED_HTML_WITH_ALLOW_RESPONSIVE_SET_TO_FALSE;
+
 		const waitForElement = ( { getByA11yLabel } ) =>
 			getByA11yLabel( /Embed Block\. Row 1/ );
 		const { element, getByA11yLabel } = await initializeEditor(
 			{
-				initialHtml:
-					'<!-- wp:embed {"url":"https://twitter.com/notnownikki"} /-->',
+				initialHtml,
 			},
 			{ waitForElement }
 		);
@@ -599,5 +613,7 @@ describe( 'Embed block', () => {
 		);
 
 		fireEvent.press( resizeToggleControl );
+
+		expect( getEditorHtml() ).toBe( expectedHtml );
 	} );
 } );
