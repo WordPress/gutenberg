@@ -25,7 +25,7 @@ export default function ListViewBranch( props ) {
 		showNestedBlocks,
 		parentBlockClientId,
 		level = 1,
-		path = [],
+		path = '',
 		isBranchSelected = false,
 		isLastOfBranch = false,
 	} = props;
@@ -53,7 +53,12 @@ export default function ListViewBranch( props ) {
 			{ map( filteredBlocks, ( block, index ) => {
 				const { clientId, innerBlocks } = block;
 				const position = index + 1;
-				const updatedPath = [ ...path, position ];
+				// If the string value changes, it's used to trigger an animation change.
+				// This may be removed if we use a different animation library in the future.
+				const updatedPath =
+					path.length > 0
+						? `${ path }_${ position }`
+						: `${ position }`;
 				const hasNestedBlocks =
 					showNestedBlocks && !! innerBlocks && !! innerBlocks.length;
 				const hasNestedAppender = itemHasAppender( clientId );
@@ -121,7 +126,11 @@ export default function ListViewBranch( props ) {
 					position={ rowCount }
 					rowCount={ appenderPosition }
 					level={ level }
-					path={ [ ...path, appenderPosition ] }
+					path={
+						path.length > 0
+							? `${ path }_${ appenderPosition }`
+							: `${ appenderPosition }`
+					}
 				/>
 			) }
 		</>
