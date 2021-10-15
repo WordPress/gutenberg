@@ -386,9 +386,7 @@ export default function PreferencesModal() {
 											'Navigate to the previous view'
 										) }
 									/>
-									<Text size="16" color="#1d2327">
-										{ section.tabLabel }
-									</Text>
+									<Text size="16">{ section.tabLabel }</Text>
 								</CardHeader>
 								<CardBody>{ section.content }</CardBody>
 							</Card>
