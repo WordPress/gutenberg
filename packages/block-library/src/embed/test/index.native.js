@@ -17,6 +17,7 @@ import { getBlockTypes, unregisterBlockType } from '@wordpress/blocks';
 import fetchRequest from '@wordpress/api-fetch';
 import { store as coreStore } from '@wordpress/core-data';
 import { dispatch } from '@wordpress/data';
+import { requestPreview } from '@wordpress/react-native-bridge';
 
 /**
  * Internal dependencies
@@ -51,6 +52,14 @@ const VIDEO_EMBED_SUCCESS_RESPONSE = {
 	provider_url: 'https://youtube.com',
 	version: '1.0',
 };
+const MOCK_EMBED_PHOTO_SUCCESS_RESPONSE = {
+	url: 'https://cloudup.com/cQFlxqtY4ob',
+	html: '<p>Mock success response.</p>',
+	type: 'photo',
+	provider_name: 'Cloudup',
+	provider_url: 'https://cloudup.com',
+	version: '1.0',
+};
 const MOCK_BAD_WORDPRESS_RESPONSE = {
 	code: 'oembed_invalid_url',
 	message: 'Not Found',
@@ -72,6 +81,11 @@ https://twitter.com/notnownikki
 // https://www.youtube.com/watch?v=lXMskKTw3Bc
 // </div></figure>
 // <!-- /wp:embed -->`;
+const PHOTO_EMBED_HTML = `<!-- wp:embed {"url":"https://cloudup.com/cQFlxqtY4ob","type":"photo","providerNameSlug":"cloudup","responsive":true} -->
+<figure class="wp-block-embed is-type-photo is-provider-cloudup wp-block-embed-cloudup"><div class="wp-block-embed__wrapper">
+https://cloudup.com/cQFlxqtY4ob
+</div></figure>
+<!-- /wp:embed -->`;
 
 const MOST_USED_PROVIDERS = embed.settings.variations.filter( ( { name } ) =>
 	[ 'youtube', 'twitter', 'wordpress', 'vimeo' ].includes( name )
@@ -145,6 +159,7 @@ beforeEach( () => {
 	mockEmbedResponses( [
 		RICH_TEXT_EMBED_SUCCESS_RESPONSE,
 		VIDEO_EMBED_SUCCESS_RESPONSE,
+		MOCK_EMBED_PHOTO_SUCCESS_RESPONSE,
 	] );
 } );
 
@@ -551,6 +566,51 @@ describe( 'Embed block', () => {
 
 			expect( paragraphBlock ).toBeDefined();
 			expect( getEditorHtml() ).toMatchSnapshot();
+		} );
+	} );
+
+	describe( 'preview coming soon', () => {
+		it( 'previews post for providers which embed preview is not available yet', async () => {
+			const { getByText, getByTestId } = await initializeWithEmbedBlock(
+				PHOTO_EMBED_HTML
+			);
+
+			// Try to preview the post
+			fireEvent.press( getByText( 'PREVIEW POST' ) );
+
+			// Wait for no preview modal to be visible
+			const noPreviewModal = getByTestId( 'embed-no-preview-modal' );
+			await waitFor( () => noPreviewModal.props.isVisible );
+
+			// Preview post
+			fireEvent.press( getByText( 'Preview post' ) );
+
+			// Dismiss the no preview modal
+			fireEvent( noPreviewModal, 'backdropPress' );
+			fireEvent( noPreviewModal, MODAL_DISMISS_EVENT );
+
+			expect( requestPreview ).toHaveBeenCalled();
+		} );
+
+		it( 'dismisses no preview modal', async () => {
+			const { getByText, getByTestId } = await initializeWithEmbedBlock(
+				PHOTO_EMBED_HTML
+			);
+
+			// Try to preview the post
+			fireEvent.press( getByText( 'PREVIEW POST' ) );
+
+			// Wait for no preview modal to be visible
+			const noPreviewModal = getByTestId( 'embed-no-preview-modal' );
+			await waitFor( () => noPreviewModal.props.isVisible );
+
+			// Dismiss modal
+			fireEvent.press( getByText( 'Dismiss' ) );
+
+			// Wait for no preview modal to be not visible
+			await waitFor( () => ! noPreviewModal.props.isVisible );
+
+			expect( requestPreview ).not.toHaveBeenCalled();
 		} );
 	} );
 } );
