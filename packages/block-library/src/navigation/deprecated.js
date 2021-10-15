@@ -15,7 +15,92 @@ const TYPOGRAPHY_PRESET_DEPRECATION_MAP = {
 	textTransform: 'var:preset|text-transform|',
 };
 
-export default [
+const deprecated = [
+	// Remove `isResponsive` attribute.
+	{
+		attributes: {
+			orientation: {
+				type: 'string',
+				default: 'horizontal',
+			},
+			textColor: {
+				type: 'string',
+			},
+			customTextColor: {
+				type: 'string',
+			},
+			rgbTextColor: {
+				type: 'string',
+			},
+			backgroundColor: {
+				type: 'string',
+			},
+			customBackgroundColor: {
+				type: 'string',
+			},
+			rgbBackgroundColor: {
+				type: 'string',
+			},
+			itemsJustification: {
+				type: 'string',
+			},
+			showSubmenuIcon: {
+				type: 'boolean',
+				default: true,
+			},
+			openSubmenusOnClick: {
+				type: 'boolean',
+				default: false,
+			},
+			isResponsive: {
+				type: 'boolean',
+				default: 'false',
+			},
+			__unstableLocation: {
+				type: 'string',
+			},
+			overlayBackgroundColor: {
+				type: 'string',
+			},
+			customOverlayBackgroundColor: {
+				type: 'string',
+			},
+			overlayTextColor: {
+				type: 'string',
+			},
+			customOverlayTextColor: {
+				type: 'string',
+			},
+		},
+		supports: {
+			align: [ 'wide', 'full' ],
+			anchor: true,
+			html: false,
+			inserter: true,
+			typography: {
+				fontSize: true,
+				lineHeight: true,
+				__experimentalFontStyle: true,
+				__experimentalFontWeight: true,
+				__experimentalTextTransform: true,
+				__experimentalFontFamily: true,
+				__experimentalTextDecoration: true,
+			},
+		},
+		isEligible( attributes ) {
+			return attributes.isResponsive;
+		},
+		migrate( attributes ) {
+			delete attributes.isResponsive;
+			return {
+				...attributes,
+				overlayMenu: 'mobile',
+			};
+		},
+		save() {
+			return <InnerBlocks.Content />;
+		},
+	},
 	{
 		attributes: {
 			orientation: {
@@ -163,3 +248,5 @@ export default [
 		},
 	},
 ];
+
+export default deprecated;

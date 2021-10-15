@@ -46,7 +46,7 @@ export default function PostTitleEdit( {
 	} );
 
 	let titleElement = (
-		<TagName { ...blockProps }>{ __( 'An example title' ) }</TagName>
+		<TagName { ...blockProps }>{ __( 'Post Title' ) }</TagName>
 	);
 
 	if ( postType && postId ) {

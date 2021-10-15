@@ -736,14 +736,15 @@ class WP_Theme_JSON_Gutenberg {
 	 *
 	 * @param array $settings Settings to process.
 	 * @param array $preset_metadata One of the PRESETS_METADATA values.
+	 * @param array $origins List of origins to process.
 	 *
 	 * @return array Array of presets where the key and value are both the slug.
 	 */
-	private static function get_settings_slugs( $settings, $preset_metadata ) {
+	private static function get_settings_slugs( $settings, $preset_metadata, $origins = self::VALID_ORIGINS ) {
 		$preset_per_origin = _wp_array_get( $settings, $preset_metadata['path'], array() );
 
 		$result = array();
-		foreach ( self::VALID_ORIGINS as $origin ) {
+		foreach ( $origins as $origin ) {
 			if ( ! isset( $preset_per_origin[ $origin ] ) ) {
 				continue;
 			}
@@ -800,7 +801,7 @@ class WP_Theme_JSON_Gutenberg {
 	/**
 	 * Transform a slug into a CSS Custom Property.
 	 *
-	 * @param array  $input String to replace.
+	 * @param string $input String to replace.
 	 * @param string $slug The slug value to use to generate the custom property.
 	 *
 	 * @return string The CSS Custom Property. Something along the lines of --wp--preset--color--black.
@@ -1003,7 +1004,8 @@ class WP_Theme_JSON_Gutenberg {
 
 				$has_block_gap_support = _wp_array_get( $this->theme_json, array( 'settings', 'spacing', 'blockGap' ) ) !== null;
 				if ( $has_block_gap_support ) {
-					$block_rules .= '.wp-site-blocks > * + * { margin-top: var( --wp--style--block-gap ); margin-bottom: 0; }';
+					$block_rules .= '.wp-site-blocks > * { margin-top: 0; margin-bottom: 0; }';
+					$block_rules .= '.wp-site-blocks > * + * { margin-top: var( --wp--style--block-gap ); }';
 				}
 			}
 		}
@@ -1119,7 +1121,8 @@ class WP_Theme_JSON_Gutenberg {
 		foreach ( $this->theme_json['templateParts'] as $item ) {
 			if ( isset( $item['name'] ) ) {
 				$template_parts[ $item['name'] ] = array(
-					'area' => isset( $item['area'] ) ? $item['area'] : '',
+					'title' => isset( $item['title'] ) ? $item['title'] : '',
+					'area'  => isset( $item['area'] ) ? $item['area'] : '',
 				);
 			}
 		}

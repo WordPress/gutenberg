@@ -66,7 +66,7 @@ function gutenberg_render_elements_support( $block_content, $block ) {
 	add_action(
 		'wp_footer',
 		function () use ( $style ) {
-			echo '<style>' . $style . '</style>';
+			echo $style;
 		}
 	);
 

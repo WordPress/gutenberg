@@ -7,8 +7,8 @@ import type { Ref } from 'react';
 /**
  * WordPress dependencies
  */
-import { check, reset, moreVertical } from '@wordpress/icons';
-import { __, sprintf } from '@wordpress/i18n';
+import { check, reset, moreVertical, plus } from '@wordpress/icons';
+import { __, _x, sprintf } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
@@ -16,6 +16,8 @@ import { __, sprintf } from '@wordpress/i18n';
 import DropdownMenu from '../../dropdown-menu';
 import MenuGroup from '../../menu-group';
 import MenuItem from '../../menu-item';
+import { HStack } from '../../h-stack';
+import { Heading } from '../../heading';
 import { useToolsPanelHeader } from './hook';
 import { contextConnect, WordPressComponentProps } from '../../ui/context';
 import type {
@@ -116,8 +118,10 @@ const ToolsPanelHeader = (
 	forwardedRef: Ref< any >
 ) => {
 	const {
+		areAllOptionalControlsHidden,
 		dropdownMenuClassName,
 		hasMenuItems,
+		headingClassName,
 		label: labelText,
 		menuItems,
 		resetAll,
@@ -131,14 +135,23 @@ const ToolsPanelHeader = (
 
 	const defaultItems = Object.entries( menuItems?.default || {} );
 	const optionalItems = Object.entries( menuItems?.optional || {} );
+	const dropDownMenuIcon = areAllOptionalControlsHidden ? plus : moreVertical;
+	const dropDownMenuLabelText = areAllOptionalControlsHidden
+		? _x(
+				'View and add options',
+				'Button label to reveal tool panel options'
+		  )
+		: _x( 'View options', 'Button label to reveal tool panel options' );
 
 	return (
-		<h2 { ...headerProps } ref={ forwardedRef }>
-			{ labelText }
+		<HStack { ...headerProps } ref={ forwardedRef }>
+			<Heading level={ 2 } className={ headingClassName }>
+				{ labelText }
+			</Heading>
 			{ hasMenuItems && (
 				<DropdownMenu
-					icon={ moreVertical }
-					label={ labelText }
+					icon={ dropDownMenuIcon }
+					label={ dropDownMenuLabelText }
 					menuProps={ { className: dropdownMenuClassName } }
 				>
 					{ ( { onClose = noop } ) => (
@@ -168,7 +181,7 @@ const ToolsPanelHeader = (
 					) }
 				</DropdownMenu>
 			) }
-		</h2>
+		</HStack>
 	);
 };
 

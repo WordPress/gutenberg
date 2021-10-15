@@ -391,7 +391,7 @@ export function* revertTemplate( template ) {
 			coreStore,
 			'getEditedEntityRecord',
 			'postType',
-			'wp_template',
+			template.type,
 			template.id
 		);
 		// We are fixing up the undo level here to make sure we can undo
@@ -400,7 +400,7 @@ export function* revertTemplate( template ) {
 			coreStore,
 			'editEntityRecord',
 			'postType',
-			'wp_template',
+			template.type,
 			template.id,
 			{
 				content: serializeBlocks, // required to make the `undo` behave correctly
@@ -417,7 +417,7 @@ export function* revertTemplate( template ) {
 			coreStore,
 			'editEntityRecord',
 			'postType',
-			'wp_template',
+			template.type,
 			fileTemplate.id,
 			{
 				content: serializeBlocks,
@@ -429,7 +429,7 @@ export function* revertTemplate( template ) {
 		const undoRevert = async () => {
 			await dispatch( coreStore ).editEntityRecord(
 				'postType',
-				'wp_template',
+				template.type,
 				edited.id,
 				{
 					content: serializeBlocks,

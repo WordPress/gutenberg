@@ -24,6 +24,7 @@ import createSelector from 'rememo';
 import {
 	getBlockType,
 	getBlockTypes,
+	getBlockVariations,
 	hasBlockSupport,
 	getPossibleBlockTransformations,
 	parse,
@@ -1514,9 +1515,7 @@ const buildBlockTypeItem = ( state, { buildScope = 'inserter' } ) => (
 	};
 	if ( buildScope === 'transform' ) return blockItemBase;
 
-	const inserterVariations = blockType.variations.filter(
-		( { scope } ) => ! scope || scope.includes( 'inserter' )
-	);
+	const inserterVariations = getBlockVariations( blockType.name, 'inserter' );
 	return {
 		...blockItemBase,
 		initialAttributes: {},

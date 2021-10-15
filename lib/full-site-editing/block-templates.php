@@ -129,7 +129,8 @@ function _gutenberg_add_template_part_area_info( $template_info ) {
 	}
 
 	if ( isset( $theme_data[ $template_info['slug'] ]['area'] ) ) {
-		$template_info['area'] = gutenberg_filter_template_part_area( $theme_data[ $template_info['slug'] ]['area'] );
+		$template_info['title'] = $theme_data[ $template_info['slug'] ]['title'];
+		$template_info['area']  = gutenberg_filter_template_part_area( $theme_data[ $template_info['slug'] ]['area'] );
 	} else {
 		$template_info['area'] = WP_TEMPLATE_PART_AREA_UNCATEGORIZED;
 	}
@@ -222,7 +223,7 @@ function _gutenberg_build_template_result_from_file( $template_file, $template_t
 	$template->slug           = $template_file['slug'];
 	$template->source         = 'theme';
 	$template->type           = $template_type;
-	$template->title          = $template_file['slug'];
+	$template->title          = ! empty( $template_file['title'] ) ? $template_file['title'] : $template_file['slug'];
 	$template->status         = 'publish';
 	$template->has_theme_file = true;
 

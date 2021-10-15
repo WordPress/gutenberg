@@ -17,7 +17,6 @@ import {
  */
 // eslint-disable-next-line no-restricted-imports
 import { find, findAll } from 'puppeteer-testing-library';
-import { first } from 'lodash';
 
 const twentyTwentyError = `Stylesheet twentytwenty-block-editor-styles-css was not properly added.
 For blocks, use the block API's style (https://developer.wordpress.org/block-editor/reference-guides/block-api/block-metadata/#style) or editorStyle (https://developer.wordpress.org/block-editor/reference-guides/block-api/block-metadata/#editor-style).
@@ -831,12 +830,11 @@ describe( 'Widgets Customizer', () => {
 		} );
 		await showMoreSettingsButton.click();
 
-		// Change font size (Any change made in this section is sufficient; not required to be font size)
-		const CUSTOM_FONT_SIZE_LABEL_SELECTOR =
-			"//fieldset[legend[contains(text(),'Font size')]]//label[contains(text(), 'Custom')]";
-		await first( await page.$x( CUSTOM_FONT_SIZE_LABEL_SELECTOR ) ).click();
-		await page.keyboard.type( '23' );
-		await page.keyboard.press( 'Enter' );
+		// Change `drop cap` (Any change made in this section is sufficient; not required to be `drop cap`).
+		const [ dropCapToggle ] = await page.$x(
+			"//label[contains(text(), 'Drop cap')]"
+		);
+		await dropCapToggle.click();
 
 		// Now that we've made a change:
 		// (1) Publish button should be active

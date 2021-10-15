@@ -10,7 +10,18 @@ For each user feature we should also add a importance categorization label  to i
 -->
 
 ## Unreleased
+
+## 1.64.0
 -   [*] [Embed block] Fix inline preview cut-off when editing URL [#35321]
+-   [**] [Embed block] Detect when an embeddable URL is pasted into an empty paragraph. [#35204]
+-   [*] [Unsupported Block Editor] Fix text selection bug for Android [#34668]
+-   [*] [Embed block] Fix URL not editable after dismissing the edit URL bottom sheet with empty value [#35460]
+-   [**] Pullquote block - Added support for text and background color customization [#34451]
+-   [**] Preformatted block - Added support for text and background color customization [#35314]
+
+## 1.63.1
+-   [*] Fixed missing modal backdrop for Android help section [#35557]
+-   [*] Fixed erroneous overflow within editor Help screens. [#35552]
 
 ## 1.63.0
 -   [**] [Embed block] Add the top 5 specific embed blocks to the Block inserter list [#34967]
@@ -21,8 +32,8 @@ For each user feature we should also add a importance categorization label  to i
 -   Same as 1.62.1 but with the changelog.
 
 ## 1.62.1
--   [**] Image block: fix height and border regression. [https://github.com/WordPress/gutenberg/pull/34957]
--   [**] Column block: fix width float attribute cut off. [#35061]
+-   [**] Image block: fix height and border regression. [#34957]
+-   [**] Column block: fix width attribute float cut off. [#34604]
 
 ## 1.62.0
 -   [**] [Embed block] Implement WP embed preview component [#34004]

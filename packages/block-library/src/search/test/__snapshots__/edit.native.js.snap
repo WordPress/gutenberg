@@ -94,7 +94,10 @@ exports[`Search Block renders block with button inside option 1`] = `
         scrollEnabled={false}
         style={
           Array [
-            false,
+            Array [
+              false,
+              undefined,
+            ],
             undefined,
           ]
         }
@@ -269,7 +272,10 @@ exports[`Search Block renders block with icon button option matches snapshot 1`]
         scrollEnabled={false}
         style={
           Array [
-            undefined,
+            Array [
+              undefined,
+              undefined,
+            ],
             undefined,
           ]
         }
@@ -326,7 +332,10 @@ exports[`Search Block renders block with label hidden matches snapshot 1`] = `
         scrollEnabled={false}
         style={
           Array [
-            undefined,
+            Array [
+              undefined,
+              undefined,
+            ],
             undefined,
           ]
         }
@@ -501,7 +510,10 @@ exports[`Search Block renders with default configuration matches snapshot 1`] = 
         scrollEnabled={false}
         style={
           Array [
-            undefined,
+            Array [
+              undefined,
+              undefined,
+            ],
             undefined,
           ]
         }
@@ -667,7 +679,10 @@ exports[`Search Block renders with no-button option matches snapshot 1`] = `
       scrollEnabled={false}
       style={
         Array [
-          undefined,
+          Array [
+            undefined,
+            undefined,
+          ],
           undefined,
         ]
       }

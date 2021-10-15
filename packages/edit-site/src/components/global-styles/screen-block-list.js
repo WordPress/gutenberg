@@ -37,7 +37,13 @@ function BlockMenuItem( { block } ) {
 function ScreenBlockList() {
 	return (
 		<>
-			<ScreenHeader back="/" title={ __( 'Blocks' ) } />
+			<ScreenHeader
+				back="/"
+				title={ __( 'Blocks' ) }
+				description={ __(
+					'Customize the appearance of specific blocks and for the whole site.'
+				) }
+			/>
 			{ getBlockTypes().map( ( block ) => (
 				<BlockMenuItem
 					block={ block }
