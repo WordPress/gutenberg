@@ -40,6 +40,20 @@ https://twitter.com/notnownikki
 <!-- /wp:embed -->"
 `;
 
+exports[`Embed block create by pasting URL creates embed block when pasting URL in paragraph block 1`] = `
+"<!-- wp:embed {\\"url\\":\\"https://www.youtube.com/watch?v=lXMskKTw3Bc\\",\\"type\\":\\"video\\",\\"providerNameSlug\\":\\"youtube\\",\\"responsive\\":true,\\"className\\":\\"wp-embed-aspect-16-9 wp-has-aspect-ratio\\"} -->
+<figure class=\\"wp-block-embed is-type-video is-provider-youtube wp-block-embed-youtube wp-embed-aspect-16-9 wp-has-aspect-ratio\\"><div class=\\"wp-block-embed__wrapper\\">
+https://www.youtube.com/watch?v=lXMskKTw3Bc
+</div></figure>
+<!-- /wp:embed -->"
+`;
+
+exports[`Embed block create by pasting URL creates link when pasting URL in paragraph block 1`] = `
+"<!-- wp:paragraph -->
+<p><a href=\\"https://www.youtube.com/watch?v=lXMskKTw3Bc\\">https://www.youtube.com/watch?v=lXMskKTw3Bc</a></p>
+<!-- /wp:paragraph -->"
+`;
+
 exports[`Embed block edit URL keeps the previous URL if an invalid URL is set 1`] = `
 "<!-- wp:embed {\\"url\\":\\"https://twitter.com/notnownikki\\",\\"type\\":\\"rich\\",\\"providerNameSlug\\":\\"twitter\\",\\"responsive\\":true} -->
 <figure class=\\"wp-block-embed is-type-rich is-provider-twitter wp-block-embed-twitter\\"><div class=\\"wp-block-embed__wrapper\\">

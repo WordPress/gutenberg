@@ -613,4 +613,96 @@ describe( 'Embed block', () => {
 			expect( requestPreview ).not.toHaveBeenCalled();
 		} );
 	} );
+
+	describe( 'create by pasting URL', () => {
+		it( 'creates embed block when pasting URL in paragraph block', async () => {
+			const expectedURL = 'https://www.youtube.com/watch?v=lXMskKTw3Bc';
+
+			const {
+				getByA11yLabel,
+				getByPlaceholderText,
+				getByTestId,
+				getByText,
+			} = await initializeEditor( {
+				initialHtml:
+					'<!-- wp:paragraph --><p></p><!-- /wp:paragraph -->',
+			} );
+
+			// Paste URL in paragraph block
+			const paragraphText = getByPlaceholderText( 'Start writing…' );
+			fireEvent( paragraphText, 'focus' );
+			fireEvent( paragraphText, 'paste', {
+				preventDefault: jest.fn(),
+				nativeEvent: {
+					eventCount: 1,
+					target: undefined,
+					files: [],
+					pastedHtml: expectedURL,
+					pastedText: expectedURL,
+				},
+			} );
+
+			// Wait for embed handler picker to be visible
+			await waitFor(
+				() => getByTestId( 'embed-handler-picker' ).props.isVisible
+			);
+
+			// Select create embed option
+			fireEvent.press( getByText( 'Create embed' ) );
+
+			// Get the created embed block
+			const embedBlock = await waitFor( () =>
+				getByA11yLabel( /Embed Block\. Row 1/ )
+			);
+
+			expect( embedBlock ).toBeDefined();
+			expect( getEditorHtml() ).toMatchSnapshot();
+		} );
+
+		it( 'creates link when pasting URL in paragraph block', async () => {
+			const expectedURL = 'https://www.youtube.com/watch?v=lXMskKTw3Bc';
+
+			const {
+				getByDisplayValue,
+				getByPlaceholderText,
+				getByTestId,
+				getByText,
+			} = await initializeEditor( {
+				initialHtml:
+					'<!-- wp:paragraph --><p></p><!-- /wp:paragraph -->',
+			} );
+
+			// Paste URL in paragraph block
+			const paragraphText = getByPlaceholderText( 'Start writing…' );
+			fireEvent( paragraphText, 'focus' );
+			fireEvent( paragraphText, 'paste', {
+				preventDefault: jest.fn(),
+				nativeEvent: {
+					eventCount: 1,
+					target: undefined,
+					files: [],
+					pastedHtml: expectedURL,
+					pastedText: expectedURL,
+				},
+			} );
+
+			// Wait for embed handler picker to be visible
+			await waitFor(
+				() => getByTestId( 'embed-handler-picker' ).props.isVisible
+			);
+
+			// Select create link option
+			fireEvent.press( getByText( 'Create link' ) );
+
+			// Get the link text
+			const linkText = await waitFor( () =>
+				getByDisplayValue(
+					`<p><a href="${ expectedURL }">${ expectedURL }</a></p>`
+				)
+			);
+
+			expect( linkText ).toBeDefined();
+			expect( getEditorHtml() ).toMatchSnapshot();
+		} );
+	} );
 } );
