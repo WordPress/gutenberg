@@ -71,7 +71,6 @@ export const ToolsPanelHeader = css`
 		margin: ${ space( -1 ) } 0;
 		height: ${ space( 6 ) };
 
-		/* first-child used to overcome specificity of menu toggle styles */
 		.components-dropdown-menu__toggle {
 			padding: 0;
 			height: ${ space( 6 ) };
