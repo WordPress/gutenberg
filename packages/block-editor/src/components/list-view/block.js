@@ -34,7 +34,6 @@ export default function ListViewBlock( {
 	isBranchSelected,
 	isLastOfSelectedBranch,
 	selectBlock,
-	onToggleExpanded,
 	position,
 	level,
 	rowCount,
@@ -59,6 +58,8 @@ export default function ListViewBlock( {
 		__experimentalFeatures: withExperimentalFeatures,
 		__experimentalPersistentListViewFeatures: withExperimentalPersistentListViewFeatures,
 		isTreeGridMounted,
+		expand,
+		collapse,
 	} = useListViewContext();
 	const listViewBlockSettingsClassName = classnames(
 		'block-editor-list-view-block__menu-cell',
@@ -99,6 +100,18 @@ export default function ListViewBlock( {
 		[ clientId, selectBlock ]
 	);
 
+	const toggleExpanded = useCallback(
+		( event ) => {
+			event.stopPropagation();
+			if ( isExpanded === true ) {
+				collapse( clientId );
+			} else if ( isExpanded === false ) {
+				expand( clientId );
+			}
+		},
+		[ clientId, expand, collapse, isExpanded ]
+	);
+
 	const classes = classnames( {
 		'is-selected': isSelected,
 		'is-branch-selected':
@@ -134,7 +147,7 @@ export default function ListViewBlock( {
 						<ListViewBlockContents
 							block={ block }
 							onClick={ selectEditorBlock }
-							onToggleExpanded={ onToggleExpanded }
+							onToggleExpanded={ toggleExpanded }
 							isSelected={ isSelected }
 							position={ position }
 							siblingBlockCount={ siblingBlockCount }

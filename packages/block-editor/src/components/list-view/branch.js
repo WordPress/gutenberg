@@ -32,8 +32,6 @@ export default function ListViewBranch( props ) {
 
 	const {
 		expandedState,
-		expand,
-		collapse,
 		draggedClientIds,
 		selectedClientIds,
 	} = useListViewContext();
@@ -79,15 +77,6 @@ export default function ListViewBranch( props ) {
 					? expandedState[ clientId ] ?? true
 					: undefined;
 
-				const toggleExpanded = ( event ) => {
-					event.stopPropagation();
-					if ( isExpanded === true ) {
-						collapse( clientId );
-					} else if ( isExpanded === false ) {
-						expand( clientId );
-					}
-				};
-
 				// Make updates to the selected or dragged blocks synchronous,
 				// but asynchronous for any other block.
 				const isDragged = !! draggedClientIds?.includes( clientId );
@@ -97,7 +86,6 @@ export default function ListViewBranch( props ) {
 						<ListViewBlock
 							block={ block }
 							selectBlock={ selectBlock }
-							onToggleExpanded={ toggleExpanded }
 							isDragged={ isDragged }
 							isSelected={ isSelected }
 							isBranchSelected={ isSelectedBranch }
