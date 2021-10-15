@@ -313,10 +313,9 @@ class Block_Templates_Test extends WP_UnitTestCase {
 			$template_ids
 		);
 
-
 		$templates    = gutenberg_get_block_templates( array( 'theme' => 'fake-theme' ), 'wp_template_part' );
 		$template_ids = get_template_ids( $templates );
-		$this->assertEquals( array( ), $template_ids );
+		$this->assertEquals( array(), $template_ids );
 	}
 
 	/**

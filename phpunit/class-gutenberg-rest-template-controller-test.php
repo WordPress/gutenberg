@@ -63,19 +63,20 @@ class Gutenberg_REST_Templates_Controller_Test extends WP_Test_REST_Controller_T
 
 		$this->assertEquals(
 			array(
-				'id'             => 'tt1-blocks//index',
-				'theme'          => 'tt1-blocks',
-				'slug'           => 'index',
-				'title'          => array(
+				'id'                    => 'tt1-blocks//index',
+				'theme'                 => 'tt1-blocks',
+				'slug'                  => 'index',
+				'title'                 => array(
 					'raw'      => 'Index',
 					'rendered' => 'Index',
 				),
-				'description'    => 'The default template used when no other template is available. This is a required template in WordPress.',
-				'status'         => 'publish',
-				'source'         => 'theme',
-				'type'           => 'wp_template',
-				'wp_id'          => null,
-				'has_theme_file' => true,
+				'description'           => 'The default template used when no other template is available. This is a required template in WordPress.',
+				'status'                => 'publish',
+				'source'                => 'theme',
+				'type'                  => 'wp_template',
+				'wp_id'                 => null,
+				'has_theme_file'        => true,
+				'is_from_current_theme' => true,
 			),
 			find_and_normalize_template_by_id( $data, 'tt1-blocks//index' )
 		);
@@ -87,20 +88,21 @@ class Gutenberg_REST_Templates_Controller_Test extends WP_Test_REST_Controller_T
 
 		$this->assertEquals(
 			array(
-				'id'             => 'tt1-blocks//header',
-				'theme'          => 'tt1-blocks',
-				'slug'           => 'header',
-				'title'          => array(
+				'id'                    => 'tt1-blocks//header',
+				'theme'                 => 'tt1-blocks',
+				'slug'                  => 'header',
+				'title'                 => array(
 					'raw'      => 'header',
 					'rendered' => 'header',
 				),
-				'description'    => '',
-				'status'         => 'publish',
-				'source'         => 'theme',
-				'type'           => 'wp_template_part',
-				'wp_id'          => null,
-				'area'           => WP_TEMPLATE_PART_AREA_HEADER,
-				'has_theme_file' => true,
+				'description'           => '',
+				'status'                => 'publish',
+				'source'                => 'theme',
+				'type'                  => 'wp_template_part',
+				'wp_id'                 => null,
+				'area'                  => WP_TEMPLATE_PART_AREA_HEADER,
+				'has_theme_file'        => true,
+				'is_from_current_theme' => true,
 			),
 			find_and_normalize_template_by_id( $data, 'tt1-blocks//header' )
 		);
@@ -116,19 +118,20 @@ class Gutenberg_REST_Templates_Controller_Test extends WP_Test_REST_Controller_T
 
 		$this->assertEquals(
 			array(
-				'id'             => 'tt1-blocks//index',
-				'theme'          => 'tt1-blocks',
-				'slug'           => 'index',
-				'title'          => array(
+				'id'                    => 'tt1-blocks//index',
+				'theme'                 => 'tt1-blocks',
+				'slug'                  => 'index',
+				'title'                 => array(
 					'raw'      => 'Index',
 					'rendered' => 'Index',
 				),
-				'description'    => 'The default template used when no other template is available. This is a required template in WordPress.',
-				'status'         => 'publish',
-				'source'         => 'theme',
-				'type'           => 'wp_template',
-				'wp_id'          => null,
-				'has_theme_file' => true,
+				'description'           => 'The default template used when no other template is available. This is a required template in WordPress.',
+				'status'                => 'publish',
+				'source'                => 'theme',
+				'type'                  => 'wp_template',
+				'wp_id'                 => null,
+				'has_theme_file'        => true,
+				'is_from_current_theme' => true,
 			),
 			$data
 		);
@@ -141,20 +144,21 @@ class Gutenberg_REST_Templates_Controller_Test extends WP_Test_REST_Controller_T
 		unset( $data['_links'] );
 		$this->assertEquals(
 			array(
-				'id'             => 'tt1-blocks//header',
-				'theme'          => 'tt1-blocks',
-				'slug'           => 'header',
-				'title'          => array(
+				'id'                    => 'tt1-blocks//header',
+				'theme'                 => 'tt1-blocks',
+				'slug'                  => 'header',
+				'title'                 => array(
 					'raw'      => 'header',
 					'rendered' => 'header',
 				),
-				'description'    => '',
-				'status'         => 'publish',
-				'source'         => 'theme',
-				'type'           => 'wp_template_part',
-				'wp_id'          => null,
-				'area'           => WP_TEMPLATE_PART_AREA_HEADER,
-				'has_theme_file' => true,
+				'description'           => '',
+				'status'                => 'publish',
+				'source'                => 'theme',
+				'type'                  => 'wp_template_part',
+				'wp_id'                 => null,
+				'area'                  => WP_TEMPLATE_PART_AREA_HEADER,
+				'has_theme_file'        => true,
+				'is_from_current_theme' => true,
 			),
 			$data
 		);
@@ -178,21 +182,22 @@ class Gutenberg_REST_Templates_Controller_Test extends WP_Test_REST_Controller_T
 
 		$this->assertEquals(
 			array(
-				'id'             => 'tt1-blocks//my_custom_template',
-				'theme'          => 'tt1-blocks',
-				'slug'           => 'my_custom_template',
-				'title'          => array(
+				'id'                    => 'tt1-blocks//my_custom_template',
+				'theme'                 => 'tt1-blocks',
+				'slug'                  => 'my_custom_template',
+				'title'                 => array(
 					'raw'      => 'My Template',
 					'rendered' => 'My Template',
 				),
-				'description'    => 'Just a description',
-				'status'         => 'publish',
-				'source'         => 'custom',
-				'type'           => 'wp_template',
-				'content'        => array(
+				'description'           => 'Just a description',
+				'status'                => 'publish',
+				'source'                => 'custom',
+				'type'                  => 'wp_template',
+				'content'               => array(
 					'raw' => 'Content',
 				),
-				'has_theme_file' => false,
+				'has_theme_file'        => false,
+				'is_from_current_theme' => true,
 			),
 			$data
 		);
@@ -215,22 +220,23 @@ class Gutenberg_REST_Templates_Controller_Test extends WP_Test_REST_Controller_T
 
 		$this->assertEquals(
 			array(
-				'id'             => 'tt1-blocks//my_custom_template_part',
-				'theme'          => 'tt1-blocks',
-				'slug'           => 'my_custom_template_part',
-				'title'          => array(
+				'id'                    => 'tt1-blocks//my_custom_template_part',
+				'theme'                 => 'tt1-blocks',
+				'slug'                  => 'my_custom_template_part',
+				'title'                 => array(
 					'raw'      => 'My Template Part',
 					'rendered' => 'My Template Part',
 				),
-				'description'    => 'Just a description of a template part',
-				'status'         => 'publish',
-				'source'         => 'custom',
-				'type'           => 'wp_template_part',
-				'content'        => array(
+				'description'           => 'Just a description of a template part',
+				'status'                => 'publish',
+				'source'                => 'custom',
+				'type'                  => 'wp_template_part',
+				'content'               => array(
 					'raw' => 'Content',
 				),
-				'area'           => 'header',
-				'has_theme_file' => false,
+				'area'                  => 'header',
+				'has_theme_file'        => false,
+				'is_from_current_theme' => true,
 			),
 			$data
 		);
