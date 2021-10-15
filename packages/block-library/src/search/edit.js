@@ -87,6 +87,8 @@ export default function SearchEdit( {
 		return wasBlockJustInserted( clientId );
 	} );
 
+	// Save a ref to this value, as it would become outdated
+	// if any other blocks are added.
 	const isNewBlockRef = useRef( isNewBlock );
 
 	if (
