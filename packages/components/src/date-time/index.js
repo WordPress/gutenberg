@@ -75,12 +75,7 @@ function DateTimePicker(
 						<h4>{ __( 'Navigating with a keyboard' ) }</h4>
 						<ul>
 							<li>
-								<abbr
-									aria-label={ _x(
-										'Enter',
-										'keyboard button'
-									) }
-								>
+								<abbr aria-label={ _x('Enter', 'keyboard button') }>
 									↵
 								</abbr>
 								{
@@ -91,9 +86,7 @@ function DateTimePicker(
 								</span>
 							</li>
 							<li>
-								<abbr
-									aria-label={ __( 'Left and Right Arrows' ) }
-								>
+								<abbr aria-label={ __( 'Left and Right Arrows' ) }>
 									←/→
 								</abbr>
 								{
@@ -115,9 +108,7 @@ function DateTimePicker(
 								) }
 							</li>
 							<li>
-								<abbr
-									aria-label={ __( 'Page Up and Page Down' ) }
-								>
+								<abbr aria-label={ __( 'Page Up and Page Down' ) }>
 									{ __( 'PgUp/PgDn' ) }
 								</abbr>
 								{
@@ -129,14 +120,14 @@ function DateTimePicker(
 							</li>
 							<li>
 								<abbr aria-label={ __( 'Home and End' ) }>
-									{ __( 'Home/End' ) }
-								</abbr>
-								/* Translators: Home/End reffer to the 'Home' and 'End' buttons on the keyboard.*/
+								{ /* Translators: Home/End reffer to the 'Home' and 'End' buttons on the keyboard.*/ }
+										{ __( 'Home/End' ) }
+									</abbr>
 								{
 									' ' /* JSX removes whitespace, but a space is required for screen readers. */
 								}
 								{ __(
-									'Go to the first (home) or last (end) day of a week.'
+									'Go to the first (Home) or last (End) day of a week.'
 								) }
 							</li>
 						</ul>
