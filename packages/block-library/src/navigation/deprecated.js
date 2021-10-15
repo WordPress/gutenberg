@@ -12,6 +12,13 @@ import { InnerBlocks } from '@wordpress/block-editor';
  * Internal dependencies
  */
 import migrateFontFamily from '../utils/migrate-font-family';
+import blockConfig from './block.json';
+import currentSave from './save';
+
+const {
+	attributes: currentAttributes,
+	supports: currentSupports,
+} = blockConfig;
 
 const TYPOGRAPHY_PRESET_DEPRECATION_MAP = {
 	fontStyle: 'var:preset|font-style|',
@@ -253,78 +260,9 @@ const deprecated = [
 		},
 	},
 	{
-		attributes: {
-			orientation: {
-				type: 'string',
-				default: 'horizontal',
-			},
-			textColor: {
-				type: 'string',
-			},
-			customTextColor: {
-				type: 'string',
-			},
-			rgbTextColor: {
-				type: 'string',
-			},
-			backgroundColor: {
-				type: 'string',
-			},
-			customBackgroundColor: {
-				type: 'string',
-			},
-			rgbBackgroundColor: {
-				type: 'string',
-			},
-			itemsJustification: {
-				type: 'string',
-			},
-			showSubmenuIcon: {
-				type: 'boolean',
-				default: true,
-			},
-			openSubmenusOnClick: {
-				type: 'boolean',
-				default: false,
-			},
-			isResponsive: {
-				type: 'boolean',
-				default: false,
-			},
-			__unstableLocation: {
-				type: 'string',
-			},
-			overlayBackgroundColor: {
-				type: 'string',
-			},
-			customOverlayBackgroundColor: {
-				type: 'string',
-			},
-			overlayTextColor: {
-				type: 'string',
-			},
-			customOverlayTextColor: {
-				type: 'string',
-			},
-		},
-		supports: {
-			align: [ 'wide', 'full' ],
-			anchor: true,
-			html: false,
-			inserter: true,
-			typography: {
-				fontSize: true,
-				lineHeight: true,
-				__experimentalFontStyle: true,
-				__experimentalFontWeight: true,
-				__experimentalTextTransform: true,
-				__experimentalFontFamily: true,
-				__experimentalTextDecoration: true,
-			},
-		},
-		save() {
-			return <InnerBlocks.Content />;
-		},
+		attributes: currentAttributes,
+		supports: currentSupports,
+		save: currentSave,
 		migrate: migrateFontFamily,
 		isEligible( { style } ) {
 			return style?.typography?.fontFamily;
