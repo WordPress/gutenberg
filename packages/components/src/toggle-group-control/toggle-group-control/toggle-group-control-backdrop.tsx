@@ -6,7 +6,7 @@ import { useState, useEffect, memo } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import type { ToggleGroupControlBackdropProps } from './types';
+import type { ToggleGroupControlBackdropProps } from '../types';
 import { BackdropView } from './styles';
 
 function ToggleGroupControlBackdrop( {
@@ -18,6 +18,7 @@ function ToggleGroupControlBackdrop( {
 	const [ left, setLeft ] = useState( 0 );
 	const [ width, setWidth ] = useState( 0 );
 	const [ canAnimate, setCanAnimate ] = useState( false );
+	const [ renderBackdrop, setRenderBackdrop ] = useState( false );
 
 	useEffect( () => {
 		const containerNode = containerRef?.current;
@@ -29,7 +30,10 @@ function ToggleGroupControlBackdrop( {
 		const targetNode = containerNode.querySelector(
 			`[data-value="${ state }"]`
 		);
-		if ( ! targetNode ) return;
+		setRenderBackdrop( !! targetNode );
+		if ( ! targetNode ) {
+			return;
+		}
 
 		const { x: parentX } = containerNode.getBoundingClientRect();
 		const { width: offsetWidth, x } = targetNode.getBoundingClientRect();
@@ -47,6 +51,10 @@ function ToggleGroupControlBackdrop( {
 		}
 		return () => window.cancelAnimationFrame( requestId );
 	}, [ canAnimate, containerRef, containerWidth, state, isAdaptiveWidth ] );
+
+	if ( ! renderBackdrop ) {
+		return null;
+	}
 
 	return (
 		<BackdropView

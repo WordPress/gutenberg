@@ -88,21 +88,21 @@ export const TEMPLATE_PARTS_SUB_MENUS = [
 	{
 		area: TEMPLATE_PART_AREA_HEADER,
 		menu: MENU_TEMPLATE_PARTS_HEADERS,
-		title: __( 'Headers' ),
+		title: __( 'headers' ),
 	},
 	{
 		area: TEMPLATE_PART_AREA_FOOTER,
 		menu: MENU_TEMPLATE_PARTS_FOOTERS,
-		title: __( 'Footers' ),
+		title: __( 'footers' ),
 	},
 	{
 		area: TEMPLATE_PART_AREA_SIDEBAR,
 		menu: MENU_TEMPLATE_PARTS_SIDEBARS,
-		title: __( 'Sidebars' ),
+		title: __( 'sidebars' ),
 	},
 	{
 		area: 'uncategorized',
 		menu: MENU_TEMPLATE_PARTS_GENERAL,
-		title: __( 'General' ),
+		title: __( 'general' ),
 	},
 ];

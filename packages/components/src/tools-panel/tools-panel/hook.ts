@@ -109,17 +109,15 @@ export function useToolsPanel(
 		} );
 	};
 
-	// Track whether all optional controls are displayed or not.
-	// If no optional controls are present, then none are hidden and this will
-	// be `false`.
+	// Whether all optional menu items are hidden or not must be tracked
+	// in order to later determine if the panel display is empty and handle
+	// conditional display of a plus icon to indicate the presence of further
+	// menu items.
 	const [
 		areAllOptionalControlsHidden,
 		setAreAllOptionalControlsHidden,
 	] = useState( false );
 
-	// We need to track whether any optional menu items are active to later
-	// determine whether the panel is currently empty and any inner wrapper
-	// should be hidden.
 	useEffect( () => {
 		if ( menuItems.optional ) {
 			const optionalItems = Object.entries( menuItems.optional );
@@ -203,6 +201,7 @@ export function useToolsPanel(
 		registerPanelItem,
 		deregisterPanelItem,
 		flagItemCustomization,
+		areAllOptionalControlsHidden,
 		hasMenuItems: !! panelItems.length,
 		isResetting: isResetting.current,
 		shouldRenderPlaceholderItems,

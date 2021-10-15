@@ -49,25 +49,6 @@ exports[`ToggleGroupControl should render correctly 1`] = `
 }
 
 .emotion-6 {
-  background: #1e1e1e;
-  border-radius: 2px;
-  box-shadow: transparent;
-  left: 0;
-  position: absolute;
-  top: 2px;
-  bottom: 2px;
-  -webkit-transition: -webkit-transform 160ms ease;
-  transition: transform 160ms ease;
-  z-index: 1;
-}
-
-@media ( prefers-reduced-motion: reduce ) {
-  .emotion-6 {
-    transition-duration: 0ms;
-  }
-}
-
-.emotion-8 {
   display: -webkit-inline-box;
   display: -webkit-inline-flex;
   display: -ms-inline-flexbox;
@@ -80,7 +61,7 @@ exports[`ToggleGroupControl should render correctly 1`] = `
   flex: 1;
 }
 
-.emotion-10 {
+.emotion-8 {
   -webkit-align-items: center;
   -webkit-box-align: center;
   -ms-flex-align: center;
@@ -119,20 +100,20 @@ exports[`ToggleGroupControl should render correctly 1`] = `
 }
 
 @media ( prefers-reduced-motion: reduce ) {
-  .emotion-10 {
+  .emotion-8 {
     transition-duration: 0ms;
   }
 }
 
-.emotion-10::-moz-focus-inner {
+.emotion-8::-moz-focus-inner {
   border: 0;
 }
 
-.emotion-10:active {
+.emotion-8:active {
   background: #fff;
 }
 
-.emotion-11 {
+.emotion-9 {
   font-size: 13px;
   line-height: 1;
   position: absolute;
@@ -144,7 +125,7 @@ exports[`ToggleGroupControl should render correctly 1`] = `
   transform: translate( -50%, -50% );
 }
 
-.emotion-13 {
+.emotion-11 {
   font-size: 13px;
   font-weight: bold;
   height: 0;
@@ -182,17 +163,12 @@ exports[`ToggleGroupControl should render correctly 1`] = `
       />
       <div
         class="emotion-6 emotion-7"
-        role="presentation"
-        style="transform: translateX(0px); transition: none; width: 0px;"
-      />
-      <div
-        class="emotion-8 emotion-9"
         data-active="false"
       >
         <button
           aria-checked="false"
           aria-label="R"
-          class="emotion-10 components-toggle-group-control-option"
+          class="emotion-8 components-toggle-group-control-option"
           data-value="rigas"
           data-wp-c16t="true"
           data-wp-component="ToggleGroupControlOption"
@@ -201,26 +177,26 @@ exports[`ToggleGroupControl should render correctly 1`] = `
           tabindex="0"
         >
           <div
-            class="emotion-11 emotion-12"
+            class="emotion-9 emotion-10"
           >
             R
           </div>
           <div
             aria-hidden="true"
-            class="emotion-13 emotion-14"
+            class="emotion-11 emotion-12"
           >
             R
           </div>
         </button>
       </div>
       <div
-        class="emotion-8 emotion-9"
+        class="emotion-6 emotion-7"
         data-active="false"
       >
         <button
           aria-checked="false"
           aria-label="J"
-          class="emotion-10 components-toggle-group-control-option"
+          class="emotion-8 components-toggle-group-control-option"
           data-value="jack"
           data-wp-c16t="true"
           data-wp-component="ToggleGroupControlOption"
@@ -229,13 +205,13 @@ exports[`ToggleGroupControl should render correctly 1`] = `
           tabindex="-1"
         >
           <div
-            class="emotion-11 emotion-12"
+            class="emotion-9 emotion-10"
           >
             J
           </div>
           <div
             aria-hidden="true"
-            class="emotion-13 emotion-14"
+            class="emotion-11 emotion-12"
           >
             J
           </div>

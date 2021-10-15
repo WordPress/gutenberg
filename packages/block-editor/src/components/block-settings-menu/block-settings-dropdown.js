@@ -90,11 +90,11 @@ export function BlockSettingsDropdown( {
 			{ ( {
 				canDuplicate,
 				canInsertDefaultBlock,
+				canMove,
 				canRemove,
 				onDuplicate,
 				onInsertAfter,
 				onInsertBefore,
-				isLocked,
 				onRemove,
 				onCopy,
 				onMoveTo,
@@ -157,7 +157,7 @@ export function BlockSettingsDropdown( {
 										</MenuItem>
 									</>
 								) }
-								{ ! isLocked && ! onlyBlock && (
+								{ canMove && ! onlyBlock && (
 									<MenuItem
 										onClick={ flow( onClose, onMoveTo ) }
 									>

@@ -2,6 +2,8 @@
  * External dependencies
  */
 // eslint-disable-next-line no-restricted-imports
+import type { Ref } from 'react';
+// eslint-disable-next-line no-restricted-imports
 import { RadioGroup, useRadioState } from 'reakit';
 import useResizeAware from 'react-resize-aware';
 
@@ -19,20 +21,20 @@ import {
 	contextConnect,
 	useContextSystem,
 	WordPressComponentProps,
-} from '../ui/context';
-import { useUpdateEffect, useCx } from '../utils/hooks';
-import { View } from '../view';
-import BaseControl from '../base-control';
+} from '../../ui/context';
+import { useUpdateEffect, useCx } from '../../utils/hooks';
+import { View } from '../../view';
+import BaseControl from '../../base-control';
 import ToggleGroupControlBackdrop from './toggle-group-control-backdrop';
-import type { ToggleGroupControlProps } from './types';
-import ToggleGroupControlContext from './toggle-group-control-context';
+import type { ToggleGroupControlProps } from '../types';
+import ToggleGroupControlContext from '../context';
 import * as styles from './styles';
 
 const noop = () => {};
 
 function ToggleGroupControl(
 	props: WordPressComponentProps< ToggleGroupControlProps, 'input' >,
-	forwardedRef: import('react').Ref< any >
+	forwardedRef: Ref< any >
 ) {
 	const {
 		className,
@@ -114,4 +116,35 @@ function ToggleGroupControl(
 	);
 }
 
-export default contextConnect( ToggleGroupControl, 'ToggleGroupControl' );
+/**
+ * `ToggleGroupControl` is a form component that lets users choose options
+ * represented in horizontal segments. To render options for this control use
+ * `ToggleGroupControlOption` component.
+ *
+ * Only use this control when you know for sure the labels of items inside won't
+ * wrap. For items with longer labels, you can consider a `SelectControl` or a
+ * `CustomSelectControl` component instead.
+ *
+ * @example
+ * ```jsx
+ * import {
+ *   __experimentalToggleGroupControl as ToggleGroupControl,
+ *   __experimentalToggleGroupControlOption as ToggleGroupControlOption,
+ * } from '@wordpress/components';
+ *
+ * function Example() {
+ *   return (
+ *     <ToggleGroupControl label="my label" value="vertical" isBlock>
+ *       <ToggleGroupControlOption value="horizontal" label="Horizontal" />
+ *       <ToggleGroupControlOption value="vertical" label="Vertical" />
+ *     </ToggleGroupControl>
+ *   );
+ * }
+ * ```
+ */
+const ConnectedToggleGroupControl = contextConnect(
+	ToggleGroupControl,
+	'ToggleGroupControl'
+);
+
+export default ConnectedToggleGroupControl;

@@ -78,6 +78,7 @@ export function MediaPlaceholder( {
 	children,
 	mediaLibraryButton,
 	placeholder,
+	style,
 } ) {
 	const mediaUpload = useSelect( ( select ) => {
 		const { getSettings } = select( blockEditorStore );
@@ -248,6 +249,7 @@ export function MediaPlaceholder( {
 				notices={ notices }
 				onDoubleClick={ onDoubleClick }
 				preview={ mediaPreview }
+				style={ style }
 			>
 				{ content }
 				{ children }

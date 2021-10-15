@@ -801,7 +801,7 @@ class WP_Theme_JSON_Gutenberg {
 	/**
 	 * Transform a slug into a CSS Custom Property.
 	 *
-	 * @param array  $input String to replace.
+	 * @param string $input String to replace.
 	 * @param string $slug The slug value to use to generate the custom property.
 	 *
 	 * @return string The CSS Custom Property. Something along the lines of --wp--preset--color--black.
@@ -1121,7 +1121,8 @@ class WP_Theme_JSON_Gutenberg {
 		foreach ( $this->theme_json['templateParts'] as $item ) {
 			if ( isset( $item['name'] ) ) {
 				$template_parts[ $item['name'] ] = array(
-					'area' => isset( $item['area'] ) ? $item['area'] : '',
+					'title' => isset( $item['title'] ) ? $item['title'] : '',
+					'area'  => isset( $item['area'] ) ? $item['area'] : '',
 				);
 			}
 		}
