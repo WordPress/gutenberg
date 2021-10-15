@@ -28,6 +28,8 @@ export default function RawHTML( { children, ...props } ) {
 		}
 	} );
 
+	// The `div` wrapper will be stripped by the `renderElement` serializer in
+	// `./serialize.js` unless there are non-children props present.
 	return createElement( 'div', {
 		dangerouslySetInnerHTML: { __html: rawHtml },
 		...props,
