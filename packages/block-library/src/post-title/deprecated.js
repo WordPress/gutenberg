@@ -3,53 +3,59 @@
  */
 import migrateFontFamily from '../utils/migrate-font-family';
 
-const deprecated = [
-	{
-		attributes: {
-			textAlign: {
-				type: 'string',
-			},
-			level: {
-				type: 'number',
-				default: 2,
-			},
-			isLink: {
-				type: 'boolean',
-				default: false,
-			},
-			rel: {
-				type: 'string',
-				attribute: 'rel',
-				default: '',
-			},
-			linkTarget: {
-				type: 'string',
-				default: '_self',
-			},
+const v1 = {
+	attributes: {
+		textAlign: {
+			type: 'string',
 		},
-		supports: {
-			align: [ 'wide', 'full' ],
-			html: false,
-			color: {
-				gradients: true,
-				link: true,
-			},
-			typography: {
-				fontSize: true,
-				lineHeight: true,
-				__experimentalFontFamily: true,
-				__experimentalFontWeight: true,
-				__experimentalFontStyle: true,
-				__experimentalTextTransform: true,
-			},
+		level: {
+			type: 'number',
+			default: 2,
 		},
-		save() {
-			return null;
+		isLink: {
+			type: 'boolean',
+			default: false,
 		},
-		migrate: migrateFontFamily,
-		isEligible( { style } ) {
-			return style?.typography?.fontFamily;
+		rel: {
+			type: 'string',
+			attribute: 'rel',
+			default: '',
+		},
+		linkTarget: {
+			type: 'string',
+			default: '_self',
 		},
 	},
-];
-export default deprecated;
+	supports: {
+		align: [ 'wide', 'full' ],
+		html: false,
+		color: {
+			gradients: true,
+			link: true,
+		},
+		typography: {
+			fontSize: true,
+			lineHeight: true,
+			__experimentalFontFamily: true,
+			__experimentalFontWeight: true,
+			__experimentalFontStyle: true,
+			__experimentalTextTransform: true,
+		},
+	},
+	save() {
+		return null;
+	},
+	migrate: migrateFontFamily,
+	isEligible( { style } ) {
+		return style?.typography?.fontFamily;
+	},
+};
+
+/**
+ * New deprecations need to be placed first
+ * for them to have higher priority.
+ * They also need to contain the old deprecations.
+ *
+ * See block-deprecation.md
+ */
+export default [ v1 ];
