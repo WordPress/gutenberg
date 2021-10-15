@@ -53,5 +53,8 @@
 		"html": false
 	},
 	"editorStyle": "wp-block-search-editor",
-	"style": "wp-block-search"
+	"style": "wp-block-search",
+	"usesContext": [
+		"searchBlockLabel"
+	]
 }

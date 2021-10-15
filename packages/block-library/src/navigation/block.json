@@ -62,6 +62,10 @@
 		},
 		"customOverlayTextColor": {
 			"type": "string"
+		},
+		"searchBlockLabel": {
+			"type": "boolean",
+			"default": false
 		}
 	},
 	"providesContext": {
@@ -78,7 +82,8 @@
 		"showSubmenuIcon": "showSubmenuIcon",
 		"openSubmenusOnClick": "openSubmenusOnClick",
 		"style": "style",
-		"orientation": "orientation"
+		"orientation": "orientation",
+		"searchBlockLabel": "searchBlockLabel"
 	},
 	"supports": {
 		"align": [

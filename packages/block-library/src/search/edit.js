@@ -14,6 +14,7 @@ import {
 	__experimentalUseBorderProps as useBorderProps,
 	__experimentalUnitControl as UnitControl,
 	__experimentalUseColorProps as useColorProps,
+	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import {
 	ToolbarDropdownMenu,
@@ -27,6 +28,8 @@ import {
 	__experimentalUseCustomUnits as useCustomUnits,
 } from '@wordpress/components';
 import { useInstanceId } from '@wordpress/compose';
+import { useSelect } from '@wordpress/data';
+import { useRef } from '@wordpress/element';
 import { Icon, search } from '@wordpress/icons';
 import { __ } from '@wordpress/i18n';
 
@@ -54,6 +57,8 @@ const DEFAULT_INNER_PADDING = '4px';
 
 export default function SearchEdit( {
 	className,
+	clientId,
+	context,
 	attributes,
 	setAttributes,
 	toggleSelection,
@@ -75,6 +80,22 @@ export default function SearchEdit( {
 	const borderRadius = style?.border?.radius;
 	const borderColor = style?.border?.color;
 	const borderProps = useBorderProps( attributes );
+
+	const isNewBlock = useSelect( ( select ) => {
+		const { wasBlockJustInserted } = select( blockEditorStore );
+
+		return wasBlockJustInserted( clientId );
+	} );
+
+	const isNewBlockRef = useRef( isNewBlock );
+
+	if (
+		typeof context.searchBlockLabel !== 'undefined' &&
+		true === isNewBlockRef.current
+	) {
+		setAttributes( { showLabel: context.searchBlockLabel } );
+		isNewBlockRef.current = false;
+	}
 
 	// Check for old deprecated numerical border radius. Done as a separate
 	// check so that a borderRadius style won't overwrite the longhand
