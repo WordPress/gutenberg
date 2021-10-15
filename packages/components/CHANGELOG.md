@@ -11,6 +11,7 @@
 -   Removed the separator shown between `ToggleGroupControl` items ([#35497](https://github.com/WordPress/gutenberg/pull/35497)).
 -   The `ColorPicker` component property `onChangeComplete`, a function accepting a color object, was replaced with the property `onChange`, a function accepting a  string on  ([#35220](https://github.com/WordPress/gutenberg/pull/35220)).
 -   The property `disableAlpha`, was removed from the `ColorPicker` component. Use the new opposite property `enableAlpha` instead ([#35220](https://github.com/WordPress/gutenberg/pull/35220)).
+-   Added support for showing a `hint` in `CustomSelectControl`  ([#35395](https://github.com/WordPress/gutenberg/pull/35395)).
 
 ### Experimental
 
