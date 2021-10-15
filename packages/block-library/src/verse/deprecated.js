@@ -57,4 +57,4 @@ const v2 = {
  *
  * See block-deprecation.md
  */
-export default [ v1, v2 ];
+export default [ v2, v1 ];
