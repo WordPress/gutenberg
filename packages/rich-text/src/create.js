@@ -90,7 +90,13 @@ function toFormat( { type, attributes } ) {
 
 	for ( const key in formatType.attributes ) {
 		const name = formatType.attributes[ key ];
+
+		if ( ! _attributes[ name ] ) continue;
+
 		registeredAttributes[ key ] = _attributes[ name ];
+
+		// delete the attribute and what's left is considered
+		// to be unregistered.
 		delete _attributes[ name ];
 
 		if ( formatType.__unstableFilterAttributeValue ) {
