@@ -26,7 +26,15 @@ function render_block_core_query_pagination_next( $attributes, $content, $block 
 	if ( $pagination_arrow ) {
 		$label .= $pagination_arrow;
 	}
-	$content = '<span></span>';
+	$paged = (get_query_var('paged')) ? get_query_var('paged') : 1;
+	if( (int) $wp_query->max_num_pages === $paged ){
+		$wrapper_attributes = get_block_wrapper_attributes( array( 'class' => 'last-page' ) );
+	}
+	$content = sprintf(
+		'<span %1$s>%2$s</span>',
+		$wrapper_attributes,
+		$label
+	);
 
 	// Check if the pagination is for Query that inherits the global context.
 	if ( isset( $block->context['query']['inherit'] ) && $block->context['query']['inherit'] ) {
@@ -40,7 +48,6 @@ function render_block_core_query_pagination_next( $attributes, $content, $block 
 		if ( $max_page > $wp_query->max_num_pages ) {
 			$max_page = $wp_query->max_num_pages;
 		}
-		$paged = (get_query_var('paged')) ? get_query_var('paged') : 1;
 		if((int) $wp_query->max_num_pages !== $paged){
 			$content = get_next_posts_link( $label, $max_page );
 		}
