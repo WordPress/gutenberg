@@ -91,4 +91,4 @@ export function initialize( id, settings ) {
 	);
 }
 
-export { createMenuPreloadingMiddleware } from './utils';
+export { createMenuPreloadingMiddleware as __unstableCreateMenuPreloadingMiddleware } from './utils';

@@ -170,7 +170,7 @@ function gutenberg_navigation_editor_preload_menus( $preload_data, $context ) {
 	wp_add_inline_script(
 		'wp-edit-navigation',
 		sprintf(
-			'wp.apiFetch.use( wp.editNavigation.createMenuPreloadingMiddleware( %s ) );',
+			'wp.apiFetch.use( wp.editNavigation.__unstableCreateMenuPreloadingMiddleware( %s ) );',
 			wp_json_encode( $menus_data )
 		),
 		'after'
