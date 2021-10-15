@@ -101,6 +101,7 @@ const renderGroupedItemsInPanel = () => {
 const WrappedItem = ( { text, ...props } ) => {
 	return (
 		<div className="wrapped-panel-item-container">
+			<span>Wrapper</span>
 			<ToolsPanelItem { ...props }>
 				<div>{ text }</div>
 			</ToolsPanelItem>
@@ -117,10 +118,6 @@ const renderWrappedItemInPanel = () => {
 		</ToolsPanel>
 	);
 };
-
-// Attempts to find the tools panel via its CSS class.
-const getPanel = ( container ) =>
-	container.querySelector( '.components-tools-panel' );
 
 // Renders a default tools panel including children that are
 // not to be represented within the panel's menu.
@@ -166,9 +163,9 @@ describe( 'ToolsPanel', () => {
 
 	describe( 'basic rendering', () => {
 		it( 'should render panel', () => {
-			const { container } = renderPanel();
+			renderPanel();
 
-			expect( getPanel( container ) ).toBeInTheDocument();
+			expect( screen.getByText( 'Visible' ) ).toBeInTheDocument();
 		} );
 
 		it( 'should render non panel item child', () => {
@@ -301,7 +298,7 @@ describe( 'ToolsPanel', () => {
 		} );
 
 		it( 'should render appropriate menu groups', async () => {
-			const { container } = render(
+			render(
 				<ToolsPanel { ...defaultProps }>
 					<ToolsPanelItem
 						{ ...controlProps }
@@ -316,16 +313,14 @@ describe( 'ToolsPanel', () => {
 			);
 			openDropdownMenu();
 
-			const menuGroups = container.querySelectorAll(
-				'.components-menu-group'
-			);
+			const menuGroups = screen.getAllByRole( 'group' );
 
 			// Groups should be: default controls, optional controls & reset all.
 			expect( menuGroups.length ).toEqual( 3 );
 		} );
 
-		it( 'should render placeholder items when panel opts into that feature', () => {
-			const { container } = render(
+		it( 'should not render contents of items when in placeholder state', () => {
+			render(
 				<ToolsPanel
 					{ ...defaultProps }
 					shouldRenderPlaceholderItems={ true }
@@ -337,15 +332,12 @@ describe( 'ToolsPanel', () => {
 			);
 
 			const optionalItem = screen.queryByText( 'Optional control' );
-			const placeholder = container.querySelector(
-				'.components-tools-panel-item'
-			);
 
 			// When rendered as a placeholder a ToolsPanelItem will just omit
-			// all the item's children. So we should still find the container
-			// element but not the text etc within.
+			// all the item's children. So the container element will still be
+			// there holding it's position but the inner text etc should not be
+			// there.
 			expect( optionalItem ).not.toBeInTheDocument();
-			expect( placeholder ).toBeInTheDocument();
 		} );
 	} );
 
@@ -429,11 +421,9 @@ describe( 'ToolsPanel', () => {
 
 	describe( 'wrapped panel items within custom components', () => {
 		it( 'should render wrapped items correctly', () => {
-			const { container } = renderWrappedItemInPanel();
+			renderWrappedItemInPanel();
 
-			const wrappers = container.querySelectorAll(
-				'.wrapped-panel-item-container'
-			);
+			const wrappers = screen.getAllByText( 'Wrapper' );
 			const defaultItem = screen.getByText( 'Wrapped 1' );
 			const altItem = screen.queryByText( 'Wrapped 2' );
 
