@@ -8,65 +8,70 @@ import { RichText, useBlockProps } from '@wordpress/block-editor';
  */
 import migrateFontFamily from '../utils/migrate-font-family';
 
-const deprecated = [
-	{
-		attributes: {
-			ordered: {
-				type: 'boolean',
-				default: false,
-				__experimentalRole: 'content',
-			},
-			values: {
-				type: 'string',
-				source: 'html',
-				selector: 'ol,ul',
-				multiline: 'li',
-				__unstableMultilineWrapperTags: [ 'ol', 'ul' ],
-				default: '',
-				__experimentalRole: 'content',
-			},
-			type: {
-				type: 'string',
-			},
-			start: {
-				type: 'number',
-			},
-			reversed: {
-				type: 'boolean',
-			},
-			placeholder: {
-				type: 'string',
-			},
+const v1 = {
+	attributes: {
+		ordered: {
+			type: 'boolean',
+			default: false,
+			__experimentalRole: 'content',
 		},
-		supports: {
-			anchor: true,
-			className: false,
-			typography: {
-				fontSize: true,
-				__experimentalFontFamily: true,
-			},
-			color: {
-				gradients: true,
-				link: true,
-			},
-			__unstablePasteTextInline: true,
-			__experimentalSelector: 'ol,ul',
+		values: {
+			type: 'string',
+			source: 'html',
+			selector: 'ol,ul',
+			multiline: 'li',
+			__unstableMultilineWrapperTags: [ 'ol', 'ul' ],
+			default: '',
+			__experimentalRole: 'content',
 		},
-		save( { attributes } ) {
-			const { ordered, values, type, reversed, start } = attributes;
-			const TagName = ordered ? 'ol' : 'ul';
-
-			return (
-				<TagName { ...useBlockProps.save( { type, reversed, start } ) }>
-					<RichText.Content value={ values } multiline="li" />
-				</TagName>
-			);
+		type: {
+			type: 'string',
 		},
-		migrate: migrateFontFamily,
-		isEligible( { style } ) {
-			return style?.typography?.fontFamily;
+		start: {
+			type: 'number',
+		},
+		reversed: {
+			type: 'boolean',
+		},
+		placeholder: {
+			type: 'string',
 		},
 	},
-];
+	supports: {
+		anchor: true,
+		className: false,
+		typography: {
+			fontSize: true,
+			__experimentalFontFamily: true,
+		},
+		color: {
+			gradients: true,
+			link: true,
+		},
+		__unstablePasteTextInline: true,
+		__experimentalSelector: 'ol,ul',
+	},
+	save( { attributes } ) {
+		const { ordered, values, type, reversed, start } = attributes;
+		const TagName = ordered ? 'ol' : 'ul';
 
-export default deprecated;
+		return (
+			<TagName { ...useBlockProps.save( { type, reversed, start } ) }>
+				<RichText.Content value={ values } multiline="li" />
+			</TagName>
+		);
+	},
+	migrate: migrateFontFamily,
+	isEligible( { style } ) {
+		return style?.typography?.fontFamily;
+	},
+};
+
+/**
+ * New deprecations need to be placed first
+ * for them to have higher priority.
+ * They also need to contain the old deprecations.
+ *
+ * See block-deprecation.md
+ */
+export default [ v1 ];
