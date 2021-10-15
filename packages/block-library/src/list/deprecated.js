@@ -1,66 +1,19 @@
 /**
- * WordPress dependencies
- */
-import { RichText, useBlockProps } from '@wordpress/block-editor';
-
-/**
  * Internal dependencies
  */
 import migrateFontFamily from '../utils/migrate-font-family';
+import blockConfig from './block.json';
+import currentSave from './save';
+
+const {
+	attributes: currentAttributes,
+	supports: currentSupports,
+} = blockConfig;
 
 const v1 = {
-	attributes: {
-		ordered: {
-			type: 'boolean',
-			default: false,
-			__experimentalRole: 'content',
-		},
-		values: {
-			type: 'string',
-			source: 'html',
-			selector: 'ol,ul',
-			multiline: 'li',
-			__unstableMultilineWrapperTags: [ 'ol', 'ul' ],
-			default: '',
-			__experimentalRole: 'content',
-		},
-		type: {
-			type: 'string',
-		},
-		start: {
-			type: 'number',
-		},
-		reversed: {
-			type: 'boolean',
-		},
-		placeholder: {
-			type: 'string',
-		},
-	},
-	supports: {
-		anchor: true,
-		className: false,
-		typography: {
-			fontSize: true,
-			__experimentalFontFamily: true,
-		},
-		color: {
-			gradients: true,
-			link: true,
-		},
-		__unstablePasteTextInline: true,
-		__experimentalSelector: 'ol,ul',
-	},
-	save( { attributes } ) {
-		const { ordered, values, type, reversed, start } = attributes;
-		const TagName = ordered ? 'ol' : 'ul';
-
-		return (
-			<TagName { ...useBlockProps.save( { type, reversed, start } ) }>
-				<RichText.Content value={ values } multiline="li" />
-			</TagName>
-		);
-	},
+	attributes: currentAttributes,
+	supports: currentSupports,
+	save: currentSave,
 	migrate: migrateFontFamily,
 	isEligible( { style } ) {
 		return style?.typography?.fontFamily;
