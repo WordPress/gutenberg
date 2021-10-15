@@ -170,7 +170,7 @@ function gutenberg_parse_blocks_from_menu_items( $menu_items, $menu_items_by_par
 				'label'         => $menu_item->title,
 				'opensInNewTab' => $opens_in_new_tab,
 				'rel'           => $rel,
-				'title'         => $menu_item->title,
+				'title'         => $menu_item->attr_title,
 				'url'           => $menu_item->url,
 			),
 		);
