@@ -11,7 +11,7 @@ import {
 	__experimentalTreeGridItem as TreeGridItem,
 } from '@wordpress/components';
 import { moreVertical } from '@wordpress/icons';
-import { useState, useRef, useEffect } from '@wordpress/element';
+import { useState, useRef, useEffect, memo } from '@wordpress/element';
 import { useDispatch } from '@wordpress/data';
 
 /**
@@ -27,7 +27,7 @@ import BlockSettingsDropdown from '../block-settings-menu/block-settings-dropdow
 import { useListViewContext } from './context';
 import { store as blockEditorStore } from '../../store';
 
-export default function ListViewBlock( {
+function ListViewBlock( {
 	block,
 	isSelected,
 	isDragged,
@@ -193,3 +193,5 @@ export default function ListViewBlock( {
 		</ListViewLeaf>
 	);
 }
+
+export default memo( ListViewBlock );
