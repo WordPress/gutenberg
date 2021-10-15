@@ -5,7 +5,6 @@ const path = require( 'path' );
 const { writeFile, mkdir } = require( 'fs' ).promises;
 const { existsSync } = require( 'fs' );
 const yaml = require( 'js-yaml' );
-const os = require( 'os' );
 
 /**
  * Internal dependencies
@@ -106,6 +105,7 @@ module.exports = async function initConfig( {
  *
  * @return {string} The dockerfile contents.
  */
+// eslint-disable-next-line no-unused-vars
 function dockerFileContents( image, config ) {
 	return `FROM ${ image }
 
