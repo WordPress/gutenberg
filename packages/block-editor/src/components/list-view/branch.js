@@ -57,7 +57,7 @@ export default function ListViewBranch( props ) {
 		showNestedBlocks,
 		parentBlockClientId,
 		level = 1,
-		path = [],
+		path = '',
 		isBranchSelected = false,
 		isLastOfBranch = false,
 		listPosition = 0,
@@ -66,8 +66,6 @@ export default function ListViewBranch( props ) {
 
 	const {
 		expandedState,
-		expand,
-		collapse,
 		draggedClientIds,
 		selectedClientIds,
 		__experimentalPersistentListViewFeatures,
@@ -128,7 +126,12 @@ export default function ListViewBranch( props ) {
 			: undefined;
 
 		const position = index + 1;
-		const updatedPath = [ ...path, position ];
+		// If the string value changes, it's used to trigger an animation change.
+		// This may be removed if we use a different animation library in the future.
+		const updatedPath =
+			path.length > 0
+				? `${ path }_${ position }`
+				: `${ position }`;
 		const hasNestedBlocks =
 			showNestedBlocks && !! innerBlocks && !! innerBlocks.length;
 		const hasNestedAppender = itemHasAppender( clientId );
@@ -149,19 +152,6 @@ export default function ListViewBranch( props ) {
 			? expandedState[ clientId ] ?? true
 			: undefined;
 
-		const selectBlockWithClientId = ( event ) => {
-			event.stopPropagation();
-			selectBlock( clientId );
-		};
-
-		const toggleExpanded = ( event ) => {
-			event.stopPropagation();
-			if ( isExpanded === true ) {
-				collapse( clientId );
-			} else if ( isExpanded === false ) {
-				expand( clientId );
-			}
-		};
 
 		// Make updates to the selected or dragged blocks synchronous,
 		// but asynchronous for any other block.
@@ -172,8 +162,7 @@ export default function ListViewBranch( props ) {
 				{ ( isDragged || blockInView ) && (
 					<ListViewBlock
 						block={ block }
-						onClick={ selectBlockWithClientId }
-						onToggleExpanded={ toggleExpanded }
+						selectBlock={ selectBlock }
 						isDragged={ isDragged }
 						isSelected={ isSelected }
 						isBranchSelected={ isSelectedBranch }
@@ -218,7 +207,11 @@ export default function ListViewBranch( props ) {
 					position={ rowCount }
 					rowCount={ appenderPosition }
 					level={ level }
-					path={ [ ...path, appenderPosition ] }
+					path={
+						path.length > 0
+							? `${ path }_${ appenderPosition }`
+							: `${ appenderPosition }`
+					}
 				/>
 			) }
 		</>

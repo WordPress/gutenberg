@@ -11,7 +11,7 @@ import {
 	__experimentalTreeGridItem as TreeGridItem,
 } from '@wordpress/components';
 import { moreVertical } from '@wordpress/icons';
-import { useState, useRef, useEffect, memo } from '@wordpress/element';
+import { useState, useRef, useEffect, memo, useCallback} from '@wordpress/element';
 import { useDispatch } from '@wordpress/data';
 
 /**
@@ -33,8 +33,7 @@ function ListViewBlock( {
 	isDragged,
 	isBranchSelected,
 	isLastOfSelectedBranch,
-	onClick,
-	onToggleExpanded,
+	selectBlock,
 	position,
 	level,
 	rowCount,
@@ -60,7 +59,22 @@ function ListViewBlock( {
 		__experimentalFeatures: withExperimentalFeatures,
 		__experimentalPersistentListViewFeatures: withExperimentalPersistentListViewFeatures,
 		isTreeGridMounted,
+		expand,
+		collapse,
 	} = useListViewContext();
+
+	const toggleExpanded = useCallback(
+		( event ) => {
+			event.stopPropagation();
+			if ( isExpanded === true ) {
+				collapse( clientId );
+			} else if ( isExpanded === false ) {
+				expand( clientId );
+			}
+		},
+		[ clientId, expand, collapse, isExpanded ]
+	);
+
 	const listViewBlockSettingsClassName = classnames(
 		'block-editor-list-view-block__menu-cell',
 		{ 'is-visible': isHovered || isSelected }
@@ -91,6 +105,14 @@ function ListViewBlock( {
 		setIsHovered( false );
 		highlightBlock( clientId, false );
 	};
+
+	const selectEditorBlock = useCallback(
+		( event ) => {
+			event.stopPropagation();
+			selectBlock( clientId );
+		},
+		[ clientId, selectBlock ]
+	);
 
 	const classes = classnames( {
 		'is-selected': isSelected,
@@ -127,8 +149,8 @@ function ListViewBlock( {
 					<div className="block-editor-list-view-block__contents-container">
 						<ListViewBlockContents
 							block={ block }
-							onClick={ onClick }
-							onToggleExpanded={ onToggleExpanded }
+							onClick={ selectEditorBlock }
+							onToggleExpanded={ toggleExpanded }
 							isSelected={ isSelected }
 							position={ position }
 							siblingBlockCount={ siblingBlockCount }
@@ -185,7 +207,7 @@ function ListViewBlock( {
 								onFocus,
 							} }
 							disableOpenOnArrowDown
-							__experimentalSelectBlock={ onClick }
+							__experimentalSelectBlock={ selectEditorBlock }
 						/>
 					) }
 				</TreeGridCell>
