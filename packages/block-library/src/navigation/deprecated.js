@@ -28,6 +28,15 @@ const TYPOGRAPHY_PRESET_DEPRECATION_MAP = {
 };
 
 const deprecated = [
+	{
+		attributes: currentAttributes,
+		supports: currentSupports,
+		save: currentSave,
+		migrate: migrateFontFamily,
+		isEligible( { style } ) {
+			return style?.typography?.fontFamily;
+		},
+	},
 	// Remove `isResponsive` attribute.
 	{
 		attributes: {
@@ -257,15 +266,6 @@ const deprecated = [
 		},
 		save() {
 			return <InnerBlocks.Content />;
-		},
-	},
-	{
-		attributes: currentAttributes,
-		supports: currentSupports,
-		save: currentSave,
-		migrate: migrateFontFamily,
-		isEligible( { style } ) {
-			return style?.typography?.fontFamily;
 		},
 	},
 ];
