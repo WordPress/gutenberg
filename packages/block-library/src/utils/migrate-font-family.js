@@ -1,7 +1,7 @@
 /**
  * Internal dependencies
  */
-import cleanEmptyObject from '../utils/clean-empty-object';
+import cleanEmptyObject from './clean-empty-object';
 
 /**
  * Migrates the current style.typography.fontFamily attribute,
