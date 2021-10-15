@@ -6,7 +6,7 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { Button, VisuallyHidden } from '@wordpress/components';
+import { VisuallyHidden } from '@wordpress/components';
 import { useInstanceId } from '@wordpress/compose';
 import { forwardRef } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
@@ -46,15 +46,19 @@ function ListViewBlockSelectButton(
 		siblingBlockCount,
 		level
 	);
+	const onClickHandler = ( event ) => {
+		onClick();
+		event.preventDefault();
+	};
 
 	return (
 		<>
-			<Button
+			<a
 				className={ classnames(
 					'block-editor-list-view-block-select-button',
 					className
 				) }
-				onClick={ onClick }
+				onClick={ onClickHandler }
 				aria-describedby={ descriptionId }
 				ref={ ref }
 				tabIndex={ tabIndex }
@@ -62,6 +66,7 @@ function ListViewBlockSelectButton(
 				onDragStart={ onDragStart }
 				onDragEnd={ onDragEnd }
 				draggable={ draggable }
+				href={ `#block-${ blockInformation?.anchor ?? clientId }` }
 			>
 				<ListViewExpander onClick={ onToggleExpanded } />
 				<BlockIcon icon={ blockInformation?.icon } showColors />
@@ -76,7 +81,7 @@ function ListViewBlockSelectButton(
 						{ __( '(selected block)' ) }
 					</VisuallyHidden>
 				) }
-			</Button>
+			</a>
 			<div
 				className="block-editor-list-view-block-select-button__description"
 				id={ descriptionId }
