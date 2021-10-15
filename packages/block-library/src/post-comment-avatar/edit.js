@@ -9,13 +9,18 @@ import classnames from 'classnames';
 import {
 	InspectorControls,
 	__experimentalUseBorderProps as useBorderProps,
-	__experimentalImageSizeControl as ImageSizeControl,
 	__experimentalGetSpacingClassesAndStyles as useSpacingProps,
 	useBlockProps,
 } from '@wordpress/block-editor';
-import { PanelBody, ResizableBox } from '@wordpress/components';
+import { PanelBody, ResizableBox, RangeControl } from '@wordpress/components';
 import { useEntityProp } from '@wordpress/core-data';
 import { __, isRTL } from '@wordpress/i18n';
+import { useRef } from '@wordpress/element';
+
+/**
+ * Internal dependencies
+ */
+import useClientWidth from '../image/use-client-width';
 
 export default function Edit( {
 	attributes,
@@ -37,27 +42,35 @@ export default function Edit( {
 		'author_name',
 		commentId
 	);
-
+	const containerRef = useRef();
+	const clientWidth = useClientWidth( containerRef );
 	const avatarUrls = avatars ? Object.values( avatars ) : null;
 	const sizes = avatars ? Object.keys( avatars ) : null;
+	const minSize = sizes ? sizes[ 0 ] : 24;
 	const maxSize = sizes ? sizes[ sizes.length - 1 ] : 96;
 	const borderProps = useBorderProps( attributes );
 	const spacingProps = useSpacingProps( attributes );
+
 	return (
 		<>
 			<InspectorControls>
 				<PanelBody title={ __( 'Comment Avatar Settings' ) }>
-					<ImageSizeControl
-						onChange={ ( value ) => setAttributes( value ) }
-						width={ width }
-						height={ height }
-						imageWidth={ maxSize }
-						imageHeight={ maxSize }
-						showPresets={ false }
+					<RangeControl
+						label={ __( 'Image size' ) }
+						onChange={ ( newWidth ) =>
+							setAttributes( {
+								width: newWidth,
+								height: newWidth,
+							} )
+						}
+						min={ minSize }
+						max={ clientWidth || maxSize }
+						initialPosition={ width }
+						value={ width }
 					/>
 				</PanelBody>
 			</InspectorControls>
-			<div { ...useBlockProps() }>
+			<div { ...useBlockProps() } ref={ containerRef }>
 				{ avatarUrls ? (
 					<ResizableBox
 						size={ {
@@ -77,6 +90,8 @@ export default function Edit( {
 							bottom: true,
 							left: isRTL(),
 						} }
+						minWidth={ minSize }
+						maxWidth={ clientWidth || maxSize }
 					>
 						<img
 							className={ classnames(

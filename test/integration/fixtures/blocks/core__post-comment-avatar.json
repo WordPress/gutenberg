@@ -4,19 +4,19 @@
 		"name": "core/post-comment-avatar",
 		"isValid": true,
 		"attributes": {
-			"width": 170,
-			"height": 170,
+			"width": 153,
+			"height": 153,
 			"style": {
+				"border": {
+					"radius": "61%"
+				},
 				"spacing": {
 					"padding": {
-						"top": "10px",
-						"right": "10px",
-						"bottom": "10px",
-						"left": "10px"
+						"top": "20px",
+						"right": "20px",
+						"bottom": "20px",
+						"left": "20px"
 					}
-				},
-				"border": {
-					"radius": "100%"
 				}
 			}
 		},
