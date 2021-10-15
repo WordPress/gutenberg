@@ -84,11 +84,6 @@ export default function ListViewBranch( props ) {
 					? expandedState[ clientId ] ?? true
 					: undefined;
 
-				const selectBlockWithClientId = ( event ) => {
-					event.stopPropagation();
-					selectBlock( clientId );
-				};
-
 				const toggleExpanded = ( event ) => {
 					event.stopPropagation();
 					if ( isExpanded === true ) {
@@ -106,7 +101,7 @@ export default function ListViewBranch( props ) {
 					<AsyncModeProvider key={ clientId } value={ ! isSelected }>
 						<ListViewBlock
 							block={ block }
-							onClick={ selectBlockWithClientId }
+							selectBlock={ selectBlock }
 							onToggleExpanded={ toggleExpanded }
 							isDragged={ isDragged }
 							isSelected={ isSelected }
