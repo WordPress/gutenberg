@@ -1,19 +1,19 @@
 <?php
 /**
- * Server-side rendering of the `core/comment-avatar` block.
+ * Server-side rendering of the `core/post-comment-avatar` block.
  *
  * @package WordPress
  */
 
 /**
- * Renders the `core/comment-avatar` block on the server.
+ * Renders the `core/post-comment-avatar` block on the server.
  *
  * @param array    $attributes Block attributes.
  * @param string   $content    Block default content.
  * @param WP_Block $block      Block instance.
- * @return string Return the post comment's content.
+ * @return string Return the post comment's avatar.
  */
-function render_block_core_comment_avatar( $attributes, $content, $block ) {
+function render_block_core_post_comment_avatar( $attributes, $content, $block ) {
 	if ( ! isset( $block->context['commentId'] ) ) {
 		return '';
 	}
@@ -47,12 +47,12 @@ function render_block_core_comment_avatar( $attributes, $content, $block ) {
 /**
  * Registers the `core/comment-avatar` block on the server.
  */
-function register_block_core_comment_avatar() {
+function register_block_core_post_comment_avatar() {
 	register_block_type_from_metadata(
-		__DIR__ . '/comment-avatar',
+		__DIR__ . '/post-comment-avatar',
 		array(
-			'render_callback' => 'render_block_core_comment_avatar',
+			'render_callback' => 'render_block_core_post_comment_avatar',
 		)
 	);
 }
-add_action( 'init', 'register_block_core_comment_avatar' );
+add_action( 'init', 'register_block_core_post_comment_avatar' );

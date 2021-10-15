@@ -7,7 +7,7 @@ import edit from './edit';
 /**
  * WordPress dependencies
  */
-import { commentAvatar as icon } from '@wordpress/icons';
+import { postCommentAvatar as icon } from '@wordpress/icons';
 
 const { name } = metadata;
 export { metadata, name };

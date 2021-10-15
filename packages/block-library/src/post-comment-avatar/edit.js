@@ -17,7 +17,11 @@ import { PanelBody, ResizableBox } from '@wordpress/components';
 import { useEntityProp } from '@wordpress/core-data';
 import { __, isRTL } from '@wordpress/i18n';
 
-export default ( { attributes, context: { commentId }, setAttributes } ) => {
+export default function Edit( {
+	attributes,
+	context: { commentId },
+	setAttributes,
+} ) {
 	const { className, style, height, width } = attributes;
 
 	const [ avatars ] = useEntityProp(
@@ -98,4 +102,4 @@ export default ( { attributes, context: { commentId }, setAttributes } ) => {
 			</div>
 		</>
 	);
-};
+}
