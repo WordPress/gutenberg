@@ -11,7 +11,7 @@ import {
 	__experimentalTreeGridItem as TreeGridItem,
 } from '@wordpress/components';
 import { moreVertical } from '@wordpress/icons';
-import { useState, useRef, useEffect } from '@wordpress/element';
+import { useState, useRef, useEffect, useCallback } from '@wordpress/element';
 import { useDispatch } from '@wordpress/data';
 
 /**
@@ -33,7 +33,7 @@ export default function ListViewBlock( {
 	isDragged,
 	isBranchSelected,
 	isLastOfSelectedBranch,
-	onClick,
+	selectBlock,
 	onToggleExpanded,
 	position,
 	level,
@@ -82,14 +82,22 @@ export default function ListViewBlock( {
 		? toggleBlockHighlight
 		: () => {};
 
-	const onMouseEnter = () => {
+	const onMouseEnter = useCallback( () => {
 		setIsHovered( true );
 		highlightBlock( clientId, true );
-	};
-	const onMouseLeave = () => {
+	}, [ clientId, setIsHovered, highlightBlock ] );
+	const onMouseLeave = useCallback( () => {
 		setIsHovered( false );
 		highlightBlock( clientId, false );
-	};
+	}, [ clientId, setIsHovered, highlightBlock ] );
+
+	const selectEditorBlock = useCallback(
+		( event ) => {
+			event.stopPropagation();
+			selectBlock( clientId );
+		},
+		[ clientId, selectBlock ]
+	);
 
 	const classes = classnames( {
 		'is-selected': isSelected,
@@ -125,7 +133,7 @@ export default function ListViewBlock( {
 					<div className="block-editor-list-view-block__contents-container">
 						<ListViewBlockContents
 							block={ block }
-							onClick={ onClick }
+							onClick={ selectEditorBlock }
 							onToggleExpanded={ onToggleExpanded }
 							isSelected={ isSelected }
 							position={ position }
@@ -183,7 +191,7 @@ export default function ListViewBlock( {
 								onFocus,
 							} }
 							disableOpenOnArrowDown
-							__experimentalSelectBlock={ onClick }
+							__experimentalSelectBlock={ selectEditorBlock }
 						/>
 					) }
 				</TreeGridCell>
