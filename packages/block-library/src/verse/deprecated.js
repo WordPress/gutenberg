@@ -13,20 +13,18 @@ import { RichText, useBlockProps } from '@wordpress/block-editor';
  */
 import migrateFontFamily from '../utils/migrate-font-family';
 
-const blockAttributes = {
-	content: {
-		type: 'string',
-		source: 'html',
-		selector: 'pre',
-		default: '',
-	},
-	textAlign: {
-		type: 'string',
-	},
-};
-
 const v1 = {
-	attributes: blockAttributes,
+	attributes: {
+		content: {
+			type: 'string',
+			source: 'html',
+			selector: 'pre',
+			default: '',
+		},
+		textAlign: {
+			type: 'string',
+		},
+	},
 	save( { attributes } ) {
 		const { textAlign, content } = attributes;
 
