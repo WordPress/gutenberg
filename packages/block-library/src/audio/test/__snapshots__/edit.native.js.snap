@@ -88,9 +88,10 @@ exports[`Audio block renders audio block error state without crashing 1`] = `
       }
     >
       <View>
-        <RCTAztecView
-          accessible={true}
+        <TextInput
+          accessibilityLabel="Text input. Empty"
           activeFormats={Array []}
+          allowFontScaling={true}
           blockType={
             Object {
               "tag": "p",
@@ -98,47 +99,24 @@ exports[`Audio block renders audio block error state without crashing 1`] = `
           }
           deleteEnter={true}
           disableEditingMenu={false}
-          focusable={true}
           fontFamily="serif"
           fontSize={14}
           isMultiline={false}
           maxImagesWidth={200}
-          onBackspace={[Function]}
           onBlur={[Function]}
           onChange={[Function]}
-          onClick={[Function]}
           onContentSizeChange={[Function]}
-          onEnter={[Function]}
           onFocus={[Function]}
-          onHTMLContentWithCursor={[Function]}
           onKeyDown={[Function]}
           onPaste={[Function]}
-          onResponderGrant={[Function]}
-          onResponderMove={[Function]}
-          onResponderRelease={[Function]}
-          onResponderTerminate={[Function]}
-          onResponderTerminationRequest={[Function]}
           onSelectionChange={[Function]}
-          onStartShouldSetResponder={[Function]}
           placeholder="Add caption"
           placeholderTextColor="gray"
-          style={
-            Object {
-              "backgroundColor": undefined,
-              "maxWidth": undefined,
-              "minHeight": 0,
-            }
-          }
-          text={
-            Object {
-              "eventCount": undefined,
-              "linkTextColor": undefined,
-              "selection": null,
-              "text": "",
-            }
-          }
+          rejectResponderTermination={true}
           textAlign="center"
           triggerKeyCodes={Array []}
+          underlineColorAndroid="transparent"
+          value=""
         />
       </View>
     </View>
@@ -257,9 +235,10 @@ exports[`Audio block renders audio file without crashing 1`] = `
       }
     >
       <View>
-        <RCTAztecView
-          accessible={true}
+        <TextInput
+          accessibilityLabel="Text input. Empty"
           activeFormats={Array []}
+          allowFontScaling={true}
           blockType={
             Object {
               "tag": "p",
@@ -267,47 +246,24 @@ exports[`Audio block renders audio file without crashing 1`] = `
           }
           deleteEnter={true}
           disableEditingMenu={false}
-          focusable={true}
           fontFamily="serif"
           fontSize={14}
           isMultiline={false}
           maxImagesWidth={200}
-          onBackspace={[Function]}
           onBlur={[Function]}
           onChange={[Function]}
-          onClick={[Function]}
           onContentSizeChange={[Function]}
-          onEnter={[Function]}
           onFocus={[Function]}
-          onHTMLContentWithCursor={[Function]}
           onKeyDown={[Function]}
           onPaste={[Function]}
-          onResponderGrant={[Function]}
-          onResponderMove={[Function]}
-          onResponderRelease={[Function]}
-          onResponderTerminate={[Function]}
-          onResponderTerminationRequest={[Function]}
           onSelectionChange={[Function]}
-          onStartShouldSetResponder={[Function]}
           placeholder="Add caption"
           placeholderTextColor="gray"
-          style={
-            Object {
-              "backgroundColor": undefined,
-              "maxWidth": undefined,
-              "minHeight": 0,
-            }
-          }
-          text={
-            Object {
-              "eventCount": undefined,
-              "linkTextColor": undefined,
-              "selection": null,
-              "text": "",
-            }
-          }
+          rejectResponderTermination={true}
           textAlign="center"
           triggerKeyCodes={Array []}
+          underlineColorAndroid="transparent"
+          value=""
         />
       </View>
     </View>
