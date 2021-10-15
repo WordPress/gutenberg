@@ -86,7 +86,11 @@ function EditorHelpTopics( { close, isVisible, onClose } ) {
 			contentStyle={ styles.contentContainer }
 			testID="editor-help-modal"
 		>
-			<BottomSheet.NavigationContainer animate main>
+			<BottomSheet.NavigationContainer
+				animate
+				main
+				style={ styles.navigationContainer }
+			>
 				<BottomSheet.NavigationScreen
 					isScrollable
 					fullScreen

@@ -29,23 +29,18 @@ export default function useGetMedia( innerBlockImages ) {
 			if ( imageIds.length === 0 ) {
 				return currentImageMedia;
 			}
-			const getMedia = select( coreStore ).getMedia;
-			const newImageMedia = imageIds.map( ( img ) => {
-				return getMedia( img );
+
+			return select( coreStore ).getMediaItems( {
+				include: imageIds.join( ',' ),
+				per_page: -1,
 			} );
-
-			if ( newImageMedia.some( ( img ) => ! img ) ) {
-				return currentImageMedia;
-			}
-
-			return newImageMedia;
 		},
 		[ innerBlockImages ]
 	);
 
 	if (
-		imageMedia?.length !== currentImageMedia.length ||
-		imageMedia.some(
+		imageMedia?.length !== currentImageMedia?.length ||
+		imageMedia?.some(
 			( newImage ) =>
 				! currentImageMedia.find(
 					( currentImage ) => currentImage.id === newImage.id

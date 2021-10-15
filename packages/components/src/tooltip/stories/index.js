@@ -1,7 +1,13 @@
 /**
  * External dependencies
  */
+import styled from '@emotion/styled';
 import { text, select, number } from '@storybook/addon-knobs';
+
+/**
+ * WordPress dependencies
+ */
+import { useState } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -39,5 +45,33 @@ export const _default = () => {
 				Hover for more information
 			</div>
 		</Tooltip>
+	);
+};
+
+const Button = styled.button`
+	margin: 0 10px;
+`;
+
+export const DisabledElement = () => {
+	const [ showMessage, toggleMessage ] = useState( false );
+
+	return (
+		<>
+			<Tooltip text="Hey, I am tooltip" position="bottom center">
+				<Button onClick={ () => toggleMessage( ! showMessage ) }>
+					Hover me!
+				</Button>
+			</Tooltip>
+			<Tooltip text="Hey, I am tooltip" position="bottom center">
+				<Button
+					disabled
+					onClick={ () => toggleMessage( ! showMessage ) }
+				>
+					Hover me, but I am disabled
+				</Button>
+			</Tooltip>
+			<br />
+			{ showMessage ? <p>Hello World!</p> : null }
+		</>
 	);
 };

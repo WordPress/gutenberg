@@ -139,10 +139,17 @@ const renderPanel = () => {
 	);
 };
 
-// Helper to find the menu button and simulate a user click.
+/**
+ * Helper to find the menu button and simulate a user click.
+ *
+ * @return {HTMLElement} The menuButton.
+ */
 const openDropdownMenu = () => {
-	const menuButton = screen.getByLabelText( defaultProps.label );
+	const menuButton = screen.getByRole( 'button', {
+		name: /view([\w\s]+)options/i,
+	} );
 	fireEvent.click( menuButton );
+	return menuButton;
 };
 
 // Opens dropdown then selects the menu item by label before simulating a click.
@@ -212,7 +219,7 @@ describe( 'ToolsPanel', () => {
 		it( 'should render panel menu when at least one panel item', () => {
 			renderPanel();
 
-			const menuButton = screen.getByLabelText( defaultProps.label );
+			const menuButton = openDropdownMenu();
 			expect( menuButton ).toBeInTheDocument();
 		} );
 
@@ -507,6 +514,49 @@ describe( 'ToolsPanel', () => {
 			expect( items ).toHaveLength( 2 );
 			expect( items[ 0 ] ).toHaveTextContent( 'Item 1' );
 			expect( items[ 1 ] ).toHaveTextContent( 'Item 2' );
+		} );
+	} );
+
+	describe( 'panel header icon toggle', () => {
+		const optionalControls = {
+			attributes: { value: false },
+			hasValue: jest.fn().mockImplementation( () => {
+				return !! optionalControls.attributes.value;
+			} ),
+			label: 'Optional',
+			onDeselect: jest.fn(),
+			onSelect: jest.fn(),
+			isShownByDefault: false,
+		};
+
+		it( 'should render appropriate icons for the dropdown menu', async () => {
+			render(
+				<ToolsPanel { ...defaultProps }>
+					<ToolsPanelItem { ...optionalControls }>
+						<div>Optional control</div>
+					</ToolsPanelItem>
+				</ToolsPanel>
+			);
+
+			// There are unactivated, optional menu items in the Tools Panel dropdown.
+			const optionsHiddenIcon = screen.getByRole( 'button', {
+				name: 'View and add options',
+			} );
+
+			expect( optionsHiddenIcon ).toBeInTheDocument();
+
+			await selectMenuItem( optionalControls.label );
+
+			// There are now NO unactivated, optional menu items in the Tools Panel dropdown.
+			expect(
+				screen.queryByRole( 'button', { name: 'View and add options' } )
+			).not.toBeInTheDocument();
+
+			const optionsDisplayedIcon = screen.getByRole( 'button', {
+				name: 'View options',
+			} );
+
+			expect( optionsDisplayedIcon ).toBeInTheDocument();
 		} );
 	} );
 } );
