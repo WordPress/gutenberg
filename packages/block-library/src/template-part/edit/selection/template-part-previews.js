@@ -52,6 +52,7 @@ function TemplatePartItem( {
 	const {
 		slug,
 		theme,
+		is_from_current_theme: isFromCurrentTheme,
 		title: { rendered: title },
 	} = templatePart;
 	// The 'raw' property is not defined for a brief period in the save cycle.
@@ -93,6 +94,15 @@ function TemplatePartItem( {
 			<BlockPreview blocks={ blocks } />
 			<div className="wp-block-template-part__selection-preview-item-title">
 				{ title || slug }
+
+				{ ! isFromCurrentTheme &&
+					' (' +
+						sprintf(
+							// Translators: %s for the template name (e.g. "tt1-blocks").
+							'From %s',
+							theme
+						) +
+						')' }
 			</div>
 		</CompositeItem>
 	);

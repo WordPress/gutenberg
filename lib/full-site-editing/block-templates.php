@@ -325,13 +325,7 @@ function gutenberg_get_block_templates( $query = array(), $template_type = 'wp_t
 		'post_type'      => $template_type,
 		'posts_per_page' => -1,
 		'no_found_rows'  => true,
-		'tax_query'      => array(
-			array(
-				'taxonomy' => 'wp_theme',
-				'field'    => 'name',
-				'terms'    => wp_get_theme()->get_stylesheet(),
-			),
-		),
+		'tax_query'      => array(),
 	);
 
 	if ( 'wp_template_part' === $template_type && isset( $query['area'] ) ) {

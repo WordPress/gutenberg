@@ -394,20 +394,21 @@ class Gutenberg_REST_Templates_Controller extends WP_REST_Controller {
 	 */
 	public function prepare_item_for_response( $template, $request ) { // phpcs:ignore VariableAnalysis.CodeAnalysis.VariableAnalysis.UnusedVariable
 		$result = array(
-			'id'             => $template->id,
-			'theme'          => $template->theme,
-			'content'        => array( 'raw' => $template->content ),
-			'slug'           => $template->slug,
-			'source'         => $template->source,
-			'type'           => $template->type,
-			'description'    => $template->description,
-			'title'          => array(
+			'id'                    => $template->id,
+			'theme'                 => $template->theme,
+			'content'               => array( 'raw' => $template->content ),
+			'slug'                  => $template->slug,
+			'source'                => $template->source,
+			'type'                  => $template->type,
+			'description'           => $template->description,
+			'title'                 => array(
 				'raw'      => $template->title,
 				'rendered' => $template->title,
 			),
-			'status'         => $template->status,
-			'wp_id'          => $template->wp_id,
-			'has_theme_file' => $template->has_theme_file,
+			'status'                => $template->status,
+			'wp_id'                 => $template->wp_id,
+			'has_theme_file'        => $template->has_theme_file,
+			'is_from_current_theme' => wp_get_theme()->get_stylesheet() === $template->theme,
 		);
 
 		if ( 'wp_template_part' === $template->type ) {
