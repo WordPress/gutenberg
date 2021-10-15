@@ -15,6 +15,8 @@
 .edit-site-visual-editor {
 	position: relative;
 	background-color: $gray-800;
+	// Centralize the editor horizontally (flex-direction is column).
+	align-items: center;
 
 	&.is-focus-mode {
 		padding: 48px 48px 0;
