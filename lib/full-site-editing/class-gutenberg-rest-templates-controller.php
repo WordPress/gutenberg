@@ -141,6 +141,11 @@ class Gutenberg_REST_Templates_Controller extends WP_REST_Controller {
 		if ( isset( $request['area'] ) ) {
 			$query['area'] = $request['area'];
 		}
+		if ( isset( $request['theme'] ) ) {
+			$query['theme'] = $request['theme'];
+		} elseif ( isset( $request['all_themes'] ) && 'true' === $request['all_themes'] ) {
+			$query['theme'] = null;
+		}
 		$templates = array();
 		foreach ( gutenberg_get_block_templates( $query, $this->post_type ) as $template ) {
 			$data        = $this->prepare_item_for_response( $template, $request );

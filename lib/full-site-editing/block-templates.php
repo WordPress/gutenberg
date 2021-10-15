@@ -289,9 +289,10 @@ function _gutenberg_build_template_result_from_post( $post ) {
  * @param array $query {
  *     Optional. Arguments to retrieve templates.
  *
- *     @type array  $slug__in List of slugs to include.
- *     @type int    $wp_id    Post ID of customized template.
- *     @type string $area     A 'wp_template_part_area' taxonomy value to filter by (for wp_template_part template type only).
+ *     @type array   $slug__in List of slugs to include.
+ *     @type int     $wp_id    Post ID of customized template.
+ *     @type string  $area     A 'wp_template_part_area' taxonomy value to filter by (for wp_template_part template type only).
+ *     @type string  $theme    A theme to filter by. Defaults to current theme. If explicitly set to null, then no filtering is applied.
  * }
  * @param array $template_type wp_template or wp_template_part.
  *
@@ -328,6 +329,17 @@ function gutenberg_get_block_templates( $query = array(), $template_type = 'wp_t
 		'tax_query'      => array(),
 	);
 
+	// Use either a requested theme, or the current WordPress theme.
+	$requested_theme = array_key_exists( 'theme', $query ) ? $query['theme'] : wp_get_theme()->get_stylesheet();
+	if ( ! is_null( $requested_theme ) ) {
+		$wp_query_args['tax_query'][]           = array(
+			'taxonomy' => 'wp_theme',
+			'field'    => 'name',
+			'terms'    => $requested_theme,
+		);
+		$wp_query_args['tax_query']['relation'] = 'AND';
+	}
+
 	if ( 'wp_template_part' === $template_type && isset( $query['area'] ) ) {
 		$wp_query_args['tax_query'][]           = array(
 			'taxonomy' => 'wp_template_part_area',
@@ -358,19 +370,24 @@ function gutenberg_get_block_templates( $query = array(), $template_type = 'wp_t
 		}
 	}
 
+	// When not requesting a specific template part, backfill the results
+	// with template files provided by the requested theme.
 	if ( ! isset( $query['wp_id'] ) ) {
 		$template_files = _gutenberg_get_template_files( $template_type );
+		$backfill_theme = is_null( $requested_theme ) ? wp_get_theme()->get_stylesheet() : $requested_theme;
 		foreach ( $template_files as $template_file ) {
-			$is_not_custom   = false === array_search(
-				wp_get_theme()->get_stylesheet() . '//' . $template_file['slug'],
+			$is_not_custom    = false === array_search(
+				$backfill_theme . '//' . $template_file['slug'],
 				array_column( $query_result, 'id' ),
 				true
 			);
-			$fits_slug_query =
+			$fits_slug_query  =
 				! isset( $query['slug__in'] ) || in_array( $template_file['slug'], $query['slug__in'], true );
-			$fits_area_query =
+			$fits_area_query  =
 				! isset( $query['area'] ) || $template_file['area'] === $query['area'];
-			$should_include  = $is_not_custom && $fits_slug_query && $fits_area_query;
+			$fits_theme_query =
+				! isset( $query['theme'] ) || $template_file['theme'] === $requested_theme;
+			$should_include   = $is_not_custom && $fits_slug_query && $fits_area_query && $fits_theme_query;
 			if ( $should_include ) {
 				$query_result[] = _gutenberg_build_template_result_from_file( $template_file, $template_type );
 			}

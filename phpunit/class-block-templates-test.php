@@ -267,6 +267,24 @@ class Block_Templates_Test extends WP_UnitTestCase {
 		$template_ids = get_template_ids( $templates );
 		$this->assertEquals( array( get_stylesheet() . '//' . 'my_template' ), $template_ids );
 
+		// Filter by slug for all themes.
+		$templates    = gutenberg_get_block_templates(
+			array(
+				'slug__in' => array( 'my_template' ),
+				'theme'    => null,
+			),
+			'wp_template'
+		);
+		$template_ids = get_template_ids( $templates );
+		$this->assertEquals(
+			array(
+				// No specific theme was requested, so other templates are also returned.
+				'this-theme-should-not-resolve//my_template',
+				get_stylesheet() . '//' . 'my_template',
+			),
+			$template_ids
+		);
+
 		// Filter by CPT ID.
 		$templates    = gutenberg_get_block_templates( array( 'wp_id' => self::$post->ID ), 'wp_template' );
 		$template_ids = get_template_ids( $templates );
@@ -282,6 +300,23 @@ class Block_Templates_Test extends WP_UnitTestCase {
 			),
 			$template_ids
 		);
+
+		// Filter template part by theme.
+		$templates    = gutenberg_get_block_templates( array( 'theme' => 'tt1-blocks' ), 'wp_template_part' );
+		$template_ids = get_template_ids( $templates );
+		$this->assertEquals(
+			array(
+				'tt1-blocks//my_template_part',
+				'tt1-blocks//footer',
+				'tt1-blocks//header',
+			),
+			$template_ids
+		);
+
+
+		$templates    = gutenberg_get_block_templates( array( 'theme' => 'fake-theme' ), 'wp_template_part' );
+		$template_ids = get_template_ids( $templates );
+		$this->assertEquals( array( ), $template_ids );
 	}
 
 	/**

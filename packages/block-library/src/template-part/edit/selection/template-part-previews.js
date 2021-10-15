@@ -307,6 +307,7 @@ export default function TemplatePartPreviews( {
 				'wp_template_part',
 				{
 					per_page: -1,
+					all_themes: true,
 				}
 			) || []
 		).filter(
