@@ -134,6 +134,11 @@ class WP_Theme_JSON_Resolver_Gutenberg_Test extends WP_UnitTestCase {
 				'key'     => 'title',
 				'context' => 'Custom template name',
 			),
+			array(
+				'path'    => array( 'templateParts' ),
+				'key'     => 'title',
+				'context' => 'Template part name',
+			),
 		);
 
 		$this->assertEquals( $expected, $actual );
@@ -194,6 +199,15 @@ class WP_Theme_JSON_Resolver_Gutenberg_Test extends WP_UnitTestCase {
 				'page-home' => array(
 					'title'     => 'Szablon strony głównej',
 					'postTypes' => array( 'page' ),
+				),
+			)
+		);
+		$this->assertSame(
+			$actual->get_template_parts(),
+			array(
+				'small-header' => array(
+					'title' => 'Mały nagłówek',
+					'area'  => 'header',
 				),
 			)
 		);

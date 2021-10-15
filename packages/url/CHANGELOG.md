@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 3.2.3 (2021-10-12)
+
 ### Bug Fix
 
 -   Removed unused `react-native-url-polyfill` dependency ([#34687](https://github.com/WordPress/gutenberg/pull/34687)).

@@ -52,8 +52,16 @@ function NavigatorScreen( props: Props, forwardedRef: Ref< any > ) {
 
 	const cx = useCx();
 	const classes = useMemo(
-		// Ensures horizontal overflow is visually accessible
-		() => cx( css( { overflowX: 'auto' } ), className ),
+		() =>
+			cx(
+				css( {
+					// Ensures horizontal overflow is visually accessible
+					overflowX: 'auto',
+					// In case the root has a height, it should not be exceeded
+					maxHeight: '100%',
+				} ),
+				className
+			),
 		[ className ]
 	);
 

@@ -2,6 +2,11 @@
 
 ## Unreleased
 
+### Bug Fix
+
+-   Update `rawHtml` to correctly concatenate multiple strings passed as children
+(see [35532](https://github.com/WordPress/gutenberg/pull/35532))
+
 ## 4.0.0 (2021-07-29)
 
 ### Breaking Change

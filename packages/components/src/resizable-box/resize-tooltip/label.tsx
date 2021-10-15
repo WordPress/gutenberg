@@ -1,4 +1,10 @@
 /**
+ * External dependencies
+ */
+// eslint-disable-next-line no-restricted-imports
+import type { Ref } from 'react';
+
+/**
  * WordPress dependencies
  */
 import { forwardRef } from '@wordpress/element';
@@ -7,7 +13,7 @@ import { isRTL } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
-import { POSITIONS } from './utils';
+import { Position, POSITIONS } from './utils';
 import {
 	TooltipWrapper,
 	Tooltip,
@@ -17,10 +23,19 @@ import {
 const CORNER_OFFSET = 4;
 const CURSOR_OFFSET_TOP = CORNER_OFFSET * 2.5;
 
+type LabelProps = React.DetailedHTMLProps<
+	React.HTMLAttributes< HTMLDivElement >,
+	HTMLDivElement
+> & {
+	label?: string;
+	position: Position;
+	zIndex: number;
+};
+
 function Label(
-	{ label, position = POSITIONS.corner, zIndex = 1000, ...props },
-	ref
-) {
+	{ label, position = POSITIONS.corner, zIndex = 1000, ...props }: LabelProps,
+	ref: Ref< HTMLDivElement >
+): JSX.Element | null {
 	const showLabel = !! label;
 
 	const isBottom = position === POSITIONS.bottom;
@@ -28,8 +43,8 @@ function Label(
 
 	if ( ! showLabel ) return null;
 
-	let style = {
-		opacity: showLabel ? 1 : null,
+	let style: React.CSSProperties = {
+		opacity: showLabel ? 1 : undefined,
 		zIndex,
 	};
 
@@ -54,8 +69,8 @@ function Label(
 			...style,
 			position: 'absolute',
 			top: CORNER_OFFSET,
-			right: isRTL() ? null : CORNER_OFFSET,
-			left: isRTL() ? CORNER_OFFSET : null,
+			right: isRTL() ? undefined : CORNER_OFFSET,
+			left: isRTL() ? CORNER_OFFSET : undefined,
 		};
 	}
 
@@ -63,7 +78,6 @@ function Label(
 		<TooltipWrapper
 			aria-hidden="true"
 			className="components-resizable-tooltip__tooltip-wrapper"
-			isActive={ showLabel }
 			ref={ ref }
 			style={ style }
 			{ ...props }
