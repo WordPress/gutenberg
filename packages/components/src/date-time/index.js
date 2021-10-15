@@ -131,6 +131,7 @@ function DateTimePicker(
 								<abbr aria-label={ __( 'Home and End' ) }>
 									{ __( 'Home/End' ) }
 								</abbr>
+								/* Translators: Home/End reffer to the 'Home' and 'End' buttons on the keyboard.*/
 								{
 									' ' /* JSX removes whitespace, but a space is required for screen readers. */
 								}
