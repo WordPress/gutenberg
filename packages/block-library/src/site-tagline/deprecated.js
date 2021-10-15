@@ -2,32 +2,17 @@
  * Internal dependencies
  */
 import migrateFontFamily from '../utils/migrate-font-family';
+import blockConfig from './block.json';
+
+const {
+	attributes: currentAttributes,
+	supports: currentSupports,
+} = blockConfig;
 
 const deprecated = [
 	{
-		attributes: {
-			textAlign: {
-				type: 'string',
-			},
-		},
-		supports: {
-			html: false,
-			color: {
-				gradients: true,
-			},
-			spacing: {
-				margin: true,
-				padding: true,
-			},
-			typography: {
-				fontSize: true,
-				lineHeight: true,
-				__experimentalFontFamily: true,
-				__experimentalFontWeight: true,
-				__experimentalTextTransform: true,
-				__experimentalLetterSpacing: true,
-			},
-		},
+		attributes: currentAttributes,
+		supports: currentSupports,
 		save() {
 			return null;
 		},
