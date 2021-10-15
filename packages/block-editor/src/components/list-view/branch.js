@@ -129,9 +129,7 @@ export default function ListViewBranch( props ) {
 		// If the string value changes, it's used to trigger an animation change.
 		// This may be removed if we use a different animation library in the future.
 		const updatedPath =
-			path.length > 0
-				? `${ path }_${ position }`
-				: `${ position }`;
+			path.length > 0 ? `${ path }_${ position }` : `${ position }`;
 		const hasNestedBlocks =
 			showNestedBlocks && !! innerBlocks && !! innerBlocks.length;
 		const hasNestedAppender = itemHasAppender( clientId );
@@ -151,7 +149,6 @@ export default function ListViewBranch( props ) {
 		const isExpanded = hasNestedBranch
 			? expandedState[ clientId ] ?? true
 			: undefined;
-
 
 		// Make updates to the selected or dragged blocks synchronous,
 		// but asynchronous for any other block.

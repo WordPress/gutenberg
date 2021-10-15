@@ -11,7 +11,13 @@ import {
 	__experimentalTreeGridItem as TreeGridItem,
 } from '@wordpress/components';
 import { moreVertical } from '@wordpress/icons';
-import { useState, useRef, useEffect, memo, useCallback} from '@wordpress/element';
+import {
+	useState,
+	useRef,
+	useEffect,
+	memo,
+	useCallback,
+} from '@wordpress/element';
 import { useDispatch } from '@wordpress/data';
 
 /**
