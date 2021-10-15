@@ -41,6 +41,7 @@ module.exports = {
 			options: { configureJSX: true },
 		},
 		'@storybook/addon-knobs',
+		'@storybook/addon-controls',
 		'@storybook/addon-storysource',
 		'@storybook/addon-viewport',
 		'@storybook/addon-a11y',

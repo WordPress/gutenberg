@@ -96,6 +96,7 @@
 		"@octokit/rest": "16.26.0",
 		"@octokit/webhooks": "7.1.0",
 		"@storybook/addon-a11y": "6.3.2",
+		"@storybook/addon-controls": "6.3.12",
 		"@storybook/addon-docs": "6.3.2",
 		"@storybook/addon-knobs": "6.2.9",
 		"@storybook/addon-storysource": "6.3.2",
