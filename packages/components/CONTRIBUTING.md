@@ -8,21 +8,17 @@ This set of guidelines should apply especially to newly introduced components. I
 
 For an example of a component that follows these requirements, take a look at [`ItemGroup`](/packages/components/src/item-group).
 
-- [Contributing](#contributing)
-	- [Compatibility](#compatibility)
-	- [Compound components](#compound-components)
-	- [Components & Hooks](#components--hooks)
-	- [TypeScript](#typescript)
-	- [Styling](#styling)
-	- [Context system](#context-system)
-	- [Unit tests](#unit-tests)
-	- [Storybook](#storybook)
-	- [Documentation](#documentation)
-	- [README example](#readme-example)
-	- [Props](#props)
-		- [`propName`: Typescript style type i.e `string`, `number`, `( nextValue: string ) => void`](#propname-typescript-style-type-ie-string-number--nextvalue-string---void)
-		- [Inherited props](#inherited-props)
-	- [Context](#context)
+- [Compatibility](#compatibility)
+- [Compound components](#compound-components)
+- [Components & Hooks](#components--hooks)
+- [TypeScript](#typescript)
+- [Styling](#styling)
+- [Context system](#context-system)
+- [Unit tests](#unit-tests)
+- [Storybook](#storybook)
+- [Documentation](#documentation)
+- [README example](#README-example)
+- [Folder structure](#folder-structure)
 
 ## Compatibility
 
