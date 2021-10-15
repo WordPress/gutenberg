@@ -114,7 +114,8 @@ describe( 'Widgets screen', () => {
 			{ selector: '[data-block]' },
 			{ root: widgetArea }
 		);
-		const lastBlock = childBlocks[ childBlocks.length - 1 ];
+		// The initial block appender also has the [data-block] property, adding to the count.
+		const lastBlock = childBlocks[ childBlocks.length - 2 ];
 		const lastBlockBoundingBox = await lastBlock.boundingBox();
 
 		// TODO: Probably need a more accessible way to select this, maybe a test ID or data attribute.
