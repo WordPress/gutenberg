@@ -294,7 +294,7 @@ aside from `children` are passed.
 
 _Parameters_
 
--   _props_ `RawHTMLProps`: Children should be a string of HTML. Other props will be passed through to div wrapper.
+-   _props_ `RawHTMLProps`: Children should be a string of HTML or an array of strings. Other props will be passed through to the div wrapper.
 
 _Returns_
 

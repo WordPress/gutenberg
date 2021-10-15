@@ -47,12 +47,6 @@ const sleep = ( ms ) => {
 	return promise;
 };
 
-const hslMatcher = expect.objectContaining( {
-	h: expect.any( Number ),
-	s: expect.any( Number ),
-	l: expect.any( Number ),
-} );
-
 const hslaMatcher = expect.objectContaining( {
 	h: expect.any( Number ),
 	s: expect.any( Number ),
@@ -61,7 +55,6 @@ const hslaMatcher = expect.objectContaining( {
 } );
 
 const legacyColorMatcher = {
-	color: expect.anything(),
 	hex: expect.any( String ),
 	hsl: hslaMatcher,
 	hsv: expect.objectContaining( {
@@ -109,14 +102,9 @@ describe( 'ColorPicker', () => {
 		} );
 	} );
 
-	it( 'should fire onChange with the HSLA value', async () => {
+	it( 'should fire onChange with the string value', async () => {
 		const onChange = jest.fn();
-		const color = {
-			h: 125,
-			s: 0.2,
-			l: 0.5,
-			a: 0.5,
-		};
+		const color = 'rgba(1, 1, 1, 0.5)';
 
 		const { container } = render(
 			<ColorPicker onChange={ onChange } color={ color } enableAlpha />
@@ -132,7 +120,9 @@ describe( 'ColorPicker', () => {
 		// `onChange` is debounced so we need to sleep for at least 1ms before checking that onChange was called
 		await sleep( 1 );
 
-		expect( onChange ).toHaveBeenCalledWith( hslaMatcher );
+		expect( onChange ).toHaveBeenCalledWith(
+			expect.stringMatching( /^#([a-fA-F0-9]{8})$/ )
+		);
 	} );
 
 	it( 'should fire onChange with the HSL value', async () => {
@@ -163,6 +153,8 @@ describe( 'ColorPicker', () => {
 		// `onChange` is debounced so we need to sleep for at least 1ms before checking that onChange was called
 		await sleep( 1 );
 
-		expect( onChange ).toHaveBeenCalledWith( hslMatcher );
+		expect( onChange ).toHaveBeenCalledWith(
+			expect.stringMatching( /^#([a-fA-F0-9]{6})$/ )
+		);
 	} );
 } );
