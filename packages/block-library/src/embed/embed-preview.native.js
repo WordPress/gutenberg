@@ -148,7 +148,6 @@ const EmbedPreview = ( {
 					insertBlocksAfter={ insertBlocksAfter }
 					isSelected={ isCaptionSelected }
 					onFocus={ onFocusCaption }
-					testID="embed-caption"
 				/>
 			</View>
 		</TouchableWithoutFeedback>
