@@ -3,7 +3,7 @@
 ## Unreleased
 
 ### New Features
--   Add using passing local directories to --template. ([#35645](https://github.com/WordPress/gutenberg/pull/35645))
+-   Add passing local directories to --template. ([#35645](https://github.com/WordPress/gutenberg/pull/35645))
 -	Add `slugPascalCase` to the list of variables that can be used in templates ([#35462](https://github.com/WordPress/gutenberg/pull/35462))
 
 ## 2.5.0 (2021-07-21)
