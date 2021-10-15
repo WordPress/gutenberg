@@ -126,6 +126,15 @@ const blockAttributes = {
 
 const deprecated = [
 	{
+		attributes: currentAttributes,
+		supports: currentSupports,
+		save: currentSave,
+		migrate: migrateFontFamily,
+		isEligible( { style } ) {
+			return style?.typography?.fontFamily;
+		},
+	},
+	{
 		supports: {
 			anchor: true,
 			align: true,
@@ -852,15 +861,6 @@ const deprecated = [
 			);
 		},
 		migrate: oldColorsMigration,
-	},
-	{
-		attributes: currentAttributes,
-		supports: currentSupports,
-		save: currentSave,
-		migrate: migrateFontFamily,
-		isEligible( { style } ) {
-			return style?.typography?.fontFamily;
-		},
 	},
 ];
 
