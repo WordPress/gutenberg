@@ -25,11 +25,18 @@ function render_block_core_query_pagination_previous( $attributes, $content, $bl
 	if ( $pagination_arrow ) {
 		$label = $pagination_arrow . $label;
 	}
-	$content = '<span></span>';
+	$paged = (get_query_var('paged')) ? get_query_var('paged') : 1;
+	if( 1 === $paged ){
+		$wrapper_attributes = get_block_wrapper_attributes( array( 'class' => 'first-page' ) );
+	}
+	$content = sprintf(
+		'<span %1$s>%2$s</span>',
+		$wrapper_attributes,
+		$label
+	);
 	// Check if the pagination is for Query that inherits the global context
 	// and handle appropriately.
 	if ( isset( $block->context['query']['inherit'] ) && $block->context['query']['inherit'] ) {
-		$paged = (get_query_var('paged')) ? get_query_var('paged') : 1;
 		$filter_link_attributes = function() use ( $wrapper_attributes ) {
 			return $wrapper_attributes;
 		};
