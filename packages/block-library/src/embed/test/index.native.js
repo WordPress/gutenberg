@@ -52,17 +52,16 @@ const VIDEO_EMBED_SUCCESS_RESPONSE = {
 
 // Embed block HTML examples
 const EMPTY_EMBED_HTML = '<!-- wp:embed /-->';
-const EMPTY_URL_EMBED_HTML = '<!-- wp:embed {"url":""} /-->';
 const RICH_TEXT_EMBED_HTML = `<!-- wp:embed {"url":"https://twitter.com/notnownikki","type":"rich","providerNameSlug":"twitter","responsive":true} -->
 <figure class="wp-block-embed is-type-rich is-provider-twitter wp-block-embed-twitter"><div class="wp-block-embed__wrapper">
 https://twitter.com/notnownikki
 </div></figure>
 <!-- /wp:embed -->`;
-const VIDEO_EMBED_HTML = `<!-- wp:embed {"url":"https://www.youtube.com/watch?v=lXMskKTw3Bc","type":"video","providerNameSlug":"youtube","responsive":true,"className":"wp-embed-aspect-16-9 wp-has-aspect-ratio"} -->
-<figure class="wp-block-embed is-type-video is-provider-youtube wp-block-embed-youtube wp-embed-aspect-16-9 wp-has-aspect-ratio"><div class="wp-block-embed__wrapper">
-https://www.youtube.com/watch?v=lXMskKTw3Bc
-</div></figure>
-<!-- /wp:embed -->`;
+// const VIDEO_EMBED_HTML = `<!-- wp:embed {"url":"https://www.youtube.com/watch?v=lXMskKTw3Bc","type":"video","providerNameSlug":"youtube","responsive":true,"className":"wp-embed-aspect-16-9 wp-has-aspect-ratio"} -->
+// <figure class="wp-block-embed is-type-video is-provider-youtube wp-block-embed-youtube wp-embed-aspect-16-9 wp-has-aspect-ratio"><div class="wp-block-embed__wrapper">
+// https://www.youtube.com/watch?v=lXMskKTw3Bc
+// </div></figure>
+// <!-- /wp:embed -->`;
 
 const MOST_USED_PROVIDERS = embed.settings.variations.filter( ( { name } ) =>
 	[ 'youtube', 'twitter', 'wordpress', 'vimeo' ].includes( name )
@@ -80,6 +79,44 @@ const mockEmbedResponses = ( mockedResponses ) => {
 		);
 		return Promise.resolve( matchedEmbedResponse || {} );
 	} );
+};
+
+const insertEmbedBlock = async ( blockTitle = 'Embed' ) => {
+	const editor = await initializeEditor( {
+		initialHtml: '',
+	} );
+	const { getByA11yLabel, getByText } = editor;
+
+	// Open inserter menu
+	fireEvent.press( await waitFor( () => getByA11yLabel( 'Add block' ) ) );
+
+	// Insert embed block
+	fireEvent.press( await waitFor( () => getByText( blockTitle ) ) );
+
+	// Return the embed block
+	const block = await waitFor( () =>
+		getByA11yLabel( /Embed Block\. Row 1/ )
+	);
+
+	return { ...editor, block };
+};
+
+const initializeWithEmbedBlock = async ( initialHtml, selectBlock = true ) => {
+	const waitForElement = ( { getByA11yLabel } ) =>
+		getByA11yLabel( /Embed Block\. Row 1/ );
+
+	const editor = await initializeEditor(
+		{ initialHtml },
+		{ waitForElement }
+	);
+	const { element } = editor;
+
+	if ( selectBlock ) {
+		// Select block
+		fireEvent.press( element );
+	}
+
+	return { ...editor, block: element };
 };
 
 beforeAll( () => {
@@ -103,82 +140,30 @@ afterAll( () => {
 } );
 
 describe( 'Embed block', () => {
-	describe( 'Block insertion', () => {
+	describe( 'insertion', () => {
 		it( 'inserts generic embed block', async () => {
-			const initialHtml = '';
-			const expectedHtml = EMPTY_EMBED_HTML;
+			const { block } = await insertEmbedBlock();
 
-			const { getByA11yLabel, getByText } = await initializeEditor( {
-				initialHtml,
-			} );
+			const blockName = within( block ).getByText( 'Embed' );
 
-			// Open the inserter menu
-			fireEvent.press(
-				await waitFor( () => getByA11yLabel( 'Add block' ) )
-			);
-
-			// Insert an embed block
-			fireEvent.press( await waitFor( () => getByText( `Embed` ) ) );
-
-			// Get the embed block
-			const embedblock = await waitFor( () =>
-				getByA11yLabel( /Embed Block\. Row 1/ )
-			);
-			const embedBlockName = within( embedblock ).getByText( 'Embed' );
-
-			expect( embedBlockName ).toBeDefined();
-			expect( getEditorHtml() ).toBe( expectedHtml );
+			expect( blockName ).toBeDefined();
+			expect( getEditorHtml() ).toMatchSnapshot();
 		} );
 
-		MOST_USED_PROVIDERS.forEach( ( { attributes, title } ) =>
+		MOST_USED_PROVIDERS.forEach( ( { title } ) =>
 			it( `inserts ${ title } embed block`, async () => {
-				const initialHtml = '';
-				const expectedHtml = `<!-- wp:embed ${ JSON.stringify(
-					attributes
-				) } /-->`;
+				const { block } = await insertEmbedBlock( title );
+				const blockName = within( block ).getByText( title );
 
-				const { getByA11yLabel, getByText } = await initializeEditor( {
-					initialHtml,
-				} );
-
-				// Open the inserter menu
-				fireEvent.press(
-					await waitFor( () => getByA11yLabel( 'Add block' ) )
-				);
-
-				// Insert a specific embed block
-				fireEvent.press( await waitFor( () => getByText( title ) ) );
-
-				// Get the embed block
-				const embedblock = await waitFor( () =>
-					getByA11yLabel( /Embed Block\. Row 1/ )
-				);
-				const embedBlockName = within( embedblock ).getByText( title );
-
-				expect( embedBlockName ).toBeDefined();
-				expect( getEditorHtml() ).toBe( expectedHtml );
+				expect( blockName ).toBeDefined();
+				expect( getEditorHtml() ).toMatchSnapshot();
 			} )
 		);
 	} );
 
-	describe( 'Set URL upon block insertion', () => {
+	describe( 'set URL upon block insertion', () => {
 		it( 'sets empty URL when dismissing edit URL modal', async () => {
-			const initialHtml = '';
-			const expectedHtml = EMPTY_URL_EMBED_HTML;
-
-			const {
-				getByA11yLabel,
-				getByText,
-				getByTestId,
-			} = await initializeEditor( { initialHtml } );
-
-			// Open the inserter menu
-			fireEvent.press(
-				await waitFor( () => getByA11yLabel( 'Add block' ) )
-			);
-
-			// Insert an embed block
-			fireEvent.press( await waitFor( () => getByText( `Embed` ) ) );
+			const { getByTestId } = await insertEmbedBlock();
 
 			// Wait for edit URL modal to be visible
 			const embedEditURLModal = getByTestId( 'embed-edit-url-modal' );
@@ -188,28 +173,17 @@ describe( 'Embed block', () => {
 			fireEvent( embedEditURLModal, 'backdropPress' );
 			fireEvent( embedEditURLModal, MODAL_DISMISS_EVENT );
 
-			expect( getEditorHtml() ).toBe( expectedHtml );
+			expect( getEditorHtml() ).toMatchSnapshot();
 		} );
 
 		it( 'sets a valid URL when dismissing edit URL modal', async () => {
-			const initialHtml = '';
-			const expectedHtml = RICH_TEXT_EMBED_HTML;
 			const expectedURL = 'https://twitter.com/notnownikki';
 
 			const {
 				getByA11yLabel,
-				getByText,
 				getByPlaceholderText,
 				getByTestId,
-			} = await initializeEditor( { initialHtml } );
-
-			// Open the inserter menu
-			fireEvent.press(
-				await waitFor( () => getByA11yLabel( 'Add block' ) )
-			);
-
-			// Insert an embed block
-			fireEvent.press( await waitFor( () => getByText( `Embed` ) ) );
+			} = await insertEmbedBlock();
 
 			// Wait for edit URL modal to be visible
 			const embedEditURLModal = getByTestId( 'embed-edit-url-modal' );
@@ -230,12 +204,10 @@ describe( 'Embed block', () => {
 			);
 
 			expect( editURLButton ).toBeDefined();
-			expect( getEditorHtml() ).toBe( expectedHtml );
+			expect( getEditorHtml() ).toMatchSnapshot();
 		} );
 
 		it( 'auto-pastes the URL from clipboard', async () => {
-			const initialHtml = '';
-			const expectedHtml = RICH_TEXT_EMBED_HTML;
 			const clipboardURL = 'https://twitter.com/notnownikki';
 
 			// Mock clipboard
@@ -243,17 +215,9 @@ describe( 'Embed block', () => {
 
 			const {
 				getByA11yLabel,
-				getByText,
 				getByTestId,
-			} = await initializeEditor( { initialHtml } );
-
-			// Open the inserter menu
-			fireEvent.press(
-				await waitFor( () => getByA11yLabel( 'Add block' ) )
-			);
-
-			// Insert an embed block
-			fireEvent.press( await waitFor( () => getByText( `Embed` ) ) );
+				getByText,
+			} = await insertEmbedBlock();
 
 			// Wait for edit URL modal to be visible
 			const embedEditURLModal = getByTestId( 'embed-edit-url-modal' );
@@ -273,26 +237,17 @@ describe( 'Embed block', () => {
 
 			expect( embedLink ).toBeDefined();
 			expect( editURLButton ).toBeDefined();
-			expect( getEditorHtml() ).toBe( expectedHtml );
+			expect( getEditorHtml() ).toMatchSnapshot();
 
 			Clipboard.getString.mockReset();
 		} );
 	} );
 
-	describe( 'Set URL by tapping on an empty block', () => {
+	describe( 'set URL when empty block', () => {
 		it( 'sets empty URL when dismissing edit URL modal', async () => {
-			const initialHtml = EMPTY_EMBED_HTML;
-			const expectedHtml = EMPTY_URL_EMBED_HTML;
-
-			const waitForElement = ( { getByA11yLabel } ) =>
-				getByA11yLabel( /Embed Block\. Row 1/ );
-			const { element, getByText, getByTestId } = await initializeEditor(
-				{ initialHtml },
-				{ waitForElement }
+			const { getByTestId, getByText } = await initializeWithEmbedBlock(
+				EMPTY_EMBED_HTML
 			);
-
-			// Select block
-			fireEvent.press( element );
 
 			// Edit URL
 			fireEvent.press( await waitFor( () => getByText( 'ADD LINK' ) ) );
@@ -305,26 +260,18 @@ describe( 'Embed block', () => {
 			fireEvent( embedEditURLModal, 'backdropPress' );
 			fireEvent( embedEditURLModal, MODAL_DISMISS_EVENT );
 
-			expect( getEditorHtml() ).toBe( expectedHtml );
+			expect( getEditorHtml() ).toMatchSnapshot();
 		} );
 
 		it( 'sets a valid URL when dismissing edit URL modal', async () => {
-			const initialHtml = EMPTY_EMBED_HTML;
-			const expectedHtml = RICH_TEXT_EMBED_HTML;
 			const expectedURL = 'https://twitter.com/notnownikki';
 
-			const waitForElement = ( { getByA11yLabel } ) =>
-				getByA11yLabel( /Embed Block\. Row 1/ );
 			const {
-				element,
 				getByA11yLabel,
-				getByText,
 				getByPlaceholderText,
 				getByTestId,
-			} = await initializeEditor( { initialHtml }, { waitForElement } );
-
-			// Select block
-			fireEvent.press( element );
+				getByText,
+			} = await initializeWithEmbedBlock( EMPTY_EMBED_HTML );
 
 			// Edit URL
 			fireEvent.press( getByText( 'ADD LINK' ) );
@@ -348,28 +295,20 @@ describe( 'Embed block', () => {
 			);
 
 			expect( editURLButton ).toBeDefined();
-			expect( getEditorHtml() ).toBe( expectedHtml );
+			expect( getEditorHtml() ).toMatchSnapshot();
 		} );
 
 		it( 'auto-pastes the URL from clipboard', async () => {
-			const initialHtml = EMPTY_EMBED_HTML;
-			const expectedHtml = RICH_TEXT_EMBED_HTML;
 			const clipboardURL = 'https://twitter.com/notnownikki';
 
 			// Mock clipboard
 			Clipboard.getString.mockResolvedValue( clipboardURL );
 
-			const waitForElement = ( { getByA11yLabel } ) =>
-				getByA11yLabel( /Embed Block\. Row 1/ );
 			const {
-				element,
 				getByA11yLabel,
-				getByText,
 				getByTestId,
-			} = await initializeEditor( { initialHtml }, { waitForElement } );
-
-			// Select block
-			fireEvent.press( element );
+				getByText,
+			} = await initializeWithEmbedBlock( EMPTY_EMBED_HTML );
 
 			// Edit URL
 			fireEvent.press( getByText( 'ADD LINK' ) );
@@ -392,26 +331,18 @@ describe( 'Embed block', () => {
 
 			expect( embedLink ).toBeDefined();
 			expect( editURLButton ).toBeDefined();
-			expect( getEditorHtml() ).toBe( expectedHtml );
+			expect( getEditorHtml() ).toMatchSnapshot();
 
 			Clipboard.getString.mockReset();
 		} );
 	} );
 
-	describe( 'Edit URL', () => {
+	describe( 'edit URL', () => {
 		it( 'keeps the previous URL if no URL is set', async () => {
-			const initialHtml = RICH_TEXT_EMBED_HTML;
-
-			const waitForElement = ( { getByA11yLabel } ) =>
-				getByA11yLabel( /Embed Block\. Row 1/ );
 			const {
-				element,
 				getByA11yLabel,
 				getByTestId,
-			} = await initializeEditor( { initialHtml }, { waitForElement } );
-
-			// Select block
-			fireEvent.press( element );
+			} = await initializeWithEmbedBlock( RICH_TEXT_EMBED_HTML );
 
 			// Edit URL
 			fireEvent.press(
@@ -426,26 +357,18 @@ describe( 'Embed block', () => {
 			fireEvent( embedEditURLModal, 'backdropPress' );
 			fireEvent( embedEditURLModal, MODAL_DISMISS_EVENT );
 
-			expect( getEditorHtml() ).toBe( initialHtml );
+			expect( getEditorHtml() ).toMatchSnapshot();
 		} );
 
 		it( 'replaces URL', async () => {
-			const initialHtml = RICH_TEXT_EMBED_HTML;
-			const expectedHtml = VIDEO_EMBED_HTML;
 			const initialURL = 'https://twitter.com/notnownikki';
 			const expectedURL = 'https://www.youtube.com/watch?v=lXMskKTw3Bc';
 
-			const waitForElement = ( { getByA11yLabel } ) =>
-				getByA11yLabel( /Embed Block\. Row 1/ );
 			const {
-				element,
 				getByA11yLabel,
 				getByDisplayValue,
 				getByTestId,
-			} = await initializeEditor( { initialHtml }, { waitForElement } );
-
-			// Select block
-			fireEvent.press( element );
+			} = await initializeWithEmbedBlock( RICH_TEXT_EMBED_HTML );
 
 			// Edit URL
 			fireEvent.press(
@@ -476,26 +399,19 @@ describe( 'Embed block', () => {
 			);
 
 			expect( youtubeLinkField ).toBeDefined();
-			expect( getEditorHtml() ).toBe( expectedHtml );
+			expect( getEditorHtml() ).toMatchSnapshot();
 		} );
 
 		it( 'keeps the previous URL if an invalid URL is set', async () => {
-			const initialHtml = RICH_TEXT_EMBED_HTML;
 			const previousURL = 'https://twitter.com/notnownikki';
 			const invalidURL = 'http://';
 
-			const waitForElement = ( { getByA11yLabel } ) =>
-				getByA11yLabel( /Embed Block\. Row 1/ );
 			const {
-				element,
 				getByA11yLabel,
 				getByDisplayValue,
 				getByTestId,
 				getByText,
-			} = await initializeEditor( { initialHtml }, { waitForElement } );
-
-			// Select block
-			fireEvent.press( element );
+			} = await initializeWithEmbedBlock( RICH_TEXT_EMBED_HTML );
 
 			// Edit URL
 			fireEvent.press(
@@ -525,7 +441,7 @@ describe( 'Embed block', () => {
 			);
 
 			expect( errorNotice ).toBeDefined();
-			expect( getEditorHtml() ).toBe( initialHtml );
+			expect( getEditorHtml() ).toMatchSnapshot();
 		} );
 	} );
 } );
