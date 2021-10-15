@@ -9,18 +9,23 @@ const {
 	supports: currentSupports,
 } = blockConfig;
 
-const deprecated = [
-	{
-		attributes: currentAttributes,
-		supports: currentSupports,
-		save() {
-			return null;
-		},
-		migrate: migrateFontFamily,
-		isEligible( { style } ) {
-			return style?.typography?.fontFamily;
-		},
+const v1 = {
+	attributes: currentAttributes,
+	supports: currentSupports,
+	save() {
+		return null;
 	},
-];
+	migrate: migrateFontFamily,
+	isEligible( { style } ) {
+		return style?.typography?.fontFamily;
+	},
+};
 
-export default deprecated;
+/**
+ * New deprecations need to be placed first
+ * for them to have higher priority.
+ * They also need to contain the old deprecations.
+ *
+ * See block-deprecation.md
+ */
+export default [ v1 ];
