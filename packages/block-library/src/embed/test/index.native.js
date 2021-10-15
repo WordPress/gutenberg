@@ -535,48 +535,44 @@ describe( 'Embed block', () => {
 	} );
 
 	it( 'sets an Embed block caption', async () => {
+		const initialHtml = RICH_TEXT_EMBED_HTML;
+		const expectedHtml = RICH_TEXT_EMBED_HTML_WITH_CAPTION;
+		const expectedCaption = 'Caption';
+
 		const waitForElement = ( { getByA11yLabel } ) =>
 			getByA11yLabel( /Embed Block\. Row 1/ );
 		const {
 			element,
-			getByText,
 			getByPlaceholderText,
-			getByTestId,
+			getByDisplayValue,
 		} = await initializeEditor(
 			{
-				initialHtml: '<!-- wp:embed /-->',
+				initialHtml,
 			},
 			{ waitForElement }
 		);
 
-		const expectedURL = 'https://twitter.com/notnownikki';
-		const expectedCaption = 'Caption';
-
 		// Select block
 		fireEvent.press( element );
 
-		// Edit URL
-		fireEvent.press( getByText( 'ADD LINK' ) );
-
-		// Wait for edit URL modal to be visible
-		const embedEditURLModal = getByTestId( 'embed-edit-url-modal' );
-		await waitFor( () => embedEditURLModal.props.isVisible );
-
-		// Set an URL
-		const linkTextInput = getByPlaceholderText( 'Add link' );
-		fireEvent( linkTextInput, 'focus' );
-		fireEvent.changeText( linkTextInput, expectedURL );
-
-		// Dismiss the edit URL modal
-		fireEvent( embedEditURLModal, 'backdropPress' );
-		fireEvent( embedEditURLModal, MODAL_DISMISS_EVENT );
-
 		// Set a caption
-		const caption = await waitFor( () => getByTestId( 'embed-caption' ) );
-		fireEvent( caption, 'focus' );
-		fireEvent.changeText( caption, expectedCaption );
+		const captionField = getByPlaceholderText( 'Add caption' );
+		fireEvent( captionField, 'focus' );
+		fireEvent( captionField, 'onChange', {
+			nativeEvent: {
+				eventCount: 1,
+				target: undefined,
+				text: expectedCaption,
+			},
+		} );
 
-		expect( getEditorHtml() ).toBe( RICH_TEXT_EMBED_HTML_WITH_CAPTION );
+		// Get current caption
+		const caption = await waitFor( () =>
+			getByDisplayValue( `<p>${ expectedCaption }</p>` )
+		);
+
+		expect( caption ).toBeDefined();
+		expect( getEditorHtml() ).toBe( expectedHtml );
 	} );
 
 	it( 'Block settings', async () => {
