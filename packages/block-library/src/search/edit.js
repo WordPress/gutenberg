@@ -90,7 +90,7 @@ export default function SearchEdit( {
 	const isNewBlockRef = useRef( isNewBlock );
 
 	if (
-		typeof context.searchBlockLabel !== 'undefined' &&
+		'undefined' !== typeof context.searchBlockLabel &&
 		true === isNewBlockRef.current
 	) {
 		setAttributes( { showLabel: context.searchBlockLabel } );
