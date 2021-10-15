@@ -25,67 +25,73 @@ const blockAttributes = {
 	},
 };
 
-const deprecated = [
-	{
-		attributes: blockAttributes,
-		save( { attributes } ) {
-			const { textAlign, content } = attributes;
+const v1 = {
+	attributes: blockAttributes,
+	save( { attributes } ) {
+		const { textAlign, content } = attributes;
 
-			return (
-				<RichText.Content
-					tagName="pre"
-					style={ { textAlign } }
-					value={ content }
-				/>
-			);
+		return (
+			<RichText.Content
+				tagName="pre"
+				style={ { textAlign } }
+				value={ content }
+			/>
+		);
+	},
+};
+
+const v2 = {
+	attributes: {
+		content: {
+			type: 'string',
+			source: 'html',
+			selector: 'pre',
+			default: '',
+			__unstablePreserveWhiteSpace: true,
+			__experimentalRole: 'content',
+		},
+		textAlign: {
+			type: 'string',
 		},
 	},
-	{
-		attributes: {
-			content: {
-				type: 'string',
-				source: 'html',
-				selector: 'pre',
-				default: '',
-				__unstablePreserveWhiteSpace: true,
-				__experimentalRole: 'content',
-			},
-			textAlign: {
-				type: 'string',
-			},
+	supports: {
+		anchor: true,
+		color: {
+			gradients: true,
+			link: true,
 		},
-		supports: {
-			anchor: true,
-			color: {
-				gradients: true,
-				link: true,
-			},
-			typography: {
-				fontSize: true,
-				__experimentalFontFamily: true,
-			},
-			spacing: {
-				padding: true,
-			},
+		typography: {
+			fontSize: true,
+			__experimentalFontFamily: true,
 		},
-		save( { attributes } ) {
-			const { textAlign, content } = attributes;
-
-			const className = classnames( {
-				[ `has-text-align-${ textAlign }` ]: textAlign,
-			} );
-
-			return (
-				<pre { ...useBlockProps.save( { className } ) }>
-					<RichText.Content value={ content } />
-				</pre>
-			);
-		},
-		migrate: migrateFontFamily,
-		isEligible( { style } ) {
-			return style?.typography?.fontFamily;
+		spacing: {
+			padding: true,
 		},
 	},
-];
+	save( { attributes } ) {
+		const { textAlign, content } = attributes;
 
-export default deprecated;
+		const className = classnames( {
+			[ `has-text-align-${ textAlign }` ]: textAlign,
+		} );
+
+		return (
+			<pre { ...useBlockProps.save( { className } ) }>
+				<RichText.Content value={ content } />
+			</pre>
+		);
+	},
+	migrate: migrateFontFamily,
+	isEligible( { style } ) {
+		return style?.typography?.fontFamily;
+	},
+};
+
+/**
+ * New deprecations need to be placed first
+ * for them to have higher priority.
+ * They also need to contain the old deprecations.
+ *
+ * See block-deprecation.md
+ */
+export default [ v1, v2 ];
