@@ -27,7 +27,7 @@ export function backgroundImageStyles( url ) {
 export const ALLOWED_MEDIA_TYPES = [ 'image', 'video' ];
 
 export function dimRatioToClass( ratio ) {
-	return ratio === 0 || ratio === 50 || ! ratio
+	return ratio === 50 || ! ratio === undefined
 		? null
 		: 'has-background-dim-' + 10 * Math.round( ratio / 10 );
 }

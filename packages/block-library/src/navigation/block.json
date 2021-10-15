@@ -4,7 +4,11 @@
 	"title": "Navigation",
 	"category": "theme",
 	"description": "A collection of blocks that allow visitors to get around your site.",
-	"keywords": [ "menu", "navigation", "links" ],
+	"keywords": [
+		"menu",
+		"navigation",
+		"links"
+	],
 	"textdomain": "default",
 	"attributes": {
 		"orientation": {
@@ -36,13 +40,13 @@
 			"type": "boolean",
 			"default": true
 		},
-		"openSubmenusOnClick":{
+		"openSubmenusOnClick": {
 			"type": "boolean",
 			"default": false
 		},
-		"isResponsive": {
-			"type": "boolean",
-			"default": false
+		"overlayMenu": {
+			"type": "string",
+			"default": "never"
 		},
 		"__unstableLocation": {
 			"type": "string"
@@ -77,7 +81,10 @@
 		"orientation": "orientation"
 	},
 	"supports": {
-		"align": [ "wide", "full" ],
+		"align": [
+			"wide",
+			"full"
+		],
 		"anchor": true,
 		"html": false,
 		"inserter": true,

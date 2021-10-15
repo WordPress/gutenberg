@@ -59,6 +59,7 @@ When creating components that render a list of subcomponents, prefer to expose t
 	] }
 />
 ```
+
 ```jsx
 // ✅ Do:
 <List>
@@ -81,6 +82,7 @@ function List ( props ) {
 	);
 }
 ```
+
 ```jsx
 // ✅ Do:
 const ListContext = createContext();
@@ -296,7 +298,7 @@ Each component that is exported from the `@wordpress/components` package should 
 
 ## README example
 
-```md
+```markdown
 # `ComponentName`
 
 <!-- If component is experimental, add the following section: -->
@@ -306,7 +308,7 @@ This feature is still experimental. “Experimental” means this is an early im
 
 <!-- If component is deprecated, add the following section: -->
 <div class="callout callout-alert">
-This component is deprecated. Please use  `{other component}` from the `{other package}` package instead.
+This component is deprecated. Please use `{other component}` from the `{other package}` package instead.
 </div>
 
 Description of the component.
@@ -315,16 +317,17 @@ Description of the component.
 
 Code example using correct markdown syntax and formatted using project's formatting rules. See [ItemGroup](/packages/components/src/item-group/item-group/README.md#usage) for a real-world example.
 
-```jsx
-import { ExampleComponent } from '@wordpress/components';
+	```jsx
+	import { ExampleComponent } from '@wordpress/components';
 
-function Example() {
-	return (
-		<ExampleComponent>
-			<p>Code is poetry</p>
-		</ExampleComponent>
-	);
-}
+	function Example() {
+		return (
+			<ExampleComponent>
+				<p>Code is poetry</p>
+			</ExampleComponent>
+		);
+	}
+	```
 
 ## Props
 
@@ -335,6 +338,8 @@ The component accepts the following props:
 Prop description. With a new line before and after the description and before and after type/required blocks.
 
 -   Required: Either `Yes` or `No`
+<!-- If the prop has a default value, add the following line: -->
+-   Default: [default value]
 
 ### Inherited props
 
@@ -350,8 +355,12 @@ See examples for this section for the [ItemGroup](/packages/components/src/item-
 
 As a result of the above guidelines, all new components (except for shared utilities) should _generally_ follow this folder structure:
 
-```
+```text
 component-name/
+├── stories
+│   └── index.js
+├── test
+│   └── index.js
 ├── component.tsx
 ├── context.ts
 ├── hook.ts
@@ -361,28 +370,28 @@ component-name/
 └── types.ts
 ```
 
-In case of a family of components (e.g. `Card` and `CardBody`, `CardFooter`, `CardHeader` ...), each component's implementation should live in a separate subfolder:
+In case of a family of components (e.g. `Card` and `CardBody`, `CardFooter`, `CardHeader` ...), each component's implementation should live in a separate subfolder, while code common to the whole family of components (e.g types, utils, context...) should live in the family of components root folder:
 
-```
+```text
 component-family-name/
 ├── sub-component-name/
 │   ├── index.ts
 │   ├── component.tsx
 │   ├── hook.ts
 │   ├── README.md
-│   ├── styles.ts
-│   └── types.ts
+│   └── styles.ts
 ├── sub-component-name/
 │   ├── index.ts
 │   ├── component.tsx
 │   ├── hook.ts
 │   ├── README.md
-│   ├── styles.ts
-│   └── types.ts
+│   └── styles.ts
 ├── stories
 │   └── index.js
 ├── test
 │   └── index.js
 ├── context.ts
-└── index.ts
+├── index.ts
+├── types.ts
+└── utils.ts
 ```

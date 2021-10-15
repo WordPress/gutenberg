@@ -1,12 +1,13 @@
 /**
  * External dependencies
  */
-import { TextInput, Platform } from 'react-native';
+import { TextInput, Platform, Dimensions } from 'react-native';
 
 /**
  * WordPress dependencies
  */
 import { Component } from '@wordpress/element';
+import { getPxFromCssUnit } from '@wordpress/block-editor';
 
 /**
  * Internal dependencies
@@ -61,7 +62,30 @@ export default class PlainText extends Component {
 		this._input.blur();
 	}
 
+	getFontSize() {
+		const { style } = this.props;
+
+		if ( ! style?.fontSize ) {
+			return;
+		}
+
+		const { width, height } = Dimensions.get( 'window' );
+		const cssUnitOptions = { height, width };
+
+		return {
+			fontSize: parseFloat(
+				getPxFromCssUnit( style.fontSize, cssUnitOptions )
+			),
+		};
+	}
+
 	render() {
+		const { style } = this.props;
+		const textStyles = [
+			style || styles[ 'block-editor-plain-text' ],
+			this.getFontSize(),
+		];
+
 		return (
 			<TextInput
 				{ ...this.props }
@@ -75,9 +99,7 @@ export default class PlainText extends Component {
 					( this.props.style && this.props.style.fontFamily ) ||
 					styles[ 'block-editor-plain-text' ].fontFamily
 				}
-				style={
-					this.props.style || styles[ 'block-editor-plain-text' ]
-				}
+				style={ textStyles }
 				scrollEnabled={ false }
 			/>
 		);
