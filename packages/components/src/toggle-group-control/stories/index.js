@@ -18,6 +18,9 @@ import Button from '../../button';
 export default {
 	component: ToggleGroupControl,
 	title: 'Components/ToggleGroupControl',
+	parameters: {
+		knobs: { disabled: false },
+	},
 };
 
 const KNOBS_GROUPS = {

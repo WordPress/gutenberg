@@ -14,6 +14,9 @@ import { Scrollable } from '../';
 export default {
 	component: Scrollable,
 	title: 'Components (Experimental)/Scrollable',
+	parameters: {
+		knobs: { disabled: false },
+	},
 };
 
 export const _default = () => {
