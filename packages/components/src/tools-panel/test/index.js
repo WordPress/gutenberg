@@ -406,16 +406,22 @@ describe( 'ToolsPanel', () => {
 			openDropdownMenu();
 
 			const defaultItem = screen.getByText( 'Nested Control 1' );
-			const defaultMenuItem = defaultItem.parentNode;
+			const defaultMenuItem = screen.getByRole( 'menuitemcheckbox', {
+				name: 'Reset Nested Control 1',
+				checked: true,
+			} );
 
 			const altItem = screen.getByText( 'Nested Control 2' );
-			const altMenuItem = altItem.parentNode;
+			const altMenuItem = screen.getByRole( 'menuitemcheckbox', {
+				name: 'Show Nested Control 2',
+				checked: false,
+			} );
 
 			expect( defaultItem ).toBeInTheDocument();
-			expect( defaultMenuItem ).toHaveAttribute( 'aria-checked', 'true' );
+			expect( defaultMenuItem ).toBeInTheDocument();
 
 			expect( altItem ).toBeInTheDocument();
-			expect( altMenuItem ).toHaveAttribute( 'aria-checked', 'false' );
+			expect( altMenuItem ).toBeInTheDocument();
 		} );
 	} );
 
@@ -439,16 +445,22 @@ describe( 'ToolsPanel', () => {
 			openDropdownMenu();
 
 			const defaultItem = screen.getByText( 'Nested Control 1' );
-			const defaultMenuItem = defaultItem.parentNode;
+			const defaultMenuItem = screen.getByRole( 'menuitemcheckbox', {
+				name: 'Reset Nested Control 1',
+				checked: true,
+			} );
 
 			const altItem = screen.getByText( 'Nested Control 2' );
-			const altMenuItem = altItem.parentNode;
+			const altMenuItem = screen.getByRole( 'menuitemcheckbox', {
+				name: 'Show Nested Control 2',
+				checked: false,
+			} );
 
 			expect( defaultItem ).toBeInTheDocument();
-			expect( defaultMenuItem ).toHaveAttribute( 'aria-checked', 'true' );
+			expect( defaultMenuItem ).toBeInTheDocument();
 
 			expect( altItem ).toBeInTheDocument();
-			expect( altMenuItem ).toHaveAttribute( 'aria-checked', 'false' );
+			expect( altMenuItem ).toBeInTheDocument();
 		} );
 	} );
 
