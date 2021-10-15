@@ -74,7 +74,8 @@ function getSelectOptions( optionsArray, disableCustomFontSizes ) {
 		key: slug,
 		name,
 		size,
-		hint: size && isSimpleCssValue( size ) && parseInt( size ),
+		__experimentalHint:
+			size && isSimpleCssValue( size ) && parseInt( size ),
 	} ) );
 }
 

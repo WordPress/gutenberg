@@ -156,16 +156,16 @@ export default function CustomSelectControl( {
 									{
 										'is-highlighted':
 											index === highlightedIndex,
-										'has-hint': !! item.hint,
+										'has-hint': !! item.__experimentalHint,
 									}
 								),
 								style: item.style,
 							} ) }
 						>
 							{ item.name }
-							{ item.hint && (
+							{ item.__experimentalHint && (
 								<span className="components-custom-select-control__item-hint">
-									{ item.hint }
+									{ item.__experimentalHint }
 								</span>
 							) }
 							{ item === selectedItem && (
