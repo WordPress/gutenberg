@@ -92,7 +92,7 @@ function TemplatePartItem( {
 
 			<DropdownMenu
 				icon={ moreVertical }
-				label="More options"
+				label={ __( 'More options' ) }
 				className="edit-site-template-details__template-areas-item-more"
 			>
 				{ ( { onClose } ) => (
