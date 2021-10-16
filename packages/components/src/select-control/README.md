@@ -1,6 +1,6 @@
 # SelectControl
 
-SelectControl allow users to select from a single-option menu. It functions as a wrapper around the browser's native `<select>` element.
+SelectControl allow users to select from a single or multiple option menu. It functions as a wrapper around the browser's native `<select>` element.
 
 ![A “Link To” select with “none” selected.](https://wordpress.org/gutenberg/files/2018/12/select.png)
 
@@ -18,17 +18,17 @@ SelectControl allow users to select from a single-option menu. It functions as a
 
 Use a select control when:
 
--   You want users to select a single option from a list.
+-   You want users to select one or more options from a list.
 -   There is a strong default option.
 -   There is little available space.
 -   The contents of the hidden part of the menu are obvious from its label and the one selected item. For example, if you have an option menu labelled “Month:” with the item “January” selected, the user might reasonably infer that the menu contains the 12 months of the year without having to look.
 
-If you have a shorter list of options, or need all of the options visible to the user, consider using RadioControl instead.
+If you have a shorter list of options, consider using RadioControl instead.
 
 ![](https://wordpress.org/gutenberg/files/2018/12/select-do-multiple.png)
 
 **Do**
-Use selects when you have multiple options, and can only choose one.
+Use selects when you have multiple options.
 
 ![](https://wordpress.org/gutenberg/files/2018/12/select-dont-binary.png)
 
