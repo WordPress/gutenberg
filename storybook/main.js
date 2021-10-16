@@ -44,6 +44,7 @@ module.exports = {
 		'@storybook/addon-storysource',
 		'@storybook/addon-viewport',
 		'@storybook/addon-a11y',
+		'@storybook/addon-toolbars',
 	],
 	managerWebpack: updateEmotionAliases,
 	// Workaround:
