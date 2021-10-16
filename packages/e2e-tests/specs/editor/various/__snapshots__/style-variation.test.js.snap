@@ -5,3 +5,9 @@ exports[`adding blocks Should switch the style of the quote block 1`] = `
 <blockquote class=\\"wp-block-quote is-style-large\\"><p>Quote content</p></blockquote>
 <!-- /wp:quote -->"
 `;
+
+exports[`adding blocks Should switch to the large style of the quote block 1`] = `
+"<!-- wp:quote {\\"className\\":\\"is-style-large\\"} -->
+<blockquote class=\\"wp-block-quote is-style-large\\"><p>Quote content</p></blockquote>
+<!-- /wp:quote -->"
+`;
