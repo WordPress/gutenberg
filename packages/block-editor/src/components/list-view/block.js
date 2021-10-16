@@ -12,7 +12,7 @@ import {
 } from '@wordpress/components';
 import { moreVertical } from '@wordpress/icons';
 import { useState, useRef, useEffect, useCallback } from '@wordpress/element';
-import { useDispatch } from '@wordpress/data';
+import { useDispatch, useSelect } from '@wordpress/data';
 
 /**
  * Internal dependencies
@@ -26,13 +26,11 @@ import ListViewBlockContents from './block-contents';
 import BlockSettingsDropdown from '../block-settings-menu/block-settings-dropdown';
 import { useListViewContext } from './context';
 import { store as blockEditorStore } from '../../store';
+import { isClientIdSelected } from './utils';
 
 export default function ListViewBlock( {
 	block,
-	isSelected,
 	isDragged,
-	isBranchSelected,
-	isLastOfSelectedBranch,
 	selectBlock,
 	position,
 	level,
@@ -48,12 +46,6 @@ export default function ListViewBlock( {
 
 	const { toggleBlockHighlight } = useDispatch( blockEditorStore );
 
-	const hasSiblings = siblingBlockCount > 0;
-	const hasRenderedMovers = showBlockMovers && hasSiblings;
-	const moverCellClassName = classnames(
-		'block-editor-list-view-block__mover-cell',
-		{ 'is-visible': isHovered || isSelected }
-	);
 	const {
 		__experimentalFeatures: withExperimentalFeatures,
 		__experimentalPersistentListViewFeatures: withExperimentalPersistentListViewFeatures,
@@ -61,6 +53,42 @@ export default function ListViewBlock( {
 		expand,
 		collapse,
 	} = useListViewContext();
+
+	const { isBranchSelected, isSelected } = useSelect(
+		( select ) => {
+			const {
+				getSelectedBlockClientId,
+				getSelectedBlockClientIds,
+				getBlockParents,
+			} = select( blockEditorStore );
+
+			const selectedClientIds = withExperimentalPersistentListViewFeatures
+				? getSelectedBlockClientIds()
+				: [ getSelectedBlockClientId() ];
+			const blockParents = getBlockParents( clientId );
+			const _isSelected = isClientIdSelected(
+				clientId,
+				selectedClientIds
+			);
+			return {
+				isSelected: _isSelected,
+				isBranchSelected:
+					_isSelected ||
+					blockParents.some( ( id ) => {
+						return isClientIdSelected( id, selectedClientIds );
+					} ),
+			};
+		},
+		[ withExperimentalPersistentListViewFeatures, clientId ]
+	);
+
+	const hasSiblings = siblingBlockCount > 0;
+	const hasRenderedMovers = showBlockMovers && hasSiblings;
+	const moverCellClassName = classnames(
+		'block-editor-list-view-block__mover-cell',
+		{ 'is-visible': isHovered || isSelected }
+	);
+
 	const listViewBlockSettingsClassName = classnames(
 		'block-editor-list-view-block__menu-cell',
 		{ 'is-visible': isHovered || isSelected }
@@ -116,9 +144,9 @@ export default function ListViewBlock( {
 		'is-selected': isSelected,
 		'is-branch-selected':
 			withExperimentalPersistentListViewFeatures && isBranchSelected,
-		'is-last-of-selected-branch':
-			withExperimentalPersistentListViewFeatures &&
-			isLastOfSelectedBranch,
+		// 'is-last-of-selected-branch':
+		// 	withExperimentalPersistentListViewFeatures &&
+		// 	isLastOfSelectedBranch,
 		'is-dragging': isDragged,
 	} );
 

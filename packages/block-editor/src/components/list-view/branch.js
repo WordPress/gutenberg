@@ -6,47 +6,29 @@ import { map, compact } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { AsyncModeProvider } from '@wordpress/data';
+import { Fragment } from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
 import ListViewBlock from './block';
-import ListViewAppender from './appender';
-import { isClientIdSelected } from './utils';
 import { useListViewContext } from './context';
 
 export default function ListViewBranch( props ) {
 	const {
 		blocks,
 		selectBlock,
-		showAppender,
 		showBlockMovers,
 		showNestedBlocks,
-		parentBlockClientId,
 		level = 1,
 		path = '',
-		isBranchSelected = false,
-		isLastOfBranch = false,
 	} = props;
 
-	const {
-		expandedState,
-		draggedClientIds,
-		selectedClientIds,
-	} = useListViewContext();
+	const { expandedState, draggedClientIds } = useListViewContext();
 
-	const isTreeRoot = ! parentBlockClientId;
 	const filteredBlocks = compact( blocks );
-	const itemHasAppender = ( parentClientId ) =>
-		showAppender &&
-		! isTreeRoot &&
-		isClientIdSelected( parentClientId, selectedClientIds );
-	const hasAppender = itemHasAppender( parentBlockClientId );
 	// Add +1 to the rowCount to take the block appender into account.
 	const blockCount = filteredBlocks.length;
-	const rowCount = hasAppender ? blockCount + 1 : blockCount;
-	const appenderPosition = rowCount;
 
 	return (
 		<>
@@ -61,24 +43,8 @@ export default function ListViewBranch( props ) {
 						: `${ position }`;
 				const hasNestedBlocks =
 					showNestedBlocks && !! innerBlocks && !! innerBlocks.length;
-				const hasNestedAppender = itemHasAppender( clientId );
-				const hasNestedBranch = hasNestedBlocks || hasNestedAppender;
 
-				const isSelected = isClientIdSelected(
-					clientId,
-					selectedClientIds
-				);
-				const isSelectedBranch =
-					isBranchSelected || ( isSelected && hasNestedBranch );
-
-				// Logic needed to target the last item of a selected branch which might be deeply nested.
-				// This is currently only needed for styling purposes. See: `.is-last-of-selected-branch`.
-				const isLastBlock = index === blockCount - 1;
-				const isLast = isSelected || ( isLastOfBranch && isLastBlock );
-				const isLastOfSelectedBranch =
-					isLastOfBranch && ! hasNestedBranch && isLastBlock;
-
-				const isExpanded = hasNestedBranch
+				const isExpanded = hasNestedBlocks
 					? expandedState[ clientId ] ?? true
 					: undefined;
 
@@ -87,52 +53,32 @@ export default function ListViewBranch( props ) {
 				const isDragged = !! draggedClientIds?.includes( clientId );
 
 				return (
-					<AsyncModeProvider key={ clientId } value={ ! isSelected }>
+					<Fragment key={ clientId }>
 						<ListViewBlock
 							block={ block }
 							selectBlock={ selectBlock }
 							isDragged={ isDragged }
-							isSelected={ isSelected }
-							isBranchSelected={ isSelectedBranch }
-							isLastOfSelectedBranch={ isLastOfSelectedBranch }
 							level={ level }
 							position={ position }
-							rowCount={ rowCount }
+							rowCount={ blockCount }
 							siblingBlockCount={ blockCount }
 							showBlockMovers={ showBlockMovers }
 							path={ updatedPath }
 							isExpanded={ isExpanded }
 						/>
-						{ hasNestedBranch && isExpanded && ! isDragged && (
+						{ hasNestedBlocks && isExpanded && ! isDragged && (
 							<ListViewBranch
 								blocks={ innerBlocks }
 								selectBlock={ selectBlock }
-								isBranchSelected={ isSelectedBranch }
-								isLastOfBranch={ isLast }
-								showAppender={ showAppender }
 								showBlockMovers={ showBlockMovers }
 								showNestedBlocks={ showNestedBlocks }
-								parentBlockClientId={ clientId }
 								level={ level + 1 }
 								path={ updatedPath }
 							/>
 						) }
-					</AsyncModeProvider>
+					</Fragment>
 				);
 			} ) }
-			{ hasAppender && (
-				<ListViewAppender
-					parentBlockClientId={ parentBlockClientId }
-					position={ rowCount }
-					rowCount={ appenderPosition }
-					level={ level }
-					path={
-						path.length > 0
-							? `${ path }_${ appenderPosition }`
-							: `${ appenderPosition }`
-					}
-				/>
-			) }
 		</>
 	);
 }

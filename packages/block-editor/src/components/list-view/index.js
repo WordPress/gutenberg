@@ -62,11 +62,7 @@ function ListView(
 	},
 	ref
 ) {
-	const {
-		clientIdsTree,
-		selectedClientIds,
-		draggedClientIds,
-	} = useListViewClientIds(
+	const { clientIdsTree, draggedClientIds } = useListViewClientIds(
 		blocks,
 		showOnlyCurrentHierarchy,
 		__experimentalPersistentListViewFeatures
@@ -121,7 +117,6 @@ function ListView(
 			__experimentalPersistentListViewFeatures,
 			isTreeGridMounted: isMounted.current,
 			draggedClientIds,
-			selectedClientIds,
 			expandedState,
 			expand,
 			collapse,
@@ -131,7 +126,6 @@ function ListView(
 			__experimentalPersistentListViewFeatures,
 			isMounted.current,
 			draggedClientIds,
-			selectedClientIds,
 			expandedState,
 			expand,
 			collapse,

@@ -7,49 +7,20 @@ import { useSelect } from '@wordpress/data';
 /**
  * Internal dependencies
  */
-import { isClientIdSelected } from './utils';
 import { store as blockEditorStore } from '../../store';
 
-const useListViewClientIdsTree = (
-	blocks,
-	selectedClientIds,
-	showOnlyCurrentHierarchy
-) =>
+const useListViewClientIdsTree = ( blocks, showOnlyCurrentHierarchy ) =>
 	useSelect(
 		( select ) => {
-			const {
-				getBlockHierarchyRootClientId,
-				__unstableGetClientIdsTree,
-				__unstableGetClientIdWithClientIdsTree,
-			} = select( blockEditorStore );
-
 			if ( blocks ) {
 				return blocks;
 			}
 
-			const isSingleBlockSelected =
-				selectedClientIds && ! Array.isArray( selectedClientIds );
-			if ( ! showOnlyCurrentHierarchy || ! isSingleBlockSelected ) {
-				return __unstableGetClientIdsTree();
-			}
-
-			const rootBlock = __unstableGetClientIdWithClientIdsTree(
-				getBlockHierarchyRootClientId( selectedClientIds )
-			);
-			if ( ! rootBlock ) {
-				return __unstableGetClientIdsTree();
-			}
-
-			const hasHierarchy =
-				! isClientIdSelected( rootBlock.clientId, selectedClientIds ) ||
-				( rootBlock.innerBlocks && rootBlock.innerBlocks.length !== 0 );
-			if ( hasHierarchy ) {
-				return [ rootBlock ];
-			}
+			const { __unstableGetClientIdsTree } = select( blockEditorStore );
 
 			return __unstableGetClientIdsTree();
 		},
-		[ blocks, selectedClientIds, showOnlyCurrentHierarchy ]
+		[ blocks, showOnlyCurrentHierarchy ]
 	);
 
 export default function useListViewClientIds(
@@ -57,23 +28,17 @@ export default function useListViewClientIds(
 	showOnlyCurrentHierarchy,
 	__experimentalPersistentListViewFeatures
 ) {
-	const { selectedClientIds, draggedClientIds } = useSelect(
+	const { draggedClientIds } = useSelect(
 		( select ) => {
-			const {
-				getSelectedBlockClientId,
-				getSelectedBlockClientIds,
-				getDraggedBlockClientIds,
-			} = select( blockEditorStore );
+			const { getDraggedBlockClientIds } = select( blockEditorStore );
 
 			if ( __experimentalPersistentListViewFeatures ) {
 				return {
-					selectedClientIds: getSelectedBlockClientIds(),
 					draggedClientIds: getDraggedBlockClientIds(),
 				};
 			}
 
 			return {
-				selectedClientIds: getSelectedBlockClientId(),
 				draggedClientIds: getDraggedBlockClientIds(),
 			};
 		},
@@ -81,8 +46,7 @@ export default function useListViewClientIds(
 	);
 	const clientIdsTree = useListViewClientIdsTree(
 		blocks,
-		selectedClientIds,
 		showOnlyCurrentHierarchy
 	);
-	return { clientIdsTree, selectedClientIds, draggedClientIds };
+	return { clientIdsTree, draggedClientIds };
 }
