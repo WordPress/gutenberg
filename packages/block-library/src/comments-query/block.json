@@ -13,7 +13,6 @@
 			"type": "object",
 			"default": {
 				"perPage": 4,
-				"pages": 1,
 				"offset": 0
 			}
 		},

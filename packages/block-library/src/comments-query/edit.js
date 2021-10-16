@@ -21,7 +21,7 @@ import QueryToolbar from './toolbar';
 const TEMPLATE = [ [ 'core/comments-template' ] ];
 
 export default function CommentsQueryEdit( { attributes, setAttributes } ) {
-	const { query, tagName: TagName = 'div', layout = {} } = attributes;
+	const { query, tagName: TagName, layout = {} } = attributes;
 
 	const { themeSupportsLayout } = useSelect( ( select ) => {
 		const { getSettings } = select( blockEditorStore );
@@ -42,7 +42,6 @@ export default function CommentsQueryEdit( { attributes, setAttributes } ) {
 
 	return (
 		<>
-			{ /* XXX TODO: Add query inspector controls here */ }
 			<BlockControls>
 				<QueryToolbar
 					attributes={ attributes }
