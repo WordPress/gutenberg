@@ -16,9 +16,6 @@
 	"supports": {
 		"reusable": false,
 		"html": false,
-		"align": true,
-		"__experimentalLayout": {
-			"allowEditing": false
-		}
+		"align": true
 	}
 }
