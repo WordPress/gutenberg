@@ -28,14 +28,14 @@ const DEPRECATED_LINK_DESTINATION_ATTACHMENT = 'post';
  * Used in deprecations: v1-6.
  *
  * @param {Object} attributes Block attributes.
- * @return {number}            Default number of columns for the gallery.
+ * @return {number}           Default number of columns for the gallery.
  */
 export function defaultColumnsNumberV1( attributes ) {
 	return Math.min( 3, attributes.images.length );
 }
 
 /**
- * Original function to determines new href and linkDestination values for an image block from the
+ * Original function to determine new href and linkDestination values for an image block from the
  * supplied Gallery link destination.
  *
  * Used in deprecations: v1-6.
@@ -87,7 +87,7 @@ export function getHrefAndDestination( image, destination ) {
  * @param {Object} image    Image properties.
  * @param {string} sizeSlug Gallery sizeSlug attribute.
  * @param {string} linkTo   Gallery linkTo attribute.
- * @return {Object}          Image block.
+ * @return {Object}         Image block.
  */
 export function getImageBlock( image, sizeSlug, linkTo ) {
 	return createBlock( 'core/image', {
@@ -206,7 +206,7 @@ const v1 = {
 };
 
 /*
- * With the moved to innerBlocks in v7 deprecations 2 & 3 could be combined as the only difference between these
+ * With the move to innerBlocks in v7 deprecations 2 & 3 could be combined as the only difference between these
  * versions was the addition of the 'ids' attribute which is stripped out in v7 anyway.
  */
 const v2v3 = {
