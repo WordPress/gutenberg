@@ -8,8 +8,7 @@
 			"imageCrop": true,
 			"linkTo": "media",
 			"sizeSlug": "large",
-			"allowResize": false,
-			"isGrouped": true
+			"allowResize": false
 		},
 		"innerBlocks": [
 			{
