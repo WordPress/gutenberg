@@ -99,10 +99,10 @@
 		}
 	},
 	"providesContext": {
-		"allowResize": "allowResize"
+		"allowResize": "allowResize",
+		"imageCrop": "imageCrop"
 	},
 	"providesContextConstants": {
-		"imageCrop": "imageCrop",
 		"fixedHeight": "fixedHeight"
 	},
 	"supports": {
