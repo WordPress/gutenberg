@@ -695,7 +695,9 @@ export class ImageEdit extends Component {
 											}
 											retryMessage={ retryMessage }
 											url={ url }
-											shapeStyle={ styles[ className ] }
+											shapeStyle={
+												styles[ className ] || className
+											}
 											width={ this.getWidth() }
 											{ ...( hasImageContext
 												? additionalImageProps

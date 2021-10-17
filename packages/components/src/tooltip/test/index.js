@@ -211,6 +211,26 @@ describe( 'Tooltip', () => {
 			}, TOOLTIP_DELAY );
 		} );
 
+		it( 'should not emit events back to children when they are disabled', () => {
+			const handleClick = jest.fn();
+
+			const wrapper = mount(
+				<Tooltip text="Show helpful text here">
+					<button disabled onClick={ handleClick }>
+						Click me
+					</button>
+				</Tooltip>
+			);
+
+			const eventCatcher = wrapper.find( '.event-catcher' );
+			eventCatcher.simulate( 'click', {
+				type: 'click',
+				currentTarget: {},
+			} );
+
+			expect( handleClick ).toHaveBeenCalledTimes( 0 );
+		} );
+
 		it( 'should cancel pending setIsOver on mouseleave', () => {
 			// Mount: Issues with using `setState` asynchronously with shallow-
 			// rendered components: https://github.com/airbnb/enzyme/issues/450

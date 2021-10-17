@@ -1,7 +1,15 @@
 /**
  * External dependencies
  */
-import colorize, { ColorFormats } from 'tinycolor2';
+import {
+	colord,
+	HslColor,
+	HslaColor,
+	HsvColor,
+	HsvaColor,
+	RgbColor,
+	RgbaColor,
+} from 'colord';
 // eslint-disable-next-line no-restricted-imports
 import type { ComponentProps } from 'react';
 import memoize from 'memize';
@@ -24,11 +32,10 @@ type ColorPickerProps = ComponentProps< typeof ColorPicker >;
 type LegacyColor =
 	| string
 	| {
-			color: colorize.Instance;
 			hex: string;
-			hsl: ColorFormats.HSL | ColorFormats.HSLA;
-			hsv: ColorFormats.HSV | ColorFormats.HSVA;
-			rgb: ColorFormats.RGB | ColorFormats.RGBA;
+			hsl: HslColor | HslaColor;
+			hsv: HsvColor | HsvaColor;
+			rgb: RgbColor | RgbaColor;
 			/**
 			 * @deprecated
 			 */
@@ -43,7 +50,7 @@ type LegacyColor =
  * @deprecated
  */
 export interface LegacyProps {
-	color: LegacyColor | undefined;
+	color?: LegacyColor;
 	/**
 	 * @deprecated
 	 */
@@ -62,51 +69,32 @@ export interface LegacyProps {
 function isLegacyProps( props: any ): props is LegacyProps {
 	return (
 		typeof props.onChangeComplete !== 'undefined' ||
-		typeof props.color === 'string' ||
+		typeof props.disableAlpha !== 'undefined' ||
 		typeof props.color?.hex === 'string'
 	);
 }
 
-function getColorFromLegacyProps(
-	props: LegacyProps
-): ColorFormats.HSL | ColorFormats.HSLA | undefined {
-	if ( ! props.color ) {
+function getColorFromLegacyProps( props: LegacyProps ): string | undefined {
+	if ( typeof props?.color === 'undefined' ) {
 		return undefined;
 	}
 	if ( typeof props.color === 'string' ) {
-		return colorize( props.color ).toHsl();
+		return props.color;
 	}
-
-	return props.color.hsl;
+	if ( props.color.hex ) {
+		return props.color.hex;
+	}
 }
 
-function toHsv(
-	color: colorize.Instance
-): ColorFormats.HSV | ColorFormats.HSVA {
-	const { h, s, v, a } = color.toHsv();
-
-	return {
-		h: Math.round( h ),
-		s: Math.round( s * 100 ),
-		v: Math.round( v * 100 ),
-		a,
-	};
-}
-
-const transformHslToLegacyColor = memoize(
-	( hsla: ColorFormats.HSL | ColorFormats.HSLA ): LegacyColor => {
-		const color = colorize( hsla );
-		const rawHex = color.toHex();
-		const rgb = color.toRgb();
-		const hsv = toHsv( color );
-		const hsl = hsla;
-
-		const isTransparent = rawHex === '000000' && rgb.a === 0;
-
-		const hex = isTransparent ? 'transparent' : `#${ rawHex }`;
+const transformColorStringToLegacyColor = memoize(
+	( color: string ): LegacyColor => {
+		const colordColor = colord( color );
+		const hex = colordColor.toHex();
+		const rgb = colordColor.toRgb();
+		const hsv = colordColor.toHsv();
+		const hsl = colordColor.toHsl();
 
 		return {
-			color,
 			hex,
 			rgb,
 			hsv,
@@ -121,14 +109,14 @@ export function useDeprecatedProps(
 	props: LegacyProps | ColorPickerProps
 ): ColorPickerProps {
 	const onChange = useCallback(
-		( hsla: ColorFormats.HSL | ColorFormats.HSLA ) => {
+		( color: string ) => {
 			if ( isLegacyProps( props ) ) {
 				return props.onChangeComplete(
-					transformHslToLegacyColor( hsla )
+					transformColorStringToLegacyColor( color )
 				);
 			}
 
-			return props.onChange?.( hsla );
+			return props.onChange?.( color );
 		},
 		[
 			( props as LegacyProps ).onChangeComplete,

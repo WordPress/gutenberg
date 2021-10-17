@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 12.0.0 (2021-10-12)
+
 ### Breaking changes
 
 -   Removed the deprecated `resetAutosave` action ([#34537](https://github.com/WordPress/gutenberg/pull/34537)).
