@@ -29,7 +29,7 @@ export default function getBlockContext( attributes, blockType ) {
 	if ( ! blockTypeCache.has( attributes ) ) {
 		const blockProvidesContext = {
 			...blockType.providesContext,
-			...blockType.providesNativeInnerBlockContext,
+			...blockType.providesContextConstants,
 		};
 		const context = mapValues(
 			blockProvidesContext,

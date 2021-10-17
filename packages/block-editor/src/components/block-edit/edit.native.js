@@ -33,7 +33,7 @@ export const Edit = ( props ) => {
 
 	const blockUsesContext = blockType && [
 		...blockType.usesContext,
-		...blockType.usesNativeInnerBlockContext,
+		...blockType.usesContextConstants,
 	];
 
 	// Assign context values using the block type's declared context needs.

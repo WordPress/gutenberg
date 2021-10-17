@@ -136,7 +136,7 @@ function UncontrolledInnerBlocks( props ) {
 
 	const blockProvidesContext = blockType && {
 		...blockType.providesContext,
-		...blockType.providesNativeInnerBlockContext,
+		...blockType.providesContextConstants,
 	};
 
 	if ( blockProvidesContext ) {

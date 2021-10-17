@@ -101,7 +101,7 @@
 	"providesContext": {
 		"allowResize": "allowResize"
 	},
-	"providesNativeInnerBlockContext": {
+	"providesContextConstants": {
 		"imageCrop": "imageCrop",
 		"fixedHeight": "fixedHeight"
 	},
