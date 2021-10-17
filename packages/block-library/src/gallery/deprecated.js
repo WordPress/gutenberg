@@ -2,7 +2,6 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import { map, some } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -200,149 +199,17 @@ const v1 = {
 				linkTo,
 				sizeSlug,
 				allowResize: false,
-				isGrouped: true,
 			},
 			imageBlocks,
 		];
 	},
 };
 
-const v2 = {
-	attributes: {
-		images: {
-			type: 'array',
-			default: [],
-			source: 'query',
-			selector: 'ul.wp-block-gallery .blocks-gallery-item',
-			query: {
-				url: {
-					source: 'attribute',
-					selector: 'img',
-					attribute: 'src',
-				},
-				alt: {
-					source: 'attribute',
-					selector: 'img',
-					attribute: 'alt',
-					default: '',
-				},
-				id: {
-					source: 'attribute',
-					selector: 'img',
-					attribute: 'data-id',
-				},
-				link: {
-					source: 'attribute',
-					selector: 'img',
-					attribute: 'data-link',
-				},
-				caption: {
-					type: 'array',
-					source: 'children',
-					selector: 'figcaption',
-				},
-			},
-		},
-		columns: {
-			type: 'number',
-		},
-		imageCrop: {
-			type: 'boolean',
-			default: true,
-		},
-		linkTo: {
-			type: 'string',
-			default: 'none',
-		},
-	},
-	isEligible( { images, ids } ) {
-		return (
-			images &&
-			images.length > 0 &&
-			( ( ! ids && images ) ||
-				( ids && images && ids.length !== images.length ) ||
-				some( images, ( id, index ) => {
-					if ( ! id && ids[ index ] !== null ) {
-						return true;
-					}
-					return parseInt( id, 10 ) !== ids[ index ];
-				} ) )
-		);
-	},
-	migrate( attributes ) {
-		return {
-			...attributes,
-			ids: map( attributes.images, ( { id } ) => {
-				if ( ! id ) {
-					return null;
-				}
-				return parseInt( id, 10 );
-			} ),
-		};
-	},
-	supports: {
-		align: true,
-	},
-	save( { attributes } ) {
-		const {
-			images,
-			columns = defaultColumnsNumberV1( attributes ),
-			imageCrop,
-			linkTo,
-		} = attributes;
-		return (
-			<ul
-				className={ `columns-${ columns } ${
-					imageCrop ? 'is-cropped' : ''
-				}` }
-			>
-				{ images.map( ( image ) => {
-					let href;
-
-					switch ( linkTo ) {
-						case 'media':
-							href = image.url;
-							break;
-						case 'attachment':
-							href = image.link;
-							break;
-					}
-
-					const img = (
-						<img
-							src={ image.url }
-							alt={ image.alt }
-							data-id={ image.id }
-							data-link={ image.link }
-							className={
-								image.id ? `wp-image-${ image.id }` : null
-							}
-						/>
-					);
-
-					return (
-						<li
-							key={ image.id || image.url }
-							className="blocks-gallery-item"
-						>
-							<figure>
-								{ href ? <a href={ href }>{ img }</a> : img }
-								{ image.caption && image.caption.length > 0 && (
-									<RichText.Content
-										tagName="figcaption"
-										value={ image.caption }
-									/>
-								) }
-							</figure>
-						</li>
-					);
-				} ) }
-			</ul>
-		);
-	},
-};
-
-const v3 = {
+/*
+ * With the moved to innerBlocks in v7 deprecations 2 & 3 could be combined as the only difference between these
+ * versions was the addition of the 'ids' attribute which is stripped out in v7 anyway.
+ */
+const v2v3 = {
 	attributes: {
 		images: {
 			type: 'array',
@@ -473,7 +340,6 @@ const v3 = {
 				linkTo,
 				sizeSlug,
 				allowResize: false,
-				isGrouped: true,
 			},
 			imageBlocks,
 		];
@@ -561,7 +427,6 @@ const v4 = {
 				linkTo,
 				sizeSlug,
 				allowResize: false,
-				isGrouped: true,
 			},
 			imageBlocks,
 		];
@@ -740,7 +605,6 @@ const v5 = {
 				linkTo,
 				sizeSlug: attributes.sizeSlug,
 				allowResize: false,
-				isGrouped: true,
 			},
 			imageBlocks,
 		];
@@ -990,11 +854,10 @@ const v6 = {
 				linkTo,
 				sizeSlug,
 				allowResize: false,
-				isGrouped: true,
 			},
 			imageBlocks,
 		];
 	},
 };
 
-export default [ v6, v5, v4, v3, v2, v1 ];
+export default [ v6, v5, v4, v2v3, v1 ];
