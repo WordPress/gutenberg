@@ -92,13 +92,18 @@
 		"allowResize": {
 			"type": "boolean",
 			"default": false
+		},
+		"fixedHeight": {
+			"type": "boolean",
+			"default": true
 		}
 	},
 	"providesContext": {
 		"allowResize": "allowResize"
 	},
 	"providesNativeInnerBlockContext": {
-		"imageCrop": "imageCrop"
+		"imageCrop": "imageCrop",
+		"fixedHeight": "fixedHeight"
 	},
 	"supports": {
 		"anchor": true,
