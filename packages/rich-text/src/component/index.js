@@ -101,6 +101,12 @@ export function useRichText( {
 
 	if ( ! record.current ) {
 		setRecordFromProps();
+		// Sometimes properties are added programmatically
+		// and we need to make sure it's persisted to the
+		// block store / markup.
+		if ( record.current.formats.length > 0 ) {
+			handleChangesUponInit( record.current );
+		}
 	} else if (
 		selectionStart !== record.current.start ||
 		selectionEnd !== record.current.end
@@ -145,6 +151,31 @@ export function useRichText( {
 		// We batch both calls to only attempt to rerender once.
 		registry.batch( () => {
 			onSelectionChange( start, end );
+			onChange( _value.current, {
+				__unstableFormats: formats,
+				__unstableText: text,
+			} );
+		} );
+		forceRender();
+	}
+
+	function handleChangesUponInit( newRecord ) {
+		record.current = newRecord;
+
+		_value.current = toHTMLString( {
+			value: __unstableBeforeSerialize
+				? {
+						...newRecord,
+						formats: __unstableBeforeSerialize( newRecord ),
+				  }
+				: newRecord,
+			multilineTag,
+			preserveWhiteSpace,
+		} );
+
+		const { formats, text } = newRecord;
+
+		registry.batch( () => {
 			onChange( _value.current, {
 				__unstableFormats: formats,
 				__unstableText: text,
