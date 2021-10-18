@@ -2,7 +2,7 @@
  * External dependencies
  */
 // eslint-disable-next-line no-restricted-imports
-import type { ReactNode } from 'react';
+import type { ReactNode, CSSProperties } from 'react';
 
 type ResetAllFilter = () => void;
 type ResetAll = ( filters?: ResetAllFilter[] ) => void;
@@ -110,7 +110,7 @@ export type ToolsPanelItemProps = ToolsPanelItem & {
 	 * grid or how many columns it should span. This maps to the CSS grid-column
 	 * property.
 	 */
-	gridColumn?: string;
+	gridColumn?: CSSProperties[ 'gridColumn' ];
 	/**
 	 * Called when this item is deselected in the `ToolsPanel` menu. This is
 	 * normally used to reset the panel item control's value.
