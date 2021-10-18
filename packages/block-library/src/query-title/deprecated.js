@@ -2,16 +2,32 @@
  * Internal dependencies
  */
 import migrateFontFamily from '../utils/migrate-font-family';
-import blockConfig from './block.json';
-
-const {
-	attributes: currentAttributes,
-	supports: currentSupports,
-} = blockConfig;
 
 const v1 = {
-	attributes: currentAttributes,
-	supports: currentSupports,
+	attributes: {
+		type: {
+			type: 'string',
+		},
+		textAlign: {
+			type: 'string',
+		},
+		level: {
+			type: 'number',
+			default: 1,
+		},
+	},
+	supports: {
+		align: [ 'wide', 'full' ],
+		html: false,
+		color: {
+			gradients: true,
+		},
+		typography: {
+			fontSize: true,
+			lineHeight: true,
+			__experimentalFontFamily: true,
+		},
+	},
 	save() {
 		return null;
 	},
