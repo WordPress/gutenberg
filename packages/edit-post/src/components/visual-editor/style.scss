@@ -44,7 +44,8 @@
 		margin-right: auto;
 	}
 
-	margin-top: var(--wp--style--block-gap);
+	// Add extra margin at the top, to push down the Title area in the post editor.
+	margin-top: max(var(--wp--style--block-gap, #{ $grid-unit-10 * 8 }), #{ $grid-unit-10 * 8 });
 	margin-bottom: var(--wp--style--block-gap);
 }
 
