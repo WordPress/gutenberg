@@ -6,7 +6,7 @@ import { render, screen, fireEvent } from '@testing-library/react';
 /**
  * Internal dependencies
  */
-import { ToolsPanel, ToolsPanelItem } from '../';
+import { ToolsPanel, ToolsPanelContext, ToolsPanelItem } from '../';
 import { createSlotFill, Provider as SlotFillProvider } from '../../slot-fill';
 
 const { Fill: ToolsPanelItems, Slot } = createSlotFill( 'ToolsPanelSlot' );
@@ -474,6 +474,10 @@ describe( 'ToolsPanel', () => {
 	} );
 
 	describe( 'rendering via SlotFills', () => {
+		beforeEach( () => {
+			jest.clearAllMocks();
+		} );
+
 		it( 'should maintain visual order of controls when toggled on and off', async () => {
 			// Multiple fills are added to better simulate panel items being
 			// injected from different locations.
@@ -525,6 +529,62 @@ describe( 'ToolsPanel', () => {
 			expect( items ).toHaveLength( 2 );
 			expect( items[ 0 ] ).toHaveTextContent( 'Item 1' );
 			expect( items[ 1 ] ).toHaveTextContent( 'Item 2' );
+		} );
+
+		it( 'should not trigger callback when fill has not updated yet when panel has', () => {
+			// Fill provided controls can update independently to the panel.
+			// A `panelId` prop was added to both panels and items
+			// so it could prevent erroneous registrations and calls to
+			// `onDeselect` etc.
+			//
+			// This test simulates this issue by rendering an item within a
+			// contrived `ToolsPanelContext` to reflect the changes the panel
+			// item needs to protect against.
+
+			const noop = () => undefined;
+			const context = {
+				panelId: '1234',
+				menuItems: {
+					default: {},
+					optional: { [ altControlProps.label ]: true },
+				},
+				hasMenuItems: false,
+				isResetting: false,
+				shouldRenderPlaceholderItems: false,
+				registerPanelItem: noop,
+				deregisterPanelItem: noop,
+				flagItemCustomization: noop,
+				areAllOptionalControlsHidden: true,
+			};
+
+			// This initial render gives the tools panel item a chance to
+			// set its internal state to reflect it was previously selected.
+			// This later forms part of the condition used to determine if an
+			// item is being deselected and thus call the onDeselect callback.
+			const { rerender } = render(
+				<ToolsPanelContext.Provider value={ context }>
+					<ToolsPanelItem { ...altControlProps } panelId="1234">
+						<div>Item</div>
+					</ToolsPanelItem>
+				</ToolsPanelContext.Provider>
+			);
+
+			// Simulate a change in panel separate to the rendering of fills.
+			// e.g. a switch of block selection.
+			context.panelId = '4321';
+			context.menuItems.optional[ altControlProps.label ] = false;
+
+			// Rerender the panel item and ensure that it skips any check
+			// for deselection given it still belongs to a different panelId.
+			rerender(
+				<ToolsPanelContext.Provider value={ context }>
+					<ToolsPanelItem { ...altControlProps } panelId="1234">
+						<div>Item</div>
+					</ToolsPanelItem>
+				</ToolsPanelContext.Provider>
+			);
+
+			expect( altControlProps.onDeselect ).not.toHaveBeenCalled();
 		} );
 	} );
 
