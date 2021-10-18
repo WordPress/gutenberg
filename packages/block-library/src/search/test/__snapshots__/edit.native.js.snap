@@ -12,33 +12,55 @@ exports[`Search Block renders block with button inside option 1`] = `
     accessible={true}
   >
     <View>
-      <TextInput
-        accessibilityLabel="Text input. <p>Search</p>"
+      <RCTAztecView
+        accessible={true}
         activeFormats={Array []}
-        allowFontScaling={true}
         blockType={
           Object {
             "tag": "p",
           }
         }
         disableEditingMenu={false}
+        focusable={true}
         fontFamily="serif"
         fontSize={16}
         isMultiline={false}
         maxImagesWidth={200}
+        onBackspace={[Function]}
         onBlur={[Function]}
         onChange={[Function]}
+        onClick={[Function]}
         onContentSizeChange={[Function]}
+        onEnter={[Function]}
         onFocus={[Function]}
+        onHTMLContentWithCursor={[Function]}
         onKeyDown={[Function]}
         onPaste={[Function]}
+        onResponderGrant={[Function]}
+        onResponderMove={[Function]}
+        onResponderRelease={[Function]}
+        onResponderTerminate={[Function]}
+        onResponderTerminationRequest={[Function]}
         onSelectionChange={[Function]}
+        onStartShouldSetResponder={[Function]}
         placeholder="Add label…"
         placeholderTextColor="gray"
-        rejectResponderTermination={true}
+        style={
+          Object {
+            "backgroundColor": undefined,
+            "maxWidth": undefined,
+            "minHeight": 0,
+          }
+        }
+        text={
+          Object {
+            "eventCount": undefined,
+            "linkTextColor": undefined,
+            "selection": null,
+            "text": "<p>Search</p>",
+          }
+        }
         triggerKeyCodes={Array []}
-        underlineColorAndroid="transparent"
-        value="<p>Search</p>"
       />
     </View>
   </View>
@@ -100,35 +122,57 @@ exports[`Search Block renders block with button inside option 1`] = `
         onLayout={[Function]}
       >
         <View>
-          <TextInput
-            accessibilityLabel="Text input. <p>Search Button</p>"
+          <RCTAztecView
+            accessible={true}
             activeFormats={Array []}
-            allowFontScaling={true}
             blockType={
               Object {
                 "tag": "p",
               }
             }
             disableEditingMenu={false}
+            focusable={true}
             fontFamily="serif"
             fontSize={16}
             isMultiline={false}
             maxImagesWidth={200}
             minWidth={75}
+            onBackspace={[Function]}
             onBlur={[Function]}
             onChange={[Function]}
+            onClick={[Function]}
             onContentSizeChange={[Function]}
+            onEnter={[Function]}
             onFocus={[Function]}
+            onHTMLContentWithCursor={[Function]}
             onKeyDown={[Function]}
             onPaste={[Function]}
+            onResponderGrant={[Function]}
+            onResponderMove={[Function]}
+            onResponderRelease={[Function]}
+            onResponderTerminate={[Function]}
+            onResponderTerminationRequest={[Function]}
             onSelectionChange={[Function]}
+            onStartShouldSetResponder={[Function]}
             placeholder=""
             placeholderTextColor="gray"
-            rejectResponderTermination={true}
+            style={
+              Object {
+                "backgroundColor": undefined,
+                "maxWidth": NaN,
+                "minHeight": 0,
+              }
+            }
+            text={
+              Object {
+                "eventCount": undefined,
+                "linkTextColor": undefined,
+                "selection": null,
+                "text": "<p>Search Button</p>",
+              }
+            }
             textAlign="center"
             triggerKeyCodes={Array []}
-            underlineColorAndroid="transparent"
-            value="<p>Search Button</p>"
           />
         </View>
       </View>
@@ -149,33 +193,55 @@ exports[`Search Block renders block with icon button option matches snapshot 1`]
     accessible={true}
   >
     <View>
-      <TextInput
-        accessibilityLabel="Text input. <p>Search</p>"
+      <RCTAztecView
+        accessible={true}
         activeFormats={Array []}
-        allowFontScaling={true}
         blockType={
           Object {
             "tag": "p",
           }
         }
         disableEditingMenu={false}
+        focusable={true}
         fontFamily="serif"
         fontSize={16}
         isMultiline={false}
         maxImagesWidth={200}
+        onBackspace={[Function]}
         onBlur={[Function]}
         onChange={[Function]}
+        onClick={[Function]}
         onContentSizeChange={[Function]}
+        onEnter={[Function]}
         onFocus={[Function]}
+        onHTMLContentWithCursor={[Function]}
         onKeyDown={[Function]}
         onPaste={[Function]}
+        onResponderGrant={[Function]}
+        onResponderMove={[Function]}
+        onResponderRelease={[Function]}
+        onResponderTerminate={[Function]}
+        onResponderTerminationRequest={[Function]}
         onSelectionChange={[Function]}
+        onStartShouldSetResponder={[Function]}
         placeholder="Add label…"
         placeholderTextColor="gray"
-        rejectResponderTermination={true}
+        style={
+          Object {
+            "backgroundColor": undefined,
+            "maxWidth": undefined,
+            "minHeight": 0,
+          }
+        }
+        text={
+          Object {
+            "eventCount": undefined,
+            "linkTextColor": undefined,
+            "selection": null,
+            "text": "<p>Search</p>",
+          }
+        }
         triggerKeyCodes={Array []}
-        underlineColorAndroid="transparent"
-        value="<p>Search</p>"
       />
     </View>
   </View>
@@ -300,35 +366,57 @@ exports[`Search Block renders block with label hidden matches snapshot 1`] = `
         onLayout={[Function]}
       >
         <View>
-          <TextInput
-            accessibilityLabel="Text input. <p>Search Button</p>"
+          <RCTAztecView
+            accessible={true}
             activeFormats={Array []}
-            allowFontScaling={true}
             blockType={
               Object {
                 "tag": "p",
               }
             }
             disableEditingMenu={false}
+            focusable={true}
             fontFamily="serif"
             fontSize={16}
             isMultiline={false}
             maxImagesWidth={200}
             minWidth={75}
+            onBackspace={[Function]}
             onBlur={[Function]}
             onChange={[Function]}
+            onClick={[Function]}
             onContentSizeChange={[Function]}
+            onEnter={[Function]}
             onFocus={[Function]}
+            onHTMLContentWithCursor={[Function]}
             onKeyDown={[Function]}
             onPaste={[Function]}
+            onResponderGrant={[Function]}
+            onResponderMove={[Function]}
+            onResponderRelease={[Function]}
+            onResponderTerminate={[Function]}
+            onResponderTerminationRequest={[Function]}
             onSelectionChange={[Function]}
+            onStartShouldSetResponder={[Function]}
             placeholder=""
             placeholderTextColor="gray"
-            rejectResponderTermination={true}
+            style={
+              Object {
+                "backgroundColor": undefined,
+                "maxWidth": NaN,
+                "minHeight": 0,
+              }
+            }
+            text={
+              Object {
+                "eventCount": undefined,
+                "linkTextColor": undefined,
+                "selection": null,
+                "text": "<p>Search Button</p>",
+              }
+            }
             textAlign="center"
             triggerKeyCodes={Array []}
-            underlineColorAndroid="transparent"
-            value="<p>Search Button</p>"
           />
         </View>
       </View>
@@ -349,33 +437,55 @@ exports[`Search Block renders with default configuration matches snapshot 1`] = 
     accessible={true}
   >
     <View>
-      <TextInput
-        accessibilityLabel="Text input. <p>Search</p>"
+      <RCTAztecView
+        accessible={true}
         activeFormats={Array []}
-        allowFontScaling={true}
         blockType={
           Object {
             "tag": "p",
           }
         }
         disableEditingMenu={false}
+        focusable={true}
         fontFamily="serif"
         fontSize={16}
         isMultiline={false}
         maxImagesWidth={200}
+        onBackspace={[Function]}
         onBlur={[Function]}
         onChange={[Function]}
+        onClick={[Function]}
         onContentSizeChange={[Function]}
+        onEnter={[Function]}
         onFocus={[Function]}
+        onHTMLContentWithCursor={[Function]}
         onKeyDown={[Function]}
         onPaste={[Function]}
+        onResponderGrant={[Function]}
+        onResponderMove={[Function]}
+        onResponderRelease={[Function]}
+        onResponderTerminate={[Function]}
+        onResponderTerminationRequest={[Function]}
         onSelectionChange={[Function]}
+        onStartShouldSetResponder={[Function]}
         placeholder="Add label…"
         placeholderTextColor="gray"
-        rejectResponderTermination={true}
+        style={
+          Object {
+            "backgroundColor": undefined,
+            "maxWidth": undefined,
+            "minHeight": 0,
+          }
+        }
+        text={
+          Object {
+            "eventCount": undefined,
+            "linkTextColor": undefined,
+            "selection": null,
+            "text": "<p>Search</p>",
+          }
+        }
         triggerKeyCodes={Array []}
-        underlineColorAndroid="transparent"
-        value="<p>Search</p>"
       />
     </View>
   </View>
@@ -437,35 +547,57 @@ exports[`Search Block renders with default configuration matches snapshot 1`] = 
         onLayout={[Function]}
       >
         <View>
-          <TextInput
-            accessibilityLabel="Text input. <p>Search Button</p>"
+          <RCTAztecView
+            accessible={true}
             activeFormats={Array []}
-            allowFontScaling={true}
             blockType={
               Object {
                 "tag": "p",
               }
             }
             disableEditingMenu={false}
+            focusable={true}
             fontFamily="serif"
             fontSize={16}
             isMultiline={false}
             maxImagesWidth={200}
             minWidth={75}
+            onBackspace={[Function]}
             onBlur={[Function]}
             onChange={[Function]}
+            onClick={[Function]}
             onContentSizeChange={[Function]}
+            onEnter={[Function]}
             onFocus={[Function]}
+            onHTMLContentWithCursor={[Function]}
             onKeyDown={[Function]}
             onPaste={[Function]}
+            onResponderGrant={[Function]}
+            onResponderMove={[Function]}
+            onResponderRelease={[Function]}
+            onResponderTerminate={[Function]}
+            onResponderTerminationRequest={[Function]}
             onSelectionChange={[Function]}
+            onStartShouldSetResponder={[Function]}
             placeholder=""
             placeholderTextColor="gray"
-            rejectResponderTermination={true}
+            style={
+              Object {
+                "backgroundColor": undefined,
+                "maxWidth": NaN,
+                "minHeight": 0,
+              }
+            }
+            text={
+              Object {
+                "eventCount": undefined,
+                "linkTextColor": undefined,
+                "selection": null,
+                "text": "<p>Search Button</p>",
+              }
+            }
             textAlign="center"
             triggerKeyCodes={Array []}
-            underlineColorAndroid="transparent"
-            value="<p>Search Button</p>"
           />
         </View>
       </View>
@@ -486,33 +618,55 @@ exports[`Search Block renders with no-button option matches snapshot 1`] = `
     accessible={true}
   >
     <View>
-      <TextInput
-        accessibilityLabel="Text input. <p>Search</p>"
+      <RCTAztecView
+        accessible={true}
         activeFormats={Array []}
-        allowFontScaling={true}
         blockType={
           Object {
             "tag": "p",
           }
         }
         disableEditingMenu={false}
+        focusable={true}
         fontFamily="serif"
         fontSize={16}
         isMultiline={false}
         maxImagesWidth={200}
+        onBackspace={[Function]}
         onBlur={[Function]}
         onChange={[Function]}
+        onClick={[Function]}
         onContentSizeChange={[Function]}
+        onEnter={[Function]}
         onFocus={[Function]}
+        onHTMLContentWithCursor={[Function]}
         onKeyDown={[Function]}
         onPaste={[Function]}
+        onResponderGrant={[Function]}
+        onResponderMove={[Function]}
+        onResponderRelease={[Function]}
+        onResponderTerminate={[Function]}
+        onResponderTerminationRequest={[Function]}
         onSelectionChange={[Function]}
+        onStartShouldSetResponder={[Function]}
         placeholder="Add label…"
         placeholderTextColor="gray"
-        rejectResponderTermination={true}
+        style={
+          Object {
+            "backgroundColor": undefined,
+            "maxWidth": undefined,
+            "minHeight": 0,
+          }
+        }
+        text={
+          Object {
+            "eventCount": undefined,
+            "linkTextColor": undefined,
+            "selection": null,
+            "text": "<p>Search</p>",
+          }
+        }
         triggerKeyCodes={Array []}
-        underlineColorAndroid="transparent"
-        value="<p>Search</p>"
       />
     </View>
   </View>
