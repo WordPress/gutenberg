@@ -384,3 +384,57 @@ CSS;
 	}
 }
 add_action( 'admin_enqueue_scripts', 'gutenberg_add_block_menu_item_styles_to_nav_menus' );
+
+
+/**
+ * Registers block editor 'wp_navigation' post type.
+ */
+function gutenberg_register_navigation_post_type() {
+	// TODO - Some of the language here needs to be revised. 'Navigation' is a
+	// singular noun, so cannot comfortably be used in a plural form, which
+	// leads to a situation where something like 'menus' needs to be suffixed.
+	$labels = array(
+		'name'                  => __( 'Navigation', 'gutenberg' ),
+		'singular_name'         => __( 'Navigation', 'gutenberg' ),
+		'menu_name'             => _x( 'Navigation', 'Admin Menu text', 'gutenberg' ),
+		'add_new'               => _x( 'Add New', 'Navigation', 'gutenberg' ),
+		'add_new_item'          => __( 'Add New Navigation', 'gutenberg' ),
+		'new_item'              => __( 'New Navigation', 'gutenberg' ),
+		'edit_item'             => __( 'Edit Navigation', 'gutenberg' ),
+		'view_item'             => __( 'View Navigation', 'gutenberg' ),
+		'all_items'             => __( 'All Navigation Menus', 'gutenberg' ),
+		'search_items'          => __( 'Search Navigation Menus', 'gutenberg' ),
+		'parent_item_colon'     => __( 'Parent Navigation:', 'gutenberg' ),
+		'not_found'             => __( 'No Navigation found.', 'gutenberg' ),
+		'not_found_in_trash'    => __( 'No Navigation found in Trash.', 'gutenberg' ),
+		'archives'              => __( 'Navigation archives', 'gutenberg' ),
+		'insert_into_item'      => __( 'Insert into Navigation', 'gutenberg' ),
+		'uploaded_to_this_item' => __( 'Uploaded to this Navigation', 'gutenberg' ),
+		// Some of these are a bit weird, what are they for?
+		'filter_items_list'     => __( 'Filter Navigation list', 'gutenberg' ),
+		'items_list_navigation' => __( 'Navigation Menus list navigation', 'gutenberg' ),
+		'items_list'            => __( 'Navigation Menus list', 'gutenberg' ),
+	);
+
+	$args = array(
+		'labels'            => $labels,
+		'description'       => __( 'Navigation menus.', 'gutenberg' ),
+		'public'            => false,
+		'has_archive'       => false,
+		'show_ui'           => true,
+		'show_in_menu'      => 'themes.php',
+		'show_in_admin_bar' => false,
+		'show_in_rest'      => true,
+		'map_meta_cap'      => true,
+		'supports'          => array(
+			'title',
+			'slug',
+			'excerpt',
+			'editor',
+			'revisions',
+		),
+	);
+
+	register_post_type( 'wp_navigation', $args );
+}
+add_action( 'init', 'gutenberg_register_navigation_post_type' );
