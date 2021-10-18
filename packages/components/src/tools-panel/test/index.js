@@ -344,7 +344,7 @@ describe( 'ToolsPanel', () => {
 
 			// When rendered as a placeholder a ToolsPanelItem will just omit
 			// all the item's children. So the container element will still be
-			// there holding it's position but the inner text etc should not be
+			// there holding its position but the inner text etc should not be
 			// there.
 			expect( optionalItem ).not.toBeInTheDocument();
 		} );
