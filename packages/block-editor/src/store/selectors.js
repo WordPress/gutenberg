@@ -1566,15 +1566,22 @@ export const getInserterItems = createSelector(
 		const buildReusableBlockInserterItem = ( reusableBlock ) => {
 			const id = `core/block/${ reusableBlock.id }`;
 
-			const referencedBlocks = __experimentalGetParsedReusableBlock(
-				state,
-				reusableBlock.id
+			const blockTypeNames = getBlockTypes().map( ( blockType ) =>
+				blockType.name.replace( 'core/', 'wp:' )
 			);
-			let referencedBlockType;
-			if ( referencedBlocks.length === 1 ) {
-				referencedBlockType = getBlockType(
-					referencedBlocks[ 0 ].name
+			const referencedBlock = blockTypeNames.find(
+				( blockTypeName ) =>
+					reusableBlock.content.raw &&
+					reusableBlock.content.raw.includes( blockTypeName )
+			);
+
+			let icon = symbol;
+			if ( Platform.OS === 'web' && referencedBlock ) {
+				const referencedBlockType = getBlockType(
+					referencedBlock.replace( 'wp:', 'core/' )
 				);
+
+				icon = referencedBlockType.icon;
 			}
 
 			const { time, count = 0 } = getInsertUsage( state, id ) || {};
@@ -1585,10 +1592,7 @@ export const getInserterItems = createSelector(
 				name: 'core/block',
 				initialAttributes: { ref: reusableBlock.id },
 				title: reusableBlock.title.raw,
-				icon:
-					referencedBlockType && Platform.OS === 'web'
-						? referencedBlockType.icon
-						: symbol,
+				icon,
 				category: 'reusable',
 				keywords: [],
 				isDisabled: false,
@@ -2070,35 +2074,6 @@ export const __experimentalGetBlockListSettingsForBlocks = createSelector(
 		}, {} );
 	},
 	( state ) => [ state.blockListSettings ]
-);
-
-/**
- * Returns the parsed block saved as shared block with the given ID.
- *
- * @param {Object}        state Global application state.
- * @param {number|string} ref   The shared block's ID.
- *
- * @return {Object} The parsed block.
- */
-export const __experimentalGetParsedReusableBlock = createSelector(
-	( state, ref ) => {
-		const reusableBlock = find(
-			getReusableBlocks( state ),
-			( block ) => block.id === ref
-		);
-		if ( ! reusableBlock ) {
-			return null;
-		}
-
-		// Only reusableBlock.content.raw should be used here, `reusableBlock.content` is a
-		// workaround until #22127 is fixed.
-		return parse(
-			typeof reusableBlock.content.raw === 'string'
-				? reusableBlock.content.raw
-				: reusableBlock.content
-		);
-	},
-	( state ) => [ getReusableBlocks( state ) ]
 );
 
 /**
