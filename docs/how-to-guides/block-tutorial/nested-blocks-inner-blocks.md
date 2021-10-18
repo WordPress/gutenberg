@@ -79,7 +79,7 @@ const ALLOWED_BLOCKS = [ 'core/image', 'core/paragraph' ];
 
 ## Orientation
 
-By default, `InnerBlocks` expects its blocks to be shown in a vertical list. A valid use-case is to style InnerBlocks to appear horizontally, for instance by adding css flex or grid properties to the inner blocks wrapper. When blocks are styled in such a way, the `orientation` prop can be set to indicate that a horizontal layout is being used:
+By default, `InnerBlocks` expects its blocks to be shown in a vertical list. A valid use-case is to style inner blocks to appear horizontally, for instance by adding CSS flex or grid properties to the inner blocks wrapper. When blocks are styled in such a way, the `orientation` prop can be set to indicate that a horizontal layout is being used:
 
 ```js
 <InnerBlocks orientation="horizontal" />
