@@ -25,10 +25,12 @@ function render_block_core_post_comment_author_avatar( $attributes, $content, $b
 
 	$wrapper_attributes = get_block_wrapper_attributes();
 
-	$width  = isset( $attributes['width'] ) ? $attributes['width'] : '96';
-	$height = isset( $attributes['height'] ) ? $attributes['height'] : '96';
+	$width     = isset( $attributes['width'] ) ? $attributes['width'] : '96';
+	$height    = isset( $attributes['height'] ) ? $attributes['height'] : '96';
+	$className = isset( $attributes['className'] ) ? $attributes['className'] : '';
 	/* translators: %s is the Comment Author name */
 	$alt = sprintf( __( '%s Avatar' ), $comment->comment_author );
+
 
 	return get_avatar(
 		$comment,
@@ -39,7 +41,7 @@ function render_block_core_post_comment_author_avatar( $attributes, $content, $b
 			'height'     => $height,
 			'width'      => $width,
 			'extra_attr' => $wrapper_attributes,
-			'class'      => 'wp-block-comment-avatar ' . $attributes['className'],
+			'class'      => 'wp-block-comment-avatar ' . $className,
 		)
 	);
 }

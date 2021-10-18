@@ -4,11 +4,18 @@
 		"name": "core/post-comment-author-avatar",
 		"isValid": true,
 		"attributes": {
-			"width": 153,
-			"height": 153,
+			"width": 126,
+			"height": 126,
+			"className": "additional-class",
 			"style": {
 				"border": {
-					"radius": "61%"
+					"width": "11px",
+					"style": "solid",
+					"color": "#8000ff",
+					"radius": "100%"
+				},
+				"color": {
+					"background": "#ff0000"
 				},
 				"spacing": {
 					"padding": {

@@ -25,6 +25,11 @@
 			"color": true,
 			"style": true
 		},
+		"color": {
+			"background": true,
+			"text": false,
+			"links": false
+		},
 		"spacing": {
 			"padding": true,
 			"__experimentalDefaultControls": {
