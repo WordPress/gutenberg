@@ -30,6 +30,11 @@ $preview-image-height: 140px;
 	position: relative;
 }
 
+// Provides positioning context for search actions
+.block-editor-link-control__search-input-container {
+	position: relative;
+}
+
 // If the input doesn't have a visible label then
 // we need to expand it to the full available horizontal space.
 .block-editor-link-control__search-input.has-no-label {
@@ -85,10 +90,6 @@ $preview-image-height: 140px;
 	 */
 	top: 1px + ( ( 40px - $button-size ) * 0.5 );
 	right: $grid-unit-20 + 1px + min($grid-unit-10, ( 40px - $button-size ) * 0.5);
-}
-
-.block-editor-link-control__search-input-wrapper.has-text-control .block-editor-link-control__search-actions {
-	top: 59px; // TODO: figure this out in variables!
 }
 
 .components-button .block-editor-link-control__search-submit .has-icon {

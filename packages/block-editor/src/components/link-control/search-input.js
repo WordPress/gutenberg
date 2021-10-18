@@ -123,7 +123,7 @@ const LinkControlSearchInput = forwardRef(
 		} );
 
 		return (
-			<div>
+			<div className="block-editor-link-control__search-input-container">
 				<URLInput
 					label={ useLabel ? 'URL' : undefined }
 					className={ inputClasses }
