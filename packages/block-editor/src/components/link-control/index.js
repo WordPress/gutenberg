@@ -126,6 +126,7 @@ function LinkControl( {
 		withCreateSuggestion = true;
 	}
 
+	const isMounting = useRef( true );
 	const wrapperNode = useRef();
 	const textInputRef = useRef();
 
@@ -155,7 +156,14 @@ function LinkControl( {
 	}, [ forceIsEditingLink ] );
 
 	useEffect( () => {
-		// We always want to focus either:
+		// We don't auto focus into the Link UI on mount
+		// because otherwise using the keyboard to select text
+		// *within* the link format is not possible.
+		if ( isMounting.current ) {
+			isMounting.current = false;
+			return;
+		}
+		// Unless we are mounting, we always want to focus either:
 		// - the URL input
 		// - the first focusable element in the Link UI.
 		// But in editing mode if there is a text input present then
