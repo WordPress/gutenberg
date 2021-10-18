@@ -37,10 +37,7 @@ import {
 	useRef,
 	createInterpolateElement,
 } from '@wordpress/element';
-import {
-	placeCaretAtHorizontalEdge,
-	__unstableStripHTML as stripHTML,
-} from '@wordpress/dom';
+import { placeCaretAtHorizontalEdge } from '@wordpress/dom';
 import { link as linkIcon, addSubmenu } from '@wordpress/icons';
 import { store as coreStore } from '@wordpress/core-data';
 
@@ -266,6 +263,22 @@ export const updateNavigationLinkBlockAttributes = (
 	} );
 };
 
+/**
+ * Removes HTML from a given string.
+ * Note the does not provide XSS protection or otherwise attempt
+ * to filter strings with malicious intent.
+ *
+ * See also: https://github.com/WordPress/gutenberg/pull/35539
+ *
+ * @param {string} html the string from which HTML should be removed.
+ * @return {string} the "cleaned" string.
+ */
+function navStripHTML( html ) {
+	const doc = document.implementation.createHTMLDocument( '' );
+	doc.body.innerHTML = html;
+	return doc.body.textContent || '';
+}
+
 export default function NavigationLinkEdit( {
 	attributes,
 	isSelected,
@@ -290,7 +303,7 @@ export default function NavigationLinkEdit( {
 	const link = {
 		url,
 		opensInNewTab,
-		title: label && stripHTML( label ), // don't allow HTML to display inside the <LinkControl>
+		title: label && navStripHTML( label ), // don't allow HTML to display inside the <LinkControl>
 	};
 	const { saveEntityRecord } = useDispatch( coreStore );
 	const {
