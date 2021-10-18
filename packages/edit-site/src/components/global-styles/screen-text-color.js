@@ -3,10 +3,6 @@
  */
 import { __ } from '@wordpress/i18n';
 import { __experimentalPanelColorGradientSettings as PanelColorGradientSettings } from '@wordpress/block-editor';
-import {
-	ColorIndicator,
-	__experimentalHStack as HStack,
-} from '@wordpress/components';
 
 /**
  * Internal dependencies
@@ -46,12 +42,7 @@ function ScreenTextColor( { name } ) {
 		<>
 			<ScreenHeader
 				back={ parentMenu + '/colors' }
-				title={
-					<HStack justify="flex-start" spacing={ 3 }>
-						<span>{ __( 'Text' ) }</span>
-						<ColorIndicator colorValue={ color } />
-					</HStack>
-				}
+				title={ __( 'Text' ) }
 				description={ __(
 					'Set the default color used for text across the site.'
 				) }
