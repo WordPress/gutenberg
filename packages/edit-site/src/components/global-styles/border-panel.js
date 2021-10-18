@@ -72,11 +72,10 @@ export default function BorderPanel( { name } ) {
 	// To better reflect if the user has customized a value we need to
 	// ensure the style value being checked is from the `user` origin.
 	const [ userBorderStyles ] = useStyle( 'border', name, 'user' );
-	const createHasValueCallback = ( feature ) => () => 
+	const createHasValueCallback = ( feature ) => () =>
 		!! userBorderStyles?.[ feature ];
 
-	const createResetCallback = ( setStyle ) => () =>
-		setStyle( undefined );
+	const createResetCallback = ( setStyle ) => () => setStyle( undefined );
 
 	const handleOnChange = ( setStyle ) => ( value ) => {
 		setStyle( value || undefined );
@@ -115,19 +114,19 @@ export default function BorderPanel( { name } ) {
 		name
 	);
 	const hasBorderRadius = () => {
-		const borderValues = userBorderStyles?.[ 'radius' ];
+		const borderValues = userBorderStyles?.radius;
 		if ( typeof borderValues === 'object' ) {
 			return Object.entries( borderValues ).some( Boolean );
 		}
 		return !! borderValues;
-	}
+	};
 
 	const resetAll = () => {
 		setBorderColor( undefined );
 		setBorderRadius( undefined );
 		setBorderStyle( undefined );
 		setBorderWidth( undefined );
-	}
+	};
 
 	return (
 		<ToolsPanel label={ __( 'Border' ) } resetAll={ resetAll }>
@@ -138,16 +137,16 @@ export default function BorderPanel( { name } ) {
 					label={ __( 'Width' ) }
 					onDeselect={ createResetCallback( setBorderWidth ) }
 					isShownByDefault={ true }
-					>
-						<UnitControl
-							value={ borderWidthValue }
-							label={ __( 'Width' ) }
-							min={ MIN_BORDER_WIDTH }
-							onChange={ handleOnChange( setBorderWidth ) }
-							units={ units }
-						/>
-					</ToolsPanelItem>
-			)}
+				>
+					<UnitControl
+						value={ borderWidthValue }
+						label={ __( 'Width' ) }
+						min={ MIN_BORDER_WIDTH }
+						onChange={ handleOnChange( setBorderWidth ) }
+						units={ units }
+					/>
+				</ToolsPanelItem>
+			) }
 			{ showBorderStyle && (
 				<ToolsPanelItem
 					className="single-column"
