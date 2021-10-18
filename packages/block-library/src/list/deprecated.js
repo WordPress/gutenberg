@@ -50,6 +50,7 @@ const v1 = {
 		},
 		__unstablePasteTextInline: true,
 		__experimentalSelector: 'ol,ul',
+		__experimentalSlashInserter: true,
 	},
 	save( { attributes } ) {
 		const { ordered, values, type, reversed, start } = attributes;
