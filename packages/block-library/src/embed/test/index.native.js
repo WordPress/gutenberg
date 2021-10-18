@@ -76,11 +76,6 @@ const RICH_TEXT_EMBED_HTML = `<!-- wp:embed {"url":"https://twitter.com/notnowni
 https://twitter.com/notnownikki
 </div></figure>
 <!-- /wp:embed -->`;
-// const VIDEO_EMBED_HTML = `<!-- wp:embed {"url":"https://www.youtube.com/watch?v=lXMskKTw3Bc","type":"video","providerNameSlug":"youtube","responsive":true,"className":"wp-embed-aspect-16-9 wp-has-aspect-ratio"} -->
-// <figure class="wp-block-embed is-type-video is-provider-youtube wp-block-embed-youtube wp-embed-aspect-16-9 wp-has-aspect-ratio"><div class="wp-block-embed__wrapper">
-// https://www.youtube.com/watch?v=lXMskKTw3Bc
-// </div></figure>
-// <!-- /wp:embed -->`;
 const PHOTO_EMBED_HTML = `<!-- wp:embed {"url":"https://cloudup.com/cQFlxqtY4ob","type":"photo","providerNameSlug":"cloudup","responsive":true} -->
 <figure class="wp-block-embed is-type-photo is-provider-cloudup wp-block-embed-cloudup"><div class="wp-block-embed__wrapper">
 https://cloudup.com/cQFlxqtY4ob
