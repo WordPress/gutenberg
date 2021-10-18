@@ -537,6 +537,8 @@ describe( 'ToolsPanel', () => {
 			// so it could prevent erroneous registrations and calls to
 			// `onDeselect` etc.
 			//
+			// See: https://github.com/WordPress/gutenberg/pull/35375
+			//
 			// This test simulates this issue by rendering an item within a
 			// contrived `ToolsPanelContext` to reflect the changes the panel
 			// item needs to protect against.
