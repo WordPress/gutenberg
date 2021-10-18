@@ -67,14 +67,6 @@ export function DimensionPanel( props ) {
 
 ## Props
 
-### `columns`: `number`
-
-This defines the number of columns in the `ToolsPanel` grid layout. Items
-contained within are set to span all columns by default.
-
-- Required: No
-- Default: `2`
-
 ### `hasInnerWrapper`: `boolean`
 
 Flags that the items in this ToolsPanel will be contained within an inner
@@ -110,3 +102,7 @@ Advises the `ToolsPanel` that all of its `ToolsPanelItem` children should render
 placeholder content (instead of `null`) when they are toggled off and hidden.
 
 - Required: No
+
+### Inherited props
+
+`ToolsPanel` also inherits all of the [`Grid` props](/packages/components/src/grid/README.md#props).
