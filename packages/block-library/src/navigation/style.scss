@@ -326,7 +326,10 @@
 	// Horizontal layout
 	display: flex;
 	flex-wrap: wrap;
-	flex: 1;
+
+	.items-justified-space-between & {
+		flex-grow: 1;
+	}
 }
 
 // Vertical layout
