@@ -8,27 +8,28 @@ import { useCallback, useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 
 const PLACEHOLDER_STEPS = {
-	templatePart: 1,
-	navigation: 2,
+	selectNavigationPost: 1,
+	createInnerBlocks: 2,
 };
 
 /**
  * Internal dependencies
  */
-import TemplatePartStep from './template-part-step';
-import NavigationStep from './navigation-step';
+import SelectNavigationPostStep from './select-navigation-post-step';
+import CreateInnerBlocksStep from './create-inner-blocks-step';
 
 export default function Placeholder( {
-	area,
-	enableSelection,
-	hasResolvedReplacements,
 	onFinish,
+	canSwitchNavigationPost,
+	hasResolvedNavigationPosts,
 } ) {
-	const [ step, setStep ] = useState( PLACEHOLDER_STEPS.templatePart );
-	const [ templatePartTitle, setTemplatePartTitle ] = useState( '' );
+	const [ step, setStep ] = useState(
+		PLACEHOLDER_STEPS.selectNavigationPost
+	);
+	const [ navigationPostTitle, setNavigationPostTitle ] = useState( '' );
 	const { saveEntityRecord } = useDispatch( coreStore );
 
-	const createTemplatePart = useCallback(
+	const createNavigationPost = useCallback(
 		async ( title = __( 'Untitled Menu' ), blocks = [] ) => {
 			// If we have `area` set from block attributes, means an exposed
 			// block variation was inserted. So add this prop to the template
@@ -36,52 +37,44 @@ export default function Placeholder( {
 			// block attributes.
 			const record = {
 				title,
-				slug: 'template-part',
 				content: serialize( blocks ),
-				// `area` is filterable on the server and defaults to `UNCATEGORIZED`
-				// if provided value is not allowed.
-				area,
+				status: 'publish',
 			};
 
-			const templatePart = await saveEntityRecord(
+			const navigationPost = await saveEntityRecord(
 				'postType',
-				'wp_template_part',
+				'wp_navigation',
 				record
 			);
 
-			return {
-				slug: templatePart.slug,
-				theme: templatePart.theme,
-				area: undefined,
-			};
+			return navigationPost;
 		},
-		[ area ]
+		[ serialize, saveEntityRecord ]
 	);
 
 	return (
 		<>
-			{ step === PLACEHOLDER_STEPS.templatePart && (
-				<TemplatePartStep
-					area={ area }
-					enableSelection={ enableSelection }
-					hasResolvedReplacements={ hasResolvedReplacements }
+			{ step === PLACEHOLDER_STEPS.selectNavigationPost && (
+				<SelectNavigationPostStep
 					onCreateNew={ ( newTitle ) => {
-						setTemplatePartTitle( newTitle );
-						setStep( PLACEHOLDER_STEPS.navigation );
+						setNavigationPostTitle( newTitle );
+						setStep( PLACEHOLDER_STEPS.createInnerBlocks );
 					} }
-					onSelectExisting={ ( templatePartAttributes ) => {
-						onFinish( templatePartAttributes );
+					onSelectExisting={ ( navigationPost ) => {
+						onFinish( navigationPost );
 					} }
+					canSwitchNavigationPost={ canSwitchNavigationPost }
+					hasResolvedNavigationPosts={ hasResolvedNavigationPosts }
 				/>
 			) }
-			{ step === PLACEHOLDER_STEPS.navigation && (
-				<NavigationStep
+			{ step === PLACEHOLDER_STEPS.createInnerBlocks && (
+				<CreateInnerBlocksStep
 					onFinish={ async ( blocks ) => {
-						const templatePartAttributes = await createTemplatePart(
-							templatePartTitle,
+						const navigationPost = await createNavigationPost(
+							navigationPostTitle,
 							blocks
 						);
-						onFinish( templatePartAttributes );
+						onFinish( navigationPost );
 					} }
 				/>
 			) }

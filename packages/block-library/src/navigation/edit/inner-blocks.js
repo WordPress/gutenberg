@@ -44,7 +44,7 @@ const LAYOUT = {
 
 export default function NavigationInnerBlocks( {
 	isVisible,
-	templatePartId: id,
+	navigationPostId: id,
 	clientId,
 	appender: CustomAppender,
 	hasCustomPlaceholder,
@@ -82,7 +82,7 @@ export default function NavigationInnerBlocks( {
 
 	const [ blocks, onInput, onChange ] = useEntityBlockEditor(
 		'postType',
-		'wp_template_part',
+		'wp_navigation',
 		{ id }
 	);
 

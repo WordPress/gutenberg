@@ -34,12 +34,11 @@ import { __, sprintf } from '@wordpress/i18n';
  * Internal dependencies
  */
 import useBlockNavigator from '../use-block-navigator';
-import useTemplatePartEntity from '../use-template-part';
+import useNavigationPost from '../use-navigation-post';
 import Placeholder from './placeholder';
 import ResponsiveWrapper from './responsive-wrapper';
 
 // TODO - refactor these to somewhere common?
-import { createTemplatePartId } from '../../template-part/edit/utils/create-template-part-id';
 import NavigationInnerBlocks from './inner-blocks';
 
 function getComputedStyle( node ) {
@@ -92,19 +91,15 @@ function Navigation( {
 	customAppender: CustomAppender = null,
 } ) {
 	const {
-		slug,
-		theme,
-		area: blockArea,
+		navigationPostId,
 		itemsJustification,
 		openSubmenusOnClick,
 		orientation,
 		overlayMenu,
 	} = attributes;
 
-	// Replicates `createTemplatePartId` in the template part block.
-	const templatePartId = createTemplatePartId( theme, slug );
 	const [ hasAlreadyRendered, RecursionProvider ] = useNoRecursiveRenders(
-		templatePartId
+		`navigationPost/${ navigationPostId }`
 	);
 
 	const innerBlocks = useSelect(
@@ -123,12 +118,11 @@ function Navigation( {
 	);
 
 	const {
-		isResolved,
-		isMissing,
-		area,
-		enableSelection,
-		hasResolvedReplacements,
-	} = useTemplatePartEntity( templatePartId, blockArea );
+		isNavigationPostResolved,
+		isNavigationPostMissing,
+		canSwitchNavigationPost,
+		hasResolvedNavigationPosts,
+	} = useNavigationPost( navigationPostId );
 
 	const navRef = useRef();
 
@@ -136,7 +130,8 @@ function Navigation( {
 		clientId
 	);
 
-	const isEntityAvailable = ! isMissing && isResolved;
+	const isEntityAvailable =
+		! isNavigationPostMissing && isNavigationPostResolved;
 
 	const blockProps = useBlockProps( {
 		ref: navRef,
@@ -195,10 +190,7 @@ function Navigation( {
 
 	// We don't want to render a missing state if we have any inner blocks.
 	// A new template part is automatically created if we have any inner blocks but no entity.
-	if (
-		innerBlocks.length === 0 &&
-		( ( slug && ! theme ) || ( slug && isMissing ) )
-	) {
+	if ( navigationPostId && isNavigationPostMissing ) {
 		return (
 			<div { ...blockProps }>
 				<Warning>
@@ -207,7 +199,7 @@ function Navigation( {
 						__(
 							'Navigation block has been deleted or is unavailable: %s'
 						),
-						slug
+						navigationPostId
 					) }
 				</Warning>
 			</div>
@@ -351,14 +343,17 @@ function Navigation( {
 			<nav { ...blockProps }>
 				{ ! isEntityAvailable && isPlaceholderShown && (
 					<PlaceholderComponent
-						onFinish={ ( newAttributes ) => {
+						onFinish={ ( post ) => {
 							setIsPlaceholderShown( false );
-							setAttributes( newAttributes );
+							setAttributes( {
+								navigationPostId: post.id.toString(),
+							} );
 							selectBlock( clientId );
 						} }
-						area={ area }
-						enableSelection={ enableSelection }
-						hasResolvedReplacements={ hasResolvedReplacements }
+						canSwitchNavigationPost={ canSwitchNavigationPost }
+						hasResolvedNavigationPosts={
+							hasResolvedNavigationPosts
+						}
 					/>
 				) }
 				<ResponsiveWrapper
@@ -373,7 +368,7 @@ function Navigation( {
 							isVisible={
 								hasExistingNavItems || ! isPlaceholderShown
 							}
-							templatePartId={ templatePartId }
+							navigationPostId={ navigationPostId }
 							clientId={ clientId }
 							appender={ CustomAppender }
 							hasCustomPlaceholder={ !! CustomPlaceholder }

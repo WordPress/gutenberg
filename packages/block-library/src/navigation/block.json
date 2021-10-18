@@ -11,13 +11,7 @@
 	],
 	"textdomain": "default",
 	"attributes": {
-		"slug": {
-			"type": "string"
-		},
-		"theme": {
-			"type": "string"
-		},
-		"area": {
+		"navigationPostId": {
 			"type": "string"
 		},
 		"orientation": {
