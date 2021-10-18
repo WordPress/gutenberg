@@ -27,7 +27,6 @@ export default function ListViewBranch( props ) {
 	const { expandedState, draggedClientIds } = useListViewContext();
 
 	const filteredBlocks = compact( blocks );
-	// Add +1 to the rowCount to take the block appender into account.
 	const blockCount = filteredBlocks.length;
 
 	return (
@@ -35,7 +34,7 @@ export default function ListViewBranch( props ) {
 			{ map( filteredBlocks, ( block, index ) => {
 				const { clientId, innerBlocks } = block;
 				const position = index + 1;
-				// If the string value changes, it's used to trigger an animation change.
+				// This string value is used to trigger an animation change.
 				// This may be removed if we use a different animation library in the future.
 				const updatedPath =
 					path.length > 0
@@ -48,8 +47,6 @@ export default function ListViewBranch( props ) {
 					? expandedState[ clientId ] ?? true
 					: undefined;
 
-				// Make updates to the selected or dragged blocks synchronous,
-				// but asynchronous for any other block.
 				const isDragged = !! draggedClientIds?.includes( clientId );
 
 				return (
