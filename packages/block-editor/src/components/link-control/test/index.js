@@ -2343,7 +2343,7 @@ describe( 'Controlling link title text', () => {
 			'<strong>Yes this</strong> <em>is</em> expected behaviour',
 		],
 	] )(
-		"should ensure text input reflects currenty link value's `title` property %s",
+		"should ensure text input reflects the current link value's `title` property %s",
 		async ( _unused, titleValue ) => {
 			const linkWithTitle = { ...selectedLink, title: titleValue };
 			act( () => {
