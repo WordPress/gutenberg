@@ -417,19 +417,19 @@ function gutenberg_register_navigation_post_type() {
 	);
 
 	$args = array(
-		'labels'            => $labels,
-		'description'       => __( 'Navigation menus.', 'gutenberg' ),
-		'public'            => false,
-		'has_archive'       => false,
-		'show_ui'           => true,
-		'show_in_menu'      => 'themes.php',
-		'show_in_admin_bar' => false,
-		'show_in_rest'      => true,
-		'map_meta_cap'      => true,
-		'supports'          => array(
+		'labels'                => $labels,
+		'description'           => __( 'Navigation menus.', 'gutenberg' ),
+		'public'                => false,
+		'has_archive'           => false,
+		'show_ui'               => true,
+		'show_in_menu'          => 'themes.php',
+		'show_in_admin_bar'     => false,
+		'show_in_rest'          => true,
+		'map_meta_cap'          => true,
+		'rest_base'             => 'navigation-posts',
+		'rest_controller_class' => 'WP_REST_Posts_Controller',
+		'supports'              => array(
 			'title',
-			'slug',
-			'excerpt',
 			'editor',
 			'revisions',
 		),

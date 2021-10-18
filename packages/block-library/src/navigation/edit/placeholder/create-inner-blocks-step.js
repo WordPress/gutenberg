@@ -27,7 +27,7 @@ import useNavigationEntities from '../../use-navigation-entities';
 import PlaceholderPreview from './placeholder-preview';
 import menuItemsToBlocks from '../../menu-items-to-blocks';
 
-function NavigationStep( { onFinish }, ref ) {
+function CreateInnerBlocksStep( { onFinish }, ref ) {
 	const [ selectedMenu, setSelectedMenu ] = useState();
 
 	const [ isCreatingFromMenu, setIsCreatingFromMenu ] = useState( false );
@@ -149,4 +149,4 @@ function NavigationStep( { onFinish }, ref ) {
 	);
 }
 
-export default forwardRef( NavigationStep );
+export default forwardRef( CreateInnerBlocksStep );
