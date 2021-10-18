@@ -36,9 +36,10 @@ $preview-image-height: 140px;
 }
 
 // If the input doesn't have a visible label then
-// we need to expand it to the full available horizontal space.
-.block-editor-link-control__search-input.has-no-label {
-	width: 100%;
+// we need to expand the input itself to occupy
+// the full available horizontal space.
+.block-editor-link-control__search-input.has-no-label .block-editor-url-input__input {
+	flex: 1;
 }
 
 .block-editor-link-control__field {
