@@ -101,10 +101,19 @@ export function useRichText( {
 
 	if ( ! record.current ) {
 		setRecordFromProps();
-		// Sometimes properties are added programmatically
-		// and we need to make sure it's persisted to the
-		// block store / markup.
-		if ( record.current.formats.length > 0 ) {
+		// Sometimes formats are added programmatically and we need to make
+		// sure it's persisted to the block store / markup. If these formats
+		// are not applied, they could cause inconsistencies between the data
+		// in the visual editor and the frontend. Right now, it's only relevant
+		// to the `core/text-color` format, which is applied at runtime in
+		// certain circunstances. See the `__unstableFilterAttributeValue`
+		// function in `packages/format-library/src/text-color/index.js`.
+		// @todo find a less-hacky way of solving this.
+
+		const hasRelevantInitFormat =
+			record.current.formats[ 0 ]?.[ 0 ]?.type === 'core/text-color';
+
+		if ( hasRelevantInitFormat ) {
 			handleChangesUponInit( record.current );
 		}
 	} else if (
