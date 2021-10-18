@@ -301,7 +301,7 @@ describe( 'ToolsPanel', () => {
 			expect( control ).toBeInTheDocument();
 
 			await selectMenuItem( controlProps.label );
-			const resetControl = screen.queryByText( 'Default control' );
+			const resetControl = screen.getByText( 'Default control' );
 
 			expect( resetControl ).toBeInTheDocument();
 		} );
