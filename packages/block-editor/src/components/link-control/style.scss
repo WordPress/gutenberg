@@ -30,6 +30,12 @@ $preview-image-height: 140px;
 	position: relative;
 }
 
+// If the input doesn't have a visible label then
+// we need to expand it to the full available horizontal space.
+.block-editor-link-control__search-input.has-no-label {
+	width: 100%;
+}
+
 .block-editor-link-control__field {
 	margin: $grid-unit-20; // allow margin collapse for vertical spacing.
 

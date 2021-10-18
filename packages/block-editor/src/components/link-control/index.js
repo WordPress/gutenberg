@@ -301,6 +301,7 @@ function LinkControl( {
 							createSuggestionButtonText={
 								createSuggestionButtonText
 							}
+							useLabel={ showTextControl }
 						>
 							<div className="block-editor-link-control__search-actions">
 								<Button
