@@ -126,8 +126,8 @@ function LinkControl( {
 		withCreateSuggestion = true;
 	}
 
-	const isMounting = useRef( true );
 	const wrapperNode = useRef();
+	const textInputRef = useRef();
 
 	const [ internalInputValue, setInternalInputValue ] = useState(
 		value?.url || ''
@@ -155,20 +155,22 @@ function LinkControl( {
 	}, [ forceIsEditingLink ] );
 
 	useEffect( () => {
-		if ( isMounting.current ) {
-			isMounting.current = false;
-			return;
-		}
+		// We always want to focus either:
+		// - the URL input
+		// - the first focusable element in the Link UI.
+		// But in editing mode if there is a text input present then
+		// the URL input is at index 1. If not then it is at index 0.
+		const whichFocusTargetIndex = textInputRef?.current ? 1 : 0;
 
-		const linkURLInputIndex = 1;
-
-		// When editing, the 2nd focusable element is the Link URL input.
-		const whichFocusTarget = isEditingLink ? linkURLInputIndex : 0;
-		// When switching between editable and non editable LinkControl
-		// move focus to the most appropriate element to avoid focus loss.
+		// Scenario - when:
+		// - switching between editable and non editable LinkControl
+		// - clicking on a link
+		// ...then move focus to the *first* element to avoid focus loss
+		// and to ensure focus is *within* the Link UI.
 		const nextFocusTarget =
-			focus.focusable.find( wrapperNode.current )[ whichFocusTarget ] ||
-			wrapperNode.current;
+			focus.focusable.find( wrapperNode.current )[
+				whichFocusTargetIndex
+			] || wrapperNode.current;
 
 		nextFocusTarget.focus();
 
@@ -265,6 +267,7 @@ function LinkControl( {
 					>
 						{ showTextControl && (
 							<TextControl
+								ref={ textInputRef }
 								className="block-editor-link-control__field block-editor-link-control__text-content"
 								label="Text"
 								value={ internalTextValue }
