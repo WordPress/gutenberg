@@ -46,9 +46,14 @@ function ListViewBlockSelectButton(
 		siblingBlockCount,
 		level
 	);
-	const onClickHandler = ( event ) => {
-		onClick();
-		event.preventDefault();
+
+	// The `href` attribute triggers the browser's native HTML drag operations.
+	// When the link is dragged, the element's outerHTML is set in DataTransfer object as text/html.
+	// We need to clear any HTML drag data to prevent `pasteHandler` from firing
+	// inside the `useOnBlockDrop` hook.
+	const onDragStartHandler = ( event ) => {
+		event.dataTransfer.clearData();
+		onDragStart( event );
 	};
 
 	return (
@@ -58,12 +63,12 @@ function ListViewBlockSelectButton(
 					'block-editor-list-view-block-select-button',
 					className
 				) }
-				onClick={ onClickHandler }
+				onClick={ onClick }
 				aria-describedby={ descriptionId }
 				ref={ ref }
 				tabIndex={ tabIndex }
 				onFocus={ onFocus }
-				onDragStart={ onDragStart }
+				onDragStart={ onDragStartHandler }
 				onDragEnd={ onDragEnd }
 				draggable={ draggable }
 				href={ `#block-${ clientId }` }
