@@ -45,6 +45,8 @@ const expanded = ( state, action ) => {
  * @param {Object}   props                                          Components props.
  * @param {Array}    props.blocks                                   Custom subset of block client IDs to be used instead of the default hierarchy.
  * @param {Function} props.onSelect                                 Block selection callback.
+ * @param {boolean}  props.showNestedBlocks                         Flag to enable displaying nested blocks.
+ * @param {boolean}  props.showBlockMovers                          Flag to enable block movers
  * @param {boolean}  props.__experimentalFeatures                   Flag to enable experimental features.
  * @param {boolean}  props.__experimentalPersistentListViewFeatures Flag to enable features for the Persistent List View experiment.
  * @param {Object}   ref                                            Forwarded ref
@@ -55,6 +57,8 @@ function ListView(
 		onSelect = noop,
 		__experimentalFeatures,
 		__experimentalPersistentListViewFeatures,
+		showNestedBlocks,
+		showBlockMovers,
 		...props
 	},
 	ref
@@ -148,6 +152,8 @@ function ListView(
 					<ListViewBranch
 						blocks={ clientIdsTree }
 						selectBlock={ selectEditorBlock }
+						showNestedBlocks={ showNestedBlocks }
+						showBlockMovers={ showBlockMovers }
 						{ ...props }
 					/>
 				</ListViewContext.Provider>
