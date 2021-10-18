@@ -121,11 +121,10 @@
 		// Don't take up space when the menu is collapsed.
 		width: 0;
 		height: 0;
-		overflow: hidden;
 
 		// Submenu items.
 		> .wp-block-navigation-item {
-			> a {
+			> .wp-block-navigation-item__content {
 				display: flex;
 				flex-grow: 1;
 
@@ -142,12 +141,12 @@
 		}
 
 		// Spacing in all submenus.
-		a {
+		.wp-block-navigation-item__content {
 			margin: 0;
 		}
 
 		// Submenu indentation when there's no background.
-		left: -1em;
+		left: -1px; // Border width.
 		top: 100%;
 
 		// Indentation for all submenus.
@@ -184,7 +183,6 @@
 		opacity: 1;
 		width: auto;
 		height: auto;
-		overflow: initial;
 		min-width: 200px;
 	}
 
@@ -253,7 +251,7 @@
 // https://css-tricks.com/almanac/selectors/w/where/
 
 // Set the default menu item padding to zero, to allow text-only buttons.
-.wp-block-navigation a {
+.wp-block-navigation .wp-block-navigation-item__content {
 	padding: 0;
 }
 
@@ -264,7 +262,7 @@
 }
 
 // Provide a default padding for submenus who should always have some, regardless of the top level menu items.
-.wp-block-navigation :where(.wp-block-navigation__submenu-container) a {
+.wp-block-navigation :where(.wp-block-navigation__submenu-container) .wp-block-navigation-item__content {
 	padding: 0.5em 1em;
 }
 
