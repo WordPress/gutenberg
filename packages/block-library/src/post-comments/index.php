@@ -17,17 +17,11 @@ function render_block_core_post_comments( $attributes, $content, $block ) {
 	global $post;
 
 	$post_id = $block->context['postId'];
-
 	if ( ! isset( $post_id ) ) {
 		return '';
 	}
 
-	if ( ! comments_open( $post_id ) && $attributes['hideCommentsClosed'] ) {
-		return '';
-	}
-
 	$post_before = $post;
-
 	$post = get_post( $post_id );
 	setup_postdata( $post );
 
@@ -43,6 +37,9 @@ function render_block_core_post_comments( $attributes, $content, $block ) {
 	$classes = '';
 	if ( isset( $attributes['textAlign'] ) ) {
 		$classes .= 'has-text-align-' . $attributes['textAlign'];
+	}
+	if ( ! comments_open( $post_id ) && $attributes['hideCommentsClosed'] ) {
+		$classes .= 'hide-comments-closed';
 	}
 
 	$wrapper_attributes = get_block_wrapper_attributes( array( 'class' => $classes ) );

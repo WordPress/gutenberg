@@ -93,4 +93,10 @@
 	input[type="submit"] {
 		border: none;
 	}
+
+	&.hide-comments-closed {
+		.nocomments {
+			display: none;
+		}
+	}
 }
