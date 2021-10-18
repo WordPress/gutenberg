@@ -143,7 +143,7 @@ function gutenberg_experimental_global_styles_settings( $settings ) {
 		// that haven't provided any editor styles.
 		if ( empty( $settings['styles'] ) ) {
 			$new_styles[] = array(
-				'css' => file_get_contents( gutenberg_dir_path() . 'build/block-editor/default-editor-styles.css' )
+				'css' => file_get_contents( gutenberg_dir_path() . 'build/block-editor/default-editor-styles.css' ),
 			);
 		}
 
@@ -159,13 +159,11 @@ function gutenberg_experimental_global_styles_settings( $settings ) {
 		}
 
 		// Add the new styles for global styles back.
-		$block_styles  = array( 'css' => gutenberg_experimental_global_styles_get_stylesheet( $consolidated, 'block_styles' ) );
-		$css_variables = array(
+		$new_styles[] = array( 'css' => gutenberg_experimental_global_styles_get_stylesheet( $consolidated, 'block_styles' ) );
+		$new_styles[] = array(
 			'css'                     => gutenberg_experimental_global_styles_get_stylesheet( $consolidated, 'css_variables' ),
 			'__experimentalNoWrapper' => true,
 		);
-		$new_styles[] = $css_variables;
-		$new_styles[] = $block_styles;
 
 		$settings['styles'] = $new_styles;
 	}
