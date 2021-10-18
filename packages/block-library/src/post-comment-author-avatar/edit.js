@@ -1,17 +1,7 @@
 /**
- * External dependencies
- */
-import classnames from 'classnames';
-
-/**
  * WordPress dependencies
  */
-import {
-	InspectorControls,
-	__experimentalUseBorderProps as useBorderProps,
-	__experimentalGetSpacingClassesAndStyles as useSpacingProps,
-	useBlockProps,
-} from '@wordpress/block-editor';
+import { InspectorControls, useBlockProps } from '@wordpress/block-editor';
 import { PanelBody, ResizableBox, RangeControl } from '@wordpress/components';
 import { useEntityProp } from '@wordpress/core-data';
 import { __, isRTL } from '@wordpress/i18n';
@@ -27,7 +17,7 @@ export default function Edit( {
 	context: { commentId },
 	setAttributes,
 } ) {
-	const { className, style, height, width } = attributes;
+	const { height, width } = attributes;
 
 	const [ avatars ] = useEntityProp(
 		'root',
@@ -48,8 +38,7 @@ export default function Edit( {
 	const sizes = avatars ? Object.keys( avatars ) : null;
 	const minSize = sizes ? sizes[ 0 ] : 24;
 	const maxSize = sizes ? sizes[ sizes.length - 1 ] : 96;
-	const borderProps = useBorderProps( attributes );
-	const spacingProps = useSpacingProps( attributes );
+	const blockProps = useBlockProps();
 
 	return (
 		<>
@@ -70,7 +59,7 @@ export default function Edit( {
 					/>
 				</PanelBody>
 			</InspectorControls>
-			<div { ...useBlockProps() } ref={ containerRef }>
+			<div ref={ containerRef }>
 				{ avatarUrls ? (
 					<ResizableBox
 						size={ {
@@ -94,23 +83,9 @@ export default function Edit( {
 						maxWidth={ clientWidth || maxSize }
 					>
 						<img
-							className={ classnames(
-								className,
-								borderProps.className,
-								spacingProps.className,
-								{
-									// For backwards compatibility add style that isn't
-									// provided via block support.
-									'no-border-radius':
-										style?.border?.radius === 0,
-								}
-							) }
-							style={ {
-								...borderProps.style,
-								...spacingProps.style,
-							} }
 							src={ avatarUrls[ avatarUrls.length - 1 ] }
 							alt={ `${ authorName } ${ __( 'Avatar' ) }` }
+							{ ...blockProps }
 						/>
 					</ResizableBox>
 				) : null }

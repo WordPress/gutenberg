@@ -20,7 +20,10 @@
 	"supports": {
 		"html": false,
 		"__experimentalBorder": {
-			"radius": true
+			"radius": true,
+			"width": true,
+			"color": true,
+			"style": true
 		},
 		"spacing": {
 			"padding": true,

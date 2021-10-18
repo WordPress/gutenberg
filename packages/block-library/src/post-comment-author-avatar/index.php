@@ -45,11 +45,11 @@ function render_block_core_post_comment_author_avatar( $attributes, $content, $b
 }
 
 /**
- * Registers the `core/comment-avatar` block on the server.
+ * Registers the `core/comment-author-avatar` block on the server.
  */
 function register_block_core_post_comment_author_avatar() {
 	register_block_type_from_metadata(
-		__DIR__ . '/post-comment-avatar',
+		__DIR__ . '/post-comment-author-avatar',
 		array(
 			'render_callback' => 'render_block_core_post_comment_author_avatar',
 		)
