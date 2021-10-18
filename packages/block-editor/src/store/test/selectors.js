@@ -70,7 +70,6 @@ const {
 	__experimentalGetLastBlockAttributeChanges,
 	getLowestCommonAncestorWithSelectedBlock,
 	__experimentalGetActiveBlockIdByBlockNames: getActiveBlockIdByBlockNames,
-	__experimentalGetParsedReusableBlock,
 	__experimentalGetAllowedPatterns,
 	__experimentalGetPatternsByBlockTypes,
 	__unstableGetClientIdWithClientIdsTree,
@@ -3622,26 +3621,6 @@ describe( 'selectors', () => {
 				wasBlockJustInserted( state, clientId, expectedSource )
 			).toBe( false );
 		} );
-	} );
-} );
-
-describe( '__experimentalGetParsedReusableBlock', () => {
-	const state = {
-		settings: {
-			__experimentalReusableBlocks: [
-				{
-					id: 1,
-					content: { raw: '' },
-				},
-			],
-		},
-	};
-
-	// Regression test for https://github.com/WordPress/gutenberg/issues/26485. See https://github.com/WordPress/gutenberg/issues/26548.
-	it( "Should return an empty array if reusable block's content.raw is an empty string", () => {
-		expect( __experimentalGetParsedReusableBlock( state, 1 ) ).toEqual(
-			[]
-		);
 	} );
 } );
 
