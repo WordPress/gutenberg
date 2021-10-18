@@ -91,12 +91,7 @@ function toFormat( { type, attributes } ) {
 	for ( const key in formatType.attributes ) {
 		const name = formatType.attributes[ key ];
 
-		if ( typeof _attributes[ name ] !== 'undefined' ) {
-			registeredAttributes[ key ] = _attributes[ name ];
-			// delete the attribute and what's left is considered
-			// to be unregistered.
-			delete _attributes[ name ];
-		}
+		registeredAttributes[ key ] = _attributes[ name ];
 
 		if ( formatType.__unstableFilterAttributeValue ) {
 			registeredAttributes[
@@ -105,6 +100,14 @@ function toFormat( { type, attributes } ) {
 				key,
 				registeredAttributes[ key ]
 			);
+		}
+
+		// delete the attribute and what's left is considered
+		// to be unregistered.
+		delete _attributes[ name ];
+
+		if ( typeof registeredAttributes[ key ] === 'undefined' ) {
+			delete registeredAttributes[ key ];
 		}
 	}
 
