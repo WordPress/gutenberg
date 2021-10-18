@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import { castArray } from 'lodash';
+
+/**
  * WordPress dependencies
  */
 
@@ -27,14 +32,24 @@ import { store as blockEditorStore } from '../../store';
 
 const noop = () => {};
 const expanded = ( state, action ) => {
+	const nextState = { ...state };
+
 	switch ( action.type ) {
-		case 'expand':
-			return { ...state, ...{ [ action.clientId ]: true } };
-		case 'collapse':
-			return { ...state, ...{ [ action.clientId ]: false } };
-		default:
-			return state;
+		case 'expand': {
+			castArray( action.clientIds ).forEach( ( clientId ) => {
+				nextState[ clientId ] = true;
+			} );
+			break;
+		}
+		case 'collapse': {
+			castArray( action.clientIds ).forEach( ( clientId ) => {
+				nextState[ clientId ] = false;
+			} );
+			break;
+		}
 	}
+
+	return nextState;
 };
 
 /**
@@ -91,20 +106,20 @@ function ListView(
 	}, [] );
 
 	const expand = useCallback(
-		( clientId ) => {
-			if ( ! clientId ) {
+		( clientIds ) => {
+			if ( ! clientIds ) {
 				return;
 			}
-			setExpandedState( { type: 'expand', clientId } );
+			setExpandedState( { type: 'expand', clientIds } );
 		},
 		[ setExpandedState ]
 	);
 	const collapse = useCallback(
-		( clientId ) => {
-			if ( ! clientId ) {
+		( clientIds ) => {
+			if ( ! clientIds ) {
 				return;
 			}
-			setExpandedState( { type: 'collapse', clientId } );
+			setExpandedState( { type: 'collapse', clientIds } );
 		},
 		[ setExpandedState ]
 	);

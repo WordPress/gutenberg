@@ -15,6 +15,7 @@ import ListViewBlock from './block';
 import ListViewAppender from './appender';
 import { isClientIdSelected } from './utils';
 import { useListViewContext } from './context';
+import { isAppleOS } from '../../utils/platform';
 
 export default function ListViewBranch( props ) {
 	const {
@@ -91,10 +92,19 @@ export default function ListViewBranch( props ) {
 
 				const toggleExpanded = ( event ) => {
 					event.stopPropagation();
+
+					const isPrimaryKeyPressed = isAppleOS()
+						? event.metaKey
+						: event.ctrlKey;
+
+					const clientIds = isPrimaryKeyPressed
+						? map( blocks, 'clientId' )
+						: [ clientId ];
+
 					if ( isExpanded === true ) {
-						collapse( clientId );
+						collapse( clientIds );
 					} else if ( isExpanded === false ) {
-						expand( clientId );
+						expand( clientIds );
 					}
 				};
 
