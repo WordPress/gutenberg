@@ -615,9 +615,13 @@ describe( 'Links', () => {
 
 		it( 'should display text input when the link has a valid URL value', async () => {
 			await createAndReselectLink();
-			// Make a collapsed selection inside the link
+
+			// Make a collapsed selection inside the link. This is used
+			// as a stress test to ensure we can find the link text from a
+			// collapsed RichTextValue that contains a link format.
 			await page.keyboard.press( 'ArrowLeft' );
 			await page.keyboard.press( 'ArrowRight' );
+
 			await showBlockToolbar();
 			const [ editButton ] = await page.$x( '//button[text()="Edit"]' );
 			await editButton.click();
@@ -645,9 +649,13 @@ describe( 'Links', () => {
 
 		it( 'should allow text input when the link has a valid URL value', async () => {
 			await createAndReselectLink();
-			// Make a collapsed selection inside the link
+
+			// Make a collapsed selection inside the link. This is used
+			// as a stress test to ensure we can find the link text from a
+			// collapsed RichTextValue that contains a link format.
 			await page.keyboard.press( 'ArrowLeft' );
 			await page.keyboard.press( 'ArrowRight' );
+
 			await showBlockToolbar();
 			const [ editButton ] = await page.$x( '//button[text()="Edit"]' );
 			await editButton.click();
@@ -729,10 +737,15 @@ describe( 'Links', () => {
 		it( 'should allow for modification of link text via Link UI', async () => {
 			const changedLinkText =
 				'    link text that was modified via the Link UI to include spaces     ';
+
 			await createAndReselectLink();
-			// Make a collapsed selection inside the link
+
+			// Make a collapsed selection inside the link. This is used
+			// as a stress test to ensure we can find the link text from a
+			// collapsed RichTextValue that contains a link format.
 			await page.keyboard.press( 'ArrowLeft' );
 			await page.keyboard.press( 'ArrowRight' );
+
 			await showBlockToolbar();
 			const [ editButton ] = await page.$x( '//button[text()="Edit"]' );
 			await editButton.click();
