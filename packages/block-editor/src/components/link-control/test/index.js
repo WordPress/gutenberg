@@ -1653,7 +1653,7 @@ describe( 'Selecting links', () => {
 					);
 				}
 
-				// Commit the selected item as the current link
+				// Submit the selected item as the current link
 				act( () => {
 					Simulate.keyDown( searchInput, { keyCode: ENTER } );
 				} );
@@ -2365,7 +2365,7 @@ describe( 'Controlling link title text', () => {
 		}
 	);
 
-	it( "should ensure title value matching the text input's current value is included in onChange handler value on commit", async () => {
+	it( "should ensure title value matching the text input's current value is included in onChange handler value on submit", async () => {
 		const mockOnChange = jest.fn();
 		const textValue = 'My new text value';
 
@@ -2408,7 +2408,7 @@ describe( 'Controlling link title text', () => {
 		);
 	} );
 
-	it( 'should allow `ENTER` keypress within the text field to trigger commit/submission of value', async () => {
+	it( 'should allow `ENTER` keypress within the text field to trigger submission of value', async () => {
 		const textValue = 'My new text value';
 		const mockOnChange = jest.fn();
 		act( () => {
