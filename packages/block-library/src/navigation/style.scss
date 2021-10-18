@@ -42,8 +42,7 @@
 
 	// Menu item link.
 	// By targetting the markup directly we enable greater global styles compatibility.
-	// The extra container specificity is due to global styles outputting link styles that need overriding.
-	&.wp-block-navigation a {
+	a {
 		// Inherit colors set by the block color definition.
 		color: inherit;
 		display: block;
