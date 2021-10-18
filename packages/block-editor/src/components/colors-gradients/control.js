@@ -13,24 +13,15 @@ import {
 	__experimentalVStack as VStack,
 	__experimentalToggleGroupControl as ToggleGroupControl,
 	__experimentalToggleGroupControlOption as ToggleGroupControlOption,
-	ColorIndicator,
 	ColorPalette,
 	GradientPicker,
 } from '@wordpress/components';
-import { sprintf, __ } from '@wordpress/i18n';
+import { __ } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
  */
-import { getColorObjectByColorValue } from '../colors';
-import { __experimentalGetGradientObjectByGradientValue } from '../gradients';
 import useSetting from '../use-setting';
-
-// translators: first %s: the color name or value (e.g. red or #ff0000)
-const colorIndicatorAriaLabel = __( '(Color: %s)' );
-
-// translators: first %s: the gradient name or value (e.g. red to green or linear-gradient(135deg,rgba(6,147,227,1) 0%,rgb(155,81,224) 100%)
-const gradientIndicatorAriaLabel = __( '(Gradient: %s)' );
 
 const colorsAndGradientKeys = [
 	'colors',
@@ -38,45 +29,6 @@ const colorsAndGradientKeys = [
 	'gradients',
 	'disableCustomGradients',
 ];
-
-function VisualLabel( {
-	colors,
-	gradients,
-	label,
-	currentTab,
-	colorValue,
-	gradientValue,
-} ) {
-	let value, ariaLabel;
-	if ( currentTab === 'color' ) {
-		if ( colorValue ) {
-			value = colorValue;
-			const colorObject = getColorObjectByColorValue( colors, value );
-			const colorName = colorObject && colorObject.name;
-			ariaLabel = sprintf( colorIndicatorAriaLabel, colorName || value );
-		}
-	} else if ( currentTab === 'gradient' && gradientValue ) {
-		value = gradientValue;
-		const gradientObject = __experimentalGetGradientObjectByGradientValue(
-			gradients,
-			value
-		);
-		const gradientName = gradientObject && gradientObject.name;
-		ariaLabel = sprintf(
-			gradientIndicatorAriaLabel,
-			gradientName || value
-		);
-	}
-
-	return (
-		<>
-			{ label }
-			{ !! value && (
-				<ColorIndicator colorValue={ value } aria-label={ ariaLabel } />
-			) }
-		</>
-	);
-}
 
 function ColorGradientControlInner( {
 	colors,
@@ -112,17 +64,12 @@ function ColorGradientControlInner( {
 			) }
 		>
 			<fieldset>
-				<VStack space={ 3 }>
+				<VStack spacing={ 1 }>
 					{ showTitle && (
 						<legend>
 							<div className="block-editor-color-gradient-control__color-indicator">
 								<BaseControl.VisualLabel>
-									<VisualLabel
-										currentTab={ currentTab }
-										label={ label }
-										colorValue={ colorValue }
-										gradientValue={ gradientValue }
-									/>
+									{ label }
 								</BaseControl.VisualLabel>
 							</div>
 						</legend>
