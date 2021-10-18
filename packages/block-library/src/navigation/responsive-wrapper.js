@@ -17,6 +17,7 @@ export default function ResponsiveWrapper( {
 	isOpen,
 	isResponsive,
 	onToggle,
+	isHiddenByDefault,
 } ) {
 	if ( ! isResponsive ) {
 		return children;
@@ -25,7 +26,12 @@ export default function ResponsiveWrapper( {
 		'wp-block-navigation__responsive-container',
 		{
 			'is-menu-open': isOpen,
+			'hidden-by-default': isHiddenByDefault,
 		}
+	);
+	const openButtonClasses = classnames(
+		'wp-block-navigation__responsive-container-open',
+		{ 'always-shown': isHiddenByDefault }
 	);
 
 	const modalId = `${ id }-modal`;
@@ -37,7 +43,7 @@ export default function ResponsiveWrapper( {
 					aria-haspopup="true"
 					aria-expanded={ isOpen }
 					aria-label={ __( 'Open menu' ) }
-					className="wp-block-navigation__responsive-container-open"
+					className={ openButtonClasses }
 					onClick={ () => onToggle( true ) }
 				>
 					<SVG

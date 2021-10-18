@@ -9,33 +9,44 @@ import useResizeAware from 'react-resize-aware';
  */
 import { useEffect, useRef, useState } from '@wordpress/element';
 
-const { clearTimeout, setTimeout } =
-	typeof window !== 'undefined' ? window : {};
+const { clearTimeout, setTimeout } = window;
+
+export type Axis = 'x' | 'y';
 
 export const POSITIONS = {
 	bottom: 'bottom',
 	corner: 'corner',
-};
+} as const;
 
-/**
- * @typedef {Object} UseResizeLabelProps
- *
- * @property {undefined|string} label          The label value.
- * @property {Function}         resizeListener Element to be rendered for resize listening events.
- */
+export type Position = typeof POSITIONS[ keyof typeof POSITIONS ];
+
+interface UseResizeLabelProps {
+	/** The label value. */
+	label?: string;
+	/** Element to be rendered for resize listening events. */
+	resizeListener: JSX.Element;
+}
+
+interface UseResizeLabelArgs {
+	axis?: Axis;
+	fadeTimeout: number;
+	onResize( data: { width: number | null; height: number | null } ): void;
+	position: Position;
+	showPx: boolean;
+}
 
 /**
  * Custom hook that manages resize listener events. It also provides a label
  * based on current resize width x height values.
  *
- * @param {Object}  props
- * @param {string}  props.axis        Only shows the label corresponding to the axis.
- * @param {number}  props.fadeTimeout Duration (ms) before deactivating the resize label.
- * @param {boolean} props.onResize    Callback when a resize occurs. Provides { width, height } callback.
- * @param {string}  props.position    Adjusts label value.
- * @param {boolean} props.showPx      Whether to add `PX` to the label.
+ * @param  props
+ * @param  props.axis        Only shows the label corresponding to the axis.
+ * @param  props.fadeTimeout Duration (ms) before deactivating the resize label.
+ * @param  props.onResize    Callback when a resize occurs. Provides { width, height } callback.
+ * @param  props.position    Adjusts label value.
+ * @param  props.showPx      Whether to add `PX` to the label.
  *
- * @return {UseResizeLabelProps} Properties for hook.
+ * @return Properties for hook.
  */
 export function useResizeLabel( {
 	axis,
@@ -43,7 +54,7 @@ export function useResizeLabel( {
 	onResize = noop,
 	position = POSITIONS.bottom,
 	showPx = false,
-} ) {
+}: UseResizeLabelArgs ): UseResizeLabelProps {
 	/*
 	 * The width/height values derive from this special useResizeAware hook.
 	 * This custom hook uses injects an iFrame into the element, allowing it
@@ -77,7 +88,7 @@ export function useResizeLabel( {
 	 * This timeout is used with setMoveX and setMoveY to determine of
 	 * both width and height values have changed at (roughly) the same time.
 	 */
-	const moveTimeoutRef = useRef();
+	const moveTimeoutRef = useRef< number >();
 
 	const unsetMoveXY = () => {
 		/*
@@ -156,19 +167,29 @@ export function useResizeLabel( {
 	};
 }
 
+interface GetSizeLabelArgs {
+	axis?: Axis;
+	height: number | null;
+	moveX: boolean;
+	moveY: boolean;
+	position: Position;
+	showPx: boolean;
+	width: number | null;
+}
+
 /**
  * Gets the resize label based on width and height values (as well as recent changes).
  *
- * @param {Object}  props
- * @param {string}  props.axis     Only shows the label corresponding to the axis.
- * @param {number}  props.height   Height value.
- * @param {boolean} props.moveX    Recent width (x axis) changes.
- * @param {boolean} props.moveY    Recent width (y axis) changes.
- * @param {string}  props.position Adjusts label value.
- * @param {boolean} props.showPx   Whether to add `PX` to the label.
- * @param {number}  props.width    Width value.
+ * @param  props
+ * @param  props.axis     Only shows the label corresponding to the axis.
+ * @param  props.height   Height value.
+ * @param  props.moveX    Recent width (x axis) changes.
+ * @param  props.moveY    Recent width (y axis) changes.
+ * @param  props.position Adjusts label value.
+ * @param  props.showPx   Whether to add `PX` to the label.
+ * @param  props.width    Width value.
  *
- * @return {undefined | string} The rendered label.
+ * @return The rendered label.
  */
 function getSizeLabel( {
 	axis,
@@ -178,8 +199,8 @@ function getSizeLabel( {
 	position = POSITIONS.bottom,
 	showPx = false,
 	width,
-} ) {
-	if ( ! moveX && ! moveY ) return null;
+}: GetSizeLabelArgs ): string | undefined {
+	if ( ! moveX && ! moveY ) return undefined;
 
 	/*
 	 * Corner position...
@@ -218,5 +239,5 @@ function getSizeLabel( {
 		return `${ height }${ labelUnit }`;
 	}
 
-	return null;
+	return undefined;
 }

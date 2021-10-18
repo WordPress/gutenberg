@@ -1,151 +1,265 @@
 /**
- * External dependencies
- */
-import { first } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import {
 	clickBlockAppender,
 	getEditedPostContent,
 	createNewPost,
+	pressKeyWithModifier,
 	pressKeyTimes,
+	activateTheme,
 } from '@wordpress/e2e-test-utils';
 
+const openFontSizeSelectControl = async () => {
+	const selectControlSelector =
+		"//div[contains(@class, 'components-font-size-picker__controls')]//button[contains(@class, 'components-custom-select-control__button')]";
+	const selectControl = await page.waitForXPath( selectControlSelector );
+	return selectControl.click();
+};
+
+const FONT_SIZE_TOGGLE_GROUP_SELECTOR =
+	"//div[contains(@class, 'components-font-size-picker__controls')]//div[contains(@class, 'components-toggle-group-control')]";
+
+// Click a button by its label - applies when ToggleGroupControl is used.
+const clickFontSizeButtonByLabel = async ( label ) => {
+	const buttonSelector = `${ FONT_SIZE_TOGGLE_GROUP_SELECTOR }//button[@aria-label='${ label }']`;
+	const button = await page.waitForXPath( buttonSelector );
+	return button.click();
+};
+
+// Clicks the button to toggle between custom size input and the control for the presets.
+const toggleCustomInput = async ( showCustomInput ) => {
+	const label = showCustomInput ? 'Set custom size' : 'Use size preset';
+	const toggleButton = await page.waitForXPath(
+		`//button[@aria-label='${ label }']`
+	);
+	return toggleButton.click();
+};
+
+const clickCustomInput = async () => {
+	const customInput = await page.waitForXPath(
+		"//input[@aria-label='Custom']"
+	);
+	return customInput.click();
+};
+
 describe( 'Font Size Picker', () => {
-	const FONT_SIZE_LABEL_SELECTOR = "//label[contains(text(), 'Font size')]";
-	const CUSTOM_FONT_SIZE_LABEL_SELECTOR =
-		"//fieldset[legend[contains(text(),'Font size')]]//label[contains(text(), 'Custom')]";
 	beforeEach( async () => {
 		await createNewPost();
 	} );
+	describe( 'Common', () => {
+		it( 'should apply a named font size using the font size input', async () => {
+			// Create a paragraph block with some content.
+			await clickBlockAppender();
+			await page.keyboard.type( 'Paragraph to be made "small"' );
 
-	it( 'should apply a named font size using the font size buttons', async () => {
-		// Create a paragraph block with some content.
-		await clickBlockAppender();
-		await page.keyboard.type( 'Paragraph to be made "large"' );
-		await first( await page.$x( FONT_SIZE_LABEL_SELECTOR ) ).click();
-		await pressKeyTimes( 'ArrowDown', 4 );
-		await page.keyboard.press( 'Enter' );
-		const selectedFontSize = await page.evaluate(
-			( selector ) =>
-				document
-					.evaluate(
-						selector,
-						document,
-						null,
-						XPathResult.ANY_TYPE,
-						null
-					)
-					.iterateNext().control.textContent,
-			FONT_SIZE_LABEL_SELECTOR
-		);
+			await toggleCustomInput( true );
+			await clickCustomInput();
+			// This should be the "small" font-size of the editor defaults.
+			await page.keyboard.type( '13' );
+			expect( await getEditedPostContent() ).toMatchInlineSnapshot( `
+			"<!-- wp:paragraph {\\"fontSize\\":\\"small\\"} -->
+			<p class=\\"has-small-font-size\\">Paragraph to be made \\"small\\"</p>
+			<!-- /wp:paragraph -->"
+		` );
+		} );
+		it( 'should apply a custom font size using the font size input', async () => {
+			// Create a paragraph block with some content.
+			await clickBlockAppender();
+			await page.keyboard.type( 'Paragraph to be made "small"' );
 
-		expect( selectedFontSize ).toBe( 'Large' );
+			await toggleCustomInput( true );
+			await clickCustomInput();
+			await page.keyboard.type( '23' );
+			expect( await getEditedPostContent() ).toMatchInlineSnapshot( `
+			"<!-- wp:paragraph {\\"style\\":{\\"typography\\":{\\"fontSize\\":\\"23px\\"}}} -->
+			<p style=\\"font-size:23px\\">Paragraph to be made \\"small\\"</p>
+			<!-- /wp:paragraph -->"
+		` );
+		} );
+		it( 'should reset a custom font size using input field', async () => {
+			// Create a paragraph block with some content.
+			await clickBlockAppender();
+			await page.keyboard.type( 'Paragraph reset - custom size' );
 
-		// Ensure content matches snapshot.
-		const content = await getEditedPostContent();
-		expect( content ).toMatchSnapshot();
+			await toggleCustomInput( true );
+			await clickCustomInput();
+			await page.keyboard.type( '23' );
+			expect( await getEditedPostContent() ).toMatchInlineSnapshot( `
+			"<!-- wp:paragraph {\\"style\\":{\\"typography\\":{\\"fontSize\\":\\"23px\\"}}} -->
+			<p style=\\"font-size:23px\\">Paragraph reset - custom size</p>
+			<!-- /wp:paragraph -->"
+		` );
+
+			await pressKeyTimes( 'Backspace', 2 );
+			expect( await getEditedPostContent() ).toMatchInlineSnapshot( `
+			"<!-- wp:paragraph -->
+			<p>Paragraph reset - custom size</p>
+			<!-- /wp:paragraph -->"
+		` );
+		} );
 	} );
+	// A different control is rendered based on the available font sizes number.
+	describe( 'More font sizes', () => {
+		beforeAll( async () => {
+			await activateTheme( 'tt1-blocks' );
+		} );
+		afterAll( async () => {
+			await activateTheme( 'twentytwentyone' );
+		} );
+		it( 'should apply a named font size using the font size buttons', async () => {
+			// Create a paragraph block with some content.
+			await clickBlockAppender();
+			await page.keyboard.type( 'Paragraph to be made "large"' );
 
-	it( 'should apply a named font size using the font size input', async () => {
-		// Create a paragraph block with some content.
-		await clickBlockAppender();
-		await page.keyboard.type( 'Paragraph to be made "small"' );
+			await openFontSizeSelectControl();
+			await pressKeyTimes( 'ArrowDown', 4 );
+			await page.keyboard.press( 'Enter' );
 
-		await first( await page.$x( CUSTOM_FONT_SIZE_LABEL_SELECTOR ) ).click();
-		// This should be the "small" font-size of the editor defaults.
-		await page.keyboard.type( '13' );
-		await page.keyboard.press( 'Enter' );
+			expect( await getEditedPostContent() ).toMatchInlineSnapshot( `
+			"<!-- wp:paragraph {\\"fontSize\\":\\"large\\"} -->
+			<p class=\\"has-large-font-size\\">Paragraph to be made \\"large\\"</p>
+			<!-- /wp:paragraph -->"
+		` );
+		} );
+		it( 'should reset a named font size using the reset button', async () => {
+			// Create a paragraph block with some content.
+			await clickBlockAppender();
+			await page.keyboard.type(
+				'Paragraph with font size reset using button'
+			);
 
-		// Ensure content matches snapshot.
-		const content = await getEditedPostContent();
-		expect( content ).toMatchSnapshot();
+			await openFontSizeSelectControl();
+			await pressKeyTimes( 'ArrowDown', 3 );
+			await page.keyboard.press( 'Enter' );
+			expect( await getEditedPostContent() ).toMatchInlineSnapshot( `
+			"<!-- wp:paragraph {\\"fontSize\\":\\"normal\\"} -->
+			<p class=\\"has-normal-font-size\\">Paragraph with font size reset using button</p>
+			<!-- /wp:paragraph -->"
+		` );
+
+			await toggleCustomInput( true );
+			await page.keyboard.press( 'Tab' );
+			await page.keyboard.press( 'Tab' );
+			await page.keyboard.press( 'Tab' );
+
+			await page.keyboard.press( 'Enter' );
+			expect( await getEditedPostContent() ).toMatchInlineSnapshot( `
+			"<!-- wp:paragraph -->
+			<p>Paragraph with font size reset using button</p>
+			<!-- /wp:paragraph -->"
+		` );
+		} );
+
+		it( 'should reset a named font size using input field', async () => {
+			// Create a paragraph block with some content.
+			await clickBlockAppender();
+			await page.keyboard.type(
+				'Paragraph with font size reset using input field'
+			);
+
+			await openFontSizeSelectControl();
+			await pressKeyTimes( 'ArrowDown', 2 );
+			await page.keyboard.press( 'Enter' );
+			expect( await getEditedPostContent() ).toMatchInlineSnapshot( `
+			"<!-- wp:paragraph {\\"fontSize\\":\\"small\\"} -->
+			<p class=\\"has-small-font-size\\">Paragraph with font size reset using input field</p>
+			<!-- /wp:paragraph -->"
+		` );
+
+			await toggleCustomInput( true );
+			await clickCustomInput();
+			await pressKeyWithModifier( 'primary', 'A' );
+			await page.keyboard.press( 'Backspace' );
+
+			// Disable reason: Wait for changes to apply.
+			// eslint-disable-next-line no-restricted-syntax
+			await page.waitForTimeout( 1000 );
+
+			expect( await getEditedPostContent() ).toMatchInlineSnapshot( `
+			"<!-- wp:paragraph -->
+			<p>Paragraph with font size reset using input field</p>
+			<!-- /wp:paragraph -->"
+		` );
+		} );
 	} );
+	describe( 'Few font sizes', () => {
+		it( 'should apply a named font size using the font size buttons', async () => {
+			// Create a paragraph block with some content.
+			await clickBlockAppender();
+			await page.keyboard.type( 'Paragraph to be made "large"' );
 
-	it( 'should apply a custom font size using the font size input', async () => {
-		// Create a paragraph block with some content.
-		await clickBlockAppender();
-		await page.keyboard.type( 'Paragraph to be made "small"' );
+			await clickFontSizeButtonByLabel( 'Large' );
+			const buttonSelector = `${ FONT_SIZE_TOGGLE_GROUP_SELECTOR }//div[@data-active='true']//button`;
+			const [ activeButton ] = await page.$x( buttonSelector );
+			const activeLabel = await page.evaluate(
+				( element ) => element?.getAttribute( 'aria-label' ),
+				activeButton
+			);
+			expect( activeLabel ).toEqual( 'Large' );
 
-		await first( await page.$x( CUSTOM_FONT_SIZE_LABEL_SELECTOR ) ).click();
-		await page.keyboard.type( '23' );
-		await page.keyboard.press( 'Enter' );
+			expect( await getEditedPostContent() ).toMatchInlineSnapshot( `
+			"<!-- wp:paragraph {\\"fontSize\\":\\"large\\"} -->
+			<p class=\\"has-large-font-size\\">Paragraph to be made \\"large\\"</p>
+			<!-- /wp:paragraph -->"
+		` );
+		} );
 
-		// Ensure content matches snapshot.
-		const content = await getEditedPostContent();
-		expect( content ).toMatchSnapshot();
-	} );
+		it( 'should reset a named font size using the reset button', async () => {
+			// Create a paragraph block with some content.
+			await clickBlockAppender();
+			await page.keyboard.type(
+				'Paragraph with font size reset using button'
+			);
 
-	it( 'should reset a named font size using the reset button', async () => {
-		// Create a paragraph block with some content.
-		await clickBlockAppender();
-		await page.keyboard.type(
-			'Paragraph with font size reset using button'
-		);
+			await clickFontSizeButtonByLabel( 'Small' );
+			expect( await getEditedPostContent() ).toMatchInlineSnapshot( `
+			"<!-- wp:paragraph {\\"fontSize\\":\\"small\\"} -->
+			<p class=\\"has-small-font-size\\">Paragraph with font size reset using button</p>
+			<!-- /wp:paragraph -->"
+		` );
 
-		await first( await page.$x( FONT_SIZE_LABEL_SELECTOR ) ).click();
+			await toggleCustomInput( true );
+			await page.keyboard.press( 'Tab' );
+			await page.keyboard.press( 'Tab' );
+			await page.keyboard.press( 'Tab' );
 
-		// Disable reason: Wait for changes to apply.
-		// eslint-disable-next-line no-restricted-syntax
-		await page.waitForTimeout( 100 );
+			await page.keyboard.press( 'Enter' );
+			expect( await getEditedPostContent() ).toMatchInlineSnapshot( `
+			"<!-- wp:paragraph -->
+			<p>Paragraph with font size reset using button</p>
+			<!-- /wp:paragraph -->"
+		` );
+		} );
 
-		await pressKeyTimes( 'ArrowDown', 2 );
-		await page.keyboard.press( 'Enter' );
+		it( 'should reset a named font size using input field', async () => {
+			// Create a paragraph block with some content.
+			await clickBlockAppender();
+			await page.keyboard.type(
+				'Paragraph with font size reset using input field'
+			);
 
-		await page.keyboard.press( 'Tab' );
-		await page.keyboard.press( 'Tab' );
-		await page.keyboard.press( 'Tab' );
+			await clickFontSizeButtonByLabel( 'Small' );
+			expect( await getEditedPostContent() ).toMatchInlineSnapshot( `
+			"<!-- wp:paragraph {\\"fontSize\\":\\"small\\"} -->
+			<p class=\\"has-small-font-size\\">Paragraph with font size reset using input field</p>
+			<!-- /wp:paragraph -->"
+		` );
 
-		await page.keyboard.press( 'Enter' );
+			await toggleCustomInput( true );
+			await clickCustomInput();
+			await pressKeyWithModifier( 'primary', 'A' );
+			await page.keyboard.press( 'Backspace' );
 
-		// Ensure content matches snapshot.
-		const content = await getEditedPostContent();
-		expect( content ).toMatchSnapshot();
-	} );
+			// Disable reason: Wait for changes to apply.
+			// eslint-disable-next-line no-restricted-syntax
+			await page.waitForTimeout( 1000 );
 
-	it( 'should reset a named font size using input field', async () => {
-		// Create a paragraph block with some content.
-		await clickBlockAppender();
-		await page.keyboard.type(
-			'Paragraph with font size reset using input field'
-		);
-
-		await first( await page.$x( FONT_SIZE_LABEL_SELECTOR ) ).click();
-		await pressKeyTimes( 'ArrowDown', 2 );
-		await page.keyboard.press( 'Enter' );
-
-		await first( await page.$x( CUSTOM_FONT_SIZE_LABEL_SELECTOR ) ).click();
-		await pressKeyTimes( 'ArrowRight', 5 );
-		await pressKeyTimes( 'Backspace', 5 );
-		await page.keyboard.press( 'Enter' );
-
-		// Disable reason: Wait for changes to apply.
-		// eslint-disable-next-line no-restricted-syntax
-		await page.waitForTimeout( 1000 );
-
-		// Ensure content matches snapshot.
-		const content = await getEditedPostContent();
-		expect( content ).toMatchSnapshot();
-	} );
-
-	it( 'should reset a custom font size using input field', async () => {
-		// Create a paragraph block with some content.
-		await clickBlockAppender();
-		await page.keyboard.type( 'Paragraph to be made "small"' );
-
-		await first( await page.$x( CUSTOM_FONT_SIZE_LABEL_SELECTOR ) ).click();
-		await page.keyboard.type( '23' );
-		await page.keyboard.press( 'Enter' );
-
-		await first( await page.$x( CUSTOM_FONT_SIZE_LABEL_SELECTOR ) ).click();
-		await page.keyboard.press( 'Backspace' );
-		await page.keyboard.press( 'Backspace' );
-		await page.keyboard.press( 'Enter' );
-
-		// Ensure content matches snapshot.
-		const content = await getEditedPostContent();
-		expect( content ).toMatchSnapshot();
+			expect( await getEditedPostContent() ).toMatchInlineSnapshot( `
+			"<!-- wp:paragraph -->
+			<p>Paragraph with font size reset using input field</p>
+			<!-- /wp:paragraph -->"
+		` );
+		} );
 	} );
 } );

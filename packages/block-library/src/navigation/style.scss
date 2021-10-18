@@ -505,16 +505,18 @@
 	}
 
 	@include break-small() {
-		&:not(.is-menu-open) {
-			display: flex;
-			flex-direction: row;
-			width: 100%;
-			position: relative;
-			z-index: 2;
-			background-color: inherit;
+		&:not(.hidden-by-default) {
+			&:not(.is-menu-open) {
+				display: flex;
+				flex-direction: row;
+				width: 100%;
+				position: relative;
+				z-index: 2;
+				background-color: inherit;
 
-			.wp-block-navigation__responsive-container-close {
-				display: none;
+				.wp-block-navigation__responsive-container-close {
+					display: none;
+				}
 			}
 		}
 
@@ -558,8 +560,10 @@
 .wp-block-navigation__responsive-container-open {
 	display: flex;
 
-	@include break-small {
-		display: none;
+	&:not(.always-shown) {
+		@include break-small {
+			display: none;
+		}
 	}
 
 	// Justify the button.

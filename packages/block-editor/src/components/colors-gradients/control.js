@@ -10,8 +10,9 @@ import { every, isEmpty } from 'lodash';
 import { useState } from '@wordpress/element';
 import {
 	BaseControl,
-	Button,
-	ButtonGroup,
+	__experimentalVStack as VStack,
+	__experimentalToggleGroupControl as ToggleGroupControl,
+	__experimentalToggleGroupControlOption as ToggleGroupControlOption,
 	ColorIndicator,
 	ColorPalette,
 	GradientPicker,
@@ -110,66 +111,68 @@ function ColorGradientControlInner( {
 			) }
 		>
 			<fieldset>
-				<legend>
-					<div className="block-editor-color-gradient-control__color-indicator">
-						<BaseControl.VisualLabel>
-							<VisualLabel
-								currentTab={ currentTab }
-								label={ label }
-								colorValue={ colorValue }
-								gradientValue={ gradientValue }
+				<VStack space={ 3 }>
+					<legend>
+						<div className="block-editor-color-gradient-control__color-indicator">
+							<BaseControl.VisualLabel>
+								<VisualLabel
+									currentTab={ currentTab }
+									label={ label }
+									colorValue={ colorValue }
+									gradientValue={ gradientValue }
+								/>
+							</BaseControl.VisualLabel>
+						</div>
+					</legend>
+					{ canChooseAColor && canChooseAGradient && (
+						<ToggleGroupControl
+							value={ currentTab }
+							onChange={ setCurrentTab }
+							label={ __( 'Select color type' ) }
+							hideLabelFromVision
+							isBlock
+						>
+							<ToggleGroupControlOption
+								value="color"
+								label={ __( 'Solid' ) }
 							/>
-						</BaseControl.VisualLabel>
-					</div>
-				</legend>
-				{ canChooseAColor && canChooseAGradient && (
-					<ButtonGroup className="block-editor-color-gradient-control__button-tabs">
-						<Button
-							isSmall
-							isPressed={ currentTab === 'color' }
-							onClick={ () => setCurrentTab( 'color' ) }
-						>
-							{ __( 'Solid' ) }
-						</Button>
-						<Button
-							isSmall
-							isPressed={ currentTab === 'gradient' }
-							onClick={ () => setCurrentTab( 'gradient' ) }
-						>
-							{ __( 'Gradient' ) }
-						</Button>
-					</ButtonGroup>
-				) }
-				{ ( currentTab === 'color' || ! canChooseAGradient ) && (
-					<ColorPalette
-						value={ colorValue }
-						onChange={
-							canChooseAGradient
-								? ( newColor ) => {
-										onColorChange( newColor );
-										onGradientChange();
-								  }
-								: onColorChange
-						}
-						{ ...{ colors, disableCustomColors } }
-						clearable={ clearable }
-					/>
-				) }
-				{ ( currentTab === 'gradient' || ! canChooseAColor ) && (
-					<GradientPicker
-						value={ gradientValue }
-						onChange={
-							canChooseAColor
-								? ( newGradient ) => {
-										onGradientChange( newGradient );
-										onColorChange();
-								  }
-								: onGradientChange
-						}
-						{ ...{ gradients, disableCustomGradients } }
-						clearable={ clearable }
-					/>
-				) }
+							<ToggleGroupControlOption
+								value="gradient"
+								label={ __( 'Gradient' ) }
+							/>
+						</ToggleGroupControl>
+					) }
+					{ ( currentTab === 'color' || ! canChooseAGradient ) && (
+						<ColorPalette
+							value={ colorValue }
+							onChange={
+								canChooseAGradient
+									? ( newColor ) => {
+											onColorChange( newColor );
+											onGradientChange();
+									  }
+									: onColorChange
+							}
+							{ ...{ colors, disableCustomColors } }
+							clearable={ clearable }
+						/>
+					) }
+					{ ( currentTab === 'gradient' || ! canChooseAColor ) && (
+						<GradientPicker
+							value={ gradientValue }
+							onChange={
+								canChooseAColor
+									? ( newGradient ) => {
+											onGradientChange( newGradient );
+											onColorChange();
+									  }
+									: onGradientChange
+							}
+							{ ...{ gradients, disableCustomGradients } }
+							clearable={ clearable }
+						/>
+					) }
+				</VStack>
 			</fieldset>
 		</BaseControl>
 	);

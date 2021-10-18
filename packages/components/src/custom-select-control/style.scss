@@ -58,19 +58,25 @@
 
 .components-custom-select-control__item {
 	align-items: center;
-	display: flex;
+	display: grid;
+	grid-template-columns: auto auto;
 	list-style-type: none;
 	padding: $grid-unit-10;
 	cursor: default;
 	line-height: $icon-size + $grid-unit-05;
 
-
+	&.has-hint {
+		grid-template-columns: auto auto 30px;
+	}
 	&.is-highlighted {
 		background: $gray-300;
 	}
-
+	.components-custom-select-control__item-hint {
+		color: $gray-700;
+		text-align: right;
+		padding-right: $grid-unit-05;
+	}
 	.components-custom-select-control__item-icon {
-		margin-right: 0;
 		margin-left: auto;
 	}
 

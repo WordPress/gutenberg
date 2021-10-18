@@ -22,6 +22,10 @@ msgctxt "Custom template name"
 msgid "Homepage template"
 msgstr "Szablon strony głównej"
 
+msgctxt "Template part name"
+msgid "Small Header"
+msgstr "Mały nagłówek"
+
 msgctxt "Color name"
 msgid "Light"
 msgstr "Jasny"

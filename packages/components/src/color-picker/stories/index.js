@@ -2,7 +2,6 @@
  * External dependencies
  */
 import { boolean, select } from '@storybook/addon-knobs';
-import colorize from 'tinycolor2';
 
 /**
  * WordPress dependencies
@@ -48,9 +47,7 @@ const Example = () => {
 			marginTop={ space( 10 ) }
 		>
 			<ColorPicker { ...props } color={ color } onChange={ setColor } />
-			<div style={ { width: 200, textAlign: 'center' } }>
-				{ colorize( color ).toHslString() }
-			</div>
+			<div style={ { width: 200, textAlign: 'center' } }>{ color }</div>
 			<ColorPicker { ...props } color={ color } onChange={ setColor } />
 		</Flex>
 	);

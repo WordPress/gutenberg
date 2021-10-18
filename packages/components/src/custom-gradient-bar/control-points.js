@@ -2,6 +2,7 @@
  * External dependencies
  */
 import classnames from 'classnames';
+import { colord } from 'colord';
 
 /**
  * WordPress dependencies
@@ -212,14 +213,14 @@ function ControlPoints( {
 					renderContent={ ( { onClose } ) => (
 						<>
 							<ColorPicker
-								disableAlpha={ disableAlpha }
+								enableAlpha={ ! disableAlpha }
 								color={ point.color }
-								onChangeComplete={ ( { color } ) => {
+								onChange={ ( color ) => {
 									onChange(
 										updateControlPointColor(
 											controlPoints,
 											index,
-											color.toRgbString()
+											colord( color ).toRgbString()
 										)
 									);
 								} }
@@ -290,14 +291,14 @@ function InsertPoint( {
 			) }
 			renderContent={ () => (
 				<ColorPicker
-					disableAlpha={ disableAlpha }
-					onChangeComplete={ ( { color } ) => {
+					enableAlpha={ ! disableAlpha }
+					onChange={ ( color ) => {
 						if ( ! alreadyInsertedPoint ) {
 							onChange(
 								addControlPoint(
 									controlPoints,
 									insertPosition,
-									color.toRgbString()
+									colord( color ).toRgbString()
 								)
 							);
 							setAlreadyInsertedPoint( true );
@@ -306,7 +307,7 @@ function InsertPoint( {
 								updateControlPointColorByPosition(
 									controlPoints,
 									insertPosition,
-									color.toRgbString()
+									colord( color ).toRgbString()
 								)
 							);
 						}

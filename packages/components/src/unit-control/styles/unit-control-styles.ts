@@ -8,13 +8,24 @@ import styled from '@emotion/styled';
  */
 import { COLORS, rtl } from '../../utils';
 import NumberControl from '../../number-control';
+import type { SelectSize } from '../types';
+
+// Using `selectSize` instead of `size` to avoid a type conflict with the
+// `size` HTML attribute of the `select` element.
+type SelectProps = {
+	selectSize: SelectSize;
+};
+
+type InputProps = {
+	disableUnits?: boolean;
+};
 
 export const Root = styled.div`
 	box-sizing: border-box;
 	position: relative;
 `;
 
-const paddingStyles = ( { disableUnits } ) => {
+const paddingStyles = ( { disableUnits }: InputProps ) => {
 	const value = disableUnits ? 3 : 24;
 
 	return css`
@@ -22,7 +33,7 @@ const paddingStyles = ( { disableUnits } ) => {
 	`;
 };
 
-const arrowStyles = ( { disableUnits } ) => {
+const arrowStyles = ( { disableUnits }: InputProps ) => {
 	if ( disableUnits ) return '';
 
 	return css`
@@ -51,7 +62,7 @@ export const ValueInput = styled( NumberControl )`
 	}
 `;
 
-const unitSizeStyles = ( { size } ) => {
+const unitSizeStyles = ( { selectSize }: SelectProps ) => {
 	const sizes = {
 		default: {
 			height: 28,
@@ -67,10 +78,10 @@ const unitSizeStyles = ( { size } ) => {
 		},
 	};
 
-	return css( sizes[ size ] );
+	return css( sizes[ selectSize ] );
 };
 
-const baseUnitLabelStyles = ( props ) => {
+const baseUnitLabelStyles = ( props: SelectProps ) => {
 	return css`
 		appearance: none;
 		background: transparent;
@@ -95,7 +106,7 @@ const baseUnitLabelStyles = ( props ) => {
 	`;
 };
 
-export const UnitLabel = styled.div`
+export const UnitLabel = styled.div< SelectProps >`
 	&&& {
 		pointer-events: none;
 
@@ -103,7 +114,7 @@ export const UnitLabel = styled.div`
 	}
 `;
 
-export const UnitSelect = styled.select`
+export const UnitSelect = styled.select< SelectProps >`
 	&&& {
 		${ baseUnitLabelStyles };
 		cursor: pointer;

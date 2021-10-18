@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import colorize, { ColorFormats } from 'tinycolor2';
+import { colord, extend, Colord } from 'colord';
 
 /**
  * WordPress dependencies
@@ -20,13 +20,13 @@ import type { ColorType } from './types';
 import { space } from '../ui/utils/space';
 
 interface ColorDisplayProps {
-	color: ColorFormats.HSLA;
+	color: Colord;
 	colorType: ColorType;
 	enableAlpha: boolean;
 }
 
 interface DisplayProps {
-	color: ColorFormats.HSLA;
+	color: Colord;
 	enableAlpha: boolean;
 }
 
@@ -50,7 +50,7 @@ const ValueDisplay = ( { values }: ValueDisplayProps ) => (
 );
 
 const HslDisplay = ( { color, enableAlpha }: DisplayProps ) => {
-	const { h, s, l, a } = colorize( color ).toHsl();
+	const { h, s, l, a } = color.toHsl();
 
 	const values: Values = [
 		[ Math.floor( h ), 'H' ],
@@ -65,7 +65,7 @@ const HslDisplay = ( { color, enableAlpha }: DisplayProps ) => {
 };
 
 const RgbDisplay = ( { color, enableAlpha }: DisplayProps ) => {
-	const { r, g, b, a } = colorize( color ).toRgb();
+	const { r, g, b, a } = color.toRgb();
 
 	const values: Values = [
 		[ r, 'R' ],
@@ -80,14 +80,8 @@ const RgbDisplay = ( { color, enableAlpha }: DisplayProps ) => {
 	return <ValueDisplay values={ values } />;
 };
 
-const HexDisplay = ( { color, enableAlpha }: DisplayProps ) => {
-	const colorized = colorize( color );
-	const colorWithoutHash = ( enableAlpha
-		? colorized.toHex8String()
-		: colorized.toHexString()
-	)
-		.slice( 1 )
-		.toUpperCase();
+const HexDisplay = ( { color }: DisplayProps ) => {
+	const colorWithoutHash = color.toHex().slice( 1 ).toUpperCase();
 	return (
 		<FlexItem>
 			<Text color="blue">#</Text>
@@ -114,24 +108,21 @@ export const ColorDisplay = ( {
 	enableAlpha,
 }: ColorDisplayProps ) => {
 	const [ copiedColor, setCopiedColor ] = useState< string | null >( null );
-	const copyTimer = useRef< number | undefined >();
+	const copyTimer = useRef< ReturnType< typeof setTimeout > | undefined >();
 	const props = { color, enableAlpha };
 	const Component = getComponent( colorType );
 	const copyRef = useCopyToClipboard< HTMLDivElement >(
 		() => {
 			switch ( colorType ) {
 				case 'hsl': {
-					return colorize( color ).toHslString();
+					return color.toHslString();
 				}
 				case 'rgb': {
-					return colorize( color ).toRgbString();
+					return color.toRgbString();
 				}
 				default:
 				case 'hex': {
-					const colorized = colorize( color );
-					return enableAlpha
-						? colorized.toHex8String()
-						: colorized.toHexString();
+					return color.toHex();
 				}
 			}
 		},
@@ -139,7 +130,7 @@ export const ColorDisplay = ( {
 			if ( copyTimer.current ) {
 				clearTimeout( copyTimer.current );
 			}
-			setCopiedColor( colorize( color ).toHex8String() );
+			setCopiedColor( color.toHex() );
 			copyTimer.current = setTimeout( () => {
 				setCopiedColor( null );
 				copyTimer.current = undefined;
@@ -158,7 +149,7 @@ export const ColorDisplay = ( {
 		<Tooltip
 			content={
 				<Text color="white">
-					{ copiedColor === colorize( color ).toHex8String()
+					{ copiedColor === color.toHex()
 						? __( 'Copied!' )
 						: __( 'Copy' ) }
 				</Text>
