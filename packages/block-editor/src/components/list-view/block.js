@@ -12,7 +12,7 @@ import {
 } from '@wordpress/components';
 import { moreVertical } from '@wordpress/icons';
 import { useState, useRef, useEffect, useCallback } from '@wordpress/element';
-import { useDispatch, useSelect } from '@wordpress/data';
+import { useDispatch, useSelect, AsyncModeProvider } from '@wordpress/data';
 
 /**
  * Internal dependencies
@@ -151,92 +151,95 @@ export default function ListViewBlock( {
 	} );
 
 	return (
-		<ListViewLeaf
-			className={ classes }
-			onMouseEnter={ onMouseEnter }
-			onMouseLeave={ onMouseLeave }
-			onFocus={ onMouseEnter }
-			onBlur={ onMouseLeave }
-			level={ level }
-			position={ position }
-			rowCount={ rowCount }
-			path={ path }
-			id={ `list-view-block-${ clientId }` }
-			data-block={ clientId }
-			isExpanded={ isExpanded }
-		>
-			<TreeGridCell
-				className="block-editor-list-view-block__contents-cell"
-				colSpan={ hasRenderedMovers ? undefined : 2 }
-				ref={ cellRef }
+		<AsyncModeProvider value={ ! isSelected }>
+			<ListViewLeaf
+				className={ classes }
+				onMouseEnter={ onMouseEnter }
+				onMouseLeave={ onMouseLeave }
+				onFocus={ onMouseEnter }
+				onBlur={ onMouseLeave }
+				level={ level }
+				position={ position }
+				rowCount={ rowCount }
+				path={ path }
+				id={ `list-view-block-${ clientId }` }
+				data-block={ clientId }
+				isExpanded={ isExpanded }
 			>
-				{ ( { ref, tabIndex, onFocus } ) => (
-					<div className="block-editor-list-view-block__contents-container">
-						<ListViewBlockContents
-							block={ block }
-							onClick={ selectEditorBlock }
-							onToggleExpanded={ toggleExpanded }
-							isSelected={ isSelected }
-							position={ position }
-							siblingBlockCount={ siblingBlockCount }
-							level={ level }
-							ref={ ref }
-							tabIndex={ tabIndex }
-							onFocus={ onFocus }
-						/>
-					</div>
-				) }
-			</TreeGridCell>
-			{ hasRenderedMovers && (
-				<>
-					<TreeGridCell
-						className={ moverCellClassName }
-						withoutGridItem
-					>
-						<TreeGridItem>
-							{ ( { ref, tabIndex, onFocus } ) => (
-								<BlockMoverUpButton
-									orientation="vertical"
-									clientIds={ [ clientId ] }
-									ref={ ref }
-									tabIndex={ tabIndex }
-									onFocus={ onFocus }
-								/>
-							) }
-						</TreeGridItem>
-						<TreeGridItem>
-							{ ( { ref, tabIndex, onFocus } ) => (
-								<BlockMoverDownButton
-									orientation="vertical"
-									clientIds={ [ clientId ] }
-									ref={ ref }
-									tabIndex={ tabIndex }
-									onFocus={ onFocus }
-								/>
-							) }
-						</TreeGridItem>
-					</TreeGridCell>
-				</>
-			) }
-
-			{ withExperimentalFeatures && (
-				<TreeGridCell className={ listViewBlockSettingsClassName }>
+				<TreeGridCell
+					className="block-editor-list-view-block__contents-cell"
+					colSpan={ hasRenderedMovers ? undefined : 2 }
+					ref={ cellRef }
+				>
 					{ ( { ref, tabIndex, onFocus } ) => (
-						<BlockSettingsDropdown
-							clientIds={ [ clientId ] }
-							icon={ moreVertical }
-							toggleProps={ {
-								ref,
-								className: 'block-editor-list-view-block__menu',
-								tabIndex,
-								onFocus,
-							} }
-							disableOpenOnArrowDown
-							__experimentalSelectBlock={ selectEditorBlock }
-						/>
+						<div className="block-editor-list-view-block__contents-container">
+							<ListViewBlockContents
+								block={ block }
+								onClick={ selectEditorBlock }
+								onToggleExpanded={ toggleExpanded }
+								isSelected={ isSelected }
+								position={ position }
+								siblingBlockCount={ siblingBlockCount }
+								level={ level }
+								ref={ ref }
+								tabIndex={ tabIndex }
+								onFocus={ onFocus }
+							/>
+						</div>
 					) }
 				</TreeGridCell>
-			) }
-		</ListViewLeaf>
+				{ hasRenderedMovers && (
+					<>
+						<TreeGridCell
+							className={ moverCellClassName }
+							withoutGridItem
+						>
+							<TreeGridItem>
+								{ ( { ref, tabIndex, onFocus } ) => (
+									<BlockMoverUpButton
+										orientation="vertical"
+										clientIds={ [ clientId ] }
+										ref={ ref }
+										tabIndex={ tabIndex }
+										onFocus={ onFocus }
+									/>
+								) }
+							</TreeGridItem>
+							<TreeGridItem>
+								{ ( { ref, tabIndex, onFocus } ) => (
+									<BlockMoverDownButton
+										orientation="vertical"
+										clientIds={ [ clientId ] }
+										ref={ ref }
+										tabIndex={ tabIndex }
+										onFocus={ onFocus }
+									/>
+								) }
+							</TreeGridItem>
+						</TreeGridCell>
+					</>
+				) }
+
+				{ withExperimentalFeatures && (
+					<TreeGridCell className={ listViewBlockSettingsClassName }>
+						{ ( { ref, tabIndex, onFocus } ) => (
+							<BlockSettingsDropdown
+								clientIds={ [ clientId ] }
+								icon={ moreVertical }
+								toggleProps={ {
+									ref,
+									className:
+										'block-editor-list-view-block__menu',
+									tabIndex,
+									onFocus,
+								} }
+								disableOpenOnArrowDown
+								__experimentalSelectBlock={ selectEditorBlock }
+							/>
+						) }
+					</TreeGridCell>
+				) }
+			</ListViewLeaf>
+		</AsyncModeProvider>
 	);
 }

@@ -97,12 +97,18 @@ function ListView(
 		},
 		[ setExpandedState ]
 	);
-	const expandRow = ( row ) => {
-		expand( row?.dataset?.block );
-	};
-	const collapseRow = ( row ) => {
-		collapse( row?.dataset?.block );
-	};
+	const expandRow = useCallback(
+		( row ) => {
+			expand( row?.dataset?.block );
+		},
+		[ expand ]
+	);
+	const collapseRow = useCallback(
+		( row ) => {
+			collapse( row?.dataset?.block );
+		},
+		[ collapse ]
+	);
 
 	const contextValue = useMemo(
 		() => ( {
