@@ -90,6 +90,7 @@ export default function BlockEditor( { setIsInserterOpen } ) {
 				<BackButton />
 
 				<ResizableEditor
+					enabledResizing={ isTemplatePart }
 					settings={ settings }
 					contentRef={ mergedRefs }
 				/>

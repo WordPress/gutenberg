@@ -31,7 +31,7 @@ const DEFAULT_STYLES = {
 	height: '100%',
 };
 
-function ResizableEditor( { settings, ...props } ) {
+function ResizableEditor( { enabledResizing, settings, ...props } ) {
 	const deviceType = useSelect(
 		( select ) =>
 			select( editSiteStore ).__experimentalGetPreviewDeviceType(),
@@ -72,9 +72,10 @@ function ResizableEditor( { settings, ...props } ) {
 			minWidth={ 300 }
 			maxWidth="100%"
 			enable={ {
-				right: true,
-				left: true,
+				right: enabledResizing,
+				left: enabledResizing,
 			} }
+			showHandle={ enabledResizing }
 			// The editor is centered horizontally, resizing it only
 			// moves half the distance. Hence double the ratio to correctly
 			// align the cursor to the resizer handle.
