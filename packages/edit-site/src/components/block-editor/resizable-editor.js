@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { useState, useEffect } from '@wordpress/element';
+import { useState, useEffect, useRef } from '@wordpress/element';
 import { ResizableBox } from '@wordpress/components';
 import {
 	BlockList,
@@ -11,7 +11,6 @@ import {
 	__unstableUseMouseMoveTypingReset as useMouseMoveTypingReset,
 } from '@wordpress/block-editor';
 import { useDispatch, useSelect } from '@wordpress/data';
-import { usePrevious } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -38,11 +37,11 @@ function ResizableEditor( { enabledResizing, settings, ...props } ) {
 		[]
 	);
 	const resizedCanvasStyles = useResizeCanvas( deviceType ) ?? DEFAULT_STYLES;
-	const previousResizedCanvasStyles = usePrevious( resizedCanvasStyles );
+	const previousResizedCanvasStylesRef = useRef( resizedCanvasStyles );
 	// Keep the height of the canvas when resizing on each device type.
 	const styles =
 		deviceType === RESPONSIVE_DEVICE
-			? previousResizedCanvasStyles
+			? previousResizedCanvasStylesRef.current
 			: resizedCanvasStyles;
 	const [ width, setWidth ] = useState( styles.width );
 	const {
@@ -54,6 +53,7 @@ function ResizableEditor( { enabledResizing, settings, ...props } ) {
 		function setWidthWhenDeviceTypeChanged() {
 			if ( deviceType !== RESPONSIVE_DEVICE ) {
 				setWidth( resizedCanvasStyles.width );
+				previousResizedCanvasStylesRef.current = resizedCanvasStyles;
 			}
 		},
 		[ deviceType, resizedCanvasStyles.width ]
