@@ -8,6 +8,10 @@
 	"attributes": {
 		"textAlign": {
 			"type": "string"
+		},
+		"hideCommentsClosed": {
+			"type": "boolean",
+			"default": false
 		}
 	},
 	"usesContext": [ "postId", "postType" ],

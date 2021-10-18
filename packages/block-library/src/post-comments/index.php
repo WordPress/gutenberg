@@ -16,13 +16,19 @@
 function render_block_core_post_comments( $attributes, $content, $block ) {
 	global $post;
 
-	if ( ! isset( $block->context['postId'] ) ) {
+	$post_id = $block->context['postId'];
+
+	if ( ! isset( $post_id ) ) {
+		return '';
+	}
+
+	if ( ! comments_open( $post_id ) && $attributes['hideCommentsClosed'] ) {
 		return '';
 	}
 
 	$post_before = $post;
 
-	$post = get_post( $block->context['postId'] );
+	$post = get_post( $post_id );
 	setup_postdata( $post );
 
 	ob_start();
