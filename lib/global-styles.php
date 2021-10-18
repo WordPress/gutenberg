@@ -131,30 +131,43 @@ function gutenberg_experimental_global_styles_settings( $settings ) {
 	}
 
 	if ( 'other' === $context ) {
-		$block_styles  = array( 'css' => gutenberg_experimental_global_styles_get_stylesheet( $consolidated, 'block_styles' ) );
-		$css_variables = array(
-			'css'                     => gutenberg_experimental_global_styles_get_stylesheet( $consolidated, 'css_variables' ),
-			'__experimentalNoWrapper' => true,
-		);
+		$new_styles = array();
 
-		// Make sure the styles array exists.
+		// Make sure the styles array exists, first.
 		// In some contexts, like the navigation editor, it doesn't.
 		if ( ! isset( $settings['styles'] ) ) {
 			$settings['styles'] = array();
 		}
 
-		// Reset existing global styles.
-		$styles_without_existing_global_styles = array();
+		// Add some editor defaults for themes
+		// that haven't provided any editor styles.
+		if ( empty( $settings['styles'] ) ) {
+			$new_styles[] = array(
+				'css' => file_get_contents( gutenberg_dir_path() . 'build/block-editor/default-editor-styles.css' )
+			);
+		}
+
+		// Take all provided styles but the ones provided by core (font & global styles).
 		foreach ( $settings['styles'] as $style ) {
-			if ( ! isset( $style['__unstableType'] ) || 'globalStyles' !== $style['__unstableType'] ) {
-				$styles_without_existing_global_styles[] = $style;
+			if (
+				! isset( $style['__unstableType'] ) ||
+				'globalStyles' !== $style['__unstableType'] || // Remove the global styles from core.
+				'core' !== $style['__unstableType'] // Remove the default font addition from core.
+			) {
+				$new_styles[] = $style;
 			}
 		}
 
-		// Add the new ones.
-		$styles_without_existing_global_styles[] = $css_variables;
-		$styles_without_existing_global_styles[] = $block_styles;
-		$settings['styles']                      = $styles_without_existing_global_styles;
+		// Add the new styles for global styles back.
+		$block_styles  = array( 'css' => gutenberg_experimental_global_styles_get_stylesheet( $consolidated, 'block_styles' ) );
+		$css_variables = array(
+			'css'                     => gutenberg_experimental_global_styles_get_stylesheet( $consolidated, 'css_variables' ),
+			'__experimentalNoWrapper' => true,
+		);
+		$new_styles[] = $css_variables;
+		$new_styles[] = $block_styles;
+
+		$settings['styles'] = $new_styles;
 	}
 
 	// Copied from get_block_editor_settings() at wordpress-develop/block-editor.php.
