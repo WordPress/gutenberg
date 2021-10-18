@@ -1,19 +1,17 @@
 /**
+ * External dependencies
+ */
+import classnames from 'classnames';
+
+/**
  * WordPress dependencies
  */
-import { RichText } from '@wordpress/block-editor';
+import { RichText, useBlockProps } from '@wordpress/block-editor';
 
 /**
  * Internal dependencies
  */
 import migrateFontFamily from '../utils/migrate-font-family';
-import blockConfig from './block.json';
-import currentSave from './save';
-
-const {
-	attributes: currentAttributes,
-	supports: currentSupports,
-} = blockConfig;
 
 const v1 = {
 	attributes: {
@@ -41,9 +39,46 @@ const v1 = {
 };
 
 const v2 = {
-	attributes: currentAttributes,
-	supports: currentSupports,
-	save: currentSave,
+	attributes: {
+		content: {
+			type: 'string',
+			source: 'html',
+			selector: 'pre',
+			default: '',
+			__unstablePreserveWhiteSpace: true,
+			__experimentalRole: 'content',
+		},
+		textAlign: {
+			type: 'string',
+		},
+	},
+	supports: {
+		anchor: true,
+		color: {
+			gradients: true,
+			link: true,
+		},
+		typography: {
+			fontSize: true,
+			__experimentalFontFamily: true,
+		},
+		spacing: {
+			padding: true,
+		},
+	},
+	save( { attributes } ) {
+		const { textAlign, content } = attributes;
+
+		const className = classnames( {
+			[ `has-text-align-${ textAlign }` ]: textAlign,
+		} );
+
+		return (
+			<pre { ...useBlockProps.save( { className } ) }>
+				<RichText.Content value={ content } />
+			</pre>
+		);
+	},
 	migrate: migrateFontFamily,
 	isEligible( { style } ) {
 		return style?.typography?.fontFamily;
