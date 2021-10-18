@@ -137,14 +137,23 @@ const renderPanel = () => {
 };
 
 /**
+ * Retrieves the panel's dropdown menu toggle button.
+ *
+ * @return {HTMLElement} The menu button.
+ */
+const getMenuButton = () => {
+	return screen.getByRole( 'button', {
+		name: /view([\w\s]+)options/i,
+	} );
+};
+
+/**
  * Helper to find the menu button and simulate a user click.
  *
  * @return {HTMLElement} The menuButton.
  */
 const openDropdownMenu = () => {
-	const menuButton = screen.getByRole( 'button', {
-		name: /view([\w\s]+)options/i,
-	} );
+	const menuButton = getMenuButton();
 	fireEvent.click( menuButton );
 	return menuButton;
 };
@@ -165,15 +174,15 @@ describe( 'ToolsPanel', () => {
 		it( 'should render panel', () => {
 			renderPanel();
 
-			expect( screen.getByText( 'Visible' ) ).toBeInTheDocument();
-		} );
+			const menuButton = getMenuButton();
+			const label = screen.getByText( defaultProps.label );
+			const control = screen.getByText( 'Example control' );
+			const nonToolsPanelItem = screen.getByText( 'Visible' );
 
-		it( 'should render non panel item child', () => {
-			renderPanel();
-
-			const nonPanelItem = screen.queryByText( 'Visible' );
-
-			expect( nonPanelItem ).toBeInTheDocument();
+			expect( menuButton ).toBeInTheDocument();
+			expect( label ).toBeInTheDocument();
+			expect( control ).toBeInTheDocument();
+			expect( nonToolsPanelItem ).toBeInTheDocument();
 		} );
 
 		it( 'should render panel item flagged as default control even without value', () => {
