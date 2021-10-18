@@ -100,7 +100,7 @@ const renderGroupedItemsInPanel = () => {
 // to test panel item registration and rendering.
 const WrappedItem = ( { text, ...props } ) => {
 	return (
-		<div className="wrapped-panel-item-container">
+		<div>
 			<span>Wrapper</span>
 			<ToolsPanelItem { ...props }>
 				<div>{ text }</div>
