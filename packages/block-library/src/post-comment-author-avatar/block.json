@@ -1,10 +1,10 @@
 {
 	"apiVersion": 2,
-	"name": "core/post-comment-avatar",
-	"title": "Comment Avatar",
+	"name": "core/post-comment-author-avatar",
+	"title": "Comment Author Avatar",
 	"category": "design",
 	"parent": [ "core/post-comment" ],
-	"description": "Comment Avatar.",
+	"description": "Comment Author Avatar.",
 	"textdomain": "default",
 	"attributes": {
 		"width": {

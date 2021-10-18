@@ -54,7 +54,7 @@ export default function Edit( {
 	return (
 		<>
 			<InspectorControls>
-				<PanelBody title={ __( 'Comment Avatar Settings' ) }>
+				<PanelBody title={ __( 'Comment Author Avatar Settings' ) }>
 					<RangeControl
 						label={ __( 'Image size' ) }
 						onChange={ ( newWidth ) =>

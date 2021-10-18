@@ -1,7 +1,9 @@
 [
 	{
-		"blockName": "core/post-comment-avatar",
-		"attrs": {
+		"clientId": "_clientId_0",
+		"name": "core/post-comment-author-avatar",
+		"isValid": true,
+		"attributes": {
 			"width": 153,
 			"height": 153,
 			"style": {
@@ -19,7 +21,6 @@
 			}
 		},
 		"innerBlocks": [],
-		"innerHTML": "",
-		"innerContent": []
+		"originalContent": ""
 	}
 ]
