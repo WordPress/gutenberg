@@ -57,9 +57,6 @@
 	&.is-branch-selected:not(.is-selected) .block-editor-list-view-block-contents {
 		border-radius: 0;
 	}
-	&.is-branch-selected.is-last-of-selected-branch .block-editor-list-view-block-contents {
-		border-radius: 0 0 2px 2px;
-	}
 
 	&.is-dragging {
 		display: none;

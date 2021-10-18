@@ -144,9 +144,6 @@ export default function ListViewBlock( {
 		'is-selected': isSelected,
 		'is-branch-selected':
 			withExperimentalPersistentListViewFeatures && isBranchSelected,
-		// 'is-last-of-selected-branch':
-		// 	withExperimentalPersistentListViewFeatures &&
-		// 	isLastOfSelectedBranch,
 		'is-dragging': isDragged,
 	} );
 
