@@ -9,43 +9,15 @@
  * Takes a tree adhering to the theme.json schema and generates
  * the corresponding stylesheet.
  *
- * @param WP_Theme_JSON_Gutenberg $tree Input tree.
- * @param string                  $type Type of stylesheet. It accepts 'all', 'block_styles', 'css_variables', 'presets'.
+ * @param WP_Theme_JSON_Gutenberg $tree  Input tree.
+ * @param array                   $types Which styles to load. It accepts 'css_variables', 'block_classes', 'preset_classes'. By default, it'll load all.
  *
  * @return string Stylesheet.
  */
-function gutenberg_experimental_global_styles_get_stylesheet( $tree, $type = null ) {
-	// Check if we can use cached.
-	$can_use_cached = (
-		( 'all' === $type ) &&
-		( ! defined( 'WP_DEBUG' ) || ! WP_DEBUG ) &&
-		( ! defined( 'SCRIPT_DEBUG' ) || ! SCRIPT_DEBUG ) &&
-		( ! defined( 'REST_REQUEST' ) || ! REST_REQUEST ) &&
-		! is_admin()
-	);
-
-	$transient_name = 'gutenberg_global_styles_' . get_stylesheet();
-	if ( $can_use_cached ) {
-		// Check if we have the styles already cached.
-		// It's cached by theme to make sure that theme switching
-		// is inmediately reflected.
-		$cached = get_transient( $transient_name );
-		if ( $cached ) {
-			return $cached;
-		}
-	}
-
+function gutenberg_experimental_global_styles_get_stylesheet( $tree, $types = array( 'css_variables', 'block_classes', 'preset_classes' ) ) {
+	$origins             = array( 'core', 'theme', 'user' );
 	$supports_theme_json = WP_Theme_JSON_Resolver_Gutenberg::theme_has_support();
 	$supports_link_color = get_theme_support( 'experimental-link-color' );
-
-	// Only modify the $type if the consumer hasn't provided any.
-	if ( null === $type && ! $supports_theme_json ) {
-		$type = 'presets';
-	} elseif ( null === $type ) {
-		$type = 'all';
-	}
-
-	$origins = array( 'core', 'theme', 'user' );
 	if ( ! $supports_theme_json && ! $supports_link_color ) {
 		// In this case we only enqueue the core presets (CSS Custom Properties + the classes).
 		$origins = array( 'core' );
@@ -55,13 +27,7 @@ function gutenberg_experimental_global_styles_get_stylesheet( $tree, $type = nul
 		$origins = array( 'core', 'theme' );
 	}
 
-	$stylesheet = $tree->get_stylesheet( $type, $origins );
-
-	if ( $can_use_cached ) {
-		// Cache for a minute.
-		// This cache doesn't need to be any longer, we only want to avoid spikes on high-traffic sites.
-		set_transient( $transient_name, $stylesheet, MINUTE_IN_SECONDS );
-	}
+	$stylesheet = $tree->get_stylesheet( $types, $origins );
 
 	return $stylesheet;
 }
@@ -128,10 +94,18 @@ function gutenberg_experimental_global_styles_settings( $settings ) {
 	}
 
 	if ( 'other' === $context ) {
-		$block_styles  = array( 'css' => gutenberg_experimental_global_styles_get_stylesheet( $consolidated, 'block_styles' ) );
-		$css_variables = array(
-			'css'                     => gutenberg_experimental_global_styles_get_stylesheet( $consolidated, 'css_variables' ),
+		$block_classes  = array(
+			'css'            => gutenberg_experimental_global_styles_get_stylesheet( $consolidated, array( 'block_classes' ) ),
+			'__unstableType' => 'theme',
+		);
+		$preset_classes = array(
+			'css'            => gutenberg_experimental_global_styles_get_stylesheet( $consolidated, array( 'preset_classes' ) ),
+			'__unstableType' => 'presets',
+		);
+		$css_variables  = array(
+			'css'                     => gutenberg_experimental_global_styles_get_stylesheet( $consolidated, array( 'css_variables' ) ),
 			'__experimentalNoWrapper' => true,
+			'__unstableType'          => 'presets',
 		);
 
 		// Make sure the styles array exists.
@@ -150,7 +124,8 @@ function gutenberg_experimental_global_styles_settings( $settings ) {
 
 		// Add the new ones.
 		$styles_without_existing_global_styles[] = $css_variables;
-		$styles_without_existing_global_styles[] = $block_styles;
+		$styles_without_existing_global_styles[] = $block_classes;
+		$styles_without_existing_global_styles[] = $preset_classes;
 		$settings['styles']                      = $styles_without_existing_global_styles;
 	}
 
