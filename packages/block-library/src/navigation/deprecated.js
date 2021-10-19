@@ -7,6 +7,7 @@ import { mapValues, omit } from 'lodash';
  * WordPress dependencies
  */
 import { InnerBlocks } from '@wordpress/block-editor';
+import { compose } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -106,6 +107,40 @@ const v4 = {
 	},
 };
 
+const migrateIsResponsive = function ( attributes ) {
+	delete attributes.isResponsive;
+	return {
+		...attributes,
+		overlayMenu: 'mobile',
+	};
+};
+
+const migrateTypographyPresets = function ( attributes ) {
+	return {
+		...attributes,
+		style: {
+			...attributes.style,
+			typography: mapValues(
+				attributes.style.typography,
+				( value, key ) => {
+					const prefix = TYPOGRAPHY_PRESET_DEPRECATION_MAP[ key ];
+					if ( prefix && value.startsWith( prefix ) ) {
+						const newValue = value.slice( prefix.length );
+						if (
+							'textDecoration' === key &&
+							'strikethrough' === newValue
+						) {
+							return 'line-through';
+						}
+						return newValue;
+					}
+					return value;
+				}
+			),
+		},
+	};
+};
+
 const deprecated = [
 	v4,
 	// Remove `isResponsive` attribute.
@@ -182,13 +217,7 @@ const deprecated = [
 		isEligible( attributes ) {
 			return attributes.isResponsive;
 		},
-		migrate( attributes ) {
-			delete attributes.isResponsive;
-			return {
-				...attributes,
-				overlayMenu: 'mobile',
-			};
-		},
+		migrate: compose( migrateFontFamily, migrateIsResponsive ),
 		save() {
 			return <InnerBlocks.Content />;
 		},
@@ -258,32 +287,7 @@ const deprecated = [
 			}
 			return false;
 		},
-		migrate( attributes ) {
-			return {
-				...attributes,
-				style: {
-					...attributes.style,
-					typography: mapValues(
-						attributes.style.typography,
-						( value, key ) => {
-							const prefix =
-								TYPOGRAPHY_PRESET_DEPRECATION_MAP[ key ];
-							if ( prefix && value.startsWith( prefix ) ) {
-								const newValue = value.slice( prefix.length );
-								if (
-									'textDecoration' === key &&
-									'strikethrough' === newValue
-								) {
-									return 'line-through';
-								}
-								return newValue;
-							}
-							return value;
-						}
-					),
-				},
-			};
-		},
+		migrate: compose( migrateFontFamily, migrateTypographyPresets ),
 	},
 	{
 		attributes: {
