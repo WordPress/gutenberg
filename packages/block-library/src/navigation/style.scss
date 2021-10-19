@@ -231,7 +231,7 @@
 .wp-block-navigation,
 .wp-block-navigation .wp-block-page-list,
 .wp-block-navigation__container {
-	gap: calc(var(--wp--style--block-gap, 2em) / 4) var(--wp--style--block-gap, 2em);
+	gap: var(--wp--style--block-gap, 2em);
 }
 
 // Menu items with background.
@@ -242,7 +242,7 @@
 	&,
 	.wp-block-navigation .wp-block-page-list,
 	.wp-block-navigation__container {
-		gap: calc(var(--wp--style--block-gap, 0) / 4) var(--wp--style--block-gap, 0.5em);
+		gap: var(--wp--style--block-gap, 0.5em);
 	}
 }
 
@@ -256,7 +256,7 @@
 
 // When the menu has a background, items have paddings, reduce margins to compensate.
 // Treat margins and paddings differently when the block has a background.
-.wp-block-navigation:where(.has-background) a {
+.wp-block-navigation:where(.has-background) .wp-block-navigation-item__content {
 	padding: 0.5em 1em;
 }
 
@@ -465,7 +465,7 @@
 			}
 
 			// A default padding is added to submenu items. It's not appropriate inside the modal.
-			& :where(.wp-block-navigation__submenu-container) a {
+			a {
 				padding: 0;
 			}
 
