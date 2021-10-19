@@ -144,4 +144,10 @@ module.exports = {
 	'embed-no-preview__sheet-icon': {
 		fill: 'gray',
 	},
+	fullAlignment: {
+		width: '100%',
+	},
+	'embed__icon--error': {
+		fill: 'red',
+	},
 };

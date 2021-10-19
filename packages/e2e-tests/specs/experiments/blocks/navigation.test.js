@@ -598,7 +598,7 @@ describe( 'Navigation', () => {
 		await toggleSidebar();
 
 		const [ openOnClickButton ] = await page.$x(
-			'//label[contains(text(),"Open submenus on click")]'
+			'//label[contains(text(),"Open on click")]'
 		);
 
 		await openOnClickButton.click();
@@ -654,6 +654,8 @@ describe( 'Navigation', () => {
 		await insertBlock( 'Site Title' );
 
 		// Now try inserting another Link block via the quick inserter.
+		await page.focus( '.wp-block-navigation .block-list-appender' );
+
 		await page.click( '.wp-block-navigation .block-list-appender' );
 
 		const linkButton = await page.waitForSelector(

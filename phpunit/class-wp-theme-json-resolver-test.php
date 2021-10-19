@@ -134,6 +134,11 @@ class WP_Theme_JSON_Resolver_Gutenberg_Test extends WP_UnitTestCase {
 				'key'     => 'title',
 				'context' => 'Custom template name',
 			),
+			array(
+				'path'    => array( 'templateParts' ),
+				'key'     => 'title',
+				'context' => 'Template part name',
+			),
 		);
 
 		$this->assertEquals( $expected, $actual );
@@ -197,6 +202,15 @@ class WP_Theme_JSON_Resolver_Gutenberg_Test extends WP_UnitTestCase {
 				),
 			)
 		);
+		$this->assertSame(
+			$actual->get_template_parts(),
+			array(
+				'small-header' => array(
+					'title' => 'Mały nagłówek',
+					'area'  => 'header',
+				),
+			)
+		);
 	}
 
 	function test_switching_themes_recalculates_data() {
@@ -241,4 +255,63 @@ class WP_Theme_JSON_Resolver_Gutenberg_Test extends WP_UnitTestCase {
 		$this->assertSame( $color_palette, $settings['color']['palette']['theme'] );
 	}
 
+	function test_merges_child_theme_json_into_parent_theme_json() {
+		switch_theme( 'fse-child' );
+
+		$actual = WP_Theme_JSON_Resolver_Gutenberg::get_theme_data();
+
+		// Should merge settings.
+		$this->assertSame(
+			array(
+				'color'  => array(
+					'palette' => array(
+						'theme' => array(
+							array(
+								'slug'  => 'light',
+								'name'  => 'Light',
+								'color' => '#f3f4f6',
+							),
+							array(
+								'slug'  => 'primary',
+								'name'  => 'Primary',
+								'color' => '#3858e9',
+							),
+							array(
+								'slug'  => 'dark',
+								'name'  => 'Dark',
+								'color' => '#111827',
+							),
+						),
+					),
+					'custom'  => true,
+				),
+				'blocks' => array(
+					'core/paragraph' => array(
+						'color' => array(
+							'palette' => array(
+								'theme' => array(
+									array(
+										'slug'  => 'light',
+										'name'  => 'Light',
+										'color' => '#f3f4f6',
+									),
+								),
+							),
+						),
+					),
+				),
+			),
+			$actual->get_settings()
+		);
+
+		$this->assertSame(
+			$actual->get_custom_templates(),
+			array(
+				'page-home' => array(
+					'title'     => 'Homepage',
+					'postTypes' => array( 'page' ),
+				),
+			)
+		);
+	}
 }

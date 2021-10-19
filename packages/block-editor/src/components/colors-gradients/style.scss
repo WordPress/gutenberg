@@ -2,11 +2,6 @@
 	.block-editor-color-gradient-control__color-indicator {
 		margin-bottom: $grid-unit-15;
 	}
-
-	.block-editor-color-gradient-control__button-tabs {
-		display: block;
-		margin-bottom: $grid-unit-15;
-	}
 }
 
 .block-editor-panel-color-gradient-settings {
@@ -44,5 +39,13 @@
 		.components-circular-option-picker__option-wrapper:nth-child(6n + 6) {
 			margin-right: 0;
 		}
+	}
+
+
+	// This shouldn't be needed but there's a rule in the inspector controls
+	// overriding this causing too much spacing.
+	// That generic rule should ideally be removed.
+	.block-editor-block-inspector & .components-base-control {
+		margin-bottom: inherit;
 	}
 }

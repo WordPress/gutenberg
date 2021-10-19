@@ -18,7 +18,14 @@
 	"supports": {
 		"anchor": true,
 		"align": [ "wide", "full" ],
-		"__experimentalExposeControlsToChildren": true
+		"__experimentalExposeControlsToChildren": true,
+		"spacing": {
+			"blockGap": true,
+			"margin": ["top", "bottom" ],
+			"__experimentalDefaultControls": {
+				"blockGap": true
+			}
+		}
 	},
 	"editorStyle": "wp-block-buttons-editor",
 	"style": "wp-block-buttons"

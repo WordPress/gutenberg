@@ -69,6 +69,7 @@ export default function TemplatePartsMenu() {
 					TEMPLATE_PARTS_SUB_MENUS.map( ( { title, menu } ) => (
 						<NavigationItem
 							key={ `template-parts-navigate-to-${ menu }` }
+							className="edit-site-navigation-panel__template-part-item"
 							navigateToMenu={ menu }
 							title={ title }
 							hideIfTargetMenuEmpty

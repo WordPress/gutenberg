@@ -15,7 +15,7 @@ import { useCallback, useMemo } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import ColorPicker from '../color-picker';
+import { ColorPicker } from '../color-picker';
 import CircularOptionPicker from '../circular-option-picker';
 
 extend( [ namesPlugin, a11yPlugin ] );
@@ -70,8 +70,7 @@ export default function ColorPalette( {
 	const renderCustomColorPicker = () => (
 		<ColorPicker
 			color={ value }
-			onChangeComplete={ ( color ) => onChange( color.hex ) }
-			disableAlpha
+			onChange={ ( color ) => onChange( color ) }
 		/>
 	);
 

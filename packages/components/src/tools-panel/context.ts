@@ -18,6 +18,7 @@ export const ToolsPanelContext = createContext< ToolsPanelContextType >( {
 	registerPanelItem: noop,
 	deregisterPanelItem: noop,
 	flagItemCustomization: noop,
+	areAllOptionalControlsHidden: true,
 } );
 
 export const useToolsPanelContext = () =>
