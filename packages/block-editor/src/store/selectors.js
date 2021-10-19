@@ -1564,16 +1564,26 @@ export const getInserterItems = createSelector(
 		} );
 
 		/*
-		 * @see `@wordpress/block-serialization-default-parser` package
+		 * Matches block comment delimiters amid serialized content.
+		 *
+		 * @see `tokenizer` in `@wordpress/block-serialization-default-parser` package
 		 */
-		const tokenizer = /<!--\s+(\/)?wp:([a-z][a-z0-9_-]*\/)?([a-z][a-z0-9_-]*)\s+({(?:(?=([^}]+|}+(?=})|(?!}\s+\/?-->)[^])*)\5|[^]*?)}\s+)?(\/)?-->/;
+		const blockParserTokenizer = /<!--\s+(\/)?wp:([a-z][a-z0-9_-]*\/)?([a-z][a-z0-9_-]*)\s+({(?:(?=([^}]+|}+(?=})|(?!}\s+\/?-->)[^])*)\5|[^]*?)}\s+)?(\/)?-->/;
 
 		const buildReusableBlockInserterItem = ( reusableBlock ) => {
 			let icon = symbol;
 
+			/*
+			 * Instead of always displaying a generic "symbol" icon for every
+			 * reusable block, try to use an icon that represents the first
+			 * outermost block contained in the reusable block. This requires
+			 * scanning the serialized form of the reusable block to find its
+			 * first block delimiter, then looking up the corresponding block
+			 * type, if available.
+			 */
 			if ( Platform.OS === 'web' ) {
 				const rawBlockMatch = reusableBlock.content.raw.match(
-					tokenizer
+					blockParserTokenizer
 				);
 				if ( rawBlockMatch ) {
 					const [
