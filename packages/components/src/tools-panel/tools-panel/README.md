@@ -102,7 +102,3 @@ Advises the `ToolsPanel` that all of its `ToolsPanelItem` children should render
 placeholder content (instead of `null`) when they are toggled off and hidden.
 
 - Required: No
-
-### Inherited props
-
-`ToolsPanel` also inherits all of the [`Grid` props](/packages/components/src/grid/README.md#props).
