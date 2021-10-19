@@ -1,12 +1,7 @@
 /**
- * External dependencies
- */
-import { fromPairs } from 'lodash';
-
-/**
  * WordPress dependencies
  */
-import { useMemo, useCallback } from '@wordpress/element';
+import { useMemo, useState, useCallback } from '@wordpress/element';
 import { _x } from '@wordpress/i18n';
 import { useAsyncList } from '@wordpress/compose';
 
@@ -16,6 +11,7 @@ import { useAsyncList } from '@wordpress/compose';
 import PatternInserterPanel from './pattern-panel';
 import usePatternsState from './hooks/use-patterns-state';
 import BlockPatternList from '../block-patterns-list';
+import PatternsExplorer from './block-patterns-explorer/explorer';
 
 function BlockPatternsCategory( {
 	rootClientId,
@@ -23,6 +19,7 @@ function BlockPatternsCategory( {
 	selectedCategory,
 	onClickCategory,
 } ) {
+	const [ showPatternsExplorer, setShowPatternsExplorer ] = useState( false );
 	const [ allPatterns, allCategories, onClick ] = usePatternsState(
 		onInsert,
 		rootClientId
@@ -79,14 +76,15 @@ function BlockPatternsCategory( {
 
 	const getPatternIndex = useCallback(
 		( pattern ) => {
-			if ( ! pattern.categories || ! pattern.categories.length ) {
+			if ( ! pattern.categories?.length ) {
 				return Infinity;
 			}
-			const indexedCategories = fromPairs(
-				populatedCategories.map( ( { name }, index ) => [
-					name,
-					index,
-				] )
+			const indexedCategories = populatedCategories.reduce(
+				( accumulator, { name }, index ) => {
+					accumulator[ name ] = index;
+					return accumulator;
+				},
+				{}
 			);
 			return Math.min(
 				...pattern.categories.map( ( cat ) =>
@@ -104,8 +102,7 @@ function BlockPatternsCategory( {
 			allPatterns.filter( ( pattern ) =>
 				patternCategory.name === 'uncategorized'
 					? getPatternIndex( pattern ) === Infinity
-					: pattern.categories &&
-					  pattern.categories.includes( patternCategory.name )
+					: pattern.categories?.includes( patternCategory.name )
 			),
 		[ allPatterns, patternCategory ]
 	);
@@ -119,23 +116,40 @@ function BlockPatternsCategory( {
 
 	const currentShownPatterns = useAsyncList( orderedPatterns );
 
+	if ( ! currentCategoryPatterns.length ) {
+		return null;
+	}
+
+	const patternListProps = {
+		shownPatterns: currentShownPatterns,
+		blockPatterns: currentCategoryPatterns,
+		onClickPattern: onClick,
+		label: patternCategory.label,
+		orientation: ! showPatternsExplorer ? 'vertical' : undefined,
+		isDraggable: ! showPatternsExplorer,
+	};
+	const blockPatternList = <BlockPatternList { ...patternListProps } />;
 	return (
 		<>
-			{ !! currentCategoryPatterns.length && (
+			{ ! showPatternsExplorer && (
 				<PatternInserterPanel
 					selectedCategory={ patternCategory }
 					patternCategories={ populatedCategories }
 					onClickCategory={ onClickCategory }
+					onShowExplorer={ () => setShowPatternsExplorer( true ) }
 				>
-					<BlockPatternList
-						shownPatterns={ currentShownPatterns }
-						blockPatterns={ currentCategoryPatterns }
-						onClickPattern={ onClick }
-						label={ patternCategory.label }
-						orientation="vertical"
-						isDraggable
-					/>
+					{ blockPatternList }
 				</PatternInserterPanel>
+			) }
+			{ showPatternsExplorer && (
+				<PatternsExplorer
+					selectedCategory={ patternCategory }
+					patternCategories={ populatedCategories }
+					onClickCategory={ onClickCategory }
+					onModalClose={ () => setShowPatternsExplorer( false ) }
+				>
+					{ blockPatternList }
+				</PatternsExplorer>
 			) }
 		</>
 	);

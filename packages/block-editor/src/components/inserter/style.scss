@@ -330,3 +330,24 @@ $block-inserter-tabs-height: 44px;
 		border-color: var(--wp-admin-theme-color);
 	}
 }
+
+.block-editor-block-patterns-explorer {
+	&__sidebar {
+		&__categories-list__item {
+			display: block;
+		}
+	}
+	.block-editor-block-patterns-list {
+		display: grid;
+		grid-gap: 10px;
+		grid-template-columns: repeat(3, 1fr);
+		align-items: baseline;
+		.block-editor-block-patterns-list__list-item {
+			margin-top: 0;
+		}
+		.block-editor-block-preview__container {
+			max-height: 250px;
+			overflow: auto;
+		}
+	}
+}

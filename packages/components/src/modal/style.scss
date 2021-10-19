@@ -37,6 +37,11 @@
 		animation: components-modal__appear-animation 0.1s ease-out;
 		animation-fill-mode: forwards;
 		@include reduce-motion("animation");
+
+		&.is-full-screen {
+			width: 90vw;
+			min-height: 90vh;
+		}
 	}
 
 	@include break-large() {

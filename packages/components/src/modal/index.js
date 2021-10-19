@@ -52,6 +52,7 @@ export default function Modal( {
 	className,
 	contentLabel,
 	onKeyDown,
+	isFullScreen, // TODO: change docs
 } ) {
 	const ref = useRef();
 	const instanceId = useInstanceId( Modal );
@@ -112,7 +113,9 @@ export default function Modal( {
 			onKeyDown={ handleEscapeKeyDown }
 		>
 			<div
-				className={ classnames( 'components-modal__frame', className ) }
+				className={ classnames( 'components-modal__frame', className, {
+					'is-full-screen': isFullScreen,
+				} ) }
 				style={ style }
 				ref={ useMergeRefs( [
 					constrainedTabbingRef,
