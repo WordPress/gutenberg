@@ -22,7 +22,7 @@ function render_block_core_post_comments( $attributes, $content, $block ) {
 	}
 
 	$post_before = $post;
-	$post = get_post( $post_id );
+	$post        = get_post( $post_id );
 	setup_postdata( $post );
 
 	ob_start();
