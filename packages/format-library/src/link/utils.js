@@ -199,6 +199,17 @@ export function getFormatBoundary(
 	};
 }
 
+/**
+ * Walks forwards/backwards towards the boundary of a given format within an
+ * array of format objects. Returns the index of the boundary.
+ *
+ * @param {Array}  formats         the formats to search for the given format type.
+ * @param {number} initialIndex    the starting index from which to walk.
+ * @param {Object} targetFormatRef a reference to the format type object being sought.
+ * @param {number} formatIndex     the index at which we expect the target format object to be.
+ * @param {string} direction       either 'forwards' or 'backwards' to indicate the direction.
+ * @return {number} the index of the boundary of the given format.
+ */
 function walkToBoundary(
 	formats,
 	initialIndex,
