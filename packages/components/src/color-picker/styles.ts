@@ -42,14 +42,6 @@ export const RangeControl = styled( InnerRangeControl )`
 	}
 `;
 
-// All inputs should be the same height so this should be changed at the component level.
-// That involves changing heights of multiple input types probably buttons too etc.
-// So until that is done we are already using the new height on the color picker so it matches the mockups.
-const inputHeightStyle = `
-&&& ${ Input } {
-	height: 40px;
-}`;
-
 // Make the Hue circle picker not go out of the bar
 const interactiveHueStyles = `
 .react-colorful__interactive {
@@ -107,8 +99,6 @@ export const ColorfulWrapper = styled.div`
 	${ StyledField } {
 		margin-bottom: 0;
 	}
-
-	${ inputHeightStyle }
 `;
 
 export const DetailsControlButton = styled( Button )`
