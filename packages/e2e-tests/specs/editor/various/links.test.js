@@ -695,8 +695,6 @@ describe( 'Links', () => {
 				() => document.activeElement.value
 			);
 
-			// Link was created on text value "Gutenberg". We expect
-			// the text input to reflect that value.
 			expect( textInputValue ).toBe( textToSelect );
 		} );
 
