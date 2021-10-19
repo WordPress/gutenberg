@@ -186,15 +186,15 @@ class DependencyExtractionWebpackPlugin {
 			};
 
 			if ( runtimeChunk.contentHash ) {
-				// If available, copy webpack's contentHash data into the asset.
-				assetData.contentHash = runtimeChunk.contentHash;
-				// Also combine all content hashes into a "version" for back compat.
+				// Combine all content hashes into a "version".
+				// We could someday expose the individual assets' hashes too so e.g. CSS can be cache-busted without
+				// unnecessarily busting the JS cache too, but apparently that's too scary for now <https://git.io/J6CLT>.
 				const hash = createHash( 'md4' );
 				for ( const key of Object.keys(
-					assetData.contentHash
+					runtimeChunk.contentHash
 				).sort() ) {
 					hash.update(
-						`${ key }: ${ assetData.contentHash[ key ] }\n`
+						`${ key }: ${ runtimeChunk.contentHash[ key ] }\n`
 					);
 				}
 				assetData.version = hash.digest( 'hex' );
@@ -205,9 +205,6 @@ class DependencyExtractionWebpackPlugin {
 					`DependencyExtractionWebpackPlugin\nWebpack produced no contentHash for entrypoint '${ entrypointName }'`
 				);
 				compilation.warnings.push( warning );
-				assetData.contentHash = {
-					javascript: runtimeChunk.hash,
-				};
 				assetData.version = runtimeChunk.hash;
 			}
 
