@@ -38,7 +38,7 @@ function render_block_core_post_comments( $attributes, $content, $block ) {
 	if ( isset( $attributes['textAlign'] ) ) {
 		$classes .= 'has-text-align-' . $attributes['textAlign'];
 	}
-	if ( ! comments_open( $post_id ) && $attributes['hideCommentsClosed'] ) {
+	if ( ! comments_open( $post_id ) && ! empty( $attributes['hideCommentsClosed'] ) && $attributes['hideCommentsClosed'] ) {
 		$classes .= 'hide-comments-closed';
 	}
 
