@@ -118,8 +118,8 @@ describe( 'getFormatBoundary', () => {
 		[ 'inside', [ 8, 8 ] ],
 		[ 'start', [ 6, 6 ] ],
 		[ 'end', [ 10, 10 ] ],
-		[ 'insideStart', [ 7, 7 ] ],
-		[ 'insideEnd', [ 9, 9 ] ],
+		[ 'just inside the start', [ 7, 7 ] ],
+		[ 'just inside the end', [ 9, 9 ] ],
 	] )(
 		'should find bounds of a format from %s of a collapsed RichTextValue',
 		( _ignored, [ start, end ] ) => {
@@ -201,10 +201,10 @@ describe( 'getFormatBoundary', () => {
 		}
 	);
 
-	it( 'should handle values with pointers at 0 with formats that start at zero-th index', () => {
+	it( 'should find bounds of a format which starts at zeroth index where start/end pointers are at 0', () => {
 		const record = {
 			formats: [
-				[ linkFormat ], // 0
+				[ linkFormat ], // 0 (th zeroth index)
 				[ linkFormat ],
 				[ linkFormat ],
 				[ linkFormat ],
