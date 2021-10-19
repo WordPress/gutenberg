@@ -1563,27 +1563,35 @@ export const getInserterItems = createSelector(
 			buildScope: 'inserter',
 		} );
 
+		/*
+		 * @see `@wordpress/block-serialization-default-parser` package
+		 */
+		const tokenizer = /<!--\s+(\/)?wp:([a-z][a-z0-9_-]*\/)?([a-z][a-z0-9_-]*)\s+({(?:(?=([^}]+|}+(?=})|(?!}\s+\/?-->)[^])*)\5|[^]*?)}\s+)?(\/)?-->/;
+
 		const buildReusableBlockInserterItem = ( reusableBlock ) => {
-			const id = `core/block/${ reusableBlock.id }`;
-
-			const blockTypeNames = getBlockTypes().map( ( blockType ) =>
-				blockType.name.replace( 'core/', 'wp:' )
-			);
-			const referencedBlock = blockTypeNames.find(
-				( blockTypeName ) =>
-					reusableBlock.content.raw &&
-					reusableBlock.content.raw.includes( blockTypeName )
-			);
-
 			let icon = symbol;
-			if ( Platform.OS === 'web' && referencedBlock ) {
-				const referencedBlockType = getBlockType(
-					referencedBlock.replace( 'wp:', 'core/' )
-				);
 
-				icon = referencedBlockType.icon;
+			if ( Platform.OS === 'web' ) {
+				const rawBlockMatch = reusableBlock.content.raw.match(
+					tokenizer
+				);
+				if ( rawBlockMatch ) {
+					const [
+						,
+						,
+						namespace = 'core/',
+						blockName,
+					] = rawBlockMatch;
+					const referencedBlockType = getBlockType(
+						namespace + blockName
+					);
+					if ( referencedBlockType ) {
+						icon = referencedBlockType.icon;
+					}
+				}
 			}
 
+			const id = `core/block/${ reusableBlock.id }`;
 			const { time, count = 0 } = getInsertUsage( state, id ) || {};
 			const frecency = calculateFrecency( time, count );
 
