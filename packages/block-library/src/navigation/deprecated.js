@@ -20,85 +20,94 @@ const TYPOGRAPHY_PRESET_DEPRECATION_MAP = {
 	textTransform: 'var:preset|text-transform|',
 };
 
-const deprecated = [
-	{
-		attributes: {
-			orientation: {
-				type: 'string',
-				default: 'horizontal',
-			},
-			textColor: {
-				type: 'string',
-			},
-			customTextColor: {
-				type: 'string',
-			},
-			rgbTextColor: {
-				type: 'string',
-			},
-			backgroundColor: {
-				type: 'string',
-			},
-			customBackgroundColor: {
-				type: 'string',
-			},
-			rgbBackgroundColor: {
-				type: 'string',
-			},
-			itemsJustification: {
-				type: 'string',
-			},
-			showSubmenuIcon: {
-				type: 'boolean',
-				default: true,
-			},
-			openSubmenusOnClick: {
-				type: 'boolean',
-				default: false,
-			},
-			overlayMenu: {
-				type: 'string',
-				default: 'never',
-			},
-			__unstableLocation: {
-				type: 'string',
-			},
-			overlayBackgroundColor: {
-				type: 'string',
-			},
-			customOverlayBackgroundColor: {
-				type: 'string',
-			},
-			overlayTextColor: {
-				type: 'string',
-			},
-			customOverlayTextColor: {
-				type: 'string',
-			},
+const v4 = {
+	attributes: {
+		orientation: {
+			type: 'string',
+			default: 'horizontal',
 		},
-		supports: {
-			align: [ 'wide', 'full' ],
-			anchor: true,
-			html: false,
-			inserter: true,
-			typography: {
-				fontSize: true,
-				lineHeight: true,
-				__experimentalFontStyle: true,
-				__experimentalFontWeight: true,
-				__experimentalTextTransform: true,
-				__experimentalFontFamily: true,
-				__experimentalTextDecoration: true,
-			},
+		textColor: {
+			type: 'string',
 		},
-		save() {
-			return <InnerBlocks.Content />;
+		customTextColor: {
+			type: 'string',
 		},
-		migrate: migrateFontFamily,
-		isEligible( { style } ) {
-			return style?.typography?.fontFamily;
+		rgbTextColor: {
+			type: 'string',
+		},
+		backgroundColor: {
+			type: 'string',
+		},
+		customBackgroundColor: {
+			type: 'string',
+		},
+		rgbBackgroundColor: {
+			type: 'string',
+		},
+		itemsJustification: {
+			type: 'string',
+		},
+		showSubmenuIcon: {
+			type: 'boolean',
+			default: true,
+		},
+		openSubmenusOnClick: {
+			type: 'boolean',
+			default: false,
+		},
+		overlayMenu: {
+			type: 'string',
+			default: 'never',
+		},
+		__unstableLocation: {
+			type: 'string',
+		},
+		overlayBackgroundColor: {
+			type: 'string',
+		},
+		customOverlayBackgroundColor: {
+			type: 'string',
+		},
+		overlayTextColor: {
+			type: 'string',
+		},
+		customOverlayTextColor: {
+			type: 'string',
 		},
 	},
+	supports: {
+		align: [ 'wide', 'full' ],
+		anchor: true,
+		html: false,
+		inserter: true,
+		typography: {
+			fontSize: true,
+			lineHeight: true,
+			__experimentalFontStyle: true,
+			__experimentalFontWeight: true,
+			__experimentalTextTransform: true,
+			__experimentalFontFamily: true,
+			__experimentalTextDecoration: true,
+		},
+		spacing: {
+			blockGap: true,
+			units: [ 'px', 'em', 'rem', 'vh', 'vw' ],
+			__experimentalDefaultControls: {
+				blockGap: true,
+			},
+		},
+	},
+	save() {
+		return <InnerBlocks.Content />;
+	},
+	migrate: migrateFontFamily,
+	isEligible( { style } ) {
+		return style?.typography?.fontFamily;
+	},
+};
+
+const deprecated = [
+	v4,
 	// Remove `isResponsive` attribute.
 	{
 		attributes: {
