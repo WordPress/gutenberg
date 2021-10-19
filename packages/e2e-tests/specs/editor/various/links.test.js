@@ -701,6 +701,7 @@ describe( 'Links', () => {
 		} );
 
 		it( 'should allow for modification of link text via Link UI', async () => {
+			const originalLinkText = 'Gutenberg';
 			const changedLinkText =
 				'    link text that was modified via the Link UI to include spaces     ';
 
@@ -724,9 +725,9 @@ describe( 'Links', () => {
 				() => document.activeElement.value
 			);
 
-			// Link was created on text value "Gutenberg". We expect
-			// the text input to reflect that value.
-			expect( textInputValue ).toBe( 'Gutenberg' );
+			// At this point, we still expect the text input
+			// to reflect the original value with no modifications.
+			expect( textInputValue ).toBe( originalLinkText );
 
 			// Select all the link text in the input
 			await pressKeyWithModifier( 'primary', 'a' );
