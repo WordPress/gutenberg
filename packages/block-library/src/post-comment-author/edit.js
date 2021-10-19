@@ -46,7 +46,7 @@ export default function Edit( { attributes, context, setAttributes } ) {
 			{ displayName }
 		</a>
 	) : (
-		{ displayName }
+		<p>{ displayName }</p>
 	);
 
 	return (
