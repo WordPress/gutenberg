@@ -9,9 +9,9 @@ import { __experimentalParseUnit as parseUnit } from '@wordpress/components';
  *
  * Undefined values are always sorted to the end by `sort`, so this function
  * returns the first element, to always prioritize real values over undefined
- * values. See:
+ * values.
  *
- * https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/sort#description
+ * See: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/sort#description
  *
  * @param {Array<any>} inputArray Array of items to check.
  * @return {any}                  The item with the most occurrences.
@@ -29,8 +29,7 @@ export function mode( inputArray ) {
 
 /**
  * Returns the most common CSS unit in the radius values.
- *
- * Fallback to `px` as a default unit.
+ * Falls back to `px` as a default unit.
  *
  * @param {Object|string} values Radius values.
  * @return {string}              Most common CSS unit in values. Default: `px`.
