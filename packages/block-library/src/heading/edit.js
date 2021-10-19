@@ -22,9 +22,7 @@ import {
  * Internal dependencies
  */
 import HeadingLevelDropdown from './heading-level-dropdown';
-import { generateAnchor } from './autogenerate-anchors';
-
-const allHeadingAnchors = {};
+import { generateAnchor, setAnchor } from './autogenerate-anchors';
 
 function HeadingEdit( {
 	attributes,
@@ -54,14 +52,13 @@ function HeadingEdit( {
 			// This side-effect should not create an undo level.
 			__unstableMarkNextChangeAsNotPersistent();
 			setAttributes( {
-				anchor: generateAnchor( clientId, content, allHeadingAnchors ),
+				anchor: generateAnchor( clientId, content ),
 			} );
 		}
+		setAnchor( clientId, anchor );
 
-		allHeadingAnchors[ clientId ] = anchor;
-		return () => {
-			delete allHeadingAnchors[ clientId ];
-		};
+		// Remove anchor map when block unmounts.
+		return () => setAnchor( clientId, null );
 	}, [ content, anchor ] );
 
 	const onContentChange = ( value ) => {
@@ -69,13 +66,9 @@ function HeadingEdit( {
 		if (
 			! anchor ||
 			! value ||
-			generateAnchor( clientId, content, allHeadingAnchors ) === anchor
+			generateAnchor( clientId, content ) === anchor
 		) {
-			newAttrs.anchor = generateAnchor(
-				clientId,
-				value,
-				allHeadingAnchors
-			);
+			newAttrs.anchor = generateAnchor( clientId, value );
 		}
 		setAttributes( newAttrs );
 	};
