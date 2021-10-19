@@ -154,13 +154,11 @@ export function getFormatBoundary(
 	// Account for endindex being +1 (see above).
 	const initialIndex = isIndexAtEnd ? startIndex - 1 : startIndex;
 
-	// Retrieve a reference to the target format object
+	// Retrieve a *reference* to the target format object
 	// at the initial index.
-	const targetFormat = getTargetFormatObjectReference(
-		newFormats,
-		initialIndex,
-		format.type
-	);
+	const targetFormat = find( newFormats[ initialIndex ], {
+		type: format.type,
+	} );
 
 	if ( ! targetFormat ) {
 		return EMPTY_BOUNDARIES;
@@ -199,14 +197,6 @@ export function getFormatBoundary(
 		start: startIndex,
 		end: endIndex,
 	};
-}
-
-// Retrieve a reference to the target format object
-// at the initial index.
-function getTargetFormatObjectReference( formats, index, type ) {
-	return find( formats[ index ], {
-		type,
-	} );
 }
 
 function walkToBoundary( formats, index, initFormat, formatIndex, direction ) {
