@@ -101,6 +101,8 @@ const Cover = ( {
 		style,
 		customOverlayColor,
 		minHeightUnit = 'px',
+		allowedBlocks,
+		templateLock,
 	} = attributes;
 	const [ isScreenReaderEnabled, setIsScreenReaderEnabled ] = useState(
 		false
@@ -504,7 +506,9 @@ const Cover = ( {
 				style={ [ styles.content, { minHeight: convertedMinHeight } ] }
 			>
 				<InnerBlocks
+					allowedBlocks={ allowedBlocks }
 					template={ INNER_BLOCKS_TEMPLATE }
+					templateLock={ templateLock }
 					templateInsertUpdatesSelection
 					blockWidth={ blockWidth }
 				/>

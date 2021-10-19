@@ -277,14 +277,24 @@ import Button from '../';
 
 export default { title: 'Components/Button', component: Button };
 
-export const _default = () => <Button>Default Button</Button>;
+const Template = ( args ) => <Button { ...args } />;
 
-export const primary = () => <Button variant="primary">Primary Button</Button>;
+export const Default = Template.bind( {} );
+Default.args = {
+	text: 'Default Button',
+	isBusy: false,
+	isSmall: false,
+};
 
-export const secondary = () => <Button variant="secondary">Secondary Button</Button>;
+export const Primary = Template.bind( {} );
+Primary.args = {
+	...Default.args,
+	text: 'Primary Button',
+	variant: 'primary',
+};
 ```
 
-A great tool to use when writing stories is the [Storybook Controls addon](https://storybook.js.org/addons/@storybook/addon-controls). Ideally props should be exposed by using this addon, which provides a graphical UI to interact dynamically with the component without needing to write code.
+A great tool to use when writing stories is the [Storybook Controls addon](https://storybook.js.org/addons/@storybook/addon-controls). Ideally props should be exposed by using this addon, which provides a graphical UI to interact dynamically with the component without needing to write code. Avoid using [Knobs](https://storybook.js.org/addons/@storybook/addon-knobs) for new stories, as this addon is deprecated.
 
 The default value of each control should coincide with the default value of the props (i.e. it should be `undefined` if a prop is not required). A story should, therefore, also explicitly show how values from the Context System are applied to (sub)components. A good example of how this may look like is the [`Card` story](https://wordpress.github.io/gutenberg/?path=/story/components-card--default) (code [here](/packages/components/src/card/stories/index.js)).
 
