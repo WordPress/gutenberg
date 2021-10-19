@@ -65,7 +65,8 @@ function BlockStyles( {
 			block,
 			type: blockType,
 			styles: getBlockStyles( block.name ),
-			className: block.attributes.className || '',
+			className:
+				block.attributes.className.trim().replace( /\s+/gi, '-' ) || '',
 		};
 	};
 
@@ -79,6 +80,10 @@ function BlockStyles( {
 	if ( ! styles || styles.length === 0 ) {
 		return null;
 	}
+
+	styles.map(
+		( style ) => ( style.name = style.name.trim().replace( /\s+/gi, '-' ) )
+	);
 
 	const renderedStyles = find( styles, 'isDefault' )
 		? styles
