@@ -54,7 +54,8 @@ const v1 = {
 /**
  * New deprecations need to be placed first
  * for them to have higher priority.
- * They also need to contain the old deprecations.
+ *
+ * Old deprecations may need to be updated as well.
  *
  * See block-deprecation.md
  */
