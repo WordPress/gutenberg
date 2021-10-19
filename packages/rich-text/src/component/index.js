@@ -111,7 +111,7 @@ export function useRichText( {
 		// @todo find a less-hacky way of solving this.
 
 		const hasRelevantInitFormat =
-			record.current.formats[ 0 ]?.[ 0 ]?.type === 'core/text-color';
+			record.current?.formats[ 0 ]?.[ 0 ]?.type === 'core/text-color';
 
 		if ( hasRelevantInitFormat ) {
 			handleChangesUponInit( record.current );
