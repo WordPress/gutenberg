@@ -50,6 +50,10 @@ function HeadingEdit( {
 			} );
 		}
 		allHeadingAnchors[ clientId ] = anchor;
+
+		return () => {
+			delete allHeadingAnchors[ clientId ];
+		};
 	}, [ content, anchor ] );
 
 	const onContentChange = ( value ) => {
