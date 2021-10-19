@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { commentContent as icon } from '@wordpress/icons';
+import { postCommentContent as icon } from '@wordpress/icons';
 
 /**
  * Internal dependencies

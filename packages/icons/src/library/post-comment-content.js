@@ -3,7 +3,7 @@
  */
 import { Path, SVG } from '@wordpress/primitives';
 
-const commentContent = (
+const postCommentContent = (
 	<SVG viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
 		<Path
 			fillRule="evenodd"
@@ -13,4 +13,4 @@ const commentContent = (
 	</SVG>
 );
 
-export default commentContent;
+export default postCommentContent;
