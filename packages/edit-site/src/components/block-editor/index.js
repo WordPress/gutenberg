@@ -17,7 +17,7 @@ import {
 	__unstableBlockSettingsMenuFirstItem,
 	__unstableUseTypingObserver as useTypingObserver,
 } from '@wordpress/block-editor';
-import { useMergeRefs } from '@wordpress/compose';
+import { useMergeRefs, useViewportMatch } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -53,6 +53,7 @@ export default function BlockEditor( { setIsInserterOpen } ) {
 	const { setPage } = useDispatch( editSiteStore );
 	const contentRef = useRef();
 	const mergedRefs = useMergeRefs( [ contentRef, useTypingObserver() ] );
+	const isMobileViewport = useViewportMatch( 'small', '<' );
 
 	const isTemplatePart = templateType === 'wp_template_part';
 
@@ -90,7 +91,11 @@ export default function BlockEditor( { setIsInserterOpen } ) {
 				<BackButton />
 
 				<ResizableEditor
-					enabledResizing={ isTemplatePart }
+					enableResizing={
+						isTemplatePart &&
+						// Disable resizing in mobile viewport.
+						! isMobileViewport
+					}
 					settings={ settings }
 					contentRef={ mergedRefs }
 				/>
