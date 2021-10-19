@@ -57,11 +57,11 @@ export default function Edit( {
 				/>
 			</BlockControls>
 			<div { ...blockProps }>
-				{ ! commentId ? (
-					<p>{ __( 'The content of the comment.' ) }</p>
+				{ ! commentId || ! content ? (
+					<p>{ __( 'Post Comment Content' ) }</p>
 				) : (
 					<Disabled>
-						<RawHTML key="html">{ content?.rendered }</RawHTML>
+						<RawHTML key="html">{ content.rendered }</RawHTML>
 					</Disabled>
 				) }
 			</div>
