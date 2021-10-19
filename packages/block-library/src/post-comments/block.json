@@ -10,8 +10,7 @@
 			"type": "string"
 		},
 		"hideCommentsClosed": {
-			"type": "boolean",
-			"default": false
+			"type": "boolean"
 		}
 	},
 	"usesContext": [ "postId", "postType" ],
