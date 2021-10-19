@@ -124,7 +124,7 @@ class DependencyExtractionWebpackPlugin {
 							name: this.constructor.name,
 							stage:
 								compiler.webpack.Compilation
-									.PROCESS_ASSETS_STAGE_ADDITIONAL,
+									.PROCESS_ASSETS_STAGE_ANALYSE,
 						},
 						() => this.addAssets( compilation, compiler )
 					);
@@ -178,35 +178,24 @@ class DependencyExtractionWebpackPlugin {
 				}
 			}
 
+			// Go through the assets and hash the sources. We can't just use
+			// `runtimeChunk.contentHash` because that's not updated when
+			// assets are minified. Sigh.
+			// @todo Use `asset.info.contenthash` if we can make sure it's reliably set.
+			const hash = createHash( 'md4' );
+			for ( const filename of entrypoint.getFiles().sort() ) {
+				const asset = compilation.getAsset( filename );
+				hash.update( `${ filename }: ` );
+				asset.source.updateHash( hash );
+			}
+
 			const runtimeChunk = entrypoint.getRuntimeChunk();
 
 			const assetData = {
 				// Get a sorted array so we can produce a stable, stringified representation.
 				dependencies: Array.from( entrypointExternalizedWpDeps ).sort(),
+				version: hash.digest( 'hex' ),
 			};
-
-			if ( runtimeChunk.contentHash ) {
-				// Combine all content hashes into a "version".
-				// We could someday expose the individual assets' hashes too so e.g. CSS can be cache-busted without
-				// unnecessarily busting the JS cache too, but apparently that's too scary for now <https://git.io/J6CLT>.
-				const hash = createHash( 'md4' );
-				for ( const key of Object.keys(
-					runtimeChunk.contentHash
-				).sort() ) {
-					hash.update(
-						`${ key }: ${ runtimeChunk.contentHash[ key ] }\n`
-					);
-				}
-				assetData.version = hash.digest( 'hex' );
-			} else {
-				// Fallback. I don't know if this can happen, but if it does handle it gracefully (for now).
-				// @todo: Make this an error when we're more confident it can't happen or we're willing to break compilation when it does.
-				const warning = new webpack.WebpackError(
-					`DependencyExtractionWebpackPlugin\nWebpack produced no contentHash for entrypoint '${ entrypointName }'`
-				);
-				compilation.warnings.push( warning );
-				assetData.version = runtimeChunk.hash;
-			}
 
 			const assetString = this.stringify( assetData );
 
