@@ -139,7 +139,9 @@ export const textColor = {
 		// We should not add a background-color if it's already set
 		if ( value && value.includes( 'background-color' ) ) return value;
 		const addedCSS = [ 'background-color', 'rgba(0, 0, 0, 0)' ].join( ':' );
-		return value ? [ value, addedCSS ].join( ';' ) : addedCSS;
+		// Prepend `addedCSS` to avoid a double `;;` as any the existing CSS
+		// rules will already include a `;`.
+		return value ? [ addedCSS, value ].join( ';' ) : addedCSS;
 	},
 	edit: TextColorEdit,
 };
