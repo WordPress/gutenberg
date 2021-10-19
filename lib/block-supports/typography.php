@@ -109,7 +109,7 @@ function gutenberg_apply_typography_support( $block_type, $block_attributes ) {
 		$has_custom_font_family = isset( $block_attributes['style']['typography']['fontFamily'] );
 
 		if ( $has_named_font_family ) {
-			$classes[] = sprintf( 'has-%s-font-family', $block_attributes['fontFamily'] );
+			$classes[] = sprintf( 'has-%s-font-family', gutenberg_experimental_to_kebab_case( $block_attributes['fontFamily'] ) );
 		} elseif ( $has_custom_font_family ) {
 			// Before using classes, the value was serialized as a CSS Custom Property.
 			// We don't need this code path when it lands in core.
