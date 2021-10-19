@@ -52,7 +52,7 @@ function Header() {
 	const handleClick = () => {
 		if ( isInserterOpen ) {
 			// Focusing the inserter button closes the inserter popover
-			inserterButton.current.focus();
+			setIsInserterOpened( false );
 		} else {
 			if ( ! isLastSelectedWidgetAreaOpen ) {
 				// Select the last selected block if hasn't already.
