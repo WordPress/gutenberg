@@ -363,7 +363,7 @@ const deprecated = [
 				</div>
 			);
 		},
-		migrate: migrateBorderRadius,
+		migrate: compose( migrateFontFamily, migrateBorderRadius ),
 	},
 	{
 		supports: {
@@ -458,7 +458,7 @@ const deprecated = [
 				</div>
 			);
 		},
-		migrate: migrateBorderRadius,
+		migrate: compose( migrateFontFamily, migrateBorderRadius ),
 	},
 	{
 		supports: {
@@ -553,7 +553,7 @@ const deprecated = [
 				</div>
 			);
 		},
-		migrate: migrateBorderRadius,
+		migrate: compose( migrateFontFamily, migrateBorderRadius ),
 	},
 	{
 		supports: {
@@ -623,7 +623,7 @@ const deprecated = [
 				/>
 			);
 		},
-		migrate: migrateBorderRadius,
+		migrate: compose( migrateFontFamily, migrateBorderRadius ),
 	},
 	{
 		supports: {
@@ -669,12 +669,12 @@ const deprecated = [
 				type: 'string',
 			},
 		},
-
 		isEligible: ( attributes ) =>
 			!! attributes.customTextColor ||
 			!! attributes.customBackgroundColor ||
 			!! attributes.customGradient,
 		migrate: compose(
+			migrateFontFamily,
 			migrateBorderRadius,
 			migrateCustomColorsAndGradients
 		),
@@ -791,12 +791,14 @@ const deprecated = [
 					.replace( /is-style-squared[\s]?/, '' )
 					.trim();
 			}
-			return migrateBorderRadius(
-				migrateCustomColorsAndGradients( {
-					...attributes,
-					className: newClassName ? newClassName : undefined,
-					borderRadius: 0,
-				} )
+			return migrateFontFamily(
+				migrateBorderRadius(
+					migrateCustomColorsAndGradients( {
+						...attributes,
+						className: newClassName ? newClassName : undefined,
+						borderRadius: 0,
+					} )
+				)
 			);
 		},
 		save( { attributes } ) {
