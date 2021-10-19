@@ -15,7 +15,7 @@ describe( 'Links', () => {
 		await createNewPost();
 	} );
 
-	const waitForAutoFocus = async () => {
+	const waitForURLFieldAutoFocus = async () => {
 		await page.waitForFunction(
 			() => !! document.activeElement.closest( '.block-editor-url-input' )
 		);
@@ -35,7 +35,7 @@ describe( 'Links', () => {
 		await pressKeyWithModifier( 'primary', 'K' );
 
 		// Wait for the URL field to auto-focus
-		await waitForAutoFocus();
+		await waitForURLFieldAutoFocus();
 		expect(
 			await page.$(
 				'.components-popover__content .block-editor-link-control'
@@ -69,7 +69,7 @@ describe( 'Links', () => {
 		await page.click( 'button[aria-label="Link"]' );
 
 		// Wait for the URL field to auto-focus
-		await waitForAutoFocus();
+		await waitForURLFieldAutoFocus();
 
 		// Type a URL
 		await page.keyboard.type( 'https://wordpress.org/gutenberg' );
@@ -93,7 +93,7 @@ describe( 'Links', () => {
 		await page.click( 'button[aria-label="Link"]' );
 
 		// Wait for the URL field to auto-focus
-		await waitForAutoFocus();
+		await waitForURLFieldAutoFocus();
 
 		const urlInputValue = await page.evaluate(
 			() => document.querySelector( '[aria-label="URL"]' ).value
@@ -114,7 +114,7 @@ describe( 'Links', () => {
 		await pressKeyWithModifier( 'primary', 'K' );
 
 		// Wait for the URL field to auto-focus
-		await waitForAutoFocus();
+		await waitForURLFieldAutoFocus();
 
 		// Type a URL
 		await page.keyboard.type( 'https://wordpress.org/gutenberg' );
@@ -150,7 +150,7 @@ describe( 'Links', () => {
 		await pressKeyWithModifier( 'primary', 'K' );
 
 		// Wait for the URL field to auto-focus
-		await waitForAutoFocus();
+		await waitForURLFieldAutoFocus();
 
 		// Type a URL
 		await page.keyboard.type( 'https://wordpress.org/gutenberg' );
@@ -197,7 +197,7 @@ describe( 'Links', () => {
 		await page.click( 'button[aria-label="Link"]' );
 
 		// Wait for the URL field to auto-focus
-		await waitForAutoFocus();
+		await waitForURLFieldAutoFocus();
 
 		// Type a URL
 		await page.keyboard.type( 'https://wordpress.org/gutenberg' );
@@ -218,7 +218,7 @@ describe( 'Links', () => {
 		await page.click( 'button[aria-label="Link"]' );
 
 		// Wait for the URL field to auto-focus
-		await waitForAutoFocus();
+		await waitForURLFieldAutoFocus();
 
 		// Type a URL
 		await page.keyboard.type( 'https://wordpress.org/gutenberg' );
@@ -240,7 +240,7 @@ describe( 'Links', () => {
 		await editButton.click();
 
 		// Wait for the URL field to auto-focus
-		await waitForAutoFocus();
+		await waitForURLFieldAutoFocus();
 
 		// Change the URL
 		await page.keyboard.type( '/handbook' );
@@ -335,7 +335,7 @@ describe( 'Links', () => {
 			'//button[contains(@aria-label, "Edit")]'
 		);
 		await editButton.click();
-		await waitForAutoFocus();
+		await waitForURLFieldAutoFocus();
 		await page.keyboard.type( '/handbook' );
 		await page.keyboard.press( 'Enter' );
 		expect( await getEditedPostContent() ).toMatchSnapshot();
@@ -381,7 +381,7 @@ describe( 'Links', () => {
 		await pressKeyWithModifier( 'primary', 'K' );
 
 		// Wait for the URL field to auto-focus
-		await waitForAutoFocus();
+		await waitForURLFieldAutoFocus();
 		expect(
 			await page.$(
 				'.components-popover__content .block-editor-link-control'
@@ -411,7 +411,7 @@ describe( 'Links', () => {
 		await pressKeyWithModifier( 'primary', 'K' );
 
 		// Wait for the URL field to auto-focus
-		await waitForAutoFocus();
+		await waitForURLFieldAutoFocus();
 		expect(
 			await page.$(
 				'.components-popover__content .block-editor-link-control'
@@ -430,7 +430,7 @@ describe( 'Links', () => {
 		await pressKeyWithModifier( 'primary', 'K' );
 
 		// Wait for the URL field to auto-focus
-		await waitForAutoFocus();
+		await waitForURLFieldAutoFocus();
 		expect(
 			await page.$(
 				'.components-popover__content .block-editor-link-control'
@@ -458,7 +458,7 @@ describe( 'Links', () => {
 		await page.keyboard.type( 'This is Gutenberg' );
 		await pressKeyWithModifier( 'shiftAlt', 'ArrowLeft' );
 		await pressKeyWithModifier( 'primary', 'K' );
-		await waitForAutoFocus();
+		await waitForURLFieldAutoFocus();
 		await page.keyboard.type( URL );
 		await page.keyboard.press( 'Enter' );
 
@@ -483,7 +483,7 @@ describe( 'Links', () => {
 		// Press Cmd+K to edit the link and the url-input should become
 		// focused with the value previously inserted.
 		await pressKeyWithModifier( 'primary', 'K' );
-		await waitForAutoFocus();
+		await waitForURLFieldAutoFocus();
 		const isInURLInput = await page.evaluate(
 			() => !! document.activeElement.closest( '.block-editor-url-input' )
 		);
@@ -506,7 +506,7 @@ describe( 'Links', () => {
 		await page.keyboard.type( 'This is Gutenberg' );
 		await pressKeyWithModifier( 'shiftAlt', 'ArrowLeft' );
 		await pressKeyWithModifier( 'primary', 'K' );
-		await waitForAutoFocus();
+		await waitForURLFieldAutoFocus();
 		await page.keyboard.type( 'http://#test.com' );
 		await page.keyboard.press( 'Enter' );
 		const assertiveContent = await page.evaluate(
@@ -523,7 +523,7 @@ describe( 'Links', () => {
 		// Select "WordPress".
 		await pressKeyWithModifier( 'shiftAlt', 'ArrowLeft' );
 		await pressKeyWithModifier( 'primary', 'k' );
-		await waitForAutoFocus();
+		await waitForURLFieldAutoFocus();
 		await page.keyboard.type( 'w.org' );
 
 		// Navigate to and toggle the "Open in new tab" checkbox.
@@ -560,7 +560,7 @@ describe( 'Links', () => {
 
 		// Edit link.
 		await pressKeyWithModifier( 'primary', 'k' );
-		await waitForAutoFocus();
+		await waitForURLFieldAutoFocus();
 		await pressKeyWithModifier( 'primary', 'a' );
 		await page.keyboard.type( 'wordpress.org' );
 
@@ -573,7 +573,7 @@ describe( 'Links', () => {
 
 		// Navigate back to inputs to verify appears as changed.
 		await pressKeyWithModifier( 'primary', 'k' );
-		await waitForAutoFocus();
+		await waitForURLFieldAutoFocus();
 
 		// Navigate to the "Open in new tab" checkbox.
 		await page.keyboard.press( 'Tab' );
@@ -599,7 +599,7 @@ describe( 'Links', () => {
 			await pressKeyWithModifier( 'primary', 'K' );
 
 			// Wait for the URL field to auto-focus
-			await waitForAutoFocus();
+			await waitForURLFieldAutoFocus();
 
 			const textInput = await page
 				.waitForXPath(
@@ -625,7 +625,7 @@ describe( 'Links', () => {
 			await showBlockToolbar();
 			const [ editButton ] = await page.$x( '//button[text()="Edit"]' );
 			await editButton.click();
-			await waitForAutoFocus();
+			await waitForURLFieldAutoFocus();
 
 			await pressKeyWithModifier( 'shift', 'Tab' );
 
@@ -665,7 +665,7 @@ describe( 'Links', () => {
 			await page.click( 'button[aria-label="Link"]' );
 
 			// Wait for the URL field to auto-focus
-			await waitForAutoFocus();
+			await waitForURLFieldAutoFocus();
 
 			// Type a URL
 			await page.keyboard.type( 'https://wordpress.org/gutenberg' );
@@ -686,7 +686,7 @@ describe( 'Links', () => {
 
 			await editButton.click();
 
-			await waitForAutoFocus();
+			await waitForURLFieldAutoFocus();
 
 			await pressKeyWithModifier( 'shift', 'Tab' );
 
@@ -714,7 +714,7 @@ describe( 'Links', () => {
 			await showBlockToolbar();
 			const [ editButton ] = await page.$x( '//button[text()="Edit"]' );
 			await editButton.click();
-			await waitForAutoFocus();
+			await waitForURLFieldAutoFocus();
 
 			await pressKeyWithModifier( 'shift', 'Tab' );
 
