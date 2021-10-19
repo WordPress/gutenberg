@@ -48,7 +48,7 @@ export default function CommentsQueryEdit( { attributes, setAttributes } ) {
 				<QueryToolbar
 					queryPerPage={ queryPerPage }
 					queryOffset={ queryOffset }
-					setQuery={ ( newQuery ) => setAttributes( { newQuery } ) }
+					setQuery={ setAttributes }
 				/>
 			</BlockControls>
 			<InspectorControls __experimentalGroup="advanced">
