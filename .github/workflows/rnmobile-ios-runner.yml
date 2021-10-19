@@ -14,7 +14,7 @@ concurrency:
 
 jobs:
     test:
-        runs-on: macos-latest
+        runs-on: macos-11
         if: ${{ github.repository == 'WordPress/gutenberg' || github.event_name == 'pull_request' }}
         strategy:
             matrix:
