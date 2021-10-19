@@ -12,7 +12,7 @@ import NumberControl from '../../number-control';
 import { COLORS, reduceMotion, rtl } from '../../utils';
 import { space } from '../../ui/utils/space';
 
-const rangeHeightValue = 30;
+const rangeHeightValue = 40;
 const railHeight = 4;
 const rangeHeight = () =>
 	css( { height: rangeHeightValue, minHeight: rangeHeightValue } );
