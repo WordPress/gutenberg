@@ -41,12 +41,14 @@
 	}
 
 	// Menu item link.
-	// By targetting the markup directly we enable greater global styles compatibility.
-	// The extra container specificity is due to global styles outputting link styles that need overriding.
-	&.wp-block-navigation a {
-		// Inherit colors set by the block color definition.
+	// By adding low specificity, we enable compatibility with link colors set in theme.json,
+	// but still allow them to be overridden by user-set colors.
+	.wp-block-navigation-item__content {
 		color: inherit;
 		display: block;
+
+		// Set the default menu item padding to zero, to allow text-only buttons.
+		padding: 0;
 	}
 
 	// Force links to inherit text decoration applied to navigation block.
@@ -251,11 +253,6 @@
 // We use :where to keep specificity minimal, yet still scope it to only the navigation block.
 // That way if padding is set in theme.json, it still wins.
 // https://css-tricks.com/almanac/selectors/w/where/
-
-// Set the default menu item padding to zero, to allow text-only buttons.
-.wp-block-navigation .wp-block-navigation-item__content {
-	padding: 0;
-}
 
 // When the menu has a background, items have paddings, reduce margins to compensate.
 // Treat margins and paddings differently when the block has a background.
