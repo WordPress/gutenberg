@@ -18,13 +18,6 @@ for how to use `ToolsPanelItem`.
 
 ## Props
 
-### `gridColumn`: `CSSProperties[ 'gridColumn' ]`
-
-Allows panel items to define which column to occupy within the panel's grid or
-how many columns it should span. This maps to the CSS `grid-column` property.
-
-- Required: No
-
 ### `hasValue`: `() => boolean`
 
 This is called when building the `ToolsPanel` menu to determine the item's

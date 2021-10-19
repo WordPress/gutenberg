@@ -24,11 +24,14 @@ const ToolsPanel = (
 		panelContext,
 		resetAllItems,
 		toggleItem,
-		...toolsPanelProps
+		className,
 	} = useToolsPanel( props );
 
+	// Props are not directly passed through to avoid exposing Grid props
+	// until agreement has been reached on how ToolsPanel layout should be
+	// handled.
 	return (
-		<Grid { ...toolsPanelProps } ref={ forwardedRef }>
+		<Grid columns={ 2 } className={ className } ref={ forwardedRef }>
 			<ToolsPanelContext.Provider value={ panelContext }>
 				<ToolsPanelHeader
 					label={ label }
