@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { startsWith, find } from 'lodash';
+import { startsWith, find, partialRight } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -171,23 +171,13 @@ export function getFormatBoundary(
 		return EMPTY_BOUNDARIES;
 	}
 
+	const walkingArgs = [ newFormats, initialIndex, targetFormat, index ];
+
 	// Walk the startIndex "backwards" to the leading "edge" of the matching format.
-	startIndex = walkToBoundary(
-		newFormats,
-		initialIndex,
-		targetFormat,
-		index,
-		'backwards'
-	);
+	startIndex = walkToStart( ...walkingArgs );
 
 	// Walk the endIndex "forwards" until the trailing "edge" of the matching format.
-	endIndex = walkToBoundary(
-		newFormats,
-		initialIndex,
-		targetFormat,
-		index,
-		'forwards'
-	);
+	endIndex = walkToEnd( ...walkingArgs );
 
 	// Safe guard: start index cannot be less than 0
 	startIndex = startIndex < 0 ? 0 : startIndex;
@@ -241,3 +231,7 @@ function walkToBoundary(
 
 	return index;
 }
+
+const walkToStart = partialRight( walkToBoundary, 'backwards' );
+
+const walkToEnd = partialRight( walkToBoundary, 'forwards' );
