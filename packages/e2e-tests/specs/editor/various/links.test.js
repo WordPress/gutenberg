@@ -622,7 +622,6 @@ describe( 'Links', () => {
 			await page.keyboard.press( 'ArrowLeft' );
 			await page.keyboard.press( 'ArrowRight' );
 
-			await showBlockToolbar();
 			const [ editButton ] = await page.$x( '//button[text()="Edit"]' );
 			await editButton.click();
 			await waitForURLFieldAutoFocus();
@@ -674,11 +673,7 @@ describe( 'Links', () => {
 			await page.keyboard.press( 'Enter' );
 
 			// Reselect the link.
-			await pressKeyWithModifier( 'shiftAlt', 'ArrowLeft' );
-
-			// Make a collapsed selection inside the link
 			await page.keyboard.press( 'ArrowLeft' );
-			await page.keyboard.press( 'ArrowRight' );
 
 			await showBlockToolbar();
 
