@@ -12,7 +12,8 @@ import { __ } from '@wordpress/i18n';
 import { settings } from '@wordpress/icons';
 
 export default function CommentsQueryToolbar( {
-	attributes: { query },
+	queryPerPage,
+	queryOffset,
 	setQuery,
 } ) {
 	return (
@@ -45,18 +46,18 @@ export default function CommentsQueryToolbar( {
 											return;
 										}
 										setQuery( {
-											perPage: num,
+											queryPerPage: num,
 										} );
 									} }
 									step="1"
-									value={ query.perPage }
+									value={ queryPerPage }
 									isDragEnabled={ false }
 								/>
 							</BaseControl>
 							<BaseControl>
 								<NumberControl
 									__unstableInputWidth="60px"
-									label={ __( 'Offset' ) }
+									label={ __( 'queryOffset' ) }
 									labelPosition="edge"
 									min={ 0 }
 									max={ 100 }
@@ -69,10 +70,10 @@ export default function CommentsQueryToolbar( {
 										) {
 											return;
 										}
-										setQuery( { offset: num } );
+										setQuery( { queryOffset: num } );
 									} }
 									step="1"
-									value={ query.offset }
+									value={ queryOffset }
 									isDragEnabled={ false }
 								/>
 							</BaseControl>
@@ -80,7 +81,6 @@ export default function CommentsQueryToolbar( {
 					) }
 				/>
 			</ToolbarGroup>
-			)
 		</>
 	);
 }

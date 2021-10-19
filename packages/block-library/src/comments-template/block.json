@@ -6,7 +6,13 @@
 	"parent": [ "core/comments-query" ],
 	"description": "Contains the block elements used to render a comment, like the title, date, author, avatar and more.",
 	"textdomain": "default",
-	"usesContext": [ "queryId", "query", "displayLayout", "templateSlug" ],
+	"usesContext": [
+		"queryId",
+		"queryPerPage",
+		"queryOffset",
+		"displayLayout",
+		"templateSlug"
+	],
 	"supports": {
 		"reusable": false,
 		"html": false,

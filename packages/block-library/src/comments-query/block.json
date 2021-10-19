@@ -9,12 +9,13 @@
 		"queryId": {
 			"type": "number"
 		},
-		"query": {
-			"type": "object",
-			"default": {
-				"perPage": 4,
-				"offset": 0
-			}
+		"queryPerPage": {
+			"type": "number",
+			"default": 4
+		},
+		"queryOffset": {
+			"type": "number",
+			"default": 0
 		},
 		"tagName": {
 			"type": "string",
@@ -23,7 +24,8 @@
 	},
 	"providesContext": {
 		"queryId": "queryId",
-		"query": "query",
+		"queryPerPage": "queryPerPage",
+		"queryOffset": "queryOffset",
 		"displayLayout": "displayLayout"
 	},
 	"supports": {
