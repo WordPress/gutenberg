@@ -57,7 +57,7 @@ export default function CommentsQueryToolbar( {
 							<BaseControl>
 								<NumberControl
 									__unstableInputWidth="60px"
-									label={ __( 'queryOffset' ) }
+									label={ __( 'Offset' ) }
 									labelPosition="edge"
 									min={ 0 }
 									max={ 100 }
