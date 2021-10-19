@@ -98,7 +98,7 @@ function gutenberg_apply_typography_support( $block_type, $block_attributes ) {
 		$has_custom_font_size = isset( $block_attributes['style']['typography']['fontSize'] );
 
 		if ( $has_named_font_size ) {
-			$classes[] = sprintf( 'has-%s-font-size', $block_attributes['fontSize'] );
+			$classes[] = sprintf( 'has-%s-font-size', gutenberg_experimental_to_kebab_case( $block_attributes['fontSize'] ) );
 		} elseif ( $has_custom_font_size ) {
 			$styles[] = sprintf( 'font-size: %s;', $block_attributes['style']['typography']['fontSize'] );
 		}
