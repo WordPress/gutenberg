@@ -153,7 +153,48 @@ export function addSaveProps( extraProps, blockType, attributes ) {
 	return extraProps;
 }
 
+/**
+ * Make sure the anchor continues to stay unique when the block is cloned
+ *
+ * @param {string} blockType type of the block
+ * @param {Object} block     cloned block object
+ * @return {Object} modified cloned block object
+ */
+export function cloneAttribute( blockType, block ) {
+	if (
+		hasBlockSupport( blockType, 'anchor' ) &&
+		has( block, 'attributes.anchor' )
+	) {
+		// check wether the anchor already ends with a `-${number}`
+		const index = block.attributes.anchor.lastIndexOf( '-' );
+		const result = block.attributes.anchor.substring( index + 1 );
+
+		// store the anchor without the `-${number}`
+		const shortendAnchor =
+			index > 0
+				? block.attributes.anchor.substring( 0, index )
+				: block.attributes.anchor;
+
+		// generate the suffix number
+		let suffix = 1;
+		if ( result ) {
+			const number = parseInt( result );
+
+			if ( number ) {
+				suffix = number + 1;
+			}
+		}
+
+		// add the suffix to the anchor
+		block.attributes.anchor = `${ shortendAnchor }-${ suffix }`;
+	}
+
+	// return the modified cloned block
+	return block;
+}
+
 addFilter( 'blocks.registerBlockType', 'core/anchor/attribute', addAttribute );
+addFilter( 'blocks.cloneBlock', 'core/anchor/clone', cloneAttribute );
 addFilter(
 	'editor.BlockEdit',
 	'core/editor/anchor/with-inspector-control',
