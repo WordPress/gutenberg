@@ -262,11 +262,11 @@ describe( 'getFormatBoundary', () => {
 		} );
 	} );
 
-	it( 'should return empty bounds if start is beyond the format boundary', () => {
+	it( 'should return empty bounds if start is after the end of the end of the format', () => {
 		const record = {
-			formats: [],
+			formats: [ [ boldFormat ], [ boldFormat ], [ boldFormat ], [], [] ],
 			text: 'Lorem ipsum dolor.',
-			start: 1,
+			start: 4, // beyond the end of the format
 			end: 8,
 		};
 
@@ -278,10 +278,10 @@ describe( 'getFormatBoundary', () => {
 
 	it( 'should return empty bounds if end is beyond the format boundary', () => {
 		const record = {
-			formats: [],
+			formats: [ [ boldFormat ], [ boldFormat ], [ boldFormat ], [], [] ],
 			text: 'Lorem ipsum dolor.',
-			start: 8,
-			end: 14,
+			start: 1, // within format
+			end: 4, // beyond end of format
 		};
 
 		expect( getFormatBoundary( record, { type: 'core/link' } ) ).toEqual( {
