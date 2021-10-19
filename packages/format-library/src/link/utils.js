@@ -199,24 +199,34 @@ export function getFormatBoundary(
 	};
 }
 
-function walkToBoundary( formats, index, initFormat, formatIndex, direction ) {
+function walkToBoundary(
+	formats,
+	initialIndex,
+	targetFormatRef,
+	formatIndex,
+	direction
+) {
+	let index = initialIndex;
+
+	const directions = {
+		forwards: 1,
+		backwards: -1,
+	};
+
+	const directionIncrement = directions[ direction ] || 1; // invalid direction arg default to forwards
+	const inverseDirectionIncrement = directionIncrement * -1;
+
 	while (
 		formats[ index ] &&
-		formats[ index ][ formatIndex ] === initFormat
+		formats[ index ][ formatIndex ] === targetFormatRef
 	) {
-		if ( direction === 'forwards' ) {
-			index++;
-		} else {
-			index--;
-		}
+		// Increment/decrement in the direction of operation.
+		index = index + directionIncrement;
 	}
 
-	// Restore by one to avoid out of bounds.
-	if ( direction === 'backwards' ) {
-		index++;
-	} else {
-		index--;
-	}
+	// Restore by one in inverse direction of operation
+	// to avoid out of bounds.
+	index = index + inverseDirectionIncrement;
 
 	return index;
 }
