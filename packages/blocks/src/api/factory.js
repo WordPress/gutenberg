@@ -118,7 +118,14 @@ export function __experimentalCloneSanitizedBlock(
 		}
 	);
 
-	return {
+	/**
+	 * Filters the cloned block.
+	 * The entire new block object is passed and can be modified
+	 *
+	 * @param {string} blockType block type of the block being transformed.
+	 * @param {Object} block     cloned block object
+	 */
+	return applyFilters( 'blocks.cloneBlock', block.name, {
 		...block,
 		clientId,
 		attributes: sanitizedAttributes,
@@ -127,7 +134,7 @@ export function __experimentalCloneSanitizedBlock(
 			block.innerBlocks.map( ( innerBlock ) =>
 				__experimentalCloneSanitizedBlock( innerBlock )
 			),
-	};
+	} );
 }
 
 /**
