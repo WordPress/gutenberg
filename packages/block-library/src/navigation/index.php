@@ -168,6 +168,7 @@ function gutenberg_parse_blocks_from_menu_items( $menu_items, $menu_items_by_par
 			'blockName' => 'core/navigation-link',
 			'attrs'     => array(
 				'classes'       => $menu_item->classes,
+				'id'            => $menu_item->object_id,
 				'label'         => $menu_item->title,
 				'opensInNewTab' => $opens_in_new_tab,
 				'rel'           => $rel,
