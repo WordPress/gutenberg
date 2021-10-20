@@ -39,3 +39,47 @@
 		color: $gray-100;
 	}
 }
+
+.resizable-editor__drag-handle {
+	position: absolute;
+	top: 0;
+	bottom: 0;
+	width: 20px;
+
+	&.is-left {
+		left: -20px;
+	}
+
+	&.is-right {
+		right: -20px;
+	}
+}
+
+.resizable-editor__drag-handle-button {
+	$height: 100px;
+	position: absolute;
+	top: calc(50% - #{math.div($height, 2)});
+	left: 6px;
+	padding: 0;
+	width: 8px;
+	height: $height;
+	appearance: none;
+	cursor: grab;
+	outline: none;
+	background: #7e8993;
+	border-radius: 99999px;
+	border: none;
+
+	&:hover {
+		background: #6c7782;
+	}
+
+	&:active {
+		cursor: grabbing;
+		background: #606a74;
+	}
+
+	&:focus {
+		box-shadow: 0 1px 0 #0073aa, 0 0 2px 1px #33b3db;
+	}
+}

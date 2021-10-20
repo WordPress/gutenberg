@@ -6,7 +6,7 @@ import { omit } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { useState, useEffect, useRef } from '@wordpress/element';
+import { useState, useEffect, useRef, useCallback } from '@wordpress/element';
 import { ResizableBox } from '@wordpress/components';
 import {
 	BlockList,
@@ -16,11 +16,13 @@ import {
 	__unstableUseMouseMoveTypingReset as useMouseMoveTypingReset,
 } from '@wordpress/block-editor';
 import { useDispatch, useSelect } from '@wordpress/data';
+import { useMergeRefs } from '@wordpress/compose';
 
 /**
  * Internal dependencies
  */
 import { store as editSiteStore } from '../../store';
+import ResizeHandle from './resize-handle';
 
 const LAYOUT = {
 	type: 'default',
@@ -33,6 +35,19 @@ const RESPONSIVE_DEVICE = 'responsive';
 const DEFAULT_STYLES = {
 	width: '100%',
 	height: '100%',
+};
+
+// Removes the inline styles in the drag handles.
+const HANDLE_STYLES_OVERRIDE = {
+	position: undefined,
+	userSelect: undefined,
+	cursor: undefined,
+	width: undefined,
+	height: undefined,
+	top: undefined,
+	right: undefined,
+	bottom: undefined,
+	left: undefined,
 };
 
 function ResizableEditor( { enableResizing, settings, ...props } ) {
@@ -52,7 +67,9 @@ function ResizableEditor( { enableResizing, settings, ...props } ) {
 	const {
 		__experimentalSetPreviewDeviceType: setPreviewDeviceType,
 	} = useDispatch( editSiteStore );
-	const ref = useMouseMoveTypingReset();
+	const iframeRef = useRef();
+	const mouseMoveTypingResetRef = useMouseMoveTypingReset();
+	const ref = useMergeRefs( [ iframeRef, mouseMoveTypingResetRef ] );
 
 	useEffect(
 		function setWidthWhenDeviceTypeChanged() {
@@ -63,6 +80,12 @@ function ResizableEditor( { enableResizing, settings, ...props } ) {
 		},
 		[ deviceType, resizedCanvasStyles.width ]
 	);
+
+	const resizeWidthBy = useCallback( ( deltaPixels ) => {
+		if ( iframeRef.current ) {
+			setWidth( `${ iframeRef.current.offsetWidth + deltaPixels }px` );
+		}
+	}, [] );
 
 	return (
 		<ResizableBox
@@ -85,6 +108,25 @@ function ResizableEditor( { enableResizing, settings, ...props } ) {
 			// moves half the distance. Hence double the ratio to correctly
 			// align the cursor to the resizer handle.
 			resizeRatio={ 2 }
+			handleComponent={ {
+				left: (
+					<ResizeHandle
+						direction="left"
+						resizeWidthBy={ resizeWidthBy }
+					/>
+				),
+				right: (
+					<ResizeHandle
+						direction="right"
+						resizeWidthBy={ resizeWidthBy }
+					/>
+				),
+			} }
+			handleClasses={ undefined }
+			handleStyles={ {
+				left: HANDLE_STYLES_OVERRIDE,
+				right: HANDLE_STYLES_OVERRIDE,
+			} }
 		>
 			<Iframe
 				style={
