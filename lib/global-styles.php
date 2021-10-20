@@ -297,6 +297,24 @@ function gutenberg_register_webfonts_from_theme_json() {
 	}
 	$theme_settings = WP_Theme_JSON_Resolver_Gutenberg::get_theme_data()->get_settings();
 	if ( ! empty( $theme_settings['typography'] ) && ! empty( $theme_settings['typography']['webfonts'] ) ) {
+
+		// Check if webfonts have a "src" param, and if they do account for the use of "file:./".
+		foreach ( $theme_settings['typography']['webfonts'] as $key => $webfont ) {
+			if ( empty( $webfont['src'] ) ) {
+				continue;
+			}
+			$webfont['src'] = (array) $webfont['src'];
+
+			foreach ( $webfont['src'] as $src_key => $url ) {
+				// Tweak the URL to be relative to the theme root.
+				if ( 0 !== strpos( $url, 'file:./' ) ) {
+					continue;
+				}
+				$webfont['src'][ $src_key ] = get_theme_file_uri( str_replace( 'file:./', '', $url ) );
+			}
+
+			$theme_settings['typography']['webfonts'][ $key ] = $webfont;
+		}
 		wp_register_webfonts( $theme_settings['typography']['webfonts'] );
 	}
 }
