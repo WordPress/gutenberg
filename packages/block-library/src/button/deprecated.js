@@ -674,7 +674,6 @@ const deprecated = [
 			!! attributes.customBackgroundColor ||
 			!! attributes.customGradient,
 		migrate: compose(
-			migrateFontFamily,
 			migrateBorderRadius,
 			migrateCustomColorsAndGradients
 		),
