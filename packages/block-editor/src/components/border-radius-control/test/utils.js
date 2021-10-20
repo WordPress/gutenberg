@@ -85,7 +85,7 @@ describe( 'getAllValue', () => {
 			expect( getAllValue( '32em' ) ).toBe( '32em' );
 		} );
 
-		it( 'should return string as-is without passing it', () => {
+		it( 'should return string as-is without parsing it', () => {
 			expect( getAllValue( '32apples' ) ).toBe( '32apples' );
 		} );
 	} );
