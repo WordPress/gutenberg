@@ -46,5 +46,6 @@ class WP_Block_Supports_Colors_Test extends WP_UnitTestCase {
 		$expected = array( 'class' => 'has-text-color has-fg-1-color has-background has-bg-2-background-color has-background has-gr-3-gradient-background' );
 
 		$this->assertSame( $expected, $actual );
+		unregister_block_type( 'test/color-slug-with-numbers' );
 	}
 }

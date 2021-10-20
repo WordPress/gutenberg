@@ -34,5 +34,6 @@ class WP_Block_Supports_Typography_Test extends WP_UnitTestCase {
 		$expected = array( 'class' => 'has-h-1-font-size' );
 
 		$this->assertSame( $expected, $actual );
+		unregister_block_type( 'test/font-size-slug-with-numbers' );
 	}
 }
