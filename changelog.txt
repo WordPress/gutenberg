@@ -1,5 +1,12 @@
 == Changelog ==
 
+= 11.7.1 =
+
+### Bug Fixes
+
+-  Rich text: formats: allow format to filter value when changing tag name ([35516](https://github.com/WordPress/gutenberg/pull/35516))
+
+
 = 11.8.0-rc.1 =
 
 
