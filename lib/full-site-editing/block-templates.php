@@ -259,6 +259,10 @@ function _gutenberg_build_template_result_from_file( $template_file, $template_t
 		$template->title       = $default_template_types[ $template_file['slug'] ]['title'];
 	}
 
+	if ( 'wp_template' === $template_type && isset( $template_file['postTypes'] ) ) {
+		$template->post_types = $template_file['postTypes'];
+	}
+
 	if ( 'wp_template_part' === $template_type && isset( $template_file['area'] ) ) {
 		$template->area = $template_file['area'];
 	}
