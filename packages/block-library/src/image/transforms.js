@@ -136,6 +136,7 @@ const transforms = {
 			// creating a new gallery.
 			type: 'files',
 			isMatch( files ) {
+				// The following check is intended to catch non-image files when dropped together with images.
 				if (
 					files.some(
 						( file ) => file.type.indexOf( 'image/' ) === 0
