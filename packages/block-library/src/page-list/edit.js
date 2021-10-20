@@ -63,46 +63,7 @@ const Menu = ( { pagesByParentId, parentId, depth = 0 } ) => {
 	} );
 };
 
-export default function PageListEdit( {
-	context,
-	clientId,
-	attributes,
-	setAttributes,
-} ) {
-	// Copy context to attributes to make it accessible in the editor's
-	// ServerSideRender
-	useEffect( () => {
-		const {
-			textColor,
-			customTextColor,
-			backgroundColor,
-			customBackgroundColor,
-			overlayTextColor,
-			customOverlayTextColor,
-			overlayBackgroundColor,
-			customOverlayBackgroundColor,
-		} = context;
-		setAttributes( {
-			textColor,
-			customTextColor,
-			backgroundColor,
-			customBackgroundColor,
-			overlayTextColor,
-			customOverlayTextColor,
-			overlayBackgroundColor,
-			customOverlayBackgroundColor,
-		} );
-	}, [
-		context.textColor,
-		context.customTextColor,
-		context.backgroundColor,
-		context.customBackgroundColor,
-		context.overlayTextColor,
-		context.customOverlayTextColor,
-		context.overlayBackgroundColor,
-		context.customOverlayBackgroundColor,
-	] );
-
+export default function PageListEdit( { context, clientId } ) {
 	const { textColor, backgroundColor, style } = context || {};
 
 	const [ allowConvertToLinks, setAllowConvertToLinks ] = useState( false );
@@ -135,14 +96,6 @@ export default function PageListEdit( {
 	);
 
 	useEffect( () => {
-		setAttributes( {
-			isNavigationChild: isParentNavigation,
-			openSubmenusOnClick: !! context.openSubmenusOnClick,
-			showSubmenuIcon: !! context.showSubmenuIcon,
-		} );
-	}, [ context.openSubmenusOnClick, context.showSubmenuIcon ] );
-
-	useEffect( () => {
 		apiFetch( {
 			path: addQueryArgs( '/wp/v2/pages', {
 				orderby: 'menu_order',
@@ -170,14 +123,6 @@ export default function PageListEdit( {
 	const [ isOpen, setOpen ] = useState( false );
 	const openModal = () => setOpen( true );
 	const closeModal = () => setOpen( false );
-
-	// Update parent status before component first renders.
-	const attributesWithParentStatus = {
-		...attributes,
-		isNavigationChild: isParentNavigation,
-		openSubmenusOnClick: !! context.openSubmenusOnClick,
-		showSubmenuIcon: !! context.showSubmenuIcon,
-	};
 
 	return (
 		<>
