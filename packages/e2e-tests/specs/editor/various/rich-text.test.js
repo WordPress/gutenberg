@@ -9,6 +9,7 @@ import {
 	pressKeyWithModifier,
 	showBlockToolbar,
 	clickBlockToolbarButton,
+	switchEditorModeTo,
 } from '@wordpress/e2e-test-utils';
 
 describe( 'RichText', () => {
@@ -547,5 +548,52 @@ describe( 'RichText', () => {
 
 		// Expect: <strong>1</strong>-<em>2</em>
 		expect( await getEditedPostContent() ).toMatchSnapshot();
+	} );
+
+	// Regression test for https://github.com/WordPress/gutenberg/pull/35516.
+	it.only( 'should properly handle pre-<mark> `text-color` markup', async () => {
+		// Change editing mode from "Visual" to "HTML".
+		await switchEditorModeTo( 'Code' );
+
+		const markupFixture = `
+			<!-- wp:paragraph -->
+			<p><span class="has-inline-color has-red-color">Preset color added pre-11.7</span></p>
+			<!-- /wp:paragraph -->
+
+			<!-- wp:paragraph -->
+			<p><span style="color:#a30097" class="has-inline-color">Custom color added pre-11.7</span></p>
+			<!-- /wp:paragraph -->
+		`;
+
+		await page.type( '.editor-post-text-editor', markupFixture );
+
+		await switchEditorModeTo( 'Visual' );
+
+		const [
+			editorPresetColorText,
+			editorCustomColorText,
+		] = await page.evaluate( () =>
+			Array.from(
+				document.querySelectorAll(
+					'p[aria-label="Paragraph block"] > *'
+				)
+			).map( ( el ) => ( {
+				tag: el.localName,
+				style: el.getAttribute( 'style' ),
+				class: el.getAttribute( 'class' ),
+			} ) )
+		);
+
+		expect( editorPresetColorText.tag ).toEqual( 'mark' );
+		expect( editorPresetColorText.style ).toEqual(
+			'background-color:rgba(0, 0, 0, 0)'
+		);
+		expect( editorCustomColorText.tag ).toEqual( 'mark' );
+		expect( editorCustomColorText.style ).toEqual(
+			'background-color:rgba(0, 0, 0, 0);color:#a30097'
+		);
+
+		// @todo Publish
+		// @todo Gather p tags and its style/class, do the same checks as above.
 	} );
 } );
