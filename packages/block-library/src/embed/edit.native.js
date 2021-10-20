@@ -86,8 +86,8 @@ const EmbedEdit = ( props ) => {
 		( select ) => {
 			const {
 				getEmbedPreview,
+				hasFinishedResolution,
 				isPreviewEmbedFallback,
-				isRequestingEmbedPreview,
 				getThemeSupports,
 			} = select( coreStore );
 			if ( ! url ) {
@@ -95,6 +95,10 @@ const EmbedEdit = ( props ) => {
 			}
 
 			const embedPreview = getEmbedPreview( url );
+			const hasResolvedEmbedPreview = hasFinishedResolution(
+				'getEmbedPreview',
+				[ url ]
+			);
 			const previewIsFallback = isPreviewEmbedFallback( url );
 
 			// The external oEmbed provider does not exist. We got no type info and no html.
@@ -108,16 +112,9 @@ const EmbedEdit = ( props ) => {
 			const validPreview =
 				!! embedPreview && ! badEmbedProvider && ! wordpressCantEmbed;
 
-			// `isRequestingEmbedPreview` is returning false just before an
-			// `apiFetch` is triggered. We're assuming that a fetch is happening
-			// if there is an `attributesUrl` set but there is no data in
-			// `embedPreview` which represents the response returned from the API.
-			const isFetching =
-				isRequestingEmbedPreview( url ) || ( url && ! embedPreview );
-
 			return {
 				preview: validPreview ? embedPreview : undefined,
-				fetching: isFetching,
+				fetching: ! hasResolvedEmbedPreview,
 				themeSupportsResponsive: getThemeSupports()[
 					'responsive-embeds'
 				],
