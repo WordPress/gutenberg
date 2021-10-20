@@ -55,6 +55,7 @@
 	.comment-form-url {
 		label {
 			display: block;
+			margin-bottom: 0.25em;
 		}
 	}
 
@@ -69,7 +70,13 @@
 	}
 
 	textarea,
-	input {
+	input:not([type="submit"]) {
 		border: 1px solid $gray-600;
+		font-size: 1em;
+		padding: calc(0.667em + 2px); // The extra 2px is added to match outline buttons.
+	}
+
+	input[type="submit"] {
+		border: none;
 	}
 }
