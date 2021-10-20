@@ -55,67 +55,47 @@ function removeUserOriginFromSettings( settingsToRemove ) {
 }
 
 function useGlobalStylesUserConfig() {
-	const { globalStylesId, content } = useSelect( ( select ) => {
+	const { globalStylesId, settings, styles } = useSelect( ( select ) => {
 		const _globalStylesId = select( editSiteStore ).getSettings()
 			.__experimentalGlobalStylesUserEntityId;
+		const record = select( coreStore ).getEditedEntityRecord(
+			'root',
+			'globalStyles',
+			_globalStylesId
+		);
 		return {
 			globalStylesId: _globalStylesId,
-			content: select( coreStore ).getEditedEntityRecord(
-				'postType',
-				'wp_global_styles',
-				_globalStylesId
-			)?.content,
+			settings: record?.settings,
+			styles: record?.styles,
 		};
 	}, [] );
 	const { getEditedEntityRecord } = useSelect( coreStore );
 	const { editEntityRecord } = useDispatch( coreStore );
 
-	const parseContent = ( contentToParse ) => {
-		let parsedConfig;
-		try {
-			parsedConfig = contentToParse ? JSON.parse( contentToParse ) : {};
-			// It is very important to verify if the flag isGlobalStylesUserThemeJSON is true.
-			// If it is not true the content was not escaped and is not safe.
-			if ( ! parsedConfig.isGlobalStylesUserThemeJSON ) {
-				parsedConfig = {};
-			} else {
-				parsedConfig = {
-					...parsedConfig,
-					settings: addUserOriginToSettings( parsedConfig.settings ),
-				};
-			}
-		} catch ( e ) {
-			/* eslint-disable no-console */
-			console.error( 'Global Styles User data is not valid' );
-			console.error( e );
-			/* eslint-enable no-console */
-			parsedConfig = {};
-		}
-
-		return parsedConfig;
-	};
-
 	const config = useMemo( () => {
-		return parseContent( content );
-	}, [ content ] );
+		return {
+			settings: addUserOriginToSettings( settings ?? {} ),
+			styles: styles ?? {},
+		};
+	}, [ settings, styles ] );
 
 	const setConfig = useCallback(
 		( callback ) => {
-			const currentConfig = parseContent(
-				getEditedEntityRecord(
-					'postType',
-					'wp_global_styles',
-					globalStylesId
-				)?.content
+			const record = getEditedEntityRecord(
+				'root',
+				'globalStyles',
+				globalStylesId
 			);
+			const currentConfig = {
+				styles: record?.styles ?? {},
+				settings: addUserOriginToSettings( record?.settings ?? {} ),
+			};
 			const updatedConfig = callback( currentConfig );
-			editEntityRecord( 'postType', 'wp_global_styles', globalStylesId, {
-				content: JSON.stringify( {
-					...updatedConfig,
-					settings: removeUserOriginFromSettings(
-						updatedConfig.settings
-					),
-				} ),
+			editEntityRecord( 'root', 'globalStyles', globalStylesId, {
+				styles: updatedConfig.styles,
+				settings: removeUserOriginFromSettings(
+					updatedConfig.settings
+				),
 			} );
 		},
 		[ globalStylesId ]
