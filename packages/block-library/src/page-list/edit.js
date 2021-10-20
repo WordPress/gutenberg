@@ -2,6 +2,7 @@
  * External dependencies
  */
 import classnames from 'classnames';
+import { sortBy } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -86,14 +87,20 @@ function usePagesByParentId() {
 
 	useEffect( () => {
 		async function performFetch() {
-			const pages = await apiFetch( {
+			let pages = await apiFetch( {
 				path: addQueryArgs( '/wp/v2/pages', {
 					orderby: 'menu_order',
 					order: 'asc',
-					_fields: [ 'id', 'link', 'parent', 'title' ],
+					_fields: [ 'id', 'link', 'parent', 'title', 'menu_order' ],
 					per_page: -1,
 				} ),
 			} );
+
+			// TODO: Once the REST API supports passing multiple values to
+			// 'orderby', this an be removed.
+			// https://core.trac.wordpress.org/ticket/39037
+			pages = sortBy( pages, [ 'menu_order', 'title.rendered' ] );
+
 			pagesByParentIdRef.current = pages.reduce(
 				( pagesByParentId, page ) => {
 					const { parent } = page;
