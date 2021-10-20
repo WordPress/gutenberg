@@ -50,6 +50,7 @@ export { default as column } from './library/column';
 export { default as columns } from './library/columns';
 export { default as comment } from './library/comment';
 export { default as commentAuthor } from './library/comment-author';
+export { default as postCommentContent } from './library/post-comment-content';
 export { default as cover } from './library/cover';
 export { default as create } from './library/create';
 export { default as crop } from './library/crop';
