@@ -112,6 +112,11 @@
 			}
 		}
 	}
+	//fix focus styling width when one row has fewer cells
+	&.has-single-cell .block-editor-list-view-block-contents:focus::after {
+		right: 0;
+	}
+
 	.block-editor-list-view-block__menu:focus {
 		box-shadow: inset 0 0 0 var(--wp-admin-border-width-focus) var(--wp-admin-theme-color);
 		z-index: 1;

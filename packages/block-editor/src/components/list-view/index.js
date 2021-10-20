@@ -49,6 +49,7 @@ const expanded = ( state, action ) => {
  * @param {boolean}  props.showBlockMovers                          Flag to enable block movers
  * @param {boolean}  props.__experimentalFeatures                   Flag to enable experimental features.
  * @param {boolean}  props.__experimentalPersistentListViewFeatures Flag to enable features for the Persistent List View experiment.
+ * @param {boolean}  props.__experimentalHideContainerBlockActions  Flag to hide actions of top level blocks (like core/widget-area)
  * @param {Object}   ref                                            Forwarded ref
  */
 function ListView(
@@ -57,6 +58,7 @@ function ListView(
 		onSelect = noop,
 		__experimentalFeatures,
 		__experimentalPersistentListViewFeatures,
+		__experimentalHideContainerBlockActions,
 		showNestedBlocks,
 		showBlockMovers,
 		...props
@@ -118,6 +120,7 @@ function ListView(
 		() => ( {
 			__experimentalFeatures,
 			__experimentalPersistentListViewFeatures,
+			__experimentalHideContainerBlockActions,
 			isTreeGridMounted: isMounted.current,
 			draggedClientIds,
 			expandedState,
@@ -127,6 +130,7 @@ function ListView(
 		[
 			__experimentalFeatures,
 			__experimentalPersistentListViewFeatures,
+			__experimentalHideContainerBlockActions,
 			isMounted.current,
 			draggedClientIds,
 			expandedState,

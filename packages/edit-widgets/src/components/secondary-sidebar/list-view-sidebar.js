@@ -65,6 +65,7 @@ export default function ListViewSidebar() {
 				<ListView
 					onSelect={ selectEditorBlock }
 					showNestedBlocks
+					__experimentalHideContainerBlockActions
 					__experimentalFeatures
 					__experimentalPersistentListViewFeatures
 				/>

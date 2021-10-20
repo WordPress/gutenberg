@@ -49,6 +49,7 @@ export default function ListViewBlock( {
 	const {
 		__experimentalFeatures: withExperimentalFeatures,
 		__experimentalPersistentListViewFeatures: withExperimentalPersistentListViewFeatures,
+		__experimentalHideContainerBlockActions: hideContainerBlockActions,
 		isTreeGridMounted,
 		expand,
 		collapse,
@@ -140,11 +141,27 @@ export default function ListViewBlock( {
 		[ clientId, expand, collapse, isExpanded ]
 	);
 
+	const showBlockActions =
+		withExperimentalFeatures &&
+		//hide actions for blocks like core/widget-areas
+		( ! hideContainerBlockActions ||
+			( hideContainerBlockActions && level > 1 ) );
+
+	const hideBlockActions = withExperimentalFeatures && ! showBlockActions;
+
+	let colSpan;
+	if ( hasRenderedMovers ) {
+		colSpan = 2;
+	} else if ( hideBlockActions ) {
+		colSpan = 3;
+	}
+
 	const classes = classnames( {
 		'is-selected': isSelected,
 		'is-branch-selected':
 			withExperimentalPersistentListViewFeatures && isBranchSelected,
 		'is-dragging': isDragged,
+		'has-single-cell': hideBlockActions,
 	} );
 
 	return (
@@ -165,7 +182,7 @@ export default function ListViewBlock( {
 			>
 				<TreeGridCell
 					className="block-editor-list-view-block__contents-cell"
-					colSpan={ hasRenderedMovers ? undefined : 2 }
+					colSpan={ colSpan }
 					ref={ cellRef }
 				>
 					{ ( { ref, tabIndex, onFocus } ) => (
@@ -217,7 +234,7 @@ export default function ListViewBlock( {
 					</>
 				) }
 
-				{ withExperimentalFeatures && (
+				{ showBlockActions && (
 					<TreeGridCell className={ listViewBlockSettingsClassName }>
 						{ ( { ref, tabIndex, onFocus } ) => (
 							<BlockSettingsDropdown
