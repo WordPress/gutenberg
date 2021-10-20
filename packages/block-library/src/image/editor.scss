@@ -59,7 +59,8 @@ figure.wp-block-image:not(.wp-block) {
 
 .wp-block[data-align="left"],
 .wp-block[data-align="center"],
-.wp-block[data-align="right"] {
+.wp-block[data-align="right"],
+*:not([data-align]) {
 	> .wp-block-image {
 		display: table;
 
