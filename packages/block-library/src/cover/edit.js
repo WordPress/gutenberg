@@ -331,7 +331,7 @@ function CoverEdit( {
 		gradientValue,
 		setGradient,
 	} = __experimentalUseGradient();
-	const onSelectMedia = attributesFromMedia( setAttributes );
+	const onSelectMedia = attributesFromMedia( setAttributes, dimRatio );
 	const isUploadingMedia = isTemporaryMedia( id, url );
 
 	const [ prevMinHeightValue, setPrevMinHeightValue ] = useState( minHeight );
