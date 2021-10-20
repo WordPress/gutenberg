@@ -60,6 +60,10 @@ function render_block_core_post_template( $attributes, $content, $block ) {
 	$content = '';
 	while ( $query->have_posts() ) {
 		$query->the_post();
+		// Do not display duplicate sticky posts in the paged result.
+		if ( $page > 1 && is_sticky() ) {
+			continue;
+		}
 		$block_content = (
 			new WP_Block(
 				$block->parsed_block,
