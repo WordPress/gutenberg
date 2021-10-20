@@ -15,6 +15,14 @@
  * @return string Returns the output of the query, structured using the layout defined by the block's inner blocks.
  */
 function render_block_core_post_template( $attributes, $content, $block ) {
+
+	// Return early if sticky posts are set to only, but there are no sticky posts.
+	if ( isset( $block->context['query']['sticky'] )
+		&& 'only' === $block->context['query']['sticky']
+		&& empty( get_option( 'sticky_posts' ) ) ) {
+		return '';
+	}
+
 	$page_key = isset( $block->context['queryId'] ) ? 'query-' . $block->context['queryId'] . '-page' : 'query-page';
 	$page     = empty( $_GET[ $page_key ] ) ? 1 : (int) $_GET[ $page_key ];
 
