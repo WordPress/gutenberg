@@ -86,16 +86,14 @@ function usePagesByParentId() {
 
 	useEffect( () => {
 		async function performFetch() {
-			const response = await apiFetch( {
+			const pages = await apiFetch( {
 				path: addQueryArgs( '/wp/v2/pages', {
 					orderby: 'menu_order',
 					order: 'asc',
 					_fields: [ 'id', 'link', 'parent', 'title' ],
+					per_page: -1,
 				} ),
-				parse: false,
 			} );
-
-			const pages = await response.json();
 			pagesByParentIdRef.current = pages.reduce(
 				( pagesByParentId, page ) => {
 					const { parent } = page;
@@ -108,8 +106,7 @@ function usePagesByParentId() {
 				},
 				new Map()
 			);
-
-			totalPagesRef.current = response.headers.get( 'X-WP-Total' );
+			totalPagesRef.current = pages.length;
 		}
 		performFetch();
 	}, [] );
