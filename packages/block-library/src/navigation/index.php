@@ -161,6 +161,7 @@ function gutenberg_parse_blocks_from_menu_items( $menu_items, $menu_items_by_par
 	$blocks = array();
 
 	foreach ( $menu_items as $menu_item ) {
+		$id               = ( null !== $menu_item->object_id && 'custom' !== $menu_item->object ) ? $menu_item->object_id : null;
 		$opens_in_new_tab = null !== $menu_item->target && '_blank' === $menu_item->target;
 		$rel              = ( null !== $menu_item->xfn && '' !== $menu_item->xfn ) ? $menu_item->xfn : null;
 		$kind             = null !== $menu_item->type ? str_replace( '_', '-', $menu_item->type ) : 'custom';
@@ -169,8 +170,8 @@ function gutenberg_parse_blocks_from_menu_items( $menu_items, $menu_items_by_par
 			'blockName' => 'core/navigation-link',
 			'attrs'     => array(
 				'classes'       => $menu_item->classes,
-				'id'            => $menu_item->object_id,
 				'description'   => $menu_item->description,
+				'id'            => $id,
 				'kind'          => $kind,
 				'label'         => $menu_item->title,
 				'opensInNewTab' => $opens_in_new_tab,
