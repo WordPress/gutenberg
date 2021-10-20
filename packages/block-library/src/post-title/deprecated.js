@@ -33,6 +33,9 @@ const v1 = {
 			gradients: true,
 			link: true,
 		},
+		spacing: {
+			margin: true,
+		},
 		typography: {
 			fontSize: true,
 			lineHeight: true,
