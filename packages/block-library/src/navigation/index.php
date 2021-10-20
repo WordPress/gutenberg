@@ -163,16 +163,20 @@ function gutenberg_parse_blocks_from_menu_items( $menu_items, $menu_items_by_par
 	foreach ( $menu_items as $menu_item ) {
 		$opens_in_new_tab = null !== $menu_item->target && '_blank' === $menu_item->target;
 		$rel              = ( null !== $menu_item->xfn && '' !== $menu_item->xfn ) ? $menu_item->xfn : null;
+		$kind             = null !== $menu_item->type ? str_replace( '_', '-', $menu_item->type ) : 'custom';
 
 		$block = array(
 			'blockName' => 'core/navigation-link',
 			'attrs'     => array(
 				'classes'       => $menu_item->classes,
 				'id'            => $menu_item->object_id,
+				'description'   => $menu_item->description,
+				'kind'          => $kind,
 				'label'         => $menu_item->title,
 				'opensInNewTab' => $opens_in_new_tab,
 				'rel'           => $rel,
 				'title'         => $menu_item->attr_title,
+				'type'          => $menu_item->object,
 				'url'           => $menu_item->url,
 			),
 		);
