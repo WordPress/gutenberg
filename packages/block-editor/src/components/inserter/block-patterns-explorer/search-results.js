@@ -26,7 +26,6 @@ function PatternExplorerSearchResults( {
 	isAppender,
 	__experimentalInsertionIndex,
 	maxBlockPatterns,
-	// maxBlockTypes,
 	shouldFocusBlock = true,
 } ) {
 	const debouncedSpeak = useDebounce( speak, 500 );
@@ -71,17 +70,33 @@ function PatternExplorerSearchResults( {
 
 	const hasItems = !! filteredBlockPatterns?.length;
 	return (
-		<InserterListbox>
-			{ ! hasItems && <InserterNoResults /> }
+		<>
 			{ hasItems && (
-				<BlockPatternsList
-					shownPatterns={ currentShownPatterns }
-					blockPatterns={ filteredBlockPatterns }
-					onClickPattern={ onSelectBlockPattern }
-					isDraggable={ false }
-				/>
+				<h2 className="block-editor-block-patterns-explorer__search-results-count">
+					{ sprintf(
+						/* translators: %d: number of patterns. */
+						_n(
+							'%d pattern found for',
+							'%d patterns found for',
+							filteredBlockPatterns.length
+						),
+						filteredBlockPatterns.length
+					) }
+					{ ` "${ filterValue }"` }
+				</h2>
 			) }
-		</InserterListbox>
+			<InserterListbox>
+				{ ! hasItems && <InserterNoResults /> }
+				{ hasItems && (
+					<BlockPatternsList
+						shownPatterns={ currentShownPatterns }
+						blockPatterns={ filteredBlockPatterns }
+						onClickPattern={ onSelectBlockPattern }
+						isDraggable={ false }
+					/>
+				) }
+			</InserterListbox>
+		</>
 	);
 }
 

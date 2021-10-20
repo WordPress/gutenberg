@@ -7,7 +7,7 @@ import classnames from 'classnames';
  * WordPress dependencies
  */
 import { Flex, FlexItem, SelectControl, Button } from '@wordpress/components';
-import { grid } from '@wordpress/icons';
+import { fullscreen } from '@wordpress/icons';
 import { __ } from '@wordpress/i18n';
 
 function PatternInserterPanel( {
@@ -70,7 +70,7 @@ function PatternInserterPanel( {
 				<FlexItem>
 					<Button
 						label={ __( 'Pattern explorer' ) }
-						icon={ grid }
+						icon={ fullscreen }
 						onClick={ onShowExplorer }
 						isSmall
 					/>

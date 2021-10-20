@@ -20,10 +20,7 @@ function PatternsExplorer( {
 } ) {
 	const [ filterValue, setFilterValue ] = useState( '' );
 	const patternList = !! filterValue ? (
-		<PatternExplorerSearchResults
-			filterValue={ filterValue }
-			// onSelect={ onSelect }
-		/>
+		<PatternExplorerSearchResults filterValue={ filterValue } />
 	) : (
 		children
 	);
