@@ -40,7 +40,7 @@ Options:
 
 ```bash
 -V, --version                output the version number
--t, --template <name>        block template type name, allowed values: "es5", "esnext", or the name of an external npm package (default: "esnext")
+-t, --template <name>        block template type name, allowed values: "es5", "esnext", the name of an external npm package (default: "esnext"), or the path to a local directory.
 --namespace <value>          internal namespace for the block name
 --title <value>              display title for the block
 --short-description <value>  short description for the block
@@ -65,7 +65,13 @@ $ npx @wordpress/create-block
 $ npx @wordpress/create-block --template es5
 ```
 
-3. Help – you need to use `npx` to output usage information.
+3. Local template directory – it is also possible to pick a local directory as a template.
+
+```bash
+$ npx @wordpress/create-block --template ./path/to/template
+```
+
+4. Help – you need to use `npx` to output usage information.
 
 ```bash
 $ npx @wordpress/create-block --help

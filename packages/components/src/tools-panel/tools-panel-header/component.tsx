@@ -16,6 +16,8 @@ import { __, _x, sprintf } from '@wordpress/i18n';
 import DropdownMenu from '../../dropdown-menu';
 import MenuGroup from '../../menu-group';
 import MenuItem from '../../menu-item';
+import { HStack } from '../../h-stack';
+import { Heading } from '../../heading';
 import { useToolsPanelHeader } from './hook';
 import { contextConnect, WordPressComponentProps } from '../../ui/context';
 import type {
@@ -116,9 +118,10 @@ const ToolsPanelHeader = (
 	forwardedRef: Ref< any >
 ) => {
 	const {
+		areAllOptionalControlsHidden,
 		dropdownMenuClassName,
 		hasMenuItems,
-		areAllOptionalControlsHidden,
+		headingClassName,
 		label: labelText,
 		menuItems,
 		resetAll,
@@ -141,8 +144,10 @@ const ToolsPanelHeader = (
 		: _x( 'View options', 'Button label to reveal tool panel options' );
 
 	return (
-		<h2 { ...headerProps } ref={ forwardedRef }>
-			{ labelText }
+		<HStack { ...headerProps } ref={ forwardedRef }>
+			<Heading level={ 2 } className={ headingClassName }>
+				{ labelText }
+			</Heading>
 			{ hasMenuItems && (
 				<DropdownMenu
 					icon={ dropDownMenuIcon }
@@ -176,7 +181,7 @@ const ToolsPanelHeader = (
 					) }
 				</DropdownMenu>
 			) }
-		</h2>
+		</HStack>
 	);
 };
 

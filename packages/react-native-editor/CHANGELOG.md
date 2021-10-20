@@ -10,11 +10,15 @@ For each user feature we should also add a importance categorization label  to i
 -->
 
 ## Unreleased
+- [**] Search block - Text and background color support [#35511]
+
+## 1.64.0
 -   [*] [Embed block] Fix inline preview cut-off when editing URL [#35321]
 -   [**] [Embed block] Detect when an embeddable URL is pasted into an empty paragraph. [#35204]
 -   [*] [Unsupported Block Editor] Fix text selection bug for Android [#34668]
 -   [*] [Embed block] Fix URL not editable after dismissing the edit URL bottom sheet with empty value [#35460]
 -   [**] Pullquote block - Added support for text and background color customization [#34451]
+-   [**] Preformatted block - Added support for text and background color customization [#35314]
 
 ## 1.63.1
 -   [*] Fixed missing modal backdrop for Android help section [#35557]

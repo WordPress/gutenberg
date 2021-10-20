@@ -15,7 +15,13 @@ import PanelBody from '../body';
  */
 import { wordpress } from '@wordpress/icons';
 
-export default { title: 'Components/Panel', component: Panel };
+export default {
+	title: 'Components/Panel',
+	component: Panel,
+	parameters: {
+		knobs: { disabled: false },
+	},
+};
 
 export const _default = () => {
 	const bodyTitle = text( 'Body Title', 'My Block Settings' );

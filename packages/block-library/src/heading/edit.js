@@ -8,12 +8,14 @@ import classnames from 'classnames';
  */
 import { __ } from '@wordpress/i18n';
 import { useEffect } from '@wordpress/element';
+import { useDispatch } from '@wordpress/data';
 import { createBlock } from '@wordpress/blocks';
 import {
 	AlignmentControl,
 	BlockControls,
 	RichText,
 	useBlockProps,
+	store as blockEditorStore,
 } from '@wordpress/block-editor';
 
 /**
@@ -41,15 +43,25 @@ function HeadingEdit( {
 		style,
 	} );
 
+	const { __unstableMarkNextChangeAsNotPersistent } = useDispatch(
+		blockEditorStore
+	);
+
 	// Initially set anchor for headings that have content but no anchor set.
 	// This is used when transforming a block to heading, or for legacy anchors.
 	useEffect( () => {
 		if ( ! anchor && content ) {
+			// This side-effect should not create an undo level.
+			__unstableMarkNextChangeAsNotPersistent();
 			setAttributes( {
 				anchor: generateAnchor( clientId, content, allHeadingAnchors ),
 			} );
 		}
+
 		allHeadingAnchors[ clientId ] = anchor;
+		return () => {
+			delete allHeadingAnchors[ clientId ];
+		};
 	}, [ content, anchor ] );
 
 	const onContentChange = ( value ) => {

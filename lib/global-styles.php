@@ -125,8 +125,9 @@ function gutenberg_experimental_global_styles_settings( $settings ) {
 		$theme       = WP_Theme_JSON_Resolver_Gutenberg::get_merged_data( $settings, 'theme' );
 		$user_cpt_id = WP_Theme_JSON_Resolver_Gutenberg::get_user_custom_post_type_id();
 
-		$settings['__experimentalGlobalStylesUserEntityId'] = $user_cpt_id;
-		$settings['__experimentalGlobalStylesBaseStyles']   = $theme->get_raw_data();
+		$settings['__experimentalGlobalStylesUserEntityId']           = $user_cpt_id;
+		$settings['__experimentalGlobalStylesBaseConfig']['styles']   = $theme->get_raw_data()['styles'];
+		$settings['__experimentalGlobalStylesBaseConfig']['settings'] = $theme->get_settings();
 	}
 
 	if ( 'other' === $context ) {

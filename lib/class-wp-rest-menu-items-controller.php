@@ -750,29 +750,23 @@ class WP_REST_Menu_Items_Controller extends WP_REST_Posts_Controller {
 	 */
 	protected function prepare_links( $menu_item ) {
 		$links = parent::prepare_links( $menu_item );
+		if ( empty( $menu_item->object_id ) ) {
+			return $links;
+		}
 
-		if ( 'post_type' === $menu_item->type && ! empty( $menu_item->object_id ) ) {
-			$post_type_object = get_post_type_object( $menu_item->object );
-			if ( $post_type_object->show_in_rest ) {
-				$rest_base                           = ! empty( $post_type_object->rest_base ) ? $post_type_object->rest_base : $post_type_object->name;
-				$url                                 = rest_url( sprintf( 'wp/v2/%s/%d', $rest_base, $menu_item->object_id ) );
-				$links['https://api.w.org/object'][] = array(
-					'href'       => $url,
-					'post_type'  => $menu_item->type,
-					'embeddable' => true,
-				);
-			}
-		} elseif ( 'taxonomy' === $menu_item->type && ! empty( $menu_item->object_id ) ) {
-			$taxonomy_object = get_taxonomy( $menu_item->object );
-			if ( $taxonomy_object->show_in_rest ) {
-				$rest_base                           = ! empty( $taxonomy_object->rest_base ) ? $taxonomy_object->rest_base : $taxonomy_object->name;
-				$url                                 = rest_url( sprintf( 'wp/v2/%s/%d', $rest_base, $menu_item->object_id ) );
-				$links['https://api.w.org/object'][] = array(
-					'href'       => $url,
-					'taxonomy'   => $menu_item->type,
-					'embeddable' => true,
-				);
-			}
+		$path = '';
+		if ( 'post_type' === $menu_item->type ) {
+			$path = rest_get_route_for_post( $menu_item->object_id );
+		} elseif ( 'taxonomy' === $menu_item->type ) {
+			$path = rest_get_route_for_term( $menu_item->object_id );
+		}
+
+		if ( $path ) {
+			$links['https://api.w.org/object'][] = array(
+				'href'       => rest_url( $path ),
+				'post_type'  => $menu_item->type,
+				'embeddable' => true,
+			);
 		}
 
 		return $links;

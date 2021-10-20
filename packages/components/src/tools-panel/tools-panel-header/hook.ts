@@ -29,6 +29,10 @@ export function useToolsPanelHeader(
 		return cx( styles.DropdownMenu );
 	}, [] );
 
+	const headingClassName = useMemo( () => {
+		return cx( styles.ToolsPanelHeading );
+	}, [] );
+
 	const {
 		menuItems,
 		hasMenuItems,
@@ -37,9 +41,10 @@ export function useToolsPanelHeader(
 
 	return {
 		...otherProps,
+		areAllOptionalControlsHidden,
 		dropdownMenuClassName,
 		hasMenuItems,
-		areAllOptionalControlsHidden,
+		headingClassName,
 		menuItems,
 		className: classes,
 	};

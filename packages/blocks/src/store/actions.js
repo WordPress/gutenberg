@@ -1,9 +1,131 @@
 /**
  * External dependencies
  */
-import { castArray } from 'lodash';
+import { castArray, isFunction, isPlainObject, omit, pick, some } from 'lodash';
+
+/**
+ * WordPress dependencies
+ */
+import { select } from '@wordpress/data';
+import { applyFilters } from '@wordpress/hooks';
+
+/**
+ * Internal dependencies
+ */
+import { STORE_NAME } from './constants';
+import { isValidIcon, normalizeIconObject } from '../api/utils';
+import { DEPRECATED_ENTRY_KEYS } from '../api/constants';
 
 /** @typedef {import('../api/registration').WPBlockVariation} WPBlockVariation */
+
+const { error, warn } = window.console;
+
+/**
+ * Mapping of legacy category slugs to their latest normal values, used to
+ * accommodate updates of the default set of block categories.
+ *
+ * @type {Record<string,string>}
+ */
+const LEGACY_CATEGORY_MAPPING = {
+	common: 'text',
+	formatting: 'text',
+	layout: 'design',
+};
+
+/**
+ * Takes the unprocessed block type data and applies all the existing filters for the registered block type.
+ * Next, it validates all the settings and performs additional processing to the block type definition.
+ *
+ * @param {WPBlockType} blockType Unprocessed block type settings.
+ *
+ * @return {?WPBlockType} The block, if it has been successfully registered; otherwise `undefined`.
+ */
+function processBlockType( blockType ) {
+	const { name } = blockType;
+
+	const settings = applyFilters(
+		'blocks.registerBlockType',
+		{ ...blockType },
+		name
+	);
+
+	if ( settings.deprecated ) {
+		settings.deprecated = settings.deprecated.map( ( deprecation ) =>
+			pick(
+				// Only keep valid deprecation keys.
+				applyFilters(
+					'blocks.registerBlockType',
+					// Merge deprecation keys with pre-filter settings
+					// so that filters that depend on specific keys being
+					// present don't fail.
+					{
+						// Omit deprecation keys here so that deprecations
+						// can opt out of specific keys like "supports".
+						...omit( blockType, DEPRECATED_ENTRY_KEYS ),
+						...deprecation,
+					},
+					name
+				),
+				DEPRECATED_ENTRY_KEYS
+			)
+		);
+	}
+
+	if ( ! isPlainObject( settings ) ) {
+		error( 'Block settings must be a valid object.' );
+		return;
+	}
+
+	if ( ! isFunction( settings.save ) ) {
+		error( 'The "save" property must be a valid function.' );
+		return;
+	}
+	if ( 'edit' in settings && ! isFunction( settings.edit ) ) {
+		error( 'The "edit" property must be a valid function.' );
+		return;
+	}
+
+	// Canonicalize legacy categories to equivalent fallback.
+	if ( LEGACY_CATEGORY_MAPPING.hasOwnProperty( settings.category ) ) {
+		settings.category = LEGACY_CATEGORY_MAPPING[ settings.category ];
+	}
+
+	if (
+		'category' in settings &&
+		! some( select( STORE_NAME ).getCategories(), {
+			slug: settings.category,
+		} )
+	) {
+		warn(
+			'The block "' +
+				name +
+				'" is registered with an invalid category "' +
+				settings.category +
+				'".'
+		);
+		delete settings.category;
+	}
+
+	if ( ! ( 'title' in settings ) || settings.title === '' ) {
+		error( 'The block "' + name + '" must have a title.' );
+		return;
+	}
+	if ( typeof settings.title !== 'string' ) {
+		error( 'Block titles must be strings.' );
+		return;
+	}
+
+	settings.icon = normalizeIconObject( settings.icon );
+	if ( ! isValidIcon( settings.icon.src ) ) {
+		error(
+			'The icon passed is invalid. ' +
+				'The icon should be a string, an element, a function, or an object following the specifications documented in https://developer.wordpress.org/block-editor/developers/block-api/block-registration/#icon-optional'
+		);
+		return;
+	}
+
+	return settings;
+}
 
 /**
  * Returns an action object used in signalling that block types have been added.
@@ -17,6 +139,67 @@ export function addBlockTypes( blockTypes ) {
 		type: 'ADD_BLOCK_TYPES',
 		blockTypes: castArray( blockTypes ),
 	};
+}
+
+/**
+ * Yields action objects signaling that the passed block type's settings should be stored in the state.
+ *
+ * @param {WPBlockType} blockType Unprocessed block type settings.
+ *
+ * @yield {Object} Action object.
+ */
+export function* __experimentalRegisterBlockType( blockType ) {
+	yield {
+		type: 'ADD_UNPROCESSED_BLOCK_TYPE',
+		blockType,
+	};
+
+	const processedBlockType = processBlockType( blockType );
+	if ( ! processedBlockType ) {
+		return;
+	}
+	yield addBlockTypes( processedBlockType );
+}
+
+/**
+ * Yields an action object signaling that all block types should be computed again.
+ * It uses stored unprocessed block types and all the most recent list of registered filters.
+ *
+ * It addresses the issue where third party block filters get registered after third party blocks. A sample sequence:
+ *   1. Filter A.
+ *   2. Block B.
+ *   3. Block C.
+ *   4. Filter D.
+ *   5. Filter E.
+ *   6. Block F.
+ *   7. Filter G.
+ * In this scenario some filters would not get applied for all blocks because they are registered too late.
+ *
+ * @yield {Object} Action object.
+ */
+export function* __experimentalReapplyBlockTypeFilters() {
+	const unprocessedBlockTypes = select(
+		STORE_NAME
+	).__experimentalGetUnprocessedBlockTypes();
+
+	const processedBlockTypes = Object.keys( unprocessedBlockTypes ).reduce(
+		( accumulator, blockName ) => {
+			const result = processBlockType(
+				unprocessedBlockTypes[ blockName ]
+			);
+			if ( result ) {
+				accumulator.push( result );
+			}
+			return accumulator;
+		},
+		[]
+	);
+
+	if ( ! processedBlockTypes.length ) {
+		return;
+	}
+
+	yield addBlockTypes( processedBlockTypes );
 }
 
 /**
