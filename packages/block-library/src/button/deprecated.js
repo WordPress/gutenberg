@@ -791,14 +791,12 @@ const deprecated = [
 					.replace( /is-style-squared[\s]?/, '' )
 					.trim();
 			}
-			return migrateFontFamily(
-				migrateBorderRadius(
-					migrateCustomColorsAndGradients( {
-						...attributes,
-						className: newClassName ? newClassName : undefined,
-						borderRadius: 0,
-					} )
-				)
+			return migrateBorderRadius(
+				migrateCustomColorsAndGradients( {
+					...attributes,
+					className: newClassName ? newClassName : undefined,
+					borderRadius: 0,
+				} )
 			);
 		},
 		save( { attributes } ) {
