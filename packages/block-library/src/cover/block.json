@@ -76,7 +76,7 @@
 		"html": false,
 		"spacing": {
 			"padding": true,
-			"margin": true,
+			"margin": [ "top", "bottom" ],
 			"__experimentalDefaultControls": {
 				"padding": true
 			}
