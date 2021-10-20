@@ -192,7 +192,7 @@ export const ThumbWrapper = styled.span`
 	transform: translateX( 4.5px );
 
 	${ thumbColor };
-	${ rtl( { marginLeft: -10 }, { marginRight: 1 } ) };
+	${ rtl( { marginLeft: -10 }, { marginRight: -2 } ) };
 `;
 
 const thumbFocus = ( { isFocused } ) => {
