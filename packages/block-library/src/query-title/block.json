@@ -24,8 +24,7 @@
 			"gradients": true
 		},
 		"spacing": {
-			"margin": true,
-			"padding": true
+			"margin": true
 		},
 		"typography": {
 			"fontSize": true,
