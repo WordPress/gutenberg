@@ -14,15 +14,15 @@ class WP_Block_Supports_Colors_Test extends WP_UnitTestCase {
 			array(
 				'api_version' => 2,
 				'attributes'  => array(
-					'textColor' => array(
+					'textColor'       => array(
 						'type' => 'string',
 					),
 					'backgroundColor' => array(
-						'type' => 'string'
+						'type' => 'string',
 					),
-					'gradient' => array(
-						'type' => 'string'
-					)
+					'gradient'        => array(
+						'type' => 'string',
+					),
 				),
 				'supports'    => array(
 					'color' => array(
@@ -36,7 +36,11 @@ class WP_Block_Supports_Colors_Test extends WP_UnitTestCase {
 		$registry   = WP_Block_Type_Registry::get_instance();
 		$block_type = $registry->get_registered( 'test/test-block' );
 
-		$block_atts = array( 'textColor' => 'fg1', 'backgroundColor' => 'bg2', 'gradient' => 'gr3' );
+		$block_atts = array(
+			'textColor'       => 'fg1',
+			'backgroundColor' => 'bg2',
+			'gradient'        => 'gr3',
+		);
 
 		$actual   = gutenberg_apply_colors_support( $block_type, $block_atts );
 		$expected = array( 'class' => 'has-text-color has-fg-1-color has-background has-bg-2-background-color has-background has-gr-3-gradient-background' );
