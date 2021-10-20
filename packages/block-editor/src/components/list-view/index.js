@@ -26,6 +26,7 @@ import ListViewDropIndicator from './drop-indicator';
 import useListViewClientIds from './use-list-view-client-ids';
 import useListViewDropZone from './use-list-view-drop-zone';
 import { store as blockEditorStore } from '../../store';
+import { hasFocusWithin } from './utils';
 
 const noop = () => {};
 const expanded = ( state, action ) => {
@@ -67,7 +68,11 @@ function ListView(
 	},
 	ref
 ) {
-	const { clientIdsTree, draggedClientIds } = useListViewClientIds( blocks );
+	const {
+		clientIdsTree,
+		draggedClientIds,
+		selectedBlockParentIds,
+	} = useListViewClientIds( blocks );
 	const { selectBlock } = useDispatch( blockEditorStore );
 	const { visibleBlockCount } = useSelect(
 		( select ) => {
@@ -92,12 +97,12 @@ function ListView(
 		[ selectBlock, onSelect ]
 	);
 	const [ expandedState, setExpandedState ] = useReducer( expanded, {} );
-
 	const { ref: dropZoneRef, target: blockDropTarget } = useListViewDropZone();
 	const elementRef = useRef();
 	const treeGridRef = useMergeRefs( [ elementRef, dropZoneRef, ref ] );
-
 	const isMounted = useRef( false );
+	const hasFocus = hasFocusWithin( elementRef?.current );
+
 	useEffect( () => {
 		isMounted.current = true;
 	}, [] );
@@ -167,6 +172,26 @@ function ListView(
 			collapse,
 		]
 	);
+
+	// If a selection is made outside the block list,
+	// for example, in the Block Editor,
+	// try to expand the block list tree.
+	useEffect( () => {
+		if (
+			! hasFocus &&
+			Array.isArray( selectedBlockParentIds ) &&
+			selectedBlockParentIds.length
+		) {
+			selectedBlockParentIds.forEach( ( clientId ) => {
+				if ( ! expandedState[ clientId ] ) {
+					setExpandedState( {
+						type: 'expand',
+						clientId,
+					} );
+				}
+			} );
+		}
+	}, [ hasFocus, selectedBlockParentIds ] );
 
 	return (
 		<AsyncModeProvider value={ true }>

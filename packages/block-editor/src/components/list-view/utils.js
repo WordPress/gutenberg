@@ -30,3 +30,14 @@ export const isClientIdSelected = ( clientId, selectedBlockClientIds ) =>
 	isArray( selectedBlockClientIds ) && selectedBlockClientIds.length
 		? selectedBlockClientIds.indexOf( clientId ) !== -1
 		: selectedBlockClientIds === clientId;
+
+/**
+ * Returns true if the container contains the document active element.
+ *
+ * @param {HTMLElement} container An HTML element.
+ *
+ * @return {boolean} Whether the container contains the currently document active element.
+ */
+export const hasFocusWithin = ( container ) => {
+	return !! container?.contains( container?.ownerDocument?.activeElement );
+};
