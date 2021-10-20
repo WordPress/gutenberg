@@ -10,7 +10,7 @@ class WP_Block_Supports_Colors_Test extends WP_UnitTestCase {
 
 	function test_color_slugs_with_numbers_are_kebab_cased_properly() {
 		register_block_type(
-			'test/test-block',
+			'test/color-slug-with-numbers',
 			array(
 				'api_version' => 2,
 				'attributes'  => array(
@@ -34,7 +34,7 @@ class WP_Block_Supports_Colors_Test extends WP_UnitTestCase {
 			)
 		);
 		$registry   = WP_Block_Type_Registry::get_instance();
-		$block_type = $registry->get_registered( 'test/test-block' );
+		$block_type = $registry->get_registered( 'test/color-slug-with-numbers' );
 
 		$block_atts = array(
 			'textColor'       => 'fg1',

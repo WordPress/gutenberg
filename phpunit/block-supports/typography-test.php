@@ -10,7 +10,7 @@ class WP_Block_Supports_Typography_Test extends WP_UnitTestCase {
 
 	function test_font_size_slug_with_numbers_is_kebab_cased_properly() {
 		register_block_type(
-			'test/test-block',
+			'test/font-size-slug-with-numbers',
 			array(
 				'api_version' => 2,
 				'attributes'  => array(
@@ -26,7 +26,7 @@ class WP_Block_Supports_Typography_Test extends WP_UnitTestCase {
 			)
 		);
 		$registry   = WP_Block_Type_Registry::get_instance();
-		$block_type = $registry->get_registered( 'test/test-block' );
+		$block_type = $registry->get_registered( 'test/font-size-slug-with-numbers' );
 
 		$block_atts = array( 'fontSize' => 'h1' );
 
