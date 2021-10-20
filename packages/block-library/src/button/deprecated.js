@@ -623,7 +623,7 @@ const deprecated = [
 				/>
 			);
 		},
-		migrate: compose( migrateFontFamily, migrateBorderRadius ),
+		migrate: migrateBorderRadius,
 	},
 	{
 		supports: {
