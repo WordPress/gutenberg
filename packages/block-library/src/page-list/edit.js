@@ -9,13 +9,11 @@ import classnames from 'classnames';
 import {
 	BlockControls,
 	useBlockProps,
-	store as blockEditorStore,
 	getColorClassName,
 } from '@wordpress/block-editor';
 import { ToolbarButton } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-import { useEffect, useState } from '@wordpress/element';
-import { useSelect } from '@wordpress/data';
+import { useEffect, useState, useRef } from '@wordpress/element';
 import apiFetch from '@wordpress/api-fetch';
 import { addQueryArgs } from '@wordpress/url';
 
@@ -29,8 +27,104 @@ import { ItemSubmenuIcon } from '../navigation-link/icons';
 // Performance of Navigation Links is not good past this value.
 const MAX_PAGE_COUNT = 100;
 
-const Menu = ( { pagesByParentId, parentId, depth = 0 } ) => {
-	return pagesByParentId.get( parentId )?.map( ( page ) => {
+export default function PageListEdit( { context, clientId } ) {
+	const { pagesByParentId, totalPages } = usePagesByParentId();
+
+	const isInNavigation = !! context.orientation;
+	const allowConvertToLinks = isInNavigation && totalPages <= MAX_PAGE_COUNT;
+
+	const [ isOpen, setOpen ] = useState( false );
+	const openModal = () => setOpen( true );
+	const closeModal = () => setOpen( false );
+
+	const blockProps = useBlockProps( {
+		className: classnames( {
+			'has-text-color': !! context.textColor,
+			[ getColorClassName(
+				'color',
+				context.textColor
+			) ]: !! context.textColor,
+			'has-background': !! context.backgroundColor,
+			[ getColorClassName(
+				'background-color',
+				context.backgroundColor
+			) ]: !! context.backgroundColor,
+		} ),
+		style: { ...context.style?.color },
+	} );
+
+	return (
+		<>
+			{ allowConvertToLinks && (
+				<BlockControls group="other">
+					<ToolbarButton title={ __( 'Edit' ) } onClick={ openModal }>
+						{ __( 'Edit' ) }
+					</ToolbarButton>
+				</BlockControls>
+			) }
+			{ allowConvertToLinks && isOpen && (
+				<ConvertToLinksModal
+					onClose={ closeModal }
+					clientId={ clientId }
+				/>
+			) }
+			<div { ...blockProps }>
+				<ul className="wp-block-page-list">
+					<PageItems pagesByParentId={ pagesByParentId } />
+				</ul>
+			</div>
+		</>
+	);
+}
+
+function usePagesByParentId() {
+	const pagesByParentIdRef = useRef( new Map() );
+	const totalPagesRef = useRef( 0 );
+
+	useEffect( () => {
+		async function performFetch() {
+			const response = await apiFetch( {
+				path: addQueryArgs( '/wp/v2/pages', {
+					orderby: 'menu_order',
+					order: 'asc',
+					_fields: [ 'id', 'link', 'parent', 'title' ],
+				} ),
+				parse: false,
+			} );
+
+			const pages = await response.json();
+			pagesByParentIdRef.current = pages.reduce(
+				( pagesByParentId, page ) => {
+					const { parent } = page;
+					if ( pagesByParentId.has( parent ) ) {
+						pagesByParentId.get( parent ).push( page );
+					} else {
+						pagesByParentId.set( parent, [ page ] );
+					}
+					return pagesByParentId;
+				},
+				new Map()
+			);
+
+			totalPagesRef.current = response.headers.get( 'X-WP-Total' );
+		}
+		performFetch();
+	}, [] );
+
+	return {
+		pagesByParentId: pagesByParentIdRef.current,
+		totalPages: totalPagesRef.current,
+	};
+}
+
+function PageItems( { pagesByParentId, parentId = 0, depth = 0 } ) {
+	const pages = pagesByParentId.get( parentId );
+
+	if ( ! pages?.length ) {
+		return [];
+	}
+
+	return pages.map( ( page ) => {
 		const hasChildren = pagesByParentId.has( page.id );
 		const classes = classnames( 'wp-block-pages-list__item', {
 			'has-child': hasChildren,
@@ -50,7 +144,7 @@ const Menu = ( { pagesByParentId, parentId, depth = 0 } ) => {
 							<ItemSubmenuIcon />
 						</span>
 						<ul className="submenu-container">
-							<Menu
+							<PageItems
 								pagesByParentId={ pagesByParentId }
 								parentId={ page.id }
 								depth={ depth + 1 }
@@ -61,89 +155,4 @@ const Menu = ( { pagesByParentId, parentId, depth = 0 } ) => {
 			</li>
 		);
 	} );
-};
-
-export default function PageListEdit( { context, clientId } ) {
-	const { textColor, backgroundColor, style } = context || {};
-
-	const [ allowConvertToLinks, setAllowConvertToLinks ] = useState( false );
-	const [ pagesByParentId, setPagesByParentId ] = useState(
-		new Map( [ [ 0, [] ] ] )
-	);
-
-	const blockProps = useBlockProps( {
-		className: classnames( {
-			'has-text-color': !! textColor,
-			[ getColorClassName( 'color', textColor ) ]: !! textColor,
-			'has-background': !! backgroundColor,
-			[ getColorClassName(
-				'background-color',
-				backgroundColor
-			) ]: !! backgroundColor,
-		} ),
-		style: { ...style?.color },
-	} );
-
-	const isParentNavigation = useSelect(
-		( select ) => {
-			const { getBlockParentsByBlockName } = select( blockEditorStore );
-			return (
-				getBlockParentsByBlockName( clientId, 'core/navigation' )
-					.length > 0
-			);
-		},
-		[ clientId ]
-	);
-
-	useEffect( () => {
-		apiFetch( {
-			path: addQueryArgs( '/wp/v2/pages', {
-				orderby: 'menu_order',
-				order: 'asc',
-				_fields: [ 'id', 'link', 'parent', 'title' ],
-			} ),
-		} ).then( ( res ) => {
-			const groupedPages = res.reduce( ( parentMap, page ) => {
-				const { parent } = page;
-				if ( parentMap.has( parent ) ) {
-					parentMap.get( parent ).push( page );
-				} else {
-					parentMap.set( parent, [ page ] );
-				}
-				return parentMap;
-			}, new Map() );
-			setPagesByParentId( groupedPages );
-			setAllowConvertToLinks(
-				isParentNavigation &&
-					res.headers.get( 'X-WP-Total' ) <= MAX_PAGE_COUNT
-			);
-		} );
-	}, [ isParentNavigation ] );
-
-	const [ isOpen, setOpen ] = useState( false );
-	const openModal = () => setOpen( true );
-	const closeModal = () => setOpen( false );
-
-	return (
-		<>
-			{ allowConvertToLinks && (
-				<BlockControls group="other">
-					<ToolbarButton title={ __( 'Edit' ) } onClick={ openModal }>
-						{ __( 'Edit' ) }
-					</ToolbarButton>
-				</BlockControls>
-			) }
-			{ allowConvertToLinks && isOpen && (
-				<ConvertToLinksModal
-					onClose={ closeModal }
-					clientId={ clientId }
-				/>
-			) }
-			<div { ...blockProps }>
-				<ul className="wp-block-page-list">
-					<Menu pagesByParentId={ pagesByParentId } parentId={ 0 } />
-				</ul>
-			</div>
-		</>
-	);
 }
