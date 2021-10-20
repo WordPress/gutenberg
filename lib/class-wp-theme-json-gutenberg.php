@@ -205,7 +205,7 @@ class WP_Theme_JSON_Gutenberg {
 			'path'       => array( 'typography', 'fontFamilies' ),
 			'value_key'  => 'fontFamily',
 			'css_vars'   => '--wp--preset--font-family--$slug',
-			'classes'    => array(),
+			'classes'    => array( '.has-$slug-font-family' => 'font-family' ),
 			'properties' => array( 'font-family' ),
 		),
 	);
