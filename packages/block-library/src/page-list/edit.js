@@ -30,15 +30,17 @@ const MAX_PAGE_COUNT = 100;
 export default function PageListEdit( { context, clientId } ) {
 	const { pagesByParentId, totalPages } = usePagesByParentId();
 
-	const isInNavigation = !! context.orientation;
-	const allowConvertToLinks = isInNavigation && totalPages <= MAX_PAGE_COUNT;
+	const isNavigationChild = 'showSubmenuIcon' in context;
+	const allowConvertToLinks =
+		isNavigationChild && totalPages <= MAX_PAGE_COUNT;
 
 	const [ isOpen, setOpen ] = useState( false );
 	const openModal = () => setOpen( true );
 	const closeModal = () => setOpen( false );
 
 	const blockProps = useBlockProps( {
-		className: classnames( {
+		// TODO: Test that this behaviour matches index.php.
+		className: classnames( 'wp-block-page-list', {
 			'has-text-color': !! context.textColor,
 			[ getColorClassName(
 				'color',
@@ -68,11 +70,12 @@ export default function PageListEdit( { context, clientId } ) {
 					clientId={ clientId }
 				/>
 			) }
-			<div { ...blockProps }>
-				<ul className="wp-block-page-list">
-					<PageItems pagesByParentId={ pagesByParentId } />
-				</ul>
-			</div>
+			<ul { ...blockProps }>
+				<PageItems
+					context={ context }
+					pagesByParentId={ pagesByParentId }
+				/>
+			</ul>
 		</>
 	);
 }
@@ -117,7 +120,7 @@ function usePagesByParentId() {
 	};
 }
 
-function PageItems( { pagesByParentId, parentId = 0, depth = 0 } ) {
+function PageItems( { context, pagesByParentId, parentId = 0, depth = 0 } ) {
 	const pages = pagesByParentId.get( parentId );
 
 	if ( ! pages?.length ) {
@@ -126,25 +129,51 @@ function PageItems( { pagesByParentId, parentId = 0, depth = 0 } ) {
 
 	return pages.map( ( page ) => {
 		const hasChildren = pagesByParentId.has( page.id );
-		const classes = classnames( 'wp-block-pages-list__item', {
-			'has-child': hasChildren,
-		} );
-
+		const isNavigationChild = 'showSubmenuIcon' in context;
 		return (
-			<li key={ page.id } className={ classes }>
-				<a
-					href={ page.link }
-					className="wp-block-pages-list__item__link"
-				>
-					{ page.title?.rendered }
-				</a>
+			<li
+				key={ page.id }
+				className={ classnames( 'wp-block-pages-list__item', {
+					'has-child': hasChildren,
+					'wp-block-navigation-item': isNavigationChild,
+					'open-on-click':
+						isNavigationChild && context.openSubmenusOnClick,
+					'open-on-hover-click':
+						isNavigationChild &&
+						! context.openSubmenusOnClick &&
+						context.showSubmenuIcon,
+					// TODO: Overlay classes and styles?
+				} ) }
+			>
+				{ hasChildren &&
+				isNavigationChild &&
+				context.openSubmenusOnClick ? (
+					<ItemSubmenuToggle title={ page.title?.rendered } />
+				) : (
+					<a
+						className={ classnames(
+							'wp-block-pages-list__item__link',
+							{
+								'wp-block-navigation-item__content': isNavigationChild,
+							}
+						) }
+						href={ page.link }
+					>
+						{ page.title?.rendered }
+					</a>
+				) }
 				{ hasChildren && (
 					<>
-						<span className="wp-block-page-list__submenu-icon">
-							<ItemSubmenuIcon />
-						</span>
-						<ul className="submenu-container">
+						{ isNavigationChild &&
+							! context.openSubmenusOnClick &&
+							context.showSubmenuIcon && <ItemSubmenuToggle /> }
+						<ul
+							className={ classnames( 'submenu-container', {
+								'wp-block-navigation__submenu-container': isNavigationChild,
+							} ) }
+						>
 							<PageItems
+								context={ context }
 								pagesByParentId={ pagesByParentId }
 								parentId={ page.id }
 								depth={ depth + 1 }
@@ -155,4 +184,18 @@ function PageItems( { pagesByParentId, parentId = 0, depth = 0 } ) {
 			</li>
 		);
 	} );
+}
+
+function ItemSubmenuToggle( { title } ) {
+	return (
+		<button
+			className="wp-block-navigation-item__content wp-block-navigation-submenu__toggle"
+			aria-expanded="false"
+		>
+			{ title }
+			<span className="wp-block-page-list__submenu-icon wp-block-navigation__submenu-icon">
+				<ItemSubmenuIcon />
+			</span>
+		</button>
+	);
 }
