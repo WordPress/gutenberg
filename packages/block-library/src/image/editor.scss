@@ -59,10 +59,22 @@ figure.wp-block-image:not(.wp-block) {
 
 .wp-block[data-align="left"],
 .wp-block[data-align="center"],
-.wp-block[data-align="right"],
-*:not([data-align]) {
+.wp-block[data-align="right"] {
 	> .wp-block-image {
 		display: table;
+
+		> figcaption {
+			display: table-caption;
+			caption-side: bottom;
+		}
+	}
+}
+
+*:not([data-align]) {
+	> .wp-block-image {
+		display: grid;
+		grid-template-rows: auto auto;
+		grid-template-columns: min-content;
 
 		> figcaption {
 			display: table-caption;
