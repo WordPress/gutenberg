@@ -28,7 +28,7 @@ export const NumberControlWrapper = styled( NumberControl )`
 
 export const SelectControl = styled( InnerSelectControl )`
 	margin-left: ${ space( -2 ) };
-	width: 5em;
+	width: 6.5em;
 	${ BackdropUI } {
 		display: none;
 	}
@@ -109,5 +109,5 @@ export const DetailsControlButton = styled( Button )`
 `;
 
 export const ColorHexInputControl = styled( InputControl )`
-	width: 8em;
+	width: 9em;
 `;
