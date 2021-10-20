@@ -138,6 +138,9 @@ const transforms = {
 			isMatch( files ) {
 				if (
 					files.some(
+						( file ) => file.type.indexOf( 'image/' ) === 0
+					) &&
+					files.some(
 						( file ) => file.type.indexOf( 'image/' ) !== 0
 					)
 				) {
