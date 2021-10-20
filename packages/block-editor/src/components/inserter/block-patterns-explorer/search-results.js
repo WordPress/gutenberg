@@ -74,15 +74,15 @@ function PatternExplorerSearchResults( {
 			{ hasItems && (
 				<h2 className="block-editor-block-patterns-explorer__search-results-count">
 					{ sprintf(
-						/* translators: %d: number of patterns. */
+						/* translators: %d: number of patterns. %s: block pattern search query */
 						_n(
-							'%d pattern found for',
-							'%d patterns found for',
+							'%d pattern found for "%s"',
+							'%d patterns found for "%s"',
 							filteredBlockPatterns.length
 						),
-						filteredBlockPatterns.length
+						filteredBlockPatterns.length,
+						filterValue
 					) }
-					{ ` "${ filterValue }"` }
 				</h2>
 			) }
 			<InserterListbox>
