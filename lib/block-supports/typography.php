@@ -115,12 +115,11 @@ function gutenberg_apply_typography_support( $block_type, $block_attributes ) {
 			// We don't need this code path when it lands in core.
 			$font_family_custom = $block_attributes['style']['typography']['fontFamily'];
 			if ( strpos( $font_family_custom, 'var:preset|font-family' ) !== false ) {
-				$index_to_splice  = strrpos( $font_family_custom, '|' ) + 1;
-				$font_family_slug = substr( $font_family_custom, $index_to_splice );
-				$classes[]        = sprintf( 'has-%s-font-family', $font_family_slug );
-			} else {
-				$styles[] = sprintf( 'font-family: %s;', $font_family_custom );
+				$index_to_splice    = strrpos( $font_family_custom, '|' ) + 1;
+				$font_family_slug   = gutenberg_experimental_to_kebab_case( substr( $font_family_custom, $index_to_splice ) );
+				$font_family_custom = sprintf( 'var(--wp--preset--font-family--%s)', $font_family_slug );
 			}
+			$styles[] = sprintf( 'font-family: %s;', $font_family_custom );
 		}
 	}
 
