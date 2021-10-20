@@ -22,6 +22,9 @@ const v1 = {
 		color: {
 			gradients: true,
 		},
+		spacing: {
+			margin: true,
+		},
 		typography: {
 			fontSize: true,
 			lineHeight: true,
