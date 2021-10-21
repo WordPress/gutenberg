@@ -6,7 +6,7 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { __ } from '@wordpress/i18n';
+import { _x } from '@wordpress/i18n';
 import { RawHTML } from '@wordpress/element';
 import { Disabled } from '@wordpress/components';
 import { useEntityProp } from '@wordpress/core-data';
@@ -38,7 +38,6 @@ export default function Edit( {
 			[ `has-text-align-${ textAlign }` ]: textAlign,
 		} ),
 	} );
-
 	const [ content ] = useEntityProp(
 		'root',
 		'comment',
@@ -46,24 +45,35 @@ export default function Edit( {
 		commentId
 	);
 
+	const blockControls = (
+		<BlockControls group="block">
+			<AlignmentControl
+				value={ textAlign }
+				onChange={ ( newAlign ) =>
+					setAttributes( { textAlign: newAlign } )
+				}
+			/>
+		</BlockControls>
+	);
+
+	if ( ! commentId || ! content ) {
+		return (
+			<>
+				{ blockControls }
+				<div { ...blockProps }>
+					<p>{ _x( 'Post Comment Content', 'block title' ) }</p>
+				</div>
+			</>
+		);
+	}
+
 	return (
 		<>
-			<BlockControls group="block">
-				<AlignmentControl
-					value={ textAlign }
-					onChange={ ( newAlign ) =>
-						setAttributes( { textAlign: newAlign } )
-					}
-				/>
-			</BlockControls>
+			{ blockControls }
 			<div { ...blockProps }>
-				{ ! commentId || ! content ? (
-					<p>{ __( 'Post Comment Content' ) }</p>
-				) : (
-					<Disabled>
-						<RawHTML key="html">{ content.rendered }</RawHTML>
-					</Disabled>
-				) }
+				<Disabled>
+					<RawHTML key="html">{ content.rendered }</RawHTML>
+				</Disabled>
 			</div>
 		</>
 	);

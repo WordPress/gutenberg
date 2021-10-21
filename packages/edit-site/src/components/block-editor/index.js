@@ -16,6 +16,7 @@ import {
 	BlockTools,
 	__unstableBlockSettingsMenuFirstItem,
 	__unstableUseTypingObserver as useTypingObserver,
+	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import { useMergeRefs, useViewportMatch } from '@wordpress/compose';
 
@@ -54,6 +55,7 @@ export default function BlockEditor( { setIsInserterOpen } ) {
 	const contentRef = useRef();
 	const mergedRefs = useMergeRefs( [ contentRef, useTypingObserver() ] );
 	const isMobileViewport = useViewportMatch( 'small', '<' );
+	const { clearSelectedBlock } = useDispatch( blockEditorStore );
 
 	const isTemplatePart = templateType === 'wp_template_part';
 
@@ -87,6 +89,12 @@ export default function BlockEditor( { setIsInserterOpen } ) {
 					'is-focus-mode': isTemplatePart,
 				} ) }
 				__unstableContentRef={ contentRef }
+				onClick={ ( event ) => {
+					// Clear selected block when clicking on the gray background.
+					if ( event.target === event.currentTarget ) {
+						clearSelectedBlock();
+					}
+				} }
 			>
 				<BackButton />
 

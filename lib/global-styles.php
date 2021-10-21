@@ -71,10 +71,7 @@ function gutenberg_experimental_global_styles_get_stylesheet( $tree, $type = nul
  * and enqueues the resulting stylesheet.
  */
 function gutenberg_experimental_global_styles_enqueue_assets() {
-	$settings = gutenberg_get_default_block_editor_settings();
-	$all      = WP_Theme_JSON_Resolver_Gutenberg::get_merged_data( $settings );
-
-	$stylesheet = gutenberg_experimental_global_styles_get_stylesheet( $all );
+	$stylesheet = gutenberg_get_global_stylesheet();
 	if ( empty( $stylesheet ) ) {
 		return;
 	}
