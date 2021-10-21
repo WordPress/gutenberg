@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { RichText, useBlockProps } from '@wordpress/block-editor';
+import { InnerBlocks, RichText, useBlockProps } from '@wordpress/block-editor';
 
 export default function save( { attributes } ) {
 	const { ordered, values, type, reversed, start } = attributes;
@@ -9,7 +9,8 @@ export default function save( { attributes } ) {
 
 	return (
 		<TagName { ...useBlockProps.save( { type, reversed, start } ) }>
-			<RichText.Content value={ values } multiline="li" />
+			{ /*<RichText.Content value={ values } multiline="li" />*/ }
+			<InnerBlocks.Content />
 		</TagName>
 	);
 }
