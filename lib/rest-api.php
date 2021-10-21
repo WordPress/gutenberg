@@ -85,6 +85,7 @@ function wp_api_nav_menus_post_type_args( $args, $post_type ) {
 	if ( 'nav_menu_item' === $post_type ) {
 		$args['show_in_rest']          = true;
 		$args['rest_base']             = 'menu-items';
+		$args['rest_namespace']        = '__experimental';
 		$args['rest_controller_class'] = 'WP_REST_Menu_Items_Controller';
 	}
 
@@ -104,6 +105,7 @@ function wp_api_nav_menus_taxonomy_args( $args, $taxonomy ) {
 	if ( 'nav_menu' === $taxonomy ) {
 		$args['show_in_rest']          = true;
 		$args['rest_base']             = 'menus';
+		$args['rest_namespace']        = '__experimental';
 		$args['rest_controller_class'] = 'WP_REST_Menus_Controller';
 	}
 

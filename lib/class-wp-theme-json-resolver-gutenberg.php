@@ -430,13 +430,15 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 	 */
 	public static function register_user_custom_post_type() {
 		$args = array(
-			'label'        => __( 'Global Styles', 'gutenberg' ),
-			'description'  => 'CPT to store user design tokens',
-			'public'       => false,
-			'show_ui'      => false,
-			'show_in_rest' => true,
-			'rest_base'    => '__experimental/global-styles',
-			'capabilities' => array(
+			'label'                 => __( 'Global Styles', 'gutenberg' ),
+			'description'           => 'CPT to store user design tokens',
+			'public'                => false,
+			'show_ui'               => false,
+			'show_in_rest'          => true,
+			'rest_base'             => 'global-styles',
+			'rest_namespace'        => '__experimental',
+			'rest_controller_class' => 'WP_REST_Global_Styles_Controller',
+			'capabilities'          => array(
 				'read'                   => 'edit_theme_options',
 				'create_posts'           => 'edit_theme_options',
 				'edit_posts'             => 'edit_theme_options',
@@ -445,8 +447,8 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 				'edit_others_posts'      => 'edit_theme_options',
 				'delete_others_posts'    => 'edit_theme_options',
 			),
-			'map_meta_cap' => true,
-			'supports'     => array(
+			'map_meta_cap'          => true,
+			'supports'              => array(
 				'title',
 				'editor',
 				'revisions',
