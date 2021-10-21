@@ -1,8 +1,10 @@
 /**
  * External dependencies
  */
-import { every, has, isFunction, isString, reduce } from 'lodash';
-import { default as tinycolor, mostReadable } from 'tinycolor2';
+import { every, has, isFunction, isString, reduce, maxBy } from 'lodash';
+import { colord, extend } from 'colord';
+import namesPlugin from 'colord/plugins/names';
+import a11yPlugin from 'colord/plugins/a11y';
 
 /**
  * WordPress dependencies
@@ -17,6 +19,8 @@ import { __unstableStripHTML as stripHTML } from '@wordpress/dom';
 import { BLOCK_ICON_DEFAULT } from './constants';
 import { getBlockType, getDefaultBlockName } from './registration';
 import { createBlock } from './factory';
+
+extend( [ namesPlugin, a11yPlugin ] );
 
 /**
  * Array of icon colors containing a color to be used if the icon color
@@ -54,7 +58,7 @@ export function isUnmodifiedDefaultBlock( block ) {
 	const blockType = getBlockType( defaultBlockName );
 
 	return every(
-		blockType.attributes,
+		blockType?.attributes,
 		( value, key ) =>
 			newDefaultBlock.attributes[ key ] === block.attributes[ key ]
 	);
@@ -96,18 +100,16 @@ export function normalizeIconObject( icon ) {
 	}
 
 	if ( has( icon, [ 'background' ] ) ) {
-		const tinyBgColor = tinycolor( icon.background );
+		const colordBgColor = colord( icon.background );
 
 		return {
 			...icon,
 			foreground: icon.foreground
 				? icon.foreground
-				: mostReadable( tinyBgColor, ICON_COLORS, {
-						includeFallbackColors: true,
-						level: 'AA',
-						size: 'large',
-				  } ).toHexString(),
-			shadowColor: tinyBgColor.setAlpha( 0.3 ).toRgbString(),
+				: maxBy( ICON_COLORS, ( iconColor ) =>
+						colordBgColor.contrast( iconColor )
+				  ),
+			shadowColor: colordBgColor.alpha( 0.3 ).toRgbString(),
 		};
 	}
 
@@ -173,8 +175,10 @@ export function getAccessibleBlockLabel(
 	direction = 'vertical'
 ) {
 	// `title` is already localized, `label` is a user-supplied value.
-	const { title } = blockType;
-	const label = getBlockLabel( blockType, attributes, 'accessibility' );
+	const title = blockType?.title;
+	const label = blockType
+		? getBlockLabel( blockType, attributes, 'accessibility' )
+		: '';
 	const hasPosition = position !== undefined;
 
 	// getBlockLabel returns the block title as a fallback when there's no label,

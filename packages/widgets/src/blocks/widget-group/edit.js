@@ -7,30 +7,28 @@ import {
 	ButtonBlockAppender,
 	InnerBlocks,
 	store as blockEditorStore,
+	RichText,
 } from '@wordpress/block-editor';
-import { Placeholder, TextControl } from '@wordpress/components';
+import { Placeholder } from '@wordpress/components';
 import { group as groupIcon } from '@wordpress/icons';
 import { __ } from '@wordpress/i18n';
 import { useSelect } from '@wordpress/data';
-import { getBlockType } from '@wordpress/blocks';
 
 export default function Edit( props ) {
-	const { clientId, isSelected } = props;
-	const { innerBlocks } = useSelect( ( select ) =>
-		select( blockEditorStore ).getBlock( clientId )
+	const { clientId } = props;
+	const { innerBlocks } = useSelect(
+		( select ) => select( blockEditorStore ).getBlock( clientId ),
+		[ clientId ]
 	);
 
-	let content;
-	if ( innerBlocks.length === 0 ) {
-		content = <PlaceholderContent { ...props } />;
-	} else if ( isSelected ) {
-		content = <EditFormContent { ...props } innerBlocks={ innerBlocks } />;
-	} else {
-		content = <PreviewContent { ...props } innerBlocks={ innerBlocks } />;
-	}
-
 	return (
-		<div { ...useBlockProps( { className: 'widget' } ) }>{ content }</div>
+		<div { ...useBlockProps( { className: 'widget' } ) }>
+			{ innerBlocks.length === 0 ? (
+				<PlaceholderContent { ...props } />
+			) : (
+				<PreviewContent { ...props } />
+			) }
+		</div>
 	);
 }
 
@@ -49,36 +47,18 @@ function PlaceholderContent( { clientId } ) {
 	);
 }
 
-function EditFormContent( { attributes, setAttributes, innerBlocks } ) {
+function PreviewContent( { attributes, setAttributes } ) {
 	return (
-		<div className="wp-block-widget-group__edit-form">
-			<h2 className="wp-block-widget-group__edit-form-title">
-				{ __( 'Widget Group' ) }
-			</h2>
-			<TextControl
-				label={ __( 'Title' ) }
-				placeholder={ getDefaultTitle( innerBlocks ) }
+		<>
+			<RichText
+				tagName="h2"
+				className="widget-title"
+				allowedFormats={ [] }
+				placeholder={ __( 'Title' ) }
 				value={ attributes.title ?? '' }
 				onChange={ ( title ) => setAttributes( { title } ) }
 			/>
-		</div>
-	);
-}
-
-function PreviewContent( { attributes, innerBlocks } ) {
-	return (
-		<>
-			<h2 className="widget-title">
-				{ attributes.title || getDefaultTitle( innerBlocks ) }
-			</h2>
 			<InnerBlocks />
 		</>
 	);
-}
-
-function getDefaultTitle( innerBlocks ) {
-	if ( innerBlocks.length === 0 ) {
-		return null;
-	}
-	return getBlockType( innerBlocks[ 0 ].name ).title;
 }

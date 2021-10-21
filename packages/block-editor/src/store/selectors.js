@@ -24,6 +24,7 @@ import createSelector from 'rememo';
 import {
 	getBlockType,
 	getBlockTypes,
+	getBlockVariations,
 	hasBlockSupport,
 	getPossibleBlockTransformations,
 	parse,
@@ -1514,9 +1515,7 @@ const buildBlockTypeItem = ( state, { buildScope = 'inserter' } ) => (
 	};
 	if ( buildScope === 'transform' ) return blockItemBase;
 
-	const inserterVariations = blockType.variations.filter(
-		( { scope } ) => ! scope || scope.includes( 'inserter' )
-	);
+	const inserterVariations = getBlockVariations( blockType.name, 'inserter' );
 	return {
 		...blockItemBase,
 		initialAttributes: {},
@@ -1586,7 +1585,10 @@ export const getInserterItems = createSelector(
 				name: 'core/block',
 				initialAttributes: { ref: reusableBlock.id },
 				title: reusableBlock.title.raw,
-				icon: referencedBlockType ? referencedBlockType.icon : symbol,
+				icon:
+					referencedBlockType && Platform.OS === 'web'
+						? referencedBlockType.icon
+						: symbol,
 				category: 'reusable',
 				keywords: [],
 				isDisabled: false,
@@ -1786,6 +1788,39 @@ export const __experimentalGetAllowedBlocks = createSelector(
 		state.settings.allowedBlockTypes,
 		state.settings.templateLock,
 		getBlockTypes(),
+	]
+);
+
+/**
+ * Returns the block to be directly inserted by the block appender.
+ *
+ * @param {Object}  state        Editor state.
+ * @param {?string} rootClientId Optional root client ID of block list.
+ *
+ * @return {?Array} The block type to be directly inserted.
+ */
+export const __experimentalGetDirectInsertBlock = createSelector(
+	( state, rootClientId = null ) => {
+		if ( ! rootClientId ) {
+			return;
+		}
+		const defaultBlock =
+			state.blockListSettings[ rootClientId ]?.__experimentalDefaultBlock;
+		const directInsert =
+			state.blockListSettings[ rootClientId ]?.__experimentalDirectInsert;
+		if ( ! defaultBlock || ! directInsert ) {
+			return;
+		}
+		if ( typeof directInsert === 'function' ) {
+			return directInsert( getBlock( state, rootClientId ) )
+				? defaultBlock
+				: null;
+		}
+		return defaultBlock;
+	},
+	( state, rootClientId ) => [
+		state.blockListSettings[ rootClientId ],
+		state.blocks.tree[ rootClientId ],
 	]
 );
 

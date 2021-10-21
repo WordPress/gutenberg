@@ -26,7 +26,13 @@ import {
 	getColorClassName,
 } from '@wordpress/block-editor';
 import { useDispatch, withSelect, withDispatch } from '@wordpress/data';
-import { PanelBody, ToggleControl, ToolbarGroup } from '@wordpress/components';
+import {
+	PanelBody,
+	ToggleControl,
+	__experimentalToggleGroupControl as ToggleGroupControl,
+	__experimentalToggleGroupControlOption as ToggleGroupControlOption,
+	ToolbarGroup,
+} from '@wordpress/components';
 import { compose } from '@wordpress/compose';
 import { __ } from '@wordpress/i18n';
 
@@ -49,6 +55,16 @@ const ALLOWED_BLOCKS = [
 	'core/site-logo',
 	'core/navigation-submenu',
 ];
+
+const DEFAULT_BLOCK = [ 'core/navigation-link' ];
+
+const DIRECT_INSERT = ( block ) => {
+	return block.innerBlocks.every(
+		( { name } ) =>
+			name === 'core/navigation-link' ||
+			name === 'core/navigation-submenu'
+	);
+};
 
 const LAYOUT = {
 	type: 'default',
@@ -125,7 +141,7 @@ function Navigation( {
 		className: classnames( className, {
 			[ `items-justified-${ attributes.itemsJustification }` ]: attributes.itemsJustification,
 			'is-vertical': attributes.orientation === 'vertical',
-			'is-responsive': attributes.isResponsive,
+			'is-responsive': 'never' !== attributes.overlayMenu,
 			'has-text-color': !! textColor.color || !! textColor?.class,
 			[ getColorClassName(
 				'color',
@@ -164,6 +180,8 @@ function Navigation( {
 		},
 		{
 			allowedBlocks: ALLOWED_BLOCKS,
+			__experimentalDefaultBlock: DEFAULT_BLOCK,
+			__experimentalDirectInsert: DIRECT_INSERT,
 			orientation: attributes.orientation,
 			renderAppender: CustomAppender || appender,
 
@@ -259,16 +277,34 @@ function Navigation( {
 			{ navigatorModal }
 			<InspectorControls>
 				{ hasSubmenuIndicatorSetting && (
-					<PanelBody title={ __( 'Display settings' ) }>
-						<ToggleControl
-							checked={ attributes.isResponsive }
-							onChange={ ( value ) => {
-								setAttributes( {
-									isResponsive: value,
-								} );
-							} }
-							label={ __( 'Enable responsive menu' ) }
-						/>
+					<PanelBody title={ __( 'Display' ) }>
+						<h3>{ __( 'Overlay Menu' ) }</h3>
+						<ToggleGroupControl
+							label={ __( 'Configure overlay menu' ) }
+							value={ attributes.overlayMenu }
+							help={ __(
+								'Collapses the navigation options in a menu icon opening an overlay.'
+							) }
+							onChange={ ( value ) =>
+								setAttributes( { overlayMenu: value } )
+							}
+							isBlock
+							hideLabelFromVision
+						>
+							<ToggleGroupControlOption
+								value="never"
+								label={ __( 'Off' ) }
+							/>
+							<ToggleGroupControlOption
+								value="mobile"
+								label={ __( 'Mobile' ) }
+							/>
+							<ToggleGroupControlOption
+								value="always"
+								label={ __( 'Always' ) }
+							/>
+						</ToggleGroupControl>
+						<h3>{ __( 'Submenus' ) }</h3>
 						<ToggleControl
 							checked={ attributes.openSubmenusOnClick }
 							onChange={ ( value ) => {
@@ -276,7 +312,7 @@ function Navigation( {
 									openSubmenusOnClick: value,
 								} );
 							} }
-							label={ __( 'Open submenus on click' ) }
+							label={ __( 'Open on click' ) }
 						/>
 						{ ! attributes.openSubmenusOnClick && (
 							<ToggleControl
@@ -286,7 +322,7 @@ function Navigation( {
 										showSubmenuIcon: value,
 									} );
 								} }
-								label={ __( 'Show submenu indicator icons' ) }
+								label={ __( 'Show icons' ) }
 							/>
 						) }
 					</PanelBody>
@@ -340,7 +376,8 @@ function Navigation( {
 					id={ clientId }
 					onToggle={ setResponsiveMenuVisibility }
 					isOpen={ isResponsiveMenuOpen }
-					isResponsive={ attributes.isResponsive }
+					isResponsive={ 'never' !== attributes.overlayMenu }
+					isHiddenByDefault={ 'always' === attributes.overlayMenu }
 				>
 					<div { ...innerBlocksProps }></div>
 				</ResponsiveWrapper>

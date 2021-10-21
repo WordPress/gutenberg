@@ -45,6 +45,10 @@
 			padding-left: calc((2/3) * 1em);
 			padding-right: calc((2/3) * 1em);
 		}
+
+		.is-style-logos-only & {
+			padding: 0;
+		}
 	}
 
 	.wp-social-link::before {

@@ -5,8 +5,7 @@
 		"isValid": true,
 		"attributes": {
 			"value": "<p>Testing deprecated quote block...</p>",
-			"citation": "...with a caption",
-			"style": 1
+			"citation": "...with a caption"
 		},
 		"innerBlocks": [],
 		"originalContent": "<blockquote class=\"wp-block-quote blocks-quote-style-1\">\n\t<p>Testing deprecated quote block...</p>\n\t<footer>...with a caption</footer>\n</blockquote>"

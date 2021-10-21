@@ -11,6 +11,7 @@ import { Icon } from '@wordpress/components';
 import { withPreferredColorScheme } from '@wordpress/compose';
 import { __, sprintf } from '@wordpress/i18n';
 import { sparkles } from '@wordpress/icons';
+import { BlockIcon } from '@wordpress/block-editor';
 
 /**
  * Internal dependencies
@@ -41,10 +42,7 @@ class MenuItem extends Component {
 			styles.modalIconWrapper,
 			styles.modalIconWrapperDark
 		);
-		const modalIconStyle = getStylesFromColorScheme(
-			styles.modalIcon,
-			styles.modalIconDark
-		);
+		const modalIconStyle = styles.modalIcon;
 		const modalItemLabelStyle = getStylesFromColorScheme(
 			styles.modalItemLabel,
 			styles.modalItemLabelDark
@@ -98,9 +96,8 @@ class MenuItem extends Component {
 							/>
 						) }
 						<View style={ modalIconStyle }>
-							<Icon
-								icon={ item.icon.src || item.icon }
-								fill={ modalIconStyle.fill }
+							<BlockIcon
+								icon={ item.icon }
 								size={ modalIconStyle.width }
 							/>
 						</View>

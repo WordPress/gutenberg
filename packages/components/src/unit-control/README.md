@@ -21,70 +21,69 @@ const Example = () => {
 
 ## Props
 
-### disabledUnits
+### `disableUnits`: `boolean`
 
 If true, the unit `<select>` is hidden.
 
--   Type: `Boolean`
 -   Required: No
 -   Default: `false`
 
-### isPressEnterToChange
+### `isPressEnterToChange`: `boolean`
 
-If true, the `ENTER` key press is required in order to trigger an `onChange`. If enabled, a change is also triggered when tabbing away (`onBlur`).
+If `true`, the `ENTER` key press is required in order to trigger an `onChange`. If enabled, a change is also triggered when tabbing away (`onBlur`).
 
--   Type: `Boolean`
 -   Required: No
 -   Default: `false`
 
-### isUnitSelectTabbable
+### `isResetValueOnUnitChange`: `boolean`
+
+If `true`, and the selected unit provides a `default` value, this value is set when changing units.
+
+-   Required: No
+-   Default: `false`
+
+### `isUnitSelectTabbable`: `boolean`
 
 Determines if the unit `<select>` is tabbable.
 
--   Type: `Boolean`
 -   Required: No
 -   Default: `true`
 
-### label
+### `label`: `string`
 
 If this property is added, a label will be generated using label property as the content.
 
--   Type: `String`
 -   Required: No
 
-### labelPosition
+### `labelPosition`: `string`
 
 The position of the label (`top`, `side`, `bottom`, or `edge`).
 
--   Type: `String`
 -   Required: No
 
-### onChange
+### `onChange`: `UnitControlOnChangeCallback`
 
 Callback when the `value` changes.
 
--   Type: `Function`
 -   Required: No
 -   Default: `noop`
 
-### onUnitChange
+### `onUnitChange`: `UnitControlOnChangeCallback`
 
 Callback when the `unit` changes.
 
--   Type: `Function`
 -   Required: No
 -   Default: `noop`
 
-### size
+### `size`: `string`
 
 Adjusts the size of the input.
 Sizes include: `default`, `small`
 
--   Type: `String`
 -   Required: No
 -   Default: `default`
 
-### unit
+### `unit`: `string`
 
 Deprecated: Current unit value.
 Instead, provide a unit with a value through the `value` prop.
@@ -95,14 +94,12 @@ Example:
 <UnitControl value="50%" />
 ```
 
--   Type: `String`
 -   Required: No
 
-### units
+### `units`: `WPUnitControlUnitList`
 
 Collection of available units.
 
--   Type: `Array<Object>`
 -   Required: No
 
 Example:
@@ -126,9 +123,10 @@ const Example = () => {
 
 A `default` value (in the example above, `10` for `%`), if defined, is set as the new `value` when a unit changes. This is helpful in scenarios where changing a unit may cause drastic results, such as changing from `px` to `vh`.
 
-### value
+### `value`: `number | string`
 
-Current value. To set a unit, provide a unit with a value through the `value` prop.
+Current value. If passed as a string, the current unit will be inferred from this value.
+For example, a `value` of `50%` will set the current unit to `%`.
 
 Example:
 
@@ -136,5 +134,4 @@ Example:
 <UnitControl value="50%" />
 ```
 
--   Type: `Number`|`String`
 -   Required: No

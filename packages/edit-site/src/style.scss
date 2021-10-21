@@ -1,6 +1,7 @@
 @import "../../interface/src/style.scss";
 
 @import "./components/block-editor/style.scss";
+@import "./components/global-styles/style.scss";
 @import "./components/header/style.scss";
 @import "./components/header/document-actions/style.scss";
 @import "./components/header/more-menu/style.scss";
@@ -54,7 +55,7 @@ body.toplevel_page_gutenberg-edit-site {
 	}
 
 	.interface-interface-skeleton__content {
-		background-color: $gray-400;
+		background-color: $gray-800;
 	}
 }
 

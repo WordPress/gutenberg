@@ -16,7 +16,7 @@ import {
  * External dependencies
  */
 // eslint-disable-next-line no-restricted-imports
-import { find } from 'puppeteer-testing-library';
+import { find, findAll } from 'puppeteer-testing-library';
 
 const twentyTwentyError = `Stylesheet twentytwenty-block-editor-styles-css was not properly added.
 For blocks, use the block API's style (https://developer.wordpress.org/block-editor/reference-guides/block-api/block-metadata/#style) or editorStyle (https://developer.wordpress.org/block-editor/reference-guides/block-api/block-metadata/#editor-style).
@@ -760,6 +760,97 @@ describe( 'Widgets Customizer', () => {
 		await expect( movedParagraphBlockQuery ).toBeFound();
 		const movedParagraphBlock = await find( movedParagraphBlockQuery );
 		await expect( movedParagraphBlock ).toHaveFocus();
+
+		expect( console ).toHaveErrored( twentyTwentyError );
+	} );
+
+	it( 'should not render Block Settings sections', async () => {
+		// We add Block Settings as a section, but it shouldn't display to
+		// the user as a section on the main menu. It's simply how we
+		// integrate the G sidebar inside the customizer.
+		const findAllBlockSettingsHeader = findAll(
+			{
+				role: 'heading',
+				name: /Block Settings/,
+				level: 3,
+			},
+			{ timeout: 0 }
+		);
+		await expect( findAllBlockSettingsHeader ).toThrowQueryEmptyError();
+	} );
+
+	it( 'should stay in block settings after making a change in that area', async () => {
+		// Open footer block widgets
+		const widgetsPanel = await find( {
+			role: 'heading',
+			name: /Widgets/,
+			level: 3,
+		} );
+		await widgetsPanel.click();
+
+		const footer1Section = await find( {
+			role: 'heading',
+			name: /^Footer #1/,
+			level: 3,
+		} );
+		await footer1Section.click();
+
+		// Add a block to make the publish button active.
+		await addBlock( 'Paragraph' );
+		await page.keyboard.type( 'First Paragraph' );
+
+		await waitForPreviewIframe();
+
+		// Click Publish
+		const publishButton = await find( {
+			role: 'button',
+			name: 'Publish',
+		} );
+		await publishButton.click();
+
+		// Wait for publishing to finish.
+		await page.waitForResponse( createURL( '/wp-admin/admin-ajax.php' ) );
+		await expect( publishButton ).toMatchQuery( {
+			disabled: true,
+		} );
+
+		// Select the paragraph block
+		const paragraphBlock = await find( {
+			role: 'document',
+			name: 'Paragraph block',
+		} );
+		await paragraphBlock.focus();
+
+		// Click the three dots button, then click "Show More Settings".
+		await showBlockToolbar();
+		await clickBlockToolbarButton( 'Options' );
+		const showMoreSettingsButton = await find( {
+			role: 'menuitem',
+			name: 'Show more settings',
+		} );
+		await showMoreSettingsButton.click();
+
+		// Change `drop cap` (Any change made in this section is sufficient; not required to be `drop cap`).
+		const [ dropCapToggle ] = await page.$x(
+			"//label[contains(text(), 'Drop cap')]"
+		);
+		await dropCapToggle.click();
+
+		// Now that we've made a change:
+		// (1) Publish button should be active
+		// (2) We should still be in the "Block Settings" area
+		await find( {
+			role: 'button',
+			name: 'Publish',
+		} );
+
+		// This fails on 539cea09 and earlier; we get kicked back to the widgets area.
+		// We expect to stay in block settings.
+		await find( {
+			role: 'heading',
+			name: 'Customizing ▸ Widgets ▸ Footer #1 Block Settings',
+			level: 3,
+		} );
 
 		expect( console ).toHaveErrored( twentyTwentyError );
 	} );

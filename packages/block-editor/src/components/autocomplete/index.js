@@ -12,7 +12,7 @@ import {
 	__unstableUseAutocompleteProps as useAutocompleteProps,
 } from '@wordpress/components';
 import { useMemo } from '@wordpress/element';
-import { getDefaultBlockName } from '@wordpress/blocks';
+import { getDefaultBlockName, getBlockSupport } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
@@ -33,7 +33,10 @@ function useCompleters( { completers = EMPTY_ARRAY } ) {
 	return useMemo( () => {
 		let filteredCompleters = completers;
 
-		if ( name === getDefaultBlockName() ) {
+		if (
+			name === getDefaultBlockName() ||
+			getBlockSupport( name, '__experimentalSlashInserter', false )
+		) {
 			filteredCompleters = filteredCompleters.concat( [
 				blockAutocompleter,
 			] );

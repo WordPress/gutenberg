@@ -10,7 +10,7 @@ import { ControlLabel } from '../control-label';
 import { VisuallyHidden } from '../../visually-hidden';
 
 /**
- * @param {import('../context').WordPressComponentProps<import('./types').FormGroupLabelProps, 'label'>} props
+ * @param {import('../context').WordPressComponentProps<import('./types').FormGroupLabelProps, 'label', false>} props
  * @return {JSX.Element | null} The form group's label.
  */
 function FormGroupLabel( { children, id, labelHidden = false, ...props } ) {

@@ -224,6 +224,28 @@ class REST_Nav_Menus_Controller_Test extends WP_Test_REST_Controller_Testcase {
 	/**
 	 *
 	 */
+	public function test_create_item_same_name() {
+		wp_set_current_user( self::$admin_id );
+
+		wp_update_nav_menu_object(
+			0,
+			array(
+				'description' => 'This menu is so Original',
+				'menu-name'   => 'Original',
+			)
+		);
+
+		$request = new WP_REST_Request( 'POST', '/__experimental/menus' );
+		$request->set_param( 'name', 'Original' );
+		$request->set_param( 'description', 'This menu is so Original' );
+		$response = rest_get_server()->dispatch( $request );
+
+		$this->assertErrorResponse( 'menu_exists', $response, 400 );
+	}
+
+	/**
+	 *
+	 */
 	public function test_update_item() {
 		wp_set_current_user( self::$admin_id );
 

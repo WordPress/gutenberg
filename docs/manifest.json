@@ -1074,6 +1074,18 @@
 		"parent": "components"
 	},
 	{
+		"title": "NavigatorProvider",
+		"slug": "navigator-provider",
+		"markdown_source": "../packages/components/src/navigator/navigator-provider/README.md",
+		"parent": "components"
+	},
+	{
+		"title": "NavigatorScreen",
+		"slug": "navigator-screen",
+		"markdown_source": "../packages/components/src/navigator/navigator-screen/README.md",
+		"parent": "components"
+	},
+	{
 		"title": "Notice",
 		"slug": "notice",
 		"markdown_source": "../packages/components/src/notice/README.md",
@@ -1242,9 +1254,15 @@
 		"parent": "components"
 	},
 	{
+		"title": "ToggleGroupControlOption",
+		"slug": "toggle-group-control-option",
+		"markdown_source": "../packages/components/src/toggle-group-control/toggle-group-control-option/README.md",
+		"parent": "components"
+	},
+	{
 		"title": "ToggleGroupControl",
 		"slug": "toggle-group-control",
-		"markdown_source": "../packages/components/src/toggle-group-control/README.md",
+		"markdown_source": "../packages/components/src/toggle-group-control/toggle-group-control/README.md",
 		"parent": "components"
 	},
 	{

@@ -122,13 +122,27 @@ export function* removeTemplate( templateId ) {
 /**
  * Returns an action object used to set a template part.
  *
- * @param {number} templatePartId The template part ID.
+ * @param {string} templatePartId The template part ID.
  *
  * @return {Object} Action object.
  */
 export function setTemplatePart( templatePartId ) {
 	return {
 		type: 'SET_TEMPLATE_PART',
+		templatePartId,
+	};
+}
+
+/**
+ * Returns an action object used to push a template part to navigation history.
+ *
+ * @param {string} templatePartId The template part ID.
+ *
+ * @return {Object} Action object.
+ */
+export function pushTemplatePart( templatePartId ) {
+	return {
+		type: 'PUSH_TEMPLATE_PART',
 		templatePartId,
 	};
 }
@@ -189,6 +203,15 @@ export function* setPage( page ) {
 		templateId,
 	};
 	return templateId;
+}
+
+/**
+ * Go back to the current editing page.
+ */
+export function goBack() {
+	return {
+		type: 'GO_BACK',
+	};
 }
 
 /**
@@ -368,7 +391,7 @@ export function* revertTemplate( template ) {
 			coreStore,
 			'getEditedEntityRecord',
 			'postType',
-			'wp_template',
+			template.type,
 			template.id
 		);
 		// We are fixing up the undo level here to make sure we can undo
@@ -377,7 +400,7 @@ export function* revertTemplate( template ) {
 			coreStore,
 			'editEntityRecord',
 			'postType',
-			'wp_template',
+			template.type,
 			template.id,
 			{
 				content: serializeBlocks, // required to make the `undo` behave correctly
@@ -394,7 +417,7 @@ export function* revertTemplate( template ) {
 			coreStore,
 			'editEntityRecord',
 			'postType',
-			'wp_template',
+			template.type,
 			fileTemplate.id,
 			{
 				content: serializeBlocks,
@@ -406,7 +429,7 @@ export function* revertTemplate( template ) {
 		const undoRevert = async () => {
 			await dispatch( coreStore ).editEntityRecord(
 				'postType',
-				'wp_template',
+				template.type,
 				edited.id,
 				{
 					content: serializeBlocks,

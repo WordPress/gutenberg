@@ -519,7 +519,7 @@ Note that the name of the variable is created by adding `--` in between each nes
 }
 ```
 
-- Disable border radius for the button block (borders only work in the plugin so far):
+- Disable border radius for the button block:
 
 ```json
 {
@@ -949,6 +949,7 @@ Within this field themes can list the template parts present in the `block-templ
 Currently block variations exist for "header" and "footer" values of the area term, any other values and template parts not defined in the json will default to the general template part block. Variations will be denoted by specific icons within the editor's interface, will default to the corresponding semantic HTML element for the wrapper (this can also be overridden by the `tagName` attribute set on the template part block), and will contextualize the template part allowing more custom flows in future editor improvements.
 
 - name: mandatory.
+- title: optional, translatable.
 - area: optional, will be set to `uncategorized` by default and trigger no block variation.
 
 ```json
@@ -957,11 +958,21 @@ Currently block variations exist for "header" and "footer" values of the area te
 	"templateParts": [
 		{
 			"name": "my-template-part",
+			"title": "Header",
 			"area": "header"
 		}
 	]
 }
 ```
+
+## Developing with theme.json
+
+It can be difficult to remember the theme.json settings and properties while you develop, so a JSON scheme was created to help. The schema is available at [SchemaStore.org](https://schemastore.org/)
+
+To use the schema, add `"$schema": "https://json.schemastore.org/theme-v1.json"` to the beginning of your theme.json file. Visual Studio Code and other editors will pick up the schema and can provide help like tooltips, autocomplete, or schema validation in the editor.
+
+![Example using validation with schema](https://developer.wordpress.org/files/2021/10/schema-validation.gif)
+
 
 ## Frequently Asked Questions
 

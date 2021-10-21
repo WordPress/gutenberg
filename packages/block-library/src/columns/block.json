@@ -21,6 +21,13 @@
 		"color": {
 			"gradients": true,
 			"link": true
+		},
+		"spacing": {
+			"blockGap": true,
+			"margin": [ "top", "bottom" ],
+			"__experimentalDefaultControls": {
+				"blockGap": true
+			}
 		}
 	},
 	"editorStyle": "wp-block-columns-editor",
