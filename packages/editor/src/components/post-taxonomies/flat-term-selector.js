@@ -117,7 +117,7 @@ function FlatTermSelector( { slug } ) {
 			const query = {
 				...DEFAULT_QUERY,
 				include: _termIds.join( ',' ),
-				per_page: _termIds.length,
+				per_page: -1,
 			};
 
 			return {
