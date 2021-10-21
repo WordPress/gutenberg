@@ -14,7 +14,7 @@ import {
 } from '@wordpress/block-editor';
 import { ToolbarButton } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-import { useEffect, useState, useRef } from '@wordpress/element';
+import { useEffect, useState } from '@wordpress/element';
 import apiFetch from '@wordpress/api-fetch';
 import { addQueryArgs } from '@wordpress/url';
 
@@ -88,8 +88,8 @@ export default function PageListEdit( { context, clientId } ) {
 }
 
 function usePagesByParentId() {
-	const pagesByParentIdRef = useRef( new Map() );
-	const totalPagesRef = useRef( 0 );
+	const [ pagesByParentId, setPagesByParentId ] = useState( new Map() );
+	const [ totalPages, setTotalPages ] = useState( 0 );
 
 	useEffect( () => {
 		async function performFetch() {
@@ -107,26 +107,25 @@ function usePagesByParentId() {
 			// https://core.trac.wordpress.org/ticket/39037
 			pages = sortBy( pages, [ 'menu_order', 'title.rendered' ] );
 
-			pagesByParentIdRef.current = pages.reduce(
-				( pagesByParentId, page ) => {
+			setPagesByParentId(
+				pages.reduce( ( accumulator, page ) => {
 					const { parent } = page;
-					if ( pagesByParentId.has( parent ) ) {
-						pagesByParentId.get( parent ).push( page );
+					if ( accumulator.has( parent ) ) {
+						accumulator.get( parent ).push( page );
 					} else {
-						pagesByParentId.set( parent, [ page ] );
+						accumulator.set( parent, [ page ] );
 					}
-					return pagesByParentId;
-				},
-				new Map()
+					return accumulator;
+				}, new Map() )
 			);
-			totalPagesRef.current = pages.length;
+			setTotalPages( pages.length );
 		}
 		performFetch();
 	}, [] );
 
 	return {
-		pagesByParentId: pagesByParentIdRef.current,
-		totalPages: totalPagesRef.current,
+		pagesByParentId,
+		totalPages,
 	};
 }
 
