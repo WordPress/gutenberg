@@ -17,6 +17,11 @@ import {
 	ToolbarButton,
 	Tooltip,
 	ToolbarGroup,
+	Button,
+	Icon,
+	__experimentalNavigation as Navigation,
+	__experimentalNavigationItem as NavigationItem,
+	__experimentalNavigationMenu as NavigationMenu,
 } from '@wordpress/components';
 import { displayShortcut, isKeyboardEvent, ENTER } from '@wordpress/keycodes';
 import { __, sprintf } from '@wordpress/i18n';
@@ -38,7 +43,11 @@ import {
 	createInterpolateElement,
 } from '@wordpress/element';
 import { placeCaretAtHorizontalEdge } from '@wordpress/dom';
-import { link as linkIcon, addSubmenu } from '@wordpress/icons';
+import {
+	link as linkIcon,
+	addSubmenu,
+	page as pageIcon,
+} from '@wordpress/icons';
 import { store as coreStore } from '@wordpress/core-data';
 
 /**
@@ -261,6 +270,84 @@ export const updateNavigationLinkBlockAttributes = (
 	} );
 };
 
+const usePagesControl = true;
+
+function usePageEntities() {
+	const { pages, isResolvingPages, hasResolvedPages } = useSelect(
+		( select ) => {
+			const {
+				getEntityRecords,
+				isResolving,
+				hasFinishedResolution,
+			} = select( coreStore );
+
+			const pagesParameters = [
+				'postType',
+				'page',
+				{
+					parent: 0,
+					order: 'asc',
+					orderby: 'id',
+					per_page: -1,
+				},
+			];
+
+			return {
+				pages: getEntityRecords( ...pagesParameters ) || null,
+				isResolvingPages: isResolving(
+					'getEntityRecords',
+					pagesParameters
+				),
+				hasResolvedPages: hasFinishedResolution(
+					'getEntityRecords',
+					pagesParameters
+				),
+			};
+		},
+		[]
+	);
+
+	return {
+		pages,
+		isResolvingPages,
+		hasResolvedPages,
+		hasPages: !! ( hasResolvedPages && pages?.length ),
+	};
+}
+
+function PagesControl( { pages, hasPages, isResolvingPages } ) {
+	if ( isResolvingPages ) {
+		<p>Loading...</p>;
+	}
+
+	if ( ! hasPages ) {
+		return <p>Your site has no Pages!</p>;
+	}
+
+	const pageList = pages.map( ( page ) => {
+		return (
+			<NavigationItem key={ page.id } item={ page.slug }>
+				<Button
+					href="https://wordpress.org/"
+					target="_blank"
+					rel="noreferrer"
+				>
+					<Icon icon={ pageIcon } />
+					<span>{ page.title.rendered }</span>
+				</Button>
+			</NavigationItem>
+		);
+	} );
+
+	return (
+		<Navigation className="navigation-block-page-search">
+			<NavigationMenu hasSearch title="Pages">
+				{ pageList }
+			</NavigationMenu>
+		</Navigation>
+	);
+}
+
 export default function NavigationLinkEdit( {
 	attributes,
 	isSelected,
@@ -376,6 +463,8 @@ export default function NavigationLinkEdit( {
 		);
 		replaceBlock( clientId, newSubmenu );
 	}
+
+	const pageEntities = usePageEntities();
 
 	useEffect( () => {
 		// Show the LinkControl on mount if the URL is empty
@@ -645,45 +734,51 @@ export default function NavigationLinkEdit( {
 							onClose={ () => setIsLinkOpen( false ) }
 							anchorRef={ listItemRef.current }
 						>
-							<LinkControl
-								className="wp-block-navigation-link__inline-link-input"
-								value={ link }
-								showInitialSuggestions={ true }
-								withCreateSuggestion={ userCanCreate }
-								createSuggestion={ handleCreate }
-								createSuggestionButtonText={ ( searchTerm ) => {
-									let format;
-									if ( type === 'post' ) {
-										/* translators: %s: search term. */
-										format = __(
-											'Create draft post: <mark>%s</mark>'
+							{ usePagesControl ? (
+								<PagesControl { ...pageEntities } />
+							) : (
+								<LinkControl
+									className="wp-block-navigation-link__inline-link-input"
+									value={ link }
+									showInitialSuggestions={ true }
+									withCreateSuggestion={ userCanCreate }
+									createSuggestion={ handleCreate }
+									createSuggestionButtonText={ (
+										searchTerm
+									) => {
+										let format;
+										if ( type === 'post' ) {
+											/* translators: %s: search term. */
+											format = __(
+												'Create draft post: <mark>%s</mark>'
+											);
+										} else {
+											/* translators: %s: search term. */
+											format = __(
+												'Create draft page: <mark>%s</mark>'
+											);
+										}
+										return createInterpolateElement(
+											sprintf( format, searchTerm ),
+											{ mark: <mark /> }
 										);
-									} else {
-										/* translators: %s: search term. */
-										format = __(
-											'Create draft page: <mark>%s</mark>'
-										);
+									} }
+									noDirectEntry={ !! type }
+									noURLSuggestion={ !! type }
+									suggestionsQuery={ getSuggestionsQuery(
+										type,
+										kind
+									) }
+									onChange={ ( updatedValue ) =>
+										updateNavigationLinkBlockAttributes(
+											updatedValue,
+											setAttributes,
+											attributes
+										)
 									}
-									return createInterpolateElement(
-										sprintf( format, searchTerm ),
-										{ mark: <mark /> }
-									);
-								} }
-								noDirectEntry={ !! type }
-								noURLSuggestion={ !! type }
-								suggestionsQuery={ getSuggestionsQuery(
-									type,
-									kind
-								) }
-								onChange={ ( updatedValue ) =>
-									updateNavigationLinkBlockAttributes(
-										updatedValue,
-										setAttributes,
-										attributes
-									)
-								}
-								onRemove={ removeLink }
-							/>
+									onRemove={ removeLink }
+								/>
+							) }
 						</Popover>
 					) }
 				</a>

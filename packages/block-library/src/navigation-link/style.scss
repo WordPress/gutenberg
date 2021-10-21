@@ -9,3 +9,22 @@
 		overflow-wrap: break-word;
 	}
 }
+
+
+.navigation-block-page-search .components-navigation__item {
+	display: flex;
+	flex-direction: row;
+
+	.components-button {
+		align-items: center;
+		display: flex;
+		flex-direction: row;
+		height: auto;
+
+		svg {
+			fill: #949494;
+			margin-right: 8px;
+			flex: 1;
+		}
+	}
+}
