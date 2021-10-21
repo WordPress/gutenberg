@@ -75,11 +75,11 @@ function gutenberg_get_global_styles( $path = array(), $block_name = '', $origin
  *
  * @return string Stylesheet.
  */
-function gutenberg_get_global_stylesheet( $types = '' ) {
+function gutenberg_get_global_stylesheet( $types = array() ) {
 	// Return cached value if it can be used and exists.
 	// It's cached by theme to make sure that theme switching clears the cache.
 	$can_use_cached = (
-		( '' === $types ) &&
+		( empty( $types ) ) &&
 		( ! defined( 'WP_DEBUG' ) || ! WP_DEBUG ) &&
 		( ! defined( 'SCRIPT_DEBUG' ) || ! SCRIPT_DEBUG ) &&
 		( ! defined( 'REST_REQUEST' ) || ! REST_REQUEST ) &&
