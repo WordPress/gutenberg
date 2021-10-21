@@ -253,12 +253,12 @@ function _gutenberg_build_template_result_from_file( $template_file, $template_t
 	$template->title          = ! empty( $template_file['title'] ) ? $template_file['title'] : $template_file['slug'];
 	$template->status         = 'publish';
 	$template->has_theme_file = true;
-	$template->default        = false;
+	$template->is_custom      = true;
 
 	if ( 'wp_template' === $template_type && isset( $default_template_types[ $template_file['slug'] ] ) ) {
 		$template->description = $default_template_types[ $template_file['slug'] ]['description'];
 		$template->title       = $default_template_types[ $template_file['slug'] ]['title'];
-		$template->default     = true;
+		$template->is_custom   = false;
 	}
 
 	if ( 'wp_template' === $template_type && isset( $template_file['postTypes'] ) ) {
@@ -280,7 +280,8 @@ function _gutenberg_build_template_result_from_file( $template_file, $template_t
  * @return WP_Block_Template|WP_Error Template.
  */
 function _gutenberg_build_template_result_from_post( $post ) {
-	$terms = get_the_terms( $post, 'wp_theme' );
+	$default_template_types = gutenberg_get_default_template_types();
+	$terms                  = get_the_terms( $post, 'wp_theme' );
 
 	if ( is_wp_error( $terms ) ) {
 		return $terms;
@@ -306,7 +307,11 @@ function _gutenberg_build_template_result_from_post( $post ) {
 	$template->title          = $post->post_title;
 	$template->status         = $post->post_status;
 	$template->has_theme_file = $has_theme_file;
-	$template->default        = false;
+	$template->is_custom      = true;
+
+	if ( 'wp_template' === $post->post_type && isset( $default_template_types[ $template->slug ] ) ) {
+		$template->is_custom = false;
+	}
 
 	if ( 'wp_template_part' === $post->post_type ) {
 		$type_terms = get_the_terms( $post, 'wp_template_part_area' );

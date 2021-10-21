@@ -89,9 +89,9 @@ class WP_Block_Template {
 	public $has_theme_file;
 
 	/**
-	 * Whether a template is default WordPress template (e.g. 'index', 'archive').
+	 * Whether a template is a custom template.
 	 *
 	 * @var bool
 	 */
-	public $default = false;
+	public $is_custom = true;
 }

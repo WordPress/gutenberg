@@ -21,7 +21,7 @@ function gutenberg_load_block_page_templates( $templates, $theme, $post, $post_t
 
 	$block_templates = gutenberg_get_block_templates( array(), 'wp_template' );
 	foreach ( $block_templates as $template ) {
-		if ( $template->default ) {
+		if ( ! $template->is_custom ) {
 			continue;
 		}
 
