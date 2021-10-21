@@ -71,12 +71,18 @@ export default function PageListEdit( { context, clientId } ) {
 					clientId={ clientId }
 				/>
 			) }
-			<ul { ...blockProps }>
-				<PageItems
-					context={ context }
-					pagesByParentId={ pagesByParentId }
-				/>
-			</ul>
+			{ totalPages > 0 ? (
+				<ul { ...blockProps }>
+					<PageItems
+						context={ context }
+						pagesByParentId={ pagesByParentId }
+					/>
+				</ul>
+			) : (
+				<div { ...blockProps }>
+					<span>{ __( 'Page List: No pages to show.' ) }</span>
+				</div>
+			) }
 		</>
 	);
 }
