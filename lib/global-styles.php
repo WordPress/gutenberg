@@ -94,20 +94,6 @@ function gutenberg_experimental_global_styles_settings( $settings ) {
 	}
 
 	if ( 'other' === $context ) {
-		$block_classes  = array(
-			'css'            => gutenberg_experimental_global_styles_get_stylesheet( $consolidated, array( 'block_classes' ) ),
-			'__unstableType' => 'theme',
-		);
-		$preset_classes = array(
-			'css'            => gutenberg_experimental_global_styles_get_stylesheet( $consolidated, array( 'preset_classes' ) ),
-			'__unstableType' => 'presets',
-		);
-		$css_variables  = array(
-			'css'                     => gutenberg_experimental_global_styles_get_stylesheet( $consolidated, array( 'css_variables' ) ),
-			'__experimentalNoWrapper' => true,
-			'__unstableType'          => 'presets',
-		);
-
 		// Make sure the styles array exists.
 		// In some contexts, like the navigation editor, it doesn't.
 		if ( ! isset( $settings['styles'] ) ) {
@@ -122,11 +108,31 @@ function gutenberg_experimental_global_styles_settings( $settings ) {
 			}
 		}
 
-		// Add the new ones.
-		$styles_without_existing_global_styles[] = $css_variables;
-		$styles_without_existing_global_styles[] = $block_classes;
-		$styles_without_existing_global_styles[] = $preset_classes;
-		$settings['styles']                      = $styles_without_existing_global_styles;
+		$new_global_styles        = array();
+		$new_global_styles_config = array(
+			array(
+				'css'                     => 'css_variables',
+				'__unstableType'          => 'presets',
+				'__experimentalNoWrapper' => true,
+			),
+			array(
+				'css'            => 'block_classes',
+				'__unstableType' => 'theme'
+			),
+			array(
+				'css'            => 'preset_classes',
+				'__unstableType' => 'presets'
+			),
+		);
+		foreach( $new_global_styles_config as $new_style ) {
+			$style_css = gutenberg_experimental_global_styles_get_stylesheet( $consolidated, [ $new_style['css'] ] );
+			if ( '' !== $style_css ) {
+				$new_style['css']    = $style_css;
+				$new_global_styles[] = $new_style;
+			}
+		}
+
+		$settings['styles'] = array_merge( $styles_without_existing_global_styles, $new_global_styles );
 	}
 
 	// Copied from get_block_editor_settings() at wordpress-develop/block-editor.php.
