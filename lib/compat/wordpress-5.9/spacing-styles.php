@@ -6,6 +6,10 @@
  */
 
 function gutenberg_load_spacing_styles_in_editor( $settings ) {
+	if ( ! WP_Theme_JSON_Resolver_Gutenberg::theme_has_support() ) {
+		return $settings;
+	}
+
 	$styles  = 'body { margin: 0; }';
 	$styles .= '.wp-site-blocks > .alignleft { float: left; margin-right: 2em; }';
 	$styles .= '.wp-site-blocks > .alignright { float: right; margin-left: 2em; }';
@@ -27,6 +31,10 @@ function gutenberg_load_spacing_styles_in_editor( $settings ) {
 add_filter( 'block_editor_settings_all', 'gutenberg_load_spacing_styles_in_editor' );
 
 function gutenberg_load_spacing_styles_in_front_end() {
+	if ( ! WP_Theme_JSON_Resolver_Gutenberg::theme_has_support() ) {
+		return;
+	}
+
 	$styles  = 'body { margin: 0; }';
 	$styles .= '.wp-site-blocks > .alignleft { float: left; margin-right: 2em; }';
 	$styles .= '.wp-site-blocks > .alignright { float: right; margin-left: 2em; }';
