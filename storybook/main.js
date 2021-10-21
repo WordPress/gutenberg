@@ -40,10 +40,12 @@ module.exports = {
 			name: '@storybook/addon-docs',
 			options: { configureJSX: true },
 		},
-		'@storybook/addon-knobs',
+		'@storybook/addon-controls',
+		'@storybook/addon-knobs', // deprecated, new stories should use addon-controls
 		'@storybook/addon-storysource',
 		'@storybook/addon-viewport',
 		'@storybook/addon-a11y',
+		'@storybook/addon-toolbars',
 	],
 	managerWebpack: updateEmotionAliases,
 	// Workaround:

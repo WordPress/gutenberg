@@ -59,6 +59,11 @@ function _gutenberg_get_template_file( $template_type, $slug ) {
 			if ( 'wp_template_part' === $template_type ) {
 				return _gutenberg_add_template_part_area_info( $new_template_item );
 			}
+
+			if ( 'wp_template' === $template_type ) {
+				return _gutenberg_add_template_info( $new_template_item );
+			}
+
 			return $new_template_item;
 		}
 	}
@@ -107,13 +112,35 @@ function _gutenberg_get_template_files( $template_type ) {
 
 			if ( 'wp_template_part' === $template_type ) {
 				$template_files[] = _gutenberg_add_template_part_area_info( $new_template_item );
-			} else {
-				$template_files[] = $new_template_item;
+			}
+
+			if ( 'wp_template' === $template_type ) {
+				$template_files[] = _gutenberg_add_template_info( $new_template_item );
 			}
 		}
 	}
 
 	return $template_files;
+}
+
+/**
+ * Attempts to add custom template information to the template item.
+ *
+ * @param array $template_item Template to add information to (requires 'slug' field).
+ * @return array Template
+ */
+function _gutenberg_add_template_info( $template_item ) {
+	if ( ! WP_Theme_JSON_Resolver_Gutenberg::theme_has_support() ) {
+		return $template_item;
+	}
+
+	$theme_data = WP_Theme_JSON_Resolver_Gutenberg::get_theme_data()->get_custom_templates();
+	if ( isset( $theme_data[ $template_item['slug'] ] ) ) {
+		$template_item['title']     = $theme_data[ $template_item['slug'] ]['title'];
+		$template_item['postTypes'] = $theme_data[ $template_item['slug'] ]['postTypes'];
+	}
+
+	return $template_item;
 }
 
 /**

@@ -249,16 +249,16 @@ const tooltipShow = ( { show } ) => {
 };
 
 const tooltipPosition = ( { position } ) => {
-	const isTop = position === 'top';
+	const isBottom = position === 'bottom';
 
-	if ( isTop ) {
+	if ( isBottom ) {
 		return css`
-			top: -80%;
+			bottom: -80%;
 		`;
 	}
 
 	return css`
-		bottom: -80%;
+		top: -80%;
 	`;
 };
 
