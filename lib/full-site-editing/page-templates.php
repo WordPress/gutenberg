@@ -19,16 +19,8 @@ function gutenberg_load_block_page_templates( $templates, $theme, $post, $post_t
 		return $templates;
 	}
 
-	$block_templates = gutenberg_get_block_templates( array(), 'wp_template' );
+	$block_templates = gutenberg_get_block_templates( array( 'post_type' => $post_type ), 'wp_template' );
 	foreach ( $block_templates as $template ) {
-		if ( ! $template->is_custom ) {
-			continue;
-		}
-
-		if ( isset( $template->post_types ) && ! in_array( $post_type, $template->post_types, true ) ) {
-			continue;
-		}
-
 		$templates[ $template->slug ] = $template->title;
 	}
 
