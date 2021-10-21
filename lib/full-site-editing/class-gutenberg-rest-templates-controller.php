@@ -144,6 +144,11 @@ class Gutenberg_REST_Templates_Controller extends WP_REST_Controller {
 
 		$templates = array();
 		foreach ( gutenberg_get_block_templates( $query, $this->post_type ) as $template ) {
+			// Maybe we should do this on `get_block_templates` level based on query?
+			if ( isset( $request['post_type'] ) && $template->default ) {
+				continue;
+			}
+
 			if (
 				isset( $request['post_type'] ) &&
 				isset( $template->post_types ) &&

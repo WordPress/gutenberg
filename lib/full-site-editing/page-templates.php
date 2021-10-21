@@ -21,6 +21,10 @@ function gutenberg_load_block_page_templates( $templates, $theme, $post, $post_t
 
 	$block_templates = gutenberg_get_block_templates( array(), 'wp_template' );
 	foreach ( $block_templates as $template ) {
+		if ( $template->default ) {
+			continue;
+		}
+
 		if ( isset( $template->post_types ) && ! in_array( $post_type, $template->post_types, true ) ) {
 			continue;
 		}
