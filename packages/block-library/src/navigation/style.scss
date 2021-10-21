@@ -21,6 +21,13 @@
 	}
 
 	// Normalize list styles.
+	ul {
+		margin-top: 0;
+		margin-bottom: 0;
+		margin-left: 0;
+		padding-left: 0;
+	}
+
 	ul,
 	ul li {
 		list-style: none;
@@ -230,7 +237,8 @@
 // Menu items with no background.
 .wp-block-navigation,
 .wp-block-navigation .wp-block-page-list,
-.wp-block-navigation__container {
+.wp-block-navigation__container,
+.wp-block-navigation__responsive-container-content {
 	gap: var(--wp--style--block-gap, 2em);
 }
 
@@ -331,7 +339,8 @@
 
 // Vertical layout
 .is-vertical .wp-block-page-list, // Page list.
-.is-vertical .wp-block-navigation__container {
+.is-vertical .wp-block-navigation__container,
+.is-vertical .wp-block-navigation__responsive-container-content {
 	display: flex;
 	flex-direction: column;
 	align-items: flex-start;
@@ -406,13 +415,17 @@
 	align-items: flex-start;
 	justify-content: flex-start;
 
+	.wp-block-navigation__responsive-container-content {
+		display: flex;
+	}
+
 	// Overlay menu.
 	// Provide an opinionated default style for menu items inside.
 	// Inherit as much as we can regarding colors, fonts, sizes,
 	// but otherwise provide a baseline.
 	// In a future version, we can explore more customizability.
 	&.is-menu-open {
-		display: flex;
+		display: flex; // Needs to be set to override "none".
 		flex-direction: column;
 
 		// Allow modal to scroll.
