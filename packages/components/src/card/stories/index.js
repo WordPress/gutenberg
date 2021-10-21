@@ -21,6 +21,9 @@ import Button from '../../button';
 export default {
 	component: Card,
 	title: 'Components/Card',
+	parameters: {
+		knobs: { disabled: false },
+	},
 };
 
 const KNOBS_GROUPS = {

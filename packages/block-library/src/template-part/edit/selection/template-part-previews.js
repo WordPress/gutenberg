@@ -149,7 +149,9 @@ function TemplatePartsByArea( {
 			>
 				{ sprintf(
 					// Translators: %s for the template part variation ("Header", "Footer", "Template Part").
-					'There is no other %s available. If you are looking for another type of template part, try searching for it using the input above.',
+					__(
+						'There is no other %s available. If you are looking for another type of template part, try searching for it using the input above.'
+					),
 					area && area !== 'uncategorized'
 						? labelsByArea[ area ] || area
 						: __( 'Template Part' )

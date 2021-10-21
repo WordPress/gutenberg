@@ -21,6 +21,13 @@
 	}
 
 	// Normalize list styles.
+	ul {
+		margin-top: 0;
+		margin-bottom: 0;
+		margin-left: 0;
+		padding-left: 0;
+	}
+
 	ul,
 	ul li {
 		list-style: none;
@@ -41,12 +48,14 @@
 	}
 
 	// Menu item link.
-	// By targetting the markup directly we enable greater global styles compatibility.
-	// The extra container specificity is due to global styles outputting link styles that need overriding.
-	&.wp-block-navigation a {
-		// Inherit colors set by the block color definition.
+	// By adding low specificity, we enable compatibility with link colors set in theme.json,
+	// but still allow them to be overridden by user-set colors.
+	.wp-block-navigation-item__content {
 		color: inherit;
 		display: block;
+
+		// Set the default menu item padding to zero, to allow text-only buttons.
+		padding: 0;
 	}
 
 	// Force links to inherit text decoration applied to navigation block.
@@ -121,11 +130,10 @@
 		// Don't take up space when the menu is collapsed.
 		width: 0;
 		height: 0;
-		overflow: hidden;
 
 		// Submenu items.
 		> .wp-block-navigation-item {
-			> a {
+			> .wp-block-navigation-item__content {
 				display: flex;
 				flex-grow: 1;
 
@@ -142,12 +150,12 @@
 		}
 
 		// Spacing in all submenus.
-		a {
+		.wp-block-navigation-item__content {
 			margin: 0;
 		}
 
 		// Submenu indentation when there's no background.
-		left: -1em;
+		left: -1px; // Border width.
 		top: 100%;
 
 		// Indentation for all submenus.
@@ -184,7 +192,6 @@
 		opacity: 1;
 		width: auto;
 		height: auto;
-		overflow: initial;
 		min-width: 200px;
 	}
 
@@ -228,9 +235,11 @@
  */
 
 // Menu items with no background.
+.wp-block-navigation,
 .wp-block-navigation .wp-block-page-list,
-.wp-block-navigation__container {
-	gap: 0.5em 2em;
+.wp-block-navigation__container,
+.wp-block-navigation__responsive-container-content {
+	gap: var(--wp--style--block-gap, 2em);
 }
 
 // Menu items with background.
@@ -238,9 +247,10 @@
 // That way if padding is set in theme.json, it still wins.
 // https://css-tricks.com/almanac/selectors/w/where/
 .wp-block-navigation:where(.has-background) {
+	&,
 	.wp-block-navigation .wp-block-page-list,
 	.wp-block-navigation__container {
-		gap: 0 0.5em;
+		gap: var(--wp--style--block-gap, 0.5em);
 	}
 }
 
@@ -252,19 +262,14 @@
 // That way if padding is set in theme.json, it still wins.
 // https://css-tricks.com/almanac/selectors/w/where/
 
-// Set the default menu item padding to zero, to allow text-only buttons.
-.wp-block-navigation a {
-	padding: 0;
-}
-
 // When the menu has a background, items have paddings, reduce margins to compensate.
 // Treat margins and paddings differently when the block has a background.
-.wp-block-navigation:where(.has-background) a {
+.wp-block-navigation:where(.has-background) .wp-block-navigation-item__content {
 	padding: 0.5em 1em;
 }
 
 // Provide a default padding for submenus who should always have some, regardless of the top level menu items.
-.wp-block-navigation :where(.wp-block-navigation__submenu-container) a {
+.wp-block-navigation :where(.wp-block-navigation__submenu-container) .wp-block-navigation-item__content {
 	padding: 0.5em 1em;
 }
 
@@ -326,12 +331,16 @@
 	// Horizontal layout
 	display: flex;
 	flex-wrap: wrap;
-	flex: 1;
+
+	.items-justified-space-between & {
+		flex-grow: 1;
+	}
 }
 
 // Vertical layout
 .is-vertical .wp-block-page-list, // Page list.
-.is-vertical .wp-block-navigation__container {
+.is-vertical .wp-block-navigation__container,
+.is-vertical .wp-block-navigation__responsive-container-content {
 	display: flex;
 	flex-direction: column;
 	align-items: flex-start;
@@ -406,13 +415,17 @@
 	align-items: flex-start;
 	justify-content: flex-start;
 
+	.wp-block-navigation__responsive-container-content {
+		display: flex;
+	}
+
 	// Overlay menu.
 	// Provide an opinionated default style for menu items inside.
 	// Inherit as much as we can regarding colors, fonts, sizes,
 	// but otherwise provide a baseline.
 	// In a future version, we can explore more customizability.
 	&.is-menu-open {
-		display: flex;
+		display: flex; // Needs to be set to override "none".
 		flex-direction: column;
 
 		// Allow modal to scroll.
@@ -465,7 +478,7 @@
 			}
 
 			// A default padding is added to submenu items. It's not appropriate inside the modal.
-			& :where(.wp-block-navigation__submenu-container) a {
+			.wp-block-navigation-item__content {
 				padding: 0;
 			}
 

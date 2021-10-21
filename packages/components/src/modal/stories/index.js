@@ -16,7 +16,13 @@ import Modal from '../';
 import { useState } from '@wordpress/element';
 import { wordpress } from '@wordpress/icons';
 
-export default { title: 'Components/Modal', component: Modal };
+export default {
+	title: 'Components/Modal',
+	component: Modal,
+	parameters: {
+		knobs: { disabled: false },
+	},
+};
 
 const ModalExample = ( props ) => {
 	const [ isOpen, setOpen ] = useState( false );
