@@ -9,7 +9,7 @@ async function acceptPageDialog( dialog ) {
 	await dialog.accept();
 }
 /**
- * Enables event listener which auto-accepts all dialogs on th page.
+ * Enables event listener which auto-accepts all dialogs on the page.
  */
 export function enablePageDialogAccept() {
 	page.on( 'dialog', acceptPageDialog );

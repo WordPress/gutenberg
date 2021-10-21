@@ -267,7 +267,7 @@ loss of focus.
 
 ### enablePageDialogAccept
 
-Enables event listener which auto-accepts all dialogs on th page.
+Enables event listener which auto-accepts all dialogs on the page.
 
 ### enablePrePublishChecks
 
