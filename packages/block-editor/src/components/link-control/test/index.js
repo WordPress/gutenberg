@@ -202,9 +202,9 @@ describe( 'Basic rendering', () => {
 			} );
 
 			// Click the "Edit" button to trigger into the editing mode.
-			const editButton = Array.from(
-				container.querySelectorAll( 'button' )
-			).find( ( button ) => button.innerHTML.includes( 'Edit' ) );
+			const editButton = queryByRole( container, 'button', {
+				name: 'Edit',
+			} );
 
 			act( () => {
 				Simulate.click( editButton );
