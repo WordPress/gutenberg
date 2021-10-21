@@ -11,6 +11,21 @@ class WP_Navigation_Page_Test extends WP_UnitTestCase {
 	 */
 	private $callback;
 
+	/** @var WP_Scripts */
+	private static $wp_scripts;
+
+	public static function setUpBeforeClass(): void {
+		parent::setUpBeforeClass();
+		global $wp_scripts;
+		static::$wp_scripts = clone $wp_scripts;
+	}
+
+	public static function tearDownAfterClass(): void {
+		parent::tearDownAfterClass();
+		global $wp_scripts;
+		$wp_scripts = static::$wp_scripts;
+	}
+
 	public function setUp() {
 		parent::setUp();
 		$this->callback = $this->createMock( WP_Navigation_Page_Test_Callback::class );
@@ -22,6 +37,7 @@ class WP_Navigation_Page_Test extends WP_UnitTestCase {
 		parent::tearDown();
 		remove_filter( 'navigation_editor_preload_paths', array( $this->callback, 'preload_paths_callback' ) );
 		remove_filter( 'wp_get_nav_menus', array( $this->callback, 'wp_nav_menus_callback' ) );
+		remove_filter( 'rest_pre_dispatch', array( $this->callback, 'preload_menus_rest_pre_dispatch_callback' ) );
 	}
 
 	public function test_gutenberg_navigation_init_function_generates_correct_preload_paths() {
@@ -36,7 +52,6 @@ class WP_Navigation_Page_Test extends WP_UnitTestCase {
 				'/wp/v2/posts',
 				'OPTIONS',
 			),
-			'/__experimental/menus?per_page=100&context=edit&_locale=user',
 			'/wp/v2/types?context=edit',
 			"/__experimental/menu-items?context=edit&menus={$menu_id}&per_page=100&_locale=user",
 		);
@@ -57,22 +72,28 @@ class WP_Navigation_Page_Test extends WP_UnitTestCase {
 		gutenberg_navigation_init( 'gutenberg_page_gutenberg-navigation' );
 	}
 
-	public function test_gutenberg_navigation_editor_preload_menus_function_returns_correct_data() {
-		$menus_endpoint = gutenberg_navigation_get_menus_endpoint();
-		$preload_data   = array(
-			'/__experimental/menu-locations' => array( 'some menu locations' ),
-			'OPTIONS'                        => array(
-				array( 'some options requests' ),
-			),
-			$menus_endpoint                  => ( 'some menus' ),
-		);
+	public function test_gutenberg_navigation_editor_preload_menus_initializes_createMenuPreloadingMiddleware() {
+		add_filter( 'rest_pre_dispatch', array( $this->callback, 'preload_menus_rest_pre_dispatch_callback' ) );
+		$scripts = wp_scripts();
+		$handle  = 'wp-edit-navigation';
+		$scripts->remove( $handle );
+		$scripts->add( $handle, 'https://test.test/test.js' );
+		$response = new WP_REST_Response( array( 'someData' ) );
+		$this->callback->expects( $this->once() )
+					   ->method( 'preload_menus_rest_pre_dispatch_callback' )
+						->willReturn( new $response );
 
-		$result = gutenberg_navigation_editor_preload_menus( $preload_data, 'navigation_editor' );
-		$this->assertArrayHasKey( '/__experimental/menu-locations', $result );
-		$this->assertArrayHasKey( 'OPTIONS', $result );
-		$this->assertArrayNotHasKey( $menus_endpoint, $result );
+		gutenberg_navigation_editor_preload_menus();
+
+		/** @var _WP_Dependency $result */
+		$result = $scripts->get_data( $handle, 'after' );
+		$this->assertIsArray( $result );
+		$this->assertArrayHasKey( 1, $result );
+		$this->assertStringContainsString( 'wp.editNavigation.__unstableCreateMenuPreloadingMiddleware', $result[1] );
 	}
 }
+
+
 
 
 /**
@@ -82,4 +103,5 @@ class WP_Navigation_Page_Test_Callback {
 
 	public function preload_paths_callback() {}
 	public function wp_nav_menus_callback() {}
+	public function preload_menus_rest_pre_dispatch_callback() {}
 }
