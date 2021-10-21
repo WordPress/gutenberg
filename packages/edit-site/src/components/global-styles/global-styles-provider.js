@@ -56,13 +56,16 @@ function removeUserOriginFromSettings( settingsToRemove ) {
 
 function useGlobalStylesUserConfig() {
 	const { globalStylesId, settings, styles } = useSelect( ( select ) => {
-		const _globalStylesId = select( editSiteStore ).getSettings()
-			.__experimentalGlobalStylesUserEntityId;
-		const record = select( coreStore ).getEditedEntityRecord(
-			'root',
-			'globalStyles',
-			_globalStylesId
-		);
+		const _globalStylesId = select(
+			coreStore
+		).__experimentalGetCurrentGlobalStylesId();
+		const record = _globalStylesId
+			? select( coreStore ).getEditedEntityRecord(
+					'root',
+					'globalStyles',
+					_globalStylesId
+			  )
+			: undefined;
 		return {
 			globalStylesId: _globalStylesId,
 			settings: record?.settings,

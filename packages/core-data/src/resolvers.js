@@ -418,3 +418,26 @@ __experimentalGetTemplateForLink.shouldInvalidate = ( action ) => {
 		action.name === 'wp_template'
 	);
 };
+
+export const __experimentalGetCurrentGlobalStylesId = () => async ( {
+	dispatch,
+} ) => {
+	const activeThemes = await apiFetch( {
+		path: '/wp/v2/themes?status=active',
+	} );
+	const globalStylesURL = get( activeThemes, [
+		0,
+		'_links',
+		'global-styles',
+		0,
+		'href',
+	] );
+	if ( globalStylesURL ) {
+		const globalStylesObject = await apiFetch( {
+			path: globalStylesURL,
+		} );
+		dispatch.__experimentalReceiveCurrentGlobalStylesId(
+			globalStylesObject.id
+		);
+	}
+};
