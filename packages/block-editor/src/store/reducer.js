@@ -246,15 +246,18 @@ function updateParentInnerBlocksInTree( state, tree, updatedClientIds ) {
 	for ( const clientId of updatedClientIds ) {
 		let current = clientId;
 		do {
-			if ( state.controlledInnerBlocks[ current ] ) {
-				controlledParents.add( current );
+			clientIds.add( current );
+
+			const parent = state.parents[ current ];
+			if ( state.controlledInnerBlocks[ parent ] ) {
+				// Should stop on controlled blocks.
 				// If we reach a controlled parent, break out of the loop.
+				controlledParents.add( current );
 				break;
 			} else {
-				clientIds.add( current );
+				// else continue traversing up through parents.
+				current = state.parents[ current ];
 			}
-			// Should stop on controlled blocks.
-			current = state.parents[ current ];
 		} while ( current !== undefined );
 	}
 
