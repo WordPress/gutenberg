@@ -245,7 +245,12 @@ function render_block_core_navigation( $attributes, $content, $block ) {
 	// Load inner blocks from the navigation post.
 	if ( empty( $inner_blocks ) && array_key_exists( 'navigationPostId', $attributes ) ) {
 		$navigation_post = get_post( $attributes['navigationPostId'] );
-		$parsed_blocks   = parse_blocks( $navigation_post->post_content );
+		if ( isset( $navigation_post ) ) {
+			return '';
+		}
+
+		$parsed_blocks = parse_blocks( $navigation_post->post_content );
+
 		// For some reason 'parse_blocks' includes a null block with '\n\n' as the content?
 		// This code strips it.
 		$compacted_blocks = array_filter(
