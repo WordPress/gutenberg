@@ -61,10 +61,12 @@ jobs:
               run: sudo xcode-select --switch /Applications/Xcode_${{ matrix.xcode }}.app
 
             - name: Build (if needed)
-              run: test -e packages/react-native-editor/ios/build/GutenbergDemo/Build/Products/Release-iphonesimulator/GutenbergDemo.app/GutenbergDemo || npm run native test:e2e:build-app:ios
+              # run: test -e packages/react-native-editor/ios/build/GutenbergDemo/Build/Products/Release-iphonesimulator/GutenbergDemo.app/GutenbergDemo || npm run native test:e2e:build-app:ios
+              run: npm run native test:e2e:build-app:ios
 
             - name: Build Web Driver Agent (if needed)
-              run: test -d packages/react-native-editor/ios/build/WDA || npm run native test:e2e:build-wda
+              # run: test -d packages/react-native-editor/ios/build/WDA || npm run native test:e2e:build-wda
+              run: npm run native test:e2e:build-wda
 
             - name: Run iOS Device Tests
               run: TEST_RN_PLATFORM=ios npm run native device-tests:local  ${{ matrix.native-test-name }}
