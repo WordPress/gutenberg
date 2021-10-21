@@ -9,14 +9,14 @@ const variations = [
 		isDefault: true,
 		title: __( 'Horizontal' ),
 		description: __( 'Buttons shown in a row.' ),
-		attributes: { orientation: 'horizontal' },
+		attributes: { layout: { type: 'flex' } },
 		scope: [ 'transform' ],
 	},
 	{
 		name: 'buttons-vertical',
 		title: __( 'Vertical' ),
 		description: __( 'Buttons shown in a column.' ),
-		attributes: { orientation: 'vertical' },
+		attributes: { layout: { type: 'column' } },
 		scope: [ 'transform' ],
 	},
 ];

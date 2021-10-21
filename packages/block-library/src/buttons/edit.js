@@ -1,16 +1,10 @@
 /**
- * External dependencies
- */
-import classnames from 'classnames';
-
-/**
  * WordPress dependencies
  */
 import {
 	BlockControls,
 	useBlockProps,
 	useInnerBlocksProps,
-	JustifyContentControl,
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import { useSelect } from '@wordpress/data';
@@ -21,28 +15,9 @@ import { useSelect } from '@wordpress/data';
 import { name as buttonBlockName } from '../button';
 
 const ALLOWED_BLOCKS = [ buttonBlockName ];
-const LAYOUT = {
-	type: 'default',
-	alignments: [],
-};
-const VERTICAL_JUSTIFY_CONTROLS = [ 'left', 'center', 'right' ];
-const HORIZONTAL_JUSTIFY_CONTROLS = [
-	'left',
-	'center',
-	'right',
-	'space-between',
-];
 
-function ButtonsEdit( {
-	attributes: { contentJustification, orientation },
-	setAttributes,
-} ) {
-	const blockProps = useBlockProps( {
-		className: classnames( {
-			[ `is-content-justification-${ contentJustification }` ]: contentJustification,
-			'is-vertical': orientation === 'vertical',
-		} ),
-	} );
+function ButtonsEdit( { attributes: { layout = {} } } ) {
+	const blockProps = useBlockProps();
 	const preferredStyle = useSelect( ( select ) => {
 		const preferredStyleVariations = select(
 			blockEditorStore
@@ -58,31 +33,16 @@ function ButtonsEdit( {
 				{ className: preferredStyle && `is-style-${ preferredStyle }` },
 			],
 		],
-		orientation,
-		__experimentalLayout: LAYOUT,
+		__experimentalLayout: layout,
 		templateInsertUpdatesSelection: true,
 	} );
 
-	const justifyControls =
-		orientation === 'vertical'
-			? VERTICAL_JUSTIFY_CONTROLS
-			: HORIZONTAL_JUSTIFY_CONTROLS;
-
 	return (
 		<>
-			<BlockControls group="block" __experimentalShareWithChildBlocks>
-				<JustifyContentControl
-					allowedControls={ justifyControls }
-					value={ contentJustification }
-					onChange={ ( value ) =>
-						setAttributes( { contentJustification: value } )
-					}
-					popoverProps={ {
-						position: 'bottom right',
-						isAlternate: true,
-					} }
-				/>
-			</BlockControls>
+			<BlockControls
+				group="block"
+				__experimentalShareWithChildBlocks
+			></BlockControls>
 			<div { ...innerBlocksProps } />
 		</>
 	);

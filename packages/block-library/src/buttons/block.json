@@ -6,15 +6,6 @@
 	"description": "Prompt visitors to take action with a group of button-style links.",
 	"keywords": [ "link" ],
 	"textdomain": "default",
-	"attributes": {
-		"contentJustification": {
-			"type": "string"
-		},
-		"orientation": {
-			"type": "string",
-			"default": "horizontal"
-		}
-	},
 	"supports": {
 		"anchor": true,
 		"align": [ "wide", "full" ],
@@ -24,6 +15,13 @@
 			"margin": ["top", "bottom" ],
 			"__experimentalDefaultControls": {
 				"blockGap": true
+			}
+		},
+		"__experimentalLayout": {
+			"allowSwitching": false,
+			"allowInheriting": false,
+			"default": {
+				"type": "flex"
 			}
 		}
 	},
