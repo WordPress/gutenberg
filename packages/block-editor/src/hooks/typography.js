@@ -112,7 +112,10 @@ export function TypographyPanel( props ) {
 					label={ __( 'Font family' ) }
 					onDeselect={ () => resetFontFamily( props ) }
 					isShownByDefault={ defaultControls?.fontFamily }
-					resetAllFilter={ createResetAllFilter( 'fontFamily' ) }
+					resetAllFilter={ ( newAttributes ) => ( {
+						...newAttributes,
+						fontFamily: undefined,
+					} ) }
 					panelId={ clientId }
 				>
 					<FontFamilyEdit { ...props } />
