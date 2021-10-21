@@ -10,6 +10,7 @@ For each user feature we should also add a importance categorization label  to i
 -->
 
 ## Unreleased
+- [**] Search block - Text and background color support [#35511]
 
 ## 1.64.1
 -   [**] Fix updating the block list after block removal [#35721]

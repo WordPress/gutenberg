@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import type { ColorFormats } from 'tinycolor2';
+import { colord, extend, Colord } from 'colord';
 
 /**
  * Internal dependencies
@@ -12,8 +12,8 @@ import { HexInput } from './hex-input';
 
 interface ColorInputProps {
 	colorType: 'hsl' | 'hex' | 'rgb';
-	color: ColorFormats.HSLA;
-	onChange: ( value: ColorFormats.HSLA ) => void;
+	color: Colord;
+	onChange: ( nextColor: Colord ) => void;
 	enableAlpha: boolean;
 }
 

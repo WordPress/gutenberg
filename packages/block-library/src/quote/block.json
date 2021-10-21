@@ -36,6 +36,7 @@
 			"label": "Default",
 			"isDefault": true
 		},
+		{ "name": "plain", "label": "Plain" },
 		{ "name": "large", "label": "Large" }
 	],
 	"editorStyle": "wp-block-quote-editor",

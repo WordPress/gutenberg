@@ -96,14 +96,13 @@ function ColorOption( {
 					renderContent={ () => (
 						<ColorPicker
 							color={ color }
-							onChangeComplete={ ( newColor ) =>
+							onChange={ ( newColor ) =>
 								onChange( {
-									color: newColor.hex,
+									color: newColor,
 									slug,
 									name,
 								} )
 							}
-							disableAlpha
 						/>
 					) }
 				/>

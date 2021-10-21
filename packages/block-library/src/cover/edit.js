@@ -325,6 +325,8 @@ function CoverEdit( {
 		style: styleAttribute,
 		url,
 		alt,
+		allowedBlocks,
+		templateLock,
 	} = attributes;
 	const {
 		gradientClass,
@@ -618,6 +620,8 @@ function CoverEdit( {
 		{
 			template: innerBlocksTemplate,
 			templateInsertUpdatesSelection: true,
+			allowedBlocks,
+			templateLock,
 		}
 	);
 

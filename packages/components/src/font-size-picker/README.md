@@ -97,3 +97,12 @@ If `true`, the UI will contain a slider, instead of a numeric text input field. 
 -   Type: `Boolean`
 -   Required: no
 -   Default: `false`
+
+### withReset
+
+If `true`, a reset button will be displayed alongside the predefined and custom
+font size fields.
+
+-   Type: `Boolean`
+-   Required: no
+-   Default: `true`
