@@ -18,10 +18,38 @@ function render_block_core_post_comment_reply_link( $attributes, $content, $bloc
 		return '';
 	}
 
+	$thread_comments = get_option( 'thread_comments' );
+	if ( ! $thread_comments ){
+		return '';
+	}
+
+	$comment = get_comment( $block->context['commentId'] );
+
+	$depth     = 1;
+	$max_depth = get_option( 'thread_comments_depth' );
+	$parent_id = $comment->comment_parent;
+
+	while ( 0 != $parent_id ) {
+		$depth++;
+		$parent_id = get_comment( $parent_id )->comment_parent;
+	}
+
+	$comment_reply_link = get_comment_reply_link(
+		array(
+			'depth'     => $depth,
+			'max_depth' => $max_depth,
+		),
+		$comment,
+	);
+
+	$block_wrapper_attributes = get_block_wrapper_attributes(
+		array( 'class' => "div-comment-{$comment->comment_ID}" )
+	);
+
 	return sprintf(
-		'<a %1$s>%2$s</a>',
-		get_block_wrapper_attributes(),
-		'Reply'
+		'<div %1$s>%2$s</div>',
+		$block_wrapper_attributes,
+		$comment_reply_link,
 	);
 }
 
