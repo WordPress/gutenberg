@@ -23,15 +23,17 @@ function render_block_core_post_comment_author_avatar( $attributes, $content, $b
 		return '';
 	}
 
-	$wrapper_attributes = get_block_wrapper_attributes();
+	// This is the only way to retreive style and classes on different instances
+	$wrapper_attributes = WP_Block_Supports::get_instance()->apply_block_supports();
+	$width              = isset( $attributes['width'] ) ? $attributes['width'] : '96';
+	$height             = isset( $attributes['height'] ) ? $attributes['height'] : '96';
+	$styles             = isset( $wrapper_attributes['style'] ) ? $wrapper_attributes['style'] : '';
+	$classes            = isset( $wrapper_attributes['class'] ) ? $wrapper_attributes['class'] : '';
 
-	$width      = isset( $attributes['width'] ) ? $attributes['width'] : '96';
-	$height     = isset( $attributes['height'] ) ? $attributes['height'] : '96';
-	$class_name = isset( $attributes['className'] ) ? $attributes['className'] : '';
 	/* translators: %s is the Comment Author name */
 	$alt = sprintf( __( '%s Avatar' ), $comment->comment_author );
 
-	return get_avatar(
+	$avatar_string = get_avatar(
 		$comment,
 		null,
 		'',
@@ -39,10 +41,11 @@ function render_block_core_post_comment_author_avatar( $attributes, $content, $b
 		array(
 			'height'     => $height,
 			'width'      => $width,
-			'extra_attr' => $wrapper_attributes,
-			'class'      => 'wp-block-comment-avatar ' . $class_name,
+			'extra_attr' => sprintf( 'style="%1s"', $styles ),
+			'class'      => $classes,
 		)
 	);
+	return $avatar_string;
 }
 
 /**
