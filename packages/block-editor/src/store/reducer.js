@@ -241,13 +241,11 @@ function buildBlockTree( state, blocks ) {
 }
 
 function updateParentInnerBlocksInTree( state, tree, updatedClientIds ) {
-	const clientIds = new Set( [] );
+	const uncontrolledParents = new Set( [] );
 	const controlledParents = new Set();
 	for ( const clientId of updatedClientIds ) {
 		let current = clientId;
 		do {
-			clientIds.add( current );
-
 			const parent = state.parents[ current ];
 			if ( state.controlledInnerBlocks[ parent ] ) {
 				// Should stop on controlled blocks.
@@ -256,6 +254,7 @@ function updateParentInnerBlocksInTree( state, tree, updatedClientIds ) {
 				break;
 			} else {
 				// else continue traversing up through parents.
+				uncontrolledParents.add( current );
 				current = state.parents[ current ];
 			}
 		} while ( current !== undefined );
@@ -263,12 +262,12 @@ function updateParentInnerBlocksInTree( state, tree, updatedClientIds ) {
 
 	// To make sure the order of assignments doesn't matter,
 	// we first create empty objects and mutates the inner blocks later.
-	for ( const clientId of clientIds ) {
+	for ( const clientId of uncontrolledParents ) {
 		tree[ clientId ] = {
 			...tree[ clientId ],
 		};
 	}
-	for ( const clientId of clientIds ) {
+	for ( const clientId of uncontrolledParents ) {
 		tree[ clientId ].innerBlocks = ( state.order[ clientId ] || [] ).map(
 			( subClientId ) => tree[ subClientId ]
 		);
