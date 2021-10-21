@@ -21,6 +21,13 @@
 	}
 
 	// Normalize list styles.
+	ul {
+		margin-top: 0;
+		margin-bottom: 0;
+		margin-left: 0;
+		padding-left: 0;
+	}
+
 	ul,
 	ul li {
 		list-style: none;
@@ -435,6 +442,9 @@
 			display: flex;
 			flex-direction: column;
 			padding: 0;
+
+			// Unset the inherited gap, as it's instead applied individually to the containers here.
+			gap: 0;
 
 			.wp-block-navigation__submenu-icon {
 				display: none;
