@@ -15,7 +15,8 @@ concurrency:
 jobs:
     test:
         runs-on: macos-11
-        if: ${{ github.repository == 'WordPress/gutenberg' || github.event_name == 'pull_request' }}
+        # if: ${{ github.repository == 'WordPress/gutenberg' || github.event_name == 'pull_request' }}
+        if: ${{ false }} # Skip the job until we manage to fix the unavailable environment error when running the E2E tests.
         strategy:
             matrix:
                 xcode: [12.5.1]
