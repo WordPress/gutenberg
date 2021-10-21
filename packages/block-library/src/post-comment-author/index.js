@@ -3,6 +3,7 @@
  */
 import metadata from './block.json';
 import edit from './edit';
+import deprecated from './deprecated';
 
 /**
  * WordPress dependencies
@@ -15,4 +16,5 @@ export { metadata, name };
 export const settings = {
 	icon,
 	edit,
+	deprecated,
 };

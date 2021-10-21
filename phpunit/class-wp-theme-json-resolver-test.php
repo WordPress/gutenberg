@@ -283,10 +283,24 @@ class WP_Theme_JSON_Resolver_Gutenberg_Test extends WP_UnitTestCase {
 							),
 						),
 					),
-					'custom'  => true,
+					'custom'  => false,
+					'link'    => true,
 				),
 				'blocks' => array(
-					'core/paragraph' => array(
+					'core/paragraph'  => array(
+						'color' => array(
+							'palette' => array(
+								'theme' => array(
+									array(
+										'slug'  => 'light',
+										'name'  => 'Light',
+										'color' => '#f5f7f9',
+									),
+								),
+							),
+						),
+					),
+					'core/post-title' => array(
 						'color' => array(
 							'palette' => array(
 								'theme' => array(
