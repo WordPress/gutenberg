@@ -995,7 +995,6 @@ class WP_Theme_JSON_Gutenberg {
 				$selector_duotone = self::scope_selector( $metadata['selector'], $metadata['duotone'] );
 				$block_rules     .= self::to_ruleset( $selector_duotone, $declarations_duotone );
 			}
-
 		}
 
 		return $block_rules;
@@ -1253,7 +1252,7 @@ class WP_Theme_JSON_Gutenberg {
 	 *                         'css_variables': only CSS variables (presets & custom).
 	 *                         'block_classes': only block classes.
 	 *                         'preset_classes': only classes for presets.
-	 * @param array  $origins A list of origins to include. By default it includes 'core', 'theme', and 'user'.
+	 * @param array $origins A list of origins to include. By default it includes 'core', 'theme', and 'user'.
 	 *
 	 * @return string Stylesheet.
 	 */
@@ -1264,15 +1263,15 @@ class WP_Theme_JSON_Gutenberg {
 
 		$stylesheet = '';
 
-		if ( in_array( 'css_variables', $types ) ) {
+		if ( in_array( 'css_variables', $types, true ) ) {
 			$stylesheet .= $this->get_css_variables( $setting_nodes, $origins );
 		}
 
-		if ( in_array( 'block_classes', $types ) ) {
+		if ( in_array( 'block_classes', $types, true ) ) {
 			$stylesheet .= $this->get_block_classes( $style_nodes );
 		}
 
-		if ( in_array( 'preset_classes', $types ) ) {
+		if ( in_array( 'preset_classes', $types, true ) ) {
 			$stylesheet .= $this->get_preset_classes( $setting_nodes, $origins );
 		}
 

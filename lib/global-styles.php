@@ -117,15 +117,15 @@ function gutenberg_experimental_global_styles_settings( $settings ) {
 			),
 			array(
 				'css'            => 'block_classes',
-				'__unstableType' => 'theme'
+				'__unstableType' => 'theme',
 			),
 			array(
 				'css'            => 'preset_classes',
-				'__unstableType' => 'presets'
+				'__unstableType' => 'presets',
 			),
 		);
-		foreach( $new_global_styles_config as $new_style ) {
-			$style_css = gutenberg_experimental_global_styles_get_stylesheet( $consolidated, [ $new_style['css'] ] );
+		foreach ( $new_global_styles_config as $new_style ) {
+			$style_css = gutenberg_experimental_global_styles_get_stylesheet( $consolidated, array( $new_style['css'] ) );
 			if ( '' !== $style_css ) {
 				$new_style['css']    = $style_css;
 				$new_global_styles[] = $new_style;

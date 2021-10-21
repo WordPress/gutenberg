@@ -1,10 +1,16 @@
 <?php
 /**
- * Loads the default editor styles.
+ * Loads the spacing styles.
  *
  * @package gutenberg
  */
 
+/**
+ * Callback to load the spacing styles in the editor.
+ *
+ * @param array $settings The existing editor settings.
+ * @return array The filtered editor settings.
+ */
 function gutenberg_load_spacing_styles_in_editor( $settings ) {
 	if ( ! WP_Theme_JSON_Resolver_Gutenberg::theme_has_support() ) {
 		return $settings;
@@ -30,6 +36,9 @@ function gutenberg_load_spacing_styles_in_editor( $settings ) {
 }
 add_filter( 'block_editor_settings_all', 'gutenberg_load_spacing_styles_in_editor' );
 
+/**
+ * Callback to enqueue spacing styles in the front.
+ */
 function gutenberg_load_spacing_styles_in_front_end() {
 	if ( ! WP_Theme_JSON_Resolver_Gutenberg::theme_has_support() ) {
 		return;
