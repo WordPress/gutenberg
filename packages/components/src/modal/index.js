@@ -71,6 +71,7 @@ const Modal = ( props, forwardedRef ) => {
 	const constrainedTabbingRef = useConstrainedTabbing();
 	const focusReturnRef = useFocusReturn();
 	const focusOutsideProps = useFocusOutside( onRequestClose );
+	const showTitle = !! title;
 
 	useEffect( () => {
 		openModalCount++;
@@ -136,36 +137,41 @@ const Modal = ( props, forwardedRef ) => {
 				{ ...( shouldCloseOnClickOutside ? focusOutsideProps : {} ) }
 				onKeyDown={ onKeyDown }
 			>
-				<div className={ 'components-modal__content' } role="document">
-					<div className="components-modal__header">
-						<div className="components-modal__header-heading-container">
-							{ icon && (
-								<span
-									className="components-modal__icon-container"
-									aria-hidden
-								>
-									{ icon }
-								</span>
-							) }
-							{ title && (
+				<div
+					className={ `components-modal__content ${
+						! showTitle ? 'no-title' : ''
+					}` }
+					role="document"
+				>
+					{ showTitle && (
+						<div className="components-modal__header">
+							<div className="components-modal__header-heading-container">
+								{ icon && (
+									<span
+										className="components-modal__icon-container"
+										aria-hidden
+									>
+										{ icon }
+									</span>
+								) }
 								<h1
 									id={ headingId }
 									className="components-modal__header-heading"
 								>
 									{ title }
 								</h1>
+							</div>
+							{ isDismissible && (
+								<Button
+									onClick={ onRequestClose }
+									icon={ closeSmall }
+									label={
+										closeButtonLabel || __( 'Close dialog' )
+									}
+								/>
 							) }
 						</div>
-						{ isDismissible && (
-							<Button
-								onClick={ onRequestClose }
-								icon={ closeSmall }
-								label={
-									closeButtonLabel || __( 'Close dialog' )
-								}
-							/>
-						) }
-					</div>
+					) }
 					{ children }
 				</div>
 			</div>

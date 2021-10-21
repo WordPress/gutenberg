@@ -9,7 +9,6 @@ export type DialogInputEvent =
 	| MouseEvent< HTMLButtonElement >;
 
 type BaseProps = {
-	title?: string;
 	children: ReactNode;
 	onConfirm: ( event: DialogInputEvent ) => void;
 };

@@ -17,28 +17,15 @@ const noop = () => {};
 describe( 'Confirm', () => {
 	describe( 'Confirm component', () => {
 		describe( 'Structure', () => {
-			/**
-			 * Helper method to check the structure of the dialog only for the elements
-			 * we care about.
-			 *
-			 * @param { string } title The title of the dialog. If set, that means we'll
-			 *                         make sure it's rendered, too.
-			 */
-			const shouldRenderCorrectly = ( title ) => {
+			it( 'should render correctly', () => {
 				const wrapper = render(
-					<ConfirmDialog
-						title={ title }
-						onConfirm={ noop }
-						onCancel={ noop }
-					>
+					<ConfirmDialog onConfirm={ noop } onCancel={ noop }>
 						Are you sure?
 					</ConfirmDialog>
 				);
 
 				const dialog = wrapper.getByRole( 'dialog' );
-				const xCloseButton = wrapper.getByLabelText( 'Cancel' );
 				const elementsTexts = [ 'Are you sure?', 'OK', 'Cancel' ];
-				if ( title ) elementsTexts.push( title );
 
 				expect( dialog ).toBeInTheDocument();
 
@@ -46,21 +33,6 @@ describe( 'Confirm', () => {
 					const el = wrapper.getByText( txt );
 					expect( el ).toBeInTheDocument();
 				} );
-
-				expect( xCloseButton ).toBeInTheDocument();
-
-				if ( title ) {
-					expect( xCloseButton ).toBeVisible();
-				} else {
-					expect( xCloseButton ).not.toBeVisible();
-				}
-			};
-
-			it( 'should render correctly with title', () => {
-				shouldRenderCorrectly( 'Hi there!' );
-			} );
-			it( 'should render correctly without title', () => {
-				shouldRenderCorrectly();
 			} );
 		} );
 
@@ -308,26 +280,6 @@ describe( 'Confirm', () => {
 			expect( onCancel ).toHaveBeenCalled();
 
 			jest.useRealTimers();
-		} );
-
-		it( 'should call the `onCancel` callback if the `x` button is clicked', async () => {
-			const onCancel = jest.fn().mockName( 'onCancel()' );
-
-			const wrapper = render(
-				<ConfirmDialog
-					isOpen={ true }
-					onConfirm={ noop }
-					onCancel={ onCancel }
-				>
-					Are you sure?
-				</ConfirmDialog>
-			);
-
-			const button = wrapper.getByLabelText( 'Cancel' );
-
-			fireEvent.click( button );
-
-			expect( onCancel ).toHaveBeenCalled();
 		} );
 
 		it( 'should call the `onCancel` callback if the `Escape` key is pressed', async () => {

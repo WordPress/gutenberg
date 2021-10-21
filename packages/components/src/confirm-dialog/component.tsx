@@ -23,8 +23,8 @@ import {
 } from '../ui/context';
 import { Flex } from '../flex';
 import Button from '../button';
-import * as styles from './styles';
-import { useCx } from '../utils/hooks/use-cx';
+import { Text } from '../text';
+import { VStack } from '../v-stack';
 
 function ConfirmDialog(
 	props: WordPressComponentProps< OwnProps, 'div', false >,
@@ -32,20 +32,11 @@ function ConfirmDialog(
 ) {
 	const {
 		isOpen: isOpenProp,
-		title,
 		onConfirm,
 		onCancel,
 		children,
 		...otherProps
 	} = useContextSystem( props, 'ConfirmDialog' );
-
-	const hasTitle = !! title;
-	const cx = useCx();
-	const wrapperClassNames = cx(
-		styles.wrapper,
-		! hasTitle && styles.withoutTitle
-	);
-	const stackedMarginWrapperClassName = cx( styles.stackedMarginWrapper );
 
 	const [ isOpen, setIsOpen ] = useState< boolean >();
 	const [ selfClose, setSelfClose ] = useState< boolean >();
@@ -80,8 +71,6 @@ function ConfirmDialog(
 		<>
 			{ isOpen && (
 				<Modal
-					title={ title }
-					overlayClassName={ wrapperClassNames }
 					onRequestClose={ handleEvent( onCancel ) }
 					onKeyDown={ handleEnter }
 					closeButtonLabel={ __( 'Cancel' ) }
@@ -89,8 +78,8 @@ function ConfirmDialog(
 					ref={ forwardedRef }
 					{ ...otherProps }
 				>
-					<div className={ stackedMarginWrapperClassName }>
-						<p>{ children }</p>
+					<VStack spacing={ 8 }>
+						<Text>{ children }</Text>
 						<Flex direction="row" justify="flex-end">
 							<Button
 								variant="tertiary"
@@ -105,7 +94,7 @@ function ConfirmDialog(
 								{ __( 'OK' ) }
 							</Button>
 						</Flex>
-					</div>
+					</VStack>
 				</Modal>
 			) }
 		</>

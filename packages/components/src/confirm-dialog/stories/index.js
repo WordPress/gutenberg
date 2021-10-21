@@ -33,22 +33,6 @@ export const _default = () => {
 	);
 };
 
-export const WithTitle = () => {
-	const [ confirmVal, setConfirmVal ] = useState( 'Not confirmed' );
-
-	return (
-		<>
-			<ConfirmDialog
-				title="Are you sure?"
-				onConfirm={ () => setConfirmVal( 'Confirmed!' ) }
-			>
-				{ daText() }
-			</ConfirmDialog>
-			<h1>{ confirmVal }</h1>
-		</>
-	);
-};
-
 export const WithJSXMessage = () => {
 	const [ confirmVal, setConfirmVal ] = useState( 'Not confirmed' );
 
