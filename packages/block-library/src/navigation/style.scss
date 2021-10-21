@@ -443,9 +443,6 @@
 			flex-direction: column;
 			padding: 0;
 
-			// Unset the inherited gap, as it's instead applied individually to the containers here.
-			gap: 0;
-
 			.wp-block-navigation__submenu-icon {
 				display: none;
 			}
