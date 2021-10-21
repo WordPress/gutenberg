@@ -1,14 +1,14 @@
 [
 	{
 		"clientId": "_clientId_0",
-		"name": "core/comments-query",
+		"name": "core/missing",
 		"isValid": true,
 		"attributes": {
-			"queryPerPage": 4,
-			"queryOffset": 0,
-			"tagName": "div"
+			"originalName": "core/comments-query",
+			"originalUndelimitedContent": "<div class=\"wp-block-comments-query\"></div>",
+			"originalContent": "<!-- wp:comments-query -->\n<div class=\"wp-block-comments-query\"></div>\n<!-- /wp:comments-query -->"
 		},
 		"innerBlocks": [],
-		"originalContent": "<div class=\"wp-block-comments-query\"></div>"
+		"originalContent": "<!-- wp:comments-query -->\n<div class=\"wp-block-comments-query\"></div>\n<!-- /wp:comments-query -->"
 	}
 ]

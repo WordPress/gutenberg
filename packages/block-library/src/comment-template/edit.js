@@ -1,4 +1,4 @@
-export default function CommentsTemplateEdit( {
+export default function CommentTemplateEdit( {
 	context: { queryPerPage, queryOffset },
 } ) {
 	// XXX TODO: actually implement this

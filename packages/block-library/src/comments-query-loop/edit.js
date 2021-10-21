@@ -20,7 +20,7 @@ import QueryToolbar from './toolbar';
 
 const TEMPLATE = [ [ 'core/comments-template' ] ];
 
-export default function CommentsQueryEdit( { attributes, setAttributes } ) {
+export default function CommentsQueryLoopEdit( { attributes, setAttributes } ) {
 	const {
 		queryPerPage,
 		queryOffset,

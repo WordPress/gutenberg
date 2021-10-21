@@ -63,8 +63,8 @@ import * as socialLinks from './social-links';
 import * as socialLink from './social-link';
 
 // Full Site Editing Blocks
-import * as commentsQuery from './comments-query';
-import * as commentsTemplate from './comments-template';
+import * as commentsQueryLoop from './comments-query-loop';
+import * as commentTemplate from './comment-template';
 import * as siteLogo from './site-logo';
 import * as siteTagline from './site-tagline';
 import * as siteTitle from './site-title';
@@ -172,8 +172,8 @@ export const __experimentalGetCoreBlocks = () => [
 	video,
 
 	// Theme blocks
-	commentsQuery,
-	commentsTemplate,
+	commentsQueryLoop,
+	commentTemplate,
 
 	siteLogo,
 	siteTagline,

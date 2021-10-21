@@ -11,7 +11,7 @@ import {
 import { __ } from '@wordpress/i18n';
 import { settings } from '@wordpress/icons';
 
-export default function CommentsQueryToolbar( {
+export default function CommentsQueryLoopToolbar( {
 	queryPerPage,
 	queryOffset,
 	setQuery,

@@ -1,10 +1,14 @@
 [
 	{
 		"clientId": "_clientId_0",
-		"name": "core/comments-template",
+		"name": "core/missing",
 		"isValid": true,
-		"attributes": {},
+		"attributes": {
+			"originalName": "core/comments-template",
+			"originalUndelimitedContent": "",
+			"originalContent": "<!-- wp:comments-template /-->"
+		},
 		"innerBlocks": [],
-		"originalContent": ""
+		"originalContent": "<!-- wp:comments-template /-->"
 	}
 ]
