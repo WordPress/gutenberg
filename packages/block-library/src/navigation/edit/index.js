@@ -96,6 +96,7 @@ function Navigation( {
 		openSubmenusOnClick,
 		orientation,
 		overlayMenu,
+		showSubmenuIcon,
 	} = attributes;
 
 	const [ hasAlreadyRendered, RecursionProvider ] = useNoRecursiveRenders(
@@ -285,7 +286,7 @@ function Navigation( {
 						/>
 						{ ! attributes.openSubmenusOnClick && (
 							<ToggleControl
-								checked={ attributes.showSubmenuIcon }
+								checked={ showSubmenuIcon }
 								onChange={ ( value ) => {
 									setAttributes( {
 										showSubmenuIcon: value,
