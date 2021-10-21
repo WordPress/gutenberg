@@ -478,7 +478,7 @@
 			}
 
 			// A default padding is added to submenu items. It's not appropriate inside the modal.
-			a {
+			.wp-block-navigation-item__content {
 				padding: 0;
 			}
 
