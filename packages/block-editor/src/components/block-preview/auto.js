@@ -34,6 +34,14 @@ function AutoBlockPreview( { viewportWidth, __experimentalPadding } ) {
 
 	const scale = containerWidth / viewportWidth;
 
+	// Use iframe content height as the iframe height, but cap it to the arbitrary but reasonable aspect ratio of 1:1
+	// see explanation here: https://github.com/WordPress/gutenberg/issues/34729#issuecomment-919949857
+	const cappedContentHeight = Math.min( contentHeight, viewportWidth );
+	const cappedContentHeightScaled = Math.min(
+		contentHeight * scale,
+		containerWidth // container width is already scaled
+	);
+
 	return (
 		<div className="block-editor-block-preview__container">
 			{ containerResizeListener }
@@ -41,7 +49,7 @@ function AutoBlockPreview( { viewportWidth, __experimentalPadding } ) {
 				className="block-editor-block-preview__content"
 				style={ {
 					transform: `scale(${ scale })`,
-					height: contentHeight * scale,
+					height: cappedContentHeightScaled,
 				} }
 			>
 				<Iframe
@@ -60,7 +68,7 @@ function AutoBlockPreview( { viewportWidth, __experimentalPadding } ) {
 					style={ {
 						position: 'absolute',
 						width: viewportWidth,
-						height: contentHeight,
+						height: cappedContentHeight,
 						pointerEvents: 'none',
 					} }
 				>
