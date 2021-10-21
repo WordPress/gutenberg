@@ -40,7 +40,6 @@ export default function PageListEdit( { context, clientId } ) {
 	const closeModal = () => setOpen( false );
 
 	const blockProps = useBlockProps( {
-		// TODO: Test that this behaviour matches index.php.
 		className: classnames( 'wp-block-page-list', {
 			'has-text-color': !! context.textColor,
 			[ getColorClassName(
@@ -151,7 +150,6 @@ function PageItems( { context, pagesByParentId, parentId = 0, depth = 0 } ) {
 						isNavigationChild &&
 						! context.openSubmenusOnClick &&
 						context.showSubmenuIcon,
-					// TODO: Overlay classes and styles?
 				} ) }
 			>
 				{ hasChildren &&
