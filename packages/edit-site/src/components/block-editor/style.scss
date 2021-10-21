@@ -41,27 +41,12 @@
 }
 
 .resizable-editor__drag-handle {
+	$height: 100px;
 	position: absolute;
 	top: 0;
 	bottom: 0;
-	width: $grid-unit-60;
-
-	&.is-left {
-		left: -$grid-unit-60;
-	}
-
-	&.is-right {
-		right: -$grid-unit-60;
-	}
-}
-
-.resizable-editor__drag-handle-button {
-	$height: 100px;
-	position: absolute;
-	top: calc(50% - #{math.div($height, 2)});
-	left: 50%;
-	transform: translateX(-$grid-unit-05);
 	padding: 0;
+	margin: auto 0;
 	width: $grid-unit-10;
 	height: $height;
 	appearance: none;
@@ -70,6 +55,14 @@
 	background: $gray-700;
 	border-radius: 4px;
 	border: 0;
+
+	&.is-left {
+		left: #{-$grid-unit-30 - $grid-unit-05};
+	}
+
+	&.is-right {
+		right: #{-$grid-unit-30 - $grid-unit-05};
+	}
 
 	&:hover {
 		background: $gray-600;
