@@ -7,7 +7,26 @@
 	"description": "Displays a link to reply to a comment.",
 	"textdomain": "default",
 	"usesContext": [ "commentId" ],
+	"attributes": {
+		"textAlign": {
+			"type": "string"
+		}
+	},
 	"supports": {
+		"color": {
+			"gradients": true,
+			"link": true,
+			"text": false
+		},
+		"typography": {
+			"fontSize": true,
+			"lineHeight": true,
+			"__experimentalFontFamily": true,
+			"__experimentalFontWeight": true,
+			"__experimentalFontStyle": true,
+			"__experimentalTextTransform": true,
+			"__experimentalLetterSpacing": true
+		},
 		"html": false
 	}
 }

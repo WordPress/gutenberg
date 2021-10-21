@@ -42,13 +42,16 @@ function render_block_core_post_comment_reply_link( $attributes, $content, $bloc
 		$comment,
 	);
 
-	$block_wrapper_attributes = get_block_wrapper_attributes(
-		array( 'class' => "div-comment-{$comment->comment_ID}" )
-	);
+	$classes = '';
+	if ( isset( $attributes['textAlign'] ) ) {
+		$classes .= 'has-text-align-' . $attributes['textAlign'];
+	}
+
+	$wrapper_attributes = get_block_wrapper_attributes( array( 'class' => $classes ) );
 
 	return sprintf(
 		'<div %1$s>%2$s</div>',
-		$block_wrapper_attributes,
+		$wrapper_attributes,
 		$comment_reply_link,
 	);
 }

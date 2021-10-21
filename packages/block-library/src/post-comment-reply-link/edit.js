@@ -1,17 +1,59 @@
 /**
+ * External dependencies
+ */
+import classnames from 'classnames';
+
+/**
  * WordPress dependencies
  */
-import { useBlockProps } from '@wordpress/block-editor';
 import { __ } from '@wordpress/i18n';
+import {
+	AlignmentControl,
+	BlockControls,
+	useBlockProps,
+} from '@wordpress/block-editor';
 
-function PostCommentReplyLink() {
+/**
+ * Renders the `core/post-comment-reply-link` block on the editor.
+ *
+ * @param {Object} props                      React props.
+ * @param {Object} props.setAttributes        Callback for updating block attributes.
+ * @param {Object} props.attributes           Block attributes.
+ * @param {string} props.attributes.textAlign The `textAlign` attribute.
+ *
+ * @return {JSX.Element} React element.
+ */
+function Edit( { setAttributes, attributes: { textAlign } } ) {
+	const blockProps = useBlockProps( {
+		className: classnames( {
+			[ `has-text-align-${ textAlign }` ]: textAlign,
+		} ),
+	} );
+
+	const blockControls = (
+		<BlockControls group="block">
+			<AlignmentControl
+				value={ textAlign }
+				onChange={ ( newAlign ) =>
+					setAttributes( { textAlign: newAlign } )
+				}
+			/>
+		</BlockControls>
+	);
+
 	return (
-		<div { ...useBlockProps() }>
-			<a href="#comments" onClick={ ( event ) => event.preventDefault() }>
-				{ __( 'Reply' ) }
-			</a>
-		</div>
+		<>
+			{ blockControls }
+			<div { ...blockProps }>
+				<a
+					href="#comments"
+					onClick={ ( event ) => event.preventDefault() }
+				>
+					{ __( 'Reply' ) }
+				</a>
+			</div>
+		</>
 	);
 }
 
-export default PostCommentReplyLink;
+export default Edit;
