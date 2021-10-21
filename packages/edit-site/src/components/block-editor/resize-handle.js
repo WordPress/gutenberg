@@ -23,9 +23,9 @@ export default function ResizeHandle( { direction, resizeWidthBy } ) {
 	}
 
 	return (
-		<div className={ `resizable-editor__drag-handle is-${ direction }` }>
+		<>
 			<button
-				className="resizable-editor__drag-handle-button"
+				className={ `resizable-editor__drag-handle is-${ direction }` }
 				aria-label={ __( 'Drag to resize' ) }
 				aria-describedby={ `resizable-editor__resize-help-${ direction }` }
 				onKeyDown={ handleKeyDown }
@@ -35,6 +35,6 @@ export default function ResizeHandle( { direction, resizeWidthBy } ) {
 			>
 				{ __( 'Use left and right arrow keys to resize the canvas.' ) }
 			</VisuallyHidden>
-		</div>
+		</>
 	);
 }
