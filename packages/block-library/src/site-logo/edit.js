@@ -61,7 +61,11 @@ const SiteLogo = ( {
 	logoUrl,
 	siteUrl,
 	logoId,
+	setIcon,
+	iconId,
+	canUserEdit,
 } ) => {
+	const [ isIconSynced, setIsIconSynced ] = useState( iconId === logoId );
 	const clientWidth = useClientWidth( containerRef, [ align ] );
 	const isLargeViewport = useViewportMatch( 'medium' );
 	const isWideAligned = includes( [ 'wide', 'full' ], align );
@@ -250,6 +254,10 @@ const SiteLogo = ( {
 			</ResizableBox>
 		);
 
+	const syncSiteIconHelpText = __(
+		"Site Icons are what you see in browser tabs, bookmark bars, and within the WordPress mobile apps. If you don't have one, you can set your logo to also be your icon. If you do have a custom site icon, you can upload that from the Site Icon settings!"
+	);
+
 	return (
 		<>
 			<InspectorControls>
@@ -286,6 +294,19 @@ const SiteLogo = ( {
 							/>
 						</>
 					) }
+					{ canUserEdit && (
+						<>
+							<ToggleControl
+								label={ __( 'Use site logo as icon' ) }
+								onChange={ ( value ) => {
+									setIsIconSynced( value );
+									setIcon( value );
+								} }
+								checked={ isIconSynced }
+								help={ syncSiteIconHelpText }
+							/>
+						</>
+					) }
 				</PanelBody>
 			</InspectorControls>
 			<BlockControls group="block">
@@ -316,6 +337,7 @@ export default function LogoEdit( {
 		siteLogoId,
 		canUserEdit,
 		url,
+		siteIconId,
 		mediaItemData,
 		isRequestingMediaItem,
 	} = useSelect( ( select ) => {
@@ -328,6 +350,7 @@ export default function LogoEdit( {
 		const _readOnlyLogo = siteData?.site_logo;
 		const _canUserEdit = canUser( 'update', 'settings' );
 		const _siteLogoId = _canUserEdit ? _siteLogo : _readOnlyLogo;
+		const _siteIconId = siteSettings?.site_icon;
 		const mediaItem =
 			_siteLogoId &&
 			select( coreStore ).getMedia( _siteLogoId, {
@@ -349,6 +372,7 @@ export default function LogoEdit( {
 				alt: mediaItem.alt_text,
 			},
 			isRequestingMediaItem: _isRequestingMediaItem,
+			siteIconId: _siteIconId,
 		};
 	}, [] );
 
@@ -356,6 +380,11 @@ export default function LogoEdit( {
 	const setLogo = ( newValue ) =>
 		editEntityRecord( 'root', 'site', undefined, {
 			site_logo: newValue,
+		} );
+
+	const setIcon = ( syncIconToLogo ) =>
+		editEntityRecord( 'root', 'site', undefined, {
+			site_icon: syncIconToLogo ? siteLogoId : null,
 		} );
 
 	let alt = null;
@@ -423,6 +452,9 @@ export default function LogoEdit( {
 				setLogo={ setLogo }
 				logoId={ mediaItemData?.id || siteLogoId }
 				siteUrl={ url }
+				setIcon={ setIcon }
+				iconId={ siteIconId }
+				canUserEdit={ canUserEdit }
 			/>
 		);
 	}
