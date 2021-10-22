@@ -9,7 +9,6 @@
 	"usesContext": [
 		"queryId",
 		"queryPerPage",
-		"queryOffset",
 		"displayLayout",
 		"templateSlug"
 	],

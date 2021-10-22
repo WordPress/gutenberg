@@ -13,10 +13,6 @@
 			"type": "number",
 			"default": 4
 		},
-		"queryOffset": {
-			"type": "number",
-			"default": 0
-		},
 		"tagName": {
 			"type": "string",
 			"default": "div"
@@ -25,7 +21,6 @@
 	"providesContext": {
 		"queryId": "queryId",
 		"queryPerPage": "queryPerPage",
-		"queryOffset": "queryOffset",
 		"displayLayout": "displayLayout"
 	},
 	"supports": {

@@ -11,11 +11,7 @@ import {
 import { __ } from '@wordpress/i18n';
 import { settings } from '@wordpress/icons';
 
-export default function CommentsQueryLoopToolbar( {
-	queryPerPage,
-	queryOffset,
-	setQuery,
-} ) {
+export default function CommentsQueryLoopToolbar( { queryPerPage, setQuery } ) {
 	return (
 		<>
 			<ToolbarGroup>
@@ -51,29 +47,6 @@ export default function CommentsQueryLoopToolbar( {
 									} }
 									step="1"
 									value={ queryPerPage }
-									isDragEnabled={ false }
-								/>
-							</BaseControl>
-							<BaseControl>
-								<NumberControl
-									__unstableInputWidth="60px"
-									label={ __( 'Offset' ) }
-									labelPosition="edge"
-									min={ 0 }
-									max={ 100 }
-									onChange={ ( value ) => {
-										const num = parseInt( value, 10 );
-										if (
-											isNaN( num ) ||
-											num < 0 ||
-											num > 100
-										) {
-											return;
-										}
-										setQuery( { queryOffset: num } );
-									} }
-									step="1"
-									value={ queryOffset }
 									isDragEnabled={ false }
 								/>
 							</BaseControl>

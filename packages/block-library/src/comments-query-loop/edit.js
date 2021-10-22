@@ -21,12 +21,7 @@ import QueryToolbar from './toolbar';
 const TEMPLATE = [ [ 'core/comments-template' ] ];
 
 export default function CommentsQueryLoopEdit( { attributes, setAttributes } ) {
-	const {
-		queryPerPage,
-		queryOffset,
-		tagName: TagName,
-		layout = {},
-	} = attributes;
+	const { queryPerPage, tagName: TagName, layout = {} } = attributes;
 
 	const { themeSupportsLayout } = useSelect( ( select ) => {
 		const { getSettings } = select( blockEditorStore );
@@ -47,7 +42,6 @@ export default function CommentsQueryLoopEdit( { attributes, setAttributes } ) {
 			<BlockControls>
 				<QueryToolbar
 					queryPerPage={ queryPerPage }
-					queryOffset={ queryOffset }
 					setQuery={ setAttributes }
 				/>
 			</BlockControls>
