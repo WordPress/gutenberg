@@ -68,96 +68,80 @@ function ListViewBranch( props ) {
 	const blockCount = filteredBlocks.length;
 	let nextPosition = listPosition;
 
-	const listItems = [];
-	for ( let index = 0; index < filteredBlocks.length; index++ ) {
-		const block = filteredBlocks[ index ];
-		const { clientId, innerBlocks } = block;
+	return (
+		<>
+			{ filteredBlocks.map( ( block, index ) => {
+				const { clientId, innerBlocks } = block;
 
-		if ( index > 0 ) {
-			nextPosition += countBlocks(
-				filteredBlocks[ index - 1 ],
-				expandedState,
-				draggedClientIds
-			);
-		}
+				if ( index > 0 ) {
+					nextPosition += countBlocks(
+						filteredBlocks[ index - 1 ],
+						expandedState,
+						draggedClientIds
+					);
+				}
 
-		const usesWindowing = __experimentalPersistentListViewFeatures;
+				const usesWindowing = __experimentalPersistentListViewFeatures;
 
-		const {
-			start,
-			end,
-			itemInView,
-			startPadding,
-			endPadding,
-		} = fixedListWindow;
+				const { itemInView } = fixedListWindow;
 
-		const blockInView = ! usesWindowing || itemInView( nextPosition );
+				const blockInView =
+					! usesWindowing || itemInView( nextPosition );
 
-		const isDragging = draggedClientIds?.length > 0;
-		if (
-			usesWindowing &&
-			! isDragging &&
-			! blockInView &&
-			nextPosition > start
-		) {
-			// found the end of the window, don't bother processing the rest of the items
-			break;
-		}
-		const style = usesWindowing
-			? {
-					paddingTop: start === nextPosition ? startPadding : 0,
-					paddingBottom: end === nextPosition ? endPadding : 0,
-			  }
-			: undefined;
+				const position = index + 1;
+				const updatedPath =
+					path.length > 0
+						? `${ path }_${ position }`
+						: `${ position }`;
+				const hasNestedBlocks =
+					showNestedBlocks && !! innerBlocks && !! innerBlocks.length;
 
-		const position = index + 1;
-		const updatedPath =
-			path.length > 0 ? `${ path }_${ position }` : `${ position }`;
-		const hasNestedBlocks =
-			showNestedBlocks && !! innerBlocks && !! innerBlocks.length;
+				const isExpanded = hasNestedBlocks
+					? expandedState[ clientId ] ?? true
+					: undefined;
 
-		const isExpanded = hasNestedBlocks
-			? expandedState[ clientId ] ?? true
-			: undefined;
+				const isDragged = !! draggedClientIds?.includes( clientId );
 
-		// Make updates to the selected or dragged blocks synchronous,
-		// but asynchronous for any other block.
-		const isDragged = !! draggedClientIds?.includes( clientId );
-
-		listItems.push(
-			<Fragment key={ clientId }>
-				{ ( isDragged || blockInView ) && (
-					<ListViewBlock
-						block={ block }
-						selectBlock={ selectBlock }
-						isDragged={ isDragged }
-						level={ level }
-						position={ position }
-						rowCount={ blockCount }
-						siblingBlockCount={ blockCount }
-						showBlockMovers={ showBlockMovers }
-						path={ updatedPath }
-						isExpanded={ isExpanded }
-						listPosition={ nextPosition }
-						style={ style }
-					/>
-				) }
-				{ hasNestedBlocks && isExpanded && ! isDragged && (
-					<ListViewBranch
-						blocks={ innerBlocks }
-						selectBlock={ selectBlock }
-						showBlockMovers={ showBlockMovers }
-						showNestedBlocks={ showNestedBlocks }
-						level={ level + 1 }
-						path={ updatedPath }
-						listPosition={ nextPosition + 1 }
-						fixedListWindow={ fixedListWindow }
-					/>
-				) }
-			</Fragment>
-		);
-	}
-	return <>{ listItems }</>;
+				const showBlock = isDragged || blockInView;
+				return (
+					<Fragment key={ clientId }>
+						{ showBlock && (
+							<ListViewBlock
+								block={ block }
+								selectBlock={ selectBlock }
+								isDragged={ isDragged }
+								level={ level }
+								position={ position }
+								rowCount={ blockCount }
+								siblingBlockCount={ blockCount }
+								showBlockMovers={ showBlockMovers }
+								path={ updatedPath }
+								isExpanded={ isExpanded }
+								listPosition={ nextPosition }
+							/>
+						) }
+						{ ! showBlock && (
+							<tr>
+								<td className="block-editor-list-view-placeholder" />
+							</tr>
+						) }
+						{ hasNestedBlocks && isExpanded && ! isDragged && (
+							<ListViewBranch
+								blocks={ innerBlocks }
+								selectBlock={ selectBlock }
+								showBlockMovers={ showBlockMovers }
+								showNestedBlocks={ showNestedBlocks }
+								level={ level + 1 }
+								path={ updatedPath }
+								listPosition={ nextPosition + 1 }
+								fixedListWindow={ fixedListWindow }
+							/>
+						) }
+					</Fragment>
+				);
+			} ) }
+		</>
+	);
 }
 
 ListViewBranch.defaultProps = {

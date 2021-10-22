@@ -19,8 +19,6 @@ const DEFAULT_INIT_WINDOW_SIZE = 30;
  * @property {number}                  start        Start index of the window
  * @property {number}                  end          End index of the window
  * @property {(index:number)=>boolean} itemInView   Returns true if item is in the window
- * @property {number}                  startPadding Padding in px to add before the start item
- * @property {number}                  endPadding   Padding in px to add after the end item
  */
 
 /**
@@ -55,8 +53,6 @@ export default function useFixedWindowList(
 		itemInView: ( /** @type {number} */ index ) => {
 			return index >= 0 && index <= initWindowSize;
 		},
-		startPadding: 0,
-		endPadding: 0,
 	} );
 
 	useLayoutEffect( () => {
@@ -72,14 +68,13 @@ export default function useFixedWindowList(
 				scrollContainer.clientHeight / itemHeight
 			);
 			const windowOverscan = options?.windowOverscan ?? visibleItems;
-			const start = Math.max(
-				0,
-				Math.floor( scrollContainer.scrollTop / itemHeight ) -
-					windowOverscan
+			const firstViewableIndex = Math.floor(
+				scrollContainer.scrollTop / itemHeight
 			);
+			const start = Math.max( 0, firstViewableIndex - windowOverscan );
 			const end = Math.min(
 				totalItems - 1,
-				start + visibleItems + windowOverscan
+				firstViewableIndex + visibleItems + windowOverscan
 			);
 			setFixedListWindow( ( lastWindow ) => {
 				const nextWindow = {
@@ -89,11 +84,6 @@ export default function useFixedWindowList(
 					itemInView: ( /** @type {number} */ index ) => {
 						return start <= index && index <= end;
 					},
-					startPadding: itemHeight * start,
-					endPadding:
-						totalItems > end
-							? itemHeight * ( totalItems - end - 1 )
-							: 0,
 				};
 				if (
 					lastWindow.start !== nextWindow.start ||

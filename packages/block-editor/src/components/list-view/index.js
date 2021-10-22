@@ -177,11 +177,6 @@ function ListView(
 				ref={ treeGridRef }
 				onCollapseRow={ collapseRow }
 				onExpandRow={ expandRow }
-				aria-rowcount={
-					__experimentalPersistentListViewFeatures
-						? visibleBlockCount
-						: undefined
-				}
 			>
 				<ListViewContext.Provider value={ contextValue }>
 					<ListViewBranch
