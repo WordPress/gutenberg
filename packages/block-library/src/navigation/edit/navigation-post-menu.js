@@ -6,15 +6,15 @@ import { MenuGroup, MenuItemsChoice } from '@wordpress/components';
 /**
  * Internal dependencies
  */
-import useNavigationPost from '../../use-navigation-post';
+import useNavigationPost from '../use-navigation-post';
 
-export default function NavigationPostSelection( { onSelect } ) {
-	const { navigationPost, navigationPosts } = useNavigationPost();
+export default function NavigationPostMenu( { onSelect, navigationPostId } ) {
+	const { navigationPosts } = useNavigationPost();
 
 	return (
 		<MenuGroup>
 			<MenuItemsChoice
-				value={ navigationPost?.id }
+				value={ navigationPostId }
 				onSelect={ ( selectedId ) =>
 					onSelect(
 						navigationPosts.find(
