@@ -62,10 +62,10 @@ const SiteLogo = ( {
 	siteUrl,
 	logoId,
 	setIcon,
-	iconId,
 	canUserEdit,
+	syncSiteIcon,
+	setSyncSiteIcon,
 } ) => {
-	const [ isIconSynced, setIsIconSynced ] = useState( iconId === logoId );
 	const clientWidth = useClientWidth( containerRef, [ align ] );
 	const isLargeViewport = useViewportMatch( 'medium' );
 	const isWideAligned = includes( [ 'wide', 'full' ], align );
@@ -299,10 +299,10 @@ const SiteLogo = ( {
 							<ToggleControl
 								label={ __( 'Use site logo as icon' ) }
 								onChange={ ( value ) => {
-									setIsIconSynced( value );
-									setIcon( value );
+									setSyncSiteIcon( !! value );
+									setIcon( value ? logoId : null );
 								} }
-								checked={ isIconSynced }
+								checked={ syncSiteIcon }
 								help={ syncSiteIconHelpText }
 							/>
 						</>
@@ -362,6 +362,7 @@ export default function LogoEdit( {
 				_siteLogoId,
 				{ context: 'view' },
 			] );
+
 		return {
 			siteLogoId: _siteLogoId,
 			canUserEdit: _canUserEdit,
@@ -377,15 +378,34 @@ export default function LogoEdit( {
 	}, [] );
 
 	const { editEntityRecord } = useDispatch( coreStore );
-	const setLogo = ( newValue ) =>
+
+	const [ syncSiteIcon, setSyncSiteIcon ] = useState(
+		siteLogoId === siteIconId
+	);
+	const setLogo = ( newValue ) => {
 		editEntityRecord( 'root', 'site', undefined, {
 			site_logo: newValue,
 		} );
 
-	const setIcon = ( syncIconToLogo ) =>
+		// If the user has the option to sync their site icon enabled, also update
+		// the site icon.
+		if ( syncSiteIcon ) {
+			setIcon( newValue );
+		}
+
+		// If we're setting a new Site Logo for the first time, and there is no
+		// existing site icon, then automatically sync the icon to the logo.
+		if ( ! siteLogoId && ! siteIconId && newValue ) {
+			setIcon( newValue );
+			setSyncSiteIcon( true );
+		}
+	};
+
+	const setIcon = ( newValue ) => {
 		editEntityRecord( 'root', 'site', undefined, {
-			site_icon: syncIconToLogo ? siteLogoId : null,
+			site_icon: newValue,
 		} );
+	};
 
 	let alt = null;
 	if ( mediaItemData ) {
@@ -453,8 +473,9 @@ export default function LogoEdit( {
 				logoId={ mediaItemData?.id || siteLogoId }
 				siteUrl={ url }
 				setIcon={ setIcon }
-				iconId={ siteIconId }
 				canUserEdit={ canUserEdit }
+				syncSiteIcon={ syncSiteIcon }
+				setSyncSiteIcon={ setSyncSiteIcon }
 			/>
 		);
 	}
