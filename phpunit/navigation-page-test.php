@@ -14,13 +14,13 @@ class WP_Navigation_Page_Test extends WP_UnitTestCase {
 	/** @var WP_Scripts */
 	private static $wp_scripts;
 
-	public static function setUpBeforeClass(): void {
+	public static function setUpBeforeClass() {
 		parent::setUpBeforeClass();
 		global $wp_scripts;
 		static::$wp_scripts = clone $wp_scripts;
 	}
 
-	public static function tearDownAfterClass(): void {
+	public static function tearDownAfterClass() {
 		parent::tearDownAfterClass();
 		global $wp_scripts;
 		$wp_scripts = static::$wp_scripts;
@@ -80,9 +80,10 @@ class WP_Navigation_Page_Test extends WP_UnitTestCase {
 		$scripts->remove( $handle );
 		$scripts->add( $handle, 'https://test.test/test.js' );
 		$response = new WP_REST_Response( array( 'someData' ) );
-		$this->callback->expects( $this->once() )
-					   ->method( 'preload_menus_rest_pre_dispatch_callback' )
-						->willReturn( new $response );
+		$this->callback
+			->expects( $this->once() )
+			->method( 'preload_menus_rest_pre_dispatch_callback' )
+			->willReturn( new $response );
 
 		gutenberg_navigation_editor_preload_menus();
 
