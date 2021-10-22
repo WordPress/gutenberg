@@ -145,6 +145,7 @@ function block_core_page_list_render_nested_page_list( $open_submenus_on_click, 
 	$markup = '';
 	foreach ( (array) $nested_pages as $page ) {
 		$css_class       = $page['is_active'] ? ' current-menu-item' : '';
+		$aria_current    = $page['is_active'] ? ' aria-current="page"' : '';
 		$style_attribute = '';
 
 		$css_class .= in_array( $page['page_id'], $active_page_ancestor_ids, true ) ? ' current-menu-ancestor' : '';
@@ -181,7 +182,7 @@ function block_core_page_list_render_nested_page_list( $open_submenus_on_click, 
 			) . '<span class="wp-block-page-list__submenu-icon wp-block-navigation__submenu-icon"><svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 12 12" fill="none" role="img" aria-hidden="true" focusable="false"><path d="M1.50002 4L6.00002 8L10.5 4" stroke-width="1.5"></path></svg></span>' .
 			'</button>';
 		} else {
-			$markup .= '<a class="wp-block-pages-list__item__link' . $navigation_child_content_class . ' "href="' . esc_url( $page['link'] ) . '">' . wp_kses(
+			$markup .= '<a class="wp-block-pages-list__item__link' . $navigation_child_content_class . ' "href="' . esc_url( $page['link'] ) . '"' . $aria_current . '>' . wp_kses(
 				$page['title'],
 				wp_kses_allowed_html( 'post' )
 			) . '</a>';
