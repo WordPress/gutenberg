@@ -487,10 +487,18 @@ class Gutenberg_REST_Templates_Controller extends WP_REST_Controller {
 	 */
 	public function get_collection_params() {
 		return array(
-			'context' => $this->get_context_param(),
-			'wp_id'   => array(
+			'context'   => $this->get_context_param(),
+			'wp_id'     => array(
 				'description' => __( 'Limit to the specified post id.', 'gutenberg' ),
 				'type'        => 'integer',
+			),
+			'area'      => array(
+				'description' => __( 'Limit to the specified template part area.', 'gutenberg' ),
+				'type'        => 'string',
+			),
+			'post_type' => array(
+				'description' => __( 'Post type to get the templates for.', 'gutenberg' ),
+				'type'        => 'string',
 			),
 		);
 	}
