@@ -9,6 +9,7 @@ import { navigation as icon } from '@wordpress/icons';
  */
 import metadata from './block.json';
 import edit from './edit';
+import save from './save';
 import deprecated from './deprecated';
 import variations from './variations';
 
@@ -48,5 +49,6 @@ export const settings = {
 		],
 	},
 	edit,
+	save,
 	deprecated,
 };
