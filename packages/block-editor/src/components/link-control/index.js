@@ -121,6 +121,7 @@ function LinkControl( {
 	createSuggestionButtonText,
 	hasRichPreviews = false,
 	hasTextControl = false,
+	children,
 } ) {
 	if ( withCreateSuggestion === undefined && createSuggestion ) {
 		withCreateSuggestion = true;
@@ -346,6 +347,7 @@ function LinkControl( {
 					/>
 				</div>
 			) }
+			{ children }
 		</div>
 	);
 }

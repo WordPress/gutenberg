@@ -7,7 +7,7 @@ import { escape } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { createBlock } from '@wordpress/blocks';
+import { createBlock, switchToBlockType } from '@wordpress/blocks';
 import { useSelect, useDispatch } from '@wordpress/data';
 import {
 	PanelBody,
@@ -324,9 +324,11 @@ export default function NavigationLinkEdit( {
 		hasDescendants,
 		userCanCreatePages,
 		userCanCreatePosts,
+		thisBlock,
 	} = useSelect(
 		( select ) => {
 			const {
+				getBlock,
 				getBlocks,
 				getBlockName,
 				getBlockRootClientId,
@@ -371,6 +373,7 @@ export default function NavigationLinkEdit( {
 					'create',
 					'posts'
 				),
+				thisBlock: getBlock( clientId ),
 			};
 		},
 		[ clientId ]
@@ -395,6 +398,37 @@ export default function NavigationLinkEdit( {
 			innerBlocks
 		);
 		replaceBlock( clientId, newSubmenu );
+	}
+
+	/**
+	 * Add transforms to Link Control
+	 */
+
+	function LinkControlTransforms( block ) {
+		const featuredTransforms = [
+			'core/site-logo',
+			'core/social-links',
+			'core/search',
+		];
+		return (
+			<>
+				{ featuredTransforms.map( ( item, index ) => {
+					return (
+						<button
+							key={ `transform-${ index }` }
+							onClick={ () =>
+								replaceBlock(
+									clientId,
+									switchToBlockType( block, item )
+								)
+							}
+						>
+							{ item }
+						</button>
+					);
+				} ) }
+			</>
+		);
 	}
 
 	useEffect( () => {
@@ -706,6 +740,11 @@ export default function NavigationLinkEdit( {
 									)
 								}
 								onRemove={ removeLink }
+								children={
+									<LinkControlTransforms
+										block={ thisBlock }
+									/>
+								}
 							/>
 						</Popover>
 					) }
