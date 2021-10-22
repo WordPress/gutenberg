@@ -112,7 +112,7 @@
 			}
 		}
 	}
-	//fix focus styling width when one row has fewer cells
+	// Fix focus styling width when one row has fewer cells.
 	&.has-single-cell .block-editor-list-view-block-contents:focus::after {
 		right: 0;
 	}
