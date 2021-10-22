@@ -13,6 +13,11 @@
  * @return string                Filtered block content.
  */
 function gutenberg_render_elements_support( $block_content, $block ) {
+
+	if ( ! $block_content ) {
+		return $block_content;
+	}
+
 	$link_color = null;
 	if ( ! empty( $block['attrs'] ) ) {
 		$link_color = _wp_array_get( $block['attrs'], array( 'style', 'elements', 'link', 'color', 'text' ), null );
