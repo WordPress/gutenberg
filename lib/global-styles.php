@@ -10,11 +10,11 @@
  * the corresponding stylesheet.
  *
  * @param WP_Theme_JSON_Gutenberg $tree  Input tree.
- * @param array                   $types Which styles to load. It accepts 'css_variables', 'block_classes', 'preset_classes'. By default, it'll load all.
+ * @param array                   $types Which styles to load. It accepts 'variables', 'styles', 'presets'. By default, it'll load all.
  *
  * @return string Stylesheet.
  */
-function gutenberg_experimental_global_styles_get_stylesheet( $tree, $types = array( 'css_variables', 'block_classes', 'preset_classes' ) ) {
+function gutenberg_experimental_global_styles_get_stylesheet( $tree, $types = array( 'variables', 'styles', 'presets' ) ) {
 	$origins             = array( 'core', 'theme', 'user' );
 	$supports_theme_json = WP_Theme_JSON_Resolver_Gutenberg::theme_has_support();
 	$supports_link_color = get_theme_support( 'experimental-link-color' );
@@ -111,12 +111,12 @@ function gutenberg_experimental_global_styles_settings( $settings ) {
 		$new_global_styles = array();
 		$new_presets       = array(
 			array(
-				'css'                     => 'css_variables',
+				'css'                     => 'variables',
 				'__unstableType'          => 'presets',
 				'__experimentalNoWrapper' => true,
 			),
 			array(
-				'css'            => 'preset_classes',
+				'css'            => 'presets',
 				'__unstableType' => 'presets',
 			),
 		);
@@ -129,7 +129,7 @@ function gutenberg_experimental_global_styles_settings( $settings ) {
 		}
 
 		$new_block_classes = array(
-			'css'            => 'block_classes',
+			'css'            => 'styles',
 			'__unstableType' => 'theme',
 		);
 		if ( WP_Theme_JSON_Resolver_Gutenberg::theme_has_support() ) {

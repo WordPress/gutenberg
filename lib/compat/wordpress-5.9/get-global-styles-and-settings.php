@@ -69,9 +69,9 @@ function gutenberg_get_global_styles( $path = array(), $block_name = '', $origin
  * Returns the stylesheet resulting of merging core, theme, and user data.
  *
  * @param array $types Types of styles to load. Optional.
- *                     It accepts 'css_variables', 'block_classes', 'preset_classes' as values.
+ *                     It accepts 'variables', 'styles', 'presets' as values.
  *                     If empty, it'll load all for themes with theme.json support
- *                     and only [ 'css_variables', 'preset_classes' ] for themes without theme.json support.
+ *                     and only [ 'variables', 'presets' ] for themes without theme.json support.
  *
  * @return string Stylesheet.
  */
@@ -96,9 +96,9 @@ function gutenberg_get_global_stylesheet( $types = array() ) {
 	$supports_theme_json = WP_Theme_JSON_Resolver_Gutenberg::theme_has_support();
 	$supports_link_color = get_theme_support( 'experimental-link-color' );
 	if ( empty( $types ) && ! $supports_theme_json ) {
-		$types = array( 'css_variables', 'preset_classes' );
+		$types = array( 'variables', 'presets' );
 	} elseif ( empty( $types ) ) {
-		$types = array( 'css_variables', 'block_classes', 'preset_classes' );
+		$types = array( 'variables', 'styles', 'presets' );
 	}
 
 	$origins = array( 'core', 'theme', 'user' );

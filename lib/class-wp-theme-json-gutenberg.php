@@ -1262,29 +1262,29 @@ class WP_Theme_JSON_Gutenberg {
 	 * the theme.json structure this object represents.
 	 *
 	 * @param array $types    Types of styles to load. Will load all by default. It accepts:
-	 *                         'css_variables': only CSS variables (presets & custom).
-	 *                         'block_classes': only block classes.
-	 *                         'preset_classes': only classes for presets.
+	 *                         'variables': only the CSS Custom Properties for presets & custom ones.
+	 *                         'styles': only the styles section in theme.json.
+	 *                         'presets': only the classes for the presets.
 	 * @param array $origins A list of origins to include. By default it includes 'core', 'theme', and 'user'.
 	 *
 	 * @return string Stylesheet.
 	 */
-	public function get_stylesheet( $types = array( 'css_variables', 'block_classes', 'preset_classes' ), $origins = self::VALID_ORIGINS ) {
+	public function get_stylesheet( $types = array( 'variables', 'styles', 'presets' ), $origins = self::VALID_ORIGINS ) {
 		$blocks_metadata = self::get_blocks_metadata();
 		$style_nodes     = self::get_style_nodes( $this->theme_json, $blocks_metadata );
 		$setting_nodes   = self::get_setting_nodes( $this->theme_json, $blocks_metadata );
 
 		$stylesheet = '';
 
-		if ( in_array( 'css_variables', $types, true ) ) {
+		if ( in_array( 'variables', $types, true ) ) {
 			$stylesheet .= $this->get_css_variables( $setting_nodes, $origins );
 		}
 
-		if ( in_array( 'block_classes', $types, true ) ) {
+		if ( in_array( 'styles', $types, true ) ) {
 			$stylesheet .= $this->get_block_classes( $style_nodes );
 		}
 
-		if ( in_array( 'preset_classes', $types, true ) ) {
+		if ( in_array( 'presets', $types, true ) ) {
 			$stylesheet .= $this->get_preset_classes( $setting_nodes, $origins );
 		}
 
