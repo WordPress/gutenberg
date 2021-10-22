@@ -390,19 +390,16 @@ add_action( 'admin_enqueue_scripts', 'gutenberg_add_block_menu_item_styles_to_na
  * Registers block editor 'wp_navigation' post type.
  */
 function gutenberg_register_navigation_post_type() {
-	// TODO - Some of the language here needs to be revised. 'Navigation' is a
-	// singular noun, so cannot comfortably be used in a plural form, which
-	// leads to a situation where something like 'menus' needs to be suffixed.
 	$labels = array(
-		'name'                  => __( 'Navigation Menu', 'gutenberg' ),
+		'name'                  => __( 'Navigation Menus', 'gutenberg' ),
 		'singular_name'         => __( 'Navigation Menu', 'gutenberg' ),
-		'menu_name'             => _x( 'Navigation Menu', 'Admin Menu text', 'gutenberg' ),
-		'add_new'               => _x( 'Add New', 'Navigation', 'gutenberg' ),
+		'menu_name'             => _x( 'Navigation Menus', 'Admin Menu text', 'gutenberg' ),
+		'add_new'               => _x( 'Add New', 'Navigation Menu', 'gutenberg' ),
 		'add_new_item'          => __( 'Add New Navigation Menu', 'gutenberg' ),
 		'new_item'              => __( 'New Navigation Menu', 'gutenberg' ),
 		'edit_item'             => __( 'Edit Navigation Menu', 'gutenberg' ),
 		'view_item'             => __( 'View Navigation Menu', 'gutenberg' ),
-		'all_items'             => __( 'All Navigation Menu', 'gutenberg' ),
+		'all_items'             => __( 'All Navigation Menus', 'gutenberg' ),
 		'search_items'          => __( 'Search Navigation Menus', 'gutenberg' ),
 		'parent_item_colon'     => __( 'Parent Navigation Menu:', 'gutenberg' ),
 		'not_found'             => __( 'No Navigation Menu found.', 'gutenberg' ),
@@ -421,7 +418,7 @@ function gutenberg_register_navigation_post_type() {
 		'description'           => __( 'Navigation menus.', 'gutenberg' ),
 		'public'                => false,
 		'has_archive'           => false,
-		'show_ui'               => false,
+		'show_ui'               => true,
 		'show_in_menu'          => 'themes.php',
 		'show_in_admin_bar'     => false,
 		'show_in_rest'          => true,
@@ -430,7 +427,6 @@ function gutenberg_register_navigation_post_type() {
 		'rest_controller_class' => 'WP_REST_Posts_Controller',
 		'supports'              => array(
 			'title',
-			'editor',
 			'revisions',
 		),
 	);
