@@ -6,6 +6,7 @@ Starting in WordPress 5.8 release, we encourage using the `block.json` metadata 
 
 ```json
 {
+	"$schema": "https://json.schemastore.org/block.json",
 	"apiVersion": 2,
 	"name": "my-plugin/notice",
 	"title": "Notice",
@@ -54,7 +55,13 @@ From a performance perspective, when themes support lazy loading assets, blocks 
 
 Furthermore, because the [Block Type REST API Endpoint](https://developer.wordpress.org/rest-api/reference/block-types/) can only list blocks registered on the server, registering blocks server-side is recommended; using the `block.json` file simplifies this registration.
 
-Last, but not least, the [WordPress Plugins Directory](https://wordpress.org/plugins/) can detect `block.json` files, highlight blocks included in plugins, and extract their metadata. If you wish to [submit your block(s) to the Block Directory](/docs/getting-started/tutorials/create-block/submitting-to-block-directory.md), all blocks contained in your plugin must have a `block.json` file for the Block Directory to recognize them.
+The [WordPress Plugins Directory](https://wordpress.org/plugins/) can detect `block.json` files, highlight blocks included in plugins, and extract their metadata. If you wish to [submit your block(s) to the Block Directory](/docs/getting-started/tutorials/create-block/submitting-to-block-directory.md), all blocks contained in your plugin must have a `block.json` file for the Block Directory to recognize them.
+
+Development is improved by using a defined schema definition file. Supported editors can provide help like tooltips, autocomplete, and schema validation. To use the schema, add the following to the top of the `block.json`.
+
+```json
+"$schema": "https://json.schemastore.org/block.json"
+```
 
 ## Block registration
 
