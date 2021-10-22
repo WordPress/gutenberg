@@ -22,11 +22,16 @@ import {
 	ToggleControl,
 	DateTimePicker,
 	PanelBody,
-	CustomSelectControl,
 } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
 import { edit } from '@wordpress/icons';
 import { DOWN } from '@wordpress/keycodes';
+
+/**
+ * Internal dependencies
+ */
+import DateFormatControls from './date-format-controls';
+import { useDateFormat } from './util';
 
 export default function PostDateEdit( {
 	attributes: { textAlign, format, isLink },
@@ -34,7 +39,6 @@ export default function PostDateEdit( {
 	setAttributes,
 } ) {
 	const isDescendentOfQueryLoop = !! queryId;
-	const [ siteFormat ] = useEntityProp( 'root', 'site', 'date_format' );
 	const [ date, setDate ] = useEntityProp(
 		'postType',
 		postType,
@@ -52,13 +56,7 @@ export default function PostDateEdit( {
 			.reverse()
 			.join( '' ) // Reverse the string and test for "a" not followed by a slash.
 	);
-	const formatOptions = Object.values( settings.formats ).map(
-		( formatOption ) => ( {
-			key: formatOption,
-			name: dateI18n( formatOption, date ),
-		} )
-	);
-	const resolvedFormat = format || siteFormat || settings.formats.date;
+	const resolvedFormat = useDateFormat( format );
 	const blockProps = useBlockProps( {
 		className: classnames( {
 			[ `has-text-align-${ textAlign }` ]: textAlign,
@@ -129,18 +127,12 @@ export default function PostDateEdit( {
 
 			<InspectorControls>
 				<PanelBody title={ __( 'Format settings' ) }>
-					<CustomSelectControl
-						hideLabelFromVision
-						label={ __( 'Date Format' ) }
-						options={ formatOptions }
-						onChange={ ( { selectedItem } ) =>
-							setAttributes( {
-								format: selectedItem.key,
-							} )
+					<DateFormatControls
+						format={ format }
+						date={ date }
+						setFormat={ ( newFormat ) =>
+							setAttributes( { format: newFormat } )
 						}
-						value={ formatOptions.find(
-							( option ) => option.key === resolvedFormat
-						) }
 					/>
 				</PanelBody>
 				<PanelBody title={ __( 'Link settings' ) }>

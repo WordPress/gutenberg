@@ -2,14 +2,16 @@
  * WordPress dependencies
  */
 import { useEntityProp } from '@wordpress/core-data';
-import { __experimentalGetSettings, dateI18n } from '@wordpress/date';
+import { dateI18n } from '@wordpress/date';
 import { InspectorControls, useBlockProps } from '@wordpress/block-editor';
-import {
-	PanelBody,
-	CustomSelectControl,
-	ToggleControl,
-} from '@wordpress/components';
+import { PanelBody, ToggleControl } from '@wordpress/components';
 import { __, _x } from '@wordpress/i18n';
+
+/**
+ * Internal dependencies
+ */
+import DateFormatControls from '../post-date/date-format-controls';
+import { useDateFormat } from '../post-date/util';
 
 /**
  * Renders the `core/post-comment-date` block on the editor.
@@ -32,32 +34,17 @@ export default function Edit( {
 } ) {
 	const blockProps = useBlockProps( { className } );
 	const [ date ] = useEntityProp( 'root', 'comment', 'date', commentId );
-	const [ siteDateFormat ] = useEntityProp( 'root', 'site', 'date_format' );
-
-	const settings = __experimentalGetSettings();
-	const formatOptions = Object.values( settings.formats ).map(
-		( formatOption ) => ( {
-			key: formatOption,
-			name: dateI18n( formatOption, date || new Date() ),
-		} )
-	);
-	const resolvedFormat = format || siteDateFormat || settings.formats.date;
+	const resolvedFormat = useDateFormat( format );
 
 	const inspectorControls = (
 		<InspectorControls>
 			<PanelBody title={ __( 'Format settings' ) }>
-				<CustomSelectControl
-					hideLabelFromVision
-					label={ __( 'Date Format' ) }
-					options={ formatOptions }
-					onChange={ ( { selectedItem } ) =>
-						setAttributes( {
-							format: selectedItem.key,
-						} )
+				<DateFormatControls
+					format={ format }
+					date={ date }
+					setFormat={ ( newFormat ) =>
+						setAttributes( { format: newFormat } )
 					}
-					value={ formatOptions.find(
-						( option ) => option.key === resolvedFormat
-					) }
 				/>
 			</PanelBody>
 			<PanelBody title={ __( 'Link settings' ) }>
