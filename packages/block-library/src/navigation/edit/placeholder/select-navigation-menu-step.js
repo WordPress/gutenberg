@@ -18,11 +18,11 @@ import { navigation as navigationIcon } from '@wordpress/icons';
  * Internal dependencies
  */
 import PlaceholderPreview from './placeholder-preview';
-import NavigationPostMenu from '../navigation-post-menu';
+import NavigationMenuSelector from '../navigation-menu-selector';
 
-export default function SelectNavigationPostStep( {
-	canSwitchNavigationPost,
-	hasResolvedNavigationPosts,
+export default function SelectNavigationMenuStep( {
+	canSwitchNavigationMenu,
+	hasResolvedNavigationMenu,
 	onCreateNew,
 	onSelectExisting,
 } ) {
@@ -33,20 +33,20 @@ export default function SelectNavigationPostStep( {
 
 	return (
 		<>
-			{ ! hasResolvedNavigationPosts && <PlaceholderPreview isLoading /> }
-			{ hasResolvedNavigationPosts && (
+			{ ! hasResolvedNavigationMenu && <PlaceholderPreview isLoading /> }
+			{ hasResolvedNavigationMenu && (
 				<Placeholder
 					icon={ navigationIcon }
 					label={ __( 'Navigation' ) }
 					instructions={
-						canSwitchNavigationPost
+						canSwitchNavigationMenu
 							? __(
-									'Choose an existing menu or create a new one.'
+									'Choose an existing navigation menu or create a new one.'
 							  )
-							: __( 'Create a new menu.' )
+							: __( 'New navigation menu.' )
 					}
 				>
-					{ canSwitchNavigationPost && (
+					{ canSwitchNavigationMenu && (
 						<Dropdown
 							contentClassName="wp-block-template-part__placeholder-preview-dropdown-content"
 							position="bottom right left"
@@ -60,7 +60,7 @@ export default function SelectNavigationPostStep( {
 								</Button>
 							) }
 							renderContent={ ( { onClose } ) => (
-								<NavigationPostMenu
+								<NavigationMenuSelector
 									onSelect={ onSelectExisting }
 									onClose={ onClose }
 								/>
@@ -69,7 +69,7 @@ export default function SelectNavigationPostStep( {
 					) }
 					<Button
 						variant={
-							canSwitchNavigationPost ? 'tertiary' : 'primary'
+							canSwitchNavigationMenu ? 'tertiary' : 'primary'
 						}
 						onClick={ () => {
 							setIsNewMenuModalVisible( true );
@@ -81,7 +81,7 @@ export default function SelectNavigationPostStep( {
 			) }
 			{ isNewMenuModalVisible && (
 				<Modal
-					title={ __( 'Name and create your new menu' ) }
+					title={ __( 'Create your new navigation menu' ) }
 					closeLabel={ __( 'Cancel' ) }
 					onRequestClose={ () => {
 						setIsNewMenuModalVisible( false );

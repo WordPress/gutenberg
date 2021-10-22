@@ -5,7 +5,7 @@ import { TextControl } from '@wordpress/components';
 import { useEntityProp } from '@wordpress/core-data';
 import { __ } from '@wordpress/i18n';
 
-export default function NavigationPostTitleControl() {
+export default function NavigationMenuNameControl() {
 	const [ title, updateTitle ] = useEntityProp(
 		'postType',
 		'wp_navigation',
