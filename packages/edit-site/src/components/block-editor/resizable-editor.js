@@ -137,7 +137,7 @@ function ResizableEditor( { enableResizing, settings, ...props } ) {
 					<>
 						<EditorStyles styles={ settings.styles } />
 						<style>
-							{ `html { background: repeating-conic-gradient(#000 0% 25%, #333 0% 50%) 50%/ 40px 40px; }
+							{ `html { background: repeating-conic-gradient(#1e1e1e 0% 25%, #2c2c2c 0% 50%) 50%/ 20px 20px; border: 1px solid #1e1e1e; border-radius: 2px; }
 body { display: inline-block; width: 100%; }` }
 						</style>
 					</>
