@@ -158,6 +158,8 @@ function render_block_core_navigation_link( $attributes, $content, $block ) {
 		$css_classes .= ' ' . $class_name;
 	}
 
+	$aria_current = $is_active ? ' aria-current="page"' : '';
+
 	$wrapper_attributes = get_block_wrapper_attributes(
 		array(
 			'class' => $css_classes . ' wp-block-navigation-item' . ( $has_submenu ? ' has-child' : '' ) .
@@ -165,7 +167,7 @@ function render_block_core_navigation_link( $attributes, $content, $block ) {
 			'style' => $style_attribute,
 		)
 	);
-	$html               = '<li ' . $wrapper_attributes . '>' .
+	$html               = '<li ' . $wrapper_attributes . $aria_current . '>' .
 		'<a class="wp-block-navigation-item__content" ';
 
 	// Start appending HTML attributes to anchor tag.
