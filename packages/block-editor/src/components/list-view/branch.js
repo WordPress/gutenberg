@@ -6,7 +6,7 @@ import { compact } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { Fragment } from '@wordpress/element';
+import { Fragment, memo } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -46,7 +46,7 @@ const countReducer = ( expandedState, draggedClientIds ) => (
 	return count + 1;
 };
 
-export default function ListViewBranch( props ) {
+function ListViewBranch( props ) {
 	const {
 		blocks,
 		selectBlock,
@@ -82,6 +82,7 @@ export default function ListViewBranch( props ) {
 		}
 
 		const usesWindowing = __experimentalPersistentListViewFeatures;
+
 		const {
 			start,
 			end,
@@ -162,3 +163,5 @@ export default function ListViewBranch( props ) {
 ListViewBranch.defaultProps = {
 	selectBlock: () => {},
 };
+
+export default memo( ListViewBranch );

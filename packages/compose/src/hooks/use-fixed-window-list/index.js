@@ -81,18 +81,28 @@ export default function useFixedWindowList(
 				totalItems - 1,
 				start + visibleItems + windowOverscan
 			);
-			setFixedListWindow( {
-				visibleItems,
-				start,
-				end,
-				itemInView: ( index ) => {
-					return start <= index && index <= end;
-				},
-				startPadding: itemHeight * start,
-				endPadding:
-					totalItems > end
-						? itemHeight * ( totalItems - end - 1 )
-						: 0,
+			setFixedListWindow( ( lastWindow ) => {
+				const nextWindow = {
+					visibleItems,
+					start,
+					end,
+					itemInView: ( /** @type {number} */ index ) => {
+						return start <= index && index <= end;
+					},
+					startPadding: itemHeight * start,
+					endPadding:
+						totalItems > end
+							? itemHeight * ( totalItems - end - 1 )
+							: 0,
+				};
+				if (
+					lastWindow.start !== nextWindow.start ||
+					lastWindow.end !== nextWindow.end ||
+					lastWindow.visibleItems !== nextWindow.visibleItems
+				) {
+					return nextWindow;
+				}
+				return lastWindow;
 			} );
 		};
 		const handleKeyDown = ( /** @type {KeyboardEvent} */ event ) => {

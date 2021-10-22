@@ -107,7 +107,6 @@ function ListView(
 		36,
 		visibleBlockCount,
 		{
-			windowOverscan: 1,
 			useWindowing: __experimentalPersistentListViewFeatures,
 		}
 	);
