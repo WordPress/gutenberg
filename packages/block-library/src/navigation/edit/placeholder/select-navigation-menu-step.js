@@ -3,15 +3,7 @@
  */
 import { __ } from '@wordpress/i18n';
 import { useState } from '@wordpress/element';
-import {
-	Button,
-	Dropdown,
-	Flex,
-	FlexItem,
-	Modal,
-	Placeholder,
-	TextControl,
-} from '@wordpress/components';
+import { Button, Dropdown, Placeholder } from '@wordpress/components';
 import { navigation as navigationIcon } from '@wordpress/icons';
 
 /**
@@ -19,6 +11,7 @@ import { navigation as navigationIcon } from '@wordpress/icons';
  */
 import PlaceholderPreview from './placeholder-preview';
 import NavigationMenuSelector from '../navigation-menu-selector';
+import NavigationMenuNameModal from '../navigation-menu-name-modal';
 
 export default function SelectNavigationMenuStep( {
 	canSwitchNavigationMenu,
@@ -29,7 +22,6 @@ export default function SelectNavigationMenuStep( {
 	const [ isNewMenuModalVisible, setIsNewMenuModalVisible ] = useState(
 		false
 	);
-	const [ title, setTitle ] = useState( __( 'Untitled Menu' ) );
 
 	return (
 		<>
@@ -80,52 +72,13 @@ export default function SelectNavigationMenuStep( {
 				</Placeholder>
 			) }
 			{ isNewMenuModalVisible && (
-				<Modal
+				<NavigationMenuNameModal
 					title={ __( 'Create your new navigation menu' ) }
-					closeLabel={ __( 'Cancel' ) }
 					onRequestClose={ () => {
 						setIsNewMenuModalVisible( false );
 					} }
-					overlayClassName="wp-block-template-part__placeholder-create-new__title-form"
-				>
-					<form
-						onSubmit={ ( event ) => {
-							event.preventDefault();
-							onCreateNew( title );
-						} }
-					>
-						<TextControl
-							label={ __( 'Name' ) }
-							value={ title }
-							onChange={ setTitle }
-						/>
-						<Flex
-							className="wp-block-template-part__placeholder-create-new__title-form-actions"
-							justify="flex-end"
-						>
-							<FlexItem>
-								<Button
-									variant="secondary"
-									onClick={ () => {
-										setIsNewMenuModalVisible( false );
-									} }
-								>
-									{ __( 'Cancel' ) }
-								</Button>
-							</FlexItem>
-							<FlexItem>
-								<Button
-									variant="primary"
-									type="submit"
-									disabled={ ! title.length }
-									aria-disabled={ ! title.length }
-								>
-									{ __( 'Create' ) }
-								</Button>
-							</FlexItem>
-						</Flex>
-					</form>
-				</Modal>
+					onFinish={ onCreateNew }
+				/>
 			) }
 		</>
 	);
