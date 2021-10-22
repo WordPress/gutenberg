@@ -33,7 +33,7 @@ import { __, sprintf } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
-import useBlockNavigator from '../use-block-navigator';
+import useListViewModal from './use-list-view-modal';
 import useNavigationPost from '../use-navigation-post';
 import Placeholder from './placeholder';
 import ResponsiveWrapper from './responsive-wrapper';
@@ -127,7 +127,7 @@ function Navigation( {
 
 	const navRef = useRef();
 
-	const { navigatorToolbarButton, navigatorModal } = useBlockNavigator(
+	const { listViewToolbarButton, listViewModal } = useListViewModal(
 		clientId
 	);
 
@@ -242,9 +242,9 @@ function Navigation( {
 						} }
 					/>
 				) }
-				<ToolbarGroup>{ navigatorToolbarButton }</ToolbarGroup>
+				<ToolbarGroup>{ listViewToolbarButton }</ToolbarGroup>
 			</BlockControls>
-			{ navigatorModal }
+			{ listViewModal }
 			<InspectorControls>
 				{ hasSubmenuIndicatorSetting && (
 					<PanelBody title={ __( 'Display' ) }>
