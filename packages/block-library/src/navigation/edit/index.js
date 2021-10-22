@@ -20,6 +20,7 @@ import {
 	getColorClassName,
 	Warning,
 } from '@wordpress/block-editor';
+import { EntityProvider } from '@wordpress/core-data';
 import { useDispatch, useSelect } from '@wordpress/data';
 import {
 	PanelBody,
@@ -40,6 +41,7 @@ import Placeholder from './placeholder';
 import ResponsiveWrapper from './responsive-wrapper';
 import NavigationInnerBlocks from './inner-blocks';
 import NavigationPostMenu from './navigation-post-menu';
+import NavigationPostTitleControl from './navigation-post-title-control';
 
 function getComputedStyle( node ) {
 	return node.ownerDocument.defaultView.getComputedStyle( node );
@@ -227,179 +229,190 @@ function Navigation( {
 			: [ 'left', 'center', 'right', 'space-between' ];
 
 	return (
-		<RecursionProvider>
-			<BlockControls>
-				{ hasItemJustificationControls && (
-					<JustifyToolbar
-						value={ itemsJustification }
-						allowedControls={ justifyAllowedControls }
-						onChange={ ( value ) =>
-							setAttributes( { itemsJustification: value } )
-						}
-						popoverProps={ {
-							position: 'bottom right',
-							isAlternate: true,
-						} }
-					/>
-				) }
-				<ToolbarGroup>
-					{ isEntityAvailable && (
-						<ToolbarDropdownMenu
-							label={ __( 'Select Navigation' ) }
-							text={ __( 'Select Navigation' ) }
-							icon={ null }
-						>
-							{ ( { onClose } ) => (
-								<NavigationPostMenu
-									onSelect={ ( { id } ) => {
-										setAttributes( {
-											navigationPostId: id,
-										} );
-										onClose();
-									} }
-									navigationPostId={ navigationPostId }
-								/>
-							) }
-						</ToolbarDropdownMenu>
-					) }
-				</ToolbarGroup>
-				<ToolbarGroup>{ listViewToolbarButton }</ToolbarGroup>
-			</BlockControls>
-			{ listViewModal }
-			<InspectorControls>
-				{ hasSubmenuIndicatorSetting && (
-					<PanelBody title={ __( 'Display' ) }>
-						<h3>{ __( 'Overlay Menu' ) }</h3>
-						<ToggleGroupControl
-							label={ __( 'Configure overlay menu' ) }
-							value={ overlayMenu }
-							help={ __(
-								'Collapses the navigation options in a menu icon opening an overlay.'
-							) }
+		<EntityProvider
+			kind="postType"
+			type="wp_navigation"
+			id={ navigationPostId }
+		>
+			<RecursionProvider>
+				<BlockControls>
+					<ToolbarGroup>
+						{ isEntityAvailable && (
+							<ToolbarDropdownMenu
+								label={ __( 'Select Navigation' ) }
+								text={ __( 'Select Navigation' ) }
+								icon={ null }
+							>
+								{ ( { onClose } ) => (
+									<NavigationPostMenu
+										onSelect={ ( { id } ) => {
+											setAttributes( {
+												navigationPostId: id,
+											} );
+											onClose();
+										} }
+									/>
+								) }
+							</ToolbarDropdownMenu>
+						) }
+					</ToolbarGroup>
+					{ hasItemJustificationControls && (
+						<JustifyToolbar
+							value={ itemsJustification }
+							allowedControls={ justifyAllowedControls }
 							onChange={ ( value ) =>
-								setAttributes( { overlayMenu: value } )
+								setAttributes( { itemsJustification: value } )
 							}
-							isBlock
-							hideLabelFromVision
-						>
-							<ToggleGroupControlOption
-								value="never"
-								label={ __( 'Off' ) }
-							/>
-							<ToggleGroupControlOption
-								value="mobile"
-								label={ __( 'Mobile' ) }
-							/>
-							<ToggleGroupControlOption
-								value="always"
-								label={ __( 'Always' ) }
-							/>
-						</ToggleGroupControl>
-						<h3>{ __( 'Submenus' ) }</h3>
-						<ToggleControl
-							checked={ openSubmenusOnClick }
-							onChange={ ( value ) => {
-								setAttributes( {
-									openSubmenusOnClick: value,
-								} );
+							popoverProps={ {
+								position: 'bottom right',
+								isAlternate: true,
 							} }
-							label={ __( 'Open on click' ) }
 						/>
-						{ ! attributes.openSubmenusOnClick && (
+					) }
+					<ToolbarGroup>{ listViewToolbarButton }</ToolbarGroup>
+				</BlockControls>
+				{ listViewModal }
+				<InspectorControls>
+					{ isEntityAvailable && (
+						<PanelBody title={ __( 'Navigation name' ) }>
+							<NavigationPostTitleControl />
+						</PanelBody>
+					) }
+					{ hasSubmenuIndicatorSetting && (
+						<PanelBody title={ __( 'Display' ) }>
+							<h3>{ __( 'Overlay Menu' ) }</h3>
+							<ToggleGroupControl
+								label={ __( 'Configure overlay menu' ) }
+								value={ overlayMenu }
+								help={ __(
+									'Collapses the navigation options in a menu icon opening an overlay.'
+								) }
+								onChange={ ( value ) =>
+									setAttributes( { overlayMenu: value } )
+								}
+								isBlock
+								hideLabelFromVision
+							>
+								<ToggleGroupControlOption
+									value="never"
+									label={ __( 'Off' ) }
+								/>
+								<ToggleGroupControlOption
+									value="mobile"
+									label={ __( 'Mobile' ) }
+								/>
+								<ToggleGroupControlOption
+									value="always"
+									label={ __( 'Always' ) }
+								/>
+							</ToggleGroupControl>
+							<h3>{ __( 'Submenus' ) }</h3>
 							<ToggleControl
-								checked={ showSubmenuIcon }
+								checked={ openSubmenusOnClick }
 								onChange={ ( value ) => {
 									setAttributes( {
-										showSubmenuIcon: value,
+										openSubmenusOnClick: value,
 									} );
 								} }
-								label={ __( 'Show icons' ) }
+								label={ __( 'Open on click' ) }
 							/>
-						) }
-					</PanelBody>
-				) }
-				{ hasColorSettings && (
-					<PanelColorSettings
-						title={ __( 'Color' ) }
-						initialOpen={ false }
-						colorSettings={ [
-							{
-								value: textColor.color,
-								onChange: setTextColor,
-								label: __( 'Text' ),
-							},
-							{
-								value: backgroundColor.color,
-								onChange: setBackgroundColor,
-								label: __( 'Background' ),
-							},
-							{
-								value: overlayTextColor.color,
-								onChange: setOverlayTextColor,
-								label: __( 'Overlay text' ),
-							},
-							{
-								value: overlayBackgroundColor.color,
-								onChange: setOverlayBackgroundColor,
-								label: __( 'Overlay background' ),
-							},
-						] }
-					>
-						{ enableContrastChecking && (
-							<>
-								<ContrastChecker
-									backgroundColor={ detectedBackgroundColor }
-									textColor={ detectedColor }
+							{ ! attributes.openSubmenusOnClick && (
+								<ToggleControl
+									checked={ showSubmenuIcon }
+									onChange={ ( value ) => {
+										setAttributes( {
+											showSubmenuIcon: value,
+										} );
+									} }
+									label={ __( 'Show icons' ) }
 								/>
-								<ContrastChecker
-									backgroundColor={
-										detectedOverlayBackgroundColor
-									}
-									textColor={ detectedOverlayColor }
-								/>
-							</>
-						) }
-					</PanelColorSettings>
-				) }
-			</InspectorControls>
-			<nav { ...blockProps }>
-				{ ! isEntityAvailable && isPlaceholderShown && (
-					<PlaceholderComponent
-						onFinish={ ( post ) => {
-							setIsPlaceholderShown( false );
-							setAttributes( {
-								navigationPostId: post.id,
-							} );
-							selectBlock( clientId );
-						} }
-						canSwitchNavigationPost={ canSwitchNavigationPost }
-						hasResolvedNavigationPosts={
-							hasResolvedNavigationPosts
-						}
-					/>
-				) }
-				<ResponsiveWrapper
-					id={ clientId }
-					onToggle={ setResponsiveMenuVisibility }
-					isOpen={ isResponsiveMenuOpen }
-					isResponsive={ 'never' !== overlayMenu }
-					isHiddenByDefault={ 'always' === overlayMenu }
-				>
-					{ isEntityAvailable && (
-						<NavigationInnerBlocks
-							isVisible={
-								hasExistingNavItems || ! isPlaceholderShown
+							) }
+						</PanelBody>
+					) }
+					{ hasColorSettings && (
+						<PanelColorSettings
+							title={ __( 'Color' ) }
+							initialOpen={ false }
+							colorSettings={ [
+								{
+									value: textColor.color,
+									onChange: setTextColor,
+									label: __( 'Text' ),
+								},
+								{
+									value: backgroundColor.color,
+									onChange: setBackgroundColor,
+									label: __( 'Background' ),
+								},
+								{
+									value: overlayTextColor.color,
+									onChange: setOverlayTextColor,
+									label: __( 'Overlay text' ),
+								},
+								{
+									value: overlayBackgroundColor.color,
+									onChange: setOverlayBackgroundColor,
+									label: __( 'Overlay background' ),
+								},
+							] }
+						>
+							{ enableContrastChecking && (
+								<>
+									<ContrastChecker
+										backgroundColor={
+											detectedBackgroundColor
+										}
+										textColor={ detectedColor }
+									/>
+									<ContrastChecker
+										backgroundColor={
+											detectedOverlayBackgroundColor
+										}
+										textColor={ detectedOverlayColor }
+									/>
+								</>
+							) }
+						</PanelColorSettings>
+					) }
+				</InspectorControls>
+				<nav { ...blockProps }>
+					{ ! isEntityAvailable && isPlaceholderShown && (
+						<PlaceholderComponent
+							onFinish={ ( post ) => {
+								setIsPlaceholderShown( false );
+								setAttributes( {
+									navigationPostId: post.id,
+								} );
+								selectBlock( clientId );
+							} }
+							canSwitchNavigationPost={ canSwitchNavigationPost }
+							hasResolvedNavigationPosts={
+								hasResolvedNavigationPosts
 							}
-							navigationPostId={ navigationPostId }
-							clientId={ clientId }
-							appender={ CustomAppender }
-							hasCustomPlaceholder={ !! CustomPlaceholder }
-							orientation={ orientation }
 						/>
 					) }
-				</ResponsiveWrapper>
-			</nav>
-		</RecursionProvider>
+					<ResponsiveWrapper
+						id={ clientId }
+						onToggle={ setResponsiveMenuVisibility }
+						isOpen={ isResponsiveMenuOpen }
+						isResponsive={ 'never' !== overlayMenu }
+						isHiddenByDefault={ 'always' === overlayMenu }
+					>
+						{ isEntityAvailable && (
+							<NavigationInnerBlocks
+								isVisible={
+									hasExistingNavItems || ! isPlaceholderShown
+								}
+								clientId={ clientId }
+								appender={ CustomAppender }
+								hasCustomPlaceholder={ !! CustomPlaceholder }
+								orientation={ orientation }
+							/>
+						) }
+					</ResponsiveWrapper>
+				</nav>
+			</RecursionProvider>
+		</EntityProvider>
 	);
 }
 

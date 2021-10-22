@@ -36,7 +36,6 @@ const LAYOUT = {
 
 export default function NavigationInnerBlocks( {
 	isVisible,
-	navigationPostId: id,
 	clientId,
 	appender: CustomAppender,
 	hasCustomPlaceholder,
@@ -74,8 +73,7 @@ export default function NavigationInnerBlocks( {
 
 	const [ blocks, onInput, onChange ] = useEntityBlockEditor(
 		'postType',
-		'wp_navigation',
-		{ id }
+		'wp_navigation'
 	);
 
 	const shouldDirectInsert = useMemo(
