@@ -4,16 +4,14 @@
 import stripHTML from '../strip-html';
 
 describe( 'stripHTML', () => {
-	it( 'should strip valid HTML', () => {
-		const input =
-			'<strong>Here is some text</strong> that contains <em>HTML markup</em>.';
+	it( 'should strip valid HTML, scripts and on attributes', () => {
+		const input = `<strong onClick="alert('and on attributes')">Here is some text</strong> that contains <em>HTML markup</em><script>alert("and scripts")</script>.`;
 		const output = 'Here is some text that contains HTML markup.';
 		expect( stripHTML( input ) ).toBe( output );
 	} );
 
-	it( 'should strip invalid HTML', () => {
-		const input =
-			'<strong>Here is some text</em> <p></div>that contains HTML markup</p>.';
+	it( 'should strip invalid HTML, scripts and on attributes', () => {
+		const input = `<strong onClick="alert('and on attributes')">Here is some text</em> <p></div>that contains HTML markup</p><script>alert("and scripts")</script>.`;
 		const output = 'Here is some text that contains HTML markup.';
 		expect( stripHTML( input ) ).toBe( output );
 	} );
