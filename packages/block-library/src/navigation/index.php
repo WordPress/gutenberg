@@ -243,9 +243,9 @@ function render_block_core_navigation( $attributes, $content, $block ) {
 	}
 
 	// Load inner blocks from the navigation post.
-	if ( empty( $inner_blocks ) && array_key_exists( 'navigationPostId', $attributes ) ) {
-		$navigation_post = get_post( $attributes['navigationPostId'] );
-		if ( isset( $navigation_post ) ) {
+	if ( array_key_exists( 'navigationMenuId', $attributes ) ) {
+		$navigation_post = get_post( $attributes['navigationMenuId'] );
+		if ( ! isset( $navigation_post ) ) {
 			return '';
 		}
 
