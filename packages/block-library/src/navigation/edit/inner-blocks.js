@@ -29,14 +29,6 @@ const ALLOWED_BLOCKS = [
 
 const DEFAULT_BLOCK = [ 'core/navigation-link' ];
 
-const DIRECT_INSERT = ( block ) => {
-	return block.innerBlocks.every(
-		( { name } ) =>
-			name === 'core/navigation-link' ||
-			name === 'core/navigation-submenu'
-	);
-};
-
 const LAYOUT = {
 	type: 'default',
 	alignments: [],
@@ -86,6 +78,16 @@ export default function NavigationInnerBlocks( {
 		{ id }
 	);
 
+	const shouldDirectInsert = useMemo(
+		() =>
+			blocks.every(
+				( { name } ) =>
+					name === 'core/navigation-link' ||
+					name === 'core/navigation-submenu'
+			),
+		[ blocks ]
+	);
+
 	// When the block is selected itself or has a top level item selected that
 	// doesn't itself have children, show the standard appender. Else show no
 	// appender.
@@ -106,7 +108,7 @@ export default function NavigationInnerBlocks( {
 			onChange,
 			allowedBlocks: ALLOWED_BLOCKS,
 			__experimentalDefaultBlock: DEFAULT_BLOCK,
-			__experimentalDirectInsert: DIRECT_INSERT,
+			__experimentalDirectInsert: shouldDirectInsert,
 			orientation,
 			renderAppender: CustomAppender || appender,
 
