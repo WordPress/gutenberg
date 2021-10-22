@@ -102,7 +102,7 @@ function usePagesByParentId() {
 			} );
 
 			// TODO: Once the REST API supports passing multiple values to
-			// 'orderby', this an be removed.
+			// 'orderby', this can be removed.
 			// https://core.trac.wordpress.org/ticket/39037
 			pages = sortBy( pages, [ 'menu_order', 'title.rendered' ] );
 
