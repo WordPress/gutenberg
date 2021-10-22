@@ -115,32 +115,13 @@ export default {
 				? `
 					${ appendSelectors( selector, '> *' ) } {
 						max-width: ${ contentSize ?? wideSize };
-						margin-left: auto !important;
-						margin-right: auto !important;
 					}
 
 					${ appendSelectors( selector, '> [data-align="wide"]' ) }  {
 						max-width: ${ wideSize ?? contentSize };
 					}
-
-					${ appendSelectors( selector, '> [data-align="full"]' ) } {
-						max-width: none;
-					}
 				`
 				: '';
-
-		style += `
-			${ appendSelectors( selector, '> [data-align="left"]' ) } {
-				float: left;
-				margin-right: 2em;
-			}
-
-			${ appendSelectors( selector, '> [data-align="right"]' ) } {
-				float: right;
-				margin-left: 2em;
-			}
-
-		`;
 
 		if ( hasBlockGapStylesSupport ) {
 			style += `

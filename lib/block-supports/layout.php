@@ -54,16 +54,11 @@ function gutenberg_get_layout_style( $selector, $layout, $has_block_gap_support 
 		if ( $content_size || $wide_size ) {
 			$style  = "$selector > * {";
 			$style .= 'max-width: ' . esc_html( $all_max_width_value ) . ';';
-			$style .= 'margin-left: auto !important;';
-			$style .= 'margin-right: auto !important;';
 			$style .= '}';
 
 			$style .= "$selector > .alignwide { max-width: " . esc_html( $wide_max_width_value ) . ';}';
-			$style .= "$selector .alignfull { max-width: none; }";
 		}
 
-		$style .= "$selector .alignleft { float: left; margin-right: 2em; }";
-		$style .= "$selector .alignright { float: right; margin-left: 2em; }";
 		if ( $has_block_gap_support ) {
 			$style .= "$selector > * { margin-top: 0; margin-bottom: 0; }";
 			$style .= "$selector > * + * { margin-top: var( --wp--style--block-gap ); margin-bottom: 0; }";
@@ -76,15 +71,12 @@ function gutenberg_get_layout_style( $selector, $layout, $has_block_gap_support 
 			'space-between' => 'space-between',
 		);
 
-		$style  = "$selector {";
-		$style .= 'display: flex;';
+		$style = "$selector {";
 		if ( $has_block_gap_support ) {
 			$style .= 'gap: var( --wp--style--block-gap, 0.5em );';
 		} else {
 			$style .= 'gap: 0.5em;';
 		}
-		$style .= 'flex-wrap: wrap;';
-		$style .= 'align-items: center;';
 		/**
 		 * Add this style only if is not empty for backwards compatibility,
 		 * since we intend to convert blocks that had flex layout implemented
@@ -94,8 +86,6 @@ function gutenberg_get_layout_style( $selector, $layout, $has_block_gap_support 
 			$style .= "justify-content: {$justify_content_options[ $layout['justifyContent'] ]};";
 		}
 		$style .= '}';
-
-		$style .= "$selector > * { margin: 0; }";
 	}
 
 	return $style;
@@ -128,13 +118,14 @@ function gutenberg_render_layout_support_flag( $block_content, $block ) {
 		$used_layout = $default_layout;
 	}
 
-	$id    = uniqid();
-	$style = gutenberg_get_layout_style( ".wp-container-$id", $used_layout, $has_block_gap_support );
+	$id          = uniqid();
+	$style       = gutenberg_get_layout_style( ".wp-container-$id", $used_layout, $has_block_gap_support );
+	$layout_type = isset( $used_layout['type'] ) ? $used_layout['type'] : 'default';
 	// This assumes the hook only applies to blocks with a single wrapper.
 	// I think this is a reasonable limitation for that particular hook.
 	$content = preg_replace(
 		'/' . preg_quote( 'class="', '/' ) . '/',
-		'class="wp-container-' . $id . ' ',
+		'class="wp-layout-' . $layout_type . ' wp-container-' . $id . ' ',
 		$block_content,
 		1
 	);
@@ -142,12 +133,14 @@ function gutenberg_render_layout_support_flag( $block_content, $block ) {
 	// Ideally styles should be loaded in the head, but blocks may be parsed
 	// after that, so loading in the footer for now.
 	// See https://core.trac.wordpress.org/ticket/53494.
-	add_action(
-		'wp_footer',
-		function () use ( $style ) {
-			echo '<style>' . $style . '</style>';
-		}
-	);
+	if ( $style ) {
+		add_action(
+			'wp_footer',
+			function () use ( $style ) {
+				echo '<style>' . $style . '</style>';
+			}
+		);
+	}
 
 	return $content;
 }

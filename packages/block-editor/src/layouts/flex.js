@@ -64,20 +64,12 @@ export default {
 		return (
 			<style>{ `
 				${ appendSelectors( selector ) } {
-					display: flex;
 					gap: ${
 						hasBlockGapStylesSupport
 							? 'var( --wp--style--block-gap, 0.5em )'
 							: '0.5em'
 					};
-					flex-wrap: wrap;
-					align-items: center;
-					flex-direction: row;
 					justify-content: ${ justifyContent };
-				}
-
-				${ appendSelectors( selector, '> *' ) } {
-					margin: 0;
 				}
 			` }</style>
 		);

@@ -203,9 +203,14 @@ export const withLayoutStyles = createHigherOrderComponent(
 		const usedLayout = layout?.inherit
 			? defaultThemeLayout
 			: layout || defaultBlockLayout || {};
-		const className = classnames( props?.className, {
-			[ `wp-container-${ id }` ]: shouldRenderLayoutStyles,
-		} );
+		const layoutType = usedLayout.type || 'default';
+		const className = classnames(
+			props?.className,
+			`wp-layout-${ layoutType }`,
+			{
+				[ `wp-container-${ id }` ]: shouldRenderLayoutStyles,
+			}
+		);
 
 		return (
 			<>

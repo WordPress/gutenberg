@@ -89,3 +89,40 @@
 	width: auto;
 	z-index: 100000;
 }
+
+// Default Flow Layout
+.wp-site-blocks > *,
+.wp-layout-default > * {
+	margin-left: auto !important;
+	margin-right: auto !important;
+}
+
+.wp-site-blocks > [data-align="full"],
+.wp-layout-default > [data-align="full"] {
+	max-width: none;
+}
+
+.wp-site-blocks > [data-align="left"],
+.wp-layout-default > [data-align="left"] {
+	float: left;
+	margin-right: 2em;
+}
+
+.wp-site-blocks > [data-align="right"],
+.wp-layout-default > [data-align="right"] {
+	float: right;
+	margin-left: 2em;
+}
+
+// Default Flex Layout
+.wp-layout-flex {
+	display: flex;
+	gap: 0.5em;
+	flex-wrap: wrap;
+	align-items: center;
+	flex-direction: row;
+}
+
+.wp-layout-flex > * {
+	margin: 0;
+}

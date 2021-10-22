@@ -227,7 +227,7 @@ export default function VisualEditor( { styles } ) {
 							/>
 						) }
 						{ ! isTemplateMode && (
-							<div className="edit-post-visual-editor__post-title-wrapper">
+							<div className="edit-post-visual-editor__post-title-wrapper wp-layout-default">
 								<PostTitle />
 							</div>
 						) }
@@ -236,7 +236,7 @@ export default function VisualEditor( { styles } ) {
 								className={
 									isTemplateMode
 										? 'wp-site-blocks'
-										: undefined
+										: 'wp-layout-default'
 								}
 								__experimentalLayout={ layout }
 							/>

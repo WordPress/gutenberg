@@ -997,11 +997,7 @@ class WP_Theme_JSON_Gutenberg {
 			}
 
 			if ( self::ROOT_BLOCK_SELECTOR === $selector ) {
-				$block_rules .= 'body { margin: 0; }';
-				$block_rules .= '.wp-site-blocks > .alignleft { float: left; margin-right: 2em; }';
-				$block_rules .= '.wp-site-blocks > .alignright { float: right; margin-left: 2em; }';
-				$block_rules .= '.wp-site-blocks > .aligncenter { justify-content: center; margin-left: auto; margin-right: auto; }';
-
+				$block_rules          .= 'body { margin: 0; }';
 				$has_block_gap_support = _wp_array_get( $this->theme_json, array( 'settings', 'spacing', 'blockGap' ) ) !== null;
 				if ( $has_block_gap_support ) {
 					$block_rules .= '.wp-site-blocks > * { margin-top: 0; margin-bottom: 0; }';
