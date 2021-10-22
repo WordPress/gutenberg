@@ -15,7 +15,7 @@
 function gutenberg_render_elements_support( $block_content, $block ) {
 
 	if ( ! $block_content ) {
-		return;
+		return $block_content;
 	}
 
 	$link_color = null;
