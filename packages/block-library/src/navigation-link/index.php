@@ -152,12 +152,6 @@ function render_block_core_navigation_link( $attributes, $content, $block ) {
 	$has_submenu = count( $block->inner_blocks ) > 0;
 	$is_active   = ! empty( $attributes['id'] ) && ( get_the_ID() === $attributes['id'] );
 
-	$class_names = ! empty( $attributes['classes'] ) ? implode( ' ', (array) $attributes['classes'] ) : false;
-
-	if ( false !== $class_names ) {
-		$css_classes .= ' ' . $class_names;
-	}
-
 	$wrapper_attributes = get_block_wrapper_attributes(
 		array(
 			'class' => $css_classes . ' wp-block-navigation-item' . ( $has_submenu ? ' has-child' : '' ) .
