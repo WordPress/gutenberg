@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 2.6.0 (2021-10-22)
+
 ### New Features
 
 -   Add passing local directories to --template. ([#35645](https://github.com/WordPress/gutenberg/pull/35645))
