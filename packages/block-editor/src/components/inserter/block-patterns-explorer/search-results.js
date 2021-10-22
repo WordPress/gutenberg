@@ -76,8 +76,8 @@ function PatternExplorerSearchResults( {
 					{ sprintf(
 						/* translators: %d: number of patterns. %s: block pattern search query */
 						_n(
-							'%d pattern found for "%s"',
-							'%d patterns found for "%s"',
+							'%1$d pattern found for "%2$s"',
+							'%1$d patterns found for "%2$s"',
 							filteredBlockPatterns.length
 						),
 						filteredBlockPatterns.length,
