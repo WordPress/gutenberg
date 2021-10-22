@@ -18,6 +18,22 @@
 		margin-left: revert;
 		margin-right: revert;
 	}
+
+	// Force user selected text decoration to be applied to navigation items
+	// when edited.The div introduced in the editor within the `<a>` tag,
+	// changes the flow and breaks the inheritance setup within style.scss.
+	// Without the ability to use `inherit` we need to reapply the correct
+	// text decoration style.
+	&[style*="text-decoration: line-through"] {
+		a > div {
+			text-decoration: line-through;
+		}
+	}
+	&[style*="text-decoration: underline"] {
+		a > div {
+			text-decoration: underline;
+		}
+	}
 }
 
 // This element is inline on the frontend but needs to be editable, therefore inline-block, in the editor.
