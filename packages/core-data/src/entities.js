@@ -207,7 +207,7 @@ function* loadTaxonomyEntities() {
 		path: '/wp/v2/taxonomies?context=edit',
 	} );
 	return map( taxonomies, ( taxonomy, name ) => {
-		const namespace = taxonomy.rest_namespace
+		const namespace = taxonomy?.rest_namespace
 			? taxonomy.rest_namespace
 			: 'wp/v2';
 		return {
