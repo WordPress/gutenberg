@@ -6,6 +6,13 @@ const childProcess = require( 'child_process' );
 // Spawns an appium process
 const start = ( localAppiumPort ) =>
 	new Promise( ( resolve, reject ) => {
+		// eslint-disable-next-line no-console
+		console.log(
+			`Appium version: ${ childProcess
+				.execSync( 'appium --version' )
+				.toString() }`
+		);
+
 		const appium = childProcess.spawn( 'appium', [
 			'--port',
 			localAppiumPort.toString(),
