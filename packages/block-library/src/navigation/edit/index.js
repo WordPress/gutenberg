@@ -30,18 +30,18 @@ import {
 	ToolbarGroup,
 	ToolbarDropdownMenu,
 } from '@wordpress/components';
-import { __, sprintf } from '@wordpress/i18n';
+import { __ } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
  */
 import useListViewModal from './use-list-view-modal';
-import useNavigationPost from '../use-navigation-post';
+import useNavigationMenu from '../use-navigation-menu';
 import Placeholder from './placeholder';
 import ResponsiveWrapper from './responsive-wrapper';
 import NavigationInnerBlocks from './inner-blocks';
-import NavigationPostMenu from './navigation-post-menu';
-import NavigationPostTitleControl from './navigation-post-title-control';
+import NavigationMenuSelector from './navigation-menu-selector';
+import NavigationMenuNameControl from './navigation-menu-name-control';
 
 function getComputedStyle( node ) {
 	return node.ownerDocument.defaultView.getComputedStyle( node );
@@ -93,7 +93,7 @@ function Navigation( {
 	customAppender: CustomAppender = null,
 } ) {
 	const {
-		navigationPostId,
+		navigationMenuId,
 		itemsJustification,
 		openSubmenusOnClick,
 		orientation,
@@ -102,7 +102,7 @@ function Navigation( {
 	} = attributes;
 
 	const [ hasAlreadyRendered, RecursionProvider ] = useNoRecursiveRenders(
-		`navigationPost/${ navigationPostId }`
+		`navigationMenu/${ navigationMenuId }`
 	);
 
 	const innerBlocks = useSelect(
@@ -121,11 +121,11 @@ function Navigation( {
 	);
 
 	const {
-		isNavigationPostResolved,
-		isNavigationPostMissing,
-		canSwitchNavigationPost,
-		hasResolvedNavigationPosts,
-	} = useNavigationPost( navigationPostId );
+		isNavigationMenuResolved,
+		isNavigationMenuMissing,
+		canSwitchNavigationMenu,
+		hasResolvedNavigationMenu,
+	} = useNavigationMenu( navigationMenuId );
 
 	const navRef = useRef();
 
@@ -134,7 +134,7 @@ function Navigation( {
 	);
 
 	const isEntityAvailable =
-		! isNavigationPostMissing && isNavigationPostResolved;
+		! isNavigationMenuMissing && isNavigationMenuResolved;
 
 	const blockProps = useBlockProps( {
 		ref: navRef,
@@ -191,18 +191,14 @@ function Navigation( {
 		}
 	} );
 
-	// We don't want to render a missing state if we have any inner blocks.
-	// A new template part is automatically created if we have any inner blocks but no entity.
-	if ( navigationPostId && isNavigationPostMissing ) {
+	// Show a warning if the selected menu is no longer available.
+	// TODO - the user should be able to select a new one?
+	if ( navigationMenuId && isNavigationMenuMissing ) {
 		return (
 			<div { ...blockProps }>
 				<Warning>
-					{ sprintf(
-						/* translators: %s: Template part slug */
-						__(
-							'Navigation block has been deleted or is unavailable: %s'
-						),
-						navigationPostId
+					{ __(
+						'Navigation menu has been deleted or is unavailable'
 					) }
 				</Warning>
 			</div>
@@ -232,22 +228,22 @@ function Navigation( {
 		<EntityProvider
 			kind="postType"
 			type="wp_navigation"
-			id={ navigationPostId }
+			id={ navigationMenuId }
 		>
 			<RecursionProvider>
 				<BlockControls>
 					<ToolbarGroup>
 						{ isEntityAvailable && (
 							<ToolbarDropdownMenu
-								label={ __( 'Select Navigation' ) }
-								text={ __( 'Select Navigation' ) }
+								label={ __( 'Select Menu' ) }
+								text={ __( 'Select Menu' ) }
 								icon={ null }
 							>
 								{ ( { onClose } ) => (
-									<NavigationPostMenu
+									<NavigationMenuSelector
 										onSelect={ ( { id } ) => {
 											setAttributes( {
-												navigationPostId: id,
+												navigationMenuId: id,
 											} );
 											onClose();
 										} }
@@ -274,8 +270,8 @@ function Navigation( {
 				{ listViewModal }
 				<InspectorControls>
 					{ isEntityAvailable && (
-						<PanelBody title={ __( 'Navigation name' ) }>
-							<NavigationPostTitleControl />
+						<PanelBody title={ __( 'Navigation menu name' ) }>
+							<NavigationMenuNameControl />
 						</PanelBody>
 					) }
 					{ hasSubmenuIndicatorSetting && (
@@ -381,13 +377,13 @@ function Navigation( {
 							onFinish={ ( post ) => {
 								setIsPlaceholderShown( false );
 								setAttributes( {
-									navigationPostId: post.id,
+									navigationMenuId: post.id,
 								} );
 								selectBlock( clientId );
 							} }
-							canSwitchNavigationPost={ canSwitchNavigationPost }
-							hasResolvedNavigationPosts={
-								hasResolvedNavigationPosts
+							canSwitchNavigationMenu={ canSwitchNavigationMenu }
+							hasResolvedNavigationMenu={
+								hasResolvedNavigationMenu
 							}
 						/>
 					) }

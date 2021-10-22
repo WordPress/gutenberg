@@ -11,7 +11,7 @@
 	],
 	"textdomain": "default",
 	"attributes": {
-		"navigationPostId": {
+		"navigationMenuId": {
 			"type": "number"
 		},
 		"orientation": {

@@ -15,39 +15,37 @@ const PLACEHOLDER_STEPS = {
 /**
  * Internal dependencies
  */
-import SelectNavigationPostStep from './select-navigation-post-step';
+import SelectNavigationMenuStep from './select-navigation-menu-step';
 import CreateInnerBlocksStep from './create-inner-blocks-step';
 
 export default function Placeholder( {
 	onFinish,
-	canSwitchNavigationPost,
-	hasResolvedNavigationPosts,
+	canSwitchNavigationMenu,
+	hasResolvedNavigationMenu,
 } ) {
 	const [ step, setStep ] = useState(
 		PLACEHOLDER_STEPS.selectNavigationPost
 	);
-	const [ navigationPostTitle, setNavigationPostTitle ] = useState( '' );
+	const [ navigationMenuTitle, setNavigationMenuTitle ] = useState( '' );
 	const { saveEntityRecord } = useDispatch( coreStore );
 
-	const createNavigationPost = useCallback(
-		async ( title = __( 'Untitled Menu' ), blocks = [] ) => {
-			// If we have `area` set from block attributes, means an exposed
-			// block variation was inserted. So add this prop to the template
-			// part entity on creation. Afterwards remove `area` value from
-			// block attributes.
+	// This callback uses data from the two placeholder steps and only creates
+	// a new navigation menu when the user completes the final step.
+	const createNavigationMenu = useCallback(
+		async ( title = __( 'Untitled Navigation Menu' ), blocks = [] ) => {
 			const record = {
 				title,
 				content: serialize( blocks ),
 				status: 'publish',
 			};
 
-			const navigationPost = await saveEntityRecord(
+			const navigationMenu = await saveEntityRecord(
 				'postType',
 				'wp_navigation',
 				record
 			);
 
-			return navigationPost;
+			return navigationMenu;
 		},
 		[ serialize, saveEntityRecord ]
 	);
@@ -55,26 +53,26 @@ export default function Placeholder( {
 	return (
 		<>
 			{ step === PLACEHOLDER_STEPS.selectNavigationPost && (
-				<SelectNavigationPostStep
+				<SelectNavigationMenuStep
 					onCreateNew={ ( newTitle ) => {
-						setNavigationPostTitle( newTitle );
+						setNavigationMenuTitle( newTitle );
 						setStep( PLACEHOLDER_STEPS.createInnerBlocks );
 					} }
-					onSelectExisting={ ( navigationPost ) => {
-						onFinish( navigationPost );
+					onSelectExisting={ ( navigationMenu ) => {
+						onFinish( navigationMenu );
 					} }
-					canSwitchNavigationPost={ canSwitchNavigationPost }
-					hasResolvedNavigationPosts={ hasResolvedNavigationPosts }
+					canSwitchNavigationMenu={ canSwitchNavigationMenu }
+					hasResolvedNavigationMenu={ hasResolvedNavigationMenu }
 				/>
 			) }
 			{ step === PLACEHOLDER_STEPS.createInnerBlocks && (
 				<CreateInnerBlocksStep
 					onFinish={ async ( blocks ) => {
-						const navigationPost = await createNavigationPost(
-							navigationPostTitle,
+						const navigationMenu = await createNavigationMenu(
+							navigationMenuTitle,
 							blocks
 						);
-						onFinish( navigationPost );
+						onFinish( navigationMenu );
 					} }
 				/>
 			) }
