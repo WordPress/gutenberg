@@ -16,7 +16,8 @@ import { removeFormat } from '@wordpress/rich-text';
 /**
  * Internal dependencies
  */
-import { default as InlineColorUI, getActiveColors } from './inline';
+import { getActiveColors } from './inline.js';
+import { default as InlineColorUI } from './inline';
 
 const name = 'core/text-color';
 const title = __( 'Text color' );

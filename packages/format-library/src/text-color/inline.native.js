@@ -14,7 +14,7 @@ import { BottomSheet, ColorSettings } from '@wordpress/components';
  * Internal dependencies
  */
 import { textColor as settings } from './index';
-import { getActiveColors } from './inline';
+import { getActiveColors } from './inline.js';
 
 function setColors( value, name, colorSettings, colors ) {
 	const { color, backgroundColor } = {
