@@ -2,9 +2,10 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
+import { parse } from '@wordpress/blocks';
 import { useSelect } from '@wordpress/data';
-import { RawHTML } from '@wordpress/element';
 import {
+	BlockPreview,
 	useBlockProps,
 	useInnerBlocksProps,
 	useSetting,
@@ -27,13 +28,20 @@ function ReadOnlyContent( { userCanEdit, postType, postId } ) {
 		postId
 	);
 	const blockProps = useBlockProps();
+
+	let blocks;
+
+	if ( content?.raw ) {
+		blocks = parse( content.raw );
+	}
+
 	return content?.protected && ! userCanEdit ? (
 		<div { ...blockProps }>
 			<Warning>{ __( 'This content is password protected.' ) }</Warning>
 		</div>
 	) : (
 		<div { ...blockProps }>
-			<RawHTML key="html">{ content?.rendered }</RawHTML>
+			<BlockPreview blocks={ blocks } __experimentalLive={ true } />
 		</div>
 	);
 }
