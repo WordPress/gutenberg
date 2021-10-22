@@ -154,11 +154,10 @@ export class RichText extends Component {
 
 		const { formats, replacements, text } = currentValue;
 		const { activeFormats } = this.state;
-		// const newFormats = getFormatColors( value, formats, colorPalette );
-		getFormatColors( value, formats, colorPalette );
+		const newFormats = getFormatColors( value, formats, colorPalette );
 
 		return {
-			formats,
+			formats: newFormats,
 			replacements,
 			text,
 			start,
