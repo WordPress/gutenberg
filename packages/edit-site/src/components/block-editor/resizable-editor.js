@@ -131,9 +131,17 @@ function ResizableEditor( { enableResizing, settings, ...props } ) {
 			<Iframe
 				style={
 					// We'll be using the size controlled by ResizableBox so resetting them here.
-					omit( styles, [ 'width', 'height', 'margin' ] )
+					omit( styles, [ 'width', 'height', 'margin', 'border' ] )
 				}
-				head={ <EditorStyles styles={ settings.styles } /> }
+				head={
+					<>
+						<EditorStyles styles={ settings.styles } />
+						<style>
+							{ `html { background: repeating-conic-gradient(#000 0% 25%, #333 0% 50%) 50%/ 40px 40px; }
+body { display: inline-block; width: 100%; }` }
+						</style>
+					</>
+				}
 				ref={ ref }
 				name="editor-canvas"
 				className="edit-site-visual-editor__editor-canvas"
