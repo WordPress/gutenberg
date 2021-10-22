@@ -6,10 +6,16 @@
 		"parent": null
 	},
 	{
+		"title": "Getting Started",
+		"slug": "getting-started",
+		"markdown_source": "../docs/getting-started/README.md",
+		"parent": null
+	},
+	{
 		"title": "Development Environment",
 		"slug": "devenv",
 		"markdown_source": "../docs/getting-started/devenv/README.md",
-		"parent": "handbook"
+		"parent": "getting-started"
 	},
 	{
 		"title": "How to setup local WordPress environment on Ubuntu",
@@ -21,7 +27,7 @@
 		"title": "Create a Block Tutorial",
 		"slug": "create-block",
 		"markdown_source": "../docs/getting-started/create-block/README.md",
-		"parent": "handbook"
+		"parent": "getting-started"
 	},
 	{
 		"title": "WordPress Plugin",
@@ -69,13 +75,13 @@
 		"title": "Full Site Editing",
 		"slug": "full-site-editing",
 		"markdown_source": "../docs/getting-started/full-site-editing.md",
-		"parent": "handbook"
+		"parent": "getting-started"
 	},
 	{
 		"title": "Outreach",
 		"slug": "outreach",
 		"markdown_source": "../docs/getting-started/outreach.md",
-		"parent": "handbook"
+		"parent": "getting-started"
 	},
 	{
 		"title": "How-to Guides",
