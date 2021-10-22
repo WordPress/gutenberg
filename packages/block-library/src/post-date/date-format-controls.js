@@ -12,12 +12,14 @@ import { useState } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import { useDateFormatOptions } from './util';
+import { useDateFormatOptions, useDateFormat } from './util';
 
 export default function DateFormatControls( { format, setFormat, date } ) {
 	const formatOptions = useDateFormatOptions( date );
+	const resolvedFormat = useDateFormat( format );
+
 	const [ selectedFormat, setSelectedFormat ] = useState(
-		getInitialSelectedFormat( format, formatOptions )
+		formatOptions[ resolvedFormat ] ? resolvedFormat : 'custom'
 	);
 
 	return (
@@ -39,7 +41,7 @@ export default function DateFormatControls( { format, setFormat, date } ) {
 			{ selectedFormat === 'custom' && (
 				<PanelRow>
 					<TextControl
-						label={ __( 'Custom Format' ) }
+						label={ __( 'Custom format' ) }
 						value={ format }
 						onChange={ setFormat }
 					/>
@@ -47,12 +49,4 @@ export default function DateFormatControls( { format, setFormat, date } ) {
 			) }
 		</>
 	);
-}
-
-function getInitialSelectedFormat( format, formatOptions ) {
-	if ( ! formatOptions[ format ] ) {
-		return 'custom';
-	}
-
-	return format;
 }
