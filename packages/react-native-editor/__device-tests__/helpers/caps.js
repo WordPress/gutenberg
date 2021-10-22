@@ -15,7 +15,7 @@ exports.iosLocal = {
 	...ios,
 	deviceName: 'iPhone 11',
 	wdaLaunchTimeout: 240000,
-	usePrebuiltWDA: false,
+	usePrebuiltWDA: true,
 };
 
 exports.iosServer = {
