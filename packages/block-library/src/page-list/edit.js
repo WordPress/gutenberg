@@ -14,7 +14,7 @@ import {
 } from '@wordpress/block-editor';
 import { ToolbarButton, Placeholder, Spinner } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-import { useEffect, useState } from '@wordpress/element';
+import { useEffect, useState, memo } from '@wordpress/element';
 import apiFetch from '@wordpress/api-fetch';
 import { addQueryArgs } from '@wordpress/url';
 
@@ -139,7 +139,12 @@ function usePagesByParentId() {
 	};
 }
 
-function PageItems( { context, pagesByParentId, parentId = 0, depth = 0 } ) {
+const PageItems = memo( function PageItems( {
+	context,
+	pagesByParentId,
+	parentId = 0,
+	depth = 0,
+} ) {
 	const pages = pagesByParentId.get( parentId );
 
 	if ( ! pages?.length ) {
@@ -197,7 +202,7 @@ function PageItems( { context, pagesByParentId, parentId = 0, depth = 0 } ) {
 			</li>
 		);
 	} );
-}
+} );
 
 function ItemSubmenuToggle( { title } ) {
 	return (
