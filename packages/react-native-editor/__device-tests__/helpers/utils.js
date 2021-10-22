@@ -68,6 +68,78 @@ const getIOSPlatformVersions = () => {
 		);
 };
 
+const forceIOSSimulatorBootup = async ( platformVersion, deviceName ) => {
+	const iosPlatformVersions = getIOSPlatformVersions();
+	const selectedPlatform = iosPlatformVersions.find(
+		( { version } ) => version === platformVersion
+	);
+
+	if ( ! selectedPlatform ) {
+		// eslint-disable-next-line no-console
+		console.log(
+			`Can't boot up simulator "${ deviceName }" because iOS platform version "${ platformVersion }" is not available.`
+		);
+	}
+
+	const { identifier: platformIdentifier } = selectedPlatform;
+
+	const getDevices = () => {
+		const { devices = [] } = JSON.parse(
+			childProcess
+				.execSync( 'xcrun simctl list devices available --json' )
+				.toString()
+		);
+		return devices[ platformIdentifier ] || [];
+	};
+
+	const getDevice = () => {
+		return getDevices().find( ( { name } ) => name === deviceName );
+	};
+
+	// eslint-disable-next-line no-console
+	console.log(
+		`Available simulators in iOS platform versions "${ platformVersion }":`,
+		getDevices().map( ( { name } ) => name )
+	);
+
+	const simulator = getDevice();
+	if ( ! simulator ) {
+		// eslint-disable-next-line no-console
+		console.log(
+			`Can't boot up simulator "${ deviceName }" because not matching device has been found in iOS platform version "${ platformVersion }".`
+		);
+		return;
+	}
+	const { udid, name, state } = simulator;
+
+	if ( state !== 'Booted' ) {
+		// eslint-disable-next-line no-console
+		console.log( `Booting up iOS simulator "${ name }"...` );
+		childProcess.execSync( `xcrun simctl boot ${ udid }` );
+
+		let retries = 3;
+		let isSimulatorBooted = false;
+		while ( ! isSimulatorBooted && retries > 0 ) {
+			await timer( 5000 );
+			isSimulatorBooted = getDevice()?.state === 'Booted';
+			retries--;
+		}
+
+		if ( isSimulatorBooted ) {
+			// eslint-disable-next-line no-console
+			console.log( `iOS simulator "${ name }" successfully booted.` );
+		} else {
+			// eslint-disable-next-line no-console
+			console.log(
+				`Boot up simulator "${ deviceName } - ${ platformVersion }" timed out.`
+			);
+		}
+	} else {
+		// eslint-disable-next-line no-console
+		console.log( `iOS simulator "${ name }" already booted.` );
+	}
+};
+
 // Initialises the driver and desired capabilities for appium
 const setupDriver = async () => {
 	const branch = process.env.CIRCLE_BRANCH || '';
@@ -142,6 +214,11 @@ const setupDriver = async () => {
 
 			desiredCaps.app = path.resolve( localIOSAppPath );
 			desiredCaps.derivedDataPath = path.resolve( webDriverAgentPath );
+
+			await forceIOSSimulatorBootup(
+				desiredCaps.platformVersion,
+				desiredCaps.deviceName
+			);
 		}
 	}
 
