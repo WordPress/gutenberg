@@ -16,7 +16,6 @@ function PatternsExplorer( {
 	patternCategories,
 	onClickCategory,
 	children,
-	onModalClose,
 } ) {
 	const [ filterValue, setFilterValue ] = useState( '' );
 	const patternList = !! filterValue ? (
@@ -25,6 +24,26 @@ function PatternsExplorer( {
 		children
 	);
 	return (
+		<Grid
+			columns={ 2 }
+			templateColumns="240px auto"
+			className="block-editor-block-patterns-explorer"
+		>
+			<PatternExplorerSidebar
+				selectedCategory={ selectedCategory }
+				patternCategories={ patternCategories }
+				onClickCategory={ onClickCategory }
+				filterValue={ filterValue }
+				setFilterValue={ setFilterValue }
+			/>
+
+			<div>{ patternList }</div>
+		</Grid>
+	);
+}
+
+function PatternsExplorerModal( { onModalClose, ...restProps } ) {
+	return (
 		<Modal
 			title={ __( 'Patterns' ) }
 			closeLabel={ __( 'Close' ) }
@@ -32,23 +51,9 @@ function PatternsExplorer( {
 			shouldCloseOnClickOutside={ false }
 			isFullScreen
 		>
-			<Grid
-				columns={ 2 }
-				templateColumns="20% auto"
-				className="block-editor-block-patterns-explorer"
-			>
-				<PatternExplorerSidebar
-					selectedCategory={ selectedCategory }
-					patternCategories={ patternCategories }
-					onClickCategory={ onClickCategory }
-					filterValue={ filterValue }
-					setFilterValue={ setFilterValue }
-				/>
-
-				<div>{ patternList }</div>
-			</Grid>
+			<PatternsExplorer { ...restProps } />
 		</Modal>
 	);
 }
 
-export default PatternsExplorer;
+export default PatternsExplorerModal;

@@ -7,8 +7,7 @@ import classnames from 'classnames';
  * WordPress dependencies
  */
 import { Flex, FlexItem, SelectControl, Button } from '@wordpress/components';
-import { fullscreen } from '@wordpress/icons';
-import { __ } from '@wordpress/i18n';
+import { __, _x } from '@wordpress/i18n';
 
 function PatternInserterPanel( {
 	selectedCategory,
@@ -55,8 +54,8 @@ function PatternInserterPanel( {
 
 	return (
 		<>
-			<Flex justify="space-between" className={ className }>
-				<FlexItem>
+			<Flex justify="space-between" align="start" className={ className }>
+				<FlexItem isBlock>
 					<SelectControl
 						className="block-editor-inserter__panel-dropdown"
 						label={ __( 'Filter patterns' ) }
@@ -69,11 +68,15 @@ function PatternInserterPanel( {
 				</FlexItem>
 				<FlexItem>
 					<Button
-						label={ __( 'Pattern explorer' ) }
-						icon={ fullscreen }
+						className="block-editor-inserter__patterns-explorer-expand"
+						label={ __( 'See all patterns' ) }
 						onClick={ onShowExplorer }
-						isSmall
-					/>
+					>
+						{ _x(
+							'See all',
+							'Label for showing all block patterns'
+						) }
+					</Button>
 				</FlexItem>
 			</Flex>
 			<div className="block-editor-inserter__panel-content">

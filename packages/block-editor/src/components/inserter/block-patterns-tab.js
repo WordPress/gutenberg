@@ -11,7 +11,7 @@ import { useAsyncList } from '@wordpress/compose';
 import PatternInserterPanel from './pattern-panel';
 import usePatternsState from './hooks/use-patterns-state';
 import BlockPatternList from '../block-patterns-list';
-import PatternsExplorer from './block-patterns-explorer/explorer';
+import PatternsExplorerModal from './block-patterns-explorer/explorer';
 
 function BlockPatternsCategory( {
 	rootClientId,
@@ -142,14 +142,14 @@ function BlockPatternsCategory( {
 				</PatternInserterPanel>
 			) }
 			{ showPatternsExplorer && (
-				<PatternsExplorer
+				<PatternsExplorerModal
 					selectedCategory={ patternCategory }
 					patternCategories={ populatedCategories }
 					onClickCategory={ onClickCategory }
 					onModalClose={ () => setShowPatternsExplorer( false ) }
 				>
 					{ blockPatternList }
-				</PatternsExplorer>
+				</PatternsExplorerModal>
 			) }
 		</>
 	);
