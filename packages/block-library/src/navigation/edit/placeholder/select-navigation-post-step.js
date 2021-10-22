@@ -18,7 +18,7 @@ import { navigation as navigationIcon } from '@wordpress/icons';
 /**
  * Internal dependencies
  */
-import NavigationPostSelection from './navigation-post-selection';
+import NavigationPostMenu from '../navigation-post-menu';
 
 export default function SelectNavigationPostStep( {
 	canSwitchNavigationPost,
@@ -60,7 +60,7 @@ export default function SelectNavigationPostStep( {
 									</Button>
 								) }
 								renderContent={ ( { onClose } ) => (
-									<NavigationPostSelection
+									<NavigationPostMenu
 										onSelect={ onSelectExisting }
 										onClose={ onClose }
 									/>

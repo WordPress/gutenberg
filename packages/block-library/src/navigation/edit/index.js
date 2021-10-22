@@ -27,6 +27,7 @@ import {
 	__experimentalToggleGroupControl as ToggleGroupControl,
 	__experimentalToggleGroupControlOption as ToggleGroupControlOption,
 	ToolbarGroup,
+	ToolbarDropdownMenu,
 } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
 
@@ -37,9 +38,8 @@ import useListViewModal from './use-list-view-modal';
 import useNavigationPost from '../use-navigation-post';
 import Placeholder from './placeholder';
 import ResponsiveWrapper from './responsive-wrapper';
-
-// TODO - refactor these to somewhere common?
 import NavigationInnerBlocks from './inner-blocks';
+import NavigationPostMenu from './navigation-post-menu';
 
 function getComputedStyle( node ) {
 	return node.ownerDocument.defaultView.getComputedStyle( node );
@@ -242,6 +242,27 @@ function Navigation( {
 						} }
 					/>
 				) }
+				<ToolbarGroup>
+					{ isEntityAvailable && (
+						<ToolbarDropdownMenu
+							label={ __( 'Select Navigation' ) }
+							text={ __( 'Select Navigation' ) }
+							icon={ null }
+						>
+							{ ( { onClose } ) => (
+								<NavigationPostMenu
+									onSelect={ ( { id } ) => {
+										setAttributes( {
+											navigationPostId: id,
+										} );
+										onClose();
+									} }
+									navigationPostId={ navigationPostId }
+								/>
+							) }
+						</ToolbarDropdownMenu>
+					) }
+				</ToolbarGroup>
 				<ToolbarGroup>{ listViewToolbarButton }</ToolbarGroup>
 			</BlockControls>
 			{ listViewModal }
