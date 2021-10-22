@@ -94,9 +94,6 @@ class WP_Navigation_Page_Test extends WP_UnitTestCase {
 	}
 }
 
-
-
-
 /**
  * This is a utility test class for creating mocks of the callback functions
  */
