@@ -136,7 +136,7 @@ function gutenberg_menu_order( $menu_order ) {
 
 /**
  * Check if any plugin, or theme features, are using the Customizer.
- * 
+ *
  * @return bool A boolean value indicating if Customizer support is needed.
  */
 function gutenberg_site_requires_customizer() {
