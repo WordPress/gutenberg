@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 7.1.2 (2021-10-22)
+
 ### Bug Fix
 
 -   Provide more complete mocks of browser timing functions. ([#35368](https://github.com/WordPress/gutenberg/pull/35368))
