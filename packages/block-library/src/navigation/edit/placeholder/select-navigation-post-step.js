@@ -10,7 +10,6 @@ import {
 	FlexItem,
 	Modal,
 	Placeholder,
-	Spinner,
 	TextControl,
 } from '@wordpress/components';
 import { navigation as navigationIcon } from '@wordpress/icons';
@@ -18,6 +17,7 @@ import { navigation as navigationIcon } from '@wordpress/icons';
 /**
  * Internal dependencies
  */
+import PlaceholderPreview from './placeholder-preview';
 import NavigationPostMenu from '../navigation-post-menu';
 
 export default function SelectNavigationPostStep( {
@@ -33,53 +33,52 @@ export default function SelectNavigationPostStep( {
 
 	return (
 		<>
-			<Placeholder
-				icon={ navigationIcon }
-				label={ __( 'Navigation' ) }
-				instructions={
-					canSwitchNavigationPost
-						? __( 'Choose an existing menu or create a new one.' )
-						: __( 'Create a new menu.' )
-				}
-			>
-				{ ! hasResolvedNavigationPosts ? (
-					<Spinner />
-				) : (
-					<>
-						{ canSwitchNavigationPost && (
-							<Dropdown
-								contentClassName="wp-block-template-part__placeholder-preview-dropdown-content"
-								position="bottom right left"
-								renderToggle={ ( { isOpen, onToggle } ) => (
-									<Button
-										variant="primary"
-										onClick={ onToggle }
-										aria-expanded={ isOpen }
-									>
-										{ __( 'Choose existing' ) }
-									</Button>
-								) }
-								renderContent={ ( { onClose } ) => (
-									<NavigationPostMenu
-										onSelect={ onSelectExisting }
-										onClose={ onClose }
-									/>
-								) }
-							/>
-						) }
-						<Button
-							variant={
-								canSwitchNavigationPost ? 'tertiary' : 'primary'
-							}
-							onClick={ () => {
-								setIsNewMenuModalVisible( true );
-							} }
-						>
-							{ __( 'New menu' ) }
-						</Button>
-					</>
-				) }
-			</Placeholder>
+			{ ! hasResolvedNavigationPosts && <PlaceholderPreview isLoading /> }
+			{ hasResolvedNavigationPosts && (
+				<Placeholder
+					icon={ navigationIcon }
+					label={ __( 'Navigation' ) }
+					instructions={
+						canSwitchNavigationPost
+							? __(
+									'Choose an existing menu or create a new one.'
+							  )
+							: __( 'Create a new menu.' )
+					}
+				>
+					{ canSwitchNavigationPost && (
+						<Dropdown
+							contentClassName="wp-block-template-part__placeholder-preview-dropdown-content"
+							position="bottom right left"
+							renderToggle={ ( { isOpen, onToggle } ) => (
+								<Button
+									variant="primary"
+									onClick={ onToggle }
+									aria-expanded={ isOpen }
+								>
+									{ __( 'Choose existing' ) }
+								</Button>
+							) }
+							renderContent={ ( { onClose } ) => (
+								<NavigationPostMenu
+									onSelect={ onSelectExisting }
+									onClose={ onClose }
+								/>
+							) }
+						/>
+					) }
+					<Button
+						variant={
+							canSwitchNavigationPost ? 'tertiary' : 'primary'
+						}
+						onClick={ () => {
+							setIsNewMenuModalVisible( true );
+						} }
+					>
+						{ __( 'New menu' ) }
+					</Button>
+				</Placeholder>
+			) }
 			{ isNewMenuModalVisible && (
 				<Modal
 					title={ __( 'Name and create your new menu' ) }
