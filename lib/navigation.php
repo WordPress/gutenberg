@@ -426,7 +426,7 @@ function gutenberg_register_navigation_post_type() {
 		'show_in_admin_bar'     => false,
 		'show_in_rest'          => true,
 		'map_meta_cap'          => true,
-		'rest_base'             => 'navigation-posts',
+		'rest_base'             => 'navigation',
 		'rest_controller_class' => 'WP_REST_Posts_Controller',
 		'supports'              => array(
 			'title',
