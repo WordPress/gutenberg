@@ -192,6 +192,13 @@ function Navigation( {
 		}
 	} );
 
+	// Hide the placeholder if an navigation menu entity has loaded.
+	useEffect( () => {
+		if ( isEntityAvailable ) {
+			setIsPlaceholderShown( false );
+		}
+	}, [ isEntityAvailable ] );
+
 	// If the block has inner blocks, but no menu id, this was an older
 	// navigation block added before the block used a wp_navigation entity.
 	// Offer a UI to upgrade it to using the entity.
@@ -412,9 +419,7 @@ function Navigation( {
 					>
 						{ isEntityAvailable && (
 							<NavigationInnerBlocks
-								isVisible={
-									hasExistingNavItems || ! isPlaceholderShown
-								}
+								isVisible={ ! isPlaceholderShown }
 								clientId={ clientId }
 								appender={ CustomAppender }
 								hasCustomPlaceholder={ !! CustomPlaceholder }
