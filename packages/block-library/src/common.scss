@@ -91,12 +91,6 @@
 }
 
 // Default Flow Layout
-.wp-site-blocks > *,
-.wp-layout-default > * {
-	margin-left: auto !important;
-	margin-right: auto !important;
-}
-
 .wp-site-blocks > [data-align="full"],
 .wp-layout-default > [data-align="full"] {
 	max-width: none;

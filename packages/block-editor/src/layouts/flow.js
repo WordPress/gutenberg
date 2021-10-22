@@ -115,6 +115,8 @@ export default {
 				? `
 					${ appendSelectors( selector, '> *' ) } {
 						max-width: ${ contentSize ?? wideSize };
+						margin-left: auto !important;
+						margin-right: auto !important;
 					}
 
 					${ appendSelectors( selector, '> [data-align="wide"]' ) }  {
