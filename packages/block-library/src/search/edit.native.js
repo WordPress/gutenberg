@@ -49,6 +49,7 @@ export default function SearchEdit( {
 	setAttributes,
 	className,
 	blockWidth,
+	style,
 } ) {
 	const [ isButtonSelected, setIsButtonSelected ] = useState( false );
 	const [ isLabelSelected, setIsLabelSelected ] = useState( false );
@@ -222,12 +223,18 @@ export default function SearchEdit( {
 			styles.plainTextInput,
 			styles.plainTextInputDark
 		),
+		style?.baseColors?.color && { color: style?.baseColors?.color?.text },
 	];
 
-	const placeholderStyle = usePreferredColorSchemeStyle(
-		styles.plainTextPlaceholder,
-		styles.plainTextPlaceholderDark
-	);
+	const placeholderStyle = {
+		...usePreferredColorSchemeStyle(
+			styles.plainTextPlaceholder,
+			styles.plainTextPlaceholderDark
+		),
+		...( style?.baseColors?.color && {
+			color: style?.baseColors?.color?.text,
+		} ),
+	};
 
 	const searchBarStyle = [
 		styles.searchBarContainer,
@@ -332,18 +339,45 @@ export default function SearchEdit( {
 			? ''
 			: __( 'Add button text' );
 
+	const baseButtonStyles = {
+		...style?.baseColors?.blocks?.[ 'core/button' ]?.color,
+		...attributes?.style?.color,
+		...( style?.color && { text: style.color } ),
+	};
+
+	const richTextButtonContainerStyle = [
+		styles.buttonContainer,
+		isLongButton && styles.buttonContainerWide,
+		baseButtonStyles?.background && {
+			backgroundColor: baseButtonStyles.background,
+			borderWidth: 0,
+		},
+		style?.backgroundColor && {
+			backgroundColor: style.backgroundColor,
+			borderWidth: 0,
+		},
+	];
+
+	const richTextButtonStyle = {
+		...styles.richTextButton,
+		...( baseButtonStyles?.text && {
+			color: baseButtonStyles.text,
+			placeholderColor: baseButtonStyles.text,
+		} ),
+	};
+
+	const iconStyles = {
+		...styles.icon,
+		...( baseButtonStyles?.text && { fill: baseButtonStyles.text } ),
+	};
+
 	const renderButton = () => {
 		return (
-			<View
-				style={ [
-					styles.buttonContainer,
-					isLongButton && styles.buttonContainerWide,
-				] }
-			>
+			<View style={ richTextButtonContainerStyle }>
 				{ buttonUseIcon && (
 					<Icon
 						icon={ search }
-						{ ...styles.icon }
+						{ ...iconStyles }
 						onLayout={ onLayoutButton }
 					/>
 				) }
@@ -364,7 +398,7 @@ export default function SearchEdit( {
 							className="wp-block-search__button"
 							identifier="text"
 							tagName="p"
-							style={ styles.richTextButton }
+							style={ richTextButtonStyle }
 							placeholder={ buttonPlaceholderText }
 							value={ buttonText }
 							withoutInteractiveFormatting

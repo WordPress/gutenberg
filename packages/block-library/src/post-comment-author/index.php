@@ -11,7 +11,7 @@
  * @param array    $attributes Block attributes.
  * @param string   $content    Block default content.
  * @param WP_Block $block      Block instance.
- * @return string Return the post comment's content.
+ * @return string Return the post comment's author.
  */
 function render_block_core_post_comment_author( $attributes, $content, $block ) {
 	if ( ! isset( $block->context['commentId'] ) ) {
@@ -19,11 +19,17 @@ function render_block_core_post_comment_author( $attributes, $content, $block ) 
 	}
 
 	$wrapper_attributes = get_block_wrapper_attributes();
+	$comment_author     = get_comment_author( $block->context['commentId'] );
+	$link               = get_comment_author_url( $block->context['commentId'] );
+
+	if ( ! empty( $attributes['isLink'] ) && ! empty( $attributes['linkTarget'] ) ) {
+		$comment_author = sprintf( '<a rel="external nofollow ugc" href="%1s" target="%2s" >%3s</a>', $link, $attributes['linkTarget'], $comment_author );
+	}
 
 	return sprintf(
 		'<div %1$s>%2$s</div>',
 		$wrapper_attributes,
-		get_comment_author( $block->context['commentId'] )
+		$comment_author
 	);
 }
 

@@ -21,22 +21,33 @@ import { pin } from '@wordpress/icons';
 import { store as coreStore } from '@wordpress/core-data';
 
 export default function CategoriesEdit( {
-	attributes: { displayAsDropdown, showHierarchy, showPostCounts },
+	attributes: {
+		displayAsDropdown,
+		showHierarchy,
+		showPostCounts,
+		showOnlyTopLevel,
+	},
 	setAttributes,
 } ) {
 	const selectId = useInstanceId( CategoriesEdit, 'blocks-category-select' );
-	const { categories, isRequesting } = useSelect( ( select ) => {
-		const { getEntityRecords, isResolving } = select( coreStore );
-		const query = { per_page: -1, hide_empty: true, context: 'view' };
-		return {
-			categories: getEntityRecords( 'taxonomy', 'category', query ),
-			isRequesting: isResolving( 'getEntityRecords', [
-				'taxonomy',
-				'category',
-				query,
-			] ),
-		};
-	}, [] );
+	const { categories, isRequesting } = useSelect(
+		( select ) => {
+			const { getEntityRecords, isResolving } = select( coreStore );
+			const query = { per_page: -1, hide_empty: true, context: 'view' };
+			if ( showOnlyTopLevel ) {
+				query.parent = 0;
+			}
+			return {
+				categories: getEntityRecords( 'taxonomy', 'category', query ),
+				isRequesting: isResolving( 'getEntityRecords', [
+					'taxonomy',
+					'category',
+					query,
+				] ),
+			};
+		},
+		[ showOnlyTopLevel ]
+	);
 	const getCategoriesList = ( parentId ) => {
 		if ( ! categories?.length ) {
 			return [];
@@ -134,15 +145,22 @@ export default function CategoriesEdit( {
 						onChange={ toggleAttribute( 'displayAsDropdown' ) }
 					/>
 					<ToggleControl
-						label={ __( 'Show hierarchy' ) }
-						checked={ showHierarchy }
-						onChange={ toggleAttribute( 'showHierarchy' ) }
-					/>
-					<ToggleControl
 						label={ __( 'Show post counts' ) }
 						checked={ showPostCounts }
 						onChange={ toggleAttribute( 'showPostCounts' ) }
 					/>
+					<ToggleControl
+						label={ __( 'Show only top level categories' ) }
+						checked={ showOnlyTopLevel }
+						onChange={ toggleAttribute( 'showOnlyTopLevel' ) }
+					/>
+					{ ! showOnlyTopLevel && (
+						<ToggleControl
+							label={ __( 'Show hierarchy' ) }
+							checked={ showHierarchy }
+							onChange={ toggleAttribute( 'showHierarchy' ) }
+						/>
+					) }
 				</PanelBody>
 			</InspectorControls>
 			{ isRequesting && (

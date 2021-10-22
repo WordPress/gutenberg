@@ -38,7 +38,6 @@ const getDisabledElement = ( { eventHandlers, child, childrenWithPopover } ) =>
 			{ cloneElement( child, {
 				children: childrenWithPopover,
 			} ) }
-			,
 		</span>,
 		eventHandlers
 	);
@@ -82,6 +81,12 @@ const emitToChild = ( children, eventName, event ) => {
 	}
 
 	const child = Children.only( children );
+
+	// If the underlying element is disabled, do not emit the event.
+	if ( child.props.disabled ) {
+		return;
+	}
+
 	if ( typeof child.props[ eventName ] === 'function' ) {
 		child.props[ eventName ]( event );
 	}

@@ -5,6 +5,10 @@ import android.os.Bundle
 data class GutenbergProps @JvmOverloads constructor(
     val enableContactInfoBlock: Boolean,
     val enableLayoutGridBlock: Boolean,
+    val enableFacebookEmbed: Boolean,
+    val enableInstagramEmbed: Boolean,
+    val enableLoomEmbed: Boolean,
+    val enableSmartframeEmbed: Boolean,
     val enableMediaFilesCollectionBlocks: Boolean,
     val enableMentions: Boolean,
     val enableXPosts: Boolean,
@@ -60,6 +64,10 @@ data class GutenbergProps @JvmOverloads constructor(
         putBoolean(PROP_CAPABILITIES_REUSABLE_BLOCK, enableReusableBlock)
         putBoolean(PROP_CAPABILITIES_EDITOR_ONBOARDING, enableEditorOnboarding)
         putBoolean(PROP_CAPABILITIES_FIRST_GUTENBERG_SESSION, firstGutenbergEditorSession)
+        putBoolean(PROP_CAPABILITIES_FACEBOOK_EMBED_BLOCK, enableFacebookEmbed)
+        putBoolean(PROP_CAPABILITIES_INSTAGRAM_EMBED_BLOCK, enableInstagramEmbed)
+        putBoolean(PROP_CAPABILITIES_LOOM_EMBED_BLOCK, enableLoomEmbed)
+        putBoolean(PROP_CAPABILITIES_SMARTFRAME_EMBED_BLOCK, enableSmartframeEmbed)
     }
 
     companion object {
@@ -87,6 +95,10 @@ data class GutenbergProps @JvmOverloads constructor(
         const val PROP_CAPABILITIES = "capabilities"
         const val PROP_CAPABILITIES_CONTACT_INFO_BLOCK = "contactInfoBlock"
         const val PROP_CAPABILITIES_LAYOUT_GRID_BLOCK = "layoutGridBlock"
+        const val PROP_CAPABILITIES_FACEBOOK_EMBED_BLOCK = "facebookEmbed"
+        const val PROP_CAPABILITIES_INSTAGRAM_EMBED_BLOCK = "instagramEmbed"
+        const val PROP_CAPABILITIES_LOOM_EMBED_BLOCK = "loomEmbed"
+        const val PROP_CAPABILITIES_SMARTFRAME_EMBED_BLOCK = "smartframeEmbed"
         const val PROP_CAPABILITIES_MEDIAFILES_COLLECTION_BLOCK = "mediaFilesCollectionBlock"
         const val PROP_CAPABILITIES_MENTIONS = "mentions"
         const val PROP_CAPABILITIES_XPOSTS = "xposts"

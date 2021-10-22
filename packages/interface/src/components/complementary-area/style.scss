@@ -35,9 +35,17 @@
 		margin-top: 0;
 	}
 
-	h2,
-	h3 {
+	h2 {
 		font-size: $default-font-size;
+		color: $gray-900;
+		margin-bottom: 1.5em;
+	}
+
+	// Subheading style.
+	h3 {
+		font-size: 11px;
+		text-transform: uppercase;
+		font-weight: 500;
 		color: $gray-900;
 		margin-bottom: 1.5em;
 	}
