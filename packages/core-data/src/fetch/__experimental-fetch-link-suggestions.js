@@ -3,6 +3,7 @@
  */
 import apiFetch from '@wordpress/api-fetch';
 import { addQueryArgs } from '@wordpress/url';
+import { applyFilters } from '@wordpress/hooks';
 import { decodeEntities } from '@wordpress/html-entities';
 import { __ } from '@wordpress/i18n';
 
@@ -154,7 +155,12 @@ const fetchLinkSuggestions = async (
 	}
 
 	return Promise.all( queries ).then( ( results ) => {
-		return results
+		const filteredResults = applyFilters(
+			'editor.fetchLink.suggestions',
+			results,
+			search
+		);
+		return filteredResults
 			.reduce(
 				( accumulator, current ) => accumulator.concat( current ), //flatten list
 				[]
