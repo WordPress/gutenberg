@@ -253,10 +253,16 @@ function _gutenberg_build_template_result_from_file( $template_file, $template_t
 	$template->title          = ! empty( $template_file['title'] ) ? $template_file['title'] : $template_file['slug'];
 	$template->status         = 'publish';
 	$template->has_theme_file = true;
+	$template->is_custom      = true;
 
 	if ( 'wp_template' === $template_type && isset( $default_template_types[ $template_file['slug'] ] ) ) {
 		$template->description = $default_template_types[ $template_file['slug'] ]['description'];
 		$template->title       = $default_template_types[ $template_file['slug'] ]['title'];
+		$template->is_custom   = false;
+	}
+
+	if ( 'wp_template' === $template_type && isset( $template_file['postTypes'] ) ) {
+		$template->post_types = $template_file['postTypes'];
 	}
 
 	if ( 'wp_template_part' === $template_type && isset( $template_file['area'] ) ) {
@@ -274,7 +280,8 @@ function _gutenberg_build_template_result_from_file( $template_file, $template_t
  * @return WP_Block_Template|WP_Error Template.
  */
 function _gutenberg_build_template_result_from_post( $post ) {
-	$terms = get_the_terms( $post, 'wp_theme' );
+	$default_template_types = gutenberg_get_default_template_types();
+	$terms                  = get_the_terms( $post, 'wp_theme' );
 
 	if ( is_wp_error( $terms ) ) {
 		return $terms;
@@ -300,6 +307,11 @@ function _gutenberg_build_template_result_from_post( $post ) {
 	$template->title          = $post->post_title;
 	$template->status         = $post->post_status;
 	$template->has_theme_file = $has_theme_file;
+	$template->is_custom      = true;
+
+	if ( 'wp_template' === $post->post_type && isset( $default_template_types[ $template->slug ] ) ) {
+		$template->is_custom = false;
+	}
 
 	if ( 'wp_template_part' === $post->post_type ) {
 		$type_terms = get_the_terms( $post, 'wp_template_part_area' );
@@ -317,9 +329,10 @@ function _gutenberg_build_template_result_from_post( $post ) {
  * @param array $query {
  *     Optional. Arguments to retrieve templates.
  *
- *     @type array  $slug__in List of slugs to include.
- *     @type int    $wp_id    Post ID of customized template.
- *     @type string $area     A 'wp_template_part_area' taxonomy value to filter by (for wp_template_part template type only).
+ *     @type array  $slug__in  List of slugs to include.
+ *     @type int    $wp_id     Post ID of customized template.
+ *     @type string $area      A 'wp_template_part_area' taxonomy value to filter by (for wp_template_part template type only).
+ *     @type string $post_type Post type to get the templates for.
  * }
  * @param array $template_type wp_template or wp_template_part.
  *
@@ -340,6 +353,7 @@ function gutenberg_get_block_templates( $query = array(), $template_type = 'wp_t
 	 *
 	 *     @type array  $slug__in List of slugs to include.
 	 *     @type int    $wp_id Post ID of customized template.
+	 *     @type string $post_type Post type to get the templates for.
 	 * }
 	 * @param array $template_type wp_template or wp_template_part.
 	 */
@@ -348,6 +362,7 @@ function gutenberg_get_block_templates( $query = array(), $template_type = 'wp_t
 		return $templates;
 	}
 
+	$post_type     = isset( $query['post_type'] ) ? $query['post_type'] : '';
 	$wp_query_args = array(
 		'post_status'    => array( 'auto-draft', 'draft', 'publish' ),
 		'post_type'      => $template_type,
@@ -387,14 +402,33 @@ function gutenberg_get_block_templates( $query = array(), $template_type = 'wp_t
 	foreach ( $template_query->posts as $post ) {
 		$template = _gutenberg_build_template_result_from_post( $post );
 
-		if ( ! is_wp_error( $template ) ) {
-			$query_result[] = $template;
+		if ( is_wp_error( $template ) ) {
+			continue;
 		}
+
+		if ( $post_type && ! $template->is_custom ) {
+			continue;
+		}
+
+		$query_result[] = $template;
 	}
 
 	if ( ! isset( $query['wp_id'] ) ) {
 		$template_files = _gutenberg_get_template_files( $template_type );
 		foreach ( $template_files as $template_file ) {
+			$template = _gutenberg_build_template_result_from_file( $template_file, $template_type );
+
+			if ( $post_type && ! $template->is_custom ) {
+				continue;
+			}
+
+			if ( $post_type &&
+				isset( $template->post_types ) &&
+				! in_array( $post_type, $template->post_types, true )
+			) {
+				continue;
+			}
+
 			$is_not_custom   = false === array_search(
 				wp_get_theme()->get_stylesheet() . '//' . $template_file['slug'],
 				array_column( $query_result, 'id' ),
@@ -406,7 +440,7 @@ function gutenberg_get_block_templates( $query = array(), $template_type = 'wp_t
 				! isset( $query['area'] ) || $template_file['area'] === $query['area'];
 			$should_include  = $is_not_custom && $fits_slug_query && $fits_area_query;
 			if ( $should_include ) {
-				$query_result[] = _gutenberg_build_template_result_from_file( $template_file, $template_type );
+				$query_result[] = $template;
 			}
 		}
 	}

@@ -237,6 +237,10 @@ _Parameters_
 
 Removes the focus loss listener that `enableFocusLossObservation()` adds.
 
+### disablePageDialogAccept
+
+Disable auto-accepting any dialogs.
+
 ### disablePrePublishChecks
 
 Disables Pre-publish checks.
@@ -263,8 +267,7 @@ loss of focus.
 
 ### enablePageDialogAccept
 
-Enables even listener which accepts a page dialog which
-may appear when navigating away from Gutenberg.
+Enables event listener which auto-accepts all dialogs on the page.
 
 ### enablePrePublishChecks
 

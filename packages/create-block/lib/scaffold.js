@@ -19,6 +19,7 @@ const { code, info, success } = require( './log' );
 module.exports = async (
 	blockTemplate,
 	{
+		$schema,
 		apiVersion,
 		namespace,
 		slug,
@@ -48,6 +49,7 @@ module.exports = async (
 
 	const { outputTemplates, outputAssets } = blockTemplate;
 	const view = {
+		$schema,
 		apiVersion,
 		namespace,
 		namespaceSnakeCase: snakeCase( namespace ),

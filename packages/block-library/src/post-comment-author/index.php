@@ -18,9 +18,14 @@ function render_block_core_post_comment_author( $attributes, $content, $block ) 
 		return '';
 	}
 
+	$comment = get_comment( $block->context['commentId'] );
+	if ( empty( $comment ) ) {
+		return '';
+	}
+
 	$wrapper_attributes = get_block_wrapper_attributes();
-	$comment_author     = get_comment_author( $block->context['commentId'] );
-	$link               = get_comment_author_url( $block->context['commentId'] );
+	$comment_author     = get_comment_author( $comment );
+	$link               = get_comment_author_url( $comment );
 
 	if ( ! empty( $attributes['isLink'] ) && ! empty( $attributes['linkTarget'] ) ) {
 		$comment_author = sprintf( '<a rel="external nofollow ugc" href="%1s" target="%2s" >%3s</a>', $link, $attributes['linkTarget'], $comment_author );

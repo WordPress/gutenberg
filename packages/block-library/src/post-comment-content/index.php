@@ -18,7 +18,12 @@ function render_block_core_post_comment_content( $attributes, $content, $block )
 		return '';
 	}
 
-	$comment_text = get_comment_text( $block->context['commentId'] );
+	$comment = get_comment( $block->context['commentId'] );
+	if ( empty( $comment ) ) {
+		return '';
+	}
+
+	$comment_text = get_comment_text( $comment );
 	if ( ! $comment_text ) {
 		return '';
 	}

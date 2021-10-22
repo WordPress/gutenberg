@@ -21,6 +21,13 @@
 	}
 
 	// Normalize list styles.
+	ul {
+		margin-top: 0;
+		margin-bottom: 0;
+		margin-left: 0;
+		padding-left: 0;
+	}
+
 	ul,
 	ul li {
 		list-style: none;
@@ -230,7 +237,8 @@
 // Menu items with no background.
 .wp-block-navigation,
 .wp-block-navigation .wp-block-page-list,
-.wp-block-navigation__container {
+.wp-block-navigation__container,
+.wp-block-navigation__responsive-container-content {
 	gap: var(--wp--style--block-gap, 2em);
 }
 
@@ -331,7 +339,8 @@
 
 // Vertical layout
 .is-vertical .wp-block-page-list, // Page list.
-.is-vertical .wp-block-navigation__container {
+.is-vertical .wp-block-navigation__container,
+.is-vertical .wp-block-navigation__responsive-container-content {
 	display: flex;
 	flex-direction: column;
 	align-items: flex-start;
@@ -406,13 +415,17 @@
 	align-items: flex-start;
 	justify-content: flex-start;
 
+	.wp-block-navigation__responsive-container-content {
+		display: flex;
+	}
+
 	// Overlay menu.
 	// Provide an opinionated default style for menu items inside.
 	// Inherit as much as we can regarding colors, fonts, sizes,
 	// but otherwise provide a baseline.
 	// In a future version, we can explore more customizability.
 	&.is-menu-open {
-		display: flex;
+		display: flex; // Needs to be set to override "none".
 		flex-direction: column;
 
 		// Allow modal to scroll.
@@ -459,13 +472,17 @@
 			// Space unfolded items using gap and padding for submenus.
 			.wp-block-navigation__submenu-container,
 			.wp-block-navigation__container {
-				gap: 2rem;
-				padding-top: 2rem;
-				padding-bottom: 2rem;
+				gap: var(--wp--style--block-gap, 2em);
+
+				// Apply top padding to nested submenus.
+				.wp-block-navigation__submenu-container,
+				.wp-block-navigation__container {
+					padding-top: var(--wp--style--block-gap, 2em);
+				}
 			}
 
 			// A default padding is added to submenu items. It's not appropriate inside the modal.
-			a {
+			.wp-block-navigation-item__content {
 				padding: 0;
 			}
 
