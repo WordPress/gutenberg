@@ -144,17 +144,13 @@ function PageItems( { context, pagesByParentId, parentId = 0, depth = 0 } ) {
 				className={ classnames( 'wp-block-pages-list__item', {
 					'has-child': hasChildren,
 					'wp-block-navigation-item': isNavigationChild,
-					'open-on-click':
-						isNavigationChild && context.openSubmenusOnClick,
+					'open-on-click': context.openSubmenusOnClick,
 					'open-on-hover-click':
-						isNavigationChild &&
 						! context.openSubmenusOnClick &&
 						context.showSubmenuIcon,
 				} ) }
 			>
-				{ hasChildren &&
-				isNavigationChild &&
-				context.openSubmenusOnClick ? (
+				{ hasChildren && context.openSubmenusOnClick ? (
 					<ItemSubmenuToggle title={ page.title?.rendered } />
 				) : (
 					<a
@@ -171,8 +167,7 @@ function PageItems( { context, pagesByParentId, parentId = 0, depth = 0 } ) {
 				) }
 				{ hasChildren && (
 					<>
-						{ isNavigationChild &&
-							! context.openSubmenusOnClick &&
+						{ ! context.openSubmenusOnClick &&
 							context.showSubmenuIcon && <ItemSubmenuToggle /> }
 						<ul
 							className={ classnames( 'submenu-container', {
