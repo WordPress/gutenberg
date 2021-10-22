@@ -2,6 +2,14 @@
 
 ## Unreleased
 
+### Performance
+
+-   Avoid re-rendering all List View items on block focus [#35706](https://github.com/WordPress/gutenberg/pull/35706). These changes speed up block focus time in large posts by 80% when List View is open.
+
+### Breaking change
+
+-   List View no longer supports the `showOnlyCurrentHierarchy` flag [#35706](https://github.com/WordPress/gutenberg/pull/35706). To display a subset of blocks, use the `blocks` parameter instead.
+
 ## 7.0.0 (2021-07-29)
 
 ### Breaking Change
