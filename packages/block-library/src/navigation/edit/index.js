@@ -368,7 +368,7 @@ function Navigation( {
 						onFinish={ ( post ) => {
 							setIsPlaceholderShown( false );
 							setAttributes( {
-								navigationPostId: post.id.toString(),
+								navigationPostId: post.id,
 							} );
 							selectBlock( clientId );
 						} }

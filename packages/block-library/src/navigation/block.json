@@ -12,7 +12,7 @@
 	"textdomain": "default",
 	"attributes": {
 		"navigationPostId": {
-			"type": "string"
+			"type": "number"
 		},
 		"orientation": {
 			"type": "string",
