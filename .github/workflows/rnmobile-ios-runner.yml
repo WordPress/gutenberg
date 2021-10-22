@@ -44,15 +44,15 @@ jobs:
             #           packages/react-native-editor/ios/build/WDA
             #       key: ${{ runner.os }}-ios-build-${{ matrix.xcode }}-${{ hashFiles('ios-checksums.txt') }}
 
-            # - name: Restore pods cache
-            #   uses: actions/cache@c64c572235d810460d0d6876e9c705ad5002b353 # v2.1.6
-            #   with:
-            #       path: |
-            #           packages/react-native-editor/ios/Pods
-            #           ~/Library/Caches/CocoaPods
-            #           ~/.cocoapods/repos/trunk
-            #           packages/react-native-editor/ios/vendor
-            #       key: ${{ runner.os }}-pods-${{ hashFiles('packages/react-native-editor/ios/Gemfile.lock') }}-${{ hashFiles('packages/react-native-editor/ios/Podfile.lock') }}-${{ hashFiles('package-lock.json') }}
+            - name: Restore pods cache
+              uses: actions/cache@c64c572235d810460d0d6876e9c705ad5002b353 # v2.1.6
+              with:
+                  path: |
+                      packages/react-native-editor/ios/Pods
+                      ~/Library/Caches/CocoaPods
+                      ~/.cocoapods/repos/trunk
+                      packages/react-native-editor/ios/vendor
+                  key: ${{ runner.os }}-pods-${{ hashFiles('packages/react-native-editor/ios/Gemfile.lock') }}-${{ hashFiles('packages/react-native-editor/ios/Podfile.lock') }}-${{ hashFiles('package-lock.json') }}
 
             - name: Bundle iOS
               run: npm run native test:e2e:bundle:ios
