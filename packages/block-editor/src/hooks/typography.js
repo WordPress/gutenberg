@@ -9,6 +9,7 @@ import { __ } from '@wordpress/i18n';
  * Internal dependencies
  */
 import InspectorControls from '../components/inspector-controls';
+import { getFontAppearanceLabel } from '../components/font-appearance-control';
 
 import {
 	LINE_HEIGHT_SUPPORT_KEY,
@@ -24,6 +25,8 @@ import {
 	hasFontAppearanceValue,
 	resetFontAppearance,
 	useIsFontAppearanceDisabled,
+	useIsFontStyleDisabled,
+	useIsFontWeightDisabled,
 } from './font-appearance';
 import {
 	FONT_FAMILY_SUPPORT_KEY,
@@ -82,6 +85,9 @@ export function TypographyPanel( props ) {
 	const isTextDecorationDisabled = useIsTextDecorationDisabled( props );
 	const isTextTransformDisabled = useIsTextTransformDisabled( props );
 	const isLetterSpacingDisabled = useIsLetterSpacingDisabled( props );
+
+	const hasFontStyles = ! useIsFontStyleDisabled( props );
+	const hasFontWeights = ! useIsFontWeightDisabled( props );
 
 	const isDisabled = useIsTypographyDisabled( props );
 	const isSupported = hasTypographySupport( props.name );
@@ -147,7 +153,10 @@ export function TypographyPanel( props ) {
 				<ToolsPanelItem
 					className="single-column"
 					hasValue={ () => hasFontAppearanceValue( props ) }
-					label={ __( 'Appearance' ) }
+					label={ getFontAppearanceLabel(
+						hasFontStyles,
+						hasFontWeights
+					) }
 					onDeselect={ () => resetFontAppearance( props ) }
 					isShownByDefault={ defaultControls?.fontAppearance }
 					resetAllFilter={ ( newAttributes ) => ( {
