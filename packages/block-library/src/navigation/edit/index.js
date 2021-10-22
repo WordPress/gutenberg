@@ -42,6 +42,7 @@ import ResponsiveWrapper from './responsive-wrapper';
 import NavigationInnerBlocks from './inner-blocks';
 import NavigationMenuSelector from './navigation-menu-selector';
 import NavigationMenuNameControl from './navigation-menu-name-control';
+import UpgradeToNavigationMenu from './upgrade-to-navigation-menu';
 
 function getComputedStyle( node ) {
 	return node.ownerDocument.defaultView.getComputedStyle( node );
@@ -190,6 +191,21 @@ function Navigation( {
 			);
 		}
 	} );
+
+	// If the block has inner blocks, but no menu id, this was an older
+	// navigation block added before the block used a wp_navigation entity.
+	// Offer a UI to upgrade it to using the entity.
+	if ( hasExistingNavItems && navigationMenuId === undefined ) {
+		return (
+			<UpgradeToNavigationMenu
+				blockProps={ blockProps }
+				blocks={ innerBlocks }
+				onUpgrade={ ( post ) =>
+					setAttributes( { navigationMenuId: post.id } )
+				}
+			/>
+		);
+	}
 
 	// Show a warning if the selected menu is no longer available.
 	// TODO - the user should be able to select a new one?
