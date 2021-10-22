@@ -709,7 +709,7 @@ class WP_REST_URL_Details_Controller_Test extends WP_Test_REST_Controller_Testca
 				'<meta first="first" name="description" third="third" content="description with other attributes" fifth="fifth">',
 				'description with other attributes',
 			),
-			'with open graph'                          => array(
+			'with open graph'                            => array(
 				'<meta name="og:description" content="This is a OG description." />
 				<meta name="description" content="This is a description.">',
 				'This is a OG description.',
