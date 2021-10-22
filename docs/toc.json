@@ -1,6 +1,7 @@
 [
 	{
-		"docs/README.md": [
+		"docs/README.md": [],
+		"docs/getting-started/README.md": [
 			{
 				"docs/getting-started/devenv/README.md": [
 					{
