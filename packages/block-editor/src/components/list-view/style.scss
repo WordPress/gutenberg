@@ -264,17 +264,6 @@
 		}
 	}
 
-	.block-editor-list-view-block-select-button {
-		text-decoration: none;
-		&:hover {
-			color: var(--wp-admin-theme-color);
-		}
-	}
-
-	&.is-selected .block-editor-list-view-block-select-button:hover {
-		color: $white;
-	}
-
 	.block-editor-list-view-block-select-button__anchor {
 		background: rgba($black, 0.1);
 		border-radius: $radius-block-ui;

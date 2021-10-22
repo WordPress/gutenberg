@@ -6,7 +6,7 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { VisuallyHidden } from '@wordpress/components';
+import { Button, VisuallyHidden } from '@wordpress/components';
 import { useInstanceId } from '@wordpress/compose';
 import { forwardRef } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
@@ -58,7 +58,7 @@ function ListViewBlockSelectButton(
 
 	return (
 		<>
-			<a
+			<Button
 				className={ classnames(
 					'block-editor-list-view-block-select-button',
 					className
@@ -86,7 +86,7 @@ function ListViewBlockSelectButton(
 						{ __( '(selected block)' ) }
 					</VisuallyHidden>
 				) }
-			</a>
+			</Button>
 			<div
 				className="block-editor-list-view-block-select-button__description"
 				id={ descriptionId }
