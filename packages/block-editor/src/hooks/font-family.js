@@ -22,8 +22,8 @@ export const FONT_FAMILY_SUPPORT_KEY = 'typography.__experimentalFontFamily';
  * Filters registered block settings, extending attributes to include
  * the `fontFamily` attribute.
  *
- * @param  {Object} settings Original block settings
- * @return {Object}          Filtered block settings
+ * @param {Object} settings Original block settings
+ * @return {Object}         Filtered block settings
  */
 function addAttributes( settings ) {
 	if ( ! hasBlockSupport( settings, FONT_FAMILY_SUPPORT_KEY ) ) {
@@ -45,10 +45,10 @@ function addAttributes( settings ) {
 /**
  * Override props assigned to save component to inject font family.
  *
- * @param  {Object} props      Additional props applied to save element
- * @param  {Object} blockType  Block type
- * @param  {Object} attributes Block attributes
- * @return {Object}            Filtered props applied to save element
+ * @param {Object} props      Additional props applied to save element
+ * @param {Object} blockType  Block type
+ * @param {Object} attributes Block attributes
+ * @return {Object}           Filtered props applied to save element
  */
 function addSaveProps( props, blockType, attributes ) {
 	if ( ! hasBlockSupport( blockType, FONT_FAMILY_SUPPORT_KEY ) ) {
@@ -103,16 +103,10 @@ function addEditProps( settings ) {
 }
 
 export function FontFamilyEdit( {
-	name,
 	setAttributes,
 	attributes: { fontFamily },
 } ) {
 	const fontFamilies = useSetting( 'typography.fontFamilies' );
-	const isDisable = useIsFontFamilyDisabled( { name } );
-
-	if ( isDisable ) {
-		return null;
-	}
 
 	const value = find( fontFamilies, ( { slug } ) => fontFamily === slug )
 		?.fontFamily;
@@ -150,6 +144,28 @@ export function useIsFontFamilyDisabled( { name } ) {
 		fontFamilies.length === 0 ||
 		! hasBlockSupport( name, FONT_FAMILY_SUPPORT_KEY )
 	);
+}
+
+/**
+ * Checks if there is a current value set for the font family block support.
+ *
+ * @param {Object} props Block props.
+ * @return {boolean}     Whether or not the block has a font family value set.
+ */
+export function hasFontFamilyValue( props ) {
+	return !! props.attributes.fontFamily;
+}
+
+/**
+ * Resets the font family block support attribute. This can be used when
+ * disabling the font family support controls for a block via a progressive
+ * discovery panel.
+ *
+ * @param {Object} props               Block props.
+ * @param {Object} props.setAttributes Function to set block's attributes.
+ */
+export function resetFontFamily( { setAttributes } ) {
+	setAttributes( { fontFamily: undefined } );
 }
 
 addFilter(

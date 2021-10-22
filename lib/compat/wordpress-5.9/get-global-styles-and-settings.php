@@ -68,18 +68,18 @@ function gutenberg_get_global_styles( $path = array(), $block_name = '', $origin
 /**
  * Returns the stylesheet resulting of merging core, theme, and user data.
  *
- * @param string $type     Type of the stylesheet. Optional.
- *                         It accepts 'all', 'block_styles', 'css_variables', 'presets'.
- *                         If empty, it'll resolve to all (theme with theme.json support)
- *                         or 'presets' (theme without theme.json support).
+ * @param array $types Types of styles to load. Optional.
+ *                     It accepts 'variables', 'styles', 'presets' as values.
+ *                     If empty, it'll load all for themes with theme.json support
+ *                     and only [ 'variables', 'presets' ] for themes without theme.json support.
  *
  * @return string Stylesheet.
  */
-function gutenberg_get_global_stylesheet( $type = '' ) {
+function gutenberg_get_global_stylesheet( $types = array() ) {
 	// Return cached value if it can be used and exists.
 	// It's cached by theme to make sure that theme switching clears the cache.
 	$can_use_cached = (
-		( 'all' === $type ) &&
+		( empty( $types ) ) &&
 		( ! defined( 'WP_DEBUG' ) || ! WP_DEBUG ) &&
 		( ! defined( 'SCRIPT_DEBUG' ) || ! SCRIPT_DEBUG ) &&
 		( ! defined( 'REST_REQUEST' ) || ! REST_REQUEST ) &&
@@ -95,10 +95,10 @@ function gutenberg_get_global_stylesheet( $type = '' ) {
 
 	$supports_theme_json = WP_Theme_JSON_Resolver_Gutenberg::theme_has_support();
 	$supports_link_color = get_theme_support( 'experimental-link-color' );
-	if ( empty( $type ) && ! $supports_theme_json ) {
-		$type = 'presets';
-	} elseif ( empty( $type ) ) {
-		$type = 'all';
+	if ( empty( $types ) && ! $supports_theme_json ) {
+		$types = array( 'variables', 'presets' );
+	} elseif ( empty( $types ) ) {
+		$types = array( 'variables', 'styles', 'presets' );
 	}
 
 	$origins = array( 'core', 'theme', 'user' );
@@ -113,7 +113,7 @@ function gutenberg_get_global_stylesheet( $type = '' ) {
 
 	$theme_supports = gutenberg_get_default_block_editor_settings();
 	$tree           = WP_Theme_JSON_Resolver_Gutenberg::get_merged_data( $theme_supports );
-	$stylesheet     = $tree->get_stylesheet( $type, $origins );
+	$stylesheet     = $tree->get_stylesheet( $types, $origins );
 
 	if ( $can_use_cached ) {
 		// Cache for a minute.

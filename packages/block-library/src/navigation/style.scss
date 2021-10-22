@@ -472,9 +472,13 @@
 			// Space unfolded items using gap and padding for submenus.
 			.wp-block-navigation__submenu-container,
 			.wp-block-navigation__container {
-				gap: 2rem;
-				padding-top: 2rem;
-				padding-bottom: 2rem;
+				gap: var(--wp--style--block-gap, 2em);
+
+				// Apply top padding to nested submenus.
+				.wp-block-navigation__submenu-container,
+				.wp-block-navigation__container {
+					padding-top: var(--wp--style--block-gap, 2em);
+				}
 			}
 
 			// A default padding is added to submenu items. It's not appropriate inside the modal.

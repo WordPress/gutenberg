@@ -1,5 +1,20 @@
 == Changelog ==
 
+= 11.8.0-rc.2 =
+
+
+
+### Bug Fixes
+
+- [Block Editor]: Fix displaying only the `none` alignment option. ([35822](https://github.com/WordPress/gutenberg/pull/35822))
+
+#### Block Library
+- Fix issue with responsive navigation causing wrapping. ([35820](https://github.com/WordPress/gutenberg/pull/35820))
+
+
+
+
+
 = 11.7.1 =
 
 ### Bug Fixes
