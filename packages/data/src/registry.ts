@@ -11,7 +11,15 @@ import createCoreDataStore from './store';
 import { STORE_NAME } from './store/name';
 import { createEmitter } from './utils/emitter';
 
-/** @typedef {import('./types').WPDataStore} WPDataStore */
+import type {
+	BaseActions,
+	BaseSelectors,
+	EmptyState,
+	WPDataAttachedStore,
+	WPDataReduxStoreConfig,
+	WPDataRegistry,
+	WPDataStore,
+} from './types.d';
 
 /**
  * @typedef {Object} WPDataRegistry An isolated orchestrator of store registrations.
@@ -43,13 +51,18 @@ import { createEmitter } from './utils/emitter';
  * Creates a new store registry, given an optional object of initial store
  * configurations.
  *
- * @param {Object}  storeConfigs Initial store configurations.
- * @param {Object?} parent       Parent registry.
+ * @param storeConfigs Initial store configurations.
+ * @param parent       Parent registry.
  *
- * @return {WPDataRegistry} Data registry.
+ * @return Data registry.
  */
-export function createRegistry( storeConfigs = {}, parent = null ) {
-	const stores = {};
+export function createRegistry<
+	Registry extends Record<
+		string,
+		WPDataAttachedStore< BaseActions, BaseSelectors >
+	>
+>( storeConfigs = {}, parent: WPDataRegistry | null = null ): WPDataRegistry {
+	const stores = {} as Registry;
 	const emitter = createEmitter();
 	const __experimentalListeningStores = new Set();
 
@@ -74,12 +87,23 @@ export function createRegistry( storeConfigs = {}, parent = null ) {
 	/**
 	 * Calls a selector given the current state and extra arguments.
 	 *
-	 * @param {string|WPDataStore} storeNameOrDefinition Unique namespace identifier for the store
-	 *                                                   or the store definition.
+	 * @param  storeNameOrDefinition Unique namespace identifier for the store
+	 *                               or the store definition.
 	 *
-	 * @return {*} The selector's returned value.
+	 * @return The selector's returned value.
 	 */
-	function select( storeNameOrDefinition ) {
+	function select<
+		Name extends keyof Registry & string,
+		Config extends Registry[ Name ]
+	>(
+		storeNameOrDefinition:
+			| Name
+			| WPDataStore<
+					Name,
+					ReturnType< Config[ 'getActions' ] >,
+					ReturnType< Config[ 'getSelectors' ] >
+			  >
+	) {
 		const storeName = isObject( storeNameOrDefinition )
 			? storeNameOrDefinition.name
 			: storeNameOrDefinition;
@@ -161,10 +185,14 @@ export function createRegistry( storeConfigs = {}, parent = null ) {
 	/**
 	 * Registers a generic store.
 	 *
-	 * @param {string} key    Store registry key.
-	 * @param {Object} config Configuration (getSelectors, getActions, subscribe).
+	 * @param key    Store registry key.
+	 * @param config Configuration (getSelectors, getActions, subscribe).
 	 */
-	function registerGenericStore( key, config ) {
+	function registerGenericStore<
+		Name extends string,
+		Actions extends Record< string, Function | Generator >,
+		Selectors extends Record< string, Function | Generator >
+	>( key: Name, config: WPDataAttachedStore< Actions, Selectors > ) {
 		if ( typeof config.getSelectors !== 'function' ) {
 			throw new TypeError( 'config.getSelectors must be a function' );
 		}
@@ -205,9 +233,13 @@ export function createRegistry( storeConfigs = {}, parent = null ) {
 	/**
 	 * Registers a new store definition.
 	 *
-	 * @param {WPDataStore} store Store definition.
+	 * @param store Store definition.
 	 */
-	function register( store ) {
+	function register<
+		Name extends string,
+		Actions extends Record< string, Function | Generator >,
+		Selectors extends Record< string, Function | Generator >
+	>( store: WPDataStore< Name, Actions, Selectors > ) {
 		registerGenericStore( store.name, store.instantiate( registry ) );
 	}
 
@@ -260,12 +292,20 @@ export function createRegistry( storeConfigs = {}, parent = null ) {
 	/**
 	 * Registers a standard `@wordpress/data` store.
 	 *
-	 * @param {string} storeName Unique namespace identifier.
-	 * @param {Object} options   Store description (reducer, actions, selectors, resolvers).
+	 * @param storeName Unique namespace identifier.
+	 * @param options   Store description (reducer, actions, selectors, resolvers).
 	 *
-	 * @return {Object} Registered store object.
+	 * @return Registered store object.
 	 */
-	registry.registerStore = ( storeName, options ) => {
+	registry.registerStore = <
+		Name extends string,
+		State extends EmptyState,
+		Actions extends Record< string, Function | Generator >,
+		Selectors extends Record< string, Function | Generator >
+	>(
+		storeName: Name,
+		options: WPDataReduxStoreConfig< State, Actions, Selectors >
+	): WPDataStore< Name, Actions, Selectors > => {
 		if ( ! options.reducer ) {
 			throw new TypeError( 'Must specify store reducer' );
 		}

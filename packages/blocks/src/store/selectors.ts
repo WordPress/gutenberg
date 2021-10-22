@@ -14,9 +14,8 @@ import {
 	some,
 } from 'lodash';
 
-/** @typedef {import('../api/registration').WPBlockVariation} WPBlockVariation */
-/** @typedef {import('../api/registration').WPBlockVariationScope} WPBlockVariationScope */
-/** @typedef {import('./reducer').WPBlockCategory} WPBlockCategory */
+import type { WPBlockVariation, WPBlockVariationScope } from '../api/registration';
+import type { WPBlockCategory } from './reducer'
 
 /**
  * Given a block name or block type object, returns the corresponding

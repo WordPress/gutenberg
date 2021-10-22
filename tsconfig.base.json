@@ -1,6 +1,7 @@
 {
 	"compilerOptions": {
 		"allowJs": true,
+	  	"baseUrl": ".",
 		"checkJs": true,
 		"allowSyntheticDefaultImports": true,
 		"jsx": "preserve",
@@ -29,6 +30,10 @@
 		/* This needs to be false so our types are possible to consume without setting this */
 		"esModuleInterop": false,
 		"resolveJsonModule": true,
+
+		"paths": {
+			"@wordpress/data/*": [ "packages/data/src/*" ]
+		},
 
 		"typeRoots": [ "./typings", "./node_modules/@types" ],
 		"types": []

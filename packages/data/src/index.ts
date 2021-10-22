@@ -9,7 +9,7 @@ import combineReducers from 'turbo-combine-reducers';
 import defaultRegistry from './default-registry';
 import * as plugins from './plugins';
 
-/** @typedef {import('./types').WPDataStore} WPDataStore */
+import type { WPDataStore } from './types.d';
 
 export { default as withSelect } from './components/with-select';
 export { default as withDispatch } from './components/with-dispatch';
@@ -91,7 +91,7 @@ export { combineReducers };
  * select( 'my-shop' ).getPrice( 'hammer' );
  * ```
  *
- * @return {Object} Object containing the store's selectors.
+ * @return Object containing the store's selectors.
  */
 export const select = defaultRegistry.select;
 
@@ -204,6 +204,12 @@ export const use = defaultRegistry.use;
  * register( store );
  * ```
  *
- * @param {WPDataStore} store Store definition.
+ * @param store Store definition.
  */
-export const register = defaultRegistry.register;
+export const register = <
+	Name extends string,
+	Actions extends Record< string, Function | Generator >,
+	Selectors extends Record< string, Function | Generator >
+>(
+	store: WPDataStore< Name, Actions, Selectors >
+) => defaultRegistry.register( store );

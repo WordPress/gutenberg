@@ -1,34 +1,66 @@
 export type WPDataFunctionOrGeneratorArray = Array< Function | Generator >;
 export type WPDataFunctionArray = Array< Function >;
 
-export interface WPDataAttachedStore {
-	getSelectors: () => WPDataFunctionArray;
-	getActions: () => WPDataFunctionArray;
+export interface ActionBase< Type extends string = string > {
+	type: Type;
+}
+
+export type ActionCreator< Action extends ActionBase = ActionBase > = {
+	[ name: string ]: ( ...args: unknown[] ) => Action;
+};
+
+export type FunctionThingy = Record< string, Function | Generator > | undefined;
+export type BaseActions = FunctionThingy;
+export type BaseSelectors = FunctionThingy;
+
+export type EmptyState = Record< string, unknown >;
+
+export interface WPDataAttachedStore<
+	Actions extends BaseActions,
+	Selectors extends BaseSelectors
+> {
+	getSelectors: () => Selectors;
+	getActions: () => Actions;
 	subscribe: ( listener: () => void ) => () => void;
 }
 
-export interface WPDataStore {
+export interface WPDataStore<
+	Name extends string,
+	Actions extends BaseActions,
+	Selectors extends BaseSelectors
+> {
 	/**
 	 * Store Name
 	 */
-	name: string;
+	name: Name;
 
 	/**
 	 * Store configuration object.
 	 */
-	instantiate: ( registry: WPDataRegistry ) => WPDataAttachedStore;
+	instantiate: (
+		registry: WPDataRegistry< Name, Actions, Selectors >
+	) => WPDataAttachedStore< Actions, Selectors >;
 }
 
-export interface WPDataReduxStoreConfig {
-	reducer: ( state: any, action: any ) => any;
-	actions?: WPDataFunctionOrGeneratorArray;
+export interface WPDataReduxStoreConfig<
+	State extends EmptyState,
+	Actions extends Record< string, Function | Generator > | undefined,
+	Selectors extends Record< string, Function | Generator > | undefined
+> {
+	reducer: ( state: State, action: any ) => any;
+	actions?: Actions;
 	resolvers?: WPDataFunctionOrGeneratorArray;
-	selectors?: WPDataFunctionArray;
+	selectors?: Selectors;
 	controls?: WPDataFunctionArray;
 }
 
-export interface WPDataRegistry {
-	register: ( store: WPDataStore ) => void;
+export interface WPDataRegistry<
+	Name extends string = string,
+	Actions extends BaseActions = BaseActions,
+	Selectors extends BaseSelectors = BaseSelectors
+> {
+	register: ( store: WPDataStore< Name, Actions, Selectors > ) => void;
+	select: (store: Name | WPDataStore<Name, Actions, Selectors>) => Selectors
 }
 
 export interface WPDataEmitter {

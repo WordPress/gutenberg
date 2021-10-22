@@ -1,0 +1,10 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+	"baseUrl": "../../",
+	"resolveJsonModule": true,
+	"paths": {
+	  "@wordpress/*": [ "packages/*/src" ]
+	}
+  },
+}

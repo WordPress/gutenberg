@@ -22,9 +22,13 @@ import metadataReducer from './metadata/reducer';
 import * as metadataSelectors from './metadata/selectors';
 import * as metadataActions from './metadata/actions';
 
-/** @typedef {import('../types').WPDataRegistry} WPDataRegistry */
-/** @typedef {import('../types').WPDataStore} WPDataStore */
-/** @typedef {import('../types').WPDataReduxStoreConfig} WPDataReduxStoreConfig */
+import type {
+	ActionCreator,
+	EmptyState,
+	WPDataReduxStoreConfig,
+	WPDataRegistry,
+	WPDataStore,
+} from '../types.d';
 
 /**
  * Create a cache to track whether resolvers started running or not.
@@ -70,14 +74,22 @@ function createResolversCache() {
  * } );
  * ```
  *
- * @param {string}                 key     Unique namespace identifier.
- * @param {WPDataReduxStoreConfig} options Registered store options, with properties
+ * @param key     Unique namespace identifier.
+ * @param options Registered store options, with properties
  *                                         describing reducer, actions, selectors,
  *                                         and resolvers.
  *
- * @return {WPDataStore} Store Object.
+ * @return Store Object.
  */
-export default function createReduxStore( key, options ) {
+export default function createReduxStore<
+	Key extends string,
+	State extends EmptyState,
+	Actions extends Record< string, Function | Generator >,
+	Selectors extends Record< string, Function | Generator >
+>(
+	key: Key,
+	options: WPDataReduxStoreConfig< State, Actions, Selectors >
+): WPDataStore< Key, Actions, Selectors > {
 	return {
 		name: key,
 		instantiate: ( registry ) => {

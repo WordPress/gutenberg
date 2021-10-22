@@ -1,7 +1,8 @@
 /**
  * WordPress dependencies
  */
-import { createReduxStore, register } from '@wordpress/data';
+import { createReduxStore, register, select } from '@wordpress/data';
+import type { WPDataAttachedStore } from '@wordpress/data/types.d';
 
 /**
  * Internal dependencies
@@ -11,12 +12,15 @@ import * as selectors from './selectors';
 import * as actions from './actions';
 import { STORE_NAME } from './constants';
 
+export type BlockStore = WPDataAttachedStore<
+	typeof actions,
+	typeof selectors
+>;
+
 /**
  * Store definition for the blocks namespace.
  *
  * @see https://github.com/WordPress/gutenberg/blob/HEAD/packages/data/README.md#createReduxStore
- *
- * @type {Object}
  */
 export const store = createReduxStore( STORE_NAME, {
 	reducer,
@@ -24,4 +28,9 @@ export const store = createReduxStore( STORE_NAME, {
 	actions,
 } );
 
+const a = store.instantiate( null as any );
+a.getSelectors().getCategories( {} );
+a.getActions().addBlockTypes( {} );
+
 register( store );
+select( store );
