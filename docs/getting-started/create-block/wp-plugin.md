@@ -49,7 +49,7 @@ Let's confirm the plugin is loaded and working.
 
 -or-
 
-(3B) If you are using `wp-env`, see [Development Environment setup](/docs/getting-started/tutorials/devenv/README.md), then you should now run from inside the `gutenpride` directory:
+(3B) If you are using `wp-env`, see [Development Environment setup](/docs/getting-started/devenv/README.md), then you should now run from inside the `gutenpride` directory:
 
 ```sh
 wp-env start
@@ -139,4 +139,4 @@ For more info, see the build section of the [Getting Started with JavaScript tut
 
 Hopefully, at this point, you have your plugin created and activated. We have the `package.json` with the `@wordpress/scripts` dependency, that defines the build and start scripts. The basic block is in place and can be added to the editor.
 
-Next Section: [Anatomy of a Block](/docs/getting-started/tutorials/create-block/block-anatomy.md)
+Next Section: [Anatomy of a Block](/docs/getting-started/create-block/block-anatomy.md)

@@ -344,7 +344,7 @@ Yes, you can drag and drop blocks to rearrange their order.
 
 ## How do I make my own block?
 
-The best place to start is the [Create a Block Tutorial](https://developer.wordpress.org/block-editor/tutorials/create-block/).
+The best place to start is the [Create a Block Tutorial](https://developer.wordpress.org/block-editor/getting-started/create-block/).
 
 ## Does Gutenberg involve editing posts/pages in the front-end?
 
@@ -352,15 +352,27 @@ No, we are designing Gutenberg primarily as a replacement for the post and page 
 
 ## Given Gutenberg is built in JavaScript, how do old meta boxes (PHP) work?
 
-See the [Meta Box Tutorial](https://developer.wordpress.org/block-editor/tutorials/metabox/) for more information on using Meta boxes with the new block editor.
+See the [Meta Box Tutorial](https://developer.wordpress.org/block-editor/how-to-guides/metabox/) for more information on using Meta boxes with the new block editor.
 
 ## How can plugins extend the Gutenberg UI?
 
-The main extension point we want to emphasize is creating new blocks. Blocks are added to the block editor using plugins, see the [Create a Block Tutorial](https://developer.wordpress.org/block-editor/tutorials/create-block/) to get started.
+The main extension point we want to emphasize is creating new blocks. Blocks are added to the block editor using plugins, see the [Create a Block Tutorial](https://developer.wordpress.org/block-editor/getting-stared/create-block/) to get started.
 
 ## Are Custom Post Types still supported?
 
 Indeed. There are multiple ways in which custom post types can leverage Gutenberg. The plan is to allow them to specify the blocks they support, as well as defining a default block for the post type. It's not currently the case, but if a post type disables the content field, the “advanced” section at the bottom would fill the page.
+
+## Does Gutenberg support columns?
+
+Yes, a columns block is available in Gutenberg.
+
+## Does Gutenberg support nested blocks?
+
+Yes, it is supported. You can have multiple levels of nesting – blocks within blocks within blocks. See the [Nested Block Tutorial](/docs/how-to-guides/block-tutorial/nested-blocks-inner-blocks.md) for more information.
+
+## Does drag and drop work for rearranging blocks?
+
+Yes, you can drag and drop blocks to rearrange their order.
 
 
 ## Can themes _style_ blocks?

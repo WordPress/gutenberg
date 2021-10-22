@@ -77,4 +77,4 @@ export default function save( { attributes } ) {
 
 Rebuild the block using `npm run build`, reload the editor and add the block. Type a message in the editor, save, and view it in the post.
 
-Next Section: [Code Implementation](/docs/getting-started/tutorials/create-block/block-code.md)
+Next Section: [Code Implementation](/docs/getting-started/create-block/block-code.md)
