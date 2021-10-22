@@ -12,7 +12,7 @@ import {
 	useBlockProps,
 	getColorClassName,
 } from '@wordpress/block-editor';
-import { ToolbarButton } from '@wordpress/components';
+import { ToolbarButton, Placeholder, Spinner } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { useEffect, useState } from '@wordpress/element';
 import apiFetch from '@wordpress/api-fetch';
@@ -70,28 +70,39 @@ export default function PageListEdit( { context, clientId } ) {
 					clientId={ clientId }
 				/>
 			) }
-			{ totalPages > 0 ? (
+			{ totalPages === null && (
+				<div { ...blockProps }>
+					<Placeholder>
+						<Spinner />
+					</Placeholder>
+				</div>
+			) }
+			{ totalPages === 0 && (
+				<div { ...blockProps }>
+					<span>{ __( 'Page List: No pages to show.' ) }</span>
+				</div>
+			) }
+			{ totalPages > 0 && (
 				<ul { ...blockProps }>
 					<PageItems
 						context={ context }
 						pagesByParentId={ pagesByParentId }
 					/>
 				</ul>
-			) : (
-				<div { ...blockProps }>
-					<span>{ __( 'Page List: No pages to show.' ) }</span>
-				</div>
 			) }
 		</>
 	);
 }
 
 function usePagesByParentId() {
-	const [ pagesByParentId, setPagesByParentId ] = useState( new Map() );
-	const [ totalPages, setTotalPages ] = useState( 0 );
+	const [ pagesByParentId, setPagesByParentId ] = useState( null );
+	const [ totalPages, setTotalPages ] = useState( null );
 
 	useEffect( () => {
 		async function performFetch() {
+			setPagesByParentId( null );
+			setTotalPages( null );
+
 			let pages = await apiFetch( {
 				path: addQueryArgs( '/wp/v2/pages', {
 					orderby: 'menu_order',
