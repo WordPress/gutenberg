@@ -181,6 +181,10 @@ function render_block_core_navigation_submenu( $attributes, $content, $block ) {
 		// Start appending HTML attributes to anchor tag.
 		$html .= '<a class="wp-block-navigation-item__content" href="' . $item_url . '"';
 
+		if ( $is_active ) {
+			$html .= ' aria-current="page"';
+		}
+
 		if ( isset( $attributes['opensInNewTab'] ) && true === $attributes['opensInNewTab'] ) {
 			$html .= ' target="_blank"  ';
 		}
