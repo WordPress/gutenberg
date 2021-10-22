@@ -122,7 +122,7 @@ export default function SidebarBlockEditor( {
 				<CopyHandler>
 					<BlockTools>
 						<BlockSelectionClearer>
-							<WritingFlow>
+							<WritingFlow className="editor-styles-wrapper">
 								<ObserveTyping>
 									<BlockList
 										renderAppender={ BlockAppender }
