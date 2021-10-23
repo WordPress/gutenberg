@@ -21,6 +21,10 @@
 	"config": {
 		"GUTENBERG_PHASE": 2
 	},
+	"resolutions": {
+		"**/ua-parser-js": "0.7.28",
+		"**/@types/ua-parser-js": "0.7.28"
+	},
 	"dependencies": {
 		"@wordpress/a11y": "file:packages/a11y",
 		"@wordpress/admin-manifest": "file:packages/admin-manifest",
