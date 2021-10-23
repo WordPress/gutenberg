@@ -58,8 +58,8 @@ _Returns_
 ### documentHasUncollapsedSelection
 
 Check whether the current document has any sort of selection. This includes
-ranges of text across elements and any selection inside <input> and
-<textarea> elements.
+ranges of text across elements and any selection inside `<input>` and
+`<textarea>` elements.
 
 _Parameters_
 
