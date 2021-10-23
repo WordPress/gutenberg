@@ -19,6 +19,7 @@ import useBlockDisplayInformation from '../use-block-display-information';
 import { getBlockPositionDescription } from './utils';
 import BlockTitle from '../block-title';
 import ListViewExpander from './expander';
+import { SPACE, ENTER } from '@wordpress/keycodes';
 
 function ListViewBlockSelectButton(
 	{
@@ -30,7 +31,6 @@ function ListViewBlockSelectButton(
 		position,
 		siblingBlockCount,
 		level,
-		tabIndex,
 		onFocus,
 		onDragStart,
 		onDragEnd,
@@ -56,6 +56,13 @@ function ListViewBlockSelectButton(
 		onDragStart( event );
 	};
 
+	function onKeyDownHandler( event ) {
+		if ( event.keyCode === ENTER || event.keyCode === SPACE ) {
+			event.preventDefault();
+			onClick( event );
+		}
+	}
+
 	return (
 		<>
 			<Button
@@ -64,9 +71,10 @@ function ListViewBlockSelectButton(
 					className
 				) }
 				onClick={ onClick }
+				onKeyDown={ onKeyDownHandler }
 				aria-describedby={ descriptionId }
 				ref={ ref }
-				tabIndex={ tabIndex }
+				tabIndex="0"
 				onFocus={ onFocus }
 				onDragStart={ onDragStartHandler }
 				onDragEnd={ onDragEnd }
