@@ -1,7 +1,8 @@
 /**
  * WordPress dependencies
  */
-import { __ } from '@wordpress/i18n';
+import { __, sprintf } from '@wordpress/i18n';
+import { speak } from '@wordpress/a11y';
 import { toggleFormat } from '@wordpress/rich-text';
 import {
 	RichTextToolbarButton,
@@ -21,6 +22,14 @@ export const bold = {
 	edit( { isActive, value, onChange, onFocus } ) {
 		function onToggle() {
 			onChange( toggleFormat( value, { type: name } ) );
+			// For screen readers, will announce if Bold is active or not. Because isActive is not updated yet, flip the value and then compare type true/false.
+			if ( ! isActive === true ) {
+				// translators: %s: title of the formatting control
+				speak( sprintf( __( '%s applied.' ), title ), 'assertive' );
+			} else {
+				// translators: %s: title of the formatting control
+				speak( sprintf( __( '%s removed.' ), title ), 'assertive' );
+			}
 		}
 
 		function onClick() {
