@@ -92,7 +92,6 @@ function TextColorEdit( {
 					<Icon
 						icon={ textColorIcon }
 						style={ colorIndicatorStyle }
-						role="menuitemcheckbox"
 					/>
 				}
 				title={ title }
@@ -102,6 +101,7 @@ function TextColorEdit( {
 						? enableIsAddingColor
 						: () => onChange( removeFormat( value, name ) )
 				}
+				role="menuitemcheckbox"
 			/>
 			{ isAddingColor && (
 				<InlineColorUI

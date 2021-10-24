@@ -51,7 +51,9 @@ const FormatToolbar = () => {
 											toggleProps.className,
 											{ 'is-pressed': hasActive }
 										),
-										describedBy: __( 'Displays more block tools' ),
+										describedBy: __(
+											'Displays more block tools'
+										),
 									} }
 									controls={ orderBy(
 										fills.map( ( [ { props } ] ) => props ),
