@@ -1,4 +1,5 @@
 {
+	"$schema": "https://json.schemastore.org/block.json",
 	"apiVersion": 2,
 	"name": "core/social-link",
 	"title": "Social Icon",

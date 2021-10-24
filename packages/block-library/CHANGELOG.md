@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+-   Code quality: Add block schema to each core block.
+
 ## 6.0.0 (2021-09-09)
 
 ### Breaking Change
