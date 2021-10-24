@@ -24,7 +24,7 @@ export const bold = {
 		}
 
 		function onClick() {
-			onToggle();
+			onChange( toggleFormat( value, { type: name } ) );
 			onFocus();
 		}
 

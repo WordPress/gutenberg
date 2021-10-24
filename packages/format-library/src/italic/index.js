@@ -24,7 +24,7 @@ export const italic = {
 		}
 
 		function onClick() {
-			onToggle();
+			onChange( toggleFormat( value, { type: name } ) );
 			onFocus();
 		}
 
