@@ -20,8 +20,7 @@
 	},
 	"providesContext": {
 		"queryId": "queryId",
-		"queryPerPage": "queryPerPage",
-		"displayLayout": "displayLayout"
+		"queryPerPage": "queryPerPage"
 	},
 	"supports": {
 		"align": [ "wide", "full" ],
