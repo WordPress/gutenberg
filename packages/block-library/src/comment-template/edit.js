@@ -15,7 +15,11 @@ import { Spinner } from '@wordpress/components';
 import { store as coreStore } from '@wordpress/core-data';
 import { store as editorStore } from '@wordpress/editor';
 
-const TEMPLATE = [ [ 'core/post-comment-content' ] ];
+const TEMPLATE = [
+	[ 'core/post-comment-author' ],
+	[ 'core/post-comment-date' ],
+	[ 'core/post-comment-content' ],
+];
 
 export default function CommentTemplateEdit( { clientId, context: {} } ) {
 	const innerBlocksProps = useInnerBlocksProps( {}, { template: TEMPLATE } );
