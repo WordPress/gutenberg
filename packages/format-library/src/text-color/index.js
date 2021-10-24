@@ -92,6 +92,7 @@ function TextColorEdit( {
 					<Icon
 						icon={ textColorIcon }
 						style={ colorIndicatorStyle }
+						role="menuitemcheckbox"
 					/>
 				}
 				title={ title }

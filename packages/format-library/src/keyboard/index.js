@@ -30,6 +30,7 @@ export const keyboard = {
 				title={ title }
 				onClick={ onClick }
 				isActive={ isActive }
+				role="menuitemcheckbox"
 			/>
 		);
 	},

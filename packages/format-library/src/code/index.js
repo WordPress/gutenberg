@@ -56,6 +56,7 @@ export const code = {
 				title={ title }
 				onClick={ onClick }
 				isActive={ isActive }
+				role="menuitemcheckbox"
 			/>
 		);
 	},

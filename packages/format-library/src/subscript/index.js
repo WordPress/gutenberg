@@ -30,6 +30,7 @@ export const subscript = {
 				title={ title }
 				onClick={ onClick }
 				isActive={ isActive }
+				role="menuitemcheckbox"
 			/>
 		);
 	},
