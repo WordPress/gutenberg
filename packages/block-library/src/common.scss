@@ -3,37 +3,17 @@
 // the colors override the added specificity by link states such as :hover.
 
 :root {
-	// Background colors.
-	@include background-colors();
-
-	// Foreground colors.
-	@include foreground-colors();
-
-	// Gradients
-	@include gradient-colors();
-
+	@include background-colors-deprecated();
+	@include foreground-colors-deprecated();
+	@include gradient-colors-deprecated();
 }
 
-// Font sizes.
-.has-small-font-size {
-	font-size: 0.8125em;
-}
-
-.has-regular-font-size, // Not used now, kept because of backward compatibility.
-.has-normal-font-size {
+// Font sizes (not used now, kept because of backward compatibility).
+.has-regular-font-size {
 	font-size: 1em;
 }
 
-.has-medium-font-size {
-	font-size: 1.25em;
-}
-
-.has-large-font-size {
-	font-size: 2.25em;
-}
-
-.has-larger-font-size, // Not used now, kept because of backward compatibility.
-.has-huge-font-size {
+.has-larger-font-size {
 	font-size: 2.625em;
 }
 

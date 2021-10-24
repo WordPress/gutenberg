@@ -12,6 +12,7 @@
 		}
 	},
 	"supports": {
+		"align": [ "wide", "full" ],
 		"html": false,
 		"color": {
 			"gradients": true
@@ -20,10 +21,15 @@
 			"margin": true,
 			"padding": true
 		},
-		"fontSize": true,
-		"lineHeight": true,
-		"__experimentalFontFamily": true,
-		"__experimentalTextTransform": true,
-		"__experimentalLetterSpacing": true
-	}
+		"typography": {
+			"fontSize": true,
+			"lineHeight": true,
+			"__experimentalFontFamily": true,
+			"__experimentalTextTransform": true,
+			"__experimentalFontStyle": true,
+			"__experimentalFontWeight": true,
+			"__experimentalLetterSpacing": true
+		}
+	},
+	"editorStyle": "wp-block-site-tagline-editor"
 }

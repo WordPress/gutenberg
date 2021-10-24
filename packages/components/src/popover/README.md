@@ -8,21 +8,21 @@ Render a Popover within the parent to which it should anchor:
 
 ```jsx
 import { Button, Popover } from '@wordpress/components';
-import { withState } from '@wordpress/compose';
+import { useState } from '@wordpress/element';
 
-const MyPopover = withState( {
-	isVisible: false,
-} )( ( { isVisible, setState } ) => {
+const MyPopover = () => {
+	const [ isVisible, setIsVisible ] = useState( false );
 	const toggleVisible = () => {
-		setState( ( state ) => ( { isVisible: ! state.isVisible } ) );
+		setIsVisible( ( state ) => ! state );
 	};
+
 	return (
 		<Button variant="secondary" onClick={ toggleVisible }>
 			Toggle Popover!
 			{ isVisible && <Popover>Popover is toggled!</Popover> }
 		</Button>
 	);
-} );
+};
 ```
 
 If a Popover is returned by your component, it will be shown. To hide the popover, simply omit it from your component's render value.

@@ -46,5 +46,6 @@
 
 .edit-post-editor__list-view-panel-content {
 	overflow-y: auto;
-	padding: $grid-unit-10;
+	// The table cells use an extra pixels of space left and right. We compensate for that here.
+	padding: $grid-unit-10 ($grid-unit-10 - $border-width - $border-width);
 }

@@ -11,6 +11,10 @@ import { default as lodash, first, last, nth, uniqueId } from 'lodash';
 import { useState } from '@wordpress/element';
 import { UP, DOWN, ENTER } from '@wordpress/keycodes';
 /**
+ * WordPress dependencies
+ */
+import { useSelect } from '@wordpress/data';
+/**
  * Internal dependencies
  */
 import LinkControl from '../';
@@ -24,8 +28,23 @@ lodash.debounce = jest.fn( ( callback ) => {
 
 const mockFetchSearchSuggestions = jest.fn();
 
-jest.mock( '@wordpress/data/src/components/use-select', () => () => ( {
+/**
+ * The call to the real method `fetchRichUrlData` is wrapped in a promise in order to make it cancellable.
+ * Therefore if we pass any value as the mock of `fetchRichUrlData` then ALL of the tests will require
+ * addition code to handle the async nature of `fetchRichUrlData`. This is unecessary. Instead we default
+ * to an undefined value which will ensure that the code under test does not call `fetchRichUrlData`. Only
+ * when we are testing the "rich previews" to we update this value with a true mock.
+ */
+let mockFetchRichUrlData;
+
+jest.mock( '@wordpress/data/src/components/use-select', () => {
+	// This allows us to tweak the returned value on each test
+	const mock = jest.fn();
+	return mock;
+} );
+useSelect.mockImplementation( () => ( {
 	fetchSearchSuggestions: mockFetchSearchSuggestions,
+	fetchRichUrlData: mockFetchRichUrlData,
 } ) );
 
 jest.mock( '@wordpress/data/src/components/use-dispatch', () => ( {
@@ -59,6 +78,7 @@ afterEach( () => {
 	container.remove();
 	container = null;
 	mockFetchSearchSuggestions.mockReset();
+	mockFetchRichUrlData?.mockReset(); // conditionally reset as it may NOT be a mock
 } );
 
 function getURLInput() {
@@ -93,7 +113,6 @@ describe( 'Basic rendering', () => {
 		const searchInput = getURLInput();
 
 		expect( searchInput ).not.toBeNull();
-		expect( container.innerHTML ).toMatchSnapshot();
 	} );
 
 	it( 'should not render protocol in links', async () => {
@@ -206,6 +225,83 @@ describe( 'Basic rendering', () => {
 			} );
 
 			expect( isEditing() ).toBe( false );
+		} );
+
+		it( 'should display human friendly error message if value URL prop is empty when component is forced into no-editing (preview) mode', async () => {
+			// Why do we need this test?
+			// Occasionally `forceIsEditingLink` is set explictly to `false` which causes the Link UI to render
+			// it's preview even if the `value` has no URL.
+			// for an example of this see the usage in the following file whereby forceIsEditingLink is used to start/stop editing mode:
+			// https://github.com/WordPress/gutenberg/blob/fa5728771df7cdc86369f7157d6aa763649937a7/packages/format-library/src/link/inline.js#L151.
+			// see also: https://github.com/WordPress/gutenberg/issues/17972.
+
+			const valueWithEmptyURL = {
+				url: '',
+				id: 123,
+				type: 'post',
+			};
+
+			act( () => {
+				render(
+					<LinkControl
+						value={ valueWithEmptyURL }
+						forceIsEditingLink={ false }
+					/>,
+					container
+				);
+			} );
+
+			const linkPreview = queryByRole( container, 'generic', {
+				name: 'Currently selected',
+			} );
+
+			const isPreviewError = linkPreview.classList.contains( 'is-error' );
+			expect( isPreviewError ).toBe( true );
+
+			expect( queryByText( linkPreview, 'Link is empty' ) ).toBeTruthy();
+		} );
+	} );
+
+	describe( 'Unlinking', () => {
+		it( 'should not show "Unlink" button if no onRemove handler is provided', () => {
+			act( () => {
+				render(
+					<LinkControl value={ { url: 'https://example.com' } } />,
+					container
+				);
+			} );
+
+			const unLinkButton = queryByRole( container, 'button', {
+				name: 'Unlink',
+			} );
+
+			expect( unLinkButton ).toBeNull();
+			expect( unLinkButton ).not.toBeInTheDocument();
+		} );
+
+		it( 'should show "Unlink" button if a onRemove handler is provided', () => {
+			const mockOnRemove = jest.fn();
+			act( () => {
+				render(
+					<LinkControl
+						value={ { url: 'https://example.com' } }
+						onRemove={ mockOnRemove }
+					/>,
+					container
+				);
+			} );
+
+			const unLinkButton = queryByRole( container, 'button', {
+				name: 'Unlink',
+			} );
+			expect( unLinkButton ).toBeTruthy();
+			expect( unLinkButton ).toBeInTheDocument();
+
+			act( () => {
+				Simulate.click( unLinkButton );
+			} );
+
+			expect( mockOnRemove ).toHaveBeenCalled();
 		} );
 	} );
 } );
@@ -352,6 +448,31 @@ describe( 'Searching for a link', () => {
 		expect( mockFetchSuggestionsFirstArg ).toEqual( 'Hello' );
 	} );
 
+	it( 'should not call search handler when showSuggestions is false', async () => {
+		act( () => {
+			render( <LinkControl showSuggestions={ false } />, container );
+		} );
+
+		// Search Input UI
+		const searchInput = getURLInput();
+
+		// Simulate searching for a term
+		act( () => {
+			Simulate.change( searchInput, {
+				target: { value: 'anything' },
+			} );
+		} );
+
+		const searchResultElements = getSearchResults();
+
+		// fetchFauxEntitySuggestions resolves on next "tick" of event loop
+		await eventLoopTick();
+
+		// TODO: select these by aria relationship to autocomplete rather than arbitrary selector.
+		expect( searchResultElements ).toHaveLength( 0 );
+		expect( mockFetchSearchSuggestions ).not.toHaveBeenCalled();
+	} );
+
 	it.each( [
 		[ 'couldbeurlorentitysearchterm' ],
 		[ 'ThisCouldAlsoBeAValidURL' ],
@@ -475,6 +596,104 @@ describe( 'Manual link entry', () => {
 			);
 		}
 	);
+
+	describe( 'Handling of empty values', () => {
+		const testTable = [
+			[ 'containing only spaces', '        ' ],
+			[ 'containing only tabs', '		' ],
+			[ 'from strings with no length', '' ],
+		];
+
+		it.each( testTable )(
+			'should not allow creation of links %s when using the keyboard',
+			async ( _desc, searchString ) => {
+				act( () => {
+					render( <LinkControl />, container );
+				} );
+
+				// Search Input UI
+				const searchInput = getURLInput();
+
+				let submitButton = queryByRole( container, 'button', {
+					name: 'Submit',
+				} );
+
+				expect( submitButton.disabled ).toBeTruthy();
+				expect( submitButton ).not.toBeNull();
+				expect( submitButton ).toBeInTheDocument();
+
+				// Simulate searching for a term
+				act( () => {
+					Simulate.change( searchInput, {
+						target: { value: searchString },
+					} );
+				} );
+
+				// fetchFauxEntitySuggestions resolves on next "tick" of event loop
+				await eventLoopTick();
+
+				// Attempt to submit the empty search value in the input.
+				act( () => {
+					Simulate.keyDown( searchInput, { keyCode: ENTER } );
+				} );
+
+				submitButton = queryByRole( container, 'button', {
+					name: 'Submit',
+				} );
+
+				// Verify the UI hasn't allowed submission.
+				expect( searchInput ).toBeInTheDocument();
+				expect( submitButton.disabled ).toBeTruthy();
+				expect( submitButton ).not.toBeNull();
+				expect( submitButton ).toBeInTheDocument();
+			}
+		);
+
+		it.each( testTable )(
+			'should not allow creation of links %s via the UI "submit" button',
+			async ( _desc, searchString ) => {
+				act( () => {
+					render( <LinkControl />, container );
+				} );
+
+				// Search Input UI
+				const searchInput = getURLInput();
+
+				let submitButton = queryByRole( container, 'button', {
+					name: 'Submit',
+				} );
+
+				expect( submitButton.disabled ).toBeTruthy();
+				expect( submitButton ).not.toBeNull();
+				expect( submitButton ).toBeInTheDocument();
+
+				// Simulate searching for a term
+				act( () => {
+					Simulate.change( searchInput, {
+						target: { value: searchString },
+					} );
+				} );
+
+				// fetchFauxEntitySuggestions resolves on next "tick" of event loop
+				await eventLoopTick();
+
+				// Attempt to submit the empty search value in the input.
+				act( () => {
+					Simulate.click( submitButton );
+				} );
+
+				submitButton = queryByRole( container, 'button', {
+					name: 'Submit',
+				} );
+
+				// Verify the UI hasn't allowed submission.
+				expect( searchInput ).toBeInTheDocument();
+				expect( submitButton.disabled ).toBeTruthy();
+				expect( submitButton ).not.toBeNull();
+				expect( submitButton ).toBeInTheDocument();
+			}
+		);
+	} );
 
 	describe( 'Alternative link protocols and formats', () => {
 		it.each( [
@@ -927,7 +1146,6 @@ describe( 'Creating Entities (eg: Posts, Pages)', () => {
 		const searchResultElements = container.querySelectorAll(
 			'[role="listbox"] [role="option"]'
 		);
-		const form = container.querySelector( 'form' );
 		const createButton = first(
 			Array.from( searchResultElements ).filter( ( result ) =>
 				result.innerHTML.includes( 'Create:' )
@@ -944,7 +1162,7 @@ describe( 'Creating Entities (eg: Posts, Pages)', () => {
 		} );
 
 		await act( async () => {
-			Simulate.submit( form );
+			Simulate.keyDown( searchInput, { keyCode: ENTER } );
 		} );
 
 		await eventLoopTick();
@@ -1374,7 +1592,6 @@ describe( 'Selecting links', () => {
 				// Search Input UI
 				const searchInput = getURLInput();
 				searchInput.focus();
-				const form = container.querySelector( 'form' );
 
 				// Simulate searching for a term
 				act( () => {
@@ -1439,9 +1656,6 @@ describe( 'Selecting links', () => {
 				// Commit the selected item as the current link
 				act( () => {
 					Simulate.keyDown( searchInput, { keyCode: ENTER } );
-				} );
-				act( () => {
-					Simulate.submit( form );
 				} );
 
 				// Check that the suggestion selected via is now shown as selected
@@ -1712,4 +1926,351 @@ describe( 'Post types', () => {
 			} );
 		}
 	);
+} );
+
+describe( 'Rich link previews', () => {
+	const selectedLink = {
+		id: '1',
+		title: 'Wordpress.org', // customize this for differentiation in assertions
+		url: 'https://www.wordpress.org',
+		type: 'URL',
+	};
+
+	beforeAll( () => {
+		/**
+		 * These tests require that we exercise the `fetchRichUrlData` function.
+		 * We are therefore overwriting the mock "placeholder" with a true jest mock
+		 * which will cause the code under test to execute the code which fetches
+		 * rich previews.
+		 */
+		mockFetchRichUrlData = jest.fn();
+	} );
+
+	it( 'should not fetch or display rich previews by default', async () => {
+		mockFetchRichUrlData.mockImplementation( () =>
+			Promise.resolve( {
+				title:
+					'Blog Tool, Publishing Platform, and CMS \u2014 WordPress.org',
+				icon: 'https://s.w.org/favicon.ico?2',
+				description:
+					'Open source software which you can use to easily create a beautiful website, blog, or app.',
+				image: 'https://s.w.org/images/home/screen-themes.png?3',
+			} )
+		);
+
+		act( () => {
+			render( <LinkControl value={ selectedLink } />, container );
+		} );
+
+		// mockFetchRichUrlData resolves on next "tick" of event loop
+		await act( async () => {
+			await eventLoopTick();
+		} );
+
+		const linkPreview = container.querySelector(
+			"[aria-label='Currently selected']"
+		);
+
+		const isRichLinkPreview = linkPreview.classList.contains( 'is-rich' );
+
+		expect( mockFetchRichUrlData ).not.toHaveBeenCalled();
+		expect( isRichLinkPreview ).toBe( false );
+	} );
+
+	it( 'should display a rich preview when data is available', async () => {
+		mockFetchRichUrlData.mockImplementation( () =>
+			Promise.resolve( {
+				title:
+					'Blog Tool, Publishing Platform, and CMS \u2014 WordPress.org',
+				icon: 'https://s.w.org/favicon.ico?2',
+				description:
+					'Open source software which you can use to easily create a beautiful website, blog, or app.',
+				image: 'https://s.w.org/images/home/screen-themes.png?3',
+			} )
+		);
+
+		act( () => {
+			render(
+				<LinkControl value={ selectedLink } hasRichPreviews />,
+				container
+			);
+		} );
+
+		// mockFetchRichUrlData resolves on next "tick" of event loop
+		await act( async () => {
+			await eventLoopTick();
+		} );
+
+		const linkPreview = container.querySelector(
+			"[aria-label='Currently selected']"
+		);
+
+		const isRichLinkPreview = linkPreview.classList.contains( 'is-rich' );
+
+		expect( isRichLinkPreview ).toBe( true );
+	} );
+
+	it( 'should not display placeholders for the image and description if neither is available in the data', async () => {
+		mockFetchRichUrlData.mockImplementation( () =>
+			Promise.resolve( {
+				title: '',
+				icon: 'https://s.w.org/favicon.ico?2',
+				description: '',
+				image: '',
+			} )
+		);
+
+		act( () => {
+			render(
+				<LinkControl value={ selectedLink } hasRichPreviews />,
+				container
+			);
+		} );
+
+		// mockFetchRichUrlData resolves on next "tick" of event loop
+		await act( async () => {
+			await eventLoopTick();
+		} );
+
+		const linkPreview = container.querySelector(
+			"[aria-label='Currently selected']"
+		);
+
+		// Todo: refactor to use user-facing queries.
+		const hasRichImagePreview = linkPreview.querySelector(
+			'.block-editor-link-control__search-item-image'
+		);
+
+		// Todo: refactor to use user-facing queries.
+		const hasRichDescriptionPreview = linkPreview.querySelector(
+			'.block-editor-link-control__search-item-description'
+		);
+
+		expect( hasRichImagePreview ).toBeFalsy();
+		expect( hasRichDescriptionPreview ).toBeFalsy();
+	} );
+
+	it( 'should display a fallback when title is missing from rich data', async () => {
+		mockFetchRichUrlData.mockImplementation( () =>
+			Promise.resolve( {
+				icon: 'https://s.w.org/favicon.ico?2',
+				description:
+					'Open source software which you can use to easily create a beautiful website, blog, or app.',
+				image: 'https://s.w.org/images/home/screen-themes.png?3',
+			} )
+		);
+
+		act( () => {
+			render(
+				<LinkControl value={ selectedLink } hasRichPreviews />,
+				container
+			);
+		} );
+
+		// mockFetchRichUrlData resolves on next "tick" of event loop
+		await act( async () => {
+			await eventLoopTick();
+		} );
+
+		const linkPreview = container.querySelector(
+			"[aria-label='Currently selected']"
+		);
+
+		const isRichLinkPreview = linkPreview.classList.contains( 'is-rich' );
+		expect( isRichLinkPreview ).toBe( true );
+
+		const titlePreview = linkPreview.querySelector(
+			'.block-editor-link-control__search-item-title'
+		);
+
+		expect( titlePreview.textContent ).toEqual(
+			expect.stringContaining( selectedLink.title )
+		);
+	} );
+
+	it( 'should display a fallback when icon is missing from rich data', async () => {
+		mockFetchRichUrlData.mockImplementation( () =>
+			Promise.resolve( {
+				title:
+					'Blog Tool, Publishing Platform, and CMS \u2014 WordPress.org',
+				description:
+					'Open source software which you can use to easily create a beautiful website, blog, or app.',
+				image: 'https://s.w.org/images/home/screen-themes.png?3',
+			} )
+		);
+
+		act( () => {
+			render(
+				<LinkControl value={ selectedLink } hasRichPreviews />,
+				container
+			);
+		} );
+
+		// mockFetchRichUrlData resolves on next "tick" of event loop
+		await act( async () => {
+			await eventLoopTick();
+		} );
+
+		const linkPreview = container.querySelector(
+			"[aria-label='Currently selected']"
+		);
+
+		const isRichLinkPreview = linkPreview.classList.contains( 'is-rich' );
+		expect( isRichLinkPreview ).toBe( true );
+
+		const iconPreview = linkPreview.querySelector(
+			`.block-editor-link-control__search-item-icon`
+		);
+
+		const fallBackIcon = iconPreview.querySelector( 'svg' );
+		const richIcon = iconPreview.querySelector( 'img' );
+
+		expect( fallBackIcon ).toBeTruthy();
+		expect( richIcon ).toBeFalsy();
+	} );
+
+	it.each( [ 'image', 'description' ] )(
+		'should not display the rich %s when it is missing from the data',
+		async ( dataItem ) => {
+			mockFetchRichUrlData.mockImplementation( () => {
+				const data = {
+					title:
+						'Blog Tool, Publishing Platform, and CMS \u2014 WordPress.org',
+					icon: 'https://s.w.org/favicon.ico?2',
+					description:
+						'Open source software which you can use to easily create a beautiful website, blog, or app.',
+					image: 'https://s.w.org/images/home/screen-themes.png?3',
+				};
+				delete data[ dataItem ];
+				return Promise.resolve( data );
+			} );
+
+			act( () => {
+				render(
+					<LinkControl value={ selectedLink } hasRichPreviews />,
+					container
+				);
+			} );
+
+			// mockFetchRichUrlData resolves on next "tick" of event loop
+			await act( async () => {
+				await eventLoopTick();
+			} );
+
+			const linkPreview = container.querySelector(
+				"[aria-label='Currently selected']"
+			);
+
+			const isRichLinkPreview = linkPreview.classList.contains(
+				'is-rich'
+			);
+			expect( isRichLinkPreview ).toBe( true );
+
+			const missingDataItem = linkPreview.querySelector(
+				`.block-editor-link-control__search-item-${ dataItem }`
+			);
+
+			expect( missingDataItem ).toBeFalsy();
+		}
+	);
+
+	it.each( [
+		[ 'empty', {} ],
+		[ 'null', null ],
+	] )(
+		'should not display a rich preview when data is %s',
+		async ( _descriptor, data ) => {
+			mockFetchRichUrlData.mockImplementation( () =>
+				Promise.resolve( data )
+			);
+
+			act( () => {
+				render(
+					<LinkControl value={ selectedLink } hasRichPreviews />,
+					container
+				);
+			} );
+
+			// mockFetchRichUrlData resolves on next "tick" of event loop
+			await act( async () => {
+				await eventLoopTick();
+			} );
+
+			const linkPreview = container.querySelector(
+				"[aria-label='Currently selected']"
+			);
+
+			const isRichLinkPreview = linkPreview.classList.contains(
+				'is-rich'
+			);
+
+			expect( isRichLinkPreview ).toBe( false );
+		}
+	);
+
+	it( 'should display in loading state when rich data is being fetched', async () => {
+		const nonResolvingPromise = () => new Promise( () => {} );
+
+		mockFetchRichUrlData.mockImplementation( nonResolvingPromise );
+
+		act( () => {
+			render(
+				<LinkControl value={ selectedLink } hasRichPreviews />,
+				container
+			);
+		} );
+
+		// mockFetchRichUrlData resolves on next "tick" of event loop
+		await act( async () => {
+			await eventLoopTick();
+		} );
+
+		const linkPreview = container.querySelector(
+			"[aria-label='Currently selected']"
+		);
+
+		const isFetchingRichPreview = linkPreview.classList.contains(
+			'is-fetching'
+		);
+		const isRichLinkPreview = linkPreview.classList.contains( 'is-rich' );
+
+		expect( isFetchingRichPreview ).toBe( true );
+		expect( isRichLinkPreview ).toBe( false );
+	} );
+
+	it( 'should remove fetching UI indicators and fallback to standard preview if request for rich preview results in an error', async () => {
+		const simulateFailedFetch = () => Promise.reject();
+
+		mockFetchRichUrlData.mockImplementation( simulateFailedFetch );
+
+		act( () => {
+			render(
+				<LinkControl value={ selectedLink } hasRichPreviews />,
+				container
+			);
+		} );
+
+		// mockFetchRichUrlData resolves on next "tick" of event loop
+		await act( async () => {
+			await eventLoopTick();
+		} );
+
+		const linkPreview = container.querySelector(
+			"[aria-label='Currently selected']"
+		);
+
+		const isFetchingRichPreview = linkPreview.classList.contains(
+			'is-fetching'
+		);
+
+		const isRichLinkPreview = linkPreview.classList.contains( 'is-rich' );
+
+		expect( isFetchingRichPreview ).toBe( false );
+		expect( isRichLinkPreview ).toBe( false );
+	} );
+
+	afterAll( () => {
+		// Remove the mock to avoid edge cases in other tests.
+		mockFetchRichUrlData = undefined;
+	} );
 } );

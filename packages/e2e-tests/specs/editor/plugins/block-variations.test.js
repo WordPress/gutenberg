@@ -132,7 +132,7 @@ describe( 'Block variations', () => {
 			return page.evaluate(
 				() =>
 					document.querySelector(
-						'.block-editor-block-navigation-block-select-button'
+						'.block-editor-list-view-block-select-button'
 					).textContent
 			);
 		};

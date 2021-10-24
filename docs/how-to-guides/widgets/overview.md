@@ -4,7 +4,7 @@
 
 The new Widgets Editor is a WordPress feature which upgrades widget areas to allow using blocks alongside widgets. It offers a new widget management experience built using the familiar WordPress block editor.
 
-You can access the new Widgets Editor by navigating to Appearance → Widgets or Appearance → Cusomize → Widgets and choose a widget area.
+You can access the new Widgets Editor by navigating to Appearance → Widgets or Appearance → Customize → Widgets and choose a widget area.
 
 The Widgets Block Editor allows you to insert blocks and widgets into any of the [Widget Areas or Sidebars](https://developer.wordpress.org/themes/functionality/sidebars/) defined by the site's active theme, via a standalone editor or through the Customizer.
 

@@ -45,16 +45,19 @@ export default function DeleteTemplate() {
 	return (
 		<MenuGroup className="edit-post-template-top-area__second-menu-group">
 			<MenuItem
+				className="edit-post-template-top-area__delete-template-button"
 				isDestructive
-				variant="tertiary"
+				variant="secondary"
 				aria-label={ __( 'Delete template' ) }
 				onClick={ () => {
 					if (
 						// eslint-disable-next-line no-alert
 						window.confirm(
-							/* translators: %1$s: template name */
 							sprintf(
-								'Are you sure you want to delete the %s template? It may be used by other pages or posts.',
+								/* translators: %s: template name */
+								__(
+									'Are you sure you want to delete the %s template? It may be used by other pages or posts.'
+								),
 								templateTitle
 							)
 						)

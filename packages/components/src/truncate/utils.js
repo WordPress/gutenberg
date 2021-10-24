@@ -59,7 +59,7 @@ export function truncateMiddle( word, headLength, tailLength, ellipsis ) {
 
 /**
  *
- * @param {string} words
+ * @param {string}                        words
  * @param {typeof TRUNCATE_DEFAULT_PROPS} props
  */
 export function truncateContent( words = '', props ) {

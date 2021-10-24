@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * External dependencies
  */
@@ -13,12 +14,9 @@ import { isRTL } from '@wordpress/i18n';
  * Internal dependencies
  */
 import { Input } from './styles/number-control-styles';
-import {
-	inputControlActionTypes,
-	composeStateReducers,
-} from '../input-control/state';
+import * as inputControlActionTypes from '../input-control/reducer/actions';
+import { composeStateReducers } from '../input-control/reducer/reducer';
 import { add, subtract, roundClamp } from '../utils/math';
-import { useJumpStep } from '../utils/hooks';
 import { isValueEmpty } from '../utils/values';
 
 export function NumberControl(
@@ -32,6 +30,7 @@ export function NumberControl(
 		label,
 		max = Infinity,
 		min = -Infinity,
+		required = false,
 		shiftStep = 10,
 		step = 1,
 		type: typeProp = 'number',
@@ -40,13 +39,15 @@ export function NumberControl(
 	},
 	ref
 ) {
-	const baseValue = roundClamp( 0, min, max, step );
-
-	const jumpStep = useJumpStep( {
-		step,
-		shiftStep,
-		isShiftStepEnabled,
-	} );
+	const isStepAny = step === 'any';
+	const baseStep = isStepAny ? 1 : parseFloat( step );
+	const baseValue = roundClamp( 0, min, max, baseStep );
+	const constrainValue = ( value, stepOverride ) => {
+		// When step is "any" clamp the value, otherwise round and clamp it
+		return isStepAny
+			? Math.min( max, Math.max( min, value ) )
+			: roundClamp( value, min, max, stepOverride ?? baseStep );
+	};
 
 	const autoComplete = typeProp === 'number' ? 'off' : null;
 	const classes = classNames( 'components-number-control', className );
@@ -56,7 +57,7 @@ export function NumberControl(
 	 * This allows us to tap into actions to transform the (next) state for
 	 * InputControl.
 	 *
-	 * @param {Object} state State from InputControl
+	 * @param {Object} state  State from InputControl
 	 * @param {Object} action Action triggering state change
 	 * @return {Object} The updated state to apply to InputControl
 	 */
@@ -75,8 +76,8 @@ export function NumberControl(
 			const enableShift = event.shiftKey && isShiftStepEnabled;
 
 			const incrementalValue = enableShift
-				? parseFloat( shiftStep ) * parseFloat( step )
-				: parseFloat( step );
+				? parseFloat( shiftStep ) * baseStep
+				: baseStep;
 			let nextValue = isValueEmpty( currentValue )
 				? baseValue
 				: currentValue;
@@ -93,58 +94,55 @@ export function NumberControl(
 				nextValue = subtract( nextValue, incrementalValue );
 			}
 
-			nextValue = roundClamp( nextValue, min, max, incrementalValue );
-
-			state.value = nextValue;
+			state.value = constrainValue(
+				nextValue,
+				enableShift ? incrementalValue : null
+			);
 		}
 
 		/**
 		 * Handles drag to update events
 		 */
 		if ( type === inputControlActionTypes.DRAG && isDragEnabled ) {
-			const { delta, shiftKey } = payload;
-			const [ x, y ] = delta;
-			const modifier = shiftKey
-				? parseFloat( shiftStep ) * parseFloat( step )
-				: parseFloat( step );
+			const [ x, y ] = payload.delta;
+			const enableShift = payload.shiftKey && isShiftStepEnabled;
+			const modifier = enableShift
+				? parseFloat( shiftStep ) * baseStep
+				: baseStep;
 
 			let directionModifier;
-			let directionBaseValue;
+			let delta;
 
 			switch ( dragDirection ) {
 				case 'n':
-					directionBaseValue = y;
+					delta = y;
 					directionModifier = -1;
 					break;
 
 				case 'e':
-					directionBaseValue = x;
+					delta = x;
 					directionModifier = isRTL() ? -1 : 1;
 					break;
 
 				case 's':
-					directionBaseValue = y;
+					delta = y;
 					directionModifier = 1;
 					break;
 
 				case 'w':
-					directionBaseValue = x;
+					delta = x;
 					directionModifier = isRTL() ? 1 : -1;
 					break;
 			}
 
-			const distance = directionBaseValue * modifier * directionModifier;
-			let nextValue;
+			if ( delta !== 0 ) {
+				delta = Math.ceil( Math.abs( delta ) ) * Math.sign( delta );
+				const distance = delta * modifier * directionModifier;
 
-			if ( distance !== 0 ) {
-				nextValue = roundClamp(
+				state.value = constrainValue(
 					add( currentValue, distance ),
-					min,
-					max,
-					modifier
+					enableShift ? modifier : null
 				);
-
-				state.value = nextValue;
 			}
 		}
 
@@ -155,7 +153,11 @@ export function NumberControl(
 			type === inputControlActionTypes.PRESS_ENTER ||
 			type === inputControlActionTypes.COMMIT
 		) {
-			state.value = roundClamp( currentValue, min, max );
+			const applyEmptyValue = required === false && currentValue === '';
+
+			state.value = applyEmptyValue
+				? currentValue
+				: constrainValue( currentValue );
 		}
 
 		return state;
@@ -174,7 +176,8 @@ export function NumberControl(
 			max={ max }
 			min={ min }
 			ref={ ref }
-			step={ jumpStep }
+			required={ required }
+			step={ step }
 			type={ typeProp }
 			value={ valueProp }
 			__unstableStateReducer={ composeStateReducers(

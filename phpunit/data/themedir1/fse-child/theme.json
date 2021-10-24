@@ -1,0 +1,51 @@
+{
+	"version": 1,
+	"settings": {
+		"color": {
+			"palette": [
+				{
+					"slug": "light",
+					"name": "Light",
+					"color": "#f3f4f6"
+				},
+				{
+					"slug": "primary",
+					"name": "Primary",
+					"color": "#3858e9"
+				},
+				{
+					"slug": "dark",
+					"name": "Dark",
+					"color": "#111827"
+				}
+			],
+			"link": true
+		},
+		"blocks": {
+			"core/post-title": {
+				"color": {
+					"palette": [
+						{
+							"slug": "light",
+							"name": "Light",
+							"color": "#f3f4f6"
+						}
+					]
+				}
+			}
+		}
+	},
+	"customTemplates": [
+		{
+			"name": "page-home",
+			"title": "Homepage"
+		}
+	],
+	"templateParts": [
+		{
+			"name": "small-header",
+			"title": "Small Header",
+			"area": "header"
+		}
+	]
+}

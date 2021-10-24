@@ -16,6 +16,10 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 					'color'       => array(
 						'custom' => false,
 					),
+					'layout'      => array(
+						'contentSize' => 'value',
+						'invalid/key' => 'value',
+					),
 					'invalid/key' => 'value',
 					'blocks'      => array(
 						'core/group' => array(
@@ -44,6 +48,9 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 			'color'  => array(
 				'custom' => false,
 			),
+			'layout' => array(
+				'contentSize' => 'value',
+			),
 			'blocks' => array(
 				'core/group' => array(
 					'color' => array(
@@ -54,6 +61,235 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 		);
 
 		$this->assertEqualSetsWithIndex( $expected, $actual );
+	}
+
+	function test_get_settings_presets_are_keyed_by_origin() {
+		$core_origin = new WP_Theme_JSON_Gutenberg(
+			array(
+				'version'  => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
+				'settings' => array(
+					'color'       => array(
+						'palette' => array(
+							array(
+								'slug'  => 'white',
+								'color' => 'white',
+							),
+						),
+					),
+					'invalid/key' => 'value',
+					'blocks'      => array(
+						'core/group' => array(
+							'color' => array(
+								'palette' => array(
+									array(
+										'slug'  => 'white',
+										'color' => 'white',
+									),
+								),
+							),
+						),
+					),
+				),
+			),
+			'core'
+		);
+		$no_origin   = new WP_Theme_JSON_Gutenberg(
+			array(
+				'version'  => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
+				'settings' => array(
+					'color'       => array(
+						'palette' => array(
+							array(
+								'slug'  => 'black',
+								'color' => 'black',
+							),
+						),
+					),
+					'invalid/key' => 'value',
+					'blocks'      => array(
+						'core/group' => array(
+							'color' => array(
+								'palette' => array(
+									array(
+										'slug'  => 'black',
+										'color' => 'black',
+									),
+								),
+							),
+						),
+					),
+				),
+			)
+		);
+
+		$actual_core      = $core_origin->get_raw_data();
+		$actual_no_origin = $no_origin->get_raw_data();
+
+		$expected_core      = array(
+			'version'  => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
+			'settings' => array(
+				'color'  => array(
+					'palette' => array(
+						'core' => array(
+							array(
+								'slug'  => 'white',
+								'color' => 'white',
+							),
+						),
+					),
+				),
+				'blocks' => array(
+					'core/group' => array(
+						'color' => array(
+							'palette' => array(
+								'core' => array(
+									array(
+										'slug'  => 'white',
+										'color' => 'white',
+									),
+								),
+							),
+						),
+					),
+				),
+			),
+		);
+		$expected_no_origin = array(
+			'version'  => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
+			'settings' => array(
+				'color'  => array(
+					'palette' => array(
+						'theme' => array(
+							array(
+								'slug'  => 'black',
+								'color' => 'black',
+							),
+						),
+					),
+				),
+				'blocks' => array(
+					'core/group' => array(
+						'color' => array(
+							'palette' => array(
+								'theme' => array(
+									array(
+										'slug'  => 'black',
+										'color' => 'black',
+									),
+								),
+							),
+						),
+					),
+				),
+			),
+		);
+
+		$this->assertEqualSetsWithIndex( $expected_core, $actual_core );
+		$this->assertEqualSetsWithIndex( $expected_no_origin, $actual_no_origin );
+	}
+
+	function test_get_stylesheet_support_for_shorthand_and_longhand_values() {
+		$theme_json = new WP_Theme_JSON_Gutenberg(
+			array(
+				'version' => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
+				'styles'  => array(
+					'blocks' => array(
+						'core/group' => array(
+							'border'  => array(
+								'radius' => '10px',
+							),
+							'spacing' => array(
+								'padding' => '24px',
+								'margin'  => '1em',
+							),
+						),
+						'core/image' => array(
+							'border'  => array(
+								'radius' => array(
+									'topLeft'     => '10px',
+									'bottomRight' => '1em',
+								),
+							),
+							'spacing' => array(
+								'padding' => array(
+									'top' => '15px',
+								),
+								'margin'  => array(
+									'bottom' => '30px',
+								),
+							),
+						),
+					),
+				),
+			)
+		);
+
+		$this->assertEquals(
+			'body { margin: 0; }.wp-site-blocks > .alignleft { float: left; margin-right: 2em; }.wp-site-blocks > .alignright { float: right; margin-left: 2em; }.wp-site-blocks > .aligncenter { justify-content: center; margin-left: auto; margin-right: auto; }.wp-block-group{border-radius: 10px;margin: 1em;padding: 24px;}.wp-block-image{border-top-left-radius: 10px;border-bottom-right-radius: 1em;margin-bottom: 30px;padding-top: 15px;}',
+			$theme_json->get_stylesheet()
+		);
+		$this->assertEquals(
+			'body { margin: 0; }.wp-site-blocks > .alignleft { float: left; margin-right: 2em; }.wp-site-blocks > .alignright { float: right; margin-left: 2em; }.wp-site-blocks > .aligncenter { justify-content: center; margin-left: auto; margin-right: auto; }.wp-block-group{border-radius: 10px;margin: 1em;padding: 24px;}.wp-block-image{border-top-left-radius: 10px;border-bottom-right-radius: 1em;margin-bottom: 30px;padding-top: 15px;}',
+			$theme_json->get_stylesheet( array( 'styles', 'presets' ) )
+		);
+	}
+
+	function test_get_stylesheet_skips_disabled_protected_properties() {
+		$theme_json = new WP_Theme_JSON_Gutenberg(
+			array(
+				'version'  => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
+				'settings' => array(
+					'spacing' => array(
+						'blockGap' => null,
+					),
+				),
+				'styles'   => array(
+					'spacing' => array(
+						'blockGap' => '1em',
+					),
+					'blocks'  => array(
+						'core/columns' => array(
+							'spacing' => array(
+								'blockGap' => '24px',
+							),
+						),
+					),
+				),
+			)
+		);
+
+		$expected = 'body { margin: 0; }.wp-site-blocks > .alignleft { float: left; margin-right: 2em; }.wp-site-blocks > .alignright { float: right; margin-left: 2em; }.wp-site-blocks > .aligncenter { justify-content: center; margin-left: auto; margin-right: auto; }';
+		$this->assertEquals( $expected, $theme_json->get_stylesheet() );
+		$this->assertEquals( $expected, $theme_json->get_stylesheet( array( 'styles', 'presets' ) ) );
+	}
+
+	function test_get_stylesheet_renders_enabled_protected_properties() {
+		$theme_json = new WP_Theme_JSON_Gutenberg(
+			array(
+				'version'  => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
+				'settings' => array(
+					'spacing' => array(
+						'blockGap' => true,
+					),
+				),
+				'styles'   => array(
+					'spacing' => array(
+						'blockGap' => '1em',
+					),
+					'blocks'  => array(
+						'core/columns' => array(
+							'spacing' => array(
+								'blockGap' => '24px',
+							),
+						),
+					),
+				),
+			)
+		);
+
+		$expected = 'body{--wp--style--block-gap: 1em;}body { margin: 0; }.wp-site-blocks > .alignleft { float: left; margin-right: 2em; }.wp-site-blocks > .alignright { float: right; margin-left: 2em; }.wp-site-blocks > .aligncenter { justify-content: center; margin-left: auto; margin-right: auto; }.wp-site-blocks > * { margin-top: 0; margin-bottom: 0; }.wp-site-blocks > * + * { margin-top: var( --wp--style--block-gap ); }.wp-block-columns{--wp--style--block-gap: 24px;}';
+		$this->assertEquals( $expected, $theme_json->get_stylesheet() );
+		$this->assertEquals( $expected, $theme_json->get_stylesheet( array( 'styles', 'presets' ) ) );
 	}
 
 	function test_get_stylesheet() {
@@ -81,6 +317,9 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 								'fontFamily' => '41px',
 							),
 						),
+					),
+					'spacing'    => array(
+						'blockGap' => false,
 					),
 					'misc'       => 'value',
 					'blocks'     => array(
@@ -111,6 +350,9 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 					),
 					'blocks'   => array(
 						'core/group'     => array(
+							'border'   => array(
+								'radius' => '10px',
+							),
 							'elements' => array(
 								'link' => array(
 									'color' => array(
@@ -119,10 +361,7 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 								),
 							),
 							'spacing'  => array(
-								'padding' => array(
-									'top'    => '12px',
-									'bottom' => '24px',
-								),
+								'padding' => '24px',
 							),
 						),
 						'core/heading'   => array(
@@ -154,6 +393,19 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 								),
 							),
 						),
+						'core/image'     => array(
+							'border'  => array(
+								'radius' => array(
+									'topLeft'     => '10px',
+									'bottomRight' => '1em',
+								),
+							),
+							'spacing' => array(
+								'margin' => array(
+									'bottom' => '30px',
+								),
+							),
+						),
 					),
 				),
 				'misc'     => 'value',
@@ -161,16 +413,16 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 		);
 
 		$this->assertEquals(
-			'body{--wp--preset--color--grey: grey;--wp--preset--font-family--small: 14px;--wp--preset--font-family--big: 41px;}.wp-block-group{--wp--custom--base-font: 16;--wp--custom--line-height--small: 1.2;--wp--custom--line-height--medium: 1.4;--wp--custom--line-height--large: 1.8;}body{color: var(--wp--preset--color--grey);}a{background-color: #333;color: #111;}.wp-block-group{padding-top: 12px;padding-bottom: 24px;}.wp-block-group a{color: #111;}h1,h2,h3,h4,h5,h6{color: #123456;}h1 a,h2 a,h3 a,h4 a,h5 a,h6 a{background-color: #333;color: #111;font-size: 60px;}.wp-block-post-date{color: #123456;}.wp-block-post-date a{background-color: #777;color: #555;}.has-grey-color{color: grey !important;}.has-grey-background-color{background-color: grey !important;}.has-grey-border-color{border-color: grey !important;}',
+			'body{--wp--preset--color--grey: grey;--wp--preset--font-family--small: 14px;--wp--preset--font-family--big: 41px;}.wp-block-group{--wp--custom--base-font: 16;--wp--custom--line-height--small: 1.2;--wp--custom--line-height--medium: 1.4;--wp--custom--line-height--large: 1.8;}body{color: var(--wp--preset--color--grey);}body { margin: 0; }.wp-site-blocks > .alignleft { float: left; margin-right: 2em; }.wp-site-blocks > .alignright { float: right; margin-left: 2em; }.wp-site-blocks > .aligncenter { justify-content: center; margin-left: auto; margin-right: auto; }.wp-site-blocks > * { margin-top: 0; margin-bottom: 0; }.wp-site-blocks > * + * { margin-top: var( --wp--style--block-gap ); }a{background-color: #333;color: #111;}.wp-block-group{border-radius: 10px;padding: 24px;}.wp-block-group a{color: #111;}h1,h2,h3,h4,h5,h6{color: #123456;}h1 a,h2 a,h3 a,h4 a,h5 a,h6 a{background-color: #333;color: #111;font-size: 60px;}.wp-block-post-date{color: #123456;}.wp-block-post-date a{background-color: #777;color: #555;}.wp-block-image{border-top-left-radius: 10px;border-bottom-right-radius: 1em;margin-bottom: 30px;}.has-grey-color{color: var(--wp--preset--color--grey) !important;}.has-grey-background-color{background-color: var(--wp--preset--color--grey) !important;}.has-grey-border-color{border-color: var(--wp--preset--color--grey) !important;}.has-small-font-family{font-family: var(--wp--preset--font-family--small) !important;}.has-big-font-family{font-family: var(--wp--preset--font-family--big) !important;}',
 			$theme_json->get_stylesheet()
 		);
 		$this->assertEquals(
-			'body{color: var(--wp--preset--color--grey);}a{background-color: #333;color: #111;}.wp-block-group{padding-top: 12px;padding-bottom: 24px;}.wp-block-group a{color: #111;}h1,h2,h3,h4,h5,h6{color: #123456;}h1 a,h2 a,h3 a,h4 a,h5 a,h6 a{background-color: #333;color: #111;font-size: 60px;}.wp-block-post-date{color: #123456;}.wp-block-post-date a{background-color: #777;color: #555;}.has-grey-color{color: grey !important;}.has-grey-background-color{background-color: grey !important;}.has-grey-border-color{border-color: grey !important;}',
-			$theme_json->get_stylesheet( 'block_styles' )
+			'body{color: var(--wp--preset--color--grey);}body { margin: 0; }.wp-site-blocks > .alignleft { float: left; margin-right: 2em; }.wp-site-blocks > .alignright { float: right; margin-left: 2em; }.wp-site-blocks > .aligncenter { justify-content: center; margin-left: auto; margin-right: auto; }.wp-site-blocks > * { margin-top: 0; margin-bottom: 0; }.wp-site-blocks > * + * { margin-top: var( --wp--style--block-gap ); }a{background-color: #333;color: #111;}.wp-block-group{border-radius: 10px;padding: 24px;}.wp-block-group a{color: #111;}h1,h2,h3,h4,h5,h6{color: #123456;}h1 a,h2 a,h3 a,h4 a,h5 a,h6 a{background-color: #333;color: #111;font-size: 60px;}.wp-block-post-date{color: #123456;}.wp-block-post-date a{background-color: #777;color: #555;}.wp-block-image{border-top-left-radius: 10px;border-bottom-right-radius: 1em;margin-bottom: 30px;}.has-grey-color{color: var(--wp--preset--color--grey) !important;}.has-grey-background-color{background-color: var(--wp--preset--color--grey) !important;}.has-grey-border-color{border-color: var(--wp--preset--color--grey) !important;}.has-small-font-family{font-family: var(--wp--preset--font-family--small) !important;}.has-big-font-family{font-family: var(--wp--preset--font-family--big) !important;}',
+			$theme_json->get_stylesheet( array( 'styles', 'presets' ) )
 		);
 		$this->assertEquals(
 			'body{--wp--preset--color--grey: grey;--wp--preset--font-family--small: 14px;--wp--preset--font-family--big: 41px;}.wp-block-group{--wp--custom--base-font: 16;--wp--custom--line-height--small: 1.2;--wp--custom--line-height--medium: 1.4;--wp--custom--line-height--large: 1.8;}',
-			$theme_json->get_stylesheet( 'css_variables' )
+			$theme_json->get_stylesheet( array( 'variables' ) )
 		);
 	}
 
@@ -196,8 +448,8 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 		);
 
 		$this->assertEquals(
-			'h1.has-white-color,h2.has-white-color,h3.has-white-color,h4.has-white-color,h5.has-white-color,h6.has-white-color{color: #fff !important;}h1.has-white-background-color,h2.has-white-background-color,h3.has-white-background-color,h4.has-white-background-color,h5.has-white-background-color,h6.has-white-background-color{background-color: #fff !important;}h1.has-white-border-color,h2.has-white-border-color,h3.has-white-border-color,h4.has-white-border-color,h5.has-white-border-color,h6.has-white-border-color{border-color: #fff !important;}',
-			$theme_json->get_stylesheet( 'block_styles' )
+			'h1.has-white-color,h2.has-white-color,h3.has-white-color,h4.has-white-color,h5.has-white-color,h6.has-white-color{color: var(--wp--preset--color--white) !important;}h1.has-white-background-color,h2.has-white-background-color,h3.has-white-background-color,h4.has-white-background-color,h5.has-white-background-color,h6.has-white-background-color{background-color: var(--wp--preset--color--white) !important;}h1.has-white-border-color,h2.has-white-border-color,h3.has-white-border-color,h4.has-white-border-color,h5.has-white-border-color,h6.has-white-border-color{border-color: var(--wp--preset--color--white) !important;}',
+			$theme_json->get_stylesheet( array( 'styles', 'presets' ) )
 		);
 	}
 
@@ -232,13 +484,53 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 		);
 
 		$this->assertEquals(
-			'.wp-block-group{--wp--preset--color--grey: grey;}.wp-block-group{color: red;}.wp-block-group.has-grey-color{color: grey !important;}.wp-block-group.has-grey-background-color{background-color: grey !important;}.wp-block-group.has-grey-border-color{border-color: grey !important;}',
+			'.wp-block-group{--wp--preset--color--grey: grey;}body { margin: 0; }.wp-site-blocks > .alignleft { float: left; margin-right: 2em; }.wp-site-blocks > .alignright { float: right; margin-left: 2em; }.wp-site-blocks > .aligncenter { justify-content: center; margin-left: auto; margin-right: auto; }.wp-block-group{color: red;}.wp-block-group.has-grey-color{color: var(--wp--preset--color--grey) !important;}.wp-block-group.has-grey-background-color{background-color: var(--wp--preset--color--grey) !important;}.wp-block-group.has-grey-border-color{border-color: var(--wp--preset--color--grey) !important;}',
 			$theme_json->get_stylesheet()
 		);
 		$this->assertEquals(
-			'.wp-block-group{color: red;}.wp-block-group.has-grey-color{color: grey !important;}.wp-block-group.has-grey-background-color{background-color: grey !important;}.wp-block-group.has-grey-border-color{border-color: grey !important;}',
-			$theme_json->get_stylesheet( 'block_styles' )
+			'body { margin: 0; }.wp-site-blocks > .alignleft { float: left; margin-right: 2em; }.wp-site-blocks > .alignright { float: right; margin-left: 2em; }.wp-site-blocks > .aligncenter { justify-content: center; margin-left: auto; margin-right: auto; }.wp-block-group{color: red;}.wp-block-group.has-grey-color{color: var(--wp--preset--color--grey) !important;}.wp-block-group.has-grey-background-color{background-color: var(--wp--preset--color--grey) !important;}.wp-block-group.has-grey-border-color{border-color: var(--wp--preset--color--grey) !important;}',
+			$theme_json->get_stylesheet( array( 'styles', 'presets' ) )
 		);
+	}
+
+	function test_get_stylesheet_generates_proper_classes_from_slugs() {
+		$theme_json = new WP_Theme_JSON_Gutenberg(
+			array(
+				'version'  => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
+				'settings' => array(
+					'color' => array(
+						'palette' => array(
+							array(
+								'slug'  => 'grey',
+								'color' => 'grey',
+							),
+							array(
+								'slug'  => 'dark grey',
+								'color' => 'grey',
+							),
+							array(
+								'slug'  => 'light-grey',
+								'color' => 'grey',
+							),
+							array(
+								'slug'  => 'white2black',
+								'color' => 'grey',
+							),
+						),
+					),
+				),
+			)
+		);
+
+		$this->assertEquals(
+			'.has-grey-color{color: var(--wp--preset--color--grey) !important;}.has-dark-grey-color{color: var(--wp--preset--color--dark-grey) !important;}.has-light-grey-color{color: var(--wp--preset--color--light-grey) !important;}.has-white-2-black-color{color: var(--wp--preset--color--white-2-black) !important;}.has-grey-background-color{background-color: var(--wp--preset--color--grey) !important;}.has-dark-grey-background-color{background-color: var(--wp--preset--color--dark-grey) !important;}.has-light-grey-background-color{background-color: var(--wp--preset--color--light-grey) !important;}.has-white-2-black-background-color{background-color: var(--wp--preset--color--white-2-black) !important;}.has-grey-border-color{border-color: var(--wp--preset--color--grey) !important;}.has-dark-grey-border-color{border-color: var(--wp--preset--color--dark-grey) !important;}.has-light-grey-border-color{border-color: var(--wp--preset--color--light-grey) !important;}.has-white-2-black-border-color{border-color: var(--wp--preset--color--white-2-black) !important;}',
+			$theme_json->get_stylesheet( array( 'styles', 'presets' ) )
+		);
+		$this->assertEquals(
+			'body{--wp--preset--color--grey: grey;--wp--preset--color--dark-grey: grey;--wp--preset--color--light-grey: grey;--wp--preset--color--white-2-black: grey;}',
+			$theme_json->get_stylesheet( array( 'variables' ) )
+		);
+
 	}
 
 	public function test_get_stylesheet_preset_values_are_marked_as_important() {
@@ -269,45 +561,48 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 						),
 					),
 				),
-			)
+			),
+			'core'
 		);
 
 		$this->assertEquals(
-			'body{--wp--preset--color--grey: grey;}p{background-color: blue;color: red;font-size: 12px;line-height: 1.3;}.has-grey-color{color: grey !important;}.has-grey-background-color{background-color: grey !important;}.has-grey-border-color{border-color: grey !important;}',
+			'body{--wp--preset--color--grey: grey;}body { margin: 0; }.wp-site-blocks > .alignleft { float: left; margin-right: 2em; }.wp-site-blocks > .alignright { float: right; margin-left: 2em; }.wp-site-blocks > .aligncenter { justify-content: center; margin-left: auto; margin-right: auto; }p{background-color: blue;color: red;font-size: 12px;line-height: 1.3;}.has-grey-color{color: var(--wp--preset--color--grey) !important;}.has-grey-background-color{background-color: var(--wp--preset--color--grey) !important;}.has-grey-border-color{border-color: var(--wp--preset--color--grey) !important;}',
 			$theme_json->get_stylesheet()
 		);
 	}
 
 	public function test_merge_incoming_data() {
-		$initial = array(
-			'version'  => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
-			'settings' => array(
-				'color'  => array(
-					'custom'  => false,
-					'palette' => array(
-						array(
-							'slug'  => 'red',
-							'color' => 'red',
+		$theme_json = new WP_Theme_JSON_Gutenberg(
+			array(
+				'version'  => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
+				'settings' => array(
+					'color'  => array(
+						'custom'  => false,
+						'palette' => array(
+							array(
+								'slug'  => 'red',
+								'color' => 'red',
+							),
+							array(
+								'slug'  => 'green',
+								'color' => 'green',
+							),
 						),
-						array(
-							'slug'  => 'green',
-							'color' => 'green',
+					),
+					'blocks' => array(
+						'core/paragraph' => array(
+							'color' => array(
+								'custom' => false,
+							),
 						),
 					),
 				),
-				'blocks' => array(
-					'core/paragraph' => array(
-						'color' => array(
-							'custom' => false,
-						),
+				'styles'   => array(
+					'typography' => array(
+						'fontSize' => '12',
 					),
 				),
-			),
-			'styles'   => array(
-				'typography' => array(
-					'fontSize' => '12',
-				),
-			),
+			)
 		);
 
 		$add_new_block = array(
@@ -437,37 +732,37 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 					'custom'         => true,
 					'customGradient' => true,
 					'palette'        => array(
-						array(
-							'slug'  => 'red',
-							'color' => 'red',
-						),
-						array(
-							'slug'  => 'green',
-							'color' => 'green',
-						),
-						array(
-							'slug'  => 'blue',
-							'color' => 'blue',
+						'theme' => array(
+							array(
+								'slug'  => 'blue',
+								'color' => 'blue',
+							),
 						),
 					),
 					'gradients'      => array(
-						array(
-							'slug'     => 'gradient',
-							'gradient' => 'gradient',
+						'theme' => array(
+							array(
+								'slug'     => 'gradient',
+								'gradient' => 'gradient',
+							),
 						),
 					),
 				),
 				'typography' => array(
 					'fontSizes'    => array(
-						array(
-							'slug' => 'fontSize',
-							'size' => 'fontSize',
+						'theme' => array(
+							array(
+								'slug' => 'fontSize',
+								'size' => 'fontSize',
+							),
 						),
 					),
 					'fontFamilies' => array(
-						array(
-							'slug'       => 'fontFamily',
-							'fontFamily' => 'fontFamily',
+						'theme' => array(
+							array(
+								'slug'       => 'fontFamily',
+								'fontFamily' => 'fontFamily',
+							),
 						),
 					),
 				),
@@ -509,7 +804,6 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 			),
 		);
 
-		$theme_json = new WP_Theme_JSON_Gutenberg( $initial );
 		$theme_json->merge( new WP_Theme_JSON_Gutenberg( $add_new_block ) );
 		$theme_json->merge( new WP_Theme_JSON_Gutenberg( $add_key_in_settings ) );
 		$theme_json->merge( new WP_Theme_JSON_Gutenberg( $update_key_in_settings ) );
@@ -522,8 +816,209 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 		$this->assertEqualSetsWithIndex( $expected, $actual );
 	}
 
-	function test_remove_insecure_properties_removes_unsafe_styles() {
+	public function test_merge_incoming_data_empty_presets() {
 		$theme_json = new WP_Theme_JSON_Gutenberg(
+			array(
+				'version'  => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
+				'settings' => array(
+					'color'      => array(
+						'duotone'   => array(
+							array(
+								'slug'   => 'value',
+								'colors' => array( 'red', 'green' ),
+							),
+						),
+						'gradients' => array(
+							array(
+								'slug'     => 'gradient',
+								'gradient' => 'gradient',
+							),
+						),
+						'palette'   => array(
+							array(
+								'slug'  => 'red',
+								'color' => 'red',
+							),
+						),
+					),
+					'spacing'    => array(
+						'units' => array( 'px', 'em' ),
+					),
+					'typography' => array(
+						'fontSizes' => array(
+							array(
+								'slug'  => 'size',
+								'value' => 'size',
+							),
+						),
+					),
+				),
+			)
+		);
+
+		$theme_json->merge(
+			new WP_Theme_JSON_Gutenberg(
+				array(
+					'version'  => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
+					'settings' => array(
+						'color'      => array(
+							'duotone'   => array(),
+							'gradients' => array(),
+							'palette'   => array(),
+						),
+						'spacing'    => array(
+							'units' => array(),
+						),
+						'typography' => array(
+							'fontSizes' => array(),
+						),
+					),
+				)
+			)
+		);
+
+		$actual   = $theme_json->get_raw_data();
+		$expected = array(
+			'version'  => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
+			'settings' => array(
+				'color'      => array(
+					'duotone'   => array(
+						'theme' => array(),
+					),
+					'gradients' => array(
+						'theme' => array(),
+					),
+					'palette'   => array(
+						'theme' => array(),
+					),
+				),
+				'spacing'    => array(
+					'units' => array(),
+				),
+				'typography' => array(
+					'fontSizes' => array(
+						'theme' => array(),
+					),
+				),
+			),
+		);
+
+		$this->assertEqualSetsWithIndex( $expected, $actual );
+	}
+
+	public function test_merge_incoming_data_null_presets() {
+		$theme_json = new WP_Theme_JSON_Gutenberg(
+			array(
+				'version'  => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
+				'settings' => array(
+					'color'      => array(
+						'duotone'   => array(
+							array(
+								'slug'   => 'value',
+								'colors' => array( 'red', 'green' ),
+							),
+						),
+						'gradients' => array(
+							array(
+								'slug'     => 'gradient',
+								'gradient' => 'gradient',
+							),
+						),
+						'palette'   => array(
+							array(
+								'slug'  => 'red',
+								'color' => 'red',
+							),
+						),
+					),
+					'spacing'    => array(
+						'units' => array( 'px', 'em' ),
+					),
+					'typography' => array(
+						'fontSizes' => array(
+							array(
+								'slug'  => 'size',
+								'value' => 'size',
+							),
+						),
+					),
+				),
+			)
+		);
+
+		$theme_json->merge(
+			new WP_Theme_JSON_Gutenberg(
+				array(
+					'version'  => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
+					'settings' => array(
+						'color'      => array(
+							'custom' => false,
+						),
+						'spacing'    => array(
+							'customMargin' => false,
+						),
+						'typography' => array(
+							'customLineHeight' => false,
+						),
+					),
+				)
+			)
+		);
+
+		$actual   = $theme_json->get_raw_data();
+		$expected = array(
+			'version'  => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
+			'settings' => array(
+				'color'      => array(
+					'custom'    => false,
+					'duotone'   => array(
+						'theme' => array(
+							array(
+								'slug'   => 'value',
+								'colors' => array( 'red', 'green' ),
+							),
+						),
+					),
+					'gradients' => array(
+						'theme' => array(
+							array(
+								'slug'     => 'gradient',
+								'gradient' => 'gradient',
+							),
+						),
+					),
+					'palette'   => array(
+						'theme' => array(
+							array(
+								'slug'  => 'red',
+								'color' => 'red',
+							),
+						),
+					),
+				),
+				'spacing'    => array(
+					'customMargin' => false,
+					'units'        => array( 'px', 'em' ),
+				),
+				'typography' => array(
+					'customLineHeight' => false,
+					'fontSizes'        => array(
+						'theme' => array(
+							array(
+								'slug'  => 'size',
+								'value' => 'size',
+							),
+						),
+					),
+				),
+			),
+		);
+
+		$this->assertEqualSetsWithIndex( $expected, $actual );
+	}
+
+	function test_remove_insecure_properties_removes_unsafe_styles() {
+		$actual = WP_Theme_JSON_Gutenberg::remove_insecure_properties(
 			array(
 				'version' => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
 				'styles'  => array(
@@ -541,6 +1036,16 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 						),
 					),
 					'blocks'   => array(
+						'core/image'  => array(
+							'filter' => array(
+								'duotone' => 'var:preset|duotone|blue-red',
+							),
+						),
+						'core/cover'  => array(
+							'filter' => array(
+								'duotone' => 'var(--wp--preset--duotone--blue-red, var(--fallback-unsafe))',
+							),
+						),
 						'core/group'  => array(
 							'color'    => array(
 								'gradient' => 'url(\'data:image/svg+xml;base64,PHN2ZyB4bWxucz0naHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmcnIHdpZHRoPScxMCcgaGVpZ2h0PScxMCc+PHNjcmlwdD5hbGVydCgnb2snKTwvc2NyaXB0PjxsaW5lYXJHcmFkaWVudCBpZD0nZ3JhZGllbnQnPjxzdG9wIG9mZnNldD0nMTAlJyBzdG9wLWNvbG9yPScjRjAwJy8+PHN0b3Agb2Zmc2V0PSc5MCUnIHN0b3AtY29sb3I9JyNmY2MnLz4gPC9saW5lYXJHcmFkaWVudD48cmVjdCBmaWxsPSd1cmwoI2dyYWRpZW50KScgeD0nMCcgeT0nMCcgd2lkdGg9JzEwMCUnIGhlaWdodD0nMTAwJScvPjwvc3ZnPg==\')',
@@ -560,11 +1065,9 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 						),
 					),
 				),
-			),
-			true
+			)
 		);
-		$theme_json->remove_insecure_properties();
-		$actual   = $theme_json->get_raw_data();
+
 		$expected = array(
 			'version' => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
 			'styles'  => array(
@@ -580,6 +1083,11 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 					),
 				),
 				'blocks'   => array(
+					'core/image' => array(
+						'filter' => array(
+							'duotone' => 'var:preset|duotone|blue-red',
+						),
+					),
 					'core/group' => array(
 						'color'    => array(
 							'text' => 'var:preset|color|dark-gray',
@@ -599,10 +1107,18 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 	}
 
 	function test_remove_insecure_properties_removes_unsafe_styles_sub_properties() {
-		$theme_json = new WP_Theme_JSON_Gutenberg(
+		$actual = WP_Theme_JSON_Gutenberg::remove_insecure_properties(
 			array(
 				'version' => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
 				'styles'  => array(
+					'border'   => array(
+						'radius' => array(
+							'topLeft'     => '6px',
+							'topRight'    => 'var(--top-right, var(--unsafe-fallback))',
+							'bottomRight' => '6px',
+							'bottomLeft'  => '6px',
+						),
+					),
 					'spacing'  => array(
 						'padding' => array(
 							'top'    => '1px',
@@ -625,6 +1141,14 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 					),
 					'blocks'   => array(
 						'core/group' => array(
+							'border'   => array(
+								'radius' => array(
+									'topLeft'     => '5px',
+									'topRight'    => 'var(--top-right, var(--unsafe-fallback))',
+									'bottomRight' => '5px',
+									'bottomLeft'  => '5px',
+								),
+							),
 							'spacing'  => array(
 								'padding' => array(
 									'top'    => '3px',
@@ -651,11 +1175,17 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 			),
 			true
 		);
-		$theme_json->remove_insecure_properties();
-		$actual   = $theme_json->get_raw_data();
+
 		$expected = array(
 			'version' => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
 			'styles'  => array(
+				'border'   => array(
+					'radius' => array(
+						'topLeft'     => '6px',
+						'bottomRight' => '6px',
+						'bottomLeft'  => '6px',
+					),
+				),
 				'spacing'  => array(
 					'padding' => array(
 						'top'   => '1px',
@@ -676,6 +1206,13 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 				),
 				'blocks'   => array(
 					'core/group' => array(
+						'border'   => array(
+							'radius' => array(
+								'topLeft'     => '5px',
+								'bottomRight' => '5px',
+								'bottomLeft'  => '5px',
+							),
+						),
 						'spacing'  => array(
 							'padding' => array(
 								'top'   => '3px',
@@ -702,7 +1239,7 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 	}
 
 	function test_remove_insecure_properties_removes_non_preset_settings() {
-		$theme_json = new WP_Theme_JSON_Gutenberg(
+		$actual = WP_Theme_JSON_Gutenberg::remove_insecure_properties(
 			array(
 				'version'  => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
 				'settings' => array(
@@ -757,11 +1294,9 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 						),
 					),
 				),
-			),
-			true
+			)
 		);
-		$theme_json->remove_insecure_properties();
-		$result   = $theme_json->get_raw_data();
+
 		$expected = array(
 			'version'  => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
 			'settings' => array(
@@ -809,11 +1344,11 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 				),
 			),
 		);
-		$this->assertEqualSetsWithIndex( $expected, $result );
+		$this->assertEqualSetsWithIndex( $expected, $actual );
 	}
 
 	function test_remove_insecure_properties_removes_unsafe_preset_settings() {
-		$theme_json = new WP_Theme_JSON_Gutenberg(
+		$actual = WP_Theme_JSON_Gutenberg::remove_insecure_properties(
 			array(
 				'version'  => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
 				'settings' => array(
@@ -882,7 +1417,7 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 									array(
 										'name'  => 'Blue',
 										'slug'  => 'blue',
-										'color' => 'var(--color, var(--unsafe--falback))',
+										'color' => 'var(--color, var(--unsafe--fallback))',
 									),
 									array(
 										'name'  => 'Pink',
@@ -894,11 +1429,9 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 						),
 					),
 				),
-			),
-			true
+			)
 		);
-		$theme_json->remove_insecure_properties();
-		$result   = $theme_json->get_raw_data();
+
 		$expected = array(
 			'version'  => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
 			'settings' => array(
@@ -935,11 +1468,11 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 				),
 			),
 		);
-		$this->assertEqualSetsWithIndex( $expected, $result );
+		$this->assertEqualSetsWithIndex( $expected, $actual );
 	}
 
 	function test_remove_insecure_properties_applies_safe_styles() {
-		$theme_json = new WP_Theme_JSON_Gutenberg(
+		$actual = WP_Theme_JSON_Gutenberg::remove_insecure_properties(
 			array(
 				'version' => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
 				'styles'  => array(
@@ -950,8 +1483,7 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 			),
 			true
 		);
-		$theme_json->remove_insecure_properties();
-		$result   = $theme_json->get_raw_data();
+
 		$expected = array(
 			'version' => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
 			'styles'  => array(
@@ -960,7 +1492,7 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 				),
 			),
 		);
-		$this->assertEqualSetsWithIndex( $expected, $result );
+		$this->assertEqualSetsWithIndex( $expected, $actual );
 	}
 
 	function test_get_custom_templates() {
@@ -993,8 +1525,9 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 			array(
 				'templateParts' => array(
 					array(
-						'name' => 'small-header',
-						'area' => 'header',
+						'name'  => 'small-header',
+						'title' => 'Small Header',
+						'area'  => 'header',
 					),
 				),
 			)
@@ -1006,7 +1539,8 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 			$template_parts,
 			array(
 				'small-header' => array(
-					'area' => 'header',
+					'title' => 'Small Header',
+					'area'  => 'header',
 				),
 			)
 		);
@@ -1064,7 +1598,7 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 					),
 				),
 				'spacing'    => array(
-					'units' => array( 'px', 'em', 'rem', 'vh', 'vw' ),
+					'units' => array( 'px', 'em', 'rem', 'vh', 'vw', '%' ),
 				),
 				'typography' => array(
 					'customFontSize'   => false,
@@ -1166,7 +1700,7 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 		$input = gutenberg_get_default_block_editor_settings();
 
 		$expected = array(
-			'units'         => array( 'px', 'em', 'rem', 'vh', 'vw' ),
+			'units'         => array( 'px', 'em', 'rem', 'vh', 'vw', '%' ),
 			'customPadding' => false,
 		);
 

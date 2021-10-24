@@ -17,14 +17,20 @@ public struct MediaInfo: Encodable {
 /// Definition of capabilities to enable in the Block Editor
 public enum Capabilities: String {
     case contactInfoBlock
+    case layoutGridBlock
     case mediaFilesCollectionBlock
     case mentions
     case xposts
     case unsupportedBlockEditor
     case canEnableUnsupportedBlockEditor
-    case audioBlock
+    case isAudioBlockMediaUploadEnabled
     case reusableBlock
-    case canViewEditorOnboarding
+    case editorOnboarding
+    case firstGutenbergEditorSession
+    case facebookEmbed
+    case instagramEmbed
+    case loomEmbed
+    case smartframeEmbed
 }
 
 /// Wrapper for single block data
@@ -162,6 +168,10 @@ public protocol GutenbergBridgeDelegate: class {
     ///
     func gutenbergDidRequestMediaUploadCancelation(for mediaID: Int32)
 
+    /// Tells the delegate that an image block requested for the featured image to be set.
+    ///
+    func gutenbergDidRequestToSetFeaturedImage(for mediaID: Int32)
+
     /// Tells the delegate that the Gutenberg module has finished loading.
     ///
     func gutenbergDidLoad()
@@ -232,6 +242,20 @@ public protocol GutenbergBridgeDelegate: class {
     func gutenbergDidRequestMediaFilesUploadCancelDialog(_ mediaFiles: [[String: Any]])
 
     func gutenbergDidRequestMediaFilesSaveCancelDialog(_ mediaFiles: [[String: Any]])
+
+    func gutenbergDidRequestPreview()
+
+    /// Tells the delegate that the editor requested the block type impression counts
+    func gutenbergDidRequestBlockTypeImpressions() -> [String: Int]
+
+    /// Tells the delegate the the editor requested setting the impression counts
+    func gutenbergDidRequestSetBlockTypeImpressions(_ impressions: [String: Int])
+
+    /// Tells the delegate that the editor requested to show the "Contact Support" support view.
+    func gutenbergDidRequestContactCustomerSupport()
+
+    /// Tells the delegate that the editor requested to show the "My Tickets" support view.
+    func gutenbergDidRequestGotoCustomerSupportOptions()
 }
 
 // MARK: - Optional GutenbergBridgeDelegate methods

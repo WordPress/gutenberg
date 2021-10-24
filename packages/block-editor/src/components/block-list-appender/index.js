@@ -7,7 +7,6 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { createContext } from '@wordpress/element';
 import { withSelect } from '@wordpress/data';
 import { getDefaultBlockName } from '@wordpress/blocks';
 
@@ -17,13 +16,6 @@ import { getDefaultBlockName } from '@wordpress/blocks';
 import DefaultBlockAppender from '../default-block-appender';
 import ButtonBlockAppender from '../button-block-appender';
 import { store as blockEditorStore } from '../../store';
-
-// A Context to store the map of the appender map.
-export const AppenderNodesContext = createContext();
-
-function stopPropagation( event ) {
-	event.stopPropagation();
-}
 
 function BlockListAppender( {
 	blockClientIds,
@@ -91,14 +83,18 @@ function BlockListAppender( {
 			//
 			// See: https://developer.mozilla.org/en-US/docs/Web/HTML/Element/button#Clicking_and_focus
 			tabIndex={ -1 }
-			// Prevent the block from being selected when the appender is
-			// clicked.
-			onFocus={ stopPropagation }
 			className={ classnames(
-				'block-list-appender',
-				'wp-block',
+				'block-list-appender wp-block',
 				className
 			) }
+			// The appender exists to let you add the first Paragraph before
+			// any is inserted. To that end, this appender should visually be
+			// presented as a block. That means theme CSS should style it as if
+			// it were an empty paragraph block. That means a `wp-block` class to
+			// ensure the width is correct, and a [data-block] attribute to ensure
+			// the correct margin is applied, especially for classic themes which
+			// have commonly targeted that attribute for margins.
+			data-block
 		>
 			{ appender }
 		</TagName>

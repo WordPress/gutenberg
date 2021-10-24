@@ -9,10 +9,9 @@ import { find } from 'lodash';
 import { __, sprintf } from '@wordpress/i18n';
 import { useCallback, useState } from '@wordpress/element';
 import { useDispatch, useSelect } from '@wordpress/data';
-import { Placeholder, Dropdown, Button } from '@wordpress/components';
+import { Placeholder, Dropdown, Button, Spinner } from '@wordpress/components';
 import { serialize } from '@wordpress/blocks';
 import { store as coreStore } from '@wordpress/core-data';
-import { store as editorStore } from '@wordpress/editor';
 
 /**
  * Internal dependencies
@@ -30,14 +29,18 @@ export default function TemplatePartPlaceholder( {
 	clientId,
 	setAttributes,
 	enableSelection,
+	hasResolvedReplacements,
 } ) {
 	const { saveEntityRecord } = useDispatch( coreStore );
 	const [ step, setStep ] = useState( PLACEHOLDER_STEPS.initial );
 
 	const { areaIcon, areaLabel } = useSelect(
 		( select ) => {
+			// FIXME: @wordpress/block-library should not depend on @wordpress/editor.
+			// Blocks can be loaded into a *non-post* block editor.
+			// eslint-disable-next-line @wordpress/data-no-store-string-literals
 			const definedAreas = select(
-				editorStore
+				'core/editor'
 			).__experimentalGetDefaultTemplatePartAreas();
 
 			const selectedArea = find( definedAreas, { area } );
@@ -52,8 +55,10 @@ export default function TemplatePartPlaceholder( {
 	);
 
 	const onCreate = useCallback(
-		async ( startingBlocks = [] ) => {
-			const title = __( 'Untitled Template Part' );
+		async (
+			startingBlocks = [],
+			title = __( 'Untitled Template Part' )
+		) => {
 			// If we have `area` set from block attributes, means an exposed
 			// block variation was inserted. So add this prop to the template
 			// part entity on creation. Afterwards remove `area` value from
@@ -90,61 +95,76 @@ export default function TemplatePartPlaceholder( {
 						enableSelection
 							? sprintf(
 									// Translators: %s as template part area title ("Header", "Footer", etc.).
-									'Choose an existing %s or create a new one.',
+									__(
+										'Choose an existing %s or create a new one.'
+									),
 									areaLabel.toLowerCase()
 							  )
 							: sprintf(
 									// Translators: %s as template part area title ("Header", "Footer", etc.).
-									'Create a new %s.',
+									__( 'Create a new %s.' ),
 									areaLabel.toLowerCase()
 							  )
 					}
 				>
-					<Dropdown
-						contentClassName="wp-block-template-part__placeholder-preview-dropdown-content"
-						position="bottom right left"
-						renderToggle={ ( { isOpen, onToggle } ) => (
-							<>
-								{ enableSelection && (
-									<Button
-										variant="primary"
-										onClick={ onToggle }
-										aria-expanded={ isOpen }
-									>
-										{ __( 'Choose existing' ) }
-									</Button>
-								) }
-								<Button
-									variant={
-										enableSelection ? 'tertiary' : 'primary'
-									}
-									onClick={ () =>
-										setStep( PLACEHOLDER_STEPS.patterns )
-									}
-								>
-									{ sprintf(
-										// Translators: %s as template part area title ("Header", "Footer", etc.).
-										'New %s',
-										areaLabel.toLowerCase()
+					{ ! hasResolvedReplacements ? (
+						<Spinner />
+					) : (
+						<Dropdown
+							contentClassName="wp-block-template-part__placeholder-preview-dropdown-content"
+							position="bottom right left"
+							renderToggle={ ( { isOpen, onToggle } ) => (
+								<>
+									{ enableSelection && (
+										<Button
+											variant="primary"
+											onClick={ onToggle }
+											aria-expanded={ isOpen }
+										>
+											{ __( 'Choose existing' ) }
+										</Button>
 									) }
-								</Button>
-							</>
-						) }
-						renderContent={ ( { onClose } ) => (
-							<TemplatePartSelection
-								setAttributes={ setAttributes }
-								onClose={ onClose }
-								area={ area }
-							/>
-						) }
-					/>
+									<Button
+										variant={
+											enableSelection
+												? 'tertiary'
+												: 'primary'
+										}
+										onClick={ () =>
+											setStep(
+												PLACEHOLDER_STEPS.patterns
+											)
+										}
+									>
+										{ sprintf(
+											// Translators: %s as template part area title ("Header", "Footer", etc.).
+											__( 'New %s' ),
+											areaLabel.toLowerCase()
+										) }
+									</Button>
+								</>
+							) }
+							renderContent={ ( { onClose } ) => (
+								<TemplatePartSelection
+									setAttributes={ setAttributes }
+									onClose={ onClose }
+									area={ area }
+								/>
+							) }
+						/>
+					) }
 				</Placeholder>
 			) }
 			{ step === PLACEHOLDER_STEPS.patterns && (
 				<PatternsSetup
 					area={ area }
+					areaLabel={ areaLabel }
+					areaIcon={ areaIcon }
 					onCreate={ onCreate }
 					clientId={ clientId }
+					resetPlaceholder={ () =>
+						setStep( PLACEHOLDER_STEPS.initial )
+					}
 				/>
 			) }
 		</>

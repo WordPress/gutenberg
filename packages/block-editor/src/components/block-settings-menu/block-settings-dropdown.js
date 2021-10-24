@@ -24,6 +24,7 @@ import BlockModeToggle from './block-mode-toggle';
 import BlockHTMLConvertButton from './block-html-convert-button';
 import __unstableBlockSettingsMenuFirstItem from './block-settings-menu-first-item';
 import BlockSettingsMenuControls from '../block-settings-menu-controls';
+import { store as blockEditorStore } from '../../store';
 
 const POPOVER_PROPS = {
 	className: 'block-editor-block-settings-menu__popover',
@@ -45,6 +46,10 @@ export function BlockSettingsDropdown( {
 	const blockClientIds = castArray( clientIds );
 	const count = blockClientIds.length;
 	const firstBlockClientId = blockClientIds[ 0 ];
+	const onlyBlock = useSelect(
+		( select ) => 1 === select( blockEditorStore ).getBlockCount(),
+		[]
+	);
 
 	const shortcuts = useSelect( ( select ) => {
 		const { getShortcutRepresentation } = select( keyboardShortcutsStore );
@@ -85,7 +90,8 @@ export function BlockSettingsDropdown( {
 			{ ( {
 				canDuplicate,
 				canInsertDefaultBlock,
-				isLocked,
+				canMove,
+				canRemove,
 				onDuplicate,
 				onInsertAfter,
 				onInsertBefore,
@@ -151,7 +157,7 @@ export function BlockSettingsDropdown( {
 										</MenuItem>
 									</>
 								) }
-								{ ! isLocked && (
+								{ canMove && ! onlyBlock && (
 									<MenuItem
 										onClick={ flow( onClose, onMoveTo ) }
 									>
@@ -174,8 +180,8 @@ export function BlockSettingsDropdown( {
 								: Children.map( ( child ) =>
 										cloneElement( child, { onClose } )
 								  ) }
-							<MenuGroup>
-								{ ! isLocked && (
+							{ canRemove && (
+								<MenuGroup>
 									<MenuItem
 										onClick={ flow(
 											onClose,
@@ -186,8 +192,8 @@ export function BlockSettingsDropdown( {
 									>
 										{ removeBlockLabel }
 									</MenuItem>
-								) }
-							</MenuGroup>
+								</MenuGroup>
+							) }
 						</>
 					) }
 				</DropdownMenu>

@@ -16,8 +16,8 @@ import { store as blockEditorStore } from '../../store';
  *
  * @typedef {Object} WPBlockDisplayInformation
  *
- * @property {string} title Human-readable block type label.
- * @property {WPIcon} icon Block type icon.
+ * @property {string} title       Human-readable block type label.
+ * @property {WPIcon} icon        Block type icon.
  * @property {string} description A detailed block type description.
  */
 

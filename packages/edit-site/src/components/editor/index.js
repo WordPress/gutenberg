@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { useEffect, useState, useMemo, useCallback } from '@wordpress/element';
-import { AsyncModeProvider, useSelect, useDispatch } from '@wordpress/data';
+import { useSelect, useDispatch } from '@wordpress/data';
 import {
 	SlotFillProvider,
 	Popover,
@@ -19,12 +19,14 @@ import {
 } from '@wordpress/interface';
 import {
 	EditorNotices,
+	EditorSnackbars,
 	EntitiesSavedStates,
 	UnsavedChangesWarning,
 	store as editorStore,
 } from '@wordpress/editor';
 import { __ } from '@wordpress/i18n';
 import { PluginArea } from '@wordpress/plugins';
+import { ShortcutProvider } from '@wordpress/keyboard-shortcuts';
 
 /**
  * Internal dependencies
@@ -33,19 +35,21 @@ import Header from '../header';
 import { SidebarComplementaryAreaFills } from '../sidebar';
 import BlockEditor from '../block-editor';
 import KeyboardShortcuts from '../keyboard-shortcuts';
-import GlobalStylesProvider from './global-styles-provider';
 import NavigationSidebar from '../navigation-sidebar';
 import URLQueryController from '../url-query-controller';
 import InserterSidebar from '../secondary-sidebar/inserter-sidebar';
 import ListViewSidebar from '../secondary-sidebar/list-view-sidebar';
+import ErrorBoundary from '../error-boundary';
 import { store as editSiteStore } from '../../store';
+import { GlobalStylesRenderer } from './global-styles-renderer';
+import { GlobalStylesProvider } from '../global-styles/global-styles-provider';
 
 const interfaceLabels = {
 	secondarySidebar: __( 'Block Library' ),
 	drawer: __( 'Navigation Sidebar' ),
 };
 
-function Editor( { initialSettings } ) {
+function Editor( { initialSettings, onError } ) {
 	const {
 		isInserterOpen,
 		isListViewOpen,
@@ -55,6 +59,7 @@ function Editor( { initialSettings } ) {
 		templateType,
 		page,
 		template,
+		templateResolved,
 		isNavigationOpen,
 	} = useSelect( ( select ) => {
 		const {
@@ -66,6 +71,7 @@ function Editor( { initialSettings } ) {
 			getPage,
 			isNavigationOpened,
 		} = select( editSiteStore );
+		const { hasFinishedResolution, getEntityRecord } = select( coreStore );
 		const postType = getEditedPostType();
 		const postId = getEditedPostId();
 
@@ -80,12 +86,15 @@ function Editor( { initialSettings } ) {
 			templateType: postType,
 			page: getPage(),
 			template: postId
-				? select( coreStore ).getEntityRecord(
+				? getEntityRecord( 'postType', postType, postId )
+				: null,
+			templateResolved: postId
+				? hasFinishedResolution( 'getEntityRecord', [
 						'postType',
 						postType,
-						postId
-				  )
-				: null,
+						postId,
+				  ] )
+				: false,
 			entityId: postId,
 			isNavigationOpen: isNavigationOpened(),
 		};
@@ -161,20 +170,14 @@ function Editor( { initialSettings } ) {
 			return <InserterSidebar />;
 		}
 		if ( isListViewOpen ) {
-			return (
-				<AsyncModeProvider value="true">
-					<ListViewSidebar />
-				</AsyncModeProvider>
-			);
+			return <ListViewSidebar />;
 		}
 		return null;
 	};
 
 	return (
-		<>
+		<ShortcutProvider>
 			<URLQueryController />
-			<FullscreenMode isActive />
-			<UnsavedChangesWarning />
 			<SlotFillProvider>
 				<EntityProvider kind="root" type="site">
 					<EntityProvider
@@ -182,19 +185,12 @@ function Editor( { initialSettings } ) {
 						type={ templateType }
 						id={ entityId }
 					>
-						<EntityProvider
-							kind="postType"
-							type="wp_global_styles"
-							id={
-								settings.__experimentalGlobalStylesUserEntityId
-							}
-						>
+						<GlobalStylesProvider>
 							<BlockContextProvider value={ blockContext }>
-								<GlobalStylesProvider
-									baseStyles={
-										settings.__experimentalGlobalStylesBaseStyles
-									}
-								>
+								<GlobalStylesRenderer />
+								<ErrorBoundary onError={ onError }>
+									<FullscreenMode isActive />
+									<UnsavedChangesWarning />
 									<KeyboardShortcuts.Register />
 									<SidebarComplementaryAreaFills />
 									<InterfaceSkeleton
@@ -213,6 +209,7 @@ function Editor( { initialSettings } ) {
 												}
 											/>
 										}
+										notices={ <EditorSnackbars /> }
 										content={
 											<>
 												<EditorNotices />
@@ -223,7 +220,8 @@ function Editor( { initialSettings } ) {
 														}
 													/>
 												) }
-												{ ! template &&
+												{ templateResolved &&
+													! template &&
 													settings?.siteUrl &&
 													entityId && (
 														<Notice
@@ -272,13 +270,13 @@ function Editor( { initialSettings } ) {
 									/>
 									<Popover.Slot />
 									<PluginArea />
-								</GlobalStylesProvider>
+								</ErrorBoundary>
 							</BlockContextProvider>
-						</EntityProvider>
+						</GlobalStylesProvider>
 					</EntityProvider>
 				</EntityProvider>
 			</SlotFillProvider>
-		</>
+		</ShortcutProvider>
 	);
 }
 export default Editor;

@@ -15,16 +15,16 @@ import { useEffect, useRef } from '@wordpress/element';
  *
  * @typedef {Object} WPKeyboardShortcutConfig
  *
- * @property {boolean} [bindGlobal]  Handle keyboard events anywhere including inside textarea/input fields.
- * @property {string}  [eventName]   Event name used to trigger the handler, defaults to keydown.
- * @property {boolean} [isDisabled]  Disables the keyboard handler if the value is true.
- * @property {import('react').RefObject<HTMLElement>}  [target]      React reference to the DOM element used to catch the keyboard event.
+ * @property {boolean}                                [bindGlobal] Handle keyboard events anywhere including inside textarea/input fields.
+ * @property {string}                                 [eventName]  Event name used to trigger the handler, defaults to keydown.
+ * @property {boolean}                                [isDisabled] Disables the keyboard handler if the value is true.
+ * @property {import('react').RefObject<HTMLElement>} [target]     React reference to the DOM element used to catch the keyboard event.
  */
 
 /**
  * Return true if platform is MacOS.
  *
- * @param {Window} [_window]   window object by default; used for DI testing.
+ * @param {Window} [_window] window object by default; used for DI testing.
  *
  * @return {boolean} True if MacOS; false otherwise.
  */
@@ -43,9 +43,9 @@ function isAppleOS( _window = window ) {
  *
  * @see https://craig.is/killing/mice#api.bind for information about the `callback` parameter.
  *
- * @param {string[]|string} shortcuts Keyboard Shortcuts.
- * @param {(e: import('mousetrap').ExtendedKeyboardEvent, combo: string) => void} callback Shortcut callback.
- * @param {WPKeyboardShortcutConfig} options Shortcut options.
+ * @param {string[]|string}                                                       shortcuts Keyboard Shortcuts.
+ * @param {(e: import('mousetrap').ExtendedKeyboardEvent, combo: string) => void} callback  Shortcut callback.
+ * @param {WPKeyboardShortcutConfig}                                              options   Shortcut options.
  */
 function useKeyboardShortcut(
 	/* eslint-enable jsdoc/valid-types */

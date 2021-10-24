@@ -11,11 +11,11 @@ $image-height: 64px;
 
 .imageWrapper {
 	height: $image-height;
-	margin-bottom: $grid-unit / 2;
+	margin-bottom: $grid-unit * 0.5;
 }
 
 .rounded {
-	border-radius: $image-height / 2;
+	border-radius: $image-height * 0.5;
 	overflow: hidden;
 }
 

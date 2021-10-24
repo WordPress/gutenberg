@@ -79,13 +79,13 @@ const ALLOWED_BLOCKS = [ 'core/image', 'core/paragraph' ];
 
 ## Orientation
 
-By default, `InnerBlocks` expects its blocks to be shown in a vertical list. A valid use-case is to style InnerBlocks to appear horizontally. When blocks are styled in such a way, the `orientation` prop can be used to indicate a horizontal layout:
+By default, `InnerBlocks` expects its blocks to be shown in a vertical list. A valid use-case is to style inner blocks to appear horizontally, for instance by adding CSS flex or grid properties to the inner blocks wrapper. When blocks are styled in such a way, the `orientation` prop can be set to indicate that a horizontal layout is being used:
 
 ```js
 <InnerBlocks orientation="horizontal" />
 ```
 
-Specifying this prop will result in the block movers being shown horizontally, and also ensure drag and drop works correctly.
+Specifying this prop does not affect the layout of the inner blocks, but results in the block mover icons in the child blocks being displayed horizontally, and also ensures that drag and drop works correctly.
 
 ## Template
 
@@ -137,7 +137,7 @@ const MY_TEMPLATE = [
 
 {% end %}
 
-Use the `templateLock` property to lock down the template. Using `all` locks the template complete, no changes can be made. Using `insert` prevents additional blocks to be inserted, but existing blocks can be reordered. See [templateLock documentation](https://github.com/WordPress/gutenberg/tree/HEAD/packages/block-editor/src/components/inner-blocks/README.md#templatelock) for additional information.
+Use the `templateLock` property to lock down the template. Using `all` locks the template completely so no changes can be made. Using `insert` prevents additional blocks from being inserted, but existing blocks can be reordered. See [templateLock documentation](https://github.com/WordPress/gutenberg/tree/HEAD/packages/block-editor/src/components/inner-blocks/README.md#templatelock) for additional information.
 
 ### Post Template
 

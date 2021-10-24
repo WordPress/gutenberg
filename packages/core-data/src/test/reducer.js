@@ -67,12 +67,16 @@ describe( 'entities', () => {
 
 		expect( state.data.root.postType.queriedData ).toEqual( {
 			items: {
-				b: { slug: 'b', title: 'beach' },
-				s: { slug: 's', title: 'sun' },
+				default: {
+					b: { slug: 'b', title: 'beach' },
+					s: { slug: 's', title: 'sun' },
+				},
 			},
 			itemIsComplete: {
-				b: true,
-				s: true,
+				default: {
+					b: true,
+					s: true,
+				},
 			},
 			queries: {},
 		} );
@@ -85,10 +89,14 @@ describe( 'entities', () => {
 					postType: {
 						queriedData: {
 							items: {
-								w: { slug: 'w', title: 'water' },
+								default: {
+									w: { slug: 'w', title: 'water' },
+								},
 							},
 							itemIsComplete: {
-								w: true,
+								default: {
+									w: true,
+								},
 							},
 							queries: {},
 						},
@@ -105,12 +113,16 @@ describe( 'entities', () => {
 
 		expect( state.data.root.postType.queriedData ).toEqual( {
 			items: {
-				w: { slug: 'w', title: 'water' },
-				b: { slug: 'b', title: 'beach' },
+				default: {
+					w: { slug: 'w', title: 'water' },
+					b: { slug: 'b', title: 'beach' },
+				},
 			},
 			itemIsComplete: {
-				w: true,
-				b: true,
+				default: {
+					w: true,
+					b: true,
+				},
 			},
 			queries: {},
 		} );

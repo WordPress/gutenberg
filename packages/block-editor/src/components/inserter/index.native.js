@@ -10,7 +10,7 @@ import { delay } from 'lodash';
 import { __ } from '@wordpress/i18n';
 import { Dropdown, ToolbarButton, Picker } from '@wordpress/components';
 import { Component } from '@wordpress/element';
-import { withSelect } from '@wordpress/data';
+import { withDispatch, withSelect } from '@wordpress/data';
 import { compose, withPreferredColorScheme } from '@wordpress/compose';
 import { isUnmodifiedDefaultBlock } from '@wordpress/blocks';
 import {
@@ -20,6 +20,7 @@ import {
 	insertAfter,
 	insertBefore,
 } from '@wordpress/icons';
+import { setBlockTypeImpressions } from '@wordpress/react-native-bridge';
 
 /**
  * Internal dependencies
@@ -31,19 +32,9 @@ import { store as blockEditorStore } from '../../store';
 
 const VOICE_OVER_ANNOUNCEMENT_DELAY = 1000;
 
-const defaultRenderToggle = ( {
-	canViewEditorOnboarding,
-	onToggle,
-	disabled,
-	style,
-	onLongPress,
-} ) => (
+const defaultRenderToggle = ( { onToggle, disabled, style, onLongPress } ) => (
 	<ToolbarButton
-		title={
-			canViewEditorOnboarding
-				? __( 'Tap to add content' )
-				: __( 'Add block' )
-		}
+		title={ __( 'Add block' ) }
 		icon={
 			<Icon
 				icon={ plusCircleFilled }
@@ -51,8 +42,6 @@ const defaultRenderToggle = ( {
 				color={ style.color }
 			/>
 		}
-		showTooltip={ canViewEditorOnboarding }
-		tooltipPosition="top right"
 		onClick={ onToggle }
 		extraProps={ {
 			hint: __( 'Double tap to add a block' ),
@@ -161,7 +150,33 @@ export class Inserter extends Component {
 	}
 
 	onToggle( isOpen ) {
-		const { onToggle } = this.props;
+		const { blockTypeImpressions, onToggle, updateSettings } = this.props;
+
+		if ( ! isOpen ) {
+			const impressionsRemain = Object.values(
+				blockTypeImpressions
+			).some( ( count ) => count > 0 );
+
+			if ( impressionsRemain ) {
+				const decrementedImpressions = Object.entries(
+					blockTypeImpressions
+				).reduce(
+					( acc, [ blockName, count ] ) => ( {
+						...acc,
+						[ blockName ]: Math.max( count - 1, 0 ),
+					} ),
+					{}
+				);
+
+				// Persist block type impression to JavaScript store
+				updateSettings( {
+					impressions: decrementedImpressions,
+				} );
+
+				// Persist block type impression count to native app store
+				setBlockTypeImpressions( decrementedImpressions );
+			}
+		}
 
 		// Surface toggle callback to parent component
 		if ( onToggle ) {
@@ -171,7 +186,7 @@ export class Inserter extends Component {
 	}
 
 	onInserterToggledAnnouncement( isOpen ) {
-		AccessibilityInfo.fetch().done( ( isEnabled ) => {
+		AccessibilityInfo.isScreenReaderEnabled().done( ( isEnabled ) => {
 			if ( isEnabled ) {
 				const isIOS = Platform.OS === 'ios';
 				const announcement = isOpen
@@ -200,7 +215,6 @@ export class Inserter extends Component {
 	 */
 	renderInserterToggle( { onToggle, isOpen } ) {
 		const {
-			canViewEditorOnboarding,
 			disabled,
 			renderToggle = defaultRenderToggle,
 			getStylesFromColorScheme,
@@ -247,7 +261,6 @@ export class Inserter extends Component {
 		return (
 			<>
 				{ renderToggle( {
-					canViewEditorOnboarding,
 					onToggle: onPress,
 					isOpen,
 					disabled,
@@ -308,6 +321,10 @@ export class Inserter extends Component {
 }
 
 export default compose( [
+	withDispatch( ( dispatch ) => {
+		const { updateSettings } = dispatch( blockEditorStore );
+		return { updateSettings };
+	} ),
 	withSelect( ( select, { clientId, isAppender, rootClientId } ) => {
 		const {
 			getBlockRootClientId,
@@ -378,8 +395,7 @@ export default compose( [
 		const insertionIndexEnd = endOfRootIndex;
 
 		return {
-			canViewEditorOnboarding: getBlockEditorSettings()
-				.canViewEditorOnboarding,
+			blockTypeImpressions: getBlockEditorSettings().impressions,
 			destinationRootClientId,
 			insertionIndexDefault: getDefaultInsertionIndex(),
 			insertionIndexBefore,

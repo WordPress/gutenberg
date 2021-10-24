@@ -11,6 +11,7 @@ import {
 	searchForBlock,
 	setBrowserViewport,
 	showBlockToolbar,
+	pressKeyWithModifier,
 } from '@wordpress/e2e-test-utils';
 
 /** @typedef {import('puppeteer').ElementHandle} ElementHandle */
@@ -57,7 +58,7 @@ describe( 'Inserting blocks', () => {
 		return page.mouse.click( x, y );
 	}
 
-	it( 'Should insert content using the placeholder and the regular inserter', async () => {
+	it.skip( 'Should insert content using the placeholder and the regular inserter', async () => {
 		// This ensures the editor is loaded in navigation mode.
 		await page.reload();
 		await page.waitForSelector( '.edit-post-layout' );
@@ -135,19 +136,17 @@ describe( 'Inserting blocks', () => {
 		await page.mouse.move( rect.x + rect.width / 2, rect.y - 10, {
 			steps: 10,
 		} );
-		await page.waitForSelector(
+		const lineInserter = await page.waitForSelector(
 			'.block-editor-block-list__insertion-point .block-editor-inserter__toggle'
 		);
-		await page.click(
-			'.block-editor-block-list__insertion-point .block-editor-inserter__toggle'
-		);
+		await lineInserter.click();
 		// [TODO]: Search input should be focused immediately. It shouldn't be
 		// necessary to have `waitForFunction`.
 		await page.waitForFunction(
 			() =>
 				document.activeElement &&
 				document.activeElement.classList.contains(
-					'block-editor-inserter__search-input'
+					'components-search-control__input'
 				)
 		);
 		await page.keyboard.type( 'para' );
@@ -185,7 +184,7 @@ describe( 'Inserting blocks', () => {
 			() => document.activeElement.classList
 		);
 		expect( Object.values( activeElementClassList ) ).toContain(
-			'block-editor-inserter__search-input'
+			'components-search-control__input'
 		);
 
 		// Try using the up arrow key (vertical navigation triggers the issue described in #9583).
@@ -196,7 +195,7 @@ describe( 'Inserting blocks', () => {
 			() => document.activeElement.classList
 		);
 		expect( Object.values( activeElementClassList ) ).toContain(
-			'block-editor-inserter__search-input'
+			'components-search-control__input'
 		);
 
 		// Tab to the block list
@@ -250,7 +249,7 @@ describe( 'Inserting blocks', () => {
 		);
 
 		// Insert a paragraph block.
-		await page.waitForSelector( '.block-editor-inserter__search-input' );
+		await page.waitForSelector( '.block-editor-inserter__search input' );
 
 		// Search for the paragraph block if it's not in the list of blocks shown.
 		if ( ! page.$( '.editor-block-list-item-paragraph' ) ) {
@@ -287,13 +286,10 @@ describe( 'Inserting blocks', () => {
 		await page.mouse.move( rect.x + rect.width / 2, rect.y - 10, {
 			steps: 10,
 		} );
-		await page.waitForSelector(
+		const insertionLine = await page.waitForSelector(
 			'.block-editor-block-list__insertion-point .block-editor-inserter__toggle'
 		);
-		await page.click(
-			'.block-editor-block-list__insertion-point .block-editor-inserter__toggle'
-		);
-
+		await insertionLine.click();
 		const browseAll = await page.waitForSelector(
 			'button.block-editor-inserter__quick-inserter-expand'
 		);
@@ -328,7 +324,7 @@ describe( 'Inserting blocks', () => {
 		await headingButton.hover();
 
 		// Should show the blue line indicator somewhere.
-		const indicator = await page.$(
+		const indicator = await page.waitForSelector(
 			'.block-editor-block-list__insertion-point-indicator'
 		);
 		const indicatorRect = await indicator.boundingBox();
@@ -352,6 +348,28 @@ describe( 'Inserting blocks', () => {
 		await insertBlock( 'Paragraph' );
 		await page.keyboard.type( 'Paragraph inside group' );
 		expect( await getEditedPostContent() ).toMatchSnapshot();
+	} );
+
+	it( 'passes the search value in the main inserter when clicking `Browse all`', async () => {
+		const INSERTER_SEARCH_SELECTOR =
+			'.block-editor-inserter__search input,.block-editor-inserter__search-input,input.block-editor-inserter__search';
+		await insertBlock( 'Group' );
+		await insertBlock( 'Paragraph' );
+		await page.keyboard.type( 'Text' );
+		await page.click( '[data-type="core/group"] [aria-label="Add block"]' );
+		await page.waitForSelector( INSERTER_SEARCH_SELECTOR );
+		await page.focus( INSERTER_SEARCH_SELECTOR );
+		await pressKeyWithModifier( 'primary', 'a' );
+		const searchTerm = 'Heading';
+		await page.keyboard.type( searchTerm );
+		const browseAll = await page.waitForXPath(
+			'//button[text()="Browse all"]'
+		);
+		await browseAll.click();
+		const availableBlocks = await page.$$(
+			'.block-editor-block-types-list__list-item'
+		);
+		expect( availableBlocks ).toHaveLength( 1 );
 	} );
 
 	// Check for regression of https://github.com/WordPress/gutenberg/issues/27586
@@ -378,6 +396,7 @@ describe( 'Inserting blocks', () => {
 
 	it( 'shows block preview when hovering over block in inserter', async () => {
 		await openGlobalBlockInserter();
+		await page.waitForSelector( '.editor-block-list-item-paragraph' );
 		await page.focus( '.editor-block-list-item-paragraph' );
 		const preview = await page.waitForSelector(
 			'.block-editor-inserter__preview',

@@ -8,18 +8,18 @@ Assuming you have a form component, you can disable all form inputs by wrapping 
 
 ```jsx
 import { Button, Disabled, TextControl } from '@wordpress/components';
-import { withState } from '@wordpress/compose';
+import { useState } from '@wordpress/element';
 
-const MyDisabled = withState( {
-	isDisabled: true,
-} )( ( { isDisabled, setState } ) => {
+const MyDisabled = () => {
+	const [ isDisabled, setIsDisabled ] = useState( true );
+
 	let input = <TextControl label="Input" onChange={ () => {} } />;
 	if ( isDisabled ) {
 		input = <Disabled>{ input }</Disabled>;
 	}
 
 	const toggleDisabled = () => {
-		setState( ( state ) => ( { isDisabled: ! state.isDisabled } ) );
+		setIsDisabled( ( state ) => ! state );
 	};
 
 	return (
@@ -30,7 +30,7 @@ const MyDisabled = withState( {
 			</Button>
 		</div>
 	);
-} );
+};
 ```
 
 A component can detect if it has been wrapped in a `<Disabled>` by accessing its [context](https://reactjs.org/docs/context.html) using `Disabled.Consumer`.

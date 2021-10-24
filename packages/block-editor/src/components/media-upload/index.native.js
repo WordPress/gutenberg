@@ -26,6 +26,9 @@ import {
 	mobile,
 	globe,
 } from '@wordpress/icons';
+import { store as blockEditorStore } from '@wordpress/block-editor';
+import { compose } from '@wordpress/compose';
+import { withSelect } from '@wordpress/data';
 
 export const MEDIA_TYPE_IMAGE = 'image';
 export const MEDIA_TYPE_VIDEO = 'video';
@@ -35,6 +38,9 @@ export const MEDIA_TYPE_ANY = 'any';
 export const OPTION_TAKE_VIDEO = __( 'Take a Video' );
 export const OPTION_TAKE_PHOTO = __( 'Take a Photo' );
 export const OPTION_TAKE_PHOTO_OR_VIDEO = __( 'Take a Photo or Video' );
+export const OPTION_INSERT_FROM_URL = __( 'Insert from URL' );
+
+const URL_MEDIA_SOURCE = 'URL';
 
 const PICKER_OPENING_DELAY = 200;
 
@@ -115,8 +121,8 @@ export class MediaUpload extends Component {
 		};
 
 		const urlSource = {
-			id: 'URL',
-			value: 'URL',
+			id: URL_MEDIA_SOURCE,
+			value: URL_MEDIA_SOURCE,
 			label: __( 'Insert from URL' ),
 			types: [ MEDIA_TYPE_AUDIO ],
 			icon: globe,
@@ -137,15 +143,27 @@ export class MediaUpload extends Component {
 		const {
 			allowedTypes = [],
 			__experimentalOnlyMediaLibrary,
+			isAudioBlockMediaUploadEnabled,
 		} = this.props;
 
 		return this.getAllSources()
 			.filter( ( source ) => {
-				return __experimentalOnlyMediaLibrary
-					? source.mediaLibrary
-					: allowedTypes.some( ( allowedType ) =>
+				if ( __experimentalOnlyMediaLibrary ) {
+					return source.mediaLibrary;
+				} else if (
+					allowedTypes.every(
+						( allowedType ) =>
+							allowedType === MEDIA_TYPE_AUDIO &&
 							source.types.includes( allowedType )
-					  );
+					) &&
+					source.id !== URL_MEDIA_SOURCE
+				) {
+					return isAudioBlockMediaUploadEnabled === true;
+				}
+
+				return allowedTypes.some( ( allowedType ) =>
+					source.types.includes( allowedType )
+				);
 			} )
 			.map( ( source ) => {
 				return {
@@ -185,7 +203,7 @@ export class MediaUpload extends Component {
 			multiple = false,
 		} = this.props;
 
-		if ( value === 'URL' ) {
+		if ( value === URL_MEDIA_SOURCE ) {
 			prompt(
 				__( 'Type a URL' ), // title
 				undefined, // message
@@ -286,4 +304,12 @@ export class MediaUpload extends Component {
 	}
 }
 
-export default MediaUpload;
+export default compose( [
+	withSelect( ( select ) => {
+		return {
+			isAudioBlockMediaUploadEnabled:
+				select( blockEditorStore ).getSettings( 'capabilities' )
+					.isAudioBlockMediaUploadEnabled === true,
+		};
+	} ),
+] )( MediaUpload );

@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { cx } from 'emotion';
-
-/**
  * WordPress dependencies
  */
 import warn from '@wordpress/warning';
@@ -14,10 +9,11 @@ import warn from '@wordpress/warning';
 import { useComponentsContext } from './context-system-provider';
 import { getNamespace, getConnectedNamespace } from './utils';
 import { getStyledClassNameFromKey } from './get-styled-class-name-from-key';
+import { useCx } from '../../utils/hooks/use-cx';
 
 /**
  * @template TProps
- * @typedef {TProps & { className: string; }} ConnectedProps
+ * @typedef {TProps & { className: string }} ConnectedProps
  */
 
 /**
@@ -25,7 +21,7 @@ import { getStyledClassNameFromKey } from './get-styled-class-name-from-key';
  * These derived props are then consolidated with incoming component props.
  *
  * @template {{ className?: string }} P
- * @param {P} props Incoming props from the component.
+ * @param {P}      props     Incoming props from the component.
  * @param {string} namespace The namespace to register and to derive context props from.
  * @return {ConnectedProps<P>} The connected props.
  */
@@ -51,6 +47,8 @@ export function useContextSystem( props, namespace ) {
 	const initialMergedProps = Object.entries( otherContextProps ).length
 		? Object.assign( {}, otherContextProps, props )
 		: props;
+
+	const cx = useCx();
 
 	const classes = cx(
 		getStyledClassNameFromKey( namespace ),

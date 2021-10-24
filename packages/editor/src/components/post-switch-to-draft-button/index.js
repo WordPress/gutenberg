@@ -6,6 +6,11 @@ import { __ } from '@wordpress/i18n';
 import { withSelect, withDispatch } from '@wordpress/data';
 import { compose, useViewportMatch } from '@wordpress/compose';
 
+/**
+ * Internal dependencies
+ */
+import { store as editorStore } from '../../store';
+
 function PostSwitchToDraftButton( {
 	isSaving,
 	isPublished,
@@ -53,7 +58,7 @@ export default compose( [
 			isSavingPost,
 			isCurrentPostPublished,
 			isCurrentPostScheduled,
-		} = select( 'core/editor' );
+		} = select( editorStore );
 		return {
 			isSaving: isSavingPost(),
 			isPublished: isCurrentPostPublished(),
@@ -61,7 +66,7 @@ export default compose( [
 		};
 	} ),
 	withDispatch( ( dispatch ) => {
-		const { editPost, savePost } = dispatch( 'core/editor' );
+		const { editPost, savePost } = dispatch( editorStore );
 		return {
 			onClick: () => {
 				editPost( { status: 'draft' } );

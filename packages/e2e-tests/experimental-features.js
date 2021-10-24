@@ -89,9 +89,10 @@ export const navigationPanel = {
 	},
 
 	async getItemByText( text ) {
-		const selector = `//div[contains(@class, "edit-site-navigation-panel")]//button[contains(., "${ text }")]`;
-		await page.waitForXPath( selector );
-		const [ item ] = await page.$x( selector );
+		const item = await page.waitForXPath(
+			`//div[contains(@class, "edit-site-navigation-panel")]//button[.//*[text()="${ text }"]]`,
+			{ visible: true }
+		);
 		return item;
 	},
 
@@ -102,9 +103,10 @@ export const navigationPanel = {
 };
 
 export const siteEditor = {
-	async visit() {
-		const query = addQueryArgs( '', {
+	async visit( query ) {
+		query = addQueryArgs( '', {
 			page: 'gutenberg-edit-site',
+			...query,
 		} ).slice( 1 );
 		await visitAdminPage( 'admin.php', query );
 		await page.waitForSelector( '.edit-site-visual-editor iframe' );

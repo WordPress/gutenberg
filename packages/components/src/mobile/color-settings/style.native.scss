@@ -29,7 +29,30 @@
 	line-height: 24px;
 }
 
+.colorText {
+	font-family: $default-monospace-font;
+	color: $light-primary;
+	font-size: 16px;
+	font-weight: 400;
+}
+
+.colorTextDark {
+	color: $dark-primary;
+}
+
 .flex {
 	flex: 1;
 }
 
+.clearButtonContainer {
+	align-items: flex-end;
+}
+
+.clearButton {
+	color: $blue-50;
+	font-size: 17px;
+}
+
+.clearButtonDark {
+	color: $blue-30;
+}

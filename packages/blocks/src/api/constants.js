@@ -1,3 +1,5 @@
+export const BLOCK_ICON_DEFAULT = 'block-default';
+
 /**
  * Array of valid keys in a block type settings deprecation object.
  *
@@ -24,7 +26,8 @@ export const __EXPERIMENTAL_STYLE_PROPERTY = {
 	},
 	backgroundColor: {
 		value: [ 'color', 'background' ],
-		support: [ 'color' ],
+		support: [ 'color', 'background' ],
+		requiresOptOut: true,
 	},
 	borderColor: {
 		value: [ 'border', 'color' ],
@@ -33,6 +36,12 @@ export const __EXPERIMENTAL_STYLE_PROPERTY = {
 	borderRadius: {
 		value: [ 'border', 'radius' ],
 		support: [ '__experimentalBorder', 'radius' ],
+		properties: {
+			borderTopLeftRadius: 'topLeft',
+			borderTopRightRadius: 'topRight',
+			borderBottomLeftRadius: 'bottomLeft',
+			borderBottomRightRadius: 'bottomRight',
+		},
 	},
 	borderStyle: {
 		value: [ 'border', 'style' ],
@@ -44,7 +53,8 @@ export const __EXPERIMENTAL_STYLE_PROPERTY = {
 	},
 	color: {
 		value: [ 'color', 'text' ],
-		support: [ 'color' ],
+		support: [ 'color', 'text' ],
+		requiresOptOut: true,
 	},
 	linkColor: {
 		value: [ 'elements', 'link', 'color', 'text' ],
@@ -52,45 +62,59 @@ export const __EXPERIMENTAL_STYLE_PROPERTY = {
 	},
 	fontFamily: {
 		value: [ 'typography', 'fontFamily' ],
-		support: [ '__experimentalFontFamily' ],
+		support: [ 'typography', '__experimentalFontFamily' ],
 	},
 	fontSize: {
 		value: [ 'typography', 'fontSize' ],
-		support: [ 'fontSize' ],
+		support: [ 'typography', 'fontSize' ],
 	},
 	fontStyle: {
 		value: [ 'typography', 'fontStyle' ],
-		support: [ '__experimentalFontStyle' ],
+		support: [ 'typography', '__experimentalFontStyle' ],
 	},
 	fontWeight: {
 		value: [ 'typography', 'fontWeight' ],
-		support: [ '__experimentalFontWeight' ],
+		support: [ 'typography', '__experimentalFontWeight' ],
 	},
 	lineHeight: {
 		value: [ 'typography', 'lineHeight' ],
-		support: [ 'lineHeight' ],
+		support: [ 'typography', 'lineHeight' ],
 	},
 	margin: {
 		value: [ 'spacing', 'margin' ],
 		support: [ 'spacing', 'margin' ],
-		properties: [ 'top', 'right', 'bottom', 'left' ],
+		properties: {
+			marginTop: 'top',
+			marginRight: 'right',
+			marginBottom: 'bottom',
+			marginLeft: 'left',
+		},
 	},
 	padding: {
 		value: [ 'spacing', 'padding' ],
 		support: [ 'spacing', 'padding' ],
-		properties: [ 'top', 'right', 'bottom', 'left' ],
+		properties: {
+			paddingTop: 'top',
+			paddingRight: 'right',
+			paddingBottom: 'bottom',
+			paddingLeft: 'left',
+		},
 	},
 	textDecoration: {
 		value: [ 'typography', 'textDecoration' ],
-		support: [ '__experimentalTextDecoration' ],
+		support: [ 'typography', '__experimentalTextDecoration' ],
 	},
 	textTransform: {
 		value: [ 'typography', 'textTransform' ],
-		support: [ '__experimentalTextTransform' ],
+		support: [ 'typography', '__experimentalTextTransform' ],
 	},
 	letterSpacing: {
 		value: [ 'typography', 'letterSpacing' ],
-		support: [ '__experimentalLetterSpacing' ],
+		support: [ 'typography', '__experimentalLetterSpacing' ],
+	},
+	'--wp--style--block-gap': {
+		value: [ 'spacing', 'blockGap' ],
+		support: [ 'spacing', 'blockGap' ],
 	},
 };
 
@@ -102,4 +126,12 @@ export const __EXPERIMENTAL_ELEMENTS = {
 	h4: 'h4',
 	h5: 'h5',
 	h6: 'h6',
+};
+
+export const __EXPERIMENTAL_PATHS_WITH_MERGE = {
+	'color.duotone': true,
+	'color.gradients': true,
+	'color.palette': true,
+	'typography.fontFamilies': true,
+	'typography.fontSizes': true,
 };

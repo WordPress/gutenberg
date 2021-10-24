@@ -16,6 +16,9 @@ import NumberControl from '../';
 export default {
 	title: 'Components/NumberControl',
 	component: NumberControl,
+	parameters: {
+		knobs: { disabled: false },
+	},
 };
 
 function Example() {
@@ -30,8 +33,9 @@ function Example() {
 		min: number( 'min', 0 ),
 		max: number( 'max', 100 ),
 		placeholder: text( 'placeholder', 0 ),
+		required: boolean( 'required', false ),
 		shiftStep: number( 'shiftStep', 10 ),
-		step: number( 'step', 1 ),
+		step: text( 'step', 1 ),
 	};
 
 	return (

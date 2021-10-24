@@ -12,7 +12,7 @@ exports[`props should render correctly 1`] = `
 }
 
 <h2
-  class="components-truncate components-text components-heading emotion-0 emotion-1 emotion-2"
+  class="components-truncate components-text components-heading emotion-0 emotion-1"
   data-wp-c16t="true"
   data-wp-component="Heading"
 >

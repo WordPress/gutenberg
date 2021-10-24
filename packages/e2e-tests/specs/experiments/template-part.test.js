@@ -42,7 +42,7 @@ describe( 'Template Part', () => {
 			// Switch to editing the header template part.
 			await navigationPanel.open();
 			await navigationPanel.backToRoot();
-			await navigationPanel.navigate( [ 'Template Parts', 'Headers' ] );
+			await navigationPanel.navigate( [ 'Template Parts', 'headers' ] );
 			await navigationPanel.clickItemByText( 'header' );
 		}
 
@@ -92,6 +92,15 @@ describe( 'Template Part', () => {
 				`//*[@data-type="core/template-part"][//p[text()="${ content }"]]`
 			);
 			expect( paragraphInTemplatePart ).not.toBeNull();
+		}
+
+		async function awaitHeaderAndFooterLoad() {
+			await canvas().waitForSelector(
+				'.wp-block-template-part.site-header.block-editor-block-list__layout'
+			);
+			await canvas().waitForSelector(
+				'.wp-block-template-part.site-footer.block-editor-block-list__layout'
+			);
 		}
 
 		it( 'Should load customizations when in a template even if only the slug and theme attributes are set.', async () => {
@@ -164,9 +173,7 @@ describe( 'Template Part', () => {
 		} );
 
 		it( 'Should convert selected block to template part', async () => {
-			await canvas().waitForSelector(
-				'.wp-block-template-part.block-editor-block-list__layout'
-			);
+			await awaitHeaderAndFooterLoad();
 			const initialTemplateParts = await canvas().$$(
 				'.wp-block-template-part'
 			);
@@ -204,9 +211,7 @@ describe( 'Template Part', () => {
 		} );
 
 		it( 'Should convert multiple selected blocks to template part', async () => {
-			await canvas().waitForSelector(
-				'.wp-block-template-part.block-editor-block-list__layout'
-			);
+			await awaitHeaderAndFooterLoad();
 			const initialTemplateParts = await canvas().$$(
 				'.wp-block-template-part'
 			);
@@ -271,6 +276,8 @@ describe( 'Template Part', () => {
 			'//button[contains(text(), "New template part")]';
 		const chooseExistingButtonSelector =
 			'//button[contains(text(), "Choose existing")]';
+		const confirmTitleButtonSelector =
+			'.wp-block-template-part__placeholder-create-new__title-form .components-button.is-primary';
 
 		it( 'Should insert new template part on creation', async () => {
 			await createNewPost();
@@ -282,6 +289,13 @@ describe( 'Template Part', () => {
 				createNewButtonSelector
 			);
 			await createNewButton.click();
+			const confirmTitleButton = await page.waitForSelector(
+				confirmTitleButtonSelector
+			);
+			await page.keyboard.press( 'Tab' );
+			await page.keyboard.press( 'Tab' );
+			await page.keyboard.type( 'Create New' );
+			await confirmTitleButton.click();
 
 			const newTemplatePart = await page.waitForSelector(
 				activatedTemplatePartSelector
@@ -302,9 +316,9 @@ describe( 'Template Part', () => {
 				chooseExistingButtonSelector
 			);
 			await chooseExistingButton.click();
-			const preview = await page.waitForXPath( testContentSelector );
-			expect( preview ).toBeTruthy();
-
+			const preview = await page.waitForSelector(
+				'[aria-label="Create New"]'
+			);
 			await preview.click();
 			await page.waitForSelector( activatedTemplatePartSelector );
 			const templatePartContent = await page.waitForXPath(

@@ -20,7 +20,7 @@ const RenderedRefsContext = createContext( {} );
  *
  * @param {Object} renderedBlocks Rendered blocks grouped by block name
  * @param {string} blockName      Name of the block.
- * @param {*} uniqueId            Any value that acts as a unique identifier for a block instance.
+ * @param {*}      uniqueId       Any value that acts as a unique identifier for a block instance.
  *
  * @return {Object} The list of rendered blocks grouped by block name.
  */

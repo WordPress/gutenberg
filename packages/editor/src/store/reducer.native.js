@@ -27,8 +27,8 @@ export * from './reducer.js';
 /**
  * Reducer returning the post title state.
  *
- * @param {Object}  state  Current state.
- * @param {Object}  action Dispatched action.
+ * @param {Object} state  Current state.
+ * @param {Object} action Dispatched action.
  *
  * @return {Object} Updated state.
  */
@@ -46,8 +46,8 @@ export const postTitle = combineReducers( {
 /**
  * Reducer returning the clipboard state.
  *
- * @param {Object}  state  Current state.
- * @param {Object}  action Dispatched action.
+ * @param {Object} state  Current state.
+ * @param {Object} action Dispatched action.
  *
  * @return {Object} Updated state.
  */
@@ -63,8 +63,8 @@ export function clipboard( state = null, action ) {
 /**
  * Reducer returning the notices state.
  *
- * @param {Object}  state  Current state.
- * @param {Object}  action Dispatched action.
+ * @param {Object} state  Current state.
+ * @param {Object} action Dispatched action.
  *
  * @return {Object} Updated state.
  */

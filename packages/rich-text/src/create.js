@@ -7,7 +7,6 @@ import { select } from '@wordpress/data';
  * Internal dependencies
  */
 import { store as richTextStore } from './store';
-import { isFormatEqual } from './is-format-equal';
 import { createElement } from './create-element';
 import { mergePair } from './concat';
 import {
@@ -42,14 +41,6 @@ function createEmptyValue() {
 		replacements: [],
 		text: '',
 	};
-}
-
-function simpleFindKey( object, value ) {
-	for ( const key in object ) {
-		if ( object[ key ] === value ) {
-			return key;
-		}
-	}
 }
 
 function toFormat( { type, attributes } ) {
@@ -95,15 +86,33 @@ function toFormat( { type, attributes } ) {
 
 	const registeredAttributes = {};
 	const unregisteredAttributes = {};
+	const _attributes = { ...attributes };
 
-	for ( const name in attributes ) {
-		const key = simpleFindKey( formatType.attributes, name );
+	for ( const key in formatType.attributes ) {
+		const name = formatType.attributes[ key ];
 
-		if ( key ) {
-			registeredAttributes[ key ] = attributes[ name ];
-		} else {
-			unregisteredAttributes[ name ] = attributes[ name ];
+		registeredAttributes[ key ] = _attributes[ name ];
+
+		if ( formatType.__unstableFilterAttributeValue ) {
+			registeredAttributes[
+				key
+			] = formatType.__unstableFilterAttributeValue(
+				key,
+				registeredAttributes[ key ]
+			);
 		}
+
+		// delete the attribute and what's left is considered
+		// to be unregistered.
+		delete _attributes[ name ];
+
+		if ( typeof registeredAttributes[ key ] === 'undefined' ) {
+			delete registeredAttributes[ key ];
+		}
+	}
+
+	for ( const name in _attributes ) {
+		unregisteredAttributes[ name ] = attributes[ name ];
 	}
 
 	return {
@@ -141,17 +150,17 @@ function toFormat( { type, attributes } ) {
  * `start` and `end` state which text indices are selected. They are only
  * provided if a `Range` was given.
  *
- * @param {Object}  [$1]                      Optional named arguments.
- * @param {Element} [$1.element]              Element to create value from.
- * @param {string}  [$1.text]                 Text to create value from.
- * @param {string}  [$1.html]                 HTML to create value from.
- * @param {Range}   [$1.range]                Range to create value from.
- * @param {string}  [$1.multilineTag]         Multiline tag if the structure is
- *                                            multiline.
- * @param {Array}   [$1.multilineWrapperTags] Tags where lines can be found if
- *                                            nesting is possible.
- * @param {boolean} [$1.preserveWhiteSpace]   Whether or not to collapse white
- *                                            space characters.
+ * @param {Object}  [$1]                          Optional named arguments.
+ * @param {Element} [$1.element]                  Element to create value from.
+ * @param {string}  [$1.text]                     Text to create value from.
+ * @param {string}  [$1.html]                     HTML to create value from.
+ * @param {Range}   [$1.range]                    Range to create value from.
+ * @param {string}  [$1.multilineTag]             Multiline tag if the structure is
+ *                                                multiline.
+ * @param {Array}   [$1.multilineWrapperTags]     Tags where lines can be found if
+ *                                                nesting is possible.
+ * @param {boolean} [$1.preserveWhiteSpace]       Whether or not to collapse white
+ *                                                space characters.
  * @param {boolean} [$1.__unstableIsEditableTree]
  *
  * @return {RichTextValue} A rich text value.
@@ -306,15 +315,17 @@ function collapseWhiteSpace( string ) {
 	return string.replace( /[\n\r\t]+/g, ' ' );
 }
 
-const ZWNBSPRegExp = new RegExp( ZWNBSP, 'g' );
-
 /**
- * Removes padding (zero width non breaking spaces) added by `toTree`.
+ * Removes reserved characters used by rich-text (zero width non breaking spaces added by `toTree` and object replacement characters).
  *
  * @param {string} string
  */
-function removePadding( string ) {
-	return string.replace( ZWNBSPRegExp, '' );
+export function removeReservedCharacters( string ) {
+	//with the global flag, note that we should create a new regex each time OR reset lastIndex state.
+	return string.replace(
+		new RegExp( `[${ ZWNBSP }${ OBJECT_REPLACEMENT_CHARACTER }]`, 'gu' ),
+		''
+	);
 }
 
 /**
@@ -362,11 +373,11 @@ function createFromElement( {
 		const type = node.nodeName.toLowerCase();
 
 		if ( node.nodeType === node.TEXT_NODE ) {
-			let filter = removePadding;
+			let filter = removeReservedCharacters;
 
 			if ( ! preserveWhiteSpace ) {
 				filter = ( string ) =>
-					removePadding( collapseWhiteSpace( string ) );
+					removeReservedCharacters( collapseWhiteSpace( string ) );
 			}
 
 			const text = filter( node.nodeValue );
@@ -396,22 +407,36 @@ function createFromElement( {
 			continue;
 		}
 
+		if ( type === 'script' ) {
+			const value = {
+				formats: [ , ],
+				replacements: [
+					{
+						type,
+						attributes: {
+							'data-rich-text-script':
+								node.getAttribute( 'data-rich-text-script' ) ||
+								encodeURIComponent( node.innerHTML ),
+						},
+					},
+				],
+				text: OBJECT_REPLACEMENT_CHARACTER,
+			};
+			accumulateSelection( accumulator, node, range, value );
+			mergePair( accumulator, value );
+			continue;
+		}
+
 		if ( type === 'br' ) {
 			accumulateSelection( accumulator, node, range, createEmptyValue() );
 			mergePair( accumulator, create( { text: '\n' } ) );
 			continue;
 		}
 
-		const lastFormats =
-			accumulator.formats[ accumulator.formats.length - 1 ];
-		const lastFormat = lastFormats && lastFormats[ lastFormats.length - 1 ];
-		const newFormat = toFormat( {
+		const format = toFormat( {
 			type,
 			attributes: getAttributes( { element: node } ),
 		} );
-		const format = isFormatEqual( newFormat, lastFormat )
-			? lastFormat
-			: newFormat;
 
 		if (
 			multilineWrapperTags &&
@@ -496,7 +521,7 @@ function createFromElement( {
  *                                            multiline.
  * @param {Array}   [$1.multilineWrapperTags] Tags where lines can be found if
  *                                            nesting is possible.
- * @param {boolean} [$1.currentWrapperTags]   Whether to prepend a line
+ * @param {Array}   [$1.currentWrapperTags]   Whether to prepend a line
  *                                            separator.
  * @param {boolean} [$1.preserveWhiteSpace]   Whether or not to collapse white
  *                                            space characters.
@@ -583,8 +608,12 @@ function getAttributes( { element } ) {
 			continue;
 		}
 
+		const safeName = /^on/i.test( name )
+			? 'data-disable-rich-text-' + name
+			: name;
+
 		accumulator = accumulator || {};
-		accumulator[ name ] = value;
+		accumulator[ safeName ] = value;
 	}
 
 	return accumulator;

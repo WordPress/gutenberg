@@ -92,19 +92,21 @@ Render a RangeControl to make a selection from a range of incremental values.
 
 ```jsx
 import { RangeControl } from '@wordpress/components';
-import { withState } from '@wordpress/compose';
+import { useState } from '@wordpress/element';
 
-const MyRangeControl = withState( {
-	columns: 2,
-} )( ( { columns, setState } ) => (
-	<RangeControl
-		label="Columns"
-		value={ columns }
-		onChange={ ( columns ) => setState( { columns } ) }
-		min={ 2 }
-		max={ 10 }
-	/>
-) );
+const MyRangeControl = () => {
+	const [ columns, setColumns ] = useState( 2 );
+
+	return(
+		<RangeControl
+			label="Columns"
+			value={ columns }
+			onChange={ ( value ) => setColumns( value ) }
+			min={ 2 }
+			max={ 10 }
+		/>
+	);
+};
 ```
 
 ### Props
@@ -168,13 +170,12 @@ If no value exists this prop contains the slider starting position.
 -   Required: No
 -   Platform: Web | Mobile
 
-### isShiftStepEnabled
+#### isShiftStepEnabled
 
-If true, pressing `UP` or `DOWN` along with the `SHIFT` key will increment the value by the `shiftStep` value.
+Passed as a prop to the `NumberControl` component and is only applicable if `withInputField` is true. If true, while the number input has focus, pressing `UP` or `DOWN` along with the `SHIFT` key will change the value by the `shiftStep` value.
 
 -   Type: `Boolean`
 -   Required: No
--   Default: `true`
 
 #### marks
 
@@ -271,7 +272,7 @@ The value to revert to if the Reset button is clicked (enabled by `allowReset`)
 
 #### showTooltip
 
-Forcing the Tooltip UI to show or hide.
+Forcing the Tooltip UI to show or hide. This is overriden to `false` when `step` is set to the special string value `any`.
 
 -   Type: `Boolean`
 -   Required: No
@@ -279,11 +280,18 @@ Forcing the Tooltip UI to show or hide.
 
 #### step
 
-The stepping interval between `min` and `max` values. Step is used both for user interface and validation purposes.
+The minimum amount by which `value` changes. It is also a factor in validation as `value` must be a multiple of `step` (offset by `min`) to be valid. Accepts the special string value `any` that voids the validation constraint and overrides both `withInputField` and `showTooltip` props to `false`.
+
+-   Type: `Number | "any"`
+-   Required: No
+-   Platform: Web
+
+#### shiftStep
+
+Passed as a prop to the `NumberControl` component and is only applicable if `withInputField` and `isShiftStepEnabled` are both true and while the number input has focus. Acts as a multiplier of `step`.
 
 -   Type: `Number`
 -   Required: No
--   Platform: Web
 
 #### trackColor
 
@@ -303,7 +311,7 @@ The current value of the range slider.
 
 #### withInputField
 
-Determines if the `input` number field will render next to the RangeControl.
+Determines if the `input` number field will render next to the RangeControl. This is overriden to `false` when `step` is set to the special string value `any`.
 
 -   Type: `Boolean`
 -   Required: No

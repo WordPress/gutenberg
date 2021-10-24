@@ -14,6 +14,7 @@ import {
 } from '@wordpress/components';
 import { useState } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
+import { decodeEntities } from '@wordpress/html-entities';
 
 /**
  * Internal dependencies
@@ -37,7 +38,7 @@ export default function MenuSwitcher( {
 					onSelect={ onSelectMenu }
 					choices={ menus.map( ( { id, name } ) => ( {
 						value: id,
-						label: name,
+						label: decodeEntities( name ),
 						'aria-label': sprintf(
 							/* translators: %s: The name of a menu. */
 							__( "Switch to '%s'" ),
@@ -47,17 +48,19 @@ export default function MenuSwitcher( {
 				/>
 			</MenuGroup>
 			<MenuGroup hideSeparator>
-				<MenuItem variant="primary" onClick={ openModal }>
+				<MenuItem
+					className="edit-navigation-menu-switcher__new-button"
+					onClick={ openModal }
+				>
 					{ __( 'Create a new menu' ) }
 				</MenuItem>
 				{ isModalVisible && (
 					<Modal
 						title={ __( 'Create a new menu' ) }
+						className="edit-navigation-menu-switcher__modal"
 						onRequestClose={ closeModal }
 					>
 						<AddMenu
-							className="edit-navigation-menu-switcher__add-menu"
-							menus={ menus }
 							onCreate={ ( menuId ) => {
 								closeModal();
 								onSelectMenu( menuId );

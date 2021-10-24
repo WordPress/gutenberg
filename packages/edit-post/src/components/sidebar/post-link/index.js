@@ -9,10 +9,11 @@ import { get } from 'lodash';
 import { __ } from '@wordpress/i18n';
 import { PanelBody, TextControl, ExternalLink } from '@wordpress/components';
 import { withSelect, withDispatch } from '@wordpress/data';
-import { compose, ifCondition, withState } from '@wordpress/compose';
+import { compose, ifCondition } from '@wordpress/compose';
 import { cleanForSlug, store as editorStore } from '@wordpress/editor';
 import { safeDecodeURIComponent } from '@wordpress/url';
 import { store as coreStore } from '@wordpress/core-data';
+import { useState } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -32,11 +33,11 @@ function PostLink( {
 	permalinkPrefix,
 	permalinkSuffix,
 	editPermalink,
-	forceEmptyField,
-	setState,
 	postSlug,
 	postTypeLabel,
 } ) {
+	const [ forceEmptyField, setForceEmptyField ] = useState( false );
+
 	let prefixElement, postNameElement, suffixElement;
 	if ( isEditable ) {
 		prefixElement = permalinkPrefix && (
@@ -67,6 +68,8 @@ function PostLink( {
 					<TextControl
 						label={ __( 'URL Slug' ) }
 						value={ forceEmptyField ? '' : postSlug }
+						autoComplete="off"
+						spellCheck="false"
 						onChange={ ( newValue ) => {
 							editPermalink( newValue );
 							// When we delete the field the permalink gets
@@ -75,30 +78,28 @@ function PostLink( {
 							// the field temporarily empty while typing.
 							if ( ! newValue ) {
 								if ( ! forceEmptyField ) {
-									setState( {
-										forceEmptyField: true,
-									} );
+									setForceEmptyField( true );
 								}
 								return;
 							}
 							if ( forceEmptyField ) {
-								setState( {
-									forceEmptyField: false,
-								} );
+								setForceEmptyField( false );
 							}
 						} }
 						onBlur={ ( event ) => {
 							editPermalink( cleanForSlug( event.target.value ) );
 							if ( forceEmptyField ) {
-								setState( {
-									forceEmptyField: false,
-								} );
+								setForceEmptyField( false );
 							}
 						} }
 					/>
 					<p>
 						{ __( 'The last part of the URL.' ) }{ ' ' }
-						<ExternalLink href="https://wordpress.org/support/article/writing-posts/#post-field-descriptions">
+						<ExternalLink
+							href={ __(
+								'https://wordpress.org/support/article/writing-posts/#post-field-descriptions'
+							) }
+						>
 							{ __( 'Read about permalinks' ) }
 						</ExternalLink>
 					</p>
@@ -175,8 +176,5 @@ export default compose( [
 				editPost( { slug: newSlug } );
 			},
 		};
-	} ),
-	withState( {
-		forceEmptyField: false,
 	} ),
 ] )( PostLink );

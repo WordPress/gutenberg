@@ -59,7 +59,7 @@ describe( 'Document Settings', () => {
 					'.edit-post-header-toolbar__list-view-toggle'
 				);
 				const headerTemplatePartListViewButton = await page.waitForXPath(
-					'//button[contains(@class, "block-editor-block-navigation-block-select-button")][contains(., "Header")]'
+					'//button[contains(@class, "block-editor-list-view-block-select-button")][contains(., "Header")]'
 				);
 				headerTemplatePartListViewButton.click();
 				await page.click(
@@ -79,7 +79,7 @@ describe( 'Document Settings', () => {
 			// Navigate to a template part
 			await navigationPanel.open();
 			await navigationPanel.backToRoot();
-			await navigationPanel.navigate( [ 'Template Parts', 'Headers' ] );
+			await navigationPanel.navigate( [ 'Template Parts', 'headers' ] );
 			await navigationPanel.clickItemByText( 'header' );
 
 			// Evaluate the document settings title

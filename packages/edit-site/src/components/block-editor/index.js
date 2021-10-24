@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import classnames from 'classnames';
+
+/**
  * WordPress dependencies
  */
 import { useSelect, useDispatch } from '@wordpress/data';
@@ -6,20 +11,14 @@ import { useCallback, useRef } from '@wordpress/element';
 import { useEntityBlockEditor } from '@wordpress/core-data';
 import {
 	BlockEditorProvider,
-	BlockEditorKeyboardShortcuts,
 	__experimentalLinkControl,
 	BlockInspector,
-	WritingFlow,
-	BlockList,
 	BlockTools,
 	__unstableBlockSettingsMenuFirstItem,
-	__experimentalUseResizeCanvas as useResizeCanvas,
 	__unstableUseTypingObserver as useTypingObserver,
-	__unstableUseMouseMoveTypingReset as useMouseMoveTypingReset,
-	__unstableEditorStyles as EditorStyles,
-	__unstableIframe as Iframe,
+	store as blockEditorStore,
 } from '@wordpress/block-editor';
-import { useMergeRefs } from '@wordpress/compose';
+import { useMergeRefs, useViewportMatch } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -29,21 +28,21 @@ import NavigateToLink from '../navigate-to-link';
 import { SidebarInspectorFill } from '../sidebar';
 import { store as editSiteStore } from '../../store';
 import BlockInspectorButton from './block-inspector-button';
+import EditTemplatePartMenuButton from '../edit-template-part-menu-button';
+import BackButton from './back-button';
+import ResizableEditor from './resizable-editor';
 
 export default function BlockEditor( { setIsInserterOpen } ) {
-	const { settings, templateType, page, deviceType } = useSelect(
+	const { settings, templateType, page } = useSelect(
 		( select ) => {
-			const {
-				getSettings,
-				getEditedPostType,
-				getPage,
-				__experimentalGetPreviewDeviceType,
-			} = select( editSiteStore );
+			const { getSettings, getEditedPostType, getPage } = select(
+				editSiteStore
+			);
+
 			return {
 				settings: getSettings( setIsInserterOpen ),
 				templateType: getEditedPostType(),
 				page: getPage(),
-				deviceType: __experimentalGetPreviewDeviceType(),
 			};
 		},
 		[ setIsInserterOpen ]
@@ -53,10 +52,12 @@ export default function BlockEditor( { setIsInserterOpen } ) {
 		templateType
 	);
 	const { setPage } = useDispatch( editSiteStore );
-	const resizedCanvasStyles = useResizeCanvas( deviceType, true );
-	const ref = useMouseMoveTypingReset();
 	const contentRef = useRef();
 	const mergedRefs = useMergeRefs( [ contentRef, useTypingObserver() ] );
+	const isMobileViewport = useViewportMatch( 'small', '<' );
+	const { clearSelectedBlock } = useDispatch( blockEditorStore );
+
+	const isTemplatePart = templateType === 'wp_template_part';
 
 	return (
 		<BlockEditorProvider
@@ -66,7 +67,7 @@ export default function BlockEditor( { setIsInserterOpen } ) {
 			onChange={ onChange }
 			useSubRegistry={ false }
 		>
-			<BlockEditorKeyboardShortcuts />
+			<EditTemplatePartMenuButton />
 			<TemplatePartConverter />
 			<__experimentalLinkControl.ViewerFill>
 				{ useCallback(
@@ -83,32 +84,36 @@ export default function BlockEditor( { setIsInserterOpen } ) {
 			<SidebarInspectorFill>
 				<BlockInspector />
 			</SidebarInspectorFill>
-			<div className="edit-site-visual-editor">
-				<BlockTools __unstableContentRef={ contentRef }>
-					<Iframe
-						style={ resizedCanvasStyles }
-						head={ <EditorStyles styles={ settings.styles } /> }
-						ref={ ref }
-						contentRef={ mergedRefs }
-					>
-						<WritingFlow>
-							<BlockList
-								className="edit-site-block-editor__block-list"
-								__experimentalLayout={ {
-									type: 'default',
-									// At the root level of the site editor, no alignments should be allowed.
-									alignments: [],
-								} }
-							/>
-						</WritingFlow>
-					</Iframe>
-				</BlockTools>
+			<BlockTools
+				className={ classnames( 'edit-site-visual-editor', {
+					'is-focus-mode': isTemplatePart,
+				} ) }
+				__unstableContentRef={ contentRef }
+				onClick={ ( event ) => {
+					// Clear selected block when clicking on the gray background.
+					if ( event.target === event.currentTarget ) {
+						clearSelectedBlock();
+					}
+				} }
+			>
+				<BackButton />
+
+				<ResizableEditor
+					enableResizing={
+						isTemplatePart &&
+						// Disable resizing in mobile viewport.
+						! isMobileViewport
+					}
+					settings={ settings }
+					contentRef={ mergedRefs }
+				/>
+
 				<__unstableBlockSettingsMenuFirstItem>
 					{ ( { onClose } ) => (
 						<BlockInspectorButton onClick={ onClose } />
 					) }
 				</__unstableBlockSettingsMenuFirstItem>
-			</div>
+			</BlockTools>
 		</BlockEditorProvider>
 	);
 }

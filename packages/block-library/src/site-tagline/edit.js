@@ -6,7 +6,8 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { useEntityProp } from '@wordpress/core-data';
+import { useSelect } from '@wordpress/data';
+import { useEntityProp, store as coreStore } from '@wordpress/core-data';
 import {
 	AlignmentControl,
 	useBlockProps,
@@ -22,11 +23,36 @@ export default function SiteTaglineEdit( { attributes, setAttributes } ) {
 		'site',
 		'description'
 	);
+	const { canUserEdit, readOnlySiteTagLine } = useSelect( ( select ) => {
+		const { canUser, getEntityRecord } = select( coreStore );
+		const siteData = getEntityRecord( 'root', '__unstableBase' );
+		return {
+			canUserEdit: canUser( 'update', 'settings' ),
+			readOnlySiteTagLine: siteData?.description,
+		};
+	}, [] );
 	const blockProps = useBlockProps( {
 		className: classnames( {
 			[ `has-text-align-${ textAlign }` ]: textAlign,
+			'wp-block-site-tagline__placeholder':
+				! canUserEdit && ! readOnlySiteTagLine,
 		} ),
 	} );
+	const siteTaglineContent = canUserEdit ? (
+		<RichText
+			allowedFormats={ [] }
+			onChange={ setSiteTagline }
+			aria-label={ __( 'Site tagline text' ) }
+			placeholder={ __( 'Write site tagline…' ) }
+			tagName="p"
+			value={ siteTagline }
+			{ ...blockProps }
+		/>
+	) : (
+		<p { ...blockProps }>
+			{ readOnlySiteTagLine || __( 'Site Tagline placeholder' ) }
+		</p>
+	);
 	return (
 		<>
 			<BlockControls group="block">
@@ -37,16 +63,7 @@ export default function SiteTaglineEdit( { attributes, setAttributes } ) {
 					value={ textAlign }
 				/>
 			</BlockControls>
-
-			<RichText
-				allowedFormats={ [] }
-				onChange={ setSiteTagline }
-				aria-label={ __( 'Site tagline text' ) }
-				placeholder={ __( 'Write site tagline…' ) }
-				tagName="p"
-				value={ siteTagline }
-				{ ...blockProps }
-			/>
+			{ siteTaglineContent }
 		</>
 	);
 }

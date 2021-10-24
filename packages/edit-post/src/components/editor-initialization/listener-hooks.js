@@ -19,7 +19,7 @@ import {
  * This listener hook monitors for block selection and triggers the appropriate
  * sidebar state.
  *
- * @param {number} postId  The current post id.
+ * @param {number} postId The current post id.
  */
 export const useBlockSelectionListener = ( postId ) => {
 	const { hasBlockSelection, isEditorSidebarOpened } = useSelect(

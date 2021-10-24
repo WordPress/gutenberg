@@ -20,15 +20,15 @@ import { store as blockEditorStore } from '../../../store';
 /**
  * @typedef WPInserterConfig
  *
- * @property {string=}   rootClientId        If set, insertion will be into the
- *                                           block with this ID.
- * @property {number=}   insertionIndex      If set, insertion will be into this
- *                                           explicit position.
- * @property {string=}   clientId            If set, insertion will be after the
- *                                           block with this ID.
- * @property {boolean=}  isAppender          Whether the inserter is an appender
- *                                           or not.
- * @property {Function=} onSelect            Called after insertion.
+ * @property {string=}   rootClientId   If set, insertion will be into the
+ *                                      block with this ID.
+ * @property {number=}   insertionIndex If set, insertion will be into this
+ *                                      explicit position.
+ * @property {string=}   clientId       If set, insertion will be after the
+ *                                      block with this ID.
+ * @property {boolean=}  isAppender     Whether the inserter is an appender
+ *                                      or not.
+ * @property {Function=} onSelect       Called after insertion.
  */
 
 /**
@@ -59,7 +59,7 @@ function useInsertionPoint( {
 			let _destinationRootClientId = rootClientId;
 			let _destinationIndex;
 
-			if ( insertionIndex ) {
+			if ( insertionIndex !== undefined ) {
 				// Insert into a specific index.
 				_destinationIndex = insertionIndex;
 			} else if ( clientId ) {

@@ -6,21 +6,7 @@
 	}
 
 	&__image {
-		height: 240px;
-
-		&__prm-r {
-			display: none;
-		}
-
-		@media (prefers-reduced-motion: reduce) {
-			&__prm-r {
-				display: block;
-			}
-
-			&__prm-np {
-				display: none;
-			}
-		}
+		height: auto;
 	}
 
 	// Extra specificity to override `.wrap h1` styles.

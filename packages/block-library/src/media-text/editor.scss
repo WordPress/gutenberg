@@ -1,3 +1,20 @@
+.wp-block-media-text__media {
+	position: relative;
+
+	&.is-transient img {
+		opacity: 0.3;
+	}
+
+	// Shown while image is being uploaded
+	.components-spinner {
+		position: absolute;
+		top: 50%;
+		left: 50%;
+		margin-top: -9px;
+		margin-left: -9px;
+	}
+}
+
 .wp-block-media-text .__resizable_base__ {
 	grid-column: 1 / span 2;
 	grid-row: 2;

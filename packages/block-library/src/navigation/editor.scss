@@ -11,8 +11,19 @@
 		margin-left: 0;
 		padding-left: 0;
 	}
+
+	// Revert any left/right margins.
+	// This also makes it work with classic theme auto margins.
+	.wp-block-navigation-item.wp-block {
+		margin-left: revert;
+		margin-right: revert;
+	}
 }
 
+// This element is inline on the frontend but needs to be editable, therefore inline-block, in the editor.
+.wp-block-navigation-item__label {
+	display: inline-block;
+}
 
 /**
  * Submenus.
@@ -26,13 +37,14 @@
 
 // Low specificity default to ensure background color applies to submenus.
 .wp-block-navigation__container,
-.wp-block-navigation-link {
+.wp-block-navigation-item {
 	background-color: inherit;
 }
 
 // Only show the flyout on hover if the parent menu item is selected.
-.wp-block-navigation:not(.is-selected):not(.has-child-selected) .has-child:hover {
-	> .wp-block-navigation-link__container {
+.wp-block-navigation:not(.is-selected):not(.has-child-selected)
+.has-child:hover {
+	> .wp-block-navigation__submenu-container {
 		opacity: 0;
 		visibility: hidden;
 	}
@@ -42,7 +54,7 @@
 .has-child {
 	&.is-selected,
 	&.has-child-selected {
-		> .wp-block-navigation-link__container {
+		> .wp-block-navigation__submenu-container {
 			display: flex;
 			opacity: 1;
 			visibility: visible;
@@ -53,7 +65,7 @@
 // Show a submenu when generally dragging (is-dragging-components-draggable) if that
 // submenu has children (has-child) and is being dragged within (is-dragging-within).
 .is-dragging-components-draggable .has-child.is-dragging-within {
-	> .wp-block-navigation-link__container {
+	> .wp-block-navigation__submenu-container {
 		opacity: 1;
 		visibility: visible;
 	}
@@ -67,7 +79,8 @@
 	flex-direction: column;
 }
 
-.is-dragging-components-draggable .wp-block-navigation-link > .wp-block-navigation__container {
+.is-dragging-components-draggable
+.wp-block-navigation-link > .wp-block-navigation__container {
 	// Set opacity to 1 to still be able to show the draggable chip.
 	opacity: 1;
 	visibility: hidden;
@@ -110,7 +123,7 @@ $colors-selector-size: 22px;
 		margin-right: auto;
 
 		// colors-selector - selection status.
-		border-radius: $colors-selector-size / 2;
+		border-radius: $colors-selector-size * 0.5;
 		box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.2);
 
 		width: $colors-selector-size;
@@ -161,7 +174,6 @@ $color-control-label-height: 20px;
 	justify-content: flex-start;
 }
 
-
 /**
  * Setup state
  */
@@ -210,7 +222,7 @@ $color-control-label-height: 20px;
 
 	// Style skeleton elements to mostly match the metrics of actual menu items.
 	// Needs specificity.
-	.wp-block-navigation-link.wp-block-navigation-link {
+	.wp-block-navigation-item.wp-block-navigation-item {
 		position: relative;
 		min-width: 72px;
 
@@ -224,12 +236,15 @@ $color-control-label-height: 20px;
 		}
 	}
 
-	svg {
-		fill: currentColor;
+	.wp-block-navigation-placeholder__preview-search-icon {
+		height: $icon-size;
+		svg {
+			fill: currentColor;
+		}
 	}
 
-	.wp-block-navigation-link.wp-block-navigation-link,
-	svg {
+	.wp-block-navigation-item.wp-block-navigation-item,
+	.wp-block-navigation-placeholder__preview-search-icon {
 		opacity: 0.3;
 	}
 
@@ -241,9 +256,15 @@ $color-control-label-height: 20px;
 		width: 0;
 		overflow: hidden;
 		flex-wrap: nowrap;
+		flex: 0;
 	}
 
-	// .. but hide entirely when the placeholder can still be toggled.
+	// Hide entirely when vertical.
+	.is-vertical.is-selected & {
+		display: none;
+	}
+
+	// Hide entirely when the placeholder can still be toggled.
 	.wp-block-navigation.is-selected .is-small & {
 		display: none;
 	}
@@ -333,7 +354,9 @@ $color-control-label-height: 20px;
 .is-vertical .wp-block-navigation-placeholder,
 .is-vertical .wp-block-navigation-placeholder__preview,
 .is-vertical .wp-block-navigation-placeholder__controls {
-	min-height: $icon-size + ($grid-unit-20 + $grid-unit-05 + $grid-unit-15 + $grid-unit-15) * 3;
+	min-height:
+		$icon-size +
+		( $grid-unit-20 + $grid-unit-05 + $grid-unit-15 + $grid-unit-15 ) * 3;
 }
 
 .is-vertical .wp-block-navigation-placeholder__preview,
@@ -348,7 +371,9 @@ $color-control-label-height: 20px;
 	font-family: $default-font;
 
 	.components-button.components-dropdown-menu__toggle.has-icon {
-		padding: ($grid-unit-15 / 2) $grid-unit-05 ($grid-unit-15 / 2) $grid-unit-15;
+		padding:
+			( $grid-unit-15 * 0.5 ) $grid-unit-05 ( $grid-unit-15 * 0.5 )
+			$grid-unit-15;
 		display: flex;
 		flex-direction: row-reverse; // This puts the chevron, which is hidden from screen readers, on the right.
 	}
@@ -359,7 +384,6 @@ $color-control-label-height: 20px;
 		margin-right: $grid-unit-15;
 	}
 }
-
 
 /**
  * Mobile menu.
@@ -373,27 +397,80 @@ $color-control-label-height: 20px;
 		}
 	}
 }
-.components-button.wp-block-navigation__responsive-container-open {
-	@include break-small {
-		display: none;
+// Emulate the fullscreen editing inside the editor.
+// Most of this can be removed when the iframe lands.
+
+// When not fullscreen.
+.wp-block-navigation__responsive-container.is-menu-open {
+	position: fixed;
+	top:
+		$admin-bar-height-big + $header-height + $block-toolbar-height +
+		$border-width;
+
+	@include break-medium() {
+		top: $admin-bar-height + $header-height + $border-width;
+	}
+
+	// Navigation sidebar rules.
+	@include break-medium() {
+		left: $admin-sidebar-width-collapsed;
+	}
+	@include break-large() {
+		left: $admin-sidebar-width;
 	}
 }
 
-// Emulate the fullscreen editing inside the editor.
-.wp-block-navigation__responsive-container.is-menu-open {
-	position: fixed;
+.has-fixed-toolbar .wp-block-navigation__responsive-container.is-menu-open {
+	@include break-medium() {
+		top:
+			$admin-bar-height + $header-height + $block-toolbar-height +
+			$border-width;
+	}
+}
 
-	// Handle top position.
-	// For now, the editing of menu items in the mobile view only happens <600px.
-	// That means we only have to consider the big adminbar height (<783px).
-	// And in that view we also know that the toolbar is stacked.
-	body.admin-bar & {
-		top: $admin-bar-height-big + $header-height + $block-toolbar-height + $border-width;
+.is-mobile-preview .wp-block-navigation__responsive-container.is-menu-open,
+.is-tablet-preview .wp-block-navigation__responsive-container.is-menu-open {
+	top:
+		$admin-bar-height + $header-height + $block-toolbar-height +
+		$border-width;
+}
+
+.is-sidebar-opened .wp-block-navigation__responsive-container.is-menu-open {
+	right: $sidebar-width;
+}
+
+// When fullscreen.
+.is-fullscreen-mode {
+	.wp-block-navigation__responsive-container.is-menu-open {
+		left: 0; // Unset the value from non fullscreen mode.
+		top:
+			$admin-bar-height-big + $header-height + $block-toolbar-height +
+			$border-width;
 
 		@include break-medium() {
 			top: $header-height + $border-width;
 		}
 	}
+
+	.has-fixed-toolbar .wp-block-navigation__responsive-container.is-menu-open {
+		@include break-medium() {
+			top: $header-height + $block-toolbar-height + $border-width;
+		}
+	}
+
+	.is-mobile-preview .wp-block-navigation__responsive-container.is-menu-open,
+	.is-tablet-preview .wp-block-navigation__responsive-container.is-menu-open {
+		top: $header-height + $block-toolbar-height + $border-width;
+	}
+}
+
+// The iframe makes these rules a lot simpler.
+body.editor-styles-wrapper
+.wp-block-navigation__responsive-container.is-menu-open {
+	top: 0;
+	right: 0;
+	bottom: 0;
+	left: 0;
 }
 
 // Without this, the block cannot be selected, nor does the right container get focus.

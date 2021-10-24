@@ -8,12 +8,13 @@ const { types: babelTypes } = require( '@babel/core' );
 /** @typedef {ReturnType<import('comment-parser').parse>[0]} CommentBlock */
 /** @typedef {CommentBlock['tags'][0]} CommentTag */
 /** @typedef {babelTypes.TSType} TypeAnnotation */
+/** @typedef {babelTypes.TSCallSignatureDeclaration | babelTypes.TSFunctionType | babelTypes.TSConstructSignatureDeclaration} ExtendedTypeAnnotation */
 /** @typedef {import('@babel/core').Node} ASTNode */
 /* eslint-enable jsdoc/valid-types */
 
 /**
- * @param {babelTypes.TSCallSignatureDeclaration | babelTypes.TSFunctionType | babelTypes.TSConstructSignatureDeclaration} typeAnnotation
- * @param {' => ' | ': '} returnIndicator The return indicator to use. Allows using the same function for function annotations and object call properties.
+ * @param {ExtendedTypeAnnotation} typeAnnotation
+ * @param {' => ' | ': '}          returnIndicator The return indicator to use. Allows using the same function for function annotations and object call properties.
  */
 function getFunctionTypeAnnotation( typeAnnotation, returnIndicator ) {
 	const nonRestParams = typeAnnotation.parameters
@@ -43,7 +44,9 @@ function getFunctionTypeAnnotation( typeAnnotation, returnIndicator ) {
 			typeAnnotation.typeAnnotation.typeAnnotation
 	);
 
-	return `( ${ params } )${ returnIndicator }${ returnType }`;
+	const paramsWithParens = params.length ? `( ${ params } )` : `()`;
+
+	return `${ paramsWithParens }${ returnIndicator }${ returnType }`;
 }
 
 /**
@@ -376,6 +379,10 @@ function getTypeAnnotation( typeAnnotation ) {
  */
 function getFunctionToken( token ) {
 	let resolvedToken = token;
+	if ( babelTypes.isExportDefaultDeclaration( resolvedToken ) ) {
+		resolvedToken = resolvedToken.declaration;
+	}
+
 	if ( babelTypes.isExportNamedDeclaration( resolvedToken ) ) {
 		resolvedToken = resolvedToken.declaration;
 	}
@@ -441,9 +448,9 @@ function getQualifiedObjectPatternTypeAnnotation( tag, paramType ) {
 }
 
 /**
- * @param {CommentTag} tag The documented parameter.
- * @param {ASTNode} declarationToken The function the parameter is documented on.
- * @param {number} paramIndex The parameter index.
+ * @param {CommentTag} tag              The documented parameter.
+ * @param {ASTNode}    declarationToken The function the parameter is documented on.
+ * @param {number}     paramIndex       The parameter index.
  * @return {null | string} The parameter's type annotation.
  */
 function getParamTypeAnnotation( tag, declarationToken, paramIndex ) {
@@ -540,8 +547,8 @@ function getVariableTypeAnnotation( declarationToken ) {
 
 module.exports =
 	/**
-	 * @param {CommentTag} tag A comment tag.
-	 * @param {ASTNode} token A function token.
+	 * @param {CommentTag}    tag   A comment tag.
+	 * @param {ASTNode}       token A function token.
 	 * @param {number | null} index The index of the parameter or `null` if not a param tag.
 	 * @return {null | string} The type annotation for the given tag or null if the tag has no type annotation.
 	 */

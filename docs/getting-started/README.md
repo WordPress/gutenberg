@@ -1,14 +1,15 @@
 # Getting Started
 
-## [Tutorials](/docs/getting-started/tutorials/README.md)
 
--   [Development Environment](/docs/getting-started/tutorials/devenv/README.md)
--   [Create a Block Tutorial](/docs/getting-started/tutorials/create-block/README.md)
+## Tutorials
 
-## [Glossary](/docs/getting-started/glossary.md)
+-   [Development Environment](/docs/getting-started/devenv/README.md)
+-   [Create a Block Tutorial](/docs/getting-started/create-block/README.md)
 
-## [FAQ](/docs/getting-started/faq.md)
+## [Glossary](/docs/explanations/glossary.md)
 
-## [History](/docs/getting-started/history.md)
+## [FAQ](/docs/explanations/faq.md)
+
+## [History](/docs/explanations/history.md)
 
 ## [Outreach](/docs/getting-started/outreach.md)

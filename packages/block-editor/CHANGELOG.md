@@ -2,6 +2,26 @@
 
 ## Unreleased
 
+### Performance
+
+-   Avoid re-rendering all List View items on block focus [#35706](https://github.com/WordPress/gutenberg/pull/35706). These changes speed up block focus time in large posts by 80% when List View is open.
+
+### Breaking change
+
+-   List View no longer supports the `showOnlyCurrentHierarchy` flag [#35706](https://github.com/WordPress/gutenberg/pull/35706). To display a subset of blocks, use the `blocks` parameter instead.
+
+## 7.0.0 (2021-07-29)
+
+### Breaking Change
+
+-   Upgraded React components to work with v17.0 ([#29118](https://github.com/WordPress/gutenberg/pull/29118)). There are no new features in React v17.0 as explained in the [blog post](https://reactjs.org/blog/2020/10/20/react-v17.html).
+
+## 6.2.0 (2021-07-21)
+
+### New Features
+
+-   `ButtonBlockerAppender` is now `ButtonBlockAppender`, the original name was a typo, but is still being exported for backward compatibility.
+
 ## 6.1.0 (2021-05-20)
 
 ## 6.0.0 (2021-05-14)

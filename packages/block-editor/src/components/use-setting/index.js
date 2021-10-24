@@ -7,6 +7,7 @@ import { get } from 'lodash';
  * WordPress dependencies
  */
 import { useSelect } from '@wordpress/data';
+import { __EXPERIMENTAL_PATHS_WITH_MERGE as PATHS_WITH_MERGE } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
@@ -41,26 +42,12 @@ const deprecatedFlags = {
 		}
 
 		if ( settings.enableCustomUnits === true ) {
-			return [ 'px', 'em', 'rem', 'vh', 'vw' ];
+			return [ 'px', 'em', 'rem', 'vh', 'vw', '%' ];
 		}
 
 		return settings.enableCustomUnits;
 	},
 	'spacing.customPadding': ( settings ) => settings.enableCustomSpacing,
-};
-
-const filterColorsFromCoreOrigin = ( path, setting ) => {
-	if ( path !== 'color.palette' && path !== 'color.gradients' ) {
-		return setting;
-	}
-
-	if ( ! Array.isArray( setting ) ) {
-		return setting;
-	}
-
-	const colors = setting.filter( ( color ) => color?.origin !== 'core' );
-
-	return colors.length > 0 ? colors : setting;
 };
 
 /**
@@ -90,10 +77,14 @@ export default function useSetting( path ) {
 			const experimentalFeaturesResult =
 				get( settings, blockPath ) ?? get( settings, defaultsPath );
 			if ( experimentalFeaturesResult !== undefined ) {
-				return filterColorsFromCoreOrigin(
-					path,
-					experimentalFeaturesResult
-				);
+				if ( PATHS_WITH_MERGE[ path ] ) {
+					return (
+						experimentalFeaturesResult.user ??
+						experimentalFeaturesResult.theme ??
+						experimentalFeaturesResult.core
+					);
+				}
+				return experimentalFeaturesResult;
 			}
 
 			// 2 - Use deprecated settings, otherwise.
@@ -101,10 +92,7 @@ export default function useSetting( path ) {
 				? deprecatedFlags[ path ]( settings )
 				: undefined;
 			if ( deprecatedSettingsValue !== undefined ) {
-				return filterColorsFromCoreOrigin(
-					path,
-					deprecatedSettingsValue
-				);
+				return deprecatedSettingsValue;
 			}
 
 			// 3 - Fall back for typography.dropCap:

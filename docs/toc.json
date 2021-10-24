@@ -1,46 +1,42 @@
 [
 	{
-		"docs/README.md": [
+		"docs/README.md": []
+	},
+	{
+		"docs/getting-started/README.md": [
 			{
-				"docs/getting-started/tutorials/README.md": [
+				"docs/getting-started/devenv/README.md": [
 					{
-						"docs/getting-started/tutorials/devenv/README.md": [
-							{
-								"docs/getting-started/tutorials/devenv/docker-ubuntu.md": []
-							}
-						]
+						"docs/getting-started/devenv/docker-ubuntu.md": []
+					}
+				]
+			},
+			{
+				"docs/getting-started/create-block/README.md": [
+					{
+						"docs/getting-started/create-block/wp-plugin.md": []
 					},
 					{
-						"docs/getting-started/tutorials/create-block/README.md": [
-							{
-								"docs/getting-started/tutorials/create-block/wp-plugin.md": []
-							},
-							{
-								"docs/getting-started/tutorials/create-block/block-anatomy.md": []
-							},
-							{
-								"docs/getting-started/tutorials/create-block/attributes.md": []
-							},
-							{
-								"docs/getting-started/tutorials/create-block/block-code.md": []
-							},
-							{
-								"docs/getting-started/tutorials/create-block/author-experience.md": []
-							},
-							{
-								"docs/getting-started/tutorials/create-block/finishing.md": []
-							},
-							{
-								"docs/getting-started/tutorials/create-block/submitting-to-block-directory.md": []
-							}
-						]
+						"docs/getting-started/create-block/block-anatomy.md": []
+					},
+					{
+						"docs/getting-started/create-block/attributes.md": []
+					},
+					{
+						"docs/getting-started/create-block/block-code.md": []
+					},
+					{
+						"docs/getting-started/create-block/author-experience.md": []
+					},
+					{
+						"docs/getting-started/create-block/finishing.md": []
+					},
+					{
+						"docs/getting-started/create-block/submitting-to-block-directory.md": []
 					}
 				]
 			},
 			{ "docs/getting-started/full-site-editing.md": [] },
-			{ "docs/getting-started/glossary.md": [] },
-			{ "docs/getting-started/faq.md": [] },
-			{ "docs/getting-started/history.md": [] },
 			{ "docs/getting-started/outreach.md": [] }
 		]
 	},
@@ -98,9 +94,6 @@
 					},
 					{
 						"docs/how-to-guides/sidebar-tutorial/plugin-sidebar-5-update-meta.md": []
-					},
-					{
-						"docs/how-to-guides/sidebar-tutorial/plugin-sidebar-6-finishing-touches.md": []
 					}
 				]
 			},
@@ -178,11 +171,13 @@
 			},
 			{ "docs/how-to-guides/accessibility.md": [] },
 			{ "docs/how-to-guides/internationalization.md": [] },
-			{ "docs/how-to-guides/widgets/README.md": [
-				{ "docs/how-to-guides/widgets/overview.md": [] },
-				{ "docs/how-to-guides/widgets/opting-out.md": [] },
-				{ "docs/how-to-guides/widgets/legacy-widget-block.md": [] }
-			] }
+			{
+				"docs/how-to-guides/widgets/README.md": [
+					{ "docs/how-to-guides/widgets/overview.md": [] },
+					{ "docs/how-to-guides/widgets/opting-out.md": [] },
+					{ "docs/how-to-guides/widgets/legacy-widget-block.md": [] }
+				]
+			}
 		]
 	},
 	{
@@ -227,6 +222,7 @@
 				"docs/reference-guides/filters/README.md": [
 					{ "docs/reference-guides/filters/block-filters.md": [] },
 					{ "docs/reference-guides/filters/editor-filters.md": [] },
+					{ "docs/reference-guides/filters/i18n-filters.md": [] },
 					{ "docs/reference-guides/filters/parser-filters.md": [] },
 					{
 						"docs/reference-guides/filters/autocomplete-filters.md": []
@@ -299,7 +295,10 @@
 						"docs/explanations/architecture/full-site-editing-templates.md": []
 					}
 				]
-			}
+			},
+			{ "docs/explanations/faq.md": [] },
+			{ "docs/explanations/glossary.md": [] },
+			{ "docs/explanations/history.md": [] }
 		]
 	},
 	{
@@ -317,6 +316,9 @@
 					{ "docs/contributors/code/managing-packages.md": [] },
 					{ "docs/contributors/code/release.md": [] },
 					{ "docs/contributors/code/native-mobile.md": [] },
+					{
+						"docs/contributors/code/native-mobile-integration-test-guide.md": []
+					},
 					{
 						"docs/contributors/code/getting-started-native-mobile.md": []
 					}

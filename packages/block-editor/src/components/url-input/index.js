@@ -134,7 +134,13 @@ class URLInput extends Component {
 			return;
 		}
 
-		const isInitialSuggestions = ! ( value && value.length );
+		// Initial suggestions may only show if there is no value
+		// (note: this includes whitespace).
+		const isInitialSuggestions = ! value?.length;
+
+		// Trim only now we've determined whether or not it originally had a "length"
+		// (even if that value was all whitespace).
+		value = value.trim();
 
 		// Allow a suggestions request if:
 		// - there are at least 2 characters in the search input (except manual searches where
@@ -219,7 +225,7 @@ class URLInput extends Component {
 
 		this.props.onChange( inputValue );
 		if ( ! this.props.disableSuggestions ) {
-			this.updateSuggestions( inputValue.trim() );
+			this.updateSuggestions( inputValue );
 		}
 	}
 
@@ -236,7 +242,7 @@ class URLInput extends Component {
 			! ( suggestions && suggestions.length )
 		) {
 			// Ensure the suggestions are updated with the current input value
-			this.updateSuggestions( value.trim() );
+			this.updateSuggestions( value );
 		}
 	}
 
@@ -261,7 +267,6 @@ class URLInput extends Component {
 				// position.
 				case UP: {
 					if ( 0 !== event.target.selectionStart ) {
-						event.stopPropagation();
 						event.preventDefault();
 
 						// Set the input caret to position 0
@@ -275,7 +280,6 @@ class URLInput extends Component {
 					if (
 						this.props.value.length !== event.target.selectionStart
 					) {
-						event.stopPropagation();
 						event.preventDefault();
 
 						// Set the input caret to the last position
@@ -284,6 +288,15 @@ class URLInput extends Component {
 							this.props.value.length
 						);
 					}
+					break;
+				}
+
+				// Submitting while loading should trigger onSubmit
+				case ENTER: {
+					if ( this.props.onSubmit ) {
+						this.props.onSubmit( null, event );
+					}
+
 					break;
 				}
 			}
@@ -297,7 +310,6 @@ class URLInput extends Component {
 
 		switch ( event.keyCode ) {
 			case UP: {
-				event.stopPropagation();
 				event.preventDefault();
 				const previousIndex = ! selectedSuggestion
 					? suggestions.length - 1
@@ -308,7 +320,6 @@ class URLInput extends Component {
 				break;
 			}
 			case DOWN: {
-				event.stopPropagation();
 				event.preventDefault();
 				const nextIndex =
 					selectedSuggestion === null ||
@@ -330,9 +341,15 @@ class URLInput extends Component {
 			}
 			case ENTER: {
 				if ( this.state.selectedSuggestion !== null ) {
-					event.stopPropagation();
 					this.selectLink( suggestion );
+
+					if ( this.props.onSubmit ) {
+						this.props.onSubmit( suggestion, event );
+					}
+				} else if ( this.props.onSubmit ) {
+					this.props.onSubmit( null, event );
 				}
+
 				break;
 			}
 		}

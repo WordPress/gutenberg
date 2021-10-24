@@ -979,7 +979,7 @@ describe( 'block factory', () => {
 			expect( availableBlocks ).toEqual( [] );
 		} );
 
-		it( 'for a non multiblock transform, the isMatch function receives the source block’s attributes object as its first argument', () => {
+		it( 'for a non multiblock transform, the isMatch function receives the source block’s attributes object and the block object as its arguments', () => {
 			const isMatch = jest.fn();
 
 			registerBlockType( 'core/updated-text-block', {
@@ -1010,10 +1010,10 @@ describe( 'block factory', () => {
 
 			getPossibleBlockTransformations( [ block ] );
 
-			expect( isMatch ).toHaveBeenCalledWith( { value: 'ribs' } );
+			expect( isMatch ).toHaveBeenCalledWith( { value: 'ribs' }, block );
 		} );
 
-		it( 'for a multiblock transform, the isMatch function receives an array containing every source block’s attributes as its first argument', () => {
+		it( 'for a multiblock transform, the isMatch function receives an array containing every source block’s attributes and an array of source blocks as its arguments', () => {
 			const isMatch = jest.fn();
 
 			registerBlockType( 'core/updated-text-block', {
@@ -1049,10 +1049,10 @@ describe( 'block factory', () => {
 
 			getPossibleBlockTransformations( [ meatBlock, cheeseBlock ] );
 
-			expect( isMatch ).toHaveBeenCalledWith( [
-				{ value: 'ribs' },
-				{ value: 'halloumi' },
-			] );
+			expect( isMatch ).toHaveBeenCalledWith(
+				[ { value: 'ribs' }, { value: 'halloumi' } ],
+				[ meatBlock, cheeseBlock ]
+			);
 		} );
 
 		describe( 'wildcard block transforms', () => {
@@ -1537,15 +1537,11 @@ describe( 'block factory', () => {
 			// to keep the existing block's client ID.
 			expect( transformedBlocks ).toHaveLength( 2 );
 			expect( transformedBlocks[ 0 ] ).toHaveProperty( 'clientId' );
-			expect( transformedBlocks[ 0 ].clientId ).not.toBe(
-				block.clientId
-			);
 			expect( transformedBlocks[ 0 ].name ).toBe( 'core/text-block' );
 			expect( transformedBlocks[ 0 ].isValid ).toBe( true );
 			expect( transformedBlocks[ 0 ].attributes ).toEqual( {
 				value: 'chicken ribs',
 			} );
-			expect( transformedBlocks[ 1 ].clientId ).toBe( block.clientId );
 			expect( transformedBlocks[ 1 ] ).toHaveProperty( 'clientId' );
 			expect( transformedBlocks[ 1 ].name ).toBe(
 				'core/updated-text-block'

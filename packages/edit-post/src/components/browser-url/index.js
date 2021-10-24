@@ -20,7 +20,7 @@ export function getPostEditURL( postId ) {
 /**
  * Returns the Post's Trashed URL.
  *
- * @param {number} postId    Post ID.
+ * @param {number} postId   Post ID.
  * @param {string} postType Post Type.
  *
  * @return {string} Post trashed URL.
@@ -65,8 +65,8 @@ export class BrowserURL extends Component {
 	/**
 	 * Navigates the browser to the post trashed URL to show a notice about the trashed post.
 	 *
-	 * @param {number} postId    Post ID.
-	 * @param {string} postType  Post Type.
+	 * @param {number} postId   Post ID.
+	 * @param {string} postType Post Type.
 	 */
 	setTrashURL( postId, postType ) {
 		window.location.href = getPostTrashedURL( postId, postType );

@@ -4,7 +4,6 @@
 import {
 	createNewPost,
 	insertBlock,
-	pressKeyWithModifier,
 	saveDraft,
 } from '@wordpress/e2e-test-utils';
 
@@ -16,9 +15,10 @@ describe( 'Post Title block', () => {
 	it( 'Can edit the post title', async () => {
 		// Create a block with some text that will trigger a list creation.
 		await insertBlock( 'Post Title' );
-
-		// Select all of the text in the post title block.
-		await pressKeyWithModifier( 'primary', 'a' );
+		const editablePostTitleSelector =
+			'.wp-block-post-title[contenteditable="true"]';
+		await page.waitForSelector( editablePostTitleSelector );
+		await page.focus( editablePostTitleSelector );
 
 		// Create a second list item.
 		await page.keyboard.type( 'Just tweaking the post title' );
@@ -28,7 +28,7 @@ describe( 'Post Title block', () => {
 		await page.waitForSelector( '.edit-post-layout' );
 		const title = await page.$eval(
 			'.editor-post-title__input',
-			( element ) => element.value
+			( element ) => element.textContent
 		);
 		expect( title ).toEqual( 'Just tweaking the post title' );
 	} );

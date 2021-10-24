@@ -78,16 +78,16 @@ export default function Sidebar() {
 
 		const selectedBlock = getSelectedBlock();
 
-		let activeArea = getActiveComplementaryArea( editWidgetsStore.name );
-		if ( ! activeArea ) {
+		const activeArea = getActiveComplementaryArea( editWidgetsStore.name );
+
+		let currentSelection = activeArea;
+		if ( ! currentSelection ) {
 			if ( selectedBlock ) {
-				activeArea = BLOCK_INSPECTOR_IDENTIFIER;
+				currentSelection = BLOCK_INSPECTOR_IDENTIFIER;
 			} else {
-				activeArea = WIDGET_AREAS_IDENTIFIER;
+				currentSelection = WIDGET_AREAS_IDENTIFIER;
 			}
 		}
-
-		const isSidebarOpen = !! activeArea;
 
 		let widgetAreaBlock;
 		if ( selectedBlock ) {
@@ -104,11 +104,11 @@ export default function Sidebar() {
 		}
 
 		return {
-			currentArea: activeArea,
+			currentArea: currentSelection,
 			hasSelectedNonAreaBlock: !! (
 				selectedBlock && selectedBlock.name !== 'core/widget-area'
 			),
-			isGeneralSidebarOpen: isSidebarOpen,
+			isGeneralSidebarOpen: !! activeArea,
 			selectedWidgetAreaBlock: widgetAreaBlock,
 		};
 	}, [] );

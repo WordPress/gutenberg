@@ -11,7 +11,9 @@ import androidx.core.util.Consumer;
 
 import com.facebook.react.ReactApplication;
 import com.BV.LinearGradient.LinearGradientPackage;
+import com.facebook.react.bridge.Arguments;
 import com.facebook.react.bridge.ReadableMap;
+import com.facebook.react.bridge.WritableMap;
 import com.reactnativecommunity.slider.ReactSliderPackage;
 import com.brentvatne.react.ReactVideoPackage;
 import com.facebook.react.bridge.ReadableArray;
@@ -32,6 +34,7 @@ import com.facebook.react.ReactNativeHost;
 import com.facebook.react.ReactPackage;
 import com.facebook.react.shell.MainReactPackage;
 import com.facebook.soloader.SoLoader;
+import com.reactnativecommunity.webview.RNCWebViewPackage;
 import com.swmansion.gesturehandler.react.RNGestureHandlerPackage;
 import com.swmansion.reanimated.ReanimatedPackage;
 import com.swmansion.rnscreens.RNScreensPackage;
@@ -112,6 +115,10 @@ public class MainApplication extends Application implements ReactApplication, Gu
 
             @Override
             public void requestImageUploadCancel(int mediaId) {
+            }
+
+            @Override
+            public void setFeaturedImage(int mediaId) {
             }
 
             @Override
@@ -236,6 +243,31 @@ public class MainApplication extends Application implements ReactApplication, Gu
 
             }
 
+            @Override
+            public void requestPreview() {
+                Toast.makeText(MainApplication.this, "requestPreview called", Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void requestBlockTypeImpressions(BlockTypeImpressionsCallback blockTypeImpressionsCallback) {
+                ReadableMap impressions = Arguments.createMap();
+                blockTypeImpressionsCallback.onRequestBlockTypeImpressions(impressions);
+            }
+
+            @Override
+            public void setBlockTypeImpressions(ReadableMap impressions) {
+                Log.d("BlockTypeImpressions", String.format("Gutenberg requested setting block type impression to %s.", impressions));
+            }
+
+            @Override
+            public void requestContactCustomerSupport() {
+                Toast.makeText(MainApplication.this, "requestContactCustomerSupport called", Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void requestGotoCustomerSupportOptions() {
+                Toast.makeText(MainApplication.this, "requestGotoCustomerSupportOptions called", Toast.LENGTH_SHORT).show();
+            }
         }, isDarkMode());
 
         return new ReactNativeHost(this) {
@@ -261,6 +293,7 @@ public class MainApplication extends Application implements ReactApplication, Gu
                         new SafeAreaContextPackage(),
                         new RNScreensPackage(),
                         new RNPromptPackage(),
+                        new RNCWebViewPackage(),
                         mRnReactNativeGutenbergBridgePackage);
             }
 
@@ -312,6 +345,13 @@ public class MainApplication extends Application implements ReactApplication, Gu
             @Override
             public void onOptionSelected() {
                 mRnReactNativeGutenbergBridgePackage.getRNReactNativeGutenbergBridgeModule().toggleEditorMode();
+            }
+        });
+
+        devSupportManager.addCustomDevOption("Help", new DevOptionHandler() {
+            @Override
+            public void onOptionSelected() {
+                mRnReactNativeGutenbergBridgePackage.getRNReactNativeGutenbergBridgeModule().showEditorHelp();
             }
         });
     }

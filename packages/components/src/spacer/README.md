@@ -33,86 +33,87 @@ function Example() {
 
 ## Props
 
-##### margin
-
-**Type**: `number`
+### `margin`: `number`
 
 Adjusts all margins.
 
-##### marginBottom
+- Required: No
 
-**Type**: `number`
+### `marginY`: `number`
 
-Adjusts bottom margins.
+Adjusts top and bottom margins, potentially overriding the value from the more generic `margin` prop.
 
-##### marginLeft
+- Required: No
 
-**Type**: `number`
+### `marginX`: `number`
 
-Adjusts left margins.
+Adjusts left and right margins, potentially overriding the value from the more generic `margin` prop.
 
-##### marginRight
+- Required: No
 
-**Type**: `number`
+### `marginTop`: `number`
 
-Adjusts right margins.
+Adjusts top margin, potentially overriding the value from the more generic `margin` and `marginY` props.
 
-##### marginTop
+- Required: No
 
-**Type**: `number`
+### `marginBottom`: `number`
 
-Adjusts top margins.
+Adjusts bottom margin, potentially overriding the value from the more generic `margin` and `marginY` props.
 
-##### marginX
+- Required: No
+- Default: `2`
 
-**Type**: `number`
+### `marginLeft`: `number`
 
-Adjusts left and right margins.
+Adjusts left margin, potentially overriding the value from the more generic `margin` and `marginX` props.
 
-##### marginY
+- Required: No
 
-**Type**: `number`
+### `marginRight`: `number`
 
-Adjusts top and bottom margins.
+Adjusts right margin, potentially overriding the value from the more generic `margin` and `marginX` props.
 
-##### padding
+- Required: No
 
-**Type**: `number`
+### `padding`: `number`
 
 Adjusts all padding.
 
-##### paddingBottom
+- Required: No
 
-**Type**: `number`
+### `paddingY`: `number`
 
-Adjusts bottom padding.
+Adjusts top and bottom padding, potentially overriding the value from the more generic `padding` prop.
 
-##### paddingLeft
+- Required: No
 
-**Type**: `number`
+### `paddingX`: `number`
 
-Adjusts left padding.
+Adjusts left and right padding, potentially overriding the value from the more generic `padding` prop.
 
-##### paddingRight
+- Required: No
 
-**Type**: `number`
+### `paddingTop`: `number`
 
-Adjusts right padding.
+Adjusts top padding, potentially overriding the value from the more generic `padding` and `paddingY` props.
 
-##### paddingTop
+- Required: No
 
-**Type**: `number`
+### `paddingBottom`: `number`
 
-Adjusts top padding.
+Adjusts bottom padding, potentially overriding the value from the more generic `padding` and `paddingY` props.
 
-##### paddingX
+- Required: No
 
-**Type**: `number`
+### `paddingLeft`: `number`
 
-Adjusts left and right padding.
+Adjusts left padding, potentially overriding the value from the more generic `padding` and `paddingX` props.
 
-##### paddingY
+- Required: No
 
-**Type**: `number`
+### `paddingRight`: `number`
 
-Adjusts top and bottom padding.
+Adjusts right padding, potentially overriding the value from the more generic `padding` and `paddingX` props.
+
+- Required: No

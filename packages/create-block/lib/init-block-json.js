@@ -11,10 +11,12 @@ const { writeFile } = require( 'fs' ).promises;
 const { info } = require( './log' );
 
 module.exports = async ( {
+	$schema,
 	apiVersion,
 	slug,
 	namespace,
 	title,
+	version,
 	description,
 	category,
 	attributes,
@@ -33,8 +35,10 @@ module.exports = async ( {
 		JSON.stringify(
 			omitBy(
 				{
+					$schema,
 					apiVersion,
 					name: namespace + '/' + slug,
+					version,
 					title,
 					category,
 					icon: dashicon,

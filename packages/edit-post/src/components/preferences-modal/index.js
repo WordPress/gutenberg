@@ -7,13 +7,23 @@ import { get } from 'lodash';
  * WordPress dependencies
  */
 import {
-	__experimentalNavigation as Navigation,
-	__experimentalNavigationMenu as NavigationMenu,
-	__experimentalNavigationItem as NavigationItem,
+	__experimentalNavigatorProvider as NavigatorProvider,
+	__experimentalNavigatorScreen as NavigatorScreen,
+	__experimentalUseNavigator as useNavigator,
+	__experimentalItemGroup as ItemGroup,
+	__experimentalItem as Item,
+	__experimentalHStack as HStack,
+	__experimentalText as Text,
+	__experimentalTruncate as Truncate,
+	FlexItem,
 	Modal,
 	TabPanel,
+	Button,
+	Card,
+	CardHeader,
+	CardBody,
 } from '@wordpress/components';
-import { __ } from '@wordpress/i18n';
+import { isRTL, __ } from '@wordpress/i18n';
 import { useViewportMatch } from '@wordpress/compose';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { useMemo, useCallback, useState } from '@wordpress/element';
@@ -26,6 +36,7 @@ import {
 	store as editorStore,
 } from '@wordpress/editor';
 import { store as coreStore } from '@wordpress/core-data';
+import { chevronLeft, chevronRight, Icon } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -39,9 +50,25 @@ import {
 } from './options';
 import MetaBoxesSection from './meta-boxes-section';
 import { store as editPostStore } from '../../store';
+import BlockManager from '../block-manager';
 
 const MODAL_NAME = 'edit-post/preferences';
 const PREFERENCES_MENU = 'preferences-menu';
+
+function NavigationButton( {
+	as: Tag = Button,
+	path,
+	isBack = false,
+	...props
+} ) {
+	const navigator = useNavigator();
+	return (
+		<Tag
+			onClick={ () => navigator.push( path, { isBack } ) }
+			{ ...props }
+		/>
+	);
+}
 
 export default function PreferencesModal() {
 	const isLargeViewport = useViewportMatch( 'medium' );
@@ -80,11 +107,14 @@ export default function PreferencesModal() {
 					<>
 						{ isLargeViewport && (
 							<Section
-								title={ __( 'Choose your own experience' ) }
+								title={ __( 'Publishing' ) }
+								description={ __(
+									'Change options related to publishing.'
+								) }
 							>
 								<EnablePublishSidebarOption
 									help={ __(
-										'Review settings such as categories and tags.'
+										'Review settings, such as visibility and tags.'
 									) }
 									label={ __(
 										'Include pre-publish checklist'
@@ -93,7 +123,12 @@ export default function PreferencesModal() {
 							</Section>
 						) }
 
-						<Section title={ __( 'Decide what to focus on' ) }>
+						<Section
+							title={ __( 'Appearance' ) }
+							description={ __(
+								'Customize options related to the block editor interface and editing flow.'
+							) }
+						>
 							<EnableFeature
 								featureName="reducedUI"
 								help={ __(
@@ -107,6 +142,18 @@ export default function PreferencesModal() {
 									'Highlights the current block and fades other content.'
 								) }
 								label={ __( 'Spotlight mode' ) }
+							/>
+							<EnableFeature
+								featureName="showIconLabels"
+								help={ __( 'Shows text instead of icons.' ) }
+								label={ __( 'Display button labels' ) }
+							/>
+							<EnableFeature
+								featureName="themeStyles"
+								help={ __(
+									'Make the editor look like your theme.'
+								) }
+								label={ __( 'Use theme styles' ) }
 							/>
 							{ showBlockBreadcrumbsOption && (
 								<EnableFeature
@@ -122,49 +169,42 @@ export default function PreferencesModal() {
 				),
 			},
 			{
-				name: 'appearance',
-				tabLabel: __( 'Appearance' ),
-				content: (
-					<Section title={ __( 'Choose the way it looks' ) }>
-						<EnableFeature
-							featureName="showIconLabels"
-							help={ __(
-								'Shows text instead of icons in toolbar.'
-							) }
-							label={ __( 'Display button labels' ) }
-						/>
-						<EnableFeature
-							featureName="themeStyles"
-							help={ __(
-								'Make the editor look like your theme.'
-							) }
-							label={ __( 'Use theme styles' ) }
-						/>
-					</Section>
-				),
-			},
-			{
 				name: 'blocks',
 				tabLabel: __( 'Blocks' ),
 				content: (
-					<Section
-						title={ __( 'Choose how you interact with blocks' ) }
-					>
-						<EnableFeature
-							featureName="mostUsedBlocks"
-							help={ __(
-								'Places the most frequent blocks in the block library.'
+					<>
+						<Section
+							title={ __( 'Block interactions' ) }
+							description={ __(
+								'Customize how you interact with blocks in the block library and editing canvas.'
 							) }
-							label={ __( 'Show most used blocks' ) }
-						/>
-						<EnableFeature
-							featureName="keepCaretInsideBlock"
-							help={ __(
-								'Aids screen readers by stopping text caret from leaving blocks.'
+						>
+							<EnableFeature
+								featureName="mostUsedBlocks"
+								help={ __(
+									'Places the most frequent blocks in the block library.'
+								) }
+								label={ __( 'Show most used blocks' ) }
+							/>
+							<EnableFeature
+								featureName="keepCaretInsideBlock"
+								help={ __(
+									'Aids screen readers by stopping text caret from leaving blocks.'
+								) }
+								label={ __(
+									'Contain text cursor inside block'
+								) }
+							/>
+						</Section>
+						<Section
+							title={ __( 'Visible blocks' ) }
+							description={ __(
+								"Disable blocks that you don't want to appear in the inserter. They can always be toggled back on later."
 							) }
-							label={ __( 'Contain text cursor inside block' ) }
-						/>
-					</Section>
+						>
+							<BlockManager />
+						</Section>
+					</>
 				),
 			},
 			{
@@ -229,14 +269,12 @@ export default function PreferencesModal() {
 								/>
 							</PageAttributesCheck>
 						</Section>
-						<Section
+						<MetaBoxesSection
 							title={ __( 'Additional' ) }
 							description={ __(
 								'Add extra areas to the editor.'
 							) }
-						>
-							<MetaBoxesSection />
-						</Section>
+						/>
 					</>
 				),
 			},
@@ -289,34 +327,73 @@ export default function PreferencesModal() {
 		);
 	} else {
 		modalContent = (
-			<Navigation
-				activeMenu={ activeMenu }
-				onActivateMenu={ setActiveMenu }
-			>
-				<NavigationMenu menu={ PREFERENCES_MENU }>
-					{ tabs.map( ( tab ) => {
-						return (
-							<NavigationItem
-								key={ tab.name }
-								title={ tab.title }
-								navigateToMenu={ tab.name }
-							/>
-						);
-					} ) }
-				</NavigationMenu>
+			<NavigatorProvider initialPath="/">
+				<NavigatorScreen path="/">
+					<Card isBorderless size="small">
+						<CardBody>
+							<ItemGroup>
+								{ tabs.map( ( tab ) => {
+									return (
+										<NavigationButton
+											key={ tab.name }
+											path={ tab.name }
+											as={ Item }
+											isAction
+										>
+											<HStack justify="space-between">
+												<FlexItem>
+													<Truncate>
+														{ tab.title }
+													</Truncate>
+												</FlexItem>
+												<FlexItem>
+													<Icon
+														icon={
+															isRTL()
+																? chevronLeft
+																: chevronRight
+														}
+													/>
+												</FlexItem>
+											</HStack>
+										</NavigationButton>
+									);
+								} ) }
+							</ItemGroup>
+						</CardBody>
+					</Card>
+				</NavigatorScreen>
 				{ sections.map( ( section ) => {
 					return (
-						<NavigationMenu
+						<NavigatorScreen
 							key={ `${ section.name }-menu` }
-							menu={ section.name }
-							title={ section.tabLabel }
-							parentMenu={ PREFERENCES_MENU }
+							path={ section.name }
 						>
-							<NavigationItem>{ section.content }</NavigationItem>
-						</NavigationMenu>
+							<Card isBorderless size="large">
+								<CardHeader
+									isBorderless={ false }
+									justify="left"
+									size="small"
+									gap="6"
+								>
+									<NavigationButton
+										path="/"
+										icon={
+											isRTL() ? chevronRight : chevronLeft
+										}
+										isBack
+										aria-label={ __(
+											'Navigate to the previous view'
+										) }
+									/>
+									<Text size="16">{ section.tabLabel }</Text>
+								</CardHeader>
+								<CardBody>{ section.content }</CardBody>
+							</Card>
+						</NavigatorScreen>
 					);
 				} ) }
-			</Navigation>
+			</NavigatorProvider>
 		);
 	}
 	return (

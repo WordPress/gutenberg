@@ -1,12 +1,12 @@
-( function() {
-	var el = wp.element.createElement;
-	var Fragment = wp.element.Fragment;
-	var Button = wp.components.Button;
-	var PanelBody = wp.components.PanelBody;
-	var InspectorControls = wp.blockEditor.InspectorControls;
-	var addFilter = wp.hooks.addFilter;
-	var createBlock = wp.blocks.createBlock;
-	var __ = wp.i18n.__;
+( function () {
+	const el = wp.element.createElement;
+	const Fragment = wp.element.Fragment;
+	const Button = wp.components.Button;
+	const PanelBody = wp.components.PanelBody;
+	const InspectorControls = wp.blockEditor.InspectorControls;
+	const addFilter = wp.hooks.addFilter;
+	const createBlock = wp.blocks.createBlock;
+	const __ = wp.i18n.__;
 
 	function ResetBlockButton( props ) {
 		return el(
@@ -18,10 +18,10 @@
 					className: 'e2e-reset-block-button',
 					variant: "secondary",
 					isLarge: true,
-					onClick: function() {
-						var emptyBlock = createBlock( props.name );
+					onClick() {
+						const emptyBlock = createBlock( props.name );
 						props.onReplace( emptyBlock );
-					}
+					},
 				},
 				__( 'Reset Block' )
 			)
@@ -29,25 +29,19 @@
 	}
 
 	function addResetBlockButton( BlockEdit ) {
-		return function( props ) {
+		return function ( props ) {
 			return el(
 				Fragment,
 				{},
 				el(
 					InspectorControls,
 					{},
-					el(
-						ResetBlockButton,
-						{
-							name: props.name,
-							onReplace: props.onReplace
-						}
-					)
+					el( ResetBlockButton, {
+						name: props.name,
+						onReplace: props.onReplace,
+					} )
 				),
-				el(
-					BlockEdit,
-					props
-				)
+				el( BlockEdit, props )
 			);
 		};
 	}

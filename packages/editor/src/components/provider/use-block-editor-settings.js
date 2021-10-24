@@ -11,8 +11,9 @@ import { useDispatch, useSelect } from '@wordpress/data';
 import {
 	store as coreStore,
 	__experimentalFetchLinkSuggestions as fetchLinkSuggestions,
-	__experimentalFetchRemoteUrlData as fetchRemoteUrlData,
+	__experimentalFetchUrlData as fetchUrlData,
 } from '@wordpress/core-data';
+import { __ } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
@@ -33,10 +34,19 @@ function useBlockEditorSettings( settings, hasTemplate ) {
 		reusableBlocks,
 		hasUploadPermissions,
 		canUseUnfilteredHTML,
+		userCanCreatePages,
 	} = useSelect( ( select ) => {
 		const { canUserUseUnfilteredHTML } = select( editorStore );
 		const isWeb = Platform.OS === 'web';
-		const { canUser } = select( coreStore );
+		const { canUser, getUnstableBase, hasFinishedResolution } = select(
+			coreStore
+		);
+
+		const siteData = getUnstableBase();
+
+		const hasFinishedResolvingSiteData = hasFinishedResolution(
+			'getUnstableBase'
+		);
 
 		return {
 			canUseUnfilteredHTML: canUserUseUnfilteredHTML(),
@@ -51,10 +61,31 @@ function useBlockEditorSettings( settings, hasTemplate ) {
 				canUser( 'create', 'media' ),
 				true
 			),
+			hasResolvedLocalSiteData: hasFinishedResolvingSiteData,
+			baseUrl: siteData?.url || '',
+			userCanCreatePages: canUser( 'create', 'pages' ),
 		};
 	}, [] );
 
 	const { undo } = useDispatch( editorStore );
+
+	const { saveEntityRecord } = useDispatch( coreStore );
+
+	/**
+	 * Creates a Post entity.
+	 * This is utilised by the Link UI to allow for on-the-fly creation of Posts/Pages.
+	 *
+	 * @param {Object} options parameters for the post being created. These mirror those used on 3rd param of saveEntityRecord.
+	 * @return {Object} the post type object that was created.
+	 */
+	const createPageEntity = ( options ) => {
+		if ( ! userCanCreatePages ) {
+			return Promise.reject( {
+				message: __( 'You do not have permission to create Pages.' ),
+			} );
+		}
+		return saveEntityRecord( 'postType', 'page', options );
+	};
 
 	return useMemo(
 		() => ( {
@@ -63,10 +94,11 @@ function useBlockEditorSettings( settings, hasTemplate ) {
 				'__experimentalBlockPatternCategories',
 				'__experimentalBlockPatterns',
 				'__experimentalFeatures',
-				'__experimentalGlobalStylesBaseStyles',
+				'__experimentalGlobalStylesBaseConfig',
 				'__experimentalGlobalStylesUserEntityId',
 				'__experimentalPreferredStyleVariations',
 				'__experimentalSetIsInserterOpened',
+				'__unstableGalleryWithImageBlocks',
 				'alignWide',
 				'allowedBlockTypes',
 				'bodyPlaceholder',
@@ -102,11 +134,12 @@ function useBlockEditorSettings( settings, hasTemplate ) {
 			__experimentalReusableBlocks: reusableBlocks,
 			__experimentalFetchLinkSuggestions: ( search, searchOptions ) =>
 				fetchLinkSuggestions( search, searchOptions, settings ),
-			__experimentalFetchRemoteUrlData: ( url ) =>
-				fetchRemoteUrlData( url ),
+			__experimentalFetchRichUrlData: fetchUrlData,
 			__experimentalCanUserUseUnfilteredHTML: canUseUnfilteredHTML,
 			__experimentalUndo: undo,
 			outlineMode: hasTemplate,
+			__experimentalCreatePageEntity: createPageEntity,
+			__experimentalUserCanCreatePages: userCanCreatePages,
 		} ),
 		[
 			settings,
@@ -115,6 +148,7 @@ function useBlockEditorSettings( settings, hasTemplate ) {
 			canUseUnfilteredHTML,
 			undo,
 			hasTemplate,
+			userCanCreatePages,
 		]
 	);
 }

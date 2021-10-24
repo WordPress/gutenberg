@@ -1,87 +1,73 @@
 /**
  * WordPress dependencies
  */
-import { DropdownMenu } from '@wordpress/components';
+import { __ } from '@wordpress/i18n';
+import { NavigableToolbar } from '@wordpress/block-editor';
+import { useViewportMatch } from '@wordpress/compose';
 import { PinnedItems } from '@wordpress/interface';
-import { __, sprintf } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
  */
+import MenuActions from './menu-actions';
+import NewButton from './new-button';
 import SaveButton from './save-button';
-import MenuSwitcher from '../menu-switcher';
-import { useMenuEntityProp } from '../../hooks';
+import UndoButton from './undo-button';
+import RedoButton from './redo-button';
+import InserterToggle from './inserter-toggle';
+import MoreMenu from './more-menu';
 
 export default function Header( {
 	isMenuSelected,
 	menus,
-	selectedMenuId,
-	onSelectMenu,
 	isPending,
 	navigationPost,
 } ) {
-	const [ menuName ] = useMenuEntityProp( 'name', selectedMenuId );
-	let actionHeaderText;
+	const isMediumViewport = useViewportMatch( 'medium' );
 
-	if ( menuName ) {
-		actionHeaderText = sprintf(
-			// translators: Name of the menu being edited, e.g. 'Main Menu'.
-			__( 'Editing: %s' ),
-			menuName
+	if ( ! isMenuSelected ) {
+		return (
+			<div className="edit-navigation-header">
+				<div className="edit-navigation-header__toolbar-wrapper">
+					<h1 className="edit-navigation-header__title">
+						{ __( 'Navigation' ) }
+					</h1>
+				</div>
+			</div>
 		);
-	} else if ( isPending ) {
-		// Loading text won't be displayed if menus are preloaded.
-		actionHeaderText = __( 'Loading …' );
-	} else {
-		actionHeaderText = __( 'No menus available' );
 	}
 
 	return (
 		<div className="edit-navigation-header">
-			<div className="edit-navigation-header__title-subtitle">
-				<h1 className="edit-navigation-header__title">
-					{ __( 'Navigation' ) }
-				</h1>
-				<h2 className="edit-navigation-header__subtitle">
-					{ isMenuSelected && actionHeaderText }
-				</h2>
-			</div>
-			{ isMenuSelected && (
-				<div className="edit-navigation-header__actions">
-					<DropdownMenu
-						icon={ null }
-						toggleProps={ {
-							children: __( 'Switch menu' ),
-							'aria-label': __(
-								'Switch menu, or create a new menu'
-							),
-							showTooltip: false,
-							variant: 'tertiary',
-							disabled: ! menus?.length,
-							__experimentalIsFocusable: true,
-						} }
-						popoverProps={ {
-							className:
-								'edit-navigation-header__menu-switcher-dropdown',
-							position: 'bottom center',
-						} }
-					>
-						{ ( { onClose } ) => (
-							<MenuSwitcher
-								menus={ menus }
-								selectedMenuId={ selectedMenuId }
-								onSelectMenu={ ( menuId ) => {
-									onSelectMenu( menuId );
-									onClose();
-								} }
-							/>
-						) }
-					</DropdownMenu>
+			<div className="edit-navigation-header__toolbar-wrapper">
+				{ isMediumViewport && (
+					<h1 className="edit-navigation-header__title">
+						{ __( 'Navigation' ) }
+					</h1>
+				) }
 
-					<SaveButton navigationPost={ navigationPost } />
-					<PinnedItems.Slot scope="core/edit-navigation" />
-				</div>
-			) }
+				<NavigableToolbar
+					className="edit-navigation-header__toolbar"
+					aria-label={ __( 'Document tools' ) }
+				>
+					<InserterToggle />
+					{ isMediumViewport && (
+						<>
+							<UndoButton />
+							<RedoButton />
+						</>
+					) }
+				</NavigableToolbar>
+			</div>
+
+			<MenuActions menus={ menus } isLoading={ isPending } />
+
+			<div className="edit-navigation-header__actions">
+				{ isMediumViewport && <NewButton /> }
+				<SaveButton navigationPost={ navigationPost } />
+				<PinnedItems.Slot scope="core/edit-navigation" />
+				<MoreMenu />
+			</div>
 		</div>
 	);
 }

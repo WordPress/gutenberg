@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * External dependencies
  */
@@ -20,7 +21,6 @@ import { useDebounce } from '@wordpress/compose';
  */
 import Popover from '../popover';
 import Shortcut from '../shortcut';
-import { withNextComponent } from './next';
 
 /**
  * Time over children to wait before showing tooltip
@@ -38,7 +38,6 @@ const getDisabledElement = ( { eventHandlers, child, childrenWithPopover } ) =>
 			{ cloneElement( child, {
 				children: childrenWithPopover,
 			} ) }
-			,
 		</span>,
 		eventHandlers
 	);
@@ -82,12 +81,24 @@ const emitToChild = ( children, eventName, event ) => {
 	}
 
 	const child = Children.only( children );
+
+	// If the underlying element is disabled, do not emit the event.
+	if ( child.props.disabled ) {
+		return;
+	}
+
 	if ( typeof child.props[ eventName ] === 'function' ) {
 		child.props[ eventName ]( event );
 	}
 };
 
-function Tooltip( { children, position, text, shortcut } ) {
+function Tooltip( {
+	children,
+	position,
+	text,
+	shortcut,
+	delay = TOOLTIP_DELAY,
+} ) {
 	/**
 	 * Whether a mouse is currently pressed, used in determining whether
 	 * to handle a focus event as displaying the tooltip immediately.
@@ -96,7 +107,7 @@ function Tooltip( { children, position, text, shortcut } ) {
 	 */
 	const [ isMouseDown, setIsMouseDown ] = useState( false );
 	const [ isOver, setIsOver ] = useState( false );
-	const delayedSetIsOver = useDebounce( setIsOver, TOOLTIP_DELAY );
+	const delayedSetIsOver = useDebounce( setIsOver, delay );
 
 	const createMouseDown = ( event ) => {
 		// Preserve original child callback behavior
@@ -169,6 +180,7 @@ function Tooltip( { children, position, text, shortcut } ) {
 	};
 	const clearOnUnmount = () => {
 		delayedSetIsOver.cancel();
+		document.removeEventListener( 'mouseup', cancelIsMouseDown );
 	};
 
 	useEffect( () => clearOnUnmount, [] );
@@ -217,4 +229,4 @@ function Tooltip( { children, position, text, shortcut } ) {
 	} );
 }
 
-export default withNextComponent( Tooltip );
+export default Tooltip;
