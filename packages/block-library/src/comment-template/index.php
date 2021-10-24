@@ -7,14 +7,8 @@
 
 function render_block_core_comment_template( $attributes, $content, $block ) {
 
-	$postID = get_the_ID();
-
-	$args = array(
-		'post_type' => 'post',
-		'post_id' => $postID
-	);
-
-	$comments = get_comments($args);
+	// Get an array of comments for the current post.
+	$comments = get_approved_comments(get_the_ID());
 
 	if (count($comments) == 0) {
 		return '';
