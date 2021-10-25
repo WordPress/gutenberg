@@ -48,14 +48,10 @@ describe( 'BlockTypesTab component', () => {
 	it( 'shows block items', () => {
 		selectMock.getInserterItems.mockReturnValue( items );
 
-		const blockItems = items
-			.filter(
-				( { id, category } ) =>
-					category !== 'reusable' &&
-					id !== 'core-embed/a-paragraph-embed'
-			)
-			// Set `isNew` property expected from block type impressions
-			.map( ( filteredItems ) => ( { ...filteredItems, isNew: false } ) );
+		const blockItems = items.filter(
+			( { id, category } ) =>
+				category !== 'reusable' && id !== 'core-embed/a-paragraph-embed'
+		);
 		const component = shallow(
 			<BlockTypesTab
 				rootClientId={ 0 }
