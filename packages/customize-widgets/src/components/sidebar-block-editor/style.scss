@@ -16,3 +16,16 @@
 	position: fixed;
 	z-index: z-index(".customize-widgets__block-toolbar");
 }
+
+// Copied from block-editor/src/default-editor-styles.scss.
+// Apply default styles to "editor-styles-wrapper" in the customizer block editor.
+.customize-widgets__sidebar-section .editor-styles-wrapper {
+	font-family: $default-font;
+	font-size: 18px;
+	line-height: 1.5;
+	--wp--style--block-gap: 2em;
+
+	p {
+		line-height: 1.8;
+	}
+}
