@@ -92,10 +92,6 @@
 		"allowResize": {
 			"type": "boolean",
 			"default": false
-		},
-		"fixedHeight": {
-			"type": "boolean",
-			"default": true
 		}
 	},
 	"providesContext": {
@@ -103,7 +99,7 @@
 		"imageCrop": "imageCrop"
 	},
 	"providesContextConstants": {
-		"fixedHeight": "fixedHeight"
+		"fixedHeight": true
 	},
 	"supports": {
 		"anchor": true,
