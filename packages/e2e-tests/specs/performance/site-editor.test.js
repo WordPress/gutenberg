@@ -13,7 +13,7 @@ import {
 	canvas,
 	createNewPost,
 	saveDraft,
-	openListView,
+	insertBlock,
 } from '@wordpress/e2e-test-utils';
 
 /**
@@ -118,13 +118,7 @@ describe( 'Site Editor Performance', () => {
 		await canvas().click(
 			'[data-type="core/post-content"] [data-type="core/paragraph"]'
 		);
-		await openListView();
-		await canvas().click(
-			'[data-type="core/post-content"] [data-type="core/paragraph"]'
-		);
-		await page.keyboard.press( 'Enter' );
-		await page.keyboard.press( 'Enter' );
-		await page.keyboard.press( 'ArrowUp' );
+		await insertBlock( 'Paragraph' );
 		i = 200;
 		const traceFile = __dirname + '/trace.json';
 		await page.tracing.start( {
