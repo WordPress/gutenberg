@@ -46,7 +46,7 @@
 		},
 		"overlayMenu": {
 			"type": "string",
-			"default": "never"
+			"default": "mobile"
 		},
 		"__unstableLocation": {
 			"type": "string"
