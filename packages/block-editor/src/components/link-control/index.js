@@ -270,26 +270,18 @@ function LinkControl( {
 					value={ value }
 					onEditClick={ () => setIsEditingLink( true ) }
 					hasRichPreviews={ hasRichPreviews }
+					hasUnlinkControl={ shownUnlinkControl }
+					onRemove={ onRemove }
 				/>
 			) }
 
-			{ ( showSettingsDrawer || shownUnlinkControl ) && (
+			{ showSettingsDrawer && (
 				<div className="block-editor-link-control__tools">
 					<LinkControlSettingsDrawer
 						value={ value }
 						settings={ settings }
 						onChange={ onChange }
 					/>
-					{ shownUnlinkControl && (
-						<Button
-							className="block-editor-link-control__unlink"
-							isDestructive
-							variant="link"
-							onClick={ onRemove }
-						>
-							{ __( 'Unlink' ) }
-						</Button>
-					) }
 				</div>
 			) }
 		</div>
