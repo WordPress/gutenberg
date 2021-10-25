@@ -1,5 +1,7 @@
 # Link Control
 
+Force change.
+
 Renders a link control. A link control is a controlled input which maintains a value associated with a link (HTML anchor element) and relevant settings for how that link is expected to behave.
 
 It is designed to provide a standardized UI for the creation of a link throughout the Editor, see History section at bottom for further background.
@@ -69,9 +71,7 @@ An array of settings objects associated with a link (for example: a setting to d
 To disable settings, pass in an empty array. for example:
 
 ```jsx
-<LinkControl
-	settings={ [] }
-/>
+<LinkControl settings={ [] } />
 ```
 
 ### onChange
