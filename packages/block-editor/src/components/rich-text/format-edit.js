@@ -2,6 +2,10 @@
  * WordPress dependencies
  */
 import { getActiveFormat, getActiveObject } from '@wordpress/rich-text';
+/**
+ * External dependencies
+ */
+import { find } from 'lodash';
 
 export default function FormatEdit( {
 	formatTypes,
@@ -18,10 +22,35 @@ export default function FormatEdit( {
 		}
 
 		const activeFormat = getActiveFormat( value, name );
-		const isActive = activeFormat !== undefined;
+		let isActive = activeFormat !== undefined;
 		const activeObject = getActiveObject( value );
 		const isObjectActive =
 			activeObject !== undefined && activeObject.type === name;
+
+		// Edge case: link format
+		// If there is a missing link format at either end of the selection
+		// then we shouldn't show the Edit UI because the selection has exeeded
+		// the bounds of the link format.
+		// Also if the format objects don't match then we're dealing with two separate
+		// links so we should not allow the link to be modified over the top.
+		if ( name === 'core/link' ) {
+			const formats = value.formats;
+			const linkFormatAtStart = find( formats[ value.start ], {
+				type: 'core/link',
+			} );
+
+			const linkFormatAtEnd = find( formats[ value.end - 1 ], {
+				type: 'core/link',
+			} );
+
+			if (
+				! linkFormatAtStart ||
+				! linkFormatAtEnd ||
+				linkFormatAtStart !== linkFormatAtEnd
+			) {
+				isActive = false;
+			}
+		}
 
 		return (
 			<Edit
