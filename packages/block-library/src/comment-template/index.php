@@ -5,33 +5,40 @@
  * @package WordPress
  */
 
+/**
+ * Renders the `core/comment-template` block on the server.
+ *
+ * @param array    $attributes Block attributes.
+ * @param string   $content    Block default content.
+ * @param WP_Block $block      Block instance.
+ *
+ * @return string Returns the HTML representing the comments using the layout
+ * defined by the block's inner blocks.
+ */
 function render_block_core_comment_template( $attributes, $content, $block ) {
 
 	// Get an array of comments for the current post.
-	$comments = get_approved_comments(get_the_ID());
+	$comments = get_approved_comments( get_the_ID() );
 
-	if (count($comments) == 0) {
+	if ( count( $comments ) === 0 ) {
 		return '';
 	}
-	
+
 	$content = '';
 	foreach ( $comments as $comment ) {
-		$block_content = (
-			new WP_Block(
-				$block->parsed_block,
-				array(
-					'commentId'  => $comment->comment_ID
-				)
+		$block_content = ( new WP_Block(
+			$block->parsed_block,
+			array(
+				'commentId' => $comment->comment_ID,
 			)
-		)->render( array( 'dynamic' => false ) );
-		$content .= '<li>' . $block_content . '</li>';
+		) )->render( array( 'dynamic' => false ) );
+		$content      .= '<li>' . $block_content . '</li>';
 	}
 
 	return sprintf(
 		'<ul>%1$s</ul>',
 		$content
 	);
-
 }
 
 /**
@@ -39,8 +46,8 @@ function render_block_core_comment_template( $attributes, $content, $block ) {
  */
 function register_block_core_comment_template() {
 	register_block_type_from_metadata(
-		__DIR__ . '/comment-template', 
-			array(
+		__DIR__ . '/comment-template',
+		array(
 			'render_callback'   => 'render_block_core_comment_template',
 			'skip_inner_blocks' => true,
 		)
