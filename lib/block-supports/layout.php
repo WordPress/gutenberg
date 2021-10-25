@@ -39,8 +39,9 @@ function gutenberg_get_layout_style( $selector, $layout, $has_block_gap_support 
 
 	$style = '';
 	if ( 'default' === $layout_type ) {
-		$content_size = isset( $layout['contentSize'] ) ? $layout['contentSize'] : null;
-		$wide_size    = isset( $layout['wideSize'] ) ? $layout['wideSize'] : null;
+		$content_size  = isset( $layout['contentSize'] ) ? $layout['contentSize'] : null;
+		$wide_size     = isset( $layout['wideSize'] ) ? $layout['wideSize'] : null;
+		$outer_padding = isset( $layout['outerPadding'] ) ? $layout['outerPadding'] : 0;
 
 		$all_max_width_value  = $content_size ? $content_size : $wide_size;
 		$wide_max_width_value = $wide_size ? $wide_size : $content_size;
@@ -52,14 +53,21 @@ function gutenberg_get_layout_style( $selector, $layout, $has_block_gap_support 
 
 		$style = '';
 		if ( $content_size || $wide_size ) {
-			$style  = "$selector > * {";
+			$style  = "$selector {";
+			$style .= "--wp-style-layout-outer-padding: $outer_padding;";
+			$style .= 'padding: 0 var(--wp-style-layout-outer-padding);';
+			$style .= '}';
+			$style .= "$selector > * {";
 			$style .= 'max-width: ' . esc_html( $all_max_width_value ) . ';';
 			$style .= 'margin-left: auto !important;';
 			$style .= 'margin-right: auto !important;';
 			$style .= '}';
-
 			$style .= "$selector > .alignwide { max-width: " . esc_html( $wide_max_width_value ) . ';}';
-			$style .= "$selector .alignfull { max-width: none; }";
+			$style .= "$selector .alignfull {";
+			$style .= 'max-width: none;';
+			$style .= 'margin-left: calc( -1 * var(--wp-style-layout-outer-padding) ) !important;';
+			$style .= 'margin-right: calc( -1 * var(--wp-style-layout-outer-padding) ) !important;';
+			$style .= '}';
 		}
 
 		$style .= "$selector .alignleft { float: left; margin-right: 2em; }";
