@@ -20,11 +20,6 @@
 	}
 }
 
-// This element is inline on the frontend but needs to be editable, therefore ensure that the RichText field is inline in the editor.
-.wp-block-navigation-item__label {
-	display: inline;
-}
-
 /**
  * Submenus.
  */

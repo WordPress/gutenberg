@@ -632,7 +632,6 @@ export default function NavigationLinkEdit( {
 								'core/image',
 								'core/strikethrough',
 							] }
-							tagName="span"
 							onClick={ () => {
 								if ( ! url ) {
 									setIsLinkOpen( true );
