@@ -172,10 +172,10 @@ export default function EntitiesSavedStates( { close } ) {
 			</div>
 
 			<div className="entities-saved-states__text-prompt">
-				<strong>{ __( 'Select the changes you want to save' ) }</strong>
+				<strong>{ __( 'Are you ready to save?' ) }</strong>
 				<p>
 					{ __(
-						'Some changes may affect other areas of your site.'
+						'The following changes have been made to your site, templates, and content.'
 					) }
 				</p>
 			</div>
