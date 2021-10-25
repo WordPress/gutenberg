@@ -224,8 +224,12 @@ export const WithSlotFillItems = () => {
 export { TypographyPanel } from './typography-panel';
 
 const PanelWrapperView = styled.div`
-	max-width: 270px;
+	max-width: 280px;
 	font-size: 13px;
+
+	.components-dropdown-menu__menu {
+		max-width: 220px;
+	}
 
 	.single-column {
 		grid-column: span 1;
