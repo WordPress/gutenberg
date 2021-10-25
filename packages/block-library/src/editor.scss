@@ -62,9 +62,21 @@
 	font-size: 42px;
 }
 
-/**
- * Editor Normalization Styles
- *
- * These are only output in the editor, but styles here are NOT prefixed .editor-styles-wrapper.
- * This allows us to create normalization styles that are easily overridden by editor styles.
- */
+// Ideally these shouldn't be needed and it should rely on the
+// .alignleft... classnames that are also available on the frontend.
+.wp-site-blocks > [data-align="full"],
+.wp-layout-default > [data-align="full"] {
+	max-width: none !important;
+}
+
+.wp-site-blocks > [data-align="left"],
+.wp-layout-default > [data-align="left"] {
+	float: left;
+	margin-right: 2em !important;
+}
+
+.wp-site-blocks > [data-align="right"],
+.wp-layout-default > [data-align="right"] {
+	float: right;
+	margin-left: 2em !important;
+}

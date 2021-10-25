@@ -91,19 +91,19 @@
 }
 
 // Default Flow Layout
-.wp-site-blocks > [data-align="full"],
-.wp-layout-default > [data-align="full"] {
+.wp-site-blocks > .alignfull,
+.wp-layout-default > .alignfull {
 	max-width: none;
 }
 
-.wp-site-blocks > [data-align="left"],
-.wp-layout-default > [data-align="left"] {
+.wp-site-blocks > .alignleft,
+.wp-layout-default > .alignleft {
 	float: left;
 	margin-right: 2em;
 }
 
-.wp-site-blocks > [data-align="right"],
-.wp-layout-default > [data-align="right"] {
+.wp-site-blocks > .alignright,
+.wp-layout-default > .alignright {
 	float: right;
 	margin-left: 2em;
 }
