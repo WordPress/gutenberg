@@ -18,7 +18,7 @@ import NavigationButton from './navigation-button';
 
 function ScreenHeader( { back, title, description } ) {
 	return (
-		<VStack spacing={ 2 } className="edit-site-global-styles-header">
+		<VStack spacing={ 2 }>
 			<HStack spacing={ 2 }>
 				<View>
 					<NavigationButton
