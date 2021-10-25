@@ -4,7 +4,8 @@ Are you interested in contributing to native mobile development? This
 guide is a detailed walk through designed to get you up and running!
 
 Note that the following instructions here are primarily focused on the
-OSX environment.
+OSX environment. For other environments, [the React Native quickstart documentation](https://reactnative.dev/docs/environment-setup)
+has helpful pointers and steps for getting set up.
 
 ## Install Xcode
 
@@ -83,7 +84,7 @@ npx @react-native-community/cli doctor
 
 [Add screenshot of cli doctor]
 
-See if doctor can fix both "common" and "iOS" issues. At this stage "Android" will still have ❌s for items.
+See if `doctor` can fix both "common" and "iOS" issues. (Don't worry if "Android" still has ❌s at this stage, we'll get to those later!)
 
 Once all common and iOS issues are resolved, try:
 
@@ -138,13 +139,15 @@ Export the following env variables and update $PATH. We can normally add this to
 in our terminal, or `.bash_profile` if the terminal is still using bash.
 
 ```sh
-export JAVA_HOME=/Applications/Android\ Studio.app/Contents/jre/jdk/Contents/Home
-export ANDROID_HOME=/Users/{your-username}/Library/Android/sdk
-export ANDROID_AVD_HOME=/Users/{your-username}/.android/avd
-export ANDROID_SDK_ROOT=/Users/{your-username}/Library/Android/sdk
-export ANDROID_NDK=/Users/{your-username}/Library/Android/ndk
-export PATH=$PATH:$ANDROID_HOME/tools:$ANDROID_HOME/platform-tools
-```
+### Java that comes with Android Studio:
+export JAVA_HOME=/Applications/Android\ Studio.app/Contents/jre/Contents/Home
+### Android Home is configurable in Android Studio. Go to Preferences > System Settings > Android SDK > Android SDK Location
+export ANDROID_HOME=$HOME/Library/Android/sdk
+export PATH=$PATH:$ANDROID_HOME/emulator
+export PATH=$PATH:$ANDROID_HOME/tools
+export PATH=$PATH:$ANDROID_HOME/tools/bin
+export PATH=$PATH:$ANDROID_HOME/platform-tools
+````
 
 Save then source, or open a new terminal to pick up changes.
 ```sh
@@ -185,7 +188,7 @@ Start metro:
 npm run native start:reset
 ```
 
-In another terminal run the following. The emulator doesn’t need to be launched previously.
+In another terminal run the following to launch the demo app in the Android emulator (if the emulator isn't already running, it'll also be launched as part of this command):
 
 ```
 npm run native android
