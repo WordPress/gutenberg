@@ -226,12 +226,6 @@ function Layout( { styles } ) {
 						{ isRichEditingEnabled && mode === 'visual' && (
 							<VisualEditorOrPluginPreview styles={ styles } />
 						) }
-						{ ! isTemplateMode && (
-							<div className="edit-post-layout__metaboxes">
-								<MetaBoxes location="normal" />
-								<MetaBoxes location="advanced" />
-							</div>
-						) }
 						{ isMobileViewport && sidebarIsOpened && (
 							<ScrollLock />
 						) }
