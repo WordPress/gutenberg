@@ -106,13 +106,18 @@ export default {
 		return null;
 	},
 	save: function DefaultLayoutStyle( { selector, layout = {} } ) {
-		const { contentSize, wideSize } = layout;
+		const { contentSize, wideSize, outerPadding = 0 } = layout;
 		const blockGapSupport = useSetting( 'spacing.blockGap' );
 		const hasBlockGapStylesSupport = blockGapSupport !== null;
 
 		let style =
 			!! contentSize || !! wideSize
 				? `
+					${ appendSelectors( selector ) } {
+						--wp-style-layout-outer-padding: ${ outerPadding };
+						padding: 0 var(--wp-style-layout-outer-padding);
+					}
+
 					${ appendSelectors( selector, '> *' ) } {
 						max-width: ${ contentSize ?? wideSize };
 						margin-left: auto !important;
@@ -125,6 +130,8 @@ export default {
 
 					${ appendSelectors( selector, '> [data-align="full"]' ) } {
 						max-width: none;
+						margin-left: calc( -1 * var(--wp-style-layout-outer-padding) ) !important;
+						margin-right: calc( -1 * var(--wp-style-layout-outer-padding) ) !important;
 					}
 				`
 				: '';

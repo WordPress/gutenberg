@@ -234,8 +234,9 @@ class WP_Theme_JSON_Gutenberg {
 		),
 		'custom'          => null,
 		'layout'          => array(
-			'contentSize' => null,
-			'wideSize'    => null,
+			'contentSize'  => null,
+			'wideSize'     => null,
+			'outerPadding' => null,
 		),
 		'spacing'         => array(
 			'blockGap' => null,
