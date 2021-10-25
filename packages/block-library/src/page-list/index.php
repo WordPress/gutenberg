@@ -250,6 +250,18 @@ function render_block_core_page_list( $attributes, $content, $block ) {
 		)
 	);
 
+	// $mapped_pages = array_map(
+	// function( $page ) {
+	// return array(
+	// 'title'  => $page->post_title,
+	// 'order'  => $page->menu_order,
+	// 'parent' => $page->parent,
+	// );
+	// },
+	// $all_pages
+	// );
+
+	// return '<div>' . json_encode( $mapped_pages ) . '</div>';
 	// If thare are no pages, there is nothing to show.
 	// Return early and empty to trigger EmptyResponsePlaceholder.
 	if ( empty( $all_pages ) ) {
