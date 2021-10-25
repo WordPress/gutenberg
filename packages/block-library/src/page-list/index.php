@@ -22,8 +22,8 @@ function block_core_page_list_build_css_colors( $attributes, $context ) {
 	);
 
 	// Text color.
-	$has_named_text_color  = array_key_exists( 'textColor', $attributes );
-	$has_picked_text_color = array_key_exists( 'customTextColor', $attributes );
+	$has_named_text_color  = array_key_exists( 'textColor', $context );
+	$has_picked_text_color = array_key_exists( 'customTextColor', $context );
 	$has_custom_text_color = isset( $context['style']['color']['text'] );
 
 	// If has text color.
@@ -34,17 +34,17 @@ function block_core_page_list_build_css_colors( $attributes, $context ) {
 
 	if ( $has_named_text_color ) {
 		// Add the color class.
-		$colors['css_classes'][] = sprintf( 'has-%s-color', gutenberg_experimental_to_kebab_case( $attributes['textColor'] ) );
+		$colors['css_classes'][] = sprintf( 'has-%s-color', gutenberg_experimental_to_kebab_case( $context['textColor'] ) );
 	} elseif ( $has_picked_text_color ) {
-		$colors['inline_styles'] .= sprintf( 'color: %s;', $attributes['customTextColor'] );
+		$colors['inline_styles'] .= sprintf( 'color: %s;', $context['customTextColor'] );
 	} elseif ( $has_custom_text_color ) {
 		// Add the custom color inline style.
 		$colors['inline_styles'] .= sprintf( 'color: %s;', $context['style']['color']['text'] );
 	}
 
 	// Background color.
-	$has_named_background_color  = array_key_exists( 'backgroundColor', $attributes );
-	$has_picked_background_color = array_key_exists( 'customBackgroundColor', $attributes );
+	$has_named_background_color  = array_key_exists( 'backgroundColor', $context );
+	$has_picked_background_color = array_key_exists( 'customBackgroundColor', $context );
 	$has_custom_background_color = isset( $context['style']['color']['background'] );
 
 	// If has background color.
@@ -55,17 +55,17 @@ function block_core_page_list_build_css_colors( $attributes, $context ) {
 
 	if ( $has_named_background_color ) {
 		// Add the background-color class.
-		$colors['css_classes'][] = sprintf( 'has-%s-background-color', gutenberg_experimental_to_kebab_case( $attributes['backgroundColor'] ) );
+		$colors['css_classes'][] = sprintf( 'has-%s-background-color', gutenberg_experimental_to_kebab_case( $context['backgroundColor'] ) );
 	} elseif ( $has_picked_background_color ) {
-		$colors['inline_styles'] .= sprintf( 'background-color: %s;', $attributes['customBackgroundColor'] );
+		$colors['inline_styles'] .= sprintf( 'background-color: %s;', $context['customBackgroundColor'] );
 	} elseif ( $has_custom_background_color ) {
 		// Add the custom background-color inline style.
 		$colors['inline_styles'] .= sprintf( 'background-color: %s;', $context['style']['color']['background'] );
 	}
 
 	// Overlay text color.
-	$has_named_overlay_text_color  = array_key_exists( 'overlayTextColor', $attributes );
-	$has_picked_overlay_text_color = array_key_exists( 'customOverlayTextColor', $attributes );
+	$has_named_overlay_text_color  = array_key_exists( 'overlayTextColor', $context );
+	$has_picked_overlay_text_color = array_key_exists( 'customOverlayTextColor', $context );
 
 	// If it has a text color.
 	if ( $has_named_overlay_text_color || $has_picked_overlay_text_color ) {
@@ -74,14 +74,14 @@ function block_core_page_list_build_css_colors( $attributes, $context ) {
 
 	// Give overlay colors priority, fall back to Navigation block colors, then global styles.
 	if ( $has_named_overlay_text_color ) {
-		$colors['overlay_css_classes'][] = sprintf( 'has-%s-color', gutenberg_experimental_to_kebab_case( $attributes['overlayTextColor'] ) );
+		$colors['overlay_css_classes'][] = sprintf( 'has-%s-color', gutenberg_experimental_to_kebab_case( $context['overlayTextColor'] ) );
 	} elseif ( $has_picked_overlay_text_color ) {
-		$colors['overlay_inline_styles'] .= sprintf( 'color: %s;', $attributes['customOverlayTextColor'] );
+		$colors['overlay_inline_styles'] .= sprintf( 'color: %s;', $context['customOverlayTextColor'] );
 	}
 
 	// Overlay background colors.
-	$has_named_overlay_background_color  = array_key_exists( 'overlayBackgroundColor', $attributes );
-	$has_picked_overlay_background_color = array_key_exists( 'customOverlayBackgroundColor', $attributes );
+	$has_named_overlay_background_color  = array_key_exists( 'overlayBackgroundColor', $context );
+	$has_picked_overlay_background_color = array_key_exists( 'customOverlayBackgroundColor', $context );
 
 	// If has background color.
 	if ( $has_named_overlay_background_color || $has_picked_overlay_background_color ) {
@@ -89,9 +89,9 @@ function block_core_page_list_build_css_colors( $attributes, $context ) {
 	}
 
 	if ( $has_named_overlay_background_color ) {
-		$colors['overlay_css_classes'][] = sprintf( 'has-%s-background-color', gutenberg_experimental_to_kebab_case( $attributes['overlayBackgroundColor'] ) );
+		$colors['overlay_css_classes'][] = sprintf( 'has-%s-background-color', gutenberg_experimental_to_kebab_case( $context['overlayBackgroundColor'] ) );
 	} elseif ( $has_picked_overlay_background_color ) {
-		$colors['overlay_inline_styles'] .= sprintf( 'background-color: %s;', $attributes['customOverlayBackgroundColor'] );
+		$colors['overlay_inline_styles'] .= sprintf( 'background-color: %s;', $context['customOverlayBackgroundColor'] );
 	}
 
 	return $colors;
@@ -238,20 +238,14 @@ function render_block_core_page_list( $attributes, $content, $block ) {
 	static $block_id = 0;
 	$block_id++;
 
-	// TODO: When https://core.trac.wordpress.org/ticket/39037 REST API support for multiple orderby values is resolved,
-	// update 'sort_column' to 'menu_order, post_title'. Sorting by both menu_order and post_title ensures a stable sort.
-	// Otherwise with pages that have the same menu_order value, we can see different ordering depending on how DB
-	// queries are constructed internally. For example we might see a different order when a limit is set to <499
-	// versus >= 500.
 	$all_pages = get_pages(
 		array(
-			'sort_column' => 'menu_order',
+			'sort_column' => 'menu_order,post_title',
 			'order'       => 'asc',
 		)
 	);
 
 	// If thare are no pages, there is nothing to show.
-	// Return early and empty to trigger EmptyResponsePlaceholder.
 	if ( empty( $all_pages ) ) {
 		return;
 	}
@@ -298,11 +292,11 @@ function render_block_core_page_list( $attributes, $content, $block ) {
 
 	$nested_pages = block_core_page_list_nest_pages( $top_level_pages, $pages_with_children );
 
-	$is_navigation_child = array_key_exists( 'isNavigationChild', $attributes ) ? $attributes['isNavigationChild'] : ! empty( $block->context );
+	$is_navigation_child = array_key_exists( 'showSubmenuIcon', $block->context );
 
-	$open_submenus_on_click = array_key_exists( 'openSubmenusOnClick', $attributes ) ? $attributes['openSubmenusOnClick'] : false;
+	$open_submenus_on_click = array_key_exists( 'openSubmenusOnClick', $block->context ) ? $block->context['openSubmenusOnClick'] : false;
 
-	$show_submenu_icons = array_key_exists( 'showSubmenuIcon', $attributes ) ? $attributes['showSubmenuIcon'] : false;
+	$show_submenu_icons = array_key_exists( 'showSubmenuIcon', $block->context ) ? $block->context['showSubmenuIcon'] : false;
 
 	$wrapper_markup = '<ul %1$s>%2$s</ul>';
 

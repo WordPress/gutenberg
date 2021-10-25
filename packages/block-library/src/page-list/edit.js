@@ -2,6 +2,7 @@
  * External dependencies
  */
 import classnames from 'classnames';
+import { sortBy } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -9,14 +10,11 @@ import classnames from 'classnames';
 import {
 	BlockControls,
 	useBlockProps,
-	store as blockEditorStore,
 	getColorClassName,
 } from '@wordpress/block-editor';
-import ServerSideRender from '@wordpress/server-side-render';
-import { ToolbarButton } from '@wordpress/components';
+import { ToolbarButton, Placeholder, Spinner } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-import { useEffect, useState } from '@wordpress/element';
-import { useSelect } from '@wordpress/data';
+import { useEffect, useState, memo } from '@wordpress/element';
 import apiFetch from '@wordpress/api-fetch';
 import { addQueryArgs } from '@wordpress/url';
 
@@ -24,116 +22,38 @@ import { addQueryArgs } from '@wordpress/url';
  * Internal dependencies
  */
 import ConvertToLinksModal from './convert-to-links-modal';
+import { ItemSubmenuIcon } from '../navigation-link/icons';
 
 // We only show the edit option when page count is <= MAX_PAGE_COUNT
 // Performance of Navigation Links is not good past this value.
 const MAX_PAGE_COUNT = 100;
 
-export default function PageListEdit( {
-	context,
-	clientId,
-	attributes,
-	setAttributes,
-} ) {
-	// Copy context to attributes to make it accessible in the editor's
-	// ServerSideRender
-	useEffect( () => {
-		const {
-			textColor,
-			customTextColor,
-			backgroundColor,
-			customBackgroundColor,
-			overlayTextColor,
-			customOverlayTextColor,
-			overlayBackgroundColor,
-			customOverlayBackgroundColor,
-		} = context;
-		setAttributes( {
-			textColor,
-			customTextColor,
-			backgroundColor,
-			customBackgroundColor,
-			overlayTextColor,
-			customOverlayTextColor,
-			overlayBackgroundColor,
-			customOverlayBackgroundColor,
-		} );
-	}, [
-		context.textColor,
-		context.customTextColor,
-		context.backgroundColor,
-		context.customBackgroundColor,
-		context.overlayTextColor,
-		context.customOverlayTextColor,
-		context.overlayBackgroundColor,
-		context.customOverlayBackgroundColor,
-	] );
+export default function PageListEdit( { context, clientId } ) {
+	const { pagesByParentId, totalPages } = usePagesByParentId();
 
-	const { textColor, backgroundColor, style } = context || {};
-
-	const [ allowConvertToLinks, setAllowConvertToLinks ] = useState( false );
-
-	const blockProps = useBlockProps( {
-		className: classnames( {
-			'has-text-color': !! textColor,
-			[ getColorClassName( 'color', textColor ) ]: !! textColor,
-			'has-background': !! backgroundColor,
-			[ getColorClassName(
-				'background-color',
-				backgroundColor
-			) ]: !! backgroundColor,
-		} ),
-		style: { ...style?.color },
-	} );
-
-	const isParentNavigation = useSelect(
-		( select ) => {
-			const { getBlockParentsByBlockName } = select( blockEditorStore );
-			return (
-				getBlockParentsByBlockName( clientId, 'core/navigation' )
-					.length > 0
-			);
-		},
-		[ clientId ]
-	);
-
-	useEffect( () => {
-		setAttributes( {
-			isNavigationChild: isParentNavigation,
-			openSubmenusOnClick: !! context.openSubmenusOnClick,
-			showSubmenuIcon: !! context.showSubmenuIcon,
-		} );
-	}, [ context.openSubmenusOnClick, context.showSubmenuIcon ] );
-
-	useEffect( () => {
-		if ( isParentNavigation ) {
-			apiFetch( {
-				path: addQueryArgs( '/wp/v2/pages', {
-					per_page: 1,
-					_fields: [ 'id' ],
-				} ),
-				parse: false,
-			} ).then( ( res ) => {
-				setAllowConvertToLinks(
-					res.headers.get( 'X-WP-Total' ) <= MAX_PAGE_COUNT
-				);
-			} );
-		} else {
-			setAllowConvertToLinks( false );
-		}
-	}, [ isParentNavigation ] );
+	const isNavigationChild = 'showSubmenuIcon' in context;
+	const allowConvertToLinks =
+		isNavigationChild && totalPages <= MAX_PAGE_COUNT;
 
 	const [ isOpen, setOpen ] = useState( false );
 	const openModal = () => setOpen( true );
 	const closeModal = () => setOpen( false );
 
-	// Update parent status before component first renders.
-	const attributesWithParentStatus = {
-		...attributes,
-		isNavigationChild: isParentNavigation,
-		openSubmenusOnClick: !! context.openSubmenusOnClick,
-		showSubmenuIcon: !! context.showSubmenuIcon,
-	};
+	const blockProps = useBlockProps( {
+		className: classnames( 'wp-block-page-list', {
+			'has-text-color': !! context.textColor,
+			[ getColorClassName(
+				'color',
+				context.textColor
+			) ]: !! context.textColor,
+			'has-background': !! context.backgroundColor,
+			[ getColorClassName(
+				'background-color',
+				context.backgroundColor
+			) ]: !! context.backgroundColor,
+		} ),
+		style: { ...context.style?.color },
+	} );
 
 	return (
 		<>
@@ -150,15 +70,150 @@ export default function PageListEdit( {
 					clientId={ clientId }
 				/>
 			) }
-			<div { ...blockProps }>
-				<ServerSideRender
-					block="core/page-list"
-					attributes={ attributesWithParentStatus }
-					EmptyResponsePlaceholder={ () => (
-						<span>{ __( 'Page List: No pages to show.' ) }</span>
-					) }
-				/>
-			</div>
+			{ totalPages === null && (
+				<div { ...blockProps }>
+					<Placeholder>
+						<Spinner />
+					</Placeholder>
+				</div>
+			) }
+			{ totalPages === 0 && (
+				<div { ...blockProps }>
+					<span>{ __( 'Page List: No pages to show.' ) }</span>
+				</div>
+			) }
+			{ totalPages > 0 && (
+				<ul { ...blockProps }>
+					<PageItems
+						context={ context }
+						pagesByParentId={ pagesByParentId }
+					/>
+				</ul>
+			) }
 		</>
+	);
+}
+
+function usePagesByParentId() {
+	const [ pagesByParentId, setPagesByParentId ] = useState( null );
+	const [ totalPages, setTotalPages ] = useState( null );
+
+	useEffect( () => {
+		async function performFetch() {
+			setPagesByParentId( null );
+			setTotalPages( null );
+
+			let pages = await apiFetch( {
+				path: addQueryArgs( '/wp/v2/pages', {
+					orderby: 'menu_order',
+					order: 'asc',
+					_fields: [ 'id', 'link', 'parent', 'title', 'menu_order' ],
+					per_page: -1,
+				} ),
+			} );
+
+			// TODO: Once the REST API supports passing multiple values to
+			// 'orderby', this can be removed.
+			// https://core.trac.wordpress.org/ticket/39037
+			pages = sortBy( pages, [ 'menu_order', 'title.rendered' ] );
+
+			setPagesByParentId(
+				pages.reduce( ( accumulator, page ) => {
+					const { parent } = page;
+					if ( accumulator.has( parent ) ) {
+						accumulator.get( parent ).push( page );
+					} else {
+						accumulator.set( parent, [ page ] );
+					}
+					return accumulator;
+				}, new Map() )
+			);
+			setTotalPages( pages.length );
+		}
+		performFetch();
+	}, [] );
+
+	return {
+		pagesByParentId,
+		totalPages,
+	};
+}
+
+const PageItems = memo( function PageItems( {
+	context,
+	pagesByParentId,
+	parentId = 0,
+	depth = 0,
+} ) {
+	const pages = pagesByParentId.get( parentId );
+
+	if ( ! pages?.length ) {
+		return [];
+	}
+
+	return pages.map( ( page ) => {
+		const hasChildren = pagesByParentId.has( page.id );
+		const isNavigationChild = 'showSubmenuIcon' in context;
+		return (
+			<li
+				key={ page.id }
+				className={ classnames( 'wp-block-pages-list__item', {
+					'has-child': hasChildren,
+					'wp-block-navigation-item': isNavigationChild,
+					'open-on-click': context.openSubmenusOnClick,
+					'open-on-hover-click':
+						! context.openSubmenusOnClick &&
+						context.showSubmenuIcon,
+				} ) }
+			>
+				{ hasChildren && context.openSubmenusOnClick ? (
+					<ItemSubmenuToggle title={ page.title?.rendered } />
+				) : (
+					<a
+						className={ classnames(
+							'wp-block-pages-list__item__link',
+							{
+								'wp-block-navigation-item__content': isNavigationChild,
+							}
+						) }
+						href={ page.link }
+					>
+						{ page.title?.rendered }
+					</a>
+				) }
+				{ hasChildren && (
+					<>
+						{ ! context.openSubmenusOnClick &&
+							context.showSubmenuIcon && <ItemSubmenuToggle /> }
+						<ul
+							className={ classnames( 'submenu-container', {
+								'wp-block-navigation__submenu-container': isNavigationChild,
+							} ) }
+						>
+							<PageItems
+								context={ context }
+								pagesByParentId={ pagesByParentId }
+								parentId={ page.id }
+								depth={ depth + 1 }
+							/>
+						</ul>
+					</>
+				) }
+			</li>
+		);
+	} );
+} );
+
+function ItemSubmenuToggle( { title } ) {
+	return (
+		<button
+			className="wp-block-navigation-item__content wp-block-navigation-submenu__toggle"
+			aria-expanded="false"
+		>
+			{ title }
+			<span className="wp-block-page-list__submenu-icon wp-block-navigation__submenu-icon">
+				<ItemSubmenuIcon />
+			</span>
+		</button>
 	);
 }
