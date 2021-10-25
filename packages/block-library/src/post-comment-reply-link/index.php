@@ -11,7 +11,7 @@
  * @param array    $attributes Block attributes.
  * @param string   $content    Block default content.
  * @param WP_Block $block      Block instance.
- * @return string Return the post comment's content.
+ * @return string Return the post comment's reply link.
  */
 function render_block_core_post_comment_reply_link( $attributes, $content, $block ) {
 	if ( ! isset( $block->context['commentId'] ) ) {
@@ -29,6 +29,7 @@ function render_block_core_post_comment_reply_link( $attributes, $content, $bloc
 	$max_depth = get_option( 'thread_comments_depth' );
 	$parent_id = $comment->comment_parent;
 
+	// Compute comment's depth iterating over its ancestors.
 	while ( 0 !== $parent_id ) {
 		$depth++;
 		$parent_id = get_comment( $parent_id )->comment_parent;
