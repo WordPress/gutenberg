@@ -154,11 +154,9 @@ const fetchLinkSuggestions = async (
 		);
 	}
 
-	return Promise.all( queries ).then( ( results ) => {
-		const filteredResults = applyFilters(
-			'editor.fetchLink.suggestions',
-			results,
-			search
+	return Promise.all( queries ).then( async ( results ) => {
+		const filteredResults = await Promise.resolve(
+			applyFilters( 'editor.fetchLink.suggestions', results, search )
 		);
 		return filteredResults
 			.reduce(
