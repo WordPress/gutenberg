@@ -1,4 +1,9 @@
 /**
+ * WordPress dependencies
+ */
+import { addFilter, removeFilter } from '@wordpress/hooks';
+
+/**
  * Internal dependencies
  */
 import fetchLinkSuggestions from '../__experimental-fetch-link-suggestions';
@@ -228,5 +233,68 @@ describe( 'fetchLinkSuggestions', () => {
 				},
 			] )
 		);
+	} );
+	it( 'returns results added by hooks', () => {
+		addFilter(
+			'editor.fetchLink.suggestions',
+			'plugin_link_suggestions',
+			( results ) => {
+				return results.concat( [
+					{
+						id: 'plugin_case',
+						url: 'https://www.example.com/',
+						title: 'Plugin Case',
+						type: 'custom_link',
+					},
+				] );
+			}
+		);
+
+		return fetchLinkSuggestions( '', {} ).then( ( suggestions ) => {
+			expect( suggestions[ suggestions.length - 1 ] ).toEqual( {
+				id: 'plugin_case',
+				title: 'Plugin Case',
+				url: 'https://www.example.com/',
+				type: 'custom_link',
+			} );
+			removeFilter(
+				'editor.fetchLink.suggestions',
+				'plugin_link_suggestions'
+			);
+		} );
+	} );
+	it( 'returns results added by async hooks', () => {
+		addFilter(
+			'editor.fetchLink.suggestions',
+			'plugin_link_suggestions',
+			( results ) => {
+				return new Promise( ( resolve ) => {
+					resolve(
+						results.concat( [
+							{
+								id: 'async_plugin_case',
+								url: 'https://www.example.com/',
+								title: 'Async Plugin Case',
+								type: 'custom_link',
+							},
+						] )
+					);
+				} );
+			}
+		);
+
+		return fetchLinkSuggestions( '', {} ).then( ( suggestions ) => {
+			expect( suggestions[ suggestions.length - 1 ] ).toEqual( {
+				id: 'async_plugin_case',
+				title: 'Async Plugin Case',
+				url: 'https://www.example.com/',
+				type: 'custom_link',
+			} );
+
+			removeFilter(
+				'editor.fetchLink.suggestions',
+				'plugin_link_suggestions'
+			);
+		} );
 	} );
 } );
