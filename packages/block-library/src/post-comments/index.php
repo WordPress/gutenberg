@@ -39,7 +39,13 @@ function render_block_core_post_comments( $attributes, $content, $block ) {
 		$classes .= 'has-text-align-' . $attributes['textAlign'];
 	}
 	if ( ! comments_open( $post_id ) && ! empty( $attributes['hideCommentsClosed'] ) && $attributes['hideCommentsClosed'] ) {
-		$classes .= 'hide-comments-closed';
+		$args = array(
+			'post_id' => $post_id,
+			'count'   => true,
+		);
+		if ( ! get_comments( $args ) ) {
+			return;
+		}
 	}
 
 	$wrapper_attributes = get_block_wrapper_attributes( array( 'class' => $classes ) );
