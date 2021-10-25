@@ -236,7 +236,7 @@ describe( 'fetchLinkSuggestions', () => {
 	} );
 	it( 'returns results added by hooks', () => {
 		addFilter(
-			'editor.fetchLink.suggestions',
+			'experimentalEditor.fetchLink.suggestions',
 			'plugin_link_suggestions',
 			( results ) => {
 				return results.concat( [
@@ -258,14 +258,14 @@ describe( 'fetchLinkSuggestions', () => {
 				type: 'custom_link',
 			} );
 			removeFilter(
-				'editor.fetchLink.suggestions',
+				'experimentalEditor.fetchLink.suggestions',
 				'plugin_link_suggestions'
 			);
 		} );
 	} );
 	it( 'returns results added by async hooks', () => {
 		addFilter(
-			'editor.fetchLink.suggestions',
+			'experimentalEditor.fetchLink.suggestions',
 			'plugin_link_suggestions',
 			( results ) => {
 				return new Promise( ( resolve ) => {
@@ -292,7 +292,7 @@ describe( 'fetchLinkSuggestions', () => {
 			} );
 
 			removeFilter(
-				'editor.fetchLink.suggestions',
+				'experimentalEditor.fetchLink.suggestions',
 				'plugin_link_suggestions'
 			);
 		} );
