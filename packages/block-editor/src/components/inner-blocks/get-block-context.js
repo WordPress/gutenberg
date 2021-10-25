@@ -27,14 +27,13 @@ export default function getBlockContext( attributes, blockType ) {
 
 	const blockTypeCache = BLOCK_CONTEXT_CACHE.get( blockType );
 	if ( ! blockTypeCache.has( attributes ) ) {
-		const blockProvidesContext = {
-			...blockType.providesContext,
+		const context = {
+			...mapValues(
+				blockType.providesContext,
+				( attributeName ) => attributes[ attributeName ]
+			),
 			...blockType.providesContextConstants,
 		};
-		const context = mapValues(
-			blockProvidesContext,
-			( attributeName ) => attributes[ attributeName ]
-		);
 
 		blockTypeCache.set( attributes, context );
 	}
