@@ -233,7 +233,7 @@ describe( 'Widgets screen', () => {
 		}
 	` );
 
-		expect( console ).toHaveErrored( twentyTwentyError );
+		expect( console ).toHaveWarned( twentyTwentyError );
 	} );
 
 	it.skip( 'Should insert content using the inline inserter', async () => {
@@ -602,7 +602,7 @@ describe( 'Widgets screen', () => {
 			].join( '\n' )
 		);
 
-		expect( console ).toHaveErrored( twentyTwentyError );
+		expect( console ).toHaveWarned( twentyTwentyError );
 	} );
 
 	it( 'Should display legacy widgets', async () => {
@@ -778,7 +778,7 @@ describe( 'Widgets screen', () => {
 		}
 	` );
 
-		expect( console ).toHaveErrored( twentyTwentyError );
+		expect( console ).toHaveWarned( twentyTwentyError );
 	} );
 
 	it( 'Allows widget deletion to be undone', async () => {
@@ -839,7 +839,7 @@ describe( 'Widgets screen', () => {
 		}
 	` );
 
-		expect( console ).toHaveErrored( twentyTwentyError );
+		expect( console ).toHaveWarned( twentyTwentyError );
 	} );
 
 	it( 'can toggle sidebar list view', async () => {
