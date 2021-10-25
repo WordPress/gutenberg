@@ -22,7 +22,7 @@ data class GutenbergProps @JvmOverloads constructor(
     val editorTheme: Bundle?,
     val translations: Bundle,
     val isDarkMode: Boolean,
-    val htmlModeEnabled: Boolean,
+    val htmlModeEnabled: Boolean
 ) {
 
     fun getInitialProps(bundle: Bundle?) = (bundle ?: Bundle()).apply {
