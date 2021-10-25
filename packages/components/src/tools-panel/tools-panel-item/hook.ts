@@ -117,7 +117,6 @@ export function useToolsPanelItem(
 			shouldRenderPlaceholder &&
 			! isShown &&
 			styles.ToolsPanelItemPlaceholder;
-
 		return cx( styles.ToolsPanelItem, placeholderStyle, className );
 	}, [ isShown, shouldRenderPlaceholder, className ] );
 
