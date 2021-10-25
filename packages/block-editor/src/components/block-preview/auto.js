@@ -16,7 +16,11 @@ import { store } from '../../store';
 // This is used to avoid rendering the block list if the sizes change.
 let MemoizedBlockList;
 
-function AutoBlockPreview( { viewportWidth, __experimentalPadding } ) {
+function AutoBlockPreview( {
+	viewportWidth,
+	__experimentalPadding,
+	__experimentalIsRootContainer,
+} ) {
 	const [
 		containerResizeListener,
 		{ width: containerWidth },
@@ -65,7 +69,12 @@ function AutoBlockPreview( { viewportWidth, __experimentalPadding } ) {
 					} }
 				>
 					{ contentResizeListener }
-					<MemoizedBlockList renderAppender={ false } />
+					<MemoizedBlockList
+						renderAppender={ false }
+						__experimentalIsRootContainer={
+							__experimentalIsRootContainer
+						}
+					/>
 				</Iframe>
 			</Disabled>
 		</div>

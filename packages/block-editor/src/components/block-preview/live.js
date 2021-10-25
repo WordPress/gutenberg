@@ -8,7 +8,10 @@ import { Disabled } from '@wordpress/components';
  */
 import BlockList from '../block-list';
 
-export default function LiveBlockPreview( { onClick } ) {
+export default function LiveBlockPreview( {
+	onClick,
+	__experimentalIsRootContainer,
+} ) {
 	return (
 		<div
 			tabIndex={ 0 }
@@ -17,7 +20,12 @@ export default function LiveBlockPreview( { onClick } ) {
 			onKeyPress={ onClick }
 		>
 			<Disabled>
-				<BlockList />
+				<BlockList
+					renderAppender={ false }
+					__experimentalIsRootContainer={
+						__experimentalIsRootContainer
+					}
+				/>
 			</Disabled>
 		</div>
 	);

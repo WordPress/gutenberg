@@ -23,6 +23,7 @@ export function BlockPreview( {
 	viewportWidth = 1200,
 	__experimentalLive = false,
 	__experimentalOnClick,
+	__experimentalIsRootContainer = true,
 } ) {
 	const originalSettings = useSelect(
 		( select ) => select( blockEditorStore ).getSettings(),
@@ -40,11 +41,19 @@ export function BlockPreview( {
 	return (
 		<BlockEditorProvider value={ renderedBlocks } settings={ settings }>
 			{ __experimentalLive ? (
-				<LiveBlockPreview onClick={ __experimentalOnClick } />
+				<LiveBlockPreview
+					onClick={ __experimentalOnClick }
+					__experimentalIsRootContainer={
+						__experimentalIsRootContainer
+					}
+				/>
 			) : (
 				<AutoHeightBlockPreview
 					viewportWidth={ viewportWidth }
 					__experimentalPadding={ __experimentalPadding }
+					__experimentalIsRootContainer={
+						__experimentalIsRootContainer
+					}
 				/>
 			) }
 		</BlockEditorProvider>

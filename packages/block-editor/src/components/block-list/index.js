@@ -31,7 +31,11 @@ const elementContext = createContext();
 
 export const IntersectionObserver = createContext();
 
-function Root( { className, ...settings } ) {
+function Root( {
+	className,
+	__experimentalIsRootContainer = true,
+	...settings
+} ) {
 	const [ element, setElement ] = useState();
 	const isLargeViewport = useViewportMatch( 'medium' );
 	const { isOutlineMode, isFocusMode, isNavigationMode } = useSelect(
@@ -55,7 +59,8 @@ function Root( { className, ...settings } ) {
 				useInBetweenInserter(),
 				setElement,
 			] ),
-			className: classnames( 'is-root-container', className, {
+			className: classnames( className, {
+				'is-root-container': __experimentalIsRootContainer,
 				'is-outline-mode': isOutlineMode,
 				'is-focus-mode': isFocusMode && isLargeViewport,
 				'is-navigate-mode': isNavigationMode,

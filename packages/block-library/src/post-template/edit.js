@@ -158,6 +158,7 @@ export default function PostTemplateEdit( {
 									__experimentalOnClick={ () =>
 										setActiveBlockContext( blockContext )
 									}
+									__experimentalIsRootContainer={ false }
 								/>
 							</li>
 						) }
