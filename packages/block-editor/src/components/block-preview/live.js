@@ -8,10 +8,10 @@ import { Disabled } from '@wordpress/components';
  */
 import BlockList from '../block-list';
 
-export default function LiveBlockPreview( { onClick } ) {
+export default function LiveBlockPreview( { onClick, tabIndex = 0 } ) {
 	return (
 		<div
-			tabIndex={ 0 }
+			tabIndex={ tabIndex }
 			role="button"
 			onClick={ onClick }
 			onKeyPress={ onClick }

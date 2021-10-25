@@ -14,6 +14,7 @@ import {
 	Warning,
 } from '@wordpress/block-editor';
 import { useEntityProp, useEntityBlockEditor } from '@wordpress/core-data';
+import { useMemo } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -27,13 +28,12 @@ function ReadOnlyContent( { userCanEdit, postType, postId } ) {
 		'content',
 		postId
 	);
-	const blockProps = useBlockProps();
+	const blockProps = useBlockProps( { className: 'is-readonly' } );
 
-	let blocks;
-
-	if ( content?.raw ) {
-		blocks = parse( content.raw );
-	}
+	const rawContent = content?.raw;
+	const blocks = useMemo( () => {
+		return rawContent ? parse( rawContent ) : [];
+	}, [ rawContent ] );
 
 	return content?.protected && ! userCanEdit ? (
 		<div { ...blockProps }>
@@ -41,7 +41,12 @@ function ReadOnlyContent( { userCanEdit, postType, postId } ) {
 		</div>
 	) : (
 		<div { ...blockProps }>
-			<BlockPreview blocks={ blocks } __experimentalLive={ true } />
+			<BlockPreview
+				blocks={ blocks }
+				tabIndex={ -1 }
+				__experimentalLive={ true }
+				__experimentalIsDisabled={ false }
+			/>
 		</div>
 	);
 }
