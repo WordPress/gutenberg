@@ -92,6 +92,7 @@ export function BorderColorEdit( props ) {
 			disableCustomColors={ disableCustomColors }
 			disableCustomGradients={ disableCustomGradients }
 			onColorChange={ onChangeColor }
+			clearable={ false }
 		/>
 	);
 }
