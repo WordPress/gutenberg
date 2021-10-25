@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { useDispatch, useSelect } from '@wordpress/data';
+import { useSelect } from '@wordpress/data';
 import { store as editorStore } from '@wordpress/editor';
 import { useRef } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
@@ -11,45 +11,30 @@ import {
 	Dropdown,
 	Button,
 	VisuallyHidden,
-	TextControl,
 	__experimentalText as Text,
 } from '@wordpress/components';
 
 /**
- * External dependencies
+ * Internal dependencies
  */
-import { noop } from 'lodash';
-
-const EditPostTitlePanel = ( { entityTitle, onChange = noop } ) => {
-	return (
-		<div className="edit-post-title-panel">
-			<TextControl
-				className=""
-				label={ __( 'Title' ) }
-				value={ entityTitle ?? '' }
-				min={ 1 }
-				onChange={ onChange }
-			/>
-		</div>
-	);
-};
+import EditPostTitle from './edit-post-title';
 
 function PostTitle() {
-	const { editPost } = useDispatch( editorStore );
+	const { entityTitle, entityLabel, isLoaded } = useSelect( ( select ) => {
+		const { getEditedPostAttribute } = select( editorStore );
+		const postId = getEditedPostAttribute( 'id' );
+		const _isLoaded = !! postId;
 
-	const { entityTitle, entityLabel } = useSelect(
-		( select ) => ( {
-			entityTitle: select( editorStore ).getEditedPostAttribute(
-				'title'
-			),
-			entityLabel: select( editorStore ).getEditedPostAttribute( 'type' ),
-		} ),
-		[]
-	);
+		return {
+			entityTitle: getEditedPostAttribute( 'title' ),
+			entityLabel: getEditedPostAttribute( 'type' ),
+			isLoaded: _isLoaded,
+		};
+	}, [] );
 
 	const titleRef = useRef();
 
-	if ( ! entityTitle ) {
+	if ( ! isLoaded ) {
 		return (
 			<div className="edit-post-title-actions">{ __( 'Loading…' ) }</div>
 		);
@@ -62,7 +47,7 @@ function PostTitle() {
 				className="edit-post-title-actions__title-wrapper"
 			>
 				<Text
-					variant="body.small"
+					size="body"
 					className="edit-post-title-actions__title-prefix"
 				>
 					<VisuallyHidden as="span">
@@ -75,11 +60,11 @@ function PostTitle() {
 				</Text>
 
 				<Text
-					variant="body.small"
+					size="body"
 					className="edit-post-title-actions__title"
 					as="h1"
 				>
-					{ entityTitle.length === 0
+					{ ! entityTitle || entityTitle.length === 0
 						? __( 'No Title' )
 						: entityTitle }
 				</Text>
@@ -96,22 +81,11 @@ function PostTitle() {
 							aria-expanded={ isOpen }
 							aria-haspopup="true"
 							onClick={ onToggle }
-							label={ sprintf(
-								/* translators: %s: the entity to see details about, like "template"*/
-								__( 'Show %s details' ),
-								entityLabel
-							) }
+							label={ __( 'Edit Title' ) }
 						/>
 					) }
 					contentClassName="edit-post-title-actions__info-dropdown"
-					renderContent={ () => (
-						<EditPostTitlePanel
-							entityTitle={ entityTitle }
-							onChange={ ( value ) =>
-								editPost( { title: value } )
-							}
-						/>
-					) }
+					renderContent={ () => <EditPostTitle /> }
 				/>
 			</div>
 		</div>
