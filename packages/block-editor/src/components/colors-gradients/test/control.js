@@ -10,14 +10,6 @@ import { noop } from 'lodash';
  */
 import ColorGradientControl from '../control';
 
-const getButtonWithTestPredicate = ( text ) => ( element ) => {
-	return (
-		element.type === 'button' &&
-		element.children[ 0 ] === text &&
-		element.children.length === 1
-	);
-};
-
 const getButtonWithAriaLabelStartPredicate = ( ariaLabelStart ) => (
 	element
 ) => {
@@ -76,9 +68,6 @@ describe( 'ColorPaletteControl', () => {
 
 		// Is showing the two predefined Colors.
 		expect( screen.getAllByLabelText( /^Color:/ ) ).toHaveLength( 2 );
-
-		// Is showing the custom color picker.
-		expect( screen.queryByText( 'Custom color' ) ).toBeInTheDocument();
 	} );
 
 	it( 'renders the color picker and does not render tabs if it is only possible to select a color', async () => {
@@ -116,11 +105,6 @@ describe( 'ColorPaletteControl', () => {
 				getButtonWithAriaLabelStartPredicate( 'Color:' )
 			)
 		).toHaveLength( 2 );
-
-		// Is showing the custom color picker.
-		expect(
-			wrapper.root.findAll( getButtonWithTestPredicate( 'Custom color' ) )
-		).toHaveLength( 1 );
 	} );
 
 	it( 'renders the gradient picker and does not render tabs if it is only possible to select a gradient', async () => {

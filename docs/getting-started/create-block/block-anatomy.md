@@ -75,4 +75,4 @@ __( 'Gutenpride – hello from the saved content!', 'gutenpride' );
 
 This is an internationalization wrapper that allows for the string "Gutenpride" to be translated. The second parameter, "gutenpride" is called the text domain and gives context for where the string is from. The JavaScript internationalization, often abbreviated i18n, matches the core WordPress internationalization process. See the [Internationalization in Plugin Developer Handbook](https://developer.wordpress.org/plugins/internationalization/) for more details.
 
-Next Section: [Block Attributes](/docs/getting-started/tutorials/create-block/attributes.md)
+Next Section: [Block Attributes](/docs/getting-started/create-block/attributes.md)
