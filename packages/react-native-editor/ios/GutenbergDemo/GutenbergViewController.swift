@@ -316,6 +316,10 @@ extension GutenbergViewController: GutenbergBridgeDataSource {
             .mediaFilesCollectionBlock: true,
             .isAudioBlockMediaUploadEnabled: true,
             .reusableBlock: false,
+            .facebookEmbed: true,
+            .instagramEmbed: true,
+            .loomEmbed: true,
+            .smartframeEmbed: true,
         ]
     }
 

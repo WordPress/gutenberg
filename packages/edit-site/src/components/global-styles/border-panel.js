@@ -16,7 +16,7 @@ import { __ } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
-import { useSetting } from '../editor/utils';
+import { getSupportedGlobalStylesPanels, useSetting, useStyle } from './hooks';
 
 const MIN_BORDER_WIDTH = 0;
 
@@ -24,72 +24,82 @@ const MIN_BORDER_WIDTH = 0;
 // color control.
 const EMPTY_ARRAY = [];
 
-export function useHasBorderPanel( { supports, name } ) {
+export function useHasBorderPanel( name ) {
 	const controls = [
-		useHasBorderColorControl( { supports, name } ),
-		useHasBorderRadiusControl( { supports, name } ),
-		useHasBorderStyleControl( { supports, name } ),
-		useHasBorderWidthControl( { supports, name } ),
+		useHasBorderColorControl( name ),
+		useHasBorderRadiusControl( name ),
+		useHasBorderStyleControl( name ),
+		useHasBorderWidthControl( name ),
 	];
 
 	return controls.some( Boolean );
 }
 
-function useHasBorderColorControl( { supports, name } ) {
+function useHasBorderColorControl( name ) {
+	const supports = getSupportedGlobalStylesPanels( name );
 	return (
-		useSetting( 'border.customColor', name ) &&
+		useSetting( 'border.customColor', name )[ 0 ] &&
 		supports.includes( 'borderColor' )
 	);
 }
 
-function useHasBorderRadiusControl( { supports, name } ) {
+function useHasBorderRadiusControl( name ) {
+	const supports = getSupportedGlobalStylesPanels( name );
 	return (
-		useSetting( 'border.customRadius', name ) &&
+		useSetting( 'border.customRadius', name )[ 0 ] &&
 		supports.includes( 'borderRadius' )
 	);
 }
 
-function useHasBorderStyleControl( { supports, name } ) {
+function useHasBorderStyleControl( name ) {
+	const supports = getSupportedGlobalStylesPanels( name );
 	return (
-		useSetting( 'border.customStyle', name ) &&
+		useSetting( 'border.customStyle', name )[ 0 ] &&
 		supports.includes( 'borderStyle' )
 	);
 }
 
-function useHasBorderWidthControl( { supports, name } ) {
+function useHasBorderWidthControl( name ) {
+	const supports = getSupportedGlobalStylesPanels( name );
 	return (
-		useSetting( 'border.customWidth', name ) &&
+		useSetting( 'border.customWidth', name )[ 0 ] &&
 		supports.includes( 'borderWidth' )
 	);
 }
 
-export default function BorderPanel( {
-	context: { supports, name },
-	getStyle,
-	setStyle,
-} ) {
+export default function BorderPanel( { name } ) {
 	const units = useCustomUnits( {
-		availableUnits: useSetting( 'spacing.units' ) || [ 'px', 'em', 'rem' ],
+		availableUnits: useSetting( 'spacing.units' )[ 0 ] || [
+			'px',
+			'em',
+			'rem',
+		],
 	} );
 
 	// Border width.
-	const hasBorderWidth = useHasBorderWidthControl( { supports, name } );
-	const borderWidthValue = getStyle( name, 'borderWidth' );
+	const hasBorderWidth = useHasBorderWidthControl( name );
+	const [ borderWidthValue, setBorderWidth ] = useStyle(
+		'border.width',
+		name
+	);
 
 	// Border style.
-	const hasBorderStyle = useHasBorderStyleControl( { supports, name } );
-	const borderStyle = getStyle( name, 'borderStyle' );
+	const hasBorderStyle = useHasBorderStyleControl( name );
+	const [ borderStyle, setBorderStyle ] = useStyle( 'border.style', name );
 
 	// Border color.
-	const colors = useSetting( 'color.palette' ) || EMPTY_ARRAY;
-	const disableCustomColors = ! useSetting( 'color.custom' );
-	const disableCustomGradients = ! useSetting( 'color.customGradient' );
-	const hasBorderColor = useHasBorderColorControl( { supports, name } );
-	const borderColor = getStyle( name, 'borderColor' );
+	const [ colors = EMPTY_ARRAY ] = useSetting( 'color.palette' );
+	const disableCustomColors = ! useSetting( 'color.custom' )[ 0 ];
+	const disableCustomGradients = ! useSetting( 'color.customGradient' )[ 0 ];
+	const hasBorderColor = useHasBorderColorControl( name );
+	const [ borderColor, setBorderColor ] = useStyle( 'border.color', name );
 
 	// Border radius.
-	const hasBorderRadius = useHasBorderRadiusControl( { supports, name } );
-	const borderRadiusValues = getStyle( name, 'borderRadius' );
+	const hasBorderRadius = useHasBorderRadiusControl( name );
+	const [ borderRadiusValues, setBorderRadius ] = useStyle(
+		'border.radius',
+		name
+	);
 
 	return (
 		<PanelBody title={ __( 'Border' ) } initialOpen={ true }>
@@ -101,11 +111,7 @@ export default function BorderPanel( {
 							label={ __( 'Width' ) }
 							min={ MIN_BORDER_WIDTH }
 							onChange={ ( value ) => {
-								setStyle(
-									name,
-									'borderWidth',
-									value || undefined
-								);
+								setBorderWidth( value || undefined );
 							} }
 							units={ units }
 						/>
@@ -113,9 +119,7 @@ export default function BorderPanel( {
 					{ hasBorderStyle && (
 						<BorderStyleControl
 							value={ borderStyle }
-							onChange={ ( value ) =>
-								setStyle( name, 'borderStyle', value )
-							}
+							onChange={ setBorderStyle }
 						/>
 					) }
 				</div>
@@ -128,17 +132,13 @@ export default function BorderPanel( {
 					gradients={ undefined }
 					disableCustomColors={ disableCustomColors }
 					disableCustomGradients={ disableCustomGradients }
-					onColorChange={ ( value ) =>
-						setStyle( name, 'borderColor', value )
-					}
+					onColorChange={ setBorderColor }
 				/>
 			) }
 			{ hasBorderRadius && (
 				<BorderRadiusControl
 					values={ borderRadiusValues }
-					onChange={ ( value ) =>
-						setStyle( name, 'borderRadius', value )
-					}
+					onChange={ setBorderRadius }
 				/>
 			) }
 		</PanelBody>

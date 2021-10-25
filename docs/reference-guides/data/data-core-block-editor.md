@@ -1105,7 +1105,7 @@ _Returns_
 
 ### clearSelectedBlock
 
-Returns an action object used in signalling that the block selection is cleared.
+Action that clears the block selection.
 
 _Returns_
 
@@ -1113,7 +1113,7 @@ _Returns_
 
 ### duplicateBlocks
 
-Generator that triggers an action used to duplicate a list of blocks.
+Action that duplicates a list of blocks.
 
 _Parameters_
 
@@ -1138,8 +1138,7 @@ _Returns_
 
 ### flashBlock
 
-Yields action objects used in signalling that the block corresponding to the
-given clientId should appear to "flash" by rhythmically highlighting it.
+Action that "flashes" the block with a given `clientId` by rhythmically highlighting it.
 
 _Parameters_
 
@@ -1147,7 +1146,7 @@ _Parameters_
 
 ### hideInsertionPoint
 
-Returns an action object hiding the insertion point.
+Action that hides the insertion point.
 
 _Returns_
 
@@ -1155,7 +1154,7 @@ _Returns_
 
 ### insertAfterBlock
 
-Generator used to insert an empty block before a given block.
+Action that inserts an empty block after a given block.
 
 _Parameters_
 
@@ -1163,7 +1162,7 @@ _Parameters_
 
 ### insertBeforeBlock
 
-Generator used to insert an empty block after a given block.
+Action that inserts an empty block before a given block.
 
 _Parameters_
 
@@ -1171,8 +1170,7 @@ _Parameters_
 
 ### insertBlock
 
-Returns an action object used in signalling that a single block should be
-inserted, optionally at a specific index respective a root block list.
+Action that inserts a single block, optionally at a specific index respective a root block list.
 
 _Parameters_
 
@@ -1188,8 +1186,7 @@ _Returns_
 
 ### insertBlocks
 
-Returns an action object used in signalling that an array of blocks should
-be inserted, optionally at a specific index respective a root block list.
+Action that inserts an array of blocks, optionally at a specific index respective a root block list.
 
 _Parameters_
 
@@ -1206,8 +1203,7 @@ _Returns_
 
 ### insertDefaultBlock
 
-Returns an action object used in signalling that a new block of the default
-type should be added to the block list.
+Action that adds a new block of the default type to the block list.
 
 _Parameters_
 
@@ -1221,7 +1217,7 @@ _Returns_
 
 ### mergeBlocks
 
-Returns an action object used in signalling that two blocks should be merged
+Action that merges two blocks.
 
 _Parameters_
 
@@ -1234,8 +1230,7 @@ Undocumented declaration.
 
 ### moveBlocksToPosition
 
-Returns an action object signalling that the given blocks should be moved to
-a new position.
+Action that moves given blocks to a new position.
 
 _Parameters_
 
@@ -1250,8 +1245,7 @@ Undocumented declaration.
 
 ### moveBlockToPosition
 
-Returns an action object signalling that the given block should be moved to a
-new position.
+Action that moves given block to a new position.
 
 _Parameters_
 
@@ -1262,7 +1256,7 @@ _Parameters_
 
 ### multiSelect
 
-Returns an action object used in signalling that block multi-selection changed.
+Action that changes block multi-selection.
 
 _Parameters_
 
@@ -1311,8 +1305,7 @@ _Parameters_
 
 ### replaceBlock
 
-Returns an action object signalling that a single block should be replaced
-with one or more replacement blocks.
+Action that replaces a single block with one or more replacement blocks.
 
 _Parameters_
 
@@ -1325,8 +1318,7 @@ _Returns_
 
 ### replaceBlocks
 
-Returns an action object signalling that a blocks should be replaced with
-one or more replacement blocks.
+Action that replaces given blocks with one or more replacement blocks.
 
 _Parameters_
 
@@ -1335,6 +1327,10 @@ _Parameters_
 -   _indexToSelect_ `number`: Index of replacement block to select.
 -   _initialPosition_ `0|-1|null`: Index of caret after in the selected block after the operation.
 -   _meta_ `?Object`: Optional Meta values to be passed to the action object.
+
+_Returns_
+
+-   `Object`: Action object.
 
 ### replaceInnerBlocks
 
@@ -1354,9 +1350,8 @@ _Returns_
 
 ### resetBlocks
 
-Returns an action object used in signalling that blocks state should be
-reset to the specified array of blocks, taking precedence over any other
-content reflected as an edit in state.
+Action that resets blocks state to the specified array of blocks, taking precedence
+over any other content reflected as an edit in state.
 
 _Parameters_
 
@@ -1395,8 +1390,7 @@ _Returns_
 
 ### selectionChange
 
-Returns an action object used in signalling that the user caret has changed
-position.
+Action that changes the position of the user caret.
 
 _Parameters_
 
@@ -1429,7 +1423,7 @@ _Parameters_
 
 ### setBlockMovingClientId
 
-Generator that triggers an action used to enable or disable the block moving mode.
+Action that enables or disables the block moving mode.
 
 _Parameters_
 
@@ -1437,7 +1431,7 @@ _Parameters_
 
 ### setHasControlledInnerBlocks
 
-Returns an action object that sets whether the block has controlled innerblocks.
+Action that sets whether a block has controlled inner blocks.
 
 _Parameters_
 
@@ -1446,7 +1440,7 @@ _Parameters_
 
 ### setNavigationMode
 
-Generators that triggers an action used to enable or disable the navigation mode.
+Action that enables or disables the navigation mode.
 
 _Parameters_
 
@@ -1454,7 +1448,7 @@ _Parameters_
 
 ### setTemplateValidity
 
-Returns an action object resetting the template validity.
+Action that resets the template validity.
 
 _Parameters_
 
@@ -1466,8 +1460,7 @@ _Returns_
 
 ### showInsertionPoint
 
-Returns an action object used in signalling that the insertion point should
-be shown.
+Action that shows the insertion point.
 
 _Parameters_
 
@@ -1493,7 +1486,7 @@ _Returns_
 
 ### startMultiSelect
 
-Returns an action object used in signalling that a block multi-selection has started.
+Action that starts block multi-selection.
 
 _Returns_
 
@@ -1517,7 +1510,7 @@ _Returns_
 
 ### stopMultiSelect
 
-Returns an action object used in signalling that block multi-selection stopped.
+Action that stops block multi-selection.
 
 _Returns_
 
@@ -1533,7 +1526,7 @@ _Returns_
 
 ### synchronizeTemplate
 
-Returns an action object synchronize the template with the list of blocks
+Action that synchronizes the template with the list of blocks.
 
 _Returns_
 
@@ -1541,7 +1534,7 @@ _Returns_
 
 ### toggleBlockHighlight
 
-Returns an action object that toggles the highlighted block state.
+Action that toggles the highlighted block state.
 
 _Parameters_
 
@@ -1563,7 +1556,7 @@ _Returns_
 
 ### toggleSelection
 
-Returns an action object that enables or disables block selection.
+Action that enables or disables block selection.
 
 _Parameters_
 
@@ -1575,8 +1568,7 @@ _Returns_
 
 ### updateBlock
 
-Returns an action object used in signalling that the block with the
-specified client ID has been updated.
+Action that updates the block with the specified client ID.
 
 _Parameters_
 
@@ -1589,8 +1581,7 @@ _Returns_
 
 ### updateBlockAttributes
 
-Returns an action object used in signalling that the multiple blocks'
-attributes with the specified client IDs have been updated.
+Action that updates attributes of multiple blocks with the specified client IDs.
 
 _Parameters_
 
@@ -1604,7 +1595,7 @@ _Returns_
 
 ### updateBlockListSettings
 
-Returns an action object that changes the nested settings of a given block.
+Action that changes the nested settings of a given block.
 
 _Parameters_
 
@@ -1617,7 +1608,7 @@ _Returns_
 
 ### updateSettings
 
-Returns an action object used in signalling that the block editor settings have been updated.
+Action that updates the block editor settings.
 
 _Parameters_
 

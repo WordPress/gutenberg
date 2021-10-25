@@ -77,6 +77,14 @@ function RangeControl(
 		initial: initialPosition,
 	} );
 	const isResetPendent = useRef( false );
+
+	if ( step === 'any' ) {
+		// The tooltip and number input field are hidden when the step is "any"
+		// because the decimals get too lengthy to fit well.
+		showTooltipProp = false;
+		withInputField = false;
+	}
+
 	const [ showTooltip, setShowTooltip ] = useState( showTooltipProp );
 	const [ isFocused, setIsFocused ] = useState( false );
 
@@ -257,6 +265,7 @@ function RangeControl(
 						<SimpleTooltip
 							className="components-range-control__tooltip"
 							inputRef={ inputRef }
+							tooltipPosition="bottom"
 							renderTooltipContent={ renderTooltipContent }
 							show={ isCurrentlyFocused || showTooltip }
 							style={ offsetStyle }

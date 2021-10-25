@@ -34,15 +34,14 @@ const generateMenuItems = ( {
 export function useToolsPanel(
 	props: WordPressComponentProps< ToolsPanelProps, 'div' >
 ) {
-	const { className, resetAll, panelId, ...otherProps } = useContextSystem(
-		props,
-		'ToolsPanel'
-	);
-
-	const cx = useCx();
-	const classes = useMemo( () => {
-		return cx( styles.ToolsPanel, className );
-	}, [ className ] );
+	const {
+		className,
+		resetAll,
+		panelId,
+		hasInnerWrapper,
+		shouldRenderPlaceholderItems,
+		...otherProps
+	} = useContextSystem( props, 'ToolsPanel' );
 
 	const isResetting = useRef( false );
 	const wasResetting = isResetting.current;
@@ -110,6 +109,44 @@ export function useToolsPanel(
 		} );
 	};
 
+	// Whether all optional menu items are hidden or not must be tracked
+	// in order to later determine if the panel display is empty and handle
+	// conditional display of a plus icon to indicate the presence of further
+	// menu items.
+	const [
+		areAllOptionalControlsHidden,
+		setAreAllOptionalControlsHidden,
+	] = useState( false );
+
+	useEffect( () => {
+		if ( menuItems.optional ) {
+			const optionalItems = Object.entries( menuItems.optional );
+			const allControlsHidden =
+				optionalItems.length > 0 &&
+				! optionalItems.some( ( [ , isSelected ] ) => isSelected );
+			setAreAllOptionalControlsHidden( allControlsHidden );
+		}
+	}, [ menuItems.optional ] );
+
+	const cx = useCx();
+	const classes = useMemo( () => {
+		const hasDefaultMenuItems =
+			menuItems?.default && !! Object.keys( menuItems?.default ).length;
+		const wrapperStyle =
+			hasInnerWrapper && styles.ToolsPanelWithInnerWrapper;
+		const emptyStyle =
+			! hasDefaultMenuItems &&
+			areAllOptionalControlsHidden &&
+			styles.ToolsPanelHiddenInnerWrapper;
+
+		return cx( styles.ToolsPanel, wrapperStyle, emptyStyle, className );
+	}, [
+		className,
+		hasInnerWrapper,
+		menuItems,
+		areAllOptionalControlsHidden,
+	] );
+
 	// Toggle the checked state of a menu item which is then used to determine
 	// display of the item within the panel.
 	const toggleItem = ( label: string ) => {
@@ -164,8 +201,10 @@ export function useToolsPanel(
 		registerPanelItem,
 		deregisterPanelItem,
 		flagItemCustomization,
+		areAllOptionalControlsHidden,
 		hasMenuItems: !! panelItems.length,
 		isResetting: isResetting.current,
+		shouldRenderPlaceholderItems,
 	};
 
 	return {

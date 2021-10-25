@@ -25,6 +25,10 @@ public enum Capabilities: String {
     case canEnableUnsupportedBlockEditor
     case isAudioBlockMediaUploadEnabled
     case reusableBlock
+    case facebookEmbed
+    case instagramEmbed
+    case loomEmbed
+    case smartframeEmbed
 }
 
 /// Wrapper for single block data

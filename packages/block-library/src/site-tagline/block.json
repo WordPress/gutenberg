@@ -12,6 +12,7 @@
 		}
 	},
 	"supports": {
+		"align": [ "wide", "full" ],
 		"html": false,
 		"color": {
 			"gradients": true
@@ -24,8 +25,9 @@
 			"fontSize": true,
 			"lineHeight": true,
 			"__experimentalFontFamily": true,
-			"__experimentalFontWeight": true,
 			"__experimentalTextTransform": true,
+			"__experimentalFontStyle": true,
+			"__experimentalFontWeight": true,
 			"__experimentalLetterSpacing": true
 		}
 	},

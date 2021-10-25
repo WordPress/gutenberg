@@ -7,18 +7,22 @@ import classnames from 'classnames';
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
+import { useEffect } from '@wordpress/element';
+import { useDispatch } from '@wordpress/data';
 import { createBlock } from '@wordpress/blocks';
 import {
 	AlignmentControl,
 	BlockControls,
 	RichText,
 	useBlockProps,
+	store as blockEditorStore,
 } from '@wordpress/block-editor';
 
 /**
  * Internal dependencies
  */
 import HeadingLevelDropdown from './heading-level-dropdown';
+import { generateAnchor, setAnchor } from './autogenerate-anchors';
 
 function HeadingEdit( {
 	attributes,
@@ -28,7 +32,7 @@ function HeadingEdit( {
 	style,
 	clientId,
 } ) {
-	const { textAlign, content, level, placeholder } = attributes;
+	const { textAlign, content, level, placeholder, anchor } = attributes;
 	const tagName = 'h' + level;
 	const blockProps = useBlockProps( {
 		className: classnames( {
@@ -36,6 +40,38 @@ function HeadingEdit( {
 		} ),
 		style,
 	} );
+
+	const { __unstableMarkNextChangeAsNotPersistent } = useDispatch(
+		blockEditorStore
+	);
+
+	// Initially set anchor for headings that have content but no anchor set.
+	// This is used when transforming a block to heading, or for legacy anchors.
+	useEffect( () => {
+		if ( ! anchor && content ) {
+			// This side-effect should not create an undo level.
+			__unstableMarkNextChangeAsNotPersistent();
+			setAttributes( {
+				anchor: generateAnchor( clientId, content ),
+			} );
+		}
+		setAnchor( clientId, anchor );
+
+		// Remove anchor map when block unmounts.
+		return () => setAnchor( clientId, null );
+	}, [ content, anchor ] );
+
+	const onContentChange = ( value ) => {
+		const newAttrs = { content: value };
+		if (
+			! anchor ||
+			! value ||
+			generateAnchor( clientId, content ) === anchor
+		) {
+			newAttrs.anchor = generateAnchor( clientId, value );
+		}
+		setAttributes( newAttrs );
+	};
 
 	return (
 		<>
@@ -57,7 +93,7 @@ function HeadingEdit( {
 				identifier="content"
 				tagName={ tagName }
 				value={ content }
-				onChange={ ( value ) => setAttributes( { content: value } ) }
+				onChange={ onContentChange }
 				onMerge={ mergeBlocks }
 				onSplit={ ( value, isOriginal ) => {
 					let block;

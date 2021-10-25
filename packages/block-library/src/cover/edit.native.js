@@ -101,6 +101,8 @@ const Cover = ( {
 		style,
 		customOverlayColor,
 		minHeightUnit = 'px',
+		allowedBlocks,
+		templateLock,
 	} = attributes;
 	const [ isScreenReaderEnabled, setIsScreenReaderEnabled ] = useState(
 		false
@@ -188,7 +190,7 @@ const Cover = ( {
 
 	const onSelectMedia = ( media ) => {
 		setDidUploadFail( false );
-		const onSelect = attributesFromMedia( setAttributes );
+		const onSelect = attributesFromMedia( setAttributes, dimRatio );
 		onSelect( media );
 	};
 
@@ -504,7 +506,9 @@ const Cover = ( {
 				style={ [ styles.content, { minHeight: convertedMinHeight } ] }
 			>
 				<InnerBlocks
+					allowedBlocks={ allowedBlocks }
 					template={ INNER_BLOCKS_TEMPLATE }
+					templateLock={ templateLock }
 					templateInsertUpdatesSelection
 					blockWidth={ blockWidth }
 				/>

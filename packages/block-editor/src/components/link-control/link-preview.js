@@ -13,7 +13,7 @@ import {
 	__experimentalText as Text,
 } from '@wordpress/components';
 import { filterURLForDisplay, safeDecodeURI } from '@wordpress/url';
-import { Icon, globe, info } from '@wordpress/icons';
+import { Icon, globe, info, linkOff, edit } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -26,6 +26,8 @@ export default function LinkPreview( {
 	value,
 	onEditClick,
 	hasRichPreviews = false,
+	hasUnlinkControl = false,
+	onRemove,
 } ) {
 	// Avoid fetching if rich previews are not desired.
 	const showRichPreviews = hasRichPreviews ? value?.url : null;
@@ -102,12 +104,21 @@ export default function LinkPreview( {
 				</span>
 
 				<Button
-					variant="secondary"
-					onClick={ () => onEditClick() }
+					icon={ edit }
+					label={ __( 'Edit' ) }
 					className="block-editor-link-control__search-item-action"
-				>
-					{ __( 'Edit' ) }
-				</Button>
+					onClick={ onEditClick }
+					iconSize={ 24 }
+				/>
+				{ hasUnlinkControl && (
+					<Button
+						icon={ linkOff }
+						label={ __( 'Unlink' ) }
+						className="block-editor-link-control__search-item-action block-editor-link-control__unlink"
+						onClick={ onRemove }
+						iconSize={ 24 }
+					/>
+				) }
 				<ViewerSlot fillProps={ value } />
 			</div>
 

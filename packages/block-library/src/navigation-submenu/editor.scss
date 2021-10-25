@@ -17,7 +17,7 @@
 			width: auto !important;
 			// These styles are needed to display the dropdown properly when it is empty.
 			position: absolute;
-			left: -1em;
+			left: -1px; // Border width.
 			top: 100%;
 
 			@include break-medium {
