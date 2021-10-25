@@ -25,7 +25,7 @@ export default function useListViewClientIds( blocks ) {
 				selectedClientIds: getSelectedBlockClientIds(),
 				draggedClientIds: getDraggedBlockClientIds(),
 				clientIdsTree: blocks ? blocks : __unstableGetClientIdsTree(),
-				selectedBlockParentIds: getBlockParents(
+				selectedBlockParentClientIds: getBlockParents(
 					selectedBlockClientIds[ 0 ],
 					false
 				),
