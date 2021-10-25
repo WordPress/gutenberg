@@ -1,6 +1,6 @@
 # Plugin Sidebar
 
-How to add a sidebar to your plugin. A sidebar is the region to the far right of the editor.Your plugin can add an additional icon next to the InspectorControls (gear icon) that can be expanded.
+How to add a sidebar to your plugin. A sidebar is the region to the far right of the editor. Your plugin can add an additional icon next to the InspectorControls (gear icon) that can be expanded.
 
 ![Example sidebar](https://raw.githubusercontent.com/WordPress/gutenberg/HEAD/docs/assets/sidebar-up-and-running.png)
 
