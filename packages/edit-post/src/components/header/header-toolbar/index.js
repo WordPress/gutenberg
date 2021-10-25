@@ -23,8 +23,6 @@ import { store as keyboardShortcutsStore } from '@wordpress/keyboard-shortcuts';
 /**
  * Internal dependencies
  */
-import TemplateTitle from '../template-title';
-import PostTitle from '../post-title';
 import { store as editPostStore } from '../../../store';
 
 const preventDefault = ( event ) => {
@@ -43,7 +41,6 @@ function HeaderToolbar() {
 		showIconLabels,
 		isListViewOpen,
 		listViewShortcut,
-		isTemplateMode,
 	} = useSelect( ( select ) => {
 		const {
 			hasInserterItems,
@@ -71,7 +68,6 @@ function HeaderToolbar() {
 			listViewShortcut: getShortcutRepresentation(
 				'core/edit-post/toggle-list-view'
 			),
-			isTemplateMode: select( editPostStore ).isEditingTemplate(),
 		};
 	}, [] );
 	const isLargeViewport = useViewportMatch( 'medium' );
@@ -167,10 +163,6 @@ function HeaderToolbar() {
 						{ overflowItems }
 					</>
 				) }
-			</div>
-
-			<div className="edit-post-header-toolbar__middle">
-				{ isTemplateMode ? <TemplateTitle /> : <PostTitle /> }
 			</div>
 		</NavigableToolbar>
 	);
