@@ -25,8 +25,8 @@ function render_block_core_post_comments( $attributes, $content, $block ) {
 		'post_id' => $post_id,
 		'count'   => true,
 	);
-	// Return early if there are no comments and comments are closed
-	if ( ! comments_open( $post_id ) && get_comments( $comment_args ) === 0) {
+	// Return early if there are no comments and comments are closed.
+	if ( ! comments_open( $post_id ) && get_comments( $comment_args ) === 0 ) {
 		return '';
 	}
 
