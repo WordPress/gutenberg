@@ -41,12 +41,6 @@ function moveReactColorfulSlider( sliderElement, from, to ) {
 	fireEvent( sliderElement, new FakeMouseEvent( 'mousemove', to ) );
 }
 
-const sleep = ( ms ) => {
-	const promise = new Promise( ( resolve ) => setTimeout( resolve, ms ) );
-	jest.advanceTimersByTime( ms + 1 );
-	return promise;
-};
-
 const hslaMatcher = expect.objectContaining( {
 	h: expect.any( Number ),
 	s: expect.any( Number ),
@@ -93,9 +87,6 @@ describe( 'ColorPicker', () => {
 				{ pageX: 10, pageY: 10 }
 			);
 
-			// `onChange` is debounced so we need to sleep for at least 1ms before checking that onChange was called
-			await sleep( 1 );
-
 			expect( onChangeComplete ).toHaveBeenCalledWith(
 				legacyColorMatcher
 			);
@@ -116,9 +107,6 @@ describe( 'ColorPicker', () => {
 			{ pageX: 0, pageY: 0 },
 			{ pageX: 10, pageY: 10 }
 		);
-
-		// `onChange` is debounced so we need to sleep for at least 1ms before checking that onChange was called
-		await sleep( 1 );
 
 		expect( onChange ).toHaveBeenCalledWith(
 			expect.stringMatching( /^#([a-fA-F0-9]{8})$/ )
@@ -149,9 +137,6 @@ describe( 'ColorPicker', () => {
 			{ pageX: 0, pageY: 0 },
 			{ pageX: 10, pageY: 10 }
 		);
-
-		// `onChange` is debounced so we need to sleep for at least 1ms before checking that onChange was called
-		await sleep( 1 );
 
 		expect( onChange ).toHaveBeenCalledWith(
 			expect.stringMatching( /^#([a-fA-F0-9]{6})$/ )

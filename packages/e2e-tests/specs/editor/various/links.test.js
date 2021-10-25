@@ -234,7 +234,9 @@ describe( 'Links', () => {
 		await createAndReselectLink();
 
 		// Click on the Edit button
-		const [ editButton ] = await page.$x( '//button[text()="Edit"]' );
+		const [ editButton ] = await page.$x(
+			'//button[contains(@aria-label, "Edit")]'
+		);
 		await editButton.click();
 
 		// Wait for the URL field to auto-focus
@@ -329,7 +331,9 @@ describe( 'Links', () => {
 		await page.keyboard.press( 'ArrowLeft' );
 		await page.keyboard.press( 'ArrowRight' );
 		await showBlockToolbar();
-		const [ editButton ] = await page.$x( '//button[text()="Edit"]' );
+		const [ editButton ] = await page.$x(
+			'//button[contains(@aria-label, "Edit")]'
+		);
 		await editButton.click();
 		await waitForAutoFocus();
 		await page.keyboard.type( '/handbook' );

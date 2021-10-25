@@ -85,7 +85,7 @@ export const getEntityRecord = ( kind, name, key = '', query ) => async ( {
 		// for how the request is made to the REST API.
 
 		// eslint-disable-next-line @wordpress/no-unused-vars-before-return
-		const path = addQueryArgs( entity.baseURL + '/' + key, {
+		const path = addQueryArgs( entity.baseURL + ( key ? '/' + key : '' ), {
 			...entity.baseURLParams,
 			...query,
 		} );

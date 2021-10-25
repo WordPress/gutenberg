@@ -16,6 +16,9 @@ import TextareaControl from '../';
 export default {
 	title: 'Components/TextareaControl',
 	component: TextareaControl,
+	parameters: {
+		knobs: { disabled: false },
+	},
 };
 
 const TextareaControlWithState = ( props ) => {

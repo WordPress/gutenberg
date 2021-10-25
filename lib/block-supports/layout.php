@@ -116,10 +116,9 @@ function gutenberg_render_layout_support_flag( $block_content, $block ) {
 		return $block_content;
 	}
 
-	$tree                  = WP_Theme_JSON_Resolver_Gutenberg::get_merged_data( array(), 'theme' );
-	$theme_settings        = $tree->get_settings();
-	$default_layout        = _wp_array_get( $theme_settings, array( 'layout' ) );
-	$has_block_gap_support = isset( $theme_settings['spacing']['blockGap'] ) ? null !== $theme_settings['spacing']['blockGap'] : false;
+	$block_gap             = gutenberg_get_global_settings( array( 'spacing', 'blockGap' ) );
+	$default_layout        = gutenberg_get_global_settings( array( 'layout' ) );
+	$has_block_gap_support = isset( $block_gap ) ? null !== $block_gap : false;
 	$default_block_layout  = _wp_array_get( $block_type->supports, array( '__experimentalLayout', 'default' ), array() );
 	$used_layout           = isset( $block['attrs']['layout'] ) ? $block['attrs']['layout'] : $default_block_layout;
 	if ( isset( $used_layout['inherit'] ) && $used_layout['inherit'] ) {
