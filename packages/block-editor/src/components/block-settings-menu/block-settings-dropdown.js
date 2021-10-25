@@ -46,10 +46,14 @@ export function BlockSettingsDropdown( {
 	const blockClientIds = castArray( clientIds );
 	const count = blockClientIds.length;
 	const firstBlockClientId = blockClientIds[ 0 ];
-	const onlyBlock = useSelect(
-		( select ) => 1 === select( blockEditorStore ).getBlockCount(),
-		[]
-	);
+	const { onlyBlock, title } = useSelect( ( select ) => {
+		const { getBlockName } = select( blockEditorStore );
+		const { getBlockType } = select( blocksStore );
+		return {
+			onlyBlock: 1 === select( blockEditorStore ).getBlockCount(),
+			title: getBlockType( getBlockName( firstBlockClientId ) )?.title,
+		};
+	}, [] );
 
 	const shortcuts = useSelect( ( select ) => {
 		const { getShortcutRepresentation } = select( keyboardShortcutsStore );
@@ -79,15 +83,11 @@ export function BlockSettingsDropdown( {
 		[ __experimentalSelectBlock ]
 	);
 
-	const { getBlockName } = useSelect( blockEditorStore );
-	const { getBlockType } = useSelect( blocksStore );
-	const title = getBlockType( getBlockName( firstBlockClientId ) )?.title;
 	const label = sprintf(
 		/* translators: %s: block name */
 		__( 'Remove %s' ),
 		title
 	);
-
 	const removeBlockLabel = count === 1 ? label : __( 'Remove blocks' );
 
 	return (
