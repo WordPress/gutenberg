@@ -470,18 +470,14 @@ class WP_Theme_JSON_Schema_V0_Test extends WP_UnitTestCase {
 			)
 		);
 
-		$this->assertEquals(
-			'body{--wp--preset--color--grey: grey;--wp--preset--font-family--small: 14px;--wp--preset--font-family--big: 41px;}.wp-block-group{--wp--custom--base-font: 16;--wp--custom--line-height--small: 1.2;--wp--custom--line-height--medium: 1.4;--wp--custom--line-height--large: 1.8;}body{color: var(--wp--preset--color--grey);}body { margin: 0; }.wp-site-blocks > .alignleft { float: left; margin-right: 2em; }.wp-site-blocks > .alignright { float: right; margin-left: 2em; }.wp-site-blocks > .aligncenter { justify-content: center; margin-left: auto; margin-right: auto; }a{color: #111;}h1{font-size: 1em;}h2{font-size: 2em;}.wp-block-group{padding-top: 12px;padding-bottom: 24px;}.wp-block-group a{color: #333;}h1 a,h2 a,h3 a,h4 a,h5 a,h6 a{color: #222;}.wp-block-post-title{font-size: 5em;}.wp-block-post-title a{color: #555;}.wp-block-query-title{font-size: 5em;}.wp-block-query-title a{color: #555;}.has-grey-color{color: var(--wp--preset--color--grey) !important;}.has-grey-background-color{background-color: var(--wp--preset--color--grey) !important;}.has-grey-border-color{border-color: var(--wp--preset--color--grey) !important;}.has-small-font-family{font-family: var(--wp--preset--font-family--small) !important;}.has-big-font-family{font-family: var(--wp--preset--font-family--big) !important;}',
-			$theme_json->get_stylesheet()
-		);
-		$this->assertEquals(
-			'body{color: var(--wp--preset--color--grey);}body { margin: 0; }.wp-site-blocks > .alignleft { float: left; margin-right: 2em; }.wp-site-blocks > .alignright { float: right; margin-left: 2em; }.wp-site-blocks > .aligncenter { justify-content: center; margin-left: auto; margin-right: auto; }a{color: #111;}h1{font-size: 1em;}h2{font-size: 2em;}.wp-block-group{padding-top: 12px;padding-bottom: 24px;}.wp-block-group a{color: #333;}h1 a,h2 a,h3 a,h4 a,h5 a,h6 a{color: #222;}.wp-block-post-title{font-size: 5em;}.wp-block-post-title a{color: #555;}.wp-block-query-title{font-size: 5em;}.wp-block-query-title a{color: #555;}.has-grey-color{color: var(--wp--preset--color--grey) !important;}.has-grey-background-color{background-color: var(--wp--preset--color--grey) !important;}.has-grey-border-color{border-color: var(--wp--preset--color--grey) !important;}.has-small-font-family{font-family: var(--wp--preset--font-family--small) !important;}.has-big-font-family{font-family: var(--wp--preset--font-family--big) !important;}',
-			$theme_json->get_stylesheet( array( 'styles', 'presets' ) )
-		);
-		$this->assertEquals(
-			'body{--wp--preset--color--grey: grey;--wp--preset--font-family--small: 14px;--wp--preset--font-family--big: 41px;}.wp-block-group{--wp--custom--base-font: 16;--wp--custom--line-height--small: 1.2;--wp--custom--line-height--medium: 1.4;--wp--custom--line-height--large: 1.8;}',
-			$theme_json->get_stylesheet( array( 'variables' ) )
-		);
+		$variables = 'body{--wp--preset--color--grey: grey;--wp--preset--font-family--small: 14px;--wp--preset--font-family--big: 41px;}.wp-block-group{--wp--custom--base-font: 16;--wp--custom--line-height--small: 1.2;--wp--custom--line-height--medium: 1.4;--wp--custom--line-height--large: 1.8;}';
+		$presets   = '.has-grey-color{color: var(--wp--preset--color--grey) !important;}.has-grey-background-color{background-color: var(--wp--preset--color--grey) !important;}.has-grey-border-color{border-color: var(--wp--preset--color--grey) !important;}.has-small-font-family{font-family: var(--wp--preset--font-family--small) !important;}.has-big-font-family{font-family: var(--wp--preset--font-family--big) !important;}';
+		$styles    = 'body{color: var(--wp--preset--color--grey);}body { margin: 0; }.wp-site-blocks > .alignleft { float: left; margin-right: 2em; }.wp-site-blocks > .alignright { float: right; margin-left: 2em; }.wp-site-blocks > .aligncenter { justify-content: center; margin-left: auto; margin-right: auto; }a{color: #111;}h1{font-size: 1em;}h2{font-size: 2em;}.wp-block-group{padding-top: 12px;padding-bottom: 24px;}.wp-block-group a{color: #333;}h1 a,h2 a,h3 a,h4 a,h5 a,h6 a{color: #222;}.wp-block-post-title{font-size: 5em;}.wp-block-post-title a{color: #555;}.wp-block-query-title{font-size: 5em;}.wp-block-query-title a{color: #555;}';
+		$all       = $variables . $styles . $presets;
+		$this->assertEquals( $all, $theme_json->get_stylesheet() );
+		$this->assertEquals( $styles, $theme_json->get_stylesheet( array( 'styles' ) ) );
+		$this->assertEquals( $presets, $theme_json->get_stylesheet( array( 'presets' ) ) );
+		$this->assertEquals( $variables, $theme_json->get_stylesheet( array( 'variables' ) ) );
 	}
 
 }
