@@ -13,6 +13,7 @@ import {
 	openPreviewPage,
 	selectBlockByClientId,
 	getAllBlocks,
+	ensureSidebarOpened,
 } from '@wordpress/e2e-test-utils';
 
 /**
@@ -246,17 +247,11 @@ async function createEmptyNavBlock() {
 	await startEmptyButton.click();
 }
 
-async function toggleSidebar() {
-	await page.click(
-		'.edit-post-header__settings button[aria-label="Settings"]'
-	);
-}
-
 async function turnResponsivenessOn() {
 	const blocks = await getAllBlocks();
 
 	await selectBlockByClientId( blocks[ 0 ].clientId );
-	await toggleSidebar();
+	await ensureSidebarOpened();
 
 	const [ responsivenessToggleButton ] = await page.$x(
 		'//label[text()[contains(.,"Enable responsive menu")]]'
@@ -597,7 +592,7 @@ describe.skip( 'Navigation', () => {
 		// 	const blocks = await getAllBlocks();
 		// await selectBlockByClientId( blocks[ 0 ].clientId );
 
-		await toggleSidebar();
+		await ensureSidebarOpened();
 
 		const [ openOnClickButton ] = await page.$x(
 			'//label[contains(text(),"Open on click")]'
