@@ -29,12 +29,6 @@
 			"background": true,
 			"text": false,
 			"links": false
-		},
-		"spacing": {
-			"padding": true,
-			"__experimentalDefaultControls": {
-				"padding": true
-			}
 		}
 	}
 }

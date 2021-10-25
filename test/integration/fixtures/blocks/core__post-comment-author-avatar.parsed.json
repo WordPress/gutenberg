@@ -2,28 +2,17 @@
 	{
 		"blockName": "core/post-comment-author-avatar",
 		"attrs": {
-			"width": 126,
-			"height": 126,
+			"width": 120,
+			"height": 120,
 			"style": {
 				"border": {
-					"width": "11px",
+					"width": "3px",
 					"style": "solid",
-					"color": "#8000ff",
-					"radius": "100%"
-				},
-				"color": {
-					"background": "#ff0000"
-				},
-				"spacing": {
-					"padding": {
-						"top": "20px",
-						"right": "20px",
-						"bottom": "20px",
-						"left": "20px"
-					}
+					"radius": "100px"
 				}
 			},
-			"className": "additional-class"
+			"borderColor": "recommended-color-02",
+			"backgroundColor": "text-color"
 		},
 		"innerBlocks": [],
 		"innerHTML": "",
