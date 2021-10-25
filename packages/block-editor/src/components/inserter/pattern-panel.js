@@ -13,8 +13,7 @@ function PatternInserterPanel( {
 	selectedCategory,
 	patternCategories,
 	onClickCategory,
-	onShowExplorer,
-	children,
+	openPatternExplorer,
 } ) {
 	const categoryOptions = () => {
 		const options = [];
@@ -53,36 +52,28 @@ function PatternInserterPanel( {
 	};
 
 	return (
-		<>
-			<Flex justify="space-between" align="start" className={ className }>
-				<FlexItem isBlock>
-					<SelectControl
-						className="block-editor-inserter__panel-dropdown"
-						label={ __( 'Filter patterns' ) }
-						hideLabelFromVision
-						value={ selectedCategory.name }
-						onChange={ onChangeSelect }
-						onBlur={ onBlur }
-						options={ categoryOptions() }
-					/>
-				</FlexItem>
-				<FlexItem>
-					<Button
-						className="block-editor-inserter__patterns-explorer-expand"
-						label={ __( 'See all patterns' ) }
-						onClick={ onShowExplorer }
-					>
-						{ _x(
-							'See all',
-							'Label for showing all block patterns'
-						) }
-					</Button>
-				</FlexItem>
-			</Flex>
-			<div className="block-editor-inserter__panel-content">
-				{ children }
-			</div>
-		</>
+		<Flex justify="space-between" align="start" className={ className }>
+			<FlexItem isBlock>
+				<SelectControl
+					className="block-editor-inserter__panel-dropdown"
+					label={ __( 'Filter patterns' ) }
+					hideLabelFromVision
+					value={ selectedCategory.name }
+					onChange={ onChangeSelect }
+					onBlur={ onBlur }
+					options={ categoryOptions() }
+				/>
+			</FlexItem>
+			<FlexItem>
+				<Button
+					className="block-editor-inserter__patterns-explorer-expand"
+					label={ __( 'See all patterns' ) }
+					onClick={ () => openPatternExplorer() }
+				>
+					{ _x( 'See all', 'Label for showing all block patterns' ) }
+				</Button>
+			</FlexItem>
+		</Flex>
 	);
 }
 

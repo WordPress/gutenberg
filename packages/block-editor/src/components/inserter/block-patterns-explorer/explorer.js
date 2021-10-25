@@ -9,19 +9,12 @@ import { __ } from '@wordpress/i18n';
  * Internal dependencies
  */
 import PatternExplorerSidebar from './sidebar';
-import PatternExplorerSearchResults from './search-results';
+import PatternList from './patterns-list';
 
-function PatternsExplorer( {
-	selectedCategory,
-	patternCategories,
-	onClickCategory,
-	children,
-} ) {
+function PatternsExplorer( { initialCategory, patternCategories } ) {
 	const [ filterValue, setFilterValue ] = useState( '' );
-	const patternList = !! filterValue ? (
-		<PatternExplorerSearchResults filterValue={ filterValue } />
-	) : (
-		children
+	const [ selectedCategory, setSelectedCategory ] = useState(
+		initialCategory?.name
 	);
 	return (
 		<Grid
@@ -32,12 +25,15 @@ function PatternsExplorer( {
 			<PatternExplorerSidebar
 				selectedCategory={ selectedCategory }
 				patternCategories={ patternCategories }
-				onClickCategory={ onClickCategory }
+				onClickCategory={ setSelectedCategory }
 				filterValue={ filterValue }
 				setFilterValue={ setFilterValue }
 			/>
-
-			<div>{ patternList }</div>
+			<PatternList
+				filterValue={ filterValue }
+				selectedCategory={ selectedCategory }
+				patternCategories={ patternCategories }
+			/>
 		</Grid>
 	);
 }
@@ -48,7 +44,6 @@ function PatternsExplorerModal( { onModalClose, ...restProps } ) {
 			title={ __( 'Patterns' ) }
 			closeLabel={ __( 'Close' ) }
 			onRequestClose={ onModalClose }
-			shouldCloseOnClickOutside={ false }
 			isFullScreen
 		>
 			<PatternsExplorer { ...restProps } />

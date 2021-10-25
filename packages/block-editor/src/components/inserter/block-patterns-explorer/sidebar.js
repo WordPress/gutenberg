@@ -12,16 +12,15 @@ function PatternCategoriesList( {
 	const baseClassName = 'block-editor-block-patterns-explorer__sidebar';
 	return (
 		<div className={ `${ baseClassName }__categories-list` }>
-			{ patternCategories.map( ( patternCategory ) => {
-				const { name, label } = patternCategory;
+			{ patternCategories.map( ( { name, label } ) => {
 				return (
 					<Button
 						key={ name }
 						label={ label }
 						className={ `${ baseClassName }__categories-list__item` }
-						isPressed={ selectedCategory.name === name }
+						isPressed={ selectedCategory === name }
 						onClick={ () => {
-							onClickCategory( patternCategory );
+							onClickCategory( name );
 						} }
 					>
 						{ label }
@@ -37,7 +36,6 @@ function PatternsExplorerSearch( { filterValue, setFilterValue } ) {
 	return (
 		<div className={ baseClassName }>
 			<SearchControl
-				// className="block-editor-inserter__search"
 				onChange={ setFilterValue }
 				value={ filterValue }
 				label={ __( 'Search for patterns' ) }
