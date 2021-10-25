@@ -64,6 +64,7 @@ function ResizableEditor( { enableResizing, settings, ...props } ) {
 			? previousResizedCanvasStylesRef.current
 			: resizedCanvasStyles;
 	const [ width, setWidth ] = useState( styles.width );
+	const [ height, setHeight ] = useState( styles.height );
 	const {
 		__experimentalSetPreviewDeviceType: setPreviewDeviceType,
 	} = useDispatch( editSiteStore );
@@ -87,18 +88,47 @@ function ResizableEditor( { enableResizing, settings, ...props } ) {
 		}
 	}, [] );
 
+	useEffect(
+		function autoResizeIframeHeight() {
+			const iframe = iframeRef.current;
+
+			if ( ! iframe || ! enableResizing ) {
+				return;
+			}
+
+			const resizeObserver = new iframe.contentWindow.ResizeObserver(
+				() => {
+					setHeight( iframe.contentDocument.body.offsetHeight );
+				}
+			);
+
+			// Observing the <html> rather than the <body> because the latter
+			// gets destroyed and remounted after initialization in <Iframe>.
+			resizeObserver.observe( iframe.contentDocument.documentElement );
+
+			return () => {
+				resizeObserver.disconnect();
+			};
+		},
+		[ enableResizing ]
+	);
+
 	return (
 		<ResizableBox
 			size={ {
 				width,
-				height: styles.height,
+				height,
 			} }
 			onResizeStop={ ( event, direction, element ) => {
 				setWidth( element.style.width );
 				setPreviewDeviceType( RESPONSIVE_DEVICE );
 			} }
 			minWidth={ 300 }
+			// Not sure why this is needed to prevent the height from decreasing
+			// to 10px while resizing horizontally.
+			minHeight={ height }
 			maxWidth="100%"
+			maxHeight="100%"
 			enable={ {
 				right: enableResizing,
 				left: enableResizing,
