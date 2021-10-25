@@ -9,6 +9,7 @@ import { difference, zip } from 'lodash';
 import { __, sprintf } from '@wordpress/i18n';
 import { store as noticesStore } from '@wordpress/notices';
 import { store as coreDataStore } from '@wordpress/core-data';
+import { warning } from '@wordpress/warning';
 
 /**
  * Internal dependencies
@@ -206,7 +207,13 @@ const batchUpdateMenuItems = ( navigationBlock, menuId ) => async ( {
 } ) => {
 	const updatedMenuItems = blocksTreeToAnnotatedList( navigationBlock )
 		// Filter out unsupported blocks
-		.filter( ( { block } ) => isBlockSupportedInNav( block ) )
+		.filter( ( { block } ) => {
+			const isBlockSupported = isBlockSupportedInNav( block );
+			if ( ! isBlockSupported ) {
+				warning( isBlockSupported );
+			}
+			return isBlockSupported;
+		} )
 		// Transform the blocks into menu items
 		.map( ( { block, parentBlock, childIndex } ) =>
 			blockToMenuItem(
