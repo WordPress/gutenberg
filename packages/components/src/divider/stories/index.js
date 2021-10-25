@@ -11,6 +11,9 @@ import { Divider } from '..';
 export default {
 	component: Divider,
 	title: 'Components (Experimental)/Divider',
+	parameters: {
+		knobs: { disabled: false },
+	},
 };
 
 const BlackDivider = ( props ) => (

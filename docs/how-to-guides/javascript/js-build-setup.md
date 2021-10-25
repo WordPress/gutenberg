@@ -34,7 +34,7 @@ First, you need to set up Node.js for your development environment. The steps re
 -   macOS: `brew install node`
 -   Windows: `choco install node`
 
-If you are not using a package manager, see the [developer environment setup documentation](/docs/getting-started/tutorials/devenv/README.md) for setting up Node using nvm, or see the official [Node.js download page](https://nodejs.org/en/download/) for installers and binaries.
+If you are not using a package manager, see the [developer environment setup documentation](/docs/getting-started/devenv/README.md) for setting up Node using nvm, or see the official [Node.js download page](https://nodejs.org/en/download/) for installers and binaries.
 
 **Note:** The build tools and process occur on the command-line, so basic familiarity using a terminal application is required. Some text editors have a terminal built-in that is fine to use; Visual Studio Code and PhpStorm are two popular options.
 

@@ -50,29 +50,9 @@ class WP_Theme_JSON_Resolver_Gutenberg_Test extends WP_UnitTestCase {
 				'context' => 'Font size name',
 			),
 			array(
-				'path'    => array( 'settings', 'typography', 'fontStyles' ),
-				'key'     => 'name',
-				'context' => 'Font style name',
-			),
-			array(
-				'path'    => array( 'settings', 'typography', 'fontWeights' ),
-				'key'     => 'name',
-				'context' => 'Font weight name',
-			),
-			array(
 				'path'    => array( 'settings', 'typography', 'fontFamilies' ),
 				'key'     => 'name',
 				'context' => 'Font family name',
-			),
-			array(
-				'path'    => array( 'settings', 'typography', 'textTransforms' ),
-				'key'     => 'name',
-				'context' => 'Text transform name',
-			),
-			array(
-				'path'    => array( 'settings', 'typography', 'textDecorations' ),
-				'key'     => 'name',
-				'context' => 'Text decoration name',
 			),
 			array(
 				'path'    => array( 'settings', 'color', 'palette' ),
@@ -95,29 +75,9 @@ class WP_Theme_JSON_Resolver_Gutenberg_Test extends WP_UnitTestCase {
 				'context' => 'Font size name',
 			),
 			array(
-				'path'    => array( 'settings', 'blocks', '*', 'typography', 'fontStyles' ),
-				'key'     => 'name',
-				'context' => 'Font style name',
-			),
-			array(
-				'path'    => array( 'settings', 'blocks', '*', 'typography', 'fontWeights' ),
-				'key'     => 'name',
-				'context' => 'Font weight name',
-			),
-			array(
 				'path'    => array( 'settings', 'blocks', '*', 'typography', 'fontFamilies' ),
 				'key'     => 'name',
 				'context' => 'Font family name',
-			),
-			array(
-				'path'    => array( 'settings', 'blocks', '*', 'typography', 'textTransforms' ),
-				'key'     => 'name',
-				'context' => 'Text transform name',
-			),
-			array(
-				'path'    => array( 'settings', 'blocks', '*', 'typography', 'textDecorations' ),
-				'key'     => 'name',
-				'context' => 'Text decoration name',
 			),
 			array(
 				'path'    => array( 'settings', 'blocks', '*', 'color', 'palette' ),
@@ -255,4 +215,77 @@ class WP_Theme_JSON_Resolver_Gutenberg_Test extends WP_UnitTestCase {
 		$this->assertSame( $color_palette, $settings['color']['palette']['theme'] );
 	}
 
+	function test_merges_child_theme_json_into_parent_theme_json() {
+		switch_theme( 'fse-child' );
+
+		$actual = WP_Theme_JSON_Resolver_Gutenberg::get_theme_data();
+
+		// Should merge settings.
+		$this->assertSame(
+			array(
+				'color'  => array(
+					'palette' => array(
+						'theme' => array(
+							array(
+								'slug'  => 'light',
+								'name'  => 'Light',
+								'color' => '#f3f4f6',
+							),
+							array(
+								'slug'  => 'primary',
+								'name'  => 'Primary',
+								'color' => '#3858e9',
+							),
+							array(
+								'slug'  => 'dark',
+								'name'  => 'Dark',
+								'color' => '#111827',
+							),
+						),
+					),
+					'custom'  => false,
+					'link'    => true,
+				),
+				'blocks' => array(
+					'core/paragraph'  => array(
+						'color' => array(
+							'palette' => array(
+								'theme' => array(
+									array(
+										'slug'  => 'light',
+										'name'  => 'Light',
+										'color' => '#f5f7f9',
+									),
+								),
+							),
+						),
+					),
+					'core/post-title' => array(
+						'color' => array(
+							'palette' => array(
+								'theme' => array(
+									array(
+										'slug'  => 'light',
+										'name'  => 'Light',
+										'color' => '#f3f4f6',
+									),
+								),
+							),
+						),
+					),
+				),
+			),
+			$actual->get_settings()
+		);
+
+		$this->assertSame(
+			$actual->get_custom_templates(),
+			array(
+				'page-home' => array(
+					'title'     => 'Homepage',
+					'postTypes' => array( 'page' ),
+				),
+			)
+		);
+	}
 }

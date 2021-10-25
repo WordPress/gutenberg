@@ -18,6 +18,9 @@ import { CSS_UNITS } from '../utils';
 export default {
 	title: 'Components/UnitControl',
 	component: UnitControl,
+	parameters: {
+		knobs: { disabled: false },
+	},
 };
 
 const ControlWrapperView = styled.div`

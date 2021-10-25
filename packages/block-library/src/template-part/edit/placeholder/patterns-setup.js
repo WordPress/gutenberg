@@ -62,7 +62,8 @@ export default function PatternsSetup( {
 			{ isTitleStep && (
 				<Modal
 					title={ sprintf(
-						'Name and create your new %s',
+						// Translators: %s as template part area title ("Header", "Footer", etc.).
+						__( 'Name and create your new %s' ),
 						areaLabel.toLowerCase()
 					) }
 					closeLabel={ __( 'Cancel' ) }
@@ -115,7 +116,7 @@ function StartBlankComponent( { setTitleStep, areaLabel, areaIcon } ) {
 			icon={ areaIcon }
 			instructions={ sprintf(
 				// Translators: %s as template part area title ("Header", "Footer", "Template Part", etc.).
-				'Creating your new %s...',
+				__( 'Creating your new %s…' ),
 				areaLabel.toLowerCase()
 			) }
 		/>

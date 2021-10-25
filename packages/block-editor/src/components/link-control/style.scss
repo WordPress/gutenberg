@@ -171,7 +171,6 @@ $preview-image-height: 140px;
 		flex-direction: row;
 		align-items: flex-start;
 		margin-right: $grid-unit-10;
-		overflow: hidden;
 
 		// Force text to wrap to improve UX when encountering long lines
 		// of text, particular those with no spaces.
@@ -187,10 +186,6 @@ $preview-image-height: 140px;
 
 	&.is-error .block-editor-link-control__search-item-header {
 		align-items: center;
-	}
-
-	.block-editor-link-control__search-item-details {
-		overflow: hidden; // clip to force text ellipsis.
 	}
 
 	.block-editor-link-control__search-item-icon {

@@ -345,12 +345,12 @@ function Navigation( {
 							{
 								value: overlayTextColor.color,
 								onChange: setOverlayTextColor,
-								label: __( 'Overlay text' ),
+								label: __( 'Submenu & overlay text' ),
 							},
 							{
 								value: overlayBackgroundColor.color,
 								onChange: setOverlayBackgroundColor,
-								label: __( 'Overlay background' ),
+								label: __( 'Submenu & overlay background' ),
 							},
 						] }
 					>
