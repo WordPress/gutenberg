@@ -6,8 +6,9 @@ import { some } from 'lodash';
 /**
  * WordPress dependencies
  */
+import { __ } from '@wordpress/i18n';
 import { useSelect } from '@wordpress/data';
-import { PanelBody } from '@wordpress/components';
+import { PanelBody, PanelRow } from '@wordpress/components';
 import { page, layout } from '@wordpress/icons';
 import { store as coreStore } from '@wordpress/core-data';
 
@@ -19,6 +20,13 @@ import EntityRecordItem from './entity-record-item';
 const ENTITY_NAME_ICONS = {
 	site: layout,
 	page,
+};
+
+const ENTITY_NAME_DESCRIPTIONS = {
+	site: __( 'These changes will affect your whole site.' ),
+	wp_template: __(
+		'These changes will affect pages and posts that use these templates.'
+	),
 };
 
 export default function EntityTypeList( {
@@ -34,12 +42,14 @@ export default function EntityTypeList( {
 		[ firstRecord.kind, firstRecord.name ]
 	);
 
-	// Set icon based on type of entity.
+	// Set icon and description based on type of entity.
 	const { name } = firstRecord;
 	const icon = ENTITY_NAME_ICONS[ name ];
+	const description = ENTITY_NAME_DESCRIPTIONS[ name ];
 
 	return (
 		<PanelBody title={ entity.label } initialOpen={ true } icon={ icon }>
+			{ description ? <PanelRow>{ description }</PanelRow> : null }
 			{ list.map( ( record ) => {
 				return (
 					<EntityRecordItem
