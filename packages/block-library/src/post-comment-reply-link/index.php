@@ -19,7 +19,7 @@ function render_block_core_post_comment_reply_link( $attributes, $content, $bloc
 	}
 
 	$thread_comments = get_option( 'thread_comments' );
-	if ( ! $thread_comments ){
+	if ( ! $thread_comments ) {
 		return '';
 	}
 
@@ -29,7 +29,7 @@ function render_block_core_post_comment_reply_link( $attributes, $content, $bloc
 	$max_depth = get_option( 'thread_comments_depth' );
 	$parent_id = $comment->comment_parent;
 
-	while ( 0 != $parent_id ) {
+	while ( 0 !== $parent_id ) {
 		$depth++;
 		$parent_id = get_comment( $parent_id )->comment_parent;
 	}
@@ -39,7 +39,7 @@ function render_block_core_post_comment_reply_link( $attributes, $content, $bloc
 			'depth'     => $depth,
 			'max_depth' => $max_depth,
 		),
-		$comment,
+		$comment
 	);
 
 	$classes = '';
@@ -52,7 +52,7 @@ function render_block_core_post_comment_reply_link( $attributes, $content, $bloc
 	return sprintf(
 		'<div %1$s>%2$s</div>',
 		$wrapper_attributes,
-		$comment_reply_link,
+		$comment_reply_link
 	);
 }
 
