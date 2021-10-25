@@ -2,7 +2,7 @@
 
 ## Unreleased
 
--   Code quality: Add block schema to each core block.
+-   Code quality: Add block schema to each core block ([#35900](https://github.com/WordPress/gutenberg/pull/35900)).
 
 ## 6.0.0 (2021-09-09)
 
