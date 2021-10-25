@@ -68,9 +68,21 @@ export default function EntitiesSavedStates( { close } ) {
 	} = useDispatch( coreStore );
 
 	// To group entities by type.
-	const partitionedSavables = Object.values(
-		groupBy( dirtyEntityRecords, 'name' )
-	);
+	const partitionedSavables = groupBy( dirtyEntityRecords, 'name' );
+
+	// Sort entity groups.
+	const {
+		site: siteSavables,
+		wp_template: templateSavables,
+		wp_template_part: templatePartSavables,
+		...contentSavables
+	} = partitionedSavables;
+	const sortedPartitionedSavables = [
+		siteSavables,
+		templateSavables,
+		templatePartSavables,
+		...Object.values( contentSavables ),
+	];
 
 	// Unchecked entities to be ignored by save function.
 	const [ unselectedEntities, _setUnselectedEntities ] = useState( [] );
@@ -168,7 +180,7 @@ export default function EntitiesSavedStates( { close } ) {
 				</p>
 			</div>
 
-			{ partitionedSavables.map( ( list ) => {
+			{ sortedPartitionedSavables.map( ( list ) => {
 				return (
 					<EntityTypeList
 						key={ list[ 0 ].name }
