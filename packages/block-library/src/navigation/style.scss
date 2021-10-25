@@ -350,21 +350,23 @@
 // These target the named container class to work even with the additional mobile menu containers.
 .items-justified-center {
 	.wp-block-page-list,
-	.wp-block-navigation__container {
+	.wp-block-navigation__container,
+	.wp-block-navigation__responsive-container-content {
 		justify-content: center;
 	}
 }
 
 .items-justified-right {
 	.wp-block-page-list,
-	.wp-block-navigation__container {
+	.wp-block-navigation__container,
+	.wp-block-navigation__responsive-container-content {
 		justify-content: flex-end;
 	}
 }
 
 .items-justified-space-between {
-	.wp-block-navigation__responsive-container-content,
-	.wp-block-navigation__container {
+	.wp-block-navigation__container,
+	.wp-block-navigation__responsive-container-content {
 		display: flex;
 		justify-content: space-between;
 		flex: 1;
