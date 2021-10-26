@@ -155,11 +155,15 @@ class Gutenberg_REST_Global_Styles_Controller extends WP_REST_Controller {
 		$changes     = new stdClass();
 		$changes->ID = $request['id'];
 
-		$post            = get_post( $request['id'] );
-		$existing_config = $post ? json_decode( $post->post_content, true ) : array(
-			'settings' => array(),
-			'styles'   => array(),
-		);
+		$post = get_post( $request['id'] );
+		if ( $post ) {
+			$existing_config = json_decode( $post->post_content, true );
+		} else {
+			$existing_config = array(
+				'settings' => array(),
+				'styles'   => array(),
+			);
+		}
 
 		if ( isset( $request['styles'] ) || isset( $request['settings'] ) ) {
 			$config = array();
@@ -296,13 +300,13 @@ class Gutenberg_REST_Global_Styles_Controller extends WP_REST_Controller {
 					'description' => __( 'Global styles.', 'gutenberg' ),
 					'type'        => array( 'object' ),
 					'default'     => array(),
-					'context'     => array( 'embed', 'view', 'edit' ),
+					'context'     => array( 'view', 'edit' ),
 				),
 				'settings' => array(
 					'description' => __( 'Global settings.', 'gutenberg' ),
 					'type'        => array( 'object' ),
 					'default'     => array(),
-					'context'     => array( 'embed', 'view', 'edit' ),
+					'context'     => array( 'view', 'edit' ),
 				),
 				'title'    => array(
 					'description' => __( 'Title of the global styles variation.', 'gutenberg' ),
