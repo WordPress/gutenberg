@@ -37,5 +37,5 @@ export function getActiveFormats(
 		return formatsAfter;
 	}
 
-	return formats[ start ] || EMPTY_ACTIVE_FORMATS;
+	return formats[ start ] || formats[ end ] || EMPTY_ACTIVE_FORMATS;
 }
