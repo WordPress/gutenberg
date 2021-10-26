@@ -29,7 +29,7 @@ You should not attempted to create your own `value` objects. Rather you should r
 
 Understanding how a value represents richly formatted text is very important so let's consider an example.
 
-If `text` is formatted from position 2-5 in bold (`core/bold`) and from position 2-10 with a link (`core/link`), then you'll find:
+If `text` is formatted from position 2-5 in bold (`core/bold`) and from position 2-8 with a link (`core/link`), then you'll find:
 
 -   arrays within the sparse array at positions 2-5 that include the `core/bold` format
 -   arrays within the sparse array at positions 2-8 that include the `core/link` format
