@@ -25,7 +25,7 @@ The value object is comprised of the following:
 -   `start` - an index in the `text` representing the _start_ of the currently active selection.
 -   `end` - an index in the `text` representing the _end_ of the currently active selection.
 
-You should not attempted to create your own `value` objects. Rather you should rely on the built in methods of the `@wordpress/rich-text` package to build these for you.
+You should not attempt to create your own `value` objects. Rather you should rely on the built in methods of the `@wordpress/rich-text` package to build these for you.
 
 It is important to understand how a value represents richly formatted text. Here is an example to illustrate.
 
