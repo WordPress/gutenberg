@@ -78,6 +78,25 @@
 	font-size: 42px;
 }
 
+// Mark empty links with a red squiggly underline to indicate an error
+.editor-styles-wrapper.editor-styles-wrapper a[href=""] {
+	$blur: 10%;
+	$width: 6%;
+	$stop1: 30%;
+	$stop2: 64%;
+	$angle: 45deg;
+
+	background-image:
+		linear-gradient($angle, transparent ($stop1 - $blur), currentColor $stop1, currentColor ($stop1 + $width), transparent ($stop1 + $width + $blur)),
+		linear-gradient(($angle * 3), transparent ($stop2 - $blur), currentColor $stop2, currentColor ($stop2 + $width), transparent ($stop2 + $width + $blur));
+	background-position: 0 100%;
+	background-size: 6px 3px;
+	background-repeat: repeat-x;
+
+	color: #f00;
+	text-decoration-line: none;
+}
+
 /**
  * Editor Normalization Styles
  *
