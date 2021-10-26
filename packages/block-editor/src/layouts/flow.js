@@ -106,7 +106,7 @@ export default {
 		return null;
 	},
 	save: function DefaultLayoutStyle( { selector, layout = {} } ) {
-		const { contentSize, wideSize, outerPadding = 0 } = layout;
+		const { contentSize, wideSize, outerPadding } = layout;
 		const blockGapSupport = useSetting( 'spacing.blockGap' );
 		const hasBlockGapStylesSupport = blockGapSupport !== null;
 
@@ -114,8 +114,9 @@ export default {
 			!! contentSize || !! wideSize
 				? `
 					${ appendSelectors( selector ) } {
-						--wp-style-layout-outer-padding: ${ outerPadding };
-						padding: 0 var(--wp-style-layout-outer-padding);
+						padding: ${ outerPadding?.top || 0 } ${ outerPadding?.right || 0 } ${
+						outerPadding?.bottom || 0
+				  } ${ outerPadding?.left || 0 }; 
 					}
 
 					${ appendSelectors( selector, '> *' ) } {
@@ -130,8 +131,8 @@ export default {
 
 					${ appendSelectors( selector, '> [data-align="full"]' ) } {
 						max-width: none;
-						margin-left: calc( -1 * var(--wp-style-layout-outer-padding) ) !important;
-						margin-right: calc( -1 * var(--wp-style-layout-outer-padding) ) !important;
+						margin-left: calc( -1 * ${ outerPadding.left || 0 } ) !important;
+						margin-right: calc( -1 * ${ outerPadding.right || 0 } ) !important;
 					}
 				`
 				: '';
