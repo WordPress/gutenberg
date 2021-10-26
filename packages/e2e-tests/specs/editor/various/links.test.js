@@ -816,7 +816,7 @@ describe( 'Links', () => {
 			await page.click( 'button[aria-label="Link"]' );
 
 			// Wait for the URL field to auto-focus
-			await waitForAutoFocus();
+			await waitForURLFieldAutoFocus();
 
 			// Type a URL
 			await page.keyboard.type( 'https://wordpress.org/gutenberg' );
@@ -889,7 +889,7 @@ describe( 'Links', () => {
 			await page.click( 'button[aria-label="Link"]' );
 
 			// Wait for the URL field to auto-focus
-			await waitForAutoFocus();
+			await waitForURLFieldAutoFocus();
 
 			// Type a URL
 			await page.keyboard.type( linkTwoURL );
@@ -909,7 +909,7 @@ describe( 'Links', () => {
 			await page.click( 'button[aria-label="Link"]' );
 
 			// Wait for the URL field to auto-focus
-			await waitForAutoFocus();
+			await waitForURLFieldAutoFocus();
 
 			// Type a URL
 			await page.keyboard.type( linkOneURL );
