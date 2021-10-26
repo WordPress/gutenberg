@@ -622,7 +622,9 @@ describe( 'Links', () => {
 			await page.keyboard.press( 'ArrowLeft' );
 			await page.keyboard.press( 'ArrowRight' );
 
-			const [ editButton ] = await page.$x( '//button[text()="Edit"]' );
+			const [ editButton ] = await page.$x(
+				'//button[contains(@aria-label, "Edit")]'
+			);
 			await editButton.click();
 			await waitForURLFieldAutoFocus();
 
@@ -677,7 +679,9 @@ describe( 'Links', () => {
 
 			await showBlockToolbar();
 
-			const [ editButton ] = await page.$x( '//button[text()="Edit"]' );
+			const [ editButton ] = await page.$x(
+				'//button[contains(@aria-label, "Edit")]'
+			);
 
 			await editButton.click();
 
@@ -707,7 +711,9 @@ describe( 'Links', () => {
 			await page.keyboard.press( 'ArrowRight' );
 
 			await showBlockToolbar();
-			const [ editButton ] = await page.$x( '//button[text()="Edit"]' );
+			const [ editButton ] = await page.$x(
+				'//button[contains(@aria-label, "Edit")]'
+			);
 			await editButton.click();
 			await waitForURLFieldAutoFocus();
 
