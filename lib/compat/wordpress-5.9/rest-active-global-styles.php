@@ -12,7 +12,7 @@
  * @param WP_Theme         $theme    The theme object.
  */
 function gutenberg_add_active_global_styles_link( $response, $theme ) {
-	$wp_query_args = array(
+	$wp_query_args       = array(
 		'post_status'    => array( 'publish' ),
 		'post_type'      => 'wp_global_styles',
 		'posts_per_page' => 1,
