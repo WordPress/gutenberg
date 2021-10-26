@@ -31,21 +31,6 @@ class Gutenberg_REST_Global_Styles_Controller extends WP_REST_Controller {
 	 * @return void
 	 */
 	public function register_routes() {
-		// Lists all templates.
-		register_rest_route(
-			$this->namespace,
-			'/' . $this->rest_base,
-			array(
-				array(
-					'methods'             => WP_REST_Server::READABLE,
-					'callback'            => array( $this, 'get_items' ),
-					'permission_callback' => array( $this, 'get_items_permissions_check' ),
-					'args'                => $this->get_collection_params(),
-				),
-				'schema' => array( $this, 'get_public_item_schema' ),
-			)
-		);
-
 		// Lists/updates a single gloval style variation based on the given id.
 		register_rest_route(
 			$this->namespace,
@@ -92,41 +77,6 @@ class Gutenberg_REST_Global_Styles_Controller extends WP_REST_Controller {
 		}
 
 		return true;
-	}
-
-	/**
-	 * Checks if a given request has access to read global styles configs.
-	 *
-	 * @param WP_REST_Request $request Full details about the request.
-	 * @return true|WP_Error True if the request has read access, WP_Error object otherwise.
-	 */
-	public function get_items_permissions_check( $request ) {
-		return $this->permissions_check( $request );
-	}
-
-	/**
-	 * Returns a list of available global styles variations.
-	 *
-	 * @param WP_REST_Request $request The request instance.
-	 *
-	 * @return WP_REST_Response
-	 */
-	public function get_items( $request ) {
-		$wp_query_args = array(
-			'post_status'    => array( 'publish' ),
-			'post_type'      => 'wp_global_styles',
-			'posts_per_page' => -1,
-			'no_found_rows'  => true,
-		);
-
-		$query   = new WP_Query( $wp_query_args );
-		$results = array();
-		foreach ( $query->posts as $post ) {
-			$data      = $this->prepare_item_for_response( $post, $request );
-			$results[] = $this->prepare_response_for_collection( $data );
-		}
-
-		return rest_ensure_response( $results );
 	}
 
 	/**

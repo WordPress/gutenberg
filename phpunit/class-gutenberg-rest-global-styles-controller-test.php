@@ -66,28 +66,7 @@ class Gutenberg_REST_Global_Styles_Controller_Test extends WP_Test_REST_Controll
 	}
 
 	public function test_get_items() {
-		wp_set_current_user( 0 );
-		$request  = new WP_REST_Request( 'GET', '/wp/v2/global-styles' );
-		$response = rest_get_server()->dispatch( $request );
-		$this->assertErrorResponse( 'rest_cannot_manage_global_styles', $response, 401 );
-
-		wp_set_current_user( self::$admin_id );
-		$request  = new WP_REST_Request( 'GET', '/wp/v2/global-styles' );
-		$response = rest_get_server()->dispatch( $request );
-		$data     = $response->get_data();
-
-		$this->assertEquals(
-			array(
-				'id'       => self::$global_styles_id,
-				'title'    => array(
-					'raw'      => 'Custom Styles',
-					'rendered' => 'Custom Styles',
-				),
-				'settings' => new stdClass(),
-				'styles'   => new stdClass(),
-			),
-			$this->find_and_normalize_global_styles_by_id( $data, self::$global_styles_id )
-		);
+		$this->markTestIncomplete();
 	}
 
 	public function test_get_item() {
