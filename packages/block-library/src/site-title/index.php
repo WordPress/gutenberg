@@ -21,7 +21,7 @@ function render_block_core_site_title( $attributes ) {
 	$tag_name         = 'h1';
 	$align_class_name = empty( $attributes['textAlign'] ) ? '' : "has-text-align-{$attributes['textAlign']}";
 
-	$aria_current = is_home() ? ' aria-current="true"' : '';
+	$aria_current = is_home() || ( is_front_page() && 'page' == get_option( 'show_on_front' ) ) ? ' aria-current="page"' : '';
 
 	if ( isset( $attributes['level'] ) ) {
 		$tag_name = 0 === $attributes['level'] ? 'p' : 'h' . $attributes['level'];
