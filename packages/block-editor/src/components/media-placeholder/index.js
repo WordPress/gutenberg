@@ -311,14 +311,16 @@ export function MediaPlaceholder( {
 	const renderMediaUploadChecked = () => {
 		const defaultButton = ( { open } ) => {
 			return (
-				<Button
-					variant="tertiary"
-					onClick={ () => {
-						open();
-					} }
-				>
-					{ __( 'Media Library' ) }
-				</Button>
+				<div className="components-form-media-select">
+					<Button
+						variant="tertiary"
+						onClick={ () => {
+							open();
+						} }
+					>
+						{ __( 'Media Library' ) }
+					</Button>
+				</div>
 			);
 		};
 		const libraryButton = mediaLibraryButton ?? defaultButton;
