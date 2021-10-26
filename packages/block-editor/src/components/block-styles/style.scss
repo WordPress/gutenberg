@@ -1,26 +1,11 @@
-// Do not show in narrow widths. Needs specificity.
-.block-editor-block-styles__popover.block-editor-block-styles__preview__popover {
-	display: none;
+.block-editor-block-styles {
 
-	@include break-medium() {
-		display: flex;
-	}
-}
-
-.block-editor-block-styles__preview__popover {
-	@include break-medium() {
-		// The right position equals the sidebar width plus the
-		// left offset of .block-editor-inserter__preview-container.
-		// We need the !important to override the Popover inline styles.
-		right: calc(#{$sidebar-width} + #{$grid-unit-20}) !important;
-		left: auto !important;
-	}
-
-	// Overrides for InserterPreviewPanel.
-	.block-editor-inserter__preview-container {
+	// Fixing the position is specific to the block inspector context.
+	&.block-inspector__block-styles .block-editor-inserter__preview-container {
+		position: fixed;
+		right: calc(#{$sidebar-width} + #{$grid-unit-40});
+		top: calc(#{$header-height} + #{$panel-header-height});
 		left: auto;
-		right: auto;
-		position: static;
 	}
 
 	.block-editor-block-card__title.block-editor-block-card__title {
@@ -65,4 +50,3 @@
 .block-editor-block-styles__block-preview-container * {
 	box-sizing: border-box !important;
 }
-

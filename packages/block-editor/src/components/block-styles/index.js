@@ -23,13 +23,14 @@ export default function BlockStyles( {
 	clientId,
 	onSwitch = noop,
 	onHoverClassName = noop,
+	className = '',
 } ) {
 	const {
 		onSelect,
 		stylesToRender,
 		activeStyle,
 		genericPreviewBlock,
-		className,
+		className: previewClassName,
 	} = useStylesForBlocks( {
 		clientId,
 		onSwitch,
@@ -56,7 +57,7 @@ export default function BlockStyles( {
 	};
 
 	return (
-		<div className="block-editor-block-styles">
+		<div className={ classnames( 'block-editor-block-styles', className ) }>
 			<div className="block-editor-block-styles__variants">
 				{ stylesToRender.map( ( style ) => {
 					const buttonText = style.label || style.name;
@@ -105,7 +106,7 @@ export default function BlockStyles( {
 			{ hoveredStyle && (
 				<BlockStylesPreviewPanel
 					activeStyle={ activeStyle }
-					className={ className }
+					className={ previewClassName }
 					genericPreviewBlock={ genericPreviewBlock }
 					style={ hoveredStyle }
 				/>

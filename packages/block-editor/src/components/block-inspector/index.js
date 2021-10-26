@@ -119,7 +119,10 @@ const BlockInspectorSingleBlock = ( {
 			{ hasBlockStyles && (
 				<div>
 					<PanelBody title={ __( 'Styles' ) }>
-						<BlockStyles clientId={ clientId } />
+						<BlockStyles
+							clientId={ clientId }
+							className="block-inspector__block-styles"
+						/>
 						{ hasBlockSupport(
 							blockName,
 							'defaultStylePicker',

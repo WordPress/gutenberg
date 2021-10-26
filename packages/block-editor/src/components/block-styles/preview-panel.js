@@ -8,7 +8,6 @@ import { useMemo } from '@wordpress/element';
  */
 import InserterPreviewPanel from '../inserter/preview-panel';
 import { replaceActiveStyle } from './utils';
-import { Popover } from '@wordpress/components';
 
 export default function BlockStylesPreviewPanel( {
 	genericPreviewBlock,
@@ -32,16 +31,6 @@ export default function BlockStylesPreviewPanel( {
 	}, [ genericPreviewBlock, styleClassName ] );
 
 	return (
-		<Popover
-			className="block-editor-block-styles__popover block-editor-block-styles__preview__popover "
-			focusOnMount={ false }
-			position="middle left"
-			animate={ false }
-		>
-			<InserterPreviewPanel
-				item={ previewBlocks }
-				isStylePreview={ true }
-			/>
-		</Popover>
+		<InserterPreviewPanel item={ previewBlocks } isStylePreview={ true } />
 	);
 }
