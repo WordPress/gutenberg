@@ -1,11 +1,22 @@
 /**
+ * External dependencies
+ */
+import classnames from 'classnames';
+
+/**
  * WordPress dependencies
  */
 import { Icon, search } from '@wordpress/icons';
 
-const PlaceholderPreview = () => {
+const PlaceholderPreview = ( { isLoading } ) => {
 	return (
-		<ul className="wp-block-navigation-placeholder__preview wp-block-navigation__container">
+		<ul
+			className={ classnames(
+				'wp-block-navigation-placeholder__preview',
+				'wp-block-navigation__container',
+				{ 'is-loading': isLoading }
+			) }
+		>
 			<li className="wp-block-navigation-item">&#8203;</li>
 			<li className="wp-block-navigation-item">&#8203;</li>
 			<li className="wp-block-navigation-item">&#8203;</li>

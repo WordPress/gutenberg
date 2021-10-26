@@ -23,11 +23,11 @@ import { navigation, chevronDown, Icon } from '@wordpress/icons';
 /**
  * Internal dependencies
  */
-import useNavigationEntities from './use-navigation-entities';
+import useNavigationEntities from '../../use-navigation-entities';
 import PlaceholderPreview from './placeholder-preview';
-import menuItemsToBlocks from './menu-items-to-blocks';
+import menuItemsToBlocks from '../../menu-items-to-blocks';
 
-function NavigationPlaceholder( { onCreate }, ref ) {
+function CreateInnerBlocksStep( { onFinish }, ref ) {
 	const [ selectedMenu, setSelectedMenu ] = useState();
 
 	const [ isCreatingFromMenu, setIsCreatingFromMenu ] = useState( false );
@@ -46,9 +46,8 @@ function NavigationPlaceholder( { onCreate }, ref ) {
 
 	const createFromMenu = useCallback( () => {
 		const { innerBlocks: blocks } = menuItemsToBlocks( menuItems );
-		const selectNavigationBlock = true;
-		onCreate( blocks, selectNavigationBlock );
-	}, [ menuItems, menuItemsToBlocks, onCreate ] );
+		onFinish( blocks );
+	}, [ menuItems, menuItemsToBlocks, onFinish ] );
 
 	const onCreateFromMenu = () => {
 		// If we have menu items, create the block right away.
@@ -62,13 +61,12 @@ function NavigationPlaceholder( { onCreate }, ref ) {
 	};
 
 	const onCreateEmptyMenu = () => {
-		onCreate( [] );
+		onFinish( [] );
 	};
 
 	const onCreateAllPages = () => {
 		const block = [ createBlock( 'core/page-list' ) ];
-		const selectNavigationBlock = true;
-		onCreate( block, selectNavigationBlock );
+		onFinish( block );
 	};
 
 	useEffect( () => {
@@ -151,4 +149,4 @@ function NavigationPlaceholder( { onCreate }, ref ) {
 	);
 }
 
-export default forwardRef( NavigationPlaceholder );
+export default forwardRef( CreateInnerBlocksStep );
