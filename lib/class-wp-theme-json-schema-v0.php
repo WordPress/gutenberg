@@ -186,7 +186,6 @@ class WP_Theme_JSON_Schema_V0 implements WP_Theme_JSON_Schema {
 
 		$renamed_paths = array(
 			'border.customColor'               => 'border.color',
-			'border.customRadius'              => 'border.radius',
 			'border.customStyle'               => 'border.style',
 			'border.customWidth'               => 'border.width',
 			'typography.customFontStyle'       => 'typography.fontStyle',

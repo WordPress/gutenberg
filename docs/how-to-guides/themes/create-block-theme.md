@@ -440,7 +440,7 @@ To enable border styles, add a `border` object under `settings` with the followi
 	"settings": {
 		"border": {
 			"color": true,
-			"radius": true,
+			"customRadius": true,
 			"style": true,
 			"width": true
 		}
@@ -456,7 +456,7 @@ To enable link colors, add a `color` setting and set `link` to true:
 	"settings": {
 		"border": {
 			"color": true,
-			"radius": true,
+			"customRadius": true,
 			"style": true,
 			"width": true
 		},
@@ -475,7 +475,7 @@ To enable padding, margin and custom spacing units, include a setting for spacin
 	"settings": {
 		"border": {
 			"color": true,
-			"radius": true,
+			"customRadius": true,
 			"style": true,
 			"width": true
 		},
@@ -501,7 +501,7 @@ If you want to disable gradients, which are enabled by default, set `gradient` t
 	"settings": {
 		"border": {
 			"color": true,
-			"radius": true,
+			"customRadius": true,
 			"style": true,
 			"width": true
 		},

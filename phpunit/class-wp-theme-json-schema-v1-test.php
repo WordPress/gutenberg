@@ -112,10 +112,10 @@ class WP_Theme_JSON_Schema_V1_Test extends WP_UnitTestCase {
 					'link'    => true,
 				),
 				'border'     => array(
-					'color'  => false,
-					'radius' => false,
-					'style'  => false,
-					'width'  => false,
+					'color'        => false,
+					'customRadius' => false,
+					'style'        => false,
+					'width'        => false,
 				),
 				'typography' => array(
 					'fontStyle'      => false,
@@ -126,10 +126,10 @@ class WP_Theme_JSON_Schema_V1_Test extends WP_UnitTestCase {
 				'blocks'     => array(
 					'core/group' => array(
 						'border'     => array(
-							'color'  => true,
-							'radius' => true,
-							'style'  => true,
-							'width'  => true,
+							'color'        => true,
+							'customRadius' => true,
+							'style'        => true,
+							'width'        => true,
 						),
 						'typography' => array(
 							'fontStyle'      => true,

@@ -217,7 +217,7 @@ The settings section has the following structure:
 	"settings": {
 		"border": {
 			"color": false,
-			"radius": false,
+			"customRadius": false,
 			"style": false,
 			"width": false
 		},
@@ -528,7 +528,7 @@ Note that the name of the variable is created by adding `--` in between each nes
 		"blocks": {
 			"core/button": {
 				"border": {
-					"radius": false
+					"customRadius": false
 				}
 			}
 		}

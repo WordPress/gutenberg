@@ -117,10 +117,10 @@ class WP_Theme_JSON_Schema_V0_Test extends WP_UnitTestCase {
 					'link'    => true,
 				),
 				'border'     => array(
-					'color'  => false,
-					'radius' => false,
-					'style'  => false,
-					'width'  => false,
+					'color'        => false,
+					'customRadius' => false,
+					'style'        => false,
+					'width'        => false,
 				),
 				'typography' => array(
 					'fontStyle'      => false,

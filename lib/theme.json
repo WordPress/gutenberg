@@ -220,20 +220,20 @@
 		},
 		"border": {
 			"color": false,
-			"radius": false,
+			"customRadius": false,
 			"style": false,
 			"width": false
 		},
 		"blocks": {
 			"core/button": {
 				"border": {
-					"radius": true
+					"customRadius": true
 				}
 			},
 			"core/pullquote": {
 				"border": {
 					"color": true,
-					"radius": true,
+					"customRadius": true,
 					"style": true,
 					"width": true
 				}

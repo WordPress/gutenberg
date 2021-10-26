@@ -57,7 +57,6 @@ const deprecatedFlags = {
 // See: https://github.com/WordPress/gutenberg/pull/34485
 const prefixedFlags = {
 	'border.customColor': 'border.color',
-	'border.customRadius': 'border.radius',
 	'border.customStyle': 'border.style',
 	'border.customWidth': 'border.width',
 	'typography.customFontStyle': 'typography.fontStyle',
