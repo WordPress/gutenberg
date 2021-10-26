@@ -5,7 +5,7 @@ import { __ } from '@wordpress/i18n';
 import { LEFT, RIGHT, UP, DOWN } from '@wordpress/keycodes';
 import { VisuallyHidden } from '@wordpress/components';
 
-const DELTA_LENGTH = 10; // The length to resize per keydown in pixels.
+const DELTA_DISTANCE = 10; // The distance to resize per keydown in pixels.
 
 export default function ResizeHandle( { direction, resizeBy } ) {
 	function handleKeyDown( event ) {
@@ -16,18 +16,18 @@ export default function ResizeHandle( { direction, resizeBy } ) {
 			( direction === 'right' && keyCode === RIGHT )
 		) {
 			// The canvas is centered horizontally, thus resizing it horizontally
-			// needs two times the length.
-			resizeBy( DELTA_LENGTH * 2, 0 );
+			// needs two times the distance.
+			resizeBy( DELTA_DISTANCE * 2, 0 );
 		} else if (
 			( direction === 'left' && keyCode === RIGHT ) ||
 			( direction === 'right' && keyCode === LEFT )
 		) {
-			resizeBy( -DELTA_LENGTH * 2, 0 );
+			resizeBy( -DELTA_DISTANCE * 2, 0 );
 		} else if ( direction === 'down' ) {
 			if ( keyCode === DOWN ) {
-				resizeBy( 0, DELTA_LENGTH );
+				resizeBy( 0, DELTA_DISTANCE );
 			} else if ( keyCode === UP ) {
-				resizeBy( 0, -DELTA_LENGTH );
+				resizeBy( 0, -DELTA_DISTANCE );
 			}
 		}
 	}

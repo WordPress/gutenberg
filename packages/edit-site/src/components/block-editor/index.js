@@ -10,6 +10,7 @@ import { useSelect, useDispatch } from '@wordpress/data';
 import { useCallback, useRef } from '@wordpress/element';
 import { useEntityBlockEditor } from '@wordpress/core-data';
 import {
+	BlockList,
 	BlockEditorProvider,
 	__experimentalLinkControl,
 	BlockInspector,
@@ -31,6 +32,12 @@ import BlockInspectorButton from './block-inspector-button';
 import EditTemplatePartMenuButton from '../edit-template-part-menu-button';
 import BackButton from './back-button';
 import ResizableEditor from './resizable-editor';
+
+const LAYOUT = {
+	type: 'default',
+	// At the root level of the site editor, no alignments should be allowed.
+	alignments: [],
+};
 
 export default function BlockEditor( { setIsInserterOpen } ) {
 	const { settings, templateType, templateId, page } = useSelect(
@@ -112,7 +119,12 @@ export default function BlockEditor( { setIsInserterOpen } ) {
 					}
 					settings={ settings }
 					contentRef={ mergedRefs }
-				/>
+				>
+					<BlockList
+						className="edit-site-block-editor__block-list wp-site-blocks"
+						__experimentalLayout={ LAYOUT }
+					/>
+				</ResizableEditor>
 
 				<__unstableBlockSettingsMenuFirstItem>
 					{ ( { onClose } ) => (

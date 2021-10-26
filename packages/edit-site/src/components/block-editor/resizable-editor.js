@@ -1,21 +1,15 @@
 /**
- * External dependencies
- */
-import { omit } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { useState, useEffect, useRef, useCallback } from '@wordpress/element';
 import { ResizableBox } from '@wordpress/components';
 import {
-	BlockList,
 	__experimentalUseResizeCanvas as useResizeCanvas,
 	__unstableEditorStyles as EditorStyles,
 	__unstableIframe as Iframe,
 	__unstableUseMouseMoveTypingReset as useMouseMoveTypingReset,
 } from '@wordpress/block-editor';
-import { useDispatch, useSelect } from '@wordpress/data';
+import { useSelect } from '@wordpress/data';
 import { useMergeRefs } from '@wordpress/compose';
 
 /**
@@ -23,14 +17,6 @@ import { useMergeRefs } from '@wordpress/compose';
  */
 import { store as editSiteStore } from '../../store';
 import ResizeHandle from './resize-handle';
-
-const LAYOUT = {
-	type: 'default',
-	// At the root level of the site editor, no alignments should be allowed.
-	alignments: [],
-};
-
-const RESPONSIVE_DEVICE = 'responsive';
 
 const DEFAULT_STYLES = {
 	width: '100%',
@@ -50,7 +36,9 @@ const HANDLE_STYLES_OVERRIDE = {
 	left: undefined,
 };
 
-const ROOT_CONTAINER_CLASS_NAME = 'edit-site-block-editor__root-container';
+function isHorizontal( direction ) {
+	return direction === 'left' || direction === 'right';
+}
 
 function ResizableEditor( { enableResizing, settings, ...props } ) {
 	const deviceType = useSelect(
@@ -58,32 +46,13 @@ function ResizableEditor( { enableResizing, settings, ...props } ) {
 			select( editSiteStore ).__experimentalGetPreviewDeviceType(),
 		[]
 	);
-	const resizedCanvasStyles = useResizeCanvas( deviceType ) ?? DEFAULT_STYLES;
-	const previousResizedCanvasStylesRef = useRef( resizedCanvasStyles );
-	// Keep the height of the canvas when resizing on each device type.
-	const styles =
-		deviceType === RESPONSIVE_DEVICE
-			? previousResizedCanvasStylesRef.current
-			: resizedCanvasStyles;
-	const [ width, setWidth ] = useState( styles.width );
-	const [ height, setHeight ] = useState( styles.height );
+	const deviceStyles = useResizeCanvas( deviceType );
+	const [ width, setWidth ] = useState( DEFAULT_STYLES.width );
+	const [ height, setHeight ] = useState( DEFAULT_STYLES.height );
 	const [ resizingDirection, setResizingDirection ] = useState( null );
-	const {
-		__experimentalSetPreviewDeviceType: setPreviewDeviceType,
-	} = useDispatch( editSiteStore );
 	const iframeRef = useRef();
 	const mouseMoveTypingResetRef = useMouseMoveTypingReset();
 	const ref = useMergeRefs( [ iframeRef, mouseMoveTypingResetRef ] );
-
-	useEffect(
-		function setWidthWhenDeviceTypeChanged() {
-			if ( deviceType !== RESPONSIVE_DEVICE ) {
-				setWidth( resizedCanvasStyles.width );
-				previousResizedCanvasStylesRef.current = resizedCanvasStyles;
-			}
-		},
-		[ deviceType, resizedCanvasStyles.width ]
-	);
 
 	const resizeBy = useCallback( ( deltaWidth, deltaHeight ) => {
 		if ( deltaWidth > 0 ) {
@@ -115,7 +84,7 @@ function ResizableEditor( { enableResizing, settings, ...props } ) {
 				() => {
 					setHeight(
 						iframe.contentDocument.querySelector(
-							`.${ ROOT_CONTAINER_CLASS_NAME }`
+							`.edit-site-block-editor__block-list`
 						).offsetHeight
 					);
 				}
@@ -144,7 +113,6 @@ function ResizableEditor( { enableResizing, settings, ...props } ) {
 			onResizeStop={ ( event, direction, element ) => {
 				setWidth( element.style.width );
 				setHeight( parseInt( element.style.height, 10 ) );
-				setPreviewDeviceType( RESPONSIVE_DEVICE );
 			} }
 			minWidth={ 300 }
 			maxWidth="100%"
@@ -172,17 +140,14 @@ function ResizableEditor( { enableResizing, settings, ...props } ) {
 			} }
 		>
 			<Iframe
-				style={
-					// We'll be using the size controlled by ResizableBox so resetting them here.
-					omit( styles, [ 'width', 'height', 'margin' ] )
-				}
+				style={ enableResizing ? undefined : deviceStyles }
 				head={
 					<>
 						<EditorStyles styles={ settings.styles } />
 						<style>{
 							// Forming a "block formatting context" to prevent margin collapsing.
 							// @see https://developer.mozilla.org/en-US/docs/Web/Guide/CSS/Block_formatting_context
-							`.${ ROOT_CONTAINER_CLASS_NAME } { display: flow-root; }`
+							`.edit-site-block-editor__block-list { display: flow-root; }`
 						}</style>
 					</>
 				}
@@ -190,18 +155,9 @@ function ResizableEditor( { enableResizing, settings, ...props } ) {
 				name="editor-canvas"
 				className="edit-site-visual-editor__editor-canvas"
 				{ ...props }
-			>
-				<BlockList
-					className={ `edit-site-block-editor__block-list wp-site-blocks ${ ROOT_CONTAINER_CLASS_NAME }` }
-					__experimentalLayout={ LAYOUT }
-				/>
-			</Iframe>
+			/>
 		</ResizableBox>
 	);
-}
-
-function isHorizontal( direction ) {
-	return direction === 'left' || direction === 'right';
 }
 
 export default ResizableEditor;
