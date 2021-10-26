@@ -589,6 +589,61 @@ describe( 'Links', () => {
 		expect( await getEditedPostContent() ).toMatchSnapshot();
 	} );
 
+	describe( 'Editing link text', () => {
+		it( 'should not display text input when initially creating the link', async () => {
+			// Create a block with some text
+			await clickBlockAppender();
+			await page.keyboard.type( 'This is Gutenberg: ' );
+
+			// Press Cmd+K to insert a link
+			await pressKeyWithModifier( 'primary', 'K' );
+
+			// Wait for the URL field to auto-focus
+			await waitForAutoFocus();
+
+			const textInput = await page
+				.waitForXPath(
+					'//[contains(@class, "block-editor-link-control__search-input-wrapper")]//label[contains(text(), "Text")]',
+					{
+						timeout: 1000,
+					}
+				)
+				.catch( () => false );
+
+			expect( textInput ).toBeFalsy();
+		} );
+
+		it( 'should display text input when the link has a valid URL value', async () => {
+			await createAndReselectLink();
+			// Make a collapsed selection inside the link
+			await page.keyboard.press( 'ArrowLeft' );
+			await page.keyboard.press( 'ArrowRight' );
+			await showBlockToolbar();
+			const [ editButton ] = await page.$x( '//button[text()="Edit"]' );
+			await editButton.click();
+			await waitForAutoFocus();
+
+			await pressKeyWithModifier( 'shift', 'Tab' );
+
+			// Tabbing back should land us in the text input.
+			const { isTextInput, textValue } = await page.evaluate( () => {
+				const el = document.activeElement;
+
+				return {
+					isTextInput: el.matches( 'input[type="text"]' ),
+					textValue: el.value,
+				};
+			} );
+
+			// Let's check we've focused a text input.
+			expect( isTextInput ).toBe( true );
+
+			// Link was created on text value "Gutenberg". We expect
+			// the text input to reflect that value.
+			expect( textValue ).toBe( 'Gutenberg' );
+		} );
+	} );
+
 	describe( 'Disabling Link UI active state', () => {
 		it( 'should not show the Link UI when selection extends beyond link boundary', async () => {
 			const linkedText = `Gutenberg`;
