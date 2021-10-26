@@ -58,7 +58,7 @@ export function isUnmodifiedDefaultBlock( block ) {
 	const blockType = getBlockType( defaultBlockName );
 
 	return every(
-		blockType.attributes,
+		blockType?.attributes,
 		( value, key ) =>
 			newDefaultBlock.attributes[ key ] === block.attributes[ key ]
 	);
@@ -175,8 +175,10 @@ export function getAccessibleBlockLabel(
 	direction = 'vertical'
 ) {
 	// `title` is already localized, `label` is a user-supplied value.
-	const { title } = blockType;
-	const label = getBlockLabel( blockType, attributes, 'accessibility' );
+	const title = blockType?.title;
+	const label = blockType
+		? getBlockLabel( blockType, attributes, 'accessibility' )
+		: '';
 	const hasPosition = position !== undefined;
 
 	// getBlockLabel returns the block title as a fallback when there's no label,

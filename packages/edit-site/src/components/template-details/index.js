@@ -1,10 +1,13 @@
 /**
  * WordPress dependencies
  */
-import { __ } from '@wordpress/i18n';
+import { useMemo } from '@wordpress/element';
+import { sprintf, __ } from '@wordpress/i18n';
 import {
 	Button,
+	MenuGroup,
 	MenuItem,
+	__experimentalHeading as Heading,
 	__experimentalText as Text,
 } from '@wordpress/components';
 import { useDispatch, useSelect } from '@wordpress/data';
@@ -14,7 +17,10 @@ import { store as editorStore } from '@wordpress/editor';
  * Internal dependencies
  */
 import isTemplateRevertable from '../../utils/is-template-revertable';
-import { MENU_TEMPLATES } from '../navigation-sidebar/navigation-panel/constants';
+import {
+	MENU_TEMPLATES,
+	TEMPLATE_PARTS_SUB_MENUS,
+} from '../navigation-sidebar/navigation-panel/constants';
 import { store as editSiteStore } from '../../store';
 import TemplateAreas from './template-areas';
 
@@ -28,13 +34,23 @@ export default function TemplateDetails( { template, onClose } ) {
 		editSiteStore
 	);
 
+	const templateSubMenu = useMemo( () => {
+		if ( template?.type === 'wp_template' ) {
+			return { title: __( 'templates' ), menu: MENU_TEMPLATES };
+		}
+
+		return TEMPLATE_PARTS_SUB_MENUS.find(
+			( { area } ) => area === template?.area
+		);
+	}, [ template ] );
+
 	if ( ! template ) {
 		return null;
 	}
 
 	const showTemplateInSidebar = () => {
 		onClose();
-		openNavigationPanelToMenu( MENU_TEMPLATES );
+		openNavigationPanelToMenu( templateSubMenu.menu );
 	};
 
 	const revert = () => {
@@ -43,44 +59,58 @@ export default function TemplateDetails( { template, onClose } ) {
 	};
 
 	return (
-		<>
-			<div className="edit-site-template-details">
-				<Text size="body" weight={ 600 }>
+		<div className="edit-site-template-details">
+			<div className="edit-site-template-details__group">
+				<Heading
+					level={ 4 }
+					weight={ 600 }
+					className="edit-site-template-details__title"
+				>
 					{ title }
-				</Text>
+				</Heading>
 
 				{ description && (
 					<Text
 						size="body"
 						className="edit-site-template-details__description"
+						as="p"
 					>
 						{ description }
 					</Text>
 				) }
 			</div>
 
-			<TemplateAreas />
+			<TemplateAreas closeTemplateDetailsDropdown={ onClose } />
 
 			{ isTemplateRevertable( template ) && (
-				<div className="edit-site-template-details__revert">
+				<MenuGroup className="edit-site-template-details__group edit-site-template-details__revert">
 					<MenuItem
+						className="edit-site-template-details__revert-button"
 						info={ __( 'Restore template to theme default' ) }
 						onClick={ revert }
 					>
 						{ __( 'Clear customizations' ) }
 					</MenuItem>
-				</div>
+				</MenuGroup>
 			) }
 
 			<Button
 				className="edit-site-template-details__show-all-button"
 				onClick={ showTemplateInSidebar }
-				aria-label={ __(
-					'Browse all templates. This will open the template menu in the navigation side panel.'
+				aria-label={ sprintf(
+					/* translators: %1$s: the template part's area name ("Headers", "Sidebars") or "templates". */
+					__(
+						'Browse all %1$s. This will open the %1$s menu in the navigation side panel.'
+					),
+					templateSubMenu.title
 				) }
 			>
-				{ __( 'Browse all templates' ) }
+				{ sprintf(
+					/* translators: the template part's area name ("Headers", "Sidebars") or "templates". */
+					__( 'Browse all %s' ),
+					templateSubMenu.title
+				) }
 			</Button>
-		</>
+		</div>
 	);
 }

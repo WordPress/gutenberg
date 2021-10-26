@@ -94,7 +94,7 @@ function useBlockEditorSettings( settings, hasTemplate ) {
 				'__experimentalBlockPatternCategories',
 				'__experimentalBlockPatterns',
 				'__experimentalFeatures',
-				'__experimentalGlobalStylesBaseStyles',
+				'__experimentalGlobalStylesBaseConfig',
 				'__experimentalGlobalStylesUserEntityId',
 				'__experimentalPreferredStyleVariations',
 				'__experimentalSetIsInserterOpened',
@@ -148,9 +148,7 @@ function useBlockEditorSettings( settings, hasTemplate ) {
 			canUseUnfilteredHTML,
 			undo,
 			hasTemplate,
-
 			userCanCreatePages,
-			createPageEntity,
 		]
 	);
 }

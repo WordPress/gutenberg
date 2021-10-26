@@ -59,8 +59,8 @@ export function DefaultBlockAppender( {
 				// eslint-disable-next-line jsx-a11y/no-noninteractive-element-to-interactive-role
 				role="button"
 				aria-label={ __( 'Add block' ) }
-				// The wp-block className is important for editor styles.
-				className="wp-block block-editor-default-block-appender__content"
+				// A wrapping container for this one already has the wp-block className.
+				className="block-editor-default-block-appender__content"
 				onFocus={ onAppend }
 			>
 				{ showPrompt ? value : ZWNBSP }

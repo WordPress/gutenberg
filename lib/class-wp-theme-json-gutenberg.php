@@ -205,7 +205,7 @@ class WP_Theme_JSON_Gutenberg {
 			'path'       => array( 'typography', 'fontFamilies' ),
 			'value_key'  => 'fontFamily',
 			'css_vars'   => '--wp--preset--font-family--$slug',
-			'classes'    => array(),
+			'classes'    => array( '.has-$slug-font-family' => 'font-family' ),
 			'properties' => array( 'font-family' ),
 		),
 	);
@@ -247,16 +247,20 @@ class WP_Theme_JSON_Gutenberg {
 		'--wp--style--block-gap'     => array( 'spacing', 'blockGap' ),
 		'text-decoration'            => array( 'typography', 'textDecoration' ),
 		'text-transform'             => array( 'typography', 'textTransform' ),
+		'filter'                     => array( 'filter', 'duotone' ),
 	);
 
 	/**
-	 * Metadata for style properties that need to use the duotone selector.
+	 * Protected style properties.
 	 *
-	 * Each element is a direct mapping from the CSS property name to the
-	 * path to the value in theme.json & block attributes.
+	 * These style properties are only rendered if a setting enables it
+	 * via a value other than `null`.
+	 *
+	 * Each element maps the style property to the corresponding theme.json
+	 * setting key.
 	 */
-	const DUOTONE_PROPERTIES_METADATA = array(
-		'filter' => array( 'filter', 'duotone' ),
+	const PROTECTED_PROPERTIES = array(
+		'spacing.blockGap' => array( 'spacing', 'blockGap' ),
 	);
 
 	const ELEMENTS = array(
@@ -567,11 +571,12 @@ class WP_Theme_JSON_Gutenberg {
 	 * ```
 	 *
 	 * @param array $styles Styles to process.
+	 * @param array $settings Theme settings.
 	 * @param array $properties Properties metadata.
 	 *
 	 * @return array Returns the modified $declarations.
 	 */
-	private static function compute_style_properties( $styles, $properties = self::PROPERTIES_METADATA ) {
+	private static function compute_style_properties( $styles, $settings = array(), $properties = self::PROPERTIES_METADATA ) {
 		$declarations = array();
 		if ( empty( $styles ) ) {
 			return $declarations;
@@ -579,6 +584,18 @@ class WP_Theme_JSON_Gutenberg {
 
 		foreach ( $properties as $css_property => $value_path ) {
 			$value = self::get_property_value( $styles, $value_path );
+
+			// Look up protected properties, keyed by value path.
+			// Skip protected properties that are explicitly set to `null`.
+			if ( is_array( $value_path ) ) {
+				$path_string = implode( '.', $value_path );
+				if (
+					isset( self::PROTECTED_PROPERTIES[ $path_string ] ) &&
+					_wp_array_get( $settings, self::PROTECTED_PROPERTIES[ $path_string ], null ) === null
+				) {
+					continue;
+				}
+			}
 
 			// Skip if empty and not "0" or value represents array of longhand values.
 			$has_missing_value = empty( $value ) && ! is_numeric( $value );
@@ -697,7 +714,10 @@ class WP_Theme_JSON_Gutenberg {
 				if ( isset( $preset_metadata['value_key'] ) ) {
 					$value_key = $preset_metadata['value_key'];
 					$value     = $preset[ $value_key ];
-				} elseif ( is_callable( $preset_metadata['value_func'] ) ) {
+				} elseif (
+					isset( $preset_metadata['value_func'] ) &&
+					is_callable( $preset_metadata['value_func'] )
+				) {
 					$value_func = $preset_metadata['value_func'];
 					$value      = call_user_func( $value_func, $preset );
 				} else {
@@ -716,14 +736,15 @@ class WP_Theme_JSON_Gutenberg {
 	 *
 	 * @param array $settings Settings to process.
 	 * @param array $preset_metadata One of the PRESETS_METADATA values.
+	 * @param array $origins List of origins to process.
 	 *
 	 * @return array Array of presets where the key and value are both the slug.
 	 */
-	private static function get_settings_slugs( $settings, $preset_metadata ) {
+	private static function get_settings_slugs( $settings, $preset_metadata, $origins = self::VALID_ORIGINS ) {
 		$preset_per_origin = _wp_array_get( $settings, $preset_metadata['path'], array() );
 
 		$result = array();
-		foreach ( self::VALID_ORIGINS as $origin ) {
+		foreach ( $origins as $origin ) {
 			if ( ! isset( $preset_per_origin[ $origin ] ) ) {
 				continue;
 			}
@@ -780,7 +801,7 @@ class WP_Theme_JSON_Gutenberg {
 	/**
 	 * Transform a slug into a CSS Custom Property.
 	 *
-	 * @param array  $input String to replace.
+	 * @param string $input String to replace.
 	 * @param string $slug The slug value to use to generate the custom property.
 	 *
 	 * @return string The CSS Custom Property. Something along the lines of --wp--preset--color--black.
@@ -953,24 +974,39 @@ class WP_Theme_JSON_Gutenberg {
 
 			$node         = _wp_array_get( $this->theme_json, $metadata['path'], array() );
 			$selector     = $metadata['selector'];
-			$declarations = self::compute_style_properties( $node );
+			$settings     = _wp_array_get( $this->theme_json, array( 'settings' ) );
+			$declarations = self::compute_style_properties( $node, $settings );
+
+			// 1. Separate the ones who use the general selector
+			// and the ones who use the duotone selector.
+			$declarations_duotone = array();
+			foreach ( $declarations as $index => $declaration ) {
+				if ( 'filter' === $declaration['name'] ) {
+					unset( $declarations[ $index ] );
+					$declarations_duotone[] = $declaration;
+				}
+			}
+
+			// 2. Generate the rules that use the general selector.
 			$block_rules .= self::to_ruleset( $selector, $declarations );
 
+			// 3. Generate the rules that use the duotone selector.
+			if ( isset( $metadata['duotone'] ) && ! empty( $declarations_duotone ) ) {
+				$selector_duotone = self::scope_selector( $metadata['selector'], $metadata['duotone'] );
+				$block_rules     .= self::to_ruleset( $selector_duotone, $declarations_duotone );
+			}
+
 			if ( self::ROOT_BLOCK_SELECTOR === $selector ) {
+				$block_rules .= 'body { margin: 0; }';
 				$block_rules .= '.wp-site-blocks > .alignleft { float: left; margin-right: 2em; }';
 				$block_rules .= '.wp-site-blocks > .alignright { float: right; margin-left: 2em; }';
 				$block_rules .= '.wp-site-blocks > .aligncenter { justify-content: center; margin-left: auto; margin-right: auto; }';
 
 				$has_block_gap_support = _wp_array_get( $this->theme_json, array( 'settings', 'spacing', 'blockGap' ) ) !== null;
 				if ( $has_block_gap_support ) {
-					$block_rules .= '.wp-site-blocks > * + * { margin-top: var( --wp--style--block-gap ); margin-bottom: 0; }';
+					$block_rules .= '.wp-site-blocks > * { margin-top: 0; margin-bottom: 0; }';
+					$block_rules .= '.wp-site-blocks > * + * { margin-top: var( --wp--style--block-gap ); }';
 				}
-			}
-
-			if ( isset( $metadata['duotone'] ) ) {
-				$selector     = self::scope_selector( $metadata['selector'], $metadata['duotone'] );
-				$declarations = self::compute_style_properties( $node, self::DUOTONE_PROPERTIES_METADATA );
-				$block_rules .= self::to_ruleset( $selector, $declarations );
 			}
 		}
 
@@ -1085,7 +1121,8 @@ class WP_Theme_JSON_Gutenberg {
 		foreach ( $this->theme_json['templateParts'] as $item ) {
 			if ( isset( $item['name'] ) ) {
 				$template_parts[ $item['name'] ] = array(
-					'area' => isset( $item['area'] ) ? $item['area'] : '',
+					'title' => isset( $item['title'] ) ? $item['title'] : '',
+					'area'  => isset( $item['area'] ) ? $item['area'] : '',
 				);
 			}
 		}
@@ -1224,30 +1261,34 @@ class WP_Theme_JSON_Gutenberg {
 	 * Returns the stylesheet that results of processing
 	 * the theme.json structure this object represents.
 	 *
-	 * @param string $type   Type of stylesheet. It accepts:
-	 *                         'all': css variables, block classes, preset classes. The default.
-	 *                         'block_styles': only block & preset classes.
-	 *                         'css_variables': only css variables.
-	 *                         'presets': only css variables and preset classes.
-	 * @param array  $origins A list of origins to include. By default it includes 'core', 'theme', and 'user'.
+	 * @param array $types    Types of styles to load. Will load all by default. It accepts:
+	 *                         'variables': only the CSS Custom Properties for presets & custom ones.
+	 *                         'styles': only the styles section in theme.json.
+	 *                         'presets': only the classes for the presets.
+	 * @param array $origins A list of origins to include. By default it includes 'core', 'theme', and 'user'.
 	 *
 	 * @return string Stylesheet.
 	 */
-	public function get_stylesheet( $type = 'all', $origins = self::VALID_ORIGINS ) {
+	public function get_stylesheet( $types = array( 'variables', 'styles', 'presets' ), $origins = self::VALID_ORIGINS ) {
 		$blocks_metadata = self::get_blocks_metadata();
 		$style_nodes     = self::get_style_nodes( $this->theme_json, $blocks_metadata );
 		$setting_nodes   = self::get_setting_nodes( $this->theme_json, $blocks_metadata );
 
-		switch ( $type ) {
-			case 'block_styles':
-				return $this->get_block_classes( $style_nodes ) . $this->get_preset_classes( $setting_nodes, $origins );
-			case 'css_variables':
-				return $this->get_css_variables( $setting_nodes, $origins );
-			case 'presets':
-				return $this->get_css_variables( $setting_nodes, $origins ) . $this->get_preset_classes( $setting_nodes, $origins );
-			default:
-				return $this->get_css_variables( $setting_nodes, $origins ) . $this->get_block_classes( $style_nodes ) . $this->get_preset_classes( $setting_nodes, $origins );
+		$stylesheet = '';
+
+		if ( in_array( 'variables', $types, true ) ) {
+			$stylesheet .= $this->get_css_variables( $setting_nodes, $origins );
 		}
+
+		if ( in_array( 'styles', $types, true ) ) {
+			$stylesheet .= $this->get_block_classes( $style_nodes );
+		}
+
+		if ( in_array( 'presets', $types, true ) ) {
+			$stylesheet .= $this->get_preset_classes( $setting_nodes, $origins );
+		}
+
+		return $stylesheet;
 	}
 
 	/**
@@ -1307,7 +1348,16 @@ class WP_Theme_JSON_Gutenberg {
 					esc_attr( esc_html( $preset['name'] ) ) === $preset['name'] &&
 					sanitize_html_class( $preset['slug'] ) === $preset['slug']
 				) {
-					$value           = $preset[ $preset_metadata['value_key'] ];
+					$value = null;
+					if ( isset( $preset_metadata['value_key'] ) ) {
+						$value = $preset[ $preset_metadata['value_key'] ];
+					} elseif (
+						isset( $preset_metadata['value_func'] ) &&
+						is_callable( $preset_metadata['value_func'] )
+					) {
+						$value = call_user_func( $preset_metadata['value_func'], $preset );
+					}
+
 					$preset_is_valid = true;
 					foreach ( $preset_metadata['properties'] as $property ) {
 						if ( ! self::is_safe_css_declaration( $property, $value ) ) {

@@ -84,6 +84,7 @@ require __DIR__ . '/compat.php';
 require __DIR__ . '/compat/wordpress-5.8/index.php';
 require __DIR__ . '/compat/wordpress-5.8.1/index.php';
 require __DIR__ . '/compat/wordpress-5.9/default-editor-styles.php';
+require __DIR__ . '/compat/wordpress-5.9/get-global-styles-and-settings.php';
 require __DIR__ . '/utils.php';
 require __DIR__ . '/editor-settings.php';
 
@@ -108,6 +109,7 @@ require __DIR__ . '/full-site-editing/template-parts.php';
 require __DIR__ . '/full-site-editing/template-loader.php';
 require __DIR__ . '/full-site-editing/edit-site-page.php';
 require __DIR__ . '/full-site-editing/edit-site-export.php';
+require __DIR__ . '/compat/wordpress-5.9/default-theme-supports.php';
 
 require __DIR__ . '/blocks.php';
 require __DIR__ . '/block-patterns.php';

@@ -10,16 +10,38 @@ For each user feature we should also add a importance categorization label  to i
 -->
 
 ## Unreleased
+- [**] Search block - Text and background color support [#35511]
+- [*] [Embed Block] Fix loading glitch with resolver resolution approach [#35798]
+- [**] Block inserter indicates newly available block types [#35201]
+- [*] Add support for the Mark HTML tag [#35956]
+
+## 1.64.1
+-   [**] Fix updating the block list after block removal [#35721]
+-   [**] Cover block: Change dimRatio to 50 if media added and dimRatio is set to 100 [#35792]
+
+## 1.64.0
+-   [*] [Embed block] Fix inline preview cut-off when editing URL [#35321]
+-   [**] [Embed block] Detect when an embeddable URL is pasted into an empty paragraph. [#35204]
+-   [*] [Unsupported Block Editor] Fix text selection bug for Android [#34668]
+-   [*] [Embed block] Fix URL not editable after dismissing the edit URL bottom sheet with empty value [#35460]
+-   [**] Pullquote block - Added support for text and background color customization [#34451]
+-   [**] Preformatted block - Added support for text and background color customization [#35314]
+
+## 1.63.1
+-   [*] Fixed missing modal backdrop for Android help section [#35557]
+-   [*] Fixed erroneous overflow within editor Help screens. [#35552]
+
+## 1.63.0
 -   [**] [Embed block] Add the top 5 specific embed blocks to the Block inserter list [#34967]
+-   [*] Embed block: Fix URL update when edited after setting a bad URL of a provider [#35013]
+-   [**] Users can now contact support from inside the block editor screen. [#34890]
 
-1.62.2
-------
-* Same as 1.62.1 but with the changelog.
+## 1.62.2
+-   Same as 1.62.1 but with the changelog.
 
-1.62.1
-------
-* [**] Image block: fix height and border regression. [https://github.com/WordPress/gutenberg/pull/34957]
-* [**] Column block: fix width attribute flout cutoff. [https://github.com/wordpress-mobile/gutenberg-mobile/pull/3921]
+## 1.62.1
+-   [**] Image block: fix height and border regression. [#34957]
+-   [**] Column block: fix width attribute float cut off. [#34604]
 
 ## 1.62.0
 -   [**] [Embed block] Implement WP embed preview component [#34004]

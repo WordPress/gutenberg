@@ -30,7 +30,7 @@ export default function ListViewLeaf( {
 		isSelected,
 		adjustScrolling: false,
 		enableAnimation: true,
-		triggerAnimationOnChange: path.join( '_' ),
+		triggerAnimationOnChange: path,
 	} );
 
 	return (

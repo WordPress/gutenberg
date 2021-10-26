@@ -199,6 +199,34 @@ describe( 'Preloading Middleware', () => {
 		expect( value ).toEqual( body );
 	} );
 
+	it( 'should remove OPTIONS type requests from the cache after the first hit', async () => {
+		const body = { content: 'example' };
+		const preloadedData = {
+			OPTIONS: {
+				'wp/v2/demo': { body },
+			},
+		};
+
+		const preloadingMiddleware = createPreloadingMiddleware(
+			preloadedData
+		);
+
+		const requestOptions = {
+			method: 'OPTIONS',
+			path: 'wp/v2/demo',
+		};
+
+		const firstMiddleware = jest.fn();
+		preloadingMiddleware( requestOptions, firstMiddleware );
+		expect( firstMiddleware ).not.toHaveBeenCalled();
+
+		await preloadingMiddleware( requestOptions, firstMiddleware );
+
+		const secondMiddleware = jest.fn();
+		await preloadingMiddleware( requestOptions, secondMiddleware );
+		expect( secondMiddleware ).toHaveBeenCalledTimes( 1 );
+	} );
+
 	describe.each( [ [ 'GET' ], [ 'OPTIONS' ] ] )( '%s', ( method ) => {
 		describe.each( [
 			[ 'all empty', {} ],

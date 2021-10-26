@@ -60,8 +60,7 @@ The initial active path.
 
 -   Required: No
 
-
-## The navigator object
+## The `navigator` object
 
 You can retrieve a `navigator` instance by using the `useNavigator` hook.
 

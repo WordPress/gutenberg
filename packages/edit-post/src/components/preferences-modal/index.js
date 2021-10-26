@@ -13,12 +13,14 @@ import {
 	__experimentalItemGroup as ItemGroup,
 	__experimentalItem as Item,
 	__experimentalHStack as HStack,
+	__experimentalText as Text,
 	__experimentalTruncate as Truncate,
 	FlexItem,
 	Modal,
 	TabPanel,
 	Button,
 	Card,
+	CardHeader,
 	CardBody,
 } from '@wordpress/components';
 import { isRTL, __ } from '@wordpress/i18n';
@@ -325,10 +327,10 @@ export default function PreferencesModal() {
 		);
 	} else {
 		modalContent = (
-			<Card isBorderless>
-				<CardBody>
-					<NavigatorProvider initialPath="/">
-						<NavigatorScreen path="/">
+			<NavigatorProvider initialPath="/">
+				<NavigatorScreen path="/">
+					<Card isBorderless size="small">
+						<CardBody>
 							<ItemGroup>
 								{ tabs.map( ( tab ) => {
 									return (
@@ -358,12 +360,21 @@ export default function PreferencesModal() {
 									);
 								} ) }
 							</ItemGroup>
-						</NavigatorScreen>
-						{ sections.map( ( section ) => {
-							return (
-								<NavigatorScreen
-									key={ `${ section.name }-menu` }
-									path={ section.name }
+						</CardBody>
+					</Card>
+				</NavigatorScreen>
+				{ sections.map( ( section ) => {
+					return (
+						<NavigatorScreen
+							key={ `${ section.name }-menu` }
+							path={ section.name }
+						>
+							<Card isBorderless size="large">
+								<CardHeader
+									isBorderless={ false }
+									justify="left"
+									size="small"
+									gap="6"
 								>
 									<NavigationButton
 										path="/"
@@ -371,17 +382,18 @@ export default function PreferencesModal() {
 											isRTL() ? chevronRight : chevronLeft
 										}
 										isBack
-									>
-										{ __( 'Back' ) }
-									</NavigationButton>
-									<h2>{ section.tabLabel }</h2>
-									{ section.content }
-								</NavigatorScreen>
-							);
-						} ) }
-					</NavigatorProvider>
-				</CardBody>
-			</Card>
+										aria-label={ __(
+											'Navigate to the previous view'
+										) }
+									/>
+									<Text size="16">{ section.tabLabel }</Text>
+								</CardHeader>
+								<CardBody>{ section.content }</CardBody>
+							</Card>
+						</NavigatorScreen>
+					);
+				} ) }
+			</NavigatorProvider>
 		);
 	}
 	return (

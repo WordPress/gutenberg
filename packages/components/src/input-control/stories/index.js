@@ -16,6 +16,9 @@ import InputControl from '../';
 export default {
 	title: 'Components/InputControl',
 	component: InputControl,
+	parameters: {
+		knobs: { disabled: false },
+	},
 };
 
 function Example() {

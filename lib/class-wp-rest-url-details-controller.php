@@ -310,7 +310,7 @@ class WP_REST_URL_Details_Controller extends WP_REST_Controller {
 			return '';
 		}
 
-		$description = $this->get_metadata_from_meta_element( $meta_elements, 'name', '\bdescription\b' );
+		$description = $this->get_metadata_from_meta_element( $meta_elements, 'name', '(?:description|og:description)' );
 
 		// Bail out if description not found.
 		if ( '' === $description ) {

@@ -33,6 +33,11 @@ import { store as noticesStore } from '@wordpress/notices';
 import { store as editorStore } from '@wordpress/editor';
 import { check } from '@wordpress/icons';
 
+/**
+ * Internal dependencies
+ */
+import { TEMPLATE_PART_AREA_GENERAL } from '../../store/constants';
+
 export default function ConvertToTemplatePart( { clientIds, blocks } ) {
 	const instanceId = useInstanceId( ConvertToTemplatePart );
 	const [ isModalOpen, setIsModalOpen ] = useState( false );
@@ -40,7 +45,7 @@ export default function ConvertToTemplatePart( { clientIds, blocks } ) {
 	const { replaceBlocks } = useDispatch( blockEditorStore );
 	const { saveEntityRecord } = useDispatch( coreStore );
 	const { createSuccessNotice } = useDispatch( noticesStore );
-	const [ area, setArea ] = useState( 'uncategorized' );
+	const [ area, setArea ] = useState( TEMPLATE_PART_AREA_GENERAL );
 
 	const templatePartAreas = useSelect(
 		( select ) =>
