@@ -1582,9 +1582,11 @@ export const getInserterItems = createSelector(
 			 * type, if available.
 			 */
 			if ( Platform.OS === 'web' ) {
-				const rawBlockMatch = reusableBlock.content.raw.match(
-					blockParserTokenizer
-				);
+				const content =
+					typeof reusableBlock.content.raw === 'string'
+						? reusableBlock.content.raw
+						: reusableBlock.content;
+				const rawBlockMatch = content.match( blockParserTokenizer );
 				if ( rawBlockMatch ) {
 					const [
 						,
