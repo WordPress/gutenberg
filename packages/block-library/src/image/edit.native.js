@@ -114,7 +114,7 @@ export class ImageEdit extends Component {
 				label: __( 'Image Link URL' ),
 				placeholder: __( 'Add URL' ),
 				autoFocus: false,
-				autoFill: true,
+				autoFill: false,
 			},
 			openInNewTab: {
 				label: __( 'Open in new tab' ),
