@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { NativeModules as RNNativeModules } from 'react-native';
+import { Image, NativeModules as RNNativeModules } from 'react-native';
 
 RNNativeModules.UIManager = RNNativeModules.UIManager || {};
 RNNativeModules.UIManager.RCTView = RNNativeModules.UIManager.RCTView || {};
@@ -152,6 +152,17 @@ jest.mock( 'react-native-reanimated', () => {
 // https://reactnavigation.org/docs/testing/#mocking-native-modules
 jest.mock( 'react-native/Libraries/Animated/NativeAnimatedHelper' );
 
+/**
+ * Note: Clipboard has been extracted from react-native core and will be removed in a future release.
+ * It can now be installed and imported from @react-native-community/clipboard instead of 'react-native'.
+ *
+ * @see node_modules/react-native/Libraries/Components/Clipboard/Clipboard.js
+ */
+jest.mock( 'react-native/Libraries/Components/Clipboard/Clipboard', () => ( {
+	getString: jest.fn( () => new Promise( ( resolve ) => resolve( '' ) ) ),
+	setString: jest.fn(),
+} ) );
+
 // We currently reference TextStateInput (a private module) within
 // react-native-aztec/src/AztecView. Doing so requires that we mock it via its
 // internal path to avoid "TypeError: Cannot read property 'Commands' of
@@ -195,3 +206,7 @@ jest.mock( '@wordpress/compose', () => {
 		] ),
 	};
 } );
+
+jest.spyOn( Image, 'getSize' ).mockImplementation( ( url, success ) =>
+	success( 0, 0 )
+);
