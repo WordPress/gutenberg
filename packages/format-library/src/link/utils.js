@@ -158,15 +158,15 @@ export function getFormatBoundary(
 		type: format.type,
 	} );
 
-	if ( Boolean( formatAtStart ) ) {
+	if ( !! formatAtStart ) {
 		// Set values to conform to "start"
 		targetFormat = formatAtStart;
 		initialIndex = startIndex;
-	} else if ( Boolean( formatAtEnd ) ) {
+	} else if ( !! formatAtEnd ) {
 		// Set values to conform to "end"
 		targetFormat = formatAtEnd;
 		initialIndex = endIndex;
-	} else if ( Boolean( formatAtEndMinusOne ) ) {
+	} else if ( !! formatAtEndMinusOne ) {
 		// This is an edge case which will occur if you create a format, then place
 		// the caret just before the format and hit the back ARROW key. The resulting
 		// value object will have start and end +1 beyond the edge of the format boundary.
