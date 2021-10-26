@@ -107,7 +107,7 @@ function gutenberg_render_spacing_gap_support( $block_content, $block ) {
 	}
 
 	$gap_value = $block['attrs']['style']['spacing']['blockGap'];
-	var_dump($gap_value);
+
 	$styles = [];
 	if ( is_array( $gap_value ) ) {
 
