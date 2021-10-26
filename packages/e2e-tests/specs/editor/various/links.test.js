@@ -589,77 +589,157 @@ describe( 'Links', () => {
 		expect( await getEditedPostContent() ).toMatchSnapshot();
 	} );
 
-	it( 'should not show the Link UI when selection extends beyond link boundary', async () => {
-		const linkedText = `Gutenberg`;
-		const textBeyondLinkedText = ` and more text.`;
+	describe( 'Disabling Link UI active state', () => {
+		it( 'should not show the Link UI when selection extends beyond link boundary', async () => {
+			const linkedText = `Gutenberg`;
+			const textBeyondLinkedText = ` and more text.`;
 
-		// Create a block with some text
-		await clickBlockAppender();
-		await page.keyboard.type(
-			`This is ${ linkedText }${ textBeyondLinkedText }`
-		);
+			// Create a block with some text
+			await clickBlockAppender();
+			await page.keyboard.type(
+				`This is ${ linkedText }${ textBeyondLinkedText }`
+			);
 
-		// Move cursor next to end of `linkedText`
-		for ( let index = 0; index < textBeyondLinkedText.length; index++ ) {
+			// Move cursor next to end of `linkedText`
+			for (
+				let index = 0;
+				index < textBeyondLinkedText.length;
+				index++
+			) {
+				await page.keyboard.press( 'ArrowLeft' );
+			}
+
+			// Select the linkedText
+			await pressKeyWithModifier( 'shiftAlt', 'ArrowLeft' );
+
+			// Click on the Link button
+			await page.click( 'button[aria-label="Link"]' );
+
+			// Wait for the URL field to auto-focus
+			await waitForAutoFocus();
+
+			// Type a URL
+			await page.keyboard.type( 'https://wordpress.org/gutenberg' );
+
+			// Update the link
+			await page.keyboard.press( 'Enter' );
+
 			await page.keyboard.press( 'ArrowLeft' );
-		}
+			await page.keyboard.press( 'ArrowLeft' );
 
-		// Select the linkedText
-		await pressKeyWithModifier( 'shiftAlt', 'ArrowLeft' );
+			expect(
+				await page.$(
+					'.components-popover__content .block-editor-link-control'
+				)
+			).not.toBeNull();
 
-		// Click on the Link button
-		await page.click( 'button[aria-label="Link"]' );
+			// Make selection starting within the link and moving beyond boundary to the left.
+			for ( let index = 0; index < linkedText.length; index++ ) {
+				await pressKeyWithModifier( 'shift', 'ArrowLeft' );
+			}
 
-		// Wait for the URL field to auto-focus
-		await waitForAutoFocus();
+			// The Link UI should have disappeared (i.e. be inactive).
+			expect(
+				await page.$(
+					'.components-popover__content .block-editor-link-control'
+				)
+			).toBeNull();
 
-		// Type a URL
-		await page.keyboard.type( 'https://wordpress.org/gutenberg' );
+			// Cancel selection and move back within the Link.
+			await page.keyboard.press( 'ArrowRight' );
 
-		// Update the link
-		await page.keyboard.press( 'Enter' );
+			// We should see the Link UI displayed again.
+			expect(
+				await page.$(
+					'.components-popover__content .block-editor-link-control'
+				)
+			).not.toBeNull();
 
-		await page.keyboard.press( 'ArrowLeft' );
-		await page.keyboard.press( 'ArrowLeft' );
+			// Make selection starting within the link and moving beyond boundary to the right.
+			await pressKeyWithModifier( 'shift', 'ArrowRight' );
+			await pressKeyWithModifier( 'shift', 'ArrowRight' );
+			await pressKeyWithModifier( 'shift', 'ArrowRight' );
 
-		expect(
-			await page.$(
-				'.components-popover__content .block-editor-link-control'
-			)
-		).not.toBeNull();
+			// The Link UI should have disappeared (i.e. be inactive).
+			expect(
+				await page.$(
+					'.components-popover__content .block-editor-link-control'
+				)
+			).toBeNull();
+		} );
 
-		// Make selection starting within the link and moving beyond boundary to the left.
-		for ( let index = 0; index < linkedText.length; index++ ) {
-			await pressKeyWithModifier( 'shift', 'ArrowLeft' );
-		}
+		it( 'should not show the Link UI when selection extends into another link', async () => {
+			const linkedTextOne = `Gutenberg`;
+			const linkedTextTwo = `Block Editor`;
+			const linkOneURL = 'https://wordpress.org';
+			const linkTwoURL = 'https://wordpress.org/gutenberg';
 
-		// The Link UI should have disappeared (i.e. be inactive).
-		expect(
-			await page.$(
-				'.components-popover__content .block-editor-link-control'
-			)
-		).toBeNull();
+			// Create a block with some text
+			await clickBlockAppender();
+			await page.keyboard.type(
+				`This is the ${ linkedTextOne }${ linkedTextTwo }`
+			);
 
-		// Cancel selection and move back within the Link.
-		await page.keyboard.press( 'ArrowRight' );
+			// Select the linkedTextTwo
+			for ( let index = 0; index < linkedTextTwo.length; index++ ) {
+				await pressKeyWithModifier( 'shift', 'ArrowLeft' );
+			}
 
-		// We should see the Link UI displayed again.
-		expect(
-			await page.$(
-				'.components-popover__content .block-editor-link-control'
-			)
-		).not.toBeNull();
+			// Click on the Link button
+			await page.click( 'button[aria-label="Link"]' );
 
-		// Make selection starting within the link and moving beyond boundary to the right.
-		await pressKeyWithModifier( 'shift', 'ArrowRight' );
-		await pressKeyWithModifier( 'shift', 'ArrowRight' );
-		await pressKeyWithModifier( 'shift', 'ArrowRight' );
+			// Wait for the URL field to auto-focus
+			await waitForAutoFocus();
 
-		// The Link UI should have disappeared (i.e. be inactive).
-		expect(
-			await page.$(
-				'.components-popover__content .block-editor-link-control'
-			)
-		).toBeNull();
+			// Type a URL
+			await page.keyboard.type( linkTwoURL );
+
+			// Update the link
+			await page.keyboard.press( 'Enter' );
+
+			// Move cursor next to the **end** of `linkTextOne`
+			for ( let index = 0; index < linkedTextTwo.length + 2; index++ ) {
+				await page.keyboard.press( 'ArrowLeft' );
+			}
+
+			// Select `linkTextOne`
+			await pressKeyWithModifier( 'shiftAlt', 'ArrowLeft' );
+
+			// Click on the Link button
+			await page.click( 'button[aria-label="Link"]' );
+
+			// Wait for the URL field to auto-focus
+			await waitForAutoFocus();
+
+			// Type a URL
+			await page.keyboard.type( linkOneURL );
+
+			// Update the link
+			await page.keyboard.press( 'Enter' );
+
+			// Move cursor within `linkTextOne`
+			for ( let index = 0; index < 3; index++ ) {
+				await page.keyboard.press( 'ArrowLeft' );
+			}
+
+			// Link UI should activate for `linkTextOne`
+			expect(
+				await page.$(
+					'.components-popover__content .block-editor-link-control'
+				)
+			).not.toBeNull();
+
+			// Expand selection so that it overlaps with `linkTextTwo`
+			for ( let index = 0; index < 3; index++ ) {
+				await pressKeyWithModifier( 'shift', 'ArrowRight' );
+			}
+
+			// Link UI should be inactive.
+			expect(
+				await page.$(
+					'.components-popover__content .block-editor-link-control'
+				)
+			).toBeNull();
+		} );
 	} );
 } );
