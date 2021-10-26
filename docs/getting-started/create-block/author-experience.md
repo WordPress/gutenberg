@@ -73,7 +73,7 @@ attributes.message && ! isSelected;
 
 If the message is set and `!isSelected`, meaning we are not editing the block, the focus is elsewhere, then display the message not the text field.
 
-All so this combined together here's what the edit function looks like this:
+All of this combined together, here's what the edit function looks like:
 
 ```jsx
 import { Placeholder, TextControl } from '@wordpress/components';
