@@ -33,7 +33,7 @@ export default function FormatEdit( {
 
 		// Edge case: un-collapsed link formats.
 		// If there is a missing link format at either end of the selection
-		// then we shouldn't show the Edit UI because the selection has exeeded
+		// then we shouldn't show the Edit UI because the selection has exceeded
 		// the bounds of the link format.
 		// Also if the format objects don't match then we're dealing with two separate
 		// links so we should not allow the link to be modified over the top.
