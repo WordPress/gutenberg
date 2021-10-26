@@ -19,6 +19,7 @@
 			"fontSize": true
 		},
 		"spacing": {
+			"margin": [ "top", "bottom" ],
 			"padding": true
 		},
 		"__experimentalBorder": {
