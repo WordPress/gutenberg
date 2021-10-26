@@ -297,12 +297,12 @@ export function isListViewOpened( state ) {
 }
 
 /**
- * Returns the template part blocks grouped by areas for the current edited template.
+ * Returns the template parts and their blocks for the current edited template.
  *
  * @param {Object} state Global application state.
- * @return {Object} Template part blocks by areas.
+ * @return {Array} Template parts and their blocks in an array.
  */
-export const getTemplateAreaBlocks = createRegistrySelector(
+export const getCurrentTemplateTemplateParts = createRegistrySelector(
 	( select ) => ( state ) => {
 		const templateType = getEditedPostType( state );
 		const templateId = getEditedPostId( state );
@@ -324,22 +324,20 @@ export const getTemplateAreaBlocks = createRegistrySelector(
 			( templatePart ) => templatePart.id
 		);
 
-		const templatePartBlocksByAreas = {};
-
-		for ( const block of template.blocks ?? [] ) {
-			if ( isTemplatePart( block ) ) {
+		return ( template.blocks ?? [] )
+			.filter( ( block ) => isTemplatePart( block ) )
+			.map( ( block ) => {
 				const {
 					attributes: { theme, slug },
 				} = block;
 				const templatePartId = `${ theme }//${ slug }`;
 				const templatePart = templatePartsById[ templatePartId ];
 
-				if ( templatePart ) {
-					templatePartBlocksByAreas[ templatePart.area ] = block;
-				}
-			}
-		}
-
-		return templatePartBlocksByAreas;
+				return {
+					templatePart,
+					block,
+				};
+			} )
+			.filter( ( { templatePart } ) => !! templatePart );
 	}
 );

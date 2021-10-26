@@ -14,6 +14,9 @@ import { ZStack } from '..';
 export default {
 	component: ZStack,
 	title: 'Components (Experimental)/ZStack',
+	parameters: {
+		knobs: { disabled: false },
+	},
 };
 
 const Avatar = ( { backgroundColor } ) => {

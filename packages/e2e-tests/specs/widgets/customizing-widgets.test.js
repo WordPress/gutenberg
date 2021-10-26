@@ -17,7 +17,6 @@ import {
  */
 // eslint-disable-next-line no-restricted-imports
 import { find, findAll } from 'puppeteer-testing-library';
-import { first } from 'lodash';
 
 const twentyTwentyError = `Stylesheet twentytwenty-block-editor-styles-css was not properly added.
 For blocks, use the block API's style (https://developer.wordpress.org/block-editor/reference-guides/block-api/block-metadata/#style) or editorStyle (https://developer.wordpress.org/block-editor/reference-guides/block-api/block-metadata/#editor-style).
@@ -164,7 +163,7 @@ describe( 'Widgets Customizer', () => {
 			selector: '.widget-content *',
 		} ).toBeFound( findOptions );
 
-		expect( console ).toHaveErrored( twentyTwentyError );
+		expect( console ).toHaveWarned( twentyTwentyError );
 	} );
 
 	it( 'should open the inspector panel', async () => {
@@ -251,7 +250,7 @@ describe( 'Widgets Customizer', () => {
 
 		await expect( inspectorHeading ).not.toBeVisible();
 
-		expect( console ).toHaveErrored( twentyTwentyError );
+		expect( console ).toHaveWarned( twentyTwentyError );
 	} );
 
 	it( 'should handle the inserter outer section', async () => {
@@ -360,7 +359,7 @@ describe( 'Widgets Customizer', () => {
 			level: 2,
 		} ).not.toBeFound();
 
-		expect( console ).toHaveErrored( twentyTwentyError );
+		expect( console ).toHaveWarned( twentyTwentyError );
 	} );
 
 	it( 'should move focus to the block', async () => {
@@ -457,7 +456,7 @@ describe( 'Widgets Customizer', () => {
 		} );
 		await expect( headingBlock ).toHaveFocus();
 
-		expect( console ).toHaveErrored( twentyTwentyError );
+		expect( console ).toHaveWarned( twentyTwentyError );
 	} );
 
 	it( 'should clear block selection', async () => {
@@ -521,7 +520,7 @@ describe( 'Widgets Customizer', () => {
 			name: 'Block tools',
 		} ).not.toBeFound();
 
-		expect( console ).toHaveErrored( twentyTwentyError );
+		expect( console ).toHaveWarned( twentyTwentyError );
 	} );
 
 	it( 'should handle legacy widgets', async () => {
@@ -701,7 +700,7 @@ describe( 'Widgets Customizer', () => {
 		} ).toBeFound();
 		await expect( paragraphBlock ).toBeVisible();
 
-		expect( console ).toHaveErrored( twentyTwentyError );
+		expect( console ).toHaveWarned( twentyTwentyError );
 	} );
 
 	it( 'should move (inner) blocks to another sidebar', async () => {
@@ -762,7 +761,7 @@ describe( 'Widgets Customizer', () => {
 		const movedParagraphBlock = await find( movedParagraphBlockQuery );
 		await expect( movedParagraphBlock ).toHaveFocus();
 
-		expect( console ).toHaveErrored( twentyTwentyError );
+		expect( console ).toHaveWarned( twentyTwentyError );
 	} );
 
 	it( 'should not render Block Settings sections', async () => {
@@ -831,12 +830,11 @@ describe( 'Widgets Customizer', () => {
 		} );
 		await showMoreSettingsButton.click();
 
-		// Change font size (Any change made in this section is sufficient; not required to be font size)
-		const CUSTOM_FONT_SIZE_LABEL_SELECTOR =
-			"//fieldset[legend[contains(text(),'Font size')]]//label[contains(text(), 'Custom')]";
-		await first( await page.$x( CUSTOM_FONT_SIZE_LABEL_SELECTOR ) ).click();
-		await page.keyboard.type( '23' );
-		await page.keyboard.press( 'Enter' );
+		// Change `drop cap` (Any change made in this section is sufficient; not required to be `drop cap`).
+		const [ dropCapToggle ] = await page.$x(
+			"//label[contains(text(), 'Drop cap')]"
+		);
+		await dropCapToggle.click();
 
 		// Now that we've made a change:
 		// (1) Publish button should be active
@@ -854,7 +852,7 @@ describe( 'Widgets Customizer', () => {
 			level: 3,
 		} );
 
-		expect( console ).toHaveErrored( twentyTwentyError );
+		expect( console ).toHaveWarned( twentyTwentyError );
 	} );
 } );
 

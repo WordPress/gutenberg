@@ -1,9 +1,9 @@
 /**
  * WordPress dependencies
  */
-import { Button } from '@wordpress/components';
+import { DropdownMenu, FlexItem, FlexBlock, Flex } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-import { styles } from '@wordpress/icons';
+import { styles, moreVertical } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -12,7 +12,7 @@ import DefaultSidebar from './default-sidebar';
 import { GlobalStylesUI, useGlobalStylesReset } from '../global-styles';
 
 export default function GlobalStylesSidebar() {
-	const [ canRestart, onReset ] = useGlobalStylesReset();
+	const [ canReset, onReset ] = useGlobalStylesReset();
 
 	return (
 		<DefaultSidebar
@@ -22,21 +22,27 @@ export default function GlobalStylesSidebar() {
 			icon={ styles }
 			closeLabel={ __( 'Close global styles sidebar' ) }
 			header={
-				<>
-					<strong>{ __( 'Styles' ) }</strong>
-					<span className="edit-site-global-styles-sidebar__beta">
-						{ __( 'Beta' ) }
-					</span>
-					<Button
-						className="edit-site-global-styles-sidebar__reset-button"
-						isSmall
-						variant="tertiary"
-						disabled={ ! canRestart }
-						onClick={ onReset }
-					>
-						{ __( 'Reset to defaults' ) }
-					</Button>
-				</>
+				<Flex>
+					<FlexBlock>
+						<strong>{ __( 'Styles' ) }</strong>
+						<span className="edit-site-global-styles-sidebar__beta">
+							{ __( 'Beta' ) }
+						</span>
+					</FlexBlock>
+					<FlexItem>
+						<DropdownMenu
+							icon={ moreVertical }
+							label={ __( 'More Global Styles Actions' ) }
+							toggleProps={ { disabled: ! canReset } }
+							controls={ [
+								{
+									title: __( 'Reset to defaults' ),
+									onClick: onReset,
+								},
+							] }
+						/>
+					</FlexItem>
+				</Flex>
 			}
 		>
 			<GlobalStylesUI />

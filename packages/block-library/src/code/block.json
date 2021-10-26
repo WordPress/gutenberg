@@ -17,6 +17,21 @@
 		"__experimentalSelector": ".wp-block-code > code",
 		"typography": {
 			"fontSize": true
+		},
+		"spacing": {
+			"margin": [ "top", "bottom" ],
+			"padding": true
+		},
+		"__experimentalBorder": {
+			"radius": true,
+			"color": true,
+			"width": true,
+			"style": true
+		},
+		"color": {
+			"text": true,
+			"background": true,
+			"gradients": true
 		}
 	},
 	"style": "wp-block-code"

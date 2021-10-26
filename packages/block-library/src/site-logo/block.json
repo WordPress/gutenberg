@@ -21,6 +21,12 @@
 			"default": "_self"
 		}
 	},
+	"example": {
+		"viewportWidth": 500,
+		"attributes": {
+			"width": 350
+		}
+	},
 	"supports": {
 		"html": false,
 		"align": true,

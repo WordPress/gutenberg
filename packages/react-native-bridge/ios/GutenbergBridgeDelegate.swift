@@ -25,8 +25,6 @@ public enum Capabilities: String {
     case canEnableUnsupportedBlockEditor
     case isAudioBlockMediaUploadEnabled
     case reusableBlock
-    case editorOnboarding
-    case firstGutenbergEditorSession
     case facebookEmbed
     case instagramEmbed
     case loomEmbed

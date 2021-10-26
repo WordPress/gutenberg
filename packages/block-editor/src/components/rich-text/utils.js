@@ -3,6 +3,8 @@
  */
 import { regexp } from '@wordpress/shortcode';
 import deprecated from '@wordpress/deprecated';
+import { renderToString } from '@wordpress/element';
+import { createBlock } from '@wordpress/blocks';
 
 export function addActiveFormats( value, activeFormats ) {
 	if ( activeFormats?.length ) {
@@ -60,3 +62,17 @@ export function getAllowedFormats( {
 getAllowedFormats.EMPTY_ARRAY = [];
 
 export const isShortcode = ( text ) => regexp( '.*' ).test( text );
+
+/**
+ * Creates a link from pasted URL.
+ * Creates a paragraph block containing a link to the URL, and calls `onReplace`.
+ *
+ * @param {string}   url       The URL that could not be embedded.
+ * @param {Function} onReplace Function to call with the created fallback block.
+ */
+export function createLinkInParagraph( url, onReplace ) {
+	const link = <a href={ url }>{ url }</a>;
+	onReplace(
+		createBlock( 'core/paragraph', { content: renderToString( link ) } )
+	);
+}
