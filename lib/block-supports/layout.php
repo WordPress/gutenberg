@@ -41,7 +41,7 @@ function gutenberg_get_layout_style( $selector, $layout, $has_block_gap_support 
 	if ( 'default' === $layout_type ) {
 		$content_size  = isset( $layout['contentSize'] ) ? $layout['contentSize'] : null;
 		$wide_size     = isset( $layout['wideSize'] ) ? $layout['wideSize'] : null;
-		$outer_padding = isset( $layout['outerPadding'] ) ? $layout['outerPadding'] : 0;
+		$outer_padding = isset( $layout['outerPadding'] ) ? $layout['outerPadding'] : array();
 
 		$all_max_width_value  = $content_size ? $content_size : $wide_size;
 		$wide_max_width_value = $wide_size ? $wide_size : $content_size;
@@ -54,8 +54,13 @@ function gutenberg_get_layout_style( $selector, $layout, $has_block_gap_support 
 		$style = '';
 		if ( $content_size || $wide_size ) {
 			$style  = "$selector {";
-			$style .= "--wp-style-layout-outer-padding: $outer_padding;";
-			$style .= 'padding: 0 var(--wp-style-layout-outer-padding);';
+			$style .= sprintf(
+				'padding: %s %s %s %s',
+				isset( $outer_padding['top'] ) ? $outer_padding['top'] : 0,
+				isset( $outer_padding['right'] ) ? $outer_padding['right'] : 0,
+				isset( $outer_padding['bottom'] ) ? $outer_padding['bottom'] : 0,
+				isset( $outer_padding['left'] ) ? $outer_padding['left'] : 0
+			);
 			$style .= '}';
 			$style .= "$selector > * {";
 			$style .= 'max-width: ' . esc_html( $all_max_width_value ) . ';';
@@ -65,8 +70,8 @@ function gutenberg_get_layout_style( $selector, $layout, $has_block_gap_support 
 			$style .= "$selector > .alignwide { max-width: " . esc_html( $wide_max_width_value ) . ';}';
 			$style .= "$selector .alignfull {";
 			$style .= 'max-width: none;';
-			$style .= 'margin-left: calc( -1 * var(--wp-style-layout-outer-padding) ) !important;';
-			$style .= 'margin-right: calc( -1 * var(--wp-style-layout-outer-padding) ) !important;';
+			$style .= isset( $outer_padding['left'] ) ? sprintf( 'margin-left: calc( -1 * %s ) !important;', $outer_padding['left'] ) : '';
+			$style .= isset( $outer_padding['right'] ) ? sprintf( 'margin-right: calc( -1 * %s ) !important;', $outer_padding['right'] ) : '';
 			$style .= '}';
 		}
 
