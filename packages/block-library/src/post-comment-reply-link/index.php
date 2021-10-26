@@ -24,13 +24,16 @@ function render_block_core_post_comment_reply_link( $attributes, $content, $bloc
 	}
 
 	$comment = get_comment( $block->context['commentId'] );
+	if ( empty( $comment ) ) {
+		return '';
+	}
 
 	$depth     = 1;
 	$max_depth = get_option( 'thread_comments_depth' );
 	$parent_id = $comment->comment_parent;
 
 	// Compute comment's depth iterating over its ancestors.
-	while ( 0 !== $parent_id ) {
+	while ( ! empty( $parent_id ) ) {
 		$depth++;
 		$parent_id = get_comment( $parent_id )->comment_parent;
 	}
@@ -42,6 +45,11 @@ function render_block_core_post_comment_reply_link( $attributes, $content, $bloc
 		),
 		$comment
 	);
+
+	// Render nothing if the generated reply link is empty.
+	if ( empty( $comment_reply_link ) ) {
+		return;
+	}
 
 	$classes = '';
 	if ( isset( $attributes['textAlign'] ) ) {
