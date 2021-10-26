@@ -251,8 +251,8 @@ function render_block_core_navigation( $attributes, $content, $block ) {
 
 		$parsed_blocks = parse_blocks( $navigation_post->post_content );
 
-		// For some reason 'parse_blocks' includes a null block with '\n\n' as the content?
-		// This code strips it.
+		// 'parse_blocks' includes a null block with '\n\n' as the content when
+		// it encounters whitespace. This code strips it.
 		$compacted_blocks = array_filter(
 			$parsed_blocks,
 			function( $block ) {
