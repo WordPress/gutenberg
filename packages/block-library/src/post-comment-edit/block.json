@@ -1,22 +1,33 @@
 {
 	"apiVersion": 2,
 	"name": "core/post-comment-edit",
+	"title": "Post Comment Edit Link",
 	"category": "design",
-	"usesContext": [ "commentId" ],
 	"parent": [ "core/post-comment" ],
+	"description": "Displays a link to edit the comment in the WordPress Dashboard. This link is only visible to users with the edit comment capability.",
+	"textdomain": "default",
+	"usesContext": [ "commentId" ],
 	"attributes": {
-		"openInNewTab": {
-			"type": "boolean",
-			"default": false
+		"linkTarget": {
+			"type": "string",
+			"default": "_self"
 		}
 	},
 	"supports": {
 		"html": false,
 		"color": {
 			"link": true,
+			"gradients": true,
 			"text": false
 		},
-		"fontSize": true,
-		"lineHeight": true
+		"typography": {
+			"fontSize": true,
+			"lineHeight": true,
+			"__experimentalFontFamily": true,
+			"__experimentalFontWeight": true,
+			"__experimentalFontStyle": true,
+			"__experimentalTextTransform": true,
+			"__experimentalLetterSpacing": true
+		}
 	}
 }

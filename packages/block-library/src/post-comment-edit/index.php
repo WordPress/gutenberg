@@ -20,12 +20,11 @@ function render_block_core_post_comment_edit( $attributes, $content, $block ) {
 	}
 
 	$edit_comment_link = get_edit_comment_link( $block->context['commentId'] );
-	$open_in_new_tab   = true === $attributes['openInNewTab'];
 
 	$link_atts = '';
 
-	if ( $open_in_new_tab ) {
-		$link_atts .= 'target="_blank"';
+	if ( ! empty( $attributes['linkTarget'] ) ) {
+		$link_atts .= sprintf( 'target="%s"', $attributes['linkTarget'] );
 	}
 
 	return sprintf(

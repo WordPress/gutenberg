@@ -4,7 +4,26 @@
 		"name": "core/post-comment-edit",
 		"isValid": true,
 		"attributes": {
-			"openInNewTab": false
+			"linkTarget": "_blank",
+			"backgroundColor": "recommended-color-03",
+			"fontFamily": "system-monospace",
+			"fontSize": "extra-large",
+			"style": {
+				"typography": {
+					"fontStyle": "normal",
+					"fontWeight": "700",
+					"lineHeight": "2",
+					"textTransform": "uppercase",
+					"letterSpacing": "13px"
+				},
+				"elements": {
+					"link": {
+						"color": {
+							"text": "#ed1717"
+						}
+					}
+				}
+			}
 		},
 		"innerBlocks": [],
 		"originalContent": ""
