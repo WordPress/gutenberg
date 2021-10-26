@@ -16,7 +16,7 @@ Welcome! Let's get started building with blocks. Blocks are at the core of exten
 
 ## Additional Resources
 
--   [What's New in Gutenberg](https://make.wordpress.org/core/tag/gutenberg-new) - follow the Make Core blog to see te latest developments.
+-   [What's New in Gutenberg](https://make.wordpress.org/core/tag/gutenberg-new) - follow the Make Core blog for development news.
 -   [Glossary](/docs/explanations/glossary.md)
 -   [Frequently Asked Questions](/docs/explanations/faq.md)
 -   [Project History](/docs/explanations/history.md)
