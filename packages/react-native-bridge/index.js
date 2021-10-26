@@ -426,7 +426,7 @@ export function requestGotoCustomerSupportOptions() {
  * Request the host app receive an event with properties.
  *
  * @param {string} eventName  Name representing to the event.
- * @param {Object} properties Key-value paris of event properties.
+ * @param {Object} properties Key-value pairs of event properties.
  * @return {void}
  */
 export function sendEventToHost( eventName, properties ) {
