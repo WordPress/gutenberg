@@ -106,9 +106,9 @@ In general, this is useful for knowing which portion of the text is selected. Ho
 
 #### Collapsed selections
 
-A collapsed selection is one where `start` and `end` values are identical. This happens when no characters are selected, but there is a caret present. This most often occurs when a user places the cursor/caret within a string of text but does not make a selected range.
+A collapsed selection is one where `start` and `end` values are _identical_ (e.g. `start: 4, end: 4`). This happens when no characters are selected, but there is a caret present. This most often occurs when a user places the cursor/caret within a string of text but does not make a selection.
 
-Given that it has no range identifiers, finding the currently selected portion of text from collapsed values can be challenging.
+Given that the selection has no "range" (i.e. there is no difference between `start` and `end` indices), finding the currently selected portion of text from collapsed values can be challenging.
 
 ### Replacements
 
