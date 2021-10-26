@@ -2,10 +2,12 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { LEFT, RIGHT } from '@wordpress/keycodes';
+import { LEFT, RIGHT, UP, DOWN } from '@wordpress/keycodes';
 import { VisuallyHidden } from '@wordpress/components';
 
-export default function ResizeHandle( { direction, resizeWidthBy } ) {
+const DELTA_LENGTH = 10; // The length to resize per keydown in pixels.
+
+export default function ResizeHandle( { direction, resizeBy } ) {
 	function handleKeyDown( event ) {
 		const { keyCode } = event;
 
@@ -13,12 +15,20 @@ export default function ResizeHandle( { direction, resizeWidthBy } ) {
 			( direction === 'left' && keyCode === LEFT ) ||
 			( direction === 'right' && keyCode === RIGHT )
 		) {
-			resizeWidthBy( 20 );
+			// The canvas is centered horizontally, thus resizing it horizontally
+			// needs two times the length.
+			resizeBy( DELTA_LENGTH * 2, 0 );
 		} else if (
 			( direction === 'left' && keyCode === RIGHT ) ||
 			( direction === 'right' && keyCode === LEFT )
 		) {
-			resizeWidthBy( -20 );
+			resizeBy( -DELTA_LENGTH * 2, 0 );
+		} else if ( direction === 'down' ) {
+			if ( keyCode === DOWN ) {
+				resizeBy( 0, DELTA_LENGTH );
+			} else if ( keyCode === UP ) {
+				resizeBy( 0, -DELTA_LENGTH );
+			}
 		}
 	}
 
@@ -33,7 +43,11 @@ export default function ResizeHandle( { direction, resizeWidthBy } ) {
 			<VisuallyHidden
 				id={ `resizable-editor__resize-help-${ direction }` }
 			>
-				{ __( 'Use left and right arrow keys to resize the canvas.' ) }
+				{ direction === 'down'
+					? __( 'Use up and down arrow keys to resize the canvas.' )
+					: __(
+							'Use left and right arrow keys to resize the canvas.'
+					  ) }
 			</VisuallyHidden>
 		</>
 	);

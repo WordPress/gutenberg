@@ -19,7 +19,7 @@
 	align-items: center;
 
 	&.is-focus-mode {
-		padding: 48px 48px 0;
+		padding: 48px;
 	}
 }
 
@@ -38,6 +38,10 @@
 	&:hover {
 		color: $gray-100;
 	}
+}
+
+.components-resizable-box__container {
+	margin: 0 auto;
 }
 
 .resizable-editor__drag-handle {
@@ -62,6 +66,16 @@
 
 	&.is-right {
 		right: #{-$grid-unit-30 - $grid-unit-05};
+	}
+
+	&.is-down {
+		left: 0;
+		right: 0;
+		margin: 0 auto;
+		top: auto;
+		bottom: #{-$grid-unit-30 - $grid-unit-05};
+		width: $height;
+		height: $grid-unit-10;
 	}
 
 	&:hover {

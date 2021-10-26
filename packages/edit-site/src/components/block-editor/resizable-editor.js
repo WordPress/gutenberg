@@ -50,6 +50,8 @@ const HANDLE_STYLES_OVERRIDE = {
 	left: undefined,
 };
 
+const ROOT_CONTAINER_CLASS_NAME = 'edit-site-block-editor__root-container';
+
 function ResizableEditor( { enableResizing, settings, ...props } ) {
 	const deviceType = useSelect(
 		( select ) =>
@@ -65,6 +67,7 @@ function ResizableEditor( { enableResizing, settings, ...props } ) {
 			: resizedCanvasStyles;
 	const [ width, setWidth ] = useState( styles.width );
 	const [ height, setHeight ] = useState( styles.height );
+	const [ resizingDirection, setResizingDirection ] = useState( null );
 	const {
 		__experimentalSetPreviewDeviceType: setPreviewDeviceType,
 	} = useDispatch( editSiteStore );
@@ -82,23 +85,39 @@ function ResizableEditor( { enableResizing, settings, ...props } ) {
 		[ deviceType, resizedCanvasStyles.width ]
 	);
 
-	const resizeWidthBy = useCallback( ( deltaPixels ) => {
-		if ( iframeRef.current ) {
-			setWidth( `${ iframeRef.current.offsetWidth + deltaPixels }px` );
+	const resizeBy = useCallback( ( deltaWidth, deltaHeight ) => {
+		if ( deltaWidth > 0 ) {
+			setResizingDirection( 'right' );
+		} else if ( deltaWidth < 0 ) {
+			setResizingDirection( 'left' );
+		} else {
+			setResizingDirection( 'down' );
 		}
+
+		setWidth( iframeRef.current.offsetWidth + deltaWidth );
+		setHeight( ( currentHeight ) => currentHeight + deltaHeight );
 	}, [] );
 
 	useEffect(
 		function autoResizeIframeHeight() {
 			const iframe = iframeRef.current;
 
-			if ( ! iframe || ! enableResizing ) {
+			if (
+				! iframe ||
+				! enableResizing ||
+				// Disable auto size after the user has manually resized it.
+				resizingDirection !== null
+			) {
 				return;
 			}
 
 			const resizeObserver = new iframe.contentWindow.ResizeObserver(
 				() => {
-					setHeight( iframe.contentDocument.body.offsetHeight );
+					setHeight(
+						iframe.contentDocument.querySelector(
+							`.${ ROOT_CONTAINER_CLASS_NAME }`
+						).offsetHeight
+					);
 				}
 			);
 
@@ -110,7 +129,7 @@ function ResizableEditor( { enableResizing, settings, ...props } ) {
 				resizeObserver.disconnect();
 			};
 		},
-		[ enableResizing ]
+		[ enableResizing, resizingDirection ]
 	);
 
 	return (
@@ -119,43 +138,37 @@ function ResizableEditor( { enableResizing, settings, ...props } ) {
 				width,
 				height,
 			} }
+			onResizeStart={ ( event, direction ) => {
+				setResizingDirection( direction );
+			} }
 			onResizeStop={ ( event, direction, element ) => {
 				setWidth( element.style.width );
+				setHeight( parseInt( element.style.height, 10 ) );
 				setPreviewDeviceType( RESPONSIVE_DEVICE );
 			} }
 			minWidth={ 300 }
-			// Not sure why this is needed to prevent the height from decreasing
-			// to 10px while resizing horizontally.
-			minHeight={ height }
 			maxWidth="100%"
 			maxHeight="100%"
 			enable={ {
 				right: enableResizing,
 				left: enableResizing,
+				bottom: enableResizing,
 			} }
 			showHandle={ enableResizing }
 			// The editor is centered horizontally, resizing it only
 			// moves half the distance. Hence double the ratio to correctly
 			// align the cursor to the resizer handle.
-			resizeRatio={ 2 }
+			resizeRatio={ isHorizontal( resizingDirection ) ? 2 : 1 }
 			handleComponent={ {
-				left: (
-					<ResizeHandle
-						direction="left"
-						resizeWidthBy={ resizeWidthBy }
-					/>
-				),
-				right: (
-					<ResizeHandle
-						direction="right"
-						resizeWidthBy={ resizeWidthBy }
-					/>
-				),
+				left: <ResizeHandle direction="left" resizeBy={ resizeBy } />,
+				right: <ResizeHandle direction="right" resizeBy={ resizeBy } />,
+				bottom: <ResizeHandle direction="down" resizeBy={ resizeBy } />,
 			} }
 			handleClasses={ undefined }
 			handleStyles={ {
 				left: HANDLE_STYLES_OVERRIDE,
 				right: HANDLE_STYLES_OVERRIDE,
+				bottom: HANDLE_STYLES_OVERRIDE,
 			} }
 		>
 			<Iframe
@@ -163,19 +176,32 @@ function ResizableEditor( { enableResizing, settings, ...props } ) {
 					// We'll be using the size controlled by ResizableBox so resetting them here.
 					omit( styles, [ 'width', 'height', 'margin' ] )
 				}
-				head={ <EditorStyles styles={ settings.styles } /> }
+				head={
+					<>
+						<EditorStyles styles={ settings.styles } />
+						<style>{
+							// Forming a "block formatting context" to prevent margin collapsing.
+							// @see https://developer.mozilla.org/en-US/docs/Web/Guide/CSS/Block_formatting_context
+							`.${ ROOT_CONTAINER_CLASS_NAME } { display: flow-root; }`
+						}</style>
+					</>
+				}
 				ref={ ref }
 				name="editor-canvas"
 				className="edit-site-visual-editor__editor-canvas"
 				{ ...props }
 			>
 				<BlockList
-					className="edit-site-block-editor__block-list wp-site-blocks"
+					className={ `edit-site-block-editor__block-list wp-site-blocks ${ ROOT_CONTAINER_CLASS_NAME }` }
 					__experimentalLayout={ LAYOUT }
 				/>
 			</Iframe>
 		</ResizableBox>
 	);
+}
+
+function isHorizontal( direction ) {
+	return direction === 'left' || direction === 'right';
 }
 
 export default ResizableEditor;

@@ -33,15 +33,19 @@ import BackButton from './back-button';
 import ResizableEditor from './resizable-editor';
 
 export default function BlockEditor( { setIsInserterOpen } ) {
-	const { settings, templateType, page } = useSelect(
+	const { settings, templateType, templateId, page } = useSelect(
 		( select ) => {
-			const { getSettings, getEditedPostType, getPage } = select(
-				editSiteStore
-			);
+			const {
+				getSettings,
+				getEditedPostType,
+				getEditedPostId,
+				getPage,
+			} = select( editSiteStore );
 
 			return {
 				settings: getSettings( setIsInserterOpen ),
 				templateType: getEditedPostType(),
+				templateId: getEditedPostId(),
 				page: getPage(),
 			};
 		},
@@ -99,6 +103,8 @@ export default function BlockEditor( { setIsInserterOpen } ) {
 				<BackButton />
 
 				<ResizableEditor
+					// Reinitialize the editor when the template changes.
+					key={ templateId }
 					enableResizing={
 						isTemplatePart &&
 						// Disable resizing in mobile viewport.
