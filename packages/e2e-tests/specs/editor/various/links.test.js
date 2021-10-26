@@ -746,6 +746,47 @@ describe( 'Links', () => {
 			);
 			expect( actualLinkText ).toBe( changedLinkText );
 		} );
+
+		it( 'should display (capture the) text from the currently active link even if there is a rich text selection', async () => {
+			const originalLinkText = 'Gutenberg';
+
+			await createAndReselectLink();
+
+			// Make a collapsed selection inside the link in order
+			// to activate the Link UI.
+			await page.keyboard.press( 'ArrowLeft' );
+			await page.keyboard.press( 'ArrowRight' );
+
+			const [ editButton ] = await page.$x(
+				'//button[contains(@aria-label, "Edit")]'
+			);
+			await editButton.click();
+			await waitForURLFieldAutoFocus();
+
+			// Move focus back to RichText for the underlying link.
+			await page.keyboard.press( 'Tab' );
+			await page.keyboard.press( 'Tab' );
+			await page.keyboard.press( 'Tab' );
+
+			// Make a selection within the RichText
+			await pressKeyWithModifier( 'shift', 'ArrowRight' );
+			await pressKeyWithModifier( 'shift', 'ArrowRight' );
+			await pressKeyWithModifier( 'shift', 'ArrowRight' );
+
+			// Move back to the text input
+			await page.keyboard.press( 'Tab' );
+
+			// Tabbing back should land us in the text input.
+			const textInputValue = await page.evaluate(
+				() => document.activeElement.value
+			);
+
+			// Making a selection within the link text whilst the Link UI
+			// is open should not alter the value in the Link UI's text
+			// input. It should remain as the full text of the currently
+			// focused link format.
+			expect( textInputValue ).toBe( originalLinkText );
+		} );
 	} );
 
 	describe( 'Disabling Link UI active state', () => {

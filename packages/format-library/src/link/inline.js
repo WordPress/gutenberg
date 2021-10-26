@@ -241,12 +241,10 @@ function getRichTextValueFromSelection( value, isActive ) {
 	let textStart = value.start;
 	let textEnd = value.end;
 
-	// On the condition that:
-	// 1. we have an active format
-	// 2. there is no range to the selection
-	// ...then manually find the boundaries of the selection via the
-	// boundaries of the active format.
-	if ( isCollapsed( value ) && isActive ) {
+	// If the format is currently active then the rich text value
+	// should always be taken from the bounds of the active format
+	// and not the selected text.
+	if ( isActive ) {
 		const boundary = getFormatBoundary( value, {
 			type: 'core/link',
 		} );
