@@ -14,7 +14,15 @@ _This package assumes that your code will run in an **ES2015+** environment. If 
 
 ## Usage
 
-The Rich Text package is designed to aid with applying rich formatting (e.g. bold, italic, links) onto plain text strings. By using a `RichTextValue` value object (referred to from here on as `value`) it is possible to separate text from formatting, thereby affording the ability to easily search and manipulate rich formats.
+The Rich Text package is designed to aid in the manipulation of plain text strings in order that they can represent complex formatting.
+
+By using a `RichTextValue` value object (referred to from here on as `value`) it is possible to separate text from formatting, thereby affording the ability to easily search and manipulate rich formats.
+
+Examples of rich formats include:
+
+-   bold, italic, superscript (etc)
+-   links
+-   underordered/ordered lists
 
 ### The RichTextValue object
 
