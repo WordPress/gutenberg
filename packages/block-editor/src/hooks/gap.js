@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { isObject } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
@@ -112,21 +107,16 @@ export function GapEdit( props ) {
 	}
 
 	const onChange = ( next ) => {
-		// TODO: make this less bad
-		if ( ! isObject( next ) ) {
-			next = {
-				top: next,
-				left: next,
-			};
-		}
+		const row = next?.top ?? next;
+		const column = next?.left ?? next;
 
 		const newStyle = {
 			...style,
 			spacing: {
 				...style?.spacing,
 				blockGap: {
-					row: next?.top,
-					column: next?.left,
+					row,
+					column,
 				},
 			},
 		};
@@ -177,7 +167,8 @@ export function GapEdit( props ) {
 						min={ 0 }
 						onChange={ onChange }
 						units={ units }
-						value={ style?.spacing?.blockGap }
+						// Default to `row` for combined values.
+						value={ style?.spacing?.blockGap?.row }
 					/>
 				) }
 			</>
