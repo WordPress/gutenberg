@@ -292,6 +292,12 @@ class WP_Theme_JSON_Gutenberg {
 			$theme_json = WP_Theme_JSON_Schema_V0::parse( $theme_json );
 		}
 
+		// Provide backwards compatibility for settings that did not land in 5.8
+		// and have had their `custom` prefixed removed since.
+		if ( 1 === $theme_json['version'] ) {
+			$theme_json = WP_Theme_JSON_Schema_V1::parse( $theme_json );
+		}
+
 		$valid_block_names   = array_keys( self::get_blocks_metadata() );
 		$valid_element_names = array_keys( self::ELEMENTS );
 		$this->theme_json    = self::sanitize( $theme_json, $valid_block_names, $valid_element_names );
@@ -1432,6 +1438,12 @@ class WP_Theme_JSON_Gutenberg {
 
 		if ( ! isset( $theme_json['version'] ) || 0 === $theme_json['version'] ) {
 			$theme_json = WP_Theme_JSON_Schema_V0::parse( $theme_json );
+		}
+
+		// Provide backwards compatibility for settings that did not land in 5.8
+		// and have had their `custom` prefixed removed since.
+		if ( 1 === $theme_json['version'] ) {
+			$theme_json = WP_Theme_JSON_Schema_V1::parse( $theme_json );
 		}
 
 		$valid_block_names   = array_keys( self::get_blocks_metadata() );
