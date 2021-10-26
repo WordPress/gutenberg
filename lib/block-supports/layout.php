@@ -72,9 +72,9 @@ function gutenberg_get_layout_style( $selector, $layout, $has_block_gap_support 
 		$layout_orientation = isset( $layout['orientation'] ) ? $layout['orientation'] : 'horizontal';
 
 		$justify_content_options = array(
-			'left'          => 'flex-start',
-			'right'         => 'flex-end',
-			'center'        => 'center',
+			'left'   => 'flex-start',
+			'right'  => 'flex-end',
+			'center' => 'center',
 		);
 
 		if ( 'horizontal' === $layout_orientation ) {
