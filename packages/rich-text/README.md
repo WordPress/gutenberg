@@ -27,7 +27,7 @@ The value object is comprised of the following:
 
 You should not attempted to create your own `value` objects. Rather you should rely on the built in methods of the `@wordpress/rich-text` package to build these for you.
 
-Understanding how a value represents richly formatted text is very important so let's consider an example.
+It is important to understand how a value represents richly formatted text. Here is an example to illustrate.
 
 If `text` is formatted from position 2-5 in bold (`core/bold`) and from position 2-8 with a link (`core/link`), then you'll find:
 
