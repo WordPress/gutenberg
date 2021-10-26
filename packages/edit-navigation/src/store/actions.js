@@ -9,7 +9,7 @@ import { difference, zip } from 'lodash';
 import { __, sprintf } from '@wordpress/i18n';
 import { store as noticesStore } from '@wordpress/notices';
 import { store as coreDataStore } from '@wordpress/core-data';
-import { warning } from '@wordpress/warning';
+import { default as logWarning } from '@wordpress/warning';
 
 /**
  * Internal dependencies
@@ -205,15 +205,24 @@ const batchInsertPlaceholderMenuItems = ( navigationBlock ) => async ( {
 const batchUpdateMenuItems = ( navigationBlock, menuId ) => async ( {
 	registry,
 } ) => {
-	const updatedMenuItems = blocksTreeToAnnotatedList( navigationBlock )
+	const allMenuItems = blocksTreeToAnnotatedList( navigationBlock );
+	const unsupportedMenuItems = allMenuItems
+		.filter( ( { block } ) => ! isBlockSupportedInNav( block ) )
+		.map( ( { block } ) => block.name );
+	if ( unsupportedMenuItems.length ) {
+		logWarning(
+			sprintf(
+				// translators: %s: Name of block (i.e. core/legacy-widget)
+				__(
+					'The following blocks haven\'t been saved because they are not supported: "%s".'
+				),
+				unsupportedMenuItems.join( '", "' )
+			)
+		);
+	}
+	const updatedMenuItems = allMenuItems
 		// Filter out unsupported blocks
-		.filter( ( { block } ) => {
-			const isBlockSupported = isBlockSupportedInNav( block );
-			if ( ! isBlockSupported ) {
-				warning( isBlockSupported );
-			}
-			return isBlockSupported;
-		} )
+		.filter( ( { block } ) => isBlockSupportedInNav( block ) )
 		// Transform the blocks into menu items
 		.map( ( { block, parentBlock, childIndex } ) =>
 			blockToMenuItem(
