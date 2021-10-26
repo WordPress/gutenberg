@@ -91,7 +91,13 @@ class Layout extends Component {
 	}
 
 	renderHTML() {
-		return <HTMLTextInput parentHeight={ this.state.rootViewHeight } />;
+		const { globalStyles } = this.props;
+		return (
+			<HTMLTextInput
+				parentHeight={ this.state.rootViewHeight }
+				style={ globalStyles }
+			/>
+		);
 	}
 
 	renderVisual() {

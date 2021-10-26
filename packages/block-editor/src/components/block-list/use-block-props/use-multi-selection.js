@@ -165,15 +165,29 @@ export function useMultiSelection( clientId ) {
 
 				if ( event.shiftKey ) {
 					const blockSelectionStart = getBlockSelectionStart();
-					// Handle the case where we select a single block by
-					// holding the `shiftKey` and don't mark this action
-					// as multiselection.
+					// By checking `blockSelectionStart` to be set, we handle the
+					// case where we select a single block. We also have to check
+					// the selectionEnd (clientId) not to be included in the
+					// `blockSelectionStart`'s parents because the click event is
+					// propagated.
+					const startParents = getBlockParents( blockSelectionStart );
 					if (
 						blockSelectionStart &&
-						blockSelectionStart !== clientId
+						blockSelectionStart !== clientId &&
+						! startParents?.includes( clientId )
 					) {
 						toggleRichText( node, false );
-						multiSelect( blockSelectionStart, clientId );
+						const startPath = [
+							...startParents,
+							blockSelectionStart,
+						];
+						const endPath = [
+							...getBlockParents( clientId ),
+							clientId,
+						];
+						const depth =
+							Math.min( startPath.length, endPath.length ) - 1;
+						multiSelect( startPath[ depth ], endPath[ depth ] );
 						event.preventDefault();
 					}
 				} else if ( hasMultiSelection() ) {

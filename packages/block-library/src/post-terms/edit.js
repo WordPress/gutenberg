@@ -10,7 +10,6 @@ import {
 	AlignmentToolbar,
 	InspectorControls,
 	BlockControls,
-	Warning,
 	useBlockProps,
 } from '@wordpress/block-editor';
 import { Spinner, TextControl } from '@wordpress/components';
@@ -53,20 +52,8 @@ export default function PostTermsEdit( {
 		} ),
 	} );
 
-	if ( ! hasPost ) {
-		return (
-			<div { ...blockProps }>
-				<Warning>{ __( 'Post Terms block: post not found.' ) }</Warning>
-			</div>
-		);
-	}
-
-	if ( ! term ) {
-		return (
-			<div { ...blockProps }>
-				{ __( 'Post Terms block: no term specified.' ) }
-			</div>
-		);
+	if ( ! hasPost || ! term ) {
+		return <div { ...blockProps }>{ __( 'Post Terms' ) }</div>;
 	}
 
 	return (

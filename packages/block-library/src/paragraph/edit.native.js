@@ -83,6 +83,7 @@ function ParagraphBlock( {
 				onRemove={ onReplace ? () => onReplace( [] ) : undefined }
 				placeholder={ placeholder || __( 'Start writing…' ) }
 				textAlign={ align }
+				__unstableEmbedURLOnPaste
 			/>
 		</>
 	);

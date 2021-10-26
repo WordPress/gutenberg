@@ -439,23 +439,23 @@ You can additionally have the devtools automatically open for interactive debugg
 npm run test-e2e:watch -- --puppeteer-devtools
 ```
 
-### Using alternate enviornment
+### Using alternate environment
 
-If you're using a different setup than wp-env, you can provide the base URL, username and password like this:
-
-```bash
-npm run test-e2e -- --wordpress-base-url=http://localhost:8888 --wordpress-username=admin --wordpress-password=password
-```
-
-You also need to symlink all e2e test plugins to your site plugins directory:
+If using a different setup than `wp-env`, you first need to symlink the e2e test plugins to your test site, from your site's plugins directory run:
 
 ```bash
 ln -s gutenberg/packages/e2e-tests/plugins/* .
 ```
 
+Then to run the tests, specify the base URL, username, and passwords for your site. For example, if your test site is at `http://wp.test`, use:
+
+```bash
+WP_BASE_URL=http://wp.test npm run test-e2e -- --wordpress-username=admin --wordpress-password=password
+```
+
 ### Scenario Testing
 
-If you find that end-to-end tests pass when run locally, but fail in Travis, you may be able to isolate a CPU- or netowrk-bound race condition by simulating a slow CPU or network:
+If you find that end-to-end tests pass when run locally, but fail in GitHub Actions, you may be able to isolate a CPU- or network-bound race condition by simulating a slow CPU or network:
 
 ```
 THROTTLE_CPU=4 npm run test-e2e
@@ -484,6 +484,10 @@ See [Chrome docs: emulateNetworkConditions](https://chromedevtools.github.io/dev
 ### Core Block Testing
 
 Every core block is required to have at least one set of fixture files for its main save function and one for each deprecation. These fixtures test the parsing and serialization of the block. See [the integration tests fixtures readme](https://github.com/wordpress/gutenberg/blob/HEAD/test/integration/fixtures/blocks/README.md) for more information and instructions.
+
+### Flaky Tests
+
+A test is considered to be **flaky** when it can pass and fail across multiple retry attempts without any code changes. We auto retry failed tests at most **twice** on CI to detect and report them to GitHub issues automatically under the [`[Type] Flaky Test`](https://github.com/WordPress/gutenberg/issues?q=is%3Aissue+is%3Aopen+sort%3Aupdated-desc+label%3A%22%5BType%5D+Flaky+Test%22) label via [`report-flaky-tests`](https://github.com/WordPress/gutenberg/blob/trunk/.github/report-flaky-tests/index.js) GitHub action. Note that a test that failed three times in a row is not counted as a flaky test and will not be reported to an issue.
 
 ## PHP Testing
 

@@ -137,6 +137,8 @@ function LinkControl( {
 	);
 	const isEndingEditWithFocus = useRef( false );
 
+	const currentInputIsEmpty = ! currentInputValue?.trim()?.length;
+
 	useEffect( () => {
 		if (
 			forceIsEditingLink !== undefined &&
@@ -234,7 +236,10 @@ function LinkControl( {
 									onClick={ () => handleSubmitButton() }
 									onKeyDown={ ( event ) => {
 										const { keyCode } = event;
-										if ( keyCode === ENTER ) {
+										if (
+											keyCode === ENTER &&
+											! currentInputIsEmpty // disallow submitting empty values.
+										) {
 											event.preventDefault();
 											handleSubmitButton();
 										}
@@ -242,6 +247,7 @@ function LinkControl( {
 									label={ __( 'Submit' ) }
 									icon={ keyboardReturn }
 									className="block-editor-link-control__search-submit"
+									disabled={ currentInputIsEmpty } // disallow submitting empty values.
 								/>
 							</div>
 						</LinkControlSearchInput>
@@ -264,26 +270,18 @@ function LinkControl( {
 					value={ value }
 					onEditClick={ () => setIsEditingLink( true ) }
 					hasRichPreviews={ hasRichPreviews }
+					hasUnlinkControl={ shownUnlinkControl }
+					onRemove={ onRemove }
 				/>
 			) }
 
-			{ ( showSettingsDrawer || shownUnlinkControl ) && (
+			{ showSettingsDrawer && (
 				<div className="block-editor-link-control__tools">
 					<LinkControlSettingsDrawer
 						value={ value }
 						settings={ settings }
 						onChange={ onChange }
 					/>
-					{ shownUnlinkControl && (
-						<Button
-							className="block-editor-link-control__unlink"
-							isDestructive
-							variant="link"
-							onClick={ onRemove }
-						>
-							{ __( 'Unlink' ) }
-						</Button>
-					) }
 				</div>
 			) }
 		</div>

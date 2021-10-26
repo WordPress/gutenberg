@@ -89,6 +89,7 @@ export const PanelColorGradientSettingsInner = ( {
 	children,
 	settings,
 	title,
+	showTitle = true,
 	...props
 } ) => {
 	if (
@@ -120,17 +121,19 @@ export const PanelColorGradientSettingsInner = ( {
 			/>
 		</span>
 	);
+
 	return (
 		<PanelBody
 			className={ classnames(
 				'block-editor-panel-color-gradient-settings',
 				className
 			) }
-			title={ titleElement }
+			title={ showTitle ? titleElement : undefined }
 			{ ...props }
 		>
 			{ settings.map( ( setting, index ) => (
 				<ColorGradientControl
+					showTitle={ showTitle }
 					key={ index }
 					{ ...{
 						colors,

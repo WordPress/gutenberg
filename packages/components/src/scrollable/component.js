@@ -1,15 +1,26 @@
 /**
  * Internal dependencies
  */
-import { createComponent } from '../ui/utils';
+import { contextConnect } from '../ui/context';
+import { View } from '../view';
 import { useScrollable } from './hook';
+
+/**
+ * @param {import('../ui/context').WordPressComponentProps<import('./types').Props, 'div'>} props
+ * @param {import('react').Ref<any>}                                                        forwardedRef
+ */
+function Scrollable( props, forwardedRef ) {
+	const scrollableProps = useScrollable( props );
+
+	return <View { ...scrollableProps } ref={ forwardedRef } />;
+}
 
 /**
  * `Scrollable` is a layout component that content in a scrollable container.
  *
  * @example
  * ```jsx
- * import { __experimentalScrollable as Scrollable } from `@wordpress/components/ui`;
+ * import { __experimentalScrollable as Scrollable } from `@wordpress/components`;
  *
  * function Example() {
  * 	return (
@@ -21,10 +32,6 @@ import { useScrollable } from './hook';
  * ```
  */
 
-const Scrollable = createComponent( {
-	as: 'div',
-	useHook: useScrollable,
-	name: 'Scrollable',
-} );
+const ConnectedScrollable = contextConnect( Scrollable, 'Scrollable' );
 
-export default Scrollable;
+export default ConnectedScrollable;

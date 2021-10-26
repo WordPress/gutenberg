@@ -54,7 +54,7 @@ export const getEntityRecord = ( kind, name, key = '', query ) => async ( {
 } ) => {
 	const entities = await dispatch( getKindEntities( kind ) );
 	const entity = find( entities, { kind, name } );
-	if ( ! entity ) {
+	if ( ! entity || entity?.__experimentalNoFetch ) {
 		return;
 	}
 
@@ -85,7 +85,7 @@ export const getEntityRecord = ( kind, name, key = '', query ) => async ( {
 		// for how the request is made to the REST API.
 
 		// eslint-disable-next-line @wordpress/no-unused-vars-before-return
-		const path = addQueryArgs( entity.baseURL + '/' + key, {
+		const path = addQueryArgs( entity.baseURL + ( key ? '/' + key : '' ), {
 			...entity.baseURLParams,
 			...query,
 		} );
@@ -140,7 +140,7 @@ export const getEntityRecords = ( kind, name, query = {} ) => async ( {
 } ) => {
 	const entities = await dispatch( getKindEntities( kind ) );
 	const entity = find( entities, { kind, name } );
-	if ( ! entity ) {
+	if ( ! entity || entity?.__experimentalNoFetch ) {
 		return;
 	}
 

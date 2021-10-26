@@ -414,4 +414,12 @@ export function setBlockTypeImpressions( impressions ) {
 	return RNReactNativeGutenbergBridge.setBlockTypeImpressions( impressions );
 }
 
+export function requestContactCustomerSupport() {
+	RNReactNativeGutenbergBridge.requestContactCustomerSupport();
+}
+
+export function requestGotoCustomerSupportOptions() {
+	RNReactNativeGutenbergBridge.requestGotoCustomerSupportOptions();
+}
+
 export default RNReactNativeGutenbergBridge;

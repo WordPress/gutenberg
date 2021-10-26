@@ -63,7 +63,7 @@ export function getValidAlignments(
 		);
 	} else if ( blockAlign === true ) {
 		// `true` includes all alignments...
-		validAlignments = ALL_ALIGNMENTS;
+		validAlignments = [ ...ALL_ALIGNMENTS ];
 	} else {
 		validAlignments = [];
 	}
@@ -117,19 +117,23 @@ export function addAttribute( settings ) {
 export const withToolbarControls = createHigherOrderComponent(
 	( BlockEdit ) => ( props ) => {
 		const { name: blockName } = props;
-		// Compute the block allowed alignments without taking into account,
-		// if the theme supports wide alignments or not
-		// and without checking the layout for availble alignments.
-		// BlockAlignmentToolbar takes both of these into account.
+		// Compute the block valid alignments by taking into account,
+		// if the theme supports wide alignments or not and the layout's
+		// availble alignments. We do that for conditionally rendering
+		// Slot.
 		const blockAllowedAlignments = getValidAlignments(
 			getBlockSupport( blockName, 'align' ),
 			hasBlockSupport( blockName, 'alignWide', true )
 		);
 
+		const validAlignments = useAvailableAlignments(
+			blockAllowedAlignments
+		).map( ( { name } ) => name );
+
 		const updateAlignment = ( nextAlign ) => {
 			if ( ! nextAlign ) {
 				const blockType = getBlockType( props.name );
-				const blockDefaultAlign = blockType.attributes?.align?.default;
+				const blockDefaultAlign = blockType?.attributes?.align?.default;
 				if ( blockDefaultAlign ) {
 					nextAlign = '';
 				}
@@ -139,7 +143,7 @@ export const withToolbarControls = createHigherOrderComponent(
 
 		return (
 			<>
-				{ blockAllowedAlignments.length > 0 && (
+				{ !! validAlignments.length && (
 					<BlockControls
 						group="block"
 						__experimentalShareWithChildBlocks
@@ -147,7 +151,7 @@ export const withToolbarControls = createHigherOrderComponent(
 						<BlockAlignmentControl
 							value={ props.attributes.align }
 							onChange={ updateAlignment }
-							controls={ blockAllowedAlignments }
+							controls={ validAlignments }
 						/>
 					</BlockControls>
 				) }
@@ -184,7 +188,9 @@ export const withDataAlign = createHigherOrderComponent(
 		}
 
 		let wrapperProps = props.wrapperProps;
-		if ( validAlignments.includes( align ) ) {
+		if (
+			validAlignments.some( ( alignment ) => alignment.name === align )
+		) {
 			wrapperProps = { ...wrapperProps, 'data-align': align };
 		}
 

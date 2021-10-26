@@ -37,6 +37,7 @@ $z-layers: (
 	".edit-widgets-header": 30,
 	".block-library-button__inline-link .block-editor-url-input__suggestions": 6, // URL suggestions for button block above sibling inserter
 	".wp-block-cover__inner-container": 1, // InnerBlocks area inside cover image block
+	".wp-block-cover.is-placeholder .components-placeholder.is-large": 1, // Cover block resizer component inside a large placeholder.
 	".wp-block-cover.has-background-dim::before": 1, // Overlay area inside block cover need to be higher than the video background.
 	".wp-block-cover__image-background": 0, // Image background inside cover block.
 	".wp-block-cover__video-background": 0, // Video background inside cover block.
@@ -147,7 +148,7 @@ $z-layers: (
 	".components-popover.edit-widgets-more-menu__content": 99998,
 	".components-popover.block-editor-rich-text__inline-format-toolbar": 99998,
 	".components-popover.block-editor-warning__dropdown": 99998,
-	".components-popover.edit-navigation-header__menu-switcher-dropdown": 99998,
+	".components-popover.edit-navigation-menu-actions__switcher-dropdown": 99998,
 
 	".components-autocomplete__results": 1000000,
 

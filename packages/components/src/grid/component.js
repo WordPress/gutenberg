@@ -1,8 +1,19 @@
 /**
  * Internal dependencies
  */
-import { createComponent } from '../ui/utils';
+import { contextConnect } from '../ui/context';
+import { View } from '../view';
 import useGrid from './hook';
+
+/**
+ * @param {import('../ui/context').WordPressComponentProps<import('./types').Props, 'div'>} props
+ * @param {import('react').Ref<any>}                                                        forwardedRef
+ */
+function Grid( props, forwardedRef ) {
+	const gridProps = useGrid( props );
+
+	return <View { ...gridProps } ref={ forwardedRef } />;
+}
 
 /**
  * `Grid` is a primitive layout component that can arrange content in a grid configuration.
@@ -25,10 +36,6 @@ import useGrid from './hook';
  * }
  * ```
  */
-const Grid = createComponent( {
-	as: 'div',
-	useHook: useGrid,
-	name: 'Grid',
-} );
+const ConnectedGrid = contextConnect( Grid, 'Grid' );
 
-export default Grid;
+export default ConnectedGrid;

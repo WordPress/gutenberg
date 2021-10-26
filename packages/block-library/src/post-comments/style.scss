@@ -55,6 +55,7 @@
 	.comment-form-url {
 		label {
 			display: block;
+			margin-bottom: 0.25em;
 		}
 	}
 
@@ -63,13 +64,33 @@
 		width: 100%;
 	}
 
+	.comment-form-cookies-consent {
+		display: flex;
+		gap: 0.25em;
+
+		#wp-comment-cookies-consent {
+			margin-top: 0.35em;
+		}
+	}
+
 	.reply {
 		font-size: 0.75em;
 		margin-bottom: 1.4em;
 	}
 
 	textarea,
-	input {
+	input:not([type="submit"]) {
 		border: 1px solid $gray-600;
+		font-size: 1em;
+		font-family: inherit;
+	}
+
+	textarea,
+	input:not([type="submit"]):not([type="checkbox"]) {
+		padding: calc(0.667em + 2px); // The extra 2px is added to match outline buttons.
+	}
+
+	input[type="submit"] {
+		border: none;
 	}
 }

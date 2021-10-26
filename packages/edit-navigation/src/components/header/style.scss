@@ -18,6 +18,7 @@
 }
 
 .edit-navigation-header__toolbar {
+	align-items: center;
 	border: none;
 
 	// The Toolbar component adds different styles to buttons, so we reset them
@@ -42,13 +43,73 @@
 			display: none;
 		}
 	}
+
+	> .edit-navigation-header-inserter-toggle.has-icon.has-icon.has-icon {
+		margin-right: $grid-unit-10;
+		// Special dimensions for this button.
+		min-width: 32px;
+		width: 32px;
+		height: 32px;
+		padding: 0;
+	}
 }
 
-.edit-navigation-header__subtitle {
-	display: block;
-	margin: 0;
-	font-size: 15px;
-	font-weight: normal;
+.edit-navigation-menu-actions {
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+
+	.edit-navigation-menu-actions__subtitle-wrapper {
+		display: flex;
+		flex-direction: row;
+		justify-content: center;
+		align-items: center;
+	}
+
+	.components-dropdown {
+		margin-left: $grid-unit-05;
+	}
+
+	.edit-navigation-menu-actions__switcher-toggle {
+		padding: 0;
+		min-width: 0;
+	}
+}
+
+.edit-navigation-menu-actions__switcher-dropdown {
+	// Appear below the modal overlay.
+	z-index: z-index(".components-popover.edit-navigation-menu-actions__switcher-dropdown");
+
+	// Resetting MenuItemGroup padding so button can take full space.
+	.components-menu-group.has-hidden-separator {
+		padding: 0;
+	}
+
+	.edit-navigation-menu-switcher__new-button.components-button {
+		justify-content: center;
+		background: $gray-900;
+		color: $white;
+		height: ($button-size + $grid-unit-10);
+		border-radius: 0;
+
+		&:hover {
+			color: $white;
+		}
+
+		&:active {
+			color: $gray-400;
+		}
+
+		&:focus:not(:disabled) {
+			box-shadow: inset 0 0 0 var(--wp-admin-border-width-focus) var(--wp-admin-theme-color), inset 0 0 0 3px $white;
+		}
+
+		// This is needed to center the button text.
+		.components-menu-item__item {
+			min-width: 0;
+			margin: 0;
+		}
+	}
 }
 
 .edit-navigation-header__actions {
@@ -63,15 +124,41 @@
 	}
 }
 
-.edit-navigation-header__menu-switcher-dropdown {
-	// Appear below the modal overlay.
-	z-index: z-index(".components-popover.edit-navigation-header__menu-switcher-dropdown");
-}
-
 // Hide notices.
 .gutenberg_page_gutenberg-navigation {
 	.notice,
 	#wpfooter {
+		display: none;
+	}
+}
+
+
+// INSERTER TOGGLE
+.edit-navigation-header-inserter-toggle {
+
+	svg {
+		transition: transform cubic-bezier(0.165, 0.84, 0.44, 1) 0.2s;
+		@include reduce-motion("transition");
+	}
+
+	// Make the button appear like a "X" close button.
+	&.is-pressed {
+		svg {
+			transform: rotate(45deg);
+		}
+	}
+}
+
+// INSERTER PANEL
+.edit-navigation-layout__inserter-panel-header {
+	padding-top: $grid-unit-10;
+	padding-right: $grid-unit-10;
+	display: flex;
+	justify-content: flex-end;
+
+	// Hide close button within panel on larger screens as this
+	// action is provided by the inserter toggle or ESC key.
+	@include break-medium() {
 		display: none;
 	}
 }

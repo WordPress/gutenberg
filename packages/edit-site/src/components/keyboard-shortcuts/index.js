@@ -19,8 +19,9 @@ import { SIDEBAR_BLOCK } from '../sidebar/constants';
 import { STORE_NAME } from '../../store/constants';
 
 function KeyboardShortcuts() {
-	const isListViewOpen = useSelect( ( select ) =>
-		select( editSiteStore ).isListViewOpened()
+	const isListViewOpen = useSelect(
+		( select ) => select( editSiteStore ).isListViewOpened(),
+		[]
 	);
 	const isBlockInspectorOpen = useSelect(
 		( select ) =>

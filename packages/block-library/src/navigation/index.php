@@ -218,13 +218,19 @@ function render_block_core_navigation( $attributes, $content, $block ) {
 
 	unset( $attributes['rgbTextColor'], $attributes['rgbBackgroundColor'] );
 
-	$should_load_view_script = ! empty( $attributes['isResponsive'] ) && ! wp_script_is( 'wp-block-navigation-view' );
+	/**
+	 * This is for backwards compatibility after `isResponsive` attribute has been removed.
+	 */
+	$has_old_responsive_attribute = ! empty( $attributes['isResponsive'] ) && $attributes['isResponsive'];
+	$is_responsive_menu           = isset( $attributes['overlayMenu'] ) && 'never' !== $attributes['overlayMenu'] || $has_old_responsive_attribute;
+	$should_load_view_script      = ! wp_script_is( 'wp-block-navigation-view' ) && ( $is_responsive_menu || $attributes['openSubmenusOnClick'] || $attributes['showSubmenuIcon'] );
 	if ( $should_load_view_script ) {
 		wp_enqueue_script( 'wp-block-navigation-view' );
 	}
 
 	$inner_blocks = $block->inner_blocks;
 
+	// If `__unstableLocation` is defined, create inner blocks from the classic menu assigned to that location.
 	if ( empty( $inner_blocks ) && array_key_exists( '__unstableLocation', $attributes ) ) {
 		$menu_items = gutenberg_get_menu_items_at_location( $attributes['__unstableLocation'] );
 		if ( empty( $menu_items ) ) {
@@ -233,16 +239,35 @@ function render_block_core_navigation( $attributes, $content, $block ) {
 
 		$menu_items_by_parent_id = gutenberg_sort_menu_items_by_parent_id( $menu_items );
 		$parsed_blocks           = gutenberg_parse_blocks_from_menu_items( $menu_items_by_parent_id[0], $menu_items_by_parent_id );
+		$inner_blocks            = new WP_Block_List( $parsed_blocks, $attributes );
+	}
+
+	// Load inner blocks from the navigation post.
+	if ( array_key_exists( 'navigationMenuId', $attributes ) ) {
+		$navigation_post = get_post( $attributes['navigationMenuId'] );
+		if ( ! isset( $navigation_post ) ) {
+			return '';
+		}
+
+		$parsed_blocks = parse_blocks( $navigation_post->post_content );
+
+		// 'parse_blocks' includes a null block with '\n\n' as the content when
+		// it encounters whitespace. This code strips it.
+		$compacted_blocks = array_filter(
+			$parsed_blocks,
+			function( $block ) {
+				return isset( $block['blockName'] );
+			}
+		);
 
 		// TODO - this uses the full navigation block attributes for the
 		// context which could be refined.
-		$inner_blocks = new WP_Block_List( $parsed_blocks, $attributes );
+		$inner_blocks = new WP_Block_List( $compacted_blocks, $attributes );
 	}
 
 	if ( empty( $inner_blocks ) ) {
 		return '';
 	}
-
 	$colors     = block_core_navigation_build_css_colors( $attributes );
 	$font_sizes = block_core_navigation_build_css_font_sizes( $attributes );
 	$classes    = array_merge(
@@ -250,7 +275,7 @@ function render_block_core_navigation( $attributes, $content, $block ) {
 		$font_sizes['css_classes'],
 		( isset( $attributes['orientation'] ) && 'vertical' === $attributes['orientation'] ) ? array( 'is-vertical' ) : array(),
 		isset( $attributes['itemsJustification'] ) ? array( 'items-justified-' . $attributes['itemsJustification'] ) : array(),
-		isset( $attributes['isResponsive'] ) && true === $attributes['isResponsive'] ? array( 'is-responsive' ) : array()
+		$is_responsive_menu ? array( 'is-responsive' ) : array()
 	);
 
 	$inner_blocks_html = '';
@@ -288,7 +313,7 @@ function render_block_core_navigation( $attributes, $content, $block ) {
 
 	// Determine whether or not navigation elements should be wrapped in the markup required to make it responsive,
 	// return early if they don't.
-	if ( ! isset( $attributes['isResponsive'] ) || false === $attributes['isResponsive'] ) {
+	if ( ! $is_responsive_menu ) {
 		return sprintf(
 			'<nav %1$s>%2$s</nav>',
 			$wrapper_attributes,
@@ -296,9 +321,20 @@ function render_block_core_navigation( $attributes, $content, $block ) {
 		);
 	}
 
+	$is_hidden_by_default = isset( $attributes['overlayMenu'] ) && 'always' === $attributes['overlayMenu'];
+
+	$responsive_container_classes = array(
+		'wp-block-navigation__responsive-container',
+		$is_hidden_by_default ? 'hidden-by-default' : '',
+	);
+	$open_button_classes          = array(
+		'wp-block-navigation__responsive-container-open',
+		$is_hidden_by_default ? 'always-shown' : '',
+	);
+
 	$responsive_container_markup = sprintf(
-		'<button aria-expanded="false" aria-haspopup="true" aria-label="%3$s" class="wp-block-navigation__responsive-container-open" data-micromodal-trigger="modal-%1$s"><svg width="24" height="24" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" role="img" aria-hidden="true" focusable="false"><rect x="4" y="7.5" width="16" height="1.5" /><rect x="4" y="15" width="16" height="1.5" /></svg></button>
-			<div class="wp-block-navigation__responsive-container" id="modal-%1$s" aria-hidden="true">
+		'<button aria-expanded="false" aria-haspopup="true" aria-label="%3$s" class="%6$s" data-micromodal-trigger="modal-%1$s"><svg width="24" height="24" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" role="img" aria-hidden="true" focusable="false"><rect x="4" y="7.5" width="16" height="1.5" /><rect x="4" y="15" width="16" height="1.5" /></svg></button>
+			<div class="%5$s" id="modal-%1$s" aria-hidden="true">
 				<div class="wp-block-navigation__responsive-close" tabindex="-1" data-micromodal-close>
 					<div class="wp-block-navigation__responsive-dialog" role="dialog" aria-modal="true" aria-labelledby="modal-%1$s-title" >
 							<button aria-label="%4$s" data-micromodal-close class="wp-block-navigation__responsive-container-close"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" role="img" aria-hidden="true" focusable="false"><path d="M13 11.8l6.1-6.3-1-1-6.1 6.2-6.1-6.2-1 1 6.1 6.3-6.5 6.7 1 1 6.5-6.6 6.5 6.6 1-1z"></path></svg></button>
@@ -311,7 +347,9 @@ function render_block_core_navigation( $attributes, $content, $block ) {
 		$modal_unique_id,
 		$inner_blocks_html,
 		__( 'Open menu' ), // Open button label.
-		__( 'Close menu' ) // Close button label.
+		__( 'Close menu' ), // Close button label.
+		implode( ' ', $responsive_container_classes ),
+		implode( ' ', $open_button_classes )
 	);
 
 	return sprintf(

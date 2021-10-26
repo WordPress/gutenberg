@@ -270,6 +270,7 @@ function updateParentInnerBlocksInTree( state, tree, updatedClientIds ) {
 			( subClientId ) => tree[ subClientId ]
 		);
 	}
+
 	// Controlled parent blocks, need a dedicated key for their inner blocks
 	// to be used when doing getBlocks( controlledBlockClientId ).
 	for ( const clientId of controlledParents ) {
@@ -364,6 +365,23 @@ const withBlockTree = ( reducer ) => ( state = {}, action ) => {
 					...subTree,
 				},
 				action.blocks.map( ( b ) => b.clientId )
+			);
+
+			// If there are no replaced blocks, it means we're removing blocks so we need to update their parent.
+			const parentsOfRemovedBlocks = [];
+			for ( const clientId of action.clientIds ) {
+				if (
+					state.parents[ clientId ] !== undefined &&
+					( state.parents[ clientId ] === '' ||
+						newState.byClientId[ state.parents[ clientId ] ] )
+				) {
+					parentsOfRemovedBlocks.push( state.parents[ clientId ] );
+				}
+			}
+			newState.tree = updateParentInnerBlocksInTree(
+				newState,
+				newState.tree,
+				parentsOfRemovedBlocks
 			);
 			break;
 		}
@@ -949,7 +967,7 @@ export const blocks = flow(
 				return {
 					...state,
 					...omit( blockOrder, '' ),
-					'': ( state?.[ '' ] || [] ).concat( blockOrder ),
+					'': ( state?.[ '' ] || [] ).concat( blockOrder[ '' ] ),
 				};
 			}
 			case 'INSERT_BLOCKS': {
