@@ -254,7 +254,7 @@ class Gutenberg_REST_Global_Styles_Controller extends WP_REST_Controller {
 			'settings' => isset( $config['settings'] ) ? $config['settings'] : new stdClass(),
 			'styles'   => isset( $config['styles'] ) ? $config['styles'] : new stdClass(),
 			'title'    => array(
-				'raw'      => $post->title,
+				'raw'      => $post->post_title,
 				'rendered' => get_the_title( $post ),
 			),
 		);
