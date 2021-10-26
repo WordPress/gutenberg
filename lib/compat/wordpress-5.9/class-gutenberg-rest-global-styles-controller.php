@@ -227,8 +227,13 @@ class Gutenberg_REST_Global_Styles_Controller extends WP_REST_Controller {
 			$changes->post_content = wp_json_encode( $config );
 		}
 
+		// Post title.
 		if ( isset( $request['title'] ) ) {
-			$changes->post_title = $request['title'];
+			if ( is_string( $request['title'] ) ) {
+				$changes->post_title = $request['title'];
+			} elseif ( ! empty( $request['title']['raw'] ) ) {
+				$changes->post_title = $request['title']['raw'];
+			}
 		}
 
 		return $changes;
@@ -250,7 +255,7 @@ class Gutenberg_REST_Global_Styles_Controller extends WP_REST_Controller {
 			'styles'   => isset( $config['styles'] ) ? $config['styles'] : new stdClass(),
 			'title'    => array(
 				'raw'      => $post->title,
-				'rendered' => $post->title,
+				'rendered' => get_the_title( $post ),
 			),
 		);
 
@@ -340,13 +345,13 @@ class Gutenberg_REST_Global_Styles_Controller extends WP_REST_Controller {
 				'styles'   => array(
 					'description' => __( 'Global styles.', 'gutenberg' ),
 					'type'        => array( 'object' ),
-					'default'     => '',
+					'default'     => array(),
 					'context'     => array( 'embed', 'view', 'edit' ),
 				),
 				'settings' => array(
 					'description' => __( 'Global settings.', 'gutenberg' ),
 					'type'        => array( 'object' ),
-					'default'     => '',
+					'default'     => array(),
 					'context'     => array( 'embed', 'view', 'edit' ),
 				),
 				'title'    => array(
@@ -354,6 +359,19 @@ class Gutenberg_REST_Global_Styles_Controller extends WP_REST_Controller {
 					'type'        => array( 'object', 'string' ),
 					'default'     => '',
 					'context'     => array( 'embed', 'view', 'edit' ),
+					'properties'  => array(
+						'raw'      => array(
+							'description' => __( 'Title for the global styles variation, as it exists in the database.', 'gutenberg' ),
+							'type'        => 'string',
+							'context'     => array( 'view', 'edit', 'embed' ),
+						),
+						'rendered' => array(
+							'description' => __( 'HTML title for the post, transformed for display.', 'gutenberg' ),
+							'type'        => 'string',
+							'context'     => array( 'view', 'edit', 'embed' ),
+							'readonly'    => true,
+						),
+					),
 				),
 			),
 		);

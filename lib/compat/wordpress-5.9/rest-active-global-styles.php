@@ -28,8 +28,8 @@ function gutenberg_add_active_global_styles_link( $response, $theme ) {
 	$global_styles_query = new WP_Query( $wp_query_args );
 	if ( count( $global_styles_query->posts ) ) {
 		$response->add_link(
-			'global-styles',
-			get_rest_url( null, 'wp/v2/global-styles/' . $global_styles_query->posts[0]->ID )
+			'https://api.w.org/global-styles',
+			rest_url( 'wp/v2/global-styles/' . $global_styles_query->posts[0]->ID )
 		);
 	}
 
