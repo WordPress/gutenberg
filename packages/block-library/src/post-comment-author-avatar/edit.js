@@ -82,9 +82,9 @@ export default function Edit( {
 			/>
 		</ResizableBox>
 	) : (
-		<div>
-			<p>{ _x( 'Comment Author Avatar', 'block title' ) }</p>
-		</div>
+		<p { ...blockProps }>
+			{ _x( 'Comment Author Avatar', 'block title' ) }
+		</p>
 	);
 
 	return (
