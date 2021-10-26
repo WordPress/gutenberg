@@ -1,6 +1,6 @@
 .wp-block-post-comments {
-	.comment-reply-title,
-	.nocomments {
+	// Remove extraneous top padding added to the first heading of the block.
+	> h3:first-of-type {
 		margin-top: 0;
 	}
 
