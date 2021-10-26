@@ -25,8 +25,8 @@ function render_block_core_post_comment_author_avatar( $attributes, $content, $b
 
 	// This is the only way to retreive style and classes on different instances.
 	$wrapper_attributes = WP_Block_Supports::get_instance()->apply_block_supports();
-	$width              = isset( $attributes['width'] ) ? $attributes['width'] : '96';
-	$height             = isset( $attributes['height'] ) ? $attributes['height'] : '96';
+	$width              = isset( $attributes['width'] ) ? $attributes['width'] : 96;
+	$height             = isset( $attributes['height'] ) ? $attributes['height'] : 96;
 	$styles             = isset( $wrapper_attributes['style'] ) ? $wrapper_attributes['style'] : '';
 	$classes            = isset( $wrapper_attributes['class'] ) ? $wrapper_attributes['class'] : '';
 

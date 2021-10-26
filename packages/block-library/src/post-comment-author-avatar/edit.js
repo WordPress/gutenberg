@@ -33,7 +33,7 @@ export default function Edit( {
 	const minSize = sizes ? sizes[ 0 ] : 24;
 	const maxSize = sizes ? sizes[ sizes.length - 1 ] : 96;
 	const blockProps = useBlockProps();
-	const maxSizeBuffer = maxSize * 2.5;
+	const maxSizeBuffer = Math.floor( maxSize * 2.5 );
 
 	const inspectorControls = (
 		<InspectorControls>
