@@ -13,7 +13,6 @@ import {
 } from '@wordpress/block-editor';
 import { Spinner } from '@wordpress/components';
 import { store as coreStore } from '@wordpress/core-data';
-import { store as editorStore } from '@wordpress/editor';
 
 const TEMPLATE = [
 	[ 'core/post-comment-author' ],
@@ -21,7 +20,10 @@ const TEMPLATE = [
 	[ 'core/post-comment-content' ],
 ];
 
-export default function CommentTemplateEdit( { clientId, context: {} } ) {
+export default function CommentTemplateEdit( {
+	clientId,
+	context: { postId },
+} ) {
 	const innerBlocksProps = useInnerBlocksProps( {}, { template: TEMPLATE } );
 	const blockProps = useBlockProps();
 
@@ -30,7 +32,6 @@ export default function CommentTemplateEdit( { clientId, context: {} } ) {
 	const { comments, blocks } = useSelect( ( select ) => {
 		const { getEntityRecords } = select( coreStore );
 		const { getBlocks } = select( blockEditorStore );
-		const postId = select( editorStore ).getCurrentPostId();
 
 		return {
 			comments: getEntityRecords( 'root', 'comment', { post: postId } ),
