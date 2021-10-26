@@ -7,11 +7,6 @@ import { useEntityProp } from '@wordpress/core-data';
 import { __, isRTL } from '@wordpress/i18n';
 import { useRef } from '@wordpress/element';
 
-/**
- * Internal dependencies
- */
-import useClientWidth from '../image/use-client-width';
-
 export default function Edit( {
 	attributes,
 	context: { commentId },
@@ -33,12 +28,12 @@ export default function Edit( {
 		commentId
 	);
 	const containerRef = useRef();
-	const clientWidth = useClientWidth( containerRef );
 	const avatarUrls = avatars ? Object.values( avatars ) : null;
 	const sizes = avatars ? Object.keys( avatars ) : null;
 	const minSize = sizes ? sizes[ 0 ] : 24;
 	const maxSize = sizes ? sizes[ sizes.length - 1 ] : 96;
 	const blockProps = useBlockProps();
+	const maxSizeBuffer = maxSize * 2.5;
 
 	return (
 		<>
@@ -53,7 +48,7 @@ export default function Edit( {
 							} )
 						}
 						min={ minSize }
-						max={ clientWidth || maxSize }
+						max={ maxSizeBuffer }
 						initialPosition={ width }
 						value={ width }
 					/>
@@ -80,7 +75,7 @@ export default function Edit( {
 							left: isRTL(),
 						} }
 						minWidth={ minSize }
-						maxWidth={ clientWidth || maxSize }
+						maxWidth={ maxSizeBuffer }
 					>
 						<img
 							src={ avatarUrls[ avatarUrls.length - 1 ] }
