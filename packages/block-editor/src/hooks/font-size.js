@@ -114,7 +114,6 @@ export function FontSizeEdit( props ) {
 		attributes: { fontSize, style },
 		setAttributes,
 	} = props;
-	const isDisabled = useIsFontSizeDisabled( props );
 	const fontSizes = useSetting( 'typography.fontSizes' );
 
 	const onChange = ( value ) => {
@@ -132,10 +131,6 @@ export function FontSizeEdit( props ) {
 		} );
 	};
 
-	if ( isDisabled ) {
-		return null;
-	}
-
 	const fontSizeObject = getFontSize(
 		fontSizes,
 		fontSize,
@@ -145,7 +140,48 @@ export function FontSizeEdit( props ) {
 	const fontSizeValue =
 		fontSizeObject?.size || style?.typography?.fontSize || fontSize;
 
-	return <FontSizePicker onChange={ onChange } value={ fontSizeValue } />;
+	return (
+		<FontSizePicker
+			onChange={ onChange }
+			value={ fontSizeValue }
+			withReset={ false }
+		/>
+	);
+}
+
+/**
+ * Checks if there is a current value set for the font size block support.
+ *
+ * @param {Object} props Block props.
+ * @return {boolean}     Whether or not the block has a font size value set.
+ */
+export function hasFontSizeValue( props ) {
+	const { fontSize, style } = props.attributes;
+	return !! fontSize || !! style?.typography?.fontSize;
+}
+
+/**
+ * Resets the font size block support attribute. This can be used when
+ * disabling the font size support controls for a block via a progressive
+ * discovery panel.
+ *
+ * @param {Object} props               Block props.
+ * @param {Object} props.attributes    Block's attributes.
+ * @param {Object} props.setAttributes Function to set block's attributes.
+ */
+export function resetFontSize( { attributes = {}, setAttributes } ) {
+	const { style } = attributes;
+
+	setAttributes( {
+		fontSize: undefined,
+		style: cleanEmptyObject( {
+			...style,
+			typography: {
+				...style?.typography,
+				fontSize: undefined,
+			},
+		} ),
+	} );
 }
 
 /**

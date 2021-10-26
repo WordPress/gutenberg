@@ -63,8 +63,7 @@ function render_block_core_post_navigation_link( $attributes, $content ) {
 				 */
 				$label = 'next' === $navigation_type ? _x( 'Next:', 'label before the title of the next post' ) : _x( 'Previous:', 'label before the title of the previous post' );
 				$link  = sprintf(
-					/* translators: 1: label. 2: post title */
-					__( '<span class="post-navigation-link__label">%1$s</span> <span class="post-navigation-link__title">%2$s</span>' ),
+					'<span class="post-navigation-link__label">%1$s</span> <span class="post-navigation-link__title">%2$s</span>',
 					$label,
 					'%title'
 				);
