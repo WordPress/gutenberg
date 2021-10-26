@@ -46,7 +46,7 @@ function Edit( { setAttributes, attributes: { textAlign } } ) {
 			{ blockControls }
 			<div { ...blockProps }>
 				<a
-					href="#comments"
+					href="#comment-reply-pseudo-link"
 					onClick={ ( event ) => event.preventDefault() }
 				>
 					{ __( 'Reply' ) }
