@@ -323,17 +323,17 @@ class EditorPage {
 
 			if (
 				await this.driver.hasElementByAccessibilityId(
-					blockAccessibilityLabel
+					blockAccessibilityLabelNewBlock
 				)
 			) {
-				return await this.driver.elementByAccessibilityId(
-					blockAccessibilityLabel
-				);
-			} else {
 				return await this.driver.elementByAccessibilityId(
 					blockAccessibilityLabelNewBlock
 				);
 			}
+
+			return await this.driver.elementByAccessibilityId(
+				blockAccessibilityLabel
+			);
 		}
 
 		const blockButton = ( await this.driver.hasElementByAccessibilityId(
