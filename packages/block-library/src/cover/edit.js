@@ -543,6 +543,7 @@ function CoverEdit( {
 					</PanelBody>
 				) }
 				<PanelColorGradientSettings
+					__experimentalHasMultipleOrigins
 					title={ __( 'Overlay' ) }
 					initialOpen={ true }
 					settings={ [

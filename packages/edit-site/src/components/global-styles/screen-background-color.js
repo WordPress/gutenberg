@@ -8,7 +8,13 @@ import { __experimentalPanelColorGradientSettings as PanelColorGradientSettings 
  * Internal dependencies
  */
 import ScreenHeader from './header';
-import { getSupportedGlobalStylesPanels, useSetting, useStyle } from './hooks';
+import {
+	getSupportedGlobalStylesPanels,
+	useColorsPerOrigin,
+	useGradientsPerOrigin,
+	useSetting,
+	useStyle,
+} from './hooks';
 
 function ScreenBackgroundColor( { name } ) {
 	const parentMenu = name === undefined ? '' : '/blocks/' + name;
@@ -20,6 +26,9 @@ function ScreenBackgroundColor( { name } ) {
 		'color.customGradient',
 		name
 	);
+
+	const colorsPerOrigin = useColorsPerOrigin( name );
+	const gradientsPerOrigin = useGradientsPerOrigin( name );
 
 	const [ isBackgroundEnabled ] = useSetting( 'color.background', name );
 
@@ -89,10 +98,11 @@ function ScreenBackgroundColor( { name } ) {
 			<PanelColorGradientSettings
 				title={ __( 'Color' ) }
 				settings={ settings }
-				colors={ solids }
-				gradients={ gradients }
+				colors={ colorsPerOrigin }
+				gradients={ gradientsPerOrigin }
 				disableCustomColors={ ! areCustomSolidsEnabled }
 				disableCustomGradients={ ! areCustomGradientsEnabled }
+				__experimentalHasMultipleOrigins
 				showTitle={ false }
 			/>
 		</>

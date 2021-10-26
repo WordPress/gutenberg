@@ -166,6 +166,7 @@ export function SocialLinksEdit( props ) {
 					/>
 				</PanelBody>
 				<PanelColorSettings
+					__experimentalHasMultipleOrigins
 					title={ __( 'Color' ) }
 					colorSettings={ [
 						{

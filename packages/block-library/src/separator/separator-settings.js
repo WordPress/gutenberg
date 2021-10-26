@@ -7,6 +7,7 @@ import { InspectorControls, PanelColorSettings } from '@wordpress/block-editor';
 const SeparatorSettings = ( { color, setColor } ) => (
 	<InspectorControls>
 		<PanelColorSettings
+			__experimentalHasMultipleOrigins
 			title={ __( 'Color' ) }
 			colorSettings={ [
 				{

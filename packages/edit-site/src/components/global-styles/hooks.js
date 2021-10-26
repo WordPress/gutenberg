@@ -6,7 +6,8 @@ import { get, cloneDeep, set, isEqual, has } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { useContext, useCallback } from '@wordpress/element';
+import { __ } from '@wordpress/i18n';
+import { useContext, useCallback, useMemo } from '@wordpress/element';
 import {
 	getBlockType,
 	__EXPERIMENTAL_PATHS_WITH_MERGE as PATHS_WITH_MERGE,
@@ -214,4 +215,60 @@ export function getSupportedGlobalStylesPanels( name ) {
 	} );
 
 	return supportKeys;
+}
+
+export function useColorsPerOrigin( name ) {
+	const [ userColors ] = useSetting( 'color.palette.user', name );
+	const [ themeColors ] = useSetting( 'color.palette.theme', name );
+	const [ coreColors ] = useSetting( 'color.palette.core', name );
+	return useMemo( () => {
+		const result = [];
+		if ( coreColors && coreColors.length ) {
+			result.push( {
+				name: __( 'Core' ),
+				colors: coreColors,
+			} );
+		}
+		if ( themeColors && themeColors.length ) {
+			result.push( {
+				name: __( 'Theme' ),
+				colors: themeColors,
+			} );
+		}
+		if ( userColors && userColors.length ) {
+			result.push( {
+				name: __( 'User' ),
+				colors: userColors,
+			} );
+		}
+		return result;
+	}, [ userColors, themeColors, coreColors ] );
+}
+
+export function useGradientsPerOrigin( name ) {
+	const [ userGradients ] = useSetting( 'color.gradients.user', name );
+	const [ themeGradients ] = useSetting( 'color.gradients.theme', name );
+	const [ coreGradients ] = useSetting( 'color.gradients.core', name );
+	return useMemo( () => {
+		const result = [];
+		if ( coreGradients && coreGradients.length ) {
+			result.push( {
+				name: __( 'Core' ),
+				gradients: coreGradients,
+			} );
+		}
+		if ( themeGradients && themeGradients.length ) {
+			result.push( {
+				name: __( 'Theme' ),
+				gradients: themeGradients,
+			} );
+		}
+		if ( userGradients && userGradients.length ) {
+			result.push( {
+				name: __( 'User' ),
+				gradients: userGradients,
+			} );
+		}
+		return result;
+	}, [ userGradients, themeGradients, coreGradients ] );
 }

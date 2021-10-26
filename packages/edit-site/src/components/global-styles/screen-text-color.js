@@ -8,7 +8,12 @@ import { __experimentalPanelColorGradientSettings as PanelColorGradientSettings 
  * Internal dependencies
  */
 import ScreenHeader from './header';
-import { getSupportedGlobalStylesPanels, useSetting, useStyle } from './hooks';
+import {
+	getSupportedGlobalStylesPanels,
+	useSetting,
+	useStyle,
+	useColorsPerOrigin,
+} from './hooks';
 
 function ScreenTextColor( { name } ) {
 	const parentMenu = name === undefined ? '' : '/blocks/' + name;
@@ -16,6 +21,8 @@ function ScreenTextColor( { name } ) {
 	const [ solids ] = useSetting( 'color.palette', name );
 	const [ areCustomSolidsEnabled ] = useSetting( 'color.custom', name );
 	const [ isTextEnabled ] = useSetting( 'color.text', name );
+
+	const colorsPerOrigin = useColorsPerOrigin( name );
 
 	const hasTextColor =
 		supports.includes( 'color' ) &&
@@ -51,8 +58,9 @@ function ScreenTextColor( { name } ) {
 			<PanelColorGradientSettings
 				title={ __( 'Color' ) }
 				settings={ settings }
-				colors={ solids }
+				colors={ colorsPerOrigin }
 				disableCustomColors={ ! areCustomSolidsEnabled }
+				__experimentalHasMultipleOrigins
 				showTitle={ false }
 			/>
 		</>

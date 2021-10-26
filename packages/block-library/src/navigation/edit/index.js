@@ -365,6 +365,7 @@ function Navigation( {
 					) }
 					{ hasColorSettings && (
 						<PanelColorSettings
+							__experimentalHasMultipleOrigins
 							title={ __( 'Color' ) }
 							initialOpen={ false }
 							colorSettings={ [

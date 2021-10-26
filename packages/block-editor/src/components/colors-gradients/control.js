@@ -35,6 +35,7 @@ function ColorGradientControlInner( {
 	gradients,
 	disableCustomColors,
 	disableCustomGradients,
+	__experimentalHasMultipleOrigins,
 	className,
 	label,
 	onColorChange,
@@ -104,6 +105,9 @@ function ColorGradientControlInner( {
 									: onColorChange
 							}
 							{ ...{ colors, disableCustomColors } }
+							__experimentalHasMultipleOrigins={
+								__experimentalHasMultipleOrigins
+							}
 							clearable={ clearable }
 						/>
 					) }
@@ -119,6 +123,9 @@ function ColorGradientControlInner( {
 									: onGradientChange
 							}
 							{ ...{ gradients, disableCustomGradients } }
+							__experimentalHasMultipleOrigins={
+								__experimentalHasMultipleOrigins
+							}
 							clearable={ clearable }
 						/>
 					) }

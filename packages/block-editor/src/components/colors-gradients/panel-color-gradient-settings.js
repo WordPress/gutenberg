@@ -9,6 +9,7 @@ import { every, isEmpty } from 'lodash';
  */
 import { PanelBody, ColorIndicator } from '@wordpress/components';
 import { sprintf, __ } from '@wordpress/i18n';
+import { useMemo } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -90,6 +91,7 @@ export const PanelColorGradientSettingsInner = ( {
 	settings,
 	title,
 	showTitle = true,
+	__experimentalHasMultipleOrigins,
 	...props
 } ) => {
 	if (
@@ -140,6 +142,7 @@ export const PanelColorGradientSettingsInner = ( {
 						gradients,
 						disableCustomColors,
 						disableCustomGradients,
+						__experimentalHasMultipleOrigins,
 						...setting,
 					} }
 				/>
@@ -149,14 +152,77 @@ export const PanelColorGradientSettingsInner = ( {
 	);
 };
 
-const PanelColorGradientSettingsSelect = ( props ) => {
-	const colorGradientSettings = {};
+function useCommonSingleMultipleSelects() {
+	return {
+		disableCustomColors: ! useSetting( 'color.custom' ),
+		disableCustomGradients: ! useSetting( 'color.customGradient' ),
+	};
+}
+
+const PanelColorGradientSettingsSingleSelect = ( props ) => {
+	const colorGradientSettings = useCommonSingleMultipleSelects();
 	colorGradientSettings.colors = useSetting( 'color.palette' );
 	colorGradientSettings.gradients = useSetting( 'color.gradients' );
-	colorGradientSettings.disableCustomColors = ! useSetting( 'color.custom' );
-	colorGradientSettings.disableCustomGradients = ! useSetting(
-		'color.customGradient'
+	return (
+		<PanelColorGradientSettingsInner
+			{ ...{ ...colorGradientSettings, ...props } }
+		/>
 	);
+};
+
+const PanelColorGradientSettingsMultipleSelect = ( props ) => {
+	const colorGradientSettings = useCommonSingleMultipleSelects();
+	const userColors = useSetting( 'color.palette.user' );
+	const themeColors = useSetting( 'color.palette.theme' );
+	const coreColors = useSetting( 'color.palette.core' );
+	colorGradientSettings.colors = useMemo( () => {
+		const result = [];
+		if ( coreColors && coreColors.length ) {
+			result.push( {
+				name: __( 'Core' ),
+				colors: coreColors,
+			} );
+		}
+		if ( themeColors && themeColors.length ) {
+			result.push( {
+				name: __( 'Theme' ),
+				colors: themeColors,
+			} );
+		}
+		if ( userColors && userColors.length ) {
+			result.push( {
+				name: __( 'User' ),
+				colors: userColors,
+			} );
+		}
+		return result;
+	}, [ coreColors, themeColors, userColors ] );
+
+	const userGradients = useSetting( 'color.gradients.user' );
+	const themeGradients = useSetting( 'color.gradients.theme' );
+	const coreGradients = useSetting( 'color.gradients.core' );
+	colorGradientSettings.gradients = useMemo( () => {
+		const result = [];
+		if ( coreGradients && coreGradients.length ) {
+			result.push( {
+				name: __( 'Core' ),
+				gradients: coreGradients,
+			} );
+		}
+		if ( themeGradients && themeGradients.length ) {
+			result.push( {
+				name: __( 'Theme' ),
+				gradients: themeGradients,
+			} );
+		}
+		if ( userGradients && userGradients.length ) {
+			result.push( {
+				name: __( 'User' ),
+				gradients: userGradients,
+			} );
+		}
+		return result;
+	}, [ userGradients, themeGradients, coreGradients ] );
 	return (
 		<PanelColorGradientSettingsInner
 			{ ...{ ...colorGradientSettings, ...props } }
@@ -170,7 +236,10 @@ const PanelColorGradientSettings = ( props ) => {
 	) {
 		return <PanelColorGradientSettingsInner { ...props } />;
 	}
-	return <PanelColorGradientSettingsSelect { ...props } />;
+	if ( props.__experimentalHasMultipleOrigins ) {
+		return <PanelColorGradientSettingsMultipleSelect { ...props } />;
+	}
+	return <PanelColorGradientSettingsSingleSelect { ...props } />;
 };
 
 export default PanelColorGradientSettings;

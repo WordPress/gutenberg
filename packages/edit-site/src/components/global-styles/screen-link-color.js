@@ -8,13 +8,20 @@ import { __experimentalPanelColorGradientSettings as PanelColorGradientSettings 
  * Internal dependencies
  */
 import ScreenHeader from './header';
-import { getSupportedGlobalStylesPanels, useSetting, useStyle } from './hooks';
+import {
+	getSupportedGlobalStylesPanels,
+	useSetting,
+	useStyle,
+	useColorsPerOrigin,
+} from './hooks';
 
 function ScreenLinkColor( { name } ) {
 	const parentMenu = name === undefined ? '' : '/blocks/' + name;
 	const supports = getSupportedGlobalStylesPanels( name );
 	const [ solids ] = useSetting( 'color.palette', name );
 	const [ areCustomSolidsEnabled ] = useSetting( 'color.custom', name );
+
+	const colorsPerOrigin = useColorsPerOrigin( name );
 
 	const [ isLinkEnabled ] = useSetting( 'color.link', name );
 
@@ -59,8 +66,9 @@ function ScreenLinkColor( { name } ) {
 			<PanelColorGradientSettings
 				title={ __( 'Color' ) }
 				settings={ settings }
-				colors={ solids }
+				colors={ colorsPerOrigin }
 				disableCustomColors={ ! areCustomSolidsEnabled }
+				__experimentalHasMultipleOrigins
 				showTitle={ false }
 			/>
 		</>
