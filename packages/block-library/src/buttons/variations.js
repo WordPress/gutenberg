@@ -16,7 +16,7 @@ const variations = [
 		name: 'buttons-vertical',
 		title: __( 'Vertical' ),
 		description: __( 'Buttons shown in a column.' ),
-		attributes: { layout: { type: 'column' } },
+		attributes: { layout: { type: 'flex', orientation: 'vertical' } },
 		scope: [ 'transform' ],
 	},
 ];

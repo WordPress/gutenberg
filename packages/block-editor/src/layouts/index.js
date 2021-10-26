@@ -3,9 +3,8 @@
  */
 import flex from './flex';
 import flow from './flow';
-import column from './column';
 
-const layoutTypes = [ flow, flex, column ];
+const layoutTypes = [ flow, flex ];
 
 /**
  * Retrieves a layout type by name.
