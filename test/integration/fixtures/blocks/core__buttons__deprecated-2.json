@@ -4,10 +4,12 @@
 		"name": "core/buttons",
 		"isValid": true,
 		"attributes": {
+			"contentJustification": "center",
 			"orientation": "horizontal",
+			"align": "wide",
 			"layout": {
 				"type": "flex",
-				"justifyContent": "left",
+				"justifyContent": "center",
 				"orientation": "horizontal"
 			}
 		},
@@ -20,7 +22,7 @@
 					"text": "My button 1"
 				},
 				"innerBlocks": [],
-				"originalContent": "<a class=\"wp-block-button wp-block-button__link\">My button 1</a>"
+				"originalContent": "<div class=\"wp-block-button\"><a class=\"wp-block-button__link\">My button 1</a></div>"
 			},
 			{
 				"clientId": "_clientId_1",
@@ -30,9 +32,9 @@
 					"text": "My button 2"
 				},
 				"innerBlocks": [],
-				"originalContent": "<a class=\"wp-block-button wp-block-button__link\">My button 2</a>"
+				"originalContent": "<div class=\"wp-block-button\"><a class=\"wp-block-button__link\">My button 2</a></div>"
 			}
 		],
-		"originalContent": "<div class=\"wp-block-buttons\">\n\t\n\n\t\n</div>"
+		"originalContent": "<div class=\"wp-block-buttons alignwide is-content-justification-center\">\n\t\n\n\t\n</div>"
 	}
 ]

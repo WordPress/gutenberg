@@ -4,9 +4,11 @@
 		"name": "core/buttons",
 		"isValid": true,
 		"attributes": {
-			"contentJustification": "center",
-			"orientation": "horizontal",
-			"align": "wide"
+			"align": "wide",
+			"layout": {
+				"type": "flex",
+				"justifyContent": "center"
+			}
 		},
 		"innerBlocks": [
 			{
@@ -30,6 +32,6 @@
 				"originalContent": "<div class=\"wp-block-button\"><a class=\"wp-block-button__link\">My button 2</a></div>"
 			}
 		],
-		"originalContent": "<div class=\"wp-block-buttons alignwide is-content-justification-center\">\n\t\n\n\t\n</div>"
+		"originalContent": "<div class=\"wp-block-buttons alignwide\">\n\t\n\n\t\n</div>"
 	}
 ]
