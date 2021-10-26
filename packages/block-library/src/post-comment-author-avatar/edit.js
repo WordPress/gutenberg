@@ -5,7 +5,6 @@ import { InspectorControls, useBlockProps } from '@wordpress/block-editor';
 import { PanelBody, ResizableBox, RangeControl } from '@wordpress/components';
 import { useEntityProp } from '@wordpress/core-data';
 import { __, _x, isRTL } from '@wordpress/i18n';
-import { useRef } from '@wordpress/element';
 
 export default function Edit( {
 	attributes,
@@ -27,7 +26,6 @@ export default function Edit( {
 		'author_name',
 		commentId
 	);
-	const containerRef = useRef();
 	const avatarUrls = avatars ? Object.values( avatars ) : null;
 	const sizes = avatars ? Object.keys( avatars ) : null;
 	const minSize = sizes ? sizes[ 0 ] : 24;
@@ -84,13 +82,15 @@ export default function Edit( {
 			/>
 		</ResizableBox>
 	) : (
-		<p>{ _x( 'Post Comment Author Avatar', 'block title' ) }</p>
+		<div>
+			<p>{ _x( 'Comment Author Avatar', 'block title' ) }</p>
+		</div>
 	);
 
 	return (
 		<>
 			{ inspectorControls }
-			<div ref={ containerRef }>{ displayAvatar }</div>
+			<div>{ displayAvatar }</div>
 		</>
 	);
 }
