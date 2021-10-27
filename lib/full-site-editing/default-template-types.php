@@ -19,7 +19,7 @@ function gutenberg_get_default_template_types() {
 		),
 		'home'           => array(
 			'title'       => _x( 'Home', 'Template name', 'gutenberg' ),
-			'description' => __( 'Displays latest posts when the homepage is set to display latest posts.', 'gutenberg' ),
+			'description' => __( 'Displays latest posts. Used by the site home page when it is configured to display latest posts, or by the posts page when it is configured to display a static page.', 'gutenberg' ),
 		),
 		'front-page'     => array(
 			'title'       => _x( 'Front Page', 'Template name', 'gutenberg' ),
@@ -35,7 +35,7 @@ function gutenberg_get_default_template_types() {
 		),
 		'page'           => array(
 			'title'       => _x( 'Page', 'Template name', 'gutenberg' ),
-			'description' => __( 'Displays individual pages.', 'gutenberg' ),
+			'description' => __( 'Displays a single page.', 'gutenberg' ),
 		),
 		'archive'        => array(
 			'title'       => _x( 'Archive', 'Template name', 'gutenberg' ),
