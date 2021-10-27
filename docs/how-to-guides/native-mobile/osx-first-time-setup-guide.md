@@ -18,6 +18,8 @@ After opening the application:
 * Accept the license agreement.
 * Verify that `Xcode > Preferences > Locations > Command Line Tools` points at the current Xcode version.
 
+<img src="https://developer.wordpress.org/files/2021/10/xcode-command-line-tools.png" width="500" alt="Screenshot of XCode command line tools settings.">
+
 ## Clone Gutenberg
 
 If Xcode was installed successfully, we'll also have a version of git available. (It's possible to
@@ -56,7 +58,7 @@ npm ci
 
 #### Do you have an older existing Gutenberg checkout?
 
-If you have an existing Gutenberg checkout be sure to fully clean node_modules and re-install dependencies.
+If you have an existing Gutenberg checkout be sure to fully clean `node_modules` and re-install dependencies.
 This may help avoid errors in the future.
 
 ```sh
@@ -82,7 +84,7 @@ relative to `/packages/react-native-editor folder`, run:
 npx @react-native-community/cli doctor
 ```
 
-[Add screenshot of cli doctor]
+<img src="https://developer.wordpress.org/files/2021/10/react-native-doctor.png" width="500px" alt="Screenshot of react-native-community/cli doctor tool running in the terminal.">
 
 See if `doctor` can fix both "common" and "iOS" issues. (Don't worry if "Android" still has ❌s at this stage, we'll get to those later!)
 
@@ -99,7 +101,7 @@ npm run native ios
 
 After waiting for everything to build we should see:
 
-[Add video of working iOS Simulator]
+<img src="https://developer.wordpress.org/files/2021/10/iOS-Simulator.png" alt="Screenshot of the block editor in iOS simulator." />
 
 ## Android
 
@@ -110,38 +112,34 @@ Next, open an existing project and select the gutenberg folder you cloned:
 
 Click on the cube with the down arrow:
 
-[Add screenshot of Android studio with the icon annotated]
+<img src="https://developer.wordpress.org/files/2021/10/react-native-package-manager.png" alt="Screenshot highlighting where the package manager button is located in Android Studio.">
 
 We can download SDK platforms, packages and other tools on this screen. Specific versions are
 hidden behind the "Show package details" checkbox, check it, since our build requires specific versions for E2E and
 development:
 
-[Add screenshot of the package manager with the checkbox annotated]
+<img src="https://developer.wordpress.org/files/2021/10/react-native-show-package-details.png" alt="Screenshot of the package manager in Android Studio, highlighting the Show Package Details checkbox.">
 
 Check all related packages from [build.gradle](https://github.com/WordPress/gutenberg/blob/trunk/packages/react-native-editor/android/build.gradle).
 Then click on "Apply" to download items. There may be other related dependencies from build.gradle files in node_modules.
 If you don’t want to dig through files, stack traces will complain of missing packages, but it does take quite a number
 of tries if you go through this route.
 
-[Add screenshot of example package list]
+<img src="https://developer.wordpress.org/files/2021/10/react-native-editor-build-gradle.png" alt="Screenshot of the build.gradle configuration file.">
 
-For good measure, let’s also set the project SDK in Android Studio in File > Project Structure
+<img src="https://developer.wordpress.org/files/2021/10/react-native-sdk.png" width="500" alt="Screenshot of the package manager displaying SDK Platforms.">
 
-[Add screenshot of project structure]
-
-Then set it to our current SDK target 29:
-
-[Add screenshot of project settings]
+<img src="https://developer.wordpress.org/files/2021/10/react-native-sdk-tools.png" width="500" alt="Screenshot of the package manager displaying SDK Tools.">
 
 ### Update Paths
 
 Export the following env variables and update $PATH. We can normally add this to our ` ~/.zshrc` file if we're using zsh
-in our terminal, or `.bash_profile` if the terminal is still using bash.
+in our terminal, or `~/.bash_profile` if the terminal is still using bash.
 
 ```sh
 ### Java that comes with Android Studio:
 export JAVA_HOME=/Applications/Android\ Studio.app/Contents/jre/Contents/Home
-### Android Home is configurable in Android Studio. Go to Preferences > System Settings > Android SDK > Android SDK Location
+### Android Home is configurable in Android Studio. Go to Preferences > System Settings > Android SDK
 export ANDROID_HOME=$HOME/Library/Android/sdk
 export PATH=$PATH:$ANDROID_HOME/emulator
 export PATH=$PATH:$ANDROID_HOME/tools
@@ -157,28 +155,27 @@ or
 ```sh
 source ~/.bash_profile
 ```
+
+If the SDK path can't be found, you can verify its location by visiting Android Studio > Preferences > System Settings > Android SDK
+
+<img src="https://developer.wordpress.org/files/2021/10/sdk-path.png" alt="Screenshot of where the SDK Path may be found in Android Studio.">
+
 ### Create a new device image
 
 Next, let’s create a virtual device image. Click on the phone icon with an android to the bottom-right.
 
-[Add screenshot]
+<img src="https://developer.wordpress.org/files/2021/10/react-native-android-device-manager-button.png" alt="Screenshot of where to find the android device manager button.">
 
-This brings up the “Android Virtual Device Manager” or (AVD). Click on “Create Virtual Device”.
+This brings up the “Android Virtual Device Manager” or (AVD). Click on “Create Virtual Device”. Pick a phone type of your choice:
 
-[Add screenshot]
-
-Pick a phone type of your choice:
-
-[Add screenshot]
+<img src="https://developer.wordpress.org/files/2021/10/react-native-android-select-hardware.png" alt="Screenshot of the Virtual Device Configuration setup.">
 
 Pick the target SDK version. This is the targetSdkVersion set in the
 [build.gradle](https://github.com/WordPress/gutenberg/blob/trunk/packages/react-native-editor/android/build.gradle) file.
 
-[Add screenshot]
+<img src="https://developer.wordpress.org/files/2021/10/react-native-adv-system-image.png" alt="Screenshot of picking a system image in the Android Device Manager workflow.">
 
 There are some advanced settings we can toggle, but these are optional. Click finish.
-
-[Add screenshot]
 
 ### Putting it all together
 
@@ -196,7 +193,7 @@ npm run native android
 
 After a bit of a wait, we’ll see something like this:
 
-[Add video of a working env]
+<img src="https://developer.wordpress.org/files/2021/10/android-simulator.png" alt="Screenshot of a the block editor in Android Simulator.">
 
 ## Integration Tests
 
@@ -206,7 +203,7 @@ After a bit of a wait, we’ll see something like this:
 npx appium-doctor
 ```
 
-[Add screenshot of appium doctor]
+<img src="https://developer.wordpress.org/files/2021/10/CleanShot-2021-10-27-at-15.20.16.png" width="500px" alt="Screenshot of the appium-doctor tool running in the terminal.">
 
 Resolve any required dependencies.
 
@@ -229,7 +226,7 @@ npm run native test:e2e:ios:local gutenberg-editor-gallery.test.js
 
 If all things go well, it should look like:
 
-[Add video of working integration tests]
+<video src="https://user-images.githubusercontent.com/1270189/137403353-2a8ded47-5c7c-4f99-b2cc-fa6def4b4990.mp4" data-canonical-src="https://user-images.githubusercontent.com/1270189/137403353-2a8ded47-5c7c-4f99-b2cc-fa6def4b4990.mp4" controls="controls" muted="muted" class="d-block rounded-bottom-2 width-fit" style="max-height:640px;" alt="A video of block editor integration tests in iOS Simulator"></video>
 
 ### Android Integration Tests
 
@@ -237,7 +234,7 @@ If all things go well, it should look like:
 
 Start the virtual device first. Go back to the AVD by clicking on the phone icon, then click the green play button.
 
-[Add screenshot]
+<img src="https://developer.wordpress.org/files/2021/10/adv-integration.png" alt="A screenshot of how to start the Android Simulator.">
 
 Make sure no metro processes are running. This was launched previously with `npm run native start:reset`.
 
@@ -255,4 +252,4 @@ npm run native test:e2e:android:local gutenberg-editor-gallery.test.js
 
 After a bit of a wait we should see:
 
-[Add video of working integration tests]
+<img src="https://developer.wordpress.org/files/2021/10/CleanShot-2021-10-27-at-15.28.22.png" alt="A screenshot of block editor integration tests in Android Simulator.">
