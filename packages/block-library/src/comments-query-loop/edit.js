@@ -1,13 +1,10 @@
 /**
  * WordPress dependencies
  */
-import { useSelect } from '@wordpress/data';
 import {
 	BlockControls,
 	InspectorControls,
 	useBlockProps,
-	useSetting,
-	store as blockEditorStore,
 	__experimentalUseInnerBlocksProps as useInnerBlocksProps,
 } from '@wordpress/block-editor';
 import { SelectControl } from '@wordpress/components';
@@ -21,20 +18,11 @@ import QueryToolbar from './toolbar';
 const TEMPLATE = [ [ 'core/comment-template' ] ];
 
 export default function CommentsQueryLoopEdit( { attributes, setAttributes } ) {
-	const { queryPerPage, tagName: TagName, layout = {} } = attributes;
+	const { queryPerPage, tagName: TagName } = attributes;
 
-	const { themeSupportsLayout } = useSelect( ( select ) => {
-		const { getSettings } = select( blockEditorStore );
-		return { themeSupportsLayout: getSettings()?.supportsLayout };
-	}, [] );
-
-	const defaultLayout = useSetting( 'layout' ) || {};
-	const usedLayout = !! layout && layout.inherit ? defaultLayout : layout;
 	const blockProps = useBlockProps();
-
 	const innerBlocksProps = useInnerBlocksProps( blockProps, {
 		template: TEMPLATE,
-		__experimentalLayout: themeSupportsLayout ? usedLayout : undefined,
 	} );
 
 	return (
