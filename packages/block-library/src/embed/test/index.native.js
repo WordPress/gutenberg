@@ -816,4 +816,36 @@ describe( 'Embed block', () => {
 
 		expect( cannotEmbedText ).toBeDefined();
 	} );
+
+	it( 'insert embed from slash inserter', async () => {
+		const embedBlockSlashInserter = '/Embed';
+		const { getByPlaceholderText, getByA11yLabel } = await initializeEditor(
+			{
+				initialHtml:
+					'<!-- wp:paragraph --><p></p><!-- /wp:paragraph -->',
+			}
+		);
+
+		const paragraphText = getByPlaceholderText( 'Start writing…' );
+		fireEvent( paragraphText, 'focus' );
+		fireEvent( paragraphText, 'onChange', {
+			nativeEvent: {
+				eventCount: 1,
+				target: undefined,
+				text: embedBlockSlashInserter,
+			},
+		} );
+
+		fireEvent.press(
+			await waitFor( () => getByA11yLabel( 'Embed block' ) )
+		);
+
+		const block = await waitFor( () =>
+			getByA11yLabel( /Embed Block\. Row 1/ )
+		);
+
+		const blockName = within( block ).getByText( 'Embed' );
+
+		expect( blockName ).toBeDefined();
+	} );
 } );
