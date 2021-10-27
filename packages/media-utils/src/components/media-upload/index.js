@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { castArray, defaults, pick } from 'lodash';
+import { castArray, defaults, pick, noop } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -239,6 +239,9 @@ class MediaUpload extends Component {
 		this.onSelect = this.onSelect.bind( this );
 		this.onUpdate = this.onUpdate.bind( this );
 		this.onClose = this.onClose.bind( this );
+		this.onRemoveSelectedAttachment = this.onRemoveSelectedAttachment.bind(
+			this
+		);
 
 		if ( gallery ) {
 			this.buildAndSetGalleryFrame();
@@ -270,6 +273,11 @@ class MediaUpload extends Component {
 		this.frame.on( 'update', this.onUpdate );
 		this.frame.on( 'open', this.onOpen );
 		this.frame.on( 'close', this.onClose );
+		this.frame.listenTo(
+			wp.media.model.Attachments.all,
+			'remove',
+			this.onRemoveSelectedAttachment
+		);
 	}
 
 	/**
@@ -372,6 +380,12 @@ class MediaUpload extends Component {
 		// Get media attachment details from the frame state
 		const attachment = this.frame.state().get( 'selection' ).toJSON();
 		onSelect( multiple ? attachment : attachment[ 0 ] );
+	}
+
+	onRemoveSelectedAttachment( attachment ) {
+		const { onRemove = noop } = this.props;
+		console.log( 'onRemoveSelectedAttachment', attachment );
+		onRemove( attachment );
 	}
 
 	onOpen() {
