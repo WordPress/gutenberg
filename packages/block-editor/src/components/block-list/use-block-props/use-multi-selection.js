@@ -176,7 +176,6 @@ export function useMultiSelection( clientId ) {
 						blockSelectionStart !== clientId &&
 						! startParents?.includes( clientId )
 					) {
-						toggleRichText( node, false );
 						const startPath = [
 							...startParents,
 							blockSelectionStart,
@@ -187,8 +186,15 @@ export function useMultiSelection( clientId ) {
 						];
 						const depth =
 							Math.min( startPath.length, endPath.length ) - 1;
-						multiSelect( startPath[ depth ], endPath[ depth ] );
-						event.preventDefault();
+						const start = startPath[ depth ];
+						const end = endPath[ depth ];
+						// Handle the case of having selected a parent block and
+						// then sfift+click on a child.
+						if ( start !== end ) {
+							toggleRichText( node, false );
+							multiSelect( start, end );
+							event.preventDefault();
+						}
 					}
 				} else if ( hasMultiSelection() ) {
 					// Allow user to escape out of a multi-selection to a

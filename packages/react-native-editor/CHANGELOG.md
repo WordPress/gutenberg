@@ -12,6 +12,8 @@ For each user feature we should also add a importance categorization label  to i
 ## Unreleased
 - [**] Search block - Text and background color support [#35511]
 - [*] [Embed Block] Fix loading glitch with resolver resolution approach [#35798]
+- [**] Block inserter indicates newly available block types [#35201]
+- [*] Add support for the Mark HTML tag [#35956]
 
 ## 1.64.1
 -   [**] Fix updating the block list after block removal [#35721]

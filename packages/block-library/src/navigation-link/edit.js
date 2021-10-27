@@ -221,21 +221,23 @@ export const updateNavigationLinkBlockAttributes = (
 		kind: originalKind = '',
 		type: originalType = '',
 	} = blockAttributes;
+
 	const {
-		title = '',
+		title = '', // the title of any provided Post.
 		url = '',
+
 		opensInNewTab,
 		id,
 		kind: newKind = originalKind,
 		type: newType = originalType,
 	} = updatedValue;
-
 	const normalizedTitle = title.replace( /http(s?):\/\//gi, '' );
 	const normalizedURL = url.replace( /http(s?):\/\//gi, '' );
 	const escapeTitle =
 		title !== '' &&
 		normalizedTitle !== normalizedURL &&
 		originalLabel !== title;
+
 	const label = escapeTitle
 		? escape( title )
 		: originalLabel || escape( normalizedURL );
@@ -261,6 +263,22 @@ export const updateNavigationLinkBlockAttributes = (
 	} );
 };
 
+/**
+ * Removes HTML from a given string.
+ * Note the does not provide XSS protection or otherwise attempt
+ * to filter strings with malicious intent.
+ *
+ * See also: https://github.com/WordPress/gutenberg/pull/35539
+ *
+ * @param {string} html the string from which HTML should be removed.
+ * @return {string} the "cleaned" string.
+ */
+function navStripHTML( html ) {
+	const doc = document.implementation.createHTMLDocument( '' );
+	doc.body.innerHTML = html;
+	return doc.body.textContent || '';
+}
+
 export default function NavigationLinkEdit( {
 	attributes,
 	isSelected,
@@ -281,9 +299,11 @@ export default function NavigationLinkEdit( {
 		title,
 		kind,
 	} = attributes;
+
 	const link = {
 		url,
 		opensInNewTab,
+		title: label && navStripHTML( label ), // don't allow HTML to display inside the <LinkControl>
 	};
 	const { saveEntityRecord } = useDispatch( coreStore );
 	const {
@@ -614,7 +634,9 @@ export default function NavigationLinkEdit( {
 							className="wp-block-navigation-item__label"
 							value={ label }
 							onChange={ ( labelValue ) =>
-								setAttributes( { label: labelValue } )
+								setAttributes( {
+									label: labelValue,
+								} )
 							}
 							onMerge={ mergeBlocks }
 							onReplace={ onReplace }
@@ -646,6 +668,7 @@ export default function NavigationLinkEdit( {
 							anchorRef={ listItemRef.current }
 						>
 							<LinkControl
+								hasTextControl
 								className="wp-block-navigation-link__inline-link-input"
 								value={ link }
 								showInitialSuggestions={ true }
