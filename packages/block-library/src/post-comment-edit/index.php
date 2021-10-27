@@ -24,7 +24,7 @@ function render_block_core_post_comment_edit( $attributes, $content, $block ) {
 	$link_atts = '';
 
 	if ( ! empty( $attributes['linkTarget'] ) ) {
-		$link_atts .= sprintf( 'target="%s"', $attributes['linkTarget'] );
+		$link_atts .= sprintf( 'target="%s"', esc_attr( $attributes['linkTarget'] ) );
 	}
 
 	return sprintf(
