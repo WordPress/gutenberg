@@ -6,7 +6,7 @@ import { some } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { __ } from '@wordpress/i18n';
+import { _n } from '@wordpress/i18n';
 import { useSelect } from '@wordpress/data';
 import { PanelBody, PanelRow } from '@wordpress/components';
 import { page, layout } from '@wordpress/icons';
@@ -23,10 +23,18 @@ const ENTITY_NAME_ICONS = {
 };
 
 const ENTITY_NAME_DESCRIPTIONS = {
-	site: __( 'These changes will affect your whole site.' ),
-	wp_template: __(
-		'These changes will affect pages and posts that use these templates.'
-	),
+	site: ( length ) =>
+		_n(
+			'This change will affect your whole site.',
+			'These changes will affect your whole site.',
+			length
+		),
+	wp_template: ( length ) =>
+		_n(
+			'This change will affect pages and posts that use these templates.',
+			'These changes will affect pages and posts that use these templates.',
+			length
+		),
 };
 
 export default function EntityTypeList( {
@@ -45,7 +53,7 @@ export default function EntityTypeList( {
 	// Set icon and description based on type of entity.
 	const { name } = firstRecord;
 	const icon = ENTITY_NAME_ICONS[ name ];
-	const description = ENTITY_NAME_DESCRIPTIONS[ name ];
+	const description = ENTITY_NAME_DESCRIPTIONS[ name ]?.( list.length );
 
 	return (
 		<PanelBody title={ entity.label } initialOpen={ true } icon={ icon }>
