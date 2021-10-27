@@ -14,6 +14,18 @@ import { Fragment, memo } from '@wordpress/element';
 import ListViewBlock from './block';
 import { useListViewContext } from './context';
 
+/**
+ * Given a block, returns the total number of blocks in that subtree. This is used to help determine
+ * the list position of a block.
+ *
+ * When a block is collapsed, we do not count their children as part of that total. In the current drag
+ * implementation dragged blocks and their children are not counted.
+ *
+ * @param {Object} block            block tree
+ * @param {Object} expandedState    state that notes which branches are collapsed
+ * @param {Array}  draggedClientIds a list of dragged client ids
+ * @return {number} block count
+ */
 function countBlocks( block, expandedState, draggedClientIds ) {
 	const isDragged = draggedClientIds?.includes( block.clientId );
 	if ( isDragged ) {

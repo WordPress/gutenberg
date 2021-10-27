@@ -102,6 +102,9 @@ function ListView(
 		isMounted.current = true;
 	}, [] );
 
+	// List View renders a fixed number of items and relies on each having a fixed item height of 36px.
+	// If this value changes, we should also change the itemHeight value set in useFixedWindowList.
+	// See: https://github.com/WordPress/gutenberg/pull/35230 for additional context.
 	const [ fixedListWindow ] = useFixedWindowList(
 		elementRef,
 		36,
