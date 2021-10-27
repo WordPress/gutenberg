@@ -75,8 +75,13 @@ figure.wp-block-gallery {
 		margin-top: -9px;
 		margin-left: -9px;
 	}
-}
 
+	// Temporary notice to display warning about mobile app compat. Can be removed for 6.0
+	.components-notice {
+		margin: 0 0 12px 0;
+		padding-right: 10px;
+	}
+}
 
 /**
  * Gallery inspector controls settings.
