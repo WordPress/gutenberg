@@ -21,7 +21,11 @@
 		"showOnlyTopLevel": {
 			"type": "boolean",
 			"default": false
-		}
+		},
+	  "showEmpty": {
+		"type": "boolean",
+		"default": false
+	  }
 	},
 	"supports": {
 		"align": true,

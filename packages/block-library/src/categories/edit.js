@@ -26,6 +26,7 @@ export default function CategoriesEdit( {
 		showHierarchy,
 		showPostCounts,
 		showOnlyTopLevel,
+		showEmpty,
 	},
 	setAttributes,
 } ) {
@@ -33,7 +34,7 @@ export default function CategoriesEdit( {
 	const { categories, isRequesting } = useSelect(
 		( select ) => {
 			const { getEntityRecords, isResolving } = select( coreStore );
-			const query = { per_page: -1, hide_empty: true, context: 'view' };
+			const query = { per_page: -1, hide_empty: ! showEmpty, context: 'view' };
 			if ( showOnlyTopLevel ) {
 				query.parent = 0;
 			}
@@ -46,7 +47,7 @@ export default function CategoriesEdit( {
 				] ),
 			};
 		},
-		[ showOnlyTopLevel ]
+		[ showOnlyTopLevel, showEmpty ]
 	);
 	const getCategoriesList = ( parentId ) => {
 		if ( ! categories?.length ) {
@@ -153,6 +154,11 @@ export default function CategoriesEdit( {
 						label={ __( 'Show only top level categories' ) }
 						checked={ showOnlyTopLevel }
 						onChange={ toggleAttribute( 'showOnlyTopLevel' ) }
+					/>
+					<ToggleControl
+						label={ __( 'Show empty terms' ) }
+						checked={ showEmpty }
+						onChange={ toggleAttribute( 'showEmpty' ) }
 					/>
 					{ ! showOnlyTopLevel && (
 						<ToggleControl
