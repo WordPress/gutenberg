@@ -104,7 +104,7 @@ export default function useSetting( path ) {
 				get( settings, blockPath ) ?? get( settings, defaultsPath );
 
 			if ( experimentalFeaturesResult !== undefined ) {
-				if ( PATHS_WITH_MERGE[ path ] ) {
+				if ( PATHS_WITH_MERGE[ normalizedPath ] ) {
 					return (
 						experimentalFeaturesResult.user ??
 						experimentalFeaturesResult.theme ??
@@ -115,8 +115,8 @@ export default function useSetting( path ) {
 			}
 
 			// 2 - Use deprecated settings, otherwise.
-			const deprecatedSettingsValue = deprecatedFlags[ path ]
-				? deprecatedFlags[ path ]( settings )
+			const deprecatedSettingsValue = deprecatedFlags[ normalizedPath ]
+				? deprecatedFlags[ normalizedPath ]( settings )
 				: undefined;
 			if ( deprecatedSettingsValue !== undefined ) {
 				return deprecatedSettingsValue;
@@ -126,7 +126,7 @@ export default function useSetting( path ) {
 			// This is only necessary to support typography.dropCap.
 			// when __experimentalFeatures are not present (core without plugin).
 			// To remove when __experimentalFeatures are ported to core.
-			return path === 'typography.dropCap' ? true : undefined;
+			return normalizedPath === 'typography.dropCap' ? true : undefined;
 		},
 		[ blockName, path ]
 	);
