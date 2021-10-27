@@ -7,9 +7,10 @@ import { escape } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { createBlock } from '@wordpress/blocks';
+import { createBlock, switchToBlockType } from '@wordpress/blocks';
 import { useSelect, useDispatch } from '@wordpress/data';
 import {
+	Button,
 	PanelBody,
 	Popover,
 	TextControl,
@@ -22,6 +23,7 @@ import { displayShortcut, isKeyboardEvent, ENTER } from '@wordpress/keycodes';
 import { __, sprintf } from '@wordpress/i18n';
 import {
 	BlockControls,
+	BlockIcon,
 	InspectorControls,
 	RichText,
 	__experimentalLinkControl as LinkControl,
@@ -279,6 +281,37 @@ function navStripHTML( html ) {
 	return doc.body.textContent || '';
 }
 
+/**
+ * Add transforms to Link Control
+ */
+
+function LinkControlTransforms( { block, transforms, replace } ) {
+	return (
+		<div className="link-control-transform">
+			<h3 className="link-control-transform__subheading">Transform</h3>
+			<div className="link-control-transform__items">
+				{ transforms.map( ( item, index ) => {
+					return (
+						<Button
+							key={ `transform-${ index }` }
+							onClick={ () =>
+								replace(
+									block.clientId,
+									switchToBlockType( block, item.name )
+								)
+							}
+							className="link-control-transform__item"
+						>
+							<BlockIcon icon={ item.icon } />
+							{ item.title }
+						</Button>
+					);
+				} ) }
+			</div>
+		</div>
+	);
+}
+
 export default function NavigationLinkEdit( {
 	attributes,
 	isSelected,
@@ -324,9 +357,12 @@ export default function NavigationLinkEdit( {
 		hasDescendants,
 		userCanCreatePages,
 		userCanCreatePosts,
+		thisBlock,
+		blockTransforms,
 	} = useSelect(
 		( select ) => {
 			const {
+				getBlock,
 				getBlocks,
 				getBlockName,
 				getBlockRootClientId,
@@ -334,6 +370,7 @@ export default function NavigationLinkEdit( {
 				hasSelectedInnerBlock,
 				getSelectedBlockClientId,
 				getBlockParentsByBlockName,
+				getBlockTransformItems,
 			} = select( blockEditorStore );
 
 			const selectedBlockId = getSelectedBlockClientId();
@@ -371,6 +408,11 @@ export default function NavigationLinkEdit( {
 					'create',
 					'posts'
 				),
+				thisBlock: getBlock( clientId ),
+				blockTransforms: getBlockTransformItems(
+					[ getBlock( clientId ) ],
+					getBlockRootClientId( clientId )
+				),
 			};
 		},
 		[ clientId ]
@@ -396,6 +438,15 @@ export default function NavigationLinkEdit( {
 		);
 		replaceBlock( clientId, newSubmenu );
 	}
+
+	const featuredBlocks = [
+		'core/site-logo',
+		'core/social-links',
+		'core/search',
+	];
+	const featuredTransforms = blockTransforms.filter( ( item ) => {
+		return featuredBlocks.includes( item.name );
+	} );
 
 	useEffect( () => {
 		// Show the LinkControl on mount if the URL is empty
@@ -706,6 +757,19 @@ export default function NavigationLinkEdit( {
 									)
 								}
 								onRemove={ removeLink }
+								renderControlBottom={
+									! url
+										? () => (
+												<LinkControlTransforms
+													block={ thisBlock }
+													transforms={
+														featuredTransforms
+													}
+													replace={ replaceBlock }
+												/>
+										  )
+										: null
+								}
 							/>
 						</Popover>
 					) }

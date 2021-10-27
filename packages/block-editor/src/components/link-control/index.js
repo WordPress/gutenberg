@@ -94,6 +94,7 @@ import { DEFAULT_LINK_SETTINGS } from './constants';
  * @property {Object=}                    suggestionsQuery           Query parameters to pass along to wp.blockEditor.__experimentalFetchLinkSuggestions.
  * @property {boolean=}                   noURLSuggestion            Whether to add a fallback suggestion which treats the search query as a URL.
  * @property {string|Function|undefined}  createSuggestionButtonText The text to use in the button that calls createSuggestion.
+ * @property {Function}                   renderControlBottom        Optional controls to be rendered at the bottom of the component.
  */
 
 /**
@@ -121,6 +122,7 @@ function LinkControl( {
 	createSuggestionButtonText,
 	hasRichPreviews = false,
 	hasTextControl = false,
+	renderControlBottom = null,
 } ) {
 	if ( withCreateSuggestion === undefined && createSuggestion ) {
 		withCreateSuggestion = true;
@@ -346,6 +348,7 @@ function LinkControl( {
 					/>
 				</div>
 			) }
+			{ renderControlBottom && renderControlBottom() }
 		</div>
 	);
 }
