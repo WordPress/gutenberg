@@ -1,6 +1,6 @@
 {
 	"name": "gutenberg",
-	"version": "11.7.0",
+	"version": "11.8.0-rc.2",
 	"private": true,
 	"description": "A new WordPress editor experience.",
 	"author": "The WordPress Contributors",
@@ -145,7 +145,7 @@
 		"@wordpress/readable-js-assets-webpack-plugin": "file:packages/readable-js-assets-webpack-plugin",
 		"@wordpress/scripts": "file:packages/scripts",
 		"@wordpress/stylelint-config": "file:packages/stylelint-config",
-		"appium": "1.20.2",
+		"appium": "1.22.0",
 		"babel-jest": "26.6.3",
 		"babel-loader": "8.2.2",
 		"babel-plugin-inline-json-import": "0.3.2",

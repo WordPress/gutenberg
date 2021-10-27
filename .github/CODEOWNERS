@@ -1,7 +1,7 @@
 # Documentation
-/docs                                           @chrisvanpatten @ajitbohra
-/docs/designers-developers/developers           @chrisvanpatten @mkaz @ajitbohra
-/docs/designers-developers/designers            @chrisvanpatten @mkaz @ajitbohra
+/docs                                           @ajitbohra
+/docs/designers-developers/developers           @mkaz @ajitbohra
+/docs/designers-developers/designers            @mkaz @ajitbohra
 
 # Data
 /packages/api-fetch                             @nerrad @mmtr
@@ -56,7 +56,7 @@
 # Tooling
 /bin                                            @ntwb @nerrad @ajitbohra
 /bin/api-docs                                   @ntwb @nerrad @ajitbohra @oandregal
-/docs/tool                                      @chrisvanpatten @ajitbohra @oandregal
+/docs/tool                                      @ajitbohra @oandregal
 /packages/babel-plugin-import-jsx-pragma        @ntwb @nerrad @ajitbohra
 /packages/babel-plugin-makepot                  @ntwb @nerrad @ajitbohra
 /packages/babel-preset-default                  @gziolo @ntwb @nerrad @ajitbohra
@@ -80,7 +80,7 @@
 /packages/stylelint-config                      @ntwb
 
 # UI Components
-/packages/components                            @ajitbohra @jaymanpandya @chrisvanpatten
+/packages/components                            @ajitbohra @jaymanpandya
 /packages/compose                               @ajitbohra @jaymanpandya
 /packages/element                               @ajitbohra @jaymanpandya
 /packages/notices                               @ajitbohra @jaymanpandya
