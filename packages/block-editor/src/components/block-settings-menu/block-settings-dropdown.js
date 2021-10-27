@@ -46,14 +46,18 @@ export function BlockSettingsDropdown( {
 	const blockClientIds = castArray( clientIds );
 	const count = blockClientIds.length;
 	const firstBlockClientId = blockClientIds[ 0 ];
-	const { onlyBlock, title } = useSelect( ( select ) => {
-		const { getBlockName } = select( blockEditorStore );
-		const { getBlockType } = select( blocksStore );
-		return {
-			onlyBlock: 1 === select( blockEditorStore ).getBlockCount(),
-			title: getBlockType( getBlockName( firstBlockClientId ) )?.title,
-		};
-	}, [] );
+	const { onlyBlock, title } = useSelect(
+		( select ) => {
+			const { getBlockCount, getBlockName } = select( blockEditorStore );
+			const { getBlockType } = select( blocksStore );
+			return {
+				onlyBlock: 1 === getBlockCount(),
+				title: getBlockType( getBlockName( firstBlockClientId ) )
+					?.title,
+			};
+		},
+		[ firstBlockClientId ]
+	);
 
 	const shortcuts = useSelect( ( select ) => {
 		const { getShortcutRepresentation } = select( keyboardShortcutsStore );
