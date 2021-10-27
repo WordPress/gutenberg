@@ -114,7 +114,13 @@
 	margin-bottom: 1.5em;
 }
 
+.link-control-transform__items {
+	display: flex;
+	justify-content: space-between;
+}
+
 .link-control-transform__item {
+	flex-basis: 33%;
 	flex-direction: column;
 	gap: $grid-unit-10;
 	height: auto;

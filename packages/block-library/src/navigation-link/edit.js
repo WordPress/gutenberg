@@ -11,8 +11,6 @@ import { createBlock, switchToBlockType } from '@wordpress/blocks';
 import { useSelect, useDispatch } from '@wordpress/data';
 import {
 	Button,
-	Flex,
-	FlexItem,
 	PanelBody,
 	Popover,
 	TextControl,
@@ -291,29 +289,25 @@ function LinkControlTransforms( { block, transforms, replace } ) {
 	return (
 		<div className="link-control-transform">
 			<h3 className="link-control-transform__subheading">Transform</h3>
-			<Flex
-				justify="space-between"
-				className="link-control-transform__items"
-			>
+			<div className="link-control-transform__items">
 				{ transforms.map( ( item, index ) => {
 					return (
-						<FlexItem key={ `transform-${ index }` }>
-							<Button
-								onClick={ () =>
-									replace(
-										block.clientId,
-										switchToBlockType( block, item.name )
-									)
-								}
-								className="link-control-transform__item"
-							>
-								<BlockIcon icon={ item.icon } />
-								{ item.title }
-							</Button>
-						</FlexItem>
+						<Button
+							key={ `transform-${ index }` }
+							onClick={ () =>
+								replace(
+									block.clientId,
+									switchToBlockType( block, item.name )
+								)
+							}
+							className="link-control-transform__item"
+						>
+							<BlockIcon icon={ item.icon } />
+							{ item.title }
+						</Button>
 					);
 				} ) }
-			</Flex>
+			</div>
 		</div>
 	);
 }
