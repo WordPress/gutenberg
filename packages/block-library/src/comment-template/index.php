@@ -17,8 +17,15 @@
  */
 function render_block_core_comment_template( $attributes, $content, $block ) {
 
+	$post_id = $block->context['postId'];
+
+	// Bail out early if the post ID is not set for some reason.
+	if ( ! isset( $post_id ) ) {
+		return '';
+	}
+
 	// Get an array of comments for the current post.
-	$comments = get_approved_comments( get_the_ID() );
+	$comments = get_approved_comments( $post_id );
 
 	if ( count( $comments ) === 0 ) {
 		return '';
