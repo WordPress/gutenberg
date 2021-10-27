@@ -20,8 +20,8 @@ import { store as blockEditorStore } from '../../store';
 export function BlockPreview( {
 	blocks,
 	__experimentalPadding = 0,
-	tabIndex = 0,
 	viewportWidth = 1200,
+	__experimentalAsButton = true,
 	__experimentalLive = false,
 	__experimentalOnClick,
 } ) {
@@ -42,8 +42,8 @@ export function BlockPreview( {
 		<BlockEditorProvider value={ renderedBlocks } settings={ settings }>
 			{ __experimentalLive ? (
 				<LiveBlockPreview
+					__experimentalAsButton={ __experimentalAsButton }
 					onClick={ __experimentalOnClick }
-					tabIndex={ tabIndex }
 				/>
 			) : (
 				<AutoHeightBlockPreview

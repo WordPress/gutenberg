@@ -8,17 +8,26 @@ import { Disabled } from '@wordpress/components';
  */
 import BlockList from '../block-list';
 
-export default function LiveBlockPreview( { onClick, tabIndex = 0 } ) {
-	return (
+export default function LiveBlockPreview( {
+	onClick,
+	__experimentalAsButton = true,
+} ) {
+	const blockList = (
+		<Disabled className="block-editor-block-preview__live-content">
+			<BlockList />
+		</Disabled>
+	);
+
+	return __experimentalAsButton ? (
 		<div
-			tabIndex={ tabIndex }
+			tabIndex={ 0 }
 			role="button"
 			onClick={ onClick }
 			onKeyPress={ onClick }
 		>
-			<Disabled>
-				<BlockList />
-			</Disabled>
+			{ blockList }
 		</div>
+	) : (
+		<>{ blockList }</>
 	);
 }

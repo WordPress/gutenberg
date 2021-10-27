@@ -44,6 +44,7 @@ function ReadOnlyContent( { userCanEdit, postType, postId } ) {
 			<BlockPreview
 				blocks={ blocks }
 				tabIndex={ -1 }
+				__experimentalAsButton={ false }
 				__experimentalLive={ true }
 				__experimentalIsDisabled={ false }
 			/>
