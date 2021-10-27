@@ -43,6 +43,7 @@ import NavigationInnerBlocks from './inner-blocks';
 import NavigationMenuSelector from './navigation-menu-selector';
 import NavigationMenuNameControl from './navigation-menu-name-control';
 import UnsavedInnerBlocks from './unsaved-inner-blocks';
+import NavigationMenuDeleteControl from './navigation-menu-delete-control';
 
 function getComputedStyle( node ) {
 	return node.ownerDocument.defaultView.getComputedStyle( node );
@@ -112,7 +113,7 @@ function Navigation( {
 		[ clientId ]
 	);
 	const hasExistingNavItems = !! innerBlocks.length;
-	const { selectBlock } = useDispatch( blockEditorStore );
+	const { replaceInnerBlocks, selectBlock } = useDispatch( blockEditorStore );
 
 	const [ isPlaceholderShown, setIsPlaceholderShown ] = useState(
 		! hasExistingNavItems
@@ -298,8 +299,17 @@ function Navigation( {
 				{ listViewModal }
 				<InspectorControls>
 					{ isEntityAvailable && (
-						<PanelBody title={ __( 'Navigation menu name' ) }>
+						<PanelBody title={ __( 'Navigation menu' ) }>
 							<NavigationMenuNameControl />
+							<NavigationMenuDeleteControl
+								onDelete={ () => {
+									replaceInnerBlocks( clientId, [] );
+									setAttributes( {
+										navigationMenuId: undefined,
+									} );
+									setIsPlaceholderShown( true );
+								} }
+							/>
 						</PanelBody>
 					) }
 					{ hasSubmenuIndicatorSetting && (
