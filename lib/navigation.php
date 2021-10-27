@@ -418,8 +418,8 @@ function gutenberg_register_navigation_post_type() {
 		'description'           => __( 'Navigation menus.', 'gutenberg' ),
 		'public'                => false,
 		'has_archive'           => false,
-		'show_ui'               => false,
-		'show_in_menu'          => 'themes.php',
+		'show_ui'               => true,
+		// 'show_in_menu'          => 'themes.php',
 		'show_in_admin_bar'     => false,
 		'show_in_rest'          => true,
 		'map_meta_cap'          => true,
@@ -435,3 +435,34 @@ function gutenberg_register_navigation_post_type() {
 	register_post_type( 'wp_navigation', $args );
 }
 add_action( 'init', 'gutenberg_register_navigation_post_type' );
+
+
+/**
+ * Registers the 'wp_template_part_area' taxonomy.
+ */
+function gutenberg_register_navigation_area_taxonomy() {
+	if ( ! gutenberg_supports_block_templates() ) {
+		return;
+	}
+
+	register_taxonomy(
+		'wp_navigation_area',
+		array( 'wp_navigation' ),
+		array(
+			'public'       => true, // TODO - remove
+			'hierarchical' => false,
+			'labels'       => array(
+				'name'          => __( 'Navigation Areas', 'gutenberg' ),
+				'singular_name' => __( 'Navigation Area', 'gutenberg' ),
+			),
+			// TODO - reinstate
+			// 'query_var'         => false,
+			// 'rewrite'           => false,
+			// 'show_ui'           => false,
+			// '_builtin'          => true,
+			// 'show_in_nav_menus' => false,
+			// 'show_in_rest'      => false,
+		)
+	);
+}
+add_action( 'init', 'gutenberg_register_navigation_area_taxonomy' );
