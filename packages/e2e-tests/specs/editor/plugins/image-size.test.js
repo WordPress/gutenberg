@@ -12,7 +12,6 @@ import { v4 as uuid } from 'uuid';
 import {
 	activatePlugin,
 	createNewPost,
-	clickButton,
 	deactivatePlugin,
 	insertBlock,
 	openDocumentSettingsSidebar,
@@ -30,7 +29,13 @@ describe( 'changing image size', () => {
 
 	it( 'should insert and change my image size', async () => {
 		await insertBlock( 'Image' );
-		await clickButton( 'Media Library' );
+
+		// Navigate into the placeholder and activate the Media Library option.
+		await page.keyboard.press( 'ArrowDown' );
+		await page.keyboard.press( 'Space' );
+		await page.keyboard.press( 'Tab' );
+		await page.keyboard.press( 'Tab' );
+		await page.keyboard.press( 'Space' );
 
 		// Wait for media modal to appear and upload image.
 		await page.waitForSelector( '.media-modal input[type=file]' );

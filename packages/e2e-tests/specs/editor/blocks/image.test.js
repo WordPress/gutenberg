@@ -20,9 +20,7 @@ import {
 	pressKeyWithModifier,
 } from '@wordpress/e2e-test-utils';
 
-async function upload( selector ) {
-	await page.waitForSelector( selector );
-	const inputElement = await page.$( selector );
+async function upload( handle ) {
 	const testImagePath = path.join(
 		__dirname,
 		'..',
@@ -34,7 +32,7 @@ async function upload( selector ) {
 	const filename = uuid();
 	const tmpFileName = path.join( os.tmpdir(), filename + '.png' );
 	fs.copyFileSync( testImagePath, tmpFileName );
-	await inputElement.uploadFile( tmpFileName );
+	await handle.uploadFile( tmpFileName );
 	return filename;
 }
 
@@ -65,7 +63,10 @@ describe( 'Image', () => {
 
 	it( 'can be inserted', async () => {
 		await insertBlock( 'Image' );
-		const filename = await upload( '.wp-block-image input[type="file"]' );
+		const inputHandle = await page.evaluateHandle(
+			`document.querySelector('.wp-block-image [role="button"]').shadowRoot.querySelector('input[type="file"]')`
+		);
+		const filename = await upload( inputHandle );
 		await waitForImage( filename );
 
 		const regex = new RegExp(
@@ -76,7 +77,10 @@ describe( 'Image', () => {
 
 	it( 'should replace, reset size, and keep selection', async () => {
 		await insertBlock( 'Image' );
-		const filename1 = await upload( '.wp-block-image input[type="file"]' );
+		const inputHandle = await page.evaluateHandle(
+			`document.querySelector('.wp-block-image [role="button"]').shadowRoot.querySelector('input[type="file"]')`
+		);
+		const filename1 = await upload( inputHandle );
 		await waitForImage( filename1 );
 
 		const regex1 = new RegExp(
@@ -95,7 +99,9 @@ describe( 'Image', () => {
 
 		await clickButton( 'Replace' );
 		const filename2 = await upload(
-			'.block-editor-media-replace-flow__options input[type="file"]'
+			await page.$(
+				'.block-editor-media-replace-flow__options input[type="file"]'
+			)
 		);
 		await waitForImage( filename2 );
 
@@ -112,7 +118,10 @@ describe( 'Image', () => {
 
 	it.skip( 'should place caret at end of caption after merging empty paragraph', async () => {
 		await insertBlock( 'Image' );
-		const fileName = await upload( '.wp-block-image input[type="file"]' );
+		const inputHandle = await page.evaluateHandle(
+			`document.querySelector('.wp-block-image [role="button"]').shadowRoot.querySelector('input[type="file"]')`
+		);
+		const fileName = await upload( inputHandle );
 		await waitForImage( fileName );
 		await page.keyboard.type( '1' );
 		await page.keyboard.press( 'Enter' );
@@ -126,7 +135,10 @@ describe( 'Image', () => {
 
 	it( 'should allow soft line breaks in caption', async () => {
 		await insertBlock( 'Image' );
-		const fileName = await upload( '.wp-block-image input[type="file"]' );
+		const inputHandle = await page.evaluateHandle(
+			`document.querySelector('.wp-block-image [role="button"]').shadowRoot.querySelector('input[type="file"]')`
+		);
+		const fileName = await upload( inputHandle );
 		await waitForImage( fileName );
 		await page.keyboard.type( '12' );
 		await page.keyboard.press( 'ArrowLeft' );
@@ -139,7 +151,10 @@ describe( 'Image', () => {
 
 	it( 'should have keyboard navigable toolbar for caption', async () => {
 		await insertBlock( 'Image' );
-		const fileName = await upload( '.wp-block-image input[type="file"]' );
+		const inputHandle = await page.evaluateHandle(
+			`document.querySelector('.wp-block-image [role="button"]').shadowRoot.querySelector('input[type="file"]')`
+		);
+		const fileName = await upload( inputHandle );
 		await waitForImage( fileName );
 		// Navigate to More, Link, Italic and finally Bold.
 		await pressKeyWithModifier( 'shift', 'Tab' );
@@ -171,7 +186,7 @@ describe( 'Image', () => {
 			document.body.appendChild( input );
 		} );
 
-		const fileName = await upload( '#wp-temp-test-input' );
+		const fileName = await upload( await page.$( '#wp-temp-test-input' ) );
 
 		const paragraphRect = await image.boundingBox();
 		const pX = paragraphRect.x + paragraphRect.width / 2;
@@ -200,7 +215,10 @@ describe( 'Image', () => {
 	it( 'allows zooming using the crop tools', async () => {
 		// Insert the block, upload a file and crop.
 		await insertBlock( 'Image' );
-		const filename = await upload( '.wp-block-image input[type="file"]' );
+		const inputHandle = await page.evaluateHandle(
+			`document.querySelector('.wp-block-image [role="button"]').shadowRoot.querySelector('input[type="file"]')`
+		);
+		const filename = await upload( inputHandle );
 		await waitForImage( filename );
 
 		// Assert that the image is initially unscaled and unedited.
@@ -245,7 +263,10 @@ describe( 'Image', () => {
 	it( 'allows changing aspect ratio using the crop tools', async () => {
 		// Insert the block, upload a file and crop.
 		await insertBlock( 'Image' );
-		const filename = await upload( '.wp-block-image input[type="file"]' );
+		const inputHandle = await page.evaluateHandle(
+			`document.querySelector('.wp-block-image [role="button"]').shadowRoot.querySelector('input[type="file"]')`
+		);
+		const filename = await upload( inputHandle );
 		await waitForImage( filename );
 
 		// Assert that the image is initially unscaled and unedited.
@@ -282,7 +303,10 @@ describe( 'Image', () => {
 	it( 'allows rotating using the crop tools', async () => {
 		// Insert the block, upload a file and crop.
 		await insertBlock( 'Image' );
-		const filename = await upload( '.wp-block-image input[type="file"]' );
+		const inputHandle = await page.evaluateHandle(
+			`document.querySelector('.wp-block-image [role="button"]').shadowRoot.querySelector('input[type="file"]')`
+		);
+		const filename = await upload( inputHandle );
 		await waitForImage( filename );
 
 		// Assert that the image is initially unscaled and unedited.
@@ -313,7 +337,10 @@ describe( 'Image', () => {
 		await insertBlock( 'Image' );
 
 		// Upload an initial image.
-		const filename = await upload( '.wp-block-image input[type="file"]' );
+		const inputHandle = await page.evaluateHandle(
+			`document.querySelector('.wp-block-image [role="button"]').shadowRoot.querySelector('input[type="file"]')`
+		);
+		const filename = await upload( inputHandle );
 
 		// Resize the Uploaded Image.
 		await openDocumentSettingsSidebar();
@@ -358,7 +385,10 @@ describe( 'Image', () => {
 
 	it( 'should undo without broken temporary state', async () => {
 		await insertBlock( 'Image' );
-		const fileName = await upload( '.wp-block-image input[type="file"]' );
+		const inputHandle = await page.evaluateHandle(
+			`document.querySelector('.wp-block-image [role="button"]').shadowRoot.querySelector('input[type="file"]')`
+		);
+		const fileName = await upload( inputHandle );
 		await waitForImage( fileName );
 		await pressKeyWithModifier( 'primary', 'z' );
 		// Expect an empty image block (placeholder) rather than one with a

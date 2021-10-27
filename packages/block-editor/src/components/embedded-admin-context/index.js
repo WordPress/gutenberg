@@ -43,11 +43,26 @@ export default function EmbeddedAdminContext( props ) {
 			setHasFocus( false );
 		}
 
+		function onKeyDown( event ) {
+			if ( element !== event.path[ 0 ] ) return;
+
+			if ( event.keyCode === ENTER || event.keyCode === SPACE ) {
+				focus.focusable.find( root )[ 0 ].focus();
+				event.preventDefault();
+			} else if ( event.keyCode === ESCAPE ) {
+				root.host.focus();
+				event.preventDefault();
+				event.stopPropagation();
+			}
+		}
+
 		root.addEventListener( 'focusin', onFocusIn );
 		root.addEventListener( 'focusout', onFocusOut );
+		element.addEventListener( 'keydown', onKeyDown );
 		return () => {
 			root.addEventListener( 'focusin', onFocusIn );
 			root.addEventListener( 'focusout', onFocusOut );
+			element.removeEventListener( 'keydown', onKeyDown );
 		};
 	}, [] );
 	return (
@@ -57,16 +72,6 @@ export default function EmbeddedAdminContext( props ) {
 			tabIndex={ 0 }
 			role="button"
 			aria-pressed={ hasFocus }
-			onKeyDown={ ( event ) => {
-				if ( event.keyCode === ENTER || event.keyCode === SPACE ) {
-					focus.focusable.find( shadow )[ 0 ].focus();
-					event.preventDefault();
-				} else if ( event.keyCode === ESCAPE ) {
-					shadow.host.focus();
-					event.preventDefault();
-					event.stopPropagation();
-				}
-			} }
 		>
 			{ shadow &&
 				createPortal(

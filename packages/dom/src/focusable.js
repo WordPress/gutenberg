@@ -86,14 +86,14 @@ function isValidFocusableArea( element ) {
 /**
  * Returns all focusable elements within a given context.
  *
- * @param {Element} context              Element in which to search.
- * @param {Object}  [options]
- * @param {boolean} [options.sequential] If set, only return elements that are
- *                                       sequentially focusable.
- *                                       Non-interactive elements with a
- *                                       negative `tabindex` are focusable but
- *                                       not sequentially focusable.
- *                                       https://html.spec.whatwg.org/multipage/interaction.html#the-tabindex-attribute
+ * @param {Element|Document|ShadowRoot} context              Element in which to search.
+ * @param {Object}                      [options]
+ * @param {boolean}                     [options.sequential] If set, only return elements that are
+ *                                                           sequentially focusable.
+ *                                                           Non-interactive elements with a
+ *                                                           negative `tabindex` are focusable but
+ *                                                           not sequentially focusable.
+ *                                                           https://html.spec.whatwg.org/multipage/interaction.html#the-tabindex-attribute
  *
  * @return {Element[]} Focusable elements.
  */
