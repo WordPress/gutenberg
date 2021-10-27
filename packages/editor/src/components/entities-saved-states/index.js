@@ -82,7 +82,7 @@ export default function EntitiesSavedStates( { close } ) {
 		templateSavables,
 		templatePartSavables,
 		...Object.values( contentSavables ),
-	];
+	].filter( Array.isArray );
 
 	// Unchecked entities to be ignored by save function.
 	const [ unselectedEntities, _setUnselectedEntities ] = useState( [] );
