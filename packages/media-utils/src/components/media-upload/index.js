@@ -384,7 +384,6 @@ class MediaUpload extends Component {
 
 	onRemoveSelectedAttachment( attachment ) {
 		const { onRemove = noop } = this.props;
-		console.log( 'onRemoveSelectedAttachment', attachment );
 		onRemove( attachment );
 	}
 
