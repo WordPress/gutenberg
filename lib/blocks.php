@@ -66,6 +66,8 @@ function gutenberg_reregister_core_block_types() {
 				'comment-template.php'          => 'core/comment-template',
 				'file.php'                      => 'core/file',
 				'home-link.php'                 => 'core/home-link',
+				'image.php'                     => 'core/image',
+				'gallery.php'                   => 'core/gallery',
 				'latest-comments.php'           => 'core/latest-comments',
 				'latest-posts.php'              => 'core/latest-posts',
 				'loginout.php'                  => 'core/loginout',
