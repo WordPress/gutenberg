@@ -455,13 +455,14 @@ function gutenberg_register_navigation_area_taxonomy() {
 				'name'          => __( 'Navigation Areas', 'gutenberg' ),
 				'singular_name' => __( 'Navigation Area', 'gutenberg' ),
 			),
+			'show_in_rest'      => true,
+			'rest_base' => 'wp_navigation_area',
 			// TODO - reinstate
 			// 'query_var'         => false,
 			// 'rewrite'           => false,
 			// 'show_ui'           => false,
 			// '_builtin'          => true,
 			// 'show_in_nav_menus' => false,
-			// 'show_in_rest'      => false,
 		)
 	);
 }

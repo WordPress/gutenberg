@@ -43,7 +43,7 @@ import NavigationInnerBlocks from './inner-blocks';
 import NavigationMenuSelector from './navigation-menu-selector';
 import NavigationMenuNameControl from './navigation-menu-name-control';
 import UnsavedInnerBlocks from './unsaved-inner-blocks';
-
+import NavigationAreaSelector from './navigation-area-selector';
 function getComputedStyle( node ) {
 	return node.ownerDocument.defaultView.getComputedStyle( node );
 }
@@ -302,6 +302,9 @@ function Navigation( {
 							<NavigationMenuNameControl />
 						</PanelBody>
 					) }
+					<PanelBody title={ __( 'Navigation Area' ) }>
+						<NavigationAreaSelector />
+					</PanelBody>
 					{ hasSubmenuIndicatorSetting && (
 						<PanelBody title={ __( 'Display' ) }>
 							<h3>{ __( 'Overlay Menu' ) }</h3>
