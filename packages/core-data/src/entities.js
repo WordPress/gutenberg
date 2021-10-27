@@ -132,6 +132,9 @@ export const defaultEntities = [
 		name: 'globalStyles',
 		kind: 'root',
 		baseURL: '/wp/v2/global-styles',
+		baseURLParams: { context: 'edit' },
+		plural: 'globalStylesVariations', // should be different than name
+		getTitle: ( record ) => record?.title?.rendered || record?.title,
 	},
 ];
 
