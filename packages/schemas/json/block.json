@@ -385,6 +385,6 @@
 			"description": "Block type frontend style definition. It will be enqueued both in the editor and when viewing the content on the front of the site."
 		}
 	},
-	"required": [ "name", "title", "category" ],
+	"required": [ "name", "title" ],
 	"additionalProperties": false
 }
