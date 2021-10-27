@@ -428,7 +428,7 @@ export const __experimentalGetCurrentGlobalStylesId = () => async ( {
 	const globalStylesURL = get( activeThemes, [
 		0,
 		'_links',
-		'wp:global-styles',
+		'wp:user-global-styles',
 		0,
 		'href',
 	] );
