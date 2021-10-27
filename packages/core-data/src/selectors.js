@@ -906,3 +906,18 @@ export function __experimentalGetTemplateForLink( state, link ) {
 	}
 	return template;
 }
+
+/**
+ * Retrieve the current theme's base global styles
+ *
+ * @param {Object} state Editor state.
+ *
+ * @return {Object?} The Global Styles object.
+ */
+export function __experimentalGetCurrentThemeBaseGlobalStyles( state ) {
+	const currentTheme = getCurrentTheme( state );
+	if ( ! currentTheme ) {
+		return null;
+	}
+	return state.themeBaseGlobalStyles[ currentTheme.stylesheet ];
+}

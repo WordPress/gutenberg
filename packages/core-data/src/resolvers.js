@@ -436,3 +436,17 @@ export const __experimentalGetCurrentGlobalStylesId = () => async ( {
 		);
 	}
 };
+
+export const __experimentalGetCurrentThemeBaseGlobalStyles = () => async ( {
+	resolveSelect,
+	dispatch,
+} ) => {
+	const currentTheme = await resolveSelect.getCurrentTheme();
+	const themeGlobalStyles = await apiFetch( {
+		path: `/wp/v2/themes/${ currentTheme.stylesheet }/global-styles`,
+	} );
+	await dispatch.__experimentalReceiveThemeBaseGlobalStyles(
+		currentTheme.stylesheet,
+		themeGlobalStyles
+	);
+};
