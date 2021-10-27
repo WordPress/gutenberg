@@ -4,7 +4,6 @@
 import { SelectControl } from '@wordpress/components';
 import { store as coreStore } from '@wordpress/core-data';
 import { useSelect } from '@wordpress/data';
-import { useState } from '@wordpress/element';
 
 const navOptionPlaceholder = [
 	{
@@ -13,9 +12,8 @@ const navOptionPlaceholder = [
 	},
 ];
 
-export default function NavigationAreaSelector() {
-	const [ navigationArea, setNavigationArea ] = useState();
-
+export default function NavigationAreaSelector( props ) {
+	const { navigationArea, onSelect } = props;
 	const { areas, isRequesting } = useSelect( ( select ) => {
 		const { getEntityRecords, isResolving } = select( coreStore );
 		return {
@@ -46,7 +44,7 @@ export default function NavigationAreaSelector() {
 					};
 				} )
 			) }
-			onChange={ ( { slug } ) => setNavigationArea( slug ) }
+			onChange={ onSelect }
 		/>
 	);
 }

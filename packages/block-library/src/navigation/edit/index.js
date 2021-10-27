@@ -101,6 +101,7 @@ function Navigation( {
 		orientation,
 		overlayMenu,
 		showSubmenuIcon,
+		navigationArea,
 	} = attributes;
 
 	const [ hasAlreadyRendered, RecursionProvider ] = useNoRecursiveRenders(
@@ -303,7 +304,14 @@ function Navigation( {
 						</PanelBody>
 					) }
 					<PanelBody title={ __( 'Navigation Area' ) }>
-						<NavigationAreaSelector />
+						<NavigationAreaSelector
+							navigationArea={ navigationArea }
+							onSelect={ ( navAreaSlug ) => {
+								setAttributes( {
+									navigationArea: navAreaSlug,
+								} );
+							} }
+						/>
 					</PanelBody>
 					{ hasSubmenuIndicatorSetting && (
 						<PanelBody title={ __( 'Display' ) }>
