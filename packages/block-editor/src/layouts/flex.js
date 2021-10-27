@@ -8,7 +8,11 @@ import {
 	justifyRight,
 	justifySpaceBetween,
 } from '@wordpress/icons';
-import { Button } from '@wordpress/components';
+import {
+	Button,
+	__experimentalToggleGroupControl as ToggleGroupControl,
+	__experimentalToggleGroupControlOption as ToggleGroupControlOption,
+} from '@wordpress/components';
 
 /**
  * Internal dependencies
@@ -24,6 +28,11 @@ const justifyContentMap = {
 	'space-between': 'space-between',
 };
 
+const flexWrapMap = {
+	wrap: 'wrap',
+	nowrap: 'nowrap',
+};
+
 export default {
 	name: 'flex',
 	label: __( 'Flex' ),
@@ -32,10 +41,13 @@ export default {
 		onChange,
 	} ) {
 		return (
-			<FlexLayoutJustifyContentControl
-				layout={ layout }
-				onChange={ onChange }
-			/>
+			<>
+				<FlexLayoutJustifyContentControl
+					layout={ layout }
+					onChange={ onChange }
+				/>
+				<FlexWrapControl layout={ layout } onChange={ onChange } />
+			</>
 		);
 	},
 	toolBarControls: function FlexLayoutToolbarControls( {
@@ -60,7 +72,9 @@ export default {
 		const blockGapSupport = useSetting( 'spacing.blockGap' );
 		const hasBlockGapStylesSupport = blockGapSupport !== null;
 		const justifyContent =
-			justifyContentMap[ layout.justifyContent ] || 'flex-start';
+			justifyContentMap[ layout.justifyContent ] ||
+			justifyContentMap.left;
+		const flexWrap = flexWrapMap[ layout.flexWrap ] || flexWrapMap.wrap;
 		return (
 			<style>{ `
 				${ appendSelectors( selector ) } {
@@ -70,7 +84,7 @@ export default {
 							? 'var( --wp--style--block-gap, 0.5em )'
 							: '0.5em'
 					};
-					flex-wrap: wrap;
+					flex-wrap: ${ flexWrap };
 					align-items: center;
 					flex-direction: row;
 					justify-content: ${ justifyContent };
@@ -160,5 +174,33 @@ function FlexLayoutJustifyContentControl( {
 				} ) }
 			</div>
 		</fieldset>
+	);
+}
+
+function FlexWrapControl( { layout, onChange } ) {
+	const { flexWrap = flexWrapMap.wrap } = layout;
+	const helpTexts = {
+		wrap: __( 'Items wrap onto multiple lines.' ),
+		nowrap: __( 'Items are forced onto one line.' ),
+	};
+	return (
+		<ToggleGroupControl
+			label={ __( 'Flex wrap' ) }
+			value={ flexWrap }
+			help={ helpTexts[ flexWrap ] }
+			onChange={ ( value ) => {
+				onChange( {
+					...layout,
+					flexWrap: value,
+				} );
+			} }
+			isBlock
+		>
+			<ToggleGroupControlOption value="wrap" label={ __( 'Wrap' ) } />
+			<ToggleGroupControlOption
+				value="nowrap"
+				label={ __( 'No Wrap' ) }
+			/>
+		</ToggleGroupControl>
 	);
 }

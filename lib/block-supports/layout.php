@@ -76,6 +76,14 @@ function gutenberg_get_layout_style( $selector, $layout, $has_block_gap_support 
 			'space-between' => 'space-between',
 		);
 
+		$flex_wrap_options = array(
+			'wrap'   => 'wrap',
+			'nowrap' => 'nowrap',
+		);
+		$flex_wrap         = ! empty( $layout['flexWrap'] ) && array_key_exists( $layout['flexWrap'], $flex_wrap_options ) ?
+			$flex_wrap_options[ $layout['flexWrap'] ] :
+			'wrap';
+
 		$style  = "$selector {";
 		$style .= 'display: flex;';
 		if ( $has_block_gap_support ) {
@@ -83,7 +91,7 @@ function gutenberg_get_layout_style( $selector, $layout, $has_block_gap_support 
 		} else {
 			$style .= 'gap: 0.5em;';
 		}
-		$style .= 'flex-wrap: wrap;';
+		$style .= "flex-wrap: $flex_wrap;";
 		$style .= 'align-items: center;';
 		/**
 		 * Add this style only if is not empty for backwards compatibility,
