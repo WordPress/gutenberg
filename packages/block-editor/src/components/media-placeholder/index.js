@@ -70,7 +70,6 @@ export function MediaPlaceholder( {
 	disableMediaButtons,
 	onError,
 	onSelect,
-	onRemove = noop,
 	onCancel,
 	onSelectURL,
 	onDoubleClick,
@@ -329,7 +328,6 @@ export function MediaPlaceholder( {
 				gallery={ multiple && onlyAllowsImages() }
 				multiple={ multiple }
 				onSelect={ onSelect }
-				onRemove={ onRemove }
 				allowedTypes={ allowedTypes }
 				value={
 					Array.isArray( value )

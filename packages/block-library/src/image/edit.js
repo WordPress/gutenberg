@@ -132,22 +132,6 @@ export function ImageEdit( {
 		noticeOperations.createErrorNotice( message );
 	}
 
-	function onRemoveImage( attachment ) {
-		if (
-			attachment?.id === attributes?.id &&
-			attachment?.destroyed === true
-		) {
-			setAttributes( {
-				url: undefined,
-				alt: undefined,
-				id: undefined,
-				title: undefined,
-				caption: undefined,
-			} );
-			setTemporaryURL( undefined );
-		}
-	}
-
 	function onSelectImage( media ) {
 		if ( ! media || ! media.url ) {
 			setAttributes( {
@@ -353,7 +337,6 @@ export function ImageEdit( {
 			<MediaPlaceholder
 				icon={ <BlockIcon icon={ icon } /> }
 				onSelect={ onSelectImage }
-				onRemove={ onRemoveImage }
 				onSelectURL={ onSelectURL }
 				notices={ noticeUI }
 				onError={ onUploadError }
