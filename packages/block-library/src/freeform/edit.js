@@ -89,6 +89,8 @@ export default function ClassicEdit( {
 				);
 				const scrollPosition = scrollContainer.scrollTop;
 
+				// Only update attributes if we aren't multi-selecting blocks.
+				// Updating during multi-selection can overwrite attributes of other blocks.
 				if ( ! getMultiSelectedBlockClientIds()?.length ) {
 					setAttributes( {
 						content: editor.getContent(),
