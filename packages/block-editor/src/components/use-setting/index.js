@@ -50,11 +50,6 @@ const deprecatedFlags = {
 	'spacing.customPadding': ( settings ) => settings.enableCustomSpacing,
 };
 
-// The following provide continued support for `custom` prefixed properties.
-// This will be removed once third party devs have had sufficient time to update
-// themes, plugins, etc. This is also separate to the deprecated flags as there
-// will be some overlap e.g. `typography.customLineHeight`.
-// See: https://github.com/WordPress/gutenberg/pull/34485
 const prefixedFlags = {
 	'border.customColor': 'border.color',
 	'border.customStyle': 'border.style',
@@ -67,19 +62,19 @@ const prefixedFlags = {
 };
 
 /**
- * Retrieve editor setting value. The block specific setting is preferred
- * otherwise falls back to the generic setting path.
+ * Remove `custom` prefixes for flags that did not land in 5.8.
  *
- * @param {Object} settings  Editor settings.
- * @param {string} blockName Block to retrieve setting for.
- * @param {string} path      Path to desired value in settings.
- * @return {any}             The value for defined setting.
+ * This provides continued support for `custom` prefixed properties. It will
+ * be removed once third party devs have had sufficient time to update themes,
+ * plugins, etc.
+ *
+ * @see https://github.com/WordPress/gutenberg/pull/34485
+ *
+ * @param {string} path Path to desired value in settings.
+ * @return {string}     The value for defined setting.
  */
-const getSetting = ( settings, blockName, path ) => {
-	const blockPath = `__experimentalFeatures.blocks.${ blockName }.${ path }`;
-	const defaultsPath = `__experimentalFeatures.${ path }`;
-
-	return get( settings, blockPath ) ?? get( settings, defaultsPath );
+const removeCustomPrefixes = ( path ) => {
+	return prefixedFlags[ path ] || path;
 };
 
 /**
@@ -102,11 +97,11 @@ export default function useSetting( path ) {
 
 			// 1 - Use __experimental features, if available.
 			// We cascade to the all value if the block one is not available.
-			const experimentalFeaturesResult = getSetting(
-				settings,
-				blockName,
-				path
-			);
+			const normalizedPath = removeCustomPrefixes( path );
+			const defaultsPath = `__experimentalFeatures.${ normalizedPath }`;
+			const blockPath = `__experimentalFeatures.blocks.${ blockName }.${ normalizedPath }`;
+			const experimentalFeaturesResult =
+				get( settings, blockPath ) ?? get( settings, defaultsPath );
 
 			if ( experimentalFeaturesResult !== undefined ) {
 				if ( PATHS_WITH_MERGE[ path ] ) {
@@ -119,22 +114,7 @@ export default function useSetting( path ) {
 				return experimentalFeaturesResult;
 			}
 
-			// 2 - Handle `custom` prefixed settings.
-			const pathWithoutPrefix = prefixedFlags[ path ];
-
-			if ( pathWithoutPrefix ) {
-				const settingsValue = getSetting(
-					settings,
-					blockName,
-					pathWithoutPrefix
-				);
-
-				if ( settingsValue !== undefined ) {
-					return settingsValue;
-				}
-			}
-
-			// 3 - Use deprecated settings, otherwise.
+			// 2 - Use deprecated settings, otherwise.
 			const deprecatedSettingsValue = deprecatedFlags[ path ]
 				? deprecatedFlags[ path ]( settings )
 				: undefined;
@@ -142,7 +122,7 @@ export default function useSetting( path ) {
 				return deprecatedSettingsValue;
 			}
 
-			// 4 - Fall back for typography.dropCap:
+			// 3 - Fall back for typography.dropCap:
 			// This is only necessary to support typography.dropCap.
 			// when __experimentalFeatures are not present (core without plugin).
 			// To remove when __experimentalFeatures are ported to core.
