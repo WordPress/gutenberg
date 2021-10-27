@@ -9,7 +9,6 @@ import { difference, zip } from 'lodash';
 import { __, sprintf } from '@wordpress/i18n';
 import { store as noticesStore } from '@wordpress/notices';
 import { store as coreDataStore } from '@wordpress/core-data';
-import { default as logWarning } from '@wordpress/warning';
 
 /**
  * Internal dependencies
@@ -210,7 +209,7 @@ const batchUpdateMenuItems = ( navigationBlock, menuId ) => async ( {
 		.filter( ( { block } ) => ! isBlockSupportedInNav( block ) )
 		.map( ( { block } ) => block.name );
 	if ( unsupportedMenuItems.length ) {
-		logWarning(
+		window.console.warn(
 			sprintf(
 				// translators: %s: Name of block (i.e. core/legacy-widget)
 				__(
