@@ -134,7 +134,7 @@ class WP_Theme_JSON_Schema_V1 implements WP_Theme_JSON_Schema {
 		self::rename_settings( $new_settings );
 
 		// Process individual block settings.
-		if ( is_array( $new_settings['blocks'] ) ) {
+		if ( isset( $new_settings['blocks'] ) && is_array( $new_settings['blocks'] ) ) {
 			foreach ( $new_settings['blocks'] as &$block_settings ) {
 				self::rename_settings( $block_settings );
 			}
