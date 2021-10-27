@@ -283,6 +283,41 @@ function navStripHTML( html ) {
 	return doc.body.textContent || '';
 }
 
+/**
+ * Add transforms to Link Control
+ */
+
+function LinkControlTransforms( { block, transforms, replace } ) {
+	return (
+		<div className="link-control-transform">
+			<h3 className="link-control-transform__subheading">Transform</h3>
+			<Flex
+				justify="space-between"
+				className="link-control-transform__items"
+			>
+				{ transforms.map( ( item, index ) => {
+					return (
+						<FlexItem key={ `transform-${ index }` }>
+							<Button
+								onClick={ () =>
+									replace(
+										block.clientId,
+										switchToBlockType( block, item.name )
+									)
+								}
+								className="link-control-transform__item"
+							>
+								<BlockIcon icon={ item.icon } />
+								{ item.title }
+							</Button>
+						</FlexItem>
+					);
+				} ) }
+			</Flex>
+		</div>
+	);
+}
+
 export default function NavigationLinkEdit( {
 	attributes,
 	isSelected,
@@ -329,7 +364,7 @@ export default function NavigationLinkEdit( {
 		userCanCreatePages,
 		userCanCreatePosts,
 		thisBlock,
-		inserterItems,
+		blockTransforms,
 	} = useSelect(
 		( select ) => {
 			const {
@@ -341,7 +376,7 @@ export default function NavigationLinkEdit( {
 				hasSelectedInnerBlock,
 				getSelectedBlockClientId,
 				getBlockParentsByBlockName,
-				getInserterItems,
+				getBlockTransformItems,
 			} = select( blockEditorStore );
 
 			const selectedBlockId = getSelectedBlockClientId();
@@ -380,7 +415,8 @@ export default function NavigationLinkEdit( {
 					'posts'
 				),
 				thisBlock: getBlock( clientId ),
-				inserterItems: getInserterItems(
+				blockTransforms: getBlockTransformItems(
+					[ getBlock( clientId ) ],
 					getBlockRootClientId( clientId )
 				),
 			};
@@ -414,48 +450,9 @@ export default function NavigationLinkEdit( {
 		'core/social-links',
 		'core/search',
 	];
-	const featuredTransforms = inserterItems.filter( ( item ) => {
+	const featuredTransforms = blockTransforms.filter( ( item ) => {
 		return featuredBlocks.includes( item.name );
 	} );
-	/**
-	 * Add transforms to Link Control
-	 */
-
-	function LinkControlTransforms( { block, transforms } ) {
-		return (
-			<div className="link-control-transform">
-				<h3 className="link-control-transform__subheading">
-					Transform
-				</h3>
-				<Flex
-					justify="space-between"
-					className="link-control-transform__items"
-				>
-					{ transforms.map( ( item, index ) => {
-						return (
-							<FlexItem key={ `transform-${ index }` }>
-								<Button
-									onClick={ () =>
-										replaceBlock(
-											block.clientId,
-											switchToBlockType(
-												block,
-												item.name
-											)
-										)
-									}
-									className="link-control-transform__item"
-								>
-									<BlockIcon icon={ item.icon } />
-									{ item.title }
-								</Button>
-							</FlexItem>
-						);
-					} ) }
-				</Flex>
-			</div>
-		);
-	}
 
 	useEffect( () => {
 		// Show the LinkControl on mount if the URL is empty
@@ -774,6 +771,7 @@ export default function NavigationLinkEdit( {
 													transforms={
 														featuredTransforms
 													}
+													replace={ replaceBlock }
 												/>
 										  )
 										: null
