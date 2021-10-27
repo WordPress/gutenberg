@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/schemas",
-	"version": "1.0.0-prerelase",
+	"version": "1.0.0-prerelease",
 	"description": "A collection of schemas used in WordPress.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
