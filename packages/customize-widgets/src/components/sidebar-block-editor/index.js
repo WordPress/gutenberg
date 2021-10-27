@@ -19,6 +19,7 @@ import {
 	WritingFlow,
 	BlockEditorKeyboardShortcuts,
 	__unstableBlockSettingsMenuFirstItem,
+	__unstableEditorStyles as EditorStyles,
 } from '@wordpress/block-editor';
 import { uploadMedia } from '@wordpress/media-utils';
 import { store as interfaceStore } from '@wordpress/interface';
@@ -121,6 +122,7 @@ export default function SidebarBlockEditor( {
 
 				<CopyHandler>
 					<BlockTools>
+						<EditorStyles styles={ settings.defaultEditorStyles } />
 						<BlockSelectionClearer>
 							<WritingFlow className="editor-styles-wrapper">
 								<ObserveTyping>
