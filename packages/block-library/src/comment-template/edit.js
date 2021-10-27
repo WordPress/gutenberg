@@ -22,22 +22,28 @@ const TEMPLATE = [
 
 export default function CommentTemplateEdit( {
 	clientId,
-	context: { postId },
+	context: { postId, queryPerPage },
 } ) {
 	const innerBlocksProps = useInnerBlocksProps( {}, { template: TEMPLATE } );
 	const blockProps = useBlockProps();
 
 	const [ activeBlockContext, setActiveBlockContext ] = useState();
 
-	const { comments, blocks } = useSelect( ( select ) => {
-		const { getEntityRecords } = select( coreStore );
-		const { getBlocks } = select( blockEditorStore );
+	const { comments, blocks } = useSelect(
+		( select ) => {
+			const { getEntityRecords } = select( coreStore );
+			const { getBlocks } = select( blockEditorStore );
 
-		return {
-			comments: getEntityRecords( 'root', 'comment', { post: postId } ),
-			blocks: getBlocks( clientId ),
-		};
-	}, [] );
+			return {
+				comments: getEntityRecords( 'root', 'comment', {
+					post: postId,
+					per_page: queryPerPage,
+				} ),
+				blocks: getBlocks( clientId ),
+			};
+		},
+		[ queryPerPage, postId, clientId ]
+	);
 
 	const blockContexts = useMemo(
 		() => comments?.map( ( comment ) => ( { commentId: comment.id } ) ),
