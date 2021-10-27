@@ -301,7 +301,17 @@ _Example:_
 
 #### Advanced information
 
-The command checks which packages whose name starts with `@wordpress/` are used in the project by reading the package.json file, and then executes `npm install @wordpress/package1@latest @wordpress/package2@latest ... --save` to change the package versions to the latest one.
+The command checks which packages whose name starts with `@wordpress/` are used in the project by reading the `package.json` file, and then executes `npm install @wordpress/package1@latest @wordpress/package2@latest ... --save` to change the package versions to the latest one.
+
+##### `--wpVersion`
+
+You may use this command to update your local dependencies, to the versions delivered by a specific WordPress version. This is especially usefull when you use [`@wordpress/dependency-extraction-webpack-plugin`](https://www.npmjs.com/package/@wordpress/dependency-extraction-webpack-plugin). You may want to install the dependencies at versions used by the lowest WordPress version your plugin supports, for local testing, etc.
+
+```sh
+wp-scripts packages-update --wpVersion=5.6
+```
+
+Please note, this command updates all `@wordpress/*` packages that intersects your `package.json` and given WordPress version's. It will **not** check your `dependency-extraction-webpack-plugin` setup, to update only extracted ones.
 
 ### `start`
 
