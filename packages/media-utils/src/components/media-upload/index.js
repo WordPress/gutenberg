@@ -8,8 +8,13 @@ import { castArray, defaults, pick, noop } from 'lodash';
  */
 import { Component } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
-
+import { useDispatch } from '@wordpress/data';
 const { wp } = window;
+
+/**
+ * Internal dependencies
+ */
+import { store as mediaUtilsStore } from '../../store';
 
 const DEFAULT_EMPTY_GALLERY = [];
 
@@ -383,8 +388,15 @@ class MediaUpload extends Component {
 	}
 
 	onRemoveSelectedAttachment( attachment ) {
-		const { onRemove = noop } = this.props;
-		onRemove( attachment );
+		if ( attachment.destroyed ) {
+			const { onRemove = noop } = this.props;
+			// @TODO We can't dispatch outside the body of a function component.
+			// Maybe we should turn this into a function component first.
+			const { removeAttachment } = useDispatch( mediaUtilsStore );
+			console.log( 'onRemoveSelectedAttachment', attachment );
+			removeAttachment( attachment );
+			onRemove( attachment );
+		}
 	}
 
 	onOpen() {

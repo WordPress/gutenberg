@@ -21,6 +21,7 @@ import {
 import { useEffect, useRef, useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { image as icon } from '@wordpress/icons';
+import { store as mediaUtilsStore } from '@wordpress/media-utils';
 
 /* global wp */
 
@@ -124,8 +125,28 @@ export function ImageEdit( {
 	const ref = useRef();
 	const { imageDefaultSize, mediaUpload } = useSelect( ( select ) => {
 		const { getSettings } = select( blockEditorStore );
+		const { getDeletedAttachment } = select( mediaUtilsStore );
 		return pick( getSettings(), [ 'imageDefaultSize', 'mediaUpload' ] );
 	}, [] );
+
+	const { isImageDeleted } = useSelect( ( select ) => {
+		const { getDeletedAttachment } = select( mediaUtilsStore );
+		console.log( 'useSelect', getDeletedAttachment( id ) );
+		return !! getDeletedAttachment( id );
+	}, [ id ] );
+
+	useEffect( () => {
+		if ( isImageDeleted === true ) {
+			console.log( 'useEffect', isImageDeleted );
+			setAttributes( {
+				url: undefined,
+				alt: undefined,
+				id: undefined,
+				title: undefined,
+				caption: undefined,
+			} );
+		}
+	}, [ isImageDeleted ] );
 
 	function onUploadError( message ) {
 		noticeOperations.removeAllNotices();
