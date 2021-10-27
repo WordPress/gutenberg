@@ -434,7 +434,7 @@ export const __experimentalGetCurrentGlobalStylesId = () => async ( {
 	] );
 	if ( globalStylesURL ) {
 		const globalStylesObject = await apiFetch( {
-			path: globalStylesURL,
+			url: globalStylesURL,
 		} );
 		dispatch.__experimentalReceiveCurrentGlobalStylesId(
 			globalStylesObject.id
