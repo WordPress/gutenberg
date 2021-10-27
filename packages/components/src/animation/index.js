@@ -11,4 +11,5 @@ export {
 	motion as __unstableMotion,
 	AnimatePresence as __unstableAnimatePresence,
 	AnimateSharedLayout as __unstableAnimateSharedLayout,
+	useMotionValue as __unstableUseMotionValue,
 } from 'framer-motion';

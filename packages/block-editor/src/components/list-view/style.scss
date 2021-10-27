@@ -40,6 +40,14 @@
 		box-shadow: inset 0 0 0 var(--wp-admin-border-width-focus) $white;
 	}
 
+	&.is-moving {
+		z-index: 1;
+	}
+
+	&.is-moving .block-editor-list-view-block-contents:focus {
+		box-shadow: none;
+	}
+
 	&.is-branch-selected:not(.is-selected) {
 		// Lighten a CSS variable without introducing a new SASS variable
 		background:
@@ -57,11 +65,6 @@
 	&.is-branch-selected:not(.is-selected) .block-editor-list-view-block-contents {
 		border-radius: 0;
 	}
-
-	&.is-dragging {
-		display: none;
-	}
-
 	// List View renders a fixed number of items and relies on each item having a fixed height of 36px.
 	// If this value changes, we should also change the itemHeight value set in useFixedWindowList.
 	// See: https://github.com/WordPress/gutenberg/pull/35230 for additional context.
@@ -76,17 +79,6 @@
 		border-radius: 2px;
 		position: relative;
 		white-space: nowrap;
-
-		&.is-dropping-before::before {
-			content: "";
-			position: absolute;
-			pointer-events: none;
-			transition: border-color 0.1s linear, border-style 0.1s linear, box-shadow 0.1s linear;
-			top: -2px;
-			right: 0;
-			left: 0;
-			border-top: 4px solid var(--wp-admin-theme-color);
-		}
 
 		.components-modal__content & {
 			padding-left: 0;
@@ -324,6 +316,33 @@ $block-navigation-max-indent: 8;
 	}
 }
 
+.block-editor-list-view-tree .block-editor-list-view-leaf {
+	button {
+		cursor: pointer;
+	}
+
+	.block-editor-block-icon {
+		cursor: grab;
+	}
+
+	.block-editor-block-icon:active,
+	&.is-moving button,
+	&.is-moving .block-editor-list-view__expander,
+	&.is-moving .block-editor-list-view-block-select-button__title,
+	&.is-moving .block-editor-block-icon {
+		cursor: grabbing;
+	}
+
+	button.is-hovered {
+		box-shadow: inset 0 0 0 var(--wp-admin-border-width-focus) var(--wp-admin-theme-color);
+	}
+
+	// Hide hover styles while a user is dragging blocks/files etc.
+	&.is-moving button {
+		box-shadow: none;
+	}
+}
+
 .block-editor-list-view-leaf .block-editor-list-view__expander {
 	visibility: hidden;
 }
@@ -342,27 +361,5 @@ $block-navigation-max-indent: 8;
 	transform: rotate(0deg);
 	transition: transform 0.2s ease;
 	@include reduce-motion("transition");
-}
-
-.block-editor-list-view-drop-indicator {
-	pointer-events: none;
-
-	.block-editor-list-view-drop-indicator__line {
-		background: var(--wp-admin-theme-color);
-		height: $border-width;
-	}
-}
-
-// Reset some popover defaults for the drop indicator.
-.block-editor-list-view-drop-indicator:not([data-y-axis="middle"][data-x-axis="right"]) > .components-popover__content {
-	margin-left: 0;
-	border: none;
-	box-shadow: none;
-}
-
-.block-editor-list-view-placeholder {
-	padding: 0;
-	margin: 0;
-	height: 36px;
 }
 

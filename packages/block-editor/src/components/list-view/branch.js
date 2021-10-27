@@ -18,42 +18,23 @@ import { useListViewContext } from './context';
  * Given a block, returns the total number of blocks in that subtree. This is used to help determine
  * the list position of a block.
  *
- * When a block is collapsed, we do not count their children as part of that total. In the current drag
- * implementation dragged blocks and their children are not counted.
+ * When a block is collapsed, we do not count their children as part of that total.
  *
- * @param {Object} block            block tree
- * @param {Object} expandedState    state that notes which branches are collapsed
- * @param {Array}  draggedClientIds a list of dragged client ids
+ * @param {Object} block         block tree
+ * @param {Object} expandedState state that notes which branches are collapsed
  * @return {number} block count
  */
-function countBlocks( block, expandedState, draggedClientIds ) {
-	const isDragged = draggedClientIds?.includes( block.clientId );
-	if ( isDragged ) {
-		return 0;
-	}
+function countBlocks( block, expandedState ) {
 	const isExpanded = expandedState[ block.clientId ] ?? true;
 	if ( isExpanded ) {
-		return (
-			1 +
-			block.innerBlocks.reduce(
-				countReducer( expandedState, draggedClientIds ),
-				0
-			)
-		);
+		return 1 + block.innerBlocks.reduce( countReducer( expandedState ), 0 );
 	}
 	return 1;
 }
-const countReducer = ( expandedState, draggedClientIds ) => (
-	count,
-	block
-) => {
-	const isDragged = draggedClientIds?.includes( block.clientId );
-	if ( isDragged ) {
-		return count;
-	}
+const countReducer = ( expandedState ) => ( count, block ) => {
 	const isExpanded = expandedState[ block.clientId ] ?? true;
 	if ( isExpanded && block.innerBlocks.length > 0 ) {
-		return count + countBlocks( block, expandedState, draggedClientIds );
+		return count + countBlocks( block, expandedState );
 	}
 	return count + 1;
 };
@@ -65,15 +46,22 @@ function ListViewBranch( props ) {
 		showBlockMovers,
 		showNestedBlocks,
 		level = 1,
-		path = '',
-		listPosition = 0,
 		fixedListWindow,
+		animateToggleOpen = false,
+		setPosition,
+		moveItem,
+		listPosition = 0,
+		draggingId,
+		dragStart,
+		dragEnd,
 	} = props;
 
 	const {
 		expandedState,
 		draggedClientIds,
 		__experimentalPersistentListViewFeatures,
+		isTreeGridMounted,
+		useAnimation,
 	} = useListViewContext();
 
 	const filteredBlocks = compact( blocks );
@@ -101,10 +89,6 @@ function ListViewBranch( props ) {
 					! usesWindowing || itemInView( nextPosition );
 
 				const position = index + 1;
-				const updatedPath =
-					path.length > 0
-						? `${ path }_${ position }`
-						: `${ position }`;
 				const hasNestedBlocks =
 					showNestedBlocks && !! innerBlocks && !! innerBlocks.length;
 
@@ -113,6 +97,13 @@ function ListViewBranch( props ) {
 					: undefined;
 
 				const isDragged = !! draggedClientIds?.includes( clientId );
+
+				const animateToggle =
+					useAnimation &&
+					( animateToggleOpen ||
+						( isExpanded &&
+							isTreeGridMounted &&
+							expandedState[ clientId ] !== undefined ) );
 
 				const showBlock = isDragged || blockInView;
 				return (
@@ -127,9 +118,14 @@ function ListViewBranch( props ) {
 								rowCount={ blockCount }
 								siblingBlockCount={ blockCount }
 								showBlockMovers={ showBlockMovers }
-								path={ updatedPath }
 								isExpanded={ isExpanded }
+								animateToggleOpen={ animateToggle }
+								setPosition={ setPosition }
+								moveItem={ moveItem }
 								listPosition={ nextPosition }
+								draggingId={ draggingId }
+								dragStart={ () => dragStart( clientId ) }
+								dragEnd={ () => dragEnd( clientId ) }
 							/>
 						) }
 						{ ! showBlock && (
@@ -144,9 +140,14 @@ function ListViewBranch( props ) {
 								showBlockMovers={ showBlockMovers }
 								showNestedBlocks={ showNestedBlocks }
 								level={ level + 1 }
-								path={ updatedPath }
 								listPosition={ nextPosition + 1 }
 								fixedListWindow={ fixedListWindow }
+								animateToggleOpen={ animateToggle }
+								setPosition={ setPosition }
+								moveItem={ moveItem }
+								draggingId={ draggingId }
+								dragStart={ dragStart }
+								dragEnd={ dragEnd }
 							/>
 						) }
 					</Fragment>

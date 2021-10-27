@@ -3,8 +3,21 @@
  */
 import { forwardRef } from '@wordpress/element';
 
+/**
+ * Internal dependencies
+ */
+import { __unstableMotion as motion } from '../animation';
+
 function TreeGridRow(
-	{ children, level, positionInSet, setSize, isExpanded, ...props },
+	{
+		children,
+		level,
+		positionInSet,
+		setSize,
+		isExpanded,
+		useAnimation = false,
+		...props
+	},
 	ref
 ) {
 	return (
@@ -14,17 +27,18 @@ function TreeGridRow(
 		// linting rule fails when validating this markup.
 		//
 		// eslint-disable-next-line jsx-a11y/role-supports-aria-props
-		<tr
-			{ ...props }
+		<motion.tr
+			layout={ useAnimation ? 'position' : false }
 			ref={ ref }
 			role="row"
 			aria-level={ level }
 			aria-posinset={ positionInSet }
 			aria-setsize={ setSize }
 			aria-expanded={ isExpanded }
+			{ ...props }
 		>
 			{ children }
-		</tr>
+		</motion.tr>
 	);
 }
 

@@ -22,7 +22,7 @@ import { ESCAPE } from '@wordpress/keycodes';
  */
 import { store as editSiteStore } from '../../store';
 
-export default function ListViewSidebar() {
+function ListViewSidebar() {
 	const { setIsListViewOpened } = useDispatch( editSiteStore );
 
 	const { clearSelectedBlock, selectBlock } = useDispatch( blockEditorStore );
@@ -71,3 +71,4 @@ export default function ListViewSidebar() {
 		</div>
 	);
 }
+export default ListViewSidebar;

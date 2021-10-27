@@ -49,11 +49,9 @@ describe( 'Navigating the block hierarchy', () => {
 
 		// Navigate to the columns blocks.
 		await page.click( '.edit-post-header-toolbar__list-view-toggle' );
-		const columnsBlockMenuItem = (
-			await page.$x(
-				"//button[contains(@class,'block-editor-list-view-block-select-button') and contains(text(), 'Columns')]"
-			)
-		 )[ 0 ];
+		const columnsBlockMenuItem = await page.waitForXPath(
+			"//button[contains( @class, 'block-editor-list-view-block-select-button')][span[text()='Columns']]"
+		);
 		await columnsBlockMenuItem.click();
 
 		// Tweak the columns count.
@@ -73,11 +71,9 @@ describe( 'Navigating the block hierarchy', () => {
 		);
 
 		// Navigate to the last column block.
-		const lastColumnsBlockMenuItem = (
-			await page.$x(
-				"//button[contains(@class,'block-editor-list-view-block-select-button') and contains(text(), 'Column')]"
-			)
-		 )[ 3 ];
+		const lastColumnsBlockMenuItem = await page.waitForXPath(
+			"(//button[contains( @class, 'block-editor-list-view-block-select-button')][span[text()='Column']])[3]"
+		);
 		await lastColumnsBlockMenuItem.click();
 
 		// Insert text in the last column block.
@@ -186,11 +182,9 @@ describe( 'Navigating the block hierarchy', () => {
 
 		// Try selecting the group block using the Outline
 		await page.click( '.edit-post-header-toolbar__list-view-toggle' );
-		const groupMenuItem = (
-			await page.$x(
-				"//button[contains(@class,'block-editor-list-view-block-select-button') and contains(text(), 'Group')]"
-			)
-		 )[ 0 ];
+		const groupMenuItem = await page.waitForXPath(
+			"//button[contains( @class, 'block-editor-list-view-block-select-button')][span[text()='Group']]"
+		);
 		await groupMenuItem.click();
 
 		// The group block's wrapper should be selected.
