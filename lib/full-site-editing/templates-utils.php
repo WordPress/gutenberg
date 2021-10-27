@@ -12,9 +12,7 @@
  * @return array Filtered $columns.
  */
 function gutenberg_templates_lists_custom_columns( array $columns ) {
-	$columns['slug']        = __( 'Slug', 'gutenberg' );
 	$columns['description'] = __( 'Description', 'gutenberg' );
-	$columns['status']      = __( 'Status', 'gutenberg' );
 	$columns['theme']       = __( 'Theme', 'gutenberg' );
 	if ( isset( $columns['date'] ) ) {
 		unset( $columns['date'] );
@@ -29,26 +27,8 @@ function gutenberg_templates_lists_custom_columns( array $columns ) {
  * @param int    $post_id     Post ID.
  */
 function gutenberg_render_templates_lists_custom_column( $column_name, $post_id ) {
-	if ( 'slug' === $column_name ) {
-		$post = get_post( $post_id );
-		echo esc_html( $post->post_name );
-		return;
-	}
-
 	if ( 'description' === $column_name && has_excerpt( $post_id ) ) {
 		the_excerpt( $post_id );
-		return;
-	}
-
-	if ( 'status' === $column_name ) {
-		$post_status = get_post_status( $post_id );
-		// The auto-draft status doesn't have localized labels.
-		if ( 'auto-draft' === $post_status ) {
-			echo esc_html_x( 'Auto-Draft', 'Post status', 'gutenberg' );
-			return;
-		}
-		$post_status_object = get_post_status_object( $post_status );
-		echo esc_html( $post_status_object->label );
 		return;
 	}
 
