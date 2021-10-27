@@ -154,6 +154,7 @@ export { default as postCategories } from './library/post-categories';
 export { default as postContent } from './library/post-content';
 export { default as postCommentReplyLink } from './library/post-comment-reply-link';
 export { default as postComments } from './library/post-comments';
+export { default as postCommentAuthorAvatar } from './library/post-comment-author-avatar';
 export { default as postCommentsCount } from './library/post-comments-count';
 export { default as postCommentsForm } from './library/post-comments-form';
 export { default as postDate } from './library/post-date';
