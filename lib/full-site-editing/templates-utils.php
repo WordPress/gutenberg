@@ -19,6 +19,7 @@ function gutenberg_templates_lists_custom_columns( array $columns ) {
 	if ( isset( $columns['date'] ) ) {
 		unset( $columns['date'] );
 	}
+	unset( $columns['cb'] );
 	return $columns;
 }
 
@@ -111,3 +112,13 @@ function gutenberg_filter_templates_edit_views( $views ) {
 
 	return $views;
 }
+
+/**
+ * Removes the bulk actions from the templates list view.
+ *
+ * @param array $actions The bulk actions to filter.
+ */
+function gutenberg_filter_templates_bulk_actions( $actions ) {
+	return array();
+}
+add_filter( 'bulk_actions-edit-wp_template', 'gutenberg_filter_templates_bulk_actions' );
