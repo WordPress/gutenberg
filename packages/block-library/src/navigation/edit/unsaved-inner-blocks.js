@@ -51,22 +51,23 @@ export default function UnsavedInnerBlocks( {
 
 	return (
 		<>
-			{ isSelected && (
-				<Warning
-					actions={ [
-						<Button
-							key="save"
-							onClick={ () => setIsModalVisible( true ) }
-							variant="primary"
-						>
-							{ __( 'Save as' ) }
-						</Button>,
-					] }
-				>
-					{ __( 'Save this block to continue editing.' ) }
-				</Warning>
-			) }
 			<nav { ...blockProps }>
+				{ isSelected && (
+					<Warning
+						className="wp-block-navigation__unsaved-changes-warning"
+						actions={ [
+							<Button
+								key="save"
+								onClick={ () => setIsModalVisible( true ) }
+								variant="primary"
+							>
+								{ __( 'Save as' ) }
+							</Button>,
+						] }
+					>
+						{ __( 'Save this block to continue editing.' ) }
+					</Warning>
+				) }
 				<Disabled>
 					<div { ...innerBlocksProps } />
 				</Disabled>

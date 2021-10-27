@@ -521,3 +521,11 @@ body.editor-styles-wrapper
 		margin-top: $grid-unit-20;
 	}
 }
+
+.wp-block-navigation__unsaved-changes-warning {
+	width: 100%;
+
+	.block-editor-warning__actions {
+		margin-top: 0;
+	}
+}
