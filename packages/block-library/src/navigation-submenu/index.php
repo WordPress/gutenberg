@@ -129,11 +129,8 @@ function render_block_core_navigation_submenu( $attributes, $content, $block ) {
 	$is_post_type           = $is_post_type || isset( $attributes['type'] ) && ( 'post' === $attributes['type'] || 'page' === $attributes['type'] );
 
 	// Don't render the block's subtree if it is a draft.
-	if ( $is_post_type && $navigation_link_has_id ) {
-		$post = get_post( $attributes['id'] );
-		if ( 'publish' !== $post->post_status ) {
-			return '';
-		}
+	if ( $is_post_type && $navigation_link_has_id && 'publish' !== get_post_status( $attributes['id'] ) ) {
+		return '';
 	}
 
 	// Don't render the block's subtree if it has no label.
