@@ -50,6 +50,7 @@ function gutenberg_reregister_core_block_types() {
 				'embed',
 			),
 			'block_names'   => array(
+				'author-name.php'                => 'core/author-name',
 				'archives.php'                   => 'core/archives',
 				'block.php'                      => 'core/block',
 				'calendar.php'                   => 'core/calendar',
