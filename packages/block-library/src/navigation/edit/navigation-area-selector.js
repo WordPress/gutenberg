@@ -7,7 +7,7 @@ import { useSelect } from '@wordpress/data';
 
 const navOptionPlaceholder = [
 	{
-		value: null,
+		value: 0,
 		label: 'None',
 	},
 ];
@@ -24,6 +24,7 @@ export default function NavigationAreaSelector( props ) {
 			] ),
 		};
 	}, [] );
+
 	if ( isRequesting ) {
 		return 'Loading Navigation Areas...';
 	}
@@ -37,14 +38,16 @@ export default function NavigationAreaSelector( props ) {
 			label="Navigation Area"
 			value={ navigationArea }
 			options={ navOptionPlaceholder.concat(
-				areas.map( ( { slug, name } ) => {
+				areas.map( ( { id, name } ) => {
 					return {
-						value: slug,
+						value: id,
 						label: name,
 					};
 				} )
 			) }
-			onChange={ onSelect }
+			onChange={ ( areaId ) => {
+				onSelect( Number( areaId ) );
+			} }
 		/>
 	);
 }

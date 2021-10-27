@@ -37,6 +37,7 @@ export default function Placeholder( {
 				title,
 				content: serialize( blocks ),
 				status: 'publish',
+				wp_navigation_area: [],
 			};
 
 			const navigationMenu = await saveEntityRecord(

@@ -20,7 +20,7 @@ import {
 	getColorClassName,
 	Warning,
 } from '@wordpress/block-editor';
-import { EntityProvider } from '@wordpress/core-data';
+import { EntityProvider, store as coreStore } from '@wordpress/core-data';
 import { useDispatch, useSelect } from '@wordpress/data';
 import {
 	PanelBody,
@@ -44,6 +44,7 @@ import NavigationMenuSelector from './navigation-menu-selector';
 import NavigationMenuNameControl from './navigation-menu-name-control';
 import UnsavedInnerBlocks from './unsaved-inner-blocks';
 import NavigationAreaSelector from './navigation-area-selector';
+
 function getComputedStyle( node ) {
 	return node.ownerDocument.defaultView.getComputedStyle( node );
 }
@@ -114,6 +115,10 @@ function Navigation( {
 	);
 	const hasExistingNavItems = !! innerBlocks.length;
 	const { selectBlock } = useDispatch( blockEditorStore );
+
+	const { editEntityRecord, saveEditedEntityRecord } = useDispatch(
+		coreStore
+	);
 
 	const [ isPlaceholderShown, setIsPlaceholderShown ] = useState(
 		! hasExistingNavItems
@@ -200,6 +205,37 @@ function Navigation( {
 			setIsPlaceholderShown( false );
 		}
 	}, [ isEntityAvailable ] );
+
+	useEffect( () => {
+		const updateNavEntityArea = async () => {
+			const noTerms = [];
+
+			// navigationArea is of type "number". Therefore
+			// ID: 0 is used to represent a value of "none".
+			const maybeNewAreaTermId =
+				navigationArea > 0 ? [ navigationArea ] : noTerms;
+
+			// Toggle the active navigaiton area term.
+			await editEntityRecord(
+				'postType',
+				'wp_navigation',
+				navigationMenuId,
+				{
+					wp_navigation_area: maybeNewAreaTermId,
+				}
+			);
+
+			// Persist the change.
+			await saveEditedEntityRecord(
+				'postType',
+				'wp_navigation',
+				navigationMenuId
+			);
+		};
+		if ( isEntityAvailable ) {
+			updateNavEntityArea( navigationArea );
+		}
+	}, [ navigationArea ] );
 
 	// If the block has inner blocks, but no menu id, this was an older
 	// navigation block added before the block used a wp_navigation entity.
@@ -306,9 +342,9 @@ function Navigation( {
 					<PanelBody title={ __( 'Navigation Area' ) }>
 						<NavigationAreaSelector
 							navigationArea={ navigationArea }
-							onSelect={ ( navAreaSlug ) => {
+							onSelect={ ( navAreaId ) => {
 								setAttributes( {
-									navigationArea: navAreaSlug,
+									navigationArea: navAreaId,
 								} );
 							} }
 						/>
