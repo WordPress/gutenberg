@@ -31,7 +31,7 @@ const ENTITY_NAME_DESCRIPTIONS = {
 		),
 	wp_template: ( length ) =>
 		_n(
-			'This change will affect pages and posts that use these templates.',
+			'This change will affect pages and posts that use this template.',
 			'These changes will affect pages and posts that use these templates.',
 			length
 		),
