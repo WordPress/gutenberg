@@ -21,7 +21,8 @@
 
 	@media screen and (min-width: $break-medium) {
 		.components-circular-option-picker__swatches {
-			justify-content: space-between;
+			display: grid;
+			grid-template-columns: repeat(6, 1fr);
 		}
 	}
 
