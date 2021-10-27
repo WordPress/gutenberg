@@ -1,7 +1,17 @@
 /**
  * External dependencies
  */
-import { get, cloneDeep, set, mergeWith } from 'lodash';
+import {
+	get,
+	cloneDeep,
+	set,
+	mergeWith,
+	pickBy,
+	isEmpty,
+	isObject,
+	identity,
+	mapValues,
+} from 'lodash';
 
 /**
  * WordPress dependencies
@@ -53,6 +63,16 @@ function removeUserOriginFromSettings( settingsToRemove ) {
 	} );
 	return newSettings;
 }
+const cleanEmptyObject = ( object ) => {
+	if ( ! isObject( object ) || Array.isArray( object ) ) {
+		return object;
+	}
+	const cleanedNestedObjects = pickBy(
+		mapValues( object, cleanEmptyObject ),
+		identity
+	);
+	return isEmpty( cleanedNestedObjects ) ? undefined : cleanedNestedObjects;
+};
 
 function useGlobalStylesUserConfig() {
 	const { globalStylesId, settings, styles } = useSelect( ( select ) => {
@@ -95,10 +115,11 @@ function useGlobalStylesUserConfig() {
 			};
 			const updatedConfig = callback( currentConfig );
 			editEntityRecord( 'root', 'globalStyles', globalStylesId, {
-				styles: updatedConfig.styles,
-				settings: removeUserOriginFromSettings(
-					updatedConfig.settings
-				),
+				styles: cleanEmptyObject( updatedConfig.styles ) || {},
+				settings:
+					cleanEmptyObject(
+						removeUserOriginFromSettings( updatedConfig.settings )
+					) || {},
 			} );
 		},
 		[ globalStylesId ]
