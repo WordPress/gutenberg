@@ -11,68 +11,11 @@
  * a given structure in v0 schema to the latest one.
  */
 class WP_Theme_JSON_Schema_V1 implements WP_Theme_JSON_Schema {
-
 	/**
-	 * Data schema of each block within a theme.json.
-	 *
-	 * Example:
-	 *
-	 * {
-	 *   'block-one': {
-	 *     'styles': {
-	 *       'color': {
-	 *         'background': 'color'
-	 *       }
-	 *     },
-	 *     'settings': {
-	 *       'color': {
-	 *         'custom': true
-	 *       }
-	 *     }
-	 *   },
-	 *   'block-two': {
-	 *     'styles': {
-	 *       'color': {
-	 *         'link': 'color'
-	 *       }
-	 *     }
-	 *   }
-	 * }
+	 * Data schema for v1 theme.json.
 	 */
 	const SCHEMA = array(
-		'customTemplates' => null,
-		'templateParts'   => null,
-		'styles'          => array(
-			'border'     => array(
-				'radius' => null,
-				'color'  => null,
-				'style'  => null,
-				'width'  => null,
-			),
-			'color'      => array(
-				'background' => null,
-				'gradient'   => null,
-				'link'       => null,
-				'text'       => null,
-			),
-			'spacing'    => array(
-				'padding' => array(
-					'top'    => null,
-					'right'  => null,
-					'bottom' => null,
-					'left'   => null,
-				),
-			),
-			'typography' => array(
-				'fontFamily'     => null,
-				'fontSize'       => null,
-				'fontStyle'      => null,
-				'fontWeight'     => null,
-				'lineHeight'     => null,
-				'textDecoration' => null,
-				'textTransform'  => null,
-			),
-		),
+		'version'         => 1,
 		'settings'        => array(
 			'border'     => array(
 				'radius' => null,
@@ -106,6 +49,39 @@ class WP_Theme_JSON_Schema_V1 implements WP_Theme_JSON_Schema {
 			'custom'     => null,
 			'layout'     => null,
 		),
+		'styles'          => array(
+			'border'     => array(
+				'radius' => null,
+				'color'  => null,
+				'style'  => null,
+				'width'  => null,
+			),
+			'color'      => array(
+				'background' => null,
+				'gradient'   => null,
+				'link'       => null,
+				'text'       => null,
+			),
+			'spacing'    => array(
+				'padding' => array(
+					'top'    => null,
+					'right'  => null,
+					'bottom' => null,
+					'left'   => null,
+				),
+			),
+			'typography' => array(
+				'fontFamily'     => null,
+				'fontSize'       => null,
+				'fontStyle'      => null,
+				'fontWeight'     => null,
+				'lineHeight'     => null,
+				'textDecoration' => null,
+				'textTransform'  => null,
+			),
+		),
+		'customTemplates' => null,
+		'templateParts'   => null,
 	);
 
 	/**
@@ -124,9 +100,9 @@ class WP_Theme_JSON_Schema_V1 implements WP_Theme_JSON_Schema {
 	);
 
 	/**
-	 * Converts a v0 schema into the latest.
+	 * Converts a v1 schema into the latest.
 	 *
-	 * @param array $old Data in v0 schema.
+	 * @param array $old Data in v1 schema.
 	 *
 	 * @return array Data in the latest schema.
 	 */
