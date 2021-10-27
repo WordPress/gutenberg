@@ -99,6 +99,7 @@ class WP_Theme_JSON_Schema_V1 implements WP_Theme_JSON_Schema {
 				'fontSizes'        => null,
 				'fontStyle'        => null,
 				'fontWeight'       => null,
+				'letterSpacing'    => null,
 				'textDecorations'  => null,
 				'textTransforms'   => null,
 			),
@@ -117,6 +118,7 @@ class WP_Theme_JSON_Schema_V1 implements WP_Theme_JSON_Schema {
 		'border.customWidth'               => 'border.width',
 		'typography.customFontStyle'       => 'typography.fontStyle',
 		'typography.customFontWeight'      => 'typography.fontWeight',
+		'typography.customLetterSpacing'   => 'typography.letterSpacing',
 		'typography.customTextDecorations' => 'typography.textDecoration',
 		'typography.customTextTransforms'  => 'typography.textTransform',
 	);

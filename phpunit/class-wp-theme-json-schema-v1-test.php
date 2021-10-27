@@ -37,6 +37,7 @@ class WP_Theme_JSON_Schema_V1_Test extends WP_UnitTestCase {
 				'typography' => array(
 					'customFontStyle'       => false,
 					'customFontWeight'      => false,
+					'customLetterSpacing'   => false,
 					'customTextDecorations' => false,
 					'customTextTransforms'  => false,
 				),
@@ -51,6 +52,7 @@ class WP_Theme_JSON_Schema_V1_Test extends WP_UnitTestCase {
 						'typography' => array(
 							'customFontStyle'       => true,
 							'customFontWeight'      => true,
+							'customLetterSpacing'   => true,
 							'customTextDecorations' => true,
 							'customTextTransforms'  => true,
 						),
@@ -120,6 +122,7 @@ class WP_Theme_JSON_Schema_V1_Test extends WP_UnitTestCase {
 				'typography' => array(
 					'fontStyle'      => false,
 					'fontWeight'     => false,
+					'letterSpacing'  => false,
 					'textDecoration' => false,
 					'textTransform'  => false,
 				),
@@ -134,6 +137,7 @@ class WP_Theme_JSON_Schema_V1_Test extends WP_UnitTestCase {
 						'typography' => array(
 							'fontStyle'      => true,
 							'fontWeight'     => true,
+							'letterSpacing'  => true,
 							'textDecoration' => true,
 							'textTransform'  => true,
 						),
