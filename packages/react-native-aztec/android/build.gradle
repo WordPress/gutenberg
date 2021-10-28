@@ -116,17 +116,13 @@ project.afterEvaluate {
 
                 groupId 'org.wordpress-mobile.gutenberg-mobile'
                 artifactId 'react-native-aztec'
+                artifact tasks.named("androidSourcesJar")
                 // version is set by 'publish-to-s3' plugin
 
                 addDependenciesToPom(pom)
             }
         }
    }
-}
-
-publishToS3Plugin {
-    mavenPublishGroupId 'org.wordpress-mobile.gutenberg-mobile'
-    mavenPublishArtifactId 'react-native-aztec'
 }
 
 def addDependenciesToPom(pom) {
