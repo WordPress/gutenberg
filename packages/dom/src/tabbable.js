@@ -148,7 +148,8 @@ function filterTabbable( focusables ) {
 }
 
 /**
- * @param {Element} context
+ * @param {Element|Document|ShadowRoot} context
+ *
  * @return {Element[]} Tabbable elements within the context.
  */
 export function find( context ) {

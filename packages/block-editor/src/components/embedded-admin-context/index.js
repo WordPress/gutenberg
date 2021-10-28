@@ -79,6 +79,12 @@ export default function EmbeddedAdminContext( props ) {
 			clearTimeout( timeoutId );
 		};
 	}, [] );
+	const content = (
+		<StyleProvider document={ { head: shadow } }>
+			{ props.children }
+		</StyleProvider>
+	);
+
 	return (
 		<div
 			{ ...props }
@@ -87,13 +93,7 @@ export default function EmbeddedAdminContext( props ) {
 			role="button"
 			aria-pressed={ hasFocus }
 		>
-			{ shadow &&
-				createPortal(
-					<StyleProvider document={ { head: shadow } }>
-						{ props.children }
-					</StyleProvider>,
-					shadow
-				) }
+			{ shadow && createPortal( content, shadow ) }
 		</div>
 	);
 }

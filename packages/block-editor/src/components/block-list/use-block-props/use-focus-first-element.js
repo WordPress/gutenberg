@@ -79,23 +79,38 @@ export function useFocusFirstElement( clientId ) {
 			return;
 		}
 
-		// Find all tabbables within node.
-		const textInputs = focus.tabbable
-			.find( ref.current )
-			.filter( ( node ) => isTextField( node ) );
+		let target = ref.current;
+		let candidates;
 
 		// If reversed (e.g. merge via backspace), use the last in the set of
 		// tabbables.
 		const isReverse = -1 === initialPosition;
-		const target =
-			( isReverse ? last : first )( textInputs ) || ref.current;
+
+		// Find all text fields or placeholders within the block.
+		candidates = focus.tabbable
+			.find( target )
+			.filter( ( node ) => isTextField( node ) || node.shadowRoot );
+
+		target = ( isReverse ? last : first )( candidates ) || target;
 
 		if ( ! isInsideRootBlock( ref.current, target ) ) {
 			ref.current.focus();
 			return;
 		}
 
-		placeCaretAtHorizontalEdge( target, isReverse );
+		if ( target.shadowRoot ) {
+			// We must wait for the placeholder content to load.
+			setTimeout( () => {
+				// Find all text fields within the placeholder.
+				candidates = focus.tabbable
+					.find( target.shadowRoot )
+					.filter( ( node ) => isTextField( node ) );
+				target = ( isReverse ? last : first )( candidates ) || target;
+				placeCaretAtHorizontalEdge( target, isReverse );
+			} );
+		} else {
+			placeCaretAtHorizontalEdge( target, isReverse );
+		}
 	}, [ initialPosition ] );
 
 	return ref;

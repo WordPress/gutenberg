@@ -167,6 +167,12 @@ async function insertEmbed( URL ) {
 		`//*[contains(@class, "components-autocomplete__result") and contains(@class, "is-selected") and contains(text(), 'Embed')]`
 	);
 	await page.keyboard.press( 'Enter' );
+	await page.evaluate(
+		() =>
+			new Promise( ( resolve ) => {
+				setTimeout( resolve );
+			} )
+	);
 	await page.keyboard.type( URL );
 	await page.keyboard.press( 'Enter' );
 }
