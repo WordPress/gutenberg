@@ -11,6 +11,9 @@
 		"linkTarget": {
 			"type": "string",
 			"default": "_self"
+		},
+		"textAlign": {
+			"type": "string"
 		}
 	},
 	"supports": {
