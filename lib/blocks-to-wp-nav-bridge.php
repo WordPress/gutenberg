@@ -22,24 +22,22 @@ function transform_navigation_block_into_wp_posts( $nav_block ) {
 		$stack[] = array(
 			'block'  => $block,
 			'parent' => 0,
-			'order'  => ++$order,
 		);
 	}
 
 	while ( ! empty( $stack ) ) {
 		$item = array_pop( $stack );
-		$post = block_to_post( $item['block'], $item['order'], $item['parent'] );
+		$post = block_to_post( $item['block'], ++$order, $item['parent'] );
 		if ( $post ) {
 			$all_posts[] = $post;
 		}
 		$inner_blocks = ! empty( $item['block']['innerBlocks'] ) ? $item['block']['innerBlocks'] : array();
 		foreach ( $inner_blocks as $inner_block ) {
-			array_push(
+			array_unshift(
 				$stack,
 				array(
 					'block'  => $inner_block,
 					'parent' => $post ? $post->ID : 0,
-					'order'  => ++$order,
 				)
 			);
 		}
