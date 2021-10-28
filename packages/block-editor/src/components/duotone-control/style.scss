@@ -1,5 +1,7 @@
 .block-editor-duotone-control__popover {
 	> .components-popover__content {
+		padding: $grid-unit-10;
+
 		// Matches 8 swatches in width.
 		width: 326px;
 	}
@@ -15,6 +17,7 @@
 
 .block-editor-duotone-control__description {
 	margin: $grid-unit-20 0;
+	font-size: $helptext-font-size;
 }
 
 // Better align the popover under the swatch.
