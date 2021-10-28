@@ -60,14 +60,19 @@ export default function useFixedWindowList(
 			return;
 		}
 		const scrollContainer = getScrollContainer( elementRef.current );
-		const measureWindow = () => {
+		const measureWindow = (
+			/** @type {boolean | undefined} */ initRender
+		) => {
 			if ( ! scrollContainer ) {
 				return;
 			}
 			const visibleItems = Math.ceil(
 				scrollContainer.clientHeight / itemHeight
 			);
-			const windowOverscan = options?.windowOverscan ?? visibleItems;
+			// Aim to keep opening list view fast, afterward we can optimize for scrolling
+			const windowOverscan = initRender
+				? visibleItems
+				: options?.windowOverscan ?? visibleItems;
 			const firstViewableIndex = Math.floor(
 				scrollContainer.scrollTop / itemHeight
 			);
@@ -96,7 +101,7 @@ export default function useFixedWindowList(
 			} );
 		};
 
-		measureWindow();
+		measureWindow( true );
 		const debounceMeasureList = debounce( () => {
 			measureWindow();
 		}, 16 );
