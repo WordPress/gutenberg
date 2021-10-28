@@ -11,8 +11,7 @@
 			"type": "number"
 		},
 		"queryPerPage": {
-			"type": "number",
-			"default": 4
+			"type": "number"
 		},
 		"tagName": {
 			"type": "string",

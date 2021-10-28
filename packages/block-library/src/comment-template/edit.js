@@ -38,14 +38,24 @@ export default function CommentTemplateEdit( {
 
 	const { comments, blocks } = useSelect(
 		( select ) => {
-			const { getEntityRecords } = select( coreStore );
+			const { getEntityRecords, getEntityRecord } = select( coreStore );
 			const { getBlocks } = select( blockEditorStore );
+
+			const siteSettings = getEntityRecord( 'root', 'site' );
 
 			return {
 				comments: getEntityRecords( 'root', 'comment', {
 					post: postId,
 					status: 'approve',
-					per_page: queryPerPage,
+					per_page:
+						// `commentsPerPage` are added to the REST API.
+						//
+						// If the `queryPerPage` is set, use that. Otherwise, use the value
+						// from the site settings. If those are not available for some
+						// reason, use `50` (it's the same as the default value of commentsPerPage)
+						queryPerPage ||
+						parseInt( siteSettings?.comments_per_page, 10 ) ||
+						50,
 					order: 'asc',
 				} ),
 				blocks: getBlocks( clientId ),
