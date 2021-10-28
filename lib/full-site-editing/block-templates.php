@@ -204,6 +204,9 @@ function _gutenberg_flatten_blocks( &$blocks ) {
  * @return string Updated wp_template content.
  */
 function _gutenberg_inject_theme_attribute_in_content( $template_content ) {
+	// HACK proof of concept
+	$template_content = str_replace( "{{ template_directory_uri }}", get_template_directory_uri(), $template_content );
+
 	$has_updated_content = false;
 	$new_content         = '';
 	$template_blocks     = parse_blocks( $template_content );
