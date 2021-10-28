@@ -1563,20 +1563,55 @@ export const getInserterItems = createSelector(
 			buildScope: 'inserter',
 		} );
 
-		const buildReusableBlockInserterItem = ( reusableBlock ) => {
-			const id = `core/block/${ reusableBlock.id }`;
+		/*
+		 * Matches block comment delimiters amid serialized content.
+		 *
+		 * @see `tokenizer` in `@wordpress/block-serialization-default-parser`
+		 * package
+		 *
+		 * blockParserTokenizer differs from the original tokenizer in the
+		 * following ways:
+		 *
+		 * - removed global flag (/g)
+		 * - prepended ^\s*
+		 *
+		 */
+		const blockParserTokenizer = /^\s*<!--\s+(\/)?wp:([a-z][a-z0-9_-]*\/)?([a-z][a-z0-9_-]*)\s+({(?:(?=([^}]+|}+(?=})|(?!}\s+\/?-->)[^])*)\5|[^]*?)}\s+)?(\/)?-->/;
 
-			const referencedBlocks = __experimentalGetParsedReusableBlock(
-				state,
-				reusableBlock.id
-			);
-			let referencedBlockType;
-			if ( referencedBlocks.length === 1 ) {
-				referencedBlockType = getBlockType(
-					referencedBlocks[ 0 ].name
-				);
+		const buildReusableBlockInserterItem = ( reusableBlock ) => {
+			let icon = symbol;
+
+			/*
+			 * Instead of always displaying a generic "symbol" icon for every
+			 * reusable block, try to use an icon that represents the first
+			 * outermost block contained in the reusable block. This requires
+			 * scanning the serialized form of the reusable block to find its
+			 * first block delimiter, then looking up the corresponding block
+			 * type, if available.
+			 */
+			if ( Platform.OS === 'web' ) {
+				const content =
+					typeof reusableBlock.content.raw === 'string'
+						? reusableBlock.content.raw
+						: reusableBlock.content;
+				const rawBlockMatch = content.match( blockParserTokenizer );
+				if ( rawBlockMatch ) {
+					const [
+						,
+						,
+						namespace = 'core/',
+						blockName,
+					] = rawBlockMatch;
+					const referencedBlockType = getBlockType(
+						namespace + blockName
+					);
+					if ( referencedBlockType ) {
+						icon = referencedBlockType.icon;
+					}
+				}
 			}
 
+			const id = `core/block/${ reusableBlock.id }`;
 			const { time, count = 0 } = getInsertUsage( state, id ) || {};
 			const frecency = calculateFrecency( time, count );
 
@@ -1585,10 +1620,7 @@ export const getInserterItems = createSelector(
 				name: 'core/block',
 				initialAttributes: { ref: reusableBlock.id },
 				title: reusableBlock.title.raw,
-				icon:
-					referencedBlockType && Platform.OS === 'web'
-						? referencedBlockType.icon
-						: symbol,
+				icon,
 				category: 'reusable',
 				keywords: [],
 				isDisabled: false,
@@ -2070,35 +2102,6 @@ export const __experimentalGetBlockListSettingsForBlocks = createSelector(
 		}, {} );
 	},
 	( state ) => [ state.blockListSettings ]
-);
-
-/**
- * Returns the parsed block saved as shared block with the given ID.
- *
- * @param {Object}        state Global application state.
- * @param {number|string} ref   The shared block's ID.
- *
- * @return {Object} The parsed block.
- */
-export const __experimentalGetParsedReusableBlock = createSelector(
-	( state, ref ) => {
-		const reusableBlock = find(
-			getReusableBlocks( state ),
-			( block ) => block.id === ref
-		);
-		if ( ! reusableBlock ) {
-			return null;
-		}
-
-		// Only reusableBlock.content.raw should be used here, `reusableBlock.content` is a
-		// workaround until #22127 is fixed.
-		return parse(
-			typeof reusableBlock.content.raw === 'string'
-				? reusableBlock.content.raw
-				: reusableBlock.content
-		);
-	},
-	( state ) => [ getReusableBlocks( state ) ]
 );
 
 /**
