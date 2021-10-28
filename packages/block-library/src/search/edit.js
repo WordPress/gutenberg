@@ -29,7 +29,7 @@ import {
 } from '@wordpress/components';
 import { useInstanceId } from '@wordpress/compose';
 import { useDispatch } from '@wordpress/data';
-import { useEffect } from '@wordpress/element';
+import { useEffect, useRef } from '@wordpress/element';
 import { Icon, search } from '@wordpress/icons';
 import { __ } from '@wordpress/i18n';
 
@@ -86,14 +86,25 @@ export default function SearchEdit( {
 
 	// Check if Navigation contains the block.
 	const isNavigationChild = 'showSubmenuIcon' in context;
+	const hasChangedDefaults = useRef( false );
 
 	useEffect( () => {
-		if ( isNavigationChild && showLabel ) {
+		if ( hasChangedDefaults.current ) {
+			return;
+		}
+
+		if ( isNavigationChild ) {
 			// This side-effect should not create an undo level.
 			__unstableMarkNextChangeAsNotPersistent();
-			setAttributes( { showLabel: false } );
+			setAttributes( {
+				showLabel: false,
+				buttonUseIcon: true,
+				buttonPosition: 'button-inside',
+			} );
+
+			hasChangedDefaults.current = true;
 		}
-	}, [ isNavigationChild, showLabel ] );
+	}, [ isNavigationChild ] );
 
 	// Check for old deprecated numerical border radius. Done as a separate
 	// check so that a borderRadius style won't overwrite the longhand
@@ -273,18 +284,16 @@ export default function SearchEdit( {
 		<>
 			<BlockControls>
 				<ToolbarGroup>
-					{ ! isNavigationChild && (
-						<ToolbarButton
-							title={ __( 'Toggle search label' ) }
-							icon={ toggleLabel }
-							onClick={ () => {
-								setAttributes( {
-									showLabel: ! showLabel,
-								} );
-							} }
-							className={ showLabel ? 'is-pressed' : undefined }
-						/>
-					) }
+					<ToolbarButton
+						title={ __( 'Toggle search label' ) }
+						icon={ toggleLabel }
+						onClick={ () => {
+							setAttributes( {
+								showLabel: ! showLabel,
+							} );
+						} }
+						className={ showLabel ? 'is-pressed' : undefined }
+					/>
 					<ToolbarDropdownMenu
 						icon={ getButtonPositionIcon() }
 						label={ __( 'Change button position' ) }
