@@ -1,6 +1,7 @@
 .block-editor-duotone-control__popover {
-	.components-popover__content {
-		min-width: 214px;
+	> .components-popover__content {
+		// Matches 8 swatches in width.
+		width: 334px;
 	}
 
 	.components-circular-option-picker {
@@ -12,11 +13,6 @@
 		width: 100%;
 		box-sizing: border-box;
 	}
-}
-
-.block-editor-duotone-control__popover > .components-popover__content {
-	// Matches 8 swatches in width.
-	width: 334px;
 }
 
 .block-editor-duotone-control__description {
