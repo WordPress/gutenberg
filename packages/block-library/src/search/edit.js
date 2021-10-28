@@ -93,7 +93,7 @@ export default function SearchEdit( {
 			return;
 		}
 
-		if ( isNavigationChild ) {
+		if ( isNavigationChild && showLabel && ! buttonUseIcon ) {
 			// This side-effect should not create an undo level.
 			__unstableMarkNextChangeAsNotPersistent();
 			setAttributes( {
@@ -104,7 +104,7 @@ export default function SearchEdit( {
 
 			hasChangedDefaults.current = true;
 		}
-	}, [ isNavigationChild ] );
+	}, [ isNavigationChild, showLabel, buttonUseIcon ] );
 
 	// Check for old deprecated numerical border radius. Done as a separate
 	// check so that a borderRadius style won't overwrite the longhand
