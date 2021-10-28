@@ -27,11 +27,18 @@ function register_block_core_pattern() {
  * @return string Returns the output of the pattern.
  */
 function render_block_core_pattern( $attributes ) {
-	$slug = $attributes['slug'];
-	if ( class_exists( 'WP_Block_Patterns_Registry' ) && WP_Block_Patterns_Registry::get_instance()->is_registered( $slug ) ) {
-		$pattern = WP_Block_Patterns_Registry::get_instance()->get_registered( $slug );
-		return do_blocks( '<div>' . $pattern['content'] . '</div>' );
+	if ( empty( $attributes['slug'] ) ) {
+		return '';
 	}
+
+	$slug     = $attributes['slug'];
+	$registry = WP_Block_Patterns_Registry::get_instance();
+	if ( ! $registry->is_registered( $slug ) ) {
+		return '';
+	}
+
+	$pattern = $registry->get_registered( $slug );
+	return do_blocks( '<div>' . $pattern['content'] . '</div>' );
 }
 
 add_action( 'init', 'register_block_core_pattern' );
