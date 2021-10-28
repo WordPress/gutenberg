@@ -3,7 +3,7 @@
  */
 import AxePuppeteer from '@axe-core/puppeteer';
 
-/** @typedef {import('puppeteer').Page} Page */
+/** @typedef {import('puppeteer-core').Page} Page */
 
 /** @typedef {import('axe-core').RunOptions} RunOptions */
 
