@@ -16,13 +16,12 @@ import { PanelBody, ToggleControl } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 
 export default function Edit( {
-	attributes: { className, linkTarget, textAlign },
+	attributes: { linkTarget, textAlign },
 	setAttributes,
 } ) {
 	const blockProps = useBlockProps( {
 		className: classnames( {
 			[ `has-text-align-${ textAlign }` ]: textAlign,
-			className,
 		} ),
 	} );
 
