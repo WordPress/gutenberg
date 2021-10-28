@@ -14,7 +14,7 @@
 		"navigationMenuId": {
 			"type": "number"
 		},
-		"navigationArea": {
+		"navigationAreaId": {
 			"type": "number"
 		},
 		"orientation": {

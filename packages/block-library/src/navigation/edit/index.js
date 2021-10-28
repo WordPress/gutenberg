@@ -102,7 +102,7 @@ function Navigation( {
 		orientation,
 		overlayMenu,
 		showSubmenuIcon,
-		navigationArea,
+		navigationAreaId,
 	} = attributes;
 
 	const [ hasAlreadyRendered, RecursionProvider ] = useNoRecursiveRenders(
@@ -210,10 +210,10 @@ function Navigation( {
 		const updateNavEntityArea = async () => {
 			const noTerms = [];
 
-			// navigationArea is of type "number". Therefore
+			// navigationAreaId is of type "number". Therefore
 			// ID: 0 is used to represent a value of "none".
 			const maybeNewAreaTermId =
-				navigationArea > 0 ? [ navigationArea ] : noTerms;
+				navigationAreaId > 0 ? [ navigationAreaId ] : noTerms;
 
 			// Toggle the active navigaiton area term.
 			await editEntityRecord(
@@ -233,9 +233,9 @@ function Navigation( {
 			);
 		};
 		if ( isEntityAvailable ) {
-			updateNavEntityArea( navigationArea );
+			updateNavEntityArea( navigationAreaId );
 		}
-	}, [ navigationArea ] );
+	}, [ navigationAreaId ] );
 
 	// If the block has inner blocks, but no menu id, this was an older
 	// navigation block added before the block used a wp_navigation entity.
@@ -341,10 +341,10 @@ function Navigation( {
 					) }
 					<PanelBody title={ __( 'Navigation Area' ) }>
 						<NavigationAreaSelector
-							navigationArea={ navigationArea }
-							onSelect={ ( navAreaId ) => {
+							navigationAreaId={ navigationAreaId }
+							onSelect={ ( _id ) => {
 								setAttributes( {
-									navigationArea: navAreaId,
+									navigationAreaId: _id,
 								} );
 							} }
 						/>

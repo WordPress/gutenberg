@@ -13,7 +13,7 @@ const navOptionPlaceholder = [
 ];
 
 export default function NavigationAreaSelector( props ) {
-	const { navigationArea, onSelect } = props;
+	const { navigationAreaId, onSelect } = props;
 	const { areas, isRequesting } = useSelect( ( select ) => {
 		const { getEntityRecords, isResolving } = select( coreStore );
 		return {
@@ -36,7 +36,7 @@ export default function NavigationAreaSelector( props ) {
 	return (
 		<SelectControl
 			label="Navigation Area"
-			value={ navigationArea }
+			value={ navigationAreaId }
 			options={ navOptionPlaceholder.concat(
 				areas.map( ( { id, name } ) => {
 					return {
@@ -45,8 +45,8 @@ export default function NavigationAreaSelector( props ) {
 					};
 				} )
 			) }
-			onChange={ ( areaId ) => {
-				onSelect( Number( areaId ) );
+			onChange={ ( value ) => {
+				onSelect( Number( value ) );
 			} }
 		/>
 	);
