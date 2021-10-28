@@ -7,7 +7,7 @@
 			"orientation": "horizontal",
 			"showSubmenuIcon": true,
 			"openSubmenusOnClick": false,
-			"overlayMenu": "never"
+			"overlayMenu": "mobile"
 		},
 		"innerBlocks": [],
 		"originalContent": ""

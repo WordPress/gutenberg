@@ -11,7 +11,6 @@ import namesPlugin from 'colord/plugins/names';
  */
 import { useState, useMemo } from '@wordpress/element';
 import { settings } from '@wordpress/icons';
-import { useDebounce } from '@wordpress/compose';
 import { __ } from '@wordpress/i18n';
 
 /**
@@ -33,7 +32,6 @@ import {
 import { ColorDisplay } from './color-display';
 import { ColorInput } from './color-input';
 import { Picker } from './picker';
-import { useControlledValue } from '../utils/hooks';
 
 import type { ColorType } from './types';
 
@@ -59,32 +57,23 @@ const ColorPicker = (
 ) => {
 	const {
 		enableAlpha = false,
-		color: colorProp,
+		color,
 		onChange,
-		defaultValue,
+		defaultValue = '#fff',
 		copyFormat,
 		...divProps
 	} = useContextSystem( props, 'ColorPicker' );
 
-	const [ color, setColor ] = useControlledValue( {
-		onChange,
-		value: colorProp,
-		defaultValue,
-	} );
-
 	// Use a safe default value for the color and remove the possibility of `undefined`.
 	const safeColordColor = useMemo( () => {
-		return color ? colord( color ) : colord( '#fff' );
-	}, [ color ] );
-
-	// Debounce to prevent rapid changes from conflicting with one another.
-	const debouncedSetColor = useDebounce( setColor );
+		return color ? colord( color ) : colord( defaultValue );
+	}, [ color, defaultValue ] );
 
 	const handleChange = useCallback(
 		( nextValue: Colord ) => {
-			debouncedSetColor( nextValue.toHex() );
+			onChange( nextValue.toHex() );
 		},
-		[ debouncedSetColor ]
+		[ onChange ]
 	);
 
 	const [ showInputs, setShowInputs ] = useState< boolean >( false );

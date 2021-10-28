@@ -11,6 +11,9 @@
 	],
 	"textdomain": "default",
 	"attributes": {
+		"navigationMenuId": {
+			"type": "number"
+		},
 		"orientation": {
 			"type": "string",
 			"default": "horizontal"
@@ -46,7 +49,7 @@
 		},
 		"overlayMenu": {
 			"type": "string",
-			"default": "never"
+			"default": "mobile"
 		},
 		"__unstableLocation": {
 			"type": "string"

@@ -80,8 +80,11 @@ import * as postContent from './post-content';
 import * as postAuthor from './post-author';
 import * as postComment from './post-comment';
 import * as postCommentAuthor from './post-comment-author';
+import * as postCommentAuthorAvatar from './post-comment-author-avatar';
 import * as postCommentContent from './post-comment-content';
 import * as postCommentDate from './post-comment-date';
+import * as postCommentEdit from './post-comment-edit';
+import * as postCommentReplyLink from './post-comment-reply-link';
 import * as postComments from './post-comments';
 import * as postCommentsCount from './post-comments-count';
 import * as postCommentsForm from './post-comments-form';
@@ -241,8 +244,11 @@ export const __experimentalRegisterExperimentalCoreBlocks =
 								postAuthor,
 								postComment,
 								postCommentAuthor,
+								postCommentAuthorAvatar,
 								postCommentContent,
 								postCommentDate,
+								postCommentEdit,
+								postCommentReplyLink,
 								postComments,
 								postCommentsCount,
 								postCommentsForm,

@@ -69,14 +69,10 @@ export const ToolsPanelHeader = css`
 	 */
 	.components-dropdown-menu {
 		margin: ${ space( -1 ) } 0;
-		height: ${ space( 6 ) };
-
-		.components-dropdown-menu__toggle {
-			padding: 0;
-			height: ${ space( 6 ) };
-			min-width: ${ space( 6 ) };
-			width: ${ space( 6 ) };
-		}
+	}
+	&&&& .components-dropdown-menu__toggle {
+		padding: 0;
+		min-width: ${ space( 6 ) };
 	}
 `;
 

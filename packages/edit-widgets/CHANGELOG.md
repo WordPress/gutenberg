@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Enhancement
+
+-  Enable persistent List View in the widget editor [#35706](https://github.com/WordPress/gutenberg/pull/35706).
+
 ## 3.0.0 (2021-07-29)
 
 ### Breaking Change

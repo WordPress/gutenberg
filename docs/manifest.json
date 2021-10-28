@@ -1,105 +1,87 @@
 [
 	{
-		"title": "Getting started",
+		"title": "Block Editor Handbook",
 		"slug": "handbook",
 		"markdown_source": "../docs/README.md",
 		"parent": null
 	},
 	{
-		"title": "Tutorials",
-		"slug": "tutorials",
-		"markdown_source": "../docs/getting-started/tutorials/README.md",
-		"parent": "handbook"
+		"title": "Getting Started",
+		"slug": "getting-started",
+		"markdown_source": "../docs/getting-started/README.md",
+		"parent": null
 	},
 	{
 		"title": "Development Environment",
 		"slug": "devenv",
-		"markdown_source": "../docs/getting-started/tutorials/devenv/README.md",
-		"parent": "tutorials"
+		"markdown_source": "../docs/getting-started/devenv/README.md",
+		"parent": "getting-started"
 	},
 	{
 		"title": "How to setup local WordPress environment on Ubuntu",
 		"slug": "docker-ubuntu",
-		"markdown_source": "../docs/getting-started/tutorials/devenv/docker-ubuntu.md",
+		"markdown_source": "../docs/getting-started/devenv/docker-ubuntu.md",
 		"parent": "devenv"
 	},
 	{
 		"title": "Create a Block Tutorial",
 		"slug": "create-block",
-		"markdown_source": "../docs/getting-started/tutorials/create-block/README.md",
-		"parent": "tutorials"
+		"markdown_source": "../docs/getting-started/create-block/README.md",
+		"parent": "getting-started"
 	},
 	{
 		"title": "WordPress Plugin",
 		"slug": "wp-plugin",
-		"markdown_source": "../docs/getting-started/tutorials/create-block/wp-plugin.md",
+		"markdown_source": "../docs/getting-started/create-block/wp-plugin.md",
 		"parent": "create-block"
 	},
 	{
 		"title": "Anatomy of a Block",
 		"slug": "block-anatomy",
-		"markdown_source": "../docs/getting-started/tutorials/create-block/block-anatomy.md",
+		"markdown_source": "../docs/getting-started/create-block/block-anatomy.md",
 		"parent": "create-block"
 	},
 	{
 		"title": "Block Attributes",
 		"slug": "attributes",
-		"markdown_source": "../docs/getting-started/tutorials/create-block/attributes.md",
+		"markdown_source": "../docs/getting-started/create-block/attributes.md",
 		"parent": "create-block"
 	},
 	{
 		"title": "Code Implementation",
 		"slug": "block-code",
-		"markdown_source": "../docs/getting-started/tutorials/create-block/block-code.md",
+		"markdown_source": "../docs/getting-started/create-block/block-code.md",
 		"parent": "create-block"
 	},
 	{
 		"title": "Authoring Experience",
 		"slug": "author-experience",
-		"markdown_source": "../docs/getting-started/tutorials/create-block/author-experience.md",
+		"markdown_source": "../docs/getting-started/create-block/author-experience.md",
 		"parent": "create-block"
 	},
 	{
 		"title": "Finishing Touches",
 		"slug": "finishing",
-		"markdown_source": "../docs/getting-started/tutorials/create-block/finishing.md",
+		"markdown_source": "../docs/getting-started/create-block/finishing.md",
 		"parent": "create-block"
 	},
 	{
 		"title": "Share your Block with the World",
 		"slug": "submitting-to-block-directory",
-		"markdown_source": "../docs/getting-started/tutorials/create-block/submitting-to-block-directory.md",
+		"markdown_source": "../docs/getting-started/create-block/submitting-to-block-directory.md",
 		"parent": "create-block"
 	},
 	{
 		"title": "Full Site Editing",
 		"slug": "full-site-editing",
 		"markdown_source": "../docs/getting-started/full-site-editing.md",
-		"parent": "handbook"
-	},
-	{
-		"title": "Glossary",
-		"slug": "glossary",
-		"markdown_source": "../docs/getting-started/glossary.md",
-		"parent": "handbook"
-	},
-	{
-		"title": "Frequently Asked Questions",
-		"slug": "faq",
-		"markdown_source": "../docs/getting-started/faq.md",
-		"parent": "handbook"
-	},
-	{
-		"title": "History",
-		"slug": "history",
-		"markdown_source": "../docs/getting-started/history.md",
-		"parent": "handbook"
+		"parent": "getting-started"
 	},
 	{
 		"title": "Outreach",
 		"slug": "outreach",
 		"markdown_source": "../docs/getting-started/outreach.md",
-		"parent": "handbook"
+		"parent": "getting-started"
 	},
 	{
 		"title": "How-to Guides",
@@ -1960,6 +1942,24 @@
 		"slug": "full-site-editing-templates",
 		"markdown_source": "../docs/explanations/architecture/full-site-editing-templates.md",
 		"parent": "architecture"
+	},
+	{
+		"title": "Frequently Asked Questions",
+		"slug": "faq",
+		"markdown_source": "../docs/explanations/faq.md",
+		"parent": "explanations"
+	},
+	{
+		"title": "Glossary",
+		"slug": "glossary",
+		"markdown_source": "../docs/explanations/glossary.md",
+		"parent": "explanations"
+	},
+	{
+		"title": "History",
+		"slug": "history",
+		"markdown_source": "../docs/explanations/history.md",
+		"parent": "explanations"
 	},
 	{
 		"title": "Contributor Guide",
