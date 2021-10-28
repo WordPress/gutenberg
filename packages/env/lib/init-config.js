@@ -150,7 +150,8 @@ function installXdebug( enableXdebug ) {
 
 	return `
 # Install Xdebug:
-RUN pecl install xdebug && docker-php-ext-enable xdebug
+RUN if [ -z "$(pecl list | grep xdebug)" ] ; then pecl install xdebug ; fi
+RUN docker-php-ext-enable xdebug
 RUN echo 'xdebug.start_with_request=yes' >> /usr/local/etc/php/php.ini
 RUN echo 'xdebug.mode=${ enableXdebug }' >> /usr/local/etc/php/php.ini
 RUN echo '${ clientDetectSettings }' >> /usr/local/etc/php/php.ini
