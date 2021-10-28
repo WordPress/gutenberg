@@ -96,6 +96,7 @@ export default function ColorPalette( {
 				/>
 			) }
 			<CircularOptionPicker
+				className="components-color-palette__swatches"
 				options={ colorOptions }
 				actions={
 					!! clearable && (
