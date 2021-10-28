@@ -86,10 +86,18 @@ describe( 'Block variations', () => {
 	test( 'Pick the additional variation in the inserted Columns block', async () => {
 		await insertBlock( 'Columns' );
 
-		const fourColumnsVariation = await page.waitForSelector(
-			'.wp-block[data-type="core/columns"] .block-editor-block-variation-picker__variation[aria-label="Four columns"]'
-		);
-		await fourColumnsVariation.click();
+		// Navigate into the placeholder and activate the 50/50 option.
+		await page.keyboard.press( 'ArrowDown' );
+		await page.keyboard.press( 'Space' );
+		await page.keyboard.press( 'Tab' );
+		await page.keyboard.press( 'Tab' );
+		await page.keyboard.press( 'Tab' );
+		await page.keyboard.press( 'Tab' );
+		await page.keyboard.press( 'Tab' );
+		await page.keyboard.press( 'Tab' );
+		await page.keyboard.press( 'Tab' );
+		await page.keyboard.press( 'Space' );
+
 		expect(
 			await page.$$(
 				'.wp-block[data-type="core/columns"] .wp-block[data-type="core/column"]'

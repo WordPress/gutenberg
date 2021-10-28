@@ -116,7 +116,7 @@ describe( 'block deletion -', () => {
 
 			// Click on the image block so that its wrapper is selected and backspace to delete it.
 			await page.click(
-				'.wp-block[data-type="core/image"] .components-placeholder__label'
+				'.wp-block[data-type="core/image"] [role="button"]'
 			);
 			await page.keyboard.press( 'Backspace' );
 

@@ -26,7 +26,14 @@ const addParagraphsAndColumnsDemo = async () => {
 		`//*[contains(@class, "components-autocomplete__result") and contains(@class, "is-selected") and contains(text(), 'Columns')]`
 	);
 	await page.keyboard.press( 'Enter' );
-	await page.click( ':focus [aria-label="Two columns; equal split"]' );
+
+	// Navigate into the placeholder and activate the 50/50 option.
+	await page.keyboard.press( 'ArrowDown' );
+	await page.keyboard.press( 'Space' );
+	await page.keyboard.press( 'Tab' );
+	await page.keyboard.press( 'Tab' );
+	await page.keyboard.press( 'Space' );
+
 	await page.click( ':focus .block-editor-button-block-appender' );
 	await page.waitForSelector( '.block-editor-inserter__search input:focus' );
 	await page.keyboard.type( 'Paragraph' );
@@ -599,7 +606,9 @@ describe( 'Writing Flow', () => {
 		await page.keyboard.press( 'Enter' );
 		// Move into the placeholder UI.
 		await page.keyboard.press( 'ArrowDown' );
+		await page.keyboard.press( 'Space' );
 		// Tab to the "Create table" button.
+		await page.keyboard.press( 'Tab' );
 		await page.keyboard.press( 'Tab' );
 		await page.keyboard.press( 'Tab' );
 		// Create the table.

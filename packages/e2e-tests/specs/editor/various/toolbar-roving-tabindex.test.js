@@ -101,7 +101,22 @@ describe( 'Toolbar roving tabindex', () => {
 		// Move focus to the first toolbar item
 		await page.keyboard.press( 'Home' );
 		await expectLabelToHaveFocus( 'Table' );
-		await page.click( '.blocks-table__placeholder-button' );
+
+		// Tab to editor content.
+		await page.keyboard.press( 'Tab' );
+
+		// Navigate into the placeholder.
+		await page.keyboard.press( 'ArrowDown' );
+		await page.keyboard.press( 'Space' );
+
+		// Navigate to "Create Table"
+		await page.keyboard.press( 'Tab' );
+		await page.keyboard.press( 'Tab' );
+		await page.keyboard.press( 'Tab' );
+
+		// Create the table.
+		await page.keyboard.press( 'Space' );
+
 		await page.keyboard.press( 'Tab' );
 		await testBlockToolbarKeyboardNavigation( 'Body cell text', 'Table' );
 		await wrapCurrentBlockWithGroup( 'Table' );

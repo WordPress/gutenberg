@@ -56,13 +56,27 @@ export default function EmbeddedAdminContext( props ) {
 			}
 		}
 
+		let timeoutId;
+
+		// Allow clicking through the placeholder so focus moves to the block
+		// wraper, which can handle delete, enter, etc.
+		function onMouseDown() {
+			element.removeAttribute( 'tabindex' );
+			timeoutId = setTimeout( () =>
+				element.setAttribute( 'tabindex', '0' )
+			);
+		}
+
 		root.addEventListener( 'focusin', onFocusIn );
 		root.addEventListener( 'focusout', onFocusOut );
 		element.addEventListener( 'keydown', onKeyDown );
+		element.addEventListener( 'mousedown', onMouseDown );
 		return () => {
-			root.addEventListener( 'focusin', onFocusIn );
-			root.addEventListener( 'focusout', onFocusOut );
+			root.removeEventListener( 'focusin', onFocusIn );
+			root.removeEventListener( 'focusout', onFocusOut );
 			element.removeEventListener( 'keydown', onKeyDown );
+			element.removeEventListener( 'mousedown', onMouseDown );
+			clearTimeout( timeoutId );
 		};
 	}, [] );
 	return (
