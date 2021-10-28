@@ -13,7 +13,6 @@ import { PanelBody, ToggleControl } from '@wordpress/components';
  * @param {Object} props                       React props.
  * @param {Object} props.setAttributes         Callback for updating block attributes.
  * @param {Object} props.attributes            Block attributes.
- * @param {string} props.attributes.className  Block class name.
  * @param {string} props.attributes.isLink     Whether the author name should be linked.
  * @param {string} props.attributes.linkTarget Target of the link.
  * @param {Object} props.context               Inherited context.
@@ -22,11 +21,11 @@ import { PanelBody, ToggleControl } from '@wordpress/components';
  * @return {JSX.Element} React element.
  */
 export default function Edit( {
-	attributes: { className, isLink, linkTarget },
+	attributes: { isLink, linkTarget },
 	context: { commentId },
 	setAttributes,
 } ) {
-	const blockProps = useBlockProps( { className } );
+	const blockProps = useBlockProps();
 	const displayName = useSelect(
 		( select ) => {
 			const { getEntityRecord } = select( coreStore );
@@ -71,7 +70,7 @@ export default function Edit( {
 			<>
 				{ inspectorControls }
 				<div { ...blockProps }>
-					<p>{ _x( 'Post Comment Author', 'block title' ) }</p>
+					<p>{ _x( 'Comment Author', 'block title' ) }</p>
 				</div>
 			</>
 		);
