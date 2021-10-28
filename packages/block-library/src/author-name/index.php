@@ -23,7 +23,7 @@ function render_block_core_author_name( $attributes, $content, $block ) {
 		return '';
 	}
 
-	$author_name = get_the_author_meta( 'display_name', $author_id );
+	$author_name      = get_the_author_meta( 'display_name', $author_id );
 	$align_class_name = empty( $attributes['textAlign'] ) ? '' : "has-text-align-{$attributes['textAlign']}";
 
 	if ( isset( $attributes['isLink'] ) && $attributes['isLink'] ) {
