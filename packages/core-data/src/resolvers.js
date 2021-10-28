@@ -231,14 +231,7 @@ export const getCurrentTheme = () => async ( { dispatch, resolveSelect } ) => {
 /**
  * Requests theme supports data from the index.
  */
-export const getThemeSupports = () => async ( { dispatch, resolveSelect } ) => {
-	const activeThemes = await resolveSelect.getEntityRecords(
-		'root',
-		'theme',
-		{ status: 'active' }
-	);
-	dispatch.receiveThemeSupports( activeThemes[ 0 ].theme_supports );
-};
+export const getThemeSupports = forwardResolver( 'getCurrentTheme' );
 
 /**
  * Requests a preview from the from the Embed API.

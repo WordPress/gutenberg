@@ -15,9 +15,13 @@ function createPreloadingMiddleware( preloadedData ) {
 
 	return ( options, next ) => {
 		const { parse = true } = options;
+		/** @type {string | void} */
 		let rawPath = options.path;
 		if ( ! rawPath && options.url ) {
-			rawPath = getQueryArg( options.url, 'rest_route' );
+			const pathFromQuery = getQueryArg( options.url, 'rest_route' );
+			if ( typeof pathFromQuery === 'string' ) {
+				rawPath = pathFromQuery;
+			}
 		}
 		if ( typeof rawPath === 'string' ) {
 			const method = options.method || 'GET';

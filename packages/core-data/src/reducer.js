@@ -137,26 +137,6 @@ export function currentGlobalStylesId( state = undefined, action ) {
 }
 
 /**
- * Reducer managing theme supports data.
- *
- * @param {Object} state  Current state.
- * @param {Object} action Dispatched action.
- *
- * @return {Object} Updated state.
- */
-export function themeSupports( state = {}, action ) {
-	switch ( action.type ) {
-		case 'RECEIVE_THEME_SUPPORTS':
-			return {
-				...state,
-				...action.themeSupports,
-			};
-	}
-
-	return state;
-}
-
-/**
  * Higher Order Reducer for a given entity config. It supports:
  *
  *  - Fetching
@@ -570,7 +550,6 @@ export default combineReducers( {
 	currentGlobalStylesId,
 	currentUser,
 	taxonomies,
-	themeSupports,
 	entities,
 	undo,
 	embedPreviews,
