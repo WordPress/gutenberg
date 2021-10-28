@@ -9,15 +9,17 @@ import classnames from 'classnames';
 import {
 	AlignmentControl,
 	BlockControls,
+	InspectorControls,
 	useBlockProps,
 } from '@wordpress/block-editor';
 import { useSelect } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
 import { store as coreStore } from '@wordpress/core-data';
+import { PanelBody, ToggleControl } from '@wordpress/components';
 
 function AuthorNameEdit( {
 	context: { postType, postId },
-	attributes,
+	attributes: { textAlign, isLink, linkTarget },
 	setAttributes,
 } ) {
 	const { authorName } = useSelect(
@@ -36,13 +38,24 @@ function AuthorNameEdit( {
 		[ postType, postId ]
 	);
 
-	const { textAlign } = attributes;
-
 	const blockProps = useBlockProps( {
 		className: classnames( {
 			[ `has-text-align-${ textAlign }` ]: textAlign,
 		} ),
 	} );
+
+	const displayName = authorName?.name || __( 'Author Name' );
+
+	const displayAuthor = isLink ? (
+		<a
+			href="#author-pseudo-link"
+			onClick={ ( event ) => event.preventDefault() }
+		>
+			{ displayName }
+		</a>
+	) : (
+		displayName
+	);
 
 	return (
 		<>
@@ -54,12 +67,27 @@ function AuthorNameEdit( {
 					} }
 				/>
 			</BlockControls>
-
-			<div { ...blockProps }>
-				<div className="wp-block-author-name">
-					{ authorName?.name || __( 'Author Name' ) }
-				</div>
-			</div>
+			<InspectorControls>
+				<PanelBody title={ __( 'Link settings' ) }>
+					<ToggleControl
+						label={ __( 'Link to author archive' ) }
+						onChange={ () => setAttributes( { isLink: ! isLink } ) }
+						checked={ isLink }
+					/>
+					{ isLink && (
+						<ToggleControl
+							label={ __( 'Open in new tab' ) }
+							onChange={ ( value ) =>
+								setAttributes( {
+									linkTarget: value ? '_blank' : '_self',
+								} )
+							}
+							checked={ linkTarget === '_blank' }
+						/>
+					) }
+				</PanelBody>
+			</InspectorControls>
+			<div { ...blockProps }> { displayAuthor } </div>
 		</>
 	);
 }

@@ -11,7 +11,7 @@
  * @param  array    $attributes Block attributes.
  * @param  string   $content    Block default content.
  * @param  WP_Block $block      Block instance.
- * @return string Returns the rendered author block.
+ * @return string Returns the rendered author name block.
  */
 function render_block_core_author_name( $attributes, $content, $block ) {
 	if ( ! isset( $block->context['postId'] ) ) {
@@ -23,14 +23,16 @@ function render_block_core_author_name( $attributes, $content, $block ) {
 		return '';
 	}
 
-	$classes = array_merge(
-		isset( $attributes['className'] ) ? array( $attributes['className'] ) : array(),
-		isset( $attributes['textAlign'] ) ? array( 'has-text-align-' . $attributes['textAlign'] ) : array()
-	);
+	$author_name = get_the_author_meta( 'display_name', $author_id );
+	$align_class_name = empty( $attributes['textAlign'] ) ? '' : "has-text-align-{$attributes['textAlign']}";
 
-	$wrapper_attributes = get_block_wrapper_attributes( array( 'class' => implode( ' ', $classes ) ) );
+	if ( isset( $attributes['isLink'] ) && $attributes['isLink'] ) {
+		$author_name = sprintf( '<a href="%1$s" target="%2$s" class="wp-block-author-name__link">%3$s</a>', get_author_posts_url( $author_id ), $attributes['linkTarget'], $author_name );
+	}
 
-	return sprintf( '<div %1$s>', $wrapper_attributes ) . get_the_author_meta( 'display_name', $author_id ) . '</div>';
+	$wrapper_attributes = get_block_wrapper_attributes( array( 'class' => $align_class_name ) );
+
+	return sprintf( '<div %1$s>', $wrapper_attributes ) . $author_name . '</div>';
 }
 
 /**
