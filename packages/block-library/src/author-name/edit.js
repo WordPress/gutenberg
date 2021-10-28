@@ -20,10 +20,9 @@ function AuthorNameEdit( {
 	attributes,
 	setAttributes,
 } ) {
-
 	const { authorName } = useSelect(
 		( select ) => {
-			const { getEditedEntityRecord, getUser, } = select( coreStore );
+			const { getEditedEntityRecord, getUser } = select( coreStore );
 			const _authorId = getEditedEntityRecord(
 				'postType',
 				postType,
