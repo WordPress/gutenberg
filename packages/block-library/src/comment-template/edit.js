@@ -37,7 +37,9 @@ export default function CommentTemplateEdit( {
 			return {
 				comments: getEntityRecords( 'root', 'comment', {
 					post: postId,
+					status: 'approve',
 					per_page: queryPerPage,
+					order: 'asc',
 				} ),
 				blocks: getBlocks( clientId ),
 			};
