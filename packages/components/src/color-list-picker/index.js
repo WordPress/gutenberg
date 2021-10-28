@@ -29,6 +29,7 @@ function ColorOption( {
 			</Button>
 			{ isOpen && (
 				<ColorPalette
+					className="components-color-list-picker__color-picker"
 					colors={ colors }
 					value={ value }
 					clearable={ false }
