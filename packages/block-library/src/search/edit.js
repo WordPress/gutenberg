@@ -14,6 +14,7 @@ import {
 	__experimentalUseBorderProps as useBorderProps,
 	__experimentalUnitControl as UnitControl,
 	__experimentalUseColorProps as useColorProps,
+	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import {
 	ToolbarDropdownMenu,
@@ -27,6 +28,8 @@ import {
 	__experimentalUseCustomUnits as useCustomUnits,
 } from '@wordpress/components';
 import { useInstanceId } from '@wordpress/compose';
+import { useDispatch } from '@wordpress/data';
+import { useEffect } from '@wordpress/element';
 import { Icon, search } from '@wordpress/icons';
 import { __ } from '@wordpress/i18n';
 
@@ -54,6 +57,7 @@ const DEFAULT_INNER_PADDING = '4px';
 
 export default function SearchEdit( {
 	className,
+	context,
 	attributes,
 	setAttributes,
 	toggleSelection,
@@ -75,6 +79,21 @@ export default function SearchEdit( {
 	const borderRadius = style?.border?.radius;
 	const borderColor = style?.border?.color;
 	const borderProps = useBorderProps( attributes );
+
+	const { __unstableMarkNextChangeAsNotPersistent } = useDispatch(
+		blockEditorStore
+	);
+
+	// Check if Navigation contains the block.
+	const isNavigationChild = 'showSubmenuIcon' in context;
+
+	useEffect( () => {
+		if ( isNavigationChild && showLabel ) {
+			// This side-effect should not create an undo level.
+			__unstableMarkNextChangeAsNotPersistent();
+			setAttributes( { showLabel: false } );
+		}
+	}, [ isNavigationChild, showLabel ] );
 
 	// Check for old deprecated numerical border radius. Done as a separate
 	// check so that a borderRadius style won't overwrite the longhand
@@ -254,16 +273,18 @@ export default function SearchEdit( {
 		<>
 			<BlockControls>
 				<ToolbarGroup>
-					<ToolbarButton
-						title={ __( 'Toggle search label' ) }
-						icon={ toggleLabel }
-						onClick={ () => {
-							setAttributes( {
-								showLabel: ! showLabel,
-							} );
-						} }
-						className={ showLabel ? 'is-pressed' : undefined }
-					/>
+					{ ! isNavigationChild && (
+						<ToolbarButton
+							title={ __( 'Toggle search label' ) }
+							icon={ toggleLabel }
+							onClick={ () => {
+								setAttributes( {
+									showLabel: ! showLabel,
+								} );
+							} }
+							className={ showLabel ? 'is-pressed' : undefined }
+						/>
+					) }
 					<ToolbarDropdownMenu
 						icon={ getButtonPositionIcon() }
 						label={ __( 'Change button position' ) }

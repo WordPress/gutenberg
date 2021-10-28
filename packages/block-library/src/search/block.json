@@ -39,6 +39,7 @@
 			"default": false
 		}
 	},
+	"usesContext": [ "showSubmenuIcon" ],
 	"supports": {
 		"align": [ "left", "center", "right" ],
 		"color": {
