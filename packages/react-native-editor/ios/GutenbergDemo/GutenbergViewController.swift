@@ -264,6 +264,10 @@ extension GutenbergViewController: GutenbergBridgeDelegate {
     func gutenbergDidRequestGotoCustomerSupportOptions() {
         print(#function)
     }
+
+    func gutenbergDidRequestSendEventToHost(_ eventName: String, properties: [AnyHashable: Any]) -> Void {
+        print("Gutenberg requested sending '\(eventName)' event to host with propreties: \(properties).")
+    }
 }
 
 extension GutenbergViewController: GutenbergWebDelegate {
@@ -317,8 +321,10 @@ extension GutenbergViewController: GutenbergBridgeDataSource {
             .tiledGalleryBlock: true,
             .isAudioBlockMediaUploadEnabled: true,
             .reusableBlock: false,
-            .editorOnboarding: false,
-            .firstGutenbergEditorSession: false,
+            .facebookEmbed: true,
+            .instagramEmbed: true,
+            .loomEmbed: true,
+            .smartframeEmbed: true,
         ]
     }
 

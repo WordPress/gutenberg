@@ -9,16 +9,16 @@ import { __ } from '@wordpress/i18n';
  * Internal dependencies
  */
 import { useHasBorderPanel } from './border-panel';
-import { useHasColorPanel } from './color-panel';
+import { useHasColorPanel } from './color-utils';
 import { useHasDimensionsPanel } from './dimensions-panel';
 import { useHasTypographyPanel } from './typography-panel';
 import NavigationButton from './navigation-button';
 
-function ContextMenu( { context, parentMenu = '' } ) {
-	const hasTypographyPanel = useHasTypographyPanel( context );
-	const hasColorPanel = useHasColorPanel( context );
-	const hasBorderPanel = useHasBorderPanel( context );
-	const hasDimensionsPanel = useHasDimensionsPanel( context );
+function ContextMenu( { name, parentMenu = '' } ) {
+	const hasTypographyPanel = useHasTypographyPanel( name );
+	const hasColorPanel = useHasColorPanel( name );
+	const hasBorderPanel = useHasBorderPanel( name );
+	const hasDimensionsPanel = useHasDimensionsPanel( name );
 	const hasLayoutPanel = hasBorderPanel || hasDimensionsPanel;
 
 	return (

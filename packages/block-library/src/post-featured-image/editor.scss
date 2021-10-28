@@ -10,7 +10,7 @@ div[data-type="core/post-featured-image"] {
 	.post-featured-image_placeholder {
 		display: flex;
 		flex-direction: row;
-		align-items: flex-start;
+		align-items: center;
 		border-radius: $radius-block-ui;
 		background-color: $white;
 		box-shadow: inset 0 0 0 $border-width $gray-900;

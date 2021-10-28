@@ -275,7 +275,9 @@ afterEach( async () => {
 	await setUpResponseMocking( [] );
 } );
 
-describe( 'Navigation', () => {
+// Disable reason - these tests are to be re-written.
+// eslint-disable-next-line jest/no-disabled-tests
+describe.skip( 'Navigation', () => {
 	describe( 'Creating from existing Pages', () => {
 		it( 'allows a navigation block to be created using existing pages', async () => {
 			// Mock the response from the Pages endpoint. This is done so that the pages returned are always
@@ -576,7 +578,7 @@ describe( 'Navigation', () => {
 		await createPageButton.click();
 
 		const draftLink = await page.waitForSelector(
-			'.wp-block-navigation-link__content'
+			'.wp-block-navigation-item__content'
 		);
 		await draftLink.click();
 
@@ -598,7 +600,7 @@ describe( 'Navigation', () => {
 		await toggleSidebar();
 
 		const [ openOnClickButton ] = await page.$x(
-			'//label[contains(text(),"Open submenus on click")]'
+			'//label[contains(text(),"Open on click")]'
 		);
 
 		await openOnClickButton.click();
@@ -654,10 +656,12 @@ describe( 'Navigation', () => {
 		await insertBlock( 'Site Title' );
 
 		// Now try inserting another Link block via the quick inserter.
+		await page.focus( '.wp-block-navigation .block-list-appender' );
+
 		await page.click( '.wp-block-navigation .block-list-appender' );
 
-		const [ linkButton ] = await page.$x(
-			"//*[contains(@class, 'block-editor-inserter__quick-inserter')]//*[text()='Custom Link']"
+		const linkButton = await page.waitForSelector(
+			'.block-editor-inserter__quick-inserter .editor-block-list-item-navigation-link'
 		);
 		await linkButton.click();
 
@@ -731,6 +735,7 @@ describe( 'Navigation', () => {
 		expect( tagCount ).toBe( 1 );
 	} );
 
+	// eslint-disable-next-line jest/no-disabled-tests
 	it.skip( 'loads frontend code only if responsiveness is turned on', async () => {
 		await mockPagesResponse( [
 			{

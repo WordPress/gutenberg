@@ -19,10 +19,18 @@
 		"showTitle": {
 			"type": "boolean",
 			"default": false
+		},
+		"linkLabel": {
+			"type": "boolean",
+			"default": false
 		}
 	},
 	"supports": {
 		"reusable": false,
-		"html": false
+		"html": false,
+		"typography": {
+			"fontSize": true,
+			"lineHeight": true
+		}
 	}
 }

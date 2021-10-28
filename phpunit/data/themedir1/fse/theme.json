@@ -39,6 +39,7 @@
 	"templateParts": [
 		{
 			"name": "small-header",
+			"title": "Small Header",
 			"area": "header"
 		}
 	]

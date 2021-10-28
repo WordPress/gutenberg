@@ -16,7 +16,7 @@ const rangeHeightValue = 30;
 const railHeight = 4;
 const rangeHeight = () =>
 	css( { height: rangeHeightValue, minHeight: rangeHeightValue } );
-const thumbSize = 9;
+const thumbSize = 12;
 
 export const Root = styled.div`
 	-webkit-tap-highlight-color: transparent;
@@ -189,10 +189,13 @@ export const ThumbWrapper = styled.span`
 	user-select: none;
 	width: ${ thumbSize }px;
 	border-radius: 50%;
-	transform: translateX( 4.5px );
 
 	${ thumbColor };
 	${ rtl( { marginLeft: -10 } ) };
+	${ rtl(
+		{ transform: 'translateX( 4.5px )' },
+		{ transform: 'translateX( -4.5px )' }
+	) };
 `;
 
 const thumbFocus = ( { isFocused } ) => {
@@ -201,13 +204,13 @@ const thumbFocus = ( { isFocused } ) => {
 				&::before {
 					content: ' ';
 					position: absolute;
-					background-color: transparent;
-					box-shadow: 0 0 0 1.5px var( --wp-admin-theme-color );
+					background-color: var( --wp-admin-theme-color );
+					opacity: 0.4;
 					border-radius: 50%;
-					height: ${ thumbSize + 4 }px;
-					width: ${ thumbSize + 4 }px;
-					top: -2px;
-					left: -2px;
+					height: ${ thumbSize + 8 }px;
+					width: ${ thumbSize + 8 }px;
+					top: -4px;
+					left: -4px;
 				}
 		  `
 		: '';
@@ -249,16 +252,16 @@ const tooltipShow = ( { show } ) => {
 };
 
 const tooltipPosition = ( { position } ) => {
-	const isTop = position === 'top';
+	const isBottom = position === 'bottom';
 
-	if ( isTop ) {
+	if ( isBottom ) {
 		return css`
-			top: -80%;
+			bottom: -80%;
 		`;
 	}
 
 	return css`
-		bottom: -80%;
+		top: -80%;
 	`;
 };
 

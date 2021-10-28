@@ -21,10 +21,21 @@
 			"default": "_self"
 		}
 	},
+	"example": {
+		"viewportWidth": 500,
+		"attributes": {
+			"width": 350
+		}
+	},
 	"supports": {
 		"html": false,
 		"align": true,
-		"alignWide": false
+		"alignWide": false,
+		"color": {
+			"__experimentalDuotone": "img",
+			"text": false,
+			"background": false
+		}
 	},
 	"styles": [
 		{

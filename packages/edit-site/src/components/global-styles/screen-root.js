@@ -4,6 +4,9 @@
 import {
 	__experimentalItemGroup as ItemGroup,
 	__experimentalItem as Item,
+	CardBody,
+	Card,
+	CardDivider,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 
@@ -12,31 +15,36 @@ import { __ } from '@wordpress/i18n';
  */
 import StylesPreview from './preview';
 import NavigationButton from './navigation-button';
-import { useGlobalStylesContext } from '../editor/global-styles-provider';
 import ContextMenu from './context-menu';
 
 function ScreenRoot() {
-	const { root } = useGlobalStylesContext();
-
 	return (
-		<>
-			<StylesPreview />
+		<Card size="small">
+			<CardBody>
+				<StylesPreview />
+			</CardBody>
 
-			<ContextMenu context={ root } />
+			<CardBody>
+				<ContextMenu />
+			</CardBody>
 
-			<ItemGroup>
-				<Item>
-					<p>
-						{ __(
-							'Customize the appearance of specific blocks for the whole site'
-						) }
-					</p>
-				</Item>
-				<NavigationButton path="/blocks">
-					{ __( 'Blocks' ) }
-				</NavigationButton>
-			</ItemGroup>
-		</>
+			<CardDivider />
+
+			<CardBody>
+				<ItemGroup>
+					<Item>
+						<p>
+							{ __(
+								'Customize the appearance of specific blocks for the whole site.'
+							) }
+						</p>
+					</Item>
+					<NavigationButton path="/blocks">
+						{ __( 'Blocks' ) }
+					</NavigationButton>
+				</ItemGroup>
+			</CardBody>
+		</Card>
 	);
 }
 

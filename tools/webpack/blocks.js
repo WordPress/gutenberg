@@ -7,6 +7,11 @@ const { join, sep } = require( 'path' );
 const fastGlob = require( 'fast-glob' );
 
 /**
+ * WordPress dependencies
+ */
+const DependencyExtractionWebpackPlugin = require( '@wordpress/dependency-extraction-webpack-plugin' );
+
+/**
  * Internal dependencies
  */
 const { baseConfig, plugins, stylesTransform } = require( './shared' );
@@ -54,6 +59,7 @@ module.exports = {
 	},
 	plugins: [
 		...plugins,
+		new DependencyExtractionWebpackPlugin( { injectPolyfill: false } ),
 		new CopyWebpackPlugin( {
 			patterns: [].concat(
 				[

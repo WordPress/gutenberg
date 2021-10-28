@@ -8,7 +8,7 @@ import {
 	__experimentalHeading as Heading,
 	__experimentalView as View,
 } from '@wordpress/components';
-import { isRTL } from '@wordpress/i18n';
+import { isRTL, __ } from '@wordpress/i18n';
 import { chevronRight, chevronLeft, Icon } from '@wordpress/icons';
 
 /**
@@ -31,6 +31,7 @@ function ScreenHeader( { back, title, description } ) {
 						}
 						size="small"
 						isBack
+						aria-label={ __( 'Navigate to the previous view' ) }
 					/>
 				</View>
 				<Spacer>

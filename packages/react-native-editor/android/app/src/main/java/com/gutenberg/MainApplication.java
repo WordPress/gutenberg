@@ -268,6 +268,11 @@ public class MainApplication extends Application implements ReactApplication, Gu
             public void requestGotoCustomerSupportOptions() {
                 Toast.makeText(MainApplication.this, "requestGotoCustomerSupportOptions called", Toast.LENGTH_SHORT).show();
             }
+
+            @Override
+            public void sendEventToHost(final String eventName, final ReadableMap properties) {
+                Log.d("SendEventToHost", String.format("Gutenberg requested sending '%s' event to host with properties: %s", eventName, properties));
+            }
         }, isDarkMode());
 
         return new ReactNativeHost(this) {
