@@ -117,9 +117,11 @@ function Navigation( {
 	const hasExistingNavItems = !! innerBlocks.length;
 	const { selectBlock } = useDispatch( blockEditorStore );
 
+	/* eslint-disable no-unused-vars */
 	const { editEntityRecord, saveEditedEntityRecord } = useDispatch(
 		coreStore
 	);
+	/* eslint-enable no-unused-vars */
 
 	const [ isPlaceholderShown, setIsPlaceholderShown ] = useState(
 		! hasExistingNavItems
@@ -134,7 +136,19 @@ function Navigation( {
 		isNavigationMenuMissing,
 		canSwitchNavigationMenu,
 		hasResolvedNavigationMenu,
+		navigationMenu,
 	} = useNavigationMenu( navigationMenuId, navigationAreaId );
+
+	useEffect( () => {
+		// If there is a area ID then the retrieved menu will be
+		// that which is associated with the area. Update the reference
+		// on the block to mirror that.
+		if ( navigationAreaId ) {
+			setAttributes( {
+				navigationMenuId: navigationMenu?.id,
+			} );
+		}
+	}, [ navigationMenu?.id ] );
 
 	const {
 		navigationAreas,
@@ -214,34 +228,31 @@ function Navigation( {
 	}, [ isEntityAvailable ] );
 
 	useEffect( () => {
-		const updateNavEntityArea = async () => {
-			const noTerms = [];
-
-			// navigationAreaId is of type "number". Therefore
-			// ID: 0 is used to represent a value of "none".
-			const maybeNewAreaTermId =
-				navigationAreaId > 0 ? [ navigationAreaId ] : noTerms;
-
-			// Toggle the active navigaiton area term.
-			await editEntityRecord(
-				'postType',
-				'wp_navigation',
-				navigationMenuId,
-				{
-					wp_navigation_area: maybeNewAreaTermId,
-				}
-			);
-
-			// Persist the change.
-			await saveEditedEntityRecord(
-				'postType',
-				'wp_navigation',
-				navigationMenuId
-			);
-		};
-		if ( isEntityAvailable ) {
-			updateNavEntityArea( navigationAreaId );
-		}
+		// const updateNavEntityArea = async () => {
+		// 	const noTerms = [];
+		// 	// navigationAreaId is of type "number". Therefore
+		// 	// ID: 0 is used to represent a value of "none".
+		// 	const maybeNewAreaTermId =
+		// 		navigationAreaId > 0 ? [ navigationAreaId ] : noTerms;
+		// 	// Toggle the active navigaiton area term.
+		// 	await editEntityRecord(
+		// 		'postType',
+		// 		'wp_navigation',
+		// 		navigationMenuId,
+		// 		{
+		// 			wp_navigation_area: maybeNewAreaTermId,
+		// 		}
+		// 	);
+		// 	// Persist the change.
+		// 	await saveEditedEntityRecord(
+		// 		'postType',
+		// 		'wp_navigation',
+		// 		navigationMenuId
+		// 	);
+		// };
+		// if ( isEntityAvailable ) {
+		// 	updateNavEntityArea( navigationAreaId );
+		// }
 	}, [ navigationAreaId ] );
 
 	// If the block has inner blocks, but no menu id, this was an older
@@ -363,20 +374,18 @@ function Navigation( {
 						</PanelBody>
 					) }
 
-					{ !! hasResolvedAreas && (
-						<PanelBody title={ __( 'Navigation Area' ) }>
-							<NavigationAreaSelector
-								navigationAreaId={ navigationAreaId }
-								navigationAreas={ navigationAreas }
-								isRequestingAreas={ isRequestingAreas }
-								onSelect={ ( _id ) => {
-									setAttributes( {
-										navigationAreaId: _id,
-									} );
-								} }
-							/>
-						</PanelBody>
-					) }
+					<PanelBody title={ __( 'Navigation Area' ) }>
+						<NavigationAreaSelector
+							navigationAreaId={ navigationAreaId }
+							navigationAreas={ navigationAreas }
+							isRequestingAreas={ isRequestingAreas }
+							onSelect={ ( _id ) => {
+								setAttributes( {
+									navigationAreaId: _id,
+								} );
+							} }
+						/>
+					</PanelBody>
 
 					{ hasSubmenuIndicatorSetting && (
 						<PanelBody title={ __( 'Display' ) }>
