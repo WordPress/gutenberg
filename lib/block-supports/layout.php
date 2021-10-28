@@ -76,12 +76,9 @@ function gutenberg_get_layout_style( $selector, $layout, $has_block_gap_support 
 			'space-between' => 'space-between',
 		);
 
-		$flex_wrap_options = array(
-			'wrap'   => 'wrap',
-			'nowrap' => 'nowrap',
-		);
-		$flex_wrap         = ! empty( $layout['flexWrap'] ) && array_key_exists( $layout['flexWrap'], $flex_wrap_options ) ?
-			$flex_wrap_options[ $layout['flexWrap'] ] :
+		$flex_wrap_options = array( 'wrap', 'nowrap' );
+		$flex_wrap         = ! empty( $layout['flexWrap'] ) && in_array( $layout['flexWrap'], $flex_wrap_options, true ) ?
+			$layout['flexWrap'] :
 			'wrap';
 
 		$style  = "$selector {";

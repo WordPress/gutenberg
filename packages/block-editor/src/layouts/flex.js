@@ -8,11 +8,7 @@ import {
 	justifyRight,
 	justifySpaceBetween,
 } from '@wordpress/icons';
-import {
-	Button,
-	__experimentalToggleGroupControl as ToggleGroupControl,
-	__experimentalToggleGroupControlOption as ToggleGroupControlOption,
-} from '@wordpress/components';
+import { Button, ToggleControl } from '@wordpress/components';
 
 /**
  * Internal dependencies
@@ -28,10 +24,7 @@ const justifyContentMap = {
 	'space-between': 'space-between',
 };
 
-const flexWrapMap = {
-	wrap: 'wrap',
-	nowrap: 'nowrap',
-};
+const flexWrapOptions = [ 'wrap', 'nowrap' ];
 
 export default {
 	name: 'flex',
@@ -74,7 +67,9 @@ export default {
 		const justifyContent =
 			justifyContentMap[ layout.justifyContent ] ||
 			justifyContentMap.left;
-		const flexWrap = flexWrapMap[ layout.flexWrap ] || flexWrapMap.wrap;
+		const flexWrap = flexWrapOptions.includes( layout.flexWrap )
+			? layout.flexWrap
+			: 'wrap';
 		return (
 			<style>{ `
 				${ appendSelectors( selector ) } {
@@ -178,29 +173,17 @@ function FlexLayoutJustifyContentControl( {
 }
 
 function FlexWrapControl( { layout, onChange } ) {
-	const { flexWrap = flexWrapMap.wrap } = layout;
-	const helpTexts = {
-		wrap: __( 'Items wrap onto multiple lines.' ),
-		nowrap: __( 'Items are forced onto one line.' ),
-	};
+	const { flexWrap = 'wrap' } = layout;
 	return (
-		<ToggleGroupControl
-			label={ __( 'Flex wrap' ) }
-			value={ flexWrap }
-			help={ helpTexts[ flexWrap ] }
+		<ToggleControl
+			label={ __( 'Allow to wrap to multiple lines' ) }
 			onChange={ ( value ) => {
 				onChange( {
 					...layout,
-					flexWrap: value,
+					flexWrap: value ? 'wrap' : 'nowrap',
 				} );
 			} }
-			isBlock
-		>
-			<ToggleGroupControlOption value="wrap" label={ __( 'Wrap' ) } />
-			<ToggleGroupControlOption
-				value="nowrap"
-				label={ __( 'No Wrap' ) }
-			/>
-		</ToggleGroupControl>
+			checked={ flexWrap === 'wrap' }
+		/>
 	);
 }
