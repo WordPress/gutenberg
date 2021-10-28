@@ -12,6 +12,11 @@
  * @param WP_Theme         $theme    The theme object.
  */
 function gutenberg_add_active_global_styles_link( $response, $theme ) {
+	if ( $theme->get_stylesheet() === wp_get_theme()->get_stylesheet() ) {
+		// This creates a record for the current theme if not existant.
+		WP_Theme_JSON_Resolver_Gutenberg::get_user_custom_post_type_id();
+	}
+
 	$wp_query_args       = array(
 		'post_status'    => array( 'publish' ),
 		'post_type'      => 'wp_global_styles',
