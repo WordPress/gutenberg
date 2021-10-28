@@ -1,6 +1,6 @@
 # Thunks in Core-Data
 
-[Gutenberg 11.6](https://github.com/WordPress/gutenberg/pull/27276) added supports for thunks. You can think of thunks as of functions that can be dispatched:
+[Gutenberg 11.6](https://github.com/WordPress/gutenberg/pull/27276) added support for _thunks_. You can think of thunks as functions that can be dispatched:
 
 ```js
 // actions.js
@@ -9,9 +9,9 @@ export const myThunkAction = () => ( { select, dispatch } ) => {
 };
 ```
 
-## Why Are Thunks Useful?
+## Why are thunks useful?
 
-Thunks [expand the meaning of what a Redux action is](https://jsnajdr.wordpress.com/2021/10/04/motivation-for-thunks/). Before thunks, actions were purely functional and could only return and yield data. Common use-cases such as interacting with the store or requesting API data from an action required using a separate [control](https://developer.wordpress.org/block-editor/reference-guides/packages/packages-data/#controls). You would often see code like:
+Thunks [expand the meaning of what a Redux action is](https://jsnajdr.wordpress.com/2021/10/04/motivation-for-thunks/). Before thunks, actions were purely functional and could only return and yield data. Common use cases such as interacting with the store or requesting API data from an action required using a separate [control](https://developer.wordpress.org/block-editor/reference-guides/packages/packages-data/#controls). You would often see code like:
 
 ```js
 export function* saveRecordAction( id ) {
@@ -28,7 +28,7 @@ const controls = {
 };
 ```
 
-Side-effects like store operations and fetch functions would be implemented outside of the action. Thunks provide alternative to this approach. They allow you to use side-effects inline, like this:
+Side effects like store operations and fetch functions would be implemented outside of the action. Thunks provide an alternative to this approach. They allow you to use side effects inline, like this:
 
 ```js
 export const saveRecordAction = ( id ) => async ({ select, dispatch }) => {
@@ -43,7 +43,7 @@ export const saveRecordAction = ( id ) => async ({ select, dispatch }) => {
 
 This removes the need to implement separate controls.
 
-### Thunks Have Access to the Store Helpers
+### Thunks have access to the store helpers
 
 Let's take a look at an example from Gutenberg core. Prior to thunks, the `toggleFeature` action from the `@wordpress/interface` package was implemented like this:
 
@@ -81,7 +81,7 @@ export function toggleFeature( scope, featureName ) {
 
 Thanks to the `select` and `dispatch` arguments, thunks may use the store directly without the need for generators and controls.
 
-### Thunks may be async
+### Thunks can be async
 
 Imagine a simple React app that allows you to set the temperature on a thermostat. It only has one input and one button. Clicking the button dispatches a `saveTemperatureToAPI` action with the value from the input.
 
@@ -147,7 +147,7 @@ const store = wp.data.createReduxStore( 'my-store', {
 } );
 ```
 
-Thunks' support is experimental for now. You can enable it by setting `__experimentalUseThunks: true` when registering your store.
+Support for thunks is experimental for now. You can enable it by setting `__experimentalUseThunks: true` when registering your store.
 
 ## Thunks API
 
@@ -167,7 +167,7 @@ const thunk = () => ( { select } ) => {
 }
 ```
 
-Since not all selectors are exposed on the store, `select` doubles as a function that supports passing selector as an argument:
+Since not all selectors are exposed on the store, `select` doubles as a function that supports passing a selector as an argument:
 
 ```js
 const thunk = () => ( { select } ) => {
@@ -199,7 +199,7 @@ const thunk = () => ( { dispatch } ) => {
 }
 ```
 
-Since not all actions are exposed on the store, `dispatch` doubles as a function that supports passing a redux action as an argument:
+Since not all actions are exposed on the store, `dispatch` doubles as a function that supports passing a Redux action as an argument:
 
 ```js
 const thunk = () => async ( { dispatch } ) => {
@@ -216,8 +216,8 @@ const thunk = () => async ( { dispatch } ) => {
 
 ### registry
 
-Registry provides access to other stores through `dispatch`, `select`, and `resolveSelect` methods.
-They are very similar to the ones described above, with a slight twist. Calling `registry.select( storeName )` returns a function returning an object of selectors from `storeName`. This comes handy when you need to interact with another store. For example:
+A registry provides access to other stores through its `dispatch`, `select`, and `resolveSelect` methods.
+These are very similar to the ones described above, with a slight twist. Calling `registry.select( storeName )` returns a function returning an object of selectors from `storeName`. This comes handy when you need to interact with another store. For example:
 
 ```js
 const thunk = () => ( { registry } ) => {
