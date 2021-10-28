@@ -87,8 +87,7 @@ class URLInput extends Component {
 		if (
 			prevProps.value !== value &&
 			! this.props.disableSuggestions &&
-			! this.isUpdatingSuggestions &&
-			! this.props.__experimentalShowInitialSuggestions
+			! this.isUpdatingSuggestions
 		) {
 			this.updateSuggestions( value );
 		}
