@@ -266,6 +266,12 @@ function entity( entityConfig ) {
 							...state,
 							[ action.recordId ]: nextEdits,
 						};
+					case 'REMOVE_ENTITY_RECORD_EDITS':
+						const updatedEdits = {
+							...state,
+						};
+						delete updatedEdits[ action.recordId ];
+						return updatedEdits;
 				}
 
 				return state;
