@@ -43,6 +43,9 @@ $z-layers: (
 	".wp-block-cover__video-background": 0, // Video background inside cover block.
 	".wp-block-template-part__placeholder-preview-filter-input": 1,
 
+	// Fixed position appender:
+	".block-editor-block-list__block .block-list-appender": 2,
+
 	// Navigation menu dropdown.
 	".has-child .wp-block-navigation__submenu-container": 28,
 	".has-child:hover .wp-block-navigation__submenu-container": 29,
