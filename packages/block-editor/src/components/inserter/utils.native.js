@@ -1,5 +1,12 @@
 const REUSABLE_BLOCKS_CATEGORY = 'reusable';
-const ALLOWED_EMBED_VARIATIONS = [ 'core/embed' ];
+const ALLOWED_EMBED_VARIATIONS = [
+	'core/embed',
+	'core/embed/youtube',
+	'core/embed/twitter',
+	'core/embed/wordpress',
+	'core/embed/instagram',
+	'core/embed/vimeo',
+];
 
 export function blockAllowed( block, { onlyReusable, allowReusable } ) {
 	const { id, category } = block;

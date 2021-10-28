@@ -177,7 +177,7 @@ async function deleteAllLinkedResources() {
 	} );
 }
 
-describe( 'Navigation editor', () => {
+describe.skip( 'Navigation editor', () => {
 	useExperimentalFeatures( [ '#gutenberg-navigation' ] );
 
 	beforeAll( async () => {
@@ -379,11 +379,6 @@ describe( 'Navigation editor', () => {
 			'button[aria-label="Add block"]'
 		);
 		await appender.click();
-
-		const linkInserterItem = await page.waitForXPath(
-			'//button[@role="option"]//span[.="Custom Link"]'
-		);
-		await linkInserterItem.click();
 
 		await page.waitForSelector( 'input[aria-label="URL"]' );
 

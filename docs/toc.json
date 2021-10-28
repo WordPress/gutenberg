@@ -1,46 +1,42 @@
 [
 	{
-		"docs/README.md": [
+		"docs/README.md": []
+	},
+	{
+		"docs/getting-started/README.md": [
 			{
-				"docs/getting-started/tutorials/README.md": [
+				"docs/getting-started/devenv/README.md": [
 					{
-						"docs/getting-started/tutorials/devenv/README.md": [
-							{
-								"docs/getting-started/tutorials/devenv/docker-ubuntu.md": []
-							}
-						]
+						"docs/getting-started/devenv/docker-ubuntu.md": []
+					}
+				]
+			},
+			{
+				"docs/getting-started/create-block/README.md": [
+					{
+						"docs/getting-started/create-block/wp-plugin.md": []
 					},
 					{
-						"docs/getting-started/tutorials/create-block/README.md": [
-							{
-								"docs/getting-started/tutorials/create-block/wp-plugin.md": []
-							},
-							{
-								"docs/getting-started/tutorials/create-block/block-anatomy.md": []
-							},
-							{
-								"docs/getting-started/tutorials/create-block/attributes.md": []
-							},
-							{
-								"docs/getting-started/tutorials/create-block/block-code.md": []
-							},
-							{
-								"docs/getting-started/tutorials/create-block/author-experience.md": []
-							},
-							{
-								"docs/getting-started/tutorials/create-block/finishing.md": []
-							},
-							{
-								"docs/getting-started/tutorials/create-block/submitting-to-block-directory.md": []
-							}
-						]
+						"docs/getting-started/create-block/block-anatomy.md": []
+					},
+					{
+						"docs/getting-started/create-block/attributes.md": []
+					},
+					{
+						"docs/getting-started/create-block/block-code.md": []
+					},
+					{
+						"docs/getting-started/create-block/author-experience.md": []
+					},
+					{
+						"docs/getting-started/create-block/finishing.md": []
+					},
+					{
+						"docs/getting-started/create-block/submitting-to-block-directory.md": []
 					}
 				]
 			},
 			{ "docs/getting-started/full-site-editing.md": [] },
-			{ "docs/getting-started/glossary.md": [] },
-			{ "docs/getting-started/faq.md": [] },
-			{ "docs/getting-started/history.md": [] },
 			{ "docs/getting-started/outreach.md": [] }
 		]
 	},
@@ -299,7 +295,10 @@
 						"docs/explanations/architecture/full-site-editing-templates.md": []
 					}
 				]
-			}
+			},
+			{ "docs/explanations/faq.md": [] },
+			{ "docs/explanations/glossary.md": [] },
+			{ "docs/explanations/history.md": [] }
 		]
 	},
 	{

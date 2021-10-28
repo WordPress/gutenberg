@@ -43,14 +43,6 @@ function createEmptyValue() {
 	};
 }
 
-function simpleFindKey( object, value ) {
-	for ( const key in object ) {
-		if ( object[ key ] === value ) {
-			return key;
-		}
-	}
-}
-
 function toFormat( { type, attributes } ) {
 	let formatType;
 
@@ -94,15 +86,33 @@ function toFormat( { type, attributes } ) {
 
 	const registeredAttributes = {};
 	const unregisteredAttributes = {};
+	const _attributes = { ...attributes };
 
-	for ( const name in attributes ) {
-		const key = simpleFindKey( formatType.attributes, name );
+	for ( const key in formatType.attributes ) {
+		const name = formatType.attributes[ key ];
 
-		if ( key ) {
-			registeredAttributes[ key ] = attributes[ name ];
-		} else {
-			unregisteredAttributes[ name ] = attributes[ name ];
+		registeredAttributes[ key ] = _attributes[ name ];
+
+		if ( formatType.__unstableFilterAttributeValue ) {
+			registeredAttributes[
+				key
+			] = formatType.__unstableFilterAttributeValue(
+				key,
+				registeredAttributes[ key ]
+			);
 		}
+
+		// delete the attribute and what's left is considered
+		// to be unregistered.
+		delete _attributes[ name ];
+
+		if ( typeof registeredAttributes[ key ] === 'undefined' ) {
+			delete registeredAttributes[ key ];
+		}
+	}
+
+	for ( const name in _attributes ) {
+		unregisteredAttributes[ name ] = attributes[ name ];
 	}
 
 	return {
@@ -511,7 +521,7 @@ function createFromElement( {
  *                                            multiline.
  * @param {Array}   [$1.multilineWrapperTags] Tags where lines can be found if
  *                                            nesting is possible.
- * @param {boolean} [$1.currentWrapperTags]   Whether to prepend a line
+ * @param {Array}   [$1.currentWrapperTags]   Whether to prepend a line
  *                                            separator.
  * @param {boolean} [$1.preserveWhiteSpace]   Whether or not to collapse white
  *                                            space characters.

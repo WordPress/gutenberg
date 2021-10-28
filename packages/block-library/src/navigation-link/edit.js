@@ -7,9 +7,10 @@ import { escape } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { createBlock } from '@wordpress/blocks';
+import { createBlock, switchToBlockType } from '@wordpress/blocks';
 import { useSelect, useDispatch } from '@wordpress/data';
 import {
+	Button,
 	PanelBody,
 	Popover,
 	TextControl,
@@ -22,8 +23,7 @@ import { displayShortcut, isKeyboardEvent, ENTER } from '@wordpress/keycodes';
 import { __, sprintf } from '@wordpress/i18n';
 import {
 	BlockControls,
-	InnerBlocks,
-	__experimentalUseInnerBlocksProps as useInnerBlocksProps,
+	BlockIcon,
 	InspectorControls,
 	RichText,
 	__experimentalLinkControl as LinkControl,
@@ -46,10 +46,7 @@ import { store as coreStore } from '@wordpress/core-data';
 /**
  * Internal dependencies
  */
-import { ItemSubmenuIcon } from './icons';
 import { name } from './block.json';
-
-const ALLOWED_BLOCKS = [ 'core/navigation-link' ];
 
 const MAX_NESTING = 5;
 
@@ -226,21 +223,23 @@ export const updateNavigationLinkBlockAttributes = (
 		kind: originalKind = '',
 		type: originalType = '',
 	} = blockAttributes;
+
 	const {
-		title = '',
+		title = '', // the title of any provided Post.
 		url = '',
+
 		opensInNewTab,
 		id,
 		kind: newKind = originalKind,
 		type: newType = originalType,
 	} = updatedValue;
-
 	const normalizedTitle = title.replace( /http(s?):\/\//gi, '' );
 	const normalizedURL = url.replace( /http(s?):\/\//gi, '' );
 	const escapeTitle =
 		title !== '' &&
 		normalizedTitle !== normalizedURL &&
 		originalLabel !== title;
+
 	const label = escapeTitle
 		? escape( title )
 		: originalLabel || escape( normalizedURL );
@@ -266,6 +265,53 @@ export const updateNavigationLinkBlockAttributes = (
 	} );
 };
 
+/**
+ * Removes HTML from a given string.
+ * Note the does not provide XSS protection or otherwise attempt
+ * to filter strings with malicious intent.
+ *
+ * See also: https://github.com/WordPress/gutenberg/pull/35539
+ *
+ * @param {string} html the string from which HTML should be removed.
+ * @return {string} the "cleaned" string.
+ */
+function navStripHTML( html ) {
+	const doc = document.implementation.createHTMLDocument( '' );
+	doc.body.innerHTML = html;
+	return doc.body.textContent || '';
+}
+
+/**
+ * Add transforms to Link Control
+ */
+
+function LinkControlTransforms( { block, transforms, replace } ) {
+	return (
+		<div className="link-control-transform">
+			<h3 className="link-control-transform__subheading">Transform</h3>
+			<div className="link-control-transform__items">
+				{ transforms.map( ( item, index ) => {
+					return (
+						<Button
+							key={ `transform-${ index }` }
+							onClick={ () =>
+								replace(
+									block.clientId,
+									switchToBlockType( block, item.name )
+								)
+							}
+							className="link-control-transform__item"
+						>
+							<BlockIcon icon={ item.icon } />
+							{ item.title }
+						</Button>
+					);
+				} ) }
+			</div>
+		</div>
+	);
+}
+
 export default function NavigationLinkEdit( {
 	attributes,
 	isSelected,
@@ -286,11 +332,12 @@ export default function NavigationLinkEdit( {
 		title,
 		kind,
 	} = attributes;
+
 	const link = {
 		url,
 		opensInNewTab,
+		title: label && navStripHTML( label ), // don't allow HTML to display inside the <LinkControl>
 	};
-	const { showSubmenuIcon } = context;
 	const { saveEntityRecord } = useDispatch( coreStore );
 	const {
 		replaceBlock,
@@ -307,14 +354,15 @@ export default function NavigationLinkEdit( {
 		isAtMaxNesting,
 		isTopLevelLink,
 		isParentOfSelectedBlock,
-		isImmediateParentOfSelectedBlock,
 		hasDescendants,
-		selectedBlockHasDescendants,
 		userCanCreatePages,
 		userCanCreatePosts,
+		thisBlock,
+		blockTransforms,
 	} = useSelect(
 		( select ) => {
 			const {
+				getBlock,
 				getBlocks,
 				getBlockName,
 				getBlockRootClientId,
@@ -322,6 +370,7 @@ export default function NavigationLinkEdit( {
 				hasSelectedInnerBlock,
 				getSelectedBlockClientId,
 				getBlockParentsByBlockName,
+				getBlockTransformItems,
 			} = select( blockEditorStore );
 
 			const selectedBlockId = getSelectedBlockClientId();
@@ -359,6 +408,11 @@ export default function NavigationLinkEdit( {
 					'create',
 					'posts'
 				),
+				thisBlock: getBlock( clientId ),
+				blockTransforms: getBlockTransformItems(
+					[ getBlock( clientId ) ],
+					getBlockRootClientId( clientId )
+				),
 			};
 		},
 		[ clientId ]
@@ -385,13 +439,26 @@ export default function NavigationLinkEdit( {
 		replaceBlock( clientId, newSubmenu );
 	}
 
-	// Show the LinkControl on mount if the URL is empty
-	// ( When adding a new menu item)
-	// This can't be done in the useState call because it conflicts
-	// with the autofocus behavior of the BlockListBlock component.
+	const featuredBlocks = [
+		'core/site-logo',
+		'core/social-links',
+		'core/search',
+	];
+	const featuredTransforms = blockTransforms.filter( ( item ) => {
+		return featuredBlocks.includes( item.name );
+	} );
+
 	useEffect( () => {
+		// Show the LinkControl on mount if the URL is empty
+		// ( When adding a new menu item)
+		// This can't be done in the useState call because it conflicts
+		// with the autofocus behavior of the BlockListBlock component.
 		if ( ! url ) {
 			setIsLinkOpen( true );
+		}
+		// If block has inner blocks, transform to Submenu.
+		if ( hasDescendants ) {
+			transformToSubmenu();
 		}
 	}, [] );
 
@@ -520,52 +587,9 @@ export default function NavigationLinkEdit( {
 		blockProps.onClick = () => setIsLinkOpen( true );
 	}
 
-	// Always use overlay colors for submenus
-	const innerBlocksColors = getColors( context, true );
-	const innerBlocksProps = useInnerBlocksProps(
-		{
-			className: classnames(
-				'wp-block-navigation-link__container',
-				'wp-block-navigation__submenu-container',
-				{
-					'is-parent-of-selected-block': isParentOfSelectedBlock,
-					'has-text-color': !! (
-						innerBlocksColors.textColor ||
-						innerBlocksColors.customTextColor
-					),
-					[ `has-${ innerBlocksColors.textColor }-color` ]: !! innerBlocksColors.textColor,
-					'has-background': !! (
-						innerBlocksColors.backgroundColor ||
-						innerBlocksColors.customBackgroundColor
-					),
-					[ `has-${ innerBlocksColors.backgroundColor }-background-color` ]: !! innerBlocksColors.backgroundColor,
-				}
-			),
-			style: {
-				color: innerBlocksColors.customTextColor,
-				backgroundColor: innerBlocksColors.customBackgroundColor,
-			},
-		},
-		{
-			allowedBlocks: ALLOWED_BLOCKS,
-			renderAppender:
-				( isSelected && hasDescendants ) ||
-				( isImmediateParentOfSelectedBlock &&
-					! selectedBlockHasDescendants ) ||
-				// Show the appender while dragging to allow inserting element between item and the appender.
-				hasDescendants
-					? InnerBlocks.DefaultAppender
-					: false,
-		}
-	);
-
-	const classes = classnames(
-		'wp-block-navigation-link__content',
-		'wp-block-navigation-item__content',
-		{
-			'wp-block-navigation-link__placeholder': ! url,
-		}
-	);
+	const classes = classnames( 'wp-block-navigation-item__content', {
+		'wp-block-navigation-link__placeholder': ! url,
+	} );
 
 	let missingText = '';
 	switch ( type ) {
@@ -658,10 +682,12 @@ export default function NavigationLinkEdit( {
 						<RichText
 							ref={ ref }
 							identifier="label"
-							className="wp-block-navigation-link__label"
+							className="wp-block-navigation-item__label"
 							value={ label }
 							onChange={ ( labelValue ) =>
-								setAttributes( { label: labelValue } )
+								setAttributes( {
+									label: labelValue,
+								} )
 							}
 							onMerge={ mergeBlocks }
 							onReplace={ onReplace }
@@ -693,6 +719,7 @@ export default function NavigationLinkEdit( {
 							anchorRef={ listItemRef.current }
 						>
 							<LinkControl
+								hasTextControl
 								className="wp-block-navigation-link__inline-link-input"
 								value={ link }
 								showInitialSuggestions={ true }
@@ -730,16 +757,23 @@ export default function NavigationLinkEdit( {
 									)
 								}
 								onRemove={ removeLink }
+								renderControlBottom={
+									! url
+										? () => (
+												<LinkControlTransforms
+													block={ thisBlock }
+													transforms={
+														featuredTransforms
+													}
+													replace={ replaceBlock }
+												/>
+										  )
+										: null
+								}
 							/>
 						</Popover>
 					) }
-					{ hasDescendants && showSubmenuIcon && (
-						<span className="wp-block-navigation-link__submenu-icon wp-block-navigation__submenu-icon">
-							<ItemSubmenuIcon />
-						</span>
-					) }
 				</a>
-				<div { ...innerBlocksProps } />
 			</div>
 		</Fragment>
 	);

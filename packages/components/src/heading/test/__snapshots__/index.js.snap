@@ -2,7 +2,7 @@
 
 exports[`props should render correctly 1`] = `
 .emotion-0 {
-  color: #000;
+  color: #1e1e1e;
   line-height: 1.2;
   margin: 0;
   color: #050505;

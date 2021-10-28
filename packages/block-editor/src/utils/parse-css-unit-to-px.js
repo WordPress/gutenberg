@@ -131,6 +131,7 @@ function evalMathExpression( cssUnit ) {
 
 	return errorFound ? null : calculate( cssUnit ).toFixed( 0 ) + 'px';
 }
+
 /**
  * Convert a parsedUnit object to px value.
  *
@@ -202,14 +203,15 @@ function convertParsedUnitToPx( parsedUnit, options ) {
 
 	return null;
 }
+
 /**
  * Returns the px value of a cssUnit.
  *
  * @param {string} cssUnit
- * @param {string} options
+ * @param {Object} options
  * @return {string} returns the cssUnit value in a simple px format.
  */
-function getPxFromCssUnit( cssUnit, options = {} ) {
+export function getPxFromCssUnit( cssUnit, options = {} ) {
 	if ( Number.isFinite( cssUnit ) ) {
 		return cssUnit.toFixed( 0 ) + 'px';
 	}
@@ -229,4 +231,42 @@ function getPxFromCssUnit( cssUnit, options = {} ) {
 	return convertParsedUnitToPx( parsedUnit, options );
 }
 
-export default getPxFromCssUnit;
+// Use simple cache.
+const cache = {};
+/**
+ * Returns the px value of a cssUnit. The memoized version of getPxFromCssUnit;
+ *
+ * @param {string} cssUnit
+ * @param {Object} options
+ * @return {string} returns the cssUnit value in a simple px format.
+ */
+function memoizedGetPxFromCssUnit( cssUnit, options = {} ) {
+	const hash = cssUnit + hashOptions( options );
+
+	if ( ! cache[ hash ] ) {
+		cache[ hash ] = getPxFromCssUnit( cssUnit, options );
+	}
+	return cache[ hash ];
+}
+
+function hashOptions( options ) {
+	let hash = '';
+	if ( options.hasOwnProperty( 'fontSize' ) ) {
+		hash = ':' + options.width;
+	}
+	if ( options.hasOwnProperty( 'lineHeight' ) ) {
+		hash = ':' + options.lineHeight;
+	}
+	if ( options.hasOwnProperty( 'width' ) ) {
+		hash = ':' + options.width;
+	}
+	if ( options.hasOwnProperty( 'height' ) ) {
+		hash = ':' + options.height;
+	}
+	if ( options.hasOwnProperty( 'type' ) ) {
+		hash = ':' + options.type;
+	}
+	return hash;
+}
+
+export default memoizedGetPxFromCssUnit;

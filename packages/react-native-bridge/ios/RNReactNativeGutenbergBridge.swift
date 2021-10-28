@@ -356,7 +356,7 @@ public class RNReactNativeGutenbergBridge: RCTEventEmitter {
             self.delegate?.gutenbergDidSendButtonPressedAction(button)
         }
     }
-    
+
     @objc
     func requestPreview() {
         DispatchQueue.main.async {
@@ -372,6 +372,25 @@ public class RNReactNativeGutenbergBridge: RCTEventEmitter {
     @objc
     func setBlockTypeImpressions(_ impressions: [String: Int]) {
         self.delegate?.gutenbergDidRequestSetBlockTypeImpressions(impressions)
+    }
+
+    @objc
+    func requestContactCustomerSupport() {
+        DispatchQueue.main.async {
+            self.delegate?.gutenbergDidRequestContactCustomerSupport()
+        }
+    }
+
+    @objc
+    func requestGotoCustomerSupportOptions() {
+        DispatchQueue.main.async {
+            self.delegate?.gutenbergDidRequestGotoCustomerSupportOptions()
+        }
+    }
+
+    @objc
+    func sendEventToHost(_ eventName: String, properties: [AnyHashable: Any]) {
+        self.delegate?.gutenbergDidRequestSendEventToHost(eventName, properties: properties)
     }
 }
 

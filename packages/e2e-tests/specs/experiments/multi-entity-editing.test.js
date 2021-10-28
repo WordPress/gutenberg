@@ -150,7 +150,7 @@ describe( 'Multi-entity editor states', () => {
 
 	it( 'should not dirty an entity by switching to it in the template dropdown', async () => {
 		await siteEditor.visit();
-		await clickTemplateItem( [ 'Template Parts', 'Headers' ], 'header' );
+		await clickTemplateItem( [ 'Template Parts', 'headers' ], 'header' );
 		await page.waitForFunction( () =>
 			Array.from( window.frames ).find(
 				( { name } ) => name === 'editor-canvas'

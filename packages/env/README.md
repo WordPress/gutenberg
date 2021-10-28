@@ -509,9 +509,20 @@ This is useful for plugin development when upstream Core changes need to be test
 
 This is useful for working on plugins and WordPress Core at the same time.
 
+If you are running a _build_ of `wordpress-develop`, point `core` to the `build` directory.
+
 ```json
 {
 	"core": "../wordpress-develop/build",
+	"plugins": [ "." ]
+}
+```
+
+If you are running `wordpress-develop` in a dev mode (e.g. the watch command `dev` or the dev build `build:dev`), then point `core` to the `src` directory.
+
+```json
+{
+	"core": "../wordpress-develop/src",
 	"plugins": [ "." ]
 }
 ```

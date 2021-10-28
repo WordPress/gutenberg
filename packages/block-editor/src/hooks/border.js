@@ -23,20 +23,17 @@ export function BorderPanel( props ) {
 	const isSupported = hasBorderSupport( props.name );
 
 	const isColorSupported =
-		useSetting( 'border.customColor' ) &&
-		hasBorderSupport( props.name, 'color' );
+		useSetting( 'border.color' ) && hasBorderSupport( props.name, 'color' );
 
 	const isRadiusSupported =
 		useSetting( 'border.customRadius' ) &&
 		hasBorderSupport( props.name, 'radius' );
 
 	const isStyleSupported =
-		useSetting( 'border.customStyle' ) &&
-		hasBorderSupport( props.name, 'style' );
+		useSetting( 'border.style' ) && hasBorderSupport( props.name, 'style' );
 
 	const isWidthSupported =
-		useSetting( 'border.customWidth' ) &&
-		hasBorderSupport( props.name, 'width' );
+		useSetting( 'border.width' ) && hasBorderSupport( props.name, 'width' );
 
 	if ( isDisabled || ! isSupported ) {
 		return null;
@@ -113,10 +110,10 @@ export function shouldSkipSerialization( blockType ) {
  */
 const useIsBorderDisabled = () => {
 	const configs = [
-		! useSetting( 'border.customColor' ),
+		! useSetting( 'border.color' ),
 		! useSetting( 'border.customRadius' ),
-		! useSetting( 'border.customStyle' ),
-		! useSetting( 'border.customWidth' ),
+		! useSetting( 'border.style' ),
+		! useSetting( 'border.width' ),
 	];
 
 	return configs.every( Boolean );

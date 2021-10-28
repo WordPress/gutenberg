@@ -7,7 +7,7 @@ import {
 	header as headerIcon,
 	footer as footerIcon,
 	sidebar as sidebarIcon,
-	layout as layoutIcon,
+	symbolFilled as symbolFilledIcon,
 } from '@wordpress/icons';
 
 /**
@@ -23,7 +23,7 @@ function getTemplatePartIcon( iconName ) {
 	} else if ( 'sidebar' === iconName ) {
 		return sidebarIcon;
 	}
-	return layoutIcon;
+	return symbolFilledIcon;
 }
 
 export function enhanceTemplatePartVariations( settings, name ) {

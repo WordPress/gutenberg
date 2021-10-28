@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { get, map } from 'lodash';
+import { get, map, keyBy } from 'lodash';
 import createSelector from 'rememo';
 
 /**
@@ -10,6 +10,7 @@ import createSelector from 'rememo';
 import { store as coreDataStore } from '@wordpress/core-data';
 import { createRegistrySelector } from '@wordpress/data';
 import { uploadMedia } from '@wordpress/media-utils';
+import { isTemplatePart } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
@@ -294,3 +295,49 @@ export function __experimentalGetInsertionPoint( state ) {
 export function isListViewOpened( state ) {
 	return state.listViewPanel;
 }
+
+/**
+ * Returns the template parts and their blocks for the current edited template.
+ *
+ * @param {Object} state Global application state.
+ * @return {Array} Template parts and their blocks in an array.
+ */
+export const getCurrentTemplateTemplateParts = createRegistrySelector(
+	( select ) => ( state ) => {
+		const templateType = getEditedPostType( state );
+		const templateId = getEditedPostId( state );
+		const template = select( coreDataStore ).getEditedEntityRecord(
+			'postType',
+			templateType,
+			templateId
+		);
+
+		const templateParts = select( coreDataStore ).getEntityRecords(
+			'postType',
+			'wp_template_part',
+			{
+				per_page: -1,
+			}
+		);
+		const templatePartsById = keyBy(
+			templateParts,
+			( templatePart ) => templatePart.id
+		);
+
+		return ( template.blocks ?? [] )
+			.filter( ( block ) => isTemplatePart( block ) )
+			.map( ( block ) => {
+				const {
+					attributes: { theme, slug },
+				} = block;
+				const templatePartId = `${ theme }//${ slug }`;
+				const templatePart = templatePartsById[ templatePartId ];
+
+				return {
+					templatePart,
+					block,
+				};
+			} )
+			.filter( ( { templatePart } ) => !! templatePart );
+	}
+);

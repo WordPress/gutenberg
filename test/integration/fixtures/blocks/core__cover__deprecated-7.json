@@ -1,0 +1,32 @@
+[
+	{
+		"clientId": "_clientId_0",
+		"name": "core/cover",
+		"isValid": true,
+		"attributes": {
+			"url": "data:image/jpeg;base64,/9j/2wBDAAMCAgICAgMCAgIDAwMDBAYEBAQEBAgGBgUGCQgKCgkICQkKDA8MCgsOCwkJDRENDg8QEBEQCgwSExIQEw8QEBD/yQALCAABAAEBAREA/8wABgAQEAX/2gAIAQEAAD8A0s8g/9k=",
+			"hasParallax": false,
+			"dimRatio": 40,
+			"backgroundType": "image",
+			"isRepeated": false,
+			"alt": ""
+		},
+		"innerBlocks": [
+			{
+				"clientId": "_clientId_0",
+				"name": "core/paragraph",
+				"isValid": true,
+				"attributes": {
+					"align": "center",
+					"content": "\n\t\t\tGuten Berg!\n\t\t",
+					"dropCap": false,
+					"placeholder": "Write title…",
+					"fontSize": "large"
+				},
+				"innerBlocks": [],
+				"originalContent": "<p class=\"has-text-align-center has-large-font-size\">\n\t\t\tGuten Berg!\n\t\t</p>"
+			}
+		],
+		"originalContent": "<div class=\"wp-block-cover has-background-dim-40 has-background-dim\">\n\t<img class=\"wp-block-cover__image-background\" alt=\"\" src=\"data:image/jpeg;base64,/9j/2wBDAAMCAgICAgMCAgIDAwMDBAYEBAQEBAgGBgUGCQgKCgkICQkKDA8MCgsOCwkJDRENDg8QEBEQCgwSExIQEw8QEBD/yQALCAABAAEBAREA/8wABgAQEAX/2gAIAQEAAD8A0s8g/9k=\" data-object-fit=\"cover\" />\n\t<div class=\"wp-block-cover__inner-container\">\n\t\t\n\t</div>\n</div>"
+	}
+]
