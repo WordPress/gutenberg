@@ -9,11 +9,6 @@ export default function usePostTerms( { postId, postType, term } ) {
 	const [ termIds ] = useEntityProp( 'postType', postType, restBase, postId );
 	return useSelect(
 		( select ) => {
-			const termPostType = term?.types;
-			if ( ! termIds && termPostType !== postType ) {
-				return { isLoading: false };
-			}
-
 			const visible = term?.visibility?.publicly_queryable;
 			if ( ! visible ) {
 				return {
@@ -24,7 +19,7 @@ export default function usePostTerms( { postId, postType, term } ) {
 			}
 			if ( ! termIds ) {
 				// Waiting for post terms to be fetched.
-				return { isLoading: true };
+				return { isLoading: term?.postTerms?.includes( postType ) };
 			}
 			if ( ! termIds.length ) {
 				return { isLoading: false };
