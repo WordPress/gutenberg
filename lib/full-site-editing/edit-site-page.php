@@ -89,7 +89,7 @@ function gutenberg_edit_site_init( $hook ) {
 	 */
 	$current_screen->is_block_editor( true );
 
-	$custom_settings     = array(
+	$custom_settings         = array(
 		'siteUrl'                              => site_url(),
 		'postsPerPage'                         => get_option( 'posts_per_page' ),
 		'styles'                               => gutenberg_get_editor_styles(),
