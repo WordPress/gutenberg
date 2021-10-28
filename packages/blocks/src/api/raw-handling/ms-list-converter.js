@@ -54,7 +54,7 @@ export default function msListConverter( node, doc ) {
 	let receivingNode = listNode;
 
 	// Remove the first span with list info.
-	node.removeChild( node.firstElementChild );
+	node.removeChild( node.firstChild );
 
 	// Add content.
 	while ( node.firstChild ) {
