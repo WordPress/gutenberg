@@ -34,7 +34,7 @@ function render_block_core_author_name( $attributes, $content, $block ) {
 }
 
 /**
- * Registers the `core/author_name` block on the server.
+ * Registers the `core/author-name` block on the server.
  */
 function register_block_core_author_name() {
 	register_block_type_from_metadata(
