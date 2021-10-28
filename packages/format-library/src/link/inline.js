@@ -214,6 +214,8 @@ function InlineLinkUI( {
 		);
 	}
 
+	const linkControlRemountKey = anchorRef?.outerHTML;
+
 	return (
 		<Popover
 			anchorRef={ anchorRef }
@@ -222,7 +224,7 @@ function InlineLinkUI( {
 			position="bottom center"
 		>
 			<LinkControl
-				key={ anchorRef }
+				key={ linkControlRemountKey }
 				value={ linkValue }
 				onChange={ onChangeLink }
 				onRemove={ removeLink }
