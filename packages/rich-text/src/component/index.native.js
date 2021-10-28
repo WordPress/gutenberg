@@ -1164,7 +1164,8 @@ export default compose( [
 		const colorPalette =
 			experimentalFeatures?.user ??
 			experimentalFeatures?.theme ??
-			experimentalFeatures?.core;
+			experimentalFeatures?.core ??
+			settings?.colors;
 
 		return {
 			areMentionsSupported:

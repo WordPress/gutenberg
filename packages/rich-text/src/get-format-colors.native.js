@@ -4,7 +4,7 @@
 import { getColorObjectByAttributeValues } from '@wordpress/block-editor';
 
 const FORMAT_TYPE = 'core/text-color';
-const REGEX_TO_MATCH = /^has-([^-]+)-color$/;
+const REGEX_TO_MATCH = /^has-(.*)-color$/;
 const TAGS_TO_SEARCH = /\<mark/;
 
 export function getFormatColors( value, formats, colors ) {
