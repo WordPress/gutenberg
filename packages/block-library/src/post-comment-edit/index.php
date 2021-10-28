@@ -27,9 +27,16 @@ function render_block_core_post_comment_edit( $attributes, $content, $block ) {
 		$link_atts .= sprintf( 'target="%s"', esc_attr( $attributes['linkTarget'] ) );
 	}
 
+	$classes = '';
+	if ( isset( $attributes['textAlign'] ) ) {
+		$classes .= 'has-text-align-' . esc_attr( $attributes['textAlign'] );
+	}
+
+	$wrapper_attributes = get_block_wrapper_attributes( array( 'class' => $classes ) );
+
 	return sprintf(
 		'<div %1$s><a href="%2$s" %3$s>%4$s</a></div>',
-		get_block_wrapper_attributes(),
+		$wrapper_attributes,
 		esc_url( $edit_comment_link ),
 		$link_atts,
 		esc_html__( 'Edit' )

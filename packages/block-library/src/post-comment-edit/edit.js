@@ -1,15 +1,40 @@
 /**
+ * External dependencies
+ */
+import classnames from 'classnames';
+
+/**
  * WordPress dependencies
  */
-import { InspectorControls, useBlockProps } from '@wordpress/block-editor';
+import {
+	AlignmentControl,
+	BlockControls,
+	InspectorControls,
+	useBlockProps,
+} from '@wordpress/block-editor';
 import { PanelBody, ToggleControl } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 
 export default function Edit( {
-	attributes: { className, linkTarget },
+	attributes: { linkTarget, textAlign },
 	setAttributes,
 } ) {
-	const blockProps = useBlockProps( { className } );
+	const blockProps = useBlockProps( {
+		className: classnames( {
+			[ `has-text-align-${ textAlign }` ]: textAlign,
+		} ),
+	} );
+
+	const blockControls = (
+		<BlockControls group="block">
+			<AlignmentControl
+				value={ textAlign }
+				onChange={ ( newAlign ) =>
+					setAttributes( { textAlign: newAlign } )
+				}
+			/>
+		</BlockControls>
+	);
 	const inspectorControls = (
 		<InspectorControls>
 			<PanelBody title={ __( 'Link settings' ) }>
@@ -28,6 +53,7 @@ export default function Edit( {
 
 	return (
 		<>
+			{ blockControls }
 			{ inspectorControls }
 			<div { ...blockProps }>
 				<a
