@@ -155,14 +155,15 @@ class Gutenberg_REST_Global_Styles_Controller extends WP_REST_Controller {
 		$changes     = new stdClass();
 		$changes->ID = $request['id'];
 
-		$post = get_post( $request['id'] );
+		$post         = get_post( $request['id'] );
 		$empty_config = array(
 			'settings' => new stdClass(),
 			'styles'   => new stdClass(),
 		);
 		if ( $post ) {
 			$existing_config = json_decode( $post->post_content, true );
-			if( ! isset( $existing_config['isGlobalStylesUserThemeJSON'] ) || ! $existing_config['isGlobalStylesUserThemeJSON'] ) {
+			if ( ! isset( $existing_config['isGlobalStylesUserThemeJSON'] ) ||
+				! $existing_config['isGlobalStylesUserThemeJSON'] ) {
 				$existing_config = $empty_config;
 			}
 		} else {
@@ -182,8 +183,8 @@ class Gutenberg_REST_Global_Styles_Controller extends WP_REST_Controller {
 				$config['settings'] = $existing_config['settings'];
 			}
 			$config['isGlobalStylesUserThemeJSON'] = true;
-			$config['version'] = WP_Theme_JSON_Gutenberg::LATEST_SCHEMA;
-			$changes->post_content = wp_json_encode( $config );
+			$config['version']                     = WP_Theme_JSON_Gutenberg::LATEST_SCHEMA;
+			$changes->post_content                 = wp_json_encode( $config );
 		}
 
 		// Post title.
@@ -207,9 +208,9 @@ class Gutenberg_REST_Global_Styles_Controller extends WP_REST_Controller {
 	 * @return WP_REST_Response $data
 	 */
 	public function prepare_item_for_response( $post, $request ) { // phpcs:ignore VariableAnalysis.CodeAnalysis.VariableAnalysis.UnusedVariable
-		$config = json_decode( $post->post_content, true );
+		$config                           = json_decode( $post->post_content, true );
 		$is_global_styles_user_theme_json = isset( $config['isGlobalStylesUserThemeJSON'] ) && true === $config['isGlobalStylesUserThemeJSON'];
-		$result = array(
+		$result                           = array(
 			'id'       => $post->ID,
 			'settings' => ! empty( $config['settings'] ) && $is_global_styles_user_theme_json ? $config['settings'] : new stdClass(),
 			'styles'   => ! empty( $config['styles'] ) && $is_global_styles_user_theme_json ? $config['styles'] : new stdClass(),
@@ -218,9 +219,9 @@ class Gutenberg_REST_Global_Styles_Controller extends WP_REST_Controller {
 				'rendered' => get_the_title( $post ),
 			),
 		);
-		$result   = $this->add_additional_fields_to_object( $result, $request );
-		$response = rest_ensure_response( $result );
-		$links    = $this->prepare_links( $post->id );
+		$result                           = $this->add_additional_fields_to_object( $result, $request );
+		$response                         = rest_ensure_response( $result );
+		$links                            = $this->prepare_links( $post->id );
 		$response->add_links( $links );
 		if ( ! empty( $links['self']['href'] ) ) {
 			$actions = $this->get_available_actions();
