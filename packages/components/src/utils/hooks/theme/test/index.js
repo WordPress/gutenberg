@@ -10,7 +10,7 @@ import { render, screen } from '@testing-library/react';
  */
 import { createTheme, safeTheme, useTheme } from '..';
 
-import { CONFIG, COLORS, useCx } from '../../../utils';
+import { CONFIG, COLORS, useCx } from '../../..';
 
 describe( 'theme utils', () => {
 	describe( 'safeTheme', () => {
