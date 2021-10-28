@@ -93,7 +93,7 @@ function gutenberg_experimental_global_styles_settings( $settings ) {
 		$settings['__experimentalGlobalStylesBaseConfig']['settings'] = $theme->get_settings();
 	}
 
-	if ( 'mobile' !== $context ) {
+	if ( 'other' === $context ) {
 		// Make sure the styles array exists.
 		// In some contexts, like the navigation editor, it doesn't.
 		if ( ! isset( $settings['styles'] ) ) {
