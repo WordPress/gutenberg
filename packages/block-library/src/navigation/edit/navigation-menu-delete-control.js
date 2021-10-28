@@ -64,7 +64,8 @@ export default function NavigationMenuDeleteControl( { onDelete } ) {
 									deleteEntityRecord(
 										'postType',
 										'wp_navigation',
-										id
+										id,
+										{ force: true }
 									);
 									onDelete();
 								} }
