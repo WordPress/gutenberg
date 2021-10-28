@@ -222,7 +222,7 @@ function InlineLinkUI( {
 			position="bottom center"
 		>
 			<LinkControl
-				key={ linkValue?.url }
+				key={ anchorRef }
 				value={ linkValue }
 				onChange={ onChangeLink }
 				onRemove={ removeLink }
