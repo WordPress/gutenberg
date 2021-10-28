@@ -44,6 +44,7 @@ import NavigationMenuSelector from './navigation-menu-selector';
 import NavigationMenuNameControl from './navigation-menu-name-control';
 import UnsavedInnerBlocks from './unsaved-inner-blocks';
 import NavigationAreaSelector from './navigation-area-selector';
+import useNavigationAreas from '../use-navigation-areas';
 
 function getComputedStyle( node ) {
 	return node.ownerDocument.defaultView.getComputedStyle( node );
@@ -134,6 +135,12 @@ function Navigation( {
 		canSwitchNavigationMenu,
 		hasResolvedNavigationMenu,
 	} = useNavigationMenu( navigationMenuId, navigationAreaId );
+
+	const {
+		navigationAreas,
+		isRequestingAreas,
+		hasResolvedAreas,
+	} = useNavigationAreas();
 
 	const navRef = useRef();
 
@@ -266,6 +273,22 @@ function Navigation( {
 						'Navigation menu has been deleted or is unavailable'
 					) }
 				</Warning>
+				<InspectorControls>
+					{ !! hasResolvedAreas && (
+						<PanelBody title={ __( 'Navigation Area' ) }>
+							<NavigationAreaSelector
+								navigationAreaId={ navigationAreaId }
+								navigationAreas={ navigationAreas }
+								isRequestingAreas={ isRequestingAreas }
+								onSelect={ ( _id ) => {
+									setAttributes( {
+										navigationAreaId: _id,
+									} );
+								} }
+							/>
+						</PanelBody>
+					) }
+				</InspectorControls>
 			</div>
 		);
 	}
@@ -339,16 +362,22 @@ function Navigation( {
 							<NavigationMenuNameControl />
 						</PanelBody>
 					) }
-					<PanelBody title={ __( 'Navigation Area' ) }>
-						<NavigationAreaSelector
-							navigationAreaId={ navigationAreaId }
-							onSelect={ ( _id ) => {
-								setAttributes( {
-									navigationAreaId: _id,
-								} );
-							} }
-						/>
-					</PanelBody>
+
+					{ !! hasResolvedAreas && (
+						<PanelBody title={ __( 'Navigation Area' ) }>
+							<NavigationAreaSelector
+								navigationAreaId={ navigationAreaId }
+								navigationAreas={ navigationAreas }
+								isRequestingAreas={ isRequestingAreas }
+								onSelect={ ( _id ) => {
+									setAttributes( {
+										navigationAreaId: _id,
+									} );
+								} }
+							/>
+						</PanelBody>
+					) }
+
 					{ hasSubmenuIndicatorSetting && (
 						<PanelBody title={ __( 'Display' ) }>
 							<h3>{ __( 'Overlay Menu' ) }</h3>

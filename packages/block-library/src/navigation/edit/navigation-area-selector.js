@@ -2,8 +2,6 @@
  * WordPress dependencies
  */
 import { SelectControl } from '@wordpress/components';
-import { store as coreStore } from '@wordpress/core-data';
-import { useSelect } from '@wordpress/data';
 
 const navOptionPlaceholder = [
 	{
@@ -13,23 +11,18 @@ const navOptionPlaceholder = [
 ];
 
 export default function NavigationAreaSelector( props ) {
-	const { navigationAreaId, onSelect } = props;
-	const { areas, isRequesting } = useSelect( ( select ) => {
-		const { getEntityRecords, isResolving } = select( coreStore );
-		return {
-			areas: getEntityRecords( 'taxonomy', 'wp_navigation_area' ),
-			isRequesting: isResolving( 'getEntityRecords', [
-				'taxonomy',
-				'wp_navigation_area',
-			] ),
-		};
-	}, [] );
+	const {
+		navigationAreaId,
+		navigationAreas,
+		isRequestingAreas,
+		onSelect,
+	} = props;
 
-	if ( isRequesting ) {
+	if ( isRequestingAreas ) {
 		return 'Loading Navigation Areas...';
 	}
 
-	if ( ! areas?.length ) {
+	if ( ! navigationAreas?.length ) {
 		return null;
 	}
 
@@ -38,7 +31,7 @@ export default function NavigationAreaSelector( props ) {
 			label="Navigation Area"
 			value={ navigationAreaId }
 			options={ navOptionPlaceholder.concat(
-				areas.map( ( { id, name } ) => {
+				navigationAreas.map( ( { id, name } ) => {
 					return {
 						value: id,
 						label: name,
