@@ -326,8 +326,12 @@ export const __experimentalGetDirtyEntityRecords = createSelector(
 			Object.keys( data[ kind ] ).forEach( ( name ) => {
 				const primaryKeys = Object.keys(
 					data[ kind ][ name ].edits
-				).filter( ( primaryKey ) =>
-					hasEditsForEntityRecord( state, kind, name, primaryKey )
+				).filter(
+					( primaryKey ) =>
+						// The entity record must exist (not be deleted),
+						// and it must have edits.
+						getEntityRecord( state, kind, name, primaryKey ) &&
+						hasEditsForEntityRecord( state, kind, name, primaryKey )
 				);
 
 				if ( primaryKeys.length ) {
