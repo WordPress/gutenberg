@@ -35,7 +35,7 @@
 /packages/blocks
 /packages/edit-post
 /packages/editor
-/packages/editor/src/components/post-title/index.js @alexstine
+/packages/editor/src/components/post-title @alexstine
 /packages/list-reusable-blocks
 /packages/shortcode
 /packages/block-directory
