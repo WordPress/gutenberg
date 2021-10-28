@@ -137,26 +137,6 @@ export function currentGlobalStylesId( state = undefined, action ) {
 }
 
 /**
- * Reducer managing installed themes.
- *
- * @param {Object} state  Current state.
- * @param {Object} action Dispatched action.
- *
- * @return {Object} Updated state.
- */
-export function themes( state = {}, action ) {
-	switch ( action.type ) {
-		case 'RECEIVE_CURRENT_THEME':
-			return {
-				...state,
-				[ action.currentTheme.stylesheet ]: action.currentTheme,
-			};
-	}
-
-	return state;
-}
-
-/**
  * Reducer managing theme supports data.
  *
  * @param {Object} state  Current state.
@@ -590,7 +570,6 @@ export default combineReducers( {
 	currentGlobalStylesId,
 	currentUser,
 	taxonomies,
-	themes,
 	themeSupports,
 	entities,
 	undo,

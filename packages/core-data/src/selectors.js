@@ -688,7 +688,7 @@ export function hasRedo( state ) {
  * @return {Object} The current theme.
  */
 export function getCurrentTheme( state ) {
-	return state.themes[ state.currentTheme ];
+	return getEntityRecord( state, 'root', 'theme', state.currentTheme );
 }
 
 /**

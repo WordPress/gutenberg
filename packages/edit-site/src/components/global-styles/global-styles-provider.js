@@ -92,6 +92,7 @@ function useGlobalStylesUserConfig() {
 			styles: record?.styles,
 		};
 	}, [] );
+
 	const { getEditedEntityRecord } = useSelect( coreStore );
 	const { editEntityRecord } = useDispatch( coreStore );
 
@@ -125,7 +126,7 @@ function useGlobalStylesUserConfig() {
 		[ globalStylesId ]
 	);
 
-	return [ config, setConfig ];
+	return [ !! settings || !! styles, config, setConfig ];
 }
 
 function useGlobalStylesBaseConfig() {
@@ -138,25 +139,39 @@ function useGlobalStylesBaseConfig() {
 }
 
 function useGlobalStylesContext() {
-	const [ userConfig, setUserConfig ] = useGlobalStylesUserConfig();
+	const [
+		isUserConfigReady,
+		userConfig,
+		setUserConfig,
+	] = useGlobalStylesUserConfig();
 	const baseConfig = useGlobalStylesBaseConfig();
 	const mergedConfig = useMemo( () => {
 		return mergeBaseAndUserConfigs( baseConfig, userConfig );
 	}, [ userConfig, baseConfig ] );
 	const context = useMemo( () => {
 		return {
+			isReady: isUserConfigReady,
 			user: userConfig,
 			base: baseConfig,
 			merged: mergedConfig,
 			setUserConfig,
 		};
-	}, [ mergedConfig, userConfig, baseConfig, setUserConfig ] );
+	}, [
+		mergedConfig,
+		userConfig,
+		baseConfig,
+		setUserConfig,
+		isUserConfigReady,
+	] );
 
 	return context;
 }
 
 export function GlobalStylesProvider( { children } ) {
 	const context = useGlobalStylesContext();
+	if ( ! context.isReady ) {
+		return null;
+	}
 
 	return (
 		<GlobalStylesContext.Provider value={ context }>
