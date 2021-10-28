@@ -27,15 +27,16 @@ const DEFAULT_THEME: Theme = { config: CONFIG, colors: COLORS };
  * Creates a theme getter function using lodash's `merge` to allow for easy
  * partial overrides.
  *
- * @param  overrides Override values for the particular theme being created
- * @param  isStatic  Whether to inherit from ancestor themes
+ * @param  overrides        Override values for the particular theme being created
+ * @param  options          Options configuration for the `createTheme` function
+ * @param  options.isStatic Whether to inherit from ancestor themes
  * @return A theme getter function to be passed to emotion's ThemeProvider
  */
 export const createTheme = (
 	overrides: DeepPartial< Theme >,
-	isStatic: boolean = false
+	{ isStatic }: { isStatic: boolean } = { isStatic: true }
 ) =>
-	isStatic === true
+	isStatic
 		? ( merge( {}, DEFAULT_THEME, overrides ) as Theme )
 		: ( ancestor: EmotionTheme ) =>
 				merge( {}, DEFAULT_THEME, ancestor, overrides ) as Theme;
