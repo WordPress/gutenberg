@@ -82,7 +82,7 @@ export default function CommentTemplateEdit( {
 	}
 
 	return (
-		<ul { ...blockProps }>
+		<ol { ...blockProps }>
 			{ blockContexts &&
 				blockContexts.map( ( blockContext ) => (
 					<BlockContextProvider
@@ -105,6 +105,6 @@ export default function CommentTemplateEdit( {
 						) }
 					</BlockContextProvider>
 				) ) }
-		</ul>
+		</ol>
 	);
 }
