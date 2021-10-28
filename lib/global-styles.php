@@ -78,14 +78,14 @@ function gutenberg_experimental_global_styles_settings( $settings ) {
 		$context = 'mobile';
 	}
 
-	$consolidated = WP_Theme_JSON_Resolver_Gutenberg::get_merged_data( $settings );
+	$consolidated = WP_Theme_JSON_Resolver_Gutenberg::get_merged_data();
 
 	if ( 'mobile' === $context && WP_Theme_JSON_Resolver_Gutenberg::theme_has_support() ) {
 		$settings['__experimentalStyles'] = $consolidated->get_raw_data()['styles'];
 	}
 
 	if ( 'site-editor' === $context && gutenberg_experimental_is_site_editor_available() ) {
-		$theme = WP_Theme_JSON_Resolver_Gutenberg::get_merged_data( $settings, 'theme' );
+		$theme = WP_Theme_JSON_Resolver_Gutenberg::get_merged_data( array(), 'theme' );
 
 		$settings['__experimentalGlobalStylesBaseConfig']['styles']   = $theme->get_raw_data()['styles'];
 		$settings['__experimentalGlobalStylesBaseConfig']['settings'] = $theme->get_settings();
