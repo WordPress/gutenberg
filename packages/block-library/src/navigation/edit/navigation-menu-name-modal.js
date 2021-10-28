@@ -13,10 +13,12 @@ import { __ } from '@wordpress/i18n';
 
 export default function NavigationMenuNameModal( {
 	title,
+	finishButtonText = __( 'Create' ),
 	onFinish,
 	onRequestClose,
+	value = '',
 } ) {
-	const [ name, setName ] = useState( '' );
+	const [ name, setName ] = useState( value );
 
 	return (
 		<Modal
@@ -57,7 +59,7 @@ export default function NavigationMenuNameModal( {
 							disabled={ ! name.length }
 							aria-disabled={ ! name.length }
 						>
-							{ __( 'Create' ) }
+							{ finishButtonText }
 						</Button>
 					</FlexItem>
 				</Flex>

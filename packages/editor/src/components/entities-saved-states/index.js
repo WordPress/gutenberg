@@ -27,6 +27,13 @@ const TRANSLATED_SITE_PROPERTIES = {
 	page_on_front: __( 'Page on front' ),
 };
 
+const PUBLISH_ON_SAVE_ENTITIES = [
+	{
+		kind: 'postType',
+		name: 'wp_navigation',
+	},
+];
+
 export default function EntitiesSavedStates( { close } ) {
 	const saveButtonRef = useRef();
 	const { dirtyEntityRecords } = useSelect( ( select ) => {
@@ -63,6 +70,7 @@ export default function EntitiesSavedStates( { close } ) {
 		};
 	}, [] );
 	const {
+		editEntityRecord,
 		saveEditedEntityRecord,
 		__experimentalSaveSpecifiedEntityEdits: saveSpecifiedEntityEdits,
 	} = useDispatch( coreStore );
@@ -130,6 +138,16 @@ export default function EntitiesSavedStates( { close } ) {
 			if ( 'root' === kind && 'site' === name ) {
 				siteItemsToSave.push( property );
 			} else {
+				if (
+					PUBLISH_ON_SAVE_ENTITIES.some(
+						( typeToPublish ) =>
+							typeToPublish.kind === kind &&
+							typeToPublish.name === name
+					)
+				) {
+					editEntityRecord( kind, name, key, { status: 'publish' } );
+				}
+
 				saveEditedEntityRecord( kind, name, key );
 			}
 		} );
