@@ -1,15 +1,44 @@
 <?php
 
-function render_block_menu_as_wp_menu( $nav_block ) {
+
+/**
+ * Showtime! We can parse a navigation block and render it using the navigation walker.
+ */
+function links_demo() {
+	$blocks_html = '
+<!-- wp:navigation -->
+<!-- wp:navigation-link {"label":"Lorem Ipsum","type":"post","id":89,"url":"https://wordpress.org","kind":"post-type","isTopLevelLink":true} /-->
+
+<!-- wp:navigation-submenu {"label":"Lorem Ipsum","type":"post","id":89,"url":"https://wordpress.org","kind":"post-type","isTopLevelItem":true} -->
+<!-- wp:navigation-link {"label":"Lorem Ipsum","type":"post","id":89,"url":"https://wordpress.org","kind":"post-type","isTopLevelLink":false} /-->
+
+<!-- wp:navigation-submenu {"label":"Lorem Ipsum","type":"post","id":77,"url":"https://wordpress.org/","kind":"post-type","isTopLevelItem":false} -->
+<!-- wp:navigation-link {"label":"Lorem Ipsum","type":"post","id":89,"url":"https://wordpress.org","kind":"post-type","isTopLevelLink":false} /-->
+<!-- /wp:navigation-submenu -->
+<!-- /wp:navigation-submenu -->
+<!-- /wp:navigation -->';
+
+	$nav_block = array_filter(
+		parse_blocks( $blocks_html ),
+		function ( $block ) {
+			return isset( $block['blockName'] );
+		}
+	);
+
 	$blocks_disguised_as_posts = transform_navigation_block_into_wp_posts( $nav_block );
-	// An arg like "navigationPostId" could work better here
-	return wp_nav_menu_with_override_menu_items_arg(
+
+	// An arg like "navigationPostId" could work better here.
+	echo wp_nav_menu_with_override_menu_items_arg(
 		array(
 			'menu'                => 0,
 			'override_menu_items' => $blocks_disguised_as_posts,
 		)
 	);
+
+	die();
 }
+
+add_action( 'init', 'links_demo' );
 
 /**
  * This takes a navigation block and returns a list of fake wp_post-like objects
@@ -355,33 +384,3 @@ function wp_nav_menu_with_override_menu_items_arg( $args = array() ) {
 		return $nav_menu;
 	}
 }
-
-/**
- * Showtime! We can parse a navigation block and render it using the navigation walker.
- */
-function links_demo() {
-	$blocks_html = '
-<!-- wp:navigation -->
-<!-- wp:navigation-link {"label":"Lorem Ipsum","type":"post","id":89,"url":"https://wordpress.org","kind":"post-type","isTopLevelLink":true} /-->
-
-<!-- wp:navigation-submenu {"label":"Lorem Ipsum","type":"post","id":89,"url":"https://wordpress.org","kind":"post-type","isTopLevelItem":true} -->
-<!-- wp:navigation-link {"label":"Lorem Ipsum","type":"post","id":89,"url":"https://wordpress.org","kind":"post-type","isTopLevelLink":false} /-->
-
-<!-- wp:navigation-submenu {"label":"Lorem Ipsum","type":"post","id":77,"url":"https://wordpress.org/","kind":"post-type","isTopLevelItem":false} -->
-<!-- wp:navigation-link {"label":"Lorem Ipsum","type":"post","id":89,"url":"https://wordpress.org","kind":"post-type","isTopLevelLink":false} /-->
-<!-- /wp:navigation-submenu -->
-<!-- /wp:navigation-submenu -->
-<!-- /wp:navigation -->';
-
-	$blocks = array_filter(
-		parse_blocks( $blocks_html ),
-		function ( $block ) {
-			return isset( $block['blockName'] );
-		}
-	);
-
-	echo render_block_menu_as_wp_menu( $blocks );
-	die();
-}
-
-add_action( 'init', 'links_demo' );
