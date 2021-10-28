@@ -7,9 +7,15 @@ import classnames from 'classnames';
  * WordPress dependencies
  */
 import { useViewportMatch } from '@wordpress/compose';
-import { DropdownMenu, MenuGroup, MenuItem } from '@wordpress/components';
+import {
+	// __experimentalUseSlot as useSlot,
+	DropdownMenu,
+	MenuGroup,
+	MenuItem,
+} from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { check } from '@wordpress/icons';
+import { PluginPreview } from '@wordpress/interface';
 
 export default function PreviewOptions( {
 	children,
@@ -18,6 +24,8 @@ export default function PreviewOptions( {
 	deviceType,
 	setDeviceType,
 } ) {
+	const coreDeviceTypes = [ 'Desktop', 'Tablet', 'Mobile' ];
+
 	const isMobile = useViewportMatch( 'small', '<' );
 	if ( isMobile ) return null;
 
@@ -45,28 +53,24 @@ export default function PreviewOptions( {
 			{ () => (
 				<>
 					<MenuGroup>
-						<MenuItem
-							className="block-editor-post-preview__button-resize"
-							onClick={ () => setDeviceType( 'Desktop' ) }
-							icon={ deviceType === 'Desktop' && check }
-						>
-							{ __( 'Desktop' ) }
-						</MenuItem>
-						<MenuItem
-							className="block-editor-post-preview__button-resize"
-							onClick={ () => setDeviceType( 'Tablet' ) }
-							icon={ deviceType === 'Tablet' && check }
-						>
-							{ __( 'Tablet' ) }
-						</MenuItem>
-						<MenuItem
-							className="block-editor-post-preview__button-resize"
-							onClick={ () => setDeviceType( 'Mobile' ) }
-							icon={ deviceType === 'Mobile' && check }
-						>
-							{ __( 'Mobile' ) }
-						</MenuItem>
+						{ coreDeviceTypes.map( ( device ) => (
+							<MenuItem
+								key={ device }
+								className="block-editor-post-preview__button-resize"
+								onClick={ () => setDeviceType( device ) }
+								icon={ deviceType === device && check }
+							>
+								{ device }
+							</MenuItem>
+						) ) }
 					</MenuGroup>
+					<PluginPreview.Slot
+						coreDevices={ coreDeviceTypes }
+						fillProps={ {
+							deviceType,
+							setDeviceType,
+						} }
+					/>
 					{ children }
 				</>
 			) }

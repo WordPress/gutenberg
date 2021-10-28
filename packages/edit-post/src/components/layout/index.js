@@ -35,7 +35,7 @@ import { store as noticesStore } from '@wordpress/notices';
  * Internal dependencies
  */
 import TextEditor from '../text-editor';
-import VisualEditor from '../visual-editor';
+import VisualEditorOrPluginPreview from '../visual-editor/visual-editor-or-plugin-preview';
 import EditPostKeyboardShortcuts from '../keyboard-shortcuts';
 import KeyboardShortcutHelpModal from '../keyboard-shortcut-help-modal';
 import EditPostPreferencesModal from '../preferences-modal';
@@ -44,7 +44,6 @@ import Header from '../header';
 import InserterSidebar from '../secondary-sidebar/inserter-sidebar';
 import ListViewSidebar from '../secondary-sidebar/list-view-sidebar';
 import SettingsSidebar from '../sidebar/settings-sidebar';
-import MetaBoxes from '../meta-boxes';
 import WelcomeGuide from '../welcome-guide';
 import ActionsPanel from './actions-panel';
 import { store as editPostStore } from '../../store';
@@ -87,7 +86,6 @@ function Layout( { styles } ) {
 		showIconLabels,
 		hasReducedUI,
 		showBlockBreadcrumbs,
-		isTemplateMode,
 		documentLabel,
 	} = useSelect( ( select ) => {
 		const { getEditorSettings, getPostTypeLabel } = select( editorStore );
@@ -242,13 +240,7 @@ function Layout( { styles } ) {
 							<TextEditor />
 						) }
 						{ isRichEditingEnabled && mode === 'visual' && (
-							<VisualEditor styles={ styles } />
-						) }
-						{ ! isTemplateMode && (
-							<div className="edit-post-layout__metaboxes">
-								<MetaBoxes location="normal" />
-								<MetaBoxes location="advanced" />
-							</div>
+							<VisualEditorOrPluginPreview styles={ styles } />
 						) }
 						{ isMobileViewport && sidebarIsOpened && (
 							<ScrollLock />
