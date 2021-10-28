@@ -27,7 +27,7 @@ You can also filter certain aspects of the editor; this is documented on the [Ed
 Porting PHP meta boxes to blocks or sidebar plugins is highly encouraged, learn how through these [meta data tutorials](/docs/how-to-guides/metabox/README.md).
 
 See how the new editor [supports existing Meta Boxes](/docs/reference-guides/backward-compatibility/meta-box.md).
-ń
+
 ## Theme Support
 
 By default, blocks provide their styles to enable basic support for blocks in themes without any change. Themes can add/override these styles, or rely on defaults.
