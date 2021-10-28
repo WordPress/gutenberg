@@ -46,6 +46,11 @@ function DuotoneControl( {
 			} }
 			renderContent={ () => (
 				<MenuGroup label={ __( 'Duotone' ) }>
+					<div className="block-editor-duotone-control__description">
+						{ __(
+							'Create a two-tone color effect without losing your original image.'
+						) }
+					</div>
 					<DuotonePicker
 						colorPalette={ colorPalette }
 						duotonePalette={ duotonePalette }

@@ -20,6 +20,10 @@
 	width: 334px;
 }
 
+.block-editor-duotone-control__description {
+	margin: $grid-unit-20 0;
+}
+
 // Better align the popover under the swatch.
 // @todo: when the positioning for popovers gets refactored, this can presumably be removed.
 .block-editor-duotone-control__popover:not([data-y-axis="middle"][data-x-axis="right"]) > .components-popover__content {
