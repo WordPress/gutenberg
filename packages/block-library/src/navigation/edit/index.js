@@ -133,7 +133,7 @@ function Navigation( {
 		isNavigationMenuMissing,
 		canSwitchNavigationMenu,
 		hasResolvedNavigationMenu,
-	} = useNavigationMenu( navigationMenuId );
+	} = useNavigationMenu( navigationMenuId, navigationAreaId );
 
 	const navRef = useRef();
 

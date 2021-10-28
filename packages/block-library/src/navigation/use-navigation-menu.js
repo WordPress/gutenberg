@@ -4,7 +4,10 @@
 import { store as coreStore } from '@wordpress/core-data';
 import { useSelect } from '@wordpress/data';
 
-export default function useNavigationMenu( navigationMenuId ) {
+export default function useNavigationMenu(
+	navigationMenuId,
+	navigationAreaId
+) {
 	return useSelect(
 		( select ) => {
 			const {
@@ -13,20 +16,47 @@ export default function useNavigationMenu( navigationMenuId ) {
 				hasFinishedResolution,
 			} = select( coreStore );
 
-			const navigationMenuSingleArgs = [
-				'postType',
-				'wp_navigation',
-				navigationMenuId,
-			];
-			const navigationMenu = navigationMenuId
-				? getEditedEntityRecord( ...navigationMenuSingleArgs )
-				: null;
-			const hasResolvedNavigationMenu = navigationMenuId
-				? hasFinishedResolution(
-						'getEditedEntityRecord',
-						navigationMenuSingleArgs
-				  )
-				: false;
+			let navigationMenu;
+			let hasResolvedNavigationMenu;
+
+			if ( navigationAreaId ) {
+				const byAreaArgs = [
+					'postType',
+					'wp_navigation',
+					{
+						wp_navigation_area: navigationAreaId,
+					},
+				];
+
+				const navigationMenus = getEntityRecords(
+					'postType',
+					'wp_navigation',
+					{ wp_navigation_area: navigationAreaId }
+				);
+
+				navigationMenu = navigationMenus?.length
+					? navigationMenus[ 0 ]
+					: null;
+
+				hasResolvedNavigationMenu = navigationAreaId
+					? hasFinishedResolution( 'getEntityRecords', byAreaArgs )
+					: false;
+			} else {
+				const navigationMenuSingleArgs = [
+					'postType',
+					'wp_navigation',
+					navigationMenuId,
+				];
+				navigationMenu = navigationMenuId
+					? getEditedEntityRecord( ...navigationMenuSingleArgs )
+					: null;
+				hasResolvedNavigationMenu = navigationMenuId
+					? hasFinishedResolution(
+							'getEditedEntityRecord',
+							navigationMenuSingleArgs
+					  )
+					: false;
+			}
 
 			const navigationMenuMultipleArgs = [ 'postType', 'wp_navigation' ];
 			const navigationMenus = getEntityRecords(
@@ -50,6 +80,6 @@ export default function useNavigationMenu( navigationMenuId ) {
 				navigationMenus,
 			};
 		},
-		[ navigationMenuId ]
+		[ navigationMenuId, navigationAreaId ]
 	);
 }
