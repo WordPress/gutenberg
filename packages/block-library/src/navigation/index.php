@@ -230,6 +230,7 @@ function render_block_core_navigation( $attributes, $content, $block ) {
 
 	$inner_blocks = $block->inner_blocks;
 
+	// If `__unstableLocation` is defined, create inner blocks from the classic menu assigned to that location.
 	if ( empty( $inner_blocks ) && array_key_exists( '__unstableLocation', $attributes ) ) {
 		$menu_items = gutenberg_get_menu_items_at_location( $attributes['__unstableLocation'] );
 		if ( empty( $menu_items ) ) {
@@ -238,16 +239,35 @@ function render_block_core_navigation( $attributes, $content, $block ) {
 
 		$menu_items_by_parent_id = gutenberg_sort_menu_items_by_parent_id( $menu_items );
 		$parsed_blocks           = gutenberg_parse_blocks_from_menu_items( $menu_items_by_parent_id[0], $menu_items_by_parent_id );
+		$inner_blocks            = new WP_Block_List( $parsed_blocks, $attributes );
+	}
+
+	// Load inner blocks from the navigation post.
+	if ( array_key_exists( 'navigationMenuId', $attributes ) ) {
+		$navigation_post = get_post( $attributes['navigationMenuId'] );
+		if ( ! isset( $navigation_post ) ) {
+			return '';
+		}
+
+		$parsed_blocks = parse_blocks( $navigation_post->post_content );
+
+		// 'parse_blocks' includes a null block with '\n\n' as the content when
+		// it encounters whitespace. This code strips it.
+		$compacted_blocks = array_filter(
+			$parsed_blocks,
+			function( $block ) {
+				return isset( $block['blockName'] );
+			}
+		);
 
 		// TODO - this uses the full navigation block attributes for the
 		// context which could be refined.
-		$inner_blocks = new WP_Block_List( $parsed_blocks, $attributes );
+		$inner_blocks = new WP_Block_List( $compacted_blocks, $attributes );
 	}
 
 	if ( empty( $inner_blocks ) ) {
 		return '';
 	}
-
 	$colors     = block_core_navigation_build_css_colors( $attributes );
 	$font_sizes = block_core_navigation_build_css_font_sizes( $attributes );
 	$classes    = array_merge(

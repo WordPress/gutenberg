@@ -57,14 +57,14 @@
 	&.is-branch-selected:not(.is-selected) .block-editor-list-view-block-contents {
 		border-radius: 0;
 	}
-	&.is-branch-selected.is-last-of-selected-branch .block-editor-list-view-block-contents {
-		border-radius: 0 0 2px 2px;
-	}
 
 	&.is-dragging {
 		display: none;
 	}
 
+	// List View renders a fixed number of items and relies on each item having a fixed height of 36px.
+	// If this value changes, we should also change the itemHeight value set in useFixedWindowList.
+	// See: https://github.com/WordPress/gutenberg/pull/35230 for additional context.
 	.block-editor-list-view-block-contents {
 		display: flex;
 		align-items: center;
@@ -115,6 +115,11 @@
 			}
 		}
 	}
+	// Fix focus styling width when one row has fewer cells.
+	&.has-single-cell .block-editor-list-view-block-contents:focus::after {
+		right: 0;
+	}
+
 	.block-editor-list-view-block__menu:focus {
 		box-shadow: inset 0 0 0 var(--wp-admin-border-width-focus) var(--wp-admin-theme-color);
 		z-index: 1;
@@ -353,5 +358,11 @@ $block-navigation-max-indent: 8;
 	margin-left: 0;
 	border: none;
 	box-shadow: none;
+}
+
+.block-editor-list-view-placeholder {
+	padding: 0;
+	margin: 0;
+	height: 36px;
 }
 

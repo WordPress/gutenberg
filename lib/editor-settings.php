@@ -75,6 +75,7 @@ function gutenberg_initialize_editor( $editor_name, $editor_script_handle, $sett
 		'rest_preload_api_request',
 		array()
 	);
+
 	wp_add_inline_script(
 		'wp-api-fetch',
 		sprintf(

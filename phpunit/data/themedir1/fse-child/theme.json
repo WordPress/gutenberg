@@ -19,10 +19,10 @@
 					"color": "#111827"
 				}
 			],
-			"custom": true
+			"link": true
 		},
 		"blocks": {
-			"core/paragraph": {
+			"core/post-title": {
 				"color": {
 					"palette": [
 						{

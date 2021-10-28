@@ -95,8 +95,8 @@ $blocks-block__margin: 0.5em;
 	border-radius: 0 !important;
 }
 
-.is-style-outline > .wp-block-button__link,
-.wp-block-button__link.is-style-outline {
+.is-style-outline > :where(.wp-block-button__link),
+:where(.wp-block-button__link).is-style-outline {
 	border: 2px solid currentColor;
 	padding: 0.667em 1.333em;
 }

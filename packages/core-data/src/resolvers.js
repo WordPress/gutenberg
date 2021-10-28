@@ -85,7 +85,7 @@ export const getEntityRecord = ( kind, name, key = '', query ) => async ( {
 		// for how the request is made to the REST API.
 
 		// eslint-disable-next-line @wordpress/no-unused-vars-before-return
-		const path = addQueryArgs( entity.baseURL + '/' + key, {
+		const path = addQueryArgs( entity.baseURL + ( key ? '/' + key : '' ), {
 			...entity.baseURLParams,
 			...query,
 		} );
@@ -417,4 +417,27 @@ __experimentalGetTemplateForLink.shouldInvalidate = ( action ) => {
 		action.kind === 'postType' &&
 		action.name === 'wp_template'
 	);
+};
+
+export const __experimentalGetCurrentGlobalStylesId = () => async ( {
+	dispatch,
+} ) => {
+	const activeThemes = await apiFetch( {
+		path: '/wp/v2/themes?status=active',
+	} );
+	const globalStylesURL = get( activeThemes, [
+		0,
+		'_links',
+		'wp:user-global-styles',
+		0,
+		'href',
+	] );
+	if ( globalStylesURL ) {
+		const globalStylesObject = await apiFetch( {
+			url: globalStylesURL,
+		} );
+		dispatch.__experimentalReceiveCurrentGlobalStylesId(
+			globalStylesObject.id
+		);
+	}
 };

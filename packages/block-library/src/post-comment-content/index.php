@@ -17,13 +17,27 @@ function render_block_core_post_comment_content( $attributes, $content, $block )
 	if ( ! isset( $block->context['commentId'] ) ) {
 		return '';
 	}
-	$comment_text = get_comment_text( $block->context['commentId'] );
+
+	$comment = get_comment( $block->context['commentId'] );
+	if ( empty( $comment ) ) {
+		return '';
+	}
+
+	$comment_text = get_comment_text( $comment );
 	if ( ! $comment_text ) {
 		return '';
 	}
+
+	$classes = '';
+	if ( isset( $attributes['textAlign'] ) ) {
+		$classes .= 'has-text-align-' . $attributes['textAlign'];
+	}
+
+	$wrapper_attributes = get_block_wrapper_attributes( array( 'class' => $classes ) );
+
 	return sprintf(
 		'<div %1$s>%2$s</div>',
-		get_block_wrapper_attributes(),
+		$wrapper_attributes,
 		$comment_text
 	);
 }
