@@ -1,8 +1,5 @@
 <?php
 
-/**
- * @group mine
- */
 class Gutenberg_REST_Global_Styles_Controller_Test extends WP_Test_REST_Controller_Testcase {
 	/**
 	 * @var int
@@ -56,7 +53,6 @@ class Gutenberg_REST_Global_Styles_Controller_Test extends WP_Test_REST_Controll
 
 	public function test_register_routes() {
 		$routes = rest_get_server()->get_routes();
-		$this->assertArrayHasKey( '/wp/v2/global-styles', $routes );
 		$this->assertArrayHasKey( '/wp/v2/global-styles/(?P<id>[\/\w-]+)', $routes );
 	}
 
