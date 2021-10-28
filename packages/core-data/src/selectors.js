@@ -688,6 +688,17 @@ export function getCurrentTheme( state ) {
 }
 
 /**
+ * Return the ID of the current global styles object.
+ *
+ * @param {Object} state Data state.
+ *
+ * @return {string} The current global styles ID.
+ */
+export function __experimentalGetCurrentGlobalStylesId( state ) {
+	return state.currentGlobalStylesId;
+}
+
+/**
  * Return theme supports data in the index.
  *
  * @param {Object} state Data state.

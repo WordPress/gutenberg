@@ -22,7 +22,7 @@ function gutenberg_experimental_global_styles_get_stylesheet( $tree, $types = ar
 		// In this case we only enqueue the core presets (CSS Custom Properties + the classes).
 		$origins = array( 'core' );
 	} elseif ( ! $supports_theme_json && $supports_link_color ) {
-		// For the legacy link color feauter to work, the CSS Custom Properties
+		// For the legacy link color feature to work, the CSS Custom Properties
 		// should be in scope (either the core or the theme ones).
 		$origins = array( 'core', 'theme' );
 	}
@@ -85,10 +85,8 @@ function gutenberg_experimental_global_styles_settings( $settings ) {
 	}
 
 	if ( 'site-editor' === $context && gutenberg_experimental_is_site_editor_available() ) {
-		$theme       = WP_Theme_JSON_Resolver_Gutenberg::get_merged_data( $settings, 'theme' );
-		$user_cpt_id = WP_Theme_JSON_Resolver_Gutenberg::get_user_custom_post_type_id();
+		$theme = WP_Theme_JSON_Resolver_Gutenberg::get_merged_data( $settings, 'theme' );
 
-		$settings['__experimentalGlobalStylesUserEntityId']           = $user_cpt_id;
 		$settings['__experimentalGlobalStylesBaseConfig']['styles']   = $theme->get_raw_data()['styles'];
 		$settings['__experimentalGlobalStylesBaseConfig']['settings'] = $theme->get_settings();
 	}
