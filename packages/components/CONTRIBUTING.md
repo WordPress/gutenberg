@@ -180,6 +180,14 @@ All new component should be styled using [Emotion](https://emotion.sh/docs/intro
 
 Note: Instead of using Emotion's standard `cx` function, the custom [`useCx` hook](/packages/components/src/utils/hooks/use-cx.ts) should be used instead.
 
+### Theme support
+
+To acccess theme variables from Emotion components, use the custom [`useTheme` hook](/packages/components/src/ui/theme/index.ts). This function safely returns the default WordPress theme object if there is no `ThemeProvider` parent of the component calling `useTheme`. Otherwise it will return the contextual theme.
+
+Use the [`createTheme` function](/packages/components/src/ui/theme/index.ts) to create custom themes based on the default WordPress theme.
+
+And finally, for `styled` components, rather than accessing `props.theme` directly, pass it through the [`safeTheme` function](/packages/components/src/ui/theme/index.ts) to safely retrieve either the contextual theme passed to a parent `ThemeProvider` or the default WordPress theme when there is no `ThemeProvider`.
+
 ## Context system
 
 The `@wordpress/components` context system is based on [React's `Context` API](https://reactjs.org/docs/context.html), and is a way for components to adapt to the "context" they're being rendered in.
