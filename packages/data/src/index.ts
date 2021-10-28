@@ -10,6 +10,7 @@ import defaultRegistry from './default-registry';
 import * as plugins from './plugins';
 
 import type { WPDataStore } from './types.d';
+export * from './types.d';
 
 export { default as withSelect } from './components/with-select';
 export { default as withDispatch } from './components/with-dispatch';
@@ -26,6 +27,8 @@ export { createRegistry } from './registry';
 export { createRegistrySelector, createRegistryControl } from './factory';
 export { controls } from './controls';
 export { default as createReduxStore } from './redux-store';
+
+export type { Registry as CoreRegistry } from './default-registry';
 
 /**
  * Object of available plugins to use with a registry.

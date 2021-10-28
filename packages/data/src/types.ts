@@ -1,3 +1,5 @@
+import type { Ref } from '@wordpress/element';
+
 export type WPDataFunctionOrGeneratorArray = Array< Function | Generator >;
 export type WPDataFunctionArray = Array< Function >;
 
@@ -60,7 +62,17 @@ export interface WPDataRegistry<
 	Selectors extends BaseSelectors = BaseSelectors
 > {
 	register: ( store: WPDataStore< Name, Actions, Selectors > ) => void;
-	select: (store: Name | WPDataStore<Name, Actions, Selectors>) => Selectors
+	select: (
+		store: Name | WPDataStore< Name, Actions, Selectors >
+	) => Selectors;
+	__experimentalSubscribeStore: (
+		storeName: string,
+		handler: () => void
+	) => () => void;
+	__experimentalMarkListeningStores: < Response, T >(
+		callback: () => Response,
+		ref: Ref< T >
+	) => Response;
 }
 
 export interface WPDataEmitter {

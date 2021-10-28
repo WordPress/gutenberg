@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { createReduxStore, register, select } from '@wordpress/data';
-import type { WPDataAttachedStore } from '@wordpress/data/types.d';
+import type { WPDataAttachedStore } from '@wordpress/data';
 
 /**
  * Internal dependencies

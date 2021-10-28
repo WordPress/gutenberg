@@ -4,6 +4,11 @@
 import { mapValues, isObject, forEach } from 'lodash';
 
 /**
+ * WordPress dependencies
+ */
+import type { Ref } from '@wordpress/element';
+
+/**
  * Internal dependencies
  */
 import createReduxStore from './redux-store';
@@ -76,11 +81,11 @@ export function createRegistry<
 	/**
 	 * Subscribe to changes to any data.
 	 *
-	 * @param {Function} listener Listener function.
+	 * @param listener Listener function.
 	 *
-	 * @return {Function} Unsubscribe function.
+	 * @return Unsubscribe function.
 	 */
-	const subscribe = ( listener ) => {
+	const subscribe = ( listener: () => void ) => {
 		return emitter.subscribe( listener );
 	};
 
@@ -116,7 +121,10 @@ export function createRegistry<
 		return parent && parent.select( storeName );
 	}
 
-	function __experimentalMarkListeningStores( callback, ref ) {
+	function __experimentalMarkListeningStores< Response, T >(
+		callback: () => Response,
+		ref: Ref< T >
+	): Response {
 		__experimentalListeningStores.clear();
 		const result = callback.call( this );
 		ref.current = Array.from( __experimentalListeningStores );
@@ -246,11 +254,14 @@ export function createRegistry<
 	/**
 	 * Subscribe handler to a store.
 	 *
-	 * @param {string[]} storeName The store name.
-	 * @param {Function} handler   The function subscribed to the store.
-	 * @return {Function} A function to unsubscribe the handler.
+	 * @param storeName The store name.
+	 * @param handler   The function subscribed to the store.
+	 * @return A function to unsubscribe the handler.
 	 */
-	function __experimentalSubscribeStore( storeName, handler ) {
+	function __experimentalSubscribeStore(
+		storeName: string,
+		handler: () => void
+	): () => void {
 		if ( storeName in stores ) {
 			return stores[ storeName ].subscribe( handler );
 		}

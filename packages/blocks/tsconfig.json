@@ -4,7 +4,6 @@
 		"baseUrl": "../../",
 		"resolveJsonModule": true,
 		"paths": {
-			"@wordpress/data/*": [ "packages/data/src/*" ],
 			"@wordpress/*": [ "packages/*/src" ]
 		}
 	}

@@ -17,6 +17,8 @@ import './hooks';
 import './plugins';
 import Editor from './editor';
 
+export type { EditPostStore } from './store';
+
 /**
  * Reinitializes the editor after the user chooses to reboot the editor after
  * an unhandled error occurs, replacing previously mounted editor element using
