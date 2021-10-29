@@ -68,9 +68,21 @@ export default function EntitiesSavedStates( { close } ) {
 	} = useDispatch( coreStore );
 
 	// To group entities by type.
-	const partitionedSavables = Object.values(
-		groupBy( dirtyEntityRecords, 'name' )
-	);
+	const partitionedSavables = groupBy( dirtyEntityRecords, 'name' );
+
+	// Sort entity groups.
+	const {
+		site: siteSavables,
+		wp_template: templateSavables,
+		wp_template_part: templatePartSavables,
+		...contentSavables
+	} = partitionedSavables;
+	const sortedPartitionedSavables = [
+		siteSavables,
+		templateSavables,
+		templatePartSavables,
+		...Object.values( contentSavables ),
+	].filter( Array.isArray );
 
 	// Unchecked entities to be ignored by save function.
 	const [ unselectedEntities, _setUnselectedEntities ] = useState( [] );
@@ -160,15 +172,15 @@ export default function EntitiesSavedStates( { close } ) {
 			</div>
 
 			<div className="entities-saved-states__text-prompt">
-				<strong>{ __( 'Select the changes you want to save' ) }</strong>
+				<strong>{ __( 'Are you ready to save?' ) }</strong>
 				<p>
 					{ __(
-						'Some changes may affect other areas of your site.'
+						'The following changes have been made to your site, templates, and content.'
 					) }
 				</p>
 			</div>
 
-			{ partitionedSavables.map( ( list ) => {
+			{ sortedPartitionedSavables.map( ( list ) => {
 				return (
 					<EntityTypeList
 						key={ list[ 0 ].name }

@@ -444,7 +444,7 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 			'show_in_rest'          => true,
 			'rest_controller_class' => 'Gutenberg_REST_Global_Styles_Controller',
 			'rest_base'             => 'global-styles',
-			'capabilities'          => array(
+			'capabilities' => array(
 				'read'                   => 'edit_theme_options',
 				'create_posts'           => 'edit_theme_options',
 				'edit_posts'             => 'edit_theme_options',

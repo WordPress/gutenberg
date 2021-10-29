@@ -414,6 +414,12 @@
 		"parent": "how-to-guides"
 	},
 	{
+		"title": "Thunks in Core-Data",
+		"slug": "thunks",
+		"markdown_source": "../docs/how-to-guides/thunks.md",
+		"parent": "how-to-guides"
+	},
+	{
 		"title": "Widgets",
 		"slug": "widgets",
 		"markdown_source": "../docs/how-to-guides/widgets/README.md",
