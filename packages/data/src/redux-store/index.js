@@ -27,12 +27,13 @@ import * as metadataActions from './metadata/actions';
 /** @typedef {import('../types').WPDataReduxStoreConfig} WPDataReduxStoreConfig */
 
 const trimUndefinedValues = ( array ) => {
-	for ( let i = array.length - 1; i >= 0; i-- ) {
-		if ( array[ i ] === undefined ) {
-			array.splice( i, 1 );
+	const result = [ ...array ];
+	for ( let i = result.length - 1; i >= 0; i-- ) {
+		if ( result[ i ] === undefined ) {
+			result.splice( i, 1 );
 		}
 	}
-	return array;
+	return result;
 };
 
 /**
@@ -52,7 +53,7 @@ function createResolversCache() {
 
 		clear( selectorName, args ) {
 			if ( cache[ selectorName ] ) {
-				cache[ selectorName ].delete( args );
+				cache[ selectorName ].delete( trimUndefinedValues( args ) );
 			}
 		},
 
