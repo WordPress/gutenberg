@@ -21,7 +21,6 @@ The block editor first became available in December 2018, and we're still hard a
 
 Check out the [Ways to keep up with Gutenberg & Full Site Editing (FSE)](https://make.wordpress.org/core/2020/05/20/ways-to-keep-up-with-full-site-editing-fse/)
 
-
 ## Getting Started
 
 Get hands on: check out the [block editor live demo](https://wordpress.org/gutenberg/) to play with a test instance of the editor.
