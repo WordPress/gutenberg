@@ -116,9 +116,9 @@ function block_core_navigation_submenu_render_submenu_icon() {
 /**
  * Renders the `core/navigation-submenu` block.
  *
- * @param array $attributes The block attributes.
- * @param array $content The saved content.
- * @param array $block The parsed block.
+ * @param array  $attributes The block attributes.
+ * @param string $content The saved content.
+ * @param object $block The parsed block.
  *
  * @return string Returns the post content with the legacy widget added.
  */
@@ -129,11 +129,8 @@ function render_block_core_navigation_submenu( $attributes, $content, $block ) {
 	$is_post_type           = $is_post_type || isset( $attributes['type'] ) && ( 'post' === $attributes['type'] || 'page' === $attributes['type'] );
 
 	// Don't render the block's subtree if it is a draft.
-	if ( $is_post_type && $navigation_link_has_id ) {
-		$post = get_post( $attributes['id'] );
-		if ( 'publish' !== $post->post_status ) {
-			return '';
-		}
+	if ( $is_post_type && $navigation_link_has_id && 'publish' !== get_post_status( $attributes['id'] ) ) {
+		return '';
 	}
 
 	// Don't render the block's subtree if it has no label.
@@ -180,6 +177,10 @@ function render_block_core_navigation_submenu( $attributes, $content, $block ) {
 		$item_url = isset( $attributes['url'] ) ? esc_url( $attributes['url'] ) : '';
 		// Start appending HTML attributes to anchor tag.
 		$html .= '<a class="wp-block-navigation-item__content" href="' . $item_url . '"';
+
+		if ( $is_active ) {
+			$html .= ' aria-current="page"';
+		}
 
 		if ( isset( $attributes['opensInNewTab'] ) && true === $attributes['opensInNewTab'] ) {
 			$html .= ' target="_blank"  ';
