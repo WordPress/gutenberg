@@ -409,7 +409,7 @@
 	},
 	{
 		"title": "Thunks in Core-Data",
-		"slug": "thunks-in-core-data",
+		"slug": "thunks",
 		"markdown_source": "../docs/how-to-guides/thunks.md",
 		"parent": "how-to-guides"
 	},
