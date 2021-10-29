@@ -103,7 +103,7 @@ module.exports = async function initConfig( {
  * against the minimum version supported by Xdebug
  * 
  * @param {WPConfig} config 
- * @return {bool} Whether the PHP version is supported by Xdebug
+ * @return {boolean} Whether the PHP version is supported by Xdebug
  */
 function checkXdebugPhpCompatibility( config ) {
 	// By default, an undefined phpVersion uses the version on the docker image,
