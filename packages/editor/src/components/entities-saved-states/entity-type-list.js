@@ -6,7 +6,7 @@ import { some } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { _n } from '@wordpress/i18n';
+import { __, _n } from '@wordpress/i18n';
 import { useSelect } from '@wordpress/data';
 import { PanelBody, PanelRow } from '@wordpress/components';
 import { store as coreStore } from '@wordpress/core-data';
@@ -16,20 +16,25 @@ import { store as coreStore } from '@wordpress/core-data';
  */
 import EntityRecordItem from './entity-record-item';
 
-const ENTITY_NAME_DESCRIPTIONS = {
-	site: ( length ) =>
-		_n(
+function getEntityDescription( entity, length ) {
+	const descriptions = {
+		site: _n(
 			'This change will affect your whole site.',
 			'These changes will affect your whole site.',
 			length
 		),
-	wp_template: ( length ) =>
-		_n(
+		wp_template: _n(
 			'This change will affect pages and posts that use this template.',
 			'These changes will affect pages and posts that use these templates.',
 			length
 		),
-};
+	};
+
+	return (
+		descriptions[ entity ] ??
+		__( 'The following content has been modified.' )
+	);
+}
 
 export default function EntityTypeList( {
 	list,
@@ -46,7 +51,7 @@ export default function EntityTypeList( {
 
 	// Set description based on type of entity.
 	const { name } = firstRecord;
-	const description = ENTITY_NAME_DESCRIPTIONS[ name ]?.( list.length );
+	const description = getEntityDescription( name, list.length );
 
 	return (
 		<PanelBody title={ entity.label } initialOpen={ true }>
