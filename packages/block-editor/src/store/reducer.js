@@ -330,6 +330,7 @@ const withBlockTree = ( reducer ) => ( state = {}, action ) => {
 				{
 					...newState.tree,
 					[ action.clientId ]: {
+						...newState.tree[ action.clientId ],
 						...newState.byClientId[ action.clientId ],
 						attributes: newState.attributes[ action.clientId ],
 					},
