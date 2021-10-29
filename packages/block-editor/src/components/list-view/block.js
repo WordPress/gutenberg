@@ -18,7 +18,7 @@ import {
 	useCallback,
 	memo,
 } from '@wordpress/element';
-import { useDispatch, useSelect } from '@wordpress/data';
+import { useDispatch } from '@wordpress/data';
 
 /**
  * Internal dependencies
@@ -32,11 +32,12 @@ import ListViewBlockContents from './block-contents';
 import BlockSettingsDropdown from '../block-settings-menu/block-settings-dropdown';
 import { useListViewContext } from './context';
 import { store as blockEditorStore } from '../../store';
-import { isClientIdSelected } from './utils';
 
 function ListViewBlock( {
 	block,
 	isDragged,
+	isSelected,
+	isBranchSelected,
 	selectBlock,
 	position,
 	level,
@@ -60,34 +61,6 @@ function ListViewBlock( {
 		expand,
 		collapse,
 	} = useListViewContext();
-
-	const { isBranchSelected, isSelected } = useSelect(
-		( select ) => {
-			const {
-				getSelectedBlockClientId,
-				getSelectedBlockClientIds,
-				getBlockParents,
-			} = select( blockEditorStore );
-
-			const selectedClientIds = withExperimentalPersistentListViewFeatures
-				? getSelectedBlockClientIds()
-				: [ getSelectedBlockClientId() ];
-			const blockParents = getBlockParents( clientId );
-			const _isSelected = isClientIdSelected(
-				clientId,
-				selectedClientIds
-			);
-			return {
-				isSelected: _isSelected,
-				isBranchSelected:
-					_isSelected ||
-					blockParents.some( ( id ) => {
-						return isClientIdSelected( id, selectedClientIds );
-					} ),
-			};
-		},
-		[ withExperimentalPersistentListViewFeatures, clientId ]
-	);
 
 	const hasSiblings = siblingBlockCount > 0;
 	const hasRenderedMovers = showBlockMovers && hasSiblings;

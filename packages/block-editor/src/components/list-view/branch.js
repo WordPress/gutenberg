@@ -6,13 +6,15 @@ import { compact } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { Fragment, memo } from '@wordpress/element';
+import { memo } from '@wordpress/element';
+import { AsyncModeProvider } from '@wordpress/data';
 
 /**
  * Internal dependencies
  */
 import ListViewBlock from './block';
 import { useListViewContext } from './context';
+import { isClientIdSelected } from './utils';
 
 /**
  * Given a block, returns the total number of blocks in that subtree. This is used to help determine
@@ -64,8 +66,10 @@ function ListViewBranch( props ) {
 		selectBlock,
 		showBlockMovers,
 		showNestedBlocks,
+		selectedClientIds,
 		level = 1,
 		path = '',
+		isBranchSelected = false,
 		listPosition = 0,
 		fixedListWindow,
 	} = props;
@@ -115,12 +119,23 @@ function ListViewBranch( props ) {
 				const isDragged = !! draggedClientIds?.includes( clientId );
 
 				const showBlock = isDragged || blockInView;
+
+				// Make updates to the selected or dragged blocks synchronous,
+				// but asynchronous for any other block.
+				const isSelected = isClientIdSelected(
+					clientId,
+					selectedClientIds
+				);
+				const isSelectedBranch =
+					isBranchSelected || ( isSelected && hasNestedBlocks );
 				return (
-					<Fragment key={ clientId }>
+					<AsyncModeProvider key={ clientId } value={ ! isSelected }>
 						{ showBlock && (
 							<ListViewBlock
 								block={ block }
 								selectBlock={ selectBlock }
+								isSelected={ isSelected }
+								isBranchSelected={ isSelectedBranch }
 								isDragged={ isDragged }
 								level={ level }
 								position={ position }
@@ -147,9 +162,11 @@ function ListViewBranch( props ) {
 								path={ updatedPath }
 								listPosition={ nextPosition + 1 }
 								fixedListWindow={ fixedListWindow }
+								isBranchSelected={ isSelectedBranch }
+								selectedClientIds={ selectedClientIds }
 							/>
 						) }
-					</Fragment>
+					</AsyncModeProvider>
 				);
 			} ) }
 		</>

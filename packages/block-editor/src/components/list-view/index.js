@@ -67,7 +67,11 @@ function ListView(
 	},
 	ref
 ) {
-	const { clientIdsTree, draggedClientIds } = useListViewClientIds( blocks );
+	const {
+		clientIdsTree,
+		draggedClientIds,
+		selectedClientIds,
+	} = useListViewClientIds( blocks );
 	const { selectBlock } = useDispatch( blockEditorStore );
 	const { visibleBlockCount } = useSelect(
 		( select ) => {
@@ -189,6 +193,7 @@ function ListView(
 						showNestedBlocks={ showNestedBlocks }
 						showBlockMovers={ showBlockMovers }
 						fixedListWindow={ fixedListWindow }
+						selectedClientIds={ selectedClientIds }
 						{ ...props }
 					/>
 				</ListViewContext.Provider>
