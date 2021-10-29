@@ -633,7 +633,9 @@ export class ImageEdit extends Component {
 			resizeMode: context?.imageCrop ? 'cover' : 'contain',
 		};
 
-		const imageContainerStyles = [ hasImageContext && styles.fixedHeight ];
+		const imageContainerStyles = [
+			context?.fixedHeight && styles.fixedHeight,
+		];
 
 		const getImageComponent = ( openMediaOptions, getMediaOptions ) => (
 			<Badge label={ __( 'Featured' ) } show={ isFeaturedImage }>

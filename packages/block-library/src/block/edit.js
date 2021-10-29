@@ -17,7 +17,7 @@ import {
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import {
-	__experimentalUseInnerBlocksProps as useInnerBlocksProps,
+	useInnerBlocksProps,
 	__experimentalUseNoRecursiveRenders as useNoRecursiveRenders,
 	__experimentalBlockContentOverlay as BlockContentOverlay,
 	InnerBlocks,
