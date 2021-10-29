@@ -50,7 +50,7 @@ export default function EntityTypeList( {
 
 	return (
 		<PanelBody title={ entity.label } initialOpen={ true }>
-			{ description ? <PanelRow>{ description }</PanelRow> : null }
+			{ description && <PanelRow>{ description }</PanelRow> }
 			{ list.map( ( record ) => {
 				return (
 					<EntityRecordItem
