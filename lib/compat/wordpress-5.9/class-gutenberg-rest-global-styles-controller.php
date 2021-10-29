@@ -6,7 +6,6 @@
  * @subpackage REST_API
  */
 
-
 /**
  * Base Global Styles REST API Controller.
  */
@@ -18,8 +17,8 @@ class Gutenberg_REST_Global_Styles_Controller extends WP_REST_Posts_Controller {
 	 * @return stdClass|WP_Error Post object or WP_Error.
 	 */
 	protected function prepare_item_for_database( $request ) {
-		$prepared_post     = new stdClass();
-		$existing_config   = array();
+		$prepared_post   = new stdClass();
+		$existing_config = array();
 
 		// Post ID.
 		if ( isset( $request['id'] ) ) {
