@@ -14,24 +14,19 @@ import { COLORS, CONFIG } from '../utils';
 import { space } from '../ui/utils/space';
 
 const toolsPanelGrid = {
-	container: css`
+	spacing: css`
 		column-gap: ${ space( 4 ) };
-		display: grid;
-		grid-template-columns: 1fr 1fr;
 		row-gap: ${ space( 6 ) };
 	`,
 	item: {
-		halfWidth: css`
-			grid-column: span 1;
-		`,
 		fullWidth: css`
-			grid-column: span 2;
+			grid-column: 1 / -1;
 		`,
 	},
 };
 
 export const ToolsPanel = css`
-	${ toolsPanelGrid.container };
+	${ toolsPanelGrid.spacing };
 
 	border-top: ${ CONFIG.borderWidth } solid ${ COLORS.gray[ 200 ] };
 	margin-top: -1px;
@@ -43,12 +38,17 @@ export const ToolsPanel = css`
  * an inner dom element to be injected. The following rule allows for the
  * CSS grid display to be re-established.
  */
-export const ToolsPanelWithInnerWrapper = css`
-	> div:not( :first-of-type ) {
-		${ toolsPanelGrid.container }
-		${ toolsPanelGrid.item.fullWidth }
-	}
-`;
+
+export const ToolsPanelWithInnerWrapper = ( columns: number ) => {
+	return css`
+		> div:not( :first-of-type ) {
+			display: grid;
+			grid-template-columns: ${ `repeat( ${ columns }, 1fr )` };
+			${ toolsPanelGrid.spacing }
+			${ toolsPanelGrid.item.fullWidth }
+		}
+	`;
+};
 
 export const ToolsPanelHiddenInnerWrapper = css`
 	> div:not( :first-of-type ) {
@@ -89,10 +89,6 @@ export const ToolsPanelHeading = css`
 
 export const ToolsPanelItem = css`
 	${ toolsPanelGrid.item.fullWidth }
-
-	&.single-column {
-		${ toolsPanelGrid.item.halfWidth }
-	}
 
 	/* Clear spacing in and around controls added as panel items. */
 	/* Remove when they can be addressed via context system. */
