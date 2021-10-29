@@ -271,7 +271,9 @@ function entity( entityConfig ) {
 						const updatedEdits = {
 							...state,
 						};
-						delete updatedEdits[ action.recordId ];
+						for ( const recordId of action.itemIds ) {
+							delete updatedEdits[ recordId ];
+						}
 						return updatedEdits;
 				}
 
