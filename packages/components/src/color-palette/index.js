@@ -77,7 +77,7 @@ export default function ColorPalette( {
 	);
 
 	return (
-		<VStack spacing={ 3 }>
+		<VStack spacing={ 3 } className={ className }>
 			{ ! disableCustomColors && (
 				<Dropdown
 					renderContent={ renderCustomColorPicker }
@@ -96,7 +96,6 @@ export default function ColorPalette( {
 				/>
 			) }
 			<CircularOptionPicker
-				className={ className }
 				options={ colorOptions }
 				actions={
 					!! clearable && (

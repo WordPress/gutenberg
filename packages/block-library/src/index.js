@@ -42,6 +42,7 @@ import * as list from './list';
 import * as missing from './missing';
 import * as more from './more';
 import * as nextpage from './nextpage';
+import * as pattern from './pattern';
 import * as pageList from './page-list';
 import * as preformatted from './preformatted';
 import * as pullquote from './pullquote';
@@ -195,6 +196,7 @@ export const __experimentalGetCoreBlocks = () => [
 	postTerms,
 
 	logInOut,
+	pattern,
 ];
 
 /**

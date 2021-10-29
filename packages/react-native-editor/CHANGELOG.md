@@ -10,8 +10,11 @@ For each user feature we should also add a importance categorization label  to i
 -->
 
 ## Unreleased
+
+## 1.65.0
 - [**] Search block - Text and background color support [#35511]
 - [*] [Embed Block] Fix loading glitch with resolver resolution approach [#35798]
+* [*] Fixed an issue where the Help screens may not respect an iOS device's notch. [#35570]
 - [**] Block inserter indicates newly available block types [#35201]
 - [*] Add support for the Mark HTML tag [#35956]
 
