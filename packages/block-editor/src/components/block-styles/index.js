@@ -31,6 +31,7 @@ export default function BlockStyles( {
 		activeStyle,
 		genericPreviewBlock,
 		className: previewClassName,
+		isFullscreenActive,
 	} = useStylesForBlocks( {
 		clientId,
 		onSwitch,
@@ -57,7 +58,11 @@ export default function BlockStyles( {
 	};
 
 	return (
-		<div className={ classnames( 'block-editor-block-styles', className ) }>
+		<div
+			className={ classnames( 'block-editor-block-styles', className, {
+				'is-fullscreen-active': isFullscreenActive,
+			} ) }
+		>
 			<div className="block-editor-block-styles__variants">
 				{ stylesToRender.map( ( style ) => {
 					const buttonText = style.label || style.name;
@@ -95,6 +100,7 @@ export default function BlockStyles( {
 								as="span"
 								limit={ 12 }
 								ellipsizeMode="tail"
+								className="block-editor-block-styles__item-text"
 								truncate
 							>
 								{ buttonText }

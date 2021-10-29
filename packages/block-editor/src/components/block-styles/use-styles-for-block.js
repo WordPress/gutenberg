@@ -67,11 +67,18 @@ export default function useStylesForBlocks( { clientId, onSwitch } ) {
 			blockType,
 			styles: getBlockStyles( block.name ),
 			className: block.attributes.className || '',
+			isFullscreenActive: select( 'core/edit-post' ).isFeatureActive(
+				'fullscreenMode'
+			),
 		};
 	};
-	const { styles, block, blockType, className } = useSelect( selector, [
-		clientId,
-	] );
+	const {
+		styles,
+		block,
+		blockType,
+		className,
+		isFullscreenActive,
+	} = useSelect( selector, [ clientId ] );
 	const { updateBlockAttributes } = useDispatch( blockEditorStore );
 	const stylesToRender = getRenderedStyles( styles );
 	const activeStyle = getActiveStyle( stylesToRender, className );
@@ -95,5 +102,6 @@ export default function useStylesForBlocks( { clientId, onSwitch } ) {
 		activeStyle,
 		genericPreviewBlock,
 		className,
+		isFullscreenActive,
 	};
 }
