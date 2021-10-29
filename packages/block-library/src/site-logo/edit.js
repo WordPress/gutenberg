@@ -219,9 +219,6 @@ const SiteLogo = ( {
 				naturalHeight={ naturalHeight }
 				clientWidth={ clientWidth }
 				onSaveImage={ ( imageAttributes ) => {
-					if ( syncSiteIcon ) {
-						setIcon( imageAttributes.id );
-					}
 					setLogo( imageAttributes.id );
 				} }
 				isEditing={ isEditingImage }
@@ -397,10 +394,15 @@ export default function LogoEdit( {
 
 	const { editEntityRecord } = useDispatch( coreStore );
 
-	const setLogo = ( newValue ) =>
+	const setLogo = ( newValue ) => {
+		if ( syncSiteIcon ) {
+			setIcon( newValue );
+		}
+
 		editEntityRecord( 'root', 'site', undefined, {
 			site_logo: newValue,
 		} );
+	}
 
 	const setIcon = ( newValue ) =>
 		editEntityRecord( 'root', 'site', undefined, {
@@ -419,10 +421,6 @@ export default function LogoEdit( {
 			return;
 		}
 
-		if ( syncSiteIcon ) {
-			setIcon( media.id );
-		}
-
 		if ( ! media.id && media.url ) {
 			// This is a temporary blob image
 			setLogo( undefined );
@@ -434,9 +432,6 @@ export default function LogoEdit( {
 	};
 
 	const onRemoveLogo = () => {
-		if ( syncSiteIcon ) {
-			setIcon( null );
-		}
 		setLogo( null );
 		setLogoUrl( undefined );
 		setAttributes( { width: undefined } );
