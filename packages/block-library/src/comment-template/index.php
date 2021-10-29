@@ -30,7 +30,6 @@ function render_block_core_comment_template( $attributes, $content, $block ) {
 	//
 	// Finally, if those are not available for some reason, just use `50`
 	// (it's the default value of comments_per_page).
-
 	if ( isset( $block->context['queryPerPage'] ) ) {
 		$number = $block->context['queryPerPage'];
 	} elseif ( get_option( 'page_comments' ) ) {
