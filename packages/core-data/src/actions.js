@@ -203,13 +203,6 @@ export const deleteEntityRecord = (
 			} );
 
 			await dispatch( removeItems( kind, name, recordId, true ) );
-
-			dispatch( {
-				type: 'REMOVE_ENTITY_RECORD_EDITS',
-				kind,
-				name,
-				recordId,
-			} );
 		} catch ( _error ) {
 			error = _error;
 		}

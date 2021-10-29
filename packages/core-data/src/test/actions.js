@@ -82,15 +82,9 @@ describe( 'deleteEntityRecord', () => {
 			method: 'DELETE',
 		} );
 
-		expect( dispatch ).toHaveBeenCalledTimes( 5 );
+		expect( dispatch ).toHaveBeenCalledTimes( 4 );
 		expect( dispatch ).toHaveBeenCalledWith( {
 			type: 'DELETE_ENTITY_RECORD_START',
-			kind: 'postType',
-			name: 'post',
-			recordId: 10,
-		} );
-		expect( dispatch ).toHaveBeenCalledWith( {
-			type: 'REMOVE_ENTITY_RECORD_EDITS',
 			kind: 'postType',
 			name: 'post',
 			recordId: 10,

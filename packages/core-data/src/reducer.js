@@ -266,7 +266,8 @@ function entity( entityConfig ) {
 							...state,
 							[ action.recordId ]: nextEdits,
 						};
-					case 'REMOVE_ENTITY_RECORD_EDITS':
+					case 'REMOVE_ITEMS':
+						// Remove edits for deleted items.
 						const updatedEdits = {
 							...state,
 						};
@@ -504,6 +505,11 @@ export function undo( state = UNDO_INITIAL_STATE, action ) {
 				} );
 			}
 			return nextState;
+		case 'REMOVE_ITEMS':
+			// Remove undo records for a deleted entity.
+			return state.filter(
+				( undoRecord ) => undoRecord.recordId !== action.recordId
+			);
 	}
 
 	return state;
