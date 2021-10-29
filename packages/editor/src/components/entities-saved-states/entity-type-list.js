@@ -49,13 +49,16 @@ export default function EntityTypeList( {
 			select( coreStore ).getEntity( firstRecord.kind, firstRecord.name ),
 		[ firstRecord.kind, firstRecord.name ]
 	);
-
-	// Set description based on type of entity.
 	const { name } = firstRecord;
+	const entityLabel =
+		name === 'wp_template_part'
+			? _n( 'Template Part', 'Template Parts', list.length )
+			: entity.label;
+	// Set description based on type of entity.
 	const description = getEntityDescription( name, list.length );
 
 	return (
-		<PanelBody title={ entity.label } initialOpen={ true }>
+		<PanelBody title={ entityLabel } initialOpen={ true }>
 			{ description && <PanelRow>{ description }</PanelRow> }
 			{ list.map( ( record ) => {
 				return (
