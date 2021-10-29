@@ -28,6 +28,7 @@ function getEntityDescription( entity, length ) {
 			'These changes will affect pages and posts that use these templates.',
 			length
 		),
+		wp_template_part: '', // No separate description for template parts.
 	};
 
 	return (
