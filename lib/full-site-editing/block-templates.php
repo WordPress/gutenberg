@@ -241,6 +241,7 @@ function _gutenberg_inject_theme_attribute_in_content( $template_content ) {
 function _gutenberg_build_template_result_from_file( $template_file, $template_type ) {
 	$default_template_types = gutenberg_get_default_template_types();
 	$template_content       = file_get_contents( $template_file['path'] );
+	$template_content       = apply_filters( 'get_template_content_from_file', $template_content, $template_file['slug'] );
 	$theme                  = wp_get_theme()->get_stylesheet();
 
 	$template                 = new WP_Block_Template();
