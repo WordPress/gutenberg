@@ -24,13 +24,19 @@ function render_block_core_comment_template( $attributes, $content, $block ) {
 		return '';
 	}
 
-	// If the `queryPerPage` is set, use that. Otherwise, use the value
-	// from the site settings. If those are not available for some reason,
-	// use `50` (it's the same as the default value of commentsPerPage).
+	// If the `queryPerPage` is set, use that. Otherwise, we have to
+	// check if `page_comments` is set. If it is, we can use the value
+	// of `comments_per_page` from the site settings.
+	//
+	// Finally, if those are not available for some reason, just use `50`
+	// (it's the default value of comments_per_page).
+
 	if ( isset( $block->context['queryPerPage'] ) ) {
 		$number = $block->context['queryPerPage'];
-	} else {
+	} elseif ( get_option( 'page_comments' ) ) {
 		$number = get_option( 'comments_per_page', 50 );
+	} else {
+		$number = 50;
 	}
 
 	// Get an array of comments for the current post.

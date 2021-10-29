@@ -50,11 +50,15 @@ export default function CommentTemplateEdit( {
 					per_page:
 						// `commentsPerPage` are added to the REST API.
 						//
-						// If the `queryPerPage` is set, use that. Otherwise, use the value
-						// from the site settings. If those are not available for some
-						// reason, use `50` (it's the same as the default value of commentsPerPage)
+						// If the `queryPerPage` is set, use that. Otherwise, we have to
+						// check if `page_comments` is set. If it is, we can use the value
+						// of `comments_per_page` from the site settings.
+						//
+						// Finally, if those are not available for some reason, just use `50`
+						// (it's the default value of comments_per_page)
 						queryPerPage ||
-						parseInt( siteSettings?.comments_per_page, 10 ) ||
+						( siteSettings?.page_comments &&
+							parseInt( siteSettings?.comments_per_page, 10 ) ) ||
 						50,
 					order: 'asc',
 				} ),
