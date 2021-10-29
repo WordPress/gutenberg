@@ -105,15 +105,13 @@ const NavigationPanel = ( { isOpen } ) => {
 						activeMenu={ activeMenu }
 						onActivateMenu={ setActive }
 					>
-						{ activeMenu === MENU_ROOT && (
-							<MainDashboardButton.Slot>
-								<NavigationBackButton
-									backButtonLabel={ __( 'Dashboard' ) }
-									className="edit-site-navigation-panel__back-to-dashboard"
-									href="index.php"
-								/>
-							</MainDashboardButton.Slot>
-						) }
+						<MainDashboardButton.Slot>
+							<NavigationBackButton
+								backButtonLabel={ __( 'Dashboard' ) }
+								className="edit-site-navigation-panel__back-to-dashboard"
+								href="index.php"
+							/>
+						</MainDashboardButton.Slot>
 						<SiteMenu />
 					</Navigation>
 				</div>
