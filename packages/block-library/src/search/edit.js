@@ -28,7 +28,7 @@ import {
 	__experimentalUseCustomUnits as useCustomUnits,
 } from '@wordpress/components';
 import { useInstanceId } from '@wordpress/compose';
-import { useDispatch } from '@wordpress/data';
+import { useDispatch, useSelect } from '@wordpress/data';
 import { useEffect, useRef } from '@wordpress/element';
 import { Icon, search } from '@wordpress/icons';
 import { __ } from '@wordpress/i18n';
@@ -57,7 +57,7 @@ const DEFAULT_INNER_PADDING = '4px';
 
 export default function SearchEdit( {
 	className,
-	context,
+	clientId,
 	attributes,
 	setAttributes,
 	toggleSelection,
@@ -80,14 +80,24 @@ export default function SearchEdit( {
 	const borderColor = style?.border?.color;
 	const borderProps = useBorderProps( attributes );
 
+	const { isNavigationChild } = useSelect(
+		( select ) => {
+			const { getBlockParentsByBlockName } = select( blockEditorStore );
+
+			return {
+				isNavigationChild: !! getBlockParentsByBlockName(
+					clientId,
+					'core/navigation'
+				)?.length,
+			};
+		},
+		[ clientId ]
+	);
 	const { __unstableMarkNextChangeAsNotPersistent } = useDispatch(
 		blockEditorStore
 	);
 
-	// Check if Navigation contains the block.
-	const isNavigationChild = 'showSubmenuIcon' in context;
 	const hasChangedDefaults = useRef( false );
-
 	useEffect( () => {
 		if ( hasChangedDefaults.current ) {
 			return;
