@@ -2,14 +2,6 @@
 
 The collection of schemas used in WordPress, including the `theme.json` schema, and `block.json` schemas.
 
-## Installation
-
-Install the module
-
-```shell
-$ npm install @wordpress/schemas --save-dev
-```
-
 ## Usage
 
 JSON schemas are used by code editors to offer tooltips, autocomplete, and validation. To use in your JSON file, add the `$schema` property to the top of the file with the value of the schema URL.
