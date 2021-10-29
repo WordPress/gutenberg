@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import classnames from 'classnames';
+
+/**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
@@ -14,12 +19,14 @@ import {
 	Warning,
 } from '@wordpress/block-editor';
 import { useEntityProp, useEntityBlockEditor } from '@wordpress/core-data';
+import { useMergeRefs } from '@wordpress/compose';
 import { useMemo } from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
 import { useCanEditEntity } from '../utils/hooks';
+import { useDisabled } from './use-disabled';
 
 function ReadOnlyContent( { userCanEdit, postType, postId } ) {
 	const [ , , content ] = useEntityProp(
@@ -28,7 +35,15 @@ function ReadOnlyContent( { userCanEdit, postType, postId } ) {
 		'content',
 		postId
 	);
-	const blockProps = useBlockProps( { className: 'is-readonly' } );
+	const { ref, ...blockProps } = useBlockProps( {
+		className: classnames(
+			'components-disabled',
+			'block-editor-block-preview__live-content'
+		),
+	} );
+	const node = useDisabled();
+
+	const mergedRefs = useMergeRefs( [ ref, node ] );
 
 	const rawContent = content?.raw;
 	const blocks = useMemo( () => {
@@ -40,12 +55,11 @@ function ReadOnlyContent( { userCanEdit, postType, postId } ) {
 			<Warning>{ __( 'This content is password protected.' ) }</Warning>
 		</div>
 	) : (
-		<div { ...blockProps }>
+		<div { ...blockProps } ref={ mergedRefs }>
 			<BlockPreview
 				blocks={ blocks }
 				__experimentalAsButton={ false }
 				__experimentalLive={ true }
-				__experimentalIsDisabled={ false }
 			/>
 		</div>
 	);

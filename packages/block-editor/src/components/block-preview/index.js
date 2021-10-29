@@ -44,6 +44,7 @@ export function BlockPreview( {
 				<LiveBlockPreview
 					__experimentalAsButton={ __experimentalAsButton }
 					onClick={ __experimentalOnClick }
+					themeSupportsLayout={ !! settings?.supportsLayout }
 				/>
 			) : (
 				<AutoHeightBlockPreview

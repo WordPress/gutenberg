@@ -38,6 +38,10 @@
 }
 
 .block-editor-block-preview__live-content {
+	* {
+		pointer-events: none;
+	}
+
 	// Hide the block appender, as the block is not editable in this context.
 	.block-list-appender {
 		display: none;
