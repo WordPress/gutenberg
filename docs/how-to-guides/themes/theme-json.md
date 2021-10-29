@@ -216,10 +216,10 @@ The settings section has the following structure:
 	"version": 1,
 	"settings": {
 		"border": {
-			"customColor": false,
+			"color": false,
 			"customRadius": false,
-			"customStyle": false,
-			"customWidth": false
+			"style": false,
+			"width": false
 		},
 		"color": {
 			"background": true,
@@ -244,12 +244,12 @@ The settings section has the following structure:
 		},
 		"typography": {
 			"customFontSize": true,
-			"customFontStyle": true,
-			"customFontWeight": true,
 			"customLineHeight": false,
-			"customTextDecorations": true,
-			"customTextTransforms": true,
 			"dropCap": true,
+			"fontStyle": true,
+			"fontWeight": true,
+			"textDecoration": true,
+			"textTransform": true,
 			"fontFamilies": [],
 			"fontSizes": []
 		},
@@ -779,7 +779,7 @@ body {
 
 Styles found within a block will be enqueued using the block selector.
 
-By default, the block selector is generated based on its name such as `.wp-block-<blockname-without-namespace>`. For example, `.wp-block-group` for the `core/group` block. There are some blocks that want to opt-out from this default behavior. They can do so by explicitely telling the system which selector to use for them via the `__experimentalSelector` key within the `supports` section of its `block.json` file.
+By default, the block selector is generated based on its name such as `.wp-block-<blockname-without-namespace>`. For example, `.wp-block-group` for the `core/group` block. There are some blocks that want to opt-out from this default behavior. They can do so by explicitly telling the system which selector to use for them via the `__experimentalSelector` key within the `supports` section of its `block.json` file.
 
 {% codetabs %}
 {% Input %}
@@ -995,8 +995,8 @@ One thing you may have noticed is the naming schema used for the CSS Custom Prop
 
 The `--` as a separator has two functions:
 
-- Readibility, for human understanding. It can be thought as similar to the BEM naming schema, it separates "categories".
-- Parseability, for machine understanding. Using a defined structure allows machines to understand the meaning of the property `--wp--preset--color--black`: it's a value bounded to the color preset whose slug is "black", which then gives us room to do more things with them.
+- Readability, for human understanding. It can be thought as similar to the BEM naming schema, it separates "categories".
+- Parsability, for machine understanding. Using a defined structure allows machines to understand the meaning of the property `--wp--preset--color--black`: it's a value bounded to the color preset whose slug is "black", which then gives us room to do more things with them.
 
 ### Why using `--` as a separator?
 

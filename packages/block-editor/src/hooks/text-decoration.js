@@ -62,7 +62,7 @@ export function useIsTextDecorationDisabled( { name: blockName } = {} ) {
 		blockName,
 		TEXT_DECORATION_SUPPORT_KEY
 	);
-	const hasTextDecoration = useSetting( 'typography.customTextDecorations' );
+	const hasTextDecoration = useSetting( 'typography.textDecoration' );
 
 	return notSupported || ! hasTextDecoration;
 }

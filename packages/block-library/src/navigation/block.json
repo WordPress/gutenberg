@@ -11,6 +11,9 @@
 	],
 	"textdomain": "default",
 	"attributes": {
+		"navigationMenuId": {
+			"type": "number"
+		},
 		"orientation": {
 			"type": "string",
 			"default": "horizontal"

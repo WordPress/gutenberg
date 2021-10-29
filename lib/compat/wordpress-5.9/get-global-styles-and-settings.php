@@ -106,7 +106,7 @@ function gutenberg_get_global_stylesheet( $types = array() ) {
 		// In this case we only enqueue the core presets (CSS Custom Properties + the classes).
 		$origins = array( 'core' );
 	} elseif ( ! $supports_theme_json && $supports_link_color ) {
-		// For the legacy link color feauter to work, the CSS Custom Properties
+		// For the legacy link color feature to work, the CSS Custom Properties
 		// should be in scope (either the core or the theme ones).
 		$origins = array( 'core', 'theme' );
 	}

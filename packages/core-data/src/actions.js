@@ -118,6 +118,22 @@ export function receiveCurrentTheme( currentTheme ) {
 }
 
 /**
+ * Returns an action object used in signalling that the current global styles id has been received.
+ *
+ * @param {string} currentGlobalStylesId The current global styles id.
+ *
+ * @return {Object} Action object.
+ */
+export function __experimentalReceiveCurrentGlobalStylesId(
+	currentGlobalStylesId
+) {
+	return {
+		type: 'RECEIVE_CURRENT_GLOBAL_STYLES_ID',
+		id: currentGlobalStylesId,
+	};
+}
+
+/**
  * Returns an action object used in signalling that the index has been received.
  *
  * @param {Object} themeSupports Theme support for the current theme.

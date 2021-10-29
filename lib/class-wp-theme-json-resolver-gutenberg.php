@@ -441,8 +441,7 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 			'description'  => 'CPT to store user design tokens',
 			'public'       => false,
 			'show_ui'      => false,
-			'show_in_rest' => true,
-			'rest_base'    => '__experimental/global-styles',
+			'show_in_rest' => false,
 			'capabilities' => array(
 				'read'                   => 'edit_theme_options',
 				'create_posts'           => 'edit_theme_options',

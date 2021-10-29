@@ -33,7 +33,7 @@ describe( 'iframed multiple block stylesheets', () => {
 		await deactivatePlugin( 'gutenberg-test-iframed-multiple-stylesheets' );
 	} );
 
-	it( 'should load multiple block stylesheets in iframe', async () => {
+	it.skip( 'should load multiple block stylesheets in iframe', async () => {
 		await insertBlock( 'Iframed Multiple Stylesheets' );
 
 		await page.waitForSelector(

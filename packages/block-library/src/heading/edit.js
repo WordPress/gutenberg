@@ -9,7 +9,7 @@ import classnames from 'classnames';
 import { __ } from '@wordpress/i18n';
 import { useEffect } from '@wordpress/element';
 import { useDispatch } from '@wordpress/data';
-import { createBlock } from '@wordpress/blocks';
+import { createBlock, getDefaultBlockName } from '@wordpress/blocks';
 import {
 	AlignmentControl,
 	BlockControls,
@@ -104,7 +104,9 @@ function HeadingEdit( {
 							content: value,
 						} );
 					} else {
-						block = createBlock( 'core/paragraph' );
+						block = createBlock(
+							getDefaultBlockName() ?? 'core/heading'
+						);
 					}
 
 					if ( isOriginal ) {

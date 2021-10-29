@@ -1,0 +1,12 @@
+[
+	{
+		"clientId": "_clientId_0",
+		"name": "core/pattern",
+		"isValid": true,
+		"attributes": {
+			"slug": "core/text-two-columns"
+		},
+		"innerBlocks": [],
+		"originalContent": ""
+	}
+]
