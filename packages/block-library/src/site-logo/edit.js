@@ -62,10 +62,10 @@ const SiteLogo = ( {
 	siteUrl,
 	logoId,
 	setIcon,
+	iconId,
 	canUserEdit,
-	syncSiteIcon,
-	setSyncSiteIcon,
 } ) => {
+	const [ syncSiteIcon, setSyncSiteIcon ] = useState( logoId === iconId );
 	const clientWidth = useClientWidth( containerRef, [ align ] );
 	const isLargeViewport = useViewportMatch( 'medium' );
 	const isWideAligned = includes( [ 'wide', 'full' ], align );
@@ -210,6 +210,9 @@ const SiteLogo = ( {
 				clientWidth={ clientWidth }
 				onSaveImage={ ( imageAttributes ) => {
 					setLogo( imageAttributes.id );
+					if ( syncSiteIcon ) {
+						setIcon( imageAttributes.id );
+					}
 				} }
 				isEditing={ isEditingImage }
 				onFinishEditing={ () => setIsEditingImage( false ) }
@@ -300,7 +303,7 @@ const SiteLogo = ( {
 								label={ __( 'Use site logo as icon' ) }
 								onChange={ ( value ) => {
 									setSyncSiteIcon( !! value );
-									setIcon( value ? logoId : null );
+									setIcon( value ? logoId : undefined );
 								} }
 								checked={ syncSiteIcon }
 								help={ syncSiteIconHelpText }
@@ -379,26 +382,10 @@ export default function LogoEdit( {
 
 	const { editEntityRecord } = useDispatch( coreStore );
 
-	const [ syncSiteIcon, setSyncSiteIcon ] = useState(
-		siteLogoId === siteIconId
-	);
 	const setLogo = ( newValue ) => {
 		editEntityRecord( 'root', 'site', undefined, {
 			site_logo: newValue,
 		} );
-
-		// If the user has the option to sync their site icon enabled, also update
-		// the site icon.
-		if ( syncSiteIcon ) {
-			setIcon( newValue );
-		}
-
-		// If we're setting a new Site Logo for the first time, and there is no
-		// existing site icon, then automatically sync the icon to the logo.
-		if ( ! siteLogoId && ! siteIconId && newValue ) {
-			setIcon( newValue );
-			setSyncSiteIcon( true );
-		}
 	};
 
 	const setIcon = ( newValue ) => {
@@ -472,10 +459,9 @@ export default function LogoEdit( {
 				setLogo={ setLogo }
 				logoId={ mediaItemData?.id || siteLogoId }
 				siteUrl={ url }
+				iconId={ siteIconId }
 				setIcon={ setIcon }
 				canUserEdit={ canUserEdit }
-				syncSiteIcon={ syncSiteIcon }
-				setSyncSiteIcon={ setSyncSiteIcon }
 			/>
 		);
 	}
