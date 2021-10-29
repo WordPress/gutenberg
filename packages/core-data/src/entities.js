@@ -127,6 +127,15 @@ export const defaultEntities = [
 		label: __( 'Menu Location' ),
 		key: 'name',
 	},
+	{
+		label: __( 'Global Styles' ),
+		name: 'globalStyles',
+		kind: 'root',
+		baseURL: '/wp/v2/global-styles',
+		baseURLParams: { context: 'edit' },
+		plural: 'globalStylesVariations', // should be different than name
+		getTitle: ( record ) => record?.title?.rendered || record?.title,
+	},
 ];
 
 export const kinds = [

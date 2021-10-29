@@ -133,6 +133,7 @@ export const PanelColorGradientSettingsInner = ( {
 		>
 			{ settings.map( ( setting, index ) => (
 				<ColorGradientControl
+					showTitle={ showTitle }
 					key={ index }
 					{ ...{
 						colors,

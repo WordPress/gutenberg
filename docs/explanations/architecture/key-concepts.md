@@ -37,7 +37,7 @@ Given a block type, a block variation is a predefined set of its initial attribu
 **More on Blocks**
 
 -   **[Block API](/docs/reference-guides/block-api/README.md)**
--   **[Tutorial: Building A Custom Block](/docs/getting-started/tutorials/create-block/README.md)**
+-   **[Tutorial: Building A Custom Block](/docs/getting-started/create-block/README.md)**
 
 ## Reusable Blocks
 

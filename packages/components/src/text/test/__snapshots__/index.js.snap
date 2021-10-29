@@ -2,7 +2,7 @@
 
 exports[`Text should render highlighted words with highlightCaseSensitive 1`] = `
 .emotion-0 {
-  color: #000;
+  color: #1e1e1e;
   line-height: 1.2;
   margin: 0;
   font-size: calc((13 / 13) * 13px);
@@ -30,7 +30,7 @@ exports[`Text should render highlighted words with highlightCaseSensitive 1`] = 
 
 exports[`Text snapshot tests should render correctly 1`] = `
 .emotion-0 {
-  color: #000;
+  color: #1e1e1e;
   line-height: 1.2;
   margin: 0;
   font-size: calc((13 / 13) * 13px);
