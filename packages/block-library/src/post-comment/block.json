@@ -3,7 +3,7 @@
 	"name": "core/post-comment",
 	"title": "Post Comment (deprecated)",
 	"category": "theme",
-	"description": "This block is deprecated. Please use the Comment Template block instead.",
+	"description": "This block is deprecated. Please use the Comments Query Loop block instead.",
 	"textdomain": "default",
 	"attributes": {
 		"commentId": {
