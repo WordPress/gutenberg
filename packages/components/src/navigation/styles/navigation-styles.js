@@ -111,7 +111,7 @@ export const MenuTitleSearchUI = styled( SearchControl )`
 		color: #fff;
 
 		&:focus {
-			background: #303030;
+			background: #434343;
 			color: #fff;
 		}
 
