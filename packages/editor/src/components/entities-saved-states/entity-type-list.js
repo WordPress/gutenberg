@@ -17,24 +17,23 @@ import { store as coreStore } from '@wordpress/core-data';
 import EntityRecordItem from './entity-record-item';
 
 function getEntityDescription( entity, length ) {
-	const descriptions = {
-		site: _n(
-			'This change will affect your whole site.',
-			'These changes will affect your whole site.',
-			length
-		),
-		wp_template: _n(
-			'This change will affect pages and posts that use this template.',
-			'These changes will affect pages and posts that use these templates.',
-			length
-		),
-		wp_template_part: '', // No separate description for template parts.
-	};
-
-	return (
-		descriptions[ entity ] ??
-		__( 'The following content has been modified.' )
-	);
+	switch ( entity ) {
+		case 'site':
+			return _n(
+				'This change will affect your whole site.',
+				'These changes will affect your whole site.',
+				length
+			);
+		case 'wp_template':
+			return _n(
+				'This change will affect pages and posts that use this template.',
+				'These changes will affect pages and posts that use these templates.',
+				length
+			);
+		case 'page':
+		case 'post':
+			return __( 'The following content has been modified.' );
+	}
 }
 
 export default function EntityTypeList( {
