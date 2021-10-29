@@ -66,11 +66,12 @@ const SiteLogo = ( {
 	logoUrl,
 	siteUrl,
 	logoId,
-	setIcon,
 	iconId,
+	setIcon,
+	syncSiteIcon,
+	setSyncSiteIcon,
 	canUserEdit,
 } ) => {
-	const [ syncSiteIcon, setSyncSiteIcon ] = useState( logoId === iconId );
 	const clientWidth = useClientWidth( containerRef, [ align ] );
 	const isLargeViewport = useViewportMatch( 'medium' );
 	const isWideAligned = includes( [ 'wide', 'full' ], align );
@@ -91,6 +92,10 @@ const SiteLogo = ( {
 			title: siteEntities.title,
 			...pick( getSettings(), [ 'imageEditing', 'maxWidth' ] ),
 		};
+	}, [] );
+
+	useEffect( () => {
+		setSyncSiteIcon( logoId === iconId );
 	}, [] );
 
 	useEffect( () => {
@@ -214,10 +219,10 @@ const SiteLogo = ( {
 				naturalHeight={ naturalHeight }
 				clientWidth={ clientWidth }
 				onSaveImage={ ( imageAttributes ) => {
-					setLogo( imageAttributes.id );
 					if ( syncSiteIcon ) {
 						setIcon( imageAttributes.id );
 					}
+					setLogo( imageAttributes.id );
 				} }
 				isEditing={ isEditingImage }
 				onFinishEditing={ () => setIsEditingImage( false ) }
@@ -311,7 +316,7 @@ const SiteLogo = ( {
 							<ToggleControl
 								label={ __( 'Use site logo as icon' ) }
 								onChange={ ( value ) => {
-									setSyncSiteIcon( !! value );
+									setSyncSiteIcon( value );
 									setIcon( value ? logoId : undefined );
 								} }
 								checked={ syncSiteIcon }
@@ -343,6 +348,7 @@ export default function LogoEdit( {
 } ) {
 	const { width } = attributes;
 	const [ logoUrl, setLogoUrl ] = useState();
+	const [ syncSiteIcon, setSyncSiteIcon ] = useState();
 	const ref = useRef();
 
 	const {
@@ -391,17 +397,15 @@ export default function LogoEdit( {
 
 	const { editEntityRecord } = useDispatch( coreStore );
 
-	const setLogo = ( newValue ) => {
+	const setLogo = ( newValue ) =>
 		editEntityRecord( 'root', 'site', undefined, {
 			site_logo: newValue,
 		} );
-	};
 
-	const setIcon = ( newValue ) => {
+	const setIcon = ( newValue ) =>
 		editEntityRecord( 'root', 'site', undefined, {
 			site_icon: newValue,
 		} );
-	};
 
 	let alt = null;
 	if ( mediaItemData ) {
@@ -415,6 +419,10 @@ export default function LogoEdit( {
 			return;
 		}
 
+		if ( syncSiteIcon ) {
+			setIcon( media.id );
+		}
+
 		if ( ! media.id && media.url ) {
 			// This is a temporary blob image
 			setLogo( undefined );
@@ -426,6 +434,9 @@ export default function LogoEdit( {
 	};
 
 	const onRemoveLogo = () => {
+		if ( syncSiteIcon ) {
+			setIcon( null );
+		}
 		setLogo( null );
 		setLogoUrl( undefined );
 		setAttributes( { width: undefined } );
@@ -471,6 +482,8 @@ export default function LogoEdit( {
 				iconId={ siteIconId }
 				setIcon={ setIcon }
 				canUserEdit={ canUserEdit }
+				syncSiteIcon={ syncSiteIcon }
+				setSyncSiteIcon={ setSyncSiteIcon }
 			/>
 		);
 	}
