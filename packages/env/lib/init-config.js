@@ -112,19 +112,23 @@ function dockerFileContents( image, config ) {
 
 	if ( config.xdebug !== 'off' ) {
 		if ( config.env.development.phpVersion ) {
-			const versionTokens = config.env.development.phpVersion.split( '.' );
+			const versionTokens = config.env.development.phpVersion.split(
+				'.'
+			);
 			const majorVersion = parseInt( versionTokens[ 0 ] );
 			const minorVersion = parseInt( versionTokens[ 1 ] );
 
 			if ( isNaN( majorVersion ) || isNaN( minorVersion ) ) {
-				throw new Error( 'Something went wrong when parsing the PHP version.' );
+				throw new Error(
+					'Something went wrong when parsing the PHP version.'
+				);
 			}
 
 			// Xdebug 3 supports 7.2 and higher
 			// Ensure user has specified a compatible PHP version
-			const usingInompatiblePhpVersion = majorVersion < 7 || ( majorVersion === 7 && minorVersion < 2 );
+			const inompatiblePhp = majorVersion < 7 || ( majorVersion === 7 && minorVersion < 2 );
 
-			if ( usingInompatiblePhpVersion ) {
+			if ( inompatiblePhp ) {
 				throw new Error( 'Cannot use XDebug 3 on PHP < 7.2.' );
 			}
 		}
