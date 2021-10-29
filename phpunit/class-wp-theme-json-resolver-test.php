@@ -209,6 +209,8 @@ class WP_Theme_JSON_Resolver_Gutenberg_Test extends WP_UnitTestCase {
 		add_theme_support( 'editor-color-palette', $color_palette );
 		$supports = gutenberg_get_default_block_editor_settings();
 		$settings = WP_Theme_JSON_Resolver_Gutenberg::get_merged_data( $supports )->get_settings();
+		remove_theme_support( 'custom-line-height' );
+		remove_theme_support( 'editor-color-palette' );
 
 		$this->assertSame( false, WP_Theme_JSON_Resolver_Gutenberg::theme_has_support() );
 		$this->assertSame( true, $settings['typography']['customLineHeight'] );
