@@ -159,55 +159,61 @@ export default function NavigationPlaceholder( {
 										toggleProps={ toggleProps }
 									>
 										{ ( { onClose } ) => (
-											<MenuGroup>
-												{ canSwitchNavigationMenu &&
-													navigationMenus.map(
-														( menu ) => {
-															return (
-																<MenuItem
-																	onClick={ () => {
-																		setSelectedMenu(
+											<>
+												<MenuGroup label="Menus">
+													{ canSwitchNavigationMenu &&
+														navigationMenus.map(
+															( menu ) => {
+																return (
+																	<MenuItem
+																		onClick={ () => {
+																			setSelectedMenu(
+																				menu.id
+																			);
+																			onFinish(
+																				menu
+																			);
+																		} }
+																		onClose={
+																			onClose
+																		}
+																		key={
 																			menu.id
-																		);
-																		onFinish(
+																		}
+																	>
+																		{
 																			menu
-																		);
-																	} }
-																	onClose={
-																		onClose
-																	}
-																	key={
+																				.title
+																				.rendered
+																		}
+																	</MenuItem>
+																);
+															}
+														) }
+												</MenuGroup>
+												<MenuGroup label="Classic Menus">
+													{ menus.map( ( menu ) => {
+														return (
+															<MenuItem
+																onClick={ () => {
+																	setSelectedMenu(
 																		menu.id
-																	}
-																>
-																	{
-																		menu
-																			.title
-																			.rendered
-																	}
-																</MenuItem>
-															);
-														}
-													) }
-												{ menus.map( ( menu ) => {
-													return (
-														<MenuItem
-															onClick={ () => {
-																setSelectedMenu(
-																	menu.id
-																);
-																onCreateFromMenu(
-																	menu.name
-																);
-															} }
-															onClose={ onClose }
-															key={ menu.id }
-														>
-															{ menu.name }
-														</MenuItem>
-													);
-												} ) }
-											</MenuGroup>
+																	);
+																	onCreateFromMenu(
+																		menu.name
+																	);
+																} }
+																onClose={
+																	onClose
+																}
+																key={ menu.id }
+															>
+																{ menu.name }
+															</MenuItem>
+														);
+													} ) }
+												</MenuGroup>
+											</>
 										) }
 									</DropdownMenu>
 								) : undefined }
