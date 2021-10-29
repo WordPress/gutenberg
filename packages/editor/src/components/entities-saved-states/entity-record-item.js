@@ -38,10 +38,7 @@ export default function EntityRecordItem( {
 	// Handle templates that might use default descriptive titles
 	const entityRecordTitle = useSelect(
 		( select ) => {
-			if (
-				'postType' !== kind ||
-				! [ 'wp_template', 'wp_template_part' ].includes( name )
-			) {
+			if ( 'postType' !== kind || 'wp_template' !== name ) {
 				return title;
 			}
 
@@ -50,25 +47,9 @@ export default function EntityRecordItem( {
 				name,
 				key
 			);
-
-			if ( name === 'wp_template' ) {
-				return select( editorStore ).__experimentalGetTemplateInfo(
-					template
-				).title;
-			}
-
-			if ( name === 'wp_template_part' ) {
-				const templatePartAreas = select(
-					editorStore
-				).__experimentalGetDefaultTemplatePartAreas();
-
-				return (
-					templatePartAreas.find(
-						( templatePartArea ) =>
-							templatePartArea.area === template.area
-					)?.label ?? title
-				);
-			}
+			return select( editorStore ).__experimentalGetTemplateInfo(
+				template
+			).title;
 		},
 		[ name, kind, title, key ]
 	);
