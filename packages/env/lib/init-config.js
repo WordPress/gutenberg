@@ -99,23 +99,21 @@ module.exports = async function initConfig( {
 };
 
 /**
- * Checks the configured PHP version 
+ * Checks the configured PHP version
  * against the minimum version supported by Xdebug
- * 
- * @param {WPConfig} config 
+ *
+ * @param {WPConfig} config
  * @return {boolean} Whether the PHP version is supported by Xdebug
  */
 function checkXdebugPhpCompatibility( config ) {
 	// By default, an undefined phpVersion uses the version on the docker image,
 	// which is supported by Xdebug 3.
-	let phpCompatibility = true;
+	const phpCompatibility = true;
 
 	// If PHP version is defined
 	// ensure it meets the Xdebug minimum compatibility requirment
 	if ( config.env.development.phpVersion ) {
-		const versionTokens = config.env.development.phpVersion.split(
-			'.'
-		);
+		const versionTokens = config.env.development.phpVersion.split( '.' );
 		const majorVer = parseInt( versionTokens[ 0 ] );
 		const minorVer = parseInt( versionTokens[ 1 ] );
 
@@ -148,7 +146,7 @@ function dockerFileContents( image, config ) {
 	let shouldInstallXdebug = false;
 
 	if ( config.xdebug !== 'off' ) {
-		const usingCompatiblePhp = checkXdebugPhpCompatibility(config);
+		const usingCompatiblePhp = checkXdebugPhpCompatibility( config );
 
 		if ( usingCompatiblePhp ) {
 			shouldInstallXdebug = true;
