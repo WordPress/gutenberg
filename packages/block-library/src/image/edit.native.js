@@ -81,7 +81,6 @@ const getUrlForSlug = ( image, sizeSlug ) => {
 
 function LinkSettings( {
 	attributes,
-	dismissSheet,
 	image,
 	isLinkSheetVisible,
 	setMappedAttributes,
@@ -140,7 +139,6 @@ function LinkSettings( {
 				rel={ rel }
 				label={ label }
 				linkTarget={ linkTarget }
-				onClose={ dismissSheet }
 				setAttributes={ setMappedAttributes }
 				withBottomSheet={ false }
 				hasPicker
@@ -622,7 +620,6 @@ export class ImageEdit extends Component {
 				</PanelBody>
 				<LinkSettings
 					attributes={ this.props.attributes }
-					dismissSheet={ this.dismissSheet }
 					image={ this.props.image }
 					isLinkSheetVisible={ this.state.isLinkSheetVisible }
 					setMappedAttributes={ this.setMappedAttributes }
