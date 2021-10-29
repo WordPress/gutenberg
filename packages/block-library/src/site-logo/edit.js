@@ -345,7 +345,7 @@ export default function LogoEdit( {
 } ) {
 	const { width } = attributes;
 	const [ logoUrl, setLogoUrl ] = useState();
-	const [ syncSiteIcon, setSyncSiteIcon ] = useState();
+	const [ syncSiteIcon, setSyncSiteIcon ] = useState( true );
 	const ref = useRef();
 
 	const {
@@ -402,7 +402,7 @@ export default function LogoEdit( {
 		editEntityRecord( 'root', 'site', undefined, {
 			site_logo: newValue,
 		} );
-	}
+	};
 
 	const setIcon = ( newValue ) =>
 		editEntityRecord( 'root', 'site', undefined, {
