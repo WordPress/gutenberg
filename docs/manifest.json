@@ -1776,12 +1776,6 @@
 		"parent": "packages"
 	},
 	{
-		"title": "@wordpress/schemas",
-		"slug": "packages-schemas",
-		"markdown_source": "../packages/schemas/README.md",
-		"parent": "packages"
-	},
-	{
 		"title": "@wordpress/scripts",
 		"slug": "packages-scripts",
 		"markdown_source": "../packages/scripts/README.md",
