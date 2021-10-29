@@ -89,7 +89,7 @@ const EmbedEdit = ( props ) => {
 			return {
 				preview: validPreview ? embedPreview : undefined,
 				fetching: isRequestingEmbedPreview( attributesUrl ),
-				themeSupportsResponsive: getThemeSupports()[
+				themeSupportsResponsive: getThemeSupports()?.[
 					'responsive-embeds'
 				],
 				cannotEmbed: ! validPreview || previewIsFallback,
