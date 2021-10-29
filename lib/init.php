@@ -104,7 +104,7 @@ function gutenberg_site_editor_menu() {
 			),
 			'edit_theme_options',
 			'gutenberg-edit-site',
-			'gutenberg_edit_site_page',
+			'gutenberg_edit_site_page'
 		);
 	}
 }
