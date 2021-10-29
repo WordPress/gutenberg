@@ -6,7 +6,11 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { RichText, useBlockProps, InnerBlocks } from '@wordpress/block-editor';
+import {
+	RichText,
+	useBlockProps,
+	useInnerBlocksProps,
+} from '@wordpress/block-editor';
 
 /**
  * Internal dependencies
@@ -25,10 +29,12 @@ export default function saveWithInnerBlocks( { attributes } ) {
 		[ `columns-default` ]: columns === undefined,
 		'is-cropped': imageCrop,
 	} );
+	const blockProps = useBlockProps.save( { className } );
+	const innerBlocksProps = useInnerBlocksProps.save( blockProps );
 
 	return (
-		<figure { ...useBlockProps.save( { className } ) }>
-			<InnerBlocks.Content />
+		<figure { ...innerBlocksProps }>
+			{ innerBlocksProps.children }
 			{ ! RichText.isEmpty( caption ) && (
 				<RichText.Content
 					tagName="figcaption"
