@@ -30,6 +30,7 @@ class Gutenberg_REST_Global_Styles_Controller_Test extends WP_Test_REST_Controll
 	public static function wpSetupBeforeClass( $factory ) {
 		switch_theme( 'tt1-blocks' );
 		gutenberg_register_wp_theme_taxonomy();
+		WP_Theme_JSON_Resolver_Gutenberg::register_user_custom_post_type();
 		self::$admin_id = $factory->user->create(
 			array(
 				'role' => 'administrator',
@@ -53,7 +54,7 @@ class Gutenberg_REST_Global_Styles_Controller_Test extends WP_Test_REST_Controll
 
 	public function test_register_routes() {
 		$routes = rest_get_server()->get_routes();
-		$this->assertArrayHasKey( '/wp/v2/global-styles/(?P<id>[\/\w-]+)', $routes );
+		$this->assertArrayHasKey( '/wp/v2/global-styles/(?P<id>[\d]+)', $routes );
 	}
 
 	public function test_context_param() {
