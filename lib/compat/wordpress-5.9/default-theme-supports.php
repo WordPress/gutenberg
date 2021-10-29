@@ -27,6 +27,8 @@ if ( gutenberg_is_fse_theme() ) {
  * template (eg.: 404)
  *
  * More details on the bug can be found in: https://core.trac.wordpress.org/ticket/54323
+ *
+ * @see enqueue_block_styles_assets
  */
 function gutenberg_enqueue_block_styles_assets() {
 	$block_styles = WP_Block_Styles_Registry::get_instance()->get_all_registered();
