@@ -6,33 +6,6 @@
  */
 
 /**
- * Takes a tree adhering to the theme.json schema and generates
- * the corresponding stylesheet.
- *
- * @param WP_Theme_JSON_Gutenberg $tree  Input tree.
- * @param array                   $types Which styles to load. It accepts 'variables', 'styles', 'presets'. By default, it'll load all.
- *
- * @return string Stylesheet.
- */
-function gutenberg_experimental_global_styles_get_stylesheet( $tree, $types = array( 'variables', 'styles', 'presets' ) ) {
-	$origins             = array( 'core', 'theme', 'user' );
-	$supports_theme_json = WP_Theme_JSON_Resolver_Gutenberg::theme_has_support();
-	$supports_link_color = get_theme_support( 'experimental-link-color' );
-	if ( ! $supports_theme_json && ! $supports_link_color ) {
-		// In this case we only enqueue the core presets (CSS Custom Properties + the classes).
-		$origins = array( 'core' );
-	} elseif ( ! $supports_theme_json && $supports_link_color ) {
-		// For the legacy link color feature to work, the CSS Custom Properties
-		// should be in scope (either the core or the theme ones).
-		$origins = array( 'core', 'theme' );
-	}
-
-	$stylesheet = $tree->get_stylesheet( $types, $origins );
-
-	return $stylesheet;
-}
-
-/**
  * Fetches the preferences for each origin (core, theme, user)
  * and enqueues the resulting stylesheet.
  */
@@ -78,17 +51,13 @@ function gutenberg_experimental_global_styles_settings( $settings ) {
 		$context = 'mobile';
 	}
 
-	$consolidated = WP_Theme_JSON_Resolver_Gutenberg::get_merged_data();
-
 	if ( 'mobile' === $context && WP_Theme_JSON_Resolver_Gutenberg::theme_has_support() ) {
-		$settings['__experimentalStyles'] = $consolidated->get_raw_data()['styles'];
+		$settings['__experimentalStyles'] = gutenberg_get_global_styles();
 	}
 
 	if ( 'site-editor' === $context && gutenberg_experimental_is_site_editor_available() ) {
-		$theme = WP_Theme_JSON_Resolver_Gutenberg::get_merged_data( array(), 'theme' );
-
-		$settings['__experimentalGlobalStylesBaseConfig']['styles']   = $theme->get_raw_data()['styles'];
-		$settings['__experimentalGlobalStylesBaseConfig']['settings'] = $theme->get_settings();
+		$settings['__experimentalGlobalStylesBaseConfig']['styles']   = gutenberg_get_global_styles( array(), '', 'theme' );
+		$settings['__experimentalGlobalStylesBaseConfig']['settings'] = gutenberg_get_global_settings( array(), '', 'theme' );
 	}
 
 	if ( 'other' === $context ) {
@@ -119,7 +88,7 @@ function gutenberg_experimental_global_styles_settings( $settings ) {
 			),
 		);
 		foreach ( $new_presets as $new_style ) {
-			$style_css = gutenberg_experimental_global_styles_get_stylesheet( $consolidated, array( $new_style['css'] ) );
+			$style_css = gutenberg_get_global_stylesheet( array( $new_style['css'] ) );
 			if ( '' !== $style_css ) {
 				$new_style['css']    = $style_css;
 				$new_global_styles[] = $new_style;
@@ -131,7 +100,7 @@ function gutenberg_experimental_global_styles_settings( $settings ) {
 			'__unstableType' => 'theme',
 		);
 		if ( WP_Theme_JSON_Resolver_Gutenberg::theme_has_support() ) {
-			$style_css = gutenberg_experimental_global_styles_get_stylesheet( $consolidated, array( $new_block_classes['css'] ) );
+			$style_css = gutenberg_get_global_stylesheet( array( $new_block_classes['css'] ) );
 			if ( '' !== $style_css ) {
 				$new_block_classes['css'] = $style_css;
 				$new_global_styles[]      = $new_block_classes;
@@ -142,7 +111,7 @@ function gutenberg_experimental_global_styles_settings( $settings ) {
 	}
 
 	// Copied from get_block_editor_settings() at wordpress-develop/block-editor.php.
-	$settings['__experimentalFeatures'] = $consolidated->get_settings();
+	$settings['__experimentalFeatures'] = gutenberg_get_global_settings();
 
 	if ( isset( $settings['__experimentalFeatures']['color']['palette'] ) ) {
 		$colors_by_origin   = $settings['__experimentalFeatures']['color']['palette'];
