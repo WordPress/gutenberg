@@ -182,7 +182,6 @@ export class ImageEdit extends Component {
 		);
 		this.updateMediaProgress = this.updateMediaProgress.bind( this );
 		this.updateImageURL = this.updateImageURL.bind( this );
-		this.onSetLinkDestination = this.onSetLinkDestination.bind( this );
 		this.onSetNewTab = this.onSetNewTab.bind( this );
 		this.onSetSizeSlug = this.onSetSizeSlug.bind( this );
 		this.onImagePressed = this.onImagePressed.bind( this );
@@ -346,13 +345,6 @@ export class ImageEdit extends Component {
 		this.props.setAttributes( {
 			...extraUpdatedAttributes,
 			align: nextAlign,
-		} );
-	}
-
-	onSetLinkDestination( href ) {
-		this.props.setAttributes( {
-			linkDestination: LINK_DESTINATION_CUSTOM,
-			href,
 		} );
 	}
 
