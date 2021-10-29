@@ -8,7 +8,12 @@ import { includes, pick } from 'lodash';
  * WordPress dependencies
  */
 import { isBlobURL } from '@wordpress/blob';
-import { useEffect, useState, useRef } from '@wordpress/element';
+import {
+	createInterpolateElement,
+	useEffect,
+	useState,
+	useRef,
+} from '@wordpress/element';
 import { __, isRTL } from '@wordpress/i18n';
 import {
 	MenuItem,
@@ -257,8 +262,12 @@ const SiteLogo = ( {
 			</ResizableBox>
 		);
 
-	const syncSiteIconHelpText = __(
-		"Site Icons are what you see in browser tabs, bookmark bars, and within the WordPress mobile apps. If you don't have one, you can set your logo to also be your icon. If you do have a custom site icon, you can upload that from the Site Icon settings!"
+	const syncSiteIconHelpText = createInterpolateElement(
+		__(
+			"Site Icons are what you see in browser tabs, bookmark bars, and within the WordPress mobile apps. If you don't have one, you can set your logo to also be your icon. If you do have a custom site icon, you can upload that from the Site Icon settings in the <a>Customizer</a>!"
+		),
+		// eslint-disable-next-line jsx-a11y/anchor-has-content
+		{ a: <a href={ siteUrl + '/wp-admin/customize.php' } target="blank" /> }
 	);
 
 	return (
