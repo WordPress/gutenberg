@@ -159,7 +159,7 @@ jest.mock( 'react-native/Libraries/Animated/NativeAnimatedHelper' );
  * @see node_modules/react-native/Libraries/Components/Clipboard/Clipboard.js
  */
 jest.mock( 'react-native/Libraries/Components/Clipboard/Clipboard', () => ( {
-	getString: jest.fn( () => new Promise( ( resolve ) => resolve( '' ) ) ),
+	getString: jest.fn( () => Promise.resolve( '' ) ),
 	setString: jest.fn(),
 } ) );
 

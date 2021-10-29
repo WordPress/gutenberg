@@ -10,6 +10,10 @@ import { registerCoreBlocks } from '@wordpress/block-library';
 import { getBlockTypes, unregisterBlockType } from '@wordpress/blocks';
 
 /**
+ * TODO: Move this module to `<LinkSettings/>` since it's not specific to the <ImageEdit/> block type?
+ */
+
+/**
  * Utility function to unregister all core block types previously registered
  * when staging the Redux Store `beforeAll` integration tests start running.
  *
@@ -19,6 +23,32 @@ const unregisterBlocks = () => {
 	const blocks = getBlockTypes();
 
 	blocks.forEach( ( { name } ) => unregisterBlockType( name ) );
+};
+
+/**
+ * Utility function to interact with the element under test to pretend that
+ * the user pressed elements. This could also be possibly used for `onLayout`
+ * events as well, but currently I just wrote it for redundant `onPress` events.
+ * If another parameter is added, I don't see why it couldn't be used to provide
+ * text as user input into text fields.
+ *
+ * This should probably be extracted into a utility module for future tests.
+ *
+ * @param {Object[]} steps   - Interaction steps to apply to the UI element under test.
+ * @param {Object}   element - The UI element under test.
+ * @see node_modules/@testing-library/react-native/typings/index.d.ts
+ * @return {Promise<void>} - The utility `await`s promises from `waitFor` so it's `async`.
+ */
+const interactionWithUIElement = async ( steps, element ) => {
+	for ( const step of steps ) {
+		const { find = {}, then = {} } = step;
+		const { event = '' } = then;
+		const [ query = '' ] =
+			Object.keys( find ).filter( ( key ) => !! find[ key ] ) || [];
+		const selector = find[ query ] || '';
+		const subject = await waitFor( () => element[ query ]( selector ) );
+		fireEvent[ event ]( subject );
+	}
 };
 
 /**
@@ -62,7 +92,34 @@ const unregisterBlocks = () => {
  * AND the `Add this link` table cell is repopulated with the new URL from the Clipboard.
  * ```
  */
-describe( '<ImageEdit/>', () => {
+describe.each( [
+	[
+		{
+			type: 'core/button',
+			initialHtml: `
+				<!-- wp:button {"style":{"border":{"radius":"5px"}}} -->
+				<div class="wp-block-button">
+					<a class="wp-block-button__link" style="border-radius:5px">Link</a>
+				</div>
+				<!-- /wp:button -->
+			`,
+			toJSON: () => 'core/button',
+		},
+	],
+	[
+		{
+			type: 'core/image',
+			initialHtml: `
+				<!-- wp:image {"id":20,"sizeSlug":"large","linkDestination":"custom"} -->
+				<figure class="wp-block-image size-large">
+					<img class="wp-image-20" src="https://tonytahmouchtest.files.wordpress.com/2021/10/img_0111-2.jpg?w=1024" alt="" />
+				</figure>
+				<!-- /wp:image -->
+			`,
+			toJSON: () => 'core/image',
+		},
+	],
+] )( '<LinkSettings/> from %j', ( { type, initialHtml } ) => {
 	beforeAll( () => {
 		registerCoreBlocks();
 	} );
@@ -72,41 +129,46 @@ describe( '<ImageEdit/>', () => {
 	} );
 
 	/**
-	 * GIVEN an EDITOR is displayed with an IMAGE BLOCK;
+	 * GIVEN an EDITOR is displayed with an EDIT IMAGE BLOCK or EDIT BUTTON BLOCK;
 	 * GIVEN the CLIPBOARD has a URL copied;
-	 * WHEN the USER selects the EDIT BUTTON on the IMAGE BLOCK;
+	 * WHEN the USER selects the SETTINGS BUTTON on the EDIT IMAGE BLOCK or EDIT BUTTON BLOCK;
 	 */
 	// eslint-disable-next-line jest/no-done-callback
 	it( 'should display the LINK SETTINGS with an EMPTY LINK TO field.', async ( done ) => {
 		// Arrange
 		const url = 'https://tonytahmouchtest.files.wordpress.com';
-		const {
-			getByA11yHint,
-			getByA11yLabel,
-			getByText,
-		} = await initializeEditor( {
-			initialHtml: `
-				<!-- wp:image {"id":20,"sizeSlug":"large","linkDestination":"custom"} -->
-	  			<figure class="wp-block-image size-large">
-					<img class="wp-image-20" src="${ url }/2021/10/img_0111-2.jpg?w=1024" alt="" />
-	  			</figure>
-				<!-- /wp:image -->
-			`,
-		} );
+		const subject = await initializeEditor( { initialHtml } );
 		Clipboard.getString.mockReturnValueOnce( url );
+
 		// Act
-		fireEvent.press(
-			await waitFor( () =>
-				getByA11yHint( 'Double tap and hold to edit' )
-			)
+		const buttonBlockSelector =
+			type === 'core/button' ? 'Button Block. Row 1' : undefined;
+		const imageBlockSelector =
+			type === 'core/image' ? 'Double tap and hold to edit' : undefined;
+		await interactionWithUIElement(
+			[
+				{
+					find: {
+						getByA11yLabel: buttonBlockSelector,
+						getByA11yHint: imageBlockSelector,
+					},
+					then: { event: 'press' },
+				},
+				{
+					find: { getByA11yLabel: 'Open Settings' },
+					then: { event: 'press' },
+				},
+			],
+			subject
 		);
-		fireEvent.press(
-			await waitFor( () => getByA11yLabel( 'Open Settings' ) )
-		);
+
 		// Assert
 		const expectation =
 			'The URL from the Clipboard should NOT be displayed in the Link Settings > Link To field.';
-		waitFor( () => getByText( url ), { timeout: 50, interval: 10 } )
+		waitFor( () => subject.getByText( url ), {
+			timeout: 50,
+			interval: 10,
+		} )
 			.then( () => done.fail( expectation ) )
 			.catch( () => done() );
 	} );
