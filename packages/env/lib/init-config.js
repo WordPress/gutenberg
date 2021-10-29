@@ -99,6 +99,43 @@ module.exports = async function initConfig( {
 };
 
 /**
+ * Checks the configured PHP version 
+ * against the minimum version supported by Xdebug
+ * 
+ * @param {WPConfig} config 
+ * @return {bool} Whether the PHP version is supported by Xdebug
+ */
+function checkXdebugPhpCompatibility( config ) {
+	// By default, an undefined phpVersion uses the version on the docker image,
+	// which is supported by Xdebug 3.
+	let phpCompatibility = true;
+
+	// If PHP version is defined
+	// ensure it meets the Xdebug minimum compatibility requirment
+	if ( config.env.development.phpVersion ) {
+		const versionTokens = config.env.development.phpVersion.split(
+			'.'
+		);
+		const majorVer = parseInt( versionTokens[ 0 ] );
+		const minorVer = parseInt( versionTokens[ 1 ] );
+
+		if ( isNaN( majorVer ) || isNaN( minorVer ) ) {
+			throw new Error(
+				'Something went wrong when parsing the PHP version.'
+			);
+		}
+
+		// Xdebug 3 supports 7.2 and higher
+		// Ensure user has specified a compatible PHP version
+		if ( majorVer < 7 || ( majorVer === 7 && minorVer < 2 ) ) {
+			throw new Error( 'Cannot use XDebug 3 on PHP < 7.2.' );
+		}
+	}
+
+	return phpCompatibility;
+}
+
+/**
  * Generates the Dockerfile used by wp-env's development instance.
  *
  * @param {string}   image  The base docker image to use.
@@ -111,31 +148,11 @@ function dockerFileContents( image, config ) {
 	let shouldInstallXdebug = false;
 
 	if ( config.xdebug !== 'off' ) {
-		if ( config.env.development.phpVersion ) {
-			const versionTokens = config.env.development.phpVersion.split(
-				'.'
-			);
-			const majorVersion = parseInt( versionTokens[ 0 ] );
-			const minorVersion = parseInt( versionTokens[ 1 ] );
+		const usingCompatiblePhp = checkXdebugPhpCompatibility(config);
 
-			if ( isNaN( majorVersion ) || isNaN( minorVersion ) ) {
-				throw new Error(
-					'Something went wrong when parsing the PHP version.'
-				);
-			}
-
-			// Xdebug 3 supports 7.2 and higher
-			// Ensure user has specified a compatible PHP version
-			const inompatiblePhp = majorVersion < 7 || ( majorVersion === 7 && minorVersion < 2 );
-
-			if ( inompatiblePhp ) {
-				throw new Error( 'Cannot use XDebug 3 on PHP < 7.2.' );
-			}
+		if ( usingCompatiblePhp ) {
+			shouldInstallXdebug = true;
 		}
-
-		// By default, an undefined phpVersion uses the version on the docker image,
-		// which is supported by Xdebug 3.
-		shouldInstallXdebug = true;
 	}
 
 	return `FROM ${ image }
