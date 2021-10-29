@@ -15,6 +15,7 @@ import android.widget.FrameLayout.LayoutParams;
 
 import androidx.annotation.Nullable;
 import androidx.core.util.Consumer;
+import androidx.core.util.Pair;
 import androidx.fragment.app.Fragment;
 
 import com.brentvatne.react.ReactVideoPackage;
@@ -846,7 +847,7 @@ public class WPAndroidGlueCode {
         void onGetContentTimeout(InterruptedException ie);
     }
 
-    public CharSequence getContent(CharSequence originalContent, OnGetContentTimeout onGetContentTimeout) {
+    public synchronized CharSequence getContent(CharSequence originalContent, OnGetContentTimeout onGetContentTimeout) {
         if (mReactContext != null) {
             mGetContentCountDownLatch = new CountDownLatch(1);
 
@@ -866,7 +867,7 @@ public class WPAndroidGlueCode {
         return originalContent;
     }
 
-    public CharSequence getTitle(OnGetContentTimeout onGetContentTimeout) {
+    public synchronized CharSequence getTitle(OnGetContentTimeout onGetContentTimeout) {
         if (mReactContext != null) {
             mGetContentCountDownLatch = new CountDownLatch(1);
 
@@ -886,28 +887,65 @@ public class WPAndroidGlueCode {
         return "";
     }
 
+
+    /** This method retrieves both the title and the content from the Gutenberg editor by the emission of a single
+     * event. This is useful to avoid redundant events, since {@link #getTitle} and {@link #getContent} both share the
+     * same event anyway, and also share the same mechanism to suspend execution until a response is received (or a
+     * timeout is reached).
+     * @param originalContent fallback content to return in case the timeout is reached, or the thread is interrupted
+     * @param onGetContentTimeout callback to invoke if thread is interrupted before the timeout
+     * @return
+     */
+    public synchronized Pair<CharSequence, CharSequence> getTitleAndContent(CharSequence originalContent,
+                                                               OnGetContentTimeout onGetContentTimeout) {
+        if (mReactContext != null) {
+            mGetContentCountDownLatch = new CountDownLatch(1);
+
+            mRnReactNativeGutenbergBridgePackage.getRNReactNativeGutenbergBridgeModule().getHtmlFromJS();
+
+            try {
+                // TODO: we should consider logging when await returns false
+                mGetContentCountDownLatch.await(10, TimeUnit.SECONDS);
+            } catch (InterruptedException ie) {
+                // TODO: this should be either renamed, or invoked when the await returns false.
+                onGetContentTimeout.onGetContentTimeout(ie);
+            }
+
+            return new Pair<>(
+                    mTitle == null ? "" : mTitle,
+                    mContentChanged ? (mContentHtml == null ? "" : mContentHtml) : originalContent
+            );
+        } else {
+            // TODO: Add app logging here
+        }
+
+        return new Pair<>("", originalContent);
+    }
+
     public boolean triggerGetContentInfo(OnContentInfoReceivedListener onContentInfoReceivedListener) {
         if (mReactContext != null && (mGetContentCountDownLatch == null || mGetContentCountDownLatch.getCount() == 0)) {
             if (!mIsEditorMounted) {
                 onContentInfoReceivedListener.onEditorNotReady();
                 return false;
             }
-
-            mGetContentCountDownLatch = new CountDownLatch(1);
-
-            mRnReactNativeGutenbergBridgePackage.getRNReactNativeGutenbergBridgeModule().getHtmlFromJS();
-
             new Thread(new Runnable() {
                 @Override public void run() {
-                    try {
-                        mGetContentCountDownLatch.await(5, TimeUnit.SECONDS);
-                        if (mContentInfo == null) {
+                    // We need to synchronize access to (and overwriting of) the latch to avoid race conditions
+                    synchronized (WPAndroidGlueCode.this) {
+                        mGetContentCountDownLatch = new CountDownLatch(1);
+
+                        mRnReactNativeGutenbergBridgePackage.getRNReactNativeGutenbergBridgeModule().getHtmlFromJS();
+
+                        try {
+                            mGetContentCountDownLatch.await(5, TimeUnit.SECONDS);
+                            if (mContentInfo == null) {
+                                onContentInfoReceivedListener.onContentInfoFailed();
+                            } else {
+                                onContentInfoReceivedListener.onContentInfoReceived(mContentInfo.toHashMap());
+                            }
+                        } catch (InterruptedException ie) {
                             onContentInfoReceivedListener.onContentInfoFailed();
-                        } else {
-                            onContentInfoReceivedListener.onContentInfoReceived(mContentInfo.toHashMap());
                         }
-                    } catch (InterruptedException ie) {
-                        onContentInfoReceivedListener.onContentInfoFailed();
                     }
                 }
             }).start();
