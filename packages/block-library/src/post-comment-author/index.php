@@ -23,7 +23,12 @@ function render_block_core_post_comment_author( $attributes, $content, $block ) 
 		return '';
 	}
 
-	$wrapper_attributes = get_block_wrapper_attributes();
+	$classes = '';
+	if ( isset( $attributes['textAlign'] ) ) {
+		$classes .= 'has-text-align-' . esc_attr( $attributes['textAlign'] );
+	}
+
+	$wrapper_attributes = get_block_wrapper_attributes( array( 'class' => $classes ) );
 	$comment_author     = get_comment_author( $comment );
 	$link               = get_comment_author_url( $comment );
 
