@@ -2,6 +2,12 @@
 
 ## Unreleased
 
+### Experimental
+
+-   Updated the `ToolsPanel` to use `Grid` internally to manage panel layout ([35621](https://github.com/WordPress/gutenberg/pull/35621)).
+
+## 19.0.0 (2021-10-22)
+
 ### New Features
 
 -   Added support for `step="any"` in `NumberControl` and `RangeControl` ([#34542](https://github.com/WordPress/gutenberg/pull/34542)).

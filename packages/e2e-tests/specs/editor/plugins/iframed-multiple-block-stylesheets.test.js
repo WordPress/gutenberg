@@ -33,7 +33,7 @@ describe( 'iframed multiple block stylesheets', () => {
 		await deactivatePlugin( 'gutenberg-test-iframed-multiple-stylesheets' );
 	} );
 
-	it( 'should load multiple block stylesheets in iframe', async () => {
+	it.skip( 'should load multiple block stylesheets in iframe', async () => {
 		await insertBlock( 'Iframed Multiple Stylesheets' );
 
 		await page.waitForSelector(
@@ -64,8 +64,8 @@ describe( 'iframed multiple block stylesheets', () => {
 			'rgb(0, 0, 0)'
 		);
 
-		// Skip errors related to block-styles enqueing and the use of add_editor_style.
+		// Skip warnings related to block-styles enqueing and the use of add_editor_style.
 		// The issue is tracked on https://github.com/WordPress/gutenberg/issues/33212.
-		expect( console ).toHaveErrored();
+		expect( console ).toHaveWarned();
 	} );
 } );

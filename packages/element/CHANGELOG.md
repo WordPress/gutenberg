@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 4.0.3 (2021-10-22)
+
 ### Bug Fix
 
 -   Update `rawHtml` to correctly concatenate multiple strings passed as children

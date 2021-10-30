@@ -15,8 +15,10 @@ import { useCallback, useMemo } from '@wordpress/element';
 /**
  * Internal dependencies
  */
+import Dropdown from '../dropdown';
 import { ColorPicker } from '../color-picker';
 import CircularOptionPicker from '../circular-option-picker';
+import { VStack } from '../v-stack';
 
 extend( [ namesPlugin, a11yPlugin ] );
 
@@ -25,6 +27,7 @@ export default function ColorPalette( {
 	className,
 	colors,
 	disableCustomColors = false,
+	enableAlpha,
 	onChange,
 	value,
 } ) {
@@ -71,37 +74,41 @@ export default function ColorPalette( {
 		<ColorPicker
 			color={ value }
 			onChange={ ( color ) => onChange( color ) }
+			enableAlpha={ enableAlpha }
 		/>
 	);
 
 	return (
-		<CircularOptionPicker
-			className={ className }
-			options={ colorOptions }
-			actions={
-				<>
-					{ ! disableCustomColors && (
-						<CircularOptionPicker.DropdownLinkAction
-							dropdownProps={ {
-								renderContent: renderCustomColorPicker,
-								contentClassName:
-									'components-color-palette__picker',
-							} }
-							buttonProps={ {
-								'aria-label': __( 'Custom color picker' ),
-							} }
-							linkText={ __( 'Custom color' ) }
-						/>
+		<VStack spacing={ 3 } className={ className }>
+			{ ! disableCustomColors && (
+				<Dropdown
+					renderContent={ renderCustomColorPicker }
+					renderToggle={ ( { isOpen, onToggle } ) => (
+						<button
+							className="components-color-palette__custom-color"
+							aria-expanded={ isOpen }
+							aria-haspopup="true"
+							onClick={ onToggle }
+							aria-label={ __( 'Custom color picker' ) }
+							style={ { background: value } }
+						>
+							{ value }
+						</button>
 					) }
-					{ !! clearable && (
+				/>
+			) }
+			<CircularOptionPicker
+				options={ colorOptions }
+				actions={
+					!! clearable && (
 						<CircularOptionPicker.ButtonAction
 							onClick={ clearColor }
 						>
 							{ __( 'Clear' ) }
 						</CircularOptionPicker.ButtonAction>
-					) }
-				</>
-			}
-		/>
+					)
+				}
+			/>
+		</VStack>
 	);
 }

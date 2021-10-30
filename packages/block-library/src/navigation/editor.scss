@@ -20,11 +20,6 @@
 	}
 }
 
-// This element is inline on the frontend but needs to be editable, therefore inline-block, in the editor.
-.wp-block-navigation-item__label {
-	display: inline-block;
-}
-
 /**
  * Submenus.
  */
@@ -211,6 +206,18 @@ $color-control-label-height: 20px;
 	margin-right: 7px;
 }
 
+@keyframes loadingpulse {
+	0% {
+		opacity: 1;
+	}
+	50% {
+		opacity: 0.5;
+	}
+	100% {
+		opacity: 1;
+	}
+}
+
 // Unselected state.
 .wp-block-navigation-placeholder__preview {
 	display: flex;
@@ -219,6 +226,11 @@ $color-control-label-height: 20px;
 	flex-wrap: nowrap;
 	width: 100%;
 	overflow: hidden;
+
+	&.is-loading {
+		animation: loadingpulse 1s linear infinite;
+		animation-delay: 0.5s; // avoid animating for fast network responses
+	}
 
 	// Style skeleton elements to mostly match the metrics of actual menu items.
 	// Needs specificity.
@@ -507,5 +519,13 @@ body.editor-styles-wrapper
 .is-menu-open .wp-block-navigation__responsive-container-content * {
 	.block-list-appender {
 		margin-top: $grid-unit-20;
+	}
+}
+
+.wp-block-navigation__unsaved-changes-warning {
+	width: 100%;
+
+	.block-editor-warning__actions {
+		margin-top: 0;
 	}
 }

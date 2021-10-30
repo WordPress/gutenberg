@@ -326,8 +326,12 @@ export const __experimentalGetDirtyEntityRecords = createSelector(
 			Object.keys( data[ kind ] ).forEach( ( name ) => {
 				const primaryKeys = Object.keys(
 					data[ kind ][ name ].edits
-				).filter( ( primaryKey ) =>
-					hasEditsForEntityRecord( state, kind, name, primaryKey )
+				).filter(
+					( primaryKey ) =>
+						// The entity record must exist (not be deleted),
+						// and it must have edits.
+						getEntityRecord( state, kind, name, primaryKey ) &&
+						hasEditsForEntityRecord( state, kind, name, primaryKey )
 				);
 
 				if ( primaryKeys.length ) {
@@ -685,6 +689,17 @@ export function hasRedo( state ) {
  */
 export function getCurrentTheme( state ) {
 	return state.themes[ state.currentTheme ];
+}
+
+/**
+ * Return the ID of the current global styles object.
+ *
+ * @param {Object} state Data state.
+ *
+ * @return {string} The current global styles ID.
+ */
+export function __experimentalGetCurrentGlobalStylesId( state ) {
+	return state.currentGlobalStylesId;
 }
 
 /**
