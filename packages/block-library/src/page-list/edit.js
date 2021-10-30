@@ -13,10 +13,17 @@ import {
 	getColorClassName,
 	InspectorControls,
 } from '@wordpress/block-editor';
-import { ToolbarButton, Placeholder, Spinner } from '@wordpress/components';
-import { PanelBody, ToggleControl, ToolbarButton } from '@wordpress/components';
+import {
+	PanelBody,
+	Placeholder,
+	Spinner,
+	ToggleControl,
+	ToolbarButton,
+} from '@wordpress/components';
+import { useSelect } from '@wordpress/data';
+import { store as editorStore } from '@wordpress/editor';
 import { __ } from '@wordpress/i18n';
-import { useEffect, useState, memo } from '@wordpress/element';
+import { memo, useEffect, useState } from '@wordpress/element';
 import apiFetch from '@wordpress/api-fetch';
 import { addQueryArgs } from '@wordpress/url';
 
@@ -30,19 +37,21 @@ import { ItemSubmenuIcon } from '../navigation-link/icons';
 // Performance of Navigation Links is not good past this value.
 const MAX_PAGE_COUNT = 100;
 
-export default function PageListEdit( { context, clientId } ) {
+export default function PageListEdit( {
+	attributes,
+	clientId,
+	context,
+	setAttributes,
+} ) {
 	const { pagesByParentId, totalPages } = usePagesByParentId();
 
-	const isParentBlockNavigation = useSelect(
-		( select ) => {
-			const { getBlockParentsByBlockName } = select( blockEditorStore );
-			return (
-				getBlockParentsByBlockName( clientId, 'core/navigation' )
-					.length > 0
-			);
-		},
-		[ clientId ]
-	);
+	const isNavigationChild = 'showSubmenuIcon' in context;
+	const allowConvertToLinks =
+		isNavigationChild && totalPages <= MAX_PAGE_COUNT;
+
+	const [ isOpen, setOpen ] = useState( false );
+	const openModal = () => setOpen( true );
+	const closeModal = () => setOpen( false );
 
 	const showChildPageToggle = useSelect( ( select ) => {
 		const { getCurrentPostType } = select( editorStore );
@@ -51,43 +60,21 @@ export default function PageListEdit( { context, clientId } ) {
 		return ! hideToggleFrom.includes( currentPostType );
 	} );
 
-	useEffect( () => {
-		setAttributes( {
-			isNavigationChild: isParentBlockNavigation,
-			openSubmenusOnClick: !! context.openSubmenusOnClick,
-			showSubmenuIcon: !! context.showSubmenuIcon,
-		} );
-	}, [ context.openSubmenusOnClick, context.showSubmenuIcon ] );
-
-	useEffect( () => {
-		if ( isParentBlockNavigation ) {
-			apiFetch( {
-				path: addQueryArgs( '/wp/v2/pages', {
-					per_page: 1,
-					_fields: [ 'id' ],
-				} ),
-				parse: false,
-			} ).then( ( res ) => {
-				setAllowConvertToLinks(
-					res.headers.get( 'X-WP-Total' ) <= MAX_PAGE_COUNT
-				);
-			} );
-		} else {
-			setAllowConvertToLinks( false );
-		}
-	}, [ isParentBlockNavigation ] );
-
-	const [ isOpen, setOpen ] = useState( false );
-	const openModal = () => setOpen( true );
-	const closeModal = () => setOpen( false );
-
-	// Update parent status before component first renders.
-	const attributesWithParentBlockStatus = {
-		...attributes,
-		isNavigationChild: isParentBlockNavigation,
-		openSubmenusOnClick: !! context.openSubmenusOnClick,
-		showSubmenuIcon: !! context.showSubmenuIcon,
-	};
+	const blockProps = useBlockProps( {
+		className: classnames( 'wp-block-page-list', {
+			'has-text-color': !! context.textColor,
+			[ getColorClassName(
+				'color',
+				context.textColor
+			) ]: !! context.textColor,
+			'has-background': !! context.backgroundColor,
+			[ getColorClassName(
+				'background-color',
+				context.backgroundColor
+			) ]: !! context.backgroundColor,
+		} ),
+		style: { ...context.style?.color },
+	} );
 
 	return (
 		<>
@@ -122,15 +109,26 @@ export default function PageListEdit( { context, clientId } ) {
 					clientId={ clientId }
 				/>
 			) }
-			<div { ...blockProps }>
-				<ServerSideRender
-					block="core/page-list"
-					attributes={ attributesWithParentBlockStatus }
-					EmptyResponsePlaceholder={ () => (
-						<span>{ __( 'Page List: No pages to show.' ) }</span>
-					) }
-				/>
-			</div>
+			{ totalPages === null && (
+				<div { ...blockProps }>
+					<Placeholder>
+						<Spinner />
+					</Placeholder>
+				</div>
+			) }
+			{ totalPages === 0 && (
+				<div { ...blockProps }>
+					<span>{ __( 'Page List: No pages to show.' ) }</span>
+				</div>
+			) }
+			{ totalPages > 0 && (
+				<ul { ...blockProps }>
+					<PageItems
+						context={ context }
+						pagesByParentId={ pagesByParentId }
+					/>
+				</ul>
+			) }
 		</>
 	);
 }
