@@ -77,6 +77,7 @@ class WP_Theme_JSON_Gutenberg {
 			'lineHeight'     => null,
 			'textDecoration' => null,
 			'textTransform'  => null,
+			'fontSmoothing'  => null,
 		),
 	);
 
@@ -1003,7 +1004,16 @@ class WP_Theme_JSON_Gutenberg {
 			}
 
 			if ( self::ROOT_BLOCK_SELECTOR === $selector ) {
-				$block_rules .= 'body { margin: 0; }';
+				$block_rules .= 'body { margin: 0;';
+
+				$has_font_smoothing_support = _wp_array_get( $this->theme_json, array( 'styles', 'typography', 'fontSmoothing' ) );
+
+				if ( true === $has_font_smoothing_support ) {
+					$block_rules .= ' -moz-osx-font-smoothing: grayscale; -webkit-font-smoothing: antialiased;';
+				}
+
+				$block_rules .= ' }';
+
 				$block_rules .= '.wp-site-blocks > .alignleft { float: left; margin-right: 2em; }';
 				$block_rules .= '.wp-site-blocks > .alignright { float: right; margin-left: 2em; }';
 				$block_rules .= '.wp-site-blocks > .aligncenter { justify-content: center; margin-left: auto; margin-right: auto; }';
