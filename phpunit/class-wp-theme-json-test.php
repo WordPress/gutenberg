@@ -417,6 +417,134 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 		$this->assertEquals( $variables, $theme_json->get_stylesheet( array( 'variables' ) ) );
 	}
 
+	function test_get_stylesheet_font_smoothing() {
+		$theme_json = new WP_Theme_JSON_Gutenberg(
+			array(
+				'version'  => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
+				'settings' => array(
+					'color'      => array(
+						'text'    => 'value',
+						'palette' => array(
+							array(
+								'slug'  => 'grey',
+								'color' => 'grey',
+							),
+						),
+					),
+					'typography' => array(
+						'fontFamilies' => array(
+							array(
+								'slug'       => 'small',
+								'fontFamily' => '14px',
+							),
+							array(
+								'slug'       => 'big',
+								'fontFamily' => '41px',
+							),
+						),
+					),
+					'spacing'    => array(
+						'blockGap' => false,
+					),
+					'misc'       => 'value',
+					'blocks'     => array(
+						'core/group' => array(
+							'custom' => array(
+								'base-font'   => 16,
+								'line-height' => array(
+									'small'  => 1.2,
+									'medium' => 1.4,
+									'large'  => 1.8,
+								),
+							),
+						),
+					),
+				),
+				'styles'   => array(
+					'color'      => array(
+						'text' => 'var:preset|color|grey',
+					),
+					'typography' => array(
+						'fontSmoothing' => true,
+					),
+					'misc'       => 'value',
+					'elements'   => array(
+						'link' => array(
+							'color' => array(
+								'text'       => '#111',
+								'background' => '#333',
+							),
+						),
+					),
+					'blocks'     => array(
+						'core/group'     => array(
+							'border'   => array(
+								'radius' => '10px',
+							),
+							'elements' => array(
+								'link' => array(
+									'color' => array(
+										'text' => '#111',
+									),
+								),
+							),
+							'spacing'  => array(
+								'padding' => '24px',
+							),
+						),
+						'core/heading'   => array(
+							'color'    => array(
+								'text' => '#123456',
+							),
+							'elements' => array(
+								'link' => array(
+									'color'      => array(
+										'text'       => '#111',
+										'background' => '#333',
+									),
+									'typography' => array(
+										'fontSize' => '60px',
+									),
+								),
+							),
+						),
+						'core/post-date' => array(
+							'color'    => array(
+								'text' => '#123456',
+							),
+							'elements' => array(
+								'link' => array(
+									'color' => array(
+										'background' => '#777',
+										'text'       => '#555',
+									),
+								),
+							),
+						),
+						'core/image'     => array(
+							'border'  => array(
+								'radius' => array(
+									'topLeft'     => '10px',
+									'bottomRight' => '1em',
+								),
+							),
+							'spacing' => array(
+								'margin' => array(
+									'bottom' => '30px',
+								),
+							),
+						),
+					),
+				),
+				'misc'     => 'value',
+			)
+		);
+
+		$styles = 'body{color: var(--wp--preset--color--grey);}body { margin: 0; -moz-osx-font-smoothing: grayscale; -webkit-font-smoothing: antialiased; }.wp-site-blocks > .alignleft { float: left; margin-right: 2em; }.wp-site-blocks > .alignright { float: right; margin-left: 2em; }.wp-site-blocks > .aligncenter { justify-content: center; margin-left: auto; margin-right: auto; }.wp-site-blocks > * { margin-top: 0; margin-bottom: 0; }.wp-site-blocks > * + * { margin-top: var( --wp--style--block-gap ); }a{background-color: #333;color: #111;}.wp-block-group{border-radius: 10px;padding: 24px;}.wp-block-group a{color: #111;}h1,h2,h3,h4,h5,h6{color: #123456;}h1 a,h2 a,h3 a,h4 a,h5 a,h6 a{background-color: #333;color: #111;font-size: 60px;}.wp-block-post-date{color: #123456;}.wp-block-post-date a{background-color: #777;color: #555;}.wp-block-image{border-top-left-radius: 10px;border-bottom-right-radius: 1em;margin-bottom: 30px;}';
+		$this->assertEquals( $styles, $theme_json->get_stylesheet( array( 'styles' ) ) );
+
+	}
+
 	function test_get_stylesheet_preset_classes_work_with_compounded_selectors() {
 		$theme_json = new WP_Theme_JSON_Gutenberg(
 			array(
