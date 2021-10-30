@@ -27,6 +27,7 @@ export default function ColorPalette( {
 	className,
 	colors,
 	disableCustomColors = false,
+	enableAlpha,
 	onChange,
 	value,
 } ) {
@@ -73,6 +74,7 @@ export default function ColorPalette( {
 		<ColorPicker
 			color={ value }
 			onChange={ ( color ) => onChange( color ) }
+			enableAlpha={ enableAlpha }
 		/>
 	);
 

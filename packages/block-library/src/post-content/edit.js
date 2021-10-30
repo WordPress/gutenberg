@@ -6,7 +6,7 @@ import { useSelect } from '@wordpress/data';
 import { RawHTML } from '@wordpress/element';
 import {
 	useBlockProps,
-	__experimentalUseInnerBlocksProps as useInnerBlocksProps,
+	useInnerBlocksProps,
 	useSetting,
 	__experimentalUseNoRecursiveRenders as useNoRecursiveRenders,
 	store as blockEditorStore,

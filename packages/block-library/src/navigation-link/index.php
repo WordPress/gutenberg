@@ -173,6 +173,10 @@ function render_block_core_navigation_link( $attributes, $content, $block ) {
 		$html .= ' href="' . esc_url( $attributes['url'] ) . '"';
 	}
 
+	if ( $is_active ) {
+		$html .= ' aria-current="page"';
+	}
+
 	if ( isset( $attributes['opensInNewTab'] ) && true === $attributes['opensInNewTab'] ) {
 		$html .= ' target="_blank"  ';
 	}

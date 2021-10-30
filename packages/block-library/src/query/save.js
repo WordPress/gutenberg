@@ -1,12 +1,10 @@
 /**
  * WordPress dependencies
  */
-import { InnerBlocks, useBlockProps } from '@wordpress/block-editor';
+import { useInnerBlocksProps, useBlockProps } from '@wordpress/block-editor';
 
 export default function QuerySave( { attributes: { tagName: Tag = 'div' } } ) {
-	return (
-		<Tag { ...useBlockProps.save() }>
-			<InnerBlocks.Content />
-		</Tag>
-	);
+	const blockProps = useBlockProps.save();
+	const innerBlocksProps = useInnerBlocksProps.save( blockProps );
+	return <Tag { ...innerBlocksProps } />;
 }
