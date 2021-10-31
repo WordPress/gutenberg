@@ -80,6 +80,9 @@ figure.wp-block-gallery {
 	.components-notice {
 		margin: 0 0 12px 0;
 		padding-right: 10px;
+		position: absolute;
+		z-index: 1;
+		width: 65%;
 	}
 }
 
