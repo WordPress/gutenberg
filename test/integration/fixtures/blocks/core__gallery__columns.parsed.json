@@ -3,8 +3,7 @@
 		"blockName": "core/gallery",
 		"attrs": {
 			"columns": 1,
-			"linkTo": "none",
-			"imageCount": 2
+			"linkTo": "none"
 		},
 		"innerBlocks": [
 			{

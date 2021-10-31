@@ -2,8 +2,7 @@
 	{
 		"blockName": "core/gallery",
 		"attrs": {
-			"linkTo": "none",
-			"imageCount": 2
+			"linkTo": "none"
 		},
 		"innerBlocks": [
 			{
