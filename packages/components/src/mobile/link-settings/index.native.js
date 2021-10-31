@@ -242,6 +242,7 @@ function LinkSettings( {
 							autoFocus={
 								Platform.OS === 'ios' && options.url.autoFocus
 							}
+							setCursortAtStart
 							keyboardType="url"
 						/>
 					) ) }

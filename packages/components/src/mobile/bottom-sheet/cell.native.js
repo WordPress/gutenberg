@@ -35,6 +35,7 @@ class BottomSheetCell extends Component {
 		this.state = {
 			isEditingValue: props.autoFocus || false,
 			isScreenReaderEnabled: false,
+			setCursortAtStart: props.setCursorAtStart,
 		};
 
 		this.handleScreenReaderToggled = this.handleScreenReaderToggled.bind(
@@ -123,6 +124,7 @@ class BottomSheetCell extends Component {
 			step,
 			borderless,
 			help,
+			setCursortAtStart,
 			...valueProps
 		} = this.props;
 
@@ -255,6 +257,9 @@ class BottomSheetCell extends Component {
 					onBlur={ finishEditing }
 					onSubmitEditing={ onSubmit }
 					keyboardType={ this.typeToKeyboardType( type, step ) }
+					selection={
+						setCursortAtStart ? { start: 0, end: 0 } : undefined
+					}
 					{ ...valueProps }
 				/>
 			) : (
