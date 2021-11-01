@@ -45,9 +45,14 @@ afterAll( () => {
 
 describe( 'Image Block', () => {
 	it( 'sets link to None', async () => {
-		const initialHtml = `<!-- wp:image {"id":1,"sizeSlug":"large","linkDestination":"media","className":"is-style-default"} -->
-<figure class="wp-block-image size-large is-style-default"><a href="https://cldup.com/cXyG__fTLN.jpg"><img src="https://cldup.com/cXyG__fTLN.jpg" alt="" class="wp-image-1"/></a><figcaption>Mountain</figcaption></figure>
-<!-- /wp:image -->`;
+		const initialHtml = `
+		<!-- wp:image {"id":1,"sizeSlug":"large","linkDestination":"media","className":"is-style-default"} -->
+		<figure class="wp-block-image size-large is-style-default">
+			<a href="https://cldup.com/cXyG__fTLN.jpg">
+				<img src="https://cldup.com/cXyG__fTLN.jpg" alt="" class="wp-image-1"/>
+			</a>
+		<figcaption>Mountain</figcaption></figure>
+		<!-- /wp:image -->`;
 		const screen = await initializeEditor( { initialHtml } );
 		// We must await the image fetch via `getMedia`
 		await act( () => apiFetchPromise );
