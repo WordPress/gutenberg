@@ -98,7 +98,8 @@
 			"__experimentalFontWeight": true,
 			"__experimentalTextTransform": true,
 			"__experimentalFontFamily": true,
-			"__experimentalTextDecoration": true
+			"__experimentalTextDecoration": true,
+			"__experimentalSkipSerialization": true
 		},
 		"spacing": {
 			"blockGap": true,

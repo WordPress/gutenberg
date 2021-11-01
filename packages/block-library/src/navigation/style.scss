@@ -58,6 +58,29 @@
 		padding: 0;
 	}
 
+	// The following rules provide class based application of user selected text
+	// decoration via block supports.
+	&.has-text-decoration-underline .wp-block-navigation-item {
+		text-decoration: underline;
+	}
+
+	&.has-text-decoration-line-through .wp-block-navigation-item {
+		text-decoration: line-through;
+	}
+
+	&[class*="has-text-decoration"] {
+		.wp-block-navigation-item {
+			a {
+				text-decoration: inherit;
+
+				&:focus,
+				&:active {
+					text-decoration: inherit;
+				}
+			}
+		}
+	}
+
 	// Force links to inherit text decoration applied to navigation block.
 	// The extra selector adds specificity to ensure it works when user-set.
 	&[style*="text-decoration"] {
@@ -76,7 +99,7 @@
 		}
 	}
 
-	&:not([style*="text-decoration"]) {
+	&:not([class*="has-text-decoration"]):not([style*="text-decoration"]) {
 		a {
 			text-decoration: none;
 
@@ -138,7 +161,7 @@
 				flex-grow: 1;
 
 				// Without this, the changing to zero on hover-out can cause wrapping and
-				// result in an invinite hover/hover-out loop.
+				// result in an infinite hover/hover-out loop.
 				white-space: nowrap;
 
 				// Right-align the chevron in submenus.

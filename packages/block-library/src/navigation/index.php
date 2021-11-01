@@ -58,31 +58,63 @@ function block_core_navigation_build_css_colors( $attributes ) {
 }
 
 /**
- * Build an array with CSS classes and inline styles defining the font sizes
- * which will be applied to the navigation markup in the front-end.
+ * Build an array with CSS classes and inline styles defining the typography
+ * styling which will be applied to the navigation markup in the front-end.
  *
  * @param  array $attributes Navigation block attributes.
- * @return array Font size CSS classes and inline styles.
+ * @return array Typography CSS classes and inline styles.
  */
-function block_core_navigation_build_css_font_sizes( $attributes ) {
-	// CSS classes.
-	$font_sizes = array(
-		'css_classes'   => array(),
-		'inline_styles' => '',
+function block_core_navigation_build_css_typography( $attributes ) {
+	// The following config defines with block supports we are interested in
+	// having CSS classes and styles automatically generated.
+	// We wish to only handle the text-decoration support and deprecated font
+	// size attribute separately.
+	$typography_supports = array(
+		'__experimentalFontFamily'     => true,
+		'fontSize'                     => true,
+		'__experimentalFontStyle'      => true,
+		'__experimentalFontWeight'     => true,
+		'__experimentalLetterSpacing'  => true,
+		'lineHeight'                   => true,
+		'__experimentalTextDecoration' => false, // Deliberately skipping to apply manual class.
+		'__experimentalTextTransform'  => true,
 	);
 
-	$has_named_font_size  = array_key_exists( 'fontSize', $attributes );
-	$has_custom_font_size = array_key_exists( 'customFontSize', $attributes );
+	$typography = gutenberg_typography_generate_css_classes_and_styles( $typography_supports, $attributes );
+	$classes    = array();
+	$styles     = array();
 
-	if ( $has_named_font_size ) {
-		// Add the font size class.
-		$font_sizes['css_classes'][] = sprintf( 'has-%s-font-size', $attributes['fontSize'] );
-	} elseif ( $has_custom_font_size ) {
-		// Add the custom font size inline style.
-		$font_sizes['inline_styles'] = sprintf( 'font-size: %spx;', $attributes['customFontSize'] );
+	if ( isset( $typography['class'] ) ) {
+		$classes[] = $typography['class'];
 	}
 
-	return $font_sizes;
+	if ( isset( $typography['style'] ) ) {
+		$styles[] = $typography['style'];
+	}
+
+	// Font size.
+
+	// Standard font size CSS classes and inline styles will be generated
+	// via the block supports however we still need to handle the deprecated
+	// `customFontSize` attribute for this Navigation block.
+	$has_deprecated_font_size = array_key_exists( 'customFontSize', $attributes );
+
+	if ( $has_deprecated_font_size ) {
+		// Add the custom font size inline style.
+		$styles[] = sprintf( 'font-size: %spx;', $attributes['customFontSize'] );
+	}
+
+	// Text Decoration.
+	$has_text_decoration = isset( $attributes['style']['typography']['textDecoration'] );
+
+	if ( $has_text_decoration ) {
+		$classes[] = sprintf( 'has-text-decoration-%s', $attributes['style']['typography']['textDecoration'] );
+	}
+
+	return array(
+		'css_classes'   => $classes,
+		'inline_styles' => empty( $styles ) ? '' : implode( ' ', $styles ),
+	);
 }
 
 /**
@@ -269,10 +301,10 @@ function render_block_core_navigation( $attributes, $content, $block ) {
 		return '';
 	}
 	$colors     = block_core_navigation_build_css_colors( $attributes );
-	$font_sizes = block_core_navigation_build_css_font_sizes( $attributes );
+	$typography = block_core_navigation_build_css_typography( $attributes );
 	$classes    = array_merge(
 		$colors['css_classes'],
-		$font_sizes['css_classes'],
+		$typography['css_classes'],
 		( isset( $attributes['orientation'] ) && 'vertical' === $attributes['orientation'] ) ? array( 'is-vertical' ) : array(),
 		isset( $attributes['itemsJustification'] ) ? array( 'items-justified-' . $attributes['itemsJustification'] ) : array(),
 		$is_responsive_menu ? array( 'is-responsive' ) : array()
@@ -305,7 +337,7 @@ function render_block_core_navigation( $attributes, $content, $block ) {
 	$wrapper_attributes = get_block_wrapper_attributes(
 		array(
 			'class' => implode( ' ', $classes ),
-			'style' => $block_styles . $colors['inline_styles'] . $font_sizes['inline_styles'],
+			'style' => $block_styles . $colors['inline_styles'] . $typography['inline_styles'],
 		)
 	);
 

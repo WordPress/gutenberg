@@ -19,6 +19,7 @@ import {
 	ContrastChecker,
 	getColorClassName,
 	Warning,
+	__experimentalGetTypographyClassesAndStyles as getTypographyClassesAndStyles,
 } from '@wordpress/block-editor';
 import { EntityProvider } from '@wordpress/core-data';
 import { useDispatch, useSelect } from '@wordpress/data';
@@ -139,9 +140,19 @@ function Navigation( {
 	const isEntityAvailable =
 		! isNavigationMenuMissing && isNavigationMenuResolved;
 
+	// Typography block support for the Navigation block skips serialization of
+	// classes and styles to allow text decoration to be handled differently.
+	// The following will collect and reapply other typography support while
+	// also clearing the normal text-decoration style and instead adding an
+	// additional CSS className.
+	const typographyProps = getTypographyClassesAndStyles( attributes );
+	const { textDecoration } = typographyProps.style;
+	const textDecorationClassName = `has-text-decoration-${ textDecoration }`;
+	typographyProps.style.textDecoration = undefined;
+
 	const blockProps = useBlockProps( {
 		ref: navRef,
-		className: classnames( className, {
+		className: classnames( className, typographyProps.className, {
 			[ `items-justified-${ attributes.itemsJustification }` ]: itemsJustification,
 			'is-vertical': orientation === 'vertical',
 			'is-responsive': 'never' !== overlayMenu,
@@ -155,10 +166,12 @@ function Navigation( {
 				'background-color',
 				backgroundColor?.slug
 			) ]: !! backgroundColor?.slug,
+			[ textDecorationClassName ]: !! textDecoration,
 		} ),
 		style: {
 			color: ! textColor?.slug && textColor?.color,
 			backgroundColor: ! backgroundColor?.slug && backgroundColor?.color,
+			...typographyProps.style,
 		},
 	} );
 
