@@ -90,6 +90,8 @@ describe( 'Toolbar roving tabindex', () => {
 
 	it( 'ensures image block toolbar uses roving tabindex', async () => {
 		await insertBlock( 'Image' );
+		await page.keyboard.press( 'Escape' );
+		await page.keyboard.press( 'ArrowUp' );
 		await testBlockToolbarKeyboardNavigation( 'Block: Image', 'Image' );
 		await wrapCurrentBlockWithGroup( 'Image' );
 		await testGroupKeyboardNavigation( 'Block: Image', 'Image' );

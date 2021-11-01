@@ -26,8 +26,6 @@ describe( 'Multi-entity save flow', () => {
 	const savePanelSelector = '.entities-saved-states__panel';
 	const closePanelButtonSelector =
 		'.editor-post-publish-panel__header-cancel-button button';
-	const createNewButtonSelector =
-		'//button[contains(text(), "New template part")]';
 
 	// Reusable assertions across Post/Site editors.
 	const assertAllBoxesChecked = async () => {
@@ -102,10 +100,14 @@ describe( 'Multi-entity save flow', () => {
 
 			// Add a template part and edit it.
 			await insertBlock( 'Template Part' );
-			const createNewButton = await page.waitForXPath(
-				createNewButtonSelector
+			await page.waitForFunction( () =>
+				document.activeElement.shadowRoot?.querySelector( 'button' )
 			);
-			await createNewButton.click();
+			await page.keyboard.press( 'Space' );
+			await page.keyboard.press( 'Tab' );
+			await page.keyboard.press( 'Tab' );
+			await page.keyboard.press( 'Space' );
+
 			const confirmTitleButton = await page.waitForSelector(
 				confirmTitleButtonSelector
 			);

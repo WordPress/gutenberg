@@ -37,7 +37,8 @@ describe( 'Navigating the block hierarchy', () => {
 
 	it( 'should navigate using the list view sidebar', async () => {
 		await insertBlock( 'Columns' );
-		await page.click( '[aria-label="Two columns; equal split"]' );
+		await page.keyboard.press( 'Tab' );
+		await page.keyboard.press( 'Space' );
 
 		// Add a paragraph in the first column.
 		await page.keyboard.press( 'ArrowDown' ); // Navigate to inserter.
@@ -93,8 +94,8 @@ describe( 'Navigating the block hierarchy', () => {
 
 	it( 'should navigate block hierarchy using only the keyboard', async () => {
 		await insertBlock( 'Columns' );
-		await openDocumentSettingsSidebar();
-		await page.click( '[aria-label="Two columns; equal split"]' );
+		await page.keyboard.press( 'Tab' );
+		await page.keyboard.press( 'Space' );
 
 		// Add a paragraph in the first column.
 		await page.keyboard.press( 'ArrowDown' ); // Navigate to inserter.
@@ -110,6 +111,7 @@ describe( 'Navigating the block hierarchy', () => {
 		await page.keyboard.press( 'Enter' );
 
 		// Move focus to the sidebar area.
+		await openDocumentSettingsSidebar();
 		await pressKeyWithModifier( 'ctrl', '`' );
 		await pressKeyWithModifier( 'ctrl', '`' );
 		await pressKeyWithModifier( 'ctrl', '`' );
@@ -151,6 +153,7 @@ describe( 'Navigating the block hierarchy', () => {
 		// Create an image block too.
 		await page.keyboard.press( 'Enter' );
 		await insertBlock( 'Image' );
+		await page.keyboard.press( 'Escape' );
 
 		// Return to first block.
 		await openListViewSidebar();

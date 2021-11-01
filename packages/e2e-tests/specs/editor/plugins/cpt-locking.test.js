@@ -121,7 +121,15 @@ describe( 'cpt locking', () => {
 		} );
 
 		it( 'can use the global inserter in inner blocks', async () => {
-			await page.click( 'button[aria-label="Two columns; equal split"]' );
+			await page.evaluate( () => {
+				document
+					.querySelector( '.wp-block-columns > div' )
+					.shadowRoot.querySelector(
+						'[aria-label="Two columns; equal split"]'
+					)
+					.focus();
+			} );
+			await page.keyboard.press( 'Enter' );
 			await page.click(
 				'.wp-block-column .block-editor-button-block-appender'
 			);
