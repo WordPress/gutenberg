@@ -280,8 +280,10 @@ describe( 'Template Part', () => {
 			await disablePrePublishChecks();
 			// Create new template part.
 			await insertBlock( 'Template Part' );
+			await page.waitForFunction( () =>
+				document.activeElement.shadowRoot?.querySelector( 'button' )
+			);
 			// Navigate into the placeholder and "New template part"
-			await page.keyboard.press( 'ArrowDown' );
 			await page.keyboard.press( 'Space' );
 			await page.keyboard.press( 'Tab' );
 			await page.keyboard.press( 'Tab' );
@@ -309,8 +311,10 @@ describe( 'Template Part', () => {
 			await createNewPost();
 			// Try to insert the template part we created.
 			await insertBlock( 'Template Part' );
+			await page.waitForFunction( () =>
+				document.activeElement.shadowRoot?.querySelector( 'button' )
+			);
 			// Navigate into the placeholder and "Choose existing"
-			await page.keyboard.press( 'ArrowDown' );
 			await page.keyboard.press( 'Space' );
 			await page.keyboard.press( 'Tab' );
 			await page.keyboard.press( 'Space' );
