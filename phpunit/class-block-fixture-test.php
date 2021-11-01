@@ -14,6 +14,12 @@ class Block_Fixture_Test extends WP_UnitTestCase {
 	 * @dataProvider data_block_fixtures
 	 */
 	function test_kses_doesnt_change_fixtures( $block, $filename ) {
+
+		// KSES doesn't allow data: URLs, so we need to replace any of them in fixtures.
+		$block = preg_replace( "/src=['\"]data:[^'\"]+['\"]/", 'src="https://wordpress.org/foo.jpg"', $block );
+		$block = preg_replace( "/href=['\"]data:[^'\"]+['\"]/", 'href="https://wordpress.org/foo.jpg"', $block );
+		$block = preg_replace( '/url\(data:[^)]+\)/', 'url(https://wordpress.org/foo.jpg)', $block );
+
 		$kses_block = wp_kses_post( $block );
 
 		// KSES adds a space at the end of self-closing tags, add it to the original to match.
