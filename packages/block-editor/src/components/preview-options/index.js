@@ -7,12 +7,7 @@ import classnames from 'classnames';
  * WordPress dependencies
  */
 import { useViewportMatch } from '@wordpress/compose';
-import {
-	// __experimentalUseSlot as useSlot,
-	DropdownMenu,
-	MenuGroup,
-	MenuItem,
-} from '@wordpress/components';
+import { DropdownMenu, MenuGroup, MenuItem } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { check } from '@wordpress/icons';
 import { PluginPreview } from '@wordpress/interface';
