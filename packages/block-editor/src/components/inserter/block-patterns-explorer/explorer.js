@@ -19,6 +19,7 @@ function PatternsExplorer( { initialCategory, patternCategories } ) {
 	return (
 		<Grid
 			columns={ 2 }
+			gap={ 6 }
 			templateColumns="240px auto"
 			className="block-editor-block-patterns-explorer"
 		>
