@@ -29,14 +29,19 @@ import { store as blockEditorStore } from '../../store';
 
 const noop = () => {};
 const expanded = ( state, action ) => {
-	switch ( action.type ) {
-		case 'expand':
-			return { ...state, ...{ [ action.clientId ]: true } };
-		case 'collapse':
-			return { ...state, ...{ [ action.clientId ]: false } };
-		default:
-			return state;
+	if ( Array.isArray( action.clientIds ) ) {
+		return {
+			...state,
+			...action.clientIds.reduce(
+				( newState, id ) => ( {
+					...newState,
+					[ id ]: action.type === 'expand',
+				} ),
+				{}
+			),
+		};
 	}
+	return state;
 };
 
 /**
@@ -49,6 +54,7 @@ const expanded = ( state, action ) => {
  * @param {Function} props.onSelect                                 Block selection callback.
  * @param {boolean}  props.showNestedBlocks                         Flag to enable displaying nested blocks.
  * @param {boolean}  props.showBlockMovers                          Flag to enable block movers
+ * @param {boolean}  props.allItemsCollapsed                        Flag to enable full collapse of true.
  * @param {boolean}  props.__experimentalFeatures                   Flag to enable experimental features.
  * @param {boolean}  props.__experimentalPersistentListViewFeatures Flag to enable features for the Persistent List View experiment.
  * @param {boolean}  props.__experimentalHideContainerBlockActions  Flag to hide actions of top level blocks (like core/widget-area)
@@ -63,6 +69,7 @@ function ListView(
 		__experimentalHideContainerBlockActions,
 		showNestedBlocks,
 		showBlockMovers,
+		allItemsCollapsed,
 		...props
 	},
 	ref
@@ -102,6 +109,14 @@ function ListView(
 		isMounted.current = true;
 	}, [] );
 
+	useEffect( () => {
+		const type = allItemsCollapsed ? 'collapse' : 'expand';
+		setExpandedState( {
+			type,
+			clientIds: clientIdsTree.map( ( { clientId } ) => clientId ),
+		} );
+	}, [ allItemsCollapsed, clientIdsTree ] );
+
 	// List View renders a fixed number of items and relies on each having a fixed item height of 36px.
 	// If this value changes, we should also change the itemHeight value set in useFixedWindowList.
 	// See: https://github.com/WordPress/gutenberg/pull/35230 for additional context.
@@ -119,7 +134,7 @@ function ListView(
 			if ( ! clientId ) {
 				return;
 			}
-			setExpandedState( { type: 'expand', clientId } );
+			setExpandedState( { type: 'expand', clientIds: [ clientId ] } );
 		},
 		[ setExpandedState ]
 	);
@@ -128,7 +143,7 @@ function ListView(
 			if ( ! clientId ) {
 				return;
 			}
-			setExpandedState( { type: 'collapse', clientId } );
+			setExpandedState( { type: 'collapse', clientIds: [ clientId ] } );
 		},
 		[ setExpandedState ]
 	);

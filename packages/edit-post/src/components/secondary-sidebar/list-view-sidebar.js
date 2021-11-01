@@ -14,8 +14,9 @@ import {
 } from '@wordpress/compose';
 import { useDispatch } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
-import { closeSmall } from '@wordpress/icons';
+import { chevronDown, chevronUp, closeSmall } from '@wordpress/icons';
 import { ESCAPE } from '@wordpress/keycodes';
+import { useState } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -40,6 +41,8 @@ export default function ListViewSidebar() {
 		}
 	}
 
+	const [ allItemsCollapsed, setAllItemsCollapsed ] = useState( false );
+
 	const instanceId = useInstanceId( ListViewSidebar );
 	const labelId = `edit-post-editor__list-view-panel-label-${ instanceId }`;
 
@@ -53,6 +56,16 @@ export default function ListViewSidebar() {
 			<div className="edit-post-editor__list-view-panel-header">
 				<strong id={ labelId }>{ __( 'List view' ) }</strong>
 				<Button
+					icon={ chevronUp }
+					label={ __( 'Collapse all list items' ) }
+					onClick={ () => setAllItemsCollapsed( true ) }
+				/>
+				<Button
+					icon={ chevronDown }
+					label={ __( 'Expand all list items' ) }
+					onClick={ () => setAllItemsCollapsed( false ) }
+				/>
+				<Button
 					icon={ closeSmall }
 					label={ __( 'Close list view sidebar' ) }
 					onClick={ () => setIsListViewOpened( false ) }
@@ -64,6 +77,7 @@ export default function ListViewSidebar() {
 			>
 				<ListView
 					onSelect={ selectEditorBlock }
+					allItemsCollapsed={ allItemsCollapsed }
 					showNestedBlocks
 					__experimentalFeatures
 					__experimentalPersistentListViewFeatures
