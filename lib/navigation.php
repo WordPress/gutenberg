@@ -464,6 +464,7 @@ function gutenberg_migrate_nav_on_theme_switch( $new_name, $new_theme, $old_them
 		// Extract the navigationMenuId from the old template part.
 		$old_blocks = parse_blocks( $old_template_part->content );
 		if (
+				! $old_blocks ||
 				'core/navigation' !== $old_blocks[0]['blockName'] ||
 				empty( $old_blocks[0]['attrs']['navigationMenuId'] )
 		) {
@@ -477,6 +478,7 @@ function gutenberg_migrate_nav_on_theme_switch( $new_name, $new_theme, $old_them
 
 		// Set the old post_name to something else because there is a hook in place that prevents
 		// the new template part from getting the same slug as the old template part.
+		// @TODO: Remove this once the post_name is retired as a slug container.
 		if ( $old_template_part->wp_id ) {
 			$old_post            = get_post( $old_template_part->wp_id );
 			$old_post->post_name = 'temp';
@@ -510,7 +512,12 @@ function gutenberg_migrate_nav_on_theme_switch( $new_name, $new_theme, $old_them
 
 		// Apply the previous navigation post ID to the navigation block in the new theme.
 		$new_blocks = parse_blocks( $new_template_part->content );
-		if ( 'core/navigation' === $new_blocks[0]['blockName'] ) {
+		if (
+				$new_blocks &&
+				! empty( $new_blocks[0]['blockName'] ) &&
+				is_array( $new_blocks[0]['attrs'] ) &&
+				'core/navigation' === $new_blocks[0]['blockName']
+		) {
 			$new_blocks[0]['attrs']['navigationMenuId'] = $old_nav_menu_id;
 			$new_post                                   = get_post( $new_template_part->wp_id );
 			$new_post->post_name                        = $common_part;
@@ -519,6 +526,7 @@ function gutenberg_migrate_nav_on_theme_switch( $new_name, $new_theme, $old_them
 		}
 
 		// Restore the old post_name to the old template part.
+		// @TODO: Remove this once the post_name is retired as a slug container.
 		if ( $old_template_part->wp_id ) {
 			$old_post            = get_post( $old_template_part->wp_id );
 			$old_post->post_name = $common_part;
