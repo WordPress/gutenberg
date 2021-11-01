@@ -266,10 +266,20 @@ const SiteLogo = ( {
 
 	const syncSiteIconHelpText = createInterpolateElement(
 		__(
-			"Site Icons are what you see in browser tabs, bookmark bars, and within the WordPress mobile apps. If you don't have one, you can set your logo to also be your icon. If you do have a custom site icon, you can upload that from the Site Icon settings in the <a>Customizer</a>!"
+			"Site Icons are what you see in browser tabs, bookmark bars, and within the WordPress mobile apps. If you don't have one, you can set your logo to also be your icon. If you do have a custom site icon, you can upload that from the <a>Site Icon settings</a>!"
 		),
-		// eslint-disable-next-line jsx-a11y/anchor-has-content
-		{ a: <a href={ siteUrl + '/wp-admin/customize.php' } target="blank" /> }
+		{
+			a: (
+				// eslint-disable-next-line jsx-a11y/anchor-has-content
+				<a
+					href={
+						siteUrl +
+						'/wp-admin/customize.php?autofocus[section]=title_tagline'
+					}
+					target="blank"
+				/>
+			),
+		}
 	);
 
 	return (
