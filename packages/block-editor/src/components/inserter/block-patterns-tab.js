@@ -28,7 +28,7 @@ function BlockPatternsCategory( {
 		rootClientId
 	);
 
-	const hasCategory = useCallback(
+	const hasRegisteredCategory = useCallback(
 		( pattern ) => {
 			if ( ! pattern.categories || ! pattern.categories.length ) {
 				return false;
@@ -57,7 +57,9 @@ function BlockPatternsCategory( {
 			} );
 
 		if (
-			allPatterns.some( ( pattern ) => ! hasCategory( pattern ) ) &&
+			allPatterns.some(
+				( pattern ) => ! hasRegisteredCategory( pattern )
+			) &&
 			! categories.find(
 				( category ) => category.name === 'uncategorized'
 			)
