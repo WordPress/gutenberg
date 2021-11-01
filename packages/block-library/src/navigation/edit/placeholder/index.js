@@ -221,7 +221,9 @@ export default function NavigationPlaceholder( {
 								{ hasPages ? (
 									<Button
 										variant={
-											hasMenus ? 'tertiary' : 'primary'
+											hasMenus || canSwitchNavigationMenu
+												? 'tertiary'
+												: 'primary'
 										}
 										onClick={ () => {
 											setIsNewMenuModalVisible( true );
