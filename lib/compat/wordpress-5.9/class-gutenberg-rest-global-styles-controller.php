@@ -11,13 +11,6 @@
  */
 class Gutenberg_REST_Global_Styles_Controller extends WP_REST_Controller {
 	/**
-	 * Post type.
-	 *
-	 * @var string
-	 */
-	protected $post_type;
-
-	/**
 	 * Constructor.
 	 */
 	public function __construct() {
@@ -155,31 +148,27 @@ class Gutenberg_REST_Global_Styles_Controller extends WP_REST_Controller {
 		$changes     = new stdClass();
 		$changes->ID = $request['id'];
 
-		$post         = get_post( $request['id'] );
-		$empty_config = array(
-			'settings' => new stdClass(),
-			'styles'   => new stdClass(),
-		);
+		$post            = get_post( $request['id'] );
+		$existing_config = array();
 		if ( $post ) {
-			$existing_config = json_decode( $post->post_content, true );
-			if ( ! isset( $existing_config['isGlobalStylesUserThemeJSON'] ) ||
+			$existing_config     = json_decode( $post->post_content, true );
+			$json_decoding_error = json_last_error();
+			if ( JSON_ERROR_NONE !== $json_decoding_error || ! isset( $existing_config['isGlobalStylesUserThemeJSON'] ) ||
 				! $existing_config['isGlobalStylesUserThemeJSON'] ) {
-				$existing_config = $empty_config;
+				$existing_config = array();
 			}
-		} else {
-			$existing_config = $empty_config;
 		}
 
 		if ( isset( $request['styles'] ) || isset( $request['settings'] ) ) {
 			$config = array();
 			if ( isset( $request['styles'] ) ) {
 				$config['styles'] = $request['styles'];
-			} else {
+			} elseif ( isset( $existing_config['styles'] ) ) {
 				$config['styles'] = $existing_config['styles'];
 			}
 			if ( isset( $request['settings'] ) ) {
 				$config['settings'] = $request['settings'];
-			} else {
+			} elseif ( isset( $existing_config['settings'] ) ) {
 				$config['settings'] = $existing_config['settings'];
 			}
 			$config['isGlobalStylesUserThemeJSON'] = true;
