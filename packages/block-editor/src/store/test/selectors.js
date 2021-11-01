@@ -3334,7 +3334,7 @@ describe( 'selectors', () => {
 					{
 						name: 'pattern-c',
 						title: 'pattern hidden from UI',
-						hideFromUI: true,
+						inserter: false,
 						content:
 							'<!-- wp:test-block-a --><!-- /wp:test-block-a -->',
 					},
@@ -3367,7 +3367,7 @@ describe( 'selectors', () => {
 							{
 								name: 'pattern-c',
 								title: 'pattern hidden from UI',
-								hideFromUI: true,
+								inserter: false,
 								content:
 									'<!-- wp:test-block-a --><!-- /wp:test-block-a -->',
 							},
@@ -3389,7 +3389,7 @@ describe( 'selectors', () => {
 					{
 						name: 'pattern-hidden-from-ui',
 						title: 'pattern hidden from UI',
-						hideFromUI: true,
+						inserter: false,
 						content:
 							'<!-- wp:test-block-a --><!-- /wp:test-block-a --><!-- wp:test-block-b --><!-- /wp:test-block-b -->',
 					},
@@ -3415,12 +3415,12 @@ describe( 'selectors', () => {
 			);
 		} );
 		it( 'should return hidden from UI pattern when requested', () => {
-			const { name, blocks, hideFromUI } = __experimentalGetParsedPattern(
+			const { name, blocks, inserter } = __experimentalGetParsedPattern(
 				state,
 				'pattern-hidden-from-ui'
 			);
 			expect( name ).toEqual( 'pattern-hidden-from-ui' );
-			expect( hideFromUI ).toBeTruthy();
+			expect( inserter ).toBeFalsy();
 			expect( blocks ).toHaveLength( 2 );
 			expect( blocks[ 0 ] ).toEqual(
 				expect.objectContaining( {

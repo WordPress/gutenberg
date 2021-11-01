@@ -1902,7 +1902,7 @@ const getAllAllowedPatterns = createSelector(
 		const patterns = state.settings.__experimentalBlockPatterns;
 		const { allowedBlockTypes } = getSettings( state );
 		const parsedPatterns = patterns
-			.filter( ( { hideFromUI } ) => ! hideFromUI )
+			.filter( ( { inserter = true } ) => !! inserter )
 			.map( ( { name } ) =>
 				__experimentalGetParsedPattern( state, name )
 			);
