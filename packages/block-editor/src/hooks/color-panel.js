@@ -2,7 +2,6 @@
  * WordPress dependencies
  */
 import { useState, useEffect } from '@wordpress/element';
-import { __ } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
@@ -21,6 +20,7 @@ export default function ColorPanel( {
 	clientId,
 	enableContrastChecking = true,
 	showTitle = true,
+	title,
 } ) {
 	const [ detectedBackgroundColor, setDetectedBackgroundColor ] = useState();
 	const [ detectedColor, setDetectedColor ] = useState();
@@ -56,7 +56,7 @@ export default function ColorPanel( {
 	return (
 		<InspectorControls>
 			<PanelColorGradientSettings
-				title={ __( 'Color' ) }
+				title={ title }
 				initialOpen={ false }
 				settings={ settings }
 				showTitle={ showTitle }

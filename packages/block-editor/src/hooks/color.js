@@ -347,61 +347,78 @@ export function ColorEdit( props ) {
 	};
 
 	return (
-		<ColorPanel
-			enableContrastChecking={
-				// Turn on contrast checker for web only since it's not supported on mobile yet.
-				Platform.OS === 'web' && ! gradient && ! style?.color?.gradient
-			}
-			clientId={ props.clientId }
-			settings={ [
-				...( hasTextColor
-					? [
-							{
-								label: __( 'Text color' ),
-								onColorChange: onChangeColor( 'text' ),
-								colorValue: getColorObjectByAttributeValues(
-									solids,
-									textColor,
-									style?.color?.text
-								).color,
-							},
-					  ]
-					: [] ),
-				...( hasBackgroundColor || hasGradientColor
-					? [
-							{
-								label: __( 'Background color' ),
-								onColorChange: hasBackgroundColor
-									? onChangeColor( 'background' )
-									: undefined,
-								colorValue: getColorObjectByAttributeValues(
-									solids,
-									backgroundColor,
-									style?.color?.background
-								).color,
-								gradientValue,
-								onGradientChange: hasGradientColor
-									? onChangeGradient
-									: undefined,
-							},
-					  ]
-					: [] ),
-				...( hasLinkColor
-					? [
-							{
-								label: __( 'Link Color' ),
-								onColorChange: onChangeLinkColor,
-								colorValue: getLinkColorFromAttributeValue(
-									solids,
-									style?.elements?.link?.color?.text
-								),
-								clearable: !! style?.elements?.link?.color
-									?.text,
-							},
-					  ]
-					: [] ),
-			] }
-		/>
+		<>
+			<ColorPanel
+				enableContrastChecking={
+					// Turn on contrast checker for web only since it's not supported on mobile yet.
+					Platform.OS === 'web' &&
+					! gradient &&
+					! style?.color?.gradient
+				}
+				clientId={ props.clientId }
+				title={ __( 'Background' ) }
+				settings={ [
+					...( hasBackgroundColor || hasGradientColor
+						? [
+								{
+									label: __( 'Background color' ),
+									onColorChange: hasBackgroundColor
+										? onChangeColor( 'background' )
+										: undefined,
+									colorValue: getColorObjectByAttributeValues(
+										solids,
+										backgroundColor,
+										style?.color?.background
+									).color,
+									gradientValue,
+									onGradientChange: hasGradientColor
+										? onChangeGradient
+										: undefined,
+								},
+						  ]
+						: [] ),
+				] }
+			/>
+			<ColorPanel
+				enableContrastChecking={
+					// Turn on contrast checker for web only since it's not supported on mobile yet.
+					Platform.OS === 'web' &&
+					! gradient &&
+					! style?.color?.gradient
+				}
+				clientId={ props.clientId }
+				title={ __( 'Color' ) }
+				settings={ [
+					...( hasTextColor
+						? [
+								{
+									label: __( 'Text color' ),
+									onColorChange: onChangeColor( 'text' ),
+									colorValue: getColorObjectByAttributeValues(
+										solids,
+										textColor,
+										style?.color?.text
+									).color,
+								},
+						  ]
+						: [] ),
+					...( hasLinkColor
+						? [
+								{
+									label: __( 'Link Color' ),
+									onColorChange: onChangeLinkColor,
+									colorValue: getLinkColorFromAttributeValue(
+										solids,
+										style?.elements?.link?.color?.text
+									),
+									clearable: !! style?.elements?.link?.color
+										?.text,
+								},
+						  ]
+						: [] ),
+				] }
+			/>
+		</>
 	);
 }
 
