@@ -52,6 +52,7 @@ export default function NavigationMenuTitle( {
 		<MenuTitleUI className="components-navigation__menu-title">
 			{ ! isSearching && (
 				<MenuTitleHeadingUI
+					as="h2"
 					className="components-navigation__menu-title-heading"
 					level={ 3 }
 				>
