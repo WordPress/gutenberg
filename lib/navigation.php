@@ -436,6 +436,15 @@ function gutenberg_register_navigation_post_type() {
 }
 add_action( 'init', 'gutenberg_register_navigation_post_type' );
 
+/**
+ * Copies the navigationMenuId attribute from navigation template parts in the old theme, to
+ * corresponding ones in the new theme.
+ *
+ * @param string   $new_name  Name of the new theme.
+ * @param WP_Theme $new_theme New theme.
+ * @param WP_Theme $old_theme Old theme.
+ * @see switch_theme WordPress action.
+ */
 function gutenberg_migrate_nav_on_theme_switch( $new_name, $new_theme, $old_theme ) {
 	$old_theme_name = $old_theme->get_stylesheet();
 	$old_nav_parts  = get_navigation_template_part_names( $old_theme_name );
@@ -479,19 +488,19 @@ function gutenberg_migrate_nav_on_theme_switch( $new_name, $new_theme, $old_them
 			$template_file         = _gutenberg_get_template_file( 'wp_template_part', $common_part );
 			$block_template        = _gutenberg_build_template_result_from_file( $template_file, 'wp_template_part' );
 			$template_part_args    = array(
-					'post_type'    => $block_template->type,
-					'post_name'    => $common_part,
-					'post_title'   => $common_part,
-					'post_content' => $block_template->content,
-					'post_status'  => 'publish',
-					'tax_input'    => array(
-							'wp_theme'              => array(
-									$new_theme_name,
-							),
-							'wp_template_part_area' => array(
-									$block_template->area,
-							),
+				'post_type'    => $block_template->type,
+				'post_name'    => $common_part,
+				'post_title'   => $common_part,
+				'post_content' => $block_template->content,
+				'post_status'  => 'publish',
+				'tax_input'    => array(
+					'wp_theme'              => array(
+						$new_theme_name,
 					),
+					'wp_template_part_area' => array(
+						$block_template->area,
+					),
+				),
 			);
 			$template_part_post_id = wp_insert_post( $template_part_args );
 			wp_set_post_terms( $template_part_post_id, $block_template->area, 'wp_template_part_area' );
@@ -518,6 +527,12 @@ function gutenberg_migrate_nav_on_theme_switch( $new_name, $new_theme, $old_them
 	}
 }
 
+/**
+ * Returns a list of template parts representing labeled navigation areas such as primary, secondary, etc.
+ *
+ * @param string $theme_name Theme name.
+ * @return array List of template parts na
+ */
 function get_navigation_template_part_names( $theme_name ) {
 	$pattern          = get_theme_root() . "/${theme_name}/block-template-parts/*-menu.html";
 	$menu_parts_paths = glob( $pattern );
