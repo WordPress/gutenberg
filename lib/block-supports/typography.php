@@ -80,6 +80,21 @@ function gutenberg_apply_typography_support( $block_type, $block_attributes ) {
 		return array();
 	}
 
+	return gutenberg_typography_generate_css_classes_and_styles( $typography_supports, $block_attributes );
+}
+
+/**
+ * Generates all the typography block support related CSS classes and inline
+ * styles. This allows block supports config to be passed manually such that
+ * individual support features can be opted out of while still easily generating
+ * classes and styles for other features.
+ *
+ * @param array $typography_supports Typography block support flags.
+ * @param array $block_attributes    Block's attributes.
+ *
+ * @return array Typography CSS classes and inline styles.
+ */
+function gutenberg_typography_generate_css_classes_and_styles( $typography_supports, $block_attributes ) {
 	$attributes = array();
 	$classes    = array();
 	$styles     = array();
