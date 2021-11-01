@@ -81,25 +81,7 @@
 		}
 	}
 
-	// Force links to inherit text decoration applied to navigation block.
-	// The extra selector adds specificity to ensure it works when user-set.
-	&[style*="text-decoration"] {
-		.wp-block-navigation-item,
-		.wp-block-navigation__submenu-container {
-			text-decoration: inherit;
-		}
-
-		a {
-			text-decoration: inherit;
-
-			&:focus,
-			&:active {
-				text-decoration: inherit;
-			}
-		}
-	}
-
-	&:not([class*="has-text-decoration"]):not([style*="text-decoration"]) {
+	&:not([class*="has-text-decoration"]) {
 		a {
 			text-decoration: none;
 
