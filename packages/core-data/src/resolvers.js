@@ -443,7 +443,7 @@ export const __experimentalGetCurrentThemeBaseGlobalStyles = () => async ( {
 } ) => {
 	const currentTheme = await resolveSelect.getCurrentTheme();
 	const themeGlobalStyles = await apiFetch( {
-		path: `/wp/v2/themes/${ currentTheme.stylesheet }/global-styles`,
+		path: `/wp/v2/global-styles/themes/${ currentTheme.stylesheet }`,
 	} );
 	await dispatch.__experimentalReceiveThemeBaseGlobalStyles(
 		currentTheme.stylesheet,
