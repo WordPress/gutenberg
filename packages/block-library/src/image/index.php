@@ -6,35 +6,34 @@
  */
 
 /**
- * Renders the `core/image` block on the server.
+ * Adds a data-id attribute to the core Image block when nested in a Gallery block.
  *
- * @param  array $attributes The block attributes.
- * @param  array $content    The block content.
- * @return string            Returns the block content with the data-id attribute added.
+ * @param  WP_Post $post The block attributes.
+ * @return string        Returns the block content with the data-id attribute added.
  */
-function render_block_core_image( $attributes, $content ) {
-	if ( isset( $attributes['id'] ) ) {
-		// Add the data-id="$id" attribute to the img element
-		// to provide backwards compatibility for the Gallery Block,
-		// which now wraps Image Blocks within innerBlocks.
-		$data_id_attribute = 'data-id="' . esc_attr( $attributes['id'] ) . '"';
-		if ( ! strpos( $content, $data_id_attribute ) ) {
-			$content = str_replace( '<img', '<img ' . $data_id_attribute . ' ', $content );
+function get_block_core_image_post_content( $post ) {
+	if ( is_admin() ) {
+		return;
+	}
+	if ( has_blocks( $post->post_content ) ) {
+		$content = $post->post_content;
+		$blocks  = parse_blocks( $content );
+		foreach ( $blocks as $block ) {
+			if ( 'core/gallery' === $block['blockName'] ) {
+				foreach ( $block['innerBlocks'] as $inner_block ) {
+					if ( 'core/image' === $inner_block['blockName'] ) {
+						if ( isset( $inner_block['attrs']['id'] ) ) {
+							$image_id          = esc_attr( $inner_block['attrs']['id'] );
+							$data_id_attribute = 'data-id="' . $image_id . '"';
+							$class_string      = 'class="wp-image-' . $image_id . '"';
+							$content           = str_replace( $class_string, $class_string . ' ' . $data_id_attribute, $content );
+						}
+					}
+				}
+			}
 		}
 	}
-	return $content;
+	$post->post_content = $content;
 }
 
-
-/**
- * Register image block.
- */
-function register_block_core_image() {
-	register_block_type_from_metadata(
-		__DIR__ . '/image',
-		array(
-			'render_callback' => 'render_block_core_image',
-		)
-	);
-}
-add_action( 'init', 'register_block_core_image' );
+add_action( 'the_post', 'get_block_core_image_post_content', 10, 2 );
