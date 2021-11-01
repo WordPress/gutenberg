@@ -9,6 +9,7 @@ export {
 	useColorProps as __experimentalUseColorProps,
 	useCustomSides as __experimentalUseCustomSides,
 	getSpacingClassesAndStyles as __experimentalGetSpacingClassesAndStyles,
+	getTypographyClassesAndStyles as __experimentalGetTypographyClassesAndStyles,
 } from './hooks';
 export * from './components';
 export * from './utils';
