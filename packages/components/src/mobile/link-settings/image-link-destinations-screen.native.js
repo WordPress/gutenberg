@@ -62,14 +62,10 @@ function ImageLinkDestinationsScreen( props ) {
 	const { inputValue = url, imageUrl, attachmentPageUrl, linkDestination } =
 		route.params || {};
 
-	const customUrlSet =
-		!! inputValue &&
-		inputValue !== imageUrl &&
-		inputValue !== attachmentPageUrl;
-
 	function goToLinkPicker() {
 		navigation.navigate( blockSettingsScreens.linkPicker, {
-			inputValue: customUrlSet ? inputValue : '',
+			inputValue:
+				linkDestination === LINK_DESTINATION_CUSTOM ? inputValue : '',
 		} );
 	}
 
@@ -131,9 +127,15 @@ function ImageLinkDestinationsScreen( props ) {
 					isSelected={ linkDestination === LINK_DESTINATION_CUSTOM }
 					label={ __( 'Custom URL' ) }
 					onPress={ goToLinkPicker }
-					value={ customUrlSet ? inputValue : '' }
+					value={
+						linkDestination === LINK_DESTINATION_CUSTOM
+							? inputValue
+							: ''
+					}
 					valueStyle={
-						customUrlSet ? undefined : styles.placeholderTextColor
+						linkDestination === LINK_DESTINATION_CUSTOM
+							? undefined
+							: styles.placeholderTextColor
 					}
 				>
 					<Icon icon={ chevronRight }></Icon>

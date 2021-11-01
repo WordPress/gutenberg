@@ -158,6 +158,30 @@ describe( 'Image Block', () => {
 		expect( getEditorHtml() ).toBe( expectedHtml );
 	} );
 
+	it( 'does not display the Link To URL within the Custom URL input when set to Media File and query parameters are present', async () => {
+		const initialHtml = `
+		<!-- wp:image {"id":1,"sizeSlug":"large","linkDestination":"media","className":"is-style-default"} -->
+		<figure class="wp-block-image size-large is-style-default">
+			<a href="https://cldup.com/cXyG__fTLN.jpg">
+				<img src="https://cldup.com/cXyG__fTLN.jpg?w=683" alt="" class="wp-image-1"/>
+			</a>
+		<figcaption>Mountain</figcaption></figure>
+		<!-- /wp:image -->`;
+		const screen = await initializeEditor( { initialHtml } );
+		// We must await the image fetch via `getMedia`
+		await act( () => apiFetchPromise );
+
+		fireEvent.press( screen.getByA11yLabel( /Image Block/ ) );
+		// Awaiting navigation event seemingly required due to React Navigation bug
+		// https://git.io/Ju35Z
+		await act( () =>
+			fireEvent.press( screen.getByA11yLabel( 'Open Settings' ) )
+		);
+		fireEvent.press( screen.getByText( 'Media File' ) );
+
+		expect( screen.queryByA11yLabel( /https:\/\/cldup\.com/ ) ).toBeNull();
+	} );
+
 	it( 'sets link target', async () => {
 		const initialHtml = `
 		<!-- wp:image {"id":1,"sizeSlug":"large","linkDestination":"custom","className":"is-style-default"} -->
