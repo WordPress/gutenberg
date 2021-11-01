@@ -266,7 +266,7 @@ const SiteLogo = ( {
 
 	const syncSiteIconHelpText = createInterpolateElement(
 		__(
-			"Site Icons are what you see in browser tabs, bookmark bars, and within the WordPress mobile apps. If you don't have one, you can set your logo to also be your icon. If you do have a custom site icon, you can upload that from the <a>Site Icon settings</a>!"
+			"Site Icons are what you see in browser tabs, bookmark bars, and within the WordPress mobile apps. If you don't have one, you can set your logo to also be your icon. If you do have a custom site icon, you can upload that from the <a>Site Icon settings!</a>"
 		),
 		{
 			a: (
@@ -321,7 +321,7 @@ const SiteLogo = ( {
 					{ canUserEdit && (
 						<>
 							<ToggleControl
-								label={ __( 'Use site logo as icon' ) }
+								label={ __( 'Use as site icon' ) }
 								onChange={ ( value ) => {
 									setSyncSiteIcon( value );
 									setIcon( value ? logoId : undefined );
