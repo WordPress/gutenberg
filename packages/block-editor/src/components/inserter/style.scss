@@ -150,18 +150,6 @@ $block-inserter-tabs-height: 44px;
 
 .block-editor-inserter__panel-header-patterns {
 	padding: $grid-unit-20 $grid-unit-20 0;
-	.block-editor-inserter__patterns-explorer-expand {
-		background: $gray-900;
-		color: $white;
-
-		&:hover {
-			color: $white;
-		}
-
-		&:active {
-			color: $gray-400;
-		}
-	}
 }
 
 .block-editor-inserter__panel-content {
@@ -349,28 +337,29 @@ $block-inserter-tabs-height: 44px;
 		&__categories-list__item {
 			display: block;
 			width: 100%;
+			height: 48px;
 			text-align: left;
 		}
-		&__categories-list__item[aria-label="Featured"] {
-			margin-bottom: $grid-unit-20;
-		}
 	}
+
 	&__search {
 		margin-bottom: $grid-unit-20;
 	}
+
 	.block-editor-block-patterns-list {
 		display: grid;
-		grid-gap: 10px;
-		grid-template-columns: repeat(3, 1fr);
-		align-items: baseline;
+		grid-gap: $grid-unit-30;
+		grid-template-columns: repeat(2, 1fr);
+
 		.block-editor-block-patterns-list__list-item {
 			margin-top: 0;
+			margin-bottom: $grid-unit-30;
 		}
+
 		.block-editor-block-preview__container {
-			border-radius: $radius-block-ui;
-			border: $border-width solid $gray-300;
-			max-height: 250px;
-			overflow: auto;
+			height: inherit;
+			max-height: 600px;
+			overflow: hidden;
 		}
 	}
 }
