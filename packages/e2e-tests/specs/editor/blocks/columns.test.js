@@ -16,10 +16,6 @@ describe( 'Columns', () => {
 
 	it( 'restricts all blocks inside the columns block', async () => {
 		await insertBlock( 'Columns' );
-		// Navigate into the placeholder and activate the 50/50 option.
-		await page.keyboard.press( 'ArrowDown' );
-		await page.keyboard.press( 'Space' );
-		await page.keyboard.press( 'Tab' );
 		await page.keyboard.press( 'Tab' );
 		await page.keyboard.press( 'Space' );
 		await closeGlobalBlockInserter();

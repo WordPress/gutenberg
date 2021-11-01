@@ -102,9 +102,7 @@ export function useFocusFirstElement( clientId ) {
 			// We must wait for the placeholder content to load.
 			setTimeout( () => {
 				// Find all text fields within the placeholder.
-				candidates = focus.tabbable
-					.find( target.shadowRoot )
-					.filter( ( node ) => isTextField( node ) );
+				candidates = focus.tabbable.find( target.shadowRoot );
 				target = ( isReverse ? last : first )( candidates ) || target;
 				placeCaretAtHorizontalEdge( target, isReverse );
 			} );

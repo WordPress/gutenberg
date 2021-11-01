@@ -30,10 +30,7 @@ describe( 'changing image size', () => {
 	it( 'should insert and change my image size', async () => {
 		await insertBlock( 'Image' );
 
-		// Navigate into the placeholder and activate the Media Library option.
-		await page.keyboard.press( 'ArrowDown' );
-		await page.keyboard.press( 'Space' );
-		await page.keyboard.press( 'Tab' );
+		// Tab to the Media Library option.
 		await page.keyboard.press( 'Tab' );
 		await page.keyboard.press( 'Space' );
 

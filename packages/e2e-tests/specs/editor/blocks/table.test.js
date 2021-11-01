@@ -23,14 +23,10 @@ async function changeCellAlignment( align ) {
 async function createTable( columnCount, rowCount ) {
 	await insertBlock( 'Table' );
 
-	// Navigate into the placeholder.
-	await page.keyboard.press( 'ArrowDown' );
-	await page.keyboard.press( 'Space' );
-
-	// Navigate to "Column count"
-	await page.keyboard.press( 'Tab' );
-
-	if ( columnCount ) await page.keyboard.type( columnCount );
+	if ( columnCount ) {
+		await page.keyboard.press( 'Backspace' );
+		await page.keyboard.type( columnCount );
+	}
 
 	// Navigate to "Row count"
 	await page.keyboard.press( 'Tab' );

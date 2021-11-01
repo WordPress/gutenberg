@@ -3,7 +3,6 @@
  */
 import {
 	clickBlockAppender,
-	clickButton,
 	createEmbeddingMatcher,
 	createJSONResponse,
 	createNewPost,
@@ -190,22 +189,43 @@ describe( 'Embedding content', () => {
 
 		// Valid provider; invalid content. Should render failed, edit state.
 		await insertEmbed( 'https://twitter.com/wooyaygutenberg123454312' );
-		await page.waitForSelector(
-			'input[value="https://twitter.com/wooyaygutenberg123454312"]'
-		);
+		await page.waitForFunction( () => {
+			const embedPlaceholders = document.querySelectorAll(
+				'.wp-block-embed [role="button"]'
+			);
+			const lastEmbedPlaceholder =
+				embedPlaceholders[ embedPlaceholders.length - 1 ];
+			return lastEmbedPlaceholder?.shadowRoot.querySelector(
+				'input[value="https://twitter.com/wooyaygutenberg123454312"]'
+			);
+		} );
 
 		// WordPress invalid content. Should render failed, edit state.
 		await insertEmbed( 'https://wordpress.org/gutenberg/handbook/' );
-		await page.waitForSelector(
-			'input[value="https://wordpress.org/gutenberg/handbook/"]'
-		);
+		await page.waitForFunction( () => {
+			const embedPlaceholders = document.querySelectorAll(
+				'.wp-block-embed [role="button"]'
+			);
+			const lastEmbedPlaceholder =
+				embedPlaceholders[ embedPlaceholders.length - 1 ];
+			return lastEmbedPlaceholder?.shadowRoot.querySelector(
+				'input[value="https://wordpress.org/gutenberg/handbook/"]'
+			);
+		} );
 
 		// Provider whose oembed API has gone wrong. Should render failed, edit
 		// state.
 		await insertEmbed( 'https://twitter.com/thatbunty' );
-		await page.waitForSelector(
-			'input[value="https://twitter.com/thatbunty"]'
-		);
+		await page.waitForFunction( () => {
+			const embedPlaceholders = document.querySelectorAll(
+				'.wp-block-embed [role="button"]'
+			);
+			const lastEmbedPlaceholder =
+				embedPlaceholders[ embedPlaceholders.length - 1 ];
+			return lastEmbedPlaceholder?.shadowRoot.querySelector(
+				'input[value="https://twitter.com/thatbunty"]'
+			);
+		} );
 
 		// WordPress content that can be embedded. Should render valid figure
 		// element.
@@ -234,15 +254,22 @@ describe( 'Embedding content', () => {
 		// URL that can't be embedded.
 		await insertEmbed( 'https://twitter.com/wooyaygutenberg123454312' );
 
-		// Wait for the request to fail and present an error. Since placeholder
-		// has styles applied which depend on resize observer, wait for the
-		// expected size class to settle before clicking, since otherwise a race
-		// condition could occur on the placeholder layout vs. click intent.
-		await page.waitForSelector(
-			'.components-placeholder.is-large .components-placeholder__error'
-		);
+		await page.waitForFunction( () => {
+			const embedPlaceholders = document.querySelectorAll(
+				'.wp-block-embed [role="button"]'
+			);
+			const lastEmbedPlaceholder =
+				embedPlaceholders[ embedPlaceholders.length - 1 ];
+			return lastEmbedPlaceholder?.shadowRoot.querySelector(
+				'input[value="https://twitter.com/wooyaygutenberg123454312"]'
+			);
+		} );
 
-		await clickButton( 'Convert to link' );
+		const handle = await page.evaluateHandle(
+			`document.querySelector('.wp-block-embed [role="button"]').shadowRoot.querySelector('.components-placeholder__error').lastElementChild`
+		);
+		await handle.click( handle );
+
 		expect( await getEditedPostContent() ).toMatchSnapshot();
 	} );
 
@@ -257,13 +284,16 @@ describe( 'Embedding content', () => {
 		// URL that can't be embedded.
 		await insertEmbed( 'https://twitter.com/wooyaygutenberg123454312' );
 
-		// Wait for the request to fail and present an error. Since placeholder
-		// has styles applied which depend on resize observer, wait for the
-		// expected size class to settle before clicking, since otherwise a race
-		// condition could occur on the placeholder layout vs. click intent.
-		await page.waitForSelector(
-			'.components-placeholder.is-large .components-placeholder__error'
-		);
+		await page.waitForFunction( () => {
+			const embedPlaceholders = document.querySelectorAll(
+				'.wp-block-embed [role="button"]'
+			);
+			const lastEmbedPlaceholder =
+				embedPlaceholders[ embedPlaceholders.length - 1 ];
+			return lastEmbedPlaceholder?.shadowRoot.querySelector(
+				'input[value="https://twitter.com/wooyaygutenberg123454312"]'
+			);
+		} );
 
 		// Set up a different mock to make sure that try again actually does make the request again.
 		await setUpResponseMocking( [
@@ -276,7 +306,10 @@ describe( 'Embedding content', () => {
 				),
 			},
 		] );
-		await clickButton( 'Try again' );
+		const handle = await page.evaluateHandle(
+			`document.querySelector('.wp-block-embed [role="button"]').shadowRoot.querySelector('button.is-secondary')`
+		);
+		await handle.click( handle );
 		await page.waitForSelector( 'figure.wp-block-embed' );
 		expect( await getEditedPostContent() ).toMatchSnapshot();
 	} );

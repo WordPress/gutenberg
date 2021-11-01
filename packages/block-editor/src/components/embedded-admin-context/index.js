@@ -45,15 +45,17 @@ export default function EmbeddedAdminContext( props ) {
 
 		function onKeyDown( event ) {
 			if ( element !== event.path[ 0 ] ) return;
+			if ( event.keyCode !== ENTER && event.keyCode !== SPACE ) return;
 
-			if ( event.keyCode === ENTER || event.keyCode === SPACE ) {
-				focus.focusable.find( root )[ 0 ].focus();
-				event.preventDefault();
-			} else if ( event.keyCode === ESCAPE ) {
-				root.host.focus();
-				event.preventDefault();
-				event.stopPropagation();
-			}
+			focus.focusable.find( root )[ 0 ].focus();
+			event.preventDefault();
+		}
+
+		function onRootKeyDown( event ) {
+			if ( event.keyCode !== ESCAPE ) return;
+
+			root.host.focus();
+			event.preventDefault();
 		}
 
 		let timeoutId;
@@ -69,11 +71,13 @@ export default function EmbeddedAdminContext( props ) {
 
 		root.addEventListener( 'focusin', onFocusIn );
 		root.addEventListener( 'focusout', onFocusOut );
+		root.addEventListener( 'keydown', onRootKeyDown );
 		element.addEventListener( 'keydown', onKeyDown );
 		element.addEventListener( 'mousedown', onMouseDown );
 		return () => {
 			root.removeEventListener( 'focusin', onFocusIn );
 			root.removeEventListener( 'focusout', onFocusOut );
+			root.removeEventListener( 'keydown', onRootKeyDown );
 			element.removeEventListener( 'keydown', onKeyDown );
 			element.removeEventListener( 'mousedown', onMouseDown );
 			clearTimeout( timeoutId );
