@@ -107,6 +107,7 @@ export const MenuTitleActionsUI = styled.span`
 
 export const MenuTitleSearchUI = styled( SearchControl )`
 	input[type='search'].components-search-control__input {
+		margin: 0;
 		background: #303030;
 		color: #fff;
 
