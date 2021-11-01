@@ -11,7 +11,14 @@ import { useDispatch } from '@wordpress/data';
 import { store as noticesStore } from '@wordpress/notices';
 import { useCallback, useState } from '@wordpress/element';
 
-const EmbedBottomSheet = ( { value, label, isVisible, onClose, onSubmit } ) => {
+const EmbedBottomSheet = ( {
+	value,
+	label,
+	isVisible,
+	onClose,
+	onSubmit,
+	withBottomSheet,
+} ) => {
 	const [ url, setURL ] = useState( value );
 	const { createErrorNotice } = useDispatch( noticesStore );
 
@@ -68,7 +75,7 @@ const EmbedBottomSheet = ( { value, label, isVisible, onClose, onSubmit } ) => {
 			onDismiss={ onDismiss }
 			setAttributes={ setAttributes }
 			options={ linkSettingsOptions }
-			withBottomSheet
+			withBottomSheet={ withBottomSheet }
 			showIcon
 		/>
 	);
