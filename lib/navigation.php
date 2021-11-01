@@ -418,7 +418,7 @@ function gutenberg_register_navigation_post_type() {
 		'description'           => __( 'Navigation menus.', 'gutenberg' ),
 		'public'                => false,
 		'has_archive'           => false,
-		'show_ui'               => false,
+		'show_ui'               => true,
 		'show_in_menu'          => 'themes.php',
 		'show_in_admin_bar'     => false,
 		'show_in_rest'          => true,
@@ -435,3 +435,23 @@ function gutenberg_register_navigation_post_type() {
 	register_post_type( 'wp_navigation', $args );
 }
 add_action( 'init', 'gutenberg_register_navigation_post_type' );
+
+
+/**
+ * Disable block editor for wp_navigation type posts so they can be managed via the UI.
+ *
+ * @param bool   $value Whether the CPT supports block editor or not.
+ * @param string $post_type Post type.
+ *
+ * @return bool
+ */
+function gutenberg_disable_block_editor_for_navigation_post_type( $value, $post_type ) {
+	if ( 'wp_navigation' === $post_type ) {
+		return false;
+	}
+
+	return $value;
+}
+
+add_filter( 'use_block_editor_for_post_type', 'gutenberg_disable_block_editor_for_navigation_post_type', 10, 2 );
+
