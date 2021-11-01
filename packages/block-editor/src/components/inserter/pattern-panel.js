@@ -66,11 +66,12 @@ function PatternInserterPanel( {
 			</FlexItem>
 			<FlexItem>
 				<Button
+					variant="secondary"
 					className="block-editor-inserter__patterns-explorer-expand"
-					label={ __( 'See all patterns' ) }
+					label={ __( 'Explore all patterns' ) }
 					onClick={ () => openPatternExplorer() }
 				>
-					{ _x( 'See all', 'Label for showing all block patterns' ) }
+					{ _x( 'Explore', 'Label for showing all block patterns' ) }
 				</Button>
 			</FlexItem>
 		</Flex>
