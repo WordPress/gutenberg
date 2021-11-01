@@ -236,10 +236,6 @@ const EmbedEdit = ( props ) => {
 		<>
 			{ showEmbedPlaceholder ? (
 				<>
-					<EmbedControls
-						showEditButton={ cannotEmbed }
-						switchBackToURLInput={ () => setIsEditingURL( true ) }
-					/>
 					<View { ...blockProps }>
 						<EmbedPlaceholder
 							icon={ icon }
@@ -262,12 +258,10 @@ const EmbedEdit = ( props ) => {
 			) : (
 				<>
 					<EmbedControls
-						showEditButton={ preview && ! cannotEmbed }
 						themeSupportsResponsive={ themeSupportsResponsive }
 						blockSupportsResponsive={ responsive }
 						allowResponsive={ allowResponsive }
 						toggleResponsive={ toggleResponsive }
-						switchBackToURLInput={ () => setIsEditingURL( true ) }
 						bottomSheetLabel={ bottomSheetLabel }
 						url={ url }
 						onEmbedBottomSheetSubmit={ ( value ) => {
