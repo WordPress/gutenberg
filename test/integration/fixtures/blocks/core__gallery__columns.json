@@ -10,6 +10,7 @@
 			"columns": 1,
 			"caption": "",
 			"imageCrop": true,
+			"fixedHeight": true,
 			"linkTo": "none",
 			"sizeSlug": "large",
 			"allowResize": false

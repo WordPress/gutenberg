@@ -9,6 +9,7 @@
 			"shortCodeTransforms": [],
 			"caption": "Gallery Caption",
 			"imageCrop": true,
+			"fixedHeight": true,
 			"linkTo": "none",
 			"sizeSlug": "large",
 			"allowResize": false,
