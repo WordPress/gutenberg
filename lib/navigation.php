@@ -29,9 +29,9 @@
  *
  * @see https://core.trac.wordpress.org/ticket/50544
  *
- * @param int $menu_id ID of the updated menu.
- * @param int $menu_item_db_id ID of the new menu item.
- * @param array $args An array of arguments used to update/add the menu item.
+ * @param int   $menu_id         ID of the updated menu.
+ * @param int   $menu_item_db_id ID of the new menu item.
+ * @param array $args            An array of arguments used to update/add the menu item.
  */
 function gutenberg_update_nav_menu_item_content( $menu_id, $menu_item_db_id, $args ) {
 	global $wp_customize;
@@ -47,11 +47,11 @@ function gutenberg_update_nav_menu_item_content( $menu_id, $menu_item_db_id, $ar
 	// `WP_Customize_Manager::save()`.
 	if ( isset( $wp_customize ) ) {
 		$values = $wp_customize->unsanitized_post_values();
-		if ( isset( $values["nav_menu_item[$menu_item_db_id]"]['content'] ) ) {
-			if ( is_string( $values["nav_menu_item[$menu_item_db_id]"]['content'] ) ) {
-				$args['menu-item-content'] = $values["nav_menu_item[$menu_item_db_id]"]['content'];
-			} elseif ( isset( $values["nav_menu_item[$menu_item_db_id]"]['content']['raw'] ) ) {
-				$args['menu-item-content'] = $values["nav_menu_item[$menu_item_db_id]"]['content']['raw'];
+		if ( isset( $values[ "nav_menu_item[$menu_item_db_id]" ]['content'] ) ) {
+			if ( is_string( $values[ "nav_menu_item[$menu_item_db_id]" ]['content'] ) ) {
+				$args['menu-item-content'] = $values[ "nav_menu_item[$menu_item_db_id]" ]['content'];
+			} elseif ( isset( $values[ "nav_menu_item[$menu_item_db_id]" ]['content']['raw'] ) ) {
+				$args['menu-item-content'] = $values[ "nav_menu_item[$menu_item_db_id]" ]['content']['raw'];
 			}
 		}
 	}
@@ -59,14 +59,13 @@ function gutenberg_update_nav_menu_item_content( $menu_id, $menu_item_db_id, $ar
 	// Everything else belongs in `wp_update_nav_menu_item()`.
 
 	$defaults = array(
-			'menu-item-content' => '',
+		'menu-item-content' => '',
 	);
 
 	$args = wp_parse_args( $args, $defaults );
 
 	update_post_meta( $menu_item_db_id, '_menu_item_content', wp_slash( $args['menu-item-content'] ) );
 }
-
 add_action( 'wp_update_nav_menu_item', 'gutenberg_update_nav_menu_item_content', 10, 3 );
 
 /**
@@ -90,8 +89,7 @@ add_action( 'wp_update_nav_menu_item', 'gutenberg_update_nav_menu_item_content',
 function gutenberg_setup_block_nav_menu_item( $menu_item ) {
 	if ( 'block' === $menu_item->type ) {
 		$menu_item->type_label = __( 'Block', 'gutenberg' );
-		$menu_item->content    = ! isset( $menu_item->content ) ? get_post_meta( $menu_item->db_id, '_menu_item_content',
-				true ) : $menu_item->content;
+		$menu_item->content    = ! isset( $menu_item->content ) ? get_post_meta( $menu_item->db_id, '_menu_item_content', true ) : $menu_item->content;
 
 		// Set to make the menu item display nicely in nav-menus.php.
 		$menu_item->object = 'block';
@@ -100,7 +98,6 @@ function gutenberg_setup_block_nav_menu_item( $menu_item ) {
 
 	return $menu_item;
 }
-
 add_filter( 'wp_setup_nav_menu_item', 'gutenberg_setup_block_nav_menu_item' );
 
 /**
@@ -118,10 +115,10 @@ add_filter( 'wp_setup_nav_menu_item', 'gutenberg_setup_block_nav_menu_item' );
  *
  * @see https://core.trac.wordpress.org/ticket/50544
  *
- * @param string $item_output The menu item's starting HTML output.
- * @param WP_Post $item Menu item data object.
- * @param int $depth Depth of menu item. Used for padding.
- * @param stdClass $args An object of wp_nav_menu() arguments.
+ * @param string   $item_output The menu item's starting HTML output.
+ * @param WP_Post  $item        Menu item data object.
+ * @param int      $depth       Depth of menu item. Used for padding.
+ * @param stdClass $args        An object of wp_nav_menu() arguments.
  *
  * @return string The menu item's updated HTML output.
  */
@@ -135,7 +132,6 @@ function gutenberg_output_block_nav_menu_item( $item_output, $item, $depth, $arg
 
 	return $item_output;
 }
-
 add_filter( 'walker_nav_menu_start_el', 'gutenberg_output_block_nav_menu_item', 10, 4 );
 
 /**
@@ -164,13 +160,12 @@ function gutenberg_remove_block_nav_menu_items( $menu_items ) {
 	}
 
 	return array_filter(
-			$menu_items,
-			function ( $menu_item ) {
-				return 'block' !== $menu_item->type;
-			}
+		$menu_items,
+		function( $menu_item ) {
+			return 'block' !== $menu_item->type;
+		}
 	);
 }
-
 add_filter( 'wp_nav_menu_objects', 'gutenberg_remove_block_nav_menu_items', 10 );
 
 /**
@@ -182,12 +177,12 @@ add_filter( 'wp_nav_menu_objects', 'gutenberg_remove_block_nav_menu_items', 10 )
  *
  * @param array $menu_items The menu items to convert, sorted by each menu item's menu order.
  * @param array $menu_items_by_parent_id All menu items, indexed by their parent's ID.
- *
+
  * @return array Updated menu items, sorted by each menu item's menu order.
  */
 function gutenberg_convert_menu_items_to_blocks(
-		$menu_items,
-		&$menu_items_by_parent_id
+	$menu_items,
+	&$menu_items_by_parent_id
 ) {
 	if ( empty( $menu_items ) ) {
 		return array();
@@ -203,27 +198,27 @@ function gutenberg_convert_menu_items_to_blocks(
 				$block = $parsed_blocks[0];
 			} else {
 				$block = array(
-						'blockName' => 'core/freeform',
-						'attrs'     => array(
-								'originalContent' => $menu_item->content,
-						),
+					'blockName' => 'core/freeform',
+					'attrs'     => array(
+						'originalContent' => $menu_item->content,
+					),
 				);
 			}
 		} else {
 			$block = array(
-					'blockName' => 'core/navigation-link',
-					'attrs'     => array(
-							'label' => $menu_item->title,
-							'url'   => $menu_item->url,
-					),
+				'blockName' => 'core/navigation-link',
+				'attrs'     => array(
+					'label' => $menu_item->title,
+					'url'   => $menu_item->url,
+				),
 			);
 		}
 
 		$block['innerBlocks'] = gutenberg_convert_menu_items_to_blocks(
-				isset( $menu_items_by_parent_id[ $menu_item->ID ] )
-						? $menu_items_by_parent_id[ $menu_item->ID ]
-						: array(),
-				$menu_items_by_parent_id
+			isset( $menu_items_by_parent_id[ $menu_item->ID ] )
+					? $menu_items_by_parent_id[ $menu_item->ID ]
+					: array(),
+			$menu_items_by_parent_id
 		);
 
 		$blocks[] = $block;
@@ -249,7 +244,7 @@ function gutenberg_convert_menu_items_to_blocks(
  * @see https://core.trac.wordpress.org/ticket/50544
  *
  * @param string|null $output Nav menu output to short-circuit with. Default null.
- * @param stdClass $args An object containing wp_nav_menu() arguments.
+ * @param stdClass    $args   An object containing wp_nav_menu() arguments.
  *
  * @return string|null Nav menu output to short-circuit with.
  */
@@ -316,19 +311,18 @@ function gutenberg_output_block_nav_menu( $output, $args ) {
 	}
 
 	$navigation_block = array(
-			'blockName'   => 'core/navigation',
-			'attrs'       => $block_attributes,
-			'innerBlocks' => gutenberg_convert_menu_items_to_blocks(
-					isset( $menu_items_by_parent_id[0] )
-							? $menu_items_by_parent_id[0]
-							: array(),
-					$menu_items_by_parent_id
-			),
+		'blockName'   => 'core/navigation',
+		'attrs'       => $block_attributes,
+		'innerBlocks' => gutenberg_convert_menu_items_to_blocks(
+			isset( $menu_items_by_parent_id[0] )
+				? $menu_items_by_parent_id[0]
+				: array(),
+			$menu_items_by_parent_id
+		),
 	);
 
 	return render_block( $navigation_block );
 }
-
 add_filter( 'pre_wp_nav_menu', 'gutenberg_output_block_nav_menu', 10, 2 );
 
 /**
@@ -344,24 +338,21 @@ add_filter( 'pre_wp_nav_menu', 'gutenberg_output_block_nav_menu', 10, 2 );
  *
  * @see https://core.trac.wordpress.org/ticket/50544
  *
- * @param int $item_id Menu item ID.
- * @param WP_Post $item Menu item data object.
+ * @param int     $item_id Menu item ID.
+ * @param WP_Post $item    Menu item data object.
  */
 function gutenberg_output_block_menu_item_custom_fields( $item_id, $item ) {
 	if ( 'block' === $item->type ) {
 		?>
 		<p class="field-content description description-wide">
 			<label for="edit-menu-item-content-<?php echo $item_id; ?>">
-				<?php _e( 'Content', 'gutenberg' ); ?><br/>
-				<textarea id="edit-menu-item-content-<?php echo $item_id; ?>" class="widefat" rows="3" cols="20"
-						  name="menu-item-content[<?php echo $item_id; ?>]"
-						  readonly><?php echo esc_textarea( trim( $item->content ) ); ?></textarea>
+				<?php _e( 'Content', 'gutenberg' ); ?><br />
+				<textarea id="edit-menu-item-content-<?php echo $item_id; ?>" class="widefat" rows="3" cols="20" name="menu-item-content[<?php echo $item_id; ?>]" readonly><?php echo esc_textarea( trim( $item->content ) ); ?></textarea>
 			</label>
 		</p>
 		<?php
 	}
 }
-
 add_action( 'wp_nav_menu_item_custom_fields', 'gutenberg_output_block_menu_item_custom_fields', 10, 2 );
 
 /**
@@ -392,7 +383,6 @@ CSS;
 		wp_add_inline_style( 'nav-menus', $css );
 	}
 }
-
 add_action( 'admin_enqueue_scripts', 'gutenberg_add_block_menu_item_styles_to_nav_menus' );
 
 
@@ -401,50 +391,49 @@ add_action( 'admin_enqueue_scripts', 'gutenberg_add_block_menu_item_styles_to_na
  */
 function gutenberg_register_navigation_post_type() {
 	$labels = array(
-			'name'                  => __( 'Navigation Menus', 'gutenberg' ),
-			'singular_name'         => __( 'Navigation Menu', 'gutenberg' ),
-			'menu_name'             => _x( 'Navigation Menus', 'Admin Menu text', 'gutenberg' ),
-			'add_new'               => _x( 'Add New', 'Navigation Menu', 'gutenberg' ),
-			'add_new_item'          => __( 'Add New Navigation Menu', 'gutenberg' ),
-			'new_item'              => __( 'New Navigation Menu', 'gutenberg' ),
-			'edit_item'             => __( 'Edit Navigation Menu', 'gutenberg' ),
-			'view_item'             => __( 'View Navigation Menu', 'gutenberg' ),
-			'all_items'             => __( 'All Navigation Menus', 'gutenberg' ),
-			'search_items'          => __( 'Search Navigation Menus', 'gutenberg' ),
-			'parent_item_colon'     => __( 'Parent Navigation Menu:', 'gutenberg' ),
-			'not_found'             => __( 'No Navigation Menu found.', 'gutenberg' ),
-			'not_found_in_trash'    => __( 'No Navigation Menu found in Trash.', 'gutenberg' ),
-			'archives'              => __( 'Navigation Menu archives', 'gutenberg' ),
-			'insert_into_item'      => __( 'Insert into Navigation Menu', 'gutenberg' ),
-			'uploaded_to_this_item' => __( 'Uploaded to this Navigation Menu', 'gutenberg' ),
+		'name'                  => __( 'Navigation Menus', 'gutenberg' ),
+		'singular_name'         => __( 'Navigation Menu', 'gutenberg' ),
+		'menu_name'             => _x( 'Navigation Menus', 'Admin Menu text', 'gutenberg' ),
+		'add_new'               => _x( 'Add New', 'Navigation Menu', 'gutenberg' ),
+		'add_new_item'          => __( 'Add New Navigation Menu', 'gutenberg' ),
+		'new_item'              => __( 'New Navigation Menu', 'gutenberg' ),
+		'edit_item'             => __( 'Edit Navigation Menu', 'gutenberg' ),
+		'view_item'             => __( 'View Navigation Menu', 'gutenberg' ),
+		'all_items'             => __( 'All Navigation Menus', 'gutenberg' ),
+		'search_items'          => __( 'Search Navigation Menus', 'gutenberg' ),
+		'parent_item_colon'     => __( 'Parent Navigation Menu:', 'gutenberg' ),
+		'not_found'             => __( 'No Navigation Menu found.', 'gutenberg' ),
+		'not_found_in_trash'    => __( 'No Navigation Menu found in Trash.', 'gutenberg' ),
+		'archives'              => __( 'Navigation Menu archives', 'gutenberg' ),
+		'insert_into_item'      => __( 'Insert into Navigation Menu', 'gutenberg' ),
+		'uploaded_to_this_item' => __( 'Uploaded to this Navigation Menu', 'gutenberg' ),
 		// Some of these are a bit weird, what are they for?
-			'filter_items_list'     => __( 'Filter Navigation Menu list', 'gutenberg' ),
-			'items_list_navigation' => __( 'Navigation Menus list navigation', 'gutenberg' ),
-			'items_list'            => __( 'Navigation Menus list', 'gutenberg' ),
+		'filter_items_list'     => __( 'Filter Navigation Menu list', 'gutenberg' ),
+		'items_list_navigation' => __( 'Navigation Menus list navigation', 'gutenberg' ),
+		'items_list'            => __( 'Navigation Menus list', 'gutenberg' ),
 	);
 
 	$args = array(
-			'labels'                => $labels,
-			'description'           => __( 'Navigation menus.', 'gutenberg' ),
-			'public'                => false,
-			'has_archive'           => false,
-			'show_ui'               => false,
-			'show_in_menu'          => 'themes.php',
-			'show_in_admin_bar'     => false,
-			'show_in_rest'          => true,
-			'map_meta_cap'          => true,
-			'rest_base'             => 'navigation',
-			'rest_controller_class' => 'WP_REST_Posts_Controller',
-			'supports'              => array(
-					'title',
-					'editor',
-					'revisions',
-			),
+		'labels'                => $labels,
+		'description'           => __( 'Navigation menus.', 'gutenberg' ),
+		'public'                => false,
+		'has_archive'           => false,
+		'show_ui'               => false,
+		'show_in_menu'          => 'themes.php',
+		'show_in_admin_bar'     => false,
+		'show_in_rest'          => true,
+		'map_meta_cap'          => true,
+		'rest_base'             => 'navigation',
+		'rest_controller_class' => 'WP_REST_Posts_Controller',
+		'supports'              => array(
+			'title',
+			'editor',
+			'revisions',
+		),
 	);
 
 	register_post_type( 'wp_navigation', $args );
 }
-
 add_action( 'init', 'gutenberg_register_navigation_post_type' );
 
 function gutenberg_migrate_nav_on_theme_switch( $new_name, $new_theme, $old_theme ) {
@@ -466,8 +455,8 @@ function gutenberg_migrate_nav_on_theme_switch( $new_name, $new_theme, $old_them
 		// Extract the navigationMenuId from the old template part.
 		$old_blocks = parse_blocks( $old_template_part->content );
 		if (
-			'core/navigation' !== $old_blocks[0]['blockName'] ||
-			empty( $old_blocks[0]['attrs']['navigationMenuId'] )
+				'core/navigation' !== $old_blocks[0]['blockName'] ||
+				empty( $old_blocks[0]['attrs']['navigationMenuId'] )
 		) {
 			continue;
 		}
@@ -490,19 +479,19 @@ function gutenberg_migrate_nav_on_theme_switch( $new_name, $new_theme, $old_them
 			$template_file         = _gutenberg_get_template_file( 'wp_template_part', $common_part );
 			$block_template        = _gutenberg_build_template_result_from_file( $template_file, 'wp_template_part' );
 			$template_part_args    = array(
-				'post_type'    => $block_template->type,
-				'post_name'    => $common_part,
-				'post_title'   => $common_part,
-				'post_content' => $block_template->content,
-				'post_status'  => 'publish',
-				'tax_input'    => array(
-					'wp_theme'              => array(
-						$new_theme_name,
+					'post_type'    => $block_template->type,
+					'post_name'    => $common_part,
+					'post_title'   => $common_part,
+					'post_content' => $block_template->content,
+					'post_status'  => 'publish',
+					'tax_input'    => array(
+							'wp_theme'              => array(
+									$new_theme_name,
+							),
+							'wp_template_part_area' => array(
+									$block_template->area,
+							),
 					),
-					'wp_template_part_area' => array(
-						$block_template->area,
-					),
-				),
 			);
 			$template_part_post_id = wp_insert_post( $template_part_args );
 			wp_set_post_terms( $template_part_post_id, $block_template->area, 'wp_template_part_area' );
