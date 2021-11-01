@@ -425,23 +425,27 @@ function Navigation( {
 							}
 						/>
 					) }
-					<ResponsiveWrapper
-						id={ clientId }
-						onToggle={ setResponsiveMenuVisibility }
-						isOpen={ isResponsiveMenuOpen }
-						isResponsive={ 'never' !== overlayMenu }
-						isHiddenByDefault={ 'always' === overlayMenu }
-					>
-						{ isEntityAvailable && (
-							<NavigationInnerBlocks
-								isVisible={ ! isPlaceholderShown }
-								clientId={ clientId }
-								appender={ CustomAppender }
-								hasCustomPlaceholder={ !! CustomPlaceholder }
-								orientation={ orientation }
-							/>
-						) }
-					</ResponsiveWrapper>
+					{ ! isPlaceholderShown && (
+						<ResponsiveWrapper
+							id={ clientId }
+							onToggle={ setResponsiveMenuVisibility }
+							isOpen={ isResponsiveMenuOpen }
+							isResponsive={ 'never' !== overlayMenu }
+							isHiddenByDefault={ 'always' === overlayMenu }
+						>
+							{ isEntityAvailable && (
+								<NavigationInnerBlocks
+									isVisible={ ! isPlaceholderShown }
+									clientId={ clientId }
+									appender={ CustomAppender }
+									hasCustomPlaceholder={
+										!! CustomPlaceholder
+									}
+									orientation={ orientation }
+								/>
+							) }
+						</ResponsiveWrapper>
+					) }
 				</nav>
 			</RecursionProvider>
 		</EntityProvider>
