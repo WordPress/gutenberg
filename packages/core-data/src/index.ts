@@ -66,8 +66,6 @@ const storeConfig = () => ( {
  * Store definition for the code data namespace.
  *
  * @see https://github.com/WordPress/gutenberg/blob/HEAD/packages/data/README.md#createReduxStore
- *
- * @type {Object}
  */
 export const store = createReduxStore( STORE_NAME, storeConfig() );
 

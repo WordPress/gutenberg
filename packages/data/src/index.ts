@@ -9,7 +9,8 @@ import combineReducers from 'turbo-combine-reducers';
 import defaultRegistry from './default-registry';
 import * as plugins from './plugins';
 
-/** @typedef {import('./types').WPDataStore} WPDataStore */
+import type { WPDataStore } from './types.d';
+export * from './types.d';
 
 export { default as withSelect } from './components/with-select';
 export { default as withDispatch } from './components/with-dispatch';
@@ -26,6 +27,8 @@ export { createRegistry } from './registry';
 export { createRegistrySelector, createRegistryControl } from './factory';
 export { controls } from './controls';
 export { default as createReduxStore } from './redux-store';
+
+export type { Registry as CoreRegistry } from './default-registry';
 
 /**
  * Object of available plugins to use with a registry.
@@ -91,7 +94,7 @@ export { combineReducers };
  * select( 'my-shop' ).getPrice( 'hammer' );
  * ```
  *
- * @return {Object} Object containing the store's selectors.
+ * @return Object containing the store's selectors.
  */
 export const select = defaultRegistry.select;
 
@@ -204,6 +207,12 @@ export const use = defaultRegistry.use;
  * register( store );
  * ```
  *
- * @param {WPDataStore} store Store definition.
+ * @param store Store definition.
  */
-export const register = defaultRegistry.register;
+export const register = <
+	Name extends string,
+	Actions extends Record< string, Function | Generator >,
+	Selectors extends Record< string, Function | Generator >
+>(
+	store: WPDataStore< Name, Actions, Selectors >
+) => defaultRegistry.register( store );

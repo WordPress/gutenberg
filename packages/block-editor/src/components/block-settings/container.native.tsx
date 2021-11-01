@@ -10,6 +10,7 @@ import {
 } from '@wordpress/components';
 import { compose } from '@wordpress/compose';
 import { withDispatch, withSelect } from '@wordpress/data';
+import type { CoreRegistry } from '@wordpress/data';
 /**
  * Internal dependencies
  */
@@ -81,7 +82,7 @@ function BottomSheetSettings( {
 }
 
 export default compose( [
-	withSelect( ( select ) => {
+	withSelect< {}, CoreRegistry, unknown >( ( select ) => {
 		const { isEditorSidebarOpened } = select( 'core/edit-post' );
 		const { getSettings } = select( blockEditorStore );
 		return {

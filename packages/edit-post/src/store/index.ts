@@ -3,6 +3,7 @@
  */
 import { createReduxStore, registerStore } from '@wordpress/data';
 import { controls } from '@wordpress/data-controls';
+import type { WPDataAttachedStore } from '@wordpress/data';
 
 /**
  * Internal dependencies
@@ -11,6 +12,11 @@ import reducer from './reducer';
 import * as actions from './actions';
 import * as selectors from './selectors';
 import { STORE_NAME } from './constants';
+
+export type EditPostStore = WPDataAttachedStore<
+	typeof actions,
+	typeof selectors
+>;
 
 const storeConfig = {
 	reducer,

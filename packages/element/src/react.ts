@@ -13,6 +13,7 @@ import {
 	Fragment,
 	isValidElement,
 	memo,
+	Ref,
 	StrictMode,
 	useState,
 	useEffect,
@@ -111,6 +112,8 @@ export { createRef };
  * @return {WPComponent} Enhanced component.
  */
 export { forwardRef };
+
+export type { Ref };
 
 /**
  * A component which renders its children without any wrapping element.

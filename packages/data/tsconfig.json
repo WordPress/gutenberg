@@ -1,9 +1,13 @@
 {
 	"extends": "../../tsconfig.base.json",
 	"compilerOptions": {
+		"baseUrl": "../../",
 		"rootDir": "src",
 		"declarationDir": "build-types",
 		"noUnusedParameters": false,
+		"paths": {
+			"@wordpress/*": [ "packages/*/src" ]
+		}
 	},
 	"references": [
 		{ "path": "../compose" },

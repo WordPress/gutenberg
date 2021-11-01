@@ -1,8 +1,14 @@
 {
 	"extends": "../../tsconfig.base.json",
 	"compilerOptions": {
+		"baseUrl": "../../",
+		"resolveJsonModule": true,
 		"rootDir": "src",
-		"declarationDir": "build-types"
+		"declarationDir": "build-types",
+		"paths": {
+			"@wordpress/data/*": [ "packages/data/src/*" ],
+			"@wordpress/*": [ "packages/*/src" ]
+		}
 	},
 	"references": [
 		{ "path": "../deprecated" },

@@ -16,7 +16,7 @@ import { STORE_NAME } from './constants';
 import { isValidIcon, normalizeIconObject } from '../api/utils';
 import { DEPRECATED_ENTRY_KEYS } from '../api/constants';
 
-/** @typedef {import('../api/registration').WPBlockVariation} WPBlockVariation */
+import type { WPBlockVariation } from '../api/registration'
 
 const { error, warn } = window.console;
 
