@@ -35,6 +35,17 @@ const expanded = ( state, action ) => {
 			return { ...state, ...{ [ action.clientId ]: true } };
 		case 'collapse':
 			return { ...state, ...{ [ action.clientId ]: false } };
+		case 'expandAll':
+			return {
+				...state,
+				...action.clientIds.reduce(
+					( newState, id ) => ( {
+						...newState,
+						[ id ]: true,
+					} ),
+					{}
+				),
+			};
 		default:
 			return state;
 	}
@@ -182,13 +193,9 @@ function ListView(
 			Array.isArray( selectedBlockParentClientIds ) &&
 			selectedBlockParentClientIds.length
 		) {
-			selectedBlockParentClientIds.forEach( ( clientId ) => {
-				if ( ! expandedState[ clientId ] ) {
-					setExpandedState( {
-						type: 'expand',
-						clientId,
-					} );
-				}
+			setExpandedState( {
+				type: 'expandAll',
+				clientIds: selectedBlockParentClientIds,
 			} );
 		}
 	}, [ hasFocus, selectedBlockParentClientIds ] );
