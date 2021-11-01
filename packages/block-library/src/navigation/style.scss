@@ -352,7 +352,7 @@
 	.wp-block-page-list,
 	.wp-block-navigation__container,
 	.wp-block-navigation__responsive-container-content {
-		justify-content: center;
+		align-items: center;
 	}
 }
 
@@ -360,7 +360,7 @@
 	.wp-block-page-list,
 	.wp-block-navigation__container,
 	.wp-block-navigation__responsive-container-content {
-		justify-content: flex-end;
+		align-items: flex-end;
 	}
 }
 
@@ -368,7 +368,7 @@
 	.wp-block-navigation__container,
 	.wp-block-navigation__responsive-container-content {
 		display: flex;
-		justify-content: space-between;
+		align-items: space-between;
 		flex: 1;
 	}
 }
