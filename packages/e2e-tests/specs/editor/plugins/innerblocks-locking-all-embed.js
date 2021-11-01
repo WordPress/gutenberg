@@ -43,10 +43,10 @@ describe( 'Embed block inside a locked all parent', () => {
 
 	it( 'embed block should be able to embed external content', async () => {
 		await insertBlock( 'Test Inner Blocks Locking All Embed' );
-		const embedInputSelector =
-			'.components-placeholder__input[aria-label="Embed URL"]';
-		await page.waitForSelector( embedInputSelector );
-		await page.click( embedInputSelector );
+		const handle = await page.evaluateHandle(
+			`document.querySelector('.wp-block-embed [role="button"]').shadowRoot.querySelector('input')`
+		);
+		await handle.click( handle );
 		// This URL should not have a trailing slash.
 		await page.keyboard.type( 'https://twitter.com/wordpress' );
 		await page.keyboard.press( 'Enter' );
