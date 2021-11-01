@@ -8,7 +8,6 @@ import {
 	DropdownMenu,
 	MenuGroup,
 	MenuItem,
-	Spinner,
 } from '@wordpress/components';
 import { store as coreStore } from '@wordpress/core-data';
 import { useDispatch } from '@wordpress/data';
@@ -25,6 +24,66 @@ import PlaceholderPreview from './placeholder-preview';
 import menuItemsToBlocks from '../../menu-items-to-blocks';
 import NavigationMenuNameModal from '../navigation-menu-name-modal';
 import useNavigationMenu from '../../use-navigation-menu';
+
+const ExistingMenusDropdown = ( {
+	canSwitchNavigationMenu,
+	navigationMenus,
+	setSelectedMenu,
+	onFinish,
+	menus,
+	onCreateFromMenu,
+} ) => {
+	const toggleProps = {
+		variant: 'primary',
+		className: 'wp-block-navigation-placeholder__actions__dropdown',
+	};
+	return (
+		<DropdownMenu
+			text={ __( 'Select existing menu' ) }
+			icon={ chevronDown }
+			toggleProps={ toggleProps }
+			popoverProps={ { isAlternate: true } }
+		>
+			{ ( { onClose } ) => (
+				<>
+					<MenuGroup label="Menus">
+						{ canSwitchNavigationMenu &&
+							navigationMenus.map( ( menu ) => {
+								return (
+									<MenuItem
+										onClick={ () => {
+											setSelectedMenu( menu.id );
+											onFinish( menu );
+										} }
+										onClose={ onClose }
+										key={ menu.id }
+									>
+										{ menu.title.rendered }
+									</MenuItem>
+								);
+							} ) }
+					</MenuGroup>
+					<MenuGroup label="Classic Menus">
+						{ menus.map( ( menu ) => {
+							return (
+								<MenuItem
+									onClick={ () => {
+										setSelectedMenu( menu.id );
+										onCreateFromMenu( menu.name );
+									} }
+									onClose={ onClose }
+									key={ menu.id }
+								>
+									{ menu.name }
+								</MenuItem>
+							);
+						} ) }
+					</MenuGroup>
+				</>
+			) }
+		</DropdownMenu>
+	);
+};
 
 export default function NavigationPlaceholder( {
 	onFinish,
@@ -126,124 +185,59 @@ export default function NavigationPlaceholder( {
 		}
 	}, [ isCreatingFromMenu, hasResolvedMenuItems, menuName ] );
 
-	const toggleProps = {
-		variant: 'primary',
-		className: 'wp-block-navigation-placeholder__actions__dropdown',
-	};
-
 	const { navigationMenus } = useNavigationMenu();
 
 	return (
 		<>
-			{ ! hasResolvedNavigationMenu && <PlaceholderPreview isLoading /> }
-			{ hasResolvedNavigationMenu && (
+			{ ( ! hasResolvedNavigationMenu || isStillLoading ) && (
+				<PlaceholderPreview isLoading />
+			) }
+			{ hasResolvedNavigationMenu && ! isStillLoading && (
 				<Placeholder className="wp-block-navigation-placeholder">
 					<PlaceholderPreview />
-
 					<div className="wp-block-navigation-placeholder__controls">
-						{ isStillLoading && (
-							<div>
-								<Spinner />
+						<div className="wp-block-navigation-placeholder__actions">
+							<div className="wp-block-navigation-placeholder__actions__indicator">
+								<Icon icon={ navigation } />{ ' ' }
+								{ __( 'Navigation' ) }
 							</div>
-						) }
-						{ ! isStillLoading && (
-							<div className="wp-block-navigation-placeholder__actions">
-								<div className="wp-block-navigation-placeholder__actions__indicator">
-									<Icon icon={ navigation } />{ ' ' }
-									{ __( 'Navigation' ) }
-								</div>
-								{ hasMenus || canSwitchNavigationMenu ? (
-									<DropdownMenu
-										text={ __( 'Add existing menu' ) }
-										icon={ chevronDown }
-										toggleProps={ toggleProps }
-										popoverProps={ { isAlternate: true } }
-									>
-										{ ( { onClose } ) => (
-											<>
-												<MenuGroup label="Menus">
-													{ canSwitchNavigationMenu &&
-														navigationMenus.map(
-															( menu ) => {
-																return (
-																	<MenuItem
-																		onClick={ () => {
-																			setSelectedMenu(
-																				menu.id
-																			);
-																			onFinish(
-																				menu
-																			);
-																		} }
-																		onClose={
-																			onClose
-																		}
-																		key={
-																			menu.id
-																		}
-																	>
-																		{
-																			menu
-																				.title
-																				.rendered
-																		}
-																	</MenuItem>
-																);
-															}
-														) }
-												</MenuGroup>
-												<MenuGroup label="Classic Menus">
-													{ menus.map( ( menu ) => {
-														return (
-															<MenuItem
-																onClick={ () => {
-																	setSelectedMenu(
-																		menu.id
-																	);
-																	onCreateFromMenu(
-																		menu.name
-																	);
-																} }
-																onClose={
-																	onClose
-																}
-																key={ menu.id }
-															>
-																{ menu.name }
-															</MenuItem>
-														);
-													} ) }
-												</MenuGroup>
-											</>
-										) }
-									</DropdownMenu>
-								) : undefined }
-								{ hasPages ? (
-									<Button
-										variant={
-											hasMenus || canSwitchNavigationMenu
-												? 'tertiary'
-												: 'primary'
-										}
-										onClick={ () => {
-											setIsNewMenuModalVisible( true );
-											setCreateEmpty( false );
-										} }
-									>
-										{ __( 'Add all pages' ) }
-									</Button>
-								) : undefined }
+							{ hasMenus || navigationMenus.length ? (
+								<ExistingMenusDropdown
+									canSwitchNavigationMenu={
+										canSwitchNavigationMenu
+									}
+									navigationMenus={ navigationMenus }
+									setSelectedMenu={ setSelectedMenu }
+									onFinish={ onFinish }
+									menus={ menus }
+									onCreateFromMenu={ onCreateFromMenu }
+								/>
+							) : undefined }
+							{ hasPages ? (
 								<Button
-									variant="tertiary"
+									variant={
+										hasMenus || canSwitchNavigationMenu
+											? 'tertiary'
+											: 'primary'
+									}
 									onClick={ () => {
 										setIsNewMenuModalVisible( true );
-										setCreateEmpty( true );
+										setCreateEmpty( false );
 									} }
 								>
-									{ __( 'Start empty' ) }
+									{ __( 'Add all pages' ) }
 								</Button>
-							</div>
-						) }
+							) : undefined }
+							<Button
+								variant="tertiary"
+								onClick={ () => {
+									setIsNewMenuModalVisible( true );
+									setCreateEmpty( true );
+								} }
+							>
+								{ __( 'Start empty' ) }
+							</Button>
+						</div>
 					</div>
 				</Placeholder>
 			) }
