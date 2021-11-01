@@ -88,10 +88,12 @@ function ImageLinkDestinationsScreen( props ) {
 		}
 
 		navigation.navigate( blockSettingsScreens.settings, {
-			inputValue: '', // Reset to avoid stale value in link picker input
-			text: undefined, // Reset to avoid stale value in link picker input
-			url: newUrl,
-			linkDestination: newLinkDestination,
+			// The `inputValue` name is reused from LinkPicker, as it helps avoid
+			// bugs from stale values remaining in the React Navigation route
+			// parameters
+			inputValue: newUrl,
+			// Clear link text value that may be set from LinkPicker
+			text: '',
 		} );
 	};
 

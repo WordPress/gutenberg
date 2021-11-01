@@ -124,6 +124,40 @@ describe( 'Image Block', () => {
 		expect( getEditorHtml() ).toBe( expectedHtml );
 	} );
 
+	it( 'swaps the link between destinations', async () => {
+		const initialHtml = `
+		<!-- wp:image {"id":1,"sizeSlug":"large","linkDestination":"none","className":"is-style-default"} -->
+		<figure class="wp-block-image size-large is-style-default">
+			<img src="https://cldup.com/cXyG__fTLN.jpg" alt="" class="wp-image-1"/>
+		<figcaption>Mountain</figcaption></figure>
+		<!-- /wp:image -->`;
+		const screen = await initializeEditor( { initialHtml } );
+		// We must await the image fetch via `getMedia`
+		await act( () => apiFetchPromise );
+
+		fireEvent.press( screen.getByA11yLabel( /Image Block/ ) );
+		// Awaiting navigation event seemingly required due to React Navigation bug
+		// https://git.io/Ju35Z
+		await act( () =>
+			fireEvent.press( screen.getByA11yLabel( 'Open Settings' ) )
+		);
+		fireEvent.press( screen.getByText( 'None' ) );
+		fireEvent.press( screen.getByText( 'Media File' ) );
+		fireEvent.press( screen.getByText( 'Custom URL' ) );
+		fireEvent.changeText(
+			screen.getByPlaceholderText( 'Search or type URL' ),
+			'wordpress.org'
+		);
+		fireEvent.press( screen.getByA11yLabel( 'Apply' ) );
+		fireEvent.press( screen.getByText( 'Custom URL' ) );
+		fireEvent.press( screen.getByText( 'Media File' ) );
+
+		const expectedHtml = `<!-- wp:image {"id":1,"sizeSlug":"large","linkDestination":"media","className":"is-style-default"} -->
+<figure class="wp-block-image size-large is-style-default"><a href="https://cldup.com/cXyG__fTLN.jpg"><img src="https://cldup.com/cXyG__fTLN.jpg" alt="" class="wp-image-1"/></a><figcaption>Mountain</figcaption></figure>
+<!-- /wp:image -->`;
+		expect( getEditorHtml() ).toBe( expectedHtml );
+	} );
+
 	it( 'sets link target', async () => {
 		const initialHtml = `
 		<!-- wp:image {"id":1,"sizeSlug":"large","linkDestination":"custom","className":"is-style-default"} -->

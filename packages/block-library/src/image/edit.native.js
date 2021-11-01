@@ -90,15 +90,29 @@ function LinkSettings( {
 
 	// Persist attributes passed from child screen
 	useEffect( () => {
-		const { linkDestination: newLinkDestination, url: newUrl } =
-			route.params || {};
-		if ( newLinkDestination || newUrl ) {
-			setMappedAttributes( {
-				url: newUrl,
-				linkDestination: newLinkDestination,
-			} );
+		const { inputValue: newUrl } = route.params || {};
+
+		let newLinkDestination;
+		switch ( newUrl ) {
+			case attributes.url:
+				newLinkDestination = LINK_DESTINATION_MEDIA;
+				break;
+			case image?.link:
+				newLinkDestination = LINK_DESTINATION_ATTACHMENT;
+				break;
+			case '':
+				newLinkDestination = LINK_DESTINATION_NONE;
+				break;
+			default:
+				newLinkDestination = LINK_DESTINATION_CUSTOM;
+				break;
 		}
-	}, [ route.params?.url, route.params?.linkDestination ] );
+
+		setMappedAttributes( {
+			url: newUrl,
+			linkDestination: newLinkDestination,
+		} );
+	}, [ route.params?.inputValue ] );
 
 	let valueMask;
 	switch ( linkDestination ) {
