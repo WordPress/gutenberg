@@ -40,7 +40,17 @@ exports[`Navigation Creating from existing Menus creates an empty navigation blo
 
 exports[`Navigation Creating from existing Pages allows a navigation block to be created using existing pages 1`] = `
 "<!-- wp:navigation -->
-<!-- wp:page-list {\\"isNavigationChild\\":true,\\"showSubmenuIcon\\":true,\\"openSubmenusOnClick\\":false} /-->
+<!-- wp:page-list /-->
+<!-- /wp:navigation -->"
+`;
+
+exports[`Navigation Shows the quick inserter when the block contains non-navigation specific blocks 1`] = `
+"<!-- wp:navigation -->
+<!-- wp:navigation-link {\\"label\\":\\"WP\\",\\"url\\":\\"https://wordpress.org\\",\\"kind\\":\\"custom\\",\\"isTopLevelLink\\":true} /-->
+
+<!-- wp:site-title /-->
+
+<!-- wp:navigation-link {\\"label\\":\\"WP News\\",\\"url\\":\\"https://wordpress.org/news/\\",\\"kind\\":\\"custom\\",\\"isTopLevelLink\\":true} /-->
 <!-- /wp:navigation -->"
 `;
 

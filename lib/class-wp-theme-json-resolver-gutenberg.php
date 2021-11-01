@@ -274,6 +274,18 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 			$theme_json_data = self::read_json_file( self::get_file_path_from_theme( 'theme.json' ) );
 			$theme_json_data = self::translate( $theme_json_data, wp_get_theme()->get( 'TextDomain' ) );
 			self::$theme     = new WP_Theme_JSON_Gutenberg( $theme_json_data );
+
+			if ( wp_get_theme()->parent() ) {
+				// Get parent theme.json.
+				$parent_theme_json_data = self::read_json_file( self::get_file_path_from_theme( 'theme.json', true ) );
+				$parent_theme_json_data = self::translate( $parent_theme_json_data, wp_get_theme()->parent()->get( 'TextDomain' ) );
+				$parent_theme           = new WP_Theme_JSON_Gutenberg( $parent_theme_json_data );
+
+				// Merge the child theme.json into the parent theme.json.
+				// The child theme takes precedence over the parent.
+				$parent_theme->merge( self::$theme );
+				self::$theme = $parent_theme;
+			}
 		}
 
 		if ( empty( $theme_support_data ) ) {
@@ -429,8 +441,7 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 			'description'  => 'CPT to store user design tokens',
 			'public'       => false,
 			'show_ui'      => false,
-			'show_in_rest' => true,
-			'rest_base'    => '__experimental/global-styles',
+			'show_in_rest' => false,
 			'capabilities' => array(
 				'read'                   => 'edit_theme_options',
 				'create_posts'           => 'edit_theme_options',
@@ -476,7 +487,7 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 	 */
 	public static function theme_has_support() {
 		if ( ! isset( self::$theme_has_support ) ) {
-			self::$theme_has_support = (bool) self::get_file_path_from_theme( 'theme.json' );
+			self::$theme_has_support = is_readable( get_theme_file_path( 'theme.json' ) );
 		}
 
 		return self::$theme_has_support;
@@ -490,23 +501,14 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 	 * otherwise returns the whole file path.
 	 *
 	 * @param string $file_name Name of the file.
+	 * @param bool   $template  Use template theme directroy. Default: false.
 	 * @return string The whole file path or empty if the file doesn't exist.
 	 */
-	private static function get_file_path_from_theme( $file_name ) {
-		// This used to be a locate_template call.
-		// However, that method proved problematic
-		// due to its use of constants (STYLESHEETPATH)
-		// that threw errors in some scenarios.
-		//
-		// When the theme.json merge algorithm properly supports
-		// child themes, this should also fallback
-		// to the template path, as locate_template did.
-		$located   = '';
-		$candidate = get_stylesheet_directory() . '/' . $file_name;
-		if ( is_readable( $candidate ) ) {
-			$located = $candidate;
-		}
-		return $located;
+	private static function get_file_path_from_theme( $file_name, $template = false ) {
+		$path      = $template ? get_template_directory() : get_stylesheet_directory();
+		$candidate = $path . '/' . $file_name;
+
+		return is_readable( $candidate ) ? $candidate : '';
 	}
 
 	/**

@@ -64,6 +64,8 @@ jobs:
             old_version: ${{ steps.get_version.outputs.old_version }}
             new_version: ${{ steps.get_version.outputs.new_version }}
             release_branch: ${{ steps.get_version.outputs.release_branch }}
+            release_branch_commit: ${{ steps.commit_version_bump_to_release_branch.outputs.version_bump_commit }}
+            trunk_commit: ${{ steps.commit_version_bump_to_trunk.outputs.version_bump_commit }}
 
         steps:
             - name: Checkout code
@@ -125,16 +127,19 @@ jobs:
                   sed -i "s/${{ steps.get_version.outputs.old_version }}/${VERSION}/g" readme.txt
 
             - name: Commit the version bump to the release branch
+              id: commit_version_bump_to_release_branch
               run: |
                   git add gutenberg.php package.json package-lock.json readme.txt
                   git commit -m "Bump plugin version to ${{ steps.get_version.outputs.new_version }}"
                   git push --set-upstream origin "${{ steps.get_version.outputs.release_branch }}"
+                  echo "::set-output name=version_bump_commit::$(git rev-parse --verify --short HEAD)"
 
             - name: Fetch trunk
               if: ${{ github.ref != 'refs/heads/trunk' }}
               run: git fetch --depth=1 origin trunk
 
             - name: Cherry-pick the version bump commit to trunk
+              id: commit_version_bump_to_trunk
               run: |
                   git checkout trunk
                   git pull
@@ -142,6 +147,7 @@ jobs:
                   if [[ ${{ steps.get_version.outputs.old_version }} == "$TRUNK_VERSION" ]]; then
                     git cherry-pick "${{ steps.get_version.outputs.release_branch }}"
                     git push
+                    echo "::set-output name=version_bump_commit::$(git rev-parse --verify --short HEAD)"
                   fi
 
     build:
@@ -154,6 +160,8 @@ jobs:
               github.event_name == 'workflow_dispatch' ||
               github.repository == 'WordPress/gutenberg'
             )
+        outputs:
+            job_status: ${{ job.status }}
 
         steps:
             - name: Checkout code
@@ -200,6 +208,51 @@ jobs:
               with:
                   name: release-notes
                   path: ./release-notes.txt
+
+    revert-version-bump:
+        name: Revert version bump if build failed
+        needs: [bump-version, build]
+        runs-on: ubuntu-latest
+        if: |
+            always() &&
+            ( needs.build.outputs.job_status == 'failure' ) &&
+            needs.bump-version.outputs.release_branch_commit
+
+        steps:
+            - name: Checkout code
+              uses: actions/checkout@5a4ac9002d0be2fb38bd78e4b4dbde5606d7042f # v2.3.4
+              with:
+                  fetch-depth: 2
+                  ref: ${{ needs.bump-version.outputs.release_branch }}
+                  token: ${{ secrets.GUTENBERG_TOKEN }}
+
+            - name: Configure git user name and email
+              run: |
+                  git config user.name "Gutenberg Repository Automation"
+                  git config user.email gutenberg@wordpress.org
+
+            - name: Revert version bump commit on release branch
+              if: |
+                  github.event.inputs.version == 'stable' ||
+                  contains( needs.bump-version.outputs.old_version, 'rc' )
+              run: |
+                  git revert --no-edit ${{ needs.bump-version.outputs.release_branch_commit }}
+                  git push --set-upstream origin "${{ needs.bump-version.outputs.release_branch }}"
+
+            - name: Delete release branch if it was only just created for the RC
+              if: |
+                  github.event.inputs.version == 'rc' &&
+                  ! contains( needs.bump-version.outputs.old_version, 'rc' )
+              run: |
+                  git push origin :"${{ needs.bump-version.outputs.release_branch }}"
+
+            - name: Revert version bump on trunk
+              if: ${{ needs.bump-version.outputs.trunk_commit }}
+              run: |
+                  git fetch --depth=2 origin trunk
+                  git checkout trunk
+                  git revert --no-edit ${{ needs.bump-version.outputs.trunk_commit }}
+                  git push --set-upstream origin trunk
 
     create-release:
         name: Create Release Draft and Attach Asset

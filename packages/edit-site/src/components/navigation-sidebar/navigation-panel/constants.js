@@ -3,6 +3,16 @@
  */
 import { __ } from '@wordpress/i18n';
 
+/**
+ * Internal dependencies
+ */
+import {
+	TEMPLATE_PART_AREA_HEADER,
+	TEMPLATE_PART_AREA_FOOTER,
+	TEMPLATE_PART_AREA_SIDEBAR,
+	TEMPLATE_PART_AREA_GENERAL,
+} from '../../../store/constants';
+
 export const TEMPLATES_PRIMARY = [
 	'index',
 	'singular',
@@ -75,29 +85,25 @@ export const MENU_TEMPLATE_PARTS_FOOTERS = 'template-parts-footers';
 export const MENU_TEMPLATE_PARTS_SIDEBARS = 'template-parts-sidebars';
 export const MENU_TEMPLATE_PARTS_GENERAL = 'template-parts-general';
 
-export const TEMPLATE_PART_AREA_HEADER = 'header';
-export const TEMPLATE_PART_AREA_FOOTER = 'footer';
-export const TEMPLATE_PART_AREA_SIDEBAR = 'sidebar';
-
 export const TEMPLATE_PARTS_SUB_MENUS = [
 	{
 		area: TEMPLATE_PART_AREA_HEADER,
 		menu: MENU_TEMPLATE_PARTS_HEADERS,
-		title: __( 'Headers' ),
+		title: __( 'headers' ),
 	},
 	{
 		area: TEMPLATE_PART_AREA_FOOTER,
 		menu: MENU_TEMPLATE_PARTS_FOOTERS,
-		title: __( 'Footers' ),
+		title: __( 'footers' ),
 	},
 	{
 		area: TEMPLATE_PART_AREA_SIDEBAR,
 		menu: MENU_TEMPLATE_PARTS_SIDEBARS,
-		title: __( 'Sidebars' ),
+		title: __( 'sidebars' ),
 	},
 	{
-		area: 'uncategorized',
+		area: TEMPLATE_PART_AREA_GENERAL,
 		menu: MENU_TEMPLATE_PARTS_GENERAL,
-		title: __( 'General' ),
+		title: __( 'general' ),
 	},
 ];

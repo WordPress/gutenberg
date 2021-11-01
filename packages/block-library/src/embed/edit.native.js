@@ -40,6 +40,8 @@ const PREVIEWABLE_PROVIDERS = [ 'youtube', 'twitter', 'instagram', 'vimeo' ];
 // are not supported yet, so we need to disallow them with a fixed providers list.
 const NOT_PREVIEWABLE_WP_EMBED_PROVIDERS = [ 'pinterest' ];
 
+const WP_EMBED_TYPE = 'wp-embed';
+
 const EmbedEdit = ( props ) => {
 	const {
 		attributes: { align, providerNameSlug, previewable, responsive, url },
@@ -70,6 +72,9 @@ const EmbedEdit = ( props ) => {
 	const [ isEditingURL, setIsEditingURL ] = useState(
 		isSelected && wasBlockJustInserted && ! url
 	);
+	const [ showEmbedBottomSheet, setShowEmbedBottomSheet ] = useState(
+		isEditingURL
+	);
 	const { invalidateResolution } = useDispatch( coreStore );
 
 	const {
@@ -81,8 +86,8 @@ const EmbedEdit = ( props ) => {
 		( select ) => {
 			const {
 				getEmbedPreview,
+				hasFinishedResolution,
 				isPreviewEmbedFallback,
-				isRequestingEmbedPreview,
 				getThemeSupports,
 			} = select( coreStore );
 			if ( ! url ) {
@@ -90,6 +95,10 @@ const EmbedEdit = ( props ) => {
 			}
 
 			const embedPreview = getEmbedPreview( url );
+			const hasResolvedEmbedPreview = hasFinishedResolution(
+				'getEmbedPreview',
+				[ url ]
+			);
 			const previewIsFallback = isPreviewEmbedFallback( url );
 
 			// The external oEmbed provider does not exist. We got no type info and no html.
@@ -103,16 +112,9 @@ const EmbedEdit = ( props ) => {
 			const validPreview =
 				!! embedPreview && ! badEmbedProvider && ! wordpressCantEmbed;
 
-			// `isRequestingEmbedPreview` is returning false just before an
-			// `apiFetch` is triggered. We're assuming that a fetch is happening
-			// if there is an `attributesUrl` set but there is no data in
-			// `embedPreview` which represents the response returned from the API.
-			const isFetching =
-				isRequestingEmbedPreview( url ) || ( url && ! embedPreview );
-
 			return {
 				preview: validPreview ? embedPreview : undefined,
-				fetching: isFetching,
+				fetching: ! hasResolvedEmbedPreview,
 				themeSupportsResponsive: getThemeSupports()[
 					'responsive-embeds'
 				],
@@ -123,16 +125,19 @@ const EmbedEdit = ( props ) => {
 	);
 
 	/**
-	 * @return {Object} Attributes derived from the preview, merged with the current attributes.
+	 * Returns the attributes derived from the preview, merged with the current attributes.
+	 *
+	 * @param {boolean} ignorePreviousClassName Determines if the previous className attribute should be ignored when merging.
+	 * @return {Object} Merged attributes.
 	 */
-	const getMergedAttributes = () => {
+	const getMergedAttributes = ( ignorePreviousClassName = false ) => {
 		const { allowResponsive, className } = attributes;
 		return {
 			...attributes,
 			...getAttributesFromPreview(
 				preview,
 				title,
-				className,
+				ignorePreviousClassName ? undefined : className,
 				responsive,
 				allowResponsive
 			),
@@ -168,15 +173,12 @@ const EmbedEdit = ( props ) => {
 	// Handle incoming preview
 	useEffect( () => {
 		if ( preview && ! isEditingURL ) {
-			// Even though we set attributes that get derived from the preview,
-			// we don't access them directly because for the initial render,
-			// the `setAttributes` call will not have taken effect. If we're
-			// rendering responsive content, setting the responsive classes
-			// after the preview has been rendered can result in unwanted
-			// clipping or scrollbars. The `getAttributesFromPreview` function
-			// that `getMergedAttributes` uses is memoized so that we're not
-			// calculating them on every render.
-			setAttributes( getMergedAttributes() );
+			// When obtaining an incoming preview, we set the attributes derived from
+			// the preview data. In this case when getting the merged attributes,
+			// we ignore the previous classname because it might not match the expected
+			// classes by the new preview.
+			setAttributes( getMergedAttributes( true ) );
+
 			if ( onReplace ) {
 				const upgradedBlock = createUpgradedEmbedBlock(
 					props,
@@ -189,6 +191,10 @@ const EmbedEdit = ( props ) => {
 			}
 		}
 	}, [ preview, isEditingURL ] );
+
+	useEffect( () => setShowEmbedBottomSheet( isEditingURL ), [
+		isEditingURL,
+	] );
 
 	const blockProps = useBlockProps();
 
@@ -209,6 +215,7 @@ const EmbedEdit = ( props ) => {
 	// after the preview has been rendered can result in unwanted
 	// clipping or scrollbars. The `getAttributesFromPreview` function
 	// that `getMergedAttributes` uses is memoized so that we're not
+	// calculating them on every render.
 	const {
 		type,
 		allowResponsive,
@@ -220,8 +227,10 @@ const EmbedEdit = ( props ) => {
 		PREVIEWABLE_PROVIDERS.includes( providerNameSlug ) ||
 		// For WordPress embeds, we enable the inline preview for all its providers
 		// except the ones that are not supported yet.
-		( 'wp-embed' === type &&
+		( WP_EMBED_TYPE === type &&
 			! NOT_PREVIEWABLE_WP_EMBED_PROVIDERS.includes( providerNameSlug ) );
+
+	const bottomSheetLabel = WP_EMBED_TYPE === type ? 'WordPress' : title;
 
 	return (
 		<>
@@ -282,11 +291,15 @@ const EmbedEdit = ( props ) => {
 			) }
 			<EmbedBottomSheet
 				value={ url }
-				isVisible={ isEditingURL }
-				onClose={ () => setIsEditingURL( false ) }
+				label={ bottomSheetLabel }
+				isVisible={ showEmbedBottomSheet }
+				onClose={ () => setShowEmbedBottomSheet( false ) }
 				onSubmit={ ( value ) => {
-					setIsEditingURL( false );
+					// The order of the following calls is important, we need to update the URL attribute before changing `isEditingURL`,
+					// otherwise the side-effect that potentially replaces the block when updating the local state won't use the new URL
+					// for creating the new block.
 					setAttributes( { url: value } );
+					setIsEditingURL( false );
 				} }
 			/>
 		</>

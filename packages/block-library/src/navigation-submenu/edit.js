@@ -21,7 +21,7 @@ import { __, sprintf } from '@wordpress/i18n';
 import {
 	BlockControls,
 	InnerBlocks,
-	__experimentalUseInnerBlocksProps as useInnerBlocksProps,
+	useInnerBlocksProps,
 	InspectorControls,
 	RichText,
 	__experimentalLinkControl as LinkControl,
@@ -49,6 +49,8 @@ import { ItemSubmenuIcon } from './icons';
 import { name } from './block.json';
 
 const ALLOWED_BLOCKS = [ 'core/navigation-link', 'core/navigation-submenu' ];
+
+const DEFAULT_BLOCK = [ 'core/navigation-link' ];
 
 const MAX_NESTING = 5;
 
@@ -504,6 +506,8 @@ export default function NavigationSubmenuEdit( {
 		},
 		{
 			allowedBlocks: ALLOWED_BLOCKS,
+			__experimentalDefaultBlock: DEFAULT_BLOCK,
+			__experimentalDirectInsert: true,
 			renderAppender:
 				isSelected ||
 				( isImmediateParentOfSelectedBlock &&
@@ -572,7 +576,7 @@ export default function NavigationSubmenuEdit( {
 						<RichText
 							ref={ ref }
 							identifier="label"
-							className="wp-block-navigation-link__label"
+							className="wp-block-navigation-item__label"
 							value={ label }
 							onChange={ ( labelValue ) =>
 								setAttributes( { label: labelValue } )

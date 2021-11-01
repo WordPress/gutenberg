@@ -426,6 +426,19 @@ _Returns_
 
 -   `string`: Gradient value.
 
+### getPxFromCssUnit
+
+Returns the px value of a cssUnit. The memoized version of getPxFromCssUnit;
+
+_Parameters_
+
+-   _cssUnit_ `string`:
+-   _options_ `Object`:
+
+_Returns_
+
+-   `string`: returns the cssUnit value in a simple px format.
+
 ### InnerBlocks
 
 _Related_
@@ -666,6 +679,25 @@ _Parameters_
 _Returns_
 
 -   `Object`: Props to pass to the element to mark as a block.
+
+### useInnerBlocksProps
+
+This hook is used to lightly mark an element as an inner blocks wrapper
+element. Call this hook and pass the returned props to the element to mark as
+an inner blocks wrapper, automatically rendering inner blocks as children. If
+you define a ref for the element, it is important to pass the ref to this
+hook, which the hook in turn will pass to the component through the props it
+returns. Optionally, you can also pass any other props through this hook, and
+they will be merged and returned.
+
+_Related_
+
+-   <https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/inner-blocks/README.md>
+
+_Parameters_
+
+-   _props_ `Object`: Optional. Props to pass to the element. Must contain the ref if one is defined.
+-   _options_ `Object`: Optional. Inner blocks options.
 
 ### useSetting
 

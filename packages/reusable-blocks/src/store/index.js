@@ -7,7 +7,6 @@ import { createReduxStore, register } from '@wordpress/data';
  * Internal dependencies
  */
 import * as actions from './actions';
-import controls from './controls';
 import reducer from './reducer';
 import * as selectors from './selectors';
 
@@ -22,9 +21,9 @@ const STORE_NAME = 'core/reusable-blocks';
  */
 export const store = createReduxStore( STORE_NAME, {
 	actions,
-	controls,
 	reducer,
 	selectors,
+	__experimentalUseThunks: true,
 } );
 
 register( store );

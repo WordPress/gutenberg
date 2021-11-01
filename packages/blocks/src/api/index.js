@@ -62,6 +62,7 @@ export {
 	getSaveElement,
 	getSaveContent,
 	getBlockProps as __unstableGetBlockProps,
+	getInnerBlocksProps as __unstableGetInnerBlocksProps,
 	__unstableSerializeAndClean,
 } from './serializer';
 

@@ -118,6 +118,22 @@ export function receiveCurrentTheme( currentTheme ) {
 }
 
 /**
+ * Returns an action object used in signalling that the current global styles id has been received.
+ *
+ * @param {string} currentGlobalStylesId The current global styles id.
+ *
+ * @return {Object} Action object.
+ */
+export function __experimentalReceiveCurrentGlobalStylesId(
+	currentGlobalStylesId
+) {
+	return {
+		type: 'RECEIVE_CURRENT_GLOBAL_STYLES_ID',
+		id: currentGlobalStylesId,
+	};
+}
+
+/**
  * Returns an action object used in signalling that the index has been received.
  *
  * @param {Object} themeSupports Theme support for the current theme.
@@ -172,7 +188,7 @@ export const deleteEntityRecord = (
 	const entity = find( entities, { kind, name } );
 	let error;
 	let deletedRecord = false;
-	if ( ! entity ) {
+	if ( ! entity || entity?.__experimentalNoFetch ) {
 		return;
 	}
 
@@ -349,7 +365,7 @@ export const saveEntityRecord = (
 ) => async ( { select, resolveSelect, dispatch } ) => {
 	const entities = await dispatch( getKindEntities( kind ) );
 	const entity = find( entities, { kind, name } );
-	if ( ! entity ) {
+	if ( ! entity || entity?.__experimentalNoFetch ) {
 		return;
 	}
 	const entityIdKey = entity.key || DEFAULT_ENTITY_KEY;

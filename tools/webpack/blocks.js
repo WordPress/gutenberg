@@ -7,6 +7,11 @@ const { join, sep } = require( 'path' );
 const fastGlob = require( 'fast-glob' );
 
 /**
+ * WordPress dependencies
+ */
+const DependencyExtractionWebpackPlugin = require( '@wordpress/dependency-extraction-webpack-plugin' );
+
+/**
  * Internal dependencies
  */
 const { baseConfig, plugins, stylesTransform } = require( './shared' );
@@ -54,6 +59,7 @@ module.exports = {
 	},
 	plugins: [
 		...plugins,
+		new DependencyExtractionWebpackPlugin( { injectPolyfill: false } ),
 		new CopyWebpackPlugin( {
 			patterns: [].concat(
 				[
@@ -108,12 +114,12 @@ module.exports = {
 							// Within content, search for any function definitions. For
 							// each, replace every other reference to it in the file.
 							return (
-								content
-									.match( /^function [^\(]+/gm )
-									.reduce( ( result, functionName ) => {
-										// Trim leading "function " prefix from match.
-										functionName = functionName.slice( 9 );
-
+								Array.from(
+									content.matchAll(
+										/^\s*function ([^\(]+)/gm
+									)
+								)
+									.reduce( ( result, [ , functionName ] ) => {
 										// Prepend the Gutenberg prefix, substituting any
 										// other core prefix (e.g. "wp_").
 										return result.replace(

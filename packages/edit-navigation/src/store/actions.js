@@ -20,6 +20,7 @@ import {
 	isBlockSupportedInNav,
 } from './utils';
 import { blockToMenuItem, menuItemToBlockAttributes } from './transform';
+import { NAVIGATION_POST_KIND, NAVIGATION_POST_POST_TYPE } from '../constants';
 
 /**
  * Returns an action object used to select menu.
@@ -73,7 +74,12 @@ export const saveNavigationPost = ( post ) => async ( {
 		// Clear "stub" navigation post edits to avoid a false "dirty" state.
 		registry
 			.dispatch( coreDataStore )
-			.receiveEntityRecords( 'root', 'postType', post, undefined );
+			.receiveEntityRecords(
+				NAVIGATION_POST_KIND,
+				NAVIGATION_POST_POST_TYPE,
+				post,
+				undefined
+			);
 
 		const updatedPost = {
 			...post,
@@ -81,7 +87,12 @@ export const saveNavigationPost = ( post ) => async ( {
 		};
 		registry
 			.dispatch( coreDataStore )
-			.receiveEntityRecords( 'root', 'postType', updatedPost, undefined );
+			.receiveEntityRecords(
+				NAVIGATION_POST_KIND,
+				NAVIGATION_POST_POST_TYPE,
+				updatedPost,
+				undefined
+			);
 
 		registry
 			.dispatch( noticesStore )

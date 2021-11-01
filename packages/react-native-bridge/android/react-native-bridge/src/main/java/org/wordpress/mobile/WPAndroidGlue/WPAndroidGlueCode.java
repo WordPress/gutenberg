@@ -101,6 +101,8 @@ public class WPAndroidGlueCode {
     private OnFocalPointPickerTooltipShownEventListener mOnFocalPointPickerTooltipShownListener;
     private OnGutenbergDidRequestPreviewListener mOnGutenbergDidRequestPreviewListener;
     private OnBlockTypeImpressionsEventListener mOnBlockTypeImpressionsEventListener;
+    private OnCustomerSupportOptionsListener mOnCustomerSupportOptionsListener;
+    private OnSendEventToHostListener mOnSendEventToHostListener;
     private boolean mIsEditorMounted;
 
     private String mContentHtml = "";
@@ -225,6 +227,15 @@ public class WPAndroidGlueCode {
     public interface OnBlockTypeImpressionsEventListener {
         void onSetBlockTypeImpressions(Map<String, Double> impressions);
         Map<String, Double> onRequestBlockTypeImpressions();
+    }
+
+    public interface OnCustomerSupportOptionsListener {
+        void onContactCustomerSupport();
+        void onGotoCustomerSupportOptions();
+    }
+
+    public interface OnSendEventToHostListener {
+        void onSendEventToHost(String eventName, Map<String, Object> properties);
     }
 
     public void mediaSelectionCancelled() {
@@ -527,6 +538,21 @@ public class WPAndroidGlueCode {
                 }
                 mOnBlockTypeImpressionsEventListener.onSetBlockTypeImpressions(impressions);
             }
+
+            @Override
+            public void requestContactCustomerSupport() {
+                mOnCustomerSupportOptionsListener.onContactCustomerSupport();
+            }
+
+            @Override
+            public void requestGotoCustomerSupportOptions() {
+                mOnCustomerSupportOptionsListener.onGotoCustomerSupportOptions();
+            }
+
+            @Override
+            public void sendEventToHost(String eventName, ReadableMap properties) {
+                mOnSendEventToHostListener.onSendEventToHost(eventName, properties.toHashMap());
+            }
         }, mIsDarkMode);
 
         return Arrays.asList(
@@ -607,6 +633,8 @@ public class WPAndroidGlueCode {
                                   OnFocalPointPickerTooltipShownEventListener onFocalPointPickerTooltipListener,
                                   OnGutenbergDidRequestPreviewListener onGutenbergDidRequestPreviewListener,
                                   OnBlockTypeImpressionsEventListener onBlockTypeImpressionsEventListener,
+                                  OnCustomerSupportOptionsListener onCustomerSupportOptionsListener,
+                                  OnSendEventToHostListener onSendEventToHostListener,
                                   boolean isDarkMode) {
         MutableContextWrapper contextWrapper = (MutableContextWrapper) mReactRootView.getContext();
         contextWrapper.setBaseContext(viewGroup.getContext());
@@ -627,6 +655,8 @@ public class WPAndroidGlueCode {
         mOnFocalPointPickerTooltipShownListener = onFocalPointPickerTooltipListener;
         mOnGutenbergDidRequestPreviewListener = onGutenbergDidRequestPreviewListener;
         mOnBlockTypeImpressionsEventListener = onBlockTypeImpressionsEventListener;
+        mOnCustomerSupportOptionsListener = onCustomerSupportOptionsListener;
+        mOnSendEventToHostListener = onSendEventToHostListener;
 
         sAddCookiesInterceptor.setOnAuthHeaderRequestedListener(onAuthHeaderRequestedListener);
 

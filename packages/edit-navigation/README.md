@@ -125,39 +125,46 @@ For historical reasons, the following properties display some inconsistency in t
 
 ## Hooks
 
-`useMenuItems` and `useNavigationBlock` hooks are the central part of this package. They bridge the gap between the API and the block editor interface:
+The `useNavigationEditor` and `useEntityBlockEditor` hooks are the central part of this package. They bridge the gap between the API and the block editor interface:
 
-```js
-const menuId = 1;
-const query = useMemo( () => ( { menus: menuId, per_page: -1 } ), [ menuId ] );
-// Data manipulation:
+```jsx
+// Data from API:
 const {
-	menuItems,
-	eventuallySaveMenuItems,
-	createMissingMenuItems,
-} = useMenuItems( query );
+	menus,
+	hasLoadedMenus,
+	selectedMenuId,
+	navigationPost,
+} = useNavigationEditor();
 
 // Working state:
-const { blocks, setBlocks, menuItemsRef } = useNavigationBlocks( menuItems );
+const [ blocks, onInput, onChange ] = useEntityBlockEditor(
+	NAVIGATION_POST_KIND,
+	NAVIGATION_POST_POST_TYPE,
+	{
+		id: navigationPost?.id,
+	}
+);
+
+const isBlockEditorReady = !! (
+	menus?.length &&
+	navigationPost &&
+	selectedMenuId
+);
 
 return (
 	<BlockEditorProvider
 		value={ blocks }
-		onInput={ ( updatedBlocks ) => setBlocks( updatedBlocks ) }
-		onChange={ ( updatedBlocks ) => {
-			createMissingMenuItems( updatedBlocks, menuItemsRef );
-			setBlocks( updatedBlocks );
-		} }
+		onInput={ onInput }
+		onChange={ onChange }
 		settings={ blockEditorSettings }
 	>
-		<NavigationStructureArea blocks={ blocks } initialOpen />
-		<BlockEditorArea
-			menuId={ menuId }
-			saveBlocks={ () => eventuallySaveMenuItems( blocks, menuItemsRef ) }
-			onDeleteMenu={ () => {
-				/* ... */
-			} }
-		/>
+		{ isBlockEditorReady && (
+			<div className="edit-navigation-layout__content-area">
+				<BlockTools>
+					<Editor isPending={ ! hasLoadedMenus } />
+				</BlockTools>
+			</div>
+		) }
 	</BlockEditorProvider>
 );
 ```

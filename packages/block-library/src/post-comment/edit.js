@@ -1,29 +1,38 @@
 /**
  * WordPress dependencies
  */
-import { __ } from '@wordpress/i18n';
+import { __, _x } from '@wordpress/i18n';
 import { Placeholder, TextControl, Button } from '@wordpress/components';
 import { useState } from '@wordpress/element';
 import { blockDefault } from '@wordpress/icons';
-import { InnerBlocks, useBlockProps } from '@wordpress/block-editor';
+import { useBlockProps, useInnerBlocksProps } from '@wordpress/block-editor';
 
 const ALLOWED_BLOCKS = [
 	'core/post-comment-content',
 	'core/post-comment-author',
+	'core/post-comment-date',
+	'core/post-comment-reply-link',
+];
+const TEMPLATE = [
+	[ 'core/post-comment-content' ],
+	[ 'core/post-comment-author' ],
+	[ 'core/post-comment-reply-link' ],
 ];
 
-// TODO: JSDOC types
-export default function Edit( { attributes, setAttributes } ) {
-	const { commentId } = attributes;
+export default function Edit( { attributes: { commentId }, setAttributes } ) {
 	const [ commentIdInput, setCommentIdInput ] = useState( commentId );
 	const blockProps = useBlockProps();
+	const innerBlocksProps = useInnerBlocksProps( blockProps, {
+		template: TEMPLATE,
+		allowedBlocks: ALLOWED_BLOCKS,
+	} );
 
 	if ( ! commentId ) {
 		return (
 			<div { ...blockProps }>
 				<Placeholder
 					icon={ blockDefault }
-					label={ __( 'Post Comment' ) }
+					label={ _x( 'Post Comment', 'block title' ) }
 					instructions={ __(
 						'To show a comment, input the comment ID.'
 					) }
@@ -48,9 +57,5 @@ export default function Edit( { attributes, setAttributes } ) {
 		);
 	}
 
-	return (
-		<div { ...blockProps }>
-			<InnerBlocks allowedBlocks={ ALLOWED_BLOCKS } />
-		</div>
-	);
+	return <div { ...innerBlocksProps } />;
 }

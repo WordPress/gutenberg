@@ -1,17 +1,23 @@
 /**
  * WordPress dependencies
  */
+import { store as blocksStore } from '@wordpress/blocks';
 import {
 	registerCoreBlocks,
 	__experimentalRegisterExperimentalCoreBlocks,
 } from '@wordpress/block-library';
+import { dispatch, useDispatch } from '@wordpress/data';
 import { render, useMemo } from '@wordpress/element';
-import { __experimentalFetchLinkSuggestions as fetchLinkSuggestions } from '@wordpress/core-data';
-import { useDispatch } from '@wordpress/data';
+import {
+	__experimentalFetchLinkSuggestions as fetchLinkSuggestions,
+	store as coreStore,
+} from '@wordpress/core-data';
+import { __ } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
  */
+import { NAVIGATION_POST_KIND, NAVIGATION_POST_POST_TYPE } from './constants';
 import { store as editNavigationStore } from './store';
 import { addFilters } from './filters';
 import Layout from './components/layout';
@@ -53,8 +59,20 @@ function NavEditor( { settings } ) {
  */
 function setUpEditor( settings ) {
 	addFilters( ! settings.blockNavMenus );
-	registerCoreBlocks();
 
+	// Set up the navigation post entity.
+	dispatch( coreStore ).addEntities( [
+		{
+			kind: NAVIGATION_POST_KIND,
+			name: NAVIGATION_POST_POST_TYPE,
+			transientEdits: { blocks: true, selection: true },
+			label: __( 'Navigation Post' ),
+			__experimentalNoFetch: true,
+		},
+	] );
+
+	dispatch( blocksStore ).__experimentalReapplyBlockTypeFilters();
+	registerCoreBlocks();
 	if ( process.env.GUTENBERG_PHASE === 2 ) {
 		__experimentalRegisterExperimentalCoreBlocks();
 	}
@@ -74,3 +92,5 @@ export function initialize( id, settings ) {
 		document.getElementById( id )
 	);
 }
+
+export { createMenuPreloadingMiddleware as __unstableCreateMenuPreloadingMiddleware } from './utils';

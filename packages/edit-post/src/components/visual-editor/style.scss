@@ -42,12 +42,11 @@
 		// Center.
 		margin-left: auto;
 		margin-right: auto;
-
-		// Margins between the title and the first block, or appender, do not collapse.
-		// However in that support block gap, the first items in post content do not have a top margin.
-		// By leveraging the gap variable, with a fallback of zero, we handle both cases.
-		margin-bottom: var(--wp--style--block-gap, 0);
 	}
+
+	// Add extra margin at the top, to push down the Title area in the post editor.
+	margin-top: 4rem;
+	margin-bottom: var(--wp--style--block-gap);
 }
 
 .edit-post-visual-editor__exit-template-mode {

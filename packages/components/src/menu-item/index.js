@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * External dependencies
  */
@@ -16,34 +17,19 @@ import Shortcut from '../shortcut';
 import Button from '../button';
 import Icon from '../icon';
 
-/**
- * Renders a generic menu item for use inside the more menu.
- *
- * @param {Object}        props                   Component props.
- * @param {WPElement}     props.children          Element to render as child of button.
- * @param {string}        props.info              Text to use as description for button text.
- * @param {string}        props.className         Class to set on the container.
- * @param {WPIcon}        props.icon              Button's `icon` prop.
- * @param {string|Object} props.shortcut          Shortcut's `shortcut` prop.
- * @param {boolean}       props.isSelected        Whether or not the menu item is currently selected.
- * @param {string}        [props.role="menuitem"] ARIA role of the menu item.
- * @param {Object}        ref                     React Element ref.
- *
- * @return {WPComponent} The component to be rendered.
- */
-export function MenuItem(
-	{
+export function MenuItem( props, ref ) {
+	let {
 		children,
 		info,
 		className,
 		icon,
+		iconPosition = 'right',
 		shortcut,
 		isSelected,
 		role = 'menuitem',
-		...props
-	},
-	ref
-) {
+		...buttonProps
+	} = props;
+
 	className = classnames( 'components-menu-item__button', className );
 
 	if ( info ) {
@@ -57,7 +43,9 @@ export function MenuItem(
 
 	if ( icon && ! isString( icon ) ) {
 		icon = cloneElement( icon, {
-			className: 'components-menu-items__item-icon',
+			className: classnames( 'components-menu-items__item-icon', {
+				'has-icon-right': iconPosition === 'right',
+			} ),
 		} );
 	}
 
@@ -71,15 +59,16 @@ export function MenuItem(
 					: undefined
 			}
 			role={ role }
+			icon={ iconPosition === 'left' ? icon : undefined }
 			className={ className }
-			{ ...props }
+			{ ...buttonProps }
 		>
 			<span className="components-menu-item__item">{ children }</span>
 			<Shortcut
 				className="components-menu-item__shortcut"
 				shortcut={ shortcut }
 			/>
-			{ icon && <Icon icon={ icon } /> }
+			{ icon && iconPosition === 'right' && <Icon icon={ icon } /> }
 		</Button>
 	);
 }

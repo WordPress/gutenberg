@@ -17,6 +17,7 @@ For an example of a component that follows these requirements, take a look at [`
 - [Unit tests](#unit-tests)
 - [Storybook](#storybook)
 - [Documentation](#documentation)
+- [README example](#README-example)
 - [Folder structure](#folder-structure)
 
 ## Compatibility
@@ -58,6 +59,7 @@ When creating components that render a list of subcomponents, prefer to expose t
 	] }
 />
 ```
+
 ```jsx
 // ✅ Do:
 <List>
@@ -80,6 +82,7 @@ function List ( props ) {
 	);
 }
 ```
+
 ```jsx
 // ✅ Do:
 const ListContext = createContext();
@@ -274,14 +277,24 @@ import Button from '../';
 
 export default { title: 'Components/Button', component: Button };
 
-export const _default = () => <Button>Default Button</Button>;
+const Template = ( args ) => <Button { ...args } />;
 
-export const primary = () => <Button variant="primary">Primary Button</Button>;
+export const Default = Template.bind( {} );
+Default.args = {
+	text: 'Default Button',
+	isBusy: false,
+	isSmall: false,
+};
 
-export const secondary = () => <Button variant="secondary">Secondary Button</Button>;
+export const Primary = Template.bind( {} );
+Primary.args = {
+	...Default.args,
+	text: 'Primary Button',
+	variant: 'primary',
+};
 ```
 
-A great tool to use when writing stories is the [Storybook Controls addon](https://storybook.js.org/addons/@storybook/addon-controls). Ideally props should be exposed by using this addon, which provides a graphical UI to interact dynamically with the component without needing to write code.
+A great tool to use when writing stories is the [Storybook Controls addon](https://storybook.js.org/addons/@storybook/addon-controls). Ideally props should be exposed by using this addon, which provides a graphical UI to interact dynamically with the component without needing to write code. Avoid using [Knobs](https://storybook.js.org/addons/@storybook/addon-knobs) for new stories, as this addon is deprecated.
 
 The default value of each control should coincide with the default value of the props (i.e. it should be `undefined` if a prop is not required). A story should, therefore, also explicitly show how values from the Context System are applied to (sub)components. A good example of how this may look like is the [`Card` story](https://wordpress.github.io/gutenberg/?path=/story/components-card--default) (code [here](/packages/components/src/card/stories/index.js)).
 
@@ -293,12 +306,71 @@ All components, in addition to being typed, should be using JSDoc when necessary
 
 Each component that is exported from the `@wordpress/components` package should include a `README.md` file, explaining how to use the component, showing examples, and documenting all the props.
 
+## README example
+
+````markdown
+# `ComponentName`
+
+<!-- If component is experimental, add the following section: -->
+<div class="callout callout-alert">
+This feature is still experimental. “Experimental” means this is an early implementation subject to drastic and breaking changes.
+</div>
+
+<!-- If component is deprecated, add the following section: -->
+<div class="callout callout-alert">
+This component is deprecated. Please use `{other component}` from the `{other package}` package instead.
+</div>
+
+Description of the component.
+
+## Usage
+
+Code example using correct markdown syntax and formatted using project's formatting rules. See [ItemGroup](/packages/components/src/item-group/item-group/README.md#usage) for a real-world example.
+
+```jsx
+import { ExampleComponent } from '@wordpress/components';
+
+function Example() {
+	return (
+		<ExampleComponent>
+			<p>Code is poetry</p>
+		</ExampleComponent>
+	);
+}
+```
+
+## Props
+
+The component accepts the following props:
+
+### `propName`: Typescript style type i.e `string`, `number`, `( nextValue: string ) => void`
+
+Prop description. With a new line before and after the description and before and after type/required blocks.
+
+-   Required: Either `Yes` or `No`
+<!-- If the prop has a default value, add the following line: -->
+-   Default: [default value]
+
+### Inherited props
+
+Add this section when there are props that are drilled down into an internal component. See [ClipboardButton](/packages/components/src/clipboard-button/README.md) for an example.
+
+<!-- Only add the next section if the component relies on the [Context System](#context-system) -->
+## Context
+
+See examples for this section for the [ItemGroup](/packages/components/src/item-group/item-group/README.md#context) and [`Card`](/packages/components/src/card/card/README.md#context) components.
+````
+
 ## Folder structure
 
 As a result of the above guidelines, all new components (except for shared utilities) should _generally_ follow this folder structure:
 
-```
+```text
 component-name/
+├── stories
+│   └── index.js
+├── test
+│   └── index.js
 ├── component.tsx
 ├── context.ts
 ├── hook.ts
@@ -308,28 +380,28 @@ component-name/
 └── types.ts
 ```
 
-In case of a family of components (e.g. `Card` and `CardBody`, `CardFooter`, `CardHeader` ...), each component's implementation should live in a separate subfolder:
+In case of a family of components (e.g. `Card` and `CardBody`, `CardFooter`, `CardHeader` ...), each component's implementation should live in a separate subfolder, while code common to the whole family of components (e.g types, utils, context...) should live in the family of components root folder:
 
-```
+```text
 component-family-name/
 ├── sub-component-name/
 │   ├── index.ts
 │   ├── component.tsx
 │   ├── hook.ts
 │   ├── README.md
-│   ├── styles.ts
-│   └── types.ts
+│   └── styles.ts
 ├── sub-component-name/
 │   ├── index.ts
 │   ├── component.tsx
 │   ├── hook.ts
 │   ├── README.md
-│   ├── styles.ts
-│   └── types.ts
+│   └── styles.ts
 ├── stories
 │   └── index.js
 ├── test
 │   └── index.js
 ├── context.ts
-└── index.ts
+├── index.ts
+├── types.ts
+└── utils.ts
 ```

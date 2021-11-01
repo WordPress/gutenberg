@@ -2,7 +2,8 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import tinycolor from 'tinycolor2';
+import { colord, extend } from 'colord';
+import namesPlugin from 'colord/plugins/names';
 
 /**
  * WordPress dependencies
@@ -25,6 +26,8 @@ import BlockList from '../components/block-list';
 
 const EMPTY_ARRAY = [];
 
+extend( [ namesPlugin ] );
+
 /**
  * Convert a list of colors to an object of R, G, and B values.
  *
@@ -33,14 +36,14 @@ const EMPTY_ARRAY = [];
  * @return {Object} R, G, and B values.
  */
 export function getValuesFromColors( colors = [] ) {
-	const values = { r: [], g: [], b: [] };
+	const values = { r: [], g: [], b: [], a: [] };
 
 	colors.forEach( ( color ) => {
-		// Access values directly to skip extra rounding that tinycolor.toRgb() does.
-		const tcolor = tinycolor( color );
-		values.r.push( tcolor._r / 255 );
-		values.g.push( tcolor._g / 255 );
-		values.b.push( tcolor._b / 255 );
+		const rgbColor = colord( color ).toRgb();
+		values.r.push( rgbColor.r / 255 );
+		values.g.push( rgbColor.g / 255 );
+		values.b.push( rgbColor.b / 255 );
+		values.a.push( rgbColor.a );
 	} );
 
 	return values;
@@ -53,6 +56,7 @@ export function getValuesFromColors( colors = [] ) {
  * @property {number[]} r Red values.
  * @property {number[]} g Green values.
  * @property {number[]} b Blue values.
+ * @property {number[]} a Alpha values.
  */
 
 /**
@@ -61,7 +65,7 @@ export function getValuesFromColors( colors = [] ) {
  * @param {Object} props          Duotone props.
  * @param {string} props.selector Selector to apply the filter to.
  * @param {string} props.id       Unique id for this duotone filter.
- * @param {Values} props.values   R, G, and B values to filter with.
+ * @param {Values} props.values   R, G, B, and A values to filter with.
  *
  * @return {WPElement} Duotone element.
  */
@@ -91,13 +95,16 @@ ${ selector } {
 				<defs>
 					<filter id={ id }>
 						<feColorMatrix
+							// Use sRGB instead of linearRGB so transparency looks correct.
+							colorInterpolationFilters="sRGB"
 							type="matrix"
 							// Use perceptual brightness to convert to grayscale.
-							// prettier-ignore
-							values=".299 .587 .114 0 0
-							        .299 .587 .114 0 0
-							        .299 .587 .114 0 0
-							        0 0 0 1 0"
+							values="
+								.299 .587 .114 0 0
+								.299 .587 .114 0 0
+								.299 .587 .114 0 0
+								.299 .587 .114 0 0
+							"
 						/>
 						<feComponentTransfer
 							// Use sRGB instead of linearRGB to be consistent with how CSS gradients work.
@@ -115,7 +122,16 @@ ${ selector } {
 								type="table"
 								tableValues={ values.b.join( ' ' ) }
 							/>
+							<feFuncA
+								type="table"
+								tableValues={ values.a.join( ' ' ) }
+							/>
 						</feComponentTransfer>
+						<feComposite
+							// Re-mask the image with the original transparency since the feColorMatrix above loses that information.
+							in2="SourceGraphic"
+							operator="in"
+						/>
 					</filter>
 				</defs>
 			</SVG>
@@ -214,6 +230,37 @@ const withDuotoneControls = createHigherOrderComponent(
 );
 
 /**
+ * Function that scopes a selector with another one. This works a bit like
+ * SCSS nesting except the `&` operator isn't supported.
+ *
+ * @example
+ * ```js
+ * const scope = '.a, .b .c';
+ * const selector = '> .x, .y';
+ * const merged = scopeSelector( scope, selector );
+ * // merged is '.a > .x, .a .y, .b .c > .x, .b .c .y'
+ * ```
+ *
+ * @param {string} scope    Selector to scope to.
+ * @param {string} selector Original selector.
+ *
+ * @return {string} Scoped selector.
+ */
+function scopeSelector( scope, selector ) {
+	const scopes = scope.split( ',' );
+	const selectors = selector.split( ',' );
+
+	const selectorsScoped = [];
+	scopes.forEach( ( outer ) => {
+		selectors.forEach( ( inner ) => {
+			selectorsScoped.push( `${ outer.trim() } ${ inner.trim() }` );
+		} );
+	} );
+
+	return selectorsScoped.join( ', ' );
+}
+
+/**
  * Override the default block element to include duotone styles.
  *
  * @param {Function} BlockListBlock Original component.
@@ -232,13 +279,15 @@ const withDuotoneStyles = createHigherOrderComponent(
 			return <BlockListBlock { ...props } />;
 		}
 
-		const id = `wp-duotone-filter-${ useInstanceId( BlockListBlock ) }`;
+		const id = `wp-duotone-${ useInstanceId( BlockListBlock ) }`;
 
-		const selectors = duotoneSupport.split( ',' );
-		const selectorsScoped = selectors.map(
-			( selector ) => `.${ id } ${ selector.trim() }`
+		// Extra .editor-styles-wrapper specificity is needed in the editor
+		// since we're not using inline styles to apply the filter. We need to
+		// override duotone applied by global styles and theme.json.
+		const selectorsGroup = scopeSelector(
+			`.editor-styles-wrapper .${ id }`,
+			duotoneSupport
 		);
-		const selectorsGroup = selectorsScoped.join( ', ' );
 
 		const className = classnames( props?.className, id );
 

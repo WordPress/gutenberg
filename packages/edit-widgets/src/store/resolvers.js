@@ -2,11 +2,11 @@
  * WordPress dependencies
  */
 import { createBlock } from '@wordpress/blocks';
+import { store as coreStore } from '@wordpress/core-data';
 
 /**
  * Internal dependencies
  */
-import { resolveWidgets, resolveWidgetAreas, select } from './controls';
 import { persistStubPost, setWidgetAreasOpenState } from './actions';
 import {
 	KIND,
@@ -18,16 +18,20 @@ import {
 } from './utils';
 import { transformWidgetToBlock } from './transformers';
 
-export function* getWidgetAreas() {
+/**
+ * Creates a "stub" widgets post reflecting all available widget areas. The
+ * post is meant as a convenient to only exists in runtime and should never be saved. It
+ * enables a convenient way of editing the widgets by using a regular post editor.
+ *
+ * Fetches all widgets from all widgets aras, converts them into blocks, and hydrates a new post with them.
+ *
+ * @return {Function} An action creator.
+ */
+export const getWidgetAreas = () => async ( { dispatch, registry } ) => {
 	const query = buildWidgetAreasQuery();
-	yield resolveWidgetAreas( query );
-	const widgetAreas = yield select(
-		'core',
-		'getEntityRecords',
-		KIND,
-		WIDGET_AREA_ENTITY_TYPE,
-		query
-	);
+	const widgetAreas = await registry
+		.resolveSelect( coreStore )
+		.getEntityRecords( KIND, WIDGET_AREA_ENTITY_TYPE, query );
 
 	const widgetAreaBlocks = [];
 	const sortedWidgetAreas = widgetAreas.sort( ( a, b ) => {
@@ -50,7 +54,9 @@ export function* getWidgetAreas() {
 		if ( ! widgetArea.widgets.length ) {
 			// If this widget area has no widgets, it won't get a post setup by
 			// the getWidgets resolver.
-			yield persistStubPost( buildWidgetAreaPostId( widgetArea.id ), [] );
+			dispatch(
+				persistStubPost( buildWidgetAreaPostId( widgetArea.id ), [] )
+			);
 		}
 	}
 
@@ -59,21 +65,21 @@ export function* getWidgetAreas() {
 		// Defaults to open the first widget area.
 		widgetAreasOpenState[ widgetAreaBlock.clientId ] = index === 0;
 	} );
-	yield setWidgetAreasOpenState( widgetAreasOpenState );
+	dispatch( setWidgetAreasOpenState( widgetAreasOpenState ) );
 
-	yield persistStubPost( buildWidgetAreasPostId(), widgetAreaBlocks );
-}
+	dispatch( persistStubPost( buildWidgetAreasPostId(), widgetAreaBlocks ) );
+};
 
-export function* getWidgets() {
+/**
+ * Fetches all widgets from all widgets ares, and groups them by widget area Id.
+ *
+ * @return {Function} An action creator.
+ */
+export const getWidgets = () => async ( { dispatch, registry } ) => {
 	const query = buildWidgetsQuery();
-	yield resolveWidgets( query );
-	const widgets = yield select(
-		'core',
-		'getEntityRecords',
-		'root',
-		'widget',
-		query
-	);
+	const widgets = await registry
+		.resolveSelect( coreStore )
+		.getEntityRecords( 'root', 'widget', query );
 
 	const groupedBySidebar = {};
 
@@ -87,10 +93,12 @@ export function* getWidgets() {
 	for ( const sidebarId in groupedBySidebar ) {
 		if ( groupedBySidebar.hasOwnProperty( sidebarId ) ) {
 			// Persist the actual post containing the widget block
-			yield persistStubPost(
-				buildWidgetAreaPostId( sidebarId ),
-				groupedBySidebar[ sidebarId ]
+			dispatch(
+				persistStubPost(
+					buildWidgetAreaPostId( sidebarId ),
+					groupedBySidebar[ sidebarId ]
+				)
 			);
 		}
 	}
-}
+};

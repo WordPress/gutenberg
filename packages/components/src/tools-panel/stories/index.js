@@ -35,9 +35,11 @@ export const _default = () => {
 	return (
 		<PanelWrapperView>
 			<Panel>
-				<ToolsPanel label="Tools Panel" resetAll={ resetAll }>
-					<ToolsPanelItem
-						className="single-column"
+				<ToolsPanel
+					label="Tools Panel (default example)"
+					resetAll={ resetAll }
+				>
+					<SingleColumnItem
 						hasValue={ () => !! width }
 						label="Width"
 						onDeselect={ () => setWidth( undefined ) }
@@ -48,9 +50,8 @@ export const _default = () => {
 							value={ width }
 							onChange={ ( next ) => setWidth( next ) }
 						/>
-					</ToolsPanelItem>
-					<ToolsPanelItem
-						className="single-column"
+					</SingleColumnItem>
+					<SingleColumnItem
 						hasValue={ () => !! height }
 						label="Height"
 						onDeselect={ () => setHeight( undefined ) }
@@ -61,11 +62,12 @@ export const _default = () => {
 							value={ height }
 							onChange={ ( next ) => setHeight( next ) }
 						/>
-					</ToolsPanelItem>
+					</SingleColumnItem>
 					<ToolsPanelItem
 						hasValue={ () => !! minHeight }
 						label="Minimum height"
 						onDeselect={ () => setMinHeight( undefined ) }
+						isShownByDefault={ true }
 					>
 						<UnitControl
 							label="Minimum height"
@@ -73,6 +75,52 @@ export const _default = () => {
 							onChange={ ( next ) => setMinHeight( next ) }
 						/>
 					</ToolsPanelItem>
+				</ToolsPanel>
+			</Panel>
+		</PanelWrapperView>
+	);
+};
+
+export const WithOptionalItemsPlusIcon = () => {
+	const [ height, setHeight ] = useState();
+	const [ width, setWidth ] = useState();
+
+	const resetAll = () => {
+		setHeight( undefined );
+		setWidth( undefined );
+	};
+
+	return (
+		<PanelWrapperView>
+			<Panel>
+				<ToolsPanel
+					label="Tools Panel (optional items only)"
+					resetAll={ resetAll }
+				>
+					<SingleColumnItem
+						hasValue={ () => !! width }
+						label="Width"
+						onDeselect={ () => setWidth( undefined ) }
+						isShownByDefault={ false }
+					>
+						<UnitControl
+							label="Width"
+							value={ width }
+							onChange={ ( next ) => setWidth( next ) }
+						/>
+					</SingleColumnItem>
+					<SingleColumnItem
+						hasValue={ () => !! height }
+						label="Height"
+						onDeselect={ () => setHeight( undefined ) }
+						isShownByDefault={ false }
+					>
+						<UnitControl
+							label="Height"
+							value={ height }
+							onChange={ ( next ) => setHeight( next ) }
+						/>
+					</SingleColumnItem>
 				</ToolsPanel>
 			</Panel>
 		</PanelWrapperView>
@@ -109,8 +157,7 @@ export const WithSlotFillItems = () => {
 	return (
 		<SlotFillProvider>
 			<ToolsPanelItems>
-				<ToolsPanelItem
-					className="single-column"
+				<SingleColumnItem
 					hasValue={ () => !! width }
 					label="Injected Width"
 					onDeselect={ () => updateAttribute( 'width', undefined ) }
@@ -124,9 +171,8 @@ export const WithSlotFillItems = () => {
 							updateAttribute( 'width', next )
 						}
 					/>
-				</ToolsPanelItem>
-				<ToolsPanelItem
-					className="single-column"
+				</SingleColumnItem>
+				<SingleColumnItem
 					hasValue={ () => !! height }
 					label="Injected Height"
 					onDeselect={ () => updateAttribute( 'height', undefined ) }
@@ -140,7 +186,7 @@ export const WithSlotFillItems = () => {
 							updateAttribute( 'height', next )
 						}
 					/>
-				</ToolsPanelItem>
+				</SingleColumnItem>
 				<ToolsPanelItem
 					hasValue={ () => true }
 					label="Item for alternate panel"
@@ -169,7 +215,17 @@ export const WithSlotFillItems = () => {
 	);
 };
 
+export { TypographyPanel } from './typography-panel';
+
 const PanelWrapperView = styled.div`
-	max-width: 260px;
+	max-width: 280px;
 	font-size: 13px;
+
+	.components-dropdown-menu__menu {
+		max-width: 220px;
+	}
+`;
+
+const SingleColumnItem = styled( ToolsPanelItem )`
+	grid-column: span 1;
 `;

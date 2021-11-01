@@ -259,6 +259,20 @@ public class MainApplication extends Application implements ReactApplication, Gu
                 Log.d("BlockTypeImpressions", String.format("Gutenberg requested setting block type impression to %s.", impressions));
             }
 
+            @Override
+            public void requestContactCustomerSupport() {
+                Toast.makeText(MainApplication.this, "requestContactCustomerSupport called", Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void requestGotoCustomerSupportOptions() {
+                Toast.makeText(MainApplication.this, "requestGotoCustomerSupportOptions called", Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void sendEventToHost(final String eventName, final ReadableMap properties) {
+                Log.d("SendEventToHost", String.format("Gutenberg requested sending '%s' event to host with properties: %s", eventName, properties));
+            }
         }, isDarkMode());
 
         return new ReactNativeHost(this) {

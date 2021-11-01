@@ -134,40 +134,63 @@ export function getEntity( state, kind, name ) {
  *
  * @return {Object?} Record.
  */
-export function getEntityRecord( state, kind, name, key, query ) {
-	const queriedState = get( state.entities.data, [
-		kind,
-		name,
-		'queriedData',
-	] );
-	if ( ! queriedState ) {
-		return undefined;
-	}
-	const context = query?.context ?? 'default';
-
-	if ( query === undefined ) {
-		// If expecting a complete item, validate that completeness.
-		if ( ! queriedState.itemIsComplete[ context ]?.[ key ] ) {
+export const getEntityRecord = createSelector(
+	( state, kind, name, key, query ) => {
+		const queriedState = get( state.entities.data, [
+			kind,
+			name,
+			'queriedData',
+		] );
+		if ( ! queriedState ) {
 			return undefined;
 		}
+		const context = query?.context ?? 'default';
 
-		return queriedState.items[ context ][ key ];
-	}
+		if ( query === undefined ) {
+			// If expecting a complete item, validate that completeness.
+			if ( ! queriedState.itemIsComplete[ context ]?.[ key ] ) {
+				return undefined;
+			}
 
-	const item = queriedState.items[ context ]?.[ key ];
-	if ( item && query._fields ) {
-		const filteredItem = {};
-		const fields = getNormalizedCommaSeparable( query._fields );
-		for ( let f = 0; f < fields.length; f++ ) {
-			const field = fields[ f ].split( '.' );
-			const value = get( item, field );
-			set( filteredItem, field, value );
+			return queriedState.items[ context ][ key ];
 		}
-		return filteredItem;
-	}
 
-	return item;
-}
+		const item = queriedState.items[ context ]?.[ key ];
+		if ( item && query._fields ) {
+			const filteredItem = {};
+			const fields = getNormalizedCommaSeparable( query._fields );
+			for ( let f = 0; f < fields.length; f++ ) {
+				const field = fields[ f ].split( '.' );
+				const value = get( item, field );
+				set( filteredItem, field, value );
+			}
+			return filteredItem;
+		}
+
+		return item;
+	},
+	( state, kind, name, recordId, query ) => {
+		const context = query?.context ?? 'default';
+		return [
+			get( state.entities.data, [
+				kind,
+				name,
+				'queriedData',
+				'items',
+				context,
+				recordId,
+			] ),
+			get( state.entities.data, [
+				kind,
+				name,
+				'queriedData',
+				'itemIsComplete',
+				context,
+				recordId,
+			] ),
+		];
+	}
+);
 
 /**
  * Returns the Entity's record object by key. Doesn't trigger a resolver nor requests the entity from the API if the entity record isn't available in the local state.
@@ -221,7 +244,28 @@ export const getRawEntityRecord = createSelector(
 			}, {} )
 		);
 	},
-	( state ) => [ state.entities.data ]
+	( state, kind, name, recordId, query ) => {
+		const context = query?.context ?? 'default';
+		return [
+			state.entities.config,
+			get( state.entities.data, [
+				kind,
+				name,
+				'queriedData',
+				'items',
+				context,
+				recordId,
+			] ),
+			get( state.entities.data, [
+				kind,
+				name,
+				'queriedData',
+				'itemIsComplete',
+				context,
+				recordId,
+			] ),
+		];
+	}
 );
 
 /**
@@ -282,8 +326,12 @@ export const __experimentalGetDirtyEntityRecords = createSelector(
 			Object.keys( data[ kind ] ).forEach( ( name ) => {
 				const primaryKeys = Object.keys(
 					data[ kind ][ name ].edits
-				).filter( ( primaryKey ) =>
-					hasEditsForEntityRecord( state, kind, name, primaryKey )
+				).filter(
+					( primaryKey ) =>
+						// The entity record must exist (not be deleted),
+						// and it must have edits.
+						getEntityRecord( state, kind, name, primaryKey ) &&
+						hasEditsForEntityRecord( state, kind, name, primaryKey )
 				);
 
 				if ( primaryKeys.length ) {
@@ -408,7 +456,10 @@ export const getEntityRecordNonTransientEdits = createSelector(
 			return acc;
 		}, {} );
 	},
-	( state ) => [ state.entities.config, state.entities.data ]
+	( state, kind, name, recordId ) => [
+		state.entities.config,
+		get( state.entities.data, [ kind, name, 'edits', recordId ] ),
+	]
 );
 
 /**
@@ -446,7 +497,29 @@ export const getEditedEntityRecord = createSelector(
 		...getRawEntityRecord( state, kind, name, recordId ),
 		...getEntityRecordEdits( state, kind, name, recordId ),
 	} ),
-	( state ) => [ state.entities.data ]
+	( state, kind, name, recordId, query ) => {
+		const context = query?.context ?? 'default';
+		return [
+			state.entities.config,
+			get( state.entities.data, [
+				kind,
+				name,
+				'queriedData',
+				'items',
+				context,
+				recordId,
+			] ),
+			get( state.entities.data, [
+				kind,
+				name,
+				'queriedData',
+				'itemIsComplete',
+				context,
+				recordId,
+			] ),
+			get( state.entities.data, [ kind, name, 'edits', recordId ] ),
+		];
+	}
 );
 
 /**
@@ -616,6 +689,17 @@ export function hasRedo( state ) {
  */
 export function getCurrentTheme( state ) {
 	return state.themes[ state.currentTheme ];
+}
+
+/**
+ * Return the ID of the current global styles object.
+ *
+ * @param {Object} state Data state.
+ *
+ * @return {string} The current global styles ID.
+ */
+export function __experimentalGetCurrentGlobalStylesId( state ) {
+	return state.currentGlobalStylesId;
 }
 
 /**
