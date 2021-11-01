@@ -93,6 +93,9 @@ add_action( 'init', 'gutenberg_register_wp_template_part_area_taxonomy' );
 if ( ! defined( 'WP_TEMPLATE_PART_AREA_HEADER' ) ) {
 	define( 'WP_TEMPLATE_PART_AREA_HEADER', 'header' );
 }
+if ( ! defined( 'WP_TEMPLATE_PART_AREA_PRIMARY_MENU' ) ) {
+	define( 'WP_TEMPLATE_PART_AREA_PRIMARY_MENU', 'primary-menu' );
+}
 if ( ! defined( 'WP_TEMPLATE_PART_AREA_FOOTER' ) ) {
 	define( 'WP_TEMPLATE_PART_AREA_FOOTER', 'footer' );
 }
@@ -188,6 +191,16 @@ function gutenberg_get_allowed_template_part_areas() {
 			),
 			'icon'        => 'header',
 			'area_tag'    => 'header',
+		),
+		array(
+			'area'        => WP_TEMPLATE_PART_AREA_PRIMARY_MENU,
+			'label'       => __( 'Primary menu', 'gutenberg' ),
+			'description' => __(
+				'The primary menu template defines a page area that typically contains a main navigation.',
+				'gutenberg'
+			),
+			'icon'        => 'primary-menu',
+			'area_tag'    => 'div',
 		),
 		array(
 			'area'        => WP_TEMPLATE_PART_AREA_FOOTER,

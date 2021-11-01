@@ -446,11 +446,14 @@ add_action( 'init', 'gutenberg_register_navigation_post_type' );
  * @see switch_theme WordPress action.
  */
 function gutenberg_migrate_nav_on_theme_switch( $new_name, $new_theme, $old_theme ) {
-	$old_theme_name = $old_theme->get_stylesheet();
-	$old_nav_parts  = get_navigation_template_part_names( $old_theme_name );
+	$old_theme_name     = $old_theme->get_stylesheet();
+	$settings_old_theme = WP_Theme_JSON_Resolver_Gutenberg::get_theme_data();
+	$old_nav_parts      = get_navigation_template_part_names( $settings_old_theme->get_template_parts() );
 
-	$new_theme_name = $new_theme->get_stylesheet();
-	$new_nav_parts  = get_navigation_template_part_names( $new_theme_name );
+	WP_Theme_JSON_Resolver_Gutenberg::clean_cached_data();
+	$new_theme_name     = $new_theme->get_stylesheet();
+	$settings_new_theme = WP_Theme_JSON_Resolver_Gutenberg::get_theme_data();
+	$new_nav_parts      = get_navigation_template_part_names( $settings_new_theme->get_template_parts() );
 
 	$common_parts = array_intersect( $old_nav_parts, $new_nav_parts );
 	foreach ( $common_parts as $common_part ) {
@@ -538,20 +541,19 @@ function gutenberg_migrate_nav_on_theme_switch( $new_name, $new_theme, $old_them
 /**
  * Returns a list of template parts representing labeled navigation areas such as primary, secondary, etc.
  *
- * @param string $theme_name Theme name.
+ * @param array[] $template_parts Template parts from theme.json.
  * @return array List of template parts na
  */
-function get_navigation_template_part_names( $theme_name ) {
-	$pattern          = get_theme_root() . "/${theme_name}/block-template-parts/*-menu.html";
-	$menu_parts_paths = glob( $pattern );
-	$menu_parts       = array();
-	foreach ( $menu_parts_paths as $path ) {
-		$part_name    = basename( $path );
-		$part_name    = substr( $part_name, 0, strlen( $part_name ) - 5 );
-		$menu_parts[] = $part_name;
+function get_navigation_template_part_names( $template_parts ) {
+	$menu_parts = array();
+	foreach ( $template_parts as $key => $part ) {
+		if ( WP_TEMPLATE_PART_AREA_PRIMARY_MENU === $part['area'] ) {
+			$menu_parts[] = $key;
+		}
 	}
-
 	return $menu_parts;
 }
 
-add_action( 'switch_theme', 'gutenberg_migrate_nav_on_theme_switch', 10, 3 );
+// Set a priority such that WP_Theme_JSON_Resolver_Gutenberg still has contains the cached data.
+// This will clean the cache which may be unexpected, so it would be better to introduce a `before_theme_switch` action.
+add_action( 'switch_theme', 'gutenberg_migrate_nav_on_theme_switch', -200, 3 );
