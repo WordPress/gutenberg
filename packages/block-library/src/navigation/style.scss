@@ -352,6 +352,9 @@
 	.wp-block-page-list,
 	.wp-block-navigation__container,
 	.wp-block-navigation__responsive-container-content {
+		justify-content: center;
+
+		// For the overlay.
 		align-items: center;
 	}
 }
@@ -360,6 +363,9 @@
 	.wp-block-page-list,
 	.wp-block-navigation__container,
 	.wp-block-navigation__responsive-container-content {
+		justify-content: flex-end;
+
+		// For the overlay.
 		align-items: flex-end;
 	}
 }
@@ -368,7 +374,7 @@
 	.wp-block-navigation__container,
 	.wp-block-navigation__responsive-container-content {
 		display: flex;
-		align-items: space-between;
+		justify-content: space-between;
 		flex: 1;
 	}
 }
@@ -419,6 +425,9 @@
 
 	.wp-block-navigation__responsive-container-content {
 		display: flex;
+
+		// Always vertically align to the top.
+		justify-content: flex-start;
 	}
 
 	// Overlay menu.
