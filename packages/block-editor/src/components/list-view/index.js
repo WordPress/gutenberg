@@ -30,25 +30,19 @@ import { hasFocusWithin } from './utils';
 
 const noop = () => {};
 const expanded = ( state, action ) => {
-	switch ( action.type ) {
-		case 'expand':
-			return { ...state, ...{ [ action.clientId ]: true } };
-		case 'collapse':
-			return { ...state, ...{ [ action.clientId ]: false } };
-		case 'expandAll':
-			return {
-				...state,
-				...action.clientIds.reduce(
-					( newState, id ) => ( {
-						...newState,
-						[ id ]: true,
-					} ),
-					{}
-				),
-			};
-		default:
-			return state;
+	if ( Array.isArray( action.clientIds ) ) {
+		return {
+			...state,
+			...action.clientIds.reduce(
+				( newState, id ) => ( {
+					...newState,
+					[ id ]: action.type === 'expand',
+				} ),
+				{}
+			),
+		};
 	}
+	return state;
 };
 
 /**
@@ -135,7 +129,7 @@ function ListView(
 			if ( ! clientId ) {
 				return;
 			}
-			setExpandedState( { type: 'expand', clientId } );
+			setExpandedState( { type: 'expand', clientIds: [ clientId ] } );
 		},
 		[ setExpandedState ]
 	);
@@ -144,7 +138,7 @@ function ListView(
 			if ( ! clientId ) {
 				return;
 			}
-			setExpandedState( { type: 'collapse', clientId } );
+			setExpandedState( { type: 'collapse', clientIds: [ clientId ] } );
 		},
 		[ setExpandedState ]
 	);
@@ -188,13 +182,9 @@ function ListView(
 	// for example, in the Block Editor,
 	// try to expand the block list tree.
 	useEffect( () => {
-		if (
-			! hasFocus &&
-			Array.isArray( selectedBlockParentClientIds ) &&
-			selectedBlockParentClientIds.length
-		) {
+		if ( ! hasFocus ) {
 			setExpandedState( {
-				type: 'expandAll',
+				type: 'expand',
 				clientIds: selectedBlockParentClientIds,
 			} );
 		}
