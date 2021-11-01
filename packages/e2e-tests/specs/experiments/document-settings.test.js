@@ -42,7 +42,6 @@ describe( 'Document Settings', () => {
 		it( 'should display the selected templates name in the document header', async () => {
 			// Navigate to a template
 			await navigationPanel.open();
-			await navigationPanel.backToDashboard();
 			await navigationPanel.backToRoot();
 			await navigationPanel.navigate( 'Templates' );
 			await navigationPanel.clickItemByText( 'Index' );
@@ -79,7 +78,6 @@ describe( 'Document Settings', () => {
 		it( "should display the selected template part's name in the document header", async () => {
 			// Navigate to a template part
 			await navigationPanel.open();
-			await navigationPanel.backToDashboard();
 			await navigationPanel.backToRoot();
 			await navigationPanel.navigate( [ 'Template Parts', 'headers' ] );
 			await navigationPanel.clickItemByText( 'header' );

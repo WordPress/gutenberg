@@ -61,19 +61,15 @@ export const navigationPanel = {
 	},
 
 	async isRoot() {
-		const isGroupTitleVisible = !! ( await page.$(
-			'.edit-site-navigation-panel .components-navigation__group-title'
+		const isBackToDashboardButtonVisible = !! ( await page.$(
+			'.edit-site-navigation-panel .edit-site-navigation-panel__back-to-dashboard'
 		) );
 
-		return isGroupTitleVisible;
+		return isBackToDashboardButtonVisible;
 	},
 
 	async back() {
 		await page.click( '.components-navigation__back-button' );
-	},
-
-	async backToDashboard() {
-		await page.click( '.edit-site-navigation-panel__back-to-dashboard' );
 	},
 
 	async navigate( menus ) {
