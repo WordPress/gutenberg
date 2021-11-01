@@ -84,9 +84,7 @@ function register_block_core_site_icon_setting() {
 		'general',
 		'site_icon',
 		array(
-			'show_in_rest' => array(
-				'name' => 'site_icon',
-			),
+			'show_in_rest' => true,
 			'type'         => 'integer',
 			'description'  => __( 'Site icon.' ),
 		)
