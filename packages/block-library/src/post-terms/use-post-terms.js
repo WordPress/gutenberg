@@ -19,7 +19,7 @@ export default function usePostTerms( { postId, postType, term } ) {
 			}
 			if ( ! termIds ) {
 				// Waiting for post terms to be fetched.
-				return { isLoading: true };
+				return { isLoading: term?.postTerms?.includes( postType ) };
 			}
 			if ( ! termIds.length ) {
 				return { isLoading: false };

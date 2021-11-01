@@ -184,6 +184,16 @@ class WP_Theme_JSON_Schema_V0 implements WP_Theme_JSON_Schema {
 			array( 'custom' ),
 		);
 
+		$renamed_paths = array(
+			'border.customColor'               => 'border.color',
+			'border.customStyle'               => 'border.style',
+			'border.customWidth'               => 'border.width',
+			'typography.customFontStyle'       => 'typography.fontStyle',
+			'typography.customFontWeight'      => 'typography.fontWeight',
+			'typography.customTextDecorations' => 'typography.textDecoration',
+			'typography.customTextTransforms'  => 'typography.textTransform',
+		);
+
 		// 'defaults' settings become top-level.
 		if ( isset( $settings[ self::ALL_BLOCKS_NAME ] ) ) {
 			$new = $settings[ self::ALL_BLOCKS_NAME ];
@@ -219,6 +229,18 @@ class WP_Theme_JSON_Schema_V0 implements WP_Theme_JSON_Schema {
 			return $new;
 		}
 
+		// Process any renamed/moved paths within settings.
+		foreach ( $renamed_paths as $original => $renamed ) {
+			$original_path = explode( '.', $original );
+			$renamed_path  = explode( '.', $renamed );
+			$current_value = _wp_array_get( $new, $original_path, null );
+
+			if ( null !== $current_value ) {
+				gutenberg_experimental_set( $new, $renamed_path, $current_value );
+				self::unset_setting_by_path( $new, $original_path );
+			}
+		}
+
 		/*
 		 * At this point, it only contains block's data.
 		 * However, some block data we need to consolidate
@@ -252,6 +274,24 @@ class WP_Theme_JSON_Schema_V0 implements WP_Theme_JSON_Schema {
 		}
 
 		return $new;
+	}
+
+	/**
+	 * Removes a property from within the provided settings by its path.
+	 *
+	 * @param array $settings Reference to the current settings array.
+	 * @param array $path Path to the property to be removed.
+	 *
+	 * @return void
+	 */
+	private static function unset_setting_by_path( &$settings, $path ) {
+		$tmp_settings = &$settings; // phpcs:ignore VariableAnalysis.CodeAnalysis.VariableAnalysis.UnusedVariable
+		$last_key     = array_pop( $path );
+		foreach ( $path as $key ) {
+			$tmp_settings = &$tmp_settings[ $key ];
+		}
+
+		unset( $tmp_settings[ $last_key ] );
 	}
 
 	/**

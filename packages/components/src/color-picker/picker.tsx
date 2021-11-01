@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { HslColorPicker, HslaColorPicker } from 'react-colorful';
+import { RgbStringColorPicker, RgbaStringColorPicker } from 'react-colorful';
 import { colord, Colord } from 'colord';
 
 /**
@@ -15,12 +15,14 @@ interface PickerProps {
 }
 
 export const Picker = ( { color, enableAlpha, onChange }: PickerProps ) => {
-	const Component = enableAlpha ? HslaColorPicker : HslColorPicker;
-	const hslColor = useMemo( () => color.toHsl(), [ color ] );
+	const Component = enableAlpha
+		? RgbaStringColorPicker
+		: RgbStringColorPicker;
+	const rgbColor = useMemo( () => color.toRgbString(), [ color ] );
 
 	return (
 		<Component
-			color={ hslColor }
+			color={ rgbColor }
 			onChange={ ( nextColor ) => {
 				onChange( colord( nextColor ) );
 			} }

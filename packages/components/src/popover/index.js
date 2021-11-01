@@ -456,11 +456,11 @@ const Popover = (
 			defaultView.cancelAnimationFrame( rafId );
 
 			if ( anchorDocument && anchorDocument !== ownerDocument ) {
-				anchorDocument.defaultView.removeEventListener(
+				anchorDocument.defaultView?.removeEventListener(
 					'resize',
 					refresh
 				);
-				anchorDocument.defaultView.removeEventListener(
+				anchorDocument.defaultView?.removeEventListener(
 					'scroll',
 					refresh,
 					true

@@ -4,6 +4,13 @@
 import { deburr, trim } from 'lodash';
 
 /**
+ * Object map tracking anchors.
+ *
+ * @type {Record<string, string | null>}
+ */
+const anchors = {};
+
+/**
  * Returns the text without markup.
  *
  * @param {string} text The text.
@@ -36,13 +43,12 @@ const getSlug = ( content ) => {
 /**
  * Generate the anchor for a heading.
  *
- * @param {string}   clientId          The block ID.
- * @param {string}   content           The block content.
- * @param {string[]} allHeadingAnchors An array containing all headings anchors.
+ * @param {string} clientId The block ID.
+ * @param {string} content  The block content.
  *
  * @return {string|null} Return the heading anchor.
  */
-export const generateAnchor = ( clientId, content, allHeadingAnchors ) => {
+export const generateAnchor = ( clientId, content ) => {
 	const slug = getSlug( content );
 	// If slug is empty, then return null.
 	// Returning null instead of an empty string allows us to check again when the content changes.
@@ -50,16 +56,26 @@ export const generateAnchor = ( clientId, content, allHeadingAnchors ) => {
 		return null;
 	}
 
-	delete allHeadingAnchors[ clientId ];
+	delete anchors[ clientId ];
 
 	let anchor = slug;
 	let i = 0;
 
 	// If the anchor already exists in another heading, append -i.
-	while ( Object.values( allHeadingAnchors ).includes( anchor ) ) {
+	while ( Object.values( anchors ).includes( anchor ) ) {
 		i += 1;
 		anchor = slug + '-' + i;
 	}
 
 	return anchor;
+};
+
+/**
+ * Set the anchor for a heading.
+ *
+ * @param {string}      clientId The block ID.
+ * @param {string|null} anchor   The block anchor.
+ */
+export const setAnchor = ( clientId, anchor ) => {
+	anchors[ clientId ] = anchor;
 };

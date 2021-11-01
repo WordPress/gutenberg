@@ -141,6 +141,10 @@ class Gutenberg_REST_Templates_Controller extends WP_REST_Controller {
 		if ( isset( $request['area'] ) ) {
 			$query['area'] = $request['area'];
 		}
+		if ( isset( $request['post_type'] ) ) {
+			$query['post_type'] = $request['post_type'];
+		}
+
 		$templates = array();
 		foreach ( gutenberg_get_block_templates( $query, $this->post_type ) as $template ) {
 			$data        = $this->prepare_item_for_response( $template, $request );
@@ -483,10 +487,18 @@ class Gutenberg_REST_Templates_Controller extends WP_REST_Controller {
 	 */
 	public function get_collection_params() {
 		return array(
-			'context' => $this->get_context_param(),
-			'wp_id'   => array(
+			'context'   => $this->get_context_param(),
+			'wp_id'     => array(
 				'description' => __( 'Limit to the specified post id.', 'gutenberg' ),
 				'type'        => 'integer',
+			),
+			'area'      => array(
+				'description' => __( 'Limit to the specified template part area.', 'gutenberg' ),
+				'type'        => 'string',
+			),
+			'post_type' => array(
+				'description' => __( 'Post type to get the templates for.', 'gutenberg' ),
+				'type'        => 'string',
 			),
 		);
 	}
