@@ -21,16 +21,9 @@ const addParagraphsAndColumnsDemo = async () => {
 	await clickBlockAppender();
 	await page.keyboard.type( 'First paragraph' );
 	await page.keyboard.press( 'Enter' );
-	await page.keyboard.type( '/columns' );
-	await page.waitForXPath(
-		`//*[contains(@class, "components-autocomplete__result") and contains(@class, "is-selected") and contains(text(), 'Columns')]`
-	);
-	await page.keyboard.press( 'Enter' );
+	await insertBlock( 'Columns' );
 
-	// Navigate into the placeholder and activate the 50/50 option.
-	await page.keyboard.press( 'ArrowDown' );
-	await page.keyboard.press( 'Space' );
-	await page.keyboard.press( 'Tab' );
+	// Press the 50/50 option.
 	await page.keyboard.press( 'Tab' );
 	await page.keyboard.press( 'Space' );
 
@@ -557,7 +550,6 @@ describe( 'Writing Flow', () => {
 
 	it( 'should not have a dead zone above an aligned block', async () => {
 		await page.keyboard.press( 'Enter' );
-		await page.keyboard.type( '1' );
 		await page.keyboard.press( 'Enter' );
 		await page.keyboard.type( '/image' );
 		await page.keyboard.press( 'Enter' );
@@ -568,7 +560,9 @@ describe( 'Writing Flow', () => {
 		await wideButton.click();
 
 		// Select the previous block.
-		await page.keyboard.press( 'ArrowUp' );
+		await page.click( '[data-type="core/paragraph"]' );
+
+		await page.keyboard.type( '1' );
 
 		// Confirm correct setup.
 		expect( await getEditedPostContent() ).toMatchSnapshot();
@@ -594,21 +588,16 @@ describe( 'Writing Flow', () => {
 		await page.mouse.click( x, lowerInserterY );
 
 		const type = await page.evaluate( () =>
-			document.activeElement.getAttribute( 'data-type' )
+			document.activeElement.getAttribute( 'aria-label' )
 		);
 
-		expect( type ).toBe( 'core/image' );
+		expect( type ).toBe( 'Image' );
 	} );
 
 	it( 'should only consider the content as one tab stop', async () => {
 		await page.keyboard.press( 'Enter' );
-		await page.keyboard.type( '/table' );
-		await page.keyboard.press( 'Enter' );
-		// Move into the placeholder UI.
-		await page.keyboard.press( 'ArrowDown' );
-		await page.keyboard.press( 'Space' );
+		await insertBlock( 'Table' );
 		// Tab to the "Create table" button.
-		await page.keyboard.press( 'Tab' );
 		await page.keyboard.press( 'Tab' );
 		await page.keyboard.press( 'Tab' );
 		// Create the table.
@@ -623,10 +612,8 @@ describe( 'Writing Flow', () => {
 		// The content should only have one tab stop.
 		await page.keyboard.press( 'Tab' );
 		expect(
-			await page.evaluate( () =>
-				document.activeElement.getAttribute( 'aria-label' )
-			)
-		).toBe( 'Post' );
+			await page.evaluate( () => document.activeElement.textContent )
+		).toBe( 'Open document settings' );
 		await pressKeyWithModifier( 'shift', 'Tab' );
 		await pressKeyWithModifier( 'shift', 'Tab' );
 		expect(
