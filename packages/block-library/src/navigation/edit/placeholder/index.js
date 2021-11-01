@@ -157,6 +157,7 @@ export default function NavigationPlaceholder( {
 										text={ __( 'Add existing menu' ) }
 										icon={ chevronDown }
 										toggleProps={ toggleProps }
+										popoverProps={ { isAlternate: true } }
 									>
 										{ ( { onClose } ) => (
 											<>
