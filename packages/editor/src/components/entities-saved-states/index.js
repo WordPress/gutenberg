@@ -19,7 +19,7 @@ import { close as closeIcon } from '@wordpress/icons';
  */
 import EntityTypeList from './entity-type-list';
 
-const TRANSLATED_SITE_PROTPERTIES = {
+const TRANSLATED_SITE_PROPERTIES = {
 	title: __( 'Title' ),
 	description: __( 'Tagline' ),
 	site_logo: __( 'Logo' ),
@@ -49,7 +49,7 @@ export default function EntitiesSavedStates( { close } ) {
 			siteEditsAsEntities.push( {
 				kind: 'root',
 				name: 'site',
-				title: TRANSLATED_SITE_PROTPERTIES[ property ] || property,
+				title: TRANSLATED_SITE_PROPERTIES[ property ] || property,
 				property,
 			} );
 		}
