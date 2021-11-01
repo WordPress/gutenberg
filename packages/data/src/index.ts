@@ -9,7 +9,7 @@ import combineReducers from 'turbo-combine-reducers';
 import defaultRegistry from './default-registry';
 import * as plugins from './plugins';
 
-/** @typedef {import('./types').WPDataStore} WPDataStore */
+/** @typedef {import('./types').StoreDefinition} WPDataStore */
 
 export { default as withSelect } from './components/with-select';
 export { default as withDispatch } from './components/with-dispatch';

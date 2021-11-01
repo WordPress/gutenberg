@@ -11,7 +11,7 @@ import createCoreDataStore from './store';
 import { STORE_NAME } from './store/name';
 import { createEmitter } from './utils/emitter';
 
-/** @typedef {import('./types').WPDataStore} WPDataStore */
+/** @typedef {import('./types').StoreDefinition} WPDataStore */
 
 /**
  * @typedef {Object} WPDataRegistry An isolated orchestrator of store registrations.

@@ -8,7 +8,7 @@ import { isObject } from 'lodash';
  */
 import { createRegistryControl } from './factory';
 
-/** @typedef {import('./types').WPDataStore} WPDataStore */
+/** @typedef {import('./types').StoreDefinition} WPDataStore */
 
 const SELECT = '@@data/SELECT';
 const RESOLVE_SELECT = '@@data/RESOLVE_SELECT';

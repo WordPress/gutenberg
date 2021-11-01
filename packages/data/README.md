@@ -368,12 +368,12 @@ const store = createReduxStore( 'demo', {
 
 _Parameters_
 
--   _key_ `string`: Unique namespace identifier.
--   _options_ `WPDataReduxStoreConfig`: Registered store options, with properties describing reducer, actions, selectors, and resolvers.
+-   _key_ `RSCName< Config >`: Unique namespace identifier.
+-   _options_ `Config`: Registered store options, with properties describing reducer, actions, selectors, and resolvers.
 
 _Returns_
 
--   `WPDataStore`: Store Object.
+-   `StoreDefinition< Config >`: Store Object.
 
 ### createRegistry
 

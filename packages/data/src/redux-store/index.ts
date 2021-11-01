@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { createStore, applyMiddleware } from 'redux';
+import { Store as ReduxNativeStore, createStore, applyMiddleware } from 'redux';
 import { flowRight, get, mapValues, omit } from 'lodash';
 import combineReducers from 'turbo-combine-reducers';
 import EquivalentKeyMap from 'equivalent-key-map';
@@ -22,29 +22,72 @@ import metadataReducer from './metadata/reducer';
 import * as metadataSelectors from './metadata/selectors';
 import * as metadataActions from './metadata/actions';
 
-/** @typedef {import('../types').WPDataRegistry} WPDataRegistry */
-/** @typedef {import('../types').WPDataStore} WPDataStore */
-/** @typedef {import('../types').WPDataReduxStoreConfig} WPDataReduxStoreConfig */
+import type {
+	AdvancedResolver,
+	GenConfig,
+	Of,
+	RSCActions,
+	RSCName,
+	RSCSelectors,
+	RSCState,
+	RSCResolvers,
+	StoreDefinition,
+} from '../types';
+
+interface ResolverCache< Config extends GenConfig > {
+	isRunning(
+		selectorName: keyof RSCSelectors< Config >,
+		args: unknown[]
+	): boolean;
+	clear( selectorName: keyof RSCSelectors< Config >, args: unknown[] ): void;
+	markAsRunning(
+		selectorName: keyof RSCSelectors< Config >,
+		args: unknown[]
+	): void;
+}
+
+interface ReduxStore< Config extends GenConfig >
+	extends Omit<
+		ReduxNativeStore< {
+			metadata: Of< unknown >;
+			root: RSCState< Config >;
+		} >,
+		'dispatch' | 'getState'
+	> {
+	__unstableOriginalGetState(): {
+		metadata: Of< unknown >;
+		root: RSCState< Config >;
+	};
+	dispatch< Action extends keyof RSCActions< Config > >(
+		action: RSCActions< Config >[ Action ]
+	): unknown;
+	getActions(): RSCActions< Config >;
+	getResolveSelectors(): RSCResolvers< Config >;
+	getSelectors(): RSCSelectors< Config >;
+	getState(): RSCState< Config >;
+}
 
 /**
  * Create a cache to track whether resolvers started running or not.
  *
- * @return {Object} Resolvers Cache.
+ * @return Resolvers Cache.
  */
 function createResolversCache() {
-	const cache = {};
+	const cache: Record< string, EquivalentKeyMap< unknown[], boolean > > = {};
 	return {
-		isRunning( selectorName, args ) {
-			return cache[ selectorName ] && cache[ selectorName ].get( args );
+		isRunning( selectorName: string, args: unknown[] ) {
+			return !! (
+				cache[ selectorName ] && cache[ selectorName ].get( args )
+			);
 		},
 
-		clear( selectorName, args ) {
+		clear( selectorName: string, args: unknown[] ) {
 			if ( cache[ selectorName ] ) {
 				cache[ selectorName ].delete( args );
 			}
 		},
 
-		markAsRunning( selectorName, args ) {
+		markAsRunning( selectorName: string, args: unknown[] ) {
 			if ( ! cache[ selectorName ] ) {
 				cache[ selectorName ] = new EquivalentKeyMap();
 			}
@@ -70,14 +113,17 @@ function createResolversCache() {
  * } );
  * ```
  *
- * @param {string}                 key     Unique namespace identifier.
- * @param {WPDataReduxStoreConfig} options Registered store options, with properties
- *                                         describing reducer, actions, selectors,
- *                                         and resolvers.
+ * @param  key     Unique namespace identifier.
+ * @param  options Registered store options, with properties
+ *                 describing reducer, actions, selectors,
+ *                 and resolvers.
  *
- * @return {WPDataStore} Store Object.
+ * @return Store  Object.
  */
-export default function createReduxStore( key, options ) {
+export default function createReduxStore< Config extends GenConfig >(
+	key: RSCName< Config >,
+	options: Config
+): StoreDefinition< Config > {
 	return {
 		name: key,
 		instantiate: ( registry ) => {
@@ -86,14 +132,17 @@ export default function createReduxStore( key, options ) {
 				registry,
 				get dispatch() {
 					return Object.assign(
-						( action ) => store.dispatch( action ),
+						< Action extends keyof RSCActions< Config > >(
+							action: RSCActions< Config >[ Action ]
+						) => store.dispatch( action ),
 						getActions()
 					);
 				},
 				get select() {
 					return Object.assign(
-						( selector ) =>
-							selector( store.__unstableOriginalGetState() ),
+						< SelectorName extends keyof RSCSelectors< Config > >(
+							selector: RSCSelectors< Config >[ SelectorName ]
+						) => selector( store.__unstableOriginalGetState() ),
 						getSelectors()
 					);
 				},
@@ -102,12 +151,12 @@ export default function createReduxStore( key, options ) {
 				},
 			};
 
-			const store = instantiateReduxStore(
+			const store = ( instantiateReduxStore(
 				key,
 				options,
 				registry,
 				thunkArgs
-			);
+			) as unknown ) as ReduxStore< Config >;
 			const resolversCache = createResolversCache();
 
 			let resolvers;
@@ -123,8 +172,10 @@ export default function createReduxStore( key, options ) {
 				{
 					...mapValues(
 						metadataSelectors,
-						( selector ) => ( state, ...args ) =>
-							selector( state.metadata, ...args )
+						( selector ) => (
+							state: RSCState< Config >,
+							...args: Parameters< typeof selector >
+						) => selector( state.metadata, ...args )
 					),
 					...mapValues( options.selectors, ( selector ) => {
 						if ( selector.isRegistrySelector ) {
@@ -157,14 +208,16 @@ export default function createReduxStore( key, options ) {
 			// We have some modules monkey-patching the store object
 			// It's wrong to do so but until we refactor all of our effects to controls
 			// We need to keep the same "store" instance here.
-			store.__unstableOriginalGetState = store.getState;
+			store.__unstableOriginalGetState = ( ( store as unknown ) as ReduxNativeStore< {
+				root: RSCState< Config >;
+			} > ).getState;
 			store.getState = () => store.__unstableOriginalGetState().root;
 
 			// Customize subscribe behavior to call listeners only on effective change,
 			// not on every dispatch.
 			const subscribe =
 				store &&
-				( ( listener ) => {
+				( ( listener: () => void ) => {
 					let lastState = store.__unstableOriginalGetState();
 					return store.subscribe( () => {
 						const state = store.__unstableOriginalGetState();
@@ -197,15 +250,20 @@ export default function createReduxStore( key, options ) {
 /**
  * Creates a redux store for a namespace.
  *
- * @param {string}         key       Unique namespace identifier.
- * @param {Object}         options   Registered store options, with properties
- *                                   describing reducer, actions, selectors,
- *                                   and resolvers.
- * @param {WPDataRegistry} registry  Registry reference.
- * @param {Object}         thunkArgs Argument object for the thunk middleware.
- * @return {Object} Newly created redux store.
+ * @param  key       Unique namespace identifier.
+ * @param  options   Registered store options, with properties
+ *                   describing reducer, actions, selectors,
+ *                   and resolvers.
+ * @param  registry  Registry reference.
+ * @param  thunkArgs Argument object for the thunk middleware.
+ * @return Newly created redux store.
  */
-function instantiateReduxStore( key, options, registry, thunkArgs ) {
+function instantiateReduxStore< Config extends GenConfig >(
+	key: string,
+	options: Config,
+	registry: unknown,
+	thunkArgs: unknown
+) {
 	const controls = {
 		...options.controls,
 		...builtinControls,
@@ -254,14 +312,21 @@ function instantiateReduxStore( key, options, registry, thunkArgs ) {
 /**
  * Maps selectors to a store.
  *
- * @param {Object} selectors Selectors to register. Keys will be used as the
- *                           public facing API. Selectors will get passed the
- *                           state as first argument.
- * @param {Object} store     The store to which the selectors should be mapped.
- * @return {Object} Selectors mapped to the provided store.
+ * @param  selectors Selectors to register. Keys will be used as the
+ *                   public facing API. Selectors will get passed the
+ *                   state as first argument.
+ * @param  store     The store to which the selectors should be mapped.
+ * @return  electors mapped to the provided store.
  */
-function mapSelectors( selectors, store ) {
-	const createStateSelector = ( registrySelector ) => {
+function mapSelectors< Config extends GenConfig >(
+	selectors: RSCSelectors< Config >,
+	store: ReduxStore< Config >
+) {
+	const createStateSelector = <
+		SelectorName extends keyof RSCSelectors< Config >
+	>(
+		registrySelector: RSCSelectors< Config >[ SelectorName ]
+	) => {
 		const selector = function runSelector() {
 			// This function is an optimized implementation of:
 			//
@@ -289,13 +354,18 @@ function mapSelectors( selectors, store ) {
 /**
  * Maps actions to dispatch from a given store.
  *
- * @param {Object} actions Actions to register.
- * @param {Object} store   The redux store to which the actions should be mapped.
+ * @param  actions Actions to register.
+ * @param  store   The redux store to which the actions should be mapped.
  *
- * @return {Object} Actions mapped to the redux store provided.
+ * @return Actions mapped to the redux store provided.
  */
-function mapActions( actions, store ) {
-	const createBoundAction = ( action ) => ( ...args ) => {
+function mapActions< Config extends GenConfig >(
+	actions: RSCActions< Config >,
+	store: ReduxStore< Config >
+) {
+	const createBoundAction = < ActionName extends keyof RSCActions< Config > >(
+		action: RSCActions< Config >[ ActionName ]
+	) => ( ...args: Parameters< RSCActions< Config >[ ActionName ] > ) => {
 		return Promise.resolve( store.dispatch( action( ...args ) ) );
 	};
 
@@ -305,12 +375,15 @@ function mapActions( actions, store ) {
 /**
  * Maps selectors to functions that return a resolution promise for them
  *
- * @param {Object} selectors Selectors to map.
- * @param {Object} store     The redux store the selectors select from.
+ * @param  selectors Selectors to map.
+ * @param  store     The redux store the selectors select from.
  *
- * @return {Object} Selectors mapped to their resolution functions.
+ * @return  Selectors mapped to their resolution functions.
  */
-function mapResolveSelectors( selectors, store ) {
+function mapResolveSelectors< Config extends GenConfig >(
+	selectors: RSCSelectors< Config >,
+	store: ReduxStore< Config >
+) {
 	return mapValues(
 		omit( selectors, [
 			'getIsResolving',
@@ -346,17 +419,22 @@ function mapResolveSelectors( selectors, store ) {
  * Resolvers are side effects invoked once per argument set of a given selector call,
  * used in ensuring that the data needs for the selector are satisfied.
  *
- * @param {Object} resolvers      Resolvers to register.
- * @param {Object} selectors      The current selectors to be modified.
- * @param {Object} store          The redux store to which the resolvers should be mapped.
- * @param {Object} resolversCache Resolvers Cache.
+ * @param  resolvers      Resolvers to register.
+ * @param  selectors      The current selectors to be modified.
+ * @param  store          The redux store to which the resolvers should be mapped.
+ * @param  resolversCache Resolvers Cache.
  */
-function mapResolvers( resolvers, selectors, store, resolversCache ) {
+function mapResolvers< Config extends GenConfig >(
+	resolvers: RSCResolvers< Config >,
+	selectors: RSCSelectors< Config >,
+	store: ReduxStore< Config >,
+	resolversCache: ResolverCache< Config >
+) {
 	// The `resolver` can be either a function that does the resolution, or, in more advanced
 	// cases, an object with a `fullfill` method and other optional methods like `isFulfilled`.
 	// Here we normalize the `resolver` function to an object with `fulfill` method.
 	const mappedResolvers = mapValues( resolvers, ( resolver ) => {
-		if ( resolver.fulfill ) {
+		if ( ( resolver as AdvancedResolver ).fulfill ) {
 			return resolver;
 		}
 
@@ -366,20 +444,30 @@ function mapResolvers( resolvers, selectors, store, resolversCache ) {
 		};
 	} );
 
-	const mapSelector = ( selector, selectorName ) => {
+	const mapSelector = <
+		SelectorName extends keyof RSCSelectors< Config > & string
+	>(
+		selector: RSCSelectors< Config >[ SelectorName ],
+		selectorName: SelectorName
+	) => {
 		const resolver = resolvers[ selectorName ];
 		if ( ! resolver ) {
 			selector.hasResolver = false;
 			return selector;
 		}
 
-		const selectorResolver = ( ...args ) => {
+		const selectorResolver = (
+			...args: Parameters< RSCSelectors< Config >[ SelectorName ] >
+		): ReturnType< RSCSelectors< Config >[ SelectorName ] > => {
 			async function fulfillSelector() {
 				const state = store.getState();
+				const isFulfilled =
+					'isFulfilled' in resolver && resolver.isFulfilled;
+
 				if (
 					resolversCache.isRunning( selectorName, args ) ||
-					( typeof resolver.isFulfilled === 'function' &&
-						resolver.isFulfilled( state, ...args ) )
+					( typeof isFulfilled === 'function' &&
+						isFulfilled( state, ...args ) )
 				) {
 					return;
 				}
@@ -415,7 +503,7 @@ function mapResolvers( resolvers, selectors, store, resolversCache ) {
 				} );
 			}
 
-			fulfillSelector( ...args );
+			fulfillSelector();
 			return selector( ...args );
 		};
 		selectorResolver.hasResolver = true;
@@ -431,12 +519,17 @@ function mapResolvers( resolvers, selectors, store, resolversCache ) {
 /**
  * Calls a resolver given arguments
  *
- * @param {Object} store        Store reference, for fulfilling via resolvers
- * @param {Object} resolvers    Store Resolvers
- * @param {string} selectorName Selector name to fulfill.
- * @param {Array}  args         Selector Arguments.
+ * @param  store        Store reference, for fulfilling via resolvers
+ * @param  resolvers    Store Resolvers
+ * @param  selectorName Selector name to fulfill.
+ * @param  args         Selector Arguments.
  */
-async function fulfillResolver( store, resolvers, selectorName, ...args ) {
+async function fulfillResolver< Config extends GenConfig >(
+	store: ReduxStore< Config >,
+	resolvers: RSCResolvers< Config >,
+	selectorName: keyof RSCActions< Config >,
+	...args: unknown[]
+) {
 	const resolver = get( resolvers, [ selectorName ] );
 	if ( ! resolver ) {
 		return;
