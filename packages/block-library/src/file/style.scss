@@ -18,8 +18,9 @@
 		background: #32373c;
 		border-radius: 2em;
 		color: $white;
-		font-size: 0.8em;
-		padding: 0.5em 1em;
+		font-size: inherit;
+		font-family: inherit;
+		padding: calc(0.667em + 2px) calc(1.333em + 2px); // Make padding match button block padding.
 	}
 
 	a.wp-block-file__button {

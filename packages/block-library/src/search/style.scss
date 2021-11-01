@@ -1,13 +1,14 @@
 .wp-block-search__button {
 	background: #f7f7f7;
-	border: 1px solid #ccc;
-	padding: 0.375em 0.625em;
+	border: none;
 	color: #32373c;
-	margin-left: 0.625em;
-	word-break: normal;
+	cursor: pointer;
 	font-size: inherit;
 	font-family: inherit;
 	line-height: inherit;
+	margin-left: 0.625em;
+	padding: calc(0.667em + 2px) calc(1.333em + 2px); // Make padding match button block padding.
+	word-break: normal;
 
 	&.has-icon {
 		line-height: 0;
@@ -62,7 +63,7 @@
 	}
 
 	.wp-block-search__button {
-		padding: 0.125em 0.5em;
+		padding: calc(0.667em - 2px) calc(1.333em - 2px); // Make padding match button block padding, minus the padding from being placed inside the search wrapper.
 	}
 }
 
