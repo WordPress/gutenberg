@@ -424,6 +424,13 @@ class WP_Theme_JSON_Gutenberg {
 				self::$blocks_metadata[ $block_name ]['duotone'] = $block_type->supports['color']['__experimentalDuotone'];
 			}
 
+			if (
+				isset( $block_type->supports['__experimentalAdditionalSelectors'] ) &&
+				is_string( $block_type->supports['__experimentalAdditionalSelectors'] )
+			) {
+				self::$blocks_metadata[ $block_name ]['selector'] .= ', ' . $block_type->supports['__experimentalAdditionalSelectors'];
+			}
+
 			// Assign defaults, then overwrite those that the block sets by itself.
 			// If the block selector is compounded, will append the element to each
 			// individual block selector.

@@ -77,7 +77,8 @@
 			"radius": true,
 			"__experimentalSkipSerialization": true
 		},
-		"__experimentalSelector": ".wp-block-button__link"
+		"__experimentalSelector": ".wp-block-button__link",
+		"__experimentalAdditionalSelectors": ".wp-block-search__button, .wp-block-file .wp-block-file__button"
 	},
 	"styles": [
 		{ "name": "fill", "label": "Fill", "isDefault": true },
