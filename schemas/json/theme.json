@@ -1087,7 +1087,7 @@
 				"type": "object",
 				"properties": {
 					"name": {
-						"description": "Filename ,without extension, of the template in the block-templates folder.\nGutenberg plugin required.",
+						"description": "Filename, without extension, of the template in the block-templates folder.\nGutenberg plugin required.",
 						"type": "string"
 					},
 					"title": {
@@ -1115,6 +1115,10 @@
 				"properties": {
 					"name": {
 						"description": "Filename, without extension, of the template in the block-template-parts folder.\nGutenberg plugin required.",
+						"type": "string"
+					},
+					"title": {
+						"description": "Title of the template, translatable.\nGutenberg plugin required.",
 						"type": "string"
 					},
 					"area": {
