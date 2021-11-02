@@ -167,12 +167,7 @@ async function insertEmbed( URL ) {
 		`//*[contains(@class, "components-autocomplete__result") and contains(@class, "is-selected") and contains(text(), 'Embed')]`
 	);
 	await page.keyboard.press( 'Enter' );
-	await page.evaluate(
-		() =>
-			new Promise( ( resolve ) => {
-				setTimeout( resolve );
-			} )
-	);
+	await page.evaluate( () => new Promise( requestIdleCallback ) );
 	await page.keyboard.type( URL );
 	await page.keyboard.press( 'Enter' );
 }
@@ -269,6 +264,7 @@ describe( 'Embedding content', () => {
 	it( 'should allow the user to try embedding a failed URL again', async () => {
 		// URL that can't be embedded.
 		await insertEmbed( 'https://twitter.com/wooyaygutenberg123454312' );
+		await page.evaluate( () => new Promise( requestIdleCallback ) );
 
 		// Set up a different mock to make sure that try again actually does make the request again.
 		await setUpResponseMocking( [
