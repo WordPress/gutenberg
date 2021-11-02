@@ -10,7 +10,7 @@ import type { Ref } from 'react';
 import ToolsPanelHeader from '../tools-panel-header';
 import { ToolsPanelContext } from '../context';
 import { useToolsPanel } from './hook';
-import { View } from '../../view';
+import { Grid } from '../../grid';
 import { contextConnect, WordPressComponentProps } from '../../ui/context';
 import type { ToolsPanelProps } from '../types';
 
@@ -24,11 +24,14 @@ const ToolsPanel = (
 		panelContext,
 		resetAllItems,
 		toggleItem,
-		...toolsPanelProps
+		className,
 	} = useToolsPanel( props );
 
+	// Props are not directly passed through to avoid exposing Grid props
+	// until agreement has been reached on how ToolsPanel layout should be
+	// handled.
 	return (
-		<View { ...toolsPanelProps } ref={ forwardedRef }>
+		<Grid columns={ 2 } className={ className } ref={ forwardedRef }>
 			<ToolsPanelContext.Provider value={ panelContext }>
 				<ToolsPanelHeader
 					label={ label }
@@ -37,7 +40,7 @@ const ToolsPanel = (
 				/>
 				{ children }
 			</ToolsPanelContext.Provider>
-		</View>
+		</Grid>
 	);
 };
 

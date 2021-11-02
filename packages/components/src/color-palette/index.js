@@ -27,6 +27,7 @@ export default function ColorPalette( {
 	className,
 	colors,
 	disableCustomColors = false,
+	enableAlpha,
 	onChange,
 	value,
 } ) {
@@ -73,11 +74,12 @@ export default function ColorPalette( {
 		<ColorPicker
 			color={ value }
 			onChange={ ( color ) => onChange( color ) }
+			enableAlpha={ enableAlpha }
 		/>
 	);
 
 	return (
-		<VStack spacing={ 3 }>
+		<VStack spacing={ 3 } className={ className }>
 			{ ! disableCustomColors && (
 				<Dropdown
 					renderContent={ renderCustomColorPicker }
@@ -96,7 +98,6 @@ export default function ColorPalette( {
 				/>
 			) }
 			<CircularOptionPicker
-				className={ className }
 				options={ colorOptions }
 				actions={
 					!! clearable && (

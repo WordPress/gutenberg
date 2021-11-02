@@ -19,7 +19,7 @@ class WP_REST_URL_Details_Controller extends WP_REST_Controller {
 	 * Constructs the controller.
 	 */
 	public function __construct() {
-		$this->namespace = '__experimental';
+		$this->namespace = 'wp-block-editor/v1';
 		$this->rest_base = 'url-details';
 	}
 

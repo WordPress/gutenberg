@@ -179,11 +179,11 @@
 			"dropCap": true,
 			"customFontSize": true,
 			"customLineHeight": false,
-			"customFontStyle": true,
-			"customFontWeight": true,
-			"customTextTransforms": true,
-			"customTextDecorations": true,
-			"customLetterSpacing": true,
+			"fontStyle": true,
+			"fontWeight": true,
+			"textTransform": true,
+			"textDecoration": true,
+			"letterSpacing": true,
 			"fontSizes": [
 				{
 					"name": "Small",
@@ -219,10 +219,10 @@
 			"units": [ "px", "em", "rem", "vh", "vw", "%" ]
 		},
 		"border": {
-			"customColor": false,
+			"color": false,
 			"customRadius": false,
-			"customStyle": false,
-			"customWidth": false
+			"style": false,
+			"width": false
 		},
 		"blocks": {
 			"core/button": {
@@ -232,10 +232,10 @@
 			},
 			"core/pullquote": {
 				"border": {
-					"customColor": true,
+					"color": true,
 					"customRadius": true,
-					"customStyle": true,
-					"customWidth": true
+					"style": true,
+					"width": true
 				}
 			}
 		}

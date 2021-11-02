@@ -82,10 +82,10 @@ class WP_Theme_JSON_Gutenberg {
 
 	const VALID_SETTINGS = array(
 		'border'     => array(
-			'customColor'  => null,
+			'color'        => null,
 			'customRadius' => null,
-			'customStyle'  => null,
-			'customWidth'  => null,
+			'style'        => null,
+			'width'        => null,
 		),
 		'color'      => array(
 			'background'     => null,
@@ -110,16 +110,16 @@ class WP_Theme_JSON_Gutenberg {
 			'units'         => null,
 		),
 		'typography' => array(
-			'customFontSize'        => null,
-			'customFontStyle'       => null,
-			'customFontWeight'      => null,
-			'customLetterSpacing'   => null,
-			'customLineHeight'      => null,
-			'customTextDecorations' => null,
-			'customTextTransforms'  => null,
-			'dropCap'               => null,
-			'fontFamilies'          => null,
-			'fontSizes'             => null,
+			'customFontSize'   => null,
+			'customLineHeight' => null,
+			'dropCap'          => null,
+			'fontFamilies'     => null,
+			'fontSizes'        => null,
+			'fontStyle'        => null,
+			'fontWeight'       => null,
+			'letterSpacing'    => null,
+			'textDecoration'   => null,
+			'textTransform'    => null,
 		),
 	);
 
@@ -290,6 +290,12 @@ class WP_Theme_JSON_Gutenberg {
 		// We can remove it at that point.
 		if ( ! isset( $theme_json['version'] ) || 0 === $theme_json['version'] ) {
 			$theme_json = WP_Theme_JSON_Schema_V0::parse( $theme_json );
+		}
+
+		// Provide backwards compatibility for settings that did not land in 5.8
+		// and have had their `custom` prefixed removed since.
+		if ( 1 === $theme_json['version'] ) {
+			$theme_json = WP_Theme_JSON_Schema_V1::parse( $theme_json );
 		}
 
 		$valid_block_names   = array_keys( self::get_blocks_metadata() );
@@ -1432,6 +1438,12 @@ class WP_Theme_JSON_Gutenberg {
 
 		if ( ! isset( $theme_json['version'] ) || 0 === $theme_json['version'] ) {
 			$theme_json = WP_Theme_JSON_Schema_V0::parse( $theme_json );
+		}
+
+		// Provide backwards compatibility for settings that did not land in 5.8
+		// and have had their `custom` prefixed removed since.
+		if ( 1 === $theme_json['version'] ) {
+			$theme_json = WP_Theme_JSON_Schema_V1::parse( $theme_json );
 		}
 
 		$valid_block_names   = array_keys( self::get_blocks_metadata() );
