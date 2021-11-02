@@ -28,6 +28,7 @@ import {
 
 function FontSizePicker(
 	{
+		__unstableSize,
 		fallbackFontSize,
 		fontSizes = [],
 		disableCustomFontSizes = false,
@@ -148,6 +149,7 @@ function FontSizePicker(
 					shouldUseSelectControl &&
 					! showCustomValueControl && (
 						<CustomSelectControl
+							__unstableSize={ __unstableSize }
 							className={ `${ baseClassName }__select` }
 							label={ __( 'Font size' ) }
 							hideLabelFromVision
