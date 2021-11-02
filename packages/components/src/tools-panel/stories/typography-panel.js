@@ -122,6 +122,7 @@ export const TypographyPanel = () => {
 							isShownByDefault={ true }
 						>
 							<FontSizePicker
+								__unstableSize="large"
 								value={ fontSize }
 								onChange={ setFontSize }
 								fontSizes={ fontSizes }

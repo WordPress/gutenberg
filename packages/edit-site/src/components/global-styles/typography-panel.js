@@ -106,6 +106,7 @@ export default function TypographyPanel( { name } ) {
 			) }
 			{ supports.includes( 'fontSize' ) && (
 				<FontSizePicker
+					__unstableSize="large"
 					value={ fontSize }
 					onChange={ setFontSize }
 					fontSizes={ fontSizes }

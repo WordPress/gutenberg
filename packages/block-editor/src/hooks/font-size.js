@@ -142,6 +142,7 @@ export function FontSizeEdit( props ) {
 
 	return (
 		<FontSizePicker
+			__unstableSize="large"
 			onChange={ onChange }
 			value={ fontSizeValue }
 			withReset={ false }
