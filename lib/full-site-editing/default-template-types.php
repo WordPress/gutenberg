@@ -19,7 +19,7 @@ function gutenberg_get_default_template_types() {
 		),
 		'home'           => array(
 			'title'       => _x( 'Latest posts', 'Template name', 'gutenberg' ),
-			'description' => __( 'Displays as the site\'s home page when configured to display latest posts, or as the Posts page when a static home page it set.', 'gutenberg' ),
+			'description' => __( 'Displays as the site\'s home page, or as the Posts page when a static home page it set.', 'gutenberg' ),
 		),
 		'front-page'     => array(
 			'title'       => _x( 'Front Page', 'Template name', 'gutenberg' ),
