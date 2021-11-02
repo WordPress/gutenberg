@@ -61,24 +61,15 @@ function block_core_navigation_build_css_colors( $attributes ) {
  * Build an array with CSS classes and inline styles defining the typography
  * styling which will be applied to the navigation markup in the front-end.
  *
- * @param  array $attributes Navigation block attributes.
+ * @param  array $typography_supports Block support flags for typography features.
+ * @param  array $attributes          Navigation block attributes.
+ *
  * @return array Typography CSS classes and inline styles.
  */
-function block_core_navigation_build_css_typography( $attributes ) {
-	// The following config defines with block supports we are interested in
-	// having CSS classes and styles automatically generated.
-	// We wish to only handle the text-decoration support and deprecated font
-	// size attribute separately.
-	$typography_supports = array(
-		'__experimentalFontFamily'     => true,
-		'fontSize'                     => true,
-		'__experimentalFontStyle'      => true,
-		'__experimentalFontWeight'     => true,
-		'__experimentalLetterSpacing'  => true,
-		'lineHeight'                   => true,
-		'__experimentalTextDecoration' => false, // Deliberately skipping to apply manual class.
-		'__experimentalTextTransform'  => true,
-	);
+function block_core_navigation_build_css_typography( $typography_supports, $attributes ) {
+	// Explicitly set the `__experimentalTextDecoration` flag to false so that
+	// the Navigation block can manually apply a CSS class.
+	$typography_supports['__experimentalTextDecoration'] = false;
 
 	$typography = gutenberg_typography_generate_css_classes_and_styles( $typography_supports, $attributes );
 	$classes    = array();
@@ -300,8 +291,11 @@ function render_block_core_navigation( $attributes, $content, $block ) {
 	if ( empty( $inner_blocks ) ) {
 		return '';
 	}
+
+	$typography_supports = isset( $block->block_type->supports['typography'] ) ? $block->block_type->supports['typography'] : array();
+	$typography          = block_core_navigation_build_css_typography( $typography_supports, $attributes );
+
 	$colors     = block_core_navigation_build_css_colors( $attributes );
-	$typography = block_core_navigation_build_css_typography( $attributes );
 	$classes    = array_merge(
 		$colors['css_classes'],
 		$typography['css_classes'],
