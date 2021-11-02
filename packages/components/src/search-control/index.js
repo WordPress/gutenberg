@@ -9,25 +9,29 @@ import classnames from 'classnames';
 import { useInstanceId } from '@wordpress/compose';
 import { __ } from '@wordpress/i18n';
 import { Icon, search, closeSmall } from '@wordpress/icons';
-import { useRef } from '@wordpress/element';
+import { forwardRef } from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
 import { Button } from '../';
 import BaseControl from '../base-control';
+import { useCombinedRef } from '../utils';
 
-function SearchControl( {
-	className,
-	onChange,
-	value,
-	label,
-	placeholder = __( 'Search' ),
-	hideLabelFromVision = true,
-	help,
-} ) {
+function SearchControl(
+	{
+		className,
+		onChange,
+		value,
+		label,
+		placeholder = __( 'Search' ),
+		hideLabelFromVision = true,
+		help,
+	},
+	ref
+) {
 	const instanceId = useInstanceId( SearchControl );
-	const searchInput = useRef();
+	const searchInput = useCombinedRef( ref );
 	const id = `components-search-control-${ instanceId }`;
 
 	return (
@@ -67,4 +71,4 @@ function SearchControl( {
 	);
 }
 
-export default SearchControl;
+export default forwardRef( SearchControl );
