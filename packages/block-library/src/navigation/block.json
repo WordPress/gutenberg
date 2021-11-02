@@ -11,6 +11,10 @@
 	],
 	"textdomain": "default",
 	"attributes": {
+		"initialNavigationMenuArea": {
+			"type": "string",
+		  	"default": ""
+		},
 		"navigationMenuId": {
 			"type": "number"
 		},

@@ -656,24 +656,6 @@ function store_navigation_associations( $post_id ) {
 }
 add_action( 'save_post_wp_template_part', 'store_navigation_associations' );
 
-/**
- * Replaces {primary-menu} placeholders with the values stored in the database.
- *
- * @param $content
- * @return string
- */
-function _gutenberg_inject_navigation_associations_in_content ( $content ) {
-	$associations = get_option( 'navigation_associations', array() );
-	foreach ( gutenberg_get_navigation_template_part_areas() as $area_name ) {
-		$content = str_replace(
-			'{' . $area_name . '}',
-			$associations[ $area_name ],
-			$content
-		);
-	}
-	return $content;
-}
-
 function gutenberg_get_navigation_template_part_areas() {
 	return array(
 		WP_TEMPLATE_PART_AREA_PRIMARY_MENU,

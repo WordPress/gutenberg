@@ -242,6 +242,16 @@ function render_block_core_navigation( $attributes, $content, $block ) {
 		$inner_blocks            = new WP_Block_List( $parsed_blocks, $attributes );
 	}
 
+	if (
+		array_key_exists( 'initialNavigationMenuArea', $attributes ) &&
+		empty( $attributes['navigationMenuId'] )
+	) {
+		$associations = get_option( 'navigation_associations', array() );
+		if ( ! empty( $associations[ $attributes['initialNavigationMenuArea'] ] ) ) {
+			$attributes['navigationMenuId'] = $associations[ $attributes['initialNavigationMenuArea'] ];
+		}
+	}
+
 	// Load inner blocks from the navigation post.
 	if ( array_key_exists( 'navigationMenuId', $attributes ) ) {
 		$navigation_post = get_post( $attributes['navigationMenuId'] );
