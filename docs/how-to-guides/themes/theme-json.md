@@ -616,6 +616,9 @@ Each block declares which style properties it exposes via the [block supports me
 {
 	"version": 1,
 	"styles": {
+		"border": {
+			"radius": "value"
+		},
 		"color": {
 			"background": "value",
 			"gradient": "value",
@@ -641,6 +644,7 @@ Each block declares which style properties it exposes via the [block supports me
 		},
 		"elements": {
 			"link": {
+				"border": {},
 				"color": {},
 				"spacing": {},
 				"typography": {}
@@ -654,6 +658,7 @@ Each block declares which style properties it exposes via the [block supports me
 		},
 		"blocks": {
 			"core/group": {
+				"border": {},
 				"color": {},
 				"spacing": {},
 				"typography": {},
@@ -690,6 +695,9 @@ Each block declares which style properties it exposes via the [block supports me
 			"gradient": "value",
 			"text": "value"
 		},
+		"filter": {
+			"duotone": "value"
+		},
 		"spacing": {
 			"blockGap": "value",
 			"margin": {
@@ -710,6 +718,7 @@ Each block declares which style properties it exposes via the [block supports me
 			"fontSize": "value",
 			"fontStyle": "value",
 			"fontWeight": "value",
+			"letterSpacing": "value",
 			"lineHeight": "value",
 			"textDecoration": "value",
 			"textTransform": "value"
