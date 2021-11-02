@@ -400,7 +400,9 @@ class Gutenberg_REST_Templates_Controller extends WP_REST_Controller {
 		$result = array(
 			'id'             => $template->id,
 			'theme'          => $template->theme,
-			'content'        => array( 'raw' => $template->content ),
+			'content'        => array(
+				'raw' => _gutenberg_inject_navigation_associations_in_content( $template->content ),
+			),
 			'slug'           => $template->slug,
 			'source'         => $template->source,
 			'type'           => $template->type,

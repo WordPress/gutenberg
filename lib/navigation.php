@@ -437,6 +437,28 @@ function gutenberg_register_navigation_post_type() {
 add_action( 'init', 'gutenberg_register_navigation_post_type' );
 
 /**
+ * ==========================
+ * ========= IDEA 1 =========
+ * ==========================
+ *
+ * On theme switch, take navigationMenuId from theme A template parts, and apply it to theme B template parts.
+ * Upsides:
+ * * New theme always gets the "primary", "secondary" etc. menus in its corresponding slots.
+ *
+ * Downsides:
+ * * Needs to look for the first available navigation block, it could be nested, missing etc. This should be easy to address.
+ * * Placing an intermediate template part between "Primary menu" and the navigation block would derail this function.
+ *   I think the only way of addressing it is not accepting intermediate template parts, perhaps via a new flavor of the template part block.
+ * * New template parts are stored in the database on theme switch.
+ * * It adds a new concept of "re-writing content".
+ *
+ * Questions:
+ * * Template parts are the source of truth, but they could be deleted. I'm not sure if that's a problem.
+ * * There are now two blocks instead of one. It uncovers we are really managing two entities, but
+ *   it also creates a more complex interaction. I like it, though. Do you?
+ */
+
+/**
  * Copies the navigationMenuId attribute from navigation template parts in the old theme, to
  * corresponding ones in the new theme.
  *
@@ -556,4 +578,117 @@ function get_navigation_template_part_names( $template_parts ) {
 
 // Set a priority such that WP_Theme_JSON_Resolver_Gutenberg still has contains the cached data.
 // This will clean the cache which may be unexpected, so it would be better to introduce a `before_theme_switch` action.
-add_action( 'switch_theme', 'gutenberg_migrate_nav_on_theme_switch', -200, 3 );
+
+// Uncomment to enable.
+// add_action( 'switch_theme', 'gutenberg_migrate_nav_on_theme_switch', -200, 3 );
+
+// IDEA 1 above is self contained and ends here.
+
+
+/**
+ * ==========================
+ * ========= IDEA 2 =========
+ * ==========================
+ *
+ * Parse navigation-related template parts on save, and store an association like {"primary-menu": 794} somewhere.
+ * When a new navigation-related template part is rendered for the first time, provide {"primary-menu": 794} to use
+ * as the initial value of the `navigationMenuId` attribute.
+ *
+ * Upsides:
+ * * Menus are matched between themes via a keyword.
+ *
+ * Downsides:
+ * * It involves a new concept of "template part placeholder" or a "variable". Or maybe it's not that new, looking at
+ *   _gutenberg_inject_theme_attribute_in_content? It could be an opportunity to formalize this injection.
+ * * It still wouldn't work if there's a nested template part between the "primary-menu" and the navigation block.
+ */
+
+
+/**
+ * When the navigation-related template part post is saved, extract the navigationMenuId it contains,
+ * and store it in the database for later.
+ *
+ * @param int $post_id Post ID.
+ */
+function store_navigation_associations( $post_id ) {
+	$template_part_post = get_post( $post_id );
+
+	// Only proceed if the template part represents a navigation.
+	$area_terms = get_the_terms( $template_part_post, 'wp_template_part_area' );
+	if ( is_wp_error( $area_terms ) || false === $area_terms ) {
+		return;
+	}
+
+	$area = $area_terms[0]->name;
+	if ( ! in_array( $area, gutenberg_get_navigation_template_part_areas(), true ) ) {
+		return;
+	}
+
+	// Only proceed if the template part is related to the current theme.
+	$theme_terms = get_the_terms( $post_id, 'wp_theme' );
+	if ( is_wp_error( $theme_terms ) || false === $theme_terms ) {
+		return;
+	}
+	$theme = $theme_terms[0]->name;
+	if ( get_stylesheet() !== $theme ) {
+		return;
+	}
+
+	// Get the first navigation menu ID from the post.
+	// @TODO: traverse the entire tree, not just the first block.
+	$blocks = parse_blocks( $template_part_post->post_content );
+	if (
+			! $blocks ||
+			'core/navigation' !== $blocks[0]['blockName'] ||
+			empty( $blocks[0]['attrs']['navigationMenuId'] )
+	) {
+		return;
+	}
+	$navigation_post_id = $blocks[0]['attrs']['navigationMenuId'];
+
+	// Update the area -> navigation ID map.
+	// Site options are a quick&dirty choice for now. We could use taxonomies, theme mods, or anything else here.
+	$updated_associations = array_merge(
+		get_option( 'navigation_associations', array() ),
+		array( $area => $navigation_post_id )
+	);
+	update_option( 'navigation_associations', $updated_associations );
+}
+add_action( 'save_post_wp_template_part', 'store_navigation_associations' );
+
+/**
+ * Replaces {primary-menu} placeholders with the values stored in the database.
+ *
+ * @param $content
+ * @return string
+ */
+function _gutenberg_inject_navigation_associations_in_content ( $content ) {
+	$associations = get_option( 'navigation_associations', array() );
+	foreach ( gutenberg_get_navigation_template_part_areas() as $area_name ) {
+		$content = str_replace(
+			'{' . $area_name . '}',
+			$associations[ $area_name ],
+			$content
+		);
+	}
+	return $content;
+}
+
+function gutenberg_get_navigation_template_part_areas() {
+	return array(
+		WP_TEMPLATE_PART_AREA_PRIMARY_MENU,
+	);
+}
+
+
+/**
+ * TODO: Make changing nested entities affect parent entities in Gutenberg
+ * example:
+ * <!-- wp:template-part {"slug":"header"} -->
+ *   <!-- wp:template-part {"slug":"primary-menu","tagName":"primary-menu","className":"primary-menu","layout":{"inherit":true}} -->
+ *     <!-- wp:navigation { "navigationMenuId": {primary-menu} } -->
+ *   <!-- /wp:template-part -->
+ * <!-- /wp:template-part -->
+ *
+ * If I set navigationMenuId to something else, it should save the primary-menu template part. Currently it doesn't and it seems like a bug.
+ */
