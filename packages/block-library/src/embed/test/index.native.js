@@ -13,7 +13,11 @@ import { Clipboard, Platform } from 'react-native';
 /**
  * WordPress dependencies
  */
-import { getBlockTypes, unregisterBlockType } from '@wordpress/blocks';
+import {
+	getBlockTypes,
+	setDefaultBlockName,
+	unregisterBlockType,
+} from '@wordpress/blocks';
 import fetchRequest from '@wordpress/api-fetch';
 import { store as coreStore } from '@wordpress/core-data';
 import { dispatch } from '@wordpress/data';
@@ -166,6 +170,7 @@ beforeAll( () => {
 	// block is added to empty posts.
 	registerBlock( paragraph );
 	registerBlock( embed );
+	setDefaultBlockName( paragraph.name );
 } );
 
 beforeEach( () => {
