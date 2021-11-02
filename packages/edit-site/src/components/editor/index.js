@@ -240,7 +240,11 @@ function Editor( { initialSettings, onError } ) {
 																	) }
 																</Notice>
 															) }
-														<KeyboardShortcuts />
+														<KeyboardShortcuts
+															openEntitiesSavedStates={
+																openEntitiesSavedStates
+															}
+														/>
 													</>
 												}
 												actions={
