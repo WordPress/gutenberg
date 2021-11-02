@@ -774,7 +774,7 @@ function gutenberg_extend_block_editor_styles_html() {
 
 	echo "<script>window.__editorAssets = $editor_assets</script>";
 }
-add_action( 'admin_footer-toplevel_page_gutenberg-edit-site', 'gutenberg_extend_block_editor_styles_html' );
+add_action( 'admin_footer-appearance_page_gutenberg-edit-site', 'gutenberg_extend_block_editor_styles_html' );
 add_action( 'admin_footer-post.php', 'gutenberg_extend_block_editor_styles_html' );
 add_action( 'admin_footer-post-new.php', 'gutenberg_extend_block_editor_styles_html' );
 add_action( 'admin_footer-widgets.php', 'gutenberg_extend_block_editor_styles_html' );

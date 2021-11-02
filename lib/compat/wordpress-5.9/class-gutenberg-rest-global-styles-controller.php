@@ -11,13 +11,6 @@
  */
 class Gutenberg_REST_Global_Styles_Controller extends WP_REST_Controller {
 	/**
-	 * Post type.
-	 *
-	 * @var string
-	 */
-	protected $post_type;
-
-	/**
 	 * Constructor.
 	 */
 	public function __construct() {
@@ -31,6 +24,25 @@ class Gutenberg_REST_Global_Styles_Controller extends WP_REST_Controller {
 	 * @return void
 	 */
 	public function register_routes() {
+		// List themes global styles.
+		register_rest_route(
+			$this->namespace,
+			'/' . $this->rest_base . '/themes/(?P<stylesheet>[^.\/]+(?:\/[^.\/]+)?)',
+			array(
+				array(
+					'methods'             => WP_REST_Server::READABLE,
+					'callback'            => array( $this, 'get_theme_item' ),
+					'permission_callback' => array( $this, 'get_theme_item_permissions_check' ),
+					'args'                => array(
+						'stylesheet' => array(
+							'description' => __( 'The theme identifier', 'gutenberg' ),
+							'type'        => 'string',
+						),
+					),
+				),
+			)
+		);
+
 		// Lists/updates a single gloval style variation based on the given id.
 		register_rest_route(
 			$this->namespace,
@@ -155,31 +167,27 @@ class Gutenberg_REST_Global_Styles_Controller extends WP_REST_Controller {
 		$changes     = new stdClass();
 		$changes->ID = $request['id'];
 
-		$post         = get_post( $request['id'] );
-		$empty_config = array(
-			'settings' => new stdClass(),
-			'styles'   => new stdClass(),
-		);
+		$post            = get_post( $request['id'] );
+		$existing_config = array();
 		if ( $post ) {
-			$existing_config = json_decode( $post->post_content, true );
-			if ( ! isset( $existing_config['isGlobalStylesUserThemeJSON'] ) ||
+			$existing_config     = json_decode( $post->post_content, true );
+			$json_decoding_error = json_last_error();
+			if ( JSON_ERROR_NONE !== $json_decoding_error || ! isset( $existing_config['isGlobalStylesUserThemeJSON'] ) ||
 				! $existing_config['isGlobalStylesUserThemeJSON'] ) {
-				$existing_config = $empty_config;
+				$existing_config = array();
 			}
-		} else {
-			$existing_config = $empty_config;
 		}
 
 		if ( isset( $request['styles'] ) || isset( $request['settings'] ) ) {
 			$config = array();
 			if ( isset( $request['styles'] ) ) {
 				$config['styles'] = $request['styles'];
-			} else {
+			} elseif ( isset( $existing_config['styles'] ) ) {
 				$config['styles'] = $existing_config['styles'];
 			}
 			if ( isset( $request['settings'] ) ) {
 				$config['settings'] = $request['settings'];
-			} else {
+			} elseif ( isset( $existing_config['settings'] ) ) {
 				$config['settings'] = $existing_config['settings'];
 			}
 			$config['isGlobalStylesUserThemeJSON'] = true;
@@ -337,5 +345,44 @@ class Gutenberg_REST_Global_Styles_Controller extends WP_REST_Controller {
 		$this->schema = $schema;
 
 		return $this->add_additional_fields_schema( $this->schema );
+	}
+
+	/**
+	 * Checks if a given request has access to read a single theme global styles config.
+	 *
+	 * @param WP_REST_Request $request Full details about the request.
+	 * @return true|WP_Error True if the request has read access for the item, WP_Error object otherwise.
+	 */
+	public function get_theme_item_permissions_check( $request ) {
+		return $this->permissions_check( $request );
+	}
+
+	/**
+	 * Returns the given theme global styles config.
+	 *
+	 * @param WP_REST_Request $request The request instance.
+	 *
+	 * @return WP_REST_Response|WP_Error
+	 */
+	public function get_theme_item( $request ) {
+		if ( wp_get_theme()->get_stylesheet() !== $request['stylesheet'] ) {
+			// This endpoint only supports the active theme for now.
+			return new WP_Error(
+				'rest_theme_not_found',
+				__( 'Theme not found.', 'gutenberg' ),
+				array( 'status' => 404 )
+			);
+		}
+
+		$theme    = WP_Theme_JSON_Resolver_Gutenberg::get_merged_data( array(), 'theme' );
+		$styles   = $theme->get_raw_data()['styles'];
+		$settings = $theme->get_settings();
+		$result   = array(
+			'settings' => $settings,
+			'styles'   => $styles,
+		);
+		$response = rest_ensure_response( $result );
+
+		return $response;
 	}
 }

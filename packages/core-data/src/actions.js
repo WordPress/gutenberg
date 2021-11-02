@@ -9,6 +9,7 @@ import { v4 as uuid } from 'uuid';
  */
 import apiFetch from '@wordpress/api-fetch';
 import { addQueryArgs } from '@wordpress/url';
+import deprecated from '@wordpress/deprecated';
 
 /**
  * Internal dependencies
@@ -134,16 +135,38 @@ export function __experimentalReceiveCurrentGlobalStylesId(
 }
 
 /**
- * Returns an action object used in signalling that the index has been received.
+ * Returns an action object used in signalling that the theme base global styles have been received
  *
- * @param {Object} themeSupports Theme support for the current theme.
+ * @param {string} stylesheet   The theme's identifier
+ * @param {Object} globalStyles The global styles object.
  *
  * @return {Object} Action object.
  */
-export function receiveThemeSupports( themeSupports ) {
+export function __experimentalReceiveThemeBaseGlobalStyles(
+	stylesheet,
+	globalStyles
+) {
 	return {
-		type: 'RECEIVE_THEME_SUPPORTS',
-		themeSupports,
+		type: 'RECEIVE_THEME_GLOBAL_STYLES',
+		stylesheet,
+		globalStyles,
+	};
+}
+
+/**
+ * Returns an action object used in signalling that the index has been received.
+ *
+ * @deprecated since WP 5.9, this is not useful anymore, use the selector direclty.
+ *
+ * @return {Object} Action object.
+ */
+export function receiveThemeSupports() {
+	deprecated( "wp.data.dispatch( 'core' ).receiveThemeSupports", {
+		since: '5.9',
+	} );
+
+	return {
+		type: 'DO_NOTHING',
 	};
 }
 

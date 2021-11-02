@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Experimental
+
+-   Updated the `ToolsPanel` to use `Grid` internally to manage panel layout ([35621](https://github.com/WordPress/gutenberg/pull/35621)).
+
 ## 19.0.0 (2021-10-22)
 
 ### New Features
