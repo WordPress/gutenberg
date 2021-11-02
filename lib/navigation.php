@@ -483,7 +483,6 @@ add_filter( 'get_edit_post_link', 'gutenberg_disable_edit_links_for_navigation_p
  * @return array
  */
 function gutenberg_disable_edit_row_action_for_navigation_post_type($actions, $post) {
-	$post = get_post($post);
 	if ( 'wp_navigation' !== $post->post_type ) {
 		return $actions;
 	}
