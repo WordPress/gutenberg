@@ -3,6 +3,7 @@
  */
 import { useConstrainedTabbing } from '@wordpress/compose';
 import { Placeholder } from '@wordpress/components';
+import { __, sprintf } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
@@ -20,7 +21,11 @@ import EmbeddedAdminContext from '../embedded-admin-context';
 export default function IsolatedPlaceholder( props ) {
 	return (
 		<EmbeddedAdminContext
-			aria-label={ props.label }
+			aria-label={ sprintf(
+				/* translators: %s: what the placeholder is for */
+				__( 'Placeholder: %s' ),
+				props.label
+			) }
 			className="wp-block-editor-placeholder"
 		>
 			<Placeholder
