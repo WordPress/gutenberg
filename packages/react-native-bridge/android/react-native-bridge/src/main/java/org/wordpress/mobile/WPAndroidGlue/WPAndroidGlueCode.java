@@ -50,6 +50,7 @@ import com.th3rdwave.safeareacontext.SafeAreaContextPackage;
 import org.reactnative.maskedview.RNCMaskedViewPackage;
 
 import org.wordpress.android.util.AppLog;
+import org.wordpress.android.util.AppLog.T;
 import org.wordpress.mobile.ReactNativeAztec.ReactAztecPackage;
 import org.wordpress.mobile.ReactNativeGutenbergBridge.BuildConfig;
 import org.wordpress.mobile.ReactNativeGutenbergBridge.GutenbergBridgeJS2Parent;
@@ -855,20 +856,24 @@ public class WPAndroidGlueCode {
         }
     }
 
-    public interface OnGetContentTimeout {
+    public interface OnGetContentInterrupted {
         void onGetContentTimeout(InterruptedException ie);
     }
 
-    public synchronized CharSequence getContent(CharSequence originalContent, OnGetContentTimeout onGetContentTimeout) {
+    public synchronized CharSequence getContent(CharSequence originalContent,
+                                                OnGetContentInterrupted onGetContentInterrupted) {
         if (mReactContext != null) {
             mGetContentCountDownLatch = new CountDownLatch(1);
 
             mRnReactNativeGutenbergBridgePackage.getRNReactNativeGutenbergBridgeModule().getHtmlFromJS();
 
             try {
-                mGetContentCountDownLatch.await(10, TimeUnit.SECONDS);
+                boolean success = mGetContentCountDownLatch.await(10, TimeUnit.SECONDS);
+                if (!success) {
+                    AppLog.e(T.EDITOR, "Timeout reached before response from requestGetHtml");
+                }
             } catch (InterruptedException ie) {
-                onGetContentTimeout.onGetContentTimeout(ie);
+                onGetContentInterrupted.onGetContentTimeout(ie);
             }
 
             return mContentChanged ? (mContentHtml == null ? "" : mContentHtml) : originalContent;
@@ -879,16 +884,19 @@ public class WPAndroidGlueCode {
         return originalContent;
     }
 
-    public synchronized CharSequence getTitle(OnGetContentTimeout onGetContentTimeout) {
+    public synchronized CharSequence getTitle(OnGetContentInterrupted onGetContentInterrupted) {
         if (mReactContext != null) {
             mGetContentCountDownLatch = new CountDownLatch(1);
 
             mRnReactNativeGutenbergBridgePackage.getRNReactNativeGutenbergBridgeModule().getHtmlFromJS();
 
             try {
-                mGetContentCountDownLatch.await(10, TimeUnit.SECONDS);
+                boolean success = mGetContentCountDownLatch.await(10, TimeUnit.SECONDS);
+                if (!success) {
+                    AppLog.e(T.EDITOR, "Timeout reached before response from requestGetHtml");
+                }
             } catch (InterruptedException ie) {
-                onGetContentTimeout.onGetContentTimeout(ie);
+                onGetContentInterrupted.onGetContentTimeout(ie);
             }
 
             return mTitle == null ? "" : mTitle;
@@ -905,22 +913,24 @@ public class WPAndroidGlueCode {
      * same event anyway, and also share the same mechanism to suspend execution until a response is received (or a
      * timeout is reached).
      * @param originalContent fallback content to return in case the timeout is reached, or the thread is interrupted
-     * @param onGetContentTimeout callback to invoke if thread is interrupted before the timeout
+     * @param onGetContentInterrupted callback to invoke if thread is interrupted before the timeout
      * @return
      */
     public synchronized Pair<CharSequence, CharSequence> getTitleAndContent(CharSequence originalContent,
-                                                               OnGetContentTimeout onGetContentTimeout) {
+                                                               OnGetContentInterrupted onGetContentInterrupted) {
         if (mReactContext != null) {
             mGetContentCountDownLatch = new CountDownLatch(1);
 
             mRnReactNativeGutenbergBridgePackage.getRNReactNativeGutenbergBridgeModule().getHtmlFromJS();
 
             try {
-                // TODO: we should consider logging when await returns false
-                mGetContentCountDownLatch.await(10, TimeUnit.SECONDS);
+                boolean success = mGetContentCountDownLatch.await(10, TimeUnit.SECONDS);
+                if (!success) {
+                    AppLog.e(T.EDITOR, "Timeout reached before response from requestGetHtml");
+                }
             } catch (InterruptedException ie) {
                 // TODO: this should be either renamed, or invoked when the await returns false.
-                onGetContentTimeout.onGetContentTimeout(ie);
+                onGetContentInterrupted.onGetContentTimeout(ie);
             }
 
             return new Pair<>(
@@ -949,7 +959,10 @@ public class WPAndroidGlueCode {
                         mRnReactNativeGutenbergBridgePackage.getRNReactNativeGutenbergBridgeModule().getHtmlFromJS();
 
                         try {
-                            mGetContentCountDownLatch.await(5, TimeUnit.SECONDS);
+                            boolean success = mGetContentCountDownLatch.await(5, TimeUnit.SECONDS);
+                            if (!success) {
+                                AppLog.e(T.EDITOR, "Timeout reached before response from requestGetHtml");
+                            }
                             if (mContentInfo == null) {
                                 onContentInfoReceivedListener.onContentInfoFailed();
                             } else {
