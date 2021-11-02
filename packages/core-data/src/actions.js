@@ -135,6 +135,25 @@ export function __experimentalReceiveCurrentGlobalStylesId(
 }
 
 /**
+ * Returns an action object used in signalling that the theme base global styles have been received
+ *
+ * @param {string} stylesheet   The theme's identifier
+ * @param {Object} globalStyles The global styles object.
+ *
+ * @return {Object} Action object.
+ */
+export function __experimentalReceiveThemeBaseGlobalStyles(
+	stylesheet,
+	globalStyles
+) {
+	return {
+		type: 'RECEIVE_THEME_GLOBAL_STYLES',
+		stylesheet,
+		globalStyles,
+	};
+}
+
+/**
  * Returns an action object used in signalling that the index has been received.
  *
  * @deprecated since WP 5.9, this is not useful anymore, use the selector direclty.
