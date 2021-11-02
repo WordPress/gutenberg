@@ -5,6 +5,7 @@
 ### Experimental
 
 -   Updated the `ToolsPanel` to use `Grid` internally to manage panel layout ([35621](https://github.com/WordPress/gutenberg/pull/35621)).
+-   Enlarged the `default` size variant of `InputControl` to the new 40px design. `AnglePickerControl`, `BoxControl`, `ColorPicker`, `CustomGradientPicker`, `RangeControl`, `SelectControl`, and `UnitControl` were also slightly modified (either visually or internally) to accommodate this change ([#35646](https://github.com/WordPress/gutenberg/pull/35646)).
 
 ## 19.0.0 (2021-10-22)
 
