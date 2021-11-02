@@ -58,7 +58,7 @@ function addSaveProps( props, blockType, attributes ) {
 	if (
 		hasBlockSupport(
 			blockType,
-			'__experimentalSkipTypographySerialization'
+			'typography.__experimentalSkipSerialization'
 		)
 	) {
 		return props;

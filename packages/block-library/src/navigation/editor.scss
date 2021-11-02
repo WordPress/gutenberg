@@ -20,6 +20,15 @@
 	}
 }
 
+// The following rule affects the positioning of the dropdown arrow indicator.
+// On the frontend, this element is inline, which makes it look correct. In the editor,
+// the label is block, which causes the dropdown indicator to wrap onto a new line.
+// Therefore we explicitly set it to inline even in the block editor.
+.wp-block-navigation-item__label {
+	display: inline;
+}
+
+
 /**
  * Submenus.
  */
@@ -528,4 +537,9 @@ body.editor-styles-wrapper
 	.block-editor-warning__actions {
 		margin-top: 0;
 	}
+}
+
+.wp-block-navigation-delete-menu-button {
+	width: 100%;
+	justify-content: center;
 }

@@ -71,6 +71,7 @@ const {
 	getLowestCommonAncestorWithSelectedBlock,
 	__experimentalGetActiveBlockIdByBlockNames: getActiveBlockIdByBlockNames,
 	__experimentalGetAllowedPatterns,
+	__experimentalGetParsedPattern,
 	__experimentalGetPatternsByBlockTypes,
 	__unstableGetClientIdWithClientIdsTree,
 	__unstableGetClientIdsTree,
@@ -3330,6 +3331,13 @@ describe( 'selectors', () => {
 						content:
 							'<!-- wp:test-block-b --><!-- /wp:test-block-b -->',
 					},
+					{
+						name: 'pattern-c',
+						title: 'pattern hidden from UI',
+						inserter: false,
+						content:
+							'<!-- wp:test-block-a --><!-- /wp:test-block-a -->',
+					},
 				],
 			},
 		};
@@ -3348,6 +3356,77 @@ describe( 'selectors', () => {
 			expect(
 				__experimentalGetAllowedPatterns( state, 'block2' )
 			).toHaveLength( 0 );
+		} );
+		it( 'should return empty array if only patterns hidden from UI exist', () => {
+			expect(
+				__experimentalGetAllowedPatterns( {
+					blocks: { byClientId: {} },
+					blockListSettings: {},
+					settings: {
+						__experimentalBlockPatterns: [
+							{
+								name: 'pattern-c',
+								title: 'pattern hidden from UI',
+								inserter: false,
+								content:
+									'<!-- wp:test-block-a --><!-- /wp:test-block-a -->',
+							},
+						],
+					},
+				} )
+			).toHaveLength( 0 );
+		} );
+	} );
+	describe( '__experimentalGetParsedPattern', () => {
+		const state = {
+			settings: {
+				__experimentalBlockPatterns: [
+					{
+						name: 'pattern-a',
+						title: 'pattern with a',
+						content: `<!-- wp:test-block-a --><!-- /wp:test-block-a -->`,
+					},
+					{
+						name: 'pattern-hidden-from-ui',
+						title: 'pattern hidden from UI',
+						inserter: false,
+						content:
+							'<!-- wp:test-block-a --><!-- /wp:test-block-a --><!-- wp:test-block-b --><!-- /wp:test-block-b -->',
+					},
+				],
+			},
+		};
+		it( 'should return proper results when pattern does not exist', () => {
+			expect(
+				__experimentalGetParsedPattern( state, 'not there' )
+			).toBeNull();
+		} );
+		it( 'should return existing pattern properly parsed', () => {
+			const { name, blocks } = __experimentalGetParsedPattern(
+				state,
+				'pattern-a'
+			);
+			expect( name ).toEqual( 'pattern-a' );
+			expect( blocks ).toHaveLength( 1 );
+			expect( blocks[ 0 ] ).toEqual(
+				expect.objectContaining( {
+					name: 'core/test-block-a',
+				} )
+			);
+		} );
+		it( 'should return hidden from UI pattern when requested', () => {
+			const { name, blocks, inserter } = __experimentalGetParsedPattern(
+				state,
+				'pattern-hidden-from-ui'
+			);
+			expect( name ).toEqual( 'pattern-hidden-from-ui' );
+			expect( inserter ).toBeFalsy();
+			expect( blocks ).toHaveLength( 2 );
+			expect( blocks[ 0 ] ).toEqual(
+				expect.objectContaining( {
+					name: 'core/test-block-a',
+				} )
+			);
 		} );
 	} );
 	describe( '__experimentalGetPatternsByBlockTypes', () => {

@@ -10,7 +10,7 @@ import { getBlockSupport } from '@wordpress/blocks';
 import { Fragment, useEffect } from '@wordpress/element';
 import {
 	BlockControls,
-	__experimentalUseInnerBlocksProps as useInnerBlocksProps,
+	useInnerBlocksProps,
 	useBlockProps,
 	InspectorControls,
 	ContrastChecker,

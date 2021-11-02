@@ -172,6 +172,7 @@
 			},
 			{ "docs/how-to-guides/accessibility.md": [] },
 			{ "docs/how-to-guides/internationalization.md": [] },
+			{ "docs/how-to-guides/thunks.md": [] },
 			{
 				"docs/how-to-guides/widgets/README.md": [
 					{ "docs/how-to-guides/widgets/overview.md": [] },

@@ -11,13 +11,6 @@
  */
 class Gutenberg_REST_Global_Styles_Controller extends WP_REST_Controller {
 	/**
-	 * Post type.
-	 *
-	 * @var string
-	 */
-	protected $post_type;
-
-	/**
 	 * Constructor.
 	 */
 	public function __construct() {

@@ -1,10 +1,7 @@
 /**
  * WordPress dependencies
  */
-import {
-	__experimentalUseInnerBlocksProps as useInnerBlocksProps,
-	Warning,
-} from '@wordpress/block-editor';
+import { useInnerBlocksProps, Warning } from '@wordpress/block-editor';
 import { serialize } from '@wordpress/blocks';
 import { Button, Disabled } from '@wordpress/components';
 import { store as coreStore } from '@wordpress/core-data';
