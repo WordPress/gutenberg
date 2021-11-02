@@ -17,12 +17,12 @@ target 'GutenbergDemo' do
     # Pods for testing
   end
 
-  ### Begin workaround for https://github.com/facebook/react-native/issues/31034
-  # Can be removed when this issue is resolved.
   post_install do |installer|
-    
     react_native_post_install(installer)
+    __apply_Xcode_12_5_M1_post_install_workaround(installer)
     
+    ### Begin workaround for https://github.com/facebook/react-native/issues/31034
+    # Can be removed when this issue is resolved.
     installer.pods_project.targets.each do |target|
       target.build_configurations.each do |config|
         config.build_settings['BUILD_LIBRARY_FOR_DISTRIBUTION'] = 'YES'
