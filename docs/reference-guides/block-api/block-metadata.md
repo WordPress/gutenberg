@@ -176,7 +176,7 @@ This is the display title for your block, which can be translated with our trans
 ### Category
 
 -   Type: `string`
--   Required
+-   Optional
 -   Localized: No
 -   Property: `category`
 
