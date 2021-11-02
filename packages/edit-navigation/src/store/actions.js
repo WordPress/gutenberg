@@ -204,7 +204,22 @@ const batchInsertPlaceholderMenuItems = ( navigationBlock ) => async ( {
 const batchUpdateMenuItems = ( navigationBlock, menuId ) => async ( {
 	registry,
 } ) => {
-	const updatedMenuItems = blocksTreeToAnnotatedList( navigationBlock )
+	const allMenuItems = blocksTreeToAnnotatedList( navigationBlock );
+	const unsupportedMenuItems = allMenuItems
+		.filter( ( { block } ) => ! isBlockSupportedInNav( block ) )
+		.map( ( { block } ) => block.name );
+	if ( unsupportedMenuItems.length ) {
+		window.console.warn(
+			sprintf(
+				// translators: %s: Name of block (i.e. core/legacy-widget)
+				__(
+					'The following blocks haven\'t been saved because they are not supported: "%s".'
+				),
+				unsupportedMenuItems.join( '", "' )
+			)
+		);
+	}
+	const updatedMenuItems = allMenuItems
 		// Filter out unsupported blocks
 		.filter( ( { block } ) => isBlockSupportedInNav( block ) )
 		// Transform the blocks into menu items

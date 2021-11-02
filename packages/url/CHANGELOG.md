@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### New Feature
+
+-   Added new `normalizePath` function ([#35992](https://github.com/WordPress/gutenberg/pull/35992)).
+
 ## 3.2.3 (2021-10-12)
 
 ### Bug Fix
