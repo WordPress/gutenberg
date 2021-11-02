@@ -356,7 +356,7 @@ public class RNReactNativeGutenbergBridge: RCTEventEmitter {
             self.delegate?.gutenbergDidSendButtonPressedAction(button)
         }
     }
-    
+
     @objc
     func requestPreview() {
         DispatchQueue.main.async {
@@ -386,6 +386,11 @@ public class RNReactNativeGutenbergBridge: RCTEventEmitter {
         DispatchQueue.main.async {
             self.delegate?.gutenbergDidRequestGotoCustomerSupportOptions()
         }
+    }
+
+    @objc
+    func sendEventToHost(_ eventName: String, properties: [AnyHashable: Any]) {
+        self.delegate?.gutenbergDidRequestSendEventToHost(eventName, properties: properties)
     }
 }
 

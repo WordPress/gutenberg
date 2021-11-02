@@ -1,10 +1,7 @@
 /**
  * WordPress dependencies
  */
-import {
-	__experimentalUseInnerBlocksProps as useInnerBlocksProps,
-	Warning,
-} from '@wordpress/block-editor';
+import { useInnerBlocksProps, Warning } from '@wordpress/block-editor';
 import { serialize } from '@wordpress/blocks';
 import { Button, Disabled } from '@wordpress/components';
 import { store as coreStore } from '@wordpress/core-data';
@@ -17,10 +14,11 @@ import { __ } from '@wordpress/i18n';
  */
 import NavigationMenuNameModal from './navigation-menu-name-modal';
 
-export default function UpgradeToNavigationMenu( {
+export default function UnsavedInnerBlocks( {
 	blockProps,
 	blocks,
-	onUpgrade,
+	onSave,
+	isSelected,
 } ) {
 	const innerBlocksProps = useInnerBlocksProps( blockProps, {
 		renderAppender: false,
@@ -50,26 +48,27 @@ export default function UpgradeToNavigationMenu( {
 
 	return (
 		<>
-			<Warning
-				actions={ [
-					<Button
-						key="upgrade"
-						onClick={ () => setIsModalVisible( true ) }
-						variant="primary"
+			<nav { ...blockProps }>
+				{ isSelected && (
+					<Warning
+						className="wp-block-navigation__unsaved-changes-warning"
+						actions={ [
+							<Button
+								key="save"
+								onClick={ () => setIsModalVisible( true ) }
+								variant="primary"
+							>
+								{ __( 'Save as' ) }
+							</Button>,
+						] }
 					>
-						{ __( 'Upgrade' ) }
-					</Button>,
-				] }
-			>
-				{ __(
-					'The navigation block has been updated to store data in a similar way to a reusable block. Please use the upgrade option to save your navigation block data and continue editing your block.'
+						{ __( 'Save this block to continue editing.' ) }
+					</Warning>
 				) }
-			</Warning>
-			<Disabled>
-				<nav { ...blockProps }>
+				<Disabled>
 					<div { ...innerBlocksProps } />
-				</nav>
-			</Disabled>
+				</Disabled>
+			</nav>
 			{ isModalVisible && (
 				<NavigationMenuNameModal
 					title={ __( 'Name your navigation menu' ) }
@@ -78,7 +77,7 @@ export default function UpgradeToNavigationMenu( {
 					} }
 					onFinish={ async ( title ) => {
 						const menu = await createNavigationMenu( title );
-						onUpgrade( menu );
+						onSave( menu );
 					} }
 				/>
 			) }

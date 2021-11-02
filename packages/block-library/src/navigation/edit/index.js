@@ -42,7 +42,8 @@ import ResponsiveWrapper from './responsive-wrapper';
 import NavigationInnerBlocks from './inner-blocks';
 import NavigationMenuSelector from './navigation-menu-selector';
 import NavigationMenuNameControl from './navigation-menu-name-control';
-import UpgradeToNavigationMenu from './upgrade-to-navigation-menu';
+import UnsavedInnerBlocks from './unsaved-inner-blocks';
+import NavigationMenuDeleteControl from './navigation-menu-delete-control';
 
 function getComputedStyle( node ) {
 	return node.ownerDocument.defaultView.getComputedStyle( node );
@@ -74,6 +75,7 @@ function detectColors( colorsDetectionElement, setColor, setBackground ) {
 function Navigation( {
 	attributes,
 	setAttributes,
+	isSelected,
 	clientId,
 	className,
 	backgroundColor,
@@ -111,7 +113,7 @@ function Navigation( {
 		[ clientId ]
 	);
 	const hasExistingNavItems = !! innerBlocks.length;
-	const { selectBlock } = useDispatch( blockEditorStore );
+	const { replaceInnerBlocks, selectBlock } = useDispatch( blockEditorStore );
 
 	const [ isPlaceholderShown, setIsPlaceholderShown ] = useState(
 		! hasExistingNavItems
@@ -201,13 +203,17 @@ function Navigation( {
 
 	// If the block has inner blocks, but no menu id, this was an older
 	// navigation block added before the block used a wp_navigation entity.
-	// Offer a UI to upgrade it to using the entity.
-	if ( hasExistingNavItems && navigationMenuId === undefined ) {
+	// Consider this 'unsaved'. Offer an uncontrolled version of inner blocks,
+	// with a prompt to 'save'.
+	const hasUnsavedBlocks =
+		hasExistingNavItems && navigationMenuId === undefined;
+	if ( hasUnsavedBlocks ) {
 		return (
-			<UpgradeToNavigationMenu
+			<UnsavedInnerBlocks
 				blockProps={ blockProps }
 				blocks={ innerBlocks }
-				onUpgrade={ ( post ) =>
+				isSelected={ isSelected }
+				onSave={ ( post ) =>
 					setAttributes( { navigationMenuId: post.id } )
 				}
 			/>
@@ -293,8 +299,17 @@ function Navigation( {
 				{ listViewModal }
 				<InspectorControls>
 					{ isEntityAvailable && (
-						<PanelBody title={ __( 'Navigation menu name' ) }>
+						<PanelBody title={ __( 'Navigation menu' ) }>
 							<NavigationMenuNameControl />
+							<NavigationMenuDeleteControl
+								onDelete={ () => {
+									replaceInnerBlocks( clientId, [] );
+									setAttributes( {
+										navigationMenuId: undefined,
+									} );
+									setIsPlaceholderShown( true );
+								} }
+							/>
 						</PanelBody>
 					) }
 					{ hasSubmenuIndicatorSetting && (
@@ -410,23 +425,27 @@ function Navigation( {
 							}
 						/>
 					) }
-					<ResponsiveWrapper
-						id={ clientId }
-						onToggle={ setResponsiveMenuVisibility }
-						isOpen={ isResponsiveMenuOpen }
-						isResponsive={ 'never' !== overlayMenu }
-						isHiddenByDefault={ 'always' === overlayMenu }
-					>
-						{ isEntityAvailable && (
-							<NavigationInnerBlocks
-								isVisible={ ! isPlaceholderShown }
-								clientId={ clientId }
-								appender={ CustomAppender }
-								hasCustomPlaceholder={ !! CustomPlaceholder }
-								orientation={ orientation }
-							/>
-						) }
-					</ResponsiveWrapper>
+					{ ! isPlaceholderShown && (
+						<ResponsiveWrapper
+							id={ clientId }
+							onToggle={ setResponsiveMenuVisibility }
+							isOpen={ isResponsiveMenuOpen }
+							isResponsive={ 'never' !== overlayMenu }
+							isHiddenByDefault={ 'always' === overlayMenu }
+						>
+							{ isEntityAvailable && (
+								<NavigationInnerBlocks
+									isVisible={ ! isPlaceholderShown }
+									clientId={ clientId }
+									appender={ CustomAppender }
+									hasCustomPlaceholder={
+										!! CustomPlaceholder
+									}
+									orientation={ orientation }
+								/>
+							) }
+						</ResponsiveWrapper>
+					) }
 				</nav>
 			</RecursionProvider>
 		</EntityProvider>

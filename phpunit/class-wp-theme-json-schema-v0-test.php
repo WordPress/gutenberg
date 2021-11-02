@@ -12,7 +12,7 @@ class WP_Theme_JSON_Schema_V0_Test extends WP_UnitTestCase {
 		$theme_json_v0 = array(
 			'settings' => array(
 				'defaults'       => array(
-					'color' => array(
+					'color'      => array(
 						'palette' => array(
 							array(
 								'name'  => 'Black',
@@ -38,6 +38,12 @@ class WP_Theme_JSON_Schema_V0_Test extends WP_UnitTestCase {
 						'custom'  => false,
 						'link'    => false,
 					),
+					'typography' => array(
+						'customFontStyle'       => false,
+						'customFontWeight'      => false,
+						'customTextDecorations' => false,
+						'customTextTransforms'  => false,
+					),
 				),
 				'root'           => array(
 					'color'  => array(
@@ -56,7 +62,10 @@ class WP_Theme_JSON_Schema_V0_Test extends WP_UnitTestCase {
 						'link'    => true,
 					),
 					'border' => array(
+						'customColor'  => false,
 						'customRadius' => false,
+						'customStyle'  => false,
+						'customWidth'  => false,
 					),
 				),
 				'core/paragraph' => array(
@@ -91,7 +100,7 @@ class WP_Theme_JSON_Schema_V0_Test extends WP_UnitTestCase {
 		$expected = array(
 			'version'  => 1,
 			'settings' => array(
-				'color'  => array(
+				'color'      => array(
 					'palette' => array(
 						array(
 							'name'  => 'Pale Pink',
@@ -107,10 +116,19 @@ class WP_Theme_JSON_Schema_V0_Test extends WP_UnitTestCase {
 					'custom'  => false,
 					'link'    => true,
 				),
-				'border' => array(
+				'border'     => array(
+					'color'        => false,
 					'customRadius' => false,
+					'style'        => false,
+					'width'        => false,
 				),
-				'blocks' => array(
+				'typography' => array(
+					'fontStyle'      => false,
+					'fontWeight'     => false,
+					'textDecoration' => false,
+					'textTransform'  => false,
+				),
+				'blocks'     => array(
 					'core/paragraph' => array(
 						'typography' => array(
 							'dropCap' => false,

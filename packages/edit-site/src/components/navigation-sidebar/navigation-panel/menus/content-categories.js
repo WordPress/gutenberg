@@ -30,13 +30,12 @@ export default function ContentCategoriesMenu() {
 			const { getEntityRecords, hasFinishedResolution } = select(
 				coreStore
 			);
-			const getEntityRecordsArgs = [
-				'taxonomy',
-				'category',
-				{
-					search: searchQuery,
-				},
-			];
+			const query = searchQuery
+				? {
+						search: searchQuery,
+				  }
+				: undefined;
+			const getEntityRecordsArgs = [ 'taxonomy', 'category', query ];
 			const hasResolvedPosts = hasFinishedResolution(
 				'getEntityRecords',
 				getEntityRecordsArgs

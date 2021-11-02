@@ -44,9 +44,7 @@ export default function TemplatesMenu() {
 	const { templates, showOnFront } = useSelect( ( select ) => {
 		const { getEntityRecords, getEditedEntityRecord } = select( coreStore );
 		return {
-			templates: getEntityRecords( 'postType', 'wp_template', {
-				per_page: -1,
-			} ),
+			templates: getEntityRecords( 'postType', 'wp_template' ),
 			showOnFront: getEditedEntityRecord( 'root', 'site' ).show_on_front,
 		};
 	}, [] );

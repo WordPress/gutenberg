@@ -85,7 +85,7 @@ Optionally, create a `functions.php` file.
 In this file, you can enqueue `style.css`, include additional files, enable an editor stylesheet and add theme support.
 
 <div class="callout callout-tip">
-You will add most of the theme support in the `theme.json` file. The title tag is already enabled for all block themes, and it is no longer necessarry to enqueue the comment reply script because it is included with the comments block.
+You will add most of the theme support in the `theme.json` file. The title tag is already enabled for all block themes, and it is no longer necessary to enqueue the comment reply script because it is included with the comments block.
 </div>
 
 ```php
@@ -439,10 +439,10 @@ To enable border styles, add a `border` object under `settings` with the followi
 	"version": 1,
 	"settings": {
 		"border": {
-			"customColor": true,
+			"color": true,
 			"customRadius": true,
-			"customStyle": true,
-			"customWidth": true
+			"style": true,
+			"width": true
 		}
 	}
 }
@@ -455,10 +455,10 @@ To enable link colors, add a `color` setting and set `link` to true:
 	"version": 1,
 	"settings": {
 		"border": {
-			"customColor": true,
+			"color": true,
 			"customRadius": true,
-			"customStyle": true,
-			"customWidth": true
+			"style": true,
+			"width": true
 		},
 		"color": {
 			"link": true,
@@ -474,10 +474,10 @@ To enable padding, margin and custom spacing units, include a setting for spacin
 	"version": 1,
 	"settings": {
 		"border": {
-			"customColor": true,
+			"color": true,
 			"customRadius": true,
-			"customStyle": true,
-			"customWidth": true
+			"style": true,
+			"width": true
 		},
 		"color": {
 			"link": true
@@ -500,10 +500,10 @@ If you want to disable gradients, which are enabled by default, set `gradient` t
 	"version": 1,
 	"settings": {
 		"border": {
-			"customColor": true,
+			"color": true,
 			"customRadius": true,
-			"customStyle": true,
-			"customWidth": true
+			"style": true,
+			"width": true
 		},
 		"color": {
 			"link": true,
