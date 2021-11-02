@@ -112,17 +112,21 @@ export function useFocusFirstElement( clientId ) {
 			return;
 		}
 
-		if ( isMounting && target.shadowRoot ) {
+		if ( target.shadowRoot ) {
+			target.focus();
+
 			// We must wait for the placeholder content to load.
-			setTimeout( () => {
+			const timeoutId = setTimeout( () => {
 				// Find all text fields within the placeholder.
 				candidates = focus.tabbable.find( target.shadowRoot );
 				target = ( isReverse ? last : first )( candidates ) || target;
 				placeCaretAtHorizontalEdge( target, isReverse );
 			} );
-		} else {
-			placeCaretAtHorizontalEdge( target, isReverse );
+
+			return () => clearTimeout( timeoutId );
 		}
+
+		placeCaretAtHorizontalEdge( target, isReverse );
 	}, [ initialPosition ] );
 
 	return ref;
