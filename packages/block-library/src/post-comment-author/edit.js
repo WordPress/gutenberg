@@ -97,7 +97,7 @@ export default function Edit( {
 				{ inspectorControls }
 				{ blockControls }
 				<div { ...blockProps }>
-					<p>{ _x( 'Post Comment Author', 'block title' ) }</p>
+					<p>{ _x( 'Comment Author', 'block title' ) }</p>
 				</div>
 			</>
 		);
