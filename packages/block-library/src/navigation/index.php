@@ -295,8 +295,8 @@ function render_block_core_navigation( $attributes, $content, $block ) {
 	$typography_supports = isset( $block->block_type->supports['typography'] ) ? $block->block_type->supports['typography'] : array();
 	$typography          = block_core_navigation_build_css_typography( $typography_supports, $attributes );
 
-	$colors     = block_core_navigation_build_css_colors( $attributes );
-	$classes    = array_merge(
+	$colors  = block_core_navigation_build_css_colors( $attributes );
+	$classes = array_merge(
 		$colors['css_classes'],
 		$typography['css_classes'],
 		( isset( $attributes['orientation'] ) && 'vertical' === $attributes['orientation'] ) ? array( 'is-vertical' ) : array(),
