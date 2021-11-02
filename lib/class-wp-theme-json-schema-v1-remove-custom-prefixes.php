@@ -10,7 +10,7 @@
  * Class that implements a WP_Theme_JSON_Schema to convert
  * a given structure in v0 schema to the latest one.
  */
-class WP_Theme_JSON_Schema_V1 implements WP_Theme_JSON_Schema {
+class WP_Theme_JSON_Schema_V1_Remove_Custom_Prefixes implements WP_Theme_JSON_Schema {
 	/**
 	 * Data schema for v1 theme.json.
 	 */
@@ -100,13 +100,22 @@ class WP_Theme_JSON_Schema_V1 implements WP_Theme_JSON_Schema {
 	);
 
 	/**
-	 * Converts a v1 schema into the latest.
+	 * Removes the custom prefixes for a few properties that only worked in the plugin:
 	 *
-	 * @param array $old Data in v1 schema.
+	 * 'border.customColor'               => 'border.color',
+	 * 'border.customStyle'               => 'border.style',
+	 * 'border.customWidth'               => 'border.width',
+	 * 'typography.customFontStyle'       => 'typography.fontStyle',
+	 * 'typography.customFontWeight'      => 'typography.fontWeight',
+	 * 'typography.customLetterSpacing'   => 'typography.letterSpacing',
+	 * 'typography.customTextDecorations' => 'typography.textDecoration',
+	 * 'typography.customTextTransforms'  => 'typography.textTransform',
 	 *
-	 * @return array Data in the latest schema.
+	 * @param array $old Data to migrate.
+	 *
+	 * @return array Data without the custom prefixes.
 	 */
-	public static function parse( $old ) {
+	public static function migrate( $old ) {
 		// Copy everything.
 		$new = $old;
 
@@ -114,8 +123,6 @@ class WP_Theme_JSON_Schema_V1 implements WP_Theme_JSON_Schema {
 		if ( isset( $old['settings'] ) ) {
 			$new['settings'] = self::process_settings( $old['settings'] );
 		}
-
-		$new['version'] = WP_Theme_JSON_Gutenberg::LATEST_SCHEMA;
 
 		return $new;
 	}

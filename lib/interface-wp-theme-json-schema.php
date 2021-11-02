@@ -12,12 +12,12 @@
  */
 interface WP_Theme_JSON_Schema {
 	/**
-	 * Parses an array that follows an old theme.json schema
-	 * into the latest theme.json schema.
+	 * Migrates an array that follows an old theme.json schema
+	 * to a different version.
 	 *
 	 * @param array $theme_json Old data to convert.
 	 *
-	 * @return array The data in the latest theme.json schema.
+	 * @return array The new converted data.
 	 */
-	public static function parse( $theme_json );
+	public static function migrate( $theme_json );
 }

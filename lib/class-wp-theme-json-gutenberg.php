@@ -289,13 +289,14 @@ class WP_Theme_JSON_Gutenberg {
 		// The old format is not meant to be ported to core.
 		// We can remove it at that point.
 		if ( ! isset( $theme_json['version'] ) || 0 === $theme_json['version'] ) {
-			$theme_json = WP_Theme_JSON_Schema_V0::parse( $theme_json );
+			$theme_json = WP_Theme_JSON_Schema_V0_To_V1::migrate( $theme_json );
 		}
 
-		// Provide backwards compatibility for settings that did not land in 5.8
-		// and have had their `custom` prefixed removed since.
+		// Provide backwards compatibility for settings that only existed in the plugin,
+		// they did not land in 5.8, and have had their `custom` prefixed removed since.
+		// This does not need to be ported to WordPress core.
 		if ( 1 === $theme_json['version'] ) {
-			$theme_json = WP_Theme_JSON_Schema_V1::parse( $theme_json );
+			$theme_json = WP_Theme_JSON_Schema_V1_Remove_Custom_Prefixes::migrate( $theme_json );
 		}
 
 		$valid_block_names   = array_keys( self::get_blocks_metadata() );
@@ -1437,13 +1438,13 @@ class WP_Theme_JSON_Gutenberg {
 		$sanitized = array();
 
 		if ( ! isset( $theme_json['version'] ) || 0 === $theme_json['version'] ) {
-			$theme_json = WP_Theme_JSON_Schema_V0::parse( $theme_json );
+			$theme_json = WP_Theme_JSON_Schema_V0_To_V1::migrate( $theme_json );
 		}
 
 		// Provide backwards compatibility for settings that did not land in 5.8
 		// and have had their `custom` prefixed removed since.
 		if ( 1 === $theme_json['version'] ) {
-			$theme_json = WP_Theme_JSON_Schema_V1::parse( $theme_json );
+			$theme_json = WP_Theme_JSON_Schema_V1_Remove_Custom_Prefixes::migrate( $theme_json );
 		}
 
 		$valid_block_names   = array_keys( self::get_blocks_metadata() );
