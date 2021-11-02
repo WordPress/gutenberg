@@ -15,6 +15,11 @@
 	position: relative;
 	text-align: left;
 
+	&.is-unstable-size-large {
+		min-height: 40px;
+		padding-left: 16px;
+	}
+
 	// For all button sizes allow sufficient space for the
 	// dropdown "arrow" icon to display.
 	&.components-custom-select-control__button {

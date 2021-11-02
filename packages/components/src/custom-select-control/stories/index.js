@@ -6,6 +6,12 @@ import CustomSelectControl from '../';
 export default {
 	title: 'Components/CustomSelectControl',
 	component: CustomSelectControl,
+	argTypes: {
+		__unstableSize: {
+			options: [ 'default', 'large' ],
+			control: { type: 'select' },
+		},
+	},
 };
 
 const defaultOptions = [

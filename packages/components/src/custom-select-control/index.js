@@ -55,6 +55,7 @@ const stateReducer = (
 };
 export default function CustomSelectControl( {
 	className,
+	__unstableSize,
 	hideLabelFromVision,
 	label,
 	describedBy,
@@ -130,8 +131,11 @@ export default function CustomSelectControl( {
 					// This is needed because some speech recognition software don't support `aria-labelledby`.
 					'aria-label': label,
 					'aria-labelledby': undefined,
-					className: 'components-custom-select-control__button',
-					isSmall: true,
+					className: classnames(
+						'components-custom-select-control__button',
+						{ 'is-unstable-size-large': __unstableSize === 'large' }
+					),
+					isSmall: __unstableSize !== 'large',
 					describedBy: getDescribedBy(),
 				} ) }
 			>
