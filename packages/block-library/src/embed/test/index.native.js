@@ -114,7 +114,7 @@ const MOST_USED_PROVIDERS = embed.settings.variations.filter( ( { name } ) =>
 // Return specified mocked responses for the oembed endpoint.
 const mockEmbedResponses = ( mockedResponses ) => {
 	fetchRequest.mockImplementation( ( { path } ) => {
-		if ( path === '/wp/v2/themes?status=active' ) {
+		if ( path.startsWith( '/wp/v2/themes' ) ) {
 			return Promise.resolve( [
 				{ theme_supports: { 'responsive-embeds': true } },
 			] );
