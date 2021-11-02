@@ -71,7 +71,7 @@ function gutenberg_enqueue_block_styles_assets() {
 	}
 }
 
-if ( version_compare( get_bloginfo( 'version' ), '5.8.2', '<' ) ) {
+if ( version_compare( get_bloginfo( 'version' ), '5.8.2', '<' ) && has_action( 'enqueue_block_assets', 'enqueue_block_styles_assets' ) ) {
 	remove_action( 'enqueue_block_assets', 'enqueue_block_styles_assets', 30 );
 	add_action( 'enqueue_block_assets', 'gutenberg_enqueue_block_styles_assets', 30 );
 }
