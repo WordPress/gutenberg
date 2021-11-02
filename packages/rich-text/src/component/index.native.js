@@ -606,7 +606,13 @@ export class RichText extends Component {
 		const isManual =
 			this.lastAztecEventType !== 'input' &&
 			this.props.value === this.value;
-		if ( hasChanged && isManual ) {
+		const isFormatChange =
+			this.lastAztecEventType === 'format change' &&
+			this.props.value !== this.value;
+		if (
+			( hasChanged && isManual ) ||
+			( this.isIOS && hasChanged && isFormatChange )
+		) {
 			const value = this.createRecord();
 			const activeFormats = getActiveFormats( value );
 			this.setState( { activeFormats } );

@@ -15,6 +15,10 @@ export function getFormatColors( value, formats, colors ) {
 			format.forEach( ( currentFormat ) => {
 				if ( currentFormat?.type === FORMAT_TYPE ) {
 					const className = currentFormat?.attributes?.class;
+					currentFormat.attributes.style = currentFormat.attributes.style.replace(
+						' ',
+						''
+					);
 
 					className?.split( ' ' ).forEach( ( currentClass ) => {
 						const match = currentClass.match( REGEX_TO_MATCH );

@@ -30,6 +30,13 @@ function setColors( value, name, colorSettings, colors ) {
 	const classNames = [];
 	const attributes = {};
 
+	if ( backgroundColor ) {
+		styles.push( [ 'background-color', backgroundColor ].join( ':' ) );
+	} else {
+		// Override default browser color for mark element.
+		styles.push( [ 'background-color', 'rgba(0, 0, 0, 0)' ].join( ':' ) );
+	}
+
 	if ( color ) {
 		const colorObject = getColorObjectByColorValue( colorSettings, color );
 		if ( colorObject ) {
