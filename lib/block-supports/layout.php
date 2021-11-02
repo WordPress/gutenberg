@@ -94,23 +94,6 @@ function gutenberg_get_layout_style( $selector, $layout, $has_block_gap_support 
 			$style .= 'gap: 0.5em;';
 		}
 		$style .= "flex-wrap: $flex_wrap;";
-		$style .= 'align-items: center;';
-		/**
-		 * Add this style only if is not empty for backwards compatibility,
-		 * since we intend to convert blocks that had flex layout implemented
-		 * by custom css.
-		 */
-		if ( ! empty( $layout['justifyContent'] ) && array_key_exists( $layout['justifyContent'], $justify_content_options ) ) {
-			$style .= "justify-content: {$justify_content_options[ $layout['justifyContent'] ]};";
-
-		$style  = "$selector {";
-		$style .= 'display: flex;';
-		if ( $has_block_gap_support ) {
-			$style .= 'gap: var( --wp--style--block-gap, 0.5em );';
-		} else {
-			$style .= 'gap: 0.5em;';
-		}
-		$style .= 'flex-wrap: wrap;';
 		if ( 'horizontal' === $layout_orientation ) {
 			$style .= 'align-items: center;';
 			/**
