@@ -254,12 +254,12 @@ describe( 'Embed block', () => {
 			fireEvent( embedEditURLModal, 'backdropPress' );
 			fireEvent( embedEditURLModal, MODAL_DISMISS_EVENT );
 
-			// Wait for edit URL button to be present
-			const editURLButton = await waitFor( () =>
-				getByA11yLabel( 'Edit URL' )
+			// Wait for block settings button to be present
+			const settingsButton = await waitFor( () =>
+				getByA11yLabel( 'Open Settings' )
 			);
 
-			expect( editURLButton ).toBeDefined();
+			expect( settingsButton ).toBeDefined();
 			expect( getEditorHtml() ).toMatchSnapshot();
 		} );
 
@@ -286,13 +286,13 @@ describe( 'Embed block', () => {
 			fireEvent( embedEditURLModal, 'backdropPress' );
 			fireEvent( embedEditURLModal, MODAL_DISMISS_EVENT );
 
-			// Wait for edit URL button to be present
-			const editURLButton = await waitFor( () =>
-				getByA11yLabel( 'Edit URL' )
+			// Wait for block settings button to be present
+			const settingsButton = await waitFor( () =>
+				getByA11yLabel( 'Open Settings' )
 			);
 
 			expect( embedLink ).toBeDefined();
-			expect( editURLButton ).toBeDefined();
+			expect( settingsButton ).toBeDefined();
 			expect( getEditorHtml() ).toMatchSnapshot();
 
 			Clipboard.getString.mockReset();
@@ -345,12 +345,12 @@ describe( 'Embed block', () => {
 			fireEvent( embedEditURLModal, 'backdropPress' );
 			fireEvent( embedEditURLModal, MODAL_DISMISS_EVENT );
 
-			// Wait for edit URL button to be present
-			const editURLButton = await waitFor( () =>
-				getByA11yLabel( 'Edit URL' )
+			// Wait for block settings button to be present
+			const settingsButton = await waitFor( () =>
+				getByA11yLabel( 'Open Settings' )
 			);
 
-			expect( editURLButton ).toBeDefined();
+			expect( settingsButton ).toBeDefined();
 			expect( getEditorHtml() ).toMatchSnapshot();
 		} );
 
@@ -380,13 +380,13 @@ describe( 'Embed block', () => {
 			fireEvent( embedEditURLModal, 'backdropPress' );
 			fireEvent( embedEditURLModal, MODAL_DISMISS_EVENT );
 
-			// Wait for edit URL button to be present
-			const editURLButton = await waitFor( () =>
-				getByA11yLabel( 'Edit URL' )
+			// Wait for block settings button to be present
+			const settingsButton = await waitFor( () =>
+				getByA11yLabel( 'Open Settings' )
 			);
 
 			expect( embedLink ).toBeDefined();
-			expect( editURLButton ).toBeDefined();
+			expect( settingsButton ).toBeDefined();
 			expect( getEditorHtml() ).toMatchSnapshot();
 
 			Clipboard.getString.mockReset();
