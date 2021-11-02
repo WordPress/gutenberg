@@ -51,6 +51,16 @@ function useInitialPosition( clientId ) {
 	);
 }
 
+function useIsMounting() {
+	const isMounting = useRef( true );
+
+	useEffect( () => {
+		isMounting.current = false;
+	}, [] );
+
+	return isMounting.current;
+}
+
 /**
  * Transitions focus to the block or inner tabbable when the block becomes
  * selected and an initial position is set.
@@ -62,6 +72,7 @@ function useInitialPosition( clientId ) {
 export function useFocusFirstElement( clientId ) {
 	const ref = useRef();
 	const initialPosition = useInitialPosition( clientId );
+	const isMounting = useIsMounting();
 
 	useEffect( () => {
 		if ( initialPosition === undefined || initialPosition === null ) {
@@ -89,7 +100,10 @@ export function useFocusFirstElement( clientId ) {
 		// Find all text fields or placeholders within the block.
 		candidates = focus.tabbable
 			.find( target )
-			.filter( ( node ) => isTextField( node ) || node.shadowRoot );
+			.filter(
+				( node ) =>
+					isTextField( node ) || ( isMounting && node.shadowRoot )
+			);
 
 		target = ( isReverse ? last : first )( candidates ) || target;
 
@@ -98,7 +112,7 @@ export function useFocusFirstElement( clientId ) {
 			return;
 		}
 
-		if ( target.shadowRoot ) {
+		if ( isMounting && target.shadowRoot ) {
 			// We must wait for the placeholder content to load.
 			setTimeout( () => {
 				// Find all text fields within the placeholder.
