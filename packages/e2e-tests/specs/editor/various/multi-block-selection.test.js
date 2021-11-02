@@ -13,11 +13,8 @@ import {
 	saveDraft,
 	transformBlockTo,
 	clickPlaceholderButton,
+	insertBlock,
 } from '@wordpress/e2e-test-utils';
-/**
- * Internal dependencies
- */
-import { insertBlock } from '../../../../block-editor/src/store/actions';
 
 async function getSelectedFlatIndices() {
 	return await page.evaluate( () => {
@@ -654,6 +651,7 @@ describe( 'Multi-block selection', () => {
 	} );
 
 	it( 'should gradually multi-select', async () => {
+		await clickBlockAppender();
 		await insertBlock( 'Columns' );
 		await clickPlaceholderButton( 'Two columns; equal split' );
 		// Navigate to appender.
