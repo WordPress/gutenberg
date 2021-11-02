@@ -31,8 +31,8 @@ const EmbedControls = ( {
 	showEmbedBottomSheet,
 } ) => (
 	<>
-		{ themeSupportsResponsive && blockSupportsResponsive && (
-			<InspectorControls>
+		<InspectorControls>
+			{ themeSupportsResponsive && blockSupportsResponsive && (
 				<PanelBody
 					title={ __( 'Media settings' ) }
 					className="blocks-responsive"
@@ -44,18 +44,18 @@ const EmbedControls = ( {
 						onChange={ toggleResponsive }
 					/>
 				</PanelBody>
-				<PanelBody title={ __( 'Link settings' ) }>
-					<EmbedBottomSheet
-						value={ url }
-						label={ bottomSheetLabel }
-						isVisible={ showEmbedBottomSheet }
-						onClose={ onEmbedBottomSheetClose }
-						onSubmit={ onEmbedBottomSheetSubmit }
-						withBottomSheet={ false }
-					/>
-				</PanelBody>
-			</InspectorControls>
-		) }
+			) }
+			<PanelBody title={ __( 'Link settings' ) }>
+				<EmbedBottomSheet
+					value={ url }
+					label={ bottomSheetLabel }
+					isVisible={ showEmbedBottomSheet }
+					onClose={ onEmbedBottomSheetClose }
+					onSubmit={ onEmbedBottomSheetSubmit }
+					withBottomSheet={ false }
+				/>
+			</PanelBody>
+		</InspectorControls>
 	</>
 );
 
