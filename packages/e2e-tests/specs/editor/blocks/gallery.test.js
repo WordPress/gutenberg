@@ -16,6 +16,15 @@ import {
 	clickButton,
 } from '@wordpress/e2e-test-utils';
 
+async function placeholderUpload() {
+	const input = await page.waitForFunction( () =>
+		document
+			.querySelector( '.wp-block-editor-placeholder' )
+			?.shadowRoot.querySelector( 'input[type="file"]' )
+	);
+	return upload( input );
+}
+
 async function upload( handle ) {
 	const testImagePath = path.join(
 		__dirname,
@@ -42,10 +51,7 @@ describe( 'Gallery', () => {
 
 	it( 'can be created using uploaded images', async () => {
 		await insertBlock( 'Gallery' );
-		const inputHandle = await page.evaluateHandle(
-			`document.querySelector('.wp-block-gallery [role="button"]').shadowRoot.querySelector('input[type="file"]')`
-		);
-		const filename = await upload( inputHandle );
+		const filename = await placeholderUpload();
 
 		const regex = new RegExp(
 			`<!-- wp:gallery {\\"linkTo\\":\\"none\\"} -->\\s*<figure class=\\"wp-block-gallery has-nested-images columns-default is-cropped\\"><!-- wp:image {\\"id\\":\\d+,\\"sizeSlug\\":\\"full\\",\\"linkDestination\\":\\"none\\"} -->\\s*<figure class=\\"wp-block-image size-full\\"><img src=\\"[^"]+\/${ filename }\.png\\" alt=\\"\\" class=\\"wp-image-\\d+\\"\/><\/figure>\\s*<!-- \/wp:image --><\/figure>\\s*<!-- \/wp:gallery -->`
@@ -57,10 +63,7 @@ describe( 'Gallery', () => {
 		const galleryCaption = 'Tested gallery caption';
 
 		await insertBlock( 'Gallery' );
-		const inputHandle = await page.evaluateHandle(
-			`document.querySelector('.wp-block-gallery [role="button"]').shadowRoot.querySelector('input[type="file"]')`
-		);
-		await upload( inputHandle );
+		await placeholderUpload();
 
 		await page.click( '.wp-block-gallery>.blocks-gallery-caption' );
 		await page.keyboard.type( galleryCaption );
@@ -72,10 +75,7 @@ describe( 'Gallery', () => {
 
 	it( "uploaded images' captions can be edited", async () => {
 		await insertBlock( 'Gallery' );
-		const inputHandle = await page.evaluateHandle(
-			`document.querySelector('.wp-block-gallery [role="button"]').shadowRoot.querySelector('input[type="file"]')`
-		);
-		await upload( inputHandle );
+		await placeholderUpload();
 
 		const figureElement = await page.waitForSelector(
 			'.wp-block-gallery .wp-block-image'

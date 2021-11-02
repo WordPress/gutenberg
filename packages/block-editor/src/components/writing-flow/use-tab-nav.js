@@ -94,7 +94,7 @@ export default function useTabNav() {
 				return;
 			}
 
-			if ( event.target.getAttribute( 'aria-pressed' ) === 'true' ) {
+			if ( event.target.shadowRoot ) {
 				return;
 			}
 

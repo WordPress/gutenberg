@@ -539,12 +539,10 @@ describe( 'Widgets Customizer', () => {
 		await footer1Section.click();
 
 		const legacyWidgetBlock = await addBlock( 'Legacy Widget' );
-		const selectLegacyWidgets = await page.evaluateHandle( () =>
+		const selectLegacyWidgets = await page.waitForFunction( () =>
 			document
-				.querySelector(
-					'.wp-block-legacy-widget [aria-label="Legacy Widget"]'
-				)
-				.shadowRoot.querySelector( 'select' )
+				.querySelector( '.wp-block-editor-placeholder' )
+				?.shadowRoot.querySelector( 'select' )
 		);
 		await selectLegacyWidgets.select( 'test_widget' );
 
