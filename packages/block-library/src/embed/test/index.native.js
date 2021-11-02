@@ -822,6 +822,7 @@ describe( 'Embed block', () => {
 	} );
 
 	it( 'insert embed from slash inserter', async () => {
+		const expectedHtml = EMPTY_EMBED_HTML;
 		const embedBlockSlashInserter = '/Embed';
 		const {
 			getByPlaceholderText,
@@ -861,5 +862,6 @@ describe( 'Embed block', () => {
 		const blockName = within( block ).getByText( 'Embed' );
 
 		expect( blockName ).toBeDefined();
+		expect( getEditorHtml() ).toBe( expectedHtml );
 	} );
 } );
