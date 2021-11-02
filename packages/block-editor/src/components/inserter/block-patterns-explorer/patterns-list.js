@@ -15,7 +15,6 @@ import useInsertionPoint from '../hooks/use-insertion-point';
 import usePatternsState from '../hooks/use-patterns-state';
 import InserterListbox from '../../inserter-listbox';
 import { searchItems } from '../search-items';
-// import PatternExplorerSearchResults from './search-results';
 
 const INITIAL_INSERTER_RESULTS = 2;
 
