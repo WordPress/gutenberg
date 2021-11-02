@@ -823,12 +823,13 @@ describe( 'Embed block', () => {
 
 	it( 'insert embed from slash inserter', async () => {
 		const embedBlockSlashInserter = '/Embed';
-		const { getByPlaceholderText, getByA11yLabel } = await initializeEditor(
-			{
-				initialHtml:
-					'<!-- wp:paragraph --><p></p><!-- /wp:paragraph -->',
-			}
-		);
+		const {
+			getByPlaceholderText,
+			getByA11yLabel,
+			getByText,
+		} = await initializeEditor( {
+			initialHtml: '<!-- wp:paragraph --><p></p><!-- /wp:paragraph -->',
+		} );
 
 		const paragraphText = getByPlaceholderText( 'Start writing…' );
 		fireEvent( paragraphText, 'focus' );
@@ -851,9 +852,7 @@ describe( 'Embed block', () => {
 			}
 		);
 
-		fireEvent.press(
-			await waitFor( () => getByA11yLabel( 'Embed block' ) )
-		);
+		fireEvent.press( await waitFor( () => getByText( 'Embed' ) ) );
 
 		const block = await waitFor( () =>
 			getByA11yLabel( /Embed Block\. Row 1/ )
