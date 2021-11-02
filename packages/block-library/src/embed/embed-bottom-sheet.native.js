@@ -88,6 +88,7 @@ const EmbedBottomSheet = ( {
 			options={ linkSettingsOptions }
 			withBottomSheet={ withBottomSheet }
 			showIcon
+			hasPicker={ ! withBottomSheet }
 		/>
 	);
 };
