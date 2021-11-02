@@ -63,6 +63,17 @@ const EmbedBottomSheet = ( {
 		}
 	}, [ url, onSubmit, value ] );
 
+	/**
+	 * If the Embed Bottom Sheet component does not utilize a bottom sheet then the onDismiss action is not
+	 * called. Here we are wiring the onDismiss to the onClose callback that gets triggered when input is submitted.
+	 */
+	const performOnCloseOperations = () => {
+		if ( ! withBottomSheet ) {
+			onDismiss();
+		}
+		onClose();
+	};
+
 	function setAttributes( attributes ) {
 		setURL( attributes.url );
 	}
@@ -71,7 +82,7 @@ const EmbedBottomSheet = ( {
 		<LinkSettingsNavigation
 			isVisible={ isVisible }
 			url={ url }
-			onClose={ onClose }
+			onClose={ performOnCloseOperations }
 			onDismiss={ onDismiss }
 			setAttributes={ setAttributes }
 			options={ linkSettingsOptions }
