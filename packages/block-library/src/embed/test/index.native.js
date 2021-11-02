@@ -103,6 +103,9 @@ https://twitter.com/notnownikki
 </div></figure>
 <!-- /wp:embed -->`;
 
+const EMPTY_PARAGRAPH_HTML =
+	'<!-- wp:paragraph --><p></p><!-- /wp:paragraph -->';
+
 const MOST_USED_PROVIDERS = embed.settings.variations.filter( ( { name } ) =>
 	[ 'youtube', 'twitter', 'wordpress', 'vimeo' ].includes( name )
 );
@@ -647,8 +650,7 @@ describe( 'Embed block', () => {
 				getByTestId,
 				getByText,
 			} = await initializeEditor( {
-				initialHtml:
-					'<!-- wp:paragraph --><p></p><!-- /wp:paragraph -->',
+				initialHtml: EMPTY_PARAGRAPH_HTML,
 			} );
 
 			// Paste URL in paragraph block
@@ -691,8 +693,7 @@ describe( 'Embed block', () => {
 				getByTestId,
 				getByText,
 			} = await initializeEditor( {
-				initialHtml:
-					'<!-- wp:paragraph --><p></p><!-- /wp:paragraph -->',
+				initialHtml: EMPTY_PARAGRAPH_HTML,
 			} );
 
 			// Paste URL in paragraph block
@@ -834,7 +835,7 @@ describe( 'Embed block', () => {
 			getByA11yLabel,
 			getByText,
 		} = await initializeEditor( {
-			initialHtml: '<!-- wp:paragraph --><p></p><!-- /wp:paragraph -->',
+			initialHtml: EMPTY_PARAGRAPH_HTML,
 		} );
 
 		const paragraphText = getByPlaceholderText( 'Start writing…' );
