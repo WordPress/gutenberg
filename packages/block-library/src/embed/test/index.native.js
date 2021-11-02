@@ -96,12 +96,13 @@ const RICH_TEXT_EMBED_HTML_WITH_CAPTION = `<!-- wp:embed {"url":"https://twitter
 https://twitter.com/notnownikki
 </div><figcaption>Caption</figcaption></figure>
 <!-- /wp:embed -->`;
-
 const RICH_TEXT_EMBED_HTML_WITH_ALLOW_RESPONSIVE_SET_TO_FALSE = `<!-- wp:embed {"url":"https://twitter.com/notnownikki","type":"rich","providerNameSlug":"twitter","allowResponsive":false,"responsive":true} -->
 <figure class="wp-block-embed is-type-rich is-provider-twitter wp-block-embed-twitter"><div class="wp-block-embed__wrapper">
 https://twitter.com/notnownikki
 </div></figure>
 <!-- /wp:embed -->`;
+const EMPTY_RICH_TEXT_EMBED_HTML =
+	'<!-- wp:embed {"providerNameSlug":"twitter","responsive":true} /-->';
 
 const EMPTY_PARAGRAPH_HTML =
 	'<!-- wp:paragraph --><p></p><!-- /wp:paragraph -->';
@@ -730,6 +731,92 @@ describe( 'Embed block', () => {
 		} );
 	} );
 
+	describe( 'insert via slash inserter', () => {
+		it( 'insert generic embed block', async () => {
+			const expectedHtml = EMPTY_EMBED_HTML;
+			const embedBlockSlashInserter = '/Embed';
+			const {
+				getByPlaceholderText,
+				getByA11yLabel,
+				getByText,
+			} = await initializeEditor( { initialHtml: EMPTY_PARAGRAPH_HTML } );
+
+			const paragraphText = getByPlaceholderText( 'Start writing…' );
+			fireEvent( paragraphText, 'focus' );
+			// Trigger onSelectionChange to update both the current text and text selection.
+			// This event is required by the autocompleter, as it only displays the slash inserter
+			// if the text selection is located at the end of the text, for this reason,
+			// the start and end arguments match the text length.
+			fireEvent(
+				paragraphText,
+				'onSelectionChange',
+				embedBlockSlashInserter.length,
+				embedBlockSlashInserter.length,
+				embedBlockSlashInserter,
+				{
+					nativeEvent: {
+						eventCount: 1,
+						target: undefined,
+						text: embedBlockSlashInserter,
+					},
+				}
+			);
+
+			fireEvent.press( await waitFor( () => getByText( 'Embed' ) ) );
+
+			const block = await waitFor( () =>
+				getByA11yLabel( /Embed Block\. Row 1/ )
+			);
+
+			const blockName = within( block ).getByText( 'Embed' );
+
+			expect( blockName ).toBeDefined();
+			expect( getEditorHtml() ).toBe( expectedHtml );
+		} );
+
+		it( 'insert Twitter embed block', async () => {
+			const expectedHtml = EMPTY_RICH_TEXT_EMBED_HTML;
+			const embedBlockSlashInserter = '/Twitter';
+			const {
+				getByPlaceholderText,
+				getByA11yLabel,
+				getByText,
+			} = await initializeEditor( { initialHtml: EMPTY_PARAGRAPH_HTML } );
+
+			const paragraphText = getByPlaceholderText( 'Start writing…' );
+			fireEvent( paragraphText, 'focus' );
+			// Trigger onSelectionChange to update both the current text and text selection.
+			// This event is required by the autocompleter, as it only displays the slash inserter
+			// if the text selection is located at the end of the text, for this reason,
+			// the start and end arguments match the text length.
+			fireEvent(
+				paragraphText,
+				'onSelectionChange',
+				embedBlockSlashInserter.length,
+				embedBlockSlashInserter.length,
+				embedBlockSlashInserter,
+				{
+					nativeEvent: {
+						eventCount: 1,
+						target: undefined,
+						text: embedBlockSlashInserter,
+					},
+				}
+			);
+
+			fireEvent.press( await waitFor( () => getByText( 'Twitter' ) ) );
+
+			const block = await waitFor( () =>
+				getByA11yLabel( /Embed Block\. Row 1/ )
+			);
+
+			const blockName = within( block ).getByText( 'Twitter' );
+
+			expect( blockName ).toBeDefined();
+			expect( getEditorHtml() ).toBe( expectedHtml );
+		} );
+	} );
+
 	it( 'sets an Embed block caption', async () => {
 		const initialHtml = RICH_TEXT_EMBED_HTML;
 		const expectedHtml = RICH_TEXT_EMBED_HTML_WITH_CAPTION;
@@ -825,49 +912,5 @@ describe( 'Embed block', () => {
 		const cannotEmbedText = getByText( 'Unable to embed media' );
 
 		expect( cannotEmbedText ).toBeDefined();
-	} );
-
-	it( 'insert embed from slash inserter', async () => {
-		const expectedHtml = EMPTY_EMBED_HTML;
-		const embedBlockSlashInserter = '/Embed';
-		const {
-			getByPlaceholderText,
-			getByA11yLabel,
-			getByText,
-		} = await initializeEditor( {
-			initialHtml: EMPTY_PARAGRAPH_HTML,
-		} );
-
-		const paragraphText = getByPlaceholderText( 'Start writing…' );
-		fireEvent( paragraphText, 'focus' );
-		// Trigger onSelectionChange to update both the current text and text selection.
-		// This event is required by the autocompleter, as it only displays the slash inserter
-		// if the text selection is located at the end of the text, for this reason,
-		// the start and end arguments match the text length.
-		fireEvent(
-			paragraphText,
-			'onSelectionChange',
-			embedBlockSlashInserter.length,
-			embedBlockSlashInserter.length,
-			embedBlockSlashInserter,
-			{
-				nativeEvent: {
-					eventCount: 1,
-					target: undefined,
-					text: embedBlockSlashInserter,
-				},
-			}
-		);
-
-		fireEvent.press( await waitFor( () => getByText( 'Embed' ) ) );
-
-		const block = await waitFor( () =>
-			getByA11yLabel( /Embed Block\. Row 1/ )
-		);
-
-		const blockName = within( block ).getByText( 'Embed' );
-
-		expect( blockName ).toBeDefined();
-		expect( getEditorHtml() ).toBe( expectedHtml );
 	} );
 } );
