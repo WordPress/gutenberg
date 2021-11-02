@@ -15,6 +15,7 @@ import { Text } from '../text';
 import { Spacer } from '../spacer';
 import { space } from '../ui/utils/space';
 import { ColorHexInputControl } from './styles';
+import { COLORS } from '../utils/colors-values';
 
 interface HexInputProps {
 	color: Colord;
@@ -35,7 +36,7 @@ export const HexInput = ( { color, onChange, enableAlpha }: HexInputProps ) => {
 				<Spacer
 					as={ Text }
 					marginLeft={ space( 3.5 ) }
-					color="blue"
+					color={ COLORS.ui.theme }
 					lineHeight={ 1 }
 				>
 					#

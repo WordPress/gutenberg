@@ -6,6 +6,7 @@ import { Text } from '../text';
 import { Spacer } from '../spacer';
 import { space } from '../ui/utils/space';
 import { RangeControl, NumberControlWrapper } from './styles';
+import { COLORS } from '../utils/colors-values';
 
 interface InputWithSliderProps {
 	min: number;
@@ -37,7 +38,7 @@ export const InputWithSlider = ( {
 					<Spacer
 						as={ Text }
 						paddingLeft={ space( 3.5 ) }
-						color="blue"
+						color={ COLORS.ui.theme }
 						lineHeight={ 1 }
 					>
 						{ abbreviation }
