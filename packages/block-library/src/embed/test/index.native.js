@@ -832,13 +832,24 @@ describe( 'Embed block', () => {
 
 		const paragraphText = getByPlaceholderText( 'Start writing…' );
 		fireEvent( paragraphText, 'focus' );
-		fireEvent( paragraphText, 'onChange', {
-			nativeEvent: {
-				eventCount: 1,
-				target: undefined,
-				text: embedBlockSlashInserter,
-			},
-		} );
+		// Trigger onSelectionChange to update both the current text and text selection.
+		// This event is required by the autocompleter, as it only displays the slash inserter
+		// if the text selection is located at the end of the text, for this reason,
+		// the start and end arguments match the text length.
+		fireEvent(
+			paragraphText,
+			'onSelectionChange',
+			embedBlockSlashInserter.length,
+			embedBlockSlashInserter.length,
+			embedBlockSlashInserter,
+			{
+				nativeEvent: {
+					eventCount: 1,
+					target: undefined,
+					text: embedBlockSlashInserter,
+				},
+			}
+		);
 
 		fireEvent.press(
 			await waitFor( () => getByA11yLabel( 'Embed block' ) )
