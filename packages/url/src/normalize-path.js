@@ -15,20 +15,8 @@ export function normalizePath( path ) {
 		return base;
 	}
 
-	// 'b=1&c=2&a=5'
-	return (
-		base +
-		'?' +
-		query
-			// [ 'b=1', 'c=2', 'a=5' ]
-			.split( '&' )
-			// [ [ 'b, '1' ], [ 'c', '2' ], [ 'a', '5' ] ]
-			.map( ( entry ) => entry.split( '=' ) )
-			// [ [ 'a', '5' ], [ 'b, '1' ], [ 'c', '2' ] ]
-			.sort( ( a, b ) => a[ 0 ].localeCompare( b[ 0 ] ) )
-			// [ 'a=5', 'b=1', 'c=2' ]
-			.map( ( pair ) => pair.join( '=' ) )
-			// 'a=5&b=1&c=2'
-			.join( '&' )
-	);
+	const searchParams = new URLSearchParams( query );
+	searchParams.sort();
+
+	return `${ base }?${ searchParams.toString() }`;
 }
