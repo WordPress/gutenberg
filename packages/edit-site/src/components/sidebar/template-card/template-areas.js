@@ -41,10 +41,14 @@ function TemplateAreaItem( { area, clientId } ) {
 }
 
 export default function TemplateAreas() {
-	const templateAreaBlocks = useSelect(
-		( select ) => select( editSiteStore ).getTemplateAreaBlocks(),
+	const templateParts = useSelect(
+		( select ) => select( editSiteStore ).getCurrentTemplateTemplateParts(),
 		[]
 	);
+
+	if ( ! templateParts.length ) {
+		return null;
+	}
 
 	return (
 		<section className="edit-site-template-card__template-areas">
@@ -56,16 +60,14 @@ export default function TemplateAreas() {
 			</Heading>
 
 			<ul className="edit-site-template-card__template-areas-list">
-				{ Object.entries( templateAreaBlocks ).map(
-					( [ area, templateAreaBlock ] ) => (
-						<li key={ area }>
-							<TemplateAreaItem
-								area={ area }
-								clientId={ templateAreaBlock.clientId }
-							/>
-						</li>
-					)
-				) }
+				{ templateParts.map( ( { templatePart, block } ) => (
+					<li key={ templatePart.slug }>
+						<TemplateAreaItem
+							area={ templatePart.area }
+							clientId={ block.clientId }
+						/>
+					</li>
+				) ) }
 			</ul>
 		</section>
 	);

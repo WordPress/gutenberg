@@ -45,6 +45,8 @@ export { default as __experimentalDuotoneControl } from './duotone-control';
 export { default as __experimentalFontAppearanceControl } from './font-appearance-control';
 export { default as __experimentalFontFamilyControl } from './font-family';
 export { default as __experimentalLetterSpacingControl } from './letter-spacing-control';
+export { default as __experimentalTextDecorationControl } from './text-decoration-control';
+export { default as __experimentalTextTransformControl } from './text-transform-control';
 export { default as __experimentalColorGradientControl } from './colors-gradients/control';
 export { default as __experimentalPanelColorGradientSettings } from './colors-gradients/panel-color-gradient-settings';
 export {
@@ -52,10 +54,7 @@ export {
 	ImageEditingProvider as __experimentalImageEditingProvider,
 } from './image-editor';
 export { default as __experimentalImageSizeControl } from './image-size-control';
-export {
-	default as InnerBlocks,
-	useInnerBlocksProps as __experimentalUseInnerBlocksProps,
-} from './inner-blocks';
+export { default as InnerBlocks, useInnerBlocksProps } from './inner-blocks';
 export {
 	default as InspectorControls,
 	InspectorAdvancedControls,

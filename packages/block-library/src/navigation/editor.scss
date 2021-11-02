@@ -20,10 +20,14 @@
 	}
 }
 
-// This element is inline on the frontend but needs to be editable, therefore inline-block, in the editor.
+// The following rule affects the positioning of the dropdown arrow indicator.
+// On the frontend, this element is inline, which makes it look correct. In the editor,
+// the label is block, which causes the dropdown indicator to wrap onto a new line.
+// Therefore we explicitly set it to inline even in the block editor.
 .wp-block-navigation-item__label {
-	display: inline-block;
+	display: inline;
 }
+
 
 /**
  * Submenus.
@@ -211,6 +215,18 @@ $color-control-label-height: 20px;
 	margin-right: 7px;
 }
 
+@keyframes loadingpulse {
+	0% {
+		opacity: 1;
+	}
+	50% {
+		opacity: 0.5;
+	}
+	100% {
+		opacity: 1;
+	}
+}
+
 // Unselected state.
 .wp-block-navigation-placeholder__preview {
 	display: flex;
@@ -219,6 +235,11 @@ $color-control-label-height: 20px;
 	flex-wrap: nowrap;
 	width: 100%;
 	overflow: hidden;
+
+	&.is-loading {
+		animation: loadingpulse 1s linear infinite;
+		animation-delay: 0.5s; // avoid animating for fast network responses
+	}
 
 	// Style skeleton elements to mostly match the metrics of actual menu items.
 	// Needs specificity.
@@ -397,12 +418,6 @@ $color-control-label-height: 20px;
 		}
 	}
 }
-.components-button.wp-block-navigation__responsive-container-open {
-	@include break-small {
-		display: none;
-	}
-}
-
 // Emulate the fullscreen editing inside the editor.
 // Most of this can be removed when the iframe lands.
 
@@ -514,4 +529,17 @@ body.editor-styles-wrapper
 	.block-list-appender {
 		margin-top: $grid-unit-20;
 	}
+}
+
+.wp-block-navigation__unsaved-changes-warning {
+	width: 100%;
+
+	.block-editor-warning__actions {
+		margin-top: 0;
+	}
+}
+
+.wp-block-navigation-delete-menu-button {
+	width: 100%;
+	justify-content: center;
 }

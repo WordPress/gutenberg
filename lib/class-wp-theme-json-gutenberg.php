@@ -82,10 +82,10 @@ class WP_Theme_JSON_Gutenberg {
 
 	const VALID_SETTINGS = array(
 		'border'     => array(
-			'customColor'  => null,
+			'color'        => null,
 			'customRadius' => null,
-			'customStyle'  => null,
-			'customWidth'  => null,
+			'style'        => null,
+			'width'        => null,
 		),
 		'color'      => array(
 			'background'     => null,
@@ -110,16 +110,16 @@ class WP_Theme_JSON_Gutenberg {
 			'units'         => null,
 		),
 		'typography' => array(
-			'customFontSize'        => null,
-			'customFontStyle'       => null,
-			'customFontWeight'      => null,
-			'customLetterSpacing'   => null,
-			'customLineHeight'      => null,
-			'customTextDecorations' => null,
-			'customTextTransforms'  => null,
-			'dropCap'               => null,
-			'fontFamilies'          => null,
-			'fontSizes'             => null,
+			'customFontSize'   => null,
+			'customLineHeight' => null,
+			'dropCap'          => null,
+			'fontFamilies'     => null,
+			'fontSizes'        => null,
+			'fontStyle'        => null,
+			'fontWeight'       => null,
+			'letterSpacing'    => null,
+			'textDecoration'   => null,
+			'textTransform'    => null,
 		),
 	);
 
@@ -205,7 +205,7 @@ class WP_Theme_JSON_Gutenberg {
 			'path'       => array( 'typography', 'fontFamilies' ),
 			'value_key'  => 'fontFamily',
 			'css_vars'   => '--wp--preset--font-family--$slug',
-			'classes'    => array(),
+			'classes'    => array( '.has-$slug-font-family' => 'font-family' ),
 			'properties' => array( 'font-family' ),
 		),
 	);
@@ -290,6 +290,12 @@ class WP_Theme_JSON_Gutenberg {
 		// We can remove it at that point.
 		if ( ! isset( $theme_json['version'] ) || 0 === $theme_json['version'] ) {
 			$theme_json = WP_Theme_JSON_Schema_V0::parse( $theme_json );
+		}
+
+		// Provide backwards compatibility for settings that did not land in 5.8
+		// and have had their `custom` prefixed removed since.
+		if ( 1 === $theme_json['version'] ) {
+			$theme_json = WP_Theme_JSON_Schema_V1::parse( $theme_json );
 		}
 
 		$valid_block_names   = array_keys( self::get_blocks_metadata() );
@@ -736,14 +742,15 @@ class WP_Theme_JSON_Gutenberg {
 	 *
 	 * @param array $settings Settings to process.
 	 * @param array $preset_metadata One of the PRESETS_METADATA values.
+	 * @param array $origins List of origins to process.
 	 *
 	 * @return array Array of presets where the key and value are both the slug.
 	 */
-	private static function get_settings_slugs( $settings, $preset_metadata ) {
+	private static function get_settings_slugs( $settings, $preset_metadata, $origins = self::VALID_ORIGINS ) {
 		$preset_per_origin = _wp_array_get( $settings, $preset_metadata['path'], array() );
 
 		$result = array();
-		foreach ( self::VALID_ORIGINS as $origin ) {
+		foreach ( $origins as $origin ) {
 			if ( ! isset( $preset_per_origin[ $origin ] ) ) {
 				continue;
 			}
@@ -800,7 +807,7 @@ class WP_Theme_JSON_Gutenberg {
 	/**
 	 * Transform a slug into a CSS Custom Property.
 	 *
-	 * @param array  $input String to replace.
+	 * @param string $input String to replace.
 	 * @param string $slug The slug value to use to generate the custom property.
 	 *
 	 * @return string The CSS Custom Property. Something along the lines of --wp--preset--color--black.
@@ -1120,7 +1127,8 @@ class WP_Theme_JSON_Gutenberg {
 		foreach ( $this->theme_json['templateParts'] as $item ) {
 			if ( isset( $item['name'] ) ) {
 				$template_parts[ $item['name'] ] = array(
-					'area' => isset( $item['area'] ) ? $item['area'] : '',
+					'title' => isset( $item['title'] ) ? $item['title'] : '',
+					'area'  => isset( $item['area'] ) ? $item['area'] : '',
 				);
 			}
 		}
@@ -1259,30 +1267,34 @@ class WP_Theme_JSON_Gutenberg {
 	 * Returns the stylesheet that results of processing
 	 * the theme.json structure this object represents.
 	 *
-	 * @param string $type   Type of stylesheet. It accepts:
-	 *                         'all': css variables, block classes, preset classes. The default.
-	 *                         'block_styles': only block & preset classes.
-	 *                         'css_variables': only css variables.
-	 *                         'presets': only css variables and preset classes.
-	 * @param array  $origins A list of origins to include. By default it includes 'core', 'theme', and 'user'.
+	 * @param array $types    Types of styles to load. Will load all by default. It accepts:
+	 *                         'variables': only the CSS Custom Properties for presets & custom ones.
+	 *                         'styles': only the styles section in theme.json.
+	 *                         'presets': only the classes for the presets.
+	 * @param array $origins A list of origins to include. By default it includes 'core', 'theme', and 'user'.
 	 *
 	 * @return string Stylesheet.
 	 */
-	public function get_stylesheet( $type = 'all', $origins = self::VALID_ORIGINS ) {
+	public function get_stylesheet( $types = array( 'variables', 'styles', 'presets' ), $origins = self::VALID_ORIGINS ) {
 		$blocks_metadata = self::get_blocks_metadata();
 		$style_nodes     = self::get_style_nodes( $this->theme_json, $blocks_metadata );
 		$setting_nodes   = self::get_setting_nodes( $this->theme_json, $blocks_metadata );
 
-		switch ( $type ) {
-			case 'block_styles':
-				return $this->get_block_classes( $style_nodes ) . $this->get_preset_classes( $setting_nodes, $origins );
-			case 'css_variables':
-				return $this->get_css_variables( $setting_nodes, $origins );
-			case 'presets':
-				return $this->get_css_variables( $setting_nodes, $origins ) . $this->get_preset_classes( $setting_nodes, $origins );
-			default:
-				return $this->get_css_variables( $setting_nodes, $origins ) . $this->get_block_classes( $style_nodes ) . $this->get_preset_classes( $setting_nodes, $origins );
+		$stylesheet = '';
+
+		if ( in_array( 'variables', $types, true ) ) {
+			$stylesheet .= $this->get_css_variables( $setting_nodes, $origins );
 		}
+
+		if ( in_array( 'styles', $types, true ) ) {
+			$stylesheet .= $this->get_block_classes( $style_nodes );
+		}
+
+		if ( in_array( 'presets', $types, true ) ) {
+			$stylesheet .= $this->get_preset_classes( $setting_nodes, $origins );
+		}
+
+		return $stylesheet;
 	}
 
 	/**
@@ -1426,6 +1438,12 @@ class WP_Theme_JSON_Gutenberg {
 
 		if ( ! isset( $theme_json['version'] ) || 0 === $theme_json['version'] ) {
 			$theme_json = WP_Theme_JSON_Schema_V0::parse( $theme_json );
+		}
+
+		// Provide backwards compatibility for settings that did not land in 5.8
+		// and have had their `custom` prefixed removed since.
+		if ( 1 === $theme_json['version'] ) {
+			$theme_json = WP_Theme_JSON_Schema_V1::parse( $theme_json );
 		}
 
 		$valid_block_names   = array_keys( self::get_blocks_metadata() );

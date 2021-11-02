@@ -154,7 +154,7 @@ export function getParsedValue(
 	value: Value,
 	unit?: string,
 	units?: WPUnitControlUnitList
-): [ Value, string ] {
+): [ Value, string | undefined ] {
 	const initialValue = unit ? `${ value }${ unit }` : value;
 
 	return parseUnit( initialValue, units );
@@ -178,17 +178,18 @@ export function hasUnits( units: WPUnitControlUnitList ): boolean {
  * @return The extracted number and unit.
  */
 export function parseUnit(
-	initialValue: Value,
+	initialValue: Value | undefined,
 	units: WPUnitControlUnitList = ALL_CSS_UNITS
-): [ Value, string ] {
+): [ Value, string | undefined ] {
 	const value = String( initialValue ).trim();
 
 	let num: Value = parseFloat( value );
 	num = isNaN( num ) ? '' : num;
 
-	const unitMatch = value.match( /[\d.\-\+]*\s*(.*)/ )[ 1 ];
+	const unitMatch = value.match( /[\d.\-\+]*\s*(.*)/ );
 
-	let unit = unitMatch !== undefined ? unitMatch : '';
+	let unit: string | undefined =
+		unitMatch?.[ 1 ] !== undefined ? unitMatch[ 1 ] : '';
 	unit = unit.toLowerCase();
 
 	if ( hasUnits( units ) && units !== false ) {
@@ -212,14 +213,14 @@ export function parseUnit(
  * @return The extracted value and unit.
  */
 export function getValidParsedUnit(
-	next: Value,
+	next: Value | undefined,
 	units: WPUnitControlUnitList,
 	fallbackValue: Value,
-	fallbackUnit: string
-) {
+	fallbackUnit: string | undefined
+): [ Value, string | undefined ] {
 	const [ parsedValue, parsedUnit ] = parseUnit( next, units );
 	let baseValue = parsedValue;
-	let baseUnit: string;
+	let baseUnit: string | undefined;
 
 	// The parsed value from `parseUnit` should now be either a
 	// real number or an empty string. If not, use the fallback value.
@@ -233,7 +234,7 @@ export function getValidParsedUnit(
 	 * If no unit is found, attempt to use the first value from the collection
 	 * of units as a default fallback.
 	 */
-	if ( hasUnits( units ) && ! baseUnit ) {
+	if ( Array.isArray( units ) && hasUnits( units ) && ! baseUnit ) {
 		baseUnit = units[ 0 ]?.value;
 	}
 
@@ -247,7 +248,7 @@ export function getValidParsedUnit(
  * @param  unit Unit value (example: px)
  * @return a11y label for the unit abbreviation
  */
-export function parseA11yLabelForUnit( unit: string ): string {
+export function parseA11yLabelForUnit( unit: string ): string | undefined {
 	const match = ALL_CSS_UNITS.find( ( item ) => item.value === unit );
 	return match?.a11yLabel ? match?.a11yLabel : match?.value;
 }
@@ -326,7 +327,7 @@ export const useCustomUnits = ( {
 export function getUnitsWithCurrentUnit(
 	currentValue: Value,
 	legacyUnit: string | undefined,
-	units: Array< WPUnitControlUnit > | false = ALL_CSS_UNITS
+	units: WPUnitControlUnitList = ALL_CSS_UNITS
 ): WPUnitControlUnitList {
 	if ( ! Array.isArray( units ) ) {
 		return units;

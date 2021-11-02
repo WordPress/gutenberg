@@ -23,7 +23,7 @@ export const defaultEntities = [
 		label: __( 'Base' ),
 		name: '__unstableBase',
 		kind: 'root',
-		baseURL: '',
+		baseURL: '/',
 	},
 	{
 		label: __( 'Site' ),
@@ -126,6 +126,23 @@ export const defaultEntities = [
 		plural: 'menuLocations',
 		label: __( 'Menu Location' ),
 		key: 'name',
+	},
+	{
+		label: __( 'Global Styles' ),
+		name: 'globalStyles',
+		kind: 'root',
+		baseURL: '/wp/v2/global-styles',
+		baseURLParams: { context: 'edit' },
+		plural: 'globalStylesVariations', // should be different than name
+		getTitle: ( record ) => record?.title?.rendered || record?.title,
+	},
+	{
+		label: __( 'Themes' ),
+		name: 'theme',
+		kind: 'root',
+		baseURL: '/wp/v2/themes',
+		baseURLParams: { context: 'edit' },
+		key: 'stylesheet',
 	},
 ];
 

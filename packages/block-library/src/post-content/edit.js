@@ -6,7 +6,7 @@ import { useSelect } from '@wordpress/data';
 import { RawHTML } from '@wordpress/element';
 import {
 	useBlockProps,
-	__experimentalUseInnerBlocksProps as useInnerBlocksProps,
+	useInnerBlocksProps,
 	useSetting,
 	__experimentalUseNoRecursiveRenders as useNoRecursiveRenders,
 	store as blockEditorStore,
@@ -85,7 +85,7 @@ function Placeholder() {
 	const blockProps = useBlockProps();
 	return (
 		<div { ...blockProps }>
-			<p>{ __( 'This is a placeholder for post content.' ) }</p>
+			<p>{ __( 'Post Content' ) }</p>
 		</div>
 	);
 }

@@ -26,6 +26,16 @@ import * as metadataActions from './metadata/actions';
 /** @typedef {import('../types').WPDataStore} WPDataStore */
 /** @typedef {import('../types').WPDataReduxStoreConfig} WPDataReduxStoreConfig */
 
+const trimUndefinedValues = ( array ) => {
+	const result = [ ...array ];
+	for ( let i = result.length - 1; i >= 0; i-- ) {
+		if ( result[ i ] === undefined ) {
+			result.splice( i, 1 );
+		}
+	}
+	return result;
+};
+
 /**
  * Create a cache to track whether resolvers started running or not.
  *
@@ -35,12 +45,15 @@ function createResolversCache() {
 	const cache = {};
 	return {
 		isRunning( selectorName, args ) {
-			return cache[ selectorName ] && cache[ selectorName ].get( args );
+			return (
+				cache[ selectorName ] &&
+				cache[ selectorName ].get( trimUndefinedValues( args ) )
+			);
 		},
 
 		clear( selectorName, args ) {
 			if ( cache[ selectorName ] ) {
-				cache[ selectorName ].delete( args );
+				cache[ selectorName ].delete( trimUndefinedValues( args ) );
 			}
 		},
 
@@ -49,7 +62,7 @@ function createResolversCache() {
 				cache[ selectorName ] = new EquivalentKeyMap();
 			}
 
-			cache[ selectorName ].set( args, true );
+			cache[ selectorName ].set( trimUndefinedValues( args ), true );
 		},
 	};
 }
@@ -324,7 +337,6 @@ function mapResolveSelectors( selectors, store ) {
 				const hasFinished = () =>
 					selectors.hasFinishedResolution( selectorName, args );
 				const getResult = () => selector.apply( null, args );
-
 				// trigger the selector (to trigger the resolver)
 				const result = getResult();
 				if ( hasFinished() ) {
@@ -376,6 +388,7 @@ function mapResolvers( resolvers, selectors, store, resolversCache ) {
 		const selectorResolver = ( ...args ) => {
 			async function fulfillSelector() {
 				const state = store.getState();
+
 				if (
 					resolversCache.isRunning( selectorName, args ) ||
 					( typeof resolver.isFulfilled === 'function' &&

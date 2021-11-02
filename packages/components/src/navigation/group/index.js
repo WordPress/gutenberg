@@ -41,10 +41,9 @@ export default function NavigationGroup( { children, className, title } ) {
 			<li className={ classes }>
 				{ title && (
 					<GroupTitleUI
-						as="h3"
 						className="components-navigation__group-title"
 						id={ groupTitleId }
-						variant="caption"
+						level={ 3 }
 					>
 						{ title }
 					</GroupTitleUI>

@@ -84,7 +84,11 @@ const transforms = {
 			type: 'block',
 			blocks: [ 'core/search' ],
 			transform: () => {
-				return createBlock( 'core/search' );
+				return createBlock( 'core/search', {
+					showLabel: false,
+					buttonUseIcon: true,
+					buttonPosition: 'button-inside',
+				} );
 			},
 		},
 	],

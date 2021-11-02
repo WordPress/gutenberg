@@ -99,6 +99,7 @@
 		// By setting the dashed border to currentColor, we ensure it's visible
 		// against any background color.
 		color: currentColor;
+		background: transparent;
 		&::before {
 			content: "";
 			display: block;

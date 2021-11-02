@@ -9,7 +9,7 @@ import classnames from 'classnames';
 import {
 	BlockControls,
 	useBlockProps,
-	__experimentalUseInnerBlocksProps as useInnerBlocksProps,
+	useInnerBlocksProps,
 	JustifyContentControl,
 	store as blockEditorStore,
 } from '@wordpress/block-editor';

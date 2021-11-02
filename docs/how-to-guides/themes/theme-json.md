@@ -169,6 +169,9 @@ The settings section has the following structure:
 {
 	"version": 1,
 	"settings": {
+		"border": {
+			"customRadius": false
+		},
 		"color": {
 			"custom": true,
 			"customDuotone": true,
@@ -216,10 +219,10 @@ The settings section has the following structure:
 	"version": 1,
 	"settings": {
 		"border": {
-			"customColor": false,
+			"color": false,
 			"customRadius": false,
-			"customStyle": false,
-			"customWidth": false
+			"style": false,
+			"width": false
 		},
 		"color": {
 			"background": true,
@@ -238,20 +241,22 @@ The settings section has the following structure:
 			"wideSize": "1000px"
 		},
 		"spacing": {
+			"blockGap": null,
 			"customMargin": false,
 			"customPadding": false,
 			"units": [ "px", "em", "rem", "vh", "vw" ]
 		},
 		"typography": {
 			"customFontSize": true,
-			"customFontStyle": true,
-			"customFontWeight": true,
 			"customLineHeight": false,
-			"customTextDecorations": true,
-			"customTextTransforms": true,
 			"dropCap": true,
 			"fontFamilies": [],
-			"fontSizes": []
+			"fontSizes": [],
+			"fontStyle": true,
+			"fontWeight": true,
+			"letterSpacing": true,
+			"textDecoration": true,
+			"textTransform": true
 		},
 		"blocks": {
 			"core/paragraph": {
@@ -519,7 +524,7 @@ Note that the name of the variable is created by adding `--` in between each nes
 }
 ```
 
-- Disable border radius for the button block (borders only work in the plugin so far):
+- Disable border radius for the button block:
 
 ```json
 {
@@ -611,6 +616,9 @@ Each block declares which style properties it exposes via the [block supports me
 {
 	"version": 1,
 	"styles": {
+		"border": {
+			"radius": "value"
+		},
 		"color": {
 			"background": "value",
 			"gradient": "value",
@@ -636,6 +644,7 @@ Each block declares which style properties it exposes via the [block supports me
 		},
 		"elements": {
 			"link": {
+				"border": {},
 				"color": {},
 				"spacing": {},
 				"typography": {}
@@ -649,6 +658,7 @@ Each block declares which style properties it exposes via the [block supports me
 		},
 		"blocks": {
 			"core/group": {
+				"border": {},
 				"color": {},
 				"spacing": {},
 				"typography": {},
@@ -685,6 +695,9 @@ Each block declares which style properties it exposes via the [block supports me
 			"gradient": "value",
 			"text": "value"
 		},
+		"filter": {
+			"duotone": "value"
+		},
 		"spacing": {
 			"blockGap": "value",
 			"margin": {
@@ -705,6 +718,7 @@ Each block declares which style properties it exposes via the [block supports me
 			"fontSize": "value",
 			"fontStyle": "value",
 			"fontWeight": "value",
+			"letterSpacing": "value",
 			"lineHeight": "value",
 			"textDecoration": "value",
 			"textTransform": "value"
@@ -779,7 +793,7 @@ body {
 
 Styles found within a block will be enqueued using the block selector.
 
-By default, the block selector is generated based on its name such as `.wp-block-<blockname-without-namespace>`. For example, `.wp-block-group` for the `core/group` block. There are some blocks that want to opt-out from this default behavior. They can do so by explicitely telling the system which selector to use for them via the `__experimentalSelector` key within the `supports` section of its `block.json` file.
+By default, the block selector is generated based on its name such as `.wp-block-<blockname-without-namespace>`. For example, `.wp-block-group` for the `core/group` block. There are some blocks that want to opt-out from this default behavior. They can do so by explicitly telling the system which selector to use for them via the `__experimentalSelector` key within the `supports` section of its `block.json` file.
 
 {% codetabs %}
 {% Input %}
@@ -949,6 +963,7 @@ Within this field themes can list the template parts present in the `block-templ
 Currently block variations exist for "header" and "footer" values of the area term, any other values and template parts not defined in the json will default to the general template part block. Variations will be denoted by specific icons within the editor's interface, will default to the corresponding semantic HTML element for the wrapper (this can also be overridden by the `tagName` attribute set on the template part block), and will contextualize the template part allowing more custom flows in future editor improvements.
 
 - name: mandatory.
+- title: optional, translatable.
 - area: optional, will be set to `uncategorized` by default and trigger no block variation.
 
 ```json
@@ -957,11 +972,21 @@ Currently block variations exist for "header" and "footer" values of the area te
 	"templateParts": [
 		{
 			"name": "my-template-part",
+			"title": "Header",
 			"area": "header"
 		}
 	]
 }
 ```
+
+## Developing with theme.json
+
+It can be difficult to remember the theme.json settings and properties while you develop, so a JSON scheme was created to help. The schema is available at [SchemaStore.org](https://schemastore.org/)
+
+To use the schema, add `"$schema": "https://json.schemastore.org/theme-v1.json"` to the beginning of your theme.json file. Visual Studio Code and other editors will pick up the schema and can provide help like tooltips, autocomplete, or schema validation in the editor.
+
+![Example using validation with schema](https://developer.wordpress.org/files/2021/10/schema-validation.gif)
+
 
 ## Frequently Asked Questions
 
@@ -984,8 +1009,8 @@ One thing you may have noticed is the naming schema used for the CSS Custom Prop
 
 The `--` as a separator has two functions:
 
-- Readibility, for human understanding. It can be thought as similar to the BEM naming schema, it separates "categories".
-- Parseability, for machine understanding. Using a defined structure allows machines to understand the meaning of the property `--wp--preset--color--black`: it's a value bounded to the color preset whose slug is "black", which then gives us room to do more things with them.
+- Readability, for human understanding. It can be thought as similar to the BEM naming schema, it separates "categories".
+- Parsability, for machine understanding. Using a defined structure allows machines to understand the meaning of the property `--wp--preset--color--black`: it's a value bounded to the color preset whose slug is "black", which then gives us room to do more things with them.
 
 ### Why using `--` as a separator?
 

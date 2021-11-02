@@ -6,7 +6,7 @@ import { fromPairs } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { useMemo, useCallback, useEffect } from '@wordpress/element';
+import { useMemo, useCallback } from '@wordpress/element';
 import { _x } from '@wordpress/i18n';
 import { useAsyncList } from '@wordpress/compose';
 
@@ -28,43 +28,54 @@ function BlockPatternsCategory( {
 		rootClientId
 	);
 
-	// Remove any empty categories
-	const populatedCategories = useMemo(
-		() =>
-			allCategories
-				.filter( ( category ) =>
-					allPatterns.some( ( pattern ) =>
-						pattern.categories?.includes( category.name )
-					)
-				)
-				.sort( ( { name: currentName }, { name: nextName } ) => {
-					if ( ! [ currentName, nextName ].includes( 'featured' ) ) {
-						return 0;
-					}
-					return currentName === 'featured' ? -1 : 1;
-				} ),
-		[ allPatterns, allCategories ]
+	const hasRegisteredCategory = useCallback(
+		( pattern ) => {
+			if ( ! pattern.categories || ! pattern.categories.length ) {
+				return false;
+			}
+
+			return pattern.categories.some( ( cat ) =>
+				allCategories.some( ( category ) => category.name === cat )
+			);
+		},
+		[ allCategories ]
 	);
 
-	const patternCategory = selectedCategory
-		? selectedCategory
-		: populatedCategories[ 0 ];
+	// Remove any empty categories
+	const populatedCategories = useMemo( () => {
+		const categories = allCategories
+			.filter( ( category ) =>
+				allPatterns.some( ( pattern ) =>
+					pattern.categories?.includes( category.name )
+				)
+			)
+			.sort( ( { name: currentName }, { name: nextName } ) => {
+				if ( ! [ currentName, nextName ].includes( 'featured' ) ) {
+					return 0;
+				}
+				return currentName === 'featured' ? -1 : 1;
+			} );
 
-	useEffect( () => {
 		if (
 			allPatterns.some(
-				( pattern ) => getPatternIndex( pattern ) === Infinity
+				( pattern ) => ! hasRegisteredCategory( pattern )
 			) &&
-			! populatedCategories.find(
+			! categories.find(
 				( category ) => category.name === 'uncategorized'
 			)
 		) {
-			populatedCategories.push( {
+			categories.push( {
 				name: 'uncategorized',
 				label: _x( 'Uncategorized' ),
 			} );
 		}
-	}, [ populatedCategories, allPatterns ] );
+
+		return categories;
+	}, [ allPatterns, allCategories ] );
+
+	const patternCategory = selectedCategory
+		? selectedCategory
+		: populatedCategories[ 0 ];
 
 	const getPatternIndex = useCallback(
 		( pattern ) => {

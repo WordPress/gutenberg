@@ -275,7 +275,9 @@ afterEach( async () => {
 	await setUpResponseMocking( [] );
 } );
 
-describe( 'Navigation', () => {
+// Disable reason - these tests are to be re-written.
+// eslint-disable-next-line jest/no-disabled-tests
+describe.skip( 'Navigation', () => {
 	describe( 'Creating from existing Pages', () => {
 		it( 'allows a navigation block to be created using existing pages', async () => {
 			// Mock the response from the Pages endpoint. This is done so that the pages returned are always
@@ -598,7 +600,7 @@ describe( 'Navigation', () => {
 		await toggleSidebar();
 
 		const [ openOnClickButton ] = await page.$x(
-			'//label[contains(text(),"Open submenus on click")]'
+			'//label[contains(text(),"Open on click")]'
 		);
 
 		await openOnClickButton.click();
@@ -654,6 +656,8 @@ describe( 'Navigation', () => {
 		await insertBlock( 'Site Title' );
 
 		// Now try inserting another Link block via the quick inserter.
+		await page.focus( '.wp-block-navigation .block-list-appender' );
+
 		await page.click( '.wp-block-navigation .block-list-appender' );
 
 		const linkButton = await page.waitForSelector(
@@ -731,6 +735,7 @@ describe( 'Navigation', () => {
 		expect( tagCount ).toBe( 1 );
 	} );
 
+	// eslint-disable-next-line jest/no-disabled-tests
 	it.skip( 'loads frontend code only if responsiveness is turned on', async () => {
 		await mockPagesResponse( [
 			{

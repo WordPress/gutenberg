@@ -127,7 +127,9 @@ function render_block_core_home_link( $attributes, $content, $block ) {
 
 	$wrapper_attributes = block_core_home_link_build_li_wrapper_attributes( $block->context );
 
-	$html = '<li ' . $wrapper_attributes . '><a class="wp-block-home-link__content wp-block-navigation-item__content"';
+	$aria_current = is_home() || ( is_front_page() && 'page' === get_option( 'show_on_front' ) ) ? ' aria-current="page"' : '';
+
+	$html = '<li ' . $wrapper_attributes . '><a class="wp-block-home-link__content wp-block-navigation-item__content" rel="home"' . $aria_current;
 
 	// Start appending HTML attributes to anchor tag.
 	$html .= ' href="' . esc_url( home_url() ) . '"';

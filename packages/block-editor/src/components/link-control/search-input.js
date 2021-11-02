@@ -2,7 +2,7 @@
  * External dependencies
  */
 import { noop, omit } from 'lodash';
-
+import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
@@ -45,6 +45,7 @@ const LinkControlSearchInput = forwardRef(
 			suggestionsQuery = {},
 			withURLSuggestion = true,
 			createSuggestionButtonText,
+			useLabel = false,
 		},
 		ref
 	) => {
@@ -117,10 +118,15 @@ const LinkControlSearchInput = forwardRef(
 			}
 		};
 
+		const inputClasses = classnames( className, {
+			'has-no-label': ! useLabel,
+		} );
+
 		return (
-			<div>
+			<div className="block-editor-link-control__search-input-container">
 				<URLInput
-					className={ className }
+					label={ useLabel ? 'URL' : undefined }
+					className={ inputClasses }
 					value={ value }
 					onChange={ onInputChange }
 					placeholder={ placeholder ?? __( 'Search or type url' ) }

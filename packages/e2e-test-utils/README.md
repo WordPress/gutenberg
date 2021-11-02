@@ -111,6 +111,10 @@ _Parameters_
 
 Undocumented declaration.
 
+### closeListView
+
+Closes list view
+
 ### createEmbeddingMatcher
 
 Creates a function to determine if a request is embedding a certain URL.
@@ -237,6 +241,10 @@ _Parameters_
 
 Removes the focus loss listener that `enableFocusLossObservation()` adds.
 
+### disablePageDialogAccept
+
+Disable auto-accepting any dialogs.
+
 ### disablePrePublishChecks
 
 Disables Pre-publish checks.
@@ -263,8 +271,7 @@ loss of focus.
 
 ### enablePageDialogAccept
 
-Enables even listener which accepts a page dialog which
-may appear when navigating away from Gutenberg.
+Enables event listener which auto-accepts all dialogs on the page.
 
 ### enablePrePublishChecks
 
@@ -504,6 +511,10 @@ Clicks on the button in the header which opens Document Settings sidebar when it
 ### openGlobalBlockInserter
 
 Opens the global block inserter.
+
+### openListView
+
+Opens list view
 
 ### openPreviewPage
 

@@ -6,28 +6,27 @@ import { css } from '@emotion/react';
 /**
  * Internal dependencies
  */
+import {
+	StyledField as BaseControlField,
+	Wrapper as BaseControlWrapper,
+} from '../base-control/styles/base-control-styles';
 import { COLORS, CONFIG } from '../utils';
 import { space } from '../ui/utils/space';
 
 const toolsPanelGrid = {
-	container: css`
+	spacing: css`
 		column-gap: ${ space( 4 ) };
-		display: grid;
-		grid-template-columns: 1fr 1fr;
 		row-gap: ${ space( 6 ) };
 	`,
 	item: {
-		halfWidth: css`
-			grid-column: span 1;
-		`,
 		fullWidth: css`
-			grid-column: span 2;
+			grid-column: 1 / -1;
 		`,
 	},
 };
 
 export const ToolsPanel = css`
-	${ toolsPanelGrid.container };
+	${ toolsPanelGrid.spacing };
 
 	border-top: ${ CONFIG.borderWidth } solid ${ COLORS.gray[ 200 ] };
 	margin-top: -1px;
@@ -39,52 +38,57 @@ export const ToolsPanel = css`
  * an inner dom element to be injected. The following rule allows for the
  * CSS grid display to be re-established.
  */
-export const ToolsPanelWithInnerWrapper = css`
-	> div {
-		${ toolsPanelGrid.container }
-		${ toolsPanelGrid.item.fullWidth }
-	}
-`;
+
+export const ToolsPanelWithInnerWrapper = ( columns: number ) => {
+	return css`
+		> div:not( :first-of-type ) {
+			display: grid;
+			grid-template-columns: ${ `repeat( ${ columns }, 1fr )` };
+			${ toolsPanelGrid.spacing }
+			${ toolsPanelGrid.item.fullWidth }
+		}
+	`;
+};
 
 export const ToolsPanelHiddenInnerWrapper = css`
-	> div {
+	> div:not( :first-of-type ) {
 		display: none;
 	}
 `;
 
 export const ToolsPanelHeader = css`
-	align-items: center;
-	display: flex;
+	${ toolsPanelGrid.item.fullWidth }
+	gap: ${ space( 2 ) };
+
+	/**
+	 * The targeting of dropdown menu component classes here is a temporary
+	 * measure only.
+	 *
+	 * The following styles should be replaced once the DropdownMenu has been
+	 * refactored and can be targeted via component interpolation.
+	 */
+	.components-dropdown-menu {
+		margin: ${ space( -1 ) } 0;
+	}
+	&&&& .components-dropdown-menu__toggle {
+		padding: 0;
+		min-width: ${ space( 6 ) };
+	}
+`;
+
+export const ToolsPanelHeading = css`
 	font-size: inherit;
 	font-weight: 500;
-	${ toolsPanelGrid.item.fullWidth }
-	justify-content: space-between;
 	line-height: normal;
 
-	.components-tools-panel & {
+	/* Required to meet specificity requirements to ensure zero margin */
+	&& {
 		margin: 0;
-	}
-
-	.components-dropdown-menu {
-		margin-top: ${ space( -1 ) };
-		margin-bottom: ${ space( -1 ) };
-		height: ${ space( 6 ) };
-	}
-
-	.components-dropdown-menu__toggle {
-		padding: 0;
-		height: ${ space( 6 ) };
-		min-width: ${ space( 6 ) };
-		width: ${ space( 6 ) };
 	}
 `;
 
 export const ToolsPanelItem = css`
 	${ toolsPanelGrid.item.fullWidth }
-
-	&.single-column {
-		${ toolsPanelGrid.item.halfWidth }
-	}
 
 	/* Clear spacing in and around controls added as panel items. */
 	/* Remove when they can be addressed via context system. */
@@ -95,10 +99,11 @@ export const ToolsPanelItem = css`
 		max-width: 100%;
 	}
 
-	& > .components-base-control:last-child {
+	/* Remove BaseControl components margins and leave spacing to grid layout */
+	&& ${ BaseControlWrapper } {
 		margin-bottom: 0;
 
-		.components-base-control__field {
+		${ BaseControlField } {
 			margin-bottom: 0;
 		}
 	}
