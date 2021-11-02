@@ -169,6 +169,9 @@ The settings section has the following structure:
 {
 	"version": 1,
 	"settings": {
+		"border": {
+			"customRadius": false
+		},
 		"color": {
 			"custom": true,
 			"customDuotone": true,
@@ -238,6 +241,7 @@ The settings section has the following structure:
 			"wideSize": "1000px"
 		},
 		"spacing": {
+			"blockGap": null,
 			"customMargin": false,
 			"customPadding": false,
 			"units": [ "px", "em", "rem", "vh", "vw" ]
@@ -246,12 +250,13 @@ The settings section has the following structure:
 			"customFontSize": true,
 			"customLineHeight": false,
 			"dropCap": true,
+			"fontFamilies": [],
+			"fontSizes": [],
 			"fontStyle": true,
 			"fontWeight": true,
+			"letteSpacing": true,
 			"textDecoration": true,
-			"textTransform": true,
-			"fontFamilies": [],
-			"fontSizes": []
+			"textTransform": true
 		},
 		"blocks": {
 			"core/paragraph": {
