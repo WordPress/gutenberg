@@ -297,6 +297,9 @@ $block-inserter-tabs-height: 44px;
 		display: grid;
 		grid-template-columns: 1fr 1fr;
 		grid-gap: $grid-unit-10;
+		.block-editor-block-preview__container {
+			min-height: 100px;
+		}
 	}
 }
 
