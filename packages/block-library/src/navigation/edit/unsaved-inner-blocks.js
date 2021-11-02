@@ -11,13 +11,7 @@ import { serialize } from '@wordpress/blocks';
 import { Disabled, Spinner } from '@wordpress/components';
 import { store as coreStore } from '@wordpress/core-data';
 import { useDispatch, useSelect } from '@wordpress/data';
-import {
-	useCallback,
-	useContext,
-	useEffect,
-	useRef,
-	useState,
-} from '@wordpress/element';
+import { useCallback, useContext, useEffect, useRef } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 
 /**
@@ -39,7 +33,6 @@ export default function UnsavedInnerBlocks( {
 	onSave,
 	hasSelection,
 } ) {
-	const [ controlledBlocks ] = useState( blocks );
 	const isDisabled = useContext( Disabled.Context );
 	const savingLock = useRef( false );
 
@@ -49,7 +42,7 @@ export default function UnsavedInnerBlocks( {
 		// Make the inner blocks 'controlled'. This allows the block to always
 		// work with controlled inner blocks, smoothing out the switch to using
 		// an entity.
-		value: controlledBlocks,
+		value: blocks,
 		onChange: NOOP,
 		onInput: NOOP,
 	} );
