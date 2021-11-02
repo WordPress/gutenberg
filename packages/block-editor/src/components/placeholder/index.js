@@ -19,7 +19,10 @@ import EmbeddedAdminContext from '../embedded-admin-context';
  */
 export default function IsolatedPlaceholder( props ) {
 	return (
-		<EmbeddedAdminContext aria-label={ props.label }>
+		<EmbeddedAdminContext
+			aria-label={ props.label }
+			className="wp-block-editor-placeholder"
+		>
 			<Placeholder
 				{ ...props }
 				role="dialog"

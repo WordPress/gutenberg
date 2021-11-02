@@ -8,6 +8,7 @@ import {
 	pressKeyTimes,
 	pressKeyWithModifier,
 	openDocumentSettingsSidebar,
+	clickPlaceholderButton,
 } from '@wordpress/e2e-test-utils';
 
 async function openListViewSidebar() {
@@ -37,8 +38,7 @@ describe( 'Navigating the block hierarchy', () => {
 
 	it( 'should navigate using the list view sidebar', async () => {
 		await insertBlock( 'Columns' );
-		await page.keyboard.press( 'Tab' );
-		await page.keyboard.press( 'Space' );
+		await clickPlaceholderButton( 'Two columns; equal split' );
 
 		// Add a paragraph in the first column.
 		await page.keyboard.press( 'ArrowDown' ); // Navigate to inserter.
@@ -94,8 +94,7 @@ describe( 'Navigating the block hierarchy', () => {
 
 	it( 'should navigate block hierarchy using only the keyboard', async () => {
 		await insertBlock( 'Columns' );
-		await page.keyboard.press( 'Tab' );
-		await page.keyboard.press( 'Space' );
+		await clickPlaceholderButton( 'Two columns; equal split' );
 
 		// Add a paragraph in the first column.
 		await page.keyboard.press( 'ArrowDown' ); // Navigate to inserter.
@@ -153,7 +152,6 @@ describe( 'Navigating the block hierarchy', () => {
 		// Create an image block too.
 		await page.keyboard.press( 'Enter' );
 		await insertBlock( 'Image' );
-		await page.keyboard.press( 'Escape' );
 
 		// Return to first block.
 		await openListViewSidebar();

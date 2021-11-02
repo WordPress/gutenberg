@@ -9,6 +9,7 @@ import {
 	pressKeyWithModifier,
 	insertBlock,
 	clickBlockToolbarButton,
+	clickPlaceholderButton,
 } from '@wordpress/e2e-test-utils';
 
 const getActiveBlockName = async () =>
@@ -21,12 +22,12 @@ const addParagraphsAndColumnsDemo = async () => {
 	await clickBlockAppender();
 	await page.keyboard.type( 'First paragraph' );
 	await page.keyboard.press( 'Enter' );
-	await insertBlock( 'Columns' );
-
-	// Press the 50/50 option.
-	await page.keyboard.press( 'Tab' );
-	await page.keyboard.press( 'Space' );
-
+	await page.keyboard.type( '/columns' );
+	await page.waitForXPath(
+		`//*[contains(@class, "components-autocomplete__result") and contains(@class, "is-selected") and contains(text(), 'Columns')]`
+	);
+	await page.keyboard.press( 'Enter' );
+	await clickPlaceholderButton( 'Two columns; equal split' );
 	await page.click( ':focus .block-editor-button-block-appender' );
 	await page.waitForSelector( '.block-editor-inserter__search input:focus' );
 	await page.keyboard.type( 'Paragraph' );
@@ -588,20 +589,16 @@ describe( 'Writing Flow', () => {
 		await page.mouse.click( x, lowerInserterY );
 
 		const type = await page.evaluate( () =>
-			document.activeElement.getAttribute( 'aria-label' )
+			document.activeElement.getAttribute( 'data-type' )
 		);
 
-		expect( type ).toBe( 'Image' );
+		expect( type ).toBe( 'core/image' );
 	} );
 
 	it( 'should only consider the content as one tab stop', async () => {
 		await page.keyboard.press( 'Enter' );
 		await insertBlock( 'Table' );
-		// Tab to the "Create table" button.
-		await page.keyboard.press( 'Tab' );
-		await page.keyboard.press( 'Tab' );
-		// Create the table.
-		await page.keyboard.press( 'Space' );
+		await clickPlaceholderButton( 'Create Table' );
 		// Return focus after focus loss. This should be fixed.
 		await page.keyboard.press( 'Tab' );
 		// Navigate to the second cell.

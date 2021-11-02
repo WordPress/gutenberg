@@ -10,6 +10,10 @@ import {
 	activateTheme,
 	clickButton,
 } from '@wordpress/e2e-test-utils';
+/**
+ * Internal dependencies
+ */
+import { clickPlaceholderButton } from '../../../e2e-test-utils/src';
 
 /**
  * Internal dependencies
@@ -100,13 +104,7 @@ describe( 'Multi-entity save flow', () => {
 
 			// Add a template part and edit it.
 			await insertBlock( 'Template Part' );
-			await page.waitForFunction( () =>
-				document.activeElement.shadowRoot?.querySelector( 'button' )
-			);
-			await page.keyboard.press( 'Space' );
-			await page.keyboard.press( 'Tab' );
-			await page.keyboard.press( 'Tab' );
-			await page.keyboard.press( 'Space' );
+			await clickPlaceholderButton( 'New template part' );
 
 			const confirmTitleButton = await page.waitForSelector(
 				confirmTitleButtonSelector

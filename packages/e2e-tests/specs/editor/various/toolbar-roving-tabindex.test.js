@@ -7,6 +7,10 @@ import {
 	clickBlockToolbarButton,
 	insertBlock,
 } from '@wordpress/e2e-test-utils';
+/**
+ * Internal dependencies
+ */
+import { clickPlaceholderButton } from '../../../../e2e-test-utils/src';
 
 async function focusBlockToolbar() {
 	await pressKeyWithModifier( 'alt', 'F10' );
@@ -90,8 +94,6 @@ describe( 'Toolbar roving tabindex', () => {
 
 	it( 'ensures image block toolbar uses roving tabindex', async () => {
 		await insertBlock( 'Image' );
-		await page.keyboard.press( 'Escape' );
-		await page.keyboard.press( 'ArrowUp' );
 		await testBlockToolbarKeyboardNavigation( 'Block: Image', 'Image' );
 		await wrapCurrentBlockWithGroup( 'Image' );
 		await testGroupKeyboardNavigation( 'Block: Image', 'Image' );
@@ -99,28 +101,11 @@ describe( 'Toolbar roving tabindex', () => {
 
 	it( 'ensures table block toolbar uses roving tabindex', async () => {
 		await insertBlock( 'Table' );
-		await page.keyboard.press( 'Escape' );
-		await page.keyboard.press( 'ArrowUp' );
 		await testBlockToolbarKeyboardNavigation( 'Block: Table', 'Table' );
 		// Move focus to the first toolbar item
 		await page.keyboard.press( 'Home' );
 		await expectLabelToHaveFocus( 'Table' );
-
-		// Tab to editor content.
-		await page.keyboard.press( 'Tab' );
-
-		// Navigate into the placeholder.
-		await page.keyboard.press( 'ArrowDown' );
-		await page.keyboard.press( 'Space' );
-
-		// Navigate to "Create Table"
-		await page.keyboard.press( 'Tab' );
-		await page.keyboard.press( 'Tab' );
-		await page.keyboard.press( 'Tab' );
-
-		// Create the table.
-		await page.keyboard.press( 'Space' );
-
+		await clickPlaceholderButton( 'Create Table' );
 		await page.keyboard.press( 'Tab' );
 		await testBlockToolbarKeyboardNavigation( 'Body cell text', 'Table' );
 		await wrapCurrentBlockWithGroup( 'Table' );

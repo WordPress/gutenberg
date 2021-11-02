@@ -15,6 +15,7 @@ import {
 	deactivatePlugin,
 	insertBlock,
 	openDocumentSettingsSidebar,
+	clickPlaceholderButton,
 } from '@wordpress/e2e-test-utils';
 
 describe( 'changing image size', () => {
@@ -29,10 +30,7 @@ describe( 'changing image size', () => {
 
 	it( 'should insert and change my image size', async () => {
 		await insertBlock( 'Image' );
-
-		// Tab to the Media Library option.
-		await page.keyboard.press( 'Tab' );
-		await page.keyboard.press( 'Space' );
+		await clickPlaceholderButton( 'Media Library' );
 
 		// Wait for media modal to appear and upload image.
 		await page.waitForSelector( '.media-modal input[type=file]' );

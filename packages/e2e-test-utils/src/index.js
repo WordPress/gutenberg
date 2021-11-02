@@ -14,6 +14,7 @@ export { clickButton } from './click-button';
 export { clickMenuItem } from './click-menu-item';
 export { clickOnCloseModalButton } from './click-on-close-modal-button';
 export { clickOnMoreMenuItem } from './click-on-more-menu-item';
+export { clickPlaceholderButton } from './click-placeholder-button';
 export { createNewPost } from './create-new-post';
 export { createUser } from './create-user';
 export { createURL } from './create-url';

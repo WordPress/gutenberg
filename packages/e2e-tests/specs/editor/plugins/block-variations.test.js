@@ -11,6 +11,7 @@ import {
 	openDocumentSettingsSidebar,
 	togglePreferencesOption,
 	toggleMoreMenu,
+	clickPlaceholderButton,
 } from '@wordpress/e2e-test-utils';
 
 describe( 'Block variations', () => {
@@ -85,14 +86,7 @@ describe( 'Block variations', () => {
 	} );
 	test( 'Pick the additional variation in the inserted Columns block', async () => {
 		await insertBlock( 'Columns' );
-
-		await page.keyboard.press( 'Tab' );
-		await page.keyboard.press( 'Tab' );
-		await page.keyboard.press( 'Tab' );
-		await page.keyboard.press( 'Tab' );
-		await page.keyboard.press( 'Tab' );
-		await page.keyboard.press( 'Tab' );
-		await page.keyboard.press( 'Space' );
+		await clickPlaceholderButton( 'Four columns' );
 
 		expect(
 			await page.$$(

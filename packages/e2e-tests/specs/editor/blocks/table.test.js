@@ -8,7 +8,10 @@ import {
 	getEditedPostContent,
 	insertBlock,
 	openDocumentSettingsSidebar,
+	clickPlaceholderButton,
 } from '@wordpress/e2e-test-utils';
+
+const createButtonLabel = 'Create Table';
 
 /**
  * Utility function for changing the selected cell alignment.
@@ -20,40 +23,34 @@ async function changeCellAlignment( align ) {
 	await clickButton( `Align column ${ align.toLowerCase() }` );
 }
 
-async function createTable( columnCount, rowCount ) {
-	await insertBlock( 'Table' );
-
-	if ( columnCount ) {
-		await page.keyboard.press( 'Backspace' );
-		await page.keyboard.type( columnCount );
-	}
-
-	// Navigate to "Row count"
-	await page.keyboard.press( 'Tab' );
-
-	if ( rowCount ) await page.keyboard.type( rowCount );
-
-	// Navigate to "Create Table"
-	await page.keyboard.press( 'Tab' );
-
-	// Create the table.
-	await page.keyboard.press( 'Space' );
-}
-
 describe( 'Table', () => {
 	beforeEach( async () => {
 		await createNewPost();
 	} );
 
 	it( 'displays a form for choosing the row and column count of the table', async () => {
-		await createTable( '5', '10' );
+		await insertBlock( 'Table' );
+
+		await clickPlaceholderButton( 'Column count' );
+		await page.keyboard.press( 'Backspace' );
+		await page.keyboard.type( '5' );
+
+		await clickPlaceholderButton( 'Row count' );
+		await page.keyboard.press( 'Backspace' );
+		await page.keyboard.type( '10' );
+
+		// Create the table.
+		await clickPlaceholderButton( createButtonLabel );
 
 		// Expect the post content to have a correctly sized table.
 		expect( await getEditedPostContent() ).toMatchSnapshot();
 	} );
 
 	it( 'allows text to by typed into cells', async () => {
-		await createTable();
+		await insertBlock( 'Table' );
+
+		// Create the table.
+		await clickPlaceholderButton( createButtonLabel );
 
 		// Click the first cell and add some text.
 		await page.click( 'td' );
@@ -76,16 +73,26 @@ describe( 'Table', () => {
 	} );
 
 	it( 'allows header and footer rows to be switched on and off', async () => {
-		await createTable();
+		await insertBlock( 'Table' );
 		await openDocumentSettingsSidebar();
 
+		const headerSwitchSelector = "//label[text()='Header section']";
+		const footerSwitchSelector = "//label[text()='Footer section']";
+
+		// Expect the header and footer switches not to be present before the table has been created.
+		let headerSwitch = await page.$x( headerSwitchSelector );
+		let footerSwitch = await page.$x( footerSwitchSelector );
+		expect( headerSwitch ).toHaveLength( 0 );
+		expect( footerSwitch ).toHaveLength( 0 );
+
+		// Create the table.
+		await clickPlaceholderButton( createButtonLabel );
+
 		// Expect the header and footer switches to be present now that the table has been created.
-		const headerSwitch = await page.$x(
-			"//label[text()='Header section']"
-		);
-		const footerSwitch = await page.$x(
-			"//label[text()='Footer section']"
-		);
+		headerSwitch = await page.$x( headerSwitchSelector );
+		footerSwitch = await page.$x( footerSwitchSelector );
+		expect( headerSwitch ).toHaveLength( 1 );
+		expect( footerSwitch ).toHaveLength( 1 );
 
 		// Toggle on the switches and add some content.
 		await headerSwitch[ 0 ].click();
@@ -112,8 +119,11 @@ describe( 'Table', () => {
 	} );
 
 	it( 'allows adding and deleting columns across the table header, body and footer', async () => {
-		await createTable();
+		await insertBlock( 'Table' );
 		await openDocumentSettingsSidebar();
+
+		// Create the table.
+		await clickPlaceholderButton( createButtonLabel );
 
 		// Toggle on the switches and add some content.
 		const headerSwitch = await page.$x(
@@ -145,7 +155,14 @@ describe( 'Table', () => {
 	} );
 
 	it( 'allows columns to be aligned', async () => {
-		await createTable( '4' );
+		await insertBlock( 'Table' );
+
+		await clickPlaceholderButton( 'Column count' );
+		await page.keyboard.press( 'Backspace' );
+		await page.keyboard.type( '4' );
+
+		// Create the table.
+		await clickPlaceholderButton( createButtonLabel );
 
 		// Click the first cell and add some text. Don't align.
 		const cells = await page.$$( 'td,th' );
@@ -173,8 +190,11 @@ describe( 'Table', () => {
 
 	// Testing for regressions of https://github.com/WordPress/gutenberg/issues/14904.
 	it( 'allows cells to be selected when the cell area outside of the RichText is clicked', async () => {
-		await createTable();
+		await insertBlock( 'Table' );
 		await openDocumentSettingsSidebar();
+
+		// Create the table.
+		await clickPlaceholderButton( createButtonLabel );
 
 		// Enable fixed width as it exascerbates the amount of empty space around the RichText.
 		const [ fixedWidthSwitch ] = await page.$x(
@@ -207,7 +227,10 @@ describe( 'Table', () => {
 	} );
 
 	it( 'allows a caption to be added', async () => {
-		await createTable();
+		await insertBlock( 'Table' );
+
+		// Create the table.
+		await clickPlaceholderButton( createButtonLabel );
 
 		// Click the first cell and add some text.
 		await page.click( '.wp-block-table figcaption' );
@@ -217,7 +240,10 @@ describe( 'Table', () => {
 	} );
 
 	it( 'up and down arrow navigation', async () => {
-		await createTable();
+		await insertBlock( 'Table' );
+
+		// Create the table.
+		await clickPlaceholderButton( createButtonLabel );
 
 		await page.keyboard.press( 'Tab' );
 		await page.keyboard.type( '1' );

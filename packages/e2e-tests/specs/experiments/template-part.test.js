@@ -11,6 +11,7 @@ import {
 	selectBlockByClientId,
 	clickBlockToolbarButton,
 	canvas,
+	clickPlaceholderButton,
 } from '@wordpress/e2e-test-utils';
 
 /**
@@ -280,14 +281,7 @@ describe( 'Template Part', () => {
 			await disablePrePublishChecks();
 			// Create new template part.
 			await insertBlock( 'Template Part' );
-			await page.waitForFunction( () =>
-				document.activeElement.shadowRoot?.querySelector( 'button' )
-			);
-			// Navigate into the placeholder and "New template part"
-			await page.keyboard.press( 'Space' );
-			await page.keyboard.press( 'Tab' );
-			await page.keyboard.press( 'Tab' );
-			await page.keyboard.press( 'Space' );
+			await clickPlaceholderButton( 'New template part' );
 			const confirmTitleButton = await page.waitForSelector(
 				confirmTitleButtonSelector
 			);
@@ -311,13 +305,7 @@ describe( 'Template Part', () => {
 			await createNewPost();
 			// Try to insert the template part we created.
 			await insertBlock( 'Template Part' );
-			await page.waitForFunction( () =>
-				document.activeElement.shadowRoot?.querySelector( 'button' )
-			);
-			// Navigate into the placeholder and "Choose existing"
-			await page.keyboard.press( 'Space' );
-			await page.keyboard.press( 'Tab' );
-			await page.keyboard.press( 'Space' );
+			await clickPlaceholderButton( 'Choose existing' );
 			const preview = await page.waitForSelector(
 				'[aria-label="Create New"]'
 			);
