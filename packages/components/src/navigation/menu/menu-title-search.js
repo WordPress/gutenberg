@@ -86,6 +86,7 @@ function MenuTitleSearch( {
 				onChange={ ( value ) => onSearch( value ) }
 				onKeyDown={ onKeyDown }
 				placeholder={ placeholder }
+				onClose={ onClose }
 				ref={ inputRef }
 				type="search"
 				value={ search }
