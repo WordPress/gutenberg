@@ -127,7 +127,7 @@ One of the most important aspects of themes (if not the most important) is the s
 
 ## Internationalization (i18n) and Dynamic URLs
 
-A pattern block can be used to insert block translatable content inside a block template. Since those files are php-based, there is a mechanism to mark strings for translation or supply dynamic URLs.
+A pattern block can be used to insert translatable content inside a block template. Since those files are php-based, there is a mechanism to mark strings for translation or supply dynamic URLs.
 
 #### Example
 
