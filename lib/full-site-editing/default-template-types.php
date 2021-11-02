@@ -23,7 +23,7 @@ function gutenberg_get_default_template_types() {
 		),
 		'front-page'     => array(
 			'title'       => _x( 'Front Page', 'Template name', 'gutenberg' ),
-			'description' => __( 'Displays when a user visits the site home page.', 'gutenberg' ),
+			'description' => __( 'Displays as the site\'s home page.', 'gutenberg' ),
 		),
 		'singular'       => array(
 			'title'       => _x( 'Singular', 'Template name', 'gutenberg' ),
@@ -47,7 +47,7 @@ function gutenberg_get_default_template_types() {
 		),
 		'category'       => array(
 			'title'       => _x( 'Category', 'Template name', 'gutenberg' ),
-			'description' => __( 'Displays latest posts from a single post category.', 'gutenberg' ),
+			'description' => __( 'Displays latest posts in single post category.', 'gutenberg' ),
 		),
 		'taxonomy'       => array(
 			'title'       => _x( 'Taxonomy', 'Template name', 'gutenberg' ),
@@ -59,7 +59,7 @@ function gutenberg_get_default_template_types() {
 		),
 		'tag'            => array(
 			'title'       => _x( 'Tag', 'Template name', 'gutenberg' ),
-			'description' => __( 'Displays latest posts from a single post tag.', 'gutenberg' ),
+			'description' => __( 'Displays latest posts with single post tag.', 'gutenberg' ),
 		),
 		'attachment'     => array(
 			'title'       => __( 'Media', 'gutenberg' ),
