@@ -1,14 +1,13 @@
 <?php
 /**
- * Class that implements a WP_Theme_JSON_Schema to convert
- * a given structure in v0 schema to the latest one.
+ * Class that implements a WP_Theme_JSON_Schema migration.
  *
  * @package gutenberg
  */
 
 /**
- * Class that implements a WP_Theme_JSON_Schema to convert
- * a given structure in v0 schema to the latest one.
+ * Class that migrates a given structure in v0 schema to one
+ * that follows the v1 schema.
  */
 class WP_Theme_JSON_Schema_V0_To_V1 implements WP_Theme_JSON_Schema {
 
@@ -27,106 +26,63 @@ class WP_Theme_JSON_Schema_V0_To_V1 implements WP_Theme_JSON_Schema {
 	const ROOT_BLOCK_NAME = 'root';
 
 	/**
-	 * Data schema of each block within a theme.json.
+	 * Converts a v0 data structure into a v1 one.
 	 *
-	 * Example:
+	 * It expects input data to come in v0 form:
 	 *
 	 * {
-	 *   'block-one': {
-	 *     'styles': {
-	 *       'color': {
-	 *         'background': 'color'
-	 *       }
-	 *     },
-	 *     'settings': {
-	 *       'color': {
-	 *         'custom': true
-	 *       }
+	 *   'root': {
+	 *     'settings': { ... },
+	 *     'styles': { ... }
+	 *   }
+	 *   'core/paragraph': {
+	 *     'styles': { ... },
+	 *     'settings': { ... }
+	 *   },
+	 *   'core/heading/h1': {
+	 *     'settings': { ... }
+	 *     'styles': { ... }
+	 *   },
+	 *   'core/heading/h2': {
+	 *     'settings': { ... }
+	 *     'styles': { ... }
+	 *   },
+	 * }
+	 *
+	 * And it will return v1 form:
+	 *
+	 * {
+	 *   'settings': {
+	 *     'border': { ... }
+	 *     'color': { ... },
+	 *     'typography': { ... },
+	 *     'spacing': { ... },
+	 *     'custom': { ... },
+	 *     'blocks': {
+	 *       'core/paragraph': { ... }
 	 *     }
 	 *   },
-	 *   'block-two': {
-	 *     'styles': {
-	 *       'color': {
-	 *         'link': 'color'
+	 *   styles: {
+	 *     border: { ... }
+	 *     color: { ... },
+	 *     typography: { ... },
+	 *     spacing: { ... },
+	 *     custom: { ... },
+	 *     blocks: {
+	 *       core/paragraph: { ... }
+	 *       core/heading: {
+	 *         elements: {
+	 *           h1: { ... },
+	 *           h2: { ... }
+	 *         }
 	 *       }
 	 *     }
 	 *   }
 	 * }
-	 */
-	const SCHEMA = array(
-		'customTemplates' => null,
-		'templateParts'   => null,
-		'styles'          => array(
-			'border'     => array(
-				'radius' => null,
-				'color'  => null,
-				'style'  => null,
-				'width'  => null,
-			),
-			'color'      => array(
-				'background' => null,
-				'gradient'   => null,
-				'link'       => null,
-				'text'       => null,
-			),
-			'spacing'    => array(
-				'padding' => array(
-					'top'    => null,
-					'right'  => null,
-					'bottom' => null,
-					'left'   => null,
-				),
-			),
-			'typography' => array(
-				'fontFamily'     => null,
-				'fontSize'       => null,
-				'fontStyle'      => null,
-				'fontWeight'     => null,
-				'lineHeight'     => null,
-				'textDecoration' => null,
-				'textTransform'  => null,
-			),
-		),
-		'settings'        => array(
-			'border'     => array(
-				'customRadius' => null,
-				'customColor'  => null,
-				'customStyle'  => null,
-				'customWidth'  => null,
-			),
-			'color'      => array(
-				'custom'         => null,
-				'customGradient' => null,
-				'gradients'      => null,
-				'link'           => null,
-				'palette'        => null,
-			),
-			'spacing'    => array(
-				'customPadding' => null,
-				'units'         => null,
-			),
-			'typography' => array(
-				'customFontSize'        => null,
-				'customLineHeight'      => null,
-				'dropCap'               => null,
-				'fontFamilies'          => null,
-				'fontSizes'             => null,
-				'customFontStyle'       => null,
-				'customFontWeight'      => null,
-				'customTextDecorations' => null,
-				'customTextTransforms'  => null,
-			),
-			'custom'     => null,
-			'layout'     => null,
-		),
-	);
-
-	/**
-	 * Converts a v0 schema into the latest.
 	 *
 	 * @param array $old Data in v0 schema.
 	 *
-	 * @return array Data in the latest schema.
+	 * @return array Data in v1 schema.
 	 */
 	public static function migrate( $old ) {
 		// Copy everything.
