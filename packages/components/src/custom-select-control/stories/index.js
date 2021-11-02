@@ -31,29 +31,31 @@ const defaultOptions = [
 		style: { fontSize: '300%' },
 	},
 ];
-export const _default = () => (
-	<CustomSelectControl label="Font size" options={ defaultOptions } />
-);
 
-const longLabelOptions = [
-	{
-		key: 'reallylonglabel1',
-		name: 'Really long labels are good for stress testing',
-	},
-	{
-		key: 'reallylonglabel2',
-		name: 'But they can take a long time to type.',
-	},
-	{
-		key: 'reallylonglabel3',
-		name:
-			'That really is ok though because you should stress test your UIs.',
-	},
-];
+export const Default = CustomSelectControl.bind( {} );
+Default.args = {
+	hideLabelFromVision: false,
+	label: 'Font size',
+	options: defaultOptions,
+};
 
-export const longLabels = () => (
-	<CustomSelectControl
-		label="Testing long labels"
-		options={ longLabelOptions }
-	/>
-);
+export const LongLabels = CustomSelectControl.bind( {} );
+LongLabels.args = {
+	...Default.args,
+	label: 'Testing long labels',
+	options: [
+		{
+			key: 'reallylonglabel1',
+			name: 'Really long labels are good for stress testing',
+		},
+		{
+			key: 'reallylonglabel2',
+			name: 'But they can take a long time to type.',
+		},
+		{
+			key: 'reallylonglabel3',
+			name:
+				'That really is ok though because you should stress test your UIs.',
+		},
+	],
+};
