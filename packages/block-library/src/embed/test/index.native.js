@@ -68,8 +68,7 @@ const MOCK_BAD_WORDPRESS_RESPONSE = {
 	},
 	html: false,
 };
-
-const RICH_TEXT_EMBED_ERROR_RESPONSE = null;
+const EMBED_NULL_RESPONSE = null;
 
 // Embed block HTML examples
 const EMPTY_EMBED_HTML = '<!-- wp:embed /-->';
@@ -177,7 +176,6 @@ beforeEach( () => {
 	// Mock embed responses
 	mockEmbedResponses( [
 		RICH_TEXT_EMBED_SUCCESS_RESPONSE,
-		RICH_TEXT_EMBED_ERROR_RESPONSE,
 		VIDEO_EMBED_SUCCESS_RESPONSE,
 		MOCK_EMBED_PHOTO_SUCCESS_RESPONSE,
 	] );
@@ -798,6 +796,12 @@ describe( 'Embed block', () => {
 	} );
 
 	it( 'Cannot embed should be shown on the placeholder if EmbedPreview data is null', async () => {
+		// Return null response for requests to oembed endpoint.
+		fetchRequest.mockImplementation( ( { path } ) => {
+			const isEmbedRequest = path.startsWith( '/oembed/1.0/proxy' );
+			return Promise.resolve( isEmbedRequest ? EMBED_NULL_RESPONSE : {} );
+		} );
+
 		const initialHtml = RICH_TEXT_ERROR_EMBED_HTML;
 
 		const waitForElement = ( { getByA11yLabel } ) =>
