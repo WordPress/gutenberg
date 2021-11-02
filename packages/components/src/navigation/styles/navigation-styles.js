@@ -14,6 +14,7 @@ import { isRTL } from '@wordpress/i18n';
 import { BASE, G2, UI } from '../../utils/colors-values';
 import Button from '../../button';
 import { Text } from '../../text';
+import { Heading } from '../../heading';
 import { reduceMotion, rtl } from '../../utils';
 import { space } from '../../ui/utils/space';
 
@@ -67,7 +68,7 @@ export const MenuTitleUI = styled.div`
 	width: 100%;
 `;
 
-export const MenuTitleHeadingUI = styled( Text )`
+export const MenuTitleHeadingUI = styled( Heading )`
 	align-items: center;
 	color: inherit;
 	display: flex;
@@ -145,14 +146,13 @@ export const MenuTitleSearchUI = styled.div`
 	}
 `;
 
-export const GroupTitleUI = styled( Text )`
+export const GroupTitleUI = styled( Heading )`
 	color: inherit;
 	margin-top: ${ space( 2 ) };
 	padding: ${ () =>
 		isRTL()
 			? `${ space( 1 ) } ${ space( 4 ) } ${ space( 1 ) } 0`
 			: `${ space( 1 ) } 0 ${ space( 1 ) } ${ space( 4 ) }` };
-	text-transform: uppercase;
 `;
 
 export const ItemBaseUI = styled.li`

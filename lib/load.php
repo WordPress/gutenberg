@@ -111,6 +111,8 @@ require __DIR__ . '/full-site-editing/template-loader.php';
 require __DIR__ . '/full-site-editing/edit-site-page.php';
 require __DIR__ . '/full-site-editing/edit-site-export.php';
 require __DIR__ . '/compat/wordpress-5.9/default-theme-supports.php';
+require __DIR__ . '/compat/wordpress-5.9/class-gutenberg-rest-global-styles-controller.php';
+require __DIR__ . '/compat/wordpress-5.9/rest-active-global-styles.php';
 
 require __DIR__ . '/blocks.php';
 require __DIR__ . '/block-patterns.php';

@@ -109,7 +109,6 @@ class WP_Theme_JSON_Resolver_Gutenberg_Test extends WP_UnitTestCase {
 		load_textdomain( 'fse', realpath( __DIR__ . '/data/languages/themes/fse-pl_PL.mo' ) );
 
 		switch_theme( 'fse' );
-
 		$actual = WP_Theme_JSON_Resolver_Gutenberg::get_theme_data();
 
 		unload_textdomain( 'fse' );
@@ -118,8 +117,10 @@ class WP_Theme_JSON_Resolver_Gutenberg_Test extends WP_UnitTestCase {
 		$this->assertSame( wp_get_theme()->get( 'TextDomain' ), 'fse' );
 		$this->assertSame(
 			array(
-				'color'  => array(
-					'palette' => array(
+				'color'      => array(
+					'custom'         => false,
+					'customGradient' => true,
+					'palette'        => array(
 						'theme' => array(
 							array(
 								'slug'  => 'light',
@@ -133,9 +134,16 @@ class WP_Theme_JSON_Resolver_Gutenberg_Test extends WP_UnitTestCase {
 							),
 						),
 					),
-					'custom'  => false,
 				),
-				'blocks' => array(
+				'typography' => array(
+					'customFontSize'   => true,
+					'customLineHeight' => false,
+				),
+				'spacing'    => array(
+					'units'         => false,
+					'customPadding' => false,
+				),
+				'blocks'     => array(
 					'core/paragraph' => array(
 						'color' => array(
 							'palette' => array(
@@ -188,7 +196,6 @@ class WP_Theme_JSON_Resolver_Gutenberg_Test extends WP_UnitTestCase {
 
 	function test_add_theme_supports_are_loaded_for_themes_without_theme_json() {
 		switch_theme( 'default' );
-		add_theme_support( 'custom-line-height' );
 		$color_palette = array(
 			array(
 				'name'  => 'Primary',
@@ -207,8 +214,12 @@ class WP_Theme_JSON_Resolver_Gutenberg_Test extends WP_UnitTestCase {
 			),
 		);
 		add_theme_support( 'editor-color-palette', $color_palette );
-		$supports = gutenberg_get_default_block_editor_settings();
-		$settings = WP_Theme_JSON_Resolver_Gutenberg::get_merged_data( $supports )->get_settings();
+		add_theme_support( 'custom-line-height' );
+
+		$settings = WP_Theme_JSON_Resolver_Gutenberg::get_theme_data()->get_settings();
+
+		remove_theme_support( 'custom-line-height' );
+		remove_theme_support( 'editor-color-palette' );
 
 		$this->assertSame( false, WP_Theme_JSON_Resolver_Gutenberg::theme_has_support() );
 		$this->assertSame( true, $settings['typography']['customLineHeight'] );
@@ -223,8 +234,10 @@ class WP_Theme_JSON_Resolver_Gutenberg_Test extends WP_UnitTestCase {
 		// Should merge settings.
 		$this->assertSame(
 			array(
-				'color'  => array(
-					'palette' => array(
+				'color'      => array(
+					'custom'         => false,
+					'customGradient' => true,
+					'palette'        => array(
 						'theme' => array(
 							array(
 								'slug'  => 'light',
@@ -243,10 +256,17 @@ class WP_Theme_JSON_Resolver_Gutenberg_Test extends WP_UnitTestCase {
 							),
 						),
 					),
-					'custom'  => false,
-					'link'    => true,
+					'link'           => true,
 				),
-				'blocks' => array(
+				'typography' => array(
+					'customFontSize'   => true,
+					'customLineHeight' => false,
+				),
+				'spacing'    => array(
+					'units'         => false,
+					'customPadding' => false,
+				),
+				'blocks'     => array(
 					'core/paragraph'  => array(
 						'color' => array(
 							'palette' => array(

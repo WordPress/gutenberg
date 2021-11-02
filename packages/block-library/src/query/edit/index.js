@@ -11,7 +11,7 @@ import {
 	useBlockProps,
 	useSetting,
 	store as blockEditorStore,
-	__experimentalUseInnerBlocksProps as useInnerBlocksProps,
+	useInnerBlocksProps,
 	__experimentalBlockPatternSetup as BlockPatternSetup,
 } from '@wordpress/block-editor';
 import { SelectControl } from '@wordpress/components';

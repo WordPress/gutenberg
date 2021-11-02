@@ -1,10 +1,10 @@
 {
 	"apiVersion": 2,
 	"name": "core/post-comment-content",
-	"title": "Post Comment Content",
-	"category": "design",
-	"parent": [ "core/post-comment" ],
-	"description": "Post comment content",
+	"title": "Comment Content",
+	"category": "theme",
+	"parent": [ "core/comment-template" ],
+	"description": "Displays the contents of a comment.",
 	"textdomain": "default",
 	"usesContext": [ "commentId" ],
 	"attributes": {

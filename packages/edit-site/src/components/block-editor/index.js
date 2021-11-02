@@ -10,6 +10,7 @@ import { useSelect, useDispatch } from '@wordpress/data';
 import { useCallback, useRef } from '@wordpress/element';
 import { useEntityBlockEditor } from '@wordpress/core-data';
 import {
+	BlockList,
 	BlockEditorProvider,
 	__experimentalLinkControl,
 	BlockInspector,
@@ -32,16 +33,26 @@ import EditTemplatePartMenuButton from '../edit-template-part-menu-button';
 import BackButton from './back-button';
 import ResizableEditor from './resizable-editor';
 
+const LAYOUT = {
+	type: 'default',
+	// At the root level of the site editor, no alignments should be allowed.
+	alignments: [],
+};
+
 export default function BlockEditor( { setIsInserterOpen } ) {
-	const { settings, templateType, page } = useSelect(
+	const { settings, templateType, templateId, page } = useSelect(
 		( select ) => {
-			const { getSettings, getEditedPostType, getPage } = select(
-				editSiteStore
-			);
+			const {
+				getSettings,
+				getEditedPostType,
+				getEditedPostId,
+				getPage,
+			} = select( editSiteStore );
 
 			return {
 				settings: getSettings( setIsInserterOpen ),
 				templateType: getEditedPostType(),
+				templateId: getEditedPostId(),
 				page: getPage(),
 			};
 		},
@@ -99,6 +110,8 @@ export default function BlockEditor( { setIsInserterOpen } ) {
 				<BackButton />
 
 				<ResizableEditor
+					// Reinitialize the editor and reset the states when the template changes.
+					key={ templateId }
 					enableResizing={
 						isTemplatePart &&
 						// Disable resizing in mobile viewport.
@@ -106,7 +119,12 @@ export default function BlockEditor( { setIsInserterOpen } ) {
 					}
 					settings={ settings }
 					contentRef={ mergedRefs }
-				/>
+				>
+					<BlockList
+						className="edit-site-block-editor__block-list wp-site-blocks"
+						__experimentalLayout={ LAYOUT }
+					/>
+				</ResizableEditor>
 
 				<__unstableBlockSettingsMenuFirstItem>
 					{ ( { onClose } ) => (
