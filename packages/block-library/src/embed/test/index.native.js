@@ -864,7 +864,7 @@ describe( 'Embed block', () => {
 
 		const waitForElement = ( { getByA11yLabel } ) =>
 			getByA11yLabel( /Embed Block\. Row 1/ );
-		const { element, getByA11yLabel } = await initializeEditor(
+		const { element, getByA11yLabel, getByText } = await initializeEditor(
 			{
 				initialHtml,
 			},
@@ -874,16 +874,13 @@ describe( 'Embed block', () => {
 		// Select block
 		fireEvent.press( element );
 
-		const settingsButton = await waitFor( () =>
-			getByA11yLabel( 'Open Settings' )
-		);
-		fireEvent.press( settingsButton );
-
-		const resizeToggleControl = await waitFor( () =>
-			getByA11yLabel( /Resize for smaller devices/ )
+		fireEvent.press(
+			await waitFor( () => getByA11yLabel( 'Open Settings' ) )
 		);
 
-		fireEvent.press( resizeToggleControl );
+		fireEvent.press(
+			await waitFor( () => getByText( /Resize for smaller devices/ ) )
+		);
 
 		expect( getEditorHtml() ).toBe( expectedHtml );
 	} );
