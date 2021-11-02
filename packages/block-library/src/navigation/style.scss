@@ -60,24 +60,21 @@
 
 	// The following rules provide class based application of user selected text
 	// decoration via block supports.
-	&.has-text-decoration-underline .wp-block-navigation-item {
+	&.has-text-decoration-underline .wp-block-navigation-item a {
 		text-decoration: underline;
+
+		&:focus,
+		&:active {
+			text-decoration: underline;
+		}
 	}
 
-	&.has-text-decoration-line-through .wp-block-navigation-item {
+	&.has-text-decoration-line-through .wp-block-navigation-item a {
 		text-decoration: line-through;
-	}
 
-	&[class*="has-text-decoration"] {
-		.wp-block-navigation-item {
-			a {
-				text-decoration: inherit;
-
-				&:focus,
-				&:active {
-					text-decoration: inherit;
-				}
-			}
+		&:focus,
+		&:active {
+			text-decoration: line-through;
 		}
 	}
 
