@@ -150,4 +150,7 @@ module.exports = {
 	'embed__icon--error': {
 		fill: 'red',
 	},
+	'components-autocomplete': {
+		height: 100,
+	},
 };
