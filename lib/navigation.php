@@ -581,8 +581,7 @@ function get_navigation_template_part_names( $template_parts ) {
 // Set a priority such that WP_Theme_JSON_Resolver_Gutenberg still has contains the cached data.
 // This will clean the cache which may be unexpected, so it would be better to introduce a `before_theme_switch` action.
 
-// Uncomment to enable.
-// add_action( 'switch_theme', 'gutenberg_migrate_nav_on_theme_switch', -200, 3 );
+// Enable re-writing like: add_action( 'switch_theme', 'gutenberg_migrate_nav_on_theme_switch', -200, 3 );.
 
 // IDEA 1 above is self contained and ends here.
 
@@ -659,6 +658,12 @@ function store_navigation_associations( $post_id ) {
 }
 add_action( 'save_post_wp_template_part', 'store_navigation_associations' );
 
+/**
+ * Returns a list of template areas that are meant to hold navigation.
+ *
+ * @todo move this where WP_TEMPLATE_PART_AREA_PRIMARY_MENU is declared.
+ * @return string A list of area idetifiers.
+ */
 function gutenberg_get_navigation_template_part_areas() {
 	return array(
 		WP_TEMPLATE_PART_AREA_PRIMARY_MENU,
