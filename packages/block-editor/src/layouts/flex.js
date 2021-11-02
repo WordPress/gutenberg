@@ -8,7 +8,12 @@ import {
 	justifyRight,
 	justifySpaceBetween,
 } from '@wordpress/icons';
-import { Button, ToggleControl } from '@wordpress/components';
+import {
+	Button,
+	ToggleControl,
+	__experimentalToggleGroupControl as ToggleGroupControl,
+	__experimentalToggleGroupControlOption as ToggleGroupControlOption,
+} from '@wordpress/components';
 
 /**
  * Internal dependencies
@@ -47,6 +52,12 @@ export default {
 					layout={ layout }
 					onChange={ onChange }
 				/>
+				{ layout?.orientation && (
+					<OrientationControl
+						layout={ layout }
+						onChange={ onChange }
+					/>
+				) }
 				<FlexWrapControl layout={ layout } onChange={ onChange } />
 			</>
 		);
@@ -206,5 +217,24 @@ function FlexWrapControl( { layout, onChange } ) {
 			} }
 			checked={ flexWrap === 'wrap' }
 		/>
+	);
+}
+
+function OrientationControl( { layout, onChange } ) {
+	const { orientation = 'horizontal' } = layout;
+	return (
+		<ToggleGroupControl
+			label="Orientation"
+			value={ orientation }
+			onChange={ ( value ) => {
+				onChange( {
+					...layout,
+					orientation: value,
+				} );
+			} }
+		>
+			<ToggleGroupControlOption value="horizontal" label="Horizontal" />
+			<ToggleGroupControlOption value="vertical" label="Vertical" />
+		</ToggleGroupControl>
 	);
 }
