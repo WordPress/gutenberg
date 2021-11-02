@@ -254,7 +254,7 @@ The settings section has the following structure:
 			"fontSizes": [],
 			"fontStyle": true,
 			"fontWeight": true,
-			"letteSpacing": true,
+			"letterSpacing": true,
 			"textDecoration": true,
 			"textTransform": true
 		},
