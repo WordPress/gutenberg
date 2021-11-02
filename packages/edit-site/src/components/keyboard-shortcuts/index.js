@@ -90,7 +90,7 @@ function KeyboardShortcutsRegister() {
 		registerShortcut( {
 			name: 'core/edit-site/save',
 			category: 'global',
-			description: __( 'Save site editor changes.' ),
+			description: __( 'Save your changes.' ),
 			keyCombination: {
 				modifier: 'primary',
 				character: 's',
