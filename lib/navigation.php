@@ -444,6 +444,8 @@ add_action( 'init', 'gutenberg_register_navigation_post_type' );
  * On theme switch, take navigationMenuId from theme A template parts, and apply it to theme B template parts.
  * Upsides:
  * * New theme always gets the "primary", "secondary" etc. menus in its corresponding slots.
+ * * "Menu areas" are just template areas.
+ * * All the UI is in place thanks to the isolated template parts editor.
  *
  * Downsides:
  * * Needs to look for the first available navigation block, it could be nested, missing etc. This should be easy to address.
@@ -596,11 +598,12 @@ function get_navigation_template_part_names( $template_parts ) {
  *
  * Upsides:
  * * Menus are matched between themes via a keyword.
+ * * "Menu areas" are just template areas.
+ * * All the UI is in place thanks to the isolated template parts editor.
  *
  * Downsides:
- * * It involves a new concept of "template part placeholder" or a "variable". Or maybe it's not that new, looking at
- *   _gutenberg_inject_theme_attribute_in_content? It could be an opportunity to formalize this injection.
  * * It still wouldn't work if there's a nested template part between the "primary-menu" and the navigation block.
+ * * We don't use "initial" attributes in other blocks, so it's a precedent.
  */
 
 
