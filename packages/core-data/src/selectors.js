@@ -20,6 +20,15 @@ import { DEFAULT_ENTITY_KEY } from './entities';
 import { getNormalizedCommaSeparable, isRawAttribute } from './utils';
 
 /**
+ * Shared reference to an empty object for cases where it is important to avoid
+ * returning a new object reference on every invocation, as in a connected or
+ * other pure component which performs `shouldComponentUpdate` check on props.
+ * This should be used as a last resort, since the normalized data should be
+ * maintained by the reducer result in state.
+ */
+const EMPTY_OBJECT = {};
+
+/**
  * Shared reference to an empty array for cases where it is important to avoid
  * returning a new array reference on every invocation, as in a connected or
  * other pure component which performs `shouldComponentUpdate` check on props.
@@ -688,7 +697,7 @@ export function hasRedo( state ) {
  * @return {Object} The current theme.
  */
 export function getCurrentTheme( state ) {
-	return state.themes[ state.currentTheme ];
+	return getEntityRecord( state, 'root', 'theme', state.currentTheme );
 }
 
 /**
@@ -710,7 +719,7 @@ export function __experimentalGetCurrentGlobalStylesId( state ) {
  * @return {*} Index data.
  */
 export function getThemeSupports( state ) {
-	return state.themeSupports;
+	return getCurrentTheme( state )?.theme_supports ?? EMPTY_OBJECT;
 }
 
 /**
@@ -896,4 +905,19 @@ export function __experimentalGetTemplateForLink( state, link ) {
 		);
 	}
 	return template;
+}
+
+/**
+ * Retrieve the current theme's base global styles
+ *
+ * @param {Object} state Editor state.
+ *
+ * @return {Object?} The Global Styles object.
+ */
+export function __experimentalGetCurrentThemeBaseGlobalStyles( state ) {
+	const currentTheme = getCurrentTheme( state );
+	if ( ! currentTheme ) {
+		return null;
+	}
+	return state.themeBaseGlobalStyles[ currentTheme.stylesheet ];
 }

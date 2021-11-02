@@ -29,7 +29,12 @@ import './filters';
 
 const { wp } = window;
 
-const DISABLED_BLOCKS = [ 'core/more', 'core/block', 'core/freeform' ];
+const DISABLED_BLOCKS = [
+	'core/more',
+	'core/block',
+	'core/freeform',
+	'core/template-part',
+];
 const ENABLE_EXPERIMENTAL_FSE_BLOCKS = false;
 
 /**
@@ -50,7 +55,8 @@ export function initialize( editorName, blockEditorSettings ) {
 			DISABLED_BLOCKS.includes( block.name ) ||
 			block.name.startsWith( 'core/post' ) ||
 			block.name.startsWith( 'core/query' ) ||
-			block.name.startsWith( 'core/site' )
+			block.name.startsWith( 'core/site' ) ||
+			block.name.startsWith( 'core/navigation' )
 		);
 	} );
 	registerCoreBlocks( coreBlocks );

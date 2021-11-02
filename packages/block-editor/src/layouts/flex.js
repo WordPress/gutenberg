@@ -8,7 +8,7 @@ import {
 	justifyRight,
 	justifySpaceBetween,
 } from '@wordpress/icons';
-import { Button } from '@wordpress/components';
+import { Button, ToggleControl } from '@wordpress/components';
 
 /**
  * Internal dependencies
@@ -24,6 +24,8 @@ const justifyContentMap = {
 	'space-between': 'space-between',
 };
 
+const flexWrapOptions = [ 'wrap', 'nowrap' ];
+
 export default {
 	name: 'flex',
 	label: __( 'Flex' ),
@@ -32,10 +34,13 @@ export default {
 		onChange,
 	} ) {
 		return (
-			<FlexLayoutJustifyContentControl
-				layout={ layout }
-				onChange={ onChange }
-			/>
+			<>
+				<FlexLayoutJustifyContentControl
+					layout={ layout }
+					onChange={ onChange }
+				/>
+				<FlexWrapControl layout={ layout } onChange={ onChange } />
+			</>
 		);
 	},
 	toolBarControls: function FlexLayoutToolbarControls( {
@@ -60,7 +65,11 @@ export default {
 		const blockGapSupport = useSetting( 'spacing.blockGap' );
 		const hasBlockGapStylesSupport = blockGapSupport !== null;
 		const justifyContent =
-			justifyContentMap[ layout.justifyContent ] || 'flex-start';
+			justifyContentMap[ layout.justifyContent ] ||
+			justifyContentMap.left;
+		const flexWrap = flexWrapOptions.includes( layout.flexWrap )
+			? layout.flexWrap
+			: 'wrap';
 		return (
 			<style>{ `
 				${ appendSelectors( selector ) } {
@@ -70,7 +79,7 @@ export default {
 							? 'var( --wp--style--block-gap, 0.5em )'
 							: '0.5em'
 					};
-					flex-wrap: wrap;
+					flex-wrap: ${ flexWrap };
 					align-items: center;
 					flex-direction: row;
 					justify-content: ${ justifyContent };
@@ -160,5 +169,21 @@ function FlexLayoutJustifyContentControl( {
 				} ) }
 			</div>
 		</fieldset>
+	);
+}
+
+function FlexWrapControl( { layout, onChange } ) {
+	const { flexWrap = 'wrap' } = layout;
+	return (
+		<ToggleControl
+			label={ __( 'Allow to wrap to multiple lines' ) }
+			onChange={ ( value ) => {
+				onChange( {
+					...layout,
+					flexWrap: value ? 'wrap' : 'nowrap',
+				} );
+			} }
+			checked={ flexWrap === 'wrap' }
+		/>
 	);
 }

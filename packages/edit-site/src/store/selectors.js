@@ -223,10 +223,7 @@ export const getCurrentTemplateNavigationPanelSubMenu = createRegistrySelector(
 
 		const templates = select( coreDataStore ).getEntityRecords(
 			'postType',
-			'wp_template',
-			{
-				per_page: -1,
-			}
+			'wp_template'
 		);
 		const showOnFront = select( coreDataStore ).getEditedEntityRecord(
 			'root',
@@ -314,10 +311,7 @@ export const getCurrentTemplateTemplateParts = createRegistrySelector(
 
 		const templateParts = select( coreDataStore ).getEntityRecords(
 			'postType',
-			'wp_template_part',
-			{
-				per_page: -1,
-			}
+			'wp_template_part'
 		);
 		const templatePartsById = keyBy(
 			templateParts,

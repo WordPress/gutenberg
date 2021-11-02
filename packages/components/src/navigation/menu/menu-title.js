@@ -54,7 +54,7 @@ export default function NavigationMenuTitle( {
 				<MenuTitleHeadingUI
 					as="h2"
 					className="components-navigation__menu-title-heading"
-					variant="title.small"
+					level={ 3 }
 				>
 					<span id={ menuTitleId }>{ title }</span>
 

@@ -6,11 +6,9 @@ import { useEffect } from '@wordpress/element';
 import {
 	store as blockEditorStore,
 	useBlockProps,
-	useInnerBlocksProps,
 } from '@wordpress/block-editor';
-import { createBlock } from '@wordpress/blocks';
 
-const PatternEdit = ( { attributes, clientId, isSelected } ) => {
+const PatternEdit = ( { attributes, clientId } ) => {
 	const selectedPattern = useSelect(
 		( select ) =>
 			select( blockEditorStore ).__experimentalGetParsedPattern(
@@ -19,44 +17,23 @@ const PatternEdit = ( { attributes, clientId, isSelected } ) => {
 		[ attributes.slug ]
 	);
 
-	const hasSelection = useSelect(
-		( select ) =>
-			isSelected ||
-			select( blockEditorStore ).hasSelectedInnerBlock( clientId, true ),
-		[ isSelected, clientId ]
-	);
-
 	const {
 		replaceBlocks,
-		replaceInnerBlocks,
 		__unstableMarkNextChangeAsNotPersistent,
 	} = useDispatch( blockEditorStore );
 
-	// Run this effect when the block, or any of its InnerBlocks are selected.
-	// This replaces the Pattern block wrapper with a Group block.
-	// This ensures the markup structure and alignment are consistent between editor and view.
-	// This change won't be saved unless further changes are made to the InnerBlocks.
-	useEffect( () => {
-		if ( hasSelection && selectedPattern?.blocks ) {
-			__unstableMarkNextChangeAsNotPersistent();
-			replaceBlocks(
-				clientId,
-				createBlock( 'core/group', {}, selectedPattern.blocks )
-			);
-		}
-	}, [ hasSelection, selectedPattern?.blocks ] );
-
 	// Run this effect when the component loads.
-	// This adds the Pattern block template as InnerBlocks.
+	// This adds the Pattern's contents to the post.
 	// This change won't be saved.
+	// It will continue to pull from the pattern file unless changes are made to its respective template part.
 	useEffect( () => {
 		if ( selectedPattern?.blocks ) {
 			__unstableMarkNextChangeAsNotPersistent();
-			replaceInnerBlocks( clientId, selectedPattern.blocks );
+			replaceBlocks( clientId, selectedPattern.blocks );
 		}
 	}, [ selectedPattern?.blocks ] );
 
-	const props = useInnerBlocksProps( useBlockProps(), {} );
+	const props = useBlockProps();
 
 	return <div { ...props } />;
 };
