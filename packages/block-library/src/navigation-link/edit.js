@@ -288,7 +288,9 @@ function navStripHTML( html ) {
 function LinkControlTransforms( { block, transforms, replace } ) {
 	return (
 		<div className="link-control-transform">
-			<h3 className="link-control-transform__subheading">Transform</h3>
+			<h3 className="link-control-transform__subheading">
+				{ __( 'Transform' ) }
+			</h3>
 			<div className="link-control-transform__items">
 				{ transforms.map( ( item, index ) => {
 					return (
