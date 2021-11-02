@@ -91,6 +91,11 @@ const PHOTO_EMBED_HTML = `<!-- wp:embed {"url":"https://cloudup.com/cQFlxqtY4ob"
 https://cloudup.com/cQFlxqtY4ob
 </div></figure>
 <!-- /wp:embed -->`;
+const WP_EMBED_HTML = `<!-- wp:embed {"url":"https://wordpress.org/news/2021/07/tatum/","type":"wp-embed","providerNameSlug":"wordpress-news"} -->
+<figure class="wp-block-embed is-type-wp-embed is-provider-wordpress-news wp-block-embed-wordpress-news"><div class="wp-block-embed__wrapper">
+https://wordpress.org/news/2021/07/tatum/
+</div></figure>
+<!-- /wp:embed -->`;
 
 const EMPTY_PARAGRAPH_HTML =
 	'<!-- wp:paragraph --><p></p><!-- /wp:paragraph -->';
@@ -845,28 +850,6 @@ describe( 'Embed block', () => {
 		expect( getEditorHtml() ).toMatchSnapshot();
 	} );
 
-	it( 'toggles resize for smaller devices media settings', async () => {
-		const waitForElement = ( { getByA11yLabel } ) =>
-			getByA11yLabel( /Embed Block\. Row 1/ );
-		const { element, getByA11yLabel, getByText } = await initializeEditor(
-			{ initialHtml: RICH_TEXT_EMBED_HTML },
-			{ waitForElement }
-		);
-
-		// Select block
-		fireEvent.press( element );
-
-		fireEvent.press(
-			await waitFor( () => getByA11yLabel( 'Open Settings' ) )
-		);
-
-		fireEvent.press(
-			await waitFor( () => getByText( /Resize for smaller devices/ ) )
-		);
-
-		expect( getEditorHtml() ).toMatchSnapshot();
-	} );
-
 	it( 'displays cannot embed on the placeholder if preview data is null', async () => {
 		// Return null response for requests to oembed endpoint.
 		fetchRequest.mockImplementation( ( { path } ) => {
@@ -892,5 +875,56 @@ describe( 'Embed block', () => {
 
 		expect( cannotEmbedText ).toBeDefined();
 		expect( getEditorHtml() ).toMatchSnapshot();
+	} );
+
+	describe( 'block settings', () => {
+		it( 'toggles resize for smaller devices media settings', async () => {
+			const waitForElement = ( { getByA11yLabel } ) =>
+				getByA11yLabel( /Embed Block\. Row 1/ );
+			const {
+				element,
+				getByA11yLabel,
+				getByText,
+			} = await initializeEditor(
+				{ initialHtml: RICH_TEXT_EMBED_HTML },
+				{ waitForElement }
+			);
+
+			// Select block
+			fireEvent.press( element );
+
+			fireEvent.press(
+				await waitFor( () => getByA11yLabel( 'Open Settings' ) )
+			);
+
+			fireEvent.press(
+				await waitFor( () => getByText( /Resize for smaller devices/ ) )
+			);
+
+			expect( getEditorHtml() ).toMatchSnapshot();
+		} );
+
+		it( 'does not show settings button if responsive is not supported', async () => {
+			const waitForElement = ( { getByA11yLabel } ) =>
+				getByA11yLabel( /Embed Block\. Row 1/ );
+			const { element, getByA11yLabel } = await initializeEditor(
+				{ initialHtml: WP_EMBED_HTML },
+				{ waitForElement }
+			);
+
+			// Select block
+			fireEvent.press( element );
+
+			let settingsButton;
+			try {
+				settingsButton = await waitFor( () =>
+					getByA11yLabel( 'Open Settings' )
+				);
+			} catch ( e ) {
+				// NOOP
+			}
+
+			expect( settingsButton ).not.toBeDefined();
+		} );
 	} );
 } );
