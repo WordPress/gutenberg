@@ -14,12 +14,12 @@
 function gutenberg_get_default_template_types() {
 	$default_template_types = array(
 		'index'          => array(
-			'title'       => _x( 'Index', 'Template name', 'gutenberg' ),
-			'description' => __( 'Displays latest posts.', 'gutenberg' ),
+			'title'       => _x( 'Posts', 'Template name', 'gutenberg' ),
+			'description' => __( 'Displays posts.', 'gutenberg' ),
 		),
 		'home'           => array(
-			'title'       => _x( 'Home', 'Template name', 'gutenberg' ),
-			'description' => __( 'Displays latest posts. Used by the site home page when it is configured to display latest posts, or by the posts page when it is configured to display a static page.', 'gutenberg' ),
+			'title'       => _x( 'Latest posts', 'Template name', 'gutenberg' ),
+			'description' => __( 'Displays as the site\'s home page when configured to display latest posts, or as the Posts page when a static home page it set.', 'gutenberg' ),
 		),
 		'front-page'     => array(
 			'title'       => _x( 'Front Page', 'Template name', 'gutenberg' ),
