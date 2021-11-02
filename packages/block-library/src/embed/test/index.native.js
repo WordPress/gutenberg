@@ -726,7 +726,6 @@ describe( 'Embed block', () => {
 
 	describe( 'insert via slash inserter', () => {
 		it( 'insert generic embed block', async () => {
-			const expectedHtml = EMPTY_EMBED_HTML;
 			const embedBlockSlashInserter = '/Embed';
 			const {
 				getByPlaceholderText,
@@ -764,7 +763,7 @@ describe( 'Embed block', () => {
 			const blockName = within( block ).getByText( 'Embed' );
 
 			expect( blockName ).toBeDefined();
-			expect( getEditorHtml() ).toBe( expectedHtml );
+			expect( getEditorHtml() ).toMatchSnapshot();
 		} );
 
 		MOST_USED_PROVIDERS.forEach( ( { title } ) =>
