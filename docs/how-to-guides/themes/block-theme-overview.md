@@ -125,7 +125,7 @@ As we're still early in the process, the number of blocks specifically dedicated
 
 One of the most important aspects of themes (if not the most important) is the styling. While initially you'll be able to provide styles and enqueue them using the same hooks themes have always used, the [Global Styles](/docs/how-to-guides/themes/theme-json.md) effort will provide a scaffolding for adding many theme styles in the future.
 
-## Internationalization (i18n) and Dynamic URLs
+## Internationalization (i18n)
 
 A pattern block can be used to insert translatable content inside a block template. Since those files are php-based, there is a mechanism to mark strings for translation or supply dynamic URLs.
 
@@ -162,6 +162,8 @@ Load the pattern in a template or template part:
 </div>
 <!-- /wp:group -->
 ```
+
+You can read more about [internationalization in WordPress here](https://developer.wordpress.org/apis/handbook/internationalization/).
 
 ## Classic Themes
 
