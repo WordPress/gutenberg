@@ -1,89 +1,15 @@
 <?php
 /**
- * Class that implements a WP_Theme_JSON_Schema to convert
- * a given structure in v1 schema to the latest one.
+ * Class that implements a WP_Theme_JSON_Schema migration.
  *
  * @package gutenberg
  */
 
 /**
- * Class that implements a WP_Theme_JSON_Schema to convert
- * a given structure in v0 schema to the latest one.
+ * Class that removes the custom prefix for some properties
+ * that did not land in 5.8.
  */
 class WP_Theme_JSON_Schema_V1_Remove_Custom_Prefixes implements WP_Theme_JSON_Schema {
-	/**
-	 * Data schema for v1 theme.json.
-	 */
-	const SCHEMA = array(
-		'version'         => 1,
-		'settings'        => array(
-			'border'     => array(
-				'radius' => null,
-				'color'  => null,
-				'style'  => null,
-				'width'  => null,
-			),
-			'color'      => array(
-				'custom'         => null,
-				'customGradient' => null,
-				'gradients'      => null,
-				'link'           => null,
-				'palette'        => null,
-			),
-			'spacing'    => array(
-				'customPadding' => null,
-				'units'         => null,
-			),
-			'typography' => array(
-				'customFontSize'   => null,
-				'customLineHeight' => null,
-				'dropCap'          => null,
-				'fontFamilies'     => null,
-				'fontSizes'        => null,
-				'fontStyle'        => null,
-				'fontWeight'       => null,
-				'letterSpacing'    => null,
-				'textDecorations'  => null,
-				'textTransforms'   => null,
-			),
-			'custom'     => null,
-			'layout'     => null,
-		),
-		'styles'          => array(
-			'border'     => array(
-				'radius' => null,
-				'color'  => null,
-				'style'  => null,
-				'width'  => null,
-			),
-			'color'      => array(
-				'background' => null,
-				'gradient'   => null,
-				'link'       => null,
-				'text'       => null,
-			),
-			'spacing'    => array(
-				'padding' => array(
-					'top'    => null,
-					'right'  => null,
-					'bottom' => null,
-					'left'   => null,
-				),
-			),
-			'typography' => array(
-				'fontFamily'     => null,
-				'fontSize'       => null,
-				'fontStyle'      => null,
-				'fontWeight'     => null,
-				'lineHeight'     => null,
-				'textDecoration' => null,
-				'textTransform'  => null,
-			),
-		),
-		'customTemplates' => null,
-		'templateParts'   => null,
-	);
-
 	/**
 	 * Maps old properties to their new location within the schema's settings.
 	 * This will be applied at both the defaults and individual block levels.
