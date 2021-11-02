@@ -94,6 +94,7 @@ describe( 'Navigating the block hierarchy', () => {
 
 	it( 'should navigate block hierarchy using only the keyboard', async () => {
 		await insertBlock( 'Columns' );
+		await openDocumentSettingsSidebar();
 		await clickPlaceholderButton( 'Two columns; equal split' );
 
 		// Add a paragraph in the first column.
@@ -110,7 +111,6 @@ describe( 'Navigating the block hierarchy', () => {
 		await page.keyboard.press( 'Enter' );
 
 		// Move focus to the sidebar area.
-		await openDocumentSettingsSidebar();
 		await pressKeyWithModifier( 'ctrl', '`' );
 		await pressKeyWithModifier( 'ctrl', '`' );
 		await pressKeyWithModifier( 'ctrl', '`' );

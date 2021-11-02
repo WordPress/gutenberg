@@ -6,11 +6,8 @@ import {
 	pressKeyWithModifier,
 	clickBlockToolbarButton,
 	insertBlock,
+	clickPlaceholderButton,
 } from '@wordpress/e2e-test-utils';
-/**
- * Internal dependencies
- */
-import { clickPlaceholderButton } from '../../../../e2e-test-utils/src';
 
 async function focusBlockToolbar() {
 	await pressKeyWithModifier( 'alt', 'F10' );

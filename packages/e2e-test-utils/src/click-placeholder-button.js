@@ -12,7 +12,7 @@ export async function clickPlaceholderButton( buttonText ) {
 
 			for ( const placeholder of placeholders ) {
 				const buttons = placeholder.shadowRoot.querySelectorAll(
-					'button,label'
+					'button,label,[aria-label]'
 				);
 
 				for ( const button of buttons ) {

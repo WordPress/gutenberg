@@ -47,7 +47,7 @@ export default function EmbeddedAdminContext( props ) {
 			if ( element !== event.path[ 0 ] ) return;
 			if ( event.keyCode !== ENTER && event.keyCode !== SPACE ) return;
 
-			focus.focusable.find( root )[ 0 ].focus();
+			focus.tabbable.find( root )[ 0 ].focus();
 			event.preventDefault();
 		}
 

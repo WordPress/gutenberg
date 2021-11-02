@@ -116,7 +116,7 @@ describe( 'block deletion -', () => {
 
 			// Click on the image block so that its wrapper is selected and backspace to delete it.
 			await page.click(
-				'.wp-block[data-type="core/image"] [role="button"]'
+				'.wp-block[data-type="core/image"] .wp-block-editor-placeholder'
 			);
 			await page.keyboard.press( 'Backspace' );
 
@@ -192,7 +192,6 @@ describe( 'deleting all blocks', () => {
 		// Add and remove a block.
 		await insertBlock( 'Image' );
 		await page.waitForSelector( 'figure[data-type="core/image"]' );
-		await page.click( 'figure[data-type="core/image"]' );
 		await page.keyboard.press( 'Backspace' );
 
 		// Verify there is no selected block.

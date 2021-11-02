@@ -26,7 +26,6 @@ export default function IsolatedPlaceholder( props ) {
 			<Placeholder
 				{ ...props }
 				role="dialog"
-				aria-label={ props.label }
 				ref={ useConstrainedTabbing() }
 			/>
 		</EmbeddedAdminContext>

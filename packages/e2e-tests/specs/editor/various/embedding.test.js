@@ -3,6 +3,7 @@
  */
 import {
 	clickBlockAppender,
+	clickPlaceholderButton,
 	createEmbeddingMatcher,
 	createJSONResponse,
 	createNewPost,
@@ -191,7 +192,7 @@ describe( 'Embedding content', () => {
 		await insertEmbed( 'https://twitter.com/wooyaygutenberg123454312' );
 		await page.waitForFunction( () => {
 			const embedPlaceholders = document.querySelectorAll(
-				'.wp-block-embed [role="button"]'
+				'.wp-block-editor-placeholder'
 			);
 			const lastEmbedPlaceholder =
 				embedPlaceholders[ embedPlaceholders.length - 1 ];
@@ -204,7 +205,7 @@ describe( 'Embedding content', () => {
 		await insertEmbed( 'https://wordpress.org/gutenberg/handbook/' );
 		await page.waitForFunction( () => {
 			const embedPlaceholders = document.querySelectorAll(
-				'.wp-block-embed [role="button"]'
+				'.wp-block-editor-placeholder'
 			);
 			const lastEmbedPlaceholder =
 				embedPlaceholders[ embedPlaceholders.length - 1 ];
@@ -218,7 +219,7 @@ describe( 'Embedding content', () => {
 		await insertEmbed( 'https://twitter.com/thatbunty' );
 		await page.waitForFunction( () => {
 			const embedPlaceholders = document.querySelectorAll(
-				'.wp-block-embed [role="button"]'
+				'.wp-block-editor-placeholder'
 			);
 			const lastEmbedPlaceholder =
 				embedPlaceholders[ embedPlaceholders.length - 1 ];
@@ -253,22 +254,7 @@ describe( 'Embedding content', () => {
 	it( 'should allow the user to convert unembeddable URLs to a paragraph with a link in it', async () => {
 		// URL that can't be embedded.
 		await insertEmbed( 'https://twitter.com/wooyaygutenberg123454312' );
-
-		await page.waitForFunction( () => {
-			const embedPlaceholders = document.querySelectorAll(
-				'.wp-block-embed [role="button"]'
-			);
-			const lastEmbedPlaceholder =
-				embedPlaceholders[ embedPlaceholders.length - 1 ];
-			return lastEmbedPlaceholder?.shadowRoot.querySelector(
-				'input[value="https://twitter.com/wooyaygutenberg123454312"]'
-			);
-		} );
-
-		const handle = await page.evaluateHandle(
-			`document.querySelector('.wp-block-embed [role="button"]').shadowRoot.querySelector('.components-placeholder__error').lastElementChild`
-		);
-		await handle.click( handle );
+		await clickPlaceholderButton( 'Convert to link' );
 
 		expect( await getEditedPostContent() ).toMatchSnapshot();
 	} );
@@ -284,17 +270,6 @@ describe( 'Embedding content', () => {
 		// URL that can't be embedded.
 		await insertEmbed( 'https://twitter.com/wooyaygutenberg123454312' );
 
-		await page.waitForFunction( () => {
-			const embedPlaceholders = document.querySelectorAll(
-				'.wp-block-embed [role="button"]'
-			);
-			const lastEmbedPlaceholder =
-				embedPlaceholders[ embedPlaceholders.length - 1 ];
-			return lastEmbedPlaceholder?.shadowRoot.querySelector(
-				'input[value="https://twitter.com/wooyaygutenberg123454312"]'
-			);
-		} );
-
 		// Set up a different mock to make sure that try again actually does make the request again.
 		await setUpResponseMocking( [
 			{
@@ -306,10 +281,7 @@ describe( 'Embedding content', () => {
 				),
 			},
 		] );
-		const handle = await page.evaluateHandle(
-			`document.querySelector('.wp-block-embed [role="button"]').shadowRoot.querySelector('button.is-secondary')`
-		);
-		await handle.click( handle );
+		await clickPlaceholderButton( 'Try again' );
 		await page.waitForSelector( 'figure.wp-block-embed' );
 		expect( await getEditedPostContent() ).toMatchSnapshot();
 	} );
