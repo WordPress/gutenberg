@@ -117,32 +117,49 @@ class WP_Theme_JSON_Resolver_Gutenberg_Test extends WP_UnitTestCase {
 		$this->assertSame( wp_get_theme()->get( 'TextDomain' ), 'fse' );
 		$this->assertSame(
 			array(
-				'theme' => array(
-					array(
-						'slug'  => 'light',
-						'name'  => 'Jasny',
-						'color' => '#f5f7f9',
+				'color'      => array(
+					'custom'         => false,
+					'customGradient' => true,
+					'palette'        => array(
+						'theme' => array(
+							array(
+								'slug'  => 'light',
+								'name'  => 'Jasny',
+								'color' => '#f5f7f9',
+							),
+							array(
+								'slug'  => 'dark',
+								'name'  => 'Ciemny',
+								'color' => '#000',
+							),
+						),
+					),
+				),
+				'typography' => array(
+					'customFontSize'   => true,
+					'customLineHeight' => false,
+				),
+				'spacing'    => array(
+					'units'         => false,
+					'customPadding' => false,
+				),
+				'blocks'     => array(
+					'core/paragraph' => array(
+						'color' => array(
+							'palette' => array(
+								'theme' => array(
+									array(
+										'slug'  => 'light',
+										'name'  => 'Jasny',
+										'color' => '#f5f7f9',
+									),
+								),
+							),
+						),
 					),
 				),
 			),
-			$actual->get_settings()['blocks']['core/paragraph']['color']['palette']
-		);
-		$this->assertSame(
-			array(
-				'theme' => array(
-					array(
-						'slug'  => 'light',
-						'name'  => 'Jasny',
-						'color' => '#f5f7f9',
-					),
-					array(
-						'slug'  => 'dark',
-						'name'  => 'Ciemny',
-						'color' => '#000',
-					),
-				),
-			),
-			$actual->get_settings()['color']['palette']
+			$actual->get_settings()
 		);
 		$this->assertSame(
 			$actual->get_custom_templates(),
