@@ -206,6 +206,7 @@ export default function FontAppearanceControl( props ) {
 		hasStylesOrWeights && (
 			<CustomSelectControl
 				className="components-font-appearance-control"
+				__unstableSize="large"
 				label={ label }
 				describedBy={ getDescribedBy() }
 				options={ selectOptions }
