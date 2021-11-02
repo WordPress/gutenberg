@@ -91,16 +91,6 @@ const PHOTO_EMBED_HTML = `<!-- wp:embed {"url":"https://cloudup.com/cQFlxqtY4ob"
 https://cloudup.com/cQFlxqtY4ob
 </div></figure>
 <!-- /wp:embed -->`;
-const RICH_TEXT_EMBED_HTML_WITH_CAPTION = `<!-- wp:embed {"url":"https://twitter.com/notnownikki","type":"rich","providerNameSlug":"twitter","responsive":true} -->
-<figure class="wp-block-embed is-type-rich is-provider-twitter wp-block-embed-twitter"><div class="wp-block-embed__wrapper">
-https://twitter.com/notnownikki
-</div><figcaption>Caption</figcaption></figure>
-<!-- /wp:embed -->`;
-const RICH_TEXT_EMBED_HTML_WITH_ALLOW_RESPONSIVE_SET_TO_FALSE = `<!-- wp:embed {"url":"https://twitter.com/notnownikki","type":"rich","providerNameSlug":"twitter","allowResponsive":false,"responsive":true} -->
-<figure class="wp-block-embed is-type-rich is-provider-twitter wp-block-embed-twitter"><div class="wp-block-embed__wrapper">
-https://twitter.com/notnownikki
-</div></figure>
-<!-- /wp:embed -->`;
 
 const EMPTY_PARAGRAPH_HTML =
 	'<!-- wp:paragraph --><p></p><!-- /wp:paragraph -->';
@@ -818,9 +808,7 @@ describe( 'Embed block', () => {
 		);
 	} );
 
-	it( 'sets an Embed block caption', async () => {
-		const initialHtml = RICH_TEXT_EMBED_HTML;
-		const expectedHtml = RICH_TEXT_EMBED_HTML_WITH_CAPTION;
+	it( 'sets block caption', async () => {
 		const expectedCaption = 'Caption';
 
 		const waitForElement = ( { getByA11yLabel } ) =>
@@ -830,9 +818,7 @@ describe( 'Embed block', () => {
 			getByPlaceholderText,
 			getByDisplayValue,
 		} = await initializeEditor(
-			{
-				initialHtml,
-			},
+			{ initialHtml: RICH_TEXT_EMBED_HTML },
 			{ waitForElement }
 		);
 
@@ -856,19 +842,14 @@ describe( 'Embed block', () => {
 		);
 
 		expect( caption ).toBeDefined();
-		expect( getEditorHtml() ).toBe( expectedHtml );
+		expect( getEditorHtml() ).toMatchSnapshot();
 	} );
 
-	it( 'Toggle resize for smaller devices media settings', async () => {
-		const initialHtml = RICH_TEXT_EMBED_HTML;
-		const expectedHtml = RICH_TEXT_EMBED_HTML_WITH_ALLOW_RESPONSIVE_SET_TO_FALSE;
-
+	it( 'toggles resize for smaller devices media settings', async () => {
 		const waitForElement = ( { getByA11yLabel } ) =>
 			getByA11yLabel( /Embed Block\. Row 1/ );
 		const { element, getByA11yLabel, getByText } = await initializeEditor(
-			{
-				initialHtml,
-			},
+			{ initialHtml: RICH_TEXT_EMBED_HTML },
 			{ waitForElement }
 		);
 
@@ -883,10 +864,10 @@ describe( 'Embed block', () => {
 			await waitFor( () => getByText( /Resize for smaller devices/ ) )
 		);
 
-		expect( getEditorHtml() ).toBe( expectedHtml );
+		expect( getEditorHtml() ).toMatchSnapshot();
 	} );
 
-	it( 'Cannot embed should be shown on the placeholder if EmbedPreview data is null', async () => {
+	it( 'displays cannot embed on the placeholder if preview data is null', async () => {
 		// Return null response for requests to oembed endpoint.
 		fetchRequest.mockImplementation( ( { path } ) => {
 			const isEmbedRequest = path.startsWith( '/oembed/1.0/proxy' );
@@ -910,5 +891,6 @@ describe( 'Embed block', () => {
 		const cannotEmbedText = getByText( 'Unable to embed media' );
 
 		expect( cannotEmbedText ).toBeDefined();
+		expect( getEditorHtml() ).toMatchSnapshot();
 	} );
 } );
