@@ -276,7 +276,8 @@ const SiteLogo = ( {
 						siteUrl +
 						'/wp-admin/customize.php?autofocus[section]=title_tagline'
 					}
-					target="blank"
+					target="_blank"
+					rel="noopener noreferrer"
 				/>
 			),
 		}
