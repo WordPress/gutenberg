@@ -10,7 +10,7 @@ div[data-type="core/post-featured-image"] {
 	.post-featured-image_placeholder {
 		display: flex;
 		flex-direction: row;
-		align-items: flex-start;
+		align-items: center;
 		border-radius: $radius-block-ui;
 		background-color: $white;
 		box-shadow: inset 0 0 0 $border-width $gray-900;
@@ -26,14 +26,9 @@ div[data-type="core/post-featured-image"] {
 	}
 }
 
-// TODO this is temp styles.
-.block-library-post-featured-image-scale-controls {
-	margin-top: $grid-unit-20;
-	.components-flex {
-		border: $border-width solid $gray-700;
-	}
-	button {
-		width: 100%;
-		display: block;
+.block-library-post-featured-image-dimension-controls {
+	margin-bottom: $grid-unit-10;
+	&.scale-control-is-visible {
+		margin-bottom: $grid-unit-20;
 	}
 }

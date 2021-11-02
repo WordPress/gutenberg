@@ -30,13 +30,12 @@ export default function ContentPagesMenu() {
 			const { getEntityRecords, hasFinishedResolution } = select(
 				coreStore
 			);
-			const getEntityRecordsArgs = [
-				'postType',
-				'page',
-				{
-					search: searchQuery,
-				},
-			];
+			const query = searchQuery
+				? {
+						search: searchQuery,
+				  }
+				: undefined;
+			const getEntityRecordsArgs = [ 'postType', 'page', query ];
 			const hasResolvedPosts = hasFinishedResolution(
 				'getEntityRecords',
 				getEntityRecordsArgs

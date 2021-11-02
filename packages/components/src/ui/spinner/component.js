@@ -16,8 +16,8 @@ import { COLORS } from '../../utils/colors-values';
 
 /**
  *
- * @param {import('../context').PolymorphicComponentProps<Props, 'div'>} props
- * @param {import('react').Ref<any>}                                     forwardedRef
+ * @param {import('../context').WordPressComponentProps<Props, 'div'>} props
+ * @param {import('react').Ref<any>}                                   forwardedRef
  */
 function Spinner( props, forwardedRef ) {
 	const {

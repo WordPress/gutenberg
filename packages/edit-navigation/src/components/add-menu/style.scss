@@ -1,6 +1,21 @@
 .edit-navigation-add-menu {
 	display: flex;
 	flex-direction: column;
+
+	// Notices.
+	.components-with-notices-ui {
+		margin-bottom: $grid-unit-20;
+
+		// Notice is too big with default styles.
+		.components-notice {
+			margin: 0;
+			padding: $grid-unit-10 $grid-unit-15;
+		}
+
+		.components-notice__content {
+			margin: 0;
+		}
+	}
 }
 
 .edit-navigation-add-menu__title {

@@ -17,7 +17,16 @@ import deprecated from '@wordpress/deprecated';
 import { STORE_NAME } from './name';
 import { getQueriedItems } from './queried-data';
 import { DEFAULT_ENTITY_KEY } from './entities';
-import { getNormalizedCommaSeparable } from './utils';
+import { getNormalizedCommaSeparable, isRawAttribute } from './utils';
+
+/**
+ * Shared reference to an empty object for cases where it is important to avoid
+ * returning a new object reference on every invocation, as in a connected or
+ * other pure component which performs `shouldComponentUpdate` check on props.
+ * This should be used as a last resort, since the normalized data should be
+ * maintained by the reducer result in state.
+ */
+const EMPTY_OBJECT = {};
 
 /**
  * Shared reference to an empty array for cases where it is important to avoid
@@ -134,40 +143,63 @@ export function getEntity( state, kind, name ) {
  *
  * @return {Object?} Record.
  */
-export function getEntityRecord( state, kind, name, key, query ) {
-	const queriedState = get( state.entities.data, [
-		kind,
-		name,
-		'queriedData',
-	] );
-	if ( ! queriedState ) {
-		return undefined;
-	}
-	const context = query?.context ?? 'default';
-
-	if ( query === undefined ) {
-		// If expecting a complete item, validate that completeness.
-		if ( ! queriedState.itemIsComplete[ context ]?.[ key ] ) {
+export const getEntityRecord = createSelector(
+	( state, kind, name, key, query ) => {
+		const queriedState = get( state.entities.data, [
+			kind,
+			name,
+			'queriedData',
+		] );
+		if ( ! queriedState ) {
 			return undefined;
 		}
+		const context = query?.context ?? 'default';
 
-		return queriedState.items[ context ][ key ];
-	}
+		if ( query === undefined ) {
+			// If expecting a complete item, validate that completeness.
+			if ( ! queriedState.itemIsComplete[ context ]?.[ key ] ) {
+				return undefined;
+			}
 
-	const item = queriedState.items[ context ]?.[ key ];
-	if ( item && query._fields ) {
-		const filteredItem = {};
-		const fields = getNormalizedCommaSeparable( query._fields );
-		for ( let f = 0; f < fields.length; f++ ) {
-			const field = fields[ f ].split( '.' );
-			const value = get( item, field );
-			set( filteredItem, field, value );
+			return queriedState.items[ context ][ key ];
 		}
-		return filteredItem;
-	}
 
-	return item;
-}
+		const item = queriedState.items[ context ]?.[ key ];
+		if ( item && query._fields ) {
+			const filteredItem = {};
+			const fields = getNormalizedCommaSeparable( query._fields );
+			for ( let f = 0; f < fields.length; f++ ) {
+				const field = fields[ f ].split( '.' );
+				const value = get( item, field );
+				set( filteredItem, field, value );
+			}
+			return filteredItem;
+		}
+
+		return item;
+	},
+	( state, kind, name, recordId, query ) => {
+		const context = query?.context ?? 'default';
+		return [
+			get( state.entities.data, [
+				kind,
+				name,
+				'queriedData',
+				'items',
+				context,
+				recordId,
+			] ),
+			get( state.entities.data, [
+				kind,
+				name,
+				'queriedData',
+				'itemIsComplete',
+				context,
+				recordId,
+			] ),
+		];
+	}
+);
 
 /**
  * Returns the Entity's record object by key. Doesn't trigger a resolver nor requests the entity from the API if the entity record isn't available in the local state.
@@ -205,19 +237,44 @@ export const getRawEntityRecord = createSelector(
 		return (
 			record &&
 			Object.keys( record ).reduce( ( accumulator, _key ) => {
-				// Because edits are the "raw" attribute values,
-				// we return those from record selectors to make rendering,
-				// comparisons, and joins with edits easier.
-				accumulator[ _key ] = get(
-					record[ _key ],
-					'raw',
-					record[ _key ]
-				);
+				if ( isRawAttribute( getEntity( state, kind, name ), _key ) ) {
+					// Because edits are the "raw" attribute values,
+					// we return those from record selectors to make rendering,
+					// comparisons, and joins with edits easier.
+					accumulator[ _key ] = get(
+						record[ _key ],
+						'raw',
+						record[ _key ]
+					);
+				} else {
+					accumulator[ _key ] = record[ _key ];
+				}
 				return accumulator;
 			}, {} )
 		);
 	},
-	( state ) => [ state.entities.data ]
+	( state, kind, name, recordId, query ) => {
+		const context = query?.context ?? 'default';
+		return [
+			state.entities.config,
+			get( state.entities.data, [
+				kind,
+				name,
+				'queriedData',
+				'items',
+				context,
+				recordId,
+			] ),
+			get( state.entities.data, [
+				kind,
+				name,
+				'queriedData',
+				'itemIsComplete',
+				context,
+				recordId,
+			] ),
+		];
+	}
 );
 
 /**
@@ -278,8 +335,12 @@ export const __experimentalGetDirtyEntityRecords = createSelector(
 			Object.keys( data[ kind ] ).forEach( ( name ) => {
 				const primaryKeys = Object.keys(
 					data[ kind ][ name ].edits
-				).filter( ( primaryKey ) =>
-					hasEditsForEntityRecord( state, kind, name, primaryKey )
+				).filter(
+					( primaryKey ) =>
+						// The entity record must exist (not be deleted),
+						// and it must have edits.
+						getEntityRecord( state, kind, name, primaryKey ) &&
+						hasEditsForEntityRecord( state, kind, name, primaryKey )
 				);
 
 				if ( primaryKeys.length ) {
@@ -404,7 +465,10 @@ export const getEntityRecordNonTransientEdits = createSelector(
 			return acc;
 		}, {} );
 	},
-	( state ) => [ state.entities.config, state.entities.data ]
+	( state, kind, name, recordId ) => [
+		state.entities.config,
+		get( state.entities.data, [ kind, name, 'edits', recordId ] ),
+	]
 );
 
 /**
@@ -442,7 +506,29 @@ export const getEditedEntityRecord = createSelector(
 		...getRawEntityRecord( state, kind, name, recordId ),
 		...getEntityRecordEdits( state, kind, name, recordId ),
 	} ),
-	( state ) => [ state.entities.data ]
+	( state, kind, name, recordId, query ) => {
+		const context = query?.context ?? 'default';
+		return [
+			state.entities.config,
+			get( state.entities.data, [
+				kind,
+				name,
+				'queriedData',
+				'items',
+				context,
+				recordId,
+			] ),
+			get( state.entities.data, [
+				kind,
+				name,
+				'queriedData',
+				'itemIsComplete',
+				context,
+				recordId,
+			] ),
+			get( state.entities.data, [ kind, name, 'edits', recordId ] ),
+		];
+	}
 );
 
 /**
@@ -611,7 +697,18 @@ export function hasRedo( state ) {
  * @return {Object} The current theme.
  */
 export function getCurrentTheme( state ) {
-	return state.themes[ state.currentTheme ];
+	return getEntityRecord( state, 'root', 'theme', state.currentTheme );
+}
+
+/**
+ * Return the ID of the current global styles object.
+ *
+ * @param {Object} state Data state.
+ *
+ * @return {string} The current global styles ID.
+ */
+export function __experimentalGetCurrentGlobalStylesId( state ) {
+	return state.currentGlobalStylesId;
 }
 
 /**
@@ -622,7 +719,7 @@ export function getCurrentTheme( state ) {
  * @return {*} Index data.
  */
 export function getThemeSupports( state ) {
-	return state.themeSupports;
+	return getCurrentTheme( state )?.theme_supports ?? EMPTY_OBJECT;
 }
 
 /**
@@ -808,4 +905,19 @@ export function __experimentalGetTemplateForLink( state, link ) {
 		);
 	}
 	return template;
+}
+
+/**
+ * Retrieve the current theme's base global styles
+ *
+ * @param {Object} state Editor state.
+ *
+ * @return {Object?} The Global Styles object.
+ */
+export function __experimentalGetCurrentThemeBaseGlobalStyles( state ) {
+	const currentTheme = getCurrentTheme( state );
+	if ( ! currentTheme ) {
+		return null;
+	}
+	return state.themeBaseGlobalStyles[ currentTheme.stylesheet ];
 }

@@ -108,4 +108,4 @@ jobs:
                   npx lerna run build
 
             - name: Running the tests
-              run: npm run test-unit:native -- --ci --maxWorkers=2 --cacheDirectory="$HOME/.jest-cache"
+              run: npm run native test -- --ci --maxWorkers=2 --cacheDirectory="$HOME/.jest-cache"

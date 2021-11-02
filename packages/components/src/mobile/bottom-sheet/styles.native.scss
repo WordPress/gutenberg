@@ -26,6 +26,10 @@
 	background-color: $gray-70;
 }
 
+.header {
+	flex-shrink: 1;
+}
+
 .emptyHeader {
 	margin-top: $grid-unit-20 * 0.5;
 }
@@ -208,23 +212,32 @@
 // Navigation Header
 
 .bottomSheetHeader {
-	flex-direction: row;
 	align-items: center;
-	padding-right: $grid-unit-20;
+	flex-direction: row;
+	height: 44px;
+	justify-content: center;
+}
+
+.bottomSheetHeaderLeft {
+	align-items: flex-start;
+	flex: 1;
+	justify-content: center;
+}
+
+.bottomSheetHeaderRight {
+	align-items: flex-end;
+	flex: 1;
+	justify-content: center;
+}
+
+.bottomSheetActionButton {
+	align-items: center;
+	flex-direction: row;
+	height: 100%;
+	justify-content: center;
+	min-width: 44px;
 	padding-left: $grid-unit-20;
-	min-height: 44px;
-}
-
-.bottomSheetBackButton {
-	flex-direction: row;
-	align-items: center;
-	flex: 1;
-}
-
-.bottomSheetApplyButton {
-	flex-direction: row;
-	justify-content: flex-end;
-	flex: 1;
+	padding-right: $grid-unit-20;
 }
 
 .chevronLeftIcon {
@@ -255,10 +268,6 @@
 
 .bottomSheetButtonTextDark {
 	color: $blue-30;
-}
-
-.bottomSheetRightSpace {
-	flex: 1;
 }
 
 .arrowLeftIcon {
@@ -294,4 +303,13 @@
 
 .cellHelpLabelIOS {
 	padding-bottom: $grid-unit-10;
+}
+
+.cellSubLabelText {
+	font-size: 12px;
+	color: $sub-heading;
+}
+
+.cellSubLabelTextDark {
+	color: $sub-heading-dark;
 }

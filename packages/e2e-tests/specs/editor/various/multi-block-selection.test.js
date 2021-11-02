@@ -10,6 +10,8 @@ import {
 	clickBlockToolbarButton,
 	clickButton,
 	clickMenuItem,
+	saveDraft,
+	transformBlockTo,
 } from '@wordpress/e2e-test-utils';
 
 async function getSelectedFlatIndices() {
@@ -286,6 +288,80 @@ describe( 'Multi-block selection', () => {
 		await page.keyboard.up( 'Shift' );
 		await testNativeSelection();
 		expect( await getSelectedFlatIndices() ).toEqual( [ 2, 3 ] );
+	} );
+
+	// @see https://github.com/WordPress/gutenberg/issues/34118
+	it( 'should properly select a single block even if `shift` was held for the selection', async () => {
+		await clickBlockAppender();
+		await page.keyboard.type( 'test' );
+
+		await saveDraft();
+		await page.reload();
+		await page.waitForSelector( '.edit-post-layout' );
+
+		await page.keyboard.down( 'Shift' );
+		await page.click( '[data-type="core/paragraph"]', { visible: true } );
+		await page.keyboard.up( 'Shift' );
+
+		await pressKeyWithModifier( 'primary', 'a' );
+		await page.keyboard.type( 'new content' );
+		expect( await getEditedPostContent() ).toMatchInlineSnapshot( `
+		"<!-- wp:paragraph -->
+		<p>new content</p>
+		<!-- /wp:paragraph -->"
+	` );
+	} );
+
+	it( 'should properly select multiple blocks if selected nested blocks belong to different parent', async () => {
+		await clickBlockAppender();
+		await page.keyboard.type( 'first' );
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.type( 'group' );
+		// Multiselect via keyboard.
+		await page.keyboard.down( 'Shift' );
+		await page.keyboard.press( 'ArrowUp' );
+		await page.keyboard.up( 'Shift' );
+		await transformBlockTo( 'Group' );
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.type( 'second' );
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.type( 'group' );
+		await page.keyboard.down( 'Shift' );
+		await page.keyboard.press( 'ArrowUp' );
+		await page.keyboard.up( 'Shift' );
+		await transformBlockTo( 'Group' );
+		await page.keyboard.press( 'ArrowDown' );
+
+		// Click the first paragraph in the first Group block while pressing `shift` key.
+		const firstParagraph = await page.waitForXPath( "//p[text()='first']" );
+		await page.keyboard.down( 'Shift' );
+		await firstParagraph.click();
+		await page.keyboard.up( 'Shift' );
+
+		await page.waitForSelector( '.is-multi-selected' );
+		const selectedBlocks = await page.$$( '.is-multi-selected' );
+		expect( selectedBlocks ).toHaveLength( 2 );
+	} );
+	it( 'should properly select part of nested rich text block while holding shift', async () => {
+		await clickBlockAppender();
+		await page.keyboard.type( 'rich text in group' );
+		await transformBlockTo( 'Group' );
+		await page.keyboard.press( 'ArrowDown' );
+
+		await page.keyboard.down( 'Shift' );
+		const paragraph = await page.$( '[data-type="core/paragraph"]' );
+		const { x, y } = await paragraph.boundingBox();
+		await page.mouse.move( x + 20, y );
+		await page.mouse.down();
+		await page.keyboard.up( 'Shift' );
+		await page.keyboard.type( 'hi' );
+		expect( await getEditedPostContent() ).toMatchInlineSnapshot( `
+		"<!-- wp:group -->
+		<div class=\\"wp-block-group\\"><!-- wp:paragraph -->
+		<p>hih text in group</p>
+		<!-- /wp:paragraph --></div>
+		<!-- /wp:group -->"
+	` );
 	} );
 
 	it( 'should select by dragging', async () => {

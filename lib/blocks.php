@@ -21,6 +21,7 @@ function gutenberg_reregister_core_block_types() {
 				'code',
 				'column',
 				'columns',
+				'comments-query-loop',
 				'cover',
 				'gallery',
 				'group',
@@ -33,7 +34,9 @@ function gutenberg_reregister_core_block_types() {
 				'missing',
 				'more',
 				'navigation-link',
+				'navigation-submenu',
 				'nextpage',
+				'pattern',
 				'paragraph',
 				'preformatted',
 				'pullquote',
@@ -49,52 +52,58 @@ function gutenberg_reregister_core_block_types() {
 				'embed',
 			),
 			'block_names'   => array(
-				'archives.php'                  => 'core/archives',
-				'block.php'                     => 'core/block',
-				'calendar.php'                  => 'core/calendar',
-				'categories.php'                => 'core/categories',
-				'file.php'                      => 'core/file',
-				'latest-comments.php'           => 'core/latest-comments',
-				'latest-posts.php'              => 'core/latest-posts',
-				'loginout.php'                  => 'core/loginout',
-				'navigation.php'                => 'core/navigation',
-				'navigation-link.php'           => 'core/navigation-link',
-				'home-link.php'                 => 'core/home-link',
-				'rss.php'                       => 'core/rss',
-				'search.php'                    => 'core/search',
-				'shortcode.php'                 => 'core/shortcode',
-				'social-link.php'               => 'core/social-link',
-				'tag-cloud.php'                 => 'core/tag-cloud',
-				'page-list.php'                 => 'core/page-list',
-				'post-author.php'               => 'core/post-author',
-				'post-comment.php'              => 'core/post-comment',
-				'post-comment-author.php'       => 'core/post-comment-author',
-				'post-comment-content.php'      => 'core/post-comment-content',
-				'post-comment-date.php'         => 'core/post-comment-date',
-				'post-comments.php'             => 'core/post-comments',
-				'post-comments-count.php'       => 'core/post-comments-count',
-				'post-comments-form.php'        => 'core/post-comments-form',
-				'post-comments-link.php'        => 'core/post-comments-link',
-				'post-content.php'              => 'core/post-content',
-				'post-date.php'                 => 'core/post-date',
-				'post-excerpt.php'              => 'core/post-excerpt',
-				'post-featured-image.php'       => 'core/post-featured-image',
-				'post-terms.php'                => 'core/post-terms',
-				'post-navigation-link.php'      => 'core/post-navigation-link',
-				'post-title.php'                => 'core/post-title',
-				'query.php'                     => 'core/query',
-				'post-template.php'             => 'core/post-template',
-				'query-title.php'               => 'core/query-title',
-				'query-pagination.php'          => 'core/query-pagination',
-				'query-pagination-next.php'     => 'core/query-pagination-next',
-				'query-pagination-numbers.php'  => 'core/query-pagination-numbers',
-				'query-pagination-previous.php' => 'core/query-pagination-previous',
-				'site-logo.php'                 => 'core/site-logo',
-				'site-tagline.php'              => 'core/site-tagline',
-				'site-title.php'                => 'core/site-title',
+				'archives.php'                   => 'core/archives',
+				'block.php'                      => 'core/block',
+				'calendar.php'                   => 'core/calendar',
+				'categories.php'                 => 'core/categories',
+				'file.php'                       => 'core/file',
+				'latest-comments.php'            => 'core/latest-comments',
+				'latest-posts.php'               => 'core/latest-posts',
+				'loginout.php'                   => 'core/loginout',
+				'navigation.php'                 => 'core/navigation',
+				'navigation-link.php'            => 'core/navigation-link',
+				'navigation-submenu.php'         => 'core/navigation-submenu',
+				'home-link.php'                  => 'core/home-link',
+				'rss.php'                        => 'core/rss',
+				'search.php'                     => 'core/search',
+				'shortcode.php'                  => 'core/shortcode',
+				'social-link.php'                => 'core/social-link',
+				'tag-cloud.php'                  => 'core/tag-cloud',
+				'page-list.php'                  => 'core/page-list',
+				'pattern.php'                    => 'core/pattern',
+				'post-author.php'                => 'core/post-author',
+				'post-comment.php'               => 'core/post-comment',
+				'post-comment-author.php'        => 'core/post-comment-author',
+				'post-comment-author-avatar.php' => 'core/post-comment-author-avatar',
+				'post-comment-content.php'       => 'core/post-comment-content',
+				'post-comment-date.php'          => 'core/post-comment-date',
+				'post-comment-edit.php'          => 'core/post-comment-edit',
+				'post-comment-reply-link.php'    => 'core/post-comment-reply-link',
+				'post-comments.php'              => 'core/post-comments',
+				'post-comments-count.php'        => 'core/post-comments-count',
+				'post-comments-form.php'         => 'core/post-comments-form',
+				'post-comments-link.php'         => 'core/post-comments-link',
+				'comment-template.php'           => 'core/comment-template',
+				'post-content.php'               => 'core/post-content',
+				'post-date.php'                  => 'core/post-date',
+				'post-excerpt.php'               => 'core/post-excerpt',
+				'post-featured-image.php'        => 'core/post-featured-image',
+				'post-terms.php'                 => 'core/post-terms',
+				'post-navigation-link.php'       => 'core/post-navigation-link',
+				'post-title.php'                 => 'core/post-title',
+				'query.php'                      => 'core/query',
+				'post-template.php'              => 'core/post-template',
+				'query-title.php'                => 'core/query-title',
+				'query-pagination.php'           => 'core/query-pagination',
+				'query-pagination-next.php'      => 'core/query-pagination-next',
+				'query-pagination-numbers.php'   => 'core/query-pagination-numbers',
+				'query-pagination-previous.php'  => 'core/query-pagination-previous',
+				'site-logo.php'                  => 'core/site-logo',
+				'site-tagline.php'               => 'core/site-tagline',
+				'site-title.php'                 => 'core/site-title',
 				// 'table-of-contents.php'         => 'core/table-of-contents',
-				'template-part.php'             => 'core/template-part',
-				'term-description.php'          => 'core/term-description',
+				'template-part.php'              => 'core/template-part',
+				'term-description.php'           => 'core/term-description',
 			),
 		),
 		__DIR__ . '/../build/edit-widgets/blocks/'  => array(
@@ -106,9 +115,11 @@ function gutenberg_reregister_core_block_types() {
 		__DIR__ . '/../build/widgets/blocks/'       => array(
 			'block_folders' => array(
 				'legacy-widget',
+				'widget-group',
 			),
 			'block_names'   => array(
 				'legacy-widget.php' => 'core/legacy-widget',
+				'widget-group.php'  => 'core/widget-group',
 			),
 		),
 	);
@@ -508,3 +519,111 @@ function gutenberg_migrate_old_typography_shape( $metadata ) {
 if ( ! function_exists( 'wp_migrate_old_typography_shape' ) ) {
 	add_filter( 'block_type_metadata', 'gutenberg_migrate_old_typography_shape' );
 }
+
+if ( ! function_exists( 'wp_enqueue_block_style' ) ) {
+	/**
+	 * Enqueue a stylesheet for a specific block.
+	 *
+	 * If the theme has opted-in to separate-styles loading,
+	 * then the stylesheet will be enqueued on-render,
+	 * otherwise when the block inits.
+	 *
+	 * @param string $block_name The block-name, including namespace.
+	 * @param array  $args       An array of arguments [handle,src,deps,ver,media].
+	 *
+	 * @return void
+	 */
+	function wp_enqueue_block_style( $block_name, $args ) {
+		$args = wp_parse_args(
+			$args,
+			array(
+				'handle' => '',
+				'src'    => '',
+				'deps'   => array(),
+				'ver'    => false,
+				'media'  => 'all',
+			)
+		);
+
+		/**
+		 * Callback function to register and enqueue styles.
+		 *
+		 * @param string $content When the callback is used for the render_block filter,
+		 *                        the content needs to be returned so the function parameter
+		 *                        is to ensure the content exists.
+		 *
+		 * @return string
+		 */
+		$callback = function( $content ) use ( $args ) {
+			// Register the stylesheet.
+			if ( ! empty( $args['src'] ) ) {
+				wp_register_style( $args['handle'], $args['src'], $args['deps'], $args['ver'], $args['media'] );
+			}
+
+			// Add `path` data if provided.
+			if ( isset( $args['path'] ) ) {
+				wp_style_add_data( $args['handle'], 'path', $args['path'] );
+
+				// Get the RTL file path.
+				$rtl_file_path = str_replace( '.css', '-rtl.css', $args['path'] );
+
+				// Add RTL stylesheet.
+				if ( file_exists( $rtl_file_path ) ) {
+					wp_style_add_data( $args['hanle'], 'rtl', 'replace' );
+
+					if ( is_rtl() ) {
+						wp_style_add_data( $args['handle'], 'path', $rtl_file_path );
+					}
+				}
+			}
+
+			// Enqueue the stylesheet.
+			wp_enqueue_style( $args['handle'] );
+
+			return $content;
+		};
+
+		$hook = did_action( 'wp_enqueue_scripts' ) ? 'wp_footer' : 'wp_enqueue_scripts';
+		if ( wp_should_load_separate_core_block_assets() ) {
+			$hook = "render_block_$block_name";
+		}
+
+		// Enqueue assets in the frontend.
+		add_filter( $hook, $callback );
+
+		// Enqueue assets in the editor.
+		add_action( 'enqueue_block_assets', $callback );
+	}
+}
+
+/**
+ * Allow multiple block styles.
+ *
+ * @param array $metadata Metadata for registering a block type.
+ *
+ * @return array
+ */
+function gutenberg_multiple_block_styles( $metadata ) {
+	foreach ( array( 'style', 'editorStyle' ) as $key ) {
+		if ( ! empty( $metadata[ $key ] ) && is_array( $metadata[ $key ] ) ) {
+			$default_style = array_shift( $metadata[ $key ] );
+			foreach ( $metadata[ $key ] as $handle ) {
+				$args = array( 'handle' => $handle );
+				if ( 0 === strpos( $handle, 'file:' ) && isset( $metadata['file'] ) ) {
+					$style_path = remove_block_asset_path_prefix( $handle );
+					$args       = array(
+						'handle' => sanitize_key( "{$metadata['name']}-{$style_path}" ),
+						'src'    => plugins_url( $style_path, $metadata['file'] ),
+					);
+				}
+
+				wp_enqueue_block_style( $metadata['name'], $args );
+			}
+
+			// Only return the 1st item in the array.
+			$metadata[ $key ] = $default_style;
+		}
+	}
+	return $metadata;
+}
+add_filter( 'block_type_metadata', 'gutenberg_multiple_block_styles' );

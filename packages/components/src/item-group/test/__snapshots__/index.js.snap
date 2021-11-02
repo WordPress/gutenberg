@@ -11,8 +11,8 @@ Snapshot Diff:
       role="listitem"
     >
       <div
--       class="components-item css-1o1qhwe-View-medium-itemWrapper-spacedAround em57xhy0"
-+       class="components-item css-1c3a883-View-large-itemWrapper-spacedAround em57xhy0"
+-       class="components-item css-2fnxcf-View-medium-item-spacedAround em57xhy0"
++       class="components-item css-346xw3-View-large-item-spacedAround em57xhy0"
         data-wp-c16t="true"
         data-wp-component="Item"
       >
@@ -24,35 +24,13 @@ Snapshot Diff:
       role="listitem"
     >
       <div
--       class="components-item css-1o1qhwe-View-medium-itemWrapper-spacedAround em57xhy0"
-+       class="components-item css-1c3a883-View-large-itemWrapper-spacedAround em57xhy0"
+-       class="components-item css-2fnxcf-View-medium-item-spacedAround em57xhy0"
++       class="components-item css-346xw3-View-large-item-spacedAround em57xhy0"
         data-wp-c16t="true"
         data-wp-component="Item"
       >
         Is
       </div>
-`;
-
-exports[`ItemGroup Item should render a button with the isAction prop is true 1`] = `
-Snapshot Diff:
-- First value
-+ Second value
-
-  <div
-    class="css-dcjs67-itemWrapper"
-    role="listitem"
-  >
--   <div
--     class="components-item css-gqguxs-View-medium-itemWrapper em57xhy0"
-+   <button
-+     class="components-item css-1t39803-View-unstyledButton-medium-itemWrapper em57xhy0"
-      data-wp-c16t="true"
-      data-wp-component="Item"
-    >
-      Code is poetry
--   </div>
-+   </button>
-  </div>
 `;
 
 exports[`ItemGroup Item should use different amounts of padding depending on the value of the size prop 1`] = `
@@ -66,8 +44,8 @@ Snapshot Diff:
     role="listitem"
   >
     <div
--     class="components-item css-gqguxs-View-medium-itemWrapper em57xhy0"
-+     class="components-item css-1esf9dc-View-large-itemWrapper em57xhy0"
+-     class="components-item css-4qcpca-View-medium-item em57xhy0"
++     class="components-item css-132y1d5-View-large-item em57xhy0"
       data-wp-c16t="true"
       data-wp-component="Item"
     >
@@ -99,6 +77,7 @@ exports[`ItemGroup ItemGroup component should render correctly 1`] = `
   padding: calc((36px - calc(13px * 1.2) - 2px) / 2) 12px;
   width: 100%;
   display: block;
+  margin: 0;
   border-radius: 2px;
 }
 
@@ -141,8 +120,8 @@ Snapshot Diff:
       role="listitem"
     >
       <div
--       class="components-item css-1o1qhwe-View-medium-itemWrapper-spacedAround em57xhy0"
-+       class="components-item css-gqguxs-View-medium-itemWrapper em57xhy0"
+-       class="components-item css-2fnxcf-View-medium-item-spacedAround em57xhy0"
++       class="components-item css-4qcpca-View-medium-item em57xhy0"
         data-wp-c16t="true"
         data-wp-component="Item"
       >
@@ -168,8 +147,8 @@ Snapshot Diff:
       role="listitem"
     >
       <div
--       class="components-item css-1o1qhwe-View-medium-itemWrapper-spacedAround em57xhy0"
-+       class="components-item css-gqguxs-View-medium-itemWrapper em57xhy0"
+-       class="components-item css-2fnxcf-View-medium-item-spacedAround em57xhy0"
++       class="components-item css-4qcpca-View-medium-item em57xhy0"
         data-wp-c16t="true"
         data-wp-component="Item"
       >

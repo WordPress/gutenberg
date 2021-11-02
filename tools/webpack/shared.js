@@ -10,7 +10,6 @@ const postcss = require( 'postcss' );
 /**
  * WordPress dependencies
  */
-const DependencyExtractionWebpackPlugin = require( '@wordpress/dependency-extraction-webpack-plugin' );
 const ReadableJsAssetsWebpackPlugin = require( '@wordpress/readable-js-assets-webpack-plugin' );
 
 const {
@@ -19,15 +18,14 @@ const {
 } = process.env;
 
 const baseConfig = {
+	target: 'browserslist',
 	optimization: {
 		// Only concatenate modules in production, when not analyzing bundles.
 		concatenateModules:
 			mode === 'production' && ! process.env.WP_BUNDLE_ANALYZER,
 		minimizer: [
 			new TerserPlugin( {
-				cache: true,
 				parallel: true,
-				sourceMap: mode !== 'production',
 				terserOptions: {
 					output: {
 						comments: /translators:/i,
@@ -54,7 +52,10 @@ const baseConfig = {
 		] ),
 	},
 	watchOptions: {
-		ignored: [ '**/node_modules', '**/packages/*/src' ],
+		ignored: [
+			'**/node_modules',
+			'**/packages/*/src/**/*.{js,ts,tsx,scss}',
+		],
 		aggregateTimeout: 500,
 	},
 	devtool,
@@ -69,11 +70,7 @@ const plugins = [
 		'process.env.GUTENBERG_PHASE': JSON.stringify(
 			parseInt( process.env.npm_package_config_GUTENBERG_PHASE, 10 ) || 1
 		),
-		'process.env.FORCE_REDUCED_MOTION': JSON.stringify(
-			process.env.FORCE_REDUCED_MOTION
-		),
 	} ),
-	new DependencyExtractionWebpackPlugin( { injectPolyfill: true } ),
 	mode === 'production' && new ReadableJsAssetsWebpackPlugin(),
 ];
 

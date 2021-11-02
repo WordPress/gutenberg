@@ -18,7 +18,7 @@ Install the module
 npm install @wordpress/server-side-render --save
 ```
 
-_This package assumes that your code will run in an **ES2015+** environment. If you're using an environment that has limited or no support for ES2015+ such as IE browsers then using [core-js](https://github.com/zloirock/core-js) will add polyfills for these methods._
+_This package assumes that your code will run in an **ES2015+** environment. If you're using an environment that has limited or no support for such language features and APIs, you should include [the polyfill shipped in `@wordpress/babel-preset-default`](https://github.com/WordPress/gutenberg/tree/HEAD/packages/babel-preset-default#polyfill) in your code._
 
 ## Usage
 
@@ -57,6 +57,25 @@ The HTTP request method to use, either 'GET' or 'POST'. It's 'GET' by default. T
 -   Type: `String`
 -   Required: No
 
+#### Example:
+
+```php
+function add_rest_method( $endpoints ) {
+    if ( is_wp_version_compatible( '5.5' ) ) {
+        return $endpoints;
+    }
+
+    foreach ( $endpoints as $route => $handler ) {
+        if ( isset( $endpoints[ $route ][0] ) ) {
+            $endpoints[ $route ][0]['methods'] = [ WP_REST_Server::READABLE, WP_REST_Server::CREATABLE ];
+        }
+    }
+
+    return $endpoints;
+}
+add_filter( 'rest_endpoints', 'add_rest_method');
+```
+
 ### urlQueryArgs
 
 Query arguments to apply to the request URL.
@@ -90,9 +109,7 @@ The component is rendered while the API request is being processed (loading stat
 
 ```jsx
 const MyServerSideRender = () => (
-	<ServerSideRender
-		LoadingResponsePlaceholder={ MyAmazingPlaceholder }
-	/>
+	<ServerSideRender LoadingResponsePlaceholder={ MyAmazingPlaceholder } />
 );
 ```
 

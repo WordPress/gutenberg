@@ -14,7 +14,7 @@ $vertical-tabs-width: 160px;
 		height: 70%;
 	}
 
-	// Clears spacing to flush fit the navigation component to the modal edges.
+	// Clears spacing to flush fit the navigator component to the modal edges.
 	@media (max-width: #{ ($break-medium - 1) }) {
 		.components-modal__content {
 			padding: 0;
@@ -23,61 +23,10 @@ $vertical-tabs-width: 160px;
 				content: none;
 			}
 		}
-	}
-
-	.components-navigation {
-		background-color: $white;
-		padding: 0;
-		max-height: 100%;
-		overflow-y: auto;
-
-		> * {
-			// Matches spacing cleared from the modal content element.
-			padding: $grid-unit-30 $grid-unit-40;
-		}
-
-		.components-navigation__menu {
-			margin: 0;
-			color: $gray-900;
-
-			.components-navigation__item {
-				color: $gray-900; // The inheritance of some items is quite strong, so we have to duplicate this one.
-
-				& > button {
-					color: inherit;
-					padding: 3px $grid-unit-20;
-					height: $grid-unit-60;
-					// Aligns button text instead of button box.
-					margin: 0 #{-$grid-unit-20};
-					width: calc(#{$grid-unit-40} + 100%);
-					&:focus {
-						background: $gray-100;
-						font-weight: 500;
-					}
-					&:hover {
-						color: var(--wp-admin-theme-color);
-					}
-				}
-				.components-toggle-control__label {
-					color: inherit;
-				}
-			}
-			.components-navigation__menu-title-heading {
-				color: inherit;
-				border-bottom: 1px solid $gray-300;
-				padding-left: 0;
-				padding-right: 0;
-			}
-			.components-navigation__back-button {
-				color: inherit;
-				padding-left: 0;
-				&:hover {
-					color: var(--wp-admin-theme-color);
-				}
-			}
-			.edit-post-preferences-modal__custom-fields-confirmation-button {
-				width: auto;
-			}
+		// Keep the navigator component from overflowing the modal content area
+		// to ensure that sticky position elements stick where intended.
+		.components-navigator-provider {
+			height: 100%;
 		}
 	}
 
@@ -118,6 +67,7 @@ $vertical-tabs-width: 160px;
 	&__section-title {
 		font-size: 0.9rem;
 		font-weight: 600;
+		margin-top: 0;
 	}
 
 	&__option {

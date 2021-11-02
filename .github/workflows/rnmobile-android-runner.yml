@@ -15,9 +15,7 @@ concurrency:
 jobs:
     test:
         runs-on: macos-latest
-        # The false value below disables the test while we investigate a
-        # foundational error causing failures
-        if: ${{ false && (github.repository == 'WordPress/gutenberg' || github.event_name == 'pull_request') }}
+        if: ${{ github.repository == 'WordPress/gutenberg' || github.event_name == 'pull_request' }}
         strategy:
             matrix:
                 native-test-name: [gutenberg-editor-initial-html]
@@ -41,9 +39,10 @@ jobs:
                   path: ~/.gradle/caches
                   key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle') }}
 
-            - uses: reactivecircus/android-emulator-runner@d2799957d660add41c61a5103e2fbb9e2889eb73 # v2.15.0
+            - uses: reactivecircus/android-emulator-runner@5de26e4bd23bf523e8a4b7f077df8bfb8e52b50e # v2.19.1
               with:
                   api-level: 28
+                  emulator-build: 7425822 # https://git.io/JE3jX
                   profile: pixel_xl
                   script: npm run native test:e2e:android:local ${{ matrix.native-test-name }}
 

@@ -10,7 +10,113 @@ Install the module
 npm install @wordpress/rich-text
 ```
 
-_This package assumes that your code will run in an **ES2015+** environment. If you're using an environment that has limited or no support for ES2015+ such as IE browsers then using [core-js](https://github.com/zloirock/core-js) will add polyfills for these methods._
+_This package assumes that your code will run in an **ES2015+** environment. If you're using an environment that has limited or no support for such language features and APIs, you should include [the polyfill shipped in `@wordpress/babel-preset-default`](https://github.com/WordPress/gutenberg/tree/HEAD/packages/babel-preset-default#polyfill) in your code._
+
+## Usage
+
+The Rich Text package is designed to aid in the manipulation of plain text strings in order that they can represent complex formatting.
+
+By using a `RichTextValue` value object (referred to from here on as `value`) it is possible to separate text from formatting, thereby affording the ability to easily search and manipulate rich formats.
+
+Examples of rich formats include:
+
+-   bold, italic, superscript (etc)
+-   links
+-   underordered/ordered lists
+
+### The RichTextValue object
+
+The value object is comprised of the following:
+
+-   `text` - the string of text to which rich formats are to be applied.
+-   `formats` - a sparse array of the same length as `text` that is filled with [formats](https://developer.wordpress.org/block-editor/how-to-guides/format-api/) (e.g. `core/link`, `core/bold` etc.) at the positions where the text is formatted.
+-   `start` - an index in the `text` representing the _start_ of the currently active selection.
+-   `end` - an index in the `text` representing the _end_ of the currently active selection.
+
+You should not attempt to create your own `value` objects. Rather you should rely on the built in methods of the `@wordpress/rich-text` package to build these for you.
+
+It is important to understand how a value represents richly formatted text. Here is an example to illustrate.
+
+If `text` is formatted from position 2-5 in bold (`core/bold`) and from position 2-8 with a link (`core/link`), then you'll find:
+
+-   arrays within the sparse array at positions 2-5 that include the `core/bold` format
+-   arrays within the sparse array at positions 2-8 that include the `core/link` format
+
+Here's how that would look:
+
+```js
+{
+  text: 'Hello world', // length 11
+  formats: [
+    [], // 0
+    [],
+    [ // 2
+      {
+        type: 'core/bold',
+      },
+      {
+        type: 'core/link',
+      }
+    ],
+    [
+      {
+        type: 'core/bold',
+      },
+      {
+        type: 'core/link',
+      }
+    ],
+    [
+      {
+        type: 'core/bold',
+      },
+      {
+        type: 'core/link',
+      }
+    ],
+    [
+      {
+        type: 'core/bold',
+      },
+      {
+        type: 'core/link',
+      }
+    ],
+    [ // 6
+      {
+        type: 'core/link',
+      }
+    ]
+    [
+      {
+        type: 'core/link',
+      }
+    ],
+    [
+      {
+        type: 'core/link',
+      }
+    ],
+    [], // 9
+    [], // 10
+    [], // 11
+  ]
+}
+```
+
+### Selections
+
+Let's continue to consider the above example with the text `Hello world`.
+
+If, as a user, I make a selection of the word `Hello` this would result in a value object with `start` and `end` as `0` and `5` respectively.
+
+In general, this is useful for knowing which portion of the text is selected. However, we need to consider that selections may also be "collapsed".
+
+#### Collapsed selections
+
+A collapsed selection is one where `start` and `end` values are _identical_ (e.g. `start: 4, end: 4`). This happens when no characters are selected, but there is a caret present. This most often occurs when a user places the cursor/caret within a string of text but does not make a selection.
+
+Given that the selection has no "range" (i.e. there is no difference between `start` and `end` indices), finding the currently selected portion of text from collapsed values can be challenging.
 
 ## API
 

@@ -6,7 +6,7 @@ import { first, last } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { useEffect, useRef } from '@wordpress/element';
+import { useRefEffect } from '@wordpress/compose';
 import { useSelect } from '@wordpress/data';
 
 /**
@@ -70,7 +70,6 @@ function selector( select ) {
 }
 
 export default function useMultiSelection() {
-	const ref = useRef();
 	const {
 		isMultiSelecting,
 		multiSelectedBlockClientIds,
@@ -86,70 +85,78 @@ export default function useMultiSelection() {
 	 * When the component updates, and there is multi selection, we need to
 	 * select the entire block contents.
 	 */
-	useEffect( () => {
-		const { ownerDocument } = ref.current;
-		const { defaultView } = ownerDocument;
+	return useRefEffect(
+		( node ) => {
+			const { ownerDocument } = node;
+			const { defaultView } = ownerDocument;
 
-		if ( ! hasMultiSelection || isMultiSelecting ) {
-			if ( ! selectedBlockClientId || isMultiSelecting ) {
+			if ( ! hasMultiSelection || isMultiSelecting ) {
+				if ( ! selectedBlockClientId || isMultiSelecting ) {
+					return;
+				}
+
+				const selection = defaultView.getSelection();
+
+				if ( selection.rangeCount && ! selection.isCollapsed ) {
+					const blockNode = selectedRef.current;
+					const {
+						startContainer,
+						endContainer,
+					} = selection.getRangeAt( 0 );
+
+					if (
+						!! blockNode &&
+						( ! blockNode.contains( startContainer ) ||
+							! blockNode.contains( endContainer ) )
+					) {
+						selection.removeAllRanges();
+					}
+				}
+
 				return;
 			}
 
-			const selection = defaultView.getSelection();
+			const { length } = multiSelectedBlockClientIds;
 
-			if ( selection.rangeCount && ! selection.isCollapsed ) {
-				const blockNode = selectedRef.current;
-				const { startContainer, endContainer } = selection.getRangeAt(
-					0
-				);
-
-				if (
-					!! blockNode &&
-					( ! blockNode.contains( startContainer ) ||
-						! blockNode.contains( endContainer ) )
-				) {
-					selection.removeAllRanges();
-				}
+			if ( length < 2 ) {
+				return;
 			}
 
-			return;
-		}
+			// The block refs might not be immediately available
+			// when dragging blocks into another block.
+			if ( ! startRef.current || ! endRef.current ) {
+				return;
+			}
 
-		const { length } = multiSelectedBlockClientIds;
+			// For some browsers, like Safari, it is important that focus happens
+			// BEFORE selection.
+			node.focus();
 
-		if ( length < 2 ) {
-			return;
-		}
+			const selection = defaultView.getSelection();
+			const range = ownerDocument.createRange();
 
-		// For some browsers, like Safari, it is important that focus happens
-		// BEFORE selection.
-		ref.current.focus();
+			// These must be in the right DOM order.
+			// The most stable way to select the whole block contents is to start
+			// and end at the deepest points.
+			const startNode = getDeepestNode( startRef.current, 'start' );
+			const endNode = getDeepestNode( endRef.current, 'end' );
 
-		const selection = defaultView.getSelection();
-		const range = ownerDocument.createRange();
+			// While rich text will be disabled with a delay when there is a multi
+			// selection, we must do it immediately because it's not possible to set
+			// selection across editable hosts.
+			toggleRichText( node, false );
 
-		// These must be in the right DOM order.
-		// The most stable way to select the whole block contents is to start
-		// and end at the deepest points.
-		const startNode = getDeepestNode( startRef.current, 'start' );
-		const endNode = getDeepestNode( endRef.current, 'end' );
+			range.setStartBefore( startNode );
+			range.setEndAfter( endNode );
 
-		// While rich text will be disabled with a delay when there is a multi
-		// selection, we must do it immediately because it's not possible to set
-		// selection across editable hosts.
-		toggleRichText( ref.current, false );
-
-		range.setStartBefore( startNode );
-		range.setEndAfter( endNode );
-
-		selection.removeAllRanges();
-		selection.addRange( range );
-	}, [
-		hasMultiSelection,
-		isMultiSelecting,
-		multiSelectedBlockClientIds,
-		selectedBlockClientId,
-	] );
-
-	return ref;
+			selection.removeAllRanges();
+			selection.addRange( range );
+		},
+		[
+			hasMultiSelection,
+			isMultiSelecting,
+			multiSelectedBlockClientIds,
+			selectedBlockClientId,
+		]
+	);
 }

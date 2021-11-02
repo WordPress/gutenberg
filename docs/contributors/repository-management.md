@@ -123,7 +123,7 @@ A pull request can generally be merged once it is:
 -   Vetted against all potential edge cases.
 -   Changelog entries were properly added.
 -   Reviewed by someone other than the original author.
--   [Rebased](/docs/contributors/code/git-workflow.md#keeping-your-branch-up-to-date) onto the latest version of the master branch.
+-   [Rebased](/docs/contributors/code/git-workflow.md#keeping-your-branch-up-to-date) onto the latest version of the `trunk` branch.
 
 The final pull request merge decision is made by the **@wordpress/gutenberg-core** team.
 
@@ -157,7 +157,7 @@ Two GitHub teams are used in the project.
 
 -   [Gutenberg](https://github.com/orgs/WordPress/teams/gutenberg): A team composed of contributors with at least 2–3 meaningful contributions to the project.
 
-If you meet this criteria of several meaningful contributions having been accepted into the repository and would like to be added to the Gutenberg team, feel free to ask in the [#core-editor Slack channel](https://make.wordpress.org/chat/).
+If you meet this criterion of several meaningful contributions having been accepted into the repository and would like to be added to the Gutenberg team, feel free to ask in the [#core-editor Slack channel](https://make.wordpress.org/chat/).
 
 ## Projects
 

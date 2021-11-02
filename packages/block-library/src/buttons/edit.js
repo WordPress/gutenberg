@@ -9,7 +9,7 @@ import classnames from 'classnames';
 import {
 	BlockControls,
 	useBlockProps,
-	__experimentalUseInnerBlocksProps as useInnerBlocksProps,
+	useInnerBlocksProps,
 	JustifyContentControl,
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
@@ -70,7 +70,7 @@ function ButtonsEdit( {
 
 	return (
 		<>
-			<BlockControls group="block">
+			<BlockControls group="block" __experimentalShareWithChildBlocks>
 				<JustifyContentControl
 					allowedControls={ justifyControls }
 					value={ contentJustification }

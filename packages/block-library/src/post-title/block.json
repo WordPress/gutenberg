@@ -35,10 +35,16 @@
 			"gradients": true,
 			"link": true
 		},
+		"spacing": {
+			"margin": true
+		},
 		"typography": {
 			"fontSize": true,
 			"lineHeight": true,
-			"__experimentalFontFamily": true
+			"__experimentalFontFamily": true,
+			"__experimentalFontWeight": true,
+			"__experimentalFontStyle": true,
+			"__experimentalTextTransform": true
 		}
 	},
 	"style": "wp-block-post-title"

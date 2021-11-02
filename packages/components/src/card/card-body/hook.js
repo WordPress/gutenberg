@@ -11,7 +11,7 @@ import * as styles from '../styles';
 import { useCx } from '../../utils/hooks/use-cx';
 
 /**
- * @param {import('../../ui/context').PolymorphicComponentProps<import('../types').BodyProps, 'div'>} props
+ * @param {import('../../ui/context').WordPressComponentProps<import('../types').BodyProps, 'div'>} props
  */
 export function useCardBody( props ) {
 	const {

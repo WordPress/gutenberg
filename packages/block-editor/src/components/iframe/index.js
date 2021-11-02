@@ -1,17 +1,21 @@
 /**
+ * External dependencies
+ */
+import classnames from 'classnames';
+
+/**
  * WordPress dependencies
  */
 import {
 	useState,
 	createPortal,
-	useCallback,
 	forwardRef,
 	useEffect,
 	useMemo,
 	useReducer,
 } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
-import { useMergeRefs } from '@wordpress/compose';
+import { useMergeRefs, useRefEffect } from '@wordpress/compose';
 import { __experimentalStyleProvider as StyleProvider } from '@wordpress/components';
 
 /**
@@ -72,7 +76,7 @@ function styleSheetsCompat( doc ) {
 
 		if ( isMatch && ! doc.getElementById( ownerNode.id ) ) {
 			// eslint-disable-next-line no-console
-			console.error(
+			console.warn(
 				`Stylesheet ${ ownerNode.id } was not properly added.
 For blocks, use the block API's style (https://developer.wordpress.org/block-editor/reference-guides/block-api/block-metadata/#style) or editorStyle (https://developer.wordpress.org/block-editor/reference-guides/block-api/block-metadata/#editor-style).
 For themes, use add_editor_style (https://developer.wordpress.org/block-editor/how-to-guides/themes/theme-support/#editor-styles).`,
@@ -130,36 +134,10 @@ function bubbleEvents( doc ) {
 		}
 	}
 
-	const eventTypes = [ 'keydown', 'keypress', 'dragover' ];
+	const eventTypes = [ 'dragover' ];
 
 	for ( const name of eventTypes ) {
 		doc.addEventListener( name, bubbleEvent );
-	}
-}
-
-/**
- * Sets the document direction.
- *
- * Sets the `editor-styles-wrapper` class name on the body.
- *
- * Copies the `admin-color-*` class name to the body so that the admin color
- * scheme applies to components in the iframe.
- *
- * @param {Document} doc Document to add class name to.
- */
-function setBodyClassName( doc ) {
-	doc.dir = document.dir;
-	doc.body.className = BODY_CLASS_NAME;
-
-	for ( const name of document.body.classList ) {
-		if ( name.startsWith( 'admin-color-' ) ) {
-			doc.body.classList.add( name );
-		} else if ( name === 'wp-embed-responsive' ) {
-			// Ideally ALL classes that are added through get_body_class should
-			// be added in the editor too, which we'll somehow have to get from
-			// the server in the future (which will run the PHP filters).
-			doc.body.classList.add( 'wp-embed-responsive' );
-		}
 	}
 }
 
@@ -171,9 +149,9 @@ function useParsedAssets( html ) {
 	}, [ html ] );
 }
 
-async function loadScript( doc, { id, src } ) {
+async function loadScript( head, { id, src } ) {
 	return new Promise( ( resolve, reject ) => {
-		const script = doc.createElement( 'script' );
+		const script = head.ownerDocument.createElement( 'script' );
 		script.id = id;
 		if ( src ) {
 			script.src = src;
@@ -182,57 +160,45 @@ async function loadScript( doc, { id, src } ) {
 		} else {
 			resolve();
 		}
-		doc.head.appendChild( script );
+		head.appendChild( script );
 	} );
 }
 
-function Iframe( { contentRef, children, head, ...props }, ref ) {
+function Iframe( { contentRef, children, head, tabIndex = 0, ...props }, ref ) {
 	const [ , forceRender ] = useReducer( () => ( {} ) );
 	const [ iframeDocument, setIframeDocument ] = useState();
-	const styles = useParsedAssets( window.__editorAssets.styles );
-	const scripts = useParsedAssets( window.__editorAssets.scripts );
+	const [ bodyClasses, setBodyClasses ] = useState( [] );
+	const styles = useParsedAssets( window.__editorAssets?.styles );
+	const scripts = useParsedAssets( window.__editorAssets?.scripts );
 	const clearerRef = useBlockSelectionClearer();
 	const [ before, writingFlowRef, after ] = useWritingFlow();
-	const setRef = useCallback( ( node ) => {
-		if ( ! node ) {
-			return;
-		}
-
+	const setRef = useRefEffect( ( node ) => {
 		function setDocumentIfReady() {
-			const { contentDocument } = node;
-			const { readyState, body, documentElement } = contentDocument;
+			const { contentDocument, ownerDocument } = node;
+			const { readyState, documentElement } = contentDocument;
 
 			if ( readyState !== 'interactive' && readyState !== 'complete' ) {
 				return false;
 			}
 
-			if ( typeof contentRef === 'function' ) {
-				contentRef( body );
-			} else if ( contentRef ) {
-				contentRef.current = body;
-			}
-
-			setBodyClassName( contentDocument );
 			bubbleEvents( contentDocument );
-			setBodyClassName( contentDocument );
 			setIframeDocument( contentDocument );
 			clearerRef( documentElement );
-			clearerRef( body );
-			writingFlowRef( body );
 
-			scripts
-				.reduce(
-					( promise, script ) =>
-						promise.then( () =>
-							loadScript( contentDocument, script )
-						),
-					Promise.resolve()
+			// Ideally ALL classes that are added through get_body_class should
+			// be added in the editor too, which we'll somehow have to get from
+			// the server in the future (which will run the PHP filters).
+			setBodyClasses(
+				Array.from( ownerDocument.body.classList ).filter(
+					( name ) =>
+						name.startsWith( 'admin-color-' ) ||
+						name === 'wp-embed-responsive'
 				)
-				.finally( () => {
-					// When script are loaded, re-render blocks to allow them
-					// to initialise.
-					forceRender();
-				} );
+			);
+
+			contentDocument.dir = ownerDocument.dir;
+			documentElement.removeChild( contentDocument.head );
+			documentElement.removeChild( contentDocument.body );
 
 			return true;
 		}
@@ -246,6 +212,20 @@ function Iframe( { contentRef, children, head, ...props }, ref ) {
 			setDocumentIfReady();
 		} );
 	}, [] );
+	const headRef = useRefEffect( ( element ) => {
+		scripts
+			.reduce(
+				( promise, script ) =>
+					promise.then( () => loadScript( element, script ) ),
+				Promise.resolve()
+			)
+			.finally( () => {
+				// When script are loaded, re-render blocks to allow them
+				// to initialise.
+				forceRender();
+			} );
+	}, [] );
+	const bodyRef = useMergeRefs( [ contentRef, clearerRef, writingFlowRef ] );
 
 	useEffect( () => {
 		if ( iframeDocument ) {
@@ -279,24 +259,33 @@ function Iframe( { contentRef, children, head, ...props }, ref ) {
 
 	return (
 		<>
-			{ before }
+			{ tabIndex >= 0 && before }
 			<iframe
 				{ ...props }
 				ref={ useMergeRefs( [ ref, setRef ] ) }
-				tabIndex="0"
+				tabIndex={ tabIndex }
 				title={ __( 'Editor canvas' ) }
-				name="editor-canvas"
 			>
 				{ iframeDocument &&
 					createPortal(
-						<StyleProvider document={ iframeDocument }>
-							{ children }
-						</StyleProvider>,
-						iframeDocument.body
+						<>
+							<head ref={ headRef }>{ head }</head>
+							<body
+								ref={ bodyRef }
+								className={ classnames(
+									BODY_CLASS_NAME,
+									...bodyClasses
+								) }
+							>
+								<StyleProvider document={ iframeDocument }>
+									{ children }
+								</StyleProvider>
+							</body>
+						</>,
+						iframeDocument.documentElement
 					) }
-				{ iframeDocument && createPortal( head, iframeDocument.head ) }
 			</iframe>
-			{ after }
+			{ tabIndex >= 0 && after }
 		</>
 	);
 }

@@ -96,7 +96,8 @@ function gutenberg_override_query_template( $template, $type, array $templates )
 	add_action( 'wp_head', 'gutenberg_viewport_meta_tag', 0 );
 
 	// Render title tag with content, regardless of whether theme has title-tag support.
-	remove_action( 'wp_head', '_wp_render_title_tag', 1 );    // Remove conditional title tag rendering...
+	remove_action( 'wp_head', '_wp_render_title_tag', 1 ); // Remove conditional title tag rendering...
+	remove_action( 'wp_head', '_block_template_render_title_tag', 1 );
 	add_action( 'wp_head', 'gutenberg_render_title_tag', 1 ); // ...and make it unconditional.
 
 	// This file will be included instead of the theme's template file.
@@ -110,10 +111,7 @@ function gutenberg_override_query_template( $template, $type, array $templates )
  *
  * @param string   $template_type      The current template type.
  * @param string[] $template_hierarchy (optional) The current template hierarchy, ordered by priority.
- * @return null|array {
- *  @type WP_Post|null template_post A template post object, or null if none could be found.
- *  @type int[] A list of template parts IDs for the template.
- * }
+ * @return null|WP_Block_Template A block template if found. Null if not.
  */
 function gutenberg_resolve_template( $template_type, $template_hierarchy ) {
 	if ( ! $template_type ) {

@@ -20,16 +20,19 @@
 	background-color: rgba($white, 0.07);
 }
 
+.newIndicator {
+	height: 22;
+	left: 6;
+	position: absolute;
+	top: 6;
+	width: 22;
+}
+
 .modalIcon {
 	width: 32px;
 	height: 32px;
 	justify-content: center;
 	align-items: center;
-	fill: $gray-dark;
-}
-
-.modalIconDark {
-	fill: $white;
 }
 
 .modalItemLabel {

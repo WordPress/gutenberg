@@ -5,7 +5,6 @@ import {
 	isHorizontalEdge,
 	placeCaretAtHorizontalEdge,
 	isTextField,
-	__unstableStripHTML as stripHTML,
 	isNumberInput,
 	removeInvalidHTML,
 	isEmpty,
@@ -83,6 +82,14 @@ describe( 'DOM', () => {
 			parent.appendChild( div );
 			expect( isHorizontalEdge( div, true ) ).toBe( true );
 			expect( isHorizontalEdge( div, false ) ).toBe( true );
+		} );
+
+		it( 'should return true for input types that do not have selection ranges', () => {
+			const input = document.createElement( 'input' );
+			input.setAttribute( 'type', 'checkbox' );
+			parent.appendChild( input );
+			expect( isHorizontalEdge( input, true ) ).toBe( true );
+			expect( isHorizontalEdge( input, false ) ).toBe( true );
 		} );
 	} );
 
@@ -184,20 +191,6 @@ describe( 'DOM', () => {
 			expect( isTextField( document.createElement( 'div' ) ) ).toBe(
 				false
 			);
-		} );
-	} );
-
-	describe( 'stripHTML', () => {
-		it( 'removes any HTML from a text string', () => {
-			expect( stripHTML( 'This is <em>emphasized</em>' ) ).toBe(
-				'This is emphasized'
-			);
-		} );
-
-		it( 'removes script tags, but does not execute them', () => {
-			const html = 'This will not <script>throw "Error"</script>';
-			expect( stripHTML( html ) ).toBe( 'This will not throw "Error"' );
-			expect( () => stripHTML( html ) ).not.toThrow();
 		} );
 	} );
 } );

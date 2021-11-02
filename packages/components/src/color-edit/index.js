@@ -16,7 +16,7 @@ import { edit, close, chevronDown, chevronUp, plus } from '@wordpress/icons';
  */
 import Dropdown from '../dropdown';
 import CircularOptionPicker from '../circular-option-picker';
-import ColorPicker from '../color-picker';
+import { ColorPicker } from '../color-picker';
 import Button from '../button';
 import TextControl from '../text-control';
 import BaseControl from '../base-control';
@@ -96,14 +96,13 @@ function ColorOption( {
 					renderContent={ () => (
 						<ColorPicker
 							color={ color }
-							onChangeComplete={ ( newColor ) =>
+							onChange={ ( newColor ) =>
 								onChange( {
-									color: newColor.hex,
+									color: newColor,
 									slug,
 									name,
 								} )
 							}
-							disableAlpha
 						/>
 					) }
 				/>

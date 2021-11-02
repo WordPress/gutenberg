@@ -87,13 +87,10 @@ export default function BlockContentOverlay( {
 			className={ classes }
 			onMouseEnter={ () => setIsHovered( true ) }
 			onMouseLeave={ () => setIsHovered( false ) }
+			onMouseUp={
+				isOverlayActive ? () => setIsOverlayActive( false ) : undefined
+			}
 		>
-			{ isOverlayActive && (
-				<div
-					className={ `${ baseClassName }__overlay` }
-					onMouseUp={ () => setIsOverlayActive( false ) }
-				/>
-			) }
 			{ wrapperProps?.children }
 		</TagName>
 	);

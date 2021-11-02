@@ -18,9 +18,11 @@ export * from './colors';
 export * from './gradients';
 export * from './font-sizes';
 export { AlignmentControl, AlignmentToolbar } from './alignment-control';
-export { default as InnerBlocks } from './inner-blocks';
-export { default as InspectorAdvancedControls } from './inspector-advanced-controls';
-export { default as InspectorControls } from './inspector-controls';
+export { default as InnerBlocks, useInnerBlocksProps } from './inner-blocks';
+export {
+	default as InspectorControls,
+	InspectorAdvancedControls,
+} from './inspector-controls';
 export {
 	JustifyToolbar,
 	JustifyContentControl,

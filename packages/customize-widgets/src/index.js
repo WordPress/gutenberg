@@ -10,8 +10,14 @@ import {
 import {
 	registerLegacyWidgetBlock,
 	registerLegacyWidgetVariations,
+	registerWidgetGroupBlock,
 } from '@wordpress/widgets';
-import { setFreeformContentHandlerName } from '@wordpress/blocks';
+import {
+	setFreeformContentHandlerName,
+	store as blocksStore,
+} from '@wordpress/blocks';
+import { dispatch } from '@wordpress/data';
+import { store as interfaceStore } from '@wordpress/interface';
 
 /**
  * Internal dependencies
@@ -23,7 +29,12 @@ import './filters';
 
 const { wp } = window;
 
-const DISABLED_BLOCKS = [ 'core/more', 'core/block', 'core/freeform' ];
+const DISABLED_BLOCKS = [
+	'core/more',
+	'core/block',
+	'core/freeform',
+	'core/template-part',
+];
 const ENABLE_EXPERIMENTAL_FSE_BLOCKS = false;
 
 /**
@@ -33,12 +44,19 @@ const ENABLE_EXPERIMENTAL_FSE_BLOCKS = false;
  * @param {Object} blockEditorSettings Block editor settings.
  */
 export function initialize( editorName, blockEditorSettings ) {
+	dispatch( interfaceStore ).setFeatureDefaults( 'core/customize-widgets', {
+		fixedToolbar: false,
+		welcomeGuide: true,
+	} );
+
+	dispatch( blocksStore ).__experimentalReapplyBlockTypeFilters();
 	const coreBlocks = __experimentalGetCoreBlocks().filter( ( block ) => {
 		return ! (
 			DISABLED_BLOCKS.includes( block.name ) ||
 			block.name.startsWith( 'core/post' ) ||
 			block.name.startsWith( 'core/query' ) ||
-			block.name.startsWith( 'core/site' )
+			block.name.startsWith( 'core/site' ) ||
+			block.name.startsWith( 'core/navigation' )
 		);
 	} );
 	registerCoreBlocks( coreBlocks );
@@ -49,6 +67,7 @@ export function initialize( editorName, blockEditorSettings ) {
 		} );
 	}
 	registerLegacyWidgetVariations( blockEditorSettings );
+	registerWidgetGroupBlock();
 
 	// As we are unregistering `core/freeform` to avoid the Classic block, we must
 	// replace it with something as the default freeform content handler. Failure to

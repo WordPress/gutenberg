@@ -14,7 +14,7 @@ export async function getAllBlockInserterItemTitles() {
 	// Ideally, we shouldn't use a timeout and instead check the browser is idle for
 	// a specific duration, but didn't manage to find a simple way to do that.
 	// eslint-disable-next-line no-restricted-syntax
-	await page.waitFor( 500 );
+	await page.waitForTimeout( 500 );
 
 	const inserterItemTitles = await page.evaluate( () => {
 		return Array.from(

@@ -4,6 +4,10 @@
 import { useEffect, useState } from '@wordpress/element';
 import { createQueue } from '@wordpress/priority-queue';
 
+type AsyncListConfig = {
+	step: number;
+};
+
 /**
  * Returns the first items from list that are present on state.
  *
@@ -30,26 +34,42 @@ function getFirstItemsPresentInState< T >( list: T[], state: T[] ): T[] {
  * React hook returns an array which items get asynchronously appended from a source array.
  * This behavior is useful if we want to render a list of items asynchronously for performance reasons.
  *
- * @param  list Source array.
+ * @param  list   Source array.
+ * @param  config Configuration object.
+ *
  * @return Async array.
  */
-function useAsyncList< T >( list: T[] ): T[] {
+function useAsyncList< T >(
+	list: T[],
+	config: AsyncListConfig = { step: 1 }
+): T[] {
+	const { step = 1 } = config;
 	const [ current, setCurrent ] = useState( [] as T[] );
 
 	useEffect( () => {
 		// On reset, we keep the first items that were previously rendered.
-		const firstItems = getFirstItemsPresentInState( list, current );
+		let firstItems = getFirstItemsPresentInState( list, current );
+		if ( firstItems.length < step ) {
+			firstItems = firstItems.concat(
+				list.slice( firstItems.length, step )
+			);
+		}
 		setCurrent( firstItems );
+		let nextIndex = firstItems.length;
 
 		const asyncQueue = createQueue();
-		const append = ( index: number ) => () => {
-			if ( list.length <= index ) {
+		const append = () => {
+			if ( list.length <= nextIndex ) {
 				return;
 			}
-			setCurrent( ( state ) => [ ...state, list[ index ] ] );
-			asyncQueue.add( {}, append( index + 1 ) );
+			setCurrent( ( state ) => [
+				...state,
+				...list.slice( nextIndex, nextIndex + step ),
+			] );
+			nextIndex += step;
+			asyncQueue.add( {}, append );
 		};
-		asyncQueue.add( {}, append( firstItems.length ) );
+		asyncQueue.add( {}, append );
 
 		return () => asyncQueue.reset();
 	}, [ list ] );

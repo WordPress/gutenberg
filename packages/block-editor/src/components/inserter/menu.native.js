@@ -22,10 +22,9 @@ import InserterSearchResults from './search-results';
 import { store as blockEditorStore } from '../../store';
 import InserterTabs from './tabs';
 import styles from './style.scss';
+import { filterInserterItems } from './utils';
 
 const MIN_ITEMS_FOR_SEARCH = 2;
-const REUSABLE_BLOCKS_CATEGORY = 'reusable';
-
 function InserterMenu( {
 	onSelect,
 	onDismiss,
@@ -37,9 +36,9 @@ function InserterMenu( {
 } ) {
 	const [ filterValue, setFilterValue ] = useState( '' );
 	const [ showTabs, setShowTabs ] = useState( true );
-	// eslint-disable-next-line no-undef
-	const [ showSearchForm, setShowSearchForm ] = useState( __DEV__ );
 	const [ tabIndex, setTabIndex ] = useState( 0 );
+
+	const isIOS = Platform.OS === 'ios';
 
 	const {
 		showInsertionPoint,
@@ -69,9 +68,9 @@ function InserterMenu( {
 			}
 
 			const allItems = getInserterItems( targetRootClientId );
-			const reusableBlockItems = allItems.filter(
-				( { category } ) => category === REUSABLE_BLOCKS_CATEGORY
-			);
+			const reusableBlockItems = filterInserterItems( allItems, {
+				onlyReusable: true,
+			} );
 
 			return {
 				items: allItems,
@@ -102,11 +101,6 @@ function InserterMenu( {
 			}
 		}
 		showInsertionPoint( destinationRootClientId, insertionIndex );
-
-		// Show search form if there are enough items to filter.
-		if ( items.length < MIN_ITEMS_FOR_SEARCH ) {
-			setShowSearchForm( false );
-		}
 
 		return hideInsertionPoint;
 	}, [] );
@@ -176,6 +170,9 @@ function InserterMenu( {
 		setShowTabs,
 	] );
 
+	const showSearchForm = items.length > MIN_ITEMS_FOR_SEARCH;
+	const isFullScreen = ! isIOS && showSearchForm;
+
 	return (
 		<BottomSheet
 			isVisible={ true }
@@ -199,18 +196,24 @@ function InserterMenu( {
 				</>
 			}
 			hasNavigation
-			setMinHeightToMaxHeight={ showSearchForm }
-			contentStyle={ styles.list }
+			setMinHeightToMaxHeight={ true }
+			contentStyle={ styles[ 'inserter-menu__list' ] }
+			isFullScreen={ isFullScreen }
+			allowDragIndicator={ true }
 		>
 			<BottomSheetConsumer>
 				{ ( { listProps } ) => (
-					<TouchableHighlight accessible={ false }>
+					<TouchableHighlight
+						accessible={ false }
+						style={ styles[ 'inserter-menu__list-wrapper' ] }
+					>
 						{ ! showTabs || filterValue ? (
 							<InserterSearchResults
 								rootClientId={ rootClientId }
 								filterValue={ filterValue }
 								onSelect={ onSelectItem }
 								listProps={ listProps }
+								isFullScreen={ isFullScreen }
 							/>
 						) : (
 							<InserterTabs

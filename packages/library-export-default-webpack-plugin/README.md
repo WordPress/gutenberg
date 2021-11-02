@@ -1,5 +1,7 @@
 # Library Export Default Webpack Plugin
 
+> **DEPRECATED for webpack v5**: please use [`output.library.export`](https://webpack.js.org/configuration/output/#outputlibraryexport) instead.
+
 Webpack plugin for exporting `default` property for selected libraries which use ES6 Modules. Implementation is based on the Webpack's core plugin [ExportPropertyMainTemplatePlugin](https://github.com/webpack/webpack/blob/51b0df77e4f366163730ee465f01458bfad81f34/lib/ExportPropertyMainTemplatePlugin.js). The only difference is that this plugin allows to include all entry point names where the default export of your entry point will be assigned to the library target.
 
 ## Installation
@@ -10,7 +12,7 @@ Install the module
 npm install @wordpress/library-export-default-webpack-plugin --save
 ```
 
-**Note**: This package requires Node.js 12.0.0 or later. It also requires webpack 4.0 and newer. It is not compatible with older versions.
+**Note**: This package requires Node.js 12.0.0 or later. It is not compatible with older versions. It works only with webpack v4.
 
 ## Usage
 

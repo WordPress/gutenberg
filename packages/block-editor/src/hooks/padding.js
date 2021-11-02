@@ -13,7 +13,12 @@ import {
  * Internal dependencies
  */
 import useSetting from '../components/use-setting';
-import { SPACING_SUPPORT_KEY, useCustomSides } from './spacing';
+import {
+	AXIAL_SIDES,
+	SPACING_SUPPORT_KEY,
+	useCustomSides,
+	useIsDimensionsSupportValid,
+} from './dimensions';
 import { cleanEmptyObject } from './utils';
 
 /**
@@ -29,6 +34,38 @@ export function hasPaddingSupport( blockType ) {
 }
 
 /**
+ * Checks if there is a current value in the padding block support attributes.
+ *
+ * @param {Object} props Block props.
+ * @return {boolean}      Whether or not the block has a padding value set.
+ */
+export function hasPaddingValue( props ) {
+	return props.attributes.style?.spacing?.padding !== undefined;
+}
+
+/**
+ * Resets the padding block support attributes. This can be used when disabling
+ * the padding support controls for a block via a `ToolsPanel`.
+ *
+ * @param {Object} props               Block props.
+ * @param {Object} props.attributes    Block's attributes.
+ * @param {Object} props.setAttributes Function to set block's attributes.
+ */
+export function resetPadding( { attributes = {}, setAttributes } ) {
+	const { style } = attributes;
+
+	setAttributes( {
+		style: cleanEmptyObject( {
+			...style,
+			spacing: {
+				...style?.spacing,
+				padding: undefined,
+			},
+		} ),
+	} );
+}
+
+/**
  * Custom hook that checks if padding settings have been disabled.
  *
  * @param {string} name The name of the block.
@@ -37,7 +74,9 @@ export function hasPaddingSupport( blockType ) {
  */
 export function useIsPaddingDisabled( { name: blockName } = {} ) {
 	const isDisabled = ! useSetting( 'spacing.customPadding' );
-	return ! hasPaddingSupport( blockName ) || isDisabled;
+	const isInvalid = ! useIsDimensionsSupportValid( blockName, 'padding' );
+
+	return ! hasPaddingSupport( blockName ) || isDisabled || isInvalid;
 }
 
 /**
@@ -64,6 +103,8 @@ export function PaddingEdit( props ) {
 		],
 	} );
 	const sides = useCustomSides( blockName, 'padding' );
+	const splitOnAxis =
+		sides && sides.some( ( side ) => AXIAL_SIDES.includes( side ) );
 
 	if ( useIsPaddingDisabled( props ) ) {
 		return null;
@@ -106,6 +147,8 @@ export function PaddingEdit( props ) {
 					label={ __( 'Padding' ) }
 					sides={ sides }
 					units={ units }
+					allowReset={ false }
+					splitOnAxis={ splitOnAxis }
 				/>
 			</>
 		),

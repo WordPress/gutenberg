@@ -5,6 +5,10 @@ import android.os.Bundle
 data class GutenbergProps @JvmOverloads constructor(
     val enableContactInfoBlock: Boolean,
     val enableLayoutGridBlock: Boolean,
+    val enableFacebookEmbed: Boolean,
+    val enableInstagramEmbed: Boolean,
+    val enableLoomEmbed: Boolean,
+    val enableSmartframeEmbed: Boolean,
     val enableMediaFilesCollectionBlocks: Boolean,
     val enableMentions: Boolean,
     val enableXPosts: Boolean,
@@ -18,8 +22,7 @@ data class GutenbergProps @JvmOverloads constructor(
     val editorTheme: Bundle?,
     val translations: Bundle,
     val isDarkMode: Boolean,
-    val htmlModeEnabled: Boolean,
-    val enableEditorOnboarding: Boolean
+    val htmlModeEnabled: Boolean
 ) {
 
     fun getInitialProps(bundle: Bundle?) = (bundle ?: Bundle()).apply {
@@ -40,6 +43,10 @@ data class GutenbergProps @JvmOverloads constructor(
                     ?.let { putSerializable(PROP_STYLES, it) }
             theme.getSerializable(PROP_FEATURES)
                     ?.let { putSerializable(PROP_FEATURES, it) }
+            theme.getSerializable(PROP_IS_FSE_THEME)
+                    ?.let { putSerializable(PROP_IS_FSE_THEME, it) }
+            theme.getSerializable(PROP_GALLERY_WITH_IMAGE_BLOCKS)
+                    ?.let { putSerializable(PROP_GALLERY_WITH_IMAGE_BLOCKS, it) }
         }
     }
 
@@ -53,7 +60,10 @@ data class GutenbergProps @JvmOverloads constructor(
         putBoolean(PROP_CAPABILITIES_CAN_ENABLE_UNSUPPORTED_BLOCK_EDITOR, canEnableUnsupportedBlockEditor)
         putBoolean(PROP_CAPABILITIES_IS_AUDIO_BLOCK_MEDIA_UPLOAD_ENABLED, isAudioBlockMediaUploadEnabled)
         putBoolean(PROP_CAPABILITIES_REUSABLE_BLOCK, enableReusableBlock)
-        putBoolean(PROP_CAPABILITIES_EDITOR_ONBOARDING, enableEditorOnboarding)
+        putBoolean(PROP_CAPABILITIES_FACEBOOK_EMBED_BLOCK, enableFacebookEmbed)
+        putBoolean(PROP_CAPABILITIES_INSTAGRAM_EMBED_BLOCK, enableInstagramEmbed)
+        putBoolean(PROP_CAPABILITIES_LOOM_EMBED_BLOCK, enableLoomEmbed)
+        putBoolean(PROP_CAPABILITIES_SMARTFRAME_EMBED_BLOCK, enableSmartframeEmbed)
     }
 
     companion object {
@@ -75,10 +85,16 @@ data class GutenbergProps @JvmOverloads constructor(
         private const val PROP_GRADIENTS = "gradients"
         private const val PROP_STYLES = "rawStyles"
         private const val PROP_FEATURES = "rawFeatures"
+        private const val PROP_IS_FSE_THEME = "isFSETheme"
+        private const val PROP_GALLERY_WITH_IMAGE_BLOCKS = "galleryWithImageBlocks"
 
         const val PROP_CAPABILITIES = "capabilities"
         const val PROP_CAPABILITIES_CONTACT_INFO_BLOCK = "contactInfoBlock"
         const val PROP_CAPABILITIES_LAYOUT_GRID_BLOCK = "layoutGridBlock"
+        const val PROP_CAPABILITIES_FACEBOOK_EMBED_BLOCK = "facebookEmbed"
+        const val PROP_CAPABILITIES_INSTAGRAM_EMBED_BLOCK = "instagramEmbed"
+        const val PROP_CAPABILITIES_LOOM_EMBED_BLOCK = "loomEmbed"
+        const val PROP_CAPABILITIES_SMARTFRAME_EMBED_BLOCK = "smartframeEmbed"
         const val PROP_CAPABILITIES_MEDIAFILES_COLLECTION_BLOCK = "mediaFilesCollectionBlock"
         const val PROP_CAPABILITIES_MENTIONS = "mentions"
         const val PROP_CAPABILITIES_XPOSTS = "xposts"
@@ -86,6 +102,5 @@ data class GutenbergProps @JvmOverloads constructor(
         const val PROP_CAPABILITIES_CAN_ENABLE_UNSUPPORTED_BLOCK_EDITOR = "canEnableUnsupportedBlockEditor"
         const val PROP_CAPABILITIES_IS_AUDIO_BLOCK_MEDIA_UPLOAD_ENABLED = "isAudioBlockMediaUploadEnabled"
         const val PROP_CAPABILITIES_REUSABLE_BLOCK = "reusableBlock"
-        const val PROP_CAPABILITIES_EDITOR_ONBOARDING = "editorOnboarding"
     }
 }

@@ -1,6 +1,6 @@
 buildscript {
     ext {
-        gradlePluginVersion = '4.0.2'
+        gradlePluginVersion = '4.2.2'
         kotlinVersion = '1.5.20'
         buildToolsVersion = "29.0.3"
         minSdkVersion = 21
@@ -28,9 +28,16 @@ allprojects {
             url("$rootDir/../../../node_modules/react-native/android")
         }
 
+        maven {
+            url "https://a8c-libs.s3.amazonaws.com/android"
+            content {
+                includeGroup "org.wordpress"
+                includeGroup "org.wordpress.aztec"
+            }
+        }
+        maven { url "https://a8c-libs.s3.amazonaws.com/android/hermes-mirror" }
+        maven { url 'https://jitpack.io' }
         google()
         jcenter()
-        maven { url 'https://jitpack.io' }
-        maven { url "https://a8c-libs.s3.amazonaws.com/android/hermes-mirror" }
     }
 }

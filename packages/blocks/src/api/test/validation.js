@@ -727,8 +727,6 @@ describe( 'validation', () => {
 				'Apples'
 			);
 
-			expect( console ).toHaveWarned();
-			expect( console ).toHaveErrored();
 			expect( isValid ).toBe( false );
 		} );
 
@@ -746,7 +744,6 @@ describe( 'validation', () => {
 				'Bananas'
 			);
 
-			expect( console ).toHaveErrored();
 			expect( isValid ).toBe( false );
 		} );
 

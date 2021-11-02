@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { animated } from 'react-spring/web.cjs';
+import { animated } from '@react-spring/web';
 import classnames from 'classnames';
 
 /**
@@ -30,7 +30,7 @@ export default function ListViewLeaf( {
 		isSelected,
 		adjustScrolling: false,
 		enableAnimation: true,
-		triggerAnimationOnChange: path.join( '_' ),
+		triggerAnimationOnChange: path,
 	} );
 
 	return (

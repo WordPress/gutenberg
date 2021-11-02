@@ -9,15 +9,15 @@ For a developer experience closer to the one the project maintainers current hav
 -   git
 -   [nvm](https://github.com/creationix/nvm)
 -   Node.js and npm (use nvm to install them)
--   [AndroidStudio](https://developer.android.com/studio/) to be able to compile the Android version of the app
+-   [Android Studio](https://developer.android.com/studio/) to be able to compile the Android version of the app
 -   [Xcode](https://developer.apple.com/xcode/) to be able to compile the iOS app
--   CocoaPods(`sudo gem install cocoapods`) needed to fetch React and third-party dependencies.
+-   CocoaPods (`sudo gem install cocoapods`) needed to fetch React and third-party dependencies.
 
 Note that the OS platform used by the maintainers is macOS but the tools and setup should be usable in other platforms too.
 
 ## Clone the project
 
-```
+```sh
 git clone https://github.com/WordPress/gutenberg.git
 ```
 
@@ -25,14 +25,14 @@ git clone https://github.com/WordPress/gutenberg.git
 
 Note that the commands described here should be run in the top-level directory of the cloned project. Before running the demo app, you need to download and install the project dependencies. This is done via the following command:
 
-```
+```sh
 nvm install
 npm ci
 ```
 
 ## Run
 
-```
+```sh
 npm run native start:reset
 ```
 
@@ -40,7 +40,7 @@ Runs the packager (Metro) in development mode. The packager stays running to ser
 
 With the packager running, open another terminal window and use the following command to compile and run the Android app:
 
-```
+```sh
 npm run native android
 ```
 
@@ -48,7 +48,7 @@ The app should now open in a connected device or a running emulator and fetch th
 
 To compile and run the iOS variant of the app using the _default_ simulator device, use:
 
-```
+```sh
 npm run native ios
 ```
 
@@ -58,13 +58,13 @@ which will attempt to open your app in the iOS Simulator if you're on a Mac and 
 
 To compile and run the app using a different device simulator, use the following, noting the double sets of `--` to pass the simulator option down to the `react-native` CLI.
 
-```
+```sh
 npm run native ios -- -- --simulator="DEVICE_NAME"
 ```
 
 For example, if you'd like to run in an iPhone Xs Max, try:
 
-```
+```sh
 npm run native ios -- -- --simulator="iPhone Xs Max"
 ```
 
@@ -86,7 +86,7 @@ One of the extensions we are using is the [React Native Tools](https://marketpla
 
 Use the following command to run the test suite:
 
-```
+```sh
 npm run native test
 ```
 
@@ -94,7 +94,7 @@ It will run the [jest](https://github.com/facebook/jest) test runner on your tes
 
 To run the tests with debugger support, start it with the following CLI command:
 
-```
+```sh
 npm run native test:debug
 ```
 
@@ -114,15 +114,21 @@ This repository uses Appium to run UI tests. The tests live in `__device-tests__
 
 Then, to run the UI tests on iOS:
 
-`npm run native test:e2e:ios:local`
+```sh
+npm run native test:e2e:ios:local
+```
 
 and for Android:
 
-`npm run native test:e2e:android:local`
+```sh
+npm run native test:e2e:android:local
+```
 
 To run a single test instead of the entire suite, use `npm run native device-tests:local`. Here's an example that runs only `gutenberg-editor-gallery.test.js`:
 
-`npm run native test:e2e:android:local gutenberg-editor-gallery.test.js`
+```sh
+npm run native test:e2e:android:local gutenberg-editor-gallery.test.js
+```
 
 Note: You might experience problems that seem to be related to the tests starting the Appium server, e.g. errors that say `Connection Refused`, `Connection Reset` or `The requested environment is not available`. For now, you can manually start the Appium server via [appium desktop](https://github.com/appium/appium-desktop) or the CLI, then change the port number in the tests while (optionally) commenting out related code in the `beforeAll` and `afterAll` block.
 

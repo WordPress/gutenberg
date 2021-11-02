@@ -1,105 +1,87 @@
 [
 	{
-		"title": "Getting started",
+		"title": "Block Editor Handbook",
 		"slug": "handbook",
 		"markdown_source": "../docs/README.md",
 		"parent": null
 	},
 	{
-		"title": "Tutorials",
-		"slug": "tutorials",
-		"markdown_source": "../docs/getting-started/tutorials/README.md",
-		"parent": "handbook"
+		"title": "Getting Started",
+		"slug": "getting-started",
+		"markdown_source": "../docs/getting-started/README.md",
+		"parent": null
 	},
 	{
 		"title": "Development Environment",
 		"slug": "devenv",
-		"markdown_source": "../docs/getting-started/tutorials/devenv/README.md",
-		"parent": "tutorials"
+		"markdown_source": "../docs/getting-started/devenv/README.md",
+		"parent": "getting-started"
 	},
 	{
 		"title": "How to setup local WordPress environment on Ubuntu",
 		"slug": "docker-ubuntu",
-		"markdown_source": "../docs/getting-started/tutorials/devenv/docker-ubuntu.md",
+		"markdown_source": "../docs/getting-started/devenv/docker-ubuntu.md",
 		"parent": "devenv"
 	},
 	{
 		"title": "Create a Block Tutorial",
 		"slug": "create-block",
-		"markdown_source": "../docs/getting-started/tutorials/create-block/README.md",
-		"parent": "tutorials"
+		"markdown_source": "../docs/getting-started/create-block/README.md",
+		"parent": "getting-started"
 	},
 	{
 		"title": "WordPress Plugin",
 		"slug": "wp-plugin",
-		"markdown_source": "../docs/getting-started/tutorials/create-block/wp-plugin.md",
+		"markdown_source": "../docs/getting-started/create-block/wp-plugin.md",
 		"parent": "create-block"
 	},
 	{
 		"title": "Anatomy of a Block",
 		"slug": "block-anatomy",
-		"markdown_source": "../docs/getting-started/tutorials/create-block/block-anatomy.md",
+		"markdown_source": "../docs/getting-started/create-block/block-anatomy.md",
 		"parent": "create-block"
 	},
 	{
 		"title": "Block Attributes",
 		"slug": "attributes",
-		"markdown_source": "../docs/getting-started/tutorials/create-block/attributes.md",
+		"markdown_source": "../docs/getting-started/create-block/attributes.md",
 		"parent": "create-block"
 	},
 	{
 		"title": "Code Implementation",
 		"slug": "block-code",
-		"markdown_source": "../docs/getting-started/tutorials/create-block/block-code.md",
+		"markdown_source": "../docs/getting-started/create-block/block-code.md",
 		"parent": "create-block"
 	},
 	{
 		"title": "Authoring Experience",
 		"slug": "author-experience",
-		"markdown_source": "../docs/getting-started/tutorials/create-block/author-experience.md",
+		"markdown_source": "../docs/getting-started/create-block/author-experience.md",
 		"parent": "create-block"
 	},
 	{
 		"title": "Finishing Touches",
 		"slug": "finishing",
-		"markdown_source": "../docs/getting-started/tutorials/create-block/finishing.md",
+		"markdown_source": "../docs/getting-started/create-block/finishing.md",
 		"parent": "create-block"
 	},
 	{
 		"title": "Share your Block with the World",
 		"slug": "submitting-to-block-directory",
-		"markdown_source": "../docs/getting-started/tutorials/create-block/submitting-to-block-directory.md",
+		"markdown_source": "../docs/getting-started/create-block/submitting-to-block-directory.md",
 		"parent": "create-block"
 	},
 	{
 		"title": "Full Site Editing",
 		"slug": "full-site-editing",
 		"markdown_source": "../docs/getting-started/full-site-editing.md",
-		"parent": "handbook"
-	},
-	{
-		"title": "Glossary",
-		"slug": "glossary",
-		"markdown_source": "../docs/getting-started/glossary.md",
-		"parent": "handbook"
-	},
-	{
-		"title": "Frequently Asked Questions",
-		"slug": "faq",
-		"markdown_source": "../docs/getting-started/faq.md",
-		"parent": "handbook"
-	},
-	{
-		"title": "History",
-		"slug": "history",
-		"markdown_source": "../docs/getting-started/history.md",
-		"parent": "handbook"
+		"parent": "getting-started"
 	},
 	{
 		"title": "Outreach",
 		"slug": "outreach",
 		"markdown_source": "../docs/getting-started/outreach.md",
-		"parent": "handbook"
+		"parent": "getting-started"
 	},
 	{
 		"title": "How-to Guides",
@@ -129,6 +111,12 @@
 		"title": "Extending the Block Editor",
 		"slug": "extending-the-block-editor",
 		"markdown_source": "../docs/how-to-guides/javascript/extending-the-block-editor.md",
+		"parent": "javascript"
+	},
+	{
+		"title": "A first-time setup guide to native mobile development (OSX)",
+		"slug": "osx-setup-guide",
+		"markdown_source": "../docs/how-to-guides/native-mobile/osx-setup-guide.md",
 		"parent": "javascript"
 	},
 	{
@@ -237,12 +225,6 @@
 		"title": "Update the Meta Field When the Input's Content Changes",
 		"slug": "plugin-sidebar-5-update-meta",
 		"markdown_source": "../docs/how-to-guides/sidebar-tutorial/plugin-sidebar-5-update-meta.md",
-		"parent": "plugin-sidebar-0"
-	},
-	{
-		"title": "Finishing Touches",
-		"slug": "plugin-sidebar-6-finishing-touches",
-		"markdown_source": "../docs/how-to-guides/sidebar-tutorial/plugin-sidebar-6-finishing-touches.md",
 		"parent": "plugin-sidebar-0"
 	},
 	{
@@ -429,6 +411,12 @@
 		"title": "Internationalization",
 		"slug": "internationalization",
 		"markdown_source": "../docs/how-to-guides/internationalization.md",
+		"parent": "how-to-guides"
+	},
+	{
+		"title": "Thunks in Core-Data",
+		"slug": "thunks",
+		"markdown_source": "../docs/how-to-guides/thunks.md",
 		"parent": "how-to-guides"
 	},
 	{
@@ -1074,6 +1062,18 @@
 		"parent": "components"
 	},
 	{
+		"title": "NavigatorProvider",
+		"slug": "navigator-provider",
+		"markdown_source": "../packages/components/src/navigator/navigator-provider/README.md",
+		"parent": "components"
+	},
+	{
+		"title": "NavigatorScreen",
+		"slug": "navigator-screen",
+		"markdown_source": "../packages/components/src/navigator/navigator-screen/README.md",
+		"parent": "components"
+	},
+	{
 		"title": "Notice",
 		"slug": "notice",
 		"markdown_source": "../packages/components/src/notice/README.md",
@@ -1170,12 +1170,6 @@
 		"parent": "components"
 	},
 	{
-		"title": "SegmentedControl",
-		"slug": "segmented-control",
-		"markdown_source": "../packages/components/src/segmented-control/README.md",
-		"parent": "components"
-	},
-	{
 		"title": "SelectControl",
 		"slug": "select-control",
 		"markdown_source": "../packages/components/src/select-control/README.md",
@@ -1248,6 +1242,18 @@
 		"parent": "components"
 	},
 	{
+		"title": "ToggleGroupControlOption",
+		"slug": "toggle-group-control-option",
+		"markdown_source": "../packages/components/src/toggle-group-control/toggle-group-control-option/README.md",
+		"parent": "components"
+	},
+	{
+		"title": "ToggleGroupControl",
+		"slug": "toggle-group-control",
+		"markdown_source": "../packages/components/src/toggle-group-control/toggle-group-control/README.md",
+		"parent": "components"
+	},
+	{
 		"title": "ToolbarButton",
 		"slug": "toolbar-button",
 		"markdown_source": "../packages/components/src/toolbar-button/README.md",
@@ -1275,6 +1281,24 @@
 		"title": "Toolbar",
 		"slug": "toolbar",
 		"markdown_source": "../packages/components/src/toolbar/README.md",
+		"parent": "components"
+	},
+	{
+		"title": "ToolsPanelHeader",
+		"slug": "tools-panel-header",
+		"markdown_source": "../packages/components/src/tools-panel/tools-panel-header/README.md",
+		"parent": "components"
+	},
+	{
+		"title": "ToolsPanelItem",
+		"slug": "tools-panel-item",
+		"markdown_source": "../packages/components/src/tools-panel/tools-panel-item/README.md",
+		"parent": "components"
+	},
+	{
+		"title": "ToolsPanel",
+		"slug": "tools-panel",
+		"markdown_source": "../packages/components/src/tools-panel/tools-panel/README.md",
 		"parent": "components"
 	},
 	{
@@ -1932,6 +1956,24 @@
 		"parent": "architecture"
 	},
 	{
+		"title": "Frequently Asked Questions",
+		"slug": "faq",
+		"markdown_source": "../docs/explanations/faq.md",
+		"parent": "explanations"
+	},
+	{
+		"title": "Glossary",
+		"slug": "glossary",
+		"markdown_source": "../docs/explanations/glossary.md",
+		"parent": "explanations"
+	},
+	{
+		"title": "History",
+		"slug": "history",
+		"markdown_source": "../docs/explanations/history.md",
+		"parent": "explanations"
+	},
+	{
 		"title": "Contributor Guide",
 		"slug": "contributors",
 		"markdown_source": "../docs/contributors/README.md",
@@ -1995,6 +2037,12 @@
 		"title": "React Native based mobile Gutenberg",
 		"slug": "native-mobile",
 		"markdown_source": "../docs/contributors/code/native-mobile.md",
+		"parent": "code"
+	},
+	{
+		"title": "React Native Integration Test Guide",
+		"slug": "native-mobile-integration-test-guide",
+		"markdown_source": "../docs/contributors/code/native-mobile-integration-test-guide.md",
 		"parent": "code"
 	},
 	{

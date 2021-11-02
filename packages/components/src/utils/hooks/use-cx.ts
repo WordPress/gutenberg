@@ -1,9 +1,7 @@
 /**
  * External dependencies
  */
-// eslint-disable-next-line no-restricted-imports
-import type { Context } from 'react';
-import { CacheProvider, EmotionCache } from '@emotion/react';
+import { __unsafe_useEmotionCache as useEmotionCache } from '@emotion/react';
 import type { SerializedStyles } from '@emotion/serialize';
 import { insertStyles } from '@emotion/utils';
 // eslint-disable-next-line no-restricted-imports
@@ -12,16 +10,11 @@ import { cx as innerCx, ClassNamesArg } from '@emotion/css';
 /**
  * WordPress dependencies
  */
-import { useContext, useCallback } from '@wordpress/element';
-
-// @ts-ignore Private property
-const EmotionCacheContext: Context< EmotionCache > = CacheProvider._context;
-
-const useEmotionCacheContext = () => useContext( EmotionCacheContext );
+import { useCallback } from '@wordpress/element';
 
 const isSerializedStyles = ( o: any ): o is SerializedStyles =>
-	// eslint-disable-next-line eqeqeq
-	o != null &&
+	typeof o !== 'undefined' &&
+	o !== null &&
 	[ 'name', 'styles' ].every( ( p ) => typeof o[ p ] !== 'undefined' );
 
 /**
@@ -46,10 +39,16 @@ const isSerializedStyles = ( o: any ): o is SerializedStyles =>
  * }
  */
 export const useCx = () => {
-	const cache = useEmotionCacheContext();
+	const cache = useEmotionCache();
 
 	const cx = useCallback(
 		( ...classNames: ( ClassNamesArg | SerializedStyles )[] ) => {
+			if ( cache === null ) {
+				throw new Error(
+					'The `useCx` hook should be only used within a valid Emotion Cache Context'
+				);
+			}
+
 			return innerCx(
 				...classNames.map( ( arg ) => {
 					if ( isSerializedStyles( arg ) ) {

@@ -16,6 +16,7 @@ export {
 	default as Animate,
 	getAnimateClassName as __unstableGetAnimateClassName,
 } from './animate';
+export { __unstableMotion } from './animation';
 export { default as AnglePickerControl } from './angle-picker-control';
 export {
 	default as Autocomplete,
@@ -38,7 +39,7 @@ export { default as ClipboardButton } from './clipboard-button';
 export { default as __experimentalColorEdit } from './color-edit';
 export { default as ColorIndicator } from './color-indicator';
 export { default as ColorPalette } from './color-palette';
-export { default as ColorPicker } from './color-picker';
+export { ColorPicker } from './color-picker';
 export { default as ComboboxControl } from './combobox-control';
 export {
 	Composite as __unstableComposite,
@@ -95,6 +96,11 @@ export { default as __experimentalNavigationBackButton } from './navigation/back
 export { default as __experimentalNavigationGroup } from './navigation/group';
 export { default as __experimentalNavigationItem } from './navigation/item';
 export { default as __experimentalNavigationMenu } from './navigation/menu';
+export {
+	NavigatorProvider as __experimentalNavigatorProvider,
+	NavigatorScreen as __experimentalNavigatorScreen,
+	useNavigator as __experimentalUseNavigator,
+} from './navigator';
 export { default as Notice } from './notice';
 export { default as __experimentalNumberControl } from './number-control';
 export { default as NoticeList } from './notice/list';
@@ -113,10 +119,6 @@ export { default as ResizableBox } from './resizable-box';
 export { default as ResponsiveWrapper } from './responsive-wrapper';
 export { default as SandBox } from './sandbox';
 export { default as SearchControl } from './search-control';
-export {
-	SegmentedControl as __experimentalSegmentedControl,
-	SegmentedControlOption as __experimentalSegmentedControlOption,
-} from './segmented-control';
 export { default as SelectControl } from './select-control';
 export { default as Snackbar } from './snackbar';
 export { default as SnackbarList } from './snackbar/list';
@@ -131,12 +133,21 @@ export { default as TextareaControl } from './textarea-control';
 export { default as TextHighlight } from './text-highlight';
 export { default as Tip } from './tip';
 export { default as ToggleControl } from './toggle-control';
+export {
+	ToggleGroupControl as __experimentalToggleGroupControl,
+	ToggleGroupControlOption as __experimentalToggleGroupControlOption,
+} from './toggle-group-control';
 export { default as Toolbar } from './toolbar';
 export { default as ToolbarButton } from './toolbar-button';
 export { default as ToolbarDropdownMenu } from './toolbar-dropdown-menu';
 export { default as __experimentalToolbarContext } from './toolbar-context';
 export { default as ToolbarGroup } from './toolbar-group';
 export { default as ToolbarItem } from './toolbar-item';
+export {
+	ToolsPanel as __experimentalToolsPanel,
+	ToolsPanelItem as __experimentalToolsPanelItem,
+	ToolsPanelContext as __experimentalToolsPanelContext,
+} from './tools-panel';
 export { default as Tooltip } from './tooltip';
 export {
 	default as __experimentalTreeGrid,
@@ -151,6 +162,7 @@ export {
 	useCustomUnits as __experimentalUseCustomUnits,
 	parseUnit as __experimentalParseUnit,
 } from './unit-control';
+export { View as __experimentalView } from './view';
 export { VisuallyHidden } from './visually-hidden';
 export { VStack as __experimentalVStack } from './v-stack';
 export { default as IsolatedEventContainer } from './isolated-event-container';

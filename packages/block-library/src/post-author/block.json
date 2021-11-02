@@ -27,13 +27,18 @@
 	"usesContext": [ "postType", "postId", "queryId" ],
 	"supports": {
 		"html": false,
+		"spacing": {
+			"margin": true,
+			"padding": true
+		},
 		"typography": {
 			"fontSize": true,
 			"lineHeight": true
 		},
 		"color": {
 			"gradients": true,
-			"link": true
+			"link": true,
+			"__experimentalDuotone": ".wp-block-post-author__avatar img"
 		}
 	},
 	"editorStyle": "wp-block-post-author-editor",

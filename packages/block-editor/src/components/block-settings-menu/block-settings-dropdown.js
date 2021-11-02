@@ -90,7 +90,8 @@ export function BlockSettingsDropdown( {
 			{ ( {
 				canDuplicate,
 				canInsertDefaultBlock,
-				isLocked,
+				canMove,
+				canRemove,
 				onDuplicate,
 				onInsertAfter,
 				onInsertBefore,
@@ -156,7 +157,7 @@ export function BlockSettingsDropdown( {
 										</MenuItem>
 									</>
 								) }
-								{ ! isLocked && ! onlyBlock && (
+								{ canMove && ! onlyBlock && (
 									<MenuItem
 										onClick={ flow( onClose, onMoveTo ) }
 									>
@@ -179,8 +180,8 @@ export function BlockSettingsDropdown( {
 								: Children.map( ( child ) =>
 										cloneElement( child, { onClose } )
 								  ) }
-							<MenuGroup>
-								{ ! isLocked && (
+							{ canRemove && (
+								<MenuGroup>
 									<MenuItem
 										onClick={ flow(
 											onClose,
@@ -191,8 +192,8 @@ export function BlockSettingsDropdown( {
 									>
 										{ removeBlockLabel }
 									</MenuItem>
-								) }
-							</MenuGroup>
+								</MenuGroup>
+							) }
 						</>
 					) }
 				</DropdownMenu>

@@ -4,7 +4,7 @@
 		"name": "core/pullquote",
 		"isValid": true,
 		"attributes": {
-			"className": "has-background has-black-background-color is-style-solid-color",
+			"className": "is-style-solid-color",
 			"backgroundColor": "black",
 			"textAlign": "left",
 			"value": "<p>pullquote</p>",

@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { invert } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { createRegistrySelector } from '@wordpress/data';
@@ -19,7 +14,6 @@ import { buildNavigationPostId } from './utils';
  * Returns the selected menu ID.
  *
  * @param {Object} state Global application state.
- *
  * @return {number} The selected menu ID.
  */
 export function getSelectedMenuId( state ) {
@@ -44,7 +38,7 @@ export const getNavigationPostForMenu = createRegistrySelector(
 		if ( ! hasResolvedNavigationPost( state, menuId ) ) {
 			return null;
 		}
-		return select( coreStore.name ).getEditedEntityRecord(
+		return select( coreStore ).getEditedEntityRecord(
 			NAVIGATION_POST_KIND,
 			NAVIGATION_POST_POST_TYPE,
 			buildNavigationPostId( menuId )
@@ -60,9 +54,7 @@ export const getNavigationPostForMenu = createRegistrySelector(
  */
 export const hasResolvedNavigationPost = createRegistrySelector(
 	( select ) => ( state, menuId ) => {
-		return select(
-			coreStore.name
-		).hasFinishedResolution( 'getEntityRecord', [
+		return select( coreStore ).hasFinishedResolution( 'getEntityRecord', [
 			NAVIGATION_POST_KIND,
 			NAVIGATION_POST_POST_TYPE,
 			buildNavigationPostId( menuId ),
@@ -71,15 +63,11 @@ export const hasResolvedNavigationPost = createRegistrySelector(
 );
 
 /**
- * Returns a menu item represented by the block with id clientId.
+ * Returns true if the inserter is opened.
  *
- * @param {number} postId   Navigation post id
- * @param {number} clientId Block clientId
- * @return {Object|null} Menu item entity
+ * @param {Object} state Global application state.
+ * @return {boolean} Whether the inserter is opened.
  */
-export const getMenuItemForClientId = createRegistrySelector(
-	( select ) => ( state, postId, clientId ) => {
-		const mapping = invert( state.mapping[ postId ] );
-		return select( coreStore.name ).getMenuItem( mapping[ clientId ] );
-	}
-);
+export function isInserterOpened( state = false ) {
+	return !! state?.blockInserterPanel;
+}

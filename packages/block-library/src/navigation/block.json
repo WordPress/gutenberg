@@ -4,11 +4,19 @@
 	"title": "Navigation",
 	"category": "theme",
 	"description": "A collection of blocks that allow visitors to get around your site.",
-	"keywords": [ "menu", "navigation", "links" ],
+	"keywords": [
+		"menu",
+		"navigation",
+		"links"
+	],
 	"textdomain": "default",
 	"attributes": {
+		"navigationMenuId": {
+			"type": "number"
+		},
 		"orientation": {
-			"type": "string"
+			"type": "string",
+			"default": "horizontal"
 		},
 		"textColor": {
 			"type": "string"
@@ -35,9 +43,13 @@
 			"type": "boolean",
 			"default": true
 		},
-		"isResponsive": {
+		"openSubmenusOnClick": {
 			"type": "boolean",
 			"default": false
+		},
+		"overlayMenu": {
+			"type": "string",
+			"default": "mobile"
 		},
 		"__unstableLocation": {
 			"type": "string"
@@ -67,11 +79,15 @@
 		"fontSize": "fontSize",
 		"customFontSize": "customFontSize",
 		"showSubmenuIcon": "showSubmenuIcon",
+		"openSubmenusOnClick": "openSubmenusOnClick",
 		"style": "style",
 		"orientation": "orientation"
 	},
 	"supports": {
-		"align": [ "wide", "full" ],
+		"align": [
+			"wide",
+			"full"
+		],
 		"anchor": true,
 		"html": false,
 		"inserter": true,
@@ -83,6 +99,19 @@
 			"__experimentalTextTransform": true,
 			"__experimentalFontFamily": true,
 			"__experimentalTextDecoration": true
+		},
+		"spacing": {
+			"blockGap": true,
+			"units": [
+				"px",
+				"em",
+				"rem",
+				"vh",
+				"vw"
+			],
+			"__experimentalDefaultControls": {
+				"blockGap": true
+			}
 		}
 	},
 	"viewScript": "file:./view.min.js",

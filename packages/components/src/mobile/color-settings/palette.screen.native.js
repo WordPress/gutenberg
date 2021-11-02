@@ -20,7 +20,7 @@ import { useRoute, useNavigation } from '@react-navigation/native';
  */
 import ColorPalette from '../../color-palette';
 import ColorIndicator from '../../color-indicator';
-import NavigationHeader from '../bottom-sheet/navigation-header';
+import NavBar from '../bottom-sheet/nav-bar';
 import SegmentedControls from '../segmented-control';
 import { colorsUtils } from './utils';
 
@@ -55,6 +55,10 @@ const PaletteScreen = () => {
 	const clearButtonStyle = usePreferredColorSchemeStyle(
 		styles.clearButton,
 		styles.clearButtonDark
+	);
+	const selectedColorTextStyle = usePreferredColorSchemeStyle(
+		styles.colorText,
+		styles.colorTextDark
 	);
 
 	const isSolidSegment = currentSegment === segments[ 0 ];
@@ -136,12 +140,22 @@ const PaletteScreen = () => {
 						/>
 					) }
 				</View>
-				<Text
-					style={ styles.selectColorText }
-					maxFontSizeMultiplier={ 2 }
-				>
-					{ __( 'Select a color' ) }
-				</Text>
+				{ currentValue ? (
+					<Text
+						style={ selectedColorTextStyle }
+						maxFontSizeMultiplier={ 2 }
+						selectable
+					>
+						{ currentValue.toUpperCase() }
+					</Text>
+				) : (
+					<Text
+						style={ styles.selectColorText }
+						maxFontSizeMultiplier={ 2 }
+					>
+						{ __( 'Select a color above' ) }
+					</Text>
+				) }
 				<View style={ styles.flex }>
 					{ currentValue && getClearButton() }
 				</View>
@@ -150,10 +164,10 @@ const PaletteScreen = () => {
 	}
 	return (
 		<View>
-			<NavigationHeader
-				screen={ label }
-				leftButtonOnPress={ navigation.goBack }
-			/>
+			<NavBar>
+				<NavBar.BackButton onPress={ navigation.goBack } />
+				<NavBar.Heading>{ label } </NavBar.Heading>
+			</NavBar>
 			<ColorPalette
 				setColor={ setColor }
 				activeColor={ currentValue }

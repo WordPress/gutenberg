@@ -11,7 +11,7 @@ import { getInlineStyles } from './style';
  * Provides the CSS class names and inline styles for a block's spacing support
  * attributes.
  *
- * @param  {Object} attributes Block attributes.
+ * @param {Object} attributes Block attributes.
  *
  * @return {Object} Spacing block support derived CSS classes & styles.
  */
