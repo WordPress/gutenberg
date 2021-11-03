@@ -286,17 +286,7 @@ class WP_Theme_JSON_Gutenberg {
 			$origin = 'theme';
 		}
 
-		// The old format is not meant to be ported to core.
-		// We can remove it at that point.
-		if ( ! isset( $theme_json['version'] ) || 0 === $theme_json['version'] ) {
-			$theme_json = WP_Theme_JSON_Schema_V0::parse( $theme_json );
-		}
-
-		// Provide backwards compatibility for settings that did not land in 5.8
-		// and have had their `custom` prefixed removed since.
-		if ( 1 === $theme_json['version'] ) {
-			$theme_json = WP_Theme_JSON_Schema_V1::parse( $theme_json );
-		}
+		$theme_json = self::migrate( $theme_json );
 
 		$valid_block_names   = array_keys( self::get_blocks_metadata() );
 		$valid_element_names = array_keys( self::ELEMENTS );
@@ -313,6 +303,27 @@ class WP_Theme_JSON_Gutenberg {
 				}
 			}
 		}
+	}
+
+	/**
+	 * Function that migrates a given theme.json structure to the last version.
+	 *
+	 * @param array $theme_json The structure to migrate.
+	 *
+	 * @return array The structure in the last version.
+	 */
+	private static function migrate( $theme_json ) {
+		if ( ! isset( $theme_json['version'] ) || 0 === $theme_json['version'] ) {
+			$theme_json = WP_Theme_JSON_Schema_V0_To_V1::migrate( $theme_json );
+		}
+
+		// Provide backwards compatibility for settings that did not land in 5.8
+		// and have had their `custom` prefixed removed since.
+		if ( 1 === $theme_json['version'] ) {
+			$theme_json = WP_Theme_JSON_Schema_V1_Remove_Custom_Prefixes::migrate( $theme_json );
+		}
+
+		return $theme_json;
 	}
 
 	/**
@@ -1436,15 +1447,7 @@ class WP_Theme_JSON_Gutenberg {
 	public static function remove_insecure_properties( $theme_json ) {
 		$sanitized = array();
 
-		if ( ! isset( $theme_json['version'] ) || 0 === $theme_json['version'] ) {
-			$theme_json = WP_Theme_JSON_Schema_V0::parse( $theme_json );
-		}
-
-		// Provide backwards compatibility for settings that did not land in 5.8
-		// and have had their `custom` prefixed removed since.
-		if ( 1 === $theme_json['version'] ) {
-			$theme_json = WP_Theme_JSON_Schema_V1::parse( $theme_json );
-		}
+		$theme_json = self::migrate( $theme_json );
 
 		$valid_block_names   = array_keys( self::get_blocks_metadata() );
 		$valid_element_names = array_keys( self::ELEMENTS );

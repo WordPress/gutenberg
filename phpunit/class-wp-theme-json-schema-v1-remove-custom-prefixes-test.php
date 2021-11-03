@@ -1,12 +1,12 @@
 <?php
 
 /**
- * Test WP_Theme_JSON_Schema_V1 class.
+ * Test WP_Theme_JSON_Schema_V1_Remove_Custom_Prefixes class.
  *
  * @package Gutenberg
  */
 
-class WP_Theme_JSON_Schema_V1_Test extends WP_UnitTestCase {
+class WP_Theme_JSON_Schema_V1_Remove_Custom_Prefixes_Test extends WP_UnitTestCase {
 
 	function test_parse() {
 		$theme_json_v1 = array(
@@ -92,7 +92,7 @@ class WP_Theme_JSON_Schema_V1_Test extends WP_UnitTestCase {
 			),
 		);
 
-		$actual = WP_Theme_JSON_Schema_V1::parse( $theme_json_v1 );
+		$actual = WP_Theme_JSON_Schema_V1_Remove_Custom_Prefixes::migrate( $theme_json_v1 );
 
 		$expected = array(
 			'version'  => 1,

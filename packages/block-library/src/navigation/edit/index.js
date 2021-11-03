@@ -38,10 +38,12 @@ import { __ } from '@wordpress/i18n';
 import useListViewModal from './use-list-view-modal';
 import useNavigationMenu from '../use-navigation-menu';
 import Placeholder from './placeholder';
+import PlaceholderPreview from './placeholder/placeholder-preview';
 import ResponsiveWrapper from './responsive-wrapper';
 import NavigationInnerBlocks from './inner-blocks';
 import NavigationMenuSelector from './navigation-menu-selector';
 import NavigationMenuNameControl from './navigation-menu-name-control';
+import NavigationMenuPublishButton from './navigation-menu-publish-button';
 import UnsavedInnerBlocks from './unsaved-inner-blocks';
 import NavigationMenuDeleteControl from './navigation-menu-delete-control';
 
@@ -75,8 +77,8 @@ function detectColors( colorsDetectionElement, setColor, setBackground ) {
 function Navigation( {
 	attributes,
 	setAttributes,
-	isSelected,
 	clientId,
+	isSelected,
 	className,
 	backgroundColor,
 	setBackgroundColor,
@@ -108,12 +110,25 @@ function Navigation( {
 		`navigationMenu/${ navigationMenuId }`
 	);
 
-	const innerBlocks = useSelect(
-		( select ) => select( blockEditorStore ).getBlocks( clientId ),
+	const { innerBlocks, isInnerBlockSelected } = useSelect(
+		( select ) => {
+			const { getBlocks, hasSelectedInnerBlock } = select(
+				blockEditorStore
+			);
+			return {
+				innerBlocks: getBlocks( clientId ),
+				isInnerBlockSelected: hasSelectedInnerBlock( clientId, true ),
+			};
+		},
 		[ clientId ]
 	);
 	const hasExistingNavItems = !! innerBlocks.length;
 	const { replaceInnerBlocks, selectBlock } = useDispatch( blockEditorStore );
+
+	const [
+		hasSavedUnsavedInnerBlocks,
+		setHasSavedUnsavedInnerBlocks,
+	] = useState( false );
 
 	const [ isPlaceholderShown, setIsPlaceholderShown ] = useState(
 		! hasExistingNavItems
@@ -127,10 +142,13 @@ function Navigation( {
 		isNavigationMenuResolved,
 		isNavigationMenuMissing,
 		canSwitchNavigationMenu,
-		hasResolvedNavigationMenu,
+		hasResolvedNavigationMenus,
+		navigationMenus,
+		navigationMenu,
 	} = useNavigationMenu( navigationMenuId );
 
 	const navRef = useRef();
+	const isDraftNavigationMenu = navigationMenu?.status === 'draft';
 
 	const { listViewToolbarButton, listViewModal } = useListViewModal(
 		clientId
@@ -203,19 +221,23 @@ function Navigation( {
 
 	// If the block has inner blocks, but no menu id, this was an older
 	// navigation block added before the block used a wp_navigation entity.
+	// Either this block was saved in the content or inserted by a pattern.
 	// Consider this 'unsaved'. Offer an uncontrolled version of inner blocks,
-	// with a prompt to 'save'.
-	const hasUnsavedBlocks =
-		hasExistingNavItems && navigationMenuId === undefined;
+	// that automatically saves the menu.
+	const hasUnsavedBlocks = hasExistingNavItems && ! isEntityAvailable;
 	if ( hasUnsavedBlocks ) {
 		return (
 			<UnsavedInnerBlocks
 				blockProps={ blockProps }
 				blocks={ innerBlocks }
-				isSelected={ isSelected }
-				onSave={ ( post ) =>
-					setAttributes( { navigationMenuId: post.id } )
-				}
+				navigationMenus={ navigationMenus }
+				hasSelection={ isSelected || isInnerBlockSelected }
+				hasSavedUnsavedInnerBlocks={ hasSavedUnsavedInnerBlocks }
+				onSave={ ( post ) => {
+					setHasSavedUnsavedInnerBlocks( true );
+					// Switch to using the wp_navigation entity.
+					setAttributes( { navigationMenuId: post.id } );
+				} }
 			/>
 		);
 	}
@@ -261,8 +283,8 @@ function Navigation( {
 		>
 			<RecursionProvider>
 				<BlockControls>
-					<ToolbarGroup>
-						{ isEntityAvailable && (
+					{ ! isDraftNavigationMenu && isEntityAvailable && (
+						<ToolbarGroup>
 							<ToolbarDropdownMenu
 								label={ __( 'Select Menu' ) }
 								text={ __( 'Select Menu' ) }
@@ -279,8 +301,8 @@ function Navigation( {
 									/>
 								) }
 							</ToolbarDropdownMenu>
-						) }
-					</ToolbarGroup>
+						</ToolbarGroup>
+					) }
 					{ hasItemJustificationControls && (
 						<JustifyToolbar
 							value={ itemsJustification }
@@ -295,6 +317,11 @@ function Navigation( {
 						/>
 					) }
 					<ToolbarGroup>{ listViewToolbarButton }</ToolbarGroup>
+					<ToolbarGroup>
+						{ isDraftNavigationMenu && (
+							<NavigationMenuPublishButton />
+						) }
+					</ToolbarGroup>
 				</BlockControls>
 				{ listViewModal }
 				<InspectorControls>
@@ -365,6 +392,7 @@ function Navigation( {
 					) }
 					{ hasColorSettings && (
 						<PanelColorSettings
+							__experimentalHasMultipleOrigins
 							title={ __( 'Color' ) }
 							initialOpen={ false }
 							colorSettings={ [
@@ -420,10 +448,13 @@ function Navigation( {
 								selectBlock( clientId );
 							} }
 							canSwitchNavigationMenu={ canSwitchNavigationMenu }
-							hasResolvedNavigationMenu={
-								hasResolvedNavigationMenu
+							hasResolvedNavigationMenus={
+								hasResolvedNavigationMenus
 							}
 						/>
+					) }
+					{ ! isEntityAvailable && ! isPlaceholderShown && (
+						<PlaceholderPreview isLoading />
 					) }
 					{ ! isPlaceholderShown && (
 						<ResponsiveWrapper
