@@ -458,7 +458,7 @@ add_filter( 'use_block_editor_for_post_type', 'gutenberg_disable_block_editor_fo
  * This function disables ability to edit wp_navigation posts via the UI.
  * This is because the post editor doesn't correctly work with wp_navigation type posts.
  *
- * @param string $url Url of the post.
+ * @param string  $url Url of the post.
  * @param integer $post_id Post ID.
  *
  * @return string
@@ -478,8 +478,8 @@ add_filter( 'get_edit_post_link', 'gutenberg_disable_edit_links_for_navigation_p
  * This function disables "Edit" row action for wp_navigation type posts.
  * This is because the post editor doesn't correctly work with wp_navigation type posts.
  *
- * @param array $actions A list of supported row actions for the post.
- * @param $post WP_Post object.
+ * @param array   $actions A list of supported row actions for the post.
+ * @param WP_Post $post An instance of WP_Post class.
  *
  * @return array
  */

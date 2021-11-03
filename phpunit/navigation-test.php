@@ -60,10 +60,10 @@ class WP_Navigation_Test extends WP_UnitTestCase {
 	}
 
 	private function create_sample_post() {
-		 return $this->create_post( 'sample_post_type' );
+		return $this->create_post( 'sample_post_type' );
 	}
 
 	private function create_navigation_post() {
-		 return $this->create_post( 'wp_navigation' );
+		return $this->create_post( 'wp_navigation' );
 	}
 }
