@@ -141,8 +141,6 @@ export const __experimentalGetCoreBlocks = () => [
 	code,
 	column,
 	columns,
-	commentTemplate,
-	commentsQueryLoop,
 	cover,
 	embed,
 	file,
@@ -161,6 +159,7 @@ export const __experimentalGetCoreBlocks = () => [
 	pageList,
 	pattern,
 	postAuthor,
+	postComments,
 	postContent,
 	postDate,
 	postExcerpt,
@@ -242,6 +241,8 @@ export const __experimentalRegisterExperimentalCoreBlocks =
 					// Full Site Editing blocks.
 					...( enableFSEBlocks
 						? [
+								commentTemplate,
+								commentsQueryLoop,
 								postComment,
 								postCommentAuthor,
 								postCommentAuthorAvatar,
@@ -249,7 +250,6 @@ export const __experimentalRegisterExperimentalCoreBlocks =
 								postCommentDate,
 								postCommentEdit,
 								postCommentReplyLink,
-								postComments,
 								postCommentsCount,
 								postCommentsForm,
 								postCommentsLink,
