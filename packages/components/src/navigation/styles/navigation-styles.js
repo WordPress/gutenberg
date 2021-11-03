@@ -70,6 +70,7 @@ export const MenuTitleUI = styled.div`
 `;
 
 export const MenuTitleHeadingUI = styled( Heading )`
+	min-height: ${ space( 12 ) };
 	align-items: center;
 	color: inherit;
 	display: flex;
