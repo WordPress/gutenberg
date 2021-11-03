@@ -51,6 +51,10 @@ const deprecatedFlags = {
 };
 
 const prefixedFlags = {
+	/*
+	 * These were only available in the plugin
+	 * and can be removed after WordPress 5.9 is released.
+	 */
 	'border.customColor': 'border.color',
 	'border.customStyle': 'border.style',
 	'border.customWidth': 'border.width',
@@ -59,6 +63,13 @@ const prefixedFlags = {
 	'typography.customLetterSpacing': 'typography.letterSpacing',
 	'typography.customTextDecorations': 'typography.textDecoration',
 	'typography.customTextTransforms': 'typography.textTransform',
+	/*
+	 * These were part of WordPress 5.8 and we need to keep them.
+	 */
+	'border.customRadius': 'border.radius',
+	'spacing.customMargin': 'spacing.margin',
+	'spacing.customPadding': 'spacing.padding',
+	'typography.customLineHeight': 'typography.lineHeight',
 };
 
 /**
