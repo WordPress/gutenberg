@@ -455,42 +455,18 @@ function gutenberg_disable_block_editor_for_navigation_post_type( $value, $post_
 add_filter( 'use_block_editor_for_post_type', 'gutenberg_disable_block_editor_for_navigation_post_type', 10, 2 );
 
 /**
- * This function disables ability to edit wp_navigation posts via the UI.
- * This is because the post editor doesn't correctly work with wp_navigation type posts.
+ * This function disables content editor for wp_navigation type posts.
+ * Content editor cannot correctly edit wp_navigation type posts.
  *
- * @param string  $url Url of the post.
- * @param integer $post_id Post ID.
- *
- * @return string
- */
-function gutenberg_disable_edit_links_for_navigation_post_type( $url, $post_id ) {
-	$post_type = get_post_type( $post_id );
-	if ( 'wp_navigation' !== $post_type ) {
-		return $url;
-	}
-
-	return 'javascript:void(0)';
-}
-
-add_filter( 'get_edit_post_link', 'gutenberg_disable_edit_links_for_navigation_post_type', 10, 2 );
-
-/**
- * This function disables "Edit" row action for wp_navigation type posts.
- * This is because the post editor doesn't correctly work with wp_navigation type posts.
- *
- * @param array   $actions A list of supported row actions for the post.
  * @param WP_Post $post An instance of WP_Post class.
- *
- * @return array
  */
-function gutenberg_disable_edit_row_action_for_navigation_post_type( $actions, $post ) {
+function gutenberg_disable_content_editor_for_navigation_post_type( $post ) {
 	$post_type = get_post_type( $post );
 	if ( 'wp_navigation' !== $post_type ) {
-		return $actions;
+		return;
 	}
 
-	unset( $actions['edit'] );
-	return $actions;
+	remove_post_type_support( $post_type, 'editor' );
 }
 
-add_filter( 'post_row_actions', 'gutenberg_disable_edit_row_action_for_navigation_post_type', 10, 2 );
+add_action( 'edit_form_after_title', 'gutenberg_disable_content_editor_for_navigation_post_type', 10, 1 );

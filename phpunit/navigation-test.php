@@ -6,50 +6,39 @@
  */
 
 class WP_Navigation_Test extends WP_UnitTestCase {
+	const NAVIGATION_POST_TYPE     = 'wp_navigation';
+	const NON_NAVIGATION_POST_TYPE = 'wp_non_navigation';
+
+	public function tearDown() {
+		add_post_type_support( static::NAVIGATION_POST_TYPE, 'editor' );
+	}
+
 	public function test_it_doesnt_disable_block_editor_for_non_navigation_post_types() {
-		$filtered_result = gutenberg_disable_block_editor_for_navigation_post_type( true, 'sample_post_type' );
+		$filtered_result = gutenberg_disable_block_editor_for_navigation_post_type( true, static::NON_NAVIGATION_POST_TYPE );
 		$this->assertTrue( $filtered_result );
 	}
 
 	public function test_it_disables_block_editor_for_navigation_post_types() {
-		$filtered_result = gutenberg_disable_block_editor_for_navigation_post_type( true, 'wp_navigation' );
+		$filtered_result = gutenberg_disable_block_editor_for_navigation_post_type( true, static::NAVIGATION_POST_TYPE );
 		$this->assertFalse( $filtered_result );
 	}
 
-	public function test_it_doesnt_disable_edit_links_for_non_navigation_post_types() {
-		$post         = $this->create_sample_post();
-		$url          = 'someUrl';
-		$filtered_url = gutenberg_disable_edit_links_for_navigation_post_type( $url, $post );
-		$this->assertSame( $url, $filtered_url );
+	public function test_it_doesnt_disable_content_editor_for_non_navigation_type_posts() {
+		$post = $this->create_non_navigation_post();
+		$this->assertTrue( $this->supports_block_editor() );
+
+		gutenberg_disable_content_editor_for_navigation_post_type( $post );
+
+		$this->assertTrue( $this->supports_block_editor() );
 	}
 
-	public function test_it_disables_edit_links_for_navigation_post_types() {
-		$post         = $this->create_navigation_post();
-		$url          = 'someUrl';
-		$filtered_url = gutenberg_disable_edit_links_for_navigation_post_type( $url, $post );
-		$this->assertNotSame( $url, $filtered_url );
-		$this->assertNotEmpty( $filtered_url );
-		$this->assertIsString( $filtered_url );
-	}
+	public function test_it_disables_content_editor_for_navigation_type_posts() {
+		$post = $this->create_navigation_post();
+		$this->assertTrue( $this->supports_block_editor() );
 
-	public function test_it_doesnt_remove_edit_row_action_for_non_navigation_post_types() {
-		$actions = array(
-			'edit' => 1,
-		);
+		gutenberg_disable_content_editor_for_navigation_post_type( $post );
 
-		$post             = $this->create_sample_post();
-		$filtered_actions = gutenberg_disable_edit_row_action_for_navigation_post_type( $actions, $post );
-		$this->assertSame( $actions, $filtered_actions );
-	}
-
-	public function test_it_removes_edit_row_action_for_navigation_post_types() {
-		$actions = array(
-			'edit' => 1,
-		);
-
-		$post             = $this->create_navigation_post();
-		$filtered_actions = gutenberg_disable_edit_row_action_for_navigation_post_type( $actions, $post );
-		$this->assertSame( array(), $filtered_actions );
+		$this->assertFalse( $this->supports_block_editor() );
 	}
 
 	private function create_post( $type ) {
@@ -59,11 +48,15 @@ class WP_Navigation_Test extends WP_UnitTestCase {
 		return $post;
 	}
 
-	private function create_sample_post() {
-		return $this->create_post( 'sample_post_type' );
+	private function create_non_navigation_post() {
+		return $this->create_post( static::NON_NAVIGATION_POST_TYPE );
 	}
 
 	private function create_navigation_post() {
-		return $this->create_post( 'wp_navigation' );
+		return $this->create_post( static::NAVIGATION_POST_TYPE );
+	}
+
+	private function supports_block_editor() {
+		return post_type_supports( static::NAVIGATION_POST_TYPE, 'editor' );
 	}
 }
