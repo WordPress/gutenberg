@@ -34,8 +34,7 @@ const deprecatedFlags = {
 		settings.disableCustomFontSizes === undefined
 			? undefined
 			: ! settings.disableCustomFontSizes,
-	'typography.customLineHeight': ( settings ) =>
-		settings.enableCustomLineHeight,
+	'typography.lineHeight': ( settings ) => settings.enableCustomLineHeight,
 	'spacing.units': ( settings ) => {
 		if ( settings.enableCustomUnits === undefined ) {
 			return;

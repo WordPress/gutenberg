@@ -30,7 +30,7 @@ export function useHasTypographyPanel( name ) {
 function useHasLineHeightControl( name ) {
 	const supports = getSupportedGlobalStylesPanels( name );
 	return (
-		useSetting( 'typography.customLineHeight', name )[ 0 ] &&
+		useSetting( 'typography.lineHeight', name )[ 0 ] &&
 		supports.includes( 'lineHeight' )
 	);
 }
