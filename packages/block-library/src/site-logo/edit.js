@@ -66,6 +66,7 @@ const SiteLogo = ( {
 	logoUrl,
 	siteUrl,
 	logoId,
+	iconId,
 	setIcon,
 	canUserEdit,
 } ) => {
@@ -89,6 +90,15 @@ const SiteLogo = ( {
 			title: siteEntities.title,
 			...pick( getSettings(), [ 'imageEditing', 'maxWidth' ] ),
 		};
+	}, [] );
+
+	useEffect( () => {
+		// Turn the `Use as site icon` toggle off if it is on but the logo and icon have
+		// fallen out of sync. This can happen if the toggle is saved in the `on` position,
+		// but changes are later made to the site icon in the Customizer.
+		if ( shouldSyncIcon && logoId !== iconId ) {
+			setAttributes( { shouldSyncIcon: false } );
+		}
 	}, [] );
 
 	useEffect( () => {
@@ -424,7 +434,7 @@ export default function LogoEdit( {
 		// Initialize the syncSiteIcon toggle. If we currently have no Site logo and no
 		// site icon, automatically sync the logo to the icon.
 		if ( shouldSyncIcon === undefined ) {
-			setAttributes( { shouldSyncIcon: ! siteLogoId && ! siteIconId } );
+			setAttributes( { shouldSyncIcon: ! siteIconId } );
 		}
 		onSelectLogo( media );
 	};
@@ -488,6 +498,7 @@ export default function LogoEdit( {
 				logoId={ mediaItemData?.id || siteLogoId }
 				siteUrl={ url }
 				setIcon={ setIcon }
+				iconId={ siteIconId }
 				canUserEdit={ canUserEdit }
 			/>
 		);
