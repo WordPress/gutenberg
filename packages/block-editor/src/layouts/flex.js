@@ -7,13 +7,10 @@ import {
 	justifyCenter,
 	justifyRight,
 	justifySpaceBetween,
+	arrowRight,
+	arrowDown,
 } from '@wordpress/icons';
-import {
-	Button,
-	ToggleControl,
-	__experimentalToggleGroupControl as ToggleGroupControl,
-	__experimentalToggleGroupControlOption as ToggleGroupControlOption,
-} from '@wordpress/components';
+import { Button, ToggleControl, Flex, FlexItem } from '@wordpress/components';
 
 /**
  * Internal dependencies
@@ -48,16 +45,22 @@ export default {
 	} ) {
 		return (
 			<>
-				<FlexLayoutJustifyContentControl
-					layout={ layout }
-					onChange={ onChange }
-				/>
-				{ layout?.orientation && (
-					<OrientationControl
-						layout={ layout }
-						onChange={ onChange }
-					/>
-				) }
+				<Flex>
+					<FlexItem>
+						<FlexLayoutJustifyContentControl
+							layout={ layout }
+							onChange={ onChange }
+						/>
+					</FlexItem>
+					<FlexItem>
+						{ layout?.orientation && (
+							<OrientationControl
+								layout={ layout }
+								onChange={ onChange }
+							/>
+						) }
+					</FlexItem>
+				</Flex>
 				<FlexWrapControl layout={ layout } onChange={ onChange } />
 			</>
 		);
@@ -223,18 +226,30 @@ function FlexWrapControl( { layout, onChange } ) {
 function OrientationControl( { layout, onChange } ) {
 	const { orientation = 'horizontal' } = layout;
 	return (
-		<ToggleGroupControl
-			label="Orientation"
-			value={ orientation }
-			onChange={ ( value ) => {
-				onChange( {
-					...layout,
-					orientation: value,
-				} );
-			} }
-		>
-			<ToggleGroupControlOption value="horizontal" label="Horizontal" />
-			<ToggleGroupControlOption value="vertical" label="Vertical" />
-		</ToggleGroupControl>
+		<fieldset className="block-editor-hooks__flex-layout-orientation-controls">
+			<legend>{ __( 'Orientation' ) }</legend>
+			<Button
+				label={ 'horizontal' }
+				icon={ arrowRight }
+				isPressed={ orientation === 'horizontal' }
+				onClick={ () =>
+					onChange( {
+						...layout,
+						orientation: 'horizontal',
+					} )
+				}
+			/>
+			<Button
+				label={ 'vertical' }
+				icon={ arrowDown }
+				isPressed={ orientation === 'vertical' }
+				onClick={ () =>
+					onChange( {
+						...layout,
+						orientation: 'vertical',
+					} )
+				}
+			/>
+		</fieldset>
 	);
 }
