@@ -35,10 +35,6 @@ function gutenberg_remove_legacy_pages() {
 	if ( isset( $submenu['themes.php'] ) ) {
 		$indexes_to_remove = array();
 		foreach ( $submenu['themes.php'] as $index => $menu_item ) {
-			if ( false !== strpos( $menu_item[2], 'customize.php' ) && ! gutenberg_site_requires_customizer() ) {
-				$indexes_to_remove[] = $index;
-			}
-
 			if ( false !== strpos( $menu_item[2], 'gutenberg-widgets' ) ) {
 				$indexes_to_remove[] = $index;
 			}
@@ -64,13 +60,11 @@ function gutenberg_adminbar_items( $wp_admin_bar ) {
 		return;
 	}
 
-	// Remove customizer link, if this site does not rely on them for plugins or theme options.
-	if ( ! gutenberg_site_requires_customizer() ) {
-		$wp_admin_bar->remove_node( 'customize' );
-		$wp_admin_bar->remove_node( 'customize-background' );
-		$wp_admin_bar->remove_node( 'customize-header' );
-		$wp_admin_bar->remove_node( 'widgets' );
-	}
+	// Remove customizer links
+	$wp_admin_bar->remove_node( 'customize' );
+	$wp_admin_bar->remove_node( 'customize-background' );
+	$wp_admin_bar->remove_node( 'customize-header' );
+	$wp_admin_bar->remove_node( 'widgets' );
 
 	// Add site-editor link.
 	if ( ! is_admin() && current_user_can( 'edit_theme_options' ) ) {
@@ -85,19 +79,6 @@ function gutenberg_adminbar_items( $wp_admin_bar ) {
 }
 
 add_action( 'admin_bar_menu', 'gutenberg_adminbar_items', 50 );
-
-/**
- * Check if any plugin, or theme features, are using the Customizer.
- *
- * @return bool A boolean value indicating if Customizer support is needed.
- */
-function gutenberg_site_requires_customizer() {
-	if ( has_action( 'customize_register' ) ) {
-		return true;
-	}
-
-	return false;
-}
 
 /**
  * Tells the script loader to load the scripts and styles of custom block on site editor screen.
