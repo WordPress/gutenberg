@@ -374,7 +374,11 @@
 		},
 		"script": {
 			"type": "string",
-			"description": "Block type frontend script definition. It will be enqueued both in the editor and when viewing the content on the front of the site."
+			"description": "Block type frontend and editor script definition. It will be enqueued both in the editor and when viewing the content on the front of the site."
+		},
+		"viewScript": {
+			"type": "string",
+			"description": "Block type frontend script definition. It will be enqueued only when viewing the content on the front of the site."
 		},
 		"editorStyle": {
 			"type": "string",

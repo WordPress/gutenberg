@@ -42,6 +42,7 @@ Starting in WordPress 5.8 release, we encourage using the `block.json` metadata 
 	},
 	"editorScript": "file:./build/index.js",
 	"script": "file:./build/script.js",
+	"viewScript": "file:./build/view.js",
 	"editorStyle": "file:./build/index.css",
 	"style": "file:./build/style.css"
 }
@@ -262,7 +263,7 @@ Sometimes a block could have aliases that help users discover it while searching
 -   Optional
 -   Localized: No
 -   Property: `version`
--   Since: `5.8.0`
+-   Since: `WordPress 5.8.0`
 
 ```json
 { "version": "1.0.3" }
@@ -276,6 +277,7 @@ The current version number of the block, such as 1.0 or 1.0.3. It's similar to h
 -   Optional
 -   Localized: No
 -   Property: `textdomain`
+-   Since: `WordPress 5.7.0`
 
 ```json
 { "textdomain": "my-plugin" }
@@ -427,7 +429,21 @@ Block type editor script definition. It will only be enqueued in the context of 
 { "script": "file:./build/script.js" }
 ```
 
-Block type frontend script definition. It will be enqueued both in the editor and when viewing the content on the front of the site.
+Block type frontend and editor script definition. It will be enqueued both in the editor and when viewing the content on the front of the site.
+
+### View Script
+
+-   Type: `string` ([WPDefinedAsset](#WPDefinedAsset))
+-   Optional
+-   Localized: No
+-   Property: `viewScript`
+-   Since: `WordPress 5.9.0`
+
+```json
+{ "script": "file:./build/view.js" }
+```
+
+Block type frontend script definition. It will be enqueued only when viewing the content on the front of the site.
 
 ### Editor Style
 
@@ -513,6 +529,14 @@ return array(
 	'version'      => '3be55b05081a63d8f9d0ecb466c42cfd',
 );
 ```
+
+### Frontend Enqueueing
+
+Starting in the WordPress 5.8 release, it is possible to instruct WordPress to enqueue scripts and styles for a block type only when rendered on the frontend. It applies to the following asset fields in the `block.json` file:
+
+-   `script`
+-   `viewScript` (when the block defines `render_callback` during registration in PHP, then the block author is responsible for enqueuing the script)
+-   `style`
 
 ## Internationalization
 
