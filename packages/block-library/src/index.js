@@ -47,6 +47,7 @@ import * as mediaText from './media-text';
 import * as missing from './missing';
 import * as more from './more';
 import * as navigation from './navigation';
+import * as navigationArea from './navigation-area';
 import * as navigationLink from './navigation-link';
 import * as navigationSubmenu from './navigation-submenu';
 import * as nextpage from './nextpage';
@@ -153,6 +154,7 @@ export const __experimentalGetCoreBlocks = () => [
 	missing,
 	more,
 	navigation,
+	navigationArea,
 	navigationLink,
 	navigationSubmenu,
 	nextpage,
@@ -237,7 +239,6 @@ export const __experimentalRegisterExperimentalCoreBlocks =
 	process.env.GUTENBERG_PHASE === 2
 		? ( { enableFSEBlocks } = {} ) => {
 				[
-					// Experimental blocks.
 					homeLink,
 
 					// Full Site Editing blocks.

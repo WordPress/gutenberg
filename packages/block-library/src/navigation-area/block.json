@@ -1,0 +1,29 @@
+{
+	"apiVersion": 2,
+	"name": "core/navigation-area",
+	"title": "Navigation Area",
+	"category": "theme",
+	"description": "@TODO",
+	"keywords": [
+		"menu",
+		"navigation",
+		"links"
+	],
+	"textdomain": "default",
+	"attributes": {
+		"area": {
+		  "type": "string",
+		  "default": "primary"
+		},
+		"navigationMenuId": {
+		  "type": "number"
+		}
+	},
+	"providesContext": {
+		"navigationArea": "area"
+	},
+	"supports": {
+		"html": false,
+		"inserter": true
+	}
+}

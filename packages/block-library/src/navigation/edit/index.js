@@ -6,7 +6,13 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { useState, useEffect, useRef, Platform } from '@wordpress/element';
+import {
+	useState,
+	useEffect,
+	useRef,
+	useCallback,
+	Platform,
+} from '@wordpress/element';
 import {
 	InspectorControls,
 	JustifyToolbar,
@@ -20,7 +26,7 @@ import {
 	getColorClassName,
 	Warning,
 } from '@wordpress/block-editor';
-import { EntityProvider } from '@wordpress/core-data';
+import { EntityProvider, useEntityProp } from '@wordpress/core-data';
 import { useDispatch, useSelect } from '@wordpress/data';
 import {
 	PanelBody,
@@ -88,6 +94,7 @@ function Navigation( {
 	setOverlayBackgroundColor,
 	overlayTextColor,
 	setOverlayTextColor,
+	context: { navigationArea },
 
 	// These props are used by the navigation editor to override specific
 	// navigation block settings.
@@ -98,13 +105,33 @@ function Navigation( {
 	customAppender: CustomAppender = null,
 } ) {
 	const {
-		navigationMenuId,
 		itemsJustification,
 		openSubmenusOnClick,
 		orientation,
 		overlayMenu,
 		showSubmenuIcon,
 	} = attributes;
+
+	const [ areaMenu, setAreaMenu ] = useEntityProp(
+		'root',
+		'navigationArea',
+		'menu',
+		navigationArea
+	);
+
+	const navigationMenuId = navigationArea
+		? areaMenu
+		: attributes.navigationMenuId;
+
+	const setNavigationMenuId = useCallback(
+		( postId ) => {
+			setAttributes( { navigationMenuId: postId } );
+			if ( navigationArea ) {
+				setAreaMenu( postId );
+			}
+		},
+		[ navigationArea ]
+	);
 
 	const [ hasAlreadyRendered, RecursionProvider ] = useNoRecursiveRenders(
 		`navigationMenu/${ navigationMenuId }`
@@ -236,7 +263,7 @@ function Navigation( {
 				onSave={ ( post ) => {
 					setHasSavedUnsavedInnerBlocks( true );
 					// Switch to using the wp_navigation entity.
-					setAttributes( { navigationMenuId: post.id } );
+					setNavigationMenuId( post.id );
 				} }
 			/>
 		);
@@ -293,9 +320,7 @@ function Navigation( {
 								{ ( { onClose } ) => (
 									<NavigationMenuSelector
 										onSelect={ ( { id } ) => {
-											setAttributes( {
-												navigationMenuId: id,
-											} );
+											setNavigationMenuId( id );
 											onClose();
 										} }
 									/>
@@ -442,9 +467,7 @@ function Navigation( {
 						<PlaceholderComponent
 							onFinish={ ( post ) => {
 								setIsPlaceholderShown( false );
-								setAttributes( {
-									navigationMenuId: post.id,
-								} );
+								setNavigationMenuId( post.id );
 								selectBlock( clientId );
 							} }
 							canSwitchNavigationMenu={ canSwitchNavigationMenu }
