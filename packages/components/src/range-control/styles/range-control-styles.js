@@ -298,7 +298,7 @@ export const InputNumber = styled( NumberControl )`
 	display: inline-block;
 	font-size: 13px;
 	margin-top: 0;
-	width: ${ space( 20 ) } !important;
+	width: ${ space( 16 ) } !important;
 
 	input[type='number']& {
 		${ rangeHeight };
