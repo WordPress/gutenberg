@@ -13,7 +13,7 @@ import type { WordPressComponentProps } from '../../ui/context';
 import { Flex, FlexItem } from '../../flex';
 import { Text } from '../../text';
 import { COLORS, rtl } from '../../utils';
-import type { LabelPosition } from '../types';
+import type { LabelPosition, Size } from '../types';
 
 type ContainerProps = {
 	disabled?: boolean;
@@ -105,8 +105,6 @@ export const Container = styled.div< ContainerProps >`
 	${ containerWidthStyles }
 `;
 
-type Size = 'default' | 'small';
-
 type InputProps = {
 	disabled?: boolean;
 	inputSize?: Size;
@@ -126,6 +124,7 @@ const fontSizeStyles = ( { inputSize: size }: InputProps ) => {
 	const sizes = {
 		default: '13px',
 		small: '11px',
+		'__unstable-large': '13px',
 	};
 
 	const fontSize = sizes[ size as Size ] || sizes.default;
@@ -145,11 +144,11 @@ const fontSizeStyles = ( { inputSize: size }: InputProps ) => {
 const sizeStyles = ( { inputSize: size }: InputProps ) => {
 	const sizes = {
 		default: {
-			height: 40,
+			height: 36,
 			lineHeight: 1,
-			minHeight: 40,
-			paddingLeft: 16,
-			paddingRight: 16,
+			minHeight: 36,
+			paddingLeft: 8,
+			paddingRight: 8,
 		},
 		small: {
 			height: 24,
@@ -157,6 +156,13 @@ const sizeStyles = ( { inputSize: size }: InputProps ) => {
 			minHeight: 24,
 			paddingLeft: 8,
 			paddingRight: 8,
+		},
+		'__unstable-large': {
+			height: 40,
+			lineHeight: 1,
+			minHeight: 40,
+			paddingLeft: 16,
+			paddingRight: 16,
 		},
 	};
 
