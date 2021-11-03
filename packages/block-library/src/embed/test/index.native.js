@@ -813,19 +813,10 @@ describe( 'Embed block', () => {
 	it( 'sets block caption', async () => {
 		const expectedCaption = 'Caption';
 
-		const waitForElement = ( { getByA11yLabel } ) =>
-			getByA11yLabel( /Embed Block\. Row 1/ );
 		const {
-			element,
 			getByPlaceholderText,
 			getByDisplayValue,
-		} = await initializeEditor(
-			{ initialHtml: RICH_TEXT_EMBED_HTML },
-			{ waitForElement }
-		);
-
-		// Select block
-		fireEvent.press( element );
+		} = await initializeWithEmbedBlock( RICH_TEXT_EMBED_HTML );
 
 		// Set a caption
 		const captionField = getByPlaceholderText( 'Add caption' );
@@ -854,19 +845,9 @@ describe( 'Embed block', () => {
 			return Promise.resolve( isEmbedRequest ? EMBED_NULL_RESPONSE : {} );
 		} );
 
-		const initialHtml = RICH_TEXT_ERROR_EMBED_HTML;
-
-		const waitForElement = ( { getByA11yLabel } ) =>
-			getByA11yLabel( /Embed Block\. Row 1/ );
-		const { element, getByText } = await initializeEditor(
-			{
-				initialHtml,
-			},
-			{ waitForElement }
+		const { getByText } = await initializeWithEmbedBlock(
+			RICH_TEXT_ERROR_EMBED_HTML
 		);
-
-		// Select block
-		fireEvent.press( element );
 
 		const cannotEmbedText = getByText( 'Unable to embed media' );
 
@@ -876,19 +857,10 @@ describe( 'Embed block', () => {
 
 	describe( 'block settings', () => {
 		it( 'toggles resize for smaller devices media settings', async () => {
-			const waitForElement = ( { getByA11yLabel } ) =>
-				getByA11yLabel( /Embed Block\. Row 1/ );
 			const {
-				element,
 				getByA11yLabel,
 				getByText,
-			} = await initializeEditor(
-				{ initialHtml: RICH_TEXT_EMBED_HTML },
-				{ waitForElement }
-			);
-
-			// Select block
-			fireEvent.press( element );
+			} = await initializeWithEmbedBlock( RICH_TEXT_EMBED_HTML );
 
 			fireEvent.press(
 				await waitFor( () => getByA11yLabel( 'Open Settings' ) )
@@ -902,15 +874,9 @@ describe( 'Embed block', () => {
 		} );
 
 		it( 'does not show settings button if responsive is not supported', async () => {
-			const waitForElement = ( { getByA11yLabel } ) =>
-				getByA11yLabel( /Embed Block\. Row 1/ );
-			const { element, getByA11yLabel } = await initializeEditor(
-				{ initialHtml: WP_EMBED_HTML },
-				{ waitForElement }
+			const { getByA11yLabel } = await initializeWithEmbedBlock(
+				WP_EMBED_HTML
 			);
-
-			// Select block
-			fireEvent.press( element );
 
 			let settingsButton;
 			try {
