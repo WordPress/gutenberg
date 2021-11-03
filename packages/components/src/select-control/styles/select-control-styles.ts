@@ -27,6 +27,7 @@ const fontSizeStyles = ( { selectSize }: SelectProps ) => {
 	const sizes = {
 		default: '13px',
 		small: '11px',
+		'__unstable-large': '13px',
 	};
 
 	const fontSize = sizes[ selectSize as Size ];
@@ -46,14 +47,19 @@ const fontSizeStyles = ( { selectSize }: SelectProps ) => {
 const sizeStyles = ( { selectSize }: SelectProps ) => {
 	const sizes = {
 		default: {
-			height: 40,
+			height: 30,
 			lineHeight: 1,
-			minHeight: 40,
+			minHeight: 30,
 		},
 		small: {
 			height: 24,
 			lineHeight: 1,
 			minHeight: 24,
+		},
+		'__unstable-large': {
+			height: 40,
+			lineHeight: 1,
+			minHeight: 40,
 		},
 	};
 
@@ -65,12 +71,16 @@ const sizeStyles = ( { selectSize }: SelectProps ) => {
 const sizePaddings = ( { selectSize = 'default' }: SelectProps ) => {
 	const sizes = {
 		default: {
-			paddingLeft: 16,
-			paddingRight: 32,
+			paddingLeft: 8,
+			paddingRight: 24,
 		},
 		small: {
 			paddingLeft: 8,
 			paddingRight: 24,
+		},
+		'__unstable-large': {
+			paddingLeft: 16,
+			paddingRight: 32,
 		},
 	};
 	return rtl( sizes[ selectSize ] );
