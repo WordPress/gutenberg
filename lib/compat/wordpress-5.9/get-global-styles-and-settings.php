@@ -109,8 +109,8 @@ function gutenberg_get_global_stylesheet( $types = array() ) {
 		$origins = array( 'core', 'theme' );
 	}
 
-	$tree           = WP_Theme_JSON_Resolver_Gutenberg::get_merged_data();
-	$stylesheet     = $tree->get_stylesheet( $types, $origins );
+	$tree       = WP_Theme_JSON_Resolver_Gutenberg::get_merged_data();
+	$stylesheet = $tree->get_stylesheet( $types, $origins );
 
 	if ( $can_use_cached ) {
 		// Cache for a minute.
