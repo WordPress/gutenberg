@@ -16,7 +16,7 @@ export const strikethrough = {
 	className: null,
 	edit( { isActive, value, onChange, onFocus } ) {
 		function onClick() {
-			onChange( toggleFormat( value, { type: name } ) );
+			onChange( toggleFormat( value, { type: name, title } ) );
 			onFocus();
 		}
 
@@ -26,6 +26,7 @@ export const strikethrough = {
 				title={ title }
 				onClick={ onClick }
 				isActive={ isActive }
+				role="menuitemcheckbox"
 			/>
 		);
 	},
