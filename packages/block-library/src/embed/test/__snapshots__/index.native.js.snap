@@ -70,6 +70,14 @@ https://twitter.com/testing
 <!-- /wp:embed -->"
 `;
 
+exports[`Embed block edit URL edits URL when edited after setting a bad URL of a provider 1`] = `
+"<!-- wp:embed {\\"url\\":\\"https://twitter.com/notnownikki\\",\\"type\\":\\"rich\\",\\"providerNameSlug\\":\\"twitter\\",\\"responsive\\":true} -->
+<figure class=\\"wp-block-embed is-type-rich is-provider-twitter wp-block-embed-twitter\\"><div class=\\"wp-block-embed__wrapper\\">
+https://twitter.com/notnownikki
+</div></figure>
+<!-- /wp:embed -->"
+`;
+
 exports[`Embed block edit URL keeps the previous URL if an invalid URL is set 1`] = `
 "<!-- wp:embed {\\"url\\":\\"https://twitter.com/notnownikki\\",\\"type\\":\\"rich\\",\\"providerNameSlug\\":\\"twitter\\",\\"responsive\\":true} -->
 <figure class=\\"wp-block-embed is-type-rich is-provider-twitter wp-block-embed-twitter\\"><div class=\\"wp-block-embed__wrapper\\">

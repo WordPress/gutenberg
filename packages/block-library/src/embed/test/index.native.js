@@ -72,6 +72,12 @@ const MOCK_BAD_WORDPRESS_RESPONSE = {
 	},
 	html: false,
 };
+const MOCK_BAD_EMBED_PROVIDER_RESPONSE = {
+	url: 'https://youtu.be/BAD_URL',
+	html: '<p>Mock bad response.</p>',
+	provider_name: 'Embed Provider',
+	version: '1.0',
+};
 const EMBED_NULL_RESPONSE = null;
 
 // Embed block HTML examples
@@ -178,6 +184,7 @@ beforeEach( () => {
 		RICH_TEXT_EMBED_SUCCESS_RESPONSE,
 		VIDEO_EMBED_SUCCESS_RESPONSE,
 		MOCK_EMBED_PHOTO_SUCCESS_RESPONSE,
+		MOCK_BAD_EMBED_PROVIDER_RESPONSE,
 	] );
 } );
 
@@ -527,6 +534,61 @@ describe( 'Embed block', () => {
 			);
 
 			expect( isVisibleThirdTime ).toBeTruthy();
+		} );
+
+		// This test case covers the bug fixed in PR #35013
+		it( 'edits URL when edited after setting a bad URL of a provider', async () => {
+			const badURL = 'https://youtu.be/BAD_URL';
+			const expectedURL = 'https://twitter.com/notnownikki';
+
+			const {
+				getByA11yLabel,
+				getByDisplayValue,
+				getByPlaceholderText,
+				getByTestId,
+			} = await insertEmbedBlock();
+
+			// Wait for edit URL modal to be visible
+			let embedEditURLModal = getByTestId( 'embed-edit-url-modal' );
+			await waitFor( () => embedEditURLModal.props.isVisible );
+
+			// Set an bad URL
+			let linkTextInput = getByPlaceholderText( 'Add link' );
+			fireEvent( linkTextInput, 'focus' );
+			fireEvent.changeText( linkTextInput, badURL );
+
+			// Dismiss the edit URL modal
+			fireEvent( embedEditURLModal, 'backdropPress' );
+			fireEvent( embedEditURLModal, MODAL_DISMISS_EVENT );
+
+			// Edit URL
+			fireEvent.press(
+				await waitFor( () => getByA11yLabel( 'Edit URL' ) )
+			);
+
+			// Wait for edit URL modal to be visible
+			embedEditURLModal = getByTestId( 'embed-edit-url-modal' );
+			await waitFor( () => embedEditURLModal.props.isVisible );
+
+			// Start editing link
+			fireEvent.press( getByA11yLabel( `Embed link, ${ badURL }` ) );
+
+			// Replace URL
+			linkTextInput = getByDisplayValue( badURL );
+			fireEvent( linkTextInput, 'focus' );
+			fireEvent.changeText( linkTextInput, expectedURL );
+
+			// Dismiss the edit URL modal
+			fireEvent( embedEditURLModal, 'backdropPress' );
+			fireEvent( embedEditURLModal, MODAL_DISMISS_EVENT );
+
+			// Get Twitter link field
+			const twitterLinkField = await waitFor( () =>
+				getByA11yLabel( `Twitter link, ${ expectedURL }` )
+			);
+
+			expect( twitterLinkField ).toBeDefined();
+			expect( getEditorHtml() ).toMatchSnapshot();
 		} );
 	} );
 
