@@ -46,7 +46,7 @@ export const code = {
 	},
 	edit( { value, onChange, onFocus, isActive } ) {
 		function onClick() {
-			onChange( toggleFormat( value, { type: name }, title ) );
+			onChange( toggleFormat( value, { type: name, title } ) );
 			onFocus();
 		}
 

@@ -22,16 +22,13 @@ export const underline = {
 	edit( { value, onChange } ) {
 		const onToggle = () => {
 			onChange(
-				toggleFormat(
-					value,
-					{
-						type: name,
-						attributes: {
-							style: 'text-decoration: underline;',
-						},
+				toggleFormat( value, {
+					type: name,
+					attributes: {
+						style: 'text-decoration: underline;',
 					},
-					title
-				)
+					title,
+				} )
 			);
 		};
 

@@ -322,7 +322,6 @@ _Parameters_
 
 -   _value_ `RichTextValue`: Value to modify.
 -   _format_ `RichTextFormat`: Format to apply or remove.
--   _title_ `string`: Title of formatting control.
 
 _Returns_
 
