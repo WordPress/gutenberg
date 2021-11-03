@@ -150,16 +150,16 @@ function gutenberg_experimental_global_styles_settings( $settings ) {
 		$settings['disableCustomFontSizes'] = ! $settings['__experimentalFeatures']['typography']['customFontSize'];
 		unset( $settings['__experimentalFeatures']['typography']['customFontSize'] );
 	}
-	if ( isset( $settings['__experimentalFeatures']['typography']['customLineHeight'] ) ) {
-		$settings['enableCustomLineHeight'] = $settings['__experimentalFeatures']['typography']['customLineHeight'];
-		unset( $settings['__experimentalFeatures']['typography']['customLineHeight'] );
+	if ( isset( $settings['__experimentalFeatures']['typography']['lineHeight'] ) ) {
+		$settings['enableCustomLineHeight'] = $settings['__experimentalFeatures']['typography']['lineHeight'];
+		unset( $settings['__experimentalFeatures']['typography']['lineHeight'] );
 	}
 	if ( isset( $settings['__experimentalFeatures']['spacing']['units'] ) ) {
 		$settings['enableCustomUnits'] = $settings['__experimentalFeatures']['spacing']['units'];
 	}
-	if ( isset( $settings['__experimentalFeatures']['spacing']['customPadding'] ) ) {
-		$settings['enableCustomSpacing'] = $settings['__experimentalFeatures']['spacing']['customPadding'];
-		unset( $settings['__experimentalFeatures']['spacing']['customPadding'] );
+	if ( isset( $settings['__experimentalFeatures']['spacing']['padding'] ) ) {
+		$settings['enableCustomSpacing'] = $settings['__experimentalFeatures']['spacing']['padding'];
+		unset( $settings['__experimentalFeatures']['spacing']['padding'] );
 	}
 
 	return $settings;

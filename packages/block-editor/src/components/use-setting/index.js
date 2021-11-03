@@ -34,8 +34,7 @@ const deprecatedFlags = {
 		settings.disableCustomFontSizes === undefined
 			? undefined
 			: ! settings.disableCustomFontSizes,
-	'typography.customLineHeight': ( settings ) =>
-		settings.enableCustomLineHeight,
+	'typography.lineHeight': ( settings ) => settings.enableCustomLineHeight,
 	'spacing.units': ( settings ) => {
 		if ( settings.enableCustomUnits === undefined ) {
 			return;
@@ -47,10 +46,15 @@ const deprecatedFlags = {
 
 		return settings.enableCustomUnits;
 	},
-	'spacing.customPadding': ( settings ) => settings.enableCustomSpacing,
+	'spacing.padding': ( settings ) => settings.enableCustomSpacing,
 };
 
 const prefixedFlags = {
+	/*
+	 * These were only available in the plugin
+	 * and can be removed when the minimum WordPress version
+	 * for the plugin is 5.9.
+	 */
 	'border.customColor': 'border.color',
 	'border.customStyle': 'border.style',
 	'border.customWidth': 'border.width',
@@ -59,6 +63,13 @@ const prefixedFlags = {
 	'typography.customLetterSpacing': 'typography.letterSpacing',
 	'typography.customTextDecorations': 'typography.textDecoration',
 	'typography.customTextTransforms': 'typography.textTransform',
+	/*
+	 * These were part of WordPress 5.8 and we need to keep them.
+	 */
+	'border.customRadius': 'border.radius',
+	'spacing.customMargin': 'spacing.margin',
+	'spacing.customPadding': 'spacing.padding',
+	'typography.customLineHeight': 'typography.lineHeight',
 };
 
 /**

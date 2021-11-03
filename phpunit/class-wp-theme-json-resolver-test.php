@@ -136,12 +136,12 @@ class WP_Theme_JSON_Resolver_Gutenberg_Test extends WP_UnitTestCase {
 					),
 				),
 				'typography' => array(
-					'customFontSize'   => true,
-					'customLineHeight' => false,
+					'customFontSize' => true,
+					'lineHeight'     => false,
 				),
 				'spacing'    => array(
-					'units'         => false,
-					'customPadding' => false,
+					'units'   => false,
+					'padding' => false,
 				),
 				'blocks'     => array(
 					'core/paragraph' => array(
@@ -222,7 +222,7 @@ class WP_Theme_JSON_Resolver_Gutenberg_Test extends WP_UnitTestCase {
 		remove_theme_support( 'editor-color-palette' );
 
 		$this->assertSame( false, WP_Theme_JSON_Resolver_Gutenberg::theme_has_support() );
-		$this->assertSame( true, $settings['typography']['customLineHeight'] );
+		$this->assertSame( true, $settings['typography']['lineHeight'] );
 		$this->assertSame( $color_palette, $settings['color']['palette']['theme'] );
 	}
 
@@ -259,12 +259,12 @@ class WP_Theme_JSON_Resolver_Gutenberg_Test extends WP_UnitTestCase {
 					'link'           => true,
 				),
 				'typography' => array(
-					'customFontSize'   => true,
-					'customLineHeight' => false,
+					'customFontSize' => true,
+					'lineHeight'     => false,
 				),
 				'spacing'    => array(
-					'units'         => false,
-					'customPadding' => false,
+					'units'   => false,
+					'padding' => false,
 				),
 				'blocks'     => array(
 					'core/paragraph'  => array(

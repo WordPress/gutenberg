@@ -220,7 +220,7 @@ The settings section has the following structure:
 	"settings": {
 		"border": {
 			"color": false,
-			"customRadius": false,
+			"radius": false,
 			"style": false,
 			"width": false
 		},
@@ -242,19 +242,19 @@ The settings section has the following structure:
 		},
 		"spacing": {
 			"blockGap": null,
-			"customMargin": false,
-			"customPadding": false,
+			"margin": false,
+			"padding": false,
 			"units": [ "px", "em", "rem", "vh", "vw" ]
 		},
 		"typography": {
 			"customFontSize": true,
-			"customLineHeight": false,
 			"dropCap": true,
 			"fontFamilies": [],
 			"fontSizes": [],
 			"fontStyle": true,
 			"fontWeight": true,
 			"letterSpacing": true,
+			"lineHeight": false,
 			"textDecoration": true,
 			"textTransform": true
 		},
@@ -286,8 +286,8 @@ To retain backward compatibility, the existing `add_theme_support` declarations 
 
 | add_theme_support           | theme.json setting                                        |
 | --------------------------- | --------------------------------------------------------- |
-| `custom-line-height`        | Set `typography.customLineHeight` to `true`.              |
-| `custom-spacing`            | Set `spacing.customPadding` to `true`.                    |
+| `custom-line-height`        | Set `typography.lineHeight` to `true`.              |
+| `custom-spacing`            | Set `spacing.padding` to `true`.                    |
 | `custom-units`              | Provide the list of units via `spacing.units`.            |
 | `disable-custom-colors`     | Set `color.custom` to `false`.                            |
 | `disable-custom-font-sizes` | Set `typography.customFontSize` to `false`.               |

@@ -82,10 +82,10 @@ class WP_Theme_JSON_Gutenberg {
 
 	const VALID_SETTINGS = array(
 		'border'     => array(
-			'color'        => null,
-			'customRadius' => null,
-			'style'        => null,
-			'width'        => null,
+			'color'  => null,
+			'radius' => null,
+			'style'  => null,
+			'width'  => null,
 		),
 		'color'      => array(
 			'background'     => null,
@@ -104,22 +104,22 @@ class WP_Theme_JSON_Gutenberg {
 			'wideSize'    => null,
 		),
 		'spacing'    => array(
-			'blockGap'      => null,
-			'customMargin'  => null,
-			'customPadding' => null,
-			'units'         => null,
+			'blockGap' => null,
+			'margin'   => null,
+			'padding'  => null,
+			'units'    => null,
 		),
 		'typography' => array(
-			'customFontSize'   => null,
-			'customLineHeight' => null,
-			'dropCap'          => null,
-			'fontFamilies'     => null,
-			'fontSizes'        => null,
-			'fontStyle'        => null,
-			'fontWeight'       => null,
-			'letterSpacing'    => null,
-			'textDecoration'   => null,
-			'textTransform'    => null,
+			'customFontSize' => null,
+			'dropCap'        => null,
+			'fontFamilies'   => null,
+			'fontSizes'      => null,
+			'fontStyle'      => null,
+			'fontWeight'     => null,
+			'letterSpacing'  => null,
+			'lineHeight'     => null,
+			'textDecoration' => null,
+			'textTransform'  => null,
 		),
 	);
 
@@ -273,7 +273,7 @@ class WP_Theme_JSON_Gutenberg {
 		'h6'   => 'h6',
 	);
 
-	const LATEST_SCHEMA = 1;
+	const LATEST_SCHEMA = 2;
 
 	/**
 	 * Constructor.
@@ -313,14 +313,22 @@ class WP_Theme_JSON_Gutenberg {
 	 * @return array The structure in the last version.
 	 */
 	private static function migrate( $theme_json ) {
+		// Can be removed when the plugin minimum required version is WordPress 5.8.
+		// This doesn't need to land in WordPress core.
 		if ( ! isset( $theme_json['version'] ) || 0 === $theme_json['version'] ) {
 			$theme_json = WP_Theme_JSON_Schema_V0_To_V1::migrate( $theme_json );
 		}
 
 		// Provide backwards compatibility for settings that did not land in 5.8
 		// and have had their `custom` prefixed removed since.
+		// Can be removed when the plugin minimum required version is WordPress 5.9.
+		// This doesn't need to land in WordPress core.
 		if ( 1 === $theme_json['version'] ) {
 			$theme_json = WP_Theme_JSON_Schema_V1_Remove_Custom_Prefixes::migrate( $theme_json );
+		}
+
+		if ( 1 === $theme_json['version'] ) {
+			$theme_json = WP_Theme_JSON_Schema_V1_To_V2::migrate( $theme_json );
 		}
 
 		return $theme_json;
@@ -1086,8 +1094,8 @@ class WP_Theme_JSON_Gutenberg {
 	 *     }
 	 *   },
 	 *   'core/paragraph': {
-	 *     'spacing': {
-	 *       'customPadding': true
+	 *     'typography': {
+	 *       'customFontSize': true
 	 *     }
 	 *   }
 	 * }
@@ -1545,7 +1553,7 @@ class WP_Theme_JSON_Gutenberg {
 			if ( ! isset( $theme_settings['settings']['typography'] ) ) {
 				$theme_settings['settings']['typography'] = array();
 			}
-			$theme_settings['settings']['typography']['customLineHeight'] = $settings['enableCustomLineHeight'];
+			$theme_settings['settings']['typography']['lineHeight'] = $settings['enableCustomLineHeight'];
 		}
 
 		if ( isset( $settings['enableCustomUnits'] ) ) {
@@ -1593,7 +1601,7 @@ class WP_Theme_JSON_Gutenberg {
 			if ( ! isset( $theme_settings['settings']['spacing'] ) ) {
 				$theme_settings['settings']['spacing'] = array();
 			}
-			$theme_settings['settings']['spacing']['customPadding'] = $settings['enableCustomSpacing'];
+			$theme_settings['settings']['spacing']['padding'] = $settings['enableCustomSpacing'];
 		}
 
 		// Things that didn't land in core yet, so didn't have a setting assigned.
