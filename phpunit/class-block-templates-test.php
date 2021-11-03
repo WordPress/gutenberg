@@ -150,10 +150,10 @@ class Block_Templates_Test extends WP_UnitTestCase {
 		$this->assertEquals( WP_TEMPLATE_PART_AREA_HEADER, $template_part->area );
 	}
 
-	function test_gutenberg_inject_theme_attribute_in_content() {
+	function test_inject_theme_attribute_in_block_template_content() {
 		$theme                           = get_stylesheet();
 		$content_without_theme_attribute = '<!-- wp:template-part {"slug":"header","align":"full", "tagName":"header","className":"site-header"} /-->';
-		$template_content                = _gutenberg_inject_theme_attribute_in_content(
+		$template_content                = _inject_theme_attribute_in_block_template_content(
 			$content_without_theme_attribute,
 			$theme
 		);
@@ -164,7 +164,7 @@ class Block_Templates_Test extends WP_UnitTestCase {
 		$this->assertEquals( $expected, $template_content );
 
 		$content_without_theme_attribute_nested = '<!-- wp:group --><!-- wp:template-part {"slug":"header","align":"full", "tagName":"header","className":"site-header"} /--><!-- /wp:group -->';
-		$template_content                       = _gutenberg_inject_theme_attribute_in_content(
+		$template_content                       = _inject_theme_attribute_in_block_template_content(
 			$content_without_theme_attribute_nested,
 			$theme
 		);
@@ -176,7 +176,7 @@ class Block_Templates_Test extends WP_UnitTestCase {
 
 		// Does not inject theme when there is an existing theme attribute.
 		$content_with_existing_theme_attribute = '<!-- wp:template-part {"slug":"header","theme":"fake-theme","align":"full", "tagName":"header","className":"site-header"} /-->';
-		$template_content                      = _gutenberg_inject_theme_attribute_in_content(
+		$template_content                      = _inject_theme_attribute_in_block_template_content(
 			$content_with_existing_theme_attribute,
 			$theme
 		);
@@ -184,7 +184,7 @@ class Block_Templates_Test extends WP_UnitTestCase {
 
 		// Does not inject theme when there is no template part.
 		$content_with_no_template_part = '<!-- wp:post-content /-->';
-		$template_content              = _gutenberg_inject_theme_attribute_in_content(
+		$template_content              = _inject_theme_attribute_in_block_template_content(
 			$content_with_no_template_part,
 			$theme
 		);

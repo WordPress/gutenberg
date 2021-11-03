@@ -162,51 +162,53 @@ function set_unique_slug_on_create_template_part( $post_id ) {
 }
 add_action( 'save_post_wp_template_part', 'set_unique_slug_on_create_template_part' );
 
-/**
- * Returns a filtered list of allowed area values for template parts.
- *
- * @return array The supported template part area values.
- */
-function gutenberg_get_allowed_template_part_areas() {
-	$default_area_definitions = array(
-		array(
-			'area'        => WP_TEMPLATE_PART_AREA_UNCATEGORIZED,
-			'label'       => __( 'General', 'gutenberg' ),
-			'description' => __(
-				'General templates often perform a specific role like displaying post content, and are not tied to any particular area.',
-				'gutenberg'
-			),
-			'icon'        => 'layout',
-			'area_tag'    => 'div',
-		),
-		array(
-			'area'        => WP_TEMPLATE_PART_AREA_HEADER,
-			'label'       => __( 'Header', 'gutenberg' ),
-			'description' => __(
-				'The Header template defines a page area that typically contains a title, logo, and main navigation.',
-				'gutenberg'
-			),
-			'icon'        => 'header',
-			'area_tag'    => 'header',
-		),
-		array(
-			'area'        => WP_TEMPLATE_PART_AREA_FOOTER,
-			'label'       => __( 'Footer', 'gutenberg' ),
-			'description' => __(
-				'The Footer template defines a page area that typically contains site credits, social links, or any other combination of blocks.',
-				'gutenberg'
-			),
-			'icon'        => 'footer',
-			'area_tag'    => 'footer',
-		),
-	);
-
+if ( ! function_exists( 'get_allowed_block_template_part_areas' ) ) {
 	/**
-	 * Filters the list of allowed template part area values.
+	 * Returns a filtered list of allowed area values for template parts.
 	 *
-	 * @param array $default_areas An array of supported area objects.
+	 * @return array The supported template part area values.
 	 */
-	return apply_filters( 'default_wp_template_part_areas', $default_area_definitions );
+	function get_allowed_block_template_part_areas() {
+		$default_area_definitions = array(
+			array(
+				'area'        => WP_TEMPLATE_PART_AREA_UNCATEGORIZED,
+				'label'       => __( 'General', 'gutenberg' ),
+				'description' => __(
+					'General templates often perform a specific role like displaying post content, and are not tied to any particular area.',
+					'gutenberg'
+				),
+				'icon'        => 'layout',
+				'area_tag'    => 'div',
+			),
+			array(
+				'area'        => WP_TEMPLATE_PART_AREA_HEADER,
+				'label'       => __( 'Header', 'gutenberg' ),
+				'description' => __(
+					'The Header template defines a page area that typically contains a title, logo, and main navigation.',
+					'gutenberg'
+				),
+				'icon'        => 'header',
+				'area_tag'    => 'header',
+			),
+			array(
+				'area'        => WP_TEMPLATE_PART_AREA_FOOTER,
+				'label'       => __( 'Footer', 'gutenberg' ),
+				'description' => __(
+					'The Footer template defines a page area that typically contains site credits, social links, or any other combination of blocks.',
+					'gutenberg'
+				),
+				'icon'        => 'footer',
+				'area_tag'    => 'footer',
+			),
+		);
+
+		/**
+		 * Filters the list of allowed template part area values.
+		 *
+		 * @param array $default_areas An array of supported area objects.
+		 */
+		return apply_filters( 'default_wp_template_part_areas', $default_area_definitions );
+	}
 }
 
 /**
@@ -222,7 +224,7 @@ function gutenberg_filter_template_part_area( $type ) {
 		function ( $item ) {
 			return $item['area'];
 		},
-		gutenberg_get_allowed_template_part_areas()
+		get_allowed_block_template_part_areas()
 	);
 	if ( in_array( $type, $allowed_areas, true ) ) {
 		return $type;
