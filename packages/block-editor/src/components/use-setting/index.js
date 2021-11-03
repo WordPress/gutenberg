@@ -47,7 +47,7 @@ const deprecatedFlags = {
 
 		return settings.enableCustomUnits;
 	},
-	'spacing.customPadding': ( settings ) => settings.enableCustomSpacing,
+	'spacing.padding': ( settings ) => settings.enableCustomSpacing,
 };
 
 const prefixedFlags = {
