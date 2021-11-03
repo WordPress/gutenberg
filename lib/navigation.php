@@ -424,7 +424,7 @@ function gutenberg_register_navigation_post_type() {
 		'show_in_rest'          => true,
 		'map_meta_cap'          => true,
 		'rest_base'             => 'navigation',
-		'rest_controller_class' => 'WP_REST_Posts_Controller',
+		'rest_controller_class' => WP_REST_Posts_Controller::class,
 		'supports'              => array(
 			'title',
 			'editor',
@@ -455,8 +455,8 @@ function gutenberg_disable_block_editor_for_navigation_post_type( $value, $post_
 add_filter( 'use_block_editor_for_post_type', 'gutenberg_disable_block_editor_for_navigation_post_type', 10, 2 );
 
 /**
- * This function disables content editor for wp_navigation type posts.
- * Content editor cannot correctly edit wp_navigation type posts.
+ * This callback disables content editor for wp_navigation type posts.
+ * Content editor cannot handle wp_navigation type posts correctly.
  *
  * @param WP_Post $post An instance of WP_Post class.
  */
@@ -470,3 +470,25 @@ function gutenberg_disable_content_editor_for_navigation_post_type( $post ) {
 }
 
 add_action( 'edit_form_after_title', 'gutenberg_disable_content_editor_for_navigation_post_type', 10, 1 );
+
+/**
+ * Fixes the label of the 'wp_navigation' admin menu entry.
+ */
+function gutenberg_fix_navigation_items_admin_menu_entry() {
+	global $submenu;
+	if ( ! isset( $submenu['themes.php'] ) ) {
+		return;
+	}
+	$post_type = get_post_type_object( 'wp_navigation' );
+	if ( ! $post_type ) {
+		return;
+	}
+	foreach ( $submenu['themes.php'] as $key => $submenu_entry ) {
+		if ( $post_type->labels->all_items === $submenu['themes.php'][ $key ][0] ) {
+			$submenu['themes.php'][ $key ][0] = $post_type->labels->menu_name; // phpcs:ignore WordPress.WP.GlobalVariablesOverride
+			return;
+		}
+	}
+}
+
+add_action( 'admin_menu', 'gutenberg_fix_navigation_items_admin_menu_entry' );
