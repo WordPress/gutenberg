@@ -1,16 +1,11 @@
 /**
- * External dependencies
- */
-import classnames from 'classnames';
-
-/**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
 import { parse } from '@wordpress/blocks';
 import { useSelect } from '@wordpress/data';
 import {
-	BlockPreview,
+	useBlockPreview,
 	useBlockProps,
 	useInnerBlocksProps,
 	useSetting,
@@ -19,49 +14,45 @@ import {
 	Warning,
 } from '@wordpress/block-editor';
 import { useEntityProp, useEntityBlockEditor } from '@wordpress/core-data';
-import { useMergeRefs } from '@wordpress/compose';
 import { useMemo } from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
 import { useCanEditEntity } from '../utils/hooks';
-import { useDisabled } from './use-disabled';
 
-function ReadOnlyContent( { userCanEdit, postType, postId } ) {
+function ReadOnlyContent( { layout, userCanEdit, postType, postId } ) {
 	const [ , , content ] = useEntityProp(
 		'postType',
 		postType,
 		'content',
 		postId
 	);
-	const { ref, ...blockProps } = useBlockProps( {
-		className: classnames(
-			'components-disabled',
-			'block-editor-block-preview__live-content'
-		),
-	} );
-	const node = useDisabled();
+	const blockProps = useBlockProps();
 
-	const mergedRefs = useMergeRefs( [ ref, node ] );
+	const themeSupportsLayout = useSelect( ( select ) => {
+		const { getSettings } = select( blockEditorStore );
+		return getSettings()?.supportsLayout;
+	}, [] );
+	const defaultLayout = useSetting( 'layout' ) || {};
+	const usedLayout = !! layout && layout.inherit ? defaultLayout : layout;
 
 	const rawContent = content?.raw;
 	const blocks = useMemo( () => {
 		return rawContent ? parse( rawContent ) : [];
 	}, [ rawContent ] );
 
+	const blockPreviewProps = useBlockPreview( blockProps, {
+		blocks,
+		__experimentalLayout: themeSupportsLayout ? usedLayout : undefined,
+	} );
+
 	return content?.protected && ! userCanEdit ? (
 		<div { ...blockProps }>
 			<Warning>{ __( 'This content is password protected.' ) }</Warning>
 		</div>
 	) : (
-		<div { ...blockProps } ref={ mergedRefs }>
-			<BlockPreview
-				blocks={ blocks }
-				__experimentalAsButton={ false }
-				__experimentalLive={ true }
-			/>
-		</div>
+		<div { ...blockPreviewProps }></div>
 	);
 }
 
@@ -92,7 +83,7 @@ function EditableContent( { layout, context = {} } ) {
 }
 
 function Content( props ) {
-	const { context: { queryId, postType, postId } = {} } = props;
+	const { context: { queryId, postType, postId } = {}, layout } = props;
 	const isDescendentOfQueryLoop = !! queryId;
 	const userCanEdit = useCanEditEntity( 'postType', postType, postId );
 	const isEditable = userCanEdit && ! isDescendentOfQueryLoop;
@@ -101,6 +92,7 @@ function Content( props ) {
 		<EditableContent { ...props } />
 	) : (
 		<ReadOnlyContent
+			layout={ layout }
 			userCanEdit={ userCanEdit }
 			postType={ postType }
 			postId={ postId }
