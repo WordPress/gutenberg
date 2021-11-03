@@ -300,7 +300,7 @@ export const InputNumber = styled( NumberControl )`
 	margin-top: 0;
 	width: ${ space( 16 ) } !important;
 
-	input[type='number']& {
+	&& input[type='number'] {
 		${ rangeHeight };
 	}
 
