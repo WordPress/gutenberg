@@ -486,6 +486,12 @@
 		"parent": "block-api"
 	},
 	{
+		"title": "Core Blocks Reference",
+		"slug": "core-blocks",
+		"markdown_source": "../docs/reference-guides/core-blocks.md",
+		"parent": "reference-guides"
+	},
+	{
 		"title": "Filter Reference",
 		"slug": "filters",
 		"markdown_source": "../docs/reference-guides/filters/README.md",

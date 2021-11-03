@@ -194,6 +194,7 @@
 					}
 				]
 			},
+			{ "docs/reference-guides/core-blocks.md": [] },
 			{
 				"docs/reference-guides/filters/README.md": [
 					{ "docs/reference-guides/filters/block-filters.md": [] },

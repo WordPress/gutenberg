@@ -237,7 +237,7 @@
 		"dev": "npm run build:packages && concurrently \"wp-scripts start\" \"npm run dev:packages\"",
 		"dev:packages": "node ./bin/packages/watch.js",
 		"distclean": "rimraf node_modules packages/*/node_modules",
-		"docs:build": "node ./docs/tool/index.js && node ./bin/api-docs/update-api-docs.js",
+		"docs:build": "node ./docs/tool/index.js && node ./bin/api-docs/update-api-docs.js && node ./bin/api-docs/gen-block-lib-list.js",
 		"fixtures:clean": "rimraf \"test/integration/fixtures/blocks/*.+(json|serialized.html)\"",
 		"fixtures:generate": "cross-env GENERATE_MISSING_FIXTURES=y npm run test-unit test/integration/full-content/ && npm run format test/integration/fixtures/blocks/*.json",
 		"fixtures:regenerate": "npm run fixtures:clean && npm run fixtures:generate",
