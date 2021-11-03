@@ -343,6 +343,30 @@
 				"core/columns": {
 					"$ref": "#/definitions/settingsPropertiesComplete"
 				},
+				"core/comment-author-name": {
+					"$ref": "#/definitions/settingsPropertiesComplete"
+				},
+				"core/comment-author-avatar": {
+					"$ref": "#/definitions/settingsPropertiesComplete"
+				},
+				"core/comment-content": {
+					"$ref": "#/definitions/settingsPropertiesComplete"
+				},
+				"core/comment-date": {
+					"$ref": "#/definitions/settingsPropertiesComplete"
+				},
+				"core/comment-edit-link": {
+					"$ref": "#/definitions/settingsPropertiesComplete"
+				},
+				"core/comment-reply-link": {
+					"$ref": "#/definitions/settingsPropertiesComplete"
+				},
+				"core/comment-template": {
+					"$ref": "#/definitions/settingsPropertiesComplete"
+				},
+				"core/comments-query-loop": {
+					"$ref": "#/definitions/settingsPropertiesComplete"
+				},
 				"core/cover": {
 					"$ref": "#/definitions/settingsPropertiesComplete"
 				},
@@ -410,18 +434,6 @@
 					"$ref": "#/definitions/settingsPropertiesComplete"
 				},
 				"core/post-author": {
-					"$ref": "#/definitions/settingsPropertiesComplete"
-				},
-				"core/post-comment": {
-					"$ref": "#/definitions/settingsPropertiesComplete"
-				},
-				"core/post-comment-author": {
-					"$ref": "#/definitions/settingsPropertiesComplete"
-				},
-				"core/post-comment-content": {
-					"$ref": "#/definitions/settingsPropertiesComplete"
-				},
-				"core/post-comment-date": {
 					"$ref": "#/definitions/settingsPropertiesComplete"
 				},
 				"core/post-comments": {
@@ -788,6 +800,30 @@
 				"core/columns": {
 					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
 				},
+				"core/comment-author-name": {
+					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
+				},
+				"core/comment-author-avatar": {
+					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
+				},
+				"core/comment-content": {
+					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
+				},
+				"core/comment-date": {
+					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
+				},
+				"core/comment-edit-link": {
+					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
+				},
+				"core/comment-reply-link": {
+					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
+				},
+				"core/comment-template": {
+					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
+				},
+				"core/comments-query-loop": {
+					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
+				},
 				"core/cover": {
 					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
 				},
@@ -855,18 +891,6 @@
 					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
 				},
 				"core/post-author": {
-					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
-				},
-				"core/post-comment": {
-					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
-				},
-				"core/post-comment-author": {
-					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
-				},
-				"core/post-comment-content": {
-					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
-				},
-				"core/post-comment-date": {
 					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
 				},
 				"core/post-comments": {
