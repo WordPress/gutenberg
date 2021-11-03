@@ -392,55 +392,32 @@ class WP_Theme_JSON_Schema {
 
 		// Overwrite the things that change.
 		if ( isset( $old['settings'] ) ) {
-			$new['settings'] = self::migrate_v1_remove_custom_prefixes_process_settings( $old['settings'] );
+			$new['settings'] = self::rename_paths( $old['settings'], self::V1_RENAMED_PATHS );
 		}
 
 		return $new;
 	}
 
-		/**
-		 * Processes the settings subtree.
-		 *
-		 * @param array $settings Array to process.
-		 *
-		 * @return array The settings in the new format.
-		 */
-	private static function migrate_v1_remove_custom_prefixes_process_settings( $settings ) {
-		$new_settings = $settings;
-
-		// Process any renamed/moved paths within default settings.
-		self::rename_settings( $new_settings, self::V1_RENAMED_PATHS );
-
-		// Process individual block settings.
-		if ( isset( $new_settings['blocks'] ) && is_array( $new_settings['blocks'] ) ) {
-			foreach ( $new_settings['blocks'] as &$block_settings ) {
-				self::rename_settings( $block_settings, self::V1_RENAMED_PATHS );
-			}
-		}
-
-		return $new_settings;
-	}
-
-		/**
-		 * Removes the custom prefixes for a few properties
-		 * that were part of v1:
-		 *
-		 * 'border.customRadius'         => 'border.radius',
-		 * 'spacing.customMargin'        => 'spacing.margin',
-		 * 'spacing.customPadding'       => 'spacing.padding',
-		 * 'typography.customLineHeight' => 'typography.lineHeight',
-		 *
-		 * @param array $old Data to migrate.
-		 *
-		 * @return array Data without the custom prefixes.
-		 */
+	/**
+	 * Removes the custom prefixes for a few properties
+	 * that were part of v1:
+	 *
+	 * 'border.customRadius'         => 'border.radius',
+	 * 'spacing.customMargin'        => 'spacing.margin',
+	 * 'spacing.customPadding'       => 'spacing.padding',
+	 * 'typography.customLineHeight' => 'typography.lineHeight',
+	 *
+	 * @param array $old Data to migrate.
+	 *
+	 * @return array Data without the custom prefixes.
+	 */
 	private static function migrate_v1_to_v2( $old ) {
 		// Copy everything.
 		$new = $old;
 
 		// Overwrite the things that changed.
 		if ( isset( $old['settings'] ) ) {
-			$new['settings'] = self::migrate_v1_to_v2_process_settings( $old['settings'] );
+			$new['settings'] = self::rename_paths( $old['settings'], self::V1_TO_V2_RENAMED_PATHS );
 		}
 
 		// Set the new version.
@@ -452,20 +429,21 @@ class WP_Theme_JSON_Schema {
 	/**
 	 * Processes the settings subtree.
 	 *
-	 * @param array $settings Array to process.
+	 * @param array $settings        Array to process.
+	 * @param array $paths_to_rename Paths to rename.
 	 *
 	 * @return array The settings in the new format.
 	 */
-	private static function migrate_v1_to_v2_process_settings( $settings ) {
+	private static function rename_paths( $settings, $paths_to_rename ) {
 		$new_settings = $settings;
 
 		// Process any renamed/moved paths within default settings.
-		self::rename_settings( $new_settings, self::V1_TO_V2_RENAMED_PATHS );
+		self::rename_settings( $new_settings, $paths_to_rename );
 
 		// Process individual block settings.
 		if ( isset( $new_settings['blocks'] ) && is_array( $new_settings['blocks'] ) ) {
 			foreach ( $new_settings['blocks'] as &$block_settings ) {
-				self::rename_settings( $block_settings, self::V1_TO_V2_RENAMED_PATHS );
+				self::rename_settings( $block_settings, $paths_to_rename );
 			}
 		}
 
