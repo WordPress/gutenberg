@@ -6,9 +6,9 @@
  * @package Gutenberg
  */
 
-class WP_Theme_JSON_Schema_V0_Test extends WP_UnitTestCase {
+class WP_Theme_JSON_Schema_V0_To_V1_Test extends WP_UnitTestCase {
 
-	function test_parse() {
+	function test_migrate() {
 		$theme_json_v0 = array(
 			'settings' => array(
 				'defaults'       => array(
@@ -95,7 +95,7 @@ class WP_Theme_JSON_Schema_V0_Test extends WP_UnitTestCase {
 			),
 		);
 
-		$actual = WP_Theme_JSON_Schema_V0::parse( $theme_json_v0 );
+		$actual = WP_Theme_JSON_Schema_V0_To_V1::migrate( $theme_json_v0 );
 
 		$expected = array(
 			'version'  => 1,
@@ -117,16 +117,16 @@ class WP_Theme_JSON_Schema_V0_Test extends WP_UnitTestCase {
 					'link'    => true,
 				),
 				'border'     => array(
-					'color'        => false,
+					'customColor'  => false,
 					'customRadius' => false,
-					'style'        => false,
-					'width'        => false,
+					'customStyle'  => false,
+					'customWidth'  => false,
 				),
 				'typography' => array(
-					'fontStyle'      => false,
-					'fontWeight'     => false,
-					'textDecoration' => false,
-					'textTransform'  => false,
+					'customFontStyle'       => false,
+					'customFontWeight'      => false,
+					'customTextDecorations' => false,
+					'customTextTransforms'  => false,
 				),
 				'blocks'     => array(
 					'core/paragraph' => array(
@@ -173,8 +173,8 @@ class WP_Theme_JSON_Schema_V0_Test extends WP_UnitTestCase {
 	}
 
 	function test_get_settings() {
-		$defaults   = WP_Theme_JSON_Schema_V0::ALL_BLOCKS_NAME;
-		$root       = WP_Theme_JSON_Schema_V0::ROOT_BLOCK_NAME;
+		$defaults   = WP_Theme_JSON_Schema_V0_To_V1::ALL_BLOCKS_NAME;
+		$root       = WP_Theme_JSON_Schema_V0_To_V1::ROOT_BLOCK_NAME;
 		$theme_json = new WP_Theme_JSON_Gutenberg(
 			array(
 				'settings' => array(
@@ -359,8 +359,8 @@ class WP_Theme_JSON_Schema_V0_Test extends WP_UnitTestCase {
 	}
 
 	function test_get_stylesheet() {
-		$root_name       = WP_Theme_JSON_Schema_V0::ROOT_BLOCK_NAME;
-		$all_blocks_name = WP_Theme_JSON_Schema_V0::ALL_BLOCKS_NAME;
+		$root_name       = WP_Theme_JSON_Schema_V0_To_V1::ROOT_BLOCK_NAME;
+		$all_blocks_name = WP_Theme_JSON_Schema_V0_To_V1::ALL_BLOCKS_NAME;
 		$theme_json      = new WP_Theme_JSON_Gutenberg( array() );
 		$theme_json->merge(
 			new WP_Theme_JSON_Gutenberg(

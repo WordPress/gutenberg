@@ -95,8 +95,8 @@ if ( ! class_exists( 'WP_Block_Template' ) ) {
 // These are used by some FSE features
 // as well as global styles.
 require __DIR__ . '/interface-wp-theme-json-schema.php';
-require __DIR__ . '/class-wp-theme-json-schema-v0.php';
-require __DIR__ . '/class-wp-theme-json-schema-v1.php';
+require __DIR__ . '/class-wp-theme-json-schema-v0-to-v1.php';
+require __DIR__ . '/class-wp-theme-json-schema-v1-remove-custom-prefixes.php';
 require __DIR__ . '/class-wp-theme-json-gutenberg.php';
 require __DIR__ . '/class-wp-theme-json-resolver-gutenberg.php';
 
