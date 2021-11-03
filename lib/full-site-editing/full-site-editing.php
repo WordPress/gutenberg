@@ -81,6 +81,40 @@ function gutenberg_adminbar_items( $wp_admin_bar ) {
 add_action( 'admin_bar_menu', 'gutenberg_adminbar_items', 50 );
 
 /**
+ * Removes the legacy core components from the Customizer.
+ *
+ * @param array $components Core Customizer components list.
+ * @return array Modified components list.
+ */
+function gutenberg_remove_customizer_components( $components ) {
+	if ( ! gutenberg_is_fse_theme() ) {
+		return $components;
+	}
+
+	$index = array_search( 'nav_menus', $components, true );
+	if ( false !== $index ) {
+		unset( $components[ $index ] );
+	}
+
+	return $components;
+}
+add_filter( 'customize_loaded_components', 'gutenberg_remove_customizer_components' );
+
+/**
+ * Removes lagecy Customizer sections for FSE themes.
+ *
+ * @param WP_Customize_Manager $wp_customize The customize manager instance.
+ */
+function gutenberg_remove_customizer_sections( $wp_customize ) {
+	if ( ! gutenberg_is_fse_theme() ) {
+		return;
+	}
+
+	$wp_customize->remove_control( 'custom_css' );
+}
+add_action( 'customize_register', 'gutenberg_remove_customizer_sections', 50 );
+
+/**
  * Tells the script loader to load the scripts and styles of custom block on site editor screen.
  *
  * @param bool $is_block_editor_screen Current decision about loading block assets.
