@@ -145,21 +145,19 @@ const insertEmbedBlock = async ( blockTitle = 'Embed' ) => {
 };
 
 const initializeWithEmbedBlock = async ( initialHtml, selectBlock = true ) => {
-	const waitForElement = ( { getByA11yLabel } ) =>
-		getByA11yLabel( /Embed Block\. Row 1/ );
+	const editor = await initializeEditor( { initialHtml } );
+	const { getByA11yLabel } = editor;
 
-	const editor = await initializeEditor(
-		{ initialHtml },
-		{ waitForElement }
+	const block = await waitFor( () =>
+		getByA11yLabel( /Embed Block\. Row 1/ )
 	);
-	const { element } = editor;
 
 	if ( selectBlock ) {
 		// Select block
-		fireEvent.press( element );
+		fireEvent.press( block );
 	}
 
-	return { ...editor, block: element };
+	return { ...editor, block };
 };
 
 beforeAll( () => {

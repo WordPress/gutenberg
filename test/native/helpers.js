@@ -34,7 +34,7 @@ provideToNativeHtml.mockImplementation( ( html ) => {
 	serializedHtml = html;
 } );
 
-export async function initializeEditor( props, { waitForElement } = {} ) {
+export function initializeEditor( props ) {
 	const renderResult = render(
 		<Editor
 			postId={ `post-id-${ uuid() }` }
@@ -45,28 +45,26 @@ export async function initializeEditor( props, { waitForElement } = {} ) {
 	);
 	const { getByTestId } = renderResult;
 
-	const blockListWrapper = await waitFor( () =>
-		getByTestId( 'block-list-wrapper' )
-	);
-
-	// onLayout event has to be explicitly dispatched in BlockList component,
-	// otherwise the inner blocks are not rendered.
-	fireEvent( blockListWrapper, 'layout', {
-		nativeEvent: {
-			layout: {
-				width: 100,
-			},
-		},
+	// A promise is used here, instead of making the function async, to prevent
+	// the React Native testing library from warning of potential undesired React state updates
+	// that can be covered in the integration tests.
+	// Reference: https://git.io/JPHn6
+	return new Promise( ( resolve ) => {
+		waitFor( () => getByTestId( 'block-list-wrapper' ) ).then(
+			( blockListWrapper ) => {
+				// onLayout event has to be explicitly dispatched in BlockList component,
+				// otherwise the inner blocks are not rendered.
+				fireEvent( blockListWrapper, 'layout', {
+					nativeEvent: {
+						layout: {
+							width: 100,
+						},
+					},
+				} );
+				resolve( renderResult );
+			}
+		);
 	} );
-
-	// In some cases, we need to wait for an element to be present before
-	// considering the initialization finished.
-	if ( waitForElement ) {
-		const element = await waitFor( () => waitForElement( renderResult ) );
-		return { ...renderResult, element };
-	}
-
-	return renderResult;
 }
 
 export * from '@testing-library/react-native';
