@@ -69,21 +69,6 @@ export const MenuTitleUI = styled.div`
 	width: 100%;
 `;
 
-export const MenuTitleHeadingUI = styled( Heading )`
-	min-height: ${ space( 12 ) };
-	align-items: center;
-	color: inherit;
-	display: flex;
-	justify-content: space-between;
-	margin-bottom: ${ space( 2 ) };
-	padding: ${ () =>
-		isRTL()
-			? `${ space( 1 ) } ${ space( 4 ) } ${ space( 1 ) } ${ space( 2 ) }`
-			: `${ space( 1 ) } ${ space( 2 ) } ${ space( 1 ) } ${ space(
-					4
-			  ) }` };
-`;
-
 export const MenuTitleActionsUI = styled.span`
 	height: ${ space( 6 ) }; // 24px, same height as the buttons inside
 
@@ -133,12 +118,18 @@ export const MenuTitleSearchUI = styled( SearchControl )`
 `;
 
 export const GroupTitleUI = styled( Heading )`
+	min-height: ${ space( 12 ) };
+	align-items: center;
 	color: inherit;
-	margin-top: ${ space( 2 ) };
+	display: flex;
+	justify-content: space-between;
+	margin-bottom: ${ space( 2 ) };
 	padding: ${ () =>
 		isRTL()
-			? `${ space( 1 ) } ${ space( 4 ) } ${ space( 1 ) } 0`
-			: `${ space( 1 ) } 0 ${ space( 1 ) } ${ space( 4 ) }` };
+			? `${ space( 1 ) } ${ space( 4 ) } ${ space( 1 ) } ${ space( 2 ) }`
+			: `${ space( 1 ) } ${ space( 2 ) } ${ space( 1 ) } ${ space(
+					4
+			  ) }` };
 `;
 
 export const ItemBaseUI = styled.li`
