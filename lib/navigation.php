@@ -464,8 +464,8 @@ add_filter( 'use_block_editor_for_post_type', 'gutenberg_disable_block_editor_fo
  * @return string
  */
 function gutenberg_disable_edit_links_for_navigation_post_type( $url, $post_id ) {
-	$post = get_post( $post_id );
-	if ( 'wp_navigation' !== $post->post_type ) {
+	$post_type = get_post_type( $post_id );
+	if ( 'wp_navigation' !== $post_type ) {
 		return $url;
 	}
 
@@ -484,7 +484,8 @@ add_filter( 'get_edit_post_link', 'gutenberg_disable_edit_links_for_navigation_p
  * @return array
  */
 function gutenberg_disable_edit_row_action_for_navigation_post_type( $actions, $post ) {
-	if ( 'wp_navigation' !== $post->post_type ) {
+	$post_type = get_post_type( $post );
+	if ( 'wp_navigation' !== $post_type ) {
 		return $actions;
 	}
 
