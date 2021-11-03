@@ -374,7 +374,7 @@ class Gutenberg_REST_Global_Styles_Controller extends WP_REST_Controller {
 			);
 		}
 
-		$theme    = WP_Theme_JSON_Resolver_Gutenberg::get_merged_data( array(), 'theme' );
+		$theme    = WP_Theme_JSON_Resolver_Gutenberg::get_merged_data( 'theme' );
 		$styles   = $theme->get_raw_data()['styles'];
 		$settings = $theme->get_settings();
 		$result   = array(
