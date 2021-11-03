@@ -295,8 +295,6 @@ function render_block_core_navigation( $attributes, $content, $block ) {
 	$classes    = array_merge(
 		$colors['css_classes'],
 		$font_sizes['css_classes'],
-		( isset( $attributes['orientation'] ) && 'vertical' === $attributes['orientation'] ) ? array( 'is-vertical' ) : array(),
-		isset( $attributes['itemsJustification'] ) ? array( 'items-justified-' . $attributes['itemsJustification'] ) : array(),
 		$is_responsive_menu ? array( 'is-responsive' ) : array()
 	);
 

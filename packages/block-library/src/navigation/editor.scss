@@ -417,8 +417,9 @@ $color-control-label-height: 20px;
 // Most of this can be removed when the iframe lands.
 
 // When not fullscreen.
-.wp-block-navigation__responsive-container.is-menu-open {
+.wp-block-navigation.is-responsive-menu-open.is-responsive-menu-open.is-responsive-menu-open {
 	position: fixed;
+	max-width: 100%;
 	top:
 		$admin-bar-height-big + $header-height + $block-toolbar-height +
 		$border-width;
@@ -436,7 +437,7 @@ $color-control-label-height: 20px;
 	}
 }
 
-.has-fixed-toolbar .wp-block-navigation__responsive-container.is-menu-open {
+.has-fixed-toolbar .wp-block-navigation.is-responsive-menu-open {
 	@include break-medium() {
 		top:
 			$admin-bar-height + $header-height + $block-toolbar-height +
@@ -444,20 +445,20 @@ $color-control-label-height: 20px;
 	}
 }
 
-.is-mobile-preview .wp-block-navigation__responsive-container.is-menu-open,
-.is-tablet-preview .wp-block-navigation__responsive-container.is-menu-open {
+.is-mobile-preview .wp-block-navigation.is-responsive-menu-open,
+.is-tablet-preview .wp-block-navigation.is-responsive-menu-open {
 	top:
 		$admin-bar-height + $header-height + $block-toolbar-height +
 		$border-width;
 }
 
-.is-sidebar-opened .wp-block-navigation__responsive-container.is-menu-open {
+.is-sidebar-opened .wp-block-navigation.is-responsive-menu-open {
 	right: $sidebar-width;
 }
 
 // When fullscreen.
 .is-fullscreen-mode {
-	.wp-block-navigation__responsive-container.is-menu-open {
+	.wp-block-navigation.is-responsive-menu-open {
 		left: 0; // Unset the value from non fullscreen mode.
 		top:
 			$admin-bar-height-big + $header-height + $block-toolbar-height +
@@ -468,21 +469,21 @@ $color-control-label-height: 20px;
 		}
 	}
 
-	.has-fixed-toolbar .wp-block-navigation__responsive-container.is-menu-open {
+	.has-fixed-toolbar .wp-block-navigation.is-responsive-menu-open {
 		@include break-medium() {
 			top: $header-height + $block-toolbar-height + $border-width;
 		}
 	}
 
-	.is-mobile-preview .wp-block-navigation__responsive-container.is-menu-open,
-	.is-tablet-preview .wp-block-navigation__responsive-container.is-menu-open {
+	.is-mobile-preview .wp-block-navigation.is-responsive-menu-open,
+	.is-tablet-preview .wp-block-navigation.is-responsive-menu-open {
 		top: $header-height + $block-toolbar-height + $border-width;
 	}
 }
 
 // The iframe makes these rules a lot simpler.
 body.editor-styles-wrapper
-.wp-block-navigation__responsive-container.is-menu-open {
+.wp-block-navigation.is-responsive-menu-open {
 	top: 0;
 	right: 0;
 	bottom: 0;

@@ -15,6 +15,9 @@ function navigationToggleModal( modal ) {
 	triggerButton.setAttribute( 'aria-expanded', ! isHidden );
 	closeButton.setAttribute( 'aria-expanded', ! isHidden );
 	modal.classList.toggle( 'has-modal-open', ! isHidden );
+	triggerButton
+		.closest( '.wp-block-navigation' )
+		.classList.toggle( 'is-responsive-menu-open', ! isHidden );
 
 	// Add a class to indicate the modal is open.
 	const htmlElement = document.documentElement;

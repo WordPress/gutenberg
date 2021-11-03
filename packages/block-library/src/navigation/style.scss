@@ -9,17 +9,6 @@
 .wp-block-navigation {
 	position: relative;
 
-	// Horizontal layout
-	display: flex;
-	flex-wrap: wrap;
-	align-items: center;
-
-	// Vertical layout
-	&.is-vertical {
-		flex-direction: column;
-		align-items: flex-start;
-	}
-
 	// Normalize list styles.
 	ul {
 		margin-top: 0;
@@ -315,8 +304,6 @@
 
 // Navigation block inner container.
 .wp-block-navigation__container {
-	// Vertically center child blocks, like Social Links or Search.
-	align-items: center;
 
 	// Reset the default list styles
 	list-style: none;
@@ -327,90 +314,23 @@
 	.is-responsive {
 		display: none;
 	}
-
-	// Horizontal layout
-	display: flex;
-	flex-wrap: wrap;
-
-	.items-justified-space-between & {
-		flex-grow: 1;
-	}
 }
-
-// Vertical layout
-.is-vertical .wp-block-page-list, // Page list.
-.is-vertical .wp-block-navigation__container,
-.is-vertical .wp-block-navigation__responsive-container-content {
-	display: flex;
-	flex-direction: column;
-	align-items: flex-start;
-}
-
-// Justification.
-// These target the named container class to work even with the additional mobile menu containers.
-.items-justified-center {
-	.wp-block-page-list,
-	.wp-block-navigation__container,
-	.wp-block-navigation__responsive-container-content {
-		justify-content: center;
-
-		// For the overlay.
-		align-items: center;
-	}
-}
-
-.items-justified-right {
-	.wp-block-page-list,
-	.wp-block-navigation__container,
-	.wp-block-navigation__responsive-container-content {
-		justify-content: flex-end;
-
-		// For the overlay.
-		align-items: flex-end;
-	}
-}
-
-.items-justified-space-between {
-	.wp-block-navigation__container,
-	.wp-block-navigation__responsive-container-content {
-		display: flex;
-		justify-content: space-between;
-		flex: 1;
-	}
-}
-
-// Vertical justification.
-// The vertical variant does not support space-between.
-.is-vertical.items-justified-center {
-	align-items: center;
-
-	.wp-block-navigation-item {
-		justify-content: center;
-	}
-
-	.wp-block-page-list,
-	.wp-block-navigation__container {
-		align-items: center;
-	}
-}
-
-.is-vertical.items-justified-right {
-	align-items: flex-end;
-
-	.wp-block-navigation-item {
-		justify-content: flex-end;
-	}
-
-	.wp-block-page-list,
-	.wp-block-navigation__container {
-		align-items: flex-end;
-	}
-}
-
 
 /**
  * Mobile menu.
  */
+
+// Override default positioning
+.wp-block-navigation.is-responsive-menu-open {
+	position: fixed;
+	top: 0;
+	left: 0;
+	right: 0;
+	bottom: 0;
+	// Give it a z-index just higher than the adminbar.
+	z-index: 100000;
+	padding: $grid-unit-40;
+}
 
 .wp-block-navigation__responsive-container {
 	display: none;
@@ -419,15 +339,9 @@
 	left: 0;
 	right: 0;
 	bottom: 0;
-	z-index: 1;
-	align-items: flex-start;
-	justify-content: flex-start;
 
 	.wp-block-navigation__responsive-container-content {
-		display: flex;
-
-		// Always vertically align to the top.
-		justify-content: flex-start;
+		display: contents;
 	}
 
 	// Overlay menu.
@@ -436,22 +350,16 @@
 	// but otherwise provide a baseline.
 	// In a future version, we can explore more customizability.
 	&.is-menu-open {
-		display: flex; // Needs to be set to override "none".
-		flex-direction: column;
+		display: contents; // Needs to be set to override "none".
 
 		// Allow modal to scroll.
 		overflow: auto;
-
-		// Give it a z-index just higher than the adminbar.
-		z-index: 100000;
 
 		// Add extra top padding so items don't conflict with close button.
 		padding: 72px 24px 24px 24px;
 		background-color: inherit;
 
 		.wp-block-navigation__responsive-container-content {
-			display: flex;
-			flex-direction: column;
 			padding: 0;
 
 			.wp-block-navigation__submenu-icon {
@@ -474,10 +382,6 @@
 				border: none;
 				padding-left: 32px;
 
-				.items-justified-right & {
-					padding-left: 0;
-					padding-right: 32px;
-				}
 			}
 
 			// Space unfolded items using gap and padding for submenus.
@@ -504,15 +408,6 @@
 				flex-direction: column;
 				justify-content: flex-start;
 				align-items: flex-start;
-
-				// Inherit parent justifications inside the menu.
-				.items-justified-right & {
-					align-items: flex-end;
-				}
-
-				.items-justified-center & {
-					align-items: center;
-				}
 			}
 		}
 
@@ -535,8 +430,7 @@
 	@include break-small() {
 		&:not(.hidden-by-default) {
 			&:not(.is-menu-open) {
-				display: flex;
-				flex-direction: row;
+				display: contents;
 				width: 100%;
 				position: relative;
 				z-index: 2;
@@ -560,8 +454,10 @@
 // Default menu background and font color.
 .wp-block-navigation:not(.has-background)
 .wp-block-navigation__responsive-container.is-menu-open {
-	background-color: #fff;
 	color: #000;
+}
+.wp-block-navigation:not(.has-background).is-responsive-menu-open {
+	background-color: #fff;
 }
 
 // Menu and close buttons.
@@ -588,26 +484,14 @@
 .wp-block-navigation__responsive-container-open {
 	display: flex;
 
+	.is-responsive-menu-open & {
+		display: none; // Or do we need this button to still be screen reader accessible?
+	}
+
 	&:not(.always-shown) {
 		@include break-small {
 			display: none;
 		}
-	}
-
-	// Justify the button.
-	.items-justified-left & {
-		margin-left: 0;
-		margin-right: auto;
-	}
-
-	.items-justified-center & {
-		margin-left: auto;
-		margin-right: auto;
-	}
-
-	.items-justified-right & {
-		margin-left: auto;
-		margin-right: 0;
 	}
 }
 
@@ -633,4 +517,10 @@
 
 html.has-modal-open {
 	overflow: hidden;
+}
+
+.wp-block-navigation__responsive-close,
+.wp-block-navigation__responsive-dialog,
+.wp-block-navigation__container {
+	display: contents;
 }
