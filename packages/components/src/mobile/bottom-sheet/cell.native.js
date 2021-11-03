@@ -52,7 +52,7 @@ class BottomSheetCell extends Component {
 
 	componentDidMount() {
 		this.isCurrent = true;
-		AccessibilityInfo.addEventListener(
+		this.a11yInfoChangeSubscription = AccessibilityInfo.addEventListener(
 			'screenReaderChanged',
 			this.handleScreenReaderToggled
 		);
@@ -68,10 +68,7 @@ class BottomSheetCell extends Component {
 
 	componentWillUnmount() {
 		this.isCurrent = false;
-		AccessibilityInfo.removeEventListener(
-			'screenReaderChanged',
-			this.handleScreenReaderToggled
-		);
+		this.a11yInfoChangeSubscription.remove();
 	}
 
 	handleScreenReaderToggled( isScreenReaderEnabled ) {

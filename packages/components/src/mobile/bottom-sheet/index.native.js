@@ -185,7 +185,10 @@ class BottomSheet extends Component {
 			);
 		}
 
-		Dimensions.addEventListener( 'change', this.onDimensionsChange );
+		this.dimensionsChangeSubscription = Dimensions.addEventListener(
+			'change',
+			this.onDimensionsChange
+		);
 
 		// 'Will' keyboard events are not available on Android.
 		// Reference: https://reactnative.dev/docs/0.61/keyboard#addlistener
@@ -206,7 +209,7 @@ class BottomSheet extends Component {
 	}
 
 	componentWillUnmount() {
-		Dimensions.removeEventListener( 'change', this.onDimensionsChange );
+		this.dimensionsChangeSubscription.remove();
 		this.keyboardShowListener.remove();
 		this.keyboardHideListener.remove();
 		if ( this.androidModalClosedSubscription ) {
