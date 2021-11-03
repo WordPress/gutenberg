@@ -21,8 +21,8 @@ function render_block_core_gallery_data( $parsed_block ) {
 	if ( 'core/gallery' === $parsed_block['blockName'] ) {
 		foreach ( $parsed_block['innerBlocks'] as $key => $inner_block ) {
 			if ( 'core/image' === $inner_block['blockName'] ) {
-				if ( ! $parsed_block['innerBlocks'][$key]['attrs']['data-id'] ) {
-					$parsed_block['innerBlocks'][$key]['attrs']['data-id'] = esc_attr( $inner_block['attrs']['id'] );
+				if ( ! $parsed_block['innerBlocks'][ $key ]['attrs']['data-id'] ) {
+					$parsed_block['innerBlocks'][ $key ]['attrs']['data-id'] = esc_attr( $inner_block['attrs']['id'] );
 				}
 			}
 		}
