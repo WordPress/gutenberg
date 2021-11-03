@@ -13,7 +13,11 @@ import { Clipboard, Platform } from 'react-native';
 /**
  * WordPress dependencies
  */
-import { getBlockTypes, unregisterBlockType } from '@wordpress/blocks';
+import {
+	getBlockTypes,
+	setDefaultBlockName,
+	unregisterBlockType,
+} from '@wordpress/blocks';
 import fetchRequest from '@wordpress/api-fetch';
 import { store as coreStore } from '@wordpress/core-data';
 import { dispatch } from '@wordpress/data';
@@ -68,6 +72,7 @@ const MOCK_BAD_WORDPRESS_RESPONSE = {
 	},
 	html: false,
 };
+const EMBED_NULL_RESPONSE = null;
 
 // Embed block HTML examples
 const EMPTY_EMBED_HTML = '<!-- wp:embed /-->';
@@ -76,11 +81,24 @@ const RICH_TEXT_EMBED_HTML = `<!-- wp:embed {"url":"https://twitter.com/notnowni
 https://twitter.com/notnownikki
 </div></figure>
 <!-- /wp:embed -->`;
+const RICH_TEXT_ERROR_EMBED_HTML = `<!-- wp:embed {"url":"https://twitter.com/testing","type":"rich","providerNameSlug":"twitter","responsive":true} -->
+<figure class="wp-block-embed is-type-rich is-provider-twitter wp-block-embed-twitter"><div class="wp-block-embed__wrapper">
+https://twitter.com/testing
+</div></figure>
+<!-- /wp:embed -->`;
 const PHOTO_EMBED_HTML = `<!-- wp:embed {"url":"https://cloudup.com/cQFlxqtY4ob","type":"photo","providerNameSlug":"cloudup","responsive":true} -->
 <figure class="wp-block-embed is-type-photo is-provider-cloudup wp-block-embed-cloudup"><div class="wp-block-embed__wrapper">
 https://cloudup.com/cQFlxqtY4ob
 </div></figure>
 <!-- /wp:embed -->`;
+const WP_EMBED_HTML = `<!-- wp:embed {"url":"https://wordpress.org/news/2021/07/tatum/","type":"wp-embed","providerNameSlug":"wordpress-news"} -->
+<figure class="wp-block-embed is-type-wp-embed is-provider-wordpress-news wp-block-embed-wordpress-news"><div class="wp-block-embed__wrapper">
+https://wordpress.org/news/2021/07/tatum/
+</div></figure>
+<!-- /wp:embed -->`;
+
+const EMPTY_PARAGRAPH_HTML =
+	'<!-- wp:paragraph --><p></p><!-- /wp:paragraph -->';
 
 const MOST_USED_PROVIDERS = embed.settings.variations.filter( ( { name } ) =>
 	[ 'youtube', 'twitter', 'wordpress', 'vimeo' ].includes( name )
@@ -89,6 +107,12 @@ const MOST_USED_PROVIDERS = embed.settings.variations.filter( ( { name } ) =>
 // Return specified mocked responses for the oembed endpoint.
 const mockEmbedResponses = ( mockedResponses ) => {
 	fetchRequest.mockImplementation( ( { path } ) => {
+		if ( path.startsWith( '/wp/v2/themes' ) ) {
+			return Promise.resolve( [
+				{ theme_supports: { 'responsive-embeds': true } },
+			] );
+		}
+
 		const matchedEmbedResponse = mockedResponses.find(
 			( mockedResponse ) =>
 				path ===
@@ -143,6 +167,7 @@ beforeAll( () => {
 	// block is added to empty posts.
 	registerBlock( paragraph );
 	registerBlock( embed );
+	setDefaultBlockName( paragraph.name );
 } );
 
 beforeEach( () => {
@@ -224,12 +249,12 @@ describe( 'Embed block', () => {
 			fireEvent( embedEditURLModal, 'backdropPress' );
 			fireEvent( embedEditURLModal, MODAL_DISMISS_EVENT );
 
-			// Wait for edit URL button to be present
-			const editURLButton = await waitFor( () =>
-				getByA11yLabel( 'Edit URL' )
+			// Wait for block settings button to be present
+			const settingsButton = await waitFor( () =>
+				getByA11yLabel( 'Open Settings' )
 			);
 
-			expect( editURLButton ).toBeDefined();
+			expect( settingsButton ).toBeDefined();
 			expect( getEditorHtml() ).toMatchSnapshot();
 		} );
 
@@ -256,13 +281,13 @@ describe( 'Embed block', () => {
 			fireEvent( embedEditURLModal, 'backdropPress' );
 			fireEvent( embedEditURLModal, MODAL_DISMISS_EVENT );
 
-			// Wait for edit URL button to be present
-			const editURLButton = await waitFor( () =>
-				getByA11yLabel( 'Edit URL' )
+			// Wait for block settings button to be present
+			const settingsButton = await waitFor( () =>
+				getByA11yLabel( 'Open Settings' )
 			);
 
 			expect( embedLink ).toBeDefined();
-			expect( editURLButton ).toBeDefined();
+			expect( settingsButton ).toBeDefined();
 			expect( getEditorHtml() ).toMatchSnapshot();
 
 			Clipboard.getString.mockReset();
@@ -315,12 +340,12 @@ describe( 'Embed block', () => {
 			fireEvent( embedEditURLModal, 'backdropPress' );
 			fireEvent( embedEditURLModal, MODAL_DISMISS_EVENT );
 
-			// Wait for edit URL button to be present
-			const editURLButton = await waitFor( () =>
-				getByA11yLabel( 'Edit URL' )
+			// Wait for block settings button to be present
+			const settingsButton = await waitFor( () =>
+				getByA11yLabel( 'Open Settings' )
 			);
 
-			expect( editURLButton ).toBeDefined();
+			expect( settingsButton ).toBeDefined();
 			expect( getEditorHtml() ).toMatchSnapshot();
 		} );
 
@@ -350,13 +375,13 @@ describe( 'Embed block', () => {
 			fireEvent( embedEditURLModal, 'backdropPress' );
 			fireEvent( embedEditURLModal, MODAL_DISMISS_EVENT );
 
-			// Wait for edit URL button to be present
-			const editURLButton = await waitFor( () =>
-				getByA11yLabel( 'Edit URL' )
+			// Wait for block settings button to be present
+			const settingsButton = await waitFor( () =>
+				getByA11yLabel( 'Open Settings' )
 			);
 
 			expect( embedLink ).toBeDefined();
-			expect( editURLButton ).toBeDefined();
+			expect( settingsButton ).toBeDefined();
 			expect( getEditorHtml() ).toMatchSnapshot();
 
 			Clipboard.getString.mockReset();
@@ -619,8 +644,7 @@ describe( 'Embed block', () => {
 				getByTestId,
 				getByText,
 			} = await initializeEditor( {
-				initialHtml:
-					'<!-- wp:paragraph --><p></p><!-- /wp:paragraph -->',
+				initialHtml: EMPTY_PARAGRAPH_HTML,
 			} );
 
 			// Paste URL in paragraph block
@@ -663,8 +687,7 @@ describe( 'Embed block', () => {
 				getByTestId,
 				getByText,
 			} = await initializeEditor( {
-				initialHtml:
-					'<!-- wp:paragraph --><p></p><!-- /wp:paragraph -->',
+				initialHtml: EMPTY_PARAGRAPH_HTML,
 			} );
 
 			// Paste URL in paragraph block
@@ -698,6 +721,209 @@ describe( 'Embed block', () => {
 
 			expect( linkText ).toBeDefined();
 			expect( getEditorHtml() ).toMatchSnapshot();
+		} );
+	} );
+
+	describe( 'insert via slash inserter', () => {
+		it( 'insert generic embed block', async () => {
+			const embedBlockSlashInserter = '/Embed';
+			const {
+				getByPlaceholderText,
+				getByA11yLabel,
+				getByText,
+			} = await initializeEditor( { initialHtml: EMPTY_PARAGRAPH_HTML } );
+
+			const paragraphText = getByPlaceholderText( 'Start writing…' );
+			fireEvent( paragraphText, 'focus' );
+			// Trigger onSelectionChange to update both the current text and text selection.
+			// This event is required by the autocompleter, as it only displays the slash inserter
+			// if the text selection is located at the end of the text, for this reason,
+			// the start and end arguments match the text length.
+			fireEvent(
+				paragraphText,
+				'onSelectionChange',
+				embedBlockSlashInserter.length,
+				embedBlockSlashInserter.length,
+				embedBlockSlashInserter,
+				{
+					nativeEvent: {
+						eventCount: 1,
+						target: undefined,
+						text: embedBlockSlashInserter,
+					},
+				}
+			);
+
+			fireEvent.press( await waitFor( () => getByText( 'Embed' ) ) );
+
+			const block = await waitFor( () =>
+				getByA11yLabel( /Embed Block\. Row 1/ )
+			);
+
+			const blockName = within( block ).getByText( 'Embed' );
+
+			expect( blockName ).toBeDefined();
+			expect( getEditorHtml() ).toMatchSnapshot();
+		} );
+
+		MOST_USED_PROVIDERS.forEach( ( { title } ) =>
+			it( `inserts ${ title } embed block`, async () => {
+				const embedBlockSlashInserter = `/${ title }`;
+				const {
+					getByPlaceholderText,
+					getByA11yLabel,
+					getByText,
+				} = await initializeEditor( {
+					initialHtml: EMPTY_PARAGRAPH_HTML,
+				} );
+
+				const paragraphText = getByPlaceholderText( 'Start writing…' );
+				fireEvent( paragraphText, 'focus' );
+				// Trigger onSelectionChange to update both the current text and text selection.
+				// This event is required by the autocompleter, as it only displays the slash inserter
+				// if the text selection is located at the end of the text, for this reason,
+				// the start and end arguments match the text length.
+				fireEvent(
+					paragraphText,
+					'onSelectionChange',
+					embedBlockSlashInserter.length,
+					embedBlockSlashInserter.length,
+					embedBlockSlashInserter,
+					{
+						nativeEvent: {
+							eventCount: 1,
+							target: undefined,
+							text: embedBlockSlashInserter,
+						},
+					}
+				);
+
+				fireEvent.press( await waitFor( () => getByText( title ) ) );
+
+				const block = await waitFor( () =>
+					getByA11yLabel( /Embed Block\. Row 1/ )
+				);
+
+				const blockName = within( block ).getByText( title );
+
+				expect( blockName ).toBeDefined();
+				expect( getEditorHtml() ).toMatchSnapshot();
+			} )
+		);
+	} );
+
+	it( 'sets block caption', async () => {
+		const expectedCaption = 'Caption';
+
+		const waitForElement = ( { getByA11yLabel } ) =>
+			getByA11yLabel( /Embed Block\. Row 1/ );
+		const {
+			element,
+			getByPlaceholderText,
+			getByDisplayValue,
+		} = await initializeEditor(
+			{ initialHtml: RICH_TEXT_EMBED_HTML },
+			{ waitForElement }
+		);
+
+		// Select block
+		fireEvent.press( element );
+
+		// Set a caption
+		const captionField = getByPlaceholderText( 'Add caption' );
+		fireEvent( captionField, 'focus' );
+		fireEvent( captionField, 'onChange', {
+			nativeEvent: {
+				eventCount: 1,
+				target: undefined,
+				text: expectedCaption,
+			},
+		} );
+
+		// Get current caption
+		const caption = await waitFor( () =>
+			getByDisplayValue( `<p>${ expectedCaption }</p>` )
+		);
+
+		expect( caption ).toBeDefined();
+		expect( getEditorHtml() ).toMatchSnapshot();
+	} );
+
+	it( 'displays cannot embed on the placeholder if preview data is null', async () => {
+		// Return null response for requests to oembed endpoint.
+		fetchRequest.mockImplementation( ( { path } ) => {
+			const isEmbedRequest = path.startsWith( '/oembed/1.0/proxy' );
+			return Promise.resolve( isEmbedRequest ? EMBED_NULL_RESPONSE : {} );
+		} );
+
+		const initialHtml = RICH_TEXT_ERROR_EMBED_HTML;
+
+		const waitForElement = ( { getByA11yLabel } ) =>
+			getByA11yLabel( /Embed Block\. Row 1/ );
+		const { element, getByText } = await initializeEditor(
+			{
+				initialHtml,
+			},
+			{ waitForElement }
+		);
+
+		// Select block
+		fireEvent.press( element );
+
+		const cannotEmbedText = getByText( 'Unable to embed media' );
+
+		expect( cannotEmbedText ).toBeDefined();
+		expect( getEditorHtml() ).toMatchSnapshot();
+	} );
+
+	describe( 'block settings', () => {
+		it( 'toggles resize for smaller devices media settings', async () => {
+			const waitForElement = ( { getByA11yLabel } ) =>
+				getByA11yLabel( /Embed Block\. Row 1/ );
+			const {
+				element,
+				getByA11yLabel,
+				getByText,
+			} = await initializeEditor(
+				{ initialHtml: RICH_TEXT_EMBED_HTML },
+				{ waitForElement }
+			);
+
+			// Select block
+			fireEvent.press( element );
+
+			fireEvent.press(
+				await waitFor( () => getByA11yLabel( 'Open Settings' ) )
+			);
+
+			fireEvent.press(
+				await waitFor( () => getByText( /Resize for smaller devices/ ) )
+			);
+
+			expect( getEditorHtml() ).toMatchSnapshot();
+		} );
+
+		it( 'does not show settings button if responsive is not supported', async () => {
+			const waitForElement = ( { getByA11yLabel } ) =>
+				getByA11yLabel( /Embed Block\. Row 1/ );
+			const { element, getByA11yLabel } = await initializeEditor(
+				{ initialHtml: WP_EMBED_HTML },
+				{ waitForElement }
+			);
+
+			// Select block
+			fireEvent.press( element );
+
+			let settingsButton;
+			try {
+				settingsButton = await waitFor( () =>
+					getByA11yLabel( 'Open Settings' )
+				);
+			} catch ( e ) {
+				// NOOP
+			}
+
+			expect( settingsButton ).not.toBeDefined();
 		} );
 	} );
 } );
