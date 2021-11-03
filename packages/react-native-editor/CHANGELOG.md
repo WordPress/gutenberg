@@ -10,6 +10,7 @@ For each user feature we should also add a importance categorization label  to i
 -->
 
 ## Unreleased
+-   [**] [Image block] Add ability to quickly link images to Media Files and Attachment Pages [#34846]
 
 ## 1.65.0
 - [**] Search block - Text and background color support [#35511]
