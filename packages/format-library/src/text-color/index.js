@@ -7,7 +7,7 @@ import { isEmpty } from 'lodash';
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { useCallback, useMemo, useState } from '@wordpress/element';
+import { useCallback, useMemo, useState, Platform } from '@wordpress/element';
 import { RichTextToolbarButton, useSetting } from '@wordpress/block-editor';
 import { Icon, textColor as textColorIcon } from '@wordpress/icons';
 import { removeFormat } from '@wordpress/rich-text';
@@ -69,14 +69,16 @@ function TextColorEdit( {
 	const disableIsAddingColor = useCallback( () => setIsAddingColor( false ), [
 		setIsAddingColor,
 	] );
-	const colorIndicatorStyle = useMemo(
-		() =>
-			fillComputedColors(
-				contentRef.current,
-				getActiveColors( value, name, colors )
-			),
-		[ value, colors ]
-	);
+	const colorIndicatorStyle = useMemo( () => {
+		const currentActiveColors = getActiveColors( value, name, colors );
+		const isWeb = Platform.OS === 'web';
+
+		return isWeb
+			? fillComputedColors( contentRef.current, currentActiveColors )
+			: currentActiveColors?.color && {
+					color: currentActiveColors.color,
+			  };
+	}, [ value, colors ] );
 
 	const hasColorsToChoose = ! isEmpty( colors ) || ! allowCustomControl;
 	if ( ! hasColorsToChoose && ! isActive ) {

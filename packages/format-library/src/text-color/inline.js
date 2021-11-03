@@ -32,7 +32,7 @@ import { textColor as settings } from './index';
 function parseCSS( css = '' ) {
 	return css.split( ';' ).reduce( ( accumulator, rule ) => {
 		if ( rule ) {
-			const [ property, value ] = rule.split( ':' );
+			const [ property, value ] = rule.replace( / /g, '' ).split( ':' );
 			if ( property === 'color' ) accumulator.color = value;
 			if ( property === 'background-color' )
 				accumulator.backgroundColor = value;

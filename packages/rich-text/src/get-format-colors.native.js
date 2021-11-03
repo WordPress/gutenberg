@@ -16,7 +16,7 @@ export function getFormatColors( value, formats, colors ) {
 				if ( currentFormat?.type === FORMAT_TYPE ) {
 					const className = currentFormat?.attributes?.class;
 					currentFormat.attributes.style = currentFormat.attributes.style.replace(
-						' ',
+						/ /g,
 						''
 					);
 
