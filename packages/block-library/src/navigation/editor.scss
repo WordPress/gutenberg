@@ -531,12 +531,42 @@ body.editor-styles-wrapper
 	}
 }
 
-.wp-block-navigation__unsaved-changes-warning {
-	width: 100%;
-
-	.block-editor-warning__actions {
-		margin-top: 0;
+@keyframes fadein {
+	0% {
+		opacity: 0;
 	}
+	100% {
+		opacity: 1;
+	}
+}
+
+.wp-block-navigation__unsaved-changes {
+	position: relative;
+
+	.components-spinner {
+		position: absolute;
+		top: calc(50% - #{$spinner-size} / 2);
+		left: calc(50% - #{$spinner-size} / 2);
+
+		// Delay showing the saving spinner until after 2 seconds.
+		// This should ensure it only shows for slow connections.
+		opacity: 0;
+		animation: 0.5s linear 2s normal forwards fadein;
+	}
+}
+
+@keyframes fadeouthalf {
+	0% {
+		opacity: 1;
+	}
+	100% {
+		opacity: 0.5;
+	}
+}
+
+.wp-block-navigation__unsaved-changes-overlay.is-saving {
+	opacity: 1;
+	animation: 0.5s linear 2s normal forwards fadeouthalf;
 }
 
 .wp-block-navigation-delete-menu-button {

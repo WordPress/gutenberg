@@ -88,7 +88,7 @@ const ExistingMenusDropdown = ( {
 export default function NavigationPlaceholder( {
 	onFinish,
 	canSwitchNavigationMenu,
-	hasResolvedNavigationMenu,
+	hasResolvedNavigationMenus,
 } ) {
 	const [ selectedMenu, setSelectedMenu ] = useState();
 
@@ -189,10 +189,10 @@ export default function NavigationPlaceholder( {
 
 	return (
 		<>
-			{ ( ! hasResolvedNavigationMenu || isStillLoading ) && (
+			{ ( ! hasResolvedNavigationMenus || isStillLoading ) && (
 				<PlaceholderPreview isLoading />
 			) }
-			{ hasResolvedNavigationMenu && ! isStillLoading && (
+			{ hasResolvedNavigationMenus && ! isStillLoading && (
 				<Placeholder className="wp-block-navigation-placeholder">
 					<PlaceholderPreview />
 					<div className="wp-block-navigation-placeholder__controls">
