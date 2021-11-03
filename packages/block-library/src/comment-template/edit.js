@@ -20,11 +20,15 @@ const TEMPLATE = [
 	[ 'core/post-comment-content' ],
 ];
 
+function CommentTemplateInnerBlocks() {
+	const innerBlocksProps = useInnerBlocksProps( {}, { template: TEMPLATE } );
+	return <li { ...innerBlocksProps } />;
+}
+
 export default function CommentTemplateEdit( {
 	clientId,
 	context: { postId, queryPerPage },
 } ) {
-	const innerBlocksProps = useInnerBlocksProps( {}, { template: TEMPLATE } );
 	const blockProps = useBlockProps();
 
 	const [ activeBlockContext, setActiveBlockContext ] = useState();
@@ -74,7 +78,7 @@ export default function CommentTemplateEdit( {
 					>
 						{ blockContext ===
 						( activeBlockContext || blockContexts[ 0 ] ) ? (
-							<li { ...innerBlocksProps } />
+							<CommentTemplateInnerBlocks />
 						) : (
 							<li>
 								<BlockPreview
