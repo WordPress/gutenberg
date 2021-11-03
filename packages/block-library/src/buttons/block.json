@@ -21,8 +21,7 @@
 			"allowSwitching": false,
 			"allowInheriting": false,
 			"default": {
-				"type": "flex",
-				"orientation": "horizontal"
+				"type": "flex"
 			}
 		}
 	},

@@ -43,6 +43,7 @@ export default {
 		layout = {},
 		onChange,
 	} ) {
+		const { allowOrientation = true } = layout;
 		return (
 			<>
 				<Flex>
@@ -53,7 +54,7 @@ export default {
 						/>
 					</FlexItem>
 					<FlexItem>
-						{ layout?.orientation && (
+						{ allowOrientation && (
 							<OrientationControl
 								layout={ layout }
 								onChange={ onChange }
