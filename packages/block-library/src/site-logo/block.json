@@ -17,6 +17,9 @@
 		"linkTarget": {
 			"type": "string",
 			"default": "_self"
+		},
+		"shouldSyncIcon": {
+			"type": "boolean"
 		}
 	},
 	"example": {

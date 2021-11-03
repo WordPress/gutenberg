@@ -58,7 +58,7 @@ const ACCEPT_MEDIA_STRING = 'image/*';
 
 const SiteLogo = ( {
 	alt,
-	attributes: { align, width, height, isLink, linkTarget },
+	attributes: { align, width, height, isLink, linkTarget, shouldSyncIcon },
 	containerRef,
 	isSelected,
 	setAttributes,
@@ -66,10 +66,7 @@ const SiteLogo = ( {
 	logoUrl,
 	siteUrl,
 	logoId,
-	iconId,
 	setIcon,
-	syncSiteIcon,
-	setSyncSiteIcon,
 	canUserEdit,
 } ) => {
 	const clientWidth = useClientWidth( containerRef, [ align ] );
@@ -92,10 +89,6 @@ const SiteLogo = ( {
 			title: siteEntities.title,
 			...pick( getSettings(), [ 'imageEditing', 'maxWidth' ] ),
 		};
-	}, [] );
-
-	useEffect( () => {
-		setSyncSiteIcon( logoId === iconId );
 	}, [] );
 
 	useEffect( () => {
@@ -324,10 +317,10 @@ const SiteLogo = ( {
 							<ToggleControl
 								label={ __( 'Use as site icon' ) }
 								onChange={ ( value ) => {
-									setSyncSiteIcon( value );
+									setAttributes( { shouldSyncIcon: value } );
 									setIcon( value ? logoId : undefined );
 								} }
-								checked={ syncSiteIcon }
+								checked={ shouldSyncIcon }
 								help={ syncSiteIconHelpText }
 							/>
 						</>
@@ -354,9 +347,8 @@ export default function LogoEdit( {
 	setAttributes,
 	isSelected,
 } ) {
-	const { width } = attributes;
+	const { width, shouldSyncIcon } = attributes;
 	const [ logoUrl, setLogoUrl ] = useState();
-	const [ syncSiteIcon, setSyncSiteIcon ] = useState( true );
 	const ref = useRef();
 
 	const {
@@ -406,7 +398,7 @@ export default function LogoEdit( {
 	const { editEntityRecord } = useDispatch( coreStore );
 
 	const setLogo = ( newValue ) => {
-		if ( syncSiteIcon ) {
+		if ( shouldSyncIcon ) {
 			setIcon( newValue );
 		}
 
@@ -427,6 +419,16 @@ export default function LogoEdit( {
 			setLogoUrl( mediaItemData.url );
 		}
 	}
+
+	const onInitialSelectLogo = ( media ) => {
+		// Initialize the syncSiteIcon toggle. If we currently have no Site logo and no
+		// site icon, automatically sync the logo to the icon.
+		if ( shouldSyncIcon === undefined ) {
+			setAttributes( { shouldSyncIcon: ! siteLogoId && ! siteIconId } );
+		}
+		onSelectLogo( media );
+	};
+
 	const onSelectLogo = ( media ) => {
 		if ( ! media ) {
 			return;
@@ -485,11 +487,8 @@ export default function LogoEdit( {
 				setLogo={ setLogo }
 				logoId={ mediaItemData?.id || siteLogoId }
 				siteUrl={ url }
-				iconId={ siteIconId }
 				setIcon={ setIcon }
 				canUserEdit={ canUserEdit }
-				syncSiteIcon={ syncSiteIcon }
-				setSyncSiteIcon={ setSyncSiteIcon }
 			/>
 		);
 	}
@@ -548,7 +547,7 @@ export default function LogoEdit( {
 			) }
 			{ ! logoUrl && canUserEdit && (
 				<MediaPlaceholder
-					onSelect={ onSelectLogo }
+					onSelect={ onInitialSelectLogo }
 					accept={ ACCEPT_MEDIA_STRING }
 					allowedTypes={ ALLOWED_MEDIA_TYPES }
 					onError={ onUploadError }
