@@ -593,3 +593,33 @@ function gutenberg_multiple_block_styles( $metadata ) {
 	return $metadata;
 }
 add_filter( 'block_type_metadata', 'gutenberg_multiple_block_styles' );
+
+
+/**
+ * Allow multiple view scripts per block.
+ *
+ * Filters the metadata provided for registering a block type.
+ *
+ * @param array $metadata Metadata for registering a block type.
+ *
+ * @return array
+ */
+function gutenberg_block_type_metadata_multiple_view_scripts( $metadata ) {
+
+	// Early return if viewScript is empty, or not an array.
+	if ( ! isset( $metadata['viewScript'] ) || ! is_array( $metadata['viewScript'] ) ) {
+		return $metadata;
+	}
+
+	// Register all viewScript items.
+	foreach ( $metadata['viewScript'] as $view_script ) {
+		$item_metadata               = $metadata;
+		$item_metadata['viewScript'] = $view_script;
+		gutenberg_block_type_metadata_view_script( array(), $item_metadata );
+	}
+
+	// Proceed with the default behavior.
+	$metadata['viewScript'] = $metadata['viewScript'][0];
+	return $metadata;
+}
+add_filter( 'block_type_metadata', 'gutenberg_block_type_metadata_multiple_view_scripts' );
