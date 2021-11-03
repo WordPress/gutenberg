@@ -10,10 +10,17 @@ import { __ } from '@wordpress/i18n';
 import {
 	InspectorControls,
 	useBlockProps,
+	useSetting,
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
-import { PanelBody, ResizableBox, RangeControl } from '@wordpress/components';
-import { compose, withInstanceId } from '@wordpress/compose';
+import {
+	BaseControl,
+	PanelBody,
+	ResizableBox,
+	__experimentalUseCustomUnits as useCustomUnits,
+	__experimentalUnitControl as UnitControl,
+} from '@wordpress/components';
+import { compose, withInstanceId, useInstanceId } from '@wordpress/compose';
 import { withDispatch } from '@wordpress/data';
 import { useState, useEffect } from '@wordpress/element';
 import { View } from '@wordpress/primitives';
@@ -23,6 +30,74 @@ const MAX_SPACER_HEIGHT = 500;
 
 const MIN_SPACER_WIDTH = 1;
 const MAX_SPACER_WIDTH = 500;
+
+function DimensionInput( {
+	label,
+	onChange,
+	onUnitChange,
+	unit = 'px',
+	value = '',
+} ) {
+	const [ temporaryInput, setTemporaryInput ] = useState( null );
+
+	const instanceId = useInstanceId( UnitControl );
+	const inputId = `block-cover-height-input-${ instanceId }`;
+	const isPx = unit === 'px';
+
+	const units = useCustomUnits( {
+		availableUnits: useSetting( 'spacing.units' ) || [
+			'px',
+			'em',
+			'rem',
+			'vw',
+			'vh',
+		],
+		defaultValues: { px: '100', em: '10', rem: '10', vw: '10', vh: '25' },
+	} );
+
+	const handleOnChange = ( unprocessedValue ) => {
+		const inputValue =
+			unprocessedValue !== ''
+				? parseFloat( unprocessedValue )
+				: undefined;
+
+		if ( isNaN( inputValue ) && inputValue !== undefined ) {
+			setTemporaryInput( unprocessedValue );
+			return;
+		}
+		setTemporaryInput( null );
+		onChange( inputValue );
+		if ( inputValue === undefined ) {
+			onUnitChange();
+		}
+	};
+
+	const handleOnBlur = () => {
+		if ( temporaryInput !== null ) {
+			setTemporaryInput( null );
+		}
+	};
+
+	const inputValue = temporaryInput !== null ? temporaryInput : value;
+	const min = isPx ? MIN_SPACER_HEIGHT : 0;
+
+	return (
+		<BaseControl label={ label } id={ inputId }>
+			<UnitControl
+				id={ inputId }
+				isResetValueOnUnitChange
+				min={ min }
+				onBlur={ handleOnBlur }
+				onChange={ handleOnChange }
+				onUnitChange={ onUnitChange }
+				style={ { maxWidth: 80 } }
+				unit={ unit }
+				units={ units }
+				value={ inputValue }
+			/>
+		</BaseControl>
+	);
+}
 
 const SpacerEdit = ( {
 	attributes,
@@ -34,20 +109,26 @@ const SpacerEdit = ( {
 } ) => {
 	const { orientation } = context;
 	const [ isResizing, setIsResizing ] = useState( false );
-	const { height, width } = attributes;
-	const updateHeight = ( value ) => {
+	const { height, width, heightUnit, widthUnit } = attributes;
+
+	const heightWithUnit = heightUnit ? `${ height }${ heightUnit }` : height;
+	const widthWithUnit = widthUnit ? `${ width }${ widthUnit }` : width;
+
+	const updateHeight = ( nextHeight ) => {
+		nextHeight = 0 > parseFloat( nextHeight ) ? '0' : nextHeight;
 		setAttributes( {
-			height: value,
+			height: nextHeight,
 		} );
 	};
-	const updateWidth = ( value ) => {
+	const updateWidth = ( nextWidth ) => {
+		nextWidth = 0 > parseFloat( nextWidth ) ? '0' : nextWidth;
 		setAttributes( {
-			width: value,
+			width: nextWidth,
 		} );
 	};
 
-	const handleOnResizeStart = ( ...args ) => {
-		onResizeStart( ...args );
+	const handleOnResizeStart = ( _event, _direction, elt ) => {
+		onResizeStart( _event, _direction, elt );
 		setIsResizing( true );
 	};
 
@@ -83,8 +164,8 @@ const SpacerEdit = ( {
 						}
 					) }
 					size={ {
-						width,
-						height: 24,
+						width: widthWithUnit,
+						height: heightWithUnit,
 					} }
 					minWidth={ MIN_SPACER_WIDTH }
 					enable={ {
@@ -118,9 +199,6 @@ const SpacerEdit = ( {
 						'is-selected': isSelected,
 					}
 				) }
-				size={ {
-					height,
-				} }
 				minHeight={ MIN_SPACER_HEIGHT }
 				enable={ {
 					top: false,
@@ -152,29 +230,45 @@ const SpacerEdit = ( {
 		}
 	}, [] );
 
+	const style = {
+		height: orientation === 'horizontal' ? 24 : heightWithUnit || undefined,
+		width: orientation === 'horizontal' ? widthWithUnit : undefined,
+	};
 	return (
 		<>
-			<View { ...useBlockProps() }>
+			<View { ...useBlockProps() } style={ style }>
 				{ resizableBoxWithOrientation( orientation ) }
 			</View>
 			<InspectorControls>
 				<PanelBody title={ __( 'Spacer settings' ) }>
 					{ orientation === 'horizontal' && (
-						<RangeControl
+						<DimensionInput
 							label={ __( 'Width in pixels' ) }
-							min={ MIN_SPACER_WIDTH }
-							max={ Math.max( MAX_SPACER_WIDTH, width ) }
 							value={ width }
-							onChange={ updateWidth }
+							unit={ widthUnit }
+							onChange={ ( nextWidth ) =>
+								setAttributes( { width: nextWidth } )
+							}
+							onChangeUnit={ ( nextUnit ) =>
+								setAttributes( {
+									widthUnit: nextUnit,
+								} )
+							}
 						/>
 					) }
 					{ orientation !== 'horizontal' && (
-						<RangeControl
+						<DimensionInput
 							label={ __( 'Height in pixels' ) }
-							min={ MIN_SPACER_HEIGHT }
-							max={ Math.max( MAX_SPACER_HEIGHT, height ) }
 							value={ height }
-							onChange={ updateHeight }
+							unit={ heightUnit }
+							onChange={ ( newHeight ) =>
+								setAttributes( { height: newHeight } )
+							}
+							onUnitChange={ ( nextUnit ) =>
+								setAttributes( {
+									heightUnit: nextUnit,
+								} )
+							}
 						/>
 					) }
 				</PanelBody>
