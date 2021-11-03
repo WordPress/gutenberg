@@ -45,6 +45,7 @@ function Example() {
 			{
 				default: 'default',
 				small: 'small',
+				'__unstable-large': '__unstable-large',
 			},
 			'default'
 		),

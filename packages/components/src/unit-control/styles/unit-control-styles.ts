@@ -29,10 +29,13 @@ export const Root = styled.div`
 const paddingStyles = ( { disableUnits, size }: InputProps ) => {
 	const paddings = {
 		default: {
-			paddingRight: disableUnits ? 16 : 8,
+			paddingRight: 8,
 		},
 		small: {
 			paddingRight: 8,
+		},
+		'__unstable-large': {
+			paddingRight: disableUnits ? 16 : 8,
 		},
 	};
 
