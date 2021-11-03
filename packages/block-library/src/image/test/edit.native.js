@@ -8,6 +8,7 @@ import { fireEvent, initializeEditor, waitFor } from 'test/helpers';
  */
 import { registerCoreBlocks } from '@wordpress/block-library';
 import { getBlockTypes, unregisterBlockType } from '@wordpress/blocks';
+import { __ } from '@wordpress/i18n';
 
 /**
  * TODO: Move this module to `<LinkSettings/>` since it's not specific to the <ImageEdit/> block type?
@@ -26,6 +27,12 @@ const unregisterBlocks = () => {
 };
 
 /**
+ * This used to be an `async` function instead of an ordinary function that returns a Promise.
+ * It was deliberately changed because otherwise we'd get unnecessary error logs in the console that look like this:
+ * `Warning: An update to ForwardRef(NavigationContainer) inside a test was not wrapped in act(...).`
+ *
+ * @see https://github.com/WordPress/gutenberg/issues/35685
+ *
  * Utility function to interact with the element under test to pretend that
  * the user pressed elements. This could also be possibly used for `onLayout`
  * events as well, but currently I just wrote it for redundant `onPress` events.
@@ -37,18 +44,45 @@ const unregisterBlocks = () => {
  * @param {Object[]} steps   - Interaction steps to apply to the UI element under test.
  * @param {Object}   element - The UI element under test.
  * @see node_modules/@testing-library/react-native/typings/index.d.ts
- * @return {Promise<void>} - The utility `await`s promises from `waitFor` so it's `async`.
+ * @return {Promise<Object>} - A Promise that resolves to the original element being interacted with if all steps resolve.
  */
-const interactionWithUIElement = async ( steps, element ) => {
-	for ( const step of steps ) {
-		const { find = {}, then = {} } = step;
-		const { event = '' } = then;
-		const [ query = '' ] =
-			Object.keys( find ).filter( ( key ) => !! find[ key ] ) || [];
-		const selector = find[ query ] || '';
-		const subject = await waitFor( () => element[ query ]( selector ) );
-		fireEvent[ event ]( subject );
+const interactionWithUIElement = ( steps, element ) => {
+	const [ step = {}, ...rest ] = steps;
+	const { find = {}, then = {} } = step;
+	const { event = 'none', logBeforeEvent = false } = then;
+	const toQuery = ( query ) => !! find[ query ];
+	const [ query = '' ] = Object.keys( find ).filter( toQuery );
+	const selector = find[ query ] || '';
+
+	if ( logBeforeEvent ) {
+		// eslint-disable-next-line no-console
+		console.log( JSON.stringify( element.toJSON(), null, 1 ) );
 	}
+
+	return new Promise( ( resolve, reject ) => {
+		waitFor( () => element[ query ]( selector ) )
+			.then( ( subject ) => {
+				if ( event !== 'none' ) {
+					fireEvent[ event ]( subject );
+				}
+				if ( rest.length ) {
+					return interactionWithUIElement( rest, element );
+				}
+			} )
+			.then( () => resolve( element ) )
+			.catch( ( { errorStep = step } ) => reject( { errorStep } ) );
+	} ).catch( ( { errorStep } ) => {
+		// eslint-disable-next-line no-console
+		console.error(
+			new Error( `
+				Step:
+				${ JSON.stringify( errorStep ) }
+
+				Element:
+				${ JSON.stringify( element.toJSON() ) }
+			` )
+		);
+	} );
 };
 
 /**
@@ -138,7 +172,7 @@ describe.each( [
 		// Arrange
 		const url = 'https://tonytahmouchtest.files.wordpress.com';
 		const subject = await initializeEditor( { initialHtml } );
-		Clipboard.getString.mockReturnValueOnce( url );
+		Clipboard.getString.mockReturnValue( url );
 
 		// Act
 		const buttonBlockSelector =
@@ -164,11 +198,136 @@ describe.each( [
 
 		// Assert
 		const expectation =
-			'The URL from the Clipboard should NOT be displayed in the Link Settings > Link To field.';
+			'The URL from the Clipboard should NOT be displayed in the ' +
+			'Link Settings > Link To field.';
 		waitFor( () => subject.getByText( url ), {
 			timeout: 50,
 			interval: 10,
 		} )
+			.then( () => done.fail( expectation ) )
+			.catch( () => done() );
+	} );
+
+	/**
+	 * GIVEN a SETTINGS BOTTOM SHEET is displayed;
+	 * GIVEN the CLIPBOARD has a URL copied;
+	 * GIVEN the STATE has NO URL;
+	 * WHEN the USER selects the LINK TO cell;
+	 */
+	it(
+		'should display the LINK PICKER with the FROM CLIPBOARD CELL populated' +
+			' with the URL from the CLIPBOARD.',
+		// eslint-disable-next-line jest/no-done-callback
+		async ( done ) => {
+			// Arrange
+			const url = 'https://tonytahmouchtest.files.wordpress.com';
+			const subject = await initializeEditor( { initialHtml } );
+			Clipboard.getString.mockReturnValue( url );
+
+			// Act
+			const buttonBlockSelector =
+				type === 'core/button' ? 'Button Block. Row 1' : undefined;
+			const imageBlockSelector =
+				type === 'core/image'
+					? 'Double tap and hold to edit'
+					: undefined;
+			await interactionWithUIElement(
+				[
+					{
+						find: {
+							getByA11yLabel: buttonBlockSelector,
+							getByA11yHint: imageBlockSelector,
+						},
+						then: { event: 'press' },
+					},
+					{
+						find: { getByA11yLabel: 'Open Settings' },
+						then: { event: 'press' },
+					},
+					{
+						find: { getByA11yLabel: 'Link to, Search or type URL' },
+						then: { event: 'press' },
+					},
+					{
+						find: {
+							getByA11yLabel: `Copy URL from the clipboard, ${ url }`,
+						},
+					},
+				],
+				subject
+			);
+
+			// Assert
+			try {
+				await waitFor( () => subject.getByText( url ) );
+				await waitFor( () =>
+					subject.getByText( __( 'From clipboard' ) )
+				);
+				done();
+			} catch ( error ) {
+				done.fail(
+					'The URL from the Clipboard SHOULD be displayed in the ' +
+						'Link Settings > Link To > Clipboard Link Suggestion field like this:' +
+						`
+						${ url }
+						${ __( 'From clipboard' ) }
+						`
+				);
+			}
+		}
+	);
+
+	/**
+	 * GIVEN a SETTINGS BOTTOM SHEET is displayed;
+	 * GIVEN the CLIPBOARD has a NON-URL copied;
+	 * GIVEN the STATE has NO URL;
+	 * WHEN the USER selects the LINK TO cell;
+	 */
+	// eslint-disable-next-line jest/no-done-callback
+	it( 'should display the LINK PICKER with NO FROM CLIPBOARD CELL.', async ( done ) => {
+		// Arrange
+		const url = 'tonytahmouchtest.files.wordpress.com';
+		const subject = await initializeEditor( { initialHtml } );
+		Clipboard.getString.mockReturnValue( url );
+
+		// Act
+		const buttonBlockSelector =
+			type === 'core/button' ? 'Button Block. Row 1' : undefined;
+		const imageBlockSelector =
+			type === 'core/image' ? 'Double tap and hold to edit' : undefined;
+		await interactionWithUIElement(
+			[
+				{
+					find: {
+						getByA11yLabel: buttonBlockSelector,
+						getByA11yHint: imageBlockSelector,
+					},
+					then: { event: 'press' },
+				},
+				{
+					find: { getByA11yLabel: 'Open Settings' },
+					then: { event: 'press' },
+				},
+				{
+					find: { getByA11yLabel: 'Link to, Search or type URL' },
+					then: { event: 'press' },
+				},
+				{ find: { getByA11yLabel: `Apply` } },
+			],
+			subject
+		);
+
+		// Assert
+		const expectation =
+			'The URL from the Clipboard should NOT be displayed in the ' +
+			'Link Settings > Link To > Clipboard Link Suggestion field.';
+		waitFor(
+			() => subject.getByA11yLabel( /Copy URL from the clipboard[,]/ ),
+			{
+				timeout: 50,
+				interval: 10,
+			}
+		)
 			.then( () => done.fail( expectation ) )
 			.catch( () => done() );
 	} );
