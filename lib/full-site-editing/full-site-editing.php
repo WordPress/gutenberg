@@ -60,7 +60,7 @@ function gutenberg_adminbar_items( $wp_admin_bar ) {
 		return;
 	}
 
-	// Remove customizer links
+	// Remove customizer links.
 	$wp_admin_bar->remove_node( 'customize' );
 	$wp_admin_bar->remove_node( 'customize-background' );
 	$wp_admin_bar->remove_node( 'customize-header' );
