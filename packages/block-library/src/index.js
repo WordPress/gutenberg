@@ -164,6 +164,7 @@ export const __experimentalGetCoreBlocks = () => [
 	postDate,
 	postExcerpt,
 	postFeaturedImage,
+	postNavigationLink,
 	postTemplate,
 	postTerms,
 	postTitle,
@@ -190,6 +191,7 @@ export const __experimentalGetCoreBlocks = () => [
 	// tableOfContents,
 	tagCloud,
 	templatePart,
+	termDescription,
 	textColumns,
 	verse,
 	video,
@@ -253,8 +255,6 @@ export const __experimentalRegisterExperimentalCoreBlocks =
 								postCommentsCount,
 								postCommentsForm,
 								postCommentsLink,
-								postNavigationLink,
-								termDescription,
 						  ]
 						: [] ),
 				].forEach( registerBlock );
