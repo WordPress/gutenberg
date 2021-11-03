@@ -52,7 +52,8 @@ const deprecatedFlags = {
 const prefixedFlags = {
 	/*
 	 * These were only available in the plugin
-	 * and can be removed after WordPress 5.9 is released.
+	 * and can be removed when the minimum WordPress version
+	 * for the plugin is 5.9.
 	 */
 	'border.customColor': 'border.color',
 	'border.customStyle': 'border.style',
