@@ -19,19 +19,18 @@ import Dropdown from '../dropdown';
 import { ColorPicker } from '../color-picker';
 import CircularOptionPicker from '../circular-option-picker';
 import { VStack } from '../v-stack';
+import { ColorHeading } from './styles';
 
 extend( [ namesPlugin, a11yPlugin ] );
 
-export default function ColorPalette( {
-	clearable = true,
+function SinglePalette( {
 	className,
+	clearColor,
 	colors,
-	disableCustomColors = false,
-	enableAlpha,
 	onChange,
 	value,
+	actions,
 } ) {
-	const clearColor = useCallback( () => onChange( undefined ), [ onChange ] );
 	const colorOptions = useMemo( () => {
 		return map( colors, ( { color, name } ) => {
 			const colordColor = colord( color );
@@ -70,6 +69,60 @@ export default function ColorPalette( {
 			);
 		} );
 	}, [ colors, value, onChange, clearColor ] );
+	return (
+		<CircularOptionPicker
+			className={ className }
+			options={ colorOptions }
+			actions={ actions }
+		/>
+	);
+}
+
+function MultiplePalettes( {
+	className,
+	clearColor,
+	colors,
+	onChange,
+	value,
+	actions,
+} ) {
+	return (
+		<VStack spacing={ 3 } className={ className }>
+			{ colors.map( ( { name, colors: colorPalette }, index ) => {
+				return (
+					<VStack spacing={ 2 } key={ index }>
+						<ColorHeading>{ name }</ColorHeading>
+						<SinglePalette
+							clearColor={ clearColor }
+							colors={ colorPalette }
+							onChange={ onChange }
+							value={ value }
+							actions={
+								colors.length === index + 1 ? actions : null
+							}
+						/>
+					</VStack>
+				);
+			} ) }
+		</VStack>
+	);
+}
+
+export default function ColorPalette( {
+	clearable = true,
+	className,
+	colors,
+	disableCustomColors = false,
+	enableAlpha,
+	onChange,
+	value,
+	__experimentalHasMultipleOrigins = false,
+} ) {
+	const clearColor = useCallback( () => onChange( undefined ), [ onChange ] );
+	const Component = __experimentalHasMultipleOrigins
+		? MultiplePalettes
+		: SinglePalette;
+
 	const renderCustomColorPicker = () => (
 		<ColorPicker
 			color={ value }
@@ -97,8 +150,12 @@ export default function ColorPalette( {
 					) }
 				/>
 			) }
-			<CircularOptionPicker
-				options={ colorOptions }
+			<Component
+				clearable={ clearable }
+				clearColor={ clearColor }
+				colors={ colors }
+				onChange={ onChange }
+				value={ value }
 				actions={
 					!! clearable && (
 						<CircularOptionPicker.ButtonAction
