@@ -35,7 +35,7 @@ function useHasPadding( name ) {
 
 function useHasMargin( name ) {
 	const supports = getSupportedGlobalStylesPanels( name );
-	const [ settings ] = useSetting( 'spacing.customMargin', name );
+	const [ settings ] = useSetting( 'spacing.margin', name );
 
 	return settings && supports.includes( 'margin' );
 }
