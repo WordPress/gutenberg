@@ -494,7 +494,6 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 66F6B74F51BD6921D3AF25F6 /* Pods-GutenbergDemoTests.debug.xcconfig */;
 			buildSettings = {
-				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				GCC_PREPROCESSOR_DEFINITIONS = (
 					"DEBUG=1",
@@ -532,7 +531,6 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 71AC74DFA49CB3BF62D440DB /* Pods-GutenbergDemoTests.release.xcconfig */;
 			buildSettings = {
-				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				COPY_PHASE_STRIP = NO;
 				HEADER_SEARCH_PATHS = (
