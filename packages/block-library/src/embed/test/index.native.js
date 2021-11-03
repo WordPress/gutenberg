@@ -492,6 +492,42 @@ describe( 'Embed block', () => {
 			expect( errorNotice ).toBeDefined();
 			expect( getEditorHtml() ).toMatchSnapshot();
 		} );
+
+		// This test case covers the bug fixed in PR #35460
+		it( 'edits URL after dismissing two times the edit URL bottom sheet with empty value', async () => {
+			const { block, getByTestId, getByText } = await insertEmbedBlock();
+
+			// Wait for edit URL modal to be visible
+			const embedEditURLModal = getByTestId( 'embed-edit-url-modal' );
+			await waitFor( () => embedEditURLModal.props.isVisible );
+
+			// Dismiss the edit URL modal
+			fireEvent( embedEditURLModal, 'backdropPress' );
+			fireEvent( embedEditURLModal, MODAL_DISMISS_EVENT );
+
+			// Select block
+			fireEvent.press( block );
+
+			// Edit URL
+			fireEvent.press( getByText( 'ADD LINK' ) );
+
+			// Wait for edit URL modal to be visible
+			await waitFor( () => embedEditURLModal.props.isVisible );
+
+			// Dismiss the edit URL modal
+			fireEvent( embedEditURLModal, 'backdropPress' );
+			fireEvent( embedEditURLModal, MODAL_DISMISS_EVENT );
+
+			// Edit URL
+			fireEvent.press( getByText( 'ADD LINK' ) );
+
+			// Wait for edit URL modal to be visible
+			const isVisibleThirdTime = await waitFor(
+				() => embedEditURLModal.props.isVisible
+			);
+
+			expect( isVisibleThirdTime ).toBeTruthy();
+		} );
 	} );
 
 	describe( 'alignment options', () => {
