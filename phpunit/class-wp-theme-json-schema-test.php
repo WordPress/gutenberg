@@ -173,8 +173,8 @@ class WP_Theme_JSON_Schema_Test extends WP_UnitTestCase {
 	}
 
 	function test_migrate_v0_to_v1_get_settings() {
-		$defaults   = WP_Theme_JSON_Schema::ALL_BLOCKS_NAME;
-		$root       = WP_Theme_JSON_Schema::ROOT_BLOCK_NAME;
+		$defaults   = WP_Theme_JSON_Schema::V0_ALL_BLOCKS_NAME;
+		$root       = WP_Theme_JSON_Schema::V0_ROOT_BLOCK_NAME;
 		$theme_json = new WP_Theme_JSON_Gutenberg(
 			array(
 				'settings' => array(
@@ -359,8 +359,8 @@ class WP_Theme_JSON_Schema_Test extends WP_UnitTestCase {
 	}
 
 	function test_migrate_v0_to_v1_get_stylesheet() {
-		$root_name       = WP_Theme_JSON_Schema::ROOT_BLOCK_NAME;
-		$all_blocks_name = WP_Theme_JSON_Schema::ALL_BLOCKS_NAME;
+		$root_name       = WP_Theme_JSON_Schema::V0_ROOT_BLOCK_NAME;
+		$all_blocks_name = WP_Theme_JSON_Schema::V0_ALL_BLOCKS_NAME;
 		$theme_json      = new WP_Theme_JSON_Gutenberg( array() );
 		$theme_json->merge(
 			new WP_Theme_JSON_Gutenberg(
