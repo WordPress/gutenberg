@@ -44,6 +44,7 @@ export const InputWithSlider = ( {
 					</Spacer>
 				}
 				hideHTMLArrows
+				size="__unstable-large"
 			/>
 			<RangeControl
 				label={ label }

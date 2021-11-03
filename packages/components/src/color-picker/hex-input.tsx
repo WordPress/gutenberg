@@ -49,6 +49,7 @@ export const HexInput = ( { color, onChange, enableAlpha }: HexInputProps ) => {
 			maxLength={ enableAlpha ? 8 : 6 }
 			label={ __( 'Hex color' ) }
 			hideLabelFromVision
+			size="__unstable-large"
 		/>
 	);
 };
