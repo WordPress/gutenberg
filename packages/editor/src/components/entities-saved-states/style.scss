@@ -59,4 +59,21 @@
 		padding: $grid-unit-20;
 		padding-bottom: $grid-unit-05;
 	}
+
+	.entities-saved-states__discard-changes-panel {
+		// Ensure the discard changes panel accounts for the header and footer height.
+		min-height: calc( 100% - #{$header-height + 84px} );
+	}
+
+	.entities-saved-states__footer {
+		padding: 16px;
+
+		.components-button {
+			width: 100%;
+
+			span {
+				margin: auto;
+			}
+		}
+	}
 }
