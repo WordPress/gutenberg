@@ -72,7 +72,7 @@ function NavigationAreaBlock( { attributes, setAttributes } ) {
 				</ToolbarGroup>
 			</BlockControls>
 			<InspectorControls>
-				<PanelBody title={ __( 'Basic options' ) }>
+				<PanelBody title={ __( 'Options' ) }>
 					<SelectControl
 						label={ _x( 'Area' ) }
 						value={ area }
