@@ -42,7 +42,7 @@ class WP_Theme_JSON_Resolver_Gutenberg_Test extends WP_UnitTestCase {
 
 	function test_translations_are_applied() {
 		add_filter( 'locale', array( $this, 'filter_set_locale_to_polish' ) );
-		load_textdomain( 'block-theme', realpath( __DIR__ . '/data/languages/themes/fse-pl_PL.mo' ) );
+		load_textdomain( 'block-theme', realpath( __DIR__ . '/data/languages/themes/block-theme-pl_PL.mo' ) );
 
 		switch_theme( 'block-theme' );
 		$actual = WP_Theme_JSON_Resolver_Gutenberg::get_theme_data();

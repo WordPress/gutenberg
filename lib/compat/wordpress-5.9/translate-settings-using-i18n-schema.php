@@ -1,4 +1,9 @@
 <?php
+/**
+ * Function to translate json files.
+ *
+ * @package gutenberg
+ */
 
 /**
  * Translates the provided settings value using its i18n schema.
@@ -15,6 +20,7 @@ function gutenberg_translate_settings_using_i18n_schema( $i18n_schema, $settings
 	}
 
 	if ( is_string( $i18n_schema ) && is_string( $settings ) ) {
+		//phpcs:ignore WordPress.WP.I18n.NonSingularStringLiteralText, WordPress.WP.I18n.NonSingularStringLiteralContext, WordPress.WP.I18n.NonSingularStringLiteralDomain, WordPress.WP.I18n.LowLevelTranslationFunction
 		return translate_with_gettext_context( $settings, $i18n_schema, $textdomain );
 	}
 	if ( is_array( $i18n_schema ) && is_array( $settings ) ) {

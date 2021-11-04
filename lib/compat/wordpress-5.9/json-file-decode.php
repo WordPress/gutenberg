@@ -1,4 +1,9 @@
 <?php
+/**
+ * Function to read json files.
+ *
+ * @package gutenberg
+ */
 
 /**
  * Reads and decodes a JSON file.
@@ -21,7 +26,7 @@ function gutenberg_json_file_decode( $filename, $options = array() ) {
 		trigger_error(
 			sprintf(
 				/* translators: %s: Path to the JSON file. */
-				__( "File %s doesn't exist!" ),
+				__( "File %s doesn't exist!", 'gutenberg' ),
 				$filename
 			)
 		);
@@ -35,7 +40,7 @@ function gutenberg_json_file_decode( $filename, $options = array() ) {
 		trigger_error(
 			sprintf(
 				/* translators: 1: Path to the JSON file, 2: Error message. */
-				__( 'Error when decoding a JSON file at path %1$s: %2$s' ),
+				__( 'Error when decoding a JSON file at path %1$s: %2$s', 'gutenberg' ),
 				$filename,
 				json_last_error_msg()
 			)
