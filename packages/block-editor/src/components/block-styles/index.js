@@ -7,10 +7,15 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { useState } from '@wordpress/element';
+import { useState, useMemo } from '@wordpress/element';
 import { useDebounce } from '@wordpress/compose';
 import { ENTER, SPACE } from '@wordpress/keycodes';
-import { Button, __experimentalText as Text } from '@wordpress/components';
+import {
+	Button,
+	__experimentalText as Text,
+	Slot,
+	Fill,
+} from '@wordpress/components';
 
 /**
  * Internal dependencies
@@ -18,12 +23,26 @@ import { Button, __experimentalText as Text } from '@wordpress/components';
 import BlockStylesPreviewPanel from './preview-panel';
 import useStylesForBlocks from './use-styles-for-block';
 
+function BlockStylesPreviewPanelSlot( { scope } ) {
+	return <Slot name={ `BlockStylesPreviewPanel/${ scope }` } />;
+}
+
+function BlockStylesPreviewPanelFill( { children, className, style, scope } ) {
+	return (
+		<Fill name={ `BlockStylesPreviewPanel/${ scope }` }>
+			<div className={ className } style={ style }>
+				{ children }
+			</div>
+		</Fill>
+	);
+}
+
 // Block Styles component for the Settings Sidebar.
-export default function BlockStyles( {
+function BlockStyles( {
 	clientId,
 	onSwitch = noop,
 	onHoverClassName = noop,
-	className = '',
+	scope,
 } ) {
 	const {
 		onSelect,
@@ -31,13 +50,18 @@ export default function BlockStyles( {
 		activeStyle,
 		genericPreviewBlock,
 		className: previewClassName,
-		isFullscreenActive,
 	} = useStylesForBlocks( {
 		clientId,
 		onSwitch,
 	} );
 	const [ hoveredStyle, setHoveredStyle ] = useState( null );
 	const debouncedSetHoveredStyle = useDebounce( setHoveredStyle, 250 );
+	const containerScrollTop = useMemo( () => {
+		const scrollContainer = document.querySelector(
+			'.interface-interface-skeleton__content'
+		);
+		return scrollContainer.scrollTop || 0;
+	}, [ hoveredStyle ] );
 
 	if ( ! stylesToRender || stylesToRender.length === 0 ) {
 		return null;
@@ -58,11 +82,7 @@ export default function BlockStyles( {
 	};
 
 	return (
-		<div
-			className={ classnames( 'block-editor-block-styles', className, {
-				'is-fullscreen-active': isFullscreenActive,
-			} ) }
-		>
+		<div className="block-editor-block-styles">
 			<div className="block-editor-block-styles__variants">
 				{ stylesToRender.map( ( style ) => {
 					const buttonText = style.label || style.name;
@@ -110,13 +130,22 @@ export default function BlockStyles( {
 				} ) }
 			</div>
 			{ hoveredStyle && (
-				<BlockStylesPreviewPanel
-					activeStyle={ activeStyle }
-					className={ previewClassName }
-					genericPreviewBlock={ genericPreviewBlock }
-					style={ hoveredStyle }
-				/>
+				<BlockStylesPreviewPanelFill
+					scope={ scope }
+					className="block-editor-block-styles__preview-panel"
+					style={ { top: 16 + containerScrollTop } }
+				>
+					<BlockStylesPreviewPanel
+						activeStyle={ activeStyle }
+						className={ previewClassName }
+						genericPreviewBlock={ genericPreviewBlock }
+						style={ hoveredStyle }
+					/>
+				</BlockStylesPreviewPanelFill>
 			) }
 		</div>
 	);
 }
+
+BlockStyles.Slot = BlockStylesPreviewPanelSlot;
+export default BlockStyles;

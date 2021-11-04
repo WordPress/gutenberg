@@ -120,6 +120,7 @@ const BlockInspectorSingleBlock = ( {
 				<div>
 					<PanelBody title={ __( 'Styles' ) }>
 						<BlockStyles
+							scope="core/edit-post"
 							clientId={ clientId }
 							className="block-inspector__block-styles"
 						/>

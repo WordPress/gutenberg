@@ -209,6 +209,10 @@ _Returns_
 
 -   `WPElement`: Element.
 
+### BlockStyles
+
+Undocumented declaration.
+
 ### BlockTitle
 
 Renders the block's configured title as a string, or empty if the title
