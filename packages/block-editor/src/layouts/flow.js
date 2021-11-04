@@ -105,18 +105,20 @@ export default {
 	toolBarControls: function DefaultLayoutToolbarControls() {
 		return null;
 	},
-	save: function DefaultLayoutStyle( { selector, layout = {} } ) {
-		const { contentSize, wideSize, outerPadding } = layout;
+	save: function DefaultLayoutStyle( { selector, layout = {}, padding } ) {
+		const { contentSize, wideSize } = layout;
 		const blockGapSupport = useSetting( 'spacing.blockGap' );
 		const hasBlockGapStylesSupport = blockGapSupport !== null;
 
+		// Using important here for the padding to override the inline padding that could be potentially
+		// applied using the custom padding control before the layout inheritance is applied.
 		let style =
 			!! contentSize || !! wideSize
 				? `
 					${ appendSelectors( selector ) } {
-						padding: ${ outerPadding?.top || 0 } ${ outerPadding?.right || 0 } ${
-						outerPadding?.bottom || 0
-				  } ${ outerPadding?.left || 0 }; 
+						padding: ${ padding?.top || 0 } ${ padding?.right || 0 } ${
+						padding?.bottom || 0
+				  } ${ padding?.left || 0 } !important;
 					}
 
 					${ appendSelectors( selector, '> *' ) } {
@@ -131,8 +133,8 @@ export default {
 
 					${ appendSelectors( selector, '> [data-align="full"]' ) } {
 						max-width: none;
-						margin-left: calc( -1 * ${ outerPadding.left || 0 } ) !important;
-						margin-right: calc( -1 * ${ outerPadding.right || 0 } ) !important;
+						margin-left: calc( -1 * ${ padding.left || 0 } ) !important;
+						margin-right: calc( -1 * ${ padding.right || 0 } ) !important;
 					}
 				`
 				: '';

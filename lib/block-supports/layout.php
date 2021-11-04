@@ -28,20 +28,20 @@ function gutenberg_register_layout_support( $block_type ) {
 /**
  * Generates the CSS corresponding to the provided layout.
  *
- * @param string  $selector CSS selector.
- * @param array   $layout   Layout object. The one that is passed has already checked the existance of default block layout.
- * @param boolean $has_block_gap_support Whether the theme has support for the block gap.
+ * @param string     $selector CSS selector.
+ * @param array      $layout  Layout object. The one that is passed has already checked the existance of default block layout.
+ * @param array|null $padding Padding applied to the current block.
+ * @param boolean    $has_block_gap_support Whether the theme has support for the block gap.
  *
  * @return string CSS style.
  */
-function gutenberg_get_layout_style( $selector, $layout, $has_block_gap_support = false ) {
+function gutenberg_get_layout_style( $selector, $layout, $padding, $has_block_gap_support = false ) {
 	$layout_type = isset( $layout['type'] ) ? $layout['type'] : 'default';
 
 	$style = '';
 	if ( 'default' === $layout_type ) {
-		$content_size  = isset( $layout['contentSize'] ) ? $layout['contentSize'] : null;
-		$wide_size     = isset( $layout['wideSize'] ) ? $layout['wideSize'] : null;
-		$outer_padding = isset( $layout['outerPadding'] ) ? $layout['outerPadding'] : array();
+		$content_size = isset( $layout['contentSize'] ) ? $layout['contentSize'] : null;
+		$wide_size    = isset( $layout['wideSize'] ) ? $layout['wideSize'] : null;
 
 		$all_max_width_value  = $content_size ? $content_size : $wide_size;
 		$wide_max_width_value = $wide_size ? $wide_size : $content_size;
@@ -54,12 +54,14 @@ function gutenberg_get_layout_style( $selector, $layout, $has_block_gap_support 
 		$style = '';
 		if ( $content_size || $wide_size ) {
 			$style  = "$selector {";
+			// Using important here to override the inline padding that could be potentially
+			// applied using the custom padding control before the layout inheritance is applied.
 			$style .= sprintf(
-				'padding: %s %s %s %s',
-				isset( $outer_padding['top'] ) ? $outer_padding['top'] : 0,
-				isset( $outer_padding['right'] ) ? $outer_padding['right'] : 0,
-				isset( $outer_padding['bottom'] ) ? $outer_padding['bottom'] : 0,
-				isset( $outer_padding['left'] ) ? $outer_padding['left'] : 0
+				'padding: %s %s %s %s !important',
+				isset( $padding['top'] ) ? $padding['top'] : 0,
+				isset( $padding['right'] ) ? $padding['right'] : 0,
+				isset( $padding['bottom'] ) ? $padding['bottom'] : 0,
+				isset( $padding['left'] ) ? $padding['left'] : 0
 			);
 			$style .= '}';
 			$style .= "$selector > * {";
@@ -70,8 +72,8 @@ function gutenberg_get_layout_style( $selector, $layout, $has_block_gap_support 
 			$style .= "$selector > .alignwide { max-width: " . esc_html( $wide_max_width_value ) . ';}';
 			$style .= "$selector .alignfull {";
 			$style .= 'max-width: none;';
-			$style .= isset( $outer_padding['left'] ) ? sprintf( 'margin-left: calc( -1 * %s ) !important;', $outer_padding['left'] ) : '';
-			$style .= isset( $outer_padding['right'] ) ? sprintf( 'margin-right: calc( -1 * %s ) !important;', $outer_padding['right'] ) : '';
+			$style .= isset( $padding['left'] ) ? sprintf( 'margin-left: calc( -1 * %s ) !important;', $padding['left'] ) : '';
+			$style .= isset( $padding['right'] ) ? sprintf( 'margin-right: calc( -1 * %s ) !important;', $padding['right'] ) : '';
 			$style .= '}';
 		}
 
@@ -167,6 +169,7 @@ function gutenberg_render_layout_support_flag( $block_content, $block ) {
 
 	$block_gap             = wp_get_global_settings( array( 'spacing', 'blockGap' ) );
 	$default_layout        = wp_get_global_settings( array( 'layout' ) );
+	$padding               = _wp_array_get( $block, array( 'attrs', 'style', 'padding' ), null );
 	$has_block_gap_support = isset( $block_gap ) ? null !== $block_gap : false;
 	$default_block_layout  = _wp_array_get( $block_type->supports, array( '__experimentalLayout', 'default' ), array() );
 	$used_layout           = isset( $block['attrs']['layout'] ) ? $block['attrs']['layout'] : $default_block_layout;
@@ -175,10 +178,11 @@ function gutenberg_render_layout_support_flag( $block_content, $block ) {
 			return $block_content;
 		}
 		$used_layout = $default_layout;
+		$padding     = isset( $default_layout['padding'] ) ? $default_layout['padding'] : null;
 	}
 
 	$id              = uniqid();
-	$style           = gutenberg_get_layout_style( ".wp-container-$id", $used_layout, $has_block_gap_support );
+	$style           = gutenberg_get_layout_style( ".wp-container-$id", $used_layout, $padding, $has_block_gap_support );
 	$container_class = 'wp-container-' . $id . ' ';
 	$justify_class   = $used_layout['justifyContent'] ? 'wp-justify-' . $used_layout['justifyContent'] . ' ' : '';
 	// This assumes the hook only applies to blocks with a single wrapper.

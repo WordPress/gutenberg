@@ -20,6 +20,7 @@ import {
 	useIsDimensionsSupportValid,
 } from './dimensions';
 import { cleanEmptyObject } from './utils';
+import { useLayout } from './layout';
 
 /**
  * Determines if there is padding support.
@@ -72,11 +73,19 @@ export function resetPadding( { attributes = {}, setAttributes } ) {
  *
  * @return {boolean} Whether padding setting is disabled.
  */
-export function useIsPaddingDisabled( { name: blockName } = {} ) {
+export function useIsPaddingDisabled( { name: blockName, attributes } = {} ) {
+	const { supportsFlowLayout, config } = useLayout( blockName );
+	const hasInheritedLayout =
+		supportsFlowLayout && !! config && attributes?.layout?.inherit;
 	const isDisabled = ! useSetting( 'spacing.padding' );
 	const isInvalid = ! useIsDimensionsSupportValid( blockName, 'padding' );
 
-	return ! hasPaddingSupport( blockName ) || isDisabled || isInvalid;
+	return (
+		! hasPaddingSupport( blockName ) ||
+		hasInheritedLayout ||
+		isDisabled ||
+		isInvalid
+	);
 }
 
 /**

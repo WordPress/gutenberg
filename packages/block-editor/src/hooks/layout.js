@@ -2,7 +2,7 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import { has } from 'lodash';
+import { get, has } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -34,23 +34,15 @@ const layoutBlockSupportKey = '__experimentalLayout';
 
 function LayoutPanel( { setAttributes, attributes, name: blockName } ) {
 	const { layout } = attributes;
-	const defaultThemeLayout = useSetting( 'layout' );
-	const themeSupportsLayout = useSelect( ( select ) => {
-		const { getSettings } = select( blockEditorStore );
-		return getSettings().supportsLayout;
-	}, [] );
-
-	const layoutBlockSupport = getBlockSupport(
-		blockName,
-		layoutBlockSupportKey,
-		{}
+	const { supportsFlowLayout, defaultLayout, config } = useLayout(
+		blockName
 	);
 	const {
 		allowSwitching,
 		allowEditing = true,
 		allowInheriting = true,
 		default: defaultBlockLayout,
-	} = layoutBlockSupport;
+	} = config;
 
 	if ( ! allowEditing ) {
 		return null;
@@ -58,12 +50,7 @@ function LayoutPanel( { setAttributes, attributes, name: blockName } ) {
 
 	const usedLayout = layout || defaultBlockLayout || {};
 	const { inherit = false, type = 'default' } = usedLayout;
-	/**
-	 * `themeSupportsLayout` is only relevant to the `default/flow`
-	 * layout and it should not be taken into account when other
-	 * `layout` types are used.
-	 */
-	if ( type === 'default' && ! themeSupportsLayout ) {
+	if ( type === 'default' && ! supportsFlowLayout ) {
 		return null;
 	}
 	const layoutType = getLayoutType( type );
@@ -77,7 +64,7 @@ function LayoutPanel( { setAttributes, attributes, name: blockName } ) {
 		<>
 			<InspectorControls>
 				<PanelBody title={ __( 'Layout' ) }>
-					{ allowInheriting && !! defaultThemeLayout && (
+					{ allowInheriting && !! defaultLayout && (
 						<ToggleControl
 							label={ __( 'Inherit default layout' ) }
 							checked={ !! inherit }
@@ -100,7 +87,7 @@ function LayoutPanel( { setAttributes, attributes, name: blockName } ) {
 						<layoutType.inspectorControls
 							layout={ usedLayout }
 							onChange={ onChangeLayout }
-							layoutBlockSupport={ layoutBlockSupport }
+							layoutBlockSupport={ config }
 						/>
 					) }
 				</PanelBody>
@@ -109,7 +96,7 @@ function LayoutPanel( { setAttributes, attributes, name: blockName } ) {
 				<layoutType.toolBarControls
 					layout={ usedLayout }
 					onChange={ onChangeLayout }
-					layoutBlockSupport={ layoutBlockSupport }
+					layoutBlockSupport={ config }
 				/>
 			) }
 		</>
@@ -132,6 +119,26 @@ function LayoutTypeSwitcher( { type, onChange } ) {
 			} ) }
 		</ButtonGroup>
 	);
+}
+
+export function useLayout( blockName ) {
+	const defaultThemeLayout = useSetting( 'layout' );
+	const themeSupportsLayout = useSelect( ( select ) => {
+		const { getSettings } = select( blockEditorStore );
+		return getSettings().supportsLayout;
+	}, [] );
+
+	const layoutBlockSupport = getBlockSupport(
+		blockName,
+		layoutBlockSupportKey,
+		{}
+	);
+
+	return {
+		supportsFlowLayout: themeSupportsLayout,
+		defaultLayout: defaultThemeLayout,
+		config: layoutBlockSupport,
+	};
 }
 
 /**
@@ -203,6 +210,9 @@ export const withLayoutStyles = createHigherOrderComponent(
 		const usedLayout = layout?.inherit
 			? defaultThemeLayout
 			: layout || defaultBlockLayout || {};
+		const padding = layout?.inherit
+			? usedLayout?.padding
+			: get( attributes, [ 'style', 'padding' ] );
 		const className = classnames( props?.className, {
 			[ `wp-container-${ id }` ]: shouldRenderLayoutStyles,
 		} );
@@ -215,6 +225,7 @@ export const withLayoutStyles = createHigherOrderComponent(
 						<LayoutStyle
 							selector={ `.wp-container-${ id }` }
 							layout={ usedLayout }
+							padding={ padding }
 						/>,
 						element
 					) }
