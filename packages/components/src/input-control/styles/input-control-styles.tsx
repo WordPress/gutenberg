@@ -144,9 +144,9 @@ const fontSizeStyles = ( { inputSize: size }: InputProps ) => {
 const sizeStyles = ( { inputSize: size }: InputProps ) => {
 	const sizes = {
 		default: {
-			height: 36,
+			height: 30,
 			lineHeight: 1,
-			minHeight: 36,
+			minHeight: 30,
 			paddingLeft: 8,
 			paddingRight: 8,
 		},
