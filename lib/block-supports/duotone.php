@@ -293,9 +293,8 @@ function gutenberg_tinycolor_string_to_rgb( $color_str ) {
 /**
  * Returns the prefixed id for the duotone filter for use as a CSS id.
  *
- * @param array $preset Duotone preset value as seen in theme.json.
- *
- * @return string Duotone filter CSS id.
+ * @param  array $preset Duotone preset value as seen in theme.json.
+ * @return string        Duotone filter CSS id.
  */
 function gutenberg_get_duotone_filter_id( $preset ) {
 	return 'wp-duotone-' . $preset['slug'];
@@ -304,9 +303,8 @@ function gutenberg_get_duotone_filter_id( $preset ) {
 /**
  * Returns the CSS filter property url to reference the rendered SVG.
  *
- * @param array $preset Duotone preset value as seen in theme.json.
- *
- * @return string Duotone CSS filter property url value.
+ * @param  array $preset Duotone preset value as seen in theme.json.
+ * @return string        Duotone CSS filter property url value.
  */
 function gutenberg_get_duotone_filter_url( $preset ) {
 	$filter_id = gutenberg_get_duotone_filter_id( $preset );
@@ -314,11 +312,12 @@ function gutenberg_get_duotone_filter_url( $preset ) {
 }
 
 /**
- * Renders the duotone filter SVG for the preset.
+ * Returns the duotone filter SVG string for the preset.
  *
- * @param array $preset Duotone preset value as seen in theme.json.
+ * @param  array $preset Duotone preset value as seen in theme.json.
+ * @return string        Duotone SVG filter.
  */
-function gutenberg_render_duotone_filter( $preset ) {
+function gutenberg_get_duotone_filter_svg( $preset ) {
 	$filter_id = gutenberg_get_duotone_filter_id( $preset );
 
 	$duotone_values = array(
@@ -383,6 +382,16 @@ function gutenberg_render_duotone_filter( $preset ) {
 		$svg = trim( $svg );
 	}
 
+	return $svg;
+}
+
+/**
+ * Renders the duotone filter SVG for the preset.
+ *
+ * @param array $preset Duotone preset value as seen in theme.json.
+ */
+function gutenberg_render_duotone_filter( $preset ) {
+	$svg = gutenberg_get_duotone_filter_svg( $preset );
 	add_action(
 		// SVG filters won't render at all in the head of a document and
 		// Safari incorrectly renders SVG filters in the footer, so the
