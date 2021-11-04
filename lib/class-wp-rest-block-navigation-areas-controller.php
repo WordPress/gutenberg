@@ -97,18 +97,12 @@ class WP_REST_Block_Navigation_Areas_Controller extends WP_REST_Controller {
 	 * @return WP_Error|WP_REST_Response Response object on success, or WP_Error object on failure.
 	 */
 	public function get_items( $request ) {
-		$data    = array();
-		$mapping = get_option( 'fse_navigation_areas', array() );
+		$data = array();
 		foreach ( gutenberg_get_navigation_areas() as $name => $description ) {
-			$area              = new stdClass();
-			$area->name        = $name;
-			$area->description = $description;
-			$area->navigation  = ! empty( $mapping[ $name ] ) ? $mapping[ $name ] : null;
-
+			$area          = $this->get_navigation_area_object( $name );
 			$area          = $this->prepare_item_for_response( $area, $request );
 			$data[ $name ] = $this->prepare_response_for_collection( $area );
 		}
-
 		return rest_ensure_response( $data );
 	}
 
@@ -155,15 +149,8 @@ class WP_REST_Block_Navigation_Areas_Controller extends WP_REST_Controller {
 	 * @return WP_Error|WP_REST_Response Response object on success, or WP_Error object on failure.
 	 */
 	public function get_item( $request ) {
-		$name            = $request['area'];
-		$available_areas = gutenberg_get_navigation_areas();
-		$mapping         = get_option( 'fse_navigation_areas', array() );
-
-		$area              = new stdClass();
-		$area->name        = $name;
-		$area->navigation  = ! empty( $mapping[ $name ] ) ? $mapping[ $name ] : null;
-		$area->description = $available_areas[ $name ];
-
+		$name = $request['area'];
+		$area = $this->get_navigation_area_object( $name );
 		$data = $this->prepare_item_for_response( $area, $request );
 
 		return rest_ensure_response( $data );
@@ -184,8 +171,25 @@ class WP_REST_Block_Navigation_Areas_Controller extends WP_REST_Controller {
 		$mapping[ $name ] = $request['navigation'];
 		update_option( 'fse_navigation_areas', $mapping );
 
-		// @TODO: Don't call get_item here
-		return $this->get_item( $request );
+		$area = $this->get_navigation_area_object( $name );
+		$data = $this->prepare_item_for_response( $area, $request );
+		return rest_ensure_response( $data );
+	}
+
+	/**
+	 * Converts navigation area name to a convenient object that this endpoint can reason about.
+	 *
+	 * @param string $name Navigation area name.
+	 * @return stdClass An object representation of the navigation area.
+	 */
+	private function get_navigation_area_object( $name ) {
+		$available_areas   = gutenberg_get_navigation_areas();
+		$mapping           = get_option( 'fse_navigation_areas', array() );
+		$area              = new stdClass();
+		$area->name        = $name;
+		$area->navigation  = ! empty( $mapping[ $name ] ) ? $mapping[ $name ] : null;
+		$area->description = $available_areas[ $name ];
+		return $area;
 	}
 
 	/**
