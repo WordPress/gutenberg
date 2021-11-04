@@ -260,6 +260,9 @@ const EmbedEdit = ( props ) => {
 									url,
 								] );
 							} }
+							openEmbedLinkSettings={ () =>
+								setShowEmbedBottomSheet( true )
+							}
 						/>
 					</View>
 				</>
