@@ -2,55 +2,15 @@
  * WordPress dependencies
  */
 import { useCallback, useMemo } from '@wordpress/element';
-import { applyFormat, removeFormat } from '@wordpress/rich-text';
-import {
-	getColorClassName,
-	getColorObjectByColorValue,
-	useSetting,
-} from '@wordpress/block-editor';
+import { removeFormat } from '@wordpress/rich-text';
+import { useSetting } from '@wordpress/block-editor';
 import { BottomSheet, ColorSettings } from '@wordpress/components';
 
 /**
  * Internal dependencies
  */
 import { textColor as settings } from './index';
-import { getActiveColors } from './inline.js';
-
-function setColors( value, name, colorSettings, colors ) {
-	const { color, backgroundColor } = {
-		...getActiveColors( value, name, colorSettings ),
-		...colors,
-	};
-
-	if ( ! color && ! backgroundColor ) {
-		return removeFormat( value, name );
-	}
-
-	const styles = [];
-	const classNames = [];
-	const attributes = {};
-
-	if ( backgroundColor ) {
-		styles.push( [ 'background-color', backgroundColor ].join( ':' ) );
-	} else {
-		// Override default browser color for mark element.
-		styles.push( [ 'background-color', 'rgba(0, 0, 0, 0)' ].join( ':' ) );
-	}
-
-	if ( color ) {
-		const colorObject = getColorObjectByColorValue( colorSettings, color );
-		if ( colorObject ) {
-			classNames.push( getColorClassName( 'color', colorObject.slug ) );
-		} else {
-			styles.push( [ 'color', color ].join( ':' ) );
-		}
-	}
-
-	if ( styles.length ) attributes.style = styles.join( ';' );
-	if ( classNames.length ) attributes.class = classNames.join( ' ' );
-
-	return applyFormat( value, { type: name, attributes } );
-}
+import { getActiveColors, setColors } from './inline.js';
 
 function ColorPicker( { name, value, onChange } ) {
 	const property = 'color';
