@@ -492,9 +492,9 @@ function gutenberg_enable_content_editor_for_navigation_post_type( $post ) {
 add_action( 'edit_form_after_editor', 'gutenberg_enable_content_editor_for_navigation_post_type', 10, 1 );
 
 /**
- * Fixes the label of the 'wp_navigation' admin menu entry.
+ * Rename the menu title from "All Navigation Menus" to "Navigation Menus".
  */
-function gutenberg_fix_navigation_items_admin_menu_entry() {
+function gutenberg_rename_navigation_menus_admin_menu_entry() {
 	global $submenu;
 	if ( ! isset( $submenu['themes.php'] ) ) {
 		return;
@@ -511,4 +511,4 @@ function gutenberg_fix_navigation_items_admin_menu_entry() {
 	}
 }
 
-add_action( 'admin_menu', 'gutenberg_fix_navigation_items_admin_menu_entry' );
+add_action( 'admin_menu', 'gutenberg_rename_navigation_menus_admin_menu_entry' );
