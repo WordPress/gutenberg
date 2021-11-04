@@ -404,6 +404,16 @@ function gutenberg_render_duotone_filter( $preset ) {
 }
 
 /**
+ * Renders the duotone filter SVG for the preset and returns the filter url.
+ *
+ * @param array $preset Duotone preset value as seen in theme.json.
+ */
+function gutenberg_render_duotone_filter_preset( $preset ) {
+	gutenberg_render_duotone_filter( $preset );
+	return gutenberg_get_duotone_filter_url( $preset );
+}
+
+/**
  * Registers the style and colors block attributes for block types that support it.
  *
  * @param WP_Block_Type $block_type Block Type.
