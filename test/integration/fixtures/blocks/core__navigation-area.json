@@ -2,7 +2,7 @@
 	{
 		"clientId": "_clientId_0",
 		"name": "core/navigation-area",
-		"isValid": false,
+		"isValid": true,
 		"attributes": {
 			"area": "primary"
 		},

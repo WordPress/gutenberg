@@ -3,9 +3,9 @@
 		"blockName": "core/navigation-area",
 		"attrs": {},
 		"innerBlocks": [],
-		"innerHTML": "\n",
+		"innerHTML": "\n<div class=\"wp-block-navigation-area\"></div>\n",
 		"innerContent": [
-			"\n"
+			"\n<div class=\"wp-block-navigation-area\"></div>\n"
 		]
 	}
 ]
