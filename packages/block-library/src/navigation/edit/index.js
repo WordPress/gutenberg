@@ -115,7 +115,7 @@ function Navigation( {
 	const [ areaMenu, setAreaMenu ] = useEntityProp(
 		'root',
 		'navigationArea',
-		'menu',
+		'navigation',
 		navigationArea
 	);
 

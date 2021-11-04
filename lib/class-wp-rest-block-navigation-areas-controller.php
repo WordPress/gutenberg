@@ -103,7 +103,7 @@ class WP_REST_Block_Navigation_Areas_Controller extends WP_REST_Controller {
 			$area              = new stdClass();
 			$area->name        = $name;
 			$area->description = $description;
-			$area->menu        = ! empty( $mapping[ $name ] ) ? $mapping[ $name ] : null;
+			$area->navigation  = ! empty( $mapping[ $name ] ) ? $mapping[ $name ] : null;
 
 			$area          = $this->prepare_item_for_response( $area, $request );
 			$data[ $name ] = $this->prepare_response_for_collection( $area );
@@ -161,7 +161,7 @@ class WP_REST_Block_Navigation_Areas_Controller extends WP_REST_Controller {
 
 		$area              = new stdClass();
 		$area->name        = $name;
-		$area->menu        = ! empty( $mapping[ $name ] ) ? $mapping[ $name ] : null;
+		$area->navigation  = ! empty( $mapping[ $name ] ) ? $mapping[ $name ] : null;
 		$area->description = $available_areas[ $name ];
 
 		$data = $this->prepare_item_for_response( $area, $request );
@@ -178,10 +178,10 @@ class WP_REST_Block_Navigation_Areas_Controller extends WP_REST_Controller {
 	 */
 	public function update_item( $request ) {
 		$name = $request['area'];
-		// @TODO: Validate $request[ 'menu' ]
+		// @TODO: Validate $request[ 'navigation' ]
 
 		$mapping          = get_option( 'fse_navigation_areas', array() );
-		$mapping[ $name ] = $request['menu'];
+		$mapping[ $name ] = $request['navigation'];
 		update_option( 'fse_navigation_areas', $mapping );
 
 		// @TODO: Don't call get_item here
@@ -197,8 +197,8 @@ class WP_REST_Block_Navigation_Areas_Controller extends WP_REST_Controller {
 	 * @return WP_REST_Response Post status data.
 	 */
 	public function prepare_item_for_response( $area, $request ) {
-		$areas = gutenberg_get_navigation_areas();
-		$menu  = ( isset( $areas[ $area->name ] ) ) ? $area->menu : 0;
+		$areas      = gutenberg_get_navigation_areas();
+		$navigation = ( isset( $areas[ $area->name ] ) ) ? $area->navigation : 0;
 
 		$fields = $this->get_fields_for_response( $request );
 		$data   = array();
@@ -211,8 +211,8 @@ class WP_REST_Block_Navigation_Areas_Controller extends WP_REST_Controller {
 			$data['description'] = $area->description;
 		}
 
-		if ( rest_is_field_included( 'menu', $fields ) ) {
-			$data['menu'] = (int) $menu;
+		if ( rest_is_field_included( 'navigation', $fields ) ) {
+			$data['navigation'] = (int) $navigation;
 		}
 
 		$context = ! empty( $request['context'] ) ? $request['context'] : 'view';
@@ -257,7 +257,7 @@ class WP_REST_Block_Navigation_Areas_Controller extends WP_REST_Controller {
 					'context'     => array( 'embed', 'view', 'edit' ),
 					'readonly'    => true,
 				),
-				'menu'        => array(
+				'navigation'  => array(
 					'description' => __( 'The ID of the assigned navigation.', 'gutenberg' ),
 					'type'        => 'integer',
 					'context'     => array( 'embed', 'view', 'edit' ),
