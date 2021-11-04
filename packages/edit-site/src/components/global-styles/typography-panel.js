@@ -114,6 +114,7 @@ export default function TypographyPanel( { name } ) {
 			) }
 			{ hasLineHeightEnabled && (
 				<LineHeightControl
+					__unstableSize="large"
 					value={ lineHeight }
 					onChange={ setLineHeight }
 				/>

@@ -38,6 +38,7 @@ export function LineHeightEdit( props ) {
 	};
 	return (
 		<LineHeightControl
+			__unstableSize="large"
 			value={ style?.typography?.lineHeight }
 			onChange={ onChange }
 		/>

@@ -159,6 +159,7 @@ export const TypographyPanel = () => {
 							isShownByDefault={ true }
 						>
 							<LineHeightControl
+								__unstableSize="large"
 								value={ lineHeight }
 								onChange={ setLineHeight }
 							/>
