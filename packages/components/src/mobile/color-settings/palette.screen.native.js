@@ -26,7 +26,7 @@ import { colorsUtils } from './utils';
 
 import styles from './style.scss';
 
-const HIT_SLOP = { top: 22, bottom: 22, left: 22, right: 22 };
+const HIT_SLOP = { top: 8, bottom: 8, left: 8, right: 8 };
 
 const PaletteScreen = () => {
 	const route = useRoute();
