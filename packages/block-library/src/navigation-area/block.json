@@ -3,7 +3,7 @@
 	"name": "core/navigation-area",
 	"title": "Navigation Area",
 	"category": "theme",
-	"description": "@TODO",
+	"description": "Define a navigation area for your theme. The navigation block associated with this area will be automatically displayed.",
 	"keywords": [
 		"menu",
 		"navigation",
@@ -12,11 +12,11 @@
 	"textdomain": "default",
 	"attributes": {
 		"area": {
-		  "type": "string",
-		  "default": "primary"
+			"type": "string",
+			"default": "primary"
 		},
 		"navigationMenuId": {
-		  "type": "number"
+			"type": "number"
 		}
 	},
 	"providesContext": {
