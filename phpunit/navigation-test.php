@@ -50,7 +50,7 @@ class WP_Navigation_Test extends WP_UnitTestCase {
 		$post = $this->create_navigation_post();
 		$this->assertFalse( $this->supports_block_editor() );
 
-		gutenberg_disable_content_editor_for_navigation_post_type( $post );
+		gutenberg_enable_content_editor_for_navigation_post_type( $post );
 
 		$this->assertTrue( $this->supports_block_editor() );
 	}
@@ -60,7 +60,7 @@ class WP_Navigation_Test extends WP_UnitTestCase {
 		$post = $this->create_non_navigation_post();
 		$this->assertFalse( $this->supports_block_editor() );
 
-		gutenberg_disable_content_editor_for_navigation_post_type( $post );
+		gutenberg_enable_content_editor_for_navigation_post_type( $post );
 
 		$this->assertFalse( $this->supports_block_editor() );
 	}
