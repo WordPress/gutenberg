@@ -361,6 +361,9 @@ function Navigation( {
 							<NavigationMenuDeleteControl
 								onDelete={ () => {
 									replaceInnerBlocks( clientId, [] );
+									if ( navigationArea ) {
+										setAreaMenu( 0 );
+									}
 									setAttributes( {
 										navigationMenuId: undefined,
 									} );
