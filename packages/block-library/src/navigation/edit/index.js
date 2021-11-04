@@ -245,7 +245,9 @@ function Navigation( {
 
 	// Hide the placeholder if an navigation menu entity has loaded.
 	useEffect( () => {
-		setIsPlaceholderShown( ! isEntityAvailable );
+		if ( isEntityAvailable ) {
+			setIsPlaceholderShown( false );
+		}
 	}, [ isEntityAvailable ] );
 
 	// If the block has inner blocks, but no menu id, this was an older
