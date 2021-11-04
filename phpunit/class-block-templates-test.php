@@ -194,7 +194,7 @@ class Block_Templates_Test extends WP_UnitTestCase {
 	/**
 	 * Should retrieve the template from the theme files.
 	 */
-	function test_gutenberg_get_block_template_from_file() {
+	function test_get_block_template_from_file() {
 		$id       = get_stylesheet() . '//' . 'index';
 		$template = get_block_template( $id, 'wp_template' );
 		$this->assertEquals( $id, $template->id );
@@ -219,7 +219,7 @@ class Block_Templates_Test extends WP_UnitTestCase {
 	/**
 	 * Should retrieve the template from the CPT.
 	 */
-	function test_gutenberg_get_block_template_from_post() {
+	function test_get_block_template_from_post() {
 		$id       = get_stylesheet() . '//' . 'my_template';
 		$template = get_block_template( $id, 'wp_template' );
 		$this->assertEquals( $id, $template->id );
