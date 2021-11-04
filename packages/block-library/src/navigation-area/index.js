@@ -1,7 +1,6 @@
 /**
  * WordPress dependencies
  */
-import { __ } from '@wordpress/i18n';
 import { symbolFilled as icon } from '@wordpress/icons';
 
 /**
@@ -19,7 +18,7 @@ export const settings = {
 	icon,
 	example: {
 		attributes: {
-			content: 'Lorem ipsum.',
+			area: 'primary',
 		},
 	},
 	edit,
