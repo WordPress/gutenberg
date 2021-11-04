@@ -1,14 +1,14 @@
 /**
  * External dependencies
  */
-import { noop } from 'lodash';
+import { noop, debounce } from 'lodash';
 import classnames from 'classnames';
 
 /**
  * WordPress dependencies
  */
 import { useState, useLayoutEffect } from '@wordpress/element';
-import { useDebounce, useViewportMatch } from '@wordpress/compose';
+import { useViewportMatch } from '@wordpress/compose';
 import { ENTER, SPACE } from '@wordpress/keycodes';
 import {
 	Button,
@@ -27,12 +27,10 @@ function BlockStylesPreviewPanelSlot( { scope } ) {
 	return <Slot name={ `BlockStylesPreviewPanel/${ scope }` } />;
 }
 
-function BlockStylesPreviewPanelFill( { children, className, style, scope } ) {
+function BlockStylesPreviewPanelFill( { children, scope, ...props } ) {
 	return (
 		<Fill name={ `BlockStylesPreviewPanel/${ scope }` }>
-			<div className={ className } style={ style }>
-				{ children }
-			</div>
+			<div { ...props }>{ children }</div>
 		</Fill>
 	);
 }
@@ -57,28 +55,30 @@ function BlockStyles( {
 	const [ hoveredStyle, setHoveredStyle ] = useState( null );
 	const [ containerScrollTop, setContainerScrollTop ] = useState( 0 );
 	const isMobileViewport = useViewportMatch( 'medium', '<' );
-	const debouncedSetHoveredStyle = useDebounce( setHoveredStyle, 300 );
-	const hasHoveredStyle = hoveredStyle !== null; // Prevent multiple recalculation of scrollTop.
 
 	useLayoutEffect( () => {
 		const scrollContainer = document.querySelector(
 			'.interface-interface-skeleton__content'
 		);
 		setContainerScrollTop( scrollContainer.scrollTop + 16 );
-	}, [ hasHoveredStyle ] );
+	}, [ hoveredStyle ] );
 
 	if ( ! stylesToRender || stylesToRender.length === 0 ) {
 		return null;
 	}
 
+	const debouncedSetHoveredStyle = debounce( setHoveredStyle, 250 );
+
 	const onSelectStylePreview = ( style ) => {
 		onSelect( style );
 		onHoverClassName( null );
 		setHoveredStyle( null );
+		debouncedSetHoveredStyle.cancel();
 	};
 
 	const styleItemHandler = ( item ) => {
 		if ( hoveredStyle === item ) {
+			debouncedSetHoveredStyle.cancel();
 			return;
 		}
 		debouncedSetHoveredStyle( item );
@@ -138,6 +138,7 @@ function BlockStyles( {
 					scope={ scope }
 					className="block-editor-block-styles__preview-panel"
 					style={ { top: containerScrollTop } }
+					onMouseLeave={ () => styleItemHandler( null ) }
 				>
 					<BlockStylesPreviewPanel
 						activeStyle={ activeStyle }
