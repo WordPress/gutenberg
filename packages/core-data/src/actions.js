@@ -710,6 +710,43 @@ export function __experimentalResetEditedEntityRecord( kind, name, recordId ) {
 }
 
 /**
+ * Action triggered to reset only specified properties for the entity.
+ *
+ * @param {string} kind         Kind of the entity.
+ * @param {string} name         Name of the entity.
+ * @param {Object} recordId     ID of the record.
+ * @param {Array}  itemsToReset List of entity properties to reset.
+ */
+export const __experimentalResetSpecifiedEntityEdits = (
+	kind,
+	name,
+	recordId,
+	itemsToReset
+) => async ( { select, dispatch } ) => {
+	if ( ! select.hasEditsForEntityRecord( kind, name, recordId ) ) {
+		return;
+	}
+	const edits = select.getEntityRecordNonTransientEdits(
+		kind,
+		name,
+		recordId
+	);
+	const editsToDiscard = {};
+	for ( const edit in edits ) {
+		if ( itemsToReset.some( ( item ) => item === edit ) ) {
+			editsToDiscard[ edit ] = edits[ edit ];
+		}
+	}
+	return await dispatch( {
+		type: 'RESET_SPECIFIED_ENTITY_RECORD_EDITS',
+		kind,
+		name,
+		recordId,
+		edits: Object.keys( editsToDiscard ),
+	} );
+};
+
+/**
  * Returns an action object used in signalling that Upload permissions have been received.
  *
  * @param {boolean} hasUploadPermissions Does the user have permission to upload files?

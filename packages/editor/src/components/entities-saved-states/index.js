@@ -75,6 +75,7 @@ export default function EntitiesSavedStates( { close } ) {
 		saveEditedEntityRecord,
 		__experimentalSaveSpecifiedEntityEdits: saveSpecifiedEntityEdits,
 		__experimentalResetEditedEntityRecord: resetEditedEntityRecord,
+		__experimentalResetSpecifiedEntityEdits: resetSpecifiedEntityEdits,
 	} = useDispatch( coreStore );
 
 	// To group entities by type.
@@ -206,7 +207,12 @@ export default function EntitiesSavedStates( { close } ) {
 				resetEditedEntityRecord( kind, name, key );
 			}
 		} );
-		//resetSpecifiedEntityEdits( 'root', 'site', undefined, siteItemsToDiscard );
+		resetSpecifiedEntityEdits(
+			'root',
+			'site',
+			undefined,
+			siteItemsToDiscard
+		);
 	};
 
 	// Explicitly define this with no argument passed.  Using `close` on
