@@ -27,51 +27,6 @@ function _gutenberg_get_template_paths( $base_directory ) {
 }
 
 /**
- * Retrieves the template file from the theme for a given slug.
- *
- * @access private
- * @internal
- *
- * @param string $template_type wp_template or wp_template_part.
- * @param string $slug template slug.
- *
- * @return array|null Template.
- */
-function _gutenberg_get_template_file( $template_type, $slug ) {
-	$template_base_paths = array(
-		'wp_template'      => 'block-templates',
-		'wp_template_part' => 'block-template-parts',
-	);
-	$themes              = array(
-		get_stylesheet() => get_stylesheet_directory(),
-		get_template()   => get_template_directory(),
-	);
-	foreach ( $themes as $theme_slug => $theme_dir ) {
-		$file_path = $theme_dir . '/' . $template_base_paths[ $template_type ] . '/' . $slug . '.html';
-		if ( file_exists( $file_path ) ) {
-			$new_template_item = array(
-				'slug'  => $slug,
-				'path'  => $file_path,
-				'theme' => $theme_slug,
-				'type'  => $template_type,
-			);
-
-			if ( 'wp_template_part' === $template_type ) {
-				return _gutenberg_add_template_part_area_info( $new_template_item );
-			}
-
-			if ( 'wp_template' === $template_type ) {
-				return _gutenberg_add_template_info( $new_template_item );
-			}
-
-			return $new_template_item;
-		}
-	}
-
-	return null;
-}
-
-/**
  * Retrieves the template files from  the theme.
  *
  * @access private
@@ -385,7 +340,7 @@ function gutenberg_get_block_file_template( $id, $template_type = 'wp_template' 
 		return apply_filters( 'get_block_file_template', null, $id, $template_type );
 	}
 
-	$template_file = _gutenberg_get_template_file( $template_type, $slug );
+	$template_file = _get_block_template_file( $template_type, $slug );
 	if ( null === $template_file ) {
 		/** This filter is documented at the end of this function */
 		return apply_filters( 'get_block_file_template', null, $id, $template_type );
