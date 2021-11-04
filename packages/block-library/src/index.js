@@ -239,6 +239,7 @@ export const __experimentalRegisterExperimentalCoreBlocks =
 	process.env.GUTENBERG_PHASE === 2
 		? ( { enableFSEBlocks } = {} ) => {
 				[
+					// Experimental blocks.
 					homeLink,
 
 					// Full Site Editing blocks.
