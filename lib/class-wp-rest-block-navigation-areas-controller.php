@@ -99,7 +99,7 @@ class WP_REST_Block_Navigation_Areas_Controller extends WP_REST_Controller {
 	public function get_items( $request ) {
 		$data    = array();
 		$mapping = get_option( 'fse_navigation_areas', array() );
-		foreach ( $this->get_available_areas() as $name => $description ) {
+		foreach ( gutenberg_get_navigation_areas() as $name => $description ) {
 			$area              = new stdClass();
 			$area->name        = $name;
 			$area->description = $description;
@@ -110,15 +110,6 @@ class WP_REST_Block_Navigation_Areas_Controller extends WP_REST_Controller {
 		}
 
 		return rest_ensure_response( $data );
-	}
-
-	private function get_available_areas() {
-		// @TODO: Source that from theme.json
-		return array(
-			'primary'   => 'Primary',
-			'secondary' => 'Secondary',
-			'tertiary'  => 'Tertiary',
-		);
 	}
 
 	/**
@@ -137,7 +128,7 @@ class WP_REST_Block_Navigation_Areas_Controller extends WP_REST_Controller {
 				array( 'status' => rest_authorization_required_code() )
 			);
 		}
-		if ( ! array_key_exists( $request['area'], $this->get_available_areas() ) ) {
+		if ( ! array_key_exists( $request['area'], gutenberg_get_navigation_areas() ) ) {
 			return new WP_Error( 'rest_navigation_area_invalid', __( 'Invalid navigation area.', 'gutenberg' ), array( 'status' => 404 ) );
 		}
 
@@ -165,7 +156,7 @@ class WP_REST_Block_Navigation_Areas_Controller extends WP_REST_Controller {
 	 */
 	public function get_item( $request ) {
 		$name            = $request['area'];
-		$available_areas = $this->get_available_areas();
+		$available_areas = gutenberg_get_navigation_areas();
 		$mapping         = get_option( 'fse_navigation_areas', array() );
 
 		$area              = new stdClass();
@@ -206,7 +197,7 @@ class WP_REST_Block_Navigation_Areas_Controller extends WP_REST_Controller {
 	 * @return WP_REST_Response Post status data.
 	 */
 	public function prepare_item_for_response( $area, $request ) {
-		$areas = $this->get_available_areas();
+		$areas = gutenberg_get_navigation_areas();
 		$menu  = ( isset( $areas[ $area->name ] ) ) ? $area->menu : 0;
 
 		$fields = $this->get_fields_for_response( $request );

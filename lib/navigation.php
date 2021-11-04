@@ -517,3 +517,38 @@ function gutenberg_rename_navigation_menus_admin_menu_entry() {
 }
 
 add_action( 'admin_menu', 'gutenberg_rename_navigation_menus_admin_menu_entry' );
+
+/**
+ * Registers the navigation areas supported by the current theme. The expected
+ * shape of the argument is:
+ * array(
+ *     'primary'   => 'Primary',
+ *     'secondary' => 'Secondary',
+ *     'tertiary'  => 'Tertiary',
+ * )
+ *
+ * @param array $new_areas Supported navigation areas.
+ */
+function gutenberg_register_navigation_areas( $new_areas ) {
+	global $gutenberg_navigation_areas;
+	$gutenberg_navigation_areas = $new_areas;
+}
+
+// Register the default navigation areas.
+gutenberg_register_navigation_areas(
+	array(
+		'primary'   => 'Primary',
+		'secondary' => 'Secondary',
+		'tertiary'  => 'Tertiary',
+	)
+);
+
+/**
+ * Returns the available navigation areas.
+ *
+ * @return array Registered navigation areas.
+ */
+function gutenberg_get_navigation_areas() {
+	global $gutenberg_navigation_areas;
+	return $gutenberg_navigation_areas;
+}
