@@ -269,29 +269,24 @@ $color-control-label-height: 20px;
 		opacity: 0.3;
 	}
 
-	// Don't show the preview boxes for an empty nav block,
-	// but be technically present to help size the empty state.
-	.wp-block-navigation.is-selected & {
-		display: flex;
-		opacity: 0;
-		width: 0;
-		overflow: hidden;
-		flex-wrap: nowrap;
-		flex: 0;
-	}
+	&:not(.is-loading) {
+		// Don't show the preview boxes for an empty nav block,
+		// but be technically present to help size the empty state.
+		.wp-block-navigation.is-selected & {
+			display: flex;
+			opacity: 0;
+			width: 0;
+			overflow: hidden;
+			flex-wrap: nowrap;
+			flex: 0;
+		}
 
-	// Hide entirely when vertical.
-	.is-vertical.is-selected & {
-		display: none;
-	}
-
-	// Hide entirely when the placeholder can still be toggled.
-	.wp-block-navigation.is-selected .is-small & {
-		display: none;
-	}
-
-	.wp-block-navigation.is-selected .is-medium & {
-		display: none;
+		// Hide entirely when vertical.
+		.is-vertical.is-selected &,
+		.wp-block-navigation.is-selected .is-small &,
+		.wp-block-navigation.is-selected .is-medium & {
+			display: none;
+		}
 	}
 }
 

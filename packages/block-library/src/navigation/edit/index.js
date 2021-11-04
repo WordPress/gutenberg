@@ -119,8 +119,10 @@ function Navigation( {
 		navigationArea
 	);
 
+	const navigationAreaMenu = areaMenu === 0 ? undefined : areaMenu;
+
 	const navigationMenuId = navigationArea
-		? areaMenu
+		? navigationAreaMenu
 		: attributes.navigationMenuId;
 
 	const setNavigationMenuId = useCallback(
@@ -157,8 +159,10 @@ function Navigation( {
 		setHasSavedUnsavedInnerBlocks,
 	] = useState( false );
 
+	const isWithinUnassignedArea = navigationArea && ! navigationMenuId;
+
 	const [ isPlaceholderShown, setIsPlaceholderShown ] = useState(
-		! hasExistingNavItems
+		! hasExistingNavItems || isWithinUnassignedArea
 	);
 
 	const [ isResponsiveMenuOpen, setResponsiveMenuVisibility ] = useState(
@@ -251,7 +255,8 @@ function Navigation( {
 	// Either this block was saved in the content or inserted by a pattern.
 	// Consider this 'unsaved'. Offer an uncontrolled version of inner blocks,
 	// that automatically saves the menu.
-	const hasUnsavedBlocks = hasExistingNavItems && ! isEntityAvailable;
+	const hasUnsavedBlocks =
+		hasExistingNavItems && ! isEntityAvailable && ! isWithinUnassignedArea;
 	if ( hasUnsavedBlocks ) {
 		return (
 			<UnsavedInnerBlocks
@@ -342,11 +347,11 @@ function Navigation( {
 						/>
 					) }
 					<ToolbarGroup>{ listViewToolbarButton }</ToolbarGroup>
-					<ToolbarGroup>
-						{ isDraftNavigationMenu && (
+					{ isDraftNavigationMenu && (
+						<ToolbarGroup>
 							<NavigationMenuPublishButton />
-						) }
-					</ToolbarGroup>
+						</ToolbarGroup>
+					) }
 				</BlockControls>
 				{ listViewModal }
 				<InspectorControls>
