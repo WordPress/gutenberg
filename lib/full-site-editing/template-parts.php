@@ -163,28 +163,3 @@ function set_unique_slug_on_create_template_part( $post_id ) {
 
 remove_action( 'save_post_wp_template_part', 'wp_set_unique_slug_on_create_template_part' );
 add_action( 'save_post_wp_template_part', 'set_unique_slug_on_create_template_part' );
-
-/**
- * Checks whether the input 'area' is a supported value.
- * Returns the input if supported, otherwise returns the 'uncategorized' value.
- *
- * @param string $type Template part area name.
- *
- * @return string Input if supported, else the uncategorized value.
- */
-function gutenberg_filter_template_part_area( $type ) {
-	$allowed_areas = array_map(
-		function ( $item ) {
-			return $item['area'];
-		},
-		get_allowed_block_template_part_areas()
-	);
-	if ( in_array( $type, $allowed_areas, true ) ) {
-		return $type;
-	}
-
-	/* translators: %1$s: Template area type, %2$s: the uncategorized template area value. */
-	$warning_message = sprintf( __( '"%1$s" is not a supported wp_template_part area value and has been added as "%2$s".', 'gutenberg' ), $type, WP_TEMPLATE_PART_AREA_UNCATEGORIZED );
-	trigger_error( $warning_message, E_USER_NOTICE );
-	return WP_TEMPLATE_PART_AREA_UNCATEGORIZED;
-}

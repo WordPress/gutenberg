@@ -211,6 +211,33 @@ if ( ! function_exists( 'get_default_block_template_types' ) ) {
 	}
 }
 
+if ( ! function_exists( '_filter_block_template_part_area' ) ) {
+	/**
+	 * Checks whether the input 'area' is a supported value.
+	 * Returns the input if supported, otherwise returns the 'uncategorized' value.
+	 *
+	 * @param string $type Template part area name.
+	 *
+	 * @return string Input if supported, else the uncategorized value.
+	 */
+	function _filter_block_template_part_area( $type ) {
+		$allowed_areas = array_map(
+			function ( $item ) {
+				return $item['area'];
+			},
+			get_allowed_block_template_part_areas()
+		);
+		if ( in_array( $type, $allowed_areas, true ) ) {
+			return $type;
+		}
+
+		/* translators: %1$s: Template area type, %2$s: the uncategorized template area value. */
+		$warning_message = sprintf( __( '"%1$s" is not a supported wp_template_part area value and has been added as "%2$s".', 'gutenberg' ), $type, WP_TEMPLATE_PART_AREA_UNCATEGORIZED );
+		trigger_error( $warning_message, E_USER_NOTICE );
+		return WP_TEMPLATE_PART_AREA_UNCATEGORIZED;
+	}
+}
+
 if ( ! function_exists( '_add_block_template_part_area_info' ) ) {
 	/**
 	 * Attempts to add the template part's area information to the input template.
@@ -226,7 +253,7 @@ if ( ! function_exists( '_add_block_template_part_area_info' ) ) {
 
 		if ( isset( $theme_data[ $template_info['slug'] ]['area'] ) ) {
 			$template_info['title'] = $theme_data[ $template_info['slug'] ]['title'];
-			$template_info['area']  = gutenberg_filter_template_part_area( $theme_data[ $template_info['slug'] ]['area'] );
+			$template_info['area']  = _filter_block_template_part_area( $theme_data[ $template_info['slug'] ]['area'] );
 		} else {
 			$template_info['area'] = WP_TEMPLATE_PART_AREA_UNCATEGORIZED;
 		}
