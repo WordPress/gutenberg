@@ -133,8 +133,8 @@ export default {
 
 					${ appendSelectors( selector, '> [data-align="full"]' ) } {
 						max-width: none;
-						margin-left: calc( -1 * ${ padding.left || 0 } ) !important;
-						margin-right: calc( -1 * ${ padding.right || 0 } ) !important;
+						margin-left: calc( -1 * ${ padding?.left || 0 } ) !important;
+						margin-right: calc( -1 * ${ padding?.right || 0 } ) !important;
 					}
 				`
 				: '';
