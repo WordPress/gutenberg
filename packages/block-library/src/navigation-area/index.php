@@ -1,4 +1,9 @@
 <?php
+/**
+ * Server-side rendering of the `core/navigation-area` block.
+ *
+ * @package gutenberg
+ */
 
 /**
  * Registers the `core/navigation-area` block on the server.
