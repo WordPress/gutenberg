@@ -165,7 +165,6 @@ class WP_REST_Block_Navigation_Areas_Controller extends WP_REST_Controller {
 	 */
 	public function update_item( $request ) {
 		$name = $request['area'];
-		// @TODO: Validate $request[ 'navigation' ]
 
 		$mapping          = get_option( 'fse_navigation_areas', array() );
 		$mapping[ $name ] = $request['navigation'];
