@@ -29,7 +29,7 @@ function render_block_core_image( $attributes, $content ) {
 
 
 /**
- * Register image block.
+ * Registers the `core/image` block on server.
  */
 function register_block_core_image() {
 	register_block_type_from_metadata(
