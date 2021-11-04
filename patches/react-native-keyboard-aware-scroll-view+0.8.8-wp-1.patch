@@ -1,0 +1,21 @@
+diff --git a/node_modules/react-native-keyboard-aware-scroll-view/lib/KeyboardAwareHOC.js b/node_modules/react-native-keyboard-aware-scroll-view/lib/KeyboardAwareHOC.js
+index 30f62c9..1337506 100644
+--- a/node_modules/react-native-keyboard-aware-scroll-view/lib/KeyboardAwareHOC.js
++++ b/node_modules/react-native-keyboard-aware-scroll-view/lib/KeyboardAwareHOC.js
+@@ -264,9 +264,13 @@ function KeyboardAwareHOC(
+       })
+     }
+ 
+-    componentWillReceiveProps(nextProps: KeyboardAwareHOCProps) {
+-      if (nextProps.viewIsInsideTabBar !== this.props.viewIsInsideTabBar) {
+-        const keyboardSpace: number = nextProps.viewIsInsideTabBar
++    // This patch changed from the deprecated `componentWillReceiveProps` to
++    // `componentDidUpdate`. We can remove this patch when we upgrade to
++    // `react-native-keyboard-aware-scroll-view@^0.9.2`
++    // https://git.io/JPbOK
++    componentDidUpdate(prevProps: KeyboardAwareHOCProps) {
++      if (this.props.viewIsInsideTabBar !== prevProps.viewIsInsideTabBar) {
++        const keyboardSpace: number = this.props.viewIsInsideTabBar
+           ? _KAM_DEFAULT_TAB_BAR_HEIGHT
+           : 0
+         if (this.state.keyboardSpace !== keyboardSpace) {
