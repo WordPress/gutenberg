@@ -220,10 +220,6 @@ class BottomSheet extends Component {
 		}
 		this.safeAreaEventSubscription.remove();
 		this.safeAreaEventSubscription = null;
-		SafeArea.removeEventListener(
-			'safeAreaInsetsForRootViewDidChange',
-			this.onSafeAreaInsetsUpdate
-		);
 	}
 
 	onSafeAreaInsetsUpdate( result ) {
