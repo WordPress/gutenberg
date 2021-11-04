@@ -672,9 +672,9 @@ they will be merged and returned.
 
 _Parameters_
 
--   _props_ `Object`: Optional. Props to pass to the element. Must contain the ref if one is defined.
 -   _options_ `Object`: Preview options.
 -   _options.blocks_ `WPBlock[]`: Block objects.
+-   _options.props_ `Object`: Optional. Props to pass to the element. Must contain the ref if one is defined.
 -   _options.\_\_experimentalLayout_ `Object`: Layout settings to be used in the preview.
 
 ### useBlockProps

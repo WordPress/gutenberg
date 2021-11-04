@@ -42,8 +42,9 @@ function ReadOnlyContent( { layout, userCanEdit, postType, postId } ) {
 		return rawContent ? parse( rawContent ) : [];
 	}, [ rawContent ] );
 
-	const blockPreviewProps = useBlockPreview( blockProps, {
+	const blockPreviewProps = useBlockPreview( {
 		blocks,
+		props: blockProps,
 		__experimentalLayout: themeSupportsLayout ? usedLayout : undefined,
 	} );
 

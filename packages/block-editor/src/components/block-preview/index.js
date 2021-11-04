@@ -79,17 +79,18 @@ export default memo( BlockPreview );
  * returns. Optionally, you can also pass any other props through this hook, and
  * they will be merged and returned.
  *
- * @param {Object}    props                        Optional. Props to pass to the element. Must contain
- *                                                 the ref if one is defined.
  * @param {Object}    options                      Preview options.
  * @param {WPBlock[]} options.blocks               Block objects.
+ * @param {Object}    options.props                Optional. Props to pass to the element. Must contain
+ *                                                 the ref if one is defined.
  * @param {Object}    options.__experimentalLayout Layout settings to be used in the preview.
  *
  */
-export function useBlockPreview(
+export function useBlockPreview( {
+	blocks,
 	props = {},
-	{ blocks, __experimentalLayout }
-) {
+	__experimentalLayout,
+} ) {
 	const originalSettings = useSelect(
 		( select ) => select( blockEditorStore ).getSettings(),
 		[]
