@@ -646,7 +646,7 @@ export const saveEditedEntityRecord = (
 	}
 	const entities = await dispatch( getKindEntities( kind ) );
 	const entity = find( entities, { kind, name } );
-	if ( ! entity || entity?.__experimentalNoFetch ) {
+	if ( ! entity ) {
 		return;
 	}
 	const entityIdKey = entity.key || DEFAULT_ENTITY_KEY;
