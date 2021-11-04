@@ -964,15 +964,15 @@ class REST_Nav_Menu_Items_Controller_Test extends WP_Test_REST_Post_Type_Control
 			}
 
 			if ( 'post_type' === $data['type'] ) {
-				$this->assertArrayHasKey( 'https://api.w.org/object', $links );
-				$this->assertArrayHasKey( $data['type'], $links['https://api.w.org/object'][0]['attributes'] );
-				$this->assertEquals( $links['https://api.w.org/object'][0]['href'], rest_url( rest_get_route_for_post( $data['object_id'] ) ) );
+				$this->assertArrayHasKey( 'https://api.w.org/menu-item-object', $links );
+				$this->assertArrayHasKey( $data['type'], $links['https://api.w.org/menu-item-object'][0]['attributes'] );
+				$this->assertEquals( $links['https://api.w.org/menu-item-object'][0]['href'], rest_url( rest_get_route_for_post( $data['object_id'] ) ) );
 			}
 
 			if ( 'taxonomy' === $data['type'] ) {
-				$this->assertArrayHasKey( 'https://api.w.org/object', $links );
-				$this->assertArrayHasKey( $data['type'], $links['https://api.w.org/object'][0]['attributes'] );
-				$this->assertEquals( $links['https://api.w.org/object'][0]['href'], rest_url( rest_get_route_for_term( $data['object_id'] ) ) );
+				$this->assertArrayHasKey( 'https://api.w.org/menu-item-object', $links );
+				$this->assertArrayHasKey( $data['type'], $links['https://api.w.org/menu-item-object'][0]['attributes'] );
+				$this->assertEquals( $links['https://api.w.org/menu-item-object'][0]['href'], rest_url( rest_get_route_for_term( $data['object_id'] ) ) );
 			}
 		}
 	}

@@ -771,7 +771,7 @@ class WP_REST_Menu_Items_Controller extends WP_REST_Posts_Controller {
 		}
 
 		if ( $path && $type ) {
-			$links['https://api.w.org/object'][] = array(
+			$links['https://api.w.org/menu-item-object'][] = array(
 				'href'       => rest_url( $path ),
 				$key         => $type,
 				'embeddable' => true,
