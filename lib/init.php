@@ -106,6 +106,14 @@ function gutenberg_site_editor_menu() {
 			'gutenberg-edit-site',
 			'gutenberg_edit_site_page'
 		);
+
+		add_theme_page(
+			__( 'Styles', 'gutenberg' ),
+			__( 'Styles', 'gutenberg' ),
+			'edit_theme_options',
+			'gutenberg-edit-site&styles=open',
+			'gutenberg_edit_site_page'
+		);
 	}
 }
 add_action( 'admin_menu', 'gutenberg_site_editor_menu', 9 );

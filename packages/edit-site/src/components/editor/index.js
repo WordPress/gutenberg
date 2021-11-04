@@ -103,6 +103,7 @@ function Editor( { initialSettings, onError } ) {
 	const { setPage, setIsInserterOpened, updateSettings } = useDispatch(
 		editSiteStore
 	);
+	const { enableComplementaryArea } = useDispatch( interfaceStore );
 	useEffect( () => {
 		updateSettings( initialSettings );
 	}, [] );
@@ -159,6 +160,19 @@ function Editor( { initialSettings, onError } ) {
 			document.body.classList.remove( 'is-navigation-sidebar-open' );
 		}
 	}, [ isNavigationOpen ] );
+
+	useEffect(
+		function openGlobalStylesOnLoad() {
+			const searchParams = new URLSearchParams( window.location.search );
+			if ( searchParams.get( 'styles' ) === 'open' ) {
+				enableComplementaryArea(
+					'core/edit-site',
+					'edit-site/global-styles'
+				);
+			}
+		},
+		[ enableComplementaryArea ]
+	);
 
 	// Don't render the Editor until the settings are set and loaded
 	const isReady =
