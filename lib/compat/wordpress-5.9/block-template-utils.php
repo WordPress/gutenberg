@@ -640,23 +640,22 @@ if ( ! function_exists( 'get_block_templates' ) ) {
 				}
 			}
 		}
+		/**
+		 * Filters the array of queried block templates array after they've been fetched.
+		 *
+		 * @since 10.8
+		 *
+		 * @param WP_Block_Template[] $query_result Array of found block templates.
+		 * @param array $query {
+		 *     Optional. Arguments to retrieve templates.
+		 *
+		 *     @type array  $slug__in List of slugs to include.
+		 *     @type int    $wp_id Post ID of customized template.
+		 * }
+		 * @param array $template_type wp_template or wp_template_part.
+		 */
+		return apply_filters( 'get_block_templates', $query_result, $query, $template_type );
 	}
-
-	/**
-	 * Filters the array of queried block templates array after they've been fetched.
-	 *
-	 * @since 10.8
-	 *
-	 * @param WP_Block_Template[] $query_result Array of found block templates.
-	 * @param array $query {
-	 *     Optional. Arguments to retrieve templates.
-	 *
-	 *     @type array  $slug__in List of slugs to include.
-	 *     @type int    $wp_id Post ID of customized template.
-	 * }
-	 * @param array $template_type wp_template or wp_template_part.
-	 */
-	return apply_filters( 'get_block_templates', $query_result, $query, $template_type );
 }
 
 if ( ! function_exists( 'get_block_template' ) ) {
