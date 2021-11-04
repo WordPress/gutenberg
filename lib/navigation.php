@@ -472,6 +472,26 @@ function gutenberg_disable_content_editor_for_navigation_post_type( $post ) {
 add_action( 'edit_form_after_title', 'gutenberg_disable_content_editor_for_navigation_post_type', 10, 1 );
 
 /**
+ * This callback enables content editor for wp_navigation type posts.
+ * We need to enable it back because we disable it to hide
+ * the content editor for wp_navigation type posts.
+ *
+ * @see gutenberg_disable_content_editor_for_navigation_post_type
+ *
+ * @param WP_Post $post An instance of WP_Post class.
+ */
+function gutenberg_enable_content_editor_for_navigation_post_type( $post ) {
+	$post_type = get_post_type( $post );
+	if ( 'wp_navigation' !== $post_type ) {
+		return;
+	}
+
+	add_post_type_support( $post_type, 'editor' );
+}
+
+add_action( 'edit_form_after_editor', 'gutenberg_enable_content_editor_for_navigation_post_type', 10, 1 );
+
+/**
  * Fixes the label of the 'wp_navigation' admin menu entry.
  */
 function gutenberg_fix_navigation_items_admin_menu_entry() {
