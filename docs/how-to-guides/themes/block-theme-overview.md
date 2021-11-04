@@ -98,13 +98,20 @@ Note that it won't take precedence over any of your theme's templates with highe
 
 Some blocks have been made specifically for block themes. For example, you'll most likely use the **Site Title** block in your site's header while your **single** block template will most likely include a **Post Title** and a **Post Content** block.
 
-As we're still early in the process, the number of blocks specifically dedicated to these block templates is relatively small but more will be added as we move forward with the project. As of Gutenberg 8.5, the following blocks are currently available:
+As we're still early in the process, the number of blocks specifically dedicated to these block templates is relatively small but more will be added as we move forward with the project. As of Gutenberg 11.9, the following blocks are currently available:
 
 -   Site Title
+-   Site Logo
+-   Site Tagline
 -   Template Part
 -   Query
 -   Query Loop
 -   Query Pagination
+-   Header
+-   Footer
+-   Login/logout
+-   Archive Title
+-   Term Description
 -   Post Title
 -   Post Content
 -   Post Author
@@ -119,6 +126,8 @@ As we're still early in the process, the number of blocks specifically dedicated
 -   Post Featured Image
 -   Post Hierarchical Terms
 -   Post Tags
+-   Previous Post
+-   Next Post
 
 ## Styling
 
