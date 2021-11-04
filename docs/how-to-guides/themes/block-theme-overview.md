@@ -107,8 +107,9 @@ As we're still early in the process, the number of blocks specifically dedicated
 -   Query
 -   Query Loop
 -   Query Pagination
--   Header
--   Footer
+-   Header (alias of the related template part)
+-   Footer (alias of the related template part)
+-   Pattern
 -   Login/logout
 -   Archive Title
 -   Term Description
@@ -124,7 +125,7 @@ As we're still early in the process, the number of blocks specifically dedicated
 -   Post Date
 -   Post Excerpt
 -   Post Featured Image
--   Post Hierarchical Terms
+-   Post Categories
 -   Post Tags
 -   Previous Post
 -   Next Post
