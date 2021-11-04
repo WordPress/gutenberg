@@ -316,24 +316,20 @@ function gutenberg_register_duotone_support( $block_type ) {
 }
 
 /**
- * Renders the duotone filter SVG and returns the CSS filter property to
- * reference the rendered SVG.
+ * Renders the duotone filter SVG for the preset.
  *
  * @param array $preset Duotone preset value as seen in theme.json.
- *
- * @return string Duotone CSS filter property.
  */
-function gutenberg_render_duotone_filter_preset( $preset ) {
-	$duotone_id     = $preset['slug'];
-	$duotone_colors = $preset['colors'];
-	$filter_id      = 'wp-duotone-' . $duotone_id;
+function gutenberg_render_duotone_filter( $preset ) {
+	$filter_id = gutenberg_get_duotone_filter_id( $preset );
+
 	$duotone_values = array(
 		'r' => array(),
 		'g' => array(),
 		'b' => array(),
 		'a' => array(),
 	);
-	foreach ( $duotone_colors as $color_str ) {
+	foreach ( $preset['colors'] as $color_str ) {
 		$color = gutenberg_tinycolor_string_to_rgb( $color_str );
 
 		$duotone_values['r'][] = $color['r'] / 255;
@@ -398,8 +394,29 @@ function gutenberg_render_duotone_filter_preset( $preset ) {
 			echo $svg;
 		}
 	);
+}
 
+/**
+ * Returns the CSS filter property url to reference the rendered SVG.
+ *
+ * @param array $preset Duotone preset value as seen in theme.json.
+ *
+ * @return string Duotone CSS filter property url value.
+ */
+function gutenberg_get_duotone_filter_url( $preset ) {
+	$filter_id = gutenberg_get_duotone_filter_id( $preset );
 	return "url('#" . $filter_id . "')";
+}
+
+/**
+ * Returns the prefixed id for the duotone filter for use as a CSS id.
+ *
+ * @param array $preset Duotone preset value as seen in theme.json.
+ *
+ * @return string Duotone filter CSS id.
+ */
+function gutenberg_get_duotone_filter_id( $preset ) {
+	return 'wp-duotone-' . $preset['slug'];
 }
 
 /**
@@ -426,12 +443,12 @@ function gutenberg_render_duotone_support( $block_content, $block ) {
 		return $block_content;
 	}
 
-	$filter_preset   = array(
+	$filter_preset = array(
 		'slug'   => uniqid(),
 		'colors' => $block['attrs']['style']['color']['duotone'],
 	);
-	$filter_property = gutenberg_render_duotone_filter_preset( $filter_preset );
-	$filter_id       = 'wp-duotone-' . $filter_preset['slug'];
+	$filter_url    = gutenberg_get_duotone_filter_url( $filter_preset );
+	$filter_id     = gutenberg_get_duotone_filter_id( $filter_preset );
 
 	$scope     = '.' . $filter_id;
 	$selectors = explode( ',', $duotone_support );
@@ -444,12 +461,14 @@ function gutenberg_render_duotone_support( $block_content, $block ) {
 	// !important is needed because these styles render before global styles,
 	// and they should be overriding the duotone filters set by global styles.
 	$filter_style = defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG
-		? $selector . " {\n\tfilter: " . $filter_property . " !important;\n}\n"
-		: $selector . '{filter:' . $filter_property . ' !important;}';
+		? $selector . " {\n\tfilter: " . $filter_url . " !important;\n}\n"
+		: $selector . '{filter:' . $filter_url . ' !important;}';
 
 	wp_register_style( $filter_id, false, array(), true, true );
 	wp_add_inline_style( $filter_id, $filter_style );
 	wp_enqueue_style( $filter_id );
+
+	gutenberg_render_duotone_filter( $filter_preset );
 
 	// Like the layout hook, this assumes the hook only applies to blocks with a single wrapper.
 	return preg_replace(
