@@ -79,8 +79,8 @@ class Block_Templates_Test extends WP_UnitTestCase {
 		wp_delete_post( self::$post->ID );
 	}
 
-	function test_gutenberg_build_template_result_from_file() {
-		$template = _gutenberg_build_template_result_from_file(
+	function test_build_block_template_result_from_file() {
+		$template = _build_block_template_result_from_file(
 			array(
 				'slug' => 'single',
 				'path' => __DIR__ . '/fixtures/template.html',
@@ -98,7 +98,7 @@ class Block_Templates_Test extends WP_UnitTestCase {
 		$this->assertEquals( 'wp_template', $template->type );
 
 		// Test template parts.
-		$template_part = _gutenberg_build_template_result_from_file(
+		$template_part = _build_block_template_result_from_file(
 			array(
 				'slug' => 'header',
 				'path' => __DIR__ . '/fixtures/template.html',

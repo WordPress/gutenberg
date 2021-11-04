@@ -79,48 +79,6 @@ function _gutenberg_get_template_files( $template_type ) {
 }
 
 /**
- * Build a unified template object based on a theme file.
- *
- * @param array $template_file Theme file.
- * @param array $template_type wp_template or wp_template_part.
- *
- * @return WP_Block_Template Template.
- */
-function _gutenberg_build_template_result_from_file( $template_file, $template_type ) {
-	$default_template_types = get_default_block_template_types();
-	$template_content       = file_get_contents( $template_file['path'] );
-	$theme                  = wp_get_theme()->get_stylesheet();
-
-	$template                 = new WP_Block_Template();
-	$template->id             = $theme . '//' . $template_file['slug'];
-	$template->theme          = $theme;
-	$template->content        = _inject_theme_attribute_in_block_template_content( $template_content );
-	$template->slug           = $template_file['slug'];
-	$template->source         = 'theme';
-	$template->type           = $template_type;
-	$template->title          = ! empty( $template_file['title'] ) ? $template_file['title'] : $template_file['slug'];
-	$template->status         = 'publish';
-	$template->has_theme_file = true;
-	$template->is_custom      = true;
-
-	if ( 'wp_template' === $template_type && isset( $default_template_types[ $template_file['slug'] ] ) ) {
-		$template->description = $default_template_types[ $template_file['slug'] ]['description'];
-		$template->title       = $default_template_types[ $template_file['slug'] ]['title'];
-		$template->is_custom   = false;
-	}
-
-	if ( 'wp_template' === $template_type && isset( $template_file['postTypes'] ) ) {
-		$template->post_types = $template_file['postTypes'];
-	}
-
-	if ( 'wp_template_part' === $template_type && isset( $template_file['area'] ) ) {
-		$template->area = $template_file['area'];
-	}
-
-	return $template;
-}
-
-/**
  * Retrieves a list of unified template objects based on a query.
  *
  * @param array $query {
@@ -213,7 +171,7 @@ function gutenberg_get_block_templates( $query = array(), $template_type = 'wp_t
 	if ( ! isset( $query['wp_id'] ) ) {
 		$template_files = _gutenberg_get_template_files( $template_type );
 		foreach ( $template_files as $template_file ) {
-			$template = _gutenberg_build_template_result_from_file( $template_file, $template_type );
+			$template = _build_block_template_result_from_file( $template_file, $template_type );
 
 			if ( $post_type && ! $template->is_custom ) {
 				continue;
