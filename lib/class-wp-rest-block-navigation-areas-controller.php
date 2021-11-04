@@ -230,8 +230,6 @@ class WP_REST_Block_Navigation_Areas_Controller extends WP_REST_Controller {
 
 		$response = rest_ensure_response( $data );
 
-		// $response->add_links( $this->prepare_links( $data ) );
-
 		/**
 		 * Filters a navigation area returned from the REST API.
 		 *
@@ -289,43 +287,6 @@ class WP_REST_Block_Navigation_Areas_Controller extends WP_REST_Controller {
 		return array(
 			'context' => $this->get_context_param( array( 'default' => 'view' ) ),
 		);
-	}
-
-	/**
-	 * Prepares links for the request.
-	 *
-	 * @param stdClass $area navigation area.
-	 *
-	 * @return array Links for the given navigation area.
-	 */
-	protected function prepare_links( $area ) {
-		$base = sprintf( '%s/%s', $this->namespace, $this->rest_base );
-
-		// Entity meta.
-		$links = array(
-			'self'       => array(
-				'href' => rest_url( trailingslashit( $base ) . $area->name ),
-			),
-			'collection' => array(
-				'href' => rest_url( $base ),
-			),
-		);
-
-		$areas = get_nav_navigation_areas();
-		$menu      = ( isset( $areas[ $area->name ] ) ) ? $areas[ $area->name ] : 0;
-		if ( $menu ) {
-			$taxonomy_object = get_taxonomy( 'nav_menu' );
-			if ( $taxonomy_object->show_in_rest ) {
-				$rest_base                         = ! empty( $taxonomy_object->rest_base ) ? $taxonomy_object->rest_base : $taxonomy_object->name;
-				$url                               = rest_url( sprintf( '__experimental/%s/%d', $rest_base, $menu ) );
-				$links['https://api.w.org/menu'][] = array(
-					'href'       => $url,
-					'embeddable' => true,
-				);
-			}
-		}
-
-		return $links;
 	}
 
 }
