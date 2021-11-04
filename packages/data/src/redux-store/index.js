@@ -22,9 +22,9 @@ import metadataReducer from './metadata/reducer';
 import * as metadataSelectors from './metadata/selectors';
 import * as metadataActions from './metadata/actions';
 
-/** @typedef {import('../types').WPDataRegistry} WPDataRegistry */
-/** @typedef {import('../types').WPDataStore} WPDataStore */
-/** @typedef {import('../types').WPDataReduxStoreConfig} WPDataReduxStoreConfig */
+/** @typedef {import('../types').DataRegistry} WPDataRegistry */
+/** @typedef {import('../types').StoreDefinition} WPDataStore */
+/** @typedef {import('../types').StoreConfig} WPDataReduxStoreConfig */
 
 const trimUndefinedValues = ( array ) => {
 	const result = [ ...array ];
