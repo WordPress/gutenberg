@@ -4,7 +4,8 @@ require_relative '../../../node_modules/react-native/scripts/react_native_pods'
 require_relative '../../../node_modules/@react-native-community/cli-platform-ios/native_modules'
 
 # Uncomment the next line to define a global platform for your project
-platform :ios, '13.0'
+app_ios_deployment_target = Gem::Version.new('13.0')
+platform :ios, app_ios_deployment_target.version
 
 target 'GutenbergDemo' do
   # Comment the next line if you don't want to use dynamic frameworks
@@ -25,6 +26,18 @@ target 'GutenbergDemo' do
   post_install do |installer|
     react_native_post_install(installer)
     __apply_Xcode_12_5_M1_post_install_workaround(installer)
+
+    # Let Pods targets inherit deployment target from the app
+    # This solution is suggested here: https://github.com/CocoaPods/CocoaPods/issues/4859
+    installer.pods_project.targets.each do |target|
+        # Exclude RCT-Folly as it requires explicit deployment target https://git.io/JPb73
+        if (target.name != 'RCT-Folly')
+          target.build_configurations.each do |configuration|
+            pod_ios_deployment_target = Gem::Version.new(configuration.build_settings['IPHONEOS_DEPLOYMENT_TARGET'])
+            configuration.build_settings.delete 'IPHONEOS_DEPLOYMENT_TARGET' if pod_ios_deployment_target <= app_ios_deployment_target
+          end
+        end
+    end
 
     ### Begin workaround for https://github.com/facebook/react-native/issues/31034
     # Can be removed when this issue is resolved.
