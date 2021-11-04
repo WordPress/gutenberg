@@ -37,6 +37,8 @@ function DimensionInput( {
 	onUnitChange,
 	unit = 'px',
 	value = '',
+	max,
+	min,
 } ) {
 	const [ temporaryInput, setTemporaryInput ] = useState( null );
 
@@ -56,7 +58,7 @@ function DimensionInput( {
 	} );
 
 	const handleOnChange = ( unprocessedValue ) => {
-		const inputValue =
+		let inputValue =
 			unprocessedValue !== ''
 				? parseFloat( unprocessedValue )
 				: undefined;
@@ -66,6 +68,10 @@ function DimensionInput( {
 			return;
 		}
 		setTemporaryInput( null );
+
+		if ( isPx ) {
+			inputValue = Math.min( inputValue, max );
+		}
 		onChange( inputValue );
 		if ( inputValue === undefined ) {
 			onUnitChange();
@@ -79,14 +85,16 @@ function DimensionInput( {
 	};
 
 	const inputValue = temporaryInput !== null ? temporaryInput : value;
-	const min = isPx ? MIN_SPACER_HEIGHT : 0;
+	const minValue = isPx ? min : 0;
+	const maxValue = isPx ? max : undefined;
 
 	return (
 		<BaseControl label={ label } id={ inputId }>
 			<UnitControl
 				id={ inputId }
 				isResetValueOnUnitChange
-				min={ min }
+				min={ minValue }
+				max={ maxValue }
 				onBlur={ handleOnBlur }
 				onChange={ handleOnChange }
 				onUnitChange={ onUnitChange }
@@ -101,7 +109,7 @@ function DimensionInput( {
 
 const ResizableSpacer = ( {
 	orientation,
-	maxValue,
+	max,
 	onResizeStart,
 	onResize,
 	onResizeStop,
@@ -135,7 +143,7 @@ const ResizableSpacer = ( {
 				}
 			} }
 			onResizeStop={ ( _event, _direction, elt ) => {
-				onResizeStop( Math.min( getNextVal( elt ), maxValue ) );
+				onResizeStop( Math.min( getNextVal( elt ), max ) );
 				setIsResizing( false );
 			} }
 			__experimentalShowTooltip={ true }
@@ -168,7 +176,10 @@ const SpacerEdit = ( {
 	const widthWithUnit = widthUnit ? `${ width }${ widthUnit }` : width;
 
 	const handleOnResizeStart = ( _event, _direction, elt ) => {
-		setAttributes( { heightUnit: 'px' } );
+		setAttributes( {
+			heightUnit: 'px',
+			widthUnit: 'px',
+		} );
 
 		onResizeStart( _event, _direction, elt );
 	};
@@ -213,7 +224,7 @@ const SpacerEdit = ( {
 						topLeft: false,
 					} }
 					orientation={ blockOrientation }
-					maxValue={ MAX_SPACER_WIDTH }
+					max={ MAX_SPACER_WIDTH }
 					onResizeStart={ handleOnResizeStart }
 					onResize={ setTemporaryWidth }
 					onResizeStop={ handleOnHorizontalResizeStop }
@@ -236,7 +247,7 @@ const SpacerEdit = ( {
 						topLeft: false,
 					} }
 					orientation={ blockOrientation }
-					maxValue={ MAX_SPACER_HEIGHT }
+					max={ MAX_SPACER_HEIGHT }
 					onResizeStart={ handleOnResizeStart }
 					onResize={ setTemporaryHeight }
 					onResizeStop={ handleOnVerticalResizeStop }
@@ -268,6 +279,8 @@ const SpacerEdit = ( {
 						<DimensionInput
 							label={ __( 'Width' ) }
 							value={ temporaryWidth || width }
+							max={ MAX_SPACER_WIDTH }
+							min={ MIN_SPACER_WIDTH }
 							unit={ widthUnit }
 							onChange={ ( nextWidth ) =>
 								setAttributes( { width: nextWidth } )
@@ -283,6 +296,8 @@ const SpacerEdit = ( {
 						<DimensionInput
 							label={ __( 'Height' ) }
 							value={ temporaryHeight || height }
+							max={ MAX_SPACER_HEIGHT }
+							min={ MIN_SPACER_HEIGHT }
 							unit={ heightUnit }
 							onChange={ ( nextHeight ) =>
 								setAttributes( { height: nextHeight } )
