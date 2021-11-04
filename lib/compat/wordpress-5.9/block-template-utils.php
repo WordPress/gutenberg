@@ -125,6 +125,59 @@ if ( ! function_exists( '_inject_theme_attribute_in_block_template_content' ) ) 
 	}
 }
 
+if ( ! function_exists( '_build_block_template_result_from_post' ) ) {
+	/**
+	 * Build a unified template object based a post Object.
+	 *
+	 * @param WP_Post $post Template post.
+	 *
+	 * @return WP_Block_Template|WP_Error Template.
+	 */
+	function _build_block_template_result_from_post( $post ) {
+		$default_template_types = gutenberg_get_default_template_types();
+		$terms                  = get_the_terms( $post, 'wp_theme' );
+
+		if ( is_wp_error( $terms ) ) {
+			return $terms;
+		}
+
+		if ( ! $terms ) {
+			return new WP_Error( 'template_missing_theme', __( 'No theme is defined for this template.', 'gutenberg' ) );
+		}
+
+		$theme          = $terms[0]->name;
+		$has_theme_file = wp_get_theme()->get_stylesheet() === $theme &&
+			null !== _gutenberg_get_template_file( $post->post_type, $post->post_name );
+
+		$template                 = new WP_Block_Template();
+		$template->wp_id          = $post->ID;
+		$template->id             = $theme . '//' . $post->post_name;
+		$template->theme          = $theme;
+		$template->content        = $post->post_content;
+		$template->slug           = $post->post_name;
+		$template->source         = 'custom';
+		$template->type           = $post->post_type;
+		$template->description    = $post->post_excerpt;
+		$template->title          = $post->post_title;
+		$template->status         = $post->post_status;
+		$template->has_theme_file = $has_theme_file;
+		$template->is_custom      = true;
+
+		if ( 'wp_template' === $post->post_type && isset( $default_template_types[ $template->slug ] ) ) {
+			$template->is_custom = false;
+		}
+
+		if ( 'wp_template_part' === $post->post_type ) {
+			$type_terms = get_the_terms( $post, 'wp_template_part_area' );
+			if ( ! is_wp_error( $type_terms ) && false !== $type_terms ) {
+				$template->area = $type_terms[0]->name;
+			}
+		}
+
+		return $template;
+	}
+}
+
 if ( ! function_exists( 'get_block_template' ) ) {
 	/**
 	 * Retrieves a single unified template object using its id.
@@ -175,7 +228,7 @@ if ( ! function_exists( 'get_block_template' ) ) {
 		$posts                = $template_query->posts;
 
 		if ( count( $posts ) > 0 ) {
-			$template = _gutenberg_build_template_result_from_post( $posts[0] );
+			$template = _build_block_template_result_from_post( $posts[0] );
 
 			if ( ! is_wp_error( $template ) ) {
 				return $template;

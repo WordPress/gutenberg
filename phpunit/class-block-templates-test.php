@@ -117,8 +117,8 @@ class Block_Templates_Test extends WP_UnitTestCase {
 		$this->assertEquals( WP_TEMPLATE_PART_AREA_HEADER, $template_part->area );
 	}
 
-	function test_gutenberg_build_template_result_from_post() {
-		$template = _gutenberg_build_template_result_from_post(
+	function test_build_block_template_result_from_post() {
+		$template = _build_block_template_result_from_post(
 			self::$post,
 			'wp_template'
 		);
@@ -134,7 +134,7 @@ class Block_Templates_Test extends WP_UnitTestCase {
 		$this->assertEquals( 'wp_template', $template->type );
 
 		// Test template parts.
-		$template_part = _gutenberg_build_template_result_from_post(
+		$template_part = _build_block_template_result_from_post(
 			self::$template_part_post,
 			'wp_template_part'
 		);
