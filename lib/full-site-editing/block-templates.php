@@ -174,7 +174,7 @@ function _gutenberg_add_template_part_area_info( $template_info ) {
  * @return WP_Block_Template Template.
  */
 function _gutenberg_build_template_result_from_file( $template_file, $template_type ) {
-	$default_template_types = gutenberg_get_default_template_types();
+	$default_template_types = get_default_block_template_types();
 	$template_content       = file_get_contents( $template_file['path'] );
 	$theme                  = wp_get_theme()->get_stylesheet();
 
