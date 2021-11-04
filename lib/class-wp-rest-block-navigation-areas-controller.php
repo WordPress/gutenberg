@@ -79,8 +79,11 @@ class WP_REST_Block_Navigation_Areas_Controller extends WP_REST_Controller {
 	 */
 	public function get_items_permissions_check( $request ) { // phpcs:ignore VariableAnalysis.CodeAnalysis.VariableAnalysis.UnusedVariable
 		if ( ! current_user_can( 'edit_theme_options' ) ) {
-			return new WP_Error( 'rest_cannot_view', __( 'Sorry, you are not allowed to view menu locations.', 'gutenberg' ),
-				array( 'status' => rest_authorization_required_code() ) );
+			return new WP_Error(
+				'rest_cannot_view',
+				__( 'Sorry, you are not allowed to view menu locations.', 'gutenberg' ),
+				array( 'status' => rest_authorization_required_code() )
+			);
 		}
 
 		return true;
@@ -114,7 +117,7 @@ class WP_REST_Block_Navigation_Areas_Controller extends WP_REST_Controller {
 		return array(
 			'primary'   => 'Primary',
 			'secondary' => 'Secondary',
-			'tetriary'  => 'Tetriary'
+			'tertiary'  => 'Tertiary',
 		);
 	}
 
@@ -128,8 +131,11 @@ class WP_REST_Block_Navigation_Areas_Controller extends WP_REST_Controller {
 	public function get_item_permissions_check( $request ) {
 		// @TODO
 		if ( ! current_user_can( 'edit_theme_options' ) ) {
-			return new WP_Error( 'rest_cannot_view', __( 'Sorry, you are not allowed to view menu locations.', 'gutenberg' ),
-				array( 'status' => rest_authorization_required_code() ) );
+			return new WP_Error(
+				'rest_cannot_view',
+				__( 'Sorry, you are not allowed to view menu locations.', 'gutenberg' ),
+				array( 'status' => rest_authorization_required_code() )
+			);
 		}
 		if ( ! array_key_exists( $request['area'], $this->get_available_areas() ) ) {
 			return new WP_Error( 'rest_menu_location_invalid', __( 'Invalid menu location.', 'gutenberg' ), array( 'status' => 404 ) );
@@ -194,7 +200,7 @@ class WP_REST_Block_Navigation_Areas_Controller extends WP_REST_Controller {
 	/**
 	 * Prepares a menu location object for serialization.
 	 *
-	 * @param stdClass $area Post status data.
+	 * @param stdClass        $area Post status data.
 	 * @param WP_REST_Request $request Full details about the request.
 	 *
 	 * @return WP_REST_Response Post status data.
@@ -224,7 +230,7 @@ class WP_REST_Block_Navigation_Areas_Controller extends WP_REST_Controller {
 
 		$response = rest_ensure_response( $data );
 
-//		$response->add_links( $this->prepare_links( $location ) );
+		// $response->add_links( $this->prepare_links( $location ) );
 
 		/**
 		 * Filters a menu location returned from the REST API.
