@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { I18nManager } from 'react-native';
+import { I18nManager, LogBox } from 'react-native';
 
 /**
  * Internal dependencies
@@ -21,9 +21,7 @@ import {
 import { unregisterBlockType, getBlockType } from '@wordpress/blocks';
 
 const reactNativeSetup = () => {
-	// Disable warnings as they disrupt the user experience in dev mode
-	// eslint-disable-next-line no-console
-	console.disableYellowBox = true;
+	LogBox.ignoreLogs( [ /Require\scycle:|lineHeight/ ] );
 
 	I18nManager.forceRTL( false ); // Change to `true` to debug RTL layout easily.
 };
