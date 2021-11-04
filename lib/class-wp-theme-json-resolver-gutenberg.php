@@ -49,11 +49,11 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 	private static $user_custom_post_type_id = null;
 
 	/**
-	 * Structure to hold i18n metadata.
+	 * Container to keep loaded i18n schema for `theme.json`.
 	 *
 	 * @var Array
 	 */
-	private static $theme_json_i18n = null;
+	private static $i18n_schema = null;
 
 	/**
 	 * Processes a file that adheres to the theme.json
@@ -149,11 +149,11 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 	 * @return array An array of theme.json fields that are translatable and the keys that are translatable
 	 */
 	public static function get_fields_to_translate() {
-		if ( null === self::$theme_json_i18n ) {
+		if ( null === self::$i18n_schema ) {
 			$file_structure        = self::read_json_file( __DIR__ . '/theme-i18n.json' );
-			self::$theme_json_i18n = self::extract_paths_to_translate( $file_structure );
+			self::$i18n_schema = self::extract_paths_to_translate( $file_structure );
 		}
-		return self::$theme_json_i18n;
+		return self::$i18n_schema;
 	}
 
 	/**
@@ -510,7 +510,7 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 		self::$user                     = null;
 		self::$user_custom_post_type_id = null;
 		self::$theme_has_support        = null;
-		self::$theme_json_i18n          = null;
+		self::$i18n_schema          = null;
 	}
 
 }
