@@ -56,7 +56,7 @@ function gutenberg_edit_site_export_create_zip( $filename ) {
 	$zip->addEmptyDir( 'theme/block-template-parts' );
 
 	// Load templates into the zip file.
-	$templates = gutenberg_get_block_templates();
+	$templates = get_block_templates();
 	foreach ( $templates as $template ) {
 		$template->content = _remove_theme_attribute_from_content( $template->content );
 
@@ -67,7 +67,7 @@ function gutenberg_edit_site_export_create_zip( $filename ) {
 	}
 
 	// Load template parts into the zip file.
-	$template_parts = gutenberg_get_block_templates( array(), 'wp_template_part' );
+	$template_parts = get_block_templates( array(), 'wp_template_part' );
 	foreach ( $template_parts as $template_part ) {
 		$zip->addFromString(
 			'theme/block-template-parts/' . $template_part->slug . '.html',

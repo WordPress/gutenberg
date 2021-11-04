@@ -132,7 +132,7 @@ function gutenberg_resolve_template( $template_type, $template_hierarchy ) {
 		'theme'    => wp_get_theme()->get_stylesheet(),
 		'slug__in' => $slugs,
 	);
-	$templates = gutenberg_get_block_templates( $query );
+	$templates = get_block_templates( $query );
 
 	// Order these templates per slug priority.
 	// Build map of template slugs to their priority in the current hierarchy.

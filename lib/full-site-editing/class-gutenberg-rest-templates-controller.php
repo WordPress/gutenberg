@@ -146,7 +146,7 @@ class Gutenberg_REST_Templates_Controller extends WP_REST_Controller {
 		}
 
 		$templates = array();
-		foreach ( gutenberg_get_block_templates( $query, $this->post_type ) as $template ) {
+		foreach ( get_block_templates( $query, $this->post_type ) as $template ) {
 			$data        = $this->prepare_item_for_response( $template, $request );
 			$templates[] = $this->prepare_response_for_collection( $data );
 		}
@@ -258,7 +258,7 @@ class Gutenberg_REST_Templates_Controller extends WP_REST_Controller {
 		if ( is_wp_error( $result ) ) {
 			return $result;
 		}
-		$posts = gutenberg_get_block_templates( array( 'wp_id' => $result ), $this->post_type );
+		$posts = get_block_templates( array( 'wp_id' => $result ), $this->post_type );
 		if ( ! count( $posts ) ) {
 			return new WP_Error( 'rest_template_insert_error', __( 'No templates exist with that id.', 'gutenberg' ) );
 		}

@@ -89,20 +89,6 @@ function gutenberg_register_wp_template_part_area_taxonomy() {
 }
 add_action( 'init', 'gutenberg_register_wp_template_part_area_taxonomy' );
 
-// Define constants for supported wp_template_part_area taxonomy.
-if ( ! defined( 'WP_TEMPLATE_PART_AREA_HEADER' ) ) {
-	define( 'WP_TEMPLATE_PART_AREA_HEADER', 'header' );
-}
-if ( ! defined( 'WP_TEMPLATE_PART_AREA_FOOTER' ) ) {
-	define( 'WP_TEMPLATE_PART_AREA_FOOTER', 'footer' );
-}
-if ( ! defined( 'WP_TEMPLATE_PART_AREA_SIDEBAR' ) ) {
-	define( 'WP_TEMPLATE_PART_AREA_SIDEBAR', 'sidebar' );
-}
-if ( ! defined( 'WP_TEMPLATE_PART_AREA_UNCATEGORIZED' ) ) {
-	define( 'WP_TEMPLATE_PART_AREA_UNCATEGORIZED', 'uncategorized' );
-}
-
 /**
  * Fixes the label of the 'wp_template_part' admin menu entry.
  */
