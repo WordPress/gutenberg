@@ -208,7 +208,6 @@ function _gutenberg_inject_theme_attribute_in_content( $template_content ) {
 	$has_updated_content = false;
 	$new_content         = '';
 	$template_blocks     = parse_blocks( $template_content );
-	$file_regex          = '/^file:./';
 
 	$blocks = _gutenberg_flatten_blocks( $template_blocks );
 	foreach ( $blocks as &$block ) {
@@ -218,16 +217,6 @@ function _gutenberg_inject_theme_attribute_in_content( $template_content ) {
 		) {
 			$block['attrs']['theme'] = wp_get_theme()->get_stylesheet();
 			$has_updated_content     = true;
-		}
-
-		// Variable substitution for file:/ in URL attributes.
-		if ( isset( $block['attrs']['url'] ) ) {
-			if ( preg_match( $file_regex, $block['attrs']['url'] ) ) {
-				error_log("Before: " . $block['attrs']['url']);
-				$block['attrs']['url'] = preg_replace( $file_regex, get_template_directory_uri(), $block['attrs']['url'] );
-				error_log("After: " . $block['attrs']['url']);
-				$has_updated_content   = true;
-			}
 		}
 	}
 
@@ -243,6 +232,23 @@ function _gutenberg_inject_theme_attribute_in_content( $template_content ) {
 }
 
 /**
+ * Performs a search/replace over wp_template content to replace URL
+ * and src properties with file:./ to refer to local template directory 
+ * using the get_template_directory_uri().
+ *
+ * @param string $template_content serialized wp_template content.
+ *
+ * @return string Updated wp_template content.
+ */
+function _gutenberg_process_theme_variable_substitution( $template_content ) {
+	// Variable substitution for file:/ in URL attributes.
+	$template_content = str_replace( '"url":"file:.', '"url":"' . get_template_directory_uri(), $template_content );
+	$template_content = str_replace( 'src="file:.', 'src="' . get_template_directory_uri(), $template_content );
+	return $template_content;
+}
+
+
+/**
  * Build a unified template object based on a theme file.
  *
  * @param array $template_file Theme file.
@@ -253,6 +259,7 @@ function _gutenberg_inject_theme_attribute_in_content( $template_content ) {
 function _gutenberg_build_template_result_from_file( $template_file, $template_type ) {
 	$default_template_types = gutenberg_get_default_template_types();
 	$template_content       = file_get_contents( $template_file['path'] );
+	$template_content       = _gutenberg_process_theme_variable_substitution( $template_content );
 	$theme                  = wp_get_theme()->get_stylesheet();
 
 	$template                 = new WP_Block_Template();
