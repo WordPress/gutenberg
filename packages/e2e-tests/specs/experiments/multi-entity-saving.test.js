@@ -14,7 +14,7 @@ import {
 /**
  * Internal dependencies
  */
-import { navigationPanel, siteEditor } from '../../experimental-features';
+import { siteEditor } from '../../experimental-features';
 
 describe( 'Multi-entity save flow', () => {
 	// Selectors - usable between Post/Site editors.
@@ -240,13 +240,10 @@ describe( 'Multi-entity save flow', () => {
 
 		it( 'Save flow should work as expected', async () => {
 			// Navigate to site editor.
-			await siteEditor.visit();
-
-			// Ensure we are on 'index' template.
-			await navigationPanel.open();
-			await navigationPanel.backToRoot();
-			await navigationPanel.navigate( 'Templates' );
-			await navigationPanel.clickItemByText( 'Index' );
+			await siteEditor.visit( {
+				postId: 'tt1-blocks//index',
+				postType: 'wp_template',
+			} );
 
 			// Select the header template part via list view.
 			await page.click( '.edit-site-header-toolbar__list-view-toggle' );
