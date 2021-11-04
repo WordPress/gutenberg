@@ -269,8 +269,6 @@ function render_block_core_navigation( $attributes, $content, $block ) {
 		return '';
 	}
 
-	wp_enqueue_script( 'wp-block-navigation-portal' );
-
 	$colors     = block_core_navigation_build_css_colors( $attributes );
 	$font_sizes = block_core_navigation_build_css_font_sizes( $attributes );
 	$classes    = array_merge(
