@@ -86,8 +86,6 @@ function ColorPicker( { name, value, onChange } ) {
 	);
 }
 
-export { getActiveColors };
-
 export default function InlineColorUI( { name, value, onChange, onClose } ) {
 	return (
 		<BottomSheet

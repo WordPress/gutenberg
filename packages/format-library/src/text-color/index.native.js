@@ -8,50 +8,21 @@ import { isEmpty } from 'lodash';
  */
 import { __ } from '@wordpress/i18n';
 import { useCallback, useMemo, useState } from '@wordpress/element';
-import { RichTextToolbarButton, useSetting } from '@wordpress/block-editor';
+import { BlockControls, useSetting } from '@wordpress/block-editor';
+import { ToolbarGroup, ToolbarButton } from '@wordpress/components';
 import { Icon, textColor as textColorIcon } from '@wordpress/icons';
 import { removeFormat } from '@wordpress/rich-text';
 
 /**
  * Internal dependencies
  */
-import { default as InlineColorUI, getActiveColors } from './inline';
+import { getActiveColors } from './inline.js';
+import { default as InlineColorUI } from './inline';
 
 const name = 'core/text-color';
-const title = __( 'Highlight' );
+const title = __( 'Text color' );
 
 const EMPTY_ARRAY = [];
-
-function getComputedStyleProperty( element, property ) {
-	const { ownerDocument } = element;
-	const { defaultView } = ownerDocument;
-	const style = defaultView.getComputedStyle( element );
-	const value = style.getPropertyValue( property );
-
-	if (
-		property === 'background-color' &&
-		value === 'rgba(0, 0, 0, 0)' &&
-		element.parentElement
-	) {
-		return getComputedStyleProperty( element.parentElement, property );
-	}
-
-	return value;
-}
-
-function fillComputedColors( element, { color, backgroundColor } ) {
-	if ( ! color && ! backgroundColor ) {
-		return;
-	}
-
-	return {
-		color: color || getComputedStyleProperty( element, 'color' ),
-		backgroundColor:
-			backgroundColor === 'rgba(0, 0, 0, 0)'
-				? getComputedStyleProperty( element, 'background-color' )
-				: backgroundColor,
-	};
-}
 
 function TextColorEdit( {
 	value,
@@ -69,14 +40,11 @@ function TextColorEdit( {
 	const disableIsAddingColor = useCallback( () => setIsAddingColor( false ), [
 		setIsAddingColor,
 	] );
-	const colorIndicatorStyle = useMemo(
-		() =>
-			fillComputedColors(
-				contentRef.current,
-				getActiveColors( value, name, colors )
-			),
-		[ value, colors ]
-	);
+	const colorIndicatorStyle = useMemo( () => {
+		const color = getActiveColors( value, name, colors )?.color;
+
+		return { color: color?.replace( ' ', '' ) };
+	}, [ value, colors ] );
 
 	const hasColorsToChoose = ! isEmpty( colors ) || ! allowCustomControl;
 	if ( ! hasColorsToChoose && ! isActive ) {
@@ -85,23 +53,31 @@ function TextColorEdit( {
 
 	return (
 		<>
-			<RichTextToolbarButton
-				className="format-library-text-color-button"
-				isActive={ isActive }
-				icon={
-					<Icon
-						icon={ textColorIcon }
-						style={ colorIndicatorStyle }
+			<BlockControls>
+				<ToolbarGroup>
+					<ToolbarButton
+						name="text-color"
+						className="format-library-text-color-button"
+						isActive={ isActive }
+						icon={
+							<Icon
+								icon={ textColorIcon }
+								style={
+									colorIndicatorStyle?.color &&
+									colorIndicatorStyle
+								}
+							/>
+						}
+						title={ title }
+						// If has no colors to choose but a color is active remove the color onClick
+						onClick={
+							hasColorsToChoose
+								? enableIsAddingColor
+								: () => onChange( removeFormat( value, name ) )
+						}
 					/>
-				}
-				title={ title }
-				// If has no colors to choose but a color is active remove the color onClick
-				onClick={
-					hasColorsToChoose
-						? enableIsAddingColor
-						: () => onChange( removeFormat( value, name ) )
-				}
-			/>
+				</ToolbarGroup>
+			</BlockControls>
 			{ isAddingColor && (
 				<InlineColorUI
 					name={ name }
