@@ -1,6 +1,6 @@
 <?php
 /**
- * Class that implements a WP_Theme_JSON_Schema migration.
+ * Class that implements a theme.json schema migration.
  *
  * @package gutenberg
  */
@@ -9,7 +9,7 @@
  * Class that migrates a given structure in v0 schema to one
  * that follows the v1 schema.
  */
-class WP_Theme_JSON_Schema {
+class WP_Theme_JSON_Schema_Gutenberg {
 
 	/**
 	 * How to address all the blocks

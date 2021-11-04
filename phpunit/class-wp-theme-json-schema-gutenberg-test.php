@@ -6,11 +6,11 @@
  * @package Gutenberg
  */
 
-class WP_Theme_JSON_Schema_Test extends WP_UnitTestCase {
+class WP_Theme_JSON_Schema_Gutenberg_Test extends WP_UnitTestCase {
 	/**
 	 * The current theme.json schema version.
 	 */
-	const LATEST_SCHEMA_VERSION = 2;
+	const LATEST_SCHEMA_VERSION = WP_Theme_JSON_Gutenberg::LATEST_SCHEMA;
 
 	function test_migrate_v0_to_v1() {
 		$theme_json_v0 = array(
@@ -99,7 +99,7 @@ class WP_Theme_JSON_Schema_Test extends WP_UnitTestCase {
 			),
 		);
 
-		$actual = WP_Theme_JSON_Schema::migrate( $theme_json_v0 );
+		$actual = WP_Theme_JSON_Schema_Gutenberg::migrate( $theme_json_v0 );
 
 		$expected = array(
 			'version'  => self::LATEST_SCHEMA_VERSION,
@@ -177,8 +177,8 @@ class WP_Theme_JSON_Schema_Test extends WP_UnitTestCase {
 	}
 
 	function test_migrate_v0_to_v1_get_settings() {
-		$defaults   = WP_Theme_JSON_Schema::V0_ALL_BLOCKS_NAME;
-		$root       = WP_Theme_JSON_Schema::V0_ROOT_BLOCK_NAME;
+		$defaults   = WP_Theme_JSON_Schema_Gutenberg::V0_ALL_BLOCKS_NAME;
+		$root       = WP_Theme_JSON_Schema_Gutenberg::V0_ROOT_BLOCK_NAME;
 		$theme_json = new WP_Theme_JSON_Gutenberg(
 			array(
 				'settings' => array(
@@ -363,8 +363,8 @@ class WP_Theme_JSON_Schema_Test extends WP_UnitTestCase {
 	}
 
 	function test_migrate_v0_to_v1_get_stylesheet() {
-		$root_name       = WP_Theme_JSON_Schema::V0_ROOT_BLOCK_NAME;
-		$all_blocks_name = WP_Theme_JSON_Schema::V0_ALL_BLOCKS_NAME;
+		$root_name       = WP_Theme_JSON_Schema_Gutenberg::V0_ROOT_BLOCK_NAME;
+		$all_blocks_name = WP_Theme_JSON_Schema_Gutenberg::V0_ALL_BLOCKS_NAME;
 		$theme_json      = new WP_Theme_JSON_Gutenberg( array() );
 		$theme_json->merge(
 			new WP_Theme_JSON_Gutenberg(
@@ -586,7 +586,7 @@ class WP_Theme_JSON_Schema_Test extends WP_UnitTestCase {
 			),
 		);
 
-		$actual = WP_Theme_JSON_Schema::migrate( $theme_json_v1 );
+		$actual = WP_Theme_JSON_Schema_Gutenberg::migrate( $theme_json_v1 );
 
 		$expected = array(
 			'version'  => self::LATEST_SCHEMA_VERSION,
@@ -758,7 +758,7 @@ class WP_Theme_JSON_Schema_Test extends WP_UnitTestCase {
 			),
 		);
 
-		$actual = WP_Theme_JSON_Schema::migrate( $theme_json_v1 );
+		$actual = WP_Theme_JSON_Schema_Gutenberg::migrate( $theme_json_v1 );
 
 		$expected = array(
 			'version'  => self::LATEST_SCHEMA_VERSION,
