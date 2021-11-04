@@ -1,4 +1,3 @@
-// Do not show in narrow widths. Needs specificity.
 .block-editor-block-styles__preview-panel {
 	display: none;
 	position: absolute;
@@ -10,8 +9,10 @@
 	width: 300px;
 	left: auto;
 	overflow: hidden;
-	z-index: 10;
+	// Same layer as the sidebar from which it's triggered.
+	z-index: z-index(".interface-interface-skeleton__sidebar {greater than small}");
 
+	// Only show in narrow widths.
 	@include break-medium() {
 		display: block;
 	}

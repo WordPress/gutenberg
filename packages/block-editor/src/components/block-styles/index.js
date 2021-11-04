@@ -7,8 +7,8 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { useState, useMemo } from '@wordpress/element';
-import { useDebounce } from '@wordpress/compose';
+import { useState, useLayoutEffect } from '@wordpress/element';
+import { useDebounce, useViewportMatch } from '@wordpress/compose';
 import { ENTER, SPACE } from '@wordpress/keycodes';
 import {
 	Button,
@@ -55,13 +55,17 @@ function BlockStyles( {
 		onSwitch,
 	} );
 	const [ hoveredStyle, setHoveredStyle ] = useState( null );
-	const debouncedSetHoveredStyle = useDebounce( setHoveredStyle, 250 );
-	const containerScrollTop = useMemo( () => {
+	const [ containerScrollTop, setContainerScrollTop ] = useState( 0 );
+	const isMobileViewport = useViewportMatch( 'medium', '<' );
+	const debouncedSetHoveredStyle = useDebounce( setHoveredStyle, 300 );
+	const hasHoveredStyle = hoveredStyle !== null; // Prevent multiple recalculation of scrollTop.
+
+	useLayoutEffect( () => {
 		const scrollContainer = document.querySelector(
 			'.interface-interface-skeleton__content'
 		);
-		return scrollContainer.scrollTop || 0;
-	}, [ hoveredStyle ] );
+		setContainerScrollTop( scrollContainer.scrollTop + 16 );
+	}, [ hasHoveredStyle ] );
 
 	if ( ! stylesToRender || stylesToRender.length === 0 ) {
 		return null;
@@ -129,11 +133,11 @@ function BlockStyles( {
 					);
 				} ) }
 			</div>
-			{ hoveredStyle && (
+			{ hoveredStyle && ! isMobileViewport && (
 				<BlockStylesPreviewPanelFill
 					scope={ scope }
 					className="block-editor-block-styles__preview-panel"
-					style={ { top: 16 + containerScrollTop } }
+					style={ { top: containerScrollTop } }
 				>
 					<BlockStylesPreviewPanel
 						activeStyle={ activeStyle }
