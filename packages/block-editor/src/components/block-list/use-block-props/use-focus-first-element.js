@@ -51,16 +51,6 @@ function useInitialPosition( clientId ) {
 	);
 }
 
-function useIsMounting() {
-	const isMounting = useRef( true );
-
-	useEffect( () => {
-		isMounting.current = false;
-	}, [] );
-
-	return isMounting.current;
-}
-
 /**
  * Transitions focus to the block or inner tabbable when the block becomes
  * selected and an initial position is set.
@@ -72,7 +62,7 @@ function useIsMounting() {
 export function useFocusFirstElement( clientId ) {
 	const ref = useRef();
 	const initialPosition = useInitialPosition( clientId );
-	const isMounting = useIsMounting();
+	const isMounting = useRef( true );
 
 	useEffect( () => {
 		if ( initialPosition === undefined || initialPosition === null ) {
@@ -102,7 +92,11 @@ export function useFocusFirstElement( clientId ) {
 			.find( target )
 			.filter(
 				( node ) =>
-					isTextField( node ) || ( isMounting && node.shadowRoot )
+					isTextField( node ) ||
+					( isMounting.current &&
+						node.classList.contains(
+							'wp-block-editor-placeholder'
+						) )
 			);
 
 		target = ( isReverse ? last : first )( candidates ) || target;
@@ -128,6 +122,10 @@ export function useFocusFirstElement( clientId ) {
 
 		placeCaretAtHorizontalEdge( target, isReverse );
 	}, [ initialPosition ] );
+
+	useEffect( () => {
+		isMounting.current = false;
+	}, [] );
 
 	return ref;
 }

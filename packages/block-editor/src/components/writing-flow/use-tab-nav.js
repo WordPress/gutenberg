@@ -94,7 +94,9 @@ export default function useTabNav() {
 				return;
 			}
 
-			if ( event.target.shadowRoot ) {
+			if (
+				event.target.classList.contains( 'wp-block-editor-placeholder' )
+			) {
 				return;
 			}
 

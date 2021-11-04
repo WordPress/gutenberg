@@ -7,13 +7,29 @@ import { ENTER, SPACE, ESCAPE } from '@wordpress/keycodes';
 import { focus } from '@wordpress/dom';
 import { __experimentalStyleProvider as StyleProvider } from '@wordpress/components';
 
+/**
+ * Embeds the given children in shadow DOM that has the same styling as the top
+ * window (admin). A button is returned to allow the keyboard user to enter this
+ * context. Visually, it appears inline, but it is styled as the admin, not as
+ * the editor content.
+ *
+ * @param {Object} props Button props.
+ *
+ * @return {WPComponent} A button to enter the embedded admin context.
+ */
 export default function EmbeddedAdminContext( props ) {
 	const [ shadow, setShadow ] = useState();
 	const [ hasFocus, setHasFocus ] = useState();
 	const ref = useRefEffect( ( element ) => {
 		const root = element.attachShadow( { mode: 'open' } );
+
+		// Copy all admin styles to the shadow DOM.
 		const style = document.createElement( 'style' );
 		Array.from( document.styleSheets ).forEach( ( styleSheet ) => {
+			// Technically, it's fine to include this, but these are styles that
+			// target other components, so there's performance gain in not
+			// including them. Below, we use `StyleProvider` to render emotion
+			// styles in shadow DOM.
 			if ( styleSheet.ownerNode.getAttribute( 'data-emotion' ) ) {
 				return;
 			}
@@ -43,14 +59,28 @@ export default function EmbeddedAdminContext( props ) {
 			setHasFocus( false );
 		}
 
+		/**
+		 * When pressing ENTER or SPACE on the wrapper (button), focus the first
+		 * tabbable inside the shadow DOM.
+		 *
+		 * @param {KeyboardEvent} event The keyboard event.
+		 */
 		function onKeyDown( event ) {
 			if ( element !== event.path[ 0 ] ) return;
 			if ( event.keyCode !== ENTER && event.keyCode !== SPACE ) return;
 
-			focus.tabbable.find( root )[ 0 ].focus();
 			event.preventDefault();
+
+			const [ firstTabbable ] = focus.tabbable.find( root );
+			if ( firstTabbable ) firstTabbable.focus();
 		}
 
+		/**
+		 * When pressing ESCAPE inside the shadow DOM, focus the wrapper
+		 * (button).
+		 *
+		 * @param {KeyboardEvent} event The keyboard event.
+		 */
 		function onRootKeyDown( event ) {
 			if ( event.keyCode !== ESCAPE ) return;
 
@@ -60,8 +90,12 @@ export default function EmbeddedAdminContext( props ) {
 
 		let timeoutId;
 
-		// Allow clicking through the placeholder so focus moves to the block
-		// wraper, which can handle delete, enter, etc.
+		/**
+		 * When clicking inside the shadow DOM, temporarily remove the ability
+		 * to catch focus, so focus moves to a focusable parent.
+		 * This is done so that when the user clicks inside a placeholder, the
+		 * block receives focus, which can handle delete, enter, etc.
+		 */
 		function onMouseDown() {
 			element.removeAttribute( 'tabindex' );
 			timeoutId = setTimeout( () =>
