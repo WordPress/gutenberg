@@ -4,7 +4,7 @@ export type ActionCreator = Function | Generator;
 export type Resolver = Function | Generator;
 export type Selector = Function;
 
-export type AnyConfig = StoreConfig< any, any >;
+export type AnyConfig = ReduxStoreConfig< any, any, any >;
 
 export interface StoreInstance< Config extends AnyConfig > {
 	getSelectors: () => SelectorsOf< Config >;
@@ -12,7 +12,7 @@ export interface StoreInstance< Config extends AnyConfig > {
 	subscribe: ( listener: () => void ) => () => void;
 }
 
-export interface StoreDefinition< Config extends AnyConfig > {
+export interface StoreDescriptor< Config extends AnyConfig > {
 	/**
 	 * Store Name
 	 */
@@ -24,10 +24,12 @@ export interface StoreDefinition< Config extends AnyConfig > {
 	instantiate: ( registry: DataRegistry ) => StoreInstance< Config >;
 }
 
-export interface StoreConfig<
+export interface ReduxStoreConfig<
+	State,
 	ActionCreators extends MapOf< ActionCreator >,
 	Selectors extends MapOf< Selector >
 > {
+	initialState?: State;
 	reducer: ( state: any, action: any ) => any;
 	actions?: ActionCreators;
 	resolvers?: MapOf< Resolver >;
@@ -36,7 +38,7 @@ export interface StoreConfig<
 }
 
 export interface DataRegistry {
-	register: ( store: StoreDefinition< any > ) => void;
+	register: ( store: StoreDescriptor< any > ) => void;
 }
 
 export interface DataEmitter {
@@ -51,16 +53,16 @@ export interface DataEmitter {
 // Type Helpers
 //
 
-type ActionCreatorsOf< Config extends AnyConfig > = Config extends StoreConfig<
-	infer ActionCreators,
-	any
->
-	? ActionCreators
+type ActionCreatorsOf<
+	Config extends AnyConfig
+> = Config extends ReduxStoreConfig< any, infer ActionCreators, any >
+	? { [ name in keyof ActionCreators ]: Function | Generator }
 	: never;
 
-type SelectorsOf< Config extends AnyConfig > = Config extends StoreConfig<
+type SelectorsOf< Config extends AnyConfig > = Config extends ReduxStoreConfig<
+	any,
 	any,
 	infer Selectors
 >
-	? Selectors
+	? { [ name in keyof Selectors ]: Function }
 	: never;
