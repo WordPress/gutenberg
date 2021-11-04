@@ -9,7 +9,7 @@
 /**
  * Tests for REST API for Menus.
  *
- * @see WP_Test_REST_Controller_Testcase
+ * @coversDefaultClass WP_REST_Menus_Controller
  */
 class REST_Nav_Menus_Controller_Test extends WP_Test_REST_Controller_Testcase {
 	/**
@@ -108,7 +108,7 @@ class REST_Nav_Menus_Controller_Test extends WP_Test_REST_Controller_Testcase {
 	}
 
 	/**
-	 *
+	 * @covers ::register_routes
 	 */
 	public function test_register_routes() {
 		$routes = rest_get_server()->get_routes();
@@ -117,7 +117,7 @@ class REST_Nav_Menus_Controller_Test extends WP_Test_REST_Controller_Testcase {
 	}
 
 	/**
-	 *
+	 * @covers ::get_context_param
 	 */
 	public function test_context_param() {
 		// Collection.
@@ -136,7 +136,7 @@ class REST_Nav_Menus_Controller_Test extends WP_Test_REST_Controller_Testcase {
 	}
 
 	/**
-	 *
+	 * @covers ::get_collection_params
 	 */
 	public function test_registered_query_params() {
 		$request  = new WP_REST_Request( 'OPTIONS', '/__experimental/menus' );
@@ -164,7 +164,7 @@ class REST_Nav_Menus_Controller_Test extends WP_Test_REST_Controller_Testcase {
 	}
 
 	/**
-	 *
+	 * @covers ::get_items
 	 */
 	public function test_get_items() {
 		wp_set_current_user( self::$admin_id );
@@ -182,7 +182,7 @@ class REST_Nav_Menus_Controller_Test extends WP_Test_REST_Controller_Testcase {
 	}
 
 	/**
-	 *
+	 * @covers ::get_item
 	 */
 	public function test_get_item() {
 		wp_set_current_user( self::$admin_id );
@@ -203,7 +203,7 @@ class REST_Nav_Menus_Controller_Test extends WP_Test_REST_Controller_Testcase {
 	}
 
 	/**
-	 *
+	 * @covers ::create_item
 	 */
 	public function test_create_item() {
 		wp_set_current_user( self::$admin_id );
@@ -222,7 +222,7 @@ class REST_Nav_Menus_Controller_Test extends WP_Test_REST_Controller_Testcase {
 	}
 
 	/**
-	 *
+	 * @covers ::create_item
 	 */
 	public function test_create_item_same_name() {
 		wp_set_current_user( self::$admin_id );
@@ -244,7 +244,8 @@ class REST_Nav_Menus_Controller_Test extends WP_Test_REST_Controller_Testcase {
 	}
 
 	/**
-	 *
+	 * @covers ::update_item
+	 * @covers ::handle_auto_add
 	 */
 	public function test_update_item() {
 		wp_set_current_user( self::$admin_id );
@@ -271,7 +272,7 @@ class REST_Nav_Menus_Controller_Test extends WP_Test_REST_Controller_Testcase {
 	}
 
 	/**
-	 *
+	 * @covers ::delete_item
 	 */
 	public function test_delete_item() {
 		wp_set_current_user( self::$admin_id );
@@ -296,7 +297,8 @@ class REST_Nav_Menus_Controller_Test extends WP_Test_REST_Controller_Testcase {
 	}
 
 	/**
-	 *
+	 * @covers ::prepare_item_for_response
+	 * @covers ::get_item
 	 */
 	public function test_prepare_item() {
 		$nav_menu_id = wp_update_nav_menu_object(
@@ -317,7 +319,7 @@ class REST_Nav_Menus_Controller_Test extends WP_Test_REST_Controller_Testcase {
 	}
 
 	/**
-	 *
+	 * @covers ::get_item_schema
 	 */
 	public function test_get_item_schema() {
 		$request    = new WP_REST_Request( 'OPTIONS', '/__experimental/menus' );
@@ -334,7 +336,7 @@ class REST_Nav_Menus_Controller_Test extends WP_Test_REST_Controller_Testcase {
 	}
 
 	/**
-	 *
+	 * @covers ::create_item
 	 */
 	public function test_create_item_with_location_permission_correct() {
 		$this->register_nav_menu_locations( array( 'primary', 'secondary' ) );
@@ -352,7 +354,7 @@ class REST_Nav_Menus_Controller_Test extends WP_Test_REST_Controller_Testcase {
 	}
 
 	/**
-	 *
+	 * @covers ::create_item
 	 */
 	public function test_create_item_with_location_permission_incorrect() {
 		wp_set_current_user( self::$editor_id );
@@ -366,7 +368,8 @@ class REST_Nav_Menus_Controller_Test extends WP_Test_REST_Controller_Testcase {
 	}
 
 	/**
-	 *
+	 * @covers ::create_item
+	 * @covers ::handle_auto_add
 	 */
 	public function test_create_item_with_auto_add_permission_incorrect() {
 		wp_set_current_user( self::$editor_id );
@@ -380,7 +383,7 @@ class REST_Nav_Menus_Controller_Test extends WP_Test_REST_Controller_Testcase {
 	}
 
 	/**
-	 *
+	 * @covers ::create_item
 	 */
 	public function test_create_item_with_location_permission_no_location() {
 		wp_set_current_user( self::$admin_id );
@@ -394,7 +397,7 @@ class REST_Nav_Menus_Controller_Test extends WP_Test_REST_Controller_Testcase {
 	}
 
 	/**
-	 *
+	 * @covers ::update_item
 	 */
 	public function test_update_item_with_no_location() {
 		$this->register_nav_menu_locations( array( 'primary', 'secondary' ) );
@@ -410,7 +413,7 @@ class REST_Nav_Menus_Controller_Test extends WP_Test_REST_Controller_Testcase {
 	}
 
 	/**
-	 *
+	 * @covers ::update_item
 	 */
 	public function test_update_item_with_location_permission_correct() {
 		$this->register_nav_menu_locations( array( 'primary', 'secondary' ) );
@@ -427,7 +430,7 @@ class REST_Nav_Menus_Controller_Test extends WP_Test_REST_Controller_Testcase {
 	}
 
 	/**
-	 *
+	 * @covers ::update_item
 	 */
 	public function test_update_item_with_location_permission_incorrect() {
 		$this->register_nav_menu_locations( array( 'primary', 'secondary' ) );
@@ -442,7 +445,7 @@ class REST_Nav_Menus_Controller_Test extends WP_Test_REST_Controller_Testcase {
 	}
 
 	/**
-	 *
+	 * @covers ::prepare_links
 	 */
 	public function test_get_item_links() {
 		wp_set_current_user( self::$admin_id );
@@ -470,7 +473,8 @@ class REST_Nav_Menus_Controller_Test extends WP_Test_REST_Controller_Testcase {
 	}
 
 	/**
-	 *
+	 * @covers ::update_item
+	 * @covers ::handle_locations
 	 */
 	public function test_change_menu_location() {
 		$this->register_nav_menu_locations( array( 'primary', 'secondary' ) );
@@ -507,7 +511,8 @@ class REST_Nav_Menus_Controller_Test extends WP_Test_REST_Controller_Testcase {
 	}
 
 	/**
-	 *
+	 * @covers ::get_items
+	 * @covers ::get_items_permissions_check
 	 */
 	public function test_get_items_no_permission() {
 		wp_set_current_user( 0 );
@@ -517,7 +522,8 @@ class REST_Nav_Menus_Controller_Test extends WP_Test_REST_Controller_Testcase {
 	}
 
 	/**
-	 *
+	 * @covers ::get_items
+	 * @covers ::get_items_permissions_check
 	 */
 	public function test_get_item_no_permission() {
 		wp_set_current_user( 0 );
@@ -527,7 +533,8 @@ class REST_Nav_Menus_Controller_Test extends WP_Test_REST_Controller_Testcase {
 	}
 
 	/**
-	 *
+	 * @covers ::get_items
+	 * @covers ::get_items_permissions_check
 	 */
 	public function test_get_items_wrong_permission() {
 		wp_set_current_user( self::$subscriber_id );
@@ -537,7 +544,8 @@ class REST_Nav_Menus_Controller_Test extends WP_Test_REST_Controller_Testcase {
 	}
 
 	/**
-	 *
+	 * @covers ::get_item
+	 * @covers ::get_item_permissions_check
 	 */
 	public function test_get_item_wrong_permission() {
 		wp_set_current_user( self::$subscriber_id );
