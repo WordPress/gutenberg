@@ -290,29 +290,27 @@ function gutenberg_tinycolor_string_to_rgb( $color_str ) {
 	}
 }
 
+/**
+ * Returns the prefixed id for the duotone filter for use as a CSS id.
+ *
+ * @param array $preset Duotone preset value as seen in theme.json.
+ *
+ * @return string Duotone filter CSS id.
+ */
+function gutenberg_get_duotone_filter_id( $preset ) {
+	return 'wp-duotone-' . $preset['slug'];
+}
 
 /**
- * Registers the style and colors block attributes for block types that support it.
+ * Returns the CSS filter property url to reference the rendered SVG.
  *
- * @param WP_Block_Type $block_type Block Type.
+ * @param array $preset Duotone preset value as seen in theme.json.
+ *
+ * @return string Duotone CSS filter property url value.
  */
-function gutenberg_register_duotone_support( $block_type ) {
-	$has_duotone_support = false;
-	if ( property_exists( $block_type, 'supports' ) ) {
-		$has_duotone_support = _wp_array_get( $block_type->supports, array( 'color', '__experimentalDuotone' ), false );
-	}
-
-	if ( $has_duotone_support ) {
-		if ( ! $block_type->attributes ) {
-			$block_type->attributes = array();
-		}
-
-		if ( ! array_key_exists( 'style', $block_type->attributes ) ) {
-			$block_type->attributes['style'] = array(
-				'type' => 'object',
-			);
-		}
-	}
+function gutenberg_get_duotone_filter_url( $preset ) {
+	$filter_id = gutenberg_get_duotone_filter_id( $preset );
+	return "url('#" . $filter_id . "')";
 }
 
 /**
@@ -397,26 +395,27 @@ function gutenberg_render_duotone_filter( $preset ) {
 }
 
 /**
- * Returns the CSS filter property url to reference the rendered SVG.
+ * Registers the style and colors block attributes for block types that support it.
  *
- * @param array $preset Duotone preset value as seen in theme.json.
- *
- * @return string Duotone CSS filter property url value.
+ * @param WP_Block_Type $block_type Block Type.
  */
-function gutenberg_get_duotone_filter_url( $preset ) {
-	$filter_id = gutenberg_get_duotone_filter_id( $preset );
-	return "url('#" . $filter_id . "')";
-}
+function gutenberg_register_duotone_support( $block_type ) {
+	$has_duotone_support = false;
+	if ( property_exists( $block_type, 'supports' ) ) {
+		$has_duotone_support = _wp_array_get( $block_type->supports, array( 'color', '__experimentalDuotone' ), false );
+	}
 
-/**
- * Returns the prefixed id for the duotone filter for use as a CSS id.
- *
- * @param array $preset Duotone preset value as seen in theme.json.
- *
- * @return string Duotone filter CSS id.
- */
-function gutenberg_get_duotone_filter_id( $preset ) {
-	return 'wp-duotone-' . $preset['slug'];
+	if ( $has_duotone_support ) {
+		if ( ! $block_type->attributes ) {
+			$block_type->attributes = array();
+		}
+
+		if ( ! array_key_exists( 'style', $block_type->attributes ) ) {
+			$block_type->attributes['style'] = array(
+				'type' => 'object',
+			);
+		}
+	}
 }
 
 /**
