@@ -12,23 +12,33 @@ import {
 	ToolbarGroup,
 } from '@wordpress/components';
 import { useMemo } from '@wordpress/element';
-import {
-	BlockControls,
-	InspectorControls,
-	useBlockProps,
-	useInnerBlocksProps,
-} from '@wordpress/block-editor';
+import { BlockControls, InspectorControls } from '@wordpress/block-editor';
 import { useSelect } from '@wordpress/data';
 
-const ALLOWED_BLOCKS = [ 'core/navigation' ];
+/**
+ * Internal dependencies
+ */
+import InnerBlocks from './inner-blocks';
+import PlaceholderPreview from '../navigation/edit/placeholder/placeholder-preview';
 
 function NavigationAreaBlock( { attributes, setAttributes } ) {
 	const { area } = attributes;
 
-	const navigationAreas = useSelect( ( select ) =>
-		select( coreStore ).getEntityRecords( 'root', 'navigationArea' )
+	const { navigationAreas, hasResolvedNavigationAreas } = useSelect(
+		( select ) => {
+			const { getEntityRecords, hasFinishedResolution } = select(
+				coreStore
+			);
+			return {
+				navigationAreas: getEntityRecords( 'root', 'navigationArea' ),
+				hasResolvedNavigationAreas: hasFinishedResolution(
+					'getEntityRecords',
+					[ 'root', 'navigationArea' ]
+				),
+			};
+		}
 	);
-	const currentNavigationMenuId = navigationAreas?.length
+	const navigationMenuId = navigationAreas?.length
 		? navigationAreas[ area ]
 		: undefined;
 
@@ -41,24 +51,6 @@ function NavigationAreaBlock( { attributes, setAttributes } ) {
 		[ navigationAreas ]
 	);
 
-	const template = useMemo(
-		() => [
-			[
-				'core/navigation',
-				{ navigationMenuId: currentNavigationMenuId },
-			],
-		],
-		[ currentNavigationMenuId ]
-	);
-
-	const blockProps = useBlockProps();
-	const innerBlocksProps = useInnerBlocksProps( blockProps, {
-		orientation: 'horizontal',
-		renderAppender: false,
-		template,
-		// templateLock: "insert",
-		allowedBlocks: ALLOWED_BLOCKS,
-	} );
 	return (
 		<>
 			<BlockControls>
@@ -98,7 +90,14 @@ function NavigationAreaBlock( { attributes, setAttributes } ) {
 					/>
 				</PanelBody>
 			</InspectorControls>
-			<div { ...innerBlocksProps } />
+			{ ! hasResolvedNavigationAreas && <PlaceholderPreview isLoading /> }
+			{
+				// Render inner blocks only when navigationMenuId is known so
+				// that inner blocks template is correct from the start.
+				hasResolvedNavigationAreas && (
+					<InnerBlocks navigationMenuId={ navigationMenuId } />
+				)
+			}
 		</>
 	);
 }
