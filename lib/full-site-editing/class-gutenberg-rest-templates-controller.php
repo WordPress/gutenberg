@@ -173,7 +173,7 @@ class Gutenberg_REST_Templates_Controller extends WP_REST_Controller {
 	 */
 	public function get_item( $request ) {
 		if ( isset( $request['source'] ) && 'theme' === $request['source'] ) {
-			$template = gutenberg_get_block_file_template( $request['id'], $this->post_type );
+			$template = get_block_file_template( $request['id'], $this->post_type );
 		} else {
 			$template = get_block_template( $request['id'], $this->post_type );
 		}
@@ -209,7 +209,7 @@ class Gutenberg_REST_Templates_Controller extends WP_REST_Controller {
 
 		if ( isset( $request['source'] ) && 'theme' === $request['source'] ) {
 			wp_delete_post( $template->wp_id, true );
-			return $this->prepare_item_for_response( gutenberg_get_block_file_template( $request['id'], $this->post_type ), $request );
+			return $this->prepare_item_for_response( get_block_file_template( $request['id'], $this->post_type ), $request );
 		}
 
 		$changes = $this->prepare_item_for_database( $request );

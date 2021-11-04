@@ -260,65 +260,6 @@ function gutenberg_get_block_templates( $query = array(), $template_type = 'wp_t
 }
 
 /**
- * Retrieves a single unified template object using its id.
- * Retrieves the file template.
- *
- * @param string $id Template unique identifier (example: theme_slug//template_slug).
- * @param array  $template_type wp_template or wp_template_part.
- *
- * @return WP_Block_Template|null File template.
- */
-function gutenberg_get_block_file_template( $id, $template_type = 'wp_template' ) {
-	/**
-	 * Filters the block templates array before the query takes place.
-	 *
-	 * Return a non-null value to bypass the WordPress queries.
-	 *
-	 * @since 10.8
-	 *
-	 * @param WP_Block_Template|null $block_template Return block template object to short-circuit the default query,
-	 *                                               or null to allow WP to run it's normal queries.
-	 * @param string $id Template unique identifier (example: theme_slug//template_slug).
-	 * @param array  $template_type wp_template or wp_template_part.
-	 */
-	$block_template = apply_filters( 'pre_get_block_file_template', null, $id, $template_type );
-	if ( ! is_null( $block_template ) ) {
-		return $block_template;
-	}
-
-	$parts = explode( '//', $id, 2 );
-	if ( count( $parts ) < 2 ) {
-		/** This filter is documented at the end of this function */
-		return apply_filters( 'get_block_file_template', null, $id, $template_type );
-	}
-	list( $theme, $slug ) = $parts;
-
-	if ( wp_get_theme()->get_stylesheet() !== $theme ) {
-		/** This filter is documented at the end of this function */
-		return apply_filters( 'get_block_file_template', null, $id, $template_type );
-	}
-
-	$template_file = _get_block_template_file( $template_type, $slug );
-	if ( null === $template_file ) {
-		/** This filter is documented at the end of this function */
-		return apply_filters( 'get_block_file_template', null, $id, $template_type );
-	}
-
-	$block_template = _gutenberg_build_template_result_from_file( $template_file, $template_type );
-
-	/**
-	 * Filters the array of queried block templates array after they've been fetched.
-	 *
-	 * @since 10.8
-	 *
-	 * @param null|WP_Block_Template $block_template The found block template.
-	 * @param string $id Template unique identifier (example: theme_slug//template_slug).
-	 * @param array  $template_type wp_template or wp_template_part.
-	 */
-	return apply_filters( 'get_block_file_template', $block_template, $id, $template_type );
-}
-
-/**
  * Generates a unique slug for templates or template parts.
  *
  * @param string $override_slug The filtered value of the slug (starts as `null` from apply_filter).
