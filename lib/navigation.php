@@ -455,8 +455,10 @@ function gutenberg_disable_block_editor_for_navigation_post_type( $value, $post_
 add_filter( 'use_block_editor_for_post_type', 'gutenberg_disable_block_editor_for_navigation_post_type', 10, 2 );
 
 /**
- * This callback disables content editor for wp_navigation type posts.
+ * This callback disables the content editor for wp_navigation type posts.
  * Content editor cannot handle wp_navigation type posts correctly.
+ * We cannot disable the "editor" feature in the wp_navigation's CPT definition
+ * because it disables the ability to save navigation blocks via REST API.
  *
  * @param WP_Post $post An instance of WP_Post class.
  */
