@@ -21,7 +21,12 @@ import { useMemo } from '@wordpress/element';
  */
 import { useCanEditEntity } from '../utils/hooks';
 
-function ReadOnlyContent( { layout, userCanEdit, postType, postId } ) {
+function ReadOnlyContent( {
+	__experimentalLayout,
+	postId,
+	postType,
+	userCanEdit,
+} ) {
 	const [ , , content ] = useEntityProp(
 		'postType',
 		postType,
@@ -29,13 +34,6 @@ function ReadOnlyContent( { layout, userCanEdit, postType, postId } ) {
 		postId
 	);
 	const blockProps = useBlockProps();
-
-	const themeSupportsLayout = useSelect( ( select ) => {
-		const { getSettings } = select( blockEditorStore );
-		return getSettings()?.supportsLayout;
-	}, [] );
-	const defaultLayout = useSetting( 'layout' ) || {};
-	const usedLayout = !! layout && layout.inherit ? defaultLayout : layout;
 
 	const rawContent = content?.raw;
 	const blocks = useMemo( () => {
@@ -45,7 +43,7 @@ function ReadOnlyContent( { layout, userCanEdit, postType, postId } ) {
 	const blockPreviewProps = useBlockPreview( {
 		blocks,
 		props: blockProps,
-		__experimentalLayout: themeSupportsLayout ? usedLayout : undefined,
+		__experimentalLayout,
 	} );
 
 	return content?.protected && ! userCanEdit ? (
@@ -57,14 +55,8 @@ function ReadOnlyContent( { layout, userCanEdit, postType, postId } ) {
 	);
 }
 
-function EditableContent( { layout, context = {} } ) {
+function EditableContent( { __experimentalLayout, context = {} } ) {
 	const { postType, postId } = context;
-	const themeSupportsLayout = useSelect( ( select ) => {
-		const { getSettings } = select( blockEditorStore );
-		return getSettings()?.supportsLayout;
-	}, [] );
-	const defaultLayout = useSetting( 'layout' ) || {};
-	const usedLayout = !! layout && layout.inherit ? defaultLayout : layout;
 	const [ blocks, onInput, onChange ] = useEntityBlockEditor(
 		'postType',
 		postType,
@@ -77,7 +69,7 @@ function EditableContent( { layout, context = {} } ) {
 			value: blocks,
 			onInput,
 			onChange,
-			__experimentalLayout: themeSupportsLayout ? usedLayout : undefined,
+			__experimentalLayout,
 		}
 	);
 	return <div { ...props } />;
@@ -89,11 +81,22 @@ function Content( props ) {
 	const userCanEdit = useCanEditEntity( 'postType', postType, postId );
 	const isEditable = userCanEdit && ! isDescendentOfQueryLoop;
 
+	const themeSupportsLayout = useSelect( ( select ) => {
+		const { getSettings } = select( blockEditorStore );
+		return getSettings()?.supportsLayout;
+	}, [] );
+	const defaultLayout = useSetting( 'layout' ) || {};
+	const usedLayout = !! layout && layout.inherit ? defaultLayout : layout;
+	const __experimentalLayout = themeSupportsLayout ? usedLayout : undefined;
+
 	return isEditable ? (
-		<EditableContent { ...props } />
+		<EditableContent
+			{ ...props }
+			__experimentalLayout={ __experimentalLayout }
+		/>
 	) : (
 		<ReadOnlyContent
-			layout={ layout }
+			__experimentalLayout={ __experimentalLayout }
 			userCanEdit={ userCanEdit }
 			postType={ postType }
 			postId={ postId }
