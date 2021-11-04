@@ -63,11 +63,11 @@ export default function msListConverter( node, doc ) {
 
 	// Change pointer depending on indentation level.
 	while ( level-- ) {
-		receivingNode = receivingNode.lastElementChild || receivingNode;
+		receivingNode = receivingNode.lastChild || receivingNode;
 
 		// If it's a list, move pointer to the last item.
 		if ( isList( receivingNode ) ) {
-			receivingNode = receivingNode.lastElementChild || receivingNode;
+			receivingNode = receivingNode.lastChild || receivingNode;
 		}
 	}
 
