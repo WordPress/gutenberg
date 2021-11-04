@@ -9,9 +9,10 @@ import {
 import { isURL } from '@wordpress/url';
 import { useDispatch } from '@wordpress/data';
 import { store as noticesStore } from '@wordpress/notices';
-import { useCallback, useState } from '@wordpress/element';
+import { useCallback, useRef, useState } from '@wordpress/element';
 
-const EmbedBottomSheet = ( {
+const EmbedLinkSettings = ( {
+	autoFocus,
 	value,
 	label,
 	isVisible,
@@ -19,7 +20,8 @@ const EmbedBottomSheet = ( {
 	onSubmit,
 	withBottomSheet,
 } ) => {
-	const [ url, setURL ] = useState( value );
+	const url = useRef( value );
+	const [ inputURL, setInputURL ] = useState( value );
 	const { createErrorNotice } = useDispatch( noticesStore );
 
 	const linkSettingsOptions = {
@@ -30,7 +32,7 @@ const EmbedBottomSheet = ( {
 				label
 			),
 			placeholder: __( 'Add link' ),
-			autoFocus: true,
+			autoFocus,
 			autoFill: true,
 		},
 		footer: {
@@ -47,51 +49,47 @@ const EmbedBottomSheet = ( {
 	};
 
 	const onDismiss = useCallback( () => {
-		if ( url !== '' ) {
-			if ( isURL( url ) ) {
-				onSubmit( url );
-			} else {
-				createErrorNotice(
-					__( 'Invalid URL. Please enter a valid URL.' )
-				);
-				// If the URL was already defined, we submit it to stop showing the embed placeholder.
-				onSubmit( value );
-			}
-		} else {
-			// Resets the URL when new value is empty
-			onSubmit( '' );
+		if ( ! isURL( url.current ) && url.current !== '' ) {
+			createErrorNotice( __( 'Invalid URL. Please enter a valid URL.' ) );
+			// If the URL was already defined, we submit it to stop showing the embed placeholder.
+			onSubmit( value );
+			return;
 		}
-	}, [ url, onSubmit, value ] );
+		onSubmit( url.current );
+	}, [ onSubmit, value ] );
 
 	/**
 	 * If the Embed Bottom Sheet component does not utilize a bottom sheet then the onDismiss action is not
 	 * called. Here we are wiring the onDismiss to the onClose callback that gets triggered when input is submitted.
 	 */
-	const performOnCloseOperations = () => {
+	const performOnCloseOperations = useCallback( () => {
+		if ( onClose ) {
+			onClose();
+		}
+
 		if ( ! withBottomSheet ) {
 			onDismiss();
 		}
-		onClose();
-	};
+	}, [ onClose ] );
 
-	function setAttributes( attributes ) {
-		setURL( attributes.url );
-	}
+	const onSetAttributes = useCallback( ( attributes ) => {
+		url.current = attributes.url;
+		setInputURL( attributes.url );
+	}, [] );
 
 	return (
 		<LinkSettingsNavigation
 			isVisible={ isVisible }
-			url={ url }
+			url={ inputURL }
 			onClose={ performOnCloseOperations }
 			onDismiss={ onDismiss }
-			setAttributes={ setAttributes }
+			setAttributes={ onSetAttributes }
 			options={ linkSettingsOptions }
 			testID="embed-edit-url-modal"
 			withBottomSheet={ withBottomSheet }
 			showIcon
-			hasPicker={ ! withBottomSheet }
 		/>
 	);
 };
 
-export default EmbedBottomSheet;
+export default EmbedLinkSettings;
