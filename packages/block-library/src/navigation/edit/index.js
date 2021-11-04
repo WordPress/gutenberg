@@ -46,6 +46,7 @@ import NavigationMenuNameControl from './navigation-menu-name-control';
 import NavigationMenuPublishButton from './navigation-menu-publish-button';
 import UnsavedInnerBlocks from './unsaved-inner-blocks';
 import NavigationMenuDeleteControl from './navigation-menu-delete-control';
+import CopyPatternControl from './copy-pattern-control';
 
 function getComputedStyle( node ) {
 	return node.ownerDocument.defaultView.getComputedStyle( node );
@@ -437,6 +438,11 @@ function Navigation( {
 						</PanelColorSettings>
 					) }
 				</InspectorControls>
+				{ isEntityAvailable && (
+					<InspectorControls __experimentalGroup="advanced">
+						<CopyPatternControl clientId={ clientId } />
+					</InspectorControls>
+				) }
 				<nav { ...blockProps }>
 					{ ! isEntityAvailable && isPlaceholderShown && (
 						<PlaceholderComponent

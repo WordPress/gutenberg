@@ -569,7 +569,9 @@ body.editor-styles-wrapper
 	animation: 0.5s linear 2s normal forwards fadeouthalf;
 }
 
-.wp-block-navigation-delete-menu-button {
+.wp-block-navigation-delete-menu-button,
+.wp-block-navigation-copy-pattern-button {
 	width: 100%;
 	justify-content: center;
+	margin-bottom: $grid-unit-20;
 }
