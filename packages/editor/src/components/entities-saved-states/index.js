@@ -74,6 +74,7 @@ export default function EntitiesSavedStates( { close } ) {
 		editEntityRecord,
 		saveEditedEntityRecord,
 		__experimentalSaveSpecifiedEntityEdits: saveSpecifiedEntityEdits,
+		__experimentalResetEditedEntityRecord: resetEditedEntityRecord,
 	} = useDispatch( coreStore );
 
 	// To group entities by type.
@@ -137,8 +138,8 @@ export default function EntitiesSavedStates( { close } ) {
 			}
 		);
 
-		// We're saving all changes and can thus safely return to the editor afterwards.
 		if ( entitiesToSave.length === dirtyEntityRecords.length ) {
+			// We're saving all changes and can thus safely return to the editor afterwards.
 			showDiscardEntitiesPanel( false );
 			close( entitiesToSave );
 		} else {
@@ -171,6 +172,41 @@ export default function EntitiesSavedStates( { close } ) {
 				siteItemsToSave
 			);
 		}
+	};
+
+	const discardCheckedEntities = () => {
+		const entitiesToDiscard = dirtyEntityRecords.filter(
+			( { kind, name, key, property } ) => {
+				return ! some(
+					unselectedEntities,
+					( elt ) =>
+						elt.kind === kind &&
+						elt.name === name &&
+						elt.key === key &&
+						elt.property === property
+				);
+			}
+		);
+
+		const siteItemsToDiscard = [];
+		entitiesToDiscard.forEach( ( { kind, name, key, property } ) => {
+			if ( 'root' === kind && 'site' === name ) {
+				siteItemsToDiscard.push( property );
+			} else {
+				// if (
+				// 	PUBLISH_ON_SAVE_ENTITIES.some(
+				// 		( typeToPublish ) =>
+				// 			typeToPublish.kind === kind &&
+				// 			typeToPublish.name === name
+				// 	)
+				// ) {
+				// 	editEntityRecord( kind, name, key, { status: 'publish' } );
+				// }
+
+				resetEditedEntityRecord( kind, name, key );
+			}
+		} );
+		//resetSpecifiedEntityEdits( 'root', 'site', undefined, siteItemsToDiscard );
 	};
 
 	// Explicitly define this with no argument passed.  Using `close` on
@@ -254,7 +290,7 @@ export default function EntitiesSavedStates( { close } ) {
 								0
 							}
 							isDestructive
-							onClick={ dismissPanel }
+							onClick={ discardCheckedEntities }
 						>
 							{ __( 'Discard changes' ) }
 						</Button>

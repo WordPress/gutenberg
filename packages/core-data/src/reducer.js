@@ -263,6 +263,15 @@ function entity( entityConfig ) {
 							...state,
 							[ action.recordId ]: nextEdits,
 						};
+
+					case 'RESET_ENTITY_RECORD_EDITS':
+						const {
+							// eslint-disable-next-line no-unused-vars
+							[ action.recordId ]: recordEdits,
+							...otherEdits
+						} = state;
+
+						return otherEdits;
 				}
 
 				return state;

@@ -694,6 +694,22 @@ export const __experimentalSaveSpecifiedEntityEdits = (
 };
 
 /**
+ * Action triggered to reset an entity record's edits.
+ *
+ * @param {string} kind     Kind of the entity.
+ * @param {string} name     Name of the entity.
+ * @param {Object} recordId ID of the record.
+ */
+export function __experimentalResetEditedEntityRecord( kind, name, recordId ) {
+	return {
+		type: 'RESET_ENTITY_RECORD_EDITS',
+		kind,
+		name,
+		recordId,
+	};
+}
+
+/**
  * Returns an action object used in signalling that Upload permissions have been received.
  *
  * @param {boolean} hasUploadPermissions Does the user have permission to upload files?
