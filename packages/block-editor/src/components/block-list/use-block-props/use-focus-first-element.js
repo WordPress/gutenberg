@@ -81,14 +81,13 @@ export function useFocusFirstElement( clientId ) {
 		}
 
 		let target = ref.current;
-		let candidates;
 
 		// If reversed (e.g. merge via backspace), use the last in the set of
 		// tabbables.
 		const isReverse = -1 === initialPosition;
 
 		// Find all text fields or placeholders within the block.
-		candidates = focus.tabbable
+		const candidates = focus.tabbable
 			.find( target )
 			.filter(
 				( node ) =>
@@ -104,20 +103,6 @@ export function useFocusFirstElement( clientId ) {
 		if ( ! isInsideRootBlock( ref.current, target ) ) {
 			ref.current.focus();
 			return;
-		}
-
-		if ( target.shadowRoot ) {
-			target.focus();
-
-			// We must wait for the placeholder content to load.
-			const timeoutId = setTimeout( () => {
-				// Find all text fields within the placeholder.
-				candidates = focus.tabbable.find( target.shadowRoot );
-				target = ( isReverse ? last : first )( candidates ) || target;
-				placeCaretAtHorizontalEdge( target, isReverse );
-			} );
-
-			return () => clearTimeout( timeoutId );
 		}
 
 		placeCaretAtHorizontalEdge( target, isReverse );

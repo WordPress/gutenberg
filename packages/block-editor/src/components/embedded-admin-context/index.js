@@ -1,7 +1,11 @@
 /**
  * WordPress dependencies
  */
-import { useRefEffect } from '@wordpress/compose';
+import {
+	useRefEffect,
+	useConstrainedTabbing,
+	useMergeRefs,
+} from '@wordpress/compose';
 import { useState, createPortal } from '@wordpress/element';
 import { ENTER, SPACE, ESCAPE } from '@wordpress/keycodes';
 import { focus } from '@wordpress/dom';
@@ -117,9 +121,25 @@ export default function EmbeddedAdminContext( props ) {
 			clearTimeout( timeoutId );
 		};
 	}, [] );
+
+	const dialogRef = useRefEffect( ( element ) => {
+		if (
+			element.getRootNode().host !== element.ownerDocument.activeElement
+		)
+			return;
+
+		const [ firstTabbable ] = focus.tabbable.find( element );
+		if ( firstTabbable ) firstTabbable.focus();
+	}, [] );
+
 	const content = (
 		<StyleProvider document={ { head: shadow } }>
-			{ props.children }
+			<div
+				role="dialog"
+				ref={ useMergeRefs( [ useConstrainedTabbing(), dialogRef ] ) }
+			>
+				{ props.children }
+			</div>
 		</StyleProvider>
 	);
 

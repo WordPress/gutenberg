@@ -1,7 +1,6 @@
 /**
  * WordPress dependencies
  */
-import { useConstrainedTabbing } from '@wordpress/compose';
 import { Placeholder } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
 
@@ -28,11 +27,7 @@ export default function IsolatedPlaceholder( props ) {
 			) }
 			className="wp-block-editor-placeholder"
 		>
-			<Placeholder
-				{ ...props }
-				role="dialog"
-				ref={ useConstrainedTabbing() }
-			/>
+			<Placeholder { ...props } />
 		</EmbeddedAdminContext>
 	);
 }
