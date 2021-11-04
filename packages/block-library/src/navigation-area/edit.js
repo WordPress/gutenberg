@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { __, _x } from '@wordpress/i18n';
-import { useEntityProp, store as coreStore } from '@wordpress/core-data';
+import { store as coreStore } from '@wordpress/core-data';
 import {
 	MenuGroup,
 	MenuItemsChoice,
@@ -20,7 +20,7 @@ import {
 } from '@wordpress/block-editor';
 import { useSelect } from '@wordpress/data';
 
-const TEMPLATE = [ [ 'core/navigation', { area: 'primary' } ] ];
+const TEMPLATE = [ [ 'core/navigation' ] ];
 
 const ALLOWED_BLOCKS = [ 'core/navigation' ];
 
