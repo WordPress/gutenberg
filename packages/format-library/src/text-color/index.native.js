@@ -24,6 +24,36 @@ const title = __( 'Text color' );
 
 const EMPTY_ARRAY = [];
 
+function getComputedStyleProperty( element, property ) {
+	const {
+		props: { style = {} },
+	} = element;
+
+	if ( property === 'background-color' ) {
+		const { backgroundColor, baseColors } = style;
+
+		if ( backgroundColor !== 'transparent' ) {
+			return backgroundColor;
+		} else if ( baseColors && baseColors?.color?.background ) {
+			return baseColors?.color?.background;
+		}
+	}
+}
+
+function fillComputedColors( element, { color, backgroundColor } ) {
+	if ( ! color && ! backgroundColor ) {
+		return;
+	}
+
+	return {
+		color: color || getComputedStyleProperty( element, 'color' ),
+		backgroundColor:
+			backgroundColor.replace( / /g, '' ) === 'rgba(0,0,0,0)'
+				? getComputedStyleProperty( element, 'background-color' )
+				: 'transparent',
+	};
+}
+
 function TextColorEdit( {
 	value,
 	onChange,
@@ -40,11 +70,14 @@ function TextColorEdit( {
 	const disableIsAddingColor = useCallback( () => setIsAddingColor( false ), [
 		setIsAddingColor,
 	] );
-	const colorIndicatorStyle = useMemo( () => {
-		const color = getActiveColors( value, name, colors )?.color;
-
-		return { color: color?.replace( ' ', '' ) };
-	}, [ value, colors ] );
+	const colorIndicatorStyle = useMemo(
+		() =>
+			fillComputedColors(
+				contentRef,
+				getActiveColors( value, name, colors )
+			),
+		[ value, colors ]
+	);
 
 	const hasColorsToChoose = ! isEmpty( colors ) || ! allowCustomControl;
 	if ( ! hasColorsToChoose && ! isActive ) {
@@ -63,12 +96,14 @@ function TextColorEdit( {
 							<Icon
 								icon={ textColorIcon }
 								style={
-									colorIndicatorStyle?.color &&
-									colorIndicatorStyle
+									colorIndicatorStyle?.color && {
+										color: colorIndicatorStyle?.color,
+									}
 								}
 							/>
 						}
 						title={ title }
+						extraProps={ { isActiveStyle: colorIndicatorStyle } }
 						// If has no colors to choose but a color is active remove the color onClick
 						onClick={
 							hasColorsToChoose
