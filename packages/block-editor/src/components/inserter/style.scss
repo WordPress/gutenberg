@@ -352,17 +352,24 @@ $block-inserter-tabs-height: 44px;
 	.block-editor-block-patterns-list {
 		display: grid;
 		grid-gap: $grid-unit-30;
-		grid-template-columns: repeat(2, 1fr);
+		grid-template-columns: repeat(1, 1fr);
+
+		@include break-xlarge() {
+			grid-template-columns: repeat(2, 1fr);
+		}
+
+		@include break-huge() {
+			grid-template-columns: repeat(3, 1fr);
+		}
 
 		.block-editor-block-patterns-list__list-item {
-			margin-top: 0;
-			margin-bottom: $grid-unit-30;
+			min-height: 240px;
 		}
 
 		.block-editor-block-preview__container {
 			height: inherit;
-			max-height: 600px;
-			overflow: hidden;
+			min-height: 100px;
+			max-height: 800px;
 		}
 	}
 }
