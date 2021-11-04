@@ -97,7 +97,7 @@ function useGlobalStylesUserConfig() {
 
 	const config = useMemo( () => {
 		return {
-			settings: addUserOriginToSettings( settings ?? {} ),
+			settings: settings ? addUserOriginToSettings( settings ) : {},
 			styles: styles ?? {},
 		};
 	}, [ settings, styles ] );
@@ -172,9 +172,6 @@ function useGlobalStylesContext() {
 
 export function GlobalStylesProvider( { children } ) {
 	const context = useGlobalStylesContext();
-	if ( ! context.isReady ) {
-		return null;
-	}
 
 	return (
 		<GlobalStylesContext.Provider value={ context }>

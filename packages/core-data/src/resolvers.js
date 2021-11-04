@@ -441,10 +441,13 @@ export const __experimentalGetCurrentThemeBaseGlobalStyles = () => async ( {
 	resolveSelect,
 	dispatch,
 } ) => {
+	let themeGlobalStyles = null;
 	const currentTheme = await resolveSelect.getCurrentTheme();
-	const themeGlobalStyles = await apiFetch( {
-		path: `/wp/v2/global-styles/themes/${ currentTheme.stylesheet }`,
-	} );
+	try {
+		themeGlobalStyles = await apiFetch( {
+			path: `/wp/v2/global-styles/themes/${ currentTheme.stylesheet }`,
+		} );
+	} catch ( e ) {}
 	await dispatch.__experimentalReceiveThemeBaseGlobalStyles(
 		currentTheme.stylesheet,
 		themeGlobalStyles

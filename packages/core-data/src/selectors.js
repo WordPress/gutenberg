@@ -919,5 +919,11 @@ export function __experimentalGetCurrentThemeBaseGlobalStyles( state ) {
 	if ( ! currentTheme ) {
 		return null;
 	}
+	if (
+		! state.themeBaseGlobalStyles ||
+		! state.themeBaseGlobalStyles[ currentTheme.stylesheet ]
+	) {
+		return null;
+	}
 	return state.themeBaseGlobalStyles[ currentTheme.stylesheet ];
 }

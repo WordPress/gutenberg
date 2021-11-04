@@ -1,6 +1,7 @@
 /**
  * WordPress dependencies
  */
+import { useContext } from '@wordpress/element';
 import { DropdownMenu, FlexItem, FlexBlock, Flex } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { styles, moreVertical } from '@wordpress/icons';
@@ -10,10 +11,15 @@ import { styles, moreVertical } from '@wordpress/icons';
  */
 import DefaultSidebar from './default-sidebar';
 import { GlobalStylesUI, useGlobalStylesReset } from '../global-styles';
+import { GlobalStylesContext } from '../global-styles/context';
 
 export default function GlobalStylesSidebar() {
 	const [ canReset, onReset ] = useGlobalStylesReset();
 
+	const { isReady } = useContext( GlobalStylesContext );
+	if ( ! isReady ) {
+		return null;
+	}
 	return (
 		<DefaultSidebar
 			className="edit-site-global-styles-sidebar"
