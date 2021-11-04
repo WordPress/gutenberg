@@ -196,14 +196,14 @@ class WP_Theme_JSON_Schema {
 		);
 
 		// 'defaults' settings become top-level.
-		if ( isset( $settings[ self::ALL_BLOCKS_NAME ] ) ) {
-			$new = $settings[ self::ALL_BLOCKS_NAME ];
-			unset( $settings[ self::ALL_BLOCKS_NAME ] );
+		if ( isset( $settings[ self::V0_ALL_BLOCKS_NAME ] ) ) {
+			$new = $settings[ self::V0_ALL_BLOCKS_NAME ];
+			unset( $settings[ self::V0_ALL_BLOCKS_NAME ] );
 		}
 
 		// 'root' settings override 'defaults'.
-		if ( isset( $settings[ self::ROOT_BLOCK_NAME ] ) ) {
-			$new = array_replace_recursive( $new, $settings[ self::ROOT_BLOCK_NAME ] );
+		if ( isset( $settings[ self::V0_ROOT_BLOCK_NAME ] ) ) {
+			$new = array_replace_recursive( $new, $settings[ self::V0_ROOT_BLOCK_NAME ] );
 
 			// The array_replace_recursive algorithm merges at the leaf level.
 			// This means that when a leaf value is an array,
@@ -215,7 +215,7 @@ class WP_Theme_JSON_Schema {
 			foreach ( $paths_to_override as $path ) {
 				$root_value = _wp_array_get(
 					$settings,
-					array_merge( array( self::ROOT_BLOCK_NAME ), $path ),
+					array_merge( array( self::V0_ROOT_BLOCK_NAME ), $path ),
 					null
 				);
 				if ( null !== $root_value ) {
@@ -223,7 +223,7 @@ class WP_Theme_JSON_Schema {
 				}
 			}
 
-			unset( $settings[ self::ROOT_BLOCK_NAME ] );
+			unset( $settings[ self::V0_ROOT_BLOCK_NAME ] );
 		}
 
 		if ( empty( $settings ) ) {
@@ -298,9 +298,9 @@ class WP_Theme_JSON_Schema {
 		);
 
 		// Styles within root become top-level.
-		if ( isset( $styles[ self::ROOT_BLOCK_NAME ] ) ) {
-			$new = $styles[ self::ROOT_BLOCK_NAME ];
-			unset( $styles[ self::ROOT_BLOCK_NAME ] );
+		if ( isset( $styles[ self::V0_ROOT_BLOCK_NAME ] ) ) {
+			$new = $styles[ self::V0_ROOT_BLOCK_NAME ];
+			unset( $styles[ self::V0_ROOT_BLOCK_NAME ] );
 
 			// Transform root.styles.color.link into elements.link.color.text.
 			if ( isset( $new['color']['link'] ) ) {
