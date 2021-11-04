@@ -20,8 +20,6 @@ import {
 } from '@wordpress/block-editor';
 import { useSelect } from '@wordpress/data';
 
-const TEMPLATE = [ [ 'core/navigation' ] ];
-
 const ALLOWED_BLOCKS = [ 'core/navigation' ];
 
 function NavigationAreaBlock( { attributes, setAttributes } ) {
@@ -30,6 +28,10 @@ function NavigationAreaBlock( { attributes, setAttributes } ) {
 	const navigationAreas = useSelect( ( select ) =>
 		select( coreStore ).getEntityRecords( 'root', 'navigationArea' )
 	);
+	const currentNavigationMenuId = navigationAreas?.length
+		? navigationAreas[ area ]
+		: undefined;
+
 	const choices = useMemo(
 		() =>
 			navigationAreas?.map( ( { name, description } ) => ( {
@@ -39,11 +41,21 @@ function NavigationAreaBlock( { attributes, setAttributes } ) {
 		[ navigationAreas ]
 	);
 
+	const template = useMemo(
+		() => [
+			[
+				'core/navigation',
+				{ navigationMenuId: currentNavigationMenuId },
+			],
+		],
+		[ currentNavigationMenuId ]
+	);
+
 	const blockProps = useBlockProps();
 	const innerBlocksProps = useInnerBlocksProps( blockProps, {
 		orientation: 'horizontal',
 		renderAppender: false,
-		template: TEMPLATE,
+		template,
 		// templateLock: "insert",
 		allowedBlocks: ALLOWED_BLOCKS,
 	} );
