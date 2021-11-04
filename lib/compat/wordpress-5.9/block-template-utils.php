@@ -124,3 +124,42 @@ if ( ! function_exists( '_inject_theme_attribute_in_block_template_content' ) ) 
 		return $template_content;
 	}
 }
+
+if ( ! function_exists( 'block_template_part' ) ) {
+	/**
+	 * Print a template-part.
+	 *
+	 * @param string $part The template-part to print. Use "header" or "footer".
+	 *
+	 * @return void
+	 */
+	function block_template_part( $part ) {
+		$template_part = gutenberg_get_block_template( get_stylesheet() . '//' . $part, 'wp_template_part' );
+		if ( ! $template_part || empty( $template_part->content ) ) {
+			return;
+		}
+		echo do_blocks( $template_part->content );
+	}
+}
+
+if ( ! function_exists( 'block_header_area' ) ) {
+	/**
+	 * Print the header template-part.
+	 *
+	 * @return void
+	 */
+	function block_header_area() {
+		block_template_part( 'header' );
+	}
+}
+
+if ( ! function_exists( 'block_footer_area' ) ) {
+	/**
+	 * Print the footer template-part.
+	 *
+	 * @return void
+	 */
+	function block_footer_area() {
+		block_template_part( 'footer' );
+	}
+}
