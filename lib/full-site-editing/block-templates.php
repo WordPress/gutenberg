@@ -66,58 +66,16 @@ function _gutenberg_get_template_files( $template_type ) {
 			);
 
 			if ( 'wp_template_part' === $template_type ) {
-				$template_files[] = _gutenberg_add_template_part_area_info( $new_template_item );
+				$template_files[] = _add_block_template_part_area_info( $new_template_item );
 			}
 
 			if ( 'wp_template' === $template_type ) {
-				$template_files[] = _gutenberg_add_template_info( $new_template_item );
+				$template_files[] = _add_block_template_info( $new_template_item );
 			}
 		}
 	}
 
 	return $template_files;
-}
-
-/**
- * Attempts to add custom template information to the template item.
- *
- * @param array $template_item Template to add information to (requires 'slug' field).
- * @return array Template
- */
-function _gutenberg_add_template_info( $template_item ) {
-	if ( ! WP_Theme_JSON_Resolver_Gutenberg::theme_has_support() ) {
-		return $template_item;
-	}
-
-	$theme_data = WP_Theme_JSON_Resolver_Gutenberg::get_theme_data()->get_custom_templates();
-	if ( isset( $theme_data[ $template_item['slug'] ] ) ) {
-		$template_item['title']     = $theme_data[ $template_item['slug'] ]['title'];
-		$template_item['postTypes'] = $theme_data[ $template_item['slug'] ]['postTypes'];
-	}
-
-	return $template_item;
-}
-
-/**
- * Attempts to add the template part's area information to the input template.
- *
- * @param array $template_info Template to add information to (requires 'type' and 'slug' fields).
- *
- * @return array Template.
- */
-function _gutenberg_add_template_part_area_info( $template_info ) {
-	if ( WP_Theme_JSON_Resolver_Gutenberg::theme_has_support() ) {
-		$theme_data = WP_Theme_JSON_Resolver_Gutenberg::get_theme_data()->get_template_parts();
-	}
-
-	if ( isset( $theme_data[ $template_info['slug'] ]['area'] ) ) {
-		$template_info['title'] = $theme_data[ $template_info['slug'] ]['title'];
-		$template_info['area']  = gutenberg_filter_template_part_area( $theme_data[ $template_info['slug'] ]['area'] );
-	} else {
-		$template_info['area'] = WP_TEMPLATE_PART_AREA_UNCATEGORIZED;
-	}
-
-	return $template_info;
 }
 
 /**
