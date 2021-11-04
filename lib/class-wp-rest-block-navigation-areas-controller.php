@@ -114,7 +114,6 @@ class WP_REST_Block_Navigation_Areas_Controller extends WP_REST_Controller {
 	 * @return WP_Error|bool True if the request has read access for the item, WP_Error object otherwise.
 	 */
 	public function get_item_permissions_check( $request ) {
-		// @TODO
 		if ( ! current_user_can( 'edit_theme_options' ) ) {
 			return new WP_Error(
 				'rest_cannot_view',
@@ -137,7 +136,6 @@ class WP_REST_Block_Navigation_Areas_Controller extends WP_REST_Controller {
 	 * @return bool|WP_Error True if the request has access to update the item, false or WP_Error object otherwise.
 	 */
 	public function update_item_permissions_check( $request ) {
-		// @TODO
 		return $this->get_item_permissions_check( $request );
 	}
 
