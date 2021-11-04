@@ -1,6 +1,6 @@
 <?php
 /**
- * This class is supposed to test the functionality of the navigation.php
+ * This class tests the functionality of block navigation
  *
  * @package Gutenberg
  */
