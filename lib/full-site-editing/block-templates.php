@@ -204,7 +204,6 @@ function _gutenberg_flatten_blocks( &$blocks ) {
  * @return string Updated wp_template content.
  */
 function _gutenberg_inject_theme_attribute_in_content( $template_content ) {
-
 	$has_updated_content = false;
 	$new_content         = '';
 	$template_blocks     = parse_blocks( $template_content );
@@ -246,7 +245,6 @@ function _gutenberg_process_theme_variable_substitution( $template_content ) {
 	$template_content = str_replace( 'src="file:.', 'src="' . get_template_directory_uri(), $template_content );
 	return $template_content;
 }
-
 
 /**
  * Build a unified template object based on a theme file.
