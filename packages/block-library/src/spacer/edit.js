@@ -249,10 +249,10 @@ const SpacerEdit = ( {
 	useEffect( () => {
 		if ( orientation === 'horizontal' && ! width ) {
 			setAttributes( {
-				height: parseFloat( 72 ),
+				height: parseFloat( 0 ),
 				heightUnit: 'px',
-				width: parseFloat( 0 ),
-				widthUnit: 'px'
+				width: parseFloat( 72 ),
+				widthUnit: 'px',
 			} );
 		}
 	}, [] );
