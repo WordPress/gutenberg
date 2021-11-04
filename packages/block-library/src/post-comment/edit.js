@@ -16,10 +16,12 @@ const ALLOWED_BLOCKS = [
 	'core/comment-reply-link',
 ];
 const TEMPLATE = [
+	[ 'core/comment-author-avatar' ],
 	[ 'core/comment-author-name' ],
 	[ 'core/comment-date' ],
 	[ 'core/comment-content' ],
 	[ 'core/comment-reply-link' ],
+	[ 'core/comment-edit-link' ],
 ];
 
 export default function Edit( { attributes: { commentId }, setAttributes } ) {

@@ -15,10 +15,12 @@ import { Spinner } from '@wordpress/components';
 import { store as coreStore } from '@wordpress/core-data';
 
 const TEMPLATE = [
+	[ 'core/comment-author-avatar' ],
 	[ 'core/comment-author-name' ],
 	[ 'core/comment-date' ],
 	[ 'core/comment-content' ],
 	[ 'core/comment-reply-link' ],
+	[ 'core/comment-edit-link' ],
 ];
 
 function CommentTemplateInnerBlocks() {
