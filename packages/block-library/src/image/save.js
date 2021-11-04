@@ -32,14 +32,16 @@ export default function save( { attributes } ) {
 	} = attributes;
 
 	const newRel = isEmpty( rel ) ? undefined : rel;
+	const borderProps = getBorderClassesAndStyles( attributes );
 
 	const classes = classnames( {
 		[ `align${ align }` ]: align,
 		[ `size-${ sizeSlug }` ]: sizeSlug,
 		'is-resized': width || height,
+		'has-custom-border':
+			!! borderProps.className || ! isEmpty( borderProps.style ),
 	} );
 
-	const borderProps = getBorderClassesAndStyles( attributes );
 	const imageClasses = classnames( borderProps.className, {
 		[ `wp-image-${ id }` ]: !! id,
 	} );
