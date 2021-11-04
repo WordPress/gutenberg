@@ -29,6 +29,8 @@ const migrateWithLayout = ( attributes ) => {
 				orientation: orientation || 'horizontal',
 			},
 		} );
+		delete updatedAttributes.contentJustification;
+		delete updatedAttributes.orientation;
 	}
 
 	return updatedAttributes;
@@ -57,7 +59,8 @@ const deprecated = [
 				},
 			},
 		},
-		isEligible: ( { layout } ) => ! layout,
+		isEligible: ( { contentJustification, orientation } ) =>
+			!! contentJustification || !! orientation,
 		migrate: migrateWithLayout,
 		save( { attributes: { contentJustification, orientation } } ) {
 			return (
