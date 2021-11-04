@@ -17,7 +17,7 @@ export default function NavigationAreaInnerBlocks( { navigationMenuId } ) {
 		orientation: 'horizontal',
 		renderAppender: false,
 		template,
-		// templateLock: "insert",
+		templateLock: 'all',
 		allowedBlocks: ALLOWED_BLOCKS,
 	} );
 	return <div { ...innerBlocksProps } />;
