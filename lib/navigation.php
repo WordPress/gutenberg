@@ -499,13 +499,16 @@ function gutenberg_rename_navigation_menus_admin_menu_entry() {
 	if ( ! isset( $submenu['themes.php'] ) ) {
 		return;
 	}
+
 	$post_type = get_post_type_object( 'wp_navigation' );
 	if ( ! $post_type ) {
 		return;
 	}
-	foreach ( $submenu['themes.php'] as $key => $submenu_entry ) {
-		if ( $post_type->labels->all_items === $submenu['themes.php'][ $key ][0] ) {
-			$submenu['themes.php'][ $key ][0] = $post_type->labels->menu_name; // phpcs:ignore WordPress.WP.GlobalVariablesOverride
+
+	$menu_title_index = 0;
+	foreach ( $submenu['themes.php'] as $key => $menu_item ) {
+		if ( $post_type->labels->all_items === $menu_item[ $menu_title_index ] ) {
+			$submenu['themes.php'][ $key ][ $menu_title_index ] = $post_type->labels->menu_name; // phpcs:ignore WordPress.WP.GlobalVariablesOverride
 			return;
 		}
 	}
