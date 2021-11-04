@@ -329,16 +329,11 @@
 	bottom: 0;
 	// Give it a z-index just higher than the adminbar.
 	z-index: 100000;
-	padding: $grid-unit-40;
+	padding: $grid-unit-40*2 $grid-unit-30 $grid-unit-30;
 }
 
 .wp-block-navigation__responsive-container {
 	display: none;
-	position: fixed;
-	top: 0;
-	left: 0;
-	right: 0;
-	bottom: 0;
 
 	.wp-block-navigation__responsive-container-content {
 		display: contents;
@@ -350,16 +345,20 @@
 	// but otherwise provide a baseline.
 	// In a future version, we can explore more customizability.
 	&.is-menu-open {
-		display: contents; // Needs to be set to override "none".
-
-		// Allow modal to scroll.
-		overflow: auto;
-
-		// Add extra top padding so items don't conflict with close button.
-		padding: 72px 24px 24px 24px;
-		background-color: inherit;
+		display: contents;
+		// Fallback to inheritance in case the --justification-setting variable fails.
+		align-items: inherit;
 
 		.wp-block-navigation__responsive-container-content {
+			// Override the container flex layout settings
+			// because we want overlay menu to always display
+			// as a column.
+			display: flex;
+			flex-direction: column;
+			// Inherit alignment settings from container.
+			align-items: var(--justification-setting, inherit);
+			// Allow menu to scroll.
+			overflow: auto;
 			padding: 0;
 
 			.wp-block-navigation__submenu-icon {
@@ -381,6 +380,7 @@
 				position: static;
 				border: none;
 				padding-left: 32px;
+				padding-right: 32px;
 
 			}
 
@@ -401,13 +401,14 @@
 				padding: 0;
 			}
 
-			// Default justification.
+			// Default column display for overlay menu contents.
 			.wp-block-navigation__container,
 			.wp-block-navigation-item,
 			.wp-block-page-list {
+				display: flex;
 				flex-direction: column;
-				justify-content: flex-start;
-				align-items: flex-start;
+				// Inherit alignment settings from container.
+				align-items: var(--justification-setting, inherit);
 			}
 		}
 
@@ -523,4 +524,9 @@ html.has-modal-open {
 .wp-block-navigation__responsive-dialog,
 .wp-block-navigation__container {
 	display: contents;
+
+	.is-menu-open & {
+		// Fallback to inheritance in case the --justification-setting variable fails.
+		align-items: inherit;
+	}
 }
