@@ -204,12 +204,11 @@ function _gutenberg_flatten_blocks( &$blocks ) {
  * @return string Updated wp_template content.
  */
 function _gutenberg_inject_theme_attribute_in_content( $template_content ) {
-	// HACK proof of concept.
-	$template_content = str_replace( '{{ template_directory_uri }}', get_template_directory_uri(), $template_content );
 
 	$has_updated_content = false;
 	$new_content         = '';
 	$template_blocks     = parse_blocks( $template_content );
+	$file_regex          = '/^file:./';
 
 	$blocks = _gutenberg_flatten_blocks( $template_blocks );
 	foreach ( $blocks as &$block ) {
@@ -219,6 +218,16 @@ function _gutenberg_inject_theme_attribute_in_content( $template_content ) {
 		) {
 			$block['attrs']['theme'] = wp_get_theme()->get_stylesheet();
 			$has_updated_content     = true;
+		}
+
+		// Variable substitution for file:/ in URL attributes.
+		if ( isset( $block['attrs']['url'] ) ) {
+			if ( preg_match( $file_regex, $block['attrs']['url'] ) ) {
+				error_log("Before: " . $block['attrs']['url']);
+				$block['attrs']['url'] = preg_replace( $file_regex, get_template_directory_uri(), $block['attrs']['url'] );
+				error_log("After: " . $block['attrs']['url']);
+				$has_updated_content   = true;
+			}
 		}
 	}
 
