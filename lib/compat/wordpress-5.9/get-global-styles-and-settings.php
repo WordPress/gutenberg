@@ -29,8 +29,7 @@ function gutenberg_get_global_settings( $path = array(), $block_name = '', $orig
 		$origin = 'user';
 	}
 
-	$theme_supports = gutenberg_get_default_block_editor_settings();
-	$settings       = WP_Theme_JSON_Resolver_Gutenberg::get_merged_data( $theme_supports, $origin )->get_settings();
+	$settings = WP_Theme_JSON_Resolver_Gutenberg::get_merged_data( $origin )->get_settings();
 
 	return _wp_array_get( $settings, $path, $settings );
 }
@@ -59,8 +58,7 @@ function gutenberg_get_global_styles( $path = array(), $block_name = '', $origin
 		$origin = 'user';
 	}
 
-	$theme_supports = gutenberg_get_default_block_editor_settings();
-	$styles         = WP_Theme_JSON_Resolver_Gutenberg::get_merged_data( $theme_supports, $origin )->get_raw_data()['styles'];
+	$styles = WP_Theme_JSON_Resolver_Gutenberg::get_merged_data( $origin )->get_raw_data()['styles'];
 
 	return _wp_array_get( $styles, $path, $styles );
 }
@@ -111,9 +109,8 @@ function gutenberg_get_global_stylesheet( $types = array() ) {
 		$origins = array( 'core', 'theme' );
 	}
 
-	$theme_supports = gutenberg_get_default_block_editor_settings();
-	$tree           = WP_Theme_JSON_Resolver_Gutenberg::get_merged_data( $theme_supports );
-	$stylesheet     = $tree->get_stylesheet( $types, $origins );
+	$tree       = WP_Theme_JSON_Resolver_Gutenberg::get_merged_data();
+	$stylesheet = $tree->get_stylesheet( $types, $origins );
 
 	if ( $can_use_cached ) {
 		// Cache for a minute.

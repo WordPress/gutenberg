@@ -1,6 +1,7 @@
 /**
  * External dependencies
  */
+import 'react-native-gesture-handler/jestSetup';
 import { NativeModules as RNNativeModules } from 'react-native';
 
 RNNativeModules.UIManager = RNNativeModules.UIManager || {};

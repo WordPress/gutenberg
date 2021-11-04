@@ -1,16 +1,15 @@
 <?php
 /**
- * Class that implements a WP_Theme_JSON_Schema to convert
- * a given structure in v0 schema to the latest one.
+ * Class that implements a WP_Theme_JSON_Schema migration.
  *
  * @package gutenberg
  */
 
 /**
- * Class that implements a WP_Theme_JSON_Schema to convert
- * a given structure in v0 schema to the latest one.
+ * Class that migrates a given structure in v0 schema to one
+ * that follows the v1 schema.
  */
-class WP_Theme_JSON_Schema_V0 implements WP_Theme_JSON_Schema {
+class WP_Theme_JSON_Schema_V0_To_V1 implements WP_Theme_JSON_Schema {
 
 	/**
 	 * How to address all the blocks
@@ -27,108 +26,65 @@ class WP_Theme_JSON_Schema_V0 implements WP_Theme_JSON_Schema {
 	const ROOT_BLOCK_NAME = 'root';
 
 	/**
-	 * Data schema of each block within a theme.json.
+	 * Converts a v0 data structure into a v1 one.
 	 *
-	 * Example:
+	 * It expects input data to come in v0 form:
 	 *
 	 * {
-	 *   'block-one': {
-	 *     'styles': {
-	 *       'color': {
-	 *         'background': 'color'
-	 *       }
-	 *     },
-	 *     'settings': {
-	 *       'color': {
-	 *         'custom': true
-	 *       }
+	 *   'root': {
+	 *     'settings': { ... },
+	 *     'styles': { ... }
+	 *   }
+	 *   'core/paragraph': {
+	 *     'styles': { ... },
+	 *     'settings': { ... }
+	 *   },
+	 *   'core/heading/h1': {
+	 *     'settings': { ... }
+	 *     'styles': { ... }
+	 *   },
+	 *   'core/heading/h2': {
+	 *     'settings': { ... }
+	 *     'styles': { ... }
+	 *   },
+	 * }
+	 *
+	 * And it will return v1 form:
+	 *
+	 * {
+	 *   'settings': {
+	 *     'border': { ... }
+	 *     'color': { ... },
+	 *     'typography': { ... },
+	 *     'spacing': { ... },
+	 *     'custom': { ... },
+	 *     'blocks': {
+	 *       'core/paragraph': { ... }
 	 *     }
 	 *   },
-	 *   'block-two': {
-	 *     'styles': {
-	 *       'color': {
-	 *         'link': 'color'
+	 *   styles: {
+	 *     border: { ... }
+	 *     color: { ... },
+	 *     typography: { ... },
+	 *     spacing: { ... },
+	 *     custom: { ... },
+	 *     blocks: {
+	 *       core/paragraph: { ... }
+	 *       core/heading: {
+	 *         elements: {
+	 *           h1: { ... },
+	 *           h2: { ... }
+	 *         }
 	 *       }
 	 *     }
 	 *   }
 	 * }
-	 */
-	const SCHEMA = array(
-		'customTemplates' => null,
-		'templateParts'   => null,
-		'styles'          => array(
-			'border'     => array(
-				'radius' => null,
-				'color'  => null,
-				'style'  => null,
-				'width'  => null,
-			),
-			'color'      => array(
-				'background' => null,
-				'gradient'   => null,
-				'link'       => null,
-				'text'       => null,
-			),
-			'spacing'    => array(
-				'padding' => array(
-					'top'    => null,
-					'right'  => null,
-					'bottom' => null,
-					'left'   => null,
-				),
-			),
-			'typography' => array(
-				'fontFamily'     => null,
-				'fontSize'       => null,
-				'fontStyle'      => null,
-				'fontWeight'     => null,
-				'lineHeight'     => null,
-				'textDecoration' => null,
-				'textTransform'  => null,
-			),
-		),
-		'settings'        => array(
-			'border'     => array(
-				'customRadius' => null,
-				'customColor'  => null,
-				'customStyle'  => null,
-				'customWidth'  => null,
-			),
-			'color'      => array(
-				'custom'         => null,
-				'customGradient' => null,
-				'gradients'      => null,
-				'link'           => null,
-				'palette'        => null,
-			),
-			'spacing'    => array(
-				'customPadding' => null,
-				'units'         => null,
-			),
-			'typography' => array(
-				'customFontSize'        => null,
-				'customLineHeight'      => null,
-				'dropCap'               => null,
-				'fontFamilies'          => null,
-				'fontSizes'             => null,
-				'customFontStyle'       => null,
-				'customFontWeight'      => null,
-				'customTextDecorations' => null,
-				'customTextTransforms'  => null,
-			),
-			'custom'     => null,
-			'layout'     => null,
-		),
-	);
-
-	/**
-	 * Converts a v0 schema into the latest.
 	 *
 	 * @param array $old Data in v0 schema.
 	 *
-	 * @return array Data in the latest schema.
+	 * @return array Data in v1 schema.
 	 */
-	public static function parse( $old ) {
+	public static function migrate( $old ) {
 		// Copy everything.
 		$new = $old;
 
@@ -140,7 +96,7 @@ class WP_Theme_JSON_Schema_V0 implements WP_Theme_JSON_Schema {
 			$new['styles'] = self::process_styles( $old['styles'] );
 		}
 
-		$new['version'] = WP_Theme_JSON_Gutenberg::LATEST_SCHEMA;
+		$new['version'] = 1;
 
 		return $new;
 	}
@@ -184,16 +140,6 @@ class WP_Theme_JSON_Schema_V0 implements WP_Theme_JSON_Schema {
 			array( 'custom' ),
 		);
 
-		$renamed_paths = array(
-			'border.customColor'               => 'border.color',
-			'border.customStyle'               => 'border.style',
-			'border.customWidth'               => 'border.width',
-			'typography.customFontStyle'       => 'typography.fontStyle',
-			'typography.customFontWeight'      => 'typography.fontWeight',
-			'typography.customTextDecorations' => 'typography.textDecoration',
-			'typography.customTextTransforms'  => 'typography.textTransform',
-		);
-
 		// 'defaults' settings become top-level.
 		if ( isset( $settings[ self::ALL_BLOCKS_NAME ] ) ) {
 			$new = $settings[ self::ALL_BLOCKS_NAME ];
@@ -229,18 +175,6 @@ class WP_Theme_JSON_Schema_V0 implements WP_Theme_JSON_Schema {
 			return $new;
 		}
 
-		// Process any renamed/moved paths within settings.
-		foreach ( $renamed_paths as $original => $renamed ) {
-			$original_path = explode( '.', $original );
-			$renamed_path  = explode( '.', $renamed );
-			$current_value = _wp_array_get( $new, $original_path, null );
-
-			if ( null !== $current_value ) {
-				gutenberg_experimental_set( $new, $renamed_path, $current_value );
-				self::unset_setting_by_path( $new, $original_path );
-			}
-		}
-
 		/*
 		 * At this point, it only contains block's data.
 		 * However, some block data we need to consolidate
@@ -274,24 +208,6 @@ class WP_Theme_JSON_Schema_V0 implements WP_Theme_JSON_Schema {
 		}
 
 		return $new;
-	}
-
-	/**
-	 * Removes a property from within the provided settings by its path.
-	 *
-	 * @param array $settings Reference to the current settings array.
-	 * @param array $path Path to the property to be removed.
-	 *
-	 * @return void
-	 */
-	private static function unset_setting_by_path( &$settings, $path ) {
-		$tmp_settings = &$settings; // phpcs:ignore VariableAnalysis.CodeAnalysis.VariableAnalysis.UnusedVariable
-		$last_key     = array_pop( $path );
-		foreach ( $path as $key ) {
-			$tmp_settings = &$tmp_settings[ $key ];
-		}
-
-		unset( $tmp_settings[ $last_key ] );
 	}
 
 	/**
