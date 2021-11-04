@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import classnames from 'classnames';
+
+/**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
@@ -15,7 +20,11 @@ import {
 	isLineHeightDefined,
 } from './utils';
 
-export default function LineHeightControl( { value: lineHeight, onChange } ) {
+export default function LineHeightControl( {
+	__unstableSize,
+	value: lineHeight,
+	onChange,
+} ) {
 	const isDefined = isLineHeightDefined( lineHeight );
 
 	const handleOnKeyDown = ( event ) => {
@@ -64,7 +73,11 @@ export default function LineHeightControl( { value: lineHeight, onChange } ) {
 	const value = isDefined ? lineHeight : RESET_VALUE;
 
 	return (
-		<div className="block-editor-line-height-control">
+		<div
+			className={ classnames( 'block-editor-line-height-control', {
+				'is-unstable-size-large': __unstableSize === 'large',
+			} ) }
+		>
 			<TextControl
 				autoComplete="off"
 				onKeyDown={ handleOnKeyDown }
