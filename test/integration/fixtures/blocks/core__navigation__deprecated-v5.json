@@ -7,11 +7,10 @@
 			"showSubmenuIcon": true,
 			"openSubmenusOnClick": false,
 			"overlayMenu": "never",
-			"fontFamily": "cambria-georgia",
 			"layout": {
 				"type": "flex",
-				"justifyContent": "left",
-				"orientation": "horizontal"
+				"justifyContent": "center",
+				"orientation": "vertical"
 			}
 		},
 		"innerBlocks": [],
