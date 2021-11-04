@@ -93,6 +93,7 @@ export function Button( props ) {
 		label,
 		shortcut,
 		tooltipPosition,
+		isActiveStyle,
 	} = props;
 	const preferredColorScheme = usePreferredColorScheme();
 
@@ -102,6 +103,9 @@ export function Button( props ) {
 		opacity: isDisabled ? 0.3 : 1,
 		...( fixedRatio && styles.fixedRatio ),
 		...( isPressed ? styles.buttonActive : styles.buttonInactive ),
+		...( isActiveStyle?.backgroundColor && {
+			backgroundColor: isActiveStyle?.backgroundColor,
+		} ),
 	};
 
 	const states = [];
