@@ -67,17 +67,7 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 	private static function read_json_file( $file_path ) {
 		$config = array();
 		if ( $file_path ) {
-			$decoded_file = json_decode(
-				file_get_contents( $file_path ),
-				true
-			);
-
-			$json_decoding_error = json_last_error();
-			if ( JSON_ERROR_NONE !== $json_decoding_error ) {
-				trigger_error( "Error when decoding a theme.json schema at path $file_path " . json_last_error_msg() );
-				return $config;
-			}
-
+			$decoded_file = gutenberg_json_file_decode( $file_path, array( 'associative' => true ) );
 			if ( is_array( $decoded_file ) ) {
 				$config = $decoded_file;
 			}
