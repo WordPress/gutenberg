@@ -19,13 +19,13 @@ import {
 	ToggleControl,
 	ToolbarButton,
 	Button,
+	Placeholder,
 } from '@wordpress/components';
 import { useViewportMatch } from '@wordpress/compose';
 import {
 	BlockControls,
 	InspectorControls,
 	MediaPlaceholder,
-	Placeholder,
 	MediaReplaceFlow,
 	useBlockProps,
 	store as blockEditorStore,
