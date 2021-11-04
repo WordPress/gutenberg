@@ -669,7 +669,7 @@ public class WPAndroidGlueCode {
         viewGroup.addView(mReactRootView, 0,
                 new LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
 
-        if (mReactContext != null) {
+        if (hasReactContext()) {
             setPreferredColorScheme(isDarkMode);
         }
 
@@ -846,7 +846,7 @@ public class WPAndroidGlueCode {
         if (title != null) {
             mTitle = title;
         }
-        if (mReactContext != null) {
+        if (hasReactContext()) {
             if (content != null) {
                 mRnReactNativeGutenbergBridgePackage.getRNReactNativeGutenbergBridgeModule().setHtmlInJS(content);
             }
@@ -862,7 +862,7 @@ public class WPAndroidGlueCode {
 
     public synchronized CharSequence getContent(CharSequence originalContent,
                                                 OnGetContentInterrupted onGetContentInterrupted) {
-        if (mReactContext != null) {
+        if (hasReactContext()) {
             mGetContentCountDownLatch = new CountDownLatch(1);
 
             mRnReactNativeGutenbergBridgePackage.getRNReactNativeGutenbergBridgeModule().getHtmlFromJS();
@@ -870,7 +870,7 @@ public class WPAndroidGlueCode {
             try {
                 boolean success = mGetContentCountDownLatch.await(10, TimeUnit.SECONDS);
                 if (!success) {
-                    AppLog.e(T.EDITOR, "Timeout reached before response from requestGetHtml");
+                    AppLog.e(T.EDITOR, "Timeout reached before response from requestGetHtml.");
                 }
             } catch (InterruptedException ie) {
                 onGetContentInterrupted.onGetContentTimeout(ie);
@@ -878,14 +878,14 @@ public class WPAndroidGlueCode {
 
             return mContentChanged ? (mContentHtml == null ? "" : mContentHtml) : originalContent;
         } else {
-            // TODO: Add app logging here
+            AppLog.e(T.EDITOR, "getContent was called when there was no React context.");
         }
 
         return originalContent;
     }
 
     public synchronized CharSequence getTitle(OnGetContentInterrupted onGetContentInterrupted) {
-        if (mReactContext != null) {
+        if (hasReactContext()) {
             mGetContentCountDownLatch = new CountDownLatch(1);
 
             mRnReactNativeGutenbergBridgePackage.getRNReactNativeGutenbergBridgeModule().getHtmlFromJS();
@@ -893,7 +893,7 @@ public class WPAndroidGlueCode {
             try {
                 boolean success = mGetContentCountDownLatch.await(10, TimeUnit.SECONDS);
                 if (!success) {
-                    AppLog.e(T.EDITOR, "Timeout reached before response from requestGetHtml");
+                    AppLog.e(T.EDITOR, "Timeout reached before response from requestGetHtml.");
                 }
             } catch (InterruptedException ie) {
                 onGetContentInterrupted.onGetContentTimeout(ie);
@@ -901,7 +901,7 @@ public class WPAndroidGlueCode {
 
             return mTitle == null ? "" : mTitle;
         } else {
-            // TODO: Add app logging here
+            AppLog.e(T.EDITOR, "getTitle was called when there was no React context.");
         }
 
         return "";
@@ -918,7 +918,7 @@ public class WPAndroidGlueCode {
      */
     public synchronized Pair<CharSequence, CharSequence> getTitleAndContent(CharSequence originalContent,
                                                                OnGetContentInterrupted onGetContentInterrupted) {
-        if (mReactContext != null) {
+        if (hasReactContext()) {
             mGetContentCountDownLatch = new CountDownLatch(1);
 
             mRnReactNativeGutenbergBridgePackage.getRNReactNativeGutenbergBridgeModule().getHtmlFromJS();
@@ -926,10 +926,9 @@ public class WPAndroidGlueCode {
             try {
                 boolean success = mGetContentCountDownLatch.await(10, TimeUnit.SECONDS);
                 if (!success) {
-                    AppLog.e(T.EDITOR, "Timeout reached before response from requestGetHtml");
+                    AppLog.e(T.EDITOR, "Timeout reached before response from requestGetHtml.");
                 }
             } catch (InterruptedException ie) {
-                // TODO: this should be either renamed, or invoked when the await returns false.
                 onGetContentInterrupted.onGetContentTimeout(ie);
             }
 
@@ -938,14 +937,14 @@ public class WPAndroidGlueCode {
                     mContentChanged ? (mContentHtml == null ? "" : mContentHtml) : originalContent
             );
         } else {
-            // TODO: Add app logging here
+            AppLog.e(T.EDITOR, "getTitleAndContent was called when there was no React context.");
         }
 
         return new Pair<>("", originalContent);
     }
 
     public boolean triggerGetContentInfo(OnContentInfoReceivedListener onContentInfoReceivedListener) {
-        if (mReactContext != null && (mGetContentCountDownLatch == null || mGetContentCountDownLatch.getCount() == 0)) {
+        if (hasReactContext() && (mGetContentCountDownLatch == null || mGetContentCountDownLatch.getCount() == 0)) {
             if (!mIsEditorMounted) {
                 onContentInfoReceivedListener.onEditorNotReady();
                 return false;
@@ -961,7 +960,7 @@ public class WPAndroidGlueCode {
                         try {
                             boolean success = mGetContentCountDownLatch.await(5, TimeUnit.SECONDS);
                             if (!success) {
-                                AppLog.e(T.EDITOR, "Timeout reached before response from requestGetHtml");
+                                AppLog.e(T.EDITOR, "Timeout reached before response from requestGetHtml.");
                             }
                             if (mContentInfo == null) {
                                 onContentInfoReceivedListener.onContentInfoFailed();
