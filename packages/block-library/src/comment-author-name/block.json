@@ -26,6 +26,10 @@
 			"margin": true,
 			"padding": true
 		},
+		"color": {
+			"gradients": true,
+			"link": true
+		},
 		"typography": {
 			"fontSize": true,
 			"lineHeight": true,
