@@ -4,6 +4,7 @@
 import { useMemo, useEffect } from '@wordpress/element';
 import { _n, sprintf } from '@wordpress/i18n';
 import { useDebounce, useAsyncList } from '@wordpress/compose';
+import { __experimentalHeading as Heading } from '@wordpress/components';
 import { speak } from '@wordpress/a11y';
 
 /**
@@ -23,7 +24,11 @@ function PatternsListHeader( { filterValue, filteredBlockPatternsLength } ) {
 		return null;
 	}
 	return (
-		<h2 className="block-editor-block-patterns-explorer__search-results-count">
+		<Heading
+			level={ 2 }
+			lineHeight={ '48px' }
+			className="block-editor-block-patterns-explorer__search-results-count"
+		>
 			{ sprintf(
 				/* translators: %d: number of patterns. %s: block pattern search query */
 				_n(
@@ -34,7 +39,7 @@ function PatternsListHeader( { filterValue, filteredBlockPatternsLength } ) {
 				filteredBlockPatternsLength,
 				filterValue
 			) }
-		</h2>
+		</Heading>
 	);
 }
 
@@ -100,7 +105,7 @@ function PatternList( {
 
 	const hasItems = !! filteredBlockPatterns?.length;
 	return (
-		<div>
+		<div className="block-editor-block-patterns-explorer__list">
 			{ hasItems && (
 				<PatternsListHeader
 					filterValue={ filterValue }
