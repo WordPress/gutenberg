@@ -46,7 +46,7 @@ function useHasBorderColorControl( name ) {
 function useHasBorderRadiusControl( name ) {
 	const supports = getSupportedGlobalStylesPanels( name );
 	return (
-		useSetting( 'border.customRadius', name )[ 0 ] &&
+		useSetting( 'border.radius', name )[ 0 ] &&
 		supports.includes( 'borderRadius' )
 	);
 }

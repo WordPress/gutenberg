@@ -14,7 +14,7 @@ import apiFetch from '@wordpress/api-fetch';
  */
 import { STORE_NAME } from './name';
 import { getKindEntities, DEFAULT_ENTITY_KEY } from './entities';
-import { ifNotResolved, getNormalizedCommaSeparable } from './utils';
+import { forwardResolver, getNormalizedCommaSeparable } from './utils';
 
 /**
  * Requests authors from the REST API.
@@ -115,18 +115,12 @@ export const getEntityRecord = ( kind, name, key = '', query ) => async ( {
 /**
  * Requests an entity's record from the REST API.
  */
-export const getRawEntityRecord = ifNotResolved(
-	getEntityRecord,
-	'getEntityRecord'
-);
+export const getRawEntityRecord = forwardResolver( 'getEntityRecord' );
 
 /**
  * Requests an entity's record from the REST API.
  */
-export const getEditedEntityRecord = ifNotResolved(
-	getRawEntityRecord,
-	'getRawEntityRecord'
-);
+export const getEditedEntityRecord = forwardResolver( 'getEntityRecord' );
 
 /**
  * Requests the entity's records from the REST API.
@@ -224,22 +218,20 @@ getEntityRecords.shouldInvalidate = ( action, kind, name ) => {
 /**
  * Requests the current theme.
  */
-export const getCurrentTheme = () => async ( { dispatch } ) => {
-	const activeThemes = await apiFetch( {
-		path: '/wp/v2/themes?status=active',
-	} );
+export const getCurrentTheme = () => async ( { dispatch, resolveSelect } ) => {
+	const activeThemes = await resolveSelect.getEntityRecords(
+		'root',
+		'theme',
+		{ status: 'active' }
+	);
+
 	dispatch.receiveCurrentTheme( activeThemes[ 0 ] );
 };
 
 /**
  * Requests theme supports data from the index.
  */
-export const getThemeSupports = () => async ( { dispatch } ) => {
-	const activeThemes = await apiFetch( {
-		path: '/wp/v2/themes?status=active',
-	} );
-	dispatch.receiveThemeSupports( activeThemes[ 0 ].theme_supports );
-};
+export const getThemeSupports = forwardResolver( 'getCurrentTheme' );
 
 /**
  * Requests a preview from the from the Embed API.
@@ -421,10 +413,13 @@ __experimentalGetTemplateForLink.shouldInvalidate = ( action ) => {
 
 export const __experimentalGetCurrentGlobalStylesId = () => async ( {
 	dispatch,
+	resolveSelect,
 } ) => {
-	const activeThemes = await apiFetch( {
-		path: '/wp/v2/themes?status=active',
-	} );
+	const activeThemes = await resolveSelect.getEntityRecords(
+		'root',
+		'theme',
+		{ status: 'active' }
+	);
 	const globalStylesURL = get( activeThemes, [
 		0,
 		'_links',
@@ -440,4 +435,18 @@ export const __experimentalGetCurrentGlobalStylesId = () => async ( {
 			globalStylesObject.id
 		);
 	}
+};
+
+export const __experimentalGetCurrentThemeBaseGlobalStyles = () => async ( {
+	resolveSelect,
+	dispatch,
+} ) => {
+	const currentTheme = await resolveSelect.getCurrentTheme();
+	const themeGlobalStyles = await apiFetch( {
+		path: `/wp/v2/global-styles/themes/${ currentTheme.stylesheet }`,
+	} );
+	await dispatch.__experimentalReceiveThemeBaseGlobalStyles(
+		currentTheme.stylesheet,
+		themeGlobalStyles
+	);
 };

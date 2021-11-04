@@ -26,7 +26,7 @@ export function BorderPanel( props ) {
 		useSetting( 'border.color' ) && hasBorderSupport( props.name, 'color' );
 
 	const isRadiusSupported =
-		useSetting( 'border.customRadius' ) &&
+		useSetting( 'border.radius' ) &&
 		hasBorderSupport( props.name, 'radius' );
 
 	const isStyleSupported =
@@ -111,7 +111,7 @@ export function shouldSkipSerialization( blockType ) {
 const useIsBorderDisabled = () => {
 	const configs = [
 		! useSetting( 'border.color' ),
-		! useSetting( 'border.customRadius' ),
+		! useSetting( 'border.radius' ),
 		! useSetting( 'border.style' ),
 		! useSetting( 'border.width' ),
 	];

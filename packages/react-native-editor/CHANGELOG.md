@@ -10,7 +10,9 @@ For each user feature we should also add a importance categorization label  to i
 -->
 
 ## Unreleased
-[*] [Embed block] Included Link in Block Settings [#36099]
+-   [**] [Image block] Add ability to quickly link images to Media Files and Attachment Pages [#34846]
+-   [*] [Embed block] Included Link in Block Settings [#36099]
+
 ## 1.65.0
 - [**] Search block - Text and background color support [#35511]
 - [*] [Embed Block] Fix loading glitch with resolver resolution approach [#35798]

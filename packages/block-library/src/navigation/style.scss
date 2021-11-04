@@ -353,6 +353,9 @@
 	.wp-block-navigation__container,
 	.wp-block-navigation__responsive-container-content {
 		justify-content: center;
+
+		// For the overlay.
+		align-items: center;
 	}
 }
 
@@ -361,6 +364,9 @@
 	.wp-block-navigation__container,
 	.wp-block-navigation__responsive-container-content {
 		justify-content: flex-end;
+
+		// For the overlay.
+		align-items: flex-end;
 	}
 }
 
@@ -419,6 +425,9 @@
 
 	.wp-block-navigation__responsive-container-content {
 		display: flex;
+
+		// Always vertically align to the top.
+		justify-content: flex-start;
 	}
 
 	// Overlay menu.

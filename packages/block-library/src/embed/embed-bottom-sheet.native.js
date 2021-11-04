@@ -86,6 +86,7 @@ const EmbedBottomSheet = ( {
 			onDismiss={ onDismiss }
 			setAttributes={ setAttributes }
 			options={ linkSettingsOptions }
+			testID="embed-edit-url-modal"
 			withBottomSheet={ withBottomSheet }
 			showIcon
 			hasPicker={ ! withBottomSheet }

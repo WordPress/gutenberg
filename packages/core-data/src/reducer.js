@@ -137,39 +137,19 @@ export function currentGlobalStylesId( state = undefined, action ) {
 }
 
 /**
- * Reducer managing installed themes.
+ * Reducer managing the theme base global styles.
  *
- * @param {Object} state  Current state.
+ * @param {string} state  Current state.
  * @param {Object} action Dispatched action.
  *
- * @return {Object} Updated state.
+ * @return {string} Updated state.
  */
-export function themes( state = {}, action ) {
+export function themeBaseGlobalStyles( state = {}, action ) {
 	switch ( action.type ) {
-		case 'RECEIVE_CURRENT_THEME':
+		case 'RECEIVE_THEME_GLOBAL_STYLES':
 			return {
 				...state,
-				[ action.currentTheme.stylesheet ]: action.currentTheme,
-			};
-	}
-
-	return state;
-}
-
-/**
- * Reducer managing theme supports data.
- *
- * @param {Object} state  Current state.
- * @param {Object} action Dispatched action.
- *
- * @return {Object} Updated state.
- */
-export function themeSupports( state = {}, action ) {
-	switch ( action.type ) {
-		case 'RECEIVE_THEME_SUPPORTS':
-			return {
-				...state,
-				...action.themeSupports,
+				[ action.stylesheet ]: action.globalStyles,
 			};
 	}
 
@@ -589,9 +569,8 @@ export default combineReducers( {
 	currentTheme,
 	currentGlobalStylesId,
 	currentUser,
+	themeBaseGlobalStyles,
 	taxonomies,
-	themes,
-	themeSupports,
 	entities,
 	undo,
 	embedPreviews,

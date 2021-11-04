@@ -9,7 +9,7 @@
 /**
  * Tests for REST API for Menu locations.
  *
- * @see WP_Test_REST_Controller_Testcase
+ * @coversDefaultClass WP_REST_Menu_Locations_Controller
  */
 class REST_Nav_Menu_Locations_Test extends WP_Test_REST_Controller_Testcase {
 
@@ -55,7 +55,7 @@ class REST_Nav_Menu_Locations_Test extends WP_Test_REST_Controller_Testcase {
 	}
 
 	/**
-	 *
+	 * @covers ::register_routes
 	 */
 	public function test_register_routes() {
 		$routes = rest_get_server()->get_routes();
@@ -66,7 +66,7 @@ class REST_Nav_Menu_Locations_Test extends WP_Test_REST_Controller_Testcase {
 	}
 
 	/**
-	 *
+	 * @covers ::get_context_param
 	 */
 	public function test_context_param() {
 		// Collection.
@@ -85,7 +85,7 @@ class REST_Nav_Menu_Locations_Test extends WP_Test_REST_Controller_Testcase {
 	}
 
 	/**
-	 *
+	 * @covers ::get_items
 	 */
 	public function test_get_items() {
 		$menus = array( 'primary', 'secondary' );
@@ -104,7 +104,7 @@ class REST_Nav_Menu_Locations_Test extends WP_Test_REST_Controller_Testcase {
 	}
 
 	/**
-	 *
+	 * @covers ::get_item
 	 */
 	public function test_get_item() {
 		$menu = 'primary';
@@ -115,6 +115,20 @@ class REST_Nav_Menu_Locations_Test extends WP_Test_REST_Controller_Testcase {
 		$response = rest_get_server()->dispatch( $request );
 		$data     = $response->get_data();
 		$this->assertEquals( $menu, $data['name'] );
+	}
+
+	/**
+	 * @covers ::get_item
+	 */
+	public function test_get_item_invalid() {
+		$menu = 'primary';
+		$this->register_nav_menu_locations( array( $menu ) );
+
+		wp_set_current_user( self::$admin_id );
+		$request  = new WP_REST_Request( 'GET', '/__experimental/menu-locations/invalid' );
+		$response = rest_get_server()->dispatch( $request );
+
+		$this->assertErrorResponse( 'rest_menu_location_invalid', $response, 404 );
 	}
 
 	/**
@@ -138,7 +152,7 @@ class REST_Nav_Menu_Locations_Test extends WP_Test_REST_Controller_Testcase {
 	public function test_prepare_item() {}
 
 	/**
-	 *
+	 * @covers ::get_item_schema
 	 */
 	public function test_get_item_schema() {
 		wp_set_current_user( self::$admin_id );
@@ -154,9 +168,10 @@ class REST_Nav_Menu_Locations_Test extends WP_Test_REST_Controller_Testcase {
 
 
 	/**
-	 *
+	 * @covers ::get_items
+	 * @covers ::get_items_permissions_check
 	 */
-	public function test_get_item_menu_location_context_without_permission() {
+	public function test_get_items_menu_location_context_without_permission() {
 		wp_set_current_user( 0 );
 		$request  = new WP_REST_Request( 'GET', '/__experimental/menu-locations' );
 		$response = rest_get_server()->dispatch( $request );
@@ -165,9 +180,10 @@ class REST_Nav_Menu_Locations_Test extends WP_Test_REST_Controller_Testcase {
 	}
 
 	/**
-	 *
+	 * @covers ::get_item
+	 * @covers ::get_item_permissions_check
 	 */
-	public function test_get_items_menu_location_context_without_permission() {
+	public function test_get_item_menu_location_context_without_permission() {
 		$menu = 'primary';
 		$this->register_nav_menu_locations( array( $menu ) );
 
