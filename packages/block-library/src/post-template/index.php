@@ -36,10 +36,6 @@ function render_block_core_post_template( $attributes, $content, $block ) {
 
 	$query = new WP_Query( $query_args );
 
-	if ( ! $query->have_posts() ) {
-		return '';
-	}
-
 	$classnames = '';
 	if ( isset( $block->context['displayLayout'] ) && isset( $block->context['query'] ) ) {
 		if ( isset( $block->context['displayLayout']['type'] ) && 'flex' === $block->context['displayLayout']['type'] ) {
@@ -48,6 +44,10 @@ function render_block_core_post_template( $attributes, $content, $block ) {
 	}
 
 	$wrapper_attributes = get_block_wrapper_attributes( array( 'class' => $classnames ) );
+
+	if ( ! $query->have_posts() ) {
+		return "<p $wrapper_attributes>" . __( 'No results found.' ) . '</p>';
+	}
 
 	$content = '';
 	while ( $query->have_posts() ) {
