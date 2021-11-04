@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { ToolbarItem as BaseToolbarItem } from 'reakit/Toolbar';
+import { ToolbarItem as BaseToolbarItem } from 'ariakit/toolbar';
 
 /**
  * WordPress dependencies
@@ -36,7 +36,7 @@ function ToolbarItem( { children, as: Component, ...props }, ref ) {
 
 	return (
 		<BaseToolbarItem
-			{ ...accessibleToolbarState }
+			state={ accessibleToolbarState }
 			{ ...allProps }
 			as={ Component }
 		>

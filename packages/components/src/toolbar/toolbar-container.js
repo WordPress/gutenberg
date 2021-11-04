@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { useToolbarState, Toolbar } from 'reakit/Toolbar';
+import { useToolbarState, Toolbar } from 'ariakit/toolbar';
 
 /**
  * WordPress dependencies
@@ -15,12 +15,8 @@ import { isRTL } from '@wordpress/i18n';
 import ToolbarContext from '../toolbar-context';
 
 function ToolbarContainer( { label, ...props }, ref ) {
-	// https://reakit.io/docs/basic-concepts/#state-hooks
-	// Passing baseId for server side rendering (which includes snapshots)
-	// If an id prop is passed to Toolbar, toolbar items will use it as a base for their ids
 	const toolbarState = useToolbarState( {
-		loop: true,
-		baseId: props.id,
+		focusLoop: true,
 		rtl: isRTL(),
 	} );
 
@@ -30,7 +26,7 @@ function ToolbarContainer( { label, ...props }, ref ) {
 			<Toolbar
 				ref={ ref }
 				aria-label={ label }
-				{ ...toolbarState }
+				state={ toolbarState }
 				{ ...props }
 			/>
 		</ToolbarContext.Provider>
