@@ -52,7 +52,12 @@ function PatternInserterPanel( {
 	};
 
 	return (
-		<Flex justify="space-between" align="start" className={ className }>
+		<Flex
+			justify="space-between"
+			align="start"
+			gap="4"
+			className={ className }
+		>
 			<FlexItem isBlock>
 				<SelectControl
 					className="block-editor-inserter__panel-dropdown"
