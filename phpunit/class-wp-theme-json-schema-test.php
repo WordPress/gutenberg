@@ -7,6 +7,10 @@
  */
 
 class WP_Theme_JSON_Schema_Test extends WP_UnitTestCase {
+	/**
+	 * The current theme.json schema version.
+	 */
+	const LATEST_SCHEMA_VERSION = 2;
 
 	function test_migrate_v0_to_v1() {
 		$theme_json_v0 = array(
@@ -98,7 +102,7 @@ class WP_Theme_JSON_Schema_Test extends WP_UnitTestCase {
 		$actual = WP_Theme_JSON_Schema::migrate( $theme_json_v0 );
 
 		$expected = array(
-			'version'  => 1,
+			'version'  => self::LATEST_SCHEMA_VERSION,
 			'settings' => array(
 				'color'      => array(
 					'palette' => array(
@@ -117,16 +121,16 @@ class WP_Theme_JSON_Schema_Test extends WP_UnitTestCase {
 					'link'    => true,
 				),
 				'border'     => array(
-					'customColor'  => false,
-					'customRadius' => false,
-					'customStyle'  => false,
-					'customWidth'  => false,
+					'color'  => false,
+					'radius' => false,
+					'style'  => false,
+					'width'  => false,
 				),
 				'typography' => array(
-					'customFontStyle'       => false,
-					'customFontWeight'      => false,
-					'customTextDecorations' => false,
-					'customTextTransforms'  => false,
+					'fontStyle'      => false,
+					'fontWeight'     => false,
+					'textDecoration' => false,
+					'textTransform'  => false,
 				),
 				'blocks'     => array(
 					'core/paragraph' => array(
@@ -582,10 +586,10 @@ class WP_Theme_JSON_Schema_Test extends WP_UnitTestCase {
 			),
 		);
 
-		$actual = WP_Theme_JSON_Schema_V1_Remove_Custom_Prefixes::migrate( $theme_json_v1 );
+		$actual = WP_Theme_JSON_Schema::migrate( $theme_json_v1 );
 
 		$expected = array(
-			'version'  => 1,
+			'version'  => self::LATEST_SCHEMA_VERSION,
 			'settings' => array(
 				'color'      => array(
 					'palette' => array(
@@ -604,10 +608,10 @@ class WP_Theme_JSON_Schema_Test extends WP_UnitTestCase {
 					'link'    => true,
 				),
 				'border'     => array(
-					'color'        => false,
-					'customRadius' => false,
-					'style'        => false,
-					'width'        => false,
+					'color'  => false,
+					'radius' => false,
+					'style'  => false,
+					'width'  => false,
 				),
 				'typography' => array(
 					'fontStyle'      => false,
@@ -619,10 +623,10 @@ class WP_Theme_JSON_Schema_Test extends WP_UnitTestCase {
 				'blocks'     => array(
 					'core/group' => array(
 						'border'     => array(
-							'color'        => true,
-							'customRadius' => true,
-							'style'        => true,
-							'width'        => true,
+							'color'  => true,
+							'radius' => true,
+							'style'  => true,
+							'width'  => true,
 						),
 						'typography' => array(
 							'fontStyle'      => true,
@@ -754,10 +758,10 @@ class WP_Theme_JSON_Schema_Test extends WP_UnitTestCase {
 			),
 		);
 
-		$actual = WP_Theme_JSON_Schema_V1_Remove_Custom_Prefixes::migrate( $theme_json_v1 );
+		$actual = WP_Theme_JSON_Schema::migrate( $theme_json_v1 );
 
 		$expected = array(
-			'version'  => 1,
+			'version'  => self::LATEST_SCHEMA_VERSION,
 			'settings' => array(
 				'color'      => array(
 					'palette' => array(
@@ -776,10 +780,10 @@ class WP_Theme_JSON_Schema_Test extends WP_UnitTestCase {
 					'link'    => true,
 				),
 				'border'     => array(
-					'color'        => false,
-					'customRadius' => false,
-					'style'        => false,
-					'width'        => false,
+					'color'  => false,
+					'radius' => false,
+					'style'  => false,
+					'width'  => false,
 				),
 				'typography' => array(
 					'fontStyle'      => false,
@@ -791,10 +795,10 @@ class WP_Theme_JSON_Schema_Test extends WP_UnitTestCase {
 				'blocks'     => array(
 					'core/group' => array(
 						'border'     => array(
-							'color'        => true,
-							'customRadius' => true,
-							'style'        => true,
-							'width'        => true,
+							'color'  => true,
+							'radius' => true,
+							'style'  => true,
+							'width'  => true,
 						),
 						'typography' => array(
 							'fontStyle'      => true,
