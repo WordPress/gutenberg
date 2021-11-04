@@ -378,7 +378,7 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 		self::$user                     = null;
 		self::$user_custom_post_type_id = null;
 		self::$theme_has_support        = null;
-		self::$i18n_schema          = null;
+		self::$i18n_schema              = null;
 	}
 
 }
