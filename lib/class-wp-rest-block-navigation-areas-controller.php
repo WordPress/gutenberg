@@ -1,13 +1,13 @@
 <?php
 /**
- * REST API: WP_REST_Block_Navigation_Locations_Controller class
+ * REST API: WP_REST_Block_Navigation_Areas_Controller class
  *
  * @subpackage REST_API
  * @package    WordPress
  */
 
 /**
- * Core class used to access block navigation locations via the REST API.
+ * Core class used to access block navigation areas via the REST API.
  *
  * @see   WP_REST_Controller
  */
@@ -47,7 +47,7 @@ class WP_REST_Block_Navigation_Areas_Controller extends WP_REST_Controller {
 			array(
 				'args'   => array(
 					'area' => array(
-						'description' => __( 'An alphanumeric identifier for the menu location.', 'gutenberg' ),
+						'description' => __( 'An alphanumeric identifier for the navigation area.', 'gutenberg' ),
 						'type'        => 'string',
 					),
 				),
@@ -71,7 +71,7 @@ class WP_REST_Block_Navigation_Areas_Controller extends WP_REST_Controller {
 	}
 
 	/**
-	 * Checks whether a given request has permission to read menu locations.
+	 * Checks whether a given request has permission to read navigation areas.
 	 *
 	 * @param WP_REST_Request $request Full details about the request.
 	 *
@@ -81,7 +81,7 @@ class WP_REST_Block_Navigation_Areas_Controller extends WP_REST_Controller {
 		if ( ! current_user_can( 'edit_theme_options' ) ) {
 			return new WP_Error(
 				'rest_cannot_view',
-				__( 'Sorry, you are not allowed to view menu locations.', 'gutenberg' ),
+				__( 'Sorry, you are not allowed to view navigation areas.', 'gutenberg' ),
 				array( 'status' => rest_authorization_required_code() )
 			);
 		}
@@ -90,7 +90,7 @@ class WP_REST_Block_Navigation_Areas_Controller extends WP_REST_Controller {
 	}
 
 	/**
-	 * Retrieves all menu locations, depending on user context.
+	 * Retrieves all navigation areas, depending on user context.
 	 *
 	 * @param WP_REST_Request $request Full details about the request.
 	 *
@@ -122,7 +122,7 @@ class WP_REST_Block_Navigation_Areas_Controller extends WP_REST_Controller {
 	}
 
 	/**
-	 * Checks if a given request has access to read a menu location.
+	 * Checks if a given request has access to read a navigation area.
 	 *
 	 * @param WP_REST_Request $request Full details about the request.
 	 *
@@ -133,12 +133,12 @@ class WP_REST_Block_Navigation_Areas_Controller extends WP_REST_Controller {
 		if ( ! current_user_can( 'edit_theme_options' ) ) {
 			return new WP_Error(
 				'rest_cannot_view',
-				__( 'Sorry, you are not allowed to view menu locations.', 'gutenberg' ),
+				__( 'Sorry, you are not allowed to view navigation areas.', 'gutenberg' ),
 				array( 'status' => rest_authorization_required_code() )
 			);
 		}
 		if ( ! array_key_exists( $request['area'], $this->get_available_areas() ) ) {
-			return new WP_Error( 'rest_menu_location_invalid', __( 'Invalid menu location.', 'gutenberg' ), array( 'status' => 404 ) );
+			return new WP_Error( 'rest_navigation_area_invalid', __( 'Invalid navigation area.', 'gutenberg' ), array( 'status' => 404 ) );
 		}
 
 		return true;
@@ -157,7 +157,7 @@ class WP_REST_Block_Navigation_Areas_Controller extends WP_REST_Controller {
 	}
 
 	/**
-	 * Retrieves a specific menu location.
+	 * Retrieves a specific navigation area.
 	 *
 	 * @param WP_REST_Request $request Full details about the request.
 	 *
@@ -179,7 +179,7 @@ class WP_REST_Block_Navigation_Areas_Controller extends WP_REST_Controller {
 	}
 
 	/**
-	 * Updates a specific menu location.
+	 * Updates a specific navigation area.
 	 *
 	 * @param WP_REST_Request $request Full details about the request.
 	 *
@@ -198,7 +198,7 @@ class WP_REST_Block_Navigation_Areas_Controller extends WP_REST_Controller {
 	}
 
 	/**
-	 * Prepares a menu location object for serialization.
+	 * Prepares a navigation area object for serialization.
 	 *
 	 * @param stdClass        $area Post status data.
 	 * @param WP_REST_Request $request Full details about the request.
@@ -230,46 +230,46 @@ class WP_REST_Block_Navigation_Areas_Controller extends WP_REST_Controller {
 
 		$response = rest_ensure_response( $data );
 
-		// $response->add_links( $this->prepare_links( $location ) );
+		// $response->add_links( $this->prepare_links( $data ) );
 
 		/**
-		 * Filters a menu location returned from the REST API.
+		 * Filters a navigation area returned from the REST API.
 		 *
-		 * Allows modification of the menu location data right before it is
+		 * Allows modification of the navigation area data right before it is
 		 * returned.
 		 *
 		 * @param WP_REST_Response $response The response object.
 		 * @param object $area The original status object.
 		 * @param WP_REST_Request $request Request used to generate the response.
 		 */
-		return apply_filters( 'rest_prepare_menu_location', $response, $area, $request );
+		return apply_filters( 'rest_prepare_navigation_area', $response, $area, $request );
 	}
 
 	/**
-	 * Retrieves the menu location's schema, conforming to JSON Schema.
+	 * Retrieves the navigation area's schema, conforming to JSON Schema.
 	 *
 	 * @return array Item schema data.
 	 */
 	public function get_item_schema() {
 		$schema = array(
 			'$schema'    => 'http://json-schema.org/draft-04/schema#',
-			'title'      => 'menu-location',
+			'title'      => 'navigation-area',
 			'type'       => 'object',
 			'properties' => array(
 				'name'        => array(
-					'description' => __( 'The name of the menu area.', 'gutenberg' ),
+					'description' => __( 'The name of the navigation area.', 'gutenberg' ),
 					'type'        => 'string',
 					'context'     => array( 'embed', 'view', 'edit' ),
 					'readonly'    => true,
 				),
 				'description' => array(
-					'description' => __( 'The description of the menu area.', 'gutenberg' ),
+					'description' => __( 'The description of the navigation area.', 'gutenberg' ),
 					'type'        => 'string',
 					'context'     => array( 'embed', 'view', 'edit' ),
 					'readonly'    => true,
 				),
 				'menu'        => array(
-					'description' => __( 'The ID of the assigned menu.', 'gutenberg' ),
+					'description' => __( 'The ID of the assigned navigation.', 'gutenberg' ),
 					'type'        => 'integer',
 					'context'     => array( 'embed', 'view', 'edit' ),
 					'readonly'    => true,
@@ -294,25 +294,25 @@ class WP_REST_Block_Navigation_Areas_Controller extends WP_REST_Controller {
 	/**
 	 * Prepares links for the request.
 	 *
-	 * @param stdClass $location Menu location.
+	 * @param stdClass $area navigation area.
 	 *
-	 * @return array Links for the given menu location.
+	 * @return array Links for the given navigation area.
 	 */
-	protected function prepare_links( $location ) {
+	protected function prepare_links( $area ) {
 		$base = sprintf( '%s/%s', $this->namespace, $this->rest_base );
 
 		// Entity meta.
 		$links = array(
 			'self'       => array(
-				'href' => rest_url( trailingslashit( $base ) . $location->name ),
+				'href' => rest_url( trailingslashit( $base ) . $area->name ),
 			),
 			'collection' => array(
 				'href' => rest_url( $base ),
 			),
 		);
 
-		$locations = get_nav_menu_locations();
-		$menu      = ( isset( $locations[ $location->name ] ) ) ? $locations[ $location->name ] : 0;
+		$areas = get_nav_navigation_areas();
+		$menu      = ( isset( $areas[ $area->name ] ) ) ? $areas[ $area->name ] : 0;
 		if ( $menu ) {
 			$taxonomy_object = get_taxonomy( 'nav_menu' );
 			if ( $taxonomy_object->show_in_rest ) {
