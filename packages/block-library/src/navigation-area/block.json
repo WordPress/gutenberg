@@ -14,9 +14,6 @@
 		"area": {
 			"type": "string",
 			"default": "primary"
-		},
-		"navigationMenuId": {
-			"type": "number"
 		}
 	},
 	"providesContext": {
