@@ -7,7 +7,8 @@
 	"keywords": [
 		"menu",
 		"navigation",
-		"links"
+		"links",
+		"location"
 	],
 	"textdomain": "default",
 	"attributes": {
