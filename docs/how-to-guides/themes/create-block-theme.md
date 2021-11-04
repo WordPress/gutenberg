@@ -204,8 +204,7 @@ All block attributes are placed inside these curly brackets. If you wanted the p
 The HTML element that wraps the block content also uses the corresponding CSS class: `has-text-align-center`.
 
 <div class="callout callout-tip">
-If you are not sure what the correct block markup is, you can add the block in the block editor
-and copy the block markup from the code editor mode to your theme files.
+If you are not sure what the correct block markup is, you can add the block in the block editor and copy the block markup from the code editor mode to your theme files.
 </div>
 
 ### Template creation in the site editor
@@ -235,8 +234,7 @@ Edit and save the template in the same way as in the site editor.
 
 ### Exporting
 
-Templates and template parts that have been created or edited in the site editor or template editing mode
-are saved to the database as custom post types. To export them as theme files, follow these steps:
+Templates and template parts that have been created or edited in the site editor or template editing mode are saved to the database as custom post types. To export them as theme files, follow these steps:
 
 - In the site editor, open the **More tools and options** menu.
 - Select the **Export** option to download a zip file containing the files. Unpack the files.
@@ -245,8 +243,7 @@ are saved to the database as custom post types. To export them as theme files, f
 - Rename the template parts to `header.html` and `footer.html`, respectively.
 - Open `index.html` and update the template part slugs in the block markup.
 
-Saved templates have precedence over theme files. To use the updated theme files, go to **Appearance > Templates** and
-**Appearance > Template parts** and delete the saved templates.
+Saved templates have precedence over theme files. To use the updated theme files, go to **Appearance > Templates** and **Appearance > Template parts** and delete the saved templates.
 
 ### Additional templates
 
@@ -425,12 +422,11 @@ There are two different ways that a block can support a feature:
 - By allowing defaults to be set using `theme.json`.
 
 <div class="callout callout-tip">
-It is not possible to add controls to a block that does not support them by using theme.json.
+It is not possible to add controls to a block that does not support them by using <code>theme.json</code>.
 </div>
 
 Example:
-A block that does not have support for border controls, can have a default border set inside the `theme.json` file,
-as long as the border feature is enabled.
+A block that does not have support for border controls, can have a default border set inside the `theme.json` file, as long as the border feature is enabled.
 
 To enable border styles, add a `border` object under `settings` with the following attributes and values:
 
@@ -784,8 +780,8 @@ Since the theme has custom padding enabled, you can add `padding` within the `sp
 
 In the templeParts section, assign the two template parts that you created to their template areas.
 Add two keys:
--`name`, the file name of the template part file without the file extension,
--`area`, the name of the template area.
+- `name`, the file name of the template part file without the file extension,
+- `area`, the name of the template area.
 
 There are three template areas to choose from: Header, footer, and general.
 
@@ -814,8 +810,8 @@ For templates to be editable in the template editing mode, the template's file n
 
 First, create a section called `customTemplates` at the root level of `theme.json`.
 This section has two required keys:
-`Name`, which is the name of the template file without the file ending.
-`title`, which is the visible title of the template in the editors.
+- `name`, which is the name of the template file without the file ending.
+- `title`, which is the visible title of the template in the editors.
 
 ```json
 "customTemplates": [
@@ -847,8 +843,8 @@ The key is `postTypes`, followed by the name of the post type:
 
 ## Example themes
 
-You can find a basic starter theme called "emptytheme" and other example themes
-on the [Experimental themes GitHub repository](https://github.com/WordPress/theme-experiments).
+You can find a basic starter theme called "emptytheme" and other example themes on the [Experimental themes GitHub repository](https://github.com/WordPress/theme-experiments).
+
 When using a theme as reference, take note of which Gutenberg version the theme is built for,
 because the experimental features are updated frequently.
 
