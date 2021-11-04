@@ -19,8 +19,6 @@ import { ColorPicker } from '../color-picker';
 import { FlexItem } from '../flex';
 import { HStack } from '../h-stack';
 import { ItemGroup } from '../item-group';
-import { MenuGroup } from '../menu-group';
-import { MenuItem } from '../menu-item';
 import { VStack } from '../v-stack';
 import ColorPalette from '../color-palette';
 import DropdownMenu from '../dropdown-menu';
@@ -37,6 +35,7 @@ import {
 	DoneButton,
 	RemoveButton,
 } from './styles';
+import { NavigableMenu } from '../navigable-container';
 
 function ColorNameInput( { value, onChange } ) {
 	return (
@@ -251,11 +250,11 @@ export default function ColorEdit( { colors = EMPTY_ARRAY, onChange } ) {
 								isSmall: true,
 							} }
 						>
-							{ ( { onClose = () => {} } ) => (
+							{ ( { onClose } ) => (
 								<>
-									<MenuGroup>
-										<MenuItem
-											variant={ 'tertiary' }
+									<NavigableMenu role="menu">
+										<Button
+											variant="tertiary"
 											onClick={ () => {
 												setEditingColor( null );
 												setIsEditing( false );
@@ -264,8 +263,8 @@ export default function ColorEdit( { colors = EMPTY_ARRAY, onChange } ) {
 											} }
 										>
 											{ __( 'Remove all custom colors' ) }
-										</MenuItem>
-									</MenuGroup>
+										</Button>
+									</NavigableMenu>
 								</>
 							) }
 						</DropdownMenu>
