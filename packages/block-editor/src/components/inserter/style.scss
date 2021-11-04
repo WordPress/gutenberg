@@ -337,6 +337,15 @@ $block-inserter-tabs-height: 44px;
 
 .block-editor-block-patterns-explorer {
 	&__sidebar {
+		position: absolute;
+		top: $header-height;
+		left: 0;
+		bottom: 0;
+		width: $sidebar-width;
+		padding: $grid-unit-30 $grid-unit-40 $grid-unit-40;
+		overflow-x: visible;
+		overflow-y: scroll;
+
 		&__categories-list__item {
 			display: block;
 			width: 100%;
@@ -346,12 +355,20 @@ $block-inserter-tabs-height: 44px;
 	}
 
 	&__search {
-		margin-bottom: $grid-unit-20;
+		margin-bottom: $grid-unit-40;
+	}
+
+	&__search-results-count {
+		padding-bottom: $grid-unit-40;
+	}
+
+	&__list {
+		margin-left: $sidebar-width - $grid-unit-40;
 	}
 
 	.block-editor-block-patterns-list {
 		display: grid;
-		grid-gap: $grid-unit-30;
+		grid-gap: $grid-unit-40;
 		grid-template-columns: repeat(1, 1fr);
 
 		@include break-xlarge() {

@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { Modal, __experimentalGrid as Grid } from '@wordpress/components';
+import { Modal } from '@wordpress/components';
 import { useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 
@@ -17,12 +17,7 @@ function PatternsExplorer( { initialCategory, patternCategories } ) {
 		initialCategory?.name
 	);
 	return (
-		<Grid
-			columns={ 2 }
-			gap={ 6 }
-			templateColumns="240px auto"
-			className="block-editor-block-patterns-explorer"
-		>
+		<div className="block-editor-block-patterns-explorer">
 			<PatternExplorerSidebar
 				selectedCategory={ selectedCategory }
 				patternCategories={ patternCategories }
@@ -35,7 +30,7 @@ function PatternsExplorer( { initialCategory, patternCategories } ) {
 				selectedCategory={ selectedCategory }
 				patternCategories={ patternCategories }
 			/>
-		</Grid>
+		</div>
 	);
 }
 
