@@ -41,7 +41,7 @@ function DimensionInput( {
 	const [ temporaryInput, setTemporaryInput ] = useState( null );
 
 	const instanceId = useInstanceId( UnitControl );
-	const inputId = `block-cover-height-input-${ instanceId }`;
+	const inputId = `block-spacer-height-input-${ instanceId }`;
 	const isPx = unit === 'px';
 
 	const units = useCustomUnits( {
@@ -99,6 +99,57 @@ function DimensionInput( {
 	);
 }
 
+const ResizableSpacer = ( {
+	orientation,
+	maxValue,
+	onResizeStart,
+	onResize,
+	onResizeStop,
+	isSelected,
+	...props
+} ) => {
+	const [ isResizing, setIsResizing ] = useState( false );
+
+	const getNextVal = ( elt ) => {
+		return orientation === 'horizontal'
+			? elt.clientWidth
+			: elt.clientHeight;
+	};
+
+	return (
+		<ResizableBox
+			className={ classnames( 'block-library-spacer__resize-container', {
+				'resize-horizontal': orientation === 'horizontal',
+				'is-resizing': isResizing,
+				'is-selected': isSelected,
+			} ) }
+			onResizeStart={ ( _event, _direction, elt ) => {
+				const nextVal = getNextVal( elt );
+				onResizeStart( nextVal );
+				onResize( nextVal );
+			} }
+			onResize={ ( _event, _direction, elt ) => {
+				onResize( getNextVal( elt ) );
+				if ( ! isResizing ) {
+					setIsResizing( true );
+				}
+			} }
+			onResizeStop={ ( _event, _direction, elt ) => {
+				onResizeStop( Math.min( getNextVal( elt ), maxValue ) );
+				setIsResizing( false );
+			} }
+			__experimentalShowTooltip={ true }
+			__experimentalTooltipProps={ {
+				axis: orientation === 'horizontal' ? 'x' : 'y',
+				position: 'corner',
+				isVisible: isResizing,
+			} }
+			showHandle={ isSelected }
+			{ ...props }
+		/>
+	);
+};
+
 const SpacerEdit = ( {
 	attributes,
 	isSelected,
@@ -108,65 +159,48 @@ const SpacerEdit = ( {
 	context,
 } ) => {
 	const { orientation } = context;
-	const [ isResizing, setIsResizing ] = useState( false );
 	const { height, width, heightUnit, widthUnit } = attributes;
+
+	const [ temporaryHeight, setTemporaryHeight ] = useState( null );
+	const [ temporaryWidth, setTemporaryWidth ] = useState( null );
 
 	const heightWithUnit = heightUnit ? `${ height }${ heightUnit }` : height;
 	const widthWithUnit = widthUnit ? `${ width }${ widthUnit }` : width;
 
-	const updateHeight = ( nextHeight ) => {
-		nextHeight = 0 > parseFloat( nextHeight ) ? '0' : nextHeight;
-		setAttributes( {
-			height: nextHeight,
-		} );
-	};
-	const updateWidth = ( nextWidth ) => {
-		nextWidth = 0 > parseFloat( nextWidth ) ? '0' : nextWidth;
-		setAttributes( {
-			width: nextWidth,
-		} );
-	};
-
 	const handleOnResizeStart = ( _event, _direction, elt ) => {
+		setAttributes( { heightUnit: 'px' } );
+
 		onResizeStart( _event, _direction, elt );
-		setIsResizing( true );
 	};
 
-	const handleOnVerticalResizeStop = ( event, direction, elt, delta ) => {
+	const handleOnVerticalResizeStop = ( newHeight ) => {
 		onResizeStop();
-		const spacerHeight = Math.min(
-			parseInt( height + delta.height, 10 ),
-			MAX_SPACER_HEIGHT
-		);
-		updateHeight( spacerHeight );
-		setIsResizing( false );
+
+		setAttributes( { height: newHeight } );
+		setTemporaryHeight( null );
 	};
 
-	const handleOnHorizontalResizeStop = ( event, direction, elt, delta ) => {
+	const handleOnHorizontalResizeStop = ( newWidth ) => {
 		onResizeStop();
-		const spacerWidth = Math.min(
-			parseInt( width + delta.width, 10 ),
-			MAX_SPACER_WIDTH
-		);
-		updateWidth( spacerWidth );
-		setIsResizing( false );
+		setAttributes( { width: newWidth } );
+		setTemporaryWidth( null );
+	};
+
+	const style = {
+		height:
+			orientation === 'horizontal'
+				? 24
+				: temporaryHeight || heightWithUnit || undefined,
+		width:
+			orientation === 'horizontal'
+				? temporaryWidth || widthWithUnit || undefined
+				: undefined,
 	};
 
 	const resizableBoxWithOrientation = ( blockOrientation ) => {
 		if ( blockOrientation === 'horizontal' ) {
 			return (
-				<ResizableBox
-					className={ classnames(
-						'block-library-spacer__resize-container',
-						'resize-horizontal',
-						{
-							'is-selected': isSelected,
-						}
-					) }
-					size={ {
-						width: widthWithUnit,
-						height: heightWithUnit,
-					} }
+				<ResizableSpacer
 					minWidth={ MIN_SPACER_WIDTH }
 					enable={ {
 						top: false,
@@ -178,62 +212,51 @@ const SpacerEdit = ( {
 						bottomLeft: false,
 						topLeft: false,
 					} }
+					orientation={ blockOrientation }
+					maxValue={ MAX_SPACER_WIDTH }
 					onResizeStart={ handleOnResizeStart }
+					onResize={ setTemporaryWidth }
 					onResizeStop={ handleOnHorizontalResizeStop }
-					showHandle={ isSelected }
-					__experimentalShowTooltip={ true }
-					__experimentalTooltipProps={ {
-						axis: 'x',
-						position: 'corner',
-						isVisible: isResizing,
-					} }
+					isSelected={ isSelected }
 				/>
 			);
 		}
 
 		return (
-			<ResizableBox
-				className={ classnames(
-					'block-library-spacer__resize-container',
-					{
-						'is-selected': isSelected,
-					}
-				) }
-				minHeight={ MIN_SPACER_HEIGHT }
-				enable={ {
-					top: false,
-					right: false,
-					bottom: true,
-					left: false,
-					topRight: false,
-					bottomRight: false,
-					bottomLeft: false,
-					topLeft: false,
-				} }
-				onResizeStart={ handleOnResizeStart }
-				onResizeStop={ handleOnVerticalResizeStop }
-				showHandle={ isSelected }
-				__experimentalShowTooltip={ true }
-				__experimentalTooltipProps={ {
-					axis: 'y',
-					position: 'bottom',
-					isVisible: isResizing,
-				} }
-			/>
+			<>
+				<ResizableSpacer
+					enable={ {
+						top: false,
+						right: false,
+						bottom: true,
+						left: false,
+						topRight: false,
+						bottomRight: false,
+						bottomLeft: false,
+						topLeft: false,
+					} }
+					orientation={ blockOrientation }
+					maxValue={ MAX_SPACER_HEIGHT }
+					onResizeStart={ handleOnResizeStart }
+					onResize={ setTemporaryHeight }
+					onResizeStop={ handleOnVerticalResizeStop }
+					isSelected={ isSelected }
+				/>
+			</>
 		);
 	};
 
 	useEffect( () => {
 		if ( orientation === 'horizontal' && ! width ) {
-			updateWidth( 72 );
-			updateHeight( 0 );
+			setAttributes( {
+				height: parseFloat( 72 ),
+				heightUnit: 'px',
+				width: parseFloat( 0 ),
+				widthUnit: 'px'
+			} );
 		}
 	}, [] );
 
-	const style = {
-		height: orientation === 'horizontal' ? 24 : heightWithUnit || undefined,
-		width: orientation === 'horizontal' ? widthWithUnit : undefined,
-	};
 	return (
 		<>
 			<View { ...useBlockProps() } style={ style }>
@@ -243,13 +266,13 @@ const SpacerEdit = ( {
 				<PanelBody title={ __( 'Spacer settings' ) }>
 					{ orientation === 'horizontal' && (
 						<DimensionInput
-							label={ __( 'Width in pixels' ) }
-							value={ width }
+							label={ __( 'Width' ) }
+							value={ temporaryWidth || width }
 							unit={ widthUnit }
 							onChange={ ( nextWidth ) =>
 								setAttributes( { width: nextWidth } )
 							}
-							onChangeUnit={ ( nextUnit ) =>
+							onUnitChange={ ( nextUnit ) =>
 								setAttributes( {
 									widthUnit: nextUnit,
 								} )
@@ -258,11 +281,11 @@ const SpacerEdit = ( {
 					) }
 					{ orientation !== 'horizontal' && (
 						<DimensionInput
-							label={ __( 'Height in pixels' ) }
-							value={ height }
+							label={ __( 'Height' ) }
+							value={ temporaryHeight || height }
 							unit={ heightUnit }
-							onChange={ ( newHeight ) =>
-								setAttributes( { height: newHeight } )
+							onChange={ ( nextHeight ) =>
+								setAttributes( { height: nextHeight } )
 							}
 							onUnitChange={ ( nextUnit ) =>
 								setAttributes( {
