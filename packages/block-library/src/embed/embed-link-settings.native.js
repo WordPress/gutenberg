@@ -9,7 +9,7 @@ import {
 import { isURL } from '@wordpress/url';
 import { useDispatch } from '@wordpress/data';
 import { store as noticesStore } from '@wordpress/notices';
-import { useCallback, useRef, useState } from '@wordpress/element';
+import { useCallback, useEffect, useRef, useState } from '@wordpress/element';
 
 const EmbedLinkSettings = ( {
 	autoFocus,
@@ -57,6 +57,11 @@ const EmbedLinkSettings = ( {
 		}
 		onSubmit( url.current );
 	}, [ onSubmit, value ] );
+
+	useEffect( () => {
+		url.current = value;
+		setInputURL( value );
+	}, [ value ] );
 
 	/**
 	 * If the Embed Bottom Sheet component does not utilize a bottom sheet then the onDismiss action is not
