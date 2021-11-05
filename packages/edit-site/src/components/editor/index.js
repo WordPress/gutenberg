@@ -35,7 +35,6 @@ import Header from '../header';
 import { SidebarComplementaryAreaFills } from '../sidebar';
 import BlockEditor from '../block-editor';
 import KeyboardShortcuts from '../keyboard-shortcuts';
-import NavigationSidebar from '../navigation-sidebar';
 import URLQueryController from '../url-query-controller';
 import InserterSidebar from '../secondary-sidebar/inserter-sidebar';
 import ListViewSidebar from '../secondary-sidebar/list-view-sidebar';
@@ -46,7 +45,6 @@ import { GlobalStylesProvider } from '../global-styles/global-styles-provider';
 
 const interfaceLabels = {
 	secondarySidebar: __( 'Block Library' ),
-	drawer: __( 'Navigation Sidebar' ),
 };
 
 function Editor( { initialSettings, onError } ) {
@@ -103,6 +101,7 @@ function Editor( { initialSettings, onError } ) {
 	const { setPage, setIsInserterOpened, updateSettings } = useDispatch(
 		editSiteStore
 	);
+	const { enableComplementaryArea } = useDispatch( interfaceStore );
 	useEffect( () => {
 		updateSettings( initialSettings );
 	}, [] );
@@ -160,6 +159,19 @@ function Editor( { initialSettings, onError } ) {
 		}
 	}, [ isNavigationOpen ] );
 
+	useEffect(
+		function openGlobalStylesOnLoad() {
+			const searchParams = new URLSearchParams( window.location.search );
+			if ( searchParams.get( 'styles' ) === 'open' ) {
+				enableComplementaryArea(
+					'core/edit-site',
+					'edit-site/global-styles'
+				);
+			}
+		},
+		[ enableComplementaryArea ]
+	);
+
 	// Don't render the Editor until the settings are set and loaded
 	const isReady =
 		settings?.siteUrl &&
@@ -200,7 +212,6 @@ function Editor( { initialSettings, onError } ) {
 											<SidebarComplementaryAreaFills />
 											<InterfaceSkeleton
 												labels={ interfaceLabels }
-												drawer={ <NavigationSidebar /> }
 												secondarySidebar={ secondarySidebar() }
 												sidebar={
 													sidebarIsOpened && (

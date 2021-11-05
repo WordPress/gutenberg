@@ -16,7 +16,7 @@ import {
 /**
  * Internal dependencies
  */
-import { navigationPanel, siteEditor } from '../../experimental-features';
+import { siteEditor } from '../../experimental-features';
 
 const templatePartNameInput =
 	'.edit-site-template-part-converter__modal .components-text-control__input';
@@ -40,10 +40,10 @@ describe( 'Template Part', () => {
 
 		async function navigateToHeader() {
 			// Switch to editing the header template part.
-			await navigationPanel.open();
-			await navigationPanel.backToRoot();
-			await navigationPanel.navigate( [ 'Template Parts', 'headers' ] );
-			await navigationPanel.clickItemByText( 'header' );
+			await siteEditor.visit( {
+				postId: 'tt1-blocks//header',
+				postType: 'wp_template_part',
+			} );
 		}
 
 		async function updateHeader( content ) {
@@ -61,10 +61,10 @@ describe( 'Template Part', () => {
 			);
 
 			// Switch back to the Index template.
-			await navigationPanel.open();
-			await navigationPanel.backToRoot();
-			await navigationPanel.navigate( 'Templates' );
-			await navigationPanel.clickItemByText( 'Index' );
+			await siteEditor.visit( {
+				postId: 'tt1-blocks//index',
+				postType: 'wp_template',
+			} );
 		}
 
 		async function triggerEllipsisMenuItem( textPrompt ) {
