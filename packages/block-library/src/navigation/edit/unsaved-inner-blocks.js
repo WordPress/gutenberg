@@ -126,7 +126,7 @@ export default function UnsavedInnerBlocks( {
 					__( '%s menu' ),
 					area
 			  )
-			: __( 'Untitled menu' );
+			: __( 'Menu' );
 
 		// Determine how many menus start with the untitled title.
 		const matchingMenuTitleCount = [
