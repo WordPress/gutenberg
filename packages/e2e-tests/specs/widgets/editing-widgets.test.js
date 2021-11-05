@@ -122,7 +122,7 @@ describe( 'Widgets screen', () => {
 		).toBe( true );
 	}
 
-	it( 'Should insert content using the global inserter', async () => {
+	it.skip( 'Should insert content using the global inserter', async () => {
 		const updateButton = await find( {
 			role: 'button',
 			name: 'Update',
