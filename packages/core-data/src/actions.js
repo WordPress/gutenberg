@@ -700,14 +700,29 @@ export const __experimentalSaveSpecifiedEntityEdits = (
  * @param {string} name     Name of the entity.
  * @param {Object} recordId ID of the record.
  */
-export function __experimentalResetEditedEntityRecord( kind, name, recordId ) {
-	return {
-		type: 'RESET_ENTITY_RECORD_EDITS',
+export const __experimentalResetEditedEntityRecord = (
+	kind,
+	name,
+	recordId
+) => async ( { select, dispatch } ) => {
+	if ( ! select.hasEditsForEntityRecord( kind, name, recordId ) ) {
+		return;
+	}
+	const edits = select.getEntityRecordEdits( kind, name, recordId );
+	const editsToDiscard = {};
+	for ( const edit in edits ) {
+		editsToDiscard[ edit ] = undefined;
+	}
+	return await dispatch( {
+		type: 'EDIT_ENTITY_RECORD',
 		kind,
 		name,
 		recordId,
-	};
-}
+		edits: editsToDiscard,
+		transientEdits: {},
+		meta: { undo: undefined },
+	} );
+};
 
 /**
  * Action triggered to reset only specified properties for the entity.
