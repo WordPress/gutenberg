@@ -568,34 +568,3 @@ body.editor-styles-wrapper
 	width: 100%;
 	justify-content: center;
 }
-
-// This unfortunately needs a lot of specificity.
-.components-menu-group.has-hidden-separator.wp-navigation-block__create-new-menu-group {
-	padding: 0;
-}
-
-.wp-navigation-block__create-new-menu-button.components-button {
-	justify-content: center;
-	background: $gray-900;
-	color: $white;
-	height: ($button-size + $grid-unit-10);
-	border-radius: 0;
-
-	&:hover {
-		color: $white;
-	}
-
-	&:active {
-		color: $gray-400;
-	}
-
-	&:focus:not(:disabled) {
-		box-shadow: inset 0 0 0 var(--wp-admin-border-width-focus) var(--wp-admin-theme-color), inset 0 0 0 3px $white;
-	}
-
-	// This is needed to center the button text.
-	.components-menu-item__item {
-		min-width: 0;
-		margin: 0;
-	}
-}

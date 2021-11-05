@@ -32,14 +32,8 @@ export default function NavigationMenuSelector( { onSelect, onCreateNew } ) {
 					} ) ) }
 				/>
 			</MenuGroup>
-			<MenuGroup
-				className="wp-navigation-block__create-new-menu-group"
-				hideSeparator
-			>
-				<MenuItem
-					className="wp-navigation-block__create-new-menu-button"
-					onClick={ onCreateNew }
-				>
+			<MenuGroup>
+				<MenuItem onClick={ onCreateNew }>
 					{ __( 'Create new menu' ) }
 				</MenuItem>
 			</MenuGroup>
