@@ -1484,7 +1484,38 @@ class WP_Theme_JSON_Gutenberg {
 	}
 
 	/**
-	 * Returns whether a presets should be overriden or not.
+	 * Converts all filter (duotone) presets into SVGs.
+	 *
+	 * @param array $origins List of origins to process.
+	 *
+	 * @return string SVG filters.
+	 */
+	public function get_svg_filters( $origins ) {
+		// $blocks_metadata = self::get_blocks_metadata();
+		// $settings_nodes  = self::get_setting_nodes( $this->theme_json, $blocks_metadata );
+
+		// TODO: Handle the per-block settings.
+		if ( ! isset( $this->theme_json['settings']['color']['duotone'] ) ) {
+			return '';
+		}
+
+		$duotone_presets = $this->theme_json['settings']['color']['duotone'];
+
+		$filters = array();
+		foreach ( $origins as $origin ) {
+			if ( ! isset( $duotone_presets[ $origin ] ) ) {
+				continue;
+			}
+			foreach ( $duotone_presets[ $origin ] as $duotone_preset ) {
+				$filters[] = gutenberg_get_duotone_filter_svg( $duotone_preset );
+			}
+		}
+
+		return implode( $filters );
+	}
+
+	/**
+	 * Merge new incoming data.
 	 *
 	 * @param array      $theme_json The theme.json like structure to inspect.
 	 * @param array      $path Path to inspect.

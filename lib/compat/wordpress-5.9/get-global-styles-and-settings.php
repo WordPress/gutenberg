@@ -132,3 +132,45 @@ if ( ! function_exists( 'wp_get_global_stylesheet' ) ) {
 		return $stylesheet;
 	}
 }
+
+/**
+ * Returns the stylesheet resulting of merging core, theme, and user data.
+ *
+ * @return string Stylesheet.
+ */
+function gutenberg_get_global_styles_svg_filters() {
+	// Return cached value if it can be used and exists.
+	// It's cached by theme to make sure that theme switching clears the cache.
+	$transient_name = 'gutenberg_global_styles_svg_filters_' . get_stylesheet();
+	$can_use_cached = gutenberg_can_use_cached();
+	if ( $can_use_cached ) {
+		$cached = get_transient( $transient_name );
+		if ( $cached ) {
+			return $cached;
+		}
+	}
+
+	$supports_theme_json = WP_Theme_JSON_Resolver_Gutenberg::theme_has_support();
+	$supports_link_color = get_theme_support( 'experimental-link-color' );
+
+	// TODO: Which origins are needed for duotone filters?
+	$origins = array( 'core', 'theme', 'user' );
+	if ( ! $supports_theme_json && ! $supports_link_color ) {
+		// In this case we only enqueue the core presets (CSS Custom Properties + the classes).
+		$origins = array( 'core' );
+	} elseif ( ! $supports_theme_json && $supports_link_color ) {
+		// For the legacy link color feature to work, the CSS Custom Properties
+		// should be in scope (either the core or the theme ones).
+		$origins = array( 'core', 'theme' );
+	}
+
+	$tree = WP_Theme_JSON_Resolver_Gutenberg::get_merged_data();
+	$svgs = $tree->get_svg_filters( $origins );
+
+	if ( $can_use_cached ) {
+		// Cache for a minute, same as gutenberg_get_global_stylesheet.
+		set_transient( $transient_name, $svgs, MINUTE_IN_SECONDS );
+	}
+
+	return $svgs;
+}
