@@ -884,37 +884,13 @@ public class WPAndroidGlueCode {
         return originalContent;
     }
 
-    public synchronized CharSequence getTitle(OnGetContentInterrupted onGetContentInterrupted) {
-        if (hasReactContext()) {
-            mGetContentCountDownLatch = new CountDownLatch(1);
-
-            mRnReactNativeGutenbergBridgePackage.getRNReactNativeGutenbergBridgeModule().getHtmlFromJS();
-
-            try {
-                boolean success = mGetContentCountDownLatch.await(10, TimeUnit.SECONDS);
-                if (!success) {
-                    AppLog.e(T.EDITOR, "Timeout reached before response from requestGetHtml.");
-                }
-            } catch (InterruptedException ie) {
-                onGetContentInterrupted.onGetContentInterrupted(ie);
-            }
-
-            return mTitle == null ? "" : mTitle;
-        } else {
-            AppLog.e(T.EDITOR, "getTitle was called when there was no React context.");
-        }
-
-        return "";
-    }
-
-
     /** This method retrieves both the title and the content from the Gutenberg editor by the emission of a single
-     * event. This is useful to avoid redundant events, since {@link #getTitle} and {@link #getContent} both share the
-     * same event anyway, and also share the same mechanism to suspend execution until a response is received (or a
+     * event. This is useful to avoid redundant events, since {@link #getContent} already retrieves the title as well,
+     * using same event, and also shares the same mechanism to suspend execution until a response is received (or a
      * timeout is reached).
      * @param originalContent fallback content to return in case the timeout is reached, or the thread is interrupted
      * @param onGetContentInterrupted callback to invoke if thread is interrupted before the timeout
-     * @return
+     * @return A Pair of CharSequence with the first being the title and the second being the content
      */
     public synchronized Pair<CharSequence, CharSequence> getTitleAndContent(CharSequence originalContent,
                                                                OnGetContentInterrupted onGetContentInterrupted) {
