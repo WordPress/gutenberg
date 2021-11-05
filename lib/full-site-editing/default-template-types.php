@@ -71,7 +71,7 @@ function gutenberg_get_default_template_types() {
 		),
 		'privacy-policy' => array(
 			'title'       => __( 'Privacy Policy', 'gutenberg' ),
-			'description' => 'Displays the privacy policy page.',
+			'description' => __( 'Displays the privacy policy page.', 'gutenberg' ),
 		),
 		'404'            => array(
 			'title'       => _x( '404', 'Template name', 'gutenberg' ),
