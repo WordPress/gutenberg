@@ -418,7 +418,8 @@ function gutenberg_register_navigation_post_type() {
 		'description'           => __( 'Navigation menus.', 'gutenberg' ),
 		'public'                => false,
 		'has_archive'           => false,
-		'show_ui'               => true,
+		// We should disable UI for non-FSE themes.
+		'show_ui'               => gutenberg_is_fse_theme(),
 		'show_in_menu'          => 'themes.php',
 		'show_in_admin_bar'     => false,
 		'show_in_rest'          => true,
