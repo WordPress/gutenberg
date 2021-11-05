@@ -93,7 +93,7 @@ class URLInput extends Component {
 			! this.props.disableSuggestions &&
 			! this.isUpdatingSuggestions
 		) {
-			if ( value && value.length ) {
+			if ( value?.length ) {
 				// If the new value is not empty we need to update with suggestions for it
 				this.updateSuggestions( value );
 			} else if ( __experimentalShowInitialSuggestions ) {
