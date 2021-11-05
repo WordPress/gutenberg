@@ -135,11 +135,12 @@ export default function UnsavedInnerBlocks( {
 		savingLock.current = true;
 		const title = area
 			? sprintf(
-					// translators: %s is the name of a menu (e.g. Header menu).
-					__( '%s menu' ),
+					// translators: %s: the name of a menu (e.g. Header navigation).
+					__( '%s navigation' ),
 					area
 			  )
-			: __( 'Menu' );
+			: // translators: 'navigation' as in website navigation.
+			  __( 'Navigation' );
 
 		// Determine how many menus start with the untitled title.
 		const matchingMenuTitleCount = [
