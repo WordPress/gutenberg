@@ -20,7 +20,7 @@ export default function useMobileWarning() {
 
 	createWarningNotice(
 		__(
-			'To edit this Gallery block in the WP mobile app you need to be using version 18.2 or higher.'
+			'Editing this Gallery in the WordPress mobile app requires version 18.2 or higher.'
 		),
 		{ type: 'snackbar', explicitDismiss: true }
 	);
