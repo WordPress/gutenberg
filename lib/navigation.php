@@ -619,7 +619,8 @@ function gutenberg_migrate_nav_on_theme_switch( $new_name, $new_theme, $old_them
 			'post_content' => serialize_blocks( $parsed_blocks ),
 			'post_status'  => 'publish',
 		);
-		// Get or create to avoid creating too many wp_navigation posts.
+		// Get or create to avoid creating too many wp_navigation posts. Using custom SQL because WP_Query
+		// can't filter by post_content.
 		$matching_posts = $wpdb->get_results(
 			$wpdb->prepare(
 				'SELECT id FROM wp_posts WHERE post_type = %s AND MD5( post_content ) = %s AND post_status = %s LIMIT 1',
