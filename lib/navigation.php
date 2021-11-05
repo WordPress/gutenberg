@@ -622,7 +622,7 @@ function gutenberg_migrate_nav_on_theme_switch( $new_name, $new_theme, $old_them
 		// Get or create to avoid creating too many wp_navigation posts.
 		$matching_posts = $wpdb->get_results(
 			$wpdb->prepare(
-			'SELECT id FROM wp_posts WHERE post_type = %s AND MD5( post_content ) = %s AND post_status = %s',
+				'SELECT id FROM wp_posts WHERE post_type = %s AND MD5( post_content ) = %s AND post_status = %s',
 				$post_data['post_type'],
 				md5( $post_data['post_content'] ),
 				$post_data['post_status']
