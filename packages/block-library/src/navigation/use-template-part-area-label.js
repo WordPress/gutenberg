@@ -12,7 +12,7 @@ import { useSelect } from '@wordpress/data';
 // TODO: this util should perhaps be refactored somewhere like core-data.
 import { createTemplatePartId } from '../template-part/edit/utils/create-template-part-id';
 
-export default function useTemplatePartArea( clientId ) {
+export default function useTemplatePartAreaLabel( clientId ) {
 	return useSelect(
 		( select ) => {
 			// Use the lack of a clientId as an opportunity to bypass the rest

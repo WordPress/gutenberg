@@ -18,7 +18,7 @@ import { __, sprintf } from '@wordpress/i18n';
  * Internal dependencies
  */
 import useNavigationMenu from '../use-navigation-menu';
-import useTemplatePartArea from '../use-template-part-area';
+import useTemplatePartAreaLabel from '../use-template-part-area-label';
 
 const NOOP = () => {};
 const DRAFT_MENU_PARAMS = [
@@ -104,7 +104,7 @@ export default function UnsavedInnerBlocks( {
 	// Because we can't conditionally call hooks, pass an undefined client id
 	// arg to bypass the expensive `useTemplateArea` code. The hook will return
 	// early.
-	const area = useTemplatePartArea( isDisabled ? clientId : undefined );
+	const area = useTemplatePartAreaLabel( isDisabled ? undefined : clientId );
 
 	// Automatically save the uncontrolled blocks.
 	useEffect( async () => {
