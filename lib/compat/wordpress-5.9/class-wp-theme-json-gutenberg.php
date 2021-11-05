@@ -1491,23 +1491,25 @@ class WP_Theme_JSON_Gutenberg {
 	 * @return string SVG filters.
 	 */
 	public function get_svg_filters( $origins ) {
-		// $blocks_metadata = self::get_blocks_metadata();
-		// $settings_nodes  = self::get_setting_nodes( $this->theme_json, $blocks_metadata );
+		$blocks_metadata = self::get_blocks_metadata();
+		$setting_nodes   = self::get_setting_nodes( $this->theme_json, $blocks_metadata );
 
-		// TODO: Handle the per-block settings.
-		if ( ! isset( $this->theme_json['settings']['color']['duotone'] ) ) {
-			return '';
-		}
-
-		$duotone_presets = $this->theme_json['settings']['color']['duotone'];
-
-		$filters = array();
-		foreach ( $origins as $origin ) {
-			if ( ! isset( $duotone_presets[ $origin ] ) ) {
+		foreach ( $setting_nodes as $metadata ) {
+			$node = _wp_array_get( $this->theme_json, $metadata['path'], array() );
+			if ( empty( $node['color']['duotone'] ) ) {
 				continue;
 			}
-			foreach ( $duotone_presets[ $origin ] as $duotone_preset ) {
-				$filters[] = gutenberg_get_duotone_filter_svg( $duotone_preset );
+
+			$duotone_presets = $node['color']['duotone'];
+
+			$filters = array();
+			foreach ( $origins as $origin ) {
+				if ( ! isset( $duotone_presets[ $origin ] ) ) {
+					continue;
+				}
+				foreach ( $duotone_presets[ $origin ] as $duotone_preset ) {
+					$filters[] = gutenberg_get_duotone_filter_svg( $duotone_preset );
+				}
 			}
 		}
 
