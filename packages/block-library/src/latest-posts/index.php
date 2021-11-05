@@ -61,6 +61,7 @@ function render_block_core_latest_posts( $attributes ) {
 	foreach ( $recent_posts as $post ) {
 		$post_link = esc_url( get_permalink( $post ) );
 		$title     = get_the_title( $post );
+
 		if ( ! $title ) {
 			$title = __( '(no title)' );
 		}
