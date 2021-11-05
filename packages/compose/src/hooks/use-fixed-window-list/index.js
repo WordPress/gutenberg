@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { throttle } from 'lodash';
+import { debounce } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -60,14 +60,19 @@ export default function useFixedWindowList(
 			return;
 		}
 		const scrollContainer = getScrollContainer( elementRef.current );
-		const measureWindow = () => {
+		const measureWindow = (
+			/** @type {boolean | undefined} */ initRender
+		) => {
 			if ( ! scrollContainer ) {
 				return;
 			}
 			const visibleItems = Math.ceil(
 				scrollContainer.clientHeight / itemHeight
 			);
-			const windowOverscan = options?.windowOverscan ?? visibleItems;
+			// Aim to keep opening list view fast, afterward we can optimize for scrolling
+			const windowOverscan = initRender
+				? visibleItems
+				: options?.windowOverscan ?? visibleItems;
 			const firstViewableIndex = Math.floor(
 				scrollContainer.scrollTop / itemHeight
 			);
@@ -95,6 +100,38 @@ export default function useFixedWindowList(
 				return lastWindow;
 			} );
 		};
+
+		measureWindow( true );
+		const debounceMeasureList = debounce( () => {
+			measureWindow();
+		}, 16 );
+		scrollContainer?.addEventListener( 'scroll', debounceMeasureList );
+		scrollContainer?.ownerDocument?.defaultView?.addEventListener(
+			'resize',
+			debounceMeasureList
+		);
+		scrollContainer?.ownerDocument?.defaultView?.addEventListener(
+			'resize',
+			debounceMeasureList
+		);
+
+		return () => {
+			scrollContainer?.removeEventListener(
+				'scroll',
+				debounceMeasureList
+			);
+			scrollContainer?.ownerDocument?.defaultView?.removeEventListener(
+				'resize',
+				debounceMeasureList
+			);
+		};
+	}, [ itemHeight, elementRef, totalItems ] );
+
+	useLayoutEffect( () => {
+		if ( ! useWindowing ) {
+			return;
+		}
+		const scrollContainer = getScrollContainer( elementRef.current );
 		const handleKeyDown = ( /** @type {KeyboardEvent} */ event ) => {
 			switch ( event.keyCode ) {
 				case HOME: {
@@ -121,39 +158,17 @@ export default function useFixedWindowList(
 				}
 			}
 		};
-
-		measureWindow();
-		const throttleMeasureList = throttle( () => {
-			measureWindow();
-		}, 16 );
-		scrollContainer?.addEventListener( 'scroll', throttleMeasureList );
-		scrollContainer?.ownerDocument?.defaultView?.addEventListener(
-			'resize',
-			throttleMeasureList
-		);
-		scrollContainer?.ownerDocument?.defaultView?.addEventListener(
-			'resize',
-			throttleMeasureList
-		);
 		scrollContainer?.ownerDocument?.defaultView?.addEventListener(
 			'keydown',
 			handleKeyDown
 		);
 		return () => {
-			scrollContainer?.removeEventListener(
-				'scroll',
-				throttleMeasureList
-			);
-			scrollContainer?.ownerDocument?.defaultView?.removeEventListener(
-				'resize',
-				throttleMeasureList
-			);
 			scrollContainer?.ownerDocument?.defaultView?.removeEventListener(
 				'keydown',
 				handleKeyDown
 			);
 		};
-	}, [ totalItems, itemHeight, elementRef ] );
+	}, [ totalItems, itemHeight, elementRef, fixedListWindow.visibleItems ] );
 
 	return [ fixedListWindow, setFixedListWindow ];
 }

@@ -71,7 +71,7 @@ export default class Picker extends Component {
 	}
 
 	render() {
-		const { hideCancelButton, title } = this.props;
+		const { hideCancelButton, title, testID } = this.props;
 		const { isVisible } = this.state;
 
 		return (
@@ -80,6 +80,7 @@ export default class Picker extends Component {
 				onClose={ this.onClose }
 				style={ { paddingBottom: 20 } }
 				hideHeader
+				testID={ testID }
 			>
 				<PanelBody title={ title } style={ styles.panelBody }>
 					{ this.getOptions() }

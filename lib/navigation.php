@@ -418,13 +418,13 @@ function gutenberg_register_navigation_post_type() {
 		'description'           => __( 'Navigation menus.', 'gutenberg' ),
 		'public'                => false,
 		'has_archive'           => false,
-		'show_ui'               => false,
+		'show_ui'               => true,
 		'show_in_menu'          => 'themes.php',
 		'show_in_admin_bar'     => false,
 		'show_in_rest'          => true,
 		'map_meta_cap'          => true,
 		'rest_base'             => 'navigation',
-		'rest_controller_class' => 'WP_REST_Posts_Controller',
+		'rest_controller_class' => WP_REST_Posts_Controller::class,
 		'supports'              => array(
 			'title',
 			'editor',
@@ -435,3 +435,85 @@ function gutenberg_register_navigation_post_type() {
 	register_post_type( 'wp_navigation', $args );
 }
 add_action( 'init', 'gutenberg_register_navigation_post_type' );
+
+/**
+ * Disable block editor for wp_navigation type posts so they can be managed via the UI.
+ *
+ * @param bool   $value Whether the CPT supports block editor or not.
+ * @param string $post_type Post type.
+ *
+ * @return bool
+ */
+function gutenberg_disable_block_editor_for_navigation_post_type( $value, $post_type ) {
+	if ( 'wp_navigation' === $post_type ) {
+		return false;
+	}
+
+	return $value;
+}
+
+add_filter( 'use_block_editor_for_post_type', 'gutenberg_disable_block_editor_for_navigation_post_type', 10, 2 );
+
+/**
+ * This callback disables the content editor for wp_navigation type posts.
+ * Content editor cannot handle wp_navigation type posts correctly.
+ * We cannot disable the "editor" feature in the wp_navigation's CPT definition
+ * because it disables the ability to save navigation blocks via REST API.
+ *
+ * @param WP_Post $post An instance of WP_Post class.
+ */
+function gutenberg_disable_content_editor_for_navigation_post_type( $post ) {
+	$post_type = get_post_type( $post );
+	if ( 'wp_navigation' !== $post_type ) {
+		return;
+	}
+
+	remove_post_type_support( $post_type, 'editor' );
+}
+
+add_action( 'edit_form_after_title', 'gutenberg_disable_content_editor_for_navigation_post_type', 10, 1 );
+
+/**
+ * This callback enables content editor for wp_navigation type posts.
+ * We need to enable it back because we disable it to hide
+ * the content editor for wp_navigation type posts.
+ *
+ * @see gutenberg_disable_content_editor_for_navigation_post_type
+ *
+ * @param WP_Post $post An instance of WP_Post class.
+ */
+function gutenberg_enable_content_editor_for_navigation_post_type( $post ) {
+	$post_type = get_post_type( $post );
+	if ( 'wp_navigation' !== $post_type ) {
+		return;
+	}
+
+	add_post_type_support( $post_type, 'editor' );
+}
+
+add_action( 'edit_form_after_editor', 'gutenberg_enable_content_editor_for_navigation_post_type', 10, 1 );
+
+/**
+ * Rename the menu title from "All Navigation Menus" to "Navigation Menus".
+ */
+function gutenberg_rename_navigation_menus_admin_menu_entry() {
+	global $submenu;
+	if ( ! isset( $submenu['themes.php'] ) ) {
+		return;
+	}
+
+	$post_type = get_post_type_object( 'wp_navigation' );
+	if ( ! $post_type ) {
+		return;
+	}
+
+	$menu_title_index = 0;
+	foreach ( $submenu['themes.php'] as $key => $menu_item ) {
+		if ( $post_type->labels->all_items === $menu_item[ $menu_title_index ] ) {
+			$submenu['themes.php'][ $key ][ $menu_title_index ] = $post_type->labels->menu_name; // phpcs:ignore WordPress.WP.GlobalVariablesOverride
+			return;
+		}
+	}
+}
+
+add_action( 'admin_menu', 'gutenberg_rename_navigation_menus_admin_menu_entry' );

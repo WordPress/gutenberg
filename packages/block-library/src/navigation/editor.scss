@@ -20,6 +20,15 @@
 	}
 }
 
+// The following rule affects the positioning of the dropdown arrow indicator.
+// On the frontend, this element is inline, which makes it look correct. In the editor,
+// the label is block, which causes the dropdown indicator to wrap onto a new line.
+// Therefore we explicitly set it to inline even in the block editor.
+.wp-block-navigation-item__label {
+	display: inline;
+}
+
+
 /**
  * Submenus.
  */
@@ -522,10 +531,45 @@ body.editor-styles-wrapper
 	}
 }
 
-.wp-block-navigation__unsaved-changes-warning {
-	width: 100%;
-
-	.block-editor-warning__actions {
-		margin-top: 0;
+@keyframes fadein {
+	0% {
+		opacity: 0;
 	}
+	100% {
+		opacity: 1;
+	}
+}
+
+.wp-block-navigation__unsaved-changes {
+	position: relative;
+
+	.components-spinner {
+		position: absolute;
+		top: calc(50% - #{$spinner-size} / 2);
+		left: calc(50% - #{$spinner-size} / 2);
+
+		// Delay showing the saving spinner until after 2 seconds.
+		// This should ensure it only shows for slow connections.
+		opacity: 0;
+		animation: 0.5s linear 2s normal forwards fadein;
+	}
+}
+
+@keyframes fadeouthalf {
+	0% {
+		opacity: 1;
+	}
+	100% {
+		opacity: 0.5;
+	}
+}
+
+.wp-block-navigation__unsaved-changes-overlay.is-saving {
+	opacity: 1;
+	animation: 0.5s linear 2s normal forwards fadeouthalf;
+}
+
+.wp-block-navigation-delete-menu-button {
+	width: 100%;
+	justify-content: center;
 }

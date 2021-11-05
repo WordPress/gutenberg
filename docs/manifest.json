@@ -114,6 +114,12 @@
 		"parent": "javascript"
 	},
 	{
+		"title": "A first-time setup guide to native mobile development (OSX)",
+		"slug": "osx-setup-guide",
+		"markdown_source": "../docs/how-to-guides/native-mobile/osx-setup-guide.md",
+		"parent": "javascript"
+	},
+	{
 		"title": "Troubleshooting",
 		"slug": "troubleshooting",
 		"markdown_source": "../docs/how-to-guides/javascript/troubleshooting.md",
@@ -405,6 +411,12 @@
 		"title": "Internationalization",
 		"slug": "internationalization",
 		"markdown_source": "../docs/how-to-guides/internationalization.md",
+		"parent": "how-to-guides"
+	},
+	{
+		"title": "Thunks in Core-Data",
+		"slug": "thunks",
+		"markdown_source": "../docs/how-to-guides/thunks.md",
 		"parent": "how-to-guides"
 	},
 	{

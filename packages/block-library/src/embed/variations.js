@@ -25,6 +25,7 @@ import {
 	embedAnimotoIcon,
 	embedDailymotionIcon,
 	embedPinterestIcon,
+	embedWolframIcon,
 } from './icons';
 
 /** @typedef {import('@wordpress/blocks').WPBlockVariation} WPBlockVariation */
@@ -340,6 +341,14 @@ const variations = [
 			/^https?:\/\/([a-z]{2}|www)\.pinterest\.com(\.(au|mx))?\/.*/i,
 		],
 		attributes: { providerNameSlug: 'pinterest' },
+	},
+	{
+		name: 'wolfram-cloud',
+		title: 'Wolfram Cloud',
+		icon: embedWolframIcon,
+		description: __( 'Embed Wolfram Cloud notebook content.' ),
+		patterns: [ /^https?:\/\/(www\.)?wolframcloud\.com\/obj\/.+/i ],
+		attributes: { providerNameSlug: 'wolfram-cloud', responsive: true },
 	},
 ];
 

@@ -6,7 +6,7 @@ import {
 	InnerBlocks,
 	useBlockProps,
 	InspectorControls,
-	__experimentalUseInnerBlocksProps as useInnerBlocksProps,
+	useInnerBlocksProps,
 	useSetting,
 	store as blockEditorStore,
 } from '@wordpress/block-editor';

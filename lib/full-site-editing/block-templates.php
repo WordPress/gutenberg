@@ -195,41 +195,42 @@ function _gutenberg_flatten_blocks( &$blocks ) {
 	return $all_blocks;
 }
 
-/**
- * Parses wp_template content and injects the current theme's
- * stylesheet as a theme attribute into each wp_template_part
- *
- * @param string $template_content serialized wp_template content.
- *
- * @return string Updated wp_template content.
- */
-function _gutenberg_inject_theme_attribute_in_content( $template_content ) {
-	$has_updated_content = false;
-	$new_content         = '';
-	$template_blocks     = parse_blocks( $template_content );
+if ( ! function_exists( '_inject_theme_attribute_in_block_template_content' ) ) {
+	/**
+	 * Parses wp_template content and injects the current theme's
+	 * stylesheet as a theme attribute into each wp_template_part
+	 *
+	 * @param string $template_content serialized wp_template content.
+	 *
+	 * @return string Updated wp_template content.
+	 */
+	function _inject_theme_attribute_in_block_template_content( $template_content ) {
+		$has_updated_content = false;
+		$new_content         = '';
+		$template_blocks     = parse_blocks( $template_content );
 
-	$blocks = _gutenberg_flatten_blocks( $template_blocks );
-	foreach ( $blocks as &$block ) {
-		if (
-			'core/template-part' === $block['blockName'] &&
-			! isset( $block['attrs']['theme'] )
-		) {
-			$block['attrs']['theme'] = wp_get_theme()->get_stylesheet();
-			$has_updated_content     = true;
-		}
-	}
-
-	if ( $has_updated_content ) {
-		foreach ( $template_blocks as &$block ) {
-			$new_content .= serialize_block( $block );
+		$blocks = _gutenberg_flatten_blocks( $template_blocks );
+		foreach ( $blocks as &$block ) {
+			if (
+				'core/template-part' === $block['blockName'] &&
+				! isset( $block['attrs']['theme'] )
+			) {
+				$block['attrs']['theme'] = wp_get_theme()->get_stylesheet();
+				$has_updated_content     = true;
+			}
 		}
 
-		return $new_content;
-	}
+		if ( $has_updated_content ) {
+			foreach ( $template_blocks as &$block ) {
+				$new_content .= serialize_block( $block );
+			}
 
-	return $template_content;
+			return $new_content;
+		}
+
+		return $template_content;
+	}
 }
-
 /**
  * Build a unified template object based on a theme file.
  *
@@ -246,7 +247,7 @@ function _gutenberg_build_template_result_from_file( $template_file, $template_t
 	$template                 = new WP_Block_Template();
 	$template->id             = $theme . '//' . $template_file['slug'];
 	$template->theme          = $theme;
-	$template->content        = _gutenberg_inject_theme_attribute_in_content( $template_content );
+	$template->content        = _inject_theme_attribute_in_block_template_content( $template_content );
 	$template->slug           = $template_file['slug'];
 	$template->source         = 'theme';
 	$template->type           = $template_type;

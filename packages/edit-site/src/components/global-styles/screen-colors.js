@@ -102,7 +102,7 @@ function ScreenColors( { name } ) {
 
 			<div className="edit-site-global-styles-screen-colors">
 				<VStack spacing={ 10 }>
-					<Palette contextName={ name } />
+					<Palette name={ name } />
 
 					<VStack spacing={ 3 }>
 						<Subtitle>{ __( 'Elements' ) }</Subtitle>

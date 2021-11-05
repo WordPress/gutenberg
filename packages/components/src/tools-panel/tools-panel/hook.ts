@@ -17,6 +17,8 @@ import type {
 	ToolsPanelProps,
 } from '../types';
 
+const DEFAULT_COLUMNS = 2;
+
 const generateMenuItems = ( {
 	panelItems,
 	shouldReset,
@@ -133,7 +135,8 @@ export function useToolsPanel(
 		const hasDefaultMenuItems =
 			menuItems?.default && !! Object.keys( menuItems?.default ).length;
 		const wrapperStyle =
-			hasInnerWrapper && styles.ToolsPanelWithInnerWrapper;
+			hasInnerWrapper &&
+			styles.ToolsPanelWithInnerWrapper( DEFAULT_COLUMNS );
 		const emptyStyle =
 			! hasDefaultMenuItems &&
 			areAllOptionalControlsHidden &&

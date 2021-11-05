@@ -20,7 +20,7 @@ class WP_REST_URL_Details_Controller_Test extends WP_Test_REST_Controller_Testca
 
 	protected static $admin_id;
 	protected static $subscriber_id;
-	protected static $route           = '/__experimental/url-details';
+	protected static $route           = '/wp-block-editor/v1/url-details';
 	protected static $url_placeholder = 'https://placeholder-site.com';
 	protected static $request_args    = array();
 

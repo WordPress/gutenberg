@@ -3,7 +3,7 @@
  */
 import { useEntityBlockEditor } from '@wordpress/core-data';
 import {
-	__experimentalUseInnerBlocksProps as useInnerBlocksProps,
+	useInnerBlocksProps,
 	__experimentalBlockContentOverlay as BlockContentOverlay,
 	store as blockEditorStore,
 } from '@wordpress/block-editor';

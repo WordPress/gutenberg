@@ -53,6 +53,7 @@
 					{
 						"docs/how-to-guides/javascript/extending-the-block-editor.md": []
 					},
+					{ "docs/how-to-guides/native-mobile/osx-setup-guide.md": [] },
 					{ "docs/how-to-guides/javascript/troubleshooting.md": [] },
 					{
 						"docs/how-to-guides/javascript/versions-and-building.md": []
@@ -171,6 +172,7 @@
 			},
 			{ "docs/how-to-guides/accessibility.md": [] },
 			{ "docs/how-to-guides/internationalization.md": [] },
+			{ "docs/how-to-guides/thunks.md": [] },
 			{
 				"docs/how-to-guides/widgets/README.md": [
 					{ "docs/how-to-guides/widgets/overview.md": [] },

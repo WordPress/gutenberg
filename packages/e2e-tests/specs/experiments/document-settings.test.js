@@ -6,7 +6,7 @@ import { trashAllPosts, activateTheme } from '@wordpress/e2e-test-utils';
 /**
  * Internal dependencies
  */
-import { navigationPanel, siteEditor } from '../../experimental-features';
+import { siteEditor } from '../../experimental-features';
 
 async function getDocumentSettingsTitle() {
 	const titleElement = await page.waitForSelector(
@@ -41,10 +41,10 @@ describe( 'Document Settings', () => {
 	describe( 'when a template is selected from the navigation sidebar', () => {
 		it( 'should display the selected templates name in the document header', async () => {
 			// Navigate to a template
-			await navigationPanel.open();
-			await navigationPanel.backToRoot();
-			await navigationPanel.navigate( 'Templates' );
-			await navigationPanel.clickItemByText( 'Index' );
+			await siteEditor.visit( {
+				postId: 'tt1-blocks//index',
+				postType: 'wp_template',
+			} );
 
 			// Evaluate the document settings title
 			const actual = await getDocumentSettingsTitle();
@@ -77,10 +77,10 @@ describe( 'Document Settings', () => {
 	describe( 'when a template part is selected from the navigation sidebar', () => {
 		it( "should display the selected template part's name in the document header", async () => {
 			// Navigate to a template part
-			await navigationPanel.open();
-			await navigationPanel.backToRoot();
-			await navigationPanel.navigate( [ 'Template Parts', 'headers' ] );
-			await navigationPanel.clickItemByText( 'header' );
+			await siteEditor.visit( {
+				postId: 'tt1-blocks//header',
+				postType: 'wp_template_part',
+			} );
 
 			// Evaluate the document settings title
 			const actual = await getDocumentSettingsTitle();
