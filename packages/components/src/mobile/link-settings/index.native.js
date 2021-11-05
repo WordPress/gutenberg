@@ -54,7 +54,7 @@ function LinkSettings( {
 	//	* placeholder - control component placeholder, e.g. `Add URL`
 	//	* autoFocus (url only) - whether url input should be focused on sheet opening
 	//	* autoFill (url only) - whether url input should be filled with url from clipboard
-	//	* setCursorStart (url only) - whether url input's selection should be set to the start. The cursor will be at the front of the link.
+	//	* setCursorAtStart (url only) - whether url input's selection should be set to the start. The cursor will be at the front of the link.
 	// Example:
 	//	const options = {
 	//		url: {
@@ -62,7 +62,7 @@ function LinkSettings( {
 	//			placeholder: __( 'Add URL' ),
 	//			autoFocus: true,
 	//			autoFill: true,
-	//			setCursorStart: true,
+	//			setCursorAtStart: true,
 	//		}
 	//	}
 	options,
