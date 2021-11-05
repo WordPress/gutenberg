@@ -565,7 +565,9 @@ function gutenberg_get_navigation_areas_paths_to_preload() {
 		'/__experimental/block-navigation-areas?context=edit',
 	);
 	foreach ( $active_areas as $post_id ) {
-		$paths[] = "/wp/v2/navigation/$post_id?context=edit";
+		if ( 0 !== $post_id ) {
+			$paths[] = "/wp/v2/navigation/$post_id?context=edit";
+		}
 	}
 	return $paths;
 }
