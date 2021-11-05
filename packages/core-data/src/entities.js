@@ -192,9 +192,10 @@ async function loadPostTypeEntities() {
 		const isTemplate = [ 'wp_template', 'wp_template_part' ].includes(
 			name
 		);
+		const namespace = postType?.rest_namespace ?? 'wp/v2';
 		return {
 			kind: 'postType',
-			baseURL: '/wp/v2/' + postType.rest_base,
+			baseURL: `/${ namespace }/${ postType.rest_base }`,
 			baseURLParams: { context: 'edit' },
 			name,
 			label: postType.labels.singular_name,
@@ -224,9 +225,10 @@ async function loadTaxonomyEntities() {
 		path: '/wp/v2/taxonomies?context=edit',
 	} );
 	return map( taxonomies, ( taxonomy, name ) => {
+		const namespace = taxonomy?.rest_namespace ?? 'wp/v2';
 		return {
 			kind: 'taxonomy',
-			baseURL: '/wp/v2/' + taxonomy.rest_base,
+			baseURL: `/${ namespace }/${ taxonomy.rest_base }`,
 			baseURLParams: { context: 'edit' },
 			name,
 			label: taxonomy.labels.singular_name,

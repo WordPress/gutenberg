@@ -286,7 +286,7 @@ class WP_Theme_JSON_Gutenberg {
 			$origin = 'theme';
 		}
 
-		$theme_json = self::migrate( $theme_json );
+		$theme_json = WP_Theme_JSON_Schema_Gutenberg::migrate( $theme_json );
 
 		$valid_block_names   = array_keys( self::get_blocks_metadata() );
 		$valid_element_names = array_keys( self::ELEMENTS );
@@ -303,35 +303,6 @@ class WP_Theme_JSON_Gutenberg {
 				}
 			}
 		}
-	}
-
-	/**
-	 * Function that migrates a given theme.json structure to the last version.
-	 *
-	 * @param array $theme_json The structure to migrate.
-	 *
-	 * @return array The structure in the last version.
-	 */
-	private static function migrate( $theme_json ) {
-		// Can be removed when the plugin minimum required version is WordPress 5.8.
-		// This doesn't need to land in WordPress core.
-		if ( ! isset( $theme_json['version'] ) || 0 === $theme_json['version'] ) {
-			$theme_json = WP_Theme_JSON_Schema_V0_To_V1::migrate( $theme_json );
-		}
-
-		// Provide backwards compatibility for settings that did not land in 5.8
-		// and have had their `custom` prefixed removed since.
-		// Can be removed when the plugin minimum required version is WordPress 5.9.
-		// This doesn't need to land in WordPress core.
-		if ( 1 === $theme_json['version'] ) {
-			$theme_json = WP_Theme_JSON_Schema_V1_Remove_Custom_Prefixes::migrate( $theme_json );
-		}
-
-		if ( 1 === $theme_json['version'] ) {
-			$theme_json = WP_Theme_JSON_Schema_V1_To_V2::migrate( $theme_json );
-		}
-
-		return $theme_json;
 	}
 
 	/**
@@ -1455,7 +1426,7 @@ class WP_Theme_JSON_Gutenberg {
 	public static function remove_insecure_properties( $theme_json ) {
 		$sanitized = array();
 
-		$theme_json = self::migrate( $theme_json );
+		$theme_json = WP_Theme_JSON_Schema_Gutenberg::migrate( $theme_json );
 
 		$valid_block_names   = array_keys( self::get_blocks_metadata() );
 		$valid_element_names = array_keys( self::ELEMENTS );
