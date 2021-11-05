@@ -95,6 +95,8 @@ function LinkSettings( {
 	const [ linkRelInputValue, setLinkRelInputValue ] = useState( '' );
 	const prevEditorSidebarOpenedRef = useRef();
 
+	const isIOS = Platform.OS === 'ios';
+
 	const { onHandleClosingBottomSheet } = useContext( BottomSheetContext );
 	useEffect( () => {
 		if ( onHandleClosingBottomSheet ) {
@@ -239,11 +241,11 @@ function LinkSettings( {
 							autoCapitalize="none"
 							autoCorrect={ false }
 							// eslint-disable-next-line jsx-a11y/no-autofocus
-							autoFocus={
-								Platform.OS === 'ios' && options.url.autoFocus
-							}
+							autoFocus={ isIOS && options.url.autoFocus }
 							keyboardType="url"
-							setCursorAtStart={ options.url.setCursorAtStart }
+							setCursorAtStart={
+								isIOS && options.url.setCursorAtStart
+							}
 						/>
 					) ) }
 				{ options.linkLabel && (
