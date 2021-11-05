@@ -517,3 +517,57 @@ function gutenberg_rename_navigation_menus_admin_menu_entry() {
 }
 
 add_action( 'admin_menu', 'gutenberg_rename_navigation_menus_admin_menu_entry' );
+
+/**
+ * Registers the navigation areas supported by the current theme. The expected
+ * shape of the argument is:
+ * array(
+ *     'primary'   => 'Primary',
+ *     'secondary' => 'Secondary',
+ *     'tertiary'  => 'Tertiary',
+ * )
+ *
+ * @param array $new_areas Supported navigation areas.
+ */
+function gutenberg_register_navigation_areas( $new_areas ) {
+	global $gutenberg_navigation_areas;
+	$gutenberg_navigation_areas = $new_areas;
+}
+
+// Register the default navigation areas.
+gutenberg_register_navigation_areas(
+	array(
+		'primary'   => 'Primary',
+		'secondary' => 'Secondary',
+		'tertiary'  => 'Tertiary',
+	)
+);
+
+/**
+ * Returns the available navigation areas.
+ *
+ * @return array Registered navigation areas.
+ */
+function gutenberg_get_navigation_areas() {
+	global $gutenberg_navigation_areas;
+	return $gutenberg_navigation_areas;
+}
+
+/**
+ * Returns the API paths to preload to make the navigation area block load fast.
+ *
+ * @return array A list of paths.
+ */
+function gutenberg_get_navigation_areas_paths_to_preload() {
+	$areas        = get_option( 'fse_navigation_areas', array() );
+	$active_areas = array_intersect_key( $areas, gutenberg_get_navigation_areas() );
+	$paths        = array(
+		'/__experimental/block-navigation-areas?context=edit',
+	);
+	foreach ( $active_areas as $post_id ) {
+		if ( 0 !== $post_id ) {
+			$paths[] = "/wp/v2/navigation/$post_id?context=edit";
+		}
+	}
+	return $paths;
+}

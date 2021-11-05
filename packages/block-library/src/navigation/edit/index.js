@@ -6,7 +6,13 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { useState, useEffect, useRef, Platform } from '@wordpress/element';
+import {
+	useState,
+	useEffect,
+	useRef,
+	useCallback,
+	Platform,
+} from '@wordpress/element';
 import {
 	InspectorControls,
 	JustifyToolbar,
@@ -20,7 +26,7 @@ import {
 	getColorClassName,
 	Warning,
 } from '@wordpress/block-editor';
-import { EntityProvider } from '@wordpress/core-data';
+import { EntityProvider, useEntityProp } from '@wordpress/core-data';
 import { useDispatch, useSelect } from '@wordpress/data';
 import {
 	PanelBody,
@@ -88,6 +94,7 @@ function Navigation( {
 	setOverlayBackgroundColor,
 	overlayTextColor,
 	setOverlayTextColor,
+	context: { navigationArea },
 
 	// These props are used by the navigation editor to override specific
 	// navigation block settings.
@@ -98,13 +105,35 @@ function Navigation( {
 	customAppender: CustomAppender = null,
 } ) {
 	const {
-		navigationMenuId,
 		itemsJustification,
 		openSubmenusOnClick,
 		orientation,
 		overlayMenu,
 		showSubmenuIcon,
 	} = attributes;
+
+	const [ areaMenu, setAreaMenu ] = useEntityProp(
+		'root',
+		'navigationArea',
+		'navigation',
+		navigationArea
+	);
+
+	const navigationAreaMenu = areaMenu === 0 ? undefined : areaMenu;
+
+	const navigationMenuId = navigationArea
+		? navigationAreaMenu
+		: attributes.navigationMenuId;
+
+	const setNavigationMenuId = useCallback(
+		( postId ) => {
+			setAttributes( { navigationMenuId: postId } );
+			if ( navigationArea ) {
+				setAreaMenu( postId );
+			}
+		},
+		[ navigationArea ]
+	);
 
 	const [ hasAlreadyRendered, RecursionProvider ] = useNoRecursiveRenders(
 		`navigationMenu/${ navigationMenuId }`
@@ -130,8 +159,10 @@ function Navigation( {
 		setHasSavedUnsavedInnerBlocks,
 	] = useState( false );
 
+	const isWithinUnassignedArea = navigationArea && ! navigationMenuId;
+
 	const [ isPlaceholderShown, setIsPlaceholderShown ] = useState(
-		! hasExistingNavItems
+		! hasExistingNavItems || isWithinUnassignedArea
 	);
 
 	const [ isResponsiveMenuOpen, setResponsiveMenuVisibility ] = useState(
@@ -222,7 +253,8 @@ function Navigation( {
 	// Either this block was saved in the content or inserted by a pattern.
 	// Consider this 'unsaved'. Offer an uncontrolled version of inner blocks,
 	// that automatically saves the menu.
-	const hasUnsavedBlocks = hasExistingNavItems && ! isEntityAvailable;
+	const hasUnsavedBlocks =
+		hasExistingNavItems && ! isEntityAvailable && ! isWithinUnassignedArea;
 	if ( hasUnsavedBlocks ) {
 		return (
 			<UnsavedInnerBlocks
@@ -234,7 +266,7 @@ function Navigation( {
 				onSave={ ( post ) => {
 					setHasSavedUnsavedInnerBlocks( true );
 					// Switch to using the wp_navigation entity.
-					setAttributes( { navigationMenuId: post.id } );
+					setNavigationMenuId( post.id );
 				} }
 			/>
 		);
@@ -291,9 +323,7 @@ function Navigation( {
 								{ ( { onClose } ) => (
 									<NavigationMenuSelector
 										onSelect={ ( { id } ) => {
-											setAttributes( {
-												navigationMenuId: id,
-											} );
+											setNavigationMenuId( id );
 											onClose();
 										} }
 									/>
@@ -315,11 +345,11 @@ function Navigation( {
 						/>
 					) }
 					<ToolbarGroup>{ listViewToolbarButton }</ToolbarGroup>
-					<ToolbarGroup>
-						{ isDraftNavigationMenu && (
+					{ isDraftNavigationMenu && (
+						<ToolbarGroup>
 							<NavigationMenuPublishButton />
-						) }
-					</ToolbarGroup>
+						</ToolbarGroup>
+					) }
 				</BlockControls>
 				{ listViewModal }
 				<InspectorControls>
@@ -329,6 +359,9 @@ function Navigation( {
 							<NavigationMenuDeleteControl
 								onDelete={ () => {
 									replaceInnerBlocks( clientId, [] );
+									if ( navigationArea ) {
+										setAreaMenu( 0 );
+									}
 									setAttributes( {
 										navigationMenuId: undefined,
 									} );
@@ -440,9 +473,7 @@ function Navigation( {
 						<PlaceholderComponent
 							onFinish={ ( post ) => {
 								setIsPlaceholderShown( false );
-								setAttributes( {
-									navigationMenuId: post.id,
-								} );
+								setNavigationMenuId( post.id );
 								selectBlock( clientId );
 							} }
 							canSwitchNavigationMenu={ canSwitchNavigationMenu }
