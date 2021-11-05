@@ -21,6 +21,7 @@ import useNavigationMenu from '../use-navigation-menu';
 import useTemplatePartAreaLabel from '../use-template-part-area-label';
 
 const NOOP = () => {};
+const EMPTY_OBJECT = {};
 const DRAFT_MENU_PARAMS = [
 	'postType',
 	'wp_navigation',
@@ -59,7 +60,7 @@ export default function UnsavedInnerBlocks( {
 	} = useSelect(
 		( select ) => {
 			if ( isDisabled ) {
-				return {};
+				return EMPTY_OBJECT;
 			}
 
 			const {
