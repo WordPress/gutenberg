@@ -611,22 +611,15 @@ function gutenberg_migrate_nav_on_theme_switch( $new_name, $new_theme, $old_them
 			continue;
 		}
 
-		$menu_items_by_parent_id = gutenberg_sort_menu_items_by_parent_id( $menu_items );
-		$parsed_blocks           = gutenberg_parse_blocks_from_menu_items( $menu_items_by_parent_id[0], $menu_items_by_parent_id );
-		$post_data               = array(
-			'post_type'    => 'wp_navigation',
-			'post_title'   => $menu->name,
-			'post_name'    => 'classic_menu_' . $menu_id,
-			'post_content' => serialize_blocks( $parsed_blocks ),
-			'post_status'  => 'publish',
-		);
+		$post_name   = 'classic_menu_' . $menu_id;
+		$post_status = 'publish';
 
 		// Get or create to avoid creating too many wp_navigation posts.
 		$query          = new WP_Query;
 		$matching_posts = $query->query(
 			array(
-				'name'           => $post_data['post_name'],
-				'post_status'    => $post_data['post_status'],
+				'name'           => $post_name,
+				'post_status'    => $post_status,
 				'post_type'      => 'wp_navigation',
 				'posts_per_page' => 1,
 			)
@@ -635,7 +628,16 @@ function gutenberg_migrate_nav_on_theme_switch( $new_name, $new_theme, $old_them
 		if ( count( $matching_posts ) ) {
 			$navigation_post_id = $matching_posts[0]->ID;
 		} else {
-			$navigation_post_id = wp_insert_post( $post_data );
+			$menu_items_by_parent_id = gutenberg_sort_menu_items_by_parent_id( $menu_items );
+			$parsed_blocks           = gutenberg_parse_blocks_from_menu_items( $menu_items_by_parent_id[0], $menu_items_by_parent_id );
+			$post_data               = array(
+				'post_type'    => 'wp_navigation',
+				'post_title'   => $menu->name,
+				'post_name'    => $post_name,
+				'post_content' => serialize_blocks( $parsed_blocks ),
+				'post_status'  => $post_status,
+			);
+			$navigation_post_id      = wp_insert_post( $post_data );
 		}
 
 		$area_mapping[ $location_name ] = $navigation_post_id;
