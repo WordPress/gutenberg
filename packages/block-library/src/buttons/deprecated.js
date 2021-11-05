@@ -15,22 +15,22 @@ const migrateWithLayout = ( attributes ) => {
 		return attributes;
 	}
 
-	const { contentJustification, orientation } = attributes;
-
-	const updatedAttributes = {
-		...attributes,
-	};
+	const {
+		contentJustification,
+		orientation,
+		...updatedAttributes
+	} = attributes;
 
 	if ( contentJustification || orientation ) {
 		Object.assign( updatedAttributes, {
 			layout: {
 				type: 'flex',
-				justifyContent: contentJustification || 'left',
-				orientation: orientation || 'horizontal',
+				...( contentJustification && {
+					justifyContent: contentJustification,
+				} ),
+				...( orientation && { orientation } ),
 			},
 		} );
-		delete updatedAttributes.contentJustification;
-		delete updatedAttributes.orientation;
 	}
 
 	return updatedAttributes;
