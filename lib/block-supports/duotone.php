@@ -306,7 +306,7 @@ function gutenberg_get_duotone_filter_id( $preset ) {
  * @param  array $preset Duotone preset value as seen in theme.json.
  * @return string        Duotone CSS filter property url value.
  */
-function gutenberg_get_duotone_filter_url( $preset ) {
+function gutenberg_get_duotone_filter_property( $preset ) {
 	$filter_id = gutenberg_get_duotone_filter_id( $preset );
 	return "url('#" . $filter_id . "')";
 }
@@ -410,7 +410,7 @@ function gutenberg_render_duotone_filter( $preset ) {
  */
 function gutenberg_render_duotone_filter_preset( $preset ) {
 	gutenberg_render_duotone_filter( $preset );
-	return gutenberg_get_duotone_filter_url( $preset );
+	return gutenberg_get_duotone_filter_property( $preset );
 }
 
 /**
@@ -461,12 +461,12 @@ function gutenberg_render_duotone_support( $block_content, $block ) {
 		return $block_content;
 	}
 
-	$filter_preset = array(
+	$filter_preset   = array(
 		'slug'   => uniqid(),
 		'colors' => $block['attrs']['style']['color']['duotone'],
 	);
-	$filter_url    = gutenberg_get_duotone_filter_url( $filter_preset );
-	$filter_id     = gutenberg_get_duotone_filter_id( $filter_preset );
+	$filter_property = gutenberg_get_duotone_filter_property( $filter_preset );
+	$filter_id       = gutenberg_get_duotone_filter_id( $filter_preset );
 
 	$scope     = '.' . $filter_id;
 	$selectors = explode( ',', $duotone_support );
@@ -479,8 +479,8 @@ function gutenberg_render_duotone_support( $block_content, $block ) {
 	// !important is needed because these styles render before global styles,
 	// and they should be overriding the duotone filters set by global styles.
 	$filter_style = defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG
-		? $selector . " {\n\tfilter: " . $filter_url . " !important;\n}\n"
-		: $selector . '{filter:' . $filter_url . ' !important;}';
+		? $selector . " {\n\tfilter: " . $filter_property . " !important;\n}\n"
+		: $selector . '{filter:' . $filter_property . ' !important;}';
 
 	wp_register_style( $filter_id, false, array(), true, true );
 	wp_add_inline_style( $filter_id, $filter_style );
