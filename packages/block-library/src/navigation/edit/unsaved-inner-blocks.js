@@ -12,12 +12,13 @@ import { Disabled, Spinner } from '@wordpress/components';
 import { store as coreStore } from '@wordpress/core-data';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { useCallback, useContext, useEffect, useRef } from '@wordpress/element';
-import { __ } from '@wordpress/i18n';
+import { __, sprintf } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
  */
 import useNavigationMenu from '../use-navigation-menu';
+import useTemplatePartArea from '../use-template-part-area';
 
 const NOOP = () => {};
 const DRAFT_MENU_PARAMS = [
@@ -29,6 +30,7 @@ const DRAFT_MENU_PARAMS = [
 export default function UnsavedInnerBlocks( {
 	blockProps,
 	blocks,
+	clientId,
 	hasSavedUnsavedInnerBlocks,
 	onSave,
 	hasSelection,
@@ -70,6 +72,7 @@ export default function UnsavedInnerBlocks( {
 	}, [] );
 
 	const { hasResolvedNavigationMenus, navigationMenus } = useNavigationMenu();
+	const area = useTemplatePartArea( clientId );
 
 	const createNavigationMenu = useCallback(
 		async ( title ) => {
@@ -117,7 +120,13 @@ export default function UnsavedInnerBlocks( {
 		}
 
 		savingLock.current = true;
-		const title = __( 'Untitled menu' );
+		const title = area
+			? sprintf(
+					// translators: %s is the name of a menu (e.g. Header menu).
+					__( '%s menu' ),
+					area
+			  )
+			: __( 'Untitled menu' );
 
 		// Determine how many menus start with the untitled title.
 		const matchingMenuTitleCount = [
@@ -148,6 +157,7 @@ export default function UnsavedInnerBlocks( {
 		navigationMenus,
 		hasSelection,
 		createNavigationMenu,
+		area,
 	] );
 
 	return (

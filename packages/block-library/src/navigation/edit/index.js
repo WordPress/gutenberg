@@ -260,6 +260,7 @@ function Navigation( {
 			<UnsavedInnerBlocks
 				blockProps={ blockProps }
 				blocks={ innerBlocks }
+				clientId={ clientId }
 				navigationMenus={ navigationMenus }
 				hasSelection={ isSelected || isInnerBlockSelected }
 				hasSavedUnsavedInnerBlocks={ hasSavedUnsavedInnerBlocks }
