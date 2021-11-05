@@ -300,6 +300,7 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 			'public'       => false,
 			'show_ui'      => false,
 			'show_in_rest' => false,
+			'rewrite'      => false,
 			'capabilities' => array(
 				'read'                   => 'edit_theme_options',
 				'create_posts'           => 'edit_theme_options',
