@@ -35,6 +35,8 @@ export default function UnsavedInnerBlocks( {
 	onSave,
 	hasSelection,
 } ) {
+	// The block will be disabled in a block preview, use this as a way of
+	// avoiding the side-effects of this component for block previews.
 	const isDisabled = useContext( Disabled.Context );
 	const savingLock = useRef( false );
 
@@ -54,25 +56,31 @@ export default function UnsavedInnerBlocks( {
 		isSaving,
 		draftNavigationMenus,
 		hasResolvedDraftNavigationMenus,
-	} = useSelect( ( select ) => {
-		const {
-			getEntityRecords,
-			hasFinishedResolution,
-			isSavingEntityRecord,
-		} = select( coreStore );
+	} = useSelect(
+		( select ) => {
+			if ( isDisabled ) {
+				return {};
+			}
 
-		return {
-			isSaving: isSavingEntityRecord( 'postType', 'wp_navigation' ),
-			draftNavigationMenus: getEntityRecords( ...DRAFT_MENU_PARAMS ),
-			hasResolvedDraftNavigationMenus: hasFinishedResolution(
-				'getEntityRecords',
-				DRAFT_MENU_PARAMS
-			),
-		};
-	}, [] );
+			const {
+				getEntityRecords,
+				hasFinishedResolution,
+				isSavingEntityRecord,
+			} = select( coreStore );
+
+			return {
+				isSaving: isSavingEntityRecord( 'postType', 'wp_navigation' ),
+				draftNavigationMenus: getEntityRecords( ...DRAFT_MENU_PARAMS ),
+				hasResolvedDraftNavigationMenus: hasFinishedResolution(
+					'getEntityRecords',
+					DRAFT_MENU_PARAMS
+				),
+			};
+		},
+		[ isDisabled ]
+	);
 
 	const { hasResolvedNavigationMenus, navigationMenus } = useNavigationMenu();
-	const area = useTemplatePartArea( clientId );
 
 	const createNavigationMenu = useCallback(
 		async ( title ) => {
@@ -93,6 +101,11 @@ export default function UnsavedInnerBlocks( {
 		[ blocks, serialize, saveEntityRecord ]
 	);
 
+	// Because we can't conditionally call hooks, pass an undefined client id
+	// arg to bypass the expensive `useTemplateArea` code. The hook will return
+	// early.
+	const area = useTemplatePartArea( isDisabled ? clientId : undefined );
+
 	// Automatically save the uncontrolled blocks.
 	useEffect( async () => {
 		// The block will be disabled when used in a BlockPreview.
@@ -108,8 +121,8 @@ export default function UnsavedInnerBlocks( {
 		// And finally only create the menu when the block is selected,
 		// which is an indication they want to start editing.
 		if (
-			hasSavedUnsavedInnerBlocks ||
 			isDisabled ||
+			hasSavedUnsavedInnerBlocks ||
 			isSaving ||
 			savingLock.current ||
 			! hasResolvedDraftNavigationMenus ||
