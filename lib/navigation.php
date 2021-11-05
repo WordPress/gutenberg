@@ -649,6 +649,8 @@ function gutenberg_migrate_nav_on_theme_switch( $new_name, $new_theme, $old_them
 
 add_action( 'switch_theme', 'gutenberg_migrate_nav_on_theme_switch', 200, 3 );
 
+// The functions below are copied over from packages/block-library/src/navigation/index.php
+// Let's figure out a better way of managing these global PHP dependencies.
 
 /**
  * Returns the menu items for a WordPress menu location.
