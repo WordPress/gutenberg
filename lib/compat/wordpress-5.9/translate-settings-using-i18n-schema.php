@@ -26,7 +26,7 @@ function gutenberg_translate_settings_using_i18n_schema( $i18n_schema, $settings
 	if ( is_array( $i18n_schema ) && is_array( $settings ) ) {
 		$translated_settings = array();
 		foreach ( $settings as $value ) {
-			$translated_settings[] = translate_settings_using_i18n_schema( $i18n_schema[0], $value, $textdomain );
+			$translated_settings[] = gutenberg_translate_settings_using_i18n_schema( $i18n_schema[0], $value, $textdomain );
 		}
 		return $translated_settings;
 	}
@@ -35,9 +35,9 @@ function gutenberg_translate_settings_using_i18n_schema( $i18n_schema, $settings
 		$translated_settings = array();
 		foreach ( $settings as $key => $value ) {
 			if ( isset( $i18n_schema->$key ) ) {
-				$translated_settings[ $key ] = translate_settings_using_i18n_schema( $i18n_schema->$key, $value, $textdomain );
+				$translated_settings[ $key ] = gutenberg_translate_settings_using_i18n_schema( $i18n_schema->$key, $value, $textdomain );
 			} elseif ( isset( $i18n_schema->$group_key ) ) {
-				$translated_settings[ $key ] = translate_settings_using_i18n_schema( $i18n_schema->$group_key, $value, $textdomain );
+				$translated_settings[ $key ] = gutenberg_translate_settings_using_i18n_schema( $i18n_schema->$group_key, $value, $textdomain );
 			} else {
 				$translated_settings[ $key ] = $value;
 			}
