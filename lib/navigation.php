@@ -590,10 +590,10 @@ function gutenberg_migrate_nav_on_theme_switch( $new_name, $new_theme, $old_them
 	// get_nav_menu_locations() calls get_theme_mod() which depends on the stylesheet option.
 	// At the same time, switch_theme runs only after the stylesheet option was updated to $new_theme.
 	// To retrieve theme mods of the old theme, let's pretend the stylesheet is as it used to be.
-	$pretend_old_theme = function() use ( $old_theme ) {
+	$get_old_theme_stylesheet = function() use ( $old_theme ) {
 		return $old_theme->get_stylesheet();
 	};
-	add_filter( 'option_stylesheet', $pretend_old_theme );
+	add_filter( 'option_stylesheet', $get_old_theme_stylesheet );
 
 	$locations    = get_nav_menu_locations();
 	$area_mapping = get_option( 'fse_navigation_areas', array() );
@@ -637,7 +637,7 @@ function gutenberg_migrate_nav_on_theme_switch( $new_name, $new_theme, $old_them
 
 		$area_mapping[ $location_name ] = $navigation_post_id;
 	}
-	remove_filter( 'option_stylesheet', $pretend_old_theme );
+	remove_filter( 'option_stylesheet', $get_old_theme_stylesheet );
 
 	update_option( 'fse_navigation_areas', $area_mapping );
 }
