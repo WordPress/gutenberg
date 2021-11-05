@@ -126,7 +126,12 @@ add_filter( 'views_edit-wp_template_part', 'gutenberg_filter_templates_edit_view
  *
  * @param int $post_id Post ID.
  */
-function set_unique_slug_on_create_template_part( $post_id ) {
+function gutenberg_set_unique_slug_on_create_template_part( $post_id ) {
+	// This is the core function with the same functionality.
+	if ( function_exists( 'wp_set_unique_slug_on_create_template_part' ) ) {
+		return;
+	}
+
 	$post = get_post( $post_id );
 	if ( 'auto-draft' !== $post->post_status ) {
 		return;
@@ -147,5 +152,4 @@ function set_unique_slug_on_create_template_part( $post_id ) {
 	}
 }
 
-remove_action( 'save_post_wp_template_part', 'wp_set_unique_slug_on_create_template_part' );
-add_action( 'save_post_wp_template_part', 'set_unique_slug_on_create_template_part' );
+add_action( 'save_post_wp_template_part', 'gutenberg_set_unique_slug_on_create_template_part' );
