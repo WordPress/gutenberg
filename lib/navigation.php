@@ -599,7 +599,7 @@ function gutenberg_migrate_nav_on_theme_switch( $new_name, $new_theme, $old_them
 	$area_mapping = get_option( 'fse_navigation_areas', array() );
 
 	foreach ( $locations as $location_name => $menu_id ) {
-		// Get the menu from the location, returning early if there is no
+		// Get the menu from the location, skipping if there is no
 		// menu or there was an error.
 		$menu = wp_get_nav_menu_object( $menu_id );
 		if ( ! $menu || is_wp_error( $menu ) ) {
@@ -622,7 +622,7 @@ function gutenberg_migrate_nav_on_theme_switch( $new_name, $new_theme, $old_them
 		// Get or create to avoid creating too many wp_navigation posts.
 		$matching_posts = $wpdb->get_results(
 			$wpdb->prepare(
-				'SELECT id FROM wp_posts WHERE post_type = %s AND MD5( post_content ) = %s AND post_status = %s',
+				'SELECT id FROM wp_posts WHERE post_type = %s AND MD5( post_content ) = %s AND post_status = %s LIMIT 1',
 				$post_data['post_type'],
 				md5( $post_data['post_content'] ),
 				$post_data['post_status']
