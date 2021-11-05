@@ -15,7 +15,6 @@ import {
 } from '@wordpress/element';
 import {
 	InspectorControls,
-	JustifyToolbar,
 	BlockControls,
 	useBlockProps,
 	__experimentalUseNoRecursiveRenders as useNoRecursiveRenders,
@@ -99,7 +98,6 @@ function Navigation( {
 	// These props are used by the navigation editor to override specific
 	// navigation block settings.
 	hasSubmenuIndicatorSetting = true,
-	hasItemJustificationControls = true,
 	hasColorSettings = true,
 	customPlaceholder: CustomPlaceholder = null,
 	customAppender: CustomAppender = null,
@@ -300,11 +298,6 @@ function Navigation( {
 		? CustomPlaceholder
 		: Placeholder;
 
-	const justifyAllowedControls =
-		orientation === 'vertical'
-			? [ 'left', 'center', 'right' ]
-			: [ 'left', 'center', 'right', 'space-between' ];
-
 	return (
 		<EntityProvider
 			kind="postType"
@@ -330,19 +323,6 @@ function Navigation( {
 								) }
 							</ToolbarDropdownMenu>
 						</ToolbarGroup>
-					) }
-					{ hasItemJustificationControls && (
-						<JustifyToolbar
-							value={ itemsJustification }
-							allowedControls={ justifyAllowedControls }
-							onChange={ ( value ) =>
-								setAttributes( { itemsJustification: value } )
-							}
-							popoverProps={ {
-								position: 'bottom right',
-								isAlternate: true,
-							} }
-						/>
 					) }
 					<ToolbarGroup>{ listViewToolbarButton }</ToolbarGroup>
 					{ isDraftNavigationMenu && (

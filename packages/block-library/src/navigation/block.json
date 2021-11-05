@@ -14,10 +14,6 @@
 		"navigationMenuId": {
 			"type": "number"
 		},
-		"orientation": {
-			"type": "string",
-			"default": "horizontal"
-		},
 		"textColor": {
 			"type": "string"
 		},
@@ -34,9 +30,6 @@
 			"type": "string"
 		},
 		"rgbBackgroundColor": {
-			"type": "string"
-		},
-		"itemsJustification": {
 			"type": "string"
 		},
 		"showSubmenuIcon": {
@@ -115,6 +108,13 @@
 			],
 			"__experimentalDefaultControls": {
 				"blockGap": true
+			}
+		},
+		"__experimentalLayout": {
+			"allowSwitching": false,
+			"allowInheriting": false,
+			"default": {
+				"type": "flex"
 			}
 		}
 	},
