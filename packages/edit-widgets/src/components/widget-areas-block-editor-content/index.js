@@ -40,7 +40,10 @@ export default function WidgetAreasBlockEditorContent( {
 			<Notices />
 			<BlockTools>
 				<KeyboardShortcuts />
-				<EditorStyles styles={ styles } />
+				<EditorStyles
+					styles={ styles }
+					assets={ blockEditorSettings.resolvedAssets }
+				/>
 				<BlockSelectionClearer>
 					<WritingFlow>
 						<ObserveTyping>

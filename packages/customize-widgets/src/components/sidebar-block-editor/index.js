@@ -122,7 +122,10 @@ export default function SidebarBlockEditor( {
 
 				<CopyHandler>
 					<BlockTools>
-						<EditorStyles styles={ settings.defaultEditorStyles } />
+						<EditorStyles
+							styles={ settings.defaultEditorStyles }
+							assets={ blockEditorSettings.resolvedAssets }
+						/>
 						<BlockSelectionClearer>
 							<WritingFlow className="editor-styles-wrapper">
 								<ObserveTyping>

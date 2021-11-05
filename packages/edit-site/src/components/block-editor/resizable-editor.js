@@ -129,7 +129,10 @@ function ResizableEditor( { enableResizing, settings, ...props } ) {
 				style={ enableResizing ? undefined : deviceStyles }
 				head={
 					<>
-						<EditorStyles styles={ settings.styles } />
+						<EditorStyles
+							styles={ settings.styles }
+							assets={ settings.resolvedAssets }
+						/>
 						<style>{
 							// Forming a "block formatting context" to prevent margin collapsing.
 							// @see https://developer.mozilla.org/en-US/docs/Web/Guide/CSS/Block_formatting_context
@@ -137,6 +140,7 @@ function ResizableEditor( { enableResizing, settings, ...props } ) {
 						}</style>
 					</>
 				}
+				assets={ settings.resolvedAssets }
 				ref={ ref }
 				name="editor-canvas"
 				className="edit-site-visual-editor__editor-canvas"

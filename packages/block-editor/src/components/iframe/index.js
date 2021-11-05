@@ -164,12 +164,14 @@ async function loadScript( head, { id, src } ) {
 	} );
 }
 
-function Iframe( { contentRef, children, head, tabIndex = 0, ...props }, ref ) {
+function Iframe(
+	{ contentRef, children, head, tabIndex = 0, assets, ...props },
+	ref
+) {
 	const [ , forceRender ] = useReducer( () => ( {} ) );
 	const [ iframeDocument, setIframeDocument ] = useState();
 	const [ bodyClasses, setBodyClasses ] = useState( [] );
-	const styles = useParsedAssets( window.__editorAssets?.styles );
-	const scripts = useParsedAssets( window.__editorAssets?.scripts );
+	const scripts = useParsedAssets( assets.scripts );
 	const clearerRef = useBlockSelectionClearer();
 	const [ before, writingFlowRef, after ] = useWritingFlow();
 	const setRef = useRefEffect( ( node ) => {
@@ -236,23 +238,6 @@ function Iframe( { contentRef, children, head, tabIndex = 0, ...props }, ref ) {
 	head = (
 		<>
 			<style>{ 'body{margin:0}' }</style>
-			{ styles.map(
-				( { tagName, href, id, rel, media, textContent } ) => {
-					const TagName = tagName.toLowerCase();
-
-					if ( TagName === 'style' ) {
-						return (
-							<TagName { ...{ id } } key={ id }>
-								{ textContent }
-							</TagName>
-						);
-					}
-
-					return (
-						<TagName { ...{ href, id, rel, media } } key={ id } />
-					);
-				}
-			) }
 			{ head }
 		</>
 	);

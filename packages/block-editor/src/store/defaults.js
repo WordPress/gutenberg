@@ -234,4 +234,6 @@ export const SETTINGS_DEFAULTS = {
 			slug: 'midnight',
 		},
 	],
+
+	resolvedAssets: { styles: [], scripts: [] },
 };

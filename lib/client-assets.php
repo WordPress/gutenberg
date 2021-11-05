@@ -300,6 +300,15 @@ function gutenberg_register_packages_styles( $styles ) {
 
 	gutenberg_override_style(
 		$styles,
+		'wp-block-editor-styles',
+		gutenberg_url( 'build/block-editor/editor-styles.css' ),
+		array(),
+		$version
+	);
+	$styles->add_data( 'wp-block-editor-styles', 'rtl', 'replace' );
+
+	gutenberg_override_style(
+		$styles,
 		'wp-editor',
 		gutenberg_url( 'build/editor/style.css' ),
 		array( 'wp-components', 'wp-block-editor', 'wp-nux', 'wp-reusable-blocks' ),
@@ -311,7 +320,7 @@ function gutenberg_register_packages_styles( $styles ) {
 		$styles,
 		'wp-edit-post',
 		gutenberg_url( 'build/edit-post/style.css' ),
-		array( 'wp-components', 'wp-block-editor', 'wp-editor', 'wp-edit-blocks', 'wp-block-library', 'wp-nux' ),
+		array( 'wp-components', 'wp-block-editor', 'wp-editor', 'wp-edit-blocks', 'wp-nux' ),
 		$version
 	);
 	$styles->add_data( 'wp-edit-post', 'rtl', 'replace' );
@@ -345,32 +354,11 @@ function gutenberg_register_packages_styles( $styles ) {
 	);
 	$styles->add_data( 'wp-format-library', 'rtl', 'replace' );
 
-	$wp_edit_blocks_dependencies = array(
-		'wp-components',
-		'wp-editor',
-		// This need to be added before the block library styles,
-		// The block library styles override the "reset" styles.
-		'wp-reset-editor-styles',
-		'wp-block-library',
-		'wp-reusable-blocks',
-	);
-
-	// Only load the default layout and margin styles for themes without theme.json file.
-	if ( ! WP_Theme_JSON_Resolver_Gutenberg::theme_has_support() ) {
-		$wp_edit_blocks_dependencies[] = 'wp-editor-classic-layout-styles';
-	}
-
-	global $editor_styles;
-	if ( ! is_array( $editor_styles ) || count( $editor_styles ) === 0 ) {
-		// Include opinionated block styles if no $editor_styles are declared, so the editor never appears broken.
-		$wp_edit_blocks_dependencies[] = 'wp-block-library-theme';
-	}
-
 	gutenberg_override_style(
 		$styles,
 		'wp-reset-editor-styles',
 		gutenberg_url( 'build/block-library/reset.css' ),
-		array( 'common', 'forms' ), // Make sure the reset is loaded after the default WP Adminn styles.
+		array(),
 		$version
 	);
 	$styles->add_data( 'wp-reset-editor-styles', 'rtl', 'replace' );
@@ -388,7 +376,7 @@ function gutenberg_register_packages_styles( $styles ) {
 		$styles,
 		'wp-edit-blocks',
 		gutenberg_url( 'build/block-library/editor.css' ),
-		$wp_edit_blocks_dependencies,
+		array(),
 		$version
 	);
 	$styles->add_data( 'wp-edit-blocks', 'rtl', 'replace' );
@@ -710,16 +698,28 @@ if ( function_exists( 'get_block_editor_settings' ) ) {
 /**
  * Sets the editor styles to be consumed by JS.
  */
-function gutenberg_extend_block_editor_styles_html() {
+function gutenberg_get_block_editor_assets() {
 	global $pagenow;
 
 	$script_handles = array();
 	$style_handles  = array(
-		'wp-block-editor',
+		'wp-block-editor-styles',
 		'wp-block-library',
 		'wp-block-library-theme',
 		'wp-edit-blocks',
+		'wp-reset-editor-styles',
 	);
+
+	// Only load the default layout and margin styles for themes without theme.json file.
+	if ( ! WP_Theme_JSON_Resolver_Gutenberg::theme_has_support() ) {
+		$style_handles[] = 'wp-editor-classic-layout-styles';
+	}
+
+	global $editor_styles;
+	if ( ! is_array( $editor_styles ) || count( $editor_styles ) === 0 ) {
+		// Include opinionated block styles if no $editor_styles are declared, so the editor never appears broken.
+		$style_handles[] = 'wp-block-library-theme';
+	}
 
 	if ( 'widgets.php' === $pagenow || 'customize.php' === $pagenow ) {
 		$style_handles[] = 'wp-widgets';
@@ -742,39 +742,73 @@ function gutenberg_extend_block_editor_styles_html() {
 		}
 	}
 
-	$style_handles = array_unique( $style_handles );
-	$done          = wp_styles()->done;
+	$style_handles  = array_unique( $style_handles );
+	$script_handles = array_unique( $script_handles );
+
+	return array(
+		'styles'  => $style_handles,
+		'scripts' => $script_handles,
+	);
+}
+
+/**
+ * Resolves WP dependency handles for both styles and scripts to HTML.
+ * To do: ideally this should be a list of URLs and inline styles/scripts.
+ *
+ * @param array $assets WP dependency handles.
+ *
+ * @return array HTML for both styles and scripts
+ */
+function gutenberg_resolve_assets( $assets ) {
+	$done = wp_styles()->done;
 
 	ob_start();
 
 	// We do not need reset styles for the iframed editor.
-	wp_styles()->done = array( 'wp-reset-editor-styles' );
-	wp_styles()->do_items( $style_handles );
+	wp_styles()->done = array();
+	wp_styles()->do_items( $assets['styles'] );
 	wp_styles()->done = $done;
 
 	$styles = ob_get_clean();
 
-	$script_handles = array_unique( $script_handles );
-	$done           = wp_scripts()->done;
+	$done = wp_scripts()->done;
 
 	ob_start();
 
 	wp_scripts()->done = array();
-	wp_scripts()->do_items( $script_handles );
+	wp_scripts()->do_items( $assets['scripts'] );
 	wp_scripts()->done = $done;
 
 	$scripts = ob_get_clean();
 
-	$editor_assets = wp_json_encode(
-		array(
-			'styles'  => $styles,
-			'scripts' => $scripts,
-		)
+	return array(
+		'styles'  => $styles,
+		'scripts' => $scripts,
 	);
-
-	echo "<script>window.__editorAssets = $editor_assets</script>";
 }
-add_action( 'admin_footer-appearance_page_gutenberg-edit-site', 'gutenberg_extend_block_editor_styles_html' );
-add_action( 'admin_footer-post.php', 'gutenberg_extend_block_editor_styles_html' );
-add_action( 'admin_footer-post-new.php', 'gutenberg_extend_block_editor_styles_html' );
-add_action( 'admin_footer-widgets.php', 'gutenberg_extend_block_editor_styles_html' );
+
+add_filter(
+	'block_editor_settings_all',
+	function( $settings ) {
+		$assets = gutenberg_get_block_editor_assets();
+
+		if ( $settings['assets'] ) {
+			$settings['assets']['styles']  = array_merge( $settings['assets']['styles'], $assets['styles'] );
+			$settings['assets']['scripts'] = array_merge( $settings['assets']['scripts'], $assets['scripts'] );
+		} else {
+			$settings['assets'] = $assets;
+		}
+
+		return $settings;
+	},
+	9
+);
+
+add_filter(
+	'block_editor_settings_all',
+	function( $settings ) {
+		$settings['resolvedAssets'] = gutenberg_resolve_assets( $settings['assets'] );
+		return $settings;
+	},
+	100
+);

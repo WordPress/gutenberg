@@ -25,8 +25,9 @@ function AutoBlockPreview( { viewportWidth, __experimentalPadding } ) {
 		contentResizeListener,
 		{ height: contentHeight },
 	] = useResizeObserver();
-	const styles = useSelect( ( select ) => {
-		return select( store ).getSettings().styles;
+	const { styles, assets } = useSelect( ( select ) => {
+		const settings = select( store ).getSettings();
+		return { styles: settings.styles, assets: settings.resolvedAssets };
 	}, [] );
 
 	// Initialize on render instead of module top level, to avoid circular dependency issues.
@@ -45,7 +46,10 @@ function AutoBlockPreview( { viewportWidth, __experimentalPadding } ) {
 				} }
 			>
 				<Iframe
-					head={ <EditorStyles styles={ styles } /> }
+					head={
+						<EditorStyles styles={ styles } assets={ assets } />
+					}
+					assets={ assets }
 					contentRef={ useRefEffect( ( bodyElement ) => {
 						const {
 							ownerDocument: { documentElement },
