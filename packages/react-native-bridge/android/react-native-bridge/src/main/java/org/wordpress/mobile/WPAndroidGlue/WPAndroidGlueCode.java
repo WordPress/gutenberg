@@ -857,7 +857,7 @@ public class WPAndroidGlueCode {
     }
 
     public interface OnGetContentInterrupted {
-        void onGetContentTimeout(InterruptedException ie);
+        void onGetContentInterrupted(InterruptedException ie);
     }
 
     public synchronized CharSequence getContent(CharSequence originalContent,
@@ -873,7 +873,7 @@ public class WPAndroidGlueCode {
                     AppLog.e(T.EDITOR, "Timeout reached before response from requestGetHtml.");
                 }
             } catch (InterruptedException ie) {
-                onGetContentInterrupted.onGetContentTimeout(ie);
+                onGetContentInterrupted.onGetContentInterrupted(ie);
             }
 
             return mContentChanged ? (mContentHtml == null ? "" : mContentHtml) : originalContent;
@@ -896,7 +896,7 @@ public class WPAndroidGlueCode {
                     AppLog.e(T.EDITOR, "Timeout reached before response from requestGetHtml.");
                 }
             } catch (InterruptedException ie) {
-                onGetContentInterrupted.onGetContentTimeout(ie);
+                onGetContentInterrupted.onGetContentInterrupted(ie);
             }
 
             return mTitle == null ? "" : mTitle;
@@ -929,7 +929,7 @@ public class WPAndroidGlueCode {
                     AppLog.e(T.EDITOR, "Timeout reached before response from requestGetHtml.");
                 }
             } catch (InterruptedException ie) {
-                onGetContentInterrupted.onGetContentTimeout(ie);
+                onGetContentInterrupted.onGetContentInterrupted(ie);
             }
 
             return new Pair<>(
