@@ -46,6 +46,8 @@ export default function Header( {
 		isListViewOpen,
 		listViewShortcut,
 		isLoaded,
+		siteTitle,
+		siteHome,
 	} = useSelect( ( select ) => {
 		const {
 			__experimentalGetPreviewDeviceType,
@@ -64,10 +66,14 @@ export default function Header( {
 		const postId = getEditedPostId();
 		const record = getEditedEntityRecord( 'postType', postType, postId );
 		const _isLoaded = !! postId;
+		const siteData =
+			getEditedEntityRecord( 'root', '__unstableBase', undefined ) || {};
 
 		return {
 			deviceType: __experimentalGetPreviewDeviceType(),
 			entityTitle: getTemplateInfo( record ).title,
+			siteTitle: siteData.name,
+			siteHome: siteData.home,
 			isLoaded: _isLoaded,
 			template: record,
 			templateType: postType,
@@ -102,6 +108,31 @@ export default function Header( {
 	);
 
 	const isFocusMode = templateType === 'wp_template_part';
+
+	let displayTitle;
+
+	if ( entityTitle === 'Index' || entityTitle === 'Home' ) {
+		displayTitle = <a href={ siteHome }>{ siteTitle }</a>;
+	} else {
+		displayTitle = (
+			<DocumentActions
+				entityTitle={ entityTitle }
+				entityLabel={
+					templateType === 'wp_template_part'
+						? 'template part'
+						: 'template'
+				}
+				isLoaded={ isLoaded }
+			>
+				{ ( { onClose } ) => (
+					<TemplateDetails
+						template={ template }
+						onClose={ onClose }
+					/>
+				) }
+			</DocumentActions>
+		);
+	}
 
 	return (
 		<div className="edit-site-header">
@@ -141,24 +172,7 @@ export default function Header( {
 				</div>
 			</div>
 
-			<div className="edit-site-header_center">
-				<DocumentActions
-					entityTitle={ entityTitle }
-					entityLabel={
-						templateType === 'wp_template_part'
-							? 'template part'
-							: 'template'
-					}
-					isLoaded={ isLoaded }
-				>
-					{ ( { onClose } ) => (
-						<TemplateDetails
-							template={ template }
-							onClose={ onClose }
-						/>
-					) }
-				</DocumentActions>
-			</div>
+			<div className="edit-site-header_center"> { displayTitle } </div>
 
 			<div className="edit-site-header_end">
 				<div className="edit-site-header__actions">
