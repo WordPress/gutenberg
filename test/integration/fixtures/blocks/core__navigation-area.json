@@ -4,9 +4,9 @@
 		"name": "core/navigation-area",
 		"isValid": true,
 		"attributes": {
-			"area": "primary"
+			"area": "secondary"
 		},
 		"innerBlocks": [],
-		"originalContent": "<div class=\"wp-block-navigation-area\"></div>"
+		"originalContent": ""
 	}
 ]
