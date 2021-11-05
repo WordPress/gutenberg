@@ -585,11 +585,11 @@ function gutenberg_migrate_nav_on_theme_switch( $new_name, $new_theme, $old_them
 	if ( ! gutenberg_experimental_is_site_editor_available() ) {
 		return;
 	}
-	global $wpdb;
 
 	// get_nav_menu_locations() calls get_theme_mod() which depends on the stylesheet option.
 	// At the same time, switch_theme runs only after the stylesheet option was updated to $new_theme.
-	// To retrieve theme mods of the old theme, let's pretend the stylesheet is as it used to be.
+	// To retrieve theme mods of the old theme, the getter is hooked to get_option( 'stylesheet' ) so that we
+	// get the old theme, which causes the get_nav_menu_locations to get the locations of the old theme.
 	$get_old_theme_stylesheet = function() use ( $old_theme ) {
 		return $old_theme->get_stylesheet();
 	};
