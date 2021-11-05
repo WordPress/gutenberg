@@ -599,7 +599,7 @@ function gutenberg_migrate_nav_on_theme_switch( $new_name, $new_theme, $old_them
 	$mapping   = get_option( 'fse_navigation_areas', array() );
 
 	foreach ( $locations as $location_name => $menu_id ) {
-		// Get the menu from the location, returning early if there is no
+		// Get the menu from the location, skipping if there is no
 		// menu or there was an error.
 		$menu = wp_get_nav_menu_object( $menu_id );
 		if ( ! $menu || is_wp_error( $menu ) ) {
