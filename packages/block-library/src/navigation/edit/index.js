@@ -319,6 +319,15 @@ function Navigation( {
 											setNavigationMenuId( id );
 											onClose();
 										} }
+										onCreateNew={ () => {
+											if ( navigationArea ) {
+												setAreaMenu( 0 );
+											}
+											setAttributes( {
+												navigationMenuId: undefined,
+											} );
+											setIsPlaceholderShown( true );
+										} }
 									/>
 								) }
 							</ToolbarDropdownMenu>
