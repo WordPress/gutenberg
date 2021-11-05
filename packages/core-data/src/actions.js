@@ -734,7 +734,7 @@ export const __experimentalResetSpecifiedEntityEdits = (
 	const editsToDiscard = {};
 	for ( const edit in edits ) {
 		if ( itemsToReset.some( ( item ) => item === edit ) ) {
-			editsToDiscard[ edit ] = edits[ edit ];
+			editsToDiscard[ edit ] = undefined;
 		}
 	}
 	return await dispatch( {
