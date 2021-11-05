@@ -100,9 +100,7 @@ function gutenberg_experiments_editor_settings( $settings ) {
 	// The refactored gallery currently can't be run on sites with use_balanceTags option set.
 	// This bypass needs to remain in place until this is resolved and a patch released.
 	// https://core.trac.wordpress.org/ticket/54130.
-	$experiments_settings = array(
-		'__unstableGalleryWithImageBlocks' => (int) get_option( 'use_balanceTags' ) !== 1 || is_wp_version_compatible( '5.9' ),
-	);
+	$experiments_settings = array();
 	return array_merge( $settings, $experiments_settings );
 }
 // This can be removed when plugin support requires WordPress 5.8.0+.
