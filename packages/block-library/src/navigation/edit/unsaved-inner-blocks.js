@@ -12,14 +12,16 @@ import { Disabled, Spinner } from '@wordpress/components';
 import { store as coreStore } from '@wordpress/core-data';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { useCallback, useContext, useEffect, useRef } from '@wordpress/element';
-import { __ } from '@wordpress/i18n';
+import { __, sprintf } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
  */
 import useNavigationMenu from '../use-navigation-menu';
+import useTemplatePartAreaLabel from '../use-template-part-area-label';
 
 const NOOP = () => {};
+const EMPTY_OBJECT = {};
 const DRAFT_MENU_PARAMS = [
 	'postType',
 	'wp_navigation',
@@ -29,10 +31,13 @@ const DRAFT_MENU_PARAMS = [
 export default function UnsavedInnerBlocks( {
 	blockProps,
 	blocks,
+	clientId,
 	hasSavedUnsavedInnerBlocks,
 	onSave,
 	hasSelection,
 } ) {
+	// The block will be disabled in a block preview, use this as a way of
+	// avoiding the side-effects of this component for block previews.
 	const isDisabled = useContext( Disabled.Context );
 	const savingLock = useRef( false );
 
@@ -52,22 +57,29 @@ export default function UnsavedInnerBlocks( {
 		isSaving,
 		draftNavigationMenus,
 		hasResolvedDraftNavigationMenus,
-	} = useSelect( ( select ) => {
-		const {
-			getEntityRecords,
-			hasFinishedResolution,
-			isSavingEntityRecord,
-		} = select( coreStore );
+	} = useSelect(
+		( select ) => {
+			if ( isDisabled ) {
+				return EMPTY_OBJECT;
+			}
 
-		return {
-			isSaving: isSavingEntityRecord( 'postType', 'wp_navigation' ),
-			draftNavigationMenus: getEntityRecords( ...DRAFT_MENU_PARAMS ),
-			hasResolvedDraftNavigationMenus: hasFinishedResolution(
-				'getEntityRecords',
-				DRAFT_MENU_PARAMS
-			),
-		};
-	}, [] );
+			const {
+				getEntityRecords,
+				hasFinishedResolution,
+				isSavingEntityRecord,
+			} = select( coreStore );
+
+			return {
+				isSaving: isSavingEntityRecord( 'postType', 'wp_navigation' ),
+				draftNavigationMenus: getEntityRecords( ...DRAFT_MENU_PARAMS ),
+				hasResolvedDraftNavigationMenus: hasFinishedResolution(
+					'getEntityRecords',
+					DRAFT_MENU_PARAMS
+				),
+			};
+		},
+		[ isDisabled ]
+	);
 
 	const { hasResolvedNavigationMenus, navigationMenus } = useNavigationMenu();
 
@@ -90,6 +102,11 @@ export default function UnsavedInnerBlocks( {
 		[ blocks, serialize, saveEntityRecord ]
 	);
 
+	// Because we can't conditionally call hooks, pass an undefined client id
+	// arg to bypass the expensive `useTemplateArea` code. The hook will return
+	// early.
+	const area = useTemplatePartAreaLabel( isDisabled ? undefined : clientId );
+
 	// Automatically save the uncontrolled blocks.
 	useEffect( async () => {
 		// The block will be disabled when used in a BlockPreview.
@@ -105,8 +122,8 @@ export default function UnsavedInnerBlocks( {
 		// And finally only create the menu when the block is selected,
 		// which is an indication they want to start editing.
 		if (
-			hasSavedUnsavedInnerBlocks ||
 			isDisabled ||
+			hasSavedUnsavedInnerBlocks ||
 			isSaving ||
 			savingLock.current ||
 			! hasResolvedDraftNavigationMenus ||
@@ -117,9 +134,16 @@ export default function UnsavedInnerBlocks( {
 		}
 
 		savingLock.current = true;
-		const title = __( 'Untitled menu' );
+		const title = area
+			? sprintf(
+					// translators: %s: the name of a menu (e.g. Header navigation).
+					__( '%s navigation' ),
+					area
+			  )
+			: // translators: 'navigation' as in website navigation.
+			  __( 'Navigation' );
 
-		// Determine how many menus start with the untitled title.
+		// Determine how many menus start with the automatic title.
 		const matchingMenuTitleCount = [
 			...draftNavigationMenus,
 			...navigationMenus,
@@ -148,6 +172,7 @@ export default function UnsavedInnerBlocks( {
 		navigationMenus,
 		hasSelection,
 		createNavigationMenu,
+		area,
 	] );
 
 	return (

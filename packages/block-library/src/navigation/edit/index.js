@@ -258,6 +258,7 @@ function Navigation( {
 			<UnsavedInnerBlocks
 				blockProps={ blockProps }
 				blocks={ innerBlocks }
+				clientId={ clientId }
 				navigationMenus={ navigationMenus }
 				hasSelection={ isSelected || isInnerBlockSelected }
 				hasSavedUnsavedInnerBlocks={ hasSavedUnsavedInnerBlocks }
@@ -342,23 +343,6 @@ function Navigation( {
 				</BlockControls>
 				{ listViewModal }
 				<InspectorControls>
-					{ isEntityAvailable && (
-						<PanelBody title={ __( 'Navigation menu' ) }>
-							<NavigationMenuNameControl />
-							<NavigationMenuDeleteControl
-								onDelete={ () => {
-									replaceInnerBlocks( clientId, [] );
-									if ( navigationArea ) {
-										setAreaMenu( 0 );
-									}
-									setAttributes( {
-										navigationMenuId: undefined,
-									} );
-									setIsPlaceholderShown( true );
-								} }
-							/>
-						</PanelBody>
-					) }
 					{ hasSubmenuIndicatorSetting && (
 						<PanelBody title={ __( 'Display' ) }>
 							<h3>{ __( 'Overlay Menu' ) }</h3>
@@ -457,6 +441,23 @@ function Navigation( {
 						</PanelColorSettings>
 					) }
 				</InspectorControls>
+				{ isEntityAvailable && (
+					<InspectorControls __experimentalGroup="advanced">
+						<NavigationMenuNameControl />
+						<NavigationMenuDeleteControl
+							onDelete={ () => {
+								replaceInnerBlocks( clientId, [] );
+								if ( navigationArea ) {
+									setAreaMenu( 0 );
+								}
+								setAttributes( {
+									navigationMenuId: undefined,
+								} );
+								setIsPlaceholderShown( true );
+							} }
+						/>
+					</InspectorControls>
+				) }
 				<nav { ...blockProps }>
 					{ ! isEntityAvailable && isPlaceholderShown && (
 						<PlaceholderComponent
