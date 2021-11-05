@@ -194,16 +194,6 @@ export default function EntitiesSavedStates( { close } ) {
 			if ( 'root' === kind && 'site' === name ) {
 				siteItemsToDiscard.push( property );
 			} else {
-				// if (
-				// 	PUBLISH_ON_SAVE_ENTITIES.some(
-				// 		( typeToPublish ) =>
-				// 			typeToPublish.kind === kind &&
-				// 			typeToPublish.name === name
-				// 	)
-				// ) {
-				// 	editEntityRecord( kind, name, key, { status: 'publish' } );
-				// }
-
 				resetEditedEntityRecord( kind, name, key );
 			}
 		} );
