@@ -573,7 +573,7 @@ function gutenberg_get_navigation_areas_paths_to_preload() {
 }
 
 /**
- * Description todo
+ * Migrates classic menus to block-based menus on theme switch.
  *
  * @param string   $new_name  Name of the new theme.
  * @param WP_Theme $new_theme New theme.
@@ -581,6 +581,9 @@ function gutenberg_get_navigation_areas_paths_to_preload() {
  * @see switch_theme WordPress action.
  */
 function gutenberg_migrate_nav_on_theme_switch( $new_name, $new_theme, $old_theme ) {
+	// get_nav_menu_locations() calls get_theme_mod() which depends on the stylesheet option.
+	// At the same time, switch_theme runs only after the stylesheet option was updated to $new_theme.
+	// To retrieve theme mods of the old theme, let's pretend the stylesheet is as it used to be.
 	$pretend_old_theme = function() use ( $old_theme ) {
 		return $old_theme->get_stylesheet();
 	};
@@ -706,26 +709,26 @@ function gutenberg_parse_blocks_from_menu_items( $menu_items, $menu_items_by_par
 		$kind             = null !== $menu_item->type ? str_replace( '_', '-', $menu_item->type ) : 'custom';
 
 		$block = array(
-				'blockName' => 'core/navigation-link',
-				'attrs'     => array(
-						'className'     => $class_name,
-						'description'   => $menu_item->description,
-						'id'            => $id,
-						'kind'          => $kind,
-						'label'         => $menu_item->title,
-						'opensInNewTab' => $opens_in_new_tab,
-						'rel'           => $rel,
-						'title'         => $menu_item->attr_title,
-						'type'          => $menu_item->object,
-						'url'           => $menu_item->url,
-				),
+			'blockName' => 'core/navigation-link',
+			'attrs'     => array(
+				'className'     => $class_name,
+				'description'   => $menu_item->description,
+				'id'            => $id,
+				'kind'          => $kind,
+				'label'         => $menu_item->title,
+				'opensInNewTab' => $opens_in_new_tab,
+				'rel'           => $rel,
+				'title'         => $menu_item->attr_title,
+				'type'          => $menu_item->object,
+				'url'           => $menu_item->url,
+			),
 		);
 
 		$block['innerBlocks'] = gutenberg_parse_blocks_from_menu_items(
-				isset( $menu_items_by_parent_id[ $menu_item->ID ] )
-						? $menu_items_by_parent_id[ $menu_item->ID ]
-						: array(),
-				$menu_items_by_parent_id
+			isset( $menu_items_by_parent_id[ $menu_item->ID ] )
+				? $menu_items_by_parent_id[ $menu_item->ID ]
+				: array(),
+			$menu_items_by_parent_id
 		);
 
 		$blocks[] = $block;
