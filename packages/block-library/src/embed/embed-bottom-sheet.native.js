@@ -29,7 +29,7 @@ const EmbedBottomSheet = ( { value, label, isVisible, onClose, onSubmit } ) => {
 			placeholder: __( 'Add link' ),
 			autoFocus: true,
 			autoFill: true,
-			setCursortAtStart: Platform.OS === 'ios',
+			setCursorAtStart: Platform.OS === 'ios',
 		},
 		footer: {
 			label: (
