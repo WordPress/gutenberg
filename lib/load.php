@@ -59,7 +59,7 @@ if ( class_exists( 'WP_REST_Controller' ) ) {
 	if ( ! class_exists( 'WP_Rest_Customizer_Nonces' ) ) {
 		require_once __DIR__ . '/class-wp-rest-customizer-nonces.php';
 	}
-	require_once __DIR__ . '/full-site-editing/class-gutenberg-rest-templates-controller.php';
+	require_once __DIR__ . '/compat/wordpress-5.9/class-gutenberg-rest-templates-controller.php';
 	if ( ! class_exists( 'WP_REST_Block_Editor_Settings_Controller' ) ) {
 		require_once dirname( __FILE__ ) . '/class-wp-rest-block-editor-settings-controller.php';
 	}
@@ -86,6 +86,7 @@ require_once __DIR__ . '/widgets-page.php';
 require __DIR__ . '/compat.php';
 require __DIR__ . '/compat/wordpress-5.8/index.php';
 require __DIR__ . '/compat/wordpress-5.8.1/index.php';
+require __DIR__ . '/compat/wordpress-5.9/block-template-utils.php';
 require __DIR__ . '/compat/wordpress-5.9/default-editor-styles.php';
 require __DIR__ . '/compat/wordpress-5.9/get-global-styles-and-settings.php';
 require __DIR__ . '/compat/wordpress-5.9/json-file-decode.php';
