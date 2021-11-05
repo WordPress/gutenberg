@@ -13,7 +13,7 @@
  */
 function gutenberg_add_active_global_styles_link( $response, $theme ) {
 	if ( $theme->get_stylesheet() === wp_get_theme()->get_stylesheet() ) {
-		// This creates a record for the current theme if not existant.
+		// This creates a record for the current theme if not existent.
 		$id = WP_Theme_JSON_Resolver_Gutenberg::get_user_custom_post_type_id();
 	} else {
 		$wp_query_args       = array(
