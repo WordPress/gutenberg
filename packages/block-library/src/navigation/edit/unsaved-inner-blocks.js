@@ -142,7 +142,7 @@ export default function UnsavedInnerBlocks( {
 			: // translators: 'navigation' as in website navigation.
 			  __( 'Navigation' );
 
-		// Determine how many menus start with the untitled title.
+		// Determine how many menus start with the automatic title.
 		const matchingMenuTitleCount = [
 			...draftNavigationMenus,
 			...navigationMenus,
