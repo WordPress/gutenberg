@@ -107,6 +107,7 @@ class BottomSheetCell extends Component {
 			valuePlaceholder = '',
 			icon,
 			leftAlign,
+			iconStyle = {},
 			labelStyle = {},
 			valueStyle = {},
 			cellContainerStyle = {},
@@ -317,7 +318,7 @@ class BottomSheetCell extends Component {
 				  );
 		};
 
-		const iconStyle = getStylesFromColorScheme(
+		const iconStyleBase = getStylesFromColorScheme(
 			styles.icon,
 			styles.iconDark
 		);
@@ -372,7 +373,11 @@ class BottomSheetCell extends Component {
 									<Icon
 										icon={ icon }
 										size={ 24 }
-										fill={ iconStyle.color }
+										fill={
+											iconStyle.color ||
+											iconStyleBase.color
+										}
+										style={ iconStyle }
 										isPressed={ false }
 									/>
 									<View

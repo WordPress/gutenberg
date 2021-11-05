@@ -38,7 +38,7 @@ function render_block_core_pattern( $attributes ) {
 	}
 
 	$pattern = $registry->get_registered( $slug );
-	return do_blocks( '<div>' . $pattern['content'] . '</div>' );
+	return do_blocks( $pattern['content'] );
 }
 
 add_action( 'init', 'register_block_core_pattern' );

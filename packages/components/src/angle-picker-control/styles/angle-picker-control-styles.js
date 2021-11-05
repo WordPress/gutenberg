@@ -36,9 +36,9 @@ export const CircleIndicatorWrapper = styled.div`
 `;
 
 export const CircleIndicator = styled.div`
-	background: #3858e9;
+	background: ${ COLORS.admin.theme };
 	border-radius: 50%;
-	border: ${ INNER_CIRCLE_SIZE }px solid #3858e9;
+	border: ${ INNER_CIRCLE_SIZE }px solid ${ COLORS.admin.theme };
 	bottom: 0;
 	box-sizing: border-box;
 	display: block;

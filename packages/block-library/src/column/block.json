@@ -17,6 +17,7 @@
 			"type": "array"
 		},
 		"templateLock": {
+			"type": "string",
 			"enum": [ "all", "insert", false ]
 		}
 	},

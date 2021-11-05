@@ -88,9 +88,9 @@ function LinkSettings( {
 	urlValue,
 	// Attributes properties
 	url,
-	label,
+	label = '',
 	linkTarget,
-	rel,
+	rel = '',
 } ) {
 	const [ urlInputValue, setUrlInputValue ] = useState( '' );
 	const [ labelInputValue, setLabelInputValue ] = useState( '' );
@@ -230,6 +230,7 @@ function LinkSettings( {
 						<BottomSheet.LinkCell
 							showIcon={ showIcon }
 							value={ url }
+							valueMask={ options.url.valueMask }
 							onPress={ onLinkCellPressed }
 						/>
 					) : (

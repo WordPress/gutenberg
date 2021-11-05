@@ -101,6 +101,7 @@ function TextColorEdit( {
 						? enableIsAddingColor
 						: () => onChange( removeFormat( value, name ) )
 				}
+				role="menuitemcheckbox"
 			/>
 			{ isAddingColor && (
 				<InlineColorUI

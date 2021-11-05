@@ -19,13 +19,20 @@ import { close as closeIcon } from '@wordpress/icons';
  */
 import EntityTypeList from './entity-type-list';
 
-const TRANSLATED_SITE_PROTPERTIES = {
+const TRANSLATED_SITE_PROPERTIES = {
 	title: __( 'Title' ),
 	description: __( 'Tagline' ),
 	site_logo: __( 'Logo' ),
 	show_on_front: __( 'Show on front' ),
 	page_on_front: __( 'Page on front' ),
 };
+
+const PUBLISH_ON_SAVE_ENTITIES = [
+	{
+		kind: 'postType',
+		name: 'wp_navigation',
+	},
+];
 
 export default function EntitiesSavedStates( { close } ) {
 	const saveButtonRef = useRef();
@@ -49,7 +56,7 @@ export default function EntitiesSavedStates( { close } ) {
 			siteEditsAsEntities.push( {
 				kind: 'root',
 				name: 'site',
-				title: TRANSLATED_SITE_PROTPERTIES[ property ] || property,
+				title: TRANSLATED_SITE_PROPERTIES[ property ] || property,
 				property,
 			} );
 		}
@@ -63,6 +70,7 @@ export default function EntitiesSavedStates( { close } ) {
 		};
 	}, [] );
 	const {
+		editEntityRecord,
 		saveEditedEntityRecord,
 		__experimentalSaveSpecifiedEntityEdits: saveSpecifiedEntityEdits,
 	} = useDispatch( coreStore );
@@ -130,6 +138,16 @@ export default function EntitiesSavedStates( { close } ) {
 			if ( 'root' === kind && 'site' === name ) {
 				siteItemsToSave.push( property );
 			} else {
+				if (
+					PUBLISH_ON_SAVE_ENTITIES.some(
+						( typeToPublish ) =>
+							typeToPublish.kind === kind &&
+							typeToPublish.name === name
+					)
+				) {
+					editEntityRecord( kind, name, key, { status: 'publish' } );
+				}
+
 				saveEditedEntityRecord( kind, name, key );
 			}
 		} );

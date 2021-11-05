@@ -10,7 +10,8 @@ For each user feature we should also add a importance categorization label  to i
 -->
 
 ## Unreleased
-- [*] [Embed Block] Set EmbedLinkSettings URL input cursor at start of link [#36100]
+-   [**] [Image block] Add ability to quickly link images to Media Files and Attachment Pages [#34846]
+-   [**] [Embed Block] Set EmbedLinkSettings URL input cursor at start of link [#36100]
 
 ## 1.65.0
 - [**] Search block - Text and background color support [#35511]
