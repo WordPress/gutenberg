@@ -17,6 +17,7 @@ import {
 	receiveAutosaves,
 	receiveCurrentUser,
 	__experimentalBatch,
+	__experimentalResetSpecifiedEntityEdits,
 } from '../actions';
 
 jest.mock( '../batch', () => {
@@ -193,6 +194,37 @@ describe( 'saveEditedEntityRecord', () => {
 			{ area: 'primary' },
 			undefined
 		);
+	} );
+} );
+
+describe( '__experimentalResetSpecifiedEntityEdits', () => {
+	it( 'triggers an EDIT_ENTITY_RECORD action to set the selected entity record edits to undefined', async () => {
+		const itemsToDiscard = [ 'title' ];
+
+		const select = {
+			getEntityRecordNonTransientEdits: () => [ { description: {} } ],
+			hasEditsForEntityRecord: () => true,
+		};
+
+		const dispatch = Object.assign( jest.fn() );
+
+		await __experimentalResetSpecifiedEntityEdits(
+			'root',
+			'site',
+			undefined,
+			itemsToDiscard
+		)( { dispatch, select } );
+
+		expect( dispatch ).toHaveBeenCalledTimes( 1 );
+		expect( dispatch ).toHaveBeenCalledWith( {
+			type: 'EDIT_ENTITY_RECORD',
+			kind: 'root',
+			name: 'site',
+			recordId: undefined,
+			edits: { title: undefined },
+			transientEdits: {},
+			meta: { undo: undefined },
+		} );
 	} );
 } );
 
