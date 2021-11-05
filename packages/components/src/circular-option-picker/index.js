@@ -66,7 +66,8 @@ function DropdownLinkAction( {
 					aria-expanded={ isOpen }
 					aria-haspopup="true"
 					onClick={ onToggle }
-					variant="link"
+					isSmall
+					variant="secondary"
 					{ ...buttonProps }
 				>
 					{ linkText }

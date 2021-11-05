@@ -179,7 +179,7 @@ const PanelColorGradientSettingsMultipleSelect = ( props ) => {
 		const result = [];
 		if ( coreColors && coreColors.length ) {
 			result.push( {
-				name: __( 'Core' ),
+				name: __( 'Default' ),
 				colors: coreColors,
 			} );
 		}

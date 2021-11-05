@@ -225,7 +225,7 @@ export function useColorsPerOrigin( name ) {
 		const result = [];
 		if ( coreColors && coreColors.length ) {
 			result.push( {
-				name: __( 'Core' ),
+				name: __( 'Default' ),
 				colors: coreColors,
 			} );
 		}
@@ -253,7 +253,7 @@ export function useGradientsPerOrigin( name ) {
 		const result = [];
 		if ( coreGradients && coreGradients.length ) {
 			result.push( {
-				name: __( 'Core' ),
+				name: __( 'Default' ),
 				gradients: coreGradients,
 			} );
 		}

@@ -157,13 +157,28 @@ export default function ColorPalette( {
 				onChange={ onChange }
 				value={ value }
 				actions={
-					!! clearable && (
-						<CircularOptionPicker.ButtonAction
-							onClick={ clearColor }
-						>
-							{ __( 'Clear' ) }
-						</CircularOptionPicker.ButtonAction>
-					)
+					<>
+						{ ! disableCustomColors && (
+							<CircularOptionPicker.DropdownLinkAction
+								dropdownProps={ {
+									renderContent: renderCustomColorPicker,
+									contentClassName:
+										'components-color-palette__picker',
+								} }
+								buttonProps={ {
+									'aria-label': __( 'Custom color picker' ),
+								} }
+								linkText={ __( 'Custom' ) }
+							/>
+						) }
+						{ !! clearable && (
+							<CircularOptionPicker.ButtonAction
+								onClick={ clearColor }
+							>
+								{ __( 'Clear' ) }
+							</CircularOptionPicker.ButtonAction>
+						) }
+					</>
 				}
 			/>
 		</VStack>

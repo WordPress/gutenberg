@@ -11,7 +11,7 @@ export const categories = [
 export const collections = {
 	core: {
 		icon: undefined,
-		title: 'Core',
+		title: 'Default',
 	},
 };
 

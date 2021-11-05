@@ -7,6 +7,8 @@ $color-palette-circle-spacing: 12px;
 	min-width: 188px;
 
 	.components-circular-option-picker__custom-clear-wrapper {
+		margin-top: $grid-unit-20;
+		margin-bottom: $grid-unit-10;
 		display: flex;
 		justify-content: flex-end;
 	}
@@ -127,10 +129,22 @@ $color-palette-circle-spacing: 12px;
 }
 
 
-.components-circular-option-picker__dropdown-link-action {
-	margin-right: $grid-unit-20;
+.components-circular-option-picker__dropdown-link-action + .components-button {
+	margin-left: $grid-unit-10;
+}
 
-	.components-button {
-		line-height: 22px;
+// Temporarily hide the color card from the post editor, but keep it for Global Styles.
+// @todo: this should be removed and retired entirely when colors in the post editor are
+// able to use the ItemGroup component to handle color options.
+// https://github.com/WordPress/gutenberg/issues/35093
+.edit-post-sidebar .block-editor-panel-color-gradient-settings .components-flex > .components-dropdown {
+	display: none;
+
+	& + div {
+		margin-top: 0;
 	}
+}
+
+.edit-site .components-circular-option-picker__dropdown-link-action {
+	display: none;
 }
