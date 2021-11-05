@@ -1502,18 +1502,18 @@ class WP_Theme_JSON_Gutenberg {
 
 			$duotone_presets = $node['color']['duotone'];
 
-			$filters = array();
+			$filters = '';
 			foreach ( $origins as $origin ) {
 				if ( ! isset( $duotone_presets[ $origin ] ) ) {
 					continue;
 				}
 				foreach ( $duotone_presets[ $origin ] as $duotone_preset ) {
-					$filters[] = gutenberg_get_duotone_filter_svg( $duotone_preset );
+					$filters .= gutenberg_get_duotone_filter_svg( $duotone_preset );
 				}
 			}
 		}
 
-		return implode( $filters );
+		return $filters;
 	}
 
 	/**
