@@ -1,5 +1,17 @@
 == Changelog ==
 
+= 11.8.1 =
+
+
+
+### Various
+
+- Keep a copy of anchor ref to preserve highlighted text selection. ([36263](https://github.com/WordPress/gutenberg/pull/36263))
+
+
+
+
+
 = 11.9.0-rc.1 =
 
 ### Features
