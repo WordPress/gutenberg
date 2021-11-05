@@ -407,7 +407,7 @@ See the [the example documentation](/docs/reference-guides/block-api/block-regis
 
 ### Editor Script
 
--   Type: `string` ([WPDefinedAsset](#WPDefinedAsset))
+-   Type: `WPDefinedAsset` ([learn more](#WPDefinedAsset))
 -   Optional
 -   Localized: No
 -   Property: `editorScript`
@@ -420,7 +420,7 @@ Block type editor script definition. It will only be enqueued in the context of 
 
 ### Script
 
--   Type: `string` ([WPDefinedAsset](#WPDefinedAsset))
+-   Type: `WPDefinedAsset` ([learn more](#WPDefinedAsset))
 -   Optional
 -   Localized: No
 -   Property: `script`
@@ -433,7 +433,7 @@ Block type frontend and editor script definition. It will be enqueued both in th
 
 ### View Script
 
--   Type: `string` ([WPDefinedAsset](#WPDefinedAsset))
+-   Type: `WPDefinedAsset` ([learn more](#WPDefinedAsset))
 -   Optional
 -   Localized: No
 -   Property: `viewScript`
@@ -447,7 +447,7 @@ Block type frontend script definition. It will be enqueued only when viewing the
 
 ### Editor Style
 
--   Type: `string` ([WPDefinedAsset](#WPDefinedAsset))
+-   Type: `WPDefinedAsset`|`WPDefinedAsset[]` ([learn more](#WPDefinedAsset))
 -   Optional
 -   Localized: No
 -   Property: `editorStyle`
@@ -458,9 +458,11 @@ Block type frontend script definition. It will be enqueued only when viewing the
 
 Block type editor style definition. It will only be enqueued in the context of the editor.
 
+_Note: An option to pass also an array of editor styles exists since WordPress `5.9.0`._
+
 ### Style
 
--   Type: `string` ([WPDefinedAsset](#WPDefinedAsset))
+-   Type: `WPDefinedAsset`|`WPDefinedAsset[]` ([learn more](#WPDefinedAsset))
 -   Optional
 -   Localized: No
 -   Property: `style`
@@ -469,7 +471,9 @@ Block type editor style definition. It will only be enqueued in the context of t
 { "style": "file:./build/style.css" }
 ```
 
-Block type frontend style definition. It will be enqueued both in the editor and when viewing the content on the front of the site.
+Block type frontend and editor style definition. It will be enqueued both in the editor and when viewing the content on the front of the site.
+
+_Note: An option to pass also an array of styles exists since WordPress `5.9.0`._
 
 ## Assets
 
@@ -477,7 +481,7 @@ Block type frontend style definition. It will be enqueued both in the editor and
 
 The `WPDefinedAsset` type is a subtype of string, where the value represents a path to a JavaScript or CSS file relative to where `block.json` file is located. The path provided must be prefixed with `file:`. This approach is based on how npm handles [local paths](https://docs.npmjs.com/files/package.json#local-paths) for packages.
 
-An alternative would be a script or style handle name referencing a registered asset using WordPress helpers.
+An alternative would be a script or style handle name referencing an already registered asset using WordPress helpers.
 
 **Example:**
 
@@ -485,8 +489,11 @@ In `block.json`:
 
 ```json
 {
-	"editorScript": "file:./build/index.js",
-	"editorStyle": "my-editor-style-handle"
+	"editorScript": "file:./index.js",
+	"script": "my-script-handle",
+	"viewScript": "file:./view.js",
+	"editorStyle": "my-editor-style-handle",
+	"style": [ "file:./style.css", "my-style-handle" ]
 }
 ```
 
@@ -505,6 +512,7 @@ The definition is stored inside separate PHP file which ends with `.asset.php` a
 **Example:**
 
 ```
+block.json
 build/
 ├─ index.js
 └─ index.asset.php
