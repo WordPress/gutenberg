@@ -738,11 +738,13 @@ export const __experimentalResetSpecifiedEntityEdits = (
 		}
 	}
 	return await dispatch( {
-		type: 'RESET_SPECIFIED_ENTITY_RECORD_EDITS',
+		type: 'EDIT_ENTITY_RECORD',
 		kind,
 		name,
 		recordId,
-		edits: Object.keys( editsToDiscard ),
+		edits: editsToDiscard,
+		transientEdits: {},
+		meta: { undo: undefined }, // Don't add this to the undo stack.
 	} );
 };
 

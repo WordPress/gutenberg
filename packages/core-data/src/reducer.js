@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { keyBy, map, groupBy, flowRight, isEqual, get, omit } from 'lodash';
+import { keyBy, map, groupBy, flowRight, isEqual, get } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -272,14 +272,6 @@ function entity( entityConfig ) {
 						} = state;
 
 						return otherEdits;
-
-					case 'RESET_SPECIFIED_ENTITY_RECORD_EDITS':
-						const edits = state[ action.recordId ];
-
-						return {
-							...state,
-							[ action.recordId ]: omit( edits, action.edits ),
-						};
 				}
 
 				return state;
