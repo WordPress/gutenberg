@@ -608,7 +608,7 @@ function gutenberg_migrate_nav_on_theme_switch( $new_name, $new_theme, $old_them
 
 		$menu_items = gutenberg_get_menu_items_at_location( $location_name );
 		if ( empty( $menu_items ) ) {
-			return '';
+			continue;
 		}
 
 		$menu_items_by_parent_id = gutenberg_sort_menu_items_by_parent_id( $menu_items );
