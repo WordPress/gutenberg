@@ -585,6 +585,7 @@ function gutenberg_migrate_nav_on_theme_switch( $new_name, $new_theme, $old_them
 	if ( ! gutenberg_experimental_is_site_editor_available() ) {
 		return;
 	}
+	global $wpdb;
 
 	// get_nav_menu_locations() calls get_theme_mod() which depends on the stylesheet option.
 	// At the same time, switch_theme runs only after the stylesheet option was updated to $new_theme.
@@ -619,10 +620,18 @@ function gutenberg_migrate_nav_on_theme_switch( $new_name, $new_theme, $old_them
 			'post_status'  => 'publish',
 		);
 
-		$query          = new WP_Query;
-		$matching_posts = $query->query( $post_data );
+		// Get or create to avoid creating too many wp_navigation posts.
+		$matching_posts = $wpdb->get_results(
+			$wpdb->prepare(
+			'SELECT id FROM wp_posts WHERE post_type = %s AND MD5( post_content ) = %s AND post_status = %s',
+				$post_data['post_type'],
+				md5( $post_data['post_content'] ),
+				$post_data['post_status']
+			)
+		);
+
 		if ( count( $matching_posts ) ) {
-			$navigation_post_id = $matching_posts[0]->ID;
+			$navigation_post_id = $matching_posts[0]->id;
 		} else {
 			$navigation_post_id = wp_insert_post( $post_data );
 		}
