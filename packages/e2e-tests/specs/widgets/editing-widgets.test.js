@@ -605,7 +605,7 @@ describe( 'Widgets screen', () => {
 		expect( console ).toHaveWarned( twentyTwentyError );
 	} );
 
-	it( 'Should display legacy widgets', async () => {
+	it.skip( 'Should display legacy widgets', async () => {
 		// Get the default empty instance of a legacy search widget.
 		const { instance: defaultSearchInstance } = await rest( {
 			method: 'POST',
