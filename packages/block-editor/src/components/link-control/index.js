@@ -187,13 +187,21 @@ function LinkControl( {
 		isEndingEditWithFocus.current = false;
 	}, [ isEditingLink ] );
 
-	/**
-	 * If the value's `text` property changes then sync this
-	 * back up with state.
-	 */
 	useEffect( () => {
+		/**
+		 * If the value's `text` property changes then sync this
+		 * back up with state.
+		 */
 		if ( value?.title && value.title !== internalTextValue ) {
 			setInternalTextValue( value.title );
+		}
+
+		/**
+		 * Update the state value internalInputValue if the url value changes
+		 * for example when clicking on another anchor
+		 */
+		if ( value?.url ) {
+			setInternalInputValue( value.url );
 		}
 	}, [ value ] );
 
