@@ -191,3 +191,27 @@ function gutenberg_safe_style_attrs( $attrs ) {
 	return $attrs;
 }
 add_filter( 'safe_style_css', 'gutenberg_safe_style_attrs' );
+
+/**
+ * The new gallery block format is not compatible with the use_BalanceTags option
+ * in WP versions <= 5.8 https://core.trac.wordpress.org/ticket/54130.
+ * This method adds a variable to the wp namespace to indicate if the new gallery block
+ * format can be enabled or not. It needs to be added this early and to the wp namespace
+ * as it needs to be available when the intial block parsing runs on editor load, and most of
+ * the editor store and standard flags are not loaded yet at that point
+ *
+ * Note: This should be removed when the minimum required WP version is >= 5.9.
+ *
+ * @return void.
+ */
+function gutenberg_check_gallery_block_v2_compatibility() {
+	$use_balance_tags   = (int) get_option( 'use_balanceTags' );
+	$v2_gallery_enabled = boolval( 1 !== $use_balance_tags || is_wp_version_compatible( '5.9' ) ) ? 'true' : 'false';
+
+	wp_add_inline_script(
+		'wp-blocks',
+		'wp.galleryBlockV2Enabled = ' . $v2_gallery_enabled . ';',
+		'after'
+	);
+}
+add_action( 'init', 'gutenberg_check_gallery_block_v2_compatibility' );

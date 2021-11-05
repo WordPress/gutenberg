@@ -18,7 +18,7 @@ import {
 import saveWithoutInnerBlocks from './v1/save';
 
 export default function saveWithInnerBlocks( { attributes } ) {
-	if ( attributes?.ids?.length > 0 || attributes?.images?.length > 0 ) {
+	if ( ! window.wp.galleryBlockV2Enabled ) {
 		return saveWithoutInnerBlocks( { attributes } );
 	}
 

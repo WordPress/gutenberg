@@ -7,12 +7,8 @@ import { map, some } from 'lodash';
 /**
  * WordPress dependencies
  */
-import {
-	RichText,
-	store as blockEditorStore,
-	useBlockProps,
-} from '@wordpress/block-editor';
-import { select } from '@wordpress/data';
+import { RichText, useBlockProps } from '@wordpress/block-editor';
+
 import { createBlock } from '@wordpress/blocks';
 
 /**
@@ -284,9 +280,7 @@ const v6 = {
 		);
 	},
 	migrate( attributes ) {
-		const settings = select( blockEditorStore ).getSettings();
-
-		if ( settings.__unstableGalleryWithImageBlocks ) {
+		if ( window.wp.galleryBlockV2Enabled ) {
 			return runV2Migration( attributes );
 		}
 
@@ -376,9 +370,7 @@ const v5 = {
 		return ! linkTo || linkTo === 'attachment' || linkTo === 'media';
 	},
 	migrate( attributes ) {
-		const settings = select( blockEditorStore ).getSettings();
-
-		if ( settings.__unstableGalleryWithImageBlocks ) {
+		if ( window.wp.galleryBlockV2Enabled ) {
 			return runV2Migration( attributes );
 		}
 
@@ -541,9 +533,7 @@ const v4 = {
 		return ids && ids.some( ( id ) => typeof id === 'string' );
 	},
 	migrate( attributes ) {
-		const settings = select( blockEditorStore ).getSettings();
-
-		if ( settings.__unstableGalleryWithImageBlocks ) {
+		if ( window.wp.galleryBlockV2Enabled ) {
 			return runV2Migration( attributes );
 		}
 
@@ -749,9 +739,7 @@ const v3 = {
 		);
 	},
 	migrate( attributes ) {
-		const settings = select( blockEditorStore ).getSettings();
-
-		if ( settings.__unstableGalleryWithImageBlocks ) {
+		if ( window.wp.galleryBlockV2Enabled ) {
 			return runV2Migration( attributes );
 		}
 	},
@@ -819,9 +807,7 @@ const v2 = {
 		);
 	},
 	migrate( attributes ) {
-		const settings = select( blockEditorStore ).getSettings();
-
-		if ( settings.__unstableGalleryWithImageBlocks ) {
+		if ( window.wp.galleryBlockV2Enabled ) {
 			return runV2Migration( attributes );
 		}
 		return {
@@ -985,9 +971,7 @@ const v1 = {
 		);
 	},
 	migrate( attributes ) {
-		const settings = select( blockEditorStore ).getSettings();
-
-		if ( settings.__unstableGalleryWithImageBlocks ) {
+		if ( window.wp.galleryBlockV2Enabled ) {
 			return runV2Migration( attributes );
 		}
 
