@@ -595,8 +595,8 @@ function gutenberg_migrate_nav_on_theme_switch( $new_name, $new_theme, $old_them
 	};
 	add_filter( 'option_stylesheet', $pretend_old_theme );
 
-	$locations = get_nav_menu_locations();
-	$mapping   = get_option( 'fse_navigation_areas', array() );
+	$locations    = get_nav_menu_locations();
+	$area_mapping = get_option( 'fse_navigation_areas', array() );
 
 	foreach ( $locations as $location_name => $menu_id ) {
 		// Get the menu from the location, returning early if there is no
@@ -635,11 +635,11 @@ function gutenberg_migrate_nav_on_theme_switch( $new_name, $new_theme, $old_them
 			$navigation_post_id = wp_insert_post( $post_data );
 		}
 
-		$mapping[ $location_name ] = $navigation_post_id;
+		$area_mapping[ $location_name ] = $navigation_post_id;
 	}
 	remove_filter( 'option_stylesheet', $pretend_old_theme );
 
-	update_option( 'fse_navigation_areas', $mapping );
+	update_option( 'fse_navigation_areas', $area_mapping );
 }
 
 add_action( 'switch_theme', 'gutenberg_migrate_nav_on_theme_switch', 200, 3 );
