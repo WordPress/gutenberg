@@ -619,7 +619,6 @@ function gutenberg_migrate_nav_on_theme_switch( $new_name, $new_theme, $old_them
 			'post_content' => serialize_blocks( $parsed_blocks ),
 			'post_status'  => 'publish',
 		);
-
 		// Get or create to avoid creating too many wp_navigation posts.
 		$matching_posts = $wpdb->get_results(
 			$wpdb->prepare(
@@ -730,7 +729,7 @@ function gutenberg_parse_blocks_from_menu_items( $menu_items, $menu_items_by_par
 		$kind             = null !== $menu_item->type ? str_replace( '_', '-', $menu_item->type ) : 'custom';
 
 		$block = array(
-			'blockName' => 'core/navigation-link',
+			'blockName' => isset( $menu_items_by_parent_id[ $menu_item->ID ] ) ? 'core/navigation-submenu' : 'core/navigation-link',
 			'attrs'     => array(
 				'className'     => $class_name,
 				'description'   => $menu_item->description,
@@ -745,12 +744,10 @@ function gutenberg_parse_blocks_from_menu_items( $menu_items, $menu_items_by_par
 			),
 		);
 
-		$block['innerBlocks'] = gutenberg_parse_blocks_from_menu_items(
-			isset( $menu_items_by_parent_id[ $menu_item->ID ] )
-				? $menu_items_by_parent_id[ $menu_item->ID ]
-				: array(),
-			$menu_items_by_parent_id
-		);
+		$block['innerBlocks']  = isset( $menu_items_by_parent_id[ $menu_item->ID ] )
+			? gutenberg_parse_blocks_from_menu_items( $menu_items_by_parent_id[ $menu_item->ID ], $menu_items_by_parent_id )
+			: array();
+		$block['innerContent'] = array_map( 'serialize_block', $block['innerBlocks'] );
 
 		$blocks[] = $block;
 	}
