@@ -581,6 +581,11 @@ function gutenberg_get_navigation_areas_paths_to_preload() {
  * @see switch_theme WordPress action.
  */
 function gutenberg_migrate_nav_on_theme_switch( $new_name, $new_theme, $old_theme ) {
+	// Do nothing when switching to a theme that does not support site editor.
+	if ( ! gutenberg_experimental_is_site_editor_available() ) {
+		return;
+	}
+
 	// get_nav_menu_locations() calls get_theme_mod() which depends on the stylesheet option.
 	// At the same time, switch_theme runs only after the stylesheet option was updated to $new_theme.
 	// To retrieve theme mods of the old theme, let's pretend the stylesheet is as it used to be.
