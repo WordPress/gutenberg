@@ -52,7 +52,7 @@ export default function Modal( {
 	className,
 	contentLabel,
 	onKeyDown,
-	isFullScreen, // TODO: change docs
+	isFullScreen = false,
 } ) {
 	const ref = useRef();
 	const instanceId = useInstanceId( Modal );

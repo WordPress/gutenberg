@@ -43,12 +43,7 @@ function PatternsListHeader( { filterValue, filteredBlockPatternsLength } ) {
 	);
 }
 
-function PatternList( {
-	filterValue,
-	selectedCategory,
-	patternCategories,
-	maxSearchResults,
-} ) {
+function PatternList( { filterValue, selectedCategory, patternCategories } ) {
 	const debouncedSpeak = useDebounce( speak, 500 );
 	const [ destinationRootClientId, onInsertBlocks ] = useInsertionPoint( {
 		shouldFocusBlock: true,
@@ -79,11 +74,8 @@ function PatternList( {
 					: pattern.categories?.includes( selectedCategory )
 			);
 		}
-		const results = searchItems( allPatterns, filterValue );
-		return maxSearchResults !== undefined
-			? results.slice( 0, maxSearchResults )
-			: results;
-	}, [ filterValue, selectedCategory, allPatterns, maxSearchResults ] );
+		return searchItems( allPatterns, filterValue );
+	}, [ filterValue, selectedCategory, allPatterns ] );
 
 	// Announce search results on change.
 	useEffect( () => {
