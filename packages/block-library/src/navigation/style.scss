@@ -320,20 +320,13 @@
  * Mobile menu.
  */
 
-// Override default positioning
-.wp-block-navigation.is-responsive-menu-open {
+.wp-block-navigation__responsive-container {
+	display: none;
 	position: fixed;
 	top: 0;
 	left: 0;
 	right: 0;
 	bottom: 0;
-	// Give it a z-index just higher than the adminbar.
-	z-index: 100000;
-	padding: 72px 24px 24px 24px;
-}
-
-.wp-block-navigation__responsive-container {
-	display: none;
 
 	.wp-block-navigation__responsive-container-content {
 		display: contents;
@@ -345,7 +338,18 @@
 	// but otherwise provide a baseline.
 	// In a future version, we can explore more customizability.
 	&.is-menu-open {
-		display: contents;
+		display: flex; // Needs to be set to override "none".
+		flex-direction: column;
+
+		// Allow modal to scroll.
+		overflow: auto;
+
+		// Give it a z-index just higher than the adminbar.
+		z-index: 100000;
+
+		// Add extra top padding so items don't conflict with close button.
+		padding: 72px 24px 24px 24px;
+		background-color: inherit;
 		// Fallback to inheritance in case the --justification-setting variable fails.
 		align-items: inherit;
 
@@ -455,10 +459,8 @@
 // Default menu background and font color.
 .wp-block-navigation:not(.has-background)
 .wp-block-navigation__responsive-container.is-menu-open {
-	color: #000;
-}
-.wp-block-navigation:not(.has-background).is-responsive-menu-open {
 	background-color: #fff;
+	color: #000;
 }
 
 // Menu and close buttons.
@@ -484,10 +486,6 @@
 // Button to open the menu.
 .wp-block-navigation__responsive-container-open {
 	display: flex;
-
-	.is-responsive-menu-open & {
-		display: none; // Or do we need this button to still be screen reader accessible?
-	}
 
 	&:not(.always-shown) {
 		@include break-small {

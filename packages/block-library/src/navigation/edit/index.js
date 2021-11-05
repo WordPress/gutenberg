@@ -192,7 +192,6 @@ function Navigation( {
 			[ `items-justified-${ attributes.itemsJustification }` ]: itemsJustification,
 			'is-vertical': orientation === 'vertical',
 			'is-responsive': 'never' !== overlayMenu,
-			'is-responsive-menu-open': isResponsiveMenuOpen,
 			'has-text-color': !! textColor.color || !! textColor?.class,
 			[ getColorClassName(
 				'color',
