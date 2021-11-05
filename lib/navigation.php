@@ -632,7 +632,11 @@ function gutenberg_migrate_nav_on_theme_switch( $new_name, $new_theme, $old_them
 			$parsed_blocks           = gutenberg_global_parse_blocks_from_menu_items( $menu_items_by_parent_id[0], $menu_items_by_parent_id );
 			$post_data               = array(
 				'post_type'    => 'wp_navigation',
-				'post_title'   => $menu->name,
+				'post_title'   => sprintf(
+					/* translators: %s: the name of the menu, e.g. "Main Menu". */
+					__( 'Classic menu: %s', 'gutenberg' ),
+					$menu->name
+				),
 				'post_name'    => $post_name,
 				'post_content' => serialize_blocks( $parsed_blocks ),
 				'post_status'  => $post_status,
