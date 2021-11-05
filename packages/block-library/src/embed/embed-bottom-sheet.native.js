@@ -1,8 +1,4 @@
 /**
- * External dependencies
- */
-import { Platform } from 'react-native';
-/**
  * WordPress dependencies
  */
 import { __, sprintf } from '@wordpress/i18n';
@@ -29,7 +25,7 @@ const EmbedBottomSheet = ( { value, label, isVisible, onClose, onSubmit } ) => {
 			placeholder: __( 'Add link' ),
 			autoFocus: true,
 			autoFill: true,
-			setCursorAtStart: Platform.OS === 'ios',
+			setCursorAtStart: true,
 		},
 		footer: {
 			label: (
