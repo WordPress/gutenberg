@@ -616,22 +616,24 @@ function gutenberg_migrate_nav_on_theme_switch( $new_name, $new_theme, $old_them
 		$post_data               = array(
 			'post_type'    => 'wp_navigation',
 			'post_title'   => $menu->name,
+			'post_name'    => 'classic_menu_' . $menu_id,
 			'post_content' => serialize_blocks( $parsed_blocks ),
 			'post_status'  => 'publish',
 		);
-		// Get or create to avoid creating too many wp_navigation posts. Using custom SQL because WP_Query
-		// can't filter by post_content.
-		$matching_posts = $wpdb->get_results(
-			$wpdb->prepare(
-				'SELECT id FROM wp_posts WHERE post_type = %s AND MD5( post_content ) = %s AND post_status = %s LIMIT 1',
-				$post_data['post_type'],
-				md5( $post_data['post_content'] ),
-				$post_data['post_status']
+
+		// Get or create to avoid creating too many wp_navigation posts.
+		$query          = new WP_Query;
+		$matching_posts = $query->query(
+			array(
+				'name'           => $post_data['post_name'],
+				'post_status'    => $post_data['post_status'],
+				'post_type'      => 'wp_navigation',
+				'posts_per_page' => 1,
 			)
 		);
 
 		if ( count( $matching_posts ) ) {
-			$navigation_post_id = $matching_posts[0]->id;
+			$navigation_post_id = $matching_posts[0]->ID;
 		} else {
 			$navigation_post_id = wp_insert_post( $post_data );
 		}
