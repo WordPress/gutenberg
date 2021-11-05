@@ -8,6 +8,7 @@ import classnames from 'classnames';
  */
 import { Flex, FlexItem, SelectControl, Button } from '@wordpress/components';
 import { __, _x } from '@wordpress/i18n';
+import { useViewportMatch } from '@wordpress/compose';
 
 function PatternInserterPanel( {
 	selectedCategory,
@@ -15,6 +16,7 @@ function PatternInserterPanel( {
 	onClickCategory,
 	openPatternExplorer,
 } ) {
+	const isMobile = useViewportMatch( 'medium', '<' );
 	const categoryOptions = () => {
 		const options = [];
 
@@ -69,16 +71,21 @@ function PatternInserterPanel( {
 					options={ categoryOptions() }
 				/>
 			</FlexItem>
-			<FlexItem>
-				<Button
-					variant="secondary"
-					className="block-editor-inserter__patterns-explorer-expand"
-					label={ __( 'Explore all patterns' ) }
-					onClick={ () => openPatternExplorer() }
-				>
-					{ _x( 'Explore', 'Label for showing all block patterns' ) }
-				</Button>
-			</FlexItem>
+			{ ! isMobile && (
+				<FlexItem>
+					<Button
+						variant="secondary"
+						className="block-editor-inserter__patterns-explorer-expand"
+						label={ __( 'Explore all patterns' ) }
+						onClick={ () => openPatternExplorer() }
+					>
+						{ _x(
+							'Explore',
+							'Label for showing all block patterns'
+						) }
+					</Button>
+				</FlexItem>
+			) }
 		</Flex>
 	);
 }
