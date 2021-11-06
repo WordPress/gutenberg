@@ -22,13 +22,17 @@ class Gutenberg_REST_Global_Styles_Controller_Test extends WP_Test_REST_Controll
 		return null;
 	}
 
+	public function set_up() {
+		parent::set_up();
+		switch_theme( 'tt1-blocks' );
+	}
+
 	/**
 	 * Create fake data before our tests run.
 	 *
 	 * @param WP_UnitTest_Factory $factory Helper that lets us create fake data.
 	 */
 	public static function wpSetupBeforeClass( $factory ) {
-		switch_theme( 'tt1-blocks' );
 		gutenberg_register_wp_theme_taxonomy();
 		self::$admin_id = $factory->user->create(
 			array(
