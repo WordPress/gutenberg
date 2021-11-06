@@ -36,6 +36,7 @@ describe( 'Document Settings', () => {
 
 	beforeEach( async () => {
 		await siteEditor.visit();
+		await siteEditor.disableWelcomeGuide();
 	} );
 
 	describe( 'when a template is selected from the navigation sidebar', () => {

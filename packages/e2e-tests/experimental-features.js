@@ -157,4 +157,17 @@ export const siteEditor = {
 			return '';
 		} );
 	},
+
+	async disableWelcomeGuide() {
+		const isWelcomeGuideActive = await page.evaluate( () =>
+			wp.data.select( 'core/edit-site' ).isFeatureActive( 'welcomeGuide' )
+		);
+		if ( isWelcomeGuideActive ) {
+			await page.evaluate( () =>
+				wp.data
+					.dispatch( 'core/edit-site' )
+					.toggleFeature( 'welcomeGuide' )
+			);
+		}
+	},
 };
