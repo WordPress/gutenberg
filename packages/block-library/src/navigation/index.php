@@ -290,6 +290,7 @@ function render_block_core_navigation( $attributes, $content, $block ) {
 	if ( empty( $inner_blocks ) ) {
 		return '';
 	}
+
 	$colors     = block_core_navigation_build_css_colors( $attributes );
 	$font_sizes = block_core_navigation_build_css_font_sizes( $attributes );
 	$classes    = array_merge(
