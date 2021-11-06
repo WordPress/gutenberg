@@ -1,56 +1,33 @@
 /**
  * WordPress dependencies
  */
-import { useDispatch, useSelect } from '@wordpress/data';
-import { Guide } from '@wordpress/components';
-import { __ } from '@wordpress/i18n';
+import { useSelect } from '@wordpress/data';
+import { store as interfaceStore } from '@wordpress/interface';
 
 /**
  * Internal dependencies
  */
-import WelcomeGuideImage from './image';
+import WelcomeGuideEditor from './editor';
+import WelcomeGuideStyles from './styles';
 import { store as editSiteStore } from '../../store';
 
-export default function WelcomeGuideTemplate() {
-	const { toggleFeature } = useDispatch( editSiteStore );
+export default function WelcomeGuide() {
+	const { isActive, isStylesOpen } = useSelect( ( select ) => {
+		const sidebar = select( interfaceStore ).getActiveComplementaryArea(
+			editSiteStore.name
+		);
+		const isStylesSidebar = sidebar === 'edit-site/global-styles';
+		const feature = isStylesSidebar ? 'welcomeGuideStyles' : 'welcomeGuide';
 
-	const isActive = useSelect(
-		( select ) => select( editSiteStore ).isFeatureActive( 'welcomeGuide' ),
-		[]
-	);
+		return {
+			isActive: select( editSiteStore ).isFeatureActive( feature ),
+			isStylesOpen: isStylesSidebar,
+		};
+	}, [] );
 
 	if ( ! isActive ) {
 		return null;
 	}
 
-	return (
-		<Guide
-			className="edit-site-welcome-guide"
-			contentLabel={ __( 'Welcome to the site editor' ) }
-			finishButtonText={ __( 'Try Styles' ) }
-			onFinish={ () => toggleFeature( 'welcomeGuide' ) }
-			pages={ [
-				{
-					image: (
-						<WelcomeGuideImage
-							nonAnimatedSrc="https://s.w.org/images/block-editor/welcome-template-editor.svg"
-							animatedSrc="https://s.w.org/images/block-editor/welcome-template-editor.gif"
-						/>
-					),
-					content: (
-						<>
-							<h1 className="edit-site-welcome-guide__heading">
-								{ __( 'Introducing: Styles' ) }
-							</h1>
-							<p className="edit-site-welcome-guide__text">
-								{ __(
-									'Try out and apply new colors, typography, and layout across your entire site. You can also customize the appearance of specific blocks, meaning that all paragraph blocks can appear the same with a few clicks.'
-								) }
-							</p>
-						</>
-					),
-				},
-			] }
-		/>
-	);
+	return isStylesOpen ? <WelcomeGuideStyles /> : <WelcomeGuideEditor />;
 }
