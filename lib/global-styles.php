@@ -255,6 +255,8 @@ function gutenberg_global_styles_force_filtered_html_on_import_filter( $arg ) {
 	return $arg;
 }
 
+// TODO: Remove this filter when minimum supported version is WP 5.8
+// As all this code is not needed anymore now core supports all variables.
 /**
  * This filter is the last being executed on force_filtered_html_on_import.
  * If the input of the filter is true it means we are in an import situation and should
