@@ -4,7 +4,6 @@
 		"name": "core/navigation",
 		"isValid": true,
 		"attributes": {
-			"orientation": "horizontal",
 			"showSubmenuIcon": true,
 			"style": {
 				"typography": {
@@ -13,6 +12,11 @@
 					"fontStyle": "italic",
 					"fontWeight": "100"
 				}
+			},
+			"layout": {
+				"type": "flex",
+				"justifyContent": "left",
+				"orientation": "horizontal"
 			}
 		},
 		"innerBlocks": [

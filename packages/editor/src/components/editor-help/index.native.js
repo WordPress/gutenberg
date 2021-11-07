@@ -197,7 +197,7 @@ function EditorHelpTopics( { close, isVisible, onClose } ) {
 								content={ view }
 								label={ label }
 								options={ {
-									gestureEnabled: true,
+									gestureEnabled: false,
 									...TransitionPresets.DefaultTransition,
 								} }
 							/>
