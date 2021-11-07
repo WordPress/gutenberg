@@ -8,7 +8,11 @@ import { JSDOM } from 'jsdom';
  * Internal dependencies
  */
 import { create, removeReservedCharacters } from '../create';
-import { OBJECT_REPLACEMENT_CHARACTER, ZWNBSP } from '../special-characters';
+import {
+	OBJECT_REPLACEMENT_CHARACTER,
+	ZWNBSP,
+	BACKSPACE_CHARACTER,
+} from '../special-characters';
 import { createElement } from '../create-element';
 import { registerFormatType } from '../register-format-type';
 import { unregisterFormatType } from '../unregister-format-type';
@@ -130,6 +134,9 @@ describe( 'create', () => {
 		).toEqual( '' );
 		expect( removeReservedCharacters( `${ ZWNBSP }` ) ).toEqual( '' );
 		expect(
+			removeReservedCharacters( `${ BACKSPACE_CHARACTER }` )
+		).toEqual( '' );
+		expect(
 			removeReservedCharacters(
 				`${ OBJECT_REPLACEMENT_CHARACTER }c${ OBJECT_REPLACEMENT_CHARACTER }at${ OBJECT_REPLACEMENT_CHARACTER }`
 			)
@@ -139,7 +146,7 @@ describe( 'create', () => {
 		).toEqual( 'bat' );
 		expect(
 			removeReservedCharacters(
-				`te${ OBJECT_REPLACEMENT_CHARACTER }st${ ZWNBSP }${ ZWNBSP }`
+				`${ BACKSPACE_CHARACTER }te${ OBJECT_REPLACEMENT_CHARACTER }st${ ZWNBSP }${ ZWNBSP }`
 			)
 		).toEqual( 'test' );
 	} );

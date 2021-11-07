@@ -13,3 +13,8 @@ export const OBJECT_REPLACEMENT_CHARACTER = '\ufffc';
  * it is empty otherwise.
  */
 export const ZWNBSP = '\ufeff';
+
+/**
+ * Backspace character, sometimes added when deleing texts using CJK input methods.
+ */
+export const BACKSPACE_CHARACTER = '\b';

@@ -20,6 +20,7 @@ import { useIndentListItemOnSpace } from './use-indent-list-item-on-space';
 import { useInputAndSelection } from './use-input-and-selection';
 import { useDelete } from './use-delete';
 import { useSpace } from './use-space';
+import { useHidePlaceholderOnInputComposition } from './use-hide-placeholder-input-composition';
 
 export function useRichText( {
 	value = '',
@@ -248,6 +249,7 @@ export function useRichText( {
 			onSelectionChange,
 		} ),
 		useSpace(),
+		useHidePlaceholderOnInputComposition(),
 		useRefEffect( () => {
 			applyFromProps();
 			didMount.current = true;

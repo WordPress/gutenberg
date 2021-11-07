@@ -13,6 +13,7 @@ import {
 	LINE_SEPARATOR,
 	OBJECT_REPLACEMENT_CHARACTER,
 	ZWNBSP,
+	BACKSPACE_CHARACTER,
 } from './special-characters';
 
 /**
@@ -316,14 +317,20 @@ function collapseWhiteSpace( string ) {
 }
 
 /**
- * Removes reserved characters used by rich-text (zero width non breaking spaces added by `toTree` and object replacement characters).
+ * Removes reserved characters used by rich-text:
+ * - zero width non breaking spaces added by `toTree`
+ * - object replacement characters
+ * - Backspace characters which are sometimes added when using CJK input methods
  *
  * @param {string} string
  */
 export function removeReservedCharacters( string ) {
 	// with the global flag, note that we should create a new regex each time OR reset lastIndex state.
 	return string.replace(
-		new RegExp( `[${ ZWNBSP }${ OBJECT_REPLACEMENT_CHARACTER }]`, 'gu' ),
+		new RegExp(
+			`[${ ZWNBSP }${ OBJECT_REPLACEMENT_CHARACTER }${ BACKSPACE_CHARACTER }]`,
+			'gu'
+		),
 		''
 	);
 }
