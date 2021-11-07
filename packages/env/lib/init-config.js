@@ -99,6 +99,41 @@ module.exports = async function initConfig( {
 };
 
 /**
+ * Checks the configured PHP version
+ * against the minimum version supported by Xdebug
+ *
+ * @param {WPConfig} config
+ * @return {boolean} Whether the PHP version is supported by Xdebug
+ */
+function checkXdebugPhpCompatibility( config ) {
+	// By default, an undefined phpVersion uses the version on the docker image,
+	// which is supported by Xdebug 3.
+	const phpCompatibility = true;
+
+	// If PHP version is defined
+	// ensure it meets the Xdebug minimum compatibility requirment
+	if ( config.env.development.phpVersion ) {
+		const versionTokens = config.env.development.phpVersion.split( '.' );
+		const majorVer = parseInt( versionTokens[ 0 ] );
+		const minorVer = parseInt( versionTokens[ 1 ] );
+
+		if ( isNaN( majorVer ) || isNaN( minorVer ) ) {
+			throw new Error(
+				'Something went wrong when parsing the PHP version.'
+			);
+		}
+
+		// Xdebug 3 supports 7.2 and higher
+		// Ensure user has specified a compatible PHP version
+		if ( majorVer < 7 || ( majorVer === 7 && minorVer < 2 ) ) {
+			throw new Error( 'Cannot use XDebug 3 on PHP < 7.2.' );
+		}
+	}
+
+	return phpCompatibility;
+}
+
+/**
  * Generates the Dockerfile used by wp-env's development instance.
  *
  * @param {string}   image  The base docker image to use.
@@ -107,20 +142,14 @@ module.exports = async function initConfig( {
  * @return {string} The dockerfile contents.
  */
 function dockerFileContents( image, config ) {
-	let shouldInstallXdebug = true;
-	// By default, an undefined phpVersion uses the version on the docker image,
-	// which is supported by Xdebug 3.
-	if ( config.env.development.phpVersion ) {
-		const versionTokens = config.env.development.phpVersion.split( '.' );
-		const majorVersion = parseInt( versionTokens[ 0 ] );
-		const minorVersion = parseInt( versionTokens[ 1 ] );
-		if ( isNaN( majorVersion ) || isNaN( minorVersion ) ) {
-			throw new Error( 'Something went wrong parsing the php version.' );
-		}
+	// Don't install XDebug unless it is explicitly required
+	let shouldInstallXdebug = false;
 
-		// Disable Xdebug for PHP < 7.2. Xdebug 3 supports 7.2 and higher.
-		if ( majorVersion < 7 || ( majorVersion === 7 && minorVersion < 2 ) ) {
-			shouldInstallXdebug = false;
+	if ( config.xdebug !== 'off' ) {
+		const usingCompatiblePhp = checkXdebugPhpCompatibility( config );
+
+		if ( usingCompatiblePhp ) {
+			shouldInstallXdebug = true;
 		}
 	}
 
@@ -140,7 +169,8 @@ function installXdebug( enableXdebug ) {
 
 	return `
 # Install Xdebug:
-RUN pecl install xdebug && docker-php-ext-enable xdebug
+RUN if [ -z "$(pecl list | grep xdebug)" ] ; then pecl install xdebug ; fi
+RUN docker-php-ext-enable xdebug
 RUN echo 'xdebug.start_with_request=yes' >> /usr/local/etc/php/php.ini
 RUN echo 'xdebug.mode=${ enableXdebug }' >> /usr/local/etc/php/php.ini
 RUN echo '${ clientDetectSettings }' >> /usr/local/etc/php/php.ini

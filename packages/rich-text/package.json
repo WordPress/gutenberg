@@ -30,11 +30,13 @@
 	],
 	"dependencies": {
 		"@babel/runtime": "^7.13.10",
+		"@wordpress/a11y": "^3.2.3",
 		"@wordpress/compose": "file:../compose",
 		"@wordpress/data": "file:../data",
 		"@wordpress/dom": "file:../dom",
 		"@wordpress/element": "file:../element",
 		"@wordpress/escape-html": "file:../escape-html",
+		"@wordpress/i18n": "^4.2.3",
 		"@wordpress/is-shallow-equal": "file:../is-shallow-equal",
 		"@wordpress/keycodes": "file:../keycodes",
 		"classnames": "^2.3.1",

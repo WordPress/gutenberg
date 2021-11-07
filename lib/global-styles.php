@@ -6,75 +6,11 @@
  */
 
 /**
- * Takes a tree adhering to the theme.json schema and generates
- * the corresponding stylesheet.
- *
- * @param WP_Theme_JSON_Gutenberg $tree Input tree.
- * @param string                  $type Type of stylesheet. It accepts 'all', 'block_styles', 'css_variables', 'presets'.
- *
- * @return string Stylesheet.
- */
-function gutenberg_experimental_global_styles_get_stylesheet( $tree, $type = null ) {
-	// Check if we can use cached.
-	$can_use_cached = (
-		( 'all' === $type ) &&
-		( ! defined( 'WP_DEBUG' ) || ! WP_DEBUG ) &&
-		( ! defined( 'SCRIPT_DEBUG' ) || ! SCRIPT_DEBUG ) &&
-		( ! defined( 'REST_REQUEST' ) || ! REST_REQUEST ) &&
-		! is_admin()
-	);
-
-	$transient_name = 'gutenberg_global_styles_' . get_stylesheet();
-	if ( $can_use_cached ) {
-		// Check if we have the styles already cached.
-		// It's cached by theme to make sure that theme switching
-		// is inmediately reflected.
-		$cached = get_transient( $transient_name );
-		if ( $cached ) {
-			return $cached;
-		}
-	}
-
-	$supports_theme_json = WP_Theme_JSON_Resolver_Gutenberg::theme_has_support();
-	$supports_link_color = get_theme_support( 'experimental-link-color' );
-
-	// Only modify the $type if the consumer hasn't provided any.
-	if ( null === $type && ! $supports_theme_json ) {
-		$type = 'presets';
-	} elseif ( null === $type ) {
-		$type = 'all';
-	}
-
-	$origins = array( 'core', 'theme', 'user' );
-	if ( ! $supports_theme_json && ! $supports_link_color ) {
-		// In this case we only enqueue the core presets (CSS Custom Properties + the classes).
-		$origins = array( 'core' );
-	} elseif ( ! $supports_theme_json && $supports_link_color ) {
-		// For the legacy link color feauter to work, the CSS Custom Properties
-		// should be in scope (either the core or the theme ones).
-		$origins = array( 'core', 'theme' );
-	}
-
-	$stylesheet = $tree->get_stylesheet( $type, $origins );
-
-	if ( $can_use_cached ) {
-		// Cache for a minute.
-		// This cache doesn't need to be any longer, we only want to avoid spikes on high-traffic sites.
-		set_transient( $transient_name, $stylesheet, MINUTE_IN_SECONDS );
-	}
-
-	return $stylesheet;
-}
-
-/**
  * Fetches the preferences for each origin (core, theme, user)
  * and enqueues the resulting stylesheet.
  */
 function gutenberg_experimental_global_styles_enqueue_assets() {
-	$settings = gutenberg_get_default_block_editor_settings();
-	$all      = WP_Theme_JSON_Resolver_Gutenberg::get_merged_data( $settings );
-
-	$stylesheet = gutenberg_experimental_global_styles_get_stylesheet( $all );
+	$stylesheet = gutenberg_get_global_stylesheet();
 	if ( empty( $stylesheet ) ) {
 		return;
 	}
@@ -115,28 +51,11 @@ function gutenberg_experimental_global_styles_settings( $settings ) {
 		$context = 'mobile';
 	}
 
-	$consolidated = WP_Theme_JSON_Resolver_Gutenberg::get_merged_data( $settings );
-
 	if ( 'mobile' === $context && WP_Theme_JSON_Resolver_Gutenberg::theme_has_support() ) {
-		$settings['__experimentalStyles'] = $consolidated->get_raw_data()['styles'];
-	}
-
-	if ( 'site-editor' === $context && gutenberg_experimental_is_site_editor_available() ) {
-		$theme       = WP_Theme_JSON_Resolver_Gutenberg::get_merged_data( $settings, 'theme' );
-		$user_cpt_id = WP_Theme_JSON_Resolver_Gutenberg::get_user_custom_post_type_id();
-
-		$settings['__experimentalGlobalStylesUserEntityId']           = $user_cpt_id;
-		$settings['__experimentalGlobalStylesBaseConfig']['styles']   = $theme->get_raw_data()['styles'];
-		$settings['__experimentalGlobalStylesBaseConfig']['settings'] = $theme->get_settings();
+		$settings['__experimentalStyles'] = gutenberg_get_global_styles();
 	}
 
 	if ( 'other' === $context ) {
-		$block_styles  = array( 'css' => gutenberg_experimental_global_styles_get_stylesheet( $consolidated, 'block_styles' ) );
-		$css_variables = array(
-			'css'                     => gutenberg_experimental_global_styles_get_stylesheet( $consolidated, 'css_variables' ),
-			'__experimentalNoWrapper' => true,
-		);
-
 		// Make sure the styles array exists.
 		// In some contexts, like the navigation editor, it doesn't.
 		if ( ! isset( $settings['styles'] ) ) {
@@ -151,14 +70,43 @@ function gutenberg_experimental_global_styles_settings( $settings ) {
 			}
 		}
 
-		// Add the new ones.
-		$styles_without_existing_global_styles[] = $css_variables;
-		$styles_without_existing_global_styles[] = $block_styles;
-		$settings['styles']                      = $styles_without_existing_global_styles;
+		$new_global_styles = array();
+		$new_presets       = array(
+			array(
+				'css'                     => 'variables',
+				'__unstableType'          => 'presets',
+				'__experimentalNoWrapper' => true,
+			),
+			array(
+				'css'            => 'presets',
+				'__unstableType' => 'presets',
+			),
+		);
+		foreach ( $new_presets as $new_style ) {
+			$style_css = gutenberg_get_global_stylesheet( array( $new_style['css'] ) );
+			if ( '' !== $style_css ) {
+				$new_style['css']    = $style_css;
+				$new_global_styles[] = $new_style;
+			}
+		}
+
+		$new_block_classes = array(
+			'css'            => 'styles',
+			'__unstableType' => 'theme',
+		);
+		if ( WP_Theme_JSON_Resolver_Gutenberg::theme_has_support() ) {
+			$style_css = gutenberg_get_global_stylesheet( array( $new_block_classes['css'] ) );
+			if ( '' !== $style_css ) {
+				$new_block_classes['css'] = $style_css;
+				$new_global_styles[]      = $new_block_classes;
+			}
+		}
+
+		$settings['styles'] = array_merge( $styles_without_existing_global_styles, $new_global_styles );
 	}
 
 	// Copied from get_block_editor_settings() at wordpress-develop/block-editor.php.
-	$settings['__experimentalFeatures'] = $consolidated->get_settings();
+	$settings['__experimentalFeatures'] = gutenberg_get_global_settings();
 
 	if ( isset( $settings['__experimentalFeatures']['color']['palette'] ) ) {
 		$colors_by_origin   = $settings['__experimentalFeatures']['color']['palette'];
@@ -202,16 +150,16 @@ function gutenberg_experimental_global_styles_settings( $settings ) {
 		$settings['disableCustomFontSizes'] = ! $settings['__experimentalFeatures']['typography']['customFontSize'];
 		unset( $settings['__experimentalFeatures']['typography']['customFontSize'] );
 	}
-	if ( isset( $settings['__experimentalFeatures']['typography']['customLineHeight'] ) ) {
-		$settings['enableCustomLineHeight'] = $settings['__experimentalFeatures']['typography']['customLineHeight'];
-		unset( $settings['__experimentalFeatures']['typography']['customLineHeight'] );
+	if ( isset( $settings['__experimentalFeatures']['typography']['lineHeight'] ) ) {
+		$settings['enableCustomLineHeight'] = $settings['__experimentalFeatures']['typography']['lineHeight'];
+		unset( $settings['__experimentalFeatures']['typography']['lineHeight'] );
 	}
 	if ( isset( $settings['__experimentalFeatures']['spacing']['units'] ) ) {
 		$settings['enableCustomUnits'] = $settings['__experimentalFeatures']['spacing']['units'];
 	}
-	if ( isset( $settings['__experimentalFeatures']['spacing']['customPadding'] ) ) {
-		$settings['enableCustomSpacing'] = $settings['__experimentalFeatures']['spacing']['customPadding'];
-		unset( $settings['__experimentalFeatures']['spacing']['customPadding'] );
+	if ( isset( $settings['__experimentalFeatures']['spacing']['padding'] ) ) {
+		$settings['enableCustomSpacing'] = $settings['__experimentalFeatures']['spacing']['padding'];
+		unset( $settings['__experimentalFeatures']['spacing']['padding'] );
 	}
 
 	return $settings;

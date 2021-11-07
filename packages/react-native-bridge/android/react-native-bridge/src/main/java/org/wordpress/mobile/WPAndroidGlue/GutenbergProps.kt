@@ -22,9 +22,7 @@ data class GutenbergProps @JvmOverloads constructor(
     val editorTheme: Bundle?,
     val translations: Bundle,
     val isDarkMode: Boolean,
-    val htmlModeEnabled: Boolean,
-    val enableEditorOnboarding: Boolean,
-    var firstGutenbergEditorSession: Boolean
+    val htmlModeEnabled: Boolean
 ) {
 
     fun getInitialProps(bundle: Bundle?) = (bundle ?: Bundle()).apply {
@@ -62,8 +60,6 @@ data class GutenbergProps @JvmOverloads constructor(
         putBoolean(PROP_CAPABILITIES_CAN_ENABLE_UNSUPPORTED_BLOCK_EDITOR, canEnableUnsupportedBlockEditor)
         putBoolean(PROP_CAPABILITIES_IS_AUDIO_BLOCK_MEDIA_UPLOAD_ENABLED, isAudioBlockMediaUploadEnabled)
         putBoolean(PROP_CAPABILITIES_REUSABLE_BLOCK, enableReusableBlock)
-        putBoolean(PROP_CAPABILITIES_EDITOR_ONBOARDING, enableEditorOnboarding)
-        putBoolean(PROP_CAPABILITIES_FIRST_GUTENBERG_SESSION, firstGutenbergEditorSession)
         putBoolean(PROP_CAPABILITIES_FACEBOOK_EMBED_BLOCK, enableFacebookEmbed)
         putBoolean(PROP_CAPABILITIES_INSTAGRAM_EMBED_BLOCK, enableInstagramEmbed)
         putBoolean(PROP_CAPABILITIES_LOOM_EMBED_BLOCK, enableLoomEmbed)
@@ -106,7 +102,5 @@ data class GutenbergProps @JvmOverloads constructor(
         const val PROP_CAPABILITIES_CAN_ENABLE_UNSUPPORTED_BLOCK_EDITOR = "canEnableUnsupportedBlockEditor"
         const val PROP_CAPABILITIES_IS_AUDIO_BLOCK_MEDIA_UPLOAD_ENABLED = "isAudioBlockMediaUploadEnabled"
         const val PROP_CAPABILITIES_REUSABLE_BLOCK = "reusableBlock"
-        const val PROP_CAPABILITIES_EDITOR_ONBOARDING = "editorOnboarding"
-        const val PROP_CAPABILITIES_FIRST_GUTENBERG_SESSION = "firstGutenbergEditorSession"
     }
 }

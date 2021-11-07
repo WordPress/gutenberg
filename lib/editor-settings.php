@@ -25,7 +25,7 @@ function gutenberg_extend_post_editor_settings( $settings ) {
 	$settings['__unstableEnableFullSiteEditingBlocks'] = gutenberg_supports_block_templates();
 
 	if ( gutenberg_is_fse_theme() ) {
-		$settings['defaultTemplatePartAreas'] = gutenberg_get_allowed_template_part_areas();
+		$settings['defaultTemplatePartAreas'] = get_allowed_block_template_part_areas();
 	}
 
 	return $settings;
@@ -75,17 +75,6 @@ function gutenberg_initialize_editor( $editor_name, $editor_script_handle, $sett
 		'rest_preload_api_request',
 		array()
 	);
-
-	/**
-	 * Filters the array of data that has been preloaded.
-	 *
-	 * The dynamic portion of the hook name, `$editor_name`, refers to the type of block editor.
-	 *
-	 * @param array $preload_data Array containing the preloaded data.
-	 * @param string $editor_name Current editor name.
-	 * @param array Array containing the filtered preloaded data.
-	 */
-	$preload_data = apply_filters( 'block_editor_preload_data', $preload_data, $editor_name );
 
 	wp_add_inline_script(
 		'wp-api-fetch',

@@ -11,9 +11,8 @@
 	],
 	"textdomain": "default",
 	"attributes": {
-		"orientation": {
-			"type": "string",
-			"default": "horizontal"
+		"navigationMenuId": {
+			"type": "number"
 		},
 		"textColor": {
 			"type": "string"
@@ -33,9 +32,6 @@
 		"rgbBackgroundColor": {
 			"type": "string"
 		},
-		"itemsJustification": {
-			"type": "string"
-		},
 		"showSubmenuIcon": {
 			"type": "boolean",
 			"default": true
@@ -46,7 +42,7 @@
 		},
 		"overlayMenu": {
 			"type": "string",
-			"default": "never"
+			"default": "mobile"
 		},
 		"__unstableLocation": {
 			"type": "string"
@@ -64,6 +60,7 @@
 			"type": "string"
 		}
 	},
+	"usesContext": [ "navigationArea" ],
 	"providesContext": {
 		"textColor": "textColor",
 		"customTextColor": "customTextColor",
@@ -95,7 +92,10 @@
 			"__experimentalFontWeight": true,
 			"__experimentalTextTransform": true,
 			"__experimentalFontFamily": true,
-			"__experimentalTextDecoration": true
+			"__experimentalTextDecoration": true,
+			"__experimentalDefaultControls": {
+				"fontSize": true
+			}
 		},
 		"spacing": {
 			"blockGap": true,
@@ -108,6 +108,13 @@
 			],
 			"__experimentalDefaultControls": {
 				"blockGap": true
+			}
+		},
+		"__experimentalLayout": {
+			"allowSwitching": false,
+			"allowInheriting": false,
+			"default": {
+				"type": "flex"
 			}
 		}
 	},

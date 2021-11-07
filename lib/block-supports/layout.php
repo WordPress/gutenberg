@@ -69,12 +69,22 @@ function gutenberg_get_layout_style( $selector, $layout, $has_block_gap_support 
 			$style .= "$selector > * + * { margin-top: var( --wp--style--block-gap ); margin-bottom: 0; }";
 		}
 	} elseif ( 'flex' === $layout_type ) {
+		$layout_orientation = isset( $layout['orientation'] ) ? $layout['orientation'] : 'horizontal';
+
 		$justify_content_options = array(
-			'left'          => 'flex-start',
-			'right'         => 'flex-end',
-			'center'        => 'center',
-			'space-between' => 'space-between',
+			'left'   => 'flex-start',
+			'right'  => 'flex-end',
+			'center' => 'center',
 		);
+
+		if ( 'horizontal' === $layout_orientation ) {
+			$justify_content_options += array( 'space-between' => 'space-between' );
+		}
+
+		$flex_wrap_options = array( 'wrap', 'nowrap' );
+		$flex_wrap         = ! empty( $layout['flexWrap'] ) && in_array( $layout['flexWrap'], $flex_wrap_options, true ) ?
+			$layout['flexWrap'] :
+			'wrap';
 
 		$style  = "$selector {";
 		$style .= 'display: flex;';
@@ -83,15 +93,25 @@ function gutenberg_get_layout_style( $selector, $layout, $has_block_gap_support 
 		} else {
 			$style .= 'gap: 0.5em;';
 		}
-		$style .= 'flex-wrap: wrap;';
-		$style .= 'align-items: center;';
-		/**
-		 * Add this style only if is not empty for backwards compatibility,
-		 * since we intend to convert blocks that had flex layout implemented
-		 * by custom css.
-		 */
-		if ( ! empty( $layout['justifyContent'] ) && array_key_exists( $layout['justifyContent'], $justify_content_options ) ) {
-			$style .= "justify-content: {$justify_content_options[ $layout['justifyContent'] ]};";
+		$style .= "flex-wrap: $flex_wrap;";
+		if ( 'horizontal' === $layout_orientation ) {
+			$style .= 'align-items: center;';
+			/**
+			 * Add this style only if is not empty for backwards compatibility,
+			 * since we intend to convert blocks that had flex layout implemented
+			 * by custom css.
+			 */
+			if ( ! empty( $layout['justifyContent'] ) && array_key_exists( $layout['justifyContent'], $justify_content_options ) ) {
+				$style .= "justify-content: {$justify_content_options[ $layout['justifyContent'] ]};";
+				// --justification-setting allows children to inherit the value regardless or row or column direction.
+				$style .= "--justification-setting: {$justify_content_options[ $layout['justifyContent'] ]};";
+			}
+		} else {
+			$style .= 'flex-direction: column;';
+			if ( ! empty( $layout['justifyContent'] ) && array_key_exists( $layout['justifyContent'], $justify_content_options ) ) {
+				$style .= "align-items: {$justify_content_options[ $layout['justifyContent'] ]};";
+				$style .= "--justification-setting: {$justify_content_options[ $layout['justifyContent'] ]};";
+			}
 		}
 		$style .= '}';
 
@@ -116,10 +136,9 @@ function gutenberg_render_layout_support_flag( $block_content, $block ) {
 		return $block_content;
 	}
 
-	$tree                  = WP_Theme_JSON_Resolver_Gutenberg::get_merged_data( array(), 'theme' );
-	$theme_settings        = $tree->get_settings();
-	$default_layout        = _wp_array_get( $theme_settings, array( 'layout' ) );
-	$has_block_gap_support = isset( $theme_settings['spacing']['blockGap'] ) ? null !== $theme_settings['spacing']['blockGap'] : false;
+	$block_gap             = gutenberg_get_global_settings( array( 'spacing', 'blockGap' ) );
+	$default_layout        = gutenberg_get_global_settings( array( 'layout' ) );
+	$has_block_gap_support = isset( $block_gap ) ? null !== $block_gap : false;
 	$default_block_layout  = _wp_array_get( $block_type->supports, array( '__experimentalLayout', 'default' ), array() );
 	$used_layout           = isset( $block['attrs']['layout'] ) ? $block['attrs']['layout'] : $default_block_layout;
 	if ( isset( $used_layout['inherit'] ) && $used_layout['inherit'] ) {
@@ -200,4 +219,3 @@ if ( function_exists( 'wp_restore_group_inner_container' ) ) {
 	remove_filter( 'render_block', 'wp_restore_group_inner_container', 10, 2 );
 }
 add_filter( 'render_block', 'gutenberg_restore_group_inner_container', 10, 2 );
-

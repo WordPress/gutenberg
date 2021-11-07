@@ -177,7 +177,7 @@ async function deleteAllLinkedResources() {
 	} );
 }
 
-describe( 'Navigation editor', () => {
+describe.skip( 'Navigation editor', () => {
 	useExperimentalFeatures( [ '#gutenberg-navigation' ] );
 
 	beforeAll( async () => {

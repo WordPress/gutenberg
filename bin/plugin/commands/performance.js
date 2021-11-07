@@ -40,6 +40,7 @@ const config = require( '../config' );
  * @property {number[]} inserterOpen         Average time to open global inserter.
  * @property {number[]} inserterSearch       Average time to search the inserter.
  * @property {number[]} inserterHover        Average time to move mouse between two block item in the inserter.
+ * @property {number[]} listViewOpen         Average time to open listView
  */
 
 /**
@@ -52,7 +53,7 @@ const config = require( '../config' );
  * @property {number=} firstContentfulPaint Represents the time when the browser first renders any text or media.
  * @property {number=} firstBlock           Represents the time when Puppeteer first sees a block selector in the DOM.
  * @property {number=} type                 Average type time.
- * @property {number=} minType              Minium type time.
+ * @property {number=} minType              Minimum type time.
  * @property {number=} maxType              Maximum type time.
  * @property {number=} focus                Average block selection time.
  * @property {number=} minFocus             Min block selection time.
@@ -66,6 +67,9 @@ const config = require( '../config' );
  * @property {number=} inserterHover        Average time to move mouse between two block item in the inserter.
  * @property {number=} minInserterHover     Min time to move mouse between two block item in the inserter.
  * @property {number=} maxInserterHover     Max time to move mouse between two block item in the inserter.
+ * @property {number=} listViewOpen         Average time to open list view.
+ * @property {number=} minListViewOpen      Min time to open list view.
+ * @property {number=} maxListViewOpen      Max time to open list view.
  */
 
 /**
@@ -136,6 +140,9 @@ function curateResults( results ) {
 		inserterHover: average( results.inserterHover ),
 		minInserterHover: Math.min( ...results.inserterHover ),
 		maxInserterHover: Math.max( ...results.inserterHover ),
+		listViewOpen: average( results.listViewOpen ),
+		minListViewOpen: Math.min( ...results.listViewOpen ),
+		maxListViewOpen: Math.max( ...results.listViewOpen ),
 	};
 }
 
@@ -377,6 +384,15 @@ async function runPerformanceTests( branches, options ) {
 					),
 					maxInserterHover: rawResults.map(
 						( r ) => r[ branch ].maxInserterHover
+					),
+					listViewOpen: rawResults.map(
+						( r ) => r[ branch ].listViewOpen
+					),
+					minListViewOpen: rawResults.map(
+						( r ) => r[ branch ].minListViewOpen
+					),
+					maxListViewOpen: rawResults.map(
+						( r ) => r[ branch ].maxListViewOpen
 					),
 				},
 				median

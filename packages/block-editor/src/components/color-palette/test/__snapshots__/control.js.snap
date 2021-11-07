@@ -32,10 +32,35 @@ exports[`ColorPaletteControl matches the snapshot 1`] = `
 }
 
 .emotion-4>*+*:not( marquee ) {
-  margin-top: calc(4px * 2);
+  margin-top: calc(4px * 1);
 }
 
 .emotion-4>* {
+  min-height: 0;
+}
+
+.emotion-6 {
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-align-items: normal;
+  -webkit-box-align: normal;
+  -ms-flex-align: normal;
+  align-items: normal;
+  -webkit-flex-direction: column;
+  -ms-flex-direction: column;
+  flex-direction: column;
+  -webkit-box-pack: justify;
+  -webkit-justify-content: space-between;
+  justify-content: space-between;
+}
+
+.emotion-6>*+*:not( marquee ) {
+  margin-top: calc(4px * 3);
+}
+
+.emotion-6>* {
   min-height: 0;
 }
 
@@ -59,89 +84,89 @@ exports[`ColorPaletteControl matches the snapshot 1`] = `
               className="components-base-control__label"
             >
               Test Color
-              <span
-                aria-label="(Color: #f00)"
-                className="component-color-indicator"
-                style={
-                  Object {
-                    "background": "#f00",
-                  }
-                }
-              />
             </span>
           </div>
         </legend>
         <div
-          className="components-circular-option-picker"
+          className="components-flex components-h-stack components-v-stack emotion-6 emotion-5"
+          data-wp-c16t={true}
+          data-wp-component="VStack"
         >
           <div
-            className="components-circular-option-picker__swatches"
+            className="components-dropdown"
+            tabIndex="-1"
           >
-            <div
-              className="components-circular-option-picker__option-wrapper"
-            >
-              <button
-                aria-describedby={null}
-                aria-label="Color: red"
-                aria-pressed={true}
-                className="components-button components-circular-option-picker__option is-pressed"
-                onBlur={[Function]}
-                onClick={[Function]}
-                onFocus={[Function]}
-                onMouseDown={[Function]}
-                onMouseEnter={[Function]}
-                onMouseLeave={[Function]}
-                style={
-                  Object {
-                    "backgroundColor": "#f00",
-                    "color": "#f00",
-                  }
+            <button
+              aria-expanded={false}
+              aria-haspopup="true"
+              aria-label="Custom color picker"
+              className="components-color-palette__custom-color"
+              onClick={[Function]}
+              style={
+                Object {
+                  "background": "#f00",
                 }
-                type="button"
-              />
-              <svg
-                aria-hidden={true}
-                fill="#000"
-                focusable={false}
-                height={24}
-                role="img"
-                viewBox="0 0 24 24"
-                width={24}
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <path
-                  d="M16.7 7.1l-6.3 8.5-3.3-2.5-.9 1.2 4.5 3.4L17.9 8z"
-                />
-              </svg>
-            </div>
+              }
+            >
+              #f00
+            </button>
           </div>
           <div
-            className="components-circular-option-picker__custom-clear-wrapper"
+            className="components-circular-option-picker"
           >
             <div
-              className="components-dropdown components-circular-option-picker__dropdown-link-action"
-              tabIndex="-1"
+              className="components-circular-option-picker__swatches"
+            >
+              <div
+                className="components-circular-option-picker__option-wrapper"
+              >
+                <button
+                  aria-describedby={null}
+                  aria-label="Color: red"
+                  aria-pressed={true}
+                  className="components-button components-circular-option-picker__option is-pressed"
+                  onBlur={[Function]}
+                  onClick={[Function]}
+                  onFocus={[Function]}
+                  onMouseDown={[Function]}
+                  onMouseEnter={[Function]}
+                  onMouseLeave={[Function]}
+                  style={
+                    Object {
+                      "backgroundColor": "#f00",
+                      "color": "#f00",
+                    }
+                  }
+                  type="button"
+                />
+                <svg
+                  aria-hidden={true}
+                  fill="#000"
+                  focusable={false}
+                  height={24}
+                  role="img"
+                  viewBox="0 0 24 24"
+                  width={24}
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path
+                    d="M16.7 7.1l-6.3 8.5-3.3-2.5-.9 1.2 4.5 3.4L17.9 8z"
+                  />
+                </svg>
+              </div>
+            </div>
+            <div
+              className="components-circular-option-picker__custom-clear-wrapper"
             >
               <button
                 aria-describedby={null}
-                aria-expanded={false}
-                aria-haspopup="true"
-                aria-label="Custom color picker"
-                className="components-button is-link"
+                className="components-button components-circular-option-picker__clear is-secondary is-small"
                 onClick={[Function]}
                 type="button"
               >
-                Custom color
+                Clear
               </button>
             </div>
-            <button
-              aria-describedby={null}
-              className="components-button components-circular-option-picker__clear is-secondary is-small"
-              onClick={[Function]}
-              type="button"
-            >
-              Clear
-            </button>
           </div>
         </div>
       </div>

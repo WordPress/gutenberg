@@ -21,6 +21,8 @@ function render_block_core_site_title( $attributes ) {
 	$tag_name         = 'h1';
 	$align_class_name = empty( $attributes['textAlign'] ) ? '' : "has-text-align-{$attributes['textAlign']}";
 
+	$aria_current = is_home() || ( is_front_page() && 'page' === get_option( 'show_on_front' ) ) ? ' aria-current="page"' : '';
+
 	if ( isset( $attributes['level'] ) ) {
 		$tag_name = 0 === $attributes['level'] ? 'p' : 'h' . $attributes['level'];
 	}
@@ -29,6 +31,7 @@ function render_block_core_site_title( $attributes ) {
 		$link_attrs = array(
 			'href="' . get_bloginfo( 'url' ) . '"',
 			'rel="home"',
+			$aria_current,
 		);
 		if ( '_blank' === $attributes['linkTarget'] ) {
 			$link_attrs[] = 'target="_blank"';

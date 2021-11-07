@@ -189,10 +189,13 @@ export const ThumbWrapper = styled.span`
 	user-select: none;
 	width: ${ thumbSize }px;
 	border-radius: 50%;
-	transform: translateX( 4.5px );
 
 	${ thumbColor };
 	${ rtl( { marginLeft: -10 } ) };
+	${ rtl(
+		{ transform: 'translateX( 4.5px )' },
+		{ transform: 'translateX( -4.5px )' }
+	) };
 `;
 
 const thumbFocus = ( { isFocused } ) => {

@@ -2,10 +2,6 @@
 $blocks-block__margin: 0.5em;
 
 .wp-block-buttons {
-	display: flex;
-	flex-direction: row;
-	flex-wrap: wrap;
-	gap: var(--wp--style--block-gap, $blocks-block__margin);
 
 	&.is-vertical {
 		flex-direction: column;

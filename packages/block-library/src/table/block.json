@@ -129,6 +129,17 @@
 			"__experimentalSkipSerialization": true,
 			"gradients": true
 		},
+		"typography": {
+			"fontSize": true,
+			"lineHeight": true,
+			"__experimentalFontStyle": true,
+			"__experimentalFontWeight": true,
+			"__experimentalLetterSpacing": true,
+			"__experimentalTextTransform": true,
+			"__experimentalDefaultControls": {
+				"fontSize": true
+			}
+		},
 		"__experimentalBorder": {
 			"__experimentalSkipSerialization": true,
 			"color": true,

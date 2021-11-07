@@ -17,6 +17,13 @@ const openFontSizeSelectControl = async () => {
 	return selectControl.click();
 };
 
+const openTypographyToolsPanelMenu = async () => {
+	const toggleSelector =
+		"//div[contains(@class, 'typography-block-support-panel')]//button[contains(@class, 'components-dropdown-menu__toggle')]";
+	const toggle = await page.waitForXPath( toggleSelector );
+	return toggle.click();
+};
+
 const FONT_SIZE_TOGGLE_GROUP_SELECTOR =
 	"//div[contains(@class, 'components-font-size-picker__controls')]//div[contains(@class, 'components-toggle-group-control')]";
 
@@ -122,11 +129,11 @@ describe( 'Font Size Picker', () => {
 			<!-- /wp:paragraph -->"
 		` );
 		} );
-		it( 'should reset a named font size using the reset button', async () => {
+		it( 'should reset a named font size using the tools panel menu', async () => {
 			// Create a paragraph block with some content.
 			await clickBlockAppender();
 			await page.keyboard.type(
-				'Paragraph with font size reset using button'
+				'Paragraph with font size reset using tools panel menu'
 			);
 
 			await openFontSizeSelectControl();
@@ -134,19 +141,17 @@ describe( 'Font Size Picker', () => {
 			await page.keyboard.press( 'Enter' );
 			expect( await getEditedPostContent() ).toMatchInlineSnapshot( `
 			"<!-- wp:paragraph {\\"fontSize\\":\\"normal\\"} -->
-			<p class=\\"has-normal-font-size\\">Paragraph with font size reset using button</p>
+			<p class=\\"has-normal-font-size\\">Paragraph with font size reset using tools panel menu</p>
 			<!-- /wp:paragraph -->"
 		` );
 
-			await toggleCustomInput( true );
-			await page.keyboard.press( 'Tab' );
-			await page.keyboard.press( 'Tab' );
-			await page.keyboard.press( 'Tab' );
+			// Open Typography ToolsPanel, font size will be first in menu and gain focus.
+			await openTypographyToolsPanelMenu();
 
 			await page.keyboard.press( 'Enter' );
 			expect( await getEditedPostContent() ).toMatchInlineSnapshot( `
 			"<!-- wp:paragraph -->
-			<p>Paragraph with font size reset using button</p>
+			<p>Paragraph with font size reset using tools panel menu</p>
 			<!-- /wp:paragraph -->"
 		` );
 		} );
@@ -205,29 +210,27 @@ describe( 'Font Size Picker', () => {
 		` );
 		} );
 
-		it( 'should reset a named font size using the reset button', async () => {
+		it( 'should reset a named font size using the tools panel menu', async () => {
 			// Create a paragraph block with some content.
 			await clickBlockAppender();
 			await page.keyboard.type(
-				'Paragraph with font size reset using button'
+				'Paragraph with font size reset using tools panel menu'
 			);
 
 			await clickFontSizeButtonByLabel( 'Small' );
 			expect( await getEditedPostContent() ).toMatchInlineSnapshot( `
 			"<!-- wp:paragraph {\\"fontSize\\":\\"small\\"} -->
-			<p class=\\"has-small-font-size\\">Paragraph with font size reset using button</p>
+			<p class=\\"has-small-font-size\\">Paragraph with font size reset using tools panel menu</p>
 			<!-- /wp:paragraph -->"
 		` );
 
-			await toggleCustomInput( true );
-			await page.keyboard.press( 'Tab' );
-			await page.keyboard.press( 'Tab' );
-			await page.keyboard.press( 'Tab' );
+			// Open Typography ToolsPanel, font size will be first in menu and gain focus.
+			await openTypographyToolsPanelMenu();
 
 			await page.keyboard.press( 'Enter' );
 			expect( await getEditedPostContent() ).toMatchInlineSnapshot( `
 			"<!-- wp:paragraph -->
-			<p>Paragraph with font size reset using button</p>
+			<p>Paragraph with font size reset using tools panel menu</p>
 			<!-- /wp:paragraph -->"
 		` );
 		} );

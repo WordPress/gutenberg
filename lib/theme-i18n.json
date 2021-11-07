@@ -6,29 +6,9 @@
 						"name": "Font size name"
 					}
 				],
-				"fontStyles": [
-					{
-						"name": "Font style name"
-					}
-				],
-				"fontWeights": [
-					{
-						"name": "Font weight name"
-					}
-				],
 				"fontFamilies": [
 					{
 						"name": "Font family name"
-					}
-				],
-				"textTransforms": [
-					{
-						"name": "Text transform name"
-					}
-				],
-				"textDecorations": [
-					{
-						"name": "Text decoration name"
 					}
 				]
 		},
@@ -57,29 +37,9 @@
 							"name": "Font size name"
 						}
 					],
-					"fontStyles": [
-						{
-							"name": "Font style name"
-						}
-					],
-					"fontWeights": [
-						{
-							"name": "Font weight name"
-						}
-					],
 					"fontFamilies": [
 						{
 							"name": "Font family name"
-						}
-					],
-					"textTransforms": [
-						{
-							"name": "Text transform name"
-						}
-					],
-					"textDecorations": [
-						{
-							"name": "Text decoration name"
 						}
 					]
 				},

@@ -1,9 +1,9 @@
 # SlotFills Reference
 
 Slot and Fill are components that have been exposed to allow developers to inject items into some predefined places in the Gutenberg admin experience.
-Please see the [SlotFill component docs](https://wordpress.org/gutenberg/handbook/reference-guides/components/slot-fill/) for more details.
+Please see the [SlotFill component docs](/packages/components/src/slot-fill/README.md) for more details.
 
-In order to use them, we must leverage the [@wordpress/plugins](https://wordpress.org/gutenberg/handbook/reference-guides/packages/packages-plugins/) api to register a plugin that will inject our items.
+In order to use them, we must leverage the [@wordpress/plugins](/packages/plugins/README.md) api to register a plugin that will inject our items.
 
 ## Usage overview
 

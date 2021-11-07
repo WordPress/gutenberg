@@ -277,3 +277,14 @@ export const canInsertBlockInWidgetArea = createRegistrySelector(
 		);
 	}
 );
+
+/**
+ * Returns true if the list view is opened.
+ *
+ * @param {Object} state Global application state.
+ *
+ * @return {boolean} Whether the list view is opened.
+ */
+export function isListViewOpened( state ) {
+	return state.listViewPanel;
+}
