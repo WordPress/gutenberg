@@ -465,7 +465,7 @@ button.wp-block-navigation-item__content {
 				// Apply top padding to nested submenus.
 				.wp-block-navigation__submenu-container,
 				.wp-block-navigation__container {
-					padding-top: var(--wp--style--block-gap, 2em);
+					padding-top: var(--wp--style--block-row-gap, 2em);
 				}
 			}
 

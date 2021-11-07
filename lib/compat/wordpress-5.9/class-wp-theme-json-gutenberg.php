@@ -175,7 +175,7 @@ class WP_Theme_JSON_Gutenberg {
 		'padding-bottom'                => array( 'spacing', 'padding', 'bottom' ),
 		'padding-left'                  => array( 'spacing', 'padding', 'left' ),
 		'--wp--style--block-gap'        => array( 'spacing', 'blockGap' ),
-		'--wp--style--block-row-gap'    => array( 'spacing', 'blockGap', 'row'),
+		'--wp--style--block-row-gap'    => array( 'spacing', 'blockGap', 'row' ),
 		'--wp--style--block-column-gap' => array( 'spacing', 'blockGap', 'column' ),
 		'text-decoration'               => array( 'typography', 'textDecoration' ),
 		'text-transform'                => array( 'typography', 'textTransform' ),

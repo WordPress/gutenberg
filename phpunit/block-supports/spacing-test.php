@@ -7,9 +7,11 @@
  */
 
 class WP_Block_Supports_Spacing_Test extends WP_UnitTestCase {
-	private $sample_block_content = '<div class="wp-block-test-block">Test</div>';
-	private $test_gap_block_value = array();
-	private $test_gap_block_args  = array();
+	private $sample_block_content              = '<div class="wp-block-test-block">Test</div>';
+	private $test_gap_block_value              = array();
+	private $test_gap_block_axial_value        = array();
+	private $test_gap_block_single_axial_value = array();
+	private $test_gap_block_args               = array();
 
 	function setUp() {
 		parent::setUp();
@@ -33,6 +35,33 @@ class WP_Block_Supports_Spacing_Test extends WP_UnitTestCase {
 				),
 			),
 		);
+
+		$this->test_gap_block_axial_value = array(
+			'blockName' => 'test/test-block',
+			'attrs'     => array(
+				'style' => array(
+					'spacing' => array(
+						'blockGap' => array(
+							'row'    => '44px',
+							'column' => '33px',
+						),
+					),
+				),
+			),
+		);
+
+		$this->test_gap_block_single_axial_value = array(
+			'blockName' => 'test/test-block',
+			'attrs'     => array(
+				'style' => array(
+					'spacing' => array(
+						'blockGap' => array(
+							'row' => '55px',
+						),
+					),
+				),
+			),
+		);
 	}
 
 	function tearDown() {
@@ -49,7 +78,33 @@ class WP_Block_Supports_Spacing_Test extends WP_UnitTestCase {
 		);
 
 		$this->assertSame(
-			'<div style="--wp--style--block-gap: 3em" class="wp-block-test-block">Test</div>',
+			'<div style="--wp--style--block-gap: 3em 3em; --wp--style--block-row-gap: 3em; --wp--style--block-column-gap: 3em;" class="wp-block-test-block">Test</div>',
+			$render_output
+		);
+	}
+
+	function test_spacing_axial_gap_block_support_renders_block_inline_style() {
+		register_block_type( 'test/test-block', $this->test_gap_block_args );
+		$render_output = gutenberg_render_spacing_gap_support(
+			$this->sample_block_content,
+			$this->test_gap_block_axial_value
+		);
+
+		$this->assertSame(
+			'<div style="--wp--style--block-gap: 44px 33px; --wp--style--block-row-gap: 44px; --wp--style--block-column-gap: 33px;" class="wp-block-test-block">Test</div>',
+			$render_output
+		);
+	}
+
+	function test_spacing_single_axial_gap_block_support_renders_block_inline_style() {
+		register_block_type( 'test/test-block', $this->test_gap_block_args );
+		$render_output = gutenberg_render_spacing_gap_support(
+			$this->sample_block_content,
+			$this->test_gap_block_single_axial_value
+		);
+
+		$this->assertSame(
+			'<div style="--wp--style--block-row-gap: 55px;" class="wp-block-test-block">Test</div>',
 			$render_output
 		);
 	}
@@ -62,7 +117,7 @@ class WP_Block_Supports_Spacing_Test extends WP_UnitTestCase {
 		);
 
 		$this->assertSame(
-			'<div style="--wp--style--block-gap: 3em" class="wp-test-block"><p style="color: red;">Test</p></div>',
+			'<div style="--wp--style--block-gap: 3em 3em; --wp--style--block-row-gap: 3em; --wp--style--block-column-gap: 3em;" class="wp-test-block"><p style="color: red;">Test</p></div>',
 			$render_output
 		);
 	}
@@ -75,7 +130,7 @@ class WP_Block_Supports_Spacing_Test extends WP_UnitTestCase {
 		);
 
 		$this->assertSame(
-			'<div style="--wp--style--block-gap: 3em"><p>Test</p></div>',
+			'<div style="--wp--style--block-gap: 3em 3em; --wp--style--block-row-gap: 3em; --wp--style--block-column-gap: 3em;"><p>Test</p></div>',
 			$render_output
 		);
 	}
@@ -88,7 +143,7 @@ class WP_Block_Supports_Spacing_Test extends WP_UnitTestCase {
 		);
 
 		$this->assertSame(
-			'<div class="wp-test-block" style="--wp--style--block-gap: 3em; background: green;"><p style="color: red;">Test</p></div>',
+			'<div class="wp-test-block" style="--wp--style--block-gap: 3em 3em; --wp--style--block-row-gap: 3em; --wp--style--block-column-gap: 3em; background: green;"><p style="color: red;">Test</p></div>',
 			$render_output
 		);
 	}
