@@ -35,7 +35,7 @@ import { store as noticesStore } from '@wordpress/notices';
  * Internal dependencies
  */
 import TextEditor from '../text-editor';
-import VisualEditorOrPluginPreview from '../visual-editor/visual-editor-or-plugin-preview';
+import VisualEditor from '../visual-editor';
 import EditPostKeyboardShortcuts from '../keyboard-shortcuts';
 import KeyboardShortcutHelpModal from '../keyboard-shortcut-help-modal';
 import EditPostPreferencesModal from '../preferences-modal';
@@ -240,7 +240,7 @@ function Layout( { styles } ) {
 							<TextEditor />
 						) }
 						{ isRichEditingEnabled && mode === 'visual' && (
-							<VisualEditorOrPluginPreview styles={ styles } />
+							<VisualEditor styles={ styles } />
 						) }
 						{ isMobileViewport && sidebarIsOpened && (
 							<ScrollLock />

@@ -30,7 +30,12 @@ import {
 	__experimentalUseNoRecursiveRenders as useNoRecursiveRenders,
 } from '@wordpress/block-editor';
 import { useRef, useMemo } from '@wordpress/element';
-import { Button, __unstableMotion as motion } from '@wordpress/components';
+import {
+	__experimentalUseSlot as useSlot,
+	__unstableMotion as motion,
+	Button,
+	Slot,
+} from '@wordpress/components';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { useMergeRefs } from '@wordpress/compose';
 import { arrowLeft } from '@wordpress/icons';
@@ -80,6 +85,24 @@ function MaybeIframe( {
 			{ children }
 		</Iframe>
 	);
+}
+
+function PluginPreviewContent( { children } ) {
+	const previewContent = children;
+	const previewId = useSelect(
+		( select ) =>
+			select( editPostStore ).__experimentalGetPreviewDeviceType(),
+		[]
+	);
+	const previewSlotName = `PluginPreview/${ previewId }`;
+	const slot = useSlot( previewSlotName );
+	const hasFills = Boolean( slot.fills && slot.fills.length );
+
+	if ( ! hasFills ) {
+		return previewContent;
+	}
+
+	return <Slot name={ previewSlotName } fillProps={ { previewContent } } />;
 }
 
 export default function VisualEditor( { styles } ) {
@@ -219,39 +242,38 @@ export default function VisualEditor( { styles } ) {
 					initial={ desktopCanvasStyles }
 					className={ previewMode }
 				>
-					<MaybeIframe
-						shouldIframe={
-							isTemplateMode ||
-							deviceType === 'Tablet' ||
-							deviceType === 'Mobile'
-						}
-						contentRef={ contentRef }
-						styles={ styles }
-						assets={ assets }
-						style={ { paddingBottom } }
-					>
-						{ themeSupportsLayout && ! isTemplateMode && (
-							<LayoutStyle
-								selector=".edit-post-visual-editor__post-title-wrapper, .block-editor-block-list__layout.is-root-container"
-								layout={ defaultLayout }
-							/>
-						) }
-						{ ! isTemplateMode && (
-							<div className="edit-post-visual-editor__post-title-wrapper">
-								<PostTitle />
-							</div>
-						) }
-						<RecursionProvider>
-							<BlockList
-								className={
-									isTemplateMode
-										? 'wp-site-blocks'
-										: undefined
-								}
-								__experimentalLayout={ layout }
-							/>
-						</RecursionProvider>
-					</MaybeIframe>
+					<PluginPreviewContent>
+						<MaybeIframe
+							shouldIframe={
+								isTemplateMode || deviceType !== 'Desktop'
+							}
+							contentRef={ contentRef }
+							styles={ styles }
+							style={ { paddingBottom } }
+						>
+							{ themeSupportsLayout && ! isTemplateMode && (
+								<LayoutStyle
+									selector=".edit-post-visual-editor__post-title-wrapper, .block-editor-block-list__layout.is-root-container"
+									layout={ defaultLayout }
+								/>
+							) }
+							{ ! isTemplateMode && (
+								<div className="edit-post-visual-editor__post-title-wrapper">
+									<PostTitle />
+								</div>
+							) }
+							<RecursionProvider>
+								<BlockList
+									className={
+										isTemplateMode
+											? 'wp-site-blocks'
+											: undefined
+									}
+									__experimentalLayout={ layout }
+								/>
+							</RecursionProvider>
+						</MaybeIframe>
+					</PluginPreviewContent>
 				</motion.div>
 			</motion.div>
 			<__unstableBlockSettingsMenuFirstItem>

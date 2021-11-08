@@ -4,9 +4,9 @@
 import {
 	__experimentalUseSlot as useSlot,
 	createSlotFill,
-	Fill,
 	MenuItem,
 	MenuGroup,
+	Fill,
 } from '@wordpress/components';
 import { check } from '@wordpress/icons';
 
@@ -21,6 +21,9 @@ const {
  * The children of this component will be displayed in the main area of the
  * block editor, instead of the `VisualEditor` component.
  *
+ * The wrapper expects a function that returns an element. The `VisualEditor`
+ * component is fed in as a prop to be used.
+ *
  * The `title` and `icon` are used to populate the Preview menu item.
  *
  * @param {Object}    props          Component properties.
@@ -29,11 +32,21 @@ const {
  * @param {string}    props.name     A unique name of the custom preview.
  * @param {Function}  props.onClick  Menu item click handler, e.g. for previews
  *                                   that provide no content (`children`).
+ * @param {Function}  props.wrapper  Wrapper for visual editor content.
  * @param {string}    props.title    Menu item title.
  */
-function PluginPreview( { children, icon, name, onClick, title, ...props } ) {
-	const previewSlotName = `PluginPreview/${ name }`;
-	const previewSlot = useSlot( previewSlotName );
+function PluginPreview( {
+	children,
+	icon,
+	name,
+	onClick,
+	title,
+	wrapper,
+	...props
+} ) {
+	if ( ! name || ( ! children && ! wrapper ) ) {
+		name = 'Desktop';
+	}
 
 	return (
 		<>
@@ -42,9 +55,7 @@ function PluginPreview( { children, icon, name, onClick, title, ...props } ) {
 					<MenuItem
 						className={ name }
 						onClick={ ( ...args ) => {
-							if ( name && previewSlot.fills?.length > 0 ) {
-								setDeviceType( name );
-							}
+							setDeviceType( name );
 							if ( onClick ) {
 								onClick( ...args );
 							}
@@ -56,7 +67,18 @@ function PluginPreview( { children, icon, name, onClick, title, ...props } ) {
 					</MenuItem>
 				) }
 			</PluginPreviewMenuFill>
-			{ children && <Fill name={ previewSlotName }>{ children }</Fill> }
+
+			{ children ? (
+				<Fill name={ `PluginPreview/${ name }` } { ...props }>
+					{ children }
+				</Fill>
+			) : (
+				typeof wrapper === 'function' && (
+					<Fill name={ `PluginPreview/${ name }` } { ...props }>
+						{ ( { previewContent } ) => wrapper( previewContent ) }
+					</Fill>
+				)
+			) }
 		</>
 	);
 }

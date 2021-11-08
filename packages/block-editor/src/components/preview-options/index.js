@@ -19,7 +19,11 @@ export default function PreviewOptions( {
 	deviceType,
 	setDeviceType,
 } ) {
-	const coreDeviceTypes = [ 'Desktop', 'Tablet', 'Mobile' ];
+	const coreDeviceTypes = [
+		{ type: 'Desktop', label: __( 'Desktop' ) },
+		{ type: 'Tablet', label: __( 'Tablet' ) },
+		{ type: 'Mobile', label: __( 'Mobile' ) },
+	];
 
 	const isMobile = useViewportMatch( 'small', '<' );
 	if ( isMobile ) return null;
@@ -50,12 +54,12 @@ export default function PreviewOptions( {
 					<MenuGroup>
 						{ coreDeviceTypes.map( ( device ) => (
 							<MenuItem
-								key={ device }
+								key={ device.type }
 								className="block-editor-post-preview__button-resize"
-								onClick={ () => setDeviceType( device ) }
-								icon={ deviceType === device && check }
+								onClick={ () => setDeviceType( device.type ) }
+								icon={ deviceType === device.type && check }
 							>
-								{ device }
+								{ device.label }
 							</MenuItem>
 						) ) }
 					</MenuGroup>
