@@ -369,6 +369,10 @@
 			justify-content: flex-start;
 			// Inherit alignment settings from container.
 			align-items: var(--layout-justification-setting, inherit);
+
+			// Always align the contents of the menu to the top.
+			justify-content: flex-start;
+
 			// Allow menu to scroll.
 			overflow: auto;
 			padding: 0;
@@ -411,6 +415,8 @@
 			// A default padding is added to submenu items. It's not appropriate inside the modal.
 			.wp-block-navigation-item__content {
 				padding: 0;
+				// When navigation is set to open on click, the `button` centers when it's full-width.
+				text-align: left;
 			}
 
 			// Default column display for overlay menu contents.
