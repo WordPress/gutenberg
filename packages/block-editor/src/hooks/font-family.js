@@ -15,6 +15,8 @@ import TokenList from '@wordpress/token-list';
  */
 import useSetting from '../components/use-setting';
 import FontFamilyControl from '../components/font-family';
+import { shouldSkipSerialization } from './style';
+import { TYPOGRAPHY_SUPPORT_KEY } from './typography';
 
 export const FONT_FAMILY_SUPPORT_KEY = 'typography.__experimentalFontFamily';
 
@@ -56,9 +58,10 @@ function addSaveProps( props, blockType, attributes ) {
 	}
 
 	if (
-		hasBlockSupport(
+		shouldSkipSerialization(
 			blockType,
-			'typography.__experimentalSkipSerialization'
+			TYPOGRAPHY_SUPPORT_KEY,
+			'fontFamily'
 		)
 	) {
 		return props;
