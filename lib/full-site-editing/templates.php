@@ -62,29 +62,6 @@ function gutenberg_register_template_post_type() {
 add_action( 'init', 'gutenberg_register_template_post_type' );
 
 /**
- * Get the edit link for templates.
- *
- * @param string $link    The original link.
- * @param int    $post_id The custom post id.
- */
-function gutenberg_get_edit_template_link( $link, $post_id ) {
-	$templates = gutenberg_get_block_templates(
-		array( 'wp_id' => $post_id ),
-		'wp_template'
-	);
-	$template  = $templates ? $templates[0] : null;
-
-	if ( ! $template ) {
-		return $link;
-	}
-
-	$id = urlencode( $template->id );
-
-	return "themes.php?page=gutenberg-edit-site&postId=$id&postType=wp_template";
-}
-add_filter( 'get_edit_post_link', 'gutenberg_get_edit_template_link', 10, 2 );
-
-/**
  * Registers block editor 'wp_theme' taxonomy.
  */
 function gutenberg_register_wp_theme_taxonomy() {
