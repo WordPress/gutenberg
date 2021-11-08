@@ -3,7 +3,7 @@
 	"name": "core/social-links",
 	"title": "Social Icons",
 	"category": "widgets",
-	"description": "Display icons linking to your social media profiles or websites.",
+	"description": "Display icons linking to your social media profiles or sites.",
 	"keywords": [ "links" ],
 	"textdomain": "default",
 	"attributes": {
