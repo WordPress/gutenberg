@@ -7,8 +7,11 @@
 		vertical-align: bottom;
 	}
 
-	&:not(.is-style-rounded) img {
-		border-radius: inherit;
+	&:not(.is-style-rounded) {
+		> a,
+		img {
+			border-radius: inherit;
+		}
 	}
 
 	&.aligncenter {
