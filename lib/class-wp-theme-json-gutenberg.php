@@ -82,10 +82,10 @@ class WP_Theme_JSON_Gutenberg {
 
 	const VALID_SETTINGS = array(
 		'border'     => array(
-			'color'        => null,
-			'customRadius' => null,
-			'style'        => null,
-			'width'        => null,
+			'color'  => null,
+			'radius' => null,
+			'style'  => null,
+			'width'  => null,
 		),
 		'color'      => array(
 			'background'     => null,
@@ -104,22 +104,22 @@ class WP_Theme_JSON_Gutenberg {
 			'wideSize'    => null,
 		),
 		'spacing'    => array(
-			'blockGap'      => null,
-			'customMargin'  => null,
-			'customPadding' => null,
-			'units'         => null,
+			'blockGap' => null,
+			'margin'   => null,
+			'padding'  => null,
+			'units'    => null,
 		),
 		'typography' => array(
-			'customFontSize'   => null,
-			'customLineHeight' => null,
-			'dropCap'          => null,
-			'fontFamilies'     => null,
-			'fontSizes'        => null,
-			'fontStyle'        => null,
-			'fontWeight'       => null,
-			'letterSpacing'    => null,
-			'textDecoration'   => null,
-			'textTransform'    => null,
+			'customFontSize' => null,
+			'dropCap'        => null,
+			'fontFamilies'   => null,
+			'fontSizes'      => null,
+			'fontStyle'      => null,
+			'fontWeight'     => null,
+			'letterSpacing'  => null,
+			'lineHeight'     => null,
+			'textDecoration' => null,
+			'textTransform'  => null,
 		),
 	);
 
@@ -273,7 +273,7 @@ class WP_Theme_JSON_Gutenberg {
 		'h6'   => 'h6',
 	);
 
-	const LATEST_SCHEMA = 1;
+	const LATEST_SCHEMA = 2;
 
 	/**
 	 * Constructor.
@@ -286,7 +286,7 @@ class WP_Theme_JSON_Gutenberg {
 			$origin = 'theme';
 		}
 
-		$theme_json = self::migrate( $theme_json );
+		$theme_json = WP_Theme_JSON_Schema_Gutenberg::migrate( $theme_json );
 
 		$valid_block_names   = array_keys( self::get_blocks_metadata() );
 		$valid_element_names = array_keys( self::ELEMENTS );
@@ -303,27 +303,6 @@ class WP_Theme_JSON_Gutenberg {
 				}
 			}
 		}
-	}
-
-	/**
-	 * Function that migrates a given theme.json structure to the last version.
-	 *
-	 * @param array $theme_json The structure to migrate.
-	 *
-	 * @return array The structure in the last version.
-	 */
-	private static function migrate( $theme_json ) {
-		if ( ! isset( $theme_json['version'] ) || 0 === $theme_json['version'] ) {
-			$theme_json = WP_Theme_JSON_Schema_V0_To_V1::migrate( $theme_json );
-		}
-
-		// Provide backwards compatibility for settings that did not land in 5.8
-		// and have had their `custom` prefixed removed since.
-		if ( 1 === $theme_json['version'] ) {
-			$theme_json = WP_Theme_JSON_Schema_V1_Remove_Custom_Prefixes::migrate( $theme_json );
-		}
-
-		return $theme_json;
 	}
 
 	/**
@@ -607,7 +586,7 @@ class WP_Theme_JSON_Gutenberg {
 			if ( is_array( $value_path ) ) {
 				$path_string = implode( '.', $value_path );
 				if (
-					isset( self::PROTECTED_PROPERTIES[ $path_string ] ) &&
+					array_key_exists( $path_string, self::PROTECTED_PROPERTIES ) &&
 					_wp_array_get( $settings, self::PROTECTED_PROPERTIES[ $path_string ], null ) === null
 				) {
 					continue;
@@ -1086,8 +1065,8 @@ class WP_Theme_JSON_Gutenberg {
 	 *     }
 	 *   },
 	 *   'core/paragraph': {
-	 *     'spacing': {
-	 *       'customPadding': true
+	 *     'typography': {
+	 *       'customFontSize': true
 	 *     }
 	 *   }
 	 * }
@@ -1447,7 +1426,7 @@ class WP_Theme_JSON_Gutenberg {
 	public static function remove_insecure_properties( $theme_json ) {
 		$sanitized = array();
 
-		$theme_json = self::migrate( $theme_json );
+		$theme_json = WP_Theme_JSON_Schema_Gutenberg::migrate( $theme_json );
 
 		$valid_block_names   = array_keys( self::get_blocks_metadata() );
 		$valid_element_names = array_keys( self::ELEMENTS );
@@ -1545,7 +1524,7 @@ class WP_Theme_JSON_Gutenberg {
 			if ( ! isset( $theme_settings['settings']['typography'] ) ) {
 				$theme_settings['settings']['typography'] = array();
 			}
-			$theme_settings['settings']['typography']['customLineHeight'] = $settings['enableCustomLineHeight'];
+			$theme_settings['settings']['typography']['lineHeight'] = $settings['enableCustomLineHeight'];
 		}
 
 		if ( isset( $settings['enableCustomUnits'] ) ) {
@@ -1593,7 +1572,7 @@ class WP_Theme_JSON_Gutenberg {
 			if ( ! isset( $theme_settings['settings']['spacing'] ) ) {
 				$theme_settings['settings']['spacing'] = array();
 			}
-			$theme_settings['settings']['spacing']['customPadding'] = $settings['enableCustomSpacing'];
+			$theme_settings['settings']['spacing']['padding'] = $settings['enableCustomSpacing'];
 		}
 
 		// Things that didn't land in core yet, so didn't have a setting assigned.

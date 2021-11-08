@@ -13,22 +13,22 @@
 					"description": "Settings related to borders.\nGutenberg plugin required.",
 					"type": "object",
 					"properties": {
-						"customColor": {
+						"color": {
 							"description": "Allow users to set custom border colors.\nGutenberg plugin required.",
 							"type": "boolean",
 							"default": false
 						},
-						"customRadius": {
+						"radius": {
 							"description": "Allow users to set custom border radius.\nGutenberg plugin required.",
 							"type": "boolean",
 							"default": false
 						},
-						"customStyle": {
+						"style": {
 							"description": "Allow users to set custom border styles.\nGutenberg plugin required.",
 							"type": "boolean",
 							"default": false
 						},
-						"customWidth": {
+						"width": {
 							"description": "Allow users to set custom border widths.\nGutenberg plugin required.",
 							"type": "boolean",
 							"default": false
@@ -173,12 +173,12 @@
 							],
 							"default": null
 						},
-						"customMargin": {
+						"margin": {
 							"description": "Allow users to set a custom margin.\nSince 5.8.",
 							"type": "boolean",
 							"default": false
 						},
-						"customPadding": {
+						"padding": {
 							"description": "Allow users to set a custom padding.\nSince 5.8.",
 							"type": "boolean",
 							"default": false
@@ -203,32 +203,32 @@
 							"type": "boolean",
 							"default": true
 						},
-						"customFontStyle": {
+						"fontStyle": {
 							"description": "Allow users to set custom font styles.\nGutenberg plugin required.",
 							"type": "boolean",
 							"default": true
 						},
-						"customFontWeight": {
+						"fontWeight": {
 							"description": "Allow users to set custom font weights.\nGutenberg plugin required.",
 							"type": "boolean",
 							"default": true
 						},
-						"customLetterSpacing": {
+						"letterSpacing": {
 							"description": "Allow users to set custom letter spacing.\nGutenberg plugin required.",
 							"type": "boolean",
 							"default": true
 						},
-						"customLineHeight": {
+						"lineHeight": {
 							"description": "Allow users to set custom line height.\nSince 5.8.",
 							"type": "boolean",
 							"default": false
 						},
-						"customTextDecorations": {
+						"textDecoration": {
 							"description": "Allow users to set custom text decorations.\nGutenberg plugin required.",
 							"type": "boolean",
 							"default": true
 						},
-						"customTextTransforms": {
+						"textTransform": {
 							"description": "Allow users to set custom text transforms.\nGutenberg plugin required.",
 							"type": "boolean",
 							"default": true
@@ -343,6 +343,30 @@
 				"core/columns": {
 					"$ref": "#/definitions/settingsPropertiesComplete"
 				},
+				"core/comment-author-name": {
+					"$ref": "#/definitions/settingsPropertiesComplete"
+				},
+				"core/comment-author-avatar": {
+					"$ref": "#/definitions/settingsPropertiesComplete"
+				},
+				"core/comment-content": {
+					"$ref": "#/definitions/settingsPropertiesComplete"
+				},
+				"core/comment-date": {
+					"$ref": "#/definitions/settingsPropertiesComplete"
+				},
+				"core/comment-edit-link": {
+					"$ref": "#/definitions/settingsPropertiesComplete"
+				},
+				"core/comment-reply-link": {
+					"$ref": "#/definitions/settingsPropertiesComplete"
+				},
+				"core/comment-template": {
+					"$ref": "#/definitions/settingsPropertiesComplete"
+				},
+				"core/comments-query-loop": {
+					"$ref": "#/definitions/settingsPropertiesComplete"
+				},
 				"core/cover": {
 					"$ref": "#/definitions/settingsPropertiesComplete"
 				},
@@ -410,18 +434,6 @@
 					"$ref": "#/definitions/settingsPropertiesComplete"
 				},
 				"core/post-author": {
-					"$ref": "#/definitions/settingsPropertiesComplete"
-				},
-				"core/post-comment": {
-					"$ref": "#/definitions/settingsPropertiesComplete"
-				},
-				"core/post-comment-author": {
-					"$ref": "#/definitions/settingsPropertiesComplete"
-				},
-				"core/post-comment-content": {
-					"$ref": "#/definitions/settingsPropertiesComplete"
-				},
-				"core/post-comment-date": {
 					"$ref": "#/definitions/settingsPropertiesComplete"
 				},
 				"core/post-comments": {
@@ -788,6 +800,30 @@
 				"core/columns": {
 					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
 				},
+				"core/comment-author-name": {
+					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
+				},
+				"core/comment-author-avatar": {
+					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
+				},
+				"core/comment-content": {
+					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
+				},
+				"core/comment-date": {
+					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
+				},
+				"core/comment-edit-link": {
+					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
+				},
+				"core/comment-reply-link": {
+					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
+				},
+				"core/comment-template": {
+					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
+				},
+				"core/comments-query-loop": {
+					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
+				},
 				"core/cover": {
 					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
 				},
@@ -855,18 +891,6 @@
 					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
 				},
 				"core/post-author": {
-					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
-				},
-				"core/post-comment": {
-					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
-				},
-				"core/post-comment-author": {
-					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
-				},
-				"core/post-comment-content": {
-					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
-				},
-				"core/post-comment-date": {
 					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
 				},
 				"core/post-comments": {

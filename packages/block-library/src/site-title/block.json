@@ -43,7 +43,14 @@
 			"__experimentalTextTransform": true,
 			"__experimentalFontStyle": true,
 			"__experimentalFontWeight": true,
-			"__experimentalLetterSpacing": true
+			"__experimentalLetterSpacing": true,
+			"__experimentalDefaultControls": {
+				"fontSize": true,
+				"lineHeight": true,
+				"fontAppearance": true,
+				"letterSpacing": true,
+				"textTransform": true
+			}
 		}
 	},
 	"editorStyle": "wp-block-site-title-editor"

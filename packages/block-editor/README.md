@@ -680,6 +680,18 @@ _Returns_
 
 -   `Object`: Props to pass to the element to mark as a block.
 
+### useCachedTruthy
+
+Keeps an up-to-date copy of the passed value and returns it. If value becomes falsy, it will return the last truthy copy.
+
+_Parameters_
+
+-   _value_ `any`:
+
+_Returns_
+
+-   `any`: value
+
 ### useInnerBlocksProps
 
 This hook is used to lightly mark an element as an inner blocks wrapper

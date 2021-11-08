@@ -4,10 +4,14 @@
 		"name": "core/navigation",
 		"isValid": true,
 		"attributes": {
-			"orientation": "horizontal",
 			"showSubmenuIcon": true,
 			"openSubmenusOnClick": false,
-			"overlayMenu": "mobile"
+			"overlayMenu": "mobile",
+			"layout": {
+				"type": "flex",
+				"justifyContent": "left",
+				"orientation": "horizontal"
+			}
 		},
 		"innerBlocks": [
 			{

@@ -1,7 +1,7 @@
 // The Page List block should inherit navigation styles when nested within it
 .wp-block-navigation {
 	.wp-block-page-list {
-		display: flex;
+		display: contents;
 		flex-wrap: wrap;
 		background-color: inherit;
 	}
@@ -10,27 +10,5 @@
 	// and must therefore inherit from the parent.
 	.wp-block-navigation-item {
 		background-color: inherit;
-	}
-}
-
-.is-vertical .wp-block-navigation__container,
-.is-open .wp-block-navigation__container {
-	.wp-block-page-list {
-		display: flex;
-	}
-}
-
-.is-open .wp-block-navigation__container {
-	.wp-block-page-list {
-		@include break-mobile() {
-			display: flex;
-		}
-	}
-}
-
-// space-between justification.
-.wp-block-page-list {
-	.items-justified-space-between & {
-		display: contents;
 	}
 }

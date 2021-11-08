@@ -260,8 +260,10 @@ class WP_REST_Menu_Locations_Controller extends WP_REST_Controller {
 		if ( $menu ) {
 			$taxonomy_object = get_taxonomy( 'nav_menu' );
 			if ( $taxonomy_object->show_in_rest ) {
-				$rest_base                         = ! empty( $taxonomy_object->rest_base ) ? $taxonomy_object->rest_base : $taxonomy_object->name;
-				$url                               = rest_url( sprintf( '__experimental/%s/%d', $rest_base, $menu ) );
+				$rest_base = ! empty( $taxonomy_object->rest_base ) ? $taxonomy_object->rest_base : $taxonomy_object->name;
+				$namespace = ! empty( $taxonomy_object->rest_namespace ) ? $taxonomy_object->rest_namespace : '__experimental';
+				$url       = rest_url( sprintf( '%s/%s/%d', $namespace, $rest_base, $menu ) );
+
 				$links['https://api.w.org/menu'][] = array(
 					'href'       => $url,
 					'embeddable' => true,

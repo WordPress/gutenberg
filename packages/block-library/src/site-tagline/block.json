@@ -3,7 +3,7 @@
 	"name": "core/site-tagline",
 	"title": "Site Tagline",
 	"category": "design",
-	"description": "Describe in a few words what the website is about. The tagline can be used in search results or when sharing on social networks even if it's not displayed in the theme design.",
+	"description": "Describe in a few words what the site is about. The tagline can be used in search results or when sharing on social networks even if it's not displayed in the theme design.",
 	"keywords": [ "description" ],
 	"textdomain": "default",
 	"attributes": {
@@ -28,7 +28,10 @@
 			"__experimentalTextTransform": true,
 			"__experimentalFontStyle": true,
 			"__experimentalFontWeight": true,
-			"__experimentalLetterSpacing": true
+			"__experimentalLetterSpacing": true,
+			"__experimentalDefaultControls": {
+				"fontSize": true
+			}
 		}
 	},
 	"editorStyle": "wp-block-site-tagline-editor"

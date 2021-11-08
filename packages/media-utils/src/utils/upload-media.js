@@ -128,7 +128,7 @@ export async function uploadMedia( {
 			triggerError( {
 				code: 'MIME_TYPE_NOT_ALLOWED_FOR_USER',
 				message: __(
-					'Sorry, this file type is not permitted for security reasons.'
+					'Sorry, you are not allowed to upload this file type.'
 				),
 				file: mediaFile,
 			} );

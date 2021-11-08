@@ -35,6 +35,10 @@ function gutenberg_remove_legacy_pages() {
 	if ( isset( $submenu['themes.php'] ) ) {
 		$indexes_to_remove = array();
 		foreach ( $submenu['themes.php'] as $index => $menu_item ) {
+			if ( false !== strpos( $menu_item[2], 'customize.php' ) && ! gutenberg_site_requires_customizer() ) {
+				$indexes_to_remove[] = $index;
+			}
+
 			if ( false !== strpos( $menu_item[2], 'gutenberg-widgets' ) ) {
 				$indexes_to_remove[] = $index;
 			}
@@ -60,11 +64,13 @@ function gutenberg_adminbar_items( $wp_admin_bar ) {
 		return;
 	}
 
-	// Remove customizer links.
-	$wp_admin_bar->remove_node( 'customize' );
-	$wp_admin_bar->remove_node( 'customize-background' );
-	$wp_admin_bar->remove_node( 'customize-header' );
-	$wp_admin_bar->remove_node( 'widgets' );
+	// Remove customizer link, if this site does not rely on them for plugins or theme options.
+	if ( ! gutenberg_site_requires_customizer() ) {
+		$wp_admin_bar->remove_node( 'customize' );
+		$wp_admin_bar->remove_node( 'customize-background' );
+		$wp_admin_bar->remove_node( 'customize-header' );
+		$wp_admin_bar->remove_node( 'widgets' );
+	}
 
 	// Add site-editor link.
 	if ( ! is_admin() && current_user_can( 'edit_theme_options' ) ) {
@@ -81,38 +87,17 @@ function gutenberg_adminbar_items( $wp_admin_bar ) {
 add_action( 'admin_bar_menu', 'gutenberg_adminbar_items', 50 );
 
 /**
- * Removes the legacy core components from the Customizer.
+ * Check if any plugin, or theme features, are using the Customizer.
  *
- * @param array $components Core Customizer components list.
- * @return array Modified components list.
+ * @return bool A boolean value indicating if Customizer support is needed.
  */
-function gutenberg_remove_customizer_components( $components ) {
-	if ( ! gutenberg_is_fse_theme() ) {
-		return $components;
+function gutenberg_site_requires_customizer() {
+	if ( has_action( 'customize_register' ) ) {
+		return true;
 	}
 
-	$index = array_search( 'nav_menus', $components, true );
-	if ( false !== $index ) {
-		unset( $components[ $index ] );
-	}
-
-	return $components;
+	return false;
 }
-add_filter( 'customize_loaded_components', 'gutenberg_remove_customizer_components' );
-
-/**
- * Removes lagecy Customizer sections for FSE themes.
- *
- * @param WP_Customize_Manager $wp_customize The customize manager instance.
- */
-function gutenberg_remove_customizer_sections( $wp_customize ) {
-	if ( ! gutenberg_is_fse_theme() ) {
-		return;
-	}
-
-	$wp_customize->remove_control( 'custom_css' );
-}
-add_action( 'customize_register', 'gutenberg_remove_customizer_sections', 50 );
 
 /**
  * Tells the script loader to load the scripts and styles of custom block on site editor screen.
