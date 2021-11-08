@@ -175,7 +175,11 @@ jest.mock(
 		} ) ),
 	} )
 );
-jest.mock( 'react-native/Libraries/Components/Clipboard/Clipboard', () => ( {
+
+// The mock provided by the package itself does not appear to work correctly.
+// Specifically, the mock provides a named export, where the module itself uses
+// a default export.
+jest.mock( '@react-native-clipboard/clipboard', () => ( {
 	getString: jest.fn( () => Promise.resolve( '' ) ),
 	setString: jest.fn(),
 } ) );

@@ -1,7 +1,8 @@
 /**
  * External dependencies
  */
-import { Platform, Clipboard } from 'react-native';
+import { Platform } from 'react-native';
+import Clipboard from '@react-native-clipboard/clipboard';
 /**
  * WordPress dependencies
  */

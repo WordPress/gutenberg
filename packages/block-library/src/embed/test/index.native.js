@@ -8,7 +8,8 @@ import {
 	waitFor,
 	within,
 } from 'test/helpers';
-import { Clipboard, Platform } from 'react-native';
+import { Platform } from 'react-native';
+import Clipboard from '@react-native-clipboard/clipboard';
 
 /**
  * WordPress dependencies
