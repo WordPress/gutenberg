@@ -658,7 +658,10 @@ _Returns_
 
 ### useBlockEditContext
 
-Undocumented declaration.
+The `useBlockEditContext` hook provides information about the block this hook is being used in. 
+It retuns an object with the `name`, `isSelected` state and the `clientId` of he block.  
+It is usefull if you want to create custom hooks that need access to the current blocks clientId
+but don't want to rely on the data getting passed in as a parameter. 
 
 ### useBlockProps
 
