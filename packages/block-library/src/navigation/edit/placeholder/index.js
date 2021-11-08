@@ -8,17 +8,17 @@ import {
 	DropdownMenu,
 	MenuGroup,
 	MenuItem,
+	__experimentalDivider as Divider,
 } from '@wordpress/components';
 import { store as coreStore } from '@wordpress/core-data';
 import { useDispatch } from '@wordpress/data';
 import { useCallback, useState, useEffect } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
-import { navigation, chevronDown, Icon } from '@wordpress/icons';
+import { navigation, Icon } from '@wordpress/icons';
 
 /**
  * Internal dependencies
  */
-
 import useNavigationEntities from '../../use-navigation-entities';
 import PlaceholderPreview from './placeholder-preview';
 import menuItemsToBlocks from '../../menu-items-to-blocks';
@@ -34,15 +34,16 @@ const ExistingMenusDropdown = ( {
 	onCreateFromMenu,
 } ) => {
 	const toggleProps = {
-		variant: 'primary',
+		variant: 'tertiary',
+		iconPosition: 'right',
 		className: 'wp-block-navigation-placeholder__actions__dropdown',
 	};
 	return (
 		<DropdownMenu
-			text={ __( 'Select existing menu' ) }
-			icon={ chevronDown }
+			text={ __( 'Existing menu' ) }
 			toggleProps={ toggleProps }
 			popoverProps={ { isAlternate: true } }
+			icon={ null }
 		>
 			{ ( { onClose } ) => (
 				<>
@@ -187,6 +188,20 @@ export default function NavigationPlaceholder( {
 
 	const { navigationMenus } = useNavigationMenu();
 
+	const dividerProps = {
+		orientation: 'vertical',
+	};
+	const dividerStyles = {
+		borderColor: 'black',
+		borderWidth: '0 1px 0 0',
+		borderStyle: 'solid',
+		width: '1px',
+		height: '18px',
+		marginTop: 'auto',
+		marginBottom: 'auto',
+		marginRight: '11px',
+	};
+
 	return (
 		<>
 			{ ( ! hasResolvedNavigationMenus || isStillLoading ) && (
@@ -201,6 +216,10 @@ export default function NavigationPlaceholder( {
 								<Icon icon={ navigation } />{ ' ' }
 								{ __( 'Navigation' ) }
 							</div>
+							<Divider
+								{ ...dividerProps }
+								style={ dividerStyles }
+							/>
 							{ hasMenus || navigationMenus.length ? (
 								<ExistingMenusDropdown
 									canSwitchNavigationMenu={
@@ -213,13 +232,13 @@ export default function NavigationPlaceholder( {
 									onCreateFromMenu={ onCreateFromMenu }
 								/>
 							) : undefined }
+							<Divider
+								{ ...dividerProps }
+								style={ dividerStyles }
+							/>
 							{ hasPages ? (
 								<Button
-									variant={
-										hasMenus || canSwitchNavigationMenu
-											? 'tertiary'
-											: 'primary'
-									}
+									variant="tertiary"
 									onClick={ () => {
 										setIsNewMenuModalVisible( true );
 										setCreateEmpty( false );
@@ -228,6 +247,10 @@ export default function NavigationPlaceholder( {
 									{ __( 'Add all pages' ) }
 								</Button>
 							) : undefined }
+							<Divider
+								{ ...dividerProps }
+								style={ dividerStyles }
+							/>
 							<Button
 								variant="tertiary"
 								onClick={ () => {
