@@ -1,5 +1,18 @@
 == Changelog ==
 
+= 11.8.2 =
+
+
+
+### Various
+
+#### Block Library
+- Cover Block: Fix default background dim. ([36312](https://github.com/WordPress/gutenberg/pull/36312))
+
+
+
+
+
 = 11.9.0-rc.2 =
 
 ### Various
