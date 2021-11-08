@@ -11,22 +11,33 @@ import { __ } from '@wordpress/i18n';
 import { wordpress } from '@wordpress/icons';
 import { store as coreDataStore } from '@wordpress/core-data';
 import { useReducedMotion } from '@wordpress/compose';
+import { addQueryArgs } from '@wordpress/url';
+
+/**
+ * Internal dependencies
+ */
+import { store as editSiteStore } from '../../../store';
 
 function NavigationLink( { icon } ) {
-	const { isRequestingSiteIcon, siteIconUrl } = useSelect( ( select ) => {
-		const { getEntityRecord, isResolving } = select( coreDataStore );
-		const siteData =
-			getEntityRecord( 'root', '__unstableBase', undefined ) || {};
+	const { isRequestingSiteIcon, postType, siteIconUrl } = useSelect(
+		( select ) => {
+			const { getEditedPostType } = select( editSiteStore );
+			const { getEntityRecord, isResolving } = select( coreDataStore );
+			const siteData =
+				getEntityRecord( 'root', '__unstableBase', undefined ) || {};
 
-		return {
-			isRequestingSiteIcon: isResolving( 'core', 'getEntityRecord', [
-				'root',
-				'__unstableBase',
-				undefined,
-			] ),
-			siteIconUrl: siteData.site_icon_url,
-		};
-	}, [] );
+			return {
+				isRequestingSiteIcon: isResolving( 'core', 'getEntityRecord', [
+					'root',
+					'__unstableBase',
+					undefined,
+				] ),
+				postType: getEditedPostType(),
+				siteIconUrl: siteData.site_icon_url,
+			};
+		},
+		[]
+	);
 
 	const disableMotion = useReducedMotion();
 
@@ -59,8 +70,10 @@ function NavigationLink( { icon } ) {
 		<motion.div className="edit-site-navigation-link" whileHover="expand">
 			<Button
 				className="edit-site-navigation-link__button has-icon"
-				label={ __( 'Dashboard' ) }
-				href="index.php"
+				label={ __( 'Back' ) }
+				href={ addQueryArgs( 'edit.php', {
+					post_type: postType,
+				} ) }
 			>
 				{ buttonIcon }
 			</Button>
