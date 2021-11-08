@@ -162,11 +162,25 @@ export const siteEditor = {
 		const isWelcomeGuideActive = await page.evaluate( () =>
 			wp.data.select( 'core/edit-site' ).isFeatureActive( 'welcomeGuide' )
 		);
+		const isWelcomeGuideStyesActive = await page.evaluate( () =>
+			wp.data
+				.select( 'core/edit-site' )
+				.isFeatureActive( 'welcomeGuideStyles' )
+		);
+
 		if ( isWelcomeGuideActive ) {
 			await page.evaluate( () =>
 				wp.data
 					.dispatch( 'core/edit-site' )
 					.toggleFeature( 'welcomeGuide' )
+			);
+		}
+
+		if ( isWelcomeGuideStyesActive ) {
+			await page.evaluate( () =>
+				wp.data
+					.dispatch( 'core/edit-site' )
+					.toggleFeature( 'welcomeGuideStyles' )
 			);
 		}
 	},
