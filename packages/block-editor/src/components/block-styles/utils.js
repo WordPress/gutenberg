@@ -32,7 +32,8 @@ export function getActiveStyle( styles, className ) {
 }
 
 /**
- * Replaces the active style in the block's className.
+ * Replaces the active style in the block's className except if it's the default
+ * style.
  *
  * @param {string}  className   Class name.
  * @param {Object?} activeStyle The replaced style.
@@ -47,7 +48,9 @@ export function replaceActiveStyle( className, activeStyle, newStyle ) {
 		list.remove( 'is-style-' + activeStyle.name );
 	}
 
-	list.add( 'is-style-' + newStyle.name );
+	if ( ! newStyle.isDefault ) {
+		list.add( 'is-style-' + newStyle.name );
+	}
 
 	return list.value;
 }
