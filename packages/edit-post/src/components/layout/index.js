@@ -44,6 +44,7 @@ import Header from '../header';
 import InserterSidebar from '../secondary-sidebar/inserter-sidebar';
 import ListViewSidebar from '../secondary-sidebar/list-view-sidebar';
 import SettingsSidebar from '../sidebar/settings-sidebar';
+import MetaBoxes from '../meta-boxes';
 import WelcomeGuide from '../welcome-guide';
 import ActionsPanel from './actions-panel';
 import { store as editPostStore } from '../../store';
@@ -86,6 +87,7 @@ function Layout( { styles } ) {
 		showIconLabels,
 		hasReducedUI,
 		showBlockBreadcrumbs,
+		isTemplateMode,
 		documentLabel,
 	} = useSelect( ( select ) => {
 		const { getEditorSettings, getPostTypeLabel } = select( editorStore );
@@ -241,6 +243,12 @@ function Layout( { styles } ) {
 						) }
 						{ isRichEditingEnabled && mode === 'visual' && (
 							<VisualEditor styles={ styles } />
+						) }
+						{ ! isTemplateMode && (
+							<div className="edit-post-layout__metaboxes">
+								<MetaBoxes location="normal" />
+								<MetaBoxes location="advanced" />
+							</div>
 						) }
 						{ isMobileViewport && sidebarIsOpened && (
 							<ScrollLock />
