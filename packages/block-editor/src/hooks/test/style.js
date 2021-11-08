@@ -1,4 +1,9 @@
 /**
+ * WordPress dependencies
+ */
+import { applyFilters } from '@wordpress/hooks';
+
+/**
  * Internal dependencies
  */
 import { getInlineStyles } from '../style';
@@ -105,6 +110,76 @@ describe( 'getInlineStyles', () => {
 		).toEqual( {
 			margin: '10px',
 			padding: '20px',
+		} );
+	} );
+} );
+
+describe( 'addSaveProps', () => {
+	const addSaveProps = applyFilters.bind(
+		null,
+		'blocks.getSaveContent.extraProps'
+	);
+
+	const blockSettings = {
+		save: () => <div className="default" />,
+		category: 'text',
+		title: 'block title',
+		supports: {
+			spacing: { padding: true },
+			typography: {
+				fontSize: true,
+				__experimentalTextTransform: true,
+				__experimentalTextDecoration: true,
+			},
+		},
+	};
+
+	const applySkipSerialization = ( skipSerialization ) => {
+		const updatedSettings = { ...blockSettings };
+		updatedSettings.supports.typography.__experimentalSkipSerialization = skipSerialization;
+
+		return updatedSettings;
+	};
+
+	const attributes = {
+		style: {
+			spacing: { padding: '10px' },
+			typography: {
+				fontSize: '1rem',
+				textDecoration: 'underline',
+				textTransform: 'uppercase',
+			},
+		},
+	};
+
+	it( 'should serialize all styles by default', () => {
+		const extraProps = addSaveProps( {}, blockSettings, attributes );
+
+		expect( extraProps.style ).toEqual( {
+			padding: '10px',
+			fontSize: '1rem',
+			textDecoration: 'underline',
+			textTransform: 'uppercase',
+		} );
+	} );
+
+	it( 'should skip serialization of entire feature set if flag is true', () => {
+		const settings = applySkipSerialization( true );
+		const extraProps = addSaveProps( {}, settings, attributes );
+
+		expect( extraProps.style ).toEqual( { padding: '10px' } );
+	} );
+
+	it( 'should skip serialization of individual features if flag is an array', () => {
+		const settings = applySkipSerialization( [
+			'textDecoration',
+			'textTransform',
+		] );
+		const extraProps = addSaveProps( {}, settings, attributes );
+
+		expect( extraProps.style ).toEqual( {
+			padding: '10px',
+			fontSize: '1rem',
 		} );
 	} );
 } );

@@ -223,8 +223,16 @@ export function addSaveProps(
 	let { style } = attributes;
 
 	forEach( skipPaths, ( path, indicator ) => {
-		if ( getBlockSupport( blockType, indicator ) ) {
+		const skipSerialization = getBlockSupport( blockType, indicator );
+
+		if ( skipSerialization === true ) {
 			style = omit( style, path );
+		}
+
+		if ( Array.isArray( skipSerialization ) ) {
+			skipSerialization.forEach( ( feature ) => {
+				style = omit( style, [ [ ...path, feature ] ] );
+			} );
 		}
 	} );
 
