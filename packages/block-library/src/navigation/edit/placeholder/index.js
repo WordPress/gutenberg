@@ -37,6 +37,22 @@ const ExistingMenusDropdown = ( {
 		variant: 'primary',
 		className: 'wp-block-navigation-placeholder__actions__dropdown',
 	};
+
+	// Get the classic menu ID that this block menu was cloned from
+	// (if it was at all).
+	const blockMenuClassicMenuIds = navigationMenus.map( ( blockMenu ) => {
+		return parseInt( blockMenu.slug.replace( 'classic_menu_', '' ) );
+	} );
+
+	// Filter out any Classic Menus that already have a cloned
+	// block based facsimilie.
+	const classicMenus = menus.filter(
+		( menu ) => ! blockMenuClassicMenuIds.includes( menu.id )
+	);
+
+	const hasClassicMenus = !! classicMenus?.length;
+	const hasBlockMenus = !! navigationMenus?.length;
+
 	return (
 		<DropdownMenu
 			text={ __( 'Select existing menu' ) }
@@ -46,39 +62,43 @@ const ExistingMenusDropdown = ( {
 		>
 			{ ( { onClose } ) => (
 				<>
-					<MenuGroup label="Menus">
-						{ canSwitchNavigationMenu &&
-							navigationMenus.map( ( menu ) => {
+					{ hasBlockMenus && (
+						<MenuGroup label="Menus">
+							{ canSwitchNavigationMenu &&
+								navigationMenus.map( ( menu ) => {
+									return (
+										<MenuItem
+											onClick={ () => {
+												setSelectedMenu( menu.id );
+												onFinish( menu );
+											} }
+											onClose={ onClose }
+											key={ menu.id }
+										>
+											{ menu.title.rendered }
+										</MenuItem>
+									);
+								} ) }
+						</MenuGroup>
+					) }
+					{ hasClassicMenus && (
+						<MenuGroup label="Classic Menus">
+							{ classicMenus.map( ( menu ) => {
 								return (
 									<MenuItem
 										onClick={ () => {
 											setSelectedMenu( menu.id );
-											onFinish( menu );
+											onCreateFromMenu( menu.name );
 										} }
 										onClose={ onClose }
 										key={ menu.id }
 									>
-										{ menu.title.rendered }
+										{ menu.name }
 									</MenuItem>
 								);
 							} ) }
-					</MenuGroup>
-					<MenuGroup label="Classic Menus">
-						{ menus.map( ( menu ) => {
-							return (
-								<MenuItem
-									onClick={ () => {
-										setSelectedMenu( menu.id );
-										onCreateFromMenu( menu.name );
-									} }
-									onClose={ onClose }
-									key={ menu.id }
-								>
-									{ menu.name }
-								</MenuItem>
-							);
-						} ) }
-					</MenuGroup>
+						</MenuGroup>
+					) }
 				</>
 			) }
 		</DropdownMenu>
