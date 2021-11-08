@@ -85,16 +85,36 @@
 					"type": "object",
 					"properties": {
 						"type": {
-							"type": "string",
 							"description": "The type indicates the type of data that is stored by the attribute. It does not indicate where the data is stored, which is defined by the source field.\n\nA type is required, unless an enum is provided. A type can be used with an enum.\n\nNote that the validity of an object is determined by your source. For an example, see the query details below.",
-							"enum": [
-								"null",
-								"boolean",
-								"object",
-								"array",
-								"string",
-								"integer",
-								"number"
+							"oneOf": [
+								{
+									"type": "string",
+									"enum": [
+										"null",
+										"boolean",
+										"object",
+										"array",
+										"string",
+										"integer",
+										"number"
+									]
+								},
+								{
+									"type": "array",
+									"uniqueItems": true,
+									"items": {
+										"type": "string",
+										"enum": [
+											"null",
+											"boolean",
+											"object",
+											"array",
+											"string",
+											"integer",
+											"number"
+										]
+									}
+								}
 							]
 						},
 						"enum": {
