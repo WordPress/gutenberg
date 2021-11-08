@@ -46,7 +46,11 @@ function gutenberg_experimental_global_styles_settings( $settings ) {
 		// Reset existing global styles.
 		$styles_without_existing_global_styles = array();
 		foreach ( $settings['styles'] as $style ) {
-			if ( ! isset( $style['__unstableType'] ) || 'globalStyles' !== $style['__unstableType'] ) {
+			if (
+				! isset( $style['__unstableType'] ) ||
+				// 'globalStyles' is for WordPress 5.8. 'theme' and 'presets' is for WordPress 5.9.
+				! in_array( $style['__unstableType'], array( 'globalStyles', 'theme', 'presets' ), true )
+			) {
 				$styles_without_existing_global_styles[] = $style;
 			}
 		}
