@@ -586,7 +586,7 @@ class WP_Theme_JSON_Gutenberg {
 			if ( is_array( $value_path ) ) {
 				$path_string = implode( '.', $value_path );
 				if (
-					isset( self::PROTECTED_PROPERTIES[ $path_string ] ) &&
+					array_key_exists( $path_string, self::PROTECTED_PROPERTIES ) &&
 					_wp_array_get( $settings, self::PROTECTED_PROPERTIES[ $path_string ], null ) === null
 				) {
 					continue;
