@@ -414,31 +414,6 @@ describe( 'createRegistry', () => {
 			return promise;
 		} );
 
-		it( 'should resolve promise non-action to dispatch', () => {
-			let shouldThrow = false;
-			registry.registerStore( 'demo', {
-				reducer: ( state = 'OK' ) => {
-					if ( shouldThrow ) {
-						throw 'Should not have dispatched';
-					}
-
-					return state;
-				},
-				selectors: {
-					getValue: ( state ) => state,
-				},
-				resolvers: {
-					getValue: () => Promise.resolve(),
-				},
-			} );
-			shouldThrow = true;
-
-			registry.select( 'demo' ).getValue();
-			jest.runAllTimers();
-
-			return new Promise( ( resolve ) => process.nextTick( resolve ) );
-		} );
-
 		it( 'should not dispatch resolved promise action on subsequent selector calls', () => {
 			registry.registerStore( 'demo', {
 				reducer: ( state = 'NOTOK', action ) => {
