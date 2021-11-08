@@ -54,7 +54,8 @@ function gutenberg_apply_border_support( $block_type, $block_attributes ) {
 	// Border radius.
 	if (
 		gutenberg_has_border_feature_support( $block_type, 'radius' ) &&
-		isset( $block_attributes['style']['border']['radius'] )
+		isset( $block_attributes['style']['border']['radius'] ) &&
+		! gutenberg_skip_border_serialization( $block_type, 'radius' )
 	) {
 		$border_radius = $block_attributes['style']['border']['radius'];
 
@@ -78,7 +79,8 @@ function gutenberg_apply_border_support( $block_type, $block_attributes ) {
 	// Border style.
 	if (
 		gutenberg_has_border_feature_support( $block_type, 'style' ) &&
-		isset( $block_attributes['style']['border']['style'] )
+		isset( $block_attributes['style']['border']['style'] ) &&
+		! gutenberg_skip_border_serialization( $block_type, 'style' )
 	) {
 		$border_style = $block_attributes['style']['border']['style'];
 		$styles[]     = sprintf( 'border-style: %s;', $border_style );
@@ -87,7 +89,8 @@ function gutenberg_apply_border_support( $block_type, $block_attributes ) {
 	// Border width.
 	if (
 		gutenberg_has_border_feature_support( $block_type, 'width' ) &&
-		isset( $block_attributes['style']['border']['width'] )
+		isset( $block_attributes['style']['border']['width'] ) &&
+		! gutenberg_skip_border_serialization( $block_type, 'width' )
 	) {
 		$border_width = $block_attributes['style']['border']['width'];
 
@@ -100,7 +103,10 @@ function gutenberg_apply_border_support( $block_type, $block_attributes ) {
 	}
 
 	// Border color.
-	if ( gutenberg_has_border_feature_support( $block_type, 'color' ) ) {
+	if (
+		gutenberg_has_border_feature_support( $block_type, 'color' ) &&
+		! gutenberg_skip_border_serialization( $block_type, 'color' )
+	) {
 		$has_named_border_color  = array_key_exists( 'borderColor', $block_attributes );
 		$has_custom_border_color = isset( $block_attributes['style']['border']['color'] );
 
@@ -134,16 +140,20 @@ function gutenberg_apply_border_support( $block_type, $block_attributes ) {
  * Checks whether serialization of the current block's border properties should
  * occur.
  *
- * @param WP_Block_type $block_type       Block type.
+ * @param WP_Block_type $block_type Block type.
+ * @param string        $feature    Optional name of individual feature to check.
  *
  * @return boolean
  */
-function gutenberg_skip_border_serialization( $block_type ) {
-	$border_support = _wp_array_get( $block_type->supports, array( '__experimentalBorder' ), false );
+function gutenberg_skip_border_serialization( $block_type, $feature = null ) {
+	$path               = array( '__experimentalBorder', '__experimentalSkipSerialization' );
+	$skip_serialization = _wp_array_get( $block_type->supports, $path, false );
 
-	return is_array( $border_support ) &&
-		array_key_exists( '__experimentalSkipSerialization', $border_support ) &&
-		$border_support['__experimentalSkipSerialization'];
+	if ( is_array( $skip_serialization ) ) {
+		return in_array( $feature, $skip_serialization, true );
+	}
+
+	return $skip_serialization;
 }
 
 /**

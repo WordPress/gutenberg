@@ -75,8 +75,7 @@ function gutenberg_apply_typography_support( $block_type, $block_attributes ) {
 		return array();
 	}
 
-	$skip_typography_serialization = _wp_array_get( $typography_supports, array( '__experimentalSkipSerialization' ), false );
-	if ( $skip_typography_serialization ) {
+	if ( gutenberg_skip_typography_serialization( $block_type ) ) {
 		return array();
 	}
 
@@ -93,7 +92,7 @@ function gutenberg_apply_typography_support( $block_type, $block_attributes ) {
 	$has_text_decoration_support = _wp_array_get( $typography_supports, array( '__experimentalTextDecoration' ), false );
 	$has_text_transform_support  = _wp_array_get( $typography_supports, array( '__experimentalTextTransform' ), false );
 
-	if ( $has_font_size_support ) {
+	if ( $has_font_size_support && ! gutenberg_skip_typography_serialization( $block_type, 'fontSize' ) ) {
 		$has_named_font_size  = array_key_exists( 'fontSize', $block_attributes );
 		$has_custom_font_size = isset( $block_attributes['style']['typography']['fontSize'] );
 
@@ -104,7 +103,7 @@ function gutenberg_apply_typography_support( $block_type, $block_attributes ) {
 		}
 	}
 
-	if ( $has_font_family_support ) {
+	if ( $has_font_family_support && ! gutenberg_skip_typography_serialization( $block_type, 'fontFamily' ) ) {
 		$has_named_font_family  = array_key_exists( 'fontFamily', $block_attributes );
 		$has_custom_font_family = isset( $block_attributes['style']['typography']['fontFamily'] );
 
@@ -123,42 +122,42 @@ function gutenberg_apply_typography_support( $block_type, $block_attributes ) {
 		}
 	}
 
-	if ( $has_font_style_support ) {
+	if ( $has_font_style_support && ! gutenberg_skip_typography_serialization( $block_type, 'fontStyle' ) ) {
 		$font_style = gutenberg_typography_get_css_variable_inline_style( $block_attributes, 'fontStyle', 'font-style' );
 		if ( $font_style ) {
 			$styles[] = $font_style;
 		}
 	}
 
-	if ( $has_font_weight_support ) {
+	if ( $has_font_weight_support && ! gutenberg_skip_typography_serialization( $block_type, 'fontWeight' ) ) {
 		$font_weight = gutenberg_typography_get_css_variable_inline_style( $block_attributes, 'fontWeight', 'font-weight' );
 		if ( $font_weight ) {
 			$styles[] = $font_weight;
 		}
 	}
 
-	if ( $has_line_height_support ) {
+	if ( $has_line_height_support && ! gutenberg_skip_typography_serialization( $block_type, 'lineHeight' ) ) {
 		$has_line_height = isset( $block_attributes['style']['typography']['lineHeight'] );
 		if ( $has_line_height ) {
 			$styles[] = sprintf( 'line-height: %s;', $block_attributes['style']['typography']['lineHeight'] );
 		}
 	}
 
-	if ( $has_text_decoration_support ) {
+	if ( $has_text_decoration_support && ! gutenberg_skip_typography_serialization( $block_type, 'textDecoration' ) ) {
 		$text_decoration_style = gutenberg_typography_get_css_variable_inline_style( $block_attributes, 'textDecoration', 'text-decoration' );
 		if ( $text_decoration_style ) {
 			$styles[] = $text_decoration_style;
 		}
 	}
 
-	if ( $has_text_transform_support ) {
+	if ( $has_text_transform_support && ! gutenberg_skip_typography_serialization( $block_type, 'textTransform' ) ) {
 		$text_transform_style = gutenberg_typography_get_css_variable_inline_style( $block_attributes, 'textTransform', 'text-transform' );
 		if ( $text_transform_style ) {
 			$styles[] = $text_transform_style;
 		}
 	}
 
-	if ( $has_letter_spacing_support ) {
+	if ( $has_letter_spacing_support && ! gutenberg_skip_typography_serialization( $block_type, 'letterSpacing' ) ) {
 		$letter_spacing_style = gutenberg_typography_get_css_variable_inline_style( $block_attributes, 'letterSpacing', 'letter-spacing' );
 		if ( $letter_spacing_style ) {
 			$styles[] = $letter_spacing_style;
@@ -214,3 +213,23 @@ WP_Block_Supports::get_instance()->register(
 		'apply'              => 'gutenberg_apply_typography_support',
 	)
 );
+
+/**
+ * Checks whether serialization of the current block's typography properties
+ * should occur.
+ *
+ * @param WP_Block_type $block_type Block type.
+ * @param string        $feature    Optional name of individual feature to check.
+ *
+ * @return boolean Whether to serialize typography support styles & classes.
+ */
+function gutenberg_skip_typography_serialization( $block_type, $feature = null ) {
+	$path               = array( 'typography', '__experimentalSkipSerialization' );
+	$skip_serialization = _wp_array_get( $block_type->supports, $path, false );
+
+	if ( is_array( $skip_serialization ) ) {
+		return in_array( $feature, $skip_serialization, true );
+	}
+
+	return $skip_serialization;
+}

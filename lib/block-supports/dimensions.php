@@ -62,14 +62,19 @@ function gutenberg_apply_dimensions_support( $block_type, $block_attributes ) { 
  * should occur.
  *
  * @param WP_Block_type $block_type Block type.
+ * @param string        $feature    Optional name of individual feature to check.
  *
- * @return boolean Whether to serialize spacing support styles & classes.
+ * @return boolean Whether to serialize dimensions support styles & classes.
  */
-function gutenberg_skip_dimensions_serialization( $block_type ) {
-	$dimensions_support = _wp_array_get( $block_type->supports, array( '__experimentalDimensions' ), false );
-	return is_array( $dimensions_support ) &&
-		array_key_exists( '__experimentalSkipSerialization', $dimensions_support ) &&
-		$dimensions_support['__experimentalSkipSerialization'];
+function gutenberg_skip_dimensions_serialization( $block_type, $feature = null ) {
+	$path               = array( '__experimentalDimensions', '__experimentalSkipSerialization' );
+	$skip_serialization = _wp_array_get( $block_type->supports, $path, false );
+
+	if ( is_array( $skip_serialization ) ) {
+		return in_array( $feature, $skip_serialization, true );
+	}
+
+	return $skip_serialization;
 }
 
 // Register the block support.
