@@ -37,7 +37,7 @@ export default function WelcomeGuideEditor() {
 							<p className="edit-site-welcome-guide__text">
 								{ createInterpolateElement(
 									__(
-										'Design everything on your site — from the header right down to the footer — using blocks.. Click <StylesIconImage /> to start designing your blocks, and choose your typography, layout, and colors.'
+										'Design everything on your site — from the header right down to the footer — using blocks. Click <StylesIconImage /> to start designing your blocks, and choose your typography, layout, and colors.'
 									),
 									{
 										StylesIconImage: (
