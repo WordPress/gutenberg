@@ -19,7 +19,7 @@ export default function WelcomeGuideEditor() {
 		<Guide
 			className="edit-site-welcome-guide"
 			contentLabel={ __( 'Welcome to the site editor' ) }
-			finishButtonText={ __( 'Try Editor' ) }
+			finishButtonText={ __( 'Get Started' ) }
 			onFinish={ () => toggleFeature( 'welcomeGuide' ) }
 			pages={ [
 				{

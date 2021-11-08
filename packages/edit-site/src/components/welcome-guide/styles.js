@@ -18,7 +18,7 @@ export default function WelcomeGuideStyles() {
 		<Guide
 			className="edit-site-welcome-guide"
 			contentLabel={ __( 'Welcome to styles' ) }
-			finishButtonText={ __( 'Try Styles' ) }
+			finishButtonText={ __( 'Get Started' ) }
 			onFinish={ () => toggleFeature( 'welcomeGuideStyles' ) }
 			pages={ [
 				{
