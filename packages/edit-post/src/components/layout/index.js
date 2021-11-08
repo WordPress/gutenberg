@@ -18,7 +18,7 @@ import {
 import { useSelect, useDispatch } from '@wordpress/data';
 import { BlockBreadcrumb } from '@wordpress/block-editor';
 import { Button, ScrollLock, Popover } from '@wordpress/components';
-import { useViewportMatch } from '@wordpress/compose';
+import { useViewportMatch, useRefEffect } from '@wordpress/compose';
 import { PluginArea } from '@wordpress/plugins';
 import { __, _x } from '@wordpress/i18n';
 import {
@@ -178,6 +178,24 @@ function Layout( { styles } ) {
 		return null;
 	};
 
+	const refEffect = useRefEffect( ( { ownerDocument } ) => {
+		const { defaultView } = ownerDocument;
+
+		function checkFocus() {
+			if ( ownerDocument.activeElement.nodeName !== 'IFRAME' ) {
+				return;
+			}
+
+			ownerDocument.activeElement.focus();
+		}
+
+		defaultView.addEventListener( 'blur', checkFocus );
+
+		return () => {
+			defaultView.removeEventListener( 'blur', checkFocus );
+		};
+	}, [] );
+
 	return (
 		<>
 			<FullscreenMode isActive={ isFullscreenActive } />
@@ -231,9 +249,20 @@ function Layout( { styles } ) {
 							<VisualEditor styles={ styles } />
 						) }
 						{ ! isTemplateMode && (
-							<div className="edit-post-layout__metaboxes">
-								<MetaBoxes location="normal" />
-								<MetaBoxes location="advanced" />
+							<div
+								className="edit-post-layout__metaboxes"
+								ref={ refEffect }
+							>
+								<Button
+									className="edit-post-sidebar__panel-tab"
+									tabIndex={ -1 }
+								>
+									{ __( 'Meta boxes' ) }
+								</Button>
+								<div className="edit-post-layout__metaboxes-container">
+									<MetaBoxes location="normal" />
+									<MetaBoxes location="advanced" />
+								</div>
 							</div>
 						) }
 						{ isMobileViewport && sidebarIsOpened && (
