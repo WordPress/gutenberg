@@ -193,14 +193,15 @@ function gutenberg_get_navigation_areas_paths_to_preload() {
 }
 
 /**
- * Migrates classic menus to block-based menus on theme switch.
+ * Migrates classic menus to a block-based navigation post on theme switch.
+ * Assigns the created navigation post to the corresponding navigation area.
  *
  * @param string   $new_name  Name of the new theme.
  * @param WP_Theme $new_theme New theme.
  * @param WP_Theme $old_theme Old theme.
  * @see switch_theme WordPress action.
  */
-function gutenberg_migrate_nav_on_theme_switch( $new_name, $new_theme, $old_theme ) {
+function gutenberg_migrate_menu_to_navigation_post( $new_name, $new_theme, $old_theme ) {
 	// Do nothing when switching to a theme that does not support site editor.
 	if ( ! gutenberg_experimental_is_site_editor_available() ) {
 		return;
@@ -271,7 +272,7 @@ function gutenberg_migrate_nav_on_theme_switch( $new_name, $new_theme, $old_them
 	update_option( 'fse_navigation_areas', $area_mapping );
 }
 
-add_action( 'switch_theme', 'gutenberg_migrate_nav_on_theme_switch', 200, 3 );
+add_action( 'switch_theme', 'gutenberg_migrate_menu_to_navigation_post', 200, 3 );
 
 // The functions below are copied over from packages/block-library/src/navigation/index.php
 // Let's figure out a better way of managing these global PHP dependencies.
