@@ -437,7 +437,9 @@ describe( 'Embed block', () => {
 
 			// Start editing link
 			fireEvent.press(
-				getByA11yLabel( `Twitter link, ${ initialURL }` )
+				within( blockSettingsModal ).getByA11yLabel(
+					`Twitter link, ${ initialURL }`
+				)
 			);
 
 			// Replace URL
@@ -451,7 +453,9 @@ describe( 'Embed block', () => {
 
 			// Get YouTube link field
 			const youtubeLinkField = await waitFor( () =>
-				getByA11yLabel( `YouTube link, ${ expectedURL }` )
+				within( blockSettingsModal ).getByA11yLabel(
+					`YouTube link, ${ expectedURL }`
+				)
 			);
 
 			expect( youtubeLinkField ).toBeDefined();
@@ -480,7 +484,9 @@ describe( 'Embed block', () => {
 
 			// Start editing link
 			fireEvent.press(
-				getByA11yLabel( `Twitter link, ${ previousURL }` )
+				within( blockSettingsModal ).getByA11yLabel(
+					`Twitter link, ${ previousURL }`
+				)
 			);
 
 			// Replace URL
@@ -571,7 +577,11 @@ describe( 'Embed block', () => {
 			await waitFor( () => blockSettingsModal.props.isVisible );
 
 			// Start editing link
-			fireEvent.press( getByA11yLabel( `Embed link, ${ badURL }` ) );
+			fireEvent.press(
+				within( blockSettingsModal ).getByA11yLabel(
+					`Embed link, ${ badURL }`
+				)
+			);
 
 			// Replace URL
 			linkTextInput = getByDisplayValue( badURL );
@@ -584,7 +594,9 @@ describe( 'Embed block', () => {
 
 			// Get Twitter link field
 			const twitterLinkField = await waitFor( () =>
-				getByA11yLabel( `Twitter link, ${ expectedURL }` )
+				within( blockSettingsModal ).getByA11yLabel(
+					`Twitter link, ${ expectedURL }`
+				)
 			);
 
 			expect( twitterLinkField ).toBeDefined();
