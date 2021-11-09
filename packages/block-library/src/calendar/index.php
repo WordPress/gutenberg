@@ -113,7 +113,7 @@ function block_core_calendar_update_has_published_posts() {
  * @param int $post_id Deleted post ID.
  */
 function block_core_calendar_update_has_published_post_on_delete( $post_id ) {
-	if ( ! is_multisite() ) {
+	if ( is_multisite() ) {
 		return;
 	}
 
@@ -134,7 +134,7 @@ function block_core_calendar_update_has_published_post_on_delete( $post_id ) {
  * @param WP_Post $post       Post object.
  */
 function block_core_calendar_update_has_published_post_on_transition_post_status( $new_status, $old_status, $post ) {
-	if ( ! is_multisite() ) {
+	if ( is_multisite() ) {
 		return;
 	}
 
