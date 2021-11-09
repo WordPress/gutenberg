@@ -431,9 +431,9 @@ describe( 'Embed block', () => {
 				await waitFor( () => getByA11yLabel( 'Open Settings' ) )
 			);
 
-            // Wait for Block Settings to be visible
-            const blockSettingsModal = getByTestId( 'block-settings' );
-            await waitFor( () => blockSettingsModal.props.isVisible );
+			// Wait for Block Settings to be visible
+			const blockSettingsModal = getByTestId( 'block-settings' );
+			await waitFor( () => blockSettingsModal.props.isVisible );
 
 			// Start editing link
 			fireEvent.press(
@@ -445,9 +445,9 @@ describe( 'Embed block', () => {
 			fireEvent( linkTextInput, 'focus' );
 			fireEvent.changeText( linkTextInput, expectedURL );
 
-            // Dismiss the Block Settings modal
-            fireEvent( blockSettingsModal, 'backdropPress' );
-            fireEvent( blockSettingsModal, MODAL_DISMISS_EVENT );
+			// Dismiss the Block Settings modal
+			fireEvent( blockSettingsModal, 'backdropPress' );
+			fireEvent( blockSettingsModal, MODAL_DISMISS_EVENT );
 
 			// Get YouTube link field
 			const youtubeLinkField = await waitFor( () =>
@@ -467,7 +467,6 @@ describe( 'Embed block', () => {
 				getByDisplayValue,
 				getByTestId,
 				getByText,
-				debug,
 			} = await initializeWithEmbedBlock( RICH_TEXT_EMBED_HTML );
 
 			// Open Block Settings
@@ -475,9 +474,9 @@ describe( 'Embed block', () => {
 				await waitFor( () => getByA11yLabel( 'Open Settings' ) )
 			);
 
-            // Wait for Block Settings to be visible
-            const blockSettingsModal = getByTestId( 'block-settings' );
-            await waitFor( () => blockSettingsModal.props.isVisible );
+			// Wait for Block Settings to be visible
+			const blockSettingsModal = getByTestId( 'block-settings' );
+			await waitFor( () => blockSettingsModal.props.isVisible );
 
 			// Start editing link
 			fireEvent.press(
@@ -489,9 +488,9 @@ describe( 'Embed block', () => {
 			fireEvent( linkTextInput, 'focus' );
 			fireEvent.changeText( linkTextInput, invalidURL );
 
-            // Dismiss the Block Settings modal
-            fireEvent( blockSettingsModal, 'backdropPress' );
-            fireEvent( blockSettingsModal, MODAL_DISMISS_EVENT );
+			// Dismiss the Block Settings modal
+			fireEvent( blockSettingsModal, 'backdropPress' );
+			fireEvent( blockSettingsModal, MODAL_DISMISS_EVENT );
 
 			const errorNotice = await waitFor( () =>
 				getByText( 'Invalid URL. Please enter a valid URL.' )
@@ -550,7 +549,7 @@ describe( 'Embed block', () => {
 			} = await insertEmbedBlock();
 
 			// Wait for edit URL modal to be visible
-			let embedEditURLModal = getByTestId( 'embed-edit-url-modal' );
+			const embedEditURLModal = getByTestId( 'embed-edit-url-modal' );
 			await waitFor( () => embedEditURLModal.props.isVisible );
 
 			// Set an bad URL
@@ -567,9 +566,9 @@ describe( 'Embed block', () => {
 				await waitFor( () => getByA11yLabel( 'Open Settings' ) )
 			);
 
-            // Wait for Block Settings to be visible
-            const blockSettingsModal = getByTestId( 'block-settings' );
-            await waitFor( () => blockSettingsModal.props.isVisible );
+			// Wait for Block Settings to be visible
+			const blockSettingsModal = getByTestId( 'block-settings' );
+			await waitFor( () => blockSettingsModal.props.isVisible );
 
 			// Start editing link
 			fireEvent.press( getByA11yLabel( `Embed link, ${ badURL }` ) );
@@ -579,9 +578,9 @@ describe( 'Embed block', () => {
 			fireEvent( linkTextInput, 'focus' );
 			fireEvent.changeText( linkTextInput, expectedURL );
 
-            // Dismiss the Block Settings modal
-            fireEvent( blockSettingsModal, 'backdropPress' );
-            fireEvent( blockSettingsModal, MODAL_DISMISS_EVENT );
+			// Dismiss the Block Settings modal
+			fireEvent( blockSettingsModal, 'backdropPress' );
+			fireEvent( blockSettingsModal, MODAL_DISMISS_EVENT );
 
 			// Get Twitter link field
 			const twitterLinkField = await waitFor( () =>
