@@ -20,6 +20,11 @@ exports[`File block renders file error state without crashing 1`] = `
     }
   />
   <View
+    accessibilityState={
+      Object {
+        "disabled": true,
+      }
+    }
     accessible={true}
     focusable={true}
     onClick={[Function]}
@@ -105,11 +110,9 @@ exports[`File block renders file error state without crashing 1`] = `
       <View>
         Svg
         <TextInput
-          allowFontScaling={true}
           editable={false}
           fontFamily="serif"
           onChange={[Function]}
-          rejectResponderTermination={true}
           scrollEnabled={false}
           style={
             Array [
@@ -119,7 +122,6 @@ exports[`File block renders file error state without crashing 1`] = `
               undefined,
             ]
           }
-          underlineColorAndroid="transparent"
           value="Error"
         />
       </View>
@@ -223,6 +225,11 @@ exports[`File block renders file without crashing 1`] = `
     }
   />
   <View
+    accessibilityState={
+      Object {
+        "disabled": true,
+      }
+    }
     accessible={true}
     focusable={true}
     onClick={[Function]}
