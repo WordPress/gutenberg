@@ -45,7 +45,6 @@ function BottomSheetSettings( {
 			hasNavigation
 			testID="block-settings"
 			{ ...props }
-
 		>
 			<BottomSheet.NavigationContainer animate main>
 				<BottomSheet.NavigationScreen
