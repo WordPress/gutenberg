@@ -43,7 +43,9 @@ function BottomSheetSettings( {
 			hideHeader
 			contentStyle={ styles.content }
 			hasNavigation
+			testID="block-settings"
 			{ ...props }
+
 		>
 			<BottomSheet.NavigationContainer animate main>
 				<BottomSheet.NavigationScreen
