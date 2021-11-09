@@ -122,7 +122,17 @@
 							"type": "array",
 							"description": "An attribute can be defined as one of a fixed set of values. This is specified by an enum, which contains an array of allowed values:",
 							"items": {
-								"type": "string"
+								"oneOf": [
+									{
+										"type": "boolean"
+									},
+									{
+										"type": "number"
+									},
+									{
+										"type": "string"
+									}
+								]
 							}
 						},
 						"source": {
@@ -160,14 +170,7 @@
 							"description": "TA block attribute can contain a default value, which will be used if the type and source do not match anything within the block content.\n\nThe value is provided by the default field, and the value should match the expected format of the attribute."
 						}
 					},
-					"anyOf": [
-						{
-							"required": [ "type" ]
-						},
-						{
-							"required": [ "enum" ]
-						}
-					]
+					"required": [ "type" ]
 				}
 			},
 			"additionalProperties": false

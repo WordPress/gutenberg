@@ -145,6 +145,8 @@
 		"@wordpress/readable-js-assets-webpack-plugin": "file:packages/readable-js-assets-webpack-plugin",
 		"@wordpress/scripts": "file:packages/scripts",
 		"@wordpress/stylelint-config": "file:packages/stylelint-config",
+		"ajv": "8.7.1",
+		"ajv-draft-04": "1.0.0",
 		"appium": "1.22.0",
 		"babel-jest": "26.6.3",
 		"babel-loader": "8.2.2",
