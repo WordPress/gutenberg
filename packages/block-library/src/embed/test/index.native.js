@@ -175,10 +175,10 @@ beforeAll( () => {
 } );
 
 beforeEach( () => {
-	// Invalidate embed preview resolutions
-	dispatch( coreStore ).invalidateResolutionForStoreSelector(
-		'getEmbedPreview'
-	);
+	// Invalidate all resolutions of core-data to prevent
+	// caching embed preview and theme supports requests.
+	dispatch( coreStore ).invalidateResolutionForStore();
+
 	// Mock embed responses
 	mockEmbedResponses( [
 		RICH_TEXT_EMBED_SUCCESS_RESPONSE,
