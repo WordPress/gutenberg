@@ -166,13 +166,21 @@ jest.mock( 'react-native/Libraries/LayoutAnimation/LayoutAnimation' );
 jest.mock(
 	'react-native/Libraries/Components/AccessibilityInfo/AccessibilityInfo',
 	() => ( {
-		addEventListener: jest.fn(),
-		announceForAccessibility: jest.fn(),
-		removeEventListener: jest.fn(),
-		isScreenReaderEnabled: jest.fn( () => Promise.resolve( false ) ),
-		fetch: jest.fn( () => ( {
-			done: jest.fn(),
-		} ) ),
+		__esModule: true,
+		default: {
+			addEventListener: jest.fn( () => ( { remove: jest.fn() } ) ),
+			announceForAccessibility: jest.fn(),
+			isBoldTextEnabled: jest.fn(),
+			isGrayscaleEnabled: jest.fn(),
+			isInvertColorsEnabled: jest.fn(),
+			isReduceMotionEnabled: jest.fn(),
+			isReduceTransparencyEnabled: jest.fn(),
+			isScreenReaderEnabled: jest.fn( () => Promise.resolve( false ) ),
+			removeEventListener: jest.fn(),
+			setAccessibilityFocus: jest.fn(),
+			sendAccessibilityEvent_unstable: jest.fn(),
+			getRecommendedTimeoutMillis: jest.fn(),
+		},
 	} )
 );
 
