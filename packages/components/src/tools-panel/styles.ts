@@ -102,6 +102,11 @@ export const ToolsPanelItem = css`
 	/* Remove BaseControl components margins and leave spacing to grid layout */
 	&& ${ BaseControlWrapper } {
 		margin-bottom: 0;
+		/* The following allows controls with help text to maintain spacing. */
+		/* e.g. ToggleControls. */
+		display: flex;
+		flex-direction: column;
+		row-gap: ${ space( 3 ) };
 
 		${ BaseControlField } {
 			margin-bottom: 0;
