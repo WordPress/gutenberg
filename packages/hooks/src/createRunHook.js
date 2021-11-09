@@ -3,10 +3,10 @@
  * registered to a hook of the specified type, optionally returning the final
  * value of the call chain.
  *
- * @param  {import('.').Hooks}    hooks Hooks instance.
- * @param  {import('.').StoreKey} storeKey
- * @param  {boolean}              [returnFirstArg=false] Whether each hook callback is expected to
- *                                                       return its first argument.
+ * @param {import('.').Hooks}    hooks                  Hooks instance.
+ * @param {import('.').StoreKey} storeKey
+ * @param {boolean}              [returnFirstArg=false] Whether each hook callback is expected to
+ *                                                      return its first argument.
  *
  * @return {(hookName:string, ...args: unknown[]) => unknown} Function that runs hook callbacks.
  */

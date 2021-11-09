@@ -56,9 +56,9 @@ export function BlockPreview( {
  *
  * @see https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/block-preview/README.md
  *
- * @param {Object} preview options for how the preview should be shown
- * @param {Array|Object} preview.blocks A block instance (object) or an array of blocks to be previewed.
- * @param {number} preview.viewportWidth Width of the preview container in pixels. Controls at what size the blocks will be rendered inside the preview. Default: 700.
+ * @param {Object}       preview               options for how the preview should be shown
+ * @param {Array|Object} preview.blocks        A block instance (object) or an array of blocks to be previewed.
+ * @param {number}       preview.viewportWidth Width of the preview container in pixels. Controls at what size the blocks will be rendered inside the preview. Default: 700.
  *
  * @return {WPComponent} The component to be rendered.
  */

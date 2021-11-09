@@ -15,19 +15,28 @@ function gutenberg_register_typography_support( $block_type ) {
 		return;
 	}
 
-	$has_font_size_support       = _wp_array_get( $block_type->supports, array( 'fontSize' ), false );
-	$has_font_style_support      = _wp_array_get( $block_type->supports, array( '__experimentalFontStyle' ), false );
-	$has_font_weight_support     = _wp_array_get( $block_type->supports, array( '__experimentalFontWeight' ), false );
-	$has_line_height_support     = _wp_array_get( $block_type->supports, array( 'lineHeight' ), false );
-	$has_text_decoration_support = _wp_array_get( $block_type->supports, array( '__experimentalTextDecoration' ), false );
-	$has_text_transform_support  = _wp_array_get( $block_type->supports, array( '__experimentalTextTransform' ), false );
+	$typography_supports = _wp_array_get( $block_type->supports, array( 'typography' ), false );
+	if ( ! $typography_supports ) {
+		return;
+	}
 
-	$has_typography_support = $has_font_size_support
-		|| $has_font_weight_support
+	$has_font_family_support     = _wp_array_get( $typography_supports, array( '__experimentalFontFamily' ), false );
+	$has_font_size_support       = _wp_array_get( $typography_supports, array( 'fontSize' ), false );
+	$has_font_style_support      = _wp_array_get( $typography_supports, array( '__experimentalFontStyle' ), false );
+	$has_font_weight_support     = _wp_array_get( $typography_supports, array( '__experimentalFontWeight' ), false );
+	$has_letter_spacing_support  = _wp_array_get( $typography_supports, array( '__experimentalLetterSpacing' ), false );
+	$has_line_height_support     = _wp_array_get( $typography_supports, array( 'lineHeight' ), false );
+	$has_text_decoration_support = _wp_array_get( $typography_supports, array( '__experimentalTextDecoration' ), false );
+	$has_text_transform_support  = _wp_array_get( $typography_supports, array( '__experimentalTextTransform' ), false );
+
+	$has_typography_support = $has_font_family_support
+		|| $has_font_size_support
 		|| $has_font_style_support
+		|| $has_font_weight_support
+		|| $has_letter_spacing_support
 		|| $has_line_height_support
-		|| $has_text_transform_support
-		|| $has_text_decoration_support;
+		|| $has_text_decoration_support
+		|| $has_text_transform_support;
 
 	if ( ! $block_type->attributes ) {
 		$block_type->attributes = array();
@@ -61,93 +70,98 @@ function gutenberg_apply_typography_support( $block_type, $block_attributes ) {
 		return array();
 	}
 
+	$typography_supports = _wp_array_get( $block_type->supports, array( 'typography' ), false );
+	if ( ! $typography_supports ) {
+		return array();
+	}
+
+	$skip_typography_serialization = _wp_array_get( $typography_supports, array( '__experimentalSkipSerialization' ), false );
+	if ( $skip_typography_serialization ) {
+		return array();
+	}
+
 	$attributes = array();
 	$classes    = array();
 	$styles     = array();
 
-	$has_font_family_support     = _wp_array_get( $block_type->supports, array( '__experimentalFontFamily' ), false );
-	$has_font_style_support      = _wp_array_get( $block_type->supports, array( '__experimentalFontStyle' ), false );
-	$has_font_weight_support     = _wp_array_get( $block_type->supports, array( '__experimentalFontWeight' ), false );
-	$has_font_size_support       = _wp_array_get( $block_type->supports, array( 'fontSize' ), false );
-	$has_line_height_support     = _wp_array_get( $block_type->supports, array( 'lineHeight' ), false );
-	$has_text_decoration_support = _wp_array_get( $block_type->supports, array( '__experimentalTextDecoration' ), false );
-	$has_text_transform_support  = _wp_array_get( $block_type->supports, array( '__experimentalTextTransform' ), false );
+	$has_font_family_support     = _wp_array_get( $typography_supports, array( '__experimentalFontFamily' ), false );
+	$has_font_size_support       = _wp_array_get( $typography_supports, array( 'fontSize' ), false );
+	$has_font_style_support      = _wp_array_get( $typography_supports, array( '__experimentalFontStyle' ), false );
+	$has_font_weight_support     = _wp_array_get( $typography_supports, array( '__experimentalFontWeight' ), false );
+	$has_letter_spacing_support  = _wp_array_get( $typography_supports, array( '__experimentalLetterSpacing' ), false );
+	$has_line_height_support     = _wp_array_get( $typography_supports, array( 'lineHeight' ), false );
+	$has_text_decoration_support = _wp_array_get( $typography_supports, array( '__experimentalTextDecoration' ), false );
+	$has_text_transform_support  = _wp_array_get( $typography_supports, array( '__experimentalTextTransform' ), false );
 
-	$skip_font_size_support_serialization = _wp_array_get( $block_type->supports, array( '__experimentalSkipFontSizeSerialization' ), false );
-
-	// Covers all typography features _except_ font size.
-	$skip_typography_serialization = _wp_array_get( $block_type->supports, array( '__experimentalSkipTypographySerialization' ), false );
-
-	// Font Size.
-	if ( $has_font_size_support && ! $skip_font_size_support_serialization ) {
+	if ( $has_font_size_support ) {
 		$has_named_font_size  = array_key_exists( 'fontSize', $block_attributes );
 		$has_custom_font_size = isset( $block_attributes['style']['typography']['fontSize'] );
 
-		// Apply required class or style.
 		if ( $has_named_font_size ) {
-			$classes[] = sprintf( 'has-%s-font-size', $block_attributes['fontSize'] );
+			$classes[] = sprintf( 'has-%s-font-size', gutenberg_experimental_to_kebab_case( $block_attributes['fontSize'] ) );
 		} elseif ( $has_custom_font_size ) {
 			$styles[] = sprintf( 'font-size: %s;', $block_attributes['style']['typography']['fontSize'] );
 		}
 	}
 
-	// Font Family.
-	if ( $has_font_family_support && ! $skip_typography_serialization ) {
-		$has_font_family = isset( $block_attributes['style']['typography']['fontFamily'] );
-		// Apply required class and style.
-		if ( $has_font_family ) {
-			$font_family = $block_attributes['style']['typography']['fontFamily'];
-			if ( strpos( $font_family, 'var:preset|font-family' ) !== false ) {
-				// Get the name from the string and add proper styles.
-				$index_to_splice  = strrpos( $font_family, '|' ) + 1;
-				$font_family_name = substr( $font_family, $index_to_splice );
-				$styles[]         = sprintf( 'font-family: var(--wp--preset--font-family--%s);', $font_family_name );
-			} else {
-				$styles[] = sprintf( 'font-family: %s;', $block_attributes['style']['typography']['fontFamily'] );
+	if ( $has_font_family_support ) {
+		$has_named_font_family  = array_key_exists( 'fontFamily', $block_attributes );
+		$has_custom_font_family = isset( $block_attributes['style']['typography']['fontFamily'] );
+
+		if ( $has_named_font_family ) {
+			$classes[] = sprintf( 'has-%s-font-family', gutenberg_experimental_to_kebab_case( $block_attributes['fontFamily'] ) );
+		} elseif ( $has_custom_font_family ) {
+			// Before using classes, the value was serialized as a CSS Custom Property.
+			// We don't need this code path when it lands in core.
+			$font_family_custom = $block_attributes['style']['typography']['fontFamily'];
+			if ( strpos( $font_family_custom, 'var:preset|font-family' ) !== false ) {
+				$index_to_splice    = strrpos( $font_family_custom, '|' ) + 1;
+				$font_family_slug   = gutenberg_experimental_to_kebab_case( substr( $font_family_custom, $index_to_splice ) );
+				$font_family_custom = sprintf( 'var(--wp--preset--font-family--%s)', $font_family_slug );
 			}
+			$styles[] = sprintf( 'font-family: %s;', $font_family_custom );
 		}
 	}
 
-	// Font style.
-	if ( $has_font_style_support && ! $skip_typography_serialization ) {
-		// Apply font style.
+	if ( $has_font_style_support ) {
 		$font_style = gutenberg_typography_get_css_variable_inline_style( $block_attributes, 'fontStyle', 'font-style' );
 		if ( $font_style ) {
 			$styles[] = $font_style;
 		}
 	}
 
-	// Font weight.
-	if ( $has_font_weight_support && ! $skip_typography_serialization ) {
-		// Apply font weight.
+	if ( $has_font_weight_support ) {
 		$font_weight = gutenberg_typography_get_css_variable_inline_style( $block_attributes, 'fontWeight', 'font-weight' );
 		if ( $font_weight ) {
 			$styles[] = $font_weight;
 		}
 	}
 
-	// Line Height.
-	if ( $has_line_height_support && ! $skip_typography_serialization ) {
+	if ( $has_line_height_support ) {
 		$has_line_height = isset( $block_attributes['style']['typography']['lineHeight'] );
-		// Add the style (no classes for line-height).
 		if ( $has_line_height ) {
 			$styles[] = sprintf( 'line-height: %s;', $block_attributes['style']['typography']['lineHeight'] );
 		}
 	}
 
-	// Text Decoration.
-	if ( $has_text_decoration_support && ! $skip_typography_serialization ) {
+	if ( $has_text_decoration_support ) {
 		$text_decoration_style = gutenberg_typography_get_css_variable_inline_style( $block_attributes, 'textDecoration', 'text-decoration' );
 		if ( $text_decoration_style ) {
 			$styles[] = $text_decoration_style;
 		}
 	}
 
-	// Text Transform.
-	if ( $has_text_transform_support && ! $skip_typography_serialization ) {
+	if ( $has_text_transform_support ) {
 		$text_transform_style = gutenberg_typography_get_css_variable_inline_style( $block_attributes, 'textTransform', 'text-transform' );
 		if ( $text_transform_style ) {
 			$styles[] = $text_transform_style;
+		}
+	}
+
+	if ( $has_letter_spacing_support ) {
+		$letter_spacing_style = gutenberg_typography_get_css_variable_inline_style( $block_attributes, 'letterSpacing', 'letter-spacing' );
+		if ( $letter_spacing_style ) {
+			$styles[] = $letter_spacing_style;
 		}
 	}
 

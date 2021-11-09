@@ -95,7 +95,7 @@ exports[`PostPublishPanel should render the pre-publish panel if post status is 
       className="editor-post-publish-panel__header-cancel-button"
     >
       <ForwardRef(Button)
-        isSecondary={true}
+        variant="secondary"
       >
         Cancel
       </ForwardRef(Button)>
@@ -135,7 +135,7 @@ exports[`PostPublishPanel should render the pre-publish panel if the post is not
       className="editor-post-publish-panel__header-cancel-button"
     >
       <ForwardRef(Button)
-        isSecondary={true}
+        variant="secondary"
       >
         Cancel
       </ForwardRef(Button)>
@@ -175,7 +175,7 @@ exports[`PostPublishPanel should render the spinner if the post is being saved 1
       className="editor-post-publish-panel__header-cancel-button"
     >
       <ForwardRef(Button)
-        isSecondary={true}
+        variant="secondary"
       >
         Cancel
       </ForwardRef(Button)>

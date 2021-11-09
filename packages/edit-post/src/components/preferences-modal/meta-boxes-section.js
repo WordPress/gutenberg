@@ -8,6 +8,7 @@ import { filter, map } from 'lodash';
  */
 import { __ } from '@wordpress/i18n';
 import { withSelect } from '@wordpress/data';
+import { store as editorStore } from '@wordpress/editor';
 
 /**
  * Internal dependencies
@@ -48,7 +49,7 @@ export function MetaBoxesSection( {
 }
 
 export default withSelect( ( select ) => {
-	const { getEditorSettings } = select( 'core/editor' );
+	const { getEditorSettings } = select( editorStore );
 	const { getAllMetaBoxes } = select( editPostStore );
 
 	return {

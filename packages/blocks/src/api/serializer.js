@@ -6,7 +6,12 @@ import { isEmpty, reduce, isObject, castArray, startsWith } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { Component, cloneElement, renderToString } from '@wordpress/element';
+import {
+	Component,
+	cloneElement,
+	renderToString,
+	RawHTML,
+} from '@wordpress/element';
 import { hasFilter, applyFilters } from '@wordpress/hooks';
 import isShallowEqual from '@wordpress/is-shallow-equal';
 import { removep } from '@wordpress/autop';
@@ -18,10 +23,8 @@ import {
 	getBlockType,
 	getFreeformContentHandlerName,
 	getUnregisteredTypeHandlerName,
-	hasBlockSupport,
 } from './registration';
 import { isUnmodifiedDefaultBlock, normalizeBlockType } from './utils';
-import BlockContentProvider from '../block-content-provider';
 
 /**
  * @typedef {Object} WPBlockSerializationOptions Serialization Options.
@@ -71,6 +74,7 @@ export function getBlockMenuDefaultClassName( blockName ) {
 }
 
 const blockPropsProvider = {};
+const innerBlocksPropsProvider = {};
 
 /**
  * Call within a save function to get the props for the block wrapper.
@@ -88,12 +92,27 @@ export function getBlockProps( props = {} ) {
 }
 
 /**
+ * Call within a save function to get the props for the inner blocks wrapper.
+ *
+ * @param {Object} props Optional. Props to pass to the element.
+ */
+export function getInnerBlocksProps( props = {} ) {
+	const { innerBlocks } = innerBlocksPropsProvider;
+	// Value is an array of blocks, so defer to block serializer
+	const html = serialize( innerBlocks, { isInnerBlocks: true } );
+	// Use special-cased raw HTML tag to avoid default escaping.
+	const children = <RawHTML>{ html }</RawHTML>;
+
+	return { ...props, children };
+}
+
+/**
  * Given a block type containing a save render implementation and attributes, returns the
  * enhanced element to be saved or string when raw HTML expected.
  *
- * @param {string|Object} blockTypeOrName   Block type or name.
- * @param {Object}        attributes        Block attributes.
- * @param {?Array}        innerBlocks       Nested blocks.
+ * @param {string|Object} blockTypeOrName Block type or name.
+ * @param {Object}        attributes      Block attributes.
+ * @param {?Array}        innerBlocks     Nested blocks.
  *
  * @return {Object|string} Save element or raw HTML string.
  */
@@ -115,17 +134,14 @@ export function getSaveElement(
 
 	blockPropsProvider.blockType = blockType;
 	blockPropsProvider.attributes = attributes;
+	innerBlocksPropsProvider.innerBlocks = innerBlocks;
 
 	let element = save( { attributes, innerBlocks } );
-
-	const hasLightBlockWrapper =
-		blockType.apiVersion > 1 ||
-		hasBlockSupport( blockType, 'lightBlockWrapper', false );
 
 	if (
 		isObject( element ) &&
 		hasFilter( 'blocks.getSaveContent.extraProps' ) &&
-		! hasLightBlockWrapper
+		! ( blockType.apiVersion > 1 )
 	) {
 		/**
 		 * Filters the props applied to the block save result element.
@@ -153,17 +169,11 @@ export function getSaveElement(
 	 * @param {WPBlock}   blockType  Block type definition.
 	 * @param {Object}    attributes Block attributes.
 	 */
-	element = applyFilters(
+	return applyFilters(
 		'blocks.getSaveElement',
 		element,
 		blockType,
 		attributes
-	);
-
-	return (
-		<BlockContentProvider innerBlocks={ innerBlocks }>
-			{ element }
-		</BlockContentProvider>
 	);
 }
 
@@ -196,7 +206,7 @@ export function getSaveContent( blockTypeOrName, attributes, innerBlocks ) {
  * This function returns only those attributes which are needed to persist and
  * which cannot be matched from the block content.
  *
- * @param {Object<string,*>} blockType     Block type.
+ * @param {Object<string,*>} blockType  Block type.
  * @param {Object<string,*>} attributes Attributes from in-memory block data.
  *
  * @return {Object<string,*>} Subset of attributes for comment serialization.

@@ -2,7 +2,7 @@
  * External dependencies
  */
 import { noop, omit } from 'lodash';
-
+import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
@@ -18,7 +18,11 @@ import LinkControlSearchResults from './search-results';
 import { CREATE_TYPE } from './constants';
 import useSearchHandler from './use-search-handler';
 
-const noopSearchHandler = Promise.resolve( [] );
+// Must be a function as otherwise URLInput will default
+// to the fetchLinkSuggestions passed in block editor settings
+// which will cause an unintended http request.
+const noopSearchHandler = () => Promise.resolve( [] );
+
 const LinkControlSearchInput = forwardRef(
 	(
 		{
@@ -41,6 +45,7 @@ const LinkControlSearchInput = forwardRef(
 			suggestionsQuery = {},
 			withURLSuggestion = true,
 			createSuggestionButtonText,
+			useLabel = false,
 		},
 		ref
 	) => {
@@ -50,6 +55,7 @@ const LinkControlSearchInput = forwardRef(
 			withCreateSuggestion,
 			withURLSuggestion
 		);
+
 		const searchHandler = showSuggestions
 			? fetchSuggestions || genericSearchHandler
 			: noopSearchHandler;
@@ -61,17 +67,12 @@ const LinkControlSearchInput = forwardRef(
 		 * Handles the user moving between different suggestions. Does not handle
 		 * choosing an individual item.
 		 *
-		 * @param {string} selection the url of the selected suggestion.
+		 * @param {string} selection  the url of the selected suggestion.
 		 * @param {Object} suggestion the suggestion object.
 		 */
 		const onInputChange = ( selection, suggestion ) => {
 			onChange( selection );
 			setFocusedSuggestion( suggestion );
-		};
-
-		const onFormSubmit = ( event ) => {
-			event.preventDefault();
-			onSuggestionSelected( focusedSuggestion || { url: value } );
 		};
 
 		const handleRenderSuggestions = ( props ) =>
@@ -117,10 +118,15 @@ const LinkControlSearchInput = forwardRef(
 			}
 		};
 
+		const inputClasses = classnames( className, {
+			'has-no-label': ! useLabel,
+		} );
+
 		return (
-			<form onSubmit={ onFormSubmit }>
+			<div className="block-editor-link-control__search-input-container">
 				<URLInput
-					className={ className }
+					label={ useLabel ? 'URL' : undefined }
+					className={ inputClasses }
 					value={ value }
 					onChange={ onInputChange }
 					placeholder={ placeholder ?? __( 'Search or type url' ) }
@@ -132,10 +138,23 @@ const LinkControlSearchInput = forwardRef(
 					__experimentalShowInitialSuggestions={
 						showInitialSuggestions
 					}
+					onSubmit={ ( suggestion, event ) => {
+						const hasSuggestion = suggestion || focusedSuggestion;
+
+						// If there is no suggestion and the value (ie: any manually entered URL) is empty
+						// then don't allow submission otherwise we get empty links.
+						if ( ! hasSuggestion && ! value?.trim()?.length ) {
+							event.preventDefault();
+						} else {
+							onSuggestionSelected(
+								hasSuggestion || { url: value }
+							);
+						}
+					} }
 					ref={ ref }
 				/>
 				{ children }
-			</form>
+			</div>
 		);
 	}
 );

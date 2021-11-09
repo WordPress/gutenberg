@@ -20,7 +20,10 @@ import {
 	__experimentalRegisterExperimentalCoreBlocks,
 } from '@wordpress/block-library';
 import prettierConfig from '@wordpress/prettier-config';
-//eslint-disable-next-line no-restricted-syntax
+
+/**
+ * Internal dependencies
+ */
 import {
 	blockNameToFixtureBasename,
 	getAvailableBlockFixturesBasenames,
@@ -31,7 +34,7 @@ import {
 	writeBlockFixtureParsedJSON,
 	writeBlockFixtureJSON,
 	writeBlockFixtureSerializedHTML,
-} from '@wordpress/e2e-tests/fixtures';
+} from '../fixtures';
 
 const blockBasenames = getAvailableBlockFixturesBasenames();
 
@@ -263,7 +266,9 @@ describe( 'full post content fixture', () => {
 				if ( ! foundFixtures.length ) {
 					errors.push(
 						format(
-							"Expected a fixture file called '%s.html' or '%s__*.html'.",
+							"Expected a fixture file called '%s.html' or '%s__*.html' in `test/integration/fixtures/blocks/` " +
+								'\n\n' +
+								'For more information on how to create test fixtures see https://github.com/WordPress/gutenberg/blob/1f75f8f6f500a20df5b9d6e317b4d72dd5af4ede/test/integration/fixtures/blocks/README.md\n\n',
 							nameToFilename,
 							nameToFilename
 						)

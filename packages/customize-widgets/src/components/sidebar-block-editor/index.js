@@ -14,12 +14,15 @@ import {
 	BlockTools,
 	BlockSelectionClearer,
 	BlockInspector,
+	CopyHandler,
 	ObserveTyping,
 	WritingFlow,
 	BlockEditorKeyboardShortcuts,
 	__unstableBlockSettingsMenuFirstItem,
+	__unstableEditorStyles as EditorStyles,
 } from '@wordpress/block-editor';
 import { uploadMedia } from '@wordpress/media-utils';
+import { store as interfaceStore } from '@wordpress/interface';
 
 /**
  * Internal dependencies
@@ -28,9 +31,9 @@ import BlockInspectorButton from '../block-inspector-button';
 import Header from '../header';
 import useInserter from '../inserter/use-inserter';
 import SidebarEditorProvider from './sidebar-editor-provider';
-import { store as customizeWidgetsStore } from '../../store';
 import WelcomeGuide from '../welcome-guide';
 import KeyboardShortcuts from '../keyboard-shortcuts';
+import BlockAppender from '../block-appender';
 
 export default function SidebarBlockEditor( {
 	blockEditorSettings,
@@ -45,20 +48,24 @@ export default function SidebarBlockEditor( {
 		keepCaretInsideBlock,
 		isWelcomeGuideActive,
 	} = useSelect( ( select ) => {
+		const { isFeatureActive } = select( interfaceStore );
 		return {
 			hasUploadPermissions: defaultTo(
 				select( coreStore ).canUser( 'create', 'media' ),
 				true
 			),
-			isFixedToolbarActive: select(
-				customizeWidgetsStore
-			).__unstableIsFeatureActive( 'fixedToolbar' ),
-			keepCaretInsideBlock: select(
-				customizeWidgetsStore
-			).__unstableIsFeatureActive( 'keepCaretInsideBlock' ),
-			isWelcomeGuideActive: select(
-				customizeWidgetsStore
-			).__unstableIsFeatureActive( 'welcomeGuide' ),
+			isFixedToolbarActive: isFeatureActive(
+				'core/customize-widgets',
+				'fixedToolbar'
+			),
+			keepCaretInsideBlock: isFeatureActive(
+				'core/customize-widgets',
+				'keepCaretInsideBlock'
+			),
+			isWelcomeGuideActive: isFeatureActive(
+				'core/customize-widgets',
+				'welcomeGuide'
+			),
 		};
 	}, [] );
 	const settings = useMemo( () => {
@@ -79,12 +86,14 @@ export default function SidebarBlockEditor( {
 			mediaUpload: mediaUploadBlockEditor,
 			hasFixedToolbar: isFixedToolbarActive,
 			keepCaretInsideBlock,
+			__unstableHasCustomAppender: true,
 		};
 	}, [
 		hasUploadPermissions,
 		blockEditorSettings,
 		isFixedToolbarActive,
 		keepCaretInsideBlock,
+		setIsInserterOpened,
 	] );
 
 	if ( isWelcomeGuideActive ) {
@@ -97,7 +106,6 @@ export default function SidebarBlockEditor( {
 			<KeyboardShortcuts.Register />
 
 			<SidebarEditorProvider sidebar={ sidebar } settings={ settings }>
-				<BlockEditorKeyboardShortcuts />
 				<KeyboardShortcuts
 					undo={ sidebar.undo }
 					redo={ sidebar.redo }
@@ -112,15 +120,20 @@ export default function SidebarBlockEditor( {
 					isFixedToolbarActive={ isFixedToolbarActive }
 				/>
 
-				<BlockTools>
-					<BlockSelectionClearer>
-						<WritingFlow>
-							<ObserveTyping>
-								<BlockList />
-							</ObserveTyping>
-						</WritingFlow>
-					</BlockSelectionClearer>
-				</BlockTools>
+				<CopyHandler>
+					<BlockTools>
+						<EditorStyles styles={ settings.defaultEditorStyles } />
+						<BlockSelectionClearer>
+							<WritingFlow className="editor-styles-wrapper">
+								<ObserveTyping>
+									<BlockList
+										renderAppender={ BlockAppender }
+									/>
+								</ObserveTyping>
+							</WritingFlow>
+						</BlockSelectionClearer>
+					</BlockTools>
+				</CopyHandler>
 
 				{ createPortal(
 					// This is a temporary hack to prevent button component inside <BlockInspector>

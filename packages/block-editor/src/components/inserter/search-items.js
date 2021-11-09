@@ -82,7 +82,8 @@ export const searchBlockItems = (
  * @param {Array}  items       Item list
  * @param {string} searchInput Search input.
  * @param {Object} config      Search Config.
- * @return {Array}             Filtered item list.
+ *
+ * @return {Array} Filtered item list.
  */
 export const searchItems = ( items = [], searchInput = '', config = {} ) => {
 	const normalizedSearchTerms = getNormalizedSearchTerms( searchInput );
@@ -108,7 +109,8 @@ export const searchItems = ( items = [], searchInput = '', config = {} ) => {
  * @param {Object} item       Item to filter.
  * @param {string} searchTerm Search term.
  * @param {Object} config     Search Config.
- * @return {number}           Search Rank.
+ *
+ * @return {number} Search Rank.
  */
 export function getItemSearchRank( item, searchTerm, config = {} ) {
 	const {

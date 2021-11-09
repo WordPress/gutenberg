@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { ScrollView, View } from 'react-native';
+import { Platform, ScrollView, View } from 'react-native';
 
 /**
  * WordPress dependencies
@@ -16,7 +16,7 @@ import {
 	BlockToolbar,
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
-import { Toolbar, ToolbarButton } from '@wordpress/components';
+import { ToolbarGroup, ToolbarButton } from '@wordpress/components';
 import {
 	keyboardClose,
 	undo as undoIcon,
@@ -43,7 +43,13 @@ function HeaderToolbar( {
 } ) {
 	const scrollViewRef = useRef( null );
 	const scrollToStart = () => {
-		scrollViewRef.current.scrollTo( { x: 0 } );
+		// scrollview doesn't seem to automatically adjust to RTL on Android so, scroll to end when Android
+		const isAndroid = Platform.OS === 'android';
+		if ( isAndroid && isRTL ) {
+			scrollViewRef.current.scrollToEnd();
+		} else {
+			scrollViewRef.current.scrollTo( { x: 0 } );
+		}
 	};
 	const renderHistoryButtons = () => {
 		const buttons = [
@@ -94,7 +100,7 @@ function HeaderToolbar( {
 				<BlockToolbar />
 			</ScrollView>
 			{ showKeyboardHideButton && (
-				<Toolbar passedStyle={ styles.keyboardHideContainer }>
+				<ToolbarGroup passedStyle={ styles.keyboardHideContainer }>
 					<ToolbarButton
 						title={ __( 'Hide keyboard' ) }
 						icon={ keyboardClose }
@@ -103,23 +109,35 @@ function HeaderToolbar( {
 							hint: __( 'Tap to hide the keyboard' ),
 						} }
 					/>
-				</Toolbar>
+				</ToolbarGroup>
 			) }
 		</View>
 	);
 }
 
 export default compose( [
-	withSelect( ( select ) => ( {
-		hasRedo: select( editorStore ).hasEditorRedo(),
-		hasUndo: select( editorStore ).hasEditorUndo(),
-		// This setting (richEditingEnabled) should not live in the block editor's setting.
-		showInserter:
-			select( editPostStore ).getEditorMode() === 'visual' &&
-			select( editorStore ).getEditorSettings().richEditingEnabled,
-		isTextModeEnabled: select( editPostStore ).getEditorMode() === 'text',
-		isRTL: select( blockEditorStore ).getSettings().isRTL,
-	} ) ),
+	withSelect( ( select ) => {
+		const {
+			getBlockRootClientId,
+			getBlockSelectionEnd,
+			hasInserterItems,
+		} = select( blockEditorStore );
+		const { getEditorSettings } = select( editorStore );
+		return {
+			hasRedo: select( editorStore ).hasEditorRedo(),
+			hasUndo: select( editorStore ).hasEditorUndo(),
+			// This setting (richEditingEnabled) should not live in the block editor's setting.
+			showInserter:
+				select( editPostStore ).getEditorMode() === 'visual' &&
+				getEditorSettings().richEditingEnabled &&
+				hasInserterItems(
+					getBlockRootClientId( getBlockSelectionEnd() )
+				),
+			isTextModeEnabled:
+				select( editPostStore ).getEditorMode() === 'text',
+			isRTL: select( blockEditorStore ).getSettings().isRTL,
+		};
+	} ),
 	withDispatch( ( dispatch ) => {
 		const { clearSelectedBlock } = dispatch( blockEditorStore );
 		const { togglePostTitleSelection } = dispatch( editorStore );

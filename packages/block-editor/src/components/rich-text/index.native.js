@@ -55,7 +55,9 @@ import {
 	getMultilineTag,
 	getAllowedFormats,
 	isShortcode,
+	createLinkInParagraph,
 } from './utils';
+import EmbedHandlerPicker from './embed-handler-picker';
 
 const wrapperClasses = 'block-editor-rich-text';
 const classes = 'block-editor-rich-text__editable';
@@ -118,6 +120,7 @@ function RichTextWrapper(
 	const fallbackRef = useRef();
 	const { clientId, isSelected: blockIsSelected } = useBlockEditContext();
 	const nativeProps = useNativeProps();
+	const embedHandlerPickerRef = useRef();
 	const selector = ( select ) => {
 		const {
 			isCaretWithinFormattedText,
@@ -125,7 +128,7 @@ function RichTextWrapper(
 			getSelectionEnd,
 			getSettings,
 			didAutomaticChange,
-			__unstableGetBlockWithoutInnerBlocks,
+			getBlock,
 			isMultiSelecting,
 			hasMultiSelection,
 		} = select( blockEditorStore );
@@ -149,8 +152,7 @@ function RichTextWrapper(
 			// If the block of this RichText is unmodified then it's a candidate for replacing when adding a new block.
 			// In order to fix https://github.com/wordpress-mobile/gutenberg-mobile/issues/1126, let's blur on unmount in that case.
 			// This apparently assumes functionality the BlockHlder actually
-			const block =
-				clientId && __unstableGetBlockWithoutInnerBlocks( clientId );
+			const block = clientId && getBlock( clientId );
 			const shouldBlurOnUnmount =
 				block && isSelected && isUnmodifiedDefaultBlock( block );
 			extraProps = {
@@ -241,8 +243,8 @@ function RichTextWrapper(
 	 * blocks as a result of splitting the block by pasting block content in the
 	 * instance.
 	 *
-	 * @param  {Object} record       The rich text value to split.
-	 * @param  {Array}  pastedBlocks The pasted blocks to insert, if any.
+	 * @param {Object} record       The rich text value to split.
+	 * @param {Array}  pastedBlocks The pasted blocks to insert, if any.
 	 */
 	const splitValue = useCallback(
 		( record, pastedBlocks = [] ) => {
@@ -440,10 +442,19 @@ function RichTextWrapper(
 				mode = 'BLOCKS';
 			}
 
+			const isPastedURL = isURL( plainText.trim() );
+			const presentEmbedHandlerPicker = () =>
+				embedHandlerPickerRef.current?.presentPicker( {
+					createEmbed: () =>
+						onReplace( content, content.length - 1, -1 ),
+					createLink: () =>
+						createLinkInParagraph( plainText.trim(), onReplace ),
+				} );
+
 			if (
 				__unstableEmbedURLOnPaste &&
 				isEmpty( value ) &&
-				isURL( plainText.trim() )
+				isPastedURL
 			) {
 				mode = 'BLOCKS';
 			}
@@ -473,9 +484,30 @@ function RichTextWrapper(
 
 				onChange( insert( value, valueToInsert ) );
 			} else if ( content.length > 0 ) {
+				// When an URL is pasted in an empty paragraph then the EmbedHandlerPicker should showcase options allowing the transformation of that URL
+				// into either an Embed block or a link within the target paragraph. If the paragraph is non-empty, the URL is pasted as text.
+				const canPasteEmbed =
+					isPastedURL &&
+					content.length === 1 &&
+					content[ 0 ].name === 'core/embed';
 				if ( onReplace && isEmpty( value ) ) {
+					if ( canPasteEmbed ) {
+						onChange(
+							insert( value, create( { text: plainText } ) )
+						);
+						if ( __unstableEmbedURLOnPaste ) {
+							presentEmbedHandlerPicker();
+						}
+						return;
+					}
 					onReplace( content, content.length - 1, -1 );
 				} else {
+					if ( canPasteEmbed ) {
+						onChange(
+							insert( value, create( { text: plainText } ) )
+						);
+						return;
+					}
 					splitValue( value, content );
 				}
 			}
@@ -651,6 +683,7 @@ function RichTextWrapper(
 							/>
 						) }
 					</Autocomplete>
+					<EmbedHandlerPicker ref={ embedHandlerPickerRef } />
 				</>
 			) }
 		</RichText>

@@ -1,8 +1,19 @@
 /**
  * Internal dependencies
  */
-import { createComponent } from '../ui/utils';
+import { contextConnect } from '../ui/context';
+import { View } from '../view';
 import useTruncate from './hook';
+
+/**
+ * @param {import('../ui/context').WordPressComponentProps<import('./types').Props, 'span'>} props
+ * @param {import('react').Ref<any>}                                                         forwardedRef
+ */
+function Truncate( props, forwardedRef ) {
+	const truncateProps = useTruncate( props );
+
+	return <View as="span" { ...truncateProps } ref={ forwardedRef } />;
+}
 
 /**
  * `Truncate` is a typography primitive that trims text content.
@@ -25,10 +36,6 @@ import useTruncate from './hook';
  * }
  * ```
  */
-const Truncate = createComponent( {
-	as: 'span',
-	useHook: useTruncate,
-	name: 'Truncate',
-} );
+const ConnectedTruncate = contextConnect( Truncate, 'Truncate' );
 
-export default Truncate;
+export default ConnectedTruncate;

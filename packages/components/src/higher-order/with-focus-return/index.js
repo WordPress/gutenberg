@@ -24,9 +24,9 @@ function isComponentLike( object ) {
  * when the component is unmounted.
  *
  * @param {(WPComponent|Object)} options The component to be enhanced with
- *                                      focus return behavior, or an object
- *                                      describing the component and the
- *                                      focus return characteristics.
+ *                                       focus return behavior, or an object
+ *                                       describing the component and the
+ *                                       focus return characteristics.
  *
  * @return {Function} Higher Order Component with the focus restauration behaviour.
  */

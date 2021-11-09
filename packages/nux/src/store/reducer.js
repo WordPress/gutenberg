@@ -7,7 +7,7 @@ import { combineReducers } from '@wordpress/data';
  * Reducer that tracks which tips are in a guide. Each guide is represented by
  * an array which contains the tip identifiers contained within that guide.
  *
- * @param {Array} state  Current state.
+ * @param {Array}  state  Current state.
  * @param {Object} action Dispatched action.
  *
  * @return {Array} Updated state.
@@ -24,8 +24,8 @@ export function guides( state = [], action ) {
 /**
  * Reducer that tracks whether or not tips are globally enabled.
  *
- * @param {boolean} state Current state.
- * @param {Object} action Dispatched action.
+ * @param {boolean} state  Current state.
+ * @param {Object}  action Dispatched action.
  *
  * @return {boolean} Updated state.
  */

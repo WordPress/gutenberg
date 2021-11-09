@@ -17,7 +17,7 @@ import {
 const MOCK_EMBED_WORDPRESS_SUCCESS_RESPONSE = {
 	url: 'https://wordpress.org/gutenberg/handbook/block-api/attributes/',
 	html:
-		'<div class="wp-embedded-content" data-secret="shhhh it is a secret">WordPress embed</div>',
+		'<div class="wp-embedded-content" data-secret="shhhh it is a secret"></div>',
 	type: 'rich',
 	provider_name: 'WordPress',
 	provider_url: 'https://wordpress.org',

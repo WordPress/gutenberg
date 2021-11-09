@@ -9,8 +9,7 @@ import { isEmpty } from 'lodash';
  */
 import { Component } from '@wordpress/element';
 import { compose, withPreferredColorScheme } from '@wordpress/compose';
-import { withDispatch } from '@wordpress/data';
-import { coreBlocks } from '@wordpress/block-library';
+import { withDispatch, withSelect } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
 import { postList as icon } from '@wordpress/icons';
 import { InspectorControls } from '@wordpress/block-editor';
@@ -22,6 +21,7 @@ import {
 	RangeControl,
 	QueryControls,
 } from '@wordpress/components';
+import { store as blocksStore } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
@@ -189,13 +189,11 @@ class LatestPostsEdit extends Component {
 
 	render() {
 		const {
+			blockTitle,
 			getStylesFromColorScheme,
-			name,
 			openGeneralSidebar,
 			isSelected,
 		} = this.props;
-
-		const blockType = coreBlocks[ name ];
 
 		const blockStyle = getStylesFromColorScheme(
 			styles.latestPostBlock,
@@ -221,9 +219,7 @@ class LatestPostsEdit extends Component {
 				<View style={ blockStyle }>
 					{ isSelected && this.getInspectorControls() }
 					<Icon icon={ icon } { ...iconStyle } />
-					<Text style={ titleStyle }>
-						{ blockType.settings.title }
-					</Text>
+					<Text style={ titleStyle }>{ blockTitle }</Text>
 					<Text style={ styles.latestPostBlockSubtitle }>
 						{ __( 'CUSTOMIZE' ) }
 					</Text>
@@ -234,6 +230,12 @@ class LatestPostsEdit extends Component {
 }
 
 export default compose( [
+	withSelect( ( select, { name } ) => {
+		const blockType = select( blocksStore ).getBlockType( name );
+		return {
+			blockTitle: blockType?.title || name,
+		};
+	} ),
 	withDispatch( ( dispatch ) => {
 		const { openGeneralSidebar } = dispatch( 'core/edit-post' );
 

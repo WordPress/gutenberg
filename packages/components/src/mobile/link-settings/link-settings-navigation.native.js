@@ -22,6 +22,8 @@ function LinkSettingsNavigation( props ) {
 		<BottomSheet
 			isVisible={ props.isVisible }
 			onClose={ props.onClose }
+			onDismiss={ props.onDismiss }
+			testID={ props.testID }
 			hideHeader
 			hasNavigation
 		>

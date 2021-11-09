@@ -5,6 +5,7 @@ import { Icon } from '@wordpress/components';
 import { withSelect } from '@wordpress/data';
 import { compose } from '@wordpress/compose';
 import { getBlockType } from '@wordpress/blocks';
+import { BlockIcon } from '@wordpress/block-editor';
 
 /**
  * External dependencies
@@ -58,11 +59,13 @@ const BlockSelectionButton = ( {
 							/>
 						</View>,
 					] }
-				<Icon
-					size={ 24 }
-					icon={ blockInformation?.icon?.src }
-					fill={ styles.icon.color }
-				/>
+				{ blockInformation?.icon && (
+					<BlockIcon
+						size={ 24 }
+						icon={ blockInformation.icon }
+						fill={ styles.icon.color }
+					/>
+				) }
 				<Text
 					maxFontSizeMultiplier={ 1.25 }
 					ellipsizeMode="tail"

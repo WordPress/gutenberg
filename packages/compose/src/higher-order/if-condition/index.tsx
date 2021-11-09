@@ -2,7 +2,6 @@
  * Internal dependencies
  */
 import createHigherOrderComponent from '../../utils/create-higher-order-component';
-// eslint-disable-next-line no-duplicate-imports
 import type { HigherOrderComponent } from '../../utils/create-higher-order-component';
 
 /**
@@ -18,7 +17,7 @@ import type { HigherOrderComponent } from '../../utils/create-higher-order-compo
  * <ConditionalComponent foo="bar" />; // => <div>bar</div>;
  * ```
  *
- * @param predicate Function to test condition.
+ * @param  predicate Function to test condition.
  *
  * @return Higher-order component.
  */

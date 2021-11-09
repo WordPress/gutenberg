@@ -18,7 +18,7 @@ const EMPTY_ARRAY = [];
 /**
  * Returns the annotations for a specific client ID.
  *
- * @param {Object} state Editor state.
+ * @param {Object} state    Editor state.
  * @param {string} clientId The ID of the block to get the annotations for.
  *
  * @return {Array} The annotations applicable to this block.

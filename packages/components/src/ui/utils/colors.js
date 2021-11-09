@@ -2,10 +2,13 @@
  * External dependencies
  */
 import memoize from 'memize';
-import tinycolor from 'tinycolor2';
+import { colord, extend } from 'colord';
+import namesPlugin from 'colord/plugins/names';
 
 /** @type {HTMLDivElement} */
 let colorComputationNode;
+
+extend( [ namesPlugin ] );
 
 /**
  * @return {HTMLDivElement | undefined} The HTML element for color computation.
@@ -32,7 +35,7 @@ function getColorComputationNode() {
  */
 function isColor( value ) {
 	if ( typeof value !== 'string' ) return false;
-	const test = tinycolor( value );
+	const test = colord( value );
 
 	return test.isValid();
 }
@@ -71,18 +74,14 @@ const getComputedBackgroundColor = memoize( _getComputedBackgroundColor );
 /**
  * Get the text shade optimized for readability, based on a background color.
  *
- * @param {string | unknown} backgroundColor  The background color.
+ * @param {string | unknown} backgroundColor The background color.
  *
  * @return {string} The optimized text color (black or white).
  */
 export function getOptimalTextColor( backgroundColor ) {
 	const background = getComputedBackgroundColor( backgroundColor );
-	const isReadableWithBlackText = tinycolor.isReadable(
-		background,
-		'#000000'
-	);
 
-	return isReadableWithBlackText ? '#000000' : '#ffffff';
+	return colord( background ).isLight() ? '#000000' : '#ffffff';
 }
 
 /**

@@ -33,18 +33,6 @@ export function BlockInspectorButton( { onClick = noop, small = false } ) {
 		editPostStore
 	);
 
-	const speakMessage = () => {
-		if ( areAdvancedSettingsOpened ) {
-			speak( __( 'Block settings closed' ) );
-		} else {
-			speak(
-				__(
-					'Additional settings are now available in the Editor block settings sidebar'
-				)
-			);
-		}
-	};
-
 	const label = areAdvancedSettingsOpened
 		? __( 'Hide more settings' )
 		: __( 'Show more settings' );
@@ -54,11 +42,16 @@ export function BlockInspectorButton( { onClick = noop, small = false } ) {
 			onClick={ () => {
 				if ( areAdvancedSettingsOpened ) {
 					closeGeneralSidebar();
+					speak( __( 'Block settings closed' ) );
 				} else {
 					openGeneralSidebar( 'edit-post/block' );
-					speakMessage();
-					onClick();
+					speak(
+						__(
+							'Additional settings are now available in the Editor block settings sidebar'
+						)
+					);
 				}
+				onClick();
 			} }
 			shortcut={ shortcut }
 		>

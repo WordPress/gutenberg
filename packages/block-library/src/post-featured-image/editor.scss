@@ -10,7 +10,7 @@ div[data-type="core/post-featured-image"] {
 	.post-featured-image_placeholder {
 		display: flex;
 		flex-direction: row;
-		align-items: flex-start;
+		align-items: center;
 		border-radius: $radius-block-ui;
 		background-color: $white;
 		box-shadow: inset 0 0 0 $border-width $gray-900;
@@ -23,5 +23,12 @@ div[data-type="core/post-featured-image"] {
 			font-size: $default-font-size;
 			margin: 0;
 		}
+	}
+}
+
+.block-library-post-featured-image-dimension-controls {
+	margin-bottom: $grid-unit-10;
+	&.scale-control-is-visible {
+		margin-bottom: $grid-unit-20;
 	}
 }

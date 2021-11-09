@@ -9,11 +9,13 @@ import { find, get, includes } from 'lodash';
 import { Button, PanelBody } from '@wordpress/components';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { __, sprintf } from '@wordpress/i18n';
+import { store as coreStore } from '@wordpress/core-data';
 
 /**
  * Internal dependencies
  */
 import { POST_FORMATS } from '../post-format';
+import { store as editorStore } from '../../store';
 
 const getSuggestion = ( supportedFormats, suggestedPostFormat ) => {
 	const formats = POST_FORMATS.filter( ( format ) =>
@@ -27,7 +29,10 @@ const PostFormatSuggestion = ( {
 	suggestionText,
 	onUpdatePostFormat,
 } ) => (
-	<Button isLink onClick={ () => onUpdatePostFormat( suggestedPostFormat ) }>
+	<Button
+		variant="link"
+		onClick={ () => onUpdatePostFormat( suggestedPostFormat ) }
+	>
 		{ suggestionText }
 	</Button>
 );
@@ -35,10 +40,10 @@ const PostFormatSuggestion = ( {
 export default function PostFormatPanel() {
 	const { currentPostFormat, suggestion } = useSelect( ( select ) => {
 		const { getEditedPostAttribute, getSuggestedPostFormat } = select(
-			'core/editor'
+			editorStore
 		);
 		const supportedFormats = get(
-			select( 'core' ).getThemeSupports(),
+			select( coreStore ).getThemeSupports(),
 			[ 'formats' ],
 			[]
 		);
@@ -51,7 +56,7 @@ export default function PostFormatPanel() {
 		};
 	}, [] );
 
-	const { editPost } = useDispatch( 'core/editor' );
+	const { editPost } = useDispatch( editorStore );
 
 	const onUpdatePostFormat = ( format ) => editPost( { format } );
 

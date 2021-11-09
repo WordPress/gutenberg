@@ -23,20 +23,17 @@ export function BorderPanel( props ) {
 	const isSupported = hasBorderSupport( props.name );
 
 	const isColorSupported =
-		useSetting( 'border.customColor' ) &&
-		hasBorderSupport( props.name, 'color' );
+		useSetting( 'border.color' ) && hasBorderSupport( props.name, 'color' );
 
 	const isRadiusSupported =
-		useSetting( 'border.customRadius' ) &&
+		useSetting( 'border.radius' ) &&
 		hasBorderSupport( props.name, 'radius' );
 
 	const isStyleSupported =
-		useSetting( 'border.customStyle' ) &&
-		hasBorderSupport( props.name, 'style' );
+		useSetting( 'border.style' ) && hasBorderSupport( props.name, 'style' );
 
 	const isWidthSupported =
-		useSetting( 'border.customWidth' ) &&
-		hasBorderSupport( props.name, 'width' );
+		useSetting( 'border.width' ) && hasBorderSupport( props.name, 'width' );
 
 	if ( isDisabled || ! isSupported ) {
 		return null;
@@ -44,11 +41,19 @@ export function BorderPanel( props ) {
 
 	return (
 		<InspectorControls>
-			<PanelBody title={ __( 'Border settings' ) } initialOpen={ false }>
-				{ isStyleSupported && <BorderStyleEdit { ...props } /> }
-				{ isWidthSupported && <BorderWidthEdit { ...props } /> }
-				{ isRadiusSupported && <BorderRadiusEdit { ...props } /> }
+			<PanelBody
+				className="block-editor-hooks__border-controls"
+				title={ __( 'Border' ) }
+				initialOpen={ false }
+			>
+				{ ( isWidthSupported || isStyleSupported ) && (
+					<div className="block-editor-hooks__border-controls-row">
+						{ isWidthSupported && <BorderWidthEdit { ...props } /> }
+						{ isStyleSupported && <BorderStyleEdit { ...props } /> }
+					</div>
+				) }
 				{ isColorSupported && <BorderColorEdit { ...props } /> }
+				{ isRadiusSupported && <BorderRadiusEdit { ...props } /> }
 			</PanelBody>
 		</InspectorControls>
 	);
@@ -57,9 +62,10 @@ export function BorderPanel( props ) {
 /**
  * Determine whether there is block support for border properties.
  *
- * @param  {string} blockName Block name.
- * @param  {string} feature   Border feature to check support for.
- * @return {boolean}          Whether there is support.
+ * @param {string} blockName Block name.
+ * @param {string} feature   Border feature to check support for.
+ *
+ * @return {boolean} Whether there is support.
  */
 export function hasBorderSupport( blockName, feature = 'any' ) {
 	if ( Platform.OS !== 'web' ) {
@@ -87,8 +93,9 @@ export function hasBorderSupport( blockName, feature = 'any' ) {
 /**
  * Check whether serialization of border classes and styles should be skipped.
  *
- * @param  {string|Object} blockType Block name or block type object.
- * @return {boolean}                 Whether serialization of border properties should occur.
+ * @param {string|Object} blockType Block name or block type object.
+ *
+ * @return {boolean} Whether serialization of border properties should occur.
  */
 export function shouldSkipSerialization( blockType ) {
 	const support = getBlockSupport( blockType, BORDER_SUPPORT_KEY );
@@ -103,10 +110,10 @@ export function shouldSkipSerialization( blockType ) {
  */
 const useIsBorderDisabled = () => {
 	const configs = [
-		! useSetting( 'border.customColor' ),
-		! useSetting( 'border.customRadius' ),
-		! useSetting( 'border.customStyle' ),
-		! useSetting( 'border.customWidth' ),
+		! useSetting( 'border.color' ),
+		! useSetting( 'border.radius' ),
+		! useSetting( 'border.style' ),
+		! useSetting( 'border.width' ),
 	];
 
 	return configs.every( Boolean );

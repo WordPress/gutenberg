@@ -6,7 +6,7 @@ import { boolean, number } from '@storybook/addon-knobs';
 /**
  * Internal dependencies
  */
-import { Elevation } from '../../ui/elevation';
+import { Elevation } from '../../elevation';
 import { HStack } from '../../h-stack';
 import { View } from '../../view';
 import { ZStack } from '..';
@@ -14,6 +14,9 @@ import { ZStack } from '..';
 export default {
 	component: ZStack,
 	title: 'Components (Experimental)/ZStack',
+	parameters: {
+		knobs: { disabled: false },
+	},
 };
 
 const Avatar = ( { backgroundColor } ) => {

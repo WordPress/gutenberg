@@ -21,7 +21,7 @@ import {
 import { useAsyncList } from '@wordpress/compose';
 import { store as noticesStore } from '@wordpress/notices';
 import { store as coreStore } from '@wordpress/core-data';
-import { store as editorStore } from '@wordpress/editor';
+
 /**
  * Internal dependencies
  */
@@ -149,7 +149,9 @@ function TemplatePartsByArea( {
 			>
 				{ sprintf(
 					// Translators: %s for the template part variation ("Header", "Footer", "Template Part").
-					'There is no other %s available. If you are looking for another type of template part, try searching for it using the input above.',
+					__(
+						'There is no other %s available. If you are looking for another type of template part, try searching for it using the input above.'
+					),
 					area && area !== 'uncategorized'
 						? labelsByArea[ area ] || area
 						: __( 'Template Part' )
@@ -307,8 +309,11 @@ export default function TemplatePartPreviews( {
 				) !== templatePartId
 		);
 
+		// FIXME: @wordpress/block-library should not depend on @wordpress/editor.
+		// Blocks can be loaded into a *non-post* block editor.
+		// eslint-disable-next-line @wordpress/data-no-store-string-literals
 		const definedAreas = select(
-			editorStore
+			'core/editor'
 		).__experimentalGetDefaultTemplatePartAreas();
 		const _labelsByArea = {};
 		definedAreas.forEach( ( item ) => {

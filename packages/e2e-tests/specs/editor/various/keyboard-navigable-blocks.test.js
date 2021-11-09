@@ -116,7 +116,7 @@ describe( 'Order of block keyboard navigation', () => {
 		await page.keyboard.press( 'Tab' );
 		await expect(
 			await page.evaluate( () => {
-				return document.activeElement.placeholder;
+				return document.activeElement.getAttribute( 'aria-label' );
 			} )
 		).toBe( 'Add title' );
 
@@ -168,7 +168,7 @@ describe( 'Order of block keyboard navigation', () => {
 		await pressKeyWithModifier( 'shift', 'Tab' );
 		await expect(
 			await page.evaluate( () => {
-				return document.activeElement.placeholder;
+				return document.activeElement.getAttribute( 'aria-label' );
 			} )
 		).toBe( 'Add title' );
 	} );

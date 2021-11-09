@@ -30,8 +30,9 @@ const EMPTY_ARRAY = [];
  * Provides the CSS class names and inline styles for a block's color support
  * attributes.
  *
- * @param  {Object} attributes Block attributes.
- * @return {Object}            Color block support derived CSS classes & styles.
+ * @param {Object} attributes Block attributes.
+ *
+ * @return {Object} Color block support derived CSS classes & styles.
  */
 export function getColorClassesAndStyles( attributes ) {
 	const { backgroundColor, textColor, gradient, style } = attributes;
@@ -76,8 +77,9 @@ export function getColorClassesAndStyles( attributes ) {
  * Inline styles are forced for named colors to ensure these selections are
  * reflected when themes do not load their color stylesheets in the editor.
  *
- * @param  {Object} attributes Block attributes.
- * @return {Object}            ClassName & style props from colors block support.
+ * @param {Object} attributes Block attributes.
+ *
+ * @return {Object} ClassName & style props from colors block support.
  */
 export function useColorProps( attributes ) {
 	const { backgroundColor, textColor, gradient } = attributes;

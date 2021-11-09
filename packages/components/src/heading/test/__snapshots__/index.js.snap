@@ -2,7 +2,7 @@
 
 exports[`props should render correctly 1`] = `
 .emotion-0 {
-  color: #000;
+  color: #1e1e1e;
   line-height: 1.2;
   margin: 0;
   color: #050505;
@@ -12,7 +12,7 @@ exports[`props should render correctly 1`] = `
 }
 
 <h2
-  class="components-truncate components-text components-heading emotion-0 emotion-1 emotion-2"
+  class="components-truncate components-text components-heading emotion-0 emotion-1"
   data-wp-c16t="true"
   data-wp-component="Heading"
 >

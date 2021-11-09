@@ -1,5 +1,7 @@
 # withState
 
+**Deprecated**
+
 `withState` is a React [higher-order component](https://facebook.github.io/react/docs/higher-order-components.html) which enables a function component to have internal state.
 
 Wrapping a component with `withState` provides state as props to the wrapped component, along with a `setState` updater function.

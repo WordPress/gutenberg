@@ -1,8 +1,19 @@
 /**
  * Internal dependencies
  */
-import { createComponent } from '../utils';
+import { contextConnect } from '../context';
+import { View } from '../../view';
 import { useControlLabel } from './hook';
+
+/**
+ * @param {import('../context').WordPressComponentProps<import('./types').Props, 'label', false>} props
+ * @param {import('react').Ref<any>}                                                              forwardedRef
+ */
+function ControlLabel( props, forwardedRef ) {
+	const controlLabelProps = useControlLabel( props );
+
+	return <View as="label" { ...controlLabelProps } ref={ forwardedRef } />;
+}
 
 /**
  * `ControlLabel` is a form component that works with `FormGroup` to provide a
@@ -21,10 +32,6 @@ import { useControlLabel } from './hook';
  * }
  * ```
  */
-const ControlLabel = createComponent( {
-	as: 'label',
-	useHook: useControlLabel,
-	name: 'ControlLabel',
-} );
+const ConnectedControlLabel = contextConnect( ControlLabel, 'ControlLabel' );
 
-export default ControlLabel;
+export default ConnectedControlLabel;

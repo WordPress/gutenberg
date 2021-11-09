@@ -67,7 +67,7 @@ const save = async () => {
 
 const revertTemplate = async () => {
 	await page.click( '.edit-site-document-actions__get-info' );
-	await page.click( '.edit-site-template-details__revert button' );
+	await page.click( '.edit-site-template-details__revert-button' );
 	await waitForNotice();
 	await assertSaveButtonIsEnabled();
 };

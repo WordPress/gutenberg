@@ -1,12 +1,13 @@
 /**
  * External dependencies
  */
-import { partial, isEmpty, map } from 'lodash';
+import { partial, isEmpty, map, fromPairs } from 'lodash';
 
 /**
  * WordPress dependencies
  */
 import { __, sprintf } from '@wordpress/i18n';
+import { useMemo } from '@wordpress/element';
 import { PanelBody, SelectControl } from '@wordpress/components';
 import { store as editorStore } from '@wordpress/editor';
 import { useSelect, useDispatch } from '@wordpress/data';
@@ -29,9 +30,11 @@ export function TemplatePanel() {
 		isOpened,
 		selectedTemplate,
 		availableTemplates,
+		fetchedTemplates,
 		isViewable,
 		template,
 		supportsTemplateMode,
+		canUserCreate,
 	} = useSelect( ( select ) => {
 		const {
 			isEditorPanelEnabled,
@@ -43,23 +46,43 @@ export function TemplatePanel() {
 			getEditorSettings,
 			getCurrentPostType,
 		} = select( editorStore );
-		const { getPostType } = select( coreStore );
-		const _isViewable =
-			getPostType( getCurrentPostType() )?.viewable ?? false;
+		const { getPostType, getEntityRecords, canUser } = select( coreStore );
+		const currentPostType = getCurrentPostType();
+		const _isViewable = getPostType( currentPostType )?.viewable ?? false;
 		const _supportsTemplateMode =
 			select( editorStore ).getEditorSettings().supportsTemplateMode &&
 			_isViewable;
+
+		const wpTemplates = getEntityRecords( 'postType', 'wp_template', {
+			post_type: currentPostType,
+		} );
+
+		const newAvailableTemplates = fromPairs(
+			( wpTemplates || [] ).map( ( { slug, title } ) => [
+				slug,
+				title.rendered,
+			] )
+		);
 
 		return {
 			isEnabled: isEditorPanelEnabled( PANEL_NAME ),
 			isOpened: isEditorPanelOpened( PANEL_NAME ),
 			selectedTemplate: getEditedPostAttribute( 'template' ),
 			availableTemplates: getEditorSettings().availableTemplates,
+			fetchedTemplates: newAvailableTemplates,
 			template: _supportsTemplateMode && getEditedPostTemplate(),
 			isViewable: _isViewable,
 			supportsTemplateMode: _supportsTemplateMode,
+			canUserCreate: canUser( 'create', 'templates' ),
 		};
 	}, [] );
+
+	const templates = useMemo( () => {
+		return {
+			...availableTemplates,
+			...fetchedTemplates,
+		};
+	}, [ availableTemplates, fetchedTemplates ] );
 
 	const { toggleEditorPanelOpened } = useDispatch( editPostStore );
 	const { editPost } = useDispatch( editorStore );
@@ -67,7 +90,8 @@ export function TemplatePanel() {
 	if (
 		! isEnabled ||
 		! isViewable ||
-		( isEmpty( availableTemplates ) && ! supportsTemplateMode )
+		( isEmpty( availableTemplates ) &&
+			( ! supportsTemplateMode || ! canUserCreate ) )
 	) {
 		return null;
 	}
@@ -92,21 +116,22 @@ export function TemplatePanel() {
 			<SelectControl
 				hideLabelFromVision
 				label={ __( 'Template:' ) }
-				value={ selectedTemplate }
+				value={
+					Object.keys( templates ).includes( selectedTemplate )
+						? selectedTemplate
+						: ''
+				}
 				onChange={ ( templateSlug ) => {
 					editPost( {
 						template: templateSlug || '',
 					} );
 				} }
-				options={ map(
-					availableTemplates,
-					( templateName, templateSlug ) => ( {
-						value: templateSlug,
-						label: templateName,
-					} )
-				) }
+				options={ map( templates, ( templateName, templateSlug ) => ( {
+					value: templateSlug,
+					label: templateName,
+				} ) ) }
 			/>
-			<PostTemplateActions />
+			{ canUserCreate && <PostTemplateActions /> }
 		</PanelBody>
 	);
 }

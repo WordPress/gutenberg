@@ -41,7 +41,9 @@ describe( 'cpt locking', () => {
 		);
 		await clickBlockToolbarButton( 'Options' );
 		expect(
-			await page.$x( '//button/span[contains(text(), "Remove block")]' )
+			await page.$x(
+				'//button/span[contains(text(), "Remove Paragraph")]'
+			)
 		).toHaveLength( 0 );
 	};
 
@@ -123,12 +125,12 @@ describe( 'cpt locking', () => {
 			await page.click(
 				'.wp-block-column .block-editor-button-block-appender'
 			);
-			await page.type( '.block-editor-inserter__search-input', 'image' );
+			await page.type( '.block-editor-inserter__search input', 'image' );
 			await pressKeyTimes( 'Tab', 2 );
 			await page.keyboard.press( 'Enter' );
 			await page.click( '.edit-post-header-toolbar__inserter-toggle' );
 			await page.type(
-				'.block-editor-inserter__search-input',
+				'.block-editor-inserter__search input',
 				'gallery'
 			);
 			await pressKeyTimes( 'Tab', 2 );
@@ -176,7 +178,7 @@ describe( 'cpt locking', () => {
 				'p1'
 			);
 			await clickBlockToolbarButton( 'Options' );
-			await clickMenuItem( 'Remove block' );
+			await clickMenuItem( 'Remove Paragraph' );
 			expect( await getEditedPostContent() ).toMatchSnapshot();
 		} );
 
@@ -196,7 +198,7 @@ describe( 'cpt locking', () => {
 				'p1'
 			);
 			await clickBlockToolbarButton( 'Options' );
-			await clickMenuItem( 'Remove block' );
+			await clickMenuItem( 'Remove Paragraph' );
 
 			expect( await getEditedPostContent() ).toMatchSnapshot();
 		} );

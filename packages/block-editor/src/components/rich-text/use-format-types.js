@@ -36,11 +36,11 @@ const interactiveContentTags = new Set( [
  * This hook provides RichText with the `formatTypes` and its derived props from
  * experimental format type settings.
  *
- * @param {Object} $0                               Options
- * @param {string} $0.clientId                      Block client ID.
- * @param {string} $0.identifier                    Block attribute.
+ * @param {Object}  $0                              Options
+ * @param {string}  $0.clientId                     Block client ID.
+ * @param {string}  $0.identifier                   Block attribute.
  * @param {boolean} $0.withoutInteractiveFormatting Whether to clean the interactive formattings or not.
- * @param {Array} $0.allowedFormats                 Allowed formats
+ * @param {Array}   $0.allowedFormats               Allowed formats
  */
 export function useFormatTypes( {
 	clientId,

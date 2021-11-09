@@ -3,7 +3,8 @@
  */
 import { View, Text, TouchableWithoutFeedback, Platform } from 'react-native';
 import HsvColorPicker from 'react-native-hsv-color-picker';
-import tinycolor from 'tinycolor2';
+import { colord, extend } from 'colord';
+import namesPlugin from 'colord/plugins/names';
 /**
  * WordPress dependencies
  */
@@ -16,6 +17,8 @@ import { Icon, check, close } from '@wordpress/icons';
  * Internal dependencies
  */
 import styles from './style.scss';
+
+extend( [ namesPlugin ] );
 
 function ColorPicker( {
 	shouldEnableBottomSheetScroll,
@@ -35,11 +38,11 @@ function ColorPicker( {
 	const hitSlop = { top: 22, bottom: 22, left: 22, right: 22 };
 	const { h: initH, s: initS, v: initV } =
 		! isGradientColor && activeColor
-			? tinycolor( activeColor ).toHsv()
-			: { h: 0, s: 0.5, v: 0.5 };
+			? colord( activeColor ).toHsv()
+			: { h: 0, s: 50, v: 50 };
 	const [ hue, setHue ] = useState( initH );
-	const [ sat, setSaturation ] = useState( initS );
-	const [ val, setValue ] = useState( initV );
+	const [ sat, setSaturation ] = useState( initS / 100 );
+	const [ val, setValue ] = useState( initV / 100 );
 	const [ savedColor ] = useState( activeColor );
 
 	const {
@@ -71,9 +74,11 @@ function ColorPicker( {
 		styles.footerDark
 	);
 
-	const currentColor = tinycolor(
-		`hsv ${ hue } ${ sat } ${ val }`
-	).toHexString();
+	const currentColor = colord( {
+		h: hue,
+		s: sat * 100,
+		v: val * 100,
+	} ).toHex();
 
 	useEffect( () => {
 		if ( ! didMount.current ) {
@@ -205,4 +210,4 @@ function ColorPicker( {
 	);
 }
 
-export default ColorPicker;
+export { ColorPicker };

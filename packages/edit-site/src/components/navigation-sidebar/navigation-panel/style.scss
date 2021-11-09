@@ -4,6 +4,7 @@
 	width: 0;
 	overflow: hidden;
 	background: $gray-900;
+	color: $white;
 	transition: width 100ms linear;
 	@include reduce-motion("transition");
 
@@ -114,6 +115,14 @@
 	em {
 		margin-right: 1ch;
 	}
+}
+
+.edit-site-navigation-panel__template-parts .components-navigation__menu-title-heading {
+	text-transform: capitalize;
+}
+
+.edit-site-navigation-panel__template-part-item .components-navigation__item-title {
+	text-transform: capitalize;
 }
 
 .components-navigation__item + .edit-site-navigation-panel__template-item {

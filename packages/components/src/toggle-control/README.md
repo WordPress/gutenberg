@@ -8,26 +8,26 @@ Render a user interface to change fixed background setting.
 
 ```jsx
 import { ToggleControl } from '@wordpress/components';
-import { withState } from '@wordpress/compose';
+import { useState } from '@wordpress/element';
 
-const MyToggleControl = withState( {
-	hasFixedBackground: false,
-} )( ( { hasFixedBackground, setState } ) => (
-	<ToggleControl
-		label="Fixed Background"
-		help={
-			hasFixedBackground
-				? 'Has fixed background.'
-				: 'No fixed background.'
-		}
-		checked={ hasFixedBackground }
-		onChange={ () =>
-			setState( ( state ) => ( {
-				hasFixedBackground: ! state.hasFixedBackground,
-			} ) )
-		}
-	/>
-) );
+const MyToggleControl = () => {
+	const [ hasFixedBackground, setHasFixedBackground ] = useState( false );
+
+	return (
+		<ToggleControl
+			label="Fixed Background"
+			help={
+				hasFixedBackground
+					? 'Has fixed background.'
+					: 'No fixed background.'
+			}
+			checked={ hasFixedBackground }
+			onChange={ () => {
+				setHasFixedBackground( ( state ) => ! state );
+			} }
+		/>
+	);
+};
 ```
 
 ## Props

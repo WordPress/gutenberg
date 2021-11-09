@@ -9,18 +9,7 @@ import { noop } from 'lodash';
 import { __ } from '@wordpress/i18n';
 import { ToggleControl, VisuallyHidden } from '@wordpress/components';
 
-const defaultSettings = [
-	{
-		id: 'opensInNewTab',
-		title: __( 'Open in new tab' ),
-	},
-];
-
-const LinkControlSettingsDrawer = ( {
-	value,
-	onChange = noop,
-	settings = defaultSettings,
-} ) => {
+const LinkControlSettingsDrawer = ( { value, onChange = noop, settings } ) => {
 	if ( ! settings || ! settings.length ) {
 		return null;
 	}

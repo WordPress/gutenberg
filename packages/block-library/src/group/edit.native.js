@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { View, Dimensions } from 'react-native';
+import { View } from 'react-native';
 
 /**
  * WordPress dependencies
@@ -24,7 +24,7 @@ import { alignmentHelpers } from '@wordpress/components';
  */
 import styles from './editor.scss';
 
-const { isWider, isFullWidth } = alignmentHelpers;
+const { isFullWidth } = alignmentHelpers;
 
 function GroupEdit( {
 	attributes,
@@ -32,31 +32,30 @@ function GroupEdit( {
 	isSelected,
 	isLastInnerBlockSelected,
 	getStylesFromColorScheme,
-	mergedStyle,
+	style,
 	blockWidth,
 } ) {
 	const { align } = attributes;
 	const [ resizeObserver, sizes ] = useResizeObserver();
 	const { width } = sizes || { width: 0 };
-	const screenWidth = Math.floor( Dimensions.get( 'window' ).width );
-	const isEqualWidth = width === screenWidth;
 
 	const renderAppender = useCallback(
 		() => (
 			<View
-				style={
-					( isWider( screenWidth, 'mobile' ) ||
-						isEqualWidth ||
-						isFullWidth( align ) ) &&
-					( hasInnerBlocks
-						? styles.groupAppender
-						: styles.wideGroupAppender )
-				}
+				style={ [
+					! hasInnerBlocks && styles.groupAppender,
+					isFullWidth( align ) &&
+						! hasInnerBlocks &&
+						styles.fullwidthGroupAppender,
+					isFullWidth( align ) &&
+						hasInnerBlocks &&
+						styles.fullwidthHasInnerGroupAppender,
+				] }
 			>
 				<InnerBlocks.ButtonBlockAppender />
 			</View>
 		),
-		[ align, hasInnerBlocks, width ]
+		[ align, hasInnerBlocks ]
 	);
 
 	if ( ! isSelected && ! hasInnerBlocks ) {
@@ -80,13 +79,13 @@ function GroupEdit( {
 		<View
 			style={ [
 				isSelected && hasInnerBlocks && styles.innerBlocks,
-				mergedStyle,
+				style,
 				isSelected &&
 					hasInnerBlocks &&
-					mergedStyle?.backgroundColor &&
+					style?.backgroundColor &&
 					styles.hasBackgroundAppender,
 				isLastInnerBlockSelected &&
-					mergedStyle?.backgroundColor &&
+					style?.backgroundColor &&
 					styles.isLastInnerBlockSelected,
 			] }
 		>

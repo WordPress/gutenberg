@@ -13,13 +13,18 @@ import { useDispatch, useSelect } from '@wordpress/data';
 import { useInstanceId } from '@wordpress/compose';
 import { VisuallyHidden } from '@wordpress/components';
 
+/**
+ * Internal dependencies
+ */
+import { store as editorStore } from '../../store';
+
 export default function PostTextEditor() {
 	const postContent = useSelect(
-		( select ) => select( 'core/editor' ).getEditedPostContent(),
+		( select ) => select( editorStore ).getEditedPostContent(),
 		[]
 	);
 
-	const { editPost, resetEditorBlocks } = useDispatch( 'core/editor' );
+	const { editPost, resetEditorBlocks } = useDispatch( editorStore );
 
 	const [ value, setValue ] = useState( postContent );
 	const [ isDirty, setIsDirty ] = useState( false );

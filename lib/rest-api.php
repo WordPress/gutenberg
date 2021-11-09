@@ -32,7 +32,7 @@ function gutenberg_register_rest_pattern_directory() {
 add_filter( 'rest_api_init', 'gutenberg_register_rest_pattern_directory' );
 
 /**
- * Registers the menu locations area REST API routes.
+ * Registers the menu locations REST API routes.
  */
 function gutenberg_register_rest_menu_location() {
 	$nav_menu_location = new WP_REST_Menu_Locations_Controller();
@@ -41,11 +41,20 @@ function gutenberg_register_rest_menu_location() {
 add_action( 'rest_api_init', 'gutenberg_register_rest_menu_location' );
 
 /**
- * Registers the menu locations area REST API routes.
+ * Registers the navigation areas REST API routes.
+ */
+function gutenberg_register_rest_navigation_areas() {
+	$navigation_areas = new WP_REST_Block_Navigation_Areas_Controller();
+	$navigation_areas->register_routes();
+}
+add_action( 'rest_api_init', 'gutenberg_register_rest_navigation_areas' );
+
+/**
+ * Registers the customizer nonces REST API routes.
  */
 function gutenberg_register_rest_customizer_nonces() {
-	$nav_menu_location = new WP_Rest_Customizer_Nonces();
-	$nav_menu_location->register_routes();
+	$customizer_nonces = new WP_Rest_Customizer_Nonces();
+	$customizer_nonces->register_routes();
 }
 add_action( 'rest_api_init', 'gutenberg_register_rest_customizer_nonces' );
 
@@ -63,15 +72,6 @@ function gutenberg_register_sidebars_and_widgets_endpoint() {
 	$widget_types->register_routes();
 }
 add_action( 'rest_api_init', 'gutenberg_register_sidebars_and_widgets_endpoint' );
-
-/**
- * Registers the Batch REST API routes.
- */
-function gutenberg_register_batch_endpoint() {
-	$batch = new WP_REST_Batch_Controller();
-	$batch->register_routes();
-}
-add_action( 'rest_api_init', 'gutenberg_register_batch_endpoint' );
 
 /**
  * Registers the Block editor settings REST API routes.
@@ -194,79 +194,51 @@ function gutenberg_auto_draft_get_sample_permalink( $permalink, $id, $title, $na
 add_filter( 'get_sample_permalink', 'gutenberg_auto_draft_get_sample_permalink', 10, 5 );
 
 /**
- * Expose the custom_logo theme-mod in the settings REST API.
+ * Filters WP_User_Query arguments when querying users via the REST API.
+ *
+ * Allow using the has_published_post argument.
+ *
+ * @param array           $prepared_args Array of arguments for WP_User_Query.
+ * @param WP_REST_Request $request       The REST API request.
+ *
+ * @return array Returns modified $prepared_args.
  */
-register_setting(
-	'general',
-	'theme_mods_' . get_option( 'stylesheet' ),
-	array(
-		'type'         => 'object',
-		'show_in_rest' => array(
-			'name'   => 'theme_mods_' . get_option( 'stylesheet' ),
-			'schema' => array(
-				'type'       => 'object',
-				'properties' => array(
-					'custom_logo' => array( 'type' => 'integer' ),
-				),
-			),
+function gutenberg_rest_user_query_has_published_posts( $prepared_args, $request ) {
+	if ( ! empty( $request['has_published_posts'] ) ) {
+		$prepared_args['has_published_posts'] = ( true === $request['has_published_posts'] )
+			? get_post_types( array( 'show_in_rest' => true ), 'names' )
+			: (array) $request['has_published_posts'];
+	}
+	return $prepared_args;
+}
+add_filter( 'rest_user_query', 'gutenberg_rest_user_query_has_published_posts', 10, 2 );
+
+
+/**
+ * Filters REST API collection parameters for the users controller.
+ *
+ * @param array $query_params JSON Schema-formatted collection parameters.
+ *
+ * @return array Returns the $query_params with "has_published_posts".
+ */
+function gutenberg_rest_user_collection_params_has_published_posts( $query_params ) {
+	$query_params['has_published_posts'] = array(
+		'description' => __( 'Limit result set to users who have published posts.', 'gutenberg' ),
+		'type'        => array( 'boolean', 'array' ),
+		'items'       => array(
+			'type' => 'string',
+			'enum' => get_post_types( array( 'show_in_rest' => true ), 'names' ),
 		),
-	)
-);
-
-/**
- * Expose the "stylesheet" setting in the REST API.
- */
-register_setting(
-	'general',
-	'stylesheet',
-	array(
-		'type'         => 'string',
-		'show_in_rest' => true,
-	)
-);
-
-/**
- * Filters the value of a setting recognized by the REST API.
- *
- * Hijacks the value for custom_logo theme-mod.
- *
- * @param mixed  $result Value to use for the requested setting. Can be a scalar
- *                       matching the registered schema for the setting, or null to
- *                       follow the default get_option() behavior.
- * @param string $name   Setting name (as shown in REST API responses).
- *
- * @return null|array
- */
-function gutenberg_rest_pre_get_setting_filter_custom_logo( $result, $name ) {
-	if ( 'theme_mods_' . get_option( 'stylesheet' ) === $name ) {
-		return array(
-			'custom_logo' => get_theme_mod( 'custom_logo' ),
-		);
-	}
+	);
+	return $query_params;
 }
-add_filter( 'rest_pre_get_setting', 'gutenberg_rest_pre_get_setting_filter_custom_logo', 10, 2 );
+add_filter( 'rest_user_collection_params', 'gutenberg_rest_user_collection_params_has_published_posts' );
 
 /**
- * Filters whether to preempt a setting value update via the REST API.
- *
- * Hijacks the saving method for theme-mods.
- *
- * @param bool   $result Whether to override the default behavior for updating the
- *                       value of a setting.
- * @param string $name   Setting name (as shown in REST API responses).
- * @param mixed  $value  Updated setting value.
- *
- * @return bool
+ * Registers the Global Styles REST API routes.
  */
-function gutenberg_rest_pre_set_setting_filter_theme_mods( $result, $name, $value ) {
-	$theme_mods_setting_name = 'theme_mods_' . get_option( 'stylesheet' );
-	if ( $theme_mods_setting_name === $name ) {
-		$value = (array) $value;
-		$value = wp_parse_args( $value, get_option( $theme_mods_setting_name, array() ) );
-
-		update_option( $theme_mods_setting_name, $value );
-		return true;
-	}
+function gutenberg_register_global_styles_endpoints() {
+	$editor_settings = new Gutenberg_REST_Global_Styles_Controller();
+	$editor_settings->register_routes();
 }
-
-add_filter( 'rest_pre_update_setting', 'gutenberg_rest_pre_set_setting_filter_theme_mods', 10, 3 );
+add_action( 'rest_api_init', 'gutenberg_register_global_styles_endpoints' );

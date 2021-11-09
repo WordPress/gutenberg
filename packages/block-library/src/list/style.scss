@@ -1,4 +1,9 @@
-ol.has-background,
-ul.has-background {
-	padding: $block-bg-padding--v $block-bg-padding--h;
+ol,
+ul {
+	// Break long strings of text without spaces so they don't overflow the block.
+	overflow-wrap: break-word;
+
+	&.has-background {
+		padding: $block-bg-padding--v $block-bg-padding--h;
+	}
 }

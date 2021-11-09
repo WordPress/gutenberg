@@ -15,6 +15,7 @@ import {
 	createNewPost,
 	clickBlockToolbarButton,
 	clickButton,
+	pressKeyWithModifier,
 } from '@wordpress/e2e-test-utils';
 
 describe( 'adding inline tokens', () => {
@@ -59,5 +60,20 @@ describe( 'adding inline tokens', () => {
 			`<!-- wp:paragraph -->\\s*<p>a <img class="wp-image-\\d+" style="width:\\s*10px;?" src="[^"]+\\/${ filename }\\.png" alt=""\\/?><\\/p>\\s*<!-- \\/wp:paragraph -->`
 		);
 		expect( await getEditedPostContent() ).toMatch( regex );
+
+		await pressKeyWithModifier( 'shift', 'ArrowLeft' );
+		await page.waitForSelector(
+			'.block-editor-format-toolbar__image-popover'
+		);
+		await page.keyboard.press( 'Tab' );
+		await page.keyboard.press( 'Tab' );
+		await page.keyboard.type( '20' );
+		await page.keyboard.press( 'Enter' );
+
+		// Check the content.
+		const regex2 = new RegExp(
+			`<!-- wp:paragraph -->\\s*<p>a <img class="wp-image-\\d+" style="width:\\s*20px;?" src="[^"]+\\/${ filename }\\.png" alt=""\\/?><\\/p>\\s*<!-- \\/wp:paragraph -->`
+		);
+		expect( await getEditedPostContent() ).toMatch( regex2 );
 	} );
 } );

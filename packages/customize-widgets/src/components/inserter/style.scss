@@ -25,7 +25,7 @@
 	// Match the "wp-full-overlay-header" height in core, plus the 1px border.
 	height: 46px;
 	box-sizing: border-box;
-	border-bottom: 1px solid $gray-300;
+	border-bottom: $border-width solid $gray-300;
 
 	.customize-widgets-layout__inserter-panel-header-title {
 		margin: 0;

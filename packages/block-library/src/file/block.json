@@ -13,6 +13,12 @@
 		"href": {
 			"type": "string"
 		},
+		"fileId": {
+			"type": "string",
+			"source": "attribute",
+			"selector": "a:not([download])",
+			"attribute": "id"
+		},
 		"fileName": {
 			"type": "string",
 			"source": "html",
@@ -51,6 +57,7 @@
 		"anchor": true,
 		"align": true
 	},
+	"viewScript": "file:./view.min.js",
 	"editorStyle": "wp-block-file-editor",
 	"style": "wp-block-file"
 }

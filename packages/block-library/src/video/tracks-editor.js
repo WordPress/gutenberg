@@ -24,6 +24,7 @@ import {
 import { upload, media } from '@wordpress/icons';
 import { useSelect } from '@wordpress/data';
 import { useState } from '@wordpress/element';
+import { getFilename } from '@wordpress/url';
 
 const ALLOWED_TYPES = [ 'text/vtt' ];
 
@@ -73,7 +74,7 @@ function TrackList( { tracks, onEditPress } ) {
 				>
 					<span>{ track.label } </span>
 					<Button
-						isTertiary
+						variant="tertiary"
 						onClick={ () => onEditPress( index ) }
 						aria-label={ sprintf(
 							/* translators: %s: Label of the video text track e.g: "French subtitles" */
@@ -99,9 +100,7 @@ function TrackList( { tracks, onEditPress } ) {
 
 function SingleTrackEditor( { track, onChange, onClose, onRemove } ) {
 	const { src = '', label = '', srcLang = '', kind = DEFAULT_KIND } = track;
-	const fileName = src.startsWith( 'blob:' )
-		? ''
-		: src.substring( src.lastIndexOf( '/' ) + 1 );
+	const fileName = src.startsWith( 'blob:' ) ? '' : getFilename( src ) || '';
 	return (
 		<NavigableMenu>
 			<div className="block-library-video-tracks-editor__single-track-editor">
@@ -152,7 +151,7 @@ function SingleTrackEditor( { track, onChange, onClose, onRemove } ) {
 				/>
 				<div className="block-library-video-tracks-editor__single-track-editor-buttons-container">
 					<Button
-						isSecondary
+						variant="secondary"
 						onClick={ () => {
 							const changes = {};
 							let hasChanges = false;
@@ -179,7 +178,7 @@ function SingleTrackEditor( { track, onChange, onClose, onRemove } ) {
 					>
 						{ __( 'Close' ) }
 					</Button>
-					<Button isDestructive isLink onClick={ onRemove }>
+					<Button isDestructive variant="link" onClick={ onRemove }>
 						{ __( 'Remove track' ) }
 					</Button>
 				</div>

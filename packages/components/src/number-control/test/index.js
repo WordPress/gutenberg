@@ -82,12 +82,56 @@ describe( 'NumberControl', () => {
 			expect( input.value ).toBe( '0' );
 		} );
 
-		it( 'should parse to number value on ENTER keypress', () => {
-			render( <NumberControl value={ 5 } /> );
+		it( 'should parse to number value on ENTER keypress when required', () => {
+			render( <NumberControl value={ 5 } required={ true } /> );
 
 			const input = getInput();
 			input.focus();
 			fireEvent.change( input, { target: { value: '10 abc' } } );
+			fireKeyDown( { keyCode: ENTER } );
+
+			expect( input.value ).toBe( '0' );
+		} );
+
+		it( 'should parse to empty string on ENTER keypress when not required', () => {
+			render( <NumberControl value={ 5 } required={ false } /> );
+
+			const input = getInput();
+			input.focus();
+			fireEvent.change( input, { target: { value: '10 abc' } } );
+			fireKeyDown( { keyCode: ENTER } );
+
+			expect( input.value ).toBe( '' );
+		} );
+
+		it( 'should accept empty string on ENTER keypress for optional field', () => {
+			render( <NumberControl value={ 5 } required={ false } /> );
+
+			const input = getInput();
+			input.focus();
+			fireEvent.change( input, { target: { value: '' } } );
+			fireKeyDown( { keyCode: ENTER } );
+
+			expect( input.value ).toBe( '' );
+		} );
+
+		it( 'should not enforce numerical value for empty string when required is omitted', () => {
+			render( <NumberControl value={ 5 } /> );
+
+			const input = getInput();
+			input.focus();
+			fireEvent.change( input, { target: { value: '' } } );
+			fireKeyDown( { keyCode: ENTER } );
+
+			expect( input.value ).toBe( '' );
+		} );
+
+		it( 'should enforce numerical value for empty string when required', () => {
+			render( <NumberControl value={ 5 } required={ true } /> );
+
+			const input = getInput();
+			input.focus();
+			fireEvent.change( input, { target: { value: '' } } );
 			fireKeyDown( { keyCode: ENTER } );
 
 			expect( input.value ).toBe( '0' );
@@ -126,6 +170,16 @@ describe( 'NumberControl', () => {
 			expect( input.value ).toBe( '-4' );
 		} );
 
+		it( 'should increment while preserving the decimal value when `step` is “any”', () => {
+			render( <StatefulNumberControl value={ 866.5309 } step="any" /> );
+
+			const input = getInput();
+			input.focus();
+			fireKeyDown( { keyCode: UP } );
+
+			expect( input.value ).toBe( '867.5309' );
+		} );
+
 		it( 'should increment by shiftStep on key UP + shift press', () => {
 			render( <StatefulNumberControl value={ 5 } shiftStep={ 10 } /> );
 
@@ -134,6 +188,16 @@ describe( 'NumberControl', () => {
 			fireKeyDown( { keyCode: UP, shiftKey: true } );
 
 			expect( input.value ).toBe( '20' );
+		} );
+
+		it( 'should increment by shiftStep while preserving the decimal value when `step` is “any”', () => {
+			render( <StatefulNumberControl value={ 857.5309 } step="any" /> );
+
+			const input = getInput();
+			input.focus();
+			fireKeyDown( { keyCode: UP, shiftKey: true } );
+
+			expect( input.value ).toBe( '867.5309' );
 		} );
 
 		it( 'should increment by custom shiftStep on key UP + shift press', () => {
@@ -210,6 +274,16 @@ describe( 'NumberControl', () => {
 			expect( input.value ).toBe( '-6' );
 		} );
 
+		it( 'should decrement while preserving the decimal value when `step` is “any”', () => {
+			render( <StatefulNumberControl value={ 868.5309 } step="any" /> );
+
+			const input = getInput();
+			input.focus();
+			fireKeyDown( { keyCode: DOWN } );
+
+			expect( input.value ).toBe( '867.5309' );
+		} );
+
 		it( 'should decrement by shiftStep on key DOWN + shift press', () => {
 			render( <StatefulNumberControl value={ 5 } /> );
 
@@ -218,6 +292,16 @@ describe( 'NumberControl', () => {
 			fireKeyDown( { keyCode: DOWN, shiftKey: true } );
 
 			expect( input.value ).toBe( '0' );
+		} );
+
+		it( 'should decrement by shiftStep while preserving the decimal value when `step` is “any”', () => {
+			render( <StatefulNumberControl value={ 877.5309 } step="any" /> );
+
+			const input = getInput();
+			input.focus();
+			fireKeyDown( { keyCode: DOWN, shiftKey: true } );
+
+			expect( input.value ).toBe( '867.5309' );
 		} );
 
 		it( 'should decrement by custom shiftStep on key DOWN + shift press', () => {

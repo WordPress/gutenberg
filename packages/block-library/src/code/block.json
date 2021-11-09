@@ -14,7 +14,33 @@
 	},
 	"supports": {
 		"anchor": true,
-		"fontSize": true
+		"__experimentalSelector": ".wp-block-code > code",
+		"typography": {
+			"fontSize": true,
+			"lineHeight": true,
+			"__experimentalFontStyle": true,
+			"__experimentalFontWeight": true,
+			"__experimentalLetterSpacing": true,
+			"__experimentalTextTransform": true,
+			"__experimentalDefaultControls": {
+				"fontSize": true
+			}
+		},
+		"spacing": {
+			"margin": [ "top", "bottom" ],
+			"padding": true
+		},
+		"__experimentalBorder": {
+			"radius": true,
+			"color": true,
+			"width": true,
+			"style": true
+		},
+		"color": {
+			"text": true,
+			"background": true,
+			"gradients": true
+		}
 	},
 	"style": "wp-block-code"
 }

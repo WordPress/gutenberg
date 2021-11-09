@@ -1,9 +1,4 @@
 /**
- * WordPress dependencies
- */
-import '@wordpress/rich-text';
-
-/**
  * Internal dependencies
  */
 import './hooks';
@@ -13,6 +8,8 @@ export {
 	getColorClassesAndStyles as __experimentalGetColorClassesAndStyles,
 	useColorProps as __experimentalUseColorProps,
 	useCustomSides as __experimentalUseCustomSides,
+	getSpacingClassesAndStyles as __experimentalGetSpacingClassesAndStyles,
+	useCachedTruthy,
 } from './hooks';
 export * from './components';
 export * from './utils';

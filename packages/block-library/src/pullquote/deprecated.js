@@ -12,6 +12,7 @@ import {
 	getColorObjectByAttributeValues,
 	RichText,
 	store as blockEditorStore,
+	useBlockProps,
 } from '@wordpress/block-editor';
 import { select } from '@wordpress/data';
 
@@ -57,7 +58,132 @@ function parseBorderColor( styleString ) {
 	}
 }
 
+// TODO: this is ripe for a bit of a clean up according to the example in https://developer.wordpress.org/block-editor/reference-guides/block-api/block-deprecation/#example
 const deprecated = [
+	{
+		attributes: {
+			...blockAttributes,
+		},
+		save( { attributes } ) {
+			const {
+				mainColor,
+				customMainColor,
+				customTextColor,
+				textColor,
+				value,
+				citation,
+				className,
+			} = attributes;
+
+			const isSolidColorStyle = includes( className, SOLID_COLOR_CLASS );
+
+			let figureClasses, figureStyles;
+
+			// Is solid color style
+			if ( isSolidColorStyle ) {
+				const backgroundClass = getColorClassName(
+					'background-color',
+					mainColor
+				);
+
+				figureClasses = classnames( {
+					'has-background': backgroundClass || customMainColor,
+					[ backgroundClass ]: backgroundClass,
+				} );
+
+				figureStyles = {
+					backgroundColor: backgroundClass
+						? undefined
+						: customMainColor,
+				};
+				// Is normal style and a custom color is being used ( we can set a style directly with its value)
+			} else if ( customMainColor ) {
+				figureStyles = {
+					borderColor: customMainColor,
+				};
+			}
+
+			const blockquoteTextColorClass = getColorClassName(
+				'color',
+				textColor
+			);
+			const blockquoteClasses = classnames( {
+				'has-text-color': textColor || customTextColor,
+				[ blockquoteTextColorClass ]: blockquoteTextColorClass,
+			} );
+
+			const blockquoteStyles = blockquoteTextColorClass
+				? undefined
+				: { color: customTextColor };
+
+			return (
+				<figure
+					{ ...useBlockProps.save( {
+						className: figureClasses,
+						style: figureStyles,
+					} ) }
+				>
+					<blockquote
+						className={ blockquoteClasses }
+						style={ blockquoteStyles }
+					>
+						<RichText.Content value={ value } multiline />
+						{ ! RichText.isEmpty( citation ) && (
+							<RichText.Content
+								tagName="cite"
+								value={ citation }
+							/>
+						) }
+					</blockquote>
+				</figure>
+			);
+		},
+		migrate( {
+			className,
+			mainColor,
+			customMainColor,
+			customTextColor,
+			...attributes
+		} ) {
+			const isSolidColorStyle = includes( className, SOLID_COLOR_CLASS );
+			let style;
+
+			if ( customMainColor ) {
+				if ( ! isSolidColorStyle ) {
+					// Block supports: Set style.border.color if a deprecated block has a default style and a `customMainColor` attribute.
+					style = {
+						border: {
+							color: customMainColor,
+						},
+					};
+				} else {
+					// Block supports: Set style.color.background if a deprecated block has a solid style and a `customMainColor` attribute.
+					style = {
+						color: {
+							background: customMainColor,
+						},
+					};
+				}
+			}
+
+			// Block supports: Set style.color.text if a deprecated block has a `customTextColor` attribute.
+			if ( customTextColor && style ) {
+				style.color = {
+					...style.color,
+					text: customTextColor,
+				};
+			}
+
+			return {
+				className,
+				backgroundColor: isSolidColorStyle ? mainColor : undefined,
+				borderColor: isSolidColorStyle ? undefined : mainColor,
+				textAlign: isSolidColorStyle ? 'left' : undefined,
+				style,
+				...attributes,
+			};
+		},
+	},
 	{
 		attributes: {
 			...blockAttributes,
@@ -152,24 +278,66 @@ const deprecated = [
 				</figure>
 			);
 		},
-		migrate( { className, figureStyle, mainColor, ...attributes } ) {
+		migrate( {
+			className,
+			figureStyle,
+			mainColor,
+			customMainColor,
+			customTextColor,
+			...attributes
+		} ) {
 			const isSolidColorStyle = includes( className, SOLID_COLOR_CLASS );
+			let style;
+
+			if ( customMainColor ) {
+				if ( ! isSolidColorStyle ) {
+					// Block supports: Set style.border.color if a deprecated block has a default style and a `customMainColor` attribute.
+					style = {
+						border: {
+							color: customMainColor,
+						},
+					};
+				} else {
+					// Block supports: Set style.color.background if a deprecated block has a solid style and a `customMainColor` attribute.
+					style = {
+						color: {
+							background: customMainColor,
+						},
+					};
+				}
+			}
+
+			// Block supports: Set style.color.text if a deprecated block has a `customTextColor` attribute.
+			if ( customTextColor && style ) {
+				style.color = {
+					...style.color,
+					text: customTextColor,
+				};
+			}
 			// If is the default style, and a main color is set,
-			// migrate the main color value into a custom color.
-			// The custom color value is retrived by parsing the figure styles.
+			// migrate the main color value into a custom border color.
+			// The custom border color value is retrieved by parsing the figure styles.
 			if ( ! isSolidColorStyle && mainColor && figureStyle ) {
 				const borderColor = parseBorderColor( figureStyle );
 				if ( borderColor ) {
 					return {
 						...attributes,
 						className,
-						customMainColor: borderColor,
+						// Block supports: Set style.border.color if a deprecated block has `mainColor`, inline border CSS and is not a solid color style.
+						style: {
+							border: {
+								color: borderColor,
+							},
+						},
 					};
 				}
 			}
 			return {
 				className,
-				mainColor,
+				backgroundColor: isSolidColorStyle ? mainColor : undefined,
+				borderColor: isSolidColorStyle ? undefined : mainColor,
+				textAlign: isSolidColorStyle ? 'left' : undefined,
+				style,
 				...attributes,
 			};
 		},
@@ -251,6 +419,51 @@ const deprecated = [
 					</blockquote>
 				</figure>
 			);
+		},
+		migrate( {
+			className,
+			mainColor,
+			customMainColor,
+			customTextColor,
+			...attributes
+		} ) {
+			const isSolidColorStyle = includes( className, SOLID_COLOR_CLASS );
+			let style = {};
+
+			if ( customMainColor ) {
+				if ( ! isSolidColorStyle ) {
+					// Block supports: Set style.border.color if a deprecated block has a default style and a `customMainColor` attribute.
+					style = {
+						border: {
+							color: customMainColor,
+						},
+					};
+				} else {
+					// Block supports: Set style.color.background if a deprecated block has a solid style and a `customMainColor` attribute.
+					style = {
+						color: {
+							background: customMainColor,
+						},
+					};
+				}
+			}
+
+			// Block supports: Set style.color.text if a deprecated block has a `customTextColor` attribute.
+			if ( customTextColor && style ) {
+				style.color = {
+					...style.color,
+					text: customTextColor,
+				};
+			}
+
+			return {
+				className,
+				backgroundColor: isSolidColorStyle ? mainColor : undefined,
+				borderColor: isSolidColorStyle ? undefined : mainColor,
+				textAlign: isSolidColorStyle ? 'left' : undefined,
+				style,
+				...attributes,
+			};
 		},
 	},
 	{

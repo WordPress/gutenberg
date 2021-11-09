@@ -38,6 +38,7 @@ function MediaPlaceholder( props ) {
 		labels = {},
 		icon,
 		onSelect,
+		onFocus,
 		__experimentalOnlyMediaLibrary,
 		isAppender,
 		disableMediaButtons,
@@ -175,7 +176,7 @@ function MediaPlaceholder( props ) {
 							accessibilityRole={ 'button' }
 							accessibilityHint={ accessibilityHint }
 							onPress={ ( event ) => {
-								props.onFocus( event );
+								onFocus?.( event );
 								open();
 							} }
 						>

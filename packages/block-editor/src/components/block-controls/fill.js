@@ -15,18 +15,21 @@ import {
 /**
  * Internal dependencies
  */
-import useDisplayBlockControls from '../use-display-block-controls';
-import groups from './groups';
+import useBlockControlsFill from './hook';
 
 export default function BlockControlsFill( {
 	group = 'default',
 	controls,
 	children,
+	__experimentalShareWithChildBlocks = false,
 } ) {
-	if ( ! useDisplayBlockControls() ) {
+	const Fill = useBlockControlsFill(
+		group,
+		__experimentalShareWithChildBlocks
+	);
+	if ( ! Fill ) {
 		return null;
 	}
-	const Fill = groups[ group ].Fill;
 
 	return (
 		<StyleProvider document={ document }>

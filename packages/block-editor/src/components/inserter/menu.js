@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { useState, useCallback, useMemo } from '@wordpress/element';
-import { VisuallyHidden } from '@wordpress/components';
+import { VisuallyHidden, SearchControl } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { useSelect } from '@wordpress/data';
 
@@ -10,7 +10,6 @@ import { useSelect } from '@wordpress/data';
  * Internal dependencies
  */
 import Tips from './tips';
-import InserterSearchForm from './search-form';
 import InserterPreviewPanel from './preview-panel';
 import BlockTypesTab from './block-types-tab';
 import BlockPatternsTabs from './block-patterns-tab';
@@ -28,9 +27,12 @@ function InserterMenu( {
 	onSelect,
 	showInserterHelpPanel,
 	showMostUsedBlocks,
+	__experimentalFilterValue = '',
 	shouldFocusBlock = true,
 } ) {
-	const [ filterValue, setFilterValue ] = useState( '' );
+	const [ filterValue, setFilterValue ] = useState(
+		__experimentalFilterValue
+	);
 	const [ hoveredItem, setHoveredItem ] = useState( null );
 	const [ selectedPatternCategory, setSelectedPatternCategory ] = useState(
 		null
@@ -171,7 +173,8 @@ function InserterMenu( {
 			<div className="block-editor-inserter__main-area">
 				{ /* the following div is necessary to fix the sticky position of the search form */ }
 				<div className="block-editor-inserter__content">
-					<InserterSearchForm
+					<SearchControl
+						className="block-editor-inserter__search"
 						onChange={ ( value ) => {
 							if ( hoveredItem ) setHoveredItem( null );
 							setFilterValue( value );

@@ -228,7 +228,7 @@
 
 	@for $i from 1 through 9 {
 		.gallery-columns-#{ $i } .gallery-item {
-			width: #{ (100 / $i) + "%" };
+			width: #{ math.div(100, $i) + "%" };
 		}
 	}
 

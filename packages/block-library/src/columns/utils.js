@@ -122,7 +122,7 @@ export function getMappedColumnWidths( blocks, widths ) {
 	return blocks.map( ( block ) =>
 		merge( {}, block, {
 			attributes: {
-				width: widths[ block.clientId ],
+				width: `${ widths[ block.clientId ] }%`,
 			},
 		} )
 	);
@@ -131,8 +131,8 @@ export function getMappedColumnWidths( blocks, widths ) {
 /**
  * Returns an array with columns widths values, parsed or no depends on `withParsing` flag.
  *
- * @param {WPBlock[]} blocks			Block objects.
- * @param {?boolean} withParsing 	Whether value has to be parsed.
+ * @param {WPBlock[]} blocks      Block objects.
+ * @param {?boolean}  withParsing Whether value has to be parsed.
  *
  * @return {Array<number,string>} Column widths.
  */
@@ -148,8 +148,8 @@ export function getWidths( blocks, withParsing = true ) {
 /**
  * Returns a column width with unit.
  *
- * @param {string} width	Column width.
- * @param {string} unit 	Column width unit.
+ * @param {string} width Column width.
+ * @param {string} unit  Column width unit.
  *
  * @return {string} Column width with unit.
  */

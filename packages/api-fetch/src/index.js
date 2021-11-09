@@ -109,28 +109,27 @@ const defaultFetchHandler = ( nextOptions ) => {
 		}
 	);
 
-	return (
-		responsePromise
-			// Return early if fetch errors. If fetch error, there is most likely no
-			// network connection. Unfortunately fetch just throws a TypeError and
-			// the message might depend on the browser.
-			.then(
-				( value ) =>
-					Promise.resolve( value )
-						.then( checkStatus )
-						.catch( ( response ) =>
-							parseAndThrowError( response, parse )
-						)
-						.then( ( response ) =>
-							parseResponseAndNormalizeError( response, parse )
-						),
-				() => {
-					throw {
-						code: 'fetch_error',
-						message: __( 'You are probably offline.' ),
-					};
-				}
-			)
+	return responsePromise.then(
+		( value ) =>
+			Promise.resolve( value )
+				.then( checkStatus )
+				.catch( ( response ) => parseAndThrowError( response, parse ) )
+				.then( ( response ) =>
+					parseResponseAndNormalizeError( response, parse )
+				),
+		( err ) => {
+			// Re-throw AbortError for the users to handle it themselves.
+			if ( err && err.name === 'AbortError' ) {
+				throw err;
+			}
+
+			// Otherwise, there is most likely no network connection.
+			// Unfortunately the message might depend on the browser.
+			throw {
+				code: 'fetch_error',
+				message: __( 'You are probably offline.' ),
+			};
+		}
 	);
 };
 

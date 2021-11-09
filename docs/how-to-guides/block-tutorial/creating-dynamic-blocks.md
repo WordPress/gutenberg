@@ -5,7 +5,7 @@ Dynamic blocks are blocks that build their structure and content on the fly when
 There are two primary uses for dynamic blocks:
 
 1. Blocks where content should change even if a post has not been updated. One example from WordPress itself is the Latest Posts block. This block will update everywhere it is used when a new post is published.
-2. Blocks where updates to the code (HTML, CSS, JS) should be immediately shown on the front end of the website. For example, if you update the structure of a block by adding a new class, adding an HTML element, or changing the layout in any other way, using a dynamic block ensures those changes are applied immediately on all occurrences of that block across the site. (If a dynamic block is not used then when block code is updated Guterberg's [validation process](/docs/reference-guides/block-api/block-edit-save.md#validation) generally applies, causing users to see the validation message, "This block appears to have been modified externally").
+2. Blocks where updates to the code (HTML, CSS, JS) should be immediately shown on the front end of the website. For example, if you update the structure of a block by adding a new class, adding an HTML element, or changing the layout in any other way, using a dynamic block ensures those changes are applied immediately on all occurrences of that block across the site. (If a dynamic block is not used then when block code is updated Gutenberg's [validation process](/docs/reference-guides/block-api/block-edit-save.md#validation) generally applies, causing users to see the validation message, "This block appears to have been modified externally").
 
 For many dynamic blocks, the `save` callback function should be returned as `null`, which tells the editor to save only the [block attributes](/docs/reference-guides/block-api/block-attributes.md) to the database. These attributes are then passed into the server-side rendering callback, so you can decide how to display the block on the front end of your site. When you return `null`, the editor will skip the block markup validation process, avoiding issues with frequently-changing markup.
 
@@ -22,7 +22,7 @@ The following code example shows how to create a dynamic block that shows only t
 
 ```jsx
 import { registerBlockType } from '@wordpress/blocks';
-import { withSelect } from '@wordpress/data';
+import { useSelect } from '@wordpress/data';
 import { useBlockProps } from '@wordpress/block-editor';
 
 registerBlockType( 'gutenberg-examples/example-dynamic', {
@@ -31,12 +31,11 @@ registerBlockType( 'gutenberg-examples/example-dynamic', {
 	icon: 'megaphone',
 	category: 'widgets',
 
-	edit: withSelect( ( select ) => {
-		return {
-			posts: select( 'core' ).getEntityRecords( 'postType', 'post' ),
-		};
-	} )( ( { posts } ) => {
+	edit: () => {
 		const blockProps = useBlockProps();
+		const posts = useSelect( ( select ) => {
+			return select( 'core' ).getEntityRecords( 'postType', 'post' );
+		}, [] );
 
 		return (
 			<div { ...blockProps }>
@@ -49,7 +48,7 @@ registerBlockType( 'gutenberg-examples/example-dynamic', {
 				) }
 			</div>
 		);
-	} ),
+	},
 } );
 ```
 
@@ -59,7 +58,7 @@ registerBlockType( 'gutenberg-examples/example-dynamic', {
 ( function ( blocks, element, data, blockEditor ) {
 	var el = element.createElement,
 		registerBlockType = blocks.registerBlockType,
-		withSelect = data.withSelect,
+		useSelect = data.useSelect,
 		useBlockProps = blockEditor.useBlockProps;
 
 	registerBlockType( 'gutenberg-examples/example-dynamic', {
@@ -67,24 +66,23 @@ registerBlockType( 'gutenberg-examples/example-dynamic', {
 		title: 'Example: last post',
 		icon: 'megaphone',
 		category: 'widgets',
-		edit: withSelect( function ( select ) {
-			return {
-				posts: select( 'core' ).getEntityRecords( 'postType', 'post' ),
-			};
-		} )( function ( props ) {
-			var blockProps = useBlockProps();
+		edit: function () {
 			var content;
-			if ( ! props.posts ) {
+			var blockProps = useBlockProps();
+			var posts = useSelect( function ( select ) {
+				return select( 'core' ).getEntityRecords( 'postType', 'post' );
+			}, [] );
+			if ( ! posts ) {
 				content = 'Loading...';
-			} else if ( props.posts.length === 0 ) {
+			} else if ( posts.length === 0 ) {
 				content = 'No posts';
 			} else {
-				var post = props.posts[ 0 ];
+				var post = posts[ 0 ];
 				content = el( 'a', { href: post.link }, post.title.rendered );
 			}
 
 			return el( 'div', blockProps, content );
-		} ),
+		},
 	} );
 } )(
 	window.wp.blocks,

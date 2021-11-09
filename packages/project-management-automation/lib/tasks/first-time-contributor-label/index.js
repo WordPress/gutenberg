@@ -3,7 +3,7 @@
  */
 const debug = require( '../../debug' );
 
-/** @typedef {import('@actions/github').GitHub} GitHub */
+/** @typedef {ReturnType<import('@actions/github').getOctokit>} GitHub */
 /** @typedef {import('@octokit/webhooks').WebhookPayloadPullRequest} WebhookPayloadPullRequest */
 
 /**
@@ -21,7 +21,7 @@ async function firstTimeContributorLabel( payload, octokit ) {
 		`first-time-contributor: Searching for commits in ${ owner }/${ repo } by @${ author }`
 	);
 
-	const { data: commits } = await octokit.repos.listCommits( {
+	const { data: commits } = await octokit.rest.repos.listCommits( {
 		owner,
 		repo,
 		author,
@@ -40,7 +40,7 @@ async function firstTimeContributorLabel( payload, octokit ) {
 		`first-time-contributor-label: Adding 'First Time Contributor' label to pr #${ pullRequestNumber }`
 	);
 
-	await octokit.issues.addLabels( {
+	await octokit.rest.issues.addLabels( {
 		owner,
 		repo,
 		issue_number: payload.pull_request.number,
@@ -51,7 +51,7 @@ async function firstTimeContributorLabel( payload, octokit ) {
 	 * Adds a welcome comment to the first time PR
 	 */
 
-	await octokit.issues.createComment( {
+	await octokit.rest.issues.createComment( {
 		owner,
 		repo,
 		issue_number: payload.pull_request.number,

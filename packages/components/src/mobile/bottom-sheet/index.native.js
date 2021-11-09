@@ -15,6 +15,7 @@ import {
 } from 'react-native';
 import Modal from 'react-native-modal';
 import SafeArea from 'react-native-safe-area';
+import { omit } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -41,7 +42,7 @@ import NavigationScreen from './bottom-sheet-navigation/navigation-screen';
 import NavigationContainer from './bottom-sheet-navigation/navigation-container';
 import KeyboardAvoidingView from './keyboard-avoiding-view';
 import BottomSheetSubSheet from './sub-sheet';
-import NavigationHeader from './navigation-header';
+import NavBar from './nav-bar';
 import { BottomSheetProvider } from './bottom-sheet-context';
 
 const DEFAULT_LAYOUT_ANIMATION = LayoutAnimation.Presets.easeInEaseOut;
@@ -90,11 +91,6 @@ class BottomSheet extends Component {
 			isMaxHeightSet: true,
 			isFullScreen: this.props.isFullScreen || false,
 		};
-
-		SafeArea.getSafeAreaInsetsForRootView().then(
-			this.onSafeAreaInsetsUpdate
-		);
-		Dimensions.addEventListener( 'change', this.onDimensionsChange );
 	}
 
 	keyboardShow( e ) {
@@ -177,6 +173,10 @@ class BottomSheet extends Component {
 	}
 
 	componentDidMount() {
+		SafeArea.getSafeAreaInsetsForRootView().then(
+			this.onSafeAreaInsetsUpdate
+		);
+
 		if ( Platform.OS === 'android' ) {
 			this.androidModalClosedSubscription = subscribeAndroidModalClosed(
 				() => {
@@ -184,6 +184,8 @@ class BottomSheet extends Component {
 				}
 			);
 		}
+
+		Dimensions.addEventListener( 'change', this.onDimensionsChange );
 
 		// 'Will' keyboard events are not available on Android.
 		// Reference: https://reactnative.dev/docs/0.61/keyboard#addlistener
@@ -204,6 +206,7 @@ class BottomSheet extends Component {
 	}
 
 	componentWillUnmount() {
+		Dimensions.removeEventListener( 'change', this.onDimensionsChange );
 		this.keyboardShowListener.remove();
 		this.keyboardHideListener.remove();
 		if ( this.androidModalClosedSubscription ) {
@@ -432,7 +435,7 @@ class BottomSheet extends Component {
 
 		let listStyle = {};
 		if ( isFullScreen ) {
-			listStyle = { flexGrow: 1 };
+			listStyle = { flexGrow: 1, flexShrink: 1 };
 		} else if ( isMaxHeightSet ) {
 			listStyle = { maxHeight };
 
@@ -482,6 +485,16 @@ class BottomSheet extends Component {
 			</>
 		);
 
+		const showDragIndicator = () => {
+			// if iOS or not fullscreen show the drag indicator
+			if ( Platform.OS === 'ios' || ! this.state.isFullScreen ) {
+				return true;
+			}
+
+			// Otherwise check the allowDragIndicator
+			return this.props.allowDragIndicator;
+		};
+
 		return (
 			<Modal
 				isVisible={ isVisible }
@@ -493,7 +506,7 @@ class BottomSheet extends Component {
 				backdropOpacity={ 0.2 }
 				onBackdropPress={ this.onCloseBottomSheet }
 				onBackButtonPress={ this.onHardwareButtonPress }
-				onSwipe={ this.onCloseBottomSheet }
+				onSwipeComplete={ this.onCloseBottomSheet }
 				onDismiss={ Platform.OS === 'ios' ? this.onDismiss : undefined }
 				onModalHide={
 					Platform.OS === 'android' ? this.onDismiss : undefined
@@ -508,7 +521,9 @@ class BottomSheet extends Component {
 					panResponder.panHandlers.onMoveShouldSetResponderCapture
 				}
 				onAccessibilityEscape={ this.onCloseBottomSheet }
-				{ ...rest }
+				// We need to prevent overwriting the onDismiss prop,
+				// for this reason it is excluded from the rest object.
+				{ ...omit( rest, 'onDismiss' ) }
 			>
 				<KeyboardAvoidingView
 					behavior={ Platform.OS === 'ios' && 'padding' }
@@ -527,8 +542,11 @@ class BottomSheet extends Component {
 					} }
 					keyboardVerticalOffset={ -safeAreaBottomInset }
 				>
-					<View onLayout={ this.onHeaderLayout }>
-						{ ! ( Platform.OS === 'android' && isFullScreen ) && (
+					<View
+						style={ styles.header }
+						onLayout={ this.onHeaderLayout }
+					>
+						{ showDragIndicator() && (
 							<View style={ styles.dragIndicator } />
 						) }
 						{ ! hideHeader && getHeader() }
@@ -591,7 +609,7 @@ ThemedBottomSheet.getWidth = getWidth;
 ThemedBottomSheet.Button = Button;
 ThemedBottomSheet.Cell = Cell;
 ThemedBottomSheet.SubSheet = BottomSheetSubSheet;
-ThemedBottomSheet.NavigationHeader = NavigationHeader;
+ThemedBottomSheet.NavBar = NavBar;
 ThemedBottomSheet.CyclePickerCell = CyclePickerCell;
 ThemedBottomSheet.PickerCell = PickerCell;
 ThemedBottomSheet.SwitchCell = SwitchCell;

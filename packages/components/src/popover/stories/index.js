@@ -15,7 +15,13 @@ import { DraggableWrapper } from './_utils';
 import Popover from '../';
 import Button from '../../button';
 
-export default { title: 'Components/Popover', component: Popover };
+export default {
+	title: 'Components/Popover',
+	component: Popover,
+	parameters: {
+		knobs: { disabled: false },
+	},
+};
 
 export const _default = () => {
 	const show = boolean( 'Example: Show', true );
@@ -118,7 +124,7 @@ function DynamicHeightPopover() {
 		<div style={ { padding: '20px' } }>
 			<div>
 				<Button
-					isPrimary
+					variant="primary"
 					onClick={ increase }
 					style={ {
 						marginRight: '20px',
@@ -127,7 +133,7 @@ function DynamicHeightPopover() {
 					Increase Size
 				</Button>
 
-				<Button isPrimary onClick={ decrease }>
+				<Button variant="primary" onClick={ decrease }>
 					Decrease Size
 				</Button>
 			</div>

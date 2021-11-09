@@ -7,7 +7,7 @@ import memoize from 'memize';
 /**
  * Generates the connected component CSS className based on the namespace.
  *
- * @param namespace The name of the connected component.
+ * @param  namespace The name of the connected component.
  * @return The generated CSS className.
  */
 function getStyledClassName( namespace: string ): string {

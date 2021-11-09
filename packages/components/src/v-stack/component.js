@@ -1,8 +1,19 @@
 /**
  * Internal dependencies
  */
-import { createComponent } from '../ui/utils';
+import { contextConnect } from '../ui/context';
+import { View } from '../view';
 import { useVStack } from './hook';
+
+/**
+ * @param {import('../ui/context').WordPressComponentProps<import('./types').Props, 'div'>} props
+ * @param {import('react').Ref<any>}                                                        forwardedRef
+ */
+function VStack( props, forwardedRef ) {
+	const vStackProps = useVStack( props );
+
+	return <View { ...vStackProps } ref={ forwardedRef } />;
+}
 
 /**
  * `VStack` (or Vertical Stack) is a layout component that arranges child elements in a vertical line.
@@ -27,10 +38,6 @@ import { useVStack } from './hook';
  * }
  * ```
  */
-const VStack = createComponent( {
-	as: 'div',
-	useHook: useVStack,
-	name: 'VStack',
-} );
+const ConnectedVStack = contextConnect( VStack, 'VStack' );
 
-export default VStack;
+export default ConnectedVStack;

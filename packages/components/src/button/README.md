@@ -112,7 +112,7 @@ Renders a button with default style.
 ```jsx
 import { Button } from '@wordpress/components';
 
-const MyButton = () => <Button isSecondary>Click me!</Button>;
+const MyButton = () => <Button variant="secondary">Click me!</Button>;
 ```
 
 ### Props
@@ -137,29 +137,13 @@ If provided, renders `a` instead of `button`.
 -   Required: No
 -   Default: `undefined`
 
-#### isSecondary
+#### variant
 
-Renders a default button style.
+Specifies the button's style. The accepted values are `'primary'` (the primary button styles), `'secondary'` (the default button styles), `'tertiary'` (the text-based button styles), and `'link'` (the link button styles).
 
--   Type: `Boolean`
+-   Type: `String`
 -   Required: No
--   Default: `false`
-
-#### isPrimary
-
-Renders a primary button style.
-
--   Type: `Boolean`
--   Required: No
--   Default: `false`
-
-#### isTertiary
-
-Renders a text-based button style.
-
--   Type: `Boolean`
--   Required: No
--   Default: `false`
+-   Default: `undefined`
 
 #### isDestructive
 
@@ -188,14 +172,6 @@ Renders a pressed button style.
 #### isBusy
 
 Indicates activity while a action is being performed.
-
--   Type: `Boolean`
--   Required: No
--   Default: `false`
-
-#### isLink
-
-Renders a button with an anchor style.
 
 -   Type: `Boolean`
 -   Required: No

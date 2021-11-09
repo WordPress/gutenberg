@@ -18,6 +18,7 @@ import styles from './style.scss';
 
 const BottomSheetSelectControl = ( {
 	label,
+	icon,
 	options: items,
 	onChange,
 	value: selectedValue,
@@ -52,6 +53,7 @@ const BottomSheetSelectControl = ( {
 				<BottomSheet.Cell
 					label={ label }
 					separatorType="none"
+					icon={ icon }
 					value={ selectedOption.label }
 					onPress={ openSubSheet }
 					accessibilityRole={ 'button' }
@@ -68,10 +70,12 @@ const BottomSheetSelectControl = ( {
 			showSheet={ showSubSheet }
 		>
 			<>
-				<BottomSheet.NavigationHeader
-					screen={ label }
-					leftButtonOnPress={ goBack }
-				/>
+				<BottomSheet.NavBar>
+					<BottomSheet.NavBar.BackButton onPress={ goBack } />
+					<BottomSheet.NavBar.Heading>
+						{ label }
+					</BottomSheet.NavBar.Heading>
+				</BottomSheet.NavBar>
 				<View style={ styles.selectControl }>
 					{ items.map( ( item, index ) => (
 						<BottomSheet.Cell

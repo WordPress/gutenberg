@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import { omit } from 'lodash';
+
+/**
  * WordPress dependencies
  */
 import { InnerBlocks } from '@wordpress/block-editor';
@@ -37,6 +42,12 @@ const deprecated = [
 		},
 		supports: {
 			html: false,
+		},
+		migrate( attributes ) {
+			return {
+				...omit( attributes, [ 'layout' ] ),
+				displayLayout: attributes.layout,
+			};
 		},
 		save() {
 			return <InnerBlocks.Content />;

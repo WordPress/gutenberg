@@ -23,21 +23,11 @@ import classnames from 'classnames';
  * WordPress dependencies
  */
 import { __, _x, sprintf } from '@wordpress/i18n';
-import { useState, useEffect, Platform } from '@wordpress/element';
+import { useState, useEffect } from '@wordpress/element';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { useBlockProps } from '@wordpress/block-editor';
 import { store as coreStore } from '@wordpress/core-data';
 import { View } from '@wordpress/primitives';
-
-function getResponsiveHelp( checked ) {
-	return checked
-		? __(
-				'This embed will preserve its aspect ratio when the browser is resized.'
-		  )
-		: __(
-				'This embed may not preserve its aspect ratio when the browser is resized.'
-		  );
-}
 
 const EmbedEdit = ( props ) => {
 	const {
@@ -64,7 +54,7 @@ const EmbedEdit = ( props ) => {
 
 	const [ url, setURL ] = useState( attributesUrl );
 	const [ isEditingURL, setIsEditingURL ] = useState( false );
-	const { invalidateResolution } = useDispatch( 'core/data' );
+	const { invalidateResolution } = useDispatch( coreStore );
 
 	const {
 		preview,
@@ -187,13 +177,12 @@ const EmbedEdit = ( props ) => {
 		);
 	}
 
-	const label = Platform.select( {
-		// translators: %s: type of embed e.g: "YouTube", "Twitter", etc. "Embed" is used when no specific type exists
-		web: sprintf( __( '%s URL' ), title ),
-		native: title,
-	} );
+	// translators: %s: type of embed e.g: "YouTube", "Twitter", etc. "Embed" is used when no specific type exists
+	const label = sprintf( __( '%s URL' ), title );
+
 	// No preview, or we can't embed the current URL, or we've clicked the edit button.
 	const showEmbedPlaceholder = ! preview || cannotEmbed || isEditingURL;
+
 	if ( showEmbedPlaceholder ) {
 		return (
 			<View { ...blockProps }>
@@ -214,9 +203,7 @@ const EmbedEdit = ( props ) => {
 					onChange={ ( event ) => setURL( event.target.value ) }
 					fallback={ () => fallback( url, onReplace ) }
 					tryAgain={ () => {
-						invalidateResolution( 'core', 'getEmbedPreview', [
-							url,
-						] );
+						invalidateResolution( 'getEmbedPreview', [ url ] );
 					} }
 				/>
 			</View>
@@ -230,6 +217,7 @@ const EmbedEdit = ( props ) => {
 	// after the preview has been rendered can result in unwanted
 	// clipping or scrollbars. The `getAttributesFromPreview` function
 	// that `getMergedAttributes` uses is memoized so that we're not
+	// calculating them on every render.
 	const {
 		caption,
 		type,
@@ -245,7 +233,6 @@ const EmbedEdit = ( props ) => {
 				themeSupportsResponsive={ themeSupportsResponsive }
 				blockSupportsResponsive={ responsive }
 				allowResponsive={ allowResponsive }
-				getResponsiveHelp={ getResponsiveHelp }
 				toggleResponsive={ toggleResponsive }
 				switchBackToURLInput={ () => setIsEditingURL( true ) }
 			/>

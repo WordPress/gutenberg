@@ -1,11 +1,12 @@
 /**
  * WordPress dependencies
  */
-import { InspectorControls } from '@wordpress/block-editor';
+import { InspectorControls, useSetting } from '@wordpress/block-editor';
 import {
 	BottomSheet,
 	ColorSettings,
 	FocalPointSettingsPanel,
+	ImageLinkDestinationsScreen,
 	LinkPickerScreen,
 } from '@wordpress/components';
 import { compose } from '@wordpress/compose';
@@ -21,6 +22,7 @@ export const blockSettingsScreens = {
 	color: 'Color',
 	focalPoint: 'FocalPoint',
 	linkPicker: 'linkPicker',
+	imageLinkDestinations: 'imageLinkDestinations',
 };
 
 function BottomSheetSettings( {
@@ -29,6 +31,11 @@ function BottomSheetSettings( {
 	settings,
 	...props
 } ) {
+	const colorSettings = {
+		colors: useSetting( 'color.palette' ) || settings.colors,
+		gradients: useSetting( 'color.gradients' ) || settings.gradients,
+	};
+
 	return (
 		<BottomSheet
 			isVisible={ editorSidebarOpened }
@@ -53,7 +60,7 @@ function BottomSheetSettings( {
 				<BottomSheet.NavigationScreen
 					name={ blockSettingsScreens.color }
 				>
-					<ColorSettings defaultSettings={ settings } />
+					<ColorSettings defaultSettings={ colorSettings } />
 				</BottomSheet.NavigationScreen>
 				<BottomSheet.NavigationScreen
 					name={ blockSettingsScreens.focalPoint }
@@ -69,6 +76,11 @@ function BottomSheetSettings( {
 					<LinkPickerScreen
 						returnScreenName={ blockSettingsScreens.settings }
 					/>
+				</BottomSheet.NavigationScreen>
+				<BottomSheet.NavigationScreen
+					name={ blockSettingsScreens.imageLinkDestinations }
+				>
+					<ImageLinkDestinationsScreen { ...props } />
 				</BottomSheet.NavigationScreen>
 			</BottomSheet.NavigationContainer>
 		</BottomSheet>

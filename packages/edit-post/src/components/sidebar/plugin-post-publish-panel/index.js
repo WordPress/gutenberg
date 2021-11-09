@@ -29,10 +29,10 @@ const PluginPostPublishPanelFill = ( {
  * Renders provided content to the post-publish panel in the publish flow
  * (side panel that opens after a user publishes the post).
  *
- * @param {Object} props Component properties.
- * @param {string} [props.className] An optional class name added to the panel.
- * @param {string} [props.title] Title displayed at the top of the panel.
- * @param {boolean} [props.initialOpen=false] Whether to have the panel initially opened. When no title is provided it is always opened.
+ * @param {Object}                props                                 Component properties.
+ * @param {string}                [props.className]                     An optional class name added to the panel.
+ * @param {string}                [props.title]                         Title displayed at the top of the panel.
+ * @param {boolean}               [props.initialOpen=false]             Whether to have the panel initially opened. When no title is provided it is always opened.
  * @param {WPBlockTypeIconRender} [props.icon=inherits from the plugin] The [Dashicon](https://developer.wordpress.org/resource/dashicons/) icon slug string, or an SVG WP element, to be rendered when the sidebar is pinned to toolbar.
  *
  * @example

@@ -254,7 +254,7 @@ class MediaTextEdit extends Component {
 			setAttributes,
 			isSelected,
 			isRTL,
-			wrapperProps,
+			style,
 			blockWidth,
 		} = this.props;
 		const {
@@ -273,14 +273,21 @@ class MediaTextEdit extends Component {
 			? 100
 			: this.state.mediaWidth || mediaWidth;
 		const widthString = `${ temporaryMediaWidth }%`;
+		const innerBlockWidth = shouldStack ? 100 : 100 - temporaryMediaWidth;
+		const innerBlockWidthString = `${ innerBlockWidth }%`;
 
-		const innerBlockContainerStyle = ! shouldStack
-			? styles.innerBlock
-			: {
-					...( mediaPosition === 'left'
-						? styles.innerBlockStackMediaLeft
-						: styles.innerBlockStackMediaRight ),
-			  };
+		const innerBlockContainerStyle = [
+			{ width: innerBlockWidthString },
+			! shouldStack
+				? styles.innerBlock
+				: {
+						...( mediaPosition === 'left'
+							? styles.innerBlockStackMediaLeft
+							: styles.innerBlockStackMediaRight ),
+				  },
+			( style?.backgroundColor || backgroundColor.color ) &&
+				styles.innerBlockPaddings,
+		];
 
 		const containerStyles = {
 			...styles[ 'wp-block-media-text' ],
@@ -295,13 +302,9 @@ class MediaTextEdit extends Component {
 				? styles[ 'is-stacked-on-mobile.has-media-on-the-right' ]
 				: {} ),
 			...( isSelected && styles[ 'is-selected' ] ),
-			backgroundColor:
-				wrapperProps?.style?.backgroundColor || backgroundColor.color,
+			backgroundColor: style?.backgroundColor || backgroundColor.color,
 			paddingBottom: 0,
 		};
-
-		const innerBlockWidth = shouldStack ? 100 : 100 - temporaryMediaWidth;
-		const innerBlockWidthString = `${ innerBlockWidth }%`;
 
 		const mediaContainerStyle = [
 			{ flex: 1 },
@@ -375,12 +378,7 @@ class MediaTextEdit extends Component {
 					>
 						{ this.renderMediaArea( shouldStack ) }
 					</View>
-					<View
-						style={ {
-							width: innerBlockWidthString,
-							...innerBlockContainerStyle,
-						} }
-					>
+					<View style={ innerBlockContainerStyle }>
 						<InnerBlocks
 							template={ TEMPLATE }
 							blockWidth={ blockWidth }

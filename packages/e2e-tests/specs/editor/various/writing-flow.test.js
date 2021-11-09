@@ -9,7 +9,6 @@ import {
 	pressKeyWithModifier,
 	insertBlock,
 	clickBlockToolbarButton,
-	clickButton,
 } from '@wordpress/e2e-test-utils';
 
 const getActiveBlockName = async () =>
@@ -29,7 +28,7 @@ const addParagraphsAndColumnsDemo = async () => {
 	await page.keyboard.press( 'Enter' );
 	await page.click( ':focus [aria-label="Two columns; equal split"]' );
 	await page.click( ':focus .block-editor-button-block-appender' );
-	await page.waitForSelector( ':focus.block-editor-inserter__search-input' );
+	await page.waitForSelector( '.block-editor-inserter__search input:focus' );
 	await page.keyboard.type( 'Paragraph' );
 	await pressKeyTimes( 'Tab', 2 ); // Tab to paragraph result.
 	await page.keyboard.press( 'Enter' ); // Insert paragraph.
@@ -40,7 +39,7 @@ const addParagraphsAndColumnsDemo = async () => {
 	// is a temporary solution.
 	await page.focus( '.wp-block[data-type="core/column"]:nth-child(2)' );
 	await page.click( ':focus .block-editor-button-block-appender' );
-	await page.waitForSelector( ':focus.block-editor-inserter__search-input' );
+	await page.waitForSelector( '.block-editor-inserter__search input:focus' );
 	await page.keyboard.type( 'Paragraph' );
 	await pressKeyTimes( 'Tab', 2 ); // Tab to paragraph result.
 	await page.keyboard.press( 'Enter' ); // Insert paragraph.
@@ -289,29 +288,28 @@ describe( 'Writing Flow', () => {
 	it( 'should navigate native inputs vertically, not horizontally', async () => {
 		// See: https://github.com/WordPress/gutenberg/issues/9626
 
-		// Title is within the editor's writing flow, and is a <textarea>
-		await page.click( '.editor-post-title' );
+		await insertBlock( 'Shortcode' );
 
 		// Should remain in title upon ArrowRight:
 		await page.keyboard.press( 'ArrowRight' );
-		let isInTitle = await page.evaluate(
-			() => !! document.activeElement.closest( '.editor-post-title' )
+		let isInShortcodeBlock = await page.evaluate(
+			() => !! document.activeElement.closest( '.wp-block-shortcode' )
 		);
-		expect( isInTitle ).toBe( true );
+		expect( isInShortcodeBlock ).toBe( true );
 
 		// Should remain in title upon modifier + ArrowDown:
 		await pressKeyWithModifier( 'primary', 'ArrowDown' );
-		isInTitle = await page.evaluate(
-			() => !! document.activeElement.closest( '.editor-post-title' )
+		isInShortcodeBlock = await page.evaluate(
+			() => !! document.activeElement.closest( '.wp-block-shortcode' )
 		);
-		expect( isInTitle ).toBe( true );
+		expect( isInShortcodeBlock ).toBe( true );
 
 		// Should navigate into blocks list upon ArrowDown:
 		await page.keyboard.press( 'ArrowDown' );
-		const isInBlock = await page.evaluate(
-			() => !! document.activeElement.closest( '[data-type]' )
+		const isInParagraphBlock = await page.evaluate(
+			() => !! document.activeElement.closest( '.wp-block-paragraph' )
 		);
-		expect( isInBlock ).toBe( true );
+		expect( isInParagraphBlock ).toBe( true );
 	} );
 
 	it( 'should not delete surrounding space when deleting a word with Backspace', async () => {
@@ -557,7 +555,10 @@ describe( 'Writing Flow', () => {
 		await page.keyboard.type( '/image' );
 		await page.keyboard.press( 'Enter' );
 		await clickBlockToolbarButton( 'Align' );
-		await clickButton( 'Wide width' );
+		const wideButton = await page.waitForXPath(
+			`//button[contains(@class,'components-dropdown-menu__menu-item')]//span[contains(text(), 'Wide width')]`
+		);
+		await wideButton.click();
 
 		// Select the previous block.
 		await page.keyboard.press( 'ArrowUp' );

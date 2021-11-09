@@ -23,6 +23,7 @@ import { speak } from '@wordpress/a11y';
  * Internal dependencies
  */
 import InlineLinkUI from './inline';
+import { isValidHref } from './utils';
 
 const name = 'core/link';
 const title = __( 'Link' );
@@ -40,7 +41,7 @@ function Edit( {
 	function addLink() {
 		const text = getTextContent( slice( value ) );
 
-		if ( text && isURL( text ) ) {
+		if ( text && isURL( text ) && isValidHref( text ) ) {
 			onChange(
 				applyFormat( value, {
 					type: name,

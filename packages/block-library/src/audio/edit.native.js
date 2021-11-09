@@ -26,7 +26,7 @@ import {
 	MediaUploadProgress,
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
-import { __, sprintf } from '@wordpress/i18n';
+import { __, _x, sprintf } from '@wordpress/i18n';
 import { audio as icon, replace } from '@wordpress/icons';
 import { useState } from '@wordpress/element';
 import { useDispatch, useSelect } from '@wordpress/data';
@@ -197,7 +197,10 @@ function AudioEdit( {
 							checked={ loop }
 						/>
 						<SelectControl
-							label={ __( 'Preload' ) }
+							label={ _x(
+								'Preload',
+								'noun; Audio block parameter'
+							) }
 							value={ preload || '' }
 							// `undefined` is required for the preload attribute to be unset.
 							onChange={ ( value ) =>
@@ -209,7 +212,10 @@ function AudioEdit( {
 								{ value: '', label: __( 'Browser default' ) },
 								{ value: 'auto', label: __( 'Auto' ) },
 								{ value: 'metadata', label: __( 'Metadata' ) },
-								{ value: 'none', label: __( 'None' ) },
+								{
+									value: 'none',
+									label: _x( 'None', '"Preload" value' ),
+								},
 							] }
 							hideCancelButton={ true }
 						/>

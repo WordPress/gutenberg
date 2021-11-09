@@ -1,8 +1,29 @@
 /**
+ * External dependencies
+ */
+import { ActivityIndicator, View } from 'react-native';
+
+/**
  * WordPress dependencies
  */
-import { Spinner } from '@wordpress/components';
+import { usePreferredColorSchemeStyle } from '@wordpress/compose';
 
-const EmbedLoading = () => <Spinner />;
+/**
+ * Internal dependencies
+ */
+import styles from './styles.scss';
+
+const EmbedLoading = () => {
+	const style = usePreferredColorSchemeStyle(
+		styles[ 'embed-preview__loading' ],
+		styles[ 'embed-preview__loading--dark' ]
+	);
+
+	return (
+		<View style={ style }>
+			<ActivityIndicator animating />
+		</View>
+	);
+};
 
 export default EmbedLoading;

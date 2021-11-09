@@ -94,6 +94,7 @@ const SegmentedControls = ( {
 			toValue: calculateEndValue( index ),
 			duration: ANIMATION_DURATION,
 			easing: Easing.ease,
+			useNativeDriver: false,
 		} ).start();
 	}
 

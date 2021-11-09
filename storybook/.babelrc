@@ -1,7 +1,7 @@
 {
 	"presets": [ "@wordpress/babel-preset-default" ],
 	"plugins": [
-		"babel-plugin-emotion",
+		"@emotion/babel-plugin",
 		"babel-plugin-inline-json-import"
 	]
 }

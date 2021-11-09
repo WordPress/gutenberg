@@ -2,6 +2,21 @@
 
 ## Unreleased
 
+## 4.0.3 (2021-10-22)
+
+### Bug Fix
+
+-   Update `rawHtml` to correctly concatenate multiple strings passed as children
+(see [35532](https://github.com/WordPress/gutenberg/pull/35532))
+
+## 4.0.0 (2021-07-29)
+
+### Breaking Change
+
+-   Upgraded React components to work with v17.0 ([#29118](https://github.com/WordPress/gutenberg/pull/29118)). There are no new features in React v17.0 as explained in the [blog post](https://reactjs.org/blog/2020/10/20/react-v17.html).
+
+## 3.2.0 (2021-07-21)
+
 ## 3.1.0 (2021-05-20)
 
 ## 3.0.0 (2021-05-14)

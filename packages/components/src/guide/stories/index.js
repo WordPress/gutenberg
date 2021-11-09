@@ -15,7 +15,13 @@ import { useState } from '@wordpress/element';
 import Button from '../../button';
 import Guide from '../';
 
-export default { title: 'Components/Guide', component: Guide };
+export default {
+	title: 'Components/Guide',
+	component: Guide,
+	parameters: {
+		knobs: { disabled: false },
+	},
+};
 
 const ModalExample = ( { numberOfPages, ...props } ) => {
 	const [ isOpen, setOpen ] = useState( false );
@@ -28,7 +34,7 @@ const ModalExample = ( { numberOfPages, ...props } ) => {
 
 	return (
 		<>
-			<Button isSecondary onClick={ openGuide }>
+			<Button variant="secondary" onClick={ openGuide }>
 				Open Guide
 			</Button>
 			{ isOpen && (

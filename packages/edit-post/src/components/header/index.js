@@ -21,6 +21,7 @@ import PostPublishButtonOrToggle from './post-publish-button-or-toggle';
 import { default as DevicePreview } from '../device-preview';
 import MainDashboardButton from './main-dashboard-button';
 import { store as editPostStore } from '../../store';
+import TemplateTitle from './template-title';
 
 function Header( { setEntitiesSavedStatesCallback } ) {
 	const {
@@ -59,6 +60,7 @@ function Header( { setEntitiesSavedStatesCallback } ) {
 			</MainDashboardButton.Slot>
 			<div className="edit-post-header__toolbar">
 				<HeaderToolbar />
+				<TemplateTitle />
 			</div>
 			<div className="edit-post-header__settings">
 				{ ! isPublishSidebarOpened && (

@@ -26,6 +26,16 @@ import * as metadataActions from './metadata/actions';
 /** @typedef {import('../types').WPDataStore} WPDataStore */
 /** @typedef {import('../types').WPDataReduxStoreConfig} WPDataReduxStoreConfig */
 
+const trimUndefinedValues = ( array ) => {
+	const result = [ ...array ];
+	for ( let i = result.length - 1; i >= 0; i-- ) {
+		if ( result[ i ] === undefined ) {
+			result.splice( i, 1 );
+		}
+	}
+	return result;
+};
+
 /**
  * Create a cache to track whether resolvers started running or not.
  *
@@ -35,12 +45,15 @@ function createResolversCache() {
 	const cache = {};
 	return {
 		isRunning( selectorName, args ) {
-			return cache[ selectorName ] && cache[ selectorName ].get( args );
+			return (
+				cache[ selectorName ] &&
+				cache[ selectorName ].get( trimUndefinedValues( args ) )
+			);
 		},
 
 		clear( selectorName, args ) {
 			if ( cache[ selectorName ] ) {
-				cache[ selectorName ].delete( args );
+				cache[ selectorName ].delete( trimUndefinedValues( args ) );
 			}
 		},
 
@@ -49,7 +62,7 @@ function createResolversCache() {
 				cache[ selectorName ] = new EquivalentKeyMap();
 			}
 
-			cache[ selectorName ].set( args, true );
+			cache[ selectorName ].set( trimUndefinedValues( args ), true );
 		},
 	};
 }
@@ -70,10 +83,10 @@ function createResolversCache() {
  * } );
  * ```
  *
- * @param {string}                 key      Unique namespace identifier.
- * @param {WPDataReduxStoreConfig} options  Registered store options, with properties
- *                                          describing reducer, actions, selectors,
- *                                          and resolvers.
+ * @param {string}                 key     Unique namespace identifier.
+ * @param {WPDataReduxStoreConfig} options Registered store options, with properties
+ *                                         describing reducer, actions, selectors,
+ *                                         and resolvers.
  *
  * @return {WPDataStore} Store Object.
  */
@@ -197,12 +210,12 @@ export default function createReduxStore( key, options ) {
 /**
  * Creates a redux store for a namespace.
  *
- * @param {string}         key      Unique namespace identifier.
- * @param {Object}         options  Registered store options, with properties
- *                                  describing reducer, actions, selectors,
- *                                  and resolvers.
- * @param {WPDataRegistry} registry Registry reference.
- * @param {Object} thunkArgs        Argument object for the thunk middleware.
+ * @param {string}         key       Unique namespace identifier.
+ * @param {Object}         options   Registered store options, with properties
+ *                                   describing reducer, actions, selectors,
+ *                                   and resolvers.
+ * @param {WPDataRegistry} registry  Registry reference.
+ * @param {Object}         thunkArgs Argument object for the thunk middleware.
  * @return {Object} Newly created redux store.
  */
 function instantiateReduxStore( key, options, registry, thunkArgs ) {
@@ -289,9 +302,10 @@ function mapSelectors( selectors, store ) {
 /**
  * Maps actions to dispatch from a given store.
  *
- * @param {Object} actions    Actions to register.
- * @param {Object} store      The redux store to which the actions should be mapped.
- * @return {Object}           Actions mapped to the redux store provided.
+ * @param {Object} actions Actions to register.
+ * @param {Object} store   The redux store to which the actions should be mapped.
+ *
+ * @return {Object} Actions mapped to the redux store provided.
  */
 function mapActions( actions, store ) {
 	const createBoundAction = ( action ) => ( ...args ) => {
@@ -306,7 +320,8 @@ function mapActions( actions, store ) {
  *
  * @param {Object} selectors Selectors to map.
  * @param {Object} store     The redux store the selectors select from.
- * @return {Object}          Selectors mapped to their resolution functions.
+ *
+ * @return {Object} Selectors mapped to their resolution functions.
  */
 function mapResolveSelectors( selectors, store ) {
 	return mapValues(
@@ -322,7 +337,6 @@ function mapResolveSelectors( selectors, store ) {
 				const hasFinished = () =>
 					selectors.hasFinishedResolution( selectorName, args );
 				const getResult = () => selector.apply( null, args );
-
 				// trigger the selector (to trigger the resolver)
 				const result = getResult();
 				if ( hasFinished() ) {
@@ -374,6 +388,7 @@ function mapResolvers( resolvers, selectors, store, resolversCache ) {
 		const selectorResolver = ( ...args ) => {
 			async function fulfillSelector() {
 				const state = store.getState();
+
 				if (
 					resolversCache.isRunning( selectorName, args ) ||
 					( typeof resolver.isFulfilled === 'function' &&
@@ -432,7 +447,7 @@ function mapResolvers( resolvers, selectors, store, resolversCache ) {
  * @param {Object} store        Store reference, for fulfilling via resolvers
  * @param {Object} resolvers    Store Resolvers
  * @param {string} selectorName Selector name to fulfill.
- * @param {Array} args          Selector Arguments.
+ * @param {Array}  args         Selector Arguments.
  */
 async function fulfillResolver( store, resolvers, selectorName, ...args ) {
 	const resolver = get( resolvers, [ selectorName ] );

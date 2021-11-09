@@ -31,3 +31,11 @@
 		}
 	}
 }
+
+// This overrides the negative margins between two consecutives panels.
+// since the first panel is hidden.
+.components-panel__header + .interface-complementary-area-header {
+	@include break-medium() {
+		margin-top: 0;
+	}
+}

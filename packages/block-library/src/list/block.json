@@ -37,11 +37,25 @@
 	"supports": {
 		"anchor": true,
 		"className": false,
-		"fontSize": true,
-		"color": {
-			"gradients": true
+		"typography": {
+			"fontSize": true,
+			"__experimentalFontFamily": true,
+			"lineHeight": true,
+			"__experimentalFontStyle": true,
+			"__experimentalFontWeight": true,
+			"__experimentalLetterSpacing": true,
+			"__experimentalTextTransform": true,
+			"__experimentalDefaultControls": {
+				"fontSize": true
+			}
 		},
-		"__unstablePasteTextInline": true
+		"color": {
+			"gradients": true,
+			"link": true
+		},
+		"__unstablePasteTextInline": true,
+		"__experimentalSelector": "ol,ul",
+		"__experimentalSlashInserter": true
 	},
 	"editorStyle": "wp-block-list-editor",
 	"style": "wp-block-list"

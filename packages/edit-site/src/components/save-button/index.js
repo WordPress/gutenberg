@@ -27,14 +27,14 @@ export default function SaveButton( {
 				isSavingEntityRecord( record.kind, record.name, record.key )
 			),
 		};
-	} );
+	}, [] );
 
 	const disabled = ! isDirty || isSaving;
 
 	return (
 		<>
 			<Button
-				isPrimary
+				variant="primary"
 				className="edit-site-save-button__button"
 				aria-disabled={ disabled }
 				aria-expanded={ isEntitiesSavedStatesOpen }

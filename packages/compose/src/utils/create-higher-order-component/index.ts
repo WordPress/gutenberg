@@ -32,8 +32,8 @@ export type PropInjectingHigherOrderComponent< TRemovedProps > = <
  * Given a function mapping a component to an enhanced component and modifier
  * name, returns the enhanced component augmented with a generated displayName.
  *
- * @param mapComponentToEnhancedComponent Function mapping component to enhanced component.
- * @param modifierName                    Seed name from which to generated display name.
+ * @param  mapComponentToEnhancedComponent Function mapping component to enhanced component.
+ * @param  modifierName                    Seed name from which to generated display name.
  *
  * @return Component class with generated display name assigned.
  */

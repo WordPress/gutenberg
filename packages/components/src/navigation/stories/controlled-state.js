@@ -102,7 +102,7 @@ export function ControlledStateStory() {
 				</p>
 				<p>
 					<Button
-						isSecondary
+						variant="secondary"
 						onClick={ () => {
 							setActiveMenu( 'nested-sub-menu' );
 						} }
@@ -112,7 +112,7 @@ export function ControlledStateStory() {
 				</p>
 				<p>
 					<Button
-						isSecondary
+						variant="secondary"
 						onClick={ () => {
 							setActiveItem( 'child-2' );
 							setActiveMenu( 'sub-menu' );

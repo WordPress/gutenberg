@@ -8,14 +8,14 @@ import { __, _n, sprintf, isRTL } from '@wordpress/i18n';
  *
  * @param {number}  selectedCount Number of blocks selected.
  * @param {string}  type          Block type - in the case of a single block, should
- *                                 define its 'type'. I.e. 'Text', 'Heading', 'Image' etc.
+ *                                define its 'type'. I.e. 'Text', 'Heading', 'Image' etc.
  * @param {number}  firstIndex    The index (position - 1) of the first block selected.
  * @param {boolean} isFirst       This is the first block.
  * @param {boolean} isLast        This is the last block.
  * @param {number}  dir           Direction of movement (> 0 is considered to be going
- *                                 down, < 0 is up).
+ *                                down, < 0 is up).
  * @param {string}  orientation   The orientation of the block movers, vertical or
- * 								   horizontal.
+ *                                horizontal.
  *
  * @return {string} Label for the block movement controls.
  */
@@ -222,7 +222,7 @@ export function getBlockMoverDescription(
  * @param {boolean} isFirst       This is the first block.
  * @param {boolean} isLast        This is the last block.
  * @param {number}  dir           Direction of movement (> 0 is considered to be going
- *                                 down, < 0 is up).
+ *                                down, < 0 is up).
  *
  * @return {string} Label for the block movement controls.
  */

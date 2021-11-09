@@ -12,8 +12,8 @@ import { MENU_ROOT } from '../components/navigation-sidebar/navigation-panel/con
 /**
  * Reducer returning the user preferences.
  *
- * @param {Object}  state Current state.
- * @param {Object}  action Dispatched action.
+ * @param {Object} state  Current state.
+ * @param {Object} action Dispatched action.
  * @return {Object} Updated state.
  */
 export const preferences = combineReducers( {
@@ -72,25 +72,39 @@ export function settings( state = {}, action ) {
  * Reducer keeping track of the currently edited Post Type,
  * Post Id and the context provided to fill the content of the block editor.
  *
- * @param {Object} state  Current state.
+ * @param {Array}  state  Current state history.
  * @param {Object} action Dispatched action.
  *
- * @return {Object} Updated state.
+ * @return {Array} Updated state.
  */
-export function editedPost( state = {}, action ) {
+export function editedPost( state = [], action ) {
 	switch ( action.type ) {
 		case 'SET_TEMPLATE':
 		case 'SET_PAGE':
-			return {
-				type: 'wp_template',
-				id: action.templateId,
-				page: action.page,
-			};
+			return [
+				{
+					type: 'wp_template',
+					id: action.templateId,
+					page: action.page,
+				},
+			];
 		case 'SET_TEMPLATE_PART':
-			return {
-				type: 'wp_template_part',
-				id: action.templatePartId,
-			};
+			return [
+				{
+					type: 'wp_template_part',
+					id: action.templatePartId,
+				},
+			];
+		case 'PUSH_TEMPLATE_PART':
+			return [
+				...state,
+				{
+					type: 'wp_template_part',
+					id: action.templatePartId,
+				},
+			];
+		case 'GO_BACK':
+			return state.slice( 0, -1 );
 	}
 
 	return state;
@@ -99,7 +113,7 @@ export function editedPost( state = {}, action ) {
 /**
  * Reducer for information about the site's homepage.
  *
- * @param {Object} state Current state.
+ * @param {Object} state  Current state.
  * @param {Object} action Dispatched action.
  *
  * @return {Object} Updated state.
@@ -120,7 +134,7 @@ export function homeTemplateId( state, action ) {
  * Note: this reducer interacts with the inserter and list view panels reducers
  * to make sure that only one of the three panels is open at the same time.
  *
- * @param {Object} state Current state.
+ * @param {Object} state  Current state.
  * @param {Object} action Dispatched action.
  */
 export function navigationPanel(
@@ -189,7 +203,7 @@ export function blockInserterPanel( state = false, action ) {
  * Note: this reducer interacts with the navigation and inserter panels reducers
  * to make sure that only one of the three panels is open at the same time.
  *
- * @param {Object} state Current state.
+ * @param {Object} state  Current state.
  * @param {Object} action Dispatched action.
  */
 export function listViewPanel( state = false, action ) {

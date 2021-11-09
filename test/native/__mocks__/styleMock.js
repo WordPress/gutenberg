@@ -106,4 +106,51 @@ module.exports = {
 		paddingLeft: 10,
 		paddingRight: 10,
 	},
+	'block-types-list__column': {
+		paddingLeft: 10,
+		paddingRight: 10,
+	},
+	floatingToolbar: {
+		height: 10,
+	},
+	searchFormPlaceholder: {
+		color: 'gray',
+	},
+	ripple: {
+		backgroundColor: 'white',
+	},
+	spacing: {
+		marginLeft: 6,
+		marginRight: 6,
+	},
+	arrow: {
+		color: 'red',
+	},
+	button: {
+		color: 'red',
+	},
+	textInput: {
+		color: 'black',
+	},
+	buttonNoBg: {
+		color: 'orange',
+	},
+	isSelected: {
+		color: 'blue',
+	},
+	'embed-no-preview__help-icon': {
+		fill: 'gray',
+	},
+	'embed-no-preview__sheet-icon': {
+		fill: 'gray',
+	},
+	fullAlignment: {
+		width: '100%',
+	},
+	'embed__icon--error': {
+		fill: 'red',
+	},
+	'components-autocomplete': {
+		height: 100,
+	},
 };

@@ -129,13 +129,14 @@ function DateTimePicker(
 							</li>
 							<li>
 								<abbr aria-label={ __( 'Home and End' ) }>
+									{ /* Translators: Home/End reffer to the 'Home' and 'End' buttons on the keyboard.*/ }
 									{ __( 'Home/End' ) }
 								</abbr>
 								{
 									' ' /* JSX removes whitespace, but a space is required for screen readers. */
 								}
 								{ __(
-									'Go to the first (home) or last (end) day of a week.'
+									'Go to the first (Home) or last (End) day of a week.'
 								) }
 							</li>
 						</ul>
@@ -146,7 +147,7 @@ function DateTimePicker(
 				{ ! calendarHelpIsVisible && currentDate && (
 					<Button
 						className="components-datetime__date-reset-button"
-						isLink
+						variant="link"
 						onClick={ () => onChange( null ) }
 					>
 						{ __( 'Reset' ) }
@@ -154,7 +155,7 @@ function DateTimePicker(
 				) }
 				<Button
 					className="components-datetime__date-help-toggle"
-					isLink
+					variant="link"
 					onClick={ onClickDescriptionToggle }
 				>
 					{ calendarHelpIsVisible

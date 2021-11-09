@@ -24,6 +24,11 @@
 	}
 }
 
+.playground__content {
+	// Reference element for the block popover position.
+	position: relative;
+}
+
 .playground__sidebar {
 	position: fixed;
 	top: 0;

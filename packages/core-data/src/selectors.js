@@ -9,6 +9,7 @@ import { set, map, find, get, filter, compact } from 'lodash';
  */
 import { createRegistrySelector } from '@wordpress/data';
 import { addQueryArgs } from '@wordpress/url';
+import deprecated from '@wordpress/deprecated';
 
 /**
  * Internal dependencies
@@ -16,7 +17,16 @@ import { addQueryArgs } from '@wordpress/url';
 import { STORE_NAME } from './name';
 import { getQueriedItems } from './queried-data';
 import { DEFAULT_ENTITY_KEY } from './entities';
-import { getNormalizedCommaSeparable } from './utils';
+import { getNormalizedCommaSeparable, isRawAttribute } from './utils';
+
+/**
+ * Shared reference to an empty object for cases where it is important to avoid
+ * returning a new object reference on every invocation, as in a connected or
+ * other pure component which performs `shouldComponentUpdate` check on props.
+ * This should be used as a last resort, since the normalized data should be
+ * maintained by the reducer result in state.
+ */
+const EMPTY_OBJECT = {};
 
 /**
  * Shared reference to an empty array for cases where it is important to avoid
@@ -40,16 +50,14 @@ const EMPTY_ARRAY = [];
  */
 export const isRequestingEmbedPreview = createRegistrySelector(
 	( select ) => ( state, url ) => {
-		return select( 'core/data' ).isResolving(
-			STORE_NAME,
-			'getEmbedPreview',
-			[ url ]
-		);
+		return select( STORE_NAME ).isResolving( 'getEmbedPreview', [ url ] );
 	}
 );
 
 /**
  * Returns all available authors.
+ *
+ * @deprecated since 11.3. Callers should use `select( 'core' ).getUsers({ who: 'authors' })` instead.
  *
  * @param {Object}           state Data state.
  * @param {Object|undefined} query Optional object of query parameters to
@@ -57,23 +65,16 @@ export const isRequestingEmbedPreview = createRegistrySelector(
  * @return {Array} Authors list.
  */
 export function getAuthors( state, query ) {
+	deprecated( "select( 'core' ).getAuthors()", {
+		since: '5.9',
+		alternative: "select( 'core' ).getUsers({ who: 'authors' })",
+	} );
+
 	const path = addQueryArgs(
 		'/wp/v2/users/?who=authors&per_page=100',
 		query
 	);
 	return getUserQueryResults( state, path );
-}
-
-/**
- * Returns all available authors.
- *
- * @param {Object} state Data state.
- * @param {number} id The author id.
- *
- * @return {Array} Authors list.
- */
-export function __unstableGetAuthor( state, id ) {
-	return get( state, [ 'users', 'byId', id ], null );
 }
 
 /**
@@ -107,7 +108,7 @@ export const getUserQueryResults = createSelector(
 /**
  * Returns whether the entities for the give kind are loaded.
  *
- * @param {Object} state   Data state.
+ * @param {Object} state Data state.
  * @param {string} kind  Entity kind.
  *
  * @return {Array<Object>} Array of entities with config matching kind.
@@ -119,7 +120,7 @@ export function getEntitiesByKind( state, kind ) {
 /**
  * Returns the entity object given its kind and name.
  *
- * @param {Object} state   Data state.
+ * @param {Object} state Data state.
  * @param {string} kind  Entity kind.
  * @param {string} name  Entity name.
  *
@@ -142,47 +143,71 @@ export function getEntity( state, kind, name ) {
  *
  * @return {Object?} Record.
  */
-export function getEntityRecord( state, kind, name, key, query ) {
-	const queriedState = get( state.entities.data, [
-		kind,
-		name,
-		'queriedData',
-	] );
-	if ( ! queriedState ) {
-		return undefined;
-	}
-
-	if ( query === undefined ) {
-		// If expecting a complete item, validate that completeness.
-		if ( ! queriedState.itemIsComplete[ key ] ) {
+export const getEntityRecord = createSelector(
+	( state, kind, name, key, query ) => {
+		const queriedState = get( state.entities.data, [
+			kind,
+			name,
+			'queriedData',
+		] );
+		if ( ! queriedState ) {
 			return undefined;
 		}
+		const context = query?.context ?? 'default';
 
-		return queriedState.items[ key ];
-	}
+		if ( query === undefined ) {
+			// If expecting a complete item, validate that completeness.
+			if ( ! queriedState.itemIsComplete[ context ]?.[ key ] ) {
+				return undefined;
+			}
 
-	const item = queriedState.items[ key ];
-	if ( item && query._fields ) {
-		const filteredItem = {};
-		const fields = getNormalizedCommaSeparable( query._fields );
-		for ( let f = 0; f < fields.length; f++ ) {
-			const field = fields[ f ].split( '.' );
-			const value = get( item, field );
-			set( filteredItem, field, value );
+			return queriedState.items[ context ][ key ];
 		}
-		return filteredItem;
-	}
 
-	return item;
-}
+		const item = queriedState.items[ context ]?.[ key ];
+		if ( item && query._fields ) {
+			const filteredItem = {};
+			const fields = getNormalizedCommaSeparable( query._fields );
+			for ( let f = 0; f < fields.length; f++ ) {
+				const field = fields[ f ].split( '.' );
+				const value = get( item, field );
+				set( filteredItem, field, value );
+			}
+			return filteredItem;
+		}
+
+		return item;
+	},
+	( state, kind, name, recordId, query ) => {
+		const context = query?.context ?? 'default';
+		return [
+			get( state.entities.data, [
+				kind,
+				name,
+				'queriedData',
+				'items',
+				context,
+				recordId,
+			] ),
+			get( state.entities.data, [
+				kind,
+				name,
+				'queriedData',
+				'itemIsComplete',
+				context,
+				recordId,
+			] ),
+		];
+	}
+);
 
 /**
  * Returns the Entity's record object by key. Doesn't trigger a resolver nor requests the entity from the API if the entity record isn't available in the local state.
  *
- * @param {Object} state  State tree
- * @param {string} kind   Entity kind.
- * @param {string} name   Entity name.
- * @param {number} key    Record's key
+ * @param {Object} state State tree
+ * @param {string} kind  Entity kind.
+ * @param {string} name  Entity name.
+ * @param {number} key   Record's key
  *
  * @return {Object|null} Record.
  */
@@ -199,10 +224,10 @@ export function __experimentalGetEntityRecordNoResolver(
  * Returns the entity's record object by key,
  * with its attributes mapped to their raw values.
  *
- * @param {Object} state  State tree.
- * @param {string} kind   Entity kind.
- * @param {string} name   Entity name.
- * @param {number} key    Record's key.
+ * @param {Object} state State tree.
+ * @param {string} kind  Entity kind.
+ * @param {string} name  Entity name.
+ * @param {number} key   Record's key.
  *
  * @return {Object?} Object with the entity's raw attributes.
  */
@@ -212,19 +237,44 @@ export const getRawEntityRecord = createSelector(
 		return (
 			record &&
 			Object.keys( record ).reduce( ( accumulator, _key ) => {
-				// Because edits are the "raw" attribute values,
-				// we return those from record selectors to make rendering,
-				// comparisons, and joins with edits easier.
-				accumulator[ _key ] = get(
-					record[ _key ],
-					'raw',
-					record[ _key ]
-				);
+				if ( isRawAttribute( getEntity( state, kind, name ), _key ) ) {
+					// Because edits are the "raw" attribute values,
+					// we return those from record selectors to make rendering,
+					// comparisons, and joins with edits easier.
+					accumulator[ _key ] = get(
+						record[ _key ],
+						'raw',
+						record[ _key ]
+					);
+				} else {
+					accumulator[ _key ] = record[ _key ];
+				}
 				return accumulator;
 			}, {} )
 		);
 	},
-	( state ) => [ state.entities.data ]
+	( state, kind, name, recordId, query ) => {
+		const context = query?.context ?? 'default';
+		return [
+			state.entities.config,
+			get( state.entities.data, [
+				kind,
+				name,
+				'queriedData',
+				'items',
+				context,
+				recordId,
+			] ),
+			get( state.entities.data, [
+				kind,
+				name,
+				'queriedData',
+				'itemIsComplete',
+				context,
+				recordId,
+			] ),
+		];
+	}
 );
 
 /**
@@ -285,8 +335,12 @@ export const __experimentalGetDirtyEntityRecords = createSelector(
 			Object.keys( data[ kind ] ).forEach( ( name ) => {
 				const primaryKeys = Object.keys(
 					data[ kind ][ name ].edits
-				).filter( ( primaryKey ) =>
-					hasEditsForEntityRecord( state, kind, name, primaryKey )
+				).filter(
+					( primaryKey ) =>
+						// The entity record must exist (not be deleted),
+						// and it must have edits.
+						getEntityRecord( state, kind, name, primaryKey ) &&
+						hasEditsForEntityRecord( state, kind, name, primaryKey )
 				);
 
 				if ( primaryKeys.length ) {
@@ -315,6 +369,56 @@ export const __experimentalGetDirtyEntityRecords = createSelector(
 		} );
 
 		return dirtyRecords;
+	},
+	( state ) => [ state.entities.data ]
+);
+
+/**
+ * Returns the list of entities currently being saved.
+ *
+ * @param {Object} state State tree.
+ *
+ * @return {[{ title: string, key: string, name: string, kind: string }]} The list of records being saved.
+ */
+export const __experimentalGetEntitiesBeingSaved = createSelector(
+	( state ) => {
+		const {
+			entities: { data },
+		} = state;
+		const recordsBeingSaved = [];
+		Object.keys( data ).forEach( ( kind ) => {
+			Object.keys( data[ kind ] ).forEach( ( name ) => {
+				const primaryKeys = Object.keys(
+					data[ kind ][ name ].saving
+				).filter( ( primaryKey ) =>
+					isSavingEntityRecord( state, kind, name, primaryKey )
+				);
+
+				if ( primaryKeys.length ) {
+					const entity = getEntity( state, kind, name );
+					primaryKeys.forEach( ( primaryKey ) => {
+						const entityRecord = getEditedEntityRecord(
+							state,
+							kind,
+							name,
+							primaryKey
+						);
+						recordsBeingSaved.push( {
+							// We avoid using primaryKey because it's transformed into a string
+							// when it's used as an object key.
+							key:
+								entityRecord[
+									entity.key || DEFAULT_ENTITY_KEY
+								],
+							title: entity?.getTitle?.( entityRecord ) || '',
+							name,
+							kind,
+						} );
+					} );
+				}
+			} );
+		} );
+		return recordsBeingSaved;
 	},
 	( state ) => [ state.entities.data ]
 );
@@ -361,7 +465,10 @@ export const getEntityRecordNonTransientEdits = createSelector(
 			return acc;
 		}, {} );
 	},
-	( state ) => [ state.entities.config, state.entities.data ]
+	( state, kind, name, recordId ) => [
+		state.entities.config,
+		get( state.entities.data, [ kind, name, 'edits', recordId ] ),
+	]
 );
 
 /**
@@ -399,7 +506,29 @@ export const getEditedEntityRecord = createSelector(
 		...getRawEntityRecord( state, kind, name, recordId ),
 		...getEntityRecordEdits( state, kind, name, recordId ),
 	} ),
-	( state ) => [ state.entities.data ]
+	( state, kind, name, recordId, query ) => {
+		const context = query?.context ?? 'default';
+		return [
+			state.entities.config,
+			get( state.entities.data, [
+				kind,
+				name,
+				'queriedData',
+				'items',
+				context,
+				recordId,
+			] ),
+			get( state.entities.data, [
+				kind,
+				name,
+				'queriedData',
+				'itemIsComplete',
+				context,
+				recordId,
+			] ),
+			get( state.entities.data, [ kind, name, 'edits', recordId ] ),
+		];
+	}
 );
 
 /**
@@ -565,10 +694,21 @@ export function hasRedo( state ) {
  *
  * @param {Object} state Data state.
  *
- * @return {Object}      The current theme.
+ * @return {Object} The current theme.
  */
 export function getCurrentTheme( state ) {
-	return state.themes[ state.currentTheme ];
+	return getEntityRecord( state, 'root', 'theme', state.currentTheme );
+}
+
+/**
+ * Return the ID of the current global styles object.
+ *
+ * @param {Object} state Data state.
+ *
+ * @return {string} The current global styles ID.
+ */
+export function __experimentalGetCurrentGlobalStylesId( state ) {
+	return state.currentGlobalStylesId;
 }
 
 /**
@@ -576,17 +716,17 @@ export function getCurrentTheme( state ) {
  *
  * @param {Object} state Data state.
  *
- * @return {*}           Index data.
+ * @return {*} Index data.
  */
 export function getThemeSupports( state ) {
-	return state.themeSupports;
+	return getCurrentTheme( state )?.theme_supports ?? EMPTY_OBJECT;
 }
 
 /**
  * Returns the embed preview for the given URL.
  *
- * @param {Object} state    Data state.
- * @param {string} url      Embedded URL.
+ * @param {Object} state Data state.
+ * @param {string} url   Embedded URL.
  *
  * @return {*} Undefined if the preview has not been fetched, otherwise, the preview fetched from the embed preview API.
  */
@@ -601,8 +741,8 @@ export function getEmbedPreview( state, url ) {
  * We need to be able to determine if a URL is embeddable or not, based on what we
  * get back from the oEmbed preview API.
  *
- * @param {Object} state    Data state.
- * @param {string} url      Embedded URL.
+ * @param {Object} state Data state.
+ * @param {string} url   Embedded URL.
  *
  * @return {boolean} Is the preview for the URL an oEmbed link fallback.
  */
@@ -624,10 +764,10 @@ export function isPreviewEmbedFallback( state, url ) {
  *
  * https://developer.wordpress.org/rest-api/reference/
  *
- * @param {Object}   state            Data state.
- * @param {string}   action           Action to check. One of: 'create', 'read', 'update', 'delete'.
- * @param {string}   resource         REST resource to check, e.g. 'media' or 'posts'.
- * @param {string=}  id               Optional ID of the rest resource to check.
+ * @param {Object}  state    Data state.
+ * @param {string}  action   Action to check. One of: 'create', 'read', 'update', 'delete'.
+ * @param {string}  resource REST resource to check, e.g. 'media' or 'posts'.
+ * @param {string=} id       Optional ID of the rest resource to check.
  *
  * @return {boolean|undefined} Whether or not the user can perform the action,
  *                             or `undefined` if the OPTIONS request is still being made.
@@ -635,6 +775,31 @@ export function isPreviewEmbedFallback( state, url ) {
 export function canUser( state, action, resource, id ) {
 	const key = compact( [ action, resource, id ] ).join( '/' );
 	return get( state, [ 'userPermissions', key ] );
+}
+
+/**
+ * Returns whether the current user can edit the given entity.
+ *
+ * Calling this may trigger an OPTIONS request to the REST API via the
+ * `canUser()` resolver.
+ *
+ * https://developer.wordpress.org/rest-api/reference/
+ *
+ * @param {Object} state    Data state.
+ * @param {string} kind     Entity kind.
+ * @param {string} name     Entity name.
+ * @param {string} recordId Record's id.
+ * @return {boolean|undefined} Whether or not the user can edit,
+ * or `undefined` if the OPTIONS request is still being made.
+ */
+export function canUserEditEntityRecord( state, kind, name, recordId ) {
+	const entity = getEntity( state, kind, name );
+	if ( ! entity ) {
+		return false;
+	}
+	const resource = entity.__unstable_rest_base;
+
+	return canUser( state, 'update', resource, recordId );
 }
 
 /**
@@ -675,7 +840,7 @@ export function getAutosave( state, postType, postId, authorId ) {
 /**
  * Returns true if the REST request for autosaves has completed.
  *
- * @param {Object} state State tree.
+ * @param {Object} state    State tree.
  * @param {string} postType The type of the parent post.
  * @param {number} postId   The id of the parent post.
  *
@@ -740,4 +905,19 @@ export function __experimentalGetTemplateForLink( state, link ) {
 		);
 	}
 	return template;
+}
+
+/**
+ * Retrieve the current theme's base global styles
+ *
+ * @param {Object} state Editor state.
+ *
+ * @return {Object?} The Global Styles object.
+ */
+export function __experimentalGetCurrentThemeBaseGlobalStyles( state ) {
+	const currentTheme = getCurrentTheme( state );
+	if ( ! currentTheme ) {
+		return null;
+	}
+	return state.themeBaseGlobalStyles[ currentTheme.stylesheet ];
 }

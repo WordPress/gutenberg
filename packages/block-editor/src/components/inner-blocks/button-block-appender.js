@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import classnames from 'classnames';
+
+/**
  * Internal dependencies
  */
 import BaseButtonBlockAppender from '../button-block-appender';
@@ -9,9 +14,13 @@ export const ButtonBlockAppender = ( {
 	showSeparator,
 	isFloating,
 	onAddBlock,
+	isToggle,
 } ) => {
 	return (
 		<BaseButtonBlockAppender
+			className={ classnames( {
+				'block-list-appender__toggle': isToggle,
+			} ) }
 			rootClientId={ clientId }
 			showSeparator={ showSeparator }
 			isFloating={ isFloating }

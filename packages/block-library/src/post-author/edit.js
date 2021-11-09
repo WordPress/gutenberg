@@ -19,9 +19,13 @@ import { useSelect, useDispatch } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
 import { store as coreStore } from '@wordpress/core-data';
 
-function PostAuthorEdit( { isSelected, context, attributes, setAttributes } ) {
-	const { postType, postId } = context;
-
+function PostAuthorEdit( {
+	isSelected,
+	context: { postType, postId, queryId },
+	attributes,
+	setAttributes,
+} ) {
+	const isDescendentOfQueryLoop = !! queryId;
 	const { authorId, authorDetails, authors } = useSelect(
 		( select ) => {
 			const { getEditedEntityRecord, getUser, getUsers } = select(
@@ -66,7 +70,7 @@ function PostAuthorEdit( { isSelected, context, attributes, setAttributes } ) {
 		<>
 			<InspectorControls>
 				<PanelBody title={ __( 'Author Settings' ) }>
-					{ !! authors?.length && (
+					{ ! isDescendentOfQueryLoop && !! authors?.length && (
 						<SelectControl
 							label={ __( 'Author' ) }
 							value={ authorId }

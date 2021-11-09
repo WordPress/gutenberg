@@ -78,16 +78,6 @@ export const preferences = flow( [
 
 		return state;
 	},
-	features( state, action ) {
-		if ( action.type === 'TOGGLE_FEATURE' ) {
-			return {
-				...state,
-				[ action.feature ]: ! state[ action.feature ],
-			};
-		}
-
-		return state;
-	},
 	editorMode( state, action ) {
 		if ( action.type === 'SWITCH_MODE' ) {
 			return action.mode;
@@ -188,8 +178,8 @@ export function publishSidebarActive( state = false, action ) {
  * A "true" value means the meta boxes saving request is in-flight.
  *
  *
- * @param {boolean}  state   Previous state.
- * @param {Object}   action  Action Object.
+ * @param {boolean} state  Previous state.
+ * @param {Object}  action Action Object.
  *
  * @return {Object} Updated state.
  */
@@ -198,6 +188,7 @@ export function isSavingMetaBoxes( state = false, action ) {
 		case 'REQUEST_META_BOX_UPDATES':
 			return true;
 		case 'META_BOX_UPDATES_SUCCESS':
+		case 'META_BOX_UPDATES_FAILURE':
 			return false;
 		default:
 			return state;
@@ -207,8 +198,8 @@ export function isSavingMetaBoxes( state = false, action ) {
 /**
  * Reducer keeping track of the meta boxes per location.
  *
- * @param {boolean}  state   Previous state.
- * @param {Object}   action  Action Object.
+ * @param {boolean} state  Previous state.
+ * @param {Object}  action Action Object.
  *
  * @return {Object} Updated state.
  */
@@ -244,7 +235,7 @@ export function deviceType( state = 'Desktop', action ) {
  * Note: this reducer interacts with the list view panel reducer
  * to make sure that only one of the two panels is open at the same time.
  *
- * @param {Object} state Current state.
+ * @param {Object} state  Current state.
  * @param {Object} action Dispatched action.
  */
 export function blockInserterPanel( state = false, action ) {
@@ -263,7 +254,7 @@ export function blockInserterPanel( state = false, action ) {
  * Note: this reducer interacts with the inserter panel reducer
  * to make sure that only one of the two panels is open at the same time.
  *
- * @param {Object} state Current state.
+ * @param {Object} state  Current state.
  * @param {Object} action Dispatched action.
  */
 export function listViewPanel( state = false, action ) {
@@ -290,9 +281,26 @@ function isEditingTemplate( state = false, action ) {
 	return state;
 }
 
+/**
+ * Reducer tracking whether meta boxes are initialized.
+ *
+ * @param {boolean} state
+ * @param {Object}  action
+ *
+ * @return {boolean} Updated state.
+ */
+function metaBoxesInitialized( state = false, action ) {
+	switch ( action.type ) {
+		case 'META_BOXES_INITIALIZED':
+			return true;
+	}
+	return state;
+}
+
 const metaBoxes = combineReducers( {
 	isSaving: isSavingMetaBoxes,
 	locations: metaBoxLocations,
+	initialized: metaBoxesInitialized,
 } );
 
 export default combineReducers( {

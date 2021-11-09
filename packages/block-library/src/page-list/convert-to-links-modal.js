@@ -50,6 +50,26 @@ export const convertSelectedBlockToNavigationLinks = ( {
 		}
 	} );
 
+	// Transform all links with innerBlocks into Submenus. This can't be done
+	// sooner because page objects have no information on their children.
+
+	const transformSubmenus = ( listOfLinks ) => {
+		listOfLinks.forEach( ( block, index, listOfLinksArray ) => {
+			const { attributes, innerBlocks } = block;
+			if ( innerBlocks.length !== 0 ) {
+				transformSubmenus( innerBlocks );
+				const transformedBlock = createBlock(
+					'core/navigation-submenu',
+					attributes,
+					innerBlocks
+				);
+				listOfLinksArray[ index ] = transformedBlock;
+			}
+		} );
+	};
+
+	transformSubmenus( navigationLinks );
+
 	replaceBlock( clientId, navigationLinks );
 };
 
@@ -103,11 +123,11 @@ export default function ConvertToLinksModal( { onClose, clientId } ) {
 				) }
 			</p>
 			<div className="wp-block-page-list-modal-buttons">
-				<Button isTertiary onClick={ onClose }>
+				<Button variant="tertiary" onClick={ onClose }>
 					{ __( 'Cancel' ) }
 				</Button>
 				<Button
-					isPrimary
+					variant="primary"
 					disabled={ ! pagesFinished }
 					onClick={ convertSelectedBlockToNavigationLinks( {
 						pages,

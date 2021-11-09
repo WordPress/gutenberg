@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { first } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import {
@@ -57,12 +52,13 @@ describe( 'Editing modes (visual/HTML)', () => {
 		await clickBlockToolbarButton( 'Options' );
 		await clickMenuItem( 'Edit as HTML' );
 
-		// The font size picker for the paragraph block should appear, even in
+		// The `drop cap` toggle for the paragraph block should appear, even in
 		// HTML editing mode.
-		const fontSizePicker = await page.$x(
-			"//label[contains(text(), 'Font size')]"
+		const dropCapToggle = await page.$x(
+			"//label[contains(text(), 'Drop cap')]"
 		);
-		expect( fontSizePicker ).toHaveLength( 1 );
+
+		expect( dropCapToggle ).toHaveLength( 1 );
 	} );
 
 	it( 'should update HTML in HTML mode when sidebar is used', async () => {
@@ -77,12 +73,11 @@ describe( 'Editing modes (visual/HTML)', () => {
 		);
 		expect( htmlBlockContent ).toEqual( '<p>Hello world!</p>' );
 
-		// Change the font size using the sidebar.
-		await first(
-			await page.$x( "//label[contains(text(), 'Font size')]" )
-		).click();
-		await pressKeyTimes( 'ArrowDown', 4 );
-		await page.keyboard.press( 'Enter' );
+		// Change the `drop cap` using the sidebar.
+		const [ dropCapToggle ] = await page.$x(
+			"//label[contains(text(), 'Drop cap')]"
+		);
+		await dropCapToggle.click();
 
 		// Make sure the HTML content updated.
 		htmlBlockContent = await page.$eval(
@@ -90,7 +85,7 @@ describe( 'Editing modes (visual/HTML)', () => {
 			( node ) => node.textContent
 		);
 		expect( htmlBlockContent ).toEqual(
-			'<p class="has-large-font-size">Hello world!</p>'
+			'<p class="has-drop-cap">Hello world!</p>'
 		);
 	} );
 
@@ -152,6 +147,10 @@ describe( 'Editing modes (visual/HTML)', () => {
 
 		await switchEditorModeTo( 'Visual' );
 
-		expect( await getCurrentPostContent() ).toMatchSnapshot();
+		expect( await getCurrentPostContent() ).toMatchInlineSnapshot( `
+		"<!-- wp:paragraph -->
+		<p>Hi world!</p>
+		<!-- /wp:paragraph -->"
+	` );
 	} );
 } );

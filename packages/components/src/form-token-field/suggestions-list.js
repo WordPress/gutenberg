@@ -21,7 +21,11 @@ class SuggestionsList extends Component {
 	componentDidUpdate() {
 		// only have to worry about scrolling selected suggestion into view
 		// when already expanded
-		if ( this.props.selectedIndex > -1 && this.props.scrollIntoView ) {
+		if (
+			this.props.selectedIndex > -1 &&
+			this.props.scrollIntoView &&
+			this.list.children[ this.props.selectedIndex ]
+		) {
 			this.scrollingIntoView = true;
 			scrollIntoView(
 				this.list.children[ this.props.selectedIndex ],
@@ -110,7 +114,11 @@ class SuggestionsList extends Component {
 							id={ `components-form-token-suggestions-${ this.props.instanceId }-${ index }` }
 							role="option"
 							className={ classeName }
-							key={ this.props.displayTransform( suggestion ) }
+							key={
+								suggestion?.value
+									? suggestion.value
+									: this.props.displayTransform( suggestion )
+							}
 							onMouseDown={ this.handleMouseDown }
 							onClick={ this.handleClick( suggestion ) }
 							onMouseEnter={ this.handleHover( suggestion ) }

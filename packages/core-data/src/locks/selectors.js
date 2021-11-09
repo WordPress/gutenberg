@@ -8,13 +8,13 @@ import {
 	getNode,
 } from './utils';
 
-export function __unstableGetPendingLockRequests( state ) {
-	return state.locks.requests;
+export function getPendingLockRequests( state ) {
+	return state.requests;
 }
 
-export function __unstableIsLockAvailable( state, store, path, { exclusive } ) {
+export function isLockAvailable( state, store, path, { exclusive } ) {
 	const storePath = [ store, ...path ];
-	const locks = state.locks.tree;
+	const locks = state.tree;
 
 	// Validate all parents and the node itself
 	for ( const node of iteratePath( locks, storePath ) ) {

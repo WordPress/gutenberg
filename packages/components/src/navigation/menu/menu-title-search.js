@@ -7,15 +7,12 @@ import { filter } from 'lodash';
  * WordPress dependencies
  */
 import { useEffect, useRef } from '@wordpress/element';
-import { Icon, closeSmall, search as searchIcon } from '@wordpress/icons';
 import { __, _n, sprintf } from '@wordpress/i18n';
 import { ESCAPE } from '@wordpress/keycodes';
 
 /**
  * Internal dependencies
  */
-import Button from '../../button';
-import VisuallyHidden from '../../visually-hidden';
 import withSpokenMessages from '../../higher-order/with-spoken-messages';
 import { useNavigationMenuContext } from './context';
 import { useNavigationContext } from '../context';
@@ -67,46 +64,34 @@ function MenuTitleSearch( {
 	};
 
 	function onKeyDown( event ) {
-		if ( event.keyCode === ESCAPE ) {
-			event.stopPropagation();
+		if ( event.keyCode === ESCAPE && ! event.defaultPrevented ) {
+			event.preventDefault();
 			onClose();
 		}
 	}
 
-	const menuTitleId = `components-navigation__menu-title-${ menu }`;
 	const inputId = `components-navigation__menu-title-search-${ menu }`;
-	/* translators: placeholder for menu search box. %s: menu title */
-	const placeholder = sprintf( __( 'Search in %s' ), title );
+	const placeholder = sprintf(
+		/* translators: placeholder for menu search box. %s: menu title */
+		__( 'Search %s' ),
+		title?.toLowerCase()
+	).trim();
 
 	return (
-		<MenuTitleSearchUI className="components-navigation__menu-title-search">
-			<Icon icon={ searchIcon } />
-
-			<VisuallyHidden as="label" htmlFor={ inputId } id={ menuTitleId }>
-				{ placeholder }
-			</VisuallyHidden>
-
-			<input
+		<div className="components-navigation__menu-title-search">
+			<MenuTitleSearchUI
 				autoComplete="off"
-				className="components-text-control__input"
+				className="components-navigation__menu-search-input"
 				id={ inputId }
-				onChange={ ( event ) => onSearch( event.target.value ) }
+				onChange={ ( value ) => onSearch( value ) }
 				onKeyDown={ onKeyDown }
 				placeholder={ placeholder }
+				onClose={ onClose }
 				ref={ inputRef }
 				type="search"
 				value={ search }
 			/>
-
-			<Button
-				isSmall
-				isTertiary
-				label={ __( 'Close search' ) }
-				onClick={ onClose }
-			>
-				<Icon icon={ closeSmall } />
-			</Button>
-		</MenuTitleSearchUI>
+		</div>
 	);
 }
 

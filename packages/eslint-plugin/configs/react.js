@@ -5,6 +5,9 @@ module.exports = {
 			jsx: true,
 		},
 	},
+	settings: {
+		'import/extensions': [ '.js', '.jsx' ],
+	},
 	plugins: [ '@wordpress', 'react', 'react-hooks' ],
 	rules: {
 		'@wordpress/no-unused-vars-before-return': [

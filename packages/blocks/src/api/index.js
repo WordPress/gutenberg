@@ -33,11 +33,11 @@ export {
 // block. For composition, it also means inner blocks can effectively be child
 // components whose mechanisms can be shielded from the `edit` implementation
 // and just passed along.
+export { default as parse } from './parser';
 export {
-	default as parse,
 	getBlockAttributes,
 	parseWithAttributeSchema,
-} from './parser';
+} from './parser/get-block-attributes';
 
 // While block transformations account for a specific surface of the API, there
 // are also raw transformations which handle arbitrary sources not made out of
@@ -62,6 +62,7 @@ export {
 	getSaveElement,
 	getSaveContent,
 	getBlockProps as __unstableGetBlockProps,
+	getInnerBlocksProps as __unstableGetInnerBlocksProps,
 	__unstableSerializeAndClean,
 } from './serializer';
 
@@ -108,7 +109,6 @@ export { getCategories, setCategories, updateCategory } from './categories';
 // children of another block.
 export {
 	registerBlockType,
-	registerBlockTypeFromMetadata,
 	registerBlockCollection,
 	unregisterBlockType,
 	setFreeformContentHandlerName,
@@ -160,4 +160,5 @@ export { default as node } from './node';
 export {
 	__EXPERIMENTAL_STYLE_PROPERTY,
 	__EXPERIMENTAL_ELEMENTS,
+	__EXPERIMENTAL_PATHS_WITH_MERGE,
 } from './constants';

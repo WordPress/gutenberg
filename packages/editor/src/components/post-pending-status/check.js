@@ -9,6 +9,11 @@ import { get } from 'lodash';
 import { compose } from '@wordpress/compose';
 import { withSelect } from '@wordpress/data';
 
+/**
+ * Internal dependencies
+ */
+import { store as editorStore } from '../../store';
+
 export function PostPendingStatusCheck( {
 	hasPublishAction,
 	isPublished,
@@ -27,7 +32,7 @@ export default compose(
 			isCurrentPostPublished,
 			getCurrentPostType,
 			getCurrentPost,
-		} = select( 'core/editor' );
+		} = select( editorStore );
 		return {
 			hasPublishAction: get(
 				getCurrentPost(),

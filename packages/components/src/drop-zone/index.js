@@ -11,7 +11,18 @@ import { __ } from '@wordpress/i18n';
 import { useState } from '@wordpress/element';
 import { upload, Icon } from '@wordpress/icons';
 import { getFilesFromDataTransfer } from '@wordpress/dom';
-import { __experimentalUseDropZone as useDropZone } from '@wordpress/compose';
+import {
+	__experimentalUseDropZone as useDropZone,
+	useReducedMotion,
+} from '@wordpress/compose';
+
+/**
+ * Internal dependencies
+ */
+import {
+	__unstableMotion as motion,
+	__unstableAnimatePresence as AnimatePresence,
+} from '../animation';
 
 export default function DropZoneComponent( {
 	className,
@@ -65,20 +76,57 @@ export default function DropZoneComponent( {
 			setIsDraggingOverElement( false );
 		},
 	} );
+	const disableMotion = useReducedMotion();
 
 	let children;
 
+	const backdrop = {
+		hidden: { scaleY: 0, opacity: 0 },
+		show: {
+			scaleY: 1,
+			opacity: 1,
+			transition: {
+				type: 'tween',
+				duration: 0.2,
+				delay: 0.1,
+				delayChildren: 0.2,
+			},
+		},
+		exit: {
+			scaleY: 1,
+			opacity: 0,
+			transition: {
+				duration: 0.3,
+				delayChildren: 0,
+			},
+		},
+	};
+
+	const foreground = {
+		hidden: { opacity: 0, scale: 0.75 },
+		show: { opacity: 1, scale: 1 },
+		exit: { opacity: 0, scale: 0.9 },
+	};
+
 	if ( isDraggingOverElement ) {
 		children = (
-			<div className="components-drop-zone__content">
-				<Icon
-					icon={ upload }
-					className="components-drop-zone__content-icon"
-				/>
-				<span className="components-drop-zone__content-text">
-					{ label ? label : __( 'Drop files to upload' ) }
-				</span>
-			</div>
+			<motion.div
+				variants={ backdrop }
+				initial={ disableMotion ? 'show' : 'hidden' }
+				animate="show"
+				exit={ disableMotion ? 'show' : 'exit' }
+				className="components-drop-zone__content"
+			>
+				<motion.div variants={ foreground }>
+					<Icon
+						icon={ upload }
+						className="components-drop-zone__content-icon"
+					/>
+					<span className="components-drop-zone__content-text">
+						{ label ? label : __( 'Drop files to upload' ) }
+					</span>
+				</motion.div>
+			</motion.div>
 		);
 	}
 
@@ -95,7 +143,11 @@ export default function DropZoneComponent( {
 
 	return (
 		<div ref={ ref } className={ classes }>
-			{ children }
+			{ disableMotion ? (
+				children
+			) : (
+				<AnimatePresence>{ children }</AnimatePresence>
+			) }
 		</div>
 	);
 }

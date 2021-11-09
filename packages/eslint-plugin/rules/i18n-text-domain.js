@@ -10,7 +10,7 @@ const {
  * Returns the text domain passed to the given translation function.
  *
  * @param {string} functionName Translation function name.
- * @param {Array} args Function arguments.
+ * @param {Array}  args         Function arguments.
  * @return {undefined|*} Text domain argument.
  */
 function getTextDomain( functionName, args ) {

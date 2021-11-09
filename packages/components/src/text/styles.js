@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { css } from 'emotion';
+import { css } from '@emotion/react';
 
 /**
  * Internal dependencies
@@ -9,7 +9,7 @@ import { css } from 'emotion';
 import { COLORS, CONFIG } from '../utils';
 
 export const Text = css`
-	color: ${ COLORS.black };
+	color: ${ COLORS.darkGray.primary };
 	line-height: ${ CONFIG.fontLineHeightBase };
 	margin: 0;
 `;

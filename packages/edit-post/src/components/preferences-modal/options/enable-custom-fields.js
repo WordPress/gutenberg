@@ -5,6 +5,7 @@ import { useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { Button } from '@wordpress/components';
 import { withSelect } from '@wordpress/data';
+import { store as editorStore } from '@wordpress/editor';
 
 /**
  * Internal dependencies
@@ -23,7 +24,7 @@ export function CustomFieldsConfirmation( { willEnable } ) {
 			</p>
 			<Button
 				className="edit-post-preferences-modal__custom-fields-confirmation-button"
-				isSecondary
+				variant="secondary"
 				isBusy={ isReloading }
 				disabled={ isReloading }
 				onClick={ () => {
@@ -58,6 +59,6 @@ export function EnableCustomFieldsOption( { label, areCustomFieldsEnabled } ) {
 }
 
 export default withSelect( ( select ) => ( {
-	areCustomFieldsEnabled: !! select( 'core/editor' ).getEditorSettings()
+	areCustomFieldsEnabled: !! select( editorStore ).getEditorSettings()
 		.enableCustomFields,
 } ) )( EnableCustomFieldsOption );

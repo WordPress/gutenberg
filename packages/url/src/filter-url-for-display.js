@@ -1,7 +1,7 @@
 /**
  * Returns a URL for display.
  *
- * @param {string} url Original URL.
+ * @param {string}      url       Original URL.
  * @param {number|null} maxLength URL length.
  *
  * @example

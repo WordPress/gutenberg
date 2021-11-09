@@ -13,18 +13,19 @@ import { cleanEmptyObject } from './utils';
 /**
  * Key within block settings' support array indicating support for font style.
  */
-export const FONT_STYLE_SUPPORT_KEY = '__experimentalFontStyle';
+export const FONT_STYLE_SUPPORT_KEY = 'typography.__experimentalFontStyle';
 
 /**
  * Key within block settings' support array indicating support for font weight.
  */
-export const FONT_WEIGHT_SUPPORT_KEY = '__experimentalFontWeight';
+export const FONT_WEIGHT_SUPPORT_KEY = 'typography.__experimentalFontWeight';
 
 /**
  * Inspector control panel containing the font appearance options.
  *
- * @param  {Object} props Block properties.
- * @return {WPElement}    Font appearance edit element.
+ * @param {Object} props Block properties.
+ *
+ * @return {WPElement} Font appearance edit element.
  */
 export function FontAppearanceEdit( props ) {
 	const {
@@ -34,10 +35,6 @@ export function FontAppearanceEdit( props ) {
 
 	const hasFontStyles = ! useIsFontStyleDisabled( props );
 	const hasFontWeights = ! useIsFontWeightDisabled( props );
-
-	if ( ! hasFontStyles && ! hasFontWeights ) {
-		return null;
-	}
 
 	const onChange = ( newStyles ) => {
 		setAttributes( {
@@ -53,7 +50,6 @@ export function FontAppearanceEdit( props ) {
 	};
 
 	const fontStyle = style?.typography?.fontStyle;
-
 	const fontWeight = style?.typography?.fontWeight;
 
 	return (
@@ -70,13 +66,14 @@ export function FontAppearanceEdit( props ) {
  * Checks if font style support has been disabled either by not opting in for
  * support or by failing to provide preset styles.
  *
- * @param  {Object} props      Block properties.
- * @param  {string} props.name Name for the block type.
- * @return {boolean}           Whether font style support has been disabled.
+ * @param {Object} props      Block properties.
+ * @param {string} props.name Name for the block type.
+ *
+ * @return {boolean} Whether font style support has been disabled.
  */
 export function useIsFontStyleDisabled( { name: blockName } = {} ) {
 	const styleSupport = hasBlockSupport( blockName, FONT_STYLE_SUPPORT_KEY );
-	const hasFontStyles = useSetting( 'typography.customFontStyle' );
+	const hasFontStyles = useSetting( 'typography.fontStyle' );
 
 	return ! styleSupport || ! hasFontStyles;
 }
@@ -85,13 +82,14 @@ export function useIsFontStyleDisabled( { name: blockName } = {} ) {
  * Checks if font weight support has been disabled either by not opting in for
  * support or by failing to provide preset weights.
  *
- * @param  {Object} props      Block properties.
- * @param  {string} props.name Name for the block type.
- * @return {boolean}           Whether font weight support has been disabled.
+ * @param {Object} props      Block properties.
+ * @param {string} props.name Name for the block type.
+ *
+ * @return {boolean} Whether font weight support has been disabled.
  */
 export function useIsFontWeightDisabled( { name: blockName } = {} ) {
 	const weightSupport = hasBlockSupport( blockName, FONT_WEIGHT_SUPPORT_KEY );
-	const hasFontWeights = useSetting( 'typography.customFontWeight' );
+	const hasFontWeights = useSetting( 'typography.fontWeight' );
 
 	return ! weightSupport || ! hasFontWeights;
 }
@@ -99,12 +97,49 @@ export function useIsFontWeightDisabled( { name: blockName } = {} ) {
 /**
  * Checks if font appearance support has been disabled.
  *
- * @param  {Object} props      Block properties.
- * @return {boolean}           Whether font appearance support has been disabled.
+ * @param {Object} props Block properties.
+ *
+ * @return {boolean} Whether font appearance support has been disabled.
  */
 export function useIsFontAppearanceDisabled( props ) {
 	const stylesDisabled = useIsFontStyleDisabled( props );
 	const weightsDisabled = useIsFontWeightDisabled( props );
 
 	return stylesDisabled && weightsDisabled;
+}
+
+/**
+ * Checks if there is either a font style or weight value set within the
+ * typography styles.
+ *
+ * @param {Object} props Block props.
+ * @return {boolean}     Whether or not the block has a font style or weight.
+ */
+export function hasFontAppearanceValue( props ) {
+	const { fontStyle, fontWeight } = props.attributes.style?.typography || {};
+	return !! fontStyle || !! fontWeight;
+}
+
+/**
+ * Resets the font style and weight block support attributes. This can be used
+ * when disabling the font appearance support controls for a block via a
+ * progressive discovery panel.
+ *
+ * @param {Object} props               Block props.
+ * @param {Object} props.attributes    Block's attributes.
+ * @param {Object} props.setAttributes Function to set block's attributes.
+ */
+export function resetFontAppearance( { attributes = {}, setAttributes } ) {
+	const { style } = attributes;
+
+	setAttributes( {
+		style: cleanEmptyObject( {
+			...style,
+			typography: {
+				...style?.typography,
+				fontStyle: undefined,
+				fontWeight: undefined,
+			},
+		} ),
+	} );
 }

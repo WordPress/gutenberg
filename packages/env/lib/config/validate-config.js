@@ -15,7 +15,7 @@ class ValidationError extends Error {}
  * Validates a config object by throwing a ValidationError if any of its properties
  * do not match the required format.
  *
- * @param {Object} config       A config object to validate.
+ * @param {Object}  config      A config object to validate.
  * @param {?string} envLocation Identifies if the error occured in a specific environment property.
  * @return {Object} The passed config object with no modifications.
  */

@@ -7,6 +7,7 @@ import { withSelect } from '@wordpress/data';
  * Internal dependencies
  */
 import PostTypeSupportCheck from '../post-type-support-check';
+import { store as editorStore } from '../../store';
 
 export function PostLastRevisionCheck( {
 	lastRevisionId,
@@ -28,7 +29,7 @@ export default withSelect( ( select ) => {
 	const {
 		getCurrentPostLastRevisionId,
 		getCurrentPostRevisionsCount,
-	} = select( 'core/editor' );
+	} = select( editorStore );
 	return {
 		lastRevisionId: getCurrentPostLastRevisionId(),
 		revisionsCount: getCurrentPostRevisionsCount(),

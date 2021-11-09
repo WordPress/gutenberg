@@ -1,6 +1,8 @@
 # Text
 
-> **Experimental!**
+<div class="callout callout-alert">
+This feature is still experimental. “Experimental” means this is an early implementation subject to drastic and breaking changes.
+</div>
 
 `Text` is a core component that renders text in the library, using the library's typography system.
 

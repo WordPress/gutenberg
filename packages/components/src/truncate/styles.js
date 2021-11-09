@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { css } from 'emotion';
+import { css } from '@emotion/react';
 
 export const Truncate = css`
 	display: block;

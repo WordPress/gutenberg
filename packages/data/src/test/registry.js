@@ -9,6 +9,7 @@ import { castArray, mapValues } from 'lodash';
 import { createRegistry } from '../registry';
 import { createRegistrySelector } from '../factory';
 import createReduxStore from '../redux-store';
+import { STORE_NAME } from '../store/name';
 
 jest.useFakeTimers();
 
@@ -376,7 +377,7 @@ describe( 'createRegistry', () => {
 				() => registry.select( 'demo' ).getValue() === 'OK',
 				() =>
 					registry
-						.select( 'core/data' )
+						.select( STORE_NAME )
 						.hasFinishedResolution( 'demo', 'getValue' ),
 			] );
 
@@ -403,7 +404,7 @@ describe( 'createRegistry', () => {
 				() => registry.select( 'demo' ).getValue() === 'OK',
 				() =>
 					registry
-						.select( 'core/data' )
+						.select( STORE_NAME )
 						.hasFinishedResolution( 'demo', 'getValue' ),
 			] );
 
@@ -718,6 +719,40 @@ describe( 'createRegistry', () => {
 			} );
 			registry.dispatch( 'counter' ).increment( 4 ); // state = 5
 			expect( store.getState() ).toBe( 5 );
+		} );
+	} );
+
+	describe( 'batch', () => {
+		it( 'should batch callbacks and only run the subscriber once', () => {
+			const store = registry.registerStore( 'myAwesomeReducer', {
+				reducer: ( state = 0 ) => state + 1,
+			} );
+			const listener = jest.fn();
+			subscribeWithUnsubscribe( listener );
+
+			registry.batch( () => {} );
+			expect( listener ).not.toHaveBeenCalled();
+
+			registry.batch( () => {
+				store.dispatch( { type: 'dummy' } );
+				store.dispatch( { type: 'dummy' } );
+			} );
+			expect( listener ).toHaveBeenCalledTimes( 1 );
+
+			const listener2 = jest.fn();
+			// useSelect subscribes to the stores differently,
+			// This test ensures batching works in this case as well.
+			const unsubscribe = registry.__experimentalSubscribeStore(
+				'myAwesomeReducer',
+				listener2
+			);
+			registry.batch( () => {
+				store.dispatch( { type: 'dummy' } );
+				store.dispatch( { type: 'dummy' } );
+			} );
+			unsubscribe();
+
+			expect( listener2 ).toHaveBeenCalledTimes( 1 );
 		} );
 	} );
 

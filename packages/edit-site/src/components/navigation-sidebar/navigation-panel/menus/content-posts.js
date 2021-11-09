@@ -8,6 +8,7 @@ import {
 import { __ } from '@wordpress/i18n';
 import { useCallback } from '@wordpress/element';
 import { useDispatch, useSelect } from '@wordpress/data';
+import { store as coreStore } from '@wordpress/core-data';
 
 /**
  * Internal dependencies
@@ -32,14 +33,13 @@ export default function ContentPostsMenu() {
 				getEntityRecords,
 				getEditedEntityRecord,
 				hasFinishedResolution,
-			} = select( 'core' );
-			const getEntityRecodsArgs = [
-				'postType',
-				'post',
-				{
-					search: searchQuery,
-				},
-			];
+			} = select( coreStore );
+			const query = searchQuery
+				? {
+						search: searchQuery,
+				  }
+				: undefined;
+			const getEntityRecodsArgs = [ 'postType', 'post', query ];
 			const hasResolvedPosts = hasFinishedResolution(
 				'getEntityRecords',
 				getEntityRecodsArgs
@@ -54,7 +54,9 @@ export default function ContentPostsMenu() {
 		[ searchQuery ]
 	);
 
-	const { setPage } = useDispatch( editSiteStore );
+	const { setPage, setIsNavigationPanelOpened } = useDispatch(
+		editSiteStore
+	);
 
 	const onActivateFrontItem = useCallback( () => {
 		setPage( {
@@ -64,7 +66,8 @@ export default function ContentPostsMenu() {
 				queryContext: { page: 1 },
 			},
 		} );
-	}, [ setPage ] );
+		setIsNavigationPanelOpened( false );
+	}, [ setPage, setIsNavigationPanelOpened ] );
 
 	const shouldShowLoadingForDebouncing = search && isDebouncing;
 	const showLoading = ! isResolved || shouldShowLoadingForDebouncing;

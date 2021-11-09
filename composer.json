@@ -33,7 +33,7 @@
 	},
 	"scripts": {
 		"format": "phpcbf --standard=phpcs.xml.dist --report-summary --report-source",
-		"lint": "phpcs --standard=phpcs.xml.dist --runtime-set ignore_warnings_on_exit 1",
+		"lint": "phpcs --standard=phpcs.xml.dist",
 		"test": "phpunit",
 		"test:watch": "phpunit-watcher watch < /dev/tty"
 	}

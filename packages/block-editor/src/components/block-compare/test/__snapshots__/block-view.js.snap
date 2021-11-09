@@ -20,16 +20,18 @@ exports[`BlockView should match snapshot 1`] = `
     <div
       className="block-editor-block-compare__preview edit-post-visual-editor"
     >
-      render
+      <RawHTML>
+        render
+      </RawHTML>
     </div>
   </div>
   <div
     className="block-editor-block-compare__action"
   >
     <ForwardRef(Button)
-      isSecondary={true}
       onClick={[Function]}
       tabIndex="0"
+      variant="secondary"
     >
       action
     </ForwardRef(Button)>

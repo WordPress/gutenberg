@@ -36,6 +36,9 @@
 		},
 		"kind": {
 			"type": "string"
+		},
+		"isTopLevelLink": {
+			"type": "boolean"
 		}
 	},
 	"usesContext": [
@@ -43,6 +46,10 @@
 		"customTextColor",
 		"backgroundColor",
 		"customBackgroundColor",
+		"overlayTextColor",
+		"customOverlayTextColor",
+		"overlayBackgroundColor",
+		"customOverlayBackgroundColor",
 		"fontSize",
 		"customFontSize",
 		"showSubmenuIcon",
@@ -50,7 +57,8 @@
 	],
 	"supports": {
 		"reusable": false,
-		"html": false
+		"html": false,
+		"__experimentalSlashInserter": true
 	},
 	"editorStyle": "wp-block-navigation-link-editor",
 	"style": "wp-block-navigation-link"

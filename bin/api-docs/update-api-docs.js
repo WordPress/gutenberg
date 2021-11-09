@@ -38,10 +38,7 @@ const PACKAGES_DIR = resolve( ROOT_DIR, 'packages' );
  *
  * @type {string}
  */
-const DATA_DOCS_DIR = resolve(
-	ROOT_DIR,
-	'docs/designers-developers/developers/data'
-);
+const DATA_DOCS_DIR = resolve( ROOT_DIR, 'docs/reference-guides/data' );
 
 /**
  * Pattern matching start token of a README file.
@@ -235,6 +232,9 @@ glob.stream( [
 					{ shell: true }
 				);
 			}
+			await execa( 'npm', [ 'run', 'format', output ], {
+				shell: true,
+			} );
 		} catch ( error ) {
 			console.error( error );
 			process.exit( 1 );

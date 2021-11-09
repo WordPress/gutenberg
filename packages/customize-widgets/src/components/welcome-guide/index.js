@@ -4,17 +4,10 @@
 import { __ } from '@wordpress/i18n';
 import { Button, ExternalLink } from '@wordpress/components';
 import { useDispatch } from '@wordpress/data';
-
-/**
- * Internal dependencies
- */
-import { EditorImage } from './images';
-import { store as customizeWidgetsStore } from '../../store';
+import { store as interfaceStore } from '@wordpress/interface';
 
 export default function WelcomeGuide( { sidebar } ) {
-	const { __unstableToggleFeature: toggleFeature } = useDispatch(
-		customizeWidgetsStore
-	);
+	const { toggleFeature } = useDispatch( interfaceStore );
 
 	const isEntirelyBlockWidgets = sidebar
 		.getWidgets()
@@ -22,7 +15,21 @@ export default function WelcomeGuide( { sidebar } ) {
 
 	return (
 		<div className="customize-widgets-welcome-guide">
-			<EditorImage />
+			<div className="customize-widgets-welcome-guide__image__wrapper">
+				<picture>
+					<source
+						srcSet="https://s.w.org/images/block-editor/welcome-editor.svg"
+						media="(prefers-reduced-motion: reduce)"
+					/>
+					<img
+						className="customize-widgets-welcome-guide__image"
+						src="https://s.w.org/images/block-editor/welcome-editor.gif"
+						width="312"
+						height="240"
+						alt=""
+					/>
+				</picture>
+			</div>
 			<h1 className="customize-widgets-welcome-guide__heading">
 				{ __( 'Welcome to block Widgets' ) }
 			</h1>
@@ -37,8 +44,10 @@ export default function WelcomeGuide( { sidebar } ) {
 			</p>
 			<Button
 				className="customize-widgets-welcome-guide__button"
-				isPrimary
-				onClick={ () => toggleFeature( 'welcomeGuide' ) }
+				variant="primary"
+				onClick={ () =>
+					toggleFeature( 'core/customize-widgets', 'welcomeGuide' )
+				}
 			>
 				{ __( 'Got it' ) }
 			</Button>

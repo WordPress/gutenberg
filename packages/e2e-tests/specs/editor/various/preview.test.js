@@ -11,6 +11,7 @@ import {
 	publishPost,
 	saveDraft,
 	openPreviewPage,
+	pressKeyWithModifier,
 } from '@wordpress/e2e-test-utils';
 
 /** @typedef {import('puppeteer').Page} Page */
@@ -151,11 +152,21 @@ describe( 'Preview', () => {
 
 		// Preview for published post (no unsaved changes) directs to canonical URL for post.
 		await editorPage.bringToFront();
+		/**
+		 * Temp workaround until we find a reliable solution for `publishPost` util.
+		 *
+		 * @see https://github.com/WordPress/gutenberg/pull/35565
+		 */
+		await editorPage.click( '.components-snackbar' );
 		await publishPost();
 
 		// Return to editor to change title.
 		await editorPage.bringToFront();
-		await editorPage.type( '.editor-post-title__input', ' And more.' );
+		await editorPage.waitForSelector( '.editor-post-title__input' );
+		await editorPage.click( '.editor-post-title__input' );
+		await pressKeyWithModifier( 'primary', 'A' );
+		await editorPage.keyboard.press( 'ArrowRight' );
+		await editorPage.keyboard.type( ' And more.' );
 		await waitForPreviewDropdownOpen( editorPage );
 		await waitForPreviewNavigation( previewPage );
 
@@ -216,7 +227,10 @@ describe( 'Preview', () => {
 		await editorPage.bringToFront();
 
 		// Append bbbbb to the title, and tab away from the title so blur event is triggered.
-		await editorPage.type( '.editor-post-title__input', 'bbbbb' );
+		await editorPage.focus( '.editor-post-title__input' );
+		await pressKeyWithModifier( 'primary', 'a' );
+		await editorPage.keyboard.press( 'ArrowRight' );
+		await editorPage.keyboard.type( 'bbbbb' );
 		await editorPage.keyboard.press( 'Tab' );
 
 		// Save draft and open the preview page right after.

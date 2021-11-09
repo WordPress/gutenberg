@@ -9,12 +9,12 @@ import classnames from 'classnames';
 import { useState, useEffect, Children } from '@wordpress/element';
 import deprecated from '@wordpress/deprecated';
 import { __ } from '@wordpress/i18n';
+import { LEFT, RIGHT } from '@wordpress/keycodes';
 
 /**
  * Internal dependencies
  */
 import Modal from '../modal';
-import KeyboardShortcuts from '../keyboard-shortcuts';
 import Button from '../button';
 import PageControl from './page-control';
 import FinishButton from './finish-button';
@@ -66,15 +66,14 @@ export default function Guide( {
 			className={ classnames( 'components-guide', className ) }
 			contentLabel={ contentLabel }
 			onRequestClose={ onFinish }
+			onKeyDown={ ( event ) => {
+				if ( event.keyCode === LEFT ) {
+					goBack();
+				} else if ( event.keyCode === RIGHT ) {
+					goForward();
+				}
+			} }
 		>
-			<KeyboardShortcuts
-				key={ currentPage }
-				shortcuts={ {
-					left: goBack,
-					right: goForward,
-				} }
-			/>
-
 			<div className="components-guide__container">
 				<div className="components-guide__page">
 					{ pages[ currentPage ].image }

@@ -6,6 +6,13 @@
 	}
 	img {
 		max-width: 100%;
+		width: 100%;
 		height: auto;
+		vertical-align: bottom;
+	}
+
+	&.alignwide img,
+	&.alignfull img {
+		width: 100%;
 	}
 }

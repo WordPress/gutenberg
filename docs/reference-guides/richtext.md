@@ -130,4 +130,4 @@ The RichText component uses formats to display inline elements, for example imag
 wp.richText.unregisterFormatType( 'core/image' );
 ```
 
-To apply, you would need to enqueue the above script in your plugin or theme. See the JavaScript tutorial for [how to load JavaScript in WordPress](https://developer.wordpress.org/block-editor/tutorials/javascript/loading-javascript/).
+To apply, you would need to enqueue the above script in your plugin or theme. See the JavaScript tutorial for [how to load JavaScript in WordPress](https://developer.wordpress.org/block-editor/how-to-guides/javascript/loading-javascript/).

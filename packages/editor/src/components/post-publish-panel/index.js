@@ -18,6 +18,7 @@ import {
 import { withSelect, withDispatch } from '@wordpress/data';
 import { compose } from '@wordpress/compose';
 import { closeSmall } from '@wordpress/icons';
+import { store as coreStore } from '@wordpress/core-data';
 
 /**
  * Internal dependencies
@@ -25,6 +26,7 @@ import { closeSmall } from '@wordpress/icons';
 import PostPublishButton from '../post-publish-button';
 import PostPublishPanelPrepublish from './prepublish';
 import PostPublishPanelPostpublish from './postpublish';
+import { store as editorStore } from '../../store';
 
 export class PostPublishPanel extends Component {
 	constructor() {
@@ -60,6 +62,7 @@ export class PostPublishPanel extends Component {
 			isPublishSidebarEnabled,
 			isScheduled,
 			isSaving,
+			isSavingNonPostEntityChanges,
 			onClose,
 			onTogglePublishSidebar,
 			PostPublishExtension,
@@ -95,7 +98,11 @@ export class PostPublishPanel extends Component {
 								/>
 							</div>
 							<div className="editor-post-publish-panel__header-cancel-button">
-								<Button onClick={ onClose } isSecondary>
+								<Button
+									disabled={ isSavingNonPostEntityChanges }
+									onClick={ onClose }
+									variant="secondary"
+								>
 									{ __( 'Cancel' ) }
 								</Button>
 							</div>
@@ -129,7 +136,7 @@ export class PostPublishPanel extends Component {
 
 export default compose( [
 	withSelect( ( select ) => {
-		const { getPostType } = select( 'core' );
+		const { getPostType } = select( coreStore );
 		const {
 			getCurrentPost,
 			getEditedPostAttribute,
@@ -138,8 +145,9 @@ export default compose( [
 			isEditedPostBeingScheduled,
 			isEditedPostDirty,
 			isSavingPost,
-		} = select( 'core/editor' );
-		const { isPublishSidebarEnabled } = select( 'core/editor' );
+			isSavingNonPostEntityChanges,
+		} = select( editorStore );
+		const { isPublishSidebarEnabled } = select( editorStore );
 		const postType = getPostType( getEditedPostAttribute( 'type' ) );
 
 		return {
@@ -154,12 +162,13 @@ export default compose( [
 			isPublished: isCurrentPostPublished(),
 			isPublishSidebarEnabled: isPublishSidebarEnabled(),
 			isSaving: isSavingPost(),
+			isSavingNonPostEntityChanges: isSavingNonPostEntityChanges(),
 			isScheduled: isCurrentPostScheduled(),
 		};
 	} ),
 	withDispatch( ( dispatch, { isPublishSidebarEnabled } ) => {
 		const { disablePublishSidebar, enablePublishSidebar } = dispatch(
-			'core/editor'
+			editorStore
 		);
 		return {
 			onTogglePublishSidebar: () => {

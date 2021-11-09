@@ -4,12 +4,14 @@
 import {
 	BlockList,
 	BlockTools,
-	BlockEditorKeyboardShortcuts,
 	BlockSelectionClearer,
 	WritingFlow,
 	ObserveTyping,
 	__unstableEditorStyles as EditorStyles,
 } from '@wordpress/block-editor';
+import { useSelect } from '@wordpress/data';
+import { useMemo } from '@wordpress/element';
+import { store as interfaceStore } from '@wordpress/interface';
 
 /**
  * Internal dependencies
@@ -20,13 +22,25 @@ import KeyboardShortcuts from '../keyboard-shortcuts';
 export default function WidgetAreasBlockEditorContent( {
 	blockEditorSettings,
 } ) {
+	const hasThemeStyles = useSelect(
+		( select ) =>
+			select( interfaceStore ).isFeatureActive(
+				'core/edit-widgets',
+				'themeStyles'
+			),
+		[]
+	);
+
+	const styles = useMemo( () => {
+		return hasThemeStyles ? blockEditorSettings.styles : [];
+	}, [ blockEditorSettings, hasThemeStyles ] );
+
 	return (
-		<BlockTools>
-			<KeyboardShortcuts />
-			<BlockEditorKeyboardShortcuts />
+		<div className="edit-widgets-block-editor">
 			<Notices />
-			<div className="edit-widgets-block-editor editor-styles-wrapper">
-				<EditorStyles styles={ blockEditorSettings.styles } />
+			<BlockTools>
+				<KeyboardShortcuts />
+				<EditorStyles styles={ styles } />
 				<BlockSelectionClearer>
 					<WritingFlow>
 						<ObserveTyping>
@@ -34,7 +48,7 @@ export default function WidgetAreasBlockEditorContent( {
 						</ObserveTyping>
 					</WritingFlow>
 				</BlockSelectionClearer>
-			</div>
-		</BlockTools>
+			</BlockTools>
+		</div>
 	);
 }

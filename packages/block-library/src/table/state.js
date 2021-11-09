@@ -47,7 +47,7 @@ export function getFirstRow( state ) {
 /**
  * Gets an attribute for a cell.
  *
- * @param {Object} state 		 Current table state.
+ * @param {Object} state         Current table state.
  * @param {Object} cellLocation  The location of the cell
  * @param {string} attributeName The name of the attribute to get the value of.
  *

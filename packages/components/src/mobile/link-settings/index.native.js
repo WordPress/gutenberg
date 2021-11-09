@@ -86,9 +86,9 @@ function LinkSettings( {
 	urlValue,
 	// Attributes properties
 	url,
-	label,
+	label = '',
 	linkTarget,
-	rel,
+	rel = '',
 } ) {
 	const [ urlInputValue, setUrlInputValue ] = useState( '' );
 	const [ labelInputValue, setLabelInputValue ] = useState( '' );
@@ -226,6 +226,7 @@ function LinkSettings( {
 						<BottomSheet.LinkCell
 							showIcon={ showIcon }
 							value={ url }
+							valueMask={ options.url.valueMask }
 							onPress={ onLinkCellPressed }
 						/>
 					) : (
@@ -293,7 +294,10 @@ function LinkSettings( {
 			</PanelBody>
 			{ options.footer && (
 				<PanelBody style={ styles.linkSettingsPanel }>
-					<FooterMessageControl label={ options.footer.label } />
+					<FooterMessageControl
+						label={ options.footer.label }
+						separatorType={ options.footer.separatorType }
+					/>
 				</PanelBody>
 			) }
 			{ actions && <PanelActions actions={ actions } /> }

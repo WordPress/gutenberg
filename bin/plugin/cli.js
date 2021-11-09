@@ -21,6 +21,7 @@ const catchException = ( command ) => {
  */
 const {
 	publishNpmLatestDistTag,
+	publishNpmBugfixLatestDistTag,
 	publishNpmNextDistTag,
 } = require( './commands/packages' );
 const { getReleaseChangelog } = require( './commands/changelog' );
@@ -33,6 +34,14 @@ program
 		'Publishes packages to npm (latest dist-tag, production version)'
 	)
 	.action( catchException( publishNpmLatestDistTag ) );
+
+program
+	.command( 'publish-npm-packages-bugfix-latest' )
+	.alias( 'npm-bugfix' )
+	.description(
+		'Publishes bugfixes for packages to npm (latest dist-tag, production version)'
+	)
+	.action( catchException( publishNpmBugfixLatestDistTag ) );
 
 program
 	.command( 'publish-npm-packages-next' )
@@ -61,6 +70,10 @@ program
 	.option(
 		'--tests-branch <branch>',
 		"Use this branch's performance test files"
+	)
+	.option(
+		'--wp-version <version>',
+		'Specify a WordPress version on which to test all branches'
 	)
 	.description(
 		'Runs performance tests on two separate branches and outputs the result'

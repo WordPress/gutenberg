@@ -15,7 +15,7 @@ const {
 const { fromConfigRoot, fromProjectRoot, hasProjectFile } = require( './file' );
 const { hasPackageProp } = require( './package' );
 
-// See https://babeljs.io/docs/en/config-files#configuration-file-types
+// See https://babeljs.io/docs/en/config-files#configuration-file-types.
 const hasBabelConfig = () =>
 	hasProjectFile( '.babelrc.js' ) ||
 	hasProjectFile( '.babelrc.json' ) ||
@@ -23,6 +23,16 @@ const hasBabelConfig = () =>
 	hasProjectFile( 'babel.config.json' ) ||
 	hasProjectFile( '.babelrc' ) ||
 	hasPackageProp( 'babel' );
+
+// See https://cssnano.co/docs/config-file.
+const hasCssnanoConfig = () =>
+	hasProjectFile( '.cssnanorc' ) ||
+	hasProjectFile( '.cssnanorc.js' ) ||
+	hasProjectFile( '.cssnanorc.json' ) ||
+	hasProjectFile( '.cssnanorc.yaml' ) ||
+	hasProjectFile( '.cssnanorc.yml' ) ||
+	hasProjectFile( 'cssnano.config.js' ) ||
+	hasPackageProp( 'cssnano' );
 
 /**
  * Returns path to a Jest configuration which should be provided as the explicit
@@ -52,9 +62,11 @@ function getJestOverrideConfigFile( suffix ) {
 	}
 }
 
+// See https://jestjs.io/docs/configuration.
 const hasJestConfig = () =>
 	hasProjectFile( 'jest.config.js' ) ||
 	hasProjectFile( 'jest.config.json' ) ||
+	hasProjectFile( 'jest.config.ts' ) ||
 	hasPackageProp( 'jest' );
 
 // See https://prettier.io/docs/en/configuration.html.
@@ -96,38 +108,53 @@ const getWebpackArgs = () => {
 
 	const hasWebpackOutputOption =
 		hasArgInCLI( '-o' ) || hasArgInCLI( '--output' );
-	if ( hasFileArgInCLI() && ! hasWebpackOutputOption ) {
+	if (
+		! hasWebpackOutputOption &&
+		! hasArgInCLI( '--entry' ) &&
+		hasFileArgInCLI()
+	) {
 		/**
-		 * Converts a path to the entry format supported by webpack, e.g.:
-		 * `./entry-one.js` -> `entry-one=./entry-one.js`
-		 * `entry-two.js` -> `entry-two=./entry-two.js`
+		 * Converts a legacy path to the entry pair supported by webpack, e.g.:
+		 * `./entry-one.js` -> `[ 'entry-one', './entry-one.js] ]`
+		 * `entry-two.js` -> `[ 'entry-two', './entry-two.js' ]`
 		 *
 		 * @param {string} path The path provided.
 		 *
-		 * @return {string} The entry format supported by webpack.
+		 * @return {string[]} The entry pair of its name and the file path.
 		 */
 		const pathToEntry = ( path ) => {
-			const entry = basename( path, '.js' );
+			const entryName = basename( path, '.js' );
 
 			if ( ! path.startsWith( './' ) ) {
 				path = './' + path;
 			}
 
-			return [ entry, path ].join( '=' );
+			return [ entryName, path ];
 		};
 
-		// The following handles the support for multiple entry points in webpack, e.g.:
-		// `wp-scripts build one.js custom=./two.js` -> `webpack one=./one.js custom=./two.js`
-		webpackArgs = webpackArgs.map( ( cliArg ) => {
-			if (
-				getFileArgsFromCLI().includes( cliArg ) &&
-				! cliArg.includes( '=' )
-			) {
-				return pathToEntry( cliArg );
-			}
+		const fileArgs = getFileArgsFromCLI();
+		if ( fileArgs.length > 0 ) {
+			// Filters out all CLI arguments that are recognized as file paths.
+			const fileArgsToRemove = new Set( fileArgs );
+			webpackArgs = webpackArgs.filter( ( cliArg ) => {
+				if ( fileArgsToRemove.has( cliArg ) ) {
+					fileArgsToRemove.delete( cliArg );
+					return false;
+				}
+				return true;
+			} );
 
-			return cliArg;
-		} );
+			// Converts all CLI arguments that are file paths to the `entry` format supported by webpack.
+			// It is going to be consumed in the config through the WP_ENTRY global variable.
+			const entry = {};
+			fileArgs.forEach( ( fileArg ) => {
+				const [ entryName, path ] = fileArg.includes( '=' )
+					? fileArg.split( '=' )
+					: pathToEntry( fileArg );
+				entry[ entryName ] = path;
+			} );
+			process.env.WP_ENTRY = JSON.stringify( entry );
+		}
 	}
 
 	if ( ! hasWebpackConfig() ) {
@@ -138,10 +165,11 @@ const getWebpackArgs = () => {
 };
 
 module.exports = {
+	getJestOverrideConfigFile,
 	getWebpackArgs,
 	hasBabelConfig,
-	getJestOverrideConfigFile,
+	hasCssnanoConfig,
 	hasJestConfig,
-	hasPrettierConfig,
 	hasPostCSSConfig,
+	hasPrettierConfig,
 };

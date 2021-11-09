@@ -93,6 +93,13 @@ The label for the control.
 -   Type: `String`
 -   Required: Yes
 
+#### describedBy
+
+Pass in a description that will be shown to screen readers associated with the select trigger button. If no value is passed, the text "Currently selected: selectedItem.name" will be used fully translated.
+
+-   Type: `String`
+-   Required: No
+
 #### options
 
 The options that can be chosen from.

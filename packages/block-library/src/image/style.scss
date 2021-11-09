@@ -2,7 +2,9 @@
 	margin: 0 0 1em 0;
 
 	img {
+		height: auto;
 		max-width: 100%;
+		vertical-align: bottom;
 	}
 
 	&:not(.is-style-rounded) img {
@@ -15,6 +17,7 @@
 
 	&.alignfull img,
 	&.alignwide img {
+		height: auto;
 		width: 100%;
 	}
 

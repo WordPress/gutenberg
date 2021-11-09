@@ -7,6 +7,7 @@ import { get } from 'lodash';
  * WordPress dependencies
  */
 import { useSelect } from '@wordpress/data';
+import { __EXPERIMENTAL_PATHS_WITH_MERGE as PATHS_WITH_MERGE } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
@@ -33,34 +34,58 @@ const deprecatedFlags = {
 		settings.disableCustomFontSizes === undefined
 			? undefined
 			: ! settings.disableCustomFontSizes,
-	'typography.customLineHeight': ( settings ) =>
-		settings.enableCustomLineHeight,
+	'typography.lineHeight': ( settings ) => settings.enableCustomLineHeight,
 	'spacing.units': ( settings ) => {
 		if ( settings.enableCustomUnits === undefined ) {
 			return;
 		}
 
 		if ( settings.enableCustomUnits === true ) {
-			return [ 'px', 'em', 'rem', 'vh', 'vw' ];
+			return [ 'px', 'em', 'rem', 'vh', 'vw', '%' ];
 		}
 
 		return settings.enableCustomUnits;
 	},
-	'spacing.customPadding': ( settings ) => settings.enableCustomSpacing,
+	'spacing.padding': ( settings ) => settings.enableCustomSpacing,
 };
 
-const filterColorsFromCoreOrigin = ( path, setting ) => {
-	if ( path !== 'color.palette' && path !== 'color.gradients' ) {
-		return setting;
-	}
+const prefixedFlags = {
+	/*
+	 * These were only available in the plugin
+	 * and can be removed when the minimum WordPress version
+	 * for the plugin is 5.9.
+	 */
+	'border.customColor': 'border.color',
+	'border.customStyle': 'border.style',
+	'border.customWidth': 'border.width',
+	'typography.customFontStyle': 'typography.fontStyle',
+	'typography.customFontWeight': 'typography.fontWeight',
+	'typography.customLetterSpacing': 'typography.letterSpacing',
+	'typography.customTextDecorations': 'typography.textDecoration',
+	'typography.customTextTransforms': 'typography.textTransform',
+	/*
+	 * These were part of WordPress 5.8 and we need to keep them.
+	 */
+	'border.customRadius': 'border.radius',
+	'spacing.customMargin': 'spacing.margin',
+	'spacing.customPadding': 'spacing.padding',
+	'typography.customLineHeight': 'typography.lineHeight',
+};
 
-	if ( ! Array.isArray( setting ) ) {
-		return setting;
-	}
-
-	const colors = setting.filter( ( color ) => color?.origin !== 'core' );
-
-	return colors.length > 0 ? colors : setting;
+/**
+ * Remove `custom` prefixes for flags that did not land in 5.8.
+ *
+ * This provides continued support for `custom` prefixed properties. It will
+ * be removed once third party devs have had sufficient time to update themes,
+ * plugins, etc.
+ *
+ * @see https://github.com/WordPress/gutenberg/pull/34485
+ *
+ * @param {string} path Path to desired value in settings.
+ * @return {string}     The value for defined setting.
+ */
+const removeCustomPrefixes = ( path ) => {
+	return prefixedFlags[ path ] || path;
 };
 
 /**
@@ -68,9 +93,7 @@ const filterColorsFromCoreOrigin = ( path, setting ) => {
  * It works with nested objects using by finding the value at path.
  *
  * @param {string} path The path to the setting.
- *
  * @return {any} Returns the value defined for the setting.
- *
  * @example
  * ```js
  * const isEnabled = useSetting( 'typography.dropCap' );
@@ -85,33 +108,36 @@ export default function useSetting( path ) {
 
 			// 1 - Use __experimental features, if available.
 			// We cascade to the all value if the block one is not available.
-			const defaultsPath = `__experimentalFeatures.${ path }`;
-			const blockPath = `__experimentalFeatures.blocks.${ blockName }.${ path }`;
+			const normalizedPath = removeCustomPrefixes( path );
+			const defaultsPath = `__experimentalFeatures.${ normalizedPath }`;
+			const blockPath = `__experimentalFeatures.blocks.${ blockName }.${ normalizedPath }`;
 			const experimentalFeaturesResult =
 				get( settings, blockPath ) ?? get( settings, defaultsPath );
+
 			if ( experimentalFeaturesResult !== undefined ) {
-				return filterColorsFromCoreOrigin(
-					path,
-					experimentalFeaturesResult
-				);
+				if ( PATHS_WITH_MERGE[ normalizedPath ] ) {
+					return (
+						experimentalFeaturesResult.user ??
+						experimentalFeaturesResult.theme ??
+						experimentalFeaturesResult.core
+					);
+				}
+				return experimentalFeaturesResult;
 			}
 
 			// 2 - Use deprecated settings, otherwise.
-			const deprecatedSettingsValue = deprecatedFlags[ path ]
-				? deprecatedFlags[ path ]( settings )
+			const deprecatedSettingsValue = deprecatedFlags[ normalizedPath ]
+				? deprecatedFlags[ normalizedPath ]( settings )
 				: undefined;
 			if ( deprecatedSettingsValue !== undefined ) {
-				return filterColorsFromCoreOrigin(
-					path,
-					deprecatedSettingsValue
-				);
+				return deprecatedSettingsValue;
 			}
 
 			// 3 - Fall back for typography.dropCap:
 			// This is only necessary to support typography.dropCap.
 			// when __experimentalFeatures are not present (core without plugin).
 			// To remove when __experimentalFeatures are ported to core.
-			return path === 'typography.dropCap' ? true : undefined;
+			return normalizedPath === 'typography.dropCap' ? true : undefined;
 		},
 		[ blockName, path ]
 	);

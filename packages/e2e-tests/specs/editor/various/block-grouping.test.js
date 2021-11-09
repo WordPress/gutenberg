@@ -163,7 +163,7 @@ describe( 'Block Grouping', () => {
 			await insertBlock( 'Image' );
 			await clickBlockToolbarButton( 'Align' );
 			const fullButton = await page.waitForXPath(
-				`//button[contains(@class,'components-dropdown-menu__menu-item') and contains(text(), 'Full width')]`
+				`//button[contains(@class,'components-dropdown-menu__menu-item')]//span[contains(text(), 'Full width')]`
 			);
 			await fullButton.evaluate( ( element ) =>
 				element.scrollIntoView()
@@ -174,7 +174,7 @@ describe( 'Block Grouping', () => {
 			await insertBlock( 'Image' );
 			await clickBlockToolbarButton( 'Align' );
 			const wideButton = await page.waitForXPath(
-				`//button[contains(@class,'components-dropdown-menu__menu-item') and contains(text(), 'Wide width')]`
+				`//button[contains(@class,'components-dropdown-menu__menu-item')]//span[contains(text(), 'Wide width')]`
 			);
 			await wideButton.evaluate( ( element ) =>
 				element.scrollIntoView()

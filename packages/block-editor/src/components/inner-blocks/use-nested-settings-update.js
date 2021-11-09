@@ -9,6 +9,7 @@ import isShallowEqual from '@wordpress/is-shallow-equal';
  * Internal dependencies
  */
 import { store as blockEditorStore } from '../../store';
+import { getLayoutType } from '../../layouts';
 
 /**
  * This hook is a side effect which updates the block-editor store when changes
@@ -17,23 +18,30 @@ import { store as blockEditorStore } from '../../store';
  * the block-editor store, then the store is updated with the new settings which
  * came from props.
  *
- * @param {string}   clientId        The client ID of the block to update.
- * @param {string[]} allowedBlocks   An array of block names which are permitted
- *                                   in inner blocks.
- * @param {string}   [templateLock]  The template lock specified for the inner
- *                                   blocks component. (e.g. "all")
- * @param {boolean}  captureToolbars Whether or children toolbars should be shown
- *                                   in the inner blocks component rather than on
- *                                   the child block.
- * @param {string}   orientation     The direction in which the block
- *                                   should face.
+ * @param {string}            clientId                   The client ID of the block to update.
+ * @param {string[]}          allowedBlocks              An array of block names which are permitted
+ *                                                       in inner blocks.
+ * @param {?Array}            __experimentalDefaultBlock The default block to insert: [ blockName, { blockAttributes } ].
+ * @param {?Function|boolean} __experimentalDirectInsert If a default block should be inserted directly by the
+ *                                                       appender.
+ * @param {string}            [templateLock]             The template lock specified for the inner
+ *                                                       blocks component. (e.g. "all")
+ * @param {boolean}           captureToolbars            Whether or children toolbars should be shown
+ *                                                       in the inner blocks component rather than on
+ *                                                       the child block.
+ * @param {string}            orientation                The direction in which the block
+ *                                                       should face.
+ * @param {Object}            layout                     The layout object for the block container.
  */
 export default function useNestedSettingsUpdate(
 	clientId,
 	allowedBlocks,
+	__experimentalDefaultBlock,
+	__experimentalDirectInsert,
 	templateLock,
 	captureToolbars,
-	orientation
+	orientation,
+	layout
 ) {
 	const { updateBlockListSettings } = useDispatch( blockEditorStore );
 
@@ -71,8 +79,21 @@ export default function useNestedSettingsUpdate(
 			newSettings.__experimentalCaptureToolbars = captureToolbars;
 		}
 
+		// Orientation depends on layout,
+		// ideally the separate orientation prop should be deprecated.
 		if ( orientation !== undefined ) {
 			newSettings.orientation = orientation;
+		} else {
+			const layoutType = getLayoutType( layout?.type );
+			newSettings.orientation = layoutType.getOrientation( layout );
+		}
+
+		if ( __experimentalDefaultBlock !== undefined ) {
+			newSettings.__experimentalDefaultBlock = __experimentalDefaultBlock;
+		}
+
+		if ( __experimentalDirectInsert !== undefined ) {
+			newSettings.__experimentalDirectInsert = __experimentalDirectInsert;
 		}
 
 		if ( ! isShallowEqual( blockListSettings, newSettings ) ) {
@@ -82,10 +103,13 @@ export default function useNestedSettingsUpdate(
 		clientId,
 		blockListSettings,
 		_allowedBlocks,
+		__experimentalDefaultBlock,
+		__experimentalDirectInsert,
 		templateLock,
 		parentLock,
 		captureToolbars,
 		orientation,
 		updateBlockListSettings,
+		layout,
 	] );
 }

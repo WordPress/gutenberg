@@ -61,17 +61,19 @@ Render a user interface to input the name of an additional css class.
 
 ```js
 import { TextControl } from '@wordpress/components';
-import { withState } from '@wordpress/compose';
+import { useState } from '@wordpress/element';
 
-const MyTextControl = withState( {
-	className: '',
-} )( ( { className, setState } ) => (
-	<TextControl
-		label="Additional CSS Class"
-		value={ className }
-		onChange={ ( className ) => setState( { className } ) }
-	/>
-) );
+const MyTextControl = () => {
+	const [ className, setClassName ] = useState( '' );
+
+	return (
+		<TextControl
+			label="Additional CSS Class"
+			value={ className }
+			onChange={ ( value ) => setClassName( value ) }
+		/>
+	);
+};
 ```
 
 ### Props

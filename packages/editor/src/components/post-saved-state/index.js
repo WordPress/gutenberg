@@ -21,16 +21,17 @@ import { displayShortcut } from '@wordpress/keycodes';
  * Internal dependencies
  */
 import PostSwitchToDraftButton from '../post-switch-to-draft-button';
+import { store as editorStore } from '../../store';
 
 /**
  * Component showing whether the post is saved or not and providing save
  * buttons.
  *
- * @param {Object} props               Component props.
- * @param {?boolean} props.forceIsDirty  Whether to force the post to be marked
- * as dirty.
- * @param {?boolean} props.forceIsSaving Whether to force the post to be marked
- * as being saved.
+ * @param {Object}   props                Component props.
+ * @param {?boolean} props.forceIsDirty   Whether to force the post to be marked
+ *                                        as dirty.
+ * @param {?boolean} props.forceIsSaving  Whether to force the post to be marked
+ *                                        as being saved.
  * @param {?boolean} props.showIconLabels Whether interface buttons show labels instead of icons
  * @return {import('@wordpress/element').WPComponent} The component.
  */
@@ -64,7 +65,7 @@ export default function PostSavedState( {
 				getCurrentPost,
 				isAutosavingPost,
 				getEditedPostAttribute,
-			} = select( 'core/editor' );
+			} = select( editorStore );
 
 			return {
 				isAutosaving: isAutosavingPost(),
@@ -82,7 +83,7 @@ export default function PostSavedState( {
 		[ forceIsDirty, forceIsSaving ]
 	);
 
-	const { savePost } = useDispatch( 'core/editor' );
+	const { savePost } = useDispatch( editorStore );
 
 	const wasSaving = usePrevious( isSaving );
 
@@ -99,49 +100,14 @@ export default function PostSavedState( {
 		return () => clearTimeout( timeoutId );
 	}, [ isSaving ] );
 
-	if ( isSaving ) {
-		// TODO: Classes generation should be common across all return
-		// paths of this function, including proper naming convention for
-		// the "Save Draft" button.
-		const classes = classnames(
-			'editor-post-saved-state',
-			'is-saving',
-			getAnimateClassName( { type: 'loading' } ),
-			{
-				'is-autosaving': isAutosaving,
-			}
-		);
-
-		return (
-			<span className={ classes }>
-				<Icon icon={ cloud } />
-				{ isAutosaving ? __( 'Autosaving' ) : __( 'Saving' ) }
-			</span>
-		);
+	// Once the post has been submitted for review this button
+	// is not needed for the contributor role.
+	if ( ! hasPublishAction && isPending ) {
+		return null;
 	}
 
 	if ( isPublished || isScheduled ) {
 		return <PostSwitchToDraftButton />;
-	}
-
-	if ( ! isSaveable ) {
-		return null;
-	}
-
-	if ( forceSavedMessage || ( ! isNew && ! isDirty ) ) {
-		return (
-			<span className="editor-post-saved-state is-saved">
-				<Icon icon={ check } />
-				{ __( 'Saved' ) }
-			</span>
-		);
-	}
-
-	// Once the post has been submitted for review this button
-	// is not needed for the contributor role.
-
-	if ( ! hasPublishAction && isPending ) {
-		return null;
 	}
 
 	/* translators: button label text should, if possible, be under 16 characters. */
@@ -150,28 +116,49 @@ export default function PostSavedState( {
 	/* translators: button label text should, if possible, be under 16 characters. */
 	const shortLabel = __( 'Save' );
 
-	if ( ! isLargeViewport ) {
-		return (
-			<Button
-				className="editor-post-save-draft"
-				label={ label }
-				onClick={ () => savePost() }
-				shortcut={ displayShortcut.primary( 's' ) }
-				icon={ cloudUpload }
-			>
-				{ showIconLabels && shortLabel }
-			</Button>
-		);
+	const isSaved = forceSavedMessage || ( ! isNew && ! isDirty );
+	const isSavedState = isSaving || isSaved;
+	const isDisabled = isSaving || isSaved || ! isSaveable;
+
+	let text;
+
+	if ( isSaving ) {
+		text = isAutosaving ? __( 'Autosaving' ) : __( 'Saving' );
+	} else if ( isSaved ) {
+		text = __( 'Saved' );
+	} else if ( isLargeViewport ) {
+		text = label;
+	} else if ( showIconLabels ) {
+		text = shortLabel;
 	}
 
+	// Use common Button instance for all saved states so that focus is not
+	// lost.
 	return (
 		<Button
-			className="editor-post-save-draft"
-			onClick={ () => savePost() }
+			className={
+				isSaveable || isSaving
+					? classnames( {
+							'editor-post-save-draft': ! isSavedState,
+							'editor-post-saved-state': isSavedState,
+							'is-saving': isSaving,
+							'is-autosaving': isAutosaving,
+							'is-saved': isSaved,
+							[ getAnimateClassName( {
+								type: 'loading',
+							} ) ]: isSaving,
+					  } )
+					: undefined
+			}
+			onClick={ isDisabled ? undefined : () => savePost() }
 			shortcut={ displayShortcut.primary( 's' ) }
-			isTertiary
+			variant={ isLargeViewport ? 'tertiary' : undefined }
+			icon={ isLargeViewport ? undefined : cloudUpload }
+			label={ label }
+			aria-disabled={ isDisabled }
 		>
-			{ label }
+			{ isSavedState && <Icon icon={ isSaved ? check : cloud } /> }
+			{ text }
 		</Button>
 	);
 }

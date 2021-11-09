@@ -4,12 +4,6 @@
  *
  * @package Gutenberg
  */
-
-/**
- * Test WP_Theme_JSON class.
- *
- * @package Gutenberg
- */
 class Gutenberg_Elements_Test extends WP_UnitTestCase {
 	/**
 	 * Given a string containing a class prefixed by "wp-elements-" followed by a unique id,
@@ -47,7 +41,7 @@ class Gutenberg_Elements_Test extends WP_UnitTestCase {
 		);
 		$this->assertSame(
 			$result,
-			'<p class="wp-elements-1">Hello <a href="http://www.wordpress.org/">WordPress</a>!</p><style>.wp-elements-1 a{color: var(--wp--preset--color--subtle-background) !important;}</style>' . "\n"
+			'<p class="wp-elements-1">Hello <a href="http://www.wordpress.org/">WordPress</a>!</p>'
 		);
 	}
 
@@ -77,7 +71,7 @@ class Gutenberg_Elements_Test extends WP_UnitTestCase {
 		);
 		$this->assertSame(
 			$result,
-			'<p class="wp-elements-1 has-dark-gray-background-color has-background">Hello <a href="http://www.wordpress.org/">WordPress</a>!</p><style>.wp-elements-1 a{color: red !important;}</style>' . "\n"
+			'<p class="wp-elements-1 has-dark-gray-background-color has-background">Hello <a href="http://www.wordpress.org/">WordPress</a>!</p>'
 		);
 	}
 
@@ -106,7 +100,7 @@ class Gutenberg_Elements_Test extends WP_UnitTestCase {
 		);
 		$this->assertSame(
 			$result,
-			'<p id="anchor" class="wp-elements-1">Hello <a href="http://www.wordpress.org/">WordPress</a>!</p><style>.wp-elements-1 a{color: #fff000 !important;}</style>' . "\n"
+			'<p id="anchor" class="wp-elements-1">Hello <a href="http://www.wordpress.org/">WordPress</a>!</p>'
 		);
 	}
 }

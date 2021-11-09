@@ -7,6 +7,7 @@ import {
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { useSelect } from '@wordpress/data';
+import { store as coreStore } from '@wordpress/core-data';
 
 /**
  * Internal dependencies
@@ -27,15 +28,14 @@ export default function ContentPagesMenu() {
 	const { pages, isResolved } = useSelect(
 		( select ) => {
 			const { getEntityRecords, hasFinishedResolution } = select(
-				'core'
+				coreStore
 			);
-			const getEntityRecordsArgs = [
-				'postType',
-				'page',
-				{
-					search: searchQuery,
-				},
-			];
+			const query = searchQuery
+				? {
+						search: searchQuery,
+				  }
+				: undefined;
+			const getEntityRecordsArgs = [ 'postType', 'page', query ];
 			const hasResolvedPosts = hasFinishedResolution(
 				'getEntityRecords',
 				getEntityRecordsArgs

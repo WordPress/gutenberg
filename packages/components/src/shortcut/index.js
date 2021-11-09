@@ -6,8 +6,8 @@ import { isString, isObject } from 'lodash';
 /** @typedef {string | { display: string, ariaLabel: string }} Shortcut */
 /**
  * @typedef Props
- * @property {Shortcut} shortcut Shortcut configuration
- * @property {string} [className] Classname
+ * @property {Shortcut} shortcut    Shortcut configuration
+ * @property {string}   [className] Classname
  */
 
 /**

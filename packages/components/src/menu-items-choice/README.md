@@ -55,11 +55,11 @@ Designs with a `MenuItemsChoice` option selected by default make a strong sugges
 
 ```jsx
 import { MenuGroup, MenuItemsChoice } from '@wordpress/components';
-import { withState } from '@wordpress/compose';
+import { useState } from '@wordpress/element';
 
-const MyMenuItemsChoice = withState( {
-	mode: 'visual',
-	choices: [
+const MyMenuItemsChoice = () => {
+	const [ mode, setMode ] = useState( 'visual' );
+	const choices = [
 		{
 			value: 'visual',
 			label: 'Visual editor',
@@ -68,14 +68,16 @@ const MyMenuItemsChoice = withState( {
 			value: 'text',
 			label: 'Code editor',
 		},
-	],
-} )( ( { mode, choices, setState } ) => (
-	<MenuGroup label="Editor">
-		<MenuItemsChoice
-			choices={ choices }
-			value={ mode }
-			onSelect={ ( mode ) => setState( { mode } ) }
-		/>
-	</MenuGroup>
-) );
+	];
+
+	return (
+		<MenuGroup label="Editor">
+			<MenuItemsChoice
+				choices={ choices }
+				value={ mode }
+				onSelect={ ( newMode ) => setMode( newMode ) }
+			/>
+		</MenuGroup>
+	);
+};
 ```

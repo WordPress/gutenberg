@@ -1,12 +1,14 @@
-// This needs specificity to override the editor styles.
+// Provide baseline auto margin for centering blocks.
+// Specificity is kept at this level as many classic themes output
+// rules like figure { margin: 0; } which would break centering.
 .editor-styles-wrapper .wp-block {
 	margin-left: auto;
 	margin-right: auto;
 }
 
-// Depreacted style needed for the block widths and alignments.
-// for themes that don't support the new layout (theme.json)
-.wp-block {
+// Deprecated style needed for the block widths and alignments.
+// for themes that don't support the new layout (theme.json).
+html :where(.wp-block) {
 	max-width: $content-width;
 
 	// Provide every block with a default base margin. This margin provides a consistent spacing

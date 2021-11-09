@@ -38,6 +38,7 @@ export const BlockSwitcherDropdownMenu = ( { clientIds, blocks } ) => {
 	const blockInformation = useBlockDisplayInformation( blocks[ 0 ].clientId );
 	const {
 		possibleBlockTransformations,
+		canRemove,
 		hasBlockStyles,
 		icon,
 		blockTitle,
@@ -50,6 +51,7 @@ export const BlockSwitcherDropdownMenu = ( { clientIds, blocks } ) => {
 				__experimentalGetPatternTransformItems,
 			} = select( blockEditorStore );
 			const { getBlockStyles, getBlockType } = select( blocksStore );
+			const { canRemoveBlocks } = select( blockEditorStore );
 			const rootClientId = getBlockRootClientId(
 				castArray( clientIds )[ 0 ]
 			);
@@ -74,9 +76,10 @@ export const BlockSwitcherDropdownMenu = ( { clientIds, blocks } ) => {
 					blocks,
 					rootClientId
 				),
+				canRemove: canRemoveBlocks( clientIds, rootClientId ),
 				hasBlockStyles: !! styles?.length,
 				icon: _icon,
-				blockTitle: getBlockType( firstBlockName ).title,
+				blockTitle: getBlockType( firstBlockName )?.title,
 				patterns: __experimentalGetPatternTransformItems(
 					blocks,
 					rootClientId
@@ -95,8 +98,9 @@ export const BlockSwitcherDropdownMenu = ( { clientIds, blocks } ) => {
 	// Pattern transformation through the `Patterns` API.
 	const onPatternTransform = ( transformedBlocks ) =>
 		replaceBlocks( clientIds, transformedBlocks );
-	const hasPossibleBlockTransformations = !! possibleBlockTransformations.length;
-	const hasPatternTransformation = !! patterns?.length;
+	const hasPossibleBlockTransformations =
+		!! possibleBlockTransformations.length && canRemove;
+	const hasPatternTransformation = !! patterns?.length && canRemove;
 	if ( ! hasBlockStyles && ! hasPossibleBlockTransformations ) {
 		return (
 			<ToolbarGroup>

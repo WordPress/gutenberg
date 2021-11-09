@@ -19,8 +19,10 @@ import {
 	MediaUpload,
 	MEDIA_TYPE_IMAGE,
 	MEDIA_TYPE_VIDEO,
+	MEDIA_TYPE_AUDIO,
 	OPTION_TAKE_VIDEO,
 	OPTION_TAKE_PHOTO,
+	OPTION_INSERT_FROM_URL,
 } from '../index';
 
 const MEDIA_URL = 'http://host.media.type';
@@ -73,6 +75,7 @@ describe( 'MediaUpload component', () => {
 		};
 		expectOptionForMediaType( MEDIA_TYPE_IMAGE, OPTION_TAKE_PHOTO );
 		expectOptionForMediaType( MEDIA_TYPE_VIDEO, OPTION_TAKE_VIDEO );
+		expectOptionForMediaType( MEDIA_TYPE_AUDIO, OPTION_INSERT_FROM_URL );
 	} );
 
 	const expectMediaPickerForOption = (

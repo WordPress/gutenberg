@@ -1,44 +1,31 @@
 /**
  * WordPress dependencies
  */
-import { useEffect, useCallback } from '@wordpress/element';
+import { useEffect } from '@wordpress/element';
 import { useDispatch } from '@wordpress/data';
 import {
 	useShortcut,
 	store as keyboardShortcutsStore,
 } from '@wordpress/keyboard-shortcuts';
 import { __ } from '@wordpress/i18n';
+import { store as coreStore } from '@wordpress/core-data';
 
 function NavigationEditorShortcuts( { saveBlocks } ) {
-	useShortcut(
-		'core/edit-navigation/save-menu',
-		useCallback( ( event ) => {
-			event.preventDefault();
-			saveBlocks();
-		} ),
-		{
-			bindGlobal: true,
-		}
-	);
+	useShortcut( 'core/edit-navigation/save-menu', ( event ) => {
+		event.preventDefault();
+		saveBlocks();
+	} );
 
-	const { redo, undo } = useDispatch( 'core' );
-	useShortcut(
-		'core/edit-navigation/undo',
-		( event ) => {
-			undo();
-			event.preventDefault();
-		},
-		{ bindGlobal: true }
-	);
+	const { redo, undo } = useDispatch( coreStore );
+	useShortcut( 'core/edit-navigation/undo', ( event ) => {
+		undo();
+		event.preventDefault();
+	} );
 
-	useShortcut(
-		'core/edit-navigation/redo',
-		( event ) => {
-			redo();
-			event.preventDefault();
-		},
-		{ bindGlobal: true }
-	);
+	useShortcut( 'core/edit-navigation/redo', ( event ) => {
+		redo();
+		event.preventDefault();
+	} );
 
 	return null;
 }

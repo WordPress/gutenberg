@@ -178,9 +178,9 @@ export default function QueryInspectorControls( {
 		<InspectorControls>
 			<PanelBody title={ __( 'Settings' ) }>
 				<ToggleControl
-					label={ __( 'Inherit query from URL' ) }
+					label={ __( 'Inherit query from template' ) }
 					help={ __(
-						'Disable the option to customize the query arguments. Leave enabled to inherit the global query depending on the URL.'
+						'Toggle to use the global query context that is set with the current template, such as an archive or search. Disable to customize the settings independently.'
 					) }
 					checked={ !! inherit }
 					onChange={ ( value ) => setQuery( { inherit: !! value } ) }
@@ -191,6 +191,9 @@ export default function QueryInspectorControls( {
 						value={ postType }
 						label={ __( 'Post Type' ) }
 						onChange={ onPostTypeChange }
+						help={ __(
+							'WordPress contains different types of content and they are divided into collections called "Post Types". By default there are a few different ones such as blog posts and pages, but plugins could add more.'
+						) }
 					/>
 				) }
 				{ displayLayout?.type === 'flex' && (
@@ -230,6 +233,9 @@ export default function QueryInspectorControls( {
 						options={ stickyOptions }
 						value={ sticky }
 						onChange={ ( value ) => setQuery( { sticky: value } ) }
+						help={ __(
+							'Blog posts can be "stickied", a feature that places them at the top of the front page of posts, keeping it there until new sticky posts are published.'
+						) }
 					/>
 				) }
 			</PanelBody>

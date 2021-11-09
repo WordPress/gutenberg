@@ -1,8 +1,3 @@
-// This tag marks the start of the styles that apply to editing canvas contents and need to be manipulated when we resize the editor.
-#start-resizable-editor-section {
-	display: none;
-}
-
 @import "./archives/editor.scss";
 @import "./audio/editor.scss";
 @import "./block/editor.scss";
@@ -16,76 +11,54 @@
 @import "./freeform/editor.scss";
 @import "./gallery/editor.scss";
 @import "./group/editor.scss";
-@import "./heading/editor.scss";
 @import "./html/editor.scss";
 @import "./image/editor.scss";
 @import "./latest-posts/editor.scss";
-@import "./legacy-widget/editor.scss";
 @import "./media-text/editor.scss";
 @import "./more/editor.scss";
 @import "./navigation/editor.scss";
 @import "./navigation-link/editor.scss";
+@import "./navigation-submenu/editor.scss";
 @import "./nextpage/editor.scss";
 @import "./page-list/editor.scss";
 @import "./paragraph/editor.scss";
-@import "./post-content/editor.scss";
 @import "./post-excerpt/editor.scss";
-@import "./post-author/editor.scss";
 @import "./pullquote/editor.scss";
 @import "./rss/editor.scss";
 @import "./search/editor.scss";
 @import "./separator/editor.scss";
 @import "./shortcode/editor.scss";
 @import "./site-logo/editor.scss";
+@import "./site-tagline/editor.scss";
+@import "./site-title/editor.scss";
 @import "./social-link/editor.scss";
 @import "./social-links/editor.scss";
 @import "./spacer/editor.scss";
 @import "./table/editor.scss";
-@import "./tag-cloud/editor.scss";
 @import "./template-part/editor.scss";
 @import "./text-columns/editor.scss";
 @import "./video/editor.scss";
-@import "./query-title/editor.scss";
-@import "./query-loop/editor.scss";
+@import "./post-template/editor.scss";
 @import "./query/editor.scss";
 @import "./query-pagination/editor.scss";
 @import "./query-pagination-numbers/editor.scss";
 @import "./post-featured-image/editor.scss";
-@import "./term-description/editor.scss";
 
 :root .editor-styles-wrapper {
-	// Background colors.
-	@include background-colors();
-
-	// Foreground colors.
-	@include foreground-colors();
-
-	// Gradients
-	@include gradient-colors();
+	@include background-colors-deprecated();
+	@include foreground-colors-deprecated();
+	@include gradient-colors-deprecated();
 }
 
-// Font sizes.
+// Font sizes (not used now, kept because of backward compatibility).
+//
 // The reason we add the editor class wrapper here is
 // to avoid enqueing the classes twice: here and in ./editor.scss
-.editor-styles-wrapper .has-small-font-size {
-	font-size: 13px;
-}
-
-.editor-styles-wrapper .has-regular-font-size, // Not used now, kept because of backward compatibility.
-.editor-styles-wrapper .has-normal-font-size {
+.editor-styles-wrapper .has-regular-font-size {
 	font-size: 16px;
 }
 
-.editor-styles-wrapper .has-medium-font-size {
-	font-size: 20px;
-}
-
-.editor-styles-wrapper .has-large-font-size {
-	font-size: 36px;
-}
-
-.editor-styles-wrapper .has-larger-font-size, // Not used now, kept because of backward compatibility.
-.editor-styles-wrapper .has-huge-font-size {
+.editor-styles-wrapper .has-larger-font-size {
 	font-size: 42px;
 }
 
@@ -95,8 +68,3 @@
  * These are only output in the editor, but styles here are NOT prefixed .editor-styles-wrapper.
  * This allows us to create normalization styles that are easily overridden by editor styles.
  */
-
-// This tag marks the end of the styles that apply to editing canvas contents and need to be manipulated when we resize the editor.
-#end-resizable-editor-section {
-	display: none;
-}

@@ -35,8 +35,17 @@
 		"color": {
 			"link": true
 		},
-		"fontSize": true,
-		"lineHeight": true,
+		"typography": {
+			"fontSize": true,
+			"lineHeight": true,
+			"__experimentalFontStyle": true,
+			"__experimentalFontWeight": true,
+			"__experimentalLetterSpacing": true,
+			"__experimentalTextTransform": true,
+			"__experimentalDefaultControls": {
+				"fontSize": true
+			}
+		},
 		"__experimentalSelector": "p",
 		"__unstablePasteTextInline": true
 	},

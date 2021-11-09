@@ -6,8 +6,7 @@ import { upperFirst, camelCase, map, find, get, startCase } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { controls } from '@wordpress/data';
-import { apiFetch } from '@wordpress/data-controls';
+import apiFetch from '@wordpress/api-fetch';
 import { __ } from '@wordpress/i18n';
 
 /**
@@ -17,12 +16,14 @@ import { addEntities } from './actions';
 
 export const DEFAULT_ENTITY_KEY = 'id';
 
+const POST_RAW_ATTRIBUTES = [ 'title', 'excerpt', 'content' ];
+
 export const defaultEntities = [
 	{
 		label: __( 'Base' ),
 		name: '__unstableBase',
 		kind: 'root',
-		baseURL: '',
+		baseURL: '/',
 	},
 	{
 		label: __( 'Site' ),
@@ -40,6 +41,7 @@ export const defaultEntities = [
 		key: 'slug',
 		baseURL: '/wp/v2/types',
 		baseURLParams: { context: 'edit' },
+		rawAttributes: POST_RAW_ATTRIBUTES,
 	},
 	{
 		name: 'media',
@@ -114,6 +116,7 @@ export const defaultEntities = [
 		baseURLParams: { context: 'edit' },
 		plural: 'menuItems',
 		label: __( 'Menu Item' ),
+		rawAttributes: [ 'title', 'content' ],
 	},
 	{
 		name: 'menuLocation',
@@ -123,6 +126,33 @@ export const defaultEntities = [
 		plural: 'menuLocations',
 		label: __( 'Menu Location' ),
 		key: 'name',
+	},
+	{
+		name: 'navigationArea',
+		kind: 'root',
+		baseURL: '/__experimental/block-navigation-areas',
+		baseURLParams: { context: 'edit' },
+		plural: 'navigationAreas',
+		label: __( 'Navigation Area' ),
+		key: 'name',
+		getTitle: ( record ) => record?.description,
+	},
+	{
+		label: __( 'Global Styles' ),
+		name: 'globalStyles',
+		kind: 'root',
+		baseURL: '/wp/v2/global-styles',
+		baseURLParams: { context: 'edit' },
+		plural: 'globalStylesVariations', // should be different than name
+		getTitle: ( record ) => record?.title?.rendered || record?.title,
+	},
+	{
+		label: __( 'Themes' ),
+		name: 'theme',
+		kind: 'root',
+		baseURL: '/wp/v2/themes',
+		baseURLParams: { context: 'edit' },
+		key: 'stylesheet',
 	},
 ];
 
@@ -135,7 +165,7 @@ export const kinds = [
  * Returns a function to be used to retrieve extra edits to apply before persisting a post type.
  *
  * @param {Object} persistedRecord Already persisted Post
- * @param {Object} edits Edits.
+ * @param {Object} edits           Edits.
  * @return {Object} Updated edits.
  */
 export const prePersistPostType = ( persistedRecord, edits ) => {
@@ -166,15 +196,16 @@ export const prePersistPostType = ( persistedRecord, edits ) => {
  *
  * @return {Promise} Entities promise
  */
-function* loadPostTypeEntities() {
-	const postTypes = yield apiFetch( { path: '/wp/v2/types?context=edit' } );
+async function loadPostTypeEntities() {
+	const postTypes = await apiFetch( { path: '/wp/v2/types?context=edit' } );
 	return map( postTypes, ( postType, name ) => {
 		const isTemplate = [ 'wp_template', 'wp_template_part' ].includes(
 			name
 		);
+		const namespace = postType?.rest_namespace ?? 'wp/v2';
 		return {
 			kind: 'postType',
-			baseURL: '/wp/v2/' + postType.rest_base,
+			baseURL: `/${ namespace }/${ postType.rest_base }`,
 			baseURLParams: { context: 'edit' },
 			name,
 			label: postType.labels.singular_name,
@@ -183,11 +214,13 @@ function* loadPostTypeEntities() {
 				selection: true,
 			},
 			mergedEdits: { meta: true },
+			rawAttributes: POST_RAW_ATTRIBUTES,
 			getTitle: ( record ) =>
 				record?.title?.rendered ||
 				record?.title ||
 				( isTemplate ? startCase( record.slug ) : String( record.id ) ),
 			__unstablePrePersist: isTemplate ? undefined : prePersistPostType,
+			__unstable_rest_base: postType.rest_base,
 		};
 	} );
 }
@@ -197,14 +230,15 @@ function* loadPostTypeEntities() {
  *
  * @return {Promise} Entities promise
  */
-function* loadTaxonomyEntities() {
-	const taxonomies = yield apiFetch( {
+async function loadTaxonomyEntities() {
+	const taxonomies = await apiFetch( {
 		path: '/wp/v2/taxonomies?context=edit',
 	} );
 	return map( taxonomies, ( taxonomy, name ) => {
+		const namespace = taxonomy?.rest_namespace ?? 'wp/v2';
 		return {
 			kind: 'taxonomy',
-			baseURL: '/wp/v2/' + taxonomy.rest_base,
+			baseURL: `/${ namespace }/${ taxonomy.rest_base }`,
 			baseURLParams: { context: 'edit' },
 			name,
 			label: taxonomy.labels.singular_name,
@@ -242,12 +276,12 @@ export const getMethodName = (
 /**
  * Loads the kind entities into the store.
  *
- * @param {string} kind  Kind
+ * @param {string} kind Kind
  *
  * @return {Array} Entities
  */
-export function* getKindEntities( kind ) {
-	let entities = yield controls.select( 'core', 'getEntitiesByKind', kind );
+export const getKindEntities = ( kind ) => async ( { select, dispatch } ) => {
+	let entities = select.getEntitiesByKind( kind );
 	if ( entities && entities.length !== 0 ) {
 		return entities;
 	}
@@ -257,8 +291,8 @@ export function* getKindEntities( kind ) {
 		return [];
 	}
 
-	entities = yield kindConfig.loadEntities();
-	yield addEntities( entities );
+	entities = await kindConfig.loadEntities();
+	dispatch( addEntities( entities ) );
 
 	return entities;
-}
+};

@@ -181,10 +181,8 @@ export function findNext( element ) {
 	const focusables = findFocusable( element.ownerDocument.body );
 	const index = focusables.indexOf( element );
 
-	// Remove all focusables before and inside `element`.
-	const remaining = focusables
-		.slice( index + 1 )
-		.filter( ( node ) => ! element.contains( node ) );
+	// Remove all focusables before and including `element`.
+	const remaining = focusables.slice( index + 1 );
 
 	return first( filterTabbable( remaining ) );
 }

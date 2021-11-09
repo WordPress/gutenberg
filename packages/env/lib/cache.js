@@ -8,7 +8,7 @@ const fs = require( 'fs' ).promises;
  * Options for cache parsing.
  *
  * @typedef WPEnvCacheOptions
- * @property {string}  workDirectoryPath Path to the work directory located in ~/.wp-env.
+ * @property {string} workDirectoryPath Path to the work directory located in ~/.wp-env.
  */
 
 const CACHE_FILE_NAME = 'wp-env-cache.json';

@@ -116,6 +116,10 @@ function createElementHTML( { type, attributes, object, children } ) {
 function createChildrenHTML( children = [] ) {
 	return children
 		.map( ( child ) => {
+			if ( child.html !== undefined ) {
+				return child.html;
+			}
+
 			return child.text === undefined
 				? createElementHTML( child )
 				: escapeEditableHTML( child.text );

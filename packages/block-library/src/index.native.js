@@ -65,6 +65,8 @@ import * as socialLinks from './social-links';
 
 import { transformationCategory } from './transformationCategories';
 
+const ALLOWED_BLOCKS_GRADIENT_SUPPORT = [ 'core/button' ];
+
 export const coreBlocks = [
 	// Common blocks are grouped at the top to prioritize their display
 	// in various contexts — like the inserter and auto-complete components.
@@ -122,15 +124,27 @@ export const coreBlocks = [
  * @param {Object} block The block to be registered.
  *
  */
-const registerBlock = ( block ) => {
+export const registerBlock = ( block ) => {
 	if ( ! block ) {
 		return;
 	}
 	const { metadata, settings, name } = block;
+	const { supports } = metadata;
+
 	registerBlockType(
 		{
 			name,
 			...metadata,
+			// Gradients support only available for blocks listed in ALLOWED_BLOCKS_GRADIENT_SUPPORT
+			...( ! ALLOWED_BLOCKS_GRADIENT_SUPPORT.includes( name ) &&
+			supports?.color?.gradients
+				? {
+						supports: {
+							...supports,
+							color: { ...supports.color, gradients: false },
+						},
+				  }
+				: {} ),
 		},
 		settings
 	);
@@ -252,7 +266,7 @@ export const registerCoreBlocks = () => {
 		audio,
 		reusableBlock,
 		search,
-		devOnly( embed ),
+		embed,
 	].forEach( registerBlock );
 
 	registerBlockVariations( socialLink );
@@ -262,4 +276,19 @@ export const registerCoreBlocks = () => {
 	if ( group ) {
 		setGroupingBlockName( group.name );
 	}
+};
+
+/**
+ * Dictates which block types are considered "new." For each of the block types
+ * below, if the native host app does not already have an impression count set,
+ * an initial count will be set. When a block type's impression count is greater
+ * than 0, a "new" badge is displayed on the block type within the block
+ * inserter.
+ *
+ * @constant {{ string, number }}
+ */
+export const NEW_BLOCK_TYPES = {
+	[ embed.name ]: 40,
+	[ search.name ]: 40,
+	[ audio.name ]: 40,
 };

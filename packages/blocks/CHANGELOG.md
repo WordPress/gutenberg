@@ -2,6 +2,28 @@
 
 ## Unreleased
 
+## 11.1.0 (2021-09-09)
+
+### Backward Compatibility
+
+-   Register a block even when an invalid value provided for the icon setting ([#34350](https://github.com/WordPress/gutenberg/pull/34350)).
+
+### New API
+
+-   The `isMatch` callback on block transforms now receives the block object (or block objects if `isMulti` is `true`) as its second argument.
+
+## 11.0.0 (2021-07-29)
+
+### Breaking Change
+
+-   Upgraded React components to work with v17.0 ([#29118](https://github.com/WordPress/gutenberg/pull/29118)). There are no new features in React v17.0 as explained in the [blog post](https://reactjs.org/blog/2020/10/20/react-v17.html).
+
+## 10.0.0 (2021-07-21)
+
+### Breaking Changes
+
+-   The deprecated `registerBlockTypeFromMetadata` function was removed. Please use `registerBlockType` that covers the same functionality ([#32030](https://github.com/WordPress/gutenberg/pull/32030)).
+
 ## 9.1.0 (2021-05-20)
 
 ### New API

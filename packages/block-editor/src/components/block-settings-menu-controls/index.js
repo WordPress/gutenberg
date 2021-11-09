@@ -25,17 +25,20 @@ import { store as blockEditorStore } from '../../store';
 const { Fill, Slot } = createSlotFill( 'BlockSettingsMenuControls' );
 
 const BlockSettingsMenuControlsSlot = ( { fillProps, clientIds = null } ) => {
-	const selectedBlocks = useSelect(
+	const { selectedBlocks, selectedClientIds } = useSelect(
 		( select ) => {
 			const { getBlocksByClientId, getSelectedBlockClientIds } = select(
 				blockEditorStore
 			);
 			const ids =
 				clientIds !== null ? clientIds : getSelectedBlockClientIds();
-			return map(
-				compact( getBlocksByClientId( ids ) ),
-				( block ) => block.name
-			);
+			return {
+				selectedBlocks: map(
+					compact( getBlocksByClientId( ids ) ),
+					( block ) => block.name
+				),
+				selectedClientIds: ids,
+			};
 		},
 		[ clientIds ]
 	);
@@ -46,7 +49,7 @@ const BlockSettingsMenuControlsSlot = ( { fillProps, clientIds = null } ) => {
 	const { isGroupable, isUngroupable } = convertToGroupButtonProps;
 	const showConvertToGroupButton = isGroupable || isUngroupable;
 	return (
-		<Slot fillProps={ { ...fillProps, selectedBlocks } }>
+		<Slot fillProps={ { ...fillProps, selectedBlocks, selectedClientIds } }>
 			{ ( fills ) => {
 				if ( fills?.length > 0 || showConvertToGroupButton ) {
 					return (
@@ -67,7 +70,7 @@ const BlockSettingsMenuControlsSlot = ( { fillProps, clientIds = null } ) => {
 /**
  * @see https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/block-settings-menu-controls/README.md
  *
- * @param {Object} props  Fill props.
+ * @param {Object} props Fill props.
  * @return {WPElement} Element.
  */
 function BlockSettingsMenuControls( { ...props } ) {

@@ -1,13 +1,15 @@
 /**
  * External dependencies
  */
-import { without, mapValues, isObject } from 'lodash';
+import { mapValues, isObject, forEach } from 'lodash';
 
 /**
  * Internal dependencies
  */
 import createReduxStore from './redux-store';
 import createCoreDataStore from './store';
+import { STORE_NAME } from './store/name';
+import { createEmitter } from './utils/emitter';
 
 /** @typedef {import('./types').WPDataStore} WPDataStore */
 
@@ -48,29 +50,25 @@ import createCoreDataStore from './store';
  */
 export function createRegistry( storeConfigs = {}, parent = null ) {
 	const stores = {};
-	let listeners = [];
+	const emitter = createEmitter();
 	const __experimentalListeningStores = new Set();
 
 	/**
 	 * Global listener called for each store's update.
 	 */
 	function globalListener() {
-		listeners.forEach( ( listener ) => listener() );
+		emitter.emit();
 	}
 
 	/**
 	 * Subscribe to changes to any data.
 	 *
-	 * @param {Function}   listener Listener function.
+	 * @param {Function} listener Listener function.
 	 *
-	 * @return {Function}           Unsubscribe function.
+	 * @return {Function} Unsubscribe function.
 	 */
 	const subscribe = ( listener ) => {
-		listeners.push( listener );
-
-		return () => {
-			listeners = without( listeners, listener );
-		};
+		return emitter.subscribe( listener );
 	};
 
 	/**
@@ -176,6 +174,30 @@ export function createRegistry( storeConfigs = {}, parent = null ) {
 		if ( typeof config.subscribe !== 'function' ) {
 			throw new TypeError( 'config.subscribe must be a function' );
 		}
+		// Thi emitter is used to keep track of active listeners when the registry
+		// get paused, that way, when resumed we should be able to call all these
+		// pending listeners.
+		config.emitter = createEmitter();
+		const currentSubscribe = config.subscribe;
+		config.subscribe = ( listener ) => {
+			const unsubscribeFromStoreEmitter = config.emitter.subscribe(
+				listener
+			);
+			const unsubscribeFromRootStore = currentSubscribe( () => {
+				if ( config.emitter.isPaused ) {
+					config.emitter.emit();
+					return;
+				}
+				listener();
+			} );
+
+			return () => {
+				if ( unsubscribeFromRootStore ) {
+					unsubscribeFromRootStore();
+				}
+				unsubscribeFromStoreEmitter();
+			};
+		};
 		stores[ key ] = config;
 		config.subscribe( globalListener );
 	}
@@ -212,7 +234,16 @@ export function createRegistry( storeConfigs = {}, parent = null ) {
 		return parent.__experimentalSubscribeStore( storeName, handler );
 	}
 
+	function batch( callback ) {
+		emitter.pause();
+		forEach( stores, ( store ) => store.emitter.pause() );
+		callback();
+		emitter.resume();
+		forEach( stores, ( store ) => store.emitter.resume() );
+	}
+
 	let registry = {
+		batch,
 		registerGenericStore,
 		stores,
 		namespaces: stores, // TODO: Deprecate/remove this.
@@ -229,8 +260,8 @@ export function createRegistry( storeConfigs = {}, parent = null ) {
 	/**
 	 * Registers a standard `@wordpress/data` store.
 	 *
-	 * @param {string} storeName  Unique namespace identifier.
-	 * @param {Object} options    Store description (reducer, actions, selectors, resolvers).
+	 * @param {string} storeName Unique namespace identifier.
+	 * @param {Object} options   Store description (reducer, actions, selectors, resolvers).
 	 *
 	 * @return {Object} Registered store object.
 	 */
@@ -259,7 +290,7 @@ export function createRegistry( storeConfigs = {}, parent = null ) {
 		return registry;
 	}
 
-	registerGenericStore( 'core/data', createCoreDataStore( registry ) );
+	registerGenericStore( STORE_NAME, createCoreDataStore( registry ) );
 
 	Object.entries( storeConfigs ).forEach( ( [ name, config ] ) =>
 		registry.registerStore( name, config )

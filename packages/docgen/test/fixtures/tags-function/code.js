@@ -7,7 +7,7 @@
  * @see addition
  * @see https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Arithmetic_Operators
  *
- * @param {number} firstParam The first param to add.
+ * @param {number} firstParam  The first param to add.
  * @param {number} secondParam The second param to add.
  *
  *  @example

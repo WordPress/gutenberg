@@ -11,3 +11,10 @@
 .components-modal__screen-overlay {
 	z-index: 999999;
 }
+
+// Include reset CSS for the customizer.
+.customize-control-sidebar_block_editor,
+.customize-widgets-layout__inspector,
+.customize-widgets-popover {
+	@include reset;
+}

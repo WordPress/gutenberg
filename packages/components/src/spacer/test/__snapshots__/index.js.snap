@@ -1,12 +1,44 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
+exports[`props should override margin props from less to more specific 1`] = `
+Snapshot Diff:
+- Received styles
++ Base styles
+
+  Array [
+    Object {
+-     "margin": "calc(4px * 10)",
+-     "margin-bottom": "calc(4px * 1)",
+-     "margin-left": "calc(4px * 3)",
+-     "margin-right": "calc(4px * 5)",
++     "margin-bottom": "calc(4px * 2)",
+    },
+  ]
+`;
+
+exports[`props should override padding props from less to more specific 1`] = `
+Snapshot Diff:
+- Received styles
++ Base styles
+
+  Array [
+    Object {
+      "margin-bottom": "calc(4px * 2)",
+-     "padding": "calc(4px * 10)",
+-     "padding-bottom": "calc(4px * 2)",
+-     "padding-left": "calc(4px * 3)",
+-     "padding-top": "calc(4px * 5)",
+    },
+  ]
+`;
+
 exports[`props should render correctly 1`] = `
 .emotion-0 {
   margin-bottom: calc(4px * 2);
 }
 
 <div
-  class="emotion-0 components-spacer emotion-1 emotion-2"
+  class="components-spacer emotion-0 emotion-1"
   data-wp-c16t="true"
   data-wp-component="Spacer"
 />
@@ -98,9 +130,8 @@ Snapshot Diff:
 
   Array [
     Object {
--     "margin-bottom": "calc(4px * 5)",
+      "margin-bottom": "calc(4px * 2)",
 -     "margin-top": "calc(4px * 5)",
-+     "margin-bottom": "calc(4px * 2)",
     },
   ]
 `;

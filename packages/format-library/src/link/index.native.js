@@ -26,6 +26,7 @@ import { link as linkIcon } from '@wordpress/icons';
  * Internal dependencies
  */
 import ModalLinkUI from './modal';
+import { isValidHref } from './utils';
 
 const name = 'core/link';
 
@@ -58,7 +59,7 @@ export const link = {
 				const { value, onChange } = this.props;
 				const text = getTextContent( slice( value ) );
 
-				if ( text && isURL( text ) ) {
+				if ( text && isURL( text ) && isValidHref( text ) ) {
 					const newValue = applyFormat( value, {
 						type: name,
 						attributes: { url: text },

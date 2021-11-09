@@ -50,6 +50,7 @@ export function getAutoCompleterUI( autocompleter ) {
 		reset,
 	} ) {
 		const [ items ] = useItems( filterValue );
+		const filteredItems = items.filter( ( item ) => ! item.isDisabled );
 		const scrollViewRef = useRef();
 		const animationValue = useRef( new Animated.Value( 0 ) ).current;
 		const [ isVisible, setIsVisible ] = useState( false );
@@ -127,7 +128,7 @@ export function getAutoCompleterUI( autocompleter ) {
 			],
 		};
 
-		if ( ! items.length > 0 || ! isVisible ) {
+		if ( ! filteredItems.length > 0 || ! isVisible ) {
 			return null;
 		}
 
@@ -149,7 +150,7 @@ export function getAutoCompleterUI( autocompleter ) {
 									__( 'Slash inserter results' )
 								}
 							>
-								{ items.map( ( option, index ) => {
+								{ filteredItems.map( ( option, index ) => {
 									const isActive = index === selectedIndex;
 									const itemStyle = stylesCompose(
 										styles[
@@ -165,6 +166,9 @@ export function getAutoCompleterUI( autocompleter ) {
 										iconStyles,
 										isActive && activeIconStyles
 									);
+									const iconSource =
+										option?.value?.icon?.src ||
+										option?.value?.icon;
 
 									return (
 										<TouchableOpacity
@@ -186,9 +190,7 @@ export function getAutoCompleterUI( autocompleter ) {
 												}
 											>
 												<Icon
-													icon={
-														option?.value?.icon?.src
-													}
+													icon={ iconSource }
 													size={ 24 }
 													style={ iconStyle }
 												/>

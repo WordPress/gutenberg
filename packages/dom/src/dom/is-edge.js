@@ -14,14 +14,17 @@ import isInputOrTextArea from './is-input-or-text-area';
  * horizontal position by default. Set `onlyVertical` to true to check only
  * vertically.
  *
- * @param {Element} container Focusable element.
- * @param {boolean} isReverse Set to true to check left, false to check right.
+ * @param {Element} container            Focusable element.
+ * @param {boolean} isReverse            Set to true to check left, false to check right.
  * @param {boolean} [onlyVertical=false] Set to true to check only vertical position.
  *
  * @return {boolean} True if at the edge, false if not.
  */
 export default function isEdge( container, isReverse, onlyVertical = false ) {
-	if ( isInputOrTextArea( container ) ) {
+	if (
+		isInputOrTextArea( container ) &&
+		typeof container.selectionStart === 'number'
+	) {
 		if ( container.selectionStart !== container.selectionEnd ) {
 			return false;
 		}

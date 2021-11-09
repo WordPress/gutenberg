@@ -2,7 +2,7 @@
 	"apiVersion": 2,
 	"name": "core/post-navigation-link",
 	"title": "Post Navigation Link",
-	"category": "design",
+	"category": "theme",
 	"description": "Displays the next or previous post link that is adjacent to the current post.",
 	"textdomain": "default",
 	"attributes": {
@@ -19,10 +19,25 @@
 		"showTitle": {
 			"type": "boolean",
 			"default": false
+		},
+		"linkLabel": {
+			"type": "boolean",
+			"default": false
 		}
 	},
 	"supports": {
 		"reusable": false,
-		"html": false
+		"html": false,
+		"typography": {
+			"fontSize": true,
+			"lineHeight": true,
+			"__experimentalFontStyle": true,
+			"__experimentalFontWeight": true,
+			"__experimentalLetterSpacing": true,
+			"__experimentalTextTransform": true,
+			"__experimentalDefaultControls": {
+				"fontSize": true
+			}
+		}
 	}
 }

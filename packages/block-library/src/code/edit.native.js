@@ -8,7 +8,7 @@ import { View } from 'react-native';
  */
 import { PlainText } from '@wordpress/block-editor';
 import { __ } from '@wordpress/i18n';
-import { withPreferredColorScheme } from '@wordpress/compose';
+import { usePreferredColorSchemeStyle } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -22,18 +22,16 @@ import styles from './theme.scss';
 // Note: styling is applied directly to the (nested) PlainText component. Web-side components
 // apply it to the container 'div' but we don't have a proper proposal for cascading styling yet.
 export function CodeEdit( props ) {
-	const {
-		attributes,
-		setAttributes,
-		onFocus,
-		onBlur,
-		getStylesFromColorScheme,
-	} = props;
-	const codeStyle = getStylesFromColorScheme(
-		styles.blockCode,
-		styles.blockCodeDark
-	);
-	const placeholderStyle = getStylesFromColorScheme(
+	const { attributes, setAttributes, onFocus, onBlur, style } = props;
+	const codeStyle = {
+		...usePreferredColorSchemeStyle(
+			styles.blockCode,
+			styles.blockCodeDark
+		),
+		...( style?.fontSize && { fontSize: style.fontSize } ),
+	};
+
+	const placeholderStyle = usePreferredColorSchemeStyle(
 		styles.placeholder,
 		styles.placeholderDark
 	);
@@ -57,4 +55,4 @@ export function CodeEdit( props ) {
 	);
 }
 
-export default withPreferredColorScheme( CodeEdit );
+export default CodeEdit;
