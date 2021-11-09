@@ -326,7 +326,6 @@ describe( 'Embed block', () => {
 			const expectedURL = 'https://twitter.com/notnownikki';
 
 			const {
-				getByA11yLabel,
 				getByPlaceholderText,
 				getByTestId,
 				getByText,
@@ -348,12 +347,15 @@ describe( 'Embed block', () => {
 			fireEvent( embedEditURLModal, 'backdropPress' );
 			fireEvent( embedEditURLModal, MODAL_DISMISS_EVENT );
 
-			// Wait for block settings button to be present
-			const settingsButton = await waitFor( () =>
-				getByA11yLabel( 'Open Settings' )
+			const blockSettingsModal = await waitFor( () =>
+				getByTestId( 'block-settings' )
 			);
+			// Get Twitter link field
+			const twitterLinkField = within(
+				blockSettingsModal
+			).getByA11yLabel( `Twitter link, ${ expectedURL }` );
 
-			expect( settingsButton ).toBeDefined();
+			expect( twitterLinkField ).toBeDefined();
 			expect( getEditorHtml() ).toMatchSnapshot();
 		} );
 
@@ -363,11 +365,9 @@ describe( 'Embed block', () => {
 			// Mock clipboard
 			Clipboard.getString.mockResolvedValue( clipboardURL );
 
-			const {
-				getByA11yLabel,
-				getByTestId,
-				getByText,
-			} = await initializeWithEmbedBlock( EMPTY_EMBED_HTML );
+			const { getByTestId, getByText } = await initializeWithEmbedBlock(
+				EMPTY_EMBED_HTML
+			);
 
 			// Edit URL
 			fireEvent.press( getByText( 'ADD LINK' ) );
@@ -383,13 +383,16 @@ describe( 'Embed block', () => {
 			fireEvent( embedEditURLModal, 'backdropPress' );
 			fireEvent( embedEditURLModal, MODAL_DISMISS_EVENT );
 
-			// Wait for block settings button to be present
-			const settingsButton = await waitFor( () =>
-				getByA11yLabel( 'Open Settings' )
+			const blockSettingsModal = await waitFor( () =>
+				getByTestId( 'block-settings' )
 			);
+			// Get Twitter link field
+			const twitterLinkField = within(
+				blockSettingsModal
+			).getByA11yLabel( `Twitter link, ${ clipboardURL }` );
 
 			expect( embedLink ).toBeDefined();
-			expect( settingsButton ).toBeDefined();
+			expect( twitterLinkField ).toBeDefined();
 			expect( getEditorHtml() ).toMatchSnapshot();
 
 			Clipboard.getString.mockReset();
@@ -638,6 +641,8 @@ describe( 'Embed block', () => {
 
 	describe( 'retry', () => {
 		it( 'retries loading the preview if initial request failed', async () => {
+			const expectedURL = 'https://twitter.com/notnownikki';
+
 			// Return bad response for the first request to oembed endpoint
 			// and success response for the rest of requests.
 			let isFirstEmbedRequest = true;
@@ -655,21 +660,23 @@ describe( 'Embed block', () => {
 				return Promise.resolve( response );
 			} );
 
-			const {
-				getByA11yLabel,
-				getByText,
-			} = await initializeWithEmbedBlock( RICH_TEXT_EMBED_HTML );
+			const { getByTestId, getByText } = await initializeWithEmbedBlock(
+				RICH_TEXT_EMBED_HTML
+			);
 
 			// Retry request
 			fireEvent.press( getByText( 'More options' ) );
 			fireEvent.press( getByText( 'Retry' ) );
 
-			// Wait for Open Settings button to be present
-			const openSettingsButton = await waitFor( () =>
-				getByA11yLabel( 'Open Settings' )
+			const blockSettingsModal = await waitFor( () =>
+				getByTestId( 'block-settings' )
 			);
+			// Get Twitter link field
+			const twitterLinkField = within(
+				blockSettingsModal
+			).getByA11yLabel( `Twitter link, ${ expectedURL }` );
 
-			expect( openSettingsButton ).toBeDefined();
+			expect( twitterLinkField ).toBeDefined();
 			expect( getEditorHtml() ).toMatchSnapshot();
 		} );
 		it( 'converts to link if preview request failed', async () => {
