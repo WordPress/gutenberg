@@ -13,7 +13,7 @@ import { useState, useRef } from '@wordpress/element';
 import {
 	BlockControls,
 	BlockVerticalAlignmentControl,
-	__experimentalUseInnerBlocksProps as useInnerBlocksProps,
+	useInnerBlocksProps,
 	InspectorControls,
 	useBlockProps,
 	__experimentalImageURLInputUI as ImageURLInputUI,

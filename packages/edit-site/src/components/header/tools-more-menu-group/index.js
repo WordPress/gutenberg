@@ -10,7 +10,7 @@ import { createSlotFill, MenuGroup } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 
 const { Fill: ToolsMoreMenuGroup, Slot } = createSlotFill(
-	'ToolsMoreMenuGroup'
+	'EditSiteToolsMoreMenuGroup'
 );
 
 ToolsMoreMenuGroup.Slot = ( { fillProps } ) => (

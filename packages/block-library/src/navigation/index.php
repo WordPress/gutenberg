@@ -161,11 +161,25 @@ function gutenberg_parse_blocks_from_menu_items( $menu_items, $menu_items_by_par
 	$blocks = array();
 
 	foreach ( $menu_items as $menu_item ) {
+		$class_name       = ! empty( $menu_item->classes ) ? implode( ' ', (array) $menu_item->classes ) : null;
+		$id               = ( null !== $menu_item->object_id && 'custom' !== $menu_item->object ) ? $menu_item->object_id : null;
+		$opens_in_new_tab = null !== $menu_item->target && '_blank' === $menu_item->target;
+		$rel              = ( null !== $menu_item->xfn && '' !== $menu_item->xfn ) ? $menu_item->xfn : null;
+		$kind             = null !== $menu_item->type ? str_replace( '_', '-', $menu_item->type ) : 'custom';
+
 		$block = array(
 			'blockName' => 'core/navigation-link',
 			'attrs'     => array(
-				'label' => $menu_item->title,
-				'url'   => $menu_item->url,
+				'className'     => $class_name,
+				'description'   => $menu_item->description,
+				'id'            => $id,
+				'kind'          => $kind,
+				'label'         => $menu_item->title,
+				'opensInNewTab' => $opens_in_new_tab,
+				'rel'           => $rel,
+				'title'         => $menu_item->attr_title,
+				'type'          => $menu_item->object,
+				'url'           => $menu_item->url,
 			),
 		);
 
@@ -230,6 +244,7 @@ function render_block_core_navigation( $attributes, $content, $block ) {
 
 	$inner_blocks = $block->inner_blocks;
 
+	// If `__unstableLocation` is defined, create inner blocks from the classic menu assigned to that location.
 	if ( empty( $inner_blocks ) && array_key_exists( '__unstableLocation', $attributes ) ) {
 		$menu_items = gutenberg_get_menu_items_at_location( $attributes['__unstableLocation'] );
 		if ( empty( $menu_items ) ) {
@@ -238,23 +253,48 @@ function render_block_core_navigation( $attributes, $content, $block ) {
 
 		$menu_items_by_parent_id = gutenberg_sort_menu_items_by_parent_id( $menu_items );
 		$parsed_blocks           = gutenberg_parse_blocks_from_menu_items( $menu_items_by_parent_id[0], $menu_items_by_parent_id );
+		$inner_blocks            = new WP_Block_List( $parsed_blocks, $attributes );
+	}
+
+	if ( ! empty( $block->context['navigationArea'] ) ) {
+		$area    = $block->context['navigationArea'];
+		$mapping = get_option( 'fse_navigation_areas', array() );
+		if ( ! empty( $mapping[ $area ] ) ) {
+			$attributes['navigationMenuId'] = $mapping[ $area ];
+		}
+	}
+
+	// Load inner blocks from the navigation post.
+	if ( array_key_exists( 'navigationMenuId', $attributes ) ) {
+		$navigation_post = get_post( $attributes['navigationMenuId'] );
+		if ( ! isset( $navigation_post ) ) {
+			return '';
+		}
+
+		$parsed_blocks = parse_blocks( $navigation_post->post_content );
+
+		// 'parse_blocks' includes a null block with '\n\n' as the content when
+		// it encounters whitespace. This code strips it.
+		$compacted_blocks = array_filter(
+			$parsed_blocks,
+			function( $block ) {
+				return isset( $block['blockName'] );
+			}
+		);
 
 		// TODO - this uses the full navigation block attributes for the
 		// context which could be refined.
-		$inner_blocks = new WP_Block_List( $parsed_blocks, $attributes );
+		$inner_blocks = new WP_Block_List( $compacted_blocks, $attributes );
 	}
 
 	if ( empty( $inner_blocks ) ) {
 		return '';
 	}
-
 	$colors     = block_core_navigation_build_css_colors( $attributes );
 	$font_sizes = block_core_navigation_build_css_font_sizes( $attributes );
 	$classes    = array_merge(
 		$colors['css_classes'],
 		$font_sizes['css_classes'],
-		( isset( $attributes['orientation'] ) && 'vertical' === $attributes['orientation'] ) ? array( 'is-vertical' ) : array(),
-		isset( $attributes['itemsJustification'] ) ? array( 'items-justified-' . $attributes['itemsJustification'] ) : array(),
 		$is_responsive_menu ? array( 'is-responsive' ) : array()
 	);
 

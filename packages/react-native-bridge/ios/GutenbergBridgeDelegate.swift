@@ -25,8 +25,6 @@ public enum Capabilities: String {
     case canEnableUnsupportedBlockEditor
     case isAudioBlockMediaUploadEnabled
     case reusableBlock
-    case editorOnboarding
-    case firstGutenbergEditorSession
     case facebookEmbed
     case instagramEmbed
     case loomEmbed
@@ -248,7 +246,7 @@ public protocol GutenbergBridgeDelegate: class {
     /// Tells the delegate that the editor requested the block type impression counts
     func gutenbergDidRequestBlockTypeImpressions() -> [String: Int]
 
-    /// Tells the delegate the the editor requested setting the impression counts
+    /// Tells the delegate that the editor requested setting the impression counts
     func gutenbergDidRequestSetBlockTypeImpressions(_ impressions: [String: Int])
 
     /// Tells the delegate that the editor requested to show the "Contact Support" support view.
@@ -256,6 +254,9 @@ public protocol GutenbergBridgeDelegate: class {
 
     /// Tells the delegate that the editor requested to show the "My Tickets" support view.
     func gutenbergDidRequestGotoCustomerSupportOptions()
+
+    /// Tells the delegate the editor requested sending an event
+    func gutenbergDidRequestSendEventToHost(_ eventName: String, properties: [AnyHashable: Any])
 }
 
 // MARK: - Optional GutenbergBridgeDelegate methods

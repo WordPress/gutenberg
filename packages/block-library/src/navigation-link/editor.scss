@@ -96,3 +96,32 @@
 		cursor: pointer;
 	}
 }
+
+/**
+* Link Control Transforms
+*/
+
+.link-control-transform {
+	border-top: $border-width solid $gray-400;
+	padding: 0 $grid-unit-20 $grid-unit-10 $grid-unit-20;
+}
+
+.link-control-transform__subheading {
+	font-size: 11px;
+	text-transform: uppercase;
+	font-weight: 500;
+	color: $gray-900;
+	margin-bottom: 1.5em;
+}
+
+.link-control-transform__items {
+	display: flex;
+	justify-content: space-between;
+}
+
+.link-control-transform__item {
+	flex-basis: 33%;
+	flex-direction: column;
+	gap: $grid-unit-10;
+	height: auto;
+}

@@ -111,6 +111,10 @@ _Parameters_
 
 Undocumented declaration.
 
+### closeListView
+
+Closes list view
+
 ### createEmbeddingMatcher
 
 Creates a function to determine if a request is embedding a certain URL.
@@ -507,6 +511,10 @@ Clicks on the button in the header which opens Document Settings sidebar when it
 ### openGlobalBlockInserter
 
 Opens the global block inserter.
+
+### openListView
+
+Opens list view
 
 ### openPreviewPage
 

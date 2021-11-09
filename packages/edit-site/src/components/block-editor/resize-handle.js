@@ -5,6 +5,8 @@ import { __ } from '@wordpress/i18n';
 import { LEFT, RIGHT } from '@wordpress/keycodes';
 import { VisuallyHidden } from '@wordpress/components';
 
+const DELTA_DISTANCE = 20; // The distance to resize per keydown in pixels.
+
 export default function ResizeHandle( { direction, resizeWidthBy } ) {
 	function handleKeyDown( event ) {
 		const { keyCode } = event;
@@ -13,12 +15,12 @@ export default function ResizeHandle( { direction, resizeWidthBy } ) {
 			( direction === 'left' && keyCode === LEFT ) ||
 			( direction === 'right' && keyCode === RIGHT )
 		) {
-			resizeWidthBy( 20 );
+			resizeWidthBy( DELTA_DISTANCE );
 		} else if (
 			( direction === 'left' && keyCode === RIGHT ) ||
 			( direction === 'right' && keyCode === LEFT )
 		) {
-			resizeWidthBy( -20 );
+			resizeWidthBy( -DELTA_DISTANCE );
 		}
 	}
 

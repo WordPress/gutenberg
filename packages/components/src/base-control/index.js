@@ -74,7 +74,7 @@ function BaseControl( {
 			</StyledField>
 			{ !! help && (
 				<StyledHelp
-					id={ id + '__help' }
+					id={ id ? id + '__help' : undefined }
 					className="components-base-control__help"
 				>
 					{ help }

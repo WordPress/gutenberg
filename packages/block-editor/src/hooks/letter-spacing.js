@@ -45,6 +45,7 @@ export function LetterSpacingEdit( props ) {
 		<LetterSpacingControl
 			value={ style?.typography?.letterSpacing }
 			onChange={ onChange }
+			__unstableInputWidth={ false }
 		/>
 	);
 }
@@ -60,7 +61,7 @@ export function useIsLetterSpacingDisabled( { name: blockName } = {} ) {
 		blockName,
 		LETTER_SPACING_SUPPORT_KEY
 	);
-	const hasLetterSpacing = useSetting( 'typography.customLetterSpacing' );
+	const hasLetterSpacing = useSetting( 'typography.letterSpacing' );
 
 	return notSupported || ! hasLetterSpacing;
 }

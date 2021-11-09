@@ -185,6 +185,7 @@ const getBlockTemplate = async ( templateName ) => {
 
 const getDefaultValues = ( blockTemplate ) => {
 	return {
+		$schema: 'https://schemas.wp.org/trunk/block.json',
 		apiVersion: 2,
 		namespace: 'create-block',
 		category: 'widgets',

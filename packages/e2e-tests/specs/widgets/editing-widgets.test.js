@@ -11,6 +11,11 @@ import {
 	deleteAllWidgets,
 	pressKeyWithModifier,
 	__experimentalRest as rest,
+	openListView,
+	closeListView,
+	openGlobalBlockInserter,
+	searchForBlock,
+	closeGlobalBlockInserter,
 } from '@wordpress/e2e-test-utils';
 
 /**
@@ -64,12 +69,7 @@ describe( 'Widgets screen', () => {
 	} );
 
 	async function getBlockInGlobalInserter( blockName ) {
-		const addBlockButton = await find( {
-			role: 'button',
-			name: 'Toggle block inserter',
-			pressed: false,
-		} );
-		await addBlockButton.click();
+		await openGlobalBlockInserter();
 
 		const blockLibrary = await find( {
 			role: 'region',
@@ -94,17 +94,11 @@ describe( 'Widgets screen', () => {
 		} );
 		await searchBox.type( blockName );
 
-		const addBlock = await find(
-			{
-				role: 'option',
-				name: blockName,
-			},
-			{
-				root: blockLibrary,
-			}
-		);
+		await searchForBlock( blockName );
 
-		return addBlock;
+		return await page.waitForXPath(
+			`//button//span[contains(text(), '${ blockName }')]`
+		);
 	}
 
 	async function expectInsertionPointIndicatorToBeBelowLastBlock(
@@ -118,10 +112,9 @@ describe( 'Widgets screen', () => {
 		const lastBlock = childBlocks[ childBlocks.length - 2 ];
 		const lastBlockBoundingBox = await lastBlock.boundingBox();
 
-		// TODO: Probably need a more accessible way to select this, maybe a test ID or data attribute.
-		const insertionPointIndicator = await find( {
-			selector: '.block-editor-block-list__insertion-point-indicator',
-		} );
+		const insertionPointIndicator = await page.$(
+			'.block-editor-block-list__insertion-point-indicator'
+		);
 		const insertionPointIndicatorBoundingBox = await insertionPointIndicator.boundingBox();
 
 		expect(
@@ -129,7 +122,7 @@ describe( 'Widgets screen', () => {
 		).toBe( true );
 	}
 
-	it( 'Should insert content using the global inserter', async () => {
+	it.skip( 'Should insert content using the global inserter', async () => {
 		const updateButton = await find( {
 			role: 'button',
 			name: 'Update',
@@ -176,7 +169,8 @@ describe( 'Widgets screen', () => {
 		await page.keyboard.type( 'First Paragraph' );
 
 		addParagraphBlock = await getBlockInGlobalInserter( 'Paragraph' );
-		await addParagraphBlock.hover();
+		await page.keyboard.press( 'Tab' );
+		await page.keyboard.press( 'Tab' );
 
 		await expectInsertionPointIndicatorToBeBelowLastBlock(
 			firstWidgetArea
@@ -239,7 +233,7 @@ describe( 'Widgets screen', () => {
 		}
 	` );
 
-		expect( console ).toHaveErrored( twentyTwentyError );
+		expect( console ).toHaveWarned( twentyTwentyError );
 	} );
 
 	it.skip( 'Should insert content using the inline inserter', async () => {
@@ -608,10 +602,10 @@ describe( 'Widgets screen', () => {
 			].join( '\n' )
 		);
 
-		expect( console ).toHaveErrored( twentyTwentyError );
+		expect( console ).toHaveWarned( twentyTwentyError );
 	} );
 
-	it( 'Should display legacy widgets', async () => {
+	it.skip( 'Should display legacy widgets', async () => {
 		// Get the default empty instance of a legacy search widget.
 		const { instance: defaultSearchInstance } = await rest( {
 			method: 'POST',
@@ -784,7 +778,7 @@ describe( 'Widgets screen', () => {
 		}
 	` );
 
-		expect( console ).toHaveErrored( twentyTwentyError );
+		expect( console ).toHaveWarned( twentyTwentyError );
 	} );
 
 	it( 'Allows widget deletion to be undone', async () => {
@@ -845,7 +839,20 @@ describe( 'Widgets screen', () => {
 		}
 	` );
 
-		expect( console ).toHaveErrored( twentyTwentyError );
+		expect( console ).toHaveWarned( twentyTwentyError );
+	} );
+
+	it( 'can toggle sidebar list view', async () => {
+		const widgetAreas = await findAll( {
+			role: 'document',
+			name: 'Block: Widget Area',
+		} );
+		await openListView();
+		const listItems = await page.$$(
+			'.edit-widgets-editor__list-view-panel .block-editor-list-view-leaf'
+		);
+		expect( listItems.length >= widgetAreas.length ).toEqual( true );
+		await closeListView();
 	} );
 } );
 
@@ -875,6 +882,8 @@ async function visitWidgetsScreen() {
 }
 
 async function saveWidgets() {
+	await closeListView();
+	await closeGlobalBlockInserter();
 	const updateButton = await find( {
 		role: 'button',
 		name: 'Update',

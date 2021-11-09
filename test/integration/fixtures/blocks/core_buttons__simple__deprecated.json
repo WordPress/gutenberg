@@ -4,7 +4,12 @@
 		"name": "core/buttons",
 		"isValid": true,
 		"attributes": {
-			"orientation": "horizontal"
+			"orientation": "horizontal",
+			"layout": {
+				"type": "flex",
+				"justifyContent": "left",
+				"orientation": "horizontal"
+			}
 		},
 		"innerBlocks": [
 			{

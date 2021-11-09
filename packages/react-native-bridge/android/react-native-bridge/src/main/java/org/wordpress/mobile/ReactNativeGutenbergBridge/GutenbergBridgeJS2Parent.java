@@ -174,4 +174,6 @@ public interface GutenbergBridgeJS2Parent extends RequestExecutor {
     void requestContactCustomerSupport();
 
     void requestGotoCustomerSupportOptions();
+
+    void sendEventToHost(String eventName, ReadableMap properties);
 }

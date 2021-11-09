@@ -18,7 +18,11 @@ import { store as editSiteStore } from '../../store';
 import { SIDEBAR_BLOCK } from '../sidebar/constants';
 import { STORE_NAME } from '../../store/constants';
 
-function KeyboardShortcuts() {
+function KeyboardShortcuts( { openEntitiesSavedStates } ) {
+	const {
+		__experimentalGetDirtyEntityRecords,
+		isSavingEntityRecord,
+	} = useSelect( coreStore );
 	const isListViewOpen = useSelect(
 		( select ) => select( editSiteStore ).isListViewOpened(),
 		[]
@@ -35,6 +39,20 @@ function KeyboardShortcuts() {
 	const { enableComplementaryArea, disableComplementaryArea } = useDispatch(
 		interfaceStore
 	);
+
+	useShortcut( 'core/edit-site/save', ( event ) => {
+		event.preventDefault();
+
+		const dirtyEntityRecords = __experimentalGetDirtyEntityRecords();
+		const isDirty = !! dirtyEntityRecords.length;
+		const isSaving = dirtyEntityRecords.some( ( record ) =>
+			isSavingEntityRecord( record.kind, record.name, record.key )
+		);
+
+		if ( ! isSaving && isDirty ) {
+			openEntitiesSavedStates();
+		}
+	} );
 
 	useShortcut( 'core/edit-site/undo', ( event ) => {
 		undo();
@@ -64,10 +82,21 @@ function KeyboardShortcuts() {
 
 	return null;
 }
+
 function KeyboardShortcutsRegister() {
 	// Registering the shortcuts
 	const { registerShortcut } = useDispatch( keyboardShortcutsStore );
 	useEffect( () => {
+		registerShortcut( {
+			name: 'core/edit-site/save',
+			category: 'global',
+			description: __( 'Save your changes.' ),
+			keyCombination: {
+				modifier: 'primary',
+				character: 's',
+			},
+		} );
+
 		registerShortcut( {
 			name: 'core/edit-site/undo',
 			category: 'global',
