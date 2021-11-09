@@ -14,7 +14,7 @@ def extractPackageVersion(packagejson, packageName, section) {
     def packageSlurper = new JsonSlurper()
     def packageJson = packageSlurper.parse file(packagejson)
     def dep = packageJson.get(section).get(packageName)
-    
+
     // Extract version from filename of tarball URL
     def isTarball = dep.endsWith('.tgz')
     if(isTarball) {
@@ -125,17 +125,13 @@ project.afterEvaluate {
 
                 groupId 'org.wordpress-mobile.gutenberg-mobile'
                 artifactId 'react-native-gutenberg-bridge'
+                artifact tasks.named("androidSourcesJar")
                 // version is set by 'publish-to-s3' plugin
 
                 addDependenciesToPom(pom)
             }
         }
    }
-}
-
-publishToS3Plugin {
-    mavenPublishGroupId 'org.wordpress-mobile.gutenberg-mobile'
-    mavenPublishArtifactId 'react-native-bridge'
 }
 
 def addDependenciesToPom(pom) {

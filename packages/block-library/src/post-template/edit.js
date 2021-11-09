@@ -24,6 +24,12 @@ const TEMPLATE = [
 	[ 'core/post-date' ],
 	[ 'core/post-excerpt' ],
 ];
+
+function PostTemplateInnerBlocks() {
+	const innerBlocksProps = useInnerBlocksProps( {}, { template: TEMPLATE } );
+	return <li { ...innerBlocksProps } />;
+}
+
 export default function PostTemplateEdit( {
 	clientId,
 	context: {
@@ -125,7 +131,6 @@ export default function PostTemplateEdit( {
 			[ `columns-${ columns }` ]: hasLayoutFlex,
 		} ),
 	} );
-	const innerBlocksProps = useInnerBlocksProps( {}, { template: TEMPLATE } );
 
 	if ( ! posts ) {
 		return (
@@ -149,7 +154,7 @@ export default function PostTemplateEdit( {
 					>
 						{ blockContext ===
 						( activeBlockContext || blockContexts[ 0 ] ) ? (
-							<li { ...innerBlocksProps } />
+							<PostTemplateInnerBlocks />
 						) : (
 							<li>
 								<BlockPreview

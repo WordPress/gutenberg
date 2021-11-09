@@ -108,7 +108,7 @@ export const siteEditor = {
 			page: 'gutenberg-edit-site',
 			...query,
 		} ).slice( 1 );
-		await visitAdminPage( 'admin.php', query );
+		await visitAdminPage( 'themes.php', query );
 		await page.waitForSelector( '.edit-site-visual-editor iframe' );
 	},
 

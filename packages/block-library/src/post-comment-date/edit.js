@@ -14,23 +14,22 @@ import { __, _x } from '@wordpress/i18n';
 /**
  * Renders the `core/post-comment-date` block on the editor.
  *
- * @param {Object} props                      React props.
- * @param {Object} props.setAttributes        Callback for updating block attributes.
- * @param {Object} props.attributes           Block attributes.
- * @param {string} props.attributes.className Block class name.
- * @param {string} props.attributes.format    Format of the date.
- * @param {string} props.attributes.isLink    Whether the author name should be linked.
- * @param {Object} props.context              Inherited context.
- * @param {string} props.context.commentId    The comment ID.
+ * @param {Object} props                   React props.
+ * @param {Object} props.setAttributes     Callback for updating block attributes.
+ * @param {Object} props.attributes        Block attributes.
+ * @param {string} props.attributes.format Format of the date.
+ * @param {string} props.attributes.isLink Whether the author name should be linked.
+ * @param {Object} props.context           Inherited context.
+ * @param {string} props.context.commentId The comment ID.
  *
  * @return {JSX.Element} React element.
  */
 export default function Edit( {
-	attributes: { className, format, isLink },
+	attributes: { format, isLink },
 	context: { commentId },
 	setAttributes,
 } ) {
-	const blockProps = useBlockProps( { className } );
+	const blockProps = useBlockProps();
 	const [ date ] = useEntityProp( 'root', 'comment', 'date', commentId );
 	const [ siteDateFormat ] = useEntityProp( 'root', 'site', 'date_format' );
 
@@ -75,7 +74,7 @@ export default function Edit( {
 			<>
 				{ inspectorControls }
 				<div { ...blockProps }>
-					<p>{ _x( 'Post Comment Date', 'block title' ) }</p>
+					<p>{ _x( 'Comment Date', 'block title' ) }</p>
 				</div>
 			</>
 		);

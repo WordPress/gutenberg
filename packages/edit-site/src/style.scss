@@ -21,7 +21,7 @@ html.wp-toolbar {
 	background: $white;
 }
 
-body.toplevel_page_gutenberg-edit-site {
+body.appearance_page_gutenberg-edit-site {
 	@include wp-admin-reset(".edit-site");
 }
 

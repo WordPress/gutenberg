@@ -61,7 +61,7 @@ export default function Edit( {
 			<>
 				{ blockControls }
 				<div { ...blockProps }>
-					<p>{ _x( 'Post Comment Content', 'block title' ) }</p>
+					<p>{ _x( 'Comment Content', 'block title' ) }</p>
 				</div>
 			</>
 		);

@@ -1,89 +1,15 @@
 <?php
 /**
- * Class that implements a WP_Theme_JSON_Schema to convert
- * a given structure in v1 schema to the latest one.
+ * Class that implements a WP_Theme_JSON_Schema migration.
  *
  * @package gutenberg
  */
 
 /**
- * Class that implements a WP_Theme_JSON_Schema to convert
- * a given structure in v0 schema to the latest one.
+ * Class that removes the custom prefix for some properties
+ * that did not land in 5.8.
  */
-class WP_Theme_JSON_Schema_V1 implements WP_Theme_JSON_Schema {
-	/**
-	 * Data schema for v1 theme.json.
-	 */
-	const SCHEMA = array(
-		'version'         => 1,
-		'settings'        => array(
-			'border'     => array(
-				'radius' => null,
-				'color'  => null,
-				'style'  => null,
-				'width'  => null,
-			),
-			'color'      => array(
-				'custom'         => null,
-				'customGradient' => null,
-				'gradients'      => null,
-				'link'           => null,
-				'palette'        => null,
-			),
-			'spacing'    => array(
-				'customPadding' => null,
-				'units'         => null,
-			),
-			'typography' => array(
-				'customFontSize'   => null,
-				'customLineHeight' => null,
-				'dropCap'          => null,
-				'fontFamilies'     => null,
-				'fontSizes'        => null,
-				'fontStyle'        => null,
-				'fontWeight'       => null,
-				'letterSpacing'    => null,
-				'textDecorations'  => null,
-				'textTransforms'   => null,
-			),
-			'custom'     => null,
-			'layout'     => null,
-		),
-		'styles'          => array(
-			'border'     => array(
-				'radius' => null,
-				'color'  => null,
-				'style'  => null,
-				'width'  => null,
-			),
-			'color'      => array(
-				'background' => null,
-				'gradient'   => null,
-				'link'       => null,
-				'text'       => null,
-			),
-			'spacing'    => array(
-				'padding' => array(
-					'top'    => null,
-					'right'  => null,
-					'bottom' => null,
-					'left'   => null,
-				),
-			),
-			'typography' => array(
-				'fontFamily'     => null,
-				'fontSize'       => null,
-				'fontStyle'      => null,
-				'fontWeight'     => null,
-				'lineHeight'     => null,
-				'textDecoration' => null,
-				'textTransform'  => null,
-			),
-		),
-		'customTemplates' => null,
-		'templateParts'   => null,
-	);
-
+class WP_Theme_JSON_Schema_V1_Remove_Custom_Prefixes implements WP_Theme_JSON_Schema {
 	/**
 	 * Maps old properties to their new location within the schema's settings.
 	 * This will be applied at both the defaults and individual block levels.
@@ -100,13 +26,22 @@ class WP_Theme_JSON_Schema_V1 implements WP_Theme_JSON_Schema {
 	);
 
 	/**
-	 * Converts a v1 schema into the latest.
+	 * Removes the custom prefixes for a few properties that only worked in the plugin:
 	 *
-	 * @param array $old Data in v1 schema.
+	 * 'border.customColor'               => 'border.color',
+	 * 'border.customStyle'               => 'border.style',
+	 * 'border.customWidth'               => 'border.width',
+	 * 'typography.customFontStyle'       => 'typography.fontStyle',
+	 * 'typography.customFontWeight'      => 'typography.fontWeight',
+	 * 'typography.customLetterSpacing'   => 'typography.letterSpacing',
+	 * 'typography.customTextDecorations' => 'typography.textDecoration',
+	 * 'typography.customTextTransforms'  => 'typography.textTransform',
 	 *
-	 * @return array Data in the latest schema.
+	 * @param array $old Data to migrate.
+	 *
+	 * @return array Data without the custom prefixes.
 	 */
-	public static function parse( $old ) {
+	public static function migrate( $old ) {
 		// Copy everything.
 		$new = $old;
 
@@ -114,8 +49,6 @@ class WP_Theme_JSON_Schema_V1 implements WP_Theme_JSON_Schema {
 		if ( isset( $old['settings'] ) ) {
 			$new['settings'] = self::process_settings( $old['settings'] );
 		}
-
-		$new['version'] = WP_Theme_JSON_Gutenberg::LATEST_SCHEMA;
 
 		return $new;
 	}
