@@ -91,6 +91,7 @@ export function usePasteHandler( props ) {
 			// Remove Windows-specific metadata appended within copied HTML text.
 			html = removeWindowsFragments( html );
 
+			// Strip meta tag.
 			html = removeCharsetMetaTag( html );
 
 			event.preventDefault();
@@ -261,7 +262,7 @@ function removeWindowsFragments( html ) {
 }
 
 /**
- * Removes the charset meta tag inserted by Google Chrome.
+ * Removes the charset meta tag inserted by Chromium.
  * See:
  * - https://github.com/WordPress/gutenberg/issues/33585
  * - https://bugs.chromium.org/p/chromium/issues/detail?id=1264616#c4
