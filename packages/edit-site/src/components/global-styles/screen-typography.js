@@ -18,7 +18,7 @@ function ScreenTypography( { name } ) {
 				back={ parentMenu ? parentMenu : '/' }
 				title={ __( 'Typography' ) }
 				description={ __(
-					'Manage the fonts used on the website and the default aspect of different global elements.'
+					'Manage the fonts used on the site and the default aspect of different global elements.'
 				) }
 			/>
 			<TypographyPanel name={ name } />

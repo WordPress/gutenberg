@@ -983,7 +983,7 @@ Currently block variations exist for "header" and "footer" values of the area te
 
 It can be difficult to remember the theme.json settings and properties while you develop, so a JSON scheme was created to help. The schema is available at [SchemaStore.org](https://schemastore.org/)
 
-To use the schema, add `"$schema": "https://json.schemastore.org/theme-v1.json"` to the beginning of your theme.json file. Visual Studio Code and other editors will pick up the schema and can provide help like tooltips, autocomplete, or schema validation in the editor.
+Editors can pick up the schema and can provide help like tooltips, autocomplete, or schema validation in the editor. To use the schema in Visual Studio Code, add `"$schema": "https://json.schemastore.org/theme-v1.json"` to the beginning of your theme.json file.
 
 ![Example using validation with schema](https://developer.wordpress.org/files/2021/10/schema-validation.gif)
 

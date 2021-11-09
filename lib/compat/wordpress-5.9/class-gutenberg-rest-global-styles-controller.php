@@ -43,7 +43,7 @@ class Gutenberg_REST_Global_Styles_Controller extends WP_REST_Controller {
 			)
 		);
 
-		// Lists/updates a single gloval style variation based on the given id.
+		// Lists/updates a single global style variation based on the given id.
 		register_rest_route(
 			$this->namespace,
 			'/' . $this->rest_base . '/(?P<id>[\/\w-]+)',
@@ -54,7 +54,7 @@ class Gutenberg_REST_Global_Styles_Controller extends WP_REST_Controller {
 					'permission_callback' => array( $this, 'get_item_permissions_check' ),
 					'args'                => array(
 						'id' => array(
-							'description' => __( 'The id of a template', 'gutenberg' ),
+							'description' => __( 'The id of the global style variation', 'gutenberg' ),
 							'type'        => 'string',
 						),
 					),
@@ -218,18 +218,46 @@ class Gutenberg_REST_Global_Styles_Controller extends WP_REST_Controller {
 	public function prepare_item_for_response( $post, $request ) { // phpcs:ignore VariableAnalysis.CodeAnalysis.VariableAnalysis.UnusedVariable
 		$config                           = json_decode( $post->post_content, true );
 		$is_global_styles_user_theme_json = isset( $config['isGlobalStylesUserThemeJSON'] ) && true === $config['isGlobalStylesUserThemeJSON'];
-		$result                           = array(
-			'id'       => $post->ID,
-			'settings' => ! empty( $config['settings'] ) && $is_global_styles_user_theme_json ? $config['settings'] : new stdClass(),
-			'styles'   => ! empty( $config['styles'] ) && $is_global_styles_user_theme_json ? $config['styles'] : new stdClass(),
-			'title'    => array(
-				'raw'      => $post->post_title,
-				'rendered' => get_the_title( $post ),
-			),
-		);
-		$result                           = $this->add_additional_fields_to_object( $result, $request );
-		$response                         = rest_ensure_response( $result );
-		$links                            = $this->prepare_links( $post->id );
+
+		$fields = $this->get_fields_for_response( $request );
+
+		// Base fields for every post.
+		$data = array();
+
+		if ( rest_is_field_included( 'id', $fields ) ) {
+			$data['id'] = $post->ID;
+		}
+
+		if ( rest_is_field_included( 'title', $fields ) ) {
+			$data['title'] = array();
+		}
+		if ( rest_is_field_included( 'title.raw', $fields ) ) {
+			$data['title']['raw'] = $post->post_title;
+		}
+		if ( rest_is_field_included( 'title.rendered', $fields ) ) {
+			add_filter( 'protected_title_format', array( $this, 'protected_title_format' ) );
+
+			$data['title']['rendered'] = get_the_title( $post->ID );
+
+			remove_filter( 'protected_title_format', array( $this, 'protected_title_format' ) );
+		}
+
+		if ( rest_is_field_included( 'settings', $fields ) ) {
+			$data['settings'] = ! empty( $config['settings'] ) && $is_global_styles_user_theme_json ? $config['settings'] : new stdClass();
+		}
+
+		if ( rest_is_field_included( 'styles', $fields ) ) {
+			$data['styles'] = ! empty( $config['styles'] ) && $is_global_styles_user_theme_json ? $config['styles'] : new stdClass();
+		}
+
+		$context = ! empty( $request['context'] ) ? $request['context'] : 'view';
+		$data    = $this->add_additional_fields_to_object( $data, $request );
+		$data    = $this->filter_response_by_context( $data, $context );
+
+		// Wrap the data in a response object.
+		$response = rest_ensure_response( $data );
+
+		$links = $this->prepare_links( $post->ID );
 		$response->add_links( $links );
 		if ( ! empty( $links['self']['href'] ) ) {
 			$actions = $this->get_available_actions();
@@ -278,6 +306,19 @@ class Gutenberg_REST_Global_Styles_Controller extends WP_REST_Controller {
 		}
 
 		return $rels;
+	}
+
+	/**
+	 * Overwrites the default protected title format.
+	 *
+	 * By default, WordPress will show password protected posts with a title of
+	 * "Protected: %s", as the REST API communicates the protected status of a post
+	 * in a machine readable format, we remove the "Protected: " prefix.
+	 *
+	 * @return string Protected title format.
+	 */
+	public function protected_title_format() {
+		return '%s';
 	}
 
 	/**

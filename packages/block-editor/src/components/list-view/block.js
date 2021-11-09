@@ -11,8 +11,14 @@ import {
 	__experimentalTreeGridItem as TreeGridItem,
 } from '@wordpress/components';
 import { moreVertical } from '@wordpress/icons';
-import { useState, useRef, useEffect, useCallback } from '@wordpress/element';
-import { useDispatch, useSelect, AsyncModeProvider } from '@wordpress/data';
+import {
+	useState,
+	useRef,
+	useEffect,
+	useCallback,
+	memo,
+} from '@wordpress/element';
+import { useDispatch } from '@wordpress/data';
 
 /**
  * Internal dependencies
@@ -26,11 +32,12 @@ import ListViewBlockContents from './block-contents';
 import BlockSettingsDropdown from '../block-settings-menu/block-settings-dropdown';
 import { useListViewContext } from './context';
 import { store as blockEditorStore } from '../../store';
-import { isClientIdSelected } from './utils';
 
-export default function ListViewBlock( {
+function ListViewBlock( {
 	block,
 	isDragged,
+	isSelected,
+	isBranchSelected,
 	selectBlock,
 	position,
 	level,
@@ -54,34 +61,6 @@ export default function ListViewBlock( {
 		expand,
 		collapse,
 	} = useListViewContext();
-
-	const { isBranchSelected, isSelected } = useSelect(
-		( select ) => {
-			const {
-				getSelectedBlockClientId,
-				getSelectedBlockClientIds,
-				getBlockParents,
-			} = select( blockEditorStore );
-
-			const selectedClientIds = withExperimentalPersistentListViewFeatures
-				? getSelectedBlockClientIds()
-				: [ getSelectedBlockClientId() ];
-			const blockParents = getBlockParents( clientId );
-			const _isSelected = isClientIdSelected(
-				clientId,
-				selectedClientIds
-			);
-			return {
-				isSelected: _isSelected,
-				isBranchSelected:
-					_isSelected ||
-					blockParents.some( ( id ) => {
-						return isClientIdSelected( id, selectedClientIds );
-					} ),
-			};
-		},
-		[ withExperimentalPersistentListViewFeatures, clientId ]
-	);
 
 	const hasSiblings = siblingBlockCount > 0;
 	const hasRenderedMovers = showBlockMovers && hasSiblings;
@@ -165,95 +144,94 @@ export default function ListViewBlock( {
 	} );
 
 	return (
-		<AsyncModeProvider value={ ! isSelected }>
-			<ListViewLeaf
-				className={ classes }
-				onMouseEnter={ onMouseEnter }
-				onMouseLeave={ onMouseLeave }
-				onFocus={ onMouseEnter }
-				onBlur={ onMouseLeave }
-				level={ level }
-				position={ position }
-				rowCount={ rowCount }
-				path={ path }
-				id={ `list-view-block-${ clientId }` }
-				data-block={ clientId }
-				isExpanded={ isExpanded }
+		<ListViewLeaf
+			className={ classes }
+			onMouseEnter={ onMouseEnter }
+			onMouseLeave={ onMouseLeave }
+			onFocus={ onMouseEnter }
+			onBlur={ onMouseLeave }
+			level={ level }
+			position={ position }
+			rowCount={ rowCount }
+			path={ path }
+			id={ `list-view-block-${ clientId }` }
+			data-block={ clientId }
+			isExpanded={ isExpanded }
+		>
+			<TreeGridCell
+				className="block-editor-list-view-block__contents-cell"
+				colSpan={ colSpan }
+				ref={ cellRef }
 			>
-				<TreeGridCell
-					className="block-editor-list-view-block__contents-cell"
-					colSpan={ colSpan }
-					ref={ cellRef }
-				>
+				{ ( { ref, tabIndex, onFocus } ) => (
+					<div className="block-editor-list-view-block__contents-container">
+						<ListViewBlockContents
+							block={ block }
+							onClick={ selectEditorBlock }
+							onToggleExpanded={ toggleExpanded }
+							isSelected={ isSelected }
+							position={ position }
+							siblingBlockCount={ siblingBlockCount }
+							level={ level }
+							ref={ ref }
+							tabIndex={ tabIndex }
+							onFocus={ onFocus }
+						/>
+					</div>
+				) }
+			</TreeGridCell>
+			{ hasRenderedMovers && (
+				<>
+					<TreeGridCell
+						className={ moverCellClassName }
+						withoutGridItem
+					>
+						<TreeGridItem>
+							{ ( { ref, tabIndex, onFocus } ) => (
+								<BlockMoverUpButton
+									orientation="vertical"
+									clientIds={ [ clientId ] }
+									ref={ ref }
+									tabIndex={ tabIndex }
+									onFocus={ onFocus }
+								/>
+							) }
+						</TreeGridItem>
+						<TreeGridItem>
+							{ ( { ref, tabIndex, onFocus } ) => (
+								<BlockMoverDownButton
+									orientation="vertical"
+									clientIds={ [ clientId ] }
+									ref={ ref }
+									tabIndex={ tabIndex }
+									onFocus={ onFocus }
+								/>
+							) }
+						</TreeGridItem>
+					</TreeGridCell>
+				</>
+			) }
+
+			{ showBlockActions && (
+				<TreeGridCell className={ listViewBlockSettingsClassName }>
 					{ ( { ref, tabIndex, onFocus } ) => (
-						<div className="block-editor-list-view-block__contents-container">
-							<ListViewBlockContents
-								block={ block }
-								onClick={ selectEditorBlock }
-								onToggleExpanded={ toggleExpanded }
-								isSelected={ isSelected }
-								position={ position }
-								siblingBlockCount={ siblingBlockCount }
-								level={ level }
-								ref={ ref }
-								tabIndex={ tabIndex }
-								onFocus={ onFocus }
-							/>
-						</div>
+						<BlockSettingsDropdown
+							clientIds={ [ clientId ] }
+							icon={ moreVertical }
+							toggleProps={ {
+								ref,
+								className: 'block-editor-list-view-block__menu',
+								tabIndex,
+								onFocus,
+							} }
+							disableOpenOnArrowDown
+							__experimentalSelectBlock={ selectEditorBlock }
+						/>
 					) }
 				</TreeGridCell>
-				{ hasRenderedMovers && (
-					<>
-						<TreeGridCell
-							className={ moverCellClassName }
-							withoutGridItem
-						>
-							<TreeGridItem>
-								{ ( { ref, tabIndex, onFocus } ) => (
-									<BlockMoverUpButton
-										orientation="vertical"
-										clientIds={ [ clientId ] }
-										ref={ ref }
-										tabIndex={ tabIndex }
-										onFocus={ onFocus }
-									/>
-								) }
-							</TreeGridItem>
-							<TreeGridItem>
-								{ ( { ref, tabIndex, onFocus } ) => (
-									<BlockMoverDownButton
-										orientation="vertical"
-										clientIds={ [ clientId ] }
-										ref={ ref }
-										tabIndex={ tabIndex }
-										onFocus={ onFocus }
-									/>
-								) }
-							</TreeGridItem>
-						</TreeGridCell>
-					</>
-				) }
-
-				{ showBlockActions && (
-					<TreeGridCell className={ listViewBlockSettingsClassName }>
-						{ ( { ref, tabIndex, onFocus } ) => (
-							<BlockSettingsDropdown
-								clientIds={ [ clientId ] }
-								icon={ moreVertical }
-								toggleProps={ {
-									ref,
-									className:
-										'block-editor-list-view-block__menu',
-									tabIndex,
-									onFocus,
-								} }
-								disableOpenOnArrowDown
-								__experimentalSelectBlock={ selectEditorBlock }
-							/>
-						) }
-					</TreeGridCell>
-				) }
-			</ListViewLeaf>
-		</AsyncModeProvider>
+			) }
+		</ListViewLeaf>
 	);
 }
+
+export default memo( ListViewBlock );

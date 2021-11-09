@@ -22,6 +22,10 @@
 	"usesContext": [ "commentId" ],
 	"supports": {
 		"html": false,
+		"spacing": {
+			"margin": true,
+			"padding": true
+		},
 		"color": {
 			"gradients": true,
 			"link": true
