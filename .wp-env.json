@@ -4,6 +4,9 @@
 	"themes": [ "WordPress/theme-experiments/tt1-blocks#tt1-blocks@0.4.7" ],
 	"env": {
 		"tests": {
+			"config": {
+				"SCRIPT_DEBUG": true
+			},
 			"mappings": {
 				"wp-content/mu-plugins": "./packages/e2e-tests/mu-plugins",
 				"wp-content/plugins/gutenberg-test-plugins": "./packages/e2e-tests/plugins"
