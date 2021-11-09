@@ -90,6 +90,8 @@
 			"__experimentalFontWeight": true,
 			"__experimentalTextTransform": true,
 			"__experimentalFontFamily": true,
+			"__experimentalTextDecoration": true,
+			"__experimentalSkipSerialization": [ "textDecoration" ],
 			"__experimentalDefaultControls": {
 				"fontSize": true
 			}
