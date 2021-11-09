@@ -782,15 +782,19 @@ describe( 'createRegistry', () => {
 			const getSelectors = () => ( { mySelector } );
 			const getActions = () => ( { myAction } );
 			const subscribe = () => {};
-			registry.registerGenericStore( 'store', {
-				getSelectors,
-				getActions,
-				subscribe,
-			} );
+			const myStore = {
+				name: 'store',
+				instantiate: () => ( {
+					getSelectors,
+					getActions,
+					subscribe,
+				} ),
+			};
+			registry.register( myStore );
 			const subRegistry = createRegistry( {}, registry );
 
-			subRegistry.select( 'store' ).mySelector();
-			subRegistry.dispatch( 'store' ).myAction();
+			subRegistry.select( myStore ).mySelector();
+			subRegistry.dispatch( myStore ).myAction();
 
 			expect( mySelector ).toHaveBeenCalled();
 			expect( myAction ).toHaveBeenCalled();
@@ -802,10 +806,13 @@ describe( 'createRegistry', () => {
 			const getSelectors = () => ( { mySelector } );
 			const getActions = () => ( { myAction } );
 			const subscribe = () => {};
-			registry.registerGenericStore( 'store', {
-				getSelectors,
-				getActions,
-				subscribe,
+			registry.register( {
+				name: 'store',
+				instantiate: () => ( {
+					getSelectors,
+					getActions,
+					subscribe,
+				} ),
 			} );
 
 			const subRegistry = createRegistry( {}, registry );
@@ -814,10 +821,13 @@ describe( 'createRegistry', () => {
 			const getSelectors2 = () => ( { mySelector: mySelector2 } );
 			const getActions2 = () => ( { myAction: myAction2 } );
 			const subscribe2 = () => {};
-			subRegistry.registerGenericStore( 'store', {
-				getSelectors: getSelectors2,
-				getActions: getActions2,
-				subscribe: subscribe2,
+			subRegistry.register( {
+				name: 'store',
+				instantiate: () => ( {
+					getSelectors: getSelectors2,
+					getActions: getActions2,
+					subscribe: subscribe2,
+				} ),
 			} );
 
 			subRegistry.select( 'store' ).mySelector();
