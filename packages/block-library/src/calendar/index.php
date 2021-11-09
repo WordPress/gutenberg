@@ -115,7 +115,7 @@ if ( ! is_multisite() ) {
 	 *
 	 * @param int $post_id Deleted post ID.
 	 */
-	function block_core_calendar_update_has_published_post_on_delete( $post_id ) {
+	function gutenberg_block_core_calendar_update_has_published_post_on_delete( $post_id ) {
 		$post = get_post( $post_id );
 
 		if ( ! $post || 'publish' !== $post->post_status || 'post' !== $post->post_type ) {
@@ -132,7 +132,7 @@ if ( ! is_multisite() ) {
 	 * @param string  $old_status The status the post is changing from.
 	 * @param WP_Post $post       Post object.
 	 */
-	function block_core_calendar_update_has_published_post_on_transition_post_status( $new_status, $old_status, $post ) {
+	function gutenberg_block_core_calendar_update_has_published_post_on_transition_post_status( $new_status, $old_status, $post ) {
 		if ( $new_status === $old_status ) {
 			return;
 		}
@@ -148,6 +148,6 @@ if ( ! is_multisite() ) {
 		block_core_calendar_update_has_published_posts();
 	}
 
-	add_action( 'delete_post', 'block_core_calendar_update_has_published_post_on_delete' );
-	add_action( 'transition_post_status', 'block_core_calendar_update_has_published_post_on_transition_post_status', 10, 3 );
+	add_action( 'delete_post', 'gutenberg_block_core_calendar_update_has_published_post_on_delete' );
+	add_action( 'transition_post_status', 'gutenberg_block_core_calendar_update_has_published_post_on_transition_post_status', 10, 3 );
 }
