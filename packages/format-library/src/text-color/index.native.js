@@ -80,6 +80,15 @@ function TextColorEdit( {
 	);
 
 	const hasColorsToChoose = ! isEmpty( colors ) || ! allowCustomControl;
+
+	const onPressButton = useCallback( () => {
+		if ( hasColorsToChoose ) {
+			enableIsAddingColor();
+		} else {
+			onChange( removeFormat( value, name ) );
+		}
+	}, [ hasColorsToChoose, value ] );
+
 	if ( ! hasColorsToChoose && ! isActive ) {
 		return null;
 	}
@@ -105,11 +114,7 @@ function TextColorEdit( {
 						title={ title }
 						extraProps={ { isActiveStyle: colorIndicatorStyle } }
 						// If has no colors to choose but a color is active remove the color onClick
-						onClick={
-							hasColorsToChoose
-								? enableIsAddingColor
-								: () => onChange( removeFormat( value, name ) )
-						}
+						onClick={ onPressButton }
 					/>
 				</ToolbarGroup>
 			</BlockControls>

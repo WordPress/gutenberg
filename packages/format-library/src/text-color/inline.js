@@ -69,7 +69,7 @@ export function getActiveColors( value, name, colorSettings ) {
 	};
 }
 
-export function setColors( value, name, colorSettings, colors ) {
+function setColors( value, name, colorSettings, colors ) {
 	const { color, backgroundColor } = {
 		...getActiveColors( value, name, colorSettings ),
 		...colors,
