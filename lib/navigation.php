@@ -226,7 +226,7 @@ function gutenberg_migrate_nav_on_theme_switch( $new_name, $new_theme, $old_them
 			continue;
 		}
 
-		$menu_items = gutenberg_global_get_menu_items_at_location( $location_name );
+		$menu_items = gutenberg_get_menu_items_at_location( $location_name );
 		if ( empty( $menu_items ) ) {
 			continue;
 		}
@@ -248,8 +248,8 @@ function gutenberg_migrate_nav_on_theme_switch( $new_name, $new_theme, $old_them
 		if ( count( $matching_posts ) ) {
 			$navigation_post_id = $matching_posts[0]->ID;
 		} else {
-			$menu_items_by_parent_id = gutenberg_global_sort_menu_items_by_parent_id( $menu_items );
-			$parsed_blocks           = gutenberg_global_parse_blocks_from_menu_items( $menu_items_by_parent_id[0], $menu_items_by_parent_id );
+			$menu_items_by_parent_id = gutenberg_sort_menu_items_by_parent_id( $menu_items );
+			$parsed_blocks           = gutenberg_parse_blocks_from_menu_items( $menu_items_by_parent_id[0], $menu_items_by_parent_id );
 			$post_data               = array(
 				'post_type'    => 'wp_navigation',
 				'post_title'   => sprintf(
@@ -282,7 +282,7 @@ add_action( 'switch_theme', 'gutenberg_migrate_nav_on_theme_switch', 200, 3 );
  * @param string $location The menu location.
  * @return array Menu items for the location.
  */
-function gutenberg_global_get_menu_items_at_location( $location ) {
+function gutenberg_get_menu_items_at_location( $location ) {
 	if ( empty( $location ) ) {
 		return;
 	}
@@ -319,7 +319,7 @@ function gutenberg_global_get_menu_items_at_location( $location ) {
  * @return array An array keyed by the id of the parent menu where each element
  *               is an array of menu items that belong to that parent.
  */
-function gutenberg_global_sort_menu_items_by_parent_id( $menu_items ) {
+function gutenberg_sort_menu_items_by_parent_id( $menu_items ) {
 	$sorted_menu_items = array();
 	foreach ( (array) $menu_items as $menu_item ) {
 		$sorted_menu_items[ $menu_item->menu_order ] = $menu_item;
@@ -345,7 +345,7 @@ function gutenberg_global_sort_menu_items_by_parent_id( $menu_items ) {
  *                                        that parent.
  * @return array An array of parsed block data.
  */
-function gutenberg_global_parse_blocks_from_menu_items( $menu_items, $menu_items_by_parent_id ) {
+function gutenberg_parse_blocks_from_menu_items( $menu_items, $menu_items_by_parent_id ) {
 	if ( empty( $menu_items ) ) {
 		return array();
 	}
@@ -376,7 +376,7 @@ function gutenberg_global_parse_blocks_from_menu_items( $menu_items, $menu_items
 		);
 
 		$block['innerBlocks']  = isset( $menu_items_by_parent_id[ $menu_item->ID ] )
-			? gutenberg_global_parse_blocks_from_menu_items( $menu_items_by_parent_id[ $menu_item->ID ], $menu_items_by_parent_id )
+			? gutenberg_parse_blocks_from_menu_items( $menu_items_by_parent_id[ $menu_item->ID ], $menu_items_by_parent_id )
 			: array();
 		$block['innerContent'] = array_map( 'serialize_block', $block['innerBlocks'] );
 
