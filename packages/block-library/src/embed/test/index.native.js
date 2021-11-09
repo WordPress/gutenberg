@@ -982,10 +982,12 @@ describe( 'Embed block', () => {
 				getByText,
 			} = await initializeWithEmbedBlock( RICH_TEXT_EMBED_HTML );
 
+			// Open Block Settings
 			fireEvent.press(
 				await waitFor( () => getByA11yLabel( 'Open Settings' ) )
 			);
 
+			// Untoggle resize for smaller devices
 			fireEvent.press(
 				await waitFor( () => getByText( /Resize for smaller devices/ ) )
 			);
@@ -999,10 +1001,12 @@ describe( 'Embed block', () => {
 				getByText,
 			} = await initializeWithEmbedBlock( WP_EMBED_HTML );
 
+			// Open Block Settings
 			fireEvent.press(
 				await waitFor( () => getByA11yLabel( 'Open Settings' ) )
 			);
 
+			// Wait for media settings panel
 			let mediaSettingsPanel;
 			try {
 				mediaSettingsPanel = await waitFor( () =>
