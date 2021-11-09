@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import { get } from 'lodash';
+
+/**
  * WordPress dependencies
  */
 import { useSelect } from '@wordpress/data';
@@ -19,10 +24,12 @@ import { addQueryArgs } from '@wordpress/url';
 import { store as editSiteStore } from '../../../store';
 
 function NavigationLink( { icon } ) {
-	const { isRequestingSiteIcon, postType, siteIconUrl } = useSelect(
+	const { isRequestingSiteIcon, templateType, siteIconUrl } = useSelect(
 		( select ) => {
 			const { getEditedPostType } = select( editSiteStore );
-			const { getEntityRecord, isResolving } = select( coreDataStore );
+			const { getEntityRecord, getPostType, isResolving } = select(
+				coreDataStore
+			);
 			const siteData =
 				getEntityRecord( 'root', '__unstableBase', undefined ) || {};
 
@@ -32,7 +39,7 @@ function NavigationLink( { icon } ) {
 					'__unstableBase',
 					undefined,
 				] ),
-				postType: getEditedPostType(),
+				templateType: getPostType( getEditedPostType() ),
 				siteIconUrl: siteData.site_icon_url,
 			};
 		},
@@ -70,10 +77,14 @@ function NavigationLink( { icon } ) {
 		<motion.div className="edit-site-navigation-link" whileHover="expand">
 			<Button
 				className="edit-site-navigation-link__button has-icon"
-				label={ __( 'Back' ) }
 				href={ addQueryArgs( 'edit.php', {
-					post_type: postType,
+					post_type: templateType?.slug,
 				} ) }
+				label={ get(
+					templateType,
+					[ 'labels', 'view_items' ],
+					__( 'Back' )
+				) }
 			>
 				{ buttonIcon }
 			</Button>
