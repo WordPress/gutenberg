@@ -105,10 +105,18 @@ function Navigation( {
 	const {
 		itemsJustification,
 		openSubmenusOnClick,
-		orientation,
 		overlayMenu,
 		showSubmenuIcon,
+		layout: { justifyContent, orientation } = {},
 	} = attributes;
+
+	// Spacer block needs orientation from context. This is a patch until
+	// https://github.com/WordPress/gutenberg/issues/36197 is addressed.
+	useEffect( () => {
+		if ( orientation ) {
+			setAttributes( { orientation } );
+		}
+	}, [ orientation ] );
 
 	const [ areaMenu, setAreaMenu ] = useEntityProp(
 		'root',
@@ -191,6 +199,8 @@ function Navigation( {
 		className: classnames( className, {
 			[ `items-justified-${ attributes.itemsJustification }` ]: itemsJustification,
 			'is-vertical': orientation === 'vertical',
+			'items-justified-right': justifyContent === 'right',
+			'items-justified-space-between': justifyContent === 'space-between',
 			'is-responsive': 'never' !== overlayMenu,
 			'has-text-color': !! textColor.color || !! textColor?.class,
 			[ getColorClassName(
