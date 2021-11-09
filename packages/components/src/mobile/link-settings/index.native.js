@@ -95,6 +95,7 @@ function LinkSettings( {
 	const [ urlInputValue, setUrlInputValue ] = useState( '' );
 	const [ labelInputValue, setLabelInputValue ] = useState( '' );
 	const [ linkRelInputValue, setLinkRelInputValue ] = useState( '' );
+	const [isURLFromClipboard, setIsURLFromClipboard ] = useState( false );
 	const prevEditorSidebarOpenedRef = useRef();
 
 	const isIOS = Platform.OS === 'ios';
@@ -129,6 +130,9 @@ function LinkSettings( {
 		const isSettingSheetOpen = isVisible || editorSidebarOpened;
 		if ( options.url.autoFill && isSettingSheetOpen && ! url ) {
 			getURLFromClipboard();
+		}
+		else {
+			setIsURLFromClipboard( false );
 		}
 
 		if ( prevEditorSidebarOpened && ! editorSidebarOpened ) {
@@ -212,14 +216,17 @@ function LinkSettings( {
 		const clipboardText = await Clipboard.getString();
 
 		if ( ! clipboardText ) {
+			setIsURLFromClipboard( false );
 			return;
 		}
 		// Check if pasted text is URL
 		if ( ! isURL( clipboardText ) ) {
+			setIsURLFromClipboard( false );
 			return;
 		}
 
 		setAttributes( { url: clipboardText } );
+		setIsURLFromClipboard( true );
 	}
 
 	function getSettings() {
@@ -247,7 +254,7 @@ function LinkSettings( {
 							autoFocus={ isIOS && options.url.autoFocus }
 							keyboardType="url"
 							setCursorAtStart={
-								isIOS && options.url.setCursorAtStart
+								isIOS && options.url.setCursorAtStart && isURLFromClipboard
 							}
 						/>
 					) ) }
