@@ -256,6 +256,14 @@ function render_block_core_navigation( $attributes, $content, $block ) {
 		$inner_blocks            = new WP_Block_List( $parsed_blocks, $attributes );
 	}
 
+	if ( ! empty( $block->context['navigationArea'] ) ) {
+		$area    = $block->context['navigationArea'];
+		$mapping = get_option( 'fse_navigation_areas', array() );
+		if ( ! empty( $mapping[ $area ] ) ) {
+			$attributes['navigationMenuId'] = $mapping[ $area ];
+		}
+	}
+
 	// Load inner blocks from the navigation post.
 	if ( array_key_exists( 'navigationMenuId', $attributes ) ) {
 		$navigation_post = get_post( $attributes['navigationMenuId'] );
@@ -287,8 +295,6 @@ function render_block_core_navigation( $attributes, $content, $block ) {
 	$classes    = array_merge(
 		$colors['css_classes'],
 		$font_sizes['css_classes'],
-		( isset( $attributes['orientation'] ) && 'vertical' === $attributes['orientation'] ) ? array( 'is-vertical' ) : array(),
-		isset( $attributes['itemsJustification'] ) ? array( 'items-justified-' . $attributes['itemsJustification'] ) : array(),
 		$is_responsive_menu ? array( 'is-responsive' ) : array()
 	);
 

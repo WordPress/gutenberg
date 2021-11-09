@@ -324,7 +324,7 @@ class WP_REST_Menu_Items_Controller extends WP_REST_Posts_Controller {
 	 * Deletes a single menu item.
 	 *
 	 * @param WP_REST_Request $request Full details about the request.
-	 * @return true|WP_Error True on success, or WP_Error object on failure.
+	 * @return WP_REST_Response|WP_Error True on success, or WP_Error object on failure.
 	 */
 	public function delete_item( $request ) {
 		$menu_item = $this->get_nav_menu_item( $request['id'] );
@@ -479,13 +479,15 @@ class WP_REST_Menu_Items_Controller extends WP_REST_Posts_Controller {
 			}
 		}
 
+		$error = new WP_Error();
+
 		// Check if object id exists before saving.
 		if ( ! $prepared_nav_item['menu-item-object'] ) {
 			// If taxonony, check if term exists.
 			if ( 'taxonomy' === $prepared_nav_item['menu-item-type'] ) {
 				$original = get_term( absint( $prepared_nav_item['menu-item-object-id'] ) );
 				if ( empty( $original ) || is_wp_error( $original ) ) {
-					return new WP_Error( 'rest_term_invalid_id', __( 'Invalid term ID.', 'gutenberg' ), array( 'status' => 400 ) );
+					$error->add( 'rest_term_invalid_id', __( 'Invalid term ID.', 'gutenberg' ), array( 'status' => 400 ) );
 				}
 				$prepared_nav_item['menu-item-object'] = get_term_field( 'taxonomy', $original );
 
@@ -493,7 +495,7 @@ class WP_REST_Menu_Items_Controller extends WP_REST_Posts_Controller {
 			} elseif ( 'post_type' === $prepared_nav_item['menu-item-type'] ) {
 				$original = get_post( absint( $prepared_nav_item['menu-item-object-id'] ) );
 				if ( empty( $original ) ) {
-					return new WP_Error( 'rest_post_invalid_id', __( 'Invalid post ID.', 'gutenberg' ), array( 'status' => 400 ) );
+					$error->add( 'rest_post_invalid_id', __( 'Invalid post ID.', 'gutenberg' ), array( 'status' => 400 ) );
 				}
 				$prepared_nav_item['menu-item-object'] = get_post_type( $original );
 			}
@@ -504,25 +506,36 @@ class WP_REST_Menu_Items_Controller extends WP_REST_Posts_Controller {
 			$post_type = ( $prepared_nav_item['menu-item-object'] ) ? $prepared_nav_item['menu-item-object'] : false;
 			$original  = get_post_type_object( $post_type );
 			if ( empty( $original ) ) {
-				return new WP_Error( 'rest_post_invalid_type', __( 'Invalid post type.', 'gutenberg' ), array( 'status' => 400 ) );
+				$error->add( 'rest_post_invalid_type', __( 'Invalid post type.', 'gutenberg' ), array( 'status' => 400 ) );
 			}
 		}
 
 		// Check if menu item is type custom, then title and url are required.
 		if ( 'custom' === $prepared_nav_item['menu-item-type'] ) {
 			if ( '' === $prepared_nav_item['menu-item-title'] ) {
-				return new WP_Error( 'rest_title_required', __( 'Title required if menu item of type custom.', 'gutenberg' ), array( 'status' => 400 ) );
+				$error->add( 'rest_title_required', __( 'Title required if menu item of type custom.', 'gutenberg' ), array( 'status' => 400 ) );
 			}
 			if ( empty( $prepared_nav_item['menu-item-url'] ) ) {
-				return new WP_Error( 'rest_url_required', __( 'URL required if menu item of type custom.', 'gutenberg' ), array( 'status' => 400 ) );
+				$error->add( 'rest_url_required', __( 'URL required if menu item of type custom.', 'gutenberg' ), array( 'status' => 400 ) );
 			}
 		}
 
 		// If menu item is type block, then content is required.
-		if ( 'block' === $prepared_nav_item['menu-item-type'] ) {
-			if ( empty( $prepared_nav_item['menu-item-content'] ) ) {
-				return new WP_Error( 'rest_content_required', __( 'Content required if menu item of type block.', 'gutenberg' ), array( 'status' => 400 ) );
+		if ( 'block' === $prepared_nav_item['menu-item-type'] && empty( $prepared_nav_item['menu-item-content'] ) ) {
+			$error->add( 'rest_content_required', __( 'Content required if menu item of type block.', 'gutenberg' ), array( 'status' => 400 ) );
+		}
+
+		// Valid url.
+		if ( '' !== $prepared_nav_item['menu-item-url'] ) {
+			$prepared_nav_item['menu-item-url'] = esc_url_raw( $prepared_nav_item['menu-item-url'] );
+			if ( '' === $prepared_nav_item['menu-item-url'] ) {
+				// Fail sanitization if URL is invalid.
+				$error->add( 'invalid_url', __( 'Invalid URL.', 'gutenberg' ), array( 'status' => 400 ) );
 			}
+		}
+
+		if ( $error->has_errors() ) {
+			return $error;
 		}
 
 		foreach ( array( 'menu-item-object-id', 'menu-item-parent-id' ) as $key ) {
@@ -543,14 +556,6 @@ class WP_REST_Menu_Items_Controller extends WP_REST_Posts_Controller {
 			$prepared_nav_item[ $key ] = implode( ' ', array_map( 'sanitize_html_class', $value ) );
 		}
 
-		// Valid url.
-		if ( '' !== $prepared_nav_item['menu-item-url'] ) {
-			$prepared_nav_item['menu-item-url'] = esc_url_raw( $prepared_nav_item['menu-item-url'] );
-			if ( '' === $prepared_nav_item['menu-item-url'] ) {
-				// Fail sanitization if URL is invalid.
-				return new WP_Error( 'invalid_url', __( 'Invalid URL.', 'gutenberg' ), array( 'status' => 400 ) );
-			}
-		}
 		// Only draft / publish are valid post status for menu items.
 		if ( 'publish' !== $prepared_nav_item['menu-item-status'] ) {
 			$prepared_nav_item['menu-item-status'] = 'draft';
@@ -755,16 +760,20 @@ class WP_REST_Menu_Items_Controller extends WP_REST_Posts_Controller {
 		}
 
 		$path = '';
+		$type = '';
+		$key  = $menu_item->type;
 		if ( 'post_type' === $menu_item->type ) {
 			$path = rest_get_route_for_post( $menu_item->object_id );
+			$type = get_post_type( $menu_item->object_id );
 		} elseif ( 'taxonomy' === $menu_item->type ) {
 			$path = rest_get_route_for_term( $menu_item->object_id );
+			$type = get_term_field( 'taxonomy', $menu_item->object_id );
 		}
 
-		if ( $path ) {
-			$links['https://api.w.org/object'][] = array(
+		if ( $path && $type ) {
+			$links['https://api.w.org/menu-item-object'][] = array(
 				'href'       => rest_url( $path ),
-				'post_type'  => $menu_item->type,
+				$key         => $type,
 				'embeddable' => true,
 			);
 		}

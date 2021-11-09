@@ -40,81 +40,17 @@ class WP_Theme_JSON_Resolver_Gutenberg_Test extends WP_UnitTestCase {
 		return 'pl_PL';
 	}
 
-	function test_fields_are_extracted() {
-		$actual = WP_Theme_JSON_Resolver_Gutenberg::get_fields_to_translate();
-
-		$expected = array(
-			array(
-				'path'    => array( 'settings', 'typography', 'fontSizes' ),
-				'key'     => 'name',
-				'context' => 'Font size name',
-			),
-			array(
-				'path'    => array( 'settings', 'typography', 'fontFamilies' ),
-				'key'     => 'name',
-				'context' => 'Font family name',
-			),
-			array(
-				'path'    => array( 'settings', 'color', 'palette' ),
-				'key'     => 'name',
-				'context' => 'Color name',
-			),
-			array(
-				'path'    => array( 'settings', 'color', 'gradients' ),
-				'key'     => 'name',
-				'context' => 'Gradient name',
-			),
-			array(
-				'path'    => array( 'settings', 'color', 'duotone' ),
-				'key'     => 'name',
-				'context' => 'Duotone name',
-			),
-			array(
-				'path'    => array( 'settings', 'blocks', '*', 'typography', 'fontSizes' ),
-				'key'     => 'name',
-				'context' => 'Font size name',
-			),
-			array(
-				'path'    => array( 'settings', 'blocks', '*', 'typography', 'fontFamilies' ),
-				'key'     => 'name',
-				'context' => 'Font family name',
-			),
-			array(
-				'path'    => array( 'settings', 'blocks', '*', 'color', 'palette' ),
-				'key'     => 'name',
-				'context' => 'Color name',
-			),
-			array(
-				'path'    => array( 'settings', 'blocks', '*', 'color', 'gradients' ),
-				'key'     => 'name',
-				'context' => 'Gradient name',
-			),
-			array(
-				'path'    => array( 'customTemplates' ),
-				'key'     => 'title',
-				'context' => 'Custom template name',
-			),
-			array(
-				'path'    => array( 'templateParts' ),
-				'key'     => 'title',
-				'context' => 'Template part name',
-			),
-		);
-
-		$this->assertEquals( $expected, $actual );
-	}
-
 	function test_translations_are_applied() {
 		add_filter( 'locale', array( $this, 'filter_set_locale_to_polish' ) );
-		load_textdomain( 'fse', realpath( __DIR__ . '/data/languages/themes/fse-pl_PL.mo' ) );
+		load_textdomain( 'block-theme', realpath( __DIR__ . '/data/languages/themes/block-theme-pl_PL.mo' ) );
 
-		switch_theme( 'fse' );
+		switch_theme( 'block-theme' );
 		$actual = WP_Theme_JSON_Resolver_Gutenberg::get_theme_data();
 
-		unload_textdomain( 'fse' );
+		unload_textdomain( 'block-theme' );
 		remove_filter( 'locale', array( $this, 'filter_set_locale_to_polish' ) );
 
-		$this->assertSame( wp_get_theme()->get( 'TextDomain' ), 'fse' );
+		$this->assertSame( wp_get_theme()->get( 'TextDomain' ), 'block-theme' );
 		$this->assertSame(
 			array(
 				'color'      => array(
@@ -187,11 +123,11 @@ class WP_Theme_JSON_Resolver_Gutenberg_Test extends WP_UnitTestCase {
 		$default = WP_Theme_JSON_Resolver_Gutenberg::theme_has_support();
 
 		// Switch to a theme that does have support.
-		switch_theme( 'fse' );
-		$fse = WP_Theme_JSON_Resolver_Gutenberg::theme_has_support();
+		switch_theme( 'block-theme' );
+		$has_theme_json_support = WP_Theme_JSON_Resolver_Gutenberg::theme_has_support();
 
-		$this->assertSame( false, $default );
-		$this->assertSame( true, $fse );
+		$this->assertFalse( $default );
+		$this->assertTrue( $has_theme_json_support );
 	}
 
 	function test_add_theme_supports_are_loaded_for_themes_without_theme_json() {
@@ -221,85 +157,100 @@ class WP_Theme_JSON_Resolver_Gutenberg_Test extends WP_UnitTestCase {
 		remove_theme_support( 'custom-line-height' );
 		remove_theme_support( 'editor-color-palette' );
 
-		$this->assertSame( false, WP_Theme_JSON_Resolver_Gutenberg::theme_has_support() );
-		$this->assertSame( true, $settings['typography']['lineHeight'] );
+		$this->assertFalse( WP_Theme_JSON_Resolver_Gutenberg::theme_has_support() );
+		$this->assertTrue( $settings['typography']['lineHeight'] );
 		$this->assertSame( $color_palette, $settings['color']['palette']['theme'] );
 	}
 
+	/**
+	 * Recursively applies ksort to an array.
+	 */
+	private static function recursive_ksort( &$array ) {
+		foreach ( $array as &$value ) {
+			if ( is_array( $value ) ) {
+				self::recursive_ksort( $value );
+			}
+		}
+		ksort( $array );
+	}
+
 	function test_merges_child_theme_json_into_parent_theme_json() {
-		switch_theme( 'fse-child' );
+		switch_theme( 'block-theme-child' );
 
-		$actual = WP_Theme_JSON_Resolver_Gutenberg::get_theme_data();
-
-		// Should merge settings.
-		$this->assertSame(
-			array(
-				'color'      => array(
-					'custom'         => false,
-					'customGradient' => true,
-					'palette'        => array(
-						'theme' => array(
-							array(
-								'slug'  => 'light',
-								'name'  => 'Light',
-								'color' => '#f3f4f6',
-							),
-							array(
-								'slug'  => 'primary',
-								'name'  => 'Primary',
-								'color' => '#3858e9',
-							),
-							array(
-								'slug'  => 'dark',
-								'name'  => 'Dark',
-								'color' => '#111827',
-							),
+		$actual_settings   = WP_Theme_JSON_Resolver::get_theme_data()->get_settings();
+		$expected_settings = array(
+			'color'      => array(
+				'custom'         => false,
+				'customGradient' => true,
+				'palette'        => array(
+					'theme' => array(
+						array(
+							'slug'  => 'light',
+							'name'  => 'Light',
+							'color' => '#f3f4f6',
+						),
+						array(
+							'slug'  => 'primary',
+							'name'  => 'Primary',
+							'color' => '#3858e9',
+						),
+						array(
+							'slug'  => 'dark',
+							'name'  => 'Dark',
+							'color' => '#111827',
 						),
 					),
-					'link'           => true,
 				),
-				'typography' => array(
-					'customFontSize' => true,
-					'lineHeight'     => false,
-				),
-				'spacing'    => array(
-					'units'   => false,
-					'padding' => false,
-				),
-				'blocks'     => array(
-					'core/paragraph'  => array(
-						'color' => array(
-							'palette' => array(
-								'theme' => array(
-									array(
-										'slug'  => 'light',
-										'name'  => 'Light',
-										'color' => '#f5f7f9',
-									),
+				'link'           => true,
+			),
+			'typography' => array(
+				'customFontSize' => true,
+				'lineHeight'     => false,
+			),
+			'spacing'    => array(
+				'units'   => false,
+				'padding' => false,
+			),
+			'blocks'     => array(
+				'core/paragraph'  => array(
+					'color' => array(
+						'palette' => array(
+							'theme' => array(
+								array(
+									'slug'  => 'light',
+									'name'  => 'Light',
+									'color' => '#f5f7f9',
 								),
 							),
 						),
 					),
-					'core/post-title' => array(
-						'color' => array(
-							'palette' => array(
-								'theme' => array(
-									array(
-										'slug'  => 'light',
-										'name'  => 'Light',
-										'color' => '#f3f4f6',
-									),
+				),
+				'core/post-title' => array(
+					'color' => array(
+						'palette' => array(
+							'theme' => array(
+								array(
+									'slug'  => 'light',
+									'name'  => 'Light',
+									'color' => '#f3f4f6',
 								),
 							),
 						),
 					),
 				),
 			),
-			$actual->get_settings()
+		);
+		self::recursive_ksort( $actual_settings );
+		self::recursive_ksort( $expected_settings );
+
+		// Should merge settings.
+		$this->assertSame(
+			$expected_settings,
+			$actual_settings
 		);
 
 		$this->assertSame(
-			$actual->get_custom_templates(),
+			WP_Theme_JSON_Resolver::get_theme_data()->get_custom_templates(),
 			array(
 				'page-home' => array(
 					'title'     => 'Homepage',

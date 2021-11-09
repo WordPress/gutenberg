@@ -60,7 +60,10 @@ class URLInput extends Component {
 
 	componentDidUpdate( prevProps ) {
 		const { showSuggestions, selectedSuggestion } = this.state;
-		const { value } = this.props;
+		const {
+			value,
+			__experimentalShowInitialSuggestions = false,
+		} = this.props;
 
 		// only have to worry about scrolling selected suggestion into view
 		// when already expanded
@@ -84,12 +87,19 @@ class URLInput extends Component {
 			}, 100 );
 		}
 
-		// Only attempt an update on suggestions if the input value has actually changed.
+		// Update suggestions when the value changes
 		if (
 			prevProps.value !== value &&
-			this.shouldShowInitialSuggestions()
+			! this.props.disableSuggestions &&
+			! this.isUpdatingSuggestions
 		) {
-			this.updateSuggestions();
+			if ( value?.length ) {
+				// If the new value is not empty we need to update with suggestions for it
+				this.updateSuggestions( value );
+			} else if ( __experimentalShowInitialSuggestions ) {
+				// If the new value is empty and we can show initial suggestions, then show initial suggestions
+				this.updateSuggestions();
+			}
 		}
 	}
 

@@ -132,7 +132,13 @@ add_filter( 'pre_set_theme_mod_custom_logo', '_sync_custom_logo_to_site_logo' );
  * @param array $old_value Previous theme mod settings.
  * @param array $value     Updated theme mod settings.
  */
-function _gutenberg_delete_site_logo_on_remove_custom_logo( $old_value, $value ) {
+function _delete_site_logo_on_remove_custom_logo( $old_value, $value ) {
+	global $_ignore_site_logo_changes;
+
+	if ( $_ignore_site_logo_changes ) {
+		return;
+	}
+
 	// If the custom_logo is being unset, it's being removed from theme mods.
 	if ( isset( $old_value['custom_logo'] ) && ! isset( $value['custom_logo'] ) ) {
 		delete_option( 'site_logo' );
@@ -142,7 +148,13 @@ function _gutenberg_delete_site_logo_on_remove_custom_logo( $old_value, $value )
 /**
  * Deletes the site logo when all theme mods are being removed.
  */
-function _gutenberg_delete_site_logo_on_remove_theme_mods() {
+function _delete_site_logo_on_remove_theme_mods() {
+	global $_ignore_site_logo_changes;
+
+	if ( $_ignore_site_logo_changes ) {
+		return;
+	}
+
 	if ( false !== get_theme_support( 'custom-logo' ) ) {
 		delete_option( 'site_logo' );
 	}
@@ -165,27 +177,16 @@ add_action( 'setup_theme', '_delete_site_logo_on_remove_custom_logo_on_setup_the
  * Removes the custom_logo theme-mod when the site_logo option gets deleted.
  */
 function _delete_custom_logo_on_remove_site_logo() {
-	$theme = get_option( 'stylesheet' );
+	global $_ignore_site_logo_changes;
 
-	// Unhook update and delete actions for custom_logo to prevent a loop of hooks.
-	// Remove Gutenberg hooks.
-	remove_action( "update_option_theme_mods_$theme", '_gutenberg_delete_site_logo_on_remove_custom_logo', 10 );
-	remove_action( "delete_option_theme_mods_$theme", '_gutenberg_delete_site_logo_on_remove_theme_mods' );
-
-	// Remove Core hooks.
-	remove_action( "update_option_theme_mods_$theme", '_delete_site_logo_on_remove_custom_logo', 10 );
-	remove_action( "delete_option_theme_mods_$theme", '_delete_site_logo_on_remove_theme_mods' );
+	// Prevent _delete_site_logo_on_remove_custom_logo and
+	// _delete_site_logo_on_remove_theme_mods from firing and causing an
+	// infinite loop.
+	$_ignore_site_logo_changes = true;
 
 	// Remove the custom logo.
 	remove_theme_mod( 'custom_logo' );
 
-	// Restore update and delete actions.
-	// Restore Gutenberg hooks.
-	add_action( "update_option_theme_mods_$theme", '_gutenberg_delete_site_logo_on_remove_custom_logo', 10, 2 );
-	add_action( "delete_option_theme_mods_$theme", '_gutenberg_delete_site_logo_on_remove_theme_mods' );
-
-	// Restore Core hooks.
-	add_action( "update_option_theme_mods_$theme", '_delete_site_logo_on_remove_custom_logo', 10, 2 );
-	add_action( "delete_option_theme_mods_$theme", '_delete_site_logo_on_remove_theme_mods' );
+	$_ignore_site_logo_changes = false;
 }
 add_action( 'delete_option_site_logo', '_delete_custom_logo_on_remove_site_logo' );

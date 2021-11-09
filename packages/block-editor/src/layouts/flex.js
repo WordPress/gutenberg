@@ -94,16 +94,20 @@ export default {
 		const flexWrap = flexWrapOptions.includes( layout.flexWrap )
 			? layout.flexWrap
 			: 'wrap';
+		// --justification-setting allows children to inherit the value
+		// regardless or row or column direction.
 		const rowOrientation = `
 		flex-direction: row;
 		align-items: center;
 		justify-content: ${ justifyContent };
+		--justification-setting: ${ justifyContent };
 		`;
 		const alignItems =
 			alignItemsMap[ layout.justifyContent ] || alignItemsMap.left;
 		const columnOrientation = `
 		flex-direction: column;
 		align-items: ${ alignItems };
+		--justification-setting: ${ alignItems };
 		`;
 		return (
 			<style>{ `

@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 19.1.0 (2021-11-07)
+
 ### Enhancements
 
 -   Increase the timeout for e2e tests to 30 seconds ([#35983](https://github.com/WordPress/gutenberg/pull/35983)).

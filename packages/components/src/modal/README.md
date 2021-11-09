@@ -247,6 +247,14 @@ If this property is added, it will an additional class name to the modal overlay
 -   Type: `String`
 -   Required: No
 
+#### isFullScreen
+
+This property when set to `true` will render a full screen modal.
+
+-   Type: `boolean`
+-   Required: No
+-   Default: `false`
+
 ## Related components
 
 -   To notify a user with a message of medium importance, use `Notice`.

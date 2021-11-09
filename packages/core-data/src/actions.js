@@ -644,12 +644,19 @@ export const saveEditedEntityRecord = (
 	if ( ! select.hasEditsForEntityRecord( kind, name, recordId ) ) {
 		return;
 	}
+	const entities = await dispatch( getKindEntities( kind ) );
+	const entity = find( entities, { kind, name } );
+	if ( ! entity ) {
+		return;
+	}
+	const entityIdKey = entity.key || DEFAULT_ENTITY_KEY;
+
 	const edits = select.getEntityRecordNonTransientEdits(
 		kind,
 		name,
 		recordId
 	);
-	const record = { id: recordId, ...edits };
+	const record = { [ entityIdKey ]: recordId, ...edits };
 	return await dispatch.saveEntityRecord( kind, name, record, options );
 };
 
