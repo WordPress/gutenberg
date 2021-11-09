@@ -983,21 +983,26 @@ describe( 'Embed block', () => {
 			expect( getEditorHtml() ).toMatchSnapshot();
 		} );
 
-		it( 'does not show settings button if responsive is not supported', async () => {
-			const { getByA11yLabel } = await initializeWithEmbedBlock(
-				WP_EMBED_HTML
+		it( 'does not show media settings panel if responsive is not supported', async () => {
+			const {
+				getByA11yLabel,
+				getByText,
+			} = await initializeWithEmbedBlock( WP_EMBED_HTML );
+
+			fireEvent.press(
+				await waitFor( () => getByA11yLabel( 'Open Settings' ) )
 			);
 
-			let settingsButton;
+			let mediaSettingsPanel;
 			try {
-				settingsButton = await waitFor( () =>
-					getByA11yLabel( 'Open Settings' )
+				mediaSettingsPanel = await waitFor( () =>
+					getByText( 'Media settings' )
 				);
 			} catch ( e ) {
 				// NOOP
 			}
 
-			expect( settingsButton ).not.toBeDefined();
+			expect( mediaSettingsPanel ).not.toBeDefined();
 		} );
 	} );
 } );
