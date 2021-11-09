@@ -124,6 +124,14 @@ exports[`Embed block insertion inserts YouTube embed block 1`] = `"<!-- wp:embed
 
 exports[`Embed block insertion inserts generic embed block 1`] = `"<!-- wp:embed /-->"`;
 
+exports[`Embed block retry allows editing link if request failed 1`] = `
+"<!-- wp:embed {\\"url\\":\\"https://twitter.com/notnownikki\\",\\"type\\":\\"rich\\",\\"providerNameSlug\\":\\"twitter\\"} -->
+<figure class=\\"wp-block-embed is-type-rich is-provider-twitter wp-block-embed-twitter\\"><div class=\\"wp-block-embed__wrapper\\">
+https://twitter.com/notnownikki
+</div></figure>
+<!-- /wp:embed -->"
+`;
+
 exports[`Embed block retry converts to link if preview request failed 1`] = `
 "<!-- wp:paragraph -->
 <p><a href=\\"https://twitter.com/notnownikki\\">https://twitter.com/notnownikki</a></p>

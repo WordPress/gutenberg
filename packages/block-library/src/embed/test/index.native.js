@@ -722,6 +722,7 @@ describe( 'Embed block', () => {
 			expect( twitterLinkField ).toBeDefined();
 			expect( getEditorHtml() ).toMatchSnapshot();
 		} );
+
 		it( 'converts to link if preview request failed', async () => {
 			// Return bad response for requests to oembed endpoint.
 			fetchRequest.mockImplementation( ( { path } ) => {
@@ -746,6 +747,61 @@ describe( 'Embed block', () => {
 			);
 
 			expect( paragraphBlock ).toBeDefined();
+			expect( getEditorHtml() ).toMatchSnapshot();
+		} );
+
+		it( 'allows editing link if request failed', async () => {
+			const failURL = 'https://wordpress.org/news/2021/07/tatum/';
+			const successURL = 'https://twitter.com/notnownikki';
+
+			// Return bad response for WordPress URL and success for Twitter URL.
+			fetchRequest.mockImplementation( ( { path } ) => {
+				const matchesPath = ( url ) =>
+					path ===
+					`/oembed/1.0/proxy?url=${ encodeURIComponent( url ) }`;
+
+				let response = {};
+				if ( matchesPath( failURL ) ) {
+					response = MOCK_BAD_WORDPRESS_RESPONSE;
+				} else if ( matchesPath( successURL ) ) {
+					response = RICH_TEXT_EMBED_SUCCESS_RESPONSE;
+				}
+
+				return Promise.resolve( response );
+			} );
+
+			const {
+				getByA11yLabel,
+				getByText,
+				getByTestId,
+				getByDisplayValue,
+			} = await initializeWithEmbedBlock( WP_EMBED_HTML );
+
+			fireEvent.press( getByText( 'More options' ) );
+			fireEvent.press( getByText( 'Edit link' ) );
+
+			// Start editing link
+			fireEvent.press( getByA11yLabel( `WordPress link, ${ failURL }` ) );
+
+			// Set an URL
+			const linkTextInput = getByDisplayValue( failURL );
+			fireEvent( linkTextInput, 'focus' );
+			fireEvent.changeText( linkTextInput, successURL );
+
+			// Dismiss the edit URL modal
+			const embedEditURLModal = getByTestId( 'embed-edit-url-modal' );
+			fireEvent( embedEditURLModal, 'backdropPress' );
+			fireEvent( embedEditURLModal, MODAL_DISMISS_EVENT );
+
+			const blockSettingsModal = await waitFor( () =>
+				getByTestId( 'block-settings' )
+			);
+			// Get Twitter link field
+			const twitterLinkField = within(
+				blockSettingsModal
+			).getByA11yLabel( `Twitter link, ${ successURL }` );
+
+			expect( twitterLinkField ).toBeDefined();
 			expect( getEditorHtml() ).toMatchSnapshot();
 		} );
 	} );
