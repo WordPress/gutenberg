@@ -106,10 +106,10 @@ function gutenberg_get_layout_style( $selector, $layout, $has_block_gap_support 
 				if ( ! empty( $layout['setCascadingProperties'] ) && $layout['setCascadingProperties'] ) {
 					// --layout-justification-setting allows children to inherit the value regardless or row or column direction.
 					$style .= "--layout-justification-setting: {$justify_content_options[ $layout['justifyContent'] ]};";
-					$style .= "--layout-direction: row;";
+					$style .= '--layout-direction: row;';
 					$style .= "--layout-wrap: $flex_wrap;";
 					$style .= "--layout-justify: {$justify_content_options[ $layout['justifyContent'] ]};";
-					$style .= "--layout-align: center;";
+					$style .= '--layout-align: center;';
 				}
 			}
 		} else {
@@ -119,8 +119,8 @@ function gutenberg_get_layout_style( $selector, $layout, $has_block_gap_support 
 				if ( ! empty( $layout['setCascadingProperties'] ) && $layout['setCascadingProperties'] ) {
 					// --layout-justification-setting allows children to inherit the value regardless or row or column direction.
 					$style .= "--layout-justification-setting: {$justify_content_options[ $layout['justifyContent'] ]};";
-					$style .= "--layout-direction: column;";
-					$style .= "--layout-justify: initial;";
+					$style .= '--layout-direction: column;';
+					$style .= '--layout-justify: initial;';
 					$style .= "--layout-align: {$justify_content_options[ $layout['justifyContent'] ]};";
 				}
 			}
