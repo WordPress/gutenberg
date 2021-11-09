@@ -1,16 +1,16 @@
 <?php
 /**
- * Class that implements a WP_Theme_JSON_Schema to convert
+ * Class that implements a WP_Theme_JSON_Schema_Gutenberg to convert
  * a given structure in v0 schema to the latest one.
  *
  * @package gutenberg
  */
 
 /**
- * Class that implements a WP_Theme_JSON_Schema to convert
+ * Class that implements a WP_Theme_JSON_Schema_Gutenberg to convert
  * a given structure in v0 schema to the latest one.
  */
-class WP_Theme_JSON_Schema_V0 implements WP_Theme_JSON_Schema {
+class WP_Theme_JSON_Schema_V0 implements WP_Theme_JSON_Schema_Gutenberg {
 
 	/**
 	 * How to address all the blocks

@@ -10,7 +10,7 @@
  *
  * @package gutenberg
  */
-interface WP_Theme_JSON_Schema {
+interface WP_Theme_JSON_Schema_Gutenberg {
 	/**
 	 * Parses an array that follows an old theme.json schema
 	 * into the latest theme.json schema.
