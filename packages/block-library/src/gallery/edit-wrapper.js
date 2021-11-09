@@ -25,6 +25,11 @@ export default function GalleryEditWrapper( props ) {
 		[ clientId ]
 	);
 
+	const __unstableGalleryWithImageBlocks = useSelect( ( select ) => {
+		const settings = select( blockEditorStore ).getSettings();
+		return settings.__unstableGalleryWithImageBlocks;
+	}, [] );
+
 	// This logic is used to infer version information from content with higher
 	// precedence than the flag. New galleries (and existing empty galleries) will
 	// honor the flag.
@@ -33,7 +38,7 @@ export default function GalleryEditWrapper( props ) {
 		0 < attributes?.ids?.length || 0 < attributes?.images?.length;
 	if (
 		hasOldVersionContent ||
-		( ! hasNewVersionContent && ! window.wp.galleryBlockV2Enabled )
+		( ! hasNewVersionContent && ! __unstableGalleryWithImageBlocks )
 	) {
 		return <EditWithoutInnerBlocks { ...props } />;
 	}
