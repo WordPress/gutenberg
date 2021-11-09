@@ -139,12 +139,21 @@ export function GapEdit( props ) {
 		}
 	};
 
+	const blockGapValue = style?.spacing?.blockGap;
+	const rowValue = blockGapValue?.row;
+	const columnValue = blockGapValue?.column;
+	// Check for blockGap string values, e.g., "blockGap":"169px", on pre-axial blocks.
+	const isStringValue = typeof blockGapValue === 'string';
+
 	const boxValues = {
-		top: style?.spacing?.blockGap?.row,
-		right: style?.spacing?.blockGap?.column,
-		bottom: style?.spacing?.blockGap?.row,
-		left: style?.spacing?.blockGap?.column,
+		top: isStringValue ? blockGapValue : rowValue,
+		right: isStringValue ? blockGapValue : columnValue,
+		bottom: isStringValue ? blockGapValue : rowValue,
+		left: isStringValue ? blockGapValue : columnValue,
 	};
+
+	// The default combined value we'll take from row.
+	const defaultValue = boxValues.top;
 
 	return Platform.select( {
 		web: (
@@ -168,7 +177,7 @@ export function GapEdit( props ) {
 						onChange={ onChange }
 						units={ units }
 						// Default to `row` for combined values.
-						value={ style?.spacing?.blockGap?.row }
+						value={ defaultValue }
 					/>
 				) }
 			</>
