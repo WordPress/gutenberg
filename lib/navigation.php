@@ -399,7 +399,8 @@ function gutenberg_parse_blocks_from_menu_items( $menu_items, $menu_items_by_par
  * @param string $hook The current admin page.
  */
 function gutenberg_hide_visibility_and_status_for_navigation_posts( $hook ) {
-	if ( 'post.php' !== $hook ) {
+	$allowed_hooks = array( 'post.php', 'post-new.php' );
+	if ( ! in_array( $hook, $allowed_hooks, true ) ) {
 		return;
 	}
 
