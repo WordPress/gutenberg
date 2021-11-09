@@ -6,8 +6,7 @@
 		"attributes": {
 			"layout": {
 				"type": "flex",
-				"justifyContent": "center",
-				"orientation": "horizontal"
+				"justifyContent": "center"
 			}
 		},
 		"innerBlocks": [
