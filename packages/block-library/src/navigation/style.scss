@@ -366,7 +366,6 @@
 			// as a column.
 			display: flex;
 			flex-direction: column;
-			justify-content: flex-start;
 			// Inherit alignment settings from container.
 			align-items: var(--layout-justification-setting, inherit);
 
