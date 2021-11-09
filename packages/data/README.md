@@ -528,14 +528,14 @@ _Parameters_
 
 ### registerGenericStore
 
-> **Deprecated** Use `register` instead.
+> **Deprecated** Use `register( storeDescriptor )` instead.
 
-Registers a generic store.
+Registers a generic store instance.
 
 _Parameters_
 
--   _key_ `string`: Store registry key.
--   _config_ `Object`: Configuration (getSelectors, getActions, subscribe).
+-   _name_ `string`: Store registry name.
+-   _store_ `Object`: Store instance (`{ getSelectors, getActions, subscribe }`).
 
 ### registerStore
 
