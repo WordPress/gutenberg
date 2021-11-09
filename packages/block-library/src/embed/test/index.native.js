@@ -236,7 +236,6 @@ describe( 'Embed block', () => {
 			const expectedURL = 'https://twitter.com/notnownikki';
 
 			const {
-				getByA11yLabel,
 				getByPlaceholderText,
 				getByTestId,
 			} = await insertEmbedBlock();
@@ -254,12 +253,15 @@ describe( 'Embed block', () => {
 			fireEvent( embedEditURLModal, 'backdropPress' );
 			fireEvent( embedEditURLModal, MODAL_DISMISS_EVENT );
 
-			// Wait for block settings button to be present
-			const settingsButton = await waitFor( () =>
-				getByA11yLabel( 'Open Settings' )
+			const blockSettingsModal = await waitFor( () =>
+				getByTestId( 'block-settings' )
 			);
+			// Get Twitter link field
+			const twitterLinkField = within(
+				blockSettingsModal
+			).getByA11yLabel( `Twitter link, ${ expectedURL }` );
 
-			expect( settingsButton ).toBeDefined();
+			expect( twitterLinkField ).toBeDefined();
 			expect( getEditorHtml() ).toMatchSnapshot();
 		} );
 
@@ -269,30 +271,31 @@ describe( 'Embed block', () => {
 			// Mock clipboard
 			Clipboard.getString.mockResolvedValue( clipboardURL );
 
-			const {
-				getByA11yLabel,
-				getByTestId,
-				getByText,
-			} = await insertEmbedBlock();
+			const { getByTestId, getByText } = await insertEmbedBlock();
 
 			// Wait for edit URL modal to be visible
 			const embedEditURLModal = getByTestId( 'embed-edit-url-modal' );
 			await waitFor( () => embedEditURLModal.props.isVisible );
 
-			// Get embed link
-			const embedLink = await waitFor( () => getByText( clipboardURL ) );
+			// Get embed link with auto-pasted URL
+			const autopastedLinkField = await waitFor( () =>
+				getByText( clipboardURL )
+			);
 
 			// Dismiss the edit URL modal
 			fireEvent( embedEditURLModal, 'backdropPress' );
 			fireEvent( embedEditURLModal, MODAL_DISMISS_EVENT );
 
-			// Wait for block settings button to be present
-			const settingsButton = await waitFor( () =>
-				getByA11yLabel( 'Open Settings' )
+			const blockSettingsModal = await waitFor( () =>
+				getByTestId( 'block-settings' )
 			);
+			// Get Twitter link field
+			const twitterLinkField = within(
+				blockSettingsModal
+			).getByA11yLabel( `Twitter link, ${ clipboardURL }` );
 
-			expect( embedLink ).toBeDefined();
-			expect( settingsButton ).toBeDefined();
+			expect( autopastedLinkField ).toBeDefined();
+			expect( twitterLinkField ).toBeDefined();
 			expect( getEditorHtml() ).toMatchSnapshot();
 
 			Clipboard.getString.mockReset();
