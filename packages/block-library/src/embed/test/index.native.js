@@ -512,6 +512,49 @@ describe( 'Embed block', () => {
 			expect( getEditorHtml() ).toMatchSnapshot();
 		} );
 
+		it( 'sets empty state when setting an empty URL', async () => {
+			const previousURL = 'https://twitter.com/notnownikki';
+
+			const {
+				getByA11yLabel,
+				getByDisplayValue,
+				getByTestId,
+				getByPlaceholderText,
+			} = await initializeWithEmbedBlock( RICH_TEXT_EMBED_HTML );
+
+			// Open Block Settings
+			fireEvent.press(
+				await waitFor( () => getByA11yLabel( 'Open Settings' ) )
+			);
+
+			// Get Block Settings modal
+			const blockSettingsModal = getByTestId( 'block-settings' );
+
+			// Start editing link
+			fireEvent.press(
+				within( blockSettingsModal ).getByA11yLabel(
+					`Twitter link, ${ previousURL }`
+				)
+			);
+
+			// Replace URL with empty value
+			const linkTextInput = getByDisplayValue( previousURL );
+			fireEvent( linkTextInput, 'focus' );
+			fireEvent.changeText( linkTextInput, '' );
+
+			// Dismiss the Block Settings modal
+			fireEvent( blockSettingsModal, 'backdropPress' );
+			fireEvent( blockSettingsModal, MODAL_DISMISS_EVENT );
+
+			// Get empty embed link
+			const emptyLinkTextInput = await waitFor( () =>
+				getByPlaceholderText( 'Add link' )
+			);
+
+			expect( emptyLinkTextInput ).toBeDefined();
+			expect( getEditorHtml() ).toMatchSnapshot();
+		} );
+
 		// This test case covers the bug fixed in PR #35460
 		it( 'edits URL after dismissing two times the edit URL bottom sheet with empty value', async () => {
 			const { block, getByTestId, getByText } = await insertEmbedBlock();

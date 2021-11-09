@@ -102,6 +102,8 @@ https://www.youtube.com/watch?v=lXMskKTw3Bc
 <!-- /wp:embed -->"
 `;
 
+exports[`Embed block edit URL sets empty state when setting an empty URL 1`] = `"<!-- wp:embed {\\"url\\":\\"\\",\\"type\\":\\"rich\\",\\"providerNameSlug\\":\\"twitter\\",\\"responsive\\":true} /-->"`;
+
 exports[`Embed block insert via slash inserter insert generic embed block 1`] = `"<!-- wp:embed /-->"`;
 
 exports[`Embed block insert via slash inserter inserts Twitter embed block 1`] = `"<!-- wp:embed {\\"providerNameSlug\\":\\"twitter\\",\\"responsive\\":true} /-->"`;
