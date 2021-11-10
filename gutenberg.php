@@ -81,7 +81,7 @@ function gutenberg_version_too_old_notice() {
 			admin_url( 'plugins.php' )
 		);
 	} else {
-		_e( 'The Gutenberg plugin cannot be used. It is too old for your version of WordPress. Please ask an administratior to updage it.', 'gutenberg' );
+		_e( 'The Gutenberg plugin cannot be used. It is too old for your version of WordPress. Please ask an administrator to update it.', 'gutenberg' );
 	}
 
 	echo '</p></div>';
