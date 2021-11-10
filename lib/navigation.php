@@ -57,6 +57,14 @@ function gutenberg_register_navigation_post_type() {
 add_action( 'init', 'gutenberg_register_navigation_post_type' );
 
 /**
+ * Disable "Post Attributes" for wp_navigation post type.
+ *
+ * The attributes are also conditionally enabled when a site has custom templates.
+ * Block Theme templates can be available for every post type.
+ */
+add_filter( 'theme_wp_navigation_templates', '__return_empty_array' );
+
+/**
  * Disable block editor for wp_navigation type posts so they can be managed via the UI.
  *
  * @param bool   $value Whether the CPT supports block editor or not.
