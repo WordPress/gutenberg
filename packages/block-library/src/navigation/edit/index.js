@@ -107,7 +107,7 @@ function Navigation( {
 		openSubmenusOnClick,
 		overlayMenu,
 		showSubmenuIcon,
-		layout: { justifyContent, orientation } = {},
+		layout: { justifyContent, orientation = 'horizontal' } = {},
 	} = attributes;
 
 	// Spacer block needs orientation from context. This is a patch until
