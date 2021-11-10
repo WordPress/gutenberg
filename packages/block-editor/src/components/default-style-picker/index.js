@@ -11,6 +11,7 @@ import { useSelect } from '@wordpress/data';
  * Internal dependencies
  */
 import { store as blockEditorStore } from '../../store';
+import { getDefaultStyle } from '../block-styles/utils';
 
 export default function DefaultStylePicker( { blockName } ) {
 	const {
@@ -38,12 +39,21 @@ export default function DefaultStylePicker( { blockName } ) {
 		],
 		[ styles ]
 	);
+	const defaultStyleName = useMemo( () => getDefaultStyle( styles )?.name, [
+		styles,
+	] );
 	const selectOnChange = useCallback(
 		( blockStyle ) => {
 			onUpdatePreferredStyleVariations( blockName, blockStyle );
 		},
 		[ blockName, onUpdatePreferredStyleVariations ]
 	);
+
+	// Until the functionality is migrated to global styles,
+	// only show the default style picker if a non-default style has already been selected.
+	if ( ! preferredStyle || preferredStyle === defaultStyleName ) {
+		return null;
+	}
 
 	return (
 		onUpdatePreferredStyleVariations && (
