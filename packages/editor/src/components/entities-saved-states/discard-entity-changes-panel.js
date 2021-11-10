@@ -52,7 +52,7 @@ export default function DiscardEntityChangesPanel( {
 	const discardCheckedEntities = () => {
 		const entitiesToDiscard = dirtyEntityRecords.filter(
 			( { kind, name, key, property } ) => {
-				return ! some(
+				return some(
 					selectedEntities,
 					( elt ) =>
 						elt.kind === kind &&
@@ -121,11 +121,7 @@ export default function DiscardEntityChangesPanel( {
 					} ) }
 					<PanelRow>
 						<Button
-							disabled={
-								dirtyEntityRecords.length -
-									selectedEntities.length ===
-								0
-							}
+							disabled={ selectedEntities.length === 0 }
 							isDestructive
 							onClick={ discardCheckedEntities }
 						>
