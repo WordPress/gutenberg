@@ -177,7 +177,7 @@ class WP_Theme_JSON_Resolver_Gutenberg_Test extends WP_UnitTestCase {
 	function test_merges_child_theme_json_into_parent_theme_json() {
 		switch_theme( 'block-theme-child' );
 
-		$actual_settings   = WP_Theme_JSON_Resolver::get_theme_data()->get_settings();
+		$actual_settings   = WP_Theme_JSON_Resolver_Gutenberg::get_theme_data()->get_settings();
 		$expected_settings = array(
 			'color'      => array(
 				'custom'         => false,
@@ -250,7 +250,7 @@ class WP_Theme_JSON_Resolver_Gutenberg_Test extends WP_UnitTestCase {
 		);
 
 		$this->assertSame(
-			WP_Theme_JSON_Resolver::get_theme_data()->get_custom_templates(),
+			WP_Theme_JSON_Resolver_Gutenberg::get_theme_data()->get_custom_templates(),
 			array(
 				'page-home' => array(
 					'title'     => 'Homepage',
