@@ -23,7 +23,7 @@ export default function DiscardEntityChangesPanel( { closePanel, savables } ) {
 		__experimentalResetSpecifiedEntityEdits: resetSpecifiedEntityEdits,
 	} = useDispatch( coreStore );
 
-	// Unchecked entities to be ignored by discard function.
+	// Selected entities to be discarded.
 	const [ selectedEntities, _setSelectedEntities ] = useState( [] );
 
 	const setSelectedEntities = ( { kind, name, key, property }, checked ) => {
@@ -98,7 +98,6 @@ export default function DiscardEntityChangesPanel( { closePanel, savables } ) {
 								onChange={ ( value ) =>
 									setSelectedEntities( record, value )
 								}
-								//closePanel={ closePanel }
 							/>
 						);
 					} ) }
