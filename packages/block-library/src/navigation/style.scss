@@ -290,24 +290,17 @@
 }
 
 // Default background and font color.
-.wp-block-navigation .wp-block-navigation__submenu-container {
-	// Set a background color for submenus so that they're not transparent.
-	// NOTE TO DEVS - if refactoring this code, please double-check that
-	// submenus have a default background color, this feature has regressed
-	// several times, so care needs to be taken.
-	background-color: #fff;
-	color: #000;
-
-	// Apply a border using an inset box-shadow instead of a border.
-	// That way, if an explicit background color is applied, it will be hidden
-	// behind the background color, so you don't end up with border and background.
-	box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.15);
-
-	// Box-shadows are removed in Windows High Contrast mode, but a transparent
-	// outline will show up as an opaque border.
-	outline: 1px solid transparent;
+.wp-block-navigation:not(.has-background) {
+	.wp-block-navigation__submenu-container {
+		// Set a background color for submenus so that they're not transparent.
+		// NOTE TO DEVS - if refactoring this code, please double-check that
+		// submenus have a default background color, this feature has regressed
+		// several times, so care needs to be taken.
+		background-color: #fff;
+		color: #000;
+		border: 1px solid rgba(0, 0, 0, 0.15);
+	}
 }
-
 
 // Navigation block inner container.
 .wp-block-navigation__container {
@@ -403,7 +396,6 @@
 				border: none;
 				padding-left: 32px;
 				padding-right: 32px;
-				box-shadow: none;
 			}
 
 			// Space unfolded items using gap and padding for submenus.
