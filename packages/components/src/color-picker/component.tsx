@@ -5,6 +5,7 @@
 import { Ref, useCallback } from 'react';
 import { colord, extend, Colord } from 'colord';
 import namesPlugin from 'colord/plugins/names';
+import { debounce } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -70,9 +71,9 @@ const ColorPicker = (
 	}, [ color, defaultValue ] );
 
 	const handleChange = useCallback(
-		( nextValue: Colord ) => {
+		debounce( ( nextValue: Colord ) => {
 			onChange( nextValue.toHex() );
-		},
+		}, 5 ),
 		[ onChange ]
 	);
 
