@@ -19,7 +19,6 @@ import { store as coreStore } from '@wordpress/core-data';
 /**
  * Internal dependencies
  */
-import NavigationLink from './navigation-link';
 import MoreMenu from './more-menu';
 import SaveButton from '../save-button';
 import UndoButton from './undo-redo/undo';
@@ -27,7 +26,6 @@ import RedoButton from './undo-redo/redo';
 import DocumentActions from './document-actions';
 import TemplateDetails from '../template-details';
 import { store as editSiteStore } from '../../store';
-import MainDashboardButton from '../main-dashboard-button';
 
 const preventDefault = ( event ) => {
 	event.preventDefault();

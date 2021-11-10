@@ -33,6 +33,7 @@ import { ShortcutProvider } from '@wordpress/keyboard-shortcuts';
  */
 import Header from '../header';
 import { SidebarComplementaryAreaFills } from '../sidebar';
+import NavigationSidebar from '../navigation-sidebar';
 import BlockEditor from '../block-editor';
 import KeyboardShortcuts from '../keyboard-shortcuts';
 import NavigationSidebar from '../navigation-sidebar';
@@ -229,6 +230,11 @@ function Editor( { initialSettings, onError } ) {
 													sidebarIsOpened && (
 														<ComplementaryArea.Slot scope="core/edit-site" />
 													)
+												}
+												drawer={
+													<NavigationSidebar
+														defaultIsOpen={ false }
+													/>
 												}
 												header={
 													<Header

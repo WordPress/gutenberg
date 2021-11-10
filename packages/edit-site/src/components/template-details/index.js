@@ -104,6 +104,7 @@ export default function TemplateDetails( { template, onClose } ) {
 				{ ...( newMenuSidebar
 					? {
 							href: addQueryArgs( 'edit.php', {
+								page: 'gutenberg-edit-site',
 								// TODO: We should update this to filter by template part's areas as well.
 								post_type: template.type,
 							} ),
