@@ -61,11 +61,7 @@ export default function ResponsiveWrapper( {
 				</Button>
 			) }
 
-			<div
-				className={ responsiveContainerClasses }
-				id={ modalId }
-				aria-hidden={ ! isOpen }
-			>
+			<div className={ responsiveContainerClasses } id={ modalId }>
 				<div
 					className="wp-block-navigation__responsive-close"
 					tabIndex="-1"
