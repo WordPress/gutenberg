@@ -25,28 +25,31 @@ const unregisterBlocks = () => {
 };
 
 /**
- * ```
+ * ### TODO
+ * + Try to figure out why I can't `console.log(JSON.stringify(subject.toJSON()))` anymore.
+ *
+ * ### DONE
+ *
  * GIVEN the Link Settings sheet displays,
  * AND the Clipboard has a URL copied,
  * THEN the `Link to` field in the Link Settings should be populated with the placeholder text, i.e., `Search or type URL`.
- *
- * GIVEN the Link Picker sheet displays,
- * AND the Clipboard has a URL copied that is different from the contents of the text input field,
- * THEN the `From Clipboard` table cell should be populated with the URL from the Clipboard.
  *
  * GIVEN the Link Picker sheet displays with the `From Clipboard` table cell,
  * WHEN the Clipboard is cleared or changed to something that is NOT a URL,
  * THEN the `From Clipboard` table cell should disappear.
  *
  * GIVEN the Link Picker sheet displays,
- * AND the contents of the Clipboard are IDENTICAL to the contents of the text input field,
- * THEN do NOT display the `From Clipboard` table cell.
+ * AND the Clipboard has a URL copied that is different from the contents of the text input field,
+ * THEN the `From Clipboard` table cell should be populated with the URL from the Clipboard.
  *
  * GIVEN the Link Picker sheet displays,
  * AND the `From Clipboard` table cell is pressed,
  * THEN the `Search or type URL` text input field is populated with the URL from the Clipboard,
  * AND the `Add this link` table cell is repopulated with the new URL from the Clipboard.
- * ```
+ *
+ * GIVEN the Link Picker sheet displays,
+ * AND the contents of the Clipboard are IDENTICAL to the contents of the text input field,
+ * THEN do NOT display the `From Clipboard` table cell.
  */
 describe.each( [
 	[
@@ -93,7 +96,7 @@ describe.each( [
 	it( 'should display the LINK SETTINGS with an EMPTY LINK TO field.', async ( done ) => {
 		// Arrange
 		const expectation =
-			'The LINK SETTINGS > LINK TO field should be displayed WITHOUT a URL from the CLIPBOARD.';
+			'The LINK SETTINGS > LINK TO field SHOULD be displayed WITHOUT a URL from the CLIPBOARD.';
 		const url = 'https://tonytahmouchtest.files.wordpress.com';
 		const subject = await initializeEditor( { initialHtml } );
 		Clipboard.getString.mockReturnValue( url );
@@ -129,138 +132,324 @@ describe.each( [
 		}
 	} );
 
-	/**
-	 * GIVEN a SETTINGS BOTTOM SHEET is displayed;
-	 * GIVEN the CLIPBOARD has a URL copied;
-	 * GIVEN the STATE has NO URL;
-	 * WHEN the USER selects the LINK TO cell;
-	 */
-	it(
-		'should display the LINK PICKER with the FROM CLIPBOARD CELL populated' +
-			' with the URL from the CLIPBOARD.',
-		// eslint-disable-next-line jest/no-done-callback
-		async ( done ) => {
-			// Arrange
-			const url = 'https://tonytahmouchtest.files.wordpress.com';
-			const expectation =
-				'The LINK SETTINGS > LINK TO > LINK SUGGESTION SHOULD suggest the URL from the CLIPBOARD, e.g.,' +
-				`
+	describe( '<LinkPicker/>', () => {
+		describe( 'Hide Clipboard Link Suggestion - Invalid URL in Clipboard', () => {
+			/**
+			 * GIVEN a SETTINGS BOTTOM SHEET is displayed;
+			 * GIVEN the CLIPBOARD has a NON-URL copied;
+			 * GIVEN the STATE has NO URL;
+			 * WHEN the USER selects the LINK TO cell;
+			 */
+			// eslint-disable-next-line jest/no-done-callback
+			it( 'should display the LINK PICKER with NO FROM CLIPBOARD CELL.', async ( done ) => {
+				// Arrange
+				const expectation =
+					'The LINK PICKER > LINK SUGGESTION SHOULD NOT suggest the URL from the CLIPBOARD.';
+				const url = 'tonytahmouchtest.files.wordpress.com';
+				const subject = await initializeEditor( { initialHtml } );
+				Clipboard.getString.mockReturnValue( url );
+
+				// Act
+				try {
+					const block = await waitFor( () =>
+						subject.getByA11yLabel(
+							type === 'core/image'
+								? /Image Block/
+								: /Button Block/
+						)
+					);
+					fireEvent.press( block );
+					fireEvent.press( block );
+					fireEvent.press(
+						await waitFor( () =>
+							subject.getByA11yLabel( 'Open Settings' )
+						)
+					);
+					fireEvent.press(
+						await waitFor( () =>
+							subject.getByA11yLabel(
+								`Link to, ${
+									type === 'core/image'
+										? 'None'
+										: 'Search or type URL'
+								}`
+							)
+						)
+					);
+					if ( type === 'core/image' ) {
+						fireEvent.press(
+							await waitFor( () =>
+								subject.getByA11yLabel( /Custom URL/ )
+							)
+						);
+					}
+					await waitFor( () => subject.getByA11yLabel( 'Apply' ) );
+				} catch ( error ) {
+					done.fail( error );
+				}
+
+				// Assert
+				waitFor(
+					() =>
+						subject.getByA11yLabel(
+							/Copy URL from the clipboard[,]/
+						),
+					{ timeout: 50, interval: 10 }
+				)
+					.then( () => done.fail( expectation ) )
+					.catch( () => done() );
+			} );
+		} );
+
+		describe( 'Hide Clipboard Link Suggestion - Valid and Same URL in Clipboard', () => {
+			/**
+			 * GIVEN a SETTINGS BOTTOM SHEET is displayed;
+			 * GIVEN the CLIPBOARD has a URL copied;
+			 * GIVEN the STATE has the SAME URL as the CLIPBOARD;
+			 * WHEN the USER selects the LINK TO cell;
+			 */
+			// eslint-disable-next-line jest/no-done-callback
+			it( 'should display the LINK PICKER with NO FROM CLIPBOARD CELL.', async ( done ) => {
+				// Arrange
+				const expectation =
+					'The LINK PICKER > LINK SUGGESTION SHOULD NOT suggest the URL from the CLIPBOARD.';
+				const url = 'https://tonytahmouchtest.files.wordpress.com';
+				const subject = await initializeEditor( { initialHtml } );
+				Clipboard.getString.mockReturnValue( url );
+
+				// Act
+				try {
+					const block = await waitFor( () =>
+						subject.getByA11yLabel(
+							type === 'core/image'
+								? /Image Block/
+								: /Button Block/
+						)
+					);
+					fireEvent.press( block );
+					fireEvent.press( block );
+					fireEvent.press(
+						await waitFor( () =>
+							subject.getByA11yLabel( 'Open Settings' )
+						)
+					);
+					fireEvent.press(
+						await waitFor( () =>
+							subject.getByA11yLabel(
+								`Link to, ${
+									type === 'core/image'
+										? 'None'
+										: 'Search or type URL'
+								}`
+							)
+						)
+					);
+					if ( type === 'core/image' ) {
+						fireEvent.press(
+							await waitFor( () =>
+								subject.getByA11yLabel( 'Custom URL. Empty' )
+							)
+						);
+					}
+					fireEvent.press(
+						await waitFor( () =>
+							subject.getByA11yLabel(
+								`Copy URL from the clipboard, ${ url }`
+							)
+						)
+					);
+					fireEvent.press(
+						await waitFor( () =>
+							subject.getByA11yLabel(
+								`Link to, ${
+									type === 'core/image' ? 'Custom URL' : url
+								}`
+							)
+						)
+					);
+					if ( type === 'core/image' ) {
+						fireEvent.press(
+							await waitFor( () =>
+								subject.getByA11yLabel( `Custom URL, ${ url }` )
+							)
+						);
+					}
+					await waitFor( () => subject.getByA11yLabel( 'Apply' ) );
+				} catch ( error ) {
+					done.fail( error );
+				}
+
+				// Assert
+				waitFor(
+					() =>
+						subject.getByA11yLabel(
+							/Copy URL from the clipboard[,]/
+						),
+					{ timeout: 50, interval: 10 }
+				)
+					.then( () => done.fail( expectation ) )
+					.catch( () => done() );
+			} );
+		} );
+
+		describe( 'Show Clipboard Link Suggestion - Valid and Different URL in Clipboard', () => {
+			/**
+			 * GIVEN a SETTINGS BOTTOM SHEET is displayed;
+			 * GIVEN the CLIPBOARD has a URL copied;
+			 * GIVEN the STATE has NO URL;
+			 * WHEN the USER selects the LINK TO cell;
+			 */
+			it(
+				'should display the LINK PICKER with the FROM CLIPBOARD CELL populated' +
+					' with the URL from the CLIPBOARD.',
+				// eslint-disable-next-line jest/no-done-callback
+				async ( done ) => {
+					// Arrange
+					const url = 'https://tonytahmouchtest.files.wordpress.com';
+					const expectation =
+						'The LINK PICKER > LINK SUGGESTION SHOULD suggest the URL from the CLIPBOARD, e.g.,' +
+						`
 					${ url }
 					${ __( 'From clipboard' ) }
 				`;
-			const subject = await initializeEditor( { initialHtml } );
-			Clipboard.getString.mockReturnValue( url );
+					const subject = await initializeEditor( { initialHtml } );
+					Clipboard.getString.mockReturnValue( url );
 
-			// Act
-			try {
-				const block = await waitFor( () =>
-					subject.getByA11yLabel(
-						type === 'core/image' ? /Image Block/ : /Button Block/
-					)
-				);
-				fireEvent.press( block );
-				fireEvent.press( block );
-				fireEvent.press(
-					await waitFor( () =>
-						subject.getByA11yLabel( 'Open Settings' )
-					)
-				);
-				fireEvent.press(
-					await waitFor( () =>
-						subject.getByA11yLabel(
-							`Link to, ${
+					// Act
+					try {
+						const block = await waitFor( () =>
+							subject.getByA11yLabel(
 								type === 'core/image'
-									? 'None'
-									: 'Search or type URL'
-							}`
-						)
-					)
-				);
-				if ( type === 'core/image' ) {
-					fireEvent.press(
+									? /Image Block/
+									: /Button Block/
+							)
+						);
+						fireEvent.press( block );
+						fireEvent.press( block );
+						fireEvent.press(
+							await waitFor( () =>
+								subject.getByA11yLabel( 'Open Settings' )
+							)
+						);
+						fireEvent.press(
+							await waitFor( () =>
+								subject.getByA11yLabel(
+									`Link to, ${
+										type === 'core/image'
+											? 'None'
+											: 'Search or type URL'
+									}`
+								)
+							)
+						);
+						if ( type === 'core/image' ) {
+							fireEvent.press(
+								await waitFor( () =>
+									subject.getByA11yLabel( /Custom URL/ )
+								)
+							);
+						}
 						await waitFor( () =>
-							subject.getByA11yLabel( /Custom URL/ )
-						)
-					);
+							subject.getByA11yLabel(
+								`Copy URL from the clipboard, ${ url }`
+							)
+						);
+					} catch ( error ) {
+						done.fail( error );
+					}
+
+					// Assert
+					try {
+						await waitFor( () => subject.getByText( url ) );
+						await waitFor( () =>
+							subject.getByText( __( 'From clipboard' ) )
+						);
+						done();
+					} catch ( error ) {
+						done.fail( expectation );
+					}
 				}
-				await waitFor( () =>
-					subject.getByA11yLabel(
-						`Copy URL from the clipboard, ${ url }`
-					)
-				);
-			} catch ( error ) {
-				done.fail( error );
-			}
-
-			// Assert
-			try {
-				await waitFor( () => subject.getByText( url ) );
-				await waitFor( () =>
-					subject.getByText( __( 'From clipboard' ) )
-				);
-				done();
-			} catch ( error ) {
-				done.fail( expectation );
-			}
-		}
-	);
-
-	/**
-	 * GIVEN a SETTINGS BOTTOM SHEET is displayed;
-	 * GIVEN the CLIPBOARD has a NON-URL copied;
-	 * GIVEN the STATE has NO URL;
-	 * WHEN the USER selects the LINK TO cell;
-	 */
-	// eslint-disable-next-line jest/no-done-callback
-	it( 'should display the LINK PICKER with NO FROM CLIPBOARD CELL.', async ( done ) => {
-		// Arrange
-		const expectation =
-			'The LINK SETTINGS > LINK TO > LINK SUGGESTION SHOULD NOT suggest the URL from the CLIPBOARD.';
-		const url = 'tonytahmouchtest.files.wordpress.com';
-		const subject = await initializeEditor( { initialHtml } );
-		Clipboard.getString.mockReturnValue( url );
-
-		// Act
-		try {
-			const block = await waitFor( () =>
-				subject.getByA11yLabel(
-					type === 'core/image' ? /Image Block/ : /Button Block/
-				)
 			);
-			fireEvent.press( block );
-			fireEvent.press( block );
-			fireEvent.press(
-				await waitFor( () => subject.getByA11yLabel( 'Open Settings' ) )
-			);
-			fireEvent.press(
-				await waitFor( () =>
-					subject.getByA11yLabel(
-						`Link to, ${
-							type === 'core/image'
-								? 'None'
-								: 'Search or type URL'
-						}`
-					)
-				)
-			);
-			if ( type === 'core/image' ) {
-				fireEvent.press(
-					await waitFor( () =>
-						subject.getByA11yLabel( /Custom URL/ )
-					)
-				);
-			}
-			await waitFor( () => subject.getByA11yLabel( 'Apply' ) );
-		} catch ( error ) {
-			done.fail( error );
-		}
+		} );
 
-		// Assert
-		waitFor(
-			() => subject.getByA11yLabel( /Copy URL from the clipboard[,]/ ),
-			{ timeout: 50, interval: 10 }
-		)
-			.then( () => done.fail( expectation ) )
-			.catch( () => done() );
+		describe( 'Press Clipboard Link Suggestion', () => {
+			/**
+			 * GIVEN a LINK PICKER SHEET is displayed;
+			 * GIVEN the FROM CLIPBOARD CELL is displayed;
+			 * WHEN the FROM CLIPBOARD CELL is pressed;
+			 */
+			it(
+				'should display the LINK SETTINGS with the URL from the CLIPBOARD' +
+					'populated in the LINK TO field.',
+				// eslint-disable-next-line jest/no-done-callback
+				async ( done ) => {
+					// Arrange
+					const expectation =
+						'The LINK SETTINGS > LINK TO field SHOULD be displayed WITH a URL from the CLIPBOARD.';
+					const url = 'https://tonytahmouchtest.files.wordpress.com';
+					const subject = await initializeEditor( { initialHtml } );
+					Clipboard.getString.mockReturnValue( url );
+
+					// Act
+					try {
+						const block = await waitFor( () =>
+							subject.getByA11yLabel(
+								type === 'core/image'
+									? /Image Block/
+									: /Button Block/
+							)
+						);
+						fireEvent.press( block );
+						fireEvent.press( block );
+						fireEvent.press(
+							await waitFor( () =>
+								subject.getByA11yLabel( 'Open Settings' )
+							)
+						);
+						fireEvent.press(
+							await waitFor( () =>
+								subject.getByA11yLabel(
+									`Link to, ${
+										type === 'core/image'
+											? 'None'
+											: 'Search or type URL'
+									}`
+								)
+							)
+						);
+						if ( type === 'core/image' ) {
+							fireEvent.press(
+								await waitFor( () =>
+									subject.getByA11yLabel( /Custom URL/ )
+								)
+							);
+						}
+						fireEvent.press(
+							await waitFor( () =>
+								subject.getByA11yLabel(
+									`Copy URL from the clipboard, ${ url }`
+								)
+							)
+						);
+					} catch ( error ) {
+						done.fail( error );
+					}
+
+					// Assert
+					try {
+						await waitFor( () =>
+							subject.getByA11yLabel(
+								`Link to, ${
+									type === 'core/image' ? 'Custom URL' : url
+								}`
+							)
+						);
+						done();
+					} catch ( error ) {
+						done.fail( expectation );
+					}
+				}
+			);
+		} );
 	} );
 } );

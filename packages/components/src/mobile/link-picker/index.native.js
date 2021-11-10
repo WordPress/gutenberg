@@ -133,7 +133,7 @@ export const LinkPicker = ( {
 						</TouchableOpacity>
 					) }
 				</BottomSheet.Cell>
-				{ !! clipboardUrl && (
+				{ !! clipboardUrl && clipboardUrl !== value && (
 					<BottomSheet.LinkSuggestionItemCell
 						accessible
 						accessibilityLabel={
@@ -148,7 +148,7 @@ export const LinkPicker = ( {
 							url: clipboardUrl,
 							isDirectEntry: true,
 						} }
-						onLinkPicked={ () => undefined }
+						onLinkPicked={ pickLink }
 					/>
 				) }
 				{ !! value && (
