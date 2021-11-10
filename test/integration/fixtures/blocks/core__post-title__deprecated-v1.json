@@ -1,0 +1,16 @@
+[
+	{
+		"clientId": "_clientId_0",
+		"name": "core/post-title",
+		"isValid": true,
+		"attributes": {
+			"level": 2,
+			"isLink": false,
+			"rel": "",
+			"linkTarget": "_self",
+			"fontFamily": "cambria-georgia"
+		},
+		"innerBlocks": [],
+		"originalContent": ""
+	}
+]

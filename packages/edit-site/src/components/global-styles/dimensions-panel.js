@@ -28,14 +28,14 @@ export function useHasDimensionsPanel( name ) {
 
 function useHasPadding( name ) {
 	const supports = getSupportedGlobalStylesPanels( name );
-	const [ settings ] = useSetting( 'spacing.customPadding', name );
+	const [ settings ] = useSetting( 'spacing.padding', name );
 
 	return settings && supports.includes( 'padding' );
 }
 
 function useHasMargin( name ) {
 	const supports = getSupportedGlobalStylesPanels( name );
-	const [ settings ] = useSetting( 'spacing.customMargin', name );
+	const [ settings ] = useSetting( 'spacing.margin', name );
 
 	return settings && supports.includes( 'margin' );
 }

@@ -300,6 +300,7 @@ class EditorPage {
 	// Attempts to find the given block button in the block inserter control.
 	async findBlockButton( blockName ) {
 		const blockAccessibilityLabel = `${ blockName } block`;
+		const blockAccessibilityLabelNewBlock = `${ blockAccessibilityLabel }, newly available`;
 
 		if ( isAndroid() ) {
 			const size = await this.driver.getWindowSize();
@@ -308,6 +309,9 @@ class EditorPage {
 			while (
 				! ( await this.driver.hasElementByAccessibilityId(
 					blockAccessibilityLabel
+				) ) &&
+				! ( await this.driver.hasElementByAccessibilityId(
+					blockAccessibilityLabelNewBlock
 				) )
 			) {
 				swipeFromTo(
@@ -317,14 +321,31 @@ class EditorPage {
 				);
 			}
 
+			if (
+				await this.driver.hasElementByAccessibilityId(
+					blockAccessibilityLabelNewBlock
+				)
+			) {
+				return await this.driver.elementByAccessibilityId(
+					blockAccessibilityLabelNewBlock
+				);
+			}
+
 			return await this.driver.elementByAccessibilityId(
 				blockAccessibilityLabel
 			);
 		}
 
-		const blockButton = await this.driver.elementByAccessibilityId(
-			blockAccessibilityLabel
-		);
+		const blockButton = ( await this.driver.hasElementByAccessibilityId(
+			blockAccessibilityLabelNewBlock
+		) )
+			? await this.driver.elementByAccessibilityId(
+					blockAccessibilityLabelNewBlock
+			  )
+			: await this.driver.elementByAccessibilityId(
+					blockAccessibilityLabel
+			  );
+
 		const size = await this.driver.getWindowSize();
 		// The virtual home button covers the bottom 34 in portrait and 21 on landscape on iOS.
 		// We start dragging a bit above it to not trigger home button.

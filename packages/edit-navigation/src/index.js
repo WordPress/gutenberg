@@ -92,3 +92,5 @@ export function initialize( id, settings ) {
 		document.getElementById( id )
 	);
 }
+
+export { createMenuPreloadingMiddleware as __unstableCreateMenuPreloadingMiddleware } from './utils';

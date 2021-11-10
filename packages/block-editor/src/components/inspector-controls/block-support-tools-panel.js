@@ -10,7 +10,7 @@ import { useDispatch, useSelect } from '@wordpress/data';
 import { store as blockEditorStore } from '../../store';
 import { cleanEmptyObject } from '../../hooks/utils';
 
-export default function BlockSupportToolsPanel( { children, label } ) {
+export default function BlockSupportToolsPanel( { children, group, label } ) {
 	const { clientId, attributes } = useSelect( ( select ) => {
 		const { getBlockAttributes, getSelectedBlockClientId } = select(
 			blockEditorStore
@@ -46,6 +46,7 @@ export default function BlockSupportToolsPanel( { children, label } ) {
 
 	return (
 		<ToolsPanel
+			className={ `${ group }-block-support-panel` }
 			label={ label }
 			resetAll={ resetAll }
 			key={ clientId }

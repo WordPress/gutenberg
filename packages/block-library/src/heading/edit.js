@@ -8,21 +8,21 @@ import classnames from 'classnames';
  */
 import { __ } from '@wordpress/i18n';
 import { useEffect } from '@wordpress/element';
-import { createBlock } from '@wordpress/blocks';
+import { useDispatch } from '@wordpress/data';
+import { createBlock, getDefaultBlockName } from '@wordpress/blocks';
 import {
 	AlignmentControl,
 	BlockControls,
 	RichText,
 	useBlockProps,
+	store as blockEditorStore,
 } from '@wordpress/block-editor';
 
 /**
  * Internal dependencies
  */
 import HeadingLevelDropdown from './heading-level-dropdown';
-import { generateAnchor } from './autogenerate-anchors';
-
-const allHeadingAnchors = {};
+import { generateAnchor, setAnchor } from './autogenerate-anchors';
 
 function HeadingEdit( {
 	attributes,
@@ -41,15 +41,24 @@ function HeadingEdit( {
 		style,
 	} );
 
+	const { __unstableMarkNextChangeAsNotPersistent } = useDispatch(
+		blockEditorStore
+	);
+
 	// Initially set anchor for headings that have content but no anchor set.
 	// This is used when transforming a block to heading, or for legacy anchors.
 	useEffect( () => {
 		if ( ! anchor && content ) {
+			// This side-effect should not create an undo level.
+			__unstableMarkNextChangeAsNotPersistent();
 			setAttributes( {
-				anchor: generateAnchor( clientId, content, allHeadingAnchors ),
+				anchor: generateAnchor( clientId, content ),
 			} );
 		}
-		allHeadingAnchors[ clientId ] = anchor;
+		setAnchor( clientId, anchor );
+
+		// Remove anchor map when block unmounts.
+		return () => setAnchor( clientId, null );
 	}, [ content, anchor ] );
 
 	const onContentChange = ( value ) => {
@@ -57,13 +66,9 @@ function HeadingEdit( {
 		if (
 			! anchor ||
 			! value ||
-			generateAnchor( clientId, content, allHeadingAnchors ) === anchor
+			generateAnchor( clientId, content ) === anchor
 		) {
-			newAttrs.anchor = generateAnchor(
-				clientId,
-				value,
-				allHeadingAnchors
-			);
+			newAttrs.anchor = generateAnchor( clientId, value );
 		}
 		setAttributes( newAttrs );
 	};
@@ -99,7 +104,9 @@ function HeadingEdit( {
 							content: value,
 						} );
 					} else {
-						block = createBlock( 'core/paragraph' );
+						block = createBlock(
+							getDefaultBlockName() ?? 'core/heading'
+						);
 					}
 
 					if ( isOriginal ) {

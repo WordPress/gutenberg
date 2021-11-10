@@ -126,7 +126,7 @@ export default function TemplateAreas( { closeTemplateDetailsDropdown } ) {
 		>
 			{ templateParts.map( ( { templatePart, block } ) => (
 				<TemplatePartItem
-					key={ templatePart.area }
+					key={ templatePart.slug }
 					clientId={ block.clientId }
 					templatePart={ templatePart }
 					closeTemplateDetailsDropdown={

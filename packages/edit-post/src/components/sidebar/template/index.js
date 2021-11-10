@@ -47,13 +47,15 @@ export function TemplatePanel() {
 			getCurrentPostType,
 		} = select( editorStore );
 		const { getPostType, getEntityRecords, canUser } = select( coreStore );
-		const _isViewable =
-			getPostType( getCurrentPostType() )?.viewable ?? false;
+		const currentPostType = getCurrentPostType();
+		const _isViewable = getPostType( currentPostType )?.viewable ?? false;
 		const _supportsTemplateMode =
 			select( editorStore ).getEditorSettings().supportsTemplateMode &&
 			_isViewable;
 
-		const wpTemplates = getEntityRecords( 'postType', 'wp_template' );
+		const wpTemplates = getEntityRecords( 'postType', 'wp_template', {
+			post_type: currentPostType,
+		} );
 
 		const newAvailableTemplates = fromPairs(
 			( wpTemplates || [] ).map( ( { slug, title } ) => [

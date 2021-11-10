@@ -38,7 +38,7 @@ import {
 	ColorPalette,
 	useBlockProps,
 	useSetting,
-	__experimentalUseInnerBlocksProps as useInnerBlocksProps,
+	useInnerBlocksProps,
 	__experimentalUseGradient,
 	__experimentalPanelColorGradientSettings as PanelColorGradientSettings,
 	__experimentalUnitControl as UnitControl,
@@ -333,7 +333,7 @@ function CoverEdit( {
 		gradientValue,
 		setGradient,
 	} = __experimentalUseGradient();
-	const onSelectMedia = attributesFromMedia( setAttributes );
+	const onSelectMedia = attributesFromMedia( setAttributes, dimRatio );
 	const isUploadingMedia = isTemporaryMedia( id, url );
 
 	const [ prevMinHeightValue, setPrevMinHeightValue ] = useState( minHeight );
@@ -543,6 +543,7 @@ function CoverEdit( {
 					</PanelBody>
 				) }
 				<PanelColorGradientSettings
+					__experimentalHasMultipleOrigins
 					title={ __( 'Overlay' ) }
 					initialOpen={ true }
 					settings={ [

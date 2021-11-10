@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+## 5.4.6 (2021-11-07)
+
+-   Added `disablePageDialogAccept` - Disable auto-accepting dialogs enabled by `enablePageDialogAccept` [#35828](https://github.com/WordPress/gutenberg/pull/35828).
+
 ## 5.4.0 (2021-07-21)
 
 ### New Features

@@ -190,7 +190,7 @@ const Cover = ( {
 
 	const onSelectMedia = ( media ) => {
 		setDidUploadFail( false );
-		const onSelect = attributesFromMedia( setAttributes );
+		const onSelect = attributesFromMedia( setAttributes, dimRatio );
 		onSelect( media );
 	};
 

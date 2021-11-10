@@ -24,6 +24,7 @@ export { default as BlockColorsStyleSelector } from './color-style-selector';
 export { default as BlockEdit, useBlockEditContext } from './block-edit';
 export { default as BlockIcon } from './block-icon';
 export { default as BlockNavigationDropdown } from './block-navigation/dropdown';
+export { default as BlockStyles } from './block-styles';
 export { default as __experimentalBlockVariationPicker } from './block-variation-picker';
 export { default as __experimentalBlockPatternSetup } from './block-pattern-setup';
 export { default as __experimentalBlockVariationTransforms } from './block-variation-transforms';
@@ -45,6 +46,8 @@ export { default as __experimentalDuotoneControl } from './duotone-control';
 export { default as __experimentalFontAppearanceControl } from './font-appearance-control';
 export { default as __experimentalFontFamilyControl } from './font-family';
 export { default as __experimentalLetterSpacingControl } from './letter-spacing-control';
+export { default as __experimentalTextDecorationControl } from './text-decoration-control';
+export { default as __experimentalTextTransformControl } from './text-transform-control';
 export { default as __experimentalColorGradientControl } from './colors-gradients/control';
 export { default as __experimentalPanelColorGradientSettings } from './colors-gradients/panel-color-gradient-settings';
 export {
@@ -52,10 +55,7 @@ export {
 	ImageEditingProvider as __experimentalImageEditingProvider,
 } from './image-editor';
 export { default as __experimentalImageSizeControl } from './image-size-control';
-export {
-	default as InnerBlocks,
-	useInnerBlocksProps as __experimentalUseInnerBlocksProps,
-} from './inner-blocks';
+export { default as InnerBlocks, useInnerBlocksProps } from './inner-blocks';
 export {
 	default as InspectorControls,
 	InspectorAdvancedControls,

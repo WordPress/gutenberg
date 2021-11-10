@@ -10,6 +10,7 @@ import {
 	TEMPLATE_PART_AREA_HEADER,
 	TEMPLATE_PART_AREA_FOOTER,
 	TEMPLATE_PART_AREA_SIDEBAR,
+	TEMPLATE_PART_AREA_GENERAL,
 } from '../../../store/constants';
 
 export const TEMPLATES_PRIMARY = [
@@ -101,7 +102,7 @@ export const TEMPLATE_PARTS_SUB_MENUS = [
 		title: __( 'sidebars' ),
 	},
 	{
-		area: 'uncategorized',
+		area: TEMPLATE_PART_AREA_GENERAL,
 		menu: MENU_TEMPLATE_PARTS_GENERAL,
 		title: __( 'general' ),
 	},

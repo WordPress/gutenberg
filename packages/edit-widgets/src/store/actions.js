@@ -362,6 +362,19 @@ export function setIsInserterOpened( value ) {
 }
 
 /**
+ * Returns an action object used to open/close the list view.
+ *
+ * @param {boolean} isOpen A boolean representing whether the list view should be opened or closed.
+ * @return {Object} Action object.
+ */
+export function setIsListViewOpened( isOpen ) {
+	return {
+		type: 'SET_IS_LIST_VIEW_OPENED',
+		isOpen,
+	};
+}
+
+/**
  * Returns an action object signalling that the user closed the sidebar.
  *
  * @return {Object} Action creator.

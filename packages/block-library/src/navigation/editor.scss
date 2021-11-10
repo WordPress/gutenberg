@@ -20,10 +20,14 @@
 	}
 }
 
-// This element is inline on the frontend but needs to be editable, therefore inline-block, in the editor.
+// The following rule affects the positioning of the dropdown arrow indicator.
+// On the frontend, this element is inline, which makes it look correct. In the editor,
+// the label is block, which causes the dropdown indicator to wrap onto a new line.
+// Therefore we explicitly set it to inline even in the block editor.
 .wp-block-navigation-item__label {
-	display: inline-block;
+	display: inline;
 }
+
 
 /**
  * Submenus.
@@ -33,6 +37,7 @@
 .wp-block-navigation__container.is-parent-of-selected-block {
 	visibility: visible;
 	opacity: 1;
+	overflow: visible;
 }
 
 // Low specificity default to ensure background color applies to submenus.
@@ -211,6 +216,18 @@ $color-control-label-height: 20px;
 	margin-right: 7px;
 }
 
+@keyframes loadingpulse {
+	0% {
+		opacity: 1;
+	}
+	50% {
+		opacity: 0.5;
+	}
+	100% {
+		opacity: 1;
+	}
+}
+
 // Unselected state.
 .wp-block-navigation-placeholder__preview {
 	display: flex;
@@ -219,6 +236,11 @@ $color-control-label-height: 20px;
 	flex-wrap: nowrap;
 	width: 100%;
 	overflow: hidden;
+
+	&.is-loading {
+		animation: loadingpulse 1s linear infinite;
+		animation-delay: 0.5s; // avoid animating for fast network responses
+	}
 
 	// Style skeleton elements to mostly match the metrics of actual menu items.
 	// Needs specificity.
@@ -248,29 +270,24 @@ $color-control-label-height: 20px;
 		opacity: 0.3;
 	}
 
-	// Don't show the preview boxes for an empty nav block,
-	// but be technically present to help size the empty state.
-	.wp-block-navigation.is-selected & {
-		display: flex;
-		opacity: 0;
-		width: 0;
-		overflow: hidden;
-		flex-wrap: nowrap;
-		flex: 0;
-	}
+	&:not(.is-loading) {
+		// Don't show the preview boxes for an empty nav block,
+		// but be technically present to help size the empty state.
+		.wp-block-navigation.is-selected & {
+			display: flex;
+			opacity: 0;
+			width: 0;
+			overflow: hidden;
+			flex-wrap: nowrap;
+			flex: 0;
+		}
 
-	// Hide entirely when vertical.
-	.is-vertical.is-selected & {
-		display: none;
-	}
-
-	// Hide entirely when the placeholder can still be toggled.
-	.wp-block-navigation.is-selected .is-small & {
-		display: none;
-	}
-
-	.wp-block-navigation.is-selected .is-medium & {
-		display: none;
+		// Hide entirely when vertical.
+		.is-vertical.is-selected &,
+		.wp-block-navigation.is-selected .is-small &,
+		.wp-block-navigation.is-selected .is-medium & {
+			display: none;
+		}
 	}
 }
 
@@ -508,4 +525,48 @@ body.editor-styles-wrapper
 	.block-list-appender {
 		margin-top: $grid-unit-20;
 	}
+}
+
+@keyframes fadein {
+	0% {
+		opacity: 0;
+	}
+	100% {
+		opacity: 1;
+	}
+}
+
+.wp-block-navigation__unsaved-changes {
+	position: relative;
+
+	.components-spinner {
+		position: absolute;
+		top: calc(50% - #{$spinner-size} / 2);
+		left: calc(50% - #{$spinner-size} / 2);
+
+		// Delay showing the saving spinner until after 2 seconds.
+		// This should ensure it only shows for slow connections.
+		opacity: 0;
+		animation: 0.5s linear 2s normal forwards fadein;
+	}
+}
+
+@keyframes fadeouthalf {
+	0% {
+		opacity: 1;
+	}
+	100% {
+		opacity: 0.5;
+	}
+}
+
+.wp-block-navigation__unsaved-changes-overlay.is-saving {
+	opacity: 1;
+	animation: 0.5s linear 2s normal forwards fadeouthalf;
+}
+
+.wp-block-navigation-delete-menu-button {
+	width: 100%;
+	justify-content: center;
+	margin-bottom: $grid-unit-20;
 }

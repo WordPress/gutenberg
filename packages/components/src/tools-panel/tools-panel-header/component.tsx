@@ -153,6 +153,7 @@ const ToolsPanelHeader = (
 					icon={ dropDownMenuIcon }
 					label={ dropDownMenuLabelText }
 					menuProps={ { className: dropdownMenuClassName } }
+					toggleProps={ { isSmall: true } }
 				>
 					{ ( { onClose = noop } ) => (
 						<>

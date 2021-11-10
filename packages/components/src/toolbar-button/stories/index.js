@@ -14,7 +14,13 @@ import { wordpress } from '@wordpress/icons';
 import { Toolbar } from '../../';
 import ToolbarButton from '../';
 
-export default { title: 'Components/ToolbarButton', component: ToolbarButton };
+export default {
+	title: 'Components/ToolbarButton',
+	component: ToolbarButton,
+	parameters: {
+		knobs: { disabled: false },
+	},
+};
 
 export const _default = () => {
 	const label = text( 'Label', 'This is an example label.' );

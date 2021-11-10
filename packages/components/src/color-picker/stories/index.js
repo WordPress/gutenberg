@@ -19,6 +19,9 @@ import { space } from '../../ui/utils/space';
 export default {
 	component: ColorPicker,
 	title: 'Components/ColorPicker',
+	parameters: {
+		knobs: { disabled: false },
+	},
 };
 
 const PROP_UNSET = 'unset';

@@ -7,6 +7,12 @@ import { mapValues, omit } from 'lodash';
  * WordPress dependencies
  */
 import { InnerBlocks } from '@wordpress/block-editor';
+import { compose } from '@wordpress/compose';
+
+/**
+ * Internal dependencies
+ */
+import migrateFontFamily from '../utils/migrate-font-family';
 
 const TYPOGRAPHY_PRESET_DEPRECATION_MAP = {
 	fontStyle: 'var:preset|font-style|',
@@ -15,7 +21,246 @@ const TYPOGRAPHY_PRESET_DEPRECATION_MAP = {
 	textTransform: 'var:preset|text-transform|',
 };
 
+const migrateWithLayout = ( attributes ) => {
+	if ( !! attributes.layout ) {
+		return attributes;
+	}
+
+	const { itemsJustification, orientation } = attributes;
+
+	const updatedAttributes = {
+		...attributes,
+	};
+
+	if ( itemsJustification || orientation ) {
+		Object.assign( updatedAttributes, {
+			layout: {
+				type: 'flex',
+				justifyContent: itemsJustification || 'left',
+				orientation: orientation || 'horizontal',
+			},
+		} );
+		delete updatedAttributes.itemsJustification;
+		delete updatedAttributes.orientation;
+	}
+
+	return updatedAttributes;
+};
+
+const v5 = {
+	attributes: {
+		navigationMenuId: {
+			type: 'number',
+		},
+		orientation: {
+			type: 'string',
+			default: 'horizontal',
+		},
+		textColor: {
+			type: 'string',
+		},
+		customTextColor: {
+			type: 'string',
+		},
+		rgbTextColor: {
+			type: 'string',
+		},
+		backgroundColor: {
+			type: 'string',
+		},
+		customBackgroundColor: {
+			type: 'string',
+		},
+		rgbBackgroundColor: {
+			type: 'string',
+		},
+		itemsJustification: {
+			type: 'string',
+		},
+		showSubmenuIcon: {
+			type: 'boolean',
+			default: true,
+		},
+		openSubmenusOnClick: {
+			type: 'boolean',
+			default: false,
+		},
+		overlayMenu: {
+			type: 'string',
+			default: 'never',
+		},
+		__unstableLocation: {
+			type: 'string',
+		},
+		overlayBackgroundColor: {
+			type: 'string',
+		},
+		customOverlayBackgroundColor: {
+			type: 'string',
+		},
+		overlayTextColor: {
+			type: 'string',
+		},
+		customOverlayTextColor: {
+			type: 'string',
+		},
+	},
+	supports: {
+		align: [ 'wide', 'full' ],
+		anchor: true,
+		html: false,
+		inserter: true,
+		typography: {
+			fontSize: true,
+			lineHeight: true,
+			__experimentalFontStyle: true,
+			__experimentalFontWeight: true,
+			__experimentalTextTransform: true,
+			__experimentalFontFamily: true,
+			__experimentalTextDecoration: true,
+			__experimentalDefaultControls: {
+				fontSize: true,
+			},
+		},
+		spacing: {
+			blockGap: true,
+			units: [ 'px', 'em', 'rem', 'vh', 'vw' ],
+			__experimentalDefaultControls: {
+				blockGap: true,
+			},
+		},
+	},
+	save() {
+		return <InnerBlocks.Content />;
+	},
+	isEligible: ( { itemsJustification, orientation } ) =>
+		!! itemsJustification || !! orientation,
+	migrate: migrateWithLayout,
+};
+
+const v4 = {
+	attributes: {
+		orientation: {
+			type: 'string',
+			default: 'horizontal',
+		},
+		textColor: {
+			type: 'string',
+		},
+		customTextColor: {
+			type: 'string',
+		},
+		rgbTextColor: {
+			type: 'string',
+		},
+		backgroundColor: {
+			type: 'string',
+		},
+		customBackgroundColor: {
+			type: 'string',
+		},
+		rgbBackgroundColor: {
+			type: 'string',
+		},
+		itemsJustification: {
+			type: 'string',
+		},
+		showSubmenuIcon: {
+			type: 'boolean',
+			default: true,
+		},
+		openSubmenusOnClick: {
+			type: 'boolean',
+			default: false,
+		},
+		overlayMenu: {
+			type: 'string',
+			default: 'never',
+		},
+		__unstableLocation: {
+			type: 'string',
+		},
+		overlayBackgroundColor: {
+			type: 'string',
+		},
+		customOverlayBackgroundColor: {
+			type: 'string',
+		},
+		overlayTextColor: {
+			type: 'string',
+		},
+		customOverlayTextColor: {
+			type: 'string',
+		},
+	},
+	supports: {
+		align: [ 'wide', 'full' ],
+		anchor: true,
+		html: false,
+		inserter: true,
+		typography: {
+			fontSize: true,
+			lineHeight: true,
+			__experimentalFontStyle: true,
+			__experimentalFontWeight: true,
+			__experimentalTextTransform: true,
+			__experimentalFontFamily: true,
+			__experimentalTextDecoration: true,
+		},
+		spacing: {
+			blockGap: true,
+			units: [ 'px', 'em', 'rem', 'vh', 'vw' ],
+			__experimentalDefaultControls: {
+				blockGap: true,
+			},
+		},
+	},
+	save() {
+		return <InnerBlocks.Content />;
+	},
+	migrate: compose( migrateWithLayout, migrateFontFamily ),
+	isEligible( { style } ) {
+		return style?.typography?.fontFamily;
+	},
+};
+
+const migrateIsResponsive = function ( attributes ) {
+	delete attributes.isResponsive;
+	return {
+		...attributes,
+		overlayMenu: 'mobile',
+	};
+};
+
+const migrateTypographyPresets = function ( attributes ) {
+	return {
+		...attributes,
+		style: {
+			...attributes.style,
+			typography: mapValues(
+				attributes.style.typography,
+				( value, key ) => {
+					const prefix = TYPOGRAPHY_PRESET_DEPRECATION_MAP[ key ];
+					if ( prefix && value.startsWith( prefix ) ) {
+						const newValue = value.slice( prefix.length );
+						if (
+							'textDecoration' === key &&
+							'strikethrough' === newValue
+						) {
+							return 'line-through';
+						}
+						return newValue;
+					}
+					return value;
+				}
+			),
+		},
+	};
+};
+
 const deprecated = [
+	v5,
+	v4,
 	// Remove `isResponsive` attribute.
 	{
 		attributes: {
@@ -90,13 +335,11 @@ const deprecated = [
 		isEligible( attributes ) {
 			return attributes.isResponsive;
 		},
-		migrate( attributes ) {
-			delete attributes.isResponsive;
-			return {
-				...attributes,
-				overlayMenu: 'mobile',
-			};
-		},
+		migrate: compose(
+			migrateWithLayout,
+			migrateFontFamily,
+			migrateIsResponsive
+		),
 		save() {
 			return <InnerBlocks.Content />;
 		},
@@ -166,32 +409,11 @@ const deprecated = [
 			}
 			return false;
 		},
-		migrate( attributes ) {
-			return {
-				...attributes,
-				style: {
-					...attributes.style,
-					typography: mapValues(
-						attributes.style.typography,
-						( value, key ) => {
-							const prefix =
-								TYPOGRAPHY_PRESET_DEPRECATION_MAP[ key ];
-							if ( prefix && value.startsWith( prefix ) ) {
-								const newValue = value.slice( prefix.length );
-								if (
-									'textDecoration' === key &&
-									'strikethrough' === newValue
-								) {
-									return 'line-through';
-								}
-								return newValue;
-							}
-							return value;
-						}
-					),
-				},
-			};
-		},
+		migrate: compose(
+			migrateWithLayout,
+			migrateFontFamily,
+			migrateTypographyPresets
+		),
 	},
 	{
 		attributes: {

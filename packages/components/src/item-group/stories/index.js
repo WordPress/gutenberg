@@ -26,6 +26,9 @@ import { ZStack } from '../../z-stack';
 export default {
 	component: ItemGroup,
 	title: 'Components (Experimental)/ItemGroup',
+	parameters: {
+		knobs: { disabled: false },
+	},
 };
 
 // Using `unset` instead of `undefined` as Storybook seems to sometimes pass an

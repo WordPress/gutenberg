@@ -68,6 +68,7 @@ const EmbedBottomSheet = ( { value, label, isVisible, onClose, onSubmit } ) => {
 			onDismiss={ onDismiss }
 			setAttributes={ setAttributes }
 			options={ linkSettingsOptions }
+			testID="embed-edit-url-modal"
 			withBottomSheet
 			showIcon
 		/>

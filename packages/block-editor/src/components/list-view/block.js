@@ -11,7 +11,13 @@ import {
 	__experimentalTreeGridItem as TreeGridItem,
 } from '@wordpress/components';
 import { moreVertical } from '@wordpress/icons';
-import { useState, useRef, useEffect } from '@wordpress/element';
+import {
+	useState,
+	useRef,
+	useEffect,
+	useCallback,
+	memo,
+} from '@wordpress/element';
 import { useDispatch } from '@wordpress/data';
 
 /**
@@ -27,14 +33,12 @@ import BlockSettingsDropdown from '../block-settings-menu/block-settings-dropdow
 import { useListViewContext } from './context';
 import { store as blockEditorStore } from '../../store';
 
-export default function ListViewBlock( {
+function ListViewBlock( {
 	block,
-	isSelected,
 	isDragged,
+	isSelected,
 	isBranchSelected,
-	isLastOfSelectedBranch,
-	onClick,
-	onToggleExpanded,
+	selectBlock,
 	position,
 	level,
 	rowCount,
@@ -49,17 +53,22 @@ export default function ListViewBlock( {
 
 	const { toggleBlockHighlight } = useDispatch( blockEditorStore );
 
+	const {
+		__experimentalFeatures: withExperimentalFeatures,
+		__experimentalPersistentListViewFeatures: withExperimentalPersistentListViewFeatures,
+		__experimentalHideContainerBlockActions: hideContainerBlockActions,
+		isTreeGridMounted,
+		expand,
+		collapse,
+	} = useListViewContext();
+
 	const hasSiblings = siblingBlockCount > 0;
 	const hasRenderedMovers = showBlockMovers && hasSiblings;
 	const moverCellClassName = classnames(
 		'block-editor-list-view-block__mover-cell',
 		{ 'is-visible': isHovered || isSelected }
 	);
-	const {
-		__experimentalFeatures: withExperimentalFeatures,
-		__experimentalPersistentListViewFeatures: withExperimentalPersistentListViewFeatures,
-		isTreeGridMounted,
-	} = useListViewContext();
+
 	const listViewBlockSettingsClassName = classnames(
 		'block-editor-list-view-block__menu-cell',
 		{ 'is-visible': isHovered || isSelected }
@@ -82,23 +91,56 @@ export default function ListViewBlock( {
 		? toggleBlockHighlight
 		: () => {};
 
-	const onMouseEnter = () => {
+	const onMouseEnter = useCallback( () => {
 		setIsHovered( true );
 		highlightBlock( clientId, true );
-	};
-	const onMouseLeave = () => {
+	}, [ clientId, setIsHovered, highlightBlock ] );
+	const onMouseLeave = useCallback( () => {
 		setIsHovered( false );
 		highlightBlock( clientId, false );
-	};
+	}, [ clientId, setIsHovered, highlightBlock ] );
+
+	const selectEditorBlock = useCallback(
+		( event ) => {
+			event.stopPropagation();
+			selectBlock( clientId );
+		},
+		[ clientId, selectBlock ]
+	);
+
+	const toggleExpanded = useCallback(
+		( event ) => {
+			event.stopPropagation();
+			if ( isExpanded === true ) {
+				collapse( clientId );
+			} else if ( isExpanded === false ) {
+				expand( clientId );
+			}
+		},
+		[ clientId, expand, collapse, isExpanded ]
+	);
+
+	const showBlockActions =
+		withExperimentalFeatures &&
+		//hide actions for blocks like core/widget-areas
+		( ! hideContainerBlockActions ||
+			( hideContainerBlockActions && level > 1 ) );
+
+	const hideBlockActions = withExperimentalFeatures && ! showBlockActions;
+
+	let colSpan;
+	if ( hasRenderedMovers ) {
+		colSpan = 2;
+	} else if ( hideBlockActions ) {
+		colSpan = 3;
+	}
 
 	const classes = classnames( {
 		'is-selected': isSelected,
 		'is-branch-selected':
 			withExperimentalPersistentListViewFeatures && isBranchSelected,
-		'is-last-of-selected-branch':
-			withExperimentalPersistentListViewFeatures &&
-			isLastOfSelectedBranch,
 		'is-dragging': isDragged,
+		'has-single-cell': hideBlockActions,
 	} );
 
 	return (
@@ -118,15 +160,15 @@ export default function ListViewBlock( {
 		>
 			<TreeGridCell
 				className="block-editor-list-view-block__contents-cell"
-				colSpan={ hasRenderedMovers ? undefined : 2 }
+				colSpan={ colSpan }
 				ref={ cellRef }
 			>
 				{ ( { ref, tabIndex, onFocus } ) => (
 					<div className="block-editor-list-view-block__contents-container">
 						<ListViewBlockContents
 							block={ block }
-							onClick={ onClick }
-							onToggleExpanded={ onToggleExpanded }
+							onClick={ selectEditorBlock }
+							onToggleExpanded={ toggleExpanded }
 							isSelected={ isSelected }
 							position={ position }
 							siblingBlockCount={ siblingBlockCount }
@@ -170,7 +212,7 @@ export default function ListViewBlock( {
 				</>
 			) }
 
-			{ withExperimentalFeatures && (
+			{ showBlockActions && (
 				<TreeGridCell className={ listViewBlockSettingsClassName }>
 					{ ( { ref, tabIndex, onFocus } ) => (
 						<BlockSettingsDropdown
@@ -183,7 +225,7 @@ export default function ListViewBlock( {
 								onFocus,
 							} }
 							disableOpenOnArrowDown
-							__experimentalSelectBlock={ onClick }
+							__experimentalSelectBlock={ selectEditorBlock }
 						/>
 					) }
 				</TreeGridCell>
@@ -191,3 +233,5 @@ export default function ListViewBlock( {
 		</ListViewLeaf>
 	);
 }
+
+export default memo( ListViewBlock );

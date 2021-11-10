@@ -10,29 +10,22 @@ import { setBlockTypeImpressions } from '@wordpress/react-native-bridge';
 import { store as blockEditorStore } from '../../../store';
 
 function useBlockTypeImpressions( blockTypes ) {
-	const { blockTypeImpressions, enableEditorOnboarding } = useSelect(
-		( select ) => {
-			const { getSettings: getBlockEditorSettings } = select(
-				blockEditorStore
-			);
-			const { editorOnboarding, impressions } = getBlockEditorSettings();
+	const { blockTypeImpressions } = useSelect( ( select ) => {
+		const { getSettings: getBlockEditorSettings } = select(
+			blockEditorStore
+		);
+		const { impressions } = getBlockEditorSettings();
 
-			return {
-				blockTypeImpressions: impressions,
-				enableEditorOnboarding: editorOnboarding,
-			};
-		},
-		[]
-	);
+		return {
+			blockTypeImpressions: impressions,
+		};
+	}, [] );
 	const { updateSettings } = useDispatch( blockEditorStore );
 
-	const items = enableEditorOnboarding
-		? blockTypes.map( ( blockType ) => ( {
-				...blockType,
-				isNew: blockTypeImpressions[ blockType.name ] > 0,
-		  } ) )
-		: blockTypes;
-
+	const items = blockTypes.map( ( blockType ) => ( {
+		...blockType,
+		isNew: blockTypeImpressions[ blockType.name ] > 0,
+	} ) );
 	const trackBlockTypeSelected = ( { name } ) => {
 		if ( blockTypeImpressions[ name ] > 0 ) {
 			const updatedBlockTypeImpressions = {

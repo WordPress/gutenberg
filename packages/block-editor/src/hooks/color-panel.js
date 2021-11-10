@@ -60,6 +60,7 @@ export default function ColorPanel( {
 				initialOpen={ false }
 				settings={ settings }
 				showTitle={ showTitle }
+				__experimentalHasMultipleOrigins
 			>
 				{ enableContrastChecking && (
 					<ContrastChecker
