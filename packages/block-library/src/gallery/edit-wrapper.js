@@ -9,6 +9,7 @@ import { useSelect } from '@wordpress/data';
  */
 import EditWithInnerBlocks from './edit';
 import EditWithoutInnerBlocks from './v1/edit';
+import { isGalleryV2Enabled } from './shared';
 
 /*
  * Using a wrapper around the logic to load the edit for v1 of Gallery block
@@ -25,11 +26,6 @@ export default function GalleryEditWrapper( props ) {
 		[ clientId ]
 	);
 
-	const __unstableGalleryWithImageBlocks = useSelect( ( select ) => {
-		const settings = select( blockEditorStore ).getSettings();
-		return settings.__unstableGalleryWithImageBlocks;
-	}, [] );
-
 	// This logic is used to infer version information from content with higher
 	// precedence than the flag. New galleries (and existing empty galleries) will
 	// honor the flag.
@@ -38,7 +34,7 @@ export default function GalleryEditWrapper( props ) {
 		0 < attributes?.ids?.length || 0 < attributes?.images?.length;
 	if (
 		hasOldVersionContent ||
-		( ! hasNewVersionContent && ! __unstableGalleryWithImageBlocks )
+		( ! hasNewVersionContent && ! isGalleryV2Enabled() )
 	) {
 		return <EditWithoutInnerBlocks { ...props } />;
 	}

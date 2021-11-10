@@ -16,9 +16,10 @@ import {
  * Internal dependencies
  */
 import saveWithoutInnerBlocks from './v1/save';
+import { isGalleryV2Enabled } from './shared';
 
 export default function saveWithInnerBlocks( { attributes } ) {
-	if ( ! window.wp.galleryBlockV2Enabled ) {
+	if ( ! isGalleryV2Enabled() ) {
 		return saveWithoutInnerBlocks( { attributes } );
 	}
 

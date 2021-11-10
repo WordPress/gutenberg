@@ -3,6 +3,13 @@
  */
 import { get, pick } from 'lodash';
 
+/**
+ * WordPress dependencies
+ */
+import { Platform } from '@wordpress/element';
+import { select } from '@wordpress/data';
+import { store as blockEditorStore } from '@wordpress/block-editor';
+
 export function defaultColumnsNumber( imageCount ) {
 	return imageCount ? Math.min( 3, imageCount ) : 3;
 }
@@ -21,3 +28,16 @@ export const pickRelevantMediaFiles = ( image, sizeSlug = 'large' ) => {
 	}
 	return imageProps;
 };
+
+export function isGalleryV2Enabled() {
+	if ( Platform.isWeb && window.wp.galleryBlockV2Enabled ) {
+		return true;
+	}
+
+	const settings = select( blockEditorStore ).getSettings();
+	if ( settings.__unstableGalleryWithImageBlocks ) {
+		return true;
+	}
+
+	return false;
+}

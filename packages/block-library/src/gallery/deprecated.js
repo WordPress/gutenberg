@@ -19,6 +19,7 @@ import {
 	LINK_DESTINATION_MEDIA,
 	LINK_DESTINATION_NONE,
 } from './constants';
+import { isGalleryV2Enabled } from './shared';
 
 const DEPRECATED_LINK_DESTINATION_MEDIA = 'file';
 const DEPRECATED_LINK_DESTINATION_ATTACHMENT = 'post';
@@ -280,7 +281,7 @@ const v6 = {
 		);
 	},
 	migrate( attributes ) {
-		if ( window.wp.galleryBlockV2Enabled ) {
+		if ( isGalleryV2Enabled() ) {
 			return runV2Migration( attributes );
 		}
 
@@ -370,7 +371,7 @@ const v5 = {
 		return ! linkTo || linkTo === 'attachment' || linkTo === 'media';
 	},
 	migrate( attributes ) {
-		if ( window.wp.galleryBlockV2Enabled ) {
+		if ( isGalleryV2Enabled() ) {
 			return runV2Migration( attributes );
 		}
 
@@ -533,7 +534,7 @@ const v4 = {
 		return ids && ids.some( ( id ) => typeof id === 'string' );
 	},
 	migrate( attributes ) {
-		if ( window.wp.galleryBlockV2Enabled ) {
+		if ( isGalleryV2Enabled() ) {
 			return runV2Migration( attributes );
 		}
 
@@ -739,7 +740,7 @@ const v3 = {
 		);
 	},
 	migrate( attributes ) {
-		if ( window.wp.galleryBlockV2Enabled ) {
+		if ( isGalleryV2Enabled() ) {
 			return runV2Migration( attributes );
 		}
 	},
@@ -807,7 +808,7 @@ const v2 = {
 		);
 	},
 	migrate( attributes ) {
-		if ( window.wp.galleryBlockV2Enabled ) {
+		if ( isGalleryV2Enabled() ) {
 			return runV2Migration( attributes );
 		}
 		return {
@@ -971,7 +972,7 @@ const v1 = {
 		);
 	},
 	migrate( attributes ) {
-		if ( window.wp.galleryBlockV2Enabled ) {
+		if ( isGalleryV2Enabled() ) {
 			return runV2Migration( attributes );
 		}
 
