@@ -14,10 +14,6 @@ class Block_Fixture_Test extends WP_UnitTestCase {
 	 * @dataProvider data_block_fixtures
 	 */
 	function test_kses_doesnt_change_fixtures( $block, $filename ) {
-		// Skip this test while Gutenberg is pinned to WordPress 5.8.1.
-		// Once WordPress 5.9 is released, this test can be re-enabled.
-		// See: https://github.com/WordPress/gutenberg/pull/35611.
-		$this->markTestSkipped( 'This test requires WordPress 5.9. See: https://core.trac.wordpress.org/ticket/54261' );
 
 		// KSES doesn't allow data: URLs, so we need to replace any of them in fixtures.
 		$block = preg_replace( "/src=['\"]data:[^'\"]+['\"]/", 'src="https://wordpress.org/foo.jpg"', $block );
