@@ -22,6 +22,7 @@ function gutenberg_register_template_part_post_type() {
 		'new_item'              => __( 'New Template Part', 'gutenberg' ),
 		'edit_item'             => __( 'Edit Template Part', 'gutenberg' ),
 		'view_item'             => __( 'View Template Part', 'gutenberg' ),
+		'view_items'            => __( 'View Template Parts', 'gutenberg' ),
 		'all_items'             => __( 'All Template Parts', 'gutenberg' ),
 		'search_items'          => __( 'Search Template Parts', 'gutenberg' ),
 		'parent_item_colon'     => __( 'Parent Template Part:', 'gutenberg' ),

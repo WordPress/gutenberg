@@ -22,6 +22,7 @@ function gutenberg_register_template_post_type() {
 		'new_item'              => __( 'New Template', 'gutenberg' ),
 		'edit_item'             => __( 'Edit Template', 'gutenberg' ),
 		'view_item'             => __( 'View Template', 'gutenberg' ),
+		'view_items'            => __( 'View Templates', 'gutenberg' ),
 		'all_items'             => __( 'All Templates', 'gutenberg' ),
 		'search_items'          => __( 'Search Templates', 'gutenberg' ),
 		'parent_item_colon'     => __( 'Parent Template:', 'gutenberg' ),
