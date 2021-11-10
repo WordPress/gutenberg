@@ -27,6 +27,7 @@ import RedoButton from './undo-redo/redo';
 import DocumentActions from './document-actions';
 import TemplateDetails from '../template-details';
 import { store as editSiteStore } from '../../store';
+import MainDashboardButton from '../main-dashboard-button';
 
 const preventDefault = ( event ) => {
 	event.preventDefault();
@@ -106,7 +107,9 @@ export default function Header( {
 	return (
 		<div className="edit-site-header">
 			<div className="edit-site-header_start">
-				<NavigationLink />
+				<MainDashboardButton.Slot>
+					<NavigationLink />
+				</MainDashboardButton.Slot>
 
 				<div className="edit-site-header__toolbar">
 					<Button

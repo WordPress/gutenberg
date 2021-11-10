@@ -1,14 +1,11 @@
 {
+	"$schema": "https://schemas.wp.org/trunk/block.json",
 	"apiVersion": 2,
 	"name": "core/navigation",
 	"title": "Navigation",
 	"category": "theme",
 	"description": "A collection of blocks that allow visitors to get around your site.",
-	"keywords": [
-		"menu",
-		"navigation",
-		"links"
-	],
+	"keywords": [ "menu", "navigation", "links" ],
 	"textdomain": "default",
 	"attributes": {
 		"navigationMenuId": {
@@ -78,10 +75,7 @@
 		"orientation": "orientation"
 	},
 	"supports": {
-		"align": [
-			"wide",
-			"full"
-		],
+		"align": [ "wide", "full" ],
 		"anchor": true,
 		"html": false,
 		"inserter": true,
@@ -99,13 +93,7 @@
 		},
 		"spacing": {
 			"blockGap": true,
-			"units": [
-				"px",
-				"em",
-				"rem",
-				"vh",
-				"vw"
-			],
+			"units": [ "px", "em", "rem", "vh", "vw" ],
 			"__experimentalDefaultControls": {
 				"blockGap": true
 			}
@@ -114,7 +102,8 @@
 			"allowSwitching": false,
 			"allowInheriting": false,
 			"default": {
-				"type": "flex"
+				"type": "flex",
+				"setCascadingProperties": true
 			}
 		}
 	},

@@ -20,7 +20,7 @@ class WP_REST_Menus_Controller extends WP_REST_Terms_Controller {
 	 */
 	public function __construct( $taxonomy ) {
 		parent::__construct( $taxonomy );
-		$this->namespace = '__experimental';
+		$this->namespace = 'wp/v2';
 	}
 
 	/**

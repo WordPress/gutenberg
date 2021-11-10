@@ -3,8 +3,8 @@
  */
 import { rest, batch } from './rest-api';
 
-const menusEndpoint = '/__experimental/menus';
-const menuItemsEndpoint = '/__experimental/menu-items';
+const menusEndpoint = '/wp/v2/menus';
+const menuItemsEndpoint = '/wp/v2/menu-items';
 
 const menuItemObjectRequests = {
 	post: ( menuItem ) => ( {
