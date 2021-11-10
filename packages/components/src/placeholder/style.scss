@@ -30,6 +30,14 @@
 	.components-base-control__label {
 		font-size: $default-font-size;
 	}
+
+	// Separator.
+	hr {
+		border: 0;
+		min-height: $border-width;
+		min-width: $border-width;
+		background-color: $gray-900;
+	}
 }
 
 .components-placeholder__error,
