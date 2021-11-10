@@ -6,7 +6,7 @@ import { some, groupBy } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { Button, PanelBody, PanelRow } from '@wordpress/components';
+import { Button } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { Fragment, useState, useCallback, useRef } from '@wordpress/element';
@@ -18,7 +18,7 @@ import { close as closeIcon } from '@wordpress/icons';
  * Internal dependencies
  */
 import EntityTypeList from './entity-type-list';
-import EntityRecordItem from './entity-record-item';
+import DiscardEntityChangesPanel from './discard-entity-changes-panel';
 
 const TRANSLATED_SITE_PROPERTIES = {
 	title: __( 'Title' ),
@@ -74,8 +74,6 @@ export default function EntitiesSavedStates( { close } ) {
 		editEntityRecord,
 		saveEditedEntityRecord,
 		__experimentalSaveSpecifiedEntityEdits: saveSpecifiedEntityEdits,
-		__experimentalResetEditedEntityRecord: resetEditedEntityRecord,
-		__experimentalResetSpecifiedEntityEdits: resetSpecifiedEntityEdits,
 	} = useDispatch( coreStore );
 
 	// To group entities by type.
@@ -175,38 +173,6 @@ export default function EntitiesSavedStates( { close } ) {
 		}
 	};
 
-	const discardCheckedEntities = () => {
-		const entitiesToDiscard = dirtyEntityRecords.filter(
-			( { kind, name, key, property } ) => {
-				return ! some(
-					unselectedEntities,
-					( elt ) =>
-						elt.kind === kind &&
-						elt.name === name &&
-						elt.key === key &&
-						elt.property === property
-				);
-			}
-		);
-
-		close();
-
-		const siteItemsToDiscard = [];
-		entitiesToDiscard.forEach( ( { kind, name, key, property } ) => {
-			if ( 'root' === kind && 'site' === name ) {
-				siteItemsToDiscard.push( property );
-			} else {
-				resetEditedEntityRecord( kind, name, key );
-			}
-		} );
-		resetSpecifiedEntityEdits(
-			'root',
-			'site',
-			undefined,
-			siteItemsToDiscard
-		);
-	};
-
 	// Explicitly define this with no argument passed.  Using `close` on
 	// its own will use the event object in place of the expected saved entities.
 	const dismissPanel = useCallback( () => close(), [ close ] );
@@ -240,70 +206,6 @@ export default function EntitiesSavedStates( { close } ) {
 		</Fragment>
 	);
 
-	const DiscardEntitiesPanel = () => (
-		<Fragment>
-			<div className="entities-saved-states__discard-changes-panel">
-				<div className="entities-saved-states__text-prompt">
-					<strong>{ __( "What's next?" ) }</strong>
-					<p>
-						{ __(
-							'Your template still has some unsaved changes.'
-						) }
-					</p>
-					<p>
-						{ __(
-							'You can select them and discard their changes, or continue editing and deal with them later.'
-						) }
-					</p>
-				</div>
-
-				<PanelBody initialOpen={ true }>
-					{ sortedPartitionedSavables.flat().map( ( record ) => {
-						return (
-							<EntityRecordItem
-								key={ record.key || record.property }
-								record={ record }
-								checked={
-									! some(
-										unselectedEntities,
-										( elt ) =>
-											elt.kind === record.kind &&
-											elt.name === record.name &&
-											elt.key === record.key &&
-											elt.property === record.property
-									)
-								}
-								onChange={ ( value ) =>
-									setUnselectedEntities( record, value )
-								}
-								//closePanel={ closePanel }
-							/>
-						);
-					} ) }
-					<PanelRow>
-						<Button
-							disabled={
-								dirtyEntityRecords.length -
-									unselectedEntities.length ===
-								0
-							}
-							isDestructive
-							onClick={ discardCheckedEntities }
-						>
-							{ __( 'Discard changes' ) }
-						</Button>
-					</PanelRow>
-				</PanelBody>
-			</div>
-
-			<div className="entities-saved-states__footer">
-				<Button onClick={ dismissPanel } variant="primary">
-					<span>{ __( 'Continue editing' ) }</span>
-				</Button>
-			</div>
-		</Fragment>
-	);
-
 	return (
 		<div
 			ref={ saveDialogRef }
@@ -333,7 +235,11 @@ export default function EntitiesSavedStates( { close } ) {
 				/>
 			</div>
 			{ discardEntitiesPanel ? (
-				<DiscardEntitiesPanel />
+				<DiscardEntityChangesPanel
+					closePanel={ dismissPanel }
+					dirtyEntityRecords={ dirtyEntityRecords }
+					savables={ sortedPartitionedSavables.flat() }
+				/>
 			) : (
 				<SaveEntitiesPanel />
 			) }
