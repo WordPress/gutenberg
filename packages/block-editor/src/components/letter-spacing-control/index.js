@@ -33,7 +33,8 @@ export default function LetterSpacingControl( {
 	} );
 	return (
 		<UnitControl
-			label={ __( 'Letter-spacing' ) }
+			className="block-editor-letter-spacing-control"
+			label={ __( 'Letter spacing' ) }
 			value={ value }
 			__unstableInputWidth={ __unstableInputWidth }
 			units={ units }

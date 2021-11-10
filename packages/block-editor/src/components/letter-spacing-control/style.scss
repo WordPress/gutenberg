@@ -1,0 +1,6 @@
+// Needs specificity to override the very specific generated View component CSS.
+.block-editor-letter-spacing-control .components-flex-item > .components-text.components-input-control__label {
+	padding-bottom: 0;
+	margin-bottom: 8px;
+	line-height: inherit;
+}
