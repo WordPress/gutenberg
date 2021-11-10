@@ -127,6 +127,7 @@ require __DIR__ . '/widgets.php';
 require __DIR__ . '/widgets-api.php';
 require __DIR__ . '/widgets-customize.php';
 require __DIR__ . '/navigation.php';
+require __DIR__ . '/navigation-theme-opt-in.php';
 require __DIR__ . '/navigation-page.php';
 require __DIR__ . '/experiments-page.php';
 require __DIR__ . '/global-styles.php';

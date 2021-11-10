@@ -19,7 +19,7 @@ class WP_REST_Menu_Items_Controller extends WP_REST_Posts_Controller {
 	 */
 	public function __construct( $post_type ) {
 		parent::__construct( $post_type );
-		$this->namespace = '__experimental';
+		$this->namespace = 'wp/v2';
 	}
 
 	/**
