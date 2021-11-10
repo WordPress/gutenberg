@@ -41,7 +41,7 @@ describe( 'Cover', () => {
 		await createNewPost();
 	} );
 
-	it( 'can be created using color picker from the block placeholder', async () => {
+	it( 'can set overlay color using color picker on block placeholder', async () => {
 		await insertBlock( 'Cover' );
 		// Get the first color option from the block placeholder's color picker
 		const colorPickerButton = await page.waitForSelector(
@@ -65,7 +65,7 @@ describe( 'Cover', () => {
 		expect( pickedColor ).toEqual( dimColor );
 	} );
 
-	it( 'can be created using uploaded images', async () => {
+	it( 'can set background image using image upload on block placeholder', async () => {
 		await insertBlock( 'Cover' );
 		// Create the block using uploaded image
 		const sourceImageFilename = await upload(
