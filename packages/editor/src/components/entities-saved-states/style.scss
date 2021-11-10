@@ -62,7 +62,7 @@
 
 	.entities-saved-states__discard-changes-panel {
 		// Ensure the discard changes panel accounts for the header and footer height.
-		min-height: calc( 100% - #{$header-height + 84px} );
+		min-height: calc(100% - #{$header-height + 84px});
 	}
 
 	.entities-saved-states__footer {
