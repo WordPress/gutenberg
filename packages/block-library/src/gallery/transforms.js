@@ -8,8 +8,6 @@ import { filter, every, toString } from 'lodash';
  */
 import { createBlock } from '@wordpress/blocks';
 import { createBlobURL } from '@wordpress/blob';
-import { select } from '@wordpress/data';
-import { store as blockEditorStore } from '@wordpress/block-editor';
 import { addFilter } from '@wordpress/hooks';
 
 /**
@@ -259,8 +257,7 @@ const transforms = {
 				);
 			},
 			transform( files ) {
-				const settings = select( blockEditorStore ).getSettings();
-				if ( settings.__unstableGalleryWithImageBlocks ) {
+				if ( isGalleryV2Enabled() ) {
 					const innerBlocks = files.map( ( file ) =>
 						createBlock( 'core/image', {
 							url: createBlobURL( file ),
@@ -285,8 +282,7 @@ const transforms = {
 			type: 'block',
 			blocks: [ 'core/image' ],
 			transform: ( { align, images, ids, sizeSlug }, innerBlocks ) => {
-				const settings = select( blockEditorStore ).getSettings();
-				if ( settings.__unstableGalleryWithImageBlocks ) {
+				if ( isGalleryV2Enabled() ) {
 					if ( innerBlocks.length > 0 ) {
 						return innerBlocks.map(
 							( {
