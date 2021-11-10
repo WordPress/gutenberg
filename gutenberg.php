@@ -77,7 +77,7 @@ function gutenberg_version_too_old_notice() {
 	if ( current_user_can( 'update_plugins' ) ) {
 		printf(
 			/* translators: %s: URL to the Plugins screen */
-			__( 'The Gutenberg plugin cannot be used. It is too old for your version of WordPress. Please <a href="%s">turn auto-updates on</a> or updage it manually.', 'gutenberg' ),
+			__( 'The Gutenberg plugin cannot be used. It is too old for your version of WordPress. Please <a href="%s">turn auto-updates on</a> or update it manually.', 'gutenberg' ),
 			admin_url( 'plugins.php' )
 		);
 	} else {
