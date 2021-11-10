@@ -17,6 +17,9 @@ function getKey( _id ) {
  * @return {string} the unique key to use for this link control.
  */
 function useLinkInstanceKey( instance ) {
+	if ( ! instance ) {
+		return;
+	}
 	if ( weakMap.has( instance ) ) {
 		return getKey( weakMap.get( instance ) );
 	}
