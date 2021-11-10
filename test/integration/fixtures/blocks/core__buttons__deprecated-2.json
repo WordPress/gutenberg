@@ -4,8 +4,6 @@
 		"name": "core/buttons",
 		"isValid": true,
 		"attributes": {
-			"contentJustification": "center",
-			"orientation": "horizontal",
 			"align": "wide",
 			"layout": {
 				"type": "flex",
