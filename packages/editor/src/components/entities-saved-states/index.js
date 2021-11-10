@@ -189,6 +189,8 @@ export default function EntitiesSavedStates( { close } ) {
 			}
 		);
 
+		close();
+
 		const siteItemsToDiscard = [];
 		entitiesToDiscard.forEach( ( { kind, name, key, property } ) => {
 			if ( 'root' === kind && 'site' === name ) {
@@ -295,7 +297,7 @@ export default function EntitiesSavedStates( { close } ) {
 			</div>
 
 			<div className="entities-saved-states__footer">
-				<Button variant="primary">
+				<Button onClick={ dismissPanel } variant="primary">
 					<span>{ __( 'Continue editing' ) }</span>
 				</Button>
 			</div>
