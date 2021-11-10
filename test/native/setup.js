@@ -198,9 +198,12 @@ jest.mock( '@react-native-clipboard/clipboard', () => ( {
 // https://github.com/callstack/react-native-testing-library/issues/329#issuecomment-737307473
 jest.mock( 'react-native/Libraries/Components/Switch/Switch', () => {
 	const jestMockComponent = require( 'react-native/jest/mockComponent' );
-	return jestMockComponent(
-		'react-native/Libraries/Components/Switch/Switch'
-	);
+	return {
+		__esModule: true,
+		default: jestMockComponent(
+			'react-native/Libraries/Components/Switch/Switch'
+		),
+	};
 } );
 
 jest.mock( '@wordpress/compose', () => {
