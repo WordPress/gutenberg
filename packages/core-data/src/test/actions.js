@@ -202,7 +202,10 @@ describe( '__experimentalResetSpecifiedEntityEdits', () => {
 		const itemsToDiscard = [ 'title' ];
 
 		const select = {
-			getEntityRecordNonTransientEdits: () => [ { description: {} } ],
+			getEntityRecordNonTransientEdits: () => ( {
+				title: {},
+				description: {},
+			} ),
 			hasEditsForEntityRecord: () => true,
 		};
 
