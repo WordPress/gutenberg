@@ -6,7 +6,7 @@ import { useDispatch, useSelect } from '@wordpress/data';
 import { store as interfaceStore } from '@wordpress/interface';
 import { store as noticesStore } from '@wordpress/notices';
 
-export default function useMobileWarning() {
+export default function useMobileWarning( newImages ) {
 	const { createWarningNotice } = useDispatch( noticesStore );
 	const { toggleFeature } = useDispatch( interfaceStore );
 	const isMobileWarningActive = useSelect( ( select ) => {
@@ -14,7 +14,7 @@ export default function useMobileWarning() {
 		return isFeatureActive( 'core/edit-post', 'mobileGalleryWarning' );
 	}, [] );
 
-	if ( ! isMobileWarningActive ) {
+	if ( ! isMobileWarningActive || ! newImages ) {
 		return;
 	}
 
