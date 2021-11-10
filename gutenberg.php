@@ -149,7 +149,7 @@ function gutenberg_needs_update_notice() {
 
 	printf(
 		/* translators: %s: Too new, unsupported WordPress version */
-		__( 'Your version of Gutenberg is getting too old. It will stop working after you upgrade WordPress to %s. Please turn auto-updates on for the Gutenberg plugin or updage it manually.', 'gutenberg' ),
+		__( 'Your version of Gutenberg is getting too old. It will stop working after you upgrade WordPress to %s. Please turn auto-updates on for the Gutenberg plugin or update it manually.', 'gutenberg' ),
 		esc_html( GUTENBERG_NEXT_UNSUPPORTED_WP_VERSION )
 	);
 
