@@ -17,11 +17,7 @@ import { store as coreStore } from '@wordpress/core-data';
  */
 import EntityRecordItem from './entity-record-item';
 
-export default function DiscardEntityChangesPanel( {
-	closePanel,
-	dirtyEntityRecords,
-	savables,
-} ) {
+export default function DiscardEntityChangesPanel( { closePanel, savables } ) {
 	const {
 		__experimentalResetEditedEntityRecord: resetEditedEntityRecord,
 		__experimentalResetSpecifiedEntityEdits: resetSpecifiedEntityEdits,
@@ -50,23 +46,10 @@ export default function DiscardEntityChangesPanel( {
 	};
 
 	const discardCheckedEntities = () => {
-		const entitiesToDiscard = dirtyEntityRecords.filter(
-			( { kind, name, key, property } ) => {
-				return some(
-					selectedEntities,
-					( elt ) =>
-						elt.kind === kind &&
-						elt.name === name &&
-						elt.key === key &&
-						elt.property === property
-				);
-			}
-		);
-
 		closePanel();
 
 		const siteItemsToDiscard = [];
-		entitiesToDiscard.forEach( ( { kind, name, key, property } ) => {
+		selectedEntities.forEach( ( { kind, name, key, property } ) => {
 			if ( 'root' === kind && 'site' === name ) {
 				siteItemsToDiscard.push( property );
 			} else {
