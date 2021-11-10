@@ -4,8 +4,8 @@ buildscript {
         kotlinVersion = '1.5.20'
         buildToolsVersion = "30.0.2"
         minSdkVersion = 21
-        compileSdkVersion = 2930
-        targetSdkVersion = 2930
+        compileSdkVersion = 30
+        targetSdkVersion = 30
         supportLibVersion = '28.0.0'
         wordpressUtilsVersion = '1.22'
         ndkVersion = "20.1.5948944"
