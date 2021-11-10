@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { compact } from 'lodash';
+import { compact, map } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -81,6 +81,7 @@ function ListViewBranch( props ) {
 	} = useListViewContext();
 
 	const filteredBlocks = compact( blocks );
+	const branchClientIds = map( blocks, 'clientId' );
 	const blockCount = filteredBlocks.length;
 	let nextPosition = listPosition;
 
@@ -145,6 +146,7 @@ function ListViewBranch( props ) {
 								path={ updatedPath }
 								isExpanded={ isExpanded }
 								listPosition={ nextPosition }
+								branchClientIds={ branchClientIds }
 							/>
 						) }
 						{ ! showBlock && (

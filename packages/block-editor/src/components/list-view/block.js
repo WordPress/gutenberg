@@ -32,6 +32,7 @@ import ListViewBlockContents from './block-contents';
 import BlockSettingsDropdown from '../block-settings-menu/block-settings-dropdown';
 import { useListViewContext } from './context';
 import { store as blockEditorStore } from '../../store';
+import { isAppleOS } from '../../utils/platform';
 
 function ListViewBlock( {
 	block,
@@ -46,6 +47,7 @@ function ListViewBlock( {
 	showBlockMovers,
 	path,
 	isExpanded,
+	branchClientIds,
 } ) {
 	const cellRef = useRef( null );
 	const [ isHovered, setIsHovered ] = useState( false );
@@ -111,10 +113,18 @@ function ListViewBlock( {
 	const toggleExpanded = useCallback(
 		( event ) => {
 			event.stopPropagation();
+			const isPrimaryKeyPressed = isAppleOS()
+				? event.metaKey
+				: event.ctrlKey;
+
+			const clientIds = isPrimaryKeyPressed
+				? branchClientIds
+				: [ clientId ];
+
 			if ( isExpanded === true ) {
-				collapse( clientId );
+				collapse( clientIds );
 			} else if ( isExpanded === false ) {
-				expand( clientId );
+				expand( clientIds );
 			}
 		},
 		[ clientId, expand, collapse, isExpanded ]
