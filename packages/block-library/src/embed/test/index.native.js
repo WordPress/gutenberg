@@ -37,6 +37,16 @@ jest.mock( 'react-native-modal', () => {
 	const mockComponent = require( 'react-native/jest/mockComponent' );
 	return mockComponent( 'react-native-modal' );
 } );
+
+// Mock debounce to prevent potentially belated state updates.
+jest.mock( 'lodash', () => ( {
+	...jest.requireActual( 'lodash' ),
+	debounce: ( fn ) => {
+		fn.cancel = jest.fn();
+		return fn;
+	},
+} ) );
+
 const MODAL_DISMISS_EVENT = Platform.OS === 'ios' ? 'onDismiss' : 'onModalHide';
 
 // oEmbed response mocks

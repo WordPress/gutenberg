@@ -162,80 +162,95 @@ class WP_Theme_JSON_Resolver_Gutenberg_Test extends WP_UnitTestCase {
 		$this->assertSame( $color_palette, $settings['color']['palette']['theme'] );
 	}
 
+	/**
+	 * Recursively applies ksort to an array.
+	 */
+	private static function recursive_ksort( &$array ) {
+		foreach ( $array as &$value ) {
+			if ( is_array( $value ) ) {
+				self::recursive_ksort( $value );
+			}
+		}
+		ksort( $array );
+	}
+
 	function test_merges_child_theme_json_into_parent_theme_json() {
 		switch_theme( 'block-theme-child' );
 
-		$actual = WP_Theme_JSON_Resolver_Gutenberg::get_theme_data();
-
-		// Should merge settings.
-		$this->assertSame(
-			array(
-				'color'      => array(
-					'custom'         => false,
-					'customGradient' => true,
-					'palette'        => array(
-						'theme' => array(
-							array(
-								'slug'  => 'light',
-								'name'  => 'Light',
-								'color' => '#f3f4f6',
-							),
-							array(
-								'slug'  => 'primary',
-								'name'  => 'Primary',
-								'color' => '#3858e9',
-							),
-							array(
-								'slug'  => 'dark',
-								'name'  => 'Dark',
-								'color' => '#111827',
-							),
+		$actual_settings   = WP_Theme_JSON_Resolver_Gutenberg::get_theme_data()->get_settings();
+		$expected_settings = array(
+			'color'      => array(
+				'custom'         => false,
+				'customGradient' => true,
+				'palette'        => array(
+					'theme' => array(
+						array(
+							'slug'  => 'light',
+							'name'  => 'Light',
+							'color' => '#f3f4f6',
+						),
+						array(
+							'slug'  => 'primary',
+							'name'  => 'Primary',
+							'color' => '#3858e9',
+						),
+						array(
+							'slug'  => 'dark',
+							'name'  => 'Dark',
+							'color' => '#111827',
 						),
 					),
-					'link'           => true,
 				),
-				'typography' => array(
-					'customFontSize' => true,
-					'lineHeight'     => false,
-				),
-				'spacing'    => array(
-					'units'   => false,
-					'padding' => false,
-				),
-				'blocks'     => array(
-					'core/paragraph'  => array(
-						'color' => array(
-							'palette' => array(
-								'theme' => array(
-									array(
-										'slug'  => 'light',
-										'name'  => 'Light',
-										'color' => '#f5f7f9',
-									),
+				'link'           => true,
+			),
+			'typography' => array(
+				'customFontSize' => true,
+				'lineHeight'     => false,
+			),
+			'spacing'    => array(
+				'units'   => false,
+				'padding' => false,
+			),
+			'blocks'     => array(
+				'core/paragraph'  => array(
+					'color' => array(
+						'palette' => array(
+							'theme' => array(
+								array(
+									'slug'  => 'light',
+									'name'  => 'Light',
+									'color' => '#f5f7f9',
 								),
 							),
 						),
 					),
-					'core/post-title' => array(
-						'color' => array(
-							'palette' => array(
-								'theme' => array(
-									array(
-										'slug'  => 'light',
-										'name'  => 'Light',
-										'color' => '#f3f4f6',
-									),
+				),
+				'core/post-title' => array(
+					'color' => array(
+						'palette' => array(
+							'theme' => array(
+								array(
+									'slug'  => 'light',
+									'name'  => 'Light',
+									'color' => '#f3f4f6',
 								),
 							),
 						),
 					),
 				),
 			),
-			$actual->get_settings()
+		);
+		self::recursive_ksort( $actual_settings );
+		self::recursive_ksort( $expected_settings );
+
+		// Should merge settings.
+		$this->assertSame(
+			$expected_settings,
+			$actual_settings
 		);
 
 		$this->assertSame(
-			$actual->get_custom_templates(),
+			WP_Theme_JSON_Resolver_Gutenberg::get_theme_data()->get_custom_templates(),
 			array(
 				'page-home' => array(
 					'title'     => 'Homepage',
