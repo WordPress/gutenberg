@@ -48,7 +48,7 @@ const ExistingMenusDropdown = ( {
 				<>
 					<MenuGroup label={ __( 'Menus' ) }>
 						{ canSwitchNavigationMenu &&
-							navigationMenus.map( ( menu ) => {
+							navigationMenus?.map( ( menu ) => {
 								return (
 									<MenuItem
 										onClick={ () => {
@@ -64,7 +64,7 @@ const ExistingMenusDropdown = ( {
 							} ) }
 					</MenuGroup>
 					<MenuGroup label={ __( 'Classic Menus' ) }>
-						{ menus.map( ( menu ) => {
+						{ menus?.map( ( menu ) => {
 							return (
 								<MenuItem
 									onClick={ () => {
