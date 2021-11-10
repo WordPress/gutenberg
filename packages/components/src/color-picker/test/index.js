@@ -8,6 +8,15 @@ import { render, fireEvent } from '@testing-library/react';
  */
 import { ColorPicker } from '..';
 
+// Mock debounce to function ColorPicker.onChange properly
+jest.mock( 'lodash', () => ( {
+	...jest.requireActual( 'lodash' ),
+	debounce: ( fn ) => {
+		fn.cancel = jest.fn();
+		return fn;
+	},
+} ) );
+
 /**
  * Ordinarily we'd try to select the compnoent by role but the silder role appears
  * on several elements and we'd end up encoding assumptions about order when
