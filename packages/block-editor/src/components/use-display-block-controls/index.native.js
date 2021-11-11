@@ -21,13 +21,13 @@ export default function useDisplayBlockControls() {
 			const parentId = getBlockRootClientId( clientId );
 			const parentBlockName = getBlockName( parentId );
 
-			const displayControls = hasBlockSupport(
+			const hideControls = hasBlockSupport(
 				parentBlockName,
-				'__experimentalDisplayChildBlockControls',
-				true
+				'__experimentalHideChildBlockControls',
+				false
 			);
 
-			if ( displayControls && isSelected ) {
+			if ( ! hideControls && isSelected ) {
 				return true;
 			}
 
