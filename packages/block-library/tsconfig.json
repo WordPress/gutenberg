@@ -1,0 +1,14 @@
+{
+	"extends": "../../tsconfig.base.json",
+	"compilerOptions": {
+		"rootDir": "src",
+		"declarationDir": "build-types",
+		"types": [ "gutenberg-env" ],
+		"strictNullChecks": true
+	},
+	"references": [ { "path": "../element" } ],
+	"include": [
+		"src/table-of-contents/list.tsx",
+		"src/table-of-contents/utils.ts"
+	]
+}

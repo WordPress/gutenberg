@@ -33,13 +33,7 @@ import icon from './icon';
 import TableOfContentsList from './list';
 import { linearToNestedHeadingList } from './utils';
 
-/**
- * @typedef HeadingData
- *
- * @property {string} content The plain text content of the heading.
- * @property {number} level   The heading level.
- * @property {string} link    Link to the heading.
- */
+/** @typedef {import('./utils').HeadingData} HeadingData */
 
 /**
  * Table of Contents block edit component.

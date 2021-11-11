@@ -1,30 +1,31 @@
-/**
- * @typedef HeadingData
- *
- * @property {string} content The plain text content of the heading.
- * @property {number} level   The heading level.
- * @property {string} link    Link to the heading.
- */
+export interface HeadingData {
+	/** The plain text content of the heading. */
+	content: string;
+	/** The heading level. */
+	level: number;
+	/** Link to the heading. */
+	link: string;
+}
 
-/**
- * @typedef NestedHeadingData
- *
- * @property {HeadingData}              heading  The heading content, level,
- *                                               and link.
- * @property {NestedHeadingData[]|null} children The sub-headings of this
- *                                               heading, if any.
- */
+export interface NestedHeadingData {
+	/** The heading content, level, and link. */
+	heading: HeadingData;
+	/** The sub-headings of this heading, if any. */
+	children: NestedHeadingData[] | null;
+}
 
 /**
  * Takes a flat list of heading parameters and nests them based on each header's
  * immediate parent's level.
  *
- * @param {HeadingData[]} headingList The flat list of headings to nest.
+ * @param  headingList The flat list of headings to nest.
  *
- * @return {NestedHeadingData[]} The nested list of headings.
+ * @return The nested list of headings.
  */
-export function linearToNestedHeadingList( headingList ) {
-	const nestedHeadingList = [];
+export function linearToNestedHeadingList(
+	headingList: HeadingData[]
+): NestedHeadingData[] {
+	const nestedHeadingList: NestedHeadingData[] = [];
 
 	headingList.forEach( ( heading, key ) => {
 		if ( heading.content === '' ) {
