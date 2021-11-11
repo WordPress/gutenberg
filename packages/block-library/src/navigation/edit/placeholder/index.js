@@ -40,7 +40,7 @@ const ExistingMenusDropdown = ( {
 	};
 	return (
 		<DropdownMenu
-			text={ __( 'Existing menu' ) }
+			text={ __( 'Select menu' ) }
 			icon={ null }
 			toggleProps={ toggleProps }
 			popoverProps={ { isAlternate: true } }
