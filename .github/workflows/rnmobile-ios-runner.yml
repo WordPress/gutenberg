@@ -81,6 +81,12 @@ jobs:
             - uses: actions/upload-artifact@e448a9b857ee2131e752b06002bf0e093c65e571 # v2.2.2
               if: always()
               with:
+                  name: wda-app
+                  path: node_modules/appium/node_modules/appium-webdriveragent
+
+            - uses: actions/upload-artifact@e448a9b857ee2131e752b06002bf0e093c65e571 # v2.2.2
+              if: always()
+              with:
                   name: ios-screen-recordings
                   path: packages/react-native-editor/ios-screen-recordings
 
