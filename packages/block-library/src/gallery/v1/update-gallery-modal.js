@@ -14,7 +14,7 @@ import {
 	LINK_DESTINATION_ATTACHMENT,
 	LINK_DESTINATION_NONE,
 	LINK_DESTINATION_MEDIA,
-} from './constants';
+} from '../constants';
 
 export const updateGallery = ( {
 	clientId,
@@ -23,7 +23,7 @@ export const updateGallery = ( {
 } ) => () => {
 	let link;
 	const {
-		attributes: { sizeSlug, linkTo, images, caption },
+		attributes: { sizeSlug, linkTo, images, caption, columns },
 	} = getBlock( clientId );
 
 	switch ( linkTo ) {
@@ -51,7 +51,7 @@ export const updateGallery = ( {
 		clientId,
 		createBlock(
 			'core/gallery',
-			{ sizeSlug, linkTo: link, caption },
+			{ sizeSlug, linkTo: link, caption, columns },
 			innerBlocks
 		)
 	);
