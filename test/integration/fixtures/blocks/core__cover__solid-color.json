@@ -9,7 +9,6 @@
 			"isRepeated": false,
 			"dimRatio": 100,
 			"overlayColor": "primary",
-			"backgroundType": "image",
 			"isDark": true
 		},
 		"innerBlocks": [
