@@ -109,14 +109,6 @@ function Navigation( {
 		layout: { justifyContent, orientation = 'horizontal' } = {},
 	} = attributes;
 
-	// Spacer block needs orientation from context. This is a patch until
-	// https://github.com/WordPress/gutenberg/issues/36197 is addressed.
-	useEffect( () => {
-		if ( orientation ) {
-			setAttributes( { orientation } );
-		}
-	}, [ orientation ] );
-
 	const [ areaMenu, setAreaMenu ] = useEntityProp(
 		'root',
 		'navigationArea',
@@ -157,7 +149,11 @@ function Navigation( {
 		[ clientId ]
 	);
 	const hasExistingNavItems = !! innerBlocks.length;
-	const { replaceInnerBlocks, selectBlock } = useDispatch( blockEditorStore );
+	const {
+		replaceInnerBlocks,
+		selectBlock,
+		__unstableMarkNextChangeAsNotPersistent,
+	} = useDispatch( blockEditorStore );
 
 	const [
 		hasSavedUnsavedInnerBlocks,
@@ -226,6 +222,15 @@ function Navigation( {
 		setDetectedOverlayBackgroundColor,
 	] = useState();
 	const [ detectedOverlayColor, setDetectedOverlayColor ] = useState();
+
+	// Spacer block needs orientation from context. This is a patch until
+	// https://github.com/WordPress/gutenberg/issues/36197 is addressed.
+	useEffect( () => {
+		if ( orientation ) {
+			__unstableMarkNextChangeAsNotPersistent();
+			setAttributes( { orientation } );
+		}
+	}, [ orientation ] );
 
 	useEffect( () => {
 		if ( ! enableContrastChecking ) {
