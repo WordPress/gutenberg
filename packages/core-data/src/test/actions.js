@@ -120,7 +120,7 @@ describe( 'saveEditedEntityRecord', () => {
 			{
 				kind: 'root',
 				name: 'navigationArea',
-				baseURL: '/__experimental/block-navigation-areas',
+				baseURL: '/wp/v2/block-navigation-areas',
 			},
 		];
 		const select = {
@@ -160,7 +160,7 @@ describe( 'saveEditedEntityRecord', () => {
 			{
 				kind: 'root',
 				name: 'navigationArea',
-				baseURL: '/__experimental/block-navigation-areas',
+				baseURL: '/wp/v2/block-navigation-areas',
 				key: 'area',
 			},
 		];
