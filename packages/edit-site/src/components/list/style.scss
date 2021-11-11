@@ -35,66 +35,62 @@
 	display: flex;
 	align-items: center;
 	justify-content: center;
-	padding: 60px;
+	padding: $grid-unit-20;
+
+	@include break-medium() {
+		padding: $grid-unit * 9;
+	}
 }
 
 .edit-site-list-table {
 	width: 100%;
 	border: $border-width solid $gray-200;
 	border-radius: 2px;
+	margin: 0;
+	overflow: hidden;
 
-	tr {
+	li {
 		display: flex;
 		align-items: center;
-		height: 80px;
-		padding: $grid-unit-20 $grid-unit-40;
+		padding: $grid-unit-20;
 		box-sizing: border-box;
-	}
-
-	thead tr {
-		height: 60px;
-		border-bottom: $border-width solid $gray-200;
-	}
-
-	tbody tr + tr {
 		border-top: $border-width solid $gray-100;
+		margin: 0;
+
+		@include break-medium() {
+			padding: $grid-unit-30 $grid-unit-40;
+		}
+
+		.edit-site-list-table-column:nth-child(1) {
+			width: calc(60% - 36px);
+
+			a {
+				display: block;
+				text-decoration: none;
+				font-weight: 500;
+				margin-bottom: $grid-unit-05;
+			}
+		}
+
+		.edit-site-list-table-column:nth-child(2) {
+			width: calc(40% - 36px);
+		}
+
+		.edit-site-list-table-column:nth-child(3) {
+			min-width: $button-size;
+		}
 	}
 
-	td,
-	th {
-		// Name
-		&:nth-child(1) {
-			flex-basis: 150px;
-		}
-
-		// Description
-		&:nth-child(2) {
-			flex-grow: 1;
-			flex-shrink: 1;
-		}
-
-		// Theme
-		&:nth-child(3) {
-			flex-basis: 150px;
-		}
-
-		// Actions
-		&:nth-child(4) {
-			flex-basis: 36px;
-		}
-	}
-
-	// Name
-	tbody td:nth-child(1) {
-		font-weight: 500;
-		font-size: 14px;
-		color: $black;
-	}
-
-	th {
+	li.edit-site-list-table-head {
+		border-bottom: $border-width solid $gray-200;
 		font-size: 16px;
 		font-weight: 500;
 		text-align: left;
 		color: $black;
+		border-top: none;
+
+		& + li {
+			border-top: 0;
+		}
 	}
 }
