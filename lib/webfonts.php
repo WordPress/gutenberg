@@ -18,7 +18,7 @@
 function wp_webfonts() {
 	static $instance;
 
-	if ( ! $instance instanceof WP_Webfonts ) {
+	if ( ! $instance instanceof WP_Webfonts_Controller ) {
 		$instance = new WP_Webfonts_Controller(
 			new WP_Webfonts_Registry(
 				new WP_Webfonts_Schema_Validator()
