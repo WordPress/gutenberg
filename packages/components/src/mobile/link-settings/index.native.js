@@ -124,6 +124,10 @@ function LinkSettings( {
 
 	useEffect( () => {
 		const isSettingSheetOpen = isVisible || editorSidebarOpened;
+		if ( isSettingSheetOpen ) {
+			onCloseSettingsSheetConsumed.current = false;
+		}
+
 		if ( options.url.autoFill && isSettingSheetOpen && ! url ) {
 			getURLFromClipboard();
 		}
@@ -176,7 +180,6 @@ function LinkSettings( {
 
 	const onCloseSettingsSheet = useCallback( () => {
 		if ( onCloseSettingsSheetConsumed.current ) {
-			onCloseSettingsSheetConsumed.current = false;
 			return;
 		}
 
