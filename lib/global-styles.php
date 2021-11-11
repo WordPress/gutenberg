@@ -288,6 +288,37 @@ function gutenberg_global_styles_include_support_for_wp_variables( $allow_css, $
 	return ! ! preg_match( '/^var\(--wp-[a-zA-Z0-9\-]+\)$/', trim( $parts[1] ) );
 }
 
+/**
+ * Register webfonts defined in theme.json.
+ */
+function gutenberg_register_webfonts_from_theme_json() {
+	if ( ! function_exists( 'wp_register_webfonts' ) ) {
+		return;
+	}
+	$theme_settings = WP_Theme_JSON_Resolver_Gutenberg::get_theme_data()->get_settings();
+	if ( ! empty( $theme_settings['typography'] ) && ! empty( $theme_settings['typography']['webfonts'] ) ) {
+
+		// Check if webfonts have a "src" param, and if they do account for the use of "file:./".
+		foreach ( $theme_settings['typography']['webfonts'] as $key => $webfont ) {
+			if ( empty( $webfont['src'] ) ) {
+				continue;
+			}
+			$webfont['src'] = (array) $webfont['src'];
+
+			foreach ( $webfont['src'] as $src_key => $url ) {
+				// Tweak the URL to be relative to the theme root.
+				if ( 0 !== strpos( $url, 'file:./' ) ) {
+					continue;
+				}
+				$webfont['src'][ $src_key ] = get_theme_file_uri( str_replace( 'file:./', '', $url ) );
+			}
+
+			$theme_settings['typography']['webfonts'][ $key ] = $webfont;
+		}
+		wp_register_webfonts( $theme_settings['typography']['webfonts'] );
+	}
+}
+
 // The else clause can be removed when plugin support requires WordPress 5.8.0+.
 if ( function_exists( 'get_block_editor_settings' ) ) {
 	add_filter( 'block_editor_settings_all', 'gutenberg_experimental_global_styles_settings', PHP_INT_MAX );
@@ -297,6 +328,7 @@ if ( function_exists( 'get_block_editor_settings' ) ) {
 
 add_action( 'init', 'gutenberg_experimental_global_styles_register_user_cpt' );
 add_action( 'wp_enqueue_scripts', 'gutenberg_experimental_global_styles_enqueue_assets' );
+add_action( 'after_setup_theme', 'gutenberg_register_webfonts_from_theme_json' );
 
 // kses actions&filters.
 add_action( 'init', 'gutenberg_global_styles_kses_init' );
