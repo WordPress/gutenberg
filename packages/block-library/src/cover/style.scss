@@ -43,15 +43,22 @@
 	 *   - Issue with background color specificity: https://github.com/WordPress/gutenberg/issues/26545
 	 *   - Issue with alternative fix: https://github.com/WordPress/gutenberg/issues/26545
 	 */
+
+	// the first selector is required for old Cover markup
+	&.has-background-dim:not([class*="-background-color"]),
 	.has-background-dim:not([class*="-background-color"]) {
 		background-color: $black;
 	}
 
+	// the first selector is required for old Cover markup
+	&.has-background-dim::before,
 	.has-background-dim::before {
 		content: "";
 		background-color: inherit;
 	}
 
+	// the first selector is required for old Cover markup
+	&.has-background-dim:not(.has-background-gradient)::before,
 	.has-background-dim:not(.has-background-gradient)::before,
 	.wp-block-cover__gradient-background {
 		position: absolute;
