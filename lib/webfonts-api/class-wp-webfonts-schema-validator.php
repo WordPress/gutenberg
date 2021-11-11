@@ -136,7 +136,7 @@ class WP_Webfonts_Schema_Validator {
 			empty( $webfont['provider'] ) ||
 			! is_string( $webfont['provider'] )
 		) {
-			trigger_error( __( 'Webfont provider must be a non-empty string.' ) );
+			trigger_error( __( 'Webfont provider must be a non-empty string.', 'gutenberg' ) );
 
 			return false;
 		}
@@ -157,7 +157,7 @@ class WP_Webfonts_Schema_Validator {
 			empty( $webfont['font-family'] ) ||
 			! is_string( $webfont['font-family'] )
 		) {
-			trigger_error( __( 'Webfont font family must be a non-empty string.' ) );
+			trigger_error( __( 'Webfont font family must be a non-empty string.', 'gutenberg' ) );
 
 			return false;
 		}
@@ -180,20 +180,20 @@ class WP_Webfonts_Schema_Validator {
 				! is_string( $webfont['src'] ) && ! is_array( $webfont['src'] )
 			)
 		) {
-			trigger_error( __( 'Webfont src must be a non-empty string or an array of strings.' ) );
+			trigger_error( __( 'Webfont src must be a non-empty string or an array of strings.', 'gutenberg' ) );
 
 			return false;
 		}
 
 		foreach ( (array) $webfont['src'] as $src ) {
 			if ( empty( $src ) || ! is_string( $src ) ) {
-				trigger_error( __( 'Each webfont src must be a non-empty string.' ) );
+				trigger_error( __( 'Each webfont src must be a non-empty string.', 'gutenberg' ) );
 
 				return false;
 			}
 
 			if ( ! $this->is_src_value_valid( $src ) ) {
-				trigger_error( __( 'Webfont src must be a valid URL or a data URI.' ) );
+				trigger_error( __( 'Webfont src must be a valid URL or a data URI.', 'gutenberg' ) );
 
 				return false;
 			}
@@ -279,7 +279,7 @@ class WP_Webfonts_Schema_Validator {
 			empty( $this->webfont['font-style'] ) ||
 			! is_string( $this->webfont['font-style'] )
 		) {
-			trigger_error( __( 'Webfont font style must be a non-empty string.' ) );
+			trigger_error( __( 'Webfont font style must be a non-empty string.', 'gutenberg' ) );
 
 		} elseif ( // Bail out if the font-style is a valid value.
 			in_array( $this->webfont['font-style'], self::VALID_FONT_STYLE, true ) ||
@@ -302,7 +302,7 @@ class WP_Webfonts_Schema_Validator {
 			empty( $this->webfont['font-weight'] ) ||
 			! is_string( $this->webfont['font-weight'] )
 		) {
-			trigger_error( __( 'Webfont font weight must be a non-empty string.' ) );
+			trigger_error( __( 'Webfont font weight must be a non-empty string.', 'gutenberg' ) );
 
 		} elseif ( // Bail out if the font-weight is a valid value.
 			// Check if value is a single font-weight, formatted as a number.
