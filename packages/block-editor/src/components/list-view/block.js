@@ -121,9 +121,9 @@ function ListViewBlock( {
 				? branchClientIds
 				: [ clientId ];
 
-			if ( isExpanded === true ) {
+			if ( isExpanded ) {
 				collapse( clientIds );
-			} else if ( isExpanded === false ) {
+			} else {
 				expand( clientIds );
 			}
 		},

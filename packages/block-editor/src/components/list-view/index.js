@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { castArray } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import {
@@ -34,24 +29,30 @@ import { store as blockEditorStore } from '../../store';
 
 const noop = () => {};
 const expanded = ( state, action ) => {
-	const nextState = { ...state };
+	if ( ! Array.isArray( action.clientIds ) ) {
+		return state;
+	}
 
 	switch ( action.type ) {
 		case 'expand': {
-			castArray( action.clientIds ).forEach( ( clientId ) => {
-				nextState[ clientId ] = true;
-			} );
-			break;
+			return Object.fromEntries(
+				Object.entries( state ).filter( ( [ key ] ) => {
+					return ! action.clientIds.includes( key );
+				} )
+			);
 		}
 		case 'collapse': {
-			castArray( action.clientIds ).forEach( ( clientId ) => {
-				nextState[ clientId ] = false;
-			} );
-			break;
+			return {
+				...state,
+				...action.clientIds.reduce( ( newState, id ) => {
+					newState[ id ] = false;
+					return newState;
+				}, {} ),
+			};
 		}
+		default:
+			return state;
 	}
-
-	return nextState;
 };
 
 /**
