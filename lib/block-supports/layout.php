@@ -208,7 +208,7 @@ add_filter( 'render_block', 'gutenberg_render_layout_support_flag', 10, 2 );
 function gutenberg_restore_group_inner_container( $block_content, $block ) {
 	$tag_name                         = isset( $block['attrs']['tagName'] ) ? $block['attrs']['tagName'] : 'div';
 	$group_with_inner_container_regex = sprintf(
-		'/(^\s*<%1$s\b[^>]*wp-block-group(\s|")[^>]*>)(\s*<div\b[^>]*wp-block-group__inner-container(\s|")[^>]*>)((.|\S|\s)*)/',
+		'/(^\s*<%1$s\b[^>]*wp-block-group(\s|")[^>]*>)(\s*<div\b[^>]*wp-block-group__inner-container(\s|")[^>]*>)((.|\S|\s)*)/U',
 		preg_quote( $tag_name, '/' )
 	);
 	if (
