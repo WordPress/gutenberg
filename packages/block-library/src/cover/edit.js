@@ -397,6 +397,15 @@ function CoverEdit( {
 	const isImageBackground = IMAGE_BACKGROUND_TYPE === backgroundType;
 	const isVideoBackground = VIDEO_BACKGROUND_TYPE === backgroundType;
 
+	useEffect( () => {
+		const defaultDimRatio =
+			isImageBackground || isVideoBackground ? 50 : 100;
+
+		setAttributes( {
+			dimRatio: dimRatio || defaultDimRatio,
+		} );
+	}, [ isImageBackground, isVideoBackground ] );
+
 	const [ temporaryMinHeight, setTemporaryMinHeight ] = useState( null );
 
 	const minHeightWithUnit = minHeightUnit
