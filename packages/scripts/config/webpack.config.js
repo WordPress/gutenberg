@@ -7,7 +7,7 @@ const MiniCSSExtractPlugin = require( 'mini-css-extract-plugin' );
 const TerserPlugin = require( 'terser-webpack-plugin' );
 const { CleanWebpackPlugin } = require( 'clean-webpack-plugin' );
 const browserslist = require( 'browserslist' );
-const fs = require( 'fs' );
+const { sync: glob } = require( 'fast-glob' );
 const path = require( 'path' );
 
 /**
@@ -36,17 +36,14 @@ let entry = {};
 if ( process.env.WP_ENTRY ) {
 	entry = JSON.parse( process.env.WP_ENTRY );
 } else {
-	// By default the script checks if `src/index.js` exists and sets it as an entry point.
-	// In the future we should add similar handling for `src/script.js` and `src/view.js`.
-	[ 'index' ].forEach( ( entryName ) => {
-		const filepath = path.resolve(
-			process.cwd(),
-			'src',
-			`${ entryName }.js`
-		);
-		if ( fs.existsSync( filepath ) ) {
-			entry[ entryName ] = filepath;
-		}
+	// The script checks whether standard file names can be detected in the `src` folder,
+	// and converts all found files to entry points.
+	const entryFiles = glob( 'src/index.[jt]s?(x)', {
+		absolute: true,
+	} );
+	entryFiles.forEach( ( filepath ) => {
+		const [ entryName ] = path.basename( filepath ).split( '.' );
+		entry[ entryName ] = filepath;
 	} );
 }
 
@@ -115,6 +112,7 @@ const config = {
 		alias: {
 			'lodash-es': 'lodash',
 		},
+		extensions: [ '.ts', '.tsx', '...' ],
 	},
 	optimization: {
 		// Only concatenate modules in production, when not analyzing bundles.
@@ -155,7 +153,7 @@ const config = {
 	module: {
 		rules: [
 			{
-				test: /\.jsx?$/,
+				test: /\.(j|t)sx?$/,
 				exclude: /node_modules/,
 				use: [
 					{
@@ -200,7 +198,7 @@ const config = {
 			},
 			{
 				test: /\.svg$/,
-				issuer: /\.jsx?$/,
+				issuer: /\.(j|t)sx?$/,
 				use: [ '@svgr/webpack', 'url-loader' ],
 				type: 'javascript/auto',
 			},
@@ -259,7 +257,7 @@ if ( ! isProduction ) {
 	// See: https://webpack.js.org/configuration/devtool/#devtool.
 	config.devtool = process.env.WP_DEVTOOL || 'source-map';
 	config.module.rules.unshift( {
-		test: /\.js$/,
+		test: /\.(j|t)sx?$/,
 		exclude: [ /node_modules/ ],
 		use: require.resolve( 'source-map-loader' ),
 		enforce: 'pre',
