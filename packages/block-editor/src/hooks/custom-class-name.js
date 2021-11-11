@@ -52,6 +52,33 @@ export function addAttribute( settings ) {
 }
 
 /**
+ * @typedef  {Object}   CustomClassNameMenuItemProps
+ * @property {boolean}  isSelected                   Whether the item is selected.
+ * @property {Function} onClick                      An onClick handler.
+ * @property {Object}   style                        A block style object.
+ */
+
+/**
+ * Returns a menu item component.
+ *
+ * @param {CustomClassNameMenuItemProps} props  The component props.
+ * @return {WPComponent}                        The menu item component.
+ */
+function CustomClassNameMenuItem( { isSelected, onClick, style } ) {
+	return (
+		<MenuItem
+			key={ style?.label }
+			icon={ isSelected && check }
+			isSelected={ isSelected }
+			onClick={ onClick }
+			role="menuitemcheckbox"
+		>
+			{ style?.label }
+		</MenuItem>
+	);
+}
+
+/**
  * Override the default edit UI to include a new block inspector control for
  * assigning the custom class name, if block supports custom class name.
  *
@@ -71,14 +98,12 @@ export const withInspectorControl = createHigherOrderComponent(
 			const { updateBlockAttributes } = useDispatch( blockEditorStore );
 
 			const blockStyles = useSelect(
-				( select ) => {
-					const { getBlockStyles } = select( blocksStore );
-					return getBlockStyles( props.name );
-				},
+				( select ) =>
+					select( blocksStore ).getBlockStyles( props.name ),
 				[ props.name, props.attributes.className ]
 			);
 
-			const hasBlockStyles = blockStyles && blockStyles.length;
+			const hasBlockStyles = blockStyles && !! blockStyles.length;
 
 			const activeStyle = hasBlockStyles
 				? getActiveStyle(
@@ -145,20 +170,15 @@ export const withInspectorControl = createHigherOrderComponent(
 											>
 												{ blockStyles.map(
 													( style ) => {
-														const isSelected =
-															activeStyle?.name ===
-															style.name;
 														return (
-															<MenuItem
+															<CustomClassNameMenuItem
+																style={ style }
 																key={
 																	style.label
 																}
-																icon={
-																	isSelected &&
-																	check
-																}
 																isSelected={
-																	isSelected
+																	activeStyle?.name ===
+																	style.name
 																}
 																onClick={ () => {
 																	onSelectStyleClassName(
@@ -166,10 +186,7 @@ export const withInspectorControl = createHigherOrderComponent(
 																	);
 																	onClose();
 																} }
-																role="menuitemcheckbox"
-															>
-																{ style.label }
-															</MenuItem>
+															/>
 														);
 													}
 												) }

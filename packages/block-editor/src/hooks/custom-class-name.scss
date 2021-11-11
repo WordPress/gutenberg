@@ -1,8 +1,13 @@
 .additional-class-name-control__container.has-block-styles {
 	display: flex;
 	align-items: start;
+	> :first-child {
+		flex-grow: 1;
+	}
 }
 
 .additional-class-name-control__block-style-dropdown {
-	margin-top: -6px; // Being the padding around the icon.
+	margin-top: -8px; // Compensating for the top padding around the components-button icon.
+	margin-left: 8px;
+	margin-right: -8px;
 }
