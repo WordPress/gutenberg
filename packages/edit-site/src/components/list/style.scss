@@ -27,8 +27,20 @@
 	}
 }
 
-.edit-site .edit-site-list .interface-interface-skeleton__content {
-	background: $white;
+.edit-site {
+	.edit-site-list {
+		.interface-interface-skeleton__editor {
+			min-width: 100%;
+
+			@include break-medium() {
+				min-width: 0;
+			}
+		}
+
+		.interface-interface-skeleton__content {
+			background: $white;
+		}
+	}
 }
 
 .edit-site-list-main {
