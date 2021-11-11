@@ -264,7 +264,7 @@ describe( 'Embed block', () => {
 			fireEvent( embedEditURLModal, MODAL_DISMISS_EVENT );
 
 			const blockSettingsModal = await waitFor( () =>
-				getByTestId( 'block-settings' )
+				getByTestId( 'block-settings-modal' )
 			);
 			// Get Twitter link field
 			const twitterLinkField = within(
@@ -297,7 +297,7 @@ describe( 'Embed block', () => {
 			fireEvent( embedEditURLModal, MODAL_DISMISS_EVENT );
 
 			const blockSettingsModal = await waitFor( () =>
-				getByTestId( 'block-settings' )
+				getByTestId( 'block-settings-modal' )
 			);
 			// Get Twitter link field
 			const twitterLinkField = within(
@@ -358,7 +358,7 @@ describe( 'Embed block', () => {
 			fireEvent( embedEditURLModal, MODAL_DISMISS_EVENT );
 
 			const blockSettingsModal = await waitFor( () =>
-				getByTestId( 'block-settings' )
+				getByTestId( 'block-settings-modal' )
 			);
 			// Get Twitter link field
 			const twitterLinkField = within(
@@ -394,7 +394,7 @@ describe( 'Embed block', () => {
 			fireEvent( embedEditURLModal, MODAL_DISMISS_EVENT );
 
 			const blockSettingsModal = await waitFor( () =>
-				getByTestId( 'block-settings' )
+				getByTestId( 'block-settings-modal' )
 			);
 			// Get Twitter link field
 			const twitterLinkField = within(
@@ -422,7 +422,7 @@ describe( 'Embed block', () => {
 			);
 
 			// Wait for Block Settings to be visible
-			const blockSettingsModal = getByTestId( 'block-settings' );
+			const blockSettingsModal = getByTestId( 'block-settings-modal' );
 			await waitFor( () => blockSettingsModal.props.isVisible );
 
 			// Dismiss the Block Settings modal
@@ -448,7 +448,7 @@ describe( 'Embed block', () => {
 			);
 
 			// Wait for Block Settings to be visible
-			const blockSettingsModal = getByTestId( 'block-settings' );
+			const blockSettingsModal = getByTestId( 'block-settings-modal' );
 			await waitFor( () => blockSettingsModal.props.isVisible );
 
 			// Start editing link
@@ -495,7 +495,7 @@ describe( 'Embed block', () => {
 			);
 
 			// Wait for Block Settings to be visible
-			const blockSettingsModal = getByTestId( 'block-settings' );
+			const blockSettingsModal = getByTestId( 'block-settings-modal' );
 			await waitFor( () => blockSettingsModal.props.isVisible );
 
 			// Start editing link
@@ -538,7 +538,7 @@ describe( 'Embed block', () => {
 			);
 
 			// Get Block Settings modal
-			const blockSettingsModal = getByTestId( 'block-settings' );
+			const blockSettingsModal = getByTestId( 'block-settings-modal' );
 
 			// Start editing link
 			fireEvent.press(
@@ -632,7 +632,7 @@ describe( 'Embed block', () => {
 			);
 
 			// Wait for Block Settings to be visible
-			const blockSettingsModal = getByTestId( 'block-settings' );
+			const blockSettingsModal = getByTestId( 'block-settings-modal' );
 			await waitFor( () => blockSettingsModal.props.isVisible );
 
 			// Start editing link
@@ -722,7 +722,7 @@ describe( 'Embed block', () => {
 			fireEvent.press( getByText( 'Retry' ) );
 
 			const blockSettingsModal = await waitFor( () =>
-				getByTestId( 'block-settings' )
+				getByTestId( 'block-settings-modal' )
 			);
 			// Get Twitter link field
 			const twitterLinkField = within(
@@ -804,7 +804,7 @@ describe( 'Embed block', () => {
 			fireEvent( embedEditURLModal, MODAL_DISMISS_EVENT );
 
 			const blockSettingsModal = await waitFor( () =>
-				getByTestId( 'block-settings' )
+				getByTestId( 'block-settings-modal' )
 			);
 			// Get Twitter link field
 			const twitterLinkField = within(
