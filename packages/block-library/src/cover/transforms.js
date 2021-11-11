@@ -17,6 +17,7 @@ const transforms = {
 				createBlock(
 					'core/cover',
 					{
+						backgroundType: IMAGE_BACKGROUND_TYPE,
 						url,
 						alt,
 						align,
