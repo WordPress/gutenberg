@@ -271,5 +271,11 @@ function removeWindowsFragments( html ) {
  * @return {string} the cleaned html
  */
 function removeCharsetMetaTag( html ) {
-	return html.replace( /^<meta charset=["']utf-8["']>/, '' );
+	const metaTag = `<meta charset='utf-8'>`;
+
+	if ( html.startsWith( metaTag ) ) {
+		return html.slice( metaTag.length );
+	}
+
+	return html;
 }
