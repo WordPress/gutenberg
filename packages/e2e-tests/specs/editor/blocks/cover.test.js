@@ -13,11 +13,13 @@ import {
 	insertBlock,
 	createNewPost,
 	openDocumentSettingsSidebar,
+	transformBlockTo,
 } from '@wordpress/e2e-test-utils';
 
 async function upload( selector ) {
-	await page.waitForSelector( selector );
-	const inputElement = await page.$( selector );
+	const inputElement = await page.waitForSelector(
+		`${ selector } input[type="file"]`
+	);
 	const testImagePath = path.join(
 		__dirname,
 		'..',
@@ -30,9 +32,7 @@ async function upload( selector ) {
 	const tmpFileName = path.join( os.tmpdir(), filename + '.png' );
 	fs.copyFileSync( testImagePath, tmpFileName );
 	await inputElement.uploadFile( tmpFileName );
-	await page.waitForSelector(
-		`.wp-block-cover img[src$="${ filename }.png"]`
-	);
+	await page.waitForSelector( `${ selector } img[src$="${ filename }.png"]` );
 	return filename;
 }
 
@@ -68,9 +68,7 @@ describe( 'Cover', () => {
 	it( 'can set background image using image upload on block placeholder', async () => {
 		await insertBlock( 'Cover' );
 		// Create the block using uploaded image
-		const sourceImageFilename = await upload(
-			'.wp-block-cover input[type="file"]'
-		);
+		const sourceImageFilename = await upload( '.wp-block-cover' );
 		// Get the block's background image URL
 		const blockImage = await page.waitForSelector( '.wp-block-cover img' );
 		const blockImageUrl = await blockImage.evaluate( ( el ) => el.src );
@@ -81,7 +79,7 @@ describe( 'Cover', () => {
 	it( 'dims background image down by 50% by default', async () => {
 		await insertBlock( 'Cover' );
 		// Create the block using uploaded image
-		await upload( '.wp-block-cover input[type="file"]' );
+		await upload( '.wp-block-cover' );
 		// Get the block's background dim color and its opacity
 		const backgroundDim = await page.waitForSelector(
 			'.wp-block-cover .has-background-dim'
@@ -193,5 +191,27 @@ describe( 'Cover', () => {
 				heightInput
 			)
 		).toBeGreaterThan( 100 );
+	} );
+
+	it( 'dims the background image down by 50% when transformed from the Image block', async () => {
+		await insertBlock( 'Image' );
+		// Upload image and transform to the Cover block
+		await upload( '.wp-block-image' );
+		await transformBlockTo( 'Cover' );
+
+		// Get the block's background dim color and its opacity
+		const backgroundDim = await page.waitForSelector(
+			'.wp-block-cover .has-background-dim'
+		);
+		const [
+			backgroundDimColor,
+			backgroundDimOpacity,
+		] = await page.evaluate( ( el ) => {
+			const computedStyle = window.getComputedStyle( el );
+			return [ computedStyle.backgroundColor, computedStyle.opacity ];
+		}, backgroundDim );
+
+		expect( backgroundDimColor ).toBe( 'rgb(0, 0, 0)' );
+		expect( backgroundDimOpacity ).toBe( '0.5' );
 	} );
 } );
