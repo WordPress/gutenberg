@@ -81,7 +81,7 @@ function ListViewBranch( props ) {
 	} = useListViewContext();
 
 	const filteredBlocks = compact( blocks );
-	const branchClientIds = map( blocks, 'clientId' );
+	const branchClientIds = map( filteredBlocks, 'clientId' );
 	const blockCount = filteredBlocks.length;
 	let nextPosition = listPosition;
 
