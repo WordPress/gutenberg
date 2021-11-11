@@ -283,7 +283,6 @@ $color-control-label-height: 20px;
 		}
 
 		// Hide entirely when vertical.
-		.is-vertical.is-selected &,
 		.wp-block-navigation.is-selected .is-small &,
 		.wp-block-navigation.is-selected .is-medium & {
 			display: none;
@@ -321,17 +320,10 @@ $color-control-label-height: 20px;
 
 	// Show stacked for the vertical navigation, or small placeholders.
 	.is-small &,
-	.is-medium &,
-	.is-vertical & {
+	.is-medium & {
 		.wp-block-navigation-placeholder__actions {
 			flex-direction: column;
 		}
-	}
-
-	// Both selected and vertical.
-	.is-selected.is-vertical & {
-		display: inline-flex; // This makes the white box not take up all available space.
-		padding: $grid-unit-15;
 	}
 
 	.wp-block-navigation-placeholder__icon {
@@ -354,32 +346,12 @@ $color-control-label-height: 20px;
 			margin-right: $grid-unit-05;
 		}
 
-		.is-vertical & {
-			margin-bottom: $grid-unit-05;
-			margin-left: 0;
-		}
-
 		// Show only in big placeholders.
 		display: none;
 		.is-large & {
 			display: inline-flex;
 		}
 	}
-}
-
-// When block is vertical.
-.is-vertical .wp-block-navigation-placeholder,
-.is-vertical .wp-block-navigation-placeholder__preview,
-.is-vertical .wp-block-navigation-placeholder__controls {
-	min-height:
-		$icon-size +
-		( $grid-unit-20 + $grid-unit-05 + $grid-unit-15 + $grid-unit-15 ) * 3;
-}
-
-.is-vertical .wp-block-navigation-placeholder__preview,
-.is-vertical .wp-block-navigation-placeholder__controls {
-	flex-direction: column;
-	align-items: flex-start;
 }
 
 .wp-block-navigation-placeholder__actions {
