@@ -43,9 +43,7 @@ export function createMenuPreloadingMiddleware( preloadedData ) {
 			return next( options );
 		}
 
-		const matches = path.match(
-			/^\/__experimental\/menus\/(\d+)\?context=edit$/
-		);
+		const matches = path.match( /^\/wp\/v2\/menus\/(\d+)\?context=edit$/ );
 		if ( ! matches ) {
 			return next( options );
 		}
