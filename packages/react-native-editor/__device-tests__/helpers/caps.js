@@ -4,7 +4,7 @@ const ios = {
 	os: 'iOS',
 	deviceOrientation: 'portrait',
 	automationName: 'XCUITest',
-	appiumVersion: '1.20.1', // Sauce Labs requires appiumVersion to be specified.
+	appiumVersion: '1.22.0', // Sauce Labs requires appiumVersion to be specified.
 	app: undefined, // will be set later, locally this is relative to root of project
 	processArguments: {
 		args: [ 'uitesting' ],
@@ -13,7 +13,7 @@ const ios = {
 
 exports.iosLocal = {
 	...ios,
-	deviceName: 'iPhone 11',
+	deviceName: 'iPhone 12',
 	wdaLaunchTimeout: 240000,
 	usePrebuiltWDA: false,
 };
