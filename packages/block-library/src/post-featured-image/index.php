@@ -19,7 +19,7 @@ function render_block_core_post_featured_image( $attributes, $content, $block ) 
 	}
 	$post_ID = $block->context['postId'];
 
-	$featured_image = get_the_post_thumbnail( $post_ID );
+	$featured_image = get_the_post_thumbnail( $post_ID, 'thumbnail' );
 	if ( ! $featured_image ) {
 		return '';
 	}
