@@ -84,7 +84,6 @@ const NavigationPanel = ( { isOpen, setIsOpen, activeTemplateType } ) => {
 									title={ __( 'Site' ) }
 									href={ addQueryArgs( '', {
 										page: 'gutenberg-edit-site',
-										style: 'closed',
 									} ) }
 								/>
 								<NavigationItem
