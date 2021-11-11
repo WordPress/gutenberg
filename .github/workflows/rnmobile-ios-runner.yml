@@ -64,6 +64,9 @@ jobs:
             - name: Build (if needed)
               run: test -e packages/react-native-editor/ios/build/GutenbergDemo/Build/Products/Release-iphonesimulator/GutenbergDemo.app/GutenbergDemo || npm run native test:e2e:build-app:ios
 
+            - name: TEST - Print simulators list
+              run: xcrun simctl list --json
+
             - name: TEST - Force opening Simulator app
               run: open -Fn /Applications/Xcode_${{ matrix.xcode }}.app/Contents/Developer/Applications/Simulator.app
 
