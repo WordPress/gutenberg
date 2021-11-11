@@ -17,7 +17,6 @@ import {
  * Internal dependencies
  */
 import {
-	hasSameKeys,
 	isUpdatingSameBlockAttribute,
 	blocks,
 	isTyping,
@@ -36,22 +35,6 @@ import {
 } from '../reducer';
 
 describe( 'state', () => {
-	describe( 'hasSameKeys()', () => {
-		it( 'returns false if two objects do not have the same keys', () => {
-			const a = { foo: 10 };
-			const b = { bar: 10 };
-
-			expect( hasSameKeys( a, b ) ).toBe( false );
-		} );
-
-		it( 'returns false if two objects have the same keys', () => {
-			const a = { foo: 10 };
-			const b = { foo: 20 };
-
-			expect( hasSameKeys( a, b ) ).toBe( true );
-		} );
-	} );
-
 	describe( 'isUpdatingSameBlockAttribute()', () => {
 		it( 'should return false if not updating block attributes', () => {
 			const action = {
