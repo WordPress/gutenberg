@@ -183,9 +183,9 @@ function render_block_core_navigation( $attributes, $content, $block ) {
 	// Restore legacy classnames for submenu positioning.
 	$layout_class = '';
 	if ( isset( $attributes['layout']['justifyContent'] ) ) {
-		if ( 'right' === $attributes['layout']['justifyContent']) {
+		if ( 'right' === $attributes['layout']['justifyContent'] ) {
 			$layout_class .= 'items-justified-right';
-		} elseif ( 'space-between' === $attributes['layout']['justifyContent']) {
+		} elseif ( 'space-between' === $attributes['layout']['justifyContent'] ) {
 			$layout_class .= 'items-justified-space-between';
 		}
 	}
