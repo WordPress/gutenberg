@@ -11,6 +11,7 @@ import {
 	StyledHelp as BaseControlHelp,
 	Wrapper as BaseControlWrapper,
 } from '../base-control/styles/base-control-styles';
+import { LabelWrapper } from '../input-control/styles/input-control-styles';
 import { COLORS, CONFIG } from '../utils';
 import { space } from '../ui/utils/space';
 
@@ -117,6 +118,20 @@ export const ToolsPanelItem = css`
 
 	${ BaseControlHelp } {
 		margin-bottom: 0;
+	}
+
+	/**
+	 * Standardize InputControl labels with other labels inside ToolsPanel.
+	 *
+	 * This is a temporary fix until the different control components have their
+	 * labels normalized.
+	 */
+	&& ${ LabelWrapper } {
+		label {
+			margin-bottom: ${ space( 2 ) };
+			padding-bottom: 0;
+			line-height: 1.4em;
+		}
 	}
 `;
 
