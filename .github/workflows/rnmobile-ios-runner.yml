@@ -19,6 +19,7 @@ jobs:
         strategy:
             matrix:
                 xcode: ['13.0']
+                device: ['iPhone 12']
                 native-test-name: [gutenberg-editor-initial-html]
                 node: ['14']
 
@@ -42,7 +43,7 @@ jobs:
                   path: |
                       packages/react-native-editor/ios/build/GutenbergDemo/Build/Products/Release-iphonesimulator/GutenbergDemo.app
                       packages/react-native-editor/ios/build/WDA
-                  key: ${{ runner.os }}-ios-build-${{ matrix.xcode }}-${{ hashFiles('ios-checksums.txt') }}
+                  key: ${{ runner.os }}-ios-build-${{ matrix.xcode }}-${{ matrix.device }}-${{ hashFiles('ios-checksums.txt') }}
 
             - name: Restore pods cache
               uses: actions/cache@c64c572235d810460d0d6876e9c705ad5002b353 # v2.1.6
