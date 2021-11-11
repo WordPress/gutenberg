@@ -84,6 +84,29 @@ function gutenberg_edit_site_list_init() {
 	wp_enqueue_style( 'wp-edit-site' );
 	wp_enqueue_media();
 
+	$template_type = $_GET['postType'];
+	$post_type     = get_post_type_object( $template_type );
+
+	$preload_data = array_reduce(
+		array(
+			'/',
+			"/wp/v2/types/$template_type?context=edit",
+			'/wp/v2/types?context=edit',
+			"/wp/v2/$post_type->rest_base?context=edit",
+		),
+		'rest_preload_api_request',
+		array()
+	);
+
+	wp_add_inline_script(
+		'wp-api-fetch',
+		sprintf(
+			'wp.apiFetch.use( wp.apiFetch.createPreloadingMiddleware( %s ) );',
+			wp_json_encode( $preload_data )
+		),
+		'after'
+	);
+
 	wp_add_inline_script(
 		'wp-edit-site',
 		sprintf(
@@ -91,7 +114,7 @@ function gutenberg_edit_site_list_init() {
 				wp.editSite.initializeList( "%s", "%s" );
 			} );',
 			'edit-site-editor',
-			$_GET['postType']
+			$template_type
 		)
 	);
 }
