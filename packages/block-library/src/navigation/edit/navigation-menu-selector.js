@@ -3,7 +3,8 @@
  */
 import { MenuGroup, MenuItem, MenuItemsChoice } from '@wordpress/components';
 import { useEntityId } from '@wordpress/core-data';
-import { __ } from '@wordpress/i18n';
+import { __, sprintf } from '@wordpress/i18n';
+import { decodeEntities } from '@wordpress/html-entities';
 
 /**
  * Internal dependencies
@@ -26,10 +27,18 @@ export default function NavigationMenuSelector( { onSelect, onCreateNew } ) {
 							)
 						)
 					}
-					choices={ navigationMenus.map( ( { id, title } ) => ( {
-						value: id,
-						label: title.rendered,
-					} ) ) }
+					choices={ navigationMenus.map( ( { id, title } ) => {
+						const label = decodeEntities( title.rendered );
+						return {
+							value: id,
+							label,
+							'aria-label': sprintf(
+								/* translators: %s: The name of a menu. */
+								__( "Switch to '%s'" ),
+								label
+							),
+						};
+					} ) }
 				/>
 			</MenuGroup>
 			<MenuGroup>

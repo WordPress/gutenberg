@@ -14,6 +14,7 @@ import { useDispatch } from '@wordpress/data';
 import { useCallback, useState, useEffect } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { navigation, Icon } from '@wordpress/icons';
+import { decodeEntities } from '@wordpress/html-entities';
 
 /**
  * Internal dependencies
@@ -59,7 +60,9 @@ const ExistingMenusDropdown = ( {
 										onClose={ onClose }
 										key={ menu.id }
 									>
-										{ menu.title.rendered }
+										{ decodeEntities(
+											menu.title.rendered
+										) }
 									</MenuItem>
 								);
 							} ) }
@@ -75,7 +78,7 @@ const ExistingMenusDropdown = ( {
 									onClose={ onClose }
 									key={ menu.id }
 								>
-									{ menu.name }
+									{ decodeEntities( menu.name ) }
 								</MenuItem>
 							);
 						} ) }
