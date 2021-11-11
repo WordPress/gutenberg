@@ -190,7 +190,7 @@ function gutenberg_get_navigation_areas_paths_to_preload() {
 	$areas        = get_option( 'fse_navigation_areas', array() );
 	$active_areas = array_intersect_key( $areas, gutenberg_get_navigation_areas() );
 	$paths        = array(
-		'/__experimental/block-navigation-areas?context=edit',
+		'/wp/v2/block-navigation-areas?context=edit',
 	);
 	foreach ( $active_areas as $post_id ) {
 		if ( 0 !== $post_id ) {
@@ -394,3 +394,36 @@ function gutenberg_parse_blocks_from_menu_items( $menu_items, $menu_items_by_par
 
 	return $blocks;
 }
+
+/**
+ * Shim that hides ability to edit visibility and status for wp_navigation type posts.
+ * When merged to Core, the CSS below should be moved to wp-admin/css/edit.css.
+ *
+ * This shim can be removed when the Gutenberg plugin requires a WordPress
+ * version that has the ticket below.
+ *
+ * @see https://core.trac.wordpress.org/ticket/54407
+ *
+ * @param string $hook The current admin page.
+ */
+function gutenberg_hide_visibility_and_status_for_navigation_posts( $hook ) {
+	$allowed_hooks = array( 'post.php', 'post-new.php' );
+	if ( ! in_array( $hook, $allowed_hooks, true ) ) {
+		return;
+	}
+
+	/**
+	 * HACK: We're hiding the description field using CSS because this
+	 * cannot be done using a filter or an action.
+	 */
+
+	$css = <<<CSS
+			body.post-type-wp_navigation div#minor-publishing {
+				display: none;
+			}
+CSS;
+
+	wp_add_inline_style( 'common', $css );
+}
+
+add_action( 'admin_enqueue_scripts', 'gutenberg_hide_visibility_and_status_for_navigation_posts' );

@@ -20,7 +20,8 @@ html.wp-toolbar {
 	background: $white;
 }
 
-body.appearance_page_gutenberg-edit-site {
+body.appearance_page_gutenberg-edit-site,
+body.site-editor-php {
 	@include wp-admin-reset(".edit-site");
 }
 
