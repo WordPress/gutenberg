@@ -1,6 +1,6 @@
 <?php
 
-require_once ABSPATH . WPINC . '/webfonts-api/providers/class-wp-webfonts-provider.php';
+require_once dirname( dirname( dirname( __DIR__ ) ) ) . '/lib/webfonts-api/providers/class-wp-webfonts-provider.php';
 
 class My_Custom_Webfonts_Provider_Mock extends WP_Webfonts_Provider {
 	protected $id = 'my-custom-provider';

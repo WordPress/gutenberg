@@ -4,11 +4,11 @@
  * @group  webfonts
  * @covers WP_Webfonts_Schema_Validator
  */
-class Tests_Webfonts_API_wpWebfontsSchemaValidator extends WP_UnitTestCase {
+class WP_Webfonts_Schema_Validator_Test extends WP_UnitTestCase {
 	private static $validator;
 
 	public static function set_up_before_class() {
-		require_once ABSPATH . WPINC . '/webfonts-api/class-wp-webfonts-schema-validator.php';
+		require_once dirname( dirname( __DIR__ ) ) . '/lib/webfonts-api/class-wp-webfonts-schema-validator.php';
 
 		self::$validator = new WP_Webfonts_Schema_Validator();
 	}
@@ -27,7 +27,7 @@ class Tests_Webfonts_API_wpWebfontsSchemaValidator extends WP_UnitTestCase {
 	/**
 	 * Data Provider.
 	 *
-	 * return @array
+	 * @return array
 	 */
 	public function data_is_valid_schema_with_valid() {
 		return array(
@@ -60,7 +60,7 @@ class Tests_Webfonts_API_wpWebfontsSchemaValidator extends WP_UnitTestCase {
 	/**
 	 * Data Provider.
 	 *
-	 * return @array
+	 * @return array
 	 */
 	public function data_is_valid_schema_with_invalid() {
 		return array(
@@ -187,7 +187,7 @@ class Tests_Webfonts_API_wpWebfontsSchemaValidator extends WP_UnitTestCase {
 	/**
 	 * Data Provider.
 	 *
-	 * return @array
+	 * @return array
 	 */
 	public function data_set_valid_properties_with_valid_input() {
 		return array(
@@ -309,7 +309,7 @@ class Tests_Webfonts_API_wpWebfontsSchemaValidator extends WP_UnitTestCase {
 	/**
 	 * Data Provider.
 	 *
-	 * return @array
+	 * @return array
 	 */
 	public function data_set_valid_properties_with_invalid_input() {
 		return array(
@@ -401,7 +401,7 @@ class Tests_Webfonts_API_wpWebfontsSchemaValidator extends WP_UnitTestCase {
 	/**
 	 * Data Provider.
 	 *
-	 * return @array
+	 * @return array
 	 */
 	public function data_set_valid_properties_with_invalid_and_error() {
 		return array(

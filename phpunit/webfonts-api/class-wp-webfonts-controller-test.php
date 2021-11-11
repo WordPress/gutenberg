@@ -4,15 +4,15 @@
  * @group  webfonts
  * @covers WP_Webfonts_Controller
  */
-class Tests_Webfonts_API_wpWebfontsController extends WP_UnitTestCase {
+class WP_Webfonts_Controller_Test extends WP_UnitTestCase {
 	private $controller;
 	private $webfont_registry_mock;
 	private $provider_registry_mock;
 
 	public static function set_up_before_class() {
-		require_once ABSPATH . WPINC . '/webfonts-api/class-wp-webfonts-registry.php';
-		require_once ABSPATH . WPINC . '/webfonts-api/class-wp-webfonts-provider-registry.php';
-		require_once ABSPATH . WPINC . '/webfonts-api/class-wp-webfonts-controller.php';
+		require_once dirname( dirname( __DIR__ ) ) . '/lib/webfonts-api/class-wp-webfonts-registry.php';
+		require_once dirname( dirname( __DIR__ ) ) . '/lib/webfonts-api/class-wp-webfonts-provider-registry.php';
+		require_once dirname( dirname( __DIR__ ) ) . '/lib/webfonts-api/class-wp-webfonts-controller.php';
 		require_once __DIR__ . '/mocks/class-my-custom-webfonts-provider-mock.php';
 	}
 

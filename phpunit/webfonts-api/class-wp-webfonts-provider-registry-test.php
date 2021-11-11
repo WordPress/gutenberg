@@ -4,10 +4,10 @@
  * @group  webfonts
  * @covers WP_Webfonts_Provider_Registry
  */
-class Tests_Webfonts_API_wpWebfontsProviderRegistry extends WP_UnitTestCase {
+class WP_Webfonts_Provider_Registry_Test extends WP_UnitTestCase {
 
 	public static function set_up_before_class() {
-		require_once ABSPATH . WPINC . '/webfonts-api/class-wp-webfonts-provider-registry.php';
+		require_once dirname( dirname( __DIR__ ) ) . '/lib/webfonts-api/class-wp-webfonts-provider-registry.php';
 		require_once __DIR__ . '/mocks/class-my-custom-webfonts-provider-mock.php';
 	}
 

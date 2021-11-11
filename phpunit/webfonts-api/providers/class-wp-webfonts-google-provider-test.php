@@ -4,12 +4,12 @@
  * @group  webfonts
  * @covers WP_Webfonts_Google_Provider
  */
-class Tests_Webfonts_API_wpWebfontsGoogleProvider extends WP_UnitTestCase {
+class WP_Webfonts_Google_Provider_Test extends WP_UnitTestCase {
 	private $provider;
 
 	public static function set_up_before_class() {
-		require_once ABSPATH . WPINC . '/webfonts-api/providers/class-wp-webfonts-provider.php';
-		require_once ABSPATH . WPINC . '/webfonts-api/providers/class-wp-webfonts-google-provider.php';
+		require_once dirname( dirname( dirname( __DIR__ ) ) ) . '/lib/webfonts-api/providers/class-wp-webfonts-provider.php';
+		require_once dirname( dirname( dirname( __DIR__ ) ) ) . '/lib/webfonts-api/providers/class-wp-webfonts-google-provider.php';
 	}
 
 	public function set_up() {
@@ -194,7 +194,7 @@ class Tests_Webfonts_API_wpWebfontsGoogleProvider extends WP_UnitTestCase {
 	 *
 	 * @dataProvider data_get_css
 	 *
-	 * @param array  $webfonts      Prepared webfonts (to store in WP_Webfonts_Local_Provider::$webfonts property)
+	 * @param array  $webfonts      Prepared webfonts (to store in WP_Webfonts_Local_Provider::$webfonts property).
 	 * @param int    $response_code Remote request response code.
 	 * @param string $expected      Expected CSS.
 	 */

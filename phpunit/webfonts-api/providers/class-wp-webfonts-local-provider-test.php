@@ -4,14 +4,14 @@
  * @group  webfonts
  * @covers WP_WebfontsLocal_Provider
  */
-class Tests_Webfonts_API_wpWebfontsLocalProvider extends WP_UnitTestCase {
+class WP_Webfonts_Local_Provider_Test extends WP_UnitTestCase {
 	private $provider;
 	private $theme_root;
 	private $orig_theme_dir;
 
 	public static function set_up_before_class() {
-		require_once ABSPATH . WPINC . '/webfonts-api/providers/class-wp-webfonts-provider.php';
-		require_once ABSPATH . WPINC . '/webfonts-api/providers/class-wp-webfonts-local-provider.php';
+		require_once dirname( dirname( dirname( __DIR__ ) ) ) . '/lib/webfonts-api/providers/class-wp-webfonts-provider.php';
+		require_once dirname( dirname( dirname( __DIR__ ) ) ) . '/lib/webfonts-api/providers/class-wp-webfonts-local-provider.php';
 	}
 
 	public function set_up() {
@@ -86,7 +86,7 @@ class Tests_Webfonts_API_wpWebfontsLocalProvider extends WP_UnitTestCase {
 	 *
 	 * @dataProvider data_get_css
 	 *
-	 * @param array  $webfonts Prepared webfonts (to store in WP_Webfonts_Local_Provider::$webfonts property)
+	 * @param array  $webfonts Prepared webfonts (to store in WP_Webfonts_Local_Provider::$webfonts property).
 	 * @param string $expected Expected CSS.
 	 */
 	public function test_get_css( array $webfonts, $expected ) {

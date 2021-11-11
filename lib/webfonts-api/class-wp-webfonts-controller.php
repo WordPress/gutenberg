@@ -12,7 +12,7 @@
  * and coordinates the interactions between the webfonts registry,
  * providers registry, and the Dependencies API.
  *
- *                   event
+ *                   Event
  *                    ↕
  *                Controller
  *         ⤢                    ⤡

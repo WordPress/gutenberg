@@ -65,6 +65,7 @@ class WP_Webfonts_Local_Provider extends WP_Webfonts_Provider {
 	 *
 	 * the following `@font-face` styles are generated and returned:
 	 * <code>
+	 *
 	 * @font-face{
 	 *      font-family:"Source Serif Pro";
 	 *      font-style:normal;
