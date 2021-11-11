@@ -33,26 +33,24 @@ const expanded = ( state, action ) => {
 		return state;
 	}
 
+	const nextState = { ...state };
+
 	switch ( action.type ) {
 		case 'expand': {
-			return Object.fromEntries(
-				Object.entries( state ).filter( ( [ key ] ) => {
-					return ! action.clientIds.includes( key );
-				} )
-			);
+			for ( const clientId of action.clientIds ) {
+				delete nextState[ clientId ];
+			}
+			break;
 		}
 		case 'collapse': {
-			return {
-				...state,
-				...action.clientIds.reduce( ( newState, id ) => {
-					newState[ id ] = false;
-					return newState;
-				}, {} ),
-			};
+			for ( const clientId of action.clientIds ) {
+				nextState[ clientId ] = false;
+			}
+			break;
 		}
-		default:
-			return state;
 	}
+
+	return nextState;
 };
 
 /**
