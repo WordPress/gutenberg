@@ -402,7 +402,7 @@ function CoverEdit( {
 			isImageBackground || isVideoBackground ? 50 : 100;
 
 		setAttributes( {
-			dimRatio: dimRatio || defaultDimRatio,
+			dimRatio: 'number' === typeof dimRatio ? dimRatio : defaultDimRatio,
 		} );
 	}, [ isImageBackground, isVideoBackground ] );
 
