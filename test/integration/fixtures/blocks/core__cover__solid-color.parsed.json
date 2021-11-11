@@ -2,6 +2,7 @@
 	{
 		"blockName": "core/cover",
 		"attrs": {
+			"dimRatio": 100,
 			"overlayColor": "primary"
 		},
 		"innerBlocks": [
