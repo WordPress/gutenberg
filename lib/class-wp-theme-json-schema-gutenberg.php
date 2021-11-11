@@ -219,7 +219,7 @@ class WP_Theme_JSON_Schema_Gutenberg {
 					null
 				);
 				if ( null !== $root_value ) {
-					gutenberg_experimental_set( $new, $path, $root_value );
+					_wp_array_set( $new, $path, $root_value );
 				}
 			}
 
@@ -250,13 +250,13 @@ class WP_Theme_JSON_Schema_Gutenberg {
 			if ( null !== $block_settings ) {
 				$new_path     = array( 'blocks', $new_name );
 				$new_settings = array();
-				gutenberg_experimental_set( $new_settings, $new_path, $block_settings );
+				_wp_array_set( $new_settings, $new_path, $block_settings );
 
 				$new = array_replace_recursive( $new, $new_settings );
 				foreach ( $paths_to_override as $path ) {
 					$block_value = _wp_array_get( $block_settings, $path, null );
 					if ( null !== $block_value ) {
-						gutenberg_experimental_set( $new, array_merge( $new_path, $path ), $block_value );
+						_wp_array_set( $new, array_merge( $new_path, $path ), $block_value );
 					}
 				}
 			}
@@ -343,10 +343,10 @@ class WP_Theme_JSON_Schema_Gutenberg {
 				continue;
 			}
 
-			gutenberg_experimental_set( $new, array( 'elements', $new_name ), $new['blocks'][ $old_name ] );
+			_wp_array_set( $new, array( 'elements', $new_name ), $new['blocks'][ $old_name ] );
 
 			if ( isset( $new['blocks'][ $old_name ]['elements'] ) ) {
-				gutenberg_experimental_set( $new, array( 'blocks', 'core/heading', 'elements' ), $new['blocks'][ $old_name ]['elements'] );
+				_wp_array_set( $new, array( 'blocks', 'core/heading', 'elements' ), $new['blocks'][ $old_name ]['elements'] );
 			}
 
 			unset( $new['blocks'][ $old_name ] );
@@ -362,7 +362,7 @@ class WP_Theme_JSON_Schema_Gutenberg {
 				continue;
 			}
 
-			gutenberg_experimental_set( $new, array( 'blocks', $new_name ), $new['blocks'][ $old_name ] );
+			_wp_array_set( $new, array( 'blocks', $new_name ), $new['blocks'][ $old_name ] );
 			unset( $new['blocks'][ $old_name ] );
 
 		}
@@ -463,7 +463,7 @@ class WP_Theme_JSON_Schema_Gutenberg {
 			$current_value = _wp_array_get( $settings, $original_path, null );
 
 			if ( null !== $current_value ) {
-				gutenberg_experimental_set( $settings, $renamed_path, $current_value );
+				_wp_array_set( $settings, $renamed_path, $current_value );
 				self::unset_setting_by_path( $settings, $original_path );
 			}
 		}
