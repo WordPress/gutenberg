@@ -23,7 +23,7 @@ export default function useDisplayBlockControls() {
 
 			const displayControls = hasBlockSupport(
 				parentBlockName,
-				'__experimentalExposeControlsToChildren',
+				'__experimentalDisplayChildBlockControls',
 				true
 			);
 
