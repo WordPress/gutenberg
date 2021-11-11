@@ -3,7 +3,8 @@
  */
 import { __ } from '@wordpress/i18n';
 import { LEFT, RIGHT } from '@wordpress/keycodes';
-import { VisuallyHidden } from '@wordpress/components';
+import { VisuallyHidden, Button } from '@wordpress/components';
+import { dragHandle } from '@wordpress/icons';
 
 const DELTA_DISTANCE = 20; // The distance to resize per keydown in pixels.
 
@@ -26,7 +27,8 @@ export default function ResizeHandle( { direction, resizeWidthBy } ) {
 
 	return (
 		<>
-			<button
+			<Button
+				icon={ dragHandle }
 				className={ `resizable-editor__drag-handle is-${ direction }` }
 				aria-label={ __( 'Drag to resize' ) }
 				aria-describedby={ `resizable-editor__resize-help-${ direction }` }
