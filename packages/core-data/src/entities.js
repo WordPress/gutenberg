@@ -130,7 +130,7 @@ export const defaultEntities = [
 	{
 		name: 'navigationArea',
 		kind: 'root',
-		baseURL: '/__experimental/block-navigation-areas',
+		baseURL: '/wp/v2/block-navigation-areas',
 		baseURLParams: { context: 'edit' },
 		plural: 'navigationAreas',
 		label: __( 'Navigation Area' ),
