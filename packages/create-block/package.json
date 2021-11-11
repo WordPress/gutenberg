@@ -36,7 +36,7 @@
 		"check-node-version": "^4.1.0",
 		"commander": "^4.1.0",
 		"execa": "^4.0.2",
-		"fast-glob": "^2.2.7",
+		"fast-glob": "^3.2.7",
 		"inquirer": "^7.1.0",
 		"lodash": "^4.17.21",
 		"make-dir": "^3.0.0",

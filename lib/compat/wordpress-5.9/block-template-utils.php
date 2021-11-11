@@ -218,6 +218,10 @@ if ( ! function_exists( '_get_block_template_file' ) ) {
 	 * @return array|null Template.
 	 */
 	function _get_block_template_file( $template_type, $slug ) {
+		if ( 'wp_template' !== $template_type && 'wp_template_part' !== $template_type ) {
+			return null;
+		}
+
 		$template_base_paths = array(
 			'wp_template'      => 'block-templates',
 			'wp_template_part' => 'block-template-parts',
@@ -264,6 +268,10 @@ if ( ! function_exists( '_get_block_templates_files' ) ) {
 	 * @return array Template.
 	 */
 	function _get_block_templates_files( $template_type ) {
+		if ( 'wp_template' !== $template_type && 'wp_template_part' !== $template_type ) {
+			return null;
+		}
+
 		$template_base_paths = array(
 			'wp_template'      => 'block-templates',
 			'wp_template_part' => 'block-template-parts',

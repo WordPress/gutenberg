@@ -12,15 +12,14 @@
  * @see WP_REST_Posts_Controller
  */
 class WP_REST_Menu_Items_Controller extends WP_REST_Posts_Controller {
+
 	/**
-	 * Constructor.
+	 * Whether the controller supports batching.
 	 *
-	 * @param string $post_type Post type.
+	 * @since 5.9.0
+	 * @var array
 	 */
-	public function __construct( $post_type ) {
-		parent::__construct( $post_type );
-		$this->namespace = 'wp/v2';
-	}
+	protected $allow_batch = array( 'v1' => true );
 
 	/**
 	 * Overrides the route registration to support "allow_batch".
@@ -44,7 +43,7 @@ class WP_REST_Menu_Items_Controller extends WP_REST_Posts_Controller {
 					'permission_callback' => array( $this, 'create_item_permissions_check' ),
 					'args'                => $this->get_endpoint_args_for_item_schema( WP_REST_Server::CREATABLE ),
 				),
-				'allow_batch' => array( 'v1' => true ),
+				'allow_batch' => $this->allow_batch,
 				'schema'      => array( $this, 'get_public_item_schema' ),
 			)
 		);
@@ -93,7 +92,7 @@ class WP_REST_Menu_Items_Controller extends WP_REST_Posts_Controller {
 						),
 					),
 				),
-				'allow_batch' => array( 'v1' => true ),
+				'allow_batch' => $this->allow_batch,
 				'schema'      => array( $this, 'get_public_item_schema' ),
 			)
 		);

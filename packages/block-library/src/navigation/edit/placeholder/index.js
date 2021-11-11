@@ -13,7 +13,8 @@ import { store as coreStore } from '@wordpress/core-data';
 import { useDispatch } from '@wordpress/data';
 import { useCallback, useState, useEffect } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
-import { navigation, chevronDown, Icon } from '@wordpress/icons';
+import { navigation, Icon } from '@wordpress/icons';
+import { decodeEntities } from '@wordpress/html-entities';
 
 /**
  * Internal dependencies
@@ -34,13 +35,14 @@ const ExistingMenusDropdown = ( {
 	onCreateFromMenu,
 } ) => {
 	const toggleProps = {
-		variant: 'primary',
+		variant: 'tertiary',
+		iconPosition: 'right',
 		className: 'wp-block-navigation-placeholder__actions__dropdown',
 	};
 	return (
 		<DropdownMenu
-			text={ __( 'Select existing menu' ) }
-			icon={ chevronDown }
+			text={ __( 'Select menu' ) }
+			icon={ null }
 			toggleProps={ toggleProps }
 			popoverProps={ { isAlternate: true } }
 		>
@@ -58,7 +60,9 @@ const ExistingMenusDropdown = ( {
 										onClose={ onClose }
 										key={ menu.id }
 									>
-										{ menu.title.rendered }
+										{ decodeEntities(
+											menu.title.rendered
+										) }
 									</MenuItem>
 								);
 							} ) }
@@ -74,7 +78,7 @@ const ExistingMenusDropdown = ( {
 									onClose={ onClose }
 									key={ menu.id }
 								>
-									{ menu.name }
+									{ decodeEntities( menu.name ) }
 								</MenuItem>
 							);
 						} ) }
@@ -201,32 +205,35 @@ export default function NavigationPlaceholder( {
 								<Icon icon={ navigation } />{ ' ' }
 								{ __( 'Navigation' ) }
 							</div>
+							<hr />
 							{ hasMenus || navigationMenus.length ? (
-								<ExistingMenusDropdown
-									canSwitchNavigationMenu={
-										canSwitchNavigationMenu
-									}
-									navigationMenus={ navigationMenus }
-									setSelectedMenu={ setSelectedMenu }
-									onFinish={ onFinish }
-									menus={ menus }
-									onCreateFromMenu={ onCreateFromMenu }
-								/>
+								<>
+									<ExistingMenusDropdown
+										canSwitchNavigationMenu={
+											canSwitchNavigationMenu
+										}
+										navigationMenus={ navigationMenus }
+										setSelectedMenu={ setSelectedMenu }
+										onFinish={ onFinish }
+										menus={ menus }
+										onCreateFromMenu={ onCreateFromMenu }
+									/>
+									<hr />
+								</>
 							) : undefined }
 							{ hasPages ? (
-								<Button
-									variant={
-										hasMenus || canSwitchNavigationMenu
-											? 'tertiary'
-											: 'primary'
-									}
-									onClick={ () => {
-										setIsNewMenuModalVisible( true );
-										setCreateEmpty( false );
-									} }
-								>
-									{ __( 'Add all pages' ) }
-								</Button>
+								<>
+									<Button
+										variant="tertiary"
+										onClick={ () => {
+											setIsNewMenuModalVisible( true );
+											setCreateEmpty( false );
+										} }
+									>
+										{ __( 'Add all pages' ) }
+									</Button>
+									<hr />
+								</>
 							) : undefined }
 							<Button
 								variant="tertiary"
