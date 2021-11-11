@@ -18,15 +18,11 @@ const CUSTOM_FONT_SIZE_OPTION = {
  * Helper util to split a font size to its numeric value
  * and its `unit`, if exists.
  *
- * @param {string|number} size Font size.
+ * @param {string} size Font size.
  * @return {[number, string]} An array with the numeric value and the unit if exists.
  */
 export function splitValueAndUnitFromSize( size ) {
-	/**
-	 * The first matched result is ignored as it's the left
-	 * hand side of the capturing group in the regex.
-	 */
-	const [ , numericValue, unit ] = size.split( /(\d+)/ );
+	const [ numericValue, unit ] = size.match( /[\d\.]+|\D+/g );
 	return [ numericValue, unit ];
 }
 
@@ -38,7 +34,7 @@ export function splitValueAndUnitFromSize( size ) {
  * @return {boolean} Whether the value is a simple css value.
  */
 export function isSimpleCssValue( value ) {
-	const sizeRegex = /^(?!0)\d+(px|em|rem|vw|vh|%)?$/i;
+	const sizeRegex = /^(?!0)[\d\.]+(px|em|rem|vw|vh|%)?$/i;
 	return sizeRegex.test( value );
 }
 
@@ -75,7 +71,7 @@ function getSelectOptions( optionsArray, disableCustomFontSizes ) {
 		name,
 		size,
 		__experimentalHint:
-			size && isSimpleCssValue( size ) && parseInt( size ),
+			size && isSimpleCssValue( size ) && parseFloat( size ),
 	} ) );
 }
 
