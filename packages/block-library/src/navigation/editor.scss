@@ -324,6 +324,11 @@ $color-control-label-height: 20px;
 		.wp-block-navigation-placeholder__actions {
 			flex-direction: column;
 		}
+
+		// Hide the separators in the vertical version.
+		.wp-block-navigation-placeholder__actions hr {
+			display: none;
+		}
 	}
 
 	.wp-block-navigation-placeholder__icon {
@@ -333,23 +338,18 @@ $color-control-label-height: 20px;
 
 	// Block title
 	.wp-block-navigation-placeholder__actions__indicator {
-		margin-right: $grid-unit-15;
-		padding: 0;
+		display: flex;
+		padding: 0 ($grid-unit-15 * 0.5) 0 0;
 		align-items: center;
 		justify-content: flex-start;
 		line-height: 0;
+		min-height: $button-size;
 
 		// Line up with the icon in the toolbar.
-		margin-left: $grid-unit-05 + $border-width;
+		margin-left: $grid-unit-05;
 
 		svg {
 			margin-right: $grid-unit-05;
-		}
-
-		// Show only in big placeholders.
-		display: none;
-		.is-large & {
-			display: inline-flex;
 		}
 	}
 }
@@ -358,21 +358,29 @@ $color-control-label-height: 20px;
 	display: flex;
 	font-size: $default-font-size;
 	font-family: $default-font;
-
-	.components-button.components-dropdown-menu__toggle.has-icon {
-		padding:
-			( $grid-unit-15 * 0.5 ) $grid-unit-05 ( $grid-unit-15 * 0.5 )
-			$grid-unit-15;
-		display: flex;
-		flex-direction: row-reverse; // This puts the chevron, which is hidden from screen readers, on the right.
-	}
+	gap: $grid-unit-15 * 0.5;
 
 	// Margins.
 	.components-dropdown,
 	> .components-button {
-		margin-right: $grid-unit-15;
+		margin-right: 0;
+	}
+
+	// Separator.
+	height: 100%; // This allows the separator to scale vertically.
+
+	// Separator.
+	&.wp-block-navigation-placeholder__actions hr {
+		border: 0;
+		min-height: $border-width;
+		min-width: $border-width;
+		background-color: $gray-900;
+		margin: auto 0;
+		height: 100%;
+		max-height: $grid-unit-20;
 	}
 }
+
 
 /**
  * Mobile menu.
