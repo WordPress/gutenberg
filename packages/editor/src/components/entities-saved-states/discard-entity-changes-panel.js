@@ -82,25 +82,23 @@ export default function DiscardEntityChangesPanel( { closePanel, savables } ) {
 				</div>
 
 				<PanelBody initialOpen={ true }>
-					{ savables.map( ( record ) => {
-						return (
-							<EntityRecordItem
-								key={ record.key || record.property }
-								record={ record }
-								checked={ some(
-									selectedEntities,
-									( elt ) =>
-										elt.kind === record.kind &&
-										elt.name === record.name &&
-										elt.key === record.key &&
-										elt.property === record.property
-								) }
-								onChange={ ( value ) =>
-									setSelectedEntities( record, value )
-								}
-							/>
-						);
-					} ) }
+					{ savables.map( ( record ) => (
+						<EntityRecordItem
+							key={ record.key || record.property }
+							record={ record }
+							checked={ some(
+								selectedEntities,
+								( elt ) =>
+									elt.kind === record.kind &&
+									elt.name === record.name &&
+									elt.key === record.key &&
+									elt.property === record.property
+							) }
+							onChange={ ( value ) =>
+								setSelectedEntities( record, value )
+							}
+						/>
+					) ) }
 					<PanelRow>
 						<Button
 							disabled={ selectedEntities.length === 0 }
