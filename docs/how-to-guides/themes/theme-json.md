@@ -229,6 +229,8 @@ The settings section has the following structure:
 			"custom": true,
 			"customDuotone": true,
 			"customGradient": true,
+			"corePalette": true,
+			"coreGradients": true,
 			"duotone": [],
 			"gradients": [],
 			"link": false,
