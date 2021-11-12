@@ -45,6 +45,16 @@
 							"type": "boolean",
 							"default": true
 						},
+						"corePalette": {
+							"description": "Allow users to choose colors from the Core palette. \nGutenberg plugin required.",
+							"type": "boolean",
+							"default": true
+						},
+						"coreGradients": {
+							"description": "Allow users to choose colors from the Core gradients. \nGutenberg plugin required.",
+							"type": "boolean",
+							"default": true
+						},
 						"custom": {
 							"description": "Allow users to select custom colors.\nSince 5.8.",
 							"type": "boolean",
