@@ -187,7 +187,7 @@ function gutenberg_get_navigation_areas() {
  * @return array A list of paths.
  */
 function gutenberg_get_navigation_areas_paths_to_preload() {
-	$areas        = get_option( 'fse_navigation_areas', array() );
+	$areas        = get_option( 'wp_navigation_areas', array() );
 	$active_areas = array_intersect_key( $areas, gutenberg_get_navigation_areas() );
 	$paths        = array(
 		'/wp/v2/block-navigation-areas?context=edit',
@@ -225,7 +225,7 @@ function gutenberg_migrate_menu_to_navigation_post( $new_name, $new_theme, $old_
 	add_filter( 'option_stylesheet', $get_old_theme_stylesheet );
 
 	$locations    = get_nav_menu_locations();
-	$area_mapping = get_option( 'fse_navigation_areas', array() );
+	$area_mapping = get_option( 'wp_navigation_areas', array() );
 
 	foreach ( $locations as $location_name => $menu_id ) {
 		// Get the menu from the location, skipping if there is no
@@ -277,7 +277,7 @@ function gutenberg_migrate_menu_to_navigation_post( $new_name, $new_theme, $old_
 	}
 	remove_filter( 'option_stylesheet', $get_old_theme_stylesheet );
 
-	update_option( 'fse_navigation_areas', $area_mapping );
+	update_option( 'wp_navigation_areas', $area_mapping );
 }
 
 add_action( 'switch_theme', 'gutenberg_migrate_menu_to_navigation_post', 200, 3 );
