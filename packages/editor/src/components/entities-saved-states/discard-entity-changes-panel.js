@@ -8,7 +8,7 @@ import { some } from 'lodash';
  */
 import { Button, PanelBody, PanelRow } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-import { useDispatch } from '@wordpress/data';
+import { useDispatch, useSelect } from '@wordpress/data';
 import { Fragment, useState } from '@wordpress/element';
 import { store as coreStore } from '@wordpress/core-data';
 
@@ -18,6 +18,15 @@ import { store as coreStore } from '@wordpress/core-data';
 import EntityRecordItem from './entity-record-item';
 
 export default function DiscardEntityChangesPanel( { closePanel, savables } ) {
+	const discardableSavables = useSelect( ( select ) =>
+		savables.filter(
+			( { kind, name, key } ) =>
+				! select( coreStore ).isSavingEntityRecord( kind, name, key )
+		)
+	);
+
+	const isSaving = savables.length !== discardableSavables.length;
+
 	const {
 		__experimentalResetEditedEntityRecord: resetEditedEntityRecord,
 		__experimentalResetSpecifiedEntityEdits: resetSpecifiedEntityEdits,
@@ -82,7 +91,7 @@ export default function DiscardEntityChangesPanel( { closePanel, savables } ) {
 				</div>
 
 				<PanelBody initialOpen={ true }>
-					{ savables.map( ( record ) => (
+					{ discardableSavables.map( ( record ) => (
 						<EntityRecordItem
 							key={ record.key || record.property }
 							record={ record }
@@ -101,7 +110,9 @@ export default function DiscardEntityChangesPanel( { closePanel, savables } ) {
 					) ) }
 					<PanelRow>
 						<Button
-							disabled={ selectedEntities.length === 0 }
+							disabled={
+								selectedEntities.length === 0 || isSaving
+							}
 							isDestructive
 							onClick={ discardCheckedEntities }
 						>
