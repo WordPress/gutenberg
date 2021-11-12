@@ -28,6 +28,6 @@
 // We use :where to provide minimum specificity, so that intentional margins,
 // such as those configured in theme.json, override and win on specificity.
 html :where(.wp-block-column) {
-    margin-top: 0;
-    margin-bottom: 0;
+	margin-top: 0;
+	margin-bottom: 0;
 }
