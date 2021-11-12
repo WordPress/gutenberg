@@ -323,7 +323,13 @@
 	.is-responsive {
 		display: none;
 	}
+
+	// Horizontal layout
+	.items-justified-space-between & {
+		flex-grow: 1;
+	}
 }
+
 
 /**
  * Mobile menu.
