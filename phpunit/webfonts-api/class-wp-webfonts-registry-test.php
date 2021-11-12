@@ -8,13 +8,13 @@ class WP_Webfonts_Registry_Test extends WP_UnitTestCase {
 	private $registry;
 	private $validator_mock;
 
-	public static function set_up_before_class() {
+	public static function setUpBeforeClass() {
 		require_once dirname( dirname( __DIR__ ) ) . '/lib/webfonts-api/class-wp-webfonts-schema-validator.php';
 		require_once dirname( dirname( __DIR__ ) ) . '/lib/webfonts-api/class-wp-webfonts-registry.php';
 	}
 
-	public function set_up() {
-		parent::set_up();
+	public function setUp() {
+		parent::setUp();
 
 		$this->validator_mock = $this->getMockBuilder( 'WP_Webfonts_Schema_Validator' )->getMock();
 

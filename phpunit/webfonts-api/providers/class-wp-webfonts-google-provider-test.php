@@ -7,13 +7,13 @@
 class WP_Webfonts_Google_Provider_Test extends WP_UnitTestCase {
 	private $provider;
 
-	public static function set_up_before_class() {
+	public static function setUpBeforeClass() {
 		require_once dirname( dirname( dirname( __DIR__ ) ) ) . '/lib/webfonts-api/providers/class-wp-webfonts-provider.php';
 		require_once dirname( dirname( dirname( __DIR__ ) ) ) . '/lib/webfonts-api/providers/class-wp-webfonts-google-provider.php';
 	}
 
-	public function set_up() {
-		parent::set_up();
+	public function setUp() {
+		parent::setUp();
 
 		$this->provider = new WP_Webfonts_Google_Provider();
 	}

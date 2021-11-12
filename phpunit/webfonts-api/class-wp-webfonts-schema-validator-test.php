@@ -7,7 +7,7 @@
 class WP_Webfonts_Schema_Validator_Test extends WP_UnitTestCase {
 	private static $validator;
 
-	public static function set_up_before_class() {
+	public static function setUpBeforeClass() {
 		require_once dirname( dirname( __DIR__ ) ) . '/lib/webfonts-api/class-wp-webfonts-schema-validator.php';
 
 		self::$validator = new WP_Webfonts_Schema_Validator();

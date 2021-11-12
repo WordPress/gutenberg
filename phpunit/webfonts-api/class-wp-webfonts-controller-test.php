@@ -9,15 +9,15 @@ class WP_Webfonts_Controller_Test extends WP_UnitTestCase {
 	private $webfont_registry_mock;
 	private $provider_registry_mock;
 
-	public static function set_up_before_class() {
+	public static function setUpBeforeClass() {
 		require_once dirname( dirname( __DIR__ ) ) . '/lib/webfonts-api/class-wp-webfonts-registry.php';
 		require_once dirname( dirname( __DIR__ ) ) . '/lib/webfonts-api/class-wp-webfonts-provider-registry.php';
 		require_once dirname( dirname( __DIR__ ) ) . '/lib/webfonts-api/class-wp-webfonts-controller.php';
 		require_once __DIR__ . '/mocks/class-my-custom-webfonts-provider-mock.php';
 	}
 
-	public function set_up() {
-		parent::set_up();
+	public function setUp() {
+		parent::setUp();
 
 		$this->webfont_registry_mock  = $this->getMockBuilder( 'WP_Webfonts_Registry' )
 											->disableOriginalConstructor()
