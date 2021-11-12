@@ -13,6 +13,8 @@ class WP_Webfonts_Controller_Test extends WP_UnitTestCase {
 		require_once dirname( dirname( __DIR__ ) ) . '/lib/webfonts-api/class-wp-webfonts-registry.php';
 		require_once dirname( dirname( __DIR__ ) ) . '/lib/webfonts-api/class-wp-webfonts-provider-registry.php';
 		require_once dirname( dirname( __DIR__ ) ) . '/lib/webfonts-api/class-wp-webfonts-controller.php';
+		require_once dirname( dirname( __DIR__ ) ) . '/lib/webfonts-api/providers/class-wp-webfonts-provider.php';
+		require_once dirname( dirname( __DIR__ ) ) . '/lib/webfonts-api/providers/class-wp-webfonts-google-provider.php';
 		require_once __DIR__ . '/mocks/class-my-custom-webfonts-provider-mock.php';
 	}
 
