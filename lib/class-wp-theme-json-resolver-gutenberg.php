@@ -287,6 +287,8 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 			$result->merge( self::get_user_data() );
 		}
 
+		$result->maybe_remove_core_color_palette_and_gradients();
+
 		return $result;
 	}
 

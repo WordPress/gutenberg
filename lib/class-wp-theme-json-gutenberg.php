@@ -92,6 +92,8 @@ class WP_Theme_JSON_Gutenberg {
 			'custom'         => null,
 			'customDuotone'  => null,
 			'customGradient' => null,
+			'corePalette'    => null,
+			'coreGradients'  => null,
 			'duotone'        => null,
 			'gradients'      => null,
 			'link'           => null,
@@ -1319,7 +1321,47 @@ class WP_Theme_JSON_Gutenberg {
 				}
 			}
 		}
+	}
 
+	/**
+ 	 * Removes the Core Palette and Gradients if the Theme
+	 * opts out of them using the `corePalette` and `coreGradients` value
+ 	 *
+ 	 * @return void
+ 	 */
+	public function maybe_remove_core_color_palette_and_gradients() {
+
+		if ( isset( $this->theme_json['settings']['color']['corePalette'] ) ) {
+			if ( false === $this->theme_json['settings']['color']['corePalette'] ) {
+				$this->theme_json['settings']['color']['palette']['core'] = [];
+			}
+		}
+
+		if ( isset( $this->theme_json['settings']['blocks'] ) && is_array( $this->theme_json['settings']['blocks'] ) ) {
+			foreach ( $this->theme_json['settings']['blocks'] as &$block ) {
+				if ( isset( $block['color']['corePalette'] ) ) {
+					if ( false === $block['color']['corePalette'] ) {
+						$block['color']['palette']['core'] = [];
+					}
+				}
+			}
+		}
+
+		if ( isset( $this->theme_json['settings']['color']['coreGradients'] ) ) {
+			if ( false === $this->theme_json['settings']['color']['coreGradients'] ) {
+				$this->theme_json['settings']['color']['gradients']['core'] = [];
+			}
+		}
+
+		if ( isset( $this->theme_json['settings']['blocks'] ) && is_array( $this->theme_json['settings']['blocks'] ) ) {
+			foreach ( $this->theme_json['settings']['blocks'] as &$block ) {
+				if ( isset( $block['color']['coreGradients'] ) ) {
+					if ( false === $block['color']['coreGradients'] ) {
+						$block['color']['gradients']['core'] = [];
+					}
+				}
+			}
+		}
 	}
 
 	/**
