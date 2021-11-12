@@ -300,8 +300,8 @@ function gutenberg_register_webfonts_from_theme_json() {
 		$webfonts = array();
 
 		// Look for fontFamilies.
-		foreach ( $theme_settings['typography']['fontFamilies'] as $context => $font_families ) {
-			foreach ( $font_families as $key => $font_family ) {
+		foreach ( $theme_settings['typography']['fontFamilies'] as $font_families ) {
+			foreach ( $font_families as $font_family ) {
 
 				// Skip if fontFace is not defined.
 				if ( empty( $font_family['fontFace'] ) ) {
