@@ -31,15 +31,6 @@ function gutenberg_is_edit_site_page( $page ) {
 	return 'appearance_page_gutenberg-edit-site' === $page;
 }
 
-// Default to is-fullscreen-mode to avoid rendering wp-admin navigation menu while loading and
-// having jumps in the UI.
-add_filter(
-	'admin_body_class',
-	static function( $classes ) {
-		return "$classes is-fullscreen-mode";
-	}
-);
-
 /**
  * Load editor styles (this is copied from edit-form-blocks.php).
  * Ideally the code is extracted into a reusable function.
@@ -89,6 +80,15 @@ function gutenberg_edit_site_init( $hook ) {
 	if ( ! gutenberg_is_edit_site_page( $hook ) ) {
 		return;
 	}
+
+	// Default to is-fullscreen-mode to avoid rendering wp-admin navigation menu while loading and
+	// having jumps in the UI.
+	add_filter(
+		'admin_body_class',
+		static function( $classes ) {
+			return "$classes is-fullscreen-mode";
+		}
+	);
 
 	/**
 	 * Make the WP Screen object aware that this is a block editor page.
