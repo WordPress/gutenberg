@@ -11,7 +11,7 @@ import { useSelect } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
 import {
 	BlockContextProvider,
-	BlockPreview,
+	useBlockPreview,
 	useBlockProps,
 	useInnerBlocksProps,
 	store as blockEditorStore,
@@ -28,6 +28,23 @@ const TEMPLATE = [
 function PostTemplateInnerBlocks() {
 	const innerBlocksProps = useInnerBlocksProps( {}, { template: TEMPLATE } );
 	return <li { ...innerBlocksProps } />;
+}
+
+function PostTemplateBlockPreview( { blocks, onClick } ) {
+	const blockPreviewProps = useBlockPreview( {
+		blocks,
+	} );
+
+	return (
+		<li
+			{ ...blockPreviewProps }
+			tabIndex={ 0 }
+			// eslint-disable-next-line jsx-a11y/no-noninteractive-element-to-interactive-role
+			role="button"
+			onClick={ onClick }
+			onKeyPress={ onClick }
+		/>
+	);
 }
 
 export default function PostTemplateEdit( {
@@ -144,6 +161,8 @@ export default function PostTemplateEdit( {
 		return <p { ...blockProps }> { __( 'No results found.' ) }</p>;
 	}
 
+	// Insert what we need right here.
+
 	return (
 		<ul { ...blockProps }>
 			{ blockContexts &&
@@ -156,15 +175,12 @@ export default function PostTemplateEdit( {
 						( activeBlockContext || blockContexts[ 0 ] ) ? (
 							<PostTemplateInnerBlocks />
 						) : (
-							<li>
-								<BlockPreview
-									blocks={ blocks }
-									__experimentalLive
-									__experimentalOnClick={ () =>
-										setActiveBlockContext( blockContext )
-									}
-								/>
-							</li>
+							<PostTemplateBlockPreview
+								blocks={ blocks }
+								onClick={ () =>
+									setActiveBlockContext( blockContext )
+								}
+							/>
 						) }
 					</BlockContextProvider>
 				) ) }

@@ -664,6 +664,23 @@ _Returns_
 
 Undocumented declaration.
 
+### useBlockPreview
+
+This hook is used to lightly mark an element as a block preview wrapper
+element. Call this hook and pass the returned props to the element to mark as
+a block preview wrapper, automatically rendering inner blocks as children. If
+you define a ref for the element, it is important to pass the ref to this
+hook, which the hook in turn will pass to the component through the props it
+returns. Optionally, you can also pass any other props through this hook, and
+they will be merged and returned.
+
+_Parameters_
+
+-   _options_ `Object`: Preview options.
+-   _options.blocks_ `WPBlock[]`: Block objects.
+-   _options.props_ `Object`: Optional. Props to pass to the element. Must contain the ref if one is defined.
+-   _options.\_\_experimentalLayout_ `Object`: Layout settings to be used in the preview.
+
 ### useBlockProps
 
 This hook is used to lightly mark an element as a block element. The element
