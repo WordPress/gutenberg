@@ -1324,11 +1324,11 @@ class WP_Theme_JSON_Gutenberg {
 	}
 
 	/**
- 	 * Removes the Core Palette and Gradients if the Theme
+	 * Removes the Core Palette and Gradients if the Theme
 	 * opts out of them using the `corePalette` and `coreGradients` value
- 	 *
- 	 * @return void
- 	 */
+	 *
+	 * @return void
+	 */
 	public function maybe_remove_core_color_palette_and_gradients() {
 
 		if ( isset( $this->theme_json['settings']['color']['corePalette'] ) ) {
