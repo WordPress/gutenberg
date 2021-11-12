@@ -24,7 +24,7 @@ export const KeyboardAwareFlatList = ( {
 	return (
 		<RNKeyboardAwareFlatList
 			style={ [ { flex: 1 }, scrollViewStyle ] }
-			contentContainerStyle={ { flexGrow: 1, backgroundColor: 'red' } }
+			contentContainerStyle={ { flexGrow: 1 } }
 			keyboardDismissMode="none"
 			enableResetScrollToCoords={ false }
 			keyboardShouldPersistTaps="handled"
