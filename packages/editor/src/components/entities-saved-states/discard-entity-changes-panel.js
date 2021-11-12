@@ -75,7 +75,7 @@ export default function DiscardEntityChangesPanel( { closePanel, savables } ) {
 
 	return (
 		<Fragment>
-			<div className="entities-saved-states__discard-changes-panel">
+			<div>
 				<div className="entities-saved-states__text-prompt">
 					<strong>{ __( "What's next?" ) }</strong>
 					<p>
@@ -85,7 +85,7 @@ export default function DiscardEntityChangesPanel( { closePanel, savables } ) {
 					</p>
 					<p>
 						{ __(
-							'You can select them and discard their changes, or continue editing and deal with them later.'
+							'You can select them and discard their changes now, or close the panel and deal with them later.'
 						) }
 					</p>
 				</div>
@@ -120,12 +120,6 @@ export default function DiscardEntityChangesPanel( { closePanel, savables } ) {
 						</Button>
 					</PanelRow>
 				</PanelBody>
-			</div>
-
-			<div className="entities-saved-states__footer">
-				<Button onClick={ closePanel } variant="primary">
-					<span>{ __( 'Continue editing' ) }</span>
-				</Button>
 			</div>
 		</Fragment>
 	);
