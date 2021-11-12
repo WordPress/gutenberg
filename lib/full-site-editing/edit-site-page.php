@@ -85,7 +85,7 @@ function gutenberg_edit_site_init( $hook ) {
 	// having jumps in the UI.
 	add_filter(
 		'admin_body_class',
-		static function( $classes ) {
+		function( $classes ) {
 			return "$classes is-fullscreen-mode";
 		}
 	);
