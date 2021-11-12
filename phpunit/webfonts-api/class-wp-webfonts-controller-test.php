@@ -177,7 +177,7 @@ class WP_Webfonts_Controller_Test extends WP_UnitTestCase {
 		 * As this method adds an inline style, the test needs to print it.
 		 * Print the webfont styles and test the output matches expectation.
 		 */
-		$expected  = "<style id='{$stylesheet_handle}-inline-css' type='text/css'>\n";
+		$expected  = "<style id='{$stylesheet_handle}-inline-css'>\n";
 		$expected .= $provider->get_css() . "\n";
 		$expected .= "</style>\n";
 		$this->expectOutputString( $expected );
