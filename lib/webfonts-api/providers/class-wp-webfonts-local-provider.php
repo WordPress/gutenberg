@@ -94,7 +94,7 @@ class WP_Webfonts_Local_Provider extends WP_Webfonts_Provider {
 			$webfont = $this->order_src( $webfont );
 
 			// Build the @font-face CSS for this webfont.
-			$css .= "@font-face{\n" . $this->build_font_face_css( $webfont ) . "}\n";
+			$css .= '@font-face{' . $this->build_font_face_css( $webfont ) . '}';
 		}
 
 		return $css;
@@ -211,9 +211,7 @@ class WP_Webfonts_Local_Provider extends WP_Webfonts_Provider {
 			}
 
 			if ( ! empty( $value ) ) {
-				$css .= ( defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG )
-					? "\t$key:$value;\n"
-					: "$key:$value";
+				$css .= "$key:$value;";
 			}
 		}
 
