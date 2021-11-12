@@ -6,6 +6,7 @@
 	&[style*="font-family"] :where(.comment-reply-title) {
 		font-family: inherit;
 	}
+	&[class*="-font-size"] :where(.comment-reply-title),
 	&[style*="font-size"] :where(.comment-reply-title) {
 		font-size: inherit;
 	}
