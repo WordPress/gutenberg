@@ -1333,7 +1333,7 @@ class WP_Theme_JSON_Gutenberg {
 
 		if ( isset( $this->theme_json['settings']['color']['corePalette'] ) ) {
 			if ( false === $this->theme_json['settings']['color']['corePalette'] ) {
-				$this->theme_json['settings']['color']['palette']['core'] = [];
+				$this->theme_json['settings']['color']['palette']['core'] = array();
 			}
 		}
 
@@ -1341,7 +1341,7 @@ class WP_Theme_JSON_Gutenberg {
 			foreach ( $this->theme_json['settings']['blocks'] as &$block ) {
 				if ( isset( $block['color']['corePalette'] ) ) {
 					if ( false === $block['color']['corePalette'] ) {
-						$block['color']['palette']['core'] = [];
+						$block['color']['palette']['core'] = array();
 					}
 				}
 			}
@@ -1349,7 +1349,7 @@ class WP_Theme_JSON_Gutenberg {
 
 		if ( isset( $this->theme_json['settings']['color']['coreGradients'] ) ) {
 			if ( false === $this->theme_json['settings']['color']['coreGradients'] ) {
-				$this->theme_json['settings']['color']['gradients']['core'] = [];
+				$this->theme_json['settings']['color']['gradients']['core'] = array();
 			}
 		}
 
@@ -1357,7 +1357,7 @@ class WP_Theme_JSON_Gutenberg {
 			foreach ( $this->theme_json['settings']['blocks'] as &$block ) {
 				if ( isset( $block['color']['coreGradients'] ) ) {
 					if ( false === $block['color']['coreGradients'] ) {
-						$block['color']['gradients']['core'] = [];
+						$block['color']['gradients']['core'] = array();
 					}
 				}
 			}
