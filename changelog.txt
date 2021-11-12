@@ -1,6 +1,6 @@
 == Changelog ==
 
-= 11.9.0-rc.4 =
+= 11.9.0 =
 
 ### Features
 
@@ -134,15 +134,19 @@
 - Gallery: Make sure the mobile warning notice only runs when images are added to a new block. ([36326](https://github.com/WordPress/gutenberg/pull/36326))
 - Gallery: Only show the gallery upload error message if mixed multiple files are uploaded. ([35790](https://github.com/WordPress/gutenberg/pull/35790))
 - Gallery: Remove the arbitrary alt text that is added to gallery images. ([35936](https://github.com/WordPress/gutenberg/pull/35936))
+- Group: Fix inner container regexes that relied on fixed div tag. ([36256](https://github.com/WordPress/gutenberg/pull/36256))
 - Heading: Avoid error on split when the paragraph isn't registered. ([35871](https://github.com/WordPress/gutenberg/pull/35871))
 - Image: Make sure the Image block border radius is inherited if the image is linked. ([36289](https://github.com/WordPress/gutenberg/pull/36289))
 - Navigation Submenu: Fix PHP notice caused by stale id reference. ([35984](https://github.com/WordPress/gutenberg/pull/35984))
 - Navigation overlay menu: Fix submenu spacing. ([35823](https://github.com/WordPress/gutenberg/pull/35823))
+- Navigation: Ensure menus exist before map operation. ([36355](https://github.com/WordPress/gutenberg/pull/36355))
 - Navigation: Fix accessibility issues. ([36292](https://github.com/WordPress/gutenberg/pull/36292))
 - Navigation: Fix dropdown indicator position. ([36106](https://github.com/WordPress/gutenberg/pull/36106))
 - Navigation: Fix issues with responsive justifications. ([35913](https://github.com/WordPress/gutenberg/pull/35913)) and ([36105](https://github.com/WordPress/gutenberg/pull/36105))
 - Navigation: Fix padding for social links on mobile. ([35824](https://github.com/WordPress/gutenberg/pull/35824))
 - Navigation: Fix submenus not opening on click. ([36290](https://github.com/WordPress/gutenberg/pull/36290))
+- Navigation: Hide post attributes meta box. ([36358](https://github.com/WordPress/gutenberg/pull/36358))
+- Navigation: Small styling fixes and tweaks. ([36298](https://github.com/WordPress/gutenberg/pull/36298))
 - Pattern: Remove wrapping div. ([36090](https://github.com/WordPress/gutenberg/pull/36090))
 - Post Comment: Handle the case where a comment does not exist. ([35810](https://github.com/WordPress/gutenberg/pull/35810))
 - Post Navigation Link: Do not translate HTML tag. ([35930](https://github.com/WordPress/gutenberg/pull/35930))
@@ -195,8 +199,10 @@
 #### Template Editor
 - Clear selected block when clicking outside in the template part focus mode. ([35816](https://github.com/WordPress/gutenberg/pull/35816))
 - Templates: Only include templates for the current post types. ([35802](https://github.com/WordPress/gutenberg/pull/35802))
+
 #### Core Data
 - Avoid showing deleted records in editor saving flow. ([36027](https://github.com/WordPress/gutenberg/pull/36027))
+- Fix getEntityRecords to ensure resolution on REST API failure. ([36353](https://github.com/WordPress/gutenberg/pull/36353))
 - Fix Core Data using hardcoded baseURL prefix for taxonomies and post types API requests. ([35850](https://github.com/WordPress/gutenberg/pull/35850))
 - Make `saveEditedEntityRecord` use the entity key when available. ([36212](https://github.com/WordPress/gutenberg/pull/36212))
 
@@ -205,8 +211,10 @@
 
 #### Full Site Editing
 - Add fallback handling for plugins or themes using the Customizer. ([35877](https://github.com/WordPress/gutenberg/pull/35877))
-- Unhook `_block_template_render_title_tag` to prevent duplicate title tags from rendering. ([36133](https://github.com/WordPress/gutenberg/pull/36133))
+- Fix missing `<MainDashboardButton>` slot fill in site editor. ([36369](https://github.com/WordPress/gutenberg/pull/36369))
+- Remove duplicate Editor menu item. ([36342](https://github.com/WordPress/gutenberg/pull/36342))
 - Theme resolver: Fix crash from calls to `undefined` functions. ([36248](https://github.com/WordPress/gutenberg/pull/36248))
+- Unhook `_block_template_render_title_tag` to prevent duplicate title tags from rendering. ([36133](https://github.com/WordPress/gutenberg/pull/36133))
 
 #### Widgets Editor
 - Fix layout styles not applying in widgets customizer. ([35865](https://github.com/WordPress/gutenberg/pull/35865))
@@ -260,7 +268,7 @@
 - Fix wording in the Authoring Experience documentation. ([35969](https://github.com/WordPress/gutenberg/pull/35969))
 - Improve Getting Started landing page. ([35893](https://github.com/WordPress/gutenberg/pull/35893))
 - Release Docs: Remove consecutive RCs warning. ([35855](https://github.com/WordPress/gutenberg/pull/35855))
-- Theme.json - fix typo. ([36139](https://github.com/WordPress/gutenberg/pull/36139))
+- Theme.json: Fix typo. ([36139](https://github.com/WordPress/gutenberg/pull/36139))
 - Theme.json docs: Add missing settings & styles. ([36137](https://github.com/WordPress/gutenberg/pull/36137))
 - Tweak organization for getting-started documentation. ([34091](https://github.com/WordPress/gutenberg/pull/34091))
 - Update the recommendation for the cadence of npm releases. ([35925](https://github.com/WordPress/gutenberg/pull/35925))
@@ -297,7 +305,7 @@
 #### Post Editor
 - Migrate to thunks. ([35720](https://github.com/WordPress/gutenberg/pull/35720))
 - Refactor FlatTermSelector into a functional component. ([33459](https://github.com/WordPress/gutenberg/pull/33459))
-- ERemove GB prefixed functions from template part. ([36180](https://github.com/WordPress/gutenberg/pull/36180))
+- Remove GB prefixed functions from template part. ([36180](https://github.com/WordPress/gutenberg/pull/36180))
 - Translated site properties. ([36097](https://github.com/WordPress/gutenberg/pull/36097))
 
 #### Components
@@ -312,7 +320,6 @@
 - Schemas: Add schemas package. ([35998](https://github.com/WordPress/gutenberg/pull/35998))
 - Schemas: Theme.json - Add `title` to templateParts. ([36145](https://github.com/WordPress/gutenberg/pull/36145))
 
-
 #### CSS & Styling
 - Remove invalid buttons block CSS property. ([33793](https://github.com/WordPress/gutenberg/pull/33793))
 
@@ -324,10 +331,6 @@
 - Changes for FSE backport in core. ([36201](https://github.com/WordPress/gutenberg/pull/36201))
 - Temporarily pin .wp-env.json to WP 5.8.1. ([36333](https://github.com/WordPress/gutenberg/pull/36333))
 
-#### Workflows
-- Remove @chrisvanpatten from CODEOWNERS. ([35937](https://github.com/WordPress/gutenberg/pull/35937))
-- Add alexstine as code owner for post-title. ([36056](https://github.com/WordPress/gutenberg/pull/36056))
-  
 #### Testing
 - Add a method to disable auto-accepting dialogs. ([35828](https://github.com/WordPress/gutenberg/pull/35828))
 - Skip broken widgets test. ([36239](https://github.com/WordPress/gutenberg/pull/36239))
@@ -341,7 +344,6 @@
 
 #### Debugging
 - Wp-env: Disable Xdebug by default unless specified by user. ([34324](https://github.com/WordPress/gutenberg/pull/34324))
-
 
 
 = 11.8.3 =
