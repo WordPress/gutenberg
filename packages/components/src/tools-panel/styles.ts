@@ -8,6 +8,7 @@ import { css } from '@emotion/react';
  */
 import {
 	StyledField as BaseControlField,
+	StyledHelp as BaseControlHelp,
 	Wrapper as BaseControlWrapper,
 } from '../base-control/styles/base-control-styles';
 import { COLORS, CONFIG } from '../utils';
@@ -102,15 +103,14 @@ export const ToolsPanelItem = css`
 	/* Remove BaseControl components margins and leave spacing to grid layout */
 	&& ${ BaseControlWrapper } {
 		margin-bottom: 0;
-		/* The following allows controls with help text to maintain spacing. */
-		/* e.g. ToggleControls. */
-		display: flex;
-		flex-direction: column;
-		row-gap: ${ space( 3 ) };
 
-		${ BaseControlField } {
+		${ BaseControlField }:last-child {
 			margin-bottom: 0;
 		}
+	}
+
+	${ BaseControlHelp } {
+		margin-bottom: 0;
 	}
 `;
 
