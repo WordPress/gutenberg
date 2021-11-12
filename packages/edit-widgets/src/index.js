@@ -38,6 +38,7 @@ import {
 const disabledBlocks = [
 	'core/more',
 	'core/freeform',
+	'core/template-part',
 	...( ALLOW_REUSABLE_BLOCKS ? [] : [ 'core/block' ] ),
 ];
 
@@ -72,7 +73,8 @@ export function initialize( id, settings ) {
 			disabledBlocks.includes( block.name ) ||
 			block.name.startsWith( 'core/post' ) ||
 			block.name.startsWith( 'core/query' ) ||
-			block.name.startsWith( 'core/site' )
+			block.name.startsWith( 'core/site' ) ||
+			block.name.startsWith( 'core/navigation' )
 		);
 	} );
 

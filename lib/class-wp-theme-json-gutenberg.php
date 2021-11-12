@@ -82,10 +82,10 @@ class WP_Theme_JSON_Gutenberg {
 
 	const VALID_SETTINGS = array(
 		'border'     => array(
-			'color'        => null,
-			'customRadius' => null,
-			'style'        => null,
-			'width'        => null,
+			'color'  => null,
+			'radius' => null,
+			'style'  => null,
+			'width'  => null,
 		),
 		'color'      => array(
 			'background'     => null,
@@ -104,22 +104,22 @@ class WP_Theme_JSON_Gutenberg {
 			'wideSize'    => null,
 		),
 		'spacing'    => array(
-			'blockGap'      => null,
-			'customMargin'  => null,
-			'customPadding' => null,
-			'units'         => null,
+			'blockGap' => null,
+			'margin'   => null,
+			'padding'  => null,
+			'units'    => null,
 		),
 		'typography' => array(
-			'customFontSize'   => null,
-			'customLineHeight' => null,
-			'dropCap'          => null,
-			'fontFamilies'     => null,
-			'fontSizes'        => null,
-			'fontStyle'        => null,
-			'fontWeight'       => null,
-			'letterSpacing'    => null,
-			'textDecoration'   => null,
-			'textTransform'    => null,
+			'customFontSize' => null,
+			'dropCap'        => null,
+			'fontFamilies'   => null,
+			'fontSizes'      => null,
+			'fontStyle'      => null,
+			'fontWeight'     => null,
+			'letterSpacing'  => null,
+			'lineHeight'     => null,
+			'textDecoration' => null,
+			'textTransform'  => null,
 		),
 	);
 
@@ -273,7 +273,7 @@ class WP_Theme_JSON_Gutenberg {
 		'h6'   => 'h6',
 	);
 
-	const LATEST_SCHEMA = 1;
+	const LATEST_SCHEMA = 2;
 
 	/**
 	 * Constructor.
@@ -286,17 +286,7 @@ class WP_Theme_JSON_Gutenberg {
 			$origin = 'theme';
 		}
 
-		// The old format is not meant to be ported to core.
-		// We can remove it at that point.
-		if ( ! isset( $theme_json['version'] ) || 0 === $theme_json['version'] ) {
-			$theme_json = WP_Theme_JSON_Schema_V0::parse( $theme_json );
-		}
-
-		// Provide backwards compatibility for settings that did not land in 5.8
-		// and have had their `custom` prefixed removed since.
-		if ( 1 === $theme_json['version'] ) {
-			$theme_json = WP_Theme_JSON_Schema_V1::parse( $theme_json );
-		}
+		$theme_json = WP_Theme_JSON_Schema_Gutenberg::migrate( $theme_json );
 
 		$valid_block_names   = array_keys( self::get_blocks_metadata() );
 		$valid_element_names = array_keys( self::ELEMENTS );
@@ -309,7 +299,7 @@ class WP_Theme_JSON_Gutenberg {
 				$path   = array_merge( $node['path'], $preset_metadata['path'] );
 				$preset = _wp_array_get( $this->theme_json, $path, null );
 				if ( null !== $preset ) {
-					gutenberg_experimental_set( $this->theme_json, $path, array( $origin => $preset ) );
+					_wp_array_set( $this->theme_json, $path, array( $origin => $preset ) );
 				}
 			}
 		}
@@ -596,7 +586,7 @@ class WP_Theme_JSON_Gutenberg {
 			if ( is_array( $value_path ) ) {
 				$path_string = implode( '.', $value_path );
 				if (
-					isset( self::PROTECTED_PROPERTIES[ $path_string ] ) &&
+					array_key_exists( $path_string, self::PROTECTED_PROPERTIES ) &&
 					_wp_array_get( $settings, self::PROTECTED_PROPERTIES[ $path_string ], null ) === null
 				) {
 					continue;
@@ -714,7 +704,7 @@ class WP_Theme_JSON_Gutenberg {
 				continue;
 			}
 			foreach ( $preset_per_origin[ $origin ] as $preset ) {
-				$slug = gutenberg_experimental_to_kebab_case( $preset['slug'] );
+				$slug = _wp_to_kebab_case( $preset['slug'] );
 
 				$value = '';
 				if ( isset( $preset_metadata['value_key'] ) ) {
@@ -755,7 +745,7 @@ class WP_Theme_JSON_Gutenberg {
 				continue;
 			}
 			foreach ( $preset_per_origin[ $origin ] as $preset ) {
-				$slug = gutenberg_experimental_to_kebab_case( $preset['slug'] );
+				$slug = _wp_to_kebab_case( $preset['slug'] );
 
 				// Use the array as a set so we don't get duplicates.
 				$result[ $slug ] = $slug;
@@ -1075,8 +1065,8 @@ class WP_Theme_JSON_Gutenberg {
 	 *     }
 	 *   },
 	 *   'core/paragraph': {
-	 *     'spacing': {
-	 *       'customPadding': true
+	 *     'typography': {
+	 *       'customFontSize': true
 	 *     }
 	 *   }
 	 * }
@@ -1325,7 +1315,7 @@ class WP_Theme_JSON_Gutenberg {
 				$path = array_merge( $metadata['path'], $property_path );
 				$node = _wp_array_get( $incoming_data, $path, null );
 				if ( isset( $node ) ) {
-					gutenberg_experimental_set( $this->theme_json, $path, $node );
+					_wp_array_set( $this->theme_json, $path, $node );
 				}
 			}
 		}
@@ -1379,7 +1369,7 @@ class WP_Theme_JSON_Gutenberg {
 			}
 
 			if ( ! empty( $escaped_preset ) ) {
-				gutenberg_experimental_set( $output, $preset_metadata['path'], $escaped_preset );
+				_wp_array_set( $output, $preset_metadata['path'], $escaped_preset );
 			}
 		}
 
@@ -1406,7 +1396,7 @@ class WP_Theme_JSON_Gutenberg {
 				// double up shorthand and longhand styles.
 				$value = _wp_array_get( $input, $path, array() );
 				if ( ! is_array( $value ) ) {
-					gutenberg_experimental_set( $output, $path, $value );
+					_wp_array_set( $output, $path, $value );
 				}
 			}
 		}
@@ -1436,15 +1426,7 @@ class WP_Theme_JSON_Gutenberg {
 	public static function remove_insecure_properties( $theme_json ) {
 		$sanitized = array();
 
-		if ( ! isset( $theme_json['version'] ) || 0 === $theme_json['version'] ) {
-			$theme_json = WP_Theme_JSON_Schema_V0::parse( $theme_json );
-		}
-
-		// Provide backwards compatibility for settings that did not land in 5.8
-		// and have had their `custom` prefixed removed since.
-		if ( 1 === $theme_json['version'] ) {
-			$theme_json = WP_Theme_JSON_Schema_V1::parse( $theme_json );
-		}
+		$theme_json = WP_Theme_JSON_Schema_Gutenberg::migrate( $theme_json );
 
 		$valid_block_names   = array_keys( self::get_blocks_metadata() );
 		$valid_element_names = array_keys( self::ELEMENTS );
@@ -1460,7 +1442,7 @@ class WP_Theme_JSON_Gutenberg {
 
 			$output = self::remove_insecure_styles( $input );
 			if ( ! empty( $output ) ) {
-				gutenberg_experimental_set( $sanitized, $metadata['path'], $output );
+				_wp_array_set( $sanitized, $metadata['path'], $output );
 			}
 		}
 
@@ -1473,7 +1455,7 @@ class WP_Theme_JSON_Gutenberg {
 
 			$output = self::remove_insecure_settings( $input );
 			if ( ! empty( $output ) ) {
-				gutenberg_experimental_set( $sanitized, $metadata['path'], $output );
+				_wp_array_set( $sanitized, $metadata['path'], $output );
 			}
 		}
 
@@ -1542,7 +1524,7 @@ class WP_Theme_JSON_Gutenberg {
 			if ( ! isset( $theme_settings['settings']['typography'] ) ) {
 				$theme_settings['settings']['typography'] = array();
 			}
-			$theme_settings['settings']['typography']['customLineHeight'] = $settings['enableCustomLineHeight'];
+			$theme_settings['settings']['typography']['lineHeight'] = $settings['enableCustomLineHeight'];
 		}
 
 		if ( isset( $settings['enableCustomUnits'] ) ) {
@@ -1590,7 +1572,7 @@ class WP_Theme_JSON_Gutenberg {
 			if ( ! isset( $theme_settings['settings']['spacing'] ) ) {
 				$theme_settings['settings']['spacing'] = array();
 			}
-			$theme_settings['settings']['spacing']['customPadding'] = $settings['enableCustomSpacing'];
+			$theme_settings['settings']['spacing']['padding'] = $settings['enableCustomSpacing'];
 		}
 
 		// Things that didn't land in core yet, so didn't have a setting assigned.

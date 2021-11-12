@@ -24,21 +24,6 @@ function gutenberg_supports_block_templates() {
 }
 
 /**
- * Show a notice when a Full Site Editing theme is used.
- */
-function gutenberg_full_site_editing_notice() {
-	if ( ! gutenberg_is_fse_theme() || 'themes' !== get_current_screen()->base ) {
-		return;
-	}
-	?>
-	<div class="notice notice-warning">
-		<p><?php _e( 'You\'re using an experimental Full Site Editing theme. Full Site Editing is an experimental feature and potential API changes are to be expected!', 'gutenberg' ); ?></p>
-	</div>
-	<?php
-}
-add_action( 'admin_notices', 'gutenberg_full_site_editing_notice' );
-
-/**
  * Removes legacy pages from FSE themes.
  */
 function gutenberg_remove_legacy_pages() {
@@ -50,10 +35,15 @@ function gutenberg_remove_legacy_pages() {
 	if ( isset( $submenu['themes.php'] ) ) {
 		$indexes_to_remove = array();
 		foreach ( $submenu['themes.php'] as $index => $menu_item ) {
-			if (
-				false !== strpos( $menu_item[2], 'customize.php' ) ||
-				false !== strpos( $menu_item[2], 'gutenberg-widgets' )
-			) {
+			if ( false !== strpos( $menu_item[2], 'customize.php' ) && ! gutenberg_site_requires_customizer() ) {
+				$indexes_to_remove[] = $index;
+			}
+
+			if ( false !== strpos( $menu_item[2], 'site-editor.php' ) ) {
+				$indexes_to_remove[] = $index;
+			}
+
+			if ( false !== strpos( $menu_item[2], 'gutenberg-widgets' ) ) {
 				$indexes_to_remove[] = $index;
 			}
 		}
@@ -78,11 +68,13 @@ function gutenberg_adminbar_items( $wp_admin_bar ) {
 		return;
 	}
 
-	// Remove customizer link.
-	$wp_admin_bar->remove_node( 'customize' );
-	$wp_admin_bar->remove_node( 'customize-background' );
-	$wp_admin_bar->remove_node( 'customize-header' );
-	$wp_admin_bar->remove_node( 'widgets' );
+	// Remove customizer link, if this site does not rely on them for plugins or theme options.
+	if ( ! gutenberg_site_requires_customizer() ) {
+		$wp_admin_bar->remove_node( 'customize' );
+		$wp_admin_bar->remove_node( 'customize-background' );
+		$wp_admin_bar->remove_node( 'customize-header' );
+		$wp_admin_bar->remove_node( 'widgets' );
+	}
 
 	// Add site-editor link.
 	if ( ! is_admin() && current_user_can( 'edit_theme_options' ) ) {
@@ -90,7 +82,7 @@ function gutenberg_adminbar_items( $wp_admin_bar ) {
 			array(
 				'id'    => 'site-editor',
 				'title' => __( 'Edit site', 'gutenberg' ),
-				'href'  => admin_url( 'admin.php?page=gutenberg-edit-site' ),
+				'href'  => admin_url( 'themes.php?page=gutenberg-edit-site' ),
 			)
 		);
 	}
@@ -99,36 +91,16 @@ function gutenberg_adminbar_items( $wp_admin_bar ) {
 add_action( 'admin_bar_menu', 'gutenberg_adminbar_items', 50 );
 
 /**
- * Activates the 'menu_order' filter and then hooks into 'menu_order'
- */
-add_filter( 'custom_menu_order', '__return_true' );
-add_filter( 'menu_order', 'gutenberg_menu_order' );
-
-/**
- * Filters WordPress default menu order
+ * Check if any plugin, or theme features, are using the Customizer.
  *
- * @param array $menu_order Menu Order.
+ * @return bool A boolean value indicating if Customizer support is needed.
  */
-function gutenberg_menu_order( $menu_order ) {
-	if ( ! gutenberg_is_fse_theme() ) {
-		return $menu_order;
+function gutenberg_site_requires_customizer() {
+	if ( has_action( 'customize_register' ) ) {
+		return true;
 	}
 
-	$new_positions = array(
-		// Position the site editor before the appearance menu.
-		'gutenberg-edit-site' => array_search( 'themes.php', $menu_order, true ),
-	);
-
-	// Traverse through the new positions and move
-	// the items if found in the original menu_positions.
-	foreach ( $new_positions as $value => $new_index ) {
-		$current_index = array_search( $value, $menu_order, true );
-		if ( $current_index ) {
-			$out = array_splice( $menu_order, $current_index, 1 );
-			array_splice( $menu_order, $new_index, 0, $out );
-		}
-	}
-	return $menu_order;
+	return false;
 }
 
 /**
@@ -138,7 +110,7 @@ function gutenberg_menu_order( $menu_order ) {
  * @return bool Filtered decision about loading block assets.
  */
 function gutenberg_site_editor_load_block_editor_scripts_and_styles( $is_block_editor_screen ) {
-	return ( is_callable( 'get_current_screen' ) && get_current_screen() && 'toplevel_page_gutenberg-edit-site' === get_current_screen()->base )
+	return ( is_callable( 'get_current_screen' ) && get_current_screen() && 'appearance_page_gutenberg-edit-site' === get_current_screen()->base )
 		? true
 		: $is_block_editor_screen;
 }

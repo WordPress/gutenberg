@@ -19,7 +19,7 @@ const jestUnitConfig = {
 
 if ( ! hasBabelConfig() ) {
 	jestUnitConfig.transform = {
-		'^.+\\.[jt]sx?$': path.join( __dirname, 'babel-transform' ),
+		'\\.[jt]sx?$': path.join( __dirname, 'babel-transform' ),
 	};
 }
 

@@ -601,7 +601,7 @@ describe( 'Widgets Customizer', () => {
 		await clickBlockToolbarButton( 'Options' );
 		const removeBlockButton = await find( {
 			role: 'menuitem',
-			name: /Remove block/,
+			name: /Remove Legacy Widget/,
 		} );
 		await removeBlockButton.click();
 

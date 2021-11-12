@@ -222,7 +222,7 @@ describe( 'Reusable blocks', () => {
 		// Delete the block, leaving the reusable block empty
 		await clickBlockToolbarButton( 'Options' );
 		const deleteButton = await page.waitForXPath(
-			'//button/span[text()="Remove block"]'
+			'//button/span[text()="Remove Paragraph"]'
 		);
 		deleteButton.click();
 

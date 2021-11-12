@@ -449,6 +449,20 @@ _Returns_
 
 -   `boolean`: True if the argument contains a valid query string.
 
+### normalizePath
+
+Given a path, returns a normalized path where equal query parameter values
+will be treated as identical, regardless of order they appear in the original
+text.
+
+_Parameters_
+
+-   _path_ `string`: Original path.
+
+_Returns_
+
+-   `string`: Normalized path.
+
 ### prependHTTP
 
 Prepends "http\://" to a url, if it looks like something that is meant to be a TLD.

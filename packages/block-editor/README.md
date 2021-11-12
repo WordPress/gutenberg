@@ -209,6 +209,10 @@ _Returns_
 
 -   `WPElement`: Element.
 
+### BlockStyles
+
+Undocumented declaration.
+
 ### BlockTitle
 
 Renders the block's configured title as a string, or empty if the title
@@ -679,6 +683,37 @@ _Parameters_
 _Returns_
 
 -   `Object`: Props to pass to the element to mark as a block.
+
+### useCachedTruthy
+
+Keeps an up-to-date copy of the passed value and returns it. If value becomes falsy, it will return the last truthy copy.
+
+_Parameters_
+
+-   _value_ `any`:
+
+_Returns_
+
+-   `any`: value
+
+### useInnerBlocksProps
+
+This hook is used to lightly mark an element as an inner blocks wrapper
+element. Call this hook and pass the returned props to the element to mark as
+an inner blocks wrapper, automatically rendering inner blocks as children. If
+you define a ref for the element, it is important to pass the ref to this
+hook, which the hook in turn will pass to the component through the props it
+returns. Optionally, you can also pass any other props through this hook, and
+they will be merged and returned.
+
+_Related_
+
+-   <https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/inner-blocks/README.md>
+
+_Parameters_
+
+-   _props_ `Object`: Optional. Props to pass to the element. Must contain the ref if one is defined.
+-   _options_ `Object`: Optional. Inner blocks options.
 
 ### useSetting
 

@@ -67,11 +67,11 @@ function StylePreview( { onPress, isActive, style, url } ) {
 	);
 
 	const getOutline = ( outlineStyles ) =>
-		outlineStyles.map( ( outlineStyle ) => {
+		outlineStyles.map( ( outlineStyle, index ) => {
 			return (
 				<Animated.View
 					style={ [ outlineStyle, { opacity }, styles[ name ] ] }
-					key={ JSON.stringify( outlineStyle ) }
+					key={ index }
 				/>
 			);
 		} );

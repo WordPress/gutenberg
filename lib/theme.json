@@ -1,5 +1,5 @@
 {
-	"version": 1,
+	"version": 2,
 	"settings": {
 		"color": {
 			"background": true,
@@ -178,9 +178,9 @@
 		"typography": {
 			"dropCap": true,
 			"customFontSize": true,
-			"customLineHeight": false,
 			"fontStyle": true,
 			"fontWeight": true,
+			"lineHeight": false,
 			"textTransform": true,
 			"textDecoration": true,
 			"letterSpacing": true,
@@ -214,26 +214,26 @@
 		},
 		"spacing": {
 			"blockGap": null,
-			"customMargin": false,
-			"customPadding": false,
+			"margin": false,
+			"padding": false,
 			"units": [ "px", "em", "rem", "vh", "vw", "%" ]
 		},
 		"border": {
 			"color": false,
-			"customRadius": false,
+			"radius": false,
 			"style": false,
 			"width": false
 		},
 		"blocks": {
 			"core/button": {
 				"border": {
-					"customRadius": true
+					"radius": true
 				}
 			},
 			"core/pullquote": {
 				"border": {
 					"color": true,
-					"customRadius": true,
+					"radius": true,
 					"style": true,
 					"width": true
 				}

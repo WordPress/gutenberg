@@ -12,7 +12,7 @@ import {
 /**
  * Internal dependencies
  */
-import { navigationPanel, siteEditor } from '../../experimental-features';
+import { siteEditor } from '../../experimental-features';
 
 async function toggleSidebar() {
 	await page.click(
@@ -68,10 +68,10 @@ describe( 'Settings sidebar', () => {
 			await toggleSidebar();
 
 			const templateCardBeforeNavigation = await getTemplateCard();
-			await navigationPanel.open();
-			await navigationPanel.backToRoot();
-			await navigationPanel.navigate( 'Templates' );
-			await navigationPanel.clickItemByText( '404' );
+			await siteEditor.visit( {
+				postId: 'tt1-blocks//404',
+				postType: 'wp_template',
+			} );
 			const templateCardAfterNavigation = await getTemplateCard();
 
 			expect( templateCardBeforeNavigation ).toMatchObject( {
