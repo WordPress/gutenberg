@@ -347,8 +347,8 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 	public static function theme_has_support() {
 		if ( ! isset( self::$theme_has_support ) ) {
 			self::$theme_has_support = (
-				is_readable( get_stylesheet_directory() . '/theme.json' ) ||
-				is_readable( get_template_directory() . '/theme.json' )
+				is_readable( self::get_file_path_from_theme( 'theme.json' ) ) ||
+				is_readable( self::get_file_path_from_theme( 'theme.json', true ) )
 			);
 		}
 
