@@ -204,7 +204,7 @@ describe( 'Preview', () => {
 	it( 'should not revert title during a preview right after a save draft', async () => {
 		const editorPage = page;
 
-		// Type aaaaa in the title filed.
+		// Type aaaaa in the title field.
 		await editorPage.type( '.editor-post-title__input', 'aaaaa' );
 		await editorPage.keyboard.press( 'Tab' );
 
@@ -245,6 +245,70 @@ describe( 'Preview', () => {
 			( node ) => node.textContent
 		);
 		expect( previewTitle ).toBe( 'aaaaabbbbb' );
+
+		await previewPage.close();
+	} );
+
+	it( 'should not revert title during a preview right after switching from published to draft', async () => {
+		const editorPage = page;
+
+		// Type Lorem in the title field.
+		await editorPage.type( '.editor-post-title__input', 'Lorem' );
+
+		// Open the preview page.
+		const previewPage = await openPreviewPage( editorPage );
+		await previewPage.waitForSelector( '.entry-title' );
+
+		// Title in preview should match input.
+		let previewTitle = await previewPage.$eval(
+			'.entry-title',
+			( node ) => node.textContent
+		);
+		expect( previewTitle ).toBe( 'Lorem' );
+
+		// Return to editor and publish post.
+		await editorPage.bringToFront();
+		await publishPost();
+
+		// Close the panel.
+		await page.waitForSelector( '.editor-post-publish-panel' );
+		await page.click( '.editor-post-publish-panel__header button' );
+
+		// Change the title and preview again.
+		await editorPage.type( '.editor-post-title__input', ' Ipsum' );
+		await editorPage.keyboard.press( 'Tab' );
+		await waitForPreviewDropdownOpen( editorPage );
+		await waitForPreviewNavigation( previewPage );
+
+		// Title in preview should match updated input.
+		previewTitle = await previewPage.$eval(
+			'.entry-title',
+			( node ) => node.textContent
+		);
+
+		expect( previewTitle ).toBe( 'Lorem Ipsum' );
+
+		// Return to editor and switch to Draft.
+		await editorPage.bringToFront();
+		await editorPage.waitForSelector( '.editor-post-switch-to-draft' );
+		await editorPage.click( '.editor-post-switch-to-draft' );
+		await page.keyboard.press( 'Enter' );
+
+		// Change the title.
+		await editorPage.type( '.editor-post-title__input', 'Draft ' );
+		await editorPage.keyboard.press( 'Tab' );
+
+		// Open the preview page.
+		await waitForPreviewDropdownOpen( editorPage );
+		await waitForPreviewNavigation( previewPage );
+
+		// Title in preview should match updated input.
+		previewTitle = await previewPage.$eval(
+			'.entry-title',
+			( node ) => node.textContent
+		);
+
+		expect( previewTitle ).toBe( 'Draft Lorem Ipsum' );
 
 		await previewPage.close();
 	} );
