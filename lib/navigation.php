@@ -272,7 +272,7 @@ function gutenberg_migrate_menu_to_navigation_post( $new_name, $new_theme, $old_
 			);
 			$navigation_post_id      = wp_insert_post( $post_data );
 			// If wp_insert_post failed, return early and don't call update_option.
-			if ( is_wp_error( $navigation_post_id) ) {
+			if ( is_wp_error( $navigation_post_id ) ) {
 				return $navigation_post_id;
 			}
 		}
