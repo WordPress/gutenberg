@@ -290,7 +290,11 @@ add_action( 'switch_theme', 'gutenberg_migrate_menu_to_navigation_post', 200, 3 
 function gutenberg_get_navigation_areas_menus() {
 	$areas = get_option( 'wp_navigation_areas', array() );
 	if ( ! $areas ) {
-		$areas = get_option( 'fse_navigation_areas', array() );
+		// Original key used `fse` prefix but Core options should use `wp`.
+		// We fallback to the legacy option to catch sites with values in the 
+		// original location.
+		$legacy_option_key = 'fse_navigation_areas';
+		$areas = get_option( $legacy_option_key, array() );
 	}
 	return $areas;
 }
