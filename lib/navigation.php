@@ -187,7 +187,7 @@ function gutenberg_get_navigation_areas() {
  * @return array A list of paths.
  */
 function gutenberg_get_navigation_areas_paths_to_preload() {
-	$areas        = get_navigation_areas();
+	$areas        = gutenberg_get_navigation_areas_menus();
 	$active_areas = array_intersect_key( $areas, gutenberg_get_navigation_areas() );
 	$paths        = array(
 		'/wp/v2/block-navigation-areas?context=edit',
@@ -225,7 +225,7 @@ function gutenberg_migrate_menu_to_navigation_post( $new_name, $new_theme, $old_
 	add_filter( 'option_stylesheet', $get_old_theme_stylesheet );
 
 	$locations    = get_nav_menu_locations();
-	$area_mapping = get_navigation_areas();
+	$area_mapping = gutenberg_get_navigation_areas_menus();
 
 	foreach ( $locations as $location_name => $menu_id ) {
 		// Get the menu from the location, skipping if there is no
