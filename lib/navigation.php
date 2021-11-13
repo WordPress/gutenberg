@@ -271,6 +271,11 @@ function gutenberg_migrate_menu_to_navigation_post( $new_name, $new_theme, $old_
 				'post_status'  => $post_status,
 			);
 			$navigation_post_id      = wp_insert_post( $post_data );
+			// If wp_insert_post fails *at any time*, then bale out of the entire
+			// migration attempt returning the WP_Error object.
+			if ( is_wp_error( $navigation_post_id ) ) {
+				return $navigation_post_id;
+			}
 		}
 
 		$area_mapping[ $location_name ] = $navigation_post_id;
@@ -280,7 +285,7 @@ function gutenberg_migrate_menu_to_navigation_post( $new_name, $new_theme, $old_
 	update_option( 'fse_navigation_areas', $area_mapping );
 }
 
-add_action( 'switch_theme', 'gutenberg_migrate_menu_to_navigation_post', 200, 3 );
+add_action( 'switch_theme', 'gutenberg_migrate_menu_to_navigation_post', 99, 3 );
 
 // The functions below are copied over from packages/block-library/src/navigation/index.php
 // Let's figure out a better way of managing these global PHP dependencies.
