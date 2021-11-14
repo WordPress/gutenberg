@@ -1321,6 +1321,8 @@ class WP_Theme_JSON_Gutenberg {
 				}
 			}
 		}
+
+		$this->maybe_remove_core_color_palette_and_gradients();
 	}
 
 	/**
