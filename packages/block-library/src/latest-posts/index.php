@@ -61,7 +61,7 @@ function render_block_core_latest_posts( $attributes ) {
 	foreach ( $recent_posts as $post ) {
 		$post_link = esc_url( get_permalink( $post ) );
 
-		$list_items_markup .= '<li>';
+		$list_items_markup .= isset( $attributes['postLayout'] ) && 'list' === $attributes['postLayout'] ? sprintf('<li style="margin-bottom: %s;">', $attributes['spacing']) : '<li>';
 
 		if ( $attributes['displayFeaturedImage'] && has_post_thumbnail( $post ) ) {
 			$image_style = '';
@@ -112,7 +112,7 @@ function render_block_core_latest_posts( $attributes ) {
 			$author_display_name = get_the_author_meta( 'display_name', $post->post_author );
 
 			/* translators: byline. %s: current author. */
-			$byline = sprintf( __( 'by %s' ), $author_display_name );
+			$byline = isset( $attributes['byline'] ) ? implode(' ', array( $attributes['byline'],  $author_display_name ) ): $author_display_name;
 
 			if ( ! empty( $author_display_name ) ) {
 				$list_items_markup .= sprintf(
@@ -183,8 +183,14 @@ function render_block_core_latest_posts( $attributes ) {
 		$class .= ' has-author';
 	}
 
-	$wrapper_attributes = get_block_wrapper_attributes( array( 'class' => $class ) );
+	$inlineStyle = '';
+	
+	if( isset( $attributes['postLayout'] )  && 'grid' === $attributes['postLayout']  ) {
+		$gap = $attributes['spacing'];
+		$inlineStyle .= "grid-gap: $gap;";
+	}
 
+	$wrapper_attributes = get_block_wrapper_attributes( array( 'class' => $class , 'style' => $inlineStyle) );
 	return sprintf(
 		'<ul %1$s>%2$s</ul>',
 		$wrapper_attributes,

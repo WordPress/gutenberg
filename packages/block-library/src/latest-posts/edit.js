@@ -16,16 +16,18 @@ import {
 	RadioControl,
 	RangeControl,
 	Spinner,
+	TextControl,
 	ToggleControl,
 	ToolbarGroup,
 } from '@wordpress/components';
-import { __, sprintf } from '@wordpress/i18n';
+import { __ } from '@wordpress/i18n';
 import { dateI18n, format, __experimentalGetSettings } from '@wordpress/date';
 import {
 	InspectorControls,
 	BlockAlignmentToolbar,
 	BlockControls,
 	__experimentalImageSizeControl as ImageSizeControl,
+	__experimentalUnitControl as UnitControl,
 	useBlockProps,
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
@@ -75,6 +77,8 @@ export default function LatestPostsEdit( { attributes, setAttributes } ) {
 		featuredImageSizeWidth,
 		featuredImageSizeHeight,
 		addLinkToFeaturedImage,
+		byline,
+		spacing,
 	} = attributes;
 	const {
 		imageSizeOptions,
@@ -260,6 +264,11 @@ export default function LatestPostsEdit( { attributes, setAttributes } ) {
 						setAttributes( { displayPostDate: value } )
 					}
 				/>
+				<TextControl
+					label={ __( 'Byline Text' ) }
+					value={ byline }
+					onChange={ ( value ) => setAttributes( { byline: value } ) }
+				/>
 			</PanelBody>
 
 			<PanelBody title={ __( 'Featured image settings' ) }>
@@ -352,7 +361,9 @@ export default function LatestPostsEdit( { attributes, setAttributes } ) {
 					authorList={ authorList ?? [] }
 					selectedAuthorId={ selectedAuthor }
 				/>
+			</PanelBody>
 
+			<PanelBody title={ __( 'Layout Settings' ) }>
 				{ postLayout === 'grid' && (
 					<RangeControl
 						label={ __( 'Columns' ) }
@@ -372,6 +383,13 @@ export default function LatestPostsEdit( { attributes, setAttributes } ) {
 						required
 					/>
 				) }
+				<UnitControl
+					label={ __( 'Spacing' ) }
+					value={ spacing }
+					onChange={ ( value ) =>
+						setAttributes( { spacing: value } )
+					}
+				/>
 			</PanelBody>
 		</InspectorControls>
 	);
@@ -430,7 +448,10 @@ export default function LatestPostsEdit( { attributes, setAttributes } ) {
 			<BlockControls>
 				<ToolbarGroup controls={ layoutControls } />
 			</BlockControls>
-			<ul { ...blockProps }>
+			<ul
+				{ ...blockProps }
+				style={ postLayout === 'grid' ? { gridGap: spacing } : null }
+			>
 				{ displayPosts.map( ( post, i ) => {
 					const titleTrimmed = invoke( post, [
 						'title',
@@ -494,7 +515,14 @@ export default function LatestPostsEdit( { attributes, setAttributes } ) {
 					);
 
 					return (
-						<li key={ i }>
+						<li
+							key={ i }
+							style={
+								postLayout === 'list'
+									? { marginBottom: spacing }
+									: null
+							}
+						>
 							{ renderFeaturedImage && (
 								<div className={ imageClasses }>
 									{ addLinkToFeaturedImage ? (
@@ -518,11 +546,9 @@ export default function LatestPostsEdit( { attributes, setAttributes } ) {
 							</a>
 							{ displayAuthor && currentAuthor && (
 								<div className="wp-block-latest-posts__post-author">
-									{ sprintf(
-										/* translators: byline. %s: current author. */
-										__( 'by %s' ),
-										currentAuthor.name
-									) }
+									{ byline
+										? `${ byline } ${ currentAuthor.name }`
+										: currentAuthor.name }
 								</div>
 							) }
 							{ displayPostDate && post.date_gmt && (
