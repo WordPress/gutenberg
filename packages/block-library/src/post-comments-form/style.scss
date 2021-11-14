@@ -1,4 +1,3 @@
-// Styles copied from button block styles.
 .wp-block-post-comments-form {
 	&[style*="font-weight"] :where(.comment-reply-title) {
 		font-weight: inherit;
@@ -20,6 +19,7 @@
 		letter-spacing: inherit;
 	}
 
+	// Styles copied from button block styles.
 	input[type="submit"] {
 		border: none;
 		box-shadow: none;
