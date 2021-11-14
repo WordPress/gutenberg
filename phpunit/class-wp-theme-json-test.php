@@ -1164,6 +1164,107 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 		$this->assertEqualSetsWithIndex( $expected, $actual );
 	}
 
+	public function test_maybe_remove_core_palette_and_gradients_blocks() {
+		$theme_json = new WP_Theme_JSON_Gutenberg();
+
+		$core_theme_json = new WP_Theme_JSON_Gutenberg(
+			array(
+				'version'  => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
+				'settings' => array(
+					'color' => array(
+						'palette'   => array(
+							array(
+								'slug'  => 'red',
+								'color' => 'red',
+							),
+						),
+						'gradients' => array(
+							array(
+								'slug'  => 'red',
+								'color' => 'red',
+							),
+						),
+					),
+				),
+			),
+			'core'
+		);
+
+		$theme_theme_json = new WP_Theme_JSON_Gutenberg(
+			array(
+				'version'  => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
+				'settings' => array(
+					'color'  => array(
+						'palette' => array(
+							array(
+								'slug'  => 'green',
+								'color' => 'green',
+							),
+						),
+					),
+					'blocks' => array(
+						'core/heading' => array(
+							'color' => array(
+								'corePalette'   => false,
+								'coreGradients' => false,
+							),
+						),
+					),
+				),
+			)
+		);
+
+		$theme_json->merge( $core_theme_json );
+		$theme_json->merge( $theme_theme_json );
+
+		$actual   = $theme_json->get_raw_data();
+		$expected = array(
+			'version'  => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
+			'settings' => array(
+				'color'  => array(
+					'palette'   => array(
+						'core'  => array(
+							array(
+								'slug'  => 'red',
+								'color' => 'red',
+							),
+						),
+						'theme' => array(
+							array(
+								'slug'  => 'green',
+								'color' => 'green',
+							),
+						),
+					),
+					'gradients' => array(
+						'core' => array(
+							array(
+								'slug'  => 'red',
+								'color' => 'red',
+							),
+						),
+					),
+				),
+				'blocks' => array(
+					'core/heading' => array(
+						'color' => array(
+							'corePalette'   => false,
+							'coreGradients' => false,
+							'palette'       => array(
+								'core' => array(),
+							),
+							'gradients'     => array(
+								'core' => array(),
+							),
+						),
+					),
+				),
+			),
+		);
+
+		$this->assertEqualSetsWithIndex( $expected, $actual );
+	}
+
 	function test_remove_insecure_properties_removes_unsafe_styles() {
 		$actual = WP_Theme_JSON_Gutenberg::remove_insecure_properties(
 			array(
