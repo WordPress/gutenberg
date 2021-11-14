@@ -5,6 +5,10 @@
 	}
 }
 
+.wp-block-latest-posts a {
+	pointer-events: none;
+}
+
 .wp-block-latest-posts li a > div {
 	display: inline;
 }
