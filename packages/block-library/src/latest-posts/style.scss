@@ -17,24 +17,20 @@
 	}
 
 	&.is-grid {
-		display: flex;
-		flex-wrap: wrap;
+		display: grid;
+		grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+		grid-gap: 1.25em;
 		padding: 0;
 
 		li {
-			margin: 0 1.25em 1.25em 0;
+			margin: 0;
 			width: 100%;
 		}
 	}
-
-	@include break-small {
+	@include break-xlarge {
 		@for $i from 2 through 6 {
-			&.columns-#{ $i } li {
-				width: calc((100% / #{ $i }) - 1.25em + (1.25em / #{ $i }));
-
-				&:nth-child( #{ $i }n ) {
-					margin-right: 0;
-				}
+			&.columns-#{ $i } {
+				grid-template-columns: repeat($i, 1fr);
 			}
 		}
 	}
