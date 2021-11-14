@@ -80,6 +80,13 @@
 		"addLinkToFeaturedImage": {
 			"type": "boolean",
 			"default": false
+		}, 
+		"byline": {
+			"type": "string"
+		},
+		"spacing": {
+			"type": "string",
+			"default": "20px"
 		}
 	},
 	"supports": {
