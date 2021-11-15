@@ -81,7 +81,6 @@ class WP_Theme_JSON_Gutenberg {
 	);
 
 	const VALID_SETTINGS = array(
-		'appearance' => null,
 		'border'     => array(
 			'color'  => null,
 			'radius' => null,
@@ -291,8 +290,7 @@ class WP_Theme_JSON_Gutenberg {
 
 		$valid_block_names   = array_keys( self::get_blocks_metadata() );
 		$valid_element_names = array_keys( self::ELEMENTS );
-		$theme_json          = self::sanitize( $theme_json, $valid_block_names, $valid_element_names );
-		$this->theme_json    = self::maybe_opt_in_into_settings( $theme_json );
+		$this->theme_json    = self::sanitize( $theme_json, $valid_block_names, $valid_element_names );
 
 		// Internally, presets are keyed by origin.
 		$nodes = self::get_setting_nodes( $this->theme_json );
@@ -305,48 +303,6 @@ class WP_Theme_JSON_Gutenberg {
 				}
 			}
 		}
-	}
-
-	/**
-	 * Enables some opt-in settings if theme declared support.
-	 *
-	 * @param array $theme_json A theme.json structure to modify.
-	 * @return array The modified theme.json structure.
-	 */
-	private static function maybe_opt_in_into_settings( $theme_json ) {
-		$new_theme_json = $theme_json;
-
-		if ( isset( $new_theme_json['settings']['appearance'] ) ) {
-			self::do_opt_in_into_settings( $new_theme_json['settings'] );
-		}
-
-		if ( isset( $new_theme_json['settings']['blocks'] ) && is_array( $new_theme_json['settings']['blocks'] ) ) {
-			foreach ( $new_theme_json['settings']['blocks'] as &$block ) {
-				if ( isset( $block['appearance'] ) ) {
-					self::do_opt_in_into_settings( $block );
-				}
-			}
-		}
-
-		return $new_theme_json;
-	}
-
-	/**
-	 * Enables some settings.
-	 *
-	 * @param array $context The context to which the settings belong.
-	 */
-	private static function do_opt_in_into_settings( &$context ) {
-		gutenberg_experimental_set( $context, array( 'border', 'color' ), true );
-		gutenberg_experimental_set( $context, array( 'border', 'radius' ), true );
-		gutenberg_experimental_set( $context, array( 'border', 'style' ), true );
-		gutenberg_experimental_set( $context, array( 'border', 'width' ), true );
-		gutenberg_experimental_set( $context, array( 'spacing', 'margin' ), true );
-		gutenberg_experimental_set( $context, array( 'spacing', 'padding' ), true );
-		gutenberg_experimental_set( $context, array( 'spacing', 'units' ), true );
-		gutenberg_experimental_set( $context, array( 'typography', 'customFontSize' ), true );
-		gutenberg_experimental_set( $context, array( 'typography', 'lineHeight' ), true );
-		unset( $context['appearance'] );
 	}
 
 	/**
