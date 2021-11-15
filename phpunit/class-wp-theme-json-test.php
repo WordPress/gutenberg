@@ -248,7 +248,7 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 					),
 					'typography' => array(
 						'customFontSize' => true,
-						'lineHeight'     => true,
+						'lineHeight'     => false,
 					),
 				),
 			),
