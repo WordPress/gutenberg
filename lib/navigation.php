@@ -270,7 +270,7 @@ function gutenberg_migrate_menu_to_navigation_post( $new_name, $new_theme, $old_
 				'post_content' => serialize_blocks( $parsed_blocks ),
 				'post_status'  => $post_status,
 			);
-			$navigation_post_id      = wp_insert_post( $post_data );
+			$navigation_post_id      = wp_insert_post( $post_data, true );
 			// If wp_insert_post fails *at any time*, then bale out of the entire
 			// migration attempt returning the WP_Error object.
 			if ( is_wp_error( $navigation_post_id ) ) {
