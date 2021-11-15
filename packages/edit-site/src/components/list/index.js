@@ -3,9 +3,7 @@
  */
 import { InterfaceSkeleton } from '@wordpress/interface';
 import { __ } from '@wordpress/i18n';
-import {
-	useViewportMatch,
-} from '@wordpress/compose';
+import { useViewportMatch } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -15,7 +13,6 @@ import NavigationSidebar from '../navigation-sidebar';
 import Table from './table';
 
 export default function List( { templateType } ) {
-	
 	const isDesktopViewport = useViewportMatch( 'medium' );
 
 	return (
