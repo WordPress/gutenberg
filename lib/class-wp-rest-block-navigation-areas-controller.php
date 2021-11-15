@@ -165,9 +165,9 @@ class WP_REST_Block_Navigation_Areas_Controller extends WP_REST_Controller {
 	public function update_item( $request ) {
 		$name = $request['area'];
 
-		$mapping          = get_option( 'fse_navigation_areas', array() );
+		$mapping          = gutenberg_get_navigation_areas_menus();
 		$mapping[ $name ] = $request['navigation'];
-		update_option( 'fse_navigation_areas', $mapping );
+		update_option( 'wp_navigation_areas', $mapping );
 
 		$area = $this->get_navigation_area_object( $name );
 		$data = $this->prepare_item_for_response( $area, $request );
@@ -182,7 +182,7 @@ class WP_REST_Block_Navigation_Areas_Controller extends WP_REST_Controller {
 	 */
 	private function get_navigation_area_object( $name ) {
 		$available_areas   = gutenberg_get_navigation_areas();
-		$mapping           = get_option( 'fse_navigation_areas', array() );
+		$mapping           = gutenberg_get_navigation_areas_menus();
 		$area              = new stdClass();
 		$area->name        = $name;
 		$area->navigation  = ! empty( $mapping[ $name ] ) ? $mapping[ $name ] : null;

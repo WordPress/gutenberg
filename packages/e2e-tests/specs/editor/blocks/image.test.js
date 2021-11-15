@@ -74,7 +74,7 @@ describe( 'Image', () => {
 		expect( await getEditedPostContent() ).toMatch( regex );
 	} );
 
-	it( 'should replace, reset size, and keep selection', async () => {
+	it.skip( 'should replace, reset size, and keep selection', async () => {
 		await insertBlock( 'Image' );
 		const filename1 = await upload( '.wp-block-image input[type="file"]' );
 		await waitForImage( filename1 );

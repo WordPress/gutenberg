@@ -985,7 +985,7 @@ It can be difficult to remember the theme.json settings and properties while you
 
 Code editors can pick up the schema and can provide help like tooltips, autocomplete, or schema validation in the editor. To use the schema in Visual Studio Code, add `"$schema": "https://schemas.wp.org/trunk/theme.json"` to the beginning of your theme.json file.
 
-![Example using validation with schema](https://developer.wordpress.org/files/2021/10/schema-validation.gif)
+![Example using validation with schema](https://developer.wordpress.org/files/2021/11/theme-json-schema-updated.gif)
 
 
 ## Frequently Asked Questions

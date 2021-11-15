@@ -9,8 +9,8 @@ import classnames from 'classnames';
 import { __, _x, isRTL } from '@wordpress/i18n';
 import {
 	ToolbarDropdownMenu,
-	PanelBody,
 	ToggleControl,
+	__experimentalToolsPanelItem as ToolsPanelItem,
 } from '@wordpress/components';
 import {
 	AlignmentControl,
@@ -81,8 +81,16 @@ function ParagraphBlock( {
 				/>
 			</BlockControls>
 			{ isDropCapFeatureEnabled && (
-				<InspectorControls>
-					<PanelBody title={ __( 'Text settings' ) }>
+				<InspectorControls __experimentalGroup="typography">
+					<ToolsPanelItem
+						hasValue={ () => !! dropCap }
+						label={ __( 'Drop cap' ) }
+						onDeselect={ () =>
+							setAttributes( { dropCap: undefined } )
+						}
+						resetAllFilter={ () => ( { dropCap: undefined } ) }
+						panelId={ clientId }
+					>
 						<ToggleControl
 							label={ __( 'Drop cap' ) }
 							checked={ !! dropCap }
@@ -97,7 +105,7 @@ function ParagraphBlock( {
 									  )
 							}
 						/>
-					</PanelBody>
+					</ToolsPanelItem>
 				</InspectorControls>
 			) }
 			<RichText

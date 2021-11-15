@@ -81,6 +81,15 @@ function gutenberg_edit_site_init( $hook ) {
 		return;
 	}
 
+	// Default to is-fullscreen-mode to avoid rendering wp-admin navigation menu while loading and
+	// having jumps in the UI.
+	add_filter(
+		'admin_body_class',
+		static function( $classes ) {
+			return "$classes is-fullscreen-mode";
+		}
+	);
+
 	/**
 	 * Make the WP Screen object aware that this is a block editor page.
 	 * Since custom blocks check whether the screen is_block_editor,
