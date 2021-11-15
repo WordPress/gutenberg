@@ -9,7 +9,7 @@ import classnames from 'classnames';
 import { safeDecodeURI, filterURLForDisplay } from '@wordpress/url';
 import { __ } from '@wordpress/i18n';
 import { Button, TextHighlight } from '@wordpress/components';
-import { Icon, globe } from '@wordpress/icons';
+import { Icon, globe, home } from '@wordpress/icons';
 
 export const LinkControlSearchItem = ( {
 	itemProps,
@@ -19,6 +19,7 @@ export const LinkControlSearchItem = ( {
 	isURL = false,
 	searchTerm = '',
 	shouldShowType = false,
+	isFrontPage = false,
 } ) => {
 	return (
 		<Button
@@ -34,6 +35,13 @@ export const LinkControlSearchItem = ( {
 				<Icon
 					className="block-editor-link-control__search-item-icon"
 					icon={ globe }
+				/>
+			) }
+
+			{ ! isURL && isFrontPage && (
+				<Icon
+					className="block-editor-link-control__search-item-icon"
+					icon={ home }
 				/>
 			) }
 			<span className="block-editor-link-control__search-item-header">
@@ -57,12 +65,20 @@ export const LinkControlSearchItem = ( {
 			</span>
 			{ shouldShowType && suggestion.type && (
 				<span className="block-editor-link-control__search-item-type">
-					{ /* Rename 'post_tag' to 'tag'. Ideally, the API would return the localised CPT or taxonomy label. */ }
-					{ suggestion.type === 'post_tag' ? 'tag' : suggestion.type }
+					{ getVisualTypeName( suggestion ) }
 				</span>
 			) }
 		</Button>
 	);
 };
+
+function getVisualTypeName( suggestion ) {
+	if ( suggestion.isFrontPage ) {
+		return 'Front Page';
+	}
+
+	// Rename 'post_tag' to 'tag'. Ideally, the API would return the localised CPT or taxonomy label.
+	return suggestion.type === 'post_tag' ? 'tag' : suggestion.type;
+}
 
 export default LinkControlSearchItem;
