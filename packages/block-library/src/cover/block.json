@@ -29,7 +29,8 @@
 			"default": false
 		},
 		"dimRatio": {
-			"type": "number"
+			"type": "number",
+			"default": 100
 		},
 		"overlayColor": {
 			"type": "string"
