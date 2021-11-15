@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+## 19.0.2 (2021-11-15)
+
+-   Remove erroneous use of `??=` syntax from `build-module`.
+
 ## 19.0.1 (2021-11-07)
 
 ### Experimental
