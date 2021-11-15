@@ -38,7 +38,8 @@
 			"type": "string"
 		},
 		"backgroundType": {
-			"type": "string"
+			"type": "string",
+			"default": "image"
 		},
 		"focalPoint": {
 			"type": "object"

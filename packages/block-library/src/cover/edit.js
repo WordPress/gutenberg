@@ -310,6 +310,7 @@ function CoverEdit( {
 	setAttributes,
 	setOverlayColor,
 	toggleSelection,
+	markNextChangeAsNotPersistent,
 } ) {
 	const {
 		contentPosition,
@@ -399,12 +400,12 @@ function CoverEdit( {
 
 	useEffect( () => {
 		const defaultDimRatio =
-			isImageBackground || isVideoBackground ? 50 : 100;
-
+			( isImageBackground || isVideoBackground ) && url ? 50 : 100;
+		markNextChangeAsNotPersistent();
 		setAttributes( {
 			dimRatio: 'number' === typeof dimRatio ? dimRatio : defaultDimRatio,
 		} );
-	}, [ isImageBackground, isVideoBackground ] );
+	}, [ isImageBackground, isVideoBackground, url, dimRatio ] );
 
 	const [ temporaryMinHeight, setTemporaryMinHeight ] = useState( null );
 
@@ -778,10 +779,14 @@ function CoverEdit( {
 
 export default compose( [
 	withDispatch( ( dispatch ) => {
-		const { toggleSelection } = dispatch( blockEditorStore );
+		const {
+			toggleSelection,
+			__unstableMarkNextChangeAsNotPersistent,
+		} = dispatch( blockEditorStore );
 
 		return {
 			toggleSelection,
+			markNextChangeAsNotPersistent: __unstableMarkNextChangeAsNotPersistent,
 		};
 	} ),
 	withColors( { overlayColor: 'background-color' } ),
