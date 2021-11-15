@@ -226,6 +226,8 @@ The settings section has the following structure:
 		},
 		"color": {
 			"background": true,
+			"corePalette": true,
+			"coreGradients": true,
 			"custom": true,
 			"customDuotone": true,
 			"customGradient": true,
