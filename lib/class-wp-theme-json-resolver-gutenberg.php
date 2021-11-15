@@ -158,6 +158,14 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 		* and merge the self::$theme upon that.
 		*/
 		$theme_support_data  = WP_Theme_JSON_Gutenberg::get_from_editor_settings( gutenberg_get_default_block_editor_settings() );
+		// We don't want the core palette&gradients enabled for themes without theme.json support.
+		if ( ! WP_Theme_JSON_Resolver_Gutenberg::theme_has_support() ) {
+			if ( ! isset( $theme_support_data['settings']['color'] ) ) {
+				$theme_support_data['settings']['color'] = array();
+			}
+			$theme_support_data['settings']['color']['corePalette']   = false;
+			$theme_support_data['settings']['color']['coreGradients'] = false;
+		}
 		$with_theme_supports = new WP_Theme_JSON_Gutenberg( $theme_support_data );
 		$with_theme_supports->merge( self::$theme );
 
