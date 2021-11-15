@@ -1,3 +1,15 @@
+@keyframes loadingpulse {
+	0% {
+		opacity: 1;
+	}
+	50% {
+		opacity: 0.5;
+	}
+	100% {
+		opacity: 1;
+	}
+}
+
 .entities-saved-states__panel {
 	@include reset;
 	background: $white;
@@ -59,5 +71,26 @@
 		border-bottom: $border-width solid $gray-300;
 		padding: $grid-unit-20;
 		padding-bottom: $grid-unit-05;
+	}
+
+	.entities-saved-states__discard-changes__saving {
+		animation: loadingpulse 1s linear infinite;
+		animation-delay: 0.5s; // avoid animating for fast network responses
+
+		// Style skeleton elements to mostly match the metrics of actual menu items.
+		// Needs specificity.
+		.entities-saved-states__discard-changes-item {
+			position: relative;
+			min-width: 72px;
+
+			&::before {
+				display: block;
+				content: '';
+				border-radius: $radius-block-ui;
+				background: $gray-300;
+				height: $grid-unit-20;
+				width: 50%;
+			}
+		}
 	}
 }
