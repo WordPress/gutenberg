@@ -769,9 +769,7 @@ function CoverEdit( {
 
 export default compose( [
 	withDispatch( ( dispatch ) => {
-		const {
-			toggleSelection,
-		} = dispatch( blockEditorStore );
+		const { toggleSelection } = dispatch( blockEditorStore );
 
 		return {
 			toggleSelection,
