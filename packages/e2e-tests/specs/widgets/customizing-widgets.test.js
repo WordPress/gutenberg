@@ -10,6 +10,7 @@ import {
 	clickBlockToolbarButton,
 	deleteAllWidgets,
 	createURL,
+	openTypographyToolsPanelMenu,
 } from '@wordpress/e2e-test-utils';
 
 /**
@@ -831,6 +832,9 @@ describe( 'Widgets Customizer', () => {
 		await showMoreSettingsButton.click();
 
 		// Change `drop cap` (Any change made in this section is sufficient; not required to be `drop cap`).
+		await openTypographyToolsPanelMenu();
+		await page.click( 'button[aria-label="Show Drop cap"]' );
+
 		const [ dropCapToggle ] = await page.$x(
 			"//label[contains(text(), 'Drop cap')]"
 		);
