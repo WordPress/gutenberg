@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 19.2.0 (2021-11-15)
+
 ### New Features
 
 -   Add basic support for TypeScript in `build`, `start`, `test-e2e` and `test-unit-js` commands ([#36260](https://github.com/WordPress/gutenberg/pull/36260)).
