@@ -170,6 +170,8 @@
 				}
 			],
 			"custom": true,
+			"corePalette": true,
+			"coreGradients": true,
 			"customDuotone": true,
 			"customGradient": true,
 			"link": false,
