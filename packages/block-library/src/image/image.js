@@ -72,6 +72,7 @@ export default function Image( {
 	isSelected,
 	insertBlocksAfter,
 	onReplace,
+	onCloseModal,
 	onSelectImage,
 	onSelectURL,
 	onUploadError,
@@ -352,6 +353,7 @@ export default function Image( {
 						onSelect={ onSelectImage }
 						onSelectURL={ onSelectURL }
 						onError={ onUploadError }
+						onCloseModal={ onCloseModal }
 					/>
 				</BlockControls>
 			) }

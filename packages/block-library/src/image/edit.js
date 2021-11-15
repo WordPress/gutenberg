@@ -21,7 +21,7 @@ import {
 import { useEffect, useRef, useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { image as icon } from '@wordpress/icons';
-import { store as mediaUtilsStore } from '@wordpress/media-utils';
+import { store as coreStore } from '@wordpress/core-data';
 
 /* global wp */
 
@@ -88,6 +88,20 @@ function hasDefaultSize( image, defaultSize ) {
 	);
 }
 
+/**
+ * Checks if a media attachment object has been "destroyed",
+ * that is, removed from the media library. The core Media Library
+ * add a `destroyed` property to a deleted attachment object in the media collection.
+ *
+ * @param {Number} id The attachment id.
+ *
+ * @return {boolean} Whether the image has been destroyed.
+ */
+function isMediaDestroyed( id ) {
+	const attachment = wp?.media?.attachment( id ) || {};
+	return attachment.destroyed;
+}
+
 export function ImageEdit( {
 	attributes,
 	setAttributes,
@@ -125,28 +139,46 @@ export function ImageEdit( {
 	const ref = useRef();
 	const { imageDefaultSize, mediaUpload } = useSelect( ( select ) => {
 		const { getSettings } = select( blockEditorStore );
-		const { getDeletedAttachment } = select( mediaUtilsStore );
 		return pick( getSettings(), [ 'imageDefaultSize', 'mediaUpload' ] );
 	}, [] );
 
-	const { isImageDeleted } = useSelect( ( select ) => {
-		const { getDeletedAttachment } = select( mediaUtilsStore );
-		console.log( 'useSelect', getDeletedAttachment( id ) );
-		return !! getDeletedAttachment( id );
-	}, [ id ] );
+	const media = useSelect(
+		( select ) => {
+			return select( coreStore ).getMedia( id );
+		},
+		[ id ]
+	);
 
+	// Also check for destroyed media when the image is selected,
+	// If the image is used elsewhere in a post,
+	// the onCloseModal callback won't fire.
+	// Also check on media object itself in case
+	// the page had reloaded and the media attachment collection state no longer exists.
 	useEffect( () => {
-		if ( isImageDeleted === true ) {
-			console.log( 'useEffect', isImageDeleted );
-			setAttributes( {
-				url: undefined,
-				alt: undefined,
-				id: undefined,
-				title: undefined,
-				caption: undefined,
-			} );
+		if ( isSelected ) {
+			if ( isMediaDestroyed( attributes?.id ) || ! media?.id ) {
+				clearImageAttributes();
+			}
 		}
-	}, [ isImageDeleted ] );
+	}, [ isSelected, attributes?.id, media?.id ] );
+
+	function clearImageAttributes() {
+		setAttributes( {
+			url: undefined,
+			alt: undefined,
+			id: undefined,
+			title: undefined,
+			caption: undefined,
+		} );
+	}
+
+	// A callback passed to MediaUpload,
+	// fired when the media modal closes.
+	function onCloseModal() {
+		if ( isMediaDestroyed( attributes?.id ) ) {
+			clearImageAttributes();
+		}
+	}
 
 	function onUploadError( message ) {
 		noticeOperations.removeAllNotices();
@@ -155,14 +187,7 @@ export function ImageEdit( {
 
 	function onSelectImage( media ) {
 		if ( ! media || ! media.url ) {
-			setAttributes( {
-				url: undefined,
-				alt: undefined,
-				id: undefined,
-				title: undefined,
-				caption: undefined,
-			} );
-
+			clearImageAttributes();
 			return;
 		}
 
@@ -345,6 +370,7 @@ export function ImageEdit( {
 					containerRef={ ref }
 					context={ context }
 					clientId={ clientId }
+					onCloseModal={ onCloseModal }
 				/>
 			) }
 			{ ! url && (
@@ -361,6 +387,7 @@ export function ImageEdit( {
 				onSelectURL={ onSelectURL }
 				notices={ noticeUI }
 				onError={ onUploadError }
+				onClose={ onCloseModal }
 				accept="image/*"
 				allowedTypes={ ALLOWED_MEDIA_TYPES }
 				value={ { id, src } }
