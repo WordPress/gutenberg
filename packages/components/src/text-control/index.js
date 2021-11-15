@@ -36,6 +36,7 @@ function TextControl(
 		className,
 		onChange,
 		type = 'text',
+		children,
 		...props
 	},
 	ref
@@ -65,6 +66,7 @@ function TextControl(
 				ref={ ref }
 				{ ...props }
 			/>
+			{ children }
 		</BaseControl>
 	);
 }

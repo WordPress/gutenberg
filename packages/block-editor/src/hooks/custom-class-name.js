@@ -141,6 +141,7 @@ export const withInspectorControl = createHigherOrderComponent(
 								}
 							>
 								<TextControl
+									className="additional-class-name-control__text-control"
 									autoComplete="off"
 									label={ __( 'Additional CSS class(es)' ) }
 									value={ props.attributes.className || '' }
@@ -155,45 +156,48 @@ export const withInspectorControl = createHigherOrderComponent(
 									help={ __(
 										'Separate multiple classes with spaces.'
 									) }
-								/>
-								{ hasBlockStyles && (
-									<DropdownMenu
-										className="additional-class-name-control__block-style-dropdown"
-										icon={ moreVertical }
-										label={ __( 'Existing Styles' ) }
-									>
-										{ ( { onClose } ) => (
-											<MenuGroup
-												label={ __(
-													'Block style classes'
-												) }
-											>
-												{ blockStyles.map(
-													( style ) => {
-														return (
-															<CustomClassNameMenuItem
-																style={ style }
-																key={
-																	style.label
-																}
-																isSelected={
-																	activeStyle?.name ===
-																	style.name
-																}
-																onClick={ () => {
-																	onSelectStyleClassName(
+								>
+									{ hasBlockStyles && (
+										<DropdownMenu
+											className="additional-class-name-control__block-style-dropdown"
+											icon={ moreVertical }
+											label={ __( 'Existing Styles' ) }
+										>
+											{ ( { onClose } ) => (
+												<MenuGroup
+													label={ __(
+														'Block style classes'
+													) }
+												>
+													{ blockStyles.map(
+														( style ) => {
+															return (
+																<CustomClassNameMenuItem
+																	style={
 																		style
-																	);
-																	onClose();
-																} }
-															/>
-														);
-													}
-												) }
-											</MenuGroup>
-										) }
-									</DropdownMenu>
-								) }
+																	}
+																	key={
+																		style.label
+																	}
+																	isSelected={
+																		activeStyle?.name ===
+																		style.name
+																	}
+																	onClick={ () => {
+																		onSelectStyleClassName(
+																			style
+																		);
+																		onClose();
+																	} }
+																/>
+															);
+														}
+													) }
+												</MenuGroup>
+											) }
+										</DropdownMenu>
+									) }
+								</TextControl>
 							</div>
 						</InspectorControls>
 					</>

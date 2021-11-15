@@ -1,11 +1,15 @@
 .additional-class-name-control__container.has-block-styles {
-	position: relative;
+	.additional-class-name-control__text-control > .components-base-control__field {
+		position: relative;
+	}
 }
 
 .additional-class-name-control__block-style-dropdown {
 	position: absolute;
-	top: 29px;
+	top: auto;
 	right: 2px;
+	bottom: 2px;
+	background: $white;
 
 	button.components-button.has-icon {
 		min-width: 24px;
@@ -13,8 +17,12 @@
 		padding: 0;
 
 		svg {
-			height: 18px;
-			width: 18px;
+			height: 27px;
+			width: 27px;
+			@include break-medium() {
+				height: 18px;
+				width: 18px;
+			}
 		}
 	}
 }
