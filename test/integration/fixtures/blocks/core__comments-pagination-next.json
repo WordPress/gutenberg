@@ -3,7 +3,27 @@
 		"clientId": "_clientId_0",
 		"name": "core/comments-pagination-next",
 		"isValid": true,
-		"attributes": {},
+		"attributes": {
+			"backgroundColor": "black",
+			"fontSize": "large",
+			"style": {
+				"color": {
+					"text": "#cf2e2e"
+				},
+				"elements": {
+					"link": {
+						"color": {
+							"text": "#00ff51"
+						}
+					}
+				},
+				"typography": {
+					"textTransform": "uppercase",
+					"fontStyle": "normal",
+					"fontWeight": "700"
+				}
+			}
+		},
 		"innerBlocks": [],
 		"originalContent": ""
 	}
