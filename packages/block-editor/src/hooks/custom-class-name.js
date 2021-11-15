@@ -160,7 +160,7 @@ export const withInspectorControl = createHigherOrderComponent(
 									<DropdownMenu
 										className="additional-class-name-control__block-style-dropdown"
 										icon={ moreVertical }
-										label={ __( 'Block style classes' ) }
+										label={ __( 'Existing Styles' ) }
 									>
 										{ ( { onClose } ) => (
 											<MenuGroup
