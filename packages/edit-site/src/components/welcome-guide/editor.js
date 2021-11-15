@@ -25,8 +25,8 @@ export default function WelcomeGuideEditor() {
 				{
 					image: (
 						<WelcomeGuideImage
-							nonAnimatedSrc=""
-							animatedSrc="https://user-images.githubusercontent.com/4933/140506067-cd8cbab4-9a36-4e17-b3ad-c4d86659ffa3.gif"
+							nonAnimatedSrc="https://s.w.org/images/block-editor/edit-your-site.svg?1"
+							animatedSrc="https://s.w.org/images/block-editor/edit-your-site.gif?1"
 						/>
 					),
 					content: (

@@ -24,8 +24,8 @@ export default function WelcomeGuideStyles() {
 				{
 					image: (
 						<WelcomeGuideImage
-							nonAnimatedSrc=""
-							animatedSrc="https://user-images.githubusercontent.com/4933/140506059-88d5f9d2-219f-4448-9e3e-4325208f3be0.gif"
+							nonAnimatedSrc="https://s.w.org/images/block-editor/welcome-to-styles.svg?1"
+							animatedSrc="https://s.w.org/images/block-editor/welcome-to-styles.gif?1"
 						/>
 					),
 					content: (
@@ -44,8 +44,8 @@ export default function WelcomeGuideStyles() {
 				{
 					image: (
 						<WelcomeGuideImage
-							nonAnimatedSrc=""
-							animatedSrc="https://user-images.githubusercontent.com/4933/140503972-f10ab71a-b86e-4f73-935b-dd277e782a57.gif"
+							nonAnimatedSrc="https://s.w.org/images/block-editor/set-the-design.svg?1"
+							animatedSrc="https://s.w.org/images/block-editor/set-the-design.gif?1"
 						/>
 					),
 					content: (
@@ -64,8 +64,8 @@ export default function WelcomeGuideStyles() {
 				{
 					image: (
 						<WelcomeGuideImage
-							nonAnimatedSrc=""
-							animatedSrc="https://user-images.githubusercontent.com/4933/140499197-e497a167-edb8-4bfa-a462-3065dc962aba.gif"
+							nonAnimatedSrc="https://s.w.org/images/block-editor/personalize-blocks.svg?1"
+							animatedSrc="https://s.w.org/images/block-editor/personalize-blocks.gif?1"
 						/>
 					),
 					content: (
