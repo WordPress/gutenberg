@@ -156,7 +156,6 @@ function useBlockEditorSettings( settings, hasTemplate ) {
 			undo,
 			hasTemplate,
 			userCanCreatePages,
-			pageOnFront,
 		]
 	);
 }
