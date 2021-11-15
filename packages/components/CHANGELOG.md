@@ -10,6 +10,10 @@
 
 -   Fixed spacing between `BaseControl` fields and help text within the `ToolsPanel` ([36334](https://github.com/WordPress/gutenberg/pull/36334))
 
+## 19.0.2 (2021-11-15)
+
+-   Remove erroneous use of `??=` syntax from `build-module`.
+
 ## 19.0.1 (2021-11-07)
 
 ### Experimental
