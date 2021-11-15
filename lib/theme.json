@@ -1,7 +1,7 @@
 {
 	"version": 2,
 	"settings": {
-		"appearance": true,
+		"appearanceTools": true,
 		"color": {
 			"background": true,
 			"palette": [

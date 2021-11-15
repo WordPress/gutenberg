@@ -81,14 +81,14 @@ class WP_Theme_JSON_Gutenberg {
 	);
 
 	const VALID_SETTINGS = array(
-		'appearance' => null,
-		'border'     => array(
+		'appearanceTools' => null,
+		'border'          => array(
 			'color'  => null,
 			'radius' => null,
 			'style'  => null,
 			'width'  => null,
 		),
-		'color'      => array(
+		'color'           => array(
 			'background'       => null,
 			'custom'           => null,
 			'customDuotone'    => null,
@@ -101,18 +101,18 @@ class WP_Theme_JSON_Gutenberg {
 			'palette'          => null,
 			'text'             => null,
 		),
-		'custom'     => null,
-		'layout'     => array(
+		'custom'          => null,
+		'layout'          => array(
 			'contentSize' => null,
 			'wideSize'    => null,
 		),
-		'spacing'    => array(
+		'spacing'         => array(
 			'blockGap' => null,
 			'margin'   => null,
 			'padding'  => null,
 			'units'    => null,
 		),
-		'typography' => array(
+		'typography'      => array(
 			'customFontSize' => null,
 			'dropCap'        => null,
 			'fontFamilies'   => null,
@@ -318,13 +318,13 @@ class WP_Theme_JSON_Gutenberg {
 	private static function maybe_opt_in_into_settings( $theme_json ) {
 		$new_theme_json = $theme_json;
 
-		if ( isset( $new_theme_json['settings']['appearance'] ) ) {
+		if ( isset( $new_theme_json['settings']['appearanceTools'] ) ) {
 			self::do_opt_in_into_settings( $new_theme_json['settings'] );
 		}
 
 		if ( isset( $new_theme_json['settings']['blocks'] ) && is_array( $new_theme_json['settings']['blocks'] ) ) {
 			foreach ( $new_theme_json['settings']['blocks'] as &$block ) {
-				if ( isset( $block['appearance'] ) ) {
+				if ( isset( $block['appearanceTools'] ) ) {
 					self::do_opt_in_into_settings( $block );
 				}
 			}
@@ -339,7 +339,10 @@ class WP_Theme_JSON_Gutenberg {
 	 * @param array $context The context to which the settings belong.
 	 */
 	private static function do_opt_in_into_settings( &$context ) {
-		gutenberg_experimental_set( $context, array( 'border', 'color' ), true );
+		// todo: take into account existing settings, if they exists
+		if ( ! isset( _wp_array_get( $context, array( 'border', 'color' ) ) ) {
+			gutenberg_experimental_set( $context, array( 'border', 'color' ), true );
+		}
 		gutenberg_experimental_set( $context, array( 'border', 'radius' ), true );
 		gutenberg_experimental_set( $context, array( 'border', 'style' ), true );
 		gutenberg_experimental_set( $context, array( 'border', 'width' ), true );
@@ -348,7 +351,7 @@ class WP_Theme_JSON_Gutenberg {
 		gutenberg_experimental_set( $context, array( 'spacing', 'units' ), true );
 		gutenberg_experimental_set( $context, array( 'typography', 'customFontSize' ), true );
 		gutenberg_experimental_set( $context, array( 'typography', 'lineHeight' ), true );
-		unset( $context['appearance'] );
+		unset( $context['appearanceTools'] );
 	}
 
 	/**

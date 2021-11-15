@@ -218,6 +218,7 @@ The settings section has the following structure:
 {
 	"version": 1,
 	"settings": {
+		"appearanceTools": true,
 		"border": {
 			"color": false,
 			"radius": false,
@@ -282,9 +283,9 @@ Each block can configure any of these settings separately, providing a more fine
 
 Note, however, that not all settings are relevant for all blocks. The settings section provides an opt-in/opt-out mechanism for themes, but it's the block's responsibility to add support for the features that are relevant to it. For example, if a block doesn't implement the `dropCap` feature, a theme can't enable it for such a block through `theme.json`.
 
-### Opt-in into appearance controls
+### Opt-in into UI controls
 
-There's one special setting property, `appareance`, which can be a boolean and its default value is true. When this is enabled, the following setting properties will be on by default:
+There's one special setting property, `appearanceTools`, which is a boolean and its default value is true. When this is enabled, the following setting properties will be on by default:
 
 - border: color, radius, style, width
 - spacing: margin, padding, units

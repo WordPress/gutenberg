@@ -193,17 +193,17 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 			array(
 				'version'  => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
 				'settings' => array(
-					'appearance' => true,
-					'blocks'     => array(
+					'appearanceTools' => true,
+					'blocks'          => array(
 						'core/paragraph' => array(
 							'typography' => array(
 								'lineHeight' => false,
 							),
 						),
 						'core/group'     => array(
-							'appearance' => true,
-							'typography' => array(
-								'lineHeight' => false, // This is overridden by appearance.
+							'appearanceTools' => true,
+							'typography'      => array(
+								'lineHeight' => false, // This should override appearanceTools.
 							),
 						),
 					),
