@@ -52,21 +52,39 @@ const handleEntitySearch = async (
 	fetchSearchSuggestions,
 	directEntryHandler,
 	withCreateSuggestion,
-	withURLSuggestion
+	withURLSuggestion,
+	pageOnFront
 ) => {
 	const { isInitialSuggestions } = suggestionsQuery;
+	let resultsIncludeFrontPage = false;
 
 	let results = await Promise.all( [
 		fetchSearchSuggestions( val, suggestionsQuery ),
 		directEntryHandler( val ),
 	] );
 
+	// Identify front page and update type to match.
+	results[ 0 ] = results[ 0 ].map( ( result ) => {
+		if ( Number( result.id ) === pageOnFront ) {
+			resultsIncludeFrontPage = true;
+			result.isFrontPage = true;
+			return result;
+		}
+
+		return result;
+	} );
+
 	const couldBeURL = ! val.includes( ' ' );
 
 	// If it's potentially a URL search then concat on a URL search suggestion
 	// just for good measure. That way once the actual results run out we always
 	// have a URL option to fallback on.
-	if ( couldBeURL && withURLSuggestion && ! isInitialSuggestions ) {
+	if (
+		! resultsIncludeFrontPage &&
+		couldBeURL &&
+		withURLSuggestion &&
+		! isInitialSuggestions
+	) {
 		results = results[ 0 ].concat( results[ 1 ] );
 	} else {
 		results = results[ 0 ];
@@ -109,9 +127,11 @@ export default function useSearchHandler(
 	withCreateSuggestion,
 	withURLSuggestion
 ) {
-	const { fetchSearchSuggestions } = useSelect( ( select ) => {
+	const { fetchSearchSuggestions, pageOnFront } = useSelect( ( select ) => {
 		const { getSettings } = select( blockEditorStore );
+
 		return {
+			pageOnFront: getSettings().pageOnFront,
 			fetchSearchSuggestions: getSettings()
 				.__experimentalFetchLinkSuggestions,
 		};
@@ -131,7 +151,8 @@ export default function useSearchHandler(
 						fetchSearchSuggestions,
 						directEntryHandler,
 						withCreateSuggestion,
-						withURLSuggestion
+						withURLSuggestion,
+						pageOnFront
 				  );
 		},
 		[ directEntryHandler, fetchSearchSuggestions, withCreateSuggestion ]
