@@ -147,7 +147,7 @@ function render_block_core_navigation( $attributes, $content, $block ) {
 
 	if ( ! empty( $block->context['navigationArea'] ) ) {
 		$area    = $block->context['navigationArea'];
-		$mapping = get_option( 'fse_navigation_areas', array() );
+		$mapping = get_option( 'wp_navigation_areas', array() );
 		if ( ! empty( $mapping[ $area ] ) ) {
 			$attributes['navigationMenuId'] = $mapping[ $area ];
 		}
