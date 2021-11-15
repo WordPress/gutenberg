@@ -12,13 +12,14 @@
 			"type": "string"
 		}
 	},
-	"usesContext": [ "postId", "queryPerPage" ],
+	"usesContext": [ "postId", "queryPerPage", "paginationArrow" ],
 	"supports": {
 		"reusable": false,
 		"html": false,
 		"color": {
 			"gradients": true,
-			"link": true
+			"link": true,
+			"text": false
 		},
 		"typography": {
 			"fontSize": true,
