@@ -2,7 +2,7 @@
 /**
  * Server-side rendering of the `core/navigation` block.
  *
- * @package gutenberg
+ * @package WordPress
  */
 
 /**
