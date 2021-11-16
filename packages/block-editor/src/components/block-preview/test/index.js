@@ -91,7 +91,7 @@ describe( 'useBlockPreview', () => {
 		);
 
 		// Test block and block contents are rendered.
-		const previewedBlock = screen.queryByLabelText( 'Block: test block' );
+		const previewedBlock = screen.getByLabelText( 'Block: test block' );
 		const previewedBlockContents = screen.getByText(
 			'Test block edit view'
 		);
