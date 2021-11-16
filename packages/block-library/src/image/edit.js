@@ -93,7 +93,7 @@ function hasDefaultSize( image, defaultSize ) {
  * that is, removed from the media library. The core Media Library
  * add a `destroyed` property to a deleted attachment object in the media collection.
  *
- * @param {Number} id The attachment id.
+ * @param {number} id The attachment id.
  *
  * @return {boolean} Whether the image has been destroyed.
  */
@@ -125,6 +125,7 @@ export function ImageEdit( {
 		sizeSlug,
 	} = attributes;
 	const [ temporaryURL, setTemporaryURL ] = useState();
+	const [ temporaryMediaId, setTemporaryMediaId ] = useState();
 
 	const altRef = useRef();
 	useEffect( () => {
@@ -142,7 +143,7 @@ export function ImageEdit( {
 		return pick( getSettings(), [ 'imageDefaultSize', 'mediaUpload' ] );
 	}, [] );
 
-	const media = useSelect(
+	const mediaObject = useSelect(
 		( select ) => {
 			return select( coreStore ).getMedia( id );
 		},
@@ -155,12 +156,18 @@ export function ImageEdit( {
 	// Also check on media object itself in case
 	// the page had reloaded and the media attachment collection state no longer exists.
 	useEffect( () => {
-		if ( isSelected ) {
-			if ( isMediaDestroyed( attributes?.id ) || ! media?.id ) {
+		// If we can find the media in the store,
+		// remove the temporary one in state.
+		if ( temporaryMediaId && temporaryMediaId === mediaObject?.id ) {
+			setTemporaryMediaId( undefined );
+			return;
+		}
+		if ( isSelected && !! id && ! temporaryMediaId ) {
+			if ( isMediaDestroyed( id ) || ! mediaObject?.id ) {
 				clearImageAttributes();
 			}
 		}
-	}, [ isSelected, attributes?.id, media?.id ] );
+	}, [ isSelected, id, mediaObject?.id, temporaryMediaId ] );
 
 	function clearImageAttributes() {
 		setAttributes( {
@@ -197,6 +204,10 @@ export function ImageEdit( {
 		}
 
 		setTemporaryURL();
+
+		// Keep a record of the media object id in state
+		// until we can grab one from the store.
+		setTemporaryMediaId( media.id );
 
 		let mediaAttributes = pickRelevantMediaFiles( media, imageDefaultSize );
 
