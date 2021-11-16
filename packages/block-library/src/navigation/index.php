@@ -14,9 +14,9 @@
  */
 function block_core_navigation_build_css_colors( $attributes ) {
 	$colors = array(
-		'css_classes'   => array(),
-		'inline_styles' => '',
-		'overlay_css_classes' => array(),
+		'css_classes'           => array(),
+		'inline_styles'         => '',
+		'overlay_css_classes'   => array(),
 		'overlay_inline_styles' => '',
 	);
 
@@ -73,7 +73,6 @@ function block_core_navigation_build_css_colors( $attributes ) {
 		// Add the custom overlay color inline style.
 		$colors['overlay_inline_styles'] .= sprintf( 'color: %s;', $attributes['customOverlayTextColor'] );
 	}
-
 
 	// Overlay background color.
 	$has_named_overlay_background_color  = array_key_exists( 'overlayBackgroundColor', $attributes );
@@ -311,7 +310,7 @@ function render_block_core_navigation( $attributes, $content, $block ) {
 		__( 'Close menu' ), // Close button label.
 		implode( ' ', $responsive_container_classes ),
 		implode( ' ', $open_button_classes ),
-		$colors['overlay_inline_styles'],
+		$colors['overlay_inline_styles']
 	);
 
 	return sprintf(
