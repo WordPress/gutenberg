@@ -136,19 +136,19 @@ function Navigation( {
 		`navigationMenu/${ navigationMenuId }`
 	);
 
-	const { innerBlocks, isInnerBlockSelected } = useSelect(
+	const { unsavedInnerBlocks, isInnerBlockSelected } = useSelect(
 		( select ) => {
-			const { getBlocks, hasSelectedInnerBlock } = select(
+			const { getBlock, hasSelectedInnerBlock } = select(
 				blockEditorStore
 			);
 			return {
-				innerBlocks: getBlocks( clientId ),
+				unsavedInnerBlocks: getBlock( clientId ).innerBlocks,
 				isInnerBlockSelected: hasSelectedInnerBlock( clientId, true ),
 			};
 		},
 		[ clientId ]
 	);
-	const hasExistingNavItems = !! innerBlocks.length;
+	const hasUnsavedInnerBlocks = !! unsavedInnerBlocks.length;
 	const {
 		replaceInnerBlocks,
 		selectBlock,
@@ -163,7 +163,7 @@ function Navigation( {
 	const isWithinUnassignedArea = navigationArea && ! navigationMenuId;
 
 	const [ isPlaceholderShown, setIsPlaceholderShown ] = useState(
-		! hasExistingNavItems || isWithinUnassignedArea
+		! hasUnsavedInnerBlocks || isWithinUnassignedArea
 	);
 
 	const [ isResponsiveMenuOpen, setResponsiveMenuVisibility ] = useState(
@@ -223,6 +223,15 @@ function Navigation( {
 	] = useState();
 	const [ detectedOverlayColor, setDetectedOverlayColor ] = useState();
 
+	// Update the menu id attribute if the one provided by the navigation area
+	// is different to the one stored in the block.
+	useEffect( () => {
+		if ( navigationMenuId !== attributes.navigationMenuId ) {
+			__unstableMarkNextChangeAsNotPersistent();
+			setAttributes( { navigationMenuId } );
+		}
+	}, [ navigationMenuId, attributes.navigationMenuId ] );
+
 	// Spacer block needs orientation from context. This is a patch until
 	// https://github.com/WordPress/gutenberg/issues/36197 is addressed.
 	useEffect( () => {
@@ -263,13 +272,12 @@ function Navigation( {
 	// Either this block was saved in the content or inserted by a pattern.
 	// Consider this 'unsaved'. Offer an uncontrolled version of inner blocks,
 	// that automatically saves the menu.
-	const hasUnsavedBlocks =
-		hasExistingNavItems && ! isEntityAvailable && ! isWithinUnassignedArea;
+	const hasUnsavedBlocks = hasUnsavedInnerBlocks && ! isEntityAvailable;
 	if ( hasUnsavedBlocks ) {
 		return (
 			<UnsavedInnerBlocks
 				blockProps={ blockProps }
-				blocks={ innerBlocks }
+				blocks={ unsavedInnerBlocks }
 				clientId={ clientId }
 				navigationMenus={ navigationMenus }
 				hasSelection={ isSelected || isInnerBlockSelected }
