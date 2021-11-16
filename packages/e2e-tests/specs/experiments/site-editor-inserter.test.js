@@ -19,6 +19,7 @@ describe( 'Site Editor Inserter', () => {
 	} );
 	beforeEach( async () => {
 		await siteEditor.visit();
+		await siteEditor.disableWelcomeGuide();
 	} );
 
 	it( 'inserter toggle button should toggle global inserter', async () => {

@@ -145,6 +145,7 @@ describe( 'Multi-entity editor states', () => {
 
 	it( 'should not display any dirty entities when loading the site editor', async () => {
 		await siteEditor.visit();
+		await siteEditor.disableWelcomeGuide();
 		expect( await openEntitySavePanel() ).toBe( false );
 	} );
 
@@ -204,6 +205,7 @@ describe( 'Multi-entity editor states', () => {
 			);
 			await saveAllEntities();
 			await siteEditor.visit();
+			await siteEditor.disableWelcomeGuide();
 
 			// Wait for site editor to load.
 			await canvas().waitForSelector(
