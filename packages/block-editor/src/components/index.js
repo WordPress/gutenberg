@@ -24,6 +24,7 @@ export { default as BlockColorsStyleSelector } from './color-style-selector';
 export { default as BlockEdit, useBlockEditContext } from './block-edit';
 export { default as BlockIcon } from './block-icon';
 export { default as BlockNavigationDropdown } from './block-navigation/dropdown';
+export { default as BlockStyles } from './block-styles';
 export { default as __experimentalBlockVariationPicker } from './block-variation-picker';
 export { default as __experimentalBlockPatternSetup } from './block-pattern-setup';
 export { default as __experimentalBlockVariationTransforms } from './block-variation-transforms';

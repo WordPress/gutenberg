@@ -220,15 +220,19 @@ The settings section has the following structure:
 	"settings": {
 		"border": {
 			"color": false,
-			"customRadius": false,
+			"radius": false,
 			"style": false,
 			"width": false
 		},
 		"color": {
 			"background": true,
+			"corePalette": true,
+			"coreGradients": true,
 			"custom": true,
 			"customDuotone": true,
 			"customGradient": true,
+			"corePalette": true,
+			"coreGradients": true,
 			"duotone": [],
 			"gradients": [],
 			"link": false,
@@ -242,19 +246,19 @@ The settings section has the following structure:
 		},
 		"spacing": {
 			"blockGap": null,
-			"customMargin": false,
-			"customPadding": false,
+			"margin": false,
+			"padding": false,
 			"units": [ "px", "em", "rem", "vh", "vw" ]
 		},
 		"typography": {
 			"customFontSize": true,
-			"customLineHeight": false,
 			"dropCap": true,
 			"fontFamilies": [],
 			"fontSizes": [],
 			"fontStyle": true,
 			"fontWeight": true,
 			"letterSpacing": true,
+			"lineHeight": false,
 			"textDecoration": true,
 			"textTransform": true
 		},
@@ -286,8 +290,8 @@ To retain backward compatibility, the existing `add_theme_support` declarations 
 
 | add_theme_support           | theme.json setting                                        |
 | --------------------------- | --------------------------------------------------------- |
-| `custom-line-height`        | Set `typography.customLineHeight` to `true`.              |
-| `custom-spacing`            | Set `spacing.customPadding` to `true`.                    |
+| `custom-line-height`        | Set `typography.lineHeight` to `true`.              |
+| `custom-spacing`            | Set `spacing.padding` to `true`.                    |
 | `custom-units`              | Provide the list of units via `spacing.units`.            |
 | `disable-custom-colors`     | Set `color.custom` to `false`.                            |
 | `disable-custom-font-sizes` | Set `typography.customFontSize` to `false`.               |
@@ -981,11 +985,11 @@ Currently block variations exist for "header" and "footer" values of the area te
 
 ## Developing with theme.json
 
-It can be difficult to remember the theme.json settings and properties while you develop, so a JSON scheme was created to help. The schema is available at [SchemaStore.org](https://schemastore.org/)
+It can be difficult to remember the theme.json settings and properties while you develop, so a JSON scheme was created to help. The schema is available at https://schemas.wp.org/trunk/theme.json
 
-To use the schema, add `"$schema": "https://json.schemastore.org/theme-v1.json"` to the beginning of your theme.json file. Visual Studio Code and other editors will pick up the schema and can provide help like tooltips, autocomplete, or schema validation in the editor.
+Code editors can pick up the schema and can provide help like tooltips, autocomplete, or schema validation in the editor. To use the schema in Visual Studio Code, add `"$schema": "https://schemas.wp.org/trunk/theme.json"` to the beginning of your theme.json file.
 
-![Example using validation with schema](https://developer.wordpress.org/files/2021/10/schema-validation.gif)
+![Example using validation with schema](https://developer.wordpress.org/files/2021/11/theme-json-schema-updated.gif)
 
 
 ## Frequently Asked Questions

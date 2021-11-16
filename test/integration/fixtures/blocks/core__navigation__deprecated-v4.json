@@ -4,11 +4,15 @@
 		"name": "core/navigation",
 		"isValid": true,
 		"attributes": {
-			"orientation": "horizontal",
 			"showSubmenuIcon": true,
 			"openSubmenusOnClick": false,
 			"overlayMenu": "never",
-			"fontFamily": "cambria-georgia"
+			"fontFamily": "cambria-georgia",
+			"layout": {
+				"type": "flex",
+				"justifyContent": "left",
+				"orientation": "horizontal"
+			}
 		},
 		"innerBlocks": [],
 		"originalContent": ""

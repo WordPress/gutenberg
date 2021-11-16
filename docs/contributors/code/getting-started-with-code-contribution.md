@@ -33,7 +33,7 @@ $ git remote add upstream https://github.com/WordPress/gutenberg.git
 Install the Gutenberg dependencies and build your code in development mode:
 
 ```bash
-npm ci
+npm install
 npm run dev
 ```
 

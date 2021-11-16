@@ -58,6 +58,7 @@ const EmbedHandlerPicker = forwardRef( ( {}, ref ) => {
 			ref={ pickerRef }
 			options={ pickerOptions }
 			onChange={ onPickerSelect }
+			testID="embed-handler-picker"
 			hideCancelButton
 			leftAlign
 		/>

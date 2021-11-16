@@ -24,7 +24,7 @@ import { __ } from '@wordpress/i18n';
  */
 import styles from './style.scss';
 import BlockListAppender from '../block-list-appender';
-import BlockListItem from './block-list-item.native';
+import BlockListItem from './block-list-item';
 import { store as blockEditorStore } from '../../store';
 
 const BlockListContext = createContext();

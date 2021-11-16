@@ -15,16 +15,23 @@ import { Spinner } from '@wordpress/components';
 import { store as coreStore } from '@wordpress/core-data';
 
 const TEMPLATE = [
-	[ 'core/post-comment-author' ],
-	[ 'core/post-comment-date' ],
-	[ 'core/post-comment-content' ],
+	[ 'core/comment-author-avatar' ],
+	[ 'core/comment-author-name' ],
+	[ 'core/comment-date' ],
+	[ 'core/comment-content' ],
+	[ 'core/comment-reply-link' ],
+	[ 'core/comment-edit-link' ],
 ];
+
+function CommentTemplateInnerBlocks() {
+	const innerBlocksProps = useInnerBlocksProps( {}, { template: TEMPLATE } );
+	return <li { ...innerBlocksProps } />;
+}
 
 export default function CommentTemplateEdit( {
 	clientId,
 	context: { postId, queryPerPage },
 } ) {
-	const innerBlocksProps = useInnerBlocksProps( {}, { template: TEMPLATE } );
 	const blockProps = useBlockProps();
 
 	const [ activeBlockContext, setActiveBlockContext ] = useState();
@@ -74,7 +81,7 @@ export default function CommentTemplateEdit( {
 					>
 						{ blockContext ===
 						( activeBlockContext || blockContexts[ 0 ] ) ? (
-							<li { ...innerBlocksProps } />
+							<CommentTemplateInnerBlocks />
 						) : (
 							<li>
 								<BlockPreview

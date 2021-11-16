@@ -58,7 +58,7 @@ We commit to keeping the breaking changes minimal so you can upgrade `@wordpress
 
 ### `build`
 
-Transforms your code according the configuration provided so it’s ready for production and optimized for the best performance. The entry point for your project’s code should be located in `src/index.js`. The output generated will be written to `build/index.js`. This script exits after producing a single build. For incremental builds, better suited for development, see the [start](#start) script.
+Transforms your code according the configuration provided so it’s ready for production and optimized for the best performance. The entry point for your project’s code should be located in `src/index.js` (other supported extensions: `.jsx`, `.ts`, and `.tsx`). The output generated will be written to `build/index.js`. This script exits after producing a single build. For incremental builds, better suited for development, see the [start](#start) script.
 
 _Example:_
 
@@ -154,7 +154,7 @@ By default, files located in `build`, `node_modules`, and `vendor` folders are i
 
 ### `lint-js`
 
-Helps enforce coding style guidelines for your JavaScript files.
+Helps enforce coding style guidelines for your JavaScript and TypeScript files.
 
 _Example:_
 
@@ -169,8 +169,8 @@ _Example:_
 
 This is how you execute the script with presented setup:
 
--   `npm run lint:js` - lints JavaScript files in the entire project’s directories.
--   `npm run lint:js:src` - lints JavaScript files in the project’s `src` subfolder’s directories.
+-   `npm run lint:js` - lints JavaScript and TypeScript files in the entire project’s directories.
+-   `npm run lint:js:src` - lints JavaScript and TypeScript files in the project’s `src` subfolder’s directories.
 
 When you run commands similar to the `npm run lint:js:src` example above, you can provide a file, a directory, or `glob` syntax or any combination of them. See [more examples](https://eslint.org/docs/user-guide/command-line-interface).
 
@@ -305,7 +305,7 @@ The command checks which packages whose name starts with `@wordpress/` are used 
 
 ### `start`
 
-Transforms your code according the configuration provided so it’s ready for development. The script will automatically rebuild if you make changes to the code, and you will see the build errors in the console. The entry point for your project’s code should be located in `src/index.js`. The output generated will be written to `build/index.js`. For single builds, better suited for production, see the [build](#build) script.
+Transforms your code according the configuration provided so it’s ready for development. The script will automatically rebuild if you make changes to the code, and you will see the build errors in the console. The entry point for your project’s code should be located in `src/index.js` (other supported extensions: `.jsx`, `.ts`, and `.tsx`). The output generated will be written to `build/index.js`. For single builds, better suited for production, see the [build](#build) script.
 
 _Example:_
 
@@ -364,8 +364,8 @@ This is how you execute those scripts using the presented setup:
 
 Jest will look for test files with any of the following popular naming conventions:
 
--   Files with `.js` (or `.ts`) suffix at any level of depth in `spec` folders.
--   Files with `.spec.js` (or `.spec.ts`) suffix.
+-   Files with `.js` (other supported extensions: `.jsx`, `.ts`, and `.tsx`) suffix at any level of depth in `spec` folders.
+-   Files with `.spec.js` (other supported extensions: `.jsx`, `.ts`, and `.tsx`) suffix.
 
 This script automatically detects the best config to start Puppeteer but sometimes you may need to specify custom options:
 
@@ -417,9 +417,9 @@ This is how you execute those scripts using the presented setup:
 
 Jest will look for test files with any of the following popular naming conventions:
 
--   Files with `.js` (or `.ts`) suffix located at any level of depth in `__tests__` folders.
--   Files with `.js` (or `.ts`) suffix directly located in `test` folders.
--   Files with `.test.js` (or `.test.ts`) suffix.
+-   Files with `.js` (other supported extensions: `.jsx`, `.ts`, and `.tsx`) suffix located at any level of depth in `__tests__` folders.
+-   Files with `.js` (other supported extensions: `.jsx`, `.ts`, and `.tsx`) suffix directly located in `test` folders.
+-   Files with `.test.js` (other supported extensions: `.jsx`, `.ts`, and `.tsx`) suffix.
 
 #### Advanced information
 
@@ -498,7 +498,7 @@ The `build` and `start` commands use [webpack](https://webpack.js.org/) behind t
 -   [Entry](https://webpack.js.org/configuration/entry-context/#entry): `src/index.js`
 -   [Output](https://webpack.js.org/configuration/output): `build/index.js`
 -   [Loaders](https://webpack.js.org/loaders/):
-    -   [`babel-loader`](https://webpack.js.org/loaders/babel-loader/) allows transpiling JavaScript files using Babel and webpack.
+    -   [`babel-loader`](https://webpack.js.org/loaders/babel-loader/) allows transpiling JavaScript and TypeScript files using Babel and webpack.
     -   [`@svgr/webpack`](https://www.npmjs.com/package/@svgr/webpack) and [`url-loader`](https://webpack.js.org/loaders/url-loader/) makes it possible to handle SVG files in JavaScript code.
     -   [`css-loader`](https://webpack.js.org/loaders/css-loader/) chained with [`postcss-loader`](https://webpack.js.org/loaders/postcss-loader/) and [sass-loader](https://webpack.js.org/loaders/sass-loader/) let webpack process CSS, SASS or SCSS files referenced in JavaScript files.
 -   [Plugins](https://webpack.js.org/configuration/plugins) (among others):

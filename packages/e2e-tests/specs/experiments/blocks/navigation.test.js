@@ -38,12 +38,12 @@ const menusFixture = [
 // Matching against variations of the same URL encoded and non-encoded
 // produces the most reliable mocking.
 const REST_MENUS_ROUTES = [
-	'/__experimental/menus',
-	`rest_route=${ encodeURIComponent( '/__experimental/menus' ) }`,
+	'/wp/v2/menus',
+	`rest_route=${ encodeURIComponent( '/wp/v2/menus' ) }`,
 ];
 const REST_MENU_ITEMS_ROUTES = [
-	'/__experimental/menu-items',
-	`rest_route=${ encodeURIComponent( '/__experimental/menu-items' ) }`,
+	'/wp/v2/menu-items',
+	`rest_route=${ encodeURIComponent( '/wp/v2/menu-items' ) }`,
 ];
 
 const REST_PAGES_ROUTES = [

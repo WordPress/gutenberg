@@ -6,6 +6,7 @@ import {
 	BottomSheet,
 	ColorSettings,
 	FocalPointSettingsPanel,
+	ImageLinkDestinationsScreen,
 	LinkPickerScreen,
 } from '@wordpress/components';
 import { compose } from '@wordpress/compose';
@@ -21,6 +22,7 @@ export const blockSettingsScreens = {
 	color: 'Color',
 	focalPoint: 'FocalPoint',
 	linkPicker: 'linkPicker',
+	imageLinkDestinations: 'imageLinkDestinations',
 };
 
 function BottomSheetSettings( {
@@ -41,6 +43,7 @@ function BottomSheetSettings( {
 			hideHeader
 			contentStyle={ styles.content }
 			hasNavigation
+			testID="block-settings-modal"
 			{ ...props }
 		>
 			<BottomSheet.NavigationContainer animate main>
@@ -74,6 +77,11 @@ function BottomSheetSettings( {
 					<LinkPickerScreen
 						returnScreenName={ blockSettingsScreens.settings }
 					/>
+				</BottomSheet.NavigationScreen>
+				<BottomSheet.NavigationScreen
+					name={ blockSettingsScreens.imageLinkDestinations }
+				>
+					<ImageLinkDestinationsScreen { ...props } />
 				</BottomSheet.NavigationScreen>
 			</BottomSheet.NavigationContainer>
 		</BottomSheet>

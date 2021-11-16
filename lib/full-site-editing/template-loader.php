@@ -266,3 +266,28 @@ function gutenberg_resolve_template_for_new_post( $wp_query ) {
 		$wp_query->set( 'post_status', 'auto-draft' );
 	}
 }
+
+/**
+ * Redirect the edit links for templates to the site editor.
+ *
+ * @param string $link    The original link.
+ * @param int    $post_id The custom post id.
+ */
+function gutenberg_get_edit_template_link( $link, $post_id ) {
+	$post = get_post( $post_id );
+
+	if ( ! in_array( $post->post_type, array( 'wp_template', 'wp_template_part' ), true ) ) {
+		return $link;
+	}
+
+	$template = _build_block_template_result_from_post( $post );
+
+	if ( is_wp_error( $template ) ) {
+		return $link;
+	}
+
+	$edit_link = 'themes.php?page=gutenberg-edit-site&postId=%1$s&postType=%2$s';
+
+	return admin_url( sprintf( $edit_link, urlencode( $template->id ), $template->type ) );
+}
+add_filter( 'get_edit_post_link', 'gutenberg_get_edit_template_link', 10, 2 );

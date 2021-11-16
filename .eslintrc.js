@@ -175,6 +175,7 @@ module.exports = {
 				...developmentFiles,
 			],
 			rules: {
+				'import/default': 'off',
 				'import/no-extraneous-dependencies': 'off',
 				'import/no-unresolved': 'off',
 				'import/named': 'off',

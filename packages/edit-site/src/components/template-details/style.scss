@@ -50,7 +50,8 @@
 	}
 
 	.edit-site-template-details__show-all-button.components-button {
-		display: block;
+		display: flex;
+		justify-content: center;
 		background: $gray-900;
 		color: $white;
 		width: 100%;
