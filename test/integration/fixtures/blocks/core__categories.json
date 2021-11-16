@@ -6,7 +6,8 @@
 		"attributes": {
 			"displayAsDropdown": false,
 			"showHierarchy": false,
-			"showPostCounts": false
+			"showPostCounts": false,
+			"showOnlyTopLevel": false
 		},
 		"innerBlocks": [],
 		"originalContent": ""

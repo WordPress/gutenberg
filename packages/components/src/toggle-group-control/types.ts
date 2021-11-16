@@ -2,7 +2,7 @@
  * External dependencies
  */
 // eslint-disable-next-line no-restricted-imports
-import type { MutableRefObject, Ref, ReactNode, ReactText } from 'react';
+import type { MutableRefObject, ReactNode, ReactText } from 'react';
 // eslint-disable-next-line no-restricted-imports
 import type { RadioStateReturn } from 'reakit';
 
@@ -72,21 +72,6 @@ export type ToggleGroupControlContextProps = RadioStateReturn & {
 	 * @default false
 	 */
 	isBlock?: boolean;
-};
-
-export type ToggleGroupControlButtonProps = {
-	className?: string;
-	forwardedRef?: Ref< any >;
-	/**
-	 * Renders `ToggleGroupControl` as a (CSS) block element.
-	 *
-	 * @default false
-	 */
-	isBlock?: boolean;
-	label: string;
-	'aria-label'?: string;
-	value?: ReactText;
-	state?: any;
 };
 
 export type ToggleGroupControlBackdropProps = {

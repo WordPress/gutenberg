@@ -22,7 +22,10 @@ export { deleteTheme } from './delete-theme';
 export { deleteUser } from './delete-user';
 export { disablePrePublishChecks } from './disable-pre-publish-checks';
 export { dragAndResize } from './drag-and-resize';
-export { enablePageDialogAccept } from './enable-page-dialog-accept';
+export {
+	enablePageDialogAccept,
+	disablePageDialogAccept,
+} from './auto-accept-page-dialogs';
 export { enablePrePublishChecks } from './enable-pre-publish-checks';
 export { ensureSidebarOpened } from './ensure-sidebar-opened';
 export { findSidebarPanelToggleButtonWithTitle } from './find-sidebar-panel-toggle-button-with-title';
@@ -59,6 +62,7 @@ export {
 } from './observe-focus-loss';
 export { openDocumentSettingsSidebar } from './open-document-settings-sidebar';
 export { openPublishPanel } from './open-publish-panel';
+export { openTypographyToolsPanelMenu } from './open-typography-tools-panel-menu';
 export { trashAllPosts } from './posts';
 export { pressKeyTimes } from './press-key-times';
 export {
@@ -90,5 +94,6 @@ export {
 	rest as __experimentalRest,
 	batch as __experimentalBatch,
 } from './rest-api';
+export { openListView, closeListView } from './list-view';
 
 export * from './mocks';

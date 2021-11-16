@@ -8,7 +8,13 @@ import { __experimentalPanelColorGradientSettings as PanelColorGradientSettings 
  * Internal dependencies
  */
 import ScreenHeader from './header';
-import { getSupportedGlobalStylesPanels, useSetting, useStyle } from './hooks';
+import {
+	getSupportedGlobalStylesPanels,
+	useColorsPerOrigin,
+	useGradientsPerOrigin,
+	useSetting,
+	useStyle,
+} from './hooks';
 
 function ScreenBackgroundColor( { name } ) {
 	const parentMenu = name === undefined ? '' : '/blocks/' + name;
@@ -20,6 +26,9 @@ function ScreenBackgroundColor( { name } ) {
 		'color.customGradient',
 		name
 	);
+
+	const colorsPerOrigin = useColorsPerOrigin( name );
+	const gradientsPerOrigin = useGradientsPerOrigin( name );
 
 	const [ isBackgroundEnabled ] = useSetting( 'color.background', name );
 
@@ -82,17 +91,18 @@ function ScreenBackgroundColor( { name } ) {
 				back={ parentMenu + '/colors' }
 				title={ __( 'Background' ) }
 				description={ __(
-					'Set a background color or gradient for the whole website.'
+					'Set a background color or gradient for the whole site.'
 				) }
 			/>
 
 			<PanelColorGradientSettings
 				title={ __( 'Color' ) }
 				settings={ settings }
-				colors={ solids }
-				gradients={ gradients }
+				colors={ colorsPerOrigin }
+				gradients={ gradientsPerOrigin }
 				disableCustomColors={ ! areCustomSolidsEnabled }
 				disableCustomGradients={ ! areCustomGradientsEnabled }
+				__experimentalHasMultipleOrigins
 				showTitle={ false }
 			/>
 		</>

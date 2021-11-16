@@ -788,6 +788,28 @@ describe( 'state', () => {
 			} );
 		} );
 
+		it( 'Replacing the block with an empty list should remove it', () => {
+			const original = blocks( undefined, {
+				type: 'RESET_BLOCKS',
+				blocks: [
+					{
+						clientId: 'chicken',
+						name: 'core/test-block',
+						attributes: {},
+						innerBlocks: [],
+					},
+				],
+			} );
+			const state = blocks( original, {
+				type: 'REPLACE_BLOCKS',
+				clientIds: [ 'chicken' ],
+				blocks: [],
+			} );
+
+			expect( Object.keys( state.byClientId ) ).toHaveLength( 0 );
+			expect( state.tree[ '' ].innerBlocks ).toHaveLength( 0 );
+		} );
+
 		it( 'should replace the block and remove references to its inner blocks', () => {
 			const original = blocks( undefined, {
 				type: 'RESET_BLOCKS',

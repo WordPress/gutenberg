@@ -189,10 +189,13 @@ export const ThumbWrapper = styled.span`
 	user-select: none;
 	width: ${ thumbSize }px;
 	border-radius: 50%;
-	transform: translateX( 4.5px );
 
 	${ thumbColor };
 	${ rtl( { marginLeft: -10 } ) };
+	${ rtl(
+		{ transform: 'translateX( 4.5px )' },
+		{ transform: 'translateX( -4.5px )' }
+	) };
 `;
 
 const thumbFocus = ( { isFocused } ) => {
@@ -249,16 +252,16 @@ const tooltipShow = ( { show } ) => {
 };
 
 const tooltipPosition = ( { position } ) => {
-	const isTop = position === 'top';
+	const isBottom = position === 'bottom';
 
-	if ( isTop ) {
+	if ( isBottom ) {
 		return css`
-			top: -80%;
+			bottom: -80%;
 		`;
 	}
 
 	return css`
-		bottom: -80%;
+		top: -80%;
 	`;
 };
 

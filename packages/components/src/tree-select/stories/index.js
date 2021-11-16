@@ -16,6 +16,9 @@ import TreeSelect from '../';
 export default {
 	title: 'Components/TreeSelect',
 	component: TreeSelect,
+	parameters: {
+		knobs: { disabled: false },
+	},
 };
 
 const TreeSelectWithState = ( props ) => {

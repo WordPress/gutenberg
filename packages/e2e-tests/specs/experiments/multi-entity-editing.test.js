@@ -145,12 +145,16 @@ describe( 'Multi-entity editor states', () => {
 
 	it( 'should not display any dirty entities when loading the site editor', async () => {
 		await siteEditor.visit();
+		await siteEditor.disableWelcomeGuide();
 		expect( await openEntitySavePanel() ).toBe( false );
 	} );
 
-	it( 'should not dirty an entity by switching to it in the template dropdown', async () => {
-		await siteEditor.visit();
-		await clickTemplateItem( [ 'Template Parts', 'headers' ], 'header' );
+	// Skip reason: This should be rewritten to use other methods to switching to different templates.
+	it.skip( 'should not dirty an entity by switching to it in the template dropdown', async () => {
+		await siteEditor.visit( {
+			postId: 'tt1-blocks//header',
+			postType: 'wp_template_part',
+		} );
 		await page.waitForFunction( () =>
 			Array.from( window.frames ).find(
 				( { name } ) => name === 'editor-canvas'
@@ -201,6 +205,7 @@ describe( 'Multi-entity editor states', () => {
 			);
 			await saveAllEntities();
 			await siteEditor.visit();
+			await siteEditor.disableWelcomeGuide();
 
 			// Wait for site editor to load.
 			await canvas().waitForSelector(

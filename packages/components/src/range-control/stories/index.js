@@ -16,7 +16,13 @@ import { wordpress } from '@wordpress/icons';
 import RangeControl from '../index';
 import { COLORS } from '../../utils';
 
-export default { title: 'Components/RangeControl', component: RangeControl };
+export default {
+	title: 'Components/RangeControl',
+	component: RangeControl,
+	parameters: {
+		knobs: { disabled: false },
+	},
+};
 
 const RangeControlWithState = ( props ) => {
 	const initialValue = props.value === undefined ? 5 : props.value;

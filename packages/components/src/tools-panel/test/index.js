@@ -6,7 +6,7 @@ import { render, screen, fireEvent } from '@testing-library/react';
 /**
  * Internal dependencies
  */
-import { ToolsPanel, ToolsPanelItem } from '../';
+import { ToolsPanel, ToolsPanelContext, ToolsPanelItem } from '../';
 import { createSlotFill, Provider as SlotFillProvider } from '../../slot-fill';
 
 const { Fill: ToolsPanelItems, Slot } = createSlotFill( 'ToolsPanelSlot' );
@@ -100,7 +100,8 @@ const renderGroupedItemsInPanel = () => {
 // to test panel item registration and rendering.
 const WrappedItem = ( { text, ...props } ) => {
 	return (
-		<div className="wrapped-panel-item-container">
+		<div>
+			<span>Wrapper</span>
 			<ToolsPanelItem { ...props }>
 				<div>{ text }</div>
 			</ToolsPanelItem>
@@ -117,10 +118,6 @@ const renderWrappedItemInPanel = () => {
 		</ToolsPanel>
 	);
 };
-
-// Attempts to find the tools panel via its CSS class.
-const getPanel = ( container ) =>
-	container.querySelector( '.components-tools-panel' );
 
 // Renders a default tools panel including children that are
 // not to be represented within the panel's menu.
@@ -140,14 +137,23 @@ const renderPanel = () => {
 };
 
 /**
+ * Retrieves the panel's dropdown menu toggle button.
+ *
+ * @return {HTMLElement} The menu button.
+ */
+const getMenuButton = () => {
+	return screen.getByRole( 'button', {
+		name: /view([\w\s]+)options/i,
+	} );
+};
+
+/**
  * Helper to find the menu button and simulate a user click.
  *
  * @return {HTMLElement} The menuButton.
  */
 const openDropdownMenu = () => {
-	const menuButton = screen.getByRole( 'button', {
-		name: /view([\w\s]+)options/i,
-	} );
+	const menuButton = getMenuButton();
 	fireEvent.click( menuButton );
 	return menuButton;
 };
@@ -166,17 +172,17 @@ describe( 'ToolsPanel', () => {
 
 	describe( 'basic rendering', () => {
 		it( 'should render panel', () => {
-			const { container } = renderPanel();
-
-			expect( getPanel( container ) ).toBeInTheDocument();
-		} );
-
-		it( 'should render non panel item child', () => {
 			renderPanel();
 
-			const nonPanelItem = screen.queryByText( 'Visible' );
+			const menuButton = getMenuButton();
+			const label = screen.getByText( defaultProps.label );
+			const control = screen.getByText( 'Example control' );
+			const nonToolsPanelItem = screen.getByText( 'Visible' );
 
-			expect( nonPanelItem ).toBeInTheDocument();
+			expect( menuButton ).toBeInTheDocument();
+			expect( label ).toBeInTheDocument();
+			expect( control ).toBeInTheDocument();
+			expect( nonToolsPanelItem ).toBeInTheDocument();
 		} );
 
 		it( 'should render panel item flagged as default control even without value', () => {
@@ -295,13 +301,13 @@ describe( 'ToolsPanel', () => {
 			expect( control ).toBeInTheDocument();
 
 			await selectMenuItem( controlProps.label );
-			const resetControl = screen.queryByText( 'Default control' );
+			const resetControl = screen.getByText( 'Default control' );
 
 			expect( resetControl ).toBeInTheDocument();
 		} );
 
 		it( 'should render appropriate menu groups', async () => {
-			const { container } = render(
+			render(
 				<ToolsPanel { ...defaultProps }>
 					<ToolsPanelItem
 						{ ...controlProps }
@@ -316,16 +322,14 @@ describe( 'ToolsPanel', () => {
 			);
 			openDropdownMenu();
 
-			const menuGroups = container.querySelectorAll(
-				'.components-menu-group'
-			);
+			const menuGroups = screen.getAllByRole( 'group' );
 
 			// Groups should be: default controls, optional controls & reset all.
 			expect( menuGroups.length ).toEqual( 3 );
 		} );
 
-		it( 'should render placeholder items when panel opts into that feature', () => {
-			const { container } = render(
+		it( 'should not render contents of items when in placeholder state', () => {
+			render(
 				<ToolsPanel
 					{ ...defaultProps }
 					shouldRenderPlaceholderItems={ true }
@@ -337,15 +341,12 @@ describe( 'ToolsPanel', () => {
 			);
 
 			const optionalItem = screen.queryByText( 'Optional control' );
-			const placeholder = container.querySelector(
-				'.components-tools-panel-item'
-			);
 
 			// When rendered as a placeholder a ToolsPanelItem will just omit
-			// all the item's children. So we should still find the container
-			// element but not the text etc within.
+			// all the item's children. So the container element will still be
+			// there holding its position but the inner text etc should not be
+			// there.
 			expect( optionalItem ).not.toBeInTheDocument();
-			expect( placeholder ).toBeInTheDocument();
 		} );
 	} );
 
@@ -414,26 +415,30 @@ describe( 'ToolsPanel', () => {
 			openDropdownMenu();
 
 			const defaultItem = screen.getByText( 'Nested Control 1' );
-			const defaultMenuItem = defaultItem.parentNode;
+			const defaultMenuItem = screen.getByRole( 'menuitemcheckbox', {
+				name: 'Reset Nested Control 1',
+				checked: true,
+			} );
 
 			const altItem = screen.getByText( 'Nested Control 2' );
-			const altMenuItem = altItem.parentNode;
+			const altMenuItem = screen.getByRole( 'menuitemcheckbox', {
+				name: 'Show Nested Control 2',
+				checked: false,
+			} );
 
 			expect( defaultItem ).toBeInTheDocument();
-			expect( defaultMenuItem ).toHaveAttribute( 'aria-checked', 'true' );
+			expect( defaultMenuItem ).toBeInTheDocument();
 
 			expect( altItem ).toBeInTheDocument();
-			expect( altMenuItem ).toHaveAttribute( 'aria-checked', 'false' );
+			expect( altMenuItem ).toBeInTheDocument();
 		} );
 	} );
 
 	describe( 'wrapped panel items within custom components', () => {
 		it( 'should render wrapped items correctly', () => {
-			const { container } = renderWrappedItemInPanel();
+			renderWrappedItemInPanel();
 
-			const wrappers = container.querySelectorAll(
-				'.wrapped-panel-item-container'
-			);
+			const wrappers = screen.getAllByText( 'Wrapper' );
 			const defaultItem = screen.getByText( 'Wrapped 1' );
 			const altItem = screen.queryByText( 'Wrapped 2' );
 
@@ -449,20 +454,30 @@ describe( 'ToolsPanel', () => {
 			openDropdownMenu();
 
 			const defaultItem = screen.getByText( 'Nested Control 1' );
-			const defaultMenuItem = defaultItem.parentNode;
+			const defaultMenuItem = screen.getByRole( 'menuitemcheckbox', {
+				name: 'Reset Nested Control 1',
+				checked: true,
+			} );
 
 			const altItem = screen.getByText( 'Nested Control 2' );
-			const altMenuItem = altItem.parentNode;
+			const altMenuItem = screen.getByRole( 'menuitemcheckbox', {
+				name: 'Show Nested Control 2',
+				checked: false,
+			} );
 
 			expect( defaultItem ).toBeInTheDocument();
-			expect( defaultMenuItem ).toHaveAttribute( 'aria-checked', 'true' );
+			expect( defaultMenuItem ).toBeInTheDocument();
 
 			expect( altItem ).toBeInTheDocument();
-			expect( altMenuItem ).toHaveAttribute( 'aria-checked', 'false' );
+			expect( altMenuItem ).toBeInTheDocument();
 		} );
 	} );
 
 	describe( 'rendering via SlotFills', () => {
+		beforeEach( () => {
+			jest.clearAllMocks();
+		} );
+
 		it( 'should maintain visual order of controls when toggled on and off', async () => {
 			// Multiple fills are added to better simulate panel items being
 			// injected from different locations.
@@ -514,6 +529,64 @@ describe( 'ToolsPanel', () => {
 			expect( items ).toHaveLength( 2 );
 			expect( items[ 0 ] ).toHaveTextContent( 'Item 1' );
 			expect( items[ 1 ] ).toHaveTextContent( 'Item 2' );
+		} );
+
+		it( 'should not trigger callback when fill has not updated yet when panel has', () => {
+			// Fill provided controls can update independently to the panel.
+			// A `panelId` prop was added to both panels and items
+			// so it could prevent erroneous registrations and calls to
+			// `onDeselect` etc.
+			//
+			// See: https://github.com/WordPress/gutenberg/pull/35375
+			//
+			// This test simulates this issue by rendering an item within a
+			// contrived `ToolsPanelContext` to reflect the changes the panel
+			// item needs to protect against.
+
+			const noop = () => undefined;
+			const context = {
+				panelId: '1234',
+				menuItems: {
+					default: {},
+					optional: { [ altControlProps.label ]: true },
+				},
+				hasMenuItems: false,
+				isResetting: false,
+				shouldRenderPlaceholderItems: false,
+				registerPanelItem: noop,
+				deregisterPanelItem: noop,
+				flagItemCustomization: noop,
+				areAllOptionalControlsHidden: true,
+			};
+
+			// This initial render gives the tools panel item a chance to
+			// set its internal state to reflect it was previously selected.
+			// This later forms part of the condition used to determine if an
+			// item is being deselected and thus call the onDeselect callback.
+			const { rerender } = render(
+				<ToolsPanelContext.Provider value={ context }>
+					<ToolsPanelItem { ...altControlProps } panelId="1234">
+						<div>Item</div>
+					</ToolsPanelItem>
+				</ToolsPanelContext.Provider>
+			);
+
+			// Simulate a change in panel separate to the rendering of fills.
+			// e.g. a switch of block selection.
+			context.panelId = '4321';
+			context.menuItems.optional[ altControlProps.label ] = false;
+
+			// Rerender the panel item and ensure that it skips any check
+			// for deselection given it still belongs to a different panelId.
+			rerender(
+				<ToolsPanelContext.Provider value={ context }>
+					<ToolsPanelItem { ...altControlProps } panelId="1234">
+						<div>Item</div>
+					</ToolsPanelItem>
+				</ToolsPanelContext.Provider>
+			);
+
+			expect( altControlProps.onDeselect ).not.toHaveBeenCalled();
 		} );
 	} );
 

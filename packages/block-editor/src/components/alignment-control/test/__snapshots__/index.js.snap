@@ -56,7 +56,6 @@ exports[`AlignmentUI should allow custom alignment controls to be specified 1`] 
   }
   toggleProps={
     Object {
-      "className": "is-pressed",
       "describedBy": "Change text alignment",
     }
   }
@@ -134,7 +133,6 @@ exports[`AlignmentUI should match snapshot 1`] = `
   }
   toggleProps={
     Object {
-      "className": "is-pressed",
       "describedBy": "Change text alignment",
     }
   }

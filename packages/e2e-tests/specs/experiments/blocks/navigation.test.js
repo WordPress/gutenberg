@@ -38,12 +38,12 @@ const menusFixture = [
 // Matching against variations of the same URL encoded and non-encoded
 // produces the most reliable mocking.
 const REST_MENUS_ROUTES = [
-	'/__experimental/menus',
-	`rest_route=${ encodeURIComponent( '/__experimental/menus' ) }`,
+	'/wp/v2/menus',
+	`rest_route=${ encodeURIComponent( '/wp/v2/menus' ) }`,
 ];
 const REST_MENU_ITEMS_ROUTES = [
-	'/__experimental/menu-items',
-	`rest_route=${ encodeURIComponent( '/__experimental/menu-items' ) }`,
+	'/wp/v2/menu-items',
+	`rest_route=${ encodeURIComponent( '/wp/v2/menu-items' ) }`,
 ];
 
 const REST_PAGES_ROUTES = [
@@ -275,7 +275,9 @@ afterEach( async () => {
 	await setUpResponseMocking( [] );
 } );
 
-describe( 'Navigation', () => {
+// Disable reason - these tests are to be re-written.
+// eslint-disable-next-line jest/no-disabled-tests
+describe.skip( 'Navigation', () => {
 	describe( 'Creating from existing Pages', () => {
 		it( 'allows a navigation block to be created using existing pages', async () => {
 			// Mock the response from the Pages endpoint. This is done so that the pages returned are always
@@ -733,6 +735,7 @@ describe( 'Navigation', () => {
 		expect( tagCount ).toBe( 1 );
 	} );
 
+	// eslint-disable-next-line jest/no-disabled-tests
 	it.skip( 'loads frontend code only if responsiveness is turned on', async () => {
 		await mockPagesResponse( [
 			{

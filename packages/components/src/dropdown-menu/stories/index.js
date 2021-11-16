@@ -13,7 +13,13 @@ import DropdownMenu from '../';
  */
 import { menu, arrowUp, arrowDown } from '@wordpress/icons';
 
-export default { title: 'Components/DropdownMenu', component: DropdownMenu };
+export default {
+	title: 'Components/DropdownMenu',
+	component: DropdownMenu,
+	parameters: {
+		knobs: { disabled: false },
+	},
+};
 
 export const _default = () => {
 	const label = text( 'Label', 'Select a direction.' );

@@ -9,6 +9,7 @@ import { v4 as uuid } from 'uuid';
  */
 import apiFetch from '@wordpress/api-fetch';
 import { addQueryArgs } from '@wordpress/url';
+import deprecated from '@wordpress/deprecated';
 
 /**
  * Internal dependencies
@@ -118,16 +119,54 @@ export function receiveCurrentTheme( currentTheme ) {
 }
 
 /**
- * Returns an action object used in signalling that the index has been received.
+ * Returns an action object used in signalling that the current global styles id has been received.
  *
- * @param {Object} themeSupports Theme support for the current theme.
+ * @param {string} currentGlobalStylesId The current global styles id.
  *
  * @return {Object} Action object.
  */
-export function receiveThemeSupports( themeSupports ) {
+export function __experimentalReceiveCurrentGlobalStylesId(
+	currentGlobalStylesId
+) {
 	return {
-		type: 'RECEIVE_THEME_SUPPORTS',
-		themeSupports,
+		type: 'RECEIVE_CURRENT_GLOBAL_STYLES_ID',
+		id: currentGlobalStylesId,
+	};
+}
+
+/**
+ * Returns an action object used in signalling that the theme base global styles have been received
+ *
+ * @param {string} stylesheet   The theme's identifier
+ * @param {Object} globalStyles The global styles object.
+ *
+ * @return {Object} Action object.
+ */
+export function __experimentalReceiveThemeBaseGlobalStyles(
+	stylesheet,
+	globalStyles
+) {
+	return {
+		type: 'RECEIVE_THEME_GLOBAL_STYLES',
+		stylesheet,
+		globalStyles,
+	};
+}
+
+/**
+ * Returns an action object used in signalling that the index has been received.
+ *
+ * @deprecated since WP 5.9, this is not useful anymore, use the selector direclty.
+ *
+ * @return {Object} Action object.
+ */
+export function receiveThemeSupports() {
+	deprecated( "wp.data.dispatch( 'core' ).receiveThemeSupports", {
+		since: '5.9',
+	} );
+
+	return {
+		type: 'DO_NOTHING',
 	};
 }
 
@@ -605,12 +644,19 @@ export const saveEditedEntityRecord = (
 	if ( ! select.hasEditsForEntityRecord( kind, name, recordId ) ) {
 		return;
 	}
+	const entities = await dispatch( getKindEntities( kind ) );
+	const entity = find( entities, { kind, name } );
+	if ( ! entity ) {
+		return;
+	}
+	const entityIdKey = entity.key || DEFAULT_ENTITY_KEY;
+
 	const edits = select.getEntityRecordNonTransientEdits(
 		kind,
 		name,
 		recordId
 	);
-	const record = { id: recordId, ...edits };
+	const record = { [ entityIdKey ]: recordId, ...edits };
 	return await dispatch.saveEntityRecord( kind, name, record, options );
 };
 

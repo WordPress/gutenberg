@@ -1,10 +1,12 @@
 /**
  * WordPress dependencies
  */
-
-import { useMergeRefs } from '@wordpress/compose';
+import {
+	useMergeRefs,
+	__experimentalUseFixedWindowList as useFixedWindowList,
+} from '@wordpress/compose';
 import { __experimentalTreeGrid as TreeGrid } from '@wordpress/components';
-import { AsyncModeProvider, useDispatch } from '@wordpress/data';
+import { AsyncModeProvider, useDispatch, useSelect } from '@wordpress/data';
 import {
 	useCallback,
 	useEffect,
@@ -46,32 +48,46 @@ const expanded = ( state, action ) => {
  * @param {Array}    props.blocks                                   Custom subset of block client IDs to be used instead of the default hierarchy.
  * @param {Function} props.onSelect                                 Block selection callback.
  * @param {boolean}  props.showNestedBlocks                         Flag to enable displaying nested blocks.
- * @param {boolean}  props.showOnlyCurrentHierarchy                 Flag to limit the list to the current hierarchy of blocks.
+ * @param {boolean}  props.showBlockMovers                          Flag to enable block movers
  * @param {boolean}  props.__experimentalFeatures                   Flag to enable experimental features.
  * @param {boolean}  props.__experimentalPersistentListViewFeatures Flag to enable features for the Persistent List View experiment.
+ * @param {boolean}  props.__experimentalHideContainerBlockActions  Flag to hide actions of top level blocks (like core/widget-area)
  * @param {Object}   ref                                            Forwarded ref
  */
 function ListView(
 	{
 		blocks,
-		showOnlyCurrentHierarchy,
 		onSelect = noop,
 		__experimentalFeatures,
 		__experimentalPersistentListViewFeatures,
+		__experimentalHideContainerBlockActions,
+		showNestedBlocks,
+		showBlockMovers,
 		...props
 	},
 	ref
 ) {
 	const {
 		clientIdsTree,
-		selectedClientIds,
 		draggedClientIds,
-	} = useListViewClientIds(
-		blocks,
-		showOnlyCurrentHierarchy,
-		__experimentalPersistentListViewFeatures
-	);
+		selectedClientIds,
+	} = useListViewClientIds( blocks );
 	const { selectBlock } = useDispatch( blockEditorStore );
+	const { visibleBlockCount } = useSelect(
+		( select ) => {
+			const { getGlobalBlockCount, getClientIdsOfDescendants } = select(
+				blockEditorStore
+			);
+			const draggedBlockCount =
+				draggedClientIds?.length > 0
+					? getClientIdsOfDescendants( draggedClientIds ).length + 1
+					: 0;
+			return {
+				visibleBlockCount: getGlobalBlockCount() - draggedBlockCount,
+			};
+		},
+		[ draggedClientIds ]
+	);
 	const selectEditorBlock = useCallback(
 		( clientId ) => {
 			selectBlock( clientId );
@@ -89,6 +105,19 @@ function ListView(
 	useEffect( () => {
 		isMounted.current = true;
 	}, [] );
+
+	// List View renders a fixed number of items and relies on each having a fixed item height of 36px.
+	// If this value changes, we should also change the itemHeight value set in useFixedWindowList.
+	// See: https://github.com/WordPress/gutenberg/pull/35230 for additional context.
+	const [ fixedListWindow ] = useFixedWindowList(
+		elementRef,
+		36,
+		visibleBlockCount,
+		{
+			useWindowing: __experimentalPersistentListViewFeatures,
+			windowOverscan: 40,
+		}
+	);
 
 	const expand = useCallback(
 		( clientId ) => {
@@ -108,20 +137,26 @@ function ListView(
 		},
 		[ setExpandedState ]
 	);
-	const expandRow = ( row ) => {
-		expand( row?.dataset?.block );
-	};
-	const collapseRow = ( row ) => {
-		collapse( row?.dataset?.block );
-	};
+	const expandRow = useCallback(
+		( row ) => {
+			expand( row?.dataset?.block );
+		},
+		[ expand ]
+	);
+	const collapseRow = useCallback(
+		( row ) => {
+			collapse( row?.dataset?.block );
+		},
+		[ collapse ]
+	);
 
 	const contextValue = useMemo(
 		() => ( {
 			__experimentalFeatures,
 			__experimentalPersistentListViewFeatures,
+			__experimentalHideContainerBlockActions,
 			isTreeGridMounted: isMounted.current,
 			draggedClientIds,
-			selectedClientIds,
 			expandedState,
 			expand,
 			collapse,
@@ -129,9 +164,9 @@ function ListView(
 		[
 			__experimentalFeatures,
 			__experimentalPersistentListViewFeatures,
+			__experimentalHideContainerBlockActions,
 			isMounted.current,
 			draggedClientIds,
-			selectedClientIds,
 			expandedState,
 			expand,
 			collapse,
@@ -155,6 +190,10 @@ function ListView(
 					<ListViewBranch
 						blocks={ clientIdsTree }
 						selectBlock={ selectEditorBlock }
+						showNestedBlocks={ showNestedBlocks }
+						showBlockMovers={ showBlockMovers }
+						fixedListWindow={ fixedListWindow }
+						selectedClientIds={ selectedClientIds }
 						{ ...props }
 					/>
 				</ListViewContext.Provider>

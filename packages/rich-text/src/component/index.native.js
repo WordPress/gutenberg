@@ -757,6 +757,12 @@ export class RichText extends Component {
 				this.manipulateEventCounterToForceNativeToRefresh(); // force a refresh on the native side
 			}
 
+			// For font size changes from a prop value a force refresh
+			// is needed without the selection update
+			if ( nextProps?.fontSize !== this.props?.fontSize ) {
+				this.manipulateEventCounterToForceNativeToRefresh(); // force a refresh on the native side
+			}
+
 			if (
 				nextProps?.style?.fontSize !== this.props?.style?.fontSize ||
 				nextProps?.style?.lineHeight !== this.props?.style?.lineHeight
@@ -854,7 +860,9 @@ export class RichText extends Component {
 	}
 
 	getFontSize() {
-		const { baseGlobalStyles } = this.props;
+		const { baseGlobalStyles, tagName } = this.props;
+		const tagNameFontSize =
+			baseGlobalStyles?.elements?.[ tagName ]?.typography?.fontSize;
 
 		let fontSize = DEFAULT_FONT_SIZE;
 
@@ -862,11 +870,15 @@ export class RichText extends Component {
 			fontSize = baseGlobalStyles?.typography?.fontSize;
 		}
 
+		if ( tagNameFontSize ) {
+			fontSize = tagNameFontSize;
+		}
+
 		if ( this.props.style?.fontSize ) {
 			fontSize = this.props.style.fontSize;
 		}
 
-		if ( this.props.fontSize ) {
+		if ( this.props.fontSize && ! tagNameFontSize ) {
 			fontSize = this.props.fontSize;
 		}
 		const { height, width } = this.state.dimensions;
@@ -879,7 +891,9 @@ export class RichText extends Component {
 	}
 
 	getLineHeight() {
-		const { baseGlobalStyles } = this.props;
+		const { baseGlobalStyles, tagName } = this.props;
+		const tagNameLineHeight =
+			baseGlobalStyles?.elements?.[ tagName ]?.typography?.lineHeight;
 		let lineHeight;
 
 		// eslint-disable-next-line no-undef
@@ -889,6 +903,10 @@ export class RichText extends Component {
 
 		if ( baseGlobalStyles?.typography?.lineHeight ) {
 			lineHeight = parseFloat( baseGlobalStyles?.typography?.lineHeight );
+		}
+
+		if ( tagNameLineHeight ) {
+			lineHeight = parseFloat( tagNameLineHeight );
 		}
 
 		if ( this.props.style?.lineHeight ) {

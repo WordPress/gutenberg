@@ -1,16 +1,18 @@
 /**
  * WordPress dependencies
  */
+import { store as blocksStore } from '@wordpress/blocks';
 import {
 	registerCoreBlocks,
 	__experimentalRegisterExperimentalCoreBlocks,
 } from '@wordpress/block-library';
+import { dispatch, useDispatch } from '@wordpress/data';
 import { render, useMemo } from '@wordpress/element';
 import {
+	__experimentalFetchUrlData,
 	__experimentalFetchLinkSuggestions as fetchLinkSuggestions,
 	store as coreStore,
 } from '@wordpress/core-data';
-import { dispatch, useDispatch } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
 
 /**
@@ -41,6 +43,7 @@ function NavEditor( { settings } ) {
 			...settings,
 			__experimentalFetchLinkSuggestions,
 			__experimentalSetIsInserterOpened,
+			__experimentalFetchRichUrlData: __experimentalFetchUrlData,
 		};
 	}, [
 		settings,
@@ -58,7 +61,6 @@ function NavEditor( { settings } ) {
  */
 function setUpEditor( settings ) {
 	addFilters( ! settings.blockNavMenus );
-	registerCoreBlocks();
 
 	// Set up the navigation post entity.
 	dispatch( coreStore ).addEntities( [
@@ -71,6 +73,8 @@ function setUpEditor( settings ) {
 		},
 	] );
 
+	dispatch( blocksStore ).__experimentalReapplyBlockTypeFilters();
+	registerCoreBlocks();
 	if ( process.env.GUTENBERG_PHASE === 2 ) {
 		__experimentalRegisterExperimentalCoreBlocks();
 	}
@@ -90,3 +94,5 @@ export function initialize( id, settings ) {
 		document.getElementById( id )
 	);
 }
+
+export { createMenuPreloadingMiddleware as __unstableCreateMenuPreloadingMiddleware } from './utils';

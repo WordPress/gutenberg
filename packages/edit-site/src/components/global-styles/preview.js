@@ -26,7 +26,11 @@ const StylesPreview = () => {
 			style={ { background: gradientValue ?? backgroundColor } }
 		>
 			<HStack spacing={ 5 }>
-				<div style={ { fontFamily, fontSize: '80px' } }>Aa</div>
+				<div
+					style={ { fontFamily, fontSize: '80px', color: textColor } }
+				>
+					Aa
+				</div>
 				<VStack spacing={ 2 }>
 					<ColorIndicator colorValue={ textColor } />
 					<ColorIndicator colorValue={ linkColor } />

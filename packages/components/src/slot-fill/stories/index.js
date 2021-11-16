@@ -16,6 +16,9 @@ import { Slot, Fill, Provider } from '../';
 export default {
 	title: 'Components/SlotFill',
 	component: Slot,
+	parameters: {
+		knobs: { disabled: false },
+	},
 };
 
 export const _default = () => {

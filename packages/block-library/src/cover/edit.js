@@ -38,7 +38,7 @@ import {
 	ColorPalette,
 	useBlockProps,
 	useSetting,
-	__experimentalUseInnerBlocksProps as useInnerBlocksProps,
+	useInnerBlocksProps,
 	__experimentalUseGradient,
 	__experimentalPanelColorGradientSettings as PanelColorGradientSettings,
 	__experimentalUnitControl as UnitControl,
@@ -116,7 +116,7 @@ function CoverHeightInput( {
 	const handleOnChange = ( unprocessedValue ) => {
 		const inputValue =
 			unprocessedValue !== ''
-				? parseInt( unprocessedValue, 10 )
+				? parseFloat( unprocessedValue )
 				: undefined;
 
 		if ( isNaN( inputValue ) && inputValue !== undefined ) {
@@ -148,7 +148,6 @@ function CoverHeightInput( {
 				onBlur={ handleOnBlur }
 				onChange={ handleOnChange }
 				onUnitChange={ onUnitChange }
-				step="1"
 				style={ { maxWidth: 80 } }
 				unit={ unit }
 				units={ units }
@@ -326,13 +325,15 @@ function CoverEdit( {
 		style: styleAttribute,
 		url,
 		alt,
+		allowedBlocks,
+		templateLock,
 	} = attributes;
 	const {
 		gradientClass,
 		gradientValue,
 		setGradient,
 	} = __experimentalUseGradient();
-	const onSelectMedia = attributesFromMedia( setAttributes );
+	const onSelectMedia = attributesFromMedia( setAttributes, dimRatio );
 	const isUploadingMedia = isTemporaryMedia( id, url );
 
 	const [ prevMinHeightValue, setPrevMinHeightValue ] = useState( minHeight );
@@ -542,6 +543,7 @@ function CoverEdit( {
 					</PanelBody>
 				) }
 				<PanelColorGradientSettings
+					__experimentalHasMultipleOrigins
 					title={ __( 'Overlay' ) }
 					initialOpen={ true }
 					settings={ [
@@ -619,6 +621,8 @@ function CoverEdit( {
 		{
 			template: innerBlocksTemplate,
 			templateInsertUpdatesSelection: true,
+			allowedBlocks,
+			templateLock,
 		}
 	);
 
@@ -637,7 +641,12 @@ function CoverEdit( {
 						noticeUI={ noticeUI }
 						onSelectMedia={ onSelectMedia }
 						noticeOperations={ noticeOperations }
-						style={ { minHeight: temporaryMinHeight || minHeight } }
+						style={ {
+							minHeight:
+								temporaryMinHeight ||
+								minHeightWithUnit ||
+								undefined,
+						} }
 					>
 						<div className="wp-block-cover__placeholder-background-options">
 							<ColorPalette

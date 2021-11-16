@@ -16,13 +16,22 @@
 function render_block_core_post_comments( $attributes, $content, $block ) {
 	global $post;
 
-	if ( ! isset( $block->context['postId'] ) ) {
+	$post_id = $block->context['postId'];
+	if ( ! isset( $post_id ) ) {
+		return '';
+	}
+
+	$comment_args = array(
+		'post_id' => $post_id,
+		'count'   => true,
+	);
+	// Return early if there are no comments and comments are closed.
+	if ( ! comments_open( $post_id ) && get_comments( $comment_args ) === 0 ) {
 		return '';
 	}
 
 	$post_before = $post;
-
-	$post = get_post( $block->context['postId'] );
+	$post        = get_post( $post_id );
 	setup_postdata( $post );
 
 	ob_start();

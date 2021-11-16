@@ -13,7 +13,7 @@ import { embedContentIcon } from './icons';
 import EmbedLoading from './embed-loading';
 import EmbedPlaceholder from './embed-placeholder';
 import EmbedPreview from './embed-preview';
-import EmbedBottomSheet from './embed-bottom-sheet';
+import EmbedLinkSettings from './embed-link-settings';
 
 /**
  * External dependencies
@@ -24,7 +24,7 @@ import classnames from 'classnames';
  * WordPress dependencies
  */
 import { _x } from '@wordpress/i18n';
-import { useState, useEffect } from '@wordpress/element';
+import { useCallback, useState, useEffect } from '@wordpress/element';
 import { useDispatch, useSelect } from '@wordpress/data';
 import {
 	useBlockProps,
@@ -86,8 +86,8 @@ const EmbedEdit = ( props ) => {
 		( select ) => {
 			const {
 				getEmbedPreview,
+				hasFinishedResolution,
 				isPreviewEmbedFallback,
-				isRequestingEmbedPreview,
 				getThemeSupports,
 			} = select( coreStore );
 			if ( ! url ) {
@@ -95,6 +95,10 @@ const EmbedEdit = ( props ) => {
 			}
 
 			const embedPreview = getEmbedPreview( url );
+			const hasResolvedEmbedPreview = hasFinishedResolution(
+				'getEmbedPreview',
+				[ url ]
+			);
 			const previewIsFallback = isPreviewEmbedFallback( url );
 
 			// The external oEmbed provider does not exist. We got no type info and no html.
@@ -108,16 +112,9 @@ const EmbedEdit = ( props ) => {
 			const validPreview =
 				!! embedPreview && ! badEmbedProvider && ! wordpressCantEmbed;
 
-			// `isRequestingEmbedPreview` is returning false just before an
-			// `apiFetch` is triggered. We're assuming that a fetch is happening
-			// if there is an `attributesUrl` set but there is no data in
-			// `embedPreview` which represents the response returned from the API.
-			const isFetching =
-				isRequestingEmbedPreview( url ) || ( url && ! embedPreview );
-
 			return {
 				preview: validPreview ? embedPreview : undefined,
-				fetching: isFetching,
+				fetching: ! hasResolvedEmbedPreview,
 				themeSupportsResponsive: getThemeSupports()[
 					'responsive-embeds'
 				],
@@ -199,6 +196,14 @@ const EmbedEdit = ( props ) => {
 		isEditingURL,
 	] );
 
+	const onEditURL = useCallback( ( value ) => {
+		// The order of the following calls is important, we need to update the URL attribute before changing `isEditingURL`,
+		// otherwise the side-effect that potentially replaces the block when updating the local state won't use the new URL
+		// for creating the new block.
+		setAttributes( { url: value } );
+		setIsEditingURL( false );
+	}, [] );
+
 	const blockProps = useBlockProps();
 
 	if ( fetching ) {
@@ -233,16 +238,12 @@ const EmbedEdit = ( props ) => {
 		( WP_EMBED_TYPE === type &&
 			! NOT_PREVIEWABLE_WP_EMBED_PROVIDERS.includes( providerNameSlug ) );
 
-	const bottomSheetLabel = WP_EMBED_TYPE === type ? 'WordPress' : title;
+	const linkLabel = WP_EMBED_TYPE === type ? 'WordPress' : title;
 
 	return (
 		<>
 			{ showEmbedPlaceholder ? (
 				<>
-					<EmbedControls
-						showEditButton={ cannotEmbed }
-						switchBackToURLInput={ () => setIsEditingURL( true ) }
-					/>
 					<View { ...blockProps }>
 						<EmbedPlaceholder
 							icon={ icon }
@@ -259,18 +260,22 @@ const EmbedEdit = ( props ) => {
 									url,
 								] );
 							} }
+							openEmbedLinkSettings={ () =>
+								setShowEmbedBottomSheet( true )
+							}
 						/>
 					</View>
 				</>
 			) : (
 				<>
 					<EmbedControls
-						showEditButton={ preview && ! cannotEmbed }
 						themeSupportsResponsive={ themeSupportsResponsive }
 						blockSupportsResponsive={ responsive }
 						allowResponsive={ allowResponsive }
 						toggleResponsive={ toggleResponsive }
-						switchBackToURLInput={ () => setIsEditingURL( true ) }
+						url={ url }
+						linkLabel={ linkLabel }
+						onEditURL={ onEditURL }
 					/>
 					<View { ...blockProps }>
 						<EmbedPreview
@@ -292,18 +297,15 @@ const EmbedEdit = ( props ) => {
 					</View>
 				</>
 			) }
-			<EmbedBottomSheet
+			<EmbedLinkSettings
+				// eslint-disable-next-line jsx-a11y/no-autofocus
+				autoFocus
 				value={ url }
-				label={ bottomSheetLabel }
+				label={ linkLabel }
 				isVisible={ showEmbedBottomSheet }
 				onClose={ () => setShowEmbedBottomSheet( false ) }
-				onSubmit={ ( value ) => {
-					// The order of the following calls is important, we need to update the URL attribute before changing `isEditingURL`,
-					// otherwise the side-effect that potentially replaces the block when updating the local state won't use the new URL
-					// for creating the new block.
-					setAttributes( { url: value } );
-					setIsEditingURL( false );
-				} }
+				onSubmit={ onEditURL }
+				withBottomSheet
 			/>
 		</>
 	);

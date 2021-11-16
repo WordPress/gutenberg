@@ -66,22 +66,6 @@
 	}
 }
 
-// Ensures a border is present when a child block is selected.
-.block-editor-block-list__block[data-type="core/template-part"] {
-	&.has-child-selected {
-		&::after {
-			border: $border-width dotted var(--wp-admin-theme-color);
-		}
-
-		&.is-hovered,
-		&.is-highlighted {
-			&::after {
-				border: none;
-			}
-		}
-	}
-}
-
 .wp-block-template-part__placeholder-create-new__title-form {
 	.wp-block-template-part__placeholder-create-new__title-form-actions {
 		padding-top: $grid-unit-15;

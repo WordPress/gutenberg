@@ -11,6 +11,9 @@ import { Truncate } from '..';
 export default {
 	component: Truncate,
 	title: 'Components (Experimental)/Truncate',
+	parameters: {
+		knobs: { disabled: false },
+	},
 };
 
 export const _default = () => {

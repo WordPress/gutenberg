@@ -112,9 +112,12 @@ exports[`File block renders file error state without crashing 1`] = `
           rejectResponderTermination={true}
           scrollEnabled={false}
           style={
-            Object {
-              "fontFamily": "serif",
-            }
+            Array [
+              Object {
+                "fontFamily": "serif",
+              },
+              undefined,
+            ]
           }
           underlineColorAndroid="transparent"
           value="Error"

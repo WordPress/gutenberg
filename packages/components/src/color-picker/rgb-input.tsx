@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import colorize, { ColorFormats } from 'tinycolor2';
+import { colord, Colord } from 'colord';
 
 /**
  * Internal dependencies
@@ -9,13 +9,13 @@ import colorize, { ColorFormats } from 'tinycolor2';
 import { InputWithSlider } from './input-with-slider';
 
 interface RgbInputProps {
-	color: ColorFormats.HSLA;
-	onChange: ( color: ColorFormats.HSLA ) => void;
+	color: Colord;
+	onChange: ( nextColor: Colord ) => void;
 	enableAlpha: boolean;
 }
 
 export const RgbInput = ( { color, onChange, enableAlpha }: RgbInputProps ) => {
-	const { r, g, b, a } = colorize( color ).toRgb();
+	const { r, g, b, a } = color.toRgb();
 
 	return (
 		<>
@@ -26,7 +26,7 @@ export const RgbInput = ( { color, onChange, enableAlpha }: RgbInputProps ) => {
 				abbreviation="R"
 				value={ r }
 				onChange={ ( nextR: number ) =>
-					onChange( colorize( { r: nextR, g, b, a } ).toHsl() )
+					onChange( colord( { r: nextR, g, b, a } ) )
 				}
 			/>
 			<InputWithSlider
@@ -36,7 +36,7 @@ export const RgbInput = ( { color, onChange, enableAlpha }: RgbInputProps ) => {
 				abbreviation="G"
 				value={ g }
 				onChange={ ( nextG: number ) =>
-					onChange( colorize( { r, g: nextG, b, a } ).toHsl() )
+					onChange( colord( { r, g: nextG, b, a } ) )
 				}
 			/>
 			<InputWithSlider
@@ -46,7 +46,7 @@ export const RgbInput = ( { color, onChange, enableAlpha }: RgbInputProps ) => {
 				abbreviation="B"
 				value={ b }
 				onChange={ ( nextB: number ) =>
-					onChange( colorize( { r, g, b: nextB, a } ).toHsl() )
+					onChange( colord( { r, g, b: nextB, a } ) )
 				}
 			/>
 			{ enableAlpha && (
@@ -58,12 +58,12 @@ export const RgbInput = ( { color, onChange, enableAlpha }: RgbInputProps ) => {
 					value={ Math.trunc( a * 100 ) }
 					onChange={ ( nextA: number ) =>
 						onChange(
-							colorize( {
+							colord( {
 								r,
 								g,
 								b,
 								a: nextA / 100,
-							} ).toHsl()
+							} )
 						)
 					}
 				/>

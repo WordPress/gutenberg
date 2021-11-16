@@ -22,17 +22,17 @@ import {
 	__EXPERIMENTAL_ELEMENTS as ELEMENTS,
 	getBlockTypes,
 } from '@wordpress/blocks';
-import { useEffect, useState } from '@wordpress/element';
+import { useEffect, useState, useContext } from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
-import { useGlobalStylesConfig } from './hooks';
 
 /**
  * Internal dependencies
  */
 import { PRESET_METADATA, ROOT_BLOCK_SELECTOR } from './utils';
+import { GlobalStylesContext } from './context';
 
 function compileStyleValue( uncompiledValue ) {
 	const VARIABLE_REFERENCE_PREFIX = 'var:';
@@ -361,7 +361,7 @@ const getBlockSelectors = ( blockTypes ) => {
 export function useGlobalStylesOutput() {
 	const [ stylesheets, setStylesheets ] = useState( [] );
 	const [ settings, setSettings ] = useState( {} );
-	const [ , , mergedConfig ] = useGlobalStylesConfig();
+	const { merged: mergedConfig } = useContext( GlobalStylesContext );
 
 	useEffect( () => {
 		if ( ! mergedConfig?.styles || ! mergedConfig?.settings ) {

@@ -16,6 +16,9 @@ import NumberControl from '../';
 export default {
 	title: 'Components/NumberControl',
 	component: NumberControl,
+	parameters: {
+		knobs: { disabled: false },
+	},
 };
 
 function Example() {
