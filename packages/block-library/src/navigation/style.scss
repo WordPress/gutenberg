@@ -323,9 +323,12 @@
 	.is-responsive {
 		display: none;
 	}
+}
 
-	// Horizontal layout
-	.items-justified-space-between & {
+// Allow the container to grow when space-between is applied.
+.items-justified-space-between {
+	.wp-block-navigation__container,
+	.wp-block-page-list {
 		flex-grow: 1;
 	}
 }
