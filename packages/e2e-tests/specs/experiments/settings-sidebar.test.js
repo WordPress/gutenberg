@@ -53,6 +53,7 @@ describe( 'Settings sidebar', () => {
 	} );
 	beforeEach( async () => {
 		await siteEditor.visit();
+		await siteEditor.disableWelcomeGuide();
 	} );
 
 	describe( 'Template tab', () => {
