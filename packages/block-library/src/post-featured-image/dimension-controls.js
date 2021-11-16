@@ -71,9 +71,15 @@ const DimensionControls = ( {
 				className="single-column"
 				hasValue={ () => !! height }
 				label={ __( 'Height' ) }
-				onDeselect={ () => setAttributes( { height: undefined } ) }
+				onDeselect={ () =>
+					setAttributes( {
+						height: undefined,
+						scale: 'cover',
+					} )
+				}
 				resetAllFilter={ () => ( {
 					height: undefined,
+					scale: 'cover',
 				} ) }
 				isShownByDefault={ true }
 				panelId={ clientId }
@@ -82,6 +88,7 @@ const DimensionControls = ( {
 					label={ __( 'Height' ) }
 					labelPosition="top"
 					value={ height || '' }
+					min={ 0 }
 					onChange={ ( nextHeight ) =>
 						onDimensionChange( 'height', nextHeight )
 					}
@@ -103,6 +110,7 @@ const DimensionControls = ( {
 					label={ __( 'Width' ) }
 					labelPosition="top"
 					value={ width || '' }
+					min={ 0 }
 					onChange={ ( nextWidth ) =>
 						onDimensionChange( 'width', nextWidth )
 					}
@@ -115,11 +123,11 @@ const DimensionControls = ( {
 					label={ scaleLabel }
 					onDeselect={ () =>
 						setAttributes( {
-							scale: undefined,
+							scale: 'cover',
 						} )
 					}
 					resetAllFilter={ () => ( {
-						scale: undefined,
+						scale: 'cover',
 					} ) }
 					isShownByDefault={ !! height }
 					panelId={ clientId }
