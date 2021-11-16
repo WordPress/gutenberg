@@ -41,6 +41,12 @@ The component is added similar to an HTML tag, setting a label, the `value` is s
 
 The save function will simply write the `attributes.message` as a div tag since that is how we defined it to be parsed.
 
+Install the components module in order to be able to use the TextControl component:
+
+```shell
+npm install @wordpress/components --save
+```
+
 Update the edit.js and save.js files to the following, replacing the existing functions.
 
 **edit.js** file:
@@ -75,6 +81,7 @@ export default function save( { attributes } ) {
 }
 ```
 
-Rebuild the block using `npm run build`, reload the editor and add the block. Type a message in the editor, save, and view it in the post.
+If you have run the start script before `npm run start` and the script is still running, you can reload the editor now and add the block to test.
+Otherwise rebuild the block using `npm run build`, reload the editor and add the block. Type a message in the editor, save, and view it in the post.
 
 Next Section: [Code Implementation](/docs/getting-started/create-block/block-code.md)
