@@ -19,14 +19,11 @@ import { store as noticesStore } from '@wordpress/notices';
 import EntityRecordItem from './entity-record-item';
 
 export default function DiscardEntityChangesPanel( { closePanel, savables } ) {
-	const discardableSavables = useSelect( ( select ) =>
-		savables.filter(
-			( { kind, name, key } ) =>
-				! select( coreStore ).isSavingEntityRecord( kind, name, key )
+	const isSaving = useSelect( ( select ) =>
+		savables.some( ( { kind, name, key } ) =>
+			select( coreStore ).isSavingEntityRecord( kind, name, key )
 		)
 	);
-
-	const isSaving = savables.length !== discardableSavables.length;
 
 	const {
 		__experimentalResetEditedEntityRecord: resetEditedEntityRecord,
@@ -130,7 +127,7 @@ export default function DiscardEntityChangesPanel( { closePanel, savables } ) {
 						</ul>
 					) }
 					{ ! isSaving &&
-						discardableSavables.map( ( record ) => (
+						savables.map( ( record ) => (
 							<EntityRecordItem
 								key={ record.key || record.property }
 								record={ record }
