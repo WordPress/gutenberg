@@ -256,13 +256,16 @@ class BottomSheet extends Component {
 		// On horizontal mode `maxHeight` has to be set on 90% of width
 		if ( width > height ) {
 			this.setState( {
-				maxHeight: Math.min( 0.9 * height, maxHeightWithOpenKeyboard ),
+				maxHeight: Math.min(
+					0.9 * height - this.headerHeight,
+					maxHeightWithOpenKeyboard
+				),
 			} );
 			//	On vertical mode `maxHeight` has to be set on 50% of width
 		} else {
 			this.setState( {
 				maxHeight: Math.min(
-					height / 2 - safeAreaBottomInset,
+					height / 2 - safeAreaBottomInset - this.headerHeight,
 					maxHeightWithOpenKeyboard
 				),
 			} );
