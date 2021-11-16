@@ -103,28 +103,62 @@ class Gutenberg_REST_Navigation_Controller extends WP_REST_Posts_Controller {
 	protected function permissions_check() {
 		// Verify if the current user has edit_theme_options capability.
 		// This capability is required to edit/view/delete templates.
-		if ( ! current_user_can( 'edit_theme_options' ) ) {
-			return new WP_Error(
-				'rest_cannot_manage_templates',
-				__( 'Sorry, you are not allowed to access the templates on this site.', 'gutenberg' ),
-				array(
-					'status' => rest_authorization_required_code(),
-				)
-			);
-		}
+//		if ( ! current_user_can( 'edit_theme_options' ) ) {
+//			return new WP_Error(
+//				'rest_cannot_manage_templates',
+//				__( 'Sorry, you are not allowed to access the templates on this site.', 'gutenberg' ),
+//				array(
+//					'status' => rest_authorization_required_code(),
+//				)
+//			);
+//		}
 
 		return true;
+	}
+
+	public function get_item_permissions_check( $request ) {
+		return true;
+	}
+
+	public function create_item_permissions_check( $request ) {
+		return true;
+	}
+
+	public function update_item_permissions_check( $request ) {
+		return true;
+	}
+
+	public function delete_item_permissions_check( $request ) {
+		return true;
+	}
+
+	protected function check_update_permission( $post ) {
+		return true;
+	}
+
+	public function get_items_permissions_check( $request ) {
+		return true;
+	}
+
+	public function check_read_permission( $post ) {
+		return true;
+	}
+
+	protected function check_create_permission( $post ) {
+		return true;
+	}
+
+	protected function check_delete_permission( $post ) {
+		return true;
+	}
+
+	protected function handle_status_param( $post_status, $post_type ) {
+		return $post_status;
 	}
 
 	public function filter_response_by_context( $data, $context ) {
 		$data['id'] = $data['slug'];
 		return $data;
-	}
-
-	protected function prepare_item_for_database( $request ) {
-		$changes = parent::prepare_item_for_database( $request );
-		$changes->post_name = $request['slug'];
-		return $changes;
 	}
 
 	public function get_item_schema() {
@@ -136,7 +170,7 @@ class Gutenberg_REST_Navigation_Controller extends WP_REST_Posts_Controller {
 
 	protected function get_post( $id ) {
 		$wp_query_args        = array(
-			'post_name__in'  => array( $id ),
+			'name'           => $id,
 			'post_type'      => 'wp_navigation',
 			'post_status'    => array( 'auto-draft', 'draft', 'publish', 'trash' ),
 			'posts_per_page' => 1,

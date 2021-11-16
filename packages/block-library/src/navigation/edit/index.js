@@ -13,7 +13,7 @@ import {
 	useCallback,
 	Platform,
 	useContext,
-} from '@wordpress/element'
+} from '@wordpress/element';
 import { v4 as uuid } from 'uuid';
 import { Disabled } from '@wordpress/components';
 import {
@@ -268,11 +268,16 @@ function Navigation( {
 	useEffect( () => {
 		if ( ! oldSlug ) {
 			const newSlug = area?.area
-				? `${ area.area }//menu`
-				: `${ uuid() }//menu`;
+				? `wp-${ area.area }-menu`
+				: `wp-${ uuid() }-menu`;
 			setAttributes( { menuSlug: newSlug } );
 		}
 	}, [ oldSlug, area?.area ] );
+	useEffect( () => {
+		if ( navigationMenu?.slug ) {
+			setAttributes( { menuSlug: navigationMenu.slug } );
+		}
+	}, [ navigationMenu?.slug ] );
 
 	// If the block has inner blocks, but no menu id, this was an older
 	// navigation block added before the block used a wp_navigation entity.

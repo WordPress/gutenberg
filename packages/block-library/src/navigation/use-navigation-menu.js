@@ -5,10 +5,12 @@ import {
 	store as coreDataStore,
 	store as coreStore,
 } from '@wordpress/core-data';
+import { useState } from '@wordpress/element';
 import { useSelect, useDispatch } from '@wordpress/data';
 
 export default function useNavigationMenu( slug ) {
 	const dispatch = useDispatch();
+	const [ created, setCreated ] = useState( false ); // @TODO check with core data
 	return useSelect(
 		( select ) => {
 			const {
@@ -30,27 +32,6 @@ export default function useNavigationMenu( slug ) {
 				  )
 				: false;
 
-			let navigationMenu = null;
-
-			if ( slug ) {
-				navigationMenu = getEditedEntityRecord( ...navigationMenuSingleArgs );
-				if ( ! navigationMenu?.id /* && hasResolvedNavigationMenu */ ) {
-					// This could be a mock resolver or transform into a new way of creating entities in Gutenberg
-					dispatch(coreStore).receiveEntityRecords(
-						'postType',
-						'wp_navigation',
-						[{
-							id: slug,
-							slug: slug,
-							name: slug,
-							blocks: [],
-							content: ""
-						}]
-					);
-					navigationMenu = getEditedEntityRecord( ...navigationMenuSingleArgs );
-				}
-			}
-
 			const navigationMenuMultipleArgs = [
 				'postType',
 				'wp_navigation',
@@ -59,6 +40,34 @@ export default function useNavigationMenu( slug ) {
 			const navigationMenus = getEntityRecords(
 				...navigationMenuMultipleArgs
 			);
+
+			let navigationMenu = null;
+
+			if ( slug ) {
+				navigationMenu = getEditedEntityRecord(
+					...navigationMenuSingleArgs
+				);
+				if (
+					! navigationMenu?.id &&
+					! created /* && hasResolvedNavigationMenu */
+				) {
+					setCreated( true );
+					const record = {
+						slug: slug,
+						name: slug,
+						post_name: slug,
+					};
+					dispatch( coreStore )
+						.saveEntityRecord( 'postType', 'wp_navigation', record )
+					dispatch( coreStore )
+						.receiveEntityRecords( 'postType', 'wp_navigation', [
+							{ ...record, id: slug },
+						] )
+					navigationMenu = getEditedEntityRecord(
+						...navigationMenuSingleArgs
+					);
+				}
+			}
 
 			const canSwitchNavigationMenu = slug
 				? navigationMenus?.length > 1
@@ -77,6 +86,6 @@ export default function useNavigationMenu( slug ) {
 				navigationMenus,
 			};
 		},
-		[ slug ]
+		[ slug, created ]
 	);
 }
