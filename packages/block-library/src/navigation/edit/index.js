@@ -109,9 +109,12 @@ function Navigation( {
 	} = attributes;
 
 	const navigationMenuId = attributes.navigationMenuId;
-	const setNavigationMenuId = useCallback( ( postId ) => {
-		setAttributes( { navigationMenuId: postId } );
-	}, [] );
+	const setNavigationMenuId = useCallback(
+		( postId ) => {
+			setAttributes( { navigationMenuId: postId } );
+		},
+		[]
+	);
 
 	const [ hasAlreadyRendered, RecursionProvider ] = useNoRecursiveRenders(
 		`navigationMenu/${ navigationMenuId }`
@@ -141,10 +144,13 @@ function Navigation( {
 		setHasSavedUnsavedInnerBlocks,
 	] = useState( false );
 
+<<<<<<< HEAD
 	const isWithinUnassignedArea = ! navigationMenuId;
 
+=======
+>>>>>>> 16fa16cd5b (Remove remnants of nav area)
 	const [ isPlaceholderShown, setIsPlaceholderShown ] = useState(
-		! hasExistingNavItems || isWithinUnassignedArea
+		! hasExistingNavItems
 	);
 
 	const [ isResponsiveMenuOpen, setResponsiveMenuVisibility ] = useState(
@@ -268,7 +274,7 @@ function Navigation( {
 	// Consider this 'unsaved'. Offer an uncontrolled version of inner blocks,
 	// that automatically saves the menu.
 	const hasUnsavedBlocks =
-		hasExistingNavItems && ! isEntityAvailable && ! isWithinUnassignedArea;
+		hasExistingNavItems && ! isEntityAvailable;
 	if ( hasUnsavedBlocks ) {
 		return (
 			<UnsavedInnerBlocks
