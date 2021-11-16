@@ -97,11 +97,10 @@ function gutenberg_display_experiment_section() {
  * @return array Filtered editor settings.
  */
 function gutenberg_experiments_editor_settings( $settings ) {
-	// The refactored gallery currently can't be run on sites with use_balanceTags option set.
-	// This bypass needs to remain in place until this is resolved and a patch released.
-	// https://core.trac.wordpress.org/ticket/54130.
+	// Currently the refactored Gallery blocks will only be enabled for new blocks.
+	// Existing Gallery blocks will be edited and viewed in the v1 format.
 	$experiments_settings = array(
-		'__unstableGalleryWithImageBlocks' => (int) get_option( 'use_balanceTags' ) !== 1,
+		'__unstableGalleryWithImageBlocks' => true,
 	);
 	return array_merge( $settings, $experiments_settings );
 }
