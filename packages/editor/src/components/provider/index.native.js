@@ -64,7 +64,7 @@ import { EditorHelpTopics } from '@wordpress/editor';
 import EditorProvider from './index.js';
 
 class NativeEditorProvider extends Component {
-	constructor() {
+	constructor( props ) {
 		super( ...arguments );
 
 		// Keep a local reference to `post` to detect changes
@@ -75,6 +75,10 @@ class NativeEditorProvider extends Component {
 			this.post.type,
 			this.post
 		);
+
+		// need to set this globally to avoid race with deprecations
+		window.wp.galleryBlockV2Enabled = props.galleryWithImageBlocks;
+
 		this.getEditorSettings = memize(
 			( settings, capabilities ) => ( {
 				...settings,
@@ -97,9 +101,11 @@ class NativeEditorProvider extends Component {
 			galleryWithImageBlocks,
 		} = this.props;
 
+		// TODO: remove this as unnecessary since we are setting in constructor?
+		window.wp.galleryBlockV2Enabled = galleryWithImageBlocks;
+
 		updateSettings( {
 			...capabilities,
-			...{ __unstableGalleryWithImageBlocks: galleryWithImageBlocks },
 			...this.getThemeColors( this.props ),
 			locale,
 		} );
@@ -150,13 +156,8 @@ class NativeEditorProvider extends Component {
 
 		this.subscriptionParentUpdateEditorSettings = subscribeUpdateEditorSettings(
 			( editorSettings ) => {
-				updateSettings( {
-					...{
-						__unstableGalleryWithImageBlocks:
-							editorSettings.galleryWithImageBlocks,
-					},
-					...this.getThemeColors( editorSettings ),
-				} );
+				window.wp.galleryBlockV2Enabled = galleryWithImageBlocks;
+				updateSettings( { ...this.getThemeColors( editorSettings ) } );
 			}
 		);
 

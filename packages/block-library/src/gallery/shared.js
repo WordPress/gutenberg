@@ -3,13 +3,6 @@
  */
 import { get, pick } from 'lodash';
 
-/**
- * WordPress dependencies
- */
-import { Platform } from '@wordpress/element';
-import { select } from '@wordpress/data';
-import { store as blockEditorStore } from '@wordpress/block-editor';
-
 export function defaultColumnsNumber( imageCount ) {
 	return imageCount ? Math.min( 3, imageCount ) : 3;
 }
@@ -34,11 +27,5 @@ export function isGalleryV2Enabled() {
 		return true;
 	}
 
-	if ( Platform.isWeb && window.wp.galleryBlockV2Enabled ) {
-		return true;
-	}
-
-	const settings = select( blockEditorStore ).getSettings();
-
-	return !! settings.__unstableGalleryWithImageBlocks;
+	return window.wp.galleryBlockV2Enabled;
 }
