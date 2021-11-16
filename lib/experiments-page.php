@@ -98,7 +98,7 @@ function gutenberg_display_experiment_section() {
  */
 function gutenberg_experiments_editor_settings( $settings ) {
 	// The refactored gallery is disabled by default on WordPress 5.9.
-	// To run the refactored Gallery with nested Image blocks install the 
+	// To run the refactored Gallery with nested Image blocks install the
 	// Gutenberg plugin >= 11.9.
 	$experiments_settings = array(
 		'__unstableGalleryWithImageBlocks' => false,
