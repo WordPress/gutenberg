@@ -12,7 +12,9 @@ import {
 	useRef,
 	useCallback,
 	Platform,
+	useContext,
 } from '@wordpress/element';
+import { Disabled } from '@wordpress/components';
 import {
 	InspectorControls,
 	BlockControls,
@@ -51,6 +53,7 @@ import NavigationMenuNameControl from './navigation-menu-name-control';
 import NavigationMenuPublishButton from './navigation-menu-publish-button';
 import UnsavedInnerBlocks from './unsaved-inner-blocks';
 import NavigationMenuDeleteControl from './navigation-menu-delete-control';
+import useTemplatePartArea from '../use-template-part-area';
 
 function getComputedStyle( node ) {
 	return node.ownerDocument.defaultView.getComputedStyle( node );
@@ -268,13 +271,27 @@ function Navigation( {
 		setIsPlaceholderShown( ! isEntityAvailable );
 	}, [ isEntityAvailable ] );
 
+	// Because we can't conditionally call hooks, pass an undefined client id
+	// arg to bypass the expensive `useTemplateArea` code. The hook will return
+	// early.
+	const isDisabled = useContext( Disabled.Context );
+	const area = useTemplatePartArea( isDisabled ? undefined : clientId );
+	const oldSlug = attributes.menuSlug;
+	useEffect( () => {
+		if ( ! oldSlug ) {
+			const newSlug = area?.area
+				? `${ area.area }-menu`
+				: `generic-one-off-menu`;
+			setAttributes( { menuSlug: newSlug } );
+		}
+	}, [ oldSlug, area?.area ] );
+
 	// If the block has inner blocks, but no menu id, this was an older
 	// navigation block added before the block used a wp_navigation entity.
 	// Either this block was saved in the content or inserted by a pattern.
 	// Consider this 'unsaved'. Offer an uncontrolled version of inner blocks,
 	// that automatically saves the menu.
-	const hasUnsavedBlocks =
-		hasExistingNavItems && ! isEntityAvailable;
+	const hasUnsavedBlocks = hasExistingNavItems && ! isEntityAvailable;
 	if ( hasUnsavedBlocks ) {
 		return (
 			<UnsavedInnerBlocks

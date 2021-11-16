@@ -9,7 +9,10 @@
 	"textdomain": "default",
 	"attributes": {
 		"navigationMenuId": {
-			"type": "number"
+		  "type": "number"
+		},
+		"menuSlug": {
+		  "type": "string"
 		},
 		"textColor": {
 			"type": "string"
