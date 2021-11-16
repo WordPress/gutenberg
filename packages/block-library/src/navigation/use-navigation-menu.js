@@ -5,9 +5,10 @@ import {
 	store as coreDataStore,
 	store as coreStore,
 } from '@wordpress/core-data';
-import { select, useSelect } from '@wordpress/data';
+import { useSelect, useDispatch } from '@wordpress/data';
 
 export default function useNavigationMenu( slug ) {
+	const dispatch = useDispatch();
 	return useSelect(
 		( select ) => {
 			const {
@@ -21,9 +22,6 @@ export default function useNavigationMenu( slug ) {
 				'wp_navigation',
 				slug,
 			];
-			const navigationMenu = slug
-				? getEditedEntityRecord( ...navigationMenuSingleArgs )
-				: null;
 
 			const hasResolvedNavigationMenu = slug
 				? hasFinishedResolution(
@@ -31,6 +29,27 @@ export default function useNavigationMenu( slug ) {
 						navigationMenuSingleArgs
 				  )
 				: false;
+
+			let navigationMenu = null;
+
+			if ( slug ) {
+				navigationMenu = getEditedEntityRecord( ...navigationMenuSingleArgs );
+				if ( ! navigationMenu?.id /* && hasResolvedNavigationMenu */ ) {
+					// This could be a mock resolver or transform into a new way of creating entities in Gutenberg
+					dispatch(coreStore).receiveEntityRecords(
+						'postType',
+						'wp_navigation',
+						[{
+							id: slug,
+							slug: slug,
+							name: slug,
+							blocks: [],
+							content: ""
+						}]
+					);
+					navigationMenu = getEditedEntityRecord( ...navigationMenuSingleArgs );
+				}
+			}
 
 			const navigationMenuMultipleArgs = [
 				'postType',

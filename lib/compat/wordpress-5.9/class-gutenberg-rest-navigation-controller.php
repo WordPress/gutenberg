@@ -121,23 +121,6 @@ class Gutenberg_REST_Navigation_Controller extends WP_REST_Posts_Controller {
 		return $data;
 	}
 
-	private function prepare_request( $request ) {
-		return $request;
-		$slug = $request['id'];
-		$wp_query_args        = array(
-			'post_name__in'  => array( $slug ),
-			'post_type'      => 'wp_navigation',
-			'post_status'    => array( 'auto-draft', 'draft', 'publish', 'trash' ),
-			'posts_per_page' => 1,
-			'no_found_rows'  => true,
-		);
-		$template_query       = new WP_Query( $wp_query_args );
-		$post_id = $template_query->posts[0]->ID;
-
-		$request['slug'] = $request['id'];
-		$request['name'] = $request['id'];
-		$request['id'] = $post_id;
-	}
 	protected function prepare_item_for_database( $request ) {
 		$changes = parent::prepare_item_for_database( $request );
 		$changes->post_name = $request['slug'];

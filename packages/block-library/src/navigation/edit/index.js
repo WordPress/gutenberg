@@ -13,7 +13,8 @@ import {
 	useCallback,
 	Platform,
 	useContext,
-} from '@wordpress/element';
+} from '@wordpress/element'
+import { v4 as uuid } from 'uuid';
 import { Disabled } from '@wordpress/components';
 import {
 	InspectorControls,
@@ -268,7 +269,7 @@ function Navigation( {
 		if ( ! oldSlug ) {
 			const newSlug = area?.area
 				? `${ area.area }//menu`
-				: `generic-one-off//menu`;
+				: `${ uuid() }//menu`;
 			setAttributes( { menuSlug: newSlug } );
 		}
 	}, [ oldSlug, area?.area ] );
