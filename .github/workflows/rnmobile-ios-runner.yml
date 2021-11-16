@@ -67,8 +67,11 @@ jobs:
             - name: TEST - Print simulators list
               run: xcrun simctl list --json
 
-            - name: TEST - Force opening Simulator app
+            - name: TEST - Force booting Simulator app
               run: xcrun simctl boot "${{ matrix.device }}"
+
+            - name: TEST - Bring Simulator to the foreground
+              run: open -Fn /Applications/Xcode_${{ matrix.xcode }}.app/Contents/Developer/Applications/Simulator.app
 
             - name: Run iOS Device Tests
               run: TEST_RN_PLATFORM=ios npm run native device-tests:local  ${{ matrix.native-test-name }}
