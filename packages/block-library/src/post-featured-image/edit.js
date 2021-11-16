@@ -7,18 +7,20 @@ import {
 	Icon,
 	ToggleControl,
 	PanelBody,
+	Placeholder,
 	withNotices,
+	Button,
 } from '@wordpress/components';
 import {
 	InspectorControls,
 	BlockControls,
 	MediaPlaceholder,
 	MediaReplaceFlow,
-	BlockIcon,
 	useBlockProps,
 } from '@wordpress/block-editor';
 import { __, sprintf } from '@wordpress/i18n';
-import { postFeaturedImage } from '@wordpress/icons';
+import { postFeaturedImage, upload } from '@wordpress/icons';
+import { SVG, Path } from '@wordpress/primitives';
 
 /**
  * Internal dependencies
@@ -48,42 +50,79 @@ function PostFeaturedImageDisplay( {
 		'featured_media',
 		postId
 	);
+
 	const media = useSelect(
 		( select ) =>
 			featuredImage &&
 			select( coreStore ).getMedia( featuredImage, { context: 'view' } ),
 		[ featuredImage ]
 	);
+
 	const blockProps = useBlockProps( {
 		style: { width },
 	} );
+
+	const placeholder = ( content ) => {
+		return (
+			<Placeholder className="block-editor-media-placeholder">
+				{
+					<SVG
+						className="components-placeholder__illustration"
+						fill="none"
+						xmlns="http://www.w3.org/2000/svg"
+						viewBox="0 0 60 60"
+					>
+						<Path
+							vectorEffect="non-scaling-stroke"
+							d="m61 32.622-13.555-9.137-15.888 9.859a5 5 0 0 1-5.386-.073l-9.095-5.989L1 37.5"
+						/>
+					</SVG>
+				}
+				{ content }
+			</Placeholder>
+		);
+	};
+
 	const onSelectImage = ( value ) => {
 		if ( value?.id ) {
 			setFeaturedImage( value.id );
 		}
 	};
+
 	function onUploadError( message ) {
 		noticeOperations.removeAllNotices();
 		noticeOperations.createErrorNotice( message );
 	}
+
 	let image;
 	if ( ! featuredImage && isDescendentOfQueryLoop ) {
 		return <div { ...blockProps }>{ placeholderChip }</div>;
 	}
+
+	const label = __( 'Add a featured image' );
+
 	if ( ! featuredImage ) {
 		image = (
 			<MediaPlaceholder
-				icon={ <BlockIcon icon={ postFeaturedImage } /> }
 				onSelect={ onSelectImage }
-				notices={ noticeUI }
-				onError={ onUploadError }
 				accept="image/*"
 				allowedTypes={ ALLOWED_MEDIA_TYPES }
-				labels={ {
-					title: __( 'Featured image' ),
-					instructions: __(
-						'Upload a media file or pick one from your media library.'
-					),
+				onError={ onUploadError }
+				placeholder={ placeholder }
+				notices={ noticeUI }
+				mediaLibraryButton={ ( { open } ) => {
+					return (
+						<Button
+							icon={ upload }
+							variant="primary"
+							label={ label }
+							showTooltip
+							tooltipPosition="top center"
+							onClick={ () => {
+								open();
+							} }
+						/>
+					);
 				} }
 			/>
 		);
