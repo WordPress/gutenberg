@@ -86,13 +86,14 @@ function LinkSettings( {
 	urlValue,
 	// Attributes properties
 	url,
-	label,
+	label = '',
 	linkTarget,
-	rel,
+	rel = '',
 } ) {
 	const [ urlInputValue, setUrlInputValue ] = useState( '' );
 	const [ labelInputValue, setLabelInputValue ] = useState( '' );
 	const [ linkRelInputValue, setLinkRelInputValue ] = useState( '' );
+	const onCloseSettingsSheetConsumed = useRef( false );
 	const prevEditorSidebarOpenedRef = useRef();
 
 	const { onHandleClosingBottomSheet } = useContext( BottomSheetContext );
@@ -123,6 +124,10 @@ function LinkSettings( {
 
 	useEffect( () => {
 		const isSettingSheetOpen = isVisible || editorSidebarOpened;
+		if ( isSettingSheetOpen ) {
+			onCloseSettingsSheetConsumed.current = false;
+		}
+
 		if ( options.url.autoFill && isSettingSheetOpen && ! url ) {
 			getURLFromClipboard();
 		}
@@ -174,6 +179,12 @@ function LinkSettings( {
 	}, [ urlInputValue, labelInputValue, linkRelInputValue, setAttributes ] );
 
 	const onCloseSettingsSheet = useCallback( () => {
+		if ( onCloseSettingsSheetConsumed.current ) {
+			return;
+		}
+
+		onCloseSettingsSheetConsumed.current = true;
+
 		onSetAttributes();
 
 		if ( onClose ) {
@@ -226,6 +237,7 @@ function LinkSettings( {
 						<BottomSheet.LinkCell
 							showIcon={ showIcon }
 							value={ url }
+							valueMask={ options.url.valueMask }
 							onPress={ onLinkCellPressed }
 						/>
 					) : (

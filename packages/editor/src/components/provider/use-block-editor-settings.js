@@ -94,8 +94,6 @@ function useBlockEditorSettings( settings, hasTemplate ) {
 				'__experimentalBlockPatternCategories',
 				'__experimentalBlockPatterns',
 				'__experimentalFeatures',
-				'__experimentalGlobalStylesBaseStyles',
-				'__experimentalGlobalStylesUserEntityId',
 				'__experimentalPreferredStyleVariations',
 				'__experimentalSetIsInserterOpened',
 				'__unstableGalleryWithImageBlocks',

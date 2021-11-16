@@ -514,6 +514,7 @@ function ButtonEdit( props ) {
 					onReplace={ onReplace }
 					onRemove={ onRemove }
 					onMerge={ mergeBlocks }
+					fontSize={ style?.fontSize }
 				/>
 			</ColorBackground>
 

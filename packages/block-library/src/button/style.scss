@@ -34,7 +34,7 @@ $blocks-block__margin: 0.5em;
 	}
 }
 
-// Increased specificity needed to override margins
+// Increased specificity needed to override margins.
 .wp-block-buttons > .wp-block-button {
 	&.has-custom-width {
 		max-width: none;
@@ -50,58 +50,35 @@ $blocks-block__margin: 0.5em;
 	}
 
 	&.wp-block-button__width-25 {
-		width: calc(25% - #{ $blocks-block__margin });
+		width: calc(25% - (var(--wp--style--block-gap, #{$blocks-block__margin}) * 0.75));
 	}
 
 	&.wp-block-button__width-50 {
-		width: calc(50% - #{ $blocks-block__margin });
+		width: calc(50% - (var(--wp--style--block-gap, #{$blocks-block__margin}) * 0.5));
 	}
 
 	&.wp-block-button__width-75 {
-		width: calc(75% - #{ $blocks-block__margin });
+		width: calc(75% - (var(--wp--style--block-gap, #{$blocks-block__margin}) * 0.25));
 	}
 
 	&.wp-block-button__width-100 {
-		width: calc(100% - #{ $blocks-block__margin });
-
-		&:only-child {
-			margin-right: 0;
-			width: 100%;
-		}
+		width: 100%;
+		flex-basis: 100%;
 	}
 }
 
-// If the browser supports column-gap, use that instead of the margins above.
-@supports ( column-gap: #{ $blocks-block__margin } ) {
-	.wp-block-buttons {
+// For vertical buttons, gap is not factored into width calculations.
+.wp-block-buttons.is-vertical > .wp-block-button {
+	&.wp-block-button__width-25 {
+		width: 25%;
+	}
 
-		> .wp-block-button,
-		&.is-content-justification-right > .wp-block-button, {
-			// Added (duplicate) specificity needed to override the default button margin.
-			&.wp-block-button {
-				margin-right: 0;
-				margin-left: 0;
-			}
-		}
+	&.wp-block-button__width-50 {
+		width: 50%;
+	}
 
-		> .wp-block-button {
-			&.wp-block-button__width-25 {
-				width: calc(25% - #{ $blocks-block__margin * 0.75 });
-			}
-
-			&.wp-block-button__width-50 {
-				width: calc(50% - #{ $blocks-block__margin * 0.5 });
-			}
-
-			&.wp-block-button__width-75 {
-				width: calc(75% - #{ $blocks-block__margin * 0.25 });
-			}
-
-			&.wp-block-button__width-100 {
-				width: auto;
-				flex-basis: 100%;
-			}
-		}
+	&.wp-block-button__width-75 {
+		width: 75%;
 	}
 }
 
@@ -118,8 +95,8 @@ $blocks-block__margin: 0.5em;
 	border-radius: 0 !important;
 }
 
-.is-style-outline > .wp-block-button__link,
-.wp-block-button__link.is-style-outline {
+.is-style-outline > :where(.wp-block-button__link),
+:where(.wp-block-button__link).is-style-outline {
 	border: 2px solid currentColor;
 	padding: 0.667em 1.333em;
 }

@@ -14,7 +14,13 @@ import { wordpress } from '@wordpress/icons';
  */
 import Icon from '../';
 
-export default { title: 'Components/Icon', component: Icon };
+export default {
+	title: 'Components/Icon',
+	component: Icon,
+	parameters: {
+		knobs: { disabled: false },
+	},
+};
 
 const IconSizeLabel = ( { size } ) => (
 	<div style={ { fontSize: 12 } }>{ size }px</div>

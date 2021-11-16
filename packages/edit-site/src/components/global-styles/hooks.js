@@ -1,14 +1,13 @@
 /**
  * External dependencies
  */
-import { get, cloneDeep, set, isEqual, has, mergeWith } from 'lodash';
+import { get, cloneDeep, set, isEqual, has } from 'lodash';
 
 /**
  * WordPress dependencies
  */
-import { useMemo, useCallback } from '@wordpress/element';
-import { useSelect, useDispatch } from '@wordpress/data';
-import { store as coreStore } from '@wordpress/core-data';
+import { __ } from '@wordpress/i18n';
+import { useContext, useCallback, useMemo } from '@wordpress/element';
 import {
 	getBlockType,
 	__EXPERIMENTAL_PATHS_WITH_MERGE as PATHS_WITH_MERGE,
@@ -18,157 +17,29 @@ import {
 /**
  * Internal dependencies
  */
-import { store as editSiteStore } from '../../store';
-import {
-	PRESET_METADATA,
-	getValueFromVariable,
-	getPresetVariableFromValue,
-} from './utils';
+import { getValueFromVariable, getPresetVariableFromValue } from './utils';
+import { GlobalStylesContext } from './context';
 
 const EMPTY_CONFIG = { isGlobalStylesUserThemeJSON: true, version: 1 };
 
-function mergeTreesCustomizer( objValue, srcValue ) {
-	// We only pass as arrays the presets,
-	// in which case we want the new array of values
-	// to override the old array (no merging).
-	if ( Array.isArray( srcValue ) ) {
-		return srcValue;
-	}
-}
-
-function mergeBaseAndUserConfigs( base, user ) {
-	return mergeWith( {}, base, user, mergeTreesCustomizer );
-}
-
-function addUserOriginToSettings( settingsToAdd ) {
-	const newSettings = cloneDeep( settingsToAdd );
-	PRESET_METADATA.forEach( ( { path } ) => {
-		const presetData = get( newSettings, path );
-		if ( presetData ) {
-			set( newSettings, path, {
-				user: presetData,
-			} );
-		}
-	} );
-	return newSettings;
-}
-
-function removeUserOriginFromSettings( settingsToRemove ) {
-	const newSettings = cloneDeep( settingsToRemove );
-	PRESET_METADATA.forEach( ( { path } ) => {
-		const presetData = get( newSettings, path );
-		if ( presetData ) {
-			set( newSettings, path, ( presetData ?? {} ).user );
-		}
-	} );
-	return newSettings;
-}
-
-function useGlobalStylesUserConfig() {
-	const { globalStylesId, content } = useSelect( ( select ) => {
-		const _globalStylesId = select( editSiteStore ).getSettings()
-			.__experimentalGlobalStylesUserEntityId;
-		return {
-			globalStylesId: _globalStylesId,
-			content: select( coreStore ).getEditedEntityRecord(
-				'postType',
-				'wp_global_styles',
-				_globalStylesId
-			)?.content,
-		};
-	}, [] );
-	const { getEditedEntityRecord } = useSelect( coreStore );
-	const { editEntityRecord } = useDispatch( coreStore );
-
-	const parseContent = ( contentToParse ) => {
-		let parsedConfig;
-		try {
-			parsedConfig = contentToParse ? JSON.parse( contentToParse ) : {};
-			// It is very important to verify if the flag isGlobalStylesUserThemeJSON is true.
-			// If it is not true the content was not escaped and is not safe.
-			if ( ! parsedConfig.isGlobalStylesUserThemeJSON ) {
-				parsedConfig = {};
-			} else {
-				parsedConfig = {
-					...parsedConfig,
-					settings: addUserOriginToSettings( parsedConfig.settings ),
-				};
-			}
-		} catch ( e ) {
-			/* eslint-disable no-console */
-			console.error( 'Global Styles User data is not valid' );
-			console.error( e );
-			/* eslint-enable no-console */
-			parsedConfig = {};
-		}
-
-		return parsedConfig;
-	};
-
-	const config = useMemo( () => {
-		return parseContent( content );
-	}, [ content ] );
-
-	const setConfig = useCallback(
-		( callback ) => {
-			const currentConfig = parseContent(
-				getEditedEntityRecord(
-					'postType',
-					'wp_global_styles',
-					globalStylesId
-				)?.content
-			);
-			const updatedConfig = callback( currentConfig );
-			editEntityRecord( 'postType', 'wp_global_styles', globalStylesId, {
-				content: JSON.stringify( {
-					...updatedConfig,
-					settings: removeUserOriginFromSettings(
-						updatedConfig.settings
-					),
-				} ),
-			} );
-		},
-		[ globalStylesId ]
-	);
-
-	return [ config, setConfig ];
-}
-
-function useGlobalStylesBaseConfig() {
-	const baseConfig = useSelect( ( select ) => {
-		return select( editSiteStore ).getSettings()
-			.__experimentalGlobalStylesBaseStyles;
-	}, [] );
-
-	return baseConfig;
-}
-
-export function useGlobalStylesConfig() {
-	const [ userConfig, setUserConfig ] = useGlobalStylesUserConfig();
-	const baseConfig = useGlobalStylesBaseConfig();
-	const mergedConfig = useMemo( () => {
-		return mergeBaseAndUserConfigs( baseConfig, userConfig );
-	}, [ userConfig, baseConfig ] );
-
-	return [ baseConfig, userConfig, mergedConfig, setUserConfig ];
-}
-
 export const useGlobalStylesReset = () => {
-	const [ config, setConfig ] = useGlobalStylesUserConfig();
+	const { user: config, setUserConfig } = useContext( GlobalStylesContext );
 	const canReset = !! config && ! isEqual( config, EMPTY_CONFIG );
 	return [
 		canReset,
-		useCallback( () => setConfig( () => EMPTY_CONFIG ), [ setConfig ] ),
+		useCallback( () => setUserConfig( () => EMPTY_CONFIG ), [
+			setUserConfig,
+		] ),
 	];
 };
 
 export function useSetting( path, blockName, source = 'all' ) {
-	const [
-		baseConfig,
-		userConfig,
-		mergedConfig,
+	const {
+		merged: mergedConfig,
+		base: baseConfig,
+		user: userConfig,
 		setUserConfig,
-	] = useGlobalStylesConfig();
+	} = useContext( GlobalStylesContext );
 
 	const fullPath = ! blockName
 		? `settings.${ path }`
@@ -225,12 +96,12 @@ export function useSetting( path, blockName, source = 'all' ) {
 }
 
 export function useStyle( path, blockName, source = 'all' ) {
-	const [
-		baseConfig,
-		userConfig,
-		mergedConfig,
+	const {
+		merged: mergedConfig,
+		base: baseConfig,
+		user: userConfig,
 		setUserConfig,
-	] = useGlobalStylesConfig();
+	} = useContext( GlobalStylesContext );
 	const finalPath = ! blockName
 		? `styles.${ path }`
 		: `styles.blocks.${ blockName }.${ path }`;
@@ -344,4 +215,60 @@ export function getSupportedGlobalStylesPanels( name ) {
 	} );
 
 	return supportKeys;
+}
+
+export function useColorsPerOrigin( name ) {
+	const [ userColors ] = useSetting( 'color.palette.user', name );
+	const [ themeColors ] = useSetting( 'color.palette.theme', name );
+	const [ coreColors ] = useSetting( 'color.palette.core', name );
+	return useMemo( () => {
+		const result = [];
+		if ( coreColors && coreColors.length ) {
+			result.push( {
+				name: __( 'Core' ),
+				colors: coreColors,
+			} );
+		}
+		if ( themeColors && themeColors.length ) {
+			result.push( {
+				name: __( 'Theme' ),
+				colors: themeColors,
+			} );
+		}
+		if ( userColors && userColors.length ) {
+			result.push( {
+				name: __( 'User' ),
+				colors: userColors,
+			} );
+		}
+		return result;
+	}, [ userColors, themeColors, coreColors ] );
+}
+
+export function useGradientsPerOrigin( name ) {
+	const [ userGradients ] = useSetting( 'color.gradients.user', name );
+	const [ themeGradients ] = useSetting( 'color.gradients.theme', name );
+	const [ coreGradients ] = useSetting( 'color.gradients.core', name );
+	return useMemo( () => {
+		const result = [];
+		if ( coreGradients && coreGradients.length ) {
+			result.push( {
+				name: __( 'Core' ),
+				gradients: coreGradients,
+			} );
+		}
+		if ( themeGradients && themeGradients.length ) {
+			result.push( {
+				name: __( 'Theme' ),
+				gradients: themeGradients,
+			} );
+		}
+		if ( userGradients && userGradients.length ) {
+			result.push( {
+				name: __( 'User' ),
+				gradients: userGradients,
+			} );
+		}
+		return result;
+	}, [ userGradients, themeGradients, coreGradients ] );
 }

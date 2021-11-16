@@ -2,15 +2,15 @@
  * External dependencies
  */
 // eslint-disable-next-line no-restricted-imports
-import type { Ref } from 'react';
-import type { ColorFormats } from 'tinycolor2';
+import { Ref, useCallback } from 'react';
+import { colord, extend, Colord } from 'colord';
+import namesPlugin from 'colord/plugins/names';
 
 /**
  * WordPress dependencies
  */
-import { useState } from '@wordpress/element';
+import { useState, useMemo } from '@wordpress/element';
 import { settings } from '@wordpress/icons';
-import { useDebounce } from '@wordpress/compose';
 import { __ } from '@wordpress/i18n';
 
 /**
@@ -32,15 +32,16 @@ import {
 import { ColorDisplay } from './color-display';
 import { ColorInput } from './color-input';
 import { Picker } from './picker';
-import { useControlledValue } from '../utils/hooks';
 
 import type { ColorType } from './types';
 
+extend( [ namesPlugin ] );
+
 export interface ColorPickerProps {
 	enableAlpha?: boolean;
-	color?: ColorFormats.HSL | ColorFormats.HSLA;
-	onChange?: ( color: ColorFormats.HSL | ColorFormats.HSLA ) => void;
-	defaultValue?: ColorFormats.HSL | ColorFormats.HSLA;
+	color?: string;
+	onChange?: ( color: string ) => void;
+	defaultValue?: string;
 	copyFormat?: ColorType;
 }
 
@@ -50,42 +51,30 @@ const options = [
 	{ label: 'Hex', value: 'hex' as const },
 ];
 
-const getSafeColor = (
-	color: ColorFormats.HSL | ColorFormats.HSLA | undefined
-): ColorFormats.HSLA => {
-	return color ? { a: 1, ...color } : { h: 0, s: 0, l: 100, a: 1 };
-};
-
 const ColorPicker = (
 	props: WordPressComponentProps< ColorPickerProps, 'div', false >,
 	forwardedRef: Ref< any >
 ) => {
 	const {
 		enableAlpha = false,
-		color: colorProp,
+		color,
 		onChange,
-		defaultValue,
+		defaultValue = '#fff',
 		copyFormat,
 		...divProps
 	} = useContextSystem( props, 'ColorPicker' );
 
-	const [ color, setColor ] = useControlledValue( {
-		onChange,
-		value: colorProp,
-		defaultValue,
-	} );
-
-	// Debounce to prevent rapid changes from conflicting with one another.
-	const debouncedSetColor = useDebounce( setColor );
-
-	const handleChange = (
-		nextValue: ColorFormats.HSLA | ColorFormats.HSL
-	) => {
-		debouncedSetColor( nextValue );
-	};
-
 	// Use a safe default value for the color and remove the possibility of `undefined`.
-	const safeColor = getSafeColor( color );
+	const safeColordColor = useMemo( () => {
+		return color ? colord( color ) : colord( defaultValue );
+	}, [ color, defaultValue ] );
+
+	const handleChange = useCallback(
+		( nextValue: Colord ) => {
+			onChange( nextValue.toHex() );
+		},
+		[ onChange ]
+	);
 
 	const [ showInputs, setShowInputs ] = useState< boolean >( false );
 	const [ colorType, setColorType ] = useState< ColorType >(
@@ -96,7 +85,7 @@ const ColorPicker = (
 		<ColorfulWrapper ref={ forwardedRef } { ...divProps }>
 			<Picker
 				onChange={ handleChange }
-				color={ safeColor }
+				color={ safeColordColor }
 				enableAlpha={ enableAlpha }
 			/>
 			<AuxiliaryColorArtefactWrapper>
@@ -113,7 +102,7 @@ const ColorPicker = (
 						/>
 					) : (
 						<ColorDisplay
-							color={ safeColor }
+							color={ safeColordColor }
 							colorType={ copyFormat || colorType }
 							enableAlpha={ enableAlpha }
 						/>
@@ -134,7 +123,7 @@ const ColorPicker = (
 				{ showInputs && (
 					<ColorInput
 						colorType={ colorType }
-						color={ safeColor }
+						color={ safeColordColor }
 						onChange={ handleChange }
 						enableAlpha={ enableAlpha }
 					/>

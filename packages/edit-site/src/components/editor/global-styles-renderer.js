@@ -14,7 +14,7 @@ import { store as editSiteStore } from '../../store';
  */
 import { useGlobalStylesOutput } from '../global-styles/use-global-styles-output';
 
-export function useGlobalStylesRenderer() {
+function useGlobalStylesRenderer() {
 	const [ styles, settings ] = useGlobalStylesOutput();
 	const { getSettings } = useSelect( editSiteStore );
 	const { updateSettings } = useDispatch( editSiteStore );
@@ -34,4 +34,10 @@ export function useGlobalStylesRenderer() {
 			__experimentalFeatures: settings,
 		} );
 	}, [ styles, settings ] );
+}
+
+export function GlobalStylesRenderer() {
+	useGlobalStylesRenderer();
+
+	return null;
 }

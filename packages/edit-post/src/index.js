@@ -1,6 +1,7 @@
 /**
  * WordPress dependencies
  */
+import { store as blocksStore } from '@wordpress/blocks';
 import {
 	registerCoreBlocks,
 	__experimentalRegisterExperimentalCoreBlocks,
@@ -90,6 +91,7 @@ export function initializeEditor(
 	dispatch( interfaceStore ).setFeatureDefaults( 'core/edit-post', {
 		fixedToolbar: false,
 		welcomeGuide: true,
+		mobileGalleryWarning: true,
 		fullscreenMode: true,
 		showIconLabels: false,
 		themeStyles: true,
@@ -97,6 +99,7 @@ export function initializeEditor(
 		welcomeGuideTemplate: true,
 	} );
 
+	dispatch( blocksStore ).__experimentalReapplyBlockTypeFilters();
 	registerCoreBlocks();
 	if ( process.env.GUTENBERG_PHASE === 2 ) {
 		__experimentalRegisterExperimentalCoreBlocks( {

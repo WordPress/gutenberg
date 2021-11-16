@@ -161,45 +161,41 @@ export function createRegistry( storeConfigs = {}, parent = null ) {
 	/**
 	 * Registers a generic store.
 	 *
-	 * @param {string} key    Store registry key.
-	 * @param {Object} config Configuration (getSelectors, getActions, subscribe).
+	 * @param {string} name Store registry name.
+	 * @param {Object} store Store instance object (getSelectors, getActions, subscribe).
 	 */
-	function registerGenericStore( key, config ) {
-		if ( typeof config.getSelectors !== 'function' ) {
-			throw new TypeError( 'config.getSelectors must be a function' );
+	function registerGenericStore( name, store ) {
+		if ( typeof store.getSelectors !== 'function' ) {
+			throw new TypeError( 'store.getSelectors must be a function' );
 		}
-		if ( typeof config.getActions !== 'function' ) {
-			throw new TypeError( 'config.getActions must be a function' );
+		if ( typeof store.getActions !== 'function' ) {
+			throw new TypeError( 'store.getActions must be a function' );
 		}
-		if ( typeof config.subscribe !== 'function' ) {
-			throw new TypeError( 'config.subscribe must be a function' );
+		if ( typeof store.subscribe !== 'function' ) {
+			throw new TypeError( 'store.subscribe must be a function' );
 		}
-		// Thi emitter is used to keep track of active listeners when the registry
+		// The emitter is used to keep track of active listeners when the registry
 		// get paused, that way, when resumed we should be able to call all these
 		// pending listeners.
-		config.emitter = createEmitter();
-		const currentSubscribe = config.subscribe;
-		config.subscribe = ( listener ) => {
-			const unsubscribeFromStoreEmitter = config.emitter.subscribe(
-				listener
-			);
-			const unsubscribeFromRootStore = currentSubscribe( () => {
-				if ( config.emitter.isPaused ) {
-					config.emitter.emit();
+		store.emitter = createEmitter();
+		const currentSubscribe = store.subscribe;
+		store.subscribe = ( listener ) => {
+			const unsubscribeFromEmitter = store.emitter.subscribe( listener );
+			const unsubscribeFromStore = currentSubscribe( () => {
+				if ( store.emitter.isPaused ) {
+					store.emitter.emit();
 					return;
 				}
 				listener();
 			} );
 
 			return () => {
-				if ( unsubscribeFromRootStore ) {
-					unsubscribeFromRootStore();
-				}
-				unsubscribeFromStoreEmitter();
+				unsubscribeFromStore?.();
+				unsubscribeFromEmitter?.();
 			};
 		};
-		stores[ key ] = config;
-		config.subscribe( globalListener );
+		stores[ name ] = store;
+		store.subscribe( globalListener );
 	}
 
 	/**

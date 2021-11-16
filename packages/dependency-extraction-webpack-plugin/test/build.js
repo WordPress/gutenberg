@@ -75,7 +75,7 @@ describe.each( configFixtures )( 'Webpack `%s`', ( configCase ) => {
 				};
 
 				// Webpack stats external modules should match.
-				const externalModules = stats.compilation.modules
+				const externalModules = Array.from( stats.compilation.modules )
 					.filter( ( { externalType } ) => externalType )
 					.sort( compareByModuleIdentifier )
 					.map( ( module ) => ( {

@@ -59,7 +59,9 @@ export const PRESET_METADATA = [
 		path: [ 'typography', 'fontFamilies' ],
 		valueKey: 'fontFamily',
 		cssVarInfix: 'font-family',
-		classes: [],
+		classes: [
+			{ classSuffix: 'font-family', propertyName: 'font-family' },
+		],
 	},
 ];
 

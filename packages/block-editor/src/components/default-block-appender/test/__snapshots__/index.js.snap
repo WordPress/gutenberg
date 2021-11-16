@@ -7,7 +7,7 @@ exports[`DefaultBlockAppender should append a default block when input focused 1
 >
   <p
     aria-label="Add block"
-    className="wp-block block-editor-default-block-appender__content"
+    className="block-editor-default-block-appender__content"
     contentEditable={true}
     onFocus={
       [MockFunction] {
@@ -43,7 +43,7 @@ exports[`DefaultBlockAppender should match snapshot 1`] = `
 >
   <p
     aria-label="Add block"
-    className="wp-block block-editor-default-block-appender__content"
+    className="block-editor-default-block-appender__content"
     contentEditable={true}
     onFocus={[MockFunction]}
     role="button"
@@ -67,7 +67,7 @@ exports[`DefaultBlockAppender should optionally show without prompt 1`] = `
 >
   <p
     aria-label="Add block"
-    className="wp-block block-editor-default-block-appender__content"
+    className="block-editor-default-block-appender__content"
     contentEditable={true}
     onFocus={[MockFunction]}
     role="button"

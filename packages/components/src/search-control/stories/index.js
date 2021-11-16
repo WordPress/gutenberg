@@ -16,6 +16,9 @@ import SearchControl from '../';
 export default {
 	title: 'Components/SearchControl',
 	component: SearchControl,
+	parameters: {
+		knobs: { disabled: false },
+	},
 };
 
 export const _default = () => {

@@ -433,4 +433,9 @@ public class RNReactNativeGutenbergBridgeModule extends ReactContextBaseJavaModu
     public void requestGotoCustomerSupportOptions() {
         mGutenbergBridgeJS2Parent.requestGotoCustomerSupportOptions();
     }
+
+    @ReactMethod
+    public void sendEventToHost(final String eventName, final ReadableMap properties) {
+        mGutenbergBridgeJS2Parent.sendEventToHost(eventName, properties);
+    }
 }

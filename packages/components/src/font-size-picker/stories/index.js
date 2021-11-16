@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { number, object } from '@storybook/addon-knobs';
+import { number, object, boolean } from '@storybook/addon-knobs';
 
 /**
  * WordPress dependencies
@@ -16,10 +16,13 @@ import FontSizePicker from '../';
 export default {
 	title: 'Components/FontSizePicker',
 	component: FontSizePicker,
+	parameters: {
+		knobs: { disabled: false },
+	},
 };
 
-const FontSizePickerWithState = ( { ...props } ) => {
-	const [ fontSize, setFontSize ] = useState( 16 );
+const FontSizePickerWithState = ( { initialValue, ...props } ) => {
+	const [ fontSize, setFontSize ] = useState( initialValue || 16 );
 
 	return (
 		<FontSizePicker
@@ -102,5 +105,54 @@ export const withoutCustomSizes = () => {
 			fontSizes={ fontSizes }
 			disableCustomFontSizes
 		/>
+	);
+};
+
+export const differentControlBySize = () => {
+	const options = [
+		{
+			name: 'Tiny',
+			slug: 'tiny',
+			size: 8,
+		},
+		{
+			name: 'Small',
+			slug: 'small',
+			size: 12,
+		},
+		{
+			name: 'Normal',
+			slug: 'normal',
+			size: 16,
+		},
+		{
+			name: 'Big',
+			slug: 'big',
+			size: 26,
+		},
+		{
+			name: 'Bigger',
+			slug: 'bigger',
+			size: 30,
+		},
+		{
+			name: 'Huge',
+			slug: 'huge',
+			size: 36,
+		},
+	];
+	const optionsWithUnits = options.map( ( option ) => ( {
+		...option,
+		size: `${ option.size }px`,
+	} ) );
+	const showMoreFontSizes = boolean( 'Add more font sizes', false );
+	const addUnitsToSizes = boolean( 'Add units to font sizes', false );
+	const _options = addUnitsToSizes ? optionsWithUnits : options;
+	const fontSizes = _options.slice(
+		0,
+		showMoreFontSizes ? _options.length : 4
+	);
+	return (
+		<FontSizePickerWithState fontSizes={ fontSizes } initialValue={ 8 } />
 	);
 };

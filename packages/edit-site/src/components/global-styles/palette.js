@@ -19,8 +19,11 @@ import Subtitle from './subtitle';
 import NavigationButton from './navigation-button';
 import { useSetting } from './hooks';
 
+const EMPTY_COLORS = [];
+
 function Palette( { name } ) {
-	const [ colors ] = useSetting( 'color.palette', name );
+	const [ colorsSetting ] = useSetting( 'color.palette.user', name );
+	const colors = colorsSetting || EMPTY_COLORS;
 	const screenPath = ! name
 		? '/colors/palette'
 		: '/blocks/' + name + '/colors/palette';

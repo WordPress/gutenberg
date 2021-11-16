@@ -3,7 +3,7 @@
 exports[`Block Grouping Group creation creates a group from multiple blocks of different types via block transforms 1`] = `
 "<!-- wp:group -->
 <div class=\\"wp-block-group\\"><!-- wp:heading -->
-<h2>Group Heading</h2>
+<h2 id=\\"group-heading\\">Group Heading</h2>
 <!-- /wp:heading -->
 
 <!-- wp:image -->
@@ -51,7 +51,7 @@ exports[`Block Grouping Group creation creates a group from multiple blocks of t
 exports[`Block Grouping Group creation groups and ungroups multiple blocks of different types via options toolbar 1`] = `
 "<!-- wp:group -->
 <div class=\\"wp-block-group\\"><!-- wp:heading -->
-<h2>Group Heading</h2>
+<h2 id=\\"group-heading\\">Group Heading</h2>
 <!-- /wp:heading -->
 
 <!-- wp:image -->
@@ -66,7 +66,7 @@ exports[`Block Grouping Group creation groups and ungroups multiple blocks of di
 
 exports[`Block Grouping Group creation groups and ungroups multiple blocks of different types via options toolbar 2`] = `
 "<!-- wp:heading -->
-<h2>Group Heading</h2>
+<h2 id=\\"group-heading\\">Group Heading</h2>
 <!-- /wp:heading -->
 
 <!-- wp:image -->
@@ -81,7 +81,7 @@ exports[`Block Grouping Group creation groups and ungroups multiple blocks of di
 exports[`Block Grouping Preserving selected blocks attributes preserves width alignment settings of selected blocks 1`] = `
 "<!-- wp:group {\\"align\\":\\"full\\"} -->
 <div class=\\"wp-block-group alignfull\\"><!-- wp:heading -->
-<h2>Group Heading</h2>
+<h2 id=\\"group-heading\\">Group Heading</h2>
 <!-- /wp:heading -->
 
 <!-- wp:image {\\"align\\":\\"full\\"} -->

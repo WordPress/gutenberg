@@ -10,11 +10,33 @@ For each user feature we should also add a importance categorization label  to i
 -->
 
 ## Unreleased
+-   [*] [Embed block] Included Link in Block Settings [#36099]
+
+## 1.66.0
+-   [**] [Image block] Add ability to quickly link images to Media Files and Attachment Pages [#34846]
+-   [*] Fixed a race condition when autosaving content (Android) [#36072]
+
+## 1.65.1
+- [**] Fixed a crash that could occur when copying lists from Microsoft Word. [https://github.com/WordPress/gutenberg/pull/36019]
+
+## 1.65.0
+- [**] Search block - Text and background color support [#35511]
+- [*] [Embed Block] Fix loading glitch with resolver resolution approach [#35798]
+* [*] Fixed an issue where the Help screens may not respect an iOS device's notch. [#35570]
+- [**] Block inserter indicates newly available block types [#35201]
+- [*] Add support for the Mark HTML tag [#35956]
+
+## 1.64.1
+-   [**] Fix updating the block list after block removal [#35721]
+-   [**] Cover block: Change dimRatio to 50 if media added and dimRatio is set to 100 [#35792]
+
+## 1.64.0
 -   [*] [Embed block] Fix inline preview cut-off when editing URL [#35321]
 -   [**] [Embed block] Detect when an embeddable URL is pasted into an empty paragraph. [#35204]
 -   [*] [Unsupported Block Editor] Fix text selection bug for Android [#34668]
 -   [*] [Embed block] Fix URL not editable after dismissing the edit URL bottom sheet with empty value [#35460]
 -   [**] Pullquote block - Added support for text and background color customization [#34451]
+-   [**] Preformatted block - Added support for text and background color customization [#35314]
 
 ## 1.63.1
 -   [*] Fixed missing modal backdrop for Android help section [#35557]

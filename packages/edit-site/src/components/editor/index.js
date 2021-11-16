@@ -35,17 +35,17 @@ import Header from '../header';
 import { SidebarComplementaryAreaFills } from '../sidebar';
 import BlockEditor from '../block-editor';
 import KeyboardShortcuts from '../keyboard-shortcuts';
-import NavigationSidebar from '../navigation-sidebar';
 import URLQueryController from '../url-query-controller';
 import InserterSidebar from '../secondary-sidebar/inserter-sidebar';
 import ListViewSidebar from '../secondary-sidebar/list-view-sidebar';
 import ErrorBoundary from '../error-boundary';
+import WelcomeGuide from '../welcome-guide';
 import { store as editSiteStore } from '../../store';
-import { useGlobalStylesRenderer } from './global-styles-renderer';
+import { GlobalStylesRenderer } from './global-styles-renderer';
+import { GlobalStylesProvider } from '../global-styles/global-styles-provider';
 
 const interfaceLabels = {
 	secondarySidebar: __( 'Block Library' ),
-	drawer: __( 'Navigation Sidebar' ),
 };
 
 function Editor( { initialSettings, onError } ) {
@@ -102,6 +102,7 @@ function Editor( { initialSettings, onError } ) {
 	const { setPage, setIsInserterOpened, updateSettings } = useDispatch(
 		editSiteStore
 	);
+	const { enableComplementaryArea } = useDispatch( interfaceStore );
 	useEffect( () => {
 		updateSettings( initialSettings );
 	}, [] );
@@ -159,12 +160,24 @@ function Editor( { initialSettings, onError } ) {
 		}
 	}, [ isNavigationOpen ] );
 
-	useGlobalStylesRenderer();
+	useEffect(
+		function openGlobalStylesOnLoad() {
+			const searchParams = new URLSearchParams( window.location.search );
+			if ( searchParams.get( 'styles' ) === 'open' ) {
+				enableComplementaryArea(
+					'core/edit-site',
+					'edit-site/global-styles'
+				);
+			}
+		},
+		[ enableComplementaryArea ]
+	);
 
 	// Don't render the Editor until the settings are set and loaded
-	if ( ! settings?.siteUrl ) {
-		return null;
-	}
+	const isReady =
+		settings?.siteUrl &&
+		templateType !== undefined &&
+		entityId !== undefined;
 
 	const secondarySidebar = () => {
 		if ( isInserterOpen ) {
@@ -177,100 +190,117 @@ function Editor( { initialSettings, onError } ) {
 	};
 
 	return (
-		<ShortcutProvider>
+		<>
 			<URLQueryController />
-			<SlotFillProvider>
-				<EntityProvider kind="root" type="site">
-					<EntityProvider
-						kind="postType"
-						type={ templateType }
-						id={ entityId }
-					>
-						<BlockContextProvider value={ blockContext }>
-							<ErrorBoundary onError={ onError }>
-								<FullscreenMode isActive />
-								<UnsavedChangesWarning />
-								<KeyboardShortcuts.Register />
-								<SidebarComplementaryAreaFills />
-								<InterfaceSkeleton
-									labels={ interfaceLabels }
-									drawer={ <NavigationSidebar /> }
-									secondarySidebar={ secondarySidebar() }
-									sidebar={
-										sidebarIsOpened && (
-											<ComplementaryArea.Slot scope="core/edit-site" />
-										)
-									}
-									header={
-										<Header
-											openEntitiesSavedStates={
-												openEntitiesSavedStates
-											}
-										/>
-									}
-									notices={ <EditorSnackbars /> }
-									content={
-										<>
-											<EditorNotices />
-											{ template && (
-												<BlockEditor
-													setIsInserterOpen={
-														setIsInserterOpened
-													}
-												/>
-											) }
-											{ templateResolved &&
-												! template &&
-												settings?.siteUrl &&
-												entityId && (
-													<Notice
-														status="warning"
-														isDismissible={ false }
-													>
-														{ __(
-															"You attempted to edit an item that doesn't exist. Perhaps it was deleted?"
-														) }
-													</Notice>
-												) }
-											<KeyboardShortcuts />
-										</>
-									}
-									actions={
-										<>
-											{ isEntitiesSavedStatesOpen ? (
-												<EntitiesSavedStates
-													close={
-														closeEntitiesSavedStates
-													}
-												/>
-											) : (
-												<div className="edit-site-editor__toggle-save-panel">
-													<Button
-														variant="secondary"
-														className="edit-site-editor__toggle-save-panel-button"
-														onClick={
+			{ isReady && (
+				<ShortcutProvider>
+					<SlotFillProvider>
+						<EntityProvider kind="root" type="site">
+							<EntityProvider
+								kind="postType"
+								type={ templateType }
+								id={ entityId }
+							>
+								<GlobalStylesProvider>
+									<BlockContextProvider
+										value={ blockContext }
+									>
+										<GlobalStylesRenderer />
+										<ErrorBoundary onError={ onError }>
+											<FullscreenMode isActive />
+											<UnsavedChangesWarning />
+											<KeyboardShortcuts.Register />
+											<SidebarComplementaryAreaFills />
+											<InterfaceSkeleton
+												labels={ interfaceLabels }
+												secondarySidebar={ secondarySidebar() }
+												sidebar={
+													sidebarIsOpened && (
+														<ComplementaryArea.Slot scope="core/edit-site" />
+													)
+												}
+												header={
+													<Header
+														openEntitiesSavedStates={
 															openEntitiesSavedStates
 														}
-														aria-expanded={ false }
-													>
-														{ __(
-															'Open save panel'
+													/>
+												}
+												notices={ <EditorSnackbars /> }
+												content={
+													<>
+														<EditorNotices />
+														{ template && (
+															<BlockEditor
+																setIsInserterOpen={
+																	setIsInserterOpened
+																}
+															/>
 														) }
-													</Button>
-												</div>
-											) }
-										</>
-									}
-									footer={ <BlockBreadcrumb /> }
-								/>
-								<Popover.Slot />
-								<PluginArea />
-							</ErrorBoundary>
-						</BlockContextProvider>
-					</EntityProvider>
-				</EntityProvider>
-			</SlotFillProvider>
-		</ShortcutProvider>
+														{ templateResolved &&
+															! template &&
+															settings?.siteUrl &&
+															entityId && (
+																<Notice
+																	status="warning"
+																	isDismissible={
+																		false
+																	}
+																>
+																	{ __(
+																		"You attempted to edit an item that doesn't exist. Perhaps it was deleted?"
+																	) }
+																</Notice>
+															) }
+														<KeyboardShortcuts
+															openEntitiesSavedStates={
+																openEntitiesSavedStates
+															}
+														/>
+													</>
+												}
+												actions={
+													<>
+														{ isEntitiesSavedStatesOpen ? (
+															<EntitiesSavedStates
+																close={
+																	closeEntitiesSavedStates
+																}
+															/>
+														) : (
+															<div className="edit-site-editor__toggle-save-panel">
+																<Button
+																	variant="secondary"
+																	className="edit-site-editor__toggle-save-panel-button"
+																	onClick={
+																		openEntitiesSavedStates
+																	}
+																	aria-expanded={
+																		false
+																	}
+																>
+																	{ __(
+																		'Open save panel'
+																	) }
+																</Button>
+															</div>
+														) }
+													</>
+												}
+												footer={ <BlockBreadcrumb /> }
+											/>
+											<WelcomeGuide />
+											<Popover.Slot />
+											<PluginArea />
+										</ErrorBoundary>
+									</BlockContextProvider>
+								</GlobalStylesProvider>
+							</EntityProvider>
+						</EntityProvider>
+					</SlotFillProvider>
+				</ShortcutProvider>
+			) }
+		</>
 	);
 }
 export default Editor;

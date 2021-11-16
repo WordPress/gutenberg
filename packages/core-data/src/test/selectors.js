@@ -418,7 +418,7 @@ describe( 'getEntityRecords', () => {
 } );
 
 describe( '__experimentalGetDirtyEntityRecords', () => {
-	it( 'should return a map of objects with each raw edited entity record and its corresponding edits', () => {
+	it( 'returns a map of objects with each raw edited entity record and its corresponding edits', () => {
 		const state = deepFreeze( {
 			entities: {
 				config: [
@@ -451,6 +451,61 @@ describe( '__experimentalGetDirtyEntityRecords', () => {
 							},
 							edits: {
 								someKey: {
+									someProperty: 'someEditedValue',
+									someRawProperty: 'someEditedRawValue',
+									someTransientEditProperty:
+										'someEditedTransientEditValue',
+								},
+							},
+						},
+					},
+				},
+			},
+		} );
+		expect( __experimentalGetDirtyEntityRecords( state ) ).toEqual( [
+			{ kind: 'someKind', name: 'someName', key: 'someKey', title: '' },
+		] );
+	} );
+
+	it( 'excludes entity records that no longer exist', () => {
+		const state = deepFreeze( {
+			entities: {
+				config: [
+					{
+						kind: 'someKind',
+						name: 'someName',
+						transientEdits: { someTransientEditProperty: true },
+					},
+				],
+				data: {
+					someKind: {
+						someName: {
+							queriedData: {
+								items: {
+									default: {
+										someKey: {
+											someProperty: 'somePersistedValue',
+											someRawProperty: {
+												raw: 'somePersistedRawValue',
+											},
+											id: 'someKey',
+										},
+									},
+								},
+								itemIsComplete: {
+									default: {
+										someKey: true,
+									},
+								},
+							},
+							edits: {
+								someKey: {
+									someProperty: 'someEditedValue',
+									someRawProperty: 'someEditedRawValue',
+									someTransientEditProperty:
+										'someEditedTransientEditValue',
+								},
+								deletedKey: {
 									someProperty: 'someEditedValue',
 									someRawProperty: 'someEditedRawValue',
 									someTransientEditProperty:

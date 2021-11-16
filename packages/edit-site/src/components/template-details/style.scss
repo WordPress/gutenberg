@@ -22,6 +22,18 @@
 		padding: $grid-unit-10;
 	}
 
+	.edit-site-template-details__template-areas-item {
+		position: relative;
+
+		.edit-site-template-details__template-areas-item-more {
+			position: absolute;
+			right: 0;
+			top: 0;
+			bottom: 0;
+			margin: auto 0;
+		}
+	}
+
 	.edit-site-template-details__revert {
 		// Make some spaces for the revert button to have some paddings.
 		padding: $grid-unit-15 $grid-unit;
@@ -38,7 +50,8 @@
 	}
 
 	.edit-site-template-details__show-all-button.components-button {
-		display: block;
+		display: flex;
+		justify-content: center;
 		background: $gray-900;
 		color: $white;
 		width: 100%;
