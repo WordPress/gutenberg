@@ -11,6 +11,7 @@ import { store as coreDataStore } from '@wordpress/core-data';
 import { createRegistrySelector } from '@wordpress/data';
 import { uploadMedia } from '@wordpress/media-utils';
 import { isTemplatePart } from '@wordpress/blocks';
+import { Platform } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -65,6 +66,22 @@ export const getCanUserCreateMedia = createRegistrySelector( ( select ) => () =>
 );
 
 /**
+ * Returns any available Reusable blocks.
+ *
+ * @param {Object} state Global application state.
+ *
+ * @return {Array} The available reusable blocks.
+ */
+export const getReusableBlocks = createRegistrySelector( ( select ) => () => {
+	const isWeb = Platform.OS === 'web';
+	return isWeb
+		? select( coreDataStore ).getEntityRecords( 'postType', 'wp_block', {
+				per_page: -1,
+		  } )
+		: [];
+} );
+
+/**
  * Returns the settings, taking into account active features and permissions.
  *
  * @param {Object}   state             Global application state.
@@ -80,6 +97,7 @@ export const getSettings = createSelector(
 			focusMode: isFeatureActive( state, 'focusMode' ),
 			hasFixedToolbar: isFeatureActive( state, 'fixedToolbar' ),
 			__experimentalSetIsInserterOpened: setIsInserterOpen,
+			__experimentalReusableBlocks: getReusableBlocks( state ),
 		};
 
 		const canUserCreateMedia = getCanUserCreateMedia( state );
