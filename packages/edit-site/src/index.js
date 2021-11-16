@@ -49,6 +49,8 @@ export function initialize( id, settings ) {
 		fetchLinkSuggestions( search, searchOptions, settings );
 	settings.__experimentalFetchRichUrlData = fetchUrlData;
 	settings.__experimentalSpotlightEntityBlocks = [ 'core/template-part' ];
+	// Feature flag for the new menu sidebar which isn't stable yet.
+	settings.__experimentalNewMenuSidebar = false;
 
 	const target = document.getElementById( id );
 	const reboot = reinitializeEditor.bind( null, target, settings );
