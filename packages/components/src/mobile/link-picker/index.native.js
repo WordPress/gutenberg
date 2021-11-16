@@ -8,7 +8,7 @@ import { lowerCase, startsWith } from 'lodash';
  * WordPress dependencies
  */
 import { useEffect, useState } from '@wordpress/element';
-import { __ } from '@wordpress/i18n';
+import { __, sprintf } from '@wordpress/i18n';
 import { BottomSheet, Icon } from '@wordpress/components';
 import { getProtocol, isURL, prependHTTP } from '@wordpress/url';
 import { link, cancelCircleFilled } from '@wordpress/icons';
@@ -136,13 +136,11 @@ export const LinkPicker = ( {
 				{ !! clipboardUrl && clipboardUrl !== value && (
 					<BottomSheet.LinkSuggestionItemCell
 						accessible
-						accessibilityLabel={
-							`Copy URL from the clipboard, ${ clipboardUrl }`
-							// 	sprintf(
-							// 	/* translators: accessibility text. Inline textinput title, value and help text.%1: Cell title, %2: cell value, , %3: cell help. */
-							// 	_x( '%1$s, %2$s, %3$s', 'inline textinput cell' ),
-							// )
-						}
+						accessibilityLabel={ sprintf(
+							/* translators: Copy URL from the clipboard, https://sample.url */
+							__( 'Copy URL from the clipboard, %s' ),
+							clipboardUrl
+						) }
 						suggestion={ {
 							type: 'clipboard',
 							url: clipboardUrl,
