@@ -7,7 +7,7 @@ import {
 } from '@wordpress/core-data';
 import { select, useSelect } from '@wordpress/data';
 
-export default function useNavigationMenu( navigationMenuId, slug ) {
+export default function useNavigationMenu( slug ) {
 	return useSelect(
 		( select ) => {
 			const {
@@ -24,6 +24,7 @@ export default function useNavigationMenu( navigationMenuId, slug ) {
 			const navigationMenu = slug
 				? getEditedEntityRecord( ...navigationMenuSingleArgs )
 				: null;
+
 			const hasResolvedNavigationMenu = slug
 				? hasFinishedResolution(
 						'getEditedEntityRecord',

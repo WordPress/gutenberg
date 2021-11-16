@@ -111,16 +111,8 @@ function Navigation( {
 		layout: { justifyContent, orientation = 'horizontal' } = {},
 	} = attributes;
 
-	const navigationMenuId = attributes.navigationMenuId;
-	const setNavigationMenuId = useCallback(
-		( postId ) => {
-			setAttributes( { navigationMenuId: postId } );
-		},
-		[]
-	);
-
 	const [ hasAlreadyRendered, RecursionProvider ] = useNoRecursiveRenders(
-		`navigationMenu/${ navigationMenuId }`
+		`navigationMenu/${ attributes.menuSlug }`
 	);
 
 	const { innerBlocks, isInnerBlockSelected } = useSelect(
@@ -147,11 +139,6 @@ function Navigation( {
 		setHasSavedUnsavedInnerBlocks,
 	] = useState( false );
 
-<<<<<<< HEAD
-	const isWithinUnassignedArea = ! navigationMenuId;
-
-=======
->>>>>>> 16fa16cd5b (Remove remnants of nav area)
 	const [ isPlaceholderShown, setIsPlaceholderShown ] = useState(
 		! hasExistingNavItems
 	);
@@ -167,7 +154,7 @@ function Navigation( {
 		hasResolvedNavigationMenus,
 		navigationMenus,
 		navigationMenu,
-	} = useNavigationMenu( navigationMenuId, attributes.slug );
+	} = useNavigationMenu( attributes.menuSlug );
 
 	const navRef = useRef();
 	const isDraftNavigationMenu = navigationMenu?.status === 'draft';
@@ -304,7 +291,7 @@ function Navigation( {
 				onSave={ ( post ) => {
 					setHasSavedUnsavedInnerBlocks( true );
 					// Switch to using the wp_navigation entity.
-					setNavigationMenuId( post.id );
+					setAttributes( { menuSlug: post.slug } );
 				} }
 			/>
 		);
@@ -312,7 +299,7 @@ function Navigation( {
 
 	// Show a warning if the selected menu is no longer available.
 	// TODO - the user should be able to select a new one?
-	if ( navigationMenuId && isNavigationMenuMissing ) {
+	if ( attributes.menuSlug && isNavigationMenuMissing ) {
 		return (
 			<div { ...blockProps }>
 				<Warning>
@@ -342,7 +329,7 @@ function Navigation( {
 		<EntityProvider
 			kind="postType"
 			type="wp_navigation"
-			id={ navigationMenuId }
+			id={ attributes.menuSlug }
 		>
 			<RecursionProvider>
 				<BlockControls>
@@ -355,13 +342,13 @@ function Navigation( {
 							>
 								{ ( { onClose } ) => (
 									<NavigationMenuSelector
-										onSelect={ ( { id } ) => {
-											setNavigationMenuId( id );
+										onSelect={ ( { id, slug } ) => {
+											setAttributes( { menuSlug: slug } );
 											onClose();
 										} }
 										onCreateNew={ () => {
 											setAttributes( {
-												navigationMenuId: undefined,
+												menuSlug: undefined,
 											} );
 											setIsPlaceholderShown( true );
 										} }
@@ -484,7 +471,7 @@ function Navigation( {
 							onDelete={ () => {
 								replaceInnerBlocks( clientId, [] );
 								setAttributes( {
-									navigationMenuId: undefined,
+									menuSlug: undefined,
 								} );
 								setIsPlaceholderShown( true );
 							} }
@@ -496,7 +483,7 @@ function Navigation( {
 						<PlaceholderComponent
 							onFinish={ ( post ) => {
 								setIsPlaceholderShown( false );
-								setNavigationMenuId( post.id );
+								setAttributes( { menuSlug: post.slug } );
 								selectBlock( clientId );
 							} }
 							canSwitchNavigationMenu={ canSwitchNavigationMenu }

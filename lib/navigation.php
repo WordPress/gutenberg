@@ -44,7 +44,7 @@ function gutenberg_register_navigation_post_type() {
 		'show_in_rest'          => true,
 		'map_meta_cap'          => true,
 		'rest_base'             => 'navigation',
-		'rest_controller_class' => WP_REST_Posts_Controller::class,
+		'rest_controller_class' => Gutenberg_REST_Navigation_Controller::class,
 		'supports'              => array(
 			'title',
 			'editor',
