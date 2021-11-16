@@ -155,7 +155,7 @@ describe( 'Navigating the block hierarchy', () => {
 		// Return to first block.
 		await openListViewSidebar();
 		await page.keyboard.press( 'ArrowUp' );
-		await page.keyboard.press( 'Enter' );
+		await page.keyboard.press( 'Space' );
 
 		// Replace its content.
 		await pressKeyWithModifier( 'primary', 'a' );

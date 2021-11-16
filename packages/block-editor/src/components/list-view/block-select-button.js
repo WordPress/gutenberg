@@ -31,6 +31,7 @@ function ListViewBlockSelectButton(
 		position,
 		siblingBlockCount,
 		level,
+		tabIndex,
 		onFocus,
 		onDragStart,
 		onDragEnd,
@@ -74,7 +75,7 @@ function ListViewBlockSelectButton(
 				onKeyDown={ onKeyDownHandler }
 				aria-describedby={ descriptionId }
 				ref={ ref }
-				tabIndex="0"
+				tabIndex={ tabIndex }
 				onFocus={ onFocus }
 				onDragStart={ onDragStartHandler }
 				onDragEnd={ onDragEnd }
