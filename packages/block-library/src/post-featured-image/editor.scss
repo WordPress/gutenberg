@@ -94,6 +94,19 @@
 			stroke-dasharray: 3;
 			opacity: 0.3;
 		}
+
+		// Show default placeholder height when not resized.
+		min-height: 200px;
+	}
+
+	// Provide a minimum size for the placeholder when resized.
+	// Note, this should be as small as we can afford it, and exists only
+	// to ensure there's room for the upload button.
+	&[style*="height"] .components-placeholder {
+		min-height: $grid-unit-60;
+		min-width: $grid-unit-60;
+		height: 100%;
+		width: 100%;
 	}
 
 	// Show upload button on block selection.

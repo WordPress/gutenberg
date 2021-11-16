@@ -59,7 +59,7 @@ function PostFeaturedImageDisplay( {
 	);
 
 	const blockProps = useBlockProps( {
-		style: { width },
+		style: { width, height },
 	} );
 
 	const placeholder = ( content ) => {
@@ -71,6 +71,7 @@ function PostFeaturedImageDisplay( {
 						fill="none"
 						xmlns="http://www.w3.org/2000/svg"
 						viewBox="0 0 60 60"
+						preserveAspectRatio="xMidYMid slice" // @todo: "slice" matches the "cover" behavior, "meet" could be used for "container" and "fill" values.
 					>
 						<Path
 							vectorEffect="non-scaling-stroke"
