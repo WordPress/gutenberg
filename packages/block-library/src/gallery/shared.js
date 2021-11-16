@@ -39,9 +39,6 @@ export function isGalleryV2Enabled() {
 	}
 
 	const settings = select( blockEditorStore ).getSettings();
-	if ( settings.__unstableGalleryWithImageBlocks ) {
-		return true;
-	}
 
-	return false;
+	return !! settings.__unstableGalleryWithImageBlocks;
 }
