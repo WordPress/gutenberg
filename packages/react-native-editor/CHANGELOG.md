@@ -11,6 +11,7 @@ For each user feature we should also add a importance categorization label  to i
 
 ## Unreleased
 -   [*] [Embed block] Included Link in Block Settings [#36099]
+-   [**] Fix tab titles translation of inserter menu [#36534]
 
 ## 1.66.0
 -   [**] [Image block] Add ability to quickly link images to Media Files and Attachment Pages [#34846]
