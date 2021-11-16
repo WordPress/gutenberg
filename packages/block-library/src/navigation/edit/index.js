@@ -167,7 +167,7 @@ function Navigation( {
 		hasResolvedNavigationMenus,
 		navigationMenus,
 		navigationMenu,
-	} = useNavigationMenu( navigationMenuId );
+	} = useNavigationMenu( navigationMenuId, attributes.slug );
 
 	const navRef = useRef();
 	const isDraftNavigationMenu = navigationMenu?.status === 'draft';
@@ -280,8 +280,8 @@ function Navigation( {
 	useEffect( () => {
 		if ( ! oldSlug ) {
 			const newSlug = area?.area
-				? `${ area.area }-menu`
-				: `generic-one-off-menu`;
+				? `${ area.area }//menu`
+				: `generic-one-off//menu`;
 			setAttributes( { menuSlug: newSlug } );
 		}
 	}, [ oldSlug, area?.area ] );

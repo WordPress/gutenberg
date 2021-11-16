@@ -1,10 +1,13 @@
 /**
  * WordPress dependencies
  */
-import { store as coreStore } from '@wordpress/core-data';
-import { useSelect } from '@wordpress/data';
+import {
+	store as coreDataStore,
+	store as coreStore,
+} from '@wordpress/core-data';
+import { select, useSelect } from '@wordpress/data';
 
-export default function useNavigationMenu( navigationMenuId ) {
+export default function useNavigationMenu( navigationMenuId, slug ) {
 	return useSelect(
 		( select ) => {
 			const {
@@ -16,12 +19,12 @@ export default function useNavigationMenu( navigationMenuId ) {
 			const navigationMenuSingleArgs = [
 				'postType',
 				'wp_navigation',
-				navigationMenuId,
+				slug,
 			];
-			const navigationMenu = navigationMenuId
+			const navigationMenu = slug
 				? getEditedEntityRecord( ...navigationMenuSingleArgs )
 				: null;
-			const hasResolvedNavigationMenu = navigationMenuId
+			const hasResolvedNavigationMenu = slug
 				? hasFinishedResolution(
 						'getEditedEntityRecord',
 						navigationMenuSingleArgs
@@ -37,15 +40,14 @@ export default function useNavigationMenu( navigationMenuId ) {
 				...navigationMenuMultipleArgs
 			);
 
-			const canSwitchNavigationMenu = navigationMenuId
+			const canSwitchNavigationMenu = slug
 				? navigationMenus?.length > 1
 				: navigationMenus?.length > 0;
 
 			return {
 				isNavigationMenuResolved: hasResolvedNavigationMenu,
 				isNavigationMenuMissing:
-					! navigationMenuId ||
-					( hasResolvedNavigationMenu && ! navigationMenu ),
+					! slug || ( hasResolvedNavigationMenu && ! navigationMenu ),
 				canSwitchNavigationMenu,
 				hasResolvedNavigationMenus: hasFinishedResolution(
 					'getEntityRecords',
@@ -55,6 +57,6 @@ export default function useNavigationMenu( navigationMenuId ) {
 				navigationMenus,
 			};
 		},
-		[ navigationMenuId ]
+		[ slug ]
 	);
 }
