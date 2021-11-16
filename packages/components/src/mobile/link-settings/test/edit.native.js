@@ -27,29 +27,6 @@ const unregisterBlocks = () => {
 /**
  * ### TODO
  * + Try to figure out why I can't `console.log(JSON.stringify(subject.toJSON()))` anymore.
- *
- * ### DONE
- *
- * GIVEN the Link Settings sheet displays,
- * AND the Clipboard has a URL copied,
- * THEN the `Link to` field in the Link Settings should be populated with the placeholder text, i.e., `Search or type URL`.
- *
- * GIVEN the Link Picker sheet displays with the `From Clipboard` table cell,
- * WHEN the Clipboard is cleared or changed to something that is NOT a URL,
- * THEN the `From Clipboard` table cell should disappear.
- *
- * GIVEN the Link Picker sheet displays,
- * AND the Clipboard has a URL copied that is different from the contents of the text input field,
- * THEN the `From Clipboard` table cell should be populated with the URL from the Clipboard.
- *
- * GIVEN the Link Picker sheet displays,
- * AND the `From Clipboard` table cell is pressed,
- * THEN the `Search or type URL` text input field is populated with the URL from the Clipboard,
- * AND the `Add this link` table cell is repopulated with the new URL from the Clipboard.
- *
- * GIVEN the Link Picker sheet displays,
- * AND the contents of the Clipboard are IDENTICAL to the contents of the text input field,
- * THEN do NOT display the `From Clipboard` table cell.
  */
 describe.each( [
 	[
@@ -380,7 +357,7 @@ describe.each( [
 			 */
 			it(
 				'should display the LINK SETTINGS with the URL from the CLIPBOARD' +
-					'populated in the LINK TO field.',
+					' populated in the LINK TO field.',
 				// eslint-disable-next-line jest/no-done-callback
 				async ( done ) => {
 					// Arrange
