@@ -161,8 +161,6 @@ export default function PostTemplateEdit( {
 		return <p { ...blockProps }> { __( 'No results found.' ) }</p>;
 	}
 
-	// Insert what we need right here.
-
 	return (
 		<ul { ...blockProps }>
 			{ blockContexts &&
