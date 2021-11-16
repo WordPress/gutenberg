@@ -157,9 +157,9 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 		* So we take theme supports, transform it to theme.json shape
 		* and merge the self::$theme upon that.
 		*/
-		$theme_support_data  = WP_Theme_JSON_Gutenberg::get_from_editor_settings( gutenberg_get_default_block_editor_settings() );
+		$theme_support_data = WP_Theme_JSON_Gutenberg::get_from_editor_settings( gutenberg_get_default_block_editor_settings() );
 		// We don't want the core palette&gradients enabled for themes without theme.json support.
-		if ( ! WP_Theme_JSON_Resolver_Gutenberg::theme_has_support() ) {
+		if ( ! self::theme_has_support() ) {
 			if ( ! isset( $theme_support_data['settings']['color'] ) ) {
 				$theme_support_data['settings']['color'] = array();
 			}
