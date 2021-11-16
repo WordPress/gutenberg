@@ -345,6 +345,13 @@
 		align-items: var(--layout-align, initial);
 	}
 
+	// If the responsive wrapper is present but overlay is not open,
+	// overlay styles shouldn't apply.
+	&:not(.is-menu-open.is-menu-open) {
+		color: inherit !important;
+		background-color: inherit !important;
+	}
+
 	// Overlay menu.
 	// Provide an opinionated default style for menu items inside.
 	// Inherit as much as we can regarding colors, fonts, sizes,
