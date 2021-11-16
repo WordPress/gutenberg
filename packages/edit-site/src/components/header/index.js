@@ -47,6 +47,7 @@ export default function Header( {
 		isListViewOpen,
 		listViewShortcut,
 		isLoaded,
+		newMenuSidebar,
 	} = useSelect( ( select ) => {
 		const {
 			__experimentalGetPreviewDeviceType,
@@ -54,6 +55,7 @@ export default function Header( {
 			getEditedPostId,
 			isInserterOpened,
 			isListViewOpened,
+			getSettings,
 		} = select( editSiteStore );
 		const { getEditedEntityRecord } = select( coreStore );
 		const { __experimentalGetTemplateInfo: getTemplateInfo } = select(
@@ -77,6 +79,7 @@ export default function Header( {
 			listViewShortcut: getShortcutRepresentation(
 				'core/edit-site/toggle-list-view'
 			),
+			newMenuSidebar: getSettings().__experimentalNewMenuSidebar,
 		};
 	}, [] );
 
@@ -107,9 +110,11 @@ export default function Header( {
 	return (
 		<div className="edit-site-header">
 			<div className="edit-site-header_start">
-				<MainDashboardButton.Slot>
-					<NavigationLink />
-				</MainDashboardButton.Slot>
+				{ newMenuSidebar && (
+					<MainDashboardButton.Slot>
+						<NavigationLink />
+					</MainDashboardButton.Slot>
+				) }
 
 				<div className="edit-site-header__toolbar">
 					<Button
