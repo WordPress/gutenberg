@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { render, screen } from '@testing-library/react';
+import { render, screen, waitFor } from '@testing-library/react';
 
 /**
  * WordPress dependencies
@@ -30,6 +30,7 @@ jest.mock( '@wordpress/dom', () => {
 							Object.defineProperties( element, {
 								offsetWidth: {
 									get: () => 1,
+									configurable: true,
 								},
 							} );
 						}
@@ -43,34 +44,20 @@ jest.mock( '@wordpress/dom', () => {
 } );
 
 describe( 'useDisabled', () => {
-	let MutationObserver;
-
-	beforeAll( () => {
-		MutationObserver = window.MutationObserver;
-		window.MutationObserver = function () {};
-		window.MutationObserver.prototype = {
-			observe() {},
-			disconnect() {},
-		};
-	} );
-
-	afterAll( () => {
-		window.MutationObserver = MutationObserver;
-	} );
-
-	const Form = forwardRef( ( _, ref ) => {
+	const Form = forwardRef( ( { showButton }, ref ) => {
 		return (
 			<form ref={ ref }>
 				<input />
 				<a href="https://wordpress.org/">A link</a>
 				<p contentEditable={ true } tabIndex="0"></p>
+				{ showButton && <button>Button</button> }
 			</form>
 		);
 	} );
 
-	function DisabledComponent() {
+	function DisabledComponent( props ) {
 		const disabledRef = useDisabled();
-		return <Form ref={ disabledRef } />;
+		return <Form ref={ disabledRef } { ...props } />;
 	}
 
 	it( 'will disable all fields', () => {
@@ -85,5 +72,19 @@ describe( 'useDisabled', () => {
 		expect( p.getAttribute( 'contenteditable' ) ).toBe( 'false' );
 		expect( p.hasAttribute( 'tabindex' ) ).toBe( false );
 		expect( p.hasAttribute( 'disabled' ) ).toBe( false );
+	} );
+
+	it( 'will disable an element rendered in an update to the component', async () => {
+		const { rerender } = render(
+			<DisabledComponent showButton={ false } />
+		);
+
+		expect( screen.queryByText( 'Button' ) ).not.toBeInTheDocument();
+		rerender( <DisabledComponent showButton={ true } /> );
+
+		const button = screen.getByText( 'Button' );
+		await waitFor( () => {
+			expect( button.hasAttribute( 'disabled' ) ).toBe( true );
+		} );
 	} );
 } );
