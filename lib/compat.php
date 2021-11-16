@@ -209,7 +209,7 @@ function gutenberg_check_gallery_block_v2_compatibility() {
 	$v2_gallery_enabled = boolval( 1 !== $use_balance_tags || is_wp_version_compatible( '5.9' ) ) ? 'true' : 'false';
 
 	wp_add_inline_script(
-		'wp-blocks',
+		'wp-dom-ready',
 		'wp.galleryBlockV2Enabled = ' . $v2_gallery_enabled . ';',
 		'after'
 	);
