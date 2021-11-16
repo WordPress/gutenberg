@@ -97,11 +97,11 @@ function gutenberg_display_experiment_section() {
  * @return array Filtered editor settings.
  */
 function gutenberg_experiments_editor_settings( $settings ) {
-	// The refactored gallery currently can't be run on sites with use_balanceTags option set.
-	// This bypass needs to remain in place until this is resolved and a patch released.
-	// https://core.trac.wordpress.org/ticket/54130.
+	// The refactored gallery is disabled by default on WordPress 5.9.
+	// To run the refactored Gallery with nested Image blocks install the 
+	// Gutenberg plugin >= 11.9.
 	$experiments_settings = array(
-		'__unstableGalleryWithImageBlocks' => (int) get_option( 'use_balanceTags' ) !== 1,
+		'__unstableGalleryWithImageBlocks' => false,
 	);
 	return array_merge( $settings, $experiments_settings );
 }
