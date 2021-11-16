@@ -14,9 +14,9 @@ import {
 } from '@wordpress/block-editor';
 import { ToolbarButton, Placeholder, Spinner } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-import { useEffect, useState, memo } from '@wordpress/element';
-import apiFetch from '@wordpress/api-fetch';
-import { addQueryArgs } from '@wordpress/url';
+import { useMemo, useState, memo } from '@wordpress/element';
+import { useSelect } from '@wordpress/data';
+import { store as coreStore } from '@wordpress/core-data';
 
 /**
  * Internal dependencies
@@ -70,7 +70,7 @@ export default function PageListEdit( { context, clientId } ) {
 					clientId={ clientId }
 				/>
 			) }
-			{ totalPages === null && (
+			{ totalPages === undefined && (
 				<div { ...blockProps }>
 					<Placeholder>
 						<Spinner />
@@ -95,48 +95,39 @@ export default function PageListEdit( { context, clientId } ) {
 }
 
 function usePagesByParentId() {
-	const [ pagesByParentId, setPagesByParentId ] = useState( null );
-	const [ totalPages, setTotalPages ] = useState( null );
+	const { pages } = useSelect( ( select ) => {
+		const { getEntityRecords } = select( coreStore );
 
-	useEffect( () => {
-		async function performFetch() {
-			setPagesByParentId( null );
-			setTotalPages( null );
-
-			let pages = await apiFetch( {
-				path: addQueryArgs( '/wp/v2/pages', {
-					orderby: 'menu_order',
-					order: 'asc',
-					_fields: [ 'id', 'link', 'parent', 'title', 'menu_order' ],
-					per_page: -1,
-				} ),
-			} );
-
-			// TODO: Once the REST API supports passing multiple values to
-			// 'orderby', this can be removed.
-			// https://core.trac.wordpress.org/ticket/39037
-			pages = sortBy( pages, [ 'menu_order', 'title.rendered' ] );
-
-			setPagesByParentId(
-				pages.reduce( ( accumulator, page ) => {
-					const { parent } = page;
-					if ( accumulator.has( parent ) ) {
-						accumulator.get( parent ).push( page );
-					} else {
-						accumulator.set( parent, [ page ] );
-					}
-					return accumulator;
-				}, new Map() )
-			);
-			setTotalPages( pages.length );
-		}
-		performFetch();
+		return {
+			pages: getEntityRecords( 'postType', 'page', {
+				orderby: 'menu_order',
+				order: 'asc',
+				_fields: [ 'id', 'link', 'parent', 'title', 'menu_order' ],
+				per_page: -1,
+			} ),
+		};
 	}, [] );
 
-	return {
-		pagesByParentId,
-		totalPages,
-	};
+	return useMemo( () => {
+		// TODO: Once the REST API supports passing multiple values to
+		// 'orderby', this can be removed.
+		// https://core.trac.wordpress.org/ticket/39037
+		const sortedPages = sortBy( pages, [ 'menu_order', 'title.rendered' ] );
+		const pagesByParentId = sortedPages.reduce( ( accumulator, page ) => {
+			const { parent } = page;
+			if ( accumulator.has( parent ) ) {
+				accumulator.get( parent ).push( page );
+			} else {
+				accumulator.set( parent, [ page ] );
+			}
+			return accumulator;
+		}, new Map() );
+
+		return {
+			pagesByParentId,
+			totalPages: pages?.length,
+		};
+	}, [ pages ] );
 }
 
 const PageItems = memo( function PageItems( {
