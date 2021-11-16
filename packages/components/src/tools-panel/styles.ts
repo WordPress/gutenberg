@@ -9,6 +9,7 @@ import { css } from '@emotion/react';
 import {
 	StyledField as BaseControlField,
 	StyledHelp as BaseControlHelp,
+	StyledLabel as BaseControlLabel,
 	Wrapper as BaseControlWrapper,
 } from '../base-control/styles/base-control-styles';
 import { LabelWrapper } from '../input-control/styles/input-control-styles';
@@ -121,7 +122,8 @@ export const ToolsPanelItem = css`
 	}
 
 	/**
-	 * Standardize InputControl labels with other labels inside ToolsPanel.
+	 * Standardize InputControl and BaseControl labels with other labels when
+	 * inside ToolsPanel.
 	 *
 	 * This is a temporary fix until the different control components have their
 	 * labels normalized.
@@ -132,6 +134,10 @@ export const ToolsPanelItem = css`
 			padding-bottom: 0;
 			line-height: 1.4em;
 		}
+	}
+
+	${ BaseControlLabel } {
+		line-height: 1.4em;
 	}
 `;
 
