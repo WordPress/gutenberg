@@ -157,7 +157,7 @@ class NativeEditorProvider extends Component {
 		this.subscriptionParentUpdateEditorSettings = subscribeUpdateEditorSettings(
 			( editorSettings ) => {
 				window.wp.galleryBlockV2Enabled = galleryWithImageBlocks;
-				updateSettings( { ...this.getThemeColors( editorSettings ) } );
+				updateSettings( this.getThemeColors( editorSettings ) );
 			}
 		);
 
