@@ -7,10 +7,11 @@ import { some } from 'lodash';
  * WordPress dependencies
  */
 import { Button, PanelBody, PanelRow } from '@wordpress/components';
-import { __ } from '@wordpress/i18n';
+import { __, _n } from '@wordpress/i18n';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { Fragment, useState } from '@wordpress/element';
 import { store as coreStore } from '@wordpress/core-data';
+import { store as noticesStore } from '@wordpress/notices';
 
 /**
  * Internal dependencies
@@ -31,6 +32,8 @@ export default function DiscardEntityChangesPanel( { closePanel, savables } ) {
 		__experimentalResetEditedEntityRecord: resetEditedEntityRecord,
 		__experimentalResetSpecifiedEntityEdits: resetSpecifiedEntityEdits,
 	} = useDispatch( coreStore );
+
+	const { createSuccessNotice } = useDispatch( noticesStore );
 
 	// Selected entities to be discarded.
 	const [ selectedEntities, _setSelectedEntities ] = useState( [] );
@@ -57,6 +60,8 @@ export default function DiscardEntityChangesPanel( { closePanel, savables } ) {
 	const discardCheckedEntities = () => {
 		closePanel();
 
+		const numberOfSelectedEntities = selectedEntities.length;
+
 		const siteItemsToDiscard = [];
 		selectedEntities.forEach( ( { kind, name, key, property } ) => {
 			if ( 'root' === kind && 'site' === name ) {
@@ -71,6 +76,23 @@ export default function DiscardEntityChangesPanel( { closePanel, savables } ) {
 			undefined,
 			siteItemsToDiscard
 		);
+
+		if ( numberOfSelectedEntities === savables.length ) {
+			createSuccessNotice( __( 'All changes discarded.' ), {
+				type: 'snackbar',
+			} );
+		} else {
+			createSuccessNotice(
+				_n(
+					'Change discarded.',
+					'Some changes discarded.',
+					numberOfSelectedEntities
+				),
+				{
+					type: 'snackbar',
+				}
+			);
+		}
 	};
 
 	return (
