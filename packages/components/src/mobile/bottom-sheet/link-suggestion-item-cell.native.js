@@ -7,7 +7,7 @@ import { Text, View } from 'react-native';
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { clipboard, globe } from '@wordpress/icons';
+import { globe } from '@wordpress/icons';
 import { usePreferredColorSchemeStyle } from '@wordpress/compose';
 
 /**
@@ -16,7 +16,7 @@ import { usePreferredColorSchemeStyle } from '@wordpress/compose';
 import Cell from './cell';
 import cellStyles from './styles.scss';
 import suggestionStyles from './link-suggestion-styles.scss';
-import { posts, pages, empty } from '../gridicons';
+import { posts, pages, empty, clipboard } from '../gridicons';
 
 const icons = {
 	URL: globe,
