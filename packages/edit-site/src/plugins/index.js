@@ -16,6 +16,7 @@ import { download } from '@wordpress/icons';
  * Internal dependencies
  */
 import ToolsMoreMenuGroup from '../components/header/tools-more-menu-group';
+import WelcomeGuideMenuItem from './welcome-guide-menu-item';
 
 registerPlugin( 'edit-site', {
 	render() {
@@ -45,6 +46,7 @@ registerPlugin( 'edit-site', {
 					>
 						{ __( 'Export' ) }
 					</MenuItem>
+					<WelcomeGuideMenuItem />
 				</ToolsMoreMenuGroup>
 			</>
 		);

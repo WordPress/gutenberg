@@ -2,7 +2,7 @@
 /**
  * Server-side rendering of the `core/navigation-submenu` block.
  *
- * @package gutenberg
+ * @package WordPress
  */
 
 /**
@@ -149,12 +149,6 @@ function render_block_core_navigation_submenu( $attributes, $content, $block ) {
 	$css_classes = trim( implode( ' ', $classes ) );
 	$has_submenu = count( $block->inner_blocks ) > 0;
 	$is_active   = ! empty( $attributes['id'] ) && ( get_the_ID() === $attributes['id'] );
-
-	$class_name = ! empty( $attributes['className'] ) ? implode( ' ', (array) $attributes['className'] ) : false;
-
-	if ( false !== $class_name ) {
-		$css_classes .= ' ' . $class_name;
-	}
 
 	$show_submenu_indicators = isset( $block->context['showSubmenuIcon'] ) && $block->context['showSubmenuIcon'];
 	$open_on_click           = isset( $block->context['openSubmenusOnClick'] ) && $block->context['openSubmenusOnClick'];

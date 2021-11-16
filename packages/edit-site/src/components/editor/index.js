@@ -39,6 +39,7 @@ import URLQueryController from '../url-query-controller';
 import InserterSidebar from '../secondary-sidebar/inserter-sidebar';
 import ListViewSidebar from '../secondary-sidebar/list-view-sidebar';
 import ErrorBoundary from '../error-boundary';
+import WelcomeGuide from '../welcome-guide';
 import { store as editSiteStore } from '../../store';
 import { GlobalStylesRenderer } from './global-styles-renderer';
 import { GlobalStylesProvider } from '../global-styles/global-styles-provider';
@@ -288,6 +289,7 @@ function Editor( { initialSettings, onError } ) {
 												}
 												footer={ <BlockBreadcrumb /> }
 											/>
+											<WelcomeGuide />
 											<Popover.Slot />
 											<PluginArea />
 										</ErrorBoundary>

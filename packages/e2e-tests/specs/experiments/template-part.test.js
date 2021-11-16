@@ -36,6 +36,7 @@ describe( 'Template Part', () => {
 	describe( 'Template part block', () => {
 		beforeEach( async () => {
 			await siteEditor.visit();
+			await siteEditor.disableWelcomeGuide();
 		} );
 
 		async function navigateToHeader() {

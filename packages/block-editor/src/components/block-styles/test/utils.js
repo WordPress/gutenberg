@@ -1,7 +1,12 @@
 /**
  * Internal dependencies
  */
-import { getActiveStyle, replaceActiveStyle } from '../utils';
+import {
+	getActiveStyle,
+	getDefaultStyle,
+	getRenderedStyles,
+	replaceActiveStyle,
+} from '../utils';
 
 describe( 'getActiveStyle', () => {
 	it( 'Should return the undefined if no active style', () => {
@@ -72,5 +77,59 @@ describe( 'replaceActiveStyle', () => {
 		expect( replaceActiveStyle( className, activeStyle, newStyle ) ).toBe(
 			'custom-class is-style-small'
 		);
+	} );
+} );
+
+describe( 'getRenderedStyles', () => {
+	it( 'Should return an empty array if styles is falsy', () => {
+		expect( getRenderedStyles( null ) ).toEqual( [] );
+	} );
+
+	it( 'Should return an empty array if styles array is empty', () => {
+		expect( getRenderedStyles( [] ) ).toEqual( [] );
+	} );
+
+	it( 'Should return styles collection if there is a default', () => {
+		const styles = [
+			{ name: 'hazlenut' },
+			{ name: 'cashew', isDefault: true },
+		];
+
+		expect( getRenderedStyles( styles ) ).toEqual( styles );
+	} );
+
+	it( 'Should add a default item to the styles collection if there is no default', () => {
+		const styles = [ { name: 'pistachio' }, { name: 'peanut' } ];
+		const defaultStyle = {
+			name: 'default',
+			label: 'Default',
+			isDefault: true,
+		};
+
+		expect( getRenderedStyles( styles ) ).toEqual( [
+			defaultStyle,
+			...styles,
+		] );
+	} );
+} );
+
+describe( 'getDefaultStyle', () => {
+	it( 'Should return default style object', () => {
+		const styles = [
+			{ name: 'trout' },
+			{ name: 'bream', isDefault: true },
+		];
+
+		expect( getDefaultStyle( styles ) ).toEqual( styles[ 1 ] );
+	} );
+
+	it( 'Should return `undefined` if there is no default', () => {
+		const styles = [ { name: 'snapper' }, { name: 'perch' } ];
+
+		expect( getDefaultStyle( styles ) ).toBeUndefined();
+	} );
+
+	it( 'Should return `undefined` if `styles` argument is no passed', () => {
+		expect( getDefaultStyle() ).toBeUndefined();
 	} );
 } );

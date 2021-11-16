@@ -175,9 +175,11 @@ const PanelColorGradientSettingsMultipleSelect = ( props ) => {
 	const userColors = useSetting( 'color.palette.user' );
 	const themeColors = useSetting( 'color.palette.theme' );
 	const coreColors = useSetting( 'color.palette.core' );
+	const shouldDisplayCoreColors = useSetting( 'color.corePalette' );
+
 	colorGradientSettings.colors = useMemo( () => {
 		const result = [];
-		if ( coreColors && coreColors.length ) {
+		if ( shouldDisplayCoreColors && coreColors && coreColors.length ) {
 			result.push( {
 				name: __( 'Core' ),
 				colors: coreColors,
@@ -201,9 +203,14 @@ const PanelColorGradientSettingsMultipleSelect = ( props ) => {
 	const userGradients = useSetting( 'color.gradients.user' );
 	const themeGradients = useSetting( 'color.gradients.theme' );
 	const coreGradients = useSetting( 'color.gradients.core' );
+	const shouldDisplayCoreGradients = useSetting( 'color.coreGradients' );
 	colorGradientSettings.gradients = useMemo( () => {
 		const result = [];
-		if ( coreGradients && coreGradients.length ) {
+		if (
+			shouldDisplayCoreGradients &&
+			coreGradients &&
+			coreGradients.length
+		) {
 			result.push( {
 				name: __( 'Core' ),
 				gradients: coreGradients,

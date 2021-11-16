@@ -8,6 +8,7 @@ import { css } from '@emotion/react';
  */
 import {
 	StyledField as BaseControlField,
+	StyledHelp as BaseControlHelp,
 	Wrapper as BaseControlWrapper,
 } from '../base-control/styles/base-control-styles';
 import { COLORS, CONFIG } from '../utils';
@@ -103,9 +104,18 @@ export const ToolsPanelItem = css`
 	&& ${ BaseControlWrapper } {
 		margin-bottom: 0;
 
-		${ BaseControlField } {
+		/**
+		 * To maintain proper spacing within a base control, the field's bottom
+		 * margin should only be removed when there is no help text included and
+		 * it is therefore the last-child.
+		 */
+		${ BaseControlField }:last-child {
 			margin-bottom: 0;
 		}
+	}
+
+	${ BaseControlHelp } {
+		margin-bottom: 0;
 	}
 `;
 

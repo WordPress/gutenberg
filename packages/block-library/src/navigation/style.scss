@@ -119,16 +119,13 @@
 		// Don't take up space when the menu is collapsed.
 		width: 0;
 		height: 0;
+		overflow: hidden; // Overflow is necessary to set, otherwise submenu items will take up space.
 
 		// Submenu items.
 		> .wp-block-navigation-item {
 			> .wp-block-navigation-item__content {
 				display: flex;
 				flex-grow: 1;
-
-				// Without this, the changing to zero on hover-out can cause wrapping and
-				// result in an invinite hover/hover-out loop.
-				white-space: nowrap;
 
 				// Right-align the chevron in submenus.
 				.wp-block-navigation__submenu-icon {
@@ -178,6 +175,7 @@
 	// Show submenus on hover unless they open on click.
 	&:where(:not(.open-on-click)):hover > .wp-block-navigation__submenu-container {
 		visibility: visible;
+		overflow: visible;
 		opacity: 1;
 		width: auto;
 		height: auto;
@@ -187,6 +185,7 @@
 	// Keep submenus open when focus is within.
 	&:where(:not(.open-on-click):not(.open-on-hover-click)):focus-within > .wp-block-navigation__submenu-container {
 		visibility: visible;
+		overflow: visible;
 		opacity: 1;
 		width: auto;
 		height: auto;
@@ -196,6 +195,7 @@
 	// Show submenus on click.
 	.wp-block-navigation-submenu__toggle[aria-expanded="true"] + .wp-block-navigation__submenu-container {
 		visibility: visible;
+		overflow: visible;
 		opacity: 1;
 		width: auto;
 		height: auto;
@@ -269,18 +269,22 @@
 // When justified space-between, open submenus leftward for last menu item.
 // When justified right, open all submenus leftwards.
 // This needs high specificity.
-// On smaller breakpoints, menus open downwards.
-@include break-medium {
-	.wp-block-navigation.items-justified-space-between .wp-block-page-list > .has-child:last-child,
-	.wp-block-navigation.items-justified-space-between > .wp-block-navigation__container > .has-child:last-child,
-	.wp-block-navigation.items-justified-right .wp-block-page-list > .has-child,
-	.wp-block-navigation.items-justified-right .wp-block-navigation__container .has-child {
-		// First submenu.
-		.wp-block-navigation__submenu-container {
-			left: auto;
-			right: 0;
+.wp-block-navigation.items-justified-space-between .wp-block-page-list > .has-child:last-child,
+.wp-block-navigation.items-justified-space-between > .wp-block-navigation__container > .has-child:last-child,
+.wp-block-navigation.items-justified-right .wp-block-page-list > .has-child,
+.wp-block-navigation.items-justified-right .wp-block-navigation__container .has-child {
+	// First submenu.
+	.wp-block-navigation__submenu-container {
+		left: auto;
+		right: 0;
 
-			// Nested submenus.
+		// Nested submenus.
+		// On smaller breakpoints, nested menus open downwards.
+		.wp-block-navigation__submenu-container {
+			left: -1px; // Border width.
+			right: -1px;
+		}
+		@include break-medium {
 			.wp-block-navigation__submenu-container {
 				left: auto;
 				right: 100%;
@@ -304,6 +308,11 @@
 
 // Navigation block inner container.
 .wp-block-navigation__container {
+	display: flex;
+	flex-wrap: var(--layout-wrap, wrap);
+	flex-direction: var(--layout-direction, initial);
+	justify-content: var(--layout-justify, initial);
+	align-items: var(--layout-align, initial);
 
 	// Reset the default list styles
 	list-style: none;
@@ -329,7 +338,11 @@
 	bottom: 0;
 
 	.wp-block-navigation__responsive-container-content {
-		display: contents;
+		display: flex;
+		flex-wrap: var(--layout-wrap, wrap);
+		flex-direction: var(--layout-direction, initial);
+		justify-content: var(--layout-justify, initial);
+		align-items: var(--layout-align, initial);
 	}
 
 	// Overlay menu.
@@ -350,8 +363,6 @@
 		// Add extra top padding so items don't conflict with close button.
 		padding: 72px 24px 24px 24px;
 		background-color: inherit;
-		// Fallback to inheritance in case the --justification-setting variable fails.
-		align-items: inherit;
 
 		.wp-block-navigation__responsive-container-content {
 			// Override the container flex layout settings
@@ -360,7 +371,11 @@
 			display: flex;
 			flex-direction: column;
 			// Inherit alignment settings from container.
-			align-items: var(--justification-setting, inherit);
+			align-items: var(--layout-justification-setting, inherit);
+
+			// Always align the contents of the menu to the top.
+			justify-content: flex-start;
+
 			// Allow menu to scroll.
 			overflow: auto;
 			padding: 0;
@@ -385,7 +400,6 @@
 				border: none;
 				padding-left: 32px;
 				padding-right: 32px;
-
 			}
 
 			// Space unfolded items using gap and padding for submenus.
@@ -412,7 +426,7 @@
 				display: flex;
 				flex-direction: column;
 				// Inherit alignment settings from container.
-				align-items: var(--justification-setting, inherit);
+				align-items: var(--layout-justification-setting, initial);
 			}
 		}
 
@@ -435,10 +449,10 @@
 	@include break-small() {
 		&:not(.hidden-by-default) {
 			&:not(.is-menu-open) {
-				display: contents;
+				display: block;
 				width: 100%;
 				position: relative;
-				z-index: 2;
+				z-index: auto;
 				background-color: inherit;
 
 				.wp-block-navigation__responsive-container-close {
@@ -518,13 +532,3 @@ html.has-modal-open {
 	overflow: hidden;
 }
 
-.wp-block-navigation__responsive-close,
-.wp-block-navigation__responsive-dialog,
-.wp-block-navigation__container {
-	display: contents;
-
-	.is-menu-open & {
-		// Fallback to inheritance in case the --justification-setting variable fails.
-		align-items: inherit;
-	}
-}

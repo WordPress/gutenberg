@@ -18,7 +18,7 @@
 			"type": "array"
 		},
 		"templateLock": {
-			"type": "string",
+			"type": [ "string", "boolean" ],
 			"enum": [ "all", "insert", false ]
 		}
 	},

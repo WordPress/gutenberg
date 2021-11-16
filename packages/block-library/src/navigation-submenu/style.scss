@@ -13,6 +13,11 @@ button.wp-block-navigation-item__content {
 	color: currentColor;
 	font-size: inherit;
 	font-family: inherit;
+	line-height: inherit;
+
+	// Buttons default to center alignment. This becomes visible
+	// when a menu item label is long enough to wrap.
+	text-align: left;
 }
 
 .wp-block-navigation-submenu__toggle {

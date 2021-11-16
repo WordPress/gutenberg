@@ -89,6 +89,8 @@ class WP_Theme_JSON_Gutenberg {
 		),
 		'color'      => array(
 			'background'     => null,
+			'corePalette'    => null,
+			'coreGradients'  => null,
 			'custom'         => null,
 			'customDuotone'  => null,
 			'customGradient' => null,
@@ -299,7 +301,7 @@ class WP_Theme_JSON_Gutenberg {
 				$path   = array_merge( $node['path'], $preset_metadata['path'] );
 				$preset = _wp_array_get( $this->theme_json, $path, null );
 				if ( null !== $preset ) {
-					gutenberg_experimental_set( $this->theme_json, $path, array( $origin => $preset ) );
+					_wp_array_set( $this->theme_json, $path, array( $origin => $preset ) );
 				}
 			}
 		}
@@ -704,7 +706,7 @@ class WP_Theme_JSON_Gutenberg {
 				continue;
 			}
 			foreach ( $preset_per_origin[ $origin ] as $preset ) {
-				$slug = gutenberg_experimental_to_kebab_case( $preset['slug'] );
+				$slug = _wp_to_kebab_case( $preset['slug'] );
 
 				$value = '';
 				if ( isset( $preset_metadata['value_key'] ) ) {
@@ -745,7 +747,7 @@ class WP_Theme_JSON_Gutenberg {
 				continue;
 			}
 			foreach ( $preset_per_origin[ $origin ] as $preset ) {
-				$slug = gutenberg_experimental_to_kebab_case( $preset['slug'] );
+				$slug = _wp_to_kebab_case( $preset['slug'] );
 
 				// Use the array as a set so we don't get duplicates.
 				$result[ $slug ] = $slug;
@@ -1315,7 +1317,7 @@ class WP_Theme_JSON_Gutenberg {
 				$path = array_merge( $metadata['path'], $property_path );
 				$node = _wp_array_get( $incoming_data, $path, null );
 				if ( isset( $node ) ) {
-					gutenberg_experimental_set( $this->theme_json, $path, $node );
+					_wp_array_set( $this->theme_json, $path, $node );
 				}
 			}
 		}
@@ -1369,7 +1371,7 @@ class WP_Theme_JSON_Gutenberg {
 			}
 
 			if ( ! empty( $escaped_preset ) ) {
-				gutenberg_experimental_set( $output, $preset_metadata['path'], $escaped_preset );
+				_wp_array_set( $output, $preset_metadata['path'], $escaped_preset );
 			}
 		}
 
@@ -1396,7 +1398,7 @@ class WP_Theme_JSON_Gutenberg {
 				// double up shorthand and longhand styles.
 				$value = _wp_array_get( $input, $path, array() );
 				if ( ! is_array( $value ) ) {
-					gutenberg_experimental_set( $output, $path, $value );
+					_wp_array_set( $output, $path, $value );
 				}
 			}
 		}
@@ -1442,7 +1444,7 @@ class WP_Theme_JSON_Gutenberg {
 
 			$output = self::remove_insecure_styles( $input );
 			if ( ! empty( $output ) ) {
-				gutenberg_experimental_set( $sanitized, $metadata['path'], $output );
+				_wp_array_set( $sanitized, $metadata['path'], $output );
 			}
 		}
 
@@ -1455,7 +1457,7 @@ class WP_Theme_JSON_Gutenberg {
 
 			$output = self::remove_insecure_settings( $input );
 			if ( ! empty( $output ) ) {
-				gutenberg_experimental_set( $sanitized, $metadata['path'], $output );
+				_wp_array_set( $sanitized, $metadata['path'], $output );
 			}
 		}
 

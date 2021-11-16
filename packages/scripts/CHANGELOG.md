@@ -2,6 +2,17 @@
 
 ## Unreleased
 
+## 19.2.0 (2021-11-15)
+
+### New Features
+
+-   Add basic support for TypeScript in `build`, `start`, `test-e2e` and `test-unit-js` commands ([#36260](https://github.com/WordPress/gutenberg/pull/36260)).
+
+### Enhancements
+
+-   The bundled `browserslist` dependency has been updated from requiring `^4.16.6` to requiring `^4.17.6` ([#36244](https://github.com/WordPress/gutenberg/pull/36244)).
+-   Updated the default ESLint config to work correctly with the latest version of `@wordpress/eslint-plugin` ([#36244](https://github.com/WordPress/gutenberg/pull/36244)).
+
 ## 19.1.0 (2021-11-07)
 
 ### Enhancements
