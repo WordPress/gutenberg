@@ -436,7 +436,7 @@ export const WithConditionallyRenderedControl = () => {
 			<PanelWrapperView>
 				<Panel>
 					<ToolsPanel
-						label="Tools Panel With Conditional Default via SlotFill"
+						label="Tools Panel With Conditionally Rendered Item via SlotFill"
 						resetAll={ resetAll }
 						panelId={ panelId }
 					>
