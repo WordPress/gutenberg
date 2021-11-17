@@ -4,6 +4,7 @@
 import { useEntityProp, store as coreStore } from '@wordpress/core-data';
 import { useSelect, useDispatch } from '@wordpress/data';
 import {
+	MenuItem,
 	ToggleControl,
 	PanelBody,
 	Placeholder,
@@ -168,7 +169,11 @@ function PostFeaturedImageDisplay( {
 						accept="image/*"
 						onSelect={ onSelectImage }
 						onError={ onUploadError }
-					/>
+					>
+						<MenuItem onClick={ () => setFeaturedImage( 0 ) }>
+							{ __( 'Reset' ) }
+						</MenuItem>
+					</MediaReplaceFlow>
 				</BlockControls>
 			) }
 			<figure { ...blockProps }>{ image }</figure>
