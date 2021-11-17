@@ -1,8 +1,8 @@
 /**
  * WordPress dependencies
  */
-import { store as blockEditorStore } from '@wordpress/block-editor';
-import { useSelect } from '@wordpress/data';
+import { compose } from '@wordpress/compose';
+import { withNotices } from '@wordpress/components';
 
 /**
  * Internal dependencies
@@ -16,28 +16,12 @@ import { isGalleryV2Enabled } from './shared';
  * or the refactored version with InnerBlocks. This is to prevent conditional
  * use of hooks lint errors if adding this logic to the top of the edit component.
  */
-export default function GalleryEditWrapper( props ) {
-	const { attributes, clientId } = props;
-
-	const innerBlockImages = useSelect(
-		( select ) => {
-			return select( blockEditorStore ).getBlock( clientId )?.innerBlocks;
-		},
-		[ clientId ]
-	);
-
-	// This logic is used to infer version information from content with higher
-	// precedence than the flag. New galleries (and existing empty galleries) will
-	// honor the flag.
-	const hasNewVersionContent = !! innerBlockImages?.length;
-	const hasOldVersionContent =
-		0 < attributes?.ids?.length || 0 < attributes?.images?.length;
-	if (
-		hasOldVersionContent ||
-		( ! hasNewVersionContent && ! isGalleryV2Enabled() )
-	) {
+function GalleryEditWrapper( props ) {
+	if ( ! isGalleryV2Enabled() ) {
 		return <EditWithoutInnerBlocks { ...props } />;
 	}
 
 	return <EditWithInnerBlocks { ...props } />;
 }
+
+export default compose( [ withNotices ] )( GalleryEditWrapper );
