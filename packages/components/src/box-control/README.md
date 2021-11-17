@@ -140,7 +140,7 @@ A callback function when an input value changes.
 A callback function for visualizer changes, based on input hover interactions.
 
 -   Type: `Function`
--   Required: Yes
+-   Required: No
 
 ### resetValues
 

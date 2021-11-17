@@ -124,26 +124,12 @@ export function MarginEdit( props ) {
 		} );
 	};
 
-	const onChangeShowVisualizer = ( next ) => {
-		const newStyle = {
-			...style,
-			visualizers: {
-				margin: next,
-			},
-		};
-
-		setAttributes( {
-			style: cleanEmptyObject( newStyle ),
-		} );
-	};
-
 	return Platform.select( {
 		web: (
 			<>
 				<BoxControl
 					values={ style?.spacing?.margin }
 					onChange={ onChange }
-					onChangeShowVisualizer={ onChangeShowVisualizer }
 					label={ __( 'Margin' ) }
 					sides={ sides }
 					units={ units }

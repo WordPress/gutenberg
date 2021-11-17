@@ -124,26 +124,12 @@ export function PaddingEdit( props ) {
 		} );
 	};
 
-	const onChangeShowVisualizer = ( next ) => {
-		const newStyle = {
-			...style,
-			visualizers: {
-				padding: next,
-			},
-		};
-
-		setAttributes( {
-			style: cleanEmptyObject( newStyle ),
-		} );
-	};
-
 	return Platform.select( {
 		web: (
 			<>
 				<BoxControl
 					values={ style?.spacing?.padding }
 					onChange={ onChange }
-					onChangeShowVisualizer={ onChangeShowVisualizer }
 					label={ __( 'Padding' ) }
 					sides={ sides }
 					units={ units }
